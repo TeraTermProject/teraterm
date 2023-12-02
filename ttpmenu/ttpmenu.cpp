@@ -35,6 +35,7 @@
 #define _CRTDBG_MAP_ALLOC
 #include	<stdlib.h>
 #include	<crtdbg.h>
+#include	<assert.h>
 
 #include	"ttpmenu.h"
 #include	"ttpmenu-version.h"
@@ -1077,15 +1078,13 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 {
 	wchar_t	szName[MAX_PATH];
 	wchar_t	szDefault[MAX_PATH] = DEFAULT_PATH;
-
 	wchar_t	szDirectory[MAX_PATH];
 	wchar_t	szHostName[MAX_PATH];
-	wchar_t	szTempPath[MAX_PATH];
-	// https://learn.microsoft.com/en-us/troubleshoot/windows-client/shell-experience/command-line-string-limitation
-	wchar_t	szArgment[8192] = L"";
-	wchar_t	szTemp[8192];
+	wchar_t	szMacroFile[MAX_PATH];
+	bool MacroFileCreated = false;
+	wchar_t	*szArgment = NULL;
+	wchar_t	*szTemp;
 	wchar_t	*pHostName;
-	wchar_t	*pt;
 	JobInfo	jobInfo;
 
 	DWORD	dwErr;
@@ -1113,18 +1112,20 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	if ((pHostName = _wcstok(szHostName, L" ([{'\"|*")) != NULL)
 		pHostName = szHostName;
 
+	szArgment = wcsdup(L"");
+
 	if (jobInfo.dwMode != MODE_DIRECT)
 		if (wcslen(jobInfo.szInitFile) != 0) {
-			_snwprintf_s(szTemp, _countof(szTemp),  _TRUNCATE, L"/F=\"%s\"", jobInfo.szInitFile);
-			wcsncat_s(szArgment, _countof(szArgment), szTemp, _TRUNCATE);
+			aswprintf(&szTemp, L"/F=\"%s\"", jobInfo.szInitFile);
+			awcscat(&szArgment, szTemp);
+			free(szTemp);
 		}
 
-
-	// SSH自動ログインの場合はマクロは不要
-	if (jobInfo.bTtssh != TRUE) {
-		wchar_t	szMacroFile[MAX_PATH];
-		switch (jobInfo.dwMode) {
-		case MODE_AUTOLOGIN:
+	switch (jobInfo.dwMode) {
+	case MODE_AUTOLOGIN:
+		if (jobInfo.bTtssh != TRUE) {
+			// TTSSHを使用しない, 自動ログインマクロを生成、使用する
+			wchar_t	szTempPath[MAX_PATH];
 			::GetTempPathW(MAX_PATH, szTempPath);
 			::GetTempFileNameW(szTempPath, L"ttm", 0, szMacroFile);
 			if (MakeTTL(szMacroFile, &jobInfo) == FALSE) {
@@ -1134,76 +1135,82 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 				ErrorMessage(hWnd, dwErr, uimsg);
 				return FALSE;
 			}
-			break;
-		case MODE_MACRO:
-			wcscpy(szMacroFile, jobInfo.szMacroFile);
-			break;
-		}
-		if (jobInfo.dwMode != MODE_DIRECT) {
-			_snwprintf_s(szTemp, _countof(szTemp), _TRUNCATE, L" /M=\"%s\"", szMacroFile);
-			wcsncat_s(szArgment, _countof(szArgment), szTemp, _TRUNCATE);
-		}
-	}
+			MacroFileCreated = true;
+			wchar_t *m_option;
+			aswprintf(&m_option, L" /M=\"%s\"", szMacroFile);
+			awcscat(&szArgment, m_option);
+			free(m_option);
 
-	if (wcslen(jobInfo.szOption) != 0) {
-		_snwprintf_s(szTemp, _countof(szTemp), _TRUNCATE, L" %s", jobInfo.szOption);
-		wcsncat_s(szArgment, _countof(szArgment), szTemp, _TRUNCATE);
-	}
-
-	// TTSSHが有効の場合は、自動ログインのためのコマンドラインを付加する。
-	if (jobInfo.dwMode == MODE_AUTOLOGIN) {
-		if (jobInfo.bTtssh == TRUE) {
+			// SSHを使わない場合、/nossh オプションを付けておく。
+			awcscat(&szArgment, L" /nossh");
+		}
+		else {
+			// TTSSHが有効の場合は、自動ログインのためのコマンドラインを付加する。
 			wchar_t passwd[MAX_PATH], keyfile[MAX_PATH];
 
-			wcsncpy_s(szTemp, _countof(szTemp), szArgment, _TRUNCATE);
 			wchar_t *szPasswordW = ToWcharA(jobInfo.szPassword);
 			dquote_string(szPasswordW, passwd, _countof(passwd));
 			free(szPasswordW);
 			dquote_string(jobInfo.PrivateKeyFile, keyfile, _countof(keyfile));
 
+			wchar_t *options;
 			if (jobInfo.bChallenge) { // keyboard-interactive
-				_snwprintf_s(szArgment, _countof(szArgment), _TRUNCATE,
+				aswprintf(&options,
 					L"%s:22 /ssh /auth=challenge /user=%s /passwd=%s %s", 
 					jobInfo.szHostName,
 					jobInfo.szUsername,
 					passwd,
-					szTemp
+					szArgment
 					);
 
 			} else if (jobInfo.bPageant) { // Pageant
-				_snwprintf_s(szArgment, _countof(szArgment), _TRUNCATE,
+				aswprintf(&options,
 					L"%s:22 /ssh /auth=pageant /user=%s %s", 
 					jobInfo.szHostName,
 					jobInfo.szUsername,
-					szTemp
+					szArgment
 					);
 
 			}
 			else if (jobInfo.PrivateKeyFile[0] == L'\0') {  // password authentication
-				_snwprintf_s(szArgment, _countof(szArgment), _TRUNCATE,
+				aswprintf(&options,
 					L"%s:22 /ssh /auth=password /user=%s /passwd=%s %s", 
 					jobInfo.szHostName,
 					jobInfo.szUsername,
 					passwd,
-					szTemp
+					szArgment
 					);
 
 			} else { // publickey
-				_snwprintf_s(szArgment, _countof(szArgment), _TRUNCATE,
+				aswprintf(&options,
 					L"%s:22 /ssh /auth=publickey /user=%s /passwd=%s /keyfile=%s %s", 
 					jobInfo.szHostName,
 					jobInfo.szUsername,
 					passwd,
 					keyfile,
-					szTemp
+					szArgment
 					);
-
 			}
-
-		} else {
-			// SSHを使わない場合、/nossh オプションを付けておく。
-			wcsncpy_s(szArgment, _countof(szArgment), L" /nossh", _TRUNCATE);
+			free(szArgment);
+			szArgment = options;
 		}
+		break;
+	case MODE_MACRO:
+		aswprintf(&szTemp, L" /M=\"%s\"", jobInfo.szMacroFile);
+		awcscat(&szArgment, szTemp);
+		free(szTemp);
+		break;
+	case MODE_DIRECT:
+		break;
+	default:
+		assert(FALSE);
+		break;
+	}
+
+	if (wcslen(jobInfo.szOption) != 0) {
+		aswprintf(&szTemp, L" %s", jobInfo.szOption);
+		awcscat(&szArgment, szTemp);
+		free(szTemp);
 	}
 
 	// フルパス化する
@@ -1211,10 +1218,14 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	wcscpy_s(jobInfo.szTeraTerm, exe_fullpath);
 	free(exe_fullpath);
 
+	// 実行するプログラムのカレントパス
+	//   プログラムのあるフォルダ
 	wcscpy(szDirectory, jobInfo.szTeraTerm);
-	if ((::GetFileAttributesW(jobInfo.szTeraTerm) & FILE_ATTRIBUTE_DIRECTORY) == 0)
-		if ((pt = wcsrchr(szDirectory, '\\')) != NULL)
+	if ((::GetFileAttributesW(jobInfo.szTeraTerm) & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+		wchar_t	*pt = wcsrchr(szDirectory, '\\');
+		if (pt != NULL)
 			*pt	= '\0';
+	}
 
 	SHELLEXECUTEINFOW	ExecInfo;
 	memset((void *) &ExecInfo, 0, sizeof(ExecInfo));
@@ -1233,8 +1244,13 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 		UTIL_get_lang_msgW("MSG_ERROR_LAUNCH", uimsg, _countof(uimsg),
 						   L"Launching the application was failure.\n", UILanguageFileW);
 		ErrorMessage(hWnd, dwErr, uimsg);
-		::DeleteFileW(szTempPath);
+		if (MacroFileCreated) {
+			::DeleteFileW(szMacroFile);
+		}
 	}
+
+	free(szArgment);
+	szArgment = NULL;
 
 	if (wcslen(jobInfo.szLog) != 0) {
 		Sleep(500);
@@ -1500,6 +1516,7 @@ BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 	char	szEncodePassword[MAX_PATH];
 	DWORD	dwSize = MAX_PATH;
 	JobInfo jobInfo;
+	DWORD dword_tmp;
 
 	memset(&jobInfo, 0, sizeof(JobInfo));
 
@@ -1510,7 +1527,8 @@ BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 	wcscpy(jobInfo.szName, szName);
 
 	RegGetStr(hKey, KEY_HOSTNAME, jobInfo.szHostName, MAX_PATH);
-	RegGetDword(hKey, KEY_MODE, &(jobInfo.dwMode));
+	RegGetDword(hKey, KEY_MODE, &dword_tmp);
+	jobInfo.dwMode = (JobMode)dword_tmp;
 
 	RegGetDword(hKey, KEY_USERFLAG, (DWORD *) &(jobInfo.bUsername));
 	RegGetStr(hKey, KEY_USERNAME, jobInfo.szUsername, MAX_PATH);
@@ -1936,6 +1954,10 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		return TRUE;
 	case BUTTON_ETC:
 		::GetDlgItemTextW(hWnd, EDIT_ENTRY, g_JobInfo.szName, MAX_PATH);
+
+		// TODO
+		// 	実行ファイル名に L"ttermpro.exe" か含まれていると ttsshチェックを入れるしょり
+		//	必要?
 		g_JobInfo.bTtssh	= ::IsDlgButtonChecked(hWnd, CHECK_TTSSH);
 		if (TTDialogBox(g_hI, MAKEINTRESOURCE(DIALOG_ETC), hWnd, DlgCallBack_Etc) == TRUE) {
 			::CheckDlgButton(hWnd, CHECK_TTSSH, 0);

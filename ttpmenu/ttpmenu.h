@@ -34,10 +34,6 @@
 #define		MODE_SMALLICON			0x0000
 #define		MODE_LARGEICON			0x0001
 
-#define		MODE_AUTOLOGIN			0x0000
-#define		MODE_MACRO				0x0001
-#define		MODE_DIRECT				0x0002
-
 // レジストリの値名（一般設定）
 #define		KEY_ICONMODE			L"IconMode"
 #define		KEY_LEFTBUTTONPOPUP		L"LeftButtonPopup"
@@ -83,12 +79,18 @@
 #define		STR_HOTKEY				L"showing list hotkey(Ctl+Alt+M)"
 #define		STR_NOENTRY				L"(none)"
 
+typedef enum {
+	MODE_AUTOLOGIN	=		0x0000,		// 自動でログイン,sshではないときマクロを使用する
+	MODE_MACRO		=		0x0001,		// 指定マクロを起動する
+	MODE_DIRECT		=		0x0002,		
+} JobMode;
+
 // 設定情報構造体
 struct JobInfo {
 	wchar_t	szName[MAX_PATH];			// ジョブ名
 	BOOL	bStartup;					// 起動時にジョブを実行するかどうかのフラグ
 	BOOL	bTtssh;						// ttsshを使用するかどうかのフラグ
-	DWORD	dwMode;						// ジョブの種類
+	JobMode	dwMode;						// ジョブの種類
 
 	// 自動ログイン用設定
 	wchar_t	szHostName[MAX_PATH];		// ホスト名
