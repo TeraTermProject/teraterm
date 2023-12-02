@@ -80,6 +80,27 @@ static wchar_t* _wcstok(wchar_t *strToken, const wchar_t *strDelimit)
 }
 #endif
 
+/**
+ *	フルパス化する
+ *	相対パスの時は ttpmenu.exe のあるフォルダからのフルパスとなる
+ *
+ *	@param[in]	filename フルパス化するファイル名
+ *	@return		フルパス化されたファイル名
+ *				不要になったら free()すること
+ */
+static wchar_t *GetFullPath(const wchar_t *filename)
+{
+#if 0
+	wchar_t *exe_fullpath = hGetModuleFileNameW(NULL);
+	wchar_t *exe_dir = ExtractDirNameW(module_fullpath);
+	free(exe_fullpath);
+#endif
+	wchar_t *exe_dir = GetExeDirW(NULL);
+	wchar_t *fullpath = GetFullPathW(exe_dir, filename);
+	free(exe_dir);
+	return fullpath;
+}
+
 /* ==========================================================================
 	Function Name	: (BOOL) ExecStartup()
 	Outline			: スタートアップ設定のジョブを実行する。
@@ -787,6 +808,21 @@ BOOL InitVersionDlg(HWND hWnd)
 	}
 	SetDlgItemTextA(hWnd, IDC_VERSION, buf);
 
+	BOOL use_ini;
+	wchar_t *inifile;
+	RegGetStatus(&use_ini, &inifile);
+	wchar_t *setting;
+	if (!use_ini) {
+		aswprintf(&setting, L"use registory");
+	}
+	else {
+		aswprintf(&setting, L"use ini file\r\n%s", inifile);
+	}
+	free(inifile);
+
+	SetDlgItemTextW(hWnd, IDC_SETTINGS, setting);
+	free(setting);
+
 	return TRUE;
 }
 
@@ -1051,7 +1087,6 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	wchar_t	*pHostName;
 	wchar_t	*pt;
 	JobInfo	jobInfo;
-	wchar_t	cur[MAX_PATH], modulePath[MAX_PATH], fullpath[MAX_PATH];
 
 	DWORD	dwErr;
 	wchar_t uimsg[MAX_UIMSG];
@@ -1172,14 +1207,9 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	}
 
 	// フルパス化する
-	GetCurrentDirectoryW(_countof(cur), cur);
-	GetModuleFileNameW(NULL, modulePath, _countof(modulePath));
-	wchar_t *p = ExtractDirNameW(modulePath);
-	wcscpy(modulePath, p);
-	free(p);
-	SetCurrentDirectoryW(modulePath);
-	_wfullpath(fullpath, jobInfo.szTeraTerm, _countof(fullpath));
-	wcscpy(jobInfo.szTeraTerm, fullpath);
+	wchar_t *exe_fullpath = GetFullPath(jobInfo.szTeraTerm);
+	wcscpy_s(jobInfo.szTeraTerm, exe_fullpath);
+	free(exe_fullpath);
 
 	wcscpy(szDirectory, jobInfo.szTeraTerm);
 	if ((::GetFileAttributesW(jobInfo.szTeraTerm) & FILE_ATTRIBUTE_DIRECTORY) == 0)
@@ -1212,8 +1242,6 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 		if (hLog != NULL)
 			ShowWindow(hLog, SW_HIDE);
 	}
-
-	SetCurrentDirectoryW(cur);
 
 	return TRUE;
 }
@@ -1559,7 +1587,6 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	wchar_t	szName[MAX_PATH];
 	DWORD	dwErr;
 	wchar_t	uimsg[MAX_UIMSG];
-	wchar_t	cur[MAX_PATH], modulePath[MAX_PATH];
 
 	if (::GetDlgItemTextW(hWnd, EDIT_ENTRY, g_JobInfo.szName, MAX_PATH) == 0) {
 		UTIL_get_lang_msgW("MSG_ERROR_NOREGNAME", uimsg, _countof(uimsg),
@@ -1611,20 +1638,16 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 		::GetProfileStringW(L"Tera Term Pro", L"Path", szDefault, szTTermPath, MAX_PATH);
 		swprintf_s(g_JobInfo.szTeraTerm, L"%s\\%s", szTTermPath, TERATERM);
 	}
-	
-	GetCurrentDirectoryW(_countof(cur), cur);
-	GetModuleFileNameW(NULL, modulePath, _countof(modulePath));
-	wchar_t *p = ExtractDirNameW(modulePath);
-	wcscpy(modulePath, p);
-	free(p);
-	SetCurrentDirectoryW(modulePath);
-	if (::GetFileAttributesW(g_JobInfo.szTeraTerm) == INVALID_FILE_ATTRIBUTES) {
+
+	wchar_t *exe_fullpath = GetFullPath(g_JobInfo.szTeraTerm);
+	DWORD e = GetFileAttributesW(exe_fullpath);
+	free(exe_fullpath);
+	if (e == INVALID_FILE_ATTRIBUTES) {
 		dwErr = ::GetLastError();
 		if (dwErr == ERROR_FILE_NOT_FOUND || dwErr == ERROR_PATH_NOT_FOUND) {
 			UTIL_get_lang_msgW("MSG_ERROR_CHECKFILE", uimsg, _countof(uimsg),
 							   L"checking [%s] file was failure.\n", UILanguageFileW);
 			ErrorMessage(hWnd, dwErr, uimsg, g_JobInfo.szTeraTerm);
-			SetCurrentDirectoryW(cur);
 			return FALSE;
 		}
 	}
@@ -1642,7 +1665,6 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 		UTIL_get_lang_msgW("MSG_ERROR_SAVEREG", uimsg, _countof(uimsg),
 						   L"error: couldn't save to registry.\n", UILanguageFileW);
 		ErrorMessage(hWnd, dwErr, uimsg);
-		SetCurrentDirectoryW(cur);
 		return FALSE;
 	}
 
@@ -1655,8 +1677,6 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 		if (_wcsicmp(g_JobInfo.szName, szName) == 0)
 			break;
 	}
-
-	SetCurrentDirectoryW(cur);
 
 	return TRUE;
 }
@@ -2512,6 +2532,11 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 		}
 	}
 
+	// ttpmenu.exe のあるフォルダをカレントディレクトに変更する
+	wchar_t *exe_dir = GetExeDirW(NULL);
+	SetCurrentDirectoryW(exe_dir);
+	free(exe_dir);
+
 	SetupFNameW = GetDefaultSetupFNameW(NULL);
 	SetDPIAwareness(SetupFNameW);
 	GetUILanguageFile();
@@ -2519,7 +2544,9 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 	SetDialogFont(//L"Tahoma", 8, 0,
 				  NULL, 0, 0,
 				  UILanguageFileW, "TTMenu", "DLG_TAHOMA_FONT");
-	checkIniFile();		//INIファイル/レジストリ切替
+
+	// 設定ファイル初期化 (INIファイル/レジストリ切替)
+	RegInit();
 
 	g_hI			= hI;
 
@@ -2574,5 +2601,6 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 
 	free(UILanguageFileW);
 	free(SetupFNameW);
+	RegExit();
 	return TRUE;
 }

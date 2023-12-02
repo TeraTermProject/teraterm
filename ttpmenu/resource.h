@@ -61,6 +61,7 @@
 #define GRP_PROMPT                      1057
 #define IDC_CHALLENGE_CHECK             1058
 #define IDC_PAGEANT_CHECK               1059
+#define IDC_SETTINGS                    1060
 #define ID_TMENU_ADD                    40020
 #define ID_TMENU_CLOSE                  40021
 #define ID_VERSION                      40031
@@ -78,7 +79,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        116
 #define _APS_NEXT_COMMAND_VALUE         40043
-#define _APS_NEXT_CONTROL_VALUE         1059
+#define _APS_NEXT_CONTROL_VALUE         1061
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

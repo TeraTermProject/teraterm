@@ -30,13 +30,23 @@
 //保存先にiniファイルを使用したい場合は、0バイトのファイルでよいのでttpmenu.exeと同じフォルダにttpmenu.iniを用意する
 #define		STRICT
 #include	"registry.h"
-#include	"stdio.h"
-#include	"wchar.h"
+#include	<stdio.h>
+#define		_CRTDBG_MAP_ALLOC
+#include	<stdlib.h>
+#include	<crtdbg.h>
+#include	<wchar.h>
+#include	<assert.h>
+
+#include	"ttlib.h"
+#include	"asprintf.h"
+#include	"fileread.h"
+
+#define ENABLE_CONVERT_OLD_INI 1
 
 static BOOL bUseINI = FALSE;					// 保存先(TRUE=INI, FALSE=レジストリ)
 static wchar_t szSectionName[MAX_PATH];			// INIのセクション名
 static wchar_t szSectionNames[1024*10]={0};	// INIのセクション名一覧
-static wchar_t szApplicationName[MAX_PATH]={0};	// INIファイルのフルパス
+static wchar_t *szApplicationName;				// INIファイルのフルパス
 
 static BOOL getSection(const wchar_t *str)
 {
@@ -47,25 +57,120 @@ static BOOL getSection(const wchar_t *str)
 	}else{
 		t = str;
 	}
-	wcscpy(szSectionName, t);
+	wcscpy_s(szSectionName, t);
 	return TRUE;
 }
 
-static wchar_t *getModuleName()
+/**
+ *	INIファイルのフルパス取得
+ */
+static const wchar_t *getModuleName()
 {
-	if(*szApplicationName == 0){
-		GetModuleFileNameW(NULL, szApplicationName, _countof(szApplicationName));
-		wchar_t *t = szApplicationName + wcslen(szApplicationName) - 3;
-		wcscpy(t, L"ini");
-	}
+	assert(szApplicationName != NULL);
 	return szApplicationName;
 }
 
-//exeと同じフォルダにiniファイルが存在すればiniを使用、その他の場合はレジストリを使用
-void checkIniFile()
+/**
+ *	古い(exeと同じパスにある)iniファイルを
+ *	Unicode iniファイルに変換して
+ *	%APPDATA%\teraterm5\ttpmenu.ini にコピーする
+ */
+#if ENABLE_CONVERT_OLD_INI
+static void ConvertIniFile(void)
 {
-	DWORD dwAttr = ::GetFileAttributesW(getModuleName());
-	bUseINI = dwAttr != INVALID_FILE_ATTRIBUTES;
+	if (IsPortableMode()) {
+		// コピー不要
+		// ポータブル版の時はexeと同じフォルダのiniを使用する
+		return;
+	}
+
+	wchar_t *old_ini;
+	wchar_t *exe_dir = GetExeDirW(NULL);
+	aswprintf(&old_ini, L"%s\\ttpmenu.ini", exe_dir);
+	free(exe_dir);
+	if (::GetFileAttributesW(old_ini) == INVALID_FILE_ATTRIBUTES) {
+		// 存在しないのでコピーしない
+		free(old_ini);
+		return;
+	}
+
+	wchar_t *ini;
+	wchar_t *home_dir = GetHomeDirW(NULL);
+	aswprintf(&ini, L"%s\\ttpmenu.ini", home_dir);
+	free(home_dir);
+	if (::GetFileAttributesW(ini) != INVALID_FILE_ATTRIBUTES) {
+		// ファイルあり、コピーしない
+		free(old_ini);
+		free(ini);
+		return;
+	}
+
+	size_t content_len = 0;
+	wchar_t *old_ini_content = LoadFileWW(old_ini, &content_len);
+	if (old_ini_content != NULL) {
+		// write unicode ini
+		FILE *fp;
+		_wfopen_s(&fp, ini, L"wb");
+		if (fp != NULL) {
+			fwrite("\xff\xfe", 2, 1, fp);
+			fwrite(old_ini_content, content_len, sizeof(wchar_t), fp);
+			fclose(fp);
+		}
+		free(old_ini_content);
+	}
+	free(old_ini);
+	free(ini);
+}
+#endif
+
+void RegInit()
+{
+#if ENABLE_CONVERT_OLD_INI
+	ConvertIniFile();
+#endif
+
+	wchar_t *ini;
+
+	// 設定ファイルフォルダに"ttpmenu.ini" がある?
+	wchar_t *home_dir = GetHomeDirW(NULL);
+	aswprintf(&ini, L"%s\\ttpmenu.ini", home_dir);
+	free(home_dir);
+	if (::GetFileAttributesW(ini) != INVALID_FILE_ATTRIBUTES) {
+		// ファイルあり, ttpmenu.iniを使用する
+		szApplicationName = ini;
+		bUseINI = TRUE;
+		return;
+	}
+
+	// レジストリを使用する
+	free(ini);
+	szApplicationName = NULL;
+	bUseINI = FALSE;
+}
+
+void RegExit()
+{
+	free(szApplicationName);
+	szApplicationName = NULL;
+}
+
+/**
+ *	設定の状況
+ *
+ *	@param[out]	use_ini		TRUE/FALSE = iniファイル/ registry を使用している
+ *	@param[out]	inifile		iniファイル名, registryの場合は NULL
+ *							不要になったらfree()すること
+ *
+ */
+void RegGetStatus(BOOL *use_ini, wchar_t **inifile)
+{
+	*use_ini = bUseINI;
+	if (bUseINI) {
+		*inifile = wcsdup(szApplicationName);
+	}
+	else {
+		*inifile = NULL;
+	}
 }
 
 /* ==========================================================================
@@ -270,7 +375,7 @@ BOOL RegSetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD dwValue)
 {
 	if(bUseINI){
 		wchar_t t[64];
-		_swprintf(t, L"%d", dwValue);
+		swprintf_s(t, L"%d", dwValue);
 		return WritePrivateProfileStringW(szSectionName, lpszValueName, t, getModuleName());
 	}else{
 		long	lError;
@@ -358,8 +463,8 @@ BOOL RegSetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, DWORD dwSi
 		LPBYTE s = (LPBYTE)buf;
 		for(DWORD i=0; i<dwSize; i++){
 			wchar_t c[4];
-			_swprintf(c, L"%02X ", s[i]);
-			wcscat(t, c);
+			swprintf_s(c, L"%02X ", s[i]);
+			wcscat_s(t, c);
 		}
 		BOOL ret =  WritePrivateProfileStringW(szSectionName, lpszValueName, t, getModuleName());
 		return ret;

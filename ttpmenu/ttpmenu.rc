@@ -9,7 +9,6 @@
 //
 #include <winresrc.h>
 #define IDC_STATIC -1
-
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -152,7 +151,7 @@ BEGIN
     GROUPBOX        "Prompt",GRP_PROMPT,12,112,188,32
 END
 
-DIALOG_VERSION DIALOGEX 0, 0, 169, 89
+DIALOG_VERSION DIALOGEX 0, 0, 169, 120
 STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Version Information"
 FONT 8, "Tahoma", 0, 0, 0x0
@@ -161,7 +160,8 @@ BEGIN
     CTEXT           "Version %d.%02d",IDC_VERSION,7,27,156,10
     LTEXT           "Copyright(C) 1997-2003 S.Hayakawa\r\n(C) 2004-2023 TeraTerm Project",IDC_COPYRIGHT,26,42,137,18
     ICON            "",IDC_TTPMENU_ICON,4,8,20,20
-    DEFPUSHBUTTON   "OK",IDOK,61,69,44,14
+    DEFPUSHBUTTON   "OK",IDOK,61,99,44,14
+    EDITTEXT        IDC_SETTINGS,22,61,126,36,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY
 END
 
 
@@ -194,15 +194,22 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 163
         TOPMARGIN, 7
-        BOTTOMMARGIN, 85
+        BOTTOMMARGIN, 116
     END
 END
 #endif    // APSTUDIO_INVOKED
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+1                       RT_MANIFEST             "ttpmenu.manifest"
+
 #endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
-1 RT_MANIFEST ttpmenu.manifest
 
 
 #ifndef APSTUDIO_INVOKED
