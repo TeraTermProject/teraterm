@@ -11,18 +11,18 @@
 	======================================================================== */
 #include	<windows.h>
 
-HKEY	RegCreate(HKEY hCurrentKey, LPCTSTR lpszKeyName);
-HKEY	RegOpen(HKEY hCurrentKey, LPCTSTR lpszKeyName);
+HKEY	RegCreate(HKEY hCurrentKey, const wchar_t *lpszKeyName);
+HKEY	RegOpen(HKEY hCurrentKey, const wchar_t *lpszKeyName);
 BOOL	RegClose(HKEY hKey);
-BOOL	RegSetStr(HKEY hKey, LPCTSTR lpszValueName, TCHAR *buf);
-BOOL	RegGetStr(HKEY hKey, LPCTSTR lpszValueName, TCHAR *buf, DWORD dwSize);
-BOOL	RegSetDword(HKEY hKey, LPCTSTR lpszValueName, DWORD dwvalue);
-BOOL	RegGetDword(HKEY hKey, LPCTSTR lpszValueName, DWORD *dwValue);
-BOOL	RegSetBinary(HKEY hKey, LPCTSTR lpszValueName, void *buf, DWORD dwSize);
-BOOL	RegGetBinary(HKEY hKey, LPCTSTR lpszValueName, void *buf, LPDWORD lpdwSize);
+BOOL	RegSetStr(HKEY hKey, const wchar_t *lpszValueName, const wchar_t *buf);
+BOOL	RegGetStr(HKEY hKey, const wchar_t *lpszValueName, wchar_t *buf, DWORD dwSize);
+BOOL	RegSetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD dwvalue);
+BOOL	RegGetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD *dwValue);
+BOOL	RegSetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, DWORD dwSize);
+BOOL	RegGetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, LPDWORD lpdwSize);
 
-LONG RegEnumEx(HKEY hKey, DWORD dwIndex, LPTSTR lpName, LPDWORD lpcName, LPDWORD lpReserved, LPTSTR lpClass, LPDWORD lpcClass, PFILETIME lpftLastWriteTime);
-LONG RegDelete(HKEY hKey, LPCTSTR lpSubKey);
+LONG RegEnumEx(HKEY hKey, DWORD dwIndex, wchar_t *lpName, LPDWORD lpcName, LPDWORD lpReserved, wchar_t *lpClass, LPDWORD lpcClass, PFILETIME lpftLastWriteTime);
+LONG RegDelete(HKEY hKey, const wchar_t *lpSubKey);
 
 void checkIniFile();
 

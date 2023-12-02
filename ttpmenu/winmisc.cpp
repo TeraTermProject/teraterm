@@ -28,6 +28,10 @@
  */
 
 #define		STRICT
+
+#include	"codeconv.h"
+#include	"i18n.h"
+
 #include	"winmisc.h"
 
 
@@ -113,8 +117,10 @@ BOOL EnableItem(HWND hWnd, int idControl, BOOL flag)
 /* ==========================================================================
 	Function Name	: (void) EncodePassword()
 	Outline			: パスワードをエンコード(?)する。
-	Arguments		: char		cPassword		(in)	変換する文字列
-					: int		cEncodePassword	(out)	変換された文字列
+					  エンコードされた文字列をデコードする
+					  入出力は文字列またはバイナリとなる
+	Arguments		: const char *cPassword			(in)	変換する文字列
+					: char		 *cEncodePassword	(out)	変換された文字列
 	Return Value	: なし
 	Reference		: 
 	Renewal			: 
@@ -122,7 +128,7 @@ BOOL EnableItem(HWND hWnd, int idControl, BOOL flag)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-void EncodePassword(TCHAR *cPassword, TCHAR *cEncodePassword)
+void EncodePassword(const char *cPassword, char *cEncodePassword)
 {
 	DWORD	dwCnt;
 	DWORD	dwPasswordLength = ::lstrlen(cPassword);
@@ -150,6 +156,7 @@ void EncodePassword(TCHAR *cPassword, TCHAR *cEncodePassword)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
+#if 0
 BOOL SaveFileDlg(HWND hWnd, UINT editCtl, TCHAR *title, TCHAR *filter, TCHAR *defaultDir)
 {
 	TCHAR			*szDirName;
@@ -204,6 +211,7 @@ BOOL SaveFileDlg(HWND hWnd, UINT editCtl, TCHAR *title, TCHAR *filter, TCHAR *de
 
 	return	TRUE;
 }
+#endif
 
 /* ==========================================================================
 	Function Name	: (BOOL) OpenFileDlg()
@@ -222,33 +230,33 @@ BOOL SaveFileDlg(HWND hWnd, UINT editCtl, TCHAR *title, TCHAR *filter, TCHAR *de
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL OpenFileDlg(HWND hWnd, UINT editCtl, TCHAR *title, TCHAR *filter, TCHAR *defaultDir)
+BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *filter, wchar_t *defaultDir)
 {
-	TCHAR			*szDirName;
-	TCHAR			szFile[MAX_PATH] = _T("");
-	TCHAR			szPath[MAX_PATH];
-	OPENFILENAME	ofn;
+	wchar_t			*szDirName;
+	wchar_t			szFile[MAX_PATH] = L"";
+	wchar_t			szPath[MAX_PATH];
+	OPENFILENAMEW	ofn;
 
-	szDirName	= (TCHAR *) malloc(MAX_PATH);
+	szDirName	= (wchar_t *) malloc(MAX_PATH * sizeof(wchar_t));
 
 	if (editCtl != 0xffffffff) {
-		::GetDlgItemText(hWnd, editCtl, szDirName, MAX_PATH);
-		::lstrcpy(szDirName, defaultDir);
+		::GetDlgItemTextW(hWnd, editCtl, szDirName, MAX_PATH);
+		wcscpy(szDirName, defaultDir);
 	}
 
 	if (*szDirName == '"')
 		szDirName++;
-	if (szDirName[::lstrlen(szDirName) - 1] == '"')
-		szDirName[::lstrlen(szDirName) - 1] = '\0';
+	if (szDirName[wcslen(szDirName) - 1] == '"')
+		szDirName[wcslen(szDirName) - 1] = '\0';
 
-	TCHAR *ptr = _tcsrchr(szDirName, '\\');
+	wchar_t *ptr = wcsrchr(szDirName, '\\');
 	if (ptr == NULL) {
-		::lstrcpy(szFile, szDirName);
+		wcscpy(szFile, szDirName);
 		if (defaultDir != NULL && *szDirName == 0)
-			::lstrcpy(szDirName, defaultDir);
+			wcscpy(szDirName, defaultDir);
 	} else {
 		*ptr = 0;
-		::lstrcpy(szFile, ptr + 1);
+		wcscpy(szFile, ptr + 1);
 	}
 
 	memset(&ofn, 0, sizeof(ofn));
@@ -262,15 +270,15 @@ BOOL OpenFileDlg(HWND hWnd, UINT editCtl, TCHAR *title, TCHAR *filter, TCHAR *de
 	ofn.lpstrInitialDir	= szDirName;
 	ofn.Flags			= OFN_HIDEREADONLY | OFN_NODEREFERENCELINKS;
 
-	if (::GetOpenFileName(&ofn) == FALSE) {
+	if (::GetOpenFileNameW(&ofn) == FALSE) {
 		free(szDirName);
 		return	FALSE;
 	}
 
-	::lstrcpy(szPath, ofn.lpstrFile);
+	wcscpy(szPath, ofn.lpstrFile);
 
-	::SetDlgItemText(hWnd, editCtl, szPath);
-	::lstrcpy(defaultDir, szPath);
+	::SetDlgItemTextW(hWnd, editCtl, szPath);
+	wcscpy(defaultDir, szPath);
 
 	free(szDirName);
 
@@ -291,6 +299,7 @@ BOOL OpenFileDlg(HWND hWnd, UINT editCtl, TCHAR *title, TCHAR *filter, TCHAR *de
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
+#if 0
 int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
     switch (uMsg) {
@@ -303,6 +312,7 @@ int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpDa
 
     return 0;
 }
+#endif
 
 /* ==========================================================================
 	Function Name	: (BOOL) GetModulePath()
@@ -317,6 +327,7 @@ int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpDa
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
+#if 0
 BOOL GetModulePath(TCHAR *szPath, DWORD dwMaxPath)
 {
 	TCHAR	*pt;
@@ -329,6 +340,7 @@ BOOL GetModulePath(TCHAR *szPath, DWORD dwMaxPath)
 
 	return TRUE;
 }
+#endif
 
 /* ==========================================================================
 	Function Name	: (UINT) GetResourceType()
@@ -341,6 +353,7 @@ BOOL GetModulePath(TCHAR *szPath, DWORD dwMaxPath)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
+#if 0
 UINT GetResourceType(LPCTSTR lpszPath)
 {
 	UINT	ret;
@@ -358,6 +371,7 @@ UINT GetResourceType(LPCTSTR lpszPath)
 
 	return ret;
 }
+#endif
 
 /* ==========================================================================
 	Function Name	: (char *) pathTok()
@@ -372,6 +386,7 @@ UINT GetResourceType(LPCTSTR lpszPath)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
+#if 0
 TCHAR *PathTok(TCHAR *str, TCHAR *separator)
 {
 	static TCHAR	*sv_str;
@@ -403,17 +418,17 @@ TCHAR *PathTok(TCHAR *str, TCHAR *separator)
 	else
 		return	sv_str = NULL;
 }
+#endif
 
-TCHAR *lstrstri(TCHAR *s1, TCHAR *s2)
+wchar_t* lwcsstri(wchar_t *s1, const wchar_t *s2)
 {
-	DWORD	dwLen1= ::lstrlen(s1);
-	DWORD	dwLen2= ::lstrlen(s2);
+	size_t	dwLen1 = wcslen(s1);
+	size_t	dwLen2 = wcslen(s2);
 
-	for (DWORD dwCnt = 0; dwCnt <= dwLen1; dwCnt++) {
-		// VS2005でビルドエラーとなるため dwCnt2 宣言を追加 (2006.2.18 yutaka)
-		DWORD dwCnt2;
+	for (size_t dwCnt = 0; dwCnt <= dwLen1; dwCnt++) {
+		size_t dwCnt2;
 		for (dwCnt2 = 0; dwCnt2 <= dwLen2; dwCnt2++)
-			if (tolower(s1[dwCnt + dwCnt2]) != tolower(s2[dwCnt2]))
+			if (towlower(s1[dwCnt + dwCnt2]) != towlower(s2[dwCnt2]))
 				break;
 		if (dwCnt2 > dwLen2)
 			return s1 + dwCnt;
@@ -445,6 +460,11 @@ BOOL SetForceForegroundWindow(HWND hWnd)
 void UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
 	GetI18nStr("TTMenu", key, buf, buf_len, def, iniFile);
+}
+
+void UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)
+{
+	GetI18nStrW("TTMenu", key, buf, buf_len, def, iniFile);
 }
 
 int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile)
