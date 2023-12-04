@@ -363,6 +363,7 @@ typedef struct _TInstVar {
 	} recv;
 
 	char *server_sig_algs;
+	BOOL server_strict_kex;
 
 	char UIMsg[MAX_UIMSG];
 } TInstVar;
