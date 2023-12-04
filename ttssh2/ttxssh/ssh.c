@@ -2937,6 +2937,7 @@ void SSH_init(PTInstVar pvar)
 	pvar->use_subsystem = FALSE;
 	pvar->nosession = FALSE;
 	pvar->server_sig_algs = NULL;
+	pvar->server_strict_kex = FALSE;
 
 }
 
@@ -4688,7 +4689,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	if (pvar->kex_status == KEX_FLAG_KEXDONE) {
 		pvar->kex_status = KEX_FLAG_REKEYING;
 
-		// キー再作成時は myproposal から ",ext-info-c" を削除する
+		// キー再作成時は myproposal から ",ext-info-c,kex-strict-c-v00@openssh.com" を削除する
 		// 更新するのは KEX のみでよい
 		SSH2_update_kex_myproposal(pvar);
 
@@ -4750,6 +4751,13 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
 		goto error;
+	}
+
+	// サーバー側がStrict KEXに対応しているかの確認
+	choose_SSH2_proposal(buf, "kex-strict-s-v00@openssh.com", tmp, sizeof(tmp));
+	if (tmp[0] != '\0') {
+		pvar->server_strict_kex = TRUE;
+		logprintf(LOG_LEVEL_INFO, "Server supports strict kex. Strict kex will be enabled.");
 	}
 
 	// ホスト鍵アルゴリズム
@@ -5511,6 +5519,10 @@ static void ssh2_send_newkeys(PTInstVar pvar)
 
 	pvar->kex_status |= KEX_FLAG_NEWKEYS_SENT;
 
+	if (pvar->server_strict_kex) {
+		pvar->ssh_state.sender_sequence_number = 0;
+	}
+
 	// SSH2_MSG_NEWKEYS を既に受け取っていたらKEXは完了。次の処理に移る。
 	if (pvar->kex_status & KEX_FLAG_NEWKEYS_RECEIVED) {
 		if ((pvar->kex_status & KEX_FLAG_REKEYING)) {
@@ -6103,6 +6115,10 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 	pvar->ssh2_keys[MODE_IN].mac.enabled = 1;
 	pvar->ssh2_keys[MODE_IN].comp.enabled = 1;
 	enable_recv_compression(pvar);
+
+	if (pvar->server_strict_kex) {
+		pvar->ssh_state.receiver_sequence_number = 0;
+	}
 
 	SSH2_dispatch_add_message(SSH2_MSG_EXT_INFO);
 
