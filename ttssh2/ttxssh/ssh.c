@@ -132,7 +132,7 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar);
 static BOOL handle_SSH2_channel_open(PTInstVar pvar);
 static BOOL handle_SSH2_window_adjust(PTInstVar pvar);
 static BOOL handle_SSH2_channel_request(PTInstVar pvar);
-void SSH2_dispatch_init(int stage);
+void SSH2_dispatch_init(PTInstVar pvar, int stage);
 int SSH2_dispatch_enabled_check(unsigned char message);
 void SSH2_dispatch_add_message(unsigned char message);
 void SSH2_dispatch_add_range_message(unsigned char begin, unsigned char end);
@@ -2037,7 +2037,7 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len)
 					// SSHハンドラの登録を行う
 					init_protocol(pvar);
 
-					SSH2_dispatch_init(1);
+					SSH2_dispatch_init(pvar, 1);
 					SSH2_dispatch_add_message(SSH2_MSG_KEXINIT);
 				}
 			}
@@ -2241,14 +2241,21 @@ static unsigned char handle_messages[HANDLE_MESSAGE_MAX];
 static int handle_message_count = 0;
 static int handle_message_stage = 0;
 
-void SSH2_dispatch_init(int stage)
+void SSH2_dispatch_init(PTInstVar pvar, int stage)
 {
 	handle_message_count = 0;
 	handle_message_stage = stage;
 
+	// DISCONNECTは常に受け入れる
+	SSH2_dispatch_add_message(SSH2_MSG_DISCONNECT);
+
+	// Strict KEX が有効、かつ初回の KEX 時は受け入れるメッセージを制限する
+	if (pvar->server_strict_kex && pvar->kex_status == 0) {
+		return;
+	}
+
 	SSH2_dispatch_add_message(SSH2_MSG_IGNORE);
 	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
-	SSH2_dispatch_add_message(SSH2_MSG_DISCONNECT);
 	SSH2_dispatch_add_message(SSH2_MSG_UNIMPLEMENTED);
 }
 
@@ -5099,7 +5106,7 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 	}
 	pvar->kexdh = dh;
 
-	SSH2_dispatch_init(2);
+	SSH2_dispatch_init(pvar, 2);
 	SSH2_dispatch_add_message(SSH2_MSG_KEXDH_REPLY);
 
 	buffer_free(msg);
@@ -5200,7 +5207,7 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 		push_memdump("DH_GEX_REQUEST", "requested key bits", tmp, strlen(tmp));
 	}
 
-	SSH2_dispatch_init(2);
+	SSH2_dispatch_init(pvar, 2);
 	SSH2_dispatch_add_message(SSH2_MSG_KEX_DH_GEX_GROUP);
 
 	buffer_free(msg);
@@ -5340,7 +5347,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 		push_bignum_memdump("DH_GEX_GROUP", "pub_key", pub_key);
 	}
 
-	SSH2_dispatch_init(2);
+	SSH2_dispatch_init(pvar, 2);
 	SSH2_dispatch_add_message(SSH2_MSG_KEX_DH_GEX_REPLY);
 
 	buffer_free(msg);
@@ -5407,7 +5414,7 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 	}
 	pvar->ecdh_client_key = client_key;
 
-	SSH2_dispatch_init(2);
+	SSH2_dispatch_init(pvar, 2);
 	SSH2_dispatch_add_message(SSH2_MSG_KEX_ECDH_REPLY);
 
 	buffer_free(msg);
@@ -5490,7 +5497,7 @@ cont:
 
 	prep_compression(pvar);
 
-	SSH2_dispatch_init(3);
+	SSH2_dispatch_init(pvar, 3);
 	SSH2_dispatch_add_message(SSH2_MSG_NEWKEYS);
 
 	return TRUE;
@@ -6086,7 +6093,7 @@ static void do_SSH2_dispatch_setup_for_transfer(PTInstVar pvar)
 {
 	pvar->kex_status = KEX_FLAG_KEXDONE;
 
-	SSH2_dispatch_init(6);
+	SSH2_dispatch_init(pvar, 6);
 	SSH2_dispatch_add_range_message(SSH2_MSG_GLOBAL_REQUEST, SSH2_MSG_CHANNEL_FAILURE);
 	SSH2_dispatch_add_message(SSH2_MSG_KEXINIT);
 }
@@ -6202,7 +6209,7 @@ BOOL do_SSH2_userauth(PTInstVar pvar)
 	finish_send_packet(pvar);
 	buffer_free(msg);
 
-	SSH2_dispatch_init(4);
+	SSH2_dispatch_init(pvar, 4);
 	SSH2_dispatch_add_message(SSH2_MSG_SERVICE_ACCEPT);
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_SERVICE_REQUEST was sent at do_SSH2_userauth().");
@@ -6224,7 +6231,7 @@ static BOOL handle_SSH2_service_accept(PTInstVar pvar)
 	logprintf(LOG_LEVEL_VERBOSE, "SSH2_MSG_SERVICE_ACCEPT was received. service-name=%s", NonNull(svc));
 	free(svc);
 
-	SSH2_dispatch_init(5);
+	SSH2_dispatch_init(pvar, 5);
 	if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
 		// keyboard-interactive method
 		SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_INFO_REQUEST);
