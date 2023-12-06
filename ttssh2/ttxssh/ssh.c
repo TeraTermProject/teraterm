@@ -4886,11 +4886,13 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-	// サーバー側がStrict KEXに対応しているかの確認
-	choose_SSH2_proposal(buf, "kex-strict-s-v00@openssh.com", tmp, sizeof(tmp));
-	if (tmp[0] != '\0') {
-		pvar->server_strict_kex = TRUE;
-		logprintf(LOG_LEVEL_INFO, "Server supports strict kex. Strict kex will be enabled.");
+	if (pvar->kex_status == 0) {
+		// サーバー側がStrict KEXに対応しているかの確認
+		choose_SSH2_proposal(buf, "kex-strict-s-v00@openssh.com", tmp, sizeof(tmp));
+		if (tmp[0] != '\0') {
+			pvar->server_strict_kex = TRUE;
+			logprintf(LOG_LEVEL_INFO, "Server supports strict kex. Strict kex will be enabled.");
+		}
 	}
 
 	// ホスト鍵アルゴリズム
