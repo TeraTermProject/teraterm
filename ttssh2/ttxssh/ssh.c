@@ -5529,6 +5529,7 @@ static void ssh2_send_newkeys(PTInstVar pvar)
 	pvar->kex_status |= KEX_FLAG_NEWKEYS_SENT;
 
 	if (pvar->server_strict_kex) {
+		logprintf(LOG_LEVEL_INFO, "%s: Strict kex is enabled, resetting sender sequence number %d", __FUNCTION__, pvar->ssh_state.sender_sequence_number);
 		pvar->ssh_state.sender_sequence_number = 0;
 	}
 
@@ -6126,6 +6127,7 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 	enable_recv_compression(pvar);
 
 	if (pvar->server_strict_kex) {
+		logprintf(LOG_LEVEL_INFO, "%s: Strict kex is enabled, resetting receiver sequence number %d", __FUNCTION__, pvar->ssh_state.receiver_sequence_number);
 		pvar->ssh_state.receiver_sequence_number = 0;
 	}
 
