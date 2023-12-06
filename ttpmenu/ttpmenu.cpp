@@ -296,7 +296,9 @@ static BOOL GetApplicationFilename(const wchar_t *szName, wchar_t *szPath)
 /* ==========================================================================
 	Function Name	: (BOOL) AddTooltip()
 	Outline			: 指定されたコントロールにツールチップを関連付ける
-	Arguments		: int			idControl	(In) コントロールID
+	Arguments		: HWND		hWnd		(In) ウインドウのハンドル
+					: int		idControl	(In) ウィンドウ上のコントロールID
+					: wchar_t	*tip		(In) 表示するツールチップ
 	Return Value	: 成功 TRUE / 失敗 FALSE
 	Reference		: 
 	Renewal			: 
@@ -304,16 +306,16 @@ static BOOL GetApplicationFilename(const wchar_t *szName, wchar_t *szPath)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL AddTooltip(int idControl)
+BOOL AddTooltip(HWND hWnd, int idControl, const wchar_t *tip)
 {
 	TOOLINFOW	ti = {};
 
 	ti.cbSize	= sizeof(ti);
-	ti.uFlags	= TTF_IDISHWND; 
-	ti.hwnd		= g_hWndMenu; 
-	ti.uId		= (UINT_PTR)::GetDlgItem(g_hWndMenu, idControl); 
+	ti.uFlags	= TTF_IDISHWND | TTF_SUBCLASS;
+	ti.hwnd		= hWnd;
+	ti.uId		= (UINT_PTR)::GetDlgItem(hWnd, idControl); 
 	ti.hinst	= 0; 
-	ti.lpszText	= LPSTR_TEXTCALLBACKW;
+	ti.lpszText	= (LPWSTR)tip;
 
 	return (BOOL)::SendMessageW(g_hWndTip, TTM_ADDTOOLW, 0, (LPARAM)&ti);
 }
@@ -491,7 +493,7 @@ BOOL CreateTooltip(void)
 	g_hWndTip = ::CreateWindowEx(0,
 								TOOLTIPS_CLASS,
 								(LPSTR) NULL,
-								TTS_ALWAYSTIP,
+								TTS_ALWAYSTIP | TTS_BALLOON,
 								CW_USEDEFAULT,
 								CW_USEDEFAULT,
 								CW_USEDEFAULT,
@@ -504,10 +506,10 @@ BOOL CreateTooltip(void)
 	if (g_hWndTip == NULL)
 		return FALSE;
 
-	AddTooltip(BUTTON_SET);
-	AddTooltip(BUTTON_DELETE);
-	AddTooltip(BUTTON_ETC);
-	AddTooltip(CHECK_TTSSH);
+	AddTooltip(g_hWndMenu, BUTTON_SET, L"Register");
+	AddTooltip(g_hWndMenu, BUTTON_DELETE, L"Unregister");
+	AddTooltip(g_hWndMenu, BUTTON_ETC, L"Configure");
+	AddTooltip(g_hWndMenu, CHECK_TTSSH, L"use SSH");
 
 	g_hHook = ::SetWindowsHookEx(WH_GETMESSAGE,
 								GetMsgProc,
@@ -518,44 +520,6 @@ BOOL CreateTooltip(void)
 		return FALSE; 
 
 	return TRUE; 
-}
-
-/* ==========================================================================
-	Function Name	: (BOOL) ManageWMNotify_Config()
-	Outline			: 設定ダイアログのWM_NOTIFYを処理する
-	Arguments		: LPARAM	lParam
-	Return Value	: 処理 TRUE / 未処理 FALSE
-	Reference		: 
-	Renewal			: 
-	Notes			: 
-	Attention		: 
-	Up Date			: 
-   ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL ManageWMNotify_Config(LPARAM lParam)
-{
-	int				idCtrl;
-	LPTOOLTIPTEXTW	lpttt;
-
-	if ((((LPNMHDR) lParam)->code) == TTN_NEEDTEXTW) {
-		idCtrl	= ::GetDlgCtrlID((HWND) ((LPNMHDR) lParam)->idFrom);
-		lpttt	= (LPTOOLTIPTEXTW) lParam;
-		switch (idCtrl) {
-		case BUTTON_SET:
-			lpttt->lpszText	= L"Register";
-			return TRUE; 
-		case BUTTON_DELETE:
-			lpttt->lpszText	= L"Unregister";
-			return TRUE; 
-		case BUTTON_ETC:
-			lpttt->lpszText	= L"Configure";
-			return TRUE; 
-		case CHECK_TTSSH:
-			lpttt->lpszText	= L"use SSH";
-			return TRUE; 
-		}
-    }
-
-	return FALSE; 
 }
 
 /* ==========================================================================
@@ -2246,8 +2210,6 @@ INT_PTR CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		return TRUE;
 	case WM_COMMAND:
 		return ManageWMCommand_Config(hWnd, wParam);
-	case WM_NOTIFY:
-		return ManageWMNotify_Config(lParam);
 	case WM_DESTROY:
 		::UnhookWindowsHookEx(g_hHook);
 		return TRUE;
