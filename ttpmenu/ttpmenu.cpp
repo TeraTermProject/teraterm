@@ -71,8 +71,6 @@ MenuData	g_MenuData;			// TeraTerm Menu‚Ì•\Ž¦Ý’è“™‚Ì\‘¢‘Ì
 
 wchar_t		*SetupFNameW;		// TERATERM.INI
 wchar_t		*UILanguageFileW;
-HFONT		g_ConfigFont;
-HFONT		g_DetailFont;
 
 #if defined(__MINGW32__)
 static wchar_t* _wcstok(wchar_t *strToken, const wchar_t *strDelimit)
@@ -308,16 +306,16 @@ static BOOL GetApplicationFilename(const wchar_t *szName, wchar_t *szPath)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL AddTooltip(int idControl)
 {
-	TOOLINFO	ti;
+	TOOLINFOW	ti = {};
 
-	ti.cbSize	= sizeof(TOOLINFO);
+	ti.cbSize	= sizeof(ti);
 	ti.uFlags	= TTF_IDISHWND; 
 	ti.hwnd		= g_hWndMenu; 
 	ti.uId		= (UINT_PTR)::GetDlgItem(g_hWndMenu, idControl); 
 	ti.hinst	= 0; 
-	ti.lpszText	= LPSTR_TEXTCALLBACK;
+	ti.lpszText	= LPSTR_TEXTCALLBACKW;
 
-	return (BOOL)::SendMessage(g_hWndTip, TTM_ADDTOOL, 0, (LPARAM)(LPTOOLINFO)&ti);
+	return (BOOL)::SendMessageW(g_hWndTip, TTM_ADDTOOLW, 0, (LPARAM)&ti);
 }
 
 /* ==========================================================================
@@ -536,23 +534,23 @@ BOOL CreateTooltip(void)
 BOOL ManageWMNotify_Config(LPARAM lParam)
 {
 	int				idCtrl;
-	LPTOOLTIPTEXT	lpttt;
+	LPTOOLTIPTEXTW	lpttt;
 
-	if ((((LPNMHDR) lParam)->code) == TTN_NEEDTEXT) {
+	if ((((LPNMHDR) lParam)->code) == TTN_NEEDTEXTW) {
 		idCtrl	= ::GetDlgCtrlID((HWND) ((LPNMHDR) lParam)->idFrom);
-		lpttt	= (LPTOOLTIPTEXT) lParam;
+		lpttt	= (LPTOOLTIPTEXTW) lParam;
 		switch (idCtrl) {
 		case BUTTON_SET:
-			lpttt->lpszText	= "Register";
+			lpttt->lpszText	= L"Register";
 			return TRUE; 
 		case BUTTON_DELETE:
-			lpttt->lpszText	= "Unregister";
+			lpttt->lpszText	= L"Unregister";
 			return TRUE; 
 		case BUTTON_ETC:
-			lpttt->lpszText	= "Configure";
+			lpttt->lpszText	= L"Configure";
 			return TRUE; 
 		case CHECK_TTSSH:
-			lpttt->lpszText	= "use SSH";
+			lpttt->lpszText	= L"use SSH";
 			return TRUE; 
 		}
     }
@@ -1942,9 +1940,6 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 	case IDCANCEL:
 		g_hWndMenu = NULL;
 		::EndDialog(hWnd, TRUE);
-		if (g_ConfigFont != NULL) {
-			DeleteObject(g_ConfigFont);
-		}
 		return TRUE;
 	case BUTTON_SET:
 		SaveLoginHostInformation(hWnd);
@@ -2070,15 +2065,9 @@ BOOL ManageWMCommand_Etc(HWND hWnd, WPARAM wParam)
 	case IDOK:
 		SaveEtcInformation(hWnd);
 		::EndDialog(hWnd, TRUE);
-		if (g_DetailFont != NULL) {
-			DeleteObject(g_DetailFont);
-		}
 		return TRUE;
 	case IDCANCEL:
 		::EndDialog(hWnd, FALSE);
-		if (g_DetailFont != NULL) {
-			DeleteObject(g_DetailFont);
-		}
 		return TRUE;
 	case BUTTON_DEFAULT:
 		SetDefaultEtcDlg(hWnd);
