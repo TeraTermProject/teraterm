@@ -1846,7 +1846,8 @@ BOOL DeleteLoginHostInformation(HWND hWnd)
 BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 {
 	int ret = 0;
-	wchar_t title[MAX_UIMSG], filter[MAX_UIMSG];
+	wchar_t title[MAX_UIMSG];
+	wchar_t *filter;
 
 	// 秘密鍵ファイルのコントロール (2005.1.28 yutaka)
 	switch(wParam) {
@@ -1959,18 +1960,22 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		::GetDlgItemTextW(hWnd, EDIT_MACRO, g_JobInfo.szMacroFile, MAX_PATH);
 		UTIL_get_lang_msgW("FILEDLG_MACRO_TITLE", title, _countof(title),
 						   L"specifying macro file", UILanguageFileW);
-		UTIL_get_lang_msgW("FILEDLG_MACRO_FILTER", filter, _countof(filter),
-						   L"macro file(*.ttl)\\0*.ttl\\0all files(*.*)\\0*.*\\0\\0", UILanguageFileW);
-		OpenFileDlg(hWnd, EDIT_MACRO, title, filter, g_JobInfo.szMacroFile);
+		GetI18nStrWW("TTMenu", "FILEDLG_MACRO_FILTER",
+					 L"macro file(*.ttl)\\0*.ttl\\0all files(*.*)\\0*.*\\0\\0", UILanguageFileW,
+					 &filter);
+		OpenFileDlg(hWnd, EDIT_MACRO, title, filter, g_JobInfo.szMacroFile, _countof(g_JobInfo.szMacroFile));
+		free(filter);
 		return TRUE;
 
 	case IDC_KEYFILE_BUTTON:
 		::GetDlgItemTextW(hWnd, IDC_KEYFILE_PATH, g_JobInfo.PrivateKeyFile, MAX_PATH);
 		UTIL_get_lang_msgW("FILEDLG_KEY_TITLE", title, _countof(title),
 						   L"specifying private key file", UILanguageFileW);
-		UTIL_get_lang_msgW("FILEDLG_KEY_FILTER", filter, _countof(filter),
-						   L"identity files\\0identity;id_rsa;id_dsa\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0all(*.*)\\0*.*\\0\\0", UILanguageFileW);
-		OpenFileDlg(hWnd, IDC_KEYFILE_PATH, title, filter, g_JobInfo.PrivateKeyFile);
+		GetI18nStrWW("TTMenu", "FILEDLG_KEY_FILTER",
+					 L"identity files\\0identity;id_rsa;id_dsa\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0all(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filter);
+		OpenFileDlg(hWnd, IDC_KEYFILE_PATH, title, filter, g_JobInfo.PrivateKeyFile, _countof(g_JobInfo.PrivateKeyFile));
+		free(filter);
 		return TRUE;
 
 	case RADIO_LOGIN:
@@ -2027,7 +2032,8 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 BOOL ManageWMCommand_Etc(HWND hWnd, WPARAM wParam)
 {
 	wchar_t	szPath[MAX_PATH];
-	wchar_t	title[MAX_UIMSG], filter[MAX_UIMSG];
+	wchar_t	title[MAX_UIMSG];
+	wchar_t *filter;
 
 	switch(LOWORD(wParam)) {
 	case IDOK:
@@ -2044,25 +2050,29 @@ BOOL ManageWMCommand_Etc(HWND hWnd, WPARAM wParam)
 		::GetDlgItemTextW(hWnd, EDIT_TTMPATH, szPath, MAX_PATH);
 		UTIL_get_lang_msgW("FILEDLG_TERATERM_TITLE", title, _countof(title),
 						   L"specifying TeraTerm", UILanguageFileW);
-		UTIL_get_lang_msgW("FILEDLG_TERATERM_FILTER", filter, _countof(filter),
-						   L"execute file(*.exe)\\0*.exe\\0all files(*.*)\\0*.*\\0\\0", UILanguageFileW);
-		OpenFileDlg(hWnd, EDIT_TTMPATH, title, filter, szPath);
+		GetI18nStrWW("TTMenu", "FILEDLG_TERATERM_FILTER",
+					 L"execute file(*.exe)\\0*.exe\\0all files(*.*)\\0*.*\\0\\0", UILanguageFileW, &filter);
+		OpenFileDlg(hWnd, EDIT_TTMPATH, title, filter, szPath, _countof(szPath));
+		free(filter);
 		return TRUE;
 	case BUTTON_INITFILE:
 		::GetDlgItemTextW(hWnd, EDIT_INITFILE, szPath, MAX_PATH);
 		UTIL_get_lang_msgW("FILEDLG_INI_TITLE", title, _countof(title),
 						   L"specifying config file", UILanguageFileW);
-		UTIL_get_lang_msgW("FILEDLG_INI_FILTER", filter, _countof(filter),
-						   L"config file(*.ini)\\0*.ini\\0all files(*.*)\\0*.*\\0\\0", UILanguageFileW);
-		OpenFileDlg(hWnd, EDIT_INITFILE, title, filter, szPath);
+		GetI18nStrWW("TTMenu", "FILEDLG_INI_FILTER", L"config file(*.ini)\\0*.ini\\0all files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filter);
+		OpenFileDlg(hWnd, EDIT_INITFILE, title, filter, szPath, _countof(szPath));
+		free(filter);
 		return TRUE;
 	case BUTTON_LOG:
 		::GetDlgItemTextW(hWnd, EDIT_LOG, szPath, MAX_PATH);
 		UTIL_get_lang_msgW("FILEDLG_LOG_TITLE", title, _countof(title),
 						   L"specifying log file", UILanguageFileW);
-		UTIL_get_lang_msgW("FILEDLG_LOG_FILTER", filter, _countof(filter),
-						   L"log file(*.log)\\0*.log\\0all files(*.*)\\0*.*\\0\\0", UILanguageFileW);
-		OpenFileDlg(hWnd, EDIT_LOG, title, filter, szPath);
+		GetI18nStrWW("TTMenu", "FILEDLG_LOG_FILTER",
+					 L"log file(*.log)\\0*.log\\0all files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filter);
+		OpenFileDlg(hWnd, EDIT_LOG, title, filter, szPath, _countof(szPath));
+		free(filter);
 		return TRUE;
 	}
 

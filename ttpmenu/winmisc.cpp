@@ -31,6 +31,7 @@
 
 #include	"codeconv.h"
 #include	"i18n.h"
+#include	"ttcommdlg.h"
 
 #include	"winmisc.h"
 
@@ -147,7 +148,8 @@ void EncodePassword(const char *cPassword, char *cEncodePassword)
 					: UINT		editCtl		(in)	アイテムの ID
 					: char		*title		(in)	ウインドウタイトル
 					: char		*filter		(in)	表示するファイルのフィルタ
-					: char		*defaultDir	(in)	デフォルトのパス
+					: char		*defaultDir	(in,out)デフォルトのパス
+					: size_t    max_path
 	Return Value	: 成功 TRUE
 					: 失敗 FALSE
 	Reference		: 
@@ -156,12 +158,11 @@ void EncodePassword(const char *cPassword, char *cEncodePassword)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *filter, wchar_t *defaultDir)
+BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *filter, wchar_t *defaultDir, size_t max_path)
 {
 	wchar_t			*szDirName;
 	wchar_t			szFile[MAX_PATH] = L"";
-	wchar_t			szPath[MAX_PATH];
-	OPENFILENAMEW	ofn;
+	wchar_t			*szPath;
 
 	szDirName	= (wchar_t *) malloc(MAX_PATH * sizeof(wchar_t));
 
@@ -185,28 +186,26 @@ BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *f
 		wcscpy(szFile, ptr + 1);
 	}
 
-	memset(&ofn, 0, sizeof(ofn));
-	ofn.lStructSize		= sizeof(OPENFILENAME);
+	TTOPENFILENAMEW	ofn = {};
 	ofn.hwndOwner		= hWnd;
 	ofn.lpstrFilter		= filter;
 	ofn.nFilterIndex	= 1;
 	ofn.lpstrFile		= szFile;
-	ofn.nMaxFile		= sizeof(szFile);
 	ofn.lpstrTitle		= title;
 	ofn.lpstrInitialDir	= szDirName;
 	ofn.Flags			= OFN_HIDEREADONLY | OFN_NODEREFERENCELINKS;
 
-	if (::GetOpenFileNameW(&ofn) == FALSE) {
+	if (::TTGetOpenFileNameW(&ofn, &szPath) == FALSE) {
 		free(szDirName);
 		return	FALSE;
 	}
 
-	wcscpy(szPath, ofn.lpstrFile);
-
 	::SetDlgItemTextW(hWnd, editCtl, szPath);
-	wcscpy(defaultDir, szPath);
+
+	wcscpy_s(defaultDir, max_path, szPath);
 
 	free(szDirName);
+	free(szPath);
 
 	return	TRUE;
 }

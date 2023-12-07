@@ -44,8 +44,7 @@
 void	SetDlgPos(HWND hWnd, int pos);
 void	EncodePassword(const char *cPassword, char *cEncodePassword);
 BOOL	EnableItem(HWND hWnd, int idControl, BOOL flag);
-BOOL	OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *filter, wchar_t *defaultDir);
-BOOL	SaveFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, wchar_t *filter, wchar_t *defaultDir);
+BOOL	OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *filter, wchar_t *defaultDir, size_t max_path);
 BOOL	SetForceForegroundWindow(HWND hWnd);
 wchar_t* lwcsstri(wchar_t *s1, const wchar_t *s2);
 void	UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const wchar_t *iniFile);
