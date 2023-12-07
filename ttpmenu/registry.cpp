@@ -584,3 +584,33 @@ LONG RegDelete(HKEY hKey, const wchar_t *lpSubKey)
 		return ::RegDeleteKeyW(hKey, lpSubKey);
 	}
 }
+
+BOOL RegGetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD &dwValue)
+{
+	return RegGetDword(hKey, lpszValueName, &dwValue);
+}
+
+BOOL RegGetLONG(HKEY hKey, const wchar_t *lpszValueName, LONG &dwValue)
+{
+	DWORD d;
+	BOOL r = RegGetDword(hKey, lpszValueName, &d);
+	dwValue = d;
+	return r;
+}
+
+BOOL RegGetBOOL(HKEY hKey, const wchar_t *lpszValueName, BOOL &value)
+{
+	DWORD d;
+	BOOL r = RegGetDword(hKey, lpszValueName, &d);
+	value = d;
+	return r;
+}
+
+BOOL RegGetBYTE(HKEY hKey, const wchar_t *lpszValueName, BYTE &value)
+{
+	DWORD d;
+	BOOL r = RegGetDword(hKey, lpszValueName, &d);
+	value = (BYTE)d;
+	return r;
+}
+

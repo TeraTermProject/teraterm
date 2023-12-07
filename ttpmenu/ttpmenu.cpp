@@ -283,7 +283,7 @@ static BOOL GetApplicationFilename(const wchar_t *szName, wchar_t *szPath)
 
 	bRet = RegGetStr(hKey, KEY_TERATERM, szPath, MAX_PATH);
 	if (bRet == FALSE || wcslen(szPath) == 0) {
-		RegGetDword(hKey, KEY_TTSSH, (LPDWORD) &bTtssh);
+		RegGetBOOL(hKey, KEY_TTSSH, bTtssh);
 		::GetProfileStringW(L"Tera Term Pro", L"Path", szDefault, szTTermPath, MAX_PATH);
 		_swprintf(szPath, L"%s\\%s", szTTermPath, TERATERM);
 	}
@@ -339,7 +339,7 @@ BOOL LoadConfig(void)
 	if ((hKey = RegCreate(HKEY_CURRENT_USER, TTERM_KEY)) == INVALID_HANDLE_VALUE)
 		return FALSE;
 	
-	if (RegGetDword(hKey, KEY_ICONMODE, &(g_MenuData.dwIconMode)) == TRUE) {
+	if (RegGetDword(hKey, KEY_ICONMODE, g_MenuData.dwIconMode) == TRUE) {
 		if (g_MenuData.dwIconMode == MODE_LARGEICON) {
 			UTIL_get_lang_msgW("MENU_ICON", uimsg, _countof(uimsg), STR_ICONMODE, UILanguageFileW);
 			::ModifyMenuW(g_hConfigMenu, ID_ICON, MF_CHECKED | MF_BYCOMMAND, ID_ICON, uimsg);
@@ -347,17 +347,21 @@ BOOL LoadConfig(void)
 	} else
 		g_MenuData.dwIconMode = MODE_SMALLICON;
 	
-	if (RegGetDword(hKey, KEY_LEFTBUTTONPOPUP, (LPDWORD) &(g_MenuData.bLeftButtonPopup)) == FALSE)
+	if (RegGetBOOL(hKey, KEY_LEFTBUTTONPOPUP, g_MenuData.bLeftButtonPopup) == FALSE)
 		g_MenuData.bLeftButtonPopup = TRUE;
 	if (g_MenuData.bLeftButtonPopup == TRUE) {
 		UTIL_get_lang_msgW("MENU_LEFTPOPUP", uimsg, _countof(uimsg), STR_LEFTBUTTONPOPUP, UILanguageFileW);
 		::ModifyMenuW(g_hConfigMenu, ID_LEFTPOPUP, MF_CHECKED | MF_BYCOMMAND, ID_LEFTPOPUP, uimsg);
 	}
 
-	if (RegGetDword(hKey, KEY_MENUTEXTCOLOR, &(g_MenuData.crMenuTxt)) == FALSE)
+	DWORD dword_tmp;
+	BOOL r = RegGetDword(hKey, KEY_MENUTEXTCOLOR, dword_tmp);
+	g_MenuData.crMenuTxt = dword_tmp;
+	if (r == FALSE) {
 		g_MenuData.crMenuTxt = ::GetSysColor(COLOR_MENUTEXT);
+	}
 
-	if (RegGetDword(hKey, KEY_HOTKEY, (LPDWORD) &(g_MenuData.bHotkey)) == FALSE)
+	if (RegGetBOOL(hKey, KEY_HOTKEY, g_MenuData.bHotkey) == FALSE)
 		g_MenuData.bHotkey	= FALSE;
 	if (g_MenuData.bHotkey == TRUE) {
 		UTIL_get_lang_msgW("MENU_HOTKEY", uimsg, _countof(uimsg), STR_HOTKEY, UILanguageFileW);
@@ -365,19 +369,19 @@ BOOL LoadConfig(void)
 		::RegisterHotKey(g_hWnd, WM_MENUOPEN, MOD_CONTROL | MOD_ALT, 'M');
 	}
 
-	if (RegGetDword(hKey, KEY_LF_HEIGHT, (DWORD *) &(g_MenuData.lfFont.lfHeight)) == TRUE) {
-		RegGetDword(hKey, KEY_LF_WIDTH, (DWORD *) &(g_MenuData.lfFont.lfWidth));
-		RegGetDword(hKey, KEY_LF_ESCAPEMENT, (DWORD *) &(g_MenuData.lfFont.lfEscapement));
-		RegGetDword(hKey, KEY_LF_ORIENTATION, (DWORD *) &(g_MenuData.lfFont.lfOrientation));
-		RegGetDword(hKey, KEY_LF_WEIGHT, (DWORD *) &(g_MenuData.lfFont.lfWeight));
-		RegGetDword(hKey, KEY_LF_ITALIC, (DWORD *) &(g_MenuData.lfFont.lfItalic));
-		RegGetDword(hKey, KEY_LF_UNDERLINE, (DWORD *) &(g_MenuData.lfFont.lfUnderline));
-		RegGetDword(hKey, KEY_LF_STRIKEOUT, (DWORD *) &(g_MenuData.lfFont.lfStrikeOut));
-		RegGetDword(hKey, KEY_LF_CHARSET, (DWORD *) &(g_MenuData.lfFont.lfCharSet));
-		RegGetDword(hKey, KEY_LF_OUTPRECISION, (DWORD *) &(g_MenuData.lfFont.lfOutPrecision));
-		RegGetDword(hKey, KEY_LF_CLIPPRECISION, (DWORD *) &(g_MenuData.lfFont.lfClipPrecision));
-		RegGetDword(hKey, KEY_LF_QUALITY, (DWORD *) &(g_MenuData.lfFont.lfQuality));
-		RegGetDword(hKey, KEY_LF_PITCHANDFAMILY, (DWORD *) &(g_MenuData.lfFont.lfPitchAndFamily));
+	if (RegGetLONG(hKey, KEY_LF_HEIGHT, g_MenuData.lfFont.lfHeight) == TRUE) {
+		RegGetLONG(hKey, KEY_LF_WIDTH, g_MenuData.lfFont.lfWidth);
+		RegGetLONG(hKey, KEY_LF_ESCAPEMENT, g_MenuData.lfFont.lfEscapement);
+		RegGetLONG(hKey, KEY_LF_ORIENTATION, g_MenuData.lfFont.lfOrientation);
+		RegGetLONG(hKey, KEY_LF_WEIGHT, g_MenuData.lfFont.lfWeight);
+		RegGetBYTE(hKey, KEY_LF_ITALIC, g_MenuData.lfFont.lfItalic);
+		RegGetBYTE(hKey, KEY_LF_UNDERLINE, g_MenuData.lfFont.lfUnderline);
+		RegGetBYTE(hKey, KEY_LF_STRIKEOUT, g_MenuData.lfFont.lfStrikeOut);
+		RegGetBYTE(hKey, KEY_LF_CHARSET, g_MenuData.lfFont.lfCharSet);
+		RegGetBYTE(hKey, KEY_LF_OUTPRECISION, g_MenuData.lfFont.lfOutPrecision);
+		RegGetBYTE(hKey, KEY_LF_CLIPPRECISION, g_MenuData.lfFont.lfClipPrecision);
+		RegGetBYTE(hKey, KEY_LF_QUALITY, g_MenuData.lfFont.lfQuality);
+		RegGetBYTE(hKey, KEY_LF_PITCHANDFAMILY, g_MenuData.lfFont.lfPitchAndFamily);
 		RegGetStr(hKey, KEY_LF_FACENAME, g_MenuData.lfFont.lfFaceName, LF_FACESIZE);
 	} else
 		::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &(g_MenuData.lfFont));
@@ -1489,12 +1493,12 @@ BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 	wcscpy(jobInfo.szName, szName);
 
 	RegGetStr(hKey, KEY_HOSTNAME, jobInfo.szHostName, MAX_PATH);
-	RegGetDword(hKey, KEY_MODE, &dword_tmp);
+	RegGetDword(hKey, KEY_MODE, dword_tmp);
 	jobInfo.dwMode = (JobMode)dword_tmp;
 
-	RegGetDword(hKey, KEY_USERFLAG, (DWORD *) &(jobInfo.bUsername));
+	RegGetBOOL(hKey, KEY_USERFLAG, jobInfo.bUsername);
 	RegGetStr(hKey, KEY_USERNAME, jobInfo.szUsername, MAX_PATH);
-	RegGetDword(hKey, KEY_PASSWDFLAG, (DWORD *) &(jobInfo.bPassword));
+	RegGetBOOL(hKey, KEY_PASSWDFLAG, jobInfo.bPassword);
 	RegGetBinary(hKey, KEY_PASSWORD, szEncodePassword, &dwSize);
 	EncodePassword(szEncodePassword, jobInfo.szPassword);
 
@@ -1506,16 +1510,16 @@ BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 
 	RegGetStr(hKey, KEY_MACROFILE, jobInfo.szMacroFile, MAX_PATH);
 
-	RegGetDword(hKey, KEY_TTSSH, (LPDWORD) &(jobInfo.bTtssh));
-	RegGetDword(hKey, KEY_STARTUP, (LPDWORD) &(jobInfo.bStartup));
+	RegGetBOOL(hKey, KEY_TTSSH, jobInfo.bTtssh);
+	RegGetBOOL(hKey, KEY_STARTUP, jobInfo.bStartup);
 
 	RegGetStr(hKey, KEY_LOG, jobInfo.szLog, MAX_PATH);
 
 	// SSH2
 	ZeroMemory(jobInfo.PrivateKeyFile, sizeof(jobInfo.PrivateKeyFile));
 	RegGetStr(hKey, KEY_KEYFILE, jobInfo.PrivateKeyFile, MAX_PATH);
-	RegGetDword(hKey, KEY_CHALLENGE, (LPDWORD) &(jobInfo.bChallenge));
-	RegGetDword(hKey, KEY_PAGEANT, (LPDWORD) &(jobInfo.bPageant));
+	RegGetBOOL(hKey, KEY_CHALLENGE, jobInfo.bChallenge);
+	RegGetBOOL(hKey, KEY_PAGEANT, jobInfo.bPageant);
 
 	RegClose(hKey);
 
