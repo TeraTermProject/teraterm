@@ -1078,7 +1078,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	if ((pHostName = _wcstok(szHostName, L" ([{'\"|*")) != NULL)
 		pHostName = szHostName;
 
-	szArgment = wcsdup(L"");
+	szArgment = _wcsdup(L"");
 
 	if (jobInfo.dwMode != MODE_DIRECT)
 		if (wcslen(jobInfo.szInitFile) != 0) {
@@ -1257,19 +1257,19 @@ BOOL InitMenu(void)
 			return FALSE;
 
 		static const DlgTextInfo SubMenuTextInfo[] = {
-			ID_TMENU_ADD, "MENU_LISTCONFIG",
-			1, "MENU_SETTING",
-			ID_VERSION, "MENU_VERSION",
-			ID_EXEC, "MENU_EXEC",
-			ID_TMENU_CLOSE, "MENU_CLOSE",
+			{ ID_TMENU_ADD, "MENU_LISTCONFIG" },
+			{ 1, "MENU_SETTING" },
+			{ ID_VERSION, "MENU_VERSION" },
+			{ ID_EXEC, "MENU_EXEC" },
+			{ ID_TMENU_CLOSE, "MENU_CLOSE" },
 		};
 		SetI18nMenuStrsW(g_hSubMenu, "TTMenu", SubMenuTextInfo, _countof(SubMenuTextInfo), UILanguageFileW);
 
 		static const DlgTextInfo ConfigMenuTextInfo[] = {
-			ID_ICON, "MENU_ICON",
-			ID_FONT, "MENU_FONT",
-			ID_LEFTPOPUP, "MENU_LEFTPOPUP",
-			ID_HOTKEY, "MENU_HOTKEY",
+			{ ID_ICON, "MENU_ICON" },
+			{ ID_FONT, "MENU_FONT" },
+			{ ID_LEFTPOPUP, "MENU_LEFTPOPUP" },
+			{ ID_HOTKEY, "MENU_HOTKEY" },
 		};
 		SetI18nMenuStrsW(g_hConfigMenu, "TTMenu", ConfigMenuTextInfo, _countof(ConfigMenuTextInfo), UILanguageFileW);
 		UTIL_get_lang_msgW("MENU_EXEC", uimsg, _countof(uimsg), L"Execute", UILanguageFileW);
@@ -1395,9 +1395,11 @@ BOOL RedrawMenu(HWND hWnd)
 	while (wcslen(g_MenuData.szName[dwCnt]) != 0) {
 		if (GetApplicationFilename(g_MenuData.szName[dwCnt], szPath) == TRUE) {
 			if (dwCnt % itemNum == 0 && dwCnt != 0)
-				::AppendMenu(g_hListMenu, MF_OWNERDRAW | MF_MENUBARBREAK, ID_MENU_MIN + dwCnt, (LPCTSTR) dwCnt);
+				::AppendMenuA(g_hListMenu, MF_OWNERDRAW | MF_MENUBARBREAK, ID_MENU_MIN + dwCnt,
+							  (LPCSTR)(UINT_PTR)dwCnt);
 			else
-				::AppendMenu(g_hListMenu, MF_OWNERDRAW | MF_POPUP, ID_MENU_MIN + dwCnt, (LPCTSTR) dwCnt);
+				::AppendMenuA(g_hListMenu, MF_OWNERDRAW | MF_POPUP, ID_MENU_MIN + dwCnt,
+							  (LPCSTR)(UINT_PTR)dwCnt);
 			dwValidCnt++;
 		}
 		dwCnt++;
@@ -1438,7 +1440,7 @@ BOOL RegSaveLoginHostInformation(JobInfo *jobInfo)
 	RegSetStr(hKey, KEY_USERNAME, jobInfo->szUsername);
 	RegSetDword(hKey, KEY_PASSWDFLAG, (DWORD) jobInfo->bPassword);
 	EncodePassword(jobInfo->szPassword, szEncodePassword);
-	RegSetBinary(hKey, KEY_PASSWORD, szEncodePassword, strlen(szEncodePassword) + 1);
+	RegSetBinary(hKey, KEY_PASSWORD, szEncodePassword, (DWORD)(strlen(szEncodePassword) + 1));
 
 	RegSetStr(hKey, KEY_TERATERM, jobInfo->szTeraTerm);
 	RegSetStr(hKey, KEY_INITFILE, jobInfo->szInitFile);
@@ -1565,7 +1567,6 @@ BOOL SaveEtcInformation(HWND hWnd)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL SaveLoginHostInformation(HWND hWnd)
 {
-	long	index;
 	wchar_t	szDefault[MAX_PATH] = DEFAULT_PATH;
 	wchar_t	szTTermPath[MAX_PATH];
 	wchar_t	szName[MAX_PATH];
@@ -1655,7 +1656,7 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	InitListMenu(hWnd);
 	InitListBox(hWnd);
 
-	index = 0;
+	LRESULT index = 0;
 	while ((index = ::SendDlgItemMessageW(hWnd, LIST_HOST, LB_SELECTSTRING, index, (LPARAM)(LPCTSTR) g_JobInfo.szName)) != LB_ERR) {
 		::SendDlgItemMessageW(hWnd, LIST_HOST, LB_GETTEXT, index, (LPARAM)(LPCTSTR) szName);
 		if (_wcsicmp(g_JobInfo.szName, szName) == 0)
@@ -1678,8 +1679,7 @@ BOOL SaveLoginHostInformation(HWND hWnd)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL LoadLoginHostInformation(HWND hWnd)
 {
-	long	index;
-//	char	*pt;
+	LRESULT	index;
 	wchar_t	szName[MAX_PATH];
 	wchar_t	uimsg[MAX_UIMSG];
 	DWORD	dwErr;
@@ -1796,7 +1796,7 @@ BOOL LoadLoginHostInformation(HWND hWnd)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL DeleteLoginHostInformation(HWND hWnd)
 {
-	long	index;
+	LRESULT	index;
 	wchar_t	szEntryName[MAX_PATH];
 	wchar_t	szSubKey[MAX_PATH];
 	wchar_t	uimsg[MAX_UIMSG];
@@ -1845,7 +1845,7 @@ BOOL DeleteLoginHostInformation(HWND hWnd)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 {
-	int ret = 0;
+	LRESULT ret = 0;
 	wchar_t title[MAX_UIMSG];
 	wchar_t *filter;
 
@@ -2257,7 +2257,7 @@ INT_PTR CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 					g_MenuData.hSmallIcon[lpdis->itemData],
 					ICONSIZE_SMALL,
 					ICONSIZE_SMALL,
-					NULL,
+					0,
 					NULL,
 					DI_NORMAL);
 		return TRUE;
@@ -2449,7 +2449,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					(g_MenuData.dwIconMode == MODE_LARGEICON) ? g_MenuData.hLargeIcon[lpdis->itemData] : g_MenuData.hSmallIcon[lpdis->itemData],
 					dwIconSize,
 					dwIconSize,
-					NULL,
+					0,
 					NULL,
 					DI_NORMAL);
 		return TRUE;
