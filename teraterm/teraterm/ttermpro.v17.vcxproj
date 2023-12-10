@@ -312,18 +312,18 @@
     <ClInclude Include="unicode.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\common\common_static.v16.vcxproj">
+    <ProjectReference Include="..\common\common_static.v17.vcxproj">
       <Project>{ac42387d-23ec-45db-81f9-8933c7efa52a}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\ttpcmn\ttpcmn.v16.vcxproj">
+    <ProjectReference Include="..\ttpcmn\ttpcmn.v17.vcxproj">
       <Project>{118e0d32-5553-4f73-9927-e873c1c500e4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\ttpmacro\ttpmacro.v16.vcxproj">
+    <ProjectReference Include="..\ttpmacro\ttpmacro.v17.vcxproj">
       <Project>{ba519362-a2c2-4b1a-905b-f00791f9038a}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\ttptek\ttptek.v16.vcxproj">
+    <ProjectReference Include="..\ttptek\ttptek.v17.vcxproj">
       <Project>{6d08053b-1c68-4a7e-8766-3553f5af010b}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
