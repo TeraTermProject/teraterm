@@ -163,7 +163,7 @@
     <ResourceCompile Include="ttpcmn-version.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\common\common_static.v16.vcxproj">
+    <ProjectReference Include="..\common\common_static.v17.vcxproj">
       <Project>{ac42387d-23ec-45db-81f9-8933c7efa52a}</Project>
     </ProjectReference>
   </ItemGroup>

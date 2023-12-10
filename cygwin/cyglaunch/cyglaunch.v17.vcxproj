@@ -95,7 +95,7 @@
     <ClCompile Include="cyglaunch.c" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\cyglib\cyglib.v16.vcxproj">
+    <ProjectReference Include="..\cyglib\cyglib.v17.vcxproj">
       <Project>{a171f48c-bfb2-4766-97c3-9b8b7be9d548}</Project>
     </ProjectReference>
   </ItemGroup>
