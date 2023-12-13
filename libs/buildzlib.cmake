@@ -51,13 +51,13 @@ execute_process(
   COMMAND ${CMAKE_COMMAND} -DTARGET=zlib -DEXT_DIR=${EXTRACT_DIR} -P download.cmake
 )
 
-if(${SRC_DIR}/COPYING IS_NEWER_THAN ${CMAKE_CURRENT_LIST_DIR}/doc_help/Zlib-LICENSE.txt)
+if(${SRC_DIR}/COPYING IS_NEWER_THAN ${CMAKE_CURRENT_LIST_DIR}/doc_help/zlib-LICENSE.txt)
   file(COPY
     ${SRC_DIR}/README
     DESTINATION ${CMAKE_CURRENT_LIST_DIR}/doc_help)
   file(RENAME
     ${CMAKE_CURRENT_LIST_DIR}/doc_help/README
-    ${CMAKE_CURRENT_LIST_DIR}/doc_help/Zlib-LICENSE.txt)
+    ${CMAKE_CURRENT_LIST_DIR}/doc_help/zlib-LICENSE.txt)
 endif()
 
 ########################################
