@@ -83,6 +83,14 @@ static BOOL CursorOnDBCS = FALSE;
 static BOOL SaveWinSize = FALSE;
 static int WinWidthOld, WinHeightOld;
 static HBRUSH Background;
+static BOOL FontReSizeEnableInit = TRUE;	// font_resize_enable の初期値
+/*  TODO
+ *	iniファイルの読み込みの後(DispEnableResizedFont()が呼ばれた後)
+ *	初期化(InitDisp())が行われるため初期値を変数で持つ。
+ *	1回しか行わない初期はもっと早く、
+ *	iniファイル読み込みよりも前に行い、
+ *	変数FontReSizeEnableInitを不要にする。
+ */
 
 /*
  *	ANSI color table
@@ -1704,7 +1712,7 @@ void InitDisp(void)
   w->alpha_vtback = 255;
   w->debug_drawbox_text = FALSE;
   w->debug_drawbox_fillrect = FALSE;
-  w->font_resize_enable = TRUE;
+  w->font_resize_enable = FontReSizeEnableInit;
   BGReverseTextAlpha = 255;
 }
 
@@ -4065,6 +4073,7 @@ void DispEnableResizedFont(BOOL enable)
 {
 	vtdisp_work_t *w = &vtdisp_work;
 	w->font_resize_enable = enable;
+	FontReSizeEnableInit = enable;
 }
 
 BOOL DispIsResizedFont()
