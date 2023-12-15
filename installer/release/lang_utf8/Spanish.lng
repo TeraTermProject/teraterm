@@ -271,8 +271,9 @@ DLG_TAB_FONT_VTFONT_TITLE=API for drawing
 DLG_TAB_FONT_DLGFONT=&Dialog font
 DLG_TAB_FONT_BTN_DEFAULT=D&efault
 DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
-DLG_TAB_FONT_LIST_PRO_FONTS=List &proportional fonts in font dialog"
+DLG_TAB_FONT_LIST_PRO_FONTS=List &proportional fonts in font dialog
 DLG_TAB_FONT_CHARACTER_SPACE=character space
+DLG_TAB_FONT_RESIZED_FONT=Drawing resized font to fit cell width
 
 DLG_COMMENT_TITLE=Comment to Log
 

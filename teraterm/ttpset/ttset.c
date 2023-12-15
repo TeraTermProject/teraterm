@@ -53,6 +53,7 @@
 #include "ttlib_charset.h"
 #include "asprintf.h"
 #include "compat_win.h"
+#include "vtdisp.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
@@ -341,7 +342,7 @@ void IconId2IconName(char *name, int len, int id) {
 static WORD GetOnOff(PCHAR Sect, PCHAR Key, const wchar_t *FName, BOOL Default)
 {
 	char Temp[4];
-	GetPrivateProfileString(Sect, Key, "", Temp, sizeof(Temp), FName);
+	GetPrivateProfileStringAFileW(Sect, Key, "", Temp, sizeof(Temp), FName);
 	if (Default) {
 		if (_stricmp(Temp, "off") == 0)
 			return 0;
@@ -2070,6 +2071,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (ts->UnicodeEmojiWidth < 1 || 2 < ts->UnicodeEmojiWidth) {
 		ts->UnicodeEmojiWidth = GetDefaultUnicodeWidth();
 	}
+	DispEnableResizedFont(GetOnOff(Section, "DrawingResizedFont", FName, TRUE));
 
 	DispReadIni(FName, ts);
 
@@ -3298,6 +3300,8 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteInt(Section, "UnicodeAmbiguousWidth", FName, ts->UnicodeAmbiguousWidth);
 	WriteOnOff(Section, "UnicodeEmojiOverride", FName, ts->UnicodeEmojiOverride);
 	WriteInt(Section, "UnicodeEmojiWidth", FName, ts->UnicodeEmojiWidth);
+
+	WriteOnOff(Section, "DrawingResizedFont", FName, DispIsResizedFont());
 
 	// rounded corner preference for VT/TEK window
 	WriteOnOff(Section, "WindowCornerDontround", FName, ts->WindowCornerDontround);
