@@ -503,18 +503,38 @@
 				</OBJECT>
 			<UL>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="visual tab">
+					<param name="Name" value="General tab">
+					<param name="Local" value="html\menu\setup-additional.html#TabGeneral">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Control Sequence tab">
+					<param name="Local" value="html\menu\setup-additional.html#TabControlSequence">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Copy and Paste tab">
+					<param name="Local" value="html\menu\setup-additional.html#TabCopyAndPaste">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Visual tab">
 					<param name="Local" value="html\menu\setup-additional-visual.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="visual tab/theme">
+					<param name="Name" value="Visual tab/theme">
 					<param name="Local" value="html\menu\setup-additional-visual-theme.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="log tab">
+					<param name="Name" value="Log tab">
 					<param name="Local" value="html\menu\setup-additional-log.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Cygwin tab">
+					<param name="Local" value="html\menu\setup-additional.html#TabCygwin">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
