@@ -25,8 +25,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description="creating &quot;$(ProjectDir)..\ttpdlg\svnversion.h&quot;"
-				CommandLine="&quot;$(OutDir)\svnrev.exe&quot; &quot;$(SolutionDir)..\libs\svn\bin\svnversion.exe&quot; &quot;$(SolutionDir)..&quot; &quot;$(ProjectDir)..\ttpdlg\svnversion.h&quot;"
+Description="creating &quot;$(ProjectDir)..\common\svnversion.h&quot;"
+				CommandLine="&quot;$(SolutionDir)..\buildtools\svnrev\svnrev.bat&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -119,8 +119,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description="creating &quot;$(ProjectDir)..\ttpdlg\svnversion.h&quot;"
-				CommandLine="&quot;$(OutDir)\svnrev.exe&quot; &quot;$(SolutionDir)..\libs\svn\bin\svnversion.exe&quot; &quot;$(SolutionDir)..&quot; &quot;$(ProjectDir)..\ttpdlg\svnversion.h&quot;"
+Description="creating &quot;$(ProjectDir)..\common\svnversion.h&quot;"
+				CommandLine="&quot;$(SolutionDir)..\buildtools\svnrev\svnrev.bat&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"

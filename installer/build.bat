@@ -175,11 +175,7 @@ popd
 
 
 rem リビジョンが変化していれば svnversion.h を更新する。
-if exist ..\teraterm\release\svnrev.exe goto svnrev
-devenv /build release %TERATERMSLN% /project svnrev /projectconfig release
-
-:svnrev
-..\teraterm\release\svnrev.exe ..\libs\svn\bin\svnversion.exe .. ..\teraterm\ttpdlg\svnversion.h
+call ..\buildtools\svnrev\svnrev.bat
 
 
 devenv /%BUILD% release %TERATERMSLN%
