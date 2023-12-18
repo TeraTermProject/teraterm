@@ -29,8 +29,8 @@ Name: makearchive.bat; Parameters: release
 [Setup]
 AppCopyright=(C) 2004-2023 TeraTerm Project
 AppPublisher=TeraTerm Project
-AppPublisherURL=https://ttssh2.osdn.jp/
-AppSupportURL=https://ttssh2.osdn.jp/
+AppPublisherURL=https://teratermproject.github.io/
+AppSupportURL=https://teratermproject.github.io/
 AppName={#AppName}
 #ifndef snapshot
 AppVersion={#AppVer}

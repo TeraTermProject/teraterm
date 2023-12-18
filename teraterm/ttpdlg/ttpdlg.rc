@@ -238,7 +238,7 @@ BEGIN
     LTEXT           "Built using Microsoft Visual C++",IDC_BUILDTOOL,7,109,172,8
     LTEXT           "Build time: ",IDC_BUILDTIME,7,117,172,8
     LTEXT           "Author:",IDC_AUTHOR_LABEL,7,126,28,8
-    LTEXT           "https://ttssh2.osdn.jp/",IDC_AUTHOR_URL,36,126,143,8,SS_NOTIFY | WS_TABSTOP
+    LTEXT           "https://teratermproject.github.io/",IDC_AUTHOR_URL,36,126,166,8,SS_NOTIFY | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,145,5,32,14,WS_GROUP
     LTEXT           "SFMT:",IDC_SFMT_VERSION,38,93,141,8
 END
