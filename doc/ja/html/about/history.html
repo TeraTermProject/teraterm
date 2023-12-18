@@ -41,22 +41,23 @@
 
   <li>バグ修正
     <ul>
-      <li><a href="../macro/command/strjoin.html">strjoin</a> マクロコマンドで、連結文字列を誤った変数へセットしていた問題を修正した。</li>
-      <li>VT ウィンドウでF1キーを押したとき、設定したシーケンスが送信されず、ヘルプが開けないダイアログが出る問題を修正した。</li>
-      <li>ログダイアログでデフォルト値がセットされていなかった問題を修正した。</li>
-      <li><a href="../macro/command/settitle.html">settitle</a> マクロコマンドで漢字等を使用するとクラッシュする問題を修正した。</li>
-      <ul>
-        <li><a href="../macro/command/settitle.html">settitle</a>, <a href="../macro/command/gettitle.html">gettitle</a>, <a href="../macro/command/loadkeymap.html">loadkeymap</a> が文字列をUnicodeとして扱うよう修正。
-        <li>現在、Tera Term 内部ではローカルタイトル文字列をANSI文字列で持っている。変換できない文字は "?" に置き換えられる。</li>
-      </ul>
-      <li><a href="../macro/command/sendfile.html">sendfile</a> マクロコマンドで送信完了してもコマンドが終了しない問題を修正した。</li>
-      <li>接続先から単独の0x0a(LF)を受信した時に、ログとマクロに出力しないようにした。</li>
       <li>ローカルエコーがONの時、クリップボードからのペーストがローカルエコーされない問題を修正した。</li>
+      <li>VT ウィンドウでF1キーを押したとき、設定したシーケンスが送信されず、ヘルプが開けないダイアログが出る問題を修正した。</li>
+      <li>接続先から単独の0x0a(LF)を受信した時に、ログとマクロに出力しないようにした。</li>
       <li>ZMODEMの受信時に日本語ファイル名を使用するとアプリケーションエラーが発生するので修正した。</li>
-      <li>"Drawing resized font to fit cell width"設定についての修正した。
+      <li>ログダイアログでデフォルト値がセットされていなかった問題を修正した。</li>
+      <li>"Drawing resized font to fit cell width"の設定を修正した。
         <ul>
           <li>設定をTERATERM.INIへ保存していなかったので保存するよう修正した。</li>
           <li>言語UIが日本語のとき、ダイアログに"描画幅に合わせてリサイズしたフォントを描画"と表示するようにした。
+        </ul>
+      </li>
+      <li><a href="../macro/command/strjoin.html">strjoin</a> マクロコマンドで、連結文字列を誤った変数へセットしていた問題を修正した。</li>
+      <li><a href="../macro/command/sendfile.html">sendfile</a> マクロコマンドで送信完了してもコマンドが終了しない問題を修正した。</li>
+      <li><a href="../macro/command/settitle.html">settitle</a> マクロコマンドで漢字等を使用するとクラッシュする問題を修正した。
+        <ul>
+          <li><a href="../macro/command/settitle.html">settitle</a>, <a href="../macro/command/gettitle.html">gettitle</a>, <a href="../macro/command/loadkeymap.html">loadkeymap</a> が文字列をUnicodeとして扱うよう修正。
+          <li>現在、Tera Term 内部ではローカルタイトル文字列をANSI文字列で持っている。変換できない文字は "?" に置き換えられる。</li>
         </ul>
       </li>
     </ul>
@@ -65,8 +66,8 @@
   <li>その他
     <ul>
       <li><a href="#ttssh_3.1">TTSSH(3.1)</a>へ差し替えた。</li>
-      <li>Oniguruma 6.9.9へ差し替えた。</li>
       <li><a href="#ttmenu_1.18">TeraTerm Menu(1.18)</a>へ差し替えた。</li>
+      <li>Oniguruma 6.9.9へ差し替えた。</li>
     </ul>
   </li>
 </ul>
@@ -3407,8 +3408,8 @@
 
   <li>バグ修正
     <ul>
-      <li>SCP送受信時ファイル名がUnicodeに対応していない問題を修正した。</li>
       <li>秘密鍵のファイル名に漢字が含まれているとSSHセッションを複製できない問題を修正した。</li>
+      <li>SCP送受信時ファイル名がUnicodeに対応していない問題を修正した。</li>
     </ul>
   </li>
 

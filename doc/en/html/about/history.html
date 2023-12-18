@@ -41,22 +41,23 @@
 
   <li>Bug fixes
     <ul>
-      <li>MACRO: <a href="../macro/command/strjoin.html">strjoin</a> command set concatenated string to the wrong variable.</li>
-      <li>Fixed when F1 key is pressed in VT window, configured sequence is not sent and dialog that can't open open HTML help file shows.</li>
-      <li>Fixed default values were not set in the log dialog.</li>
-      <li>MACOR: <a href="../macro/command/settitle.html">settitle</a> command using Kanji characters will be crashed.</li>
-      <ul>
-        <li>Fixed <a href="../macro/command/settitle.html">settitle</a>, <a href="../macro/command/gettitle.html">gettitle</a>, <a href="../macro/command/loadkeymap.html">loadkeymap</a> to handel string in Unicode.
-        <li>Currently, Tera Term handle local title strings in ANSI strings. Characters that cannot be converted are replaced by "?".</li>
-      </ul>
-      <li>MACRO: fixed <a href="../macro/command/sendfile.html">sendfile</a> command stuck even if transmission is completed to send.</li>
-      <li>When a single 0x0a(LF) is received from server, do not output to log and macro.</li>
       <li>Fixed paste from clipboard is not echoed when local echo is on.</li>
+      <li>Fixed when F1 key is pressed in VT window, configured sequence is not sent and dialog that can't open open HTML help file shows.</li>
+      <li>When a single 0x0a(LF) is received from server, do not output to log and macro.</li>
       <li>Fixed application error using Japanese file names when receiving ZMODEM.</li>
+      <li>Fixed default values were not set in the log dialog.</li>
       <li>Fixed about "Drawing resized font to fit cell width" setting.
         <ul>
           <li>Setting is not seved in TEARTERM.INI, so fixed to save.</li>
           <li>Displaying Japanese in dialog when language UI is Japanese.</li>
+        </ul>
+      </li>
+      <li>MACRO: <a href="../macro/command/strjoin.html">strjoin</a> command set concatenated string to the wrong variable.</li>
+      <li>MACRO: fixed <a href="../macro/command/sendfile.html">sendfile</a> command stuck even if transmission is completed to send.</li>
+      <li>MACRO: <a href="../macro/command/settitle.html">settitle</a> command using Kanji characters will be crashed.
+        <ul>
+          <li>Fixed <a href="../macro/command/settitle.html">settitle</a>, <a href="../macro/command/gettitle.html">gettitle</a>, <a href="../macro/command/loadkeymap.html">loadkeymap</a> to handel string in Unicode.
+          <li>Currently, Tera Term handle local title strings in ANSI strings. Characters that cannot be converted are replaced by "?".</li>
         </ul>
       </li>
     </ul>
@@ -65,8 +66,8 @@
   <li>Misc
     <ul>
       <li>Upgraded TTSSH to <a href="#ttssh_3.1">3.1</a>.</li>
-      <li>Upgraded Oniguruma to 6.9.9.</li>
       <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.18">1.18</a></li>
+      <li>Upgraded Oniguruma to 6.9.9.</li>
     </ul>
   </li>
 </ul>
@@ -3399,8 +3400,8 @@ SYNOPSIS:
 
   <li>Bug fixes
     <ul>
-      <li>fixed unicode filename could not be used in SCP.</li>
       <li>fixed SSH sessions can not duplicate if the private key file name includes Kanji characters.</li>
+      <li>fixed unicode filename could not be used in SCP.</li>
     </ul>
   </li>
 
