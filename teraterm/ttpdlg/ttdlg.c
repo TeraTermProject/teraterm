@@ -2408,8 +2408,11 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 			// Tera Term 本体のバージョン
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d", TT_VERSION_MAJOR, TT_VERSION_MINOR);
-#ifdef SVNVERSION
+#if defined(SVNVERSION)
 			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# %d)", SVNVERSION);
+			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
+#elif defined(GITVERSION)
+			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (Git %s)", GITVERSION);
 			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
 #else
 			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# UNK)");
