@@ -146,8 +146,8 @@ void SSH2_update_kex_myproposal(PTInstVar pvar)
 			// キー再作成の場合には、接続時に pvar->settings から組み立てられた myproposal を書き換える。
 			//   pvar->settings が 接続時に myproposal を作成したときの値から変わっていない保証がない。
 			//   再度組み立てるのではなく既存の myproposal を書き換えることにした。
-			int pos = strlen(myproposal[PROPOSAL_KEX_ALGS]) - strlen(",ext-info-c");
-			if (strcmp(myproposal[PROPOSAL_KEX_ALGS] + pos, ",ext-info-c") == 0) {
+			int pos = strlen(myproposal[PROPOSAL_KEX_ALGS]) - strlen(",ext-info-c,kex-strict-c-v00@openssh.com");
+			if (strcmp(myproposal[PROPOSAL_KEX_ALGS] + pos, ",ext-info-c,kex-strict-c-v00@openssh.com") == 0) {
 				myproposal[PROPOSAL_KEX_ALGS][pos] = '\0';
 			}
 		}
@@ -163,8 +163,8 @@ void SSH2_update_kex_myproposal(PTInstVar pvar)
 		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
 
-	// RFC 8308 Extension Negotiation
-	strncat_s(buf, sizeof(buf), "ext-info-c", _TRUNCATE);
+	// Enables RFC 8308 Extension Negotiation & Strict KEX mode (for CVE-2023-48795)
+	strncat_s(buf, sizeof(buf), "ext-info-c,kex-strict-c-v00@openssh.com", _TRUNCATE);
 
 	myproposal[PROPOSAL_KEX_ALGS] = buf; 
 }

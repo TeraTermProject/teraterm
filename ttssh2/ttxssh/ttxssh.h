@@ -361,6 +361,7 @@ typedef struct _TInstVar {
 	} recv;
 
 	char *server_sig_algs;
+	BOOL server_strict_kex;
 
 } TInstVar;
 
