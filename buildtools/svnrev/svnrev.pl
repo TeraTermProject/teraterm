@@ -327,7 +327,7 @@ if (-d "$source_root/.svn" && $svn ne "") {
 		}
 	}
 }
-elsif(-d "$source_root/.git" && $git ne "") {
+elsif((-d "$source_root/.git" || -f "$source_root/.git") && $git ne "") {
 	$svninfo{'vcs'} = 'git';
 
 	my $branch = `\"$git\" rev-parse --abbrev-ref HEAD`;
