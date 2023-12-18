@@ -1,33 +1,33 @@
 ﻿#define AppName "Tera Term"
 #ifndef AppVer
-#define AppVer "5.1"
+#define AppVer "5.2-dev"
 #endif
 ;#define VerSubStr
 ;#define OutputSubStr
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
 
 [InnoIDE_PostCompile]
-Name: makearchive.bat; Parameters: release
+;Name: makearchive.bat; Parameters: release
 
 [PreCompile]
 Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
 
 [PostCompile]
-Name: makearchive.bat; Parameters: release
+;Name: makearchive.bat; Parameters: release
 
 [_ISToolPreCompile]
 Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
 
 [_ISToolPostCompile]
-Name: makearchive.bat; Parameters: release
+;Name: makearchive.bat; Parameters: release
 
 [Setup]
 AppCopyright=(C) 2004-2023 TeraTerm Project
