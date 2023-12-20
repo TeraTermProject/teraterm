@@ -56,7 +56,7 @@ sub ShowAttributesSGR {
 		},
 		{
 			Enter => "\x1b[0m\x1b[42m",
-			Str => "BG Red            / SGR 0 + SGR 42(BG Green)",
+			Str => "BG Green          / SGR 0 + SGR 42(BG Green)",
 		},
 		{
 			Enter => "\x1b[31m\x1b[42m",
