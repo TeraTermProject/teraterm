@@ -163,7 +163,7 @@ Color numbers 0 through 8 are first 8 colors set in ANSIColor in TERATERM.INI.
 15    "White"                 "Bright White"
 </pre>
 
-<h2>Reverse color</h2>
+<h2 id="reverse">Reverse color</h2>
 
 <p>
 Reverse color is displayed in the following cases:
@@ -174,7 +174,10 @@ Reverse color is displayed in the following cases:
 </ul>
 
 <p>
-In Tera Term, the fore and back colors are replace to make the display reverse color.
+When reverse attribute is enabled, text is drawn with reverse attribute fore and back colors.
+
+<p>
+When reverse attribute is disabled, the fore and back colors are replace to make the display reverse color.
 (Some terminal emulators use (255-R,255-G,255-B) as (R,G,B) color invert color.)
 
 <p>
