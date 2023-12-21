@@ -187,5 +187,43 @@ This is for following reasons:
   <li>Same as VT525 operation, which can handle color in the VT series.
 </ul>
 
+<h3 id="fg_bg_color">text foreground and background colors</h3>
+
+<ul>
+  <li>Text has attributes</li>
+  <ul>
+    <li>Normal attribute has no special attributes</li>
+  </ul>
+  <li>There may be multiple attributes (such as Reverse+Bold)</li>
+  <li>The fore and back colors of the text are determined by the attributes above table</li>
+  <li>Attribute with ÅgoÅh in the ÅgUseNormalBGColorÅh column uses ÅgNormal backÅh when ÅgAlways use Normal text's BGÅh is checked.</li>
+</ul>
+
+<pre>
+| Attribute           | Fore Color     | Back Color     | UseNormalBGColor | remark         |
+|---------------------|----------------|----------------|------------------|----------------|
+| Fore color          | Fore color     | -              |                  | 8/16/256 color |
+| Back color          | -              | Back color     |                  | 8/16/256 color |
+| Blink attribute     | Blink fore     | Blink back     | o                | SGR5           |
+| Bold attribute      | Bold fore      | Bold back      | o                | SGR1           |
+| Underline attribute | Underline fore | Underline back | o                | SGR4           |
+| URL attribute       | URL fore       | URL back       | o                |                |
+| Reverse attribute   | Reverse fore   | Reverse back   |                  | SGR7           |
+| Normal attribute    | Normal fore    | Normal back    |                  |                |
+</pre>
+
+<ul>
+  <li>There are Reverse, Blink, Bold, Underline, and URL attributes, and when these attributes are enabled, the attributeÅfs color is set.</li>
+  <li>When the Reverse attribute is enabled and the text is displayed in reverse</li>
+  <ul>
+    <li>Only Reverse attribute texts is seted colors of the Reverse attribute</li>
+    <li>For other attribute texts, Fore and Back are swapped.</li>
+  </ul>
+  <li>When the Reverse attribute is disabled and the text is displayed in reverse</li>
+  <ul>
+    <li>Fore and Back are swapped.
+  </ul>
+</ul>
+
 </body>
 </html>

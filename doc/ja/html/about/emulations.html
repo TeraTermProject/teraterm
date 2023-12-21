@@ -186,5 +186,43 @@ TERMINFOの端末エントリのsetabを次のようにすると利用可能となります。
   <li>VTシリーズでカラーが扱えるVT525の動作と同じ
 </ul>
 
+<h3 id="fg_bg_color">文字の前景と背景の色</h3>
+
+<ul>
+  <li>文字には属性がついている</li>
+  <ul>
+    <li>特別な属性がないのがNormal属性</li>
+  </ul>
+  <li>複数の属性を持つことがある(Reverse+Boldなど)</li>
+  <li>文字の前景と背景の色は、表の上の属性から優先されて決定する</li>
+  <li>UseNormalBGColor列に"o"がついている属性は、「常に標準の背景色を使う」にチェックが入っていると背景色はNormal backが使用される</li>
+</ul>
+
+<pre>
+| Attribute           | Fore Color     | Back Color     | UseNormalBGColor | remark         |
+|---------------------|----------------|----------------|------------------|----------------|
+| Fore color          | Fore color     | -              |                  | 8/16/256 color |
+| Back color          | -              | Back color     |                  | 8/16/256 color |
+| Blink attribute     | Blink fore     | Blink back     | o                | SGR5           |
+| Bold attribute      | Bold fore      | Bold back      | o                | SGR1           |
+| Underline attribute | Underline fore | Underline back | o                | SGR4           |
+| URL attribute       | URL fore       | URL back       | o                |                |
+| Reverse attribute   | Reverse fore   | Reverse back   |                  | SGR7           |
+| Normal attribute    | Normal fore    | Normal back    |                  |                |
+</pre>
+
+<ul>
+  <li>Reverse,Blink,Bold,Underline,URL属性があり、その属性がenable時、属性独自の色が設定される</li>
+  <li>Reverse属性がenable時、反転表示すると</li>
+  <ul>
+    <li>Reverse属性だけの文字は、Reverse属性の色が設定される</li>
+    <li>その他の属性の文字は、ForeとBackが入れ替わる</li>
+  </ul>
+  <li>Reverse属性がdisableのとき、反転表示すると</li>
+  <ul>
+    <li>ForeとBackが入れ替わる</li>
+  </ul>
+</ul>
+
 </body>
 </html>
