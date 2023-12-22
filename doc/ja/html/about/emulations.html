@@ -194,6 +194,8 @@ TERMINFOの端末エントリのsetabを次のようにすると利用可能となります。
     <li>特別な属性がないのがNormal属性</li>
   </ul>
   <li>複数の属性を持つことがある(Reverse+Boldなど)</li>
+  <li>色に関連する属性は、Reverse,Blink,Bold,Underline,URLがあり、
+    各々の属性の色がenableの時、属性独自の色が使用される</li>
   <li>文字の前景と背景の色は、表の上の属性から優先されて決定する</li>
   <li>UseNormalBGColor列に"o"がついている属性は、「常に標準の背景色を使う」にチェックが入っていると背景色はNormal backが使用される</li>
 </ul>
@@ -208,11 +210,10 @@ TERMINFOの端末エントリのsetabを次のようにすると利用可能となります。
 | Underline attribute | Underline fore | Underline back | o                | SGR4           |
 | URL attribute       | URL fore       | URL back       | o                |                |
 | Reverse attribute   | Reverse fore   | Reverse back   |                  | SGR7           |
-| Normal attribute    | Normal fore    | Normal back    |                  |                |
+| Normal attribute    | Normal fore    | Normal back    |                  | SGR0           |
 </pre>
 
 <ul>
-  <li>Reverse,Blink,Bold,Underline,URL属性があり、その属性がenable時、属性独自の色が設定される</li>
   <li>Reverse属性がenable時、反転表示すると</li>
   <ul>
     <li>Reverse属性だけの文字は、Reverse属性の色が設定される</li>
@@ -222,6 +223,13 @@ TERMINFOの端末エントリのsetabを次のようにすると利用可能となります。
   <ul>
     <li>ForeとBackが入れ替わる</li>
   </ul>
+  <li><a href="../setup/teraterm-win.html#color">UseTextColor=onのとき</a>かつ、<br>
+    前景色がANSI0(黒)又はANSI7(白)又はANSI15(GRAY)で、背景色と同じとき
+    <ul>
+      <li>Reverse属性がない場合は、Normal属性の前景色と背景色が使用される</li>
+      <li>Reverse属性の場合は、Reverse属性の前景色と背景色が使用される</li>
+    </ul>
+  </li>
 </ul>
 
 </body>

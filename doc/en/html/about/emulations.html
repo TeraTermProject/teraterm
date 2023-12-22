@@ -195,6 +195,7 @@ This is for following reasons:
     <li>Normal attribute has no special attributes</li>
   </ul>
   <li>There may be multiple attributes (such as Reverse+Bold)</li>
+  <li>Attributes related to color are Reverse, Blink, Bold, Underline, and URL. When each of these attributes is enabled, attribute's colors are used.</li>
   <li>The fore and back colors of the text are determined by the attributes above table</li>
   <li>Attribute with ÅgoÅh in the ÅgUseNormalBGColorÅh column uses ÅgNormal backÅh when ÅgAlways use Normal text's BGÅh is checked.</li>
 </ul>
@@ -209,11 +210,10 @@ This is for following reasons:
 | Underline attribute | Underline fore | Underline back | o                | SGR4           |
 | URL attribute       | URL fore       | URL back       | o                |                |
 | Reverse attribute   | Reverse fore   | Reverse back   |                  | SGR7           |
-| Normal attribute    | Normal fore    | Normal back    |                  |                |
+| Normal attribute    | Normal fore    | Normal back    |                  | SGR0           |
 </pre>
 
 <ul>
-  <li>There are Reverse, Blink, Bold, Underline, and URL attributes, and when these attributes are enabled, the attributeÅfs color is set.</li>
   <li>When the Reverse attribute is enabled and the text is displayed in reverse</li>
   <ul>
     <li>Only Reverse attribute texts is seted colors of the Reverse attribute</li>
@@ -223,6 +223,13 @@ This is for following reasons:
   <ul>
     <li>Fore and Back are swapped.
   </ul>
+  <li>When <a href="../setup/teraterm-win.html#color">UseTextColor=on</a>and<br>
+    Fore is ANSI0(black) or ANSI7(white) or ANSI15(gray), and Fore and Back are same,
+    <ul>
+      <li>When attribute has no Reverse, Normal attributeÅfs Fore and Back are used.</li>
+      <li>When attribute has Reverse, Reverse attributeÅfs Fore and Back are used.</li>
+    </ul>
+  </li>
 </ul>
 
 </body>
