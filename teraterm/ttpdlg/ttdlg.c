@@ -1347,32 +1347,95 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 }
 
 /**
- *	コンボボックスのホスト履歴をファイルに書き出す
+ *	リストボックスの横スクロール幅を設定する
  */
-static void WriteComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar_t *SetupFNW)
+static void ModifyListboxHScrollWidth(HWND dlg, int dlg_item)
 {
-	wchar_t EntNameW[10];
-	LRESULT Index;
-	int i;
+	LRESULT i;
+	LRESULT item_count;
+	int max_width;
 
+	HWND listbox = GetDlgItem(dlg, dlg_item);
+	HDC listbox_dc = GetDC(listbox);
+	HFONT listbox_font = (HFONT)SendMessageW(listbox, WM_GETFONT, 0, 0);
+	HFONT listbox_font_old = (HFONT)SelectObject(listbox_dc, listbox_font);
+
+	// リストボックス内の最大文字列幅取得
+	max_width = 0;
+	item_count = SendMessageW(listbox, LB_GETCOUNT, 0, 0);
+	for (i = 0; i < item_count; i++) {
+		SIZE size;
+		wchar_t *strW;
+		GetDlgItemIndexTextW(dlg, dlg_item, (WPARAM)i, &strW);
+		GetTextExtentPoint32W(listbox_dc, strW, (int)wcslen(strW), &size);
+		free(strW);
+		if (max_width < size.cx) {
+			max_width = size.cx;
+		}
+	}
+
+	// 横幅を設定する
+	SendMessageW(listbox, LB_SETHORIZONTALEXTENT, max_width + 5, 0);	// +5 幅に少し余裕を持たせる
+
+	SelectObject(listbox_dc, listbox_font_old);
+	ReleaseDC(listbox, listbox_dc);
+}
+
+/**
+ *	リストボックス(ホスト履歴)をファイルに書き出す
+ */
+static void WriteListBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar_t *SetupFNW)
+{
+	LRESULT item_count;
+	LRESULT i;
+
+	item_count = SendDlgItemMessageW(dlg, dlg_item, LB_GETCOUNT, 0, 0);
+	if (item_count == LB_ERR) {
+		return;
+	}
+
+	// [Hosts] をすべて削除
 	WritePrivateProfileStringW(L"Hosts", NULL, NULL, SetupFNW);
 
-	Index = SendDlgItemMessageW(dlg, dlg_item, LB_GETCOUNT, 0, 0);
-	if (Index == LB_ERR) {
-		Index = 0;
+	if (item_count > maxhostlist) {
+		item_count = maxhostlist;
 	}
-	else {
-		Index--;
-	}
-	if (Index > MAXHOSTLIST) {
-		Index = MAXHOSTLIST;
-	}
-	for (i = 1; i <= Index; i++) {
+	for (i = 0; i < item_count; i++) {
+		wchar_t EntNameW[10];
 		wchar_t *strW;
-		GetDlgItemIndexTextW(dlg, dlg_item, i - 1, &strW);
-		_snwprintf_s(EntNameW, _countof(EntNameW), _TRUNCATE, L"Host%i", i);
+		GetDlgItemIndexTextW(dlg, dlg_item, (WPARAM)i, &strW);
+		_snwprintf_s(EntNameW, _countof(EntNameW), _TRUNCATE, L"Host%i", (int)i + 1);
 		WritePrivateProfileStringW(L"Hosts", EntNameW, strW, SetupFNW);
 		free(strW);
+	}
+}
+
+/**
+ *	Up/Remove/Downボタンをenable/disableする
+ */
+static void TCPIPDlgButtons(HWND Dialog)
+{
+	LRESULT item_count;
+	LRESULT cur_pos;
+	item_count = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCOUNT, 0, 0);
+	cur_pos = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
+	if ((cur_pos == LB_ERR) || (item_count == LB_ERR)) {
+		DisableDlgItem(Dialog, IDC_TCPIPUP, IDC_TCPIPDOWN);
+	}
+	else {
+		EnableDlgItem(Dialog, IDC_TCPIPREMOVE, IDC_TCPIPREMOVE);
+		if (cur_pos == 0) {
+			DisableDlgItem(Dialog, IDC_TCPIPUP, IDC_TCPIPUP);
+		}
+		else {
+			EnableDlgItem(Dialog, IDC_TCPIPUP, IDC_TCPIPUP);
+		}
+		if (cur_pos + 1 >= item_count) {
+			DisableDlgItem(Dialog, IDC_TCPIPDOWN, IDC_TCPIPDOWN);
+		}
+		else {
+			EnableDlgItem(Dialog, IDC_TCPIPDOWN, IDC_TCPIPDOWN);
+		}
 	}
 }
 
@@ -1397,33 +1460,32 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		{ IDC_TCPIPHELP, "BTN_HELP" },
 	};
 	PTTSet ts;
-	UINT i, Index;
-	WORD w;
 
 	switch (Message) {
 		case WM_INITDIALOG:
 			ts = (PTTSet)lParam;
+			assert(ts != NULL);
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
 
-			SendDlgItemMessage(Dialog, IDC_TCPIPHOST, EM_LIMITTEXT,
-			                   HostNameMaxLength-1, 0);
+			SendDlgItemMessage(Dialog, IDC_TCPIPHOST, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
 
 			SetComboBoxHostHistory(Dialog, IDC_TCPIPLIST, MAXHOSTLIST, ts->SetupFNameW);
+			ModifyListboxHScrollWidth(Dialog, IDC_TCPIPLIST);
 
 			/* append a blank item to the bottom */
 			SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_ADDSTRING, 0, 0);
-			SetRB(Dialog,ts->HistoryList,IDC_TCPIPHISTORY,IDC_TCPIPHISTORY);
-			SetRB(Dialog,ts->AutoWinClose,IDC_TCPIPAUTOCLOSE,IDC_TCPIPAUTOCLOSE);
-			SetDlgItemInt(Dialog,IDC_TCPIPPORT,ts->TCPPort,FALSE);
-			SetDlgItemInt(Dialog,IDC_TCPIPTELNETKEEPALIVE,ts->TelKeepAliveInterval,FALSE);
-			SetRB(Dialog,ts->Telnet,IDC_TCPIPTELNET,IDC_TCPIPTELNET);
-			SetDlgItemText(Dialog, IDC_TCPIPTERMTYPE, ts->TermType);
-			SendDlgItemMessage(Dialog, IDC_TCPIPTERMTYPE, EM_LIMITTEXT, sizeof(ts->TermType)-1, 0);
+			SetRB(Dialog, ts->HistoryList, IDC_TCPIPHISTORY, IDC_TCPIPHISTORY);
+			SetRB(Dialog, ts->AutoWinClose, IDC_TCPIPAUTOCLOSE, IDC_TCPIPAUTOCLOSE);
+			SetDlgItemInt(Dialog, IDC_TCPIPPORT, ts->TCPPort, FALSE);
+			SetDlgItemInt(Dialog, IDC_TCPIPTELNETKEEPALIVE, ts->TelKeepAliveInterval, FALSE);
+			SetRB(Dialog, ts->Telnet, IDC_TCPIPTELNET, IDC_TCPIPTELNET);
+			SetDlgItemTextA(Dialog, IDC_TCPIPTERMTYPE, ts->TermType);
+			SendDlgItemMessage(Dialog, IDC_TCPIPTERMTYPE, EM_LIMITTEXT, sizeof(ts->TermType) - 1, 0);
 
 			// SSH接続のときにも TERM を送るので、telnetが無効でも disabled にしない。(2005.11.3 yutaka)
-			EnableDlgItem(Dialog,IDC_TCPIPTERMTYPELABEL,IDC_TCPIPTERMTYPE);
+			EnableDlgItem(Dialog, IDC_TCPIPTERMTYPELABEL, IDC_TCPIPTERMTYPE);
 
 			CenterWindow(Dialog, GetParent(Dialog));
 
@@ -1434,19 +1496,18 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 				case IDOK: {
 					BOOL Ok;
 
-					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
-					assert(ts!=NULL);
-					WriteComboBoxHostHistory(Dialog, IDC_TCPIPLIST, MAXHOSTLIST, ts->SetupFNameW);
-					GetRB(Dialog,&ts->HistoryList,IDC_TCPIPHISTORY,IDC_TCPIPHISTORY);
-					GetRB(Dialog,&ts->AutoWinClose,IDC_TCPIPAUTOCLOSE,IDC_TCPIPAUTOCLOSE);
-					ts->TCPPort = GetDlgItemInt(Dialog,IDC_TCPIPPORT,&Ok,FALSE);
-					if (! Ok) {
+					ts = (PTTSet)GetWindowLongPtr(Dialog, DWLP_USER);
+					assert(ts != NULL);
+					WriteListBoxHostHistory(Dialog, IDC_TCPIPLIST, MAXHOSTLIST, ts->SetupFNameW);
+					GetRB(Dialog, &ts->HistoryList, IDC_TCPIPHISTORY, IDC_TCPIPHISTORY);
+					GetRB(Dialog, &ts->AutoWinClose, IDC_TCPIPAUTOCLOSE, IDC_TCPIPAUTOCLOSE);
+					ts->TCPPort = GetDlgItemInt(Dialog, IDC_TCPIPPORT, &Ok, FALSE);
+					if (!Ok) {
 						ts->TCPPort = ts->TelPort;
 					}
-					ts->TelKeepAliveInterval = GetDlgItemInt(Dialog,IDC_TCPIPTELNETKEEPALIVE,&Ok,FALSE);
-					GetRB(Dialog,&ts->Telnet,IDC_TCPIPTELNET,IDC_TCPIPTELNET);
-					GetDlgItemText(Dialog, IDC_TCPIPTERMTYPE, ts->TermType,
-								   sizeof(ts->TermType));
+					ts->TelKeepAliveInterval = GetDlgItemInt(Dialog, IDC_TCPIPTELNETKEEPALIVE, &Ok, FALSE);
+					GetRB(Dialog, &ts->Telnet, IDC_TCPIPTELNET, IDC_TCPIPTELNET);
+					GetDlgItemText(Dialog, IDC_TCPIPTERMTYPE, ts->TermType, sizeof(ts->TermType));
 					EndDialog(Dialog, 1);
 					return TRUE;
 				}
@@ -1455,14 +1516,14 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					return TRUE;
 
 				case IDC_TCPIPHOST:
-					if (HIWORD(wParam)==EN_CHANGE) {
+					if (HIWORD(wParam) == EN_CHANGE) {
 						wchar_t *host;
 						hGetDlgItemTextW(Dialog, IDC_TCPIPHOST, &host);
-						if (wcslen(host)==0) {
-							DisableDlgItem(Dialog,IDC_TCPIPADD,IDC_TCPIPADD);
+						if (wcslen(host) == 0) {
+							DisableDlgItem(Dialog, IDC_TCPIPADD, IDC_TCPIPADD);
 						}
 						else {
-							EnableDlgItem(Dialog,IDC_TCPIPADD,IDC_TCPIPADD);
+							EnableDlgItem(Dialog, IDC_TCPIPADD, IDC_TCPIPADD);
 						}
 						free(host);
 					}
@@ -1472,120 +1533,104 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					wchar_t *host;
 					hGetDlgItemTextW(Dialog, IDC_TCPIPHOST, &host);
 					if (wcslen(host) > 0) {
-						Index = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCURSEL,0,0);
-						if (Index==(UINT)LB_ERR) {
-							Index = 0;
+						LRESULT cur_pos;
+						cur_pos = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
+						if (cur_pos == LB_ERR) {
+							cur_pos = 0;
 						}
-
-						SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING,
-						                   Index, (LPARAM)host);
-
-						SetDlgItemText(Dialog, IDC_TCPIPHOST, 0);
+						SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING, cur_pos, (LPARAM)host);
+						SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_SETCURSEL, cur_pos, 0);
+						SetDlgItemTextA(Dialog, IDC_TCPIPHOST, NULL);
+						TCPIPDlgButtons(Dialog);
+						ModifyListboxHScrollWidth(Dialog, IDC_TCPIPLIST);
 						SetFocus(GetDlgItem(Dialog, IDC_TCPIPHOST));
 					}
 					free(host);
 					break;
 				}
 				case IDC_TCPIPLIST:
-					if (HIWORD(wParam)==LBN_SELCHANGE) {
-						i = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCOUNT,0,0);
-						Index = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
-						if ((i<=1) || (Index==(UINT)LB_ERR) || (Index==i-1)) {
-							DisableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPDOWN);
-						}
-						else {
-							EnableDlgItem(Dialog,IDC_TCPIPREMOVE,IDC_TCPIPREMOVE);
-							if (Index==0) {
-								DisableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPUP);
-							}
-							else {
-								EnableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPUP);
-							}
-							if (Index>=i-2) {
-								DisableDlgItem(Dialog,IDC_TCPIPDOWN,IDC_TCPIPDOWN);
-							}
-							else {
-								EnableDlgItem(Dialog,IDC_TCPIPDOWN,IDC_TCPIPDOWN);
-							}
-						}
+					if (HIWORD(wParam) == LBN_SELCHANGE) {
+						TCPIPDlgButtons(Dialog);
 					}
 					break;
 
 				case IDC_TCPIPUP:
 				case IDC_TCPIPDOWN: {
 					wchar_t *host;
-					i = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCOUNT,0,0);
-					Index = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
-					if (Index==(UINT)LB_ERR) {
+					LRESULT item_count;
+					LRESULT cur_pos;
+					item_count = SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_GETCOUNT, 0, 0);
+					cur_pos = SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
+					if (item_count == LB_ERR || cur_pos == LB_ERR) {
 						return TRUE;
 					}
-					if (LOWORD(wParam)==IDC_TCPIPDOWN) {
-						Index++;
+					if (LOWORD(wParam) == IDC_TCPIPDOWN) {
+						cur_pos++;
 					}
-					if ((Index==0) || (Index>=i-1)) {
+					if ((cur_pos == 0) || (cur_pos >= item_count)) {
 						return TRUE;
 					}
-					GetDlgItemIndexTextW(Dialog, IDC_TCPIPLIST, Index, &host);
-					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_DELETESTRING,
-					                   Index, 0);
-					SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING,
-					                   Index-1, (LPARAM)host);
+					GetDlgItemIndexTextW(Dialog, IDC_TCPIPLIST, cur_pos, &host);
+					SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_DELETESTRING, cur_pos, 0);
+					SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING, cur_pos - 1, (LPARAM)host);
 					free(host);
-					if (LOWORD(wParam)==IDC_TCPIPUP) {
-						Index--;
+					if (LOWORD(wParam) == IDC_TCPIPUP) {
+						cur_pos--;
 					}
-					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_SETCURSEL,Index,0);
-					if (Index==0) {
-						DisableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPUP);
-					}
-					else {
-						EnableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPUP);
-					}
-					if (Index>=i-2) {
-						DisableDlgItem(Dialog,IDC_TCPIPDOWN,IDC_TCPIPDOWN);
-					}
-					else {
-						EnableDlgItem(Dialog,IDC_TCPIPDOWN,IDC_TCPIPDOWN);
-					}
+					SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_SETCURSEL, cur_pos, 0);
+					TCPIPDlgButtons(Dialog);
 					SetFocus(GetDlgItem(Dialog, IDC_TCPIPLIST));
 					break;
 				}
 
 				case IDC_TCPIPREMOVE: {
+					LRESULT item_count;
+					LRESULT cur_pos;
 					wchar_t *host;
-					i = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCOUNT,0,0);
-					Index = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCURSEL, 0, 0);
-					if ((Index==(UINT)LB_ERR) ||
-						(Index==i-1)) {
+					item_count = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCOUNT, 0, 0);
+					cur_pos = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
+					if ((item_count == LB_ERR) || (cur_pos == LB_ERR)) {
 						return TRUE;
 					}
-					GetDlgItemIndexTextW(Dialog, IDC_TCPIPLIST, Index, &host);
-					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_DELETESTRING,
-					                   Index, 0);
+					GetDlgItemIndexTextW(Dialog, IDC_TCPIPLIST, cur_pos, &host);
+					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_DELETESTRING, cur_pos, 0);
+					ModifyListboxHScrollWidth(Dialog, IDC_TCPIPLIST);
+					if (item_count - 1 == 0) {
+						// 0個になった
+					}
+					else if (cur_pos == item_count - 1) {
+						// 一番最後を削除
+						SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_SETCURSEL, cur_pos - 1, 0);
+					}
+					else {
+						SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_SETCURSEL, cur_pos, 0);
+					}
 					SetDlgItemTextW(Dialog, IDC_TCPIPHOST, host);
-					DisableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPDOWN);
+					TCPIPDlgButtons(Dialog);
 					SetFocus(GetDlgItem(Dialog, IDC_TCPIPHOST));
 					free(host);
 					break;
 				}
 
-				case IDC_TCPIPTELNET:
-					GetRB(Dialog,&w,IDC_TCPIPTELNET,IDC_TCPIPTELNET);
-					if (w==1) {
-						EnableDlgItem(Dialog,IDC_TCPIPTERMTYPELABEL,IDC_TCPIPTERMTYPE);
-						ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
-						if (ts!=NULL) {
-							SetDlgItemInt(Dialog,IDC_TCPIPPORT,ts->TelPort,FALSE);
+				case IDC_TCPIPTELNET: {
+					WORD w;
+					GetRB(Dialog, &w, IDC_TCPIPTELNET, IDC_TCPIPTELNET);
+					if (w == 1) {
+						EnableDlgItem(Dialog, IDC_TCPIPTERMTYPELABEL, IDC_TCPIPTERMTYPE);
+						ts = (PTTSet)GetWindowLongPtr(Dialog, DWLP_USER);
+						if (ts != NULL) {
+							SetDlgItemInt(Dialog, IDC_TCPIPPORT, ts->TelPort, FALSE);
 						}
 					}
 					else {
 						// SSH接続のときにも TERM を送るので、telnetが無効でも disabled にしない。(2005.11.3 yutaka)
-						EnableDlgItem(Dialog,IDC_TCPIPTERMTYPELABEL,IDC_TCPIPTERMTYPE);
+						EnableDlgItem(Dialog, IDC_TCPIPTERMTYPELABEL, IDC_TCPIPTERMTYPE);
 					}
 					break;
+				}
 
 				case IDC_TCPIPHELP:
-					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HlpSetupTCPIP,0);
+					PostMessage(GetParent(Dialog), WM_USER_DLGHELP2, HlpSetupTCPIP, 0);
 					break;
 			}
 	}
