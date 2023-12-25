@@ -72,7 +72,8 @@ MenuData	g_MenuData;			// TeraTerm Menu‚Ì•\¦İ’è“™‚Ì\‘¢‘Ì
 wchar_t		*SetupFNameW;		// TERATERM.INI
 wchar_t		*UILanguageFileW;
 
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) || (defined(_MSC_VER) && (_MSC_VER == 1400))
+// MinGW or VS2005(VC8.0)
 static wchar_t* _wcstok(wchar_t *strToken, const wchar_t *strDelimit)
 {
 	return wcstok(strToken, strDelimit);
