@@ -27,6 +27,8 @@ add_library(
   i18n_static.c
   inifile_com.cpp
   inifile_com.h
+  resize_helper.cpp
+  resize_helper.h
   tipwin.cpp
   tipwin.h
   tipwin2.cpp

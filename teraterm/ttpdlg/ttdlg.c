@@ -60,6 +60,7 @@
 #include "ttlib_charset.h"
 #include "asprintf.h"
 #include "ttwinman.h"
+#include "resize_helper.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_STATIC
@@ -1439,6 +1440,11 @@ static void TCPIPDlgButtons(HWND Dialog)
 	}
 }
 
+typedef struct {
+	PTTSet ts;
+	ReiseDlgHelper_t *resize_helper;
+} TCPIPDlgData;
+
 static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
@@ -1459,12 +1465,33 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_TCPIPHELP, "BTN_HELP" },
 	};
-	PTTSet ts;
+	static const ResizeHelperInfo resize_info[] = {
+		{ IDC_TCPIPADD, RESIZE_HELPER_ANCHOR_RT },
+		{ IDC_TCPIPUP, RESIZE_HELPER_ANCHOR_RT },
+		{ IDC_TCPIPREMOVE, RESIZE_HELPER_ANCHOR_RT },
+		{ IDC_TCPIPDOWN, RESIZE_HELPER_ANCHOR_RT },
+		{ IDC_TCPIPHISTORY, RESIZE_HELPER_ANCHOR_RT },
+		{ IDC_TCPIPTELNET, RESIZE_HELPER_ANCHOR_B },
+		{ IDC_TCPIPAUTOCLOSE, RESIZE_HELPER_ANCHOR_B },
+		{ IDC_TCPIPPORTLABEL, RESIZE_HELPER_ANCHOR_B },
+		{ IDC_TCPIPPORT, RESIZE_HELPER_ANCHOR_B },
+		{ IDC_TCPIPTELNETKEEPALIVELABEL, RESIZE_HELPER_ANCHOR_B },
+		{ IDC_TCPIPTELNETKEEPALIVE, RESIZE_HELPER_ANCHOR_B },
+		{ IDC_TCPIPTELNETKEEPALIVESEC, RESIZE_HELPER_ANCHOR_B },
+		{ IDC_TCPIPTERMTYPELABEL, RESIZE_HELPER_ANCHOR_B },
+		{ IDC_TCPIPTERMTYPE, RESIZE_HELPER_ANCHOR_B },
+		{ IDC_TCPIPHOST, RESIZE_HELPER_ANCHOR_LRT },
+		{ IDC_TCPIPHOSTLIST, RESIZE_HELPER_ANCHOR_LRTB },
+		{ IDC_TCPIPLIST, RESIZE_HELPER_ANCHOR_LRTB },
+		{ IDOK, RESIZE_HELPER_ANCHOR_RB },
+		{ IDCANCEL, RESIZE_HELPER_ANCHOR_RB },
+		{ IDC_TCPIPHELP, RESIZE_HELPER_ANCHOR_RB },
+	};
 
 	switch (Message) {
-		case WM_INITDIALOG:
-			ts = (PTTSet)lParam;
-			assert(ts != NULL);
+		case WM_INITDIALOG: {
+			TCPIPDlgData *data = (TCPIPDlgData *)lParam;
+			PTTSet ts = data->ts;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
@@ -1487,17 +1514,19 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			// SSH接続のときにも TERM を送るので、telnetが無効でも disabled にしない。(2005.11.3 yutaka)
 			EnableDlgItem(Dialog, IDC_TCPIPTERMTYPELABEL, IDC_TCPIPTERMTYPE);
 
+			data->resize_helper = ReiseHelperInit(Dialog, resize_info, _countof(resize_info));
+
 			CenterWindow(Dialog, GetParent(Dialog));
 
 			return TRUE;
+		}
 
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK: {
+					TCPIPDlgData *data = (TCPIPDlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+					PTTSet ts = data->ts;
 					BOOL Ok;
-
-					ts = (PTTSet)GetWindowLongPtr(Dialog, DWLP_USER);
-					assert(ts != NULL);
 					WriteListBoxHostHistory(Dialog, IDC_TCPIPLIST, MAXHOSTLIST, ts->SetupFNameW);
 					GetRB(Dialog, &ts->HistoryList, IDC_TCPIPHISTORY, IDC_TCPIPHISTORY);
 					GetRB(Dialog, &ts->AutoWinClose, IDC_TCPIPAUTOCLOSE, IDC_TCPIPAUTOCLOSE);
@@ -1616,11 +1645,10 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					WORD w;
 					GetRB(Dialog, &w, IDC_TCPIPTELNET, IDC_TCPIPTELNET);
 					if (w == 1) {
+						TCPIPDlgData *data = (TCPIPDlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+						PTTSet ts = data->ts;
 						EnableDlgItem(Dialog, IDC_TCPIPTERMTYPELABEL, IDC_TCPIPTERMTYPE);
-						ts = (PTTSet)GetWindowLongPtr(Dialog, DWLP_USER);
-						if (ts != NULL) {
-							SetDlgItemInt(Dialog, IDC_TCPIPPORT, ts->TelPort, FALSE);
-						}
+						SetDlgItemInt(Dialog, IDC_TCPIPPORT, ts->TelPort, FALSE);
 					}
 					else {
 						// SSH接続のときにも TERM を送るので、telnetが無効でも disabled にしない。(2005.11.3 yutaka)
@@ -1633,6 +1661,26 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					PostMessage(GetParent(Dialog), WM_USER_DLGHELP2, HlpSetupTCPIP, 0);
 					break;
 			}
+			break;
+
+		case WM_SIZE: {
+			TCPIPDlgData *data = (TCPIPDlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+			ReiseDlgHelper_WM_SIZE(data->resize_helper);
+			break;
+		}
+
+		case WM_GETMINMAXINFO: {
+			TCPIPDlgData *data = (TCPIPDlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+			ReiseDlgHelper_WM_GETMINMAXINFO(data->resize_helper, lParam);
+			break;
+		}
+
+		case WM_DESTROY: {
+			TCPIPDlgData *data = (TCPIPDlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+			ReiseDlgHelperDelete(data->resize_helper);
+			data->resize_helper = NULL;
+			break;
+		}
 	}
 	return FALSE;
 }
@@ -3093,10 +3141,13 @@ BOOL WINAPI _SetupSerialPort(HWND WndParent, PTTSet ts)
 
 BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts)
 {
-	return
-		(BOOL)DialogBoxParam(hInst,
-		                     MAKEINTRESOURCE(IDD_TCPIPDLG),
-		                     WndParent, TCPIPDlg, (LPARAM)ts);
+	TCPIPDlgData *data = (TCPIPDlgData *)calloc(sizeof(*data), 1);
+	data->ts = ts;
+	BOOL r= (BOOL)DialogBoxParam(hInst,
+								 MAKEINTRESOURCE(IDD_TCPIPDLG),
+								 WndParent, TCPIPDlg, (LPARAM)data);
+	free(data);
+	return r;
 }
 
 BOOL WINAPI _GetHostName(HWND WndParent, PGetHNRec GetHNRec)
