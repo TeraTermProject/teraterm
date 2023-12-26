@@ -191,7 +191,7 @@ BOOL SetMenuFont(HWND hWnd)
 	static int	open = 0;
 
 	if (open == 1) {
-		while ((hFontWnd = ::FindWindow(NULL, "Font")) != NULL) {
+		while ((hFontWnd = ::FindWindowA(NULL, "Font")) != NULL) {
 			if (hWnd == ::GetParent(hFontWnd)) {
 				::SetForceForegroundWindow(hFontWnd);
 				break;
@@ -495,8 +495,8 @@ BOOL CreateTooltip(void)
 {
 	::InitCommonControls(); 
 
-	g_hWndTip = ::CreateWindowEx(0,
-								TOOLTIPS_CLASS,
+	g_hWndTip = ::CreateWindowExA(0,
+								TOOLTIPS_CLASSA,
 								(LPSTR) NULL,
 								TTS_ALWAYSTIP | TTS_BALLOON,
 								CW_USEDEFAULT,
@@ -667,8 +667,8 @@ BOOL InitConfigDlg(HWND hWnd)
 	::DeleteMenu(::GetSystemMenu(hWnd, FALSE), SC_MAXIMIZE, MF_BYCOMMAND);
 	::DeleteMenu(::GetSystemMenu(hWnd, FALSE), SC_SIZE, MF_BYCOMMAND);
 
-	g_hIconLeft		= ::LoadIcon(g_hI, (LPCSTR)ICON_LEFT);
-	g_hIconRight	= ::LoadIcon(g_hI, (LPCSTR)ICON_RIGHT);
+	g_hIconLeft		= ::LoadIconA(g_hI, (LPCSTR)ICON_LEFT);
+	g_hIconRight	= ::LoadIconA(g_hI, (LPCSTR)ICON_RIGHT);
 	::SendDlgItemMessage(hWnd, BUTTON_SET, BM_SETIMAGE, (WPARAM) IMAGE_ICON, (LPARAM)(HANDLE) g_hIconLeft);
 	::SendDlgItemMessage(hWnd, BUTTON_DELETE, BM_SETIMAGE, (WPARAM) IMAGE_ICON, (LPARAM)(HANDLE) g_hIconRight);
 
@@ -838,7 +838,7 @@ BOOL SetDefaultEtcDlg(HWND hWnd)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 {
-	NOTIFYICONDATA	nid;
+	NOTIFYICONDATAA	nid;
 	int i;
 	BOOL ret;
 	DWORD ecode;
@@ -850,7 +850,7 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 	nid.uFlags				= NIF_ICON | NIF_TIP | NIF_MESSAGE;
 	nid.uCallbackMessage	= WM_TMENU_NOTIFY;
 	nid.hIcon				= g_hIconSmall;
-	lstrcpy(nid.szTip, "TeraTerm Menu");
+	lstrcpyA(nid.szTip, "TeraTerm Menu");
 
 	/* Shell_NotifyIcon関数は、シェルへの登録が4秒以内に完了しないとエラーと見なすため、
 	 * リトライ処理を追加する。
@@ -862,11 +862,11 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 	 */
 	if (dwMessage == NIM_ADD) {
 		for (i = 0 ; i < 10 ; i++) {
-			ret = ::Shell_NotifyIcon(dwMessage, &nid);
+			ret = ::Shell_NotifyIconA(dwMessage, &nid);
 			ecode = GetLastError();
 			if (ret == FALSE && ecode == ERROR_TIMEOUT) {
 				Sleep(1000);
-				ret = ::Shell_NotifyIcon(NIM_MODIFY, &nid);
+				ret = ::Shell_NotifyIconA(NIM_MODIFY, &nid);
 				if (ret == TRUE)
 					break;
 
@@ -876,7 +876,7 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 		}
 
 	} else {
-		::Shell_NotifyIcon(dwMessage, &nid);
+		::Shell_NotifyIconA(dwMessage, &nid);
 
 	}
 
@@ -913,41 +913,41 @@ static BOOL MakeTTL(const wchar_t *TTLName, JobInfo *jobInfo)
 		return FALSE;
 
 	sprintf_s(buf, "filedelete '%s'\r\n", (const char *)(u8)TTLName);
-	::WriteFile(hFile, buf, ::lstrlen(buf), &dwWrite, NULL);
+	::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
 
 	if (wcslen(jobInfo->szLog) != 0) {
-		::wsprintf(buf, "logopen '%s' 0 1\r\n", (const char *)(u8)jobInfo->szLog);
-		::WriteFile(hFile, buf, ::lstrlen(buf), &dwWrite, NULL);
+		::wsprintfA(buf, "logopen '%s' 0 1\r\n", (const char *)(u8)jobInfo->szLog);
+		::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
 	}
 
 	// telnetポート番号を付加する (2004.12.3 yutaka)
-	::wsprintf(buf, "connect '%s:23'\r\n", (const char *)(u8)jobInfo->szHostName);
-	::WriteFile(hFile, buf, ::lstrlen(buf), &dwWrite, NULL);
+	::wsprintfA(buf, "connect '%s:23'\r\n", (const char *)(u8)jobInfo->szHostName);
+	::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
 
 	if (jobInfo->bUsername == TRUE) {
 		if (wcslen(jobInfo->szLoginPrompt) == 0)
 			wcscpy(jobInfo->szLoginPrompt, LOGIN_PROMPT);
-		::wsprintf(buf, "UsernamePrompt = '%s'\r\nUsername = '%s'\r\n", (const char *)(u8)jobInfo->szLoginPrompt,
+		::wsprintfA(buf, "UsernamePrompt = '%s'\r\nUsername = '%s'\r\n", (const char *)(u8)jobInfo->szLoginPrompt,
 				   (const char *)(u8)jobInfo->szUsername);
-		::WriteFile(hFile, buf, ::lstrlen(buf), &dwWrite, NULL);
+		::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
 	}
 
 	if (jobInfo->bPassword == TRUE) {
 		if (wcslen(jobInfo->szPasswdPrompt) == 0)
 			wcscpy(jobInfo->szPasswdPrompt, PASSWORD_PROMPT);
-		::wsprintf(buf, "PasswordPrompt = '%s'\r\nPassword = '%s'\r\n", (const char *)(u8)jobInfo->szPasswdPrompt,
+		::wsprintfA(buf, "PasswordPrompt = '%s'\r\nPassword = '%s'\r\n", (const char *)(u8)jobInfo->szPasswdPrompt,
 				   (const char *)(u8)jobInfo->szPassword);
-		::WriteFile(hFile, buf, ::lstrlen(buf), &dwWrite, NULL);
+		::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
 	}
 
 	if (jobInfo->bUsername == TRUE) {
-		::wsprintf(buf, "wait   UsernamePrompt\r\nsendln Username\r\n");
-		::WriteFile(hFile, buf, ::lstrlen(buf), &dwWrite, NULL);
+		::wsprintfA(buf, "wait   UsernamePrompt\r\nsendln Username\r\n");
+		::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
 	}
 
 	if (jobInfo->bPassword == TRUE) {
-		::wsprintf(buf, "wait   PasswordPrompt\r\nsendln Password\r\n");
-		::WriteFile(hFile, buf, ::lstrlen(buf), &dwWrite, NULL);
+		::wsprintfA(buf, "wait   PasswordPrompt\r\nsendln Password\r\n");
+		::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
 	}
 
 	::CloseHandle(hFile);
@@ -1250,7 +1250,7 @@ BOOL InitMenu(void)
 	}
 
 	if (g_hListMenu == NULL) {
-		g_hMenu			= ::LoadMenu(g_hI, (LPCSTR) TTERM_MENU);
+		g_hMenu			= ::LoadMenuA(g_hI, (LPCSTR) TTERM_MENU);
 		g_hSubMenu		= ::GetSubMenu(g_hMenu, 0);
 		g_hListMenu		= ::CreateMenu();
 		g_hConfigMenu	= ::GetSubMenu(g_hSubMenu, 1);
@@ -2359,7 +2359,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetDlgPos(hWnd, POSITION_CENTER);
 		::ShowWindow(hWnd, SW_HIDE);
 		SetTaskTray(hWnd, NIM_ADD);
-		WM_TASKBAR_RESTART = ::RegisterWindowMessage("TaskbarCreated");
+		WM_TASKBAR_RESTART = ::RegisterWindowMessageA("TaskbarCreated");
 		InitMenu();
 		LoadConfig();
 		InitListMenu(hWnd);
@@ -2508,7 +2508,7 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	if ((module = GetModuleHandle("kernel32.dll")) != NULL) {
+	if ((module = GetModuleHandleA("kernel32.dll")) != NULL) {
 		if ((setDefDllDir = (pSetDefDllDir)GetProcAddress(module, "SetDefaultDllDirectories")) != NULL) {
 			// SetDefaultDllDirectories() が使える場合は、検索パスを %WINDOWS%\system32 のみに設定する
 			(*setDefDllDir)((DWORD)0x00000800); // LOAD_LIBRARY_SEARCH_SYSTEM32

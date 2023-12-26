@@ -497,6 +497,7 @@ BOOL RegSetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, DWORD dwSi
 	Arguments		: HKEY		hKey			(in)	値を設定するキーのハンドル
 					: const wchar_t *lpszValueName	(in)	設定する値
 					: int		*buf			(out)	値データ
+					: LPDWORD lpdwSize			(in,out)	バッファサイズ,読み込みサイズ
 	Return Value	: 成功	TRUE
 					: 失敗	FALSE
 	Reference		: 
@@ -505,8 +506,7 @@ BOOL RegSetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, DWORD dwSi
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-// 関数の返値の型を追加 (2006.2.18 yutaka)
-int RegGetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, LPDWORD lpdwSize)
+BOOL RegGetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, LPDWORD lpdwSize)
 {
 	if(bUseINI){
 		wchar_t t[1024] = {0};
@@ -532,19 +532,20 @@ int RegGetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, LPDWORD lpd
 	}else{
 		long	lError;
 		DWORD	dwType = REG_BINARY;
-		DWORD	dwWriteSize;
+		DWORD	dwReadSize;
 
-		dwWriteSize = *lpdwSize * sizeof(TCHAR);
+		dwReadSize = *lpdwSize;
 
 		if ((lError = ::RegQueryValueExW(hKey,
 										lpszValueName,
 										NULL,
 										&dwType,
 										(LPBYTE) buf,
-										&dwWriteSize)) != ERROR_SUCCESS) {
+										&dwReadSize)) != ERROR_SUCCESS) {
 			::SetLastError(lError);
 			return FALSE;
 		}
+		*lpdwSize = dwReadSize;
 	}
 
 	return TRUE;

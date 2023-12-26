@@ -132,7 +132,7 @@ BOOL EnableItem(HWND hWnd, int idControl, BOOL flag)
 void EncodePassword(const char *cPassword, char *cEncodePassword)
 {
 	DWORD	dwCnt;
-	DWORD	dwPasswordLength = ::lstrlen(cPassword);
+	DWORD	dwPasswordLength = ::lstrlenA(cPassword);
 
 	for (dwCnt = 0; dwCnt < dwPasswordLength; dwCnt++)
 		cEncodePassword[dwPasswordLength - 1 - dwCnt] = cPassword[dwCnt] ^ 0xff;
@@ -241,7 +241,7 @@ BOOL SetForceForegroundWindow(HWND hWnd)
 	::SystemParametersInfo(SPI_GETFOREGROUNDLOCKTIMEOUT, 0, (void *)&svTmOut, 0);
 	::SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, 0, 0);
 	BOOL	ret = ::SetForegroundWindow(hWnd);
-	::SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, (void *)svTmOut, 0);
+	::SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, (void *)(UINT_PTR)svTmOut, 0);
 	::AttachThreadInput(targId, foreId, FALSE);
 
 	return	ret;
@@ -255,7 +255,7 @@ void UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_
 	free(str);
 }
 
-int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile)
+int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONTA logfont, HFONT *font, const char *iniFile)
 {
 	if (GetI18nLogfont("TTMenu", key, logfont,
 					   GetDeviceCaps(GetDC(dlg),LOGPIXELSY),
@@ -263,7 +263,7 @@ int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font,
 		return FALSE;
 	}
 
-	if ((*font = CreateFontIndirect(logfont)) == NULL) {
+	if ((*font = CreateFontIndirectA(logfont)) == NULL) {
 		return FALSE;
 	}
 

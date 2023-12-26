@@ -214,14 +214,14 @@ BOOL GetFileNamePos(const char *PathName, int *DirLen, int *FNPos)
 	else
 		Ptr = PathName;
 	if (Ptr[0]=='\\' || Ptr[0]=='/')
-		Ptr = CharNext(Ptr);
+		Ptr = CharNextA(Ptr);
 
 	DirPtr = Ptr;
 	FNPtr = Ptr;
 	while (Ptr[0]!=0) {
 		b = Ptr[0];
 		PtrOld = Ptr;
-		Ptr = CharNext(Ptr);
+		Ptr = CharNextA(Ptr);
 		switch (b) {
 			case ':':
 				return FALSE;
@@ -304,8 +304,8 @@ void FitFileName(PCHAR FileName, int destlen, const char *DefExt)
 // Append a slash to the end of a path name
 void AppendSlash(PCHAR Path, int destlen)
 {
-	if (strcmp(CharPrev((LPCTSTR)Path,
-	           (LPCTSTR)(&Path[strlen(Path)])),
+	if (strcmp(CharPrevA((LPCSTR)Path,
+	           (LPCSTR)(&Path[strlen(Path)])),
 	           "\\") != 0) {
 		strncat_s(Path,destlen,"\\",_TRUNCATE);
 	}
@@ -677,10 +677,10 @@ void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
 	char CurDir[MAX_PATH];
 
 	/* Get UILanguageFile Full Path */
-	GetCurrentDirectory(sizeof(CurDir), CurDir);
-	SetCurrentDirectory(HomeDir);
+	GetCurrentDirectoryA(sizeof(CurDir), CurDir);
+	SetCurrentDirectoryA(HomeDir);
 	_fullpath(UILanguageFileFull, UILanguageFileRel, UILanguageFileFullLen);
-	SetCurrentDirectory(CurDir);
+	SetCurrentDirectoryA(CurDir);
 }
 
 // 指定したエントリを teraterm.ini から読み取る (2009.3.23 yutaka)
@@ -825,7 +825,7 @@ BOOL HasMultiMonitorSupport()
 {
 	HMODULE mod;
 
-	if (((mod = GetModuleHandle("user32.dll")) != NULL) &&
+	if (((mod = GetModuleHandleA("user32.dll")) != NULL) &&
 	    (GetProcAddress(mod, "MonitorFromPoint") != NULL)) {
 		return TRUE;
 	}
@@ -838,7 +838,7 @@ BOOL HasDnsQuery()
 {
 	HMODULE mod;
 
-	if (((mod = GetModuleHandle("Dnsapi.dll")) != NULL) &&
+	if (((mod = GetModuleHandleA("Dnsapi.dll")) != NULL) &&
 		(GetProcAddress(mod, "DnsQuery") != NULL)) {
 		return TRUE;
 	}
@@ -1124,7 +1124,7 @@ void split_buffer(char *buffer, int delimiter, char **head, char **body)
  *	ダイアログフォントを取得する
  *	エラーは発生しない
  */
-DllExport void GetMessageboxFont(LOGFONT *logfont)
+DllExport void GetMessageboxFont(LOGFONTA *logfont)
 {
 	NONCLIENTMETRICSA nci;
 	const int st_size = CCSIZEOF_STRUCT(NONCLIENTMETRICSA, lfMessageFont);
