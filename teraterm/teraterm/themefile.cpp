@@ -720,7 +720,7 @@ void ThemeLoad(const wchar_t *file, BGTheme *bg_theme, TColorTheme *color_theme)
 			else if(_wcsicmp(p, COLOR_THEME_SECTION) == 0) {
 				color = TRUE;
 			}
-			i += len;
+			i += len + 1;
 		}
 	}
 
