@@ -1577,7 +1577,7 @@ wchar_t *RandomFileW(const wchar_t *filespec_src)
 	free(fullpath);
 
 	fullpath = NULL;
-	awcscats(&fullpath, dir, L"\\", fd.cFileName);
+	awcscats(&fullpath, dir, L"\\", fd.cFileName, NULL);
 	free(dir);
 	return fullpath;
 }
