@@ -160,13 +160,21 @@ void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h)
 		width = rect.right - rect.left;
 		height = rect.bottom - rect.top;
 
-		if ((p->anchor & (RESIZE_HELPER_ANCHOR_LEFT|RESIZE_HELPER_ANCHOR_RIGHT))
+		if ((p->anchor & RESIZE_HELPER_ANCHOR_NONE_H) != 0) {
+			// 1/2して加えるので奇数サイズのリサイズが発生すると
+			// 少しづつ位置がずれる
+			lt.x += delta_width / 2;
+		} else if ((p->anchor & (RESIZE_HELPER_ANCHOR_LEFT|RESIZE_HELPER_ANCHOR_RIGHT))
 			== (RESIZE_HELPER_ANCHOR_LEFT|RESIZE_HELPER_ANCHOR_RIGHT) ) {
 			width += delta_width;
 		} else if (p->anchor & RESIZE_HELPER_ANCHOR_RIGHT) {
 			lt.x += delta_width;
 		}
-		if ((p->anchor & (RESIZE_HELPER_ANCHOR_TOP|RESIZE_HELPER_ANCHOR_BOTTOM))
+		if ((p->anchor & RESIZE_HELPER_ANCHOR_NONE_V) != 0) {
+			// 1/2して加えるので奇数サイズのリサイズが発生すると
+			// 少しづつ位置がずれる
+			lt.y += delta_height / 2;
+		} else if ((p->anchor & (RESIZE_HELPER_ANCHOR_TOP|RESIZE_HELPER_ANCHOR_BOTTOM))
 			== (RESIZE_HELPER_ANCHOR_TOP|RESIZE_HELPER_ANCHOR_BOTTOM)) {
 			height += delta_height;
 		} else if (p->anchor & RESIZE_HELPER_ANCHOR_BOTTOM) {
