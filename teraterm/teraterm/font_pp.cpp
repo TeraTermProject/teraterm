@@ -157,7 +157,6 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		{ IDC_VTFONT_CHOOSE, "DLG_TAB_FONT_BTN_SELECT" },
 		{ IDC_VTFONT_TITLE, "DLG_TAB_FONT_VTFONT_TITLE" },
 		{ IDC_VTFONT_CODEPAGE_LABEL, "DLG_TAB_FONT_CODEPAGE_LABEL" },
-		{ IDC_FONT_QUALITY_LABEL, "DLG_TAB_VISUAL_FONT_QUALITY" },
 		{ IDC_DLGFONT, "DLG_TAB_FONT_DLGFONT"},
 		{ IDC_DLGFONT_CHOOSE, "DLG_TAB_FONT_BTN_SELECT" },
 		{ IDC_DLGFONT_DEFAULT, "DLG_TAB_FONT_BTN_DEFAULT" },
@@ -194,21 +193,6 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SetDlgItemInt(hWnd, IDC_SPACE_TOP, ts->FontDX, FALSE);
 			SetDlgItemInt(hWnd, IDC_SPACE_BOTTOM, ts->FontDY, FALSE);
 
-			const static I18nTextInfo visual_font_quality[] = {
-				{ "DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT", L"Default" },
-				{ "DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED", L"Non-Antialiased" },
-				{ "DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED", L"Antialiased" },
-				{ "DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE", L"ClearType" },
-			};
-			SetI18nListW("Tera Term", hWnd, IDC_FONT_QUALITY, visual_font_quality, _countof(visual_font_quality),
-						 ts->UILanguageFileW, 0);
-			int cur =
-				ts->FontQuality == DEFAULT_QUALITY ? 0 :
-				ts->FontQuality == NONANTIALIASED_QUALITY ? 1 :
-				ts->FontQuality == ANTIALIASED_QUALITY ? 2 :
-				/*ts->FontQuality == CLEARTYPE_QUALITY ? */ 3;
-			SendDlgItemMessage(hWnd, IDC_FONT_QUALITY, CB_SETCURSEL, cur, 0);
-
 			SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
 
 			CheckDlgButton(hWnd, IDC_RESIZED_FONT, DispIsResizedFont());
@@ -228,14 +212,6 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ts->ListHiddenFonts = IsDlgButtonChecked(hWnd, IDC_LIST_HIDDEN_FONTS) == BST_CHECKED;
 
 					SetDlgLogFont(GetParent(hWnd), &dlg_data->DlgFont, ts);
-
-					// font quality
-					int cur = (int)SendDlgItemMessageA(hWnd, IDC_FONT_QUALITY, CB_GETCURSEL, 0, 0);
-					ts->FontQuality =
-						cur == 0 ? DEFAULT_QUALITY :
-						cur == 1 ? NONANTIALIASED_QUALITY :
-						cur == 2 ? ANTIALIASED_QUALITY :
-						CLEARTYPE_QUALITY;
 
 					DispEnableResizedFont(IsDlgButtonChecked(hWnd, IDC_RESIZED_FONT) == BST_CHECKED);
 
