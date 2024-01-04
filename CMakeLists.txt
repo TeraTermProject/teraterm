@@ -180,11 +180,12 @@ if((NOT EXISTS "${CMAKE_BINARY_DIR}/build_config.cmake") OR
   endif()
 endif()
 include(${CMAKE_BINARY_DIR}/build_config.cmake)
-message("revision=\"${SVNVERSION}\"")
 
 if(DEFINED GITVERSION)
+  message("git hash=\"${GITVERSION}\"")
   set(REVISION_TIME_USER "${DATE}_${TIME}-${GITVERSION}-${USER}")
 elseif(DEFINED SVNVERSION)
+  message("svn revision=\"${SVNVERSION}\"")
   set(REVISION_TIME_USER "r${SVNVERSION}-${DATE}_${TIME}-${USER}")
 else()
   set(REVISION_TIME_USER "${DATE}_${TIME}-unknown-${USER}")
