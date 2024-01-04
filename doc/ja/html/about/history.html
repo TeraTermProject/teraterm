@@ -58,10 +58,11 @@
     </ul>
   </li>
 
-  <!-- li>その他
+  <li>その他
     <ul>
+      <li><a href="#ttmenu_1.19">TeraTerm Menu(1.19)</a>へ差し替えた。</li>
     </ul>
-  </li -->
+  </li>
 </ul>
 
 <h3 id="teraterm_5.1">2023.12.19 (Ver 5.1)</h3>
@@ -5314,9 +5315,24 @@
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
 
+<h3 id="ttmenu_1.19">YYYY.MM.DD (Ver 1.19 not released)</h3>
+<ul class="history">
+      <li>接続先が登録されていないとき、"(none)"が正しく表示されないので修正した。</li>
+</ul>
+
 <h3 id="ttmenu_1.18">2023.12.19 (Ver 1.18)</h3>
 <ul class="history">
       <li>使用しているWin32 APIを Unicode版に変更、文字列をUnicodeに変更した。</li>
+      <li>TeraTerm Menuから起動するプログラムの引数長の上限をなくした。</li>
+      <li>従来の設定を引き継げるようiniファイルをコピーするようにした。</li>
+      <ul>
+        <li>ttpmenu.exeと同じパスの ttpmenu.ini が存在して
+          %APPDATA%\teraterm5\ttpmenu.ini が存在しない場合</li>
+      </ul>
+      <li>ポータブル版動作(exeフォルダにportable.iniが存在する)に対応した。</li>
+      <li>%APPDATA%\teraterm5\ttpmenu.ini が0byteの時、UTF-16 LE BOM を書き込むようにした。</li>
+      <li>ttpmenu.iniのファイル名長の上限をなくした。</li>
+      <li>バージョン表示に設定がレジストリ/iniのどちらかを表示するようにした。</li>
 </ul>
 
 <h3 id="ttmenu_1.17">2023.10.15 (Ver 1.17)</h3>

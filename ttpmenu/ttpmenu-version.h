@@ -31,7 +31,7 @@
 #include "tt-version.h"
 
 #define TTPMENU_VERSION_MAJOR             1
-#define TTPMENU_VERSION_MINOR             18
+#define TTPMENU_VERSION_MINOR             19
 #define TTPMENU_VERSION_STR(sep)          TT_TOSTR(TTPMENU_VERSION_MAJOR) sep TT_TOSTR(TTPMENU_VERSION_MINOR)
 #define TTPMENU_RES_VERSION_STR           TTPMENU_VERSION_STR(", ") ", 0, 0"
 

@@ -58,10 +58,11 @@
     </ul>
   </li>
 
-  <!-- li>Misc
+  <li>Misc
     <ul>
+      <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.19">1.19</a></li>
     </ul>
-  </li -->
+  </li>
 </ul>
 
 <h3 id="teraterm_5.1">2023.12.19 (Ver 5.1)</h3>
@@ -5303,9 +5304,23 @@ SYNOPSIS:
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
 
+<h3 id="ttmenu_1.19">YYYY.MM.DD (Ver 1.19 not released)</h3>
+<ul class="history">
+      <li>When execution list is empty, "(none)" is not displayed correctly.</li>
+</ul>
+
 <h3 id="ttmenu_1.18">2023.12.19 (Ver 1.18)</h3>
 <ul class="history">
-      <li>Win32 API was changed to the Unicode version, and strings were changed to Unicode.
+      <li>Win32 API was changed to the Unicode version, and strings were changed to Unicode.</li>
+      <li>Removed upper limit of argument length of the program invoked from TeraTerm Menu.</li>
+      <li>Copy ini files to take over settings.</li>
+      <ul>
+        <li>If ttpmenu.ini exists in the same path as ttpmenu.exe and %APPDATA%\teraterm5\ttpmenu.ini does not exist.</li>
+      </ul>
+      <li>Support portable edition(when portable.ini exists in exe folder).</li>
+      <li>When %APPDATA%\teraterm5\ttpmenu.ini is 0byte, write UTF-16 LE BOM.</li>
+      <li>Removed upper limit of ttpmenu.ini file name length.</li>
+      <li>Display that settings is either registry or ini file in about dialog.</li>
 </ul>
 
 <h3 id="ttmenu_1.17">2023.10.15 (Ver 1.17)</h3>

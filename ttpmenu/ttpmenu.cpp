@@ -1407,7 +1407,7 @@ BOOL RedrawMenu(HWND hWnd)
 	}
 	if (dwValidCnt == 0) {
 		UTIL_get_lang_msgW("MENU_NOTRAY", uimsg, _countof(uimsg), STR_NOENTRY, UILanguageFileW);
-		::AppendMenu(g_hListMenu, MF_STRING | MF_GRAYED, ID_NOENTRY, (LPCTSTR) uimsg);
+		::AppendMenuW(g_hListMenu, MF_STRING | MF_GRAYED, ID_NOENTRY, uimsg);
 	}
 
 	return TRUE;

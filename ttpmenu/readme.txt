@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
                                Tera Term支援ツール
-                           Tera Term Menu Version 1.18
+                           Tera Term Menu Version 1.19
 
                           (C) 2004- TeraTerm Project
                         https://teratermproject.github.io/
@@ -213,15 +213,21 @@ iniファイルはUnicode iniファイル(UTF-16 with LE BOM)の使用をおすすめします。
 --------------------------------------------------------------------------------
 9. 更新履歴
 
+TeraTerm Menu 1.19 (YYYY.MM.DD)
+
+・接続先が登録されていないとき、"(none)"が正しく表示されないので修正した。
+
 TeraTerm Menu 1.18 (2023.12.02)
 
-・内部文字列、使用APIなどをUnicodeに変更した。
-・引数の上限をなくした。
+・使用しているWin32 APIを Unicode版に変更、文字列をUnicodeに変更した。
+・TeraTerm Menuから起動するプログラムの引数長の上限をなくした。
 ・従来の設定を引き継げるようiniファイルをコピーするようにした。
   - ttpmenu.exeと同じパスの ttpmenu.ini が存在して
     %APPDATA%\teraterm5\ttpmenu.ini が存在しない場合
-・ポータブル版動作(exeフォルダにportable.iniが存在する)に対応
-・%APPDATA%\teraterm5\ttpmenu.ini が0byteの時、UTF-16 LE BOM を書き込むようにした
+・ポータブル版動作(exeフォルダにportable.iniが存在する)に対応した。
+・%APPDATA%\teraterm5\ttpmenu.ini が0byteの時、UTF-16 LE BOM を書き込むようにした。
+・ttpmenu.iniのファイル名長の上限をなくした。
+・バージョン表示に設定がレジストリ/iniのどちらかを表示するようにした。
 
 TeraTerm Menu 1.17 (2023.10.15)
 
