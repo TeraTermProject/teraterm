@@ -77,7 +77,6 @@
 #define HlpAboutQanda           20006
 #define HlpAboutRequests        20007
 #define HlpAboutContacts        20008
-#define HlpAboutJargons         20009
 #define HlpAboutWriter          20010
 #define HlpAboutCtrlseq         20011
 #define HlpAboutDifference      20012
