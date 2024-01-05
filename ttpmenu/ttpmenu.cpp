@@ -604,7 +604,7 @@ BOOL InitListBox(HWND hWnd)
 
 	while (wcslen(g_MenuData.szName[dwIndex]) != 0) {
 		if (GetApplicationFilename(g_MenuData.szName[dwIndex], szPath) == TRUE) {
-			::SendDlgItemMessageW(hWnd, LIST_HOST, LB_ADDSTRING, 0, (LPARAM)(LPCTSTR) g_MenuData.szName[dwIndex]);
+			::SendDlgItemMessageW(hWnd, LIST_HOST, LB_ADDSTRING, 0, (LPARAM)g_MenuData.szName[dwIndex]);
 			::SendDlgItemMessage(hWnd, LIST_HOST, LB_SETITEMDATA, (WPARAM) dwCnt, (LPARAM) dwIndex);
 			dwCnt++;
 		}
@@ -1658,8 +1658,8 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	InitListBox(hWnd);
 
 	LRESULT index = 0;
-	while ((index = ::SendDlgItemMessageW(hWnd, LIST_HOST, LB_SELECTSTRING, index, (LPARAM)(LPCTSTR) g_JobInfo.szName)) != LB_ERR) {
-		::SendDlgItemMessageW(hWnd, LIST_HOST, LB_GETTEXT, index, (LPARAM)(LPCTSTR) szName);
+	while ((index = ::SendDlgItemMessageW(hWnd, LIST_HOST, LB_SELECTSTRING, index, (LPARAM)g_JobInfo.szName)) != LB_ERR) {
+		::SendDlgItemMessageW(hWnd, LIST_HOST, LB_GETTEXT, index, (LPARAM)szName);
 		if (_wcsicmp(g_JobInfo.szName, szName) == 0)
 			break;
 	}
@@ -1686,7 +1686,7 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 	DWORD	dwErr;
 
 	index = ::SendDlgItemMessage(hWnd, LIST_HOST, LB_GETCURSEL, 0, 0);
-	::SendDlgItemMessageW(hWnd, LIST_HOST, LB_GETTEXT, (WPARAM)index, (LPARAM)(LPCTSTR)szName);
+	::SendDlgItemMessageW(hWnd, LIST_HOST, LB_GETTEXT, (WPARAM)index, (LPARAM)szName);
 
 	if (RegLoadLoginHostInformation(szName, &g_JobInfo) == FALSE) {
 		dwErr = ::GetLastError();
@@ -1810,7 +1810,7 @@ BOOL DeleteLoginHostInformation(HWND hWnd)
 		return FALSE;
 	}
 
-	if (::SendDlgItemMessageW(hWnd, LIST_HOST, LB_GETTEXT, (WPARAM) index, (LPARAM) (LPCTSTR) szEntryName) == LB_ERR) {
+	if (::SendDlgItemMessageW(hWnd, LIST_HOST, LB_GETTEXT, (WPARAM) index, (LPARAM)szEntryName) == LB_ERR) {
 		UTIL_get_lang_msgW("MSG_ERROR_GETDELETEREG", uimsg, _countof(uimsg),
 						   L"Couldn't get the deleting entry", UILanguageFileW);
 		::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
