@@ -86,6 +86,11 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Glossary">
+			<param name="Local" value="html\about\glossary.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Document writer ">
 			<param name="Local" value="html\about\writer.html">
 			<param name="ImageNumber" value="11">
