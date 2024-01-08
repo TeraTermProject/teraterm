@@ -101,6 +101,41 @@ static wchar_t *GetFullPath(const wchar_t *filename)
 	return fullpath;
 }
 
+/**
+ *	ttermpro.exe の存在するフォルダを返す
+ *
+ *	@param[in,out]	path	文字末には"/"がない
+ *	@param[in]		size
+ */
+static void GetTeraTermDir(wchar_t *path, size_t size)
+{
+#if 1
+	// 相対パス
+	//	実行ファイルが置いてあるフォルダ(GetExeDirW())を
+	//	カレントディレクトリに設定してある
+	wcsncpy_s(path, size, DEFAULT_PATH, _TRUNCATE);
+#else
+	// 絶対パス
+	wchar_t *exe_dir = GetExeDirW(NULL);
+	wcsncpy_s(path, size, exe_dir, _TRUNCATE);
+	free(exe_dir);
+#endif
+}
+
+/**
+ *	ttermpro.exe のパスを返す
+ *
+ *	@param[in,out]	path
+ *	@param[in]		size
+ */
+static void GetTeraTermPath(wchar_t *path, size_t size)
+{
+	wchar_t szTTermPath[MAX_PATH];
+
+	GetTeraTermDir(szTTermPath, MAX_PATH);
+	_snwprintf(path, size, L"%s\\%s", szTTermPath, TERATERM);
+}
+
 /* ==========================================================================
 	Function Name	: (BOOL) ExecStartup()
 	Outline			: スタートアップ設定のジョブを実行する。
@@ -271,9 +306,7 @@ static BOOL ExtractAssociatedIconEx(const wchar_t *szPath, HICON *hLargeIcon, HI
 static BOOL GetApplicationFilename(const wchar_t *szName, wchar_t *szPath)
 {
 	wchar_t	szSubKey[MAX_PATH];
-	wchar_t szDefault[MAX_PATH] = DEFAULT_PATH;
 
-	wchar_t szTTermPath[MAX_PATH];
 	BOOL	bRet;
 	BOOL	bTtssh = FALSE;
 	HKEY	hKey;
@@ -285,8 +318,7 @@ static BOOL GetApplicationFilename(const wchar_t *szName, wchar_t *szPath)
 	bRet = RegGetStr(hKey, KEY_TERATERM, szPath, MAX_PATH);
 	if (bRet == FALSE || wcslen(szPath) == 0) {
 		RegGetBOOL(hKey, KEY_TTSSH, bTtssh);
-		::GetProfileStringW(L"Tera Term Pro", L"Path", szDefault, szTTermPath, MAX_PATH);
-		_swprintf(szPath, L"%s\\%s", szTTermPath, TERATERM);
+		GetTeraTermPath(szPath, MAX_PATH);
 	}
 
 	RegClose(hKey);
@@ -697,9 +729,6 @@ BOOL InitConfigDlg(HWND hWnd)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL InitEtcDlg(HWND hWnd)
 {
-	wchar_t	szDefault[MAX_PATH] = DEFAULT_PATH;
-	wchar_t	szTTermPath[MAX_PATH];
-
 	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_ETC_TITLE" },
 		{ LBL_TTMPATH, "DLG_ETC_APP" },
@@ -717,11 +746,11 @@ BOOL InitEtcDlg(HWND hWnd)
 	SetI18nDlgStrsW(hWnd, "TTMenu", text_info, _countof(text_info), UILanguageFileW);
 
 	if (wcslen(g_JobInfo.szTeraTerm) == 0) {
-		::GetProfileStringW(L"Tera Term Pro", L"Path", szDefault, szTTermPath, MAX_PATH);
-		swprintf_s(g_JobInfo.szTeraTerm, L"%s\\%s", szTTermPath, TERATERM);
+		GetTeraTermPath(g_JobInfo.szTeraTerm, MAX_PATH);
 	}
-	if (g_JobInfo.bTtssh == TRUE && lwcsstri(g_JobInfo.szTeraTerm, TERATERM) == NULL)
-		swprintf_s(g_JobInfo.szTeraTerm, L"%s\\%s", szTTermPath, TERATERM);
+	if (g_JobInfo.bTtssh == TRUE && lwcsstri(g_JobInfo.szTeraTerm, TERATERM) == NULL) {
+		GetTeraTermPath(g_JobInfo.szTeraTerm, MAX_PATH);
+	}
 	if (wcslen(g_JobInfo.szLoginPrompt) == 0) {
 		wcscpy(g_JobInfo.szLoginPrompt, LOGIN_PROMPT);
 	}
@@ -807,11 +836,9 @@ BOOL InitVersionDlg(HWND hWnd)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL SetDefaultEtcDlg(HWND hWnd)
 {
-	wchar_t	szDefault[MAX_PATH] = DEFAULT_PATH;
 	wchar_t	szTTermPath[MAX_PATH];
 
-	::GetProfileStringW(L"Tera Term Pro", L"Path", szDefault, szTTermPath, MAX_PATH);
-	swprintf_s(szTTermPath, L"%s\\%s", szTTermPath, TERATERM);
+	GetTeraTermPath(szTTermPath, MAX_PATH);
 
 	::SetDlgItemTextW(hWnd, EDIT_TTMPATH, szTTermPath);
 	::SetDlgItemTextA(hWnd, EDIT_INITFILE, "");
@@ -1044,7 +1071,6 @@ static void dquote_string(const wchar_t *str, wchar_t *dst, size_t dst_len)
 BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 {
 	wchar_t	szName[MAX_PATH];
-	wchar_t	szDefault[MAX_PATH] = DEFAULT_PATH;
 	wchar_t	szDirectory[MAX_PATH];
 	wchar_t	szHostName[MAX_PATH];
 	wchar_t	szMacroFile[MAX_PATH];
@@ -1071,8 +1097,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 		return TRUE;
 
 	if (wcslen(jobInfo.szTeraTerm) == 0) {
-		::GetProfileStringW(L"Tera Term Pro", L"Path", szDefault, jobInfo.szTeraTerm, MAX_PATH);
-		swprintf_s(jobInfo.szTeraTerm, L"%s\\%s", jobInfo.szTeraTerm, TERATERM);
+		GetTeraTermPath(jobInfo.szTeraTerm, MAX_PATH);
 	}
 
 	wcscpy(szHostName, jobInfo.szHostName);
@@ -1568,8 +1593,6 @@ BOOL SaveEtcInformation(HWND hWnd)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL SaveLoginHostInformation(HWND hWnd)
 {
-	wchar_t	szDefault[MAX_PATH] = DEFAULT_PATH;
-	wchar_t	szTTermPath[MAX_PATH];
 	wchar_t	szName[MAX_PATH];
 	DWORD	dwErr;
 	wchar_t	uimsg[MAX_UIMSG];
@@ -1618,11 +1641,9 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 
 	g_JobInfo.bTtssh	= (BOOL) ::IsDlgButtonChecked(hWnd, CHECK_TTSSH);
 	if (g_JobInfo.bTtssh == TRUE && lwcsstri(g_JobInfo.szTeraTerm, TERATERM) == NULL) {
-		::GetProfileStringW(L"Tera Term Pro", L"Path", szDefault, szTTermPath, MAX_PATH);
-		swprintf_s(g_JobInfo.szTeraTerm, L"%s\\%s", szTTermPath, TERATERM);
+		GetTeraTermPath(g_JobInfo.szTeraTerm, MAX_PATH);
 	} else if (wcslen(g_JobInfo.szTeraTerm) == 0) {
-		::GetProfileStringW(L"Tera Term Pro", L"Path", szDefault, szTTermPath, MAX_PATH);
-		swprintf_s(g_JobInfo.szTeraTerm, L"%s\\%s", szTTermPath, TERATERM);
+		GetTeraTermPath(g_JobInfo.szTeraTerm, MAX_PATH);
 	}
 
 	wchar_t *exe_fullpath = GetFullPath(g_JobInfo.szTeraTerm);
