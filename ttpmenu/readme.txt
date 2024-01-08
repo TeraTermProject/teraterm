@@ -216,6 +216,7 @@ iniファイルはUnicode iniファイル(UTF-16 with LE BOM)の使用をおすすめします。
 TeraTerm Menu 1.19 (YYYY.MM.DD)
 
 ・接続先が登録されていないとき、"(none)"が正しく表示されないので修正した。
+・ttermpro.exe のパスを Win.ini から読み込まないよう修正した。
 
 TeraTerm Menu 1.18 (2023.12.02)
 
