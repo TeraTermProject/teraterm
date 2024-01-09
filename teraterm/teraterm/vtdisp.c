@@ -71,7 +71,7 @@ BOOL DontChangeSize=FALSE;
 static int CRTWidth, CRTHeight;
 int CursorX, CursorY;
 /* Virtual screen region */
-RECT VirtualScreen;
+static RECT VirtualScreen;
 
 // --- scrolling status flags
 int WinOrgX, WinOrgY, NewOrgX, NewOrgY;
