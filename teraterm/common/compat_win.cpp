@@ -191,6 +191,7 @@ static const APIInfo Lists_user32[] = {
 
 static const APIInfo Lists_msimg32[] = {
 	{ "AlphaBlend", (void **)&pAlphaBlend },
+	{ "TransparentBlt", (void **)&pTransparentBlt },
 	{},
 };
 
