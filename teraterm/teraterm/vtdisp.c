@@ -2925,7 +2925,7 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *cells, int len,
 			else {
 				SIZE size;
 				GetTextExtentPoint32W(DC, &StrW[i - zero_count], 1 + zero_count, &size);
-				if ((size.cx == Dx[i])) {
+				if ((size.cx == Dx[i]) || (size.cx == Dx[i] + 1)) {
 					wchar_count++;
 					cell_count += cells[i];
 				}
