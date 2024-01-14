@@ -146,6 +146,8 @@
     <ClCompile Include="..\susie_plugin\libsusieplugin.cpp" />
     <ClCompile Include="..\ttpcmn\ttcmn_dup.cpp" />
     <ClCompile Include="..\ttpcmn\ttcmn_static.c" />
+    <ClCompile Include="..\ttpdlg\aboutdlg.c" />
+    <ClCompile Include="..\ttpdlg\termdlg.c" />
     <ClCompile Include="..\ttpfile\bplus.c" />
     <ClCompile Include="..\ttpfile\filesys_win32.cpp" />
     <ClCompile Include="..\ttpfile\ftlib.c" />

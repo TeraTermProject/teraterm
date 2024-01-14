@@ -193,7 +193,9 @@ source_group(
 target_sources(
   ${PACKAGE_NAME}
   PRIVATE
+  ../ttpdlg/aboutdlg.c
   ../ttpdlg/dlg_res.h
+  ../ttpdlg/termdlg.c
   ../ttpdlg/ttdlg.c
   ../ttpdlg/ttdlg.h
   ../ttpdlg/ttpdlg.rc
