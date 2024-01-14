@@ -58,6 +58,7 @@
 #include "theme.h"
 #include "ttcmn_notify2.h"
 #include "filesys_log.h"	// for FLogGetLogFilenameBase()
+#include "ttdlg.h"
 #include "theme_pp.h"
 
 const mouse_cursor_t MouseCursor[] = {
@@ -2123,6 +2124,12 @@ void CCygwinPropPageDlg::OnHelp()
 
 //////////////////////////////////////////////////////////////////////////////
 
+#define TAB_INDEX_GENERAL	0
+#define TAB_INDEX_DEFAULT	0
+#define	TAB_INDEX_TERM	6
+#define	TAB_INDEX_CODING	7
+#define	TAB_INDEX_FONT	8
+
 // CAddSettingPropSheetDlg
 CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd):
 	TTCPropSheetDlg(hInstance, hParentWnd, ts.UILanguageFileW)
@@ -2135,10 +2142,6 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 	m_Page[i++] = new CVisualPropPageDlg(hInstance);
 	m_Page[i++] = new CLogPropPageDlg(hInstance);
 	m_Page[i++] = new CCygwinPropPageDlg(hInstance);
-	if ((GetKeyState(VK_CONTROL) & 0x8000) != 0 ||
-		(GetKeyState(VK_SHIFT) & 0x8000) != 0 ) {
-		m_Page[i++] = new CDebugPropPage(hInstance);
-	}
 	m_PageCountCPP = i;
 
 	HPROPSHEETPAGE page;
@@ -2148,12 +2151,23 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 	}
 
 	// TTCPropertyPage ‚ðŽg—p‚µ‚È‚¢ PropertyPage
+	page = CreateTerminalPP(hInstance, HVTWin, &ts);
+	AddPage(page, L"term");
 	page = CodingPageCreate(hInstance, &ts);
-	AddPage(page);
+	AddPage(page, L"term");
 	page = FontPageCreate(hInstance, &ts);
 	AddPage(page);
 	page = ThemePageCreate(hInstance, &ts);
 	AddPage(page);
+
+	// debug
+	if ((GetKeyState(VK_CONTROL) & 0x8000) != 0 ||
+		(GetKeyState(VK_SHIFT) & 0x8000) != 0 ) {
+		m_Page[m_PageCountCPP] = new CDebugPropPage(hInstance);
+		page = m_Page[m_PageCountCPP]->CreatePropertySheetPage();
+		AddPage(page, L"debug");
+		m_PageCountCPP++;
+	}
 
 	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFileW);
 	SetCaption(title);
@@ -2169,6 +2183,21 @@ CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 
 void CAddSettingPropSheetDlg::SetStartPage(Page page)
 {
-	int start_page = page == DefaultPage ? 0: 7;
-	TTCPropSheetDlg::SetStartPage(start_page);
+	int index;
+	switch (page) {
+	case DefaultPage:
+	default:
+		index = TAB_INDEX_DEFAULT;
+		break;
+	case FontPage:
+		index = TAB_INDEX_FONT;
+		break;
+	case TermPage:
+		index = TAB_INDEX_TERM;
+		break;
+	case CodingPage:
+		index = TAB_INDEX_CODING;
+		break;
+	}
+	TTCPropSheetDlg::SetStartPage(index);
 }

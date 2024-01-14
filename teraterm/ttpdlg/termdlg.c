@@ -46,6 +46,9 @@
 
 #include "ttdlg.h"
 
+// テンプレートの書き換えを行う
+#define REWRITE_TEMPLATE
+
 static const char *NLListRcv[] = {"CR", "CR+LF", "LF", "AUTO", NULL};
 static const char *NLList[] = {"CR","CR+LF", "LF", NULL};
 static const char *TermList[] =
@@ -115,11 +118,12 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 	switch (Message) {
 		case WM_INITDIALOG: {
-			DialogData *data = (DialogData *)lParam;
+			DialogData *data = (DialogData *)(((PROPSHEETPAGEW *)lParam)->lParam);
 			TTTSet *ts = data->pts;
-			SetWindowLongPtrW(Dialog, DWLP_USER, lParam);
+			SetWindowLongPtrW(Dialog, DWLP_USER, (LONG_PTR)data);
 
 			SetDlgTextsW(Dialog, TextInfosCom, _countof(TextInfosCom), ts->UILanguageFileW);
+#if 0
 			if (ts->Language==IdJapanese) {
 				// 日本語の時だけ4つの項目が存在する
 				static const DlgTextInfo TextInfosJp[] = {
@@ -130,7 +134,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				};
 				SetDlgTextsW(Dialog, TextInfosJp, _countof(TextInfosJp), ts->UILanguageFileW);
 			}
-
+#endif
 			SetDlgItemInt(Dialog,IDC_TERMWIDTH,ts->TerminalWidth,FALSE);
 			SendDlgItemMessage(Dialog, IDC_TERMWIDTH, EM_LIMITTEXT,3, 0);
 
@@ -200,15 +204,28 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					SetDropDownList(Dialog, IDC_TERMKOUT, kanji_out_list, n);
 				}
 			}
-			CenterWindow(Dialog, GetParent(Dialog));
+//			CenterWindow(Dialog, GetParent(Dialog));
 			return TRUE;
 		}
 
+		case WM_NOTIFY:
 		case WM_COMMAND: {
-			DialogData *data = (DialogData *)GetWindowLongPtrW(Dialog,DWLP_USER);
+			DialogData *data = (DialogData *)GetWindowLongPtrW(Dialog, DWLP_USER);
 			TTTSet *ts;
 			assert(data != NULL);
 			ts = data->pts;
+			if (Message == WM_NOTIFY) {
+				NMHDR *nmhdr = (NMHDR *)lParam;
+				if (nmhdr->code == PSN_APPLY) {
+					wParam = IDOK;
+				}
+				else if (nmhdr->code == PSN_HELP) {
+					wParam = IDC_TERMHELP;
+				}
+				else {
+					break;
+				}
+			}
 			switch (LOWORD(wParam)) {
 				case IDOK: {
 					int width, height;
@@ -288,12 +305,10 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 						ts->KanjiOut = 0;
 					}
 
-					TTEndDialog(Dialog, 1);
 					return TRUE;
 				}
 
 				case IDCANCEL:
-					TTEndDialog(Dialog, 0);
 					return TRUE;
 
 				case IDC_TERMISWIN:
@@ -350,7 +365,15 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 						HelpId = HlpSetupTerminal;
 						break;
 					}
-					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HelpId,0);
+					//PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HelpId,0);
+					PostMessage(data->VTWin, WM_USER_DLGHELP2, HelpId, 0);
+					break;
+				}
+
+				case IDC_CODING_BUTTON: {
+					HWND hWnd = GetParent(Dialog);
+					WPARAM tab_index = 6;
+					SendMessageW(hWnd, PSM_SETCURSEL, tab_index, 0);
 					break;
 				}
 			}
@@ -359,35 +382,72 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 	return FALSE;
 }
 
-BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
+static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp)
 {
+	(void)hwnd;
+	UINT ret_val = 0;
+	switch (uMsg) {
+	case PSPCB_CREATE:
+		ret_val = 1;
+		break;
+	case PSPCB_RELEASE:
+		free((void *)ppsp->pResource);
+		ppsp->pResource = NULL;
+		free((void *)ppsp->lParam);
+		ppsp->lParam = 0;
+		break;
+	default:
+		break;
+	}
+	return ret_val;
+}
+
+HPROPSHEETPAGE CreateTerminalPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
+{
+	int id;
+	PROPSHEETPAGEW_V1 psp = { 0 };
 	DialogData *data;
-	int i;
+	wchar_t *uimsg;
 	BOOL r;
 
-	data = (DialogData *)malloc(sizeof(*data));
-	data->pts = ts;
-	data->VTWin = WndParent;
-
-	switch (ts->Language) {
+	id = IDD_TERMDLGK;
+#if 0
+	switch (pts->Language) {
 	case IdJapanese: // Japanese mode
-		i = IDD_TERMDLGJ;
+		id = IDD_TERMDLGJ;
 		break;
 	case IdKorean: // Korean mode //HKS
 	case IdUtf8:   // UTF-8 mode
 	case IdChinese:
 	case IdRussian: // Russian mode
 	case IdEnglish:  // English mode
-		i = IDD_TERMDLGK;
+		id = IDD_TERMDLGK;
 		break;
 	default:
 		// 使っていない
-		i = IDD_TERMDLG;
+		id = IDD_TERMDLG;
 	}
+#endif
 
-	r = (BOOL)TTDialogBoxParam(hInst,
-							   MAKEINTRESOURCE(i),
-							   WndParent, TermDlg, (LPARAM)data);
-	free(data);
-	return r;
+	data = (DialogData *)malloc(sizeof(*data));
+	data->pts = &ts;
+	data->VTWin = vtwin;
+
+	psp.dwSize = sizeof(psp);
+	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
+	psp.hInstance = inst;
+	psp.pfnCallback = CallBack;
+	GetI18nStrWW("Tera Term", "DLG_TERM_TITLE", L"Tera Term: Terminal setup", pts->UILanguageFileW, &uimsg);
+	psp.pszTitle = uimsg;
+	psp.pszTemplate = MAKEINTRESOURCEW(id);
+#if defined(REWRITE_TEMPLATE)
+	psp.dwFlags |= PSP_DLGINDIRECT;
+	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
+#endif
+	psp.pfnDlgProc = TermDlg;
+	psp.lParam = (LPARAM)data;
+
+	HPROPSHEETPAGE hpsp = CreatePropertySheetPageW((LPCPROPSHEETPAGEW)&psp);
+	free(uimsg);
+	return hpsp;
 }

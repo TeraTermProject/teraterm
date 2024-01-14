@@ -112,6 +112,8 @@ public:
 	enum Page {
 		DefaultPage,
 		FontPage,
+		TermPage,
+		CodingPage,
 	};
 	void SetStartPage(Page page);
 

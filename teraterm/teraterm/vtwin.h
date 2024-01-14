@@ -237,7 +237,6 @@ protected:
 
 private:
 	void CodePopup(int client_x, int client_y);
-	void OpenExternalSetup(int page);
 	void SetColor();
 };
 #endif

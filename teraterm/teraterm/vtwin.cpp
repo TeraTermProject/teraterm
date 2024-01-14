@@ -111,6 +111,7 @@
 #include "scp.h"
 #include "ttcommdlg.h"
 #include "logdlg.h"
+#include "ttdlg.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -146,6 +147,7 @@ typedef struct {
 static vtwin_work_t vtwin_work;
 
 extern "C" PrintFile *PrintFile_;
+void OpenExternalSetup(CAddSettingPropSheetDlg::Page page);
 
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
@@ -4208,29 +4210,6 @@ void CVTWindow::OnEditCancelSelection()
 	ChangeSelectRegion();
 }
 
-void CVTWindow::OpenExternalSetup(int page)
-{
-	CAddSettingPropSheetDlg::Page additional_page =
-		page == 0 ? CAddSettingPropSheetDlg::DefaultPage : CAddSettingPropSheetDlg::FontPage;
-	BOOL old_use_unicode_api = UnicodeDebugParam.UseUnicodeApi;
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
-	CAddSettingPropSheetDlg CAddSetting(m_hInst, HVTWin);
-	CAddSetting.SetTreeViewMode(ts.ExperimentalTreeProprtySheetEnable);
-	CAddSetting.SetStartPage(additional_page);
-	INT_PTR ret = CAddSetting.DoModal();
-	if (ret == IDOK) {
-		ChangeWin();
-		ChangeFont();
-		if (old_use_unicode_api != UnicodeDebugParam.UseUnicodeApi) {
-			BuffSetDispAPI(UnicodeDebugParam.UseUnicodeApi);
-		}
-
-		// コーディングタブで設定が変化したときコールする必要がある
-		SetupTerm();
-	}
-}
-
 // Additional settings dialog
 //
 // (2004.9.5 yutaka) new added
@@ -4238,7 +4217,7 @@ void CVTWindow::OpenExternalSetup(int page)
 // (2008.5.12 maya) changed to PropertySheet
 void CVTWindow::OnExternalSetup()
 {
-	OpenExternalSetup(0);
+	OpenExternalSetup(CAddSettingPropSheetDlg::DefaultPage);
 }
 
 void CVTWindow::OnSetupTerminal()
@@ -5368,4 +5347,34 @@ void VtwinSetHelpId(DWORD help_id)
 {
 	vtwin_work_t *w = &vtwin_work;
 	w->help_id = help_id;
+}
+
+extern CVTWindow* pVTWin;
+
+void OpenExternalSetup(CAddSettingPropSheetDlg::Page page)
+{
+	CAddSettingPropSheetDlg::Page additional_page = page;
+	BOOL old_use_unicode_api = UnicodeDebugParam.UseUnicodeApi;
+	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
+				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
+	CAddSettingPropSheetDlg CAddSetting(hInst, HVTWin);
+	CAddSetting.SetTreeViewMode(ts.ExperimentalTreeProprtySheetEnable);
+	CAddSetting.SetStartPage(additional_page);
+	INT_PTR ret = CAddSetting.DoModal();
+	if (ret == IDOK) {
+		ChangeWin();
+		ChangeFont();
+		if (old_use_unicode_api != UnicodeDebugParam.UseUnicodeApi) {
+			BuffSetDispAPI(UnicodeDebugParam.UseUnicodeApi);
+		}
+
+		// コーディングタブで設定が変化したときコールする必要がある
+		pVTWin->SetupTerm();
+	}
+}
+
+BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
+{
+	OpenExternalSetup(CAddSettingPropSheetDlg::TermPage);
+	return TRUE;
 }

@@ -46,6 +46,8 @@ BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, PTTSet ts);
 BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts);
 BOOL WINAPI _WindowWindow(HWND WndParent, PBOOL Close);
 
+HPROPSHEETPAGE CreateTerminalPP(HINSTANCE inst, HWND vtwin, TTTSet *pts);
+
 #ifdef __cplusplus
 }
 #endif

@@ -407,7 +407,7 @@ void TTCPropSheetDlg::AddTreeControl()
 	HWND hTab = PropSheet_GetTabControl(m_hWnd);
 
 	// ツリーで選択できるのでタブは1行設定にする
-	SetWindowLongPtr(hTab, GWL_STYLE, GetWindowLongPtr(hTab, GWL_STYLE) & ~TCS_MULTILINE);
+//	SetWindowLongPtr(hTab, GWL_STYLE, GetWindowLongPtr(hTab, GWL_STYLE) & ~TCS_MULTILINE);
 
 #if 0
 	// タブを消して領域を移動しようとしたがうまくいかなかった
