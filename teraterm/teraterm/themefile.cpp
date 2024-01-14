@@ -615,9 +615,9 @@ static void LoadColorAttr(const wchar_t *section, const wchar_t *key, const wcha
 		return;
 	}
 
-	BYTE fg_red, fg_green, fg_blue;
-	BYTE bg_red, bg_green, bg_blue;
-	fields = swscanf_s(str, L"%d, %d, %hhu, %hhu, %hhu, %hhu, %hhu, %hhu", &change, &enable, &fg_red, &fg_green,
+	unsigned int fg_red, fg_green, fg_blue;
+	unsigned int bg_red, bg_green, bg_blue;
+	fields = swscanf_s(str, L"%d, %d, %u, %u, %u, %u, %u, %u", &change, &enable, &fg_red, &fg_green,
 					   &fg_blue, &bg_red, &bg_green, &bg_blue);
 	if (fields == 8) {
 		free(str);
