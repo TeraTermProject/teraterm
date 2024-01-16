@@ -143,7 +143,7 @@ int b64decode(PCHAR dst, int dsize, PCHAR src)
 			continue;
 		}
 
-		if ((c = b64dec_table[*src++]) == -1)
+		if ((c = b64dec_table[(unsigned char)*src++]) == -1)
 			break;
 
 		b = (b << 6) | c;
