@@ -286,8 +286,17 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					break;
 				}
 				case IDC_USE_SAME_CODE | (BN_CLICKED << 16): {
-					BOOL enable = (IsDlgButtonChecked(hWnd, IDC_USE_SAME_CODE) == BST_CHECKED) ? FALSE : TRUE;
-					EnableWindow(GetDlgItem(hWnd, IDC_TERMKANJISEND), enable);
+					const BOOL checked = (IsDlgButtonChecked(hWnd, IDC_USE_SAME_CODE) == BST_CHECKED) ? TRUE : FALSE;
+					EnableWindow(GetDlgItem(hWnd, IDC_TERMKANJISEND), checked ? FALSE : TRUE);
+					if (checked) {
+						// USE_SAME_CODEのチェックが入っているとき
+						LRESULT recv_index = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
+						LRESULT send_index = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
+						if (recv_index != send_index) {
+							// 送受信コードが異なっているなら、送信コードを受信と同一にする
+							SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETCURSEL, recv_index, 0);
+						}
+					}
 					break;
 				}
 				case IDC_EMOJI_WIDTH_CHECK | (BN_CLICKED << 16): {
