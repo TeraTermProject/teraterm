@@ -58,30 +58,105 @@ struct CodingPPData {
 	DLGTEMPLATE *dlg_templ;
 };
 
+static void EnableWindows(HWND hWnd, const int *list, int count, BOOL enable)
+{
+	int i;
+	for (i = 0; i < count; i++) {
+		HWND w = GetDlgItem(hWnd, list[i]);
+		EnableWindow(w, enable);
+	}
+}
+
+static void ArrenageItems(HWND hWnd)
+{
+	static const int JJISReceiveItems[] = {
+		IDC_TERMKINTEXT,
+		IDC_TERMKIN,
+		IDC_TERMKOUTTEXT,
+		IDC_TERMKOUT,
+		IDC_TERMKANA,
+	};
+	static const int JJISSendItems[] = {
+		IDC_TERMKANASEND,
+	};
+	static const int UnicodeItems[] = {
+		IDC_AMBIGUOUS_WIDTH_TITLE,
+		IDC_AMBIGUOUS_WIDTH_COMBO,
+		IDC_EMOJI_WIDTH_CHECK,
+		IDC_EMOJI_WIDTH_COMBO,
+	};
+
+	// 受信コード
+	LRESULT curPos = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
+	LRESULT id = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETITEMDATA, curPos, 0);
+	LRESULT lang = id / 100;
+	LRESULT coding_receive = id % 100;
+
+	// 送信コード
+	curPos = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
+	id = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETITEMDATA, curPos, 0);
+	assert(lang == (id / 100));
+	LRESULT coding_send = id % 100;
+
+	bool is_unicode =
+		((lang == IdUtf8) ||
+		 ((lang == IdJapanese) && ((coding_receive == IdUTF8) || (coding_send == IdUTF8))) ||
+		 ((lang == IdKorean) && ((coding_receive == IdUTF8) || (coding_send == IdUTF8))) ||
+		 ((lang == IdChinese) && ((coding_receive == IdUTF8) || (coding_send == IdUTF8))));
+
+	// Unicode character width
+	if (is_unicode) {
+		EnableWindows(hWnd, UnicodeItems, _countof(UnicodeItems), TRUE);
+	}
+	else {
+		EnableWindows(hWnd, UnicodeItems, _countof(UnicodeItems), FALSE);
+	}
+	if (lang == IdChinese || lang == IdJapanese || lang == IdKorean) {
+		SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
+		CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_CHECKED);
+		SendDlgItemMessage(hWnd, IDC_EMOJI_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
+	}
+	else {
+		CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_UNCHECKED);
+		SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 0, 0);
+	}
+
+	if (lang == IdJapanese && coding_receive == IdJIS) {
+		EnableWindows(hWnd, JJISReceiveItems, _countof(JJISReceiveItems), TRUE);
+	}
+	else {
+		EnableWindows(hWnd, JJISReceiveItems, _countof(JJISReceiveItems), FALSE);
+	}
+
+	if (lang == IdJapanese && coding_send == IdJIS) {
+		EnableWindows(hWnd, JJISSendItems, _countof(JJISSendItems), TRUE);
+	}
+	else {
+		EnableWindows(hWnd, JJISSendItems, _countof(JJISSendItems), FALSE);
+	}
+}
+
 static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
-		{0, "DLG_GEN_TITLE"},
-		{IDC_GENLANGLABEL, "DLG_GEN_LANG"},
-		//		{ IDC_TERMKANJILABEL, "DLG_TERM_KANJI" },
-		{IDC_TERMKANJILABEL, "DLG_TERMK_KANJI"},
-		{IDC_TERMKANA, "DLG_TERM_KANA"},
-		{IDC_TERMKANJISENDLABEL, "DLG_TERMK_KANJISEND"},
-		//		{ IDC_TERMKANASEND, "DLG_TERM_KANASEND" },
-		{IDC_TERMKANASEND, "DLG_TERM_KANASEND"},
-		{IDC_TERMKINTEXT, "DLG_TERM_KIN"},
-		{IDC_TERMKOUTTEXT, "DLG_TERM_KOUT"},
+		{ 0, "DLG_GEN_TITLE" },
+		// { IDC_TERMKANJILABEL, "DLG_TERM_KANJI" },
+		{ IDC_TERMKANJILABEL, "DLG_TERMK_KANJI" },
+		//{ IDC_TERMKANA, "DLG_TERM_KANA" },
+		{ IDC_TERMKANJISENDLABEL, "DLG_TERMK_KANJISEND" },
+		//{ IDC_TERMKANASEND, "DLG_TERM_KANASEND" },
+		{ IDC_TERMKINTEXT, "DLG_TERM_KIN" },
+		{ IDC_TERMKOUTTEXT, "DLG_TERM_KOUT" },
 		{ IDC_UNICODE2DEC, "DLG_CODING_UNICODE_TO_DEC" },
 		{ IDC_DEC2UNICODE, "DLG_CODING_DEC_TO_UNICODE" },
 		{ IDC_DEC2UNICODE_BOXDRAWING, "DLG_CODING_UNICODE_TO_DEC_BOXDRAWING" },
 		{ IDC_DEC2UNICODE_PUNCTUATION, "DLG_CODING_UNICODE_TO_DEC_PUNCTUATION" },
 		{ IDC_DEC2UNICODE_MIDDLEDOT, "DLG_CODING_UNICODE_TO_DEC_MIDDLEDOT" },
 	};
-	CodingPPData *DlgData = (CodingPPData *)GetWindowLongPtr(hWnd, DWLP_USER);
 
 	switch (msg) {
 		case WM_INITDIALOG: {
-			DlgData = (CodingPPData *)(((PROPSHEETPAGEW_V1 *)lp)->lParam);
+			CodingPPData *DlgData = (CodingPPData *)(((PROPSHEETPAGEW_V1 *)lp)->lParam);
 			const TTTSet *ts = DlgData->pts;
 			SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)DlgData);
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), DlgData->pts->UILanguageFileW);
@@ -94,15 +169,13 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					break;
 				}
 				int id = p->lang * 100 + p->coding;
-				int index =
-					(int)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_ADDSTRING, 0, (LPARAM)p->CodeName);
+				LRESULT index = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_ADDSTRING, 0, (LPARAM)p->CodeName);
 				SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_SETITEMDATA, index, id);
 				if (ts->Language == p->lang && ts->KanjiCode == p->coding) {
 					recv_index = i;
 				}
 
-				index =
-					(int)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_ADDSTRING, 0, (LPARAM)p->CodeName);
+				index =	SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_ADDSTRING, 0, (LPARAM)p->CodeName);
 				SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETITEMDATA, index, id);
 				if (ts->Language == p->lang && ts->KanjiCodeSend == p->coding) {
 					send_index = i;
@@ -114,15 +187,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETCURSEL, send_index, 0);
 
 			if (recv_index == send_index) {
-				CheckDlgButton(hWnd, IDC_USE_SAME_CODE, BST_CHECKED);
+				CheckDlgButton(hWnd, IDC_USE_DIFFERENT_CODE, BST_UNCHECKED);
 				EnableWindow(GetDlgItem(hWnd, IDC_TERMKANJISEND), FALSE);
 			}
-
-			if (ts->KanjiCode != IdJIS) {
-				DisableDlgItem(hWnd, IDC_TERMKANA, IDC_TERMKANA);
-			}
-			if (ts->KanjiCodeSend != IdJIS) {
-				DisableDlgItem(hWnd, IDC_TERMKANASEND, IDC_TERMKOUT);
+			else {
+				CheckDlgButton(hWnd, IDC_USE_DIFFERENT_CODE, BST_CHECKED);
 			}
 
 			SetRB(hWnd, ts->JIS7Katakana, IDC_TERMKANA, IDC_TERMKANA);
@@ -141,11 +210,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				SetDropDownList(hWnd, IDC_TERMKOUT, kanji_out_list, n);
 			}
 
-			// characters as wide
+			// character width
 			SetDropDownList(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CellWidthList, ts->UnicodeAmbiguousWidth == 1 ? 1 : 2);
 			CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, ts->UnicodeEmojiOverride ? BST_CHECKED : BST_UNCHECKED);
 			SetDropDownList(hWnd, IDC_EMOJI_WIDTH_COMBO, CellWidthList, ts->UnicodeEmojiWidth == 1 ? 1 : 2);
-			EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), ts->UnicodeEmojiOverride);
 
 			// DEC Special Graphics
 			CheckDlgButton(hWnd, IDC_UNICODE2DEC, ts->Dec2Unicode ? BST_UNCHECKED : BST_CHECKED);
@@ -157,12 +225,15 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			CheckDlgButton(hWnd, IDC_DEC2UNICODE_MIDDLEDOT,
 						   (ts->UnicodeDecSpMapping & 0x04) != 0 ? BST_CHECKED : BST_UNCHECKED);
 
+			ArrenageItems(hWnd);
+
 			return TRUE;
 		}
 		case WM_NOTIFY: {
 			NMHDR *nmhdr = (NMHDR *)lp;
 			switch (nmhdr->code) {
 				case PSN_APPLY: {
+					CodingPPData *DlgData = (CodingPPData *)GetWindowLongPtr(hWnd, DWLP_USER);
 					TTTSet *ts = DlgData->pts;
 
 					ts->JIS7KatakanaSend = 0;
@@ -244,52 +315,44 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			switch (wp) {
 				case IDC_TERMKANJI | (CBN_SELCHANGE << 16): {
 					// 受信コード
-					int curPos = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
-					int id = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETITEMDATA, curPos, 0);
-					if (id == IdJapanese * 100 + IdJIS) {
-						EnableDlgItem(hWnd, IDC_TERMKANA, IDC_TERMKANA);
-					}
-					else {
-						DisableDlgItem(hWnd, IDC_TERMKANA, IDC_TERMKANA);
-					}
-					if ((id / 100) == IdChinese || (id / 100) == IdJapanese || (id / 100) == IdKorean) {
-						// CJK
-						SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
-						CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_CHECKED);
-						EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), TRUE);
-						SendDlgItemMessage(hWnd, IDC_EMOJI_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
-					}
-					else {
-						CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_UNCHECKED);
-						SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 0, 0);
-						EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), FALSE);
+					LRESULT sel_receive = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
+					LRESULT id = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETITEMDATA, sel_receive, 0);
+					LRESULT lang_receive = id / 100;
+					LRESULT sel_send = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
+					id = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETITEMDATA, sel_send, 0);
+					LRESULT lang_send = id / 100;
+
+					if (lang_receive != lang_send ||
+						IsDlgButtonChecked(hWnd, IDC_USE_DIFFERENT_CODE) == BST_UNCHECKED) {
+						// 送信コードを同じ値にする
+						SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETCURSEL, sel_receive, 0);
 					}
 
-					if (IsDlgButtonChecked(hWnd, IDC_USE_SAME_CODE) == BST_CHECKED) {
-						// 送信コードを同じ値にする
-						SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETCURSEL, curPos, 0);
-						goto kanji_send_selchange;
-					}
+					ArrenageItems(hWnd);
 					break;
 				}
 				case IDC_TERMKANJISEND | (CBN_SELCHANGE << 16): {
-				kanji_send_selchange:
 					// 送信コード
-					int curPos = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
-					int id = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETITEMDATA, curPos, 0);
-					if (id == IdJapanese * 100 + IdJIS) {
-						EnableDlgItem(hWnd, IDC_TERMKANASEND, IDC_TERMKOUT);
+					LRESULT sel_receive = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
+					LRESULT id = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETITEMDATA, sel_receive, 0);
+					LRESULT lang_receive = id / 100;
+					LRESULT sel_send = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
+					id = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETITEMDATA, sel_send, 0);
+					LRESULT lang_send = id / 100;
+
+					if (lang_receive != lang_send) {
+						// 受信コードを同じ値にする
+						SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_SETCURSEL, sel_send, 0);
 					}
-					else {
-						DisableDlgItem(hWnd, IDC_TERMKANASEND, IDC_TERMKOUT);
-					}
+
+					ArrenageItems(hWnd);
 					break;
 				}
-				case IDC_USE_SAME_CODE | (BN_CLICKED << 16): {
-					const BOOL checked = (IsDlgButtonChecked(hWnd, IDC_USE_SAME_CODE) == BST_CHECKED) ? TRUE : FALSE;
-					EnableWindow(GetDlgItem(hWnd, IDC_TERMKANJISEND), checked ? FALSE : TRUE);
-					if (checked) {
-						// USE_SAME_CODEのチェックが入っているとき
+				case IDC_USE_DIFFERENT_CODE | (BN_CLICKED << 16): {
+					const BOOL checked = (IsDlgButtonChecked(hWnd, IDC_USE_DIFFERENT_CODE) == BST_CHECKED) ? TRUE : FALSE;
+					EnableWindow(GetDlgItem(hWnd, IDC_TERMKANJISEND), checked ? TRUE : FALSE);
+					if (!checked) {
+						// USE_DIFFRENT_CODEのチェックが入っていないるとき
 						LRESULT recv_index = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
 						LRESULT send_index = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
 						if (recv_index != send_index) {
