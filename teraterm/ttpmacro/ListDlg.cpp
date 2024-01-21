@@ -96,8 +96,16 @@ BOOL CListDlg::OnInitDialog()
 		{ IDOK, "BTN_YES" },
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
+	static const ResizeHelperInfo resize_info[] = {
+		{ IDC_LISTBOX, RESIZE_HELPER_ANCHOR_LRTB },
+		{ IDOK, RESIZE_HELPER_ANCHOR_RIGHT },
+		{ IDCANCEL, RESIZE_HELPER_ANCHOR_RIGHT },
+		{ IDC_LISTTEXT, RESIZE_HELPER_ANCHOR_LRB },
+	};
 	RECT R;
 	HWND HList, HOk;
+
+	ResizeHelper = ReiseHelperInit(m_hWnd, resize_info, _countof(resize_info));
 
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 
@@ -200,4 +208,21 @@ void CListDlg::Relocation(BOOL is_init, int new_WW)
 	SetDlgPos();
 
 	::InvalidateRect(m_hWnd, NULL, TRUE);
+}
+
+LRESULT CListDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
+{
+	switch (msg) {
+		case WM_SIZE:
+			ReiseDlgHelper_WM_SIZE(ResizeHelper);
+			break;
+		case WM_GETMINMAXINFO:
+			ReiseDlgHelper_WM_GETMINMAXINFO(ResizeHelper, lp);
+			break;
+		case WM_DESTROY:
+			ReiseDlgHelperDelete(ResizeHelper);
+			ResizeHelper = NULL;
+			break;
+	}
+	return (LRESULT)FALSE;
 }

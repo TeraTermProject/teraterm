@@ -29,6 +29,7 @@
 
 #include "../common/tmfc.h"
 #include "macrodlgbase.h"
+#include "resize_helper.h"
 
 // CListDlg ダイアログ
 class CListDlg : public CMacroDlgBase
@@ -46,6 +47,7 @@ private:
 	int m_Selected;
 	int init_WW, TW, TH, BH, BW, LW, LH;
 	SIZE s;
+	ReiseDlgHelper_t *ResizeHelper;
 
 	void Relocation(BOOL is_init, int WW);
 	void InitList(HWND HList);
@@ -54,4 +56,5 @@ private:
 	virtual BOOL OnOK();
 	virtual BOOL OnCancel();
 	virtual BOOL OnClose();
+	LRESULT DlgProc(UINT msg, WPARAM wp, LPARAM lp);
 };
