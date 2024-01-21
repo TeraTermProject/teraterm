@@ -57,6 +57,11 @@ ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg)
 	if (h == NULL) {
 		return NULL;
 	}
+	LONG_PTR style = GetWindowLongPtrW(dlg, GWL_STYLE);
+	if ((style & WS_THICKFRAME) == 0) {
+		// WS_THICKFRAME (=WS_SIZEBOX) スタイルがないと resizeできない
+		assert(FALSE);
+	}
 	GetWindowRect(dlg, &rect);
 	h->init_width = rect.right - rect.left;
 	h->init_height = rect.bottom - rect.top;
@@ -77,9 +82,10 @@ void ReiseDlgHelperDelete(ReiseDlgHelper_t *h)
 	}
 }
 
-static void ReiseDlgHelperAdd(ReiseDlgHelper_t *h, UINT id, int anchor)
+void ReiseDlgHelperAdd(ReiseDlgHelper_t *h, UINT id, ResizeHelperAnchor anchor)
 {
 	Controls *p;
+	assert(h != NULL);
 	Controls *ary = (Controls *)realloc(h->control_list, sizeof(Controls) * (h->control_count + 1));
 	if (ary == NULL) {
 		return;
@@ -107,31 +113,6 @@ static void ReiseDlgHelperAdd(ReiseDlgHelper_t *h, UINT id, int anchor)
 	p->anchor = anchor;
 }
 
-void ReiseDlgHelperAddB(ReiseDlgHelper_t *h, UINT id)
-{
-	ReiseDlgHelperAdd(h, id, RESIZE_HELPER_ANCHOR_BOTTOM);
-}
-
-void ReiseDlgHelperAddRT(ReiseDlgHelper_t *h, UINT id)
-{
-	ReiseDlgHelperAdd(h, id, RESIZE_HELPER_ANCHOR_RIGHT|RESIZE_HELPER_ANCHOR_TOP);
-}
-
-void ReiseDlgHelperAddRB(ReiseDlgHelper_t *h, UINT id)
-{
-	ReiseDlgHelperAdd(h, id, RESIZE_HELPER_ANCHOR_RIGHT|RESIZE_HELPER_ANCHOR_BOTTOM);
-}
-
-void ReiseDlgHelperAddLRT(ReiseDlgHelper_t *h, UINT id)
-{
-	ReiseDlgHelperAdd(h, id, RESIZE_HELPER_ANCHOR_LEFT|RESIZE_HELPER_ANCHOR_RIGHT|RESIZE_HELPER_ANCHOR_TOP);
-}
-
-void ReiseDlgHelperAddLRTB(ReiseDlgHelper_t *h, UINT id)
-{
-	ReiseDlgHelperAdd(h, id, RESIZE_HELPER_ANCHOR_LEFT|RESIZE_HELPER_ANCHOR_RIGHT|RESIZE_HELPER_ANCHOR_TOP|RESIZE_HELPER_ANCHOR_BOTTOM);
-}
-
 void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h)
 {
 	int new_width;
@@ -139,6 +120,7 @@ void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h)
 	int delta_width;
 	int delta_height;
 	RECT rect;
+	assert(h != NULL);
 	GetWindowRect(h->hWnd, &rect);
 	new_width = rect.right - rect.left;
 	new_height = rect.bottom - rect.top;
@@ -164,8 +146,7 @@ void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h)
 			// 1/2して加えるので奇数サイズのリサイズが発生すると
 			// 少しづつ位置がずれる
 			lt.x += delta_width / 2;
-		} else if ((p->anchor & (RESIZE_HELPER_ANCHOR_LEFT|RESIZE_HELPER_ANCHOR_RIGHT))
-			== (RESIZE_HELPER_ANCHOR_LEFT|RESIZE_HELPER_ANCHOR_RIGHT) ) {
+		} else if ((p->anchor & RESIZE_HELPER_ANCHOR_LR) == RESIZE_HELPER_ANCHOR_LR) {
 			width += delta_width;
 		} else if (p->anchor & RESIZE_HELPER_ANCHOR_RIGHT) {
 			lt.x += delta_width;
@@ -174,8 +155,7 @@ void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h)
 			// 1/2して加えるので奇数サイズのリサイズが発生すると
 			// 少しづつ位置がずれる
 			lt.y += delta_height / 2;
-		} else if ((p->anchor & (RESIZE_HELPER_ANCHOR_TOP|RESIZE_HELPER_ANCHOR_BOTTOM))
-			== (RESIZE_HELPER_ANCHOR_TOP|RESIZE_HELPER_ANCHOR_BOTTOM)) {
+		} else if ((p->anchor & RESIZE_HELPER_ANCHOR_TB) == RESIZE_HELPER_ANCHOR_TB) {
 			height += delta_height;
 		} else if (p->anchor & RESIZE_HELPER_ANCHOR_BOTTOM) {
 			lt.y += delta_height;
@@ -197,6 +177,7 @@ void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h)
  */
 INT_PTR ReiseDlgHelper_WM_GETMINMAXINFO(ReiseDlgHelper_t *h, LPARAM lp)
 {
+	assert(h != NULL);
 	// 初期サイズを最小サイズとする
 	LPMINMAXINFO pmmi = (LPMINMAXINFO)lp;
 	pmmi->ptMinTrackSize.x = h->init_width;
