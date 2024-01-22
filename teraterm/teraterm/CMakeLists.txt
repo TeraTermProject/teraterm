@@ -194,6 +194,7 @@ target_sources(
   ${PACKAGE_NAME}
   PRIVATE
   ../ttpdlg/aboutdlg.c
+  ../ttpdlg/choosefontdlg.c
   ../ttpdlg/dlg_res.h
   ../ttpdlg/hostdlg.c
   ../ttpdlg/serialdlg.cpp

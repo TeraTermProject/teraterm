@@ -249,6 +249,9 @@
     <ClCompile Include="..\ttpdlg\serialdlg.cpp">
       <Filter>ttpdlg</Filter>
     </ClCompile>
+    <ClCompile Include="..\ttpdlg\choosefontdlg.c">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
