@@ -29,7 +29,6 @@
 
 /* about dialog */
 
-#include "teraterm.h"
 #include <stdio.h>
 #include <string.h>
 #define _CRTDBG_MAP_ALLOC
@@ -43,8 +42,6 @@
 #include "dlglib.h"
 #include "ttcommon.h"
 #include "dlg_res.h"
-#include "tipwin.h"
-#include "codeconv.h"
 #include "asprintf.h"
 #include "win32helper.h"
 #include "compat_win.h"
