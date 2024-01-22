@@ -199,6 +199,7 @@ target_sources(
   ../ttpdlg/ttdlg.c
   ../ttpdlg/ttdlg.h
   ../ttpdlg/ttpdlg.rc
+  ../ttpdlg/windlg.cpp
   )
 
 source_group(

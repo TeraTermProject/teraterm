@@ -237,6 +237,9 @@
     <ClCompile Include="..\ttpdlg\termdlg.c">
       <Filter>ttpdlg</Filter>
     </ClCompile>
+    <ClCompile Include="..\ttpdlg\windlg.cpp">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
