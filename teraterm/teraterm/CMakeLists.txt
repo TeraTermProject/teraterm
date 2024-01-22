@@ -195,6 +195,7 @@ target_sources(
   PRIVATE
   ../ttpdlg/aboutdlg.c
   ../ttpdlg/dlg_res.h
+  ../ttpdlg/hostdlg.c
   ../ttpdlg/serialdlg.cpp
   ../ttpdlg/termdlg.c
   ../ttpdlg/ttdlg.c

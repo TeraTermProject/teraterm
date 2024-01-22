@@ -243,6 +243,9 @@
     <ClCompile Include="..\ttpdlg\windowdlg.cpp">
       <Filter>ttpdlg</Filter>
     </ClCompile>
+    <ClCompile Include="..\ttpdlg\hostdlg.c">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
     <ClCompile Include="..\ttpdlg\serialdlg.cpp">
       <Filter>ttpdlg</Filter>
     </ClCompile>

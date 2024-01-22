@@ -147,6 +147,7 @@
     <ClCompile Include="..\ttpcmn\ttcmn_dup.cpp" />
     <ClCompile Include="..\ttpcmn\ttcmn_static.c" />
     <ClCompile Include="..\ttpdlg\aboutdlg.c" />
+    <ClCompile Include="..\ttpdlg\hostdlg.c" />
     <ClCompile Include="..\ttpdlg\serialdlg.cpp" />
     <ClCompile Include="..\ttpdlg\termdlg.c" />
     <ClCompile Include="..\ttpdlg\windlg.cpp" />
