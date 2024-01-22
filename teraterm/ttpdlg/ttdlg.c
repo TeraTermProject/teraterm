@@ -1480,88 +1480,6 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 	return FALSE;
 }
 
-static INT_PTR CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
-{
-	static const DlgTextInfo TextInfos[] = {
-		{ 0, "DLG_WINLIST_TITLE" },
-		{ IDC_WINLISTLABEL, "DLG_WINLIST_LABEL" },
-		{ IDOK, "DLG_WINLIST_OPEN" },
-		{ IDCANCEL, "BTN_CANCEL" },
-		{ IDC_WINLISTCLOSE, "DLG_WINLIST_CLOSEWIN" },
-		{ IDC_WINLISTHELP, "BTN_HELP" },
-	};
-	PBOOL Close;
-	int n;
-	HWND Hw;
-
-	switch (Message) {
-		case WM_INITDIALOG:
-			Close = (PBOOL)lParam;
-			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
-
-			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
-
-			SetWinList(GetParent(Dialog),Dialog,IDC_WINLISTLIST);
-
-			CenterWindow(Dialog, GetParent(Dialog));
-
-			return TRUE;
-
-		case WM_COMMAND:
-			switch (LOWORD(wParam)) {
-				case IDOK:
-					n = SendDlgItemMessage(Dialog,IDC_WINLISTLIST,
-					LB_GETCURSEL, 0, 0);
-					if (n!=CB_ERR) {
-						SelectWin(n);
-					}
-					EndDialog(Dialog, 1);
-					return TRUE;
-
-				case IDCANCEL:
-					EndDialog(Dialog, 0);
-					return TRUE;
-
-				case IDC_WINLISTLIST:
-					if (HIWORD(wParam)==LBN_DBLCLK) {
-						PostMessage(Dialog,WM_COMMAND,IDOK,0);
-					}
-					break;
-
-				case IDC_WINLISTCLOSE:
-					n = SendDlgItemMessage(Dialog,IDC_WINLISTLIST,
-					LB_GETCURSEL, 0, 0);
-					if (n==CB_ERR) {
-						break;
-					}
-					Hw = GetNthWin(n);
-					if (Hw!=GetParent(Dialog)) {
-						if (! IsWindowEnabled(Hw)) {
-							MessageBeep(0);
-							break;
-						}
-						SendDlgItemMessage(Dialog,IDC_WINLISTLIST,
-						                   LB_DELETESTRING,n,0);
-						PostMessage(Hw,WM_SYSCOMMAND,SC_CLOSE,0);
-					}
-					else {
-						Close = (PBOOL)GetWindowLongPtr(Dialog,DWLP_USER);
-						if (Close!=NULL) {
-							*Close = TRUE;
-						}
-						EndDialog(Dialog, 1);
-						return TRUE;
-					}
-					break;
-
-				case IDC_WINLISTHELP:
-					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HlpWindowWindow,0);
-					break;
-			}
-	}
-	return FALSE;
-}
-
 BOOL WINAPI _SetupKeyboard(HWND WndParent, PTTSet ts)
 {
 	return
@@ -1696,14 +1614,4 @@ BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts)
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_GENDLG),
 		                     WndParent, GenDlg, (LPARAM)ts);
-}
-
-BOOL WINAPI _WindowWindow(HWND WndParent, PBOOL Close)
-{
-	*Close = FALSE;
-	return
-		(BOOL)DialogBoxParam(hInst,
-		                     MAKEINTRESOURCE(IDD_WINLISTDLG),
-		                     WndParent,
-							 WinListDlg, (LPARAM)Close);
 }

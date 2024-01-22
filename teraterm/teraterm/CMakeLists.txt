@@ -200,6 +200,7 @@ target_sources(
   ../ttpdlg/ttdlg.h
   ../ttpdlg/ttpdlg.rc
   ../ttpdlg/windlg.cpp
+  ../ttpdlg/windowdlg.cpp
   )
 
 source_group(

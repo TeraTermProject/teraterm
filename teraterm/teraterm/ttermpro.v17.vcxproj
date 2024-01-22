@@ -149,6 +149,7 @@
     <ClCompile Include="..\ttpdlg\aboutdlg.c" />
     <ClCompile Include="..\ttpdlg\termdlg.c" />
     <ClCompile Include="..\ttpdlg\windlg.cpp" />
+    <ClCompile Include="..\ttpdlg\windowdlg.cpp" />
     <ClCompile Include="..\ttpfile\bplus.c" />
     <ClCompile Include="..\ttpfile\filesys_win32.cpp" />
     <ClCompile Include="..\ttpfile\ftlib.c" />
