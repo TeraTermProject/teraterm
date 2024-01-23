@@ -2247,7 +2247,8 @@ static WORD TTLFolderSearch(void)
 
 	GetAbsPath(FName,sizeof(FName));
 	DWORD attr = GetFileAttributesW(wc::fromUtf8(FName));
-	if ((attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
+	if ((attr != INVALID_FILE_ATTRIBUTES) &&
+		(attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 		SetResult(1);
 	}
 	else {
