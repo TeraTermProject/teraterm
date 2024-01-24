@@ -34,6 +34,9 @@
     <Filter Include="ttpcmn">
       <UniqueIdentifier>{68f0946a-607e-4e50-89d8-edaee85394d0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ttptek">
+      <UniqueIdentifier>{2d6ac865-54a1-4b77-80fc-10822ae0226a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="filesys.cpp">
@@ -251,6 +254,12 @@
     </ClCompile>
     <ClCompile Include="..\ttpdlg\choosefontdlg.c">
       <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttptek\tekesc.c">
+      <Filter>ttptek</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttptek\tttek.c">
+      <Filter>ttptek</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -551,6 +560,15 @@
     </ClInclude>
     <ClInclude Include="logdlg.h">
       <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttptek\tekesc.h">
+      <Filter>ttptek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttptek\ttptek_def.h">
+      <Filter>ttptek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttptek\tttek.h">
+      <Filter>ttptek</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

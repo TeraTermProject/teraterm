@@ -33,6 +33,7 @@
 extern "C" {
 #endif
 
+#if 0
 typedef void (PASCAL *PTEKInit)
   (PTEKVar tk, PTTSet ts);
 typedef void (PASCAL *PTEKResizeWindow)
@@ -91,6 +92,9 @@ extern PTEKSetupFont TEKSetupFont;
 extern PTEKResetWin TEKResetWin;
 extern PTEKRestoreSetup TEKRestoreSetup;
 extern PTEKEnd TEKEnd;
+#endif
+
+#include "tttek.h"
 
 /* proto types */
 BOOL LoadTTTEK();

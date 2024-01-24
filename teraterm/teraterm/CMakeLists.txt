@@ -269,6 +269,20 @@ source_group(
   REGULAR_EXPRESSION
   "..\/ttpcmn\/")
 
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
+  ../ttptek/tekesc.c
+  ../ttptek/tekesc.h
+  ../ttptek/tttek.c
+  ../ttptek/tttek.h
+)
+
+source_group(
+  "ttptek"
+  REGULAR_EXPRESSION
+  "..\/ttptek\/")
+
 if(SUPPORT_OLD_WINDOWS)
   if(MSVC)
     if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
@@ -326,6 +340,7 @@ target_include_directories(
   ../ttpdlg
   ../ttpcmn
   ../susie_plugin
+  ../ttptek
   ${ONIGURUMA_INCLUDE_DIRS}
   ${SFMT_INCLUDE_DIRS}
   )
@@ -380,7 +395,6 @@ target_link_libraries(
   PRIVATE
   common_static
   ttpcmn
-  ttptek
   cyglib
   ${ONIGURUMA_LIB}
   ${SFMT_LIB}

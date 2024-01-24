@@ -37,13 +37,8 @@
 
 #include "ttcommon.h"
 
-#undef DllExport
-#define DllExport __declspec(dllexport)
-
 #include "tekesc.h"
 #include "tttek.h"
-
-static HANDLE hInst;
 
 void PASCAL TEKInit(PTEKVar tk, PTTSet ts)
 {
@@ -434,7 +429,7 @@ int PASCAL TEKParse(PTEKVar tk, PTTSet ts, PComVar cv)
 
         switch (tk->ParseMode) {
           case ModeFirst:
-			ParseFirst(tk,ts,cv,b);
+			TEKParseFirst(tk,ts,cv,b);
 			break;
           case ModeEscape:
 			TEKEscape(tk,ts,cv,b);
@@ -453,7 +448,7 @@ int PASCAL TEKParse(PTEKVar tk, PTTSet ts, PComVar cv)
 			break;
           default:
             tk->ParseMode = ModeFirst;
-            ParseFirst(tk,ts,cv,b);
+            TEKParseFirst(tk,ts,cv,b);
         }
       }
       else tk->IgnoreCount--;
@@ -921,25 +916,3 @@ void PASCAL TEKEnd(PTEKVar tk)
   if (tk->BackGround != NULL) DeleteObject(tk->BackGround);
   if (tk->MemBackGround != NULL) DeleteObject(tk->MemBackGround);
 }
-
-BOOL WINAPI DllMain(HANDLE hInstance,
-                    ULONG ul_reason_for_call,
-					LPVOID lpReserved)
-{
-  hInst = hInstance;
-  switch( ul_reason_for_call ) {
-  case DLL_THREAD_ATTACH:
-     /* do thread initialization */
-    break;
-  case DLL_THREAD_DETACH:
-    /* do thread cleanup */
-    break;
-  case DLL_PROCESS_ATTACH:
-     /* do process initialization */
-    break;
-  case DLL_PROCESS_DETACH:
-    /* do process cleanup */
-    break;
-  }
-   return( 1 );
- }
