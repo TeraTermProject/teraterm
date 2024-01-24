@@ -42,7 +42,6 @@
 #include "dlglib.h"
 #include "ttcommon.h"
 #include "dlg_res.h"
-#include "ttdlg.h"
 #include "codeconv.h"
 #include "helpid.h"
 #include "asprintf.h"
@@ -50,6 +49,8 @@
 #include "compat_win.h"
 #include "asprintf.h"
 #include "ttwinman.h"
+
+#include "ttdlg.h"
 
 static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {

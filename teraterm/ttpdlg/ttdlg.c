@@ -32,9 +32,6 @@
 #include "teraterm.h"
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
-#include <io.h>
-#include <direct.h>
 #include <commdlg.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
@@ -46,18 +43,16 @@
 #include "dlglib.h"
 #include "ttcommon.h"
 #include "dlg_res.h"
-#include "ttdlg.h"
-#include "tipwin.h"
-#include "comportinfo.h"
 #include "codeconv.h"
 #include "helpid.h"
 #include "asprintf.h"
 #include "win32helper.h"
 #include "compat_win.h"
 #include "ttlib_charset.h"
-#include "asprintf.h"
 #include "ttwinman.h"
 #include "resize_helper.h"
+
+#include "ttdlg.h"
 
 #undef DialogBoxParam
 #define DialogBoxParam(p1,p2,p3,p4,p5) \

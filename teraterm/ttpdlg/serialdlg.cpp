@@ -41,7 +41,6 @@
 #include "dlglib.h"
 #include "ttcommon.h"
 #include "dlg_res.h"
-#include "ttdlg.h"
 #include "tipwin.h"
 #include "comportinfo.h"
 #include "codeconv.h"
@@ -51,6 +50,8 @@
 #include "compat_win.h"
 #include "asprintf.h"
 #include "ttwinman.h"
+
+#include "ttdlg.h"
 
 static const char *BaudList[] =
 	{"110","300","600","1200","2400","4800","9600",

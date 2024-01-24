@@ -41,8 +41,6 @@
 #include "dlglib.h"
 #include "ttcommon.h"
 #include "dlg_res.h"
-#include "ttdlg.h"
-#include "tipwin.h"
 #include "comportinfo.h"
 #include "codeconv.h"
 #include "helpid.h"
@@ -52,7 +50,8 @@
 #include "ttlib_charset.h"
 #include "asprintf.h"
 #include "ttwinman.h"
-#include "resize_helper.h"
+
+#include "ttdlg.h"
 
 static const char *ProtocolFamilyList[] = { "AUTO", "IPv6", "IPv4", NULL };
 

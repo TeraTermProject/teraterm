@@ -29,32 +29,24 @@
 
 /* terminal dialog */
 
-#include "teraterm.h"
-#include <stdio.h>
-#include <string.h>
-#include <dlgs.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <assert.h>
+#include <windows.h>
 
 #include "tttypes.h"
 #include "ttlib.h"
 #include "dlglib.h"
-#include "ttcommon.h"
 #include "dlg_res.h"
-#include "ttdlg.h"
-#include "tipwin.h"
-#include "codeconv.h"
 #include "helpid.h"
-#include "asprintf.h"
-#include "win32helper.h"
-#include "compat_win.h"
 #include "ttlib_charset.h"
 #include "asprintf.h"
 #include "ttwinman.h"
 
-static const char *NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
+#include "ttdlg.h"
+
+static const char *NLListRcv[] = {"CR", "CR+LF", "LF", "AUTO", NULL};
 static const char *NLList[] = {"CR","CR+LF", "LF", NULL};
 static const char *TermList[] =
 	{"VT100", "VT101", "VT102", "VT282", "VT320", "VT382",

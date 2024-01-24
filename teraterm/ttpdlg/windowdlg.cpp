@@ -30,9 +30,6 @@
 #include "teraterm.h"
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
-#include <io.h>
-#include <direct.h>
 #include <commdlg.h>
 #include <dlgs.h>
 #define _CRTDBG_MAP_ALLOC
@@ -45,7 +42,6 @@
 #include "dlglib.h"
 #include "ttcommon.h"
 #include "dlg_res.h"
-#include "ttdlg.h"
 #include "tipwin.h"
 #include "codeconv.h"
 #include "helpid.h"
@@ -55,6 +51,8 @@
 #include "ttlib_charset.h"
 #include "asprintf.h"
 #include "ttwinman.h"
+
+#include "ttdlg.h"
 
 static INT_PTR CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {

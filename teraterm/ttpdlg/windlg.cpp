@@ -39,7 +39,6 @@
 #include "ttlib.h"
 #include "dlglib.h"
 #include "dlg_res.h"
-#include "ttdlg.h"
 #include "tipwin.h"
 #include "helpid.h"
 #include "asprintf.h"
@@ -47,6 +46,8 @@
 #include "compat_win.h"
 #include "asprintf.h"
 #include "ttwinman.h"
+
+#include "ttdlg.h"
 
 typedef struct {
 	WORD TmpColor[12][6];

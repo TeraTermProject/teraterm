@@ -55,6 +55,8 @@
 // SFMT: SIMD-oriented Fast Mersenne Twister
 #include "SFMT_version_for_teraterm.h"
 
+#include "ttdlg.h"
+
 #undef EFFECT_ENABLED	// エフェクトの有効可否
 #undef TEXTURE_ENABLED	// テクスチャの有効可否
 
