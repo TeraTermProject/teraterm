@@ -216,8 +216,6 @@ void ParseInputStr(unsigned char *rstr, int rcount) {
 		  pvar->cv->KanjiCodeEcho = pvar->ts->KanjiCode = IdJIS;
 		else if (_stricmp(p, "UTF8") == 0 || _stricmp(p, "UTF-8") == 0)
 		  pvar->cv->KanjiCodeEcho = pvar->ts->KanjiCode = IdUTF8;
-		else if (_stricmp(p, "UTF8m") == 0 || _stricmp(p, "UTF-8m") == 0)
-		  pvar->cv->KanjiCodeEcho = pvar->ts->KanjiCode = IdUTF8;
 	      }
 	      p = p2;
 	    }
