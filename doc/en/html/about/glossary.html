@@ -64,6 +64,23 @@ This window is not displayed when Tera Term is started.
 [Control]-[Open TEK] command opens TEK window.
 </dd>
 
+<dt id="UTF-8">UTF-8, UTF-8m</dt>
+<dd>
+  <p>
+    Character code encoded Unicode with MBCS from 1 byte to 4 bytes.
+  </p>
+
+  <p>
+    A single character to be displayed can be created from multiple Unicode characters.
+    ex. U+0061 + U+0302 ( a+ ^ -> &#x00E2; ).
+    Tera Term 4 uses the character code "UTF-8m", which is used in the macOS file system HFS+.
+  </p>
+
+  <p>
+    All UTF-8 can be used with character code "UTF-8" on Tera Term 5
+  </p>
+</dd>
+
 <dt>VT100</dt>
 <dd>Name of DEC(Digital Equipment Corporation)'s terminal.
 The terminal was used widely for Unix, VAX/VMS, and other computers.
