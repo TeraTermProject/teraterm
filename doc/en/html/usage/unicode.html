@@ -33,342 +33,52 @@ When "UTF8" is specified with '/KT' or '/KR' option in the command line,
 UTF-8 encoding/decoding can be used during transmitting and receiving of data.
 </p>
 
+<h1>Internal block diagram</h1>
+
 <p>
-Actually, Tera Term does not support completely Unicode language because
-the internal design is based on MBCS(Multiple Byte Character Set).
-So, the Unicode characters are two-step conversion as follows.
+  Before Tera Term 5, the character set of the internal buffer was DBCS (Double byte Character Set).
+  For example, when "Language" is set to "Japanese", character coding in internal buffer was Shift_JIS.
+</p>
+
+<p>
+  The character encoding of Tera Term 5 internal buffer is Unicode.
+</p>
+
+<p>
+  The data flow is as follows.
 </p>
 
 <pre>
-UTF-8 &lt;-----&gt; Unicode(UTF-16LE) &lt;-----&gt; MBCS
-        (1)                       (2)
+                                                                              +--------------+
+                              +------------------------+ Code:Unicode         |              |
+                              |                        +--------------------->+  Window      |
+                              |  buffer@buffer.c       |                      |   Display    |
+                              |   Code:Unicode         | Code:                |   Print      |
+                              |                        |  Input to Unicode    |              |
+                              |                        +<------------------+  +--------------+
+                              +------------------------+                   |
+                                                                           |
+                              +------------------------+   CommRead1Byte() |
+                              |                        +-------------------+
+                              |  Input buffer@ttpcmn   |
++-----------+                 |   Code:Input           | Code:
+|           |                 |                        |  Unicode to Input    +--------------+
+|  Socket   +---------------->+                        +<---------------------+              |
+|  Serial   |  CommReceive()  +------------------------+  CommTextEchoW()     |  Talker      |
+|  Pipe     |                                             CommBinaryEcho()    |   Keyboard   |
+|  Plugin   |                 +------------------------+                      |   SendMem    |
+|           +<----------------+                        | Code:                |    File      |
++-----------+  CommSend()     |  Output buffer@ttpcmn  |  Unicode to Output   |    Clipboard |
+                              |   Code:Output          +<---------------------+              |
+                              |                        |  CommTextOutW()      +--------------+
+                              |                        |  CommBinaryOut()
+                              +------------------------+  CommRawOut()
 </pre>
 
 <p>
-(1):
-Unicode information is no longer missing on decoding UTF-8 because 
-four byte UTF-8 is supported after version 4.102.<br>
-When the KanjiCode(recv) is set to UTF-8m, a part of 
-combining character are processed for Mac OS X(HFS+). <br>
-
-(2): A user must specify the locale to convert the characters between
-     Unicode and MBCS.
+  On Windows 95/98/Me, key input is converted to Unicode before processing.
+  When drawing, characters are converted from Unicode to MBCS.
 </p>
-
-<p>
-To enable Unicode character sets with the localized language, you have to
-set properly the locale parameters in the 'teraterm.ini' file.
-See example of these values below.
-</p>
-
-<pre>
-; Locale for Unicode
-Locale = japanese
-</pre>
-
-<p>
-To change this value, you can use [Locale] in "Terminal setup" dialog-box.
-</p>
-
-<p>
-Check the following web-sites to learn more about setting of locale in Tera Term:
-</p>
-<ul>
-  <li><a href="http://msdn.microsoft.com/en-us/library/39cwe7zf.aspx">Language Strings</a></li>
-</ul>
-
-<h4>Example of WindowsXP Simplified Chinese</h4>
-
-<ul>
- <li>On Setup -&gt; Terminal dialog, select locale=chs.</li>
- <li>On Setup -&gt; Font dialog, select FontName=NSimSun, CharacterSet=CHINESE_GB2312 and Size=9.</li>
-</ul>
-
-
-<h4>Example of WindowsXP USA</h4>
-<pre>
-; Locale for Unicode
-Locale = american
-</pre>
-
-<p>
-And you have to configure the font setting correctly to display MBCS.<br>
-You can choose a font from Setup-&gt;Font dialog-box.
-Select a font that include characters what you want to display. And select "Script" what you want to display.<br>
-
-Tera Term can display other language characters if locale and font settings are correct.
-For example "Japanese" characters on "English" Windows, "Korean" characters on "Japanese" Windows.<br>
-But Tera Term doesn't support the multilingual display,
-and therefore it can't display "Japanese" and "Korean" at the same time on one Tera Term window.
-</p>
-
-
-<h3>[NOTE] for Mac OS X users</h3>
-<p>
-For Mac OS X(HFS+) use "UTF-8m" encoding.
-Currently it only supports receiving mode.<br>
-To use this mode specify "UTF8m" as the value of the command line
-parameter '/KR'.
-</p>
-
-<h3>[NOTE] Language Strings for Locale</h3>
-<table>
-  <thead>
-    <tr>
-      <th>Primary language</th>
-      <th>Sub-language</th>
-      <th>Language string</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <tr>
-      <td>Chinese</td>
-      <td>Chinese</td>
-      <td>"chinese"</td>
-    </tr>
-
-    <tr>
-      <td>Chinese</td>
-      <td>Chinese (simplified)</td>
-      <td>"chinese-simplified" or "chs"</td>
-    </tr>
-
-    <tr>
-      <td>Chinese</td>
-      <td>Chinese (traditional)</td>
-      <td>"chinese-traditional" or "cht"</td>
-    </tr>
-
-    <tr>
-      <td>Czech</td>
-      <td>Czech</td>
-      <td>"csy" or "czech"</td>
-    </tr>
-
-    <tr>
-      <td>Danish</td>
-      <td>Danish</td>
-      <td>"dan" or "danish"</td>
-    </tr>
-
-    <tr>
-      <td>Dutch</td>
-      <td>Dutch (default)</td>
-      <td>"dutch" or "nld"</td>
-    </tr>
-
-    <tr>
-      <td>Dutch</td>
-      <td>Dutch (Belgium)</td>
-      <td>"belgian", "dutch-belgian", or "nlb"</td>
-    </tr>
-
-    <tr>
-      <td>English</td>
-      <td>English (default)</td>
-      <td>"english"</td>
-    </tr>
-
-    <tr>
-      <td>English</td>
-      <td>English (Australia)</td>
-      <td>"australian", "ena", or "english-aus"</td>
-    </tr>
-
-    <tr>
-      <td>English</td>
-      <td>English (Canada)</td>
-      <td>"canadian", "enc", or "english-can"</td>
-    </tr>
-
-    <tr>
-      <td>English</td>
-      <td>English (New Zealand)</td>
-      <td>"english-nz" or "enz"</td>
-    </tr>
-
-    <tr>
-      <td>English</td>
-      <td>English (United Kingdom)</td>
-      <td>"eng", "english-uk", or "uk"</td>
-    </tr>
-
-    <tr>
-      <td>English</td>
-      <td>English (United States)</td>
-      <td>"american", "american english", "american-english", "english-american", "english-us", "english-usa", "enu", "us", or "usa"</td>
-    </tr>
-
-    <tr>
-      <td>Finnish</td>
-      <td>Finnish</td>
-      <td>"fin" or "finnish"</td>
-    </tr>
-
-    <tr>
-      <td>French</td>
-      <td>French (default)</td>
-      <td>"fra" or "french"</td>
-    </tr>
-
-    <tr>
-      <td>French</td>
-      <td>French (Belgium)</td>
-      <td>"frb" or "french-belgian"</td>
-    </tr>
-
-    <tr>
-      <td>French</td>
-      <td>French (Canada)</td>
-      <td>"frc" or "french-canadian"</td>
-    </tr>
-
-    <tr>
-      <td>French</td>
-      <td>French (Switzerland)</td>
-      <td>"french-swiss" or "frs"</td>
-    </tr>
-
-    <tr>
-      <td>German</td>
-      <td>German (default)</td>
-      <td>"deu" or "german"</td>
-    </tr>
-
-    <tr>
-      <td>German</td>
-      <td>German (Austria)</td>
-      <td>"dea" or "german-austrian"</td>
-    </tr>
-
-    <tr>
-      <td>German</td>
-      <td>German (Switzerland)</td>
-      <td>"des", "german-swiss", or "swiss"</td>
-    </tr>
-
-    <tr>
-      <td>Greek</td>
-      <td>Greek</td>
-      <td>"ell" or "greek"</td>
-    </tr>
-
-    <tr>
-      <td>Hungarian</td>
-      <td>Hungarian</td>
-      <td>"hun" or "hungarian"</td>
-    </tr>
-
-    <tr>
-      <td>Icelandic</td>
-      <td>Icelandic</td>
-      <td>"icelandic" or "isl"</td>
-    </tr>
-
-    <tr>
-      <td>Italian</td>
-      <td>Italian (default)</td>
-      <td>"ita" or "italian"</td>
-    </tr>
-
-    <tr>
-      <td>Italian</td>
-      <td>Italian (Switzerland)</td>
-      <td>"italian-swiss" or "its"</td>
-    </tr>
-
-    <tr>
-      <td>Japanese</td>
-      <td>Japanese</td>
-      <td>"japanese" or "jpn"</td>
-    </tr>
-
-    <tr>
-      <td>Korean</td>
-      <td>Korean</td>
-      <td>"kor" or "korean"</td>
-    </tr>
-
-    <tr>
-      <td>Norwegian</td>
-      <td>Norwegian (default)</td>
-      <td>"norwegian"</td>
-    </tr>
-
-    <tr>
-      <td>Norwegian</td>
-      <td>Norwegian (Bokmal)</td>
-      <td>"nor" or "norwegian-bokmal"</td>
-    </tr>
-
-    <tr>
-      <td>Norwegian</td>
-      <td>Norwegian (Nynorsk)</td>
-      <td>"non" or "norwegian-nynorsk"</td>
-    </tr>
-
-    <tr>
-      <td>Polish</td>
-      <td>Polish</td>
-      <td>"plk" or "polish"</td>
-    </tr>
-
-    <tr>
-      <td>Portuguese</td>
-      <td>Portuguese (default)</td>
-      <td>"portuguese" or "ptg"</td>
-    </tr>
-
-    <tr>
-      <td>Portuguese</td>
-      <td>Portuguese (Brazil)</td>
-      <td>"portuguese-brazilian" or "ptb"</td>
-    </tr>
-
-    <tr>
-      <td>Russian</td>
-      <td>Russian (default)</td>
-      <td>"rus" or "russian"</td>
-    </tr>
-
-    <tr>
-      <td>Slovak</td>
-      <td>Slovak</td>
-      <td>"sky" or "slovak"</td>
-    </tr>
-
-    <tr>
-      <td>Spanish</td>
-      <td>Spanish (default)</td>
-      <td>"esp" or "spanish"</td>
-    </tr>
-
-    <tr>
-      <td>Spanish</td>
-      <td>Spanish (Mexico)</td>
-      <td>"esm" or "spanish-mexican"</td>
-    </tr>
-
-    <tr>
-      <td>Spanish</td>
-      <td>Spanish (Modern)</td>
-      <td>"esn" or "spanish-modern"</td>
-    </tr>
-
-    <tr>
-      <td>Swedish</td>
-      <td>Swedish</td>
-      <td>"sve" or "swedish"</td>
-    </tr>
-
-    <tr>
-      <td>Turkish</td>
-      <td>Turkish</td>
-      <td>"trk" or "turkish"</td>
-    </tr>
-  </tbody>
-</table>
 
 </BODY>
 </HTML>
