@@ -13,7 +13,7 @@ TTXKcodeChange -- 制御シーケンスで送受信漢字コードを変更出来るようにする
       KT  -- 送信漢字コード
              Valueとして SJIS, EUC, JIS, UTF8 を受け付けます。
       KR  -- 受信漢字コード
-             Valueとして SJIS, EUC, JIS, UTF8, UTF8m を受け付けます。
+             Valueとして SJIS, EUC, JIS, UTF8 を受け付けます。
 
   <OSC>5964;Pt<ST>
   <OSC>5964;Pt<BEL>

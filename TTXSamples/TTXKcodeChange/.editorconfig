@@ -1,0 +1,2 @@
+[*.{cpp,c,h,cc}]
+indent_size = 8
