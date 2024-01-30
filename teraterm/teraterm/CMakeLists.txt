@@ -197,6 +197,7 @@ target_sources(
   ../ttpdlg/choosefontdlg.c
   ../ttpdlg/dlg_res.h
   ../ttpdlg/hostdlg.c
+  ../ttpdlg/keyboarddlg.c
   ../ttpdlg/serialdlg.cpp
   ../ttpdlg/termdlg.c
   ../ttpdlg/ttdlg.c
