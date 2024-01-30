@@ -199,6 +199,7 @@ target_sources(
   ../ttpdlg/hostdlg.c
   ../ttpdlg/keyboarddlg.c
   ../ttpdlg/serialdlg.cpp
+  ../ttpdlg/tcpipdlg.c
   ../ttpdlg/termdlg.c
   ../ttpdlg/ttdlg.c
   ../ttpdlg/ttdlg.h

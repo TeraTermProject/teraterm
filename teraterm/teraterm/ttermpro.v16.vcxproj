@@ -151,6 +151,7 @@
     <ClCompile Include="..\ttpdlg\hostdlg.c" />
     <ClCompile Include="..\ttpdlg\keyboarddlg.c" />
     <ClCompile Include="..\ttpdlg\serialdlg.cpp" />
+    <ClCompile Include="..\ttpdlg\tcpipdlg.c" />
     <ClCompile Include="..\ttpdlg\termdlg.c" />
     <ClCompile Include="..\ttpdlg\windlg.cpp" />
     <ClCompile Include="..\ttpdlg\windowdlg.cpp" />
