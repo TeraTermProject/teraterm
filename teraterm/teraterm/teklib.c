@@ -34,8 +34,10 @@
 #include "tektypes.h"
 #include "ttwinman.h"
 
+#include "tttek.h"
 #include "teklib.h"
 
+#if 0
 PTEKInit TEKInit;
 PTEKResizeWindow TEKResizeWindow;
 PTEKChangeCaret TEKChangeCaret;
@@ -78,11 +80,13 @@ static HMODULE HTTTEK = NULL;
 #define IdTEKResetWin	   17
 #define IdTEKRestoreSetup  18
 #define IdTEKEnd	   19
+#endif
 
 BOOL LoadTTTEK()
 {
   BOOL Err;
-
+	return 1;
+#if 0
   if (HTTTEK != NULL) return TRUE;
   HTTTEK = LoadHomeDLL(L"TTPTEK.DLL");
   if (HTTTEK == NULL) return FALSE;
@@ -170,13 +174,16 @@ BOOL LoadTTTEK()
     HTTTEK = NULL;
   }
   return (! Err);
+#endif
 }
 
 void FreeTTTEK()
 {
+#if 0
   if (HTTTEK!=NULL)
   {
     FreeLibrary(HTTTEK);
     HTTTEK = NULL;
   }
+#endif
 }

@@ -9,11 +9,6 @@ set_target_properties(
   ttpmacro
   PROPERTIES FOLDER teraterm)
 
-add_subdirectory(ttptek)
-set_target_properties(
-  ttptek
-  PROPERTIES FOLDER teraterm)
-
 add_subdirectory(teraterm)
 set_target_properties(
   teraterm

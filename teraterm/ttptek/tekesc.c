@@ -355,7 +355,7 @@ void TEKBeep(PTTSet ts)
     MessageBeep(0);
 }
 
-void ParseFirst(PTEKVar tk, PTTSet ts, PComVar cv, BYTE b)
+void TEKParseFirst(PTEKVar tk, PTTSet ts, PComVar cv, BYTE b)
 {
   if (tk->DispMode == IdAlphaMode)
   {

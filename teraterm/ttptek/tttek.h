@@ -29,22 +29,22 @@
 
 /* TTTEK.DLL, TEK escape sequences */
 
-DllExport void WINAPI TEKInit(PTEKVar tk, PTTSet ts);
-DllExport void WINAPI TEKChangeCaret(PTEKVar tk, PTTSet ts);
-DllExport void WINAPI TEKDestroyCaret(PTEKVar tk, PTTSet ts);
-DllExport void WINAPI TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H);
-DllExport int WINAPI TEKParse(PTEKVar tk, PTTSet ts, PComVar cv);
-DllExport void WINAPI TEKReportGIN(PTEKVar tk, PTTSet ts, PComVar cv, BYTE KeyCode);
-DllExport void WINAPI TEKPaint(PTEKVar tk, PTTSet ts, HDC PaintDC, PAINTSTRUCT *PaintInfo);
-DllExport void WINAPI TEKWMLButtonDown(PTEKVar tk, PTTSet ts, PComVar cv, POINT pos);
-DllExport void WINAPI TEKWMLButtonUp(PTEKVar tk, PTTSet ts);
-DllExport void WINAPI TEKWMMouseMove(PTEKVar tk, PTTSet ts, POINT p);
-DllExport void WINAPI TEKWMSize(PTEKVar tk, PTTSet ts, int W, int H, int cx, int cy);
-DllExport void WINAPI TEKCMCopy(PTEKVar tk, PTTSet ts);
-DllExport void WINAPI TEKCMCopyScreen(PTEKVar tk, PTTSet ts);
-DllExport void WINAPI TEKPrint(PTEKVar tk, PTTSet ts, HDC PrintDC, BOOL SelFlag);
-DllExport void WINAPI TEKClearScreen(PTEKVar tk, PTTSet ts);
-DllExport void WINAPI TEKSetupFont(PTEKVar tk, PTTSet ts);
-DllExport void WINAPI TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld);
-DllExport void WINAPI TEKRestoreSetup(PTEKVar tk, PTTSet ts);
-DllExport void WINAPI TEKEnd(PTEKVar tk);
+void WINAPI TEKInit(PTEKVar tk, PTTSet ts);
+void WINAPI TEKChangeCaret(PTEKVar tk, PTTSet ts);
+void WINAPI TEKDestroyCaret(PTEKVar tk, PTTSet ts);
+void WINAPI TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H);
+int WINAPI TEKParse(PTEKVar tk, PTTSet ts, PComVar cv);
+void WINAPI TEKReportGIN(PTEKVar tk, PTTSet ts, PComVar cv, BYTE KeyCode);
+void WINAPI TEKPaint(PTEKVar tk, PTTSet ts, HDC PaintDC, PAINTSTRUCT *PaintInfo);
+void WINAPI TEKWMLButtonDown(PTEKVar tk, PTTSet ts, PComVar cv, POINT pos);
+void WINAPI TEKWMLButtonUp(PTEKVar tk, PTTSet ts);
+void WINAPI TEKWMMouseMove(PTEKVar tk, PTTSet ts, POINT p);
+void WINAPI TEKWMSize(PTEKVar tk, PTTSet ts, int W, int H, int cx, int cy);
+void WINAPI TEKCMCopy(PTEKVar tk, PTTSet ts);
+void WINAPI TEKCMCopyScreen(PTEKVar tk, PTTSet ts);
+void WINAPI TEKPrint(PTEKVar tk, PTTSet ts, HDC PrintDC, BOOL SelFlag);
+void WINAPI TEKClearScreen(PTEKVar tk, PTTSet ts);
+void WINAPI TEKSetupFont(PTEKVar tk, PTTSet ts);
+void WINAPI TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld);
+void WINAPI TEKRestoreSetup(PTEKVar tk, PTTSet ts);
+void WINAPI TEKEnd(PTEKVar tk);

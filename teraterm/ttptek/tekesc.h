@@ -29,7 +29,7 @@
 
 /* TTTEK.DLL, TEK escape sequences */
 
-void ParseFirst(PTEKVar tk, PTTSet ts, PComVar cv, BYTE b);
+void TEKParseFirst(PTEKVar tk, PTTSet ts, PComVar cv, BYTE b);
 void TEKEscape(PTEKVar tk, PTTSet ts, PComVar cv, BYTE b);
 void SelectCode(PTEKVar tk, PTTSet ts, BYTE b);
 void TwoOpCode(PTEKVar tk, PTTSet ts, PComVar cv, BYTE b);
