@@ -206,8 +206,9 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 		case WM_COMMAND: {
 			DialogData *data = (DialogData *)GetWindowLongPtrW(Dialog,DWLP_USER);
+			TTTSet *ts;
 			assert(data != NULL);
-			TTTSet *ts = data->pts;
+			ts = data->pts;
 			switch (LOWORD(wParam)) {
 				case IDOK: {
 					int width, height;
@@ -362,6 +363,7 @@ BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
 {
 	DialogData *data;
 	int i;
+	BOOL r;
 
 	data = (DialogData *)malloc(sizeof(*data));
 	data->pts = ts;
@@ -383,9 +385,9 @@ BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
 		i = IDD_TERMDLG;
 	}
 
-	BOOL r = (BOOL)TTDialogBoxParam(hInst,
-							  MAKEINTRESOURCE(i),
-							  WndParent, TermDlg, (LPARAM)data);
+	r = (BOOL)TTDialogBoxParam(hInst,
+							   MAKEINTRESOURCE(i),
+							   WndParent, TermDlg, (LPARAM)data);
 	free(data);
 	return r;
 }
