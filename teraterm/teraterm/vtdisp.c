@@ -61,6 +61,12 @@
 
 #include "defaultcolortable.c"
 
+#if 1
+#define _OutputDebugPrintf(...)  OutputDebugPrintf(__VA_ARGS__)
+#else
+#define _OutputDebugPrintf(...)  (void)0
+#endif
+
 int WinWidth, WinHeight;
 static BOOL Active = FALSE;
 static BOOL CompletelyVisible;
@@ -209,9 +215,7 @@ static HBITMAP CreateScreenCompatibleBitmap(int width,int height)
   HDC     hdc;
   HBITMAP hbm;
 
-  #ifdef _DEBUG
-    OutputDebugPrintf("CreateScreenCompatibleBitmap : width = %d height = %d\n",width,height);
-  #endif
+  _OutputDebugPrintf("CreateScreenCompatibleBitmap : width = %d height = %d\n",width,height);
 
   hdc = GetDC(NULL);
 
@@ -219,10 +223,8 @@ static HBITMAP CreateScreenCompatibleBitmap(int width,int height)
 
   ReleaseDC(NULL,hdc);
 
-  #ifdef _DEBUG
-    if(!hbm)
-      OutputDebugPrintf("CreateScreenCompatibleBitmap : fail in CreateCompatibleBitmap\n");
-  #endif
+  if(!hbm)
+	  _OutputDebugPrintf("CreateScreenCompatibleBitmap : fail in CreateCompatibleBitmap\n");
 
   return hbm;
 }
@@ -233,9 +235,7 @@ static HBITMAP CreateDIB24BPP(int width,int height,unsigned char **buf,int *lenB
   HBITMAP    hbm;
   BITMAPINFO bmi;
 
-  #ifdef _DEBUG
-    OutputDebugPrintf("CreateDIB24BPP : width = %d height = %d\n",width,height);
-  #endif
+  _OutputDebugPrintf("CreateDIB24BPP : width = %d height = %d\n",width,height);
 
   if(!width || !height)
     return NULL;
@@ -265,9 +265,7 @@ static HDC  CreateBitmapDC(HBITMAP hbm)
 {
   HDC hdc;
 
-  #ifdef _DEBUG
-    OutputDebugPrintf("CreateBitmapDC : hbm = %p\n",hbm);
-  #endif
+  _OutputDebugPrintf("CreateBitmapDC : hbm = %p\n",hbm);
 
   hdc = CreateCompatibleDC(NULL);
 
@@ -281,9 +279,7 @@ static void DeleteBitmapDC(HDC *hdc)
 {
   HBITMAP hbm;
 
-  #ifdef _DEBUG
-    OutputDebugPrintf("DeleteBitmapDC : *hdc = %p\n",hdc);
-  #endif
+  _OutputDebugPrintf("DeleteBitmapDC : *hdc = %p\n",hdc);
 
   if(!hdc)
     return;
@@ -307,9 +303,7 @@ static void FillBitmapDC(HDC hdc,COLORREF color)
   RECT    rect;
   HBRUSH  hBrush;
 
-  #ifdef _DEBUG
-    OutputDebugPrintf("FillBitmapDC : hdc = %p color = %08lx\n",hdc,color);
-  #endif
+  _OutputDebugPrintf("FillBitmapDC : hdc = %p color = %08lx\n",hdc,color);
 
   if(!hdc)
     return;
@@ -1259,9 +1253,7 @@ void BGSetupPrimary(BOOL forceSetup)
   BGPreloadSrc(&BGSrc1);
   BGPreloadSrc(&BGSrc2);
 
-  #ifdef _DEBUG
-    OutputDebugPrintf("BGSetupPrimary : BGInSizeMove = %d\n",BGInSizeMove);
-  #endif
+  _OutputDebugPrintf("BGSetupPrimary : BGInSizeMove = %d\n",BGInSizeMove);
 
   //çÏã∆óp DC çÏê¨
   if(hdcBGWork)   DeleteBitmapDC(&hdcBGWork);
