@@ -91,8 +91,6 @@ typedef struct {
 int StatusLine;	//0: none 1: shown
 /* top, bottom, left & right margin */
 int CursorTop, CursorBottom, CursorLeftM, CursorRightM;
-static BOOL Selected;		// TRUE=領域選択が行われている
-static BOOL Selecting;
 BOOL Wrap;
 
 static WORD TabStops[256];
@@ -105,7 +103,12 @@ static LONG LinePtr;
 static LONG BufferSize;
 static int NumOfLinesInBuff;
 static int BuffStartAbs, BuffEndAbs;
-static POINT SelectStart, SelectStartTmp, SelectEnd, SelectEndOld;
+
+// 選択
+static BOOL Selected;		// TRUE=領域選択が行われている
+static BOOL Selecting;
+static POINT SelectStart, SelectStartTmp, SelectEnd;
+static POINT SelectEndOld;
 static DWORD SelectStartTime;
 static BOOL BoxSelect;
 static POINT DblClkStart, DblClkEnd;
@@ -1343,6 +1346,8 @@ void BuffCopyBox(
 	DstX--;
 	DstY--;
 	DstPage--;
+	(void)SrcPage;		// warning: parameter 'SrcPage' set but not used
+	(void)DstPage;		// warning: parameter 'DstPage' set but not used
 
 	if (SrcXEnd > NumOfColumns - 1) {
 		SrcXEnd = NumOfColumns-1;
@@ -3912,8 +3917,7 @@ static BOOL IsDelimiter(LONG Line, int CharPtr)
 	return (find != NULL);
 }
 
-void GetMinMax(int i1, int i2, int i3,
-               int *min, int *max)
+static void GetMinMax(int i1, int i2, int i3, int *min, int *max)
 {
 	if (i1<i2) {
 		*min = i1;
@@ -4413,6 +4417,96 @@ void BuffStartSelect(int Xw, int Yw, BOOL Box)
 	BoxSelect = Box;
 }
 
+/**
+ *	文字の区切り(Delimiter)を探す,前方
+ *
+ *	@param[in]	sx	スタート
+ *	@param[in]	sy
+ *	@param[in]	destx	見つけた位置
+ *	@param[in]	dexty
+ */
+static void SearchDelimiterPrev(int sx, int sy, int *destx, int *desty)
+{
+	LONG ptr = GetLinePtr(sy);
+	const buff_char_t *b;
+	BOOL start_delimiter;
+	int start_cell;
+
+	sx = LeftHalfOfDBCS(ptr, sx);
+	b = CodeBuffW + ptr + sx;
+	assert(b->Padding == FALSE);
+	start_delimiter = IsDelimiter(ptr, sx);
+	start_cell = b->cell;
+
+	while (sx > 0) {
+		int x = sx;
+		sx--;
+		b--;
+		while (b->Padding == TRUE) {
+			sx--;
+			b--;
+			if (sx < 0) {
+				// 行頭が Padding はないはず
+				assert(0);
+				sx = 0;
+				break;
+			}
+		}
+		if (sx <= 0) {
+			sx = 0;
+			break;
+		}
+		if (start_delimiter != IsDelimiter(ptr, sx) || b->cell != start_cell) {
+			// 区切り文字 or cell数が変化した
+			sx = x;
+			break;
+		}
+	}
+	*destx = sx;
+	*desty = sy;
+}
+
+/**
+ *	文字の区切り(Delimiter)を探す,後方
+ *
+ *	@param[in]	sx	スタート
+ *	@param[in]	sy
+ *	@param[in]	destx	見つけた位置
+ *	@param[in]	dexty
+ */
+static void SearchDelimiterNext(int sx, int sy, int *destx, int *desty)
+{
+	LONG ptr = GetLinePtr(sy);
+	const buff_char_t *b = CodeBuffW + ptr + sx;
+	BOOL start_delimiter = IsDelimiter(ptr, sx);
+	int start_cell = b->cell;
+
+	for (;;) {
+		int x = sx;
+		sx++;
+		b++;
+		while (b->Padding == TRUE) {
+			sx++;
+			b++;
+			if (sx >= NumOfColumns - 1) {
+				sx = NumOfColumns - 1;
+				break;
+			}
+		}
+		if (sx >= NumOfColumns - 1) {
+			sx = NumOfColumns - 1;
+			break;
+		}
+		if (start_delimiter != IsDelimiter(ptr, sx) || b->cell != start_cell) {
+			// 区切り文字 or cell数が変化した
+			sx = x;
+			break;
+		}
+	}
+	*destx = sx;
+	*desty = sy;
+}
+
 void BuffChangeSelect(int Xw, int Yw, int NClick)
 //  Change selection region by mouse move
 //    Xw: horizontal position of the mouse cursor
@@ -4422,9 +4516,9 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 	int X, Y;
 	BOOL Right;
 	LONG TmpPtr;
-	int i;
-	BYTE b;
-	BOOL DBCS;
+//	int i;
+//	BYTE b;
+//	BOOL DBCS;
 
 	if (!Selecting) {
 		if (GetTickCount() - SelectStartTime < ts.SelectStartDelay) {
@@ -4448,7 +4542,11 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 
 	TmpPtr = GetLinePtr(Y);
 	LockBuffer();
+
+	X = LeftHalfOfDBCS(TmpPtr, X);
+
 	// check if the cursor is on the right half of a character
+#if 0
 	if ((X>0) &&
 	    (((CodeBuffW[TmpPtr+X-1].attr & AttrKanji) != 0) || (X<NumOfColumns)) &&
 	    ((CodeBuffW[TmpPtr+X].attr & AttrKanji) == 0) &&
@@ -4459,95 +4557,34 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 	if (X > NumOfColumns) {
 		X = NumOfColumns;
 	}
-
-#if 0
-	/* start - ishizaki */
-	if (ts.EnableClickableUrl && (NClick == 2) && (AttrBuff[TmpPtr+X] & AttrURL)) {
-		invokeBrowser(TmpPtr+X);
-
-		SelectStart.x = 0;
-		SelectStart.y = 0;
-		SelectEnd.x = 0;
-		SelectEnd.y = 0;
-		SelectEndOld.x = 0;
-		SelectEndOld.y = 0;
-		Selected = FALSE;
-		goto end;
-	}
-	/* end - ishizaki */
 #endif
 
 	SelectEnd.x = X;
 	SelectEnd.y = Y;
 
 	if (NClick==2) { // drag after double click
-		if (((SelectEnd.y>SelectStart.y) || (SelectEnd.y==SelectStart.y)) &&
-		    (SelectEnd.x>=SelectStart.x)) {
-			if (SelectStart.x==DblClkEnd.x) {
-				SelectEnd = DblClkStart;
-				ChangeSelectRegion();
-				SelectStart = DblClkStart;
-				SelectEnd.x = X;
-				SelectEnd.y = Y;
-			}
-			MoveCharPtr(TmpPtr,&X,-1);
-			if (X<SelectStart.x) {
-				X = SelectStart.x;
-			}
-
-			i = 1;
-			if (IsDelimiter(TmpPtr,X)) {
-				b = CodeBuffW[TmpPtr+X].ansi_char;
-				DBCS = (CodeBuffW[TmpPtr+X].attr & AttrKanji) != 0;
-				while ((i!=0) &&
-				       ((b==CodeBuffW[TmpPtr+SelectEnd.x].ansi_char) ||
-				        (DBCS &&
-						 ((CodeBuffW[TmpPtr+SelectEnd.x].attr & AttrKanji)!=0)))) {
-					i = MoveCharPtr(TmpPtr,(int *)&SelectEnd.x,1); // move right
-				}
-			}
-			else {
-				while ((i!=0) &&
-				       ! IsDelimiter(TmpPtr,SelectEnd.x)) {
-					i = MoveCharPtr(TmpPtr,(int *)&SelectEnd.x,1); // move right
-				}
-			}
-			if (i==0) {
-				SelectEnd.x = NumOfColumns;
-			}
-		}
-		else {
-			if (SelectStart.x==DblClkStart.x) {
-				SelectEnd = DblClkEnd;
-				ChangeSelectRegion();
-				SelectStart = DblClkEnd;
-				SelectEnd.x = X;
-				SelectEnd.y = Y;
-			}
-			if (IsDelimiter(TmpPtr,SelectEnd.x)) {
-				b = CodeBuffW[TmpPtr+SelectEnd.x].ansi_char;
-				DBCS = (CodeBuffW[TmpPtr+SelectEnd.x].attr & AttrKanji) != 0;
-				while ((SelectEnd.x>0) &&
-				       ((b==CodeBuffW[TmpPtr+SelectEnd.x].ansi_char) ||
-						(DBCS &&
-						 ((CodeBuffW[TmpPtr+SelectEnd.x].attr & AttrKanji)!=0)))) {
-					MoveCharPtr(TmpPtr,(int *)&SelectEnd.x,-1); // move left
-				}
-				if ((b!=CodeBuffW[TmpPtr+SelectEnd.x].ansi_char) &&
-				    ! (DBCS &&
-				    ((CodeBuffW[TmpPtr+SelectEnd.x].attr & AttrKanji)!=0))) {
-					MoveCharPtr(TmpPtr,(int *)&SelectEnd.x,1);
-				}
-			}
-			else {
-				while ((SelectEnd.x>0) &&
-				       ! IsDelimiter(TmpPtr,SelectEnd.x)) {
-					MoveCharPtr(TmpPtr,(int *)&SelectEnd.x,-1); // move left
-				}
-				if (IsDelimiter(TmpPtr,SelectEnd.x)) {
-					MoveCharPtr(TmpPtr,(int *)&SelectEnd.x,1);
-				}
-			}
+		if ((DblClkStart.y > Y) ||
+			(DblClkStart.y == Y && X < DblClkStart.x)) {
+			// ダブルクリック選択領域より前を選択
+			int dest_x;
+			int dest_y;
+			SearchDelimiterPrev(X, Y, &dest_x, &dest_y);
+			SelectEnd.x = dest_x;
+			SelectEnd.y = dest_y;
+			SelectStart = DblClkEnd;
+		} else if ((DblClkEnd.y < Y) ||
+				   (DblClkEnd.y == Y && X >= DblClkEnd.x)) {
+			// ダブルクリック選択領域より後ろを選択
+			int dest_x;
+			int dest_y;
+			SearchDelimiterNext(X, Y, &dest_x, &dest_y);
+			SelectEnd.x = dest_x + 1;
+			SelectEnd.y = dest_y;
+			SelectStart = DblClkStart;
+		} else {
+			// ダブルクリック選択領域上だった場合
+			SelectStart = DblClkStart;
+			SelectEnd = DblClkEnd;
 		}
 	}
 	else if (NClick==3) { // drag after tripple click
@@ -4572,12 +4609,6 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 			SelectEnd.x = 0;
 		}
 	}
-
-#if 0
-	/* start - ishizaki */
-end:
-	/* end - ishizaki */
-#endif
 
 	ChangeSelectRegion();
 	UnlockBuffer();
