@@ -34,9 +34,9 @@
 extern "C" {
 #endif
 
-#define	TIP_WIN_FRAME_WIDTH	6
+#define TIP_WIN_FRAME_WIDTH 6
 
-typedef struct tagTipWinData TipWin;
+typedef struct tagTipWin TipWin;
 
 TipWin *TipWinCreate(HINSTANCE hInstance, HWND src);
 TipWin *TipWinCreateA(HINSTANCE hInstance, HWND src, int cx, int cy, const char *str);
@@ -50,10 +50,11 @@ void TipWinSetHideTimer(TipWin *tWin, int ms);
 void TipWinSetVisible(TipWin *tWin, int visible);
 int TipWinIsExists(TipWin *tWin);
 int TipWinIsVisible(TipWin *tWin);
+void TipWinGetWindowSize(TipWin* tWin, int *width, int *height);
+void TipWinGetFrameSize(TipWin* tWin, int *width);
 
 void TipWinGetTextWidthHeight(HWND src, const char *str, int *width, int *height);
 void TipWinGetTextWidthHeightW(HWND src, const wchar_t *str, int *width, int *height);
-
 #ifdef __cplusplus
 }
 #endif
@@ -64,26 +65,20 @@ class CTipWin
 public:
 	CTipWin(HINSTANCE hInstance);
 	~CTipWin();
-	VOID Create(HWND pHwnd);
-	VOID Destroy();
-	VOID SetText(const char *str);
-	VOID SetText(const wchar_t *str);
+	void Create(HWND pHwnd);
+	void Destroy();
+	void SetText(const char *str);
+	void SetText(const wchar_t *str);
 	POINT GetPos();
-	VOID SetPos(int x, int y);
-	VOID SetHideTimer(int ms);
+	void SetPos(int x, int y);
+	void SetHideTimer(int ms);
 	BOOL IsExists();
-	VOID SetVisible(BOOL bVisible);
+	void SetVisible(BOOL bVisible);
 	BOOL IsVisible();
+	void GetWindowSize(int *width, int *height);
+	void GetFrameSize(int *width);
 private:
-	UINT_PTR timerid;
-	TipWin* tWin;
-	HINSTANCE hInstance;
-	wchar_t class_name[32];
-	static LRESULT CALLBACK WndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
-	VOID CalcStrRect();
-	ATOM RegisterClass();
-	BOOL UnregisterClass();
-	BOOL IsClassRegistered();
+	class CTipWinImpl *pimpl_;
 };
 #endif
 #endif

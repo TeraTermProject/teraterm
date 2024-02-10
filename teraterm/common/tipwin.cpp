@@ -69,96 +69,131 @@
 
 #include "tipwin.h"
 
+#define TIP_WIN_FRAME_WIDTH 6
 #define TipWinClassName L"TeraTermTipWinClass"
 
-typedef struct tagTipWinData {
+class CTipWinImpl
+{
+public:
+	CTipWinImpl(HINSTANCE hInstance);
+	~CTipWinImpl();
+	VOID Create(HWND pHwnd);
+	VOID Destroy();
+	VOID SetText(const char *str);
+	VOID SetText(const wchar_t *str);
+	POINT GetPos();
+	VOID SetPos(int x, int y);
+	VOID SetHideTimer(int ms);
+	BOOL IsExists();
+	VOID SetVisible(BOOL bVisible);
+	BOOL IsVisible();
+	void GetWindowSize(int *width, int *height);
+	void GetFrameSize(int *width);
+private:
+	HINSTANCE hInstance;
+	wchar_t class_name[32];
+	static LRESULT CALLBACK WndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
+	VOID CalcStrRect();
+	void CalcWindowRect();
+	ATOM RegisterClass();
+	BOOL UnregisterClass();
+	BOOL IsClassRegistered();
+	int win_width_;
+	int win_height_;
 	HFONT tip_font;
 	COLORREF tip_bg;
 	COLORREF tip_text;
 	HWND tip_wnd;
-	const wchar_t *str;
+	const wchar_t *str_;
 	size_t str_len;
 	RECT str_rect;
-	RECT rect;
 	int px;
 	int py;
-} TipWin;
+};
 
-VOID CTipWin::CalcStrRect(VOID)
+VOID CTipWinImpl::CalcStrRect()
 {
-	HDC hdc = CreateCompatibleDC(NULL);
-	SelectObject(hdc, tWin->tip_font);
-	tWin->str_rect.top = 0;
-	tWin->str_rect.left = 0;
-	DrawTextW(hdc, tWin->str, (int)tWin->str_len, &tWin->str_rect, DT_LEFT | DT_CALCRECT | DT_NOPREFIX);
+	HDC hdc = GetDC(tip_wnd);
+	SelectObject(hdc, tip_font);
+	str_rect.top = 0;
+	str_rect.left = 0;
+	DrawTextW(hdc, str_, (int)str_len, &str_rect, DT_LEFT | DT_CALCRECT | DT_NOPREFIX);
 	DeleteDC(hdc);
 }
 
-LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
+void CTipWinImpl::CalcWindowRect()
+{
+	// ウィンドウのサイズは文字領域+左右(上下)のフレーム
+	const int str_width = str_rect.right - str_rect.left;
+	const int str_height = str_rect.bottom - str_rect.top;
+	const int win_width = str_width + TIP_WIN_FRAME_WIDTH * 2;
+	const int win_height = str_height + TIP_WIN_FRAME_WIDTH * 2;
+	win_width_ = win_width;
+	win_height_ = win_height;
+}
+
+LRESULT CALLBACK CTipWinImpl::WndProc(HWND hWnd, UINT nMsg,
                                        WPARAM wParam, LPARAM lParam)
 {
-	CTipWin* self = (CTipWin *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	CTipWinImpl *self = (CTipWinImpl *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	switch (nMsg) {
 		case WM_CREATE: {
 			CREATESTRUCTA *create_st = (CREATESTRUCTA *)lParam;
-			self = (CTipWin *)create_st->lpCreateParams;
+			self = (CTipWinImpl *)create_st->lpCreateParams;
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)self);
-			self->tWin->tip_wnd = hWnd;
+			self->tip_wnd = hWnd;
 			break;
 		}
 
 		case WM_ERASEBKGND:
 			return TRUE;
 
-		case WM_PAINT:
-			if(self) {
-				HBRUSH hbr;
-				HGDIOBJ holdbr;
-				RECT cr;
-				HDC hdc;
+		case WM_PAINT: {
+			SetWindowPos(self->tip_wnd, NULL, self->px, self->py, self->win_width_, self->win_height_,
+						 SWP_NOZORDER | SWP_NOACTIVATE);
+			HBRUSH hbr;
+			HGDIOBJ holdbr;
+			RECT cr;
+			HDC hdc;
 
-				PAINTSTRUCT ps;
-				hdc = BeginPaint(hWnd, &ps);
+			PAINTSTRUCT ps;
+			hdc = BeginPaint(hWnd, &ps);
 
-				SelectObject(hdc, self->tWin->tip_font);
-				SelectObject(hdc, GetStockObject(BLACK_PEN));
+			SelectObject(hdc, self->tip_font);
+			SelectObject(hdc, GetStockObject(BLACK_PEN));
 
-				hbr = CreateSolidBrush(self->tWin->tip_bg);
-				holdbr = SelectObject(hdc, hbr);
+			hbr = CreateSolidBrush(self->tip_bg);
+			holdbr = SelectObject(hdc, hbr);
 
-				GetClientRect(hWnd, &cr);
-				Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+			GetClientRect(hWnd, &cr);
+			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
 
-				SetTextColor(hdc, self->tWin->tip_text);
-				SetBkColor(hdc, self->tWin->tip_bg);
+			SetTextColor(hdc, self->tip_text);
+			SetBkColor(hdc, self->tip_bg);
 
-				{
-					RECT rect = self->tWin->str_rect;
-					rect.left = rect.left + TIP_WIN_FRAME_WIDTH;
-					rect.right = rect.right + TIP_WIN_FRAME_WIDTH;
-					rect.top = rect.top + TIP_WIN_FRAME_WIDTH;
-					rect.bottom = rect.bottom + TIP_WIN_FRAME_WIDTH;
-					DrawTextW(hdc, self->tWin->str, (int)self->tWin->str_len, &rect, DT_LEFT | DT_NOPREFIX);
-				}
+			RECT rect = self->str_rect;
+			rect.left = rect.left + TIP_WIN_FRAME_WIDTH;
+			rect.right = rect.right + TIP_WIN_FRAME_WIDTH;
+			rect.top = rect.top + TIP_WIN_FRAME_WIDTH;
+			rect.bottom = rect.bottom + TIP_WIN_FRAME_WIDTH;
+			DrawTextW(hdc, self->str_, (int)self->str_len, &rect, DT_LEFT | DT_NOPREFIX);
 
-				SelectObject(hdc, holdbr);
-				DeleteObject(hbr);
+			SelectObject(hdc, holdbr);
+			DeleteObject(hbr);
 
-				EndPaint(hWnd, &ps);
-			}
+			EndPaint(hWnd, &ps);
 			return 0;
+		}
 
 		case WM_NCHITTEST:
 			return HTTRANSPARENT;
+
 		case WM_TIMER:
-			if(self) {
-				if(self->timerid > 0)
-					KillTimer(hWnd, self->timerid);
-				self->timerid = 0;
-				self->SetVisible(FALSE);
-			}
+			KillTimer(hWnd, 0);
+			self->SetVisible(FALSE);
 			break;
+
 		default:
 			break;
 	}
@@ -166,28 +201,22 @@ LRESULT CALLBACK CTipWin::WndProc(HWND hWnd, UINT nMsg,
 	return DefWindowProcW(hWnd, nMsg, wParam, lParam);
 }
 
-CTipWin::CTipWin(HINSTANCE hInstance): hInstance(hInstance)
+CTipWinImpl::CTipWinImpl(HINSTANCE hInstance) : hInstance(hInstance)
 {
-	tWin = (TipWin *)malloc(sizeof(TipWin));
-	memset(tWin, 0, sizeof(TipWin));
-	*class_name = NULL;
+	str_ = NULL;
+	class_name[0] = 0;
 }
 
-CTipWin::~CTipWin()
+CTipWinImpl::~CTipWinImpl()
 {
 	if(IsExists()) {
 		Destroy();
 	}
-	if(tWin != NULL) {
-		free((void*)tWin->str);
-		tWin->str = NULL;
-		free(tWin);
-		tWin = NULL;
-		*class_name = NULL;
-	}
+	free((void *)str_);
+	str_ = NULL;
 }
 
-ATOM CTipWin::RegisterClass()
+ATOM CTipWinImpl::RegisterClass()
 {
 	WNDCLASSW wc;
 	wc.style = CS_HREDRAW | CS_VREDRAW;
@@ -203,7 +232,7 @@ ATOM CTipWin::RegisterClass()
 	return RegisterClassW(&wc);
 }
 
-VOID CTipWin::Create(HWND pHwnd)
+VOID CTipWinImpl::Create(HWND pHwnd)
 {
 	LOGFONTA logfont;
 	const UINT uDpi = GetMonitorDpiFromWindow(pHwnd);
@@ -215,157 +244,205 @@ VOID CTipWin::Create(HWND pHwnd)
 		_snwprintf_s(class_name, _countof(class_name), _TRUNCATE, L"%s_%p", TipWinClassName, hInstance);
 	}
 	RegisterClass();
-	if (tWin == NULL) {
-		return;
-	}
-	tWin->str_len = 0;
-	tWin->str = (wchar_t*)malloc(sizeof(wchar_t));
-	memset((void*)tWin->str, 0, sizeof(wchar_t));
-	tWin->px = 0;
-	tWin->py = 0;
-	tWin->tip_bg = GetSysColor(COLOR_INFOBK);
-	tWin->tip_text = GetSysColor(COLOR_INFOTEXT);
+	str_len = 0;
+	str_ = (wchar_t *)malloc(sizeof(wchar_t));
+	memset((void *)str_, 0, sizeof(wchar_t));
+	px = 0;
+	py = 0;
+	tip_bg = GetSysColor(COLOR_INFOBK);
+	tip_text = GetSysColor(COLOR_INFOTEXT);
 	GetMessageboxFont(&logfont);
 	logfont.lfWidth = MulDiv(logfont.lfWidth, uDpi, 96);
 	logfont.lfHeight = MulDiv(logfont.lfHeight, uDpi, 96);
-	tWin->tip_font = CreateFontIndirect(&logfont);
-	tWin->tip_wnd =
+	tip_font = CreateFontIndirect(&logfont);
+	tip_wnd =
 		CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
 						class_name,
 						NULL, WS_POPUP,
 						0, 0,
-						0, 0,
+						1, 1,
 						pHwnd, NULL, hInstance, this);
-	timerid = 0;
 }
 
-VOID CTipWin::Destroy()
+VOID CTipWinImpl::Destroy()
 {
 	if(IsExists()) {
 		// フォントの破棄
-		DeleteObject(tWin->tip_font);
-		tWin->tip_font = NULL;
+		DeleteObject(tip_font);
+		tip_font = NULL;
 		// ウィンドウの破棄
-		SetWindowLongPtr(tWin->tip_wnd, GWLP_USERDATA, NULL);
-		DestroyWindow(tWin->tip_wnd);
-		tWin->tip_wnd = NULL;
+		SetWindowLongPtr(tip_wnd, GWLP_USERDATA, NULL);
+		DestroyWindow(tip_wnd);
+		tip_wnd = NULL;
 	}
 }
 
-POINT CTipWin::GetPos(void)
+POINT CTipWinImpl::GetPos(void)
 {
 	POINT pts;
-	pts.x = tWin->px;
-	pts.y = tWin->py;
+	pts.x = px;
+	pts.y = py;
 	return pts;
 }
 
-VOID CTipWin::SetPos(int x, int y)
+VOID CTipWinImpl::SetPos(int x, int y)
 {
 	if(IsExists()) {
-		tWin->px = x;
-		tWin->py = y;
-		SetWindowPos(tWin->tip_wnd, 0, x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
+		px = x;
+		py = y;
+		SetWindowPos(tip_wnd, 0, x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
 	}
 }
 
-VOID CTipWin::SetText(const char *str)
+VOID CTipWinImpl::SetText(const wchar_t *str)
+{
+	if(!IsExists()) {
+		return;
+	}
+
+	str_len = wcslen(str);
+	if (str != NULL) {
+		free((void *)str_);
+	}
+	str_ = _wcsdup(str);
+	CalcStrRect();
+	CalcWindowRect();
+
+	InvalidateRect(tip_wnd, NULL, FALSE);
+}
+
+VOID CTipWinImpl::SetText(const char *str)
 {
 	wchar_t *strW = ToWcharA(str);
 	SetText(strW);
 	free(strW);
 }
 
-VOID CTipWin::SetText(const wchar_t *str)
-{
-	if(!IsExists()) {
-		return;
-	}
-
-	TipWin* self = tWin;
-	self->str_len = wcslen(str);
-	if (self->str != NULL) {
-		free((void *)self->str);
-	}
-	self->str = _wcsdup(str);
-	CalcStrRect();
-
-	// ウィンドウのサイズは文字サイズ+左右(上下)のフレーム
-	const int str_width = self->str_rect.right - self->str_rect.left;
-	const int str_height = self->str_rect.bottom - self->str_rect.top;
-	const int win_width = str_width + TIP_WIN_FRAME_WIDTH * 2;
-	const int win_height = str_height + TIP_WIN_FRAME_WIDTH * 2;
-	SetWindowPos(tWin->tip_wnd, NULL,
-				 0, 0, win_width, win_height,
-				 SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
-
-	// WM_PAINTで描画する
-	InvalidateRect(tWin->tip_wnd, NULL, FALSE);
-}
-
-VOID CTipWin::SetHideTimer(int ms)
+VOID CTipWinImpl::SetHideTimer(int ms)
 {
 	if(IsExists()) {
-		HWND hWnd = tWin->tip_wnd;
-		timerid = SetTimer(hWnd, NULL, ms, NULL);
+		SetTimer(tip_wnd, 0, ms, NULL);
 	}
 }
 
-BOOL CTipWin::IsExists(void)
+BOOL CTipWinImpl::IsExists(void)
 {
-	if(tWin == NULL)
-		return FALSE;
-	if(tWin->tip_wnd == NULL)
+	if(tip_wnd == NULL)
 		return FALSE;
 	return TRUE;
 }
 
-VOID CTipWin::SetVisible(BOOL bVisible)
+VOID CTipWinImpl::SetVisible(BOOL bVisible)
 {
 	int visible = (bVisible) ? SW_SHOWNOACTIVATE : SW_HIDE;
 	if(IsExists()) {
-		HWND hWnd = tWin->tip_wnd;
+		HWND hWnd = tip_wnd;
 		if(IsWindowVisible(hWnd) != bVisible) {
 			ShowWindow(hWnd, visible);
 		}
 	}
 }
 
-BOOL CTipWin::IsVisible(void)
+BOOL CTipWinImpl::IsVisible(void)
 {
 	if(IsExists()) {
-		HWND hWnd = tWin->tip_wnd;
+		HWND hWnd = tip_wnd;
 		return (BOOL)IsWindowVisible(hWnd);
 	}
 	return FALSE;
 }
 
-TipWin *TipWinCreate(HINSTANCE hInstance, HWND src)
+void CTipWinImpl::GetWindowSize(int *width, int *height)
 {
-	CTipWin* tipwin = new CTipWin(hInstance);
-	tipwin->Create(src);
-	return (TipWin*)tipwin;
+	if (width != NULL) {
+		*width = win_width_;
+	}
+	if (height != NULL) {
+		*height = win_height_;
+	}
 }
 
-TipWin *TipWinCreateA(HINSTANCE hInstance, HWND src, int cx, int cy, const char *str)
+void CTipWinImpl::GetFrameSize(int *width)
 {
-	CTipWin* tipwin = new CTipWin(hInstance);
-	tipwin->Create(src);
-	tipwin->SetText(str);
-	tipwin->SetPos(cx, cy);
-	tipwin->SetVisible(TRUE);
-	return (TipWin*)tipwin;
+	*width = TIP_WIN_FRAME_WIDTH;
 }
 
-TipWin *TipWinCreateW(HINSTANCE hInstance, HWND src, int cx, int cy, const wchar_t *str)
+/**
+ *	C++ Interface
+ */
+
+CTipWin::CTipWin(HINSTANCE hInstance)
 {
-	CTipWin* tipwin = new CTipWin(hInstance);
-	tipwin->Create(src);
-	tipwin->SetText(str);
-	tipwin->SetPos(cx, cy);
-	tipwin->SetVisible(TRUE);
-	return (TipWin*)tipwin;
+	pimpl_ = new CTipWinImpl(hInstance);
 }
+
+CTipWin::~CTipWin()
+{
+	delete pimpl_;
+	pimpl_ = NULL;
+}
+
+void CTipWin::Create(HWND pHwnd)
+{
+	pimpl_->Create(pHwnd);
+}
+
+VOID CTipWin::Destroy()
+{
+	pimpl_->Destroy();
+}
+
+VOID CTipWin::SetText(const char *str)
+{
+	pimpl_->SetText(str);
+}
+
+VOID CTipWin::SetText(const wchar_t *str)
+{
+	pimpl_->SetText(str);
+}
+
+POINT CTipWin::GetPos()
+{
+	return pimpl_->GetPos();
+}
+
+VOID CTipWin::SetPos(int x, int y)
+{
+	pimpl_->SetPos(x, y);
+}
+
+VOID CTipWin::SetHideTimer(int ms)
+{
+	pimpl_->SetHideTimer(ms);
+}
+
+BOOL CTipWin::IsExists()
+{
+	return pimpl_->IsExists();
+}
+
+VOID CTipWin::SetVisible(BOOL bVisible)
+{
+	pimpl_->SetVisible(bVisible);
+}
+
+BOOL CTipWin::IsVisible()
+{
+	return pimpl_->IsVisible();
+}
+
+void CTipWin::GetWindowSize(int *width, int *height)
+{
+	pimpl_->GetWindowSize(width, height);
+}
+
+void CTipWin::GetFrameSize(int *width)
+{
+	pimpl_->GetFrameSize(width);
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 /*
  * 文字列をツールチップに描画した時の横と縦のサイズを取得する。
@@ -456,60 +533,112 @@ void TipWinGetTextWidthHeightW(HWND src, const wchar_t *str, int *width, int *he
 	/* フォントを破棄する */
 	DeleteObject(tip_font);
 }
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+ *	C Interface
+ */
+typedef struct tagTipWin {
+	CTipWin* ctipwin;
+} TipWin;
+
+TipWin *TipWinCreate(HINSTANCE hInstance, HWND src)
+{
+	TipWin *tipwin = (TipWin *)malloc(sizeof(TipWin));
+	CTipWin* ctipwin = new CTipWin(hInstance);
+	ctipwin->Create(src);
+	tipwin->ctipwin = ctipwin;
+	return (TipWin*)tipwin;
+}
+
+TipWin *TipWinCreateW(HINSTANCE hInstance, HWND src, int cx, int cy, const wchar_t *str)
+{
+	TipWin *tipwin = TipWinCreate(hInstance, src);
+	CTipWin *ctipwin = tipwin->ctipwin;
+	ctipwin->SetText(str);
+	ctipwin->SetPos(cx, cy);
+	ctipwin->SetVisible(TRUE);
+	return (TipWin*)tipwin;
+}
+
+TipWin *TipWinCreateA(HINSTANCE hInstance, HWND src, int cx, int cy, const char *str)
+{
+	wchar_t *strW = ToWcharA(str);
+	TipWin *tipwin = TipWinCreateW(hInstance, src, cx, cy, strW);
+	free(strW);
+	return tipwin;
+}
 
 void TipWinGetPos(TipWin *tWin, int *x, int *y)
 {
-	CTipWin* tipwin = (CTipWin*) tWin;
-	POINT pt = tipwin->GetPos();
+	CTipWin *ctipwin = tWin->ctipwin;
+	POINT pt = ctipwin->GetPos();
 	*x = (int)pt.x;
 	*y = (int)pt.y;
 }
 
 void TipWinSetPos(TipWin *tWin, int x, int y)
 {
-	CTipWin* tipwin = (CTipWin*) tWin;
-	tipwin->SetPos(x, y);
+	CTipWin *ctipwin = tWin->ctipwin;
+	ctipwin->SetPos(x, y);
+}
+
+/**
+ *	文字をセットする
+ *		文字をセットすると tipwinのサイズが取得(TipWinGetWindowSize())できるようになる
+ */
+void TipWinSetTextW(TipWin* tWin, const wchar_t *str)
+{
+	CTipWin *ctipwin = tWin->ctipwin;
+	ctipwin->SetText(str);
 }
 
 void TipWinSetTextA(TipWin* tWin, const char *str)
 {
-	CTipWin* tipwin = (CTipWin*) tWin;
-	tipwin->SetText(str);
-}
-
-void TipWinSetTextW(TipWin* tWin, const wchar_t *str)
-{
-	CTipWin* tipwin = (CTipWin*) tWin;
-	tipwin->SetText(str);
+	CTipWin *ctipwin = tWin->ctipwin;
+	ctipwin->SetText(str);
 }
 
 void TipWinSetHideTimer(TipWin *tWin, int ms)
 {
-	CTipWin* tipwin = (CTipWin*) tWin;
-	tipwin->SetHideTimer(ms);
+	CTipWin *ctipwin = tWin->ctipwin;
+	ctipwin->SetHideTimer(ms);
 }
 
 void TipWinDestroy(TipWin* tWin)
 {
-	CTipWin* tipwin = (CTipWin*) tWin;
-	delete(tipwin);
-	tipwin = NULL;
+	CTipWin *ctipwin = tWin->ctipwin;
+	delete(ctipwin);
+	tWin->ctipwin = NULL;
+	free(tWin);
 }
 
 int TipWinIsExists(TipWin *tWin)
 {
-	CTipWin* tipwin = (CTipWin*) tWin;
-	return (int)tipwin->IsExists();
+	CTipWin *ctipwin = tWin->ctipwin;
+	return (int)ctipwin->IsExists();
 }
 
 void TipWinSetVisible(TipWin* tWin, int bVisible)
 {
-	CTipWin* tipwin = (CTipWin*) tWin;
-	tipwin->SetVisible(bVisible);
+	CTipWin *ctipwin = tWin->ctipwin;
+	ctipwin->SetVisible(bVisible);
 }
 
 int TipWinIsVisible(TipWin* tWin)
 {
-	CTipWin* tipwin = (CTipWin*) tWin;
-	return (int)tipwin->IsVisible();
+	CTipWin *ctipwin = tWin->ctipwin;
+	return (int)ctipwin->IsVisible();
+}
+
+void TipWinGetWindowSize(TipWin* tWin, int *width, int *height)
+{
+	CTipWin *ctipwin = tWin->ctipwin;
+	ctipwin->GetWindowSize(width, height);
+}
+
+void TipWinGetFrameSize(TipWin* tWin, int *width)
+{
+	CTipWin *ctipwin = tWin->ctipwin;
+	ctipwin->GetFrameSize(width);
 }
