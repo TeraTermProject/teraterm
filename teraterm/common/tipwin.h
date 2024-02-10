@@ -34,8 +34,6 @@
 extern "C" {
 #endif
 
-#define TIP_WIN_FRAME_WIDTH 6
-
 typedef struct tagTipWin TipWin;
 
 TipWin *TipWinCreate(HINSTANCE hInstance, HWND src);
@@ -53,8 +51,6 @@ int TipWinIsVisible(TipWin *tWin);
 void TipWinGetWindowSize(TipWin* tWin, int *width, int *height);
 void TipWinGetFrameSize(TipWin* tWin, int *width);
 
-void TipWinGetTextWidthHeight(HWND src, const char *str, int *width, int *height);
-void TipWinGetTextWidthHeightW(HWND src, const wchar_t *str, int *width, int *height);
 #ifdef __cplusplus
 }
 #endif

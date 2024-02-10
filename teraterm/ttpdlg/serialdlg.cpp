@@ -174,43 +174,39 @@ static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WP
 {
 	const int tooltip_timeout = 1000;  // msec
 	POINT pt;
-	int w, h;
+	int h;
 	int cx, cy;
 	RECT wr;
-	wchar_t *uimsg;
 	SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-	const wchar_t *UILanguageFileW;
+	int frame_width;
 
 	switch (msg) {
 		case WM_MOUSEMOVE:
-			UILanguageFileW = dlg_data->pts->UILanguageFileW;
-			uimsg = TTGetLangStrW("Tera Term",
-								  "DLG_SERIAL_SPEED_TOOLTIP", L"You can directly specify a number", UILanguageFileW);
+			// ツールチップを作成
+			if (g_SerialDlgSpeedTip == NULL) {
+				const wchar_t *UILanguageFileW;
+				wchar_t *uimsg;
+				UILanguageFileW = dlg_data->pts->UILanguageFileW;
+				uimsg = TTGetLangStrW("Tera Term",
+									  "DLG_SERIAL_SPEED_TOOLTIP", L"You can directly specify a number", UILanguageFileW);
+				g_SerialDlgSpeedTip = TipWinCreate(hInst, hWnd);
+				TipWinSetTextW(g_SerialDlgSpeedTip, uimsg);
+
+				free(uimsg);
+			}
 
 			// Combo-boxの左上座標を求める
 			GetWindowRect(hWnd, &wr);
-			pt.x = wr.left;
-			pt.y = wr.top;
-
-			// 文字列の縦横サイズを取得する
-			TipWinGetTextWidthHeightW(hWnd, uimsg, &w, &h);
-
-			cx = pt.x;
-			cy = pt.y - (h + TIP_WIN_FRAME_WIDTH * 6);
 
 			// ツールチップを表示する
-			if (g_SerialDlgSpeedTip == NULL) {
-				g_SerialDlgSpeedTip = TipWinCreate(hInst, hWnd);
-				TipWinSetHideTimer(g_SerialDlgSpeedTip, tooltip_timeout);
-			}
-			if (!TipWinIsVisible(g_SerialDlgSpeedTip))
-				TipWinSetVisible(g_SerialDlgSpeedTip, TRUE);
-
-			TipWinSetTextW(g_SerialDlgSpeedTip, uimsg);
+			TipWinGetWindowSize(g_SerialDlgSpeedTip, NULL, &h);
+			TipWinGetFrameSize(g_SerialDlgSpeedTip, &frame_width);
+			cx = wr.left;
+			cy = wr.top - (h + frame_width * 4);
 			TipWinSetPos(g_SerialDlgSpeedTip, cx, cy);
 			TipWinSetHideTimer(g_SerialDlgSpeedTip, tooltip_timeout);
-
-			free(uimsg);
+			if (!TipWinIsVisible(g_SerialDlgSpeedTip))
+				TipWinSetVisible(g_SerialDlgSpeedTip, TRUE);
 
 			break;
 	}

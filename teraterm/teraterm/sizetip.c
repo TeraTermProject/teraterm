@@ -80,7 +80,7 @@ static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
 		if (iy < mi.rcMonitor.top + FrameWidth) {
 			iy = mi.rcMonitor.top + FrameWidth;
 		}
-		
+
 		point->x = ix;
 		point->y = iy;
 	}
@@ -104,7 +104,7 @@ static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
  *   fwSide     リサイズ時にどこのウィンドウを掴んだか
  *   newX, newY リサイズ後の左上の座標
  *
- * 注意: 
+ * 注意:
  * Windows9xでは画面のプロパティで「ウィンドウの内容を表示したまま
  * ドラッグする」にチェックを入れないと、ツールチップが表示されません。
  */
@@ -129,29 +129,33 @@ void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 		RECT wr;
 		POINT point;
 		int w, h;
-
-		// 文字列の縦横サイズを取得する
-		TipWinGetTextWidthHeight(src, str, &w, &h);
+		const int x_offset = 16;
 
 		// ウィンドウの位置を取得
 		GetWindowRect(src, &wr);
 
 		// sizetipを出す位置は、ウィンドウ左上(X, Y)に対して、
-		// (X, Y - 文字列の高さ - TIP_WIN_FRAME_WIDTH * 2) とする。
+		// (X, Y - sizetipの高さ) とする。
+		SizeTip = TipWinCreate(NULL, src);
+		TipWinSetTextA(SizeTip, str);
+		TipWinGetWindowSize(SizeTip, &w, &h);
 		point.x = wr.left;
-		point.y = wr.top - (h + TIP_WIN_FRAME_WIDTH * 2);
-		FixPosFromFrame(&point, 16, FALSE);
+		point.y = wr.top - h;
+		FixPosFromFrame(&point, x_offset, FALSE);
 		cx = point.x;
 		cy = point.y;
-
-		SizeTip = TipWinCreateA(NULL, src, cx, cy, str);
-	} else {
+		TipWinSetPos(SizeTip, cx, cy);
+		TipWinSetVisible(SizeTip, 1);
+	}
+	else {
 		/* Tip already exists, just set the text */
 		TipWinSetTextA(SizeTip, str);
 
 		// ウィンドウの左上が移動する場合
 		if (tooltip_movable) {
-			TipWinSetPos(SizeTip, newX + TIP_WIN_FRAME_WIDTH*2, newY + TIP_WIN_FRAME_WIDTH*2);
+			int frame_width;
+			TipWinGetFrameSize(SizeTip, &frame_width);
+			TipWinSetPos(SizeTip, newX + frame_width * 2, newY + frame_width * 2);
 		}
 	}
 }
