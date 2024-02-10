@@ -810,20 +810,44 @@ BYTE ConvHexCharW(wchar_t b)
 
 /**
  *	Hex2Str() の wchar_t 版
+ *
+ *	@param	Hex		16進エンコードされた文字列
+ *					Str2HexW() で作成された文字列
+ *	@param	MaxLen	文字列長,0=省略
+ *	@return	デコードされた文字列
+ *			不要になったら free() すること
  */
-int Hex2StrW(const wchar_t *Hex, wchar_t *Str, size_t MaxLen)
+wchar_t *Hex2StrW(const wchar_t *Hex, size_t MaxLen)
 {
+	size_t str_len = 0;
+	wchar_t *Str = NULL;
 	wchar_t b, c;
-	size_t i, imax, j;
+	size_t i;
+	size_t wp;
 
-	j = 0;
-	imax = wcslen(Hex);
+	if (MaxLen == 0) {
+		MaxLen = wcslen(Hex);
+	}
+	if( MaxLen == 0) {
+		return _wcsdup(L"");
+	}
+	wp = 0;
 	i = 0;
-	while ((i < imax) && (j<MaxLen)) {
+	while (i < MaxLen) {
+		if (wp + 1 > str_len) {
+			wchar_t *p;
+			str_len += 512;
+			p = (wchar_t *)realloc(Str, sizeof(wchar_t) * str_len);
+			if (p == NULL) {
+				free(Str);
+				return NULL;
+			}
+			Str = p;
+		}
 		b = Hex[i];
-		if (b=='$') {
+		if (b == '$') {
 			i++;
-			if (i < imax) {
+			if (i < MaxLen) {
 				c = Hex[i];
 			}
 			else {
@@ -831,7 +855,7 @@ int Hex2StrW(const wchar_t *Hex, wchar_t *Str, size_t MaxLen)
 			}
 			b = ConvHexCharW(c) << 4;
 			i++;
-			if (i < imax) {
+			if (i < MaxLen) {
 				c = (BYTE)Hex[i];
 			}
 			else {
@@ -840,15 +864,91 @@ int Hex2StrW(const wchar_t *Hex, wchar_t *Str, size_t MaxLen)
 			b = b + ConvHexCharW(c);
 		};
 
-		Str[j] = b;
-		j++;
+		Str[wp] = b;
+		wp++;
 		i++;
 	}
-	if (j<MaxLen) {
-		Str[j] = 0;
+	Str[wp] = 0;
+
+	return Str;
+}
+
+/**
+ *	Str2Hex() の wchar_t 版
+ *
+ *	@param	Str		文字列
+ *					Hex2StrW() で作成された文字列
+ *	@param	Len		文字列長(wcslen()の戻り値と同じ),0=省略
+ *					(0指定時、文字終端の'\0'は変換されない)
+ *	@param	ConvSP	TRUE時, L' 'をhexに変換
+ *	@return	16進エンコードした文字列
+ *			不要になったら free() すること
+ */
+wchar_t *Str2HexW(const wchar_t *Str, size_t Len, BOOL ConvSP)
+{
+	static const wchar_t *escape_strs = L"$\"';";
+	size_t MaxHexLen = 0;
+	wchar_t *Hex = NULL;
+	wchar_t b, low;
+	int i, j;
+
+	if (Len == 0) {
+		Len = wcslen(Str);
+	}
+	if (Len == 0) {
+		return _wcsdup(L"");
 	}
 
-	return (int)j;
+
+	if (ConvSP)
+		low = 0x20;
+	else
+		low = 0x1F;
+
+	j = 0;
+	for (i = 0; i < Len; i++) {
+		if (j + 5 >= MaxHexLen) {
+			wchar_t *p;
+			MaxHexLen += 512;
+			p = (wchar_t *)realloc(Hex, sizeof(wchar_t) * MaxHexLen);
+			if (p == NULL) {
+				free(Hex);
+				return NULL;
+			}
+			Hex = p;
+		}
+		b = Str[i];
+		if ((b > low) && (wcschr(escape_strs, b) == NULL)) {
+			if (j < MaxHexLen) {
+				Hex[j] = b;
+				j++;
+			}
+		}
+		else {
+			if (j < MaxHexLen - 2) {
+				Hex[j] = '$';
+				j++;
+				if (b <= 0x9f) {
+					Hex[j] = (char)((b >> 4) + 0x30);
+				}
+				else {
+					Hex[j] = (char)((b >> 4) + 0x37);
+				}
+				j++;
+				if ((b & 0x0f) <= 0x9) {
+					Hex[j] = (char)((b & 0x0f) + 0x30);
+				}
+				else {
+					Hex[j] = (char)((b & 0x0f) + 0x37);
+				}
+				j++;
+			}
+		}
+	}
+	Hex[j] = 0;
+	Hex = (wchar_t *)realloc(Hex, sizeof(wchar_t) * (j + 1));
+
+	return Hex;
 }
 
 /**

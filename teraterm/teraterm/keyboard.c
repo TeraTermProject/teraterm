@@ -849,10 +849,14 @@ static void GetKeyStr(HWND HWin, const PKeyMap KeyMap_, WORD KeyCode, BOOL Appli
 				*Type = p->type;
 				s = p->ptr;
 				*Len = p->len;
-				if ((*Type == IdBinary) || (*Type == IdText))
-					*Len = Hex2StrW(s, KeyStr, destlen);
-				else
+				if ((*Type == IdBinary) || (*Type == IdText)) {
+					wchar_t *str = Hex2StrW(s, 0);
+					wcsncpy_s(KeyStr, destlen, str, _TRUNCATE);
+					free(str);
+					*Len = wcslen(KeyStr);
+				} else {
 					wcsncpy_s(KeyStr, destlen, s, _TRUNCATE);
+				}
 			}
 			else
 				return;
