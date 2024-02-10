@@ -173,7 +173,6 @@ static LRESULT CALLBACK SerialDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, 
 static LRESULT CALLBACK SerialDlgSpeedComboboxWindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	const int tooltip_timeout = 1000;  // msec
-	POINT pt;
 	int h;
 	int cx, cy;
 	RECT wr;

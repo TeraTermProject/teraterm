@@ -169,7 +169,7 @@ void RegGetStatus(BOOL *use_ini, wchar_t **inifile)
 {
 	*use_ini = bUseINI;
 	if (bUseINI) {
-		*inifile = wcsdup(szApplicationName);
+		*inifile = _wcsdup(szApplicationName);
 	}
 	else {
 		*inifile = NULL;
