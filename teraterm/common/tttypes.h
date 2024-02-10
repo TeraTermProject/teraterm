@@ -350,7 +350,7 @@ struct tttset {
 	char reserve_FileDir[256];		// switch FileDirW
 	char FileSendFilter[128];
 	WORD Language;
-	char DelimList[52];
+	char reserver_DelimList[52];
 	WORD DelimDBCS;
 	WORD Minimize;
 	WORD HideWindow;
@@ -611,6 +611,7 @@ struct tttset {
 	BOOL NotifySound;
 	wchar_t *LogDefaultNameW;
 	BOOL Dec2Unicode;
+	wchar_t *DelimListW;
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;

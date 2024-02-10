@@ -1267,10 +1267,15 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->Debug = GetOnOff(Section, "Debug", FName, FALSE);
 
 	/* Delimiter list -- special option */
-	GetPrivateProfileString(Section, "DelimList",
-	                        "$20!\"#$24%&\'()*+,-./:;<=>?@[\\]^`{|}~",
-	                        Temp, sizeof(Temp), FName);
-	Hex2Str(Temp, ts->DelimList, sizeof(ts->DelimList));
+	{
+		wchar_t *s;
+		hGetPrivateProfileStringW(SectionW, L"DelimList",
+								  L"$20!\"#$24%&\'()*+,-./:;<=>?@[\\]^`{|}~",
+								  FName, &s);
+		free(ts->DelimListW);
+		ts->DelimListW = Hex2StrW(s, 0);
+		free(s);
+	}
 
 	/* regard DBCS characters as delimiters -- special option */
 	ts->DelimDBCS = GetOnOff(Section, "DelimDBCS", FName, TRUE);
@@ -2703,9 +2708,11 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "Debug", FName, ts->Debug);
 
 	/* Delimiter list -- special option */
-	Str2Hex(ts->DelimList, Temp, strlen(ts->DelimList),
-	        sizeof(Temp) - 1, TRUE);
-	WritePrivateProfileString(Section, "DelimList", Temp, FName);
+	{
+		wchar_t *s = Str2HexW(ts->DelimListW, 0, TRUE);
+		WritePrivateProfileStringW(SectionW, L"DelimList", s, FName);
+		free(s);
+	}
 
 	/* regard DBCS characters as delimiters -- special option */
 	WriteOnOff(Section, "DelimDBCS", FName, ts->DelimDBCS);
@@ -4059,6 +4066,7 @@ void TTSetUnInit(TTTSet *ts)
 		(void **)&ts->MacroFNW,
 		(void **)&ts->LogFNW,
 		(void **)&ts->LogDefaultNameW,
+		(void **)&ts->DelimListW,
 	};
 	int i;
 	for(i = 0; i < _countof(ptr_list); i++) {

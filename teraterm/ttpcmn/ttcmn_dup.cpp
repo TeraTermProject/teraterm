@@ -255,6 +255,7 @@ static const TSerializeInfo serialize_info[] = {
 	{ MALLOCED_WSTRING_INFO(TTTSet, EtermLookfeel.BGThemeFileW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, EtermLookfeel.BGSPIPathW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, LogDefaultNameW) },
+	{ MALLOCED_WSTRING_INFO(TTTSet, DelimListW) },
 	{ 0, 0, TSerializeInfo::COPY },
 };
 

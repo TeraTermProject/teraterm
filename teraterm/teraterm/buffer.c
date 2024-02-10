@@ -3901,20 +3901,24 @@ void CursorUpWithScroll(void)
 }
 
 /**
- * called by BuffDblClk
- *   check if a character is the word delimiter
+ * íPåÍãÊêÿÇËï∂éöîªíË
  *
- *	TODO Unicodeâª
+ *	TODO ts.DelimDBCS ÇÕïsóv?
  */
 static BOOL IsDelimiter(LONG Line, int CharPtr)
 {
-//	whar_t *DelimListW;
-	char *find;
-	if ((CodeBuffW[Line+CharPtr].attr & AttrKanji) !=0) {
-		return (ts.DelimDBCS!=0);
+	const buff_char_t *b = &CodeBuffW[Line+CharPtr];
+#if 0
+	if (b->cell >= 2) {
+		// 2cellà»è„ÇÃï∂éö
+		return (ts.DelimDBCS != 0);
 	}
-	find = strchr(ts.DelimList, CodeBuffW[Line+CharPtr].ansi_char);
-	return (find != NULL);
+#endif
+	wchar_t *wcs = GetWCS(b);
+	wchar_t *findp = wcsstr(ts.DelimListW, wcs);
+	BOOL find = (findp != NULL);
+	free(wcs);
+	return find;
 }
 
 static void GetMinMax(int i1, int i2, int i3, int *min, int *max)

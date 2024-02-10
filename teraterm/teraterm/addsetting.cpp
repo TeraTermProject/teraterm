@@ -559,7 +559,7 @@ void CCopypastePropPageDlg::OnInitDialog()
 	}
 
 	// (8)delimiter characters
-	SetDlgItemTextA(IDC_DELIM_LIST, ts.DelimList);
+	SetDlgItemTextW(IDC_DELIM_LIST, ts.DelimListW);
 
 	// (9)PasteDelayPerLine
 	SetDlgItemNum(IDC_PASTEDELAY_EDIT, ts.PasteDelayPerLine);
@@ -669,7 +669,8 @@ void CCopypastePropPageDlg::OnOK()
 	GetDlgItemTextA(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile, sizeof(ts.ConfirmChangePasteStringFile));
 
 	// (8)
-	GetDlgItemTextA(IDC_DELIM_LIST, ts.DelimList, sizeof(ts.DelimList));
+	free(ts.DelimListW);
+	hGetDlgItemTextW(this->m_hWnd, IDC_DELIM_LIST, &ts.DelimListW);
 
 	// (9)
 	val = GetDlgItemInt(IDC_PASTEDELAY_EDIT);
