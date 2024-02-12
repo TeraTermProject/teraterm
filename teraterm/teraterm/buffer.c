@@ -51,6 +51,11 @@
 
 #define	ENABLE_CELL_INDEX	0
 
+// ダブルクリックでワード選択後のドラッグで
+//		TRUE	前後行を継続して選択を行う
+//		FALSE	選択が行頭/行末で止まる
+#define DOUBLD_CLICK_SELECT_LINE_CONTINUE	FALSE
+
 // バッファ内の半角1文字分の情報
 typedef struct {
 	char32_t u32;
@@ -3903,17 +3908,12 @@ void CursorUpWithScroll(void)
 /**
  * 単語区切り文字判定
  *
- *	TODO ts.DelimDBCS は不要?
+ *	@retval	TRUE	区切り文字
+ *	@retval	FALSE	区切り文字ではない
  */
 static BOOL IsDelimiter(LONG Line, int CharPtr)
 {
 	const buff_char_t *b = &CodeBuffW[Line+CharPtr];
-#if 0
-	if (b->cell >= 2) {
-		// 2cell以上の文字
-		return (ts.DelimDBCS != 0);
-	}
-#endif
 	wchar_t *wcs = GetWCS(b);
 	wchar_t *findp = wcsstr(ts.DelimListW, wcs);
 	BOOL find = (findp != NULL);
@@ -4109,16 +4109,166 @@ BOOL BuffUrlDblClk(int Xw, int Yw)
 	return url_invoked;
 }
 
+/**
+ *	文字の区切り(Delimiter)を探す,前方
+ *
+ *	@param[in]	sx				スタート
+ *	@param[in]	sy
+ *	@param[in]	line_continue	FALSE=行の頭尾で区切る
+ *	@param[out]	destx			見つけた位置
+ *	@param[out]	dexty
+ */
+static void SearchDelimiterPrev(int sx, int sy, BOOL line_continue, int *destx, int *desty)
+{
+	LONG ptr = GetLinePtr(sy);
+	const buff_char_t *b;
+	BOOL start_delimiter;
+	int start_cell;
+
+	sx = LeftHalfOfDBCS(ptr, sx);
+	b = CodeBuffW + ptr + sx;
+	assert(b->Padding == FALSE);
+	start_delimiter = IsDelimiter(ptr, sx);
+	start_cell = b->cell == 1;
+
+	for (;;) {
+		// 移動前を記憶
+		int px = sx;
+		int py = sy;
+
+		// 1つ前のキャラクタへ移動
+		if (sx <= 0) {
+			// 行頭なら上の行へ
+			if (!line_continue) {
+				// 上の行へ継続しない、検索打ち切り
+				sx = 0;
+				break;
+			}
+			else {
+				// 上の行から継続している?
+				if (sy > 0 && (b->attr & AttrLineContinued)) {
+					// 継続している
+					sy--;
+					ptr = GetLinePtr(sy);
+					sx = NumOfColumns - 1;
+					sx = LeftHalfOfDBCS(ptr, sx);
+					b = &CodeBuffW[ptr + sx];
+					px = sx;
+					py = sy;
+				}
+				else {
+					// 継続していない,打ち切り
+					sx = 0;
+					break;
+				}
+			}
+		}
+		else {
+			// 1char前へ
+			sx--;
+			b--;
+			// 2cell以上の文字のとき頭出しする
+			while (b->Padding == TRUE) {
+				sx--;
+				b--;
+				if (sx < 0) {
+					// 行頭が Padding はないはず
+					assert(0);
+					sx = 0;
+					goto break_all;
+				}
+			}
+		}
+
+		// 区切り文字 or cell数が変化した
+		if (start_delimiter != IsDelimiter(ptr, sx) ||
+			(ts.DelimDBCS != 0 && ((b->cell == 1) != start_cell))) {
+		break_all:
+			// 区切りが見つかった、1つ前に進む前の位置を返す
+			sx = px;
+			sy = py;
+			break;
+		}
+	}
+	*destx = sx;
+	*desty = sy;
+}
+
+/**
+ *	文字の区切り(Delimiter)を探す,後方
+ *
+ *	@param[in]	sx				スタート
+ *	@param[in]	sy
+ *	@param[in]	line_continue	FALSE=行の頭尾で区切る
+ *	@param[out]	destx			見つけた位置
+ *	@param[out]	dexty
+ */
+static void SearchDelimiterNext(int sx, int sy, BOOL line_continue, int *destx, int *desty)
+{
+	LONG ptr = GetLinePtr(sy);
+	const buff_char_t *b = CodeBuffW + ptr + sx;
+	BOOL start_delimiter = IsDelimiter(ptr, sx);
+	int start_cell = b->cell == 1;
+
+	for (;;) {
+		int px = sx;
+		int py = sy;
+
+		// 次のキャラクタへ
+		if (sx + b->cell > NumOfColumns - 1) {
+			// 次に進むと行末?
+			if (!line_continue) {
+				// 検索打ち切り
+				sx = NumOfColumns - 1;
+				break;
+			}
+			else {
+				// 下の行が継続している?
+				b += b->cell - 1;
+				if (sy < BuffEnd && (b->attr & AttrLineContinued)) {
+					// 継続している
+					sx = 0;
+					sy++;
+					ptr = GetLinePtr(sy);
+					b = &CodeBuffW[ptr];
+				}
+				else {
+					// 検索打ち切り
+					sx = NumOfColumns - 1;
+					break;
+				}
+			}
+		}
+		else {
+			sx += b->cell;
+			b += b->cell;
+			if (sx > NumOfColumns - 1) {
+				// はみ出すのはおかしい
+				sx = NumOfColumns - 1;
+			}
+		}
+
+		// 区切り文字 or cell数が変化した
+		if (start_delimiter != IsDelimiter(ptr, sx) ||
+			(ts.DelimDBCS != 0 && ((b->cell == 1) != start_cell))) {
+			// 区切り文字 or cell数が変化した
+			sx = px;
+			sy = py;
+			break;
+		}
+	}
+	*destx = sx;
+	*desty = sy;
+}
+
 void BuffDblClk(int Xw, int Yw)
 //  Select a word at (Xw, Yw) by mouse double click
 //    Xw: horizontal position in window coordinate (pixels)
 //    Yw: vertical
 {
 	int X, Y, YStart, YEnd;
-	int IStart, IEnd, i;
+	int IStart, IEnd;
 	LONG TmpPtr;
-	BYTE b;
-	BOOL DBCS;
 
 	CaretOff();
 
@@ -4148,157 +4298,20 @@ void BuffDblClk(int Xw, int Yw)
 		IEnd = IStart;
 		YStart = YEnd = Y;
 
-		if (IsDelimiter(TmpPtr,IStart)) {
-			b = CodeBuffW[TmpPtr+IStart].ansi_char;
-			DBCS = (CodeBuffW[TmpPtr+IStart].attr & AttrKanji) != 0;
-			while ((b==CodeBuffW[TmpPtr+IStart].ansi_char) ||
-			       (DBCS &&
-					((CodeBuffW[TmpPtr+IStart].attr & AttrKanji)!=0))) {
-				MoveCharPtr(TmpPtr,&IStart,-1); // move left
-				if (ts.EnableContinuedLineCopy) {
-					if (IStart<=0) {
-						// 左端の場合
-						if (YStart>0 && CodeBuffW[TmpPtr].attr & AttrLineContinued) {
-							// 前の行に移動する
-							YStart--;
-							TmpPtr = GetLinePtr(YStart);
-							IStart = NumOfColumns;
-						}
-						else {
-							break;
-						}
-					}
-				}
-				else {
-					if (IStart<=0) {
-						// 左端の場合は終わり
-						break;
-					}
-				}
-			}
-			if ((b!=CodeBuffW[TmpPtr+IStart].ansi_char) &&
-			    ! (DBCS && ((CodeBuffW[TmpPtr+IStart].attr & AttrKanji)!=0))) {
-				// 最終位置が Delimiter でない場合にはひとつ右にずらす
-				if (ts.EnableContinuedLineCopy && IStart == NumOfColumns-1) {
-					// 右端の場合には次の行へ移動する
-					YStart++;
-					TmpPtr = GetLinePtr(YStart);
-					IStart = 0;
-				}
-				else {
-					MoveCharPtr(TmpPtr,&IStart,1);
-				}
-			}
+		{
+			int dest_x;
+			int dest_y;
 
-			// 行が移動しているかもしれないので、クリックした行を取り直す
-			TmpPtr = GetLinePtr(YEnd);
-			i = 1;
-			while (((b==CodeBuffW[TmpPtr+IEnd].ansi_char) ||
-			        (DBCS &&
-					 ((CodeBuffW[TmpPtr+IEnd].attr & AttrKanji)!=0)))) {
-				i = MoveCharPtr(TmpPtr,&IEnd,1); // move right
-				if (ts.EnableContinuedLineCopy) {
-					if (i==0) {
-						// 右端の場合
-						if (YEnd<BuffEnd &&
-							CodeBuffW[TmpPtr+IEnd+1+DBCS].attr & AttrLineContinued) {
-							// 次の行に移動する
-							YEnd++;
-							TmpPtr = GetLinePtr(YEnd);
-							IEnd = 0;
-						}
-						else {
-							break;
-						}
-					}
-				}
-				else {
-					if (i==0) {
-						// 右端の場合は終わり
-						break;
-					}
-				}
-			}
-		}
-		else {
-			while (! IsDelimiter(TmpPtr,IStart)) {
-				MoveCharPtr(TmpPtr,&IStart,-1); // move left
-				if (ts.EnableContinuedLineCopy) {
-					if (IStart<=0) {
-						// 左端の場合
-						if (YStart>0 && CodeBuffW[TmpPtr].attr & AttrLineContinued) {
-							// 前の行に移動する
-							YStart--;
-							TmpPtr = GetLinePtr(YStart);
-							IStart = NumOfColumns;
-						}
-						else {
-							break;
-						}
-					}
-				}
-				else {
-					if (IStart<=0) {
-						// 左端の場合は終わり
-						break;
-					}
-				}
-			}
-			if (IsDelimiter(TmpPtr,IStart)) {
-				// 最終位置が Delimiter の場合にはひとつ右にずらす
-				if (ts.EnableContinuedLineCopy && IStart == NumOfColumns-1) {
-					// 右端の場合には次の行へ移動する
-					YStart++;
-					TmpPtr = GetLinePtr(YStart);
-					IStart = 0;
-				}
-				else {
-					MoveCharPtr(TmpPtr,&IStart,1);
-				}
-			}
+			// 前方の区切りを探す
+			SearchDelimiterPrev(IStart, YStart, TRUE, &dest_x, &dest_y);
+			IStart = dest_x;
+			YStart = dest_y;
 
-			// 行が移動しているかもしれないので、クリックした行を取り直す
-			TmpPtr = GetLinePtr(YEnd);
-			i = 1;
-			while (! IsDelimiter(TmpPtr,IEnd)) {
-				i = MoveCharPtr(TmpPtr,&IEnd,1); // move right
-				if (ts.EnableContinuedLineCopy) {
-					if (i==0) {
-						// 右端の場合
-						if (YEnd<BuffEnd && CodeBuffW[TmpPtr+IEnd+1].attr & AttrLineContinued) {
-							// 次の行に移動する
-							YEnd++;
-							TmpPtr = GetLinePtr(YEnd);
-							IEnd = 0;
-						}
-						else {
-							break;
-						}
-					}
-				}
-				else {
-					if (i==0) {
-						// 右端の場合は終わり
-						break;
-					}
-				}
-			}
+			// 後方の区切りを探す
+			SearchDelimiterNext(IEnd, YEnd, TRUE, &dest_x, &dest_y);
+			IEnd = dest_x + 1; // 終端の一つ後ろ
+			YEnd = dest_y;
 		}
-		if (ts.EnableContinuedLineCopy) {
-			if (IEnd == 0) {
-				// 左端の場合には前の行へ移動する
-				YEnd--;
-				IEnd = NumOfColumns;
-			}
-			else if (i==0) {
-				IEnd = NumOfColumns;
-			}
-		}
-		else {
-			if (i==0)
-				IEnd = NumOfColumns;
-		}
-
 		SelectStart.x = IStart;
 		SelectStart.y = YStart;
 		SelectEnd.x = IEnd;
@@ -4421,96 +4434,6 @@ void BuffStartSelect(int Xw, int Yw, BOOL Box)
 	BoxSelect = Box;
 }
 
-/**
- *	文字の区切り(Delimiter)を探す,前方
- *
- *	@param[in]	sx	スタート
- *	@param[in]	sy
- *	@param[in]	destx	見つけた位置
- *	@param[in]	dexty
- */
-static void SearchDelimiterPrev(int sx, int sy, int *destx, int *desty)
-{
-	LONG ptr = GetLinePtr(sy);
-	const buff_char_t *b;
-	BOOL start_delimiter;
-	int start_cell;
-
-	sx = LeftHalfOfDBCS(ptr, sx);
-	b = CodeBuffW + ptr + sx;
-	assert(b->Padding == FALSE);
-	start_delimiter = IsDelimiter(ptr, sx);
-	start_cell = b->cell;
-
-	while (sx > 0) {
-		int x = sx;
-		sx--;
-		b--;
-		while (b->Padding == TRUE) {
-			sx--;
-			b--;
-			if (sx < 0) {
-				// 行頭が Padding はないはず
-				assert(0);
-				sx = 0;
-				break;
-			}
-		}
-		if (sx <= 0) {
-			sx = 0;
-			break;
-		}
-		if (start_delimiter != IsDelimiter(ptr, sx) || b->cell != start_cell) {
-			// 区切り文字 or cell数が変化した
-			sx = x;
-			break;
-		}
-	}
-	*destx = sx;
-	*desty = sy;
-}
-
-/**
- *	文字の区切り(Delimiter)を探す,後方
- *
- *	@param[in]	sx	スタート
- *	@param[in]	sy
- *	@param[in]	destx	見つけた位置
- *	@param[in]	dexty
- */
-static void SearchDelimiterNext(int sx, int sy, int *destx, int *desty)
-{
-	LONG ptr = GetLinePtr(sy);
-	const buff_char_t *b = CodeBuffW + ptr + sx;
-	BOOL start_delimiter = IsDelimiter(ptr, sx);
-	int start_cell = b->cell;
-
-	for (;;) {
-		int x = sx;
-		sx++;
-		b++;
-		while (b->Padding == TRUE) {
-			sx++;
-			b++;
-			if (sx >= NumOfColumns - 1) {
-				sx = NumOfColumns - 1;
-				break;
-			}
-		}
-		if (sx >= NumOfColumns - 1) {
-			sx = NumOfColumns - 1;
-			break;
-		}
-		if (start_delimiter != IsDelimiter(ptr, sx) || b->cell != start_cell) {
-			// 区切り文字 or cell数が変化した
-			sx = x;
-			break;
-		}
-	}
-	*destx = sx;
-	*desty = sy;
-}
-
 void BuffChangeSelect(int Xw, int Yw, int NClick)
 //  Change selection region by mouse move
 //    Xw: horizontal position of the mouse cursor
@@ -4572,7 +4495,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 			// ダブルクリック選択領域より前を選択
 			int dest_x;
 			int dest_y;
-			SearchDelimiterPrev(X, Y, &dest_x, &dest_y);
+			SearchDelimiterPrev(X, Y, DOUBLD_CLICK_SELECT_LINE_CONTINUE, &dest_x, &dest_y);
 			SelectEnd.x = dest_x;
 			SelectEnd.y = dest_y;
 			SelectStart = DblClkEnd;
@@ -4581,7 +4504,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 			// ダブルクリック選択領域より後ろを選択
 			int dest_x;
 			int dest_y;
-			SearchDelimiterNext(X, Y, &dest_x, &dest_y);
+			SearchDelimiterNext(X, Y, DOUBLD_CLICK_SELECT_LINE_CONTINUE, &dest_x, &dest_y);
 			SelectEnd.x = dest_x + 1;
 			SelectEnd.y = dest_y;
 			SelectStart = DblClkStart;
