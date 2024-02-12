@@ -4109,6 +4109,96 @@ BOOL BuffUrlDblClk(int Xw, int Yw)
 	return url_invoked;
 }
 
+/**
+ *	文字の区切り(Delimiter)を探す,前方
+ *
+ *	@param[in]	sx	スタート
+ *	@param[in]	sy
+ *	@param[in]	destx	見つけた位置
+ *	@param[in]	dexty
+ */
+static void SearchDelimiterPrev(int sx, int sy, int *destx, int *desty)
+{
+	LONG ptr = GetLinePtr(sy);
+	const buff_char_t *b;
+	BOOL start_delimiter;
+	int start_cell;
+
+	sx = LeftHalfOfDBCS(ptr, sx);
+	b = CodeBuffW + ptr + sx;
+	assert(b->Padding == FALSE);
+	start_delimiter = IsDelimiter(ptr, sx);
+	start_cell = b->cell;
+
+	while (sx > 0) {
+		int x = sx;
+		sx--;
+		b--;
+		while (b->Padding == TRUE) {
+			sx--;
+			b--;
+			if (sx < 0) {
+				// 行頭が Padding はないはず
+				assert(0);
+				sx = 0;
+				break;
+			}
+		}
+		if (sx <= 0) {
+			sx = 0;
+			break;
+		}
+		if (start_delimiter != IsDelimiter(ptr, sx) || b->cell != start_cell) {
+			// 区切り文字 or cell数が変化した
+			sx = x;
+			break;
+		}
+	}
+	*destx = sx;
+	*desty = sy;
+}
+
+/**
+ *	文字の区切り(Delimiter)を探す,後方
+ *
+ *	@param[in]	sx	スタート
+ *	@param[in]	sy
+ *	@param[in]	destx	見つけた位置
+ *	@param[in]	dexty
+ */
+static void SearchDelimiterNext(int sx, int sy, int *destx, int *desty)
+{
+	LONG ptr = GetLinePtr(sy);
+	const buff_char_t *b = CodeBuffW + ptr + sx;
+	BOOL start_delimiter = IsDelimiter(ptr, sx);
+	int start_cell = b->cell;
+
+	for (;;) {
+		int x = sx;
+		sx++;
+		b++;
+		while (b->Padding == TRUE) {
+			sx++;
+			b++;
+			if (sx >= NumOfColumns - 1) {
+				sx = NumOfColumns - 1;
+				break;
+			}
+		}
+		if (sx >= NumOfColumns - 1) {
+			sx = NumOfColumns - 1;
+			break;
+		}
+		if (start_delimiter != IsDelimiter(ptr, sx) || b->cell != start_cell) {
+			// 区切り文字 or cell数が変化した
+			sx = x;
+			break;
+		}
+	}
+	*destx = sx;
+	*desty = sy;
+}
+
 void BuffDblClk(int Xw, int Yw)
 //  Select a word at (Xw, Yw) by mouse double click
 //    Xw: horizontal position in window coordinate (pixels)
@@ -4419,96 +4509,6 @@ void BuffStartSelect(int Xw, int Yw, BOOL Box)
 	CaretOff();
 	Selected = TRUE;
 	BoxSelect = Box;
-}
-
-/**
- *	文字の区切り(Delimiter)を探す,前方
- *
- *	@param[in]	sx	スタート
- *	@param[in]	sy
- *	@param[in]	destx	見つけた位置
- *	@param[in]	dexty
- */
-static void SearchDelimiterPrev(int sx, int sy, int *destx, int *desty)
-{
-	LONG ptr = GetLinePtr(sy);
-	const buff_char_t *b;
-	BOOL start_delimiter;
-	int start_cell;
-
-	sx = LeftHalfOfDBCS(ptr, sx);
-	b = CodeBuffW + ptr + sx;
-	assert(b->Padding == FALSE);
-	start_delimiter = IsDelimiter(ptr, sx);
-	start_cell = b->cell;
-
-	while (sx > 0) {
-		int x = sx;
-		sx--;
-		b--;
-		while (b->Padding == TRUE) {
-			sx--;
-			b--;
-			if (sx < 0) {
-				// 行頭が Padding はないはず
-				assert(0);
-				sx = 0;
-				break;
-			}
-		}
-		if (sx <= 0) {
-			sx = 0;
-			break;
-		}
-		if (start_delimiter != IsDelimiter(ptr, sx) || b->cell != start_cell) {
-			// 区切り文字 or cell数が変化した
-			sx = x;
-			break;
-		}
-	}
-	*destx = sx;
-	*desty = sy;
-}
-
-/**
- *	文字の区切り(Delimiter)を探す,後方
- *
- *	@param[in]	sx	スタート
- *	@param[in]	sy
- *	@param[in]	destx	見つけた位置
- *	@param[in]	dexty
- */
-static void SearchDelimiterNext(int sx, int sy, int *destx, int *desty)
-{
-	LONG ptr = GetLinePtr(sy);
-	const buff_char_t *b = CodeBuffW + ptr + sx;
-	BOOL start_delimiter = IsDelimiter(ptr, sx);
-	int start_cell = b->cell;
-
-	for (;;) {
-		int x = sx;
-		sx++;
-		b++;
-		while (b->Padding == TRUE) {
-			sx++;
-			b++;
-			if (sx >= NumOfColumns - 1) {
-				sx = NumOfColumns - 1;
-				break;
-			}
-		}
-		if (sx >= NumOfColumns - 1) {
-			sx = NumOfColumns - 1;
-			break;
-		}
-		if (start_delimiter != IsDelimiter(ptr, sx) || b->cell != start_cell) {
-			// 区切り文字 or cell数が変化した
-			sx = x;
-			break;
-		}
-	}
-	*destx = sx;
-	*desty = sy;
 }
 
 void BuffChangeSelect(int Xw, int Yw, int NClick)
