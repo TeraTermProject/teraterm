@@ -13,36 +13,12 @@
 
 <p>
 左マウスボタンで単語をダブルクリックすると、その単語を選択することができます。<br>
-設定ファイルの [Tera Term] セクションの DelimList 行を以下のように変更することによって単語の区切り文字を指定することができます。
-</p>
 
-<pre>
-DelimList=&lt;区切り文字のリスト&gt;
-</pre>
+単語の区切り文字は <a href="../../menu/setup-additional.html#DelimiterChar">Delimiter characters</a> で指定します。
 
 <p>
-例えば、
-</p>
-
-<pre>
-DelimList=&lt;&gt;()[]
-</pre>
-
-<p>
-は6つの区切り文字 "&lt;", "&gt;", "(", ")", "[", "]" を指定します。
-ただし、スペース文字と "$" はそれぞれ、"$20", "$24" という形式で指定しなければなりません。
-</p>
-
-<pre>
-DelimList=$20 ; スペース文字
-
-省略時:
-DelimList=$20!"#$24%&amp;'()*+,-./:;&lt;=&gt;?@[\]^`{|}~
-</pre>
-
-<p>
-この "DelimList" 行には、1バイトコード文字(いわゆる半角文字)しか指定できません。2バイトコード文字(いわゆる全角文字)は区切り文字として取り扱われます。<br>
-2バイトコード文字を区切り文字としないようにするには、DelimDBCS 行を以下のように変更してください。
+デフォルトでは1cellで表示されている文字と2cell以上(漢字や絵文字など)で表示されている文字の間を区切りとします。<br>
+設定ファイルの [Tera Term] セクションの <a href="../../setup/teraterm-win.html#delimiter">DelimDBCS</a> を off にすると区切りとなりません。
 </p>
 
 <pre>
@@ -51,19 +27,6 @@ DelimDBCS=off
 省略時:
 DelimDBCS=on
 </pre>
-
-<p>
-以前のバージョンの Tera Term と単語選択の仕方を同じにするには、
-</p>
-
-<pre>
-DelimList=$20
-DelimDBCS=off
-</pre>
-
-<p>
-としてください。
-</p>
 
 </BODY>
 </HTML>

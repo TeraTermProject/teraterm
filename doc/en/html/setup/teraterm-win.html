@@ -58,7 +58,8 @@ DelimList=$20!"#$24%&amp;'()*+,-./:;&lt;=&gt;?@[\]^`{|}~
 </pre>
 
 <p>
-In the DelimList line, only singe-byte code characters can be specified. Double-byte code characters (Japanese kanji) are regarded as delimiters. You can make them be non-delimiters by editing the DelimDBCS line like the following:
+By default, delimit between one cell characters and two cells or more characters (such as kanji or emojis).<br>
+Setting off DelimDBCS in the [Tera Term] section of the configuration file will disable the delimiter.
 </p>
 
 <pre>
@@ -69,16 +70,6 @@ DelimDBCS=off
 Default:
 DelimDBCS=on
 </pre>
-
-<p>
-If you prefer the word selection behavior of earlier Tera Term versions, specify like the following:
-</p>
-
-<pre>
-DelimList=$20
-DelimDBCS=off
-</pre>
-
 
 <h1 id="popup">Disabling the pop-up menu</h1>
 
