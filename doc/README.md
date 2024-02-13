@@ -27,3 +27,10 @@
     - Markdown_1.0.1/
         - markdown 変換スクリプト
             - https://daringfireball.net/projects/markdown/
+- linkchecker.bat
+    - htmlドキュメント内のリンクをチェック
+    - [linkchecker](https://github.com/saoyagi2/linkchecker)を使用
+    - 次のパッケージを事前にインストールしておく
+      - cygwinのperl時
+        - perl-XML-Parser
+    - `linkchecker.bat`を実行する
