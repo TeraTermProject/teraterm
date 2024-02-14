@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2023-12-02)
+﻿; Updated by TeraTerm Project (2024-02-14)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -237,6 +237,7 @@ DLG_TAB_COPYPASTE_DELIMITER=Caractères délimiteurs
 DLG_TAB_COPYPASTE_PASTEDELAY=Délai avant de coller la ligne
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated by mouse
+DLG_TAB_COPYPASTE_AUTO_TEXT_COPY=Cop&y to windows clipboard when text is selected
 
 DLG_TAB_VISUAL_ALPHA=Fenêtre opacité
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active

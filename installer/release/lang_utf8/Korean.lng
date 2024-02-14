@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2023-12-02)
+﻿; Updated by TeraTerm Project (2024-02-14)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -237,6 +237,7 @@ DLG_TAB_COPYPASTE_DELIMITER=구분자 문자(&I)
 DLG_TAB_COPYPASTE_PASTEDELAY=줄당 붙여넣기 지연(&A)
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Ena&bling text selection when the window is activated by mouse
+DLG_TAB_COPYPASTE_AUTO_TEXT_COPY=Cop&y to windows clipboard when text is selected
 
 DLG_TAB_VISUAL_ALPHA=불투명
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active

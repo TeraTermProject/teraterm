@@ -517,7 +517,8 @@ void CCopypastePropPageDlg::OnInitDialog()
 		{ IDC_DELIMITER, "DLG_TAB_COPYPASTE_DELIMITER" },
 		{ IDC_PASTEDELAY_LABEL, "DLG_TAB_COPYPASTE_PASTEDELAY" },
 		{ IDC_PASTEDELAY_LABEL2, "DLG_TAB_COPYPASTE_PASTEDELAY2" },
-		{ IDC_SELECT_ON_ACTIVATE, "DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE" }
+		{ IDC_SELECT_ON_ACTIVATE, "DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE" },
+		{ IDC_AUTO_TEXT_COPY, "DLG_TAB_COPYPASTE_AUTO_TEXT_COPY" },
 	};
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
@@ -566,6 +567,9 @@ void CCopypastePropPageDlg::OnInitDialog()
 
 	// (10) SelectOnActivate
 	SetCheck(IDC_SELECT_ON_ACTIVATE, ts.SelOnActive ? BST_CHECKED : BST_UNCHECKED);
+
+	// (11) auto text copy
+	SetCheck(IDC_AUTO_TEXT_COPY, ts.AutoTextCopy ? BST_CHECKED : BST_UNCHECKED);
 
 	// ダイアログにフォーカスを当てる
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_LINECOPY));
@@ -680,6 +684,9 @@ void CCopypastePropPageDlg::OnOK()
 
 	// (10) SelectOnActivate
 	ts.SelOnActive = (GetCheck(IDC_SELECT_ON_ACTIVATE) == BST_CHECKED);
+
+	// (11) auto text copy
+	ts.AutoTextCopy = (GetCheck(IDC_AUTO_TEXT_COPY) == BST_CHECKED);
 }
 
 void CCopypastePropPageDlg::OnHelp()
