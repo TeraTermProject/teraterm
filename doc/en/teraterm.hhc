@@ -168,11 +168,6 @@
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 			<LI><OBJECT type="text/sitemap">
-				<param name="Name" value="Delimiter character of word selected by double-click">
-				<param name="Local" value="html/usage/tips/double-click.html">
-				<param name="ImageNumber" value="11">
-				</OBJECT>
-			<LI><OBJECT type="text/sitemap">
 				<param name="Name" value="Transfer the file via the intermediate server">
 				<param name="Local" value="html/usage/tips/forwarding-files.html">
 				<param name="ImageNumber" value="11">

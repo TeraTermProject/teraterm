@@ -168,11 +168,6 @@
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 			<LI><OBJECT type="text/sitemap">
-				<param name="Name" value="ダブルクリックによる単語選択の区切り文字">
-				<param name="Local" value="html/usage/tips/double-click.html">
-				<param name="ImageNumber" value="11">
-				</OBJECT>
-			<LI><OBJECT type="text/sitemap">
 				<param name="Name" value="中間ホストを経由してホストに接続した場合のファイル転送">
 				<param name="Local" value="html/usage/tips/forwarding-files.html">
 				<param name="ImageNumber" value="11">
