@@ -270,6 +270,9 @@
     <ClCompile Include="..\ttptek\tttek.c">
       <Filter>ttptek</Filter>
     </ClCompile>
+    <ClCompile Include="theme_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -578,6 +581,9 @@
     </ClInclude>
     <ClInclude Include="..\ttptek\tttek.h">
       <Filter>ttptek</Filter>
+    </ClInclude>
+    <ClInclude Include="theme_pp.h">
+      <Filter>dialog</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

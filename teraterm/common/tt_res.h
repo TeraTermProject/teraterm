@@ -130,6 +130,8 @@
 #define IDC_PROTOFNAME                  2301
 #define IDD_TABSHEET_COPYPASTE          2301
 #define IDC_PROTOPROT                   2302
+#define IDD_TABSHEET_VISUAL1            2302
+#define IDD_TABSHEET_THEME              2302
 #define IDC_PROTOPKTNUM                 2303
 #define IDC_PROTOBYTECOUNT              2304
 #define IDC_PROTOPERCENT                2305

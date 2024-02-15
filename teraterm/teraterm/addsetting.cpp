@@ -58,6 +58,7 @@
 #include "theme.h"
 #include "ttcmn_notify2.h"
 #include "filesys_log.h"	// for FLogGetLogFilenameBase()
+#include "theme_pp.h"
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -775,7 +776,6 @@ void CVisualPropPageDlg::OnInitDialog()
 		{ IDC_ENABLE_ATTR_COLOR_URL, "DLG_TAB_VISUAL_URL_COLOR" },			// URL Attribute
 		{ IDC_ENABLE_ATTR_FONT_URL, "DLG_TAB_VISUAL_URL_FONT" },
 		{ IDC_ENABLE_ANSI_COLOR, "DLG_TAB_VISUAL_ANSI" },
-		{ IDC_CHECK_FAST_SIZE_MOVE, "DLG_TAB_VISUAL_FAST_SIZE_MOVE" },
 	};
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
@@ -804,27 +804,7 @@ void CVisualPropPageDlg::OnInitDialog()
 	EnableDlgItem(IDC_ALPHA_BLEND_INACTIVE, isLayeredWindowSupported);
 	EnableDlgItem(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, isLayeredWindowSupported);
 
-	// (2) theme file
-	{
-		const static I18nTextInfo theme_select[] = {
-			{ "DLG_TAB_VISUAL_THEME_STARTUP_NO_USE", L"no use" },
-			{ "DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME", L"fixed theme file" },
-			{ "DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME", L"random theme file" },
-		};
-
-		int sel = ts.EtermLookfeel.BGEnable;
-		if (sel < 0) sel = 0;
-		if (sel > 2) sel = 2;
-		SetI18nListW("Tera Term", m_hWnd, IDC_THEME_FILE, theme_select, _countof(theme_select),
-					 ts.UILanguageFileW, sel);
-		BOOL enable = (sel == 1) ? TRUE : FALSE;
-		EnableDlgItem(IDC_THEME_EDIT, enable);
-		EnableDlgItem(IDC_THEME_BUTTON, enable);
-
-		SetDlgItemTextW(IDC_THEME_EDIT, ts.EtermLookfeel.BGThemeFileW);
-	}
-
-	// (3)Mouse cursor type
+	// (2)Mouse cursor type
 	int sel = 0;
 	for (int i = 0 ; MouseCursor[i].name ; i++) {
 		const char *name = MouseCursor[i].name;
@@ -835,7 +815,7 @@ void CVisualPropPageDlg::OnInitDialog()
 	}
 	SetCurSel(IDC_MOUSE_CURSOR, sel);
 
-	// (4)Font quality
+	// (3)Font quality
 	switch (ts.FontQuality) {
 		case DEFAULT_QUALITY:
 			SetCurSel(IDC_FONT_QUALITY, 0);
@@ -851,7 +831,7 @@ void CVisualPropPageDlg::OnInitDialog()
 			break;
 	}
 
-	// (5)ANSI color
+	// (4)ANSI color
 	for (int i = 0; i < 16; i++) {
 		ANSIColor[i] = ts.ANSIColor[i];
 	}
@@ -864,14 +844,14 @@ void CVisualPropPageDlg::OnInitDialog()
 	SendDlgItemMessage(IDC_ANSI_COLOR, LB_SETCURSEL, 0, 0);
 	::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 
-	// (6)Bold Attr Color
+	// (5)Bold Attr Color
 	SetCheck(IDC_ENABLE_ATTR_COLOR_BOLD, (ts.ColorFlag&CF_BOLDCOLOR) != 0);
 	SetCheck(IDC_ENABLE_ATTR_FONT_BOLD, (ts.FontFlag&FF_BOLD) != 0);
 
-	// (7)Blink Attr Color
+	// (6)Blink Attr Color
 	SetCheck(IDC_ENABLE_ATTR_COLOR_BLINK, (ts.ColorFlag&CF_BLINKCOLOR) != 0);
 
-	// (8)Reverse Attr Color
+	// (7)Reverse Attr Color
 	SetCheck(IDC_ENABLE_ATTR_COLOR_REVERSE, (ts.ColorFlag&CF_REVERSECOLOR) != 0);
 
 	// Underline Attr
@@ -885,7 +865,6 @@ void CVisualPropPageDlg::OnInitDialog()
 	// Color
 	SetCheck(IDC_ENABLE_ANSI_COLOR, (ts.ColorFlag&CF_ANSICOLOR) != 0);
 
-	SetCheck(IDC_CHECK_FAST_SIZE_MOVE, ts.EtermLookfeel.BGFastSizeMove != 0);
 	SetCheck(IDC_CHECK_FLICKER_LESS_MOVE, ts.EtermLookfeel.BGNoCopyBits != 0);
 
 	// ウィンドウの角を丸くしない
@@ -900,10 +879,6 @@ void CVisualPropPageDlg::OnInitDialog()
 			EnableDlgItem(IDC_CHECK_CORNERDONTROUND, FALSE);
 		}
 	}
-
-	SetCheck(IDC_THEME_ENABLE, ThemeIsEnabled() ? BST_CHECKED : BST_UNCHECKED);
-
-	SetDlgItemTextW(IDC_SPIPATH_EDIT, ts.EtermLookfeel.BGSPIPathW);
 
 	// ダイアログにフォーカスを当てる
 	::SetFocus(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE));
@@ -974,44 +949,6 @@ static void OpacityTooltip(CTipWin* tip, HWND hDlg, int trackbar, int pos, const
 BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
-		case IDC_THEME_EDITOR_BUTTON | (BN_CLICKED << 16): {
-			ThemeDialog(m_hInst, m_hWnd, &cv);
-			break;
-		}
-		case IDC_THEME_FILE | (CBN_SELCHANGE << 16): {
-			int r = GetCurSel(IDC_THEME_FILE);
-			// 固定のとき、ファイル名を入力できるようにする
-			BOOL enable = (r == 1) ? TRUE : FALSE;
-			EnableDlgItem(IDC_THEME_EDIT, enable);
-			EnableDlgItem(IDC_THEME_BUTTON, enable);
-			break;
-		}
-		case IDC_THEME_BUTTON | (BN_CLICKED << 16): {
-			// テーマファイルを選択する
-			wchar_t *theme_file;
-			hGetDlgItemTextW(m_hWnd, IDC_THEME_EDIT, &theme_file);
-
-			wchar_t *theme_dir;
-			aswprintf(&theme_dir, L"%s\\theme", ts.HomeDirW);
-
-			TTOPENFILENAMEW ofn = {};
-			ofn.hwndOwner = m_hWnd;
-			ofn.lpstrFilter = L"Theme Files(*.ini)\0*.ini\0All Files(*.*)\0*.*\0";
-			ofn.lpstrTitle = L"select theme file";
-			ofn.lpstrFile = theme_file;
-			ofn.lpstrInitialDir = theme_dir;
-			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-			wchar_t *filename;
-			BOOL ok = TTGetOpenFileNameW(&ofn, &filename);
-			if (ok) {
-				SetDlgItemTextW(IDC_THEME_EDIT, filename);
-				free(filename);
-			}
-			free(theme_dir);
-			free(theme_file);
-			return TRUE;
-		}
-
 		case IDC_ANSI_COLOR | (LBN_SELCHANGE << 16): {
 			int sel = (int)SendDlgItemMessage(IDC_ANSI_COLOR, LB_GETCURSEL, 0, 0);
 			if (sel != -1) {
@@ -1100,34 +1037,6 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				OpacityTooltip(TipWin, m_hWnd, IDC_ALPHA_BLEND_INACTIVE, pos, ts.UILanguageFileW);
 				return TRUE;
 			}
-		case IDC_SPIPATH_BUTTON | (BN_CLICKED << 16): {
-			wchar_t *def;
-			hGetDlgItemTextW(m_hWnd, IDC_SPIPATH_EDIT, &def);
-			if (GetFileAttributesW(def) == INVALID_FILE_ATTRIBUTES) {
-				// フォルダが存在しない(入力途中?,TT4から移行?)
-				static const TTMessageBoxInfoW info = {
-					"Tera Term",
-					"MSG_TT_NOTICE", L"Tera Term: Notice",
-					NULL, L"'%s' not exist\nUse home folder",
-					MB_OK };
-				TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW, def);
-				free(def);
-				def = _wcsdup(ts.HomeDirW);
-			}
-
-			TTBROWSEINFOW bi = {};
-			bi.hwndOwner = m_hWnd;
-			bi.lpszTitle = L"Select Susie Plugin path";
-			bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_EDITBOX | BIF_NEWDIALOGSTYLE;
-
-			wchar_t *folder;
-			if (TTSHBrowseForFolderW(&bi, def, &folder)) {
-				SetDlgItemTextW(IDC_SPIPATH_EDIT, folder);
-				free(folder);
-			}
-			free(def);
-			break;
-		}
 	}
 
 	return TTCPropertyPage::OnCommand(wParam, lParam);
@@ -1196,49 +1105,13 @@ void CVisualPropPageDlg::OnOK()
 		(i < 0) ? 0 :
 		(BYTE)((i > 255) ? 255 : i);
 
-	// (2) テーマファイル選択
-	{
-		int r = GetCurSel(IDC_THEME_FILE);
-		switch (r) {
-		default:
-			assert(FALSE);
-			// fall through
-		case 0:
-			ts.EtermLookfeel.BGEnable = 0;
-			break;
-		case 1: {
-			// テーマファイル指定
-			ts.EtermLookfeel.BGEnable = 1;
-
-			wchar_t* theme_file;
-			hGetDlgItemTextW(m_hWnd, IDC_THEME_EDIT, &theme_file);
-
-			if (ts.EtermLookfeel.BGThemeFileW != NULL) {
-				free(ts.EtermLookfeel.BGThemeFileW);
-			}
-			ts.EtermLookfeel.BGThemeFileW = theme_file;
-			break;
-		}
-		case 2: {
-			// ランダムテーマ
-			ts.EtermLookfeel.BGEnable = 2;
-			if (ts.EtermLookfeel.BGThemeFileW != NULL) {
-				free(ts.EtermLookfeel.BGThemeFileW);
-			}
-			ts.EtermLookfeel.BGThemeFileW = NULL;
-			break;
-		}
-		}
-	}
-
-
-	// (3)
+	// (2)
 	sel = GetCurSel(IDC_MOUSE_CURSOR);
 	if (sel >= 0 && sel < MOUSE_CURSOR_MAX) {
 		strncpy_s(ts.MouseCursorName, sizeof(ts.MouseCursorName), MouseCursor[sel].name, _TRUNCATE);
 	}
 
-	// (4)Font quality
+	// (3)Font quality
 	switch (GetCurSel(IDC_FONT_QUALITY)) {
 		case 0:
 			ts.FontQuality = DEFAULT_QUALITY;
@@ -1256,7 +1129,7 @@ void CVisualPropPageDlg::OnOK()
 			break;
 	}
 
-	// (6) Attr Bold Color
+	// (5) Attr Bold Color
 	if (((ts.ColorFlag & CF_BOLDCOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_BOLD)) {
 		ts.ColorFlag ^= CF_BOLDCOLOR;
 	}
@@ -1264,12 +1137,12 @@ void CVisualPropPageDlg::OnOK()
 		ts.FontFlag ^= FF_BOLD;
 	}
 
-	// (7) Attr Blink Color
+	// (6) Attr Blink Color
 	if (((ts.ColorFlag & CF_BLINKCOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_BLINK)) {
 		ts.ColorFlag ^= CF_BLINKCOLOR;
 	}
 
-	// (8) Attr Reverse Color
+	// (7) Attr Reverse Color
 	if (((ts.ColorFlag & CF_REVERSECOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_REVERSE)) {
 		ts.ColorFlag ^= CF_REVERSECOLOR;
 	}
@@ -1295,7 +1168,6 @@ void CVisualPropPageDlg::OnOK()
 		ts.ColorFlag ^= CF_ANSICOLOR;
 	}
 
-	ts.EtermLookfeel.BGFastSizeMove = GetCheck(IDC_CHECK_FAST_SIZE_MOVE);
 	ts.EtermLookfeel.BGNoCopyBits = GetCheck(IDC_CHECK_FLICKER_LESS_MOVE);
 
 	// ウィンドウの角を丸くしない
@@ -1338,20 +1210,6 @@ void CVisualPropPageDlg::OnOK()
 			ThemeSetColor(&color);
 		}
 	}
-
-	if ((GetCheck(IDC_THEME_ENABLE) == BST_CHECKED) && ThemeIsEnabled() == FALSE) {
-		// テーマをenableにする
-		ThemeEnable(TRUE);
-	}
-	else if ((GetCheck(IDC_THEME_ENABLE) == BST_UNCHECKED) && ThemeIsEnabled() == TRUE) {
-		// テーマをdisableにする
-		ThemeEnable(FALSE);
-	}
-
-	wchar_t *spi_path;
-	hGetDlgItemTextW(m_hWnd, IDC_SPIPATH_EDIT, &spi_path);
-	free(ts.EtermLookfeel.BGSPIPathW);
-	ts.EtermLookfeel.BGSPIPathW = spi_path;
 }
 
 void CVisualPropPageDlg::OnHelp()
@@ -2293,6 +2151,8 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 	page = CodingPageCreate(hInstance, &ts);
 	AddPage(page);
 	page = FontPageCreate(hInstance, &ts);
+	AddPage(page);
+	page = ThemePageCreate(hInstance, &ts);
 	AddPage(page);
 
 	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFileW);

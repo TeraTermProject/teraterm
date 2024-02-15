@@ -519,7 +519,12 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Visual tab/theme">
+					<param name="Name" value="theme tab">
+					<param name="Local" value="html\menu\setup-additional-theme.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="theme editor">
 					<param name="Local" value="html\menu\setup-additional-visual-theme.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>

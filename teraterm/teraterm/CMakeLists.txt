@@ -120,6 +120,8 @@ set(SRC_DIALOG
   sendfiledlg.h
   setupdirdlg.cpp
   setupdirdlg.h
+  theme_pp.cpp
+  theme_pp.h
   themedlg.cpp
   themedlg.h
   themedlg.rc

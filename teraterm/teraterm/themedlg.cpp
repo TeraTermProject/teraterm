@@ -416,7 +416,7 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				break;
 			}
 			case PSN_HELP:
-				OpenHelpCV(dlg_data->pcv, HH_HELP_CONTEXT, HlpMenuSetupAdditionalTheme);
+				OpenHelpCV(dlg_data->pcv, HH_HELP_CONTEXT, HlpMenuSetupThemeEditor);
 				break;
 			case PSN_KILLACTIVE: {
 				ReadFromDialog(hWnd, &dlg_data->BGTab.bg_theme);
@@ -746,7 +746,7 @@ static INT_PTR CALLBACK ColorThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp
 			break;
 		}
 		case PSN_HELP:
-			OpenHelpCV(dlg_data->pcv, HH_HELP_CONTEXT, HlpMenuSetupAdditionalTheme);
+			OpenHelpCV(dlg_data->pcv, HH_HELP_CONTEXT, HlpMenuSetupThemeEditor);
 			break;
 		case PSN_KILLACTIVE: {
 			RestoreColor(&dlg_data->ColorTab.color_theme);
@@ -858,7 +858,7 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			break;
 		}
 		case PSN_HELP:
-			OpenHelpCV(dlg_data->pcv, HH_HELP_CONTEXT, HlpMenuSetupAdditionalTheme);
+			OpenHelpCV(dlg_data->pcv, HH_HELP_CONTEXT, HlpMenuSetupThemeEditor);
 			break;
 		default:
 			break;
@@ -1055,7 +1055,7 @@ static INT_PTR CALLBACK BGAlphaProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			break;
 		}
 		case PSN_HELP:
-			OpenHelpCV(dlg_data->pcv, HH_HELP_CONTEXT, HlpMenuSetupAdditionalTheme);
+			OpenHelpCV(dlg_data->pcv, HH_HELP_CONTEXT, HlpMenuSetupThemeEditor);
 			break;
 		case PSN_KILLACTIVE: {
 			BGTheme *bg_theme = &dlg_data->BGTab.bg_theme;

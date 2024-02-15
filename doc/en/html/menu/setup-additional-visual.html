@@ -21,7 +21,6 @@
 	See <a href="../usage/transparent.html">Background transparency</a>.
       </dd>
 
-    <dl>
       <dt id="MouseCursor">MouseCursor</dt>
       <dd>
 	Mouse cursor can have one of the 4 shapes listed below:
@@ -70,54 +69,6 @@ ClearType       = Use the ClearType.
         Implementation:<br>
         Set SWP_NOCOPYBITS in flags of the WINDOWPOS structure (lParam)
         in WM_WINDOWPOSCHANGING message.
-      </dd>
-
-    </dl>
-
-    <h2 id="theme">Theme</h2>
-
-    <p>
-    <a href="../usage/transparent.html#theme">Looks</a> of Tera Term can be changed.<br>
-    It is not a Windows theme (dark theme, etc.) setting.
-
-    <dl>
-      <dt>Theme Editor</dt>
-      <dd>Open <a href="setup-additional-visual-theme.html">Theme editor</a>.</dd>
-
-      <dt id="FastSizeMove">FastSizeMove</dt>
-      <dd>
-        Faster drawing by omitting drawing of the window background (BG theme)
-        during window resizing, moving, and Z-order changes.<br>
-        This can be used when using the BG theme.
-      </dd>
-
-      <dt>startup</dt>
-      <dd>
-        Sets the theme to be used at startup.
-        <dl>
-          <dt>no use</dt>
-          <dd>No theme is used</dd>
-          <dt>Fixed theme file</dt>
-          <dd>Loads a specific theme file</dd>
-          <dt>Random Theme file</dt>
-          <dd>Randomly load themes from theme files folder</dd>
-        </dl>
-      </dd>
-
-      <dt>Susie Plug-in path</dt>
-      <dd>
-        Path where plugin file is stored.<br>
-        Susie Plug-in is an external file to load various image files
-        using mage viewer software <a href="../about/glossary.html#susie">Susie</a>.<br>
-        Following information was referenced.
-        <ul>
-          <li><a href="https://www.digitalpad.co.jp/~takechin/download.html" target="_blank">Susie NO HEYA / Susie NO download</a><br>
-            PLUG_API.TXT file in <a href="https://www.digitalpad.co.jp/~takechin/archives/splug004.lzh" target="_blank">https://www.digitalpad.co.jp/~takechin/archives/splug004.lzh</a>
-          </li>
-          <li>
-            <a href="https://gist.github.com/tapetums/0a924712fb2fa0a7bb93" target="_blank">Susie plugin API definition file</a>
-          <li><a href="http://toro.d.dooo.jp/slplugin.html" target="_blank">TORO's Library / TORO's Software library(Win32/Win64 Plugin)</a>
-          </li>
       </dd>
 
     </dl>

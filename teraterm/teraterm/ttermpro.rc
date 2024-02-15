@@ -145,7 +145,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,175,229,10
 END
 
-IDD_TABSHEET_VISUAL DIALOGEX 0, 0, 307, 312
+IDD_TABSHEET_VISUAL DIALOGEX 0, 0, 307, 201
 STYLE DS_SETFONT | DS_CONTROL | WS_CHILD | WS_SYSMENU
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
@@ -191,18 +191,6 @@ BEGIN
     CONTROL         "Enable URL attribute font",IDC_ENABLE_ATTR_FONT_URL,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,148,171,124,12
     CONTROL         "Enable A&NSI color",IDC_ENABLE_ANSI_COLOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,148,183,124,12
-    LTEXT           "Theme",IDC_STATIC,5,163,68,8
-    CONTROL         "Enable",IDC_THEME_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,178,122,10
-    PUSHBUTTON      "Theme Editor",IDC_THEME_EDITOR_BUTTON,15,195,50,14
-    CONTROL         "Disable theme when moving or resizing window",IDC_CHECK_FAST_SIZE_MOVE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,213,198,12
-    LTEXT           "startup",IDC_STATIC,15,231,23,8
-    COMBOBOX        IDC_THEME_FILE,14,245,120,55,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_THEME_EDIT,14,261,269,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_THEME_BUTTON,287,261,14,14
-    LTEXT           "Susie Plug-in path:",IDC_SPIPATH_TITLE,14,280,79,8
-    EDITTEXT        IDC_SPIPATH_EDIT,14,293,269,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_SPIPATH_BUTTON,287,293,14,14
 END
 
 IDD_TABSHEET_LOG DIALOGEX 0, 0, 258, 188
@@ -369,6 +357,24 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,215,166,50,14
 END
 
+IDD_TABSHEET_THEME DIALOGEX 0, 0, 307, 162
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD | WS_SYSMENU
+FONT 8, "Tahoma", 0, 0, 0x0
+BEGIN
+    LTEXT           "Theme",-1,5,8,68,8
+    CONTROL         "Enable",IDC_THEME_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,23,122,10
+    PUSHBUTTON      "Theme Editor",IDC_THEME_EDITOR_BUTTON,15,39,50,14
+    CONTROL         "Disable theme when moving or resizing window",IDC_CHECK_FAST_SIZE_MOVE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,58,198,12
+    LTEXT           "startup",-1,15,76,23,8
+    COMBOBOX        IDC_THEME_FILE,26,90,108,55,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_THEME_EDIT,26,106,257,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_THEME_BUTTON,286,106,15,14
+    LTEXT           "Susie Plug-in path:",IDC_SPIPATH_TITLE,14,125,79,8
+    EDITTEXT        IDC_SPIPATH_EDIT,26,138,257,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SPIPATH_BUTTON,286,138,15,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -420,7 +426,7 @@ BEGIN
         VERTGUIDE, 148
         VERTGUIDE, 272
         TOPMARGIN, 5
-        BOTTOMMARGIN, 307
+        BOTTOMMARGIN, 196
     END
 
     IDD_TABSHEET_LOG, DIALOG
@@ -481,6 +487,19 @@ BEGIN
         VERTGUIDE, 18
         BOTTOMMARGIN, 180
     END
+
+    IDD_TABSHEET_THEME, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 301
+        VERTGUIDE, 15
+        VERTGUIDE, 26
+        VERTGUIDE, 137
+        VERTGUIDE, 283
+        VERTGUIDE, 286
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 157
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -518,17 +537,9 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-#if defined(BMP_ICO)
-IDI_TTERM               ICON                    "../common/teraterm_bmp.ico"
-#else
 IDI_TTERM               ICON                    "../common/teraterm.ico"
-#endif
 
-#if defined(BMP_ICO)
-IDI_VT                  ICON                    "../common/vt_bmp.ico"
-#else
 IDI_VT                  ICON                    "../common/vt.ico"
-#endif
 
 IDI_TEK                 ICON                    "../common/tek.ico"
 
@@ -538,29 +549,13 @@ IDI_VT_CLASSIC          ICON                    "../common/vt_classic.ico"
 
 IDI_CYGTERM             ICON                    "../../cygwin/cygterm/cygterm.ico"
 
-#if defined(BMP_ICO)
-IDI_TTERM_3D            ICON                    "../common/teraterm_3d_bmp.ico"
-#else
 IDI_TTERM_3D            ICON                    "../common/teraterm_3d.ico"
-#endif
 
-#if defined(BMP_ICO)
-IDI_VT_3D               ICON                    "../common/vt_3d_bmp.ico"
-#else
 IDI_VT_3D               ICON                    "../common/vt_3d.ico"
-#endif
 
-#if defined(BMP_ICO)
-IDI_TTERM_FLAT          ICON                    "../common/teraterm_flat_bmp.ico"
-#else
 IDI_TTERM_FLAT          ICON                    "../common/teraterm_flat.ico"
-#endif
 
-#if defined(BMP_ICO)
-IDI_VT_FLAT             ICON                    "../common/vt_flat_bmp.ico"
-#else
 IDI_VT_FLAT             ICON                    "../common/vt_flat.ico"
-#endif
 
 
 /////////////////////////////////////////////////////////////////////////////
