@@ -727,7 +727,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	case CmdXmodemRecv: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
-		r = XMODEMStartSend(ParamFileNameW, ParamXmodemOpt);
+		r = XMODEMStartReceive(ParamFileNameW, ParamBinaryFlag, ParamXmodemOpt);
 		free(ParamFileNameW);
 		if (r) {
 			DdeCmnd = TRUE;
@@ -738,7 +738,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	}
 	case CmdXmodemSend: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
-		r = XMODEMStartReceive(ParamFileNameW, ParamBinaryFlag, ParamXmodemOpt);
+		r = XMODEMStartSend(ParamFileNameW, ParamXmodemOpt);
 		free(ParamFileNameW);
 		if (r) {
 			DdeCmnd = TRUE;
