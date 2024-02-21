@@ -273,14 +273,13 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	}
 
 	/* Parse command line parameters*/
-	// 256バイト以上のコマンドラインパラメータ指定があると、BOF(Buffer Over Flow)で
-	// 落ちるバグを修正。(2007.6.12 maya)
 	if (LoadTTSET()) {
 		// GetCommandLineW() in MSDN remark
 		//  The lifetime of the returned value is managed by the
 		//  system, applications should not free or modify this value.
-		wchar_t *ParamW = GetCommandLineW();
+		wchar_t *ParamW = _wcsdup(GetCommandLineW());
 		(*ParseParam)(ParamW, &ts, &(TopicName[0]));
+		free(ParamW);
 	}
 	FreeTTSET();
 
