@@ -1,0 +1,281 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>リリースの手順</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>リリースの手順</h1>
+
+<ol>
+  <li><a href="#start-rc">リリース作業の開始からRC作成まで</a></li>
+  <li><a href="#rc-release">RC作成からリリースまで</a></li>
+  <li><a href="#release-operation">リリース作業</a></li>
+  <li><a href="#code-freeze">コードフリーズについて</a></li>
+</ol>
+
+<hr>
+
+<p>
+TeraTerm Project でのリリース手順について以下に示します。
+</p>
+
+<h2 id="start-rc">リリース作業の開始からRC作成まで</h2>
+
+<ol>
+  <li>チケット、ブランチなどを確認する
+    <ul>
+      <li>プロジェクトチーム内で確認する
+        <ul>
+          <li>今回のリリースに入れるもの・次回以降に延期するものを整理・決定する</li>
+        </ul>
+      </li>
+      <li>ブランチをマージする
+        <ul>
+          <li>trunk と 4-stable 間、作業中のブランチなど</li>
+        </ul>
+      </li>
+      <li>チケットをクローズする
+        <ul>
+          <li>すでに修正済み、処理済みのものはクローズする<br />
+              リリース時には、対象のマイルストーンのチケットはすべてクローズされている状態になる</li>
+          <li>次のリリースへ回すものはマイルストーンを変更する<br />
+              次のリリース用マイルストーンを作成する</li>
+        </ul>
+      </li>
+      <li>この時点で新たに出てくるチケットの対応を検討する</li>
+    </ul>
+  </li>
+  <li>ツール、ライブラリ、インポート元の最新版をチェックする
+    <ul>
+      <li>Visual Studio (「更新プログラムの確認」から更新する)</li>
+      <li>Inno Setup (<a href="https://jrsoftware.org/isdl.php" target="_blank">https://jrsoftware.org/isdl.php</a>)</li>
+      <li>Oniguruma (<a href="https://github.com/kkos/oniguruma/" target="_blank">https://github.com/kkos/oniguruma/</a>)</li>
+      <li>SFMT (<a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html" target="_blank">http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html</a>)</li>
+      <li>LibreSSL (<a href="https://www.libressl.org/" target="_blank">https://www.libressl.org/</a>)</li>
+      <li>zlib (<a href="https://www.zlib.net/" target="_blank">http://www.zlib.net/</a>)</li>
+      <!--
+      <li>PuTTY (<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/" target="_blank">http://www.chiark.greenend.org.uk/~sgtatham/putty/</a>)</li>
+      -->
+      <li>The reference C implementation of Argon2 (<a href="https://github.com/P-H-C/phc-winner-argon2/" target="_blank">https://github.com/P-H-C/phc-winner-argon2/</a>)</li>
+      <li>cJSON (<a href="https://github.com/DaveGamble/cJSON/" target="_blank">https://github.com/DaveGamble/cJSON/</a>)</li>
+      <li>Unicode (<a href="https://www.unicode.org/versions/latest/" target="_blank">https://www.unicode.org/versions/latest/</a>)</li>
+    </ul>
+    <p>リリースに使うバージョンはこの時点でおおむね決定する。</p>
+  </li>
+  <li>今回のリリースに入れたいものが落ち着く</li>
+</ol>
+
+<h2 id="rc-release">RC作成からリリースまで</h2>
+
+<ol>
+  <li>ドキュメントを確認する
+    <ul>
+      <li>ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。</li>
+      <li>変更履歴を確認し、書き忘れがあれば追記する。</li>
+      <li>変更履歴の順番を変更する。だいたいの指針としては、ターミナルエミュレーション関係・アプリケーションとしての変更・マクロの順。</li>
+      <li>ドキュメント差分が翻訳されていることを確認し、翻訳忘れがあれば翻訳する。</li>
+    </ul>
+  </li>
+  <li>バージョンをインクリメントする
+    <ul>
+      <li>
+        teraterm\common\tt-version.h<br>
+        TT_VERSION_SUBSTR を "RC" にする
+<pre>
+  #define TT_VERSION_MAJOR             5
+  #define TT_VERSION_MINOR             0
+- #define TT_VERSION_SUBSTR            "dev"
++ #define TT_VERSION_SUBSTR            "RC"
+</pre>
+        TT_VERSION_MINOR は、前回のリリース直後にインクリメントされている。
+      </li>
+      <li>ttssh2\ttxssh\ttxssh-version.h<br>
+        TTSSH_VERSION_MINOR は、前回のリリース直後にインクリメントされている。
+      </li>
+      <li>ttpmenu\ttpmenu.rc // 変更時のみ</li>
+      <li>TTProxy\TTProxy.rc // 変更時のみ</li>
+      <li>TTXKanjiMenu\ttxkanjimenu.rc // 変更時のみ</li>
+      <li>
+        installer\teraterm.iss<br>
+        RC に変更し、アーカイブの作成も有効にします。
+<pre>
+- #define AppVer "5.0-dev"
++ #define AppVer "5.0-RC"
+
+  [PreCompile]
+  Name: makechm.bat
+- Name: build.bat
+- ;Name: build.bat; Parameters: rebuild
++ ;Name: build.bat
++ Name: build.bat; Parameters: rebuild
+  
+  [PostCompile]
+- ;Name: makearchive.bat; Parameters: release
++ Name: makearchive.bat; Parameters: release
+</pre>
+      </li>
+    </ul>
+    <p>
+      CygTerm+ は例外で、リリースとは関係なくバージョンが上がる。<br />
+      修正がコミットされると即リリース扱いになり、リリース日はその日付となる。そのため、修正・バージョンのインクリメント・変更履歴を同時にコミットする。<br />
+      これはコンパイラの入手が容易なため。
+    </p>
+  </li>
+  <li>この年における最初のリリースの場合は、著作権表示の「最後の発行の年」をインクリメントする
+    <ul>
+      <li>teraterm\keycode\keycode-version.rc // VERSIONINFO</li>
+      <li>teraterm\teraterm\tt-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttpcmn\ttpcmn-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttpdlg\ttpdlg.rc // dialog</li>
+      <li>teraterm\ttpmacro\ttm-version.rc // VERSIONINFO</li>
+      <li>ttssh2\ttxssh\ttxssh.rc // dialog</li>
+      <li>ttssh2\ttxssh\ttxssh-version.rc // VERSIONINFO</li>
+      <li>ttpmenu\ttpmenu.rc // dialog, VERSIONINFO</li>
+      <li>TTProxy\TTProxy.rc // dialog, VERSIONINFO(en), VERSIONINFO(ja)</li>
+      <li>TTXKanjiMenu\ttxkanjimenu.rc // VERSIONINFO</li>
+      <li>installer\teraterm.iss</li>
+      <li>installer\release\license.txt // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu</li>
+      <li>doc\en\html\index.html</li>
+      <li>doc\en\html\about\copyright.html // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu</li>
+      <li>doc\en\html\macro\index.html</li>
+      <li>doc\ja\html\index.html</li>
+      <li>doc\ja\html\about\copyright.html // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu</li>
+      <li>doc\ja\html\macro\index.html</li>
+    </ul>
+  </li>
+  <li id="RC_commit">この状態でコミットする</li>
+  <li>インストーラを作成する</li>
+  <li>サポートされている全 OS でインストーラの実行、起動、接続をチェックする</li>
+  <li>push して AppVeyor でビルドする</li>
+  <li>RCの作成をアナウンスする
+    <ul>
+      <li><a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users" target="_blank">ttssh2-users</a> メーリングリスト</li>
+      <li>Twitter (<a href="https://twitter.com/Tera_Term" target="_blank">https://twitter.com/Tera_Term</a>)</li>
+    </ul>
+  </li>
+  <li>フィードバックを受け入れる
+    <p>修正が入ったら再度「ドキュメントを確認する」「サポートされている全 OS で起動・接続チェックする」</p>
+  </li>
+</ol>
+
+<h2 id="release-operation">リリース作業</h2>
+
+<ol>
+  <li>ドキュメントを確認する (詳細は同上)</li>
+  <li>"RC" を削除する
+    <ul>
+      <li>
+        teraterm\common\tt-version.h
+<pre>
+  #define TT_VERSION_MAJOR             5
+  #define TT_VERSION_MINOR             0
+- #define TT_VERSION_SUBSTR            "RC"
++ #undef TT_VERSION_SUBSTR
+</pre>
+      </li>
+      <li>
+        installer\teraterm.iss<br>
+<pre>
+- #define AppVer "5.0-RC"
++ #define AppVer "5.0"
+</pre>
+     </li>
+    </ul>
+  </li>
+  <li>リリース日を変更する
+    <ul>
+      <li>html/about/hisotry.html</li>
+    </ul>
+  </li>
+  <li>インストーラを作成する
+    <p>
+      ビルド・インストーラの生成がエラーなくできることを確認する。
+    </p>
+  </li>
+  <li>この状態でコミットする</li>
+  <li>タグを作成する
+    <p>
+      タグは annotated tags とする。<br/>
+      タグ名は「v(バージョン)」。（例: 5.0ならば "v5.0" ）
+    </p>
+<pre>
+git tag -a v5.0 -m "Release 5.0"
+</pre>
+  </li>
+  <li>インストーラを作成する</li>
+  <li>プロジェクトサイトを更新する
+    <ul>
+      <li>新しいタグを使って release に追加する</li>
+      <li>インストーラとポータブル版の zip ファイルを追加する</li>
+      <li>ドキュメントの変更履歴からリリースノートを転記する（日本語・英語とも）</li>
+    </ul>
+  </li>
+  <li>プロジェクトWebページ (<a href="https://ttssh2.osdn.jp" target="_blank">https://ttssh2.osdn.jp</a>) を更新する
+    <p>更新のしかたは <a href="https://github.com/TeraTermProject/teraterm/wiki/Update-Project-page" target="_blank">プロジェクトページの更新手順</a> を参照</p>
+  </li>
+  <li>リリースをアナウンスする
+    <ul>
+      <li><a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users" target="_blank">ttssh2-users</a> メーリングリスト</li>
+      <li>Twitter (<a href="https://twitter.com/Tera_Term" target="_blank">https://twitter.com/Tera_Term</a>)</li>
+    </ul>
+  </li>
+  <li id="increment_version">バージョンをインクリメントする
+    <ul>
+      <li>
+        teraterm/common/tt-version.h<br>
+        TT_VERSION_MINOR を1つ進めて、SUBSTR を "dev" にする。
+<pre>
+  #define TT_VERSION_MAJOR             5
+- #define TT_VERSION_MINOR             0
+- #undef TT_VERSION_SUBSTR
++ #define TT_VERSION_MINOR             1
++ #define TT_VERSION_SUBSTR            "dev"
+</pre>
+      </li>
+      <li>
+        ttssh2/ttssh/ttxssh-version.h<br>
+        TTSSH_VERSION_MINOR を1つ進める。
+<pre>
+  #define TTSSH_VERSION_MAJOR             3
+- #define TTSSH_VERSION_MINOR             0
++ #define TTSSH_VERSION_MINOR             1
+</pre>
+      </li>
+      <li>
+        installer\teraterm.iss<br>
+        AppVer を「次のバージョン-dev」とする
+<pre>
+- #define AppVer "5.0"
++ #define AppVer "5.1-dev"
+
+  [PreCompile]
+  Name: makechm.bat
+- ;Name: build.bat
+- Name: build.bat; Parameters: rebuild
++ Name: build.bat
++ ;Name: build.bat; Parameters: rebuild
+  
+  [PostCompile]
+- Name: makearchive.bat; Parameters: release
++ ;Name: makearchive.bat; Parameters: release
+</pre>
+      </li>
+    </ul>
+  </li>
+  <li>Chocolatey の登録を更新する</li>
+</ol>
+
+<h2 id="code-freeze">コードフリーズについて</h2>
+
+<p>
+コードフリース中は、原則的には致命的なバグの修正のみ可能となります。<br />
+コードフリーズは、RC作成（<a href="#RC_commit">開発ブランチ で teraterm.iss に RC を付けるコミット</a>）</a>から（<a href="#increment_version">バージョンをインクリメントするコミット</a>）までとします。
+</p>
+
+</body>
+</html>

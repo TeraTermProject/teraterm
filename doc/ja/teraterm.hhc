@@ -792,87 +792,56 @@
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Keycode">
-			<param name="Local" value="html\reference\keycode.html">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="メニューID">
 			<param name="Local" value="html\reference\menu_id.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="RE">
+			<param name="Name" value="鬼車 正規表現">
 			<param name="Local" value="html\reference\RE.txt">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="開発者向け">
+		<param name="ImageNumber" value="1">
+		</OBJECT>
+	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="cJSON ライセンス">
-			<param name="Local" value="html\reference\cJSON-LICENSE.txt">
+			<param name="Name" value="開発環境・ライブラリ">
+			<param name="Local" value="html\reference\develop-environment.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="鬼車 ライセンス">
-			<param name="Local" value="html\reference\Oniguruma-LICENSE.txt">
+			<param name="Name" value="開発環境の構築・ビルド手順">
+			<param name="Local" value="html\reference\develop-build.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="SFMT ライセンス">
-			<param name="Local" value="html\reference\SFMT-LICENSE.txt">
+			<param name="Name" value="開発作業メモ">
+			<param name="Local" value="html\reference\develop-memo.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="OpenSSH ライセンス">
-			<param name="Local" value="html\reference\OpenSSH-LICENSE.txt">
+			<param name="Name" value="リリース手順">
+			<param name="Local" value="html\reference\develop-release.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="LibreSSL ライセンス">
-			<param name="Local" value="html\reference\LibreSSL-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="zlib ライセンス">
-			<param name="Local" value="html\reference\zlib-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="PuTTY ライセンス">
-			<param name="Local" value="html\reference\PuTTY-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="The reference C implementation of Argon2 ライセンス">
-			<param name="Local" value="html\reference\argon2-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="CygTerm+ ライセンス">
-			<param name="Local" value="html\reference\CygTerm+-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="開発者向け">
-			<param name="Local" value="html\reference\develop.html">
+			<param name="Name" value="CMakeビルドシステムを使用したビルド(experimental)">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<UL>
 			<LI> <OBJECT type="text/sitemap">
-				<param name="Name" value="CMakeビルドシステムを使用したビルド(experimental)">
+				<param name="Name" value="ライブラリのビルド">
+				<param name="Local" value="html\reference\build_library_with_cmake.html">
 				<param name="ImageNumber" value="11">
-				</OBJECT>
-			<UL>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="ライブラリのビルド">
-					<param name="Local" value="html\reference\build_library_with_cmake.html">
-					<param name="ImageNumber" value="11">
-				  </OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Tera Termのビルド">
-					<param name="Local" value="html\reference\build_with_cmake.html">
-					<param name="ImageNumber" value="11">
-				  </OBJECT>
-			</UL>
+			  </OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Tera Termのビルド">
+				<param name="Local" value="html\reference\build_with_cmake.html">
+				<param name="ImageNumber" value="11">
+			  </OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="ソースコード解説">
@@ -1969,12 +1938,17 @@
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
-				<param name="Name" value="鬼車正規表現">
+				<param name="Name" value="鬼車 正規表現">
 				<param name="Local" value="html\reference\RE.txt">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 		</UL>
 	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Keycode">
+		<param name="Local" value="html\reference\keycode.html">
+		<param name="ImageNumber" value="11">
+		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="アンインストール">
 		<param name="Local" value="html\uninstall.html">

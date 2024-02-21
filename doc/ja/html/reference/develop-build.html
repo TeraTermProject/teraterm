@@ -1,0 +1,279 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>開発環境の構築・ビルド手順</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>開発環境の構築・ビルド手順</h1>
+
+<ol>
+  <li><a href="#build-env">環境構築</a></li>
+  <li><a href="#build-quick">ビルド手順 (Quick Start)</a>
+    <ol>
+      <li><a href="#build-quick-checkout">ソースコードのチェックアウト</a></li>
+      <li><a href="#build-quick-all">ビルド</a></li>
+    </ol>
+  </li>
+  <li><a href="#build-detail">ビルド手順 (詳説)</a>
+    <ol>
+      <li><a href="#build-checkout">ソースコードの clone</a></li>
+      <li><a href="#build-library">ライブラリのビルド</a></li>
+      <li><a href="#build-teraterm">Tera Termのビルド</a></li>
+      <li><a href="#build-ttssh">TTSSHのビルド</a></li>
+      <li><a href="#build-ttproxy">TTProxyのビルド</a></li>
+      <li><a href="#build-ttxkanjimenu">TTXKanjiMenuのビルド</a></li>
+      <li><a href="#build-ttxsamples">TTXSamplesのビルド</a></li>
+      <li><a href="#build-teraterm-menu">TeraTerm Menuのビルド</a></li>
+      <li><a href="#build-cygterm">CygTerm+のビルド</a></li>
+      <li><a href="#build-cyglaunch">Cyglaunchのビルド</a></li>
+      <li><a href="#build-htmlhelp">ヘルプファイルのビルド</a></li>
+      <li><a href="#build-installer">インストーラの作成</a></li>
+    </ol>
+  </li>
+</ol>
+
+<hr>
+
+<h2 id="build-env">環境構築</h2>
+
+<ul>
+  <li>Visual Studio Community 2022 のインストール
+    <ul>
+      <li>C++ によるデスクトップ開発</li>
+      <li>最新の v143 ビルドツール用 C++ MFC (x86 および x64)<br />
+        HTML Help Compiler (hhc.exe) がインストールされます。
+      </li>
+    </ul>
+  </li>
+  <li>Cygwin のインストール<br />
+    CygTerm+ コンパイル専用の Cygwin 環境を構築するには、buildtools\install_cygwin.bat を実行します。<br />
+    既存の環境を利用する場合には、<a href="../usage/cygwin.html#build">こちら</a>を参照してください。
+  </li>
+  <li>Perl をインストールします。</li>
+  <li>Git for Windows をインストールします。</li>
+  <li>CMake をインストールします。</li>
+  <li>Inno Setup をインストールします。</li>
+</ul>
+
+<p>
+Tera Term をビルドするために上記のツールを新規導入するのではなく、すでにインストール済みのツールを使うこともできます。<br />
+installer\release.bat がインストール済みのツールを見つけられない場合は、installer\toolinfo_sample.bat を installer\toolinfo.bat にコピーし、適宜編集してください。<br />
+また、必要であれば buildtools\svnrev\toolinfo_sample.txt を buildtools\svnrev\toolinfo.txt にコピーし、適宜編集してください。
+</p>
+
+<h2 id="build-quick">ビルド手順 (Quick Start)</h2>
+
+<h3 id="build-quick-checkout">ソースコードのチェックアウト</h2>
+
+<p>
+ソースコードを GitHub (https://github.com/TeraTermProject/teraterm) から clone します。
+</p>
+
+<h3 id="build-quick-all">ビルド</h2>
+
+<p>
+installer\release.bat を実行し、3を選択します。
+</p>
+
+<h3 id="build-detail">ビルド手順 (詳説)</h2>
+
+<h3 id="build-checkout">ソースコードの clone</h2>
+
+<p>
+ソースコードを GitHub (https://github.com/TeraTermProject/teraterm) から clone します。
+</p>
+
+<h3 id="build-library">ライブラリのビルド</h2>
+
+<p>
+"x86 Native Tools Command Prompt for VS 2022" を立ち上げるか、適切な PATH を通しておく必要があります。<br />
+* の bat を個別に実行するかわりに、libs\buildall.bat を実行することでまとめてビルドすることができます。
+</p>
+
+<ul>
+  <li>Oniguruma
+    <ol>
+      <li>oniguruma のソースを libs/oniguruma の中に展開する。</li>
+      <li>libs\buildoniguruma6.bat を実行する。*</li>
+    </ol>
+  </li>
+  <li>SFMT
+    <ol>
+      <li>SFMT のソースを libs/SFMT の中に展開する。</li>
+      <li>libs\buildSFMT.bat を実行する。*</li>
+      <li>必要に応じて libs/SFMT/SFMT_version_for_teraterm.h のバージョン番号を修正する。</li>
+    </ol>
+  </li>
+  <li>LibreSSL
+    <ol>
+      <li>LibreSSL のソースを libs/libressl の中に展開する。</li>
+      <li>buildlibressl.bat を実行する。*</li>
+    </ol>
+  </li>
+  <li>Zlib
+    <ol>
+      <li>zlib のソースを libs/zlib の中に展開する。</li>
+      <li>buildzlib.bat を実行する。*</li>
+    </ol>
+  </li>
+  <!--
+  <li>PuTTY
+    <ol>
+      <li>PuTTY のソースを libs/putty の中に展開する。<br />
+          ttssh ソリューション配下の putty プロジェクトにより必要な機能のみが静的ライブラリ化され、ttxssh.dll にリンクされるため、展開するだけでよい。</li>
+    </ol>
+  </li>
+  -->
+  <li>The reference C implementation of Argon2
+    <ol>
+      <li>argon2 のソースを libs/argon2 の中に展開する。<br />
+          argon2 リファレンス実装には静的ライブラリを生成するプロジェクトファイルが含まれていない。<br />
+          ttssh ソリューション配下の argon2 プロジェクトにより静的ライブラリが生成され、ttxssh.dll にリンクされるため、展開するだけでよい。</li>
+    </ol>
+  </li>
+  <li>cJSON
+    <ol>
+      <li>cJSON のソースを libs/cJSON の中に展開する。</li>
+    </ol>
+  </li>
+</ul>
+
+<h3 id="build-teraterm">Tera Termのビルド</h2>
+
+<ol>
+  <li>teraterm\ttermpro.sln をVisual Studioで開く。<br />
+      .slnファイルの改行コードが"LF"になっていると、Visual Studioが起動しないので注意願います。</li>
+  <li>ソリューションをビルドする。</li>
+  <li>ビルドに成功すると teraterm\Debug / teraterm\Release ディレクトリに実行プログラムが生成される。</li>
+</ol>
+
+<h3 id="build-ttssh">TTSSHのビルド</h2>
+
+あらかじめ teraterm\ttermpro.sln によって common_static.lib がビルドされている必要があります。
+
+<ol>
+  <li>ttssh2\ttssh.sln をVisual Studioで開く。</li>
+  <li>ソリューションをビルドする。</li>
+  <li>ビルドに成功すると ttssh2\ttxssh\Debug / ttssh2\ttxssh\Release ディレクトリにDLLが生成される。</li>
+</ol>
+
+<h3 id="build-ttproxy">TTProxyのビルド</h2>
+
+あらかじめ teraterm\ttermpro.sln によって common_static.lib がビルドされている必要があります。
+
+<ol>
+  <li>TTProxy\TTProxy.sln をVisual Studioで開く。</li>
+  <li>ソリューションをビルドする。</li>
+  <li>ビルドに成功すると TTProxy\Debug / TTProxy\Release ディレクトリにDLLが生成される。</li>
+</ol>
+
+<h3 id="build-ttxkanjimenu">TTXKanjiMenuのビルド</h2>
+
+あらかじめ teraterm\ttermpro.sln によって common_static.lib がビルドされている必要があります。
+
+<ol>
+  <li>TTXKanjiMenu\ttxkanjimenu.sln をVisual Studioで開く。</li>
+  <li>ソリューションをビルドする。</li>
+  <li>ビルドに成功すると TTXKanjiMenu\Debug / TTXKanjiMenu\Release ディレクトリに ttxkanjimenu.dll が生成される。</li>
+</ol>
+
+<h3 id="build-ttxsamples">TTXSamplesのビルド</h2>
+
+<p>
+リポジトリのTTXSamplesに Tera Term Extension (TTX)のサンプルがあります。TTXを作る際の参考にしてください。
+</p>
+
+あらかじめ teraterm\ttermpro.sln によって common_static.lib がビルドされている必要があります。
+
+<ol>
+  <li>TTXSamples\TTXSamples.sln をVisual Studioで開く。</li>
+  <li>ソリューションをビルドする。</li>
+  <li>ビルドに成功すると TTXSamples\Debug / TTXSamples\Release ディレクトリにDLLが生成される。</li>
+</ol>
+
+<p>
+各TTXの詳細については、プロジェクト内のReadMe-ja.txtを参照してください。
+</p>
+
+<h3 id="build-teraterm-menu">TeraTerm Menuのビルド</h2>
+
+あらかじめ teraterm\ttermpro.sln によって common_static.lib がビルドされている必要があります。
+
+<ol>
+  <li>ttpmenu\ttpmenu.sln をVisual Studioで開く。</li>
+  <li>ソリューションをビルドする。</li>
+  <li>ビルドに成功すると ttpmenu\Debug / ttpmenu\Release ディレクトリに ttpmenu.exe が生成される。</li>
+</ol>
+
+<h3 id="build-cygterm">CygTerm+のビルド</h2>
+
+<ol>
+  <li>Cygwinのシェルを起動し、cygterm ディレクトリへ移動する。
+<pre>
+# cd cygterm
+</pre>
+  </li>
+  <li>CygTerm+をコンパイルする。
+<pre>
+# make
+</pre>
+  </li>
+  <li>cygterm.exe が生成される。</li>
+</ol>
+
+<h3 id="build-cyglaunch">Cyglaunchのビルド</h2>
+
+事前に teraterm\ttermpro.sln の common_static.lib がビルドされている必要があります。
+
+<ol>
+  <li>cygwin\cygwin.sln をVisual Studioで開く。</li>
+  <li>ソリューションをビルドする。</li>
+  <li>ビルドに成功すると cygwin\Debug / cygwin\Release ディレクトリに cyglaunch.exe が生成される。</li>
+</ol>
+
+<h3 id="build-htmlhelp">ヘルプファイルのビルド</h2>
+
+<ol>
+  <li>doc\makechm.bat を実行する。</li>
+</ol>
+
+<h3 id="build-installer">インストーラの作成</h2>
+
+<dl>
+  <dt>AppVeyor を使用する場合</dt>
+  <dd>
+    AppVeyor で "NEW BUILD" を実行します。<br>
+    内部では installer\release.bat が呼ばれています。
+  </dd>
+  <dt>installer\release.bat を使用する場合</dt>
+  <dd>
+    installer\release.bat を実行して、インストーラー、zipを作成します。<br>
+    作成されるファイル名は buildtool\svnrev\sourcetree_info.bat の値から生成されます。このファイルは buildtools\svnrev\svnrev.bat が teraterm\common\tt-version.h などをもとに生成します。
+    <ul>
+      <li>
+        installer\release.bat を実行します。<br>
+        インストーラーは installer\release.bat から呼び出される installer\iscc.bat で作成されます。
+      </li>
+      <li>インストーラー、ポータブル版の zip ファイル が installer\Output フォルダに出力されます。</li>
+    </ul>
+  </dd>
+  <dt>Inno Script Studio を使う場合</dt>
+  <dd>
+    RC,リリースを作成する場合は、installer\release.batを使用するほうが便利ですが、
+    インストーラーのデバグなどInno Script Studioを使用すると便利です。<br>
+    作成されるファイル名は、インストーラは installer\teraterm.iss の定義により、ポータブル版は buildtool\svnrev\sourcetree_info.bat に書き込まれたものから生成されます。
+    <ul>
+      <li>Inno Script Studio で installer\teraterm.iss を開き、"Project"-"Compile" でインストーラを作成する</li>
+      <li>インストーラーとポータブル版が installer\Output フォルダに出力されます。</li>
+      <li>作成されたポータブル版を zip で圧縮する</li>
+    </ul>
+  </dd>
+</dl>
+
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>How to release Tera Term installation package</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1 class="center">How to release Tera Term installation package</h1>
+
+<ol>
+  <li><a href="#start-rc">From start release until create RC</a></li>
+  <li><a href="#rc-release">From create RC until release</a></li>
+  <li><a href="#release-operation">Release</a></li>
+  <li><a href="#code-freeze">About code freeze</a></li>
+</ol>
+
+<hr>
+
+<p>
+To release Tera Term installation package is shown in the following step:
+</p>
+
+<h2 id="start-rc">From start release until create RC</h2>
+
+<ol>
+  <li>Confirm ticket and branches.
+    <ul>
+      <li>Confirm in project team.
+        <ul>
+          <li>Organize / decide whether to include bug fix / feature in this release or defer.</li>
+        </ul>
+      </li>
+      <li>Merge branches
+        <ul>
+          <li>Verify trunk / 4-stable and working branches.</li>
+        </ul>
+      </li>
+      <li>Close tickets.
+        <ul>
+<!--
+          <li>‚·‚Å‚ÉC³Ï‚ÝAˆ—Ï‚Ý‚Ì‚à‚Ì‚ÍƒNƒ[ƒY‚·‚é<br />
+              ƒŠƒŠ[ƒXŽž‚É‚ÍA‘ÎÛ‚Ìƒ}ƒCƒ‹ƒXƒg[ƒ“‚Ìƒ`ƒPƒbƒg‚Í‚·‚×‚ÄƒNƒ[ƒY‚³‚ê‚Ä‚¢‚éó‘Ô‚É‚È‚é</li>
+          <li>ŽŸ‚ÌƒŠƒŠ[ƒX‚Ö‰ñ‚·‚à‚Ì‚Íƒ}ƒCƒ‹ƒXƒg[ƒ“‚ð•ÏX‚·‚é<br />
+              ŽŸ‚ÌƒŠƒŠ[ƒX—pƒ}ƒCƒ‹ƒXƒg[ƒ“‚ðì¬‚·‚é</li>
+-->
+        </ul>
+      </li>
+<!--
+      <li>‚±‚ÌŽž“_‚ÅV‚½‚Éo‚Ä‚­‚éƒ`ƒPƒbƒg‚Ì‘Î‰ž‚ðŒŸ“¢‚·‚é</li>
+-->
+    </ul>
+  </li>
+  <li>Confirm tools, libraries, import sources.
+    <ul>
+      <li>Visual Studio (<a href="https://visualstudio.microsoft.com/" target="_blank">https://visualstudio.microsoft.com/</a>)</li>
+      <li>Inno Setup (<a href="https://jrsoftware.org/isdl.php" target="_blank">https://jrsoftware.org/isdl.php</a>)</li>
+      <li>Oniguruma (<a href="https://github.com/kkos/oniguruma/" target="_blank">https://github.com/kkos/oniguruma/</a>)</li>
+      <li>SFMT (<a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html" target="_blank">http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html</a>)</li>
+      <li>LibreSSL (<a href="https://www.libressl.org/" target="_blank">https://www.libressl.org/</a>)</li>
+      <li>zlib (<a href="https://www.zlib.net/" target="_blank">http://www.zlib.net/</a>)</li>
+      <!--
+      <li>PuTTY (<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/" target="_blank">http://www.chiark.greenend.org.uk/~sgtatham/putty/</a>)</li>
+      -->
+      <li>The reference C implementation of Argon2 (<a href="https://github.com/P-H-C/phc-winner-argon2/" target="_blank">https://github.com/P-H-C/phc-winner-argon2/</a>)</li>
+      <li>cJSON (<a href="https://github.com/DaveGamble/cJSON/" target="_blank">https://github.com/DaveGamble/cJSON/</a>)</li>
+      <li>Unicode (<a href="https://www.unicode.org/versions/latest/" target="_blank">https://www.unicode.org/versions/latest/</a>)</li>
+    </ul>
+<!--
+    <p>ƒŠƒŠ[ƒX‚ÉŽg‚¤ƒo[ƒWƒ‡ƒ“‚Í‚±‚ÌŽž“_‚Å‚¨‚¨‚Þ‚ËŒˆ’è‚·‚éB</p>
+-->
+  </li>
+<!--
+  <li>¡‰ñ‚ÌƒŠƒŠ[ƒX‚É“ü‚ê‚½‚¢‚à‚Ì‚ª—Ž‚¿’…‚­</li>
+-->
+</ol>
+
+<h2 id="rc-release">From create RC until release</h2>
+
+<ol>
+  <li>Confirm documents.
+    <ul>
+<!--
+      <li>ƒ_ƒCƒAƒƒOã‚ÌÝ’è€–ÚEUI‚Ì‚È‚¢“Á•ÊƒIƒvƒVƒ‡ƒ“EƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ƒpƒ‰ƒ[ƒ^EV‹Kƒ}ƒNƒƒRƒ}ƒ“ƒh‚È‚ÇA‘Î‰ž‚·‚éƒhƒLƒ…ƒƒ“ƒg‚É˜R‚ê‚ª‚È‚¢‚©Šm”F‚·‚éB</li>
+      <li>•ÏX—š—ð‚ðŠm”F‚µA‘‚«–Y‚ê‚ª‚ ‚ê‚Î’Ç‹L‚·‚éB</li>
+      <li>•ÏX—š—ð‚Ì‡”Ô‚ð•ÏX‚·‚éB‚¾‚¢‚½‚¢‚ÌŽwj‚Æ‚µ‚Ä‚ÍAƒ^[ƒ~ƒiƒ‹ƒGƒ~ƒ…ƒŒ[ƒVƒ‡ƒ“ŠÖŒWEƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Æ‚µ‚Ä‚Ì•ÏXEƒ}ƒNƒ‚Ì‡B</li>
+      <li>ƒhƒLƒ…ƒƒ“ƒg·•ª‚ª–|–ó‚³‚ê‚Ä‚¢‚é‚±‚Æ‚ðŠm”F‚µA–|–ó–Y‚ê‚ª‚ ‚ê‚Î–|–ó‚·‚éB</li>
+-->
+    </ul>
+  </li>
+  <li>Increment the version while RC release process.
+    <ul>
+      <li>
+        teraterm\common\tt-version.h<br>
+        set TT_VERSION_SUBSTR to "RC".
+<pre>
+  #define TT_VERSION_MAJOR             5
+  #define TT_VERSION_MINOR             0
+- #define TT_VERSION_SUBSTR            "dev"
++ #define TT_VERSION_SUBSTR            "RC"
+</pre>
+        TT_VERSION_MINOR is already incremented yet. It is incremented immediately after previous release.
+      </li>
+      <li>ttssh2\ttxssh\ttxssh-version.h<br>
+        TTSSH_VERSION_MINOR is already incremented yet. It is incremented immediately after previous release.
+      </li>
+      <li>ttpmenu\ttpmenu.rc // only modifying</li>
+      <li>TTProxy\TTProxy.rc // only modifying</li>
+      <li>TTXKanjiMenu\ttxkanjimenu.rc // only modifying</li>
+      <li>
+        installer\teraterm.iss<br>
+        Change to "RC" and enable create archive.
+<pre>
+- #define AppVer "5.0-dev"
++ #define AppVer "5.0-RC"
+
+  [PreCompile]
+  Name: makechm.bat
+- Name: build.bat
+- ;Name: build.bat; Parameters: rebuild
++ ;Name: build.bat
++ Name: build.bat; Parameters: rebuild
+  
+  [PostCompile]
+- ;Name: makearchive.bat; Parameters: release
++ Name: makearchive.bat; Parameters: release
+</pre>
+      </li>
+    </ul>
+    <p>
+      By way of exception, CygTerm+ always upgrades not regarding Tera Term release process when the patch is committed.<br />
+      The release date is the day committed by a developer. <!--‚»‚Ì‚½‚ßAC³Eƒo[ƒWƒ‡ƒ“‚ÌƒCƒ“ƒNƒŠƒƒ“ƒgE•ÏX—š—ð‚ð“¯Žž‚ÉƒRƒ~ƒbƒg‚·‚éB--><br />
+      Because user can get gcc compiler for free.
+    </p>
+  </li>
+  <li>Increment the year of last publication of copyright notice if it is first release in this year.
+    <ul>
+      <li>teraterm\keycode\keycode-version.rc // VERSIONINFO</li>
+      <li>teraterm\teraterm\tt-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttpcmn\ttpcmn-version.rc // VERSIONINFO</li>
+      <li>teraterm\ttpdlg\ttpdlg.rc // dialog</li>
+      <li>teraterm\ttpmacro\ttm-version.rc // VERSIONINFO</li>
+      <li>ttssh2\ttxssh\ttxssh.rc // dialog</li>
+      <li>ttssh2\ttxssh\ttxssh-version.rc // VERSIONINFO</li>
+      <li>ttpmenu\ttpmenu.rc // dialog, VERSIONINFO</li>
+      <li>TTProxy\TTProxy.rc // dialog, VERSIONINFO(en), VERSIONINFO(ja)</li>
+      <li>TTXKanjiMenu\ttxkanjimenu.rc // VERSIONINFO</li>
+      <li>installer\teraterm.iss</li>
+      <li>installer\release\license.txt // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu</li>
+      <li>doc\en\html\index.html</li>
+      <li>doc\en\html\about\copyright.html // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu</li>
+      <li>doc\en\html\macro\index.html</li>
+      <li>doc\ja\html\index.html</li>
+      <li>doc\ja\html\about\copyright.html // Tera Term, TTSSH, Cygterm+, TTProxy, TeraTerm Menu, TTX KanjiMenu</li>
+      <li>doc\ja\html\macro\index.html</li>
+    </ul>
+  </li>
+  <li id="RC_commit">Commit this state.</li>
+  <li>Create installer.</li>
+  <li>Test run installer, run and connect in all supported OS.</li>
+  <li>Push and build on AppVeyor</li>
+  <li>Announce RC release.
+    <ul>
+      <li><a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users" target="_blank">ttssh2-users</a> mailing list</li>
+      <li>Twitter (<a href="https://twitter.com/Tera_Term" target="_blank">https://twitter.com/Tera_Term</a>)</li>
+    </ul>
+  </li>
+  <li>Get feedbacks.
+    <p>If changed source code, redo "Confirm documents" and "Test run and connect in all supported OS."</p>
+  </li>
+</ol>
+
+<h2 id="release-operation">Release</h2>
+
+<ol>
+  <li>Confirm documents. (same as above)</li>
+  <li>Remove "RC" string.
+    <ul>
+      <li>
+        teraterm\common\tt-version.h
+<pre>
+  #define TT_VERSION_MAJOR             5
+  #define TT_VERSION_MINOR             0
+- #define TT_VERSION_SUBSTR            "RC"
++ #undef TT_VERSION_SUBSTR
+</pre>
+      </li>
+      <li>
+        installer\teraterm.iss<br>
+<pre>
+- #define AppVer "5.0-RC"
++ #define AppVer "5.0"
+</pre>
+     </li>
+    </ul>
+  </li>
+  <li>Modify release date.
+    <ul>
+      <li>html/about/hisotry.html</li>
+    </ul>
+  </li>
+  <li>Create installer.
+    <p>
+      Check that build and installer generation without error.
+    </p>
+  </li>
+  <li>Commit this state.</li>
+  <li>Create SVN tag.
+    <p>
+      Use annotated tags.
+      The naming rule is `v(version)' (e.g. v5.0).
+    </p>
+<pre>
+git tag -a v5.0 -m "Release 5.0"
+</pre>
+  </li>
+  <li>Create installer.</li>
+  <li>Update project site.
+    <ul>
+      <li>add new release with a new tag.</li>
+      <li>put installer and portable zip file.</li>
+      <li>copy release note from changelog of document (in Japanese and English).</li>
+    </ul>
+  </li>
+  <li>Update project web page (<a href="https://ttssh2.osdn.jp" target="_blank">https://ttssh2.osdn.jp</a>).
+    <p><a href="https://github.com/TeraTermProject/teraterm/wiki/Update-Project-page" target="_blank">How to update project home page (in Japanese).</a></p>
+  </li>
+  <li>Announce release.
+    <ul>
+      <li><a href="https://lists.osdn.me/mailman/listinfo/ttssh2-users" target="_blank">ttssh2-users</a> mailing list</li>
+      <li>Twitter (<a href="https://twitter.com/Tera_Term" target="_blank">https://twitter.com/Tera_Term</a>)</li>
+    </ul>
+  </li>
+  <li id="increment_version">Increment the version
+    <ul>
+      <li>
+        teraterm/common/tt-version.h<br>
+        Increment TT_VERSION_MINOR and set SUBSTR to "dev".
+<pre>
+  #define TT_VERSION_MAJOR             5
+- #define TT_VERSION_MINOR             0
+- #undef TT_VERSION_SUBSTR
++ #define TT_VERSION_MINOR             1
++ #define TT_VERSION_SUBSTR            "dev"
+</pre>
+      </li>
+      <li>
+        ttssh2/ttssh/ttxssh-version.h<br>
+        Increment TT_VERSION_MINOR.
+<pre>
+  #define TTSSH_VERSION_MAJOR             3
+- #define TTSSH_VERSION_MINOR             0
++ #define TTSSH_VERSION_MINOR             1
+</pre>
+      </li>
+      <li>
+        installer\teraterm.iss<br>
+        Set AppVer to [next version]-dev.
+<pre>
+- #define AppVer "5.0"
++ #define AppVer "5.1-dev"
+
+  [PreCompile]
+  Name: makechm.bat
+- ;Name: build.bat
+- Name: build.bat; Parameters: rebuild
++ Name: build.bat
++ ;Name: build.bat; Parameters: rebuild
+  
+  [PostCompile]
+- Name: makearchive.bat; Parameters: release
++ ;Name: makearchive.bat; Parameters: release
+</pre>
+      </li>
+    </ul>
+  </li>
+  <li>Update Chocolatey.</li>
+</ol>
+
+<h2 id="code-freeze">About code freeze.</h2>
+
+<p>
+After code freeze, only critical bug fix is able to committed.<br />
+Code freeze start with <a href="#RC_commit">RC commit in development branch</a>, and end with <a href="#increment_version">version increment commit.</a>.
+</p>
+
+</body>
+</html>

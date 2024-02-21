@@ -724,87 +724,56 @@
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Keycode">
-			<param name="Local" value="html\reference\keycode.html">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Menu ID">
+			<param name="Name" value="Menu IDs">
 			<param name="Local" value="html\reference\menu_id.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="RE">
+			<param name="Name" value="Oniguruma Regular Expressions">
 			<param name="Local" value="html\reference\RE.txt">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="For developer">
+		<param name="ImageNumber" value="1">
+		</OBJECT>
+	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="License of cJSON">
-			<param name="Local" value="html\reference\cJSON-LICENSE.txt">
+			<param name="Name" value="Development environment & libraries">
+			<param name="Local" value="html\reference\develop-environment.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="License of Oniguruma">
-			<param name="Local" value="html\reference\Oniguruma-LICENSE.txt">
+			<param name="Name" value="Create development environment & build">
+			<param name="Local" value="html\reference\develop-build.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="License of SFMT">
-			<param name="Local" value="html\reference\SFMT-LICENSE.txt">
+			<param name="Name" value="Note for development">
+			<param name="Local" value="html\reference\develop-memo.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="License of OpenSSH">
-			<param name="Local" value="html\reference\OpenSSH-LICENSE.txt">
+			<param name="Name" value="How to release Tera Term installation package">
+			<param name="Local" value="html\reference\develop-release.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="License of LibreSSL">
-			<param name="Local" value="html\reference\LibreSSL-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="License of zlib">
-			<param name="Local" value="html\reference\zlib-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="License of PuTTY">
-			<param name="Local" value="html\reference\PuTTY-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="License of The reference C implementation of Argon2">
-			<param name="Local" value="html\reference\argon2-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="License of CygTerm+">
-			<param name="Local" value="html\reference\CygTerm+-LICENSE.txt">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="For developer">
-			<param name="Local" value="html\reference\develop.html">
+			<param name="Name" value="Build with CMake build system (experimental)">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<UL>
 			<LI> <OBJECT type="text/sitemap">
-				<param name="Name" value="Build with CMake build system (experimental)">
+				<param name="Name" value="library">
+				<param name="Local" value="html\reference\build_library_with_cmake.html">
 				<param name="ImageNumber" value="11">
-				</OBJECT>
-			<UL>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="library">
-					<param name="Local" value="html\reference\build_library_with_cmake.html">
-					<param name="ImageNumber" value="11">
-				  </OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Tera Term">
-					<param name="Local" value="html\reference\build_with_cmake.html">
-					<param name="ImageNumber" value="11">
-				  </OBJECT>
-			</UL>
+			  </OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Tera Term">
+				<param name="Local" value="html\reference\build_with_cmake.html">
+				<param name="ImageNumber" value="11">
+			  </OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Source Code Overview">
@@ -1907,6 +1876,11 @@
 				</OBJECT>
 		</UL>
 	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Keycode">
+		<param name="Local" value="html\reference\keycode.html">
+		<param name="ImageNumber" value="11">
+		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Uninstallation">
 		<param name="Local" value="html\uninstall.html">

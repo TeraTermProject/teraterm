@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>開発環境・ライブラリ</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>開発環境・ライブラリ</h1>
+
+<ol>
+  <li><a href="#compiler">コンパイラ・ツール</a></li>
+  <li><a href="#library">使用しているライブラリ</a></li>
+</ol>
+
+<hr>
+
+<h2 id="compiler">コンパイラ・ツール</h2>
+
+<p>
+Tera Term Project でリリースに使用しているコンパイラは以下の通りです。
+</p>
+
+<ul>
+  <li>Visual Studio Community 2022 (最新版) (<a href="https://visualstudio.microsoft.com/" target="_blank">https://visualstudio.microsoft.com/</a>)</li>
+  <li>Cygwin gcc (<a href="https://www.cygwin.com/" target="_blank">https://www.cygwin.com/</a>)<br />
+    CygTerm+ のビルドに使用します。
+    <!--Cygwin の最新版は 32bit バイナリが生成できません。32bit バイナリを生成できる cygwin32-gcc-g++ を Cygwin Time Machine (<a href="http://www.crouchingtigerhiddenfruitbat.org/Cygwin/timemachine.html" target="_blank">http://www.crouchingtigerhiddenfruitbat.org/Cygwin/timemachine.html</a>) からダウンロードします。-->
+  </li>
+</ul>
+
+<p>
+ビルドに必要なツールは以下の通りです。
+</p>
+
+<ul>
+  <li>Perl<br />
+    以下のいずれか:
+    <ul>
+      <li>Strawberry Perl 5.30.1.1 以上 (<a href="https://strawberryperl.com/" target="_blank">https://strawberryperl.com/</a>)</li>
+      <li>ActivePerl 5.10 以上 (<a href="https://www.activestate.com/products/perl/" target="_blank">https://www.activestate.com/products/perl/</a>)</ li>
+    </ul>
+    ビルド過程で使用します。<br />
+    <ul>
+      <li>ドキュメントファイルの文字コード・改行コード変換(必須)</li>
+      <li>リビジョン番号取得 (perlがない場合リビジョン番号を取得せずにビルドします)</li>
+    </ul>
+  </li>
+  <li>Git<br />
+    <ul>
+      <li>Git for Windows (<a href="https://github.com/git-for-windows/git/releases" target="_blank">https://github.com/git-for-windows/git/releases</a>)</li>
+    </ul>
+    ソースの clone に使用します。<br />
+    コミットハッシュの取得のためにコマンドライン版が必要です。
+  </li>
+  <li>HTML Help Compiler<br />
+    ヘルプの作成に使用します。
+  </li>
+  <li>CMake<br />
+    ファイルのダウンロードや展開や圧縮などに使用します。
+  </li>
+  <li>Inno Setup<br />
+    <ul>
+      <li>Inno Setup 6.2.2 (<a href="https://jrsoftware.org/isinfo.php" target="_blank">https://jrsoftware.org/isinfo.php</a>)</li>
+      <li>Inno Script Studio 2.5.1 (<a href="https://www.kymoto.org/products/inno-script-studio" target="_blank">https://www.kymoto.org/products/inno-script-studio</a>)</li>
+    </ul>
+    インストーラの作成に使用します。
+  </li>
+</ul>
+
+<h2 id="library">ライブラリ</h2>
+
+<ul>
+  <li>Oniguruma 6.9.9 (<a href="https://github.com/kkos/oniguruma/" target="_blank">https://github.com/kkos/oniguruma/</a>)<br />
+    Tera Term Macro で正規表現のために使用します。
+  </li>
+  <li>SFMT 1.5.1 (<a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html" target="_blank">http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html</a>)<br />
+    Tera Term Macro で乱数生成のために使用します。
+  </li>
+  <li>LibreSSL 3.7.3 (<a href="https://www.libressl.org/" target="_blank">https://www.libressl.org/</a>)<br />
+    TTSSH で暗号のために使用します。
+  </li>
+  <li>zlib 1.3 (<a href="https://www.zlib.net/" target="_blank">https://www.zlib.net/</a>)<br />
+    TTSSH で圧縮のために使用します。
+  </li>
+  <!--
+  <li>PuTTY 0.76 (<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/" target="_blank">https://www.chiark.greenend.org.uk/~sgtatham/putty/</a>)<br />
+    TTSSH で Pageant との通信に使用します。
+  </li>
+  -->
+  <li>The reference C implementation of Argon2 20190702 (<a href="https://github.com/P-H-C/phc-winner-argon2/" target="_blank">https://github.com/P-H-C/phc-winner-argon2/</a>)<br />
+    TTSSH で PuTTY の秘密鍵ファイル形式バージョン3 (PPK3) の読み込みに使用します。
+  </li>
+  <li>cJSON 1.7.14 (<a href="https://github.com/DaveGamble/cJSON/" target="_blank">https://github.com/DaveGamble/cJSON/</a>)<br />
+    TTXCheckUpdate plugin で使用します。
+  </li>
+</ul>
+
+</body>
+</html>

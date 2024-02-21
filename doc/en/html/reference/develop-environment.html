@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Create development environment & Build</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1 class="center">Create development environment & Build</h1>
+
+<ol>
+  <li><a href="#compiler">Compiler, Tools</a></li>
+  <li><a href="#library">Libraries</a></li>
+</ol>
+
+<hr>
+
+<h2 id="compiler">Compiler, Tools</h2>
+
+<p>
+Compiler and tools used for release in Tera Term Project:
+</p>
+
+<ul>
+  <li>Visual Studio Community 2022 (latest) (<a href="https://visualstudio.microsoft.com/"  target="_blank">https://visualstudio.microsoft.com/</a>)</li>
+  <li>Cygwin gcc (<a href="https://www.cygwin.com/" target="_blank">https://www.cygwin.com/</a>)<br />
+    For build CygTerm+.
+    <!--Cygwin ‚ÌÅV”Å‚Í 32bit ƒoƒCƒiƒŠ‚ª¶¬‚Å‚«‚Ü‚¹‚ñB32bit ƒoƒCƒiƒŠ‚ð¶¬‚Å‚«‚é cygwin32-gcc-g++ ‚ð Cygwin Time Machine (<a href="http://www.crouchingtigerhiddenfruitbat.org/Cygwin/timemachine.html" target="_blank">http://www.crouchingtigerhiddenfruitbat.org/Cygwin/timemachine.html</a>) ‚©‚çƒ_ƒEƒ“ƒ[ƒh‚µ‚Ü‚·B-->
+  </li>
+</ul>
+
+<p>
+Following tools are needed to build Tera Term:
+</p>
+
+<ul>
+  <li>Perl<br />
+    Any of the following:
+    <ul>
+      <li>Strawberry Perl 5.30.1.1 or later (<a href="https://strawberryperl.com/" target="_blank">https://strawberryperl.com/</a>)</li>
+      <li>ActivePerl 5.10 or later (<a href="https://www.activestate.com/products/perl/" target="_blank">https://www.activestate.com/products/perl/</a>)</ li>
+    </ul>
+    For build.<br />
+    <ul>
+      <li>Converts character-code and return-code of documents.</li>
+      <li>For get the revision number.</li>
+    </ul>
+  </li>
+  <li>Git<br />
+    <ul>
+      <li>Git for Windows (<a href="https://github.com/git-for-windows/git/releases" target="_blank">https://github.com/git-for-windows/git/releases</a>)</li>
+    </ul>
+    For clone source code.<br />
+    The command line version is necewssaly necessary for get the commit hash.
+  </li>
+  <li>HTML Help Compiler<br />
+    For build HTML help file.
+  </li>
+  <li>CMake<br />
+    For download files and extract and compression.
+  </li>
+  <li>Inno Setup<br />
+    <ul>
+      <li>Inno Setup 6.2.2 (<a href="https://jrsoftware.org/isinfo.php" target="_blank">https://jrsoftware.org/isinfo.php</a>)</li>
+      <li>Inno Script Studio 2.5.1 (<a href="https://www.kymoto.org/products/inno-script-studio" target="_blank">https://www.kymoto.org/products/inno-script-studio</a>)</li>
+    </ul>
+    For build installer.
+  </li>
+</ul>
+
+<h2 id="library">Libraries</h2>
+
+<ul>
+  <li>Oniguruma 6.9.9 (<a href="https://github.com/kkos/oniguruma/" target="_blank">https://github.com/kkos/oniguruma/</a>)<br />
+    For regular expression. Used by Tera Term Macro.
+  </li>
+  <li>SFMT 1.5.1 (<a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html" target="_blank">http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html</a>)<br />
+    For generate random number. Used by Tera Term Macro.
+  </li>
+  <li>LibreSSL 3.7.3 (<a href="https://www.libressl.org/" target="_blank">https://www.libressl.org/</a>)<br />
+    For encryption. Used by TTSSH.
+  </li>
+  <li>zlib 1.3 (<a href="https://www.zlib.net/" target="_blank">https://www.zlib.net/</a>)<br />
+    For compress. Used by TTSSH.
+  </li>
+  <!--
+  <li>PuTTY 0.76 (<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/" target="_blank">https://www.chiark.greenend.org.uk/~sgtatham/putty/</a>)<br />
+    For communicate to Pageant. Used by TTSSH.
+  </li>
+  -->
+  <li>The reference C implementation of Argon2 20190702 (<a href="https://github.com/P-H-C/phc-winner-argon2/" target="_blank">https://github.com/P-H-C/phc-winner-argon2/</a>)<br />
+    For read PuTTY private key file format version 3 (PPK3). Used by TTSSH.
+  </li>
+  <li>cJSON 1.7.14 (<a href="https://github.com/DaveGamble/cJSON/" target="_blank">https://github.com/DaveGamble/cJSON/</a>)<br />
+    Used by TTXCheckUpdate plugin.
+  </li>
+</ul>
+
+</body>
+</html>

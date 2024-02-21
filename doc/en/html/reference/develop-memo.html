@@ -1,0 +1,440 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Note for development</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1 class="center">Note for development</h1>
+
+<ol>
+  <li><a href="#ini-entry">Add entry to TERATERM.INI</a></li>
+  <li><a href="#menu-id">Naming rule to add menu ID</a></li>
+  <li><a href="#add-macro-command">What to do when new macro command is added?</a></li>
+  <li><a href="#icon">Icon</a></li>
+</ol>
+
+<hr>
+
+<h2 id="ini-entry">Add entry to TERATERM.INI</h2>
+
+<p>
+Entry name<br />
+Unfortunately, the confusing entries such as EnableFoo... and DisableBar... are included.<br />
+It recommends that the new name like as Baz....
+</p>
+
+
+<h2 id="menu-id">Naming rule to add menu ID</h2>
+
+<pre>
+The first digit is 5.
+</pre>
+<pre>
+The second digit is:
+  Tera Term VT window          0
+  Tera Term TEK window         1
+  TTSSH                        2
+  TTProxy                      3
+  TTXKanjiMenu                 4
+</pre>
+<pre>
+The third digit is:
+  [File] menu                  1
+  [Edit] menu                  2
+  [Setup] menu                 3
+  [Control] menu               4
+  [Window] menu                8
+  [Help] menu                  9
+</pre>
+
+<p>
+Example: adding a TTSSH menu under File menu
+</p>
+<pre>
+#define ID_SSHSCPMENU       52110
+</pre>
+
+
+<h2 id="add-macro-command">What to do when new macro command is added?</h2>
+
+<ul>
+  <li>Coding
+    <ul>
+      <li>get a new number of command internal ID.<br />
+          ... teraterm/ttmacro/ttmparse.h</li>
+      <li>add a if statement to below function.<br />
+          ... CheckReservedWord@teraterm/ttmacro/ttmparse.c</li>
+      <li>add a caller doing the macro command.<br />
+          ... ExecCmnd@teraterm/ttmacro/ttl.c</li>
+      <li>make a function code for the macro command.</li>
+    </ul>
+  </li>
+  <li>Help topic
+    <ul>
+      <li>make the command help file.<br />
+          ... doc/LANG/html/macro/command/hogefunc.html</li>
+      <li>add to command index page.<br />
+          ... doc/LANG/html/macro/command/index.html</li>
+      <li>add the file to help topic.<br />
+          ... doc/LANG/teraterm.hhc</li>
+      <li>get a new number of context ID in help page.<br />
+          The value is internal ID + 92000.<br />
+          ... teraterm/common/helpid.h</li>
+      <li>make the alias between context ID and calling file.<br />
+          Open the .hhp file by using Text Editor, added a html line in [ALIAS] tag.<br />
+          ... doc/LANG/teraterm.hhp</li>
+    </ul>
+  </li>
+</ul>
+
+
+<h2 id="icon">Icon</h2>
+
+<p>
+Icon file includes 4bit 32px and 16px images, 32bit 256px, 48px, 32px and 16px images.<br />
+Each icon files include following kind images.
+</p>
+
+<strong>T (Tera Term)</strong>
+<table border="1">
+  <tr>
+    <th>icon file                           </th><th>icon name      </th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\common\teraterm.ico        </td><td>TTERM (Default)</td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\common\teraterm_classic.ico</td><td>TTERM_CLASSIC  </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>-         </td><td>-         </td><td>-         </td>
+  </tr>
+  <tr>
+    <td>teraterm\common\teraterm_3d.ico     </td><td>TTERM_3D       </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\common\teraterm_flat.ico   </td><td>TTERM_FLAT     </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
+
+<strong>VT (VT Window)</strong>
+<table border="1">
+  <tr>
+    <th>icon file                     </th><th>icon name   </th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\common\vt.ico        </td><td>VT (Default)</td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\common\vt_classic.ico</td><td>VT_CLASSIC  </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>-         </td><td>-         </td><td>-         </td>
+  </tr>
+  <tr>
+    <td>teraterm\common\vt_3d.ico     </td><td>VT_3D       </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\common\vt_flat.ico   </td><td>VT_FLAT     </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
+
+<strong>TEK (TEK Windows)</strong>
+<table border="1">
+  <tr>
+    <th>icon file              </th><th>icon name</th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\common\tek.ico</td><td>TEK      </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>-         </td><td>-         </td><td>-         </td>
+  </tr>
+</table>
+
+<strong>M (Macro)</strong>
+<table border="1">
+  <tr>
+    <th>icon file                         </th><th>icon name</th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttmacro.ico     </td><td>-        </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttmacro_3d.ico  </td><td>-        </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttmacro_flat.ico</td><td>-        </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
+
+<strong>MF (Macro File)</strong>
+<table border="1">
+  <tr>
+    <th>icon file                     </th><th>icon name</th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttmacrof.ico</td><td>-        </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
+
+<strong>keycode</strong>
+<table border="1">
+  <tr>
+    <th>icon file                   </th><th>icon name</th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\keycode\keycode.ico</td><td>-        </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>BMP       </td><td>-         </td><td>-         </td>
+  </tr>
+</table>
+
+<strong>TTSSH</strong>
+<table border="1">
+  <tr>
+    <th>icon file                             </th><th>icon name      </th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttsecure.ico        </td><td>flat2 (Default)</td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttsecure_classic.ico</td><td>classic        </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>-         </td><td>-         </td><td>-         </td>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttsecure_yellow.ico </td><td>yellow         </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttsecure_green.ico  </td><td>green          </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+  <tr>
+    <td>teraterm\ttpmacro\ttsecure_flat.ico   </td><td>flat           </td><td>BMP      </td><td>BMP      </td><td>PNG        </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
+
+<strong>TeraTerm Menu</strong>
+<table border="1">
+  <tr>
+    <th>icon file           </th><th>icon name      </th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>ttpmenu\teraterm.ico</td><td>-              </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
+
+<strong>Cygterm+</strong>
+<table border="1">
+  <tr>
+    <th>icon file                 </th><th>icon name      </th><th>4bit 32px</th><th>4bit 16px</th><th>32bit 256px</th><th>32bit 48px</th><th>32bit 32px</th><th>32bit 16px</th>
+  </tr>
+  <tr>
+    <td>cygwin\cygterm\cygterm.ico</td><td>CYGTERM        </td><td>BMP      </td><td>BMP      </td><td>-          </td><td>BMP       </td><td>BMP       </td><td>BMP       </td>
+  </tr>
+</table>
+
+<p>
+The store order of image files in icon file is "bit depth ASC", "pixel size DESC."<br />
+Otherwise, when a program load an icon image without specifying pixel size for get maximum size image, API returns first image.
+</p>
+
+<p>
+Icon file include 4-bit images.<br />
+Windows NT 4.0 supports only 4-bit icon. And notification area icon on Windows 2000 supports only 4-bit icon.<br />
+4-bit color palette is followings:
+</p>
+
+<table border="1">
+  <tr>
+    <td style="background-color:#000000;">&nbsp;&nbsp;</td><td>#000000</td><td>(0,0,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#800000;">&nbsp;&nbsp;</td><td>#800000</td><td>(128,0,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#ff0000;">&nbsp;&nbsp;</td><td>#ff0000</td><td>(255,0,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#ff00ff;">&nbsp;&nbsp;</td><td>#ff00ff</td><td>(255,0,255)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#008080;">&nbsp;&nbsp;</td><td>#008080</td><td>(0,128,128)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#008000;">&nbsp;&nbsp;</td><td>#008000</td><td>(0,128,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#00ff00;">&nbsp;&nbsp;</td><td>#00ff00</td><td>(0,255,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#00ffff;">&nbsp;&nbsp;</td><td>#00ffff</td><td>(0,255,255)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#000080;">&nbsp;&nbsp;</td><td>#000080</td><td>(0,0,128)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#800080;">&nbsp;&nbsp;</td><td>#800080</td><td>(128,0,128)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#0000ff;">&nbsp;&nbsp;</td><td>#0000ff</td><td>(0,0,255)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#c0c0c0;">&nbsp;&nbsp;</td><td>#c0c0c0</td><td>(192,192,192)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#808080;">&nbsp;&nbsp;</td><td>#808080</td><td>(128,128,128)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#808000;">&nbsp;&nbsp;</td><td>#808000</td><td>(128,128,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#ffff00;">&nbsp;&nbsp;</td><td>#ffff00</td><td>(255,255,0)</td>
+  </tr>
+  <tr>
+    <td style="background-color:#ffffff;">&nbsp;&nbsp;</td><td>#ffffff</td><td>255,255,255</td>
+  </tr>
+</table>
+
+<p>
+Source file of each icon images are followings:
+</p>
+
+<table border="1" style="margin-bottom:1ex;">
+  <tr>
+    <th>source file</th>
+    <th>bit</th>
+    <th>T</th>
+    <th>VT</th>
+    <th>Macro</th>
+    <th>SSH</th>
+    <th>Cygwin</th>
+  </tr>
+  <tr>
+    <td rowspan="2">teraterm\common\flat_icon_16.psd</td>
+    <td>4bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td rowspan="2">teraterm\common\flat_icon_32.psd</td>
+    <td>4bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  <tr>
+    <td>teraterm\common\flat_icon_48.psd</td>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td>teraterm\common\flat_icon_256.psd</td>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>-</td>
+  </tr>
+</table>
+<table border="1" style="margin-bottom:1ex;">
+  <tr>
+    <th>source file</th>
+    <th>bit</th>
+    <th>Keycode</th>
+  </tr>
+  <tr>
+    <td rowspan="2">teraterm\common\keycode_48.psd</td>
+    <td>4bit</td>
+    <td>v</td>
+  </tr>
+</table>
+<table border="1" style="margin-bottom:1ex;">
+  <tr>
+    <th>source file</th>
+    <th>bit</th>
+    <th>T</th>
+    <th>VT</th>
+    <th>Macro</th>
+    <th>Macro File</th>
+    <th>SSH</th>
+    <th>Cygwin</th>
+  </tr>
+  <tr>
+    <td rowspan="2">teraterm\common\flat2_icon_16.psd</td>
+    <td>4bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td rowspan="2">teraterm\common\flat2_icon_32.psd</td>
+    <td>4bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  <tr>
+    <td>teraterm\common\flat2_icon_48.psd</td>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+  </tr>
+  <tr>
+    <td>teraterm\common\flat2_icon_256.psd</td>
+    <td>32bit</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>v</td>
+    <td>-</td>
+  </tr>
+</table>
+
+</body>
+</html>
