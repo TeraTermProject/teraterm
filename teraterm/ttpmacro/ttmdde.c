@@ -38,6 +38,7 @@
 #include "ttmparse.h"
 #include "ttmmsg.h"
 #include "codeconv.h"
+#include "asprintf.h"
 
 #include "ttmdde.h"
 
@@ -858,38 +859,29 @@ int Wait4all()
 	}
 }
 
-
-void SetFile(PCHAR FN)
+static void SetFileCommon(char cmd, const char *filenameU8)
 {
-	char Cmd[1 + MaxStrLen];
-
-#if 1
-	_snprintf_s(Cmd, sizeof(Cmd), _TRUNCATE, "%c%s", CmdSetFile, FN);
-#else
-	Cmd[0] = CmdSetFile;
-	strcpy(&(Cmd[1]),FN);
-#endif
-	DdeClientTransaction(Cmd,strlen(Cmd)+1,ConvH,0,CF_OEMTEXT,XTYP_EXECUTE,1000,NULL);
+	char *cmd_buf;
+	int len = asprintf(&cmd_buf, "%c%s", cmd, filenameU8);
+	if (len > 0) {
+		DdeClientTransaction(cmd_buf, len, ConvH, 0, CF_OEMTEXT, XTYP_EXECUTE, 1000, NULL);
+		free(cmd_buf);
+	}
 }
 
-// add (2008.1.3 yutaka)
-void SetSecondFile(PCHAR FN)
+/**
+ *	ファイル名(文字列)を送信する
+ *
+ *	@param	filenameU8	文字列(UTF-8)
+ */
+void SetFile(const char *filenameU8)
 {
-	char Cmd[1 + MaxStrLen];
+	SetFileCommon(CmdSetFile, filenameU8);
+}
 
-#if 1
-	memset(Cmd, 0, sizeof(Cmd));
-	if (FN[0] != '\0') {
-		_snprintf_s(Cmd, sizeof(Cmd), _TRUNCATE, "%c%s", CmdSetSecondFile, FN);
-	}
-	else {
-		Cmd[0] = CmdSetSecondFile;
-	}
-#else
-	Cmd[0] = CmdSetFile;
-	strcpy(&(Cmd[1]),FN);
-#endif
-	DdeClientTransaction(Cmd,strlen(Cmd)+1,ConvH,0,CF_OEMTEXT,XTYP_EXECUTE,1000,NULL);
+void SetSecondFile(const char *filenameU8)
+{
+	SetFileCommon(CmdSetSecondFile, filenameU8);
 }
 
 void SetBinary(int BinFlag)
