@@ -704,9 +704,10 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 
 	TempA = ToCharW(Temp);
 	strncpy_s(buf, buflen, TempA, _TRUNCATE);
-	free(HomeDirW);
-	free(SetupFName);
 	free(TempA);
+	free(SetupFName);
+	free(HomeDirW);
+	free(entryW);
 }
 
 void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)
