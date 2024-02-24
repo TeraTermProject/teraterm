@@ -242,12 +242,12 @@ endfunction()
 # zlib
 function(download_zlib)
   message("zlib")
-  set(DIR_IN_ARC "zlib-1.3")
+  set(DIR_IN_ARC "zlib-1.3.1")
   set(RENAME_DIR "zlib")
   set(CHECK_FILE "zlib/ChangeLog")
-  set(CHECK_HASH "e6fed9987017f53a18bf9eef883789577fc78feb3591bfbe3d68c3dd93d92aeb")
-  set(SRC_URL "https://zlib.net/zlib-1.3.tar.xz")
-  set(ARC_HASH "8a9ba2898e1d0d774eca6ba5b4627a11e5588ba85c8851336eb38de4683050a7")
+  set(CHECK_HASH "f3bc368fd1722570d25411fece6b0e026ab95a9e20ccf39c4395aa41a956a4f0")
+  set(SRC_URL "https://zlib.net/zlib-1.3.1.tar.xz")
+  set(ARC_HASH "38ef96b8dfe510d42707d9c781877914792541133e1870841463bfa73f883e32")
   #   ARC_HASH was picked from https://www.zlib.net
   set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/zlib")
   download_extract(
