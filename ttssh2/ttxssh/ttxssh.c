@@ -2095,9 +2095,9 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 
 	// zlibÇÃÉoÅ[ÉWÉáÉìÇê›íËÇ∑ÇÈ (2005.5.11 yutaka)
 #ifdef ZLIB_VERSION
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "ZLib %s", ZLIB_VERSION);
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "zlib %s", ZLIB_VERSION);
 #else
-	_snprintf(buf, sizeof(buf), "ZLib Unknown");
+	_snprintf(buf, sizeof(buf), "zlib Unknown");
 #endif
 	SetDlgItemTextA(dlg, IDC_ZLIB_VERSION, buf);
 
