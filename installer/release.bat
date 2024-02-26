@@ -330,13 +330,16 @@ echo CMAKE=%CMAKE%
 
 echo cygwin
 echo CYGWIN_PATH=%CYGWIN_PATH%
-cygcheck -c base-cygwin
-cygcheck -c gcc-core
-cygcheck -c w32api-headers
-cygcheck -c make
+%CYGWIN_PATH%\cygcheck -c base-cygwin
+%CYGWIN_PATH%\cygcheck -c gcc-core
+%CYGWIN_PATH%\cygcheck -c w32api-headers
+%CYGWIN_PATH%\cygcheck -c make
 
 echo inno setup
 echo INNO_SETUP=%INNO_SETUP%
 %INNO_SETUP% /?
+
+echo PATH
+echo %PATH%
 
 exit /b 0
