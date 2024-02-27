@@ -412,7 +412,7 @@ HPROPSHEETPAGE CodingPageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
-	psp.pszTitle = L"coding";		// TODO lng ファイルに入れる
+	psp.pszTitle = L"Coding";		// TODO lng ファイルに入れる
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if defined(REWRITE_TEMPLATE)
 	psp.dwFlags |= PSP_DLGINDIRECT;

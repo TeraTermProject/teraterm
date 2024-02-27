@@ -299,7 +299,7 @@ HPROPSHEETPAGE ThemePageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
-	psp.pszTitle = _wcsdup(L"theme");
+	psp.pszTitle = _wcsdup(L"Theme");
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if defined(REWRITE_TEMPLATE)
 	psp.dwFlags |= PSP_DLGINDIRECT;
