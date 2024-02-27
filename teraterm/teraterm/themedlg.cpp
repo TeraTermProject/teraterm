@@ -329,7 +329,7 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	switch (msg) {
 		case WM_INITDIALOG: {
 			static const DlgTextInfo TextInfos[] = {
-				{ IDC_BGIMG_CHECK, "DLG_THEME_BG_IMAGEFILE" },
+				{ IDC_BGIMG_CHECK, "DLG_THEME_BG_IMAGE" },
 			};
 			dlg_data = (ThemeDlgData*)(((PROPSHEETPAGEW_V1 *)lp)->lParam);
 			SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)dlg_data);
@@ -802,7 +802,7 @@ static HPROPSHEETPAGE ColorThemeEditorCreate(ThemeDlgData *dlg_data)
 
 	wchar_t *title;
 	GetI18nStrWW("Tera Term", "DLG_THEME_COLOR_TITLE",
-				 L"color", dlg_data->pts->UILanguageFileW, &title);
+				 L"Text color", dlg_data->pts->UILanguageFileW, &title);
 
 	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
@@ -1002,7 +1002,7 @@ static HPROPSHEETPAGE ThemeEditorFile(ThemeDlgData* dlg_data)
 
 	wchar_t *title;
 	GetI18nStrWW("Tera Term", "DLG_THEME_PREVIEW_FILE_TITLE",
-				 L"preview/file", dlg_data->pts->UILanguageFileW, &title);
+				 L"Preview/File", dlg_data->pts->UILanguageFileW, &title);
 
 	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
@@ -1107,7 +1107,7 @@ static HPROPSHEETPAGE BGAlphaCreate(ThemeDlgData *dlg_data)
 
 	wchar_t *title;
 	GetI18nStrWW("Tera Term", "DLG_THEME_BG_ALPHA_TITLE",
-				 L"background image alpha", dlg_data->pts->UILanguageFileW, &title);
+				 L"Background image alpha", dlg_data->pts->UILanguageFileW, &title);
 
 	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);

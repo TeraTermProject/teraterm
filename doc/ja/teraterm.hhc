@@ -499,53 +499,53 @@
 				</OBJECT>
 			<UL>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="General tab">
+					<param name="Name" value="General タブ">
 					<param name="Local" value="html\menu\setup-additional.html#TabGeneral">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Control Sequence tab">
+					<param name="Name" value="Control Sequence タブ">
 					<param name="Local" value="html\menu\setup-additional.html#TabControlSequence">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Copy and Paste tab">
+					<param name="Name" value="Copy and Paste タブ">
 					<param name="Local" value="html\menu\setup-additional.html#TabCopyAndPaste">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Visual tab">
+					<param name="Name" value="Visual タブ">
 					<param name="Local" value="html\menu\setup-additional-visual.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="theme tab">
-					<param name="Local" value="html\menu\setup-additional-theme.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="theme editor">
-					<param name="Local" value="html\menu\setup-additional-visual-theme.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Log tab">
+					<param name="Name" value="Log タブ">
 					<param name="Local" value="html\menu\setup-additional-log.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Cygwin tab">
+					<param name="Name" value="Cygwin タブ">
 					<param name="Local" value="html\menu\setup-additional.html#TabCygwin">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="coding tab">
+					<param name="Name" value="Coding タブ">
 					<param name="Local" value="html\menu\setup-additional-coding.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="font tab">
+					<param name="Name" value="Font タブ">
 					<param name="Local" value="html\menu\setup-additional-font.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Theme タブ">
+					<param name="Local" value="html\menu\setup-additional-theme.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Theme Editor">
+					<param name="Local" value="html\menu\setup-additional-visual-theme.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 			</UL>

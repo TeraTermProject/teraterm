@@ -366,7 +366,7 @@ BEGIN
     PUSHBUTTON      "Theme Editor",IDC_THEME_EDITOR_BUTTON,15,39,50,14
     CONTROL         "Disable theme when moving or resizing window",IDC_CHECK_FAST_SIZE_MOVE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,58,198,12
-    LTEXT           "startup",-1,15,76,23,8
+    LTEXT           "Startup",-1,15,76,23,8
     COMBOBOX        IDC_THEME_FILE,26,90,108,55,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_THEME_EDIT,26,106,257,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_THEME_BUTTON,286,106,15,14
