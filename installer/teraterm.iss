@@ -1,6 +1,6 @@
 ﻿#define AppName "Tera Term"
 #ifndef AppVer
-#define AppVer "5.2-RC"
+#define AppVer "5.2"
 #endif
 ;#define VerSubStr
 ;#define OutputSubStr
