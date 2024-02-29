@@ -44,6 +44,7 @@ ConvertLNG(Russian.lng utf16le)
 ConvertLNG("Simplified Chinese.lng" utf16le)
 ConvertLNG(Spanish.lng utf16le)
 ConvertLNG("Traditional Chinese.lng" utf16le)
+ConvertLNG("Tamil.lng" utf16le)
 
 add_custom_target(
   ${PACKAGE_NAME} ALL

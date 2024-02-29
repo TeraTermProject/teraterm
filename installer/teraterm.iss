@@ -108,6 +108,7 @@ Source: release\lang_utf16le\Korean.lng; DestDir: {app}\lang_utf16le; Components
 Source: release\lang_utf16le\Simplified Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang_utf16le\Spanish.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang_utf16le\Traditional Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\Tamil.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: ..\ttssh2\ttxssh\Release\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH
 Source: ..\cygwin\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm

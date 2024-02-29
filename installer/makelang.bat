@@ -10,6 +10,7 @@ perl utf8_to.pl utf16le release/lang_utf8/Russian.lng release/lang_utf16le/Russi
 perl utf8_to.pl utf16le "release/lang_utf8/Simplified Chinese.lng" "release/lang_utf16le/Simplified Chinese.lng"
 perl utf8_to.pl utf16le release/lang_utf8/Spanish.lng release/lang_utf16le/Spanish.lng
 perl utf8_to.pl utf16le "release/lang_utf8/Traditional Chinese.lng" "release/lang_utf16le/Traditional Chinese.lng"
+perl utf8_to.pl utf16le "release/lang_utf8/Tamil.lng" "release/lang_utf16le/Tamil.lng"
 
 if not exist release\lang mkdir release\lang
 perl utf8_to.pl cp1252 release/lang_utf8/Default.lng release/lang/Default.lng
