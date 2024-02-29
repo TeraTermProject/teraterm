@@ -205,14 +205,25 @@ TeraTerm Project でのリリース手順について以下に示します。
     </p>
 <pre>
 git tag -a v5.0 -m "Release 5.0"
+git push origin v5.0
 </pre>
   </li>
-  <li>インストーラを作成する</li>
-  <li>プロジェクトサイトを更新する
+  <li>インストーラを作成する
+    <p>AppVeyor の "github-release" プロジェクトを使用する。</p>
+  </li>
+  <li>GitHub の Releases に追加する
     <ul>
-      <li>新しいタグを使って release に追加する</li>
+      <li>上で追加したタグを選択する</li>
       <li>インストーラとポータブル版の zip ファイルを追加する</li>
-      <li>ドキュメントの変更履歴からリリースノートを転記する（日本語・英語とも）</li>
+      <li>ドキュメントの変更履歴からリリースノートの概要を（日本語・英語ともに）記述する</li>
+    </ul>
+  </li>
+  <li>ウイルス対策ソフトの検知を確認する
+    <ul>
+      <li>Chrome でダウンロードしてみる</li>
+      <li>Edge でダウンロードしてみる<br />
+          Edge は「Defender SmartScreen」は「一般的にダウンロードされていません」の警告を出す。これを正しくない検知として報告する。
+      </li>
     </ul>
   </li>
   <li>プロジェクトWebページ (<a href="https://teratermproject.github.io" target="_blank">https://teratermproject.github.io</a>) を更新する

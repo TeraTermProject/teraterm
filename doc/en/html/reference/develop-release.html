@@ -215,14 +215,25 @@ To release Tera Term installation package is shown in the following step:
     </p>
 <pre>
 git tag -a v5.0 -m "Release 5.0"
+git push origin v5.0
 </pre>
   </li>
-  <li>Create installer.</li>
-  <li>Update project site.
+  <li>Create installer.
+    <p>use "github-release" project on AppVeyor.</p>
+  </li>
+  <li>Add to GitHub "Releases."
     <ul>
-      <li>add new release with a new tag.</li>
+      <li>select a new tag.</li>
       <li>put installer and portable zip file.</li>
-      <li>copy release note from changelog of document (in Japanese and English).</li>
+      <li>write summary of release note (in Japanese and English) from changelog of document.</li>
+    </ul>
+  </li>
+  <li>Check anti-virus software
+    <ul>
+      <li>download by Chrome</li>
+      <li>download by Edge<br />
+          Edge has "Defender SmartScreen", it notices "Uncommonly downloaded." Report it as incorrectly detected.
+      </li>
     </ul>
   </li>
   <li>Update project web page (<a href="https://teratermproject.github.io" target="_blank">https://teratermproject.github.io</a>).
