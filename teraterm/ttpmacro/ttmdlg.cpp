@@ -76,9 +76,6 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	wchar_t Temp[MaxStrLen];
 	wchar_t *start, *cur, *next;
 
-	// go home directory
-	SetCurrentDirectoryW(HomeDirW);
-
 	// Get command line parameters
 	FileName[0] = 0;
 	TopicName[0] = 0;
@@ -138,53 +135,22 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 			Params[ParamCnt] = _wcsdup(Temp);
 		}
 	}
-
-	if (FileName[0]=='*') {
-		FileName[0] = 0;
-	}
-	else if (FileName[0]!=0) {
-		size_t dirlen, fnpos;
-		if (GetFileNamePosW(FileName, &dirlen, &fnpos)) {
-			FitFileNameW(&FileName[fnpos], _countof(FileName) - fnpos, L".TTL");
-			wcsncpy_s(ShortName, _countof(ShortName), &FileName[fnpos], _TRUNCATE);
-			if (dirlen==0) {
-				wcsncpy_s(FileName, _countof(FileName), HomeDirW, _TRUNCATE);
-				AppendSlashW(FileName, _countof(FileName));
-				wcsncat_s(FileName, _countof(FileName), ShortName, _TRUNCATE);
-			}
-
-			if (Params) {
-				Params[1] = _wcsdup(ShortName);
-			}
-		}
-		else {
-			FileName[0] = 0;
-		}
-	}
 }
 
-BOOL GetFileName(HWND HWin)
+BOOL GetFileName(HWND HWin, wchar_t **fname)
 {
 	wchar_t *FNFilter;
 	wchar_t *title;
-	OPENFILENAMEW FNameRec;
+	TTOPENFILENAMEW FNameRec = {};
 
-	if (FileName[0]!=0) {
-		return FALSE;
-	}
-
-	memset(&FNameRec, 0, sizeof(OPENFILENAME));
 	GetI18nStrWW("Tera Term", "FILEDLG_OPEN_MACRO_FILTER", L"Macro files (*.ttl)\\0*.ttl\\0\\0", UILanguageFileW, &FNFilter);
 	GetI18nStrWW("Tera Term", "FILEDLG_OPEN_MACRO_TITLE", L"MACRO: Open macro", UILanguageFileW, &title);
 
-	// sizeof(OPENFILENAME) では Windows98/NT で終了してしまうため (2006.8.14 maya)
-	FNameRec.lStructSize = get_OPENFILENAME_SIZEW();
 	FNameRec.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	FNameRec.hwndOwner = HWin;
 	FNameRec.lpstrFilter = FNFilter;
 	FNameRec.nFilterIndex = 1;
 	FNameRec.lpstrFile = FileName;
-	FNameRec.nMaxFile = sizeof(FileName);
 	// 以前読み込んだ .ttl ファイルのパスを記憶できるように、初期ディレクトリを固定にしない。
 	// (2008.4.7 yutaka)
 #if 0
@@ -193,22 +159,16 @@ BOOL GetFileName(HWND HWin)
 	FNameRec.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	FNameRec.lpstrDefExt = L"TTL";
 	FNameRec.lpstrTitle = title;
-	if (GetOpenFileNameW(&FNameRec)) {
-		wcsncpy_s(ShortName, _countof(ShortName), &(FileName[FNameRec.nFileOffset]), _TRUNCATE);
-	}
-	else {
-		FileName[0] = 0;
-	}
+	wchar_t *fn;
+	BOOL r = TTGetOpenFileNameW(&FNameRec, &fn);
 	free(FNFilter);
 	free(title);
-
-	if (FileName[0]==0) {
-		ShortName[0] = 0;
+	if (r == FALSE) {
+		*fname = NULL;
 		return FALSE;
 	}
-	else {
-		return TRUE;
-	}
+	*fname = fn;
+	return TRUE;
 }
 
 void SetDlgPos(int x, int y)
