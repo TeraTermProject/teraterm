@@ -32,6 +32,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "compat_win.h"
 #include "teraterm.h"
@@ -243,6 +244,19 @@ BOOL CCtrlWindow::OnIdle()
 	return FALSE;
 }
 
+static void FitTTLFileName()
+{
+	size_t dirlen, fnpos;
+	if (!GetFileNamePosW(FileName, &dirlen, &fnpos)) {
+		FileName[0] = 0;
+		ShortName[0] = 0;
+		return;
+	}
+
+	FitFileNameW(&FileName[fnpos], _countof(FileName) - fnpos, L".TTL");
+	wcsncpy_s(ShortName, _countof(ShortName), &FileName[fnpos], _TRUNCATE);
+}
+
 // CCtrlWindow message handler
 
 BOOL CCtrlWindow::OnInitDialog()
@@ -264,14 +278,28 @@ BOOL CCtrlWindow::OnInitDialog()
 
 	ParseParam(&IOption,&VOption);
 
-	if (TopicName[0] != 0) {
-		InitDDE(GetSafeHwnd());
+	if (FileName[0] == 0 || FileName[0] == '*') {
+		// TTLファイル指定がない(or "*")のときダイアログから入力してもらう
+		wchar_t *ttl;
+		FileName[0] = 0;
+		BOOL r = GetFileName(GetSafeHwnd(), &ttl);
+		if (r == TRUE) {
+			wcsncpy_s(FileName, _countof(FileName), ttl, _TRUNCATE);
+			free(ttl);
+		}
 	}
 
-	if ((FileName[0]==0) && (! GetFileName(GetSafeHwnd()))) {
-		EndDDE();
+	FitTTLFileName();
+	Params[1] = _wcsdup(ShortName);
+
+	if (FileName[0] == 0) {
+		// TTL ファイル指定なし
 		PostQuitMessage(0);
 		return TRUE;
+	}
+
+	if (TopicName[0] != 0) {
+		InitDDE(GetSafeHwnd());
 	}
 
 	if (! InitTTL(GetSafeHwnd())) {

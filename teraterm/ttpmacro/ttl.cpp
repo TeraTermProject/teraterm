@@ -64,6 +64,7 @@
 #include "codeconv.h"
 #include "dllutil.h"
 #include "asprintf.h"
+#include "win32helper.h"
 
 #define TTERMCOMMAND "TTERMPRO"
 #define CYGTERMCOMMAND "cyglaunch -o"
@@ -183,7 +184,6 @@ static LONG win16_llseek(HANDLE hFile, LONG lOffset, int iOrigin)
 BOOL InitTTL(HWND HWin)
 {
 	int i;
-	wchar_t *DirW;
 	char *Dir;
 	TVarId ParamsVarId;
 	char tmpname[10];
@@ -262,6 +262,23 @@ BOOL InitTTL(HWND HWin)
 		DirHandle[i] = INVALID_HANDLE_VALUE;
 	HandleInit();
 
+	// TTLファイル名からカレントディレクトリを設定する
+	wchar_t *curdir;
+	if (!IsRelativePathW(FileName)) {
+		// フルパスのとき
+		// ファイルのパスをカレントフォルダに設定する
+		curdir = ExtractDirNameW(FileName);
+		SetCurrentDirectoryW(curdir);
+	}
+	else {
+		// 相対パスのとき
+		// (プロセスの)カレントディレクトリを取得する
+		hGetCurrentDirectoryW(&curdir);
+	}
+	// 現在のフォルダを設定する((プロセスの)カレントディレクトリを設定する)
+	TTMSetDir((u8)curdir);
+	free(curdir);
+
 	if (! InitBuff(FileName))
 	{
 		TTLStatus = IdTTLEnd;
@@ -269,12 +286,6 @@ BOOL InitTTL(HWND HWin)
 	}
 
 	UnlockVar();
-
-	DirW = ExtractDirNameW(FileName);
-	Dir = ToU8W(DirW);
-	TTMSetDir(Dir);
-	free(DirW);
-	free(Dir);
 
 	if (SleepFlag)
 	{ // synchronization for startup macro
