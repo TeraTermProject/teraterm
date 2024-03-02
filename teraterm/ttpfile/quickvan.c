@@ -27,19 +27,14 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, Quick-VAN protocol */
-#include "teraterm.h"
-#include "tttypes.h"
+/* Quick-VAN protocol */
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
-#include <sys/utime.h>
-#include <sys/stat.h>
 
-#include "dlglib.h"
-#include "ftlib.h"
-#include "ttlib.h"
+#include "tttypes.h"
 #include "ttcommon.h"
+#include "ftlib.h"
+#include "protolog.h"
 
 #include "quickvan.h"
 
@@ -173,9 +168,9 @@ static BOOL QVInit(PFileVarProto fv, PComVar cv, PTTSet ts)
   fv->FileOpen = FALSE;
   fv->ByteCount = 0;
 
-  fv->SetDlgProtoText(fv, "Quick-VAN");
+  fv->InfoOp->SetDlgProtoText(fv, "Quick-VAN");
 
-  fv->InitDlgProgress(fv, &fv->ProgStat);
+  fv->InfoOp->InitDlgProgress(fv, &fv->ProgStat);
   fv->StartTime = GetTickCount();
 
   qv->SeqNum = 0;
@@ -422,7 +417,7 @@ static BOOL FTCreateFile(PFileVarProto fv)
 	TFileIO *file = fv->file;
 	PQVVar qv = fv->data;
 
-	fv->SetDlgProtoFileName(fv, qv->FullName);
+	fv->InfoOp->SetDlgProtoFileName(fv, qv->FullName);
 	fv->FileOpen = file->OpenWrite(file, qv->FullName);
 	if (! fv->FileOpen) {
 		if (fv->NoMsg) {
@@ -492,10 +487,10 @@ static BOOL QVParseVFILE(PFileVarProto fv, PQVVar qv)
   /* sec */
   QVGetNum2(qv,&i,&(qv->Sec));
 
-  fv->SetDlgByteCount(fv, 0);
+  fv->InfoOp->SetDlgByteCount(fv, 0);
   if (fv->FileSize>0)
-    fv->SetDlgPercent(fv, 0, fv->FileSize, &fv->ProgStat);
-  fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+    fv->InfoOp->SetDlgPercent(fv, 0, fv->FileSize, &fv->ProgStat);
+  fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
   /* Send VRPOS */
   QVSetResPacket(qv,'P',0,0);
@@ -572,11 +567,11 @@ static void QVWriteToFile(PFileVarProto fv, PQVVar qv)
   file->WriteFile(file,&(qv->PktIn[3]),C);
   fv->ByteCount = fv->ByteCount + C;
 
-  fv->SetDlgPacketNum(fv, qv->SeqNum);
-  fv->SetDlgByteCount(fv, fv->ByteCount);
+  fv->InfoOp->SetDlgPacketNum(fv, qv->SeqNum);
+  fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
   if (fv->FileSize>0)
-    fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-  fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+    fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+  fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 }
 
 static BOOL QVCheckWindow8(PQVVar qv, WORD w0, WORD w1, BYTE b, LPWORD  w)
@@ -896,7 +891,7 @@ static void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   i = 3;
   QVPutNum2(qv,qv->FileNum,&i);
   /* file name */
-  fv->SetDlgProtoFileName(fv, qv->FullName);
+  fv->InfoOp->SetDlgProtoFileName(fv, qv->FullName);
   filename = file->GetSendFilename(file, qv->FullName, FALSE, TRUE, TRUE);
   strncpy_s(&(qv->PktOut[i]),sizeof(qv->PktOut)-i,filename,_TRUNCATE);
   i = strlen(&(qv->PktOut[i])) + i;
@@ -954,13 +949,13 @@ static void QVSendVDATA(PFileVarProto fv, PQVVar qv)
     else
       C = 128;
     /* read data from file */
-	file->Seek(file, Pos);
+    file->Seek(file, Pos);
     file->ReadFile(file,&(qv->PktOut[3]),C);
     fv->ByteCount = Pos + (LONG)C;
-    fv->SetDlgPacketNum(fv, qv->SeqSent);
-    fv->SetDlgByteCount(fv, fv->ByteCount);
-    fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-    fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+    fv->InfoOp->SetDlgPacketNum(fv, qv->SeqSent);
+    fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
+    fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+    fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
     for (i = C ; i <= 127 ; i++)
       qv->PktOut[3+i] = 0;
     /* send VDAT */
@@ -1357,6 +1352,15 @@ static void Destroy(PFileVarProto fv)
 	fv->data = NULL;
 }
 
+static const TProtoOp Op = {
+	QVInit,
+	QVParse,
+	QVTimeOutProc,
+	QVCancel,
+	SetOptV,
+	Destroy,
+};
+
 BOOL QVCreate(PFileVarProto fv)
 {
 	PQVVar qv = malloc(sizeof(*qv));
@@ -1365,13 +1369,7 @@ BOOL QVCreate(PFileVarProto fv)
 	}
 	memset(qv, 0, sizeof(*qv));
 	fv->data = qv;
-
-	fv->Destroy = Destroy;
-	fv->Init = QVInit;
-	fv->Parse = QVParse;
-	fv->TimeOutProc = QVTimeOutProc;
-	fv->Cancel = QVCancel;
-	fv->SetOptV = SetOptV;
+	fv->ProtoOp = &Op;
 
 	return TRUE;
 }

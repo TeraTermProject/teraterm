@@ -27,19 +27,13 @@
  */
 
 /* TTFILE.DLL, YMODEM protocol */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <assert.h>
 #include <stdio.h>
-#include <time.h>
+#include <assert.h>
 
-#include "teraterm.h"
 #include "tttypes.h"
-
 #include "ttcommon.h"
-#include "ttlib.h"
 #include "ftlib.h"
-#include "dlglib.h"
+#include "protolog.h"
 
 #include "ymodem.h"
 
@@ -168,7 +162,7 @@ static void YSetOpt(PFileVarProto fv, PYVar yv, WORD Opt)
 		yv->CheckLen = 2;
 		break;
 	}
-	fv->SetDlgProtoText(fv, Tmp);
+	fv->InfoOp->SetDlgProtoText(fv, Tmp);
 }
 
 static void YSendNAK(PFileVarProto fv, PYVar yv, PComVar cv)
@@ -312,12 +306,12 @@ static void initialize_file_info(PFileVarProto fv, PYVar yv)
 	}
 
 	if (yv->YMode == IdYSend) {
-		fv->InitDlgProgress(fv, &fv->ProgStat);
+		fv->InfoOp->InitDlgProgress(fv, &fv->ProgStat);
 	} else {
 		fv->ProgStat = -1;
 	}
 	fv->StartTime = GetTickCount();
-	fv->SetDlgProtoFileName(fv, yv->FullName);
+	fv->InfoOp->SetDlgProtoFileName(fv, yv->FullName);
 
 	yv->PktNumOffset = 0;
 	yv->PktNum = 0;
@@ -454,7 +448,7 @@ static BOOL FTCreateFile(PFileVarProto fv)
 	TFileIO *file = fv->file;
 	PYVar yv = fv->data;
 
-	fv->SetDlgProtoFileName(fv, yv->FullName);
+	fv->InfoOp->SetDlgProtoFileName(fv, yv->FullName);
 	fv->FileOpen = file->OpenWrite(file, yv->FullName);
 	if (! fv->FileOpen) {
 		if (fv->NoMsg) {
@@ -673,7 +667,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			}
 		}
 
-		fv->SetDlgProtoFileName(fv, name);
+		fv->InfoOp->SetDlgProtoFileName(fv, name);
 
 		yv->SendFileInfo = 1;
 
@@ -713,9 +707,9 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 
 	fv->ByteCount = fv->ByteCount + c;
 
-	fv->SetDlgPacketNum(fv, yv->PktNumOffset+yv->PktNum);
-	fv->SetDlgByteCount(fv, fv->ByteCount);
-	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgPacketNum(fv, yv->PktNumOffset + yv->PktNum);
+	fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
+	fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
 	fv->FTSetTimeOut(fv,yv->TOutLong);
 
@@ -1108,16 +1102,16 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	{
 		if (0 == yv->PktNumSent)
 		{
-			fv->SetDlgPacketNum(fv, yv->PktNumOffset + 256);
+			fv->InfoOp->SetDlgPacketNum(fv, yv->PktNumOffset + 256);
 		}
 		else
 		{
-			fv->SetDlgPacketNum(fv, yv->PktNumOffset + yv->PktNumSent);
+			fv->InfoOp->SetDlgPacketNum(fv, yv->PktNumOffset + yv->PktNumSent);
 		}
 
-		fv->SetDlgByteCount(fv, fv->ByteCount);
-		fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-		fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+		fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
+		fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+		fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 	}
 
 	return TRUE;
@@ -1170,6 +1164,15 @@ static void Destroy(PFileVarProto fv)
 	fv->data = NULL;
 }
 
+static const TProtoOp Op = {
+	YInit,
+	YParse,
+	YTimeOutProc,
+	YCancel,
+	SetOptV,
+	Destroy,
+};
+
 BOOL YCreate(PFileVarProto fv)
 {
 	PYVar pv;
@@ -1179,13 +1182,7 @@ BOOL YCreate(PFileVarProto fv)
 	}
 	memset(pv, 0, sizeof(*pv));
 	fv->data = pv;
-
-	fv->Destroy = Destroy;
-	fv->Init = YInit;
-	fv->Parse = YParse;
-	fv->TimeOutProc = YTimeOutProc;
-	fv->Cancel = YCancel;
-	fv->SetOptV = SetOptV;
+	fv->ProtoOp = &Op;
 
 	return TRUE;
 }

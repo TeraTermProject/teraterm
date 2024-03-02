@@ -28,13 +28,12 @@
  */
 
 /* XMODEM protocol */
-#include "teraterm.h"
-#include "tttypes.h"
 #include <stdio.h>
 
+#include "tttypes.h"
 #include "ttcommon.h"
-#include "ttlib.h"
 #include "ftlib.h"
+#include "protolog.h"
 
 #include "xmodem.h"
 
@@ -147,7 +146,7 @@ static void XSetOpt(PFileVarProto fv, PXVar xv, WORD Opt)
 		xv->CheckLen = 1;
 		break;
 	}
-	fv->SetDlgProtoText(fv, Tmp);
+	fv->InfoOp->SetDlgProtoText(fv, Tmp);
 }
 
 static void XSendNAK(PFileVarProto fv, PXVar xv, PComVar cv)
@@ -244,7 +243,7 @@ static BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 			return FALSE;
 		}
 		fv->FileSize = (LONG)size;
-		fv->InitDlgProgress(fv, &fv->ProgStat);
+		fv->InfoOp->InitDlgProgress(fv, &fv->ProgStat);
 	} else {
 		fv->FileOpen = file->OpenWrite(file, xv->FullName);
 		if (fv->FileOpen == FALSE) {
@@ -253,7 +252,7 @@ static BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		fv->FileSize = 0;
 		fv->ProgStat = -1;
 	}
-	fv->SetDlgProtoFileName(fv, xv->FullName);
+	fv->InfoOp->SetDlgProtoFileName(fv, xv->FullName);
 	fv->StartTime = GetTickCount();
 
 	xv->PktNumOffset = 0;
@@ -486,9 +485,9 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 
 	fv->ByteCount = fv->ByteCount + c;
 
-	fv->SetDlgPacketNum(fv, xv->PktNumOffset + xv->PktNum);
-	fv->SetDlgByteCount(fv, fv->ByteCount);
-	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgPacketNum(fv, xv->PktNumOffset + xv->PktNum);
+	fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
+	fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
 	fv->FTSetTimeOut(fv, xv->TOutLong);
 
@@ -642,14 +641,14 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 
 	if (xv->PktBufCount == 0) {
 		if (xv->PktNumSent == 0) {
-			fv->SetDlgPacketNum(fv, xv->PktNumOffset + 256);
+			fv->InfoOp->SetDlgPacketNum(fv, xv->PktNumOffset + 256);
 		}
 		else {
-			fv->SetDlgPacketNum(fv, xv->PktNumOffset + xv->PktNumSent);
+			fv->InfoOp->SetDlgPacketNum(fv, xv->PktNumOffset + xv->PktNumSent);
 		}
-		fv->SetDlgByteCount(fv, fv->ByteCount);
-		fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-		fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+		fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
+		fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+		fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 	}
 
 	return TRUE;
@@ -707,6 +706,15 @@ static void Destroy(PFileVarProto fv)
 	fv->data = NULL;
 }
 
+static const TProtoOp Op = {
+	XInit,
+	XParse,
+	XTimeOutProc,
+	XCancel,
+	SetOptV,
+	Destroy,
+};
+
 BOOL XCreate(PFileVarProto fv)
 {
 	PXVar xv;
@@ -716,13 +724,7 @@ BOOL XCreate(PFileVarProto fv)
 	}
 	memset(xv, 0, sizeof(*xv));
 	fv->data = xv;
-
-	fv->Destroy = Destroy;
-	fv->Init = XInit;
-	fv->Parse = XParse;
-	fv->TimeOutProc = XTimeOutProc;
-	fv->Cancel = XCancel;
-	fv->SetOptV = SetOptV;
+	fv->ProtoOp = &Op;
 
 	xv->log = ProtoLogCreate();
 

@@ -29,13 +29,11 @@
 /* TERATERM.EXE, file transfer routines */
 #include <stdio.h>
 #include <windows.h>
-#include <htmlhelp.h>
 #include <assert.h>
 #include <stdlib.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 
-#include "teraterm.h"
 #include "tttypes.h"
 #include "protodlg.h"
 #include "ttwinman.h"
@@ -44,10 +42,6 @@
 #include "ttdde.h"
 #include "ttlib.h"
 #include "dlglib.h"
-#include "vtterm.h"
-#include "ftlib.h"
-#include "buffer.h"
-#include "helpid.h"
 #include "codeconv.h"
 #include "asprintf.h"
 
@@ -203,6 +197,16 @@ static void SetDialogCation(struct FileVarProto *fv, const char *key, const wcha
 	fv->DlgCaption = caption;
 }
 
+static const TInfoOp InfoOp = {
+	_InitDlgProgress,
+	_SetDlgTime,
+	_SetDlgPacketNum,
+	_SetDlgByteCount,
+	_SetDlgPercent,
+	_SetDlgProtoText,
+	_SetDlgProtoFileName,
+};
+
 static BOOL NewFileVar_(PFileVarProto *pfv)
 {
 	if (*pfv != NULL) {
@@ -233,13 +237,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	fv->FTSetTimeOut = FTSetTimeOut;
 	fv->SetDialogCation = SetDialogCation;
 
-	fv->InitDlgProgress = _InitDlgProgress;
-	fv->SetDlgTime = _SetDlgTime;
-	fv->SetDlgPacketNum = _SetDlgPacketNum;
-	fv->SetDlgByteCount = _SetDlgByteCount;
-	fv->SetDlgPercent = _SetDlgPercent;
-	fv->SetDlgProtoText = _SetDlgProtoText;
-	fv->SetDlgProtoFileName = _SetDlgProtoFileName;
+	fv->InfoOp = &InfoOp;
 
 	*pfv = fv;
 	return TRUE;
@@ -252,8 +250,8 @@ static void FreeFileVar_(PFileVarProto *pfv)
 		return;
 	}
 
-	if (fv->Destroy != NULL) {
-		fv->Destroy(fv);
+	if (fv->ProtoOp != NULL) {
+		fv->ProtoOp->Destroy(fv);
 	}
 
 	if (fv->FileNames != NULL) {
@@ -271,7 +269,7 @@ static int _ProtoSetOpt(PFileVarProto fv, int request, ...)
 {
 	va_list ap;
 	va_start(ap, request);
-	int r = fv->SetOptV(fv, request, ap);
+	int r = fv->ProtoOp->SetOptV(fv, request, ap);
 	va_end(ap);
 	return r;
 }
@@ -344,7 +342,7 @@ static BOOL OpenProtoDlg(PFileVarProto fv, int IdProto, int Mode, WORD Opt1, WOR
 	fv->HWin = pd->m_hWnd;
 	PtDlg = pd;
 
-	BOOL r = fv->Init(fv, &cv, &ts);
+	BOOL r = fv->ProtoOp->Init(fv, &cv, &ts);
 	if (r == FALSE) {
 		//fv->Destroy(fv);
 		return FALSE;
@@ -776,7 +774,7 @@ int ProtoDlgParse(void)
 	CommReceive(&cv); //ダイアログ表示中に受信したデータを処理できるように読み取りを行わせる
 
 	PFileVarProto fv = FileVar;
-	if (fv->Parse(fv, &cv))
+	if (fv->ProtoOp->Parse(fv, &cv))
 		P = 0; /* continue */
 	else {
 		CommSend(&cv);
@@ -789,7 +787,7 @@ void ProtoDlgTimeOut(void)
 {
 	if (PtDlg!=NULL) {
 		PFileVarProto fv = FileVar;
-		fv->TimeOutProc(fv, &cv);
+		fv->ProtoOp->TimeOutProc(fv, &cv);
 	}
 }
 
@@ -797,7 +795,7 @@ void ProtoDlgCancel(void)
 {
 	if (PtDlg!=NULL) {
 		PFileVarProto fv = FileVar;
-		fv->Cancel(fv, &cv);
+		fv->ProtoOp->Cancel(fv, &cv);
 		ProtoEnd();
 	}
 }

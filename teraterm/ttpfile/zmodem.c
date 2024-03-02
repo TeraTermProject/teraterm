@@ -42,19 +42,14 @@
 ^^^^^CRC
  */
 
-/* TTFILE.DLL, ZMODEM protocol */
-#include "teraterm.h"
-#include "tttypes.h"
+/* ZMODEM protocol */
 #include <stdio.h>
 #include <stdarg.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#include "dlglib.h"
+#include "tttypes.h"
 #include "ftlib.h"
 #include "ttcommon.h"
-#include "ttlib.h"
+#include "protolog.h"
 
 #include "zmodem.h"
 
@@ -566,7 +561,7 @@ static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 		ZSendCancel(zv);
 		return;
 	}
-	fv->SetDlgProtoFileName(fv, zv->FullName);
+	fv->InfoOp->SetDlgProtoFileName(fv, zv->FullName);
 
 	/* file name */
 	filename = file->GetSendFilename(file, zv->FullName, FALSE, TRUE, FALSE);
@@ -612,9 +607,9 @@ static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 	fv->ByteCount = 0;
 	fv->ProgStat = 0;
 	fv->StartTime = GetTickCount();
-	fv->SetDlgByteCount(fv, fv->ByteCount);
-	fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
+	fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+	fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
 	add_sendbuf("%s: ZFILE: ZF0=%x ZF1=%x ZF2=%x file=%s size=%lu",
 		__FUNCTION__,
@@ -658,9 +653,9 @@ static void ZSendDataDat(PFileVarProto fv, PZVar zv)
 		}
 	} while ((c != 0) && (zv->PktOutCount <= zv->MaxDataLen - 2));
 
-	fv->SetDlgByteCount(fv, fv->ByteCount);
-	fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
+	fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+	fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 	zv->Pos = fv->ByteCount;
 
 	zv->PktOut[zv->PktOutCount] = ZDLE;
@@ -712,9 +707,9 @@ static BOOL ZInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		CommInsert1Byte(cv, ZPAD);
 	}
 
-	fv->SetDlgProtoText(fv, "ZMODEM");
+	fv->InfoOp->SetDlgProtoText(fv, "ZMODEM");
 
-	fv->InitDlgProgress(fv, &fv->ProgStat);
+	fv->InfoOp->InitDlgProgress(fv, &fv->ProgStat);
 	fv->StartTime = GetTickCount();
 
 	fv->FileSize = 0;
@@ -1045,7 +1040,7 @@ static BOOL FTCreateFile(PFileVarProto fv)
 	TFileIO *file = fv->file;
 	PZVar zv = fv->data;
 
-	fv->SetDlgProtoFileName(fv, zv->FullName);
+	fv->InfoOp->SetDlgProtoFileName(fv, zv->FullName);
 	fv->FileOpen = file->OpenWrite(file, zv->FullName);
 	if (! fv->FileOpen) {
 		if (fv->NoMsg) {
@@ -1117,11 +1112,11 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 	ZStoHdr(zv, 0);
 	zv->ZState = Z_RecvData;
 
-	fv->SetDlgByteCount(fv, 0);
+	fv->InfoOp->SetDlgByteCount(fv, 0);
 	if (fv->FileSize > 0)
-		fv->SetDlgPercent(fv,
+		fv->InfoOp->SetDlgPercent(fv,
 					  0, fv->FileSize, &fv->ProgStat);
-	fv->SetDlgTime(fv, GetTickCount(), fv->ByteCount);
+	fv->InfoOp->SetDlgTime(fv, GetTickCount(), fv->ByteCount);
 
 	/* set timeout for data */
 	fv->FTSetTimeOut(fv, zv->TimeOut);
@@ -1155,11 +1150,11 @@ static BOOL ZWriteData(PFileVarProto fv, PZVar zv)
 	fv->ByteCount = fv->ByteCount + zv->PktInPtr;
 	zv->Pos = zv->Pos + zv->PktInPtr;
 	ZStoHdr(zv, zv->Pos);
-	fv->SetDlgByteCount(fv, fv->ByteCount);
+	fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
 	if (fv->FileSize > 0)
-		fv->SetDlgPercent(fv,
+		fv->InfoOp->SetDlgPercent(fv,
 					  fv->ByteCount, fv->FileSize, &fv->ProgStat);
-	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
 	/* set timeout for data */
 	fv->FTSetTimeOut(fv, zv->TimeOut);
@@ -1526,6 +1521,15 @@ static void Destroy(PFileVarProto fv)
 	fv->data = NULL;
 }
 
+static const TProtoOp Op = {
+	ZInit,
+	ZParse,
+	ZTimeOutProc,
+	ZCancel,
+	SetOptV,
+	Destroy,
+};
+
 BOOL ZCreate(PFileVarProto fv)
 {
 	PZVar zv;
@@ -1535,13 +1539,7 @@ BOOL ZCreate(PFileVarProto fv)
 	}
 	memset(zv, 0, sizeof(*zv));
 	fv->data = zv;
-
-	fv->Destroy = Destroy;
-	fv->Init = ZInit;
-	fv->Parse = ZParse;
-	fv->TimeOutProc = ZTimeOutProc;
-	fv->Cancel = ZCancel;
-	fv->SetOptV = SetOptV;
+	fv->ProtoOp = &Op;
 
 	return TRUE;
 }

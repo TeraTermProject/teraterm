@@ -27,15 +27,14 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, B-Plus protocol */
-#include "teraterm.h"
-#include "tttypes.h"
+/* B-Plus protocol */
 #include <string.h>
 
-#include "dlglib.h"
+#include "tttypes.h"
 #include "ftlib.h"
 #include "ttcommon.h"
 #include "ttlib.h"
+#include "protolog.h"
 
 #include "bplus.h"
 
@@ -111,7 +110,7 @@ static BOOL BPOpenFileToBeSent(PFileVarProto fv)
   r = fileio->OpenRead(fileio, bv->FullName);
   fv->FileOpen = r;
   if (r == TRUE) {
-    fv->SetDlgProtoFileName(fv, bv->FullName);
+    fv->InfoOp->SetDlgProtoFileName(fv, bv->FullName);
     fv->FileSize = fileio->GetFSize(fileio, bv->FullName);
   }
   return fv->FileOpen;
@@ -129,8 +128,6 @@ static void BPDispMode(PFileVarProto fv, PBPVar bv)
 		fv->SetDialogCation(fv, "FILEDLG_TRANS_TITLE_BPRCV", TitBPRcv);
 		break;
 	}
-
-	SetWindowTextW(fv->HWin,fv->DlgCaption);
 }
 
 static BOOL BPInit(PFileVarProto fv, PComVar cv, PTTSet ts)
@@ -145,9 +142,9 @@ static BOOL BPInit(PFileVarProto fv, PComVar cv, PTTSet ts)
   }
 
   BPDispMode(fv,bv);
-  fv->SetDlgProtoText(fv, "B-Plus");
+  fv->InfoOp->SetDlgProtoText(fv, "B-Plus");
 
-  fv->InitDlgProgress(fv, &fv->ProgStat);
+  fv->InfoOp->InitDlgProgress(fv, &fv->ProgStat);
   fv->StartTime = GetTickCount();
 
   /* file name, file size */
@@ -526,10 +523,10 @@ static void BPSendNPacket(PFileVarProto fv, PBPVar bv)
   i = i - 4;
   BPMakePacket(bv,'N',i);
 
-  fv->SetDlgByteCount(fv, fv->ByteCount);
+  fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
   if (fv->FileSize>0)
-    fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-  fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+    fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+  fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 }
 
 static void BPCheckPacket(PFileVarProto fv, PBPVar bv, PComVar cv)
@@ -553,7 +550,7 @@ static void BPCheckPacket(PFileVarProto fv, PBPVar bv, PComVar cv)
     bv->PktNum = 0;
     bv->PktNumOffset = bv->PktNumOffset + 10;
   }
-  fv->SetDlgPacketNum(fv, bv->PktNum + bv->PktNumOffset);
+  fv->InfoOp->SetDlgPacketNum(fv, bv->PktNum + bv->PktNumOffset);
 
   if (bv->PktIn[1] != '+')
     BPSendACK(fv,bv,cv); /* Send ack */
@@ -577,7 +574,7 @@ static BOOL FTCreateFile(PFileVarProto fv)
 	TFileIO *file = fv->file;
 	PBPVar bv = fv->data;
 
-	fv->SetDlgProtoFileName(fv, bv->FullName);
+	fv->InfoOp->SetDlgProtoFileName(fv, bv->FullName);
 	fv->FileOpen = file->OpenWrite(file, bv->FullName);
 	if (! fv->FileOpen) {
 		if (fv->NoMsg) {
@@ -761,10 +758,10 @@ static void BPParsePacket(PFileVarProto fv, PBPVar bv)
 		fileio->WriteFile(fileio, &(bv->PktIn[2]), bv->PktInCount-2);
 		fv->ByteCount = fv->ByteCount +
 			bv->PktInCount - 2;
-		fv->SetDlgByteCount(fv, fv->ByteCount);
+		fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
 		if (fv->FileSize>0)
-			fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-		fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+			fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+		fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 		break;
     case 'T':
 		BPParseTPacket(fv,bv); /* File transfer */
@@ -828,7 +825,7 @@ static void BPParseAck(PFileVarProto fv, PBPVar bv, BYTE b)
       break;
     case BP_Failure: bv->BPState = BP_Close; break;
   }
-  fv->SetDlgPacketNum(fv, bv->PktNum + bv->PktNumOffset);
+  fv->InfoOp->SetDlgPacketNum(fv, bv->PktNum + bv->PktNumOffset);
 }
 
 static void BPDequote(LPBYTE b)
@@ -1027,6 +1024,15 @@ static void Destroy(PFileVarProto fv)
 	fv->data = NULL;
 }
 
+static const TProtoOp Op = {
+	BPInit,
+	BPParse,
+	BPTimeOutProc,
+	BPCancel,
+	SetOptV,
+	Destroy,
+};
+
 BOOL BPCreate(PFileVarProto fv)
 {
 	PBPVar bv;
@@ -1036,13 +1042,7 @@ BOOL BPCreate(PFileVarProto fv)
 	}
 	memset(bv, 0, sizeof(*bv));
 	fv->data = bv;
-
-	fv->Destroy = Destroy;
-	fv->Init = BPInit;
-	fv->Parse = BPParse;
-	fv->TimeOutProc = BPTimeOutProc;
-	fv->Cancel = BPCancel;
-	fv->SetOptV = SetOptV;
+	fv->ProtoOp = &Op;
 
 	return TRUE;
 }

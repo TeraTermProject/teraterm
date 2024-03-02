@@ -27,7 +27,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, routines for file transfer protocol */
+/* routines for file transfer protocol */
 
 #pragma once
 
@@ -41,5 +41,3 @@ LONG UpdateCRC32(BYTE b, LONG CRC);
 #ifdef __cplusplus
 }
 #endif
-
-#include "protolog.h"

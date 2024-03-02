@@ -27,19 +27,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, Kermit protocol */
-#include "teraterm.h"
-#include "tttypes.h"
+/* Kermit protocol */
 #include <stdio.h>
-#include <time.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/utime.h>
 
+#include "tttypes.h"
 #include "ttcommon.h"
-#include "ttlib.h"
-#include "dlglib.h"
-#include "ftlib.h"
+#include "protolog.h"
 
 #include "kermit.h"
 
@@ -708,9 +702,9 @@ static void KmtDecode(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 	}
 
 	if (Buff==NULL)
-		fv->SetDlgByteCount(fv, fv->ByteCount);
+		fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
 	*BuffLen = BuffPtr;
-	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 }
 
 static void KmtRecvFileAttr(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
@@ -967,9 +961,9 @@ static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	int DataLen, DataLenNew, maxlen;
 	BOOL NextFlag;
 
-	fv->SetDlgByteCount(fv, fv->ByteCount);
-	fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
+	fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+	fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 	DataLen = 0;
 	DataLenNew = 0;
 
@@ -998,9 +992,9 @@ static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 
 	if (DataLen==0)
 	{
-		fv->SetDlgByteCount(fv, fv->ByteCount);
-		fv->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-		fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+		fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
+		fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
+		fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 		KmtSendEOFPacket(fv,kv,cv);
 	}
 	else {
@@ -1071,11 +1065,11 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	fv->ProgStat = 0;
 	fv->StartTime = GetTickCount();
 
-	fv->SetDlgProtoFileName(fv, kv->FullName);
-	fv->SetDlgByteCount(fv, fv->ByteCount);
-	fv->SetDlgPercent(fv,
+	fv->InfoOp->SetDlgProtoFileName(fv, kv->FullName);
+	fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
+	fv->InfoOp->SetDlgPercent(fv,
 		fv->ByteCount, fv->FileSize, &fv->ProgStat);
-	fv->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
 
 	KmtIncPacketNum(kv);
 	filename = file->GetSendFilename(file, kv->FullName, FALSE, TRUE, FALSE);
@@ -1171,10 +1165,10 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 {
 	PKmtVar kv = fv->data;
 
-	fv->SetDlgProtoText(fv, "Kermit");
+	fv->InfoOp->SetDlgProtoText(fv, "Kermit");
 
 	if (kv->KmtMode == IdKmtSend) {
-		fv->InitDlgProgress(fv, &fv->ProgStat);
+		fv->InfoOp->InitDlgProgress(fv, &fv->ProgStat);
 		fv->StartTime = GetTickCount();
 	}
 	else {
@@ -1312,7 +1306,7 @@ static BOOL FTCreateFile(PFileVarProto fv)
 	PKmtVar kv = fv->data;
 	TFileIO *file = fv->file;
 
-	fv->SetDlgProtoFileName(fv, kv->FullName);
+	fv->InfoOp->SetDlgProtoFileName(fv, kv->FullName);
 	fv->FileOpen = file->OpenWrite(file, kv->FullName);
 	if (! fv->FileOpen) {
 		if (fv->NoMsg) {
@@ -1637,7 +1631,7 @@ read_end:
 			kv->PktNumOffset = kv->PktNumOffset + 64;
 	}
 
-	fv->SetDlgPacketNum(fv, kv->PktNum);
+	fv->InfoOp->SetDlgPacketNum(fv, kv->PktNum);
 
 	return TRUE;
 }
@@ -1679,6 +1673,15 @@ static void Destroy(PFileVarProto fv)
 	fv->data = NULL;
 }
 
+static const TProtoOp Op = {
+	KmtInit,
+	KmtReadPacket,
+	KmtTimeOutProc,
+	KmtCancel,
+	SetOptV,
+	Destroy,
+};
+
 BOOL KmtCreate(PFileVarProto fv)
 {
 	PKmtVar kv;
@@ -1688,13 +1691,7 @@ BOOL KmtCreate(PFileVarProto fv)
 	}
 	memset(kv, 0, sizeof(*kv));
 	fv->data = kv;
-
-	fv->Destroy = Destroy;
-	fv->Init = KmtInit;
-	fv->Parse = KmtReadPacket;
-	fv->TimeOutProc = KmtTimeOutProc;
-	fv->Cancel = KmtCancel;
-	fv->SetOptV = SetOptV;
+	fv->ProtoOp = &Op;
 
 	return TRUE;
 }

@@ -30,6 +30,27 @@
 
 #include "filesys_io.h"
 
+// プロトコルのオペレーション
+typedef struct ProtoOp_ {
+	BOOL (*Init)(struct FileVarProto *fv, PComVar cv, PTTSet ts);
+	BOOL (*Parse)(struct FileVarProto *fv, PComVar cv);
+	void (*TimeOutProc)(struct FileVarProto *fv, PComVar cv);
+	void (*Cancel)(struct FileVarProto *fv, PComVar cv);
+	int (*SetOptV)(struct FileVarProto *fv, int request, va_list ap);
+	void (*Destroy)(struct FileVarProto *fv);
+} TProtoOp;
+
+// UIなど情報表示用関数
+typedef struct InfoOp_ {
+	void (*InitDlgProgress)(struct FileVarProto *fv, int *CurProgStat);
+	void (*SetDlgTime)(struct FileVarProto *fv, DWORD elapsed, int bytes);
+	void (*SetDlgPacketNum)(struct FileVarProto *fv, LONG Num);
+	void (*SetDlgByteCount)(struct FileVarProto *fv, LONG Num);
+	void (*SetDlgPercent)(struct FileVarProto *fv, LONG a, LONG b, int *p);
+	void (*SetDlgProtoText)(struct FileVarProto *fv, const char *text);
+	void (*SetDlgProtoFileName)(struct FileVarProto *fv, const char *text);
+} TInfoOp;
+
 typedef struct FileVarProto {
 	// ↓protosys_proto.cpp内のみ使用
 	WORD OpId;
@@ -73,22 +94,11 @@ typedef struct FileVarProto {
 	void (*SetDialogCation)(struct FileVarProto *fv, const char *key, const wchar_t *default_caption);
 
 	// protocol entrys, data
-	BOOL (*Init)(struct FileVarProto *fv, PComVar cv, PTTSet ts);
-	BOOL (*Parse)(struct FileVarProto *fv, PComVar cv);
-	void (*TimeOutProc)(struct FileVarProto *fv, PComVar cv);
-	void (*Cancel)(struct FileVarProto *fv, PComVar cv);
-	int (*SetOptV)(struct FileVarProto *fv, int request, va_list ap);
-	void (*Destroy)(struct FileVarProto *fv);
+	const TProtoOp *ProtoOp;
 	void *data;
 
 	// UI
-	void (*InitDlgProgress)(struct FileVarProto *fv, int *CurProgStat);
-	void (*SetDlgTime)(struct FileVarProto *fv, DWORD elapsed, int bytes);
-	void (*SetDlgPacketNum)(struct FileVarProto *fv, LONG Num);
-	void (*SetDlgByteCount)(struct FileVarProto *fv, LONG Num);
-	void (*SetDlgPercent)(struct FileVarProto *fv, LONG a, LONG b, int *p);
-	void (*SetDlgProtoText)(struct FileVarProto *fv, const char *text);
-	void (*SetDlgProtoFileName)(struct FileVarProto *fv, const char *text);
+	const TInfoOp *InfoOp;
 
 	TFileIO *file;
 } TFileVarProto;
