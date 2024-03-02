@@ -184,9 +184,7 @@ static LONG win16_llseek(HANDLE hFile, LONG lOffset, int iOrigin)
 BOOL InitTTL(HWND HWin)
 {
 	int i;
-	char *Dir;
 	TVarId ParamsVarId;
-	char tmpname[10];
 	WORD Err;
 
 	HMainWin = HWin;
@@ -219,6 +217,7 @@ BOOL InitTTL(HWND HWin)
 	NewStrVar("param1", (u8)ShortName);
 	if (Params) {
 		for (i=2; i<=9; i++) {
+			char tmpname[10];
 			_snprintf_s(tmpname, sizeof(tmpname), _TRUNCATE, "param%d", i);
 			if (ParamCnt >= i && Params[i] != NULL) {
 				NewStrVar(tmpname, (u8)Params[i]);
