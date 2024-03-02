@@ -342,15 +342,15 @@ static BOOL OpenProtoDlg(PFileVarProto fv, int IdProto, int Mode, WORD Opt1, WOR
 	info.HMainWin = fv->HMainWin;
 	pd->Create(hInst, HVTWin, &info);
 	fv->HWin = pd->m_hWnd;
+	PtDlg = pd;
 
 	BOOL r = fv->Init(fv, &cv, &ts);
 	if (r == FALSE) {
-		fv->Destroy(fv);
+		//fv->Destroy(fv);
 		return FALSE;
 	}
 	SetWindowTextW(fv->HWin, fv->DlgCaption);
 
-	PtDlg = pd;
 	return TRUE;
 }
 
