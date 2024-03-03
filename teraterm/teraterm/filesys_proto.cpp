@@ -101,7 +101,7 @@ static BOOL cv_ProtoFlag = FALSE;
 
 static void _SetDlgTime(TFileVarProto *fv, DWORD elapsed, int bytes)
 {
-	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, elapsed, bytes);
 }
 
 static void _SetDlgPacketNum(struct FileVarProto *fv, LONG Num)
@@ -223,12 +223,10 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	AppendSlashW(FileDirExpanded, _countof(FileDirExpanded));
 	fv->RecievePath = _wcsdup(FileDirExpanded);
 
-	fv->FileOpen = FALSE;
 	fv->OverWrite = ((ts.FTFlag & FT_RENAME) == 0);
 	fv->HMainWin = HVTWin;
 	fv->Success = FALSE;
 	fv->NoMsg = FALSE;
-	fv->HideDialog = FALSE;
 
 	fv->file = FilesysCreateWin32();
 

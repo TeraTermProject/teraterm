@@ -63,6 +63,16 @@ typedef struct {
 	TProtoLog *log;
 	const char *FullName;		// Windows上のファイル名 UTF-8
 	WORD LogState;
+
+	BOOL FileOpen;
+	LONG FileSize;
+	LONG ByteCount;
+
+	int ProgStat;
+
+	DWORD StartTime;
+
+	DWORD FileMtime;
 } TYVar;
 typedef TYVar *PYVar;
 
@@ -289,28 +299,28 @@ static void initialize_file_info(PFileVarProto fv, PYVar yv)
 {
 	TFileIO *file = fv->file;
 	if (yv->YMode == IdYSend) {
-		if (fv->FileOpen) {
+		if (yv->FileOpen) {
 			file->Close(file);
 
-			if (fv->FileMtime > 0) {
-				file->SetFMtime(file, yv->FullName, fv->FileMtime);
+			if (yv->FileMtime > 0) {
+				file->SetFMtime(file, yv->FullName, yv->FileMtime);
 			}
 		}
-		fv->FileOpen = file->OpenRead(file, yv->FullName);
-		fv->FileSize = file->GetFSize(file, yv->FullName);
+		yv->FileOpen = file->OpenRead(file, yv->FullName);
+		yv->FileSize = file->GetFSize(file, yv->FullName);
 	} else {
-		fv->FileOpen = FALSE;
-		fv->FileSize = 0;
-		fv->FileMtime = 0;
+		yv->FileOpen = FALSE;
+		yv->FileSize = 0;
+		yv->FileMtime = 0;
 		yv->RecvFilesize = FALSE;
 	}
 
 	if (yv->YMode == IdYSend) {
-		fv->InfoOp->InitDlgProgress(fv, &fv->ProgStat);
+		fv->InfoOp->InitDlgProgress(fv, &yv->ProgStat);
 	} else {
-		fv->ProgStat = -1;
+		yv->ProgStat = -1;
 	}
-	fv->StartTime = GetTickCount();
+	yv->StartTime = GetTickCount();
 	fv->InfoOp->SetDlgProtoFileName(fv, yv->FullName);
 
 	yv->PktNumOffset = 0;
@@ -318,7 +328,7 @@ static void initialize_file_info(PFileVarProto fv, PYVar yv)
 	yv->PktNumSent = 0;
 	yv->PktBufCount = 0;
 	yv->CRRecv = FALSE;
-	fv->ByteCount = 0;
+	yv->ByteCount = 0;
 	yv->SendFileInfo = 0;
 	yv->SendEot = 0;
 	yv->LastSendEot = 0;
@@ -449,8 +459,8 @@ static BOOL FTCreateFile(PFileVarProto fv)
 	PYVar yv = fv->data;
 
 	fv->InfoOp->SetDlgProtoFileName(fv, yv->FullName);
-	fv->FileOpen = file->OpenWrite(file, yv->FullName);
-	if (! fv->FileOpen) {
+	yv->FileOpen = file->OpenWrite(file, yv->FullName);
+	if (!yv->FileOpen) {
 		if (fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
@@ -458,12 +468,12 @@ static BOOL FTCreateFile(PFileVarProto fv)
 		return FALSE;
 	}
 
-	fv->ByteCount = 0;
-	fv->FileSize = 0;
-	if (fv->ProgStat != -1) {
-		fv->ProgStat = 0;
+	yv->ByteCount = 0;
+	yv->FileSize = 0;
+	if (yv->ProgStat != -1) {
+		yv->ProgStat = 0;
 	}
-	fv->StartTime = GetTickCount();
+	yv->StartTime = GetTickCount();
 
 	return TRUE;
 }
@@ -510,12 +520,12 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			else if (b==EOT)
 			{
 				// EOTが来たら、1つのファイル受信が完了したことを示す。
-				if (fv->FileOpen) {
+				if (yv->FileOpen) {
 					file->Close(file);
-					fv->FileOpen = FALSE;
+					yv->FileOpen = FALSE;
 
-					if (fv->FileMtime > 0) {
-						file->SetFMtime(file, yv->FullName, fv->FileMtime);
+					if (yv->FileMtime > 0) {
+						file->SetFMtime(file, yv->FullName, yv->FileMtime);
 					}
 
 					// 1回目のEOTに対してNAKを返す
@@ -659,11 +669,11 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		if (*nameend) {
 			ret = sscanf_s(nameend, "%ld%lo%o", &bytes_total, &modtime, &mode);
 			if (ret >= 1) {
-				fv->FileSize = bytes_total;
+				yv->FileSize = bytes_total;
 				yv->RecvFilesize = TRUE;
 			}
 			if (ret >= 2) {
-				fv->FileMtime = modtime;
+				yv->FileMtime = modtime;
 			}
 		}
 
@@ -687,8 +697,8 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			c--;
 
 	// 最終ブロックの余分なデータを除去する
-	if (yv->RecvFilesize && fv->ByteCount + c > fv->FileSize) {
-		c = fv->FileSize - fv->ByteCount;
+	if (yv->RecvFilesize && yv->ByteCount + c > yv->FileSize) {
+		c = yv->FileSize - yv->ByteCount;
 	}
 
 	if (yv->TextFlag>0)
@@ -705,11 +715,11 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	else
 		file->WriteFile(file, &(yv->PktIn[3]), c);
 
-	fv->ByteCount = fv->ByteCount + c;
+	yv->ByteCount = yv->ByteCount + c;
 
 	fv->InfoOp->SetDlgPacketNum(fv, yv->PktNumOffset + yv->PktNum);
-	fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
-	fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgByteCount(fv, yv->ByteCount);
+	fv->InfoOp->SetDlgTime(fv, yv->StartTime, yv->ByteCount);
 
 	fv->FTSetTimeOut(fv,yv->TOutLong);
 
@@ -761,7 +771,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 
 				// If client confirms that last (empty) packed was received.
 				// もう送信するファイルがない場合は、正常終了。
-				if (!fv->FileOpen)
+				if (!yv->FileOpen)
 				{
 					fv->Success = TRUE;
 					yv->LastMessage = isym;
@@ -944,7 +954,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				yv->PktOut[0] = SOH;
 
 				// Timestamp.
-				fv->FileMtime = file->GetFMtime(file, yv->FullName);
+				yv->FileMtime = file->GetFMtime(file, yv->FullName);
 
 				filename = file->GetSendFilename(file, yv->FullName, FALSE, FALSE, FALSE);
 				ret = _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s", filename);
@@ -955,7 +965,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				total = ret + 1;
 
 				ret = _snprintf_s(&(buf[total]), sizeof(buf) - total, _TRUNCATE, "%lu %lo %o",
-				                  fv->FileSize, fv->FileMtime, 0644|_S_IFREG);
+				                  yv->FileSize, yv->FileMtime, 0644|_S_IFREG);
 				total += ret;
 
 				// if bloack0 is long, expand to 1024 bytes.
@@ -989,23 +999,23 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 
 				yv->__DataLen = current_packet_size;
 
-				while ((idx <= current_packet_size) && fv->FileOpen &&
+				while ((idx <= current_packet_size) && yv->FileOpen &&
 				       (1 == file->ReadFile(file, &fsym, 1)))
 				{
 					// TODO: remove magic number.
 					yv->PktOut[2 + idx] = fsym;
 					++idx;
-					fv->ByteCount++;
+					yv->ByteCount++;
 				}
 
 				// No bytes were read.
 				if (1 == idx)
 				{
 					// Close file handle.
-					if (fv->FileOpen)
+					if (yv->FileOpen)
 					{
 						file->Close(file);
-						fv->FileOpen = FALSE;
+						yv->FileOpen = FALSE;
 					}
 
 					// Send EOT.
@@ -1109,9 +1119,9 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			fv->InfoOp->SetDlgPacketNum(fv, yv->PktNumOffset + yv->PktNumSent);
 		}
 
-		fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
-		fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-		fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+		fv->InfoOp->SetDlgByteCount(fv, yv->ByteCount);
+		fv->InfoOp->SetDlgPercent(fv, yv->ByteCount, yv->FileSize, &yv->ProgStat);
+		fv->InfoOp->SetDlgTime(fv, yv->StartTime, yv->ByteCount);
 	}
 
 	return TRUE;
@@ -1181,6 +1191,7 @@ BOOL YCreate(PFileVarProto fv)
 		return FALSE;
 	}
 	memset(pv, 0, sizeof(*pv));
+	pv->FileOpen = FALSE;
 	fv->data = pv;
 	fv->ProtoOp = &Op;
 

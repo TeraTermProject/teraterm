@@ -70,6 +70,16 @@ typedef struct {
 	TProtoLog *log;
 	const char *FullName;		// Windows上のファイル名 UTF-8
 	const wchar_t *UILanguageFileW;
+
+	BOOL FileOpen;
+	//LONG FileSize;
+	LONG ByteCount;
+
+	int ProgStat;
+
+	DWORD StartTime;
+
+	DWORD FileMtime;
 } TKmtVar;
 typedef TKmtVar *PKmtVar;
 
@@ -692,7 +702,7 @@ static void KmtDecode(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 						BuffPtr++;
 					}
 			}
-			fv->ByteCount = fv->ByteCount + kv->RepeatCount;
+			kv->ByteCount = kv->ByteCount + kv->RepeatCount;
 			OutFlag = FALSE;
 			kv->RepeatCount = 1;
 			CTLflag = FALSE;
@@ -702,9 +712,9 @@ static void KmtDecode(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 	}
 
 	if (Buff==NULL)
-		fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
+		fv->InfoOp->SetDlgByteCount(fv, kv->ByteCount);
 	*BuffLen = BuffPtr;
-	fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgTime(fv, kv->StartTime, kv->ByteCount);
 }
 
 static void KmtRecvFileAttr(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
@@ -867,7 +877,8 @@ static BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
 	}
 	else if (file->ReadFile(file,&b,1)==0)
 		return FALSE;
-	else fv->ByteCount++;
+	else
+		kv->ByteCount++;
 
 	Len = 0;
 
@@ -904,7 +915,7 @@ static BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
 	kv->RepeatCount = 1;
 	if (file->ReadFile(file,&(kv->NextByte),1)==1)
 	{
-		fv->ByteCount++;
+		kv->ByteCount++;
 		kv->NextByteFlag = TRUE;
 	}
 
@@ -914,7 +925,8 @@ static BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
 		kv->RepeatCount++;
 		if (file->ReadFile(file,&(kv->NextByte),1)==0)
 			kv->NextByteFlag = FALSE;
-		else fv->ByteCount++;
+		else
+			kv->ByteCount++;
 	}
 
 	if (Len*kv->RepeatCount > Len+2)
@@ -942,11 +954,11 @@ static void KmtIncPacketNum(PKmtVar kv)
 static void KmtSendEOFPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
 {
 	/* close file */
-	if (fv->FileOpen) {
+	if (kv->FileOpen) {
 		TFileIO *file = fv->file;
 		file->Close(file);
 	}
-	fv->FileOpen = FALSE;
+	kv->FileOpen = FALSE;
 
 	KmtIncPacketNum(kv);
 
@@ -961,9 +973,9 @@ static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	int DataLen, DataLenNew, maxlen;
 	BOOL NextFlag;
 
-	fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
-	fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-	fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgByteCount(fv, kv->ByteCount);
+	fv->InfoOp->SetDlgPercent(fv, kv->ByteCount, kv->FileSize, &kv->ProgStat);
+	fv->InfoOp->SetDlgTime(fv, kv->StartTime, kv->ByteCount);
 	DataLen = 0;
 	DataLenNew = 0;
 
@@ -992,9 +1004,9 @@ static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 
 	if (DataLen==0)
 	{
-		fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
-		fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-		fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+		fv->InfoOp->SetDlgByteCount(fv, kv->ByteCount);
+		fv->InfoOp->SetDlgPercent(fv, kv->ByteCount, kv->FileSize, &kv->ProgStat);
+		fv->InfoOp->SetDlgTime(fv, kv->StartTime, kv->ByteCount);
 		KmtSendEOFPacket(fv,kv,cv);
 	}
 	else {
@@ -1044,10 +1056,10 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 
 	/* file open */
 	r = file->OpenRead(file, kv->FullName);
-	fv->FileOpen = r;
-	if (! fv->FileOpen)
+	kv->FileOpen = r;
+	if (!kv->FileOpen)
 	{
-		if (! fv->NoMsg)
+		if (!fv->NoMsg)
 		{
 			static const TTMessageBoxInfoW info = {
 				"Tera Term",
@@ -1059,17 +1071,16 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 		return FALSE;
 	}
 	else
-		fv->FileSize = file->GetFSize(file, kv->FullName);
+		kv->FileSize = file->GetFSize(file, kv->FullName);
 
-	fv->ByteCount = 0;
-	fv->ProgStat = 0;
-	fv->StartTime = GetTickCount();
+	kv->ByteCount = 0;
+	kv->ProgStat = 0;
+	kv->StartTime = GetTickCount();
 
 	fv->InfoOp->SetDlgProtoFileName(fv, kv->FullName);
-	fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
-	fv->InfoOp->SetDlgPercent(fv,
-		fv->ByteCount, fv->FileSize, &fv->ProgStat);
-	fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgByteCount(fv, kv->ByteCount);
+	fv->InfoOp->SetDlgPercent(fv, kv->ByteCount, kv->FileSize, &kv->ProgStat);
+	fv->InfoOp->SetDlgTime(fv, kv->StartTime, kv->ByteCount);
 
 	KmtIncPacketNum(kv);
 	filename = file->GetSendFilename(file, kv->FullName, FALSE, TRUE, FALSE);
@@ -1168,15 +1179,15 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	fv->InfoOp->SetDlgProtoText(fv, "Kermit");
 
 	if (kv->KmtMode == IdKmtSend) {
-		fv->InfoOp->InitDlgProgress(fv, &fv->ProgStat);
-		fv->StartTime = GetTickCount();
+		fv->InfoOp->InitDlgProgress(fv, &kv->ProgStat);
+		kv->StartTime = GetTickCount();
 	}
 	else {
-		fv->ProgStat = -1;
-		fv->StartTime = 0;
+		kv->ProgStat = -1;
+		kv->StartTime = 0;
 	}
 
-	fv->FileOpen = FALSE;
+	kv->FileOpen = FALSE;
 
 	kv->UILanguageFileW = ts->UILanguageFileW;
 	kv->KmtState = Unknown;
@@ -1307,8 +1318,8 @@ static BOOL FTCreateFile(PFileVarProto fv)
 	TFileIO *file = fv->file;
 
 	fv->InfoOp->SetDlgProtoFileName(fv, kv->FullName);
-	fv->FileOpen = file->OpenWrite(file, kv->FullName);
-	if (! fv->FileOpen) {
+	kv->FileOpen = file->OpenWrite(file, kv->FullName);
+	if (!kv->FileOpen) {
 		if (fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
@@ -1316,12 +1327,12 @@ static BOOL FTCreateFile(PFileVarProto fv)
 		return FALSE;
 	}
 
-	fv->ByteCount = 0;
-	fv->FileSize = 0;
-	if (fv->ProgStat != -1) {
-		fv->ProgStat = 0;
+	kv->ByteCount = 0;
+	kv->FileSize = 0;
+	if (kv->ProgStat != -1) {
+		kv->ProgStat = 0;
 	}
-	fv->StartTime = GetTickCount();
+	kv->StartTime = GetTickCount();
 
 	return TRUE;
 }
@@ -1608,8 +1619,9 @@ read_end:
 		if (kv->KmtState == ReceiveData)
 		{
 			TFileIO *file = fv->file;
-			if (fv->FileOpen) file->Close(file);
-			fv->FileOpen = FALSE;
+			if (kv->FileOpen)
+				file->Close(file);
+			kv->FileOpen = FALSE;
 			kv->KmtState = ReceiveFile;
 
 			/* ファイル属性を設定する。*/
@@ -1690,6 +1702,7 @@ BOOL KmtCreate(PFileVarProto fv)
 		return FALSE;
 	}
 	memset(kv, 0, sizeof(*kv));
+	kv->FileOpen = FALSE;
 	fv->data = kv;
 	fv->ProtoOp = &Op;
 

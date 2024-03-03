@@ -49,21 +49,9 @@ typedef struct FileVarProto {
 	// ↑protosys_proto.cpp内のみ使用
 
 	// ↓各プロトコルで使用するワーク
-	BOOL FileOpen;
-	LONG FileSize;
-	LONG ByteCount;
 	BOOL OverWrite;
-
 	BOOL Success;
 	BOOL NoMsg;
-
-	BOOL HideDialog;
-
-	int ProgStat;
-
-	DWORD StartTime;
-
-	DWORD FileMtime;
 	// ↑各プロトコルで使用するワーク
 
 	// services

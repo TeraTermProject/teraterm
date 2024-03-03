@@ -57,6 +57,16 @@ typedef struct {
 	TProtoLog *log;
 	const char *FullName;	// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
 	WORD LogState;
+
+	BOOL FileOpen;
+	LONG FileSize;
+	LONG ByteCount;
+
+	int ProgStat;
+
+	DWORD StartTime;
+
+	DWORD FileMtime;
 } TQVVar;
 typedef TQVVar *PQVVar;
 
@@ -165,13 +175,13 @@ static BOOL QVInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	  qv->LogState = 2;
   }
 
-  fv->FileOpen = FALSE;
-  fv->ByteCount = 0;
+  qv->FileOpen = FALSE;
+  qv->ByteCount = 0;
 
   fv->InfoOp->SetDlgProtoText(fv, "Quick-VAN");
 
-  fv->InfoOp->InitDlgProgress(fv, &fv->ProgStat);
-  fv->StartTime = GetTickCount();
+  fv->InfoOp->InitDlgProgress(fv, &qv->ProgStat);
+  qv->StartTime = GetTickCount();
 
   qv->SeqNum = 0;
   qv->FileNum = 0;
@@ -418,8 +428,8 @@ static BOOL FTCreateFile(PFileVarProto fv)
 	PQVVar qv = fv->data;
 
 	fv->InfoOp->SetDlgProtoFileName(fv, qv->FullName);
-	fv->FileOpen = file->OpenWrite(file, qv->FullName);
-	if (! fv->FileOpen) {
+	qv->FileOpen = file->OpenWrite(file, qv->FullName);
+	if (!qv->FileOpen) {
 		if (fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
@@ -427,12 +437,12 @@ static BOOL FTCreateFile(PFileVarProto fv)
 		return FALSE;
 	}
 
-	fv->ByteCount = 0;
-	fv->FileSize = 0;
-	if (fv->ProgStat != -1) {
-		fv->ProgStat = 0;
+	qv->ByteCount = 0;
+	qv->FileSize = 0;
+	if (qv->ProgStat != -1) {
+		qv->ProgStat = 0;
 	}
-	fv->StartTime = GetTickCount();
+	qv->StartTime = GetTickCount();
 
 	return TRUE;
 }
@@ -461,8 +471,7 @@ static BOOL QVParseVFILE(PFileVarProto fv, PQVVar qv)
   do {
     b = qv->PktIn[i];
     if ((b>=0x30) && (b<=0x39))
-      fv->FileSize =
-	fv->FileSize * 10 + b - 0x30;
+		qv->FileSize = qv->FileSize * 10 + b - 0x30;
     i++;
   } while ((b>=0x30) && (b<=0x39));
   /* year */
@@ -488,9 +497,9 @@ static BOOL QVParseVFILE(PFileVarProto fv, PQVVar qv)
   QVGetNum2(qv,&i,&(qv->Sec));
 
   fv->InfoOp->SetDlgByteCount(fv, 0);
-  if (fv->FileSize>0)
-    fv->InfoOp->SetDlgPercent(fv, 0, fv->FileSize, &fv->ProgStat);
-  fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+  if (qv->FileSize > 0)
+	  fv->InfoOp->SetDlgPercent(fv, 0, qv->FileSize, &qv->ProgStat);
+  fv->InfoOp->SetDlgTime(fv, qv->StartTime, qv->ByteCount);
 
   /* Send VRPOS */
   QVSetResPacket(qv,'P',0,0);
@@ -516,10 +525,10 @@ static BOOL QVParseVENQ(PFileVarProto fv, PQVVar qv)
   {
     if (qv->PktIn[4]==0x30)
     {
-      if (fv->FileOpen)
+      if (qv->FileOpen)
       {
 	file->Close(file);
-	fv->FileOpen = FALSE;
+	qv->FileOpen = FALSE;
 	/* set file date & time */
 	if ((qv->Year >= 1900) && (qv->Hour < 24))
 	{
@@ -560,18 +569,18 @@ static void QVWriteToFile(PFileVarProto fv, PQVVar qv)
   TFileIO *file = fv->file;
   int C;
 
-  if (fv->FileSize - fv->ByteCount < 128)
-    C = fv->FileSize - fv->ByteCount;
+  if (qv->FileSize - qv->ByteCount < 128)
+    C = qv->FileSize - qv->ByteCount;
   else
     C = 128;
   file->WriteFile(file,&(qv->PktIn[3]),C);
-  fv->ByteCount = fv->ByteCount + C;
+  qv->ByteCount = qv->ByteCount + C;
 
   fv->InfoOp->SetDlgPacketNum(fv, qv->SeqNum);
-  fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
-  if (fv->FileSize>0)
-    fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-  fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+  fv->InfoOp->SetDlgByteCount(fv, qv->ByteCount);
+  if (qv->FileSize > 0)
+    fv->InfoOp->SetDlgPercent(fv, qv->ByteCount, qv->FileSize, &qv->ProgStat);
+  fv->InfoOp->SetDlgTime(fv, qv->StartTime, qv->ByteCount);
 }
 
 static BOOL QVCheckWindow8(PQVVar qv, WORD w0, WORD w1, BYTE b, LPWORD  w)
@@ -864,11 +873,11 @@ static void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   qv->FullName = filename;
 
   /* find file and get file info */
-  fv->FileSize = file->GetFSize(file, qv->FullName);
-  if (fv->FileSize>0)
+  qv->FileSize = file->GetFSize(file, qv->FullName);
+  if (qv->FileSize > 0)
   {
-    qv->FileEnd = (WORD)(fv->FileSize >> 7);
-    if ((fv->FileSize & 0x7F) != 0)
+	  qv->FileEnd = (WORD)(qv->FileSize >> 7);
+    if ((qv->FileSize & 0x7F) != 0)
       qv->FileEnd++;
   }
   else {
@@ -878,16 +887,16 @@ static void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
 
   /* file open */
   r = file->OpenRead(file, qv->FullName);
-  fv->FileOpen = r;
-  if (! fv->FileOpen)
+  qv->FileOpen = r;
+  if (!qv->FileOpen)
   {
     QVCancel(fv,cv);
     return;
   }
   /* file no. */
   qv->FileNum++;
-  fv->ProgStat = 0;
-  fv->StartTime = GetTickCount();
+  qv->ProgStat = 0;
+  qv->StartTime = GetTickCount();
   i = 3;
   QVPutNum2(qv,qv->FileNum,&i);
   /* file name */
@@ -899,7 +908,7 @@ static void QVSendVFILE(PFileVarProto fv, PQVVar qv, PComVar cv)
   i++;
   free(filename);
   /* file size */
-  _snprintf_s(&(qv->PktOut[i]),sizeof(qv->PktOut)-i,_TRUNCATE,"%u",fv->FileSize);
+  _snprintf_s(&(qv->PktOut[i]), sizeof(qv->PktOut) - i, _TRUNCATE, "%u", qv->FileSize);
   i = strlen(&(qv->PktOut[i])) + i;
   qv->PktOut[i] = 0;
   i++;
@@ -945,17 +954,17 @@ static void QVSendVDATA(PFileVarProto fv, PQVVar qv)
     qv->SeqSent++;
     Pos = (LONG)(qv->SeqSent-1) << 7;
     if (qv->SeqSent==qv->FileEnd)
-      C = fv->FileSize - Pos;
+      C = qv->FileSize - Pos;
     else
       C = 128;
     /* read data from file */
     file->Seek(file, Pos);
     file->ReadFile(file,&(qv->PktOut[3]),C);
-    fv->ByteCount = Pos + (LONG)C;
+	qv->ByteCount = Pos + (LONG)C;
     fv->InfoOp->SetDlgPacketNum(fv, qv->SeqSent);
-    fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
-    fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-    fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgByteCount(fv, qv->ByteCount);
+	fv->InfoOp->SetDlgPercent(fv, qv->ByteCount, qv->FileSize, &qv->ProgStat);
+	fv->InfoOp->SetDlgTime(fv, qv->StartTime, qv->ByteCount);
     for (i = C ; i <= 127 ; i++)
       qv->PktOut[3+i] = 0;
     /* send VDAT */
@@ -1121,9 +1130,9 @@ static void QVParseVSTAT(PFileVarProto fv, PQVVar qv, PComVar cv)
   if (qv->EnqFlag && (qv->PktIn[3]==0x30))
   {
 	TFileIO *file = fv->file;
-    if (fv->FileOpen)
+    if (qv->FileOpen)
       file->Close(file);
-    fv->FileOpen = FALSE;
+	qv->FileOpen = FALSE;
     qv->EnqFlag = FALSE;
     qv->RetryCount = 10;
     QVSendVFILE(fv,qv,cv);
@@ -1368,6 +1377,7 @@ BOOL QVCreate(PFileVarProto fv)
 		return FALSE;
 	}
 	memset(qv, 0, sizeof(*qv));
+	qv->FileOpen = FALSE;
 	fv->data = qv;
 	fv->ProtoOp = &Op;
 

@@ -72,6 +72,16 @@ typedef struct {
 	TProtoLog *log;
 	const char *FullName;		// Windows上のファイル名 UTF-8
 	WORD LogState;
+
+	BOOL FileOpen;
+	LONG FileSize;
+	LONG ByteCount;
+
+	int ProgStat;
+
+	DWORD StartTime;
+
+	DWORD FileMtime;
 } TXVar;
 typedef TXVar *PXVar;
 
@@ -233,8 +243,8 @@ static BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	xv->FullName = fv->GetNextFname(fv);
 	if (xv->XMode == IdXSend) {
 		size_t size;
-		fv->FileOpen = file->OpenRead(file, xv->FullName);
-		if (fv->FileOpen == FALSE) {
+		xv->FileOpen = file->OpenRead(file, xv->FullName);
+		if (xv->FileOpen == FALSE) {
 			return FALSE;
 		}
 		size = file->GetFSize(file, xv->FullName);
@@ -243,18 +253,18 @@ static BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 			//  FileSize は各プロトコルごとに持つほうがよさそう
 			return FALSE;
 		}
-		fv->FileSize = (LONG)size;
-		fv->InfoOp->InitDlgProgress(fv, &fv->ProgStat);
+		xv->FileSize = (LONG)size;
+		fv->InfoOp->InitDlgProgress(fv, &xv->ProgStat);
 	} else {
-		fv->FileOpen = file->OpenWrite(file, xv->FullName);
-		if (fv->FileOpen == FALSE) {
+		xv->FileOpen = file->OpenWrite(file, xv->FullName);
+		if (xv->FileOpen == FALSE) {
 			return FALSE;
 		}
-		fv->FileSize = 0;
-		fv->ProgStat = -1;
+		xv->FileSize = 0;
+		xv->ProgStat = -1;
 	}
 	fv->InfoOp->SetDlgProtoFileName(fv, xv->FullName);
-	fv->StartTime = GetTickCount();
+	xv->StartTime = GetTickCount();
 
 	xv->PktNumOffset = 0;
 	xv->PktNum = 0;
@@ -263,7 +273,7 @@ static BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	xv->CRRecv = FALSE;
 	xv->CANCount = 0;
 
-	fv->ByteCount = 0;
+	xv->ByteCount = 0;
 
 	xv->TOutInit = ts->XmodemTimeOutInit;
 	xv->TOutInitCRC = ts->XmodemTimeOutInitCRC;
@@ -484,11 +494,11 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 		file->WriteFile(file, &(xv->PktIn[3]), c);
 	}
 
-	fv->ByteCount = fv->ByteCount + c;
+	xv->ByteCount = xv->ByteCount + c;
 
 	fv->InfoOp->SetDlgPacketNum(fv, xv->PktNumOffset + xv->PktNum);
-	fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
-	fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+	fv->InfoOp->SetDlgByteCount(fv, xv->ByteCount);
+	fv->InfoOp->SetDlgTime(fv, xv->StartTime, xv->ByteCount);
 
 	fv->FTSetTimeOut(fv, xv->TOutLong);
 
@@ -513,7 +523,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 
 			switch (b) {
 			case ACK:
-				if (!fv->FileOpen) {
+					if (!xv->FileOpen) {
 					fv->Success = TRUE;
 					return FALSE;
 				} else if (xv->PktNumSent == (BYTE) (xv->PktNum + 1)) {
@@ -587,11 +597,11 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 			xv->PktOut[2] = ~xv->PktNumSent;
 
 			i = 1;
-			while ((i <= xv->DataLen) && fv->FileOpen &&
+			while ((i <= xv->DataLen) && xv->FileOpen &&
 				   (file->ReadFile(file, &b, 1) == 1)) {
 				xv->PktOut[2 + i] = b;
 				i++;
-				fv->ByteCount++;
+				xv->ByteCount++;
 			}
 
 			if (i > 1) {
@@ -609,9 +619,9 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 				}
 				xv->PktBufCount = 3 + xv->DataLen + xv->CheckLen;
 			} else {			/* send EOT */
-				if (fv->FileOpen) {
+				if (xv->FileOpen) {
 					file->Close(file);
-					fv->FileOpen = FALSE;
+					xv->FileOpen = FALSE;
 				}
 				xv->PktOut[0] = EOT;
 				xv->PktBufCount = 1;
@@ -647,9 +657,9 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 		else {
 			fv->InfoOp->SetDlgPacketNum(fv, xv->PktNumOffset + xv->PktNumSent);
 		}
-		fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
-		fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-		fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+		fv->InfoOp->SetDlgByteCount(fv, xv->ByteCount);
+		fv->InfoOp->SetDlgPercent(fv, xv->ByteCount, xv->FileSize, &xv->ProgStat);
+		fv->InfoOp->SetDlgTime(fv, xv->StartTime, xv->ByteCount);
 	}
 
 	return TRUE;
@@ -724,10 +734,9 @@ BOOL XCreate(PFileVarProto fv)
 		return FALSE;
 	}
 	memset(xv, 0, sizeof(*xv));
+	xv->FileOpen = FALSE;
 	fv->data = xv;
 	fv->ProtoOp = &Op;
-
-	xv->log = ProtoLogCreate();
 
 	return TRUE;
 }

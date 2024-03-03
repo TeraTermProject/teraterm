@@ -74,6 +74,16 @@ typedef struct {
 	TProtoLog *log;
 	const char *FullName;		// Windows上のファイル名 UTF-8
 	WORD LogState;
+
+	BOOL FileOpen;
+	LONG FileSize;
+	LONG ByteCount;
+
+	int ProgStat;
+
+	DWORD StartTime;
+
+	DWORD FileMtime;
 } TBPVar;
 typedef TBPVar *PBPVar;
 
@@ -104,16 +114,17 @@ static BOOL BPOpenFileToBeSent(PFileVarProto fv)
   TFileIO *fileio = fv->file;
   PBPVar bv = fv->data;
 
-  if (fv->FileOpen) return TRUE;
+  if (bv->FileOpen)
+    return TRUE;
   if (bv->FullName == NULL) return FALSE;
 
   r = fileio->OpenRead(fileio, bv->FullName);
-  fv->FileOpen = r;
+  bv->FileOpen = r;
   if (r == TRUE) {
     fv->InfoOp->SetDlgProtoFileName(fv, bv->FullName);
-    fv->FileSize = fileio->GetFSize(fileio, bv->FullName);
+    bv->FileSize = fileio->GetFSize(fileio, bv->FullName);
   }
-  return fv->FileOpen;
+  return bv->FileOpen;
 }
 
 // 通信中に受信/送信が切り替わる?
@@ -144,8 +155,8 @@ static BOOL BPInit(PFileVarProto fv, PComVar cv, PTTSet ts)
   BPDispMode(fv,bv);
   fv->InfoOp->SetDlgProtoText(fv, "B-Plus");
 
-  fv->InfoOp->InitDlgProgress(fv, &fv->ProgStat);
-  fv->StartTime = GetTickCount();
+  fv->InfoOp->InitDlgProgress(fv, &bv->ProgStat);
+  bv->StartTime = GetTickCount();
 
   /* file name, file size */
   if (bv->BPMode==IdBPSend)
@@ -513,20 +524,20 @@ static void BPSendNPacket(PFileVarProto fv, PBPVar bv)
     c = fileio->ReadFile(fileio, &b, 1);
     if (c==1)
       BPPut1Byte(bv,b,&i);
-    fv->ByteCount = fv->ByteCount + c;
+    bv->ByteCount = bv->ByteCount + c;
   }
   if (c==0)
   {
     fileio->Close(fileio);
-    fv->FileOpen = FALSE;
+    bv->FileOpen = FALSE;
   }
   i = i - 4;
   BPMakePacket(bv,'N',i);
 
-  fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
-  if (fv->FileSize>0)
-    fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-  fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+  fv->InfoOp->SetDlgByteCount(fv, bv->ByteCount);
+  if (bv->FileSize > 0)
+    fv->InfoOp->SetDlgPercent(fv, bv->ByteCount, bv->FileSize, &bv->ProgStat);
+  fv->InfoOp->SetDlgTime(fv, bv->StartTime, bv->ByteCount);
 }
 
 static void BPCheckPacket(PFileVarProto fv, PBPVar bv, PComVar cv)
@@ -575,8 +586,8 @@ static BOOL FTCreateFile(PFileVarProto fv)
 	PBPVar bv = fv->data;
 
 	fv->InfoOp->SetDlgProtoFileName(fv, bv->FullName);
-	fv->FileOpen = file->OpenWrite(file, bv->FullName);
-	if (! fv->FileOpen) {
+	bv->FileOpen = file->OpenWrite(file, bv->FullName);
+	if (!bv->FileOpen) {
 		if (fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
@@ -584,12 +595,12 @@ static BOOL FTCreateFile(PFileVarProto fv)
 		return FALSE;
 	}
 
-	fv->ByteCount = 0;
-	fv->FileSize = 0;
-	if (fv->ProgStat != -1) {
-		fv->ProgStat = 0;
+	bv->ByteCount = 0;
+	bv->FileSize = 0;
+	if (bv->ProgStat != -1) {
+		bv->ProgStat = 0;
 	}
-	fv->StartTime = GetTickCount();
+	bv->StartTime = GetTickCount();
 
 	return TRUE;
 }
@@ -605,10 +616,10 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 
   switch (bv->PktIn[2]) {
     case 'C': /* Close */
-      if (fv->FileOpen)
+      if (bv->FileOpen)
       {
 	fileio->Close(fileio);
-	fv->FileOpen = FALSE;
+	bv->FileOpen = FALSE;
       }
       fv->Success = TRUE;
       bv->BPState = BP_Close;
@@ -653,13 +664,13 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
     case 'I': /* File information */
       i = 5;
       /* file size */
-      fv->FileSize = 0;
+      bv->FileSize = 0;
       do {
 	c = BPGet1(bv,&i,&b);
 	if ((c==1) &&
 	    (b>=0x30) && (b<=0x39))
-	  fv->FileSize =
-	    fv->FileSize * 10 + b - 0x30;
+	  bv->FileSize =
+	    bv->FileSize * 10 + b - 0x30;
       } while ((c!=0) && (b>=0x30) && (b<=0x39));
       break;
     case 'U': /* Upload */
@@ -672,7 +683,7 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
       bv->BPMode = IdBPSend;
       BPDispMode(fv,bv);
 
-      if (! fv->FileOpen)
+      if (!bv->FileOpen)
       {
 	/* Get file name */
 	j = 0;
@@ -718,7 +729,7 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 	  }
 	}
       }
-      fv->ByteCount = 0;
+      bv->ByteCount = 0;
 
       bv->BPState = BP_SendData;
       BPSendNPacket(fv,bv);
@@ -741,14 +752,14 @@ static void BPParsePacket(PFileVarProto fv, PBPVar bv)
 			BPSendFailure(bv,'E');
 		return;
     case 'F': /* Failure */
-		if (! fv->NoMsg)
+		if (!fv->NoMsg)
 			MessageBox(fv->HMainWin,"Transfer failure",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
 		bv->BPState = BP_Close;
 		break;
     case 'N': /* Data */
 		if ((bv->BPState==BP_RecvFile) &&
-			fv->FileOpen)
+			bv->FileOpen)
 			bv->BPState = BP_RecvData;
 		else if (bv->BPState != BP_RecvData)
 		{
@@ -756,12 +767,12 @@ static void BPParsePacket(PFileVarProto fv, PBPVar bv)
 			return;
 		}
 		fileio->WriteFile(fileio, &(bv->PktIn[2]), bv->PktInCount-2);
-		fv->ByteCount = fv->ByteCount +
+		bv->ByteCount = bv->ByteCount +
 			bv->PktInCount - 2;
-		fv->InfoOp->SetDlgByteCount(fv, fv->ByteCount);
-		if (fv->FileSize>0)
-			fv->InfoOp->SetDlgPercent(fv, fv->ByteCount, fv->FileSize, &fv->ProgStat);
-		fv->InfoOp->SetDlgTime(fv, fv->StartTime, fv->ByteCount);
+		fv->InfoOp->SetDlgByteCount(fv, bv->ByteCount);
+		if (bv->FileSize > 0)
+			fv->InfoOp->SetDlgPercent(fv, bv->ByteCount, bv->FileSize, &bv->ProgStat);
+		fv->InfoOp->SetDlgTime(fv, bv->StartTime, bv->ByteCount);
 		break;
     case 'T':
 		BPParseTPacket(fv,bv); /* File transfer */
@@ -813,7 +824,7 @@ static void BPParseAck(PFileVarProto fv, PBPVar bv, BYTE b)
     case BP_SendData:
       if (b==bv->PktNumSent)
       {
-	if (fv->FileOpen)
+	if (bv->FileOpen)
 	  BPSendNPacket(fv,bv);
 	else
 	  BPSendTCPacket(bv);
@@ -1041,6 +1052,7 @@ BOOL BPCreate(PFileVarProto fv)
 		return FALSE;
 	}
 	memset(bv, 0, sizeof(*bv));
+	bv->FileOpen = FALSE;
 	fv->data = bv;
 	fv->ProtoOp = &Op;
 
