@@ -34,6 +34,7 @@
 #include "ttcommon.h"
 #include "ftlib.h"
 #include "protolog.h"
+#include "filesys_proto.h"
 
 #include "xmodem.h"
 
