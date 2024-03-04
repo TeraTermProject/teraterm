@@ -75,7 +75,7 @@
 #if defined(HAS_DEVPKEY_H)
 
 #define INITGUID
-#include "devpkey.h"
+#include <devpkey.h>
 
 #else //  defined(HAS_DEVPKEY_H)
 
@@ -83,6 +83,9 @@
 
 #endif //  defined(HAS_DEVPKEY_H)
 
+#define INITGUID
+#include <guiddef.h>
+#include <ntddmodm.h>
 
 typedef BOOL (WINAPI *TSetupDiGetDevicePropertyW)(
 	HDEVINFO DeviceInfoSet,
@@ -416,46 +419,56 @@ static ComPortInfo_t *ComPortInfoGetByCreatefile(int *count)
 
 static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 {
+	static const GUID *pClassGuids[] = {
+		&GUID_DEVCLASS_PORTS,
+		&GUID_DEVCLASS_MODEM,
+	};
 	int comport_count = 0;
 	ComPortInfo_t *comport_infos = NULL;
-	const GUID *pClassGuid = &GUID_DEVCLASS_PORTS;
 
-	// List all connected serial devices
-	HDEVINFO hDevInfo = SetupDiGetClassDevsA(pClassGuid, NULL, NULL, DIGCF_PRESENT | DIGCF_PROFILE);
-	if (hDevInfo == INVALID_HANDLE_VALUE) {
-		return NULL;
-	}
-
-	// Find the ones that are driverless
-	for (int i = 0; ; i++) {
-		SP_DEVINFO_DATA DeviceInfoData = {};
-		DeviceInfoData.cbSize = sizeof (DeviceInfoData);
-		if (!SetupDiEnumDeviceInfo(hDevInfo, i, &DeviceInfoData)) {
-			break;
-		}
-
-		wchar_t *port_name;
-		if (!GetComPortName(hDevInfo, &DeviceInfoData, &port_name)) {
+	for (int i = 0; i < _countof(pClassGuids); i++) {
+		// List all connected devices
+		HDEVINFO hDevInfo = SetupDiGetClassDevsA(pClassGuids[i], NULL, NULL, DIGCF_PRESENT | DIGCF_PROFILE);
+		if (hDevInfo == INVALID_HANDLE_VALUE) {
 			continue;
 		}
-		int port_no = 0;
-		if (wcsncmp(port_name, L"COM", 3) == 0) {
-			port_no = _wtoi(port_name+3);
+
+		// Find the ones that are driverless
+		for (DWORD j = 0; ; j++) {
+			SP_DEVINFO_DATA DeviceInfoData = {};
+			DeviceInfoData.cbSize = sizeof (DeviceInfoData);
+			if (!SetupDiEnumDeviceInfo(hDevInfo, j, &DeviceInfoData)) {
+				break;
+			}
+
+			wchar_t *port_name;
+			if (!GetComPortName(hDevInfo, &DeviceInfoData, &port_name)) {
+				continue;
+			}
+			int port_no = 0;
+			if (wcsncmp(port_name, L"COM", 3) == 0) {
+				port_no = _wtoi(port_name+3);
+			}
+
+			// 情報取得
+			wchar_t *str_friendly_name = NULL;
+			wchar_t *str_prop = NULL;
+			GetComPropartys(hDevInfo, &DeviceInfoData, &str_friendly_name, &str_prop);
+
+			ComPortInfo_t *p =
+				(ComPortInfo_t *)realloc(comport_infos,
+										 sizeof(ComPortInfo_t) * (comport_count + 1));
+			if (p == NULL) {
+				break;
+			}
+			comport_infos = p;
+			comport_count++;
+			p = &comport_infos[comport_count-1];
+			p->port_name = port_name;  // COMポート名
+			p->port_no = port_no;  // COMポート番号
+			p->friendly_name = str_friendly_name;  // Device Description
+			p->property = str_prop;  // 全詳細情報
 		}
-
-		// 情報取得
-		wchar_t *str_friendly_name = NULL;
-		wchar_t *str_prop = NULL;
-		GetComPropartys(hDevInfo, &DeviceInfoData, &str_friendly_name, &str_prop);
-
-		comport_count++;
-		comport_infos = (ComPortInfo_t *)realloc(comport_infos,
-								sizeof(ComPortInfo_t) * comport_count);
-		ComPortInfo_t *p = &comport_infos[comport_count-1];
-		p->port_name = port_name;  // COMポート名
-		p->port_no = port_no;  // COMポート番号
-		p->friendly_name = str_friendly_name;  // Device Description
-		p->property = str_prop;  // 全詳細情報
 	}
 
 	/* ポート名順に並べる */
