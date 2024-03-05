@@ -420,8 +420,8 @@ static ComPortInfo_t *ComPortInfoGetByCreatefile(int *count)
 static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 {
 	static const GUID *pClassGuids[] = {
-		&GUID_DEVCLASS_PORTS,
-		&GUID_DEVCLASS_MODEM,
+		&GUID_DEVINTERFACE_COMPORT,
+		&GUID_DEVINTERFACE_MODEM,
 	};
 	int comport_count = 0;
 	ComPortInfo_t *comport_infos = NULL;
