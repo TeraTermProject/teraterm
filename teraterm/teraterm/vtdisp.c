@@ -2411,11 +2411,7 @@ static int Get16ColorIndex(int color_index_256, int pcbold16, int pcbold16_brigh
 	}
 	else if (pcbold16) {
 		// 16 color mode PC Style
-		if (color_index_256 == 0) {
-			// black -> black
-			return 0;
-		}
-		else if (color_index_256 < 8) {
+		if (color_index_256 < 8) {
 			if (pcbold16_bright) {
 				return color_index_256 + 8;
 			}
