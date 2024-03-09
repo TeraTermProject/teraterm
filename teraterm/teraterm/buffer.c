@@ -1696,6 +1696,7 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 	LONG TmpPtr;
 	int x, y;
 
+	assert(sx >= 0);
 	str_size = (NumOfColumns + 2) * (ey - sy + 1);
 	str_w = malloc(sizeof(wchar_t) * str_size);
 
@@ -4115,25 +4116,31 @@ static void SearchCharNext(
 	*desty = sy;
 }
 
+static BOOL IsNotURLChar(LONG ptr, int x, void *vwork)
+{
+	(void)vwork;
+	const buff_char_t *b = CodeBuffW + ptr + x;
+	return (b->attr & AttrURL) ? FALSE : TRUE;
+}
+
+static void SearchURLPrev(int sx, int sy, int *destx, int *desty)
+{
+	SearchCharPrev(sx, sy, TRUE, IsNotURLChar, NULL, destx, desty);
+}
+
+static void SearchURLNext(int sx, int sy, int *destx, int *desty)
+{
+	SearchCharNext(sx, sy, TRUE, IsNotURLChar, NULL, destx, desty);
+}
+
 static void invokeBrowserW(int x, int y)
 {
-	const LONG TmpPtr = GetLinePtr(y);
-	int sx;
-	int ex;
-
-	sx = x;
-	while (CodeBuffW[TmpPtr + sx].attr & AttrURL) {
-		sx--;
-	}
-	sx++;
-
-	ex = x;
-	while (CodeBuffW[TmpPtr + ex].attr & AttrURL) {
-		ex++;
-	}
-
+	int sx, sy;
+	int ex, ey;
+	SearchURLPrev(x, y, &sx, &sy);
+	SearchURLNext(x, y, &ex, &ey);
 	{
-		wchar_t *url_w = BuffGetStringForCB(sx, y, ex, y, FALSE, NULL);
+		wchar_t *url_w = BuffGetStringForCB(sx, sy, ex + 1, ey, FALSE, NULL);
 		char *url = ToCharW(url_w);
 		invokeBrowserWithUrl(url);
 		free(url);
