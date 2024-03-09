@@ -3961,6 +3961,160 @@ static void invokeBrowserWithUrl(const char *url)
 	ShellExecuteA(NULL, NULL, url, NULL, NULL, SW_SHOWNORMAL);
 }
 
+/**
+ *	文字を探す,前方
+ *
+ *	@param[in]	sx				スタート
+ *	@param[in]	sy
+ *	@param[in]	is_finish()		終了条件を満たすときにTRUEを返す関数
+ *	@param[in]	work			関数へ渡すポインタ
+ *	@param[in]	line_continue	FALSE=行頭で検索を打ち切る
+ *	@param[out]	destx			見つけた位置
+ *	@param[out]	dexty
+ */
+static void SearchCharPrev(
+	int sx, int sy, BOOL line_continue,
+	BOOL (*is_finish)(LONG ptr, int sx, void *work),
+	void *work,
+	int *destx, int *desty)
+{
+	LONG ptr = GetLinePtr(sy);
+	const buff_char_t *b;
+
+	sx = LeftHalfOfDBCS(ptr, sx);
+	b = CodeBuffW + ptr + sx;
+	assert(b->Padding == FALSE);
+
+	for (;;) {
+		// 移動前を記憶
+		int px = sx;
+		int py = sy;
+
+		// 1つ前のキャラクタへ移動
+		if (sx <= 0) {
+			// 行頭なら上の行へ
+			if (!line_continue) {
+				// 上の行へ継続しない、検索打ち切り
+				sx = 0;
+				break;
+			}
+			else {
+				// 上の行から継続している?
+				if (sy > 0 && (b->attr & AttrLineContinued)) {
+					// 継続している,前の行の最後へ
+					sy--;
+					ptr = GetLinePtr(sy);
+					sx = NumOfColumns - 1;
+					sx = LeftHalfOfDBCS(ptr, sx);
+					b = CodeBuffW + ptr + sx;
+				}
+				else {
+					// 継続していない,打ち切り
+					sx = 0;
+					break;
+				}
+			}
+		}
+		else {
+			// 1char前へ
+			sx--;
+			b--;
+			// 2cell以上の文字のとき頭出しする
+			while (b->Padding == TRUE) {
+				sx--;
+				b--;
+				if (sx < 0) {
+					// 行頭が Padding はないはず
+					assert(0);
+					sx = 0;
+					goto break_all;
+				}
+			}
+		}
+
+		// 終了?
+		if (is_finish(ptr, sx, work)) {
+		break_all:
+			// 1つ前に進む前の位置を返す
+			sx = px;
+			sy = py;
+			break;
+		}
+	}
+	*destx = sx;
+	*desty = sy;
+}
+
+/**
+ *	文字を探す,後方
+ *
+ *	@param[in]	sx				スタート
+ *	@param[in]	sy
+ *	@param[in]	is_finish()		終了条件を満たすときにTRUEを返す関数
+ *	@param[in]	work			関数へ渡すポインタ
+ *	@param[in]	line_continue	FALSE=行末で検索を打ち切る
+ *	@param[out]	destx			見つけた位置
+ *	@param[out]	dexty
+ */
+static void SearchCharNext(
+	int sx, int sy, BOOL line_continue,
+	BOOL (*is_finish)(LONG ptr, int sx, void *work),
+	void *work,
+	int *destx, int *desty)
+{
+	LONG ptr = GetLinePtr(sy);
+	const buff_char_t *b = CodeBuffW + ptr + sx;
+
+	for (;;) {
+		int px = sx;
+		int py = sy;
+
+		// 次のキャラクタへ
+		if (sx + b->cell > NumOfColumns - 1) {
+			// 次に進むと行末?
+			if (!line_continue) {
+				// 検索打ち切り
+				sx = NumOfColumns - 1;
+				break;
+			}
+			else {
+				// 下の行が継続している?
+				b += b->cell - 1;
+				if (sy < BuffEnd && (b->attr & AttrLineContinued)) {
+					// 継続している
+					sx = 0;
+					sy++;
+					ptr = GetLinePtr(sy);
+					b = CodeBuffW + ptr;
+				}
+				else {
+					// 検索打ち切り
+					sx = NumOfColumns - 1;
+					break;
+				}
+			}
+		}
+		else {
+			sx += b->cell;
+			b += b->cell;
+			if (sx > NumOfColumns - 1) {
+				// はみ出すのはおかしい
+				sx = NumOfColumns - 1;
+			}
+		}
+
+		// 終了?
+		if (is_finish(ptr, sx, work)) {
+			// 1つ前に進む前の位置を返す
+			sx = px;
+			sy = py;
+			break;
+		}
+	}
+	*destx = sx;
+	*desty = sy;
+}
+
 static void invokeBrowserW(int x, int y)
 {
 	const LONG TmpPtr = GetLinePtr(y);
@@ -4109,6 +4263,44 @@ BOOL BuffUrlDblClk(int Xw, int Yw)
 	return url_invoked;
 }
 
+typedef struct delimiter_work_tag {
+	BOOL start_delimiter;
+	wchar_t *start_char;
+	int start_cell;
+} delimiter_work;
+
+/**
+ *	区切り文字チェック
+ *
+ *	@retval	TRUE	区切り文字になった
+ *	@retval	FALSE	区切り文字ではない
+ */
+static BOOL CheckDelimiterChar(LONG ptr, int x, void *vwork)
+{
+	delimiter_work *work = (delimiter_work *)vwork;
+	const buff_char_t *b = CodeBuffW + ptr + x;
+
+	if (work->start_delimiter) {
+		// 区切り文字からスタートした場合
+		wchar_t *wcs = GetWCS(b);
+		int r = wcscmp(wcs, work->start_char);
+		free(wcs);
+		return r != 0;
+	}
+	else {
+		// 非区切り文字からスタートした場合
+		if (IsDelimiter(ptr, x) ||
+			(ts.DelimDBCS != 0 && ((b->cell == 1) != work->start_cell))) {
+			// 現在位置
+			//		区切り文字になった
+			//		スタート文字のセル数と異なるセル数(1orその他)となった
+			// 終了
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 /**
  *	文字の区切り(Delimiter)を探す,前方
  *
@@ -4121,77 +4313,18 @@ BOOL BuffUrlDblClk(int Xw, int Yw)
 static void SearchDelimiterPrev(int sx, int sy, BOOL line_continue, int *destx, int *desty)
 {
 	LONG ptr = GetLinePtr(sy);
-	const buff_char_t *b;
-	BOOL start_delimiter;
-	int start_cell;
-
 	sx = LeftHalfOfDBCS(ptr, sx);
-	b = CodeBuffW + ptr + sx;
+	const buff_char_t *b = CodeBuffW + ptr + sx;
 	assert(b->Padding == FALSE);
-	start_delimiter = IsDelimiter(ptr, sx);
-	start_cell = b->cell == 1;
 
-	for (;;) {
-		// 移動前を記憶
-		int px = sx;
-		int py = sy;
+	delimiter_work work = {0};
+	work.start_delimiter = IsDelimiter(ptr, sx);
+	work.start_cell = b->cell == 1;
+	work.start_char = GetWCS(b);
 
-		// 1つ前のキャラクタへ移動
-		if (sx <= 0) {
-			// 行頭なら上の行へ
-			if (!line_continue) {
-				// 上の行へ継続しない、検索打ち切り
-				sx = 0;
-				break;
-			}
-			else {
-				// 上の行から継続している?
-				if (sy > 0 && (b->attr & AttrLineContinued)) {
-					// 継続している
-					sy--;
-					ptr = GetLinePtr(sy);
-					sx = NumOfColumns - 1;
-					sx = LeftHalfOfDBCS(ptr, sx);
-					b = &CodeBuffW[ptr + sx];
-					px = sx;
-					py = sy;
-				}
-				else {
-					// 継続していない,打ち切り
-					sx = 0;
-					break;
-				}
-			}
-		}
-		else {
-			// 1char前へ
-			sx--;
-			b--;
-			// 2cell以上の文字のとき頭出しする
-			while (b->Padding == TRUE) {
-				sx--;
-				b--;
-				if (sx < 0) {
-					// 行頭が Padding はないはず
-					assert(0);
-					sx = 0;
-					goto break_all;
-				}
-			}
-		}
+	SearchCharPrev(sx, sy, line_continue, CheckDelimiterChar, &work, destx, desty);
 
-		// 区切り文字 or cell数が変化した
-		if (start_delimiter != IsDelimiter(ptr, sx) ||
-			(ts.DelimDBCS != 0 && ((b->cell == 1) != start_cell))) {
-		break_all:
-			// 区切りが見つかった、1つ前に進む前の位置を返す
-			sx = px;
-			sy = py;
-			break;
-		}
-	}
-	*destx = sx;
-	*desty = sy;
+	free(work.start_char);
 }
 
 /**
@@ -4203,62 +4336,23 @@ static void SearchDelimiterPrev(int sx, int sy, BOOL line_continue, int *destx, 
  *	@param[out]	destx			見つけた位置
  *	@param[out]	dexty
  */
-static void SearchDelimiterNext(int sx, int sy, BOOL line_continue, int *destx, int *desty)
+static void SearchDelimiterNext(
+	int sx, int sy, BOOL line_continue,
+	int *destx, int *desty)
 {
 	LONG ptr = GetLinePtr(sy);
+	sx = LeftHalfOfDBCS(ptr, sx);
 	const buff_char_t *b = CodeBuffW + ptr + sx;
-	BOOL start_delimiter = IsDelimiter(ptr, sx);
-	int start_cell = b->cell == 1;
+	assert(b->Padding == FALSE);
 
-	for (;;) {
-		int px = sx;
-		int py = sy;
+	delimiter_work work = {0};
+	work.start_delimiter = IsDelimiter(ptr, sx);
+	work.start_cell = b->cell == 1;
+	work.start_char = GetWCS(b);
 
-		// 次のキャラクタへ
-		if (sx + b->cell > NumOfColumns - 1) {
-			// 次に進むと行末?
-			if (!line_continue) {
-				// 検索打ち切り
-				sx = NumOfColumns - 1;
-				break;
-			}
-			else {
-				// 下の行が継続している?
-				b += b->cell - 1;
-				if (sy < BuffEnd && (b->attr & AttrLineContinued)) {
-					// 継続している
-					sx = 0;
-					sy++;
-					ptr = GetLinePtr(sy);
-					b = &CodeBuffW[ptr];
-				}
-				else {
-					// 検索打ち切り
-					sx = NumOfColumns - 1;
-					break;
-				}
-			}
-		}
-		else {
-			sx += b->cell;
-			b += b->cell;
-			if (sx > NumOfColumns - 1) {
-				// はみ出すのはおかしい
-				sx = NumOfColumns - 1;
-			}
-		}
+	SearchCharNext(sx, sy, line_continue, CheckDelimiterChar, &work, destx, desty);
 
-		// 区切り文字 or cell数が変化した
-		if (start_delimiter != IsDelimiter(ptr, sx) ||
-			(ts.DelimDBCS != 0 && ((b->cell == 1) != start_cell))) {
-			// 区切り文字 or cell数が変化した
-			sx = px;
-			sy = py;
-			break;
-		}
-	}
-	*destx = sx;
-	*desty = sy;
+	free(work.start_char);
 }
 
 void BuffDblClk(int Xw, int Yw)
