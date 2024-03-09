@@ -54,7 +54,7 @@ BOOL ContinueFlag;
 #define MAXFILENAME 128   // .ttlファイル名の最大サイズ
 
 static int INest;
-static CHAR BuffHandleFileName[MAXNESTLEVEL][MAXFILENAME];  // 各階層の.ttlファイル名
+static char BuffHandleFileName[MAXNESTLEVEL][MAXFILENAME];  // 各階層の.ttlファイル名(UTF-8)
 static PCHAR Buff[MAXNESTLEVEL];
 static BINT BuffLen[MAXNESTLEVEL];
 static BINT BuffPtr[MAXNESTLEVEL];
@@ -188,8 +188,11 @@ static BOOL LoadMacroFile(const wchar_t *FileName, int IBuff)
 }
 
 
-// 現在実行中のマクロファイルのファイル名を返す
-char *GetMacroFileName(void)
+/**
+ *	現在実行中のマクロファイルのファイル名を返す
+ *	@return	ファイル名(UTF-8)
+ */
+const char *GetMacroFileName(void)
 {
 	return &BuffHandleFileName[INest][0];
 }
