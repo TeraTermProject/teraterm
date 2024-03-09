@@ -27,6 +27,14 @@ sub ShowAttributesSGR {
 			Str => "Bold              / SGR 1",
 		},
 		{
+			Enter => "\x1b[1m\x1b[30m",
+			Str => "Bold + FG Black   / SGR 1, 30",
+		},
+		{
+			Enter => "\x1b[1m\x1b[31m",
+			Str => "Bold + FG Red     / SGR 1, 31",
+		},
+		{
 			Enter => "\x1b[4m",
 			Str => "Underline         / SGR 4",
 		},
@@ -55,6 +63,10 @@ sub ShowAttributesSGR {
 			Str => "FG Red            / SGR 0 + SGR 31(FG Red)",
 		},
 		{
+			Enter => "\x1b[0m\x1b[91m",
+			Str => "FG Bright Red     / SGR 0 + SGR 91(FG Bright Red)",
+		},
+		{
 			Enter => "\x1b[0m\x1b[42m",
 			Str => "BG Green          / SGR 0 + SGR 42(BG Green)",
 		},
@@ -71,12 +83,16 @@ sub ShowAttributesSGR {
 			Str => "BOLD + BG RED     / SGR 1 + SGR 41(BG Red)",
 		},
 		{
-			Enter => "\x1b[5m\x1b[46m",
-			Str => "Blink(Slow blink) / SGR 5 + SGR 46(BG Cyan)",
+			Enter => "\x1b[46m",
+			Str => "BG Cyan           / SGR 46(BG Cyan)",
 		},
 		{
-			Enter => "\x1b[5m\x1b[106m",
-			Str => "Blink(Slow blink) / SGR 5 + SGR 106(BG Bright Cyan)",
+			Enter => "\x1b[106m",
+			Str => "BG bright Cyan    / SGR 106(BG Bright Cyan)",
+		},
+		{
+			Enter => "\x1b[5m\x1b[46m",
+			Str => "Blink(Slow blink) / SGR 5 + SGR 46(BG Cyan)",
 		},
 		{
 			Enter => "\x1b[4m\x1b[44m",
