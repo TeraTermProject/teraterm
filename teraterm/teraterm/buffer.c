@@ -51,11 +51,6 @@
 
 #define	ENABLE_CELL_INDEX	0
 
-// ダブルクリックでワード選択後のドラッグで
-//		TRUE	前後行を継続して選択を行う
-//		FALSE	選択が行頭/行末で止まる
-#define DOUBLD_CLICK_SELECT_LINE_CONTINUE	FALSE
-
 // バッファ内の半角1文字分の情報
 typedef struct {
 	char32_t u32;
@@ -4607,7 +4602,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 			// ダブルクリック選択領域より前を選択
 			int dest_x;
 			int dest_y;
-			SearchDelimiterPrev(X, Y, DOUBLD_CLICK_SELECT_LINE_CONTINUE, &dest_x, &dest_y);
+			SearchDelimiterPrev(X, Y, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
 			SelectEnd.x = dest_x;
 			SelectEnd.y = dest_y;
 			SelectStart = DblClkEnd;
@@ -4616,7 +4611,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 			// ダブルクリック選択領域より後ろを選択
 			int dest_x;
 			int dest_y;
-			SearchDelimiterNext(X, Y, DOUBLD_CLICK_SELECT_LINE_CONTINUE, &dest_x, &dest_y);
+			SearchDelimiterNext(X, Y, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
 			SelectEnd.x = dest_x + 1;
 			SelectEnd.y = dest_y;
 			SelectStart = DblClkStart;
