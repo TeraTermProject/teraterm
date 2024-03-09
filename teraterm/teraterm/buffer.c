@@ -4415,12 +4415,12 @@ void BuffDblClk(int Xw, int Yw)
 			int dest_y;
 
 			// ‘O•û‚Ì‹æØ‚è‚ğ’T‚·
-			SearchDelimiterPrev(IStart, YStart, TRUE, &dest_x, &dest_y);
+			SearchDelimiterPrev(IStart, YStart, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
 			IStart = dest_x;
 			YStart = dest_y;
 
 			// Œã•û‚Ì‹æØ‚è‚ğ’T‚·
-			SearchDelimiterNext(IEnd, YEnd, TRUE, &dest_x, &dest_y);
+			SearchDelimiterNext(IEnd, YEnd, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
 			IEnd = dest_x + 1; // I’[‚Ìˆê‚ÂŒã‚ë
 			YEnd = dest_y;
 		}
