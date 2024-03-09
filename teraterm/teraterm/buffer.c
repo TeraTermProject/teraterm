@@ -3940,26 +3940,39 @@ static void GetMinMax(int i1, int i2, int i3, int *min, int *max)
 	}
 }
 
-static void invokeBrowserWithUrl(const char *url)
+static void invokeBrowserWithUrl(const wchar_t *url)
 {
+	static const wchar_t *schemes[] = {
+		L"http://",
+		L"https://",
+		L"ftp://",
+	};
 	BOOL use_browser = FALSE;
-	if (strncmp(url, "http://", strlen("http://")) == 0 || strncmp(url, "https://", strlen("https://")) == 0 ||
-		strncmp(url, "ftp://", strlen("ftp://")) == 0) {
-		use_browser = TRUE;
+	for (int i = 0; i < _countof(schemes); i++) {
+		const wchar_t *scheme = schemes[i];
+		if (wcsncmp(url, scheme, wcslen(scheme)) == 0) {
+			use_browser = TRUE;
+			break;
+		}
 	}
 
 	if (use_browser && ts.ClickableUrlBrowser[0] != 0) {
 		// ブラウザを使用する
-		char param[1024];
-		_snprintf_s(param, sizeof(param), _TRUNCATE, "%s %s", ts.ClickableUrlBrowserArg, url);
-		if (ShellExecuteA(NULL, NULL, ts.ClickableUrlBrowser, param, NULL, SW_SHOWNORMAL) >= (HINSTANCE)32) {
+		wchar_t *browser = ToWcharA(ts.ClickableUrlBrowser);
+		wchar_t *param;
+		aswprintf(&param, L"%hs %s", ts.ClickableUrlBrowserArg, url);
+
+		HINSTANCE r = ShellExecuteW(NULL, NULL, browser, param, NULL, SW_SHOWNORMAL);
+		free(param);
+		free(browser);
+		if (r >= (HINSTANCE)32) {
 			// 実行できた
 			return;
 		}
 		// コマンドの実行に失敗した場合は通常と同じ処理をする
 	}
 
-	ShellExecuteA(NULL, NULL, url, NULL, NULL, SW_SHOWNORMAL);
+	ShellExecuteW(NULL, NULL, url, NULL, NULL, SW_SHOWNORMAL);
 }
 
 /**
@@ -4135,17 +4148,15 @@ static void SearchURLNext(int sx, int sy, int *destx, int *desty)
 
 static void invokeBrowserW(int x, int y)
 {
+	wchar_t *url;
 	int sx, sy;
 	int ex, ey;
 	SearchURLPrev(x, y, &sx, &sy);
 	SearchURLNext(x, y, &ex, &ey);
-	{
-		wchar_t *url_w = BuffGetStringForCB(sx, sy, ex + 1, ey, FALSE, NULL);
-		char *url = ToCharW(url_w);
-		invokeBrowserWithUrl(url);
-		free(url);
-		free(url_w);
-	}
+
+	url = BuffGetStringForCB(sx, sy, ex + 1, ey, FALSE, NULL);
+	invokeBrowserWithUrl(url);
+	free(url);
 }
 
 void ChangeSelectRegion(void)
