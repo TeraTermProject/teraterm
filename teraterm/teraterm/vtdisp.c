@@ -185,8 +185,7 @@ typedef struct {
 	BOOL bg_enable;
 	BYTE alpha_vtback;
 	BYTE alpha_back;
-	BOOL debug_drawbox_text;
-	BOOL debug_drawbox_fillrect;
+	BOOL debug_drawbox_text;	// •¶Žš•`‰æ–ˆ‚Ébox‚ð•`‰æ‚·‚é
 	//
 	BYTE DCBackAlpha;
 	COLORREF DCBackColor;
@@ -1703,7 +1702,6 @@ void InitDisp(void)
   w->alpha_back = 255;
   w->alpha_vtback = 255;
   w->debug_drawbox_text = FALSE;
-  w->debug_drawbox_fillrect = FALSE;
   w->font_resize_enable = FontReSizeEnableInit;
   BGReverseTextAlpha = 255;
 }
@@ -2894,22 +2892,11 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *cells, int len,
 					start_idx = i;
 					cell_count = 0;
 					wchar_count = 0;
+					zero_count = 0;
 				}
 				wchar_count++;
 				zero_count++;
 			}
-#if 0
-			else if (zero_count > 2) {
-				wchar_count++;
-				cell_count += cells[i];
-				DrawStrWSub(DC, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count, font_width,
-							font_height, Y, X);
-				start_idx = i;
-				zero_count = 0;
-				cell_count = 0;
-				wchar_count = 1;
-			}
-#endif
 			else {
 				SIZE size;
 				GetTextExtentPoint32W(DC, &StrW[i - zero_count], 1 + zero_count, &size);
