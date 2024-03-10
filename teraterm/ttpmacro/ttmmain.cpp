@@ -33,6 +33,11 @@
 #include <commctrl.h>
 #include <stdio.h>
 #include <assert.h>
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
+#include <crtdbg.h>
 
 #include "compat_win.h"
 #include "teraterm.h"
@@ -49,6 +54,7 @@
 #include "wait4all.h"
 #include "tmfc.h"
 #include "ttmacro.h"
+#include "codeconv.h"
 
 static void ClientToScreen(HWND hWnd, RECT *rect)
 {
@@ -429,9 +435,9 @@ void CCtrlWindow::OnPaint()
 	// added line buffer (2005.7.22 yutaka)
 	// added MACRO filename (2013.9.8 yutaka)
 	// ファイル名の末尾は省略表示とする。(2014.12.30 yutaka)
-	SetDlgItemText(IDC_FILENAME, GetMacroFileName());
+	SetDlgItemTextW(IDC_FILENAME, wc::fromUtf8(GetMacroFileName()));
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, ":%d:%s", GetLineNo(), GetLineBuffer());
-	SetDlgItemText(IDC_LINENO, buf);
+	SetDlgItemTextA(IDC_LINENO, buf);
 
 	EndPaint(&ps);
 }

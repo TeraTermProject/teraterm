@@ -136,7 +136,7 @@ void DispErr(WORD Err)
 	const char *Msg;
 	int i;
 	int no, start, end;
-	char *filename;
+	const char *filename;
 
 	switch (Err) {
 		case ErrCloseParent: Msg = "\")\" expected."; break;
