@@ -71,7 +71,8 @@ int WinWidth, WinHeight;
 static BOOL Active = FALSE;
 static BOOL CompletelyVisible;
 HFONT VTFont[AttrFontMask+1];
-int FontHeight, FontWidth, ScreenWidth, ScreenHeight;
+int FontHeight, FontWidth;
+int ScreenWidth, ScreenHeight;	// スクリーンサイズ = (セル数)*(Font幅or高さ) ≒ Client Area
 BOOL AdjustSize;
 BOOL DontChangeSize=FALSE;
 static int CRTWidth, CRTHeight;
@@ -2179,6 +2180,11 @@ void DispSetCaretWidth(BOOL DW)
   CursorOnDBCS = DW;
 }
 
+/**
+ *	ウィンドウのサイズが変化
+ *	BuffChangeWinSize() からコールされる
+ *
+ */
 void DispChangeWinSize(int Nx, int Ny)
 {
   LONG W,H,dW,dH;
@@ -2230,6 +2236,17 @@ void DispChangeWinSize(int Nx, int Ny)
     InvalidateRect(HVTWin,NULL,FALSE);
 }
 
+/**
+ *	ウィンドウのサイズが変化する時(WM_SIZEが発生した時)に、
+ *	AdjustSize == TRUEの時にコールされる
+ *
+ *	@param	x	ウィンドウのleft
+ *	@param	y	ウィンドウのtop
+ *	@param	w	リサイズ前のウィンドウw
+ *	@param	h	リサイズ前のウィンドウh
+ *	@param	cw	新しいクライアント領域のw
+ *	@param	ch	新しいクライアント領域のh
+ */
 void ResizeWindow(int x, int y, int w, int h, int cw, int ch)
 {
   int dw,dh, NewX, NewY;
@@ -3326,8 +3343,11 @@ void DispSetupFontDlg(HWND hwndOwner)
   ChangeCaret();
 }
 
+/**
+ *	Restore window size by double clik on caption bar
+ *
+ */
 void DispRestoreWinSize(void)
-//  Restore window size by double clik on caption bar
 {
   if (ts.TermIsWin>0) return;
 
