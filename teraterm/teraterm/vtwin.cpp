@@ -3371,7 +3371,13 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 			ts.LogFNW = FLogGetLogFilename(NULL);
 		}
 		WideCharToACP_t(ts.LogFNW, ts.LogFN, sizeof(ts.LogFN));
-		FLogOpen(ts.LogFNW, LOG_UTF8, FALSE);
+		BOOL r = FLogOpen(ts.LogFNW, LOG_UTF8, FALSE);
+		if (r != TRUE) {
+			static const TTMessageBoxInfoW mbinfo = {
+				"Tera Term", NULL, L"Tera Term: File open error", NULL, L"Can not create a `%s' file.",
+				MB_OK | MB_ICONERROR};
+			TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, ts.LogFNW);
+		}
 	}
 
 	if ((ts.PortType==IdTCPIP) &&
