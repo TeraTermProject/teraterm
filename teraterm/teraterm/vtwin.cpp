@@ -3375,8 +3375,8 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 		if (r != TRUE && (ts.HideWindow != 1 && ts.Minimize != 1)) {
 			static const TTMessageBoxInfoW mbinfo = {
 				"Tera Term",
-				NULL, L"Tera Term: File open error",
-				NULL, L"Can not create a `%s' file.",
+				"MSG_TT_FILE_OPEN_ERROR", L"Tera Term: File open error",
+				"MSG_LOGFILE_WRITE_ERROR", L"Can not create a `%s' file.",
 				MB_OK | MB_ICONERROR};
 			TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, ts.LogFNW);
 		}
@@ -3826,8 +3826,8 @@ void CVTWindow::OnFileLog()
 			// ÉçÉOÇ≈Ç´Ç»Ç¢
 			static const TTMessageBoxInfoW mbinfo = {
 				"Tera Term",
-				NULL, L"Tera Term: File open error",
-				NULL, L"Can not create a `%s' file.",
+				"MSG_TT_FILE_OPEN_ERROR", L"Tera Term: File open error",
+				"MSG_LOGFILE_WRITE_ERROR", L"Can not create a `%s' file.",
 				MB_OK | MB_ICONERROR
 			};
 			TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, filename);

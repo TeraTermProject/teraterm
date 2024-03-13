@@ -166,6 +166,8 @@ FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE=Choose a file including strings for Conf
 FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=txt(*.txt)\0*.txt\0all(*.*)\0*.*\0\0
 MSG_LOGFILE_INVALID_CHAR_ERROR=Invalid character is included in log file name.
 MSG_LOGFILE_TOOLONG_ERROR=The log file name is too long.
+MSG_TT_FILE_OPEN_ERROR=Tera Term: File open error
+MSG_LOGFILE_WRITE_ERROR=Cannot write log file.\n%s
 MSG_SAVESETUP_PERMISSION_ERROR=TERATERM.INI file doesn't have the writable permission.
 
 DLG_TABSHEET_TITLE=Tera Term: Additional settings
