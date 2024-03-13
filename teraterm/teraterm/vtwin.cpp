@@ -2349,7 +2349,11 @@ void CVTWindow::OnSetFocus(HWND hOldWnd)
 
 void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 {
-	if (GetMonitorDpiFromWindow(m_hWnd) != vtwin_work.monitor_DPI) {
+	// ウィンドウ生成時の最初のWM_SIZE時(monitor_DPI==0のとき)は
+	// DPIのチェックを行わない
+	// ウィンドウ生成時、WM_SIZE, WM_MOVE とメッセージが発生する
+	if (vtwin_work.monitor_DPI != 0 &&
+		GetMonitorDpiFromWindow(m_hWnd) != vtwin_work.monitor_DPI) {
 		// DPIの異なるディスプレイをまたぐと WM_DPICHANGE が発生する
 		//
 		// 「ドラッグ中にウィンドウの内容を表示する=OFF」設定時
@@ -2439,7 +2443,7 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 
 #ifdef WINDOW_MAXMIMUM_ENABLED
 	if (nType == SIZE_MAXIMIZED) {
-		AdjustSize = 0;
+		AdjustSize = FALSE;
 	}
 #endif
 }
