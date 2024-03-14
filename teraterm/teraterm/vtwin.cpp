@@ -3376,7 +3376,7 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 			static const TTMessageBoxInfoW mbinfo = {
 				"Tera Term",
 				"MSG_TT_FILE_OPEN_ERROR", L"Tera Term: File open error",
-				"MSG_LOGFILE_WRITE_ERROR", L"Can not create a `%s' file.",
+				"MSG_LOGFILE_WRITE_ERROR", L"Cannot write log file.\n%s",
 				MB_OK | MB_ICONERROR};
 			TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, ts.LogFNW);
 		}
@@ -3827,7 +3827,7 @@ void CVTWindow::OnFileLog()
 			static const TTMessageBoxInfoW mbinfo = {
 				"Tera Term",
 				"MSG_TT_FILE_OPEN_ERROR", L"Tera Term: File open error",
-				"MSG_LOGFILE_WRITE_ERROR", L"Can not create a `%s' file.",
+				"MSG_LOGFILE_WRITE_ERROR", L"Cannot write log file.\n%s",
 				MB_OK | MB_ICONERROR
 			};
 			TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, filename);

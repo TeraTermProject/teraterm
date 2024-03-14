@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-02-27)
+﻿; Updated by TeraTerm Project (2024-03-14)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -167,6 +167,8 @@ FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE=選擇一個包含「警告貼上剪貼�
 FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=txt(*.txt)\0*.txt\0所有文件(*.*)\0*.*\0\0
 MSG_LOGFILE_INVALID_CHAR_ERROR=日誌文件名稱中包含無效字符
 MSG_LOGFILE_TOOLONG_ERROR=日誌文件名過長
+MSG_TT_FILE_OPEN_ERROR=Tera Term: File open error
+MSG_LOGFILE_WRITE_ERROR=Cannot write log file.\n%s
 MSG_SAVESETUP_PERMISSION_ERROR=TERATERM.INI 沒有寫入權限
 
 DLG_TABSHEET_TITLE=Tera Term：附加設定
