@@ -863,12 +863,17 @@ static WORD TTLDelPassword(void)
 	if (Err!=0) return Err;
 	if (Str[0]==0) return Err;
 
-	GetAbsPath(Str,sizeof(Str));
-	if (! DoesFileExist(Str)) return Err;
-	if (Str2[0]==0) // delete all password
-		WritePrivateProfileString("Password",NULL,NULL,Str);
-	else            // delete password specified by Str2
-		WritePrivateProfileString("Password",Str2,NULL,Str);
+	GetAbsPath(Str, sizeof(Str));
+	wc ini = wc::fromUtf8(Str);
+	DWORD attr = GetFileAttributesW(ini);
+	if ((attr == INVALID_FILE_ATTRIBUTES) || (attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
+		// ÉtÉ@ÉCÉãÇÕë∂ç›ÇµÇ»Ç¢
+		return Err;
+	}
+	if (Str2[0] == 0)  // delete all password
+		WritePrivateProfileStringW(L"Password", NULL, NULL, ini);
+	else  // delete password specified by Str2
+		WritePrivateProfileStringW(L"Password", wc::fromUtf8(Str2), NULL, ini);
 	return Err;
 }
 

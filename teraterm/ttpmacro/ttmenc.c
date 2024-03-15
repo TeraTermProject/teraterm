@@ -165,7 +165,7 @@ BYTE DecCharacter(BYTE c, LPBYTE b)
 	return d;
 }
 
-void Decrypt(PCHAR InStr, PCHAR OutStr)
+void Decrypt(const char *InStr, PCHAR OutStr)
 {
 	int i, j, k;
 	BYTE b;

@@ -178,7 +178,7 @@ BOOL GetAbsPath(PCHAR FName, int destlen)
   int i, j;
   char Temp[MAXPATHLEN];
 
-  if (! GetFileNamePos(FName,&i,&j)) {
+  if (! GetFileNamePosU8(FName,&i,&j)) {
     return FALSE;
   }
   if (strlen(FName) > 2 && FName[1] == ':') {
