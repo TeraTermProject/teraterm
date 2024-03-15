@@ -552,7 +552,7 @@ MSG_MACRO_CONF=MACRO: confirmation
 MSG_MACRO_HALT_SCRIPT=Are you sure that you want to halt this macro script?
 
 ; common
-MSG_ERROR=ERROR
+MSG_ERROR=ERREUR
 MSG_TT_ERROR=Tera Term: Erreur
 MSG_TT_NOTICE=Tera Term: Notice
 MSG_TT_TAKE_EFFECT=This option takes effect the next time a session is started.\nAre you sure that you want to relaunch Tera Term?
@@ -1017,7 +1017,7 @@ MSG_CREATEWINDOW_AUTHSETUP_ERROR=Impossible d'afficher la fenêtre de configurat
 MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=Impossible d'afficher la boîte de dialogue Fichiers: erreur %d
 
 MSG_WARNING=ATTENTION
-MSG_ERROR=ERRRREUR
+MSG_ERROR=ERREUR
 MSG_TTSSH_ERROR=TTSSH Erreur
 MSG_NONFATAL_ERROR=Tera Term: erreur non fatale
 
