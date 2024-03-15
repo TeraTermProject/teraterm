@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-02-27)
+﻿; Updated by TeraTerm Project (2024-03-15)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -883,6 +883,8 @@ DLG_SCP_SENDFILE_CANCEL=キャンセル(&C)
 DLG_SCP_RECEIVEFILE_FROM=Fr&om:
 DLG_SCP_RECEIVEFILE_TO=To:
 DLG_SCP_RECEIVEFILE_RECEIVE=受信(&R)
+DLG_SCP_SELECT_FILE_TITLE=送信ファイル選択
+DLG_SCP_SELECT_DEST_TITLE=受信フォルダ選択
 
 ; dlg SCP progress
 DLG_SCP_PROGRESS_TITLE_SENDFILE=TTSSH: SCP ファイル送信中

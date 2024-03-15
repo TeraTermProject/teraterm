@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-02-27)
+﻿; Updated by TeraTerm Project (2024-03-15)
 ; Traducido por Filiberto Olguin Ascona.
 
 [Tera Term]
@@ -10,13 +10,14 @@ MENU_FILE_NEW=&Nueva Conexion...\tAlt+N
 MENU_FILE_DUPLICATE=D&uplicar sesion\tAlt+D
 MENU_FILE_GYGWIN=Conexion Cy&gwin\tAlt+G
 MENU_FILE_LOG=&Log...
+MENU_FILE_PAUSELOG=Pause Logg&ing
 MENU_FILE_COMMENTLOG=C&omentar en Log...
 MENU_FILE_VIEWLOG=&Ver Log
-MENU_FILE_SENDFILE=&Enviar archivo...
 MENU_FILE_SHOWLOGDIALOG=Mostrar dialogo de log...
+MENU_FILE_STOPLOG=Stop Logging (&Q)
+MENU_FILE_SENDFILE=&Enviar archivo...
 MENU_FILE_CHANGEDIR=&Cambiar carpeta...
 MENU_FILE_REPLAYLOG=&Reproducir Log...
-MENU_FILE_LOGMETT=Log&MeTT
 MENU_FILE_PRINT=&Imprimir...\tAlt+P
 MENU_FILE_DISCONNECT=&Desconectar\tAlt+I
 MENU_FILE_EXIT=Salir\tAlt+Q
@@ -52,7 +53,9 @@ MENU_EDIT_SELECTALL=Selecionar &todo
 MENU_SETUP=&Configuracion
 MENU_SETUP_TERMINAL=&Terminal...
 MENU_SETUP_WINDOW=&Ventana...
+MENU_SETUP_FONT_SUBMENU=&Fuente...
 MENU_SETUP_FONT=&Fuente...
+MENU_SETUP_DIALOG_FONT=&Dialog fuente...
 MENU_SETUP_KEYBOARD=&Teclado...
 MENU_SETUP_SERIALPORT=Puerto S&erial...
 MENU_SETUP_TCPIP=T&CP/IP...
@@ -60,6 +63,7 @@ MENU_SETUP_GENERAL=&General...
 MENU_SETUP_ADDITION=Configuracion a&dicional...
 MENU_SETUP_SAVE=&Guardar Configuracion...
 MENU_SETUP_RESTORE=&Restaurar Configuracion...
+MENU_SETUP_OPENSETUP=Setup d&irectory...
 MENU_SETUP_LOADKEYMAP=&Cargar Mapa de Teclado...
 
 MENU_CONTROL=C&ontrol
@@ -73,6 +77,7 @@ MENU_CONTROL_OPENTEK=&Abrir TEK
 MENU_CONTROL_CLOSETEK=&Cerrar TEK
 MENU_CONTROL_MACRO=&Macro
 MENU_CONTROL_SHOW_MACRO=Mostrar &Ventana de Macro
+
 MENU_WINDOW=&Ventana
 MENU_WINDOW_WINDOW=&Ventana
 MENU_WINDOW_MINIMIZEALL=&Minimizar Todo
@@ -131,17 +136,22 @@ MSG_LOAD_EXT_ERROR=Cannot load extension %s (%d)
 DLG_MAIN_TITLE_CONNECTING=[connecting...]
 DLG_MAIN_TITLE_DISCONNECTED=[disconnected]
 
+; vtterm.c
+MSG_CBACCESS_TITLE=Clipboard Access
+MSG_CBACCESS_REJECT_TITLE=Rejected Clipboard Access
+MSG_CBACCESS_READ=Remote host reads clipboard contents.
+MSG_CBACCESS_WRITE=Remote host writes clipboard.
+MSG_CBACCESS_READ_REJECT=Reject clipboard read access from remote.
+MSG_CBACCESS_WRITE_REJECT=Reject clipboard write access from remote.
+
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=Terminate ALL Tera Term(s)?
 MSG_DISCONNECT_CONF=Disconnect?
-MSG_DANDD_CONF=Are you sure that you want to send the file content?
-MSG_DANDD_CONF_TITLE=Tera Term: File Drag and Drop
 MSG_EXEC_TT_ERROR=Can't execute Tera Term. (%d)
 MSG_FIND_CYGTERM_DIR_ERROR=Can't find Cygwin directory.
 MSG_CYGTERM_ENV_ALLOC_ERROR=Can't allocate memory for environment variable.
 MSG_EXEC_CYGTERM_ERROR=Can't execute Cygterm.
 MSG_EXEC_TTMENU_ERROR=Can't execute TeraTerm Menu. (%d)
-MSG_EXEC_LOGMETT_ERROR=Can't execute LogMeTT. (%d)
 MSG_VIEW_LOGFILE_ERROR=Can't view logging file. (%d)
 FILEDLG_OPEN_LOGFILE_TITLE=Select replay log file with binary mode
 FILEDLG_OPEN_LOGFILE_FILTER=all(*.*)\0*.*\0\0
@@ -303,11 +313,40 @@ DLG_FILETRANS_START=&Start
 DLG_FILETRANS_PAUSE=Pau&se
 DLG_FILETRANS_CLOSE=Close
 
+DLG_SETUPDIR_TITLE=Tera Term: Setup directory
+DLG_SETUPDIR_INIFILE=Tera Term Configuration File
+DLG_SETUPDIR_KEYBOARDFILE=Keyboard Configuration File
+DLG_SETUPDIR_CYGTERMFILE=CygTerm Configuration File
+DLG_SETUPDIR_KNOWNHOSTSFILE=SSH known_hosts File
+DLG_SETUPDIR_NOFILE_ERROR=File does not exist.(%d)
+DLG_SETUPDIR_OPENFILE_ERROR=Cannot open file.(%d)
+
+DLG_DANDD_TITLE=Tera Term: File Drag and Drop
+DLG_DANDD_TEXT=Are you sure that you want to send the file content?
+DLG_DANDD_SCP_RADIO=&SCP
+DLG_DANDD_SENDFILE_RADIO=S&end File (Paste content of file)
+DLG_DANDD_PASTE_RADIO=&Paste Filename
+DLG_DANDD_SCP_DEST_LABEL=des&t:
+DLG_DANDD_SCP_DEST_NOTE=dest is home directory if empty
+DLG_DANDD_SEND_BINARY_CHECK=Bina&ry
+DLG_DANDD_PASTE_ESCAPE_CHECK=Es&cape
+DLG_DANDD_PASTE_SPACE_RADIO=Separat&or is Space
+DLG_DANDD_PASTE_NEWLINE_RADIO=Separator is &NewLine
+DLG_DANDD_NEXTFILES=&Do this for the next %d files
+DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
+DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
+DLG_DANDD_NOTE=Drop with CTRL, this dialog is displayed
+
+TOOLTIP_TITLEBAR_OPACITY=Opacity %.1f %%
+
 ; commonlib.c
 MSG_WINSOCK_ERROR=Cannot use winsock
 MSG_INVALID_HOST_ERROR=Invalid host
-MSG_CANTOEPN_ERROR=Cannot open %s
-MSG_CANTOEPN_FILE_ERROR=Cannot open file
+MSG_CANTOPEN_ERROR=Cannot open %s
+MSG_CANTOPEN_ERROR_NOTFOUND=Cannot open %s. Not found.
+MSG_CANTOPEN_ERROR_DENIED=Cannot open %s. Access denied.
+MSG_CANTOPEN_ERROR_PIPEBUSY=Cannot open %s. Pipe is busy.
+MSG_CANTOPEN_FILE_ERROR=Cannot open file
 MSG_COMM_REFUSE_ERROR=Connection refused
 MSG_COMM_REACH_ERROR=Network cannot be reached
 MSG_COMM_TIMEOUT_ERROR=Connection timed out
@@ -355,6 +394,11 @@ DLG_SERIAL_FLOW=&Flow control:
 DLG_SERIAL_DELAY=Transmit delay
 DLG_SERIAL_DELAYCHAR=msec/&char
 DLG_SERIAL_DELAYLINE=msec/&line
+DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
+DLG_SERIAL_OK_CONNECTION=Connect with &New window
+DLG_SERIAL_OK_OPEN=&New open
+DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
+DLG_SERIAL_OK_RESET=&New setting
 
 DLG_TCPIP_TITLE=Tera Term: TCP/IP setup
 DLG_TCPIP_HOSTLIST=Host &list
@@ -527,6 +571,9 @@ MSG_OPENHELP_ERROR=Can't open HTML help file(%s).
 MSG_INI_ERROR=Tera Term: Error
 MSG_INI_WRITE_ERROR=Cannot write ini file.
 
+; sendfile
+DLG_SENDFILE_TERATERM4=Send in same way as Tera Term 4
+DLG_SENDFILE_TERATERM4_TOOLTIP=Checked(same way as Tera Term 4)\n- Send while reading from a file.\n- Textfile is read as ACP encoding and is not automatically determined.\nUnchecked\n- File is read into memory and then sent.\n- Encoding of text files is automatically determined.\n
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=Preview/File
@@ -545,8 +592,8 @@ DLG_THEME_COLOR_TITLE=Text color
 
 [TTSSH]
 ; font
-DLG_TAHOMA_FONT=Tahoma,8,0
 DLG_SYSTEM_FONT=System,14,0
+DLG_TAHOMA_FONT=Tahoma,8,0
 DLG_ABOUT_FONT=Courier New,8,0
 
 ; menu
@@ -558,6 +605,7 @@ MENU_SSH_KEYGEN=SSH KeyGe&nerator...
 
 ; dlg about
 DLG_ABOUT_TITLE=About TTSSH
+DLG_ABOUT_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_ABOUT_SERVERID=Server ID:
 DLG_ABOUT_PROTOCOL=Using protocol:
 DLG_ABOUT_ENCRYPTION=Encryption:
@@ -566,9 +614,10 @@ DLG_ABOUT_KEXKEY=Key exchange keys:
 DLG_ABOUT_AUTH=Authentication:
 DLG_ABOUT_COMP=Compression:
 DLG_ABOUT_CLIENTID=Client ID:
+DLG_ABOUT_KEX=Key exchange algorithm:
 DLG_ABOUT_HOSTKEY=Host Key:
-DLG_ABOUT_TOSERVER=" to server,"
-DLG_ABOUT_FROMSERVER=" from server"
+DLG_ABOUT_MAC=MAC algorithm:
+DLG_ABOUT_MAC_INFO=%s to server, %s from server
 DLG_ABOUT_COMPDELAY=Delayed Compression:
 DLG_ABOUT_CIPHER_INFO=%s to server, %s from server
 DLG_ABOUT_KEY_INFO=%d-bit server key, %d-bit host key
@@ -590,9 +639,16 @@ DLG_AUTH_BANNER=Logging in to %s
 DLG_AUTH_BANNER2=Authentication required.
 DLG_AUTH_BANNER2_FAILED=Authentication failed. Please retry.
 DLG_AUTH_USERNAME=User &name:
+DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
+DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
 DLG_AUTH_PASSWORD=&Passphrase:
+DLG_AUTH_PASTE_CLIPBOARD=Paste from &clipboard
+DLG_AUTH_CLEAR_CLIPBOARD=Paste from clipboard and cl&ear clipboard
+DLG_AUTH_USE_CONTORL_CHARACTERS=Use control charac&ters
+DLG_AUTH_SHOW_PASSPHRASE=&Show passphrase
 DLG_AUTH_REMEMBER_PASSWORD=Remember password on &memory
 DLG_AUTH_FWDAGENT=F&orward agent
+DLG_AUTH_METHOD=Authentication methods
 DLG_AUTH_METHOD_PASSWORD=Use p&lain password to log in
 DLG_AUTH_METHOD_RSA=Use &RSA/DSA/ECDSA/ED25519 key to log in
 DLG_AUTH_METHOD_RHOST=Use r&hosts to log in (SSH1)
@@ -602,6 +658,8 @@ DLG_AUTH_METHOD_PAGEANT=Use P&ageant to log in
 DLG_AUTH_PRIVATEKEY=Private &key file:
 DLG_AUTH_LOCALUSER=Local &user name:
 DLG_AUTH_HOST_PRIVATEKEY=Host private key &file:
+DLG_AUTH_TIP_CONTROL_CODE=control character is entered
+DLG_AUTH_TIP_PASTE_KEY=Use Shift + Insert to paste from clipboard
 MSG_PAGEANT_NOTFOUND=Can't find Pageant.
 MSG_PAGEANT_NOKEY=Pageant has no valid key.
 
@@ -609,6 +667,11 @@ MSG_PAGEANT_NOKEY=Pageant has no valid key.
 DLG_AUTHSETUP_TITLE=TTSSH: Authentication Setup
 DLG_AUTHSETUP_BANNER=Select defaults for authentication:
 DLG_AUTHSETUP_USERNAME=User &name:
+DLG_AUTHSETUP_NO_USERNAME=&Do not enter username
+DLG_AUTHSETUP_DEFAULT_USERNAME=U&se default username
+DLG_AUTHSETUP_LOGON_USERNAME=Us&e logon username
+DLG_AUTHSETUP_LOGON_USERNAME_TEXT=Current username is "%s"
+DLG_AUTHSETUP_METHOD=Authentication methods
 DLG_AUTHSETUP_METHOD_PASSWORD=Use p&lain password to log in
 DLG_AUTHSETUP_METHOD_RSA=Use &RSA/DSA/ECDSA/ED25519 key to log in
 DLG_AUTHSETUP_METHOD_RHOST=Use r&hosts to log in (SSH1)
@@ -631,6 +694,7 @@ DLG_DIFFERENTKEY_TITLE=SECURITY WARNING
 DLG_DIFFERENTKEY_WARNING=Your known hosts list has an entry for the server "####################################", but the machine you have contacted has presented a DIFFERENT KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
 DLG_DIFFERENTKEY_WARNING2=If you choose to add this new key to the known hosts list and continue, then you will not receive this warning again.
 DLG_DIFFERENTKEY_FINGERPRINT=The server's host key fingerprint is:
+DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_DIFFERENTKEY_REPLACE=&Replace the exist key with this new key
 
 ; dlg diff type key
@@ -638,6 +702,7 @@ DLG_DIFFERENTTYPEKEY_TITLE=SECURITY WARNING
 DLG_DIFFERENTTYPEKEY_WARNING=Your known hosts list has an entry for the server "####################################", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
 DLG_DIFFERENTTYPEKEY_WARNING2=If you choose to add this new key to the known hosts list and continue, then you will not receive this warning again.
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=The server's host key fingerprint is:
+DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_DIFFERENTTYPEKEY_ADD=&Add this machine and its key to the known hosts list
 
 ; dlg fwd edit
@@ -652,11 +717,13 @@ DLG_FWD_REMOTE_PORT=Forward &remote server port
 DLG_FWD_REMOTE_LISTEN=li&sten
 DLG_FWD_REMOTE_LOCAL=to local m&achine
 DLG_FWD_REMOTE_LOCAL_PORT=p&ort
+DLG_FWD_DYNAMIC_PORT=Forward &dynamic port
+DLG_FWD_DYNAMIC_LISTEN=lis&ten
 
 MSG_SAME_SERVERPORT_ERROR=You cannot have two forwardings from the same server port (%d).
 MSG_SAME_LOCALPORT_ERROR=You cannot have two forwardings from the same local port (%d).
-MSG_UNSPECIFYIED_FWD_ERROR1=The following forwardings were not specified when this SSH session began:\n\n
-MSG_UNSPECIFYIED_FWD_ERROR2=\nDue to a limitation of the SSH protocol, these forwardings will not work in the current SSH session.\nIf you save these settings and start a new SSH session, the forwardings should work.
+MSG_UNSPECIFIED_FWD_ERROR1=The following forwarding were not specified when this SSH session began:\n\n
+MSG_UNSPECIFIED_FWD_ERROR2=\nDue to a limitation of the SSH protocol, these forwarding will not work in the current SSH session.\nIf you save these settings and start a new SSH session, the forwarding should work.
 MSG_INVALID_PORT_ERROR=Port "%s" is not a valid port number.\nEither choose a port name from the list, or enter a number between 1 and 65535.
 
 ; dlg fwd setup
@@ -666,7 +733,7 @@ DLG_FWDSETUP_ADD=&Add...
 DLG_FWDSETUP_EDIT=&Edit...
 DLG_FWDSETUP_REMOVE=&Remove
 DLG_FWDSETUP_CHECKIDENTITY=Local ports a&ccept connections from other hosts
-DLD_FWDSETUP_X=X Forwarding
+DLG_FWDSETUP_X=X Forwarding
 DLG_FWDSETUP_XAPP=Display remote &X applications on local X server
 
 MSG_FWD_REMOTE_XSERVER=remote X server
@@ -674,6 +741,7 @@ MSG_FWD_REMOTE_XSCREEN=X server (display %d:%d)
 MSG_FWD_REMOTE=Remote "%s" port %s to local "%s" port %s
 MSG_FWD_LOCAL=Local "%s" port %s to remote "%s" port %s
 MSG_FWD_X=Remote X applications to local X server
+MSG_FWD_DYNAMIC=Local "%s" port %s to remote dynamic
 
 ; dlg host
 DLG_HOST_TITLE=Tera Term: New connection
@@ -700,9 +768,12 @@ DLG_KEYGEN_SAVEPUBLIC=Save publi&c key
 DLG_KEYGEN_SAVEPRIVATE=Save &private key
 DLG_KEYGEN_GENERATE=&Generate
 DLG_KEYGEN_BITS=Key &Bits:
-DLG_BCRYPT_KDF=bcrypt &KDF format
+DLG_KEYGEN_BCRYPT_KDF=bcrypt &KDF format
+DLG_KEYGEN_BCRYPT_ROUNDS=&Number of rounds:
 
 MSG_KEYBITS_MIN_ERROR=The key bits is too small.
+MSG_BCRYPT_ROUNDS_MIN_ERROR=The number of rounds is too small.
+MSG_BCRYPT_ROUNDS_MAX_ERROR=The number of rounds is too large.
 MSG_KEYGEN_GENERATING="generating key"
 MSG_KEYGEN_GENERATED="key generated"
 
@@ -729,9 +800,9 @@ DLG_SSHSETUP_COMPRESS=&Compression level:
 DLG_SSHSETUP_COMPRESS_NONE=None
 DLG_SSHSETUP_COMPRESS_HIGHEST=Highest
 DLG_SSHSETUP_COMPRESS_NOTE=SSH1: 'Compression level' determines compression on/off.\nSSH2: 'Compression order' and 'Compression level' determines compression on/off.
-DLG_SSHSETUP_CHIPER=&Preferred cipher order
-DLG_SSHSETUP_CHIPER_UP=Move Up(&1)
-DLG_SSHSETUP_CHIPER_DOWN=Move Down(&2)
+DLG_SSHSETUP_CIPHER=&Preferred cipher order
+DLG_SSHSETUP_CIPHER_UP=Move Up(&1)
+DLG_SSHSETUP_CIPHER_DOWN=Move Down(&2)
 DLG_SSHSETUP_CIPHER_BORDER=<ciphers below this line are disabled>
 DLG_SSHSETUP_KEX=K&EX order (SSH2 only)
 DLG_SSHSETUP_KEX_UP=Move Up(&3)
@@ -757,8 +828,15 @@ DLG_SSHSETUP_HEARTBEAT_UNIT=sec.(0 to turn off)
 DLG_SSHSETUP_PASSWORD=Remember password on &memory
 DLG_SSHSETUP_FORWARDAGENT=Enable &agent forwarding
 DLG_SSHSETUP_FORWARDAGENTCONFIRM=C&onfirm agent forwarding
+DLG_SSHSETUP_FORWARDAGENTNOTIFY=No&tify access to the forwarded agent
 DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Verify hostkey fingerprint by DNS
 DLG_SSHSETUP_NOTICE=All options take effect the next time a session is started.
+DLG_SSHSETUP_HOSTKEY_ROTATION=Hostkey rotatio&n
+DLG_SSHSETUP_HOSTKEY_ROTATION_NO=No
+DLG_SSHSETUP_HOSTKEY_ROTATION_YES=Yes
+DLG_SSHSETUP_HOSTKEY_ROTATION_ASK=Ask
+DLG_SSHSETUP_LOGLEVEL=&LogLevel
+DLG_SSHSETUP_LOGLEVEL_UNIT=(0 to turn off)
 
 FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=Choose a read/write known-hosts file
 FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=Choose a read-only known-hosts file to add
@@ -767,11 +845,20 @@ FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=Choose a read-only known-hosts file to add
 DLG_TIS_TITLE=SSH Authentication Challenge
 DLG_TIS_BANNER=Logging in to %s
 
+; dlg passwd change
+DLG_PASSCHG_TITLE=TTSSH: Change Password
+DLG_PASSCHG_MESSAGE=Server requests to change password
+DLG_PASSCHG_OLDPASSWD=&Old Password
+DLG_PASSCHG_NEWPASSWD=&New Password
+DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
+MSG_PASSCHG_MISMATCH=Mismatch; try again.
+
 ; dlg unknown host
-DLG_UNKNONWHOST_TITLE=SECURITY WARNING
+DLG_UNKNOWNHOST_TITLE=SECURITY WARNING
 DLG_UNKNOWNHOST_WARNING=There is no entry for the server "#####################################" in your list of known hosts. The machine you have contacted may be a hostile machine pretending to be the server.
 DLG_UNKNOWNHOST_WARNING2=If you choose to add this machine to the known hosts list and continue, then you will not receive this warning again.
 DLG_UNKNOWNHOST_FINGERPRINT=The server's host key fingerprint is:
+DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_UNKNOWNHOST_ADD=&Add this machine and its key to the known hosts list
 
 DLG_HOSTKEY_SSHFP_NOTFOUND=No host key fingerprint found in DNS.
@@ -780,6 +867,12 @@ DLG_HOSTKEY_SSHFP_MISMATCH=Mismatching host key fingerprint found in DNS.
 DLG_HOSTKEY_SSHFP_DIFFTYPE=Mismatching host key type found in DNS.
 DLG_HOSTKEY_DNSSEC_NG=Found insecure fingerprint in DNS.
 DLG_HOSTKEY_DNSSEC_OK=Found secure fingerprint in DNS.
+
+DLG_HOSTKEY_ROTATION_TITLE=Hostkey rotation
+DLG_HOSTKEY_ROTATION_WARNING=You received the list of host keys from remote server `%s'.\nYou can choose to add %u new key(s) and remove %u obsolete key(s) from this machine to the known hosts list.\nAre you sure that you want to update known hosts file?
+DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
+DLG_HOSTKEY_ROTATION_ADD=%u new key(s):
+DLG_HOSTKEY_ROTATION_REMOVE=%u obsolete key(s):
 
 ; dlg SCP
 DLG_SCP_TITLE=TTSSH: Secure Copy Protocol (SCP)
@@ -809,9 +902,9 @@ MSG_DECRYPT_ERROR2=%s decrypt error(2)
 MSG_CIPHER_INIT_ERROR=Cipher initialize error(%d)
 MSG_RSAKEY_SETUP_ERROR=Error setting up RSA keys
 MSG_UNAVAILABLE_CIPHERS_ERROR=The server does not support any of the TTSSH encryption algorithms.\nA secure connection cannot be made in the TTSSH-to-server direction.\nThe connection will be closed.
-MSG_CHIPHER_NONE_ERROR=All the encryption algorithms that this program and the server both understand have been disabled.\nTo communicate with this server, you will have to enable some more ciphers\nin the TTSSH Setup dialog box when you run Tera Term again.\nThis connection will now close.
-MSG_RASKEY_TOOWEAK_ERROR=Server RSA keys are too weak. A secure connection cannot be established.
-MSG_CHPHER_NOTSELECTED_ERROR=No cipher selected!
+MSG_CIPHER_NONE_ERROR=All the encryption algorithms that this program and the server both understand have been disabled.\nTo communicate with this server, you will have to enable some more ciphers\nin the TTSSH Setup dialog box when you run Tera Term again.\nThis connection will now close.
+MSG_RSAKEY_TOOWEAK_ERROR=Server RSA keys are too weak. A secure connection cannot be established.
+MSG_CIPHER_NOTSELECTED_ERROR=No cipher selected!
 
 ; fwd.c
 MSG_FWD_LOCAL_CHANNEL_ERROR=The server attempted to manipulate a forwarding channel that does not exist.\nEither the server has a bug or is hostile. You should close this connection.
@@ -819,7 +912,7 @@ MSG_FWD_REQUEST_ERROR=Communications error while listening for a connection to f
 MSG_FWD_REFUSED_ERROR=Connection refused (perhaps the service is not currently running)
 MSG_FWD_NETDOWN_ERROR=The machine could not be contacted (possibly a network problem)
 MSG_FWD_MACHINEDOWN_ERROR=The machine could not be contacted (possibly the machine is down)
-MSG_FWD_ADDRNOTFOUTD_ERROR=No address was found for the machine
+MSG_FWD_ADDRNOTFOUND_ERROR=No address was found for the machine
 MSG_FWD_CONNECT_ERROR=The forwarding connection could not be established
 MSG_FWD_CHANNEL_ERROR=Communications error %s forwarded local %s.\n%s (code %d).\nThe forwarded connection will be closed.
 MSG_FWD_CHANNEL_OPEN_X_ERROR=The server attempted to forward a connection through this machine.\nIt requested a connection to the X server on %s (display %d:%d).\n%s.\nThe forwarded connection will be closed.
@@ -834,6 +927,8 @@ MSG_FWD_DENIED_X_ERROR=The server attempted to forward a connection through this
 MSG_FWD_DENIED_BY_SERVER_ERROR=A program on the local machine attempted to connect to a forwarded port.\nThe forwarding request was denied by the server. The connection has been closed.
 MSG_FWD_COMM_ERROR=A communications error occurred while sending forwarded data to a local port.\nThe forwarded connection will be closed.
 MSG_FWD_AGENT_FORWARDING_CONFIRM=Are you sure you want to accept agent-forwarding request?
+MSG_FWD_AGENT_NOTIFY=Remote host access to agent.
+MSG_FWD_AGENT_NOTIFY_TITLE=Agent Forwarding
 
 ; hosts.c
 MSG_HOSTS_READ_ENOENT_ERROR=An error occurred while trying to read a known_hosts file.\nThe specified filename does not exist.
@@ -886,6 +981,14 @@ MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=The server doesn't have valid authentication
 MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\nAuthentication method is not supported by server.
 MSG_SSH_CHANNEL_OPEN_ERROR=SSH2_MSG_CHANNEL_OPEN_FAILURE was received.\nchannel [%d]: reason: %s(%d) message: %s
 MSG_SSH_NO_FREE_CHANNEL=Could not open new channel. TTSSH is already opening too many channels.
+MSG_SSH_GEX_SIZE_TITLE=TTSSH: Confirm GEX group size
+MSG_SSH_GEX_SIZE_CANCEL=New connection is cancelled.
+MSG_SSH_GEX_SIZE_OUTOFRANGE=Received group size is out of range: %d
+MSG_SSH_GEX_SIZE_SMALLER=Received group size is smaller than the requested minimal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
+MSG_SSH_GEX_SIZE_LARGER=Received group size is larger than the requested maximal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
+MSG_SSH_SUBSYSTEM_REQUEST_ERROR=subsystem request failed. (%s)
+MSG_SSH_AGENTERROR_TITLE=Bad agent request
+MSG_SSH_AGENTERROR_TOOLARGE=Agent request size is too large, ignore it.
 MSG_SSH_SCP_FILEOPEN_ERROR_TITLE=TTSSH: file open error
 MSG_SSH_SCP_FILEOPEN_READ_ERROR=Can't open file for reading: %s %s
 MSG_SSH_SCP_FILEOPEN_READONLY_ERROR=`%s' file is read only.
@@ -913,18 +1016,22 @@ MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=Unable to display file dialog box: error %d
 MSG_WARNING=WARNING
 MSG_ERROR=ERROR
 MSG_TTSSH_ERROR=TTSSH Error
-MSG_NONFAITAL_ERROR=Tera Term: not fatal error
+MSG_NONFATAL_ERROR=Tera Term: not fatal error
 
 BTN_OK=OK
 BTN_CANCEL=Cancel
+BTN_CLOSE=Close
 BTN_DISCONNECT=&Disconnect
 BTN_CONTINUE=&Continue
+BTN_YES=&Yes
+BTN_NO=&No
+BTN_HELP=&Help
 
 
 [TTProxy]
 DLG_TAHOMA_FONT=Tahoma,8,0
 
-NEMU_SETUP=&Proxy...
+MENU_SETUP=&Proxy...
 MENU_ABOUT=About TT&Proxy...
 
 DLG_SETUP_TITLE=Proxy Setup
@@ -955,7 +1062,7 @@ DLG_OTHER_CONNECT=&Connected message
 DLG_OTHER_ERROR=&Error message
 
 DLG_ABOUT_TITLE=About TTProxy
-DLG_ABOUT_EXTENTION=Tera Term proxy extension
+DLG_ABOUT_EXTENSION=Tera Term proxy extension
 DLG_ABOUT_YEBISUYA=YebisuyaHompo
 DLG_ABOUT_HOMEPAGE=TTProxy home page
 
@@ -1116,3 +1223,8 @@ DLG_TITLE=Recurring command
 DLG_ENABLE=&Enable
 DLG_INTERVAL=&Interval(sec)
 DLG_COMMAND=&Command
+DLG_ADD_NEWLINE=&Add new line
+
+[TTXCheckUpdate]
+MSG_CHECKUPDATE=Check for updates automatically?\n  %s
+MENU_CHECKUPDATE=Check for &Updates...
