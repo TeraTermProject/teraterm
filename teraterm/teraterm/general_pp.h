@@ -1,5 +1,5 @@
 /*
- * (C) 2022- TeraTerm Project
+ * (C) 2024- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,52 +28,20 @@
 
 #pragma once
 
-#include <windows.h>
-#include <commctrl.h>	// for HTREEITEM
+#include "tt_res.h"
+#include "tmfc.h"
+#include "tmfc_propdlg.h"
 
-// Property Sheet
-class TTCPropSheetDlg
+// General Page
+class CGeneralPropPageDlg : public TTCPropertyPage
 {
 public:
-	TTCPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd, const wchar_t *uilangfile);
-	virtual ~TTCPropSheetDlg();
-	INT_PTR DoModal();
-	void AddPage(HPROPSHEETPAGE page, const wchar_t *path = NULL);
-	void SetCaption(const wchar_t *caption);
-	void SetTreeViewMode(BOOL enable);
-	static void SetTreeViewModeInit(BOOL enable);
-	void SetStartPage(int start);
-
+	CGeneralPropPageDlg(HINSTANCE inst);
+	virtual ~CGeneralPropPageDlg();
 private:
-	HWND m_hWnd;
-	HWND m_hParentWnd;
-	HINSTANCE m_hInst;
-	wchar_t *m_UiLanguageFile;
-	int m_StartPage;
-
-	static int CALLBACK PropSheetProc(HWND hWnd, UINT msg, LPARAM lParam);
-	static LRESULT CALLBACK WndProcStatic(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
-	static class TTCPropSheetDlg *gTTCPS;
-	LRESULT CALLBACK WndProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
-	LONG_PTR m_OrgProc;
-	LONG_PTR m_OrgUserData;
-
-	PROPSHEETHEADERW m_psh;
-	int m_PageCount;
-	struct TTPropSheetPage {
-		HPROPSHEETPAGE hPsp;
-		wchar_t *path;
-	};
-	TTPropSheetPage *m_Page;
-
-	// tree control
-	BOOL m_TreeView;
-	HWND m_hWndTV;
-	void AddTreeControl();
-	void CreateTree(HWND dlg);
-	HTREEITEM CreatePath(const wchar_t *path, HTREEITEM hParent, int data);
-	HTREEITEM GetTreeItem(int nPage, HTREEITEM hParent);
-
-	// èâä˙íl
-	static BOOL m_TreeViewInit;
+	void OnInitDialog();
+	void OnOK();
+	enum { IDD = IDD_TABSHEET_GENERAL };
+	void OnHelp();
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 };

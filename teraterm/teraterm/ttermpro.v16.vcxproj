@@ -183,6 +183,7 @@
     <ClCompile Include="filesys_proto.cpp" />
     <ClCompile Include="font_pp.cpp" />
     <ClCompile Include="ftdlg.cpp" />
+    <ClCompile Include="general_pp.cpp" />
     <ClCompile Include="keyboard.c" />
     <ClCompile Include="logdlg.cpp" />
     <ClCompile Include="scp.cpp" />
@@ -245,6 +246,7 @@
     <ClInclude Include="filesys_log_res.h" />
     <ClInclude Include="font_pp.h" />
     <ClInclude Include="font_pp_res.h" />
+    <ClInclude Include="general_pp.h" />
     <ClInclude Include="logdlg.h" />
     <ClInclude Include="scp.h" />
     <ClInclude Include="sendfiledlg.h" />
