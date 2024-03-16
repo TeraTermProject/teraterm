@@ -1820,8 +1820,12 @@ void ChangeFont(void)
 	SetLogFont(&VTlf, TRUE);
 	VTFont[AttrDefault] = CreateFontIndirect(&VTlf);
 
-	/* set IME font */
-	SetConversionLogFont(HVTWin, &VTlf);
+	if (ts.UseIME > 0) {
+		if (ts.IMEInline > 0) {
+			/* set IME font */
+			SetConversionLogFont(HVTWin, &VTlf);
+		}
+	}
 
 	{
 		HDC TmpDC = GetDC(HVTWin);
@@ -1913,11 +1917,10 @@ void ResetIME(void)
 	cv.Language = ts.Language;
 
 	/* reset IME */
-	if ((ts.Language==IdJapanese) || (ts.Language==IdKorean) || (ts.Language==IdUtf8)) //HKS
-	{
-		if (ts.UseIME==0)
-			FreeIME(HVTWin);
-		else if (! LoadIME()) {
+	if ((IMEEnabled() == TRUE) && (ts.UseIME > 0)) {
+
+		// IME‰Šú‰»
+		if (! LoadIME()) {
 			static const TTMessageBoxInfoW info = {
 				"Tera Term",
 				"MSG_TT_ERROR", L"Tera Term: Error",
@@ -1929,19 +1932,20 @@ void ResetIME(void)
 			ts.UseIME = 0;
 		}
 
-		if (ts.UseIME>0)
-		{
+		if (ts.UseIME > 0) {
 			if (ts.IMEInline>0) {
 				LOGFONTA VTlf;
 				SetLogFont(&VTlf, TRUE);
 				SetConversionLogFont(HVTWin, &VTlf);
 			}
-			else
+			else {
 				SetConversionWindow(HVTWin,-1,0);
+			}
 		}
 	}
-	else
+	else {
 		FreeIME(HVTWin);
+	}
 
 	if (IsCaretOn()) CaretOn();
 }

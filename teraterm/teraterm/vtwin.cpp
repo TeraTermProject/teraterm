@@ -2934,8 +2934,10 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 			int CaretY = (CursorY-WinOrgY)*FontHeight;
 			SetConversionWindow(HVTWin,CaretX,CaretY);
 
-			// フォントを設定する
-			ResetConversionLogFont(HVTWin);
+			if (ts.IMEInline > 0) {
+				// フォントを設定する
+				ResetConversionLogFont(HVTWin);
+			}
 		}
 
 		// 描画
@@ -5153,24 +5155,43 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnDeviceChange((UINT)wp, (DWORD_PTR)lp);
 		DefWindowProc(msg, wp, lp);
 		break;
-	case WM_IME_STARTCOMPOSITION :
-		OnIMEStartComposition(wp, lp);
-		break;
-	case WM_IME_ENDCOMPOSITION :
-		OnIMEEndComposition(wp, lp);
-		break;
+	case WM_IME_STARTCOMPOSITION:
+	case WM_IME_ENDCOMPOSITION:
 	case WM_IME_COMPOSITION:
-		OnIMEComposition(wp, lp);
-		break;
 	case WM_INPUTLANGCHANGE:
-		OnIMEInputChange(wp, lp);
-		break;
 	case WM_IME_NOTIFY:
-		OnIMENotify(wp, lp);
-		break;
 	case WM_IME_REQUEST:
-		retval = OnIMERequest(wp, lp);
+	{
+		if (ts.UseIME > 0) {
+			switch(msg) {
+			case WM_IME_STARTCOMPOSITION:
+				OnIMEStartComposition(wp, lp);
+				break;
+			case WM_IME_ENDCOMPOSITION:
+				OnIMEEndComposition(wp, lp);
+				break;
+			case WM_IME_COMPOSITION:
+				OnIMEComposition(wp, lp);
+				break;
+			case WM_INPUTLANGCHANGE:
+				OnIMEInputChange(wp, lp);
+				break;
+			case WM_IME_NOTIFY:
+				OnIMENotify(wp, lp);
+				break;
+			case WM_IME_REQUEST:
+				retval = OnIMERequest(wp, lp);
+				break;
+			default:
+				assert(FALSE);
+				break;
+			}
+		}
+		else {
+			retval = DefWindowProc(msg, wp, lp);
+		}
 		break;
+	}
 	case WM_WINDOWPOSCHANGING:
 		OnWindowPosChanging(wp, lp);
 		break;

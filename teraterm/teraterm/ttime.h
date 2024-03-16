@@ -29,6 +29,8 @@
 /* Tera Term */
 /* TERATERM.EXE, IME interface */
 
+#pragma once
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -50,6 +52,7 @@ void *CreateReconvStringStW(HWND hWnd,
 void *CreateReconvStringStA(HWND hWnd,
 							const char *str_ptr, size_t str_count,
 							size_t cx, size_t *st_size_);
+BOOL IMEEnabled(void);
 
 #ifdef __cplusplus
 }
