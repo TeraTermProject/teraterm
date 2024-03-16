@@ -1265,7 +1265,12 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		u16 = (wchar_t)nChar;
 	} else {
 		// 入力は ANSI
-		if (ts.Language == IdJapanese || ts.Language == IdChinese || ts.Language == IdKorean) {
+		const UINT acp = GetACP();
+		if ((acp == 932) || (acp == 949) || (acp == 936) || (acp == 950)) {
+			// CP932	日本語 shift jis
+			// CP949	Korean
+			// CP936	GB2312
+			// CP950	Big5
 			// CJK (2byte文字)
 			if (vtwin_work.dbcs_lead_byte == 0 && IsDBCSLeadByte(nChar)) {
 				// ANSI 2バイト文字の 1byte目だった
@@ -1300,7 +1305,8 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 				u16 = (wchar_t)u32;
 			}
 		}
-		else if (ts.Language == IdRussian) {
+		else if (acp == 1251) {
+			// CP1251	Russian,Cyrillic キリル
 			BYTE c;
 			if (ts.RussKeyb == IdWindows) {
 				// key = CP1251
