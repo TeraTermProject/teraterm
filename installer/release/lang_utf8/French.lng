@@ -1004,9 +1004,7 @@ MSG_SSH_SCP_ERROR_INIT_TITLE=TTSSH: SCP error (SCP_INIT)
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=Option inconnue sur la ligne de commande: %s
 
-; x11util.c
-MSG_X_AUTH_ERROR=L'application X distante a envoyé des données d'authentification incorrectes.\nSa session X a été fermée.
-
+MSG_CREATEWINDOW_SCP_ERROR=Unable to display SCP dialog box.
 MSG_CREATEWINDOW_KEYGEN_ERROR=Impossible d'afficher la boîte de dialogue du Générateur de Clé.
 MSG_CREATEWINDOW_ABOUT_ERROR=Impossible d'afficher la boîte de dialogue a propos.
 MSG_CREATEWINDOW_SETUP_ERROR=Impossible d'afficher la fenêtre de Configuration de TTSSH.
@@ -1029,6 +1027,9 @@ BTN_CONTINUE=&Continuer
 BTN_YES=&Yes
 BTN_NO=&No
 BTN_HELP=&Help
+
+; x11util.c
+MSG_X_AUTH_ERROR=L'application X distante a envoyé des données d'authentification incorrectes.\nSa session X a été fermée.
 
 
 [TTProxy]

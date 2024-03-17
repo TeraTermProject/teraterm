@@ -1004,9 +1004,7 @@ MSG_SSH_SCP_ERROR_INIT_TITLE=TTSSH: SCP error (SCP_INIT)
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=無效的命令行選項：%s
 
-; x11util.c
-MSG_X_AUTH_ERROR=從遠端X應用程式收到一個無效的認證數據。\nX連線將被關閉。
-
+MSG_CREATEWINDOW_SCP_ERROR=Unable to display SCP dialog box.
 MSG_CREATEWINDOW_KEYGEN_ERROR=無法顯示密鑰生成對話框。
 MSG_CREATEWINDOW_ABOUT_ERROR=無法顯示關於對話框。
 MSG_CREATEWINDOW_SETUP_ERROR=無法顯示 TTSSH 設定對話框。
@@ -1029,6 +1027,9 @@ BTN_CONTINUE=繼續(&C)
 BTN_YES=&Yes
 BTN_NO=&No
 BTN_HELP=&Help
+
+; x11util.c
+MSG_X_AUTH_ERROR=從遠端X應用程式收到一個無效的認證數據。\nX連線將被關閉。
 
 
 [TTProxy]

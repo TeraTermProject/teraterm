@@ -1001,9 +1001,7 @@ MSG_SSH_SCP_ERROR_INIT_TITLE=தேமுபாஓடு: பாநகல் ப
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=அங்கீகரிக்கப்படாத கட்டளை வரி விருப்பம்: %s
 
-; x11util.c
-MSG_X_AUTH_ERROR=தொலை எஃசு பயன்பாடு தவறான அங்கீகாரத் தரவை அனுப்பியது.\nஅதன் எஃசு அமர்வு ரத்து செய்யப்படுகிறது.
-
+MSG_CREATEWINDOW_SCP_ERROR=Unable to display SCP dialog box.
 MSG_CREATEWINDOW_KEYGEN_ERROR=திறவுகோல் உருவாக்கி உரையாடல் பெட்டியைக் காட்ட முடியவில்லை.
 MSG_CREATEWINDOW_ABOUT_ERROR=பற்றி உரையாடல் பெட்டியைக் காட்ட முடியவில்லை.
 MSG_CREATEWINDOW_SETUP_ERROR=தேமுபாஓடு அமைவு உரையாடல் பெட்டியைக் காட்ட முடியவில்லை.
@@ -1026,6 +1024,9 @@ BTN_CONTINUE=&தொடரவும்
 BTN_YES=&ஆம்
 BTN_NO=&இல்லை
 BTN_HELP=&உதவி
+
+; x11util.c
+MSG_X_AUTH_ERROR=தொலை எஃசு பயன்பாடு தவறான அங்கீகாரத் தரவை அனுப்பியது.\nஅதன் எஃசு அமர்வு ரத்து செய்யப்படுகிறது.
 
 
 [TTProxy]

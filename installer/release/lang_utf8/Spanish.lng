@@ -1001,9 +1001,7 @@ MSG_SSH_SCP_ERROR_INIT_TITLE=TTSSH: SCP error (SCP_INIT)
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=Unrecognized command-line option: %s
 
-; x11util.c
-MSG_X_AUTH_ERROR=Remote X application sent incorrect authentication data.\nIts X session is being cancelled.
-
+MSG_CREATEWINDOW_SCP_ERROR=Unable to display SCP dialog box.
 MSG_CREATEWINDOW_KEYGEN_ERROR=Unable to display Key Generator dialog box.
 MSG_CREATEWINDOW_ABOUT_ERROR=Unable to display About dialog box.
 MSG_CREATEWINDOW_SETUP_ERROR=Unable to display TTSSH Setup dialog box.
@@ -1026,6 +1024,9 @@ BTN_CONTINUE=&Continue
 BTN_YES=&Yes
 BTN_NO=&No
 BTN_HELP=&Help
+
+; x11util.c
+MSG_X_AUTH_ERROR=Remote X application sent incorrect authentication data.\nIts X session is being cancelled.
 
 
 [TTProxy]

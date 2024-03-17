@@ -1004,9 +1004,7 @@ MSG_SSH_SCP_ERROR_INIT_TITLE=TTSSH: SCP error (SCP_INIT)
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=Неверный параметр в командной строке: %s
 
-; x11util.c
-MSG_X_AUTH_ERROR=Удаленное X-приложение послало неверные данные аутентификации.\nЭта X-сессия отменяется.
-
+MSG_CREATEWINDOW_SCP_ERROR=Unable to display SCP dialog box.
 MSG_CREATEWINDOW_KEYGEN_ERROR=Не удается отобразить диалог генератора ключа.
 MSG_CREATEWINDOW_ABOUT_ERROR=Не удается отобразить диалог информации.
 MSG_CREATEWINDOW_SETUP_ERROR=Не удается отобразить диалог настройки TTSSH.
@@ -1029,6 +1027,9 @@ BTN_CONTINUE=&Продолжение
 BTN_YES=&Yes
 BTN_NO=&No
 BTN_HELP=&Help
+
+; x11util.c
+MSG_X_AUTH_ERROR=Удаленное X-приложение послало неверные данные аутентификации.\nЭта X-сессия отменяется.
 
 
 [TTProxy]
