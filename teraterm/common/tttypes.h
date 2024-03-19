@@ -612,6 +612,7 @@ struct tttset {
 	wchar_t *LogDefaultNameW;
 	BOOL Dec2Unicode;
 	wchar_t *DelimListW;
+	WORD EnableIniAutoBackup;
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;
