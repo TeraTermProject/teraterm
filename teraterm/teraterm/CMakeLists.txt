@@ -112,6 +112,8 @@ set(SRC_DIALOG
   ftdlg.h
   ftdlg_lite.cpp
   ftdlg_lite.h
+  general_pp.cpp
+  general_pp.h
   logdlg.cpp
   logdlg.h
   protodlg.cpp

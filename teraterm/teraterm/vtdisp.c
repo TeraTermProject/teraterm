@@ -71,7 +71,8 @@ int WinWidth, WinHeight;
 static BOOL Active = FALSE;
 static BOOL CompletelyVisible;
 HFONT VTFont[AttrFontMask+1];
-int FontHeight, FontWidth, ScreenWidth, ScreenHeight;
+int FontHeight, FontWidth;
+int ScreenWidth, ScreenHeight;	// スクリーンサイズ = (セル数)*(Font幅or高さ) ≒ Client Area
 BOOL AdjustSize;
 BOOL DontChangeSize=FALSE;
 static int CRTWidth, CRTHeight;
@@ -1819,8 +1820,12 @@ void ChangeFont(void)
 	SetLogFont(&VTlf, TRUE);
 	VTFont[AttrDefault] = CreateFontIndirect(&VTlf);
 
-	/* set IME font */
-	SetConversionLogFont(HVTWin, &VTlf);
+	if (ts.UseIME > 0) {
+		if (ts.IMEInline > 0) {
+			/* set IME font */
+			SetConversionLogFont(HVTWin, &VTlf);
+		}
+	}
 
 	{
 		HDC TmpDC = GetDC(HVTWin);
@@ -1912,11 +1917,10 @@ void ResetIME(void)
 	cv.Language = ts.Language;
 
 	/* reset IME */
-	if ((ts.Language==IdJapanese) || (ts.Language==IdKorean) || (ts.Language==IdUtf8)) //HKS
-	{
-		if (ts.UseIME==0)
-			FreeIME(HVTWin);
-		else if (! LoadIME()) {
+	if ((IMEEnabled() == TRUE) && (ts.UseIME > 0)) {
+
+		// IME初期化
+		if (! LoadIME()) {
 			static const TTMessageBoxInfoW info = {
 				"Tera Term",
 				"MSG_TT_ERROR", L"Tera Term: Error",
@@ -1928,19 +1932,20 @@ void ResetIME(void)
 			ts.UseIME = 0;
 		}
 
-		if (ts.UseIME>0)
-		{
+		if (ts.UseIME > 0) {
 			if (ts.IMEInline>0) {
 				LOGFONTA VTlf;
 				SetLogFont(&VTlf, TRUE);
 				SetConversionLogFont(HVTWin, &VTlf);
 			}
-			else
+			else {
 				SetConversionWindow(HVTWin,-1,0);
+			}
 		}
 	}
-	else
+	else {
 		FreeIME(HVTWin);
+	}
 
 	if (IsCaretOn()) CaretOn();
 }
@@ -2179,6 +2184,11 @@ void DispSetCaretWidth(BOOL DW)
   CursorOnDBCS = DW;
 }
 
+/**
+ *	ウィンドウのサイズが変化
+ *	BuffChangeWinSize() からコールされる
+ *
+ */
 void DispChangeWinSize(int Nx, int Ny)
 {
   LONG W,H,dW,dH;
@@ -2230,6 +2240,17 @@ void DispChangeWinSize(int Nx, int Ny)
     InvalidateRect(HVTWin,NULL,FALSE);
 }
 
+/**
+ *	ウィンドウのサイズが変化する時(WM_SIZEが発生した時)に、
+ *	AdjustSize == TRUEの時にコールされる
+ *
+ *	@param	x	ウィンドウのleft
+ *	@param	y	ウィンドウのtop
+ *	@param	w	リサイズ前のウィンドウw
+ *	@param	h	リサイズ前のウィンドウh
+ *	@param	cw	新しいクライアント領域のw
+ *	@param	ch	新しいクライアント領域のh
+ */
 void ResizeWindow(int x, int y, int w, int h, int cw, int ch)
 {
   int dw,dh, NewX, NewY;
@@ -3326,8 +3347,11 @@ void DispSetupFontDlg(HWND hwndOwner)
   ChangeCaret();
 }
 
+/**
+ *	Restore window size by double clik on caption bar
+ *
+ */
 void DispRestoreWinSize(void)
-//  Restore window size by double clik on caption bar
 {
   if (ts.TermIsWin>0) return;
 
