@@ -51,11 +51,6 @@
 
 #define	ENABLE_CELL_INDEX	0
 
-// ダブルクリックでワード選択後のドラッグで
-//		TRUE	前後行を継続して選択を行う
-//		FALSE	選択が行頭/行末で止まる
-#define DOUBLD_CLICK_SELECT_LINE_CONTINUE	FALSE
-
 // バッファ内の半角1文字分の情報
 typedef struct {
 	char32_t u32;
@@ -4415,12 +4410,12 @@ void BuffDblClk(int Xw, int Yw)
 			int dest_y;
 
 			// 前方の区切りを探す
-			SearchDelimiterPrev(IStart, YStart, TRUE, &dest_x, &dest_y);
+			SearchDelimiterPrev(IStart, YStart, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
 			IStart = dest_x;
 			YStart = dest_y;
 
 			// 後方の区切りを探す
-			SearchDelimiterNext(IEnd, YEnd, TRUE, &dest_x, &dest_y);
+			SearchDelimiterNext(IEnd, YEnd, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
 			IEnd = dest_x + 1; // 終端の一つ後ろ
 			YEnd = dest_y;
 		}
@@ -4607,7 +4602,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 			// ダブルクリック選択領域より前を選択
 			int dest_x;
 			int dest_y;
-			SearchDelimiterPrev(X, Y, DOUBLD_CLICK_SELECT_LINE_CONTINUE, &dest_x, &dest_y);
+			SearchDelimiterPrev(X, Y, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
 			SelectEnd.x = dest_x;
 			SelectEnd.y = dest_y;
 			SelectStart = DblClkEnd;
@@ -4616,7 +4611,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 			// ダブルクリック選択領域より後ろを選択
 			int dest_x;
 			int dest_y;
-			SearchDelimiterNext(X, Y, DOUBLD_CLICK_SELECT_LINE_CONTINUE, &dest_x, &dest_y);
+			SearchDelimiterNext(X, Y, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
 			SelectEnd.x = dest_x + 1;
 			SelectEnd.y = dest_y;
 			SelectStart = DblClkStart;

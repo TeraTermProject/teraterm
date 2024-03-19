@@ -26,9 +26,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <windows.h>
-
 #pragma once
+
+#include <windows.h>
+#include <commctrl.h>	// for HTREEITEM
 
 // Property Sheet
 class TTCPropSheetDlg

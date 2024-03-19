@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2009- TeraTerm Project
+ * (C) 2024- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,15 +26,22 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTMACRO.EXE, password encryption */
+#pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "tt_res.h"
+#include "tmfc.h"
+#include "tmfc_propdlg.h"
 
-void Encrypt(const char *InStr, PCHAR OutStr);
-void Decrypt(const char *InStr, PCHAR OutStr);
-
-#ifdef __cplusplus
-}
-#endif
+// General Page
+class CGeneralPropPageDlg : public TTCPropertyPage
+{
+public:
+	CGeneralPropPageDlg(HINSTANCE inst);
+	virtual ~CGeneralPropPageDlg();
+private:
+	void OnInitDialog();
+	void OnOK();
+	enum { IDD = IDD_TABSHEET_GENERAL };
+	void OnHelp();
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+};
