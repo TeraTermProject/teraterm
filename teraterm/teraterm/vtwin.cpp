@@ -1265,7 +1265,12 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		u16 = (wchar_t)nChar;
 	} else {
 		// 入力は ANSI
-		if (ts.Language == IdJapanese || ts.Language == IdChinese || ts.Language == IdKorean) {
+		const UINT acp = GetACP();
+		if ((acp == 932) || (acp == 949) || (acp == 936) || (acp == 950)) {
+			// CP932	日本語 shift jis
+			// CP949	Korean
+			// CP936	GB2312
+			// CP950	Big5
 			// CJK (2byte文字)
 			if (vtwin_work.dbcs_lead_byte == 0 && IsDBCSLeadByte(nChar)) {
 				// ANSI 2バイト文字の 1byte目だった
@@ -1300,7 +1305,8 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 				u16 = (wchar_t)u32;
 			}
 		}
-		else if (ts.Language == IdRussian) {
+		else if (acp == 1251) {
+			// CP1251	Russian,Cyrillic キリル
 			BYTE c;
 			if (ts.RussKeyb == IdWindows) {
 				// key = CP1251
@@ -2351,7 +2357,11 @@ void CVTWindow::OnSetFocus(HWND hOldWnd)
 
 void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 {
-	if (GetMonitorDpiFromWindow(m_hWnd) != vtwin_work.monitor_DPI) {
+	// ウィンドウ生成時の最初のWM_SIZE時(monitor_DPI==0のとき)は
+	// DPIのチェックを行わない
+	// ウィンドウ生成時、WM_SIZE, WM_MOVE とメッセージが発生する
+	if (vtwin_work.monitor_DPI != 0 &&
+		GetMonitorDpiFromWindow(m_hWnd) != vtwin_work.monitor_DPI) {
 		// DPIの異なるディスプレイをまたぐと WM_DPICHANGE が発生する
 		//
 		// 「ドラッグ中にウィンドウの内容を表示する=OFF」設定時
@@ -2441,7 +2451,7 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 
 #ifdef WINDOW_MAXMIMUM_ENABLED
 	if (nType == SIZE_MAXIMIZED) {
-		AdjustSize = 0;
+		AdjustSize = FALSE;
 	}
 #endif
 }
@@ -2932,8 +2942,10 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 			int CaretY = (CursorY-WinOrgY)*FontHeight;
 			SetConversionWindow(HVTWin,CaretX,CaretY);
 
-			// フォントを設定する
-			ResetConversionLogFont(HVTWin);
+			if (ts.IMEInline > 0) {
+				// フォントを設定する
+				ResetConversionLogFont(HVTWin);
+			}
 		}
 
 		// 描画
@@ -5151,24 +5163,43 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnDeviceChange((UINT)wp, (DWORD_PTR)lp);
 		DefWindowProc(msg, wp, lp);
 		break;
-	case WM_IME_STARTCOMPOSITION :
-		OnIMEStartComposition(wp, lp);
-		break;
-	case WM_IME_ENDCOMPOSITION :
-		OnIMEEndComposition(wp, lp);
-		break;
+	case WM_IME_STARTCOMPOSITION:
+	case WM_IME_ENDCOMPOSITION:
 	case WM_IME_COMPOSITION:
-		OnIMEComposition(wp, lp);
-		break;
 	case WM_INPUTLANGCHANGE:
-		OnIMEInputChange(wp, lp);
-		break;
 	case WM_IME_NOTIFY:
-		OnIMENotify(wp, lp);
-		break;
 	case WM_IME_REQUEST:
-		retval = OnIMERequest(wp, lp);
+	{
+		if (ts.UseIME > 0) {
+			switch(msg) {
+			case WM_IME_STARTCOMPOSITION:
+				OnIMEStartComposition(wp, lp);
+				break;
+			case WM_IME_ENDCOMPOSITION:
+				OnIMEEndComposition(wp, lp);
+				break;
+			case WM_IME_COMPOSITION:
+				OnIMEComposition(wp, lp);
+				break;
+			case WM_INPUTLANGCHANGE:
+				OnIMEInputChange(wp, lp);
+				break;
+			case WM_IME_NOTIFY:
+				OnIMENotify(wp, lp);
+				break;
+			case WM_IME_REQUEST:
+				retval = OnIMERequest(wp, lp);
+				break;
+			default:
+				assert(FALSE);
+				break;
+			}
+		}
+		else {
+			retval = DefWindowProc(msg, wp, lp);
+		}
 		break;
+	}
 	case WM_WINDOWPOSCHANGING:
 		OnWindowPosChanging(wp, lp);
 		break;

@@ -273,6 +273,9 @@
     <ClCompile Include="theme_pp.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="general_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -583,6 +586,9 @@
       <Filter>ttptek</Filter>
     </ClInclude>
     <ClInclude Include="theme_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="general_pp.h">
       <Filter>dialog</Filter>
     </ClInclude>
   </ItemGroup>

@@ -513,3 +513,31 @@ void *CreateReconvStringStW(
 	//assert(IsWindowUnicode(hWnd) == TRUE);
 	return CreateReconvStringSt(hWnd, TRUE, str_ptr, str_count, cx, st_size_);
 }
+
+/**
+ * IME‚ªŽg‚¦‚éOS?
+ */
+BOOL IMEEnabled(void)
+{
+	if (GetSystemMetrics(SM_IMMENABLED) != 0) {
+		// Unicode-based IME
+		return TRUE;
+	}
+	if (GetSystemMetrics(SM_DBCSENABLED) != 0) {
+		// DBCS
+#if 0
+		int acp = GetACP();
+		if (acp == 932 || acp == 949 || acp = 936 || acp == 950) {
+			// CP932	“ú–{Œê shift jis
+			// CP949	Korean
+			// CP936	GB2312
+			// CP950	Big5
+			return TRUE;
+		}
+#else
+		// DBCS enable ‚È‚çŠ¿Žš•ÏŠ·‚Å‚«‚é‚Í‚¸
+		return TRUE;
+#endif
+	}
+	return FALSE;
+}
