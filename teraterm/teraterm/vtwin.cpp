@@ -480,8 +480,10 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 #endif
 
 	// TipWin
-	TipWin = new CTipWin(hInstance);
-	TipWin->Create(HVTWin);
+	if (ts.HideWindow==0) {
+		TipWin = new CTipWin(hInstance);
+		TipWin->Create(HVTWin);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -489,9 +491,11 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 
 CVTWindow::~CVTWindow()
 {
-	TipWin->Destroy();
-	delete TipWin;
-	TipWin = NULL;
+	if (ts.HideWindow==0) {
+		TipWin->Destroy();
+		delete TipWin;
+		TipWin = NULL;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
