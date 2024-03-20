@@ -63,7 +63,7 @@
 
     <h2>簡単な設定の方法</h2>
     <dl>
-      <dt>中国語,日本語,韓国語(CJK)で使用する場合</dt>
+      <dt>中国語,日本語,韓国語(<a href="../about/glossary.html#CJK">CJK</a>)で使用する場合</dt>
       <dd>
         Japanese/UTF-8 など、"Japanese/" などがついたコーディングを選ぶ<br>
         →Ambiguous Characters Width が 2Cell となる<br>
@@ -74,9 +74,9 @@
     <h2>表示される文字について</h2>
     Tera Term のリポジトリにテスト用テキストがあるので表示してチェックできます。
     <ul>
-      <li>漢字の文字幅<br>
+      <li>Unicode(漢字)の文字幅<br>
         "wget https://github.com/TeraTermProject/teraterm/raw/main/tests/unicodebuf-east_asian_width.txt -O -"
-      <li>絵文字の文字幅<br>
+      <li>Unicode絵文字の文字幅<br>
         "wget https://raw.githubusercontent.com/TeraTermProject/teraterm/main/tests/unicodebuf-text-emoji.txt -O -"
     </ul>
     次のことに注意してください
@@ -103,19 +103,42 @@
       </li>
     </ul>
 
+    <h2>CJK とセル数について</h2>
+
+    <p>
+      <a href="../about/glossary.html#MBCS">マルチバイト文字コード</a>の文字幅は、1バイト文字は1cell, 2バイト文字は2cellです。
+    </p>
+
+    <p>
+      Unicodeでは従来の文字コードと文字幅の互換性を保つために
+      文字によっては東アジアでは2cell、その他では1cellで表示することを定めています。
+    </p>
+
+    <p>
+    例えば、"§"(section sign,節記号,セクションマーク) の文字コードは次のようになります
+<pre>
+| code               | charactor code(code point) | cell |
+|--------------------|----------------------------|------|
+| ISO8859-1(Latin-1) | 0xA7                       | 1    |
+| Shift_JIS(CP932)   | 0x8198                     | 2    |
+| KS5601(CP949)      | 0xA1D7                     | 2    |
+| Big5(CP950)        | 0xA1B1                     | 2    |
+| BG2312(CP936)      | 0xA1EC                     | 2    |
+| Unicode            | 0xA7 (U+00A7)              | 1or2 |
+</pre>
+
+    CJKとして"§"を表示しているときは2cellで表示したほうが、
+    その他の環境で表示しているときは1cellで表示したほうが自然に表示されます。
+
     <h2 id="EastAsianWidth">East_Asian_Width特性とセル数について</h2>
 
     <p>
-      East_Asian_Width特性(東アジアの文字幅)として、
-      各文字には特性が割り当てられています。
+      Unicodeでは文字幅を5種類の特性に分類して、
+      East_Asian_Width特性(東アジアの文字幅)として定義しています。
     </p>
 
     <p>
-      この特性は5種類存在し、各々の文字幅が決められています。
-    </p>
-
-    <p>
-      また、文字幅の解釈には次の2種類があります。
+      文字幅の解釈には次の2種類があります。
       <ol>
         <li>東アジアの従来文字コードの文脈の場合</li>
         <li>東アジア以外の従来文字コードの文脈の場合</li>
@@ -139,7 +162,8 @@ cells数(2=全角/1=半角)
 </pre>
 
     <p>
-      CJK環境では、Ambiguousの文字幅を 2Cell にしたほうが自然です。<br>
+      <a href="../about/glossary.html#CJK">CJK</a>環境では、
+      Ambiguousの文字幅を 2Cell にしたほうが自然です。<br>
       また、日本語フォントでは 2Cell でデザインされていることがほとんどだと思われます。
     </p>
 
