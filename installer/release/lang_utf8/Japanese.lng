@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-03-14)
+﻿; Updated by TeraTerm Project (2024-03-15)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -885,6 +885,8 @@ DLG_SCP_SENDFILE_CANCEL=キャンセル(&C)
 DLG_SCP_RECEIVEFILE_FROM=Fr&om:
 DLG_SCP_RECEIVEFILE_TO=To:
 DLG_SCP_RECEIVEFILE_RECEIVE=受信(&R)
+DLG_SCP_SELECT_FILE_TITLE=送信ファイル選択
+DLG_SCP_SELECT_DEST_TITLE=受信フォルダ選択
 
 ; dlg SCP progress
 DLG_SCP_PROGRESS_TITLE_SENDFILE=TTSSH: SCP ファイル送信中
@@ -1000,9 +1002,7 @@ MSG_SSH_SCP_ERROR_INIT_TITLE=TTSSH: SCP エラー (SCP_INIT)
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=無効なコマンドラインオプション: %s
 
-; x11util.c
-MSG_X_AUTH_ERROR=リモートのX アプリケーションから無効な認証データを受信しました. \nX セッションは無効になっています.
-
+MSG_CREATEWINDOW_SCP_ERROR=SCP ダイアログボックスを開けません.
 MSG_CREATEWINDOW_KEYGEN_ERROR=鍵生成ダイアログボックスを開けません.
 MSG_CREATEWINDOW_ABOUT_ERROR=情報ダイアログボックスを開けません.
 MSG_CREATEWINDOW_SETUP_ERROR=TTSSH 設定ダイアログボックスを開けません.
@@ -1025,6 +1025,9 @@ BTN_CONTINUE=続行(&C)
 BTN_YES=はい(&Y)
 BTN_NO=いいえ(&N)
 BTN_HELP=ヘルプ(&H)
+
+; x11util.c
+MSG_X_AUTH_ERROR=リモートのX アプリケーションから無効な認証データを受信しました. \nX セッションは無効になっています.
 
 
 [TTProxy]

@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-03-14)
+﻿; Updated by TeraTerm Project (2024-03-15)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -573,6 +573,9 @@ MSG_OPENHELP_ERROR=HTML 도움말을 찾을 수 없습니다(%s).
 MSG_INI_ERROR=Tera Term: 오류
 MSG_INI_WRITE_ERROR=ini 파일을 저장할 수 없습니다.
 
+; sendfile
+DLG_SENDFILE_TERATERM4=Send in same way as Tera Term 4
+DLG_SENDFILE_TERATERM4_TOOLTIP=Checked(same way as Tera Term 4)\n- Send while reading from a file.\n- Textfile is read as ACP encoding and is not automatically determined.\nUnchecked\n- File is read into memory and then sent.\n- Encoding of text files is automatically determined.\n
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=Preview/File
@@ -1003,9 +1006,7 @@ MSG_SSH_SCP_ERROR_INIT_TITLE=TTSSH: SCP error (SCP_INIT)
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=인식되지 않는 명령행 옵션: %s
 
-; x11util.c
-MSG_X_AUTH_ERROR=원격 X 응용프로그램이 잘못된 인증 데이터를 보냈습니다.\n이 X 세션을 취소 중입니다.
-
+MSG_CREATEWINDOW_SCP_ERROR=Unable to display SCP dialog box.
 MSG_CREATEWINDOW_KEYGEN_ERROR=키생성 다이얼로그를 표시할 수 없슴.
 MSG_CREATEWINDOW_ABOUT_ERROR=정보 다이얼로그를 표시할 수 없슴.
 MSG_CREATEWINDOW_SETUP_ERROR=TTSSH 설정 다이얼로그를 표시할 수 없슴.
@@ -1028,6 +1029,9 @@ BTN_CONTINUE=계속(&C)
 BTN_YES=&Yes
 BTN_NO=&No
 BTN_HELP=&Help
+
+; x11util.c
+MSG_X_AUTH_ERROR=원격 X 응용프로그램이 잘못된 인증 데이터를 보냈습니다.\n이 X 세션을 취소 중입니다.
 
 
 [TTProxy]
@@ -1226,3 +1230,7 @@ DLG_ENABLE=활성화(&E)
 DLG_INTERVAL=간격(sec)(&I)
 DLG_COMMAND=명령(&C)
 DLG_ADD_NEWLINE=&Add new line
+
+[TTXCheckUpdate]
+MSG_CHECKUPDATE=Check for updates automatically?\n  %s
+MENU_CHECKUPDATE=Check for &Updates...

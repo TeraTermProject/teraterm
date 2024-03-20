@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-03-14)
+﻿; Updated by TeraTerm Project (2024-03-15)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -259,8 +259,8 @@ DLG_TAB_VISUAL_BOLD_COLOR=启用高亮颜色属性(&O)
 DLG_TAB_VISUAL_BOLD_FONT=Enable B&old attribute font
 DLG_TAB_VISUAL_BLINK=启用闪烁颜色属性(&L)
 DLG_TAB_VISUAL_REVERSE=启用反转颜色属性(&V)
-DLG_TAB_VISUAL_URL_COLOR=启用链接颜色属性(&U)
-DLG_TAB_VISUAL_URL_FONT=链接添加下划线(&D)
+DLG_TAB_VISUAL_UNDERLINE_COLOR=启用链接颜色属性(&U)
+DLG_TAB_VISUAL_UNDERLINE_FONT=链接添加下划线(&D)
 DLG_TAB_VISUAL_URL_COLOR=Enable &URL attribute color
 DLG_TAB_VISUAL_URL_FONT=Enable &URL attribute font
 DLG_TAB_VISUAL_ANSI=启用ANSI色(&N)
@@ -573,6 +573,9 @@ MSG_OPENHELP_ERROR=无法打开HTML帮助文件 %s
 MSG_INI_ERROR=Tera Term：错误
 MSG_INI_WRITE_ERROR=无法写入 ini 文件
 
+; sendfile
+DLG_SENDFILE_TERATERM4=Send in same way as Tera Term 4
+DLG_SENDFILE_TERATERM4_TOOLTIP=Checked(same way as Tera Term 4)\n- Send while reading from a file.\n- Textfile is read as ACP encoding and is not automatically determined.\nUnchecked\n- File is read into memory and then sent.\n- Encoding of text files is automatically determined.\n
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=Preview/File
@@ -991,13 +994,19 @@ MSG_SSH_GEX_SIZE_LARGER=接收到的组大小大于请求的最大值。\n请求
 MSG_SSH_SUBSYSTEM_REQUEST_ERROR=subsystem request failed. (%s)
 MSG_SSH_AGENTERROR_TITLE=Bad agent request
 MSG_SSH_AGENTERROR_TOOLARGE=Agent request size is too large, ignore it.
+MSG_SSH_SCP_FILEOPEN_ERROR_TITLE=TTSSH: file open error
+MSG_SSH_SCP_FILEOPEN_READ_ERROR=Can't open file for reading: %s %s
+MSG_SSH_SCP_FILEOPEN_READONLY_ERROR=`%s' file is read only.
+MSG_SSH_SCP_FILEOPEN_OVERWRITE_CONFIRM=`%s' file exists.\noverwrite it?
+MSG_SSH_SCP_FILEOPEN_WRITE_ERROR=Can't open file for writing: %s %s
+MSG_SSH_SCP_CONFIRM_TITLE=TTSSH: confirm
+MSG_SSH_SCP_ERROR_TITLE=TTSSH: SCP error
+MSG_SSH_SCP_ERROR_INIT_TITLE=TTSSH: SCP error (SCP_INIT)
 
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=无效的命令行选项：%s
 
-; x11util.c
-MSG_X_AUTH_ERROR=从远程X应用程序收到一个无效的认证数据。\nX会话将被关闭。
-
+MSG_CREATEWINDOW_SCP_ERROR=Unable to display SCP dialog box.
 MSG_CREATEWINDOW_KEYGEN_ERROR=无法显示密钥生成对话框。
 MSG_CREATEWINDOW_ABOUT_ERROR=无法显示关于对话框。
 MSG_CREATEWINDOW_SETUP_ERROR=无法显示 TTSSH 设置对话框。
@@ -1020,6 +1029,9 @@ BTN_CONTINUE=继续(&C)
 BTN_YES=&Yes
 BTN_NO=&No
 BTN_HELP=&Help
+
+; x11util.c
+MSG_X_AUTH_ERROR=从远程X应用程序收到一个无效的认证数据。\nX会话将被关闭。
 
 
 [TTProxy]
@@ -1218,3 +1230,7 @@ DLG_ENABLE=启用(&E)
 DLG_INTERVAL=间隔(秒)(&I)
 DLG_COMMAND=命令(&C)
 DLG_ADD_NEWLINE=添加新行(&A)
+
+[TTXCheckUpdate]
+MSG_CHECKUPDATE=Check for updates automatically?\n  %s
+MENU_CHECKUPDATE=Check for &Updates...
