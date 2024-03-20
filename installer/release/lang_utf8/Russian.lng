@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-02-27)
+﻿; Updated by TeraTerm Project (2024-03-14)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -167,6 +167,8 @@ FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE=Выберите файл, включа�
 FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=txt(*.txt)\0*.txt\0all(*.*)\0*.*\0\0
 MSG_LOGFILE_INVALID_CHAR_ERROR=В названии лог-файла обнаружен недопустимый символ.
 MSG_LOGFILE_TOOLONG_ERROR=Название лог-файла содержит слишком много символов.
+MSG_TT_FILE_OPEN_ERROR=Tera Term: File open error
+MSG_LOGFILE_WRITE_ERROR=Cannot write log file.\n%s
 MSG_SAVESETUP_PERMISSION_ERROR=Файл TERATERM.INI не предназначен для перезаписи.
 
 DLG_TABSHEET_TITLE=Tera Term: Дополнительные настройки

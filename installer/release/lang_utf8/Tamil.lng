@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-02-27)
+﻿; Updated by TeraTerm Project (2024-03-14)
 ; Last translated (Tamil language) by திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -167,6 +167,8 @@ FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE=உறுதிபடுத்திம�
 FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=உரை(*.txt)\0*.txt\0அனைத்தும்(*.*)\0*.*\0\0
 MSG_LOGFILE_INVALID_CHAR_ERROR=தவறான எழுத்து பதிவு கோப்பு பெயரில் சேர்க்கப்பட்டுள்ளது.
 MSG_LOGFILE_TOOLONG_ERROR=பதிவு கோப்பு பெயர் மிக நீளமாக உள்ளது.
+MSG_TT_FILE_OPEN_ERROR=Tera Term: File open error
+MSG_LOGFILE_WRITE_ERROR=Cannot write log file.\n%s
 MSG_SAVESETUP_PERMISSION_ERROR=TERATERM.INI கோப்பில் எழுதக்கூடிய அனுமதி இல்லை.
 
 DLG_TABSHEET_TITLE=தேரா முனை: கூடுதல் அமைப்புகள்

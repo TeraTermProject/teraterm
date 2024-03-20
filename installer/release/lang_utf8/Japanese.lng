@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-02-27)
+﻿; Updated by TeraTerm Project (2024-03-14)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -166,6 +166,8 @@ FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE=ペースト時に警告するキーワ�
 FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=txt(*.txt)\0*.txt\0すべてのファイル(*.*)\0*.*\0\0
 MSG_LOGFILE_INVALID_CHAR_ERROR=ログファイル名に無効な文字が含まれています
 MSG_LOGFILE_TOOLONG_ERROR=ログファイル名が長すぎます
+MSG_TT_FILE_OPEN_ERROR=Tera Term: ファイル オープン エラー
+MSG_LOGFILE_WRITE_ERROR=ログファイルに書き込めません。\n%s
 MSG_SAVESETUP_PERMISSION_ERROR=TERATERM.INI に書き込み権限がありません
 
 DLG_TABSHEET_TITLE=Tera Term: その他の設定

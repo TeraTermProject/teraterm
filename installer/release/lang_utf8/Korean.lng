@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-02-27)
+﻿; Updated by TeraTerm Project (2024-03-14)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -167,6 +167,8 @@ FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE=변경-붙여넣기 확인을 위한 문
 FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=txt(*.txt)\0*.txt\0all(*.*)\0*.*\0\0
 MSG_LOGFILE_INVALID_CHAR_ERROR=로그파일 이름에 사용불가능한 문자가 포함됐습니다.
 MSG_LOGFILE_TOOLONG_ERROR=로그파일 이름이 너무 깁니다.
+MSG_TT_FILE_OPEN_ERROR=Tera Term: File open error
+MSG_LOGFILE_WRITE_ERROR=Cannot write log file.\n%s
 MSG_SAVESETUP_PERMISSION_ERROR=TERATERM.INI 파일이 쓰기권한을 가지고 있지 않습니다.
 
 DLG_TABSHEET_TITLE=Tera Term: 추가 설정
