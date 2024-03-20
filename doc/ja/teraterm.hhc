@@ -445,13 +445,6 @@
 				<param name="Local" value="html\menu\setup-keyboard.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
-			<UL>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Keyboard(Russian)">
-					<param name="Local" value="html\menu\setup-keyboard_ru.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Serial port">
 				<param name="Local" value="html\menu\setup-serialport.html">

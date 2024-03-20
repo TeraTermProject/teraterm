@@ -4451,12 +4451,7 @@ void CVTWindow::OnSetupKeyboard()
 {
 	BOOL Ok;
 
-	if (ts.Language==IdRussian) {
-		HelpId = HlpSetupKeyboardRuss;
-	}
-	else {
-		HelpId = HlpSetupKeyboard;
-	}
+	HelpId = HlpSetupKeyboard;
 	if (! LoadTTDLG()) {
 		return;
 	}
