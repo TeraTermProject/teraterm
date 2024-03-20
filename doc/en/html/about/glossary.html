@@ -64,23 +64,6 @@ This window is not displayed when Tera Term is started.
 [Control]-[Open TEK] command opens TEK window.
 </dd>
 
-<dt id="UTF-8">UTF-8, UTF-8m</dt>
-<dd>
-  <p>
-    Character code encoded Unicode with MBCS from 1 byte to 4 bytes.
-  </p>
-
-  <p>
-    A single character to be displayed can be created from multiple Unicode characters.
-    ex. U+0061 + U+0302 ( a+ ^ -> &#x00E2; ).
-    Tera Term 4 uses the character code "UTF-8m", which is used in the macOS file system HFS+.
-  </p>
-
-  <p>
-    All UTF-8 can be used with character code "UTF-8" on Tera Term 5
-  </p>
-</dd>
-
 <dt>VT100</dt>
 <dd>Name of DEC(Digital Equipment Corporation)'s terminal.
 The terminal was used widely for Unix, VAX/VMS, and other computers.
@@ -113,6 +96,91 @@ Window for VT terminal emulation.</dd>
 <dd>XMODEM, YMODEM を(それらの原形をとどめないほどに)改良したファイル転送プロトコル。エラー訂正機能が強化され、制御文字の一部を通さない回線にも対応し、転送速度をあげるための工夫がなされています。
 -->
 
+</dl>
+
+<h2>Charactor code</h2>
+
+Glossary related to character codes.
+
+<dl>
+  <dt id="CJK">CJK, CJKV, East Asian characters</dt>
+
+  <dd>
+    <p>
+      Languages with a writing system that includes Kanji characters.
+      CJK(CJKV) = Chinese, Japanese, Korean, (Vietnamese)。
+    </p>
+
+    <p>
+      CJK(CJKV) environment, <a href="#DBCS">Double-byte characters</a> are used
+      to represent a character with two bytes,
+      since not all characters used can be represented with one byte.<br>
+      Before Unicode became popular, character codes were developed for each environment.
+    </p>
+
+    <p>
+      Major DBCS
+<pre>
+| Language                      | Code(CodePage)     |
+|-------------------------------|--------------------|
+| Chinese (Simplified Chinese)  | GB2312(CP936)      |
+| Chinese (Traditional Chinese) | Big5(CP950)        |
+| Japanese                      | `Shift_JIS(CP932)` |
+|                               | EUC(EUC-JP,CP51932)|
+| Korean                        | KS5601(CP949)      |
+</pre>
+
+<!--
+      Tera Termはベトナム語漢字(チュノム)独自の文字コードをサポートしていません。<br>
+      Unicodeを使用した表示には対応してします。
+-->
+
+    </p>
+  </dd>
+
+  <dt id="SBCS">SBCS</dt>
+  <dd>
+    Single-byte character set.<br>
+    Up to 256 types of characters can be represented.
+  </dd>
+
+  <dt id="DBCS">DBCS</dt>
+  <dd>
+    Double-byte character set.<br>
+    DBCS is a character set that extends SBCS and can represent characters including Kanji characters.<br>
+    Mixed 1-byte and 2-byte characters.<br>
+    Shift_jis is one example of DBCS.
+  </dd>
+
+  <dt id="MBCS">MBCS</dt>
+  <dd>
+    Multi-byte Character Set.<br>
+    Characters of 3 bytes or more are used.<br>
+    JIS, UTF-8, etc.
+  </dd>
+
+<dt id="UTF-8">UTF-8, UTF-8m</dt>
+<dd>
+  Character code encoded Unicode with MBCS from 1 byte to 4 bytes.
+
+  <p>
+    A single character to be displayed can be created from multiple Unicode characters.
+    ex. U+0061 + U+0302 ( a+ ^ -> &#x00E2; ).
+    Tera Term 4 uses the character code "UTF-8m", which is used in the macOS file system HFS+.
+  </p>
+
+  <p>
+    "UTF-8m" has been merged into "UTF-8" on Tera Term 5.
+  </p>
+</dd>
+
+  <dt>wide character</dt>
+  <dd>
+    A character representation in which smallest character unit is two or more bytes.<br>
+    In C language, wchar_t type.<br>
+    In C, type wchar_t. In C/C++ language for Windows (Visual Studio), wchar_t type is 2 bytes.<br>
+    The Windows API uses 2-byte wide characters and the character encoding is UTF-16LE.
+  </dd>
 </dl>
 
 </BODY>
