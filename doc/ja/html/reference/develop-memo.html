@@ -22,11 +22,37 @@
 
 <h2 id="ini-entry">TERATERM.INI への項目追加</h2>
 
+<h3>項目名</h3>
+
 <p>
-項目名<br />
 すでに EnableFoo... や DisableBar... が混在してしまっているが、混乱しやすい。<br />
 今後は Baz... という形式にするのが望ましい。
 </p>
+
+<h3>変更箇所</h3>
+
+<ul>
+  <li>ソースコード
+    <ul>
+      <li>INI ファイルの読み書き部分<br />
+          teraterm\ttpset\ttset.c</li>
+      <li>tttset 構造体<br />
+          teraterm\common\tttypes.h</li>
+    </ul>
+  </li>
+  <li>ドキュメント
+    <ul>
+      <li>Tera Term 設定ファイルの全項目一覧<br />
+          setup/teraterm-ini.html</li>
+      <li>設定ダイアログのヘルプ（ダイアログに変更 UI がある場合）<br />
+          menu 以下のダイアログのページ</li>
+      <li>設定項目のヘルプ（ダイアログに変更 UI がない場合）<br />
+          setup 以下の該当する分類のページ</li>
+    </ul>
+  </li>
+  <li>デフォルトの INI ファイル<br />
+      installer\release\TERATERM.INI）</li>
+</ul>
 
 
 <h2 id="menu-id">メニューID追加時の命名規則</h2>

@@ -22,11 +22,37 @@
 
 <h2 id="ini-entry">Add entry to TERATERM.INI</h2>
 
+<h3>Entry name</h3>
+
 <p>
-Entry name<br />
 Unfortunately, the confusing entries such as EnableFoo... and DisableBar... are included.<br />
 It recommends that the new name like as Baz....
 </p>
+
+<h3>Changes</h3>
+
+<ul>
+  <li>source code
+    <ul>
+      <li>read/write INI file<br />
+          teraterm\ttpset\ttset.c</li>
+      <li>struct tttset<br />
+          teraterm\common\tttypes.h</li>
+    </ul>
+  </li>
+  <li>Document
+    <ul>
+      <li>All items of Tera Term setup file<br />
+          setup/teraterm-ini.html</li>
+      <li>help for setup dialog (when UI for change is present in a dialog)<br />
+          dialog page under menu</li>
+      <li>help for setup item (when UI for change is not present in a dialog)<br />
+          category page under setup</li>
+    </ul>
+  </li>
+  <li>Default INI file<br />
+      installer\release\TERATERM.INI)</li>
+</ul>
 
 
 <h2 id="menu-id">Naming rule to add menu ID</h2>
