@@ -35,3 +35,12 @@ for ($i = 0; $i < 80; $i++) {
 	print "\N{U+0302}";
 	usleep($sleep_time);
 }
+
+# U+08fbb U+E0100 ( 辻 + IVS(U+E0100) → 辻󠄀 )
+# 異体字セレクタ 漢字異体字シーケンス(IVS)
+for ($i = 0; $i < 40; $i++) {
+	print "\N{U+08fbb}";
+	usleep($sleep_time);
+	print "\N{U+E0100}";
+	usleep($sleep_time);
+}

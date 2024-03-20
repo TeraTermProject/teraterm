@@ -3016,7 +3016,7 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 					StrChangeStart = 0;
 				}
 				else {
-					StrChangeStart = CursorX - StrChangeCount + 1;
+					StrChangeStart = CursorX - StrChangeCount;
 				}
 			}
 		}
