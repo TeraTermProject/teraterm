@@ -2089,7 +2089,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->Dec2Unicode = FALSE;
 
 	// 自動バックアップ
-	ts->EnableIniAutoBackup = GetOnOff(Section, "EnableIniAutoBackup", FName, TRUE);
+	ts->IniAutoBackup = GetOnOff(Section, "IniAutoBackup", FName, TRUE);
 
 	// Experimental
 	ts->ExperimentalTreeProprtySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
@@ -3320,7 +3320,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "NotifySound", FName, ts->NotifySound);
 
 	// 自動バックアップ
-	WriteOnOff(Section, "EnableIniAutoBackup", FName, ts->EnableIniAutoBackup);
+	WriteOnOff(Section, "IniAutoBackup", FName, ts->IniAutoBackup);
 }
 
 void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,

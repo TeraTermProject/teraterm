@@ -4611,7 +4611,7 @@ void CVTWindow::OnSetupSave()
 
 		if (wcscmp(PrevSetupFNW, ts.SetupFNameW) == 0) {
 			// 同名ファイルへ書き込み(上書き)
-			if (ts.EnableIniAutoBackup) {
+			if (ts.IniAutoBackup) {
 				// バックアップを作成
 				CreateBakupFile(ts.SetupFNameW, NULL);
 			}
