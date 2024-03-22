@@ -160,8 +160,8 @@ typedef struct _TS_SSH {
 	char KnownHostsFiles[2048];
 	int DefaultAuthMethod;
 	char DefaultRhostsLocalUserName[256];
-	char DefaultRhostsHostPrivateKeyFile[1024];
-	char DefaultRSAPrivateKeyFile[1024];
+	wchar_t DefaultRhostsHostPrivateKeyFile[1024];
+	wchar_t DefaultRSAPrivateKeyFile[1024];
 
 	char DefaultForwarding[4096];
 	BOOL TryDefaultAuth;
@@ -312,7 +312,7 @@ typedef struct _TInstVar {
 	SSHAuthMethod ssh2_authmethod;
 	char ssh2_username[MAX_PATH];
 	char ssh2_password[MAX_PATH];
-	char ssh2_keyfile[MAX_PATH];
+	wchar_t ssh2_keyfile[MAX_PATH];
 	time_t ssh_heartbeat_tick;
 	HANDLE ssh_heartbeat_thread;
 	int keyboard_interactive_password_input;

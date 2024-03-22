@@ -123,12 +123,12 @@ static BOOL normalize_key(RSA *key)
 }
 
 static RSA *read_RSA_private_key(PTInstVar pvar,
-                                 char * relative_name,
+                                 const wchar_t * relative_name,
                                  char * passphrase,
                                  BOOL * invalid_passphrase,
                                  BOOL is_auto_login)
 {
-	char filename[2048];
+	wchar_t *filename;
 	int fd;
 	unsigned int length, amount_read;
 	unsigned char *keyfile_data;
@@ -140,10 +140,10 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 
 	*invalid_passphrase = FALSE;
 
-	get_teraterm_dir_relative_name(filename, sizeof(filename),
-	                               relative_name);
+	filename = get_teraterm_dir_relative_nameW(relative_name);
 
-	fd = _open(filename, _O_RDONLY | _O_SEQUENTIAL | _O_BINARY);
+	fd = _wopen(filename, _O_RDONLY | _O_SEQUENTIAL | _O_BINARY);
+	free(filename);
 	if (fd == -1) {
 		if (errno == ENOENT) {
 			UTIL_get_lang_msg("MSG_KEYFILES_READ_ENOENT_ERROR", pvar,
@@ -345,7 +345,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 }
 
 Key *KEYFILES_read_private_key(PTInstVar pvar,
-                               char * relative_name,
+                               const wchar_t * relative_name,
                                char * passphrase,
                                BOOL * invalid_passphrase,
                                BOOL is_auto_login)
@@ -1802,21 +1802,19 @@ error:
 	return (NULL);
 }
 
-ssh2_keyfile_type get_ssh2_keytype(char *relative_name,
+ssh2_keyfile_type get_ssh2_keytype(const wchar_t *relative_name,
                                    FILE **fp,
                                    char *errmsg,
                                    int errmsg_len) {
 	ssh2_keyfile_type ret = SSH2_KEYFILE_TYPE_NONE;
-	char filename[2048];
+	wchar_t *filename;
 	char line[200];
 	int i;
 
-	// 相対パスを絶対パスへ変換する。こうすることにより、「ドットで始まる」ディレクトリに
-	// あるファイルを読み込むことができる。(2005.2.7 yutaka)
-	get_teraterm_dir_relative_name(filename, sizeof(filename),
-	                               relative_name);
+	filename = get_teraterm_dir_relative_nameW(relative_name);
 
-	*fp = fopen(filename, "r");
+	*fp = _wfopen(filename, L"r");
+	free(filename);
 	if (*fp == NULL) {
 		strncpy_s(errmsg, errmsg_len, strerror(errno), _TRUNCATE);
 		return ret;
