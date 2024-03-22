@@ -4995,10 +4995,16 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			pvar->ts_SSH =
 				(TS_SSH *) MapViewOfFile(__mem_mapping, FILE_MAP_WRITE, 0,
 				                         0, 0);
+			if (pvar->ts_SSH->struct_size != sizeof(TS_SSH)) {
+				// 構造体サイズが異なっていたら共有メモリは使用しない
+				// バージョンが異なるときや開発時に発生する
+				pvar->ts_SSH = NULL;
+			}
 		}
 		if (pvar->ts_SSH == NULL) {
 			/* fake it. The settings won't be shared, but what the heck. */
 			pvar->ts_SSH = (TS_SSH *) malloc(sizeof(TS_SSH));
+			pvar->ts_SSH->struct_size = sizeof(TS_SSH);
 			if (__mem_mapping != NULL) {
 				CloseHandle(__mem_mapping);
 			}

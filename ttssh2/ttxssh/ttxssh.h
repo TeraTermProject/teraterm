@@ -145,6 +145,7 @@ These are the fields that WOULD go in Tera Term's 'ts' structure, if
 we could put them there.
 */
 typedef struct _TS_SSH {
+	DWORD struct_size;
 	BOOL Enabled;
 	int CompressionLevel; /* 0 = NONE, else 1-9 */
 
