@@ -400,9 +400,9 @@ void logprintf(int level, const char *fmt, ...);
 void logprintf_hexdump(int level, const char *data, int len, const char *fmt, ...);
 #endif
 
-void get_teraterm_dir_relative_name(char *buf, int bufsize, char *basename);
+void get_teraterm_dir_relative_name(char *buf, int bufsize, const char *basename);
 wchar_t *get_teraterm_dir_relative_nameW(const wchar_t *basename);
-int copy_teraterm_dir_relative_path(char *dest, int destsize, char *basename);
+int copy_teraterm_dir_relative_path(char *dest, int destsize, const char *basename);
 wchar_t *get_home_dir_relative_nameW(const wchar_t *basename);
 wchar_t *get_log_dir_relative_nameW(const wchar_t *basename);
 int uuencode(unsigned char *src, int srclen, unsigned char *target, int targsize);
