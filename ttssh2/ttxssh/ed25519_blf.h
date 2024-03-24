@@ -34,7 +34,6 @@
 #ifndef _BLF_H_
 #define _BLF_H_
 
-//#include "includes.h"
 #include "ed25519_crypto_api.h"
 #include <malloc.h>
 
@@ -92,4 +91,3 @@ u_int32_t Blowfish_stream2word(const u_int8_t *, u_int16_t , u_int16_t *);
 
 #endif /* !defined(HAVE_BCRYPT_PBKDF) && !defined(HAVE_BLH_H) */
 #endif /* _BLF_H */
-

@@ -6,10 +6,8 @@
  * Copied from supercop-20130419/crypto_sign/ed25519/ref/ed25519.c
  */
 
-//#include "includes.h"
 #include "ed25519_crypto_api.h"
 #include "ed25519_ge25519.h"
-#include "ttxssh.h"
 
 static void get_hram(unsigned char *hram, const unsigned char *sm, const unsigned char *pk, unsigned char *playground, unsigned long long smlen)
 {

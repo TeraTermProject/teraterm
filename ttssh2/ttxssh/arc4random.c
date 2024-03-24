@@ -39,13 +39,13 @@
 #include <process.h>
 
 #define KEYSTREAM_ONLY
-#include "ttxssh.h"
 
 /*
  * このソースは OpenSSL のときだけ使われる
  * LibreSSL のときは libressl/crypto/compat/arc4random.c,
  * crypto/compat/getentropy_win.c が使われる
  */
+#include "openssl/opensslv.h"  // for LIBRESSL_VERSION_NUMBER
 #ifndef LIBRESSL_VERSION_NUMBER
 
 #include "arc4random.h"

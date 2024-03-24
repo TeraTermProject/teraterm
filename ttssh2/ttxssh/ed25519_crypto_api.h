@@ -32,11 +32,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "openssl/opensslv.h"	// for LIBRESSL_VERSION_NUMBER
 #ifndef LIBRESSL_VERSION_NUMBER
   #include "arc4random.h"
 #else
+  #if defined(__MINGW32__) || (_MSC_VER >= 1600)
+    #include <stdint.h>
+  #else
+    // VS2008より古いと stdint.h がないので互換ヘッダを使う
+	//   TODO libressl が 2008 でビルドできるかは不明
+    #include "compat/stdint.h"
+  #endif
   // include LibreSSL header file
-  #include <compat/stdlib.h>
+  #include "compat/stdlib.h"
 #endif
 
 typedef unsigned char u_int8_t;

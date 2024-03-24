@@ -60,6 +60,22 @@ if(${SRC_DIR}/COPYING IS_NEWER_THAN ${CMAKE_CURRENT_LIST_DIR}/doc_help/LibreSSL-
     ${CMAKE_CURRENT_LIST_DIR}/doc_help/LibreSSL-LICENSE.txt)
 endif()
 
+function(file_copy SRC DEST_DIR DEST)
+  set(SRC_FILE ${SRC})
+  set(DEST_FILE ${DEST_DIR}/${DEST})
+  file(SHA256 ${SRC_FILE} SRC_HASH)
+  if (EXISTS ${DEST_FILE})
+    file(SHA256 ${DEST_FILE} DEST_HASH)
+  else()
+    set(DEST_HASH "0")
+  endif()
+  if (NOT ${SRC_HASH} STREQUAL ${DEST_HASH})
+    file(COPY ${SRC_FILE} DESTINATION ${DEST_DIR})
+  endif()
+endfunction()
+
+file_copy(${SRC_DIR}/include/compat/stdlib.h ${CMAKE_CURRENT_LIST_DIR}/include/compat stdlib.h)
+
 ########################################
 
 file(MAKE_DIRECTORY "${BUILD_DIR}")
