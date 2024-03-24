@@ -163,12 +163,12 @@ endfunction()
 # libressl
 function(download_libressl)
   message("libressl")
-  set(DIR_IN_ARC "libressl-3.8.2")
+  set(DIR_IN_ARC "libressl-3.9.0")
   set(RENAME_DIR "libressl")
   set(CHECK_FILE "libressl/ChangeLog")
-  set(CHECK_HASH "c53a6e948c92c414235f524b20ce3c314eebb1484101c0744022b2e77b5661a4")
-  set(SRC_URL "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-3.8.2.tar.gz")
-  set(ARC_HASH "6d4b8d5bbb25a1f8336639e56ec5088052d43a95256697a85c4ce91323c25954")
+  set(CHECK_HASH "957e7339239ecafc11f4e4ea04115a96432c92d0c6300072e89c9557b65a3ca9")
+  set(SRC_URL "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-3.9.0.tar.gz")
+  set(ARC_HASH "1cc232418498de305e6d5cb80c94a16415c01dcb3cd98f2e8c3a2202091a3420")
   #   ARC_HASH was picked from https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/SHA256
   set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/libressl")
   download_extract(
