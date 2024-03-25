@@ -6,8 +6,6 @@ D. J. Bernstein
 Public domain.
 */
 
-// #include "includes.h"
-
 /*
  * このソースは OpenSSL のときだけ使われる
  * LibreSSL のときは libressl/crypto/compat/chacha_private.h が使われる

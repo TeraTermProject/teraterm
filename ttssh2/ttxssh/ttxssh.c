@@ -1362,15 +1362,11 @@ static void PASCAL TTXWriteINIFile(const wchar_t *fileName, PTTSet ts)
 static void read_ssh_options_from_user_file(PTInstVar pvar,
                                             const wchar_t *user_file_name)
 {
-	if (user_file_name[0] == '.') {
-		read_ssh_options(pvar, user_file_name);
-	} else {
-		wchar_t *fname;
+	wchar_t *fname;
 
-		fname = get_teraterm_dir_relative_nameW(user_file_name);
-		read_ssh_options(pvar, fname);
-		free(fname);
-	}
+	fname = get_home_dir_relative_nameW(user_file_name);
+	read_ssh_options(pvar, fname);
+	free(fname);
 
 	pvar->settings = *pvar->ts_SSH;
 	FWDUI_load_settings(pvar);
@@ -1664,7 +1660,10 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 				WideCharToACP_t(option + 8, pvar->ssh2_password, sizeof(pvar->ssh2_password));
 
 			} else if (wcsncmp(option + 1, L"keyfile=", 8) == 0) {
-				WideCharToACP_t(option + 9, pvar->ssh2_keyfile, sizeof(pvar->ssh2_keyfile));
+				wchar_t *keyfileW = option + 9;
+				keyfileW = get_home_dir_relative_nameW(keyfileW);
+				WideCharToACP_t(keyfileW, pvar->ssh2_keyfile, sizeof(pvar->ssh2_keyfile));
+				free(keyfileW);
 
 			} else if (wcscmp(option + 1, L"ask4passwd") == 0) {
 				// パスワードを聞く (2006.9.18 maya)
@@ -2068,7 +2067,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 
 static void init_about_dlg(PTInstVar pvar, HWND dlg)
 {
-	char buf[1024], tmpbuf[128];
+	char buf[1024];
 	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_ABOUT_TITLE" },
 		{ IDC_FP_HASH_ALG, "DLG_ABOUT_FP_HASH_ALGORITHM" },
@@ -2475,8 +2474,7 @@ wchar_t *get_teraterm_dir_relative_nameW(const wchar_t *basename)
 	wchar_t *path;
 	wchar_t *ret;
 
-	if (basename[0] == '\\' || basename[0] == '/'
-	 || (basename[0] != 0 && basename[1] == ':')) {
+	if (!IsRelativePathW(basename)) {
 		return _wcsdup(basename);
 	}
 
@@ -2487,15 +2485,13 @@ wchar_t *get_teraterm_dir_relative_nameW(const wchar_t *basename)
 	return ret;
 }
 
-void get_teraterm_dir_relative_name(char *buf, int bufsize,
-                                    char *basename)
+void get_teraterm_dir_relative_name(char *buf, int bufsize, const char *basename)
 {
 	int filename_start = 0;
 	int i;
 	int ch;
 
-	if (basename[0] == '\\' || basename[0] == '/'
-	 || (basename[0] != 0 && basename[1] == ':')) {
+	if (!IsRelativePathA(basename)) {
 		strncpy_s(buf, bufsize, basename, _TRUNCATE);
 		return;
 	}
@@ -2512,16 +2508,14 @@ void get_teraterm_dir_relative_name(char *buf, int bufsize,
 	}
 }
 
-int copy_teraterm_dir_relative_path(char *dest, int destsize,
-                                    char *basename)
+int copy_teraterm_dir_relative_path(char *dest, int destsize, const char *basename)
 {
 	char buf[1024];
 	int filename_start = 0;
 	int i;
 	int ch, ch2;
 
-	if (basename[0] != '\\' && basename[0] != '/'
-	 && (basename[0] == 0 || basename[1] != ':')) {
+	if (!IsRelativePathA(basename)) {
 		strncpy_s(dest, destsize, basename, _TRUNCATE);
 		return strlen(dest);
 	}

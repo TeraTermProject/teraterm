@@ -40,6 +40,7 @@
       <li>ダブルクリックでワード選択後のドラッグ時、EnableContinuedLineCopy を反映してするようにした。</li>
       <li>LogAutoStart=on でログ記録が開始できないとき、エラーメッセージを表示するようにした。</li>
       <li><a href="../setup/teraterm-win.html#textselect">SelectOnActivate</a> が off でも右クリックによる貼り付けは行われるようにした。</li>
+      <li>iniファイルを上書きする際に自動バックアップを作成するかどうかを <a href="../setup/teraterm-misc.html#IniAutoBackup">IniAutoBackup</a> で設定できるようにした。</li>
     </ul>
   </li>
 
@@ -62,6 +63,7 @@
   <li>その他
     <ul>
       <li>言語ファイルにタミル語(Tamil.lng)を追加した。</li>
+      <li><a href="#ttssh_3.3">TTSSH(3.3)</a>へ差し替えた。</li>
     </ul>
   </li>
 </ul>
@@ -3477,11 +3479,11 @@
 
 <h3 id="ttssh_3.3">YYYY.MM.DD (Ver 3.3 not released yet)</h3>
 <ul class="history">
-  <!--li>変更
+  <li>変更
     <ul>
-      <li></li>
+      <li>オプション(<a href="../commandline/ttssh.html#f">/f</a>, <a href="../commandline/ttssh.html#ssh-f">/ssh-f</a>, <a href="../commandline/ttssh.html#ssh-consume">/ssh-consume</a>, <a href="../commandline/ttssh.html#keyfile">/keyfile</a>)のファイル名が絶対パスでないときは、%APPDATA%\teraterm5\ からの相対パスとして扱うように変更した。</li>
     </ul>
-  </li-->
+  </li>
 
   <!--li>バグ修正
     <ul>

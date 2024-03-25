@@ -427,5 +427,21 @@ High DPI aware has some modes. For more reference, see the DPI AwarenessMode sec
 Tera Term is using the Per-monitor DPI awareness V2 feature that is supported on the Windows 10 Version 1703 or later. For more details of the Per-monitor DPI awareness V2, see the <a href="https://blogs.windows.com/buildingapps/2017/04/04/high-dpi-scaling-improvements-desktop-applications-windows-10-creators-update/" target="_blank"> High-DPI Scaling Improvements for Desktop Applications in the Windows 10 Creators Update (1703)</a>.
 </p>
 
+<h1 id="IniAutoBackup">Auto backup of Tera Term setup file</h1>
+
+<p>
+When overwriting an existing setup file, a backup file is created automatically.
+If you do not need a backup file, change the IniAutoBackup entry of [Tera Term] section as the following: 
+</p>
+
+<pre>
+IniAutoBackup=off
+</pre>
+
+<pre>
+Default:
+IniAutoBackup=on
+</pre>
+
 </BODY>
 </HTML>
