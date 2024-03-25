@@ -268,9 +268,19 @@ static BOOL read_BOOL_option(const wchar_t *fileName, char *keyName, BOOL def)
 static void read_string_option(const wchar_t *fileName, char *keyName,
                                char *def, char *buf, int bufSize)
 {
-
 	buf[0] = 0;
-	GetPrivateProfileString("TTSSH", keyName, def, buf, bufSize, fileName);
+	GetPrivateProfileStringAFileW("TTSSH", keyName, def, buf, bufSize, fileName);
+}
+
+static void read_string_optionW(const wchar_t *fileName, const char *keyName,
+                                char *def, wchar_t *bufW, size_t bufSize)
+{
+	wchar_t *keyW = ToWcharA(keyName);
+	wchar_t *defW = ToWcharA(def);
+	bufW[0] = 0;
+	GetPrivateProfileStringW(L"TTSSH", keyW, defW, bufW, (DWORD)bufSize, fileName);
+	free(keyW);
+	free(defW);
 }
 
 static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
@@ -280,6 +290,8 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 
 #define READ_STD_STRING_OPTION(name) \
 	read_string_option(fileName, #name, "", settings->name, sizeof(settings->name))
+#define READ_STD_STRING_OPTIONW(name) \
+	read_string_optionW(fileName, #name, "", settings->name, sizeof(settings->name))
 
 	settings->Enabled = read_BOOL_option(fileName, "Enabled", FALSE);
 
@@ -296,8 +308,8 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 
 	READ_STD_STRING_OPTION(DefaultForwarding);
 	READ_STD_STRING_OPTION(DefaultRhostsLocalUserName);
-	READ_STD_STRING_OPTION(DefaultRhostsHostPrivateKeyFile);
-	READ_STD_STRING_OPTION(DefaultRSAPrivateKeyFile);
+	READ_STD_STRING_OPTIONW(DefaultRhostsHostPrivateKeyFile);
+	READ_STD_STRING_OPTIONW(DefaultRSAPrivateKeyFile);
 
 	READ_STD_STRING_OPTION(CipherOrder);
 	normalize_cipher_order(settings->CipherOrder);
@@ -473,13 +485,13 @@ static void write_ssh_options(PTInstVar pvar, const wchar_t *fileName,
 	                          settings->DefaultRhostsLocalUserName,
 	                          fileName);
 
-	WritePrivateProfileString("TTSSH", "DefaultRhostsHostPrivateKeyFile",
-	                          settings->DefaultRhostsHostPrivateKeyFile,
-	                          fileName);
+	WritePrivateProfileStringW(L"TTSSH", L"DefaultRhostsHostPrivateKeyFile",
+	                           settings->DefaultRhostsHostPrivateKeyFile,
+	                           fileName);
 
-	WritePrivateProfileString("TTSSH", "DefaultRSAPrivateKeyFile",
-	                          settings->DefaultRSAPrivateKeyFile,
-	                          fileName);
+	WritePrivateProfileStringW(L"TTSSH", L"DefaultRSAPrivateKeyFile",
+	                           settings->DefaultRSAPrivateKeyFile,
+	                           fileName);
 
 	_itoa(settings->DefaultAuthMethod, buf, 10);
 	WritePrivateProfileString("TTSSH", "DefaultAuthMethod", buf, fileName);
@@ -1660,10 +1672,8 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 				WideCharToACP_t(option + 8, pvar->ssh2_password, sizeof(pvar->ssh2_password));
 
 			} else if (wcsncmp(option + 1, L"keyfile=", 8) == 0) {
-				wchar_t *keyfileW = option + 9;
-				keyfileW = get_home_dir_relative_nameW(keyfileW);
-				WideCharToACP_t(keyfileW, pvar->ssh2_keyfile, sizeof(pvar->ssh2_keyfile));
-				free(keyfileW);
+				const wchar_t *keyfileW = option + 9;
+				wcsncpy(pvar->ssh2_keyfile, keyfileW, _countof(pvar->ssh2_keyfile));
 
 			} else if (wcscmp(option + 1, L"ask4passwd") == 0) {
 				// パスワードを聞く (2006.9.18 maya)
@@ -4691,11 +4701,11 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 }
 
 
-static void _dquote_string(char *str, char *dst, int dst_len)
+static void _dquote_string(const wchar_t *str, wchar_t *dst, size_t dst_len)
 {
-	int i, len, n;
+	size_t i, len, n;
 
-	len = strlen(str);
+	len = wcslen(str);
 	n = 0;
 	for (i = 0 ; i < len ; i++) {
 		if (str[i] == '"')
@@ -4719,48 +4729,58 @@ static void _dquote_string(char *str, char *dst, int dst_len)
 	*dst = '\0';
 }
 
-static void dquote_string(char *str, char *dst, int dst_len)
+static void dquote_stringW(const wchar_t *str, wchar_t *dst, size_t dst_len)
 {
 	// ",スペース,;,^A-^_ が含まれる場合にはクオートする
-	if (strchr(str, '"') != NULL ||
-	    strchr(str, ' ') != NULL ||
-	    strchr(str, ';') != NULL ||
-	    strchr(str, 0x01) != NULL ||
-	    strchr(str, 0x02) != NULL ||
-	    strchr(str, 0x03) != NULL ||
-	    strchr(str, 0x04) != NULL ||
-	    strchr(str, 0x05) != NULL ||
-	    strchr(str, 0x06) != NULL ||
-	    strchr(str, 0x07) != NULL ||
-	    strchr(str, 0x08) != NULL ||
-	    strchr(str, 0x09) != NULL ||
-	    strchr(str, 0x0a) != NULL ||
-	    strchr(str, 0x0b) != NULL ||
-	    strchr(str, 0x0c) != NULL ||
-	    strchr(str, 0x0d) != NULL ||
-	    strchr(str, 0x0e) != NULL ||
-	    strchr(str, 0x0f) != NULL ||
-	    strchr(str, 0x10) != NULL ||
-	    strchr(str, 0x11) != NULL ||
-	    strchr(str, 0x12) != NULL ||
-	    strchr(str, 0x13) != NULL ||
-	    strchr(str, 0x14) != NULL ||
-	    strchr(str, 0x15) != NULL ||
-	    strchr(str, 0x16) != NULL ||
-	    strchr(str, 0x17) != NULL ||
-	    strchr(str, 0x18) != NULL ||
-	    strchr(str, 0x19) != NULL ||
-	    strchr(str, 0x1a) != NULL ||
-	    strchr(str, 0x1b) != NULL ||
-	    strchr(str, 0x1c) != NULL ||
-	    strchr(str, 0x1d) != NULL ||
-	    strchr(str, 0x1e) != NULL ||
-	    strchr(str, 0x1f) != NULL) {
+	if (wcschr(str, '"') != NULL ||
+	    wcschr(str, ' ') != NULL ||
+	    wcschr(str, ';') != NULL ||
+	    wcschr(str, 0x01) != NULL ||
+	    wcschr(str, 0x02) != NULL ||
+	    wcschr(str, 0x03) != NULL ||
+	    wcschr(str, 0x04) != NULL ||
+	    wcschr(str, 0x05) != NULL ||
+	    wcschr(str, 0x06) != NULL ||
+	    wcschr(str, 0x07) != NULL ||
+	    wcschr(str, 0x08) != NULL ||
+	    wcschr(str, 0x09) != NULL ||
+	    wcschr(str, 0x0a) != NULL ||
+	    wcschr(str, 0x0b) != NULL ||
+	    wcschr(str, 0x0c) != NULL ||
+	    wcschr(str, 0x0d) != NULL ||
+	    wcschr(str, 0x0e) != NULL ||
+	    wcschr(str, 0x0f) != NULL ||
+	    wcschr(str, 0x10) != NULL ||
+	    wcschr(str, 0x11) != NULL ||
+	    wcschr(str, 0x12) != NULL ||
+	    wcschr(str, 0x13) != NULL ||
+	    wcschr(str, 0x14) != NULL ||
+	    wcschr(str, 0x15) != NULL ||
+	    wcschr(str, 0x16) != NULL ||
+	    wcschr(str, 0x17) != NULL ||
+	    wcschr(str, 0x18) != NULL ||
+	    wcschr(str, 0x19) != NULL ||
+	    wcschr(str, 0x1a) != NULL ||
+	    wcschr(str, 0x1b) != NULL ||
+	    wcschr(str, 0x1c) != NULL ||
+	    wcschr(str, 0x1d) != NULL ||
+	    wcschr(str, 0x1e) != NULL ||
+	    wcschr(str, 0x1f) != NULL) {
 		_dquote_string(str, dst, dst_len);
 		return;
 	}
 	// そのままコピーして戻る
-	strncpy_s(dst, dst_len, str, _TRUNCATE);
+	wcsncpy_s(dst, dst_len, str, _TRUNCATE);
+}
+
+static void dquote_string(const char *str, char *dst, size_t dst_len)
+{
+	wchar_t *dstW = malloc(sizeof(wchar_t) * dst_len);
+	wchar_t *strW = ToWcharA(str);
+	dquote_stringW(strW, dstW, dst_len);
+	WideCharToACP_t(dstW, dst, dst_len);
+	free(strW);
+	free(dstW);
 }
 
 static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
@@ -4845,13 +4865,14 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 
 			} else if (pvar->settings.remember_password &&
 			           pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
+				wchar_t markW[MAX_PATH];
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
 							 L" /auth=publickey /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
-				dquote_string(pvar->session_settings.DefaultRSAPrivateKeyFile, mark, sizeof(mark));
-				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L" /keyfile=%hs", mark);
+				dquote_stringW(pvar->session_settings.DefaultRSAPrivateKeyFile, markW, _countof(markW));
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L" /keyfile=%s", markW);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->settings.remember_password &&
@@ -4974,10 +4995,16 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			pvar->ts_SSH =
 				(TS_SSH *) MapViewOfFile(__mem_mapping, FILE_MAP_WRITE, 0,
 				                         0, 0);
+			if (pvar->ts_SSH->struct_size != sizeof(TS_SSH)) {
+				// 構造体サイズが異なっていたら共有メモリは使用しない
+				// バージョンが異なるときや開発時に発生する
+				pvar->ts_SSH = NULL;
+			}
 		}
 		if (pvar->ts_SSH == NULL) {
 			/* fake it. The settings won't be shared, but what the heck. */
 			pvar->ts_SSH = (TS_SSH *) malloc(sizeof(TS_SSH));
+			pvar->ts_SSH->struct_size = sizeof(TS_SSH);
 			if (__mem_mapping != NULL) {
 				CloseHandle(__mem_mapping);
 			}
