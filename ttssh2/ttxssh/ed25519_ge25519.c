@@ -6,8 +6,6 @@
  * Copied from supercop-20130419/crypto_sign/ed25519/ref/ge25519.c
  */
 
-//#include "includes.h"
-
 #include "ed25519_fe25519.h"
 #include "ed25519_sc25519.h"
 #include "ed25519_ge25519.h"
