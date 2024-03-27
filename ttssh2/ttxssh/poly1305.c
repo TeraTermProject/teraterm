@@ -7,8 +7,6 @@
 
 /* $OpenBSD: poly1305.c,v 1.3 2013/12/19 22:57:13 djm Exp $ */
 
-// #include "includes.h"
-
 // for Visual Studio 2005
 #pragma warning(disable : 4244)
 

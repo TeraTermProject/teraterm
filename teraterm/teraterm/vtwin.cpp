@@ -2094,9 +2094,11 @@ void CVTWindow::OnMButtonUp(WPARAM nFlags, POINTS point)
 
 LRESULT CVTWindow::OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message)
 {
-	if ((ts.SelOnActive==0) && (nHitTest==HTCLIENT)) { //disable mouse event for text selection
+	// eat mouse event for text selection
+	// when window is activated by L button
+	if ((ts.SelOnActive==0) && (nHitTest==HTCLIENT) && (message==WM_LBUTTONDOWN)) {
 		IgnoreRelease = TRUE;
-		return MA_ACTIVATEANDEAT; //     when window is activated
+		return MA_ACTIVATEANDEAT;
 	}
 	else {
 		return MA_ACTIVATE;
@@ -4623,8 +4625,10 @@ void CVTWindow::OnSetupSave()
 
 		if (wcscmp(PrevSetupFNW, ts.SetupFNameW) == 0) {
 			// 同名ファイルへ書き込み(上書き)
-			// バックアップを作成
-			CreateBakupFile(ts.SetupFNameW, NULL);
+			if (ts.IniAutoBackup) {
+				// バックアップを作成
+				CreateBakupFile(ts.SetupFNameW, NULL);
+			}
 		}
 		else {
 			// 異なるファイルへ書き込み
