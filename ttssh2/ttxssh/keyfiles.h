@@ -43,7 +43,7 @@ typedef enum {
 } ssh2_keyfile_type;
 
 Key * KEYFILES_read_private_key(PTInstVar pvar,
-                                char * relative_name,
+                                const wchar_t * relative_name,
                                 char * passphrase,
                                 BOOL * invalid_passphrase,
                                 BOOL is_auto_login);
@@ -72,7 +72,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
                                  char *errmsg,
                                  int errmsg_len);
 
-ssh2_keyfile_type get_ssh2_keytype(char *relative_name,
+ssh2_keyfile_type get_ssh2_keytype(const wchar_t *relative_name,
                                    FILE **fp,
                                    char *errmsg,
                                    int errmsg_len);
