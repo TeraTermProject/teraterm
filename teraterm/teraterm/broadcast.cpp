@@ -52,7 +52,7 @@
 #include "tt_res.h"
 #include "codeconv.h"
 #include "sendmem.h"
-//#include "clipboar.h"		// TODO 消す
+#include "clipboar.h"		// TODO 消す
 #include "ttime.h"
 
 #include "broadcast.h"
@@ -91,6 +91,8 @@
  */
 
 #define BROADCAST_LOGFILE L"broadcast.log"
+
+TTTSet ts;
 
 /**
  *	履歴を保存するファイル名(フルパス)を取得
@@ -140,6 +142,40 @@ BOOL IsUnicharSupport(HWND hwnd)
 // サブクラス化するためのウインドウプロシージャ
 static WNDPROC OrigBroadcastEditProc; // Original window procedure
 static HWND BroadcastWindowList;
+
+static void SendCB(HWND dlg) {
+	size_t len;
+	wchar_t *cbtext = NULL;
+	PreparePaste(dlg, FALSE, FALSE, &cbtext);
+	if (cbtext != NULL) {
+		len = wcslen(cbtext);
+		char32_t* strU32 = ToU32W(cbtext);
+		int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+		for (int i = 0; i < count; i++) {
+			if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
+				HWND hwnd = GetNthWin(i);
+				if (hwnd != NULL) {
+					BOOL support_unichar = IsUnicharSupport(hwnd);
+					if (!support_unichar) {
+						for (size_t j = 0; j < len; j++) {
+							::PostMessageW(hwnd, WM_CHAR, cbtext[j], 1);
+						}
+					}
+					else {
+						const char32_t* p = strU32;
+						while (*p != 0) {
+							::PostMessageW(hwnd, WM_UNICHAR, *p, 1);
+							p++;
+						}
+					}
+				}
+			}
+		}
+		free((void*)cbtext);
+		free(strU32);
+	}
+}
+
 static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
                                           WPARAM wParam, LPARAM lParam)
 {
@@ -163,9 +199,25 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 			break;
 
 		case WM_LBUTTONDOWN:
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONUP:
 			SetFocus(dlg);
+			break;
+
+		case WM_RBUTTONDOWN:
+		case WM_MBUTTONDOWN:
+			break;
+		case WM_RBUTTONUP:
+			if (ts.PasteFlag & CPF_DISABLE_RBUTTON) {
+				return FALSE;
+			}
+			SendCB(dlg);
+			return FALSE;
+			break;
+		case WM_MBUTTONUP:
+			if (ts.PasteFlag & CPF_DISABLE_MBUTTON) {
+				return FALSE;
+			}
+			SendCB(dlg);
+			return FALSE;
 			break;
 
 		case WM_KEYDOWN:

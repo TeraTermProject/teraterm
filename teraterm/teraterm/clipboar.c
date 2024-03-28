@@ -217,7 +217,7 @@ static void CBSendStart(wchar_t *str_w)
 	SendMemStart(sm);
 }
 
-void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
+void PreparePaste(HWND HWin, BOOL AddCR, BOOL Bracketed, wchar_t **text)
 {
 	wchar_t *str_w;
 	wchar_t *str_w_edited;
@@ -289,7 +289,14 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		str_w = dest;
 	}
 
-	CBSendStart(str_w);
+	*text = str_w;
+}
+
+void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
+{
+	wchar_t *text = NULL;
+	PreparePaste(HWin, AddCR, Bracketed, &text);
+	CBSendStart(text);
 }
 
 void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
