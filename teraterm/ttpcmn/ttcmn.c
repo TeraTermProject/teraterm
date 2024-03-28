@@ -259,20 +259,25 @@ void WINAPI SetWinList(HWND HWin, HWND HDlg, int IList)
 void WINAPI SelectWin(int WinId)
 {
 	if ((WinId>=0) && (WinId<pm->NWin)) {
-		/* ウィンドウが最大化および最小化されていた場合、その状態を維持できるように、
-		 * SW_SHOWNORMAL から SW_SHOW へ変更した。
-		 * (2009.11.8 yutaka)
-		 * ウィンドウが最小化されているときは元のサイズに戻す(SW_RESTORE)ようにした。
-		 * (2009.11.9 maya)
-		 */
-		if (IsIconic(pm->WinList[WinId])) {
-			ShowWindow(pm->WinList[WinId],SW_RESTORE);
-		}
-		else {
-			ShowWindow(pm->WinList[WinId],SW_SHOW);
-		}
-		SetForegroundWindow(pm->WinList[WinId]);
+		ForegroundWin(pm->WinList[WinId]);
 	}
+}
+
+void WINAPI ForegroundWin(HWND hWnd)
+{
+	/* ウィンドウが最大化および最小化されていた場合、その状態を維持できるように、
+	 * SW_SHOWNORMAL から SW_SHOW へ変更した。
+	 * (2009.11.8 yutaka)
+	 * ウィンドウが最小化されているときは元のサイズに戻す(SW_RESTORE)ようにした。
+	 * (2009.11.9 maya)
+	 */
+	if (IsIconic(hWnd)) {
+		ShowWindow(hWnd, SW_RESTORE);
+	}
+	else {
+		ShowWindow(hWnd, SW_SHOW);
+	}
+	SetForegroundWindow(hWnd);
 }
 
 void WINAPI SelectNextWin(HWND HWin, int Next, BOOL SkipIconic)
