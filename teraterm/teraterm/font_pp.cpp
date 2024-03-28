@@ -188,10 +188,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			CheckDlgButton(hWnd, IDC_LIST_HIDDEN_FONTS, ts->ListHiddenFonts);
 			EnableWindow(GetDlgItem(hWnd, IDC_LIST_HIDDEN_FONTS), IsWindows7OrLater() ? TRUE : FALSE);
 
-			SetDlgItemInt(hWnd, IDC_SPACE_RIGHT, ts->FontDW, FALSE);
-			SetDlgItemInt(hWnd, IDC_SPACE_LEFT, ts->FontDH, FALSE);
-			SetDlgItemInt(hWnd, IDC_SPACE_TOP, ts->FontDX, FALSE);
-			SetDlgItemInt(hWnd, IDC_SPACE_BOTTOM, ts->FontDY, FALSE);
+			SetDlgItemInt(hWnd, IDC_SPACE_LEFT, ts->FontDX, TRUE);
+			SetDlgItemInt(hWnd, IDC_SPACE_RIGHT, ts->FontDW, TRUE);
+			SetDlgItemInt(hWnd, IDC_SPACE_TOP, ts->FontDY, TRUE);
+			SetDlgItemInt(hWnd, IDC_SPACE_BOTTOM, ts->FontDH, TRUE);
 
 			SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
 
@@ -214,6 +214,29 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					SetDlgLogFont(GetParent(hWnd), &dlg_data->DlgFont, ts);
 
 					DispEnableResizedFont(IsDlgButtonChecked(hWnd, IDC_RESIZED_FONT) == BST_CHECKED);
+
+					BOOL parsed;
+					int dlgx, dlgw, dlgy, dlgh;
+					dlgx = GetDlgItemInt(hWnd, IDC_SPACE_LEFT, &parsed, TRUE);
+					if (parsed) {
+						dlgw = GetDlgItemInt(hWnd, IDC_SPACE_RIGHT, &parsed, TRUE);
+						if (parsed) {
+							dlgy = GetDlgItemInt(hWnd, IDC_SPACE_TOP, &parsed, TRUE);
+							if (parsed) {
+								dlgh = GetDlgItemInt(hWnd, IDC_SPACE_BOTTOM, &parsed, TRUE);
+								if (parsed) {
+									if (ts->FontDX != dlgx || ts->FontDW != dlgw || ts->FontDY != dlgy || ts->FontDH != dlgh) {
+										ts->FontDX = dlgx;
+										ts->FontDW = dlgw;
+										ts->FontDY = dlgy;
+										ts->FontDH = dlgh;
+										ChangeFont();
+										DispChangeWinSize(ts->TerminalWidth, ts->TerminalHeight);
+									}
+								}
+							}
+						}
+					}
 
 					break;
 				}

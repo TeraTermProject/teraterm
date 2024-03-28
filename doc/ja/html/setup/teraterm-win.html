@@ -313,10 +313,10 @@ UseTextColor=off
 </pre>
 
 
-<h1 id="space">文字(行)間にすきまをあける</h1>
+<h1 id="space">文字(行)間のすきまを調整する</h1>
 
 <p>
-文字(行)間にすきまをあけるには、設定ファイルの [Tera Term] セクションの VTFontSpace 行を以下のように変更してください。
+文字(行)間のすきまを調整するには、設定ファイルの [Tera Term] セクションの VTFontSpace 行を以下のように変更してください。
 </p>
 
 <pre>
@@ -336,6 +336,7 @@ VTFontSpace=&lt;dx1&gt;,&lt;dx2&gt;,&lt;dy1&gt;,&lt;dy2&gt;
 例:
 VTFontSpace=0,1,0,0    各文字の右側に1画素分のすきまをあける。
 VTFontSpace=0,0,1,0    各行の上側に1画素分のすきまをあける。
+VTFontSpace=0,0,-1,-1  各行の上下を1画素分狭める。
 </pre>
 
 <pre>
