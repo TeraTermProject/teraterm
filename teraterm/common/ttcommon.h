@@ -47,6 +47,7 @@ DllExport void PASCAL UnregWin(HWND HWin);
 DllExport void WINAPI SetWinMenuW(HMENU menu, const wchar_t *langFile, int VTFlag);
 DllExport void PASCAL SetWinList(HWND HWin, HWND HDlg, int IList);
 DllExport void PASCAL SelectWin(int WinId);
+DllExport void PASCAL ForegroundWin(HWND);
 DllExport void PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic);
 DllExport HWND PASCAL GetNthWin(int n);
 DllExport int PASCAL GetRegisteredWindowCount(void);
