@@ -3100,9 +3100,15 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		BIGNUM *sp, *sq, *sg, *spub_key;
 
 		// private key
-		priv = DSA_generate_parameters(bits, NULL, 0, NULL, NULL, cbfunc, cbarg);
-		if (priv == NULL)
+		priv = DSA_new();
+		BN_GENCB *cb = BN_GENCB_new();
+		BN_GENCB_set_old(cb, cbfunc, cbarg);
+		int r= DSA_generate_parameters_ex(priv, bits, NULL, 0, NULL, NULL, cb);
+		BN_GENCB_free(cb);
+		if (!r) {
+			DSA_free(priv);
 			goto error;
+		}
 		if (!DSA_generate_key(priv)) {
 			// TODO: free 'priv'?
 			goto error;
@@ -3112,6 +3118,7 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		// public key
 		pub = DSA_new();
 		if (pub == NULL)
+			// TODO: free 'priv'?
 			goto error;
 		p = BN_new();
 		q = BN_new();
@@ -3120,6 +3127,7 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		pub_key = BN_new();
 		DSA_set0_key(pub, pub_key, NULL);
 		if (p == NULL || q == NULL || g == NULL || pub_key == NULL) {
+			// TODO: free 'priv'?
 			DSA_free(pub);
 			goto error;
 		}
