@@ -741,6 +741,15 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				             dlg_w - ok2right, p.y, 0, 0,
 				             SWP_NOSIZE | SWP_NOZORDER);
 
+				// Fore button
+				GetWindowRect(GetDlgItem(hWnd, IDC_FORE_RECEIVER), &rc);
+				p.x = rc.left;
+				p.y = rc.top;
+				ScreenToClient(hWnd, &p);
+				SetWindowPos(GetDlgItem(hWnd, IDC_FORE_RECEIVER), 0,
+				             dlg_w - ok2right, p.y, 0, 0,
+				             SWP_NOSIZE | SWP_NOZORDER);
+
 				// Cancel button
 				GetWindowRect(GetDlgItem(hWnd, IDCANCEL), &rc);
 				p.x = rc.left;
