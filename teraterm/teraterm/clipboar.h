@@ -35,7 +35,7 @@ extern "C" {
 
 /* prototypes */
 
-void PreparePaste(HWND HWin, BOOL AddCR, BOOL Bracketed, wchar_t **text);
+void PreparePaste(HWND HWin, BOOL shouldBeReady, BOOL AddCR, BOOL Bracketed, wchar_t **text);
 
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed);
 void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer);

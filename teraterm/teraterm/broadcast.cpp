@@ -52,7 +52,7 @@
 #include "tt_res.h"
 #include "codeconv.h"
 #include "sendmem.h"
-#include "clipboar.h"		// TODO è¡Ç∑
+#include "clipboar.h"	// for PreparePaste()
 #include "ttime.h"
 
 #include "broadcast.h"
@@ -146,7 +146,7 @@ static HWND BroadcastWindowList;
 static void SendCB(HWND dlg) {
 	size_t len;
 	wchar_t *cbtext = NULL;
-	PreparePaste(dlg, FALSE, FALSE, &cbtext);
+	PreparePaste(dlg, FALSE, FALSE, FALSE, &cbtext);
 	if (cbtext != NULL) {
 		len = wcslen(cbtext);
 		char32_t* strU32 = ToU32W(cbtext);
