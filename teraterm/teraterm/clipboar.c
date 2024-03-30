@@ -296,7 +296,9 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 {
 	wchar_t *text = NULL;
 	PreparePaste(HWin, TRUE, AddCR, Bracketed, &text);
-	CBSendStart(text);
+	if (text != NULL) {
+		CBSendStart(text);
+	}
 }
 
 void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
