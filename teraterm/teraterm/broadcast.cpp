@@ -205,26 +205,26 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 		case WM_RBUTTONDOWN:
 		case WM_MBUTTONDOWN:
 			break;
+
 		case WM_RBUTTONUP:
 			if (ts.PasteFlag & CPF_DISABLE_RBUTTON) {
 				return FALSE;
 			}
 			SendCB(dlg);
 			return FALSE;
-			break;
+
 		case WM_MBUTTONUP:
 			if (ts.PasteFlag & CPF_DISABLE_MBUTTON) {
 				return FALSE;
 			}
 			SendCB(dlg);
 			return FALSE;
-			break;
 
 		case WM_KEYDOWN:
 		case WM_KEYUP:
 		case WM_SYSKEYDOWN:
 		case WM_SYSKEYUP:
-			if (ime_mode == FALSE) {
+			// if (ime_mode == FALSE) { // IME ON でも処理するべき
 				int i;
 				HWND hd;
 				int count;
@@ -244,14 +244,14 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 					}
 				}
 				return FALSE;
-			}
+			// }
 			break;
 
 		case WM_CHAR:
 			// 入力した文字がIDC_COMMAND_EDITに残らないように捨てる
-			if (ime_mode == FALSE) {
+			// if (ime_mode == FALSE) { // IME ON でも処理するべき
 				return FALSE;
-			}
+			// }
 			break;
 
 		case WM_IME_NOTIFY:
@@ -484,7 +484,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 		{ IDC_PARENT_ONLY, "DLG_BROADCAST_PARENTONLY" },
 		{ IDC_REALTIME_CHECK, "DLG_BROADCAST_REALTIME" },
 		{ IDOK, "DLG_BROADCAST_SUBMIT" },
-		{ IDCANCEL, "BTN_CLOSE" },
+		{ IDCANCEL, "DLG_BROADCAST_CLOSE" },
 	};
 	LRESULT checked;
 	LRESULT history;
@@ -734,6 +734,10 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 								ListBox_SetSel(BroadcastWindowList, TRUE, i);
 							}
 						}
+					}
+					// 手動でリストをリフレッシュする手段を提供する
+					if (HIWORD(wp) == LBN_DBLCLK && ShiftKey()) {
+						UpdateBroadcastWindowList(BroadcastWindowList);
 					}
 
 					return FALSE;
