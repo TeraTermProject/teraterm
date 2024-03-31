@@ -124,8 +124,10 @@
       <li>When reading a ttl file, it automatically determines the character encoding of the file and read while converting to UTF-8. However, the automatic determination of encoding can be incorrect.<br>
           Adding the BOM it will be read as UTF-8.</li>
       <li>The maximum number of labels and variables (numeric, string, numeric array, and string array) is unlimited from 256.</li>
-      <li>The maximum string length for character variables is 511 bytes, the same as Tera Term 4.<br>
-          for example, Kanji character increase the number of bytets per character. (example "&copy;" is 0xc2,0xa9 in UTF-8, 0xa9 in iso-8859-1.) String that could be set in Tera Term 4 may be corrupted in Tera Term 5.</li>
+      <li>The maximum string length for character variables is 511 bytes, the same as Tera Term 4.</li>
+      <li>Character encoding of string literals in ttl file is UTF-8, which is ACP (Shift_JIS(CP932) in Japanese environment) in Tera Term 4.</li>
+      <li>When string is assigned to string variable, character encoding is UTF-8, which is ACP in Tera Term 4.</li>
+      <li>For example, Kanji character increase the number of bytets per character. (example "&copy;" is 0xc2,0xa9 in UTF-8, 0xa9 in iso-8859-1.) String that could be set in Tera Term 4 may be corrupted in Tera Term 5.</li>
       <li>The unit of character length and character position (index, pos) for macro commands that handle characters is byte. This is the same as Tera Term 4.<br>
           However, the value is different from that of Tera Term 4 because the internal character encoding is different.</li>
       <li>Performing a string operation that breaks a sequence of bytes will break the character (string).This is the same as Tera Term 4.</li>
