@@ -487,6 +487,19 @@ static void ForeSelected()
 	}
 }
 
+static void MinimizeSelected()
+{
+	int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+	for (int i = 0; i < count; i++) {
+		if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
+			HWND hd = GetNthWin(i);
+			if (hd != NULL) {
+				ShowWindow(hd, SW_MINIMIZE);
+			}
+		}
+	}
+}
+
 //
 // すべてのターミナルへ同一コマンドを送信するモードレスダイアログの表示
 // (2005.1.22 yutaka)
@@ -862,6 +875,37 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				}
 			}
 			return TRUE;
+
+		case WM_CONTEXTMENU:
+			if ((HWND)wp == BroadcastWindowList) {
+				HMENU hMenu = CreatePopupMenu();
+				wchar_t *menuitem;
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_FOREGROUND", L"Bring selected window to foreground", ts.UILanguageFileW, &menuitem);
+				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 1, menuitem);
+				free(menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_MINIMIZE", L"Minimize selected window", ts.UILanguageFileW, &menuitem);
+				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 2, menuitem);
+				free(menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_REFRESH", L"Refresh window list", ts.UILanguageFileW, &menuitem);
+				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 3, menuitem);
+				free(menuitem);
+				int choice = TrackPopupMenu(hMenu, TPM_RETURNCMD, GET_X_LPARAM(lp), GET_Y_LPARAM(lp), 0, hWnd, NULL);
+				DestroyMenu(hMenu);
+				switch (choice) {
+				case 1:
+					ForeSelected();
+					break;
+				case 2: 
+					MinimizeSelected();
+					break;
+				case 3: 
+					UpdateBroadcastWindowList(BroadcastWindowList);
+					break;
+				default:
+					break;
+				}
+			}
+			break;
 
 		case WM_VKEYTOITEM:
 			// リストボックスでキー押下(CTRL+A)されたら、全選択。
