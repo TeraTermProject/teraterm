@@ -52,7 +52,7 @@
 #include "tt_res.h"
 #include "codeconv.h"
 #include "sendmem.h"
-//#include "clipboar.h"		// TODO 消す
+#include "clipboar.h"	// for PreparePaste()
 #include "ttime.h"
 
 #include "broadcast.h"
@@ -91,6 +91,8 @@
  */
 
 #define BROADCAST_LOGFILE L"broadcast.log"
+
+TTTSet ts;
 
 /**
  *	履歴を保存するファイル名(フルパス)を取得
@@ -140,6 +142,40 @@ BOOL IsUnicharSupport(HWND hwnd)
 // サブクラス化するためのウインドウプロシージャ
 static WNDPROC OrigBroadcastEditProc; // Original window procedure
 static HWND BroadcastWindowList;
+
+static void SendCB(HWND dlg) {
+	size_t len;
+	wchar_t *cbtext = NULL;
+	PreparePaste(dlg, FALSE, FALSE, FALSE, &cbtext);
+	if (cbtext != NULL) {
+		len = wcslen(cbtext);
+		char32_t* strU32 = ToU32W(cbtext);
+		int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+		for (int i = 0; i < count; i++) {
+			if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
+				HWND hwnd = GetNthWin(i);
+				if (hwnd != NULL) {
+					BOOL support_unichar = IsUnicharSupport(hwnd);
+					if (!support_unichar) {
+						for (size_t j = 0; j < len; j++) {
+							::PostMessageW(hwnd, WM_CHAR, cbtext[j], 1);
+						}
+					}
+					else {
+						const char32_t* p = strU32;
+						while (*p != 0) {
+							::PostMessageW(hwnd, WM_UNICHAR, *p, 1);
+							p++;
+						}
+					}
+				}
+			}
+		}
+		free((void*)cbtext);
+		free(strU32);
+	}
+}
+
 static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
                                           WPARAM wParam, LPARAM lParam)
 {
@@ -163,16 +199,36 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 			break;
 
 		case WM_LBUTTONDOWN:
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONUP:
 			SetFocus(dlg);
 			break;
+
+		case WM_RBUTTONDOWN:
+		case WM_MBUTTONDOWN:
+			break;
+
+		case WM_RBUTTONUP:
+			if (ts.PasteFlag & CPF_DISABLE_RBUTTON) {
+				return FALSE;
+			}
+			SendCB(dlg);
+			return FALSE;
+
+		case WM_MBUTTONUP:
+			if (ts.PasteFlag & CPF_DISABLE_MBUTTON) {
+				return FALSE;
+			}
+			SendCB(dlg);
+			return FALSE;
 
 		case WM_KEYDOWN:
 		case WM_KEYUP:
 		case WM_SYSKEYDOWN:
 		case WM_SYSKEYUP:
-			if (ime_mode == FALSE) {
+			if (ShiftKey() && wParam == 0x2d) { // intercept Shift-INS
+				SendCB(dlg);
+				return FALSE;
+			}
+			// if (ime_mode == FALSE) { // IME ON でも処理するべき
 				int i;
 				HWND hd;
 				int count;
@@ -192,14 +248,14 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 					}
 				}
 				return FALSE;
-			}
+			// }
 			break;
 
 		case WM_CHAR:
 			// 入力した文字がIDC_COMMAND_EDITに残らないように捨てる
-			if (ime_mode == FALSE) {
+			// if (ime_mode == FALSE) { // IME ON でも処理するべき
 				return FALSE;
-			}
+			// }
 			break;
 
 		case WM_IME_NOTIFY:
@@ -250,16 +306,45 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 	return CallWindowProcW(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
 }
 
-static void UpdateBroadcastWindowList(HWND hWnd)
+DWORD selected[MAXNWIN];
+static void KeepSelection()
 {
 	int i, count;
 	HWND hd;
-	TCHAR szWindowText[256];
+	for (int i = 0; i < MAXNWIN; i++) {
+		selected[i] = 0;
+	}
+	count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+	for (i = 0; i < count; i++) {
+		if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
+			hd = GetNthWin(i);
+			if (hd != NULL) {
+				GetWindowThreadProcessId(hd, &selected[i]);
+			}
+		}
+	}
+}
+static BOOL wasSelected(DWORD proc, int count) {
+	for (int i = 0; i < count; i++) {
+		if (selected[i] == proc) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
 
+static void UpdateBroadcastWindowList(HWND hWnd)
+{
+	int i, count, prevcount;
+	HWND hd;
+	TCHAR szWindowText[256];
+	DWORD proc;
+
+	prevcount = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
 	SendMessage(hWnd, LB_RESETCONTENT, 0, 0);
 
 	count = GetRegisteredWindowCount();
-	for (i = 0 ; i < count ; i++) {
+	for (i = 0; i < count; i++) {
 		hd = GetNthWin(i);
 		if (hd == NULL) {
 			break;
@@ -267,6 +352,8 @@ static void UpdateBroadcastWindowList(HWND hWnd)
 
 		GetWindowText(hd, szWindowText, 256);
 		SendMessage(hWnd, LB_INSERTSTRING, -1, (LPARAM)szWindowText);
+		GetWindowThreadProcessId(hd, &proc);
+		SendMessage(hWnd, LB_SETSEL, wasSelected(proc, prevcount), i);
 	}
 }
 
@@ -435,6 +522,19 @@ static void ForeSelected()
 	}
 }
 
+static void MinimizeSelected()
+{
+	int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+	for (int i = 0; i < count; i++) {
+		if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
+			HWND hd = GetNthWin(i);
+			if (hd != NULL) {
+				ShowWindow(hd, SW_MINIMIZE);
+			}
+		}
+	}
+}
+
 //
 // すべてのターミナルへ同一コマンドを送信するモードレスダイアログの表示
 // (2005.1.22 yutaka)
@@ -449,7 +549,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 		{ IDC_REALTIME_CHECK, "DLG_BROADCAST_REALTIME" },
 		{ IDC_FORE_RECEIVER, "DLG_BROADCAST_FOREGROUND" },
 		{ IDOK, "DLG_BROADCAST_SUBMIT" },
-		{ IDCANCEL, "BTN_CLOSE" },
+		{ IDCANCEL, "DLG_BROADCAST_CLOSE" },
 	};
 	LRESULT checked;
 	LRESULT history;
@@ -706,7 +806,9 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 							}
 						}
 					}
-
+					if (HIWORD(wp) == LBN_SELCHANGE) {
+						KeepSelection();
+					}
 					return FALSE;
 
 				default:
@@ -806,6 +908,37 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				}
 			}
 			return TRUE;
+
+		case WM_CONTEXTMENU:
+			if ((HWND)wp == BroadcastWindowList) {
+				HMENU hMenu = CreatePopupMenu();
+				wchar_t *menuitem;
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_FOREGROUND", L"Bring selected window to foreground", ts.UILanguageFileW, &menuitem);
+				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 1, menuitem);
+				free(menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_MINIMIZE", L"Minimize selected window", ts.UILanguageFileW, &menuitem);
+				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 2, menuitem);
+				free(menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_REFRESH", L"Refresh window list", ts.UILanguageFileW, &menuitem);
+				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 3, menuitem);
+				free(menuitem);
+				int choice = TrackPopupMenu(hMenu, TPM_RETURNCMD, GET_X_LPARAM(lp), GET_Y_LPARAM(lp), 0, hWnd, NULL);
+				DestroyMenu(hMenu);
+				switch (choice) {
+				case 1:
+					ForeSelected();
+					break;
+				case 2: 
+					MinimizeSelected();
+					break;
+				case 3: 
+					UpdateBroadcastWindowList(BroadcastWindowList);
+					break;
+				default:
+					break;
+				}
+			}
+			break;
 
 		case WM_VKEYTOITEM:
 			// リストボックスでキー押下(CTRL+A)されたら、全選択。

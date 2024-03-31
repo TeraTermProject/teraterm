@@ -217,12 +217,12 @@ static void CBSendStart(wchar_t *str_w)
 	SendMemStart(sm);
 }
 
-void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
+void PreparePaste(HWND HWin, BOOL shouldBeReady, BOOL AddCR, BOOL Bracketed, wchar_t **text)
 {
 	wchar_t *str_w;
 	wchar_t *str_w_edited;
 
-	if (! cv.Ready) {
+	if (shouldBeReady && ! cv.Ready) {
 		return;
 	}
 	if (TalkStatus!=IdTalkKeyb) {
@@ -289,7 +289,16 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		str_w = dest;
 	}
 
-	CBSendStart(str_w);
+	*text = str_w;
+}
+
+void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
+{
+	wchar_t *text = NULL;
+	PreparePaste(HWin, TRUE, AddCR, Bracketed, &text);
+	if (text != NULL) {
+		CBSendStart(text);
+	}
 }
 
 void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
