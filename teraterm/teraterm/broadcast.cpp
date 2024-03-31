@@ -224,6 +224,10 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 		case WM_KEYUP:
 		case WM_SYSKEYDOWN:
 		case WM_SYSKEYUP:
+			if (ShiftKey() && wParam == 0x2d) { // intercept Shift-INS
+				SendCB(dlg);
+				return FALSE;
+			}
 			// if (ime_mode == FALSE) { // IME ON でも処理するべき
 				int i;
 				HWND hd;
@@ -804,10 +808,6 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					}
 					if (HIWORD(wp) == LBN_SELCHANGE) {
 						KeepSelection();
-					}
-					// 手動でリストをリフレッシュする手段を提供する
-					if (HIWORD(wp) == LBN_DBLCLK && ShiftKey()) {
-						UpdateBroadcastWindowList(BroadcastWindowList);
 					}
 					return FALSE;
 
