@@ -3270,14 +3270,15 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 {
-	BOOL TBar;
+	BOOL TBar,WFrame; // TitleBar, WindowFrame
 	DWORD Style,ExStyle;
 	HMENU SysMenu;
 
 	Style = (DWORD)::GetWindowLongPtr (HVTWin, GWL_STYLE);
 	ExStyle = (DWORD)::GetWindowLongPtr (HVTWin, GWL_EXSTYLE);
 	TBar = ((Style & WS_SYSMENU)!=0);
-	if (TBar == (ts.HideTitle==0)) {
+	WFrame = ((Style & WS_BORDER) != 0);
+	if (TBar == (ts.HideTitle==0) && WFrame == (ts.HideTitle==0 || ts.EtermLookfeel.BGNoFrame==0)) {
 		return 0;
 	}
 
@@ -3297,6 +3298,7 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 			Style   &= ~(WS_THICKFRAME | WS_BORDER);
 			ExStyle &= ~WS_EX_CLIENTEDGE;
 		}else{
+			Style   |=  WS_THICKFRAME;
 			ExStyle |=  WS_EX_CLIENTEDGE;
 		}
 	}
@@ -4449,12 +4451,7 @@ void CVTWindow::OnSetupKeyboard()
 {
 	BOOL Ok;
 
-	if (ts.Language==IdRussian) {
-		HelpId = HlpSetupKeyboardRuss;
-	}
-	else {
-		HelpId = HlpSetupKeyboard;
-	}
+	HelpId = HlpSetupKeyboard;
 	if (! LoadTTDLG()) {
 		return;
 	}

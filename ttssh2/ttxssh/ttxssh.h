@@ -150,7 +150,7 @@ typedef struct _TS_SSH {
 	int CompressionLevel; /* 0 = NONE, else 1-9 */
 
 	int DefaultUserType;	/* 0/1/2 = no input/DefaultUserName/Windows logon user */
-	char DefaultUserName[256];
+	wchar_t DefaultUserName[256];
 
 	/* this next option is a string of digits. Each digit represents a
 	   cipher. The first digit is the most preferred cipher, and so on.

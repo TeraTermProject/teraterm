@@ -222,28 +222,28 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSME
 CAPTION "TTSSH: Authentication Setup"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    LTEXT           "Select defaults for authentication:",IDC_SSHAUTHBANNER,6,7,166,10
+    LTEXT           "Select defaults for authentication:",IDC_SSHAUTHBANNER,6,7,295,10
     GROUPBOX        "User name",IDC_SSH_USERNAME,6,22,295,88
-    CONTROL         "&Do not enter username",IDC_SSH_NO_USERNAME,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,19,35,152,10
-    CONTROL         "U&se default username",IDC_SSH_DEFAULTUSERNAME,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,50,152,10
-    CONTROL         "Us&e logon username",IDC_SSH_WINDOWS_USERNAME,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,78,152,10
+    CONTROL         "&Do not enter username",IDC_SSH_NO_USERNAME,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,19,35,282,10
+    CONTROL         "U&se default username",IDC_SSH_DEFAULTUSERNAME,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,50,282,10
+    CONTROL         "Us&e logon username",IDC_SSH_WINDOWS_USERNAME,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,78,282,10
     EDITTEXT        IDC_SSHUSERNAME,35,62,145,12,ES_AUTOHSCROLL | WS_GROUP
-    LTEXT           "Current username is ""%s""",IDC_SSH_WINDOWS_USERNAME_TEXT,35,93,128,10
+    LTEXT           "Current username is ""%s""",IDC_SSH_WINDOWS_USERNAME_TEXT,35,93,266,10
     GROUPBOX        "Authentication methods ",IDC_SSH_AUTHMETHOD,6,120,295,200
     CONTROL         "Use p&lain password to log in",IDC_SSHUSEPASSWORD,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,19,134,120,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,19,134,282,10
     CONTROL         "Use &RSA/DSA/ECDSA/ED25519 key to log in",IDC_SSHUSERSA,
-                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,148,152,10
-    CONTROL         "Use r&hosts to log in (SSH1)",IDC_SSHUSERHOSTS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,191,99,10
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,148,282,10
+    CONTROL         "Use r&hosts to log in (SSH1)",IDC_SSHUSERHOSTS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,191,282,10
     CONTROL         "Use SSH1:challenge/response(&TIS) / SSH2:keyboard-interactive to log in",IDC_SSHUSETIS,
                     "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,271,282,10
     CONTROL         "Use P&ageant to log in",IDC_SSHUSEPAGEANT,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,286,278,10
-    LTEXT           "Private &key file:",IDC_RSAFILENAMELABEL,35,160,144,8
+    LTEXT           "Private &key file:",IDC_RSAFILENAMELABEL,35,160,266,8
     EDITTEXT        IDC_RSAFILENAME,46,172,153,13,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_CHOOSERSAFILE,207,172,15,14,WS_GROUP
-    LTEXT           "Local &user name:",IDC_LOCALUSERNAMELABEL,35,206,91,8
+    LTEXT           "Local &user name:",IDC_LOCALUSERNAMELABEL,35,206,266,8
     EDITTEXT        IDC_LOCALUSERNAME,46,219,106,13,ES_AUTOHSCROLL
-    LTEXT           "Host private key &file:",IDC_HOSTRSAFILENAMELABEL,35,234,165,8
+    LTEXT           "Host private key &file:",IDC_HOSTRSAFILENAMELABEL,35,234,266,8
     EDITTEXT        IDC_HOSTRSAFILENAME,46,247,151,13,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_CHOOSEHOSTRSAFILE,210,246,15,14
     CONTROL         "&Check the enabled authentication methods before login (SSH2)",IDC_CHECKAUTH,

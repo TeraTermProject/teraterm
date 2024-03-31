@@ -94,17 +94,47 @@
 
     <h3>Notification</h3>
 
-    Notification area(it was called the Task Tray before Windows XP) settings.
+    <p>
+      Notification area (it was called the Task Tray before Windows XP) settings and test.
+    </p>
+
+    <p>
+      If notification setting is turn off, no notification such as icons or messages will be displayed.<br>
+      If sound setting is no sound (mute), no notification sound will be output.<br>
+      You can check the behavior with test buttons.
+    </p>
 
     <dl>
       <dt id="NotifySound">Notify sound</dt>
       <dd>Notification sound(sound can be muted in Windows XP and later)</dd>
 
-      <dt>Popup Test button</dt>
-      <dd>Test Notification</dd>
+      <dt>Notify Test button</dt>
+      <dd>
+        Test Notification.<br>
+        The following behaviors can be checked.
+        <ul>
+          <li>Icon is displayed in notification area (task tray).</li>
+          <li>App notification (Windows 10,11) / Balloon notification (Windows 7, 8.1) is displayed. </li>
+        </ul>
+      </dd>
 
       <dt>Tray Test button</dt>
-      <dd>Show icon in Notification area</dd>
+      <dd>
+        Icon is displayed in notification area.<br>
+        The following behaviors can be checked.
+        <ul>
+          <li>
+            Icon is displayed in notification area (task tray).<br>
+            The icon disappears when messagebox is closed.
+          </li>
+        </ul>
+        When turn off all notifications for Tera Term,
+        "Tera Term" will not appear in Windows notification settings
+        and you may not be able to change the settings.
+
+        By pushing this button, you can change Windows notification settings
+        when icon is displayed in notification area.
+      </dd>
     </dl>
 
     <h2 id="TabControlSequence">"Control Sequence" Tab</h2>
