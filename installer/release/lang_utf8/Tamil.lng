@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-03-15)
+﻿; Updated by TeraTerm Project (2024-03-30)
 ; Last translated (Tamil language) by திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -197,7 +197,8 @@ DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT=பகநெ &துறைமுகம் �
 DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED=தொடர் துறைமுகம் வேகத்தைக் காட்டு
 DLG_TAB_GENERAL_NOTIFICATION_TITLE=அறிவிப்பு
 DLG_TAB_GENERAL_NOTIFIY_SOUND=&ஒலியை அறிவிக்கவும்
-DLG_TAB_GENERAL_NOTIFICATION_TEST_POPUP=&மேல்தோன்றும் சோதனை
+DLG_TAB_GENERAL_NOTIFICATION_TEST_NOTIFY=&Notify Test
+DLG_TAB_GENERAL_NOTIFICATION_TEST_MESSAGE=Now icon is displayed in the notification area (task tray),\n and can be turned on or off in Windows notification setting.
 DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY=&தட்டு சோதனை
 
 DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=சுட்டி நிகழ்வு கண்காணிப்பு கோரிக்கையை ஏற்கவும்

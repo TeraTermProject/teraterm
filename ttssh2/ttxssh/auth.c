@@ -267,6 +267,24 @@ static void update_server_supported_types(PTInstVar pvar, HWND dlg)
 	}
 }
 
+/**
+ * GetUserNameW()
+ *
+ *	TODO win32helper ‚ÉˆÚ“®
+ */
+static DWORD hGetUserNameW(wchar_t **username)
+{
+	wchar_t name[UNLEN+1];
+	DWORD len = _countof(name);
+	BOOL r = GetUserNameW(name, &len);
+	if (r == 0) {
+		*username = NULL;
+		return GetLastError();
+	}
+	*username = _wcsdup(name);
+	return NO_ERROR;
+}
+
 static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 {
 	static const DlgTextInfo text_info[] = {
@@ -352,17 +370,14 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 				// u“ü—Í‚µ‚È‚¢v‚É‚µ‚Ä‚¨‚­
 				pvar->session_settings.DefaultUserType = 0;
 			} else {
-				SetDlgItemText(dlg, IDC_SSHUSERNAME,
-							   pvar->session_settings.DefaultUserName);
+				SetDlgItemTextW(dlg, IDC_SSHUSERNAME, pvar->session_settings.DefaultUserName);
 			}
 			break;
 		case 2: {
-			char user_name[UNLEN+1];
-			DWORD len = _countof(user_name);
-			BOOL r = GetUserName(user_name, &len);
-			if (r != 0) {
-				SetDlgItemText(dlg, IDC_SSHUSERNAME, user_name);
-			}
+			wchar_t *user_name;
+			hGetUserNameW(&user_name);
+			SetDlgItemTextW(dlg, IDC_SSHUSERNAME, user_name);
+			free(user_name);
 			break;
 		}
 		default:
@@ -1160,16 +1175,13 @@ canceled:
 			DestroyMenu(hMenu);
 			switch (result) {
 			case 1:
-				SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->session_settings.DefaultUserName);
+				SetDlgItemTextW(dlg, IDC_SSHUSERNAME, pvar->session_settings.DefaultUserName);
 				goto after_user_name_set;
 			case 2: {
-				char user_name[UNLEN+1];
-				DWORD len = _countof(user_name);
-				BOOL r = GetUserName(user_name, &len);
-				if (r == 0) {
-					break;
-				}
-				SetDlgItemText(dlg, IDC_SSHUSERNAME, user_name);
+				wchar_t *user_name;
+				hGetUserNameW(&user_name);
+				SetDlgItemTextW(dlg, IDC_SSHUSERNAME, user_name);
+				free(user_name);
 			after_user_name_set:
 				SendDlgItemMessage(dlg, IDC_SSHUSERNAME, EM_SETSEL, 0, -1);
 				SendMessage(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_SSHUSERNAME), TRUE);
@@ -1304,7 +1316,7 @@ static void try_default_auth(PTInstVar pvar)
 		}
 
 		pvar->auth_state.user =
-			_strdup(pvar->session_settings.DefaultUserName);
+			ToU8W(pvar->session_settings.DefaultUserName);
 	}
 }
 
@@ -1475,10 +1487,6 @@ void AUTH_do_cred_dialog(PTInstVar pvar)
 static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 {
 	int id;
-	char user_name[UNLEN+1];
-	DWORD len;
-	char uimsg[MAX_UIMSG];
-	char uimsg2[MAX_UIMSG];
 	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_AUTHSETUP_TITLE" },
 		{ IDC_SSHAUTHBANNER, "DLG_AUTHSETUP_BANNER" },
@@ -1528,7 +1536,7 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 		                 IDC_SSHUSEPASSWORD);
 	}
 
-	SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->settings.DefaultUserName);
+	SetDlgItemTextW(dlg, IDC_SSHUSERNAME, pvar->settings.DefaultUserName);
 	SetDlgItemTextW(dlg, IDC_RSAFILENAME, pvar->settings.DefaultRSAPrivateKeyFile);
 	SetDlgItemTextW(dlg, IDC_HOSTRSAFILENAME, pvar->settings.DefaultRhostsHostPrivateKeyFile);
 	SetDlgItemText(dlg, IDC_LOCALUSERNAME,
@@ -1548,12 +1556,19 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 		IDC_SSH_NO_USERNAME;
 	CheckRadioButton(dlg, IDC_SSH_NO_USERNAME, IDC_SSH_WINDOWS_USERNAME, id);
 
-	len = _countof(user_name);
-	GetUserName(user_name, &len);
+	{
+		wchar_t *user_name;
+		wchar_t *format;
+		wchar_t *text;
 
-	GetDlgItemText(dlg, IDC_SSH_WINDOWS_USERNAME_TEXT, uimsg, _countof(uimsg));
-	sprintf_s(uimsg2, _countof(uimsg2), uimsg, user_name);
-	SetDlgItemText(dlg, IDC_SSH_WINDOWS_USERNAME_TEXT, uimsg2);
+		hGetUserNameW(&user_name);
+		hGetDlgItemTextW(dlg, IDC_SSH_WINDOWS_USERNAME_TEXT, &format);
+		aswprintf(&text, format, user_name);
+		free(format);
+		free(user_name);
+		SetDlgItemTextW(dlg, IDC_SSH_WINDOWS_USERNAME_TEXT, text);
+		free(text);
+	}
 }
 
 static BOOL end_default_auth_dlg(PTInstVar pvar, HWND dlg)
@@ -1574,8 +1589,8 @@ static BOOL end_default_auth_dlg(PTInstVar pvar, HWND dlg)
 		pvar->settings.DefaultAuthMethod = SSH_AUTH_PASSWORD;
 	}
 
-	GetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->settings.DefaultUserName,
-	               sizeof(pvar->settings.DefaultUserName));
+	GetDlgItemTextW(dlg, IDC_SSHUSERNAME, pvar->settings.DefaultUserName,
+					_countof(pvar->settings.DefaultUserName));
 	GetDlgItemTextW(dlg, IDC_RSAFILENAME,
 	                pvar->settings.DefaultRSAPrivateKeyFile,
 	                _countof(pvar->settings.DefaultRSAPrivateKeyFile));

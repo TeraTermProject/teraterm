@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-03-15)
+﻿; Updated by TeraTerm Project (2024-03-30)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -197,7 +197,8 @@ DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT=Display tcp &port number
 DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED=Display se&rial port speed
 DLG_TAB_GENERAL_NOTIFICATION_TITLE=Notification
 DLG_TAB_GENERAL_NOTIFIY_SOUND=&Notify sound
-DLG_TAB_GENERAL_NOTIFICATION_TEST_POPUP=&Popup Test
+DLG_TAB_GENERAL_NOTIFICATION_TEST_NOTIFY=&Notify Test
+DLG_TAB_GENERAL_NOTIFICATION_TEST_MESSAGE=Now icon is displayed in the notification area (task tray),\n and can be turned on or off in Windows notification setting.
 DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY=&Tray Test
 
 DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=Accepter les événement souris

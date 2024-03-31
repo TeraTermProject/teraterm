@@ -303,7 +303,7 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 		settings->CompressionLevel = 0;
 	}
 
-	READ_STD_STRING_OPTION(DefaultUserName);
+	READ_STD_STRING_OPTIONW(DefaultUserName);
 	settings->DefaultUserType = GetPrivateProfileInt("TTSSH", "DefaultUserType", 1, fileName);
 
 	READ_STD_STRING_OPTION(DefaultForwarding);
@@ -452,8 +452,8 @@ static void write_ssh_options(PTInstVar pvar, const wchar_t *fileName,
 
 	_itoa(settings->DefaultUserType, buf, 10);
 	WritePrivateProfileString("TTSSH", "DefaultUserType", buf, fileName);
-	WritePrivateProfileString("TTSSH", "DefaultUserName",
-	                          settings->DefaultUserName, fileName);
+	WritePrivateProfileStringW(L"TTSSH", L"DefaultUserName",
+	                           settings->DefaultUserName, fileName);
 
 	if (copy_forward) {
 		WritePrivateProfileString("TTSSH", "DefaultForwarding",
