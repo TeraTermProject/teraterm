@@ -298,6 +298,7 @@ DLG_BROADCAST_PARENTONLY=இந்த செயல்முறைக்கு �
 DLG_BROADCAST_ENTER=உள்ளிடு விசை
 DLG_BROADCAST_SUBMIT=சமர்ப்பி
 DLG_BROADCAST_REALTIME=நிகழ்நேர பயன்முறை
+DLG_BROADCAST_FOREGROUND=Fore
 
 DLG_PRNABORT_PRINTING=அச்சிடுதல்
 

@@ -471,6 +471,22 @@ static int CompareMulticastName(const wchar_t *name)
 	return result;
 }
 
+/*
+ * ダイアログで選択されたウィンドウを前面に表示する。
+ */
+static void ForeSelected()
+{
+	int count = (int) SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+	for (int i = 0; i < count; i++) {
+		if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
+			HWND hd = GetNthWin(i);
+			if (hd != NULL) {
+				ForegroundWin(hd);
+			}
+		}
+	}
+}
+
 //
 // すべてのターミナルへ同一コマンドを送信するモードレスダイアログの表示
 // (2005.1.22 yutaka)
@@ -483,6 +499,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 		{ IDC_ENTERKEY_CHECK, "DLG_BROADCAST_ENTER" },
 		{ IDC_PARENT_ONLY, "DLG_BROADCAST_PARENTONLY" },
 		{ IDC_REALTIME_CHECK, "DLG_BROADCAST_REALTIME" },
+		{ IDC_FORE_RECEIVER, "DLG_BROADCAST_FOREGROUND" },
 		{ IDOK, "DLG_BROADCAST_SUBMIT" },
 		{ IDCANCEL, "DLG_BROADCAST_CLOSE" },
 	};
@@ -628,6 +645,12 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
 				}
 				return TRUE;
+
+			case IDC_FORE_RECEIVER:
+				ForeSelected();
+				ForegroundWin(hWnd);
+				SetFocus(GetDlgItem(hWnd, IDC_COMMAND_EDIT));
+				return FALSE;
 			}
 
 			switch (LOWORD(wp)) {
@@ -771,6 +794,15 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				p.y = rc.top;
 				ScreenToClient(hWnd, &p);
 				SetWindowPos(GetDlgItem(hWnd, IDOK), 0,
+				             dlg_w - ok2right, p.y, 0, 0,
+				             SWP_NOSIZE | SWP_NOZORDER);
+
+				// Fore button
+				GetWindowRect(GetDlgItem(hWnd, IDC_FORE_RECEIVER), &rc);
+				p.x = rc.left;
+				p.y = rc.top;
+				ScreenToClient(hWnd, &p);
+				SetWindowPos(GetDlgItem(hWnd, IDC_FORE_RECEIVER), 0,
 				             dlg_w - ok2right, p.y, 0, 0,
 				             SWP_NOSIZE | SWP_NOZORDER);
 
