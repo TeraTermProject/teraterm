@@ -86,7 +86,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 		{ IDC_TITLEFMT_DISPSERIALSPEED, "DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED" },
 		{ IDC_NOTIFICATION_TITLE, "DLG_TAB_GENERAL_NOTIFICATION_TITLE" },
 		{ IDC_NOTIFY_SOUND, "DLG_TAB_GENERAL_NOTIFIY_SOUND" },
-		{ IDC_NOTIFICATION_TEST_POPUP, "DLG_TAB_GENERAL_NOTIFICATION_TEST_POPUP" },
+		{ IDC_NOTIFICATION_TEST_POPUP, "DLG_TAB_GENERAL_NOTIFICATION_TEST_NOTIFY" },
 		{ IDC_NOTIFICATION_TEST_TRAY, "DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY" },
 	};
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
@@ -211,10 +211,13 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			Notify2SetMessageW(ni, NULL, NULL, 1);
 			Notify2SetSound(ni, prev_sound);
 
+			static const wchar_t *msg =
+				L"Now icon is displayed in the notification area (task tray),\n"
+				L"and can be turned on or off in Windows notification setting.";
 			static const TTMessageBoxInfoW info = {
 				"Tera Term",
 				"MSG_TT_NOTICE", L"Tera Term: Notice",
-				NULL, L"You can change notify setting",
+				"DLG_TAB_GENERAL_NOTIFICATION_TEST_MESSAGE", msg,
 				MB_OK };
 			TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
 

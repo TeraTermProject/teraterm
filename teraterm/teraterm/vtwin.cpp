@@ -2094,9 +2094,11 @@ void CVTWindow::OnMButtonUp(WPARAM nFlags, POINTS point)
 
 LRESULT CVTWindow::OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message)
 {
-	if ((ts.SelOnActive==0) && (nHitTest==HTCLIENT)) { //disable mouse event for text selection
+	// eat mouse event for text selection
+	// when window is activated by L button
+	if ((ts.SelOnActive==0) && (nHitTest==HTCLIENT) && (message==WM_LBUTTONDOWN)) {
 		IgnoreRelease = TRUE;
-		return MA_ACTIVATEANDEAT; //     when window is activated
+		return MA_ACTIVATEANDEAT;
 	}
 	else {
 		return MA_ACTIVATE;
@@ -3268,14 +3270,15 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 {
-	BOOL TBar;
+	BOOL TBar,WFrame; // TitleBar, WindowFrame
 	DWORD Style,ExStyle;
 	HMENU SysMenu;
 
 	Style = (DWORD)::GetWindowLongPtr (HVTWin, GWL_STYLE);
 	ExStyle = (DWORD)::GetWindowLongPtr (HVTWin, GWL_EXSTYLE);
 	TBar = ((Style & WS_SYSMENU)!=0);
-	if (TBar == (ts.HideTitle==0)) {
+	WFrame = ((Style & WS_BORDER) != 0);
+	if (TBar == (ts.HideTitle==0) && WFrame == (ts.HideTitle==0 || ts.EtermLookfeel.BGNoFrame==0)) {
 		return 0;
 	}
 
@@ -3295,6 +3298,7 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 			Style   &= ~(WS_THICKFRAME | WS_BORDER);
 			ExStyle &= ~WS_EX_CLIENTEDGE;
 		}else{
+			Style   |=  WS_THICKFRAME;
 			ExStyle |=  WS_EX_CLIENTEDGE;
 		}
 	}
@@ -4447,12 +4451,7 @@ void CVTWindow::OnSetupKeyboard()
 {
 	BOOL Ok;
 
-	if (ts.Language==IdRussian) {
-		HelpId = HlpSetupKeyboardRuss;
-	}
-	else {
-		HelpId = HlpSetupKeyboard;
-	}
+	HelpId = HlpSetupKeyboard;
 	if (! LoadTTDLG()) {
 		return;
 	}
@@ -4623,8 +4622,10 @@ void CVTWindow::OnSetupSave()
 
 		if (wcscmp(PrevSetupFNW, ts.SetupFNameW) == 0) {
 			// 同名ファイルへ書き込み(上書き)
-			// バックアップを作成
-			CreateBakupFile(ts.SetupFNameW, NULL);
+			if (ts.IniAutoBackup) {
+				// バックアップを作成
+				CreateBakupFile(ts.SetupFNameW, NULL);
+			}
 		}
 		else {
 			// 異なるファイルへ書き込み

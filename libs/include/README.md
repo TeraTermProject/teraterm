@@ -1,3 +1,5 @@
 ﻿
 - compat/stdlib.h
-  - libressl内の関数をコールするためプロトタイプを定義したヘッダ
+  - cmakeビルド時のみ使用される
+  - libressl内の互換関数をコールするためのヘッダ
+  - libresslを展開するときにコピーされる

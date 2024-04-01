@@ -1462,15 +1462,19 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	GetNthNum(Temp, 2, &ts->FontDW);
 	GetNthNum(Temp, 3, &ts->FontDY);
 	GetNthNum(Temp, 4, &ts->FontDH);
+	/*
 	if (ts->FontDX < 0)
 		ts->FontDX = 0;
 	if (ts->FontDW < 0)
 		ts->FontDW = 0;
+	*/
 	ts->FontDW = ts->FontDW + ts->FontDX;
+	/*
 	if (ts->FontDY < 0)
 		ts->FontDY = 0;
 	if (ts->FontDH < 0)
 		ts->FontDH = 0;
+	*/
 	ts->FontDH = ts->FontDH + ts->FontDY;
 
 	// VT-print scaling factors (pixels per inch) --- special option
@@ -2087,6 +2091,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->NotifySound = GetOnOff(Section, "NotifySound", FName, TRUE);
 
 	ts->Dec2Unicode = FALSE;
+
+	// 自動バックアップ
+	ts->IniAutoBackup = GetOnOff(Section, "IniAutoBackup", FName, TRUE);
 
 	// Experimental
 	ts->ExperimentalTreeProprtySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
@@ -3315,6 +3322,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	// 通知音
 	WriteOnOff(Section, "NotifySound", FName, ts->NotifySound);
+
+	// 自動バックアップ
+	WriteOnOff(Section, "IniAutoBackup", FName, ts->IniAutoBackup);
 }
 
 void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,

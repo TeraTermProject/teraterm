@@ -13,6 +13,12 @@ if("${CMAKE_GENERATOR}" STREQUAL "")
   message(FATAL_ERROR "set CMAKE_GENERATOR!")
 endif()
 
+if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
+  if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "CYGWIN")
+    message(FATAL_ERROR "cmake command is from cygwin")
+  endif()
+endif()
+
 if((${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005") OR
     (${CMAKE_GENERATOR} MATCHES "Visual Studio 9 2008"))
   set(BUILD_SSL_LIBRARY OFF)

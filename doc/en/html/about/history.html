@@ -39,6 +39,9 @@
       <li>MACRO: When TTL file is relative path, it is relative from current directory of ttpmacro.</li>
       <li>Use EnableContinuedLineCopy setting when dragging after selecting a word by double click.</li>
       <li>Show error messagebox when logging cannot be started with LogAutoStart=on</li>
+      <li>Right-click(paste) is not disabled even when <a href="../setup/teraterm-win.html#textselect">SelectOnActivate</a> is off.</li>
+      <li>allow users to select creating automatic backup or not by <a href="../setup/teraterm-misc.html#IniAutoBackup">IniAutoBackup</a> when overwriting the ini file.
+      <li><a href="../setup/teraterm-win.html#space">VTFontSpace</a> can be used to adjust to narrow the space between characters.
     </ul>
   </li>
 
@@ -55,12 +58,14 @@
       <li>MACRO: fixed password file name for <a href="../macro/command/getpassword.html">getpassword</a> and <a href="../macro/command/delpassword.html">delpassword</a> macro command is not Unicode compatible.</li>
       <li>Fixed crash on exit when using <a href="../commandline/teraterm.html#v">/V option</a> of ttermpro.exe.</li>
       <li>Fixed display of combined characters was corrupted.</li>
+      <li>Apply changes even if only NoFrame is changed at Window setup dialog.</li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
       <li>Added Tamil.lng language file.</li>
+      <li>Upgraded TTSSH to <a href="#ttssh_3.3">3.3</a>.</li>
     </ul>
   </li>
 </ul>
@@ -3480,11 +3485,12 @@ SYNOPSIS:
     </ul>
   </li-->
 
-  <!--li>Misc
+  <li>Misc
     <ul>
-      <li></li>
+      <li>If option(<a href="../commandline/ttssh.html#f">/f</a>, <a href="../commandline/ttssh.html#ssh-f">/ssh-f</a>, <a href="../commandline/ttssh.html#ssh-consume">/ssh-consume</a>, <a href="../commandline/ttssh.html#keyfile">/keyfile</a>) argument file name is not absolute path, modify it to be treated as a relative path from %APPDATA%\teraterm5\.</li>
+      <li>Modified private key file name can use Unicode</li>
     </ul>
-  </li-->
+  </li>
 </ul>
 
 <h3 id="ttssh_3.2">2024.2.29 (Ver 3.2)</h3>

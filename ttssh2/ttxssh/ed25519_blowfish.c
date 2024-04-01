@@ -39,8 +39,6 @@
  * Bruce Schneier.
  */
 
-//#include "includes.h"
-
 #if !defined(HAVE_BCRYPT_PBKDF) && (!defined(HAVE_BLOWFISH_INITSTATE) || \
     !defined(HAVE_BLOWFISH_EXPAND0STATE) || !defined(HAVE_BLF_ENC))
 

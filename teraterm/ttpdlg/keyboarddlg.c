@@ -27,7 +27,6 @@
  */
 
 /* keyboard dialog */
-#include "teraterm.h"
 #include <stdio.h>
 #include <string.h>
 #define _CRTDBG_MAP_ALLOC
@@ -40,11 +39,7 @@
 #include "dlglib.h"
 #include "dlg_res.h"
 #include "helpid.h"
-#include "asprintf.h"
-#include "win32helper.h"
-#include "compat_win.h"
 #include "ttwinman.h"
-#include "resize_helper.h"
 
 #include "ttdlg.h"
 
@@ -90,9 +85,12 @@ static INT_PTR CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				SetDropDownList(Dialog, IDC_KEYBMETA, MetaList, ts->MetaKey + 1);
 			}
 
-			if (ts->Language==IdRussian) {
-				ShowDlgItem(Dialog,IDC_KEYBKEYBTEXT,IDC_KEYBKEYB);
-				SetDropDownList(Dialog, IDC_KEYBKEYB, RussList2, ts->RussKeyb);
+			SetDropDownList(Dialog, IDC_KEYBKEYB, RussList2, ts->RussKeyb);
+			if (IsWindowUnicode(Dialog) != TRUE || GetACP() != 1251) {
+				// 非Unicode(ANSI)動作 && CP1251(Russian)のとき、
+				// このオプションは使用可能となる
+				EnableWindow(GetDlgItem(Dialog, IDC_KEYBKEYBTEXT), FALSE);
+				EnableWindow(GetDlgItem(Dialog, IDC_KEYBKEYB), FALSE);
 			}
 
 			CenterWindow(Dialog, GetParent(Dialog));
@@ -114,10 +112,8 @@ static INT_PTR CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 						if ((w = (WORD)GetCurSel(Dialog, IDC_KEYBMETA)) > 0) {
 							ts->MetaKey = w - 1;
 						}
-						if (ts->Language==IdRussian) {
-							if ((w = (WORD)GetCurSel(Dialog, IDC_KEYBKEYB)) > 0) {
-								ts->RussKeyb = w;
-							}
+						if ((w = (WORD)GetCurSel(Dialog, IDC_KEYBKEYB)) > 0) {
+							ts->RussKeyb = w;
 						}
 					}
 					EndDialog(Dialog, 1);
@@ -129,12 +125,7 @@ static INT_PTR CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 				case IDC_KEYBHELP: {
 					WPARAM HelpId;
-					if (ts->Language==IdRussian) {
-						HelpId = HlpSetupKeyboardRuss;
-					}
-					else {
-						HelpId = HlpSetupKeyboard;
-					}
+					HelpId = HlpSetupKeyboard;
 					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HelpId,0);
 					break;
 				}
