@@ -454,6 +454,20 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	/* Enable drag-drop */
 	::DragAcceptFiles(HVTWin,TRUE);
 
+	DropInit();
+	DropLists = NULL;
+	DropListCount = 0;
+
+#if UNICODE_DEBUG
+	CtrlKeyState = 0;
+#endif
+
+	// TipWin
+	if (ts.HideWindow==0) {
+		TipWin = new CTipWin(hInstance);
+		TipWin->Create(HVTWin);
+	}
+
 	if (ts.HideWindow>0) {
 		if (strlen(TopicName)>0) {
 			InitDDE();
@@ -470,20 +484,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	SetWindowAlpha(ts.AlphaBlendActive);
 	ShowWindow(CmdShow);
 	ChangeCaret();
-
-	DropInit();
-	DropLists = NULL;
-	DropListCount = 0;
-
-#if UNICODE_DEBUG
-	CtrlKeyState = 0;
-#endif
-
-	// TipWin
-	if (ts.HideWindow==0) {
-		TipWin = new CTipWin(hInstance);
-		TipWin->Create(HVTWin);
-	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
