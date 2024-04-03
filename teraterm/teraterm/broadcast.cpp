@@ -52,7 +52,7 @@
 #include "tt_res.h"
 #include "codeconv.h"
 #include "sendmem.h"
-#include "clipboar.h"	// for PreparePaste()
+#include "clipboar.h"	// for CBPreparePaste()
 #include "ttime.h"
 
 #include "broadcast.h"
@@ -91,8 +91,6 @@
  */
 
 #define BROADCAST_LOGFILE L"broadcast.log"
-
-TTTSet ts;
 
 /**
  *	履歴を保存するファイル名(フルパス)を取得
@@ -146,7 +144,7 @@ static HWND BroadcastWindowList;
 static void SendCB(HWND dlg) {
 	size_t len;
 	wchar_t *cbtext = NULL;
-	PreparePaste(dlg, FALSE, FALSE, FALSE, &cbtext);
+	CBPreparePaste(dlg, FALSE, FALSE, FALSE, &cbtext);
 	if (cbtext != NULL) {
 		len = wcslen(cbtext);
 		char32_t* strU32 = ToU32W(cbtext);
@@ -181,11 +179,9 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 {
 	char buf[1024];
 	int len;
-	static BOOL ime_mode = FALSE;
 
 	switch (msg) {
 		case WM_CREATE:
-			ime_mode = FALSE;
 			break;
 
 		case WM_DESTROY:
@@ -228,7 +224,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 				SendCB(dlg);
 				return FALSE;
 			}
-			// if (ime_mode == FALSE) { // IME ON でも処理するべき
+			{
 				int i;
 				HWND hd;
 				int count;
@@ -248,23 +244,12 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 					}
 				}
 				return FALSE;
-			// }
+			}
 			break;
 
 		case WM_CHAR:
 			// 入力した文字がIDC_COMMAND_EDITに残らないように捨てる
-			// if (ime_mode == FALSE) { // IME ON でも処理するべき
-				return FALSE;
-			// }
-			break;
-
-		case WM_IME_NOTIFY:
-			switch (wParam) {
-				case IMN_SETOPENSTATUS:
-					// IMEのOn/Offを取得する
-					ime_mode = GetIMEOpenStatus(dlg);
-			}
-			break;
+			return FALSE;
 
 		case WM_IME_COMPOSITION: {
 			if (CanUseIME()) {
@@ -306,7 +291,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 	return CallWindowProcW(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
 }
 
-DWORD selected[MAXNWIN];
+static DWORD selected[MAXNWIN];
 static void KeepSelection()
 {
 	int i, count;
@@ -324,6 +309,7 @@ static void KeepSelection()
 		}
 	}
 }
+
 static BOOL wasSelected(DWORD proc, int count) {
 	for (int i = 0; i < count; i++) {
 		if (selected[i] == proc) {
@@ -450,30 +436,6 @@ void SendBroadcastMessage(HWND HVTWin, HWND hWnd, const wchar_t *buf)
 	COPYDATASTRUCT *cds = BuildBroadcastCDSW(buf);
 	SendCDS(HVTWin, cds);
 	free(cds);
-}
-
-static COPYDATASTRUCT *BuildMulticastCopyData(const char *name, const char *buf)
-{
-	size_t buflen = strlen(buf);
-	size_t nlen = strlen(name) + 1;
-	size_t msglen = nlen + buflen;
-	char *msg = (char *)malloc(msglen);
-	if (msg == NULL) {
-		return NULL;
-	}
-	strcpy_s(msg, msglen, name);
-	memcpy_s(msg + nlen, msglen - nlen, buf, buflen);
-
-	COPYDATASTRUCT *cds = (COPYDATASTRUCT *)malloc(sizeof(COPYDATASTRUCT));
-	if (cds == NULL) {
-		free(msg);
-		return NULL;
-	}
-	cds->dwData = IPC_MULTICAST_COMMAND;
-	cds->cbData = (DWORD)msglen;
-	cds->lpData = msg;
-
-	return cds;
 }
 
 /*
@@ -928,10 +890,10 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				case 1:
 					ForeSelected();
 					break;
-				case 2: 
+				case 2:
 					MinimizeSelected();
 					break;
-				case 3: 
+				case 3:
 					UpdateBroadcastWindowList(BroadcastWindowList);
 					break;
 				default:
