@@ -53,24 +53,6 @@ Tera Term の Kermit は今のところ基本的機能しか持っていないので、本家の Kermit に
 <dd>TEK 端末のエミュレーションをするウィンドウで、タイトル文字列の一番右に「TEK」と表示されています。Tera Term を起動したときは表示されません。
 [Control] Open TEK コマンドで、TEK window を開くことができます。</dd>
 
-<dt id="UTF-8">UTF-8, UTF-8m</dt>
-<dd>
-  <p>
-    UnicodeをMBCSに符号化した文字コード。1byteから4byteに符号化されます。
-  </p>
-
-  <p>
-    U+307B + U+309A (ほ + (まる)  = ぽ)など、
-    複数のUnicode文字を組み合わせて、表示1文字を表現することができます。
-    Tera Term 4 では macOSのファイルシステムHFS+で使用されていた
-    表現方法を文字コード"UTF-8m"としていました。
-  </p>
-
-  <p>
-    Tera Term 5 では文字コード"UTF-8" で全て使用可能です。
-  </p>
-</dd>
-
 <dt>VT100</dt>
 <dd>DEC 社の端末の名前です。かつて、Unix や VAX/VMS 等のコンピューターの端末として広く用いられていました。現在は、 VT100 そのものはほとんど
 使用されていませんが、その仕様が事実上の標準となっているため、PC や ワークステーションで動く VT100 エミュレーターが多く作られています。<br>
@@ -91,6 +73,92 @@ VT 端末のエミュレーションをします。</dd>
 <dt>ZMODEM</dt>
 <dd>XMODEM, YMODEM を(それらの原形をとどめないほどに)改良したファイル転送プロトコル。エラー訂正機能が強化され、制御文字の一部を通さない回線にも対応し、転送速度をあげるための工夫がなされています。</dd>
 
+</dl>
+
+<h2>文字コード</h2>
+
+文字コードに関連する用語
+
+<dl>
+  <dt id="CJK">CJK, CJKV, 東アジア(East Asian)の文字コード</dt>
+
+  <dd>
+    <p>
+      漢字を含む文字体系を持つ言語。
+      CJK(CJKV) = Chinese(中国語), Japanese(日本語), Korean(韓国語), (Vietnamese(ベトナム語))。
+    </p>
+
+    <p>
+      CJK(CJKV)環境では、使用する全ての文字を1バイトでは表現できないため、
+      1文字を2バイトで表現する<a href="#DBCS">ダブルバイト文字</a>が使用されます。<br>
+      Unicodeが普及する前、各々の環境に合わせた文字コードが策定されました。
+    </p>
+
+    <p>
+      主なDBCS
+<pre>
+| Language                      | Code(CodePage)     |
+|-------------------------------|--------------------|
+| Chinese (Simplified Chinese)  | GB2312(CP936)      |
+| Chinese (Traditional Chinese) | Big5(CP950)        |
+| Japanese                      | `Shift_JIS(CP932)` |
+|                               | EUC(EUC-JP,CP51932)|
+| Korean                        | KS5601(CP949)      |
+</pre>
+
+    <p>
+      Tera Termはベトナム語漢字(チュノム)独自の文字コードをサポートしていません。<br>
+      Unicodeを使用した表示には対応してします。
+    </p>
+<small>TODO ベトナム語漢字はVisual Studioがサポートしていない? CodePageなどを調べても文字コードがわからない</small>
+
+
+    </p>
+  </dd>
+
+  <dt id="SBCS">SBCS</dt>
+  <dd>
+    Single-byte character set, 1バイト文字セット。<br>
+    最大で256種の文字を表現できる。
+  </dd>
+
+  <dt id="DBCS">DBCS</dt>
+  <dd>
+    Double-byte character set, 2 バイト文字セット。<br>
+    SBCSを拡張して漢字なども含めた文字を表現できる。<br>
+    1バイトの文字と2バイトの文字が混在。<br>
+    Shift_jisはDBCSの1例。
+  </dd>
+
+  <dt id="MBCS">MBCS</dt>
+  <dd>
+    Multi-byte Character Set。<br>
+    3バイト以上の文字が使用される。<br>
+    JIS, UTF-8等。
+  </dd>
+
+<dt id="UTF-8">UTF-8, UTF-8m</dt>
+<dd>
+  UnicodeをMBCSに符号化した文字コード。1byteから4byteに符号化されます。
+
+  <p>
+    U+307B + U+309A (ほ + (まる)  = ぽ)など、
+    複数のUnicode文字を組み合わせて、表示1文字を表現することができます。
+    Tera Term 4 では macOSのファイルシステムHFS+で使用されていた
+    表現方法を文字コード"UTF-8m"としていました。
+  </p>
+
+  <p>
+    Tera Term 5 では "UTF-8m" は "UTF-8" に統合されました。
+  </p>
+</dd>
+
+  <dt>wide character, ワイド文字</dt>
+  <dd>
+    最小文字単位を2バイト以上とする文字表現。<br>
+    C言語ではwchar_t型。Windows用C/C++言語(Visual Studio)ではwchar_t型は2byte。<br>
+    WindowsのAPIでは2byteのワイド文字、文字コードはUTF-16LEが使用される。
+  </dd>
 </dl>
 
 </BODY>
