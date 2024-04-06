@@ -115,10 +115,8 @@
 #define IDD_ABOUTDLG                    800
 #define IDC_FONTBOLD                    901
 #define IDD_GENDLG                      1000
-#define IDC_GENPORT                     1001
 #define IDC_GENLANGLABEL                1002
 #define IDC_GENLANG                     1003
-#define IDC_GENPORT_LABEL               1004
 #define IDC_HOSTTCPPROTOCOLLABEL        1019
 #define IDC_HOSTTCPPROTOCOL             1020
 #define IDC_LOCALE_BOX                  1022

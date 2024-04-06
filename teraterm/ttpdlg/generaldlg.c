@@ -30,7 +30,6 @@
 #include "teraterm.h"
 #include <stdio.h>
 #include <string.h>
-#include <commdlg.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
@@ -47,7 +46,6 @@
 #include "compat_win.h"
 #include "ttlib_charset.h"
 #include "ttwinman.h"
-#include "resize_helper.h"
 
 #include "ttdlg.h"
 
@@ -139,7 +137,6 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_GEN_TITLE" },
-		{ IDC_GENPORT_LABEL, "DLG_GEN_PORT" },
 		{ IDC_GENLANGLABEL, "DLG_GEN_LANG" },
 		{ IDC_GENLANGUI_LABEL, "DLG_GEN_LANG_UI" },
 		{ IDOK, "BTN_OK" },
@@ -156,27 +153,6 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
-
-			SendDlgItemMessageA(Dialog, IDC_GENPORT, CB_ADDSTRING,
-			                   0, (LPARAM)"TCP/IP");
-			for (w=1;w<=ts->MaxComPort;w++) {
-				char Temp[8];
-				_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "COM%d", w);
-				SendDlgItemMessageA(Dialog, IDC_GENPORT, CB_ADDSTRING,
-				                   0, (LPARAM)Temp);
-			}
-			if (ts->PortType==IdSerial) {
-				if (ts->ComPort <= ts->MaxComPort) {
-					w = ts->ComPort;
-				}
-				else {
-					w = 1; // COM1
-				}
-			}
-			else {
-				w = 0; // TCP/IP
-			}
-			SendDlgItemMessage(Dialog, IDC_GENPORT, CB_SETCURSEL,w,0);
 
 			if ((ts->MenuFlag & MF_NOLANGUAGE)==0) {
 				int sel = 0;
@@ -220,14 +196,6 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 				case IDOK:
 					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 					if (ts!=NULL) {
-						w = (WORD)GetCurSel(Dialog, IDC_GENPORT);
-						if (w>1) {
-							ts->PortType = IdSerial;
-							ts->ComPort = w-1;
-						}
-						else {
-							ts->PortType = IdTCPIP;
-						}
 
 						if ((ts->MenuFlag & MF_NOLANGUAGE)==0) {
 							WORD language;

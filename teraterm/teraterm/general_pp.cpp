@@ -88,6 +88,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 		{ IDC_NOTIFY_SOUND, "DLG_TAB_GENERAL_NOTIFIY_SOUND" },
 		{ IDC_NOTIFICATION_TEST_POPUP, "DLG_TAB_GENERAL_NOTIFICATION_TEST_NOTIFY" },
 		{ IDC_NOTIFICATION_TEST_TRAY, "DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY" },
+		{ IDC_GENPORT_LABEL, "DLG_GEN_PORT" },
 	};
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
@@ -125,6 +126,30 @@ void CGeneralPropPageDlg::OnInitDialog()
 
 	// Notify
 	SetCheck(IDC_NOTIFY_SOUND, ts.NotifySound);
+
+	// default port
+	{
+		WORD w;
+		TTTSet *pts = &ts;
+		SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM) "TCP/IP");
+		for (w=1;w<=pts->MaxComPort;w++) {
+			char Temp[8];
+			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "COM%d", w);
+			SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM)Temp);
+		}
+		if (pts->PortType==IdSerial) {
+			if (pts->ComPort <= pts->MaxComPort) {
+				w = pts->ComPort;
+			}
+			else {
+				w = 1; // COM1
+			}
+		}
+		else {
+			w = 0; // TCP/IP
+		}
+		SendDlgItemMessageA(IDC_GENPORT, CB_SETCURSEL, w, 0);
+	}
 
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
@@ -178,6 +203,19 @@ void CGeneralPropPageDlg::OnOK()
 		if (notify_sound != ts.NotifySound) {
 			ts.NotifySound = notify_sound;
 			Notify2SetSound((NotifyIcon *)cv.NotifyIcon, notify_sound);
+		}
+	}
+
+	// default port
+	{
+		TTTSet *pts = &ts;
+		WORD w = (WORD)::GetCurSel(m_hWnd, IDC_GENPORT);
+		if (w>1) {
+			pts->PortType = IdSerial;
+			pts->ComPort = w-1;
+		}
+		else {
+			pts->PortType = IdTCPIP;
 		}
 	}
 }

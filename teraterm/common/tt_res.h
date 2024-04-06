@@ -244,6 +244,8 @@
 #define IDC_SPIPATH_EDIT                2622
 #define IDC_SPIPATH_BUTTON              2623
 #define IDC_FORE_RECEIVER               2624
+#define IDC_GENPORT                     2625
+#define IDC_GENPORT_LABEL               2626
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -343,7 +345,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2625
+#define _APS_NEXT_CONTROL_VALUE         2627
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
