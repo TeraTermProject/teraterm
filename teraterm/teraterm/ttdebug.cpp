@@ -269,30 +269,27 @@ static wchar_t *CreateDumpFilename()
 	char *version = _strdup("unknown");
 #endif
 	wchar_t *dump_file;
-	aswprintf(&dump_file, L"teraterm_%hs_%04u%02u%02u-%02u%02u%02u.dmp",
-			  version,
+	aswprintf(&dump_file, L"teraterm_%04u%02u%02u-%02u%02u%02u_%hs.dmp",
 			  local_time.wYear, local_time.wMonth, local_time.wDay,
-			  local_time.wHour, local_time.wMinute, local_time.wSecond);
+			  local_time.wHour, local_time.wMinute, local_time.wSecond,
+			  version);
 	free(version);
 	return dump_file;
 }
 
-static void DumpMiniDump(const wchar_t *filename, struct _EXCEPTION_POINTERS* pExceptionPointers)
+/**
+ *  ミニダンプファイルを出力
+ */
+static bool DumpMiniDump(const wchar_t *filename, struct _EXCEPTION_POINTERS* pExceptionPointers)
 {
-	wchar_t *logdir = NULL;
-	wchar_t *dumpfile = NULL;
-
 	if (pMiniDumpWriteDump == NULL) {
 		// MiniDumpWriteDump() がサポートされていない。XPより前
-		return;
+		return false;
 	}
 
-	logdir = GetLogDirW(NULL);
-	awcscats(&dumpfile, logdir, L"\\", filename, NULL);
-	HANDLE file = CreateFileW(dumpfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	free(dumpfile);
+	HANDLE file = CreateFileW(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (file == INVALID_HANDLE_VALUE) {
-		return;
+		return false;
 	}
 
 	MINIDUMP_EXCEPTION_INFORMATION mdei;
@@ -300,10 +297,17 @@ static void DumpMiniDump(const wchar_t *filename, struct _EXCEPTION_POINTERS* pE
 	mdei.ExceptionPointers  = pExceptionPointers;
 	mdei.ClientPointers     = TRUE;
 
-	pMiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), file,
-					   (MINIDUMP_TYPE)(MiniDumpNormal|MiniDumpWithHandleData), &mdei, NULL, NULL);
+	BOOL r = pMiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), file,
+								(MINIDUMP_TYPE)(MiniDumpNormal|MiniDumpWithHandleData),
+								&mdei, NULL, NULL);
 
 	CloseHandle(file);
+
+	if (!r) {
+		DeleteFileW(filename);
+		return false;
+	}
+	return true;
 }
 
 static BOOL DumpFile = TRUE;
@@ -311,16 +315,23 @@ static BOOL DumpFile = TRUE;
 static LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS* pExceptionPointers)
 {
 	if (DumpFile) {
+		wchar_t *dumpfile = NULL;
 		wchar_t *fname = CreateDumpFilename();
-		if (fname != NULL) {
-			DumpMiniDump(fname, pExceptionPointers);
-			MessageBoxW(NULL, fname, L"Tera Term", MB_OK);
-			free(fname);
+		wchar_t *logdir = GetLogDirW(NULL);
+		aswprintf(&dumpfile, L"%s\\%s", logdir, fname);
+
+		bool r = DumpMiniDump(dumpfile, pExceptionPointers);
+		if (r) {
+			const wchar_t *msg_base =
+				L"minidump '%s'\r\n"
+				L" refer to https://teratermproject.github.io/manual/5/ja/reference/develop.html";
+			wchar_t *msg;
+			aswprintf(&msg, msg_base, dumpfile);
+			MessageBoxW(NULL, msg, L"Tera Term", MB_OK);
+			free(msg);
 		}
-		else {
-			DumpMiniDump(L"teraterm.dmp", pExceptionPointers);
-			MessageBoxW(NULL, L"dump teraterm.dmp", L"Tera Term", MB_OK);
-		}
+		free(fname);
+		free(dumpfile);
 	}
 
 #if !defined(_M_X64)

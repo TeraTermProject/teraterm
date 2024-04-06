@@ -16,6 +16,7 @@
   <li><a href="#menu-id">メニューID追加時の命名規則</a></li>
   <li><a href="#add-macro-command">マクロコマンド追加時の作業リスト</a></li>
   <li><a href="#icon">アイコン</a></li>
+  <li><a href="#dump">ダンプ</a></li>
 </ol>
 
 <hr>
@@ -439,6 +440,40 @@ Windows NT 4.0 は 4bit アイコンのみサポートしているためです。また、Windows 2000 
     <td>-</td>
   </tr>
 </table>
+
+<h2 id="dump">ダンプ</h2>
+
+ダンプファイルを使ったデバグ方法。
+
+<p>
+必要なファイル
+<dl>
+  <dt>dmpファイル(ミニダンプファイル)</dt>
+  <dd>
+    ttermpro.exe 内で問題があったときに
+    フォルダ<code>%LOCALAPPDATA%\teraterm5</code>に出力されます。<br>
+    teraterm_YYMMDD-HHMMSS_HASH.dmp といったファイル名になります。
+  </dd>
+
+  <dt>pdbファイル</dt>
+  <dd>
+    pdb = program database files (symbol files)<br>
+    exeファイルのデバグ情報ファイル
+  </dd>
+
+  <dt>exeファイル</dt>
+  <dd>
+    ttermpro.exe
+  </dd>
+</dl>
+
+<p>
+使い方
+
+<ul>
+  <li>ミニダンプをダブルクリックしてVisual Studioを起動する</li>
+  <li>アクションの[ネイティブのみでデバグ]をクリック</li>
+</ul>
 
 </body>
 </html>
