@@ -298,7 +298,12 @@ DLG_BROADCAST_HISTORY=வரலாறு
 DLG_BROADCAST_PARENTONLY=இந்த செயல்முறைக்கு மட்டும் அனுப்பவும்
 DLG_BROADCAST_ENTER=உள்ளிடு விசை
 DLG_BROADCAST_SUBMIT=சமர்ப்பி
+DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=நிகழ்நேர பயன்முறை
+DLG_BROADCAST_FOREGROUND=to Fore
+CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
+CMENU_BROADCAST_MINIMIZE=Minimize selected window
+CMENU_BROADCAST_REFRESH=Refresh window list
 
 DLG_PRNABORT_PRINTING=அச்சிடுதல்
 

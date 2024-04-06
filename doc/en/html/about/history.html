@@ -43,6 +43,17 @@
       <li>allow users to select creating automatic backup or not by <a href="../setup/teraterm-misc.html#IniAutoBackup">IniAutoBackup</a> when overwriting the ini file.
       <li><a href="../setup/teraterm-win.html#space">VTFontSpace</a> can be used to adjust to narrow the space between characters.
       <li>Fixed some Emoji which character widths did not change with Override Emoji Characters width option. (Changed referenced Emoji table.)</li>
+      <li>Disabled COM ports are not included when making list of COM ports.</li>
+      <li>improve Broadcast command dialog:
+        <ul>
+          <li>edit control now support paste by R/M mouse clicking and Shift-INS.</li>
+          <li>edit control now works the same whether the IME is on or off.</li>
+          <li>add "to Fore" button to bring the selected windows to foreground.</li>
+          <li>add context menu in window list which provides foreground/minimize the selected windows and refresh the window list itself.</li>
+          <li>keep selection state when the window list is refreshed.</li>
+          <li>normalize Japanese button name.</li>
+        </ul>
+      </li>
     </ul>
   </li>
 
@@ -60,6 +71,7 @@
       <li>Fixed crash on exit when using <a href="../commandline/teraterm.html#v">/V option</a> of ttermpro.exe.</li>
       <li>Fixed display of combined characters was corrupted.</li>
       <li>Apply changes even if only NoFrame is changed at Window setup dialog.</li>
+      <li>MACRO: fixed <a href="../macro/command/send.html">send</a> macro command could not send $00.</li>
     </ul>
   </li>
 
