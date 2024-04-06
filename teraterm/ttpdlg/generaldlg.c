@@ -27,7 +27,6 @@
  */
 
 /* general dialog */
-#include "teraterm.h"
 #include <stdio.h>
 #include <string.h>
 #define _CRTDBG_MAP_ALLOC
@@ -43,94 +42,129 @@
 #include "helpid.h"
 #include "asprintf.h"
 #include "win32helper.h"
-#include "compat_win.h"
 #include "ttlib_charset.h"
 #include "ttwinman.h"
 
 #include "ttdlg.h"
 
-static const wchar_t **LangUIList = NULL;
-#define LANG_EXT L".lng"
+typedef struct {
+	wchar_t *fullname;
+	wchar_t *filename;
+	wchar_t *language;
+	wchar_t *date;
+	wchar_t *contributor;
+} LangInfo;
 
 static const wchar_t *get_lang_folder()
 {
 	return (IsWindowsNTKernel()) ? L"lang_utf16le" : L"lang";
 }
 
-// メモリフリー
-static void free_lang_ui_list()
+static void LangFree(LangInfo *infos, size_t count)
 {
-	if (LangUIList) {
-		const wchar_t **p = LangUIList;
-		while (*p) {
-			free((void *)*p);
-			p++;
-		}
-		free((void *)LangUIList);
-		LangUIList = NULL;
+	size_t i;
+	for (i = 0; i < count; i++) {
+		LangInfo *p = infos + i;
+		free(p->filename);
+		free(p->fullname);
+		free(p->language);
+		free(p->date);
+		free(p->contributor);
 	}
+	free(infos);
 }
 
-static int make_sel_lang_ui(const wchar_t *dir)
+/**
+ *	ファイル名をリストする(ファイル名のみ)
+ *	infosに追加してreturnする
+ */
+static LangInfo *LangAppendFileList(const wchar_t *folder, LangInfo *infos, size_t *infos_size)
 {
-	int    i;
-	int    file_num;
 	wchar_t *fullpath;
 	HANDLE hFind;
 	WIN32_FIND_DATAW fd;
+	size_t count = *infos_size;
 
-	free_lang_ui_list();
-
-	aswprintf(&fullpath, L"%s\\%s\\*%s", dir, get_lang_folder(), LANG_EXT);
-
-	file_num = 0;
+	aswprintf(&fullpath, L"%s\\*.lng", folder);
 	hFind = FindFirstFileW(fullpath, &fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
 			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				file_num++;
+				LangInfo *p = (LangInfo *)realloc(infos, sizeof(LangInfo) * (count +1));
+				if (p != NULL) {
+					infos = p;
+					p = infos + count;
+					count++;
+					memset(p, 0, sizeof(*p));
+					p->filename = _wcsdup(fd.cFileName);
+					aswprintf(&p->fullname, L"%s\\%s", folder, fd.cFileName);
+				}
 			}
 		} while(FindNextFileW(hFind, &fd));
 		FindClose(hFind);
 	}
-
-	file_num++;  // NULL
-	LangUIList = calloc(file_num, sizeof(wchar_t *));
-
-	i = 0;
-	hFind = FindFirstFileW(fullpath, &fd);
-	if (hFind != INVALID_HANDLE_VALUE) {
-		do {
-			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				LangUIList[i++] = _wcsdup(fd.cFileName);
-			}
-		} while(FindNextFileW(hFind, &fd) && i < file_num);
-		FindClose(hFind);
-	}
-	LangUIList[i] = NULL;
 	free(fullpath);
 
-	return i;
+	*infos_size = count;
+	return infos;
 }
 
-static int get_sel_lang_ui(const wchar_t **list, const wchar_t *selstr)
+/**
+ *	lngファイルの Info セクションを読み込む
+ */
+static void LangRead(LangInfo *infos, size_t infos_size)
 {
-	size_t n = 0;
-	const wchar_t **p = list;
+	size_t i;
 
-	if (selstr == NULL || selstr[0] == '\0') {
-		n = 0;  // English
-	} else {
-		while (*p) {
-			if (wcsstr(selstr, *p)) {
-				n = p - list;
-				break;
-			}
-			p++;
+	for (i = 0; i < infos_size; i++) {
+		LangInfo *p = infos + i;
+		const wchar_t *lng = p->fullname;
+		wchar_t *s;
+		hGetPrivateProfileStringW(L"Info", L"language", NULL, lng, &s);
+		if (s[0] == 0) {
+			free(s);
+			p->language = _wcsdup(p->filename);
+		} else {
+			p->language = s;
+		}
+		hGetPrivateProfileStringW(L"Info", L"date", NULL, lng, &s);
+		if (s[0] == 0) {
+			free(s);
+			p->date = _wcsdup(L"-");
+		} else {
+			p->date = s;
+		}
+		hGetPrivateProfileStringW(L"Info", L"contributor", NULL, lng, &s);
+		if (s[0] == 0) {
+			free(s);
+			p->contributor = _wcsdup(L"-");
+		} else {
+			p->contributor = s;
 		}
 	}
+}
 
-	return (int)(n + 1);  // 1origin
+typedef struct {
+	TTTSet *ts;
+	LangInfo *lng_infos;
+	size_t lng_size;
+	size_t selected_lang;	// 選ばれていたlngファイル番号
+} DlgData;
+
+static wchar_t *LangInfoText(const LangInfo *p)
+{
+	wchar_t *info;
+	aswprintf(&info,
+			  L"language\r\n"
+			  L"  %s\r\n"
+			  L"filename\r\n"
+			  L"  %s\r\n"
+			  L"date\r\n"
+			  L"  %s\r\n"
+			  L"contributor\r\n"
+			  L"  %s",
+			  p->language, p->filename, p->date, p->contributor);
+	return info;
 }
 
 static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
@@ -143,17 +177,19 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_GENHELP, "BTN_HELP" },
 	};
-	static int langui_sel = 1, uilist_count = 0;
+	DlgData *data;
 	PTTSet ts;
 	WORD w;
 
 	switch (Message) {
 		case WM_INITDIALOG:
-			ts = (PTTSet)lParam;
+			data = (DlgData *)lParam;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
+			ts = data->ts;
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
 
+#if 0
 			if ((ts->MenuFlag & MF_NOLANGUAGE)==0) {
 				int sel = 0;
 				int i;
@@ -171,20 +207,24 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 				}
 				SendDlgItemMessage(Dialog, IDC_GENLANG, CB_SETCURSEL, sel, 0);
 			}
+#endif
 
-			// 最初に指定されている言語ファイルの番号を覚えておく。
-			uilist_count = make_sel_lang_ui(ts->ExeDirW);
-			langui_sel = get_sel_lang_ui(LangUIList, ts->UILanguageFileW_ini);
-			if (LangUIList[0] != NULL) {
-				int i = 0;
-				while (LangUIList[i] != 0) {
-					SendDlgItemMessageW(Dialog, IDC_GENLANG_UI, CB_ADDSTRING, 0, (LPARAM)LangUIList[i]);
-					i++;
+			data->selected_lang = 0;
+			{
+				LangInfo *infos = data->lng_infos;
+				size_t info_size = data->lng_size;
+				size_t i;
+				for (i = 0; i < info_size; i++) {
+					const LangInfo *p = infos + i;
+					SendDlgItemMessageW(Dialog, IDC_GENLANG_UI, CB_ADDSTRING, 0, (LPARAM)p->language);
+					if (wcscmp(p->fullname, ts->UILanguageFileW) == 0) {
+						data->selected_lang = i;
+					}
 				}
-				SendDlgItemMessage(Dialog, IDC_GENLANG_UI, CB_SETCURSEL, langui_sel - 1, 0);
-			}
-			else {
-				EnableWindow(GetDlgItem(Dialog, IDC_GENLANG_UI), FALSE);
+				SendDlgItemMessage(Dialog, IDC_GENLANG_UI, CB_SETCURSEL, data->selected_lang, 0);
+				wchar_t *info_text = LangInfoText(infos + data->selected_lang);
+				SetDlgItemTextW(Dialog, IDC_GENLANUI_INFO, info_text);
+				free(info_text);
 			}
 
 			CenterWindow(Dialog, GetParent(Dialog));
@@ -192,41 +232,42 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			return TRUE;
 
 		case WM_COMMAND:
-			switch (LOWORD(wParam)) {
-				case IDOK:
-					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
-					if (ts!=NULL) {
+			switch (wParam) {
+				case IDOK | (BN_CLICKED << 16):
+					data = (DlgData *)GetWindowLongPtr(Dialog,DWLP_USER);
+					ts = data->ts;
+					assert(ts != NULL);
+#if 0
+					if ((ts->MenuFlag & MF_NOLANGUAGE)==0) {
+						WORD language;
+						w = (WORD)GetCurSel(Dialog, IDC_GENLANG);
+						language = (int)SendDlgItemMessageA(Dialog, IDC_GENLANG, CB_GETITEMDATA, w - 1, 0);
 
-						if ((ts->MenuFlag & MF_NOLANGUAGE)==0) {
-							WORD language;
-							w = (WORD)GetCurSel(Dialog, IDC_GENLANG);
-							language = (int)SendDlgItemMessageA(Dialog, IDC_GENLANG, CB_GETITEMDATA, w - 1, 0);
+						// Language が変更されたとき、
+						// KanjiCode/KanjiCodeSend を変更先の Language に存在する値に置き換える
+						if (1 <= language && language < IdLangMax && language != ts->Language) {
+							WORD KanjiCode = ts->KanjiCode;
+							WORD KanjiCodeSend = ts->KanjiCodeSend;
+							ts->KanjiCode = KanjiCodeTranslate(language,KanjiCode);
+							ts->KanjiCodeSend = KanjiCodeTranslate(language,KanjiCodeSend);
 
-							// Language が変更されたとき、
-							// KanjiCode/KanjiCodeSend を変更先の Language に存在する値に置き換える
-							if (1 <= language && language < IdLangMax && language != ts->Language) {
-								WORD KanjiCode = ts->KanjiCode;
-								WORD KanjiCodeSend = ts->KanjiCodeSend;
-								ts->KanjiCode = KanjiCodeTranslate(language,KanjiCode);
-								ts->KanjiCodeSend = KanjiCodeTranslate(language,KanjiCodeSend);
-
-								ts->Language = language;
-							}
-
+							ts->Language = language;
 						}
+					}
+#endif
 
-						// 言語ファイルが変更されていた場合
-						w = (WORD)GetCurSel(Dialog, IDC_GENLANG_UI);
-						if (1 <= w && w <= uilist_count && w != langui_sel) {
-							aswprintf(&ts->UILanguageFileW_ini, L"%s\\%s", get_lang_folder(), LangUIList[w - 1]);
-							WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
+					// 言語ファイルが変更されていた場合
+					w = SendDlgItemMessage(Dialog, IDC_GENLANG_UI, CB_GETCURSEL, 0, 0);
+					if (w != data->selected_lang) {
+						const LangInfo *p = data->lng_infos + w;
+						aswprintf(&ts->UILanguageFileW_ini, L"%s\\%s", get_lang_folder(), p->filename);
+						WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
 
-							ts->UILanguageFileW = GetUILanguageFileFullW(ts->ExeDirW, ts->UILanguageFileW_ini);
-							WideCharToACP_t(ts->UILanguageFileW, ts->UILanguageFile, sizeof(ts->UILanguageFile));
+						ts->UILanguageFileW = _wcsdup(p->fullname);
+						WideCharToACP_t(ts->UILanguageFileW, ts->UILanguageFile, sizeof(ts->UILanguageFile));
 
-							// タイトルの更新を行う。(2014.2.23 yutaka)
-							PostMessage(GetParent(Dialog),WM_USER_CHANGETITLE,0,0);
-						}
+						// タイトルの更新を行う。(2014.2.23 yutaka)
+						PostMessage(GetParent(Dialog),WM_USER_CHANGETITLE,0,0);
 					}
 
 					// TTXKanjiMenu は Language を見てメニューを表示するので、変更の可能性がある
@@ -237,18 +278,28 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					TTEndDialog(Dialog, 1);
 					return TRUE;
 
-				case IDCANCEL:
+				case IDCANCEL | (BN_CLICKED << 16):
 					TTEndDialog(Dialog, 0);
 					return TRUE;
 
-				case IDC_GENHELP:
+				case IDC_GENHELP | (BN_CLICKED << 16):
 					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HlpSetupGeneral,0);
 					break;
+
+				case IDC_GENLANG_UI | (CBN_SELCHANGE << 16): {
+					data = (DlgData *)GetWindowLongPtr(Dialog,DWLP_USER);
+					size_t ui_sel = (size_t)SendDlgItemMessageA(Dialog, IDC_GENLANG_UI, CB_GETCURSEL, 0, 0);
+					wchar_t *info = LangInfoText(data->lng_infos + ui_sel);
+					SetDlgItemTextW(Dialog, IDC_GENLANUI_INFO, info);
+					free(info);
+					break;
+				}
+
 			}
 			break;
 
 		case WM_DESTROY:
-			free_lang_ui_list();
+			//free_lang_ui_list();
 			break;
 	}
 	return FALSE;
@@ -256,8 +307,26 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts)
 {
-	return
-		(BOOL)TTDialogBoxParam(hInst,
-							   MAKEINTRESOURCE(IDD_GENDLG),
-							   WndParent, GenDlg, (LPARAM)ts);
+	LangInfo *infos = NULL;
+	size_t infos_size = 0;
+	wchar_t *folder;
+	aswprintf(&folder, L"%s\\%s", ts->ExeDirW, get_lang_folder());
+	infos = LangAppendFileList(folder, infos, &infos_size);
+	free(folder);
+#if 1
+	aswprintf(&folder, L"%s\\%s", ts->HomeDirW, get_lang_folder());
+	infos = LangAppendFileList(folder, infos, &infos_size);
+	free(folder);
+#endif
+	LangRead(infos, infos_size);
+
+	DlgData data;
+	data.ts = ts;
+	data.lng_infos = infos;
+	data.lng_size = infos_size;
+	INT_PTR r = TTDialogBoxParam(hInst,
+								 MAKEINTRESOURCE(IDD_GENDLG),
+								 WndParent, GenDlg, (LPARAM)&data);
+	LangFree(infos, infos_size);
+	return (BOOL)r;
 }
