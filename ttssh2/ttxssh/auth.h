@@ -50,6 +50,8 @@ typedef struct {
   char *user;
   AUTHCred cur_cred;
   SSHAuthMethod failed_method;
+  SSHAuthMethod initial_method;
+  int partial_success;
   int flags;
   int supported_types;
   HWND auth_dialog;

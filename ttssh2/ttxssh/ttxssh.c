@@ -4857,14 +4857,14 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 
 			// パスワードを覚えている場合のみ、コマンドラインに渡す。(2006.8.3 yutaka)
 			if (pvar->settings.remember_password &&
-			    pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) {
+			    pvar->auth_state.initial_method == SSH_AUTH_PASSWORD) {
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
 							 L" /auth=password /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->settings.remember_password &&
-			           pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
+			           pvar->auth_state.initial_method == SSH_AUTH_RSA) {
 				wchar_t markW[MAX_PATH];
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
@@ -4876,13 +4876,13 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->settings.remember_password &&
-			           pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
+			           pvar->auth_state.initial_method == SSH_AUTH_TIS) {
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
 							 L" /auth=challenge /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
-			} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
+			} else if (pvar->auth_state.initial_method == SSH_AUTH_PAGEANT) {
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
 							 L" /auth=pageant /user=%hs", pvar->auth_state.user);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);

@@ -317,7 +317,11 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	if (pvar->auth_state.failed_method != SSH_AUTH_NONE) {
 		/* must be retrying a failed attempt */
 		wchar_t uimsg[MAX_UIMSG];
-		UTIL_get_lang_msgW("DLG_AUTH_BANNER2_FAILED", pvar, L"Authentication failed. Please retry.", uimsg);
+		if (pvar->auth_state.partial_success) {
+			UTIL_get_lang_msgW("DLG_AUTH_BANNER2_FURTHER", pvar, L"Further authentication required.", uimsg);
+		} else {
+			UTIL_get_lang_msgW("DLG_AUTH_BANNER2_FAILED", pvar, L"Authentication failed. Please retry.", uimsg);
+		}
 		SetDlgItemTextW(dlg, IDC_SSHAUTHBANNER2, uimsg);
 		UTIL_get_lang_msgW("DLG_AUTH_TITLE_FAILED", pvar, L"Retrying SSH Authentication", uimsg);
 		SetWindowTextW(dlg, uimsg);
@@ -745,6 +749,9 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 			alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
 	}
 
+	if (pvar->auth_state.initial_method == SSH_AUTH_NONE)
+		pvar->auth_state.initial_method = method;
+
 	// パスワードの保存をするかどうかを決める (2006.8.3 yutaka)
 	if (SendMessage(GetDlgItem(dlg, IDC_REMEMBER_PASSWORD), BM_GETCHECK, 0,0) == BST_CHECKED) {
 		pvar->settings.remember_password = 1;  // 覚えておく
@@ -756,7 +763,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 
 	// 公開鍵認証の場合、セッション複製時にパスワードを使い回したいので解放しないようにする。
 	// (2005.4.8 yutaka)
-	if (method == SSH_AUTH_PASSWORD || method == SSH_AUTH_RSA) {
+	if (!pvar->auth_state.partial_success && (method == SSH_AUTH_PASSWORD || method == SSH_AUTH_RSA)) {
 		pvar->auth_state.cur_cred.password = password;
 	} else {
 		destroy_malloced_string(&password);
@@ -1664,6 +1671,7 @@ static INT_PTR CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 void AUTH_init(PTInstVar pvar)
 {
 	pvar->auth_state.failed_method = SSH_AUTH_NONE;
+	pvar->auth_state.initial_method = SSH_AUTH_NONE;
 	pvar->auth_state.auth_dialog = NULL;
 	pvar->auth_state.user = NULL;
 	pvar->auth_state.flags = 0;
