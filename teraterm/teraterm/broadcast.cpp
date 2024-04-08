@@ -217,13 +217,13 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 			return FALSE;
 
 		case WM_KEYDOWN:
-		case WM_KEYUP:
-		case WM_SYSKEYDOWN:
-		case WM_SYSKEYUP:
 			if (ShiftKey() && wParam == 0x2d) { // intercept Shift-INS
 				SendCB(dlg);
 				return FALSE;
 			}
+		case WM_KEYUP:
+		case WM_SYSKEYDOWN:
+		case WM_SYSKEYUP:
 			{
 				int i;
 				HWND hd;
