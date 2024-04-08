@@ -310,6 +310,31 @@ static void KeepSelection()
 	}
 }
 
+static void InverseSelection() {
+	int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+	for (int i = 0; i < count; i++) {
+		if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
+			selected[i] = 0;
+			SendMessage(BroadcastWindowList, LB_SETSEL, FALSE, i);
+		}
+		else {
+			HWND hd = GetNthWin(i);
+			if (hd != NULL) {
+				GetWindowThreadProcessId(hd, &selected[i]);
+				SendMessage(BroadcastWindowList, LB_SETSEL, TRUE, i);
+			}
+		}
+	}
+}
+
+static void ClearSelection() {
+	int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+	for (int i = 0; i < count; i++) {
+		selected[i] = 0;
+		SendMessage(BroadcastWindowList, LB_SETSEL, FALSE, i);
+	}
+}
+
 static BOOL wasSelected(DWORD proc, int count) {
 	for (int i = 0; i < count; i++) {
 		if (selected[i] == proc) {
@@ -881,8 +906,14 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_MINIMIZE", L"Minimize selected window", ts.UILanguageFileW, &menuitem);
 				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 2, menuitem);
 				free(menuitem);
-				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_REFRESH", L"Refresh window list", ts.UILanguageFileW, &menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_INVERSE", L"Inverse selection", ts.UILanguageFileW, &menuitem);
 				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 3, menuitem);
+				free(menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_Clear", L"Unselect selection", ts.UILanguageFileW, &menuitem);
+				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 4, menuitem);
+				free(menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_REFRESH", L"Refresh window list", ts.UILanguageFileW, &menuitem);
+				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 5, menuitem);
 				free(menuitem);
 				int choice = TrackPopupMenu(hMenu, TPM_RETURNCMD, GET_X_LPARAM(lp), GET_Y_LPARAM(lp), 0, hWnd, NULL);
 				DestroyMenu(hMenu);
@@ -894,6 +925,12 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					MinimizeSelected();
 					break;
 				case 3:
+					InverseSelection();
+					break;
+				case 4:
+					ClearSelection();
+					break;
+				case 5:
 					UpdateBroadcastWindowList(BroadcastWindowList);
 					break;
 				default:
