@@ -17,6 +17,7 @@
   <li><a href="#add-macro-command">マクロコマンド追加時の作業リスト</a></li>
   <li><a href="#menu-id">メニューID追加時の命名規則</a></li>
   <li><a href="#icon">アイコン</a></li>
+  <li><a href="#update-library">ライブラリバージョンアップ時の変更箇所</a></li>
 </ol>
 
 <hr>
@@ -516,6 +517,56 @@ Windows NT 4.0 は 4bit アイコンのみサポートしているためです。また、Windows 2000 
     <td>-</td>
   </tr>
 </table>
+
+
+<h2 id="update-library">ライブラリバージョンアップ時の変更箇所</h2>
+
+<h3>変更が必要なファイル</h3>
+
+<ul>
+  <li>doc/(en|ja)/html/about/history.html
+    <ul>
+      <li>ライブラリを使うコンポーネントの (その他|Misc) セクションに追記する</li>
+    </ul>
+  </li>
+  <li>doc/(en|ja)/html/reference/develop.html
+    <ul>
+      <li>使用するライブラリのバージョンを変更する</li>
+    </ul>
+  </li>
+  <li>libs/download.cmake
+    <ul>
+      <li>SRC_URL のバージョンを変更する</li>
+      <li>DIR_IN_ARC のバージョンを変更する</li>
+      <li>ARC_HASH を変更する。（ダウンロード破損チェック用）
+        <ul>
+          <li>公式配布元のハッシュ値を使用する。（LibreSSL, Oniguruma, zlib）</li>
+          <li>公式がハッシュ値を公開していないものは、手元で求める。（argon2, cJSON, SFMT）</li>
+        </ul>
+      </li>
+      <li>CHECK_HASH を変更する。（バージョンチェック用）
+        <ul>
+          <li>バージョンチェックに使うファイルのハッシュ値を手元で求める。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>TeraTermProject/update_website リポジトリの add/manual フォルダ配下
+    <ul>
+      <li>Web サイトで表示するライセンスファイルは TeraTermProject/update_website リポジトリで管理している。<br />
+          ライセンスファイルに変更があれば差し替える。</li>
+    </ul>
+  </li>
+</ul>
+
+
+<h4>ファイルのハッシュ値の求めかた</h4>
+
+<pre>
+% sha256sum foo.bar
+% openssl dgst -sha256 foo.bar
+</pre>
+
 
 </body>
 </html>
