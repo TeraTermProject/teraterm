@@ -13,8 +13,9 @@
 
 <ol>
   <li><a href="#ini-entry">TERATERM.INI への項目追加</a></li>
-  <li><a href="#menu-id">メニューID追加時の命名規則</a></li>
+  <li><a href="#i18n">国際化メッセージの対応</a></li>
   <li><a href="#add-macro-command">マクロコマンド追加時の作業リスト</a></li>
+  <li><a href="#menu-id">メニューID追加時の命名規則</a></li>
   <li><a href="#icon">アイコン</a></li>
 </ol>
 
@@ -55,35 +56,54 @@
 </ul>
 
 
-<h2 id="menu-id">メニューID追加時の命名規則</h2>
+<h2 id="i18n">国際化メッセージの対応</h2>
 
-<pre>
-1桁目は 5
-</pre>
-<pre>
-2桁目は
-  Tera Term VT ウィンドウなら  0
-  Tera Term TEK ウィンドウなら 1
-  TTSSH なら                   2
-  TTProxy なら                 3
-  TTXKanjiMenu なら            4
-</pre>
-<pre>
-3桁目は
-  [File] メニューなら    1
-  [Edit] メニューなら    2
-  [Setup] メニューなら   3
-  [Control] メニューなら 4
-  [Window] メニューなら  8
-  [Help] メニューなら    9
-</pre>
+<h3>新しく国際化メッセージに対応する</h3>
 
-<p>
-例：File配下にTTSSHのメニューを追加する
-</p>
-<pre>
-#define ID_SSHSCPMENU       52110
-</pre>
+<ul>
+  <li>ソースコード<br />
+      言語ファイルを読み込む</li>
+  <li>ダイアログのメッセージの場合には、リソースファイルに英語のメッセージをデフォルトのテキストとして記述する</li>
+  <li>言語ファイルを修正する<br />
+      修正するのは installer/release/lang_utf8 配下の言語ファイル
+    <ul>
+      <li>English.lng（英語）
+        <ul>
+          <li>英語のメッセージを追加する</li>
+          <li>メッセージの更新日として今日を記述する</li>
+          <li>この対応時に更新されるので、最終翻訳日はない</li>
+          <li>英語の言語ファイルはプログラムから読み込まれないが、他の言語ファイルへ翻訳するときの参考となる</li>
+        </ul>
+      </li>
+      <li>Japanese.lng（日本語）
+        <ul>
+          <li>日本語に翻訳したメッセージを追加する</li>
+          <li>メッセージの更新日として今日を記述する</li>
+          <li>この対応時に更新されるので、最終翻訳日はない</li>
+        </ul>
+      </li>
+      <li>他の言語ファイル
+        <ul>
+          <li>英語のメッセージを追加する</li>
+          <li>メッセージの更新日として今日を記述する</li>
+          <li>翻訳はアップデートされていないので最終翻訳日は更新しない</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3>国際化メッセージを翻訳する</h3>
+
+<ul>
+  <li>言語ファイルを修正する
+    <ul>
+      <li>対象言語のファイルに英語で書かれているメッセージを、対象言語のメッセージに翻訳する</li>
+      <li>メッセージの更新日は更新しない</li>
+      <li>最終翻訳日を更新する</li>
+    </ul>
+  </li>
+</ul>
 
 
 <h2 id="add-macro-command">マクロコマンド追加時の作業リスト</h2>
@@ -121,6 +141,37 @@ Tera Termマクロを新設するときの作業手順について、以下に示します。
     </ul>
   </li>
 </ul>
+
+
+<h2 id="menu-id">メニューID追加時の命名規則</h2>
+
+<pre>
+1桁目は 5
+</pre>
+<pre>
+2桁目は
+  Tera Term VT ウィンドウなら  0
+  Tera Term TEK ウィンドウなら 1
+  TTSSH なら                   2
+  TTProxy なら                 3
+  TTXKanjiMenu なら            4
+</pre>
+<pre>
+3桁目は
+  [File] メニューなら    1
+  [Edit] メニューなら    2
+  [Setup] メニューなら   3
+  [Control] メニューなら 4
+  [Window] メニューなら  8
+  [Help] メニューなら    9
+</pre>
+
+<p>
+例：File配下にTTSSHのメニューを追加する
+</p>
+<pre>
+#define ID_SSHSCPMENU       52110
+</pre>
 
 
 <h2 id="icon">アイコン</h2>

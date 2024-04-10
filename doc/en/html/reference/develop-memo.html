@@ -13,8 +13,9 @@
 
 <ol>
   <li><a href="#ini-entry">Add entry to TERATERM.INI</a></li>
-  <li><a href="#menu-id">Naming rule to add menu ID</a></li>
+  <li><a href="#i18n">Support i18n message</a></li>
   <li><a href="#add-macro-command">What to do when new macro command is added?</a></li>
+  <li><a href="#menu-id">Naming rule to add menu ID</a></li>
   <li><a href="#icon">Icon</a></li>
 </ol>
 
@@ -55,35 +56,54 @@ It recommends that the new name like as Baz....
 </ul>
 
 
-<h2 id="menu-id">Naming rule to add menu ID</h2>
+<h2 id="i18n">Support i18n message</h2>
 
-<pre>
-The first digit is 5.
-</pre>
-<pre>
-The second digit is:
-  Tera Term VT window          0
-  Tera Term TEK window         1
-  TTSSH                        2
-  TTProxy                      3
-  TTXKanjiMenu                 4
-</pre>
-<pre>
-The third digit is:
-  [File] menu                  1
-  [Edit] menu                  2
-  [Setup] menu                 3
-  [Control] menu               4
-  [Window] menu                8
-  [Help] menu                  9
-</pre>
+<h3>Add new i18n message</h3>
 
-<p>
-Example: adding a TTSSH menu under File menu
-</p>
-<pre>
-#define ID_SSHSCPMENU       52110
-</pre>
+<ul>
+  <li>Source code<br />
+      Read langage file</li>
+  <li>If a message is on dialog, put English message as default text</li>
+  <li>Modify language file<br />
+      Modify files under installer/release/lang_utf8 folder.
+    <ul>
+      <li>English.lng (English)
+        <ul>
+          <li>Add English message.</li>
+          <li>Describe today as message update date.</li>
+          <li>Last translate date is not present in this file.</li>
+          <li>This language file is not read from program. This is a reference for translate to other language.</li>
+        </ul>
+      </li>
+      <li>Japanese.lng (Japanese)
+        <ul>
+          <li>Add Japanese message.</li>
+          <li>Describe today as message update date.</li>
+          <li>Last translate date is not present in this file.</li>
+        </ul>
+      </li>
+      <li>Modify other language file
+        <ul>
+          <li>Add English message</li>
+          <li>Describe today as message update date.</li>
+          <li>Do not update last translate date, because translation is not updated.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3>Translate i18n message</h3>
+
+<ul>
+  <li>Modify language file
+    <ul>
+      <li>Translate English message in language file to target language.</li>
+      <li>Do not update update date.</li>
+      <li>Describe today as last translate date.</li>
+    </ul>
+  </li>
+</ul>
 
 
 <h2 id="add-macro-command">What to do when new macro command is added?</h2>
@@ -117,6 +137,37 @@ Example: adding a TTSSH menu under File menu
     </ul>
   </li>
 </ul>
+
+
+<h2 id="menu-id">Naming rule to add menu ID</h2>
+
+<pre>
+The first digit is 5.
+</pre>
+<pre>
+The second digit is:
+  Tera Term VT window          0
+  Tera Term TEK window         1
+  TTSSH                        2
+  TTProxy                      3
+  TTXKanjiMenu                 4
+</pre>
+<pre>
+The third digit is:
+  [File] menu                  1
+  [Edit] menu                  2
+  [Setup] menu                 3
+  [Control] menu               4
+  [Window] menu                8
+  [Help] menu                  9
+</pre>
+
+<p>
+Example: adding a TTSSH menu under File menu
+</p>
+<pre>
+#define ID_SSHSCPMENU       52110
+</pre>
 
 
 <h2 id="icon">Icon</h2>
