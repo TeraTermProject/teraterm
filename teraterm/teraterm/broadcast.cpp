@@ -291,6 +291,25 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 	return CallWindowProcW(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
 }
 
+static WNDPROC DefaultWindowListProc;
+
+static LRESULT CALLBACK WindowListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	switch (msg) {
+	case WM_LBUTTONDOWN:
+		int num = GetRegisteredWindowCount();
+		// クリック位置のインデックスを取得
+		POINT pt;
+		pt.x = LOWORD(lParam);
+		pt.y = HIWORD(lParam);
+		int index = SendMessage(hwnd, LB_ITEMFROMPOINT, 0, MAKELPARAM(pt.x, pt.y));
+		if (index > num) { // 余白の左クリックは無視する
+			return FALSE;
+		}
+		break;
+	}
+	return CallWindowProc(DefaultWindowListProc, hwnd, msg, wParam, lParam);
+}
+
 static DWORD selected[MAXNWIN];
 static void KeepSelection()
 {
@@ -595,6 +614,9 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			// Tera Term window list
 			BroadcastWindowList = GetDlgItem(hWnd, IDC_LIST);
 			UpdateBroadcastWindowList(BroadcastWindowList);
+			// 余白クリック対応
+			DefaultWindowListProc = (WNDPROC)GetWindowLongPtr(BroadcastWindowList, GWLP_WNDPROC);
+			SetWindowLongPtr(BroadcastWindowList, GWLP_WNDPROC, (LONG_PTR)WindowListProc);
 
 			// I18N
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
