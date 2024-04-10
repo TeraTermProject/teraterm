@@ -346,7 +346,7 @@ static void InverseSelection() {
 	}
 }
 
-static void ClearSelection() {
+static void UnselectAll() {
 	int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
 	for (int i = 0; i < count; i++) {
 		selected[i] = 0;
@@ -928,10 +928,23 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_MINIMIZE", L"Minimize selected window", ts.UILanguageFileW, &menuitem);
 				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 2, menuitem);
 				free(menuitem);
-				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_INVERSE", L"Inverse selection", ts.UILanguageFileW, &menuitem);
+				int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+				BOOL hasSelection = FALSE;
+				for (int i = 0; i < count; i++) {
+					if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
+						hasSelection = TRUE;
+						break;
+					}
+				}
+				if (hasSelection) {
+					GetI18nStrWW("Tera Term", "CMENU_BROADCAST_UNSELECT_ALL", L"Unselect all", ts.UILanguageFileW, &menuitem);
+				}
+				else {
+					GetI18nStrWW("Tera Term", "CMENU_BROADCAST_SELECT_ALL", L"Select all", ts.UILanguageFileW, &menuitem);
+				}
 				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 3, menuitem);
 				free(menuitem);
-				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_Clear", L"Unselect selection", ts.UILanguageFileW, &menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_INVERSE", L"Inverse selection", ts.UILanguageFileW, &menuitem);
 				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 4, menuitem);
 				free(menuitem);
 				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_REFRESH", L"Refresh window list", ts.UILanguageFileW, &menuitem);
@@ -947,10 +960,17 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					MinimizeSelected();
 					break;
 				case 3:
-					InverseSelection();
+					if (hasSelection) {
+						UnselectAll();
+					}
+					else {
+						for (int i = 0; i < count; i++) {
+							ListBox_SetSel(BroadcastWindowList, TRUE, i);
+						}
+					}
 					break;
 				case 4:
-					ClearSelection();
+					InverseSelection();
 					break;
 				case 5:
 					UpdateBroadcastWindowList(BroadcastWindowList);
