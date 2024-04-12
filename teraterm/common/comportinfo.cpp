@@ -86,7 +86,6 @@
 
 #define INITGUID
 #include <guiddef.h>
-#include <ntddmodm.h>
 
 typedef BOOL (WINAPI *TSetupDiGetDevicePropertyW)(
 	HDEVINFO DeviceInfoSet,
