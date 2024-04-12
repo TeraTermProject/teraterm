@@ -6795,6 +6795,7 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 
 	// 認証OK
 	pvar->userauth_success = 1;
+	pvar->auth_state.partial_success = 0;
 
 	// ディスパッチルーチンの再設定
 	do_SSH2_dispatch_setup_for_transfer(pvar);
@@ -6881,11 +6882,25 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		return FALSE;
 	}
 
-	// tryed_ssh2_authlist が FALSE の場合は、まだ認証を試行をしていない。
-	if (!pvar->tryed_ssh2_authlist) {
+	// partial が はじめてTRUE になるとき追加の認証の準備をする
+	if (partial) {
+		logprintf(LOG_LEVEL_VERBOSE, "Authenticated using \"%s\" with partial success.", cstring);
+		// はじめて追加認証を要するときは autologin を無効にする
+		// セッションの複製で指定される password をクリアして追加認証に備える
+		if (!pvar->auth_state.partial_success) {
+			pvar->ssh2_autologin = 0;
+			SecureZeroMemory(pvar->ssh2_password, sizeof(pvar->ssh2_password));
+			pvar->ssh2_authmethod = SSH_AUTH_NONE;
+			//pvar->auth_state.initial_method = pvar->auth_state.cur_cred.method;
+		}
+	}
+
+	// tryed_ssh2_authlist が FALSE の場合は、まだ認証を試行をしていない。または、partial が TRUEの場合は、追加の認証を行う
+	if (partial || !pvar->tryed_ssh2_authlist) {
 		int type = 0;
 
 		pvar->tryed_ssh2_authlist = TRUE;
+		pvar->auth_state.partial_success = partial;
 
 		// 認証ダイアログのラジオボタンを更新
 		if (strstr(cstring, "password")) {
@@ -6942,7 +6957,7 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		}
 	}
 
-	if (pvar->ssh2_autologin == 1) {
+	if (!pvar->auth_state.partial_success && pvar->ssh2_autologin == 1) {
 		char uimsg[MAX_UIMSG];
 		// SSH2自動ログインが有効の場合は、リトライは行わない。(2004.12.4 yutaka)
 		UTIL_get_lang_msg("MSG_SSH_AUTH_FAILURE_ERROR", pvar,
@@ -6967,6 +6982,8 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 	AUTH_advance_to_next_cred(pvar);
 	pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
 	try_send_credentials(pvar);
+	if(!pvar->auth_state.partial_success)
+		pvar->auth_state.initial_method = SSH_AUTH_NONE;
 
 	return TRUE;
 }
