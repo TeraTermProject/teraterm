@@ -4793,6 +4793,7 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 
 	GetTempPathW(_countof(tmpPath), tmpPath);
 	GetTempFileNameW(tmpPath, L"TTX", 0, tmpFile);
+	WriteIniBom(tmpFile, TRUE);
 
 	for (i = 0; cmd[i] != ' ' && cmd[i] != 0; i++) {
 	}
