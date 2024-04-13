@@ -55,6 +55,7 @@
 #include "clipboar.h"	// for CBPreparePaste()
 #include "ttime.h"
 
+#include "helpid.h"
 #include "broadcast.h"
 
 
@@ -553,9 +554,9 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 		{ IDC_ENTERKEY_CHECK, "DLG_BROADCAST_ENTER" },
 		{ IDC_PARENT_ONLY, "DLG_BROADCAST_PARENTONLY" },
 		{ IDC_REALTIME_CHECK, "DLG_BROADCAST_REALTIME" },
-		{ IDC_FORE_RECEIVER, "DLG_BROADCAST_FOREGROUND" },
 		{ IDOK, "DLG_BROADCAST_SUBMIT" },
 		{ IDCANCEL, "DLG_BROADCAST_CLOSE" },
+		{ IDC_BROADCAST_HELP, "DLG_BROADCAST_HELP" },
 	};
 	LRESULT checked;
 	LRESULT history;
@@ -702,12 +703,6 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
 				}
 				return TRUE;
-
-			case IDC_FORE_RECEIVER:
-				ForeSelected();
-				ForegroundWin(hWnd);
-				SetFocus(GetDlgItem(hWnd, IDC_COMMAND_EDIT));
-				return FALSE;
 			}
 
 			switch (LOWORD(wp)) {
@@ -785,6 +780,10 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 					return TRUE;
 
+				case IDC_BROADCAST_HELP:
+					PostMessage(GetParent(hWnd),WM_USER_DLGHELP2, HlpMenuControlBroadcast,0);
+					break;
+
 				case IDC_COMMAND_EDIT:
 					if (HIWORD(wp) == CBN_DROPDOWN) {
 						wchar_t *historyfile = GetHistoryFileName(&ts);
@@ -852,15 +851,6 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				             dlg_w - ok2right, p.y, 0, 0,
 				             SWP_NOSIZE | SWP_NOZORDER);
 
-				// Fore button
-				GetWindowRect(GetDlgItem(hWnd, IDC_FORE_RECEIVER), &rc);
-				p.x = rc.left;
-				p.y = rc.top;
-				ScreenToClient(hWnd, &p);
-				SetWindowPos(GetDlgItem(hWnd, IDC_FORE_RECEIVER), 0,
-				             dlg_w - ok2right, p.y, 0, 0,
-				             SWP_NOSIZE | SWP_NOZORDER);
-
 				// Cancel button
 				GetWindowRect(GetDlgItem(hWnd, IDCANCEL), &rc);
 				p.x = rc.left;
@@ -868,6 +858,15 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				ScreenToClient(hWnd, &p);
 				SetWindowPos(GetDlgItem(hWnd, IDCANCEL), 0,
 				             dlg_w - cancel2right, p.y, 0, 0,
+				             SWP_NOSIZE | SWP_NOZORDER);
+
+				// Help button
+				GetWindowRect(GetDlgItem(hWnd, IDC_BROADCAST_HELP), &rc);
+				p.x = rc.left;
+				p.y = rc.top;
+				ScreenToClient(hWnd, &p);
+				SetWindowPos(GetDlgItem(hWnd, IDC_BROADCAST_HELP), 0,
+				             dlg_w - ok2right, p.y, 0, 0,
 				             SWP_NOSIZE | SWP_NOZORDER);
 
 				// Command Edit box
@@ -955,6 +954,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				switch (choice) {
 				case 1:
 					ForeSelected();
+					SetFocus(GetDlgItem(hWnd, IDC_COMMAND_EDIT));
 					break;
 				case 2:
 					MinimizeSelected();

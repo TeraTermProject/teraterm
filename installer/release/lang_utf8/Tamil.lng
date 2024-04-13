@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-03-30)
+﻿; Updated by TeraTerm Project (2024-04-13)
 ; Last translated (Tamil language) by திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -300,7 +300,7 @@ DLG_BROADCAST_ENTER=உள்ளிடு விசை
 DLG_BROADCAST_SUBMIT=சமர்ப்பி
 DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=நிகழ்நேர பயன்முறை
-DLG_BROADCAST_FOREGROUND=to Fore
+DLG_BROADCAST_HELP=Help
 CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
 CMENU_BROADCAST_MINIMIZE=Minimize selected window
 CMENU_BROADCAST_REFRESH=Refresh window list

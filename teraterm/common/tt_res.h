@@ -243,7 +243,7 @@
 #define IDC_SPIPATH_TITLE               2621
 #define IDC_SPIPATH_EDIT                2622
 #define IDC_SPIPATH_BUTTON              2623
-#define IDC_FORE_RECEIVER               2624
+#define IDC_BROADCAST_HELP              2624
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003

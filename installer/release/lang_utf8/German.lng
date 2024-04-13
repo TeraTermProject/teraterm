@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-03-30)
+﻿; Updated by TeraTerm Project (2024-04-13)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -300,7 +300,7 @@ DLG_BROADCAST_ENTER=Auswahl-Taste
 DLG_BROADCAST_SUBMIT=Absenden
 DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=Echtzeit-Modus
-DLG_BROADCAST_FOREGROUND=to Fore
+DLG_BROADCAST_HELP=Help
 CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
 CMENU_BROADCAST_MINIMIZE=Minimize selected window
 CMENU_BROADCAST_REFRESH=Refresh window list

@@ -1,4 +1,4 @@
-﻿; Updated by TeraTerm Project (2024-03-30)
+﻿; Updated by TeraTerm Project (2024-04-13)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -300,7 +300,7 @@ DLG_BROADCAST_ENTER=T. Entrée
 DLG_BROADCAST_SUBMIT=Valider
 DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=Mode tps-réel
-DLG_BROADCAST_FOREGROUND=to Fore
+DLG_BROADCAST_HELP=Help
 CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
 CMENU_BROADCAST_MINIMIZE=Minimize selected window
 CMENU_BROADCAST_REFRESH=Refresh window list
