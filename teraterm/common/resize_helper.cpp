@@ -48,9 +48,23 @@ typedef struct ReiseDlgHelper_st
 	LONG init_height;
 	LONG window_width;
 	LONG window_height;
+	HWND hWndSizeBox;
 } ReiseDlgHelper_t;
 
-ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg)
+static void SetSizeBoxPos(ReiseDlgHelper_t *h)
+{
+	RECT rect;
+	GetClientRect(h->hWnd, &rect);
+	int width = GetSystemMetrics(SM_CXVSCROLL);
+	int height = GetSystemMetrics(SM_CYHSCROLL);
+	int x = rect.right - width;
+	int y = rect.bottom - height;
+	SetWindowPos(h->hWndSizeBox, NULL,
+				 x, y, width, height,
+				 SWP_NOZORDER|SWP_SHOWWINDOW);
+}
+
+ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg, BOOL size_box)
 {
 	RECT rect;
 	ReiseDlgHelper_t *h = (ReiseDlgHelper_t *)calloc(sizeof(*h), 1);
@@ -70,12 +84,28 @@ ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg)
 	h->hWnd = dlg;
 	h->control_list = NULL;
 	h->control_count = 0;
+
+	if (size_box) {
+		HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(dlg, GWLP_HINSTANCE);
+		// サイズボックスを作成
+		// SBS_SIZEBOX = SBS_SIZEGRIP
+		h->hWndSizeBox =
+			CreateWindowExW(
+				0, L"SCROLLBAR", NULL,
+				WS_CHILD | WS_VISIBLE | SBS_SIZEBOX | WS_DISABLED,
+				10, 10, 10, 10,
+				dlg, NULL, hInstance, NULL);
+		SetSizeBoxPos(h);
+	}
 	return h;
 }
 
 void ReiseDlgHelperDelete(ReiseDlgHelper_t *h)
 {
 	if (h != NULL) {
+		if (h->hWndSizeBox != NULL) {
+			DestroyWindow(h->hWndSizeBox);
+		}
 		free(h->control_list);
 		h->control_list = NULL;
 		free(h);
@@ -167,6 +197,10 @@ void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h)
 	h->window_height = new_height;
 	h->window_width = new_width;
 
+	if (h->hWndSizeBox != NULL) {
+		SetSizeBoxPos(h);
+	}
+
 	// 移動しているときにコントロールが重なると表示が乱れることがある
 	// 全体を再描画する
 	InvalidateRect(h->hWnd, NULL, TRUE);
@@ -185,9 +219,9 @@ INT_PTR ReiseDlgHelper_WM_GETMINMAXINFO(ReiseDlgHelper_t *h, LPARAM lp)
 	return 0;
 }
 
-ReiseDlgHelper_t *ReiseHelperInit(HWND dlg, const ResizeHelperInfo *infos, size_t info_count)
+ReiseDlgHelper_t *ReiseHelperInit(HWND dlg, BOOL size_box, const ResizeHelperInfo *infos, size_t info_count)
 {
-	ReiseDlgHelper_t *h = ReiseDlgHelperCreate(dlg);
+	ReiseDlgHelper_t *h = ReiseDlgHelperCreate(dlg, size_box);
 	if (h == NULL) {
 		return NULL;
 	}

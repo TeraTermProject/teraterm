@@ -105,7 +105,7 @@ BOOL CListDlg::OnInitDialog()
 	RECT R;
 	HWND HList, HOk;
 
-	ResizeHelper = ReiseHelperInit(m_hWnd, resize_info, _countof(resize_info));
+	ResizeHelper = ReiseHelperInit(m_hWnd, FALSE, resize_info, _countof(resize_info));
 
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
 
