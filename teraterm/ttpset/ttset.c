@@ -2109,6 +2109,8 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WORD TmpColor[12][6];
 	wchar_t *TempW;
 
+	WriteIniBom(FName, FALSE);
+
 	/* version */
 	ret = WritePrivateProfileString(Section, "Version", TT_VERSION_STR("."), FName);
 	if (ret == 0) {

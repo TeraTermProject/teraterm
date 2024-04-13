@@ -1,4 +1,9 @@
-﻿[Tera Term]
+﻿[Info]
+language=default
+date=
+contributor=
+
+[Tera Term]
 DLG_SYSTEM_FONT=System,12,0
 DLG_TAHOMA_FONT=Tahoma,8,0
 

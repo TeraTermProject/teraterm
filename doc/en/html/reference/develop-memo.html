@@ -16,6 +16,7 @@
   <li><a href="#menu-id">Naming rule to add menu ID</a></li>
   <li><a href="#add-macro-command">What to do when new macro command is added?</a></li>
   <li><a href="#icon">Icon</a></li>
+  <li><a href="#dump">Dump</a></li>
 </ol>
 
 <hr>
@@ -435,6 +436,40 @@ Source file of each icon images are followings:
     <td>-</td>
   </tr>
 </table>
+
+<h2 id="dump">Dump</h2>
+
+About debug with dump file.
+
+<p>
+Required Files
+<dl>
+  <dt>dmp file(mini dump file)</dt>
+  <dd>
+    Output to folder <code>%LOCALAPPDATA%\teraterm5</code>
+    when ttermpro.exe crash.<br>
+    File name will be teraterm_YYYMMDD-HHMMSS_HASH.dmp.
+  </dd>
+
+  <dt>pdb file</dt>
+  <dd>
+    pdb = program database files (symbol files)<br>
+    debug infomation file for exe file
+  </dd>
+
+  <dt>exe file</dt>
+  <dd>
+    ttermpro.exe
+  </dd>
+</dl>
+
+<p>
+How to use
+
+<ul>
+  <li>click dump file to start Visual Studio</li>
+  <li>click [Debugging in native only]</li>
+</ul>
 
 </body>
 </html>
