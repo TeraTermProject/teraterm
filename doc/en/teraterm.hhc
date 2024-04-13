@@ -781,6 +781,11 @@
 			<param name="Local" value="html\reference\sourcecode.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Notes on Win32 API">
+			<param name="Local" value="html\reference\dev\win32api.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="MACRO help">
