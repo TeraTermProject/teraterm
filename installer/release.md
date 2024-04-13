@@ -31,15 +31,4 @@
 
 ## pdbファイル
 
-- pdb = program database files (symbol files)
-- デバグ時に使用する
-
-### 使い方
-
-- 次のファイルを同じフォルダに配置する
-  - クラッシュしたときのミニダンプ
-    - teraterm_rREV_YYMMDD-HHMMSS-PID.dmp
-  - exe,dll
-  - pdb
-- ミニダンプをダブルクリックしてVisual Studioを起動する
-- アクションの[ネイティブのみでデバグ]をクリック
+pdbファイルについては[dump](../doc/ja/html/reference/develop-memo.html#dump)を参照ください

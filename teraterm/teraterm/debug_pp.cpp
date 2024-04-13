@@ -29,6 +29,8 @@
 /* debug property page */
 
 #include <stdio.h>
+#include <crtdbg.h>
+#include <assert.h>
 
 #include "tmfc.h"
 #include "tt_res.h"
@@ -107,6 +109,13 @@ BOOL CDebugPropPage::OnCommand(WPARAM wParam, LPARAM)
 				}
 			}
 			SetDlgItemTextA(IDC_DEBUG_CONSOLE_BUTTON, caption);
+			break;
+		}
+		case IDC_BUTTON_DUMP | (BN_CLICKED << 16): {
+			DebugTestCrash();
+			//*((unsigned char *)0) = 0;	// null pointer assignment
+			//_CrtDbgBreak();	// MinGW ‚Å‚Íí‚É–³Œø‰»‚³‚ê‚Ä‚¢‚é
+			//assert(FALSE);
 			break;
 		}
 		default:

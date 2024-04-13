@@ -19,10 +19,12 @@ if((NOT USE_GCC_32) AND (NOT USE_GCC_64) AND
 endif()
 
 if(USE_GCC_32 OR USE_CLANG_32)
+  set(CMAKE_SYSTEM_PROCESSOR i686)
   set(PREFIX "i686-w64-mingw32-")
   set(CMAKE_FIND_ROOT_PATH /usr/i686-w64-mingw32)
 endif()
 if(USE_GCC_64 OR USE_CLANG_64)
+  set(CMAKE_SYSTEM_PROCESSOR x86_64)
   set(PREFIX "x86_64-w64-mingw32-")
   set(CMAKE_FIND_ROOT_PATH /usr/x86_64-w64-mingw32)
 endif()

@@ -1,5 +1,7 @@
-﻿; Updated by TeraTerm Project (2024-04-13)
-; Last translated (French language) by Francois MOCQ (2010-07-21)
+﻿[Info]
+language=French
+date=2024-04-13 by TeraTerm Project
+contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -59,7 +61,7 @@ MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=&Clavier...
 MENU_SETUP_SERIALPORT=Port Serie...
 MENU_SETUP_TCPIP=T&CP/IP...
-MENU_SETUP_GENERAL=&General...
+MENU_SETUP_GENERAL=&General(LanguageUI)...
 MENU_SETUP_ADDITION=Plus de reglages...
 MENU_SETUP_SAVE=&Sauvegarder setup...
 MENU_SETUP_RESTORE=&Restaurer setup...
@@ -1115,7 +1117,7 @@ MSG_PATH_LENGTH_EXCEEDED=Chemin plus long que la longueur maxi admise
 MSG_INVALID_PURPOSE=Utilisation du certificat non correcte
 MSG_CERT_UNTRUSTED=Ce n'est pas un certificat de confiance
 MSG_CERT_REJECTED=Certificat rejeté
-MSG_SUBJECT_ISSUER_MISMATCH=Sujet / émetteur ne co¨ncident pas  
+MSG_SUBJECT_ISSUER_MISMATCH=Sujet / émetteur ne co¨ncident pas
 MSG_AKID_SKID_MISMATCH=Autorité et identifiant de clé Sujet ne coïncident pas
 MSG_AKID_ISSUER_SERIAL_MISMATCH=Autorité et N° de série de l'émetteur ne coïncident pas
 MSG_KEYUSAGE_NO_CERTSIGN=L'usage de la clé n'inclut pas la signature de certificats
@@ -1145,7 +1147,7 @@ DLG_ABOUT_TITLE=Version Information
 DLG_ABOUT_APPNAME=Tera Term outil de lancement\nTeraTerm Menu
 
 DLG_CONFIG_TITLE=Configuration de la liste
-DLG_CONFIG_ITEM=Item 
+DLG_CONFIG_ITEM=Item
 DLG_CONFIG_CONFIG=Configuration
 DLG_CONFIG_NAME=Nom
 DLG_CONFIG_PATTERN=Modèle de lancement
