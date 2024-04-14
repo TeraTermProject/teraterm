@@ -13,9 +13,11 @@
 
 <ol>
   <li><a href="#ini-entry">TERATERM.INI への項目追加</a></li>
-  <li><a href="#menu-id">メニューID追加時の命名規則</a></li>
+  <li><a href="#i18n">国際化メッセージの対応</a></li>
   <li><a href="#add-macro-command">マクロコマンド追加時の作業リスト</a></li>
+  <li><a href="#menu-id">メニューID追加時の命名規則</a></li>
   <li><a href="#icon">アイコン</a></li>
+  <li><a href="#update-library">ライブラリバージョンアップ時の変更箇所</a></li>
   <li><a href="#dump">ダンプ</a></li>
 </ol>
 
@@ -23,42 +25,87 @@
 
 <h2 id="ini-entry">TERATERM.INI への項目追加</h2>
 
+<h3>項目名</h3>
+
 <p>
-項目名<br />
 すでに EnableFoo... や DisableBar... が混在してしまっているが、混乱しやすい。<br />
 今後は Baz... という形式にするのが望ましい。
 </p>
 
+<h3>変更箇所</h3>
 
-<h2 id="menu-id">メニューID追加時の命名規則</h2>
+<ul>
+  <li>ソースコード
+    <ul>
+      <li>INI ファイルの読み書き部分<br />
+          teraterm\ttpset\ttset.c</li>
+      <li>tttset 構造体<br />
+          teraterm\common\tttypes.h</li>
+    </ul>
+  </li>
+  <li>ドキュメント
+    <ul>
+      <li>Tera Term 設定ファイルの全項目一覧<br />
+          setup/teraterm-ini.html</li>
+      <li>設定ダイアログのヘルプ（ダイアログに変更 UI がある場合）<br />
+          menu 以下のダイアログのページ</li>
+      <li>設定項目のヘルプ（ダイアログに変更 UI がない場合）<br />
+          setup 以下の該当する分類のページ</li>
+    </ul>
+  </li>
+  <li>デフォルトの INI ファイル<br />
+      installer\release\TERATERM.INI</li>
+</ul>
 
-<pre>
-1桁目は 5
-</pre>
-<pre>
-2桁目は
-  Tera Term VT ウィンドウなら  0
-  Tera Term TEK ウィンドウなら 1
-  TTSSH なら                   2
-  TTProxy なら                 3
-  TTXKanjiMenu なら            4
-</pre>
-<pre>
-3桁目は
-  [File] メニューなら    1
-  [Edit] メニューなら    2
-  [Setup] メニューなら   3
-  [Control] メニューなら 4
-  [Window] メニューなら  8
-  [Help] メニューなら    9
-</pre>
 
-<p>
-例：File配下にTTSSHのメニューを追加する
-</p>
-<pre>
-#define ID_SSHSCPMENU       52110
-</pre>
+<h2 id="i18n">国際化メッセージの対応</h2>
+
+<h3>新しく国際化メッセージに対応する</h3>
+
+<ul>
+  <li>ソースコード<br />
+      言語ファイルを読み込む</li>
+  <li>ダイアログのメッセージの場合には、リソースファイルに英語のメッセージをデフォルトのテキストとして記述する</li>
+  <li>言語ファイルを修正する<br />
+      修正するのは installer/release/lang_utf8 配下の言語ファイル
+    <ul>
+      <li>English.lng（英語）
+        <ul>
+          <li>英語のメッセージを追加する</li>
+          <li>メッセージの更新日として今日を記述する</li>
+          <li>この対応時に更新されるので、最終翻訳日はない</li>
+          <li>英語の言語ファイルはプログラムから読み込まれないが、他の言語ファイルへ翻訳するときの参考となる</li>
+        </ul>
+      </li>
+      <li>Japanese.lng（日本語）
+        <ul>
+          <li>日本語に翻訳したメッセージを追加する</li>
+          <li>メッセージの更新日として今日を記述する</li>
+          <li>この対応時に更新されるので、最終翻訳日はない</li>
+        </ul>
+      </li>
+      <li>他の言語ファイル
+        <ul>
+          <li>英語のメッセージを追加する</li>
+          <li>メッセージの更新日として今日を記述する</li>
+          <li>翻訳はアップデートされていないので最終翻訳日は更新しない</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3>国際化メッセージを翻訳する</h3>
+
+<ul>
+  <li>言語ファイルを修正する
+    <ul>
+      <li>対象言語のファイルに英語で書かれているメッセージを、対象言語のメッセージに翻訳する</li>
+      <li>メッセージの更新日は更新しない</li>
+      <li>最終翻訳日を更新する</li>
+    </ul>
+  </li>
+</ul>
 
 
 <h2 id="add-macro-command">マクロコマンド追加時の作業リスト</h2>
@@ -96,6 +143,37 @@ Tera Termマクロを新設するときの作業手順について、以下に示します。
     </ul>
   </li>
 </ul>
+
+
+<h2 id="menu-id">メニューID追加時の命名規則</h2>
+
+<pre>
+1桁目は 5
+</pre>
+<pre>
+2桁目は
+  Tera Term VT ウィンドウなら  0
+  Tera Term TEK ウィンドウなら 1
+  TTSSH なら                   2
+  TTProxy なら                 3
+  TTXKanjiMenu なら            4
+</pre>
+<pre>
+3桁目は
+  [File] メニューなら    1
+  [Edit] メニューなら    2
+  [Setup] メニューなら   3
+  [Control] メニューなら 4
+  [Window] メニューなら  8
+  [Help] メニューなら    9
+</pre>
+
+<p>
+例：File配下にTTSSHのメニューを追加する
+</p>
+<pre>
+#define ID_SSHSCPMENU       52110
+</pre>
 
 
 <h2 id="icon">アイコン</h2>
@@ -441,6 +519,56 @@ Windows NT 4.0 は 4bit アイコンのみサポートしているためです。また、Windows 2000 
   </tr>
 </table>
 
+
+<h2 id="update-library">ライブラリバージョンアップ時の変更箇所</h2>
+
+<h3>変更が必要なファイル</h3>
+
+<ul>
+  <li>doc/(en|ja)/html/about/history.html
+    <ul>
+      <li>ライブラリを使うコンポーネントの (その他|Misc) セクションに追記する</li>
+    </ul>
+  </li>
+  <li>doc/(en|ja)/html/reference/develop.html
+    <ul>
+      <li>使用するライブラリのバージョンを変更する</li>
+    </ul>
+  </li>
+  <li>libs/download.cmake
+    <ul>
+      <li>SRC_URL のバージョンを変更する</li>
+      <li>DIR_IN_ARC のバージョンを変更する</li>
+      <li>ARC_HASH を変更する。（ダウンロード破損チェック用）
+        <ul>
+          <li>公式配布元のハッシュ値を使用する。（LibreSSL, Oniguruma, zlib）</li>
+          <li>公式がハッシュ値を公開していないものは、手元で求める。（argon2, cJSON, SFMT）</li>
+        </ul>
+      </li>
+      <li>CHECK_HASH を変更する。（バージョンチェック用）
+        <ul>
+          <li>バージョンチェックに使うファイルのハッシュ値を手元で求める。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>TeraTermProject/update_website リポジトリの add/manual フォルダ配下
+    <ul>
+      <li>Web サイトで表示するライセンスファイルは TeraTermProject/update_website リポジトリで管理している。<br />
+          ライセンスファイルに変更があれば差し替える。</li>
+    </ul>
+  </li>
+</ul>
+
+
+<h4>ファイルのハッシュ値の求めかた</h4>
+
+<pre>
+% sha256sum foo.bar
+% openssl dgst -sha256 foo.bar
+</pre>
+
+
 <h2 id="dump">ダンプ</h2>
 
 ダンプファイルを使ったデバグ方法。
@@ -474,6 +602,7 @@ Windows NT 4.0 は 4bit アイコンのみサポートしているためです。また、Windows 2000 
   <li>ミニダンプをダブルクリックしてVisual Studioを起動する</li>
   <li>アクションの[ネイティブのみでデバグ]をクリック</li>
 </ul>
+
 
 </body>
 </html>
