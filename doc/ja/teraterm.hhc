@@ -445,13 +445,6 @@
 				<param name="Local" value="html\menu\setup-keyboard.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
-			<UL>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Keyboard(Russian)">
-					<param name="Local" value="html\menu\setup-keyboard_ru.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Serial port">
 				<param name="Local" value="html\menu\setup-serialport.html">
@@ -804,6 +797,7 @@
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="開発者向け">
+		<param name="Local" value="html\reference\develop.html">
 		<param name="ImageNumber" value="1">
 		</OBJECT>
 	<UL>
@@ -846,6 +840,11 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="ソースコード解説">
 			<param name="Local" value="html\reference\sourcecode.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Win32 API に関するメモ">
+			<param name="Local" value="html\reference\dev\win32api.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 	</UL>

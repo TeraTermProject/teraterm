@@ -52,7 +52,6 @@
 #define HlpSetupWindow          15
 #define HlpSetupFont            16
 #define HlpSetupKeyboard        18
-#define HlpSetupKeyboardRuss    19
 #define HlpSetupSerialPort      20
 #define HlpSetupTCPIP           21
 #define HlpSetupGeneral         22

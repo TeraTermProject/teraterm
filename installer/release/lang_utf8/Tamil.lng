@@ -1,5 +1,7 @@
-﻿; Updated by TeraTerm Project (2024-03-15)
-; Last translated (Tamil language) by திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
+﻿[Info]
+language=Tamil(தமிழ்)
+date=2024-04-13 by TeraTerm Project
+contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -59,7 +61,7 @@ MENU_SETUP_DIALOG_FONT=&உரையாடல் எழுத்துரு...
 MENU_SETUP_KEYBOARD=&விசைப்பலகை...
 MENU_SETUP_SERIALPORT=தொடர் துறைமுகம்...
 MENU_SETUP_TCPIP=பகநெ/இநெ...
-MENU_SETUP_GENERAL=&பொது...
+MENU_SETUP_GENERAL=&பொது(LanguageUI)...
 MENU_SETUP_ADDITION=கூடுதல் அமைப்புகள்...
 MENU_SETUP_SAVE=&அமைப்பைச் சேமி...
 MENU_SETUP_RESTORE=&அமைவை மீட்டமை...
@@ -197,7 +199,8 @@ DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT=பகநெ &துறைமுகம் �
 DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED=தொடர் துறைமுகம் வேகத்தைக் காட்டு
 DLG_TAB_GENERAL_NOTIFICATION_TITLE=அறிவிப்பு
 DLG_TAB_GENERAL_NOTIFIY_SOUND=&ஒலியை அறிவிக்கவும்
-DLG_TAB_GENERAL_NOTIFICATION_TEST_POPUP=&மேல்தோன்றும் சோதனை
+DLG_TAB_GENERAL_NOTIFICATION_TEST_NOTIFY=&Notify Test
+DLG_TAB_GENERAL_NOTIFICATION_TEST_MESSAGE=Now icon is displayed in the notification area (task tray),\n and can be turned on or off in Windows notification setting.
 DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY=&தட்டு சோதனை
 
 DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=சுட்டி நிகழ்வு கண்காணிப்பு கோரிக்கையை ஏற்கவும்
@@ -297,7 +300,12 @@ DLG_BROADCAST_HISTORY=வரலாறு
 DLG_BROADCAST_PARENTONLY=இந்த செயல்முறைக்கு மட்டும் அனுப்பவும்
 DLG_BROADCAST_ENTER=உள்ளிடு விசை
 DLG_BROADCAST_SUBMIT=சமர்ப்பி
+DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=நிகழ்நேர பயன்முறை
+DLG_BROADCAST_FOREGROUND=to Fore
+CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
+CMENU_BROADCAST_MINIMIZE=Minimize selected window
+CMENU_BROADCAST_REFRESH=Refresh window list
 
 DLG_PRNABORT_PRINTING=அச்சிடுதல்
 

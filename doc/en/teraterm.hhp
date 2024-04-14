@@ -40,7 +40,6 @@ HlpSetupTerminalUtf8=html\menu\setup-terminal_utf8.html
 HlpSetupWindow=html\menu\setup-window.html
 HlpSetupFont=html\menu\setup-font.html
 HlpSetupKeyboard=html\menu\setup-keyboard.html
-HlpSetupKeyboardRuss=html\menu\setup-keyboard_ru.html
 HlpSetupSerialPort=html\menu\setup-serialport.html
 HlpSetupTCPIP=html\menu\setup-tcpip.html
 HlpSetupGeneral=html\menu\setup-general.html

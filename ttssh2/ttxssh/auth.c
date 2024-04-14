@@ -267,6 +267,24 @@ static void update_server_supported_types(PTInstVar pvar, HWND dlg)
 	}
 }
 
+/**
+ * GetUserNameW()
+ *
+ *	TODO win32helper に移動
+ */
+static DWORD hGetUserNameW(wchar_t **username)
+{
+	wchar_t name[UNLEN+1];
+	DWORD len = _countof(name);
+	BOOL r = GetUserNameW(name, &len);
+	if (r == 0) {
+		*username = NULL;
+		return GetLastError();
+	}
+	*username = _wcsdup(name);
+	return NO_ERROR;
+}
+
 static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 {
 	static const DlgTextInfo text_info[] = {
@@ -352,17 +370,14 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 				// 「入力しない」にしておく
 				pvar->session_settings.DefaultUserType = 0;
 			} else {
-				SetDlgItemText(dlg, IDC_SSHUSERNAME,
-							   pvar->session_settings.DefaultUserName);
+				SetDlgItemTextW(dlg, IDC_SSHUSERNAME, pvar->session_settings.DefaultUserName);
 			}
 			break;
 		case 2: {
-			char user_name[UNLEN+1];
-			DWORD len = _countof(user_name);
-			BOOL r = GetUserName(user_name, &len);
-			if (r != 0) {
-				SetDlgItemText(dlg, IDC_SSHUSERNAME, user_name);
-			}
+			wchar_t *user_name;
+			hGetUserNameW(&user_name);
+			SetDlgItemTextW(dlg, IDC_SSHUSERNAME, user_name);
+			free(user_name);
 			break;
 		}
 		default:
@@ -380,9 +395,9 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		}
 	}
 
-	SetDlgItemText(dlg, IDC_RSAFILENAME,
-	               pvar->session_settings.DefaultRSAPrivateKeyFile);
-	SetDlgItemText(dlg, IDC_HOSTRSAFILENAME,
+	SetDlgItemTextW(dlg, IDC_RSAFILENAME,
+	                pvar->session_settings.DefaultRSAPrivateKeyFile);
+	SetDlgItemTextW(dlg, IDC_HOSTRSAFILENAME,
 	               pvar->session_settings.DefaultRhostsHostPrivateKeyFile);
 	SetDlgItemText(dlg, IDC_LOCALUSERNAME,
 	               pvar->session_settings.DefaultRhostsLocalUserName);
@@ -393,7 +408,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	} else if (pvar->ssh2_authmethod == SSH_AUTH_RSA) {
 		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSERSA);
 
-		SetDlgItemText(dlg, IDC_RSAFILENAME, pvar->ssh2_keyfile);
+		SetDlgItemTextW(dlg, IDC_RSAFILENAME, pvar->ssh2_keyfile);
 		if (pvar->ssh2_autologin == 1) {
 			EnableWindow(GetDlgItem(dlg, IDC_CHOOSERSAFILE), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_RSAFILENAME), FALSE);
@@ -457,7 +472,12 @@ static char *alloc_control_text(HWND ctl)
 	return textA;
 }
 
-static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar)
+/**
+ *	ファイル名を返す
+ *	@retval		ファイル名(不要になったらfree()すること)
+ *	@retval		NULL キャンセルが押された
+ */
+static wchar_t *get_key_file_name(HWND parent, const wchar_t *UILanguageFileW)
 {
 	static const wchar_t *fullname_def = L"identity";
 	static const wchar_t *filter_def =
@@ -471,7 +491,6 @@ static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar
 		L"PEM files(*.pem)\\0*.pem\\0"
 		L"all(*.*)\\0*.*\\0"
 		L"\\0";
-	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
 	TTOPENFILENAMEW params;
 	wchar_t *filter;
 	wchar_t *title;
@@ -497,33 +516,32 @@ static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar
 	free(filter);
 	free(title);
 	if (r == FALSE) {
-		buf[0] = 0;
-		return 0;
+		return NULL;
 	}
 	else {
-		char *fullnameA = ToCharW(fullnameW);
-		copy_teraterm_dir_relative_path(buf, bufsize, fullnameA);
-		free(fullnameA);
-		free(fullnameW);
-		return 1;
+		return fullnameW;
 	}
 }
 
 static void choose_RSA_key_file(HWND dlg, PTInstVar pvar)
 {
-	char buf[1024];
+	wchar_t *filename;
 
-	if (get_key_file_name(dlg, buf, sizeof(buf), pvar)) {
-		SetDlgItemText(dlg, IDC_RSAFILENAME, buf);
+	filename = get_key_file_name(dlg, pvar->ts->UILanguageFileW);
+	if (filename != NULL) {
+		SetDlgItemTextW(dlg, IDC_RSAFILENAME, filename);
+		free(filename);
 	}
 }
 
 static void choose_host_RSA_key_file(HWND dlg, PTInstVar pvar)
 {
-	char buf[1024];
+	wchar_t *filename;
 
-	if (get_key_file_name(dlg, buf, sizeof(buf), pvar)) {
-		SetDlgItemText(dlg, IDC_HOSTRSAFILENAME, buf);
+	filename = get_key_file_name(dlg, pvar->ts->UILanguageFileW);
+	if (filename != NULL) {
+		SetDlgItemTextW(dlg, IDC_HOSTRSAFILENAME, filename);
+		free(filename);
 	}
 }
 
@@ -549,12 +567,12 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 	}
 
 	if (method == SSH_AUTH_RSA || method == SSH_AUTH_RHOSTS_RSA) {
-		char keyfile[2048];
+		wchar_t keyfile[2048];
 		int file_ctl_ID =
 			method == SSH_AUTH_RSA ? IDC_RSAFILENAME : IDC_HOSTRSAFILENAME;
 
 		keyfile[0] = 0;
-		GetDlgItemText(dlg, file_ctl_ID, keyfile, sizeof(keyfile));
+		GetDlgItemTextW(dlg, file_ctl_ID, keyfile, _countof(keyfile));
 		if (keyfile[0] == 0) {
 			UTIL_get_lang_msg("MSG_KEYSPECIFY_ERROR", pvar,
 			                  "You must specify a file containing the RSA/DSA/ECDSA/ED25519 private key.");
@@ -760,14 +778,12 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 	}
 	pvar->auth_state.auth_dialog = NULL;
 
-	GetDlgItemText(dlg, IDC_RSAFILENAME,
-	               pvar->session_settings.DefaultRSAPrivateKeyFile,
-	               sizeof(pvar->session_settings.
-	                      DefaultRSAPrivateKeyFile));
-	GetDlgItemText(dlg, IDC_HOSTRSAFILENAME,
-	               pvar->session_settings.DefaultRhostsHostPrivateKeyFile,
-	               sizeof(pvar->session_settings.
-	                      DefaultRhostsHostPrivateKeyFile));
+	GetDlgItemTextW(dlg, IDC_RSAFILENAME,
+					pvar->session_settings.DefaultRSAPrivateKeyFile,
+					_countof(pvar->session_settings.DefaultRSAPrivateKeyFile));
+	GetDlgItemTextW(dlg, IDC_HOSTRSAFILENAME,
+	                pvar->session_settings.DefaultRhostsHostPrivateKeyFile,
+					_countof(pvar->session_settings.DefaultRhostsHostPrivateKeyFile));
 	GetDlgItemText(dlg, IDC_LOCALUSERNAME,
 	               pvar->session_settings.DefaultRhostsLocalUserName,
 	               sizeof(pvar->session_settings.
@@ -1159,16 +1175,13 @@ canceled:
 			DestroyMenu(hMenu);
 			switch (result) {
 			case 1:
-				SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->session_settings.DefaultUserName);
+				SetDlgItemTextW(dlg, IDC_SSHUSERNAME, pvar->session_settings.DefaultUserName);
 				goto after_user_name_set;
 			case 2: {
-				char user_name[UNLEN+1];
-				DWORD len = _countof(user_name);
-				BOOL r = GetUserName(user_name, &len);
-				if (r == 0) {
-					break;
-				}
-				SetDlgItemText(dlg, IDC_SSHUSERNAME, user_name);
+				wchar_t *user_name;
+				hGetUserNameW(&user_name);
+				SetDlgItemTextW(dlg, IDC_SSHUSERNAME, user_name);
+				free(user_name);
 			after_user_name_set:
 				SendDlgItemMessage(dlg, IDC_SSHUSERNAME, EM_SETSEL, 0, -1);
 				SendMessage(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_SSHUSERNAME), TRUE);
@@ -1303,7 +1316,7 @@ static void try_default_auth(PTInstVar pvar)
 		}
 
 		pvar->auth_state.user =
-			_strdup(pvar->session_settings.DefaultUserName);
+			ToU8W(pvar->session_settings.DefaultUserName);
 	}
 }
 
@@ -1474,10 +1487,6 @@ void AUTH_do_cred_dialog(PTInstVar pvar)
 static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 {
 	int id;
-	char user_name[UNLEN+1];
-	DWORD len;
-	char uimsg[MAX_UIMSG];
-	char uimsg2[MAX_UIMSG];
 	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_AUTHSETUP_TITLE" },
 		{ IDC_SSHAUTHBANNER, "DLG_AUTHSETUP_BANNER" },
@@ -1527,11 +1536,9 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 		                 IDC_SSHUSEPASSWORD);
 	}
 
-	SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->settings.DefaultUserName);
-	SetDlgItemText(dlg, IDC_RSAFILENAME,
-	               pvar->settings.DefaultRSAPrivateKeyFile);
-	SetDlgItemText(dlg, IDC_HOSTRSAFILENAME,
-	               pvar->settings.DefaultRhostsHostPrivateKeyFile);
+	SetDlgItemTextW(dlg, IDC_SSHUSERNAME, pvar->settings.DefaultUserName);
+	SetDlgItemTextW(dlg, IDC_RSAFILENAME, pvar->settings.DefaultRSAPrivateKeyFile);
+	SetDlgItemTextW(dlg, IDC_HOSTRSAFILENAME, pvar->settings.DefaultRhostsHostPrivateKeyFile);
 	SetDlgItemText(dlg, IDC_LOCALUSERNAME,
 	               pvar->settings.DefaultRhostsLocalUserName);
 
@@ -1549,12 +1556,19 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 		IDC_SSH_NO_USERNAME;
 	CheckRadioButton(dlg, IDC_SSH_NO_USERNAME, IDC_SSH_WINDOWS_USERNAME, id);
 
-	len = _countof(user_name);
-	GetUserName(user_name, &len);
+	{
+		wchar_t *user_name;
+		wchar_t *format;
+		wchar_t *text;
 
-	GetDlgItemText(dlg, IDC_SSH_WINDOWS_USERNAME_TEXT, uimsg, _countof(uimsg));
-	sprintf_s(uimsg2, _countof(uimsg2), uimsg, user_name);
-	SetDlgItemText(dlg, IDC_SSH_WINDOWS_USERNAME_TEXT, uimsg2);
+		hGetUserNameW(&user_name);
+		hGetDlgItemTextW(dlg, IDC_SSH_WINDOWS_USERNAME_TEXT, &format);
+		aswprintf(&text, format, user_name);
+		free(format);
+		free(user_name);
+		SetDlgItemTextW(dlg, IDC_SSH_WINDOWS_USERNAME_TEXT, text);
+		free(text);
+	}
 }
 
 static BOOL end_default_auth_dlg(PTInstVar pvar, HWND dlg)
@@ -1575,14 +1589,14 @@ static BOOL end_default_auth_dlg(PTInstVar pvar, HWND dlg)
 		pvar->settings.DefaultAuthMethod = SSH_AUTH_PASSWORD;
 	}
 
-	GetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->settings.DefaultUserName,
-	               sizeof(pvar->settings.DefaultUserName));
-	GetDlgItemText(dlg, IDC_RSAFILENAME,
-	               pvar->settings.DefaultRSAPrivateKeyFile,
-	               sizeof(pvar->settings.DefaultRSAPrivateKeyFile));
-	GetDlgItemText(dlg, IDC_HOSTRSAFILENAME,
-	               pvar->settings.DefaultRhostsHostPrivateKeyFile,
-	               sizeof(pvar->settings.DefaultRhostsHostPrivateKeyFile));
+	GetDlgItemTextW(dlg, IDC_SSHUSERNAME, pvar->settings.DefaultUserName,
+					_countof(pvar->settings.DefaultUserName));
+	GetDlgItemTextW(dlg, IDC_RSAFILENAME,
+	                pvar->settings.DefaultRSAPrivateKeyFile,
+	                _countof(pvar->settings.DefaultRSAPrivateKeyFile));
+	GetDlgItemTextW(dlg, IDC_HOSTRSAFILENAME,
+	                pvar->settings.DefaultRhostsHostPrivateKeyFile,
+				    _countof(pvar->settings.DefaultRhostsHostPrivateKeyFile));
 	GetDlgItemText(dlg, IDC_LOCALUSERNAME,
 	               pvar->settings.DefaultRhostsLocalUserName,
 	               sizeof(pvar->settings.DefaultRhostsLocalUserName));

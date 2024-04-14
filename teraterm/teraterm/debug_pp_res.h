@@ -7,6 +7,7 @@
 #define IDC_DEBUG_POPUP_KEY1            2593
 #define IDC_DEBUG_POPUP_KEY2            2594
 #define IDC_DEBUG_CONSOLE_BUTTON        2595
+#define IDC_BUTTON_DUMP                 2620
 
 // Next default values for new objects
 // 
@@ -15,7 +16,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2620
+#define _APS_NEXT_CONTROL_VALUE         2621
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -1462,15 +1462,19 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	GetNthNum(Temp, 2, &ts->FontDW);
 	GetNthNum(Temp, 3, &ts->FontDY);
 	GetNthNum(Temp, 4, &ts->FontDH);
+	/*
 	if (ts->FontDX < 0)
 		ts->FontDX = 0;
 	if (ts->FontDW < 0)
 		ts->FontDW = 0;
+	*/
 	ts->FontDW = ts->FontDW + ts->FontDX;
+	/*
 	if (ts->FontDY < 0)
 		ts->FontDY = 0;
 	if (ts->FontDH < 0)
 		ts->FontDH = 0;
+	*/
 	ts->FontDH = ts->FontDH + ts->FontDY;
 
 	// VT-print scaling factors (pixels per inch) --- special option
@@ -2104,6 +2108,8 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	int ret;
 	WORD TmpColor[12][6];
 	wchar_t *TempW;
+
+	WriteIniBom(FName, FALSE);
 
 	/* version */
 	ret = WritePrivateProfileString(Section, "Version", TT_VERSION_STR("."), FName);

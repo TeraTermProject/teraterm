@@ -13,14 +13,16 @@
 🐱:U+1F431 CAT FACE
 👤:U+1F464 BUST IN SILHOUETTE
 🐱‍👤:U+1F431 + U+1F464 (Ninja Cat Windows 10+ only?)
--- Not Emoji + Neautral
-☻:U+263B  BLACK SMILING FACE
 -- Emoji + Half
 ない?
+-- Emoji(<U+1F000) + Ambiguous
+®:U+00AE REGISTERED SIGN
 -- Emoji(<U+1F000) + Neutral
 ©:U+00A9 COPYRIGHT SIGN
+☇:U+2607 LIGHTNING
 ☹:U+2639 WHITE FROWNING FACE
-☺:U+263A White Smiling Face
+☺:U+263A WHITE SMILING FACE
+☻:U+263B BLACK SMILING FACE
 ❤:U+2764 HEAVY BLACK HEART
 -- Emoji(>=U+1F000) + Neutral
 🏎:U+1F3CE racing car

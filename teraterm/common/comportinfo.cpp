@@ -29,6 +29,7 @@
 #include <windows.h>
 #include <devguid.h>
 #include <setupapi.h>
+#include <cfgmgr32.h>
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
@@ -85,7 +86,6 @@
 
 #define INITGUID
 #include <guiddef.h>
-#include <ntddmodm.h>
 
 typedef BOOL (WINAPI *TSetupDiGetDevicePropertyW)(
 	HDEVINFO DeviceInfoSet,
@@ -197,8 +197,8 @@ static BOOL GetComPortName(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, w
  * HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\Class\{GUID}\0000
  *
  */
-static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData,
-							wchar_t **friendly_name, wchar_t **prop_str)
+static void GetComProperty(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData,
+						   wchar_t **friendly_name, wchar_t **prop_str)
 {
 	typedef struct {
 		const wchar_t *name;
@@ -441,6 +441,15 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 				break;
 			}
 
+			// check status
+			ULONG status  = 0;
+			ULONG problem = 0;
+			CONFIGRET cr = CM_Get_DevNode_Status(&status, &problem, DeviceInfoData.DevInst, 0);
+			if (cr != CR_SUCCESS || problem == CM_PROB_DISABLED) {
+				// ステータス取得に失敗 又は デバイスが無効の時
+				continue;
+			}
+
 			wchar_t *port_name;
 			if (!GetComPortName(hDevInfo, &DeviceInfoData, &port_name)) {
 				continue;
@@ -453,7 +462,7 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 			// 情報取得
 			wchar_t *str_friendly_name = NULL;
 			wchar_t *str_prop = NULL;
-			GetComPropartys(hDevInfo, &DeviceInfoData, &str_friendly_name, &str_prop);
+			GetComProperty(hDevInfo, &DeviceInfoData, &str_friendly_name, &str_prop);
 
 			ComPortInfo_t *p =
 				(ComPortInfo_t *)realloc(comport_infos,

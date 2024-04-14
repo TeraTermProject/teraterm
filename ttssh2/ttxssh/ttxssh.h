@@ -145,11 +145,12 @@ These are the fields that WOULD go in Tera Term's 'ts' structure, if
 we could put them there.
 */
 typedef struct _TS_SSH {
+	DWORD struct_size;
 	BOOL Enabled;
 	int CompressionLevel; /* 0 = NONE, else 1-9 */
 
 	int DefaultUserType;	/* 0/1/2 = no input/DefaultUserName/Windows logon user */
-	char DefaultUserName[256];
+	wchar_t DefaultUserName[256];
 
 	/* this next option is a string of digits. Each digit represents a
 	   cipher. The first digit is the most preferred cipher, and so on.
@@ -160,8 +161,8 @@ typedef struct _TS_SSH {
 	char KnownHostsFiles[2048];
 	int DefaultAuthMethod;
 	char DefaultRhostsLocalUserName[256];
-	char DefaultRhostsHostPrivateKeyFile[1024];
-	char DefaultRSAPrivateKeyFile[1024];
+	wchar_t DefaultRhostsHostPrivateKeyFile[1024];
+	wchar_t DefaultRSAPrivateKeyFile[1024];
 
 	char DefaultForwarding[4096];
 	BOOL TryDefaultAuth;
@@ -312,7 +313,7 @@ typedef struct _TInstVar {
 	SSHAuthMethod ssh2_authmethod;
 	char ssh2_username[MAX_PATH];
 	char ssh2_password[MAX_PATH];
-	char ssh2_keyfile[MAX_PATH];
+	wchar_t ssh2_keyfile[MAX_PATH];
 	time_t ssh_heartbeat_tick;
 	HANDLE ssh_heartbeat_thread;
 	int keyboard_interactive_password_input;
@@ -400,9 +401,9 @@ void logprintf(int level, const char *fmt, ...);
 void logprintf_hexdump(int level, const char *data, int len, const char *fmt, ...);
 #endif
 
-void get_teraterm_dir_relative_name(char *buf, int bufsize, char *basename);
+void get_teraterm_dir_relative_name(char *buf, int bufsize, const char *basename);
 wchar_t *get_teraterm_dir_relative_nameW(const wchar_t *basename);
-int copy_teraterm_dir_relative_path(char *dest, int destsize, char *basename);
+int copy_teraterm_dir_relative_path(char *dest, int destsize, const char *basename);
 wchar_t *get_home_dir_relative_nameW(const wchar_t *basename);
 wchar_t *get_log_dir_relative_nameW(const wchar_t *basename);
 int uuencode(unsigned char *src, int srclen, unsigned char *target, int targsize);

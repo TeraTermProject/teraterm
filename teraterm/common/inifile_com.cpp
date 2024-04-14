@@ -121,3 +121,29 @@ BOOL WritePrivateProfileIntAFileW(const char *appA, const char *keyA, int val, c
 	free(keyW);
 	return r;
 }
+
+/**
+ *	ファイルがないなら BOM だけを書き込む
+ *
+ *	@param	filename
+ *	@param	overwrite	TRUE	上書きする
+ *						FALSE	ファイルがあればなにもしない
+ */
+void WriteIniBom(const wchar_t *filename, BOOL overwrite)
+{
+	if (!overwrite) {
+		const DWORD attr = GetFileAttributesW(filename);
+		if (attr != INVALID_FILE_ATTRIBUTES) {
+			// ファイルがあるならなにもしない
+			return;
+		}
+	}
+
+	FILE *fp;
+	errno_t e = _wfopen_s(&fp, filename, L"wb");
+	if (e == 0 && fp != NULL) {
+		const char *bom = "\xff\xfe";
+		fwrite(bom, 1, 2, fp);
+		fclose(fp);
+	}
+}

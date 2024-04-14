@@ -727,13 +727,14 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 						GetI18nStrWW("Tera Term", "MSG_COMM_REFUSE_ERROR", L"Connection refused", ts->UILanguageFileW, &UIMsgW);
 						break;
 					case WSAENETUNREACH:
+					case WSAEHOSTUNREACH:
 						GetI18nStrWW("Tera Term", "MSG_COMM_REACH_ERROR", L"Network cannot be reached", ts->UILanguageFileW, &UIMsgW);
 						break;
 					case WSAETIMEDOUT:
-						GetI18nStrWW("Tera Term", "MSG_COMM_CONNECT_ERROR", L"Connection timed out", ts->UILanguageFileW, &UIMsgW);
+						GetI18nStrWW("Tera Term", "MSG_COMM_TIMEOUT_ERROR", L"Connection timed out", ts->UILanguageFileW, &UIMsgW);
 						break;
 					default:
-						GetI18nStrWW("Tera Term", "MSG_COMM_TIMEOUT_ERROR", L"Cannot connect the host", ts->UILanguageFileW, &UIMsgW);
+						GetI18nStrWW("Tera Term", "MSG_COMM_CONNECT_ERROR", L"Cannot connect the host", ts->UILanguageFileW, &UIMsgW);
 						break;
 					}
 

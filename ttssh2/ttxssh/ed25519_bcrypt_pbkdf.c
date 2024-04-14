@@ -15,8 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-//#include "includes.h"
-
 #ifndef HAVE_BCRYPT_PBKDF
 
 #include <sys/types.h>

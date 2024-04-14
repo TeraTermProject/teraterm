@@ -1,5 +1,7 @@
-﻿; Updated by TeraTerm Project (2024-03-15)
-; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
+﻿[Info]
+language=Traditional Chinese
+date=2024-04-13 by TeraTerm Project
+contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
 DLG_SYSTEM_FONT=新細明體,10,0
@@ -59,7 +61,7 @@ MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=鍵盤(&K)...
 MENU_SETUP_SERIALPORT=連接埠(&E)...
 MENU_SETUP_TCPIP=T&CP/IP...
-MENU_SETUP_GENERAL=設定(&G)...
+MENU_SETUP_GENERAL=設定(LanguageUI)(&G)...
 MENU_SETUP_ADDITION=附加設定(&D)...
 MENU_SETUP_SAVE=儲存設定(&S)...
 MENU_SETUP_RESTORE=載入設定(&R)...
@@ -197,7 +199,8 @@ DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT=Display tcp &port number
 DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED=Display se&rial port speed
 DLG_TAB_GENERAL_NOTIFICATION_TITLE=Notification
 DLG_TAB_GENERAL_NOTIFIY_SOUND=&Notify sound
-DLG_TAB_GENERAL_NOTIFICATION_TEST_POPUP=&Popup Test
+DLG_TAB_GENERAL_NOTIFICATION_TEST_NOTIFY=&Notify Test
+DLG_TAB_GENERAL_NOTIFICATION_TEST_MESSAGE=Now icon is displayed in the notification area (task tray),\n and can be turned on or off in Windows notification setting.
 DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY=&Tray Test
 
 DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=接受滑鼠事件跟蹤請求(&M)
@@ -297,7 +300,12 @@ DLG_BROADCAST_HISTORY=紀錄
 DLG_BROADCAST_PARENTONLY=僅發送
 DLG_BROADCAST_ENTER=Enter鍵
 DLG_BROADCAST_SUBMIT=提交
+DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=實時的
+DLG_BROADCAST_FOREGROUND=to Fore
+CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
+CMENU_BROADCAST_MINIMIZE=Minimize selected window
+CMENU_BROADCAST_REFRESH=Refresh window list
 
 DLG_PRNABORT_PRINTING=列印中
 

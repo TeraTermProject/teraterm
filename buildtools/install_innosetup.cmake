@@ -21,10 +21,10 @@ endif()
 
 # unrar
 #   https://www.rarlab.com/rar_add.htm
-#   RAR/Extras page, UnRAR for Windows 7.00 beta 1 x64
+#   RAR/Extras page, UnRAR for Windows 7.00 x64
 set(UNRAR_ZIP "unrarw64.exe")
 set(UNRAR_URL "https://www.rarlab.com/rar/unrarw64.exe")
-set(UNRAR_HASH "3a371fa935130283dfae4cf117386316a74971bf7895f1890d454bcf68285cb8")
+set(UNRAR_HASH "6e0ceb18906a4c66ba489d0a4aa35db4bd6aa454dff081459d427b872fdd3973")
 file(MAKE_DIRECTORY "download/unrar")
 file(DOWNLOAD
   ${UNRAR_URL}

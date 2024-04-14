@@ -1,5 +1,7 @@
-﻿; Updated by TeraTerm Project (2024-03-15)
-; Last translated (Korean language) by Daehong Kim (2013-07-25)
+﻿[Info]
+language=Korean
+date=2024-04-13 by TeraTerm Project
+contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
 DLG_SYSTEM_FONT=굴림,10,128
@@ -59,7 +61,7 @@ MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=키보드(&K)...
 MENU_SETUP_SERIALPORT=시리얼포트(&E)...
 MENU_SETUP_TCPIP=T&CP/IP...
-MENU_SETUP_GENERAL=일반(&G)...
+MENU_SETUP_GENERAL=일반(LanguageUI)(&G)...
 MENU_SETUP_ADDITION=추가설정(&D)...
 MENU_SETUP_SAVE=저장하기(&S)...
 MENU_SETUP_RESTORE=가져오기(&R)...
@@ -197,7 +199,8 @@ DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT=Display tcp &port number
 DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED=Display se&rial port speed
 DLG_TAB_GENERAL_NOTIFICATION_TITLE=Notification
 DLG_TAB_GENERAL_NOTIFIY_SOUND=&Notify sound
-DLG_TAB_GENERAL_NOTIFICATION_TEST_POPUP=&Popup Test
+DLG_TAB_GENERAL_NOTIFICATION_TEST_NOTIFY=&Notify Test
+DLG_TAB_GENERAL_NOTIFICATION_TEST_MESSAGE=Now icon is displayed in the notification area (task tray),\n and can be turned on or off in Windows notification setting.
 DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY=&Tray Test
 
 DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=마우스 이벤트 추척 요청을 받습니다(&M)
@@ -297,7 +300,12 @@ DLG_BROADCAST_HISTORY=이력
 DLG_BROADCAST_PARENTONLY=이 프로세스에만 보내기
 DLG_BROADCAST_ENTER=Enter 키
 DLG_BROADCAST_SUBMIT=제출
+DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=실시간 모드
+DLG_BROADCAST_FOREGROUND=to Fore
+CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
+CMENU_BROADCAST_MINIMIZE=Minimize selected window
+CMENU_BROADCAST_REFRESH=Refresh window list
 
 DLG_PRNABORT_PRINTING=인쇄
 

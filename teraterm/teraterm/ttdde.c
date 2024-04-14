@@ -28,12 +28,16 @@
  */
 
 /* TERATERM.EXE, DDE routines */
+#include <stdio.h>
+#include <string.h>
+#include <windows.h>
+#include <ddeml.h>
+#include <stdint.h>
+#include <assert.h>
+
 #include "teraterm.h"
 #include "tttypes.h"
 #include "tttypes_key.h"
-#include <stdio.h>
-#include <string.h>
-#include <ddeml.h>
 #include "ttwinman.h"
 #include "ttsetup.h"
 #include "telnet.h"
@@ -51,6 +55,7 @@
 #include "scp.h"
 #include "asprintf.h"
 #include "vtterm.h"
+#include "ttcstd.h"
 
 #define ServiceName "TERATERM"
 #define ItemName "DATA"
@@ -332,6 +337,54 @@ static HDDEDATA AcceptRequest(HSZ ItemHSz)
 	return DH;
 }
 
+/**
+ *	エスケープされたバイナリをデコードする
+ *	0x01 + (x+1) -> x
+ */
+static uint8_t *DecodeEscape(const uint8_t *src, size_t src_len, size_t *dest_len)
+{
+	uint8_t *dest = (uint8_t *)malloc(src_len);
+	uint8_t *p = dest;
+	size_t i;
+	size_t dlen = 0;
+	for (i = 0; i < src_len; i++) {
+		if (*src == 0x01) {
+			src++;
+			*p++ = (*src++) - 1;
+			i++;
+		}
+		else {
+			*p++ = *src++;
+		}
+		dlen++;
+	}
+	*dest_len = dlen;
+	return dest;
+}
+
+/**
+ *	バイナリデータかどうか判定する
+ *
+ *	@retval		TRUE	バイナリデータと解釈
+ *
+ *	データ内に 0x20 未満の値があった場合、バイナリデータと解釈する
+ */
+static BOOL IsBinaryData(const uint8_t *data, size_t len)
+{
+	size_t i;
+	if (len == 0) {
+		return FALSE;
+	}
+	len--;
+	for (i = 0; i < len; i++) {
+		uint8_t c = *data++;
+		if (c != 0x0d && c != 0x0a && c < 0x20) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 static HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
 						   HDDEDATA Data)
 {
@@ -355,15 +408,40 @@ static HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
 	result = (HDDEDATA)DDE_FNOTPROCESSED;
 	DataPtr = DdeAccessData(Data,&DataSize);
 	if (DataPtr != NULL) {
-		wchar_t *strW = ToWcharU8(DataPtr);
-		if (strW != NULL) {
+		// マクロコマンド "send" で送信すると、0x00から0xffまで自由に送信できる
+		// DataPtr のデータはテキストではないこともあるので考慮が必要
+		wchar_t *strW = NULL;
+		BOOL binary_data = IsBinaryData(DataPtr, DataSize);
+		if (binary_data == FALSE) {
+			strW = ToWcharU8(DataPtr);
+			if (strW == NULL) {
+				// UTF-16LEへ変換できないなら、(多分)バイナリではなくテキスト
+				binary_data = TRUE;
+			}
+		}
+
+		if (binary_data) {
+			size_t len;
+			uint8_t *p = DecodeEscape(DataPtr, DataSize, &len);
+			SendMem *sm = SendMemBinary(p, len - 1);
+			assert(sm != NULL);
+			if (sm != NULL) {
+				SendMemInitEcho(sm, FALSE);
+				SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
+				SendMemStart(sm);
+				result = (HDDEDATA)DDE_FACK;
+			}
+			// free(p); 送信完了後に自動で free() される
+		} else {
 			SendMem *sm = SendMemTextW(strW, 0);
+			assert(sm != NULL);
 			if (sm != NULL) {
 				SendMemInitEcho(sm, FALSE);
 				SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
 				SendMemStart(sm);
 				result = (HDDEDATA)DDE_FACK;
 			}
+			// free(strW);
 		}
 	}
 	DdeUnaccessData(Data);
