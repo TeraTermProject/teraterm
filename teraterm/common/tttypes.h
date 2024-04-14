@@ -613,6 +613,8 @@ struct tttset {
 	BOOL Dec2Unicode;
 	wchar_t *DelimListW;
 	WORD IniAutoBackup;
+	WORD BracketedSupport;
+	WORD BracketedControlOnly;
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;
