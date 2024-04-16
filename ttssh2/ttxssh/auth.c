@@ -307,11 +307,13 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		{ IDCANCEL, "BTN_DISCONNECT" },
 	};
 	int default_method = pvar->session_settings.DefaultAuthMethod;
+	int focus_id;
 
 	SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 	init_auth_machine_banner(pvar, dlg);
 	init_password_control(pvar, dlg, IDC_SSHPASSWORD, UseControlChar);
+	focus_id = IDC_SSHPASSWORD;
 
 	// 認証失敗後はラベルを書き換え
 	if (pvar->auth_state.failed_method != SSH_AUTH_NONE) {
@@ -392,6 +394,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORDCAPTION), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), FALSE);
+			focus_id = IDCANCEL;
 		}
 	}
 
@@ -420,6 +423,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), FALSE);
 		SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
+		focus_id = IDCANCEL;
 
 	// /auth=pageant を追加
 	} else if (pvar->ssh2_authmethod == SSH_AUTH_PAGEANT) {
@@ -427,6 +431,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), FALSE);
 		SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
+		focus_id = IDCANCEL;
 
 	} else {
 		// デフォルトの認証メソッドをダイアログに反映
@@ -439,19 +444,19 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		// しまうので、自動ログイン有効時は SetFocus しない (2009.1.31 maya)
 		if (default_method == SSH_AUTH_TIS) {
 			/* we disabled the password control, so fix the focus */
-			SetFocus(GetDlgItem(dlg, IDC_SSHUSETIS));
+			focus_id = IDC_SSHUSETIS;
 		}
 		else if (default_method == SSH_AUTH_PAGEANT) {
-			SetFocus(GetDlgItem(dlg, IDC_SSHUSEPAGEANT));
+			focus_id = IDC_SSHUSEPAGEANT;
 		}
 
 	}
 
 	if (GetWindowTextLength(GetDlgItem(dlg, IDC_SSHUSERNAME)) == 0) {
-		SetFocus(GetDlgItem(dlg, IDC_SSHUSERNAME));
+		focus_id = IDC_SSHUSERNAME;
 	}
 	else if (pvar->ask4passwd == 1) {
-		SetFocus(GetDlgItem(dlg, IDC_SSHPASSWORD));
+		focus_id = IDC_SSHPASSWORD;
 	}
 
 	// '/I' 指定があるときのみ最小化する (2005.9.5 yutaka)
@@ -460,6 +465,10 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		ShowWindow(dlg,SW_MINIMIZE);
 		//20050822追加 end T.Takahashi
 	}
+
+	// フォーカスをセットする
+	//SetFocus(GetDlgItem(dlg, focus_id));
+	PostMessage(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, focus_id), TRUE);
 }
 
 static char *alloc_control_text(HWND ctl)
