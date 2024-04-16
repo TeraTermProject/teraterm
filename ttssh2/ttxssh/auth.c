@@ -109,23 +109,24 @@ static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 		{	// 制御文字を使用する && CTRLキーが押されている
 			char chars[] = { (char) wParam, 0 };
 
-			SendMessageA(control, EM_REPLACESEL, (WPARAM) TRUE,
-			             (LPARAM)chars);
+			SendMessageA(control, EM_REPLACESEL, (WPARAM) TRUE, (LPARAM)chars);
 
 			if (data->tipwin == NULL) {
-				char uimsg[MAX_UIMSG];
-				RECT rect;
 				PTInstVar pvar = data->pvar;
-				UTIL_get_lang_msg("DLG_AUTH_TIP_CONTROL_CODE", pvar, "control character is entered");
-				strcpy_s(uimsg, _countof(uimsg), pvar->UIMsg);
+				const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
+				wchar_t *uimsg;
+				RECT rect;
+				GetI18nStrWW("TTSSH", "DLG_AUTH_TIP_CONTROL_CODE", L"control character is entered", UILanguageFileW, &uimsg);
 				if (wParam == 'V' - 'A' + 1) {
 					// CTRL + V
-					strcat_s(uimsg, _countof(uimsg), "\n");
-					UTIL_get_lang_msg("DLG_AUTH_TIP_PASTE_KEY", pvar, "Use Shift + Insert to paste from clipboard");
-					strcat_s(uimsg, _countof(uimsg), pvar->UIMsg);
+					wchar_t *uimsg_add;
+					GetI18nStrWW("TTSSH", "DLG_AUTH_TIP_PASTE_KEY", L"Use Shift + Insert to paste from clipboard", UILanguageFileW, &uimsg_add);
+					awcscats(&uimsg, L"\n", uimsg_add, NULL);
+					free(uimsg_add);
 				}
 				GetWindowRect(control, &rect);
-				data->tipwin = TipWinCreateA(hInst, control, rect.left, rect.bottom, uimsg);
+				data->tipwin = TipWinCreateW(hInst, control, rect.left, rect.bottom, uimsg);
+				free(uimsg);
 			}
 
 			return 0;
@@ -307,9 +308,10 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		{ IDCANCEL, "BTN_DISCONNECT" },
 	};
 	int default_method = pvar->session_settings.DefaultAuthMethod;
+	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
 	int focus_id;
 
-	SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
+	SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), UILanguageFileW);
 
 	init_auth_machine_banner(pvar, dlg);
 	init_password_control(pvar, dlg, IDC_SSHPASSWORD, UseControlChar);
@@ -318,11 +320,13 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	// 認証失敗後はラベルを書き換え
 	if (pvar->auth_state.failed_method != SSH_AUTH_NONE) {
 		/* must be retrying a failed attempt */
-		wchar_t uimsg[MAX_UIMSG];
-		UTIL_get_lang_msgW("DLG_AUTH_BANNER2_FAILED", pvar, L"Authentication failed. Please retry.", uimsg);
+		wchar_t *uimsg;
+		GetI18nStrWW("TTSSH", "DLG_AUTH_BANNER2_FAILED", L"Authentication failed. Please retry.", UILanguageFileW, &uimsg);
 		SetDlgItemTextW(dlg, IDC_SSHAUTHBANNER2, uimsg);
-		UTIL_get_lang_msgW("DLG_AUTH_TITLE_FAILED", pvar, L"Retrying SSH Authentication", uimsg);
+		free(uimsg);
+		GetI18nStrWW("TTSSH", "DLG_AUTH_TITLE_FAILED", L"Retrying SSH Authentication", UILanguageFileW, &uimsg);
 		SetWindowTextW(dlg, uimsg);
+		free(uimsg);
 		default_method = pvar->auth_state.failed_method;
 	}
 
@@ -337,14 +341,20 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	CheckDlgButton(dlg, IDC_FORWARD_AGENT, pvar->settings.ForwardAgent);
 
 	// SSH バージョンによって TIS のラベルを書き換え
-	if (pvar->settings.ssh_protocol_version == 1) {
-		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE1", pvar,
-		                  "Use challenge/response(&TIS) to log in");
-		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->UIMsg);
-	} else {
-		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE2", pvar,
-		                  "Use keyboard-&interactive to log in");
-		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->UIMsg);
+	{
+		const char *key;
+		const wchar_t *def;
+		wchar_t *uimsg;
+		if (pvar->settings.ssh_protocol_version == 1) {
+			key = "DLG_AUTH_METHOD_CHALLENGE1";
+			def = L"Use challenge/response(&TIS) to log in";
+		} else {
+			key = "DLG_AUTH_METHOD_CHALLENGE2";
+			def = L"Use keyboard-&interactive to log in";
+		}
+		GetI18nStrWW("TTSSH", key, def, UILanguageFileW, &uimsg);
+		SetDlgItemTextW(dlg, IDC_SSHUSETIS, uimsg);
+		free(uimsg);
 	}
 
 	if (pvar->auth_state.user != NULL) {
