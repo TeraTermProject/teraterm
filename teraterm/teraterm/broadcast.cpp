@@ -55,6 +55,7 @@
 #include "clipboar.h"	// for CBPreparePaste()
 #include "ttime.h"
 
+#include "helpid.h"
 #include "broadcast.h"
 
 
@@ -217,13 +218,13 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 			return FALSE;
 
 		case WM_KEYDOWN:
-		case WM_KEYUP:
-		case WM_SYSKEYDOWN:
-		case WM_SYSKEYUP:
 			if (ShiftKey() && wParam == 0x2d) { // intercept Shift-INS
 				SendCB(dlg);
 				return FALSE;
 			}
+		case WM_KEYUP:
+		case WM_SYSKEYDOWN:
+		case WM_SYSKEYUP:
 			{
 				int i;
 				HWND hd;
@@ -291,6 +292,25 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 	return CallWindowProcW(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
 }
 
+static WNDPROC DefaultWindowListProc;
+
+static LRESULT CALLBACK WindowListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	switch (msg) {
+	case WM_LBUTTONDOWN:
+		int num = GetRegisteredWindowCount();
+		// クリック位置のインデックスを取得
+		POINT pt;
+		pt.x = LOWORD(lParam);
+		pt.y = HIWORD(lParam);
+		int index = SendMessage(hwnd, LB_ITEMFROMPOINT, 0, MAKELPARAM(pt.x, pt.y));
+		if (index > num) { // 余白の左クリックは無視する
+			return FALSE;
+		}
+		break;
+	}
+	return CallWindowProc(DefaultWindowListProc, hwnd, msg, wParam, lParam);
+}
+
 static DWORD selected[MAXNWIN];
 static void KeepSelection()
 {
@@ -307,6 +327,31 @@ static void KeepSelection()
 				GetWindowThreadProcessId(hd, &selected[i]);
 			}
 		}
+	}
+}
+
+static void InverseSelection() {
+	int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+	for (int i = 0; i < count; i++) {
+		if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
+			selected[i] = 0;
+			SendMessage(BroadcastWindowList, LB_SETSEL, FALSE, i);
+		}
+		else {
+			HWND hd = GetNthWin(i);
+			if (hd != NULL) {
+				GetWindowThreadProcessId(hd, &selected[i]);
+				SendMessage(BroadcastWindowList, LB_SETSEL, TRUE, i);
+			}
+		}
+	}
+}
+
+static void UnselectAll() {
+	int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+	for (int i = 0; i < count; i++) {
+		selected[i] = 0;
+		SendMessage(BroadcastWindowList, LB_SETSEL, FALSE, i);
 	}
 }
 
@@ -509,9 +554,9 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 		{ IDC_ENTERKEY_CHECK, "DLG_BROADCAST_ENTER" },
 		{ IDC_PARENT_ONLY, "DLG_BROADCAST_PARENTONLY" },
 		{ IDC_REALTIME_CHECK, "DLG_BROADCAST_REALTIME" },
-		{ IDC_FORE_RECEIVER, "DLG_BROADCAST_FOREGROUND" },
 		{ IDOK, "DLG_BROADCAST_SUBMIT" },
 		{ IDCANCEL, "DLG_BROADCAST_CLOSE" },
+		{ IDC_BROADCAST_HELP, "DLG_BROADCAST_HELP" },
 	};
 	LRESULT checked;
 	LRESULT history;
@@ -570,6 +615,9 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			// Tera Term window list
 			BroadcastWindowList = GetDlgItem(hWnd, IDC_LIST);
 			UpdateBroadcastWindowList(BroadcastWindowList);
+			// 余白クリック対応
+			DefaultWindowListProc = (WNDPROC)GetWindowLongPtr(BroadcastWindowList, GWLP_WNDPROC);
+			SetWindowLongPtr(BroadcastWindowList, GWLP_WNDPROC, (LONG_PTR)WindowListProc);
 
 			// I18N
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
@@ -655,12 +703,6 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
 				}
 				return TRUE;
-
-			case IDC_FORE_RECEIVER:
-				ForeSelected();
-				ForegroundWin(hWnd);
-				SetFocus(GetDlgItem(hWnd, IDC_COMMAND_EDIT));
-				return FALSE;
 			}
 
 			switch (LOWORD(wp)) {
@@ -738,6 +780,10 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 					return TRUE;
 
+				case IDC_BROADCAST_HELP:
+					PostMessage(GetParent(hWnd),WM_USER_DLGHELP2, HlpMenuControlBroadcast,0);
+					break;
+
 				case IDC_COMMAND_EDIT:
 					if (HIWORD(wp) == CBN_DROPDOWN) {
 						wchar_t *historyfile = GetHistoryFileName(&ts);
@@ -805,15 +851,6 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				             dlg_w - ok2right, p.y, 0, 0,
 				             SWP_NOSIZE | SWP_NOZORDER);
 
-				// Fore button
-				GetWindowRect(GetDlgItem(hWnd, IDC_FORE_RECEIVER), &rc);
-				p.x = rc.left;
-				p.y = rc.top;
-				ScreenToClient(hWnd, &p);
-				SetWindowPos(GetDlgItem(hWnd, IDC_FORE_RECEIVER), 0,
-				             dlg_w - ok2right, p.y, 0, 0,
-				             SWP_NOSIZE | SWP_NOZORDER);
-
 				// Cancel button
 				GetWindowRect(GetDlgItem(hWnd, IDCANCEL), &rc);
 				p.x = rc.left;
@@ -821,6 +858,15 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				ScreenToClient(hWnd, &p);
 				SetWindowPos(GetDlgItem(hWnd, IDCANCEL), 0,
 				             dlg_w - cancel2right, p.y, 0, 0,
+				             SWP_NOSIZE | SWP_NOZORDER);
+
+				// Help button
+				GetWindowRect(GetDlgItem(hWnd, IDC_BROADCAST_HELP), &rc);
+				p.x = rc.left;
+				p.y = rc.top;
+				ScreenToClient(hWnd, &p);
+				SetWindowPos(GetDlgItem(hWnd, IDC_BROADCAST_HELP), 0,
+				             dlg_w - ok2right, p.y, 0, 0,
 				             SWP_NOSIZE | SWP_NOZORDER);
 
 				// Command Edit box
@@ -881,19 +927,52 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_MINIMIZE", L"Minimize selected window", ts.UILanguageFileW, &menuitem);
 				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 2, menuitem);
 				free(menuitem);
-				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_REFRESH", L"Refresh window list", ts.UILanguageFileW, &menuitem);
+				int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+				BOOL hasSelection = FALSE;
+				for (int i = 0; i < count; i++) {
+					if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
+						hasSelection = TRUE;
+						break;
+					}
+				}
+				if (hasSelection) {
+					GetI18nStrWW("Tera Term", "CMENU_BROADCAST_UNSELECT_ALL", L"Unselect all", ts.UILanguageFileW, &menuitem);
+				}
+				else {
+					GetI18nStrWW("Tera Term", "CMENU_BROADCAST_SELECT_ALL", L"Select all", ts.UILanguageFileW, &menuitem);
+				}
 				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 3, menuitem);
+				free(menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_INVERSE", L"Inverse selection", ts.UILanguageFileW, &menuitem);
+				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 4, menuitem);
+				free(menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_REFRESH", L"Refresh window list", ts.UILanguageFileW, &menuitem);
+				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 5, menuitem);
 				free(menuitem);
 				int choice = TrackPopupMenu(hMenu, TPM_RETURNCMD, GET_X_LPARAM(lp), GET_Y_LPARAM(lp), 0, hWnd, NULL);
 				DestroyMenu(hMenu);
 				switch (choice) {
 				case 1:
 					ForeSelected();
+					SetFocus(GetDlgItem(hWnd, IDC_COMMAND_EDIT));
 					break;
 				case 2:
 					MinimizeSelected();
 					break;
 				case 3:
+					if (hasSelection) {
+						UnselectAll();
+					}
+					else {
+						for (int i = 0; i < count; i++) {
+							ListBox_SetSel(BroadcastWindowList, TRUE, i);
+						}
+					}
+					break;
+				case 4:
+					InverseSelection();
+					break;
+				case 5:
 					UpdateBroadcastWindowList(BroadcastWindowList);
 					break;
 				default:

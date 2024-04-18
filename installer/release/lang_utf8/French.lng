@@ -302,10 +302,13 @@ DLG_BROADCAST_ENTER=T. Entrée
 DLG_BROADCAST_SUBMIT=Valider
 DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=Mode tps-réel
-DLG_BROADCAST_FOREGROUND=to Fore
+DLG_BROADCAST_HELP=Help
 CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
 CMENU_BROADCAST_MINIMIZE=Minimize selected window
 CMENU_BROADCAST_REFRESH=Refresh window list
+CMENU_BROADCAST_SELECT_ALL=Select all
+CMENU_BROADCAST_UNSELECT_ALL=Unselect all
+CMENU_BROADCAST_INVERSE=Inverse selection
 
 DLG_PRNABORT_PRINTING=Impression
 
@@ -1114,7 +1117,7 @@ MSG_PATH_LENGTH_EXCEEDED=Chemin plus long que la longueur maxi admise
 MSG_INVALID_PURPOSE=Utilisation du certificat non correcte
 MSG_CERT_UNTRUSTED=Ce n'est pas un certificat de confiance
 MSG_CERT_REJECTED=Certificat rejeté
-MSG_SUBJECT_ISSUER_MISMATCH=Sujet / émetteur ne co¨ncident pas  
+MSG_SUBJECT_ISSUER_MISMATCH=Sujet / émetteur ne co¨ncident pas
 MSG_AKID_SKID_MISMATCH=Autorité et identifiant de clé Sujet ne coïncident pas
 MSG_AKID_ISSUER_SERIAL_MISMATCH=Autorité et N° de série de l'émetteur ne coïncident pas
 MSG_KEYUSAGE_NO_CERTSIGN=L'usage de la clé n'inclut pas la signature de certificats
@@ -1144,7 +1147,7 @@ DLG_ABOUT_TITLE=Version Information
 DLG_ABOUT_APPNAME=Tera Term outil de lancement\nTeraTerm Menu
 
 DLG_CONFIG_TITLE=Configuration de la liste
-DLG_CONFIG_ITEM=Item 
+DLG_CONFIG_ITEM=Item
 DLG_CONFIG_CONFIG=Configuration
 DLG_CONFIG_NAME=Nom
 DLG_CONFIG_PATTERN=Modèle de lancement
