@@ -2095,6 +2095,10 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	// 自動バックアップ
 	ts->IniAutoBackup = GetOnOff(Section, "IniAutoBackup", FName, TRUE);
 
+	// Bracketed paste mode
+	ts->BracketedSupport = GetOnOff(Section, "BracketedSupport", FName, TRUE);
+	ts->BracketedControlOnly = GetOnOff(Section, "BracketedControlOnly", FName, FALSE);
+
 	// Experimental
 	ts->ExperimentalTreeProprtySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
 	ts->ExperimentalDontUseFontDialog = GetOnOff("Experimental", "DontUseFontDialog", FName, FALSE);
@@ -3327,6 +3331,11 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	// 自動バックアップ
 	WriteOnOff(Section, "IniAutoBackup", FName, ts->IniAutoBackup);
+
+	// Bracketed paste mode
+	WriteOnOff(Section, "BracketedSupport", FName, ts->BracketedSupport);
+	WriteOnOff(Section, "BracketedControlOnly", FName, ts->BracketedControlOnly);
+
 }
 
 void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,

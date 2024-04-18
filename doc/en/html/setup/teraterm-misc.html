@@ -280,9 +280,9 @@ ClickableUrlBrowserArg=
 
 <p>
 When the end of URL string continues to the next line, basically the whole string is recognized as a URL string.
-However, when the carriage return is inserted into the URL string by the end of a line, the whole string 
+However, when the carriage return is inserted into the URL string by the end of a line, the whole string
 can not work well.<br>
-The URL string split by a carriage return can work well to configure the JoinSplitURL entry of the 
+The URL string split by a carriage return can work well to configure the JoinSplitURL entry of the
 [Tera Term] section in the teraterm.ini file.
 </p>
 
@@ -291,7 +291,7 @@ JoinSplitURL=on
 </pre>
 
 <p>
-By using the emacs editor, a special character will be displayed at the end of the line when 
+By using the emacs editor, a special character will be displayed at the end of the line when
 the line continues to next line. If this character is recognized with a part of URL string,
 the whole string can not work well with the URL format. <br>
 So, Tera Term can ignore the special character to configure the JoinSplitURLIgnoreEOLChar entry
@@ -339,7 +339,7 @@ LogLockExclusive=on
 <h1 id="DeferredLogWriteMode">Deferred log write mode</h1>
 
 <p>
-The log file is written on the thread procedure to avoid Tera Term slows down 
+The log file is written on the thread procedure to avoid Tera Term slows down
 when the log file is recorded on the network drive.
 </p>
 
@@ -431,7 +431,7 @@ Tera Term is using the Per-monitor DPI awareness V2 feature that is supported on
 
 <p>
 When overwriting an existing setup file, a backup file is created automatically.
-If you do not need a backup file, change the IniAutoBackup entry of [Tera Term] section as the following: 
+If you do not need a backup file, change the IniAutoBackup entry of [Tera Term] section as the following:
 </p>
 
 <pre>
@@ -441,6 +441,39 @@ IniAutoBackup=off
 <pre>
 Default:
 IniAutoBackup=on
+</pre>
+
+<h1 id="BracketedSupport">Supports bracketed paste</h1>
+
+<p>
+Bracketed paste is a mode which allows programs running in the terminal such as sh to treat pasted text differently from text typed normally.
+Tera Term by default supports this mode, but it is ineffective if the program running in the terminal does not support it.
+If you do not need Bracketed paste, change the BracketedSupport entry of [Tera Term] section as the following:
+</p>
+
+<pre>
+BracketedSupport=off
+</pre>
+
+<pre>
+Default:
+BracketedSupport=on
+</pre>
+
+<h1 id="BracketedControlOnly">Limit bracketed pasting to cases containing control characters</h1>
+<p>
+Bracket pasting is useful because it allows the pasted content to be confirmed before fixateing it,
+but it requires two steps of pasting and fixating even if the pasted content does not include control characters such as line changings.
+If you want to enable bracket pasting only when control characters are included, change the BracketedControlOnly entry of [Tera Term] section as the following:
+</p>
+
+<pre>
+BracketedControlOnly=on
+</pre>
+
+<pre>
+Default:
+BracketedControlOnly=off
 </pre>
 
 </BODY>
