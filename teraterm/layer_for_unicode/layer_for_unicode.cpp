@@ -225,6 +225,7 @@ LRESULT WINAPI _SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		else {
 			retval = SendMessageA(hWnd, Msg, wParam, lParam);
 		}
+		break;
 	}
 	default:
 		retval = SendMessageA(hWnd, Msg, wParam, lParam);
@@ -896,4 +897,19 @@ BOOL WINAPI _SystemParametersInfoW(UINT uiAction, UINT uiParam,
 		return r;
 	}
 	return SystemParametersInfoW(uiAction, uiParam, pvParam, fWinIni);
+}
+
+/**
+ *	GetTabbedTextExtentW()
+ *
+ *	Tera Term では TabStop は使用していないのでテストしていない
+ */
+DWORD WINAPI _GetTabbedTextExtentW(HDC hdc, LPCWSTR lpString, int chCount,
+								   int nTabPositions, const int *lpnTabStopPositions)
+{
+	char *strA = ToCharW(lpString);
+	int lenA = (int)strlen(strA);
+	DWORD r = GetTabbedTextExtentA(hdc, strA, lenA, nTabPositions, lpnTabStopPositions);
+	free(strA);
+	return r;
 }

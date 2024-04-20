@@ -442,6 +442,7 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 			}
 
 			// check status
+#if !defined(SUPPORT_OLD_WINDOWS)
 			ULONG status  = 0;
 			ULONG problem = 0;
 			CONFIGRET cr = CM_Get_DevNode_Status(&status, &problem, DeviceInfoData.DevInst, 0);
@@ -449,6 +450,7 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 				// ステータス取得に失敗 又は デバイスが無効の時
 				continue;
 			}
+#endif
 
 			wchar_t *port_name;
 			if (!GetComPortName(hDevInfo, &DeviceInfoData, &port_name)) {

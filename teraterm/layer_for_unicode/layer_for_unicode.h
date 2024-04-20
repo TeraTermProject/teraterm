@@ -102,6 +102,8 @@ DWORD WINAPI _GetTempPathW(DWORD nBufferLength, LPWSTR lpBuffer);
 UINT WINAPI _GetTempFileNameW(LPCWSTR lpPathName, LPCWSTR lpPrefixString, UINT uUnique, LPWSTR lpTempFileName);
 BOOL WINAPI _SystemParametersInfoW(UINT uiAction, UINT uiParam,
 								   PVOID pvParam, UINT fWinIni);
+DWORD WINAPI _GetTabbedTextExtentW(HDC hdc, LPCWSTR lpString, int chCount,
+								   int nTabPositions, const int *lpnTabStopPositions);
 
 // gdi32.lib
 int WINAPI _AddFontResourceW(LPCWSTR lpFileName);
