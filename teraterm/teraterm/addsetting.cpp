@@ -1970,6 +1970,18 @@ CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 
 void CAddSettingPropSheetDlg::SetStartPage(Page page)
 {
-	int start_page = page == DefaultPage ? 0: 7;
+	int start_page;
+	switch (page) {
+	case DefaultPage:
+	default:
+		start_page = 0;
+		break;
+	case CodingPage:
+		start_page = 6;
+		break;
+	case FontPage:
+		start_page = 7;
+		break;
+	}
 	TTCPropSheetDlg::SetStartPage(start_page);
 }

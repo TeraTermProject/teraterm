@@ -43,6 +43,8 @@
 #include "ttlib_charset.h"
 #include "asprintf.h"
 #include "ttwinman.h"
+#include "tttext.h"
+#include "tt_res.h"
 
 #include "ttdlg.h"
 
@@ -227,6 +229,9 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					SetDropDownList(Dialog, IDC_TERMKOUT, kanji_out_list, n);
 				}
 			}
+
+			TTTextMenu(Dialog, IDC_OPEN_CODING, NULL, HVTWin, ID_SETUP_ADDITIONALSETTINGS_CODING);
+
 			CenterWindow(Dialog, GetParent(Dialog));
 			return TRUE;
 		}

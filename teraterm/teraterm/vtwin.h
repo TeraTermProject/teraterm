@@ -34,6 +34,7 @@
 #include "tmfc.h"
 #include "unicode_test.h"
 #include "tipwin.h"
+#include "addsetting.h"
 
 class CVTWindow : public TTCFrameWnd
 {
@@ -237,7 +238,7 @@ protected:
 
 private:
 	void CodePopup(int client_x, int client_y);
-	void OpenExternalSetup(int page);
+	void OpenExternalSetup(CAddSettingPropSheetDlg::Page page);
 	void SetColor();
 };
 #endif

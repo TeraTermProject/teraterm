@@ -4235,16 +4235,14 @@ void CVTWindow::OnEditCancelSelection()
 	ChangeSelectRegion();
 }
 
-void CVTWindow::OpenExternalSetup(int page)
+void CVTWindow::OpenExternalSetup(CAddSettingPropSheetDlg::Page page)
 {
-	CAddSettingPropSheetDlg::Page additional_page =
-		page == 0 ? CAddSettingPropSheetDlg::DefaultPage : CAddSettingPropSheetDlg::FontPage;
 	BOOL old_use_unicode_api = UnicodeDebugParam.UseUnicodeApi;
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
 	CAddSettingPropSheetDlg CAddSetting(m_hInst, HVTWin);
 	CAddSetting.SetTreeViewMode(ts.ExperimentalTreeProprtySheetEnable);
-	CAddSetting.SetStartPage(additional_page);
+	CAddSetting.SetStartPage(page);
 	INT_PTR ret = CAddSetting.DoModal();
 	if (ret == IDOK) {
 		ChangeWin();
@@ -4265,7 +4263,7 @@ void CVTWindow::OpenExternalSetup(int page)
 // (2008.5.12 maya) changed to PropertySheet
 void CVTWindow::OnExternalSetup()
 {
-	OpenExternalSetup(0);
+	OpenExternalSetup(CAddSettingPropSheetDlg::DefaultPage);
 }
 
 void CVTWindow::OnSetupTerminal()
@@ -5325,6 +5323,10 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_EDIT_SELECTALL: OnEditSelectAllBuffer(); break;
 		case ID_EDIT_SELECTSCREEN: OnEditSelectScreenBuffer(); break;
 		case ID_SETUP_ADDITIONALSETTINGS: OnExternalSetup(); break;
+		case ID_SETUP_ADDITIONALSETTINGS_CODING: {
+			OpenExternalSetup(CAddSettingPropSheetDlg::CodingPage);
+			break;
+		}
 		case ID_SETUP_TERMINAL: OnSetupTerminal(); break;
 		case ID_SETUP_WINDOW: OnSetupWindow(); break;
 		case ID_SETUP_FONT: OnSetupFont(); break;

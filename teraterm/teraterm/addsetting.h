@@ -111,6 +111,7 @@ public:
 	~CAddSettingPropSheetDlg();
 	enum Page {
 		DefaultPage,
+		CodingPage,
 		FontPage,
 	};
 	void SetStartPage(Page page);
