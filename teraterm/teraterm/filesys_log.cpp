@@ -35,7 +35,6 @@
 #include <crtdbg.h>
 #include <process.h>
 #include <windows.h>
-#include <htmlhelp.h>
 #include <assert.h>
 
 #include "teraterm.h"
@@ -49,7 +48,6 @@
 #include "vtterm.h"
 #include "ftlib.h"
 #include "buffer.h"
-#include "helpid.h"
 #include "codeconv.h"
 #include "asprintf.h"
 #include "win32helper.h"
@@ -1075,18 +1073,12 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 	wchar_t *formated = FLogGetLogFilenameBase(fname);
 	free(fname);
 
-	// òAåãÇ∑ÇÈ
-	wchar_t *logfull = NULL;
-	awcscats(&logfull, dir, L"\\", formated, NULL);
+	// òAåã,ê≥ãKâª
+	wchar_t *logfull = GetFullPathW(dir, formated);
 	free(formated);
 	free(dir);
 
-	// ê≥ãKâª
-	wchar_t *normal;
-	hGetFullPathNameW(logfull, &normal, NULL);
-	free(logfull);
-
-	return normal;
+	return logfull;
 }
 
 BOOL FLogIsPause()

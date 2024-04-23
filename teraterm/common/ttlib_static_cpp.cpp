@@ -1204,17 +1204,6 @@ int GetNthNum2W(const wchar_t *Source, int Nth, int defval)
 	return v;
 }
 
-/**
- * @brief Windowsのデフォルトのダウンロードフォルダを取得する
- * @return	ダウンロードフォルダ, 不良になったら free() すること
- */
-wchar_t *GetDownloadFolderW(void)
-{
-	wchar_t *download;
-	_SHGetKnownFolderPath(FOLDERID_Downloads, KF_FLAG_CREATE, NULL, &download);
-	return download;
-}
-
 /* fit a filename to the windows-filename format */
 /* FileName must contain filename part only. */
 void FitFileNameW(wchar_t *FileName, size_t destlen, const wchar_t *DefExt)

@@ -27,16 +27,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "teraterm.h"
-#include "tttypes.h"
-#include "tttypes_key.h"
-
-#include "ttcommon.h"
-#include "ttdialog.h"
-#include "commlib.h"
-#include "ttlib.h"
-#include "dlglib.h"
-
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
@@ -49,15 +39,23 @@
 #include <wchar.h>
 #include <htmlhelp.h>
 
+#include "teraterm.h"
+#include "tttypes.h"
+#include "tttypes_key.h"
+
+#include "ttcommon.h"
+#include "ttdialog.h"
+#include "ttlib.h"
+#include "dlglib.h"
+
 #include "tt_res.h"
-#include "vtwin.h"
 #include "compat_win.h"
-#include "codeconv.h"
 #include "asprintf.h"
 #include "helpid.h"
 #include "win32helper.h"
 #include "tipwin2.h"
 #include "scp.h"
+#include "ttlib_types.h"
 
 #include "setupdirdlg.h"
 
@@ -444,6 +442,30 @@ static wchar_t *GetCurrentPath(const SetupList *, const TTTSet *)
 	return path;
 }
 
+static wchar_t *_GetDownloadDir(const SetupList *list, const TTTSet *pts)
+{
+	if (list->data_ptr == 0) {
+		// raw
+		if (pts->FileDirW != NULL) {
+			wchar_t *d = GetDownloadDir(pts);
+			int r = wcscmp(d, pts->FileDirW);
+			free(d);
+			if (r == 0) {
+				// iniファイルの内容と環境変数展開後が同じ(環境変数を含んでいない)とき
+				// 表示しない
+				return NULL;
+			}
+			return _wcsdup(pts->FileDirW);
+		}
+		else {
+			return _wcsdup(L"");
+		}
+	}
+	else {
+		return GetDownloadDir(pts);
+	}
+}
+
 typedef struct {
 	TComVar *pcv;
 	TipWin2 *tipwin;
@@ -511,8 +533,10 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			  LIST_PARAM_STR, pts->LogDirW, NULL },
 			{ NULL, L"LogDefaultPathW",
 			  LIST_PARAM_STR, pts->LogDefaultPathW, NULL },
+			{ NULL, L"Download(FileDir in ini)",
+			  LIST_PARAM_FUNC, (void*)_GetDownloadDir, (void *)0 },
 			{ NULL, L"Download",
-			  LIST_PARAM_STR, pts->FileDirW, NULL },
+			  LIST_PARAM_FUNC, (void*)_GetDownloadDir, (void *)1 },
 			{ NULL, L"Susie Plugin Path",
 			  LIST_PARAM_STR, pts->EtermLookfeel.BGSPIPathW, NULL },
 			{ NULL, L"UI language file",

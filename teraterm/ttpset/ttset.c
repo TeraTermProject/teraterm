@@ -1162,19 +1162,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* Default directory for file transfer */
 	hGetPrivateProfileStringW(SectionW, L"FileDir", L"", FName, &ts->FileDirW);
-	if (ts->FileDirW != NULL && ts->FileDirW[0] != 0) {
-		wchar_t *FileDirExpanded;
-		hExpandEnvironmentStringsW(ts->FileDirW, &FileDirExpanded);
-		if (!DoesFolderExistW(FileDirExpanded)) {
-			free(ts->FileDirW);
-			ts->FileDirW = NULL;
-		}
-		free(FileDirExpanded);
-	}
-	if (ts->FileDirW == NULL || ts->FileDirW[0] == 0) {
-		// デフォルトフォルダをセットする
+	if (ts->FileDirW != NULL && ts->FileDirW[0] == 0) {
 		free(ts->FileDirW);
-		ts->FileDirW = GetDownloadFolderW();
+		ts->FileDirW = NULL;
 	}
 
 	/* filter on file send (2007.6.5 maya) */

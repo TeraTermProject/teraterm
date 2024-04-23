@@ -655,18 +655,6 @@ void RestoreNewLine(PCHAR Text)
 	memcpy(Text, buf, size);
 }
 
-/**
- * @brief Windowsのデフォルトのダウンロードフォルダを取得する
- * @param dest 
- * @param destlen 
- */
-void GetDownloadFolder(char *dest, int destlen)
-{
-	wchar_t *download = GetDownloadFolderW();
-	WideCharToACP_t(download, dest, destlen);
-	free(download);
-}
-
 /*
  *	UILanguageFileのフルパスを取得する
  *

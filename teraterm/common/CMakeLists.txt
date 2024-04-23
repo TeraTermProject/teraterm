@@ -52,6 +52,8 @@ add_library(
   ttlib_static_cpp.cpp
   ttlib_static_dir.cpp
   ttlib_static_dir.h
+  ttlib_types.cpp
+  ttlib_types.h
   tttext.cpp
   tttext.h
   win32helper.cpp

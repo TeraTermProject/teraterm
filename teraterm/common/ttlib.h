@@ -97,8 +97,6 @@ size_t RestoreNewLineW(wchar_t *Text);
 BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest);
 void GetNthNum(PCHAR Source, int Nth, int *Num);
 int GetNthNum2(PCHAR Source, int Nth, int defval);
-void GetDownloadFolder(char *dest, int destlen);
-wchar_t *GetDownloadFolderW(void);
 wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file);
 wchar_t *GetDefaultSetupFNameW(const wchar_t *home);
 BOOL GetNthStringW(const wchar_t *Source, int Nth, size_t Size, wchar_t *Dest);

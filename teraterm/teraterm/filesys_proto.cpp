@@ -41,6 +41,7 @@
 #include "ttcommon.h"
 #include "ttdde.h"
 #include "ttlib.h"
+#include "ttlib_types.h"
 #include "dlglib.h"
 #include "codeconv.h"
 #include "asprintf.h"
@@ -218,10 +219,13 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	memset(fv, 0, sizeof(*fv));
 
 	// 受信フォルダ
-	wchar_t FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStringsW(ts.FileDirW, FileDirExpanded, _countof(FileDirExpanded));
-	AppendSlashW(FileDirExpanded, _countof(FileDirExpanded));
-	fv->RecievePath = _wcsdup(FileDirExpanded);
+	{
+		wchar_t *dir = GetDownloadDir(&ts);
+		size_t len = wcslen(dir) + 2;
+		dir = (wchar_t *)realloc(dir, sizeof(wchar_t) * len);
+		AppendSlashW(dir, len);
+		fv->RecievePath = dir;
+	}
 
 	fv->OverWrite = ((ts.FTFlag & FT_RENAME) == 0);
 	fv->HMainWin = HVTWin;
@@ -684,10 +688,7 @@ wchar_t **MakeFileArrayMultiSelect(const wchar_t *lpstrFile)
 
 static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPLONG Option)
 {
-	wchar_t FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStringsW(ts.FileDirW, FileDirExpanded, _countof(FileDirExpanded));
-	wchar_t *CurDir = FileDirExpanded;
-
+	wchar_t *CurDir = GetDownloadDir(&ts);
 	wchar_t *filterW = ToWcharA(ts.FileSendFilter);
 	wchar_t *FNFilter = GetCommonDialogFilterWW(!Receive ? filterW : NULL, ts.UILanguageFileW);
 	free(filterW);
@@ -739,6 +740,7 @@ static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPL
 		Ok = GetSaveFileNameW(&ofn);
 	}
 	free(FNFilter);
+	free(CurDir);
 	SetCurrentDirectoryW(TempDir);
 
 	wchar_t **ret = NULL;
@@ -938,10 +940,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 #define FnStrMemSize 4096
 	wchar_t TempDir[MAX_PATH];
 	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
-
-	wchar_t FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStringsW(ts.FileDirW, FileDirExpanded, _countof(FileDirExpanded));
-	wchar_t *CurDir = FileDirExpanded;
+	wchar_t *CurDir = GetDownloadDir(&ts);
 
 	/* save current dir */
 	GetCurrentDirectoryW(_countof(TempDir), TempDir);
@@ -997,6 +996,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 		ret = MakeFileArrayMultiSelect(FnStrMem);
 	}
 	free(FnStrMem);
+	free(CurDir);
 
 	/* restore dir */
 	SetCurrentDirectoryW(TempDir);
@@ -1504,10 +1504,7 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 	wchar_t TempDir[MAX_PATH];
 	wchar_t FileName[MAX_PATH];
 	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
-
-	wchar_t FileDirExpanded[MAX_PATH];
-	ExpandEnvironmentStringsW(ts.FileDirW, FileDirExpanded, _countof(FileDirExpanded));
-	wchar_t *CurDir = FileDirExpanded;
+	wchar_t *CurDir = GetDownloadDir(&ts);
 
 	/* save current dir */
 	GetCurrentDirectoryW(_countof(TempDir), TempDir);
@@ -1530,6 +1527,7 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 
 	BOOL Ok = GetOpenFileNameW(&ofn);
 	free(FNFilter);
+	free(CurDir);
 
 	wchar_t **ret = NULL;
 	if (Ok) {
