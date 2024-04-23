@@ -168,9 +168,8 @@
 #define IDC_WINLISTLIST                 1201
 #define IDC_WINLISTCLOSE                1202
 #define IDC_WINLISTHELP                 1299
-#define IDC_GENLANUI_LABEL              1300
-#define IDC_GENLANGUI_LABEL             1301
-#define IDC_OPEN_CODING                 1302
+#define IDC_GENLANGUI_LABEL             1300
+#define IDC_OPEN_CODING                 1301
 
 // Next default values for new objects
 //
