@@ -1204,6 +1204,10 @@ int GetNthNum2W(const wchar_t *Source, int Nth, int defval)
 	return v;
 }
 
+/**
+ * @brief Windowsのデフォルトのダウンロードフォルダを取得する
+ * @return	ダウンロードフォルダ, 不良になったら free() すること
+ */
 wchar_t *GetDownloadFolderW(void)
 {
 	wchar_t *download;

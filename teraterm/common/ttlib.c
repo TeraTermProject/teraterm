@@ -43,12 +43,11 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 
-#include "teraterm.h"
-#include "tttypes.h"
 #include "compat_win.h"
 #include "codeconv.h"
-#include "ttlib.h"
 #include "ttcommdlg.h"
+
+#include "ttlib.h"
 
 // このファイルはいくつかのプロジェクトに追加されて直接コンパイル,リンクされている
 // common_static は lib として作成されて他のプロジェクトにでリンクされている
@@ -656,6 +655,11 @@ void RestoreNewLine(PCHAR Text)
 	memcpy(Text, buf, size);
 }
 
+/**
+ * @brief Windowsのデフォルトのダウンロードフォルダを取得する
+ * @param dest 
+ * @param destlen 
+ */
 void GetDownloadFolder(char *dest, int destlen)
 {
 	wchar_t *download = GetDownloadFolderW();

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2021- TeraTerm Project
  * All rights reserved.
  *
