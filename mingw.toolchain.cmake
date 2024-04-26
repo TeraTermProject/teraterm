@@ -32,7 +32,10 @@ endif()
 set(THREAD_MODEL "-win32")
 #set(THREAD_MODEL "-posix")
 if(${CMAKE_COMMAND} MATCHES "msys2")
-  # msys2にはposix版のみ
+  # msys2はposix版のみ
+  unset(THREAD_MODEL)
+elseif(${CMAKE_HOST_SYSTEM_NAME} MATCHES "CYGWIN")
+  # Cygwinはposix版のみ
   unset(THREAD_MODEL)
 endif()
 
