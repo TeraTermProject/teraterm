@@ -106,6 +106,7 @@
 #include "comportinfo.h"
 #include "asprintf.h"
 #include "ttcommdlg.h"
+#include "resize_helper.h"
 
 #include "libputty.h"
 
@@ -2156,18 +2157,34 @@ static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, L
     return CallWindowProc(g_defAboutDlgEditWndProc, hWnd, msg, wp, lp);
 }
 
-static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
-									LPARAM lParam)
+typedef struct {
+	TInstVar *pvar;
+	ReiseDlgHelper_t *resize_helper;
+	HFONT DlgAboutTextFont;
+} AboutDlgData;
+
+static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static HFONT DlgAboutTextFont;
+	static const ResizeHelperInfo resize_info[] = {
+		{ IDC_TTSSH_ICON, RESIZE_HELPER_ANCHOR_RIGHT },
+		{ IDC_WEBSITES, RESIZE_HELPER_ANCHOR_LR },
+		{ IDC_CRYPTOGRAPHY, RESIZE_HELPER_ANCHOR_LR },
+		{ IDC_CREDIT, RESIZE_HELPER_ANCHOR_LR },
+		{ IDC_ABOUTTEXT, RESIZE_HELPER_ANCHOR_LRTB },
+		{ IDOK, RESIZE_HELPER_ANCHOR_B + RESIZE_HELPER_ANCHOR_NONE_H },
+	};
 
 	switch (msg) {
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
+		AboutDlgData *data = (AboutDlgData *)lParam;
+		TInstVar *pvar = data->pvar;
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
+
 		// Edit controlは等幅フォントで表示したいので、別設定情報からフォントをセットする。
 		// (2014.5.5. yutaka)
-		DlgAboutTextFont = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFileW);
-		if (DlgAboutTextFont != NULL) {
-			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutTextFont, MAKELPARAM(TRUE,0));
+		data->DlgAboutTextFont = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFileW);
+		if (data->DlgAboutTextFont != NULL) {
+			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)data->DlgAboutTextFont, MAKELPARAM(TRUE, 0));
 		}
 
 		SetDlgItemIcon(dlg, IDC_TTSSH_ICON, MAKEINTRESOURCEW(pvar->settings.IconID), 0, 0);
@@ -2181,9 +2198,11 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 		g_deltaSumAboutDlg = 0;
 		g_defAboutDlgEditWndProc = (WNDPROC)SetWindowLongPtrW(GetDlgItem(dlg, IDC_ABOUTTEXT), GWLP_WNDPROC, (LONG_PTR)AboutDlgEditWindowProc);
 
+		data->resize_helper = ReiseHelperInit(dlg, TRUE, resize_info, _countof(resize_info));
 		CenterWindow(dlg, GetParent(dlg));
 
 		return FALSE;
+	}
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
@@ -2203,23 +2222,39 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 		}
 		break;
 
-	case WM_DESTROY:
-		if (DlgAboutTextFont != NULL) {
-			DeleteObject(DlgAboutTextFont);
-			DlgAboutTextFont = NULL;
+	case WM_DESTROY: {
+		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
+		if (data->DlgAboutTextFont != NULL) {
+			DeleteObject(data->DlgAboutTextFont);
+			data->DlgAboutTextFont = NULL;
 		}
 		break;
+	}
 
-	case WM_DPICHANGED:
-		if (DlgAboutTextFont != NULL) {
-			DeleteObject(DlgAboutTextFont);
+	case WM_DPICHANGED: {
+		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
+		if (data->DlgAboutTextFont != NULL) {
+			DeleteObject(data->DlgAboutTextFont);
 		}
-		DlgAboutTextFont = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFileW);
-		if (DlgAboutTextFont != NULL) {
-			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutTextFont, MAKELPARAM(TRUE,0));
+		data->DlgAboutTextFont = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFileW);
+		if (data->DlgAboutTextFont != NULL) {
+			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)data->DlgAboutTextFont, MAKELPARAM(TRUE, 0));
 		}
 		SendDlgItemMessage(dlg, IDC_TTSSH_ICON, WM_DPICHANGED, wParam, lParam);
 		return FALSE;
+	}
+
+	case WM_SIZE: {
+		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
+		ReiseDlgHelper_WM_SIZE(data->resize_helper);
+		break;
+	}
+
+	case WM_GETMINMAXINFO: {
+		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
+		ReiseDlgHelper_WM_GETMINMAXINFO(data->resize_helper, lParam);
+		break;
+	}
 	}
 
 	return FALSE;
@@ -4621,10 +4656,11 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 		}
 		return 1;
 
-	case ID_ABOUTMENU:
+	case ID_ABOUTMENU: {
+		AboutDlgData *data = (AboutDlgData *)calloc(sizeof(*data), 1);
 		UTIL_SetDialogFont();
-		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_ABOUTDIALOG),
-		                   hWin, TTXAboutDlg, (LPARAM) pvar) == -1) {
+		data->pvar = pvar;
+		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_ABOUTDIALOG), hWin, TTXAboutDlg, (LPARAM)data) == -1) {
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
 				"MSG_TTSSH_ERROR", L"TTSSH Error",
@@ -4633,7 +4669,9 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			};
 			TTMessageBoxW(hWin, &info, pvar->ts->UILanguageFileW);
 		}
+		free(data);
 		return 1;
+	}
 	case ID_SSHAUTH:
 		UTIL_SetDialogFont();
 		AUTH_do_cred_dialog(pvar);
