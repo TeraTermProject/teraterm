@@ -266,7 +266,7 @@ void CBPreparePaste(HWND HWin, BOOL shouldBeReady, BOOL AddCR, BOOL Bracketed, w
 		else {
 			wchar_t *c = str_w;
 			while (*c) {
-				if (*c >= 0x00 && *c <= 0x1F) {
+				if (iswcntrl(*c)) {
 					AddBracket = TRUE;
 					break;
 				}
