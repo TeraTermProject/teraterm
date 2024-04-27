@@ -44,6 +44,8 @@
 #include "asprintf.h"
 #include "win32helper.h"
 #include "ttcmn_notify2.h"
+#include "ttlib_types.H"
+#include "compat_win.h"
 
 #include "general_pp.h"
 
@@ -151,6 +153,9 @@ void CGeneralPropPageDlg::OnInitDialog()
 		SendDlgItemMessageA(IDC_GENPORT, CB_SETCURSEL, w, 0);
 	}
 
+	// Download dir
+	SetDlgItemTextW(IDC_DOWNLOAD_DIR, ts.FileDirW);
+
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
 }
@@ -218,6 +223,14 @@ void CGeneralPropPageDlg::OnOK()
 			pts->PortType = IdTCPIP;
 		}
 	}
+
+	// Download dir
+	free(ts.FileDirW);
+	hGetDlgItemTextW(m_hWnd, IDC_DOWNLOAD_DIR, &ts.FileDirW);
+	if (ts.FileDirW != NULL && ts.FileDirW[0] == 0) {
+		ts.FileDirW = NULL;
+		free(ts.FileDirW);
+	}
 }
 
 void CGeneralPropPageDlg::OnHelp()
@@ -262,6 +275,32 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			// 通知領域のアイコンを消す
 			Notify2SetBallonDontHide(ni, FALSE);
 			Notify2Hide(ni);
+			break;
+		}
+		case IDC_DOWNLOAD_DIR_SELECT | (BN_CLICKED << 16): {
+			wchar_t *uimsgW;
+			wchar_t *src;
+			wchar_t *dest;
+			GetI18nStrWW("Tera Term", "DLG_SELECT_DIR_TITLE", L"Select new directory", ts.UILanguageFileW, &uimsgW);
+
+			hGetDlgItemTextW(m_hWnd, IDC_DOWNLOAD_DIR, &src);
+			if (src != NULL && src[0] == 0) {
+				free(src);
+				// Windowsのデフォルトのダウンロードフォルダ
+				_SHGetKnownFolderPath(FOLDERID_Downloads, KF_FLAG_CREATE, NULL, &src);
+			}
+			else {
+				wchar_t *FileDirExpanded;
+				hExpandEnvironmentStringsW(src, &FileDirExpanded);
+				free(src);
+				src = FileDirExpanded;
+			}
+			if (doSelectFolderW(m_hWnd, src, uimsgW, &dest)) {
+				SetDlgItemTextW(IDC_DOWNLOAD_DIR, dest);
+				free(dest);
+			}
+			free(src);
+			free(uimsgW);
 			break;
 		}
 		default:

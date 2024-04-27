@@ -4093,6 +4093,9 @@ void CVTWindow::OnFileQVSend()
 
 void CVTWindow::OnFileChangeDir()
 {
+	// TODO
+	//		ChangeDirectory, HlpFileChangeDir çÌèú
+#if 0
 	HelpId = HlpFileChangeDir;
 	if (! LoadTTDLG()) {
 		return;
@@ -4100,6 +4103,9 @@ void CVTWindow::OnFileChangeDir()
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	(*ChangeDirectory)(HVTWin, &ts);
+#else
+	OpenExternalSetup(CAddSettingPropSheetDlg::DefaultPage);
+#endif
 }
 
 void CVTWindow::OnFilePrint()

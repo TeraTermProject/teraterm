@@ -246,6 +246,9 @@
 #define IDC_BROADCAST_HELP              2624
 #define IDC_GENPORT                     2625
 #define IDC_GENPORT_LABEL               2626
+#define IDC_DOWNLOAD_DIR_TITLE          2627
+#define IDC_DOWNLOAD_DIR                2628
+#define IDC_DOWNLOAD_DIR_SELECT         2629
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -346,7 +349,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2627
+#define _APS_NEXT_CONTROL_VALUE         2630
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
