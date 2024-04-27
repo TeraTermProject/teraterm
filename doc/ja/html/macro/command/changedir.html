@@ -14,7 +14,7 @@
 <h1>changedir</h1>
 
 <p>
-Tera Term の現在のディレクトリを変更する。
+Tera Term のダウンロードディレクトリを変更する。
 </p>
 
 <pre class="macro-syntax">
@@ -24,15 +24,20 @@ changedir &lt;path&gt;
 <h2>解説</h2>
 
 <p>
-Tera Term の現在のディレクトリを &lt;path&gt; に変更する。
+Tera Term のダウンロードディレクトリを &lt;path&gt; に変更する。
 </p>
 
 <p>
-<strong>注意:</strong> <a href="setdir.html">setdir</a> コマンドは MACRO の現在のディレクトリを変更する。通信コマンド(kmtsend 等)で指定されるファイル名は Tera Term の現在のディレクトリを基準にする。その他のコマンド(fileopen 等)で指定されるファイル名は MACRO の現在のディレクトリを基準にする。
+通信コマンド(kmtsend 等)で指定されるファイル名は Tera Term の現在のディレクトリを基準にする。
 </p>
 
 <p>
-<strong>補足:</strong> 通信コマンド（sendfile, kmtsend等）に指定されるファイル名は、changedirコマンドの影響を受けないため、絶対パスである必要がある。
+通信コマンド（sendfile, kmtsend等）に指定されるファイル名は、changedirコマンドの影響を受けないため、絶対パスである必要がある。
+</p>
+
+<p>
+ダウンロードフォルダはログの保存にも影響します。
+<a href="../../setup/folder.html#TermLogDir">Tera Term が使用するフォルダ</a>を参照ください。
 </p>
 
 <h2>例</h2>
@@ -41,6 +46,11 @@ Tera Term の現在のディレクトリを &lt;path&gt; に変更する。
 changedir 'c:\'
 sendfile 'd:\source\code.dat' 1
 </pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="setdir.html">setdir</a></li>
+</ul>
 
 </body>
 </html>

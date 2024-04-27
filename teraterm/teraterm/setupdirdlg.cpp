@@ -442,6 +442,33 @@ static wchar_t *GetCurrentPath(const SetupList *, const TTTSet *)
 	return path;
 }
 
+static wchar_t *_GetTermLogPath(const SetupList *list, const TTTSet *pts)
+{
+	if (list->data_ptr == 0) {
+		// Default log save folder
+		// LogDefaultNameW
+		if (pts->LogDefaultPathW != NULL) {
+			wchar_t *d = GetTermLogDir(pts);
+			int r = wcscmp(d, pts->LogDefaultPathW);
+			free(d);
+			if (r == 0) {
+				// ts->LogDefaultPathW と GetTermLogDir() が同じなら
+				// 表示しない
+				return NULL;
+			}
+			else {
+				return _wcsdup(pts->LogDefaultPathW);
+			}
+		}
+		else {
+			return _wcsdup(L"");
+		}
+	}
+	else {
+		return GetTermLogDir(pts);
+	}
+}
+
 static wchar_t *_GetDownloadDir(const SetupList *list, const TTTSet *pts)
 {
 	if (list->data_ptr == 0) {
@@ -451,7 +478,8 @@ static wchar_t *_GetDownloadDir(const SetupList *list, const TTTSet *pts)
 			int r = wcscmp(d, pts->FileDirW);
 			free(d);
 			if (r == 0) {
-				// iniファイルの内容と環境変数展開後が同じ(環境変数を含んでいない)とき
+				// iniファイルの内容と環境変数展開後が同じとき
+				// (環境変数を含んでいないとき)
 				// 表示しない
 				return NULL;
 			}
@@ -529,14 +557,16 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			  LIST_PARAM_STR, pts->HomeDirW, NULL },
 			{ NULL, L"ExeDir",
 			  LIST_PARAM_STR, pts->ExeDirW, NULL },
-			{ NULL, L"LogDir",
-			  LIST_PARAM_STR, pts->LogDirW, NULL },
-			{ NULL, L"LogDefaultPathW",
-			  LIST_PARAM_STR, pts->LogDefaultPathW, NULL },
 			{ NULL, L"Download(FileDir in ini)",
 			  LIST_PARAM_FUNC, (void*)_GetDownloadDir, (void *)0 },
 			{ NULL, L"Download",
 			  LIST_PARAM_FUNC, (void*)_GetDownloadDir, (void *)1 },
+			{ NULL, L"LogDir(General)",
+			  LIST_PARAM_STR, pts->LogDirW, NULL },
+			{ NULL, L"Default log save folder",
+			  LIST_PARAM_FUNC, (void*)_GetTermLogPath, (void *)0 },
+			{ NULL, L"LogDir(Terminal)",
+			  LIST_PARAM_FUNC, (void*)_GetTermLogPath, (void *)1 },
 			{ NULL, L"Susie Plugin Path",
 			  LIST_PARAM_STR, pts->EtermLookfeel.BGSPIPathW, NULL },
 			{ NULL, L"UI language file",

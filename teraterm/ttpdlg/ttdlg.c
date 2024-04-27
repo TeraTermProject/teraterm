@@ -83,6 +83,7 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			SetDlgItemTextW(Dialog, IDC_DIRCURRENT, CurDir);
 
 // adjust dialog size
+#if 0
 			// get size of current dir text
 			HDir = GetDlgItem(Dialog, IDC_DIRCURRENT);
 			GetWindowRect(HDir,&R);
@@ -149,6 +150,7 @@ static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 			// resize dialog
 			MoveWindow(Dialog,WX,WY,WW,WH,TRUE);
+#endif
 
 			CenterWindow(Dialog, GetParent(Dialog));
 

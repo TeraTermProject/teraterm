@@ -600,7 +600,7 @@ struct tttset {
 	wchar_t *UILanguageFileW;			// 絶対パス
 	wchar_t *UILanguageFileW_ini;		// 相対パス,iniファイルの中身
 	wchar_t *ExeDirW;					// ttermpro.exe のあるフォルダ
-	wchar_t *LogDirW;					// logやダンプを置くフォルダ
+	wchar_t *LogDirW;					// プログラムの動作のlogやダンプを置くフォルダ、GetLogDirW() と同一。端末のログは GetTermLogDir() で取得。
 	wchar_t *FileDirW;					// ダウンロードパス("%APPDATA%" 等が含まれる,使用前に環境変数を展開する, GetDownloadDir()を利用すると便利)
 	wchar_t *LogDefaultPathW;			// ログフォルダ([file]/[log]メニューのログ)
 	HINSTANCE PluginVTIconInstance;

@@ -12,40 +12,61 @@
 <h1>Folder to put setup files</h1>
 
 <ul>
-  <li>
-    <p>installer edition</p>
+  <li>installer edition
     <ul>
-      <li>
-        setup files
+      <li>setup files
         <ul>
           <li><code>%APPDATA%\teraterm5</code></li>
         </ul>
       </li>
-      <li id="LogDir">
-        log files, dump files
+      <li id="LogDir">log files, dump files
         <ul>
           <li><code>%LOCALAPPDATA%\teraterm5</code></li>
         </ul>
       </li>
+      <li id="DownloadDir">download folder(Priority order, below is used when not set)
+        <ol>
+          <li><a href="../menu/setup-additional.html#DownloadFolder">download folder</a></li>
+          <li><code>%USERPROFILE%\Downloads</code></li>
+        </ol>
+      </li>
+      <li id="TermLogDir">Terminal log folder(Priority order, below is used when not set)
+        <ol>
+          <li><a href="../menu/setup-additional-log.html#LogDefaultPath">Default log save folder</a></li>
+          <li><a href="../menu/setup-additional.html#DownloadFolder">download folder</a></li>
+          <li><code>%LOCALAPPDATA%\teraterm5</code></li>
+        </ol>
+      </li>
     </ul>
   </li>
   
-  <li>
-    <p>portable edition</p>
+  <li>portable edition
     <ul>
-      <li>
-        setup files
+      <li>setup files
         <ul>
           <li>a folder which is exist exe file</li>
         </ul>
       </li>
-      <li>
-        log files, dump files
+      <li>log files, dump files
         <ul>
           <li>a folder which is exist exe file + <code>\log</code></li>
         </ul>
       </li>
-  </ul>
+      <li>download folder(Priority order, below is used when not set)
+        <ol>
+          <li><a href="../menu/setup-additional.html#DownloadFolder">download folder</a></li>
+          <li><code>%USERPROFILE%\Downloads</code></li>
+        </ol>
+      </li>
+      <li>Terminal log folder(Priority order, below is used when not set)
+        <ol>
+          <li><a href="../menu/setup-additional-log.html#LogDefaultPath">Default log save folder</a></li>
+          <li><a href="../menu/setup-additional.html#DownloadFolder">download folder</a></li>
+          <li>a folder which is exist exe file + <code>\log</code></li>
+        </ol>
+      </li>
+    </ul>
+  </li>
 </ul>
 
 <h1>about portable edition</h1>

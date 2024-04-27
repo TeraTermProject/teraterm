@@ -44,6 +44,7 @@
 #include "commlib.h"
 #include "ttcommon.h"
 #include "ttlib.h"
+#include "ttlib_types.h"
 #include "dlglib.h"
 #include "vtterm.h"
 #include "ftlib.h"
@@ -1058,15 +1059,16 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 	wchar_t *dir;
 	wchar_t *fname;
 	if (log_filename == NULL) {
-		dir = _wcsdup(ts.LogDefaultPathW);
+		dir = GetTermLogDir(&ts);
 		fname = _wcsdup(ts.LogDefaultNameW);
-	} else if (!IsRelativePathW(log_filename)) {
+	}
+	else if (!IsRelativePathW(log_filename)) {
 		// ê‚ëŒÉpÉXÇ™ì¸óÕÇ≥ÇÍÇΩ
 		dir = ExtractDirNameW(log_filename);
 		fname = ExtractFileNameW(log_filename);
 	}
 	else {
-		dir = _wcsdup(ts.LogDefaultPathW);
+		dir = GetTermLogDir(&ts);
 		fname = _wcsdup(log_filename);
 	}
 

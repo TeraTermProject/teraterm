@@ -42,11 +42,11 @@ extern "C" {
 wchar_t *GetDownloadDir(const TTTSet *pts);
 
 /**
- * @brief	ログを保存するフォルダを取得
+ * @brief	端末ログを保存するフォルダを取得
  * @param	pts	TTTSet
  * @return	フォルダ 不要になったら free() すること
  */
-wchar_t *GetLogDir(const TTTSet *pts);
+wchar_t *GetTermLogDir(const TTTSet *pts);
 
 #ifdef __cplusplus
 }

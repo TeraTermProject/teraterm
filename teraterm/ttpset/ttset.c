@@ -45,6 +45,7 @@
 
 #include "tt-version.h"
 #include "ttlib.h"
+#include "ttlib_types.h"
 #include "tt_res.h"
 #include "servicenames.h"
 #include "codeconv.h"
@@ -1122,9 +1123,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Default Log file path */
 	hGetPrivateProfileStringW(SectionW, L"LogDefaultPath", ts->LogDirW, FName, &ts->LogDefaultPathW);
 	if (ts->LogDefaultPathW[0] == 0) {
-		// 未指定("LogDefaultPath=")だった、デフォルト値を入れておく
+		// 未指定("LogDefaultPath=")だった、NULLを入れる
 		free(ts->LogDefaultPathW);
-		ts->LogDefaultPathW = _wcsdup(ts->LogDirW);
+		ts->LogDefaultPathW = NULL;
 	}
 
 	/* Auto start logging (2007.5.31 maya) */
@@ -2592,11 +2593,17 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 							   ts->LogDefaultNameW, FName);
 
 	/* Default Log file path */
-	if (wcscmp(ts->LogDefaultPathW, ts->LogDirW) != 0) {
-		// 異なっているとき、フォルダを指定してる
-		WritePrivateProfileStringW(SectionW, L"LogDefaultPath",
-								   ts->LogDefaultPathW, FName);
+	TempW = NULL;
+	if (ts->LogDefaultPathW != NULL &&
+		wcscmp(ts->LogDefaultPathW, ts->LogDirW) != 0) {
+		// 設定されている && 異なっているとき、フォルダを指定してる
+		TempW = ts->LogDefaultPathW;
 	}
+	else {
+		// 設定されていない, 削除
+		TempW = NULL;
+	}
+	WritePrivateProfileStringW(SectionW, L"LogDefaultPath", TempW, FName);
 
 	/* Auto start logging (2007.5.31 maya) */
 	WriteOnOff(Section, "LogAutoStart", FName, ts->LogAutoStart);
@@ -3834,7 +3841,9 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			}
 		}
 		else if (_wcsnicmp(Temp, L"/L=", 3) == 0) {	/* log file */
-			wchar_t *f = GetFilePath(&Temp[3], ts->LogDefaultPathW, NULL);
+			wchar_t *log_dir = GetTermLogDir(ts);
+			wchar_t *f = GetFilePath(&Temp[3], log_dir, NULL);
+			free(log_dir);
 			if (f != NULL) {
 				ts->LogFNW = f;
 				WideCharToACP_t(ts->LogFNW, ts->LogFN, _countof(ts->LogFN));

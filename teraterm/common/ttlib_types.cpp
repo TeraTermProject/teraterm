@@ -45,24 +45,41 @@ wchar_t *GetDownloadDir(const TTTSet *pts)
 {
 	wchar_t *dir = NULL;
 	if (pts->FileDirW != NULL && pts->FileDirW[0] != 0) {
+		// ダウンロードフォルダが設定されている
 		// 環境変数を展開
 		hExpandEnvironmentStringsW(pts->FileDirW, &dir);
-		if (!DoesFolderExistW(dir)) {
-			// フォルダが存在しない
-			free(dir);
-			dir = NULL;
+		if (DoesFolderExistW(dir)) {
+			// フォルダが存在
+			return dir;
 		}
+		free(dir);
 	}
 
-	if (dir == NULL) {
-		// Windowsのデフォルトのダウンロードフォルダを返す
-		_SHGetKnownFolderPath(FOLDERID_Downloads, KF_FLAG_CREATE, NULL, &dir);
-	}
-
+	// Windowsのデフォルトのダウンロードフォルダを返す
+	_SHGetKnownFolderPath(FOLDERID_Downloads, KF_FLAG_CREATE, NULL, &dir);
 	return dir;
 }
 
-wchar_t *GetLogDir(const TTTSet *pts)
+wchar_t *GetTermLogDir(const TTTSet *pts)
 {
-	return _wcsdup(pts->LogDirW);
+	if (pts->LogDefaultPathW != NULL && pts->LogDefaultPathW[0] != '\0') {
+		// 端末ログフォルダが指定されている場合
+		return _wcsdup(pts->LogDefaultPathW);
+	}
+
+	// ダウンロードフォルダ
+	if (pts->FileDirW != NULL && pts->FileDirW[0] != 0) {
+		// ダウンロードフォルダが設定されている
+		// 環境変数を展開
+		wchar_t *dir;
+		hExpandEnvironmentStringsW(pts->FileDirW, &dir);
+		if (DoesFolderExistW(dir)) {
+			// フォルダが存在
+			return dir;
+		}
+		free(dir);
+	}
+
+	// %LOCALAPPDATA%\teraterm5
+	return GetLogDirW(NULL);
 }

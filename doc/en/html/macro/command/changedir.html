@@ -14,7 +14,7 @@
 <h1>changedir</h1>
 
 <p>
-Changes the current directory.
+Changes the Download directory.
 </p>
 
 <pre class="macro-syntax">
@@ -24,15 +24,20 @@ changedir &lt;path&gt;
 <h2>Remarks</h2>
 
 <p>
-Changes the current directory for Tera Term to &lt;path&gt;.
+Changes the Download directory for Tera Term to &lt;path&gt;.
 </p>
 
 <p>
-<strong>Note:</strong> the <a href="setdir.html">setdir</a> command changes the current directory for MACRO. File names specified for the communication commands (e.g. kmtsend) are based on the current directory for Tera Term. File names specified for other commands (e.g. fileopen) are based on the current directory for MACRO.
+File names specified for the communication commands (e.g. kmtsend) are based on the current directory for Tera Term.
 </p>
 
 <p>
-<strong>Complement:</strong> You must specify a fullpath name to the communication commands (e.g. sendfile, kmtsend) because these commands are not affected by `changedir' command.
+You must specify a fullpath name to the communication commands (e.g. sendfile, kmtsend) because these commands are not affected by `changedir' command.
+</p>
+
+<p>
+The download folder also affects log storage.
+Reffer to <a href="../../setup/folder.html#TermLogDir">Folder to put setup files</a>.
 </p>
 
 <h2>Example</h2>
@@ -41,6 +46,11 @@ Changes the current directory for Tera Term to &lt;path&gt;.
 changedir 'c:\'
 sendfile 'd:\source\code.dat' 1
 </pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="setdir.html">setdir</a></li>
+</ul>
 
 </body>
 </html>
