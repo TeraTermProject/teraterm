@@ -44,8 +44,6 @@
 #include <openssl/dsa.h>
 #include <openssl/md5.h>
 
-#include <limits.h>
-#include <malloc.h>
 #include <string.h>
 #if !defined(_CRTDBG_MAP_ALLOC)
 #define _CRTDBG_MAP_ALLOC
@@ -53,21 +51,16 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <process.h>
-#include <time.h>
 #include <commctrl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/utime.h>
 #include <assert.h>
 
-#include <direct.h>
 #include <io.h>
 #ifdef _DEBUG	// KEX logging
 #include <fcntl.h>
 #endif
 
 
-#include "buffer.h"
 #include "ssh.h"
 #include "crypt.h"
 #include "fwd.h"
@@ -75,6 +68,7 @@
 #include "kex.h"
 #include "dlglib.h"
 #include "win32helper.h"
+#include "ttlib_types.h"
 
 #ifndef MAX
 # define MAX(a,b) (((a)>(b))?(a):(b))
