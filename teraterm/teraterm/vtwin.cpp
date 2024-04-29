@@ -4276,26 +4276,7 @@ void CVTWindow::OnSetupTerminal()
 {
 	BOOL Ok;
 
-	switch (ts.Language) {
-	case IdJapanese:
-		HelpId = HlpSetupTerminalJa;
-		break;
-	case IdEnglish:
-		HelpId = HlpSetupTerminalEn;
-		break;
-	case IdKorean:
-		HelpId = HlpSetupTerminalKo;
-		break;
-	case IdRussian:
-		HelpId = HlpSetupTerminalRu;
-		break;
-	case IdUtf8:
-		HelpId = HlpSetupTerminalUtf8;
-		break;
-	default:
-		HelpId = HlpSetupTerminal;
-		break;
-	}
+	HelpId = HlpSetupTerminal;
 	if (! LoadTTDLG()) {
 		return;
 	}
