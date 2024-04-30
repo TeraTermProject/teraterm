@@ -48,7 +48,6 @@
 #include "dlglib.h"
 #include "vtterm.h"
 #include "ftlib.h"
-#include "buffer.h"
 #include "codeconv.h"
 #include "asprintf.h"
 #include "win32helper.h"
@@ -941,6 +940,10 @@ void FLogWriteStr(const wchar_t *str)
 	}
 }
 
+/**
+ *	ログの情報を取得する
+ *	マクロ用
+ */
 void FLogInfo(char *param_ptr, size_t param_len)
 {
 	PFileVar fv = LogVar;

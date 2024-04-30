@@ -4446,8 +4446,7 @@ void CVTWindow::OnSetupKeyboard()
 
 	if (Ok) {
 //		ResetKeypadMode(TRUE);
-		if ((ts.Language==IdJapanese) || (ts.Language==IdKorean) || (ts.Language==IdUtf8)) //HKS
-			ResetIME();
+		ResetIME();
 	}
 }
 
