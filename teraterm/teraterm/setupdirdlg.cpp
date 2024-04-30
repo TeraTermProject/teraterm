@@ -217,7 +217,7 @@ static BOOL openDirectoryWithExplorer(const wchar_t *file, const wchar_t *UILang
 		// ファイルが存在しない, ディレクトリをオープンする
 		wchar_t *dir = ExtractDirNameW(file);
 		attr = GetFileAttributesW(dir);
-		if ((attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
+		if ((attr != INVALID_FILE_ATTRIBUTES) && (attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 			// フォルダを開く
 			INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", L"explorer.exe", dir, NULL, SW_NORMAL);
 			ret = h > 32 ? TRUE : FALSE;
@@ -340,18 +340,32 @@ typedef struct {
 } SetupList;
 
 /**
- *	メニューを出して選択された処理を実行する
+ * @brief メニューを出して選択された処理を実行する
+ * @param hWnd			親ウィンドウ
+ * @param pointer_pos	ポインタの位置
+ * @param path			フルパス,file or path
+ * @param pts			*ts
  */
 static void PopupAndExec(HWND hWnd, const POINT *pointer_pos, const wchar_t *path, const TTTSet *pts)
 {
 	const wchar_t *UILanguageFile = pts->UILanguageFileW;
-	const DWORD file_stat = GetFileAttributesW(path);
-	const BOOL dir = (file_stat & FILE_ATTRIBUTE_DIRECTORY) != 0 ? TRUE : FALSE;
+	UINT menu_flag = (path == NULL || path[0] == 0) ? MF_DISABLED : MF_ENABLED;
+	UINT menu_flag_open_file = MF_DISABLED;
+	if (menu_flag == MF_ENABLED) {
+		const DWORD file_stat = GetFileAttributesW(path);
+		if ((file_stat == FILE_INVALID_FILE_ID) || ((file_stat & FILE_ATTRIBUTE_DIRECTORY) != 0)) {
+			menu_flag_open_file = MF_DISABLED;
+		}
+		else {
+			menu_flag_open_file = MF_ENABLED;
+		}
+		int b = 0;
+	}
 
 	HMENU hMenu= CreatePopupMenu();
-	AppendMenuW(hMenu, (dir ? MF_DISABLED : MF_ENABLED) | MF_STRING | 0, 1, L"&Open file");
-	AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 2, L"Open folder(with explorer)");
-	AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 3, L"Send path to clipboard");
+	AppendMenuW(hMenu, menu_flag_open_file | MF_STRING | 0, 1, L"&Open file");
+	AppendMenuW(hMenu, menu_flag | MF_STRING | 0, 2, L"Open folder(with explorer)");
+	AppendMenuW(hMenu, menu_flag | MF_STRING | 0, 3, L"Send path to clipboard");
 	int result = TrackPopupMenu(hMenu, TPM_RETURNCMD, pointer_pos->x, pointer_pos->y, 0 , hWnd, NULL);
 	DestroyMenu(hMenu);
 	switch (result) {
