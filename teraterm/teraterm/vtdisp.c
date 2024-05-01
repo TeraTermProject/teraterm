@@ -3426,9 +3426,7 @@ void DispSetActive(BOOL ActiveFlag)
 		ActiveWin = IdVT;
 	}
 	else {
-		if ((ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) &&
-		    CanUseIME())
-		{
+		if (CanUseIME()) {
 			/* position & font of conv. window -> default */
 			SetConversionWindow(HVTWin,-1,0);
 		}
