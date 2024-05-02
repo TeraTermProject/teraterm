@@ -41,12 +41,12 @@ file(COPY ${PACKAGE}/setup-x86_64.exe DESTINATION ${CYGWIN_ROOT})
 
 # install packages
 execute_process(
-  COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --packages cmake,bash,tar,make,perl,gcc-core,gcc-g++,icoutils
+  COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --upgrade-also --packages cmake,bash,tar,make,perl,gcc-core,gcc-g++,icoutils
   WORKING_DIRECTORY ${CYGWIN_ROOT}
 )
 # install packages for notify
 execute_process(
-  COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --packages perl-JSON,perl-LWP-Protocol-https
+  COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --upgrade-also--packages perl-JSON,perl-LWP-Protocol-https
   WORKING_DIRECTORY ${CYGWIN_ROOT}
 )
 
