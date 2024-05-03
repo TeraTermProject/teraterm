@@ -54,7 +54,7 @@ class PrivateData : public TTCDialog
 {
 public:
 	PrivateData() {
-		check_2sec = NULL;
+		check_2sec = FALSE;
 		show = FALSE;
 		UILanguageFile_ = NULL;
 		Pause = FALSE;
