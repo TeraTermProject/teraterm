@@ -78,6 +78,12 @@
       <li>MACRO: <a href="../macro/command/send.html">send</a> マクロコマンドで $00 を送信できなったので修正した。</li>
       <li><a href="../menu/setup-sshauth.html">SSH Authentication ダイアログ</a>でフォーカスが消えてTAB等が使えなくなる問題を修正した</li>
       <li>ログの<a href="../setup/folder.html#TermLogDir">保存フォルダ</a>に、Tera Term 4 と同様にダウンロードフォルダを追加した。</li>
+      <li>送信文字コードがJISの時、誤った文字を送信することがあったので修正した。
+        <ul>
+          <li>行末の文字出力の誤りを修正</li>
+          <li>ローカルエコーがON時、正しくエコーされなかったので修正</li>
+        </ul>
+      </li>
     </ul>
   </li>
 

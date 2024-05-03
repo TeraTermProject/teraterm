@@ -932,7 +932,7 @@ static size_t MakeOutputString(PComVar cv, OutputCharState *states,
 	if (u32 < 0x100 || ControlOut(cv, u32, TRUE, NULL, NULL)) {
 		if (cv->Language == IdJapanese && states->KanjiCode == IdJIS) {
 			// ¡‚Ì‚Æ‚±‚ëA“ú–{Œê,JIS‚µ‚©‚È‚¢
-			if (cv->SendCode == IdKanji) {
+			if (states->SendCode == IdKanji) {
 				// Š¿š‚Å‚Í‚È‚¢‚Ì‚ÅAŠ¿šOUT
 				TempStr[TempLen++] = 0x1B;
 				TempStr[TempLen++] = '(';
@@ -959,7 +959,7 @@ static size_t MakeOutputString(PComVar cv, OutputCharState *states,
 	}
 
 	// 1•¶šˆ—‚·‚é
-	if (ControlOut(cv, u32, FALSE, TempStr, &TempLen2)) {
+	if (ControlOut(cv, u32, FALSE, &TempStr[TempLen], &TempLen2)) {
 		// “Á•Ê‚È•¶š‚ğˆ—‚µ‚½
 		TempLen += TempLen2;
 		output_char_count = 1;
