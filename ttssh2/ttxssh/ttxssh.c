@@ -5046,6 +5046,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			pvar->ts_SSH->struct_size = sizeof(TS_SSH);
 			if (__mem_mapping != NULL) {
 				CloseHandle(__mem_mapping);
+				__mem_mapping = NULL;
 			}
 		}
 		break;
@@ -5054,8 +5055,8 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 		if (__mem_mapping == NULL) {
 			free(pvar->ts_SSH);
 		} else {
+			UnmapViewOfFile(__mem_mapping);
 			CloseHandle(__mem_mapping);
-			UnmapViewOfFile(pvar->ts_SSH);
 		}
 		break;
 	}
