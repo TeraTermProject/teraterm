@@ -719,11 +719,6 @@ static void Tab(void)
 	if (NeedsOutputBufs()) OutputLogByte(HT);
 }
 
-static void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert)
-{
-	BuffPutUnicode(b, Attr, Insert);
-}
-
 /**
  *	unicode(char32_t)をバッファへ書き込む
  *		ログにも書き込む場合は PutU32() を使う
