@@ -1913,9 +1913,6 @@ void ChangeFont(void)
 
 void ResetIME(void)
 {
-	/* reset language for communication */
-	cv.Language = ts.Language;
-
 	/* reset IME */
 	if ((IMEEnabled() == TRUE) && (ts.UseIME > 0)) {
 

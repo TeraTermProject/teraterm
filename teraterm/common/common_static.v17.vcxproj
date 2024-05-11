@@ -131,13 +131,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\teraterm\unicode.cpp" />
     <ClCompile Include="asprintf.cpp" />
+    <ClCompile Include="codeconv_mb.cpp" />
     <ClCompile Include="comportinfo.cpp" />
     <ClCompile Include="dlglib.c" />
     <ClCompile Include="dlglib_cpp.cpp" />
     <ClCompile Include="dlglib_tmpl.cpp" />
     <ClCompile Include="fileread.cpp" />
+    <ClCompile Include="i18n.c" />
     <ClCompile Include="inifile_com.cpp" />
+    <ClCompile Include="makeoutputstring.cpp" />
     <ClCompile Include="resize_helper.cpp" />
     <ClCompile Include="tipwin.cpp" />
     <ClCompile Include="tipwin2.cpp" />
@@ -153,6 +157,7 @@
     <ClCompile Include="ttcommdlg.cpp" />
     <ClCompile Include="ttgdiplus.cpp" />
     <ClCompile Include="ttknownfolders.c" />
+    <ClCompile Include="ttlib.c" />
     <ClCompile Include="ttlib_charset.cpp" />
     <ClCompile Include="ttlib_static.c" />
     <ClCompile Include="ttlib_static_cpp.cpp" />
@@ -162,11 +167,14 @@
     <ClCompile Include="win32helper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\teraterm\unicode.h" />
     <ClInclude Include="asprintf.h" />
+    <ClInclude Include="codeconv_mb.h" />
     <ClInclude Include="comportinfo.h" />
     <ClInclude Include="dlglib.h" />
     <ClInclude Include="fileread.h" />
     <ClInclude Include="inifile_com.h" />
+    <ClInclude Include="makeoutputstring.h" />
     <ClInclude Include="resize_helper.h" />
     <ClInclude Include="tipwin.h" />
     <ClInclude Include="tipwin2.h" />

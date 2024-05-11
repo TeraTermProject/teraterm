@@ -59,6 +59,7 @@
 #include "asprintf.h"
 #include "charset.h"
 #include "ttcstd.h"
+#include "makeoutputstring.h"
 
 #include "vtterm.h"
 
@@ -360,19 +361,13 @@ void ResetTerminal() /*reset variables but don't update screen */
 
 void ResetCharSet()
 {
-	if (ts.Language != IdJapanese) {
-		cv.SendCode = IdASCII;
-		cv.EchoCode = IdASCII;
-	}
-
-	cv.Language = ts.Language;
 	cv.CRSend = ts.CRSend;
+
+	MakeOutputStringInit(cv.StateEcho, ts.Language, ts.KanjiCode, ts.KanjiIn, ts.KanjiOut, ts.JIS7Katakana);
+	MakeOutputStringInit(cv.StateSend, ts.Language, ts.KanjiCodeSend, ts.KanjiIn, ts.KanjiOut, ts.JIS7KatakanaSend);
 	cv.KanjiCodeEcho = ts.KanjiCode;
-	cv.JIS7KatakanaEcho = ts.JIS7Katakana;
 	cv.KanjiCodeSend = ts.KanjiCodeSend;
-	cv.JIS7KatakanaSend = ts.JIS7KatakanaSend;
-	cv.KanjiIn = ts.KanjiIn;
-	cv.KanjiOut = ts.KanjiOut;
+
 
 	if (charset_data != NULL) {
 		CharSetFinish(charset_data);

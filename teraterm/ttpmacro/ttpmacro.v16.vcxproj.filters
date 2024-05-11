@@ -43,9 +43,6 @@
     <ClCompile Include="ttmmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\ttlib.c">
-      <Filter>Source Files %28C%29</Filter>
-    </ClCompile>
     <ClCompile Include="ttmbuff.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>

@@ -76,8 +76,6 @@ add_executable(
   ttwinman.h
   ttwsk.c
   ttwsk.h
-  unicode.cpp
-  unicode.h
   unicode_test.h
   vtdisp.c
   vtdisp.h
@@ -169,7 +167,6 @@ target_sources(
   ../common/ttplugin.h
   ../common/tt-version.h
   ../common/teraterm.h
-  ../common/ttlib.c
   ../common/ttlib.h
   ../common/dlglib.h
   ../common/codemap.h

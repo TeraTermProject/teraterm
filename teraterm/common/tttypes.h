@@ -806,21 +806,21 @@ typedef struct {
 
 	BOOL reserve_SendKanjiFlag;
 	BOOL reserve_EchoKanjiFlag;
-	int SendCode;
-	int EchoCode;
+	int reserve_SendCode;
+	int reserve_EchoCode;
 	BYTE reserve_SendKanjiFirst;
 	BYTE reserve_EchoKanjiFirst;
 
 	/* from VTSet */
-	WORD Language;
+	WORD reserve_Language;
 	/* from TermSet */
 	WORD CRSend;
-	WORD KanjiCodeEcho;
-	WORD JIS7KatakanaEcho;
-	WORD KanjiCodeSend;
-	WORD JIS7KatakanaSend;
-	WORD KanjiIn;
-	WORD KanjiOut;
+	WORD KanjiCodeEcho; 	// çÌèú
+	WORD reserve_JIS7KatakanaEcho;
+	WORD KanjiCodeSend;		// çÌèú
+	WORD reserve_JIS7KatakanaSend;
+	WORD reserve_KanjiIn;
+	WORD reserve_KanjiOut;
 	WORD reserve_RussHost;
 	WORD reserve_RussClient;
 	/* from PortSet */
@@ -879,6 +879,9 @@ typedef struct {
 	TTTSet *ts;
 
 	wchar_t *TitleRemoteW;
+
+	void *StateSend;
+	void *StateEcho;
 } TComVar;
 typedef TComVar *PComVar;
 

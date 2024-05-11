@@ -5,10 +5,14 @@ project(${PACKAGE_NAME})
 add_library(
   ${PACKAGE_NAME}
   STATIC
+  ../teraterm/unicode.cpp
+  ../teraterm/unicode.h
   asprintf.cpp
   asprintf.h
   codeconv.cpp
   codeconv.h
+  codeconv_mb.cpp
+  codeconv_mb.h
   compat_win.cpp
   compat_win.h
   comportinfo.cpp
@@ -23,10 +27,13 @@ add_library(
   fileread.h
   getcontent.cpp
   getcontent.h
+  i18n.c
   i18n.h
   i18n_static.c
   inifile_com.cpp
   inifile_com.h
+  makeoutputstring.cpp
+  makeoutputstring.h
   resize_helper.cpp
   resize_helper.h
   tipwin.cpp
@@ -45,6 +52,7 @@ add_library(
   ttgdiplus.h
   ttknownfolders.c
   ttknownfolders.h
+  ttlib.c
   ttlib.h
   ttlib_charset.cpp
   ttlib_charset.h
@@ -65,6 +73,7 @@ target_include_directories(
   PUBLIC
   ${CMAKE_CURRENT_BINARY_DIR}       # for svnversion.h
   .
+  ../teraterm
 )
 
 target_link_libraries(

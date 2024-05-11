@@ -124,8 +124,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\teraterm\common\i18n.c" />
-    <ClCompile Include="..\teraterm\common\ttlib.c" />
     <ClCompile Include="registry.cpp" />
     <ClCompile Include="ttpmenu.cpp" />
     <ClCompile Include="winmisc.cpp" />

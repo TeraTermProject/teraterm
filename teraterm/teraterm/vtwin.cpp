@@ -111,6 +111,7 @@
 #include "scp.h"
 #include "ttcommdlg.h"
 #include "logdlg.h"
+#include "makeoutputstring.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -436,6 +437,9 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		InitMenu(&MainMenu);
 		::SetMenu(HVTWin,MainMenu);
 	}
+
+	cv.StateEcho = MakeOutputStringCreate();
+	cv.StateSend = MakeOutputStringCreate();
 
 	/* Reset Terminal */
 	ResetTerminal();
@@ -1447,6 +1451,11 @@ LRESULT CVTWindow::OnNonConfirmClose(WPARAM wParam, LPARAM lParam)
 
 void CVTWindow::OnDestroy()
 {
+	MakeOutputStringDestroy((OutputCharState *)(cv.StateEcho));
+	cv.StateEcho = NULL;
+	MakeOutputStringDestroy((OutputCharState *)(cv.StateSend));
+	cv.StateSend = NULL;
+
 	// remove this window from the window list
 	UnregWin(HVTWin);
 

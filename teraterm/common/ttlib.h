@@ -138,7 +138,6 @@ DllExport BOOL IsWindows7OrLater();
 DllExport BOOL HasMultiMonitorSupport();
 DllExport BOOL HasDnsQuery();
 DllExport BOOL HasBalloonTipSupport();
-int KanjiCodeTranslate(int lang, int kcode);
 DllExport char *mctimelocal(const char *format, BOOL utc_flag);
 char *strelapsed(DWORD start_time);
 

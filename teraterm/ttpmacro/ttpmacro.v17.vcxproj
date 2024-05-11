@@ -129,7 +129,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="ListDlg.cpp" />
     <ClCompile Include="errdlg.cpp" />
     <ClCompile Include="inpdlg.cpp" />

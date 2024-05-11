@@ -50,6 +50,7 @@
 #include "codeconv.h"
 #include "helpid.h"
 #include "vtwin.h"
+#include "makeoutputstring.h"
 
 static SOCKET OpenSocket(PComVar);
 static void AsyncConnect(PComVar);
@@ -306,16 +307,11 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	cv->ComID = INVALID_HANDLE_VALUE;
 	cv->CanSend = TRUE;
 	cv->RRQ = FALSE;
-	cv->SendCode = IdASCII;
-	cv->EchoCode = IdASCII;
-	cv->Language = ts->Language;
 	cv->CRSend = ts->CRSend;
 	cv->KanjiCodeEcho = ts->KanjiCode;
-	cv->JIS7KatakanaEcho = ts->JIS7Katakana;
 	cv->KanjiCodeSend = ts->KanjiCodeSend;
-	cv->JIS7KatakanaSend = ts->JIS7KatakanaSend;
-	cv->KanjiIn = ts->KanjiIn;
-	cv->KanjiOut = ts->KanjiOut;
+	MakeOutputStringInit(cv->StateEcho, ts->Language, ts->KanjiCode, ts->KanjiIn, ts->KanjiOut, ts->JIS7Katakana);
+	MakeOutputStringInit(cv->StateSend, ts->Language, ts->KanjiCodeSend, ts->KanjiIn, ts->KanjiOut, ts->JIS7KatakanaSend);
 	cv->DelayFlag = TRUE;
 	cv->DelayPerChar = ts->DelayPerChar;
 	cv->DelayPerLine = ts->DelayPerLine;

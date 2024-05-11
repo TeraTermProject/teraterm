@@ -1,5 +1,5 @@
 /*
- * (C) 2021- TeraTerm Project
+ * Copyright (C) 2024- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,34 +26,20 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* Multi Byte, Double Byte, Single Byte 関連の文字コード変換 */
+
 #pragma once
+
+#include <windows.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct {
-	int language;
-	const char *str;
-} TLanguageList;
-
-typedef struct {
-	int lang;
-	int coding;
-	const char *CodeName;
-	const char *KanjiCode;
-} TKanjiList;
-
-const TLanguageList *GetLanguageList(int index);
-const char *GetLanguageStr(int language);
-int GetLanguageFromStr(const char *language_str);
-
-const TKanjiList *GetKanjiList(int index);
-const char *GetKanjiCodeStr(int language, int kanji_code);
-int GetKanjiCodeFromStr(int language, const char *kanji_code_str);
-
-int KanjiCodeToISO8859Part(int kanjicode);
-int KanjiCodeTranslate(int lang, int kcode);
+WORD CodeConvSJIS2JIS(WORD KCode);
+WORD CodeConvJIS2SJIS(WORD KCode);
+WORD CodeConvSJIS2EUC(WORD KCode);
+BYTE CodeConvRussConv(int cin, int cout, BYTE b);
 
 #ifdef __cplusplus
 }

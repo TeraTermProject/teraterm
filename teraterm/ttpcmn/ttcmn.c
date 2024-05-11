@@ -29,18 +29,12 @@
 
 /* TTCMN.DLL, main */
 #include <string.h>
-#include <stdio.h>
 #include <windows.h>
-#include <setupapi.h>
 #include <htmlhelp.h>
 #include <assert.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
-
-#define DllExport __declspec(dllexport)
-#include "language.h"
-#undef DllExport
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -48,7 +42,7 @@
 #include "codeconv.h"
 #include "compat_win.h"
 #include "win32helper.h"
-#include "../teraterm/unicode.h"
+#include "makeoutputstring.h"
 
 #include "ttcmn_shared_memory.h"
 #include "ttcommon.h"
@@ -779,18 +773,7 @@ int WINAPI CommBinaryBuffOut(PComVar cv, PCHAR B, int C)
 }
 
 /**
- *	@retval	true	日本語の半角カタカナ
- *	@retval	false	その他
- */
-static BOOL IsHalfWidthKatakana(unsigned int u32)
-{
-	// Halfwidth CJK punctuation (U+FF61～FF64)
-	// Halfwidth Katakana variants (U+FF65～FF9F)
-	return (0xff61 <= u32 && u32 <= 0xff9f);
-}
-
-/**
- *	出力用、 TODO echo用を作る
+ *	出力用
  *	@param	cv
  *	@param	u32			入力文字
  *	@param	check_only	TRUEで処理は行わず、
@@ -798,8 +781,9 @@ static BOOL IsHalfWidthKatakana(unsigned int u32)
  *	@param	StrLen		TempStrへの出力文字数
  *	@retval	処理を行った
  */
-static BOOL OutControl(PComVar cv, unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen)
+static BOOL OutControl(unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen, void *data)
 {
+	PComVar cv = data;
 	const wchar_t d = u32;
 	size_t TempLen = 0;
 	BOOL retval = FALSE;
@@ -851,8 +835,9 @@ static BOOL OutControl(PComVar cv, unsigned int u32, BOOL check_only, char *Temp
 	*StrLen = TempLen;
 	return retval;
 }
-static BOOL ControlEcho(PComVar cv, unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen)
+static BOOL ControlEcho(unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen, void *data)
 {
+	PComVar cv = data;
 	const wchar_t d = u32;
 	size_t TempLen = 0;
 	BOOL retval = FALSE;
@@ -888,231 +873,6 @@ static BOOL ControlEcho(PComVar cv, unsigned int u32, BOOL check_only, char *Tem
 }
 
 /**
- * 出力用文字列を作成する
- *
- *	@retval	消費した文字数
- */
-typedef struct {
-	int KanjiCode;		// [in]出力文字コード(sjis,jisなど)
-	BOOL (*ControlOut)(PComVar cv, unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen);
-	// stateを保存する必要がある文字コードで使用
-	BOOL JIS7Katakana;	// [in](Kanji JIS)kana
-	int SendCode;		// [in,out](Kanji JIS)直前の送信コード Ascii/Kana/Kanji
-	BOOL KanjiFlag;		// [in,out](MBCS)直前の1byteが漢字だったか?(2byte文字だったか?)
-	BYTE KanjiFirst;	// [in,out](MBCS)直前の1byte
-} OutputCharState;
-
-/**
- *	unicode(UTF-16)からunicode(UTF-32)を1文字取り出して
- *	出力データ(TempStr)を作成する
- */
-static size_t MakeOutputString(PComVar cv, OutputCharState *states,
-							   const wchar_t *B, int C,
-							   char *TempStr, int *TempLen_)
-{
-	BOOL (*ControlOut)(PComVar cv, unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen)
-		= states->ControlOut;
-//
-	int TempLen = 0;
-	size_t TempLen2;
-	size_t output_char_count;	// 消費した文字数
-
-	// UTF-32 を1文字取り出す
-	unsigned int u32;
-	size_t u16_len = UTF16ToUTF32(B, C, &u32);
-	if (u16_len == 0) {
-		// デコードできない? あり得ないのでは?
-		assert(FALSE);
-		u32 = '?';
-		u16_len = 1;
-	}
-	output_char_count = u16_len;
-
-	// 各種シフト状態を通常に戻す
-	if (u32 < 0x100 || ControlOut(cv, u32, TRUE, NULL, NULL)) {
-		if (cv->Language == IdJapanese && states->KanjiCode == IdJIS) {
-			// 今のところ、日本語,JISしかない
-			if (states->SendCode == IdKanji) {
-				// 漢字ではないので、漢字OUT
-				TempStr[TempLen++] = 0x1B;
-				TempStr[TempLen++] = '(';
-				switch (cv->KanjiOut) {
-				case IdKanjiOutJ:
-					TempStr[TempLen++] = 'J';
-					break;
-				case IdKanjiOutH:
-					TempStr[TempLen++] = 'H';
-					break;
-				default:
-					TempStr[TempLen++] = 'B';
-				}
-			}
-
-			if (states->JIS7Katakana == 1) {
-				if (cv->SendCode == IdKatakana) {
-					TempStr[TempLen++] = SO;
-				}
-			}
-
-			states->SendCode = IdASCII;
-		}
-	}
-
-	// 1文字処理する
-	if (ControlOut(cv, u32, FALSE, &TempStr[TempLen], &TempLen2)) {
-		// 特別な文字を処理した
-		TempLen += TempLen2;
-		output_char_count = 1;
-	} else if (cv->Language == IdUtf8 ||
-			   (cv->Language == IdJapanese && states->KanjiCode == IdUTF8) ||
-			   (cv->Language == IdKorean && states->KanjiCode == IdUTF8) ||
-			   (cv->Language == IdChinese && states->KanjiCode == IdUTF8))
-	{
-		// UTF-8 で出力
-		size_t utf8_len = sizeof(TempStr);
-		utf8_len = UTF32ToUTF8(u32, TempStr, utf8_len);
-		TempLen += utf8_len;
-	} else if (cv->Language == IdJapanese) {
-		// 日本語
-		// まず CP932(SJIS) に変換してから出力
-		char mb_char[2];
-		size_t mb_len = sizeof(mb_char);
-		mb_len = UTF32ToMBCP(u32, 932, mb_char, mb_len);
-		if (mb_len == 0) {
-			// SJISに変換できない
-			TempStr[TempLen++] = '?';
-		} else {
-			switch (states->KanjiCode) {
-			case IdEUC:
-				// TODO 半角カナ
-				if (mb_len == 1) {
-					TempStr[TempLen++] = mb_char[0];
-				} else {
-					WORD K;
-					K = (((WORD)(unsigned char)mb_char[0]) << 8) +
-						(WORD)(unsigned char)mb_char[1];
-					K = SJIS2EUC(K);
-					TempStr[TempLen++] = HIBYTE(K);
-					TempStr[TempLen++] = LOBYTE(K);
-				}
-				break;
-			case IdJIS:
-				if (u32 < 0x100) {
-					// ASCII
-					TempStr[TempLen++] = mb_char[0];
-					states->SendCode = IdASCII;
-				} else if (IsHalfWidthKatakana(u32)) {
-					// 半角カタカナ
-					if (states->JIS7Katakana==1) {
-						if (cv->SendCode != IdKatakana) {
-							TempStr[TempLen++] = SI;
-						}
-						TempStr[TempLen++] = mb_char[0] & 0x7f;
-					} else {
-						TempStr[TempLen++] = mb_char[0];
-					}
-					states->SendCode = IdKatakana;
-				} else {
-					// 漢字
-					WORD K;
-					K = (((WORD)(unsigned char)mb_char[0]) << 8) +
-						(WORD)(unsigned char)mb_char[1];
-					K = SJIS2JIS(K);
-					if (states->SendCode != IdKanji) {
-						// 漢字IN
-						TempStr[TempLen++] = 0x1B;
-						TempStr[TempLen++] = '$';
-						if (cv->KanjiIn == IdKanjiInB) {
-							TempStr[TempLen++] = 'B';
-						}
-						else {
-							TempStr[TempLen++] = '@';
-						}
-						states->SendCode = IdKanji;
-					}
-					TempStr[TempLen++] = HIBYTE(K);
-					TempStr[TempLen++] = LOBYTE(K);
-				}
-				break;
-			case IdSJIS:
-				if (mb_len == 1) {
-					TempStr[TempLen++] = mb_char[0];
-				} else {
-					TempStr[TempLen++] = mb_char[0];
-					TempStr[TempLen++] = mb_char[1];
-				}
-				break;
-			default:
-				assert(FALSE);
-				break;
-			}
-		}
-	} else if (cv->Language == IdRussian) {
-		/* まずCP1251に変換して出力 */
-		char mb_char[2];
-		size_t mb_len = sizeof(mb_char);
-		BYTE b;
-		mb_len = UTF32ToMBCP(u32, 1251, mb_char, mb_len);
-		if (mb_len != 1) {
-			b = '?';
-		} else {
-			b = RussConv(IdWindows, states->KanjiCode, mb_char[0]);
-		}
-		TempStr[TempLen++] = b;
-	} else if (cv->Language == IdKorean || cv->Language == IdChinese) {
-		int code_page;
-		char mb_char[2];
-		size_t mb_len;
-		if (cv->Language == IdKorean) {
-			code_page = 949;
-		} else if (cv->Language == IdChinese) {
-			switch (states->KanjiCode) {
-			case IdCnGB2312:
-				code_page = 936;
-				break;
-			case IdCnBig5:
-				code_page = 950;
-				break;
-			default:
-				assert(FALSE);
-				code_page = 936;
-				break;
-			}
-		} else {
-			assert(FALSE);
-			code_page = 0;
-		}
-		/* code_page に変換して出力 */
-		mb_len = sizeof(mb_char);
-		mb_len = UTF32ToMBCP(u32, code_page, mb_char, mb_len);
-		if (mb_len == 0) {
-			TempStr[TempLen++] = '?';
-		}
-		else if (mb_len == 1) {
-			TempStr[TempLen++] = mb_char[0];
-		} else  {
-			TempStr[TempLen++] = mb_char[0];
-			TempStr[TempLen++] = mb_char[1];
-		}
-	} else if (cv->Language == IdEnglish) {
-		char byte;
-		int part = KanjiCodeToISO8859Part(states->KanjiCode);
-		int r = UnicodeToISO8859(part, u32, &byte);
-		if (r == 0) {
-			// 変換できない文字コードだった
-			byte = '?';
-		}
-		TempStr[TempLen++] = byte;
-	} else {
-		assert(FALSE);
-	}
-
-	*TempLen_ = TempLen;
-	return output_char_count;
-}
-
-
-/**
  * CommTextOut() の wchar_t 版
  *
  *	@retval		出力文字数(wchar_t単位)
@@ -1124,20 +884,13 @@ int WINAPI CommTextOutW(PComVar cv, const wchar_t *B, int C)
 	int i = 0;
 	while (! Full && (i < C)) {
 		// 出力用データを作成
-		int TempLen = 0;
+		size_t TempLen = 0;
 		size_t output_char_count;	// 消費した文字数
-		OutputCharState state;
-		state.KanjiCode = cv->KanjiCodeSend;
-		state.ControlOut = OutControl;
-		state.SendCode = cv->SendCode;
-		state.JIS7Katakana = cv->JIS7KatakanaSend;
-		output_char_count = MakeOutputString(cv, &state, &B[i], C-i, TempStr, &TempLen);
+		output_char_count = MakeOutputString(cv->StateSend, &B[i], C - i, TempStr, &TempLen, OutControl, cv);
 
 		// データを出力バッファへ
 		if (WriteOutBuff(cv, TempStr, TempLen)) {
 			i += output_char_count;		// output_char_count 文字数 処理した
-			// 漢字の状態を保存する
-			cv->SendCode = state.SendCode;
 		} else {
 			Full = TRUE;
 		}
@@ -1158,20 +911,13 @@ int WINAPI CommTextEchoW(PComVar cv, const wchar_t *B, int C)
 	int i = 0;
 	while (! Full && (i < C)) {
 		// 出力用データを作成
-		int TempLen = 0;
+		size_t TempLen = 0;
 		size_t output_char_count;	// 消費した文字数
-		OutputCharState state;
-		state.KanjiCode = cv->KanjiCodeEcho;
-		state.ControlOut = ControlEcho;
-		state.SendCode = cv->EchoCode;
-		state.JIS7Katakana = cv->JIS7KatakanaEcho;
-		output_char_count = MakeOutputString(cv, &state, &B[i], C-i, TempStr, &TempLen);
+		output_char_count = MakeOutputString(cv->StateEcho, &B[i], C - i, TempStr, &TempLen, ControlEcho, cv);
 
 		// データを出力バッファへ
 		if (WriteInBuff(cv, TempStr, TempLen)) {
 			i += output_char_count;		// output_char_count 文字数 処理した
-			// 漢字の状態を保存する
-			cv->EchoCode = state.SendCode;
 		} else {
 			Full = TRUE;
 		}

@@ -1,5 +1,5 @@
 /*
- * (C) 2021- TeraTerm Project
+ * (C) 2024- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,32 +28,29 @@
 
 #pragma once
 
+#include <windows.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct {
-	int language;
-	const char *str;
-} TLanguageList;
+typedef struct OutputCharStateTag OutputCharState;
 
-typedef struct {
-	int lang;
-	int coding;
-	const char *CodeName;
-	const char *KanjiCode;
-} TKanjiList;
-
-const TLanguageList *GetLanguageList(int index);
-const char *GetLanguageStr(int language);
-int GetLanguageFromStr(const char *language_str);
-
-const TKanjiList *GetKanjiList(int index);
-const char *GetKanjiCodeStr(int language, int kanji_code);
-int GetKanjiCodeFromStr(int language, const char *kanji_code_str);
-
-int KanjiCodeToISO8859Part(int kanjicode);
-int KanjiCodeTranslate(int lang, int kcode);
+OutputCharState *MakeOutputStringCreate(void);
+void MakeOutputStringDestroy(OutputCharState *state);
+void MakeOutputStringInit(
+	OutputCharState *state,
+	WORD Language,
+	WORD kanji_code,
+	WORD KanjiIn,
+	WORD KanjiOut,
+	BOOL jis7katakana);
+size_t MakeOutputString(
+	OutputCharState *states,
+	const wchar_t *B, size_t C,
+	char *TempStr, size_t *TempLen_,
+	BOOL (*ControlOut)(unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen, void *data),
+	void *data);
 
 #ifdef __cplusplus
 }
