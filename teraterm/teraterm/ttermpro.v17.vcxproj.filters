@@ -69,9 +69,6 @@
     <ClCompile Include="sizetip.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
-    <ClCompile Include="teklib.c">
-      <Filter>Source Files %28C%29</Filter>
-    </ClCompile>
     <ClCompile Include="telnet.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
@@ -349,9 +346,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ttwinman.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="teklib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\teraterm.h">

@@ -43,8 +43,6 @@ add_executable(
   sendmem.h
   sizetip.c
   sizetip.h
-  teklib.c
-  teklib.h
   tekwin.cpp
   tekwin.h
   telnet.c

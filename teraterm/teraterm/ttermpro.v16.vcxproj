@@ -192,7 +192,6 @@
     <ClCompile Include="sizetip.c" />
     <ClCompile Include="prnabort.cpp" />
     <ClCompile Include="protodlg.cpp" />
-    <ClCompile Include="teklib.c" />
     <ClCompile Include="tekwin.cpp" />
     <ClCompile Include="telnet.c" />
     <ClCompile Include="teraprn.cpp" />
@@ -308,7 +307,6 @@
     <ClInclude Include="protodlg.h" />
     <ClInclude Include="setupdirdlg.h" />
     <ClInclude Include="sizetip.h" />
-    <ClInclude Include="teklib.h" />
     <ClInclude Include="tekwin.h" />
     <ClInclude Include="telnet.h" />
     <ClInclude Include="teraprn.h" />

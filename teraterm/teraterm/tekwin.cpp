@@ -33,7 +33,7 @@
 #include "tttypes.h"
 #include "tttypes_key.h"
 #include "tektypes.h"
-#include "teklib.h"
+#include "tttek.h"
 #include "ttwinman.h"
 #include "ttcommon.h"
 #include "keyboard.h"
@@ -61,9 +61,6 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 	DWORD Style;
 	m_hInst = hInstance;
 
-	if (! LoadTTTEK()) {
-		return;
-	}
 	TEKInit(&tk, &ts);
 
 	if (ts.HideTitle>0) {
@@ -297,7 +294,6 @@ void CTEKWindow::OnDestroy()
 	UnregWin(HTEKWin);
 
 	TEKEnd(&tk);
-	FreeTTTEK();
 	HTEKWin = NULL;
 	pTEKWin = NULL;
 	ActiveWin = IdVT;
