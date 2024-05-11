@@ -35,6 +35,7 @@
 #include <assert.h>
 
 #include "tttypes.h"
+#include "tttypes_charset.h"
 #include "coding_pp_res.h"
 #include "dlglib.h"
 #include "compat_win.h"

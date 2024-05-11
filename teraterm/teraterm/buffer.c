@@ -38,6 +38,7 @@
 #include <assert.h>
 
 #include "tttypes.h"
+#include "tttypes_charset.h"
 #include "ttwinman.h"
 #include "teraprn.h"
 #include "vtdisp.h"

@@ -40,11 +40,13 @@
 #include "ttwinman.h"
 #include "ttlib.h"
 #include "codeconv.h"
-
-#include "clipboar.h"
 #include "fileread.h"
 #include "sendmem.h"
 #include "clipboarddlg.h"
+#include "tttypes_charset.h"
+
+#include "clipboar.h"
+
 
 static const wchar_t BracketStartW[] = L"\033[200~";
 static const wchar_t BracketEndW[] = L"\033[201~";

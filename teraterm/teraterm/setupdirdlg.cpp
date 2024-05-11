@@ -33,21 +33,16 @@
 #include <crtdbg.h>
 #include <string.h>
 #include <assert.h>
-
 #include <shlobj.h>
 #include <windows.h>
 #include <wchar.h>
 #include <htmlhelp.h>
 
-#include "teraterm.h"
 #include "tttypes.h"
-#include "tttypes_key.h"
-
 #include "ttcommon.h"
 #include "ttdialog.h"
 #include "ttlib.h"
 #include "dlglib.h"
-
 #include "tt_res.h"
 #include "compat_win.h"
 #include "asprintf.h"
@@ -359,7 +354,6 @@ static void PopupAndExec(HWND hWnd, const POINT *pointer_pos, const wchar_t *pat
 		else {
 			menu_flag_open_file = MF_ENABLED;
 		}
-		int b = 0;
 	}
 
 	HMENU hMenu= CreatePopupMenu();

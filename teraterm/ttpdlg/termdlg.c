@@ -36,6 +36,7 @@
 #include <windows.h>
 
 #include "tttypes.h"
+#include "tttypes_charset.h"
 #include "ttlib.h"
 #include "dlglib.h"
 #include "dlg_res.h"

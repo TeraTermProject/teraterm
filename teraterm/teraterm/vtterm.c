@@ -62,6 +62,7 @@
 #include "makeoutputstring.h"
 
 #include "vtterm.h"
+#include "tttypes_charset.h"
 
 // #define DEBUG_DUMP_INPUTCODE 1
 

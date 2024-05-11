@@ -69,6 +69,7 @@
 #include "dlglib.h"
 #include "win32helper.h"
 #include "ttlib_types.h"
+#include "tttypes_charset.h"
 
 #ifndef MAX
 # define MAX(a,b) (((a)>(b))?(a):(b))

@@ -26,8 +26,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "teraterm.h"
-#include "tttypes.h"
 #include <stdio.h>
 #include <string.h>
 #if !defined(_CRTDBG_MAP_ALLOC)
@@ -36,6 +34,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <assert.h>
+#include <windows.h>
 
 #include "ttwinman.h"	// for ts
 #include "codeconv.h"
@@ -43,6 +42,7 @@
 #include "unicode.h"
 #include "ttcstd.h"
 #include "vtterm.h"
+#include "tttypes_charset.h"
 
 #include "charset.h"
 

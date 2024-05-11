@@ -33,6 +33,7 @@
 #include <ws2tcpip.h>
 #include "teraterm.h"
 #include "tttypes.h"
+#include "tttypes_charset.h"
 #include <stdio.h>
 #include <string.h>
 #include <direct.h>

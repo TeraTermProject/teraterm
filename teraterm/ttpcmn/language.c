@@ -30,7 +30,7 @@
 // TTCMN.DLL character code conversion
 
 #include "teraterm.h"
-#include "tttypes.h"
+#include "tttypes_charset.h"
 #include "codemap.h"
 #include "codeconv_mb.h"
 

@@ -30,7 +30,6 @@
 /* TTCMN.DLL, main */
 #include <string.h>
 #include <windows.h>
-#include <htmlhelp.h>
 #include <assert.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>

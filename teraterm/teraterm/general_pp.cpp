@@ -44,7 +44,7 @@
 #include "asprintf.h"
 #include "win32helper.h"
 #include "ttcmn_notify2.h"
-#include "ttlib_types.H"
+#include "ttlib_types.h"
 #include "compat_win.h"
 
 #include "general_pp.h"

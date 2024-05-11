@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include "teraterm.h"
 #include "tttypes.h"
+#include "tttypes_charset.h"
 #include "ttplugin.h"
 #include "tt_res.h"
 
