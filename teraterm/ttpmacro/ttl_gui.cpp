@@ -235,7 +235,7 @@ WORD TTLGetPassword()
 		if (Temp2[0]!=0) {
 			char TempA[512];
 			if (Encrypt(Temp2, TempA, EncryptStr) == 0) {
-				if (WritePrivateProfileStringW(L"Password", (wc)Str2, (wc)TempA, wc::fromUtf8(Str)) != 0) {
+				if (WritePrivateProfileStringW(L"Password", key, wc::fromUtf8(TempA), ini) != 0) {
 					result = 1;  /* success */
 				}
 			}
@@ -246,7 +246,6 @@ WORD TTLGetPassword()
 			result = 1;  /* success */
 		}
 		free(passwd_encW);
-		result = 1;  /* success */
 	}
 
 	if (result == 1) {
