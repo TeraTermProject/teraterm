@@ -64,7 +64,6 @@
 #include "codeconv.h"
 #include "dllutil.h"
 #include "asprintf.h"
-#include "win32helper.h"
 
 #define TTERMCOMMAND "TTERMPRO"
 #define CYGTERMCOMMAND "cyglaunch -o"
@@ -184,7 +183,10 @@ static LONG win16_llseek(HANDLE hFile, LONG lOffset, int iOrigin)
 BOOL InitTTL(HWND HWin)
 {
 	int i;
+	wchar_t *DirW;
+	char *Dir;
 	TVarId ParamsVarId;
+	char tmpname[10];
 	WORD Err;
 
 	HMainWin = HWin;
@@ -217,7 +219,6 @@ BOOL InitTTL(HWND HWin)
 	NewStrVar("param1", (u8)ShortName);
 	if (Params) {
 		for (i=2; i<=9; i++) {
-			char tmpname[10];
 			_snprintf_s(tmpname, sizeof(tmpname), _TRUNCATE, "param%d", i);
 			if (ParamCnt >= i && Params[i] != NULL) {
 				NewStrVar(tmpname, (u8)Params[i]);
@@ -261,23 +262,6 @@ BOOL InitTTL(HWND HWin)
 		DirHandle[i] = INVALID_HANDLE_VALUE;
 	HandleInit();
 
-	// TTLファイル名からカレントディレクトリを設定する
-	wchar_t *curdir;
-	if (!IsRelativePathW(FileName)) {
-		// フルパスのとき
-		// ファイルのパスをカレントフォルダに設定する
-		curdir = ExtractDirNameW(FileName);
-		SetCurrentDirectoryW(curdir);
-	}
-	else {
-		// 相対パスのとき
-		// (プロセスの)カレントディレクトリを取得する
-		hGetCurrentDirectoryW(&curdir);
-	}
-	// 現在のフォルダを設定する((プロセスの)カレントディレクトリを設定する)
-	TTMSetDir((u8)curdir);
-	free(curdir);
-
 	if (! InitBuff(FileName))
 	{
 		TTLStatus = IdTTLEnd;
@@ -285,6 +269,12 @@ BOOL InitTTL(HWND HWin)
 	}
 
 	UnlockVar();
+
+	DirW = ExtractDirNameW(FileName);
+	Dir = ToU8W(DirW);
+	TTMSetDir(Dir);
+	free(DirW);
+	free(Dir);
 
 	if (SleepFlag)
 	{ // synchronization for startup macro
@@ -863,17 +853,12 @@ static WORD TTLDelPassword(void)
 	if (Err!=0) return Err;
 	if (Str[0]==0) return Err;
 
-	GetAbsPath(Str, sizeof(Str));
-	wc ini = wc::fromUtf8(Str);
-	DWORD attr = GetFileAttributesW(ini);
-	if ((attr == INVALID_FILE_ATTRIBUTES) || (attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
-		// ファイルは存在しない
-		return Err;
-	}
-	if (Str2[0] == 0)  // delete all password
-		WritePrivateProfileStringW(L"Password", NULL, NULL, ini);
-	else  // delete password specified by Str2
-		WritePrivateProfileStringW(L"Password", wc::fromUtf8(Str2), NULL, ini);
+	GetAbsPath(Str,sizeof(Str));
+	if (! DoesFileExist(Str)) return Err;
+	if (Str2[0]==0) // delete all password
+		WritePrivateProfileString("Password",NULL,NULL,Str);
+	else            // delete password specified by Str2
+		WritePrivateProfileString("Password",Str2,NULL,Str);
 	return Err;
 }
 
@@ -2539,10 +2524,10 @@ static WORD TTLGetIPv6Addr(void)
 	return Err;
 }
 
-// setpassword 'password.dat' 'mypassword' passowrd
+// setpassword 'password.dat' 'mypassword' passowrd [encryptstr]
 static WORD TTLSetPassword(void)
 {
-	TStrVal FileNameStr, KeyStr, PassStr;
+	TStrVal FileNameStr, KeyStr, PassStr, EncryptStr;
 	char Temp[512];
 	WORD Err;
 	int result = 0;  /* failure */
@@ -2551,6 +2536,13 @@ static WORD TTLSetPassword(void)
 	GetStrVal(FileNameStr, &Err);   // ファイル名
 	GetStrVal(KeyStr, &Err);  // キー名
 	GetStrVal(PassStr, &Err);  // パスワード
+	EncryptStr[0] = 0;
+	if (CheckParameterGiven()) {
+		GetStrVal(EncryptStr, &Err);  // 暗号化文字列
+		if ((Err == 0) && (EncryptStr[0] == 0)) {
+			return ErrSyntax;
+		}
+	}
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
@@ -2565,7 +2557,10 @@ static WORD TTLSetPassword(void)
 	GetAbsPath(FileNameStr, sizeof(FileNameStr));
 
 	// パスワードを暗号化する。
-	Encrypt(PassStr, Temp);
+	if (Encrypt(PassStr, Temp, EncryptStr) != 0) {
+		SetResult(result);
+		return Err;
+	}
 
 	if (WritePrivateProfileString("Password", KeyStr, Temp, FileNameStr) != 0)
 		result = 1;  /* success */

@@ -48,7 +48,6 @@
 #include "codeconv.h"
 #include "ttlib.h"
 #include "dlglib.h"
-#include "win32helper.h"
 
 // add 'clipb2var' (2006.9.17 maya)
 WORD TTLClipb2Var()
@@ -195,8 +194,8 @@ WORD TTLFilenameBox()
 
 WORD TTLGetPassword()
 {
-	TStrVal Str, Str2, Temp2;
-	wchar_t *passwd_encW;
+	TStrVal Str, Str2, Temp2, EncryptStr;
+	wchar_t Temp[512];
 	WORD Err;
 	TVarId VarId;
 	int result = 0;  /* failure */
@@ -205,38 +204,44 @@ WORD TTLGetPassword()
 	GetStrVal(Str,&Err);  // ファイル名
 	GetStrVal(Str2,&Err);  // キー名
 	GetStrVar(&VarId,&Err);  // パスワード更新時にパスワードを格納する変数
-	if ((Err==0) && (GetFirstChar()!=0))
-		Err = ErrSyntax;
-	if (Err!=0) return Err;
 	SetStrVal(VarId,"");
 	if (Str[0]==0) return Err;
 	if (Str2[0]==0) return Err;
+	EncryptStr[0] = 0;
+	if (CheckParameterGiven()) {
+		GetStrVal(EncryptStr, &Err);  // 暗号化文字列
+		if ((Err == 0) && (EncryptStr[0] == 0)) {
+			return ErrSyntax;
+		}
+	}
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
 
 	GetAbsPath(Str,sizeof(Str));
 
-	wc key = wc::fromUtf8(Str2);
-	wc ini = wc::fromUtf8(Str);
-
-	hGetPrivateProfileStringW(L"Password", key, L"", ini, &passwd_encW);
-	if (passwd_encW[0] == L'\0')	// password not exist
+	GetPrivateProfileStringW(L"Password", (wc)Str2, L"",
+	                         Temp, _countof(Temp), (wc)Str);
+	if (Temp[0]==0) // password not exist
 	{
 		wchar_t input_string[MaxStrLen] = {};
 		size_t Temp2_len = sizeof(Temp2);
-		free(passwd_encW);
-		OpenInpDlg(input_string, key, L"Enter password", L"", TRUE);
+		OpenInpDlg(input_string, wc::fromUtf8(Str2), L"Enter password", L"", TRUE);
 		WideCharToUTF8(input_string, NULL, Temp2, &Temp2_len);
 		if (Temp2[0]!=0) {
 			char TempA[512];
-			Encrypt(Temp2, TempA);
-			if (WritePrivateProfileStringW(L"Password", key, wc::fromUtf8(TempA), ini) != 0) {
-				result = 1;  /* success */
+			if (Encrypt(Temp2, TempA, EncryptStr) == 0) {
+				if (WritePrivateProfileStringW(L"Password", (wc)Str2, (wc)TempA, wc::fromUtf8(Str)) != 0) {
+					result = 1;  /* success */
+				}
 			}
 		}
 	}
 	else {// password exist
-		Decrypt((u8)passwd_encW, Temp2);
-		free(passwd_encW);
-		result = 1;  /* success */
+		u8 TempU8 = Temp;
+		if (Decrypt((PCHAR)(const char *)TempU8, Temp2, EncryptStr) == 0) {
+			result = 1;  /* success */
+		}
 	}
 
 	if (result == 1) {
