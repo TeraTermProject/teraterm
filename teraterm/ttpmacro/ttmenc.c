@@ -161,7 +161,7 @@ BOOL EncSeparate(const char *Str, int *i, LPBYTE b)
 	}
 	bptr = *i % 8;
 	d = ((BYTE)Str[cptr] << 8) |
-		 (BYTE)Str[cptr+1];
+	     (BYTE)Str[cptr+1];
 	*b = (BYTE)((d >> (10-bptr)) & 0x3f);
 
 	*i = *i + 6;
@@ -200,7 +200,6 @@ BYTE EncCharacterize(BYTE c, LPBYTE b)
 
 int Encrypt(const char *InStr, PCHAR OutStr, PCHAR EncryptStr)
 {
-
 	int i, j;
 	BYTE b, r, r2;
 
@@ -208,7 +207,6 @@ int Encrypt(const char *InStr, PCHAR OutStr, PCHAR EncryptStr)
 	if (InStr[0]==0) {
 		return 0;
 	}
-
 	if (EncryptStr[0] != 0) {
 		if (EncDecPWD((PCHAR)InStr, OutStr, EncryptStr, 1) != 0) {
 			return -1;
@@ -234,7 +232,6 @@ int Encrypt(const char *InStr, PCHAR OutStr, PCHAR EncryptStr)
 			i++;
 		}
 	}
-
 	return 0;
 }
 
@@ -292,7 +289,7 @@ BYTE DecCharacter(BYTE c, LPBYTE b)
 	return d;
 }
 
-int Decrypt(PCHAR InStr, PCHAR OutStr, PCHAR EncryptStr)
+int Decrypt(const char *InStr, PCHAR OutStr, PCHAR EncryptStr)
 {
 	int i, j, k;
 	BYTE b;
@@ -303,7 +300,6 @@ int Decrypt(PCHAR InStr, PCHAR OutStr, PCHAR EncryptStr)
 	if (j==0) {
 		return 0;
 	}
-
 	if (EncryptStr[0] != 0) {
 		if (EncDecPWD((PCHAR)InStr, OutStr, EncryptStr, 0) != 0) {
 			return -1;
@@ -324,6 +320,5 @@ int Decrypt(PCHAR InStr, PCHAR OutStr, PCHAR EncryptStr)
 			i = i + 2;
 		}
 	}
-
 	return 0;
 }

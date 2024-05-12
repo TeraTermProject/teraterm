@@ -48,6 +48,7 @@
 #include "codeconv.h"
 #include "ttlib.h"
 #include "dlglib.h"
+#include "win32helper.h"
 
 // add 'clipb2var' (2006.9.17 maya)
 WORD TTLClipb2Var()
@@ -195,7 +196,7 @@ WORD TTLFilenameBox()
 WORD TTLGetPassword()
 {
 	TStrVal Str, Str2, Temp2, EncryptStr;
-	wchar_t Temp[512];
+	wchar_t *passwd_encW;
 	WORD Err;
 	TVarId VarId;
 	int result = 0;  /* failure */
@@ -220,13 +221,16 @@ WORD TTLGetPassword()
 
 	GetAbsPath(Str,sizeof(Str));
 
-	GetPrivateProfileStringW(L"Password", (wc)Str2, L"",
-	                         Temp, _countof(Temp), (wc)Str);
-	if (Temp[0]==0) // password not exist
+	wc key = wc::fromUtf8(Str2);
+	wc ini = wc::fromUtf8(Str);
+
+	hGetPrivateProfileStringW(L"Password", key, L"", ini, &passwd_encW);
+	if (passwd_encW[0] == L'\0')	// password not exist
 	{
 		wchar_t input_string[MaxStrLen] = {};
 		size_t Temp2_len = sizeof(Temp2);
-		OpenInpDlg(input_string, wc::fromUtf8(Str2), L"Enter password", L"", TRUE);
+		free(passwd_encW);
+		OpenInpDlg(input_string, key, L"Enter password", L"", TRUE);
 		WideCharToUTF8(input_string, NULL, Temp2, &Temp2_len);
 		if (Temp2[0]!=0) {
 			char TempA[512];
@@ -238,10 +242,11 @@ WORD TTLGetPassword()
 		}
 	}
 	else {// password exist
-		u8 TempU8 = Temp;
-		if (Decrypt((PCHAR)(const char *)TempU8, Temp2, EncryptStr) == 0) {
+		if (Decrypt((u8)passwd_encW, Temp2, EncryptStr) == 0) {
 			result = 1;  /* success */
 		}
+		free(passwd_encW);
+		result = 1;  /* success */
 	}
 
 	if (result == 1) {

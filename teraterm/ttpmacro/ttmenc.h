@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 int Encrypt(const char *InStr, PCHAR OutStr, PCHAR EncryptStr);
-int Decrypt(PCHAR InStr, PCHAR OutStr, PCHAR EncryptStr);
+int Decrypt(const char *InStr, PCHAR OutStr, PCHAR EncryptStr);
 
 #ifdef __cplusplus
 }
