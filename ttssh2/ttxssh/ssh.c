@@ -69,7 +69,7 @@
 #include "dlglib.h"
 #include "win32helper.h"
 #include "ttlib_types.h"
-#include "tttypes_charset.h"
+#include "makeoutputstring.h"
 
 #ifndef MAX
 # define MAX(a,b) (((a)>(b))?(a):(b))
@@ -7007,6 +7007,42 @@ void sanitize_str(buffer_t *buff, unsigned char *src, size_t srclen)
 	buffer_append(buff, "\0", 1);
 }
 
+/**
+ *	UTF-8 文字列を受信文字列に変換する
+ */
+static char *ConvertReceiveStr(TComVar *cv, char *strU8, size_t *len)
+{
+	TTTSet *pts = cv->ts;
+
+	OutputCharState *h = MakeOutputStringCreate();
+	MakeOutputStringInit(h, pts->Language, pts->KanjiCode, 0,0,0);
+
+	wchar_t *strW = ToWcharU8(strU8);
+	size_t strW_len = wcslen(strW);
+	size_t str_len = strW_len;
+	char *str = (char *)malloc(str_len);
+	size_t str_pos = 0;
+
+	size_t i = 0;
+	while (i < strW_len) {
+		char tmp_str[8];
+		size_t tmp_len;
+		size_t output_char_count = MakeOutputString(h, &strW[i], strW_len - i, tmp_str, &tmp_len, NULL, cv);
+		memcpy(&str[str_pos], &tmp_str, tmp_len);
+		str_pos += tmp_len;
+		i += output_char_count;
+	}
+
+	MakeOutputStringDestroy(h);
+
+	str[str_pos++] = 0;
+	*len = str_pos - 1;
+
+	free(strW);
+
+	return str;
+}
+
 /*
  * SSH_MSG_USERAUTH_BANNER:
  *    byte      SSH_MSG_USERAUTH_BANNER
@@ -7027,7 +7063,7 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 	}
 
 	if (msglen > 0) {
-		char *msg, *msgA;
+		char *msg;
 		wchar_t *msgW;
 
 		if (pvar->authbanner_buffer == NULL) {
@@ -7053,27 +7089,10 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 			break;
 		case 1:
 			if (pvar->authbanner_buffer != NULL) {
-				if (pvar->ts->Language == IdJapanese) { // とりあえず日本語モードのみ対応
-					switch (pvar->ts->KanjiCode) {
-					case IdSJIS:
-						msgA = ToCharU8(msg);
-						if (msgA) {
-							msg = msgA;
-							msglen = strlen(msg);
-						}
-						break;
-					case IdEUC:
-						// CP51932 への変換で手抜きしようとしたが
-						// 使えなかったのでとりあえず非対応
-						break;
-					case IdJIS:
-						// 使われる事が少ないのと面倒なのでとりあえず非対応
-						break;
-					default:
-						// nothing to do
-						break;
-					}
-				}
+				// 受信文字列に変換する
+				size_t msglen_s;
+				msg = ConvertReceiveStr(pvar->cv, msg, &msglen_s);
+				msglen = (int)msglen_s;
 				new_payload_buffer = msg;
 				pvar->ssh_state.payload_datastart = 0;
 				pvar->ssh_state.payload_datalen = msglen;
