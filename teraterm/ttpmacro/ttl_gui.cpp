@@ -210,7 +210,7 @@ WORD TTLGetPassword()
 	if (Str2[0]==0) return Err;
 	EncryptStr[0] = 0;
 	if (CheckParameterGiven()) {
-		GetStrVal(EncryptStr, &Err);  // 暗号化文字列
+		GetStrVal(EncryptStr, &Err);  // パスワード文字列を暗号化するためのパスワード（共通鍵）
 		if ((Err == 0) && (EncryptStr[0] == 0)) {
 			return ErrSyntax;
 		}
