@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2024-04-13 by TeraTerm Project
+date=2024-05-16 by TeraTerm Project
 contributor=LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -387,7 +387,7 @@ DLG_HOST_TCPIPPROTOCOL=IP版本(&N)：
 DLG_HOST_SERIAL=串口(&S)
 DLG_HOST_SERIALPORT=端口(&R)：
 
-DLG_KEYB_TITLE=Tera Term：键盘设置
+DLG_KEYB_TITLE=键盘
 DLG_KEYB_TRANSMIT=DEL发送为：
 DLG_KEYB_BS=&Backspace 退格键
 DLG_KEYB_DEL=&Delete 删除键

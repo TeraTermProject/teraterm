@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2024-04-13 by TeraTerm Project
+date=2024-05-16 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -387,7 +387,7 @@ DLG_HOST_TCPIPPROTOCOL=IP versio&n:
 DLG_HOST_SERIAL=&Serie
 DLG_HOST_SERIALPORT=Po&rt:
 
-DLG_KEYB_TITLE=Tera Term: Configuration clavier
+DLG_KEYB_TITLE=clavier
 DLG_KEYB_TRANSMIT=Envoyer DEL avec:
 DLG_KEYB_BS=Touche &Bkspace
 DLG_KEYB_DEL=Touche &Delete

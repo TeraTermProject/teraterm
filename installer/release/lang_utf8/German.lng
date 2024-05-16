@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2024-04-13 by TeraTerm Project
+date=2024-05-16 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -387,7 +387,7 @@ DLG_HOST_TCPIPPROTOCOL=IP Versio&n:
 DLG_HOST_SERIAL=&Seriell
 DLG_HOST_SERIALPORT=Po&rt:
 
-DLG_KEYB_TITLE=Keyboard-Einstellungen
+DLG_KEYB_TITLE=Keyboard
 DLG_KEYB_TRANSMIT=DEL senden mit:
 DLG_KEYB_BS=Backspace
 DLG_KEYB_DEL=Entfernen
