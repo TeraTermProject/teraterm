@@ -13,7 +13,7 @@
 
     <h2>tabs</h2>
     <ul>
-      <li><a href="#TabGeneral">"General" Tab</a></li>
+      <li><a href="setup-additional-general.html">"General" Tab</a></li>
       <li><a href="#TabControlSequence">"Control Sequence" Tab</a></li>
       <li><a href="#TabCopyAndPaste">"Copy and Paste" Tab</a></li>
       <li><a href="setup-additional-visual.html">"Visual" Tab</a></li>
@@ -23,135 +23,6 @@
       <li><a href="setup-additional-font.html">"Font" Tab</a></li>
       <li><a href="setup-additional-theme.html">"Theme" Tab</a></li>
     </ul>
-
-    <h2 id="TabGeneral">"General" Tab</h2>
-    <dl>
-      <dt id="EnableClickableUrl">Enable clickable URL</dt>
-      <dd>
-	Launches the web browser by clicking URL string.
-      </dd>
-
-      <dt id="DisableAcceleratorSendBreak">Disable accelerator send break</dt>
-      <dd>
-	Disables accelerator key of send break.
-      </dd>
-
-      <dt id="AcceptBroadcast">Accept broadcast</dt>
-      <dd>
-	Accept the <a href="control-broadcast.html">broadcast command</a>.<br>
-	Can be only enabled when the "Realtime mode" is off. However, this option is always ignored when the "Realtime mode" is on.
-      </dd>
-
-      <dt id="MouseWheelScrollLine">Mouse wheel scroll line</dt>
-      <dd>
-	Configures the mouse wheel scroll line.
-      </dd>
-
-      <dt id="AutoScrollOnlyInBottomLine">Auto scroll only in bottom line</dt>
-      <dd>
-	Stop auto scrolling except when the bottom line is displayed.
-      </dd>
-
-      <dt id="ClearOnResize">Clear display when window resized</dt>
-      <dd>
-	The current screen is cleared when the VT window resizes.
-      </dd>
-
-      <dt id="IMERelatedCursor">Change cursor shape with IME state</dt>
-      <dd>
-	When the IME is enabled, the caret is gray.
-      </dd>
-
-      <dt id="ListHiddenFonts">List hidden fonts in font dialog</dt>
-      <dd>
-	A feature that some fonts can be shown or not on the font list is added on Windows 7 or later. 
-	When this setting is enabled, whole fonts can be selected on the <a href="setup-font.html">Font setting dialog</a>.
-      </dd>
-
-      <dt id="Port">Default port</dt>
-      <dd>
-	Default port type (TCP/IP or Serial) to be used when Tera Term is
-	run without command line parameter.
-      </dd>
-
-      <dt id="TitleFormat">Title format</dt>
-      <dd>Configures the window title format.
-        <dl>
-          <dt>Display host/port name</dt>
-          <dd>Displays hostname or serial port name</dd>
-
-          <dt>Display session number</dt>
-          <dd>Displays session number</dd>
-
-          <dt>Display VT/TEK</dt>
-          <dd>Displays VT or TEK</dd>
-
-          <dt>Swap hostname and title position</dt>
-          <dd>Swaps the hostname and <a href="setup-window.html#Title">title text</a>, displays hostname first.</dd>
-
-          <dt>Display tcp port number</dt>
-          <dd>Displays tcp port number (TCP/IP connection only)</dd>
-
-          <dt>Display serial port speed</dt>
-          <dd>Displays speed of serial port (serial connection only)</dd>
-        </dl>
-      </dd>
-    </dl>
-
-    <h3>Notification</h3>
-
-    <p>
-      Notification area (it was called the Task Tray before Windows XP) settings and test.
-    </p>
-
-    <p>
-      If notification setting is turn off, no notification such as icons or messages will be displayed.<br>
-      If sound setting is no sound (mute), no notification sound will be output.<br>
-      You can check the behavior with test buttons.
-    </p>
-
-    <dl>
-      <dt id="NotifySound">Notify sound</dt>
-      <dd>Notification sound(sound can be muted in Windows XP and later)</dd>
-
-      <dt>Notify Test button</dt>
-      <dd>
-        Test Notification.<br>
-        The following behaviors can be checked.
-        <ul>
-          <li>Icon is displayed in notification area (task tray).</li>
-          <li>App notification (Windows 10,11) / Balloon notification (Windows 7, 8.1) is displayed. </li>
-        </ul>
-      </dd>
-
-      <dt>Tray Test button</dt>
-      <dd>
-        Icon is displayed in notification area.<br>
-        The following behaviors can be checked.
-        <ul>
-          <li>
-            Icon is displayed in notification area (task tray).<br>
-            The icon disappears when messagebox is closed.
-          </li>
-        </ul>
-        When turn off all notifications for Tera Term,
-        "Tera Term" will not appear in Windows notification settings
-        and you may not be able to change the settings.
-
-        By pushing this button, you can change Windows notification settings
-        when icon is displayed in notification area.
-      </dd>
-    </dl>
-
-    <dl>
-      <dt id="DownloadFolder">Download Folder</dt>
-      <dd>
-        Sets directory for file transfer.<br>
-        Environment variables (ex "%USERPROFILE%\Downloads") are expanded when included.<br>
-        If not set, <a href="../setup/folder.html#DownloadDir">default download folder</a> is used.<br>
-        The current folder can be check in <a href="../menu/setup-directory.html">Setup Directory</a>.
-      </dd>
-    </dl>
 
     <h2 id="TabControlSequence">"Control Sequence" Tab</h2>
     <dl>
