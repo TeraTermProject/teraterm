@@ -185,6 +185,7 @@
     <ClCompile Include="ftdlg.cpp" />
     <ClCompile Include="general_pp.cpp" />
     <ClCompile Include="keyboard.c" />
+    <ClCompile Include="keyboard_pp.c" />
     <ClCompile Include="logdlg.cpp" />
     <ClCompile Include="scp.cpp" />
     <ClCompile Include="sendfiledlg.cpp" />
@@ -246,6 +247,7 @@
     <ClInclude Include="font_pp.h" />
     <ClInclude Include="font_pp_res.h" />
     <ClInclude Include="general_pp.h" />
+    <ClInclude Include="keyboard_pp.h" />
     <ClInclude Include="logdlg.h" />
     <ClInclude Include="scp.h" />
     <ClInclude Include="sendfiledlg.h" />

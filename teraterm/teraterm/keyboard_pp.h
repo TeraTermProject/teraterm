@@ -1,5 +1,5 @@
 /*
- * (C) 2008- TeraTerm Project
+ * (C) 2020- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,45 +26,14 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include <windows.h>
 
 #ifdef __cplusplus
-#include "tmfc.h"
-#include "tmfc_propdlg.h"
+extern "C" {
 #endif
 
-typedef struct {
-	const char *name;
-	LPCTSTR id;
-} mouse_cursor_t;
-
-extern const mouse_cursor_t MouseCursor[];
+HPROPSHEETPAGE KeyboardPageCreate(HINSTANCE inst, TTTSet *pts);
 
 #ifdef __cplusplus
-
-// AddSetting Property Sheet
-class CAddSettingPropSheetDlg: public TTCPropSheetDlg
-{
-public:
-	CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd);
-	~CAddSettingPropSheetDlg();
-	enum Page {
-		DefaultPage,
-		CodingPage,
-		FontPage,
-		KeyboardPage,
-	};
-	void SetStartPage(Page page);
-
-private:
-	int m_PageCountCPP;
-	TTCPropertyPage *m_Page[7];
-};
-#endif // __cplusplus
-
-typedef enum {
-	DefaultPage,
-	CodingPage,
-	FontPage,
-	KeyboardPage,
-} CAddSettingPropSheetDlgPage;
+}
+#endif

@@ -149,6 +149,8 @@ static vtwin_work_t vtwin_work;
 
 extern "C" PrintFile *PrintFile_;
 
+static CVTWindow *pVTWin;
+
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
 
@@ -489,6 +491,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	SetWindowAlpha(ts.AlphaBlendActive);
 	ShowWindow(CmdShow);
 	ChangeCaret();
+
+	pVTWin = this;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -4270,6 +4274,14 @@ void CVTWindow::OpenExternalSetup(CAddSettingPropSheetDlg::Page page)
 		// コーディングタブで設定が変化したときコールする必要がある
 		SetupTerm();
 	}
+}
+
+/**
+ *	クラス外からその他の設定を開くために追加
+ */
+void OpenExternalSetupOutside(CAddSettingPropSheetDlgPage page)
+{
+	pVTWin->OpenExternalSetup((CAddSettingPropSheetDlg::Page)page);
 }
 
 // Additional settings dialog

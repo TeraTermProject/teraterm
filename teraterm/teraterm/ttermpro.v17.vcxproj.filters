@@ -273,6 +273,9 @@
     <ClCompile Include="general_pp.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="keyboard_pp.c">
+      <Filter>dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -583,6 +586,9 @@
       <Filter>dialog</Filter>
     </ClInclude>
     <ClInclude Include="general_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="keyboard_pp.h">
       <Filter>dialog</Filter>
     </ClInclude>
   </ItemGroup>

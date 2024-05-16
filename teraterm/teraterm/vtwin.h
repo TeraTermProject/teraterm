@@ -29,12 +29,13 @@
 
 /* TERATERM.EXE, VT window */
 
+#include "addsetting.h"
+
 #ifdef __cplusplus
 #include "tipwin.h"
 #include "tmfc.h"
 #include "unicode_test.h"
 #include "tipwin.h"
-#include "addsetting.h"
 
 class CVTWindow : public TTCFrameWnd
 {
@@ -238,8 +239,9 @@ protected:
 
 private:
 	void CodePopup(int client_x, int client_y);
-	void OpenExternalSetup(CAddSettingPropSheetDlg::Page page);
 	void SetColor();
+public:
+	void OpenExternalSetup(CAddSettingPropSheetDlg::Page page);
 };
 #endif
 
@@ -248,6 +250,7 @@ extern "C" {
 #endif
 
 void VtwinSetHelpId(DWORD data);
+void OpenExternalSetupOutside(CAddSettingPropSheetDlgPage page);
 
 #ifdef __cplusplus
 }

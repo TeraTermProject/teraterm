@@ -110,6 +110,8 @@ set(SRC_DIALOG
   ftdlg_lite.h
   general_pp.cpp
   general_pp.h
+  keyboard_pp.c
+  keyboard_pp.h
   logdlg.cpp
   logdlg.h
   protodlg.cpp
