@@ -130,7 +130,7 @@ static INT_PTR CALLBACK proc(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 			}
 			case PSN_HELP: {
 				HWND vtwin = GetParent(GetParent(Dialog));
-				PostMessage(vtwin, WM_USER_DLGHELP2, HlpSetupKeyboard, 0);
+				PostMessage(vtwin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalKeyboard, 0);
 				break;
 			}
 			}
