@@ -974,10 +974,16 @@ char32_t *_WideCharToUTF32(const wchar_t *wstr_ptr, size_t wstr_len, size_t *u32
  *							(NULLのとき文字列長を返さない)
  *	@retval		wchar_t文字列へのポインタ(NULLの時変換エラー)
  *				使用後 free() すること
+ *
+ *				変換できない文字が入力された場合
+ *					Vista以降
+ *						U+FFFD に置き換えられる
+ *					2000 SP4,XP以降
+ *						文字を削除する
  */
 wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page, size_t *w_len_)
 {
-	DWORD flags = MB_ERR_INVALID_CHARS;
+	DWORD flags = MB_PRECOMPOSED;
 	if (code_page == CP_ACP) {
 		code_page = (int)GetACP();
 	}
