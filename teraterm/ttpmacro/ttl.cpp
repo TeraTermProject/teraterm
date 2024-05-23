@@ -3190,49 +3190,21 @@ static WORD TTLMakePath(void)
 	return Err;
 }
 
-static void basedirname(char *fullpath, char *dest_base, int base_len, char *dest_dir, int dir_len) {
-	char drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
-	char dirname[MAX_PATH];
-	char basename[MAX_PATH];
-
-	_splitpath_s(fullpath, drive, sizeof(drive), dir, sizeof(dir), fname, sizeof(fname), ext, sizeof(ext));
-	strncpy_s(dirname, sizeof(dirname), drive, _TRUNCATE);
-	strncat_s(dirname, sizeof(dirname), dir, _TRUNCATE);
-	DeleteSlash(dirname); // ññîˆÇÃ \ ÇéÊÇËèúÇ≠
-	if (strlen(fname) == 0 && strlen(ext) == 0) {
-		_splitpath_s(dirname, drive, sizeof(drive), dir, sizeof(dir), fname, sizeof(fname), ext, sizeof(ext));
-		strncpy_s(dirname, sizeof(dirname), drive, _TRUNCATE);
-		strncat_s(dirname, sizeof(dirname), dir, _TRUNCATE);
-		DeleteSlash(dirname); // ññîˆÇÃ \ ÇéÊÇËèúÇ≠
-		strncpy_s(basename, sizeof(basename), fname, _TRUNCATE);
-		strncat_s(basename, sizeof(basename), ext, _TRUNCATE);
-	}
-	else {
-		strncpy_s(basename, sizeof(basename), fname, _TRUNCATE);
-		strncat_s(basename, sizeof(basename), ext, _TRUNCATE);
-	}
-
-	if (dest_dir != NULL) {
-		strncpy_s(dest_dir, dir_len, dirname, _TRUNCATE);
-	}
-	if (dest_base != NULL) {
-		strncpy_s(dest_base, base_len, basename, _TRUNCATE);
-	}
-}
-
-static void basename(char *fullpath, char *dest, int len) {
-	basedirname(fullpath, dest, len, NULL, 0);
-}
-
-static void dirname(char *fullpath, char *dest, int len) {
-	basedirname(fullpath, NULL, 0, dest, len);
+static char *ExtractFileNameU8(const char *PathName)
+{
+	wchar_t *PathNameW = ToWcharU8(PathName);
+	wchar_t *filenameW = ExtractFileNameW(PathNameW);
+	free(PathNameW);
+	char *filenameU8 = ToU8W(filenameW);
+	free(filenameW);
+	return filenameU8;
 }
 
 static WORD TTLBasename(void)
 {
 	TVarId VarId;
 	WORD Err;
-	TStrVal Src, Name;
+	TStrVal Src;
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
@@ -3243,17 +3215,32 @@ static WORD TTLBasename(void)
 
 	if (Err!=0) return Err;
 
-	basename(Src, Name, sizeof(Name));
-	SetStrVal(VarId, Name);
+	char *basename = ExtractFileNameU8(Src);
+	SetStrVal(VarId, basename);
+	free(basename);
 
 	return Err;
+}
+
+static char *ExtractDirNameU8(const char *PathName)
+{
+	wchar_t *PathNameW = ToWcharU8(PathName);
+	wchar_t *PathNameWD = DeleteSlashW(PathNameW);
+	free(PathNameW);
+	wchar_t *dirnameW = ExtractDirNameW(PathNameWD);
+	free(PathNameWD);
+	wchar_t *dirnameWD = DeleteSlashW(dirnameW);
+	free(dirnameW);
+	char *dirnameU8 = ToU8W(dirnameWD);
+	free(dirnameWD);
+	return dirnameU8;
 }
 
 static WORD TTLDirname(void)
 {
 	TVarId VarId;
 	WORD Err;
-	TStrVal Src, Dir;
+	TStrVal Src;
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
@@ -3264,8 +3251,9 @@ static WORD TTLDirname(void)
 
 	if (Err!=0) return Err;
 
-	dirname(Src, Dir, sizeof(Dir));
-	SetStrVal(VarId, Dir);
+	char *dir = ExtractDirNameU8(Src);
+	SetStrVal(VarId, dir);
+	free(dir);
 
 	return Err;
 }
