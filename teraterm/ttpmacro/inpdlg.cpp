@@ -68,7 +68,7 @@ BOOL CInpDlg::OnInitDialog()
 	RECT R;
 	HWND HEdit, HOk;
 
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFileW);
 	SetWindowTextW(TitleStr);
 	SetDlgItemTextW(IDC_INPTEXT,TextStr);
 	SetDlgItemTextW(IDC_INPEDIT,DefaultStr);

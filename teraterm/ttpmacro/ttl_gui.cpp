@@ -41,7 +41,6 @@
 #include "ttmlib.h"
 #include "ttlib.h"
 #include "ttmenc.h"
-#include "tttypes.h"
 #include "ttmacro.h"
 #include "ttl.h"
 #include "ttl_gui.h"

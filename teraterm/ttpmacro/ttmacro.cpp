@@ -55,7 +55,6 @@
 #endif
 
 wchar_t *UILanguageFileW;
-char UILanguageFile[MAX_PATH];
 static wchar_t *SetupFNameW;
 static HWND CtrlWnd;
 static HINSTANCE hInst;
@@ -79,7 +78,6 @@ static void init()
 	SetupFNameW = GetDefaultFNameW(HomeDirW, L"TERATERM.INI");
 
 	UILanguageFileW = GetUILanguageFileFullW(SetupFNameW);
-	WideCharToACP_t(UILanguageFileW, UILanguageFile, sizeof(UILanguageFile));
 
 	DLLInit();
 	WinCompatInit();

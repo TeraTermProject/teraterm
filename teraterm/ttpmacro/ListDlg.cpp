@@ -34,7 +34,6 @@
 #include "ttlib.h"
 #include "ttm_res.h"
 #include "ttmlib.h"
-#include "tttypes.h"
 #include "dlglib.h"
 #include "ttmdlg.h"
 #include "ttmacro.h"
@@ -107,7 +106,7 @@ BOOL CListDlg::OnInitDialog()
 
 	ResizeHelper = ReiseHelperInit(m_hWnd, FALSE, resize_info, _countof(resize_info));
 
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFileW);
 
 	HList = ::GetDlgItem(m_hWnd, IDC_LISTBOX);
 	InitList(HList);

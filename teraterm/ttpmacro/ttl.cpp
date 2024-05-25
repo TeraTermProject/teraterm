@@ -43,7 +43,7 @@
 #include "ttmlib.h"
 #include "ttlib.h"
 #include "ttmenc.h"
-#include "tttypes.h"
+#include "tttypes.h"	// for TitleBuffSize
 #include "ttmonig.h"
 #include <shellapi.h>
 #include <sys/stat.h>

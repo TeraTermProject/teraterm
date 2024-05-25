@@ -36,7 +36,7 @@
 #include "ttm_res.h"
 #include "ttmlib.h"
 #include "tmfc.h"
-#include "tttypes.h"
+#include "tttypes.h"	// for WM_USER_MSTATBRINGUP
 #include "ttmacro.h"
 
 #include "statdlg.h"
@@ -237,4 +237,3 @@ LRESULT CStatDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 	}
 	return FALSE;
 }
-

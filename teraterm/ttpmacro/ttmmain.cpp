@@ -276,7 +276,7 @@ BOOL CCtrlWindow::OnInitDialog()
 	RECT rc_dlg, rc_filename, rc_lineno;
 	LONG dlg_len, len;
 
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFileW);
 
 	Pause = FALSE;
 
