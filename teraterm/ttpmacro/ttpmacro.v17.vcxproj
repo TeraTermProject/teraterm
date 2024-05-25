@@ -141,6 +141,7 @@
     <ClCompile Include="ttmdde.c" />
     <ClCompile Include="ttmdlg.cpp" />
     <ClCompile Include="ttmenc.c" />
+    <ClCompile Include="ttmenc2.c" />
     <ClCompile Include="ttmlib.c" />
     <ClCompile Include="ttmmain.cpp" />
     <ClCompile Include="ttmparse.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="ttmdde.h" />
     <ClInclude Include="ttmdlg.h" />
     <ClInclude Include="ttmenc.h" />
+    <ClInclude Include="ttmenc2.h" />
     <ClInclude Include="ttmlib.h" />
     <ClInclude Include="ttmmain.h" />
     <ClInclude Include="ttmmsg.h" />

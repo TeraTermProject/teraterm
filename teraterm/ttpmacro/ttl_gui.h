@@ -34,6 +34,7 @@
 WORD TTLClipb2Var();
 WORD TTLVar2Clipb();
 WORD TTLGetPassword();
+WORD TTLGetPassword2();
 WORD TTLInputBox(BOOL Paswd);
 WORD TTLDirnameBox();
 WORD TTLListBox();

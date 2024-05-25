@@ -41,6 +41,7 @@
 #include "ttmlib.h"
 #include "ttlib.h"
 #include "ttmenc.h"
+#include "ttmenc2.h"
 #include "tttypes.h"
 #include "ttmacro.h"
 #include "ttl.h"
@@ -195,7 +196,7 @@ WORD TTLFilenameBox()
 
 WORD TTLGetPassword()
 {
-	TStrVal Str, Str2, Temp2, EncryptStr;
+	TStrVal Str, Str2, Temp2;
 	wchar_t *passwd_encW;
 	WORD Err;
 	TVarId VarId;
@@ -205,19 +206,12 @@ WORD TTLGetPassword()
 	GetStrVal(Str,&Err);  // ファイル名
 	GetStrVal(Str2,&Err);  // キー名
 	GetStrVar(&VarId,&Err);  // パスワード更新時にパスワードを格納する変数
-	SetStrVal(VarId,"");
-	if (Str[0]==0) return Err;
-	if (Str2[0]==0) return Err;
-	EncryptStr[0] = 0;
-	if (CheckParameterGiven()) {
-		GetStrVal(EncryptStr, &Err);  // パスワード文字列を暗号化するためのパスワード（共通鍵）
-		if ((Err == 0) && (EncryptStr[0] == 0)) {
-			return ErrSyntax;
-		}
-	}
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
+	SetStrVal(VarId,"");
+	if (Str[0]==0) return Err;
+	if (Str2[0]==0) return Err;
 
 	GetAbsPath(Str,sizeof(Str));
 
@@ -234,18 +228,16 @@ WORD TTLGetPassword()
 		WideCharToUTF8(input_string, NULL, Temp2, &Temp2_len);
 		if (Temp2[0]!=0) {
 			char TempA[512];
-			if (Encrypt(Temp2, TempA, EncryptStr) == 0) {
-				if (WritePrivateProfileStringW(L"Password", key, wc::fromUtf8(TempA), ini) != 0) {
-					result = 1;  /* success */
-				}
+			Encrypt(Temp2, TempA);
+			if (WritePrivateProfileStringW(L"Password", key, wc::fromUtf8(TempA), ini) != 0) {
+				result = 1;  /* success */
 			}
 		}
 	}
 	else {// password exist
-		if (Decrypt((u8)passwd_encW, Temp2, EncryptStr) == 0) {
-			result = 1;  /* success */
-		}
+		Decrypt((u8)passwd_encW, Temp2);
 		free(passwd_encW);
+		result = 1;  /* success */
 	}
 
 	if (result == 1) {
@@ -255,6 +247,57 @@ WORD TTLGetPassword()
 
 	SetResult(result);  // 成功可否を設定する。
 	return Err;
+}
+
+// getpassword2 <filename> <password name> <strvar> <encryptstr>
+WORD TTLGetPassword2()
+{
+	TStrVal FileNameStr, KeyStr, EncryptStr;
+	TVarId PassStr;
+	TStrVal inputU8;
+	WORD Err = 0;
+	int result = 0;
+
+	GetStrVal(FileNameStr, &Err);	// ファイル名
+	GetStrVal(KeyStr, &Err);		// キー名
+	GetStrVar(&PassStr, &Err);		// パスワード更新時にパスワードを格納する変数
+	SetStrVal(PassStr, "");
+	GetStrVal(EncryptStr, &Err);	// パスワード文字列を暗号化するためのパスワード（共通鍵）
+	if ((Err == 0) && (GetFirstChar() != 0)) {
+		Err = ErrSyntax;
+	}
+	if (Err != 0) {
+		return Err;
+	}
+	if (FileNameStr[0] == 0 ||
+		KeyStr[0] == 0 ||
+		EncryptStr[0] == 0) {
+		return ErrSyntax;
+	}
+
+	GetAbsPath(FileNameStr, sizeof(FileNameStr));
+	if (Encrypt2IsPassword(wc::fromUtf8(FileNameStr), KeyStr) == 0) {
+		// キー名にマッチするエントリ無し
+		wchar_t inputW[MaxStrLen] = {};
+		wc key = wc::fromUtf8(KeyStr);
+		size_t inputU8len = sizeof(inputU8);
+
+		OpenInpDlg(inputW, key, L"Enter password", L"", TRUE);
+		WideCharToUTF8(inputW, NULL, inputU8, &inputU8len);
+		if (inputU8[0] != 0) {
+			result = Encrypt2SetPassword(wc::fromUtf8(FileNameStr), KeyStr, inputU8, EncryptStr);
+		}
+	} else {
+		// キー名にマッチするエントリ有り
+		result = Encrypt2GetPassword(wc::fromUtf8(FileNameStr), KeyStr, inputU8, EncryptStr);
+	}
+
+	// パスワード入力がないときは変数を更新しない
+	if (result == 1) {
+		SetStrVal(PassStr, inputU8);
+	}
+	SetResult(result);	// 成功可否を設定する。
+	return 0;
 }
 
 WORD TTLInputBox(BOOL Paswd)

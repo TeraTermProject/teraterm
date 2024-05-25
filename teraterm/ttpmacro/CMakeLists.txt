@@ -35,7 +35,9 @@ add_executable(
   ttmdlg.cpp
   ttmdlg.h
   ttmenc.c
+  ttmenc2.c
   ttmenc.h
+  ttmenc2.h
   ttmlib.c
   ttmlib.h
   ttmmain.cpp

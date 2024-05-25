@@ -33,8 +33,8 @@
 extern "C" {
 #endif
 
-int Encrypt(const char *InStr, PCHAR OutStr, PCHAR EncryptStr);
-int Decrypt(const char *InStr, PCHAR OutStr, PCHAR EncryptStr);
+void Encrypt(const char *InStr, PCHAR OutStr);
+void Decrypt(const char *InStr, PCHAR OutStr);
 
 #ifdef __cplusplus
 }
