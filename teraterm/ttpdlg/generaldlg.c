@@ -260,11 +260,7 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					w = SendDlgItemMessage(Dialog, IDC_GENLANG_UI, CB_GETCURSEL, 0, 0);
 					if (w != data->selected_lang) {
 						const LangInfo *p = data->lng_infos + w;
-						aswprintf(&ts->UILanguageFileW_ini, L"%s\\%s", get_lang_folder(), p->filename);
-						WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
-
 						ts->UILanguageFileW = _wcsdup(p->fullname);
-						WideCharToACP_t(ts->UILanguageFileW, ts->UILanguageFile, sizeof(ts->UILanguageFile));
 
 						// タイトルの更新を行う。(2014.2.23 yutaka)
 						PostMessage(GetParent(Dialog),WM_USER_CHANGETITLE,0,0);

@@ -1593,17 +1593,8 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	GetPrivateProfileString(Section, "ViewlogEditor ", Temp,
 	                        ts->ViewlogEditor, sizeof(ts->ViewlogEditor), FName);
 
-	// UI language message file (相対パス)
-	hGetPrivateProfileStringW(SectionW, L"UILanguageFile", NULL, FName, &ts->UILanguageFileW_ini);
-	if (ts->UILanguageFileW_ini[0] == 0) {
-		free(ts->UILanguageFileW_ini);
-		ts->UILanguageFileW_ini = _wcsdup(L"lang\\Default.lng");
-	}
-	WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
-
 	// UI language message file (full path)
-	ts->UILanguageFileW = GetUILanguageFileFullW(ts->ExeDirW, ts->UILanguageFileW_ini);
-	WideCharToACP_t(ts->UILanguageFileW, ts->UILanguageFile, sizeof(ts->UILanguageFile));
+	ts->UILanguageFileW = GetUILanguageFileFullW(FName);
 
 
 	// Broadcast Command History (2007.3.3 maya)
@@ -2094,6 +2085,27 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	// Experimental
 	ts->ExperimentalTreeProprtySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
 	ts->ExperimentalDontUseFontDialog = GetOnOff("Experimental", "DontUseFontDialog", FName, FALSE);
+}
+
+/**
+ *	UILanguage File を ExeDir相対パスに変換
+ *
+ *	@return 相対UILanguageFileパス、不要になったらfree()すること
+ */
+static wchar_t *GetUILanguageFileRelPath(const wchar_t *UILanguageFile)
+{
+	wchar_t *ExeDirW = GetExeDirW(NULL);
+	size_t ExeDirLen = wcslen(ExeDirW);
+	int r = wcsncmp(ExeDirW, UILanguageFile, ExeDirLen);
+	free(ExeDirW);
+	if (r != 0) {
+		// ExeDir フォルダ以下の lng ファイルではないのでそのまま返す
+		return _wcsdup(UILanguageFile);
+	}
+
+	//   ExeDir相対に変換する
+	wchar_t *UILanguageFileRel = _wcsdup(UILanguageFile + ExeDirLen + 1);
+	return UILanguageFileRel;
 }
 
 void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
@@ -2934,8 +2946,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "UseNormalBGColor", FName, ts->UseNormalBGColor);
 
 	// UI language message file
-	WritePrivateProfileStringW(SectionW, L"UILanguageFile",
-							   ts->UILanguageFileW_ini, FName);
+	TempW = GetUILanguageFileRelPath(ts->UILanguageFileW);
+	WritePrivateProfileStringW(SectionW, L"UILanguageFile", TempW, FName);
+	free(TempW);
 
 	// Broadcast Command History (2007.3.3 maya)
 	WriteOnOff(Section, "BroadcastCommandHistory", FName,
@@ -4079,7 +4092,6 @@ void TTSetUnInit(TTTSet *ts)
 		(void **)&ts->EtermLookfeel.BGThemeFileW,
 		(void **)&ts->EtermLookfeel.BGSPIPathW,
 		(void **)&ts->UILanguageFileW,
-		(void **)&ts->UILanguageFileW_ini,
 		(void **)&ts->ExeDirW,
 		(void **)&ts->LogDirW,
 		(void **)&ts->FileDirW,
