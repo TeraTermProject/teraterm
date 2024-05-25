@@ -302,7 +302,7 @@ static void FitControlSize(HWND Dlg, UINT id)
 TTText *TTTextURL(HWND hDlg, int id, const wchar_t *text, const char *url)
 {
 	HWND hWnd = GetDlgItem(hDlg, id);
-	url_subclass_t *h = (url_subclass_t *)calloc(sizeof(*h), 1);
+	url_subclass_t *h = (url_subclass_t *)calloc(1, sizeof(*h));
 	if (text == NULL) {
 		hGetDlgItemTextW(hDlg, id, &h->text);
 	}
@@ -323,7 +323,7 @@ TTText *TTTextURL(HWND hDlg, int id, const wchar_t *text, const char *url)
 
 TTText *TTTextMenu(HWND hDlg, int id, const wchar_t *text, HWND menu_wnd, int menu_id)
 {
-	url_subclass_t *h = (url_subclass_t *)calloc(sizeof(*h), 1);
+	url_subclass_t *h = (url_subclass_t *)calloc(1, sizeof(*h));
 	HWND hWnd = GetDlgItem(hDlg, id);
 	h->hParentWnd = hDlg;
 	if (text == NULL) {

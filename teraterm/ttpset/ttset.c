@@ -3400,7 +3400,7 @@ void PASCAL _AddValueToList(const wchar_t *FName, const wchar_t *Host, const wch
 	if ((FName[0] == 0) || (Host[0] == 0))
 		return;
 
-	hostnames = (wchar_t **)calloc(sizeof(wchar_t), MaxList);
+	hostnames = (wchar_t **)calloc(MaxList, sizeof(wchar_t));
 	if (hostnames == NULL) {
 		return;
 	}

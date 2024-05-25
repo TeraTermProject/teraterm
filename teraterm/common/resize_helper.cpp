@@ -67,7 +67,7 @@ static void SetSizeBoxPos(ReiseDlgHelper_t *h)
 ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg, BOOL size_box)
 {
 	RECT rect;
-	ReiseDlgHelper_t *h = (ReiseDlgHelper_t *)calloc(sizeof(*h), 1);
+	ReiseDlgHelper_t *h = (ReiseDlgHelper_t *)calloc(1, sizeof(*h));
 	if (h == NULL) {
 		return NULL;
 	}

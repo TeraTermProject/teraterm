@@ -164,7 +164,7 @@ HPROPSHEETPAGE KeyboardPageCreate(HINSTANCE inst, TTTSet *pts)
 {
 	const int id = IDD_KEYBDLG;
 
-	KBPPData *Param = (KBPPData *)calloc(sizeof(KBPPData), 1);
+	KBPPData *Param = (KBPPData *)calloc(1, sizeof(KBPPData));
 	Param->hInst = inst;
 	Param->pts = pts;
 

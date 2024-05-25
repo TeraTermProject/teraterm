@@ -404,7 +404,7 @@ HPROPSHEETPAGE CodingPageCreate(HINSTANCE inst, TTTSet *pts)
 	// ’ common/tt_res.h ‚Æ coding_pp_res.h ‚Å’l‚ðˆê’v‚³‚¹‚é‚±‚Æ
 	int id = IDD_TABSHEET_CODING;
 
-	CodingPPData *Param = (CodingPPData *)calloc(sizeof(CodingPPData), 1);
+	CodingPPData *Param = (CodingPPData *)calloc(1, sizeof(CodingPPData));
 	Param->UILanguageFileW = pts->UILanguageFileW;
 	Param->pts = pts;
 

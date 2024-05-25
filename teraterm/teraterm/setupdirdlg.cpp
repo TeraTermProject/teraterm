@@ -715,7 +715,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 
 void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv)
 {
-	dlg_data_t* dlg_data = (dlg_data_t*)calloc(sizeof(dlg_data_t), 1);
+	dlg_data_t* dlg_data = (dlg_data_t*)calloc(1, sizeof(dlg_data_t));
 	dlg_data->pcv = pcv;
 	TTDialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
 					 hWnd, OnSetupDirectoryDlgProc, (LPARAM)dlg_data);

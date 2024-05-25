@@ -44,7 +44,7 @@ struct CheckEOLData_st {
 
 CheckEOLData_t *CheckEOLCreate(CheckEOLType type)
 {
-	CheckEOLData_t *self = (CheckEOLData_t *)calloc(sizeof(CheckEOLData_t), 1);
+	CheckEOLData_t *self = (CheckEOLData_t *)calloc(1, sizeof(CheckEOLData_t));
 	self->type = type;
 	return self;
 }

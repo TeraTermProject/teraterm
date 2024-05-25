@@ -473,7 +473,7 @@ static SendMem *SendMemInit_()
 		// ‘—M’†
 		return NULL;
 	}
-	SendMem *p = (SendMem *)calloc(sizeof(*p), 1);
+	SendMem *p = (SendMem *)calloc(1, sizeof(*p));
 	if (p == NULL) {
 		return NULL;
 	}

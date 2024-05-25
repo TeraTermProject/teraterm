@@ -1071,7 +1071,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 		int j;
 
 		GetHNRec = (PGetHNRec)lParam;
-		dlg_data = (TTXHostDlgData *)calloc(sizeof(*dlg_data), 1);
+		dlg_data = (TTXHostDlgData *)calloc(1, sizeof(*dlg_data));
 		SetWindowLongPtr(dlg, DWLP_USER, (LPARAM)dlg_data);
 		dlg_data->GetHNRec = GetHNRec;
 
@@ -4657,7 +4657,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 		return 1;
 
 	case ID_ABOUTMENU: {
-		AboutDlgData *data = (AboutDlgData *)calloc(sizeof(*data), 1);
+		AboutDlgData *data = (AboutDlgData *)calloc(1, sizeof(*data));
 		UTIL_SetDialogFont();
 		data->pvar = pvar;
 		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_ABOUTDIALOG), hWin, TTXAboutDlg, (LPARAM)data) == -1) {

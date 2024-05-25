@@ -1582,7 +1582,7 @@ typedef struct DropData_tag {
  */
 void CVTWindow::DropInit()
 {
-	DropData_t *data =(DropData_t *)calloc(sizeof(*data), 1);
+	DropData_t *data =(DropData_t *)calloc(1, sizeof(*data));
 	data->DefaultDropType = DROP_TYPE_CANCEL;
 	data->DefaultDropTypePaste = DROP_TYPE_PASTE_ESCAPE;
 	data->DefaultShowDialog = ts.ConfirmFileDragAndDrop ? true : false;

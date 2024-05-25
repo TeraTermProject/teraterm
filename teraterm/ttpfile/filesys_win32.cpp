@@ -395,13 +395,13 @@ static void FileSysDestroy(TFileIO *fv)
 
 TFileIO *FilesysCreateWin32(void)
 {
-	TFileIOWin32 *data = (TFileIOWin32 *)calloc(sizeof(TFileIOWin32), 1);
+	TFileIOWin32 *data = (TFileIOWin32 *)calloc(1, sizeof(TFileIOWin32));
 	if (data == NULL) {
 		return NULL;
 	}
 	data->FileHandle = INVALID_HANDLE_VALUE;
 	data->utf8 = TRUE;
-	TFileIO *fv = (TFileIO *)calloc(sizeof(TFileIO), 1);
+	TFileIO *fv = (TFileIO *)calloc(1, sizeof(TFileIO));
 	if (fv == NULL) {
 		free(data);
 		return NULL;

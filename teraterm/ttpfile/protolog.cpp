@@ -189,12 +189,12 @@ static void ProtoLogDestroy(TProtoLog *pv)
 
 TProtoLog *ProtoLogCreate()
 {
-	TProtoLog *pv = (TProtoLog *)calloc(sizeof(*pv), 1);
+	TProtoLog *pv = (TProtoLog *)calloc(1, sizeof(*pv));
 	if (pv == NULL) {
 		return NULL;
 	}
 
-	PrivateData_t *pdata = (PrivateData_t *)calloc(sizeof(*pdata), 1);
+	PrivateData_t *pdata = (PrivateData_t *)calloc(1, sizeof(*pdata));
 	if (pdata == NULL) {
 		free(pv);
 		return NULL;

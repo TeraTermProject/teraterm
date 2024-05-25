@@ -115,7 +115,7 @@ static LRESULT CALLBACK ColorSampleProc(HWND hWnd, UINT msg, WPARAM wParam, LPAR
  */
 ColorSampleData_t *ColorSampleInit(HWND hDlg, int ID, COLORREF color)
 {
-	ColorSampleData_t *self = (ColorSampleData_t *)calloc(sizeof(ColorSampleData_t), 1);
+	ColorSampleData_t *self = (ColorSampleData_t *)calloc(1, sizeof(ColorSampleData_t));
 	HWND hWnd = GetDlgItem(hDlg, ID);
 	self->color = color;
 	self->hWnd = hWnd;
@@ -1160,7 +1160,7 @@ private:
 
 void ThemeDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv)
 {
-	ThemeDlgData *dlg_data = (ThemeDlgData*)calloc(sizeof(*dlg_data), 1);
+	ThemeDlgData *dlg_data = (ThemeDlgData*)calloc(1, sizeof(*dlg_data));
 	dlg_data->hInst = hInst;
 	dlg_data->pcv = pcv;
 	dlg_data->pts = pcv->ts;

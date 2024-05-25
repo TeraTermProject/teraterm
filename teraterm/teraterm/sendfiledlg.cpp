@@ -79,7 +79,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 
 	switch (msg) {
 		case WM_INITDIALOG: {
-			work = (SendFileDlgWork_t *)calloc(sizeof(*work), 1);
+			work = (SendFileDlgWork_t *)calloc(1, sizeof(*work));
 			SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)work);
 			data = (sendfiledlgdata *)lp;
 			work->create_param = data;
