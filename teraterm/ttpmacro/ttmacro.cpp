@@ -78,10 +78,7 @@ static void init()
 	HomeDirW = GetHomeDirW(hInst);
 	SetupFNameW = GetDefaultFNameW(HomeDirW, L"TERATERM.INI");
 
-	wchar_t *UILanguageFileRel;
-	hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", L"lang\\Default.lng", SetupFNameW, &UILanguageFileRel);
-	UILanguageFileW = GetUILanguageFileFullW(HomeDirW, UILanguageFileRel);
-	free(UILanguageFileRel);
+	UILanguageFileW = GetUILanguageFileFullW(SetupFNameW);
 	WideCharToACP_t(UILanguageFileW, UILanguageFile, sizeof(UILanguageFile));
 
 	DLLInit();
