@@ -70,7 +70,7 @@ BOOL CInpDlg::OnInitDialog()
 	HWND HEdit, HOk;
 
 	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), 0);
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFileW);
 	SetWindowTextW(TitleStr);
 	SetDlgItemTextW(IDC_INPTEXT,TextStr);
 	SetDlgItemTextW(IDC_INPEDIT,DefaultStr);
