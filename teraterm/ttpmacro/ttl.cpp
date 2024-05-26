@@ -4159,6 +4159,11 @@ static WORD TTLShow(void)
 	return Err;
 }
 
+void TTLShowMINIMIZE(void)
+{
+	ShowWindow(HMainWin,SW_MINIMIZE);
+}
+
 // 'sprintf': Format a string in the style of sprintf
 //
 // (2007.5.1 yutaka)

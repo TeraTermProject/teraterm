@@ -223,13 +223,20 @@ WORD TTLGetPassword()
 		wchar_t input_string[MaxStrLen] = {};
 		size_t Temp2_len = sizeof(Temp2);
 		free(passwd_encW);
-		OpenInpDlg(input_string, key, L"Enter password", L"", TRUE);
-		WideCharToUTF8(input_string, NULL, Temp2, &Temp2_len);
-		if (Temp2[0]!=0) {
-			char TempA[512];
-			Encrypt(Temp2, TempA);
-			if (WritePrivateProfileStringW(L"Password", key, wc::fromUtf8(TempA), ini) != 0) {
-				result = 1;  /* success */
+		Err = OpenInpDlg(input_string, key, L"Enter password", L"", TRUE);
+		if (Err == IDCLOSE) {
+			// 閉じるボタン(&確認ダイアログ)で、マクロの終了とする。
+			TTLStatus = IdTTLEnd;
+			return 0;
+		} else {
+			Err = 0;
+			WideCharToUTF8(input_string, NULL, Temp2, &Temp2_len);
+			if (Temp2[0]!=0) {
+				char TempA[512];
+				Encrypt(Temp2, TempA);
+				if (WritePrivateProfileStringW(L"Password", key, wc::fromUtf8(TempA), ini) != 0) {
+					result = 1;  /* success */
+				}
 			}
 		}
 	}
@@ -290,10 +297,17 @@ WORD TTLInputBox(BOOL Paswd)
 	SetInputStr("");
 	if (CheckVar("inputstr",&ValType,&VarId) && (ValType==TypString)) {
 		wchar_t input_string[MaxStrLen];
-		OpenInpDlg(input_string,wc::fromUtf8(Str1),wc::fromUtf8(Str2),wc::fromUtf8(Str3),Paswd);
-		char *u8 = ToU8W(input_string);
-		SetStrVal(VarId, u8);
-		free(u8);
+		Err = OpenInpDlg(input_string,wc::fromUtf8(Str1),wc::fromUtf8(Str2),wc::fromUtf8(Str3),Paswd);
+		if (Err == IDCLOSE) {
+			// 閉じるボタン(&確認ダイアログ)で、マクロの終了とする。
+		  	TTLStatus = IdTTLEnd;
+			SetStrVal(VarId, "");
+		} else {
+			char *u8 = ToU8W(input_string);
+			SetStrVal(VarId, u8);
+			free(u8);
+		}
+		Err = 0;
 	}
 	return Err;
 }
@@ -355,6 +369,10 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 	int i, ary_size;
 	int sel = 0;
 	TVarId VarId;
+	TStrVal StrTmp;
+	int ext = 0;
+	int width;
+	int height;
 
 	*Err = 0;
 	GetStrVal2(Str1, Err, TRUE);
@@ -397,9 +415,39 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 	} else if (BoxId==IdListBox) {
 		//  リストボックスの選択肢を取得する。
 		GetStrAryVar(&VarId, Err);
-
-		if (CheckParameterGiven()) {
-			GetIntVal(&sel, Err);
+		while (CheckParameterGiven()) {
+			GetStrVal2(StrTmp, Err, TRUE);
+			if (*Err == 0) {
+				if (_wcsicmp(wc::fromUtf8(StrTmp), L"dclick=on") == 0) {
+					ext |= ExtListBoxDoubleclick;
+				} else if (_wcsicmp(wc::fromUtf8(StrTmp), L"minmaxbutton=on") == 0) {
+					ext |= ExtListBoxMinmaxbutton;
+				} else if (_wcsicmp(wc::fromUtf8(StrTmp), L"minimize=on") == 0) {
+					ext |=  ExtListBoxMinimize;
+					ext &= ~ExtListBoxMaximize;
+				} else if (_wcsicmp(wc::fromUtf8(StrTmp), L"maximize=on") == 0) {
+					ext &= ~ExtListBoxMinimize;
+					ext |=  ExtListBoxMaximize;
+				} else if (_wcsnicmp(wc::fromUtf8(StrTmp), L"size=", 5) == 0) {
+				  	wchar_t dummy1[24], dummy2[24];
+					if (swscanf_s(wc::fromUtf8(StrTmp), L"%[^=]=%d%[xX]%d", dummy1, 24, &width, dummy2, 24, &height) == 4) {
+						if (width < 0 || height < 0) {
+							*Err = ErrSyntax;
+							break;
+						} else {
+							ext |= ExtListBoxSize;
+						}
+					} else {
+						*Err = ErrSyntax;
+						break;
+					}
+				} else if (sscanf_s(StrTmp, "%d", &sel) != 1) {
+					*Err = ErrSyntax;
+					break;
+				}
+			} else {
+				break;
+			}
 		}
 		if (*Err==0 && GetFirstChar()!=0)
 			*Err = ErrSyntax;
@@ -430,7 +478,7 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 		//   0以上: 選択項目
 		//   -1: キャンセル
 		//	 -2: close
-		ret = OpenListDlg(wc::fromUtf8(Str1), wc::fromUtf8(Str2), s, sel);
+		ret = OpenListDlg(wc::fromUtf8(Str1), wc::fromUtf8(Str2), s, sel, ext, width, height);
 
 		for (i = 0 ; i < ary_size ; i++) {
 			free((void *)s[i]);

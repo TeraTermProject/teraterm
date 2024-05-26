@@ -38,6 +38,7 @@
 #include "tmfc.h"
 #include "tttypes.h"
 #include "ttmacro.h"
+#include "dlglib.h"
 
 #include "statdlg.h"
 
@@ -49,6 +50,7 @@ BOOL CStatDlg::Create(HINSTANCE hInst, const wchar_t *Text, const wchar_t *Title
 	TitleStr = Title;
 	PosX = x;
 	PosY = y;
+	m_hInst = hInst;
 	return TTCDialog::Create(hInst, NULL, CStatDlg::IDD);
 }
 
@@ -91,6 +93,9 @@ void CStatDlg::Update(const wchar_t *Text, const wchar_t *Title, int x, int y)
 
 BOOL CStatDlg::OnInitDialog()
 {
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), 0);
+	// •Â‚¶‚éƒ{ƒ^ƒ“‚ð–³Œø‰»
+	RemoveMenu(GetSystemMenu(m_hWnd, FALSE), SC_CLOSE, MF_BYCOMMAND);
 
 	Update(TextStr,TitleStr,PosX,PosY);
 	SetForegroundWindow(m_hWnd);
