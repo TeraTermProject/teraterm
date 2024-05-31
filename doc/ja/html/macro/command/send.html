@@ -28,6 +28,10 @@ send &lt;data1&gt; &lt;data2&gt;....
 &lt;data&gt; が整数型の場合は、その値の下位バイト(0-255)を ASCII コードとみなし、その文字を送信させる。
 </p>
 
+<p>
+  送信データは内容を判定して、文字と判定した場合 "<a href="sendtext.html">sendtext</a>" と同様に送信、バイナリと判定した場合 "<a href="sendbinary.html">sendbinary</a>" と同様に送信する。
+<p>
+
 <h2>例</h2>
 
 <pre class="macro-example">
@@ -72,6 +76,8 @@ send #9
 <h2>参照</h2>
 <ul>
   <li><a href="sendln.html">sendln</a></li>
+  <li><a href="sendtext.html">sendtext</a></li>
+  <li><a href="sendbinary.html">sendbinary</a></li>
   <li><a href="../syntax/formats.html">定数の形式</a></li>
 </ul>
 

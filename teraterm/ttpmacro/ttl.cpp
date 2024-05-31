@@ -3720,15 +3720,15 @@ static WORD TTLRotateRight(void)
 	return BitRotate(ROTATE_DIR_RIGHT);
 }
 
-static WORD TTLSend(void)
+/**
+ *	à¯êîÇÃï∂éöóÒÇ DDEOut(), DDEOut1Byte() Ç∑ÇÈ
+ */
+static WORD GetParamStrings(void)
 {
 	TStrVal Str;
 	WORD Err, ValType;
 	int Val;
 	BOOL EndOfLine;
-
-	if (! Linked)
-		return ErrLinkFirst;
 
 	EndOfLine = FALSE;
 	do {
@@ -3750,6 +3750,45 @@ static WORD TTLSend(void)
 		else
 			EndOfLine = TRUE;
 	} while (! EndOfLine);
+	return 0;
+}
+
+static WORD TTLSend(void)
+{
+	if (! Linked)
+		return ErrLinkFirst;
+
+	WORD r = GetParamStrings();
+	if (r != 0) {
+		return r;
+	}
+	DDESend();
+	return 0;
+}
+
+static WORD TTLSendText(void)
+{
+	if (! Linked)
+		return ErrLinkFirst;
+
+	WORD r = GetParamStrings();
+	if (r != 0) {
+		return r;
+	}
+	DDESendStringU8(NULL);
+	return 0;
+}
+
+static WORD TTLSendBinary(void)
+{
+	if (! Linked)
+		return ErrLinkFirst;
+
+	WORD r = GetParamStrings();
+	if (r != 0) {
+		return r;
+	}
+	DDESendBinary(NULL, 0);
 	return 0;
 }
 
@@ -3932,22 +3971,21 @@ static WORD TTLSendKCode(void)
 	return SendCmnd(CmdSendKCode,0);
 }
 
+/**
+ *	TTLSend() ÇÃâ¸çsïtâ¡î≈
+ */
 static WORD TTLSendLn(void)
 {
-	WORD Err;
-	char Str[2];
+	if (! Linked)
+		return ErrLinkFirst;
 
-	Err = TTLSend();
-	if (Err==0)
-	{
-		Str[0] = 0x0D;
-		Str[1] = 0;
-		if (Linked)
-			DDEOut(Str);
-		else
-			Err = ErrLinkFirst;
+	WORD r = GetParamStrings();
+	if (r != 0) {
+		return r;
 	}
-	return Err;
+	DDEOut1Byte(0x0d);
+	DDESend();
+	return 0;
 }
 
 static WORD TTLSetDate(void)
@@ -5987,6 +6025,10 @@ static int ExecCmnd(void)
 			Err = TTLScpRecv(); break;      // add 'scprecv' (2008.1.4 yutaka)
 		case RsvSend:
 			Err = TTLSend(); break;
+		case RsvSendText:
+			Err = TTLSendText(); break;
+		case RsvSendBinary:
+			Err = TTLSendBinary(); break;
 		case RsvSendBreak:
 			Err = TTLCommCmd(CmdSendBreak,0); break;
 		case RsvSendBroadcast:

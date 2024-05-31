@@ -281,6 +281,8 @@
 #if defined(OUTPUTDEBUGSTRING_ENABLE)
 #define RsvOutputDebugString	216
 #endif
+#define RsvSendText     217
+#define RsvSendBinary   218
 
 #define RsvOperator     1000
 #define RsvBNot         1001
