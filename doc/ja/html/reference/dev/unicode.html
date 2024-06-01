@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>内部構造</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>内部構造</h1>
+
+<p>
+  Tera Term 5 以前の内部バッファの文字コードはDBCS(Double byte Character Set)でした。
+  例えば「Language[言語]」を"Japanese"としたとき内部バッファの文字コードはShift_JISでした。
+</p>
+
+<p>
+  Tera Term 5 の内部バッファの文字コードは Unicodeです。
+</p>
+
+<p>
+  大まかなデータの流れは次のようになっています。
+</p>
+
+<pre>
+                                                                              +--------------+
+                              +------------------------+ Code:Unicode         |              |
+                              |                        +--------------------->+  Window      |
+                              |  buffer@buffer.c       |                      |   Display    |
+                              |   Code:Unicode         | Code:                |   Print      |
+                              |                        |  Input to Unicode    |              |
+                              |                        +<------------------+  +--------------+
+                              +------------------------+                   |
+                                                                           |
+                              +------------------------+   CommRead1Byte() |
+                              |                        +-------------------+
+                              |  Input buffer@ttpcmn   |
++-----------+                 |   Code:Input           | Code:
+|           |                 |                        |  Unicode to Input    +--------------+
+|  Socket   +---------------->+                        +<---------------------+              |
+|  Serial   |  CommReceive()  +------------------------+  CommTextEchoW()     |  Talker      |
+|  Pipe     |                                             CommBinaryEcho()    |   Keyboard   |
+|  Plugin   |                 +------------------------+                      |   SendMem    |
+|           +<----------------+                        | Code:                |    File      |
++-----------+  CommSend()     |  Output buffer@ttpcmn  |  Unicode to Output   |    Clipboard |
+                              |   Code:Output          +<---------------------+              |
+                              |                        |  CommTextOutW()      +--------------+
+                              |                        |  CommBinaryOut()
+                              +------------------------+  CommRawOut()
+</pre>
+
+<p>
+  Windows 95/98/Meのとき、キー入力は Unicode に変換してから処理を行います。
+  描画は UnicodeをMBCSに変換して描画します。
+</p>
+
+</BODY>
+</HTML>
