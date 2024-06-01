@@ -24,32 +24,45 @@
   The data flow is as follows.
 </p>
 
+<font size="1">
 <pre>
                                                                               +--------------+
                               +------------------------+ Code:Unicode         |              |
                               |                        +--------------------->+  Window      |
                               |  buffer@buffer.c       |                      |   Display    |
-                              |   Code:Unicode         | Code:                |   Print      |
-                              |                        |  Input to Unicode    |              |
-                              |                        +<------------------+  +--------------+
-                              +------------------------+                   |
-                                                                           |
-                              +------------------------+   CommRead1Byte() |
-                              |                        +-------------------+
-                              |  Input buffer@ttpcmn   |
-+-----------+                 |   Code:Input           | Code:
-|           |                 |                        |  Unicode to Input    +--------------+
-|  Socket   +---------------->+                        +<---------------------+              |
-|  Serial   |  CommReceive()  +------------------------+  CommTextEchoW()     |  Talker      |
-|  Pipe     |                                             CommBinaryEcho()    |   Keyboard   |
-|  Plugin   |                 +------------------------+                      |   SendMem    |
-|           +<----------------+                        | Code:                |    File      |
-+-----------+  CommSend()     |  Output buffer@ttpcmn  |  Unicode to Output   |    Clipboard |
-                              |   Code:Output          +<---------------------+              |
-                              |                        |  CommTextOutW()      +--------------+
-                              |                        |  CommBinaryOut()
-                              +------------------------+  CommRawOut()
+                              |   Code:Unicode         | Code:Unicode         |   Print      |
+                              |                        |  BuffPutUnicode()    |              |                                         +----------+
+                              |                        +<------------------+  +--------------+          +-----------------------+      |          |
+                              +------------------------+                   |                            |                       |      |Log File  |
+                                                                           +----------------------------+ VTParse()@vtterm.c    +----->+          |
+                              +------------------------+ CommRead1Byte()                                |  Terminal             |      |          |
+                              |                        +----------------------------------------------->+                       |      +----------+
+                              |  Input buffer@ttpcmn   |                                                |                       |
++-----------+                 |   Code:Input           | Code:                                          +----+------------------+
+|           |                 |                        |  Unicode to Input    +--------------+               |
+|  Socket   +---------------->+                        +<---------------------+              |               |
+|  Serial   |  CommReceive()  +------------------------+  CommTextEchoW()     |  Talker      |               |
+|  Pipe     |                                             CommBinaryEcho()    |   Keyboard   |               | Code:Unicode(UTF-8)
+|  Plugin   |                 +------------------------+                      |   SendMem    |               |  DDEPut1()
+|           +<----------------+                        | Code:                |    File      |               |
++-----------+  CommSend()     |  Output buffer@ttpcmn  |  Unicode to Output   |    Clipboard |               |
+                              |   Code:Output          +<---------------------+    macro     +<---------+    |
+                              |                        |  CommTextOutW()      |              |          |    |
+                              |                        |  CommBinaryOut()     +--------------+          |    |
+                              +------------------------+  CommRawOut()                                  |    |
+                                                                                                        |    |
+                                                                                                        |    |
+                                                                                                        |    |
+                                                                                                        |    v
+                                           +-------------------+      DDE, UTF-8/binary               +-+----+-----------+
+                                           |                   +------------------------------------->+                  |
+                                           |  ttpmacro.exe     |                                      |  ttdde.c         |
+                                           |                   |                                      |                  |
+                                           |                   |      DDE, UTF-8                      |                  |
+                                           |                   +<-------------------------------------+                  |
+                                           +-------------------+                                      +------------------+
 </pre>
+<font size="3">
 
 <p>
   On Windows 95/98/Me, key input is converted to Unicode before processing.
