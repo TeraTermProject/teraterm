@@ -1797,14 +1797,25 @@ void SetStrVal(TVarId VarId, const char *Str)
 	}
 }
 
+/**
+ *	•¶Žš•Ï”‚Ì“à—e‚ð•Ô‚·
+ */
 const char *StrVarPtr(TVarId VarId)
 {
 	Variable_t *v;
 	if (VarId >> 16) {
+		// •¶Žš—ñ”z—ñ•Ï”
+		const char *strU8;
 		v = &Variables[(VarId>>16)-1];
-		return v->Value.StrAry.val[VarId & 0xffff];
+		strU8 = v->Value.StrAry.val[VarId & 0xffff];
+		if (strU8 == NULL) {
+			// –¢Ý’è‚Ìê‡‚Í nullptr ‚Æ‚È‚Á‚Ä‚¢‚éA""‚ð•Ô‚·
+			strU8 = "";
+		}
+		return strU8;
 	}
 	else {
+		// •¶Žš—ñ
 		v = &Variables[VarId];
 		return v->Value.Str;
 	}
