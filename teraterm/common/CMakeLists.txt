@@ -48,6 +48,8 @@ add_library(
   tmfc_property.cpp
   ttcommdlg.cpp
   ttcommdlg.h
+  ttdebug.cpp
+  ttdebug.h
   ttgdiplus.cpp
   ttgdiplus.h
   ttknownfolders.c
@@ -66,7 +68,7 @@ add_library(
   tttext.h
   win32helper.cpp
   win32helper.h
-  )
+)
 
 target_include_directories(
   ${PACKAGE_NAME}
@@ -81,4 +83,5 @@ target_link_libraries(
   PUBLIC
   #
   setupapi
-  )
+  imagehlp
+)

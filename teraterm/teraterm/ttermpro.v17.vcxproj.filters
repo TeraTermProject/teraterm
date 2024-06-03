@@ -192,9 +192,6 @@
     <ClCompile Include="..\ttpfile\filesys_win32.cpp">
       <Filter>ttpfile</Filter>
     </ClCompile>
-    <ClCompile Include="ttdebug.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="setupdirdlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -527,9 +524,6 @@
     </ClInclude>
     <ClInclude Include="..\ttpfile\filesys_win32.h">
       <Filter>ttpfile</Filter>
-    </ClInclude>
-    <ClInclude Include="ttdebug.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="setupdirdlg.h">
       <Filter>Header Files</Filter>

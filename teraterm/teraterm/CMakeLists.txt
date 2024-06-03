@@ -57,8 +57,6 @@ add_executable(
   tt-version.rc
   ttdde.c
   ttdde.h
-  ttdebug.cpp
-  ttdebug.h
   ttdialog.c
   ttdialog.h
   ttermpro.rc
@@ -358,11 +356,6 @@ if(MINGW)
 endif()
 
 if(MSVC AND ENABLE_DEBUG_INFO)
-  target_compile_options(
-    ${PACKAGE_NAME}
-    PRIVATE
-    $<$<CONFIG:Release>:/Zi>
-    )
   if(${CMAKE_VERSION} VERSION_GREATER "3.13")
     target_link_options(
       ${PACKAGE_NAME}
@@ -419,7 +412,6 @@ target_link_libraries(
   comctl32
   comdlg32
   gdi32
-  imagehlp
   kernel32
   ole32
   oleaut32

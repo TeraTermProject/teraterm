@@ -155,6 +155,7 @@
     <ClCompile Include="getcontent.cpp" />
     <ClCompile Include="i18n_static.c" />
     <ClCompile Include="ttcommdlg.cpp" />
+    <ClCompile Include="ttdebug.cpp" />
     <ClCompile Include="ttgdiplus.cpp" />
     <ClCompile Include="ttknownfolders.c" />
     <ClCompile Include="ttlib.c" />
@@ -186,6 +187,7 @@
     <ClInclude Include="getcontent.h" />
     <ClInclude Include="tmfc_propdlg.h" />
     <ClInclude Include="ttcommon.h" />
+    <ClInclude Include="ttdebug.h" />
     <ClInclude Include="ttgdiplus.h" />
     <ClInclude Include="ttknownfolders.h" />
     <ClInclude Include="ttlib.h" />

@@ -134,9 +134,26 @@ target_link_libraries(
   comctl32
   gdi32
   comdlg32
+)
+
+if(${CMAKE_VERSION} VERSION_GREATER "3.13")
+  target_link_options(
+    ${PACKAGE_NAME}
+    PRIVATE
+    /DEBUG:FULL
+    /PDBALTPATH:${PACKAGE_NAME}.pdb
+    /map
   )
+endif()
 
 install(
   TARGETS ${PACKAGE_NAME}
   DESTINATION .
-  )
+)
+
+install(
+  FILES
+  $<TARGET_PDB_FILE:${PACKAGE_NAME}>
+  $<CONFIG>/ttpmacro.map
+  DESTINATION .
+)

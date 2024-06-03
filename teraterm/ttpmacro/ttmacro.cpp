@@ -42,6 +42,7 @@
 #include "dllutil.h"
 #include "codeconv.h"
 #include "win32helper.h"
+#include "ttdebug.h"
 
 #include "ttm_res.h"
 #include "ttmmain.h"
@@ -130,6 +131,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
+	DebugSetException();
 
 	// DPI Aware (çÇDPIëŒâû)
 	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {

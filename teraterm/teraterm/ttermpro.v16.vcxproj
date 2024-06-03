@@ -201,7 +201,6 @@
     <ClCompile Include="themefile.cpp" />
     <ClCompile Include="theme_pp.cpp" />
     <ClCompile Include="ttdde.c" />
-    <ClCompile Include="ttdebug.cpp" />
     <ClCompile Include="ttdialog.c" />
     <ClCompile Include="ttfileio.c" />
     <ClCompile Include="ttime.c" />
@@ -317,7 +316,6 @@
     <ClInclude Include="themedlg_res.h" />
     <ClInclude Include="theme_pp.h" />
     <ClInclude Include="ttdde.h" />
-    <ClInclude Include="ttdebug.h" />
     <ClInclude Include="ttdialog.h" />
     <ClInclude Include="ttfileio.h" />
     <ClInclude Include="ttime.h" />
