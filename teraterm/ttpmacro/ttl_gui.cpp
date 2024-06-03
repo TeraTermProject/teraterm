@@ -85,7 +85,7 @@ WORD TTLClipb2Var()
 		}
 		cbbuff = ToU8W(cbbuffW);
 		free(cbbuffW);
-		cblen = 0;
+		cblen = strlen(cbbuff);
 	}
 
 	if (cbbuff != NULL && Num >= 0 && Num * (MaxStrLen - 1) < cblen) {
