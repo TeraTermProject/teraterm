@@ -34,11 +34,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ddeml.h>
+#include <stdint.h>
 #include "ttmdlg.h"
 #include "ttmparse.h"
 #include "ttmmsg.h"
 #include "codeconv.h"
 #include "asprintf.h"
+#include "ddelib.h"
 
 #include "ttmdde.h"
 
@@ -346,21 +348,7 @@ void EndDDE()
 
 void DDEOut1Byte(BYTE B)
 {
-	if (((B==0x00) || (B==0x01)) &&
-	    (OutLen < OutBufSize-2)) {
-	// Character encoding
-	//   to support NUL character sending
-	//
-	//  [char to be sent] --> [encoded character]
-	//        00          -->     01 01
-	//        01          -->     01 02
-//
-		OutBuf[OutLen] = 0x01;
-		OutBuf[OutLen+1] = B+1;
-		OutLen = OutLen + 2;
-	}
-	else if (OutLen < OutBufSize-1)
-	{
+	if (OutLen < OutBufSize-1) {
 		OutBuf[OutLen] = B;
 		OutLen++;
 	}
@@ -372,36 +360,38 @@ void DDEOut(const char *B)
 		if (OutLen >= OutBufSize - 1)
 			break;
 		OutBuf[OutLen++] = *B;
-		if (*B == 0x01) {
-			if (OutLen >= OutBufSize - 1) {
-				OutLen--;
-				break;
-			}
-			else {
-				OutBuf[OutLen++] = 0x02;
-			}
-		}
 		B++;
 	}
 }
 
-void DDESend()
+// 有効時 XTYP_EXECUTE で送信する
+// 無効時 XTYP_POKE で送信する (変更前と同じ)
+#define	USE_EXECUTE	1
+
+/**
+ *	TeraTermへバイナリを送信
+ */
+static void SendBinaryTTExecute(const uint8_t *ptr, size_t len)
 {
+	size_t encoded_len;
+	uint8_t *encoded_bin = EncodeDDEBinary(ptr, len, &encoded_len);
+	DdeClientTransaction(encoded_bin, encoded_len, ConvH, 0, 0, XTYP_EXECUTE, 1000, NULL);
+	free(encoded_bin);
+}
+
+static void SendBinaryTTPoke(const uint8_t *ptr, size_t len)
+{
+	size_t encoded_len;
+	uint8_t *encoded_bin = EncodeDDEBinary(ptr, len, &encoded_len);
 	HDDEDATA hd;
 	int i;
 	const int retry_count = 10;
 
-	if ((! Linked) || (OutLen==0)) return;
-	OutBuf[OutLen] = 0;  // DDEデータの終端は null で終わることをサーバが期待している。
-
 	for (i = 0 ; i < retry_count ; i++) {
 		// サーバ(Tera Term)へコマンド列を送る。成功すると非0が返る。
-		if ((hd = DdeClientTransaction(OutBuf,OutLen+1,ConvH,Item,CF_OEMTEXT,XTYP_POKE,1000,NULL)) != 0) {
-			OutLen = 0;  // バッファを空にする
-
-			//if (i > 0) MessageBox(NULL, "retry success", "DDESend()", MB_OK);
+		hd = DdeClientTransaction(encoded_bin,len+1,ConvH,Item,CF_OEMTEXT,XTYP_POKE,1000,NULL);
+		if (hd != 0) {
 			break;
-
 		} else {
 			UINT ret = DdeGetLastError(Inst);
 			if (ret == DMLERR_BUSY) { // ビジーの場合リトライを行う
@@ -411,16 +401,57 @@ void DDESend()
 				// DDEサーバ(Tera Term)が AutoWinClose=off で切断した場合、DMLERR_NOTPROCESSED が
 				// 返ってくる。ここで破棄しなければ、延々とリトライすることになり、CPUを食い潰す。
 				// (2009.11.22 yutaka)
-				OutLen = 0;
 				break;
 			}
 		}
 	}
 
-	if (i >= retry_count) {
-		OutLen = 0;  // リトライしてもダメなら捨てる
-	}
+	free(encoded_bin);
+}
 
+static void DDESendRaw(uint8_t command, const char *ptr, size_t len)
+{
+	uint8_t *buf = (uint8_t *)malloc(1 + 4 + len);
+	if (buf == NULL) {
+		return;
+	}
+	//buf[0] = CmdSendUTF8String;
+	buf[0] = command;
+	buf[1] = (uint8_t)((len & 0xff000000 ) >> (8*3));
+	buf[2] = (uint8_t)((len & 0x00ff0000 ) >> (8*2));
+	buf[3] = (uint8_t)((len & 0x0000ff00 ) >> (8*1));
+	buf[4] = (uint8_t)((len & 0x000000ff ));
+	memcpy(buf + 1 + 4, ptr, len);
+#if USE_EXECUTE
+	SendBinaryTTExecute(buf, 1 + 4 + len);
+#else
+	SendBinaryTTPoke(buf, 1 + 4 + len);
+#endif
+	free(buf);
+}
+
+void DDESend()
+{
+	OutBuf[OutLen] = 0;  // DDEデータの終端は null で終わることをサーバが期待している。
+	DDESendRaw(CmdSendCompatString, OutBuf, OutLen + 1);
+	OutLen = 0;
+}
+
+void DDESendStringU8(const char *strU8)
+{
+	strU8 = OutBuf;
+	size_t len = strlen(strU8) + 1;		// 終端 '\0' も送信する
+	DDESendRaw(CmdSendUTF8String, strU8, len);
+	OutLen = 0;
+}
+
+void DDESendBinary(const void *ptr, size_t len)
+{
+	OutBuf[OutLen] = 0;  // 1byte長く送る ?
+	ptr = OutBuf;
+	len = OutLen + 1;
+	DDESendRaw(CmdSendBinary, ptr, len);
+	OutLen = 0;
 }
 
 void ClearRecvLnBuff()
@@ -894,19 +925,6 @@ void SetBinary(int BinFlag)
 	DdeClientTransaction(Cmd,strlen(Cmd)+1,ConvH,0,CF_OEMTEXT,XTYP_EXECUTE,1000,NULL);
 }
 
-/*
-Besides I created a setdebug command to set the debug flag of teraterm.
-Usage:
-setdebug <int>
-It sets the debug flag to <int> value. <int> can be:
-0: no debug: output as usual
-1: usual teraterm debug mode (described in http://ttssh2.sourceforge.jp/manual/en/ ... -term.html)
-2: hex output. Received bytes are printed in hex format (capital letters) separated by a space
-3: disable output completely
-
-cf. http://logmett.com/forum/viewtopic.php?f=3&t=999
-    http://logmett.com/forum/viewtopic.php?f=3&t=996
-*/
 void SetDebug(int DebugFlag)
 {
   char Cmd[3];

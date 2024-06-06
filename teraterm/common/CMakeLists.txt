@@ -17,6 +17,8 @@ add_library(
   compat_win.h
   comportinfo.cpp
   comportinfo.h
+  ddelib.cpp
+  ddelib.h
   dlglib.c
   dlglib.h
   dlglib_cpp.cpp

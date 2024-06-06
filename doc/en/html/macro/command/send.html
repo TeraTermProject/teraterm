@@ -29,6 +29,10 @@ If &lt;data&gt; is a string, the string is sent to the host. <br>
 If &lt;data&gt; is an integer, its lowest-order byte (0-255) is regarded as an ASCII code of the character, and the character is sent to the host.
 </p>
 
+<p>
+  The datas are checked, and when data is judged to be text, data is sent in same as "<a href="sendtext.html">sendtext</a>"; when data is judged to be binary, data is sent in same as "<a href="sendbinary.html">sendbinary</a>".
+<p>
+
 <h2>Example</h2>
 
 <pre class="macro-example">
@@ -73,6 +77,8 @@ See also "<a href="setsync.html">setsync</a>" for the synchronous mode.
 <h2>See also</h2>
 <ul>
   <li><a href="sendln.html">sendln</a></li>
+  <li><a href="sendtext.html">sendtext</a></li>
+  <li><a href="sendbinary.html">sendbinary</a></li>
   <li><a href="../syntax/formats.html">Formats of constants</a></li>
 </ul>
 

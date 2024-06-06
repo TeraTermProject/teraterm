@@ -1048,6 +1048,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="sendbinary">
+					<param name="Local" value="html\macro\command\sendbinary.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="sendbreak">
 					<param name="Local" value="html\macro\command\sendbreak.html">
 					<param name="ImageNumber" value="11">
@@ -1085,6 +1090,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="sendmulticast">
 					<param name="Local" value="html\macro\command\sendmulticast.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="sendtext">
+					<param name="Local" value="html\macro\command\sendtext.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">

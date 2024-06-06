@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005- TeraTerm Project
+ * (C) 2024- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,66 +27,17 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTMACRO.EXE, DDE routines */
+#pragma once
 
-#include "ttddecmnd.h"
+#include <stdlib.h>	// for size_t
+#include <stdint.h>	// for uint8_t
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void Word2HexStr(WORD w, PCHAR HexStr);
-BOOL InitDDE(HWND HWin);
-void EndDDE();
-void DDEOut1Byte(BYTE B);
-void DDEOut(const char *B);
-void DDESend();
-void DDESendStringU8(const char *strU8);
-void DDESendBinary(const void *ptr, size_t len);
-PCHAR GetRecvLnBuff();
-void FlushRecv();
-void ClearWait();
-void SetWait(int Index, const char *Str);
-void ClearWaitN();
-void SetWaitN(int Len);
-int CmpWait(int Index, PCHAR Str);
-void SetWait2(PCHAR Str, int Len, int Pos);
-int Wait();
-BOOL Wait2();
-BOOL WaitN();
-int Wait4all();
-void SetFile(const char *filenameU8);
-void SetSecondFile(const char *filenameU8);
-void SetBinary(int BinFlag);
-void SetDebug(int DebugFlag);
-void SetLogOption(int *LogFlags);
-void SetXOption(int XOption);
-void SendSync();
-void SetSync(BOOL OnFlag);
-WORD SendCmnd(char OpId, int WaitFlag);
-WORD GetTTParam(char OpId, PCHAR Param, int destlen);
-int FindRegexStringOne(char *regex, int regex_len, char *target, int target_len);
-
-extern BOOL Linked;
-extern WORD ComReady;
-extern int OutLen;
-
-  // for "WaitRecv" command
-extern TStrVal Wait2Str;
-extern BOOL    Wait2Found;
-
-enum regex_type {
-	REGEX_NONE,
-	REGEX_WAIT,
-	REGEX_WAITLN,
-	REGEX_WAITRECV,
-	REGEX_WAITEVENT,
-};
-extern enum regex_type RegexActionType;
-
-extern BOOL Wait4allGotIndex;
-extern int Wait4allFoundNum;
-
+uint8_t *EncodeDDEBinary(const uint8_t *src, size_t src_len, size_t *dest_len);
+uint8_t *DecodeDDEBinary(const uint8_t *src, size_t src_len, size_t *dest_len);
 
 #ifdef __cplusplus
 }
