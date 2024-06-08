@@ -136,14 +136,16 @@ target_link_libraries(
   comdlg32
 )
 
-if(${CMAKE_VERSION} VERSION_GREATER "3.13")
-  target_link_options(
-    ${PACKAGE_NAME}
-    PRIVATE
-    /DEBUG:FULL
-    /PDBALTPATH:${PACKAGE_NAME}.pdb
-    /map
-  )
+if(MSVC)
+  if(${CMAKE_VERSION} VERSION_GREATER "3.13")
+    target_link_options(
+      ${PACKAGE_NAME}
+      PRIVATE
+      /DEBUG:FULL
+      /PDBALTPATH:${PACKAGE_NAME}.pdb
+      /map
+    )
+  endif()
 endif()
 
 install(
@@ -151,9 +153,11 @@ install(
   DESTINATION .
 )
 
-install(
-  FILES
-  $<TARGET_PDB_FILE:${PACKAGE_NAME}>
-  $<CONFIG>/ttpmacro.map
-  DESTINATION .
-)
+if(MSVC)
+  install(
+    FILES
+    $<TARGET_PDB_FILE:${PACKAGE_NAME}>
+    $<CONFIG>/ttpmacro.map
+    DESTINATION .
+  )
+endif()
