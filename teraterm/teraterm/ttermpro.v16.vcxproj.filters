@@ -273,6 +273,9 @@
     <ClCompile Include="keyboard_pp.c">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="mouse_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -329,6 +332,9 @@
       <Filter>Source Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="themedlg.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="mouse_pp.rc">
       <Filter>dialog</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -583,6 +589,9 @@
       <Filter>dialog</Filter>
     </ClInclude>
     <ClInclude Include="keyboard_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="mouse_pp.h">
       <Filter>dialog</Filter>
     </ClInclude>
   </ItemGroup>
