@@ -71,10 +71,8 @@ void CGeneralPropPageDlg::OnInitDialog()
 	TTCPropertyPage::OnInitDialog();
 
 	static const DlgTextInfo TextInfos[] = {
-		{ IDC_CLICKABLE_URL, "DLG_TAB_GENERAL_CLICKURL" },
 		{ IDC_DISABLE_SENDBREAK, "DLG_TAB_GENERAL_DISABLESENDBREAK" },
 		{ IDC_ACCEPT_BROADCAST, "DLG_TAB_GENERAL_ACCEPTBROADCAST" },
-		{ IDC_MOUSEWHEEL_SCROLL_LINE, "DLG_TAB_GENERAL_MOUSEWHEEL_SCROLL_LINE" },
 		{ IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE, "DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE" },
 		{ IDC_CLEAR_ON_RESIZE, "DLG_TAB_GENERAL_CLEAR_ON_RESIZE" },
 		{ IDC_CURSOR_CHANGE_IME, "DLG_TAB_GENERAL_CURSOR_CHANGE_IME" },
@@ -102,9 +100,6 @@ void CGeneralPropPageDlg::OnInitDialog()
 
 	// (3)AcceptBroadcast 337: 2007/03/20
 	SetCheck(IDC_ACCEPT_BROADCAST, ts.AcceptBroadcast);
-
-	// (4)IDC_MOUSEWHEEL_SCROLL_LINE
-	SetDlgItemNum(IDC_SCROLL_LINE, ts.MouseWheelScrollLine);
 
 	// (5)IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE
 	SetCheck(IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE, ts.AutoScrollOnlyInBottomLine);
@@ -156,27 +151,19 @@ void CGeneralPropPageDlg::OnInitDialog()
 	// Download dir
 	SetDlgItemTextW(IDC_DOWNLOAD_DIR, ts.FileDirW);
 
+#if 0
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
+#endif
 }
 
 void CGeneralPropPageDlg::OnOK()
 {
-	int val;
-
 	// (1)
 	ts.DisableAcceleratorSendBreak = GetCheck(IDC_DISABLE_SENDBREAK);
 
-	// (2)
-	ts.EnableClickableUrl = GetCheck(IDC_CLICKABLE_URL);
-
 	// (3) 337: 2007/03/20
 	ts.AcceptBroadcast = GetCheck(IDC_ACCEPT_BROADCAST);
-
-	// (4)IDC_MOUSEWHEEL_SCROLL_LINE
-	val = GetDlgItemInt(IDC_SCROLL_LINE);
-	if (val > 0)
-		ts.MouseWheelScrollLine = val;
 
 	// (5)IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE
 	ts.AutoScrollOnlyInBottomLine = GetCheck(IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE);

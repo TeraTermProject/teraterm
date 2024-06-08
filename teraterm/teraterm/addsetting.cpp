@@ -57,6 +57,7 @@
 #include "theme_pp.h"
 #include "general_pp.h"
 #include "keyboard_pp.h"
+#include "mouse_pp.h"
 
 #include "addsetting.h"
 
@@ -2011,6 +2012,8 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 	page = ThemePageCreate(hInstance, &ts);
 	AddPage(page);
 	page = KeyboardPageCreate(hInstance, &ts);
+	AddPage(page);
+	page = MousePageCreate(hInstance, &ts);
 	AddPage(page);
 
 	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFileW);

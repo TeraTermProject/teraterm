@@ -157,6 +157,7 @@
 #define HlpMenuSetupAdditionalTheme         43024
 #define HlpMenuSetupThemeEditor             43025
 #define HlpMenuSetupAdditionalKeyboard      43026
+#define HlpMenuSetupAdditionalMouse         43027
 #define HlpMenuSetupSave                    43013
 #define HlpMenuSetupRestore                 43014
 #define HlpMenuSetupDir                     43016

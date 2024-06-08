@@ -485,6 +485,11 @@
 					<param name="Local" value="html\menu\setup-additional-keyboard.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Mouse tab">
+					<param name="Local" value="html\menu\setup-additional-mouse.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
 			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Save setup">

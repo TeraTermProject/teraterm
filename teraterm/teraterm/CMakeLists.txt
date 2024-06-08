@@ -84,6 +84,7 @@ add_executable(
 )
 
 set(SRC_DIALOG
+  ../common/tt_res.h
   addsetting.cpp
   addsetting.h
   clipboarddlg.cpp
@@ -112,8 +113,12 @@ set(SRC_DIALOG
   keyboard_pp.h
   logdlg.cpp
   logdlg.h
+  mouse_pp.cpp
+  mouse_pp.h
+  mouse_pp.rc
   protodlg.cpp
   protodlg.h
+  resource.h
   sendfiledlg.cpp
   sendfiledlg.h
   setupdirdlg.cpp
