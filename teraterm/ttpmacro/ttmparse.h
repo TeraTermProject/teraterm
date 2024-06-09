@@ -281,10 +281,12 @@
 #if defined(OUTPUTDEBUGSTRING_ENABLE)
 #define RsvOutputDebugString	216
 #endif
-#define RsvSetPassword2 217
-#define RsvGetPassword2 218
-#define RsvDelPassword2 219
-#define RsvIsPassword2  220
+#define RsvSendText     217
+#define RsvSendBinary   218
+#define RsvSetPassword2 219
+#define RsvGetPassword2 220
+#define RsvDelPassword2 221
+#define RsvIsPassword2  222
 
 #define RsvOperator     1000
 #define RsvBNot         1001

@@ -7,12 +7,12 @@
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ *	  notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ *	  notice, this list of conditions and the following disclaimer in the
+ *	  documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
+ *	  derived from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -37,16 +37,19 @@
 #include <openssl/sha.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
+#include <openssl/hmac.h>
 #include "ttmdef.h"
 #include "ttmparse.h"
 
+#define ENCRYPT2_SALTLEN		16
 #define ENCRYPT2_CIPHER			EVP_aes_256_ctr()
-#define ENCRYPT2_DIGEST			EVP_sha256()
-#define ENCRYPT2_ITER			10000
+#define ENCRYPT2_DIGEST			EVP_sha512()
+#define ENCRYPT2_ITER1			1001	// パスワード以外
+#define ENCRYPT2_ITER2			210001	// パスワード用 (参考 https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2)
 #define ENCRYPT2_IKLEN			32
 #define ENCRYPT2_IVLEN			16
 #define ENCRYPT2_TAG			"\000\002"
-#define ENCRYPT2_PWD_MAX_LEN	227
+#define ENCRYPT2_PWD_MAX_LEN	203
 #define ENCRYPT2_ENCODE			TRUE
 #define ENCRYPT2_DECODE			FALSE
 #define ENCRYPT2_ENCRYPT		TRUE
@@ -55,18 +58,19 @@
 // Encrypt2 パスワードプロファイル
 typedef struct {									//	   計 381バイト(base64エンコード後は508バイト + \r\n)
 	unsigned char Tag[2];							// 平文		2 Encrypt2識別タグ (ENCRYPT2_TAG)
-	unsigned char KeySalt[PKCS5_SALT_LEN];			// 平文		8 RAND_bytes()
-	unsigned char KeyHash[SHA512_DIGEST_LENGTH];	// 平文	   64 SHA512(KeyStr + KeySalt)
-	unsigned char PassSalt[PKCS5_SALT_LEN];			// 平文		8 RAND_bytes()
-	unsigned char PassStr[ENCRYPT2_PWD_MAX_LEN];	// 暗号文 227 EVP_aes_256_ctr()
-	unsigned char EncSalt[PKCS5_SALT_LEN];			// 暗号文	8 RAND_bytes()
-	unsigned char EncHash[SHA512_DIGEST_LENGTH];	// 暗号文  64 SHA512(Tag ～ EncSalt)
+	unsigned char KeySalt[ENCRYPT2_SALTLEN];		// 平文	   16 RAND_bytes()
+	unsigned char KeyHash[SHA512_DIGEST_LENGTH];	// 平文	   64 PBKDF2(KeyStr)
+	unsigned char PassSalt[ENCRYPT2_SALTLEN];		// 平文	   16 RAND_bytes()
+	unsigned char PassStr[ENCRYPT2_PWD_MAX_LEN];	// 暗号文 203 EVP_aes_256_ctr()
+	unsigned char EncSalt[ENCRYPT2_SALTLEN];		// 暗号文  16 RAND_bytes()
+	unsigned char EncHash[SHA512_DIGEST_LENGTH];	// 暗号文  64 HMAC512(Tag ～ EncSalt)
 } Encrypt2Profile, *Encrypt2ProfileP;
 
-#define ENCRYPT2_PROFILE_LEN	sizeof(Encrypt2Profile)
-#define ENCRYPT2_BASE64_LEN		sizeof(Encrypt2Profile) / 3 * 4
+#define ENCRYPT2_PROFILE_LEN	sizeof(Encrypt2Profile)				// 381 バイト
+#define ENCRYPT2_BASE64_LEN		sizeof(Encrypt2Profile) / 3 * 4		// 508 バイト
+#define ENCRYPT2_MaxLineLen		512
 
-// base64 エンコード/デコード (最大文字列長 MaxStrLen)
+// base64 エンコード/デコード (最大文字列長 ENCRYPT2_MaxLineLen)
 // 復帰値 0:エラー、n:変換後のバイト数
 static int Base64EncDec(unsigned char *In, int InLen, unsigned char *Out, BOOL Encode)
 {
@@ -84,7 +88,7 @@ static int Base64EncDec(unsigned char *In, int InLen, unsigned char *Out, BOOL E
 	if (Encode) {	// binary -> ascii
 		if (BIO_write(Bio, In,	InLen) != InLen ||
 			BIO_flush(Bio) != 1 ||
-			(Len = BIO_read(Bmem, Out, MaxStrLen)) <= 0) {
+			(Len = BIO_read(Bmem, Out, ENCRYPT2_MaxLineLen)) <= 0) {
 			goto end;
 		}
 		Out[Len] = 0;
@@ -92,7 +96,7 @@ static int Base64EncDec(unsigned char *In, int InLen, unsigned char *Out, BOOL E
 	} else {		// ascii -> binary
 		if (BIO_write(Bmem, In, InLen) != InLen ||
 			BIO_flush(Bmem) != 1 ||
-			(Len = BIO_read(Bio, Out, MaxStrLen)) <= 0) {
+			(Len = BIO_read(Bio, Out, ENCRYPT2_MaxLineLen)) <= 0) {
 			goto end;
 		}
 		Ret = Len;
@@ -106,20 +110,6 @@ static int Base64EncDec(unsigned char *In, int InLen, unsigned char *Out, BOOL E
 	BIO_free(B64);
 
 	return Ret;
-}
-
-// ハッシュ
-// HashにSHA512(Str + salt)のダイジェストが入る
-static void SHA512WithSalt(TStrVal Str, unsigned char *Salt, unsigned char *Hash)
-{
-	unsigned char HashBuf[MaxStrLen + PKCS5_SALT_LEN];
-	int StrLen;
-
-	StrLen = strlen(Str);
-	memcpy(HashBuf, Str, StrLen);
-	memcpy(HashBuf + StrLen, Salt, PKCS5_SALT_LEN);
-	SHA512(HashBuf, StrLen + PKCS5_SALT_LEN, Hash);
-	return;
 }
 
 // パスワードファイル 1行読み出し
@@ -176,7 +166,7 @@ static int PwdFileReadln(HANDLE FH, unsigned char *lpBuffer, UINT uBytes)
 static int Encrypt2ProfileAdd(HANDLE FH, Encrypt2ProfileP Profile)
 {
 	DWORD NumberOfBytesWritten;
-	TStrVal ProfileB64;
+	char ProfileB64[ENCRYPT2_MaxLineLen];
 	int ProfileB64Len;
 	BOOL Result;
 
@@ -200,12 +190,15 @@ static int Encrypt2ProfileAdd(HANDLE FH, Encrypt2ProfileP Profile)
 // パスワードファイルからKeyStr(パスワード識別子)にマッチする行を検索する
 // 復帰値  0:マッチする行無し、1:マッチする行有り
 // Profileにマッチした行のEncrypt2Profileが設定される
-static int Encrypt2ProfileSearch(HANDLE FH, TStrVal KeyStr, Encrypt2ProfileP Profile)
+#pragma optimize("", off)
+static int Encrypt2ProfileSearch (HANDLE FH, const char *KeyStr, Encrypt2ProfileP Profile)
 {
-	TStrVal ProfileB64;
+	char ProfileB64[ENCRYPT2_MaxLineLen];
 	int ProfileB64Len;
 	unsigned char KeyHash[SHA512_DIGEST_LENGTH];
-	int Ret;
+	Encrypt2Profile Lprofile, DummyProfile;
+	int Ret, Dummy;
+	DWORD Cpos, Dpos;
 
 	if (SetFilePointer(FH, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
 		return 0;
@@ -213,30 +206,58 @@ static int Encrypt2ProfileSearch(HANDLE FH, TStrVal KeyStr, Encrypt2ProfileP Pro
 
 	Ret = 0;
 	while (1) {
-		if ((ProfileB64Len = PwdFileReadln(FH, ProfileB64, MaxStrLen)) <= 0) {
+		if ((ProfileB64Len = PwdFileReadln(FH, ProfileB64, ENCRYPT2_MaxLineLen)) <= 0) {
 			break;
 		}
 		if (ProfileB64Len != ENCRYPT2_BASE64_LEN ||
-			Base64EncDec(ProfileB64, ProfileB64Len, (unsigned char *)Profile, ENCRYPT2_DECODE) == 0 ||
-			memcmp(Profile->Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1) != 0) {
+			Base64EncDec(ProfileB64, ProfileB64Len, (unsigned char *)&Lprofile, ENCRYPT2_DECODE) == 0 ||
+			memcmp(Lprofile.Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1) != 0) {
 			continue;
 		}
 		// KeyStrのhashが一致するか確認
-		SHA512WithSalt(KeyStr, Profile->KeySalt, KeyHash);
-		if (memcmp(KeyHash, Profile->KeyHash, SHA512_DIGEST_LENGTH) == 0){
+		if (PKCS5_PBKDF2_HMAC(KeyStr, strlen(KeyStr),
+							  (const unsigned char *)&(Lprofile.KeySalt), ENCRYPT2_SALTLEN,
+							  ENCRYPT2_ITER1, (EVP_MD *)ENCRYPT2_DIGEST,
+							  SHA512_DIGEST_LENGTH, KeyHash) != 1) {
+			continue;
+		}
+
+		if (memcmp(KeyHash, Lprofile.KeyHash, SHA512_DIGEST_LENGTH) == 0) {
+			memcpy(Profile, &Lprofile, ENCRYPT2_PROFILE_LEN);
+			if ((Cpos = SetFilePointer(FH, 0, NULL, FILE_CURRENT)) == INVALID_SET_FILE_POINTER) {
+				break;
+			}
 			Ret = 1;
-			break;
+			// マッチする行が見つかってもbreakしない(サイドチャネル攻撃対策)
+		} else {
+			memcpy(&DummyProfile, &Lprofile, ENCRYPT2_PROFILE_LEN);
+			if ((Dpos = SetFilePointer(FH, 0, NULL, FILE_CURRENT)) == INVALID_SET_FILE_POINTER) {
+				break;
+			}
+			Dummy = 1;
 		}
 	}
+
+	if (Ret == 0) {
+		if (SetFilePointer(FH, Dpos, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
+			Ret = 0;
+		}
+	} else {
+		if (SetFilePointer(FH, Cpos, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
+			Ret = 0;
+		}
+	}
+
 	return Ret;
 }
+#pragma optimize("", on)
 
 // パスワードファイル 行更新
-static int Encrypt2ProfileUpdate(HANDLE FH, TStrVal KeyStr, Encrypt2ProfileP Profile)
+static int Encrypt2ProfileUpdate(HANDLE FH, const char *KeyStr, Encrypt2ProfileP Profile)
 {
 	Encrypt2Profile OldProfile;
 	DWORD NumberOfBytesWritten;
-	TStrVal ProfileB64;
+	char ProfileB64[ENCRYPT2_MaxLineLen];
 	int ProfileB64Len;
 	int Result;
 
@@ -257,7 +278,7 @@ static int Encrypt2ProfileUpdate(HANDLE FH, TStrVal KeyStr, Encrypt2ProfileP Pro
 }
 
 // パスワードファイル 行削除
-static int Encrypt2ProfileDelete(HANDLE FH, TStrVal KeyStr)
+static int Encrypt2ProfileDelete(HANDLE FH, const char *KeyStr)
 {
 	Encrypt2Profile OldProfile;
 	DWORD Cpos, Epos;
@@ -287,28 +308,29 @@ static int Encrypt2ProfileDelete(HANDLE FH, TStrVal KeyStr)
 }
 
 // Encrypt2 暗号化/復号処理
-static int Encrypt2EncDec(TStrVal PassStr, TStrVal EncryptStr, Encrypt2ProfileP profile, int encrypt)
+static int Encrypt2EncDec(char *PassStr, const char *EncryptStr, Encrypt2ProfileP profile, int encrypt)
 {
 	unsigned char TmpKeyIV[EVP_MAX_KEY_LENGTH + EVP_MAX_IV_LENGTH];
 	unsigned char Key[EVP_MAX_KEY_LENGTH], IV[EVP_MAX_IV_LENGTH];
 	BIO *Bmem = NULL, *Benc = NULL, *Bio = NULL;
 	EVP_CIPHER_CTX *ctx;
 	Encrypt2Profile Lprofile;
-	unsigned char HashBuf[ENCRYPT2_PROFILE_LEN - SHA512_DIGEST_LENGTH + MaxStrLen];
+	unsigned char Buf[ENCRYPT2_PROFILE_LEN - SHA512_DIGEST_LENGTH];
 	unsigned char Hash[SHA512_DIGEST_LENGTH];
+	int HashLen;
 	int ret = 0;
 
 	if (encrypt) {
-		if (RAND_bytes(profile->PassSalt, PKCS5_SALT_LEN) <= 0 ||
-			RAND_bytes(profile->EncSalt, PKCS5_SALT_LEN) <= 0) {
+		if (RAND_bytes(profile->PassSalt, ENCRYPT2_SALTLEN) <= 0 ||
+			RAND_bytes(profile->EncSalt, ENCRYPT2_SALTLEN) <= 0) {
 			goto end;
 		}
 	}
 
 	// 鍵導出
 	if (PKCS5_PBKDF2_HMAC(EncryptStr, strlen(EncryptStr),
-						  (const unsigned char *)&(profile->PassSalt), PKCS5_SALT_LEN,
-						  ENCRYPT2_ITER, (EVP_MD *)ENCRYPT2_DIGEST,
+						  (const unsigned char *)&(profile->PassSalt), ENCRYPT2_SALTLEN,
+						  ENCRYPT2_ITER2, (EVP_MD *)ENCRYPT2_DIGEST,
 						  ENCRYPT2_IKLEN + ENCRYPT2_IVLEN, TmpKeyIV) != 1) {
 		goto end;
 	}
@@ -328,20 +350,24 @@ static int Encrypt2EncDec(TStrVal PassStr, TStrVal EncryptStr, Encrypt2ProfileP 
 		int len;
 		// 暗号化
 		len = strlen(PassStr);
-		memcpy(HashBuf, PassStr, len);
-		memset(HashBuf + len, 0x00, ENCRYPT2_PWD_MAX_LEN - len);	// nullパディング
-		if (BIO_write(Bio, HashBuf, ENCRYPT2_PWD_MAX_LEN) != ENCRYPT2_PWD_MAX_LEN ||
-			BIO_write(Bio, profile->EncSalt, PKCS5_SALT_LEN) != PKCS5_SALT_LEN ||
+		memcpy(Buf, PassStr, len);
+		memset(Buf + len, 0x00, ENCRYPT2_PWD_MAX_LEN - len);	// nullパディング
+		if (BIO_write(Bio, Buf, ENCRYPT2_PWD_MAX_LEN) != ENCRYPT2_PWD_MAX_LEN ||
+			BIO_write(Bio, profile->EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN ||
 			BIO_flush(Bio) != 1 ||
 			BIO_read(Bmem, profile->PassStr, ENCRYPT2_PWD_MAX_LEN) != ENCRYPT2_PWD_MAX_LEN ||
-			BIO_read(Bmem, profile->EncSalt, PKCS5_SALT_LEN) != PKCS5_SALT_LEN) {
+			BIO_read(Bmem, profile->EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN) {
 			goto end;
 		}
-		// hash値格納
-		memcpy(HashBuf, profile, ENCRYPT2_PROFILE_LEN - SHA512_DIGEST_LENGTH); // Tag ～ EncSalt
-		memcpy(HashBuf + ENCRYPT2_PROFILE_LEN - SHA512_DIGEST_LENGTH, EncryptStr, strlen(EncryptStr));
-		SHA512(HashBuf, ENCRYPT2_PROFILE_LEN - SHA512_DIGEST_LENGTH + strlen(EncryptStr), Hash);
-		if (BIO_write(Bio, Hash, SHA512_DIGEST_LENGTH) != SHA512_DIGEST_LENGTH ||
+		// hmac格納
+		if ((PKCS5_PBKDF2_HMAC(EncryptStr, strlen(EncryptStr),
+							   (const unsigned char *)&(profile->EncSalt), ENCRYPT2_SALTLEN,
+							   ENCRYPT2_ITER1, (EVP_MD *)ENCRYPT2_DIGEST,
+							   SHA512_DIGEST_LENGTH, Key) != 1) ||
+			HMAC(ENCRYPT2_DIGEST, Key, SHA512_DIGEST_LENGTH,
+				 (const unsigned char *)profile, ENCRYPT2_PROFILE_LEN - SHA512_DIGEST_LENGTH,
+				 Hash, &HashLen) == NULL ||
+			BIO_write(Bio, Hash, SHA512_DIGEST_LENGTH) != SHA512_DIGEST_LENGTH ||
 			BIO_flush(Bio) != 1 ||
 			BIO_read(Bmem, profile->EncHash, SHA512_DIGEST_LENGTH) != SHA512_DIGEST_LENGTH) {
 			goto end;
@@ -350,24 +376,32 @@ static int Encrypt2EncDec(TStrVal PassStr, TStrVal EncryptStr, Encrypt2ProfileP 
 	} else {
 		// 復号
 		if (BIO_write(Bmem, profile->PassStr, ENCRYPT2_PWD_MAX_LEN) != ENCRYPT2_PWD_MAX_LEN ||
-			BIO_write(Bmem, profile->EncSalt, PKCS5_SALT_LEN) != PKCS5_SALT_LEN ||
+			BIO_write(Bmem, profile->EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN ||
 			BIO_write(Bmem, profile->EncHash, SHA512_DIGEST_LENGTH) != SHA512_DIGEST_LENGTH ||
 			BIO_flush(Bmem) != 1 ||
 			BIO_read(Bio, Lprofile.PassStr, ENCRYPT2_PWD_MAX_LEN) != ENCRYPT2_PWD_MAX_LEN ||
-			BIO_read(Bio, Lprofile.EncSalt, PKCS5_SALT_LEN) != PKCS5_SALT_LEN ||
+			BIO_read(Bio, Lprofile.EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN ||
 			BIO_read(Bio, Lprofile.EncHash, SHA512_DIGEST_LENGTH) != SHA512_DIGEST_LENGTH) {
 			goto end;
 		}
-		// hash値比較
-		memcpy(HashBuf, profile, ENCRYPT2_PROFILE_LEN - SHA512_DIGEST_LENGTH); // Tag ～ EncSalt
-		memcpy(HashBuf + ENCRYPT2_PROFILE_LEN - SHA512_DIGEST_LENGTH, EncryptStr, strlen(EncryptStr));
-		SHA512(HashBuf, ENCRYPT2_PROFILE_LEN - SHA512_DIGEST_LENGTH + strlen(EncryptStr), Hash);
-		if (memcmp(Hash, Lprofile.EncHash, SHA512_DIGEST_LENGTH) != 0) {
-			goto end; // 不一致
+		// hmac比較
+		if ((PKCS5_PBKDF2_HMAC(EncryptStr, strlen(EncryptStr),
+							   (const unsigned char *)&(profile->EncSalt), ENCRYPT2_SALTLEN,
+							   ENCRYPT2_ITER1, (EVP_MD *)ENCRYPT2_DIGEST,
+							   SHA512_DIGEST_LENGTH, Key) != 1) ||
+			HMAC(ENCRYPT2_DIGEST, Key, SHA512_DIGEST_LENGTH,
+				 (const unsigned char *)profile, ENCRYPT2_PROFILE_LEN - SHA512_DIGEST_LENGTH,
+				 Hash, &HashLen) == NULL ) {
+			goto end;
 		}
 		memcpy(PassStr, Lprofile.PassStr, ENCRYPT2_PWD_MAX_LEN);
-		PassStr[ENCRYPT2_PWD_MAX_LEN] = 0;
-		ret = 1;
+		if (memcmp(Hash, Lprofile.EncHash, SHA512_DIGEST_LENGTH) == 0) {
+			PassStr[ENCRYPT2_PWD_MAX_LEN] = 0;
+			ret = 1;	// 一致
+		} else {
+			PassStr[0] = 0;
+			ret = 0;	// 不一致
+		}
 	}
 
  end:
@@ -376,10 +410,10 @@ static int Encrypt2EncDec(TStrVal PassStr, TStrVal EncryptStr, Encrypt2ProfileP 
 	return ret;
 }
 
-int Encrypt2SetPassword(LPCWSTR FileNameStr, TStrVal KeyStr, TStrVal PassStr, TStrVal EncryptStr)
+int Encrypt2SetPassword(LPCWSTR FileNameStr, const char *KeyStr, const char *PassStr, const char *EncryptStr)
 {
 	HANDLE FH;
-	Encrypt2Profile profile, OldProfile;
+	Encrypt2Profile Profile, OldProfile;
 	BOOL update;
 
 	if (strlen(PassStr) > ENCRYPT2_PWD_MAX_LEN) {
@@ -403,23 +437,29 @@ int Encrypt2SetPassword(LPCWSTR FileNameStr, TStrVal KeyStr, TStrVal PassStr, TS
 		update = FALSE;	// 追加
 	}
 
-	memcpy(profile.Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1);				// Tag
-	if (RAND_bytes(profile.KeySalt, PKCS5_SALT_LEN) <= 0) {						// KeySalt
+	memcpy(Profile.Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1);				// Tag
+	if (RAND_bytes(Profile.KeySalt, ENCRYPT2_SALTLEN) <= 0) {					// KeySalt
 		CloseHandle(FH);
 		return 0;
 	}
-	SHA512WithSalt(KeyStr, profile.KeySalt, profile.KeyHash);					// KeyHash
-	if (Encrypt2EncDec(PassStr, EncryptStr, &profile, ENCRYPT2_ENCRYPT) == 0) {	// PassSalt, EncSalt, EncHash
+	if (PKCS5_PBKDF2_HMAC(KeyStr, strlen(KeyStr),
+						  (const unsigned char *)&(Profile.KeySalt), ENCRYPT2_SALTLEN,
+						  ENCRYPT2_ITER1, (EVP_MD *)ENCRYPT2_DIGEST,
+						  SHA512_DIGEST_LENGTH, Profile.KeyHash) != 1) {		// KeyHash
+		return 0;
+	}
+	if (Encrypt2EncDec((char *)PassStr, EncryptStr, &Profile, ENCRYPT2_ENCRYPT) == 0) {	// PassSalt, EncSalt, EncHash
 		CloseHandle(FH);
 		return 0;
 	}
+
 	if (update) {
-		if (Encrypt2ProfileUpdate(FH, KeyStr, &profile) == 0) {
+		if (Encrypt2ProfileUpdate(FH, KeyStr, &Profile) == 0) {
 			CloseHandle(FH);
 			return 0;
 		}
 	} else {
-		if (Encrypt2ProfileAdd(FH, &profile) == 0) {
+		if (Encrypt2ProfileAdd(FH, &Profile) == 0) {
 			CloseHandle(FH);
 			return 0;
 		}
@@ -429,55 +469,55 @@ int Encrypt2SetPassword(LPCWSTR FileNameStr, TStrVal KeyStr, TStrVal PassStr, TS
 	return 1;
 }
 
-int Encrypt2GetPassword(LPCWSTR FileNameStr, TStrVal KeyStr, TStrVal PassStr, TStrVal EncryptStr)
+int Encrypt2GetPassword(LPCWSTR FileNameStr, const char *KeyStr, char *PassStr, const char *EncryptStr)
 {
 	HANDLE FH;
-	Encrypt2Profile profile;
+	Encrypt2Profile Profile;
 	int Ret;
 
 	if ((FH = CreateFileW(FileNameStr, GENERIC_READ, FILE_SHARE_READ, NULL,
 						  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE) {
 		return 0;
 	}
-	if ((Ret = Encrypt2ProfileSearch(FH, KeyStr, &profile)) == 0) {
+	if ((Ret = Encrypt2ProfileSearch(FH, KeyStr, &Profile)) == 0) {
 		CloseHandle(FH);
 		return 0;
 	}
-	Ret = Encrypt2EncDec(PassStr, EncryptStr, &profile, ENCRYPT2_DECRYPT);
+	Ret = Encrypt2EncDec(PassStr, EncryptStr, &Profile, ENCRYPT2_DECRYPT);
 
 	CloseHandle(FH);
 	return Ret;
 }
 
-int Encrypt2IsPassword(LPCWSTR FileNameStr, TStrVal KeyStr)
+int Encrypt2IsPassword(LPCWSTR FileNameStr, const char *KeyStr)
 {
 	HANDLE FH;
-	Encrypt2Profile profile;
+	Encrypt2Profile Profile;
 	int Ret;
 
 	if ((FH = CreateFileW(FileNameStr, GENERIC_READ, FILE_SHARE_READ, NULL,
 						  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE) {
 		return 0;
 	}
-	Ret = Encrypt2ProfileSearch(FH, KeyStr, &profile);
+	Ret = Encrypt2ProfileSearch(FH, KeyStr, &Profile);
 
 	CloseHandle(FH);
 	return Ret;
 }
 
-int Encrypt2DelPassword(LPCWSTR FileNameStr, TStrVal KeyStr)
+int Encrypt2DelPassword(LPCWSTR FileNameStr, const char *KeyStr)
 {
 	HANDLE FH;
-	Encrypt2Profile profile;
+	Encrypt2Profile Profile;
 
 	if ((FH = CreateFileW(FileNameStr, GENERIC_READ|GENERIC_WRITE, 0, NULL,
-						  OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL)) ==	 INVALID_HANDLE_VALUE) {
+						  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)) ==	 INVALID_HANDLE_VALUE) {
 		return 0;
 	}
 
 	if (KeyStr[0] != 0) {
 		// 指定されたKeyStr(パスワード識別子)のプロファイルを削除
-		if (Encrypt2ProfileSearch(FH, KeyStr, &profile) == 0) {
+		if (Encrypt2ProfileSearch(FH, KeyStr, &Profile) == 0) {
 			CloseHandle(FH);
 			return 0;
 		}
@@ -485,15 +525,15 @@ int Encrypt2DelPassword(LPCWSTR FileNameStr, TStrVal KeyStr)
 			CloseHandle(FH);
 			return 0;
 		}
+		CloseHandle(FH);
 		return 1;
 	}
 
 	// Encrypt2の全プロファイルを削除
 	DWORD cpos, epos;
 	unsigned char *p, *cp;
-	TStrVal ProfileB64;
+	char ProfileB64[ENCRYPT2_MaxLineLen];
 	int ProfileB64Len, ProfileLen;
-	Encrypt2Profile Profile;
 	DWORD NumberOfBytesWritten;
 
 	if ((cpos = SetFilePointer(FH, 0, NULL, FILE_BEGIN)) == INVALID_SET_FILE_POINTER ||
@@ -506,7 +546,7 @@ int Encrypt2DelPassword(LPCWSTR FileNameStr, TStrVal KeyStr)
 
 	cp = p;
 	while (1) {
-		if ((ProfileB64Len = PwdFileReadln(FH, ProfileB64, MaxStrLen)) <= 0) {
+		if ((ProfileB64Len = PwdFileReadln(FH, ProfileB64, ENCRYPT2_MaxLineLen)) <= 0) {
 			break;
 		}
 		// Encrypt2ではないプロファイルは消さない

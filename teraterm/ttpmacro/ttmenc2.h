@@ -32,10 +32,10 @@
 extern "C" {
 #endif
 
-int Encrypt2SetPassword(LPCWSTR FileNameStr, TStrVal KeyStr, TStrVal PassStr, TStrVal EncryptSt);
-int Encrypt2GetPassword(LPCWSTR FileNameStr, TStrVal KeyStr, TStrVal PassStr, TStrVal EncryptStr);
-int Encrypt2IsPassword(LPCWSTR FileNameStr, TStrVal KeyStr);
-int Encrypt2DelPassword(LPCWSTR FileNameStr, TStrVal KeyStr);
+int Encrypt2SetPassword(LPCWSTR FileNameStr, const char *KeyStr, const char *PassStr, const char *EncryptStr);
+int Encrypt2GetPassword(LPCWSTR FileNameStr, const char *KeyStr, char *PassStr, const char *EncryptStr);
+int Encrypt2IsPassword(LPCWSTR FileNameStr, const char *KeyStr);
+int Encrypt2DelPassword(LPCWSTR FileNameStr, const char *KeyStr);
 
 #ifdef __cplusplus
 }
