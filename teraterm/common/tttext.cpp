@@ -65,7 +65,9 @@ typedef struct TTTextSt url_subclass_t;
 static void FreeSt(TTText *h)
 {
 	free(h->text);
+	h->text = NULL;
 	free(h->url);
+	h->url = NULL;
 }
 
 // static textに割り当てるプロシージャ
@@ -230,12 +232,10 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 		// マウスカーソルを元に戻す。
 		SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
 
-		return (LRESULT)0;
-
-	case WM_NCDESTROY:
 		FreeSt(parent);
 		free(parent);
-		return 0;
+
+		return (LRESULT)0;
 	}
 
 	return CallWindowProcW( parent->proc, hWnd, msg, wParam, lParam );
