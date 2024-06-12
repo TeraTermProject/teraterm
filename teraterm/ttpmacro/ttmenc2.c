@@ -7,12 +7,12 @@
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *	  notice, this list of conditions and the following disclaimer.
+ *    notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
- *	  notice, this list of conditions and the following disclaimer in the
- *	  documentation and/or other materials provided with the distribution.
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
- *	  derived from this software without specific prior written permission.
+ *    derived from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -50,8 +50,6 @@
 #define ENCRYPT2_IVLEN			16
 #define ENCRYPT2_TAG			"\000\002"
 #define ENCRYPT2_PWD_MAX_LEN	203
-#define ENCRYPT2_ENCODE			TRUE
-#define ENCRYPT2_DECODE			FALSE
 #define ENCRYPT2_ENCRYPT		TRUE
 #define ENCRYPT2_DECRYPT		FALSE
 
@@ -69,48 +67,6 @@ typedef struct {									//	   計 381バイト(base64エンコード後は508バイト + \r\n
 #define ENCRYPT2_PROFILE_LEN	sizeof(Encrypt2Profile)				// 381 バイト
 #define ENCRYPT2_BASE64_LEN		sizeof(Encrypt2Profile) / 3 * 4		// 508 バイト
 #define ENCRYPT2_MaxLineLen		512
-
-// base64 エンコード/デコード (最大文字列長 ENCRYPT2_MaxLineLen)
-// 復帰値 0:エラー、n:変換後のバイト数
-static int Base64EncDec(unsigned char *In, int InLen, unsigned char *Out, BOOL Encode)
-{
-	BIO *B64 = NULL, *Bmem = NULL, *Bio = NULL;
-	int Len, Ret;
-
-	Ret = 0;
-	if ((B64 = BIO_new(BIO_f_base64())) == NULL ||
-		(Bmem = BIO_new(BIO_s_mem())) == NULL ||
-		(Bio = BIO_push(B64, Bmem)) == NULL) {
-		goto end;
-	}
-	BIO_set_flags(B64, BIO_FLAGS_BASE64_NO_NL);
-
-	if (Encode) {	// binary -> ascii
-		if (BIO_write(Bio, In,	InLen) != InLen ||
-			BIO_flush(Bio) != 1 ||
-			(Len = BIO_read(Bmem, Out, ENCRYPT2_MaxLineLen)) <= 0) {
-			goto end;
-		}
-		Out[Len] = 0;
-		Ret = Len;
-	} else {		// ascii -> binary
-		if (BIO_write(Bmem, In, InLen) != InLen ||
-			BIO_flush(Bmem) != 1 ||
-			(Len = BIO_read(Bio, Out, ENCRYPT2_MaxLineLen)) <= 0) {
-			goto end;
-		}
-		Ret = Len;
-	}
-
- end:
-	if (Ret == 0) {
-		Out[0] = 0;
-	}
-	BIO_free(Bmem);
-	BIO_free(B64);
-
-	return Ret;
-}
 
 // パスワードファイル 1行読み出し
 // 復帰値 -1:エラー、n:読み込みバイト数
@@ -167,17 +123,14 @@ static int Encrypt2ProfileAdd(HANDLE FH, Encrypt2ProfileP Profile)
 {
 	DWORD NumberOfBytesWritten;
 	char ProfileB64[ENCRYPT2_MaxLineLen];
-	int ProfileB64Len;
 	BOOL Result;
 
 	if (SetFilePointer(FH, 0, NULL, FILE_END) == INVALID_SET_FILE_POINTER) {
 		return 0;
 	}
-	if ((ProfileB64Len = Base64EncDec((unsigned char *)Profile, ENCRYPT2_PROFILE_LEN, ProfileB64, ENCRYPT2_ENCODE)) == 0) {
-		return 0;
-	}
-	Result = WriteFile(FH, ProfileB64, ProfileB64Len, &NumberOfBytesWritten, NULL);
-	if (Result == FALSE || ProfileB64Len != NumberOfBytesWritten) {
+	b64encode(ProfileB64, ENCRYPT2_BASE64_LEN + 1, (PCHAR)Profile, ENCRYPT2_PROFILE_LEN);
+	Result = WriteFile(FH, ProfileB64, ENCRYPT2_BASE64_LEN, &NumberOfBytesWritten, NULL);
+	if (Result == FALSE || ENCRYPT2_BASE64_LEN != NumberOfBytesWritten) {
 		return 0;
 	}
 	Result = WriteFile(FH, "\015\012", 2, &NumberOfBytesWritten, NULL);
@@ -210,7 +163,7 @@ static int Encrypt2ProfileSearch (HANDLE FH, const char *KeyStr, Encrypt2Profile
 			break;
 		}
 		if (ProfileB64Len != ENCRYPT2_BASE64_LEN ||
-			Base64EncDec(ProfileB64, ProfileB64Len, (unsigned char *)&Lprofile, ENCRYPT2_DECODE) == 0 ||
+			b64decode((PCHAR)&Lprofile, ENCRYPT2_PROFILE_LEN + 1, ProfileB64) != ENCRYPT2_PROFILE_LEN ||
 			memcmp(Lprofile.Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1) != 0) {
 			continue;
 		}
@@ -258,16 +211,15 @@ static int Encrypt2ProfileUpdate(HANDLE FH, const char *KeyStr, Encrypt2ProfileP
 	Encrypt2Profile OldProfile;
 	DWORD NumberOfBytesWritten;
 	char ProfileB64[ENCRYPT2_MaxLineLen];
-	int ProfileB64Len;
 	int Result;
 
 	if (Encrypt2ProfileSearch(FH, KeyStr, &OldProfile) == 0 ||
-		SetFilePointer(FH, (LONG)(ENCRYPT2_BASE64_LEN) * -1 - 2, NULL, FILE_CURRENT) == INVALID_SET_FILE_POINTER ||
-		(ProfileB64Len = Base64EncDec((unsigned char *)Profile, ENCRYPT2_PROFILE_LEN, ProfileB64, ENCRYPT2_ENCODE)) == 0) {
+		SetFilePointer(FH, (LONG)(ENCRYPT2_BASE64_LEN) * -1 - 2, NULL, FILE_CURRENT) == INVALID_SET_FILE_POINTER) {
 		return 0;
 	}
-	Result = WriteFile(FH, ProfileB64, ProfileB64Len, &NumberOfBytesWritten, NULL);
-	if (Result == FALSE || ProfileB64Len != NumberOfBytesWritten) {
+	b64encode(ProfileB64, ENCRYPT2_BASE64_LEN + 1, (PCHAR)Profile, ENCRYPT2_PROFILE_LEN);
+	Result = WriteFile(FH, ProfileB64, ENCRYPT2_BASE64_LEN, &NumberOfBytesWritten, NULL);
+	if (Result == FALSE || ENCRYPT2_BASE64_LEN != NumberOfBytesWritten) {
 		return 0;
 	}
 	Result = WriteFile(FH, "\015\012", 2, &NumberOfBytesWritten, NULL);
@@ -550,7 +502,7 @@ int Encrypt2DelPassword(LPCWSTR FileNameStr, const char *KeyStr)
 			break;
 		}
 		// Encrypt2ではないプロファイルは消さない
-		ProfileLen = Base64EncDec(ProfileB64, ProfileB64Len, (unsigned char *)&Profile, FALSE);
+		ProfileLen = b64decode((PCHAR)&Profile, ENCRYPT2_PROFILE_LEN + 1, ProfileB64);
 		if (ProfileB64Len != ENCRYPT2_BASE64_LEN ||
 			ProfileLen != ENCRYPT2_PROFILE_LEN ||
 			memcmp(Profile.Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1) != 0) {
