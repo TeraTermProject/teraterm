@@ -3951,26 +3951,22 @@ static wchar_t *_get_lang_msg(const char *key, const wchar_t *def, const wchar_t
 	return uimsg;
 }
 
-// ログの再生 (2006.12.13 yutaka)
+// ログの再生
 void CVTWindow::OnReplayLog()
 {
-	wchar_t szFile[MAX_PATH];
+	wchar_t *szFile;
 	const wchar_t *exec = L"ttermpro.exe";
 
 	// バイナリモードで採取したログファイルを選択する
 	wchar_t *filter = _get_lang_msg("FILEDLG_OPEN_LOGFILE_FILTER", L"all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW);
 	wchar_t *title = _get_lang_msg("FILEDLG_OPEN_LOGFILE_TITLE", L"Select replay log file with binary mode", ts.UILanguageFileW);
-	OPENFILENAMEW ofn = {};
-	szFile[0] = 0;
-	ofn.lStructSize = get_OPENFILENAME_SIZEW();
+	TTOPENFILENAMEW ofn = {};
 	ofn.hwndOwner = HVTWin;
 	ofn.lpstrFilter = filter;
-	ofn.lpstrFile = szFile;
-	ofn.nMaxFile = _countof(szFile);
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	ofn.lpstrDefExt = L"log";
 	ofn.lpstrTitle = title;
-	BOOL r = GetOpenFileNameW(&ofn);
+	BOOL r = TTGetOpenFileNameW(&ofn, &szFile);
 	free(filter);
 	free(title);
 	if (r == FALSE)
@@ -3981,6 +3977,7 @@ void CVTWindow::OnReplayLog()
 	wchar_t *Command;
 	aswprintf(&Command, L"%s\\%s /R=\"%s\"", exe_dir, exec, szFile);
 	free(exe_dir);
+	free(szFile);
 
 	STARTUPINFOW si = {};
 	PROCESS_INFORMATION pi = {};
