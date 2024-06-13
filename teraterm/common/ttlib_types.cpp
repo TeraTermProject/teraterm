@@ -38,7 +38,6 @@
 #include "win32helper.h"
 #include "compat_win.h"
 #include "tttypes.h"
-#include "codeconv.h"
 #include "asprintf.h"
 
 #include "ttlib_types.h"
@@ -88,15 +87,15 @@ wchar_t *GetTermLogDir(const TTTSet *pts)
 
 wchar_t *GetViewlogEditor(const TTTSet *pts)
 {
-	wchar_t *ViewlogEditorW;
-	if (pts->ViewlogEditor[0] == '\0') {
-		ViewlogEditorW = wcsdup(L"notepad.exe");
+	const wchar_t *ViewlogEditorW;
+	if (pts->ViewlogEditorW == NULL || pts->ViewlogEditorW[0] == '\0') {
+		ViewlogEditorW = L"notepad.exe";
 	}
 	else {
-		ViewlogEditorW = ToWcharA(pts->ViewlogEditor);
+		ViewlogEditorW = pts->ViewlogEditorW;
 	}
 	if (!IsRelativePathW(ViewlogEditorW)) {
-		return ViewlogEditorW;
+		return _wcsdup(ViewlogEditorW);
 	}
 	else {
 		wchar_t *windows_dir;
@@ -104,7 +103,6 @@ wchar_t *GetViewlogEditor(const TTTSet *pts)
 		wchar_t *fullpath;
 		aswprintf(&fullpath, L"%s\\%s", windows_dir, ViewlogEditorW);
 		free(windows_dir);
-		free(ViewlogEditorW);
 		return fullpath;
 	}
 }

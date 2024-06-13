@@ -1584,14 +1584,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	          _TRUNCATE);
 
 	// Viewlog Editor path
-	if (GetWindowsDirectory(Temp, sizeof(Temp)) + 13 < sizeof(Temp)) { // "\\notepad.exe"(12) + NUL(1)
-		strncat_s(Temp, sizeof(Temp), "\\notepad.exe", _TRUNCATE);
-	}
-	else {
-		Temp[0] = '\0';
-	}
-	GetPrivateProfileString(Section, "ViewlogEditor ", Temp,
-	                        ts->ViewlogEditor, sizeof(ts->ViewlogEditor), FName);
+	hGetPrivateProfileStringW(SectionW, L"ViewlogEditor", L"notepad.exe", FName, &ts->ViewlogEditorW);
 
 	// UI language message file (full path)
 	ts->UILanguageFileW = GetUILanguageFileFullW(FName);
@@ -2289,8 +2282,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WritePrivateProfileString(Section, "AlphaBlendActive", Temp, FName);
 	WritePrivateProfileString(Section, "CygwinDirectory",
 	                          ts->CygwinDirectory, FName);
-	WritePrivateProfileString(Section, "ViewlogEditor", ts->ViewlogEditor,
-	                          FName);
+	WritePrivateProfileStringW(SectionW, L"ViewlogEditor", ts->ViewlogEditorW, FName);
 
 	// ANSI color(2004.9.5 yutaka)
 	Temp[0] = '\0';
@@ -4100,6 +4092,7 @@ void TTSetUnInit(TTTSet *ts)
 		(void **)&ts->LogFNW,
 		(void **)&ts->LogDefaultNameW,
 		(void **)&ts->DelimListW,
+		(void **)&ts->ViewlogEditorW,
 	};
 	int i;
 	for(i = 0; i < _countof(ptr_list); i++) {

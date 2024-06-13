@@ -1129,8 +1129,8 @@ void CLogPropPageDlg::OnInitDialog()
 	SetI18nListW("Tera Term", m_hWnd, IDC_OPT_TIMESTAMP_TYPE, fopt_timestamp, _countof(fopt_timestamp),
 				 ts.UILanguageFileW, 0);
 
-	// Viewlog Editor path (2005.1.29 yutaka)
-	SetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
+	// Viewlog Editor path
+	SetDlgItemTextW(IDC_VIEWLOG_EDITOR, ts.ViewlogEditorW);
 
 	// Log Default File Name
 	static const wchar_t *logfile_patterns[] = {
@@ -1452,8 +1452,9 @@ void CLogPropPageDlg::OnOKLogFilename()
 
 void CLogPropPageDlg::OnOK()
 {
-	// Viewlog Editor path (2005.1.29 yutaka)
-	GetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor, _countof(ts.ViewlogEditor));
+	// Viewlog Editor path
+	free(ts.ViewlogEditorW);
+	hGetDlgItemTextW(m_hWnd, IDC_VIEWLOG_EDITOR, &ts.ViewlogEditorW);
 
 	// Log Default File Name
 	OnOKLogFilename();

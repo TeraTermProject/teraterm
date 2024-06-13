@@ -458,7 +458,7 @@ struct tttset {
 	char reserve_Locale[80];
 	int reserve_CodePage;
 	int DuplicateSession;
-	char ViewlogEditor[MAX_PATH];
+	char reserve_ViewlogEditor[MAX_PATH];
 	WORD LogTypePlainText;
 	WORD LogTimestamp;
 	char reserve_LogDefaultName[80];		// îpé~,LogDefaultNameW Ç÷à⁄çs
@@ -614,6 +614,7 @@ struct tttset {
 	WORD IniAutoBackup;
 	WORD BracketedSupport;
 	WORD BracketedControlOnly;
+	wchar_t *ViewlogEditorW;
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;
