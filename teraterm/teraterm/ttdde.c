@@ -1372,6 +1372,7 @@ void RunMacroW(const wchar_t *FName, BOOL startup)
 	wchar_t *Cmnd;
 	STARTUPINFOW si;
 	DWORD pri = NORMAL_PRIORITY_CLASS;
+	wchar_t *exe_dir;
 
 	// Control menuからのマクロ呼び出しで、すでにマクロ起動中の場合、
 	// 該当する"ttpmacro"をフラッシュする。
@@ -1384,7 +1385,9 @@ void RunMacroW(const wchar_t *FName, BOOL startup)
 	SetTopic();
 	if (! InitDDE()) return;
 
-	aswprintf(&Cmnd, L"TTPMACRO /D=%hs", TopicName);
+	exe_dir = GetExeDirW(NULL);
+	aswprintf(&Cmnd, L"%s\\TTPMACRO /D=%hs", exe_dir, TopicName);
+	free(exe_dir);
 	if (FName != NULL) {
 		if (wcschr(FName, ' ') != NULL) {
 			// ファイル名にスペースが含まれている -> quote('"'で囲む)する

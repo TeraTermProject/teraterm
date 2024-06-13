@@ -3955,7 +3955,7 @@ static wchar_t *_get_lang_msg(const char *key, const wchar_t *def, const wchar_t
 void CVTWindow::OnReplayLog()
 {
 	wchar_t szFile[MAX_PATH];
-	const wchar_t *exec = L"ttermpro";
+	const wchar_t *exec = L"ttermpro.exe";
 
 	// バイナリモードで採取したログファイルを選択する
 	wchar_t *filter = _get_lang_msg("FILEDLG_OPEN_LOGFILE_FILTER", L"all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW);
@@ -3977,8 +3977,10 @@ void CVTWindow::OnReplayLog()
 		return;
 
 	// "/R"オプション付きでTera Termを起動する（ログが再生される）
+	wchar_t *exe_dir = GetExeDirW(NULL);
 	wchar_t *Command;
-	aswprintf(&Command, L"%s /R=\"%s\"", exec, szFile);
+	aswprintf(&Command, L"%s\\%s /R=\"%s\"", exe_dir, exec, szFile);
+	free(exe_dir);
 
 	STARTUPINFOW si = {};
 	PROCESS_INFORMATION pi = {};
