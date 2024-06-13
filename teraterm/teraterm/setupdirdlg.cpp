@@ -141,9 +141,8 @@ error:
 // return TRUE: success
 //        FALSE: failure
 //
-static BOOL openFileWithApplication(const wchar_t *filename, const char *editor, const wchar_t *UILanguageFile)
+static BOOL openFileWithApplication(const wchar_t *filename, const wchar_t *editor, const wchar_t *UILanguageFile)
 {
-	wchar_t *commandW = NULL;
 	BOOL ret = FALSE;
 
 	if (GetFileAttributesW(filename) == INVALID_FILE_ATTRIBUTES) {
@@ -157,16 +156,15 @@ static BOOL openFileWithApplication(const wchar_t *filename, const char *editor,
 		};
 		TTMessageBoxW(NULL, &info, UILanguageFile, no);
 
-		goto error;
+		return FALSE;
 	}
 
-	aswprintf(&commandW, L"%hs \"%s\"", editor, filename);
+	wchar_t *commandW = NULL;
+	aswprintf(&commandW, L"%s \"%s\"", editor, filename);
 
-	STARTUPINFOW si;
-	PROCESS_INFORMATION pi;
-	memset(&si, 0, sizeof(si));
+	STARTUPINFOW si = {};
+	PROCESS_INFORMATION pi = {};
 	GetStartupInfoW(&si);
-	memset(&pi, 0, sizeof(pi));
 
 	if (CreateProcessW(NULL, commandW, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi) == 0) {
 		// 起動失敗
@@ -365,8 +363,9 @@ static void PopupAndExec(HWND hWnd, const POINT *pointer_pos, const wchar_t *pat
 	switch (result) {
 	case 1: {
 		// アプリで開く
-		const char *editor = pts->ViewlogEditor;
-		openFileWithApplication(path, editor, UILanguageFile);
+		wchar_t *ViewlogEditor = GetViewlogEditor(pts);
+		openFileWithApplication(path, ViewlogEditor, UILanguageFile);
+		free(ViewlogEditor);
 		break;
 	}
 	case 2: {

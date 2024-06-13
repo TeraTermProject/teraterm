@@ -113,6 +113,7 @@
 #include "ttcommdlg.h"
 #include "logdlg.h"
 #include "makeoutputstring.h"
+#include "ttlib_types.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -3903,7 +3904,7 @@ void CVTWindow::OnViewLog()
 	memset(&pi, 0, sizeof(pi));
 
 	wchar_t *command;
-	wchar_t *ViewlogEditor = ToWcharA(ts.ViewlogEditor);
+	wchar_t *ViewlogEditor = GetViewlogEditor(&ts);
 	aswprintf(&command, L"\"%s\" \"%s\"", ViewlogEditor, filename);
 	free(ViewlogEditor);
 
