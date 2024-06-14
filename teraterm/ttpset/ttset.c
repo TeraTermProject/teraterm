@@ -1305,10 +1305,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (GetOnOff(Section, "KmtFileAttr", FName, FALSE))
 		ts->KermitOpt |= KmtOptFileAttr;
 
-	// Enable language selection -- special option
-	if (!GetOnOff(Section, "LanguageSelection", FName, TRUE))
-		ts->MenuFlag |= MF_NOLANGUAGE;
-
 	/* Maximum scroll buffer size  -- special option */
 	ts->ScrollBuffMax =
 		GetPrivateProfileInt(Section, "MaxBuffSize", 10000, FName);
@@ -2761,12 +2757,6 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "KmtLog", FName, (WORD) (ts->LogFlag & LOG_KMT));
 	WriteOnOff(Section, "KmtLongPacket", FName, (WORD) (ts->KermitOpt & KmtOptLongPacket));
 	WriteOnOff(Section, "KmtFileAttr", FName, (WORD) (ts->KermitOpt & KmtOptFileAttr));
-
-	// Enable language selection -- special option
-	if ((ts->MenuFlag & MF_NOLANGUAGE) == 0)
-		WriteOnOff(Section, "LanguageSelection", FName, 1);
-	else
-		WriteOnOff(Section, "LanguageSelection", FName, 0);
 
 	/* Maximum scroll buffer size  -- special option */
 	WriteInt(Section, "MaxBuffSize", FName, ts->ScrollBuffMax);

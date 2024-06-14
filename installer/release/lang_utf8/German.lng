@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2024-05-16 by TeraTerm Project
+date=2024-06-15 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -377,7 +377,6 @@ DLG_SELECT_DIR_TITLE=Neues Verzeichnis wählen
 
 DLG_GEN_TITLE=Tera-Grundeinstellungen
 DLG_GEN_PORT=Standard-Port
-DLG_GEN_LANG=Sprache
 DLG_GEN_LANG_UI=Language&UI:
 
 DLG_HOST_TITLE=Tera Term: Neue Verbindung

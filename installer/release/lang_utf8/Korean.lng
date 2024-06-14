@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2024-05-16 by TeraTerm Project
+date=2024-06-15 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -377,7 +377,6 @@ DLG_SELECT_DIR_TITLE=새로운 경로를 선택하세요
 
 DLG_GEN_TITLE=Tera Term: 일반설정
 DLG_GEN_PORT=기본 포트(&P):
-DLG_GEN_LANG=언어(&L):
 DLG_GEN_LANG_UI=UI 언어(&U):
 
 DLG_HOST_TITLE=Tera Term: 새 연결

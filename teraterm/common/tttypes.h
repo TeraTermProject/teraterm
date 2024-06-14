@@ -158,7 +158,7 @@ enum LogTimestampType {
 // menu flags (used in ts.MenuFlag)
 #define MF_NOSHOWMENU   1
 #define MF_NOPOPUP      2
-#define MF_NOLANGUAGE   4
+//#define MF_NOLANGUAGE   4
 #define MF_SHOWWINMENU  8
 
 // Terminal flags (used in ts.TermFlag)

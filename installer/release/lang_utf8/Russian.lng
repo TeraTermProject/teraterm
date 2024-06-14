@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2024-05-16 by TeraTerm Project
+date=2024-06-15 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -377,7 +377,6 @@ DLG_SELECT_DIR_TITLE=Выбрать новую папку
 
 DLG_GEN_TITLE=Tera Term: Общие настройки
 DLG_GEN_PORT=&Порт:
-DLG_GEN_LANG=&Кодировка:
 DLG_GEN_LANG_UI=&Язык меню:
 
 DLG_HOST_TITLE=Tera Term: Новое соединение

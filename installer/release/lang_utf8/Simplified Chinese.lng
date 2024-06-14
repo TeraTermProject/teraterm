@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2024-05-16 by TeraTerm Project
+date=2024-06-15 by TeraTerm Project
 contributor=LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -377,7 +377,6 @@ DLG_SELECT_DIR_TITLE=选择新文件夹
 
 DLG_GEN_TITLE=Tera Term：常规设置
 DLG_GEN_PORT=端口(&P)：
-DLG_GEN_LANG=语言(&L)：
 DLG_GEN_LANG_UI=界面语言(&U)：
 
 DLG_HOST_TITLE=Tera Term：新建连接
