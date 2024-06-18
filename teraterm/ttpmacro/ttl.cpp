@@ -43,6 +43,7 @@
 #include "ttmlib.h"
 #include "ttlib.h"
 #include "ttmenc.h"
+#include "ttmenc2.h"
 #include "tttypes.h"	// for TitleBuffSize
 #include "ttmonig.h"
 #include <shellapi.h>
@@ -875,6 +876,29 @@ static WORD TTLDelPassword(void)
 	else  // delete password specified by Str2
 		WritePrivateProfileStringW(L"Password", wc::fromUtf8(Str2), NULL, ini);
 	return Err;
+}
+
+// delpassword2 <filename> <password name>
+static WORD TTLDelPassword2(void)
+{
+	TStrVal FileNameStr, KeyStr;
+	WORD Err = 0;
+
+	GetStrVal(FileNameStr, &Err);	// ファイル名
+	GetStrVal(KeyStr, &Err);		// キー名
+	if ((Err == 0) && (GetFirstChar() != 0)) {
+		Err = ErrSyntax;
+	}
+	if (Err != 0) {
+		return Err;
+	}
+	if (FileNameStr[0] == 0) {
+		return ErrSyntax;
+	}
+
+	GetAbsPath(FileNameStr, sizeof(FileNameStr));
+	Encrypt2DelPassword(wc::fromUtf8(FileNameStr), KeyStr);
+	return 0;
 }
 
 static WORD TTLDim(WORD type)
@@ -2574,6 +2598,38 @@ static WORD TTLSetPassword(void)
 	return Err;
 }
 
+// setpassword2 <filename> <password name> <strval> <encryptstr>
+static WORD TTLSetPassword2(void)
+{
+	TStrVal FileNameStr, KeyStr, PassStr, EncryptStr;
+	WORD Err = 0;
+
+	GetStrVal(FileNameStr, &Err);	// ファイル名
+	GetStrVal(KeyStr, &Err);		// キー名
+	GetStrVal(PassStr, &Err);		// パスワード
+	GetStrVal(EncryptStr, &Err);	// パスワード文字列を暗号化するためのパスワード（共通鍵）
+	if ((Err == 0) && (GetFirstChar() != 0)) {
+		Err = ErrSyntax;
+	}
+	if (Err != 0) {
+		return Err;
+	}
+	if (FileNameStr[0] == 0 ||
+		KeyStr[0] == 0 ||
+		PassStr[0] == 0 ||
+		EncryptStr[0] == 0) {
+		return ErrSyntax;
+	}
+
+	GetAbsPath(FileNameStr, sizeof(FileNameStr));
+	if (Encrypt2SetPassword(wc::fromUtf8(FileNameStr), KeyStr, PassStr, EncryptStr) == 0) {
+		SetResult(0);	// 失敗
+		return 0;
+	}
+	SetResult(1);		// 成功
+	return 0;
+}
+
 // ispassword 'password.dat' 'username' ; result: 0=false; 1=true
 static WORD TTLIsPassword(void)
 {
@@ -2608,6 +2664,36 @@ static WORD TTLIsPassword(void)
 
 	SetResult(result);  // 成功可否を設定する。
 	return Err;
+}
+
+// ispassword2 <filename> <password name>
+static WORD TTLIsPassword2(void)
+{
+	TStrVal FileNameStr, KeyStr;
+	WORD Err = 0;
+	int result = 0;
+
+	GetStrVal(FileNameStr, &Err);	// ファイル名
+	GetStrVal(KeyStr, &Err);		// キー名
+	if ((Err == 0) && (GetFirstChar() != 0)) {
+		Err = ErrSyntax;
+	}
+	if (Err != 0) {
+		return Err;
+	}
+	if (FileNameStr[0] == 0 ||
+		KeyStr[0] == 0) {
+		return ErrSyntax;
+	}
+
+	GetAbsPath(FileNameStr, sizeof(FileNameStr));
+	if (Encrypt2IsPassword(wc::fromUtf8(FileNameStr), KeyStr) == 0) {
+		result = 0;		// パスワード無し
+	} else {
+		result = 1;		// パスワード有り
+	}
+	SetResult(result);	// 成功可否を設定する。
+	return 0;
 }
 
 static WORD TTLGetSpecialFolder(void)
@@ -5821,6 +5907,8 @@ static int ExecCmnd(void)
 			Err = TTLDoChecksumFile(CRC32); break;
 		case RsvDelPassword:
 			Err = TTLDelPassword(); break;
+		case RsvDelPassword2:
+			Err = TTLDelPassword2(); break;
 		case RsvDirname:
 			Err = TTLDirname(); break;
 		case RsvDirnameBox:
@@ -5932,10 +6020,16 @@ static int ExecCmnd(void)
 			Err = TTLGetModemStatus(); break;
 		case RsvGetPassword:
 			Err = TTLGetPassword(); break;
+		case RsvGetPassword2:
+			Err = TTLGetPassword2(); break;
 		case RsvSetPassword:
 			Err = TTLSetPassword(); break;
+		case RsvSetPassword2:
+			Err = TTLSetPassword2(); break;
 		case RsvIsPassword:
 			Err = TTLIsPassword(); break;
+		case RsvIsPassword2:
+			Err = TTLIsPassword2(); break;
 		case RsvGetSpecialFolder:
 			Err = TTLGetSpecialFolder(); break;
 		case RsvGetTitle:

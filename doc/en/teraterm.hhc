@@ -1617,13 +1617,28 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="delpassword2">
+					<param name="Local" value="html\macro\command\delpassword2.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="getpassword">
 					<param name="Local" value="html\macro\command\getpassword.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="getpassword2">
+					<param name="Local" value="html\macro\command\getpassword2.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="ispassword">
 					<param name="Local" value="html\macro\command\ispassword.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="ispassword2">
+					<param name="Local" value="html\macro\command\ispassword2.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -1634,6 +1649,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="setpassword">
 					<param name="Local" value="html\macro\command\setpassword.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="setpassword2">
+					<param name="Local" value="html\macro\command\setpassword2.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 			</UL>

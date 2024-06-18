@@ -224,6 +224,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		break;
 	case 'd':
 		if (_stricmp(Str,"delpassword")==0) *WordId = RsvDelPassword;
+		else if (_stricmp(Str,"delpassword2")==0) *WordId = RsvDelPassword2;
 		else if (_stricmp(Str,"disconnect")==0) *WordId = RsvDisconnect;
 		else if (_stricmp(Str,"dispstr")==0) *WordId = RsvDispStr;
 		else if (_stricmp(Str,"do")==0) *WordId = RsvDo;
@@ -285,6 +286,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"getipv6addr")==0) *WordId = RsvGetIPv6Addr;
 		else if (_stricmp(Str,"getmodemstatus") == 0) *WordId = RsvGetModemStatus;
 		else if (_stricmp(Str,"getpassword")==0) *WordId = RsvGetPassword;
+		else if (_stricmp(Str,"getpassword2")==0) *WordId = RsvGetPassword2;
 		else if (_stricmp(Str,"getspecialfolder")==0) *WordId = RsvGetSpecialFolder;
 		else if (_stricmp(Str,"gettime")==0) *WordId = RsvGetTime;
 		else if (_stricmp(Str,"gettitle")==0) *WordId = RsvGetTitle;
@@ -300,6 +302,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"int2str")==0) *WordId = RsvInt2Str;
 		else if (_stricmp(Str,"intdim")==0) *WordId = RsvIntDim;
 		else if (_stricmp(Str,"ispassword")==0) *WordId = RsvIsPassword;    // add 'ispassword'  (2012.5.24 yutaka)
+		else if (_stricmp(Str,"ispassword2")==0) *WordId = RsvIsPassword2;
 		break;
 	case 'k':
 		if (_stricmp(Str,"kmtfinish")==0) *WordId = RsvKmtFinish;
@@ -379,6 +382,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"setexitcode")==0) *WordId = RsvSetExitCode;
 		else if (_stricmp(Str,"setflowctrl")==0) *WordId = RsvSetFlowCtrl;
 		else if (_stricmp(Str,"setpassword")==0) *WordId = RsvSetPassword;    // add 'setpassword'  (2012.5.23 yutaka)
+		else if (_stricmp(Str,"setpassword2")==0) *WordId = RsvSetPassword2;
 		else if (_stricmp(Str,"setrts")==0) *WordId = RsvSetRts;    // add 'setrts'  (2008.3.12 maya)
 		else if (_stricmp(Str,"setspeed")==0) *WordId = RsvSetBaud;
 		else if (_stricmp(Str,"setsync")==0) *WordId = RsvSetSync;

@@ -41,6 +41,8 @@
 #include "ttmlib.h"
 #include "ttlib.h"
 #include "ttmenc.h"
+#include "ttmenc2.h"
+#include "tttypes.h"
 #include "ttmacro.h"
 #include "ttl.h"
 #include "ttl_gui.h"
@@ -245,6 +247,57 @@ WORD TTLGetPassword()
 
 	SetResult(result);  // 成功可否を設定する。
 	return Err;
+}
+
+// getpassword2 <filename> <password name> <strvar> <encryptstr>
+WORD TTLGetPassword2()
+{
+	TStrVal FileNameStr, KeyStr, EncryptStr;
+	TVarId PassStr;
+	TStrVal inputU8;
+	WORD Err = 0;
+	int result = 0;
+
+	GetStrVal(FileNameStr, &Err);	// ファイル名
+	GetStrVal(KeyStr, &Err);		// キー名
+	GetStrVar(&PassStr, &Err);		// パスワード更新時にパスワードを格納する変数
+	SetStrVal(PassStr, "");
+	GetStrVal(EncryptStr, &Err);	// パスワード文字列を暗号化するためのパスワード（共通鍵）
+	if ((Err == 0) && (GetFirstChar() != 0)) {
+		Err = ErrSyntax;
+	}
+	if (Err != 0) {
+		return Err;
+	}
+	if (FileNameStr[0] == 0 ||
+		KeyStr[0] == 0 ||
+		EncryptStr[0] == 0) {
+		return ErrSyntax;
+	}
+
+	GetAbsPath(FileNameStr, sizeof(FileNameStr));
+	if (Encrypt2IsPassword(wc::fromUtf8(FileNameStr), KeyStr) == 0) {
+		// キー名にマッチするエントリ無し
+		wchar_t inputW[MaxStrLen] = {};
+		wc key = wc::fromUtf8(KeyStr);
+		size_t inputU8len = sizeof(inputU8);
+
+		OpenInpDlg(inputW, key, L"Enter password", L"", TRUE);
+		WideCharToUTF8(inputW, NULL, inputU8, &inputU8len);
+		if (inputU8[0] != 0) {
+			result = Encrypt2SetPassword(wc::fromUtf8(FileNameStr), KeyStr, inputU8, EncryptStr);
+		}
+	} else {
+		// キー名にマッチするエントリ有り
+		result = Encrypt2GetPassword(wc::fromUtf8(FileNameStr), KeyStr, inputU8, EncryptStr);
+	}
+
+	// パスワード入力がないときは変数を更新しない
+	if (result == 1) {
+		SetStrVal(PassStr, inputU8);
+	}
+	SetResult(result);	// 成功可否を設定する。
+	return 0;
 }
 
 WORD TTLInputBox(BOOL Paswd)

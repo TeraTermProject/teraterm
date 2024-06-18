@@ -4,6 +4,7 @@ project(${PACKAGE_NAME})
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_libressl.cmake)
 
 add_executable(
   ${PACKAGE_NAME} WIN32
@@ -34,7 +35,9 @@ add_executable(
   ttmdlg.cpp
   ttmdlg.h
   ttmenc.c
+  ttmenc2.c
   ttmenc.h
+  ttmenc2.h
   ttmlib.c
   ttmlib.h
   ttmmain.cpp
@@ -104,6 +107,7 @@ target_include_directories(
   PRIVATE
   ${ONIGURUMA_INCLUDE_DIRS}
   ${SFMT_INCLUDE_DIRS}
+  ${LIBRESSL_INCLUDE_DIRS}
   )
 
 if (MSVC)
@@ -117,6 +121,7 @@ target_link_libraries(
   ttpcmn
   ${ONIGURUMA_LIB}
   ${SFMT_LIB}
+  ${LIBRESSL_LIB}
   )
 
 if(SUPPORT_OLD_WINDOWS)
@@ -134,6 +139,7 @@ target_link_libraries(
   comctl32
   gdi32
   comdlg32
+  bcrypt
 )
 
 if(MSVC)

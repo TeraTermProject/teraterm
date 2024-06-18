@@ -52,6 +52,9 @@
     <ClCompile Include="ttmenc.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
+    <ClCompile Include="ttmenc2.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
     <ClCompile Include="ttmlib.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
@@ -109,6 +112,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ttmenc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttmenc2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ttmlib.h">
