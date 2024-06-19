@@ -492,7 +492,8 @@ static WORD TTLBringupBox(void)
 static WORD TTLCall(void)
 {
 	TName LabName;
-	WORD Err, VarType;
+	WORD Err;
+	TVariableType VarType;
 	TVarId VarId;
 
 	if (GetLabelName(LabName) && (GetFirstChar()==0)) {
@@ -903,7 +904,8 @@ static WORD TTLDelPassword2(void)
 
 static WORD TTLDim(WORD type)
 {
-	WORD Err, WordId, VarType;
+	WORD Err, WordId;
+	TVariableType VarType;
 	TName Name;
 	TVarId VarId;
 	int size;
@@ -955,7 +957,8 @@ static WORD TTLDisconnect(void)
 static WORD TTLDispStr(void)
 {
 	TStrVal Str, buff;
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	int Val;
 
 	if (! Linked)
@@ -2936,7 +2939,8 @@ static WORD TTLGetVer(void)
 static WORD TTLGoto(void)
 {
 	TName LabName;
-	WORD Err, VarType;
+	WORD Err;
+	TVariableType VarType;
 	TVarId VarId;
 
 	if (GetLabelName(LabName) && (GetFirstChar()==0))
@@ -2958,7 +2962,8 @@ static WORD TTLGoto(void)
 // add 'ifdefined' (2006.9.23 maya)
 static WORD TTLIfDefined(void)
 {
-	WORD VarType, Err;
+	WORD Err;
+	TVariableType VarType;
 	int Val;
 
 	GetVarType(&VarType,&Val,&Err);
@@ -2993,7 +2998,8 @@ static BOOL CheckThen(LPWORD Err)
 
 static WORD TTLIf(void)
 {
-	WORD Err, ValType, Tmp, WId;
+	WORD Err, Tmp, WId;
+	TVariableType ValType;
 	int Val;
 
 	if (! GetExpression(&ValType,&Val,&Err))
@@ -3440,7 +3446,7 @@ static WORD TTLRandom(void)
 static WORD TTLRecvLn(void)
 {
 	TStrVal Str;
-	WORD ValType;
+	TVariableType ValType;
 	TVarId VarId;
 	int TimeOut;
 
@@ -3812,7 +3818,8 @@ static WORD TTLRotateRight(void)
 static WORD GetParamStrings(void)
 {
 	TStrVal Str;
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	int Val;
 	BOOL EndOfLine;
 
@@ -3923,7 +3930,8 @@ static void AddBroadcastString(char *dst, int dstlen, const char *src)
 static WORD GetBroadcastString(char *buff, int bufflen, BOOL crlf)
 {
 	TStrVal Str;
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	int Val;
 	char tmp[3];
 
@@ -4901,7 +4909,8 @@ static WORD TTLStrRemove(void)
 
 static WORD TTLStrReplace(void)
 {
-	WORD Err, VarType;
+	WORD Err;
+	TVariableType VarType;
 	TVarId DestVarId;
 	TStrVal oldstr;
 	TStrVal newstr;
@@ -5182,7 +5191,7 @@ static WORD TTLStrJoin(void)
 	TStrVal delimchars, buf;
 	WORD Err;
 	TVarId TargetVarId;
-	WORD VarType;
+	TVariableType VarType;
 	int maxvar;
 	int i;
 	BOOL ary = FALSE;
@@ -5353,7 +5362,8 @@ static WORD TTLUptime(void)
 static WORD TTLWait(BOOL Ln)
 {
 	TStrVal Str;
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	TVarId VarId;
 	int i, Val;
 	int TimeOut;
@@ -5448,7 +5458,8 @@ static WORD TTLWaitRegex(BOOL Ln)
 
 static WORD TTLWaitEvent(void)
 {
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	TVarId VarId;
 	int TimeOut;
 
@@ -5481,7 +5492,8 @@ static WORD TTLWaitEvent(void)
 
 static WORD TTLWaitN(void)
 {
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	TVarId VarId;
 	int TimeOut, WaitBytes;
 
@@ -5524,7 +5536,7 @@ static WORD TTLWaitRecv(void)
 	TStrVal Str;
 	WORD Err;
 	int Pos, Len, TimeOut;
-	WORD VarType;
+	TVariableType VarType;
 	TVarId VarId;
 
 	Err = 0;
@@ -5762,9 +5774,8 @@ static int ExecCmnd(void)
 	BOOL StrConst, E, WithIndex, Result;
 	TStrVal Str;
 	TName Cmnd;
-	WORD ValType, VarType;
-	TVarId VarId;
-	int Val, Index;
+	TVariableType ValType, VarType;
+	int Val;
 
 	Err = 0;
 
@@ -6263,6 +6274,7 @@ static int ExecCmnd(void)
 			Err = ErrSyntax;
 		}
 	else if (GetIdentifier(Cmnd)) {
+		int Index;
 		if (GetIndex(&Index, &Err)) {
 			WithIndex = TRUE;
 		}
@@ -6279,6 +6291,7 @@ static int ExecCmnd(void)
 					Err = ErrSyntax;
 
 			if (!Err) {
+				TVarId VarId;
 				if (CheckVar(Cmnd,&VarType,&VarId)) {
 					if (WithIndex) {
 						switch (VarType) {
@@ -6365,7 +6378,7 @@ void Exec(void)
 // (2005.10.7 yutaka)
 void SetMatchStr(PCHAR Str)
 {
-	WORD VarType;
+	TVariableType VarType;
 	TVarId VarId;
 
 	if (CheckVar("matchstr",&VarType,&VarId) &&
@@ -6377,7 +6390,7 @@ void SetMatchStr(PCHAR Str)
 // (2005.10.15 yutaka)
 void SetGroupMatchStr(int no, const char *Str)
 {
-	WORD VarType;
+	TVariableType VarType;
 	TVarId VarId;
 	char buf[128];
 	const char *p;
@@ -6396,7 +6409,7 @@ void SetGroupMatchStr(int no, const char *Str)
 
 void SetInputStr(const char *Str)
 {
-	WORD VarType;
+	TVariableType VarType;
 	TVarId VarId;
 
 	if (CheckVar("inputstr",&VarType,&VarId) &&
@@ -6406,8 +6419,8 @@ void SetInputStr(const char *Str)
 
 void SetResult(int ResultCode)
 {
-  WORD VarType;
-  TVarId VarId;
+	TVariableType VarType;
+	TVarId VarId;
 
 	if (CheckVar("result",&VarType,&VarId) &&
 	    (VarType==TypInteger))

@@ -68,19 +68,9 @@ typedef struct {
 	WORD level;
 } TLab;
 
-typedef enum {
-	TypeUnknown = TypUnknown,
-	TypeInteger = TypInteger,
-	//TypeLogical = TypLogical,
-	TypeString = TypString,
-	TypeLabel = TypLabel,
-	TypeIntArray = TypIntArray,
-	TypeStrArray = TypStrArray,
-} VariableType_t;
-
 typedef struct {
 	char *Name;
-	VariableType_t Type;
+	TVariableType Type;
 	union {
 		char *Str;
 		int Int;
@@ -858,7 +848,7 @@ BOOL GetNumber(int *Num)
 	return TRUE;
 }
 
-BOOL CheckVar(const char *Name, LPWORD VarType, PVarId VarId)
+BOOL CheckVar(const char *Name, TVariableType *VarType, PVarId VarId)
 {
 	int i;
 	const Variable_t *v = Variables;
@@ -874,7 +864,7 @@ BOOL CheckVar(const char *Name, LPWORD VarType, PVarId VarId)
 	return FALSE;
 }
 
-static Variable_t *NewVar(const char *name, VariableType_t type)
+static Variable_t *NewVar(const char *name, TVariableType type)
 {
 	Variable_t *new_v = (Variable_t * )realloc(Variables, sizeof(Variable_t) * (VariableCount + 1));
 	if (new_v == NULL) {
@@ -982,7 +972,7 @@ void CopyLabel(WORD ILabel, BINT *Ptr, LPWORD Level)
  *   Evaluate following operator.
  *     not, ~, !, +(unary), -(unary)
  */
-BOOL GetFactor(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL GetFactor(TVariableType *ValType, int *Val, LPWORD Err)
 {
 	TName Name;
 	WORD P, WId;
@@ -1084,9 +1074,10 @@ BOOL GetFactor(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     *, /, %
  */
-BOOL EvalMultiplication(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalMultiplication(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1145,9 +1136,10 @@ BOOL EvalMultiplication(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     +, -
  */
-BOOL EvalAddition(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalAddition(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1199,9 +1191,10 @@ BOOL EvalAddition(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     >>, <<, >>>
  */
-BOOL EvalBitShift(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalBitShift(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1273,9 +1266,10 @@ BOOL EvalBitShift(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     &
  */
-BOOL EvalBitAnd(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalBitAnd(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1320,9 +1314,10 @@ BOOL EvalBitAnd(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     ^
  */
-BOOL EvalBitXor(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalBitXor(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1367,9 +1362,10 @@ BOOL EvalBitXor(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     |
  */
-BOOL EvalBitOr(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalBitOr(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1414,9 +1410,10 @@ BOOL EvalBitOr(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     <, >, <=, >=
  */
-BOOL EvalGreater(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalGreater(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1472,9 +1469,10 @@ BOOL EvalGreater(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     =, ==, <>, !=
  */
-BOOL EvalEqual(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalEqual(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1526,9 +1524,10 @@ BOOL EvalEqual(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     &&
  */
-BOOL EvalLogicalAnd(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalLogicalAnd(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1573,9 +1572,10 @@ BOOL EvalLogicalAnd(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     ||
  */
-BOOL GetExpression(LPWORD ValType, int *Val, LPWORD Err)
+BOOL GetExpression(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P1, P2, Type, Er;
+	WORD P1, P2, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1630,7 +1630,7 @@ BOOL GetExpression(LPWORD ValType, int *Val, LPWORD Err)
 
 void GetIntVal(int *Val, LPWORD Err)
 {
-	WORD ValType;
+	TVariableType ValType;
 
 	UpdateLineParsePtr();
 
@@ -1674,7 +1674,7 @@ int CopyIntVal(TVarId VarId)
 void GetIntVar(PVarId VarId, LPWORD Err)
 {
 	TName Name;
-	WORD VarType;
+	TVariableType VarType;
 	int Index;
 
 	if (*Err!=0) return;
@@ -1723,7 +1723,7 @@ void GetStrVal(PCHAR Str, LPWORD Err)
  */
 void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion)
 {
-	WORD VarType;
+	TVariableType VarType;
 	int VarId;
 
 	Str[0] = 0;
@@ -1754,7 +1754,7 @@ void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion)
 void GetStrVar(PVarId VarId, LPWORD Err)
 {
 	TName Name;
-	WORD VarType;
+	TVariableType VarType;
 	int Index;
 
 	if (*Err!=0) return;
@@ -1828,7 +1828,7 @@ const char *StrVarPtr(TVarId VarId)
 }
 
 // for ifdefined (2006.9.23 maya)
-void GetVarType(LPWORD ValType, int *Val, LPWORD Err)
+void GetVarType(TVariableType *ValType, int *Val, LPWORD Err)
 {
 	TName Name;
 	WORD WId;
@@ -1933,7 +1933,7 @@ void GetAryVar(PVarId VarId, WORD VarType, LPWORD Err)
 
 void GetAryVarByName(PVarId VarId, const char *Name, WORD VarType, LPWORD Err)
 {
-	WORD typ;
+	TVariableType typ;
 
 	if (CheckVar(Name, &typ, VarId)) {
 		if (typ != VarType) {

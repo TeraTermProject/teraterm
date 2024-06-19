@@ -128,7 +128,8 @@ WORD TTLVar2Clipb()
 WORD TTLFilenameBox()
 {
 	TStrVal Str1;
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	TVarId VarId;
 	BOOL SaveFlag = FALSE;
 	TStrVal InitDir = "";
@@ -303,7 +304,8 @@ WORD TTLGetPassword2()
 WORD TTLInputBox(BOOL Paswd)
 {
 	TStrVal Str1, Str2, Str3;
-	WORD Err, ValType, P;
+	WORD Err, P;
+	TVariableType ValType;
 	TVarId VarId;
 	int sp = 0;
 
@@ -353,7 +355,8 @@ WORD TTLInputBox(BOOL Paswd)
 WORD TTLDirnameBox()
 {
 	TStrVal Title;
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	TVarId VarId;
 	TStrVal InitDir = "";
 	BOOL ret;
