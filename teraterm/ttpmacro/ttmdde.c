@@ -371,6 +371,7 @@ void DDEOut(const char *B)
 /**
  *	TeraTermへバイナリを送信
  */
+#if USE_EXECUTE
 static void SendBinaryTTExecute(const uint8_t *ptr, size_t len)
 {
 	size_t encoded_len;
@@ -378,7 +379,7 @@ static void SendBinaryTTExecute(const uint8_t *ptr, size_t len)
 	DdeClientTransaction(encoded_bin, encoded_len, ConvH, 0, 0, XTYP_EXECUTE, 1000, NULL);
 	free(encoded_bin);
 }
-
+#else
 static void SendBinaryTTPoke(const uint8_t *ptr, size_t len)
 {
 	size_t encoded_len;
@@ -408,6 +409,7 @@ static void SendBinaryTTPoke(const uint8_t *ptr, size_t len)
 
 	free(encoded_bin);
 }
+#endif
 
 static void DDESendRaw(uint8_t command, const char *ptr, size_t len)
 {
