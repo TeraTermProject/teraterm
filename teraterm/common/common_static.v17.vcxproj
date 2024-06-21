@@ -135,6 +135,7 @@
     <ClCompile Include="asprintf.cpp" />
     <ClCompile Include="codeconv_mb.cpp" />
     <ClCompile Include="comportinfo.cpp" />
+    <ClCompile Include="ddelib.cpp" />
     <ClCompile Include="dlglib.c" />
     <ClCompile Include="dlglib_cpp.cpp" />
     <ClCompile Include="dlglib_tmpl.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="getcontent.cpp" />
     <ClCompile Include="i18n_static.c" />
     <ClCompile Include="ttcommdlg.cpp" />
+    <ClCompile Include="ttdebug.cpp" />
     <ClCompile Include="ttgdiplus.cpp" />
     <ClCompile Include="ttknownfolders.c" />
     <ClCompile Include="ttlib.c" />
@@ -171,6 +173,7 @@
     <ClInclude Include="asprintf.h" />
     <ClInclude Include="codeconv_mb.h" />
     <ClInclude Include="comportinfo.h" />
+    <ClInclude Include="ddelib.h" />
     <ClInclude Include="dlglib.h" />
     <ClInclude Include="fileread.h" />
     <ClInclude Include="inifile_com.h" />
@@ -186,6 +189,7 @@
     <ClInclude Include="getcontent.h" />
     <ClInclude Include="tmfc_propdlg.h" />
     <ClInclude Include="ttcommon.h" />
+    <ClInclude Include="ttdebug.h" />
     <ClInclude Include="ttgdiplus.h" />
     <ClInclude Include="ttknownfolders.h" />
     <ClInclude Include="ttlib.h" />

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2024-04-13 by TeraTerm Project
+date=2024-06-15 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -377,7 +377,6 @@ DLG_SELECT_DIR_TITLE=புதிய கோப்பகத்தைத் தே
 
 DLG_GEN_TITLE=தேரா முனை: பொது அமைப்பு
 DLG_GEN_PORT=இயல்புநிலை &துறைமுகம்:
-DLG_GEN_LANG=&மொழி:
 DLG_GEN_LANG_UI=மொழி இடைமுகம்:
 
 DLG_HOST_TITLE=தேரா முனை: புதிய இணைப்பு
@@ -387,7 +386,7 @@ DLG_HOST_TCPIPPROTOCOL=இநெ பதிப்பு:
 DLG_HOST_SERIAL=&தொடர்
 DLG_HOST_SERIALPORT=துறைமுகம்:
 
-DLG_KEYB_TITLE=தேரா முனை: விசைப்பலகை அமைவு
+DLG_KEYB_TITLE=விசைப்பலகை அமைவு
 DLG_KEYB_TRANSMIT=நீக்கை அனுப்பு:
 DLG_KEYB_BS=&பின்வெளி விசை
 DLG_KEYB_DEL=&நீக்கு விசை

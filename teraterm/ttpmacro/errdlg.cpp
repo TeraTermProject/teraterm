@@ -35,8 +35,8 @@
 #include "teraterm.h"
 #include "ttlib.h"
 #include "ttm_res.h"
-#include "tttypes.h"
-#include "ttcommon.h"
+#include "tttypes.h"		// for ttcommon.h
+#include "ttcommon.h"		// for OpenHelp()
 #include "helpid.h"
 #include "ttmlib.h"
 #include "ttmparse.h"
@@ -75,7 +75,7 @@ BOOL CErrDlg::OnInitDialog()
 	};
 	wchar_t buf[MaxLineLen*2];
 
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFileW);
 
 	SetDlgItemTextW(IDC_ERRMSG,MsgStr);
 
@@ -110,7 +110,9 @@ BOOL CErrDlg::OnInitDialog()
 
 void CErrDlg::OnBnClickedMacroerrhelp()
 {
+	char *UILanguageFile = ToCharW(UILanguageFileW);
 	OpenHelp(HH_HELP_CONTEXT, HlpMacroAppendixesError, UILanguageFile);
+	free(UILanguageFile);
 }
 
 BOOL CErrDlg::OnCommand(WPARAM wp, LPARAM lp)

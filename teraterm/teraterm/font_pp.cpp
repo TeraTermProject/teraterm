@@ -312,7 +312,7 @@ HPROPSHEETPAGE FontPageCreate(HINSTANCE inst, TTTSet *pts)
 	// ’ common/tt_res.h ‚Æ font_pp_res.h ‚Å’l‚ðˆê’v‚³‚¹‚é‚±‚Æ
 	const int id = IDD_TABSHEET_FONT;
 
-	FontPPData *Param = (FontPPData *)calloc(sizeof(FontPPData), 1);
+	FontPPData *Param = (FontPPData *)calloc(1, sizeof(FontPPData));
 	Param->hInst = inst;
 	Param->UILanguageFileW = pts->UILanguageFileW;
 	Param->pts = pts;

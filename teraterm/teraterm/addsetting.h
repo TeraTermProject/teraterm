@@ -28,11 +28,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
 #include "tmfc.h"
 #include "tmfc_propdlg.h"
-#include "tt_res.h"
-#include "teraterm.h"
-#include "tipwin.h"
+#endif
 
 typedef struct {
 	const char *name;
@@ -41,67 +40,7 @@ typedef struct {
 
 extern const mouse_cursor_t MouseCursor[];
 
-// Control Sequence Page
-class CSequencePropPageDlg : public TTCPropertyPage
-{
-public:
-	CSequencePropPageDlg(HINSTANCE inst);
-	virtual ~CSequencePropPageDlg();
-private:
-	void OnInitDialog();
-	void OnOK();
-	enum { IDD = IDD_TABSHEET_SEQUENCE };
-	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	void OnHelp();
-};
-
-// Copypaste Page
-class CCopypastePropPageDlg : public TTCPropertyPage
-{
-public:
-	CCopypastePropPageDlg(HINSTANCE inst);
-	virtual ~CCopypastePropPageDlg();
-private:
-	void OnInitDialog();
-	void OnOK();
-	enum { IDD = IDD_TABSHEET_COPYPASTE };
-	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	void OnHelp();
-};
-
-// Cygwin Page
-extern "C" {
-typedef struct cygterm {
-	char term[128];
-	char term_type[80];
-	char port_start[80];
-	char port_range[80];
-	char shell[80];
-	char env1[128];
-	char env2[128];
-	BOOL login_shell;
-	BOOL home_chdir;
-	BOOL agent_proxy;
-} cygterm_t;
-
-void ReadCygtermConfFile(const char *homedir, cygterm_t *psettings);
-BOOL WriteCygtermConfFile(const char *homedir, cygterm_t *psettings);
-BOOL CmpCygtermConfFile(const cygterm_t *a, const cygterm_t *b);
-}
-
-class CCygwinPropPageDlg : public TTCPropertyPage
-{
-public:
-	CCygwinPropPageDlg(HINSTANCE inst);
-	virtual ~CCygwinPropPageDlg();
-private:
-	void OnInitDialog();
-	void OnOK();
-	enum { IDD = IDD_TABSHEET_CYGWIN };
-	cygterm_t settings;
-	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	void OnHelp();
-};
+#ifdef __cplusplus
 
 // AddSetting Property Sheet
 class CAddSettingPropSheetDlg: public TTCPropSheetDlg
@@ -113,6 +52,7 @@ public:
 		DefaultPage,
 		CodingPage,
 		FontPage,
+		KeyboardPage,
 	};
 	void SetStartPage(Page page);
 
@@ -120,3 +60,11 @@ private:
 	int m_PageCountCPP;
 	TTCPropertyPage *m_Page[7];
 };
+#endif // __cplusplus
+
+typedef enum {
+	DefaultPage,
+	CodingPage,
+	FontPage,
+	KeyboardPage,
+} CAddSettingPropSheetDlgPage;

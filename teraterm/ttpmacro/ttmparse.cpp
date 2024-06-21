@@ -68,19 +68,9 @@ typedef struct {
 	WORD level;
 } TLab;
 
-typedef enum {
-	TypeUnknown = TypUnknown,
-	TypeInteger = TypInteger,
-	//TypeLogical = TypLogical,
-	TypeString = TypString,
-	TypeLabel = TypLabel,
-	TypeIntArray = TypIntArray,
-	TypeStrArray = TypStrArray,
-} VariableType_t;
-
 typedef struct {
 	char *Name;
-	VariableType_t Type;
+	TVariableType Type;
 	union {
 		char *Str;
 		int Int;
@@ -224,6 +214,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		break;
 	case 'd':
 		if (_stricmp(Str,"delpassword")==0) *WordId = RsvDelPassword;
+		else if (_stricmp(Str,"delpassword2")==0) *WordId = RsvDelPassword2;
 		else if (_stricmp(Str,"disconnect")==0) *WordId = RsvDisconnect;
 		else if (_stricmp(Str,"dispstr")==0) *WordId = RsvDispStr;
 		else if (_stricmp(Str,"do")==0) *WordId = RsvDo;
@@ -285,6 +276,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"getipv6addr")==0) *WordId = RsvGetIPv6Addr;
 		else if (_stricmp(Str,"getmodemstatus") == 0) *WordId = RsvGetModemStatus;
 		else if (_stricmp(Str,"getpassword")==0) *WordId = RsvGetPassword;
+		else if (_stricmp(Str,"getpassword2")==0) *WordId = RsvGetPassword2;
 		else if (_stricmp(Str,"getspecialfolder")==0) *WordId = RsvGetSpecialFolder;
 		else if (_stricmp(Str,"gettime")==0) *WordId = RsvGetTime;
 		else if (_stricmp(Str,"gettitle")==0) *WordId = RsvGetTitle;
@@ -300,6 +292,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"int2str")==0) *WordId = RsvInt2Str;
 		else if (_stricmp(Str,"intdim")==0) *WordId = RsvIntDim;
 		else if (_stricmp(Str,"ispassword")==0) *WordId = RsvIsPassword;    // add 'ispassword'  (2012.5.24 yutaka)
+		else if (_stricmp(Str,"ispassword2")==0) *WordId = RsvIsPassword2;
 		break;
 	case 'k':
 		if (_stricmp(Str,"kmtfinish")==0) *WordId = RsvKmtFinish;
@@ -361,6 +354,8 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"sendlnbroadcast")==0) *WordId = RsvSendlnBroadcast;
 		else if (_stricmp(Str,"sendlnmulticast")==0) *WordId = RsvSendlnMulticast;
 		else if (_stricmp(Str,"sendmulticast")==0) *WordId = RsvSendMulticast;
+		else if (_stricmp(Str,"sendtext")==0) *WordId = RsvSendText;
+		else if (_stricmp(Str,"sendbinary")==0) *WordId = RsvSendBinary;
 		else if (_stricmp(Str,"setfileattr")==0) *WordId = RsvSetFileAttr;
 		else if (_stricmp(Str,"setmulticastname")==0) *WordId = RsvSetMulticastName;
 		else if (_stricmp(Str,"sendfile")==0) *WordId = RsvSendFile;
@@ -377,6 +372,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"setexitcode")==0) *WordId = RsvSetExitCode;
 		else if (_stricmp(Str,"setflowctrl")==0) *WordId = RsvSetFlowCtrl;
 		else if (_stricmp(Str,"setpassword")==0) *WordId = RsvSetPassword;    // add 'setpassword'  (2012.5.23 yutaka)
+		else if (_stricmp(Str,"setpassword2")==0) *WordId = RsvSetPassword2;
 		else if (_stricmp(Str,"setrts")==0) *WordId = RsvSetRts;    // add 'setrts'  (2008.3.12 maya)
 		else if (_stricmp(Str,"setspeed")==0) *WordId = RsvSetBaud;
 		else if (_stricmp(Str,"setsync")==0) *WordId = RsvSetSync;
@@ -852,7 +848,7 @@ BOOL GetNumber(int *Num)
 	return TRUE;
 }
 
-BOOL CheckVar(const char *Name, LPWORD VarType, PVarId VarId)
+BOOL CheckVar(const char *Name, TVariableType *VarType, PVarId VarId)
 {
 	int i;
 	const Variable_t *v = Variables;
@@ -868,7 +864,7 @@ BOOL CheckVar(const char *Name, LPWORD VarType, PVarId VarId)
 	return FALSE;
 }
 
-static Variable_t *NewVar(const char *name, VariableType_t type)
+static Variable_t *NewVar(const char *name, TVariableType type)
 {
 	Variable_t *new_v = (Variable_t * )realloc(Variables, sizeof(Variable_t) * (VariableCount + 1));
 	if (new_v == NULL) {
@@ -976,7 +972,7 @@ void CopyLabel(WORD ILabel, BINT *Ptr, LPWORD Level)
  *   Evaluate following operator.
  *     not, ~, !, +(unary), -(unary)
  */
-BOOL GetFactor(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL GetFactor(TVariableType *ValType, int *Val, LPWORD Err)
 {
 	TName Name;
 	WORD P, WId;
@@ -1078,9 +1074,10 @@ BOOL GetFactor(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     *, /, %
  */
-BOOL EvalMultiplication(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalMultiplication(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1139,9 +1136,10 @@ BOOL EvalMultiplication(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     +, -
  */
-BOOL EvalAddition(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalAddition(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1193,9 +1191,10 @@ BOOL EvalAddition(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     >>, <<, >>>
  */
-BOOL EvalBitShift(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalBitShift(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1267,9 +1266,10 @@ BOOL EvalBitShift(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     &
  */
-BOOL EvalBitAnd(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalBitAnd(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1314,9 +1314,10 @@ BOOL EvalBitAnd(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     ^
  */
-BOOL EvalBitXor(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalBitXor(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1361,9 +1362,10 @@ BOOL EvalBitXor(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     |
  */
-BOOL EvalBitOr(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalBitOr(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1408,9 +1410,10 @@ BOOL EvalBitOr(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     <, >, <=, >=
  */
-BOOL EvalGreater(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalGreater(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1466,9 +1469,10 @@ BOOL EvalGreater(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     =, ==, <>, !=
  */
-BOOL EvalEqual(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalEqual(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1520,9 +1524,10 @@ BOOL EvalEqual(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     &&
  */
-BOOL EvalLogicalAnd(LPWORD ValType, int *Val, LPWORD Err)
+static BOOL EvalLogicalAnd(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P, Type, Er;
+	WORD P, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1567,9 +1572,10 @@ BOOL EvalLogicalAnd(LPWORD ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     ||
  */
-BOOL GetExpression(LPWORD ValType, int *Val, LPWORD Err)
+BOOL GetExpression(TVariableType *ValType, int *Val, LPWORD Err)
 {
-	WORD P1, P2, Type, Er;
+	WORD P1, P2, Er;
+	TVariableType Type;
 	int Val1, Val2;
 	WORD WId;
 
@@ -1624,7 +1630,7 @@ BOOL GetExpression(LPWORD ValType, int *Val, LPWORD Err)
 
 void GetIntVal(int *Val, LPWORD Err)
 {
-	WORD ValType;
+	TVariableType ValType;
 
 	UpdateLineParsePtr();
 
@@ -1668,7 +1674,7 @@ int CopyIntVal(TVarId VarId)
 void GetIntVar(PVarId VarId, LPWORD Err)
 {
 	TName Name;
-	WORD VarType;
+	TVariableType VarType;
 	int Index;
 
 	if (*Err!=0) return;
@@ -1717,7 +1723,7 @@ void GetStrVal(PCHAR Str, LPWORD Err)
  */
 void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion)
 {
-	WORD VarType;
+	TVariableType VarType;
 	int VarId;
 
 	Str[0] = 0;
@@ -1748,7 +1754,7 @@ void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion)
 void GetStrVar(PVarId VarId, LPWORD Err)
 {
 	TName Name;
-	WORD VarType;
+	TVariableType VarType;
 	int Index;
 
 	if (*Err!=0) return;
@@ -1797,21 +1803,32 @@ void SetStrVal(TVarId VarId, const char *Str)
 	}
 }
 
+/**
+ *	•¶Žš•Ï”‚Ì“à—e‚ð•Ô‚·
+ */
 const char *StrVarPtr(TVarId VarId)
 {
 	Variable_t *v;
 	if (VarId >> 16) {
+		// •¶Žš—ñ”z—ñ•Ï”
+		const char *strU8;
 		v = &Variables[(VarId>>16)-1];
-		return v->Value.StrAry.val[VarId & 0xffff];
+		strU8 = v->Value.StrAry.val[VarId & 0xffff];
+		if (strU8 == NULL) {
+			// –¢Ý’è‚Ìê‡‚Í nullptr ‚Æ‚È‚Á‚Ä‚¢‚éA""‚ð•Ô‚·
+			strU8 = "";
+		}
+		return strU8;
 	}
 	else {
+		// •¶Žš—ñ
 		v = &Variables[VarId];
 		return v->Value.Str;
 	}
 }
 
 // for ifdefined (2006.9.23 maya)
-void GetVarType(LPWORD ValType, int *Val, LPWORD Err)
+void GetVarType(TVariableType *ValType, int *Val, LPWORD Err)
 {
 	TName Name;
 	WORD WId;
@@ -1916,7 +1933,7 @@ void GetAryVar(PVarId VarId, WORD VarType, LPWORD Err)
 
 void GetAryVarByName(PVarId VarId, const char *Name, WORD VarType, LPWORD Err)
 {
-	WORD typ;
+	TVariableType typ;
 
 	if (CheckVar(Name, &typ, VarId)) {
 		if (typ != VarType) {

@@ -56,6 +56,8 @@
 #include "font_pp.h"
 #include "theme_pp.h"
 #include "general_pp.h"
+#include "keyboard_pp.h"
+#include "mouse_pp.h"
 
 #include "addsetting.h"
 
@@ -69,6 +71,18 @@ const mouse_cursor_t MouseCursor[] = {
 #define MOUSE_CURSOR_MAX (sizeof(MouseCursor)/sizeof(MouseCursor[0]) - 1)
 
 // CSequencePropPageDlg ダイアログ
+class CSequencePropPageDlg : public TTCPropertyPage
+{
+public:
+	CSequencePropPageDlg(HINSTANCE inst);
+	virtual ~CSequencePropPageDlg();
+private:
+	void OnInitDialog();
+	void OnOK();
+	enum { IDD = IDD_TABSHEET_SEQUENCE };
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void OnHelp();
+};
 
 CSequencePropPageDlg::CSequencePropPageDlg(HINSTANCE inst)
 	: TTCPropertyPage(inst, CSequencePropPageDlg::IDD)
@@ -285,6 +299,18 @@ void CSequencePropPageDlg::OnHelp()
 }
 
 // CCopypastePropPageDlg ダイアログ
+class CCopypastePropPageDlg : public TTCPropertyPage
+{
+public:
+	CCopypastePropPageDlg(HINSTANCE inst);
+	virtual ~CCopypastePropPageDlg();
+private:
+	void OnInitDialog();
+	void OnOK();
+	enum { IDD = IDD_TABSHEET_COPYPASTE };
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void OnHelp();
+};
 
 CCopypastePropPageDlg::CCopypastePropPageDlg(HINSTANCE inst)
 	: TTCPropertyPage(inst, CCopypastePropPageDlg::IDD)
@@ -1103,8 +1129,8 @@ void CLogPropPageDlg::OnInitDialog()
 	SetI18nListW("Tera Term", m_hWnd, IDC_OPT_TIMESTAMP_TYPE, fopt_timestamp, _countof(fopt_timestamp),
 				 ts.UILanguageFileW, 0);
 
-	// Viewlog Editor path (2005.1.29 yutaka)
-	SetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
+	// Viewlog Editor path
+	SetDlgItemTextW(IDC_VIEWLOG_EDITOR, ts.ViewlogEditorW);
 
 	// Log Default File Name
 	static const wchar_t *logfile_patterns[] = {
@@ -1426,8 +1452,9 @@ void CLogPropPageDlg::OnOKLogFilename()
 
 void CLogPropPageDlg::OnOK()
 {
-	// Viewlog Editor path (2005.1.29 yutaka)
-	GetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor, _countof(ts.ViewlogEditor));
+	// Viewlog Editor path
+	free(ts.ViewlogEditorW);
+	hGetDlgItemTextW(m_hWnd, IDC_VIEWLOG_EDITOR, &ts.ViewlogEditorW);
 
 	// Log Default File Name
 	OnOKLogFilename();
@@ -1518,6 +1545,19 @@ void CLogPropPageDlg::OnHelp()
 
 #define CYGTERM_FILE "cygterm.cfg"  // CygTerm configuration file
 #define CYGTERM_FILE_MAXLINE 100
+
+typedef struct cygterm {
+	char term[128];
+	char term_type[80];
+	char port_start[80];
+	char port_range[80];
+	char shell[80];
+	char env1[128];
+	char env2[128];
+	BOOL login_shell;
+	BOOL home_chdir;
+	BOOL agent_proxy;
+} cygterm_t;
 
 void ReadCygtermConfFile(const char *homedir, cygterm_t *psettings)
 {
@@ -1790,6 +1830,23 @@ BOOL WriteCygtermConfFile(const char *homedir, cygterm_t *psettings)
 /////////////////////////////
 
 // CCygwinPropPageDlg ダイアログ
+void ReadCygtermConfFile(const char *homedir, cygterm_t *psettings);
+BOOL WriteCygtermConfFile(const char *homedir, cygterm_t *psettings);
+BOOL CmpCygtermConfFile(const cygterm_t *a, const cygterm_t *b);
+
+class CCygwinPropPageDlg : public TTCPropertyPage
+{
+public:
+	CCygwinPropPageDlg(HINSTANCE inst);
+	virtual ~CCygwinPropPageDlg();
+private:
+	void OnInitDialog();
+	void OnOK();
+	enum { IDD = IDD_TABSHEET_CYGWIN };
+	cygterm_t settings;
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void OnHelp();
+};
 
 CCygwinPropPageDlg::CCygwinPropPageDlg(HINSTANCE inst)
 	: TTCPropertyPage(inst, CCygwinPropPageDlg::IDD)
@@ -1955,6 +2012,10 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 	AddPage(page);
 	page = ThemePageCreate(hInstance, &ts);
 	AddPage(page);
+	page = KeyboardPageCreate(hInstance, &ts);
+	AddPage(page);
+	page = MousePageCreate(hInstance, &ts);
+	AddPage(page);
 
 	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFileW);
 	SetCaption(title);
@@ -1970,10 +2031,9 @@ CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 
 void CAddSettingPropSheetDlg::SetStartPage(Page page)
 {
-	int start_page;
+	int start_page = 0;
 	switch (page) {
 	case DefaultPage:
-	default:
 		start_page = 0;
 		break;
 	case CodingPage:
@@ -1981,6 +2041,12 @@ void CAddSettingPropSheetDlg::SetStartPage(Page page)
 		break;
 	case FontPage:
 		start_page = 7;
+		break;
+	case KeyboardPage:
+		start_page = 9;
+		break;
+	default:
+		start_page = 0;
 		break;
 	}
 	TTCPropSheetDlg::SetStartPage(start_page);

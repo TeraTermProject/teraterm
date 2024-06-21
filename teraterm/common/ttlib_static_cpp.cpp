@@ -1010,16 +1010,27 @@ wchar_t *GetFullPathW(const wchar_t *dir, const wchar_t *rel_path)
 }
 
 /**
- *	UILanguageFileのフルパスを取得する
+ *	UILanguage File (lngファイル)のフルパスを取得
+ *	iniファイルから読み込んでフルパスで返す
  *
- *	@param[in]		ExeDir					exe,dllの存在するフォルダ GetExeDir()で取得できる
- *	@param[in]		UILanguageFileRel		lngファイル、ExeDirからの相対パス
- *	@return			LanguageFile			lngファイルのフルパス
- *											不要になったらfree()すること
+ *	@param[in]		iniファイル
+ *	@return			UILanguageFileパス、不要になったらfree()すること
  */
-wchar_t *GetUILanguageFileFullW(const wchar_t *ExeDir, const wchar_t *UILanguageFileRel)
+wchar_t *GetUILanguageFileFullW(const wchar_t *SetupFNameW)
 {
-	return GetFullPathW(ExeDir, UILanguageFileRel);
+	wchar_t *UILanguageFileIni;
+	hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", L"lang\\Default.lng", SetupFNameW, &UILanguageFileIni);
+	if (!IsRelativePathW(UILanguageFileIni)) {
+		// iniファイルにフルパスで書き込まれていた時、そのまま返す
+		return UILanguageFileIni;
+	}
+
+	// UILanguage File のフルパス = ExeDir + 相対パス(iniの値)
+	wchar_t *ExeDirW = GetExeDirW(NULL);
+	wchar_t *UILanguageFileW = GetFullPathW(ExeDirW, UILanguageFileIni);
+	free(UILanguageFileIni);
+	free(ExeDirW);
+	return UILanguageFileW;
 }
 
 /**

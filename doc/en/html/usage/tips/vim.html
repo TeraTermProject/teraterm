@@ -71,7 +71,7 @@ However, when tmux is used, below configuration is needed because Bracketed Past
 
 <p>
 Basically, the host application can not recognize the difference between the user input and pasting from clipboard.
-However, when a user uses the Bracketed Paste Mode as the xterm extension, the application can recognize its difference and a user can change the behavior of pasting from clipboard.
+However, when a user uses the <a href="../../about/glossary.html#Bracketed">Bracketed Paste Mode</a> as the xterm extension, the application can recognize its difference and a user can change the behavior of pasting from clipboard.
 </p>
 
 <p>
@@ -136,12 +136,6 @@ if &amp;term =~ "xterm"
     inoremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
 endif
 </pre>
-
-<h4>About Bracketed Paste mode</h4>
-<p>
-The bracketed paste mode is the xterm extension feature. When this feature is enabled, the pasted text is bracketed with control sequences so that the program can differentiate the pasted text from typed-in text.<br>
-The program will receive: ESC [ 200 ~, followed by the pasted text, followed by ESC [ 201 ~.
-</p>
 
 
 <h2 id="IMEcontrol">Controlling IME</h2>

@@ -64,7 +64,7 @@ static BOOL IsHalfWidthKatakana(unsigned int u32)
 
 OutputCharState *MakeOutputStringCreate(void)
 {
-	OutputCharState *p = (OutputCharState *)calloc(sizeof(*p), 1);
+	OutputCharState *p = (OutputCharState *)calloc(1, sizeof(*p));
 	return p;
 }
 

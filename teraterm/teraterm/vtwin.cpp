@@ -113,6 +113,7 @@
 #include "ttcommdlg.h"
 #include "logdlg.h"
 #include "makeoutputstring.h"
+#include "ttlib_types.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -148,6 +149,8 @@ typedef struct {
 static vtwin_work_t vtwin_work;
 
 extern "C" PrintFile *PrintFile_;
+
+static CVTWindow *pVTWin;
 
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
@@ -489,6 +492,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	SetWindowAlpha(ts.AlphaBlendActive);
 	ShowWindow(CmdShow);
 	ChangeCaret();
+
+	pVTWin = this;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1578,7 +1583,7 @@ typedef struct DropData_tag {
  */
 void CVTWindow::DropInit()
 {
-	DropData_t *data =(DropData_t *)calloc(sizeof(*data), 1);
+	DropData_t *data =(DropData_t *)calloc(1, sizeof(*data));
 	data->DefaultDropType = DROP_TYPE_CANCEL;
 	data->DefaultDropTypePaste = DROP_TYPE_PASTE_ESCAPE;
 	data->DefaultShowDialog = ts.ConfirmFileDragAndDrop ? true : false;
@@ -3899,7 +3904,7 @@ void CVTWindow::OnViewLog()
 	memset(&pi, 0, sizeof(pi));
 
 	wchar_t *command;
-	wchar_t *ViewlogEditor = ToWcharA(ts.ViewlogEditor);
+	wchar_t *ViewlogEditor = GetViewlogEditor(&ts);
 	aswprintf(&command, L"\"%s\" \"%s\"", ViewlogEditor, filename);
 	free(ViewlogEditor);
 
@@ -3946,34 +3951,33 @@ static wchar_t *_get_lang_msg(const char *key, const wchar_t *def, const wchar_t
 	return uimsg;
 }
 
-// ログの再生 (2006.12.13 yutaka)
+// ログの再生
 void CVTWindow::OnReplayLog()
 {
-	wchar_t szFile[MAX_PATH];
-	const wchar_t *exec = L"ttermpro";
+	wchar_t *szFile;
+	const wchar_t *exec = L"ttermpro.exe";
 
 	// バイナリモードで採取したログファイルを選択する
 	wchar_t *filter = _get_lang_msg("FILEDLG_OPEN_LOGFILE_FILTER", L"all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW);
 	wchar_t *title = _get_lang_msg("FILEDLG_OPEN_LOGFILE_TITLE", L"Select replay log file with binary mode", ts.UILanguageFileW);
-	OPENFILENAMEW ofn = {};
-	szFile[0] = 0;
-	ofn.lStructSize = get_OPENFILENAME_SIZEW();
+	TTOPENFILENAMEW ofn = {};
 	ofn.hwndOwner = HVTWin;
 	ofn.lpstrFilter = filter;
-	ofn.lpstrFile = szFile;
-	ofn.nMaxFile = _countof(szFile);
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	ofn.lpstrDefExt = L"log";
 	ofn.lpstrTitle = title;
-	BOOL r = GetOpenFileNameW(&ofn);
+	BOOL r = TTGetOpenFileNameW(&ofn, &szFile);
 	free(filter);
 	free(title);
 	if (r == FALSE)
 		return;
 
 	// "/R"オプション付きでTera Termを起動する（ログが再生される）
+	wchar_t *exe_dir = GetExeDirW(NULL);
 	wchar_t *Command;
-	aswprintf(&Command, L"%s /R=\"%s\"", exec, szFile);
+	aswprintf(&Command, L"%s\\%s /R=\"%s\"", exe_dir, exec, szFile);
+	free(exe_dir);
+	free(szFile);
 
 	STARTUPINFOW si = {};
 	PROCESS_INFORMATION pi = {};
@@ -4270,6 +4274,14 @@ void CVTWindow::OpenExternalSetup(CAddSettingPropSheetDlg::Page page)
 		// コーディングタブで設定が変化したときコールする必要がある
 		SetupTerm();
 	}
+}
+
+/**
+ *	クラス外からその他の設定を開くために追加
+ */
+void OpenExternalSetupOutside(CAddSettingPropSheetDlgPage page)
+{
+	pVTWin->OpenExternalSetup((CAddSettingPropSheetDlg::Page)page);
 }
 
 // Additional settings dialog

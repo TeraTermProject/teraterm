@@ -529,7 +529,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 BOOL WINAPI _SetupWin(HWND WndParent, PTTSet ts)
 {
-	WinDlgWork *work = (WinDlgWork *)calloc(sizeof(*work), 1);
+	WinDlgWork *work = (WinDlgWork *)calloc(1, sizeof(*work));
 	INT_PTR r;
 	work->ts = ts;
 	work->SampleFont = ts->SampleFont;

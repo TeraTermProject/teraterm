@@ -44,7 +44,8 @@
       <li>allow users to select creating automatic backup or not by <a href="../setup/teraterm-misc.html#IniAutoBackup">IniAutoBackup</a> when overwriting the ini file.
       <li><a href="../setup/teraterm-win.html#space">VTFontSpace</a> can be used to adjust to narrow the space between characters.
       <li>Fixed some Emoji which character widths did not change with Override Emoji Characters width option. (Changed referenced Emoji table.)</li>
-      <li>Disabled COM ports are not included when making list of COM ports.</li>
+      <li>Only available COM ports are listed.<br>
+        COM ports that are disabled and failed to initialize are not included.</li>
       <li>improve Broadcast command dialog:
         <ul>
           <li>edit control now support paste by R/M mouse clicking and Shift-INS.</li>
@@ -55,10 +56,25 @@
           <li>fix left click behavior in the margin of window list.</li>
         </ul>
       </li>
-      <li>Default port settings is moved to <a href="../menu/setup-additional.html#Port">General tab</a> of Additional settings dialog.</li>
+      <li>Default port settings is moved to <a href="../menu/setup-additional-general.html#Port">General tab</a> of Additional settings dialog.</li>
       <li>Display lng file information when <a href="../menu/setup-general.html#UILanguageFile">LanguageUI</a> is selected. Remove language setting.</li>
-      <li>Bracket paste behavior can be adjusted with <a href="../setup/teraterm-misc.html#BracketedSupport">BracketedSupport</a> and <a href="../setup/teraterm-misc.html#BracketedControlOnly">BracketedControlOnly</a> .</li>
-      <li>Download folder setting is moved to <a href="../menu/setup-additional.html#DownloadFolder">General tab</a> of Additional settings dialog.</li>
+      <li><a href="glossary.html#Bracketed">Bracket paste</a> behavior can be adjusted with <a href="../setup/teraterm-misc.html#BracketedSupport">BracketedSupport</a> and <a href="../setup/teraterm-misc.html#BracketedControlOnly">BracketedControlOnly</a> .
+        <ul>
+          <li>When pasting string from clipboard that does not contain control codes such as line feeds, characters are not outputted twice in the log with the default settings.</li>
+        </ul>
+      </li>
+      <li>Download folder setting is moved to <a href="../menu/setup-additional-general.html#DownloadFolder">General tab</a> of Additional settings dialog.</li>
+      <li>Modified to <a href="../setup/teraterm-ssh.html#AuthBanner">display SSH authentication banner in VT window</a> regardless of receiving character code.
+      <li>Keyboard setting dialog is moved to Keyboard tab of Additional setting dialog.</li>
+      <li>MACRO: <a href="../macro/command/send.html">send</a> macro command check data and sends it as text or binary. added <a href="../macro/command/sendtext.html">sendtext</a> and <a href="../macro/command/sendbinary.html">sendbinary</a> macro command</li>
+      <li>Macro
+        <ul>
+          <li>added the <a href="../macro/command/setpassword2.html">setpassword2</a> command.</li>
+          <li>added the <a href="../macro/command/getpassword2.html">getpassword2</a> command.</li>
+          <li>added the <a href="../macro/command/ispassword2.html">ispassword2</a> command.</li>
+          <li>added the <a href="../macro/command/delpassword2.html">delpassword2</a> command.</li>
+        </ul>
+      </li>
     </ul>
   </li>
 
@@ -82,9 +98,12 @@
       <li>Fixed wrong characters were sent when transmit character code is JIS.
         <ul>
           <li>Fixed wrong character output at end of line.</li>
-          <li>Fixed wrong character output when local echo is on.<li>
+          <li>Fixed wrong character output when local echo is on.</li>
         </ul>
       </li>
+      <li>MACRO: Fixed path of <a href="../macro/command/basename.html">basename</a> and <a href="../macro/command/dirname.html">dirname</a> macro commands were not Unicode-compatible.</li>
+      <li>MACRO: Fixed <a href="../macro/command/clipb2var.html">clipb2var</a> is not working.</li>
+      <li>MACRO: Fixed ttpmacro.exe crashes when referencing unsetted string array element.</li>
     </ul>
   </li>
 
@@ -507,7 +526,7 @@
       <li>added support for multiple files' drag&amp;drop.</li>
       <li>Functional enhancement: <a href="../usage/mouse.html#dragdropwindow">Confirmation dialog by using drag&amp;drop a file</a>.</li>
       <li>Window size is maximized when the title bar is double-clicked if <a href="../menu/setup-terminal.html#TermIsWin">"Term size = win size"</a> setting is on.</li>
-      <li>added the <a href="../setup/teraterm-win.html#title">Title format configuration</a> on the General tab of the <a href="../menu/setup-additional.html#TitleFormat">Additional settings dialog</a>.</li>
+      <li>added the <a href="../setup/teraterm-win.html#title">Title format configuration</a> on the General tab of the <a href="../menu/setup-additional-general.html#TitleFormat">Additional settings dialog</a>.</li>
     </ul>
   </li>
 
@@ -630,7 +649,7 @@
         </ul></li>
       <li>Hidden font set by OS can be selected with font setting dialog.
         <ul>
-          <li>The setting can be configured on the General tab of <a href="../menu/setup-additional.html#ListHiddenFonts">Additional settings dialog</a>.</li>
+          <li>The setting can be configured on the General tab of <a href="../menu/setup-additional-general.html#ListHiddenFonts">Additional settings dialog</a>.</li>
         </ul></li>
       <li>When the serial port and named pipe can not be opened, the error message contains reason or error code.</li>
       <li>When the <a href="../macro/command/sendlnbroadcast.html">sendlnbroadcast</a> macro command is used, the carriage return is sent one more time after last parameter.</li>
@@ -944,7 +963,7 @@
   <li>Bug fixes
     <ul>
       <li>When the port number is not 23 on local connection, the Cygwin connection starts by Alt+D(Duplicate session) key.</li>
-      <li>When the <a href="../menu/setup-keyboard.html#MetaKey">Meta key</a> is set to left or right, the combination key with the Alt and the cursor/Insert/etc edit keypad can not work well in the KEYBOARD.CNF.</li>
+      <li>When the <a href="../menu/setup-additional-keyboard.html#MetaKey">Meta key</a> is set to left or right, the combination key with the Alt and the cursor/Insert/etc edit keypad can not work well in the KEYBOARD.CNF.</li>
     </ul>
   </li>
 
@@ -2506,7 +2525,7 @@
       <li>Bug fix: last 1 character of title string that is sent from server is deleted.</li>
       <li>Bug fix: TeraTerm would use the configuration of TCPLocalEcho/TCPCRSend when the user start telnet connection on New connection dialog.</li>
       <li>Bug fix: when <a href="../menu/setup-additional.html#EnableContinuedLineCopy">continued line copy</a> is enabled, <a href="../menu/edit.html#copytable">Copy Table</a> does not work correctly</li>
-      <li>Bug fix: when <a href="../menu/setup-keyboard.html#DeleteKey">Transmit DEL by Delete key</a> is enabled and Num Lock status is off, Numeric Keypad "." sends DEL.</li>
+      <li>Bug fix: when <a href="../menu/setup-additional-keyboard.html#DeleteKey">Transmit DEL by Delete key</a> is enabled and Num Lock status is off, Numeric Keypad "." sends DEL.</li>
       <li>Bug fix: '<a href="../macro/command/wait.html">wait</a>' macro command can't wait a long string. This bug was introduced in 4.54.</li>
       <li>Bug fix: The color value on <a href="../menu/setup-window.html">Window setup dialog</a> would become 255 when the value is less than 16 and the user pushes PageUP key.</li>
       <li>Bug fix: COM port description would be wrong when COM port number is forced to switch another number. Special thanks to xoxo-san.</li>

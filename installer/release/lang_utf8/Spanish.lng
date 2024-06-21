@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Spanish
-date=2024-04-13 by TeraTerm Project
+date=2024-06-15 by TeraTerm Project
 contributor=Filiberto Olguin Ascona (2022-05-26)
 
 [Tera Term]
@@ -377,7 +377,6 @@ DLG_SELECT_DIR_TITLE=Select new directory
 
 DLG_GEN_TITLE=Tera Term: General setup
 DLG_GEN_PORT=Default &port:
-DLG_GEN_LANG=&Language:
 DLG_GEN_LANG_UI=Language&UI:
 
 DLG_HOST_TITLE=Tera Term: New connection
@@ -387,7 +386,7 @@ DLG_HOST_TCPIPPROTOCOL=Protoco&l:
 DLG_HOST_SERIAL=&Serial
 DLG_HOST_SERIALPORT=Po&rt:
 
-DLG_KEYB_TITLE=Tera Term: Keyboard setup
+DLG_KEYB_TITLE=Keyboard
 DLG_KEYB_TRANSMIT=Transmit DEL by:
 DLG_KEYB_BS=&Backspace key
 DLG_KEYB_DEL=&Delete key

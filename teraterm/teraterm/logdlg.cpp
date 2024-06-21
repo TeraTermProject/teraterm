@@ -470,7 +470,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
  */
 BOOL FLogOpenDialog(HINSTANCE hInst_, HWND hWnd, FLogDlgInfo_t *info)
 {
-	LogDlgWork_t *work = (LogDlgWork_t *)calloc(sizeof(LogDlgWork_t), 1);
+	LogDlgWork_t *work = (LogDlgWork_t *)calloc(1, sizeof(LogDlgWork_t));
 	work->info = info;
 	work->pts = info->pts;
 	work->pcv = info->pcv;

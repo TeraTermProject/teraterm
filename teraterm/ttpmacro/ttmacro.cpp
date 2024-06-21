@@ -42,6 +42,7 @@
 #include "dllutil.h"
 #include "codeconv.h"
 #include "win32helper.h"
+#include "ttdebug.h"
 
 #include "ttm_res.h"
 #include "ttmmain.h"
@@ -55,7 +56,6 @@
 #endif
 
 wchar_t *UILanguageFileW;
-char UILanguageFile[MAX_PATH];
 static wchar_t *SetupFNameW;
 static HWND CtrlWnd;
 static HINSTANCE hInst;
@@ -78,11 +78,7 @@ static void init()
 	HomeDirW = GetHomeDirW(hInst);
 	SetupFNameW = GetDefaultFNameW(HomeDirW, L"TERATERM.INI");
 
-	wchar_t *UILanguageFileRel;
-	hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", L"lang\\Default.lng", SetupFNameW, &UILanguageFileRel);
-	UILanguageFileW = GetUILanguageFileFullW(HomeDirW, UILanguageFileRel);
-	free(UILanguageFileRel);
-	WideCharToACP_t(UILanguageFileW, UILanguageFile, sizeof(UILanguageFile));
+	UILanguageFileW = GetUILanguageFileFullW(SetupFNameW);
 
 	DLLInit();
 	WinCompatInit();
@@ -135,6 +131,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
+	DebugSetException();
 
 	// DPI Aware (çÇDPIëŒâû)
 	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {

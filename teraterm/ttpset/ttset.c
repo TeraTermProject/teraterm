@@ -1305,10 +1305,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (GetOnOff(Section, "KmtFileAttr", FName, FALSE))
 		ts->KermitOpt |= KmtOptFileAttr;
 
-	// Enable language selection -- special option
-	if (!GetOnOff(Section, "LanguageSelection", FName, TRUE))
-		ts->MenuFlag |= MF_NOLANGUAGE;
-
 	/* Maximum scroll buffer size  -- special option */
 	ts->ScrollBuffMax =
 		GetPrivateProfileInt(Section, "MaxBuffSize", 10000, FName);
@@ -1584,26 +1580,10 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	          _TRUNCATE);
 
 	// Viewlog Editor path
-	if (GetWindowsDirectory(Temp, sizeof(Temp)) + 13 < sizeof(Temp)) { // "\\notepad.exe"(12) + NUL(1)
-		strncat_s(Temp, sizeof(Temp), "\\notepad.exe", _TRUNCATE);
-	}
-	else {
-		Temp[0] = '\0';
-	}
-	GetPrivateProfileString(Section, "ViewlogEditor ", Temp,
-	                        ts->ViewlogEditor, sizeof(ts->ViewlogEditor), FName);
-
-	// UI language message file (相対パス)
-	hGetPrivateProfileStringW(SectionW, L"UILanguageFile", NULL, FName, &ts->UILanguageFileW_ini);
-	if (ts->UILanguageFileW_ini[0] == 0) {
-		free(ts->UILanguageFileW_ini);
-		ts->UILanguageFileW_ini = _wcsdup(L"lang\\Default.lng");
-	}
-	WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
+	hGetPrivateProfileStringW(SectionW, L"ViewlogEditor", L"notepad.exe", FName, &ts->ViewlogEditorW);
 
 	// UI language message file (full path)
-	ts->UILanguageFileW = GetUILanguageFileFullW(ts->ExeDirW, ts->UILanguageFileW_ini);
-	WideCharToACP_t(ts->UILanguageFileW, ts->UILanguageFile, sizeof(ts->UILanguageFile));
+	ts->UILanguageFileW = GetUILanguageFileFullW(FName);
 
 
 	// Broadcast Command History (2007.3.3 maya)
@@ -2096,6 +2076,27 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->ExperimentalDontUseFontDialog = GetOnOff("Experimental", "DontUseFontDialog", FName, FALSE);
 }
 
+/**
+ *	UILanguage File を ExeDir相対パスに変換
+ *
+ *	@return 相対UILanguageFileパス、不要になったらfree()すること
+ */
+static wchar_t *GetUILanguageFileRelPath(const wchar_t *UILanguageFile)
+{
+	wchar_t *ExeDirW = GetExeDirW(NULL);
+	size_t ExeDirLen = wcslen(ExeDirW);
+	int r = wcsncmp(ExeDirW, UILanguageFile, ExeDirLen);
+	free(ExeDirW);
+	if (r != 0) {
+		// ExeDir フォルダ以下の lng ファイルではないのでそのまま返す
+		return _wcsdup(UILanguageFile);
+	}
+
+	//   ExeDir相対に変換する
+	wchar_t *UILanguageFileRel = _wcsdup(UILanguageFile + ExeDirLen + 1);
+	return UILanguageFileRel;
+}
+
 void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 {
 	int i;
@@ -2277,8 +2278,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WritePrivateProfileString(Section, "AlphaBlendActive", Temp, FName);
 	WritePrivateProfileString(Section, "CygwinDirectory",
 	                          ts->CygwinDirectory, FName);
-	WritePrivateProfileString(Section, "ViewlogEditor", ts->ViewlogEditor,
-	                          FName);
+	WritePrivateProfileStringW(SectionW, L"ViewlogEditor", ts->ViewlogEditorW, FName);
 
 	// ANSI color(2004.9.5 yutaka)
 	Temp[0] = '\0';
@@ -2758,12 +2758,6 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "KmtLongPacket", FName, (WORD) (ts->KermitOpt & KmtOptLongPacket));
 	WriteOnOff(Section, "KmtFileAttr", FName, (WORD) (ts->KermitOpt & KmtOptFileAttr));
 
-	// Enable language selection -- special option
-	if ((ts->MenuFlag & MF_NOLANGUAGE) == 0)
-		WriteOnOff(Section, "LanguageSelection", FName, 1);
-	else
-		WriteOnOff(Section, "LanguageSelection", FName, 0);
-
 	/* Maximum scroll buffer size  -- special option */
 	WriteInt(Section, "MaxBuffSize", FName, ts->ScrollBuffMax);
 
@@ -2934,8 +2928,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "UseNormalBGColor", FName, ts->UseNormalBGColor);
 
 	// UI language message file
-	WritePrivateProfileStringW(SectionW, L"UILanguageFile",
-							   ts->UILanguageFileW_ini, FName);
+	TempW = GetUILanguageFileRelPath(ts->UILanguageFileW);
+	WritePrivateProfileStringW(SectionW, L"UILanguageFile", TempW, FName);
+	free(TempW);
 
 	// Broadcast Command History (2007.3.3 maya)
 	WriteOnOff(Section, "BroadcastCommandHistory", FName,
@@ -3387,7 +3382,7 @@ void PASCAL _AddValueToList(const wchar_t *FName, const wchar_t *Host, const wch
 	if ((FName[0] == 0) || (Host[0] == 0))
 		return;
 
-	hostnames = (wchar_t **)calloc(sizeof(wchar_t), MaxList);
+	hostnames = (wchar_t **)calloc(MaxList, sizeof(wchar_t));
 	if (hostnames == NULL) {
 		return;
 	}
@@ -4079,7 +4074,6 @@ void TTSetUnInit(TTTSet *ts)
 		(void **)&ts->EtermLookfeel.BGThemeFileW,
 		(void **)&ts->EtermLookfeel.BGSPIPathW,
 		(void **)&ts->UILanguageFileW,
-		(void **)&ts->UILanguageFileW_ini,
 		(void **)&ts->ExeDirW,
 		(void **)&ts->LogDirW,
 		(void **)&ts->FileDirW,
@@ -4088,6 +4082,7 @@ void TTSetUnInit(TTTSet *ts)
 		(void **)&ts->LogFNW,
 		(void **)&ts->LogDefaultNameW,
 		(void **)&ts->DelimListW,
+		(void **)&ts->ViewlogEditorW,
 	};
 	int i;
 	for(i = 0; i < _countof(ptr_list); i++) {

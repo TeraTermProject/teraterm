@@ -296,7 +296,7 @@ BOOL RegisterLabels(int IBuff)
 	BYTE b;
 	TName LabName;
 	WORD Err;
-	WORD VarType;
+	TVariableType VarType;
 	TVarId VarId;
 	TStrVal tmp;
 

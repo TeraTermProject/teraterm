@@ -521,7 +521,7 @@ int cipher_init_SSH2(
 	char tmp[80];
 
 	*ccp = NULL;
-	if ((cc = calloc(sizeof(*cc), 1)) == NULL) {
+	if ((cc = calloc(1, sizeof(*cc))) == NULL) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->UIMsg, 1);
 		notify_fatal_error(pvar, tmp, TRUE);

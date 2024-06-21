@@ -10,81 +10,8 @@
 
   <body>
     <h1>Keyboard ([Setup] メニュー)</h1>
-
-    <h2>"Keyboard setup" ダイアログボックス</h2>
-    <dl>
-      <dt>Transmit DEL by:</dt>
-      <dd>
-	<dl>
-	  <dt id="BSKey">Backspace key</dt>
-	  <dd>
-	    このオプションが選択されると backspace キーを押した時に DEL 文字
-	    (ASCII $7F) が送出されます。
-	    選択されないと BS 文字 (ASCII $08) が送出されます。<br>
-	    また、このオプションが選択された(選択されない)時でも
-	    Ctrl+Backspace で BS (DEL) 文字を送出できます。
-	  </dd>
-
-	  <dt id="DeleteKey">Delete key</dt>
-	  <dd>
-	    このオプションが選択されると Delete (Del) キーを押した時に
-	    DEL 文字が送出されます。
-	    このオプションが選択されない場合、Delete キーの機能は
-	    <a href="../setup/keyboard.html">キーボード設定ファイル</a>
-	    により決定されます。
-	  </dd>
-	</dl>
-      </dd>
-
-      <dt id="RussKeyb">Keyboard</dt>
-      <dd>
-	ロシア語キーボードタイプを指定します。<br>
-  ロシア語 Windows で ANSI(非Unicode)動作時に有効です。<br>
-  次の値を選択してください。
-  <dl>
-    <dt>Windows</dt>
-    <dd>
-      スタンダードキーボードドライバを使用している場合
-    </dd>
-    <dt>KOI8-R</dt>
-    <dd>
-      KOI8-R コードを生成するドライバを使用している場合
-    </dd>
-  </dl>
-      </dd>
-
-      <dt id="MetaKey">Meta key</dt>
-      <dd>
-	Alt キーをメタ・キー (meta key) として使います。
-	例えば、Alt+A を押すと、ESC A を送出します。
-	メタ・キーモードでは、ショートカット・キーは一部を除いて使用できなくなります。<br >
-	メタ・キーを有効にしつつ AltGr キーとの組み合わせで文字を入力をしたい場合は、設定値を left にします。※NT 4.0 以降のみ対応
-      </dd>
-
-      <dt>Disabled mode:</dt>
-      <dd>
-	<dl>
-	  <dt id="DisableAppKeypad">Application Keypad</dt>
-	  <dd>
-	    アプリケーションキーパッドモードを無効にします。<br>
-	    アプリケーションキーパッドモードを無効にすると、
-	    なにかの拍子でアプリケーションキーパッドモードに移行してしまい
-	    数値キーパッドが使えなくなるというトラブルを防ぐ事ができます。
-	    しかし、アプリケーションキーパッドモードを使用している
-	    アプリケーションでは不具合が起きるかもしれません。
-	  </dd>
-
-	  <dt id="DisableAppCursor">Application Cursor</dt>
-	  <dd>
-	    アプリケーションカーソルモードを無効にします。
-	  </dd>
-	</dl>
-      </dd>
-    </dl>
-
     <p>
-      <A HREF="../setup/keyboard.html">キーボード設定ファイル</A>
-      を書きかえることで自由にキー設定を変更することができます。
+      Additional settings の <a href="../menu/setup-additional-keyboard.html">Keyboard タブ</a>が開きます。
     </p>
   </body>
 </html>

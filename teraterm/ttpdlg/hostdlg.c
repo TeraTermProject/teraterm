@@ -82,7 +82,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			WORD i;
 			int j;
 			GetHNRec = (PGetHNRec)lParam;
-			dlg_data = (TTXHostDlgData *)calloc(sizeof(*dlg_data), 1);
+			dlg_data = (TTXHostDlgData *)calloc(1, sizeof(*dlg_data));
 			SetWindowLongPtr(Dialog, DWLP_USER, (LPARAM)dlg_data);
 			dlg_data->GetHNRec = GetHNRec;
 

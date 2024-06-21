@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2024-04-13 by TeraTerm Project
+date=2024-06-15 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -377,7 +377,6 @@ DLG_SELECT_DIR_TITLE=選擇新文件夾
 
 DLG_GEN_TITLE=Tera Term：設定設定
 DLG_GEN_PORT=端口(&P)：
-DLG_GEN_LANG=語言(&L)：
 DLG_GEN_LANG_UI=界面語言(&U)：
 
 DLG_HOST_TITLE=Tera Term：建立新連線
@@ -387,7 +386,7 @@ DLG_HOST_TCPIPPROTOCOL=IP版本(&N)：
 DLG_HOST_SERIAL=連接埠(&S)
 DLG_HOST_SERIALPORT=端口(&R)：
 
-DLG_KEYB_TITLE=Tera Term：鍵盤設定
+DLG_KEYB_TITLE=鍵盤
 DLG_KEYB_TRANSMIT=DEL發送為：
 DLG_KEYB_BS=&Backspace 鍵
 DLG_KEYB_DEL=&Delete 刪除鍵

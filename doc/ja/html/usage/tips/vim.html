@@ -71,7 +71,7 @@ let &amp;t_EI .= "\e[1 q"
 
 <p>
 通常、ホスト側のアプリケーション (vim 等) からは、ユーザのキー入力とクリップボードからの貼り付けを区別できません。
-しかし xterm の拡張機能である Bracketed Paste Mode を利用するとこれらを区別出来るようになるため、クリップボードからの貼り付け時は動作を変える事ができます。
+しかし xterm の拡張機能である <a href="../../about/glossary.html#Bracketed">Bracketed Paste Mode</a> を利用するとこれらを区別出来るようになるため、クリップボードからの貼り付け時は動作を変える事ができます。
 </p>
 
 <p>
@@ -137,12 +137,6 @@ if &amp;term =~ "xterm"
     inoremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
 endif
 </pre>
-
-<h4>Bracketed Paste mode について</h4>
-<p>
-この機能は xterm 拡張で、有効になっていると、クリップボードからの貼り付け時に文字列の前後に特別なシーケンスを付加するというものです。<br>
-具体的には、DECSET の 2004(&lt;CSI&gt;?2004h) で有効になり、貼り付け時に文字列の前に &lt;ESC&gt;200~, 後ろに &lt;ESC&gt;201~ が付くようになります。
-</p>
 
 
 <h2 id="IMEcontrol">IME を制御する</h2>

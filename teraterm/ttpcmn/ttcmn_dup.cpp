@@ -247,7 +247,6 @@ static const TSerializeInfo serialize_info[] = {
 	{ MALLOCED_WSTRING_INFO(TTTSet, KeyCnfFNW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, MacroFNW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, UILanguageFileW) },
-	{ MALLOCED_WSTRING_INFO(TTTSet, UILanguageFileW_ini) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, ExeDirW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, LogDirW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, LogDefaultPathW) },
@@ -256,6 +255,7 @@ static const TSerializeInfo serialize_info[] = {
 	{ MALLOCED_WSTRING_INFO(TTTSet, EtermLookfeel.BGSPIPathW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, LogDefaultNameW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, DelimListW) },
+	{ MALLOCED_WSTRING_INFO(TTTSet, ViewlogEditorW) },
 	{ 0, 0, TSerializeInfo::COPY },
 };
 

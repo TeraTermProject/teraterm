@@ -65,7 +65,9 @@ typedef struct TTTextSt url_subclass_t;
 static void FreeSt(TTText *h)
 {
 	free(h->text);
+	h->text = NULL;
 	free(h->url);
+	h->url = NULL;
 }
 
 // static textに割り当てるプロシージャ
@@ -230,12 +232,10 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 		// マウスカーソルを元に戻す。
 		SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
 
-		return (LRESULT)0;
-
-	case WM_NCDESTROY:
 		FreeSt(parent);
 		free(parent);
-		return 0;
+
+		return (LRESULT)0;
 	}
 
 	return CallWindowProcW( parent->proc, hWnd, msg, wParam, lParam );
@@ -302,7 +302,7 @@ static void FitControlSize(HWND Dlg, UINT id)
 TTText *TTTextURL(HWND hDlg, int id, const wchar_t *text, const char *url)
 {
 	HWND hWnd = GetDlgItem(hDlg, id);
-	url_subclass_t *h = (url_subclass_t *)calloc(sizeof(*h), 1);
+	url_subclass_t *h = (url_subclass_t *)calloc(1, sizeof(*h));
 	if (text == NULL) {
 		hGetDlgItemTextW(hDlg, id, &h->text);
 	}
@@ -323,7 +323,7 @@ TTText *TTTextURL(HWND hDlg, int id, const wchar_t *text, const char *url)
 
 TTText *TTTextMenu(HWND hDlg, int id, const wchar_t *text, HWND menu_wnd, int menu_id)
 {
-	url_subclass_t *h = (url_subclass_t *)calloc(sizeof(*h), 1);
+	url_subclass_t *h = (url_subclass_t *)calloc(1, sizeof(*h));
 	HWND hWnd = GetDlgItem(hDlg, id);
 	h->hParentWnd = hDlg;
 	if (text == NULL) {

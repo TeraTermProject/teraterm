@@ -655,26 +655,6 @@ void RestoreNewLine(PCHAR Text)
 	memcpy(Text, buf, size);
 }
 
-/*
- *	UILanguageFileのフルパスを取得する
- *
- *	@param[in]		HomeDir					exe,dllの存在するフォルダ GetHomeDir()で取得できる
- *	@param[in]		UILanguageFileRel		lngファイル、HomeDirからの相対パス
- *	@param[in,out]	UILanguageFileFull		lngファイルptr、フルパス
- *	@param[in]		UILanguageFileFullLen	lngファイルlen、フルパス
- */
-void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
-						   char *UILanguageFileFull, size_t UILanguageFileFullLen)
-{
-	char CurDir[MAX_PATH];
-
-	/* Get UILanguageFile Full Path */
-	GetCurrentDirectoryA(sizeof(CurDir), CurDir);
-	SetCurrentDirectoryA(HomeDir);
-	_fullpath(UILanguageFileFull, UILanguageFileRel, UILanguageFileFullLen);
-	SetCurrentDirectoryA(CurDir);
-}
-
 // 指定したエントリを teraterm.ini から読み取る (2009.3.23 yutaka)
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 {

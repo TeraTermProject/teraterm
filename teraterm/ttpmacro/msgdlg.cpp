@@ -74,12 +74,12 @@ BOOL CMsgDlg::OnInitDialog()
 			{ IDCANCEL, "BTN_NO" },
 		};
 		SetDlgItemTextA(IDOK, "Yes");	// lng ÉtÉ@ÉCÉãÇ»ÇµëŒçÙ
-		SetDlgTexts(m_hWnd, TextInfosYesNo, _countof(TextInfosYesNo), UILanguageFile);
+		SetDlgTextsW(m_hWnd, TextInfosYesNo, _countof(TextInfosYesNo), UILanguageFileW);
 	} else {
 		static const DlgTextInfo TextInfosOk[] = {
 			{ IDOK, "BTN_OK" },
 		};
-		SetDlgTexts(m_hWnd, TextInfosOk, _countof(TextInfosOk), UILanguageFile);
+		SetDlgTextsW(m_hWnd, TextInfosOk, _countof(TextInfosOk), UILanguageFileW);
 	}
 	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), 0);
 

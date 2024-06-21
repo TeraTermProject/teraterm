@@ -390,7 +390,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts)
 {
 	BOOL r;
-	TCPIPDlgData *data = (TCPIPDlgData *)calloc(sizeof(*data), 1);
+	TCPIPDlgData *data = (TCPIPDlgData *)calloc(1, sizeof(*data));
 	data->ts = ts;
 	r= (BOOL)TTDialogBoxParam(hInst,
 							  MAKEINTRESOURCE(IDD_TCPIPDLG),

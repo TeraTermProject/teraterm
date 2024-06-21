@@ -171,7 +171,6 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_GEN_TITLE" },
-		{ IDC_GENLANGLABEL, "DLG_GEN_LANG" },
 		{ IDC_GENLANGUI_LABEL, "DLG_GEN_LANG_UI" },
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
@@ -179,7 +178,6 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 	};
 	DlgData *data;
 	PTTSet ts;
-	WORD w;
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -188,26 +186,6 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 			ts = data->ts;
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
-
-#if 0
-			if ((ts->MenuFlag & MF_NOLANGUAGE)==0) {
-				int sel = 0;
-				int i;
-				ShowDlgItem(Dialog,IDC_GENLANGLABEL,IDC_GENLANG);
-				for (i = 0;; i++) {
-					const TLanguageList *lang = GetLanguageList(i);
-					if (lang == NULL) {
-						break;
-					}
-					if (ts->Language == lang->language) {
-						sel = i;
-					}
-					SendDlgItemMessageA(Dialog, IDC_GENLANG, CB_ADDSTRING, 0, (LPARAM)lang->str);
-					SendDlgItemMessageA(Dialog, IDC_GENLANG, CB_SETITEMDATA, i, (LPARAM)lang->language);
-				}
-				SendDlgItemMessage(Dialog, IDC_GENLANG, CB_SETCURSEL, sel, 0);
-			}
-#endif
 
 			data->selected_lang = 0;
 			{
@@ -233,38 +211,17 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 		case WM_COMMAND:
 			switch (wParam) {
-				case IDOK | (BN_CLICKED << 16):
-					data = (DlgData *)GetWindowLongPtr(Dialog,DWLP_USER);
+				case IDOK | (BN_CLICKED << 16): {
+					LRESULT w;
+					data = (DlgData *)GetWindowLongPtrW(Dialog,DWLP_USER);
 					ts = data->ts;
 					assert(ts != NULL);
-#if 0
-					if ((ts->MenuFlag & MF_NOLANGUAGE)==0) {
-						WORD language;
-						w = (WORD)GetCurSel(Dialog, IDC_GENLANG);
-						language = (int)SendDlgItemMessageA(Dialog, IDC_GENLANG, CB_GETITEMDATA, w - 1, 0);
-
-						// Language が変更されたとき、
-						// KanjiCode/KanjiCodeSend を変更先の Language に存在する値に置き換える
-						if (1 <= language && language < IdLangMax && language != ts->Language) {
-							WORD KanjiCode = ts->KanjiCode;
-							WORD KanjiCodeSend = ts->KanjiCodeSend;
-							ts->KanjiCode = KanjiCodeTranslate(language,KanjiCode);
-							ts->KanjiCodeSend = KanjiCodeTranslate(language,KanjiCodeSend);
-
-							ts->Language = language;
-						}
-					}
-#endif
 
 					// 言語ファイルが変更されていた場合
-					w = SendDlgItemMessage(Dialog, IDC_GENLANG_UI, CB_GETCURSEL, 0, 0);
+					w = SendDlgItemMessageA(Dialog, IDC_GENLANG_UI, CB_GETCURSEL, 0, 0);
 					if (w != data->selected_lang) {
 						const LangInfo *p = data->lng_infos + w;
-						aswprintf(&ts->UILanguageFileW_ini, L"%s\\%s", get_lang_folder(), p->filename);
-						WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
-
 						ts->UILanguageFileW = _wcsdup(p->fullname);
-						WideCharToACP_t(ts->UILanguageFileW, ts->UILanguageFile, sizeof(ts->UILanguageFile));
 
 						// タイトルの更新を行う。(2014.2.23 yutaka)
 						PostMessage(GetParent(Dialog),WM_USER_CHANGETITLE,0,0);
@@ -277,7 +234,7 @@ static INT_PTR CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 					TTEndDialog(Dialog, 1);
 					return TRUE;
-
+				}
 				case IDCANCEL | (BN_CLICKED << 16):
 					TTEndDialog(Dialog, 0);
 					return TRUE;

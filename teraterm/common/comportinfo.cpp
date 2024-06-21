@@ -446,8 +446,11 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 			ULONG status  = 0;
 			ULONG problem = 0;
 			CONFIGRET cr = CM_Get_DevNode_Status(&status, &problem, DeviceInfoData.DevInst, 0);
-			if (cr != CR_SUCCESS || problem == CM_PROB_DISABLED) {
-				// ステータス取得に失敗 又は デバイスが無効の時
+			if (cr != CR_SUCCESS) {
+				continue;
+			}
+			if (problem != 0) {
+				// 何らかの問題があった?
 				continue;
 			}
 #endif

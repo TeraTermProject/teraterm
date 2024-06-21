@@ -41,7 +41,6 @@
 
 #include "teraterm.h"
 #include "ttm_res.h"
-#include "tttypes.h"
 #include "ttlib.h"
 #include "ttmdef.h"
 #include "errdlg.h"

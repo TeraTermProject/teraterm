@@ -38,6 +38,7 @@
 #include "win32helper.h"
 #include "compat_win.h"
 #include "tttypes.h"
+#include "asprintf.h"
 
 #include "ttlib_types.h"
 
@@ -82,4 +83,26 @@ wchar_t *GetTermLogDir(const TTTSet *pts)
 
 	// %LOCALAPPDATA%\teraterm5
 	return GetLogDirW(NULL);
+}
+
+wchar_t *GetViewlogEditor(const TTTSet *pts)
+{
+	const wchar_t *ViewlogEditorW;
+	if (pts->ViewlogEditorW == NULL || pts->ViewlogEditorW[0] == '\0') {
+		ViewlogEditorW = L"notepad.exe";
+	}
+	else {
+		ViewlogEditorW = pts->ViewlogEditorW;
+	}
+	if (!IsRelativePathW(ViewlogEditorW)) {
+		return _wcsdup(ViewlogEditorW);
+	}
+	else {
+		wchar_t *windows_dir;
+		_SHGetKnownFolderPath(FOLDERID_Windows, 0, NULL, &windows_dir);
+		wchar_t *fullpath;
+		aswprintf(&fullpath, L"%s\\%s", windows_dir, ViewlogEditorW);
+		free(windows_dir);
+		return fullpath;
+	}
 }

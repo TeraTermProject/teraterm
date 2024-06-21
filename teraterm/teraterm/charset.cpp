@@ -125,7 +125,7 @@ static void CharSetInit2(CharSetData *w)
  */
 CharSetData *CharSetInit(const CharSetOp *op, void *client_data)
 {
-	CharSetData *w = (CharSetData *)calloc(sizeof(*w), 1);
+	CharSetData *w = (CharSetData *)calloc(1, sizeof(*w));
 	if (w == NULL) {
 		return NULL;
 	}
