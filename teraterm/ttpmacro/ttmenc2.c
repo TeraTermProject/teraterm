@@ -143,7 +143,14 @@ static int Encrypt2ProfileAdd(HANDLE FH, Encrypt2ProfileP Profile)
 // パスワードファイルからKeyStr(パスワード識別子)にマッチする行を検索する
 // 復帰値  0:マッチする行無し、1:マッチする行有り
 // Profileにマッチした行のEncrypt2Profileが設定される
+#if defined(_MSC_VER)
 #pragma optimize("", off)
+#elif defined(__clang__)
+#pragma clang optimize off
+#else
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+#endif
 static int Encrypt2ProfileSearch (HANDLE FH, const char *KeyStr, Encrypt2ProfileP Profile)
 {
 	char ProfileB64[ENCRYPT2_MaxLineLen];
@@ -188,6 +195,7 @@ static int Encrypt2ProfileSearch (HANDLE FH, const char *KeyStr, Encrypt2Profile
 				break;
 			}
 			Dummy = 1;
+			(void)Dummy;
 		}
 	}
 
@@ -203,7 +211,13 @@ static int Encrypt2ProfileSearch (HANDLE FH, const char *KeyStr, Encrypt2Profile
 
 	return Ret;
 }
+#if defined(_MSC_VER)
 #pragma optimize("", on)
+#elif defined(__clang__)
+#pragma clang optimize on
+#else
+#pragma GCC pop_options
+#endif
 
 // パスワードファイル 行更新
 static int Encrypt2ProfileUpdate(HANDLE FH, const char *KeyStr, Encrypt2ProfileP Profile)
