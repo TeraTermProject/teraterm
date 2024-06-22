@@ -38,6 +38,7 @@
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include <openssl/hmac.h>
+#include <openssl/crypto.h>
 #include "ttmdef.h"
 #include "ttmparse.h"
 
@@ -182,7 +183,7 @@ static int Encrypt2ProfileSearch (HANDLE FH, const char *KeyStr, Encrypt2Profile
 			continue;
 		}
 
-		if (memcmp(KeyHash, Lprofile.KeyHash, SHA512_DIGEST_LENGTH) == 0) {
+		if (CRYPTO_memcmp(KeyHash, Lprofile.KeyHash, SHA512_DIGEST_LENGTH) == 0) {
 			memcpy(Profile, &Lprofile, ENCRYPT2_PROFILE_LEN);
 			if ((Cpos = SetFilePointer(FH, 0, NULL, FILE_CURRENT)) == INVALID_SET_FILE_POINTER) {
 				break;
