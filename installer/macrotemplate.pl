@@ -1,4 +1,4 @@
-# 
+#
 # マクロコマンドのドキュメント類のチェックを行う
 #
 # [実行方法]
@@ -23,7 +23,6 @@ $enhhcfile = '..\doc\en\teraterm.hhc';
 $jahhcfile = '..\doc\ja\teraterm.hhc';
 $enhhpfile = '..\doc\en\teraterm.hhp';
 $jahhpfile = '..\doc\ja\teraterm.hhp';
-$keyfile = 'release\keyfile.ini';
 
 if ($#ARGV != -1) {
 	print "==== " . $ARGV[0] . "マクロを検証中...\n";
@@ -41,11 +40,11 @@ if ($#ARGV != -1) {
 		}
 	}
 	close(FP);
-	
+
 	foreach (@FULL_COMMAND) {
 		if (/(\w+)\s+.*/) {
 			$key = lc($1);
-			
+
 			print "==== $key マクロを検証中...\n";
 			do_main($key);
 		}
@@ -137,10 +136,6 @@ sub do_main {
 	}
 
 	$pat = "\\b$macro\\b";
-	$ret = read_keyword($keyfile, $pat);
-	if ($ret eq '') {
-		print "$keyfile ファイルに $pat コマンドがありません\n";
-	}
 
 	# 置換
 	# helpid.h とコマンドのヘルプファイルで名前が一致していないため
@@ -157,12 +152,12 @@ sub do_main {
 	   ) {
 		$macro = 'crc32';
 	}
-	
+
 	$s = "$encmdfile\\$macro.html";
 	if (!(-e $s)) {
 		print "マクロコマンドの英語版説明文($s)がありません\n";
 	}
-	
+
 	$s = "$jacmdfile\\$macro.html";
 	if (!(-e $s)) {
 		print "マクロコマンドの日本語版説明文($s)がありません\n";
@@ -174,14 +169,14 @@ sub do_main {
 	if ($ret eq '') {
 		print "$s ファイルに $pat へのリンクがありません\n";
 	}
-	
+
 	$s = "$jacmdfile\\index.html";
 	$pat = "$macro.html";
 	$ret = read_keyword($s, $pat);
 	if ($ret eq '') {
 		print "$s ファイルに $pat へのリンクがありません\n";
 	}
-	
+
 
 	$pat = "$macro.html";
 	$ret = read_keyword($enhhcfile, $pat);
@@ -194,8 +189,8 @@ sub do_main {
 	if ($ret eq '') {
 		print "$jahhcfile ファイルに $pat へのリンクがありません\n";
 	}
-	
-	
+
+
 	$pat = "$macro.html";
 	$ret = read_keyword($enhhpfile, $pat);
 	if ($ret eq '') {
@@ -214,7 +209,7 @@ sub read_keyword {
 	my($file, $keyword) = @_;
 	my($line) = '';
 	my($found) = 0;
-	
+
 	open(FP, "$file") || die "Can't open $file.";
 	while (<FP>) {
 		chomp;
@@ -225,7 +220,7 @@ sub read_keyword {
 		}
 	}
 	close(FP);
-	
+
 	if ($found == 0) {
 		$line = '';
 	}
