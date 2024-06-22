@@ -1,14 +1,14 @@
 # 
-# ƒ}ƒNƒƒRƒ}ƒ“ƒh‚ÌƒhƒLƒ…ƒƒ“ƒg—Ş‚Ìƒ`ƒFƒbƒN‚ğs‚¤
+# ãƒã‚¯ãƒ­ã‚³ãƒãƒ³ãƒ‰ã®ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆé¡ã®ãƒã‚§ãƒƒã‚¯ã‚’è¡Œã†
 #
-# [Às•û–@]
-#   ‚·‚×‚Ä(ttmparse.h ‚æ‚è“Ç‚İ‚İ)‚Ìƒ}ƒNƒ‚ğŒŸØ‚·‚é
+# [å®Ÿè¡Œæ–¹æ³•]
+#   ã™ã¹ã¦(ttmparse.h ã‚ˆã‚Šèª­ã¿è¾¼ã¿)ã®ãƒã‚¯ãƒ­ã‚’æ¤œè¨¼ã™ã‚‹
 #   >perl macrotemplate.pl
 #
-#   w’è‚µ‚½ƒ}ƒNƒ‚ğŒŸØ‚·‚é
+#   æŒ‡å®šã—ãŸãƒã‚¯ãƒ­ã‚’æ¤œè¨¼ã™ã‚‹
 #   >perl macrotemplate.pl scpsend
 #
-# [‰ü”Å—š—ğ]
+# [æ”¹ç‰ˆå±¥æ­´]
 # 1.0 (2008.02.16 Yutaka Hirata)
 # 1.1 (2008.02.23 Yutaka Hirata)
 # 1.2 (2009.03.03 Yutaka Hirata)
@@ -26,7 +26,7 @@ $jahhpfile = '..\doc\ja\teraterm.hhp';
 $keyfile = 'release\keyfile.ini';
 
 if ($#ARGV != -1) {
-	print "==== " . $ARGV[0] . "ƒ}ƒNƒ‚ğŒŸØ’†...\n";
+	print "==== " . $ARGV[0] . "ãƒã‚¯ãƒ­ã‚’æ¤œè¨¼ä¸­...\n";
 	do_main(lc($ARGV[0]));
 
 } else {
@@ -46,7 +46,7 @@ if ($#ARGV != -1) {
 		if (/(\w+)\s+.*/) {
 			$key = lc($1);
 			
-			print "==== $key ƒ}ƒNƒ‚ğŒŸØ’†...\n";
+			print "==== $key ãƒã‚¯ãƒ­ã‚’æ¤œè¨¼ä¸­...\n";
 			do_main($key);
 		}
 	}
@@ -55,10 +55,10 @@ exit(0);
 
 
 #; TODO
-#; en/teraterm.hhc‚ÉƒŠƒ“ƒN‘}“ü
-#; en/teraterm.hhp‚Éalias’Ç‰Á
-#; ja/teraterm.hhc‚ÉƒŠƒ“ƒN‘}“ü
-#; ja/teraterm.hhp‚Éalias’Ç‰Á
+#; en/teraterm.hhcã«ãƒªãƒ³ã‚¯æŒ¿å…¥
+#; en/teraterm.hhpã«aliasè¿½åŠ 
+#; ja/teraterm.hhcã«ãƒªãƒ³ã‚¯æŒ¿å…¥
+#; ja/teraterm.hhpã«aliasè¿½åŠ 
 
 sub do_main {
 	my($macro) = @_;
@@ -73,14 +73,14 @@ sub do_main {
 	if ($ret =~ /$macro\s+(\d+)/i) {
 		$id = $1;
 	} else {
-		print "IDƒtƒ@ƒCƒ‹($macroidfile)‚©‚çƒ}ƒNƒ’è‹`‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ\n";
+		print "IDãƒ•ã‚¡ã‚¤ãƒ«($macroidfile)ã‹ã‚‰ãƒã‚¯ãƒ­å®šç¾©ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“\n";
 		print "$idline\n";
 		return;
 	}
 #	print "$id\n";
 
-	# ’uŠ·
-	# ttmparse.h ‚Æ helpid.h ‚Å–¼‘O‚ªˆê’v‚µ‚Ä‚¢‚È‚¢‚½‚ß
+	# ç½®æ›
+	# ttmparse.h ã¨ helpid.h ã§åå‰ãŒä¸€è‡´ã—ã¦ã„ãªã„ãŸã‚
 	if ($macro eq 'if' ||
 	    $macro eq 'then' ||
 	    $macro eq 'else' ||
@@ -124,13 +124,13 @@ sub do_main {
 	if ($ret =~ /$macro\s+(\d+)/i) {
 		$n = 92000 + $id;
 		if ($n != $1) {
-			print "$helpidfile ‚ÌID‚ªˆê’v‚µ‚Ä‚¢‚Ü‚¹‚ñ ($n != $1)\n";
+			print "$helpidfile ã®IDãŒä¸€è‡´ã—ã¦ã„ã¾ã›ã‚“ ($n != $1)\n";
 			print "$idline\n";
 			print "$ret\n";
 			return;
 		}
 	} else {
-		print "HELPIDƒtƒ@ƒCƒ‹($helpidfile)‚©‚çƒ}ƒNƒ’è‹`‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ\n";
+		print "HELPIDãƒ•ã‚¡ã‚¤ãƒ«($helpidfile)ã‹ã‚‰ãƒã‚¯ãƒ­å®šç¾©ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“\n";
 		print "$idline\n";
 		print "$ret\n";
 		return;
@@ -139,11 +139,11 @@ sub do_main {
 	$pat = "\\b$macro\\b";
 	$ret = read_keyword($keyfile, $pat);
 	if ($ret eq '') {
-		print "$keyfile ƒtƒ@ƒCƒ‹‚É $pat ƒRƒ}ƒ“ƒh‚ª‚ ‚è‚Ü‚¹‚ñ\n";
+		print "$keyfile ãƒ•ã‚¡ã‚¤ãƒ«ã« $pat ã‚³ãƒãƒ³ãƒ‰ãŒã‚ã‚Šã¾ã›ã‚“\n";
 	}
 
-	# ’uŠ·
-	# helpid.h ‚ÆƒRƒ}ƒ“ƒh‚Ìƒwƒ‹ƒvƒtƒ@ƒCƒ‹‚Å–¼‘O‚ªˆê’v‚µ‚Ä‚¢‚È‚¢‚½‚ß
+	# ç½®æ›
+	# helpid.h ã¨ã‚³ãƒãƒ³ãƒ‰ã®ãƒ˜ãƒ«ãƒ—ãƒ•ã‚¡ã‚¤ãƒ«ã§åå‰ãŒä¸€è‡´ã—ã¦ã„ãªã„ãŸã‚
 	if ($macro eq 'do' ||
 	    $macro eq 'loop'
 	   ) {
@@ -160,52 +160,52 @@ sub do_main {
 	
 	$s = "$encmdfile\\$macro.html";
 	if (!(-e $s)) {
-		print "ƒ}ƒNƒƒRƒ}ƒ“ƒh‚Ì‰pŒê”Åà–¾•¶($s)‚ª‚ ‚è‚Ü‚¹‚ñ\n";
+		print "ãƒã‚¯ãƒ­ã‚³ãƒãƒ³ãƒ‰ã®è‹±èªç‰ˆèª¬æ˜æ–‡($s)ãŒã‚ã‚Šã¾ã›ã‚“\n";
 	}
 	
 	$s = "$jacmdfile\\$macro.html";
 	if (!(-e $s)) {
-		print "ƒ}ƒNƒƒRƒ}ƒ“ƒh‚Ì“ú–{Œê”Åà–¾•¶($s)‚ª‚ ‚è‚Ü‚¹‚ñ\n";
+		print "ãƒã‚¯ãƒ­ã‚³ãƒãƒ³ãƒ‰ã®æ—¥æœ¬èªç‰ˆèª¬æ˜æ–‡($s)ãŒã‚ã‚Šã¾ã›ã‚“\n";
 	}
 
 	$s = "$encmdfile\\index.html";
 	$pat = "$macro.html";
 	$ret = read_keyword($s, $pat);
 	if ($ret eq '') {
-		print "$s ƒtƒ@ƒCƒ‹‚É $pat ‚Ö‚ÌƒŠƒ“ƒN‚ª‚ ‚è‚Ü‚¹‚ñ\n";
+		print "$s ãƒ•ã‚¡ã‚¤ãƒ«ã« $pat ã¸ã®ãƒªãƒ³ã‚¯ãŒã‚ã‚Šã¾ã›ã‚“\n";
 	}
 	
 	$s = "$jacmdfile\\index.html";
 	$pat = "$macro.html";
 	$ret = read_keyword($s, $pat);
 	if ($ret eq '') {
-		print "$s ƒtƒ@ƒCƒ‹‚É $pat ‚Ö‚ÌƒŠƒ“ƒN‚ª‚ ‚è‚Ü‚¹‚ñ\n";
+		print "$s ãƒ•ã‚¡ã‚¤ãƒ«ã« $pat ã¸ã®ãƒªãƒ³ã‚¯ãŒã‚ã‚Šã¾ã›ã‚“\n";
 	}
 	
 
 	$pat = "$macro.html";
 	$ret = read_keyword($enhhcfile, $pat);
 	if ($ret eq '') {
-		print "$enhhcfile ƒtƒ@ƒCƒ‹‚É $pat ‚Ö‚ÌƒŠƒ“ƒN‚ª‚ ‚è‚Ü‚¹‚ñ\n";
+		print "$enhhcfile ãƒ•ã‚¡ã‚¤ãƒ«ã« $pat ã¸ã®ãƒªãƒ³ã‚¯ãŒã‚ã‚Šã¾ã›ã‚“\n";
 	}
 
 	$pat = "$macro.html";
 	$ret = read_keyword($jahhcfile, $pat);
 	if ($ret eq '') {
-		print "$jahhcfile ƒtƒ@ƒCƒ‹‚É $pat ‚Ö‚ÌƒŠƒ“ƒN‚ª‚ ‚è‚Ü‚¹‚ñ\n";
+		print "$jahhcfile ãƒ•ã‚¡ã‚¤ãƒ«ã« $pat ã¸ã®ãƒªãƒ³ã‚¯ãŒã‚ã‚Šã¾ã›ã‚“\n";
 	}
 	
 	
 	$pat = "$macro.html";
 	$ret = read_keyword($enhhpfile, $pat);
 	if ($ret eq '') {
-		print "$enhhpfile ƒtƒ@ƒCƒ‹‚É $pat ‚Ö‚ÌALIASƒŠƒ“ƒN‚ª‚ ‚è‚Ü‚¹‚ñ\n";
+		print "$enhhpfile ãƒ•ã‚¡ã‚¤ãƒ«ã« $pat ã¸ã®ALIASãƒªãƒ³ã‚¯ãŒã‚ã‚Šã¾ã›ã‚“\n";
 	}
 
 	$pat = "$macro.html";
 	$ret = read_keyword($jahhpfile, $pat);
 	if ($ret eq '') {
-		print "$jahhpfile ƒtƒ@ƒCƒ‹‚É $pat ‚Ö‚ÌALIASƒŠƒ“ƒN‚ª‚ ‚è‚Ü‚¹‚ñ\n";
+		print "$jahhpfile ãƒ•ã‚¡ã‚¤ãƒ«ã« $pat ã¸ã®ALIASãƒªãƒ³ã‚¯ãŒã‚ã‚Šã¾ã›ã‚“\n";
 	}
 
 }
