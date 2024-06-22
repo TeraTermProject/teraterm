@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Spanish
-date=2024-06-15 by TeraTerm Project
+date=2024-06-22 by TeraTerm Project
 contributor=Filiberto Olguin Ascona (2022-05-26)
 
 [Tera Term]
@@ -272,7 +272,9 @@ DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=no use
 DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
-DLG_TAB_LOG_EDITOR=View log &editor
+DLG_TAB_LOG_EDITOR=View log editor
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=Default log &file name(strftime format)
 DLG_TAB_LOG_FILEPATH=Default log &save folder
 DLG_TAB_LOG_AUTOSTART=A&uto start logging

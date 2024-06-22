@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2024-06-15 by TeraTerm Project
+date=2024-06-22 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -272,7 +272,9 @@ DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=no use
 DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
-DLG_TAB_LOG_EDITOR=日誌編輯器(&E)
+DLG_TAB_LOG_EDITOR=日誌編輯器
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=默認日誌名稱 (strftime 格式) (&F)
 DLG_TAB_LOG_FILEPATH=默認日誌路徑(&S)
 DLG_TAB_LOG_AUTOSTART=自動記錄日誌(&U)

@@ -256,6 +256,7 @@ static const TSerializeInfo serialize_info[] = {
 	{ MALLOCED_WSTRING_INFO(TTTSet, LogDefaultNameW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, DelimListW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, ViewlogEditorW) },
+	{ MALLOCED_WSTRING_INFO(TTTSet, ViewlogEditorArg) },
 	{ 0, 0, TSerializeInfo::COPY },
 };
 

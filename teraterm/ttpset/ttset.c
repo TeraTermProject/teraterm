@@ -1581,6 +1581,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	// Viewlog Editor path
 	hGetPrivateProfileStringW(SectionW, L"ViewlogEditor", L"notepad.exe", FName, &ts->ViewlogEditorW);
+	hGetPrivateProfileStringW(SectionW, L"ViewlogEditorArg", NULL, FName, &ts->ViewlogEditorArg);
 
 	// UI language message file (full path)
 	ts->UILanguageFileW = GetUILanguageFileFullW(FName);
@@ -2279,6 +2280,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WritePrivateProfileString(Section, "CygwinDirectory",
 	                          ts->CygwinDirectory, FName);
 	WritePrivateProfileStringW(SectionW, L"ViewlogEditor", ts->ViewlogEditorW, FName);
+	WritePrivateProfileStringW(SectionW, L"ViewlogEditorArg", ts->ViewlogEditorArg, FName);
 
 	// ANSI color(2004.9.5 yutaka)
 	Temp[0] = '\0';
@@ -4083,6 +4085,7 @@ void TTSetUnInit(TTTSet *ts)
 		(void **)&ts->LogDefaultNameW,
 		(void **)&ts->DelimListW,
 		(void **)&ts->ViewlogEditorW,
+		(void **)&ts->ViewlogEditorArg,
 	};
 	int i;
 	for(i = 0; i < _countof(ptr_list); i++) {

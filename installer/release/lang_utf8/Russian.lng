@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2024-06-15 by TeraTerm Project
+date=2024-06-22 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -273,6 +273,8 @@ DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
 DLG_TAB_LOG_EDITOR=&Редактор лог-файла
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=&Имя лог-файла по умолчанию
 DLG_TAB_LOG_FILEPATH=&Папка для хранения лог-файла
 DLG_TAB_LOG_AUTOSTART=&Автостарт лог-файла

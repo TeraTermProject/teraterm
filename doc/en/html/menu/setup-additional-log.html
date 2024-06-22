@@ -12,9 +12,20 @@
     <h1>Additional settings / "Log" Tab ([Setup] Menu) </h1>
 
     <dl>
-      <dt id="ViewlogEditor">View log editor</dt>
+      <dt>View log editor</dt>
       <dd>
-	Specify the editor that is used for display log file
+        <dl>
+          <dt id="ViewlogEditor">exe file</dt>
+          <dd>
+            Specify program that is used for display log file.<br>
+            When program is relative path, program is searched from folder in ttermpro.exe and in PATH environment variable.<br>
+            If blank, program associated with file extension is used.
+          </dd>
+          <dt id="ViewlogEditorArg">args</dt>
+          <dd>
+            Specify program args.<br>
+          </dd>
+        </dl>
       </dd>
 
       <dt id="LogDefaultName">Default log file name</dt>

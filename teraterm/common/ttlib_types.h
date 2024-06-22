@@ -48,15 +48,6 @@ wchar_t *GetDownloadDir(const TTTSet *pts);
  */
 wchar_t *GetTermLogDir(const TTTSet *pts);
 
-/**
- * @brief	ログを表示するプログラム取得
- * @param	pts	TTTSet
- * @return	プログラムのフルパス 不要になったら free() すること
- *			スペースが含まれているかもしれない
- *			コマンドラインにする時は " で囲む
- */
-wchar_t *GetViewlogEditor(const TTTSet *pts);
-
 #ifdef __cplusplus
 }
 #endif

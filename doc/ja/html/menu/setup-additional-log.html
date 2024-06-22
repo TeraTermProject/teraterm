@@ -12,9 +12,20 @@
     <h1>Additional settings / "Log" タブ ([Setup] メニュー) </h1>
 
     <dl>
-      <dt id="ViewlogEditor">View log editor</dt>
+      <dt>View log editor</dt>
       <dd>
-	ログを表示するエディタを指定します。
+        <dl>
+          <dt id="ViewlogEditor">exe file</dt>
+          <dd>
+            ログを表示するプログラムを指定します。<br>
+            相対パスで指定すると、ttermpro.exeのフォルダ、環境変数PATHのフォルダからプログラムを検索します。<br>
+            空白の時はファイルの拡張子に関連付けされたプログラムが使用されます。
+          </dd>
+          <dt id="ViewlogEditorArg">args</dt>
+          <dd>
+            プログラムの引き数を指定します。
+          </dd>
+        </dl>
       </dd>
 
       <dt id="LogDefaultName">Default log file name</dt>

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2024-06-15 by TeraTerm Project
+date=2024-06-22 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -272,7 +272,9 @@ DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=no use
 DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
-DLG_TAB_LOG_EDITOR=로그보기 에디터(&E)
+DLG_TAB_LOG_EDITOR=로그보기 에디터
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=기본 로그 파일 이름(strftime 형식)(&F)
 DLG_TAB_LOG_FILEPATH=기본 로그 저장 폴더(&S)
 DLG_TAB_LOG_AUTOSTART=자동 로깅 시작(&U)

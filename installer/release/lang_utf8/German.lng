@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2024-06-15 by TeraTerm Project
+date=2024-06-22 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -273,6 +273,8 @@ DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
 DLG_TAB_LOG_EDITOR=&Auswahl-Editor
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=&Standardprotokoll-Name
 DLG_TAB_LOG_FILEPATH=Standardprotokoll-Ordner
 DLG_TAB_LOG_AUTOSTART=&Automatisch protokollieren

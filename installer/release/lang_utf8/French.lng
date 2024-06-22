@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2024-06-15 by TeraTerm Project
+date=2024-06-22 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -273,6 +273,8 @@ DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
 DLG_TAB_LOG_EDITOR=Prog affich journal
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=Nom par défaut du fichier journal (format strftime)
 DLG_TAB_LOG_FILEPATH=Répertoire par défaut de sauvegarde du journal
 DLG_TAB_LOG_AUTOSTART=Démarrage auto. du journal

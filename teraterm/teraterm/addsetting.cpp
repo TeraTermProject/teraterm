@@ -1101,6 +1101,8 @@ void CLogPropPageDlg::OnInitDialog()
 
 	static const DlgTextInfo TextInfos[] = {
 		{ IDC_VIEWLOG_LABEL, "DLG_TAB_LOG_EDITOR" },
+		{ IDC_VIEWLOG_EXE_LABEL, "DLG_TAB_LOG_EDITOR_EXE" },
+		{ IDC_VIEWLOG_ARG_LABEL, "DLG_TAB_LOG_EDITOR_ARG" },
 		{ IDC_DEFAULTNAME_LABEL, "DLG_TAB_LOG_FILENAME" },
 		{ IDC_DEFAULTPATH_LABEL, "DLG_TAB_LOG_FILEPATH" },
 		{ IDC_AUTOSTART, "DLG_TAB_LOG_AUTOSTART" },
@@ -1130,7 +1132,8 @@ void CLogPropPageDlg::OnInitDialog()
 				 ts.UILanguageFileW, 0);
 
 	// Viewlog Editor path
-	SetDlgItemTextW(IDC_VIEWLOG_EDITOR, ts.ViewlogEditorW);
+	SetDlgItemTextW(IDC_VIEWLOG_EDITOR_EXE, ts.ViewlogEditorW);
+	SetDlgItemTextW(IDC_VIEWLOG_EDITOR_ARG, ts.ViewlogEditorArg);
 
 	// Log Default File Name
 	static const wchar_t *logfile_patterns[] = {
@@ -1225,7 +1228,7 @@ void CLogPropPageDlg::OnInitDialog()
 	m_TipWin->Create(m_hWnd);
 
 	PostMessage(m_hWnd, WM_NEXTDLGCTL,
-				(WPARAM)GetDlgItem(IDC_VIEWLOG_EDITOR), TRUE);
+				(WPARAM)GetDlgItem(IDC_VIEWLOG_EDITOR_EXE), TRUE);
 }
 
 wchar_t *CLogPropPageDlg::MakePreviewStr(const wchar_t *format, const wchar_t *UILanguageFile)
@@ -1265,7 +1268,7 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDC_VIEWLOG_PATH | (BN_CLICKED << 16):
 			{
 				wchar_t *editor;
-				hGetDlgItemTextW(m_hWnd, IDC_VIEWLOG_EDITOR, &editor);
+				hGetDlgItemTextW(m_hWnd, IDC_VIEWLOG_EDITOR_EXE, &editor);
 
 				TTOPENFILENAMEW ofn = {};
 				ofn.hwndOwner = m_hWnd;
@@ -1276,7 +1279,7 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				wchar_t *filew;
 				BOOL ok = TTGetOpenFileNameW(&ofn, &filew);
 				if (ok) {
-					SetDlgItemTextW(IDC_VIEWLOG_EDITOR, filew);
+					SetDlgItemTextW(IDC_VIEWLOG_EDITOR_EXE, filew);
 					free(filew);
 				}
 				free((void *)ofn.lpstrFilter);
@@ -1454,7 +1457,9 @@ void CLogPropPageDlg::OnOK()
 {
 	// Viewlog Editor path
 	free(ts.ViewlogEditorW);
-	hGetDlgItemTextW(m_hWnd, IDC_VIEWLOG_EDITOR, &ts.ViewlogEditorW);
+	hGetDlgItemTextW(m_hWnd, IDC_VIEWLOG_EDITOR_EXE, &ts.ViewlogEditorW);
+	free(ts.ViewlogEditorArg);
+	hGetDlgItemTextW(m_hWnd, IDC_VIEWLOG_EDITOR_ARG, &ts.ViewlogEditorArg);
 
 	// Log Default File Name
 	OnOKLogFilename();

@@ -213,6 +213,7 @@ int __ismbblead(BYTE b, int code_page);
 void SetDPIAwareness(const wchar_t *SetupFNameW);
 wchar_t *GetFullPathW(const wchar_t *dir, const wchar_t *rel_path);
 char *GetVersionSubstr(void);
+DWORD TTCreateProcess(const wchar_t *cmd, const wchar_t *arg1, const wchar_t *arg2);
 
 #ifdef __cplusplus
 }

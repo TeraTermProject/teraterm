@@ -56,11 +56,13 @@
 #define IDC_RADIO_LF                    1021
 #define IDC_ENTERGROUP                  1022
 #define IDC_VIEWLOG_LABEL               1023
-#define IDC_VIEWLOG_EDITOR              1024
+#define IDC_VIEWLOG_EDITOR_EXE          1024
 #define IDC_VIEWLOG_PATH                1025
 #define IDC_DEFAULTNAME_LABEL           1026
 #define IDC_DEFAULTNAME_EDITOR          1027
-#define IDC_ETERM_LOOKFEEL              1030
+#define IDC_VIEWLOG_EDITOR_ARG          1028
+#define IDC_VIEWLOG_ARG_LABEL           1029
+#define IDC_VIEWLOG_EXE_LABEL           1030
 #define IDC_DISABLE_PASTE_RBUTTON       1032
 #define IDC_CLICKABLE_URL               1033
 #define IDC_CONFIRM_PASTE_RBUTTON       1034

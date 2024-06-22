@@ -3809,29 +3809,19 @@ void CVTWindow::OnCygwinConnection()
 //
 void CVTWindow::OnTTMenuLaunch()
 {
-	const char *exename = "ttpmenu.exe";
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
+	static const wchar_t *exename = L"ttpmenu.exe";
 
-	memset(&si, 0, sizeof(si));
-	GetStartupInfo(&si);
-	memset(&pi, 0, sizeof(pi));
-
-	if (CreateProcess(exename, NULL, NULL, NULL, FALSE, 0,
-	                  NULL, NULL, &si, &pi) == 0) {
+	DWORD e = TTCreateProcess(exename, NULL, NULL);
+	if (e != NO_ERROR) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
 			"MSG_EXEC_TTMENU_ERROR", L"Can't execute TeraTerm Menu. (%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, GetLastError());
-	} else {
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, e);
 	}
 }
-
 
 void CVTWindow::OnFileLog()
 {
@@ -3887,31 +3877,16 @@ void CVTWindow::OnCommentToLog()
 	FLogAddCommentDlg(m_hInst, HVTWin);
 }
 
-// ログの閲覧 (2005.1.29 yutaka)
+// ログの閲覧
 void CVTWindow::OnViewLog()
 {
-	STARTUPINFOW si;
-	PROCESS_INFORMATION pi;
-
 	if(!FLogIsOpend()) {
 		return;
 	}
 
 	const wchar_t *filename = FLogGetFilename();
-
-	memset(&si, 0, sizeof(si));
-	GetStartupInfoW(&si);
-	memset(&pi, 0, sizeof(pi));
-
-	wchar_t *command;
-	wchar_t *ViewlogEditor = GetViewlogEditor(&ts);
-	aswprintf(&command, L"\"%s\" \"%s\"", ViewlogEditor, filename);
-	free(ViewlogEditor);
-
-	BOOL r = CreateProcessW(NULL, command, NULL, NULL, FALSE, 0,
-							NULL, NULL, &si, &pi);
-	free(command);
-	if (r == 0) {
+	DWORD e = TTCreateProcess(ts.ViewlogEditorW, ts.ViewlogEditorArg, filename);
+	if (e != NO_ERROR) {
 		DWORD error = GetLastError();
 		static const TTMessageBoxInfoW mbinfo = {
 			"Tera Term",
@@ -3920,9 +3895,6 @@ void CVTWindow::OnViewLog()
 			MB_OK | MB_ICONWARNING
 		};
 		TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, error);
-	} else {
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
 	}
 }
 
@@ -3955,7 +3927,7 @@ static wchar_t *_get_lang_msg(const char *key, const wchar_t *def, const wchar_t
 void CVTWindow::OnReplayLog()
 {
 	wchar_t *szFile;
-	const wchar_t *exec = L"ttermpro.exe";
+	static const wchar_t *exec = L"ttermpro.exe";
 
 	// バイナリモードで採取したログファイルを選択する
 	wchar_t *filter = _get_lang_msg("FILEDLG_OPEN_LOGFILE_FILTER", L"all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW);
@@ -3975,27 +3947,20 @@ void CVTWindow::OnReplayLog()
 	// "/R"オプション付きでTera Termを起動する（ログが再生される）
 	wchar_t *exe_dir = GetExeDirW(NULL);
 	wchar_t *Command;
-	aswprintf(&Command, L"%s\\%s /R=\"%s\"", exe_dir, exec, szFile);
+	aswprintf(&Command, L"\"%s\\%s\" /R=\"%s\"", exe_dir, exec, szFile);
 	free(exe_dir);
 	free(szFile);
 
-	STARTUPINFOW si = {};
-	PROCESS_INFORMATION pi = {};
-	GetStartupInfoW(&si);
-
-	r = CreateProcessW(NULL, Command, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+	DWORD e = TTWinExec(Command);
 	free(Command);
-	if (r == FALSE) {
+	if (e != NO_ERROR) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
 			"MSG_EXEC_TT_ERROR", L"Can't execute Tera Term. (%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, GetLastError());
-	} else {
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, e);
 	}
 }
 
