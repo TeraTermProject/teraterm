@@ -67,7 +67,7 @@
 #define _OutputDebugPrintf(...)  (void)0
 #endif
 
-int WinWidth, WinHeight;
+int WinWidth, WinHeight;		// 画面に表示されている文字数
 static BOOL Active = FALSE;
 static BOOL CompletelyVisible;
 HFONT VTFont[AttrFontMask+1];
@@ -81,10 +81,11 @@ int CursorX, CursorY;
 static RECT VirtualScreen;
 
 // --- scrolling status flags
-int WinOrgX, WinOrgY, NewOrgX, NewOrgY;
+int WinOrgX, WinOrgY;			// 現在の表示位置
+int NewOrgX, NewOrgY;			// 更新後の表示位置
 
-int NumOfLines, NumOfColumns;
-int PageStart, BuffEnd;
+int NumOfLines, NumOfColumns;	// バッファリングしている文字数
+int PageStart, BuffEnd;			// 表示しているバッファ内の位置
 
 static BOOL CursorOnDBCS = FALSE;
 static BOOL SaveWinSize = FALSE;
