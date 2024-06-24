@@ -13,6 +13,7 @@
 # 1.1 (2008.02.23 Yutaka Hirata)
 # 1.2 (2009.03.03 Yutaka Hirata)
 # 1.3 (2009.03.04 NAGATA Shinya)
+# 1.4 (2024.06.25 hkanou)
 #
 
 $macroidfile = '..\teraterm\ttpmacro\ttmparse.h';
@@ -134,8 +135,6 @@ sub do_main {
 		print "$ret\n";
 		return;
 	}
-
-	$pat = "\\b$macro\\b";
 
 	# 置換
 	# helpid.h とコマンドのヘルプファイルで名前が一致していないため
