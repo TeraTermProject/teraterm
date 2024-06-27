@@ -2067,7 +2067,7 @@ char *GetVersionSubstr(void)
 DWORD TTCreateProcess(const wchar_t *cmd, const wchar_t *arg1, const wchar_t *arg2)
 {
 	DWORD e = NO_ERROR;
-	if (cmd != NULL) {
+	if (cmd != NULL && cmd[0] != 0) {
 		wchar_t *command;
 		if (cmd[0] == L'\"' || wcschr(cmd, L' ') == NULL) {
 			command = _wcsdup(cmd);
