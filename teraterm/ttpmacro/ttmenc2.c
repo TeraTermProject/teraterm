@@ -38,6 +38,7 @@
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include <openssl/hmac.h>
+#include <openssl/crypto.h>
 #include "ttmdef.h"
 #include "ttmparse.h"
 
@@ -171,7 +172,7 @@ static int Encrypt2ProfileSearch (HANDLE FH, const char *KeyStr, Encrypt2Profile
 		}
 		if (ProfileB64Len != ENCRYPT2_BASE64_LEN ||
 			b64decode((PCHAR)&Lprofile, ENCRYPT2_PROFILE_LEN + 1, ProfileB64) != ENCRYPT2_PROFILE_LEN ||
-			memcmp(Lprofile.Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1) != 0) {
+			CRYPTO_memcmp(Lprofile.Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1) != 0) {
 			continue;
 		}
 		// KeyStrのhashが一致するか確認
@@ -182,7 +183,7 @@ static int Encrypt2ProfileSearch (HANDLE FH, const char *KeyStr, Encrypt2Profile
 			continue;
 		}
 
-		if (memcmp(KeyHash, Lprofile.KeyHash, SHA512_DIGEST_LENGTH) == 0) {
+		if (CRYPTO_memcmp(KeyHash, Lprofile.KeyHash, SHA512_DIGEST_LENGTH) == 0) {
 			memcpy(Profile, &Lprofile, ENCRYPT2_PROFILE_LEN);
 			if ((Cpos = SetFilePointer(FH, 0, NULL, FILE_CURRENT)) == INVALID_SET_FILE_POINTER) {
 				break;
@@ -361,7 +362,7 @@ static int Encrypt2EncDec(char *PassStr, const char *EncryptStr, Encrypt2Profile
 			goto end;
 		}
 		memcpy(PassStr, Lprofile.PassStr, ENCRYPT2_PWD_MAX_LEN);
-		if (memcmp(Hash, Lprofile.EncHash, SHA512_DIGEST_LENGTH) == 0) {
+		if (CRYPTO_memcmp(Hash, Lprofile.EncHash, SHA512_DIGEST_LENGTH) == 0) {
 			PassStr[ENCRYPT2_PWD_MAX_LEN] = 0;
 			ret = 1;	// 一致
 		} else {
@@ -394,7 +395,7 @@ int Encrypt2SetPassword(LPCWSTR FileNameStr, const char *KeyStr, const char *Pas
 
 	if (Encrypt2ProfileSearch(FH, KeyStr, &OldProfile) == 1) {
 		if (Encrypt2EncDec(OldProfile.PassStr, EncryptStr, &OldProfile, ENCRYPT2_DECRYPT) == 1 &&
-			memcmp(OldProfile.PassStr, PassStr, ENCRYPT2_PWD_MAX_LEN) == 0) {
+			CRYPTO_memcmp(OldProfile.PassStr, PassStr, ENCRYPT2_PWD_MAX_LEN) == 0) {
 			CloseHandle(FH);
 			return 1;	// パスワード変更無し
 		}
@@ -519,7 +520,7 @@ int Encrypt2DelPassword(LPCWSTR FileNameStr, const char *KeyStr)
 		ProfileLen = b64decode((PCHAR)&Profile, ENCRYPT2_PROFILE_LEN + 1, ProfileB64);
 		if (ProfileB64Len != ENCRYPT2_BASE64_LEN ||
 			ProfileLen != ENCRYPT2_PROFILE_LEN ||
-			memcmp(Profile.Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1) != 0) {
+			CRYPTO_memcmp(Profile.Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1) != 0) {
 			memcpy(cp, ProfileB64, ProfileB64Len);
 			cp += ProfileB64Len;
 			memcpy(cp, "\015\012", 2);
