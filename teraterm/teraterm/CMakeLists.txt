@@ -111,6 +111,8 @@ set(SRC_DIALOG
   general_pp.h
   keyboard_pp.c
   keyboard_pp.h
+  log_pp.cpp
+  log_pp.h
   logdlg.cpp
   logdlg.h
   mouse_pp.cpp
