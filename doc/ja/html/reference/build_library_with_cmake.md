@@ -35,27 +35,32 @@
 
 libs/buildall_cmake.bat を実行して使用する Visual Studioを選ぶ
 
-    1. Visual Studio 17 2022
+    1. Visual Studio 17 2022 Win32
     2. Visual Studio 17 2022 x64
-    3. Visual Studio 16 2019
-    4. Visual Studio 16 2019 x64
-    5. Visual Studio 15 2017
-    6. Visual Studio 14 2015
-    7. Visual Studio 12 2013
-    8. Visual Studio 11 2012
-    9. Visual Studio 10 2010
-    a. Visual Studio 9 2008
+    3. Visual Studio 17 2022 arm64
+    4. Visual Studio 16 2019 Win32
+    5. Visual Studio 16 2019 x64
+    6. Visual Studio 15 2017
+    7. Visual Studio 14 2015
+    8. Visual Studio 12 2013
+    9. Visual Studio 11 2012
+    a. Visual Studio 10 2010
+    b. Visual Studio 9 2008
     select no
 
 ### cmakeを使用する場合
 
 Visual Studio 2022 x86 の場合
 
-    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=32 -P buildall.cmake
+    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=win32 -P buildall.cmake
 
 Visual Studio 2022 x64 の場合
 
-    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=64 -P buildall.cmake`
+    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=x64 -P buildall.cmake`
+
+Visual Studio 2022 arm64 の場合
+
+    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm64 -P buildall.cmake`
 
 ## MinGW 共通
 
