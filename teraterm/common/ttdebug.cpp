@@ -71,7 +71,7 @@ HWND DebugConsoleOpen(void)
 // (2007.9.30 yutaka)
 //
 // 例外コードを文字列へ変換する
-#if !defined(_M_X64)
+#if defined(_M_IX86)	// WIN32
 static const char *GetExceptionString(DWORD exception)
 {
 #define EXCEPTION(x) case EXCEPTION_##x: return (#x);
@@ -252,7 +252,7 @@ static void CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 error:
 	;
 }
-#endif // !defined(_M_X64 )
+#endif // defined(_M_IX86)
 
 static wchar_t *CreateDumpFilename()
 {
@@ -334,7 +334,7 @@ static LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS* pExceptionPointer
 		free(dumpfile);
 	}
 
-#if !defined(_M_X64)
+#if defined(_M_IX86)
 	ApplicationFaultHandler(pExceptionPointers);
 #endif
 
