@@ -43,6 +43,7 @@ private:
 	const wchar_t *TitleStr;
 	int  init_WW, TW, TH;
 	SIZE s;
+	HINSTANCE m_hInst;
 
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnOK();

@@ -320,6 +320,11 @@ typedef enum {
 #define RsvALShift      1021 // arithmetic left shift
 #define RsvLRShift      1022 // logical right shift
 
+#define ExtListBoxDoubleclick   1
+#define ExtListBoxMinmaxbutton  2
+#define ExtListBoxMinimize      4
+#define ExtListBoxMaximize      8
+#define ExtListBoxSize         16
 
 // integer type for buffer pointer
 typedef DWORD BINT;

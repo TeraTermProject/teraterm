@@ -54,6 +54,7 @@ void SetResult(int ResultCode);
 BOOL CheckTimeout();
 BOOL TestWakeup(int Wakeup);
 void SetWakeup(int Wakeup);
+void TTLShowMINIMIZE();
 
 // exit code of TTMACRO
 extern int ExitCode;

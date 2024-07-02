@@ -40,7 +40,7 @@ extern "C" {
 void ParseParam(PBOOL IOption, PBOOL VOption);
 BOOL GetFileName(HWND HWin, wchar_t **fname);
 void SetDlgPos(int x, int y);
-void OpenInpDlg(wchar_t *Input, const wchar_t *Text, const wchar_t *Caption,
+int OpenInpDlg(wchar_t *Input, const wchar_t *Text, const wchar_t *Caption,
                 const wchar_t *Default, BOOL Paswd);
 int OpenErrDlg(const char *Msg, const char *Line, int lineno, int start, int end, const char *FileName);
 int OpenMsgDlg(const wchar_t *Text, const wchar_t *Caption, BOOL YesNo);
@@ -48,7 +48,7 @@ void OpenStatDlg(const wchar_t *Text, const wchar_t *Caption);
 void CloseStatDlg();
 void BringupStatDlg();
 
-int OpenListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected);
+int OpenListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected, int ext, int DlgWidth, int DlgHeight);
 
 extern wchar_t *HomeDirW;
 extern wchar_t FileName[MAX_PATH];
