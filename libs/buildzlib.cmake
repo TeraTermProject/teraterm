@@ -1,7 +1,8 @@
 ﻿# for zlib
-# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=64 -P buildzlib.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=32 -P buildzlib.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DARCHITECTURE=32 -P buildzlib.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=win32 -P buildzlib.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=x64   -P buildzlib.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm64 -P buildzlib.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm   -P buildzlib.cmake
 # cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=64 -P buildzlib.cmake
 
 include(script_support.cmake)
@@ -10,10 +11,6 @@ set(EXTRACT_DIR "${CMAKE_CURRENT_LIST_DIR}/build/zlib/src")
 set(SRC_DIR "${EXTRACT_DIR}/zlib")
 set(BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/build/zlib/build_${TOOLSET}")
 set(INSTALL_DIR "${CMAKE_CURRENT_LIST_DIR}/zlib_${TOOLSET}")
-if(${ARCHITECTURE} EQUAL 64)
-  set(INSTALL_DIR "${INSTALL_DIR}_x64")
-  set(BUILD_DIR "${BUILD_DIR}_x64")
-endif()
 
 ########################################
 
@@ -67,10 +64,8 @@ file(MAKE_DIRECTORY "${BUILD_DIR}")
 if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
   # multi-configuration
   unset(GENERATE_OPTIONS)
-  if(${ARCHITECTURE} EQUAL 64)
-    list(APPEND GENERATE_OPTIONS "-A" "x64")
-  else()
-    list(APPEND GENERATE_OPTIONS "-A" "Win32")
+  if(DEFINED ARCHITECTURE)
+    list(APPEND GENERATE_OPTIONS "-A" ${ARCHITECTURE})
   endif()
   list(APPEND GENERATE_OPTIONS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}")
   list(APPEND GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/VSToolchain.cmake")

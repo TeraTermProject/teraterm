@@ -1,22 +1,16 @@
 ﻿# for oniguruma
-# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=64 -P buildoniguruma.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=32 -P buildoniguruma.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DARCHITECTURE=32 -P buildoniguruma.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=win32 -P buildoniguruma.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=x64   -P buildoniguruma.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm64 -P buildoniguruma.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm   -P buildoniguruma.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 8 2005" -P buildoniguruma.cmake
 
 include(script_support.cmake)
 
 set(EXTRACT_DIR "${CMAKE_CURRENT_LIST_DIR}/build/oniguruma/src")
 set(SRC_DIR "${EXTRACT_DIR}/oniguruma")
-set(INSTALL_DIR "${CMAKE_CURRENT_LIST_DIR}/oniguruma_${TOOLSET}")
 set(BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/build/oniguruma/build_${TOOLSET}")
-if(${ARCHITECTURE} EQUAL 64)
-  set(INSTALL_DIR "${INSTALL_DIR}_x64")
-  set(BUILD_DIR "${BUILD_DIR}_x64")
-endif()
-
-#message("BUILD_DIR=${BUILD_DIR}")
-#message("INSTALL_DIR=${INSTALL_DIR}")
+set(INSTALL_DIR "${CMAKE_CURRENT_LIST_DIR}/oniguruma_${TOOLSET}")
 
 ########################################
 
@@ -79,10 +73,8 @@ file(MAKE_DIRECTORY "${BUILD_DIR}")
 if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
   # multi-configuration
   unset(GENERATE_OPTIONS)
-  if(${ARCHITECTURE} EQUAL 64)
-    list(APPEND GENERATE_OPTIONS "-A" "x64")
-  else()
-    list(APPEND GENERATE_OPTIONS "-A" "Win32")
+  if(DEFINED ARCHITECTURE)
+    list(APPEND GENERATE_OPTIONS "-A" ${ARCHITECTURE})
   endif()
   list(APPEND GENERATE_OPTIONS "-DCMAKE_DEBUG_POSTFIX=d")
   list(APPEND GENERATE_OPTIONS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}")
