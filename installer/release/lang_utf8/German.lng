@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2024-06-22 by TeraTerm Project
+date=2024-07-06 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -372,9 +372,6 @@ MSG_CREATE_THREAD_ERROR=Thread kann nicht erzeugt werden
 ; ttdlg.c
 DLG_ABOUT_TITLE=Über Tera Term
 
-DLG_DIR_TITLE=Verzeichnis wechseln
-DLG_DIR_CURRENT=Aktuell:
-DLG_DIR_NEW=&Neu:
 DLG_SELECT_DIR_TITLE=Neues Verzeichnis wählen
 
 DLG_GEN_TITLE=Tera-Grundeinstellungen

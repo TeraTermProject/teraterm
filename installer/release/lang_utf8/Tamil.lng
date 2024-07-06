@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2024-06-22 by TeraTerm Project
+date=2024-07-06 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -372,9 +372,6 @@ MSG_CREATE_THREAD_ERROR=நூலை உருவாக்க முடியா
 ; ttdlg.c
 DLG_ABOUT_TITLE=தேரா முனைத்தைப் பற்றி
 
-DLG_DIR_TITLE=தேரா முனை: கோப்பகத்தை மாற்றவும்
-DLG_DIR_CURRENT=தற்போதைய கோப்பகம்:
-DLG_DIR_NEW=&புதிய கோப்பகம்:
 DLG_SELECT_DIR_TITLE=புதிய கோப்பகத்தைத் தேர்ந்தெடுக்கவும்
 
 DLG_GEN_TITLE=தேரா முனை: பொது அமைப்பு

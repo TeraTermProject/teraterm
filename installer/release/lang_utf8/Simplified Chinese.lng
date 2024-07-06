@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2024-06-22 by TeraTerm Project
+date=2024-07-06 by TeraTerm Project
 contributor=LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -372,9 +372,6 @@ MSG_CREATE_THREAD_ERROR=创建线程失败
 ; ttdlg.c
 DLG_ABOUT_TITLE=关于 Tera Term
 
-DLG_DIR_TITLE=Tera Term：更改文件夹
-DLG_DIR_CURRENT=当前文件夹：
-DLG_DIR_NEW=新文件夹(&N)：
 DLG_SELECT_DIR_TITLE=选择新文件夹
 
 DLG_GEN_TITLE=Tera Term：常规设置

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2024-06-22 by TeraTerm Project
+date=2024-07-06 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -372,9 +372,6 @@ MSG_CREATE_THREAD_ERROR=スレッドが作成できません
 ; ttdlg.c
 DLG_ABOUT_TITLE=Tera Term について
 
-DLG_DIR_TITLE=Tera Term: ディレクトリ変更
-DLG_DIR_CURRENT=現在:
-DLG_DIR_NEW=新規(&N):
 DLG_SELECT_DIR_TITLE=新しいディレクトリを選択してください
 
 DLG_GEN_TITLE=Tera Term: 全般設定

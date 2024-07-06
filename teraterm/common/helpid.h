@@ -40,7 +40,6 @@
 #define HlpFileZmodemSend       8
 #define HlpFileBPlusSend        9
 #define HlpFileQVSend           10
-#define HlpFileChangeDir        11
 #define HlpFilePrint            12
 #define HlpSetupTerminal        13
 #define HlpSetupWindow          15

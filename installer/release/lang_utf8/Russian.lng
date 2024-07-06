@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2024-06-22 by TeraTerm Project
+date=2024-07-06 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -372,9 +372,6 @@ MSG_CREATE_THREAD_ERROR=Не удается создать поток
 ; ttdlg.c
 DLG_ABOUT_TITLE=О программе Tera Term
 
-DLG_DIR_TITLE=Tera Term: Изменить папку
-DLG_DIR_CURRENT=Текущая папка:
-DLG_DIR_NEW=&Новая папка:
 DLG_SELECT_DIR_TITLE=Выбрать новую папку
 
 DLG_GEN_TITLE=Tera Term: Общие настройки

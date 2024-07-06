@@ -1,6 +1,6 @@
 ﻿[Info]
 language=English
-date=2024-06-22 by TeraTerm Project
+date=2024-07-06 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -372,9 +372,6 @@ MSG_CREATE_THREAD_ERROR=Can't create thread
 ; ttdlg.c
 DLG_ABOUT_TITLE=About Tera Term
 
-DLG_DIR_TITLE=Tera Term: Change directory
-DLG_DIR_CURRENT=Current dir:
-DLG_DIR_NEW=&New dir:
 DLG_SELECT_DIR_TITLE=Select new directory
 
 DLG_GEN_TITLE=Tera Term: General setup

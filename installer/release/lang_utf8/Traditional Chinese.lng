@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2024-06-22 by TeraTerm Project
+date=2024-07-06 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -372,9 +372,6 @@ MSG_CREATE_THREAD_ERROR=創建線程失敗
 ; ttdlg.c
 DLG_ABOUT_TITLE=關於 Tera Term
 
-DLG_DIR_TITLE=Tera Term：更改文件夾
-DLG_DIR_CURRENT=當前文件夾：
-DLG_DIR_NEW=新文件夾(&N)：
 DLG_SELECT_DIR_TITLE=選擇新文件夾
 
 DLG_GEN_TITLE=Tera Term：設定設定

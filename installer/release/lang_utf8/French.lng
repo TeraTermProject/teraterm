@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2024-06-22 by TeraTerm Project
+date=2024-07-06 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -372,9 +372,6 @@ MSG_CREATE_THREAD_ERROR=Impossible de créer la tâche
 ; ttdlg.c
 DLG_ABOUT_TITLE=A propos de Tera Term
 
-DLG_DIR_TITLE=Tera Term: Changer de répertoire
-DLG_DIR_CURRENT=Répertoire courant:
-DLG_DIR_NEW=Nouveau répertoire:
 DLG_SELECT_DIR_TITLE=Selectionner un nouveau répertoire
 
 DLG_GEN_TITLE=Tera Term: Configuration générale

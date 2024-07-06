@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2024-06-22 by TeraTerm Project
+date=2024-07-06 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -372,9 +372,6 @@ MSG_CREATE_THREAD_ERROR=쓰레드를 만들 수 없습니다
 ; ttdlg.c
 DLG_ABOUT_TITLE=Tera Term에 대하여
 
-DLG_DIR_TITLE=Tera Term: 디렉토리 변경
-DLG_DIR_CURRENT=현재 위치:
-DLG_DIR_NEW=새 위치(&N):
 DLG_SELECT_DIR_TITLE=새로운 경로를 선택하세요
 
 DLG_GEN_TITLE=Tera Term: 일반설정
