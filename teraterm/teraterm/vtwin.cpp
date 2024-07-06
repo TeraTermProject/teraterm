@@ -766,8 +766,6 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		{ ID_SETUP_TERMINAL, "MENU_SETUP_TERMINAL" },
 		{ ID_SETUP_WINDOW, "MENU_SETUP_WINDOW" },
 		{ ID_SETUP_FONT, "MENU_SETUP_FONT" },
-		{ ID_SETUP_DLG_FONT, "MENU_SETUP_DIALOG_FONT" },
-		{ 2, "MENU_SETUP_FONT_SUBMENU" },
 		{ ID_SETUP_KEYBOARD, "MENU_SETUP_KEYBOARD" },
 		{ ID_SETUP_SERIALPORT, "MENU_SETUP_SERIALPORT" },
 		{ ID_SETUP_TCPIP, "MENU_SETUP_TCPIP" },
@@ -4324,15 +4322,7 @@ void CVTWindow::OnSetupWindow()
 
 void CVTWindow::OnSetupFont()
 {
-	if (ts.ExperimentalDontUseFontDialog) {
-		OpenExternalSetup(CAddSettingPropSheetDlg::FontPage);
-	}
-	else {
-		HelpId = HlpSetupFont;
-		DispSetupFontDlg(m_hWnd);
-		// ANSI表示用のコードページを設定する
-		BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
-	}
+	OpenExternalSetup(CAddSettingPropSheetDlg::FontPage);
 }
 
 static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
@@ -4351,60 +4341,6 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 		CenterWindow(Dialog, GetParent(Dialog));
 	}
 	return FALSE;
-}
-
-void CVTWindow::OnSetupDlgFont()
-{
-	if (ts.ExperimentalDontUseFontDialog) {
-		OpenExternalSetup(CAddSettingPropSheetDlg::FontPage);
-	}
-	else {
-		LOGFONTW LogFont;
-		CHOOSEFONTW cf;
-		BOOL result;
-
-		// LOGFONT準備
-		memset(&LogFont, 0, sizeof(LogFont));
-		if (ts.DialogFontNameW[0] == 0) {
-			// フォントが設定されていなかったらOS設定を使用する
-			GetMessageboxFontW(&LogFont);
-		}
-		else {
-			wcsncpy_s(LogFont.lfFaceName, _countof(LogFont.lfFaceName), ts.DialogFontNameW,  _TRUNCATE);
-			LogFont.lfHeight = -GetFontPixelFromPoint(m_hWnd, ts.DialogFontPoint);
-			LogFont.lfCharSet = ts.DialogFontCharSet;
-			LogFont.lfWeight = FW_NORMAL;
-			LogFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
-			LogFont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
-			LogFont.lfQuality = DEFAULT_QUALITY;
-			LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
-		}
-
-		// ダイアログ表示
-		memset(&cf, 0, sizeof(cf));
-		cf.lStructSize = sizeof(cf);
-		cf.hwndOwner = HVTWin;
-		cf.lpLogFont = &LogFont;
-		cf.Flags =
-			CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
-			CF_SHOWHELP | CF_NOVERTFONTS |
-			CF_ENABLEHOOK;
-		if (IsWindows7OrLater() && ts.ListHiddenFonts) {
-			cf.Flags |= CF_INACTIVEFONTS;
-		}
-		cf.lpfnHook = TFontHook;
-		cf.nFontType = REGULAR_FONTTYPE;
-		cf.hInstance = m_hInst;
-		HelpId = HlpSetupFont;
-		result = ChooseFontW(&cf);
-
-		if (result) {
-			// 設定
-			wcsncpy_s(ts.DialogFontNameW, _countof(ts.DialogFontNameW), LogFont.lfFaceName, _TRUNCATE);
-			ts.DialogFontPoint = cf.iPointSize / 10;
-			ts.DialogFontCharSet = LogFont.lfCharSet;
-		}
-	}
 }
 
 void CVTWindow::OnSetupKeyboard()
@@ -5291,7 +5227,6 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_SETUP_TERMINAL: OnSetupTerminal(); break;
 		case ID_SETUP_WINDOW: OnSetupWindow(); break;
 		case ID_SETUP_FONT: OnSetupFont(); break;
-		case ID_SETUP_DLG_FONT: OnSetupDlgFont(); break;
 		case ID_SETUP_KEYBOARD: OnSetupKeyboard(); break;
 		case ID_SETUP_SERIALPORT: OnSetupSerialPort(); break;
 		case ID_SETUP_TCPIP: OnSetupTCPIP(); break;

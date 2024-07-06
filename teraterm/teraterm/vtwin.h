@@ -204,7 +204,6 @@ protected:
 	void OnSetupTerminal();
 	void OnSetupWindow();
 	void OnSetupFont();
-	void OnSetupDlgFont();
 	void OnSetupKeyboard();
 	void OnSetupSerialPort();
 	void OnSetupTCPIP();

@@ -38,11 +38,12 @@
 #include "font_pp_res.h"
 #include "dlglib.h"
 #include "setting.h"
-#include "vtdisp.h"		// for DispSetupFontDlg()
+#include "vtdisp.h"		// for DispSetLogFont()
 #include "buffer.h"
 #include "compat_win.h"	// for CF_INACTIVEFONTS
 #include "helpid.h"
 #include "codeconv.h"
+#include "ttdlg.h"	// _ChooseFontDlg()
 
 #include "font_pp.h"
 
@@ -54,7 +55,7 @@ struct FontPPData {
 	const wchar_t *UILanguageFileW;
 	TTTSet *pts;
 	DLGTEMPLATE *dlg_templ;
-//	LOGFONTA VTFont;
+	LOGFONTA VTFont;
 	LOGFONTW DlgFont;
 };
 
@@ -112,12 +113,13 @@ static BOOL ChooseDlgFont(HWND hWnd, FontPPData *dlg_data)
 	cf.lpLogFont = &dlg_data->DlgFont;
 	cf.Flags =
 		CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
-		CF_SHOWHELP | CF_NOVERTFONTS |
+		//CF_SHOWHELP |
+		CF_NOVERTFONTS |
 		CF_ENABLEHOOK;
 	if (IsWindows7OrLater() && ts->ListHiddenFonts) {
 		cf.Flags |= CF_INACTIVEFONTS;
 	}
-	cf.lpfnHook = &TFontHook;
+	cf.lpfnHook = TFontHook;
 	cf.nFontType = REGULAR_FONTTYPE;
 	cf.hInstance = dlg_data->hInst;
 	cf.lCustData = (LPARAM)dlg_data;
@@ -140,14 +142,62 @@ static void SetFontString(HWND hWnd, int item, const LOGFONTW *logfont)
 	SetDlgItemTextW(hWnd, item, b);
 }
 
-static void SetVTFontString(HWND hWnd, int item, const TTTSet *ts)
+/**
+ *	conver LOGFONTA -> LOGFONTW
+ */
+static void ConvertLOGFONTWA(const LOGFONTA *logfontA, LOGFONTW *logfontW)
 {
-	LOGFONTW logfont = {};
-	logfont.lfWidth = ts->VTFontSize.x;
-	logfont.lfHeight = ts->VTFontSize.y;
-	ACPToWideChar_t(ts->VTFont, logfont.lfFaceName, _countof(logfont.lfFaceName));
-	logfont.lfCharSet = ts->VTFontCharSet;
-	SetFontString(hWnd, item, &logfont);
+	logfontW->lfWidth = logfontA->lfWidth;
+	logfontW->lfHeight = logfontA->lfHeight;
+	logfontW->lfCharSet = logfontA->lfCharSet;
+	ACPToWideChar_t(logfontA->lfFaceName, logfontW->lfFaceName, _countof(logfontW->lfFaceName));
+}
+
+static void SetFontString(HWND hWnd, int item, const LOGFONTA *logfont)
+{
+	LOGFONTW logfontW = {};
+	ConvertLOGFONTWA(logfont, &logfontW);
+	SetFontString(hWnd, item, &logfontW);
+}
+
+/**
+ *	フォントのCharSet(LOGFONT.charlfCharSet)から
+ *	表示に妥当なCodePageを得る
+ */
+static int GetCodePageFromFontCharSet(BYTE char_set)
+{
+	static const struct {
+		BYTE CharSet;	// LOGFONT.lfCharSet
+		int CodePage;
+	} table[] = {
+		{ SHIFTJIS_CHARSET,  	932 },
+		{ HANGUL_CHARSET,		949 },
+		{ GB2312_CHARSET,	 	936 },
+		{ CHINESEBIG5_CHARSET,	950 },
+		{ RUSSIAN_CHARSET,		1251 },
+	};
+	int i;
+	for (i = 0; i < _countof(table); i++) {
+		if (table[i].CharSet == char_set) {
+			return table[i].CodePage;
+		}
+	}
+	return CP_ACP;
+}
+
+static BOOL ChooseVTFont(HWND hwndOwner, FontPPData *dlg_data)
+{
+	const TTTSet *ts = dlg_data->pts;
+	BOOL Ok;
+	LOGFONTA VTlf = dlg_data->VTFont;
+
+	Ok = _ChooseFontDlg(hwndOwner, &VTlf, ts);
+	if (! Ok) {
+		return FALSE;
+	}
+
+	dlg_data->VTFont = VTlf;
+	return TRUE;
 }
 
 static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -176,8 +226,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), dlg_data->pts->UILanguageFileW);
 
 			GetDlgLogFont(GetParent(hWnd), ts, &dlg_data->DlgFont);
+			SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
 
-			SetVTFontString(hWnd, IDC_VTFONT_EDIT, ts);
+			DispSetLogFont(&dlg_data->VTFont, FALSE);
+			SetFontString(hWnd, IDC_VTFONT_EDIT, &dlg_data->VTFont);
 
 			CheckDlgButton(hWnd,
 						   UnicodeDebugParam.UseUnicodeApi ? IDC_VTFONT_UNICODE : IDC_VTFONT_ANSI,
@@ -192,8 +244,6 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SetDlgItemInt(hWnd, IDC_SPACE_RIGHT, ts->FontDW, TRUE);
 			SetDlgItemInt(hWnd, IDC_SPACE_TOP, ts->FontDY, TRUE);
 			SetDlgItemInt(hWnd, IDC_SPACE_BOTTOM, ts->FontDH, TRUE);
-
-			SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
 
 			CheckDlgButton(hWnd, IDC_RESIZED_FONT, DispIsResizedFont());
 
@@ -210,6 +260,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					// ANSI表示用のコードページを設定する
 					BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
 					ts->ListHiddenFonts = IsDlgButtonChecked(hWnd, IDC_LIST_HIDDEN_FONTS) == BST_CHECKED;
+
+					strncpy_s(ts->VTFont, _countof(ts->VTFont), dlg_data->VTFont.lfFaceName, _TRUNCATE);
+					ts->VTFontSize.x = dlg_data->VTFont.lfWidth;
+					ts->VTFontSize.y = dlg_data->VTFont.lfHeight;
+					ts->VTFontCharSet = dlg_data->VTFont.lfCharSet;
 
 					SetDlgLogFont(GetParent(hWnd), &dlg_data->DlgFont, ts);
 
@@ -238,6 +293,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						}
 					}
 
+					// フォントの設定
+					ChangeFont();
+					DispChangeWinSize(WinWidth,WinHeight);
+					ChangeCaret();
+
 					break;
 				}
 				case PSN_HELP: {
@@ -260,9 +320,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				break;
 			}
 			case IDC_VTFONT_CHOOSE | (BN_CLICKED << 16): {
-				DispSetupFontDlg(hWnd);
-				SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, UnicodeDebugParam.CodePageForANSIDraw, FALSE);
-				SetVTFontString(hWnd, IDC_VTFONT_EDIT, ts);
+				if (ChooseVTFont(hWnd, dlg_data)) {
+					const int codepage = GetCodePageFromFontCharSet(dlg_data->VTFont.lfCharSet);
+					SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, codepage, FALSE);
+					SetFontString(hWnd, IDC_VTFONT_EDIT, &dlg_data->VTFont);
+				}
 				break;
 			}
 			case IDC_DLGFONT_CHOOSE | (BN_CLICKED << 16):

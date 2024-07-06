@@ -619,7 +619,6 @@ struct tttset {
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;
-	BYTE ExperimentalDontUseFontDialog;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

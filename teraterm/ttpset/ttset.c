@@ -2074,7 +2074,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	// Experimental
 	ts->ExperimentalTreeProprtySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
-	ts->ExperimentalDontUseFontDialog = GetOnOff("Experimental", "DontUseFontDialog", FName, FALSE);
 }
 
 /**

@@ -1780,7 +1780,14 @@ void DispConvScreenToWin
        *Yw = (Ys - WinOrgY) * FontHeight;
 }
 
-static void SetLogFont(LOGFONTA *VTlf, BOOL mul)
+/**
+ *	VTFont の取得
+ *
+ *	@param[out]		VTlf	取得したフォント情報
+ *	@param[in]		mul		TRUE の時、DPIに合わせたサイズを取得
+ *
+ */
+void DispSetLogFont(LOGFONTA *VTlf, BOOL mul)
 {
   memset(VTlf, 0, sizeof(*VTlf));
   VTlf->lfWeight = FW_NORMAL;
@@ -1818,7 +1825,7 @@ void ChangeFont(void)
 	}
 
 	/* Normal Font */
-	SetLogFont(&VTlf, TRUE);
+	DispSetLogFont(&VTlf, TRUE);
 	VTFont[AttrDefault] = CreateFontIndirect(&VTlf);
 
 	if (ts.UseIME > 0) {
@@ -1933,7 +1940,7 @@ void ResetIME(void)
 		if (ts.UseIME > 0) {
 			if (ts.IMEInline>0) {
 				LOGFONTA VTlf;
-				SetLogFont(&VTlf, TRUE);
+				DispSetLogFont(&VTlf, TRUE);
 				SetConversionLogFont(HVTWin, &VTlf);
 			}
 			else {
@@ -3316,33 +3323,6 @@ static int GetCodePageFromFontCharSet(BYTE char_set)
 		}
 	}
 	return CP_ACP;
-}
-
-void DispSetupFontDlg(HWND hwndOwner)
-//  Popup the Setup Font dialogbox and
-//  reset window
-{
-  BOOL Ok;
-  LOGFONTA VTlf;
-
-  ts.VTFlag = 1;
-  if (! LoadTTDLG()) return;
-  SetLogFont(&VTlf, FALSE);
-  Ok = ChooseFontDlg(hwndOwner,&VTlf,&ts);
-  if (! Ok) return;
-
-  strncpy_s(ts.VTFont, sizeof(ts.VTFont),VTlf.lfFaceName, _TRUNCATE);
-  ts.VTFontSize.x = VTlf.lfWidth;
-  ts.VTFontSize.y = VTlf.lfHeight;
-  ts.VTFontCharSet = VTlf.lfCharSet;
-
-  UnicodeDebugParam.CodePageForANSIDraw = GetCodePageFromFontCharSet(VTlf.lfCharSet);
-
-  ChangeFont();
-
-  DispChangeWinSize(WinWidth,WinHeight);
-
-  ChangeCaret();
 }
 
 /**
