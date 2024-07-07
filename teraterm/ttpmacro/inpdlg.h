@@ -52,9 +52,11 @@ private:
 	BOOL PaswdFlag;
 	int init_WW, TW, TH, BH, BW, EW, EH;
 	SIZE s;
+	HINSTANCE m_hInst;
 
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnOK();
+	virtual BOOL OnClose();
 	virtual LRESULT DlgProc(UINT msg, WPARAM wp, LPARAM lp);
 	LRESULT OnExitSizeMove(WPARAM wp, LPARAM lp);
  	void Relocation(BOOL is_init, int WW);

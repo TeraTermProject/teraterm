@@ -12,9 +12,20 @@
     <h1>Additional settings / "Log" タブ ([Setup] メニュー) </h1>
 
     <dl>
-      <dt id="ViewlogEditor">View log editor</dt>
+      <dt>View log editor</dt>
       <dd>
-	ログを表示するエディタを指定します。
+        <dl>
+          <dt id="ViewlogEditor">exe file</dt>
+          <dd>
+            ログを表示するプログラムを指定します。<br>
+            相対パスで指定すると、ttermpro.exeのフォルダ、環境変数PATHのフォルダからプログラムを検索します。<br>
+            空白の時はファイルの拡張子に関連付けされたプログラムが使用されます。
+          </dd>
+          <dt id="ViewlogEditorArg">args</dt>
+          <dd>
+            プログラムの引き数を指定します。
+          </dd>
+        </dl>
       </dd>
 
       <dt id="LogDefaultName">Default log file name</dt>
@@ -65,7 +76,7 @@ strftime と同様の書式:
       <dt id="LogDefaultPath">Default log save folder</dt>
       <dd>
 	端末ログの保存先を指定します。<br>
-	未設定の場合は<a href="../setup/folder.html#LogDir">ログフォルダ</a>に保存されます。<br>
+	端末ログの保存先については<a href="../setup/folder.html#TermLogDir">Tera Term が使用するフォルダ / 端末ログ</a>を参照ください。<br>
 	現在のフォルダは<a href="../menu/setup-directory.html">Setup Directory</a>で確認できます。
       </dd>
 

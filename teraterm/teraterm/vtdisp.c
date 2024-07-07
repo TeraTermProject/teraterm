@@ -67,7 +67,7 @@
 #define _OutputDebugPrintf(...)  (void)0
 #endif
 
-int WinWidth, WinHeight;
+int WinWidth, WinHeight;		// 画面に表示されている文字数
 static BOOL Active = FALSE;
 static BOOL CompletelyVisible;
 HFONT VTFont[AttrFontMask+1];
@@ -81,10 +81,11 @@ int CursorX, CursorY;
 static RECT VirtualScreen;
 
 // --- scrolling status flags
-int WinOrgX, WinOrgY, NewOrgX, NewOrgY;
+int WinOrgX, WinOrgY;			// 現在の表示位置
+int NewOrgX, NewOrgY;			// 更新後の表示位置
 
-int NumOfLines, NumOfColumns;
-int PageStart, BuffEnd;
+int NumOfLines, NumOfColumns;	// バッファリングしている文字数
+int PageStart, BuffEnd;			// 表示しているバッファ内の位置
 
 static BOOL CursorOnDBCS = FALSE;
 static BOOL SaveWinSize = FALSE;
@@ -1779,7 +1780,14 @@ void DispConvScreenToWin
        *Yw = (Ys - WinOrgY) * FontHeight;
 }
 
-static void SetLogFont(LOGFONTA *VTlf, BOOL mul)
+/**
+ *	VTFont の取得
+ *
+ *	@param[out]		VTlf	取得したフォント情報
+ *	@param[in]		mul		TRUE の時、DPIに合わせたサイズを取得
+ *
+ */
+void DispSetLogFont(LOGFONTA *VTlf, BOOL mul)
 {
   memset(VTlf, 0, sizeof(*VTlf));
   VTlf->lfWeight = FW_NORMAL;
@@ -1817,7 +1825,7 @@ void ChangeFont(void)
 	}
 
 	/* Normal Font */
-	SetLogFont(&VTlf, TRUE);
+	DispSetLogFont(&VTlf, TRUE);
 	VTFont[AttrDefault] = CreateFontIndirect(&VTlf);
 
 	if (ts.UseIME > 0) {
@@ -1932,7 +1940,7 @@ void ResetIME(void)
 		if (ts.UseIME > 0) {
 			if (ts.IMEInline>0) {
 				LOGFONTA VTlf;
-				SetLogFont(&VTlf, TRUE);
+				DispSetLogFont(&VTlf, TRUE);
 				SetConversionLogFont(HVTWin, &VTlf);
 			}
 			else {
@@ -3315,33 +3323,6 @@ static int GetCodePageFromFontCharSet(BYTE char_set)
 		}
 	}
 	return CP_ACP;
-}
-
-void DispSetupFontDlg(HWND hwndOwner)
-//  Popup the Setup Font dialogbox and
-//  reset window
-{
-  BOOL Ok;
-  LOGFONTA VTlf;
-
-  ts.VTFlag = 1;
-  if (! LoadTTDLG()) return;
-  SetLogFont(&VTlf, FALSE);
-  Ok = ChooseFontDlg(hwndOwner,&VTlf,&ts);
-  if (! Ok) return;
-
-  strncpy_s(ts.VTFont, sizeof(ts.VTFont),VTlf.lfFaceName, _TRUNCATE);
-  ts.VTFontSize.x = VTlf.lfWidth;
-  ts.VTFontSize.y = VTlf.lfHeight;
-  ts.VTFontCharSet = VTlf.lfCharSet;
-
-  UnicodeDebugParam.CodePageForANSIDraw = GetCodePageFromFontCharSet(VTlf.lfCharSet);
-
-  ChangeFont();
-
-  DispChangeWinSize(WinWidth,WinHeight);
-
-  ChangeCaret();
 }
 
 /**

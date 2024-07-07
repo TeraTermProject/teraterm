@@ -56,6 +56,7 @@ CInpDlg::CInpDlg(wchar_t *Input, const wchar_t *Text, const wchar_t *Title,
 
 INT_PTR CInpDlg::DoModal(HINSTANCE hInst, HWND hWndParent)
 {
+	m_hInst = hInst;
 	return TTCDialog::DoModal(hInst, hWndParent, CInpDlg::IDD);
 }
 
@@ -67,6 +68,8 @@ BOOL CInpDlg::OnInitDialog()
 	};
 	RECT R;
 	HWND HEdit, HOk;
+
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), 0);
 
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFileW);
 	SetWindowTextW(TitleStr);
@@ -102,6 +105,16 @@ BOOL CInpDlg::OnOK()
 {
 	GetDlgItemTextW(IDC_INPEDIT,InputStr,MaxStrLen-1);
 	EndDialog(IDOK);
+	return TRUE;
+}
+
+BOOL CInpDlg::OnClose()
+{
+	int ret = MessageBoxHaltScript(m_hWnd);
+	if (ret == IDYES) {
+		InputStr = NULL;
+		EndDialog(IDCLOSE);
+	}
 	return TRUE;
 }
 

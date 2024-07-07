@@ -26,60 +26,25 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTTSet related funcs */
+#pragma once
 
-#if !defined(_CRTDBG_MAP_ALLOC)
-#define _CRTDBG_MAP_ALLOC
-#endif
-#include <stdlib.h>
-#include <crtdbg.h>
-#include <string.h>
+#include "tt_res.h"
+#include "tmfc.h"
+#include "tmfc_propdlg.h"
 
-#include "win32helper.h"
-#include "compat_win.h"
-#include "tttypes.h"
-
-#include "ttlib_types.h"
-
-wchar_t *GetDownloadDir(const TTTSet *pts)
+// log page
+class CLogPropPageDlg : public TTCPropertyPage
 {
-	wchar_t *dir = NULL;
-	if (pts->FileDirW != NULL && pts->FileDirW[0] != 0) {
-		// ダウンロードフォルダが設定されている
-		// 環境変数を展開
-		hExpandEnvironmentStringsW(pts->FileDirW, &dir);
-		if (DoesFolderExistW(dir)) {
-			// フォルダが存在
-			return dir;
-		}
-		free(dir);
-	}
-
-	// Windowsのデフォルトのダウンロードフォルダを返す
-	_SHGetKnownFolderPath(FOLDERID_Downloads, KF_FLAG_CREATE, NULL, &dir);
-	return dir;
-}
-
-wchar_t *GetTermLogDir(const TTTSet *pts)
-{
-	if (pts->LogDefaultPathW != NULL && pts->LogDefaultPathW[0] != '\0') {
-		// 端末ログフォルダが指定されている場合
-		return _wcsdup(pts->LogDefaultPathW);
-	}
-
-	// ダウンロードフォルダ
-	if (pts->FileDirW != NULL && pts->FileDirW[0] != 0) {
-		// ダウンロードフォルダが設定されている
-		// 環境変数を展開
-		wchar_t *dir;
-		hExpandEnvironmentStringsW(pts->FileDirW, &dir);
-		if (DoesFolderExistW(dir)) {
-			// フォルダが存在
-			return dir;
-		}
-		free(dir);
-	}
-
-	// %LOCALAPPDATA%\teraterm5
-	return GetLogDirW(NULL);
-}
+public:
+	CLogPropPageDlg(HINSTANCE inst);
+	virtual ~CLogPropPageDlg();
+private:
+	void OnInitDialog();
+	void OnOK();
+	void OnOKLogFilename();
+	enum { IDD = IDD_TABSHEET_LOG };
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void OnHelp();
+	wchar_t *MakePreviewStr(const wchar_t *format, const wchar_t *UILanguageFile);
+	CTipWin *m_TipWin;
+};

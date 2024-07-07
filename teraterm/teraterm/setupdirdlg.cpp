@@ -135,16 +135,26 @@ error:
 	return (ret);
 }
 
+static wchar_t *GetExplorerFullPath(void)
+{
+	wchar_t *windows_dir;
+	_SHGetKnownFolderPath(FOLDERID_Windows, 0, NULL, &windows_dir);
+	wchar_t *explorer;
+	aswprintf(&explorer, L"%s\\explorer.exe", windows_dir);
+	free(windows_dir);
+	return explorer;
+}
+
 //
 // 指定したアプリケーションでファイルを開く。
 //
 // return TRUE: success
 //        FALSE: failure
 //
-static BOOL openFileWithApplication(const wchar_t *filename, const wchar_t *editor, const wchar_t *UILanguageFile)
+static BOOL openFileWithApplication(const wchar_t *filename,
+									const wchar_t *editor, const wchar_t *arg,
+									const wchar_t *UILanguageFile)
 {
-	BOOL ret = FALSE;
-
 	if (GetFileAttributesW(filename) == INVALID_FILE_ATTRIBUTES) {
 		// ファイルが存在しない
 		DWORD no = GetLastError();
@@ -159,14 +169,8 @@ static BOOL openFileWithApplication(const wchar_t *filename, const wchar_t *edit
 		return FALSE;
 	}
 
-	wchar_t *commandW = NULL;
-	aswprintf(&commandW, L"%s \"%s\"", editor, filename);
-
-	STARTUPINFOW si = {};
-	PROCESS_INFORMATION pi = {};
-	GetStartupInfoW(&si);
-
-	if (CreateProcessW(NULL, commandW, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi) == 0) {
+	DWORD e = TTCreateProcess(editor, arg, filename);
+	if (e != NO_ERROR) {
 		// 起動失敗
 		DWORD no = GetLastError();
 		static const TTMessageBoxInfoW info = {
@@ -175,21 +179,10 @@ static BOOL openFileWithApplication(const wchar_t *filename, const wchar_t *edit
 			"DLG_SETUPDIR_OPENFILE_ERROR", L"Cannot open file.(%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(NULL, &info, UILanguageFile, no);
-
-		goto error;
+		TTMessageBoxW(NULL, &info, UILanguageFile, e);
+		return FALSE;
 	}
-	else {
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
-	}
-
-	ret = TRUE;
-
-error:;
-	free(commandW);
-
-	return (ret);
+	return TRUE;
 }
 
 /**
@@ -204,7 +197,6 @@ error:;
 static BOOL openDirectoryWithExplorer(const wchar_t *file, const wchar_t *UILanguageFile)
 {
 	BOOL ret;
-
 	DWORD attr = GetFileAttributesW(file);
 	if (attr == INVALID_FILE_ATTRIBUTES) {
 		// ファイルが存在しない, ディレクトリをオープンする
@@ -212,7 +204,7 @@ static BOOL openDirectoryWithExplorer(const wchar_t *file, const wchar_t *UILang
 		attr = GetFileAttributesW(dir);
 		if ((attr != INVALID_FILE_ATTRIBUTES) && (attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 			// フォルダを開く
-			INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", L"explorer.exe", dir, NULL, SW_NORMAL);
+			INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"explore", dir, NULL, NULL, SW_NORMAL);
 			ret = h > 32 ? TRUE : FALSE;
 		}
 		else {
@@ -230,14 +222,16 @@ static BOOL openDirectoryWithExplorer(const wchar_t *file, const wchar_t *UILang
 		free(dir);
 	} else if ((attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 		// 指定されたのがフォルダだった、フォルダを開く
-		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", L"explorer.exe", file, NULL, SW_NORMAL);
+		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"explore", file, NULL, NULL, SW_NORMAL);
 		ret = h > 32 ? TRUE : FALSE;
 	} else {
 		// フォルダを開く + ファイル選択
+		wchar_t *explorer = GetExplorerFullPath();
 		wchar_t *param;
 		aswprintf(&param, L"/select,%s", file);
-		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", L"explorer.exe", param, NULL, SW_NORMAL);
+		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", explorer, param, NULL, SW_NORMAL);
 		free(param);
+		free(explorer);
 		ret = h > 32 ? TRUE : FALSE;
 	}
 	return ret;
@@ -363,9 +357,7 @@ static void PopupAndExec(HWND hWnd, const POINT *pointer_pos, const wchar_t *pat
 	switch (result) {
 	case 1: {
 		// アプリで開く
-		wchar_t *ViewlogEditor = GetViewlogEditor(pts);
-		openFileWithApplication(path, ViewlogEditor, UILanguageFile);
-		free(ViewlogEditor);
+		openFileWithApplication(path, pts->ViewlogEditorW, pts->ViewlogEditorArg, UILanguageFile);
 		break;
 	}
 	case 2: {

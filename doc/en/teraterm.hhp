@@ -28,7 +28,6 @@ HlpFileXmodemSend=html\menu\file-transfer-xmodem-send.html
 HlpFileZmodemSend=html\menu\file-transfer-zmodem-send.html
 HlpFileBPlusSend=html\menu\file-transfer-bplus-send.html
 HlpFileQVSend=html\menu\file-transfer-qv-send.html
-HlpFileChangeDir=html\menu\file-chdir.html
 HlpFilePrint=html\menu\file-print.html
 HlpSetupTerminal=html\menu\setup-terminal.html
 HlpSetupWindow=html\menu\setup-window.html

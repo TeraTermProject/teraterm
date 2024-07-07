@@ -417,7 +417,6 @@ static void DDESendRaw(uint8_t command, const char *ptr, size_t len)
 	if (buf == NULL) {
 		return;
 	}
-	//buf[0] = CmdSendUTF8String;
 	buf[0] = command;
 	buf[1] = (uint8_t)((len & 0xff000000 ) >> (8*3));
 	buf[2] = (uint8_t)((len & 0x00ff0000 ) >> (8*2));
@@ -441,6 +440,7 @@ void DDESend()
 
 void DDESendStringU8(const char *strU8)
 {
+	OutBuf[OutLen] = 0;
 	strU8 = OutBuf;
 	size_t len = strlen(strU8) + 1;		// I’[ '\0' ‚à‘—M‚·‚é
 	DDESendRaw(CmdSendUTF8String, strU8, len);

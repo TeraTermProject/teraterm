@@ -2041,3 +2041,74 @@ char *GetVersionSubstr(void)
 #endif
 	return buf;
 }
+
+/**
+ *	プロセスの起動
+ *
+ *	@param	cmd		cmd != NULL
+ *							コマンド
+ *							CreateProcessW() が使用される
+ *					cmd == NULLのとき
+ *							ファイル名の拡張子に合わせたプログラムが使用される
+ *							ShellExecuteW() が使用される
+ *	@param	arg1	cmd != NULL のとき
+ *							引き数1,引数のセパレータはスペース,
+ *							スペースを含む引数はダブルクオートで囲む
+ *							NULLのとき引数なし
+ *							cmdがNULL以外の時有効
+ *					cmd == NULL のとき
+ *							ShellExecuteW() の 第二引数
+ *	@param	arg2			引き数2,ファイル名を想定
+ *	@retval	NO_ERROR		エラーなし
+ *	@retval	エラーコード	(NO_ERROR以外)
+ *
+ *	TTWinExec()も参照
+ */
+DWORD TTCreateProcess(const wchar_t *cmd, const wchar_t *arg1, const wchar_t *arg2)
+{
+	DWORD e = NO_ERROR;
+	if (cmd != NULL && cmd[0] != 0) {
+		wchar_t *command;
+		if (cmd[0] == L'\"' || wcschr(cmd, L' ') == NULL) {
+			command = _wcsdup(cmd);
+		}
+		else {
+			aswprintf(&command, L"\"%s\"", cmd);
+		}
+
+		if (arg1 != NULL && arg1[0] != 0) {
+			awcscats(&command, L" ", arg1, NULL);
+		}
+
+		if (arg2 != NULL && arg2[0] != 0) {
+			if (arg2[0] == L'\"' || wcschr(arg2, L' ') == NULL) {
+				awcscats(&command, L" ", arg2, NULL);
+			}
+			else {
+				wchar_t *file;
+				aswprintf(&file, L"\"%s\"", arg2);
+				awcscats(&command, L" ", file, NULL);
+				free(file);
+			}
+		}
+
+		STARTUPINFOW si = {};
+		PROCESS_INFORMATION pi = {};
+		GetStartupInfoW(&si);
+		BOOL r = CreateProcessW(NULL, command, NULL, NULL, FALSE, 0,
+								NULL, NULL, &si, &pi);
+		if (r != 0) {
+			CloseHandle(pi.hThread);
+			CloseHandle(pi.hProcess);
+		}
+		free(command);
+	}
+	else {
+		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", arg2, NULL, NULL, SW_NORMAL);
+		if (h <= 32) {
+			// TODO エラー種別
+			e = ERROR_FILE_NOT_FOUND;
+		}
+	}
+	return e;
+}

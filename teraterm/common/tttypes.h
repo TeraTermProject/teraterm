@@ -615,10 +615,10 @@ struct tttset {
 	WORD BracketedSupport;
 	WORD BracketedControlOnly;
 	wchar_t *ViewlogEditorW;
+	wchar_t *ViewlogEditorArg;
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;
-	BYTE ExperimentalDontUseFontDialog;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

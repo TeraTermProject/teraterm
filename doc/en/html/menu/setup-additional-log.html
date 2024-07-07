@@ -12,9 +12,20 @@
     <h1>Additional settings / "Log" Tab ([Setup] Menu) </h1>
 
     <dl>
-      <dt id="ViewlogEditor">View log editor</dt>
+      <dt>View log editor</dt>
       <dd>
-	Specify the editor that is used for display log file
+        <dl>
+          <dt id="ViewlogEditor">exe file</dt>
+          <dd>
+            Specify program that is used for display log file.<br>
+            When program is relative path, program is searched from folder in ttermpro.exe and in PATH environment variable.<br>
+            If blank, program associated with file extension is used.
+          </dd>
+          <dt id="ViewlogEditorArg">args</dt>
+          <dd>
+            Specify program args.<br>
+          </dd>
+        </dl>
       </dd>
 
       <dt id="LogDefaultName">Default log file name</dt>
@@ -65,8 +76,8 @@ SYNOPSIS of strftime similar format:
 
       <dt id="LogDefaultPath">Default log save folder</dt>
       <dd>
-	Specify default log save folder.<br>
-	If not set, log is saved in <a href="../setup/folder.html#LogDir">log folder</a>.<br>
+	Specify default Terminal log save folder.<br>
+	Refer to <a href="../setup/folder.html#TermLogDir">Terminal log folder</a> for information where terminal logs are stored.<br>
 	The current folder can be check in <a href="../menu/setup-directory.html">Setup Directory</a>.
       </dd>
 
