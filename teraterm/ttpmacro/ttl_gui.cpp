@@ -426,8 +426,8 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 	TVarId VarId;
 	TStrVal StrTmp;
 	int ext = 0;
-	int width;
-	int height;
+	int width = 0;
+	int height = 0;
 
 	*Err = 0;
 	GetStrVal2(Str1, Err, TRUE);
