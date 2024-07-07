@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2024-06-15 by TeraTerm Project
+date=2024-07-07 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -55,9 +55,7 @@ MENU_EDIT_SELECTALL=전체 선택(&A)
 MENU_SETUP=설정(&S)
 MENU_SETUP_TERMINAL=터미널(&T)...
 MENU_SETUP_WINDOW=창(&W)...
-MENU_SETUP_FONT_SUBMENU=글꼴(&F)
 MENU_SETUP_FONT=글꼴(&F)...
-MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=키보드(&K)...
 MENU_SETUP_SERIALPORT=시리얼포트(&E)...
 MENU_SETUP_TCPIP=T&CP/IP...
@@ -272,7 +270,9 @@ DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=no use
 DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
-DLG_TAB_LOG_EDITOR=로그보기 에디터(&E)
+DLG_TAB_LOG_EDITOR=로그보기 에디터
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=기본 로그 파일 이름(strftime 형식)(&F)
 DLG_TAB_LOG_FILEPATH=기본 로그 저장 폴더(&S)
 DLG_TAB_LOG_AUTOSTART=자동 로깅 시작(&U)
@@ -370,9 +370,6 @@ MSG_CREATE_THREAD_ERROR=쓰레드를 만들 수 없습니다
 ; ttdlg.c
 DLG_ABOUT_TITLE=Tera Term에 대하여
 
-DLG_DIR_TITLE=Tera Term: 디렉토리 변경
-DLG_DIR_CURRENT=현재 위치:
-DLG_DIR_NEW=새 위치(&N):
 DLG_SELECT_DIR_TITLE=새로운 경로를 선택하세요
 
 DLG_GEN_TITLE=Tera Term: 일반설정
@@ -1157,6 +1154,8 @@ DLG_CONFIG_PASS=암호
 DLG_CONFIG_MACRO=특정 매크로파일
 DLG_CONFIG_LAUNCH=실행만
 DLG_CONFIG_STARTUP=시작시 실행
+DLG_CONFIG_LOCKBOX_CHECK=LockBox사용
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=SSH사용
 DLG_CONFIG_KEYFILE=키파일
 DLG_CONFIG_CHALLENGE=use Challenge
@@ -1172,6 +1171,15 @@ DLG_ETC_LOGFILE=로그파일
 DLG_ETC_PROMPT=Prompt
 DLG_ETC_USER=사용자 이름
 DLG_ETC_PASS=암호
+
+DLG_LOCKBOX_TITLE=Tera Term launch tool / TeraTerm Menu
+DLG_LOCKBOX_LABEL=LockBox 비밀번호를 입력하세요:
+DLG_LOCKBOX_SHOW=이 비밀번호는 LockBox를 잠그거나 잠금 해제하는 데 사용됩니다.
+DLG_LOCKBOX_WRONG=잘못된 비밀번호.
+DLG_LOCKBOX_STRTOOLONG=문자가 너무 많습니다.
+DLG_LOCKBOX_NOSTR=입력된 문자가 없습니다.
+DLG_LOCKBOX_VALID=비밀번호가 유효합니다.
+MSG_ERROR_NOLOCKBOX=오류: LockBox가 설정되지 않았습니다.
 
 MSG_ERROR_READREG=레지스트리 데이터를 읽을 수 없습니다.\n
 MSG_ERROR_MAKETTL='ttpmenu.TTL'를 만들 수 없습니다.\n

@@ -37,10 +37,10 @@
 #include	<crtdbg.h>
 #include	<assert.h>
 
+#include	"winmisc.h"
 #include	"ttpmenu.h"
 #include	"ttpmenu-version.h"
 #include	"registry.h"
-#include	"winmisc.h"
 #include	"resource.h"
 
 #include	"ttlib.h"
@@ -71,6 +71,8 @@ MenuData	g_MenuData;			// TeraTerm Menuの表示設定等の構造体
 
 wchar_t		*SetupFNameW;		// TERATERM.INI
 wchar_t		*UILanguageFileW;
+
+static char g_szLockBox[MAX_PATH];	// パスワード暗号化用パスワード
 
 #if defined(__MINGW32__) || (defined(_MSC_VER) && (_MSC_VER == 1400))
 // MinGW or VS2005(VC8.0)
@@ -350,6 +352,7 @@ BOOL AddTooltip(HWND hWnd, int idControl, const wchar_t *tip)
 	ti.hinst	= 0; 
 	ti.lpszText	= (LPWSTR)tip;
 
+	::SendMessage(g_hWndTip, TTM_SETMAXTIPWIDTH, 0, (LPARAM)1000);
 	return (BOOL)::SendMessageW(g_hWndTip, TTM_ADDTOOLW, 0, (LPARAM)&ti);
 }
 
@@ -418,6 +421,8 @@ BOOL LoadConfig(void)
 		RegGetStr(hKey, KEY_LF_FACENAME, g_MenuData.lfFont.lfFaceName, LF_FACESIZE);
 	} else
 		::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &(g_MenuData.lfFont));
+
+	g_szLockBox[0] = 0;
 
 	RegClose(hKey);
 
@@ -546,6 +551,7 @@ BOOL CreateTooltip(void)
 	AddTooltip(g_hWndMenu, BUTTON_SET, L"Register");
 	AddTooltip(g_hWndMenu, BUTTON_DELETE, L"Unregister");
 	AddTooltip(g_hWndMenu, BUTTON_ETC, L"Configure");
+	AddTooltip(g_hWndMenu, CHECK_LOCKBOX, L"If LockBox is enabled, passwords are stored encrypted.\nSet a password to encrypt the login passwords.");
 	AddTooltip(g_hWndMenu, CHECK_TTSSH, L"use SSH");
 
 	g_hHook = ::SetWindowsHookEx(WH_GETMESSAGE,
@@ -681,6 +687,8 @@ BOOL InitConfigDlg(HWND hWnd)
 		{ LBL_HOST, "DLG_CONFIG_HOST" },
 		{ CHECK_USER, "DLG_CONFIG_USER" },
 		{ CHECK_PASSWORD, "DLG_CONFIG_PASS" },
+		{ CHECK_LOCKBOX, "DLG_CONFIG_LOCKBOX_CHECK" },
+		{ BUTTON_LOCKBOX, "DLG_CONFIG_LOCKBOX_BUTTON" },
 		{ RADIO_MACRO, "DLG_CONFIG_MACRO" },
 		{ RADIO_DIRECT, "DLG_CONFIG_LAUNCH" },
 		{ CHECK_STARTUP, "DLG_CONFIG_STARTUP" },
@@ -709,6 +717,7 @@ BOOL InitConfigDlg(HWND hWnd)
 	EnableItem(hWnd, BUTTON_MACRO, FALSE);
 	::CheckDlgButton(hWnd, CHECK_USER, 1);
 	::CheckDlgButton(hWnd, CHECK_PASSWORD, 1);
+	::CheckDlgButton(hWnd, CHECK_LOCKBOX, 0);
 	::CheckDlgButton(hWnd, CHECK_INI_FILE, 1);
 
 	InitListBox(hWnd);
@@ -914,7 +923,8 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 	Function Name	: (BOOL) MakeTTL()
 	Outline			: 自動ログイン用マクロファイルを生成する。
 					  エンコーディングは UTF-8
-	Arguments		: const wchar_t *TTLName	(In) マクロファイル名
+	Arguments		: HWND hWnd	(In) ウインドウのハンドル
+					: const wchar_t *TTLName	(In) マクロファイル名
 					: JobInfo	JobInfo		(In) 設定情報構造体
 	Return Value	: 成功 TRUE / 失敗 FALSE
 	Reference		: 
@@ -923,11 +933,12 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-static BOOL MakeTTL(const wchar_t *TTLName, JobInfo *jobInfo)
+static BOOL MakeTTL(HWND hWnd, const wchar_t *TTLName, JobInfo *jobInfo)
 {
 	char	buf[1024];
 	DWORD	dwWrite;
 	HANDLE	hFile;
+	BOOL	usePassword;
 
 	hFile = ::CreateFileW(TTLName,
 						GENERIC_WRITE, 
@@ -960,11 +971,22 @@ static BOOL MakeTTL(const wchar_t *TTLName, JobInfo *jobInfo)
 	}
 
 	if (jobInfo->bPassword == TRUE) {
-		if (wcslen(jobInfo->szPasswdPrompt) == 0)
-			wcscpy(jobInfo->szPasswdPrompt, PASSWORD_PROMPT);
-		::wsprintfA(buf, "PasswordPrompt = '%s'\r\nPassword = '%s'\r\n", (const char *)(u8)jobInfo->szPasswdPrompt,
-				   (const char *)(u8)jobInfo->szPassword);
-		::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
+		char szRawPassword[MAX_PATH];
+		if (jobInfo->bLockBox == TRUE) {
+			usePassword = DecryptPassword(jobInfo->szPassword, szRawPassword, hWnd);
+		} else {
+			usePassword = TRUE;
+			EncodePassword((const char *)jobInfo->szPassword, szRawPassword);
+		}
+		if (usePassword == TRUE) {
+			if (wcslen(jobInfo->szPasswdPrompt) == 0)
+				wcscpy(jobInfo->szPasswdPrompt, PASSWORD_PROMPT);
+			::wsprintfA(buf, "PasswordPrompt = '%s'\r\nPassword = '%s'\r\n", (const char *)(u8)jobInfo->szPasswdPrompt,
+						(const char *)(u8)szRawPassword);
+			::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
+		}
+	} else {
+		usePassword = FALSE;
 	}
 
 	if (jobInfo->bUsername == TRUE) {
@@ -972,7 +994,7 @@ static BOOL MakeTTL(const wchar_t *TTLName, JobInfo *jobInfo)
 		::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
 	}
 
-	if (jobInfo->bPassword == TRUE) {
+	if (usePassword == TRUE) {
 		::wsprintfA(buf, "wait   PasswordPrompt\r\nsendln Password\r\n");
 		::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
 	}
@@ -1120,7 +1142,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 			wchar_t	szTempPath[MAX_PATH];
 			::GetTempPathW(MAX_PATH, szTempPath);
 			::GetTempFileNameW(szTempPath, L"ttm", 0, szMacroFile);
-			if (MakeTTL(szMacroFile, &jobInfo) == FALSE) {
+			if (MakeTTL(hWnd, szMacroFile, &jobInfo) == FALSE) {
 				dwErr = ::GetLastError();
 				UTIL_get_lang_msgW("MSG_ERROR_MAKETTL", uimsg, _countof(uimsg),
 								   L"Could not make 'ttpmenu.TTL'\n", UILanguageFileW);
@@ -1139,16 +1161,30 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 		else {
 			// TTSSHが有効の場合は、自動ログインのためのコマンドラインを付加する。
 			wchar_t passwd[MAX_PATH], keyfile[MAX_PATH];
+			char szRawPassword[MAX_PATH];
+			wchar_t szPassStrW[MAX_PATH];
+			BOOL usePassword;
 
-			wchar_t *szPasswordW = ToWcharA(jobInfo.szPassword);
-			dquote_string(szPasswordW, passwd, _countof(passwd));
-			free(szPasswordW);
+			if (jobInfo.bLockBox == TRUE) {
+				usePassword = DecryptPassword(jobInfo.szPassword, szRawPassword, hWnd);
+			} else {
+				usePassword = TRUE;
+				EncodePassword((const char *)jobInfo.szPassword, szRawPassword);
+			}
+			if (usePassword == TRUE) {
+				wchar_t *szPasswordW = ToWcharA(szRawPassword);
+				wsprintfW(szPassStrW, L"/passwd=%s", szPasswordW);
+				free(szPasswordW);
+			} else {
+				wsprintfW(szPassStrW, L"/ask4passwd");
+			}
+			dquote_string(szPassStrW, passwd, _countof(passwd));
 			dquote_string(jobInfo.PrivateKeyFile, keyfile, _countof(keyfile));
 
 			wchar_t *options;
 			if (jobInfo.bChallenge) { // keyboard-interactive
 				aswprintf(&options,
-					L"%s:22 /ssh /auth=challenge /user=%s /passwd=%s %s", 
+					L"%s:22 /ssh /auth=challenge /user=%s %s %s",
 					jobInfo.szHostName,
 					jobInfo.szUsername,
 					passwd,
@@ -1157,7 +1193,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 
 			} else if (jobInfo.bPageant) { // Pageant
 				aswprintf(&options,
-					L"%s:22 /ssh /auth=pageant /user=%s %s", 
+					L"%s:22 /ssh /auth=pageant /user=%s %s",
 					jobInfo.szHostName,
 					jobInfo.szUsername,
 					szArgment
@@ -1166,7 +1202,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 			}
 			else if (jobInfo.PrivateKeyFile[0] == L'\0') {  // password authentication
 				aswprintf(&options,
-					L"%s:22 /ssh /auth=password /user=%s /passwd=%s %s", 
+					L"%s:22 /ssh /auth=password /user=%s %s %s",
 					jobInfo.szHostName,
 					jobInfo.szUsername,
 					passwd,
@@ -1175,7 +1211,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 
 			} else { // publickey
 				aswprintf(&options,
-					L"%s:22 /ssh /auth=publickey /user=%s /passwd=%s /keyfile=%s %s", 
+					L"%s:22 /ssh /auth=publickey /user=%s %s /keyfile=%s %s",
 					jobInfo.szHostName,
 					jobInfo.szUsername,
 					passwd,
@@ -1453,7 +1489,6 @@ BOOL RegSaveLoginHostInformation(JobInfo *jobInfo)
 {
 	HKEY	hKey;
 	wchar_t	szSubKey[MAX_PATH];
-	char	szEncodePassword[MAX_PATH];
 
 	swprintf_s(szSubKey, L"%s\\%s", TTERM_KEY, jobInfo->szName);
 	if ((hKey = RegCreate(HKEY_CURRENT_USER, szSubKey)) == INVALID_HANDLE_VALUE)
@@ -1465,8 +1500,12 @@ BOOL RegSaveLoginHostInformation(JobInfo *jobInfo)
 	RegSetDword(hKey, KEY_USERFLAG, (DWORD) jobInfo->bUsername);
 	RegSetStr(hKey, KEY_USERNAME, jobInfo->szUsername);
 	RegSetDword(hKey, KEY_PASSWDFLAG, (DWORD) jobInfo->bPassword);
-	EncodePassword(jobInfo->szPassword, szEncodePassword);
-	RegSetBinary(hKey, KEY_PASSWORD, szEncodePassword, (DWORD)(strlen(szEncodePassword) + 1));
+	RegSetDword(hKey, KEY_LOCKBOXFLAG, (DWORD) jobInfo->bLockBox);
+	if (jobInfo->bLockBox == FALSE) {
+		RegSetBinary(hKey, KEY_PASSWORD, jobInfo->szPassword, (DWORD)(strlen(jobInfo->szPassword) + 1));
+	} else {
+		RegSetBinary(hKey, KEY_PASSWORD, jobInfo->szPassword, ENCRYPT2_PROFILE_LEN);
+	}
 
 	RegSetStr(hKey, KEY_TERATERM, jobInfo->szTeraTerm);
 	RegSetStr(hKey, KEY_INITFILE, jobInfo->szInitFile);
@@ -1507,7 +1546,6 @@ BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 {
 	HKEY	hKey;
 	wchar_t	szSubKey[MAX_PATH];
-	char	szEncodePassword[MAX_PATH];
 	DWORD	dwSize = MAX_PATH;
 	JobInfo jobInfo;
 	DWORD dword_tmp;
@@ -1527,8 +1565,8 @@ BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 	RegGetBOOL(hKey, KEY_USERFLAG, jobInfo.bUsername);
 	RegGetStr(hKey, KEY_USERNAME, jobInfo.szUsername, MAX_PATH);
 	RegGetBOOL(hKey, KEY_PASSWDFLAG, jobInfo.bPassword);
-	RegGetBinary(hKey, KEY_PASSWORD, szEncodePassword, &dwSize);
-	EncodePassword(szEncodePassword, jobInfo.szPassword);
+	RegGetBinary(hKey, KEY_PASSWORD, jobInfo.szPassword, &dwSize);
+	RegGetBOOL(hKey, KEY_LOCKBOXFLAG, jobInfo.bLockBox);
 
 	RegGetStr(hKey, KEY_TERATERM, jobInfo.szTeraTerm, MAX_PATH);
 	RegGetStr(hKey, KEY_INITFILE, jobInfo.szInitFile, MAX_PATH);
@@ -1596,6 +1634,9 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	wchar_t	szName[MAX_PATH];
 	DWORD	dwErr;
 	wchar_t	uimsg[MAX_UIMSG];
+	unsigned char	cEncodePassword[MAX_PATH];
+	unsigned char	cEncodeLockBox[MAX_PATH];
+	Encrypt2Profile	profile;
 
 	if (::GetDlgItemTextW(hWnd, EDIT_ENTRY, g_JobInfo.szName, MAX_PATH) == 0) {
 		UTIL_get_lang_msgW("MSG_ERROR_NOREGNAME", uimsg, _countof(uimsg),
@@ -1628,7 +1669,21 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	::GetDlgItemTextW(hWnd, EDIT_USER, g_JobInfo.szUsername, MAX_PATH);
 
 	g_JobInfo.bPassword	= (BOOL) ::IsDlgButtonChecked(hWnd, CHECK_PASSWORD);
-	::GetDlgItemTextA(hWnd, EDIT_PASSWORD, g_JobInfo.szPassword, MAX_PATH);
+	g_JobInfo.bLockBox = (BOOL) ::IsDlgButtonChecked(hWnd, CHECK_LOCKBOX);
+	::GetDlgItemTextA(hWnd, EDIT_PASSWORD, (LPSTR)cEncodePassword, MAX_PATH);
+	if (g_JobInfo.bLockBox == FALSE) {
+		EncodePassword((char *)cEncodePassword, g_JobInfo.szPassword);
+	} else if (g_JobInfo.dwMode == MODE_AUTOLOGIN) {
+		if (g_szLockBox[0] == 0) {
+			UTIL_get_lang_msgW("MSG_ERROR_NOLOCKBOX", uimsg, _countof(uimsg),
+							   L"error: LockBox is not set.", UILanguageFileW);
+			::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
+			return FALSE;
+		}
+		EncodePassword((const char *)g_szLockBox, (char *)cEncodeLockBox);
+		Encrypt2EncDec((char *)cEncodePassword, cEncodeLockBox, &profile, 1);
+		memcpy(g_JobInfo.szPassword, &profile, ENCRYPT2_PROFILE_LEN);
+	}
 
 	if (::GetDlgItemTextW(hWnd, EDIT_MACRO, g_JobInfo.szMacroFile, MAX_PATH) == 0 && g_JobInfo.dwMode == MODE_MACRO) {
 		UTIL_get_lang_msgW("MSG_ERROR_NOMACRO", uimsg, _countof(uimsg),
@@ -1705,6 +1760,7 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 	wchar_t	szName[MAX_PATH];
 	wchar_t	uimsg[MAX_UIMSG];
 	DWORD	dwErr;
+	char 	szEncodePassword[MAX_PATH];
 
 	index = ::SendDlgItemMessage(hWnd, LIST_HOST, LB_GETCURSEL, 0, 0);
 	::SendDlgItemMessageW(hWnd, LIST_HOST, LB_GETTEXT, (WPARAM)index, (LPARAM)szName);
@@ -1725,6 +1781,8 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 		EnableItem(hWnd, EDIT_USER, g_JobInfo.bUsername);
 		EnableItem(hWnd, CHECK_PASSWORD, TRUE);
 		EnableItem(hWnd, EDIT_PASSWORD, g_JobInfo.bPassword);
+		EnableItem(hWnd, CHECK_LOCKBOX, TRUE);
+		EnableItem(hWnd, BUTTON_LOCKBOX, TRUE);
 		EnableItem(hWnd, EDIT_MACRO, FALSE);
 		EnableItem(hWnd, BUTTON_MACRO, FALSE);
 		break;
@@ -1735,6 +1793,8 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 		EnableItem(hWnd, EDIT_USER, FALSE);
 		EnableItem(hWnd, CHECK_PASSWORD, FALSE);
 		EnableItem(hWnd, EDIT_PASSWORD, FALSE);
+		EnableItem(hWnd, CHECK_LOCKBOX, FALSE);
+		EnableItem(hWnd, BUTTON_LOCKBOX, FALSE);
 		EnableItem(hWnd, EDIT_MACRO, TRUE);
 		EnableItem(hWnd, BUTTON_MACRO, TRUE);
 		break;
@@ -1745,6 +1805,8 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 		EnableItem(hWnd, EDIT_USER, FALSE);
 		EnableItem(hWnd, CHECK_PASSWORD, FALSE);
 		EnableItem(hWnd, EDIT_PASSWORD, FALSE);
+		EnableItem(hWnd, CHECK_LOCKBOX, FALSE);
+		EnableItem(hWnd, BUTTON_LOCKBOX, FALSE);
 		EnableItem(hWnd, EDIT_MACRO, FALSE);
 		EnableItem(hWnd, BUTTON_MACRO, FALSE);
 		break;
@@ -1756,13 +1818,26 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 	::SetDlgItemTextW(hWnd, EDIT_ENTRY, g_JobInfo.szName);
 	::SetDlgItemTextW(hWnd, EDIT_HOST, g_JobInfo.szHostName);
 	::SetDlgItemTextW(hWnd, EDIT_USER, g_JobInfo.szUsername);
-	::SetDlgItemTextA(hWnd, EDIT_PASSWORD, g_JobInfo.szPassword);
+
+	if (g_JobInfo.bLockBox == TRUE) {
+		if (g_JobInfo.dwMode == MODE_AUTOLOGIN) {
+			DecryptPassword(g_JobInfo.szPassword, szEncodePassword, hWnd);
+			::SetDlgItemTextA(hWnd, EDIT_PASSWORD, szEncodePassword);
+		} else {
+			::SetDlgItemTextA(hWnd, EDIT_PASSWORD, "");
+		}
+	} else {
+		EncodePassword(g_JobInfo.szPassword, szEncodePassword);
+		::SetDlgItemTextA(hWnd, EDIT_PASSWORD, szEncodePassword);
+	}
 
 	::SetDlgItemTextW(hWnd, EDIT_MACRO, g_JobInfo.szMacroFile);
 
 	::CheckDlgButton(hWnd, CHECK_USER, g_JobInfo.bUsername);
 
 	::CheckDlgButton(hWnd, CHECK_PASSWORD, g_JobInfo.bPassword);
+
+	::CheckDlgButton(hWnd, CHECK_LOCKBOX, g_JobInfo.bLockBox);
 
 	::CheckDlgButton(hWnd, CHECK_TTSSH, g_JobInfo.bTtssh);
 
@@ -1870,6 +1945,8 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 	LRESULT ret = 0;
 	wchar_t title[MAX_UIMSG];
 	wchar_t *filter;
+	LockBoxDlgPrivateData pData;
+	char szPassword[MAX_PATH];
 
 	// 秘密鍵ファイルのコントロール (2005.1.28 yutaka)
 	switch(wParam) {
@@ -1940,18 +2017,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		return TRUE;
 	case BUTTON_ETC:
 		::GetDlgItemTextW(hWnd, EDIT_ENTRY, g_JobInfo.szName, MAX_PATH);
-
-		// TODO
-		// 	実行ファイル名に L"ttermpro.exe" か含まれていると ttsshチェックを入れるしょり
-		//	必要?
-		g_JobInfo.bTtssh	= ::IsDlgButtonChecked(hWnd, CHECK_TTSSH);
-		if (TTDialogBox(g_hI, MAKEINTRESOURCE(DIALOG_ETC), hWnd, DlgCallBack_Etc) == TRUE) {
-			::CheckDlgButton(hWnd, CHECK_TTSSH, 0);
-			wchar_t *pt = lwcsstri(g_JobInfo.szTeraTerm, TERATERM);
-			if (pt != NULL)
-				if (_wcsicmp(pt, TERATERM) == 0)
-					::CheckDlgButton(hWnd, CHECK_TTSSH, 1);
-		}
+		TTDialogBox(g_hI, MAKEINTRESOURCE(DIALOG_ETC), hWnd, DlgCallBack_Etc);
 		return TRUE;
 	case LIST_HOST:
 		if (HIWORD(wParam) == LBN_SELCHANGE)
@@ -1964,13 +2030,49 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 			EnableItem(hWnd, EDIT_USER, FALSE);
 			::CheckDlgButton(hWnd, CHECK_PASSWORD, 0);
 			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) 0);
+			::CheckDlgButton(hWnd, CHECK_LOCKBOX, 0);
+			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) 0);
 		}
 		return TRUE;
 	case CHECK_PASSWORD:
-		if (IsDlgButtonChecked(hWnd, CHECK_PASSWORD) == 1)
+		if (IsDlgButtonChecked(hWnd, CHECK_PASSWORD) == 1) {
 			EnableItem(hWnd, EDIT_PASSWORD, TRUE);
-		else
+			::CheckDlgButton(hWnd, CHECK_USER, 1);
+			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_USER, (LPARAM) 1);
+		} else {
 			EnableItem(hWnd, EDIT_PASSWORD, FALSE);
+			::CheckDlgButton(hWnd, CHECK_LOCKBOX, 0);
+			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) 0);
+		}
+		return TRUE;
+	case CHECK_LOCKBOX:
+		if (IsDlgButtonChecked(hWnd, CHECK_LOCKBOX) == 1) {
+			::CheckDlgButton(hWnd, CHECK_USER, 1);
+			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_USER, (LPARAM) 1);
+			::CheckDlgButton(hWnd, CHECK_PASSWORD, 1);
+			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) 1);
+			if (g_szLockBox[0] == 0) {
+				pData.bLockBox = g_JobInfo.bLockBox;
+				pData.pEncryptPassword = g_JobInfo.szPassword;
+				pData.pDecryptPassword = szPassword;
+				pData.nMessageFlag = 0;
+				if (TTDialogBoxParam(g_hI, MAKEINTRESOURCE(DIALOG_LOCKBOX), hWnd, DlgCallBack_LockBox, (LPARAM)&pData) == TRUE) {
+					::CheckDlgButton(hWnd, CHECK_LOCKBOX, 1);
+					::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) 1);
+				}
+			}
+		}
+		return TRUE;
+	case BUTTON_LOCKBOX:
+		pData.bLockBox = g_JobInfo.bLockBox;
+		pData.pEncryptPassword = g_JobInfo.szPassword;
+		pData.pDecryptPassword = szPassword;
+		pData.nMessageFlag = 0;
+		if (TTDialogBoxParam(g_hI, MAKEINTRESOURCE(DIALOG_LOCKBOX), hWnd, DlgCallBack_LockBox, (LPARAM)&pData) == TRUE) {
+			if (g_JobInfo.bLockBox == TRUE) {
+				::SetDlgItemTextA(hWnd, EDIT_PASSWORD, pData.pDecryptPassword);
+			}
+		}
 		return TRUE;
 	case CHECK_INI_FILE:
 		if (IsDlgButtonChecked(hWnd, CHECK_INI_FILE) == 1)
@@ -2013,6 +2115,8 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 			EnableItem(hWnd, EDIT_PASSWORD, TRUE);
 		else
 			EnableItem(hWnd, EDIT_PASSWORD, FALSE);
+		EnableItem(hWnd, CHECK_LOCKBOX, TRUE);
+		EnableItem(hWnd, BUTTON_LOCKBOX, TRUE);
 		EnableItem(hWnd, EDIT_MACRO, FALSE);
 		EnableItem(hWnd, BUTTON_MACRO, FALSE);
 		return TRUE;
@@ -2022,6 +2126,8 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		EnableItem(hWnd, EDIT_USER, FALSE);
 		EnableItem(hWnd, CHECK_PASSWORD, FALSE);
 		EnableItem(hWnd, EDIT_PASSWORD, FALSE);
+		EnableItem(hWnd, CHECK_LOCKBOX, FALSE);
+		EnableItem(hWnd, BUTTON_LOCKBOX, FALSE);
 		EnableItem(hWnd, EDIT_MACRO, TRUE);
 		EnableItem(hWnd, BUTTON_MACRO, TRUE);
 		return TRUE;
@@ -2031,6 +2137,8 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		EnableItem(hWnd, EDIT_USER, FALSE);
 		EnableItem(hWnd, CHECK_PASSWORD, FALSE);
 		EnableItem(hWnd, EDIT_PASSWORD, FALSE);
+		EnableItem(hWnd, CHECK_LOCKBOX, FALSE);
+		EnableItem(hWnd, BUTTON_LOCKBOX, FALSE);
 		EnableItem(hWnd, EDIT_MACRO, FALSE);
 		EnableItem(hWnd, BUTTON_MACRO, FALSE);
 		return TRUE;
@@ -2340,6 +2448,185 @@ INT_PTR CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		return TRUE;
 	case WM_COMMAND:
 		return ManageWMCommand_Version(hWnd, wParam);
+	}
+
+	return FALSE;
+}
+
+/* ==========================================================================
+	Function Name	: (BOOL) DecryptPassword()
+	Outline			: 暗号化されたパスワードの復号処理
+	Arguments		: char *szEncryptPassword	(in)	暗号化されたパスワード
+					: char *szDecryptPassword	(out)	復号されたパスワード
+					: HWND hWnd					(in)	ダイアログのハンドル
+	Return Value	: 成功 TRUE、失敗 FALSE
+	Reference		:
+	Renewal			:
+	Notes			: グローバル変数 g_szLockBox (in)、g_hI (in) を参照している
+	Attention		:
+	Up Date			:
+   ======1=========2=========3=========4=========5=========6=========7======= */
+BOOL DecryptPassword(char *szEncryptPassword, char *szDecryptPassword, HWND hWnd)
+{
+	LockBoxDlgPrivateData pData;
+	char szEncryptKey[MAX_PATH];
+	BOOL ret;
+
+	ret = FALSE;
+	if (g_szLockBox[0] != 0) {
+		EncodePassword((const char *)g_szLockBox, szEncryptKey);
+		if (Encrypt2EncDec(szDecryptPassword, (const unsigned char *)szEncryptKey, (Encrypt2ProfileP)szEncryptPassword, 0) == 1) {
+			ret = TRUE;
+		} else {
+			pData.nMessageFlag = 1;
+		}
+	} else {
+		pData.nMessageFlag = 0;
+	}
+	if (ret == FALSE) {
+		pData.bLockBox = TRUE;
+		pData.pEncryptPassword = szEncryptPassword;
+		pData.pDecryptPassword = szDecryptPassword;
+		if ((ret = (BOOL)TTDialogBoxParam(g_hI, MAKEINTRESOURCE(DIALOG_LOCKBOX), hWnd, DlgCallBack_LockBox, (LPARAM)&pData)) == FALSE) {
+			szDecryptPassword[0] = 0;
+		}
+	}
+
+	return ret;
+}
+
+/* ==========================================================================
+	Function Name	: (BOOL CALLBACK) DlgCallBack_LockBox()
+	Outline			: 「LockBox」ダイアログのコールバック関数
+	Arguments		: HWND		hWnd	(In)	ダイアログボックスを識別するハンドル
+					: UINT		uMsg	(In)	メッセージ
+					: WPARAM	wParam	(In)	追加のメッセージ固有情報
+					: LPARAM	lParam	(In)	復号したパスワードの保存先、
+					:							lParam[0]が0ではない場合はエラーメッセージを表示する
+					: 					(Out)	復号したパスワード(成功時)
+	Return Value	: 成功 TRUE
+					: 失敗 FALSE
+	Reference		: DialogProcのヘルプ参照
+	Renewal			:
+	Notes			: 成功した場合、g_szLockBoxに入力された文字列が設定される
+	Attention		:
+	Up Date			:
+   ======1=========2=========3=========4=========5=========6=========7======= */
+INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	wchar_t uimsg[MAX_UIMSG];
+	WORD cchEncryptKey;
+	char szEncodeEncryptKey[MAX_PATH];
+	LockBoxDlgPrivateData *pData;
+	static int error;
+	static const DlgTextInfo text_info[] = {
+		{ 0,						"DLG_LOCKBOX_TITLE" },
+		{ IDC_LOCKBOX_LABEL,		"DLG_LOCKBOX_LABEL" },
+		{ IDOK,						"BTN_OK" },
+		{ IDCANCEL,					"BTN_CANCEL" },
+		{ IDS_LOCKBOX_SHOW,			"DLG_LOCKBOX_SHOW" },
+		{ IDS_LOCKBOX_WRONG,		"DLG_LOCKBOX_WRONG" },
+		{ IDS_LOCKBOX_STRTOOLONG,	"DLG_LOCKBOX_STRTOOLONG" },
+		{ IDS_LOCKBOX_NOSTR,		"DLG_LOCKBOX_NOSTR" },
+		{ IDS_LOCKBOX_VALID,		"DLG_LOCKBOX_VALID" }
+	};
+
+	switch(uMsg) {
+	case WM_INITDIALOG:
+		SetDlgPos(hWnd, POSITION_CENTER);
+		PostMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)g_hIcon);
+		PostMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)g_hIconSmall);
+		SetI18nDlgStrsW(hWnd, "TTMenu", text_info, _countof(text_info), UILanguageFileW);
+		SendDlgItemMessage(hWnd, IDC_TTPMENU_ICON, STM_SETICON, (WPARAM)g_hIcon, 0);
+		pData = (LockBoxDlgPrivateData *)lParam;
+		SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)pData);
+
+		if (g_szLockBox[0] != 0) {
+			EncodePassword((const char *)g_szLockBox, szEncodeEncryptKey);
+			::SetDlgItemTextA(hWnd, IDC_LOCKBOX_EDIT, (LPCSTR)szEncodeEncryptKey);
+		} else {
+			::SetDlgItemTextA(hWnd, IDC_LOCKBOX_EDIT, "");
+		}
+		if (pData->nMessageFlag == 0) {
+			error = 0;
+			UTIL_get_lang_msgW("DLG_LOCKBOX_SHOW", uimsg, _countof(uimsg),
+							   L"This password is used to lock and unlock the LockBox.", UILanguageFileW);
+		} else {
+			error = 1;
+			UTIL_get_lang_msgW("DLG_LOCKBOX_WRONG", uimsg, _countof(uimsg),
+							   L"Incorrect password.", UILanguageFileW);
+		}
+		::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
+		return TRUE;
+
+	case WM_CTLCOLORSTATIC:
+		if (error != 0) {
+			int nID = GetWindowLong((HWND)lParam, GWL_ID);
+			if (nID && nID == IDC_LOCKBOX_MESSAGE) {
+				::SetBkMode((HDC)wParam, TRANSPARENT);
+				::SetTextColor((HDC)wParam, RGB(255, 0, 0));
+				::SetBkColor((HDC)wParam, ::GetSysColor(COLOR_WINDOW));
+				return (LRESULT)GetStockObject(NULL_BRUSH);
+			}
+		}
+		return FALSE;
+
+	case WM_COMMAND:
+
+		if(HIWORD(wParam) == EN_CHANGE && LOWORD(wParam) == IDC_LOCKBOX_EDIT) {
+			SendMessage(hWnd, DM_SETDEFID, (WPARAM)IDOK, (LPARAM)0);
+		}
+
+		switch (wParam) {
+		case IDOK:
+			cchEncryptKey = (WORD)::SendDlgItemMessage(hWnd, IDC_LOCKBOX_EDIT, EM_LINELENGTH, (WPARAM)0, (LPARAM)0);
+			if (cchEncryptKey > ENCRYPT2_PWD_MAX_LEN) {
+				error = 1;
+				UTIL_get_lang_msgW("DLG_LOCKBOX_STRTOOLONG", uimsg, _countof(uimsg),
+								   L"The text is too long.", UILanguageFileW);
+				::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
+			} else if (cchEncryptKey == 0) {
+				error = 1;
+				UTIL_get_lang_msgW("DLG_LOCKBOX_NOSTR", uimsg, _countof(uimsg),
+								   L"Not entered.", UILanguageFileW);
+				::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
+			} else {
+				*(WORD *)szEncodeEncryptKey = (WORD)ENCRYPT2_PWD_MAX_LEN;
+				SendDlgItemMessage(hWnd, IDC_LOCKBOX_EDIT, EM_GETLINE, (WPARAM)0, (LPARAM)szEncodeEncryptKey);
+				szEncodeEncryptKey[cchEncryptKey] = 0;
+				EncodePassword((const char *)szEncodeEncryptKey, g_szLockBox);
+				pData = (LockBoxDlgPrivateData *)GetWindowLongPtr(hWnd, DWLP_USER);
+				if (pData->bLockBox == TRUE) {
+					::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, L"- - -");
+					error = 0;
+					InvalidateRect(hWnd, NULL, TRUE);
+					UpdateWindow(hWnd);
+					if (Encrypt2EncDec(pData->pDecryptPassword, (const unsigned char *)szEncodeEncryptKey,
+									   (Encrypt2ProfileP)pData->pEncryptPassword, 0) == 0) {
+						error = 1;
+						UTIL_get_lang_msgW("DLG_LOCKBOX_WRONG", uimsg, _countof(uimsg),
+										   L"Incorrect password.", UILanguageFileW);
+						::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
+					} else{
+						UTIL_get_lang_msgW("DLG_LOCKBOX_VALID", uimsg, _countof(uimsg),
+										   L"The password is valid.", UILanguageFileW);
+						::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
+						error = 0;
+						InvalidateRect(hWnd, NULL, TRUE);
+						UpdateWindow(hWnd);
+						Sleep(900);
+						::EndDialog(hWnd, TRUE);
+					}
+				} else {
+					::EndDialog(hWnd, TRUE);
+				}
+			}
+			InvalidateRect(hWnd, NULL, TRUE);
+			return TRUE;
+		case IDCANCEL:
+			::EndDialog(hWnd, FALSE);
+			return TRUE;
+		}
 	}
 
 	return FALSE;

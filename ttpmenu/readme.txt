@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
                                Tera Term支援ツール
-                           Tera Term Menu Version 1.19
+                           TeraTerm Menu Version 1.19
 
                           (C) 2004- TeraTerm Project
                         https://teratermproject.github.io/
@@ -176,6 +176,12 @@ iniファイルはUnicode iniファイル(UTF-16 with LE BOM)の使用をおすすめします。
 レジストリ、iniファイルにはパスワードが保存されています。
 取り扱いには注意してください。
 
+LockBoxを有効にすると、パスワードがで暗号化されて保存されます。
+
+Process Explorerなどのツールから、TeraTerm Menuから起動されたTera Termの状態を
+参照するとユーザ名、パスワードなどの引数を表示させることが可能です。
+情報漏洩のリスクがある環境では、TeraTerm Menuの利用をお控えください。
+
 --------------------------------------------------------------------------------
 7. よくある質問
 
@@ -213,7 +219,14 @@ iniファイルはUnicode iniファイル(UTF-16 with LE BOM)の使用をおすすめします。
 --------------------------------------------------------------------------------
 9. 更新履歴
 
-TeraTerm Menu 1.19 (YYYY.MM.DD)
+TeraTerm Menu 1.20 (2024.7.7)
+
+・パスワードを暗号化/復号するキーワードを追加した。
+・Detailsダイアログで実行ファイル名に"ttermpro.exe"か含まれている場合に"use SSH"のチェックボックスがONになる処理をなくした。
+・情報漏洩のリスクを加筆した。
+・List Configurationダイアログのタイトルの誤字を修正した。(Cofiguration -> Configuration)
+
+TeraTerm Menu 1.19 (2024.2.29)
 
 ・接続先が登録されていないとき、"(none)"が正しく表示されないので修正した。
 ・ttermpro.exe のパスを Win.ini から読み込まないよう修正した。

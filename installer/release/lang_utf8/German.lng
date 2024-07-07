@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2024-06-15 by TeraTerm Project
+date=2024-07-07 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -55,9 +55,7 @@ MENU_EDIT_SELECTALL=&Alles auswählen
 MENU_SETUP=Ein&stellungen
 MENU_SETUP_TERMINAL=&Terminal-Einstellungen
 MENU_SETUP_WINDOW=&Fenster-Einstellungen
-MENU_SETUP_FONT_SUBMENU=&Schriftart
 MENU_SETUP_FONT=&Schriftart...
-MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=&Keyboard-Einstellungen
 MENU_SETUP_SERIALPORT=Serieller Port
 MENU_SETUP_TCPIP=&Hostliste editieren
@@ -273,6 +271,8 @@ DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
 DLG_TAB_LOG_EDITOR=&Auswahl-Editor
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=&Standardprotokoll-Name
 DLG_TAB_LOG_FILEPATH=Standardprotokoll-Ordner
 DLG_TAB_LOG_AUTOSTART=&Automatisch protokollieren
@@ -370,9 +370,6 @@ MSG_CREATE_THREAD_ERROR=Thread kann nicht erzeugt werden
 ; ttdlg.c
 DLG_ABOUT_TITLE=Über Tera Term
 
-DLG_DIR_TITLE=Verzeichnis wechseln
-DLG_DIR_CURRENT=Aktuell:
-DLG_DIR_NEW=&Neu:
 DLG_SELECT_DIR_TITLE=Neues Verzeichnis wählen
 
 DLG_GEN_TITLE=Tera-Grundeinstellungen
@@ -1157,6 +1154,8 @@ DLG_CONFIG_PASS=Passwort
 DLG_CONFIG_MACRO=specified macro file
 DLG_CONFIG_LAUNCH=launch only
 DLG_CONFIG_STARTUP=kick at starting
+DLG_CONFIG_LOCKBOX_CHECK=LockBox verwenden
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=SSH verwenden
 DLG_CONFIG_KEYFILE=Schlüsseldatei
 DLG_CONFIG_CHALLENGE=use Challenge
@@ -1172,6 +1171,15 @@ DLG_ETC_LOGFILE=Log-Datei
 DLG_ETC_PROMPT=Prompt
 DLG_ETC_USER=Benutzename
 DLG_ETC_PASS=Passwort
+
+DLG_LOCKBOX_TITLE=Tera Term launch tool / TeraTerm Menu
+DLG_LOCKBOX_LABEL=Geben Sie Ihr LockBox-Passwort ein:
+DLG_LOCKBOX_SHOW=Dieses Passwort gilt für die LockBox.
+DLG_LOCKBOX_WRONG=Falsches Passwort.
+DLG_LOCKBOX_STRTOOLONG=Zu viele Charaktere.
+DLG_LOCKBOX_NOSTR=Keine Zeichen eingegeben.
+DLG_LOCKBOX_VALID=Das Passwort ist gültig.
+MSG_ERROR_NOLOCKBOX=Fehler: LockBox ist nicht gesetzt.
 
 MSG_ERROR_READREG=Couldn't read the registry data.\n
 MSG_ERROR_MAKETTL=Could not make 'ttpmenu.TTL'\n

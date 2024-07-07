@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2024-06-15 by TeraTerm Project
+date=2024-07-07 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -55,9 +55,7 @@ MENU_EDIT_SELECTALL=&Выделить все
 MENU_SETUP=&Настройка
 MENU_SETUP_TERMINAL=&Терминал...
 MENU_SETUP_WINDOW=&Окно...
-MENU_SETUP_FONT_SUBMENU=&Шрифт
 MENU_SETUP_FONT=&Шрифт...
-MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=&Клавиатура...
 MENU_SETUP_SERIALPORT=&COM-порт...
 MENU_SETUP_TCPIP=T&CP/IP...
@@ -273,6 +271,8 @@ DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
 DLG_TAB_LOG_EDITOR=&Редактор лог-файла
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=&Имя лог-файла по умолчанию
 DLG_TAB_LOG_FILEPATH=&Папка для хранения лог-файла
 DLG_TAB_LOG_AUTOSTART=&Автостарт лог-файла
@@ -370,9 +370,6 @@ MSG_CREATE_THREAD_ERROR=Не удается создать поток
 ; ttdlg.c
 DLG_ABOUT_TITLE=О программе Tera Term
 
-DLG_DIR_TITLE=Tera Term: Изменить папку
-DLG_DIR_CURRENT=Текущая папка:
-DLG_DIR_NEW=&Новая папка:
 DLG_SELECT_DIR_TITLE=Выбрать новую папку
 
 DLG_GEN_TITLE=Tera Term: Общие настройки
@@ -1157,6 +1154,8 @@ DLG_CONFIG_PASS=Пароль
 DLG_CONFIG_MACRO=Указать файл макросов
 DLG_CONFIG_LAUNCH=Только запуск
 DLG_CONFIG_STARTUP=Старт при загрузке
+DLG_CONFIG_LOCKBOX_CHECK=Использовать LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=Использовать SSH
 DLG_CONFIG_KEYFILE=Файл ключа
 DLG_CONFIG_CHALLENGE=Использовать Challenge
@@ -1172,6 +1171,15 @@ DLG_ETC_LOGFILE=Лог-файл
 DLG_ETC_PROMPT=Подсказка
 DLG_ETC_USER=Имя пользователя
 DLG_ETC_PASS=Пароль
+
+DLG_LOCKBOX_TITLE=Tera Term launch tool / TeraTerm Menu
+DLG_LOCKBOX_LABEL=Введите пароль LockBox:
+DLG_LOCKBOX_SHOW=Этот пароль применяется к LockBox.
+DLG_LOCKBOX_WRONG=Неверный пароль.
+DLG_LOCKBOX_STRTOOLONG=Слишком много персонажей.
+DLG_LOCKBOX_NOSTR=Символы не введены.
+DLG_LOCKBOX_VALID=Пароль действителен.
+MSG_ERROR_NOLOCKBOX=ошибка: LockBox не установлен.
 
 MSG_ERROR_READREG=Не удается прочитать данные из регистра.\n
 MSG_ERROR_MAKETTL=Не удается создать 'ttpmenu.TTL'\n

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2024-06-15 by TeraTerm Project
+date=2024-07-07 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -55,9 +55,7 @@ MENU_EDIT_SELECTALL=Tout selectionner
 MENU_SETUP=Config&uration
 MENU_SETUP_TERMINAL=&Terminal...
 MENU_SETUP_WINDOW=&Fenetre...
-MENU_SETUP_FONT_SUBMENU=&Police
 MENU_SETUP_FONT=&Police...
-MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=&Clavier...
 MENU_SETUP_SERIALPORT=Port Serie...
 MENU_SETUP_TCPIP=T&CP/IP...
@@ -273,6 +271,8 @@ DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
 DLG_TAB_LOG_EDITOR=Prog affich journal
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=Nom par défaut du fichier journal (format strftime)
 DLG_TAB_LOG_FILEPATH=Répertoire par défaut de sauvegarde du journal
 DLG_TAB_LOG_AUTOSTART=Démarrage auto. du journal
@@ -370,9 +370,6 @@ MSG_CREATE_THREAD_ERROR=Impossible de créer la tâche
 ; ttdlg.c
 DLG_ABOUT_TITLE=A propos de Tera Term
 
-DLG_DIR_TITLE=Tera Term: Changer de répertoire
-DLG_DIR_CURRENT=Répertoire courant:
-DLG_DIR_NEW=Nouveau répertoire:
 DLG_SELECT_DIR_TITLE=Selectionner un nouveau répertoire
 
 DLG_GEN_TITLE=Tera Term: Configuration générale
@@ -1157,6 +1154,8 @@ DLG_CONFIG_PASS=Mot de passe
 DLG_CONFIG_MACRO=fichier de macro
 DLG_CONFIG_LAUNCH=lancement seul
 DLG_CONFIG_STARTUP=kick au démarrage
+DLG_CONFIG_LOCKBOX_CHECK=utiliser LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=utiliser SSH
 DLG_CONFIG_KEYFILE=Fichier clé
 DLG_CONFIG_CHALLENGE=utiliser Challenge
@@ -1172,6 +1171,15 @@ DLG_ETC_LOGFILE=fichier journal
 DLG_ETC_PROMPT=Prompt
 DLG_ETC_USER=Nom d'utilisateur
 DLG_ETC_PASS=Mot de passe
+
+DLG_LOCKBOX_TITLE=Tera Term launch tool / TeraTerm Menu
+DLG_LOCKBOX_LABEL=Entrez votre mot de passe LockBox:
+DLG_LOCKBOX_SHOW=Ce mot de passe s'applique au LockBox.
+DLG_LOCKBOX_WRONG=Mot de passe incorrect.
+DLG_LOCKBOX_STRTOOLONG=Trop de personnages.
+DLG_LOCKBOX_NOSTR=Aucun caractère saisi.
+DLG_LOCKBOX_VALID=Le mot de passe est valide.
+MSG_ERROR_NOLOCKBOX=erreur : LockBox n'est pas défini.
 
 MSG_ERROR_READREG=Impossible de lire le registre.\n
 MSG_ERROR_MAKETTL=Impossible de créer 'ttpmenu.TTL'\n

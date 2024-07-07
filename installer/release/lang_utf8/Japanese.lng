@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2024-06-15 by TeraTerm Project
+date=2024-07-07 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -55,9 +55,7 @@ MENU_EDIT_SELECTALL=全て選択(&A)
 MENU_SETUP=設定(&S)
 MENU_SETUP_TERMINAL=端末(&T)...
 MENU_SETUP_WINDOW=ウィンドウ(&W)...
-MENU_SETUP_FONT_SUBMENU=フォント(&F)
 MENU_SETUP_FONT=フォント(&F)...
-MENU_SETUP_DIALOG_FONT=ダイアログフォント(&D)...
 MENU_SETUP_KEYBOARD=キーボード(&K)...
 MENU_SETUP_SERIALPORT=シリアルポート(&E)...
 MENU_SETUP_TCPIP=T&CP/IP...
@@ -272,7 +270,9 @@ DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=使用しない
 DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=固定テーマ(テーマファイル指定)
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=ランダムテーマ
 
-DLG_TAB_LOG_EDITOR=ログ表示用エディタ(&E)
+DLG_TAB_LOG_EDITOR=ログ表示用エディタ
+DLG_TAB_LOG_EDITOR_EXE=実行ファイル(&E)
+DLG_TAB_LOG_EDITOR_ARG=引き数(&R)
 DLG_TAB_LOG_FILENAME=標準ログファイル名(strftimeフォーマット可) (&F)
 DLG_TAB_LOG_FILEPATH=標準のログ保存先フォルダ(&S)
 DLG_TAB_LOG_AUTOSTART=自動的にログ採取を開始する(&U)
@@ -370,9 +370,6 @@ MSG_CREATE_THREAD_ERROR=スレッドが作成できません
 ; ttdlg.c
 DLG_ABOUT_TITLE=Tera Term について
 
-DLG_DIR_TITLE=Tera Term: ディレクトリ変更
-DLG_DIR_CURRENT=現在:
-DLG_DIR_NEW=新規(&N):
 DLG_SELECT_DIR_TITLE=新しいディレクトリを選択してください
 
 DLG_GEN_TITLE=Tera Term: 全般設定
@@ -1154,6 +1151,8 @@ DLG_CONFIG_PASS=パスワード
 DLG_CONFIG_MACRO=マクロファイルを指定して実行
 DLG_CONFIG_LAUNCH=起動のみ
 DLG_CONFIG_STARTUP=起動時に実行
+DLG_CONFIG_LOCKBOX_CHECK=LockBoxを使用
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=sshを使用
 DLG_CONFIG_KEYFILE=鍵ファイル
 DLG_CONFIG_CHALLENGE=チャレンジレスポンス認証
@@ -1169,6 +1168,15 @@ DLG_ETC_LOGFILE=ログファイル
 DLG_ETC_PROMPT=プロンプト
 DLG_ETC_USER=ユーザ名
 DLG_ETC_PASS=パスワード
+
+DLG_LOCKBOX_TITLE=Tera Term launch tool / TeraTerm Menu
+DLG_LOCKBOX_LABEL=LockBoxのパスワードを入力して下さい：
+DLG_LOCKBOX_SHOW=このパスワードはLockBoxの施錠と解錠に使われます。
+DLG_LOCKBOX_WRONG=パスワードに誤りがあります。
+DLG_LOCKBOX_STRTOOLONG=文字が長すぎます。
+DLG_LOCKBOX_NOSTR=文字が入力されていません。
+DLG_LOCKBOX_VALID=有効なパスワードです。
+MSG_ERROR_NOLOCKBOX=error: LockBoxが未設定です。
 
 MSG_ERROR_READREG=レジストリからのデータ読み出しに失敗しました。\n
 MSG_ERROR_MAKETTL=ttpmenu.TTLの作成に失敗しました。\n
