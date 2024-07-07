@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
                                Tera Termx‰‡ƒc[ƒ‹
-                           TeraTerm Menu Version 1.19
+                           TeraTerm Menu Version 1.20
 
                           (C) 2004- TeraTerm Project
                         https://teratermproject.github.io/
