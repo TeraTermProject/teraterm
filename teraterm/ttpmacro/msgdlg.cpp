@@ -57,6 +57,7 @@ CMsgDlg::CMsgDlg(const wchar_t *Text, const wchar_t *Title, BOOL YesNo,
 
 INT_PTR CMsgDlg::DoModal(HINSTANCE hInst, HWND hWndParent)
 {
+	m_hInst = hInst;
 	return TTCDialog::DoModal(hInst, hWndParent, CMsgDlg::IDD);
 }
 
@@ -80,6 +81,7 @@ BOOL CMsgDlg::OnInitDialog()
 		};
 		SetDlgTextsW(m_hWnd, TextInfosOk, _countof(TextInfosOk), UILanguageFileW);
 	}
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), 0);
 
 	SetWindowTextW(TitleStr);
 	SetDlgItemTextW(IDC_MSGTEXT,TextStr);
