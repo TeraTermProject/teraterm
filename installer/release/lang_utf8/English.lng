@@ -1,6 +1,6 @@
 ﻿[Info]
 language=English
-date=2024-07-07 by TeraTerm Project
+date=2024-07-18 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -1169,14 +1169,16 @@ DLG_ETC_PROMPT=Prompt
 DLG_ETC_USER=User Name
 DLG_ETC_PASS=Password
 
-DLG_LOCKBOX_TITLE=Tera Term launch tool / TeraTerm Menu
+DLG_LOCKBOX_TITLE=TeraTerm Menu
 DLG_LOCKBOX_LABEL=Enter your LockBox password:
 DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
 DLG_LOCKBOX_WRONG=Incorrect password.
-DLG_LOCKBOX_STRTOOLONG=Too many characters.
-DLG_LOCKBOX_NOSTR=No characters entered.
-DLG_LOCKBOX_VALID=The password is valid.
-MSG_ERROR_NOLOCKBOX=error: LockBox is not set.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=Couldn't read the registry data.\n
 MSG_ERROR_MAKETTL=Could not make 'ttpmenu.TTL'\n

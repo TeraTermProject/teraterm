@@ -352,7 +352,6 @@ BOOL AddTooltip(HWND hWnd, int idControl, const wchar_t *tip)
 	ti.hinst	= 0; 
 	ti.lpszText	= (LPWSTR)tip;
 
-	::SendMessage(g_hWndTip, TTM_SETMAXTIPWIDTH, 0, (LPARAM)1000);
 	return (BOOL)::SendMessageW(g_hWndTip, TTM_ADDTOOLW, 0, (LPARAM)&ti);
 }
 
@@ -528,8 +527,14 @@ LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL CreateTooltip(void)
+BOOL CreateTooltip(HWND hWnd)
 {
+	wchar_t uimsg[MAX_UIMSG];
+	static const DlgTextInfo text_info[] = {
+		{ IDS_TOOLTIP_CHECK_LOCKBOX,		"MSG_TOOLTIP_CHECK_LOCKBOX" },
+		{ IDS_TOOLTIP_BUTTON_LOCKBOX,		"MSG_TOOLTIP_BUTTON_LOCKBOX" }
+	};
+
 	::InitCommonControls(); 
 
 	g_hWndTip = ::CreateWindowExA(0,
@@ -551,8 +556,17 @@ BOOL CreateTooltip(void)
 	AddTooltip(g_hWndMenu, BUTTON_SET, L"Register");
 	AddTooltip(g_hWndMenu, BUTTON_DELETE, L"Unregister");
 	AddTooltip(g_hWndMenu, BUTTON_ETC, L"Configure");
-	AddTooltip(g_hWndMenu, CHECK_LOCKBOX, L"If LockBox is enabled, passwords are stored encrypted.\nSet a password to encrypt the login passwords.");
 	AddTooltip(g_hWndMenu, CHECK_TTSSH, L"use SSH");
+
+	SetI18nDlgStrsW(hWnd, "TTMenu", text_info, _countof(text_info), UILanguageFileW);
+	UTIL_get_lang_msgW("MSG_TOOLTIP_CHECK_LOCKBOX", uimsg, _countof(uimsg),
+					   L"If LockBox is enabled, login passwords are stored in LockBox encrypted.",
+					   UILanguageFileW);
+	AddTooltip(g_hWndMenu, CHECK_LOCKBOX, uimsg);
+	UTIL_get_lang_msgW("MSG_TOOLTIP_BUTTON_LOCKBOX", uimsg, _countof(uimsg),
+					   L"Set a password for locking and unlocking LockBox.",
+					   UILanguageFileW);
+	AddTooltip(g_hWndMenu, BUTTON_LOCKBOX, uimsg);
 
 	g_hHook = ::SetWindowsHookEx(WH_GETMESSAGE,
 								GetMsgProc,
@@ -1676,7 +1690,7 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	} else if (g_JobInfo.dwMode == MODE_AUTOLOGIN) {
 		if (g_szLockBox[0] == 0) {
 			UTIL_get_lang_msgW("MSG_ERROR_NOLOCKBOX", uimsg, _countof(uimsg),
-							   L"error: LockBox is not set.", UILanguageFileW);
+							   L"error: LockBox is not setup.", UILanguageFileW);
 			::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
 			return FALSE;
 		}
@@ -2345,7 +2359,7 @@ INT_PTR CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		SetDlgPos(hWnd, POSITION_CENTER);
 		PostMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)g_hIcon);
 		PostMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)g_hIconSmall);
-		CreateTooltip();
+		CreateTooltip(hWnd);
 		crText		= ::GetSysColor(COLOR_WINDOWTEXT);
 		crBkgnd		= ::GetSysColor(COLOR_WINDOW);
 		crSelText	= ::GetSysColor(COLOR_HIGHLIGHTTEXT);
@@ -2583,12 +2597,12 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 			if (cchEncryptKey > ENCRYPT2_PWD_MAX_LEN) {
 				error = 1;
 				UTIL_get_lang_msgW("DLG_LOCKBOX_STRTOOLONG", uimsg, _countof(uimsg),
-								   L"The text is too long.", UILanguageFileW);
+								   L"The password is too long.", UILanguageFileW);
 				::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
 			} else if (cchEncryptKey == 0) {
 				error = 1;
 				UTIL_get_lang_msgW("DLG_LOCKBOX_NOSTR", uimsg, _countof(uimsg),
-								   L"Not entered.", UILanguageFileW);
+								   L"The password is not entered.", UILanguageFileW);
 				::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
 			} else {
 				*(WORD *)szEncodeEncryptKey = (WORD)ENCRYPT2_PWD_MAX_LEN;
@@ -2609,7 +2623,7 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 						::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
 					} else{
 						UTIL_get_lang_msgW("DLG_LOCKBOX_VALID", uimsg, _countof(uimsg),
-										   L"The password is valid.", UILanguageFileW);
+										   L"Correct password.", UILanguageFileW);
 						::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
 						error = 0;
 						InvalidateRect(hWnd, NULL, TRUE);

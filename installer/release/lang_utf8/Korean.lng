@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2024-07-07 by TeraTerm Project
+date=2024-07-06 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -1154,7 +1154,7 @@ DLG_CONFIG_PASS=암호
 DLG_CONFIG_MACRO=특정 매크로파일
 DLG_CONFIG_LAUNCH=실행만
 DLG_CONFIG_STARTUP=시작시 실행
-DLG_CONFIG_LOCKBOX_CHECK=LockBox사용
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
 DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=SSH사용
 DLG_CONFIG_KEYFILE=키파일
@@ -1172,14 +1172,16 @@ DLG_ETC_PROMPT=Prompt
 DLG_ETC_USER=사용자 이름
 DLG_ETC_PASS=암호
 
-DLG_LOCKBOX_TITLE=Tera Term launch tool / TeraTerm Menu
-DLG_LOCKBOX_LABEL=LockBox 비밀번호를 입력하세요:
-DLG_LOCKBOX_SHOW=이 비밀번호는 LockBox를 잠그거나 잠금 해제하는 데 사용됩니다.
-DLG_LOCKBOX_WRONG=잘못된 비밀번호.
-DLG_LOCKBOX_STRTOOLONG=문자가 너무 많습니다.
-DLG_LOCKBOX_NOSTR=입력된 문자가 없습니다.
-DLG_LOCKBOX_VALID=비밀번호가 유효합니다.
-MSG_ERROR_NOLOCKBOX=오류: LockBox가 설정되지 않았습니다.
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=레지스트리 데이터를 읽을 수 없습니다.\n
 MSG_ERROR_MAKETTL='ttpmenu.TTL'를 만들 수 없습니다.\n

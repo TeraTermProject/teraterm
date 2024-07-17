@@ -73,6 +73,8 @@
 #define IDS_LOCKBOX_STRTOOLONG          1069
 #define IDS_LOCKBOX_NOSTR               1070
 #define IDS_LOCKBOX_VALID               1071
+#define IDS_TOOLTIP_CHECK_LOCKBOX       1072
+#define IDS_TOOLTIP_BUTTON_LOCKBOX      1073
 #define ID_TMENU_ADD                    40020
 #define ID_TMENU_CLOSE                  40021
 #define ID_VERSION                      40031

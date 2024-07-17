@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2024-07-07 by TeraTerm Project
+date=2024-07-06 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -1154,7 +1154,7 @@ DLG_CONFIG_PASS=Пароль
 DLG_CONFIG_MACRO=Указать файл макросов
 DLG_CONFIG_LAUNCH=Только запуск
 DLG_CONFIG_STARTUP=Старт при загрузке
-DLG_CONFIG_LOCKBOX_CHECK=Использовать LockBox
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
 DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=Использовать SSH
 DLG_CONFIG_KEYFILE=Файл ключа
@@ -1172,14 +1172,16 @@ DLG_ETC_PROMPT=Подсказка
 DLG_ETC_USER=Имя пользователя
 DLG_ETC_PASS=Пароль
 
-DLG_LOCKBOX_TITLE=Tera Term launch tool / TeraTerm Menu
-DLG_LOCKBOX_LABEL=Введите пароль LockBox:
-DLG_LOCKBOX_SHOW=Этот пароль применяется к LockBox.
-DLG_LOCKBOX_WRONG=Неверный пароль.
-DLG_LOCKBOX_STRTOOLONG=Слишком много персонажей.
-DLG_LOCKBOX_NOSTR=Символы не введены.
-DLG_LOCKBOX_VALID=Пароль действителен.
-MSG_ERROR_NOLOCKBOX=ошибка: LockBox не установлен.
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=Не удается прочитать данные из регистра.\n
 MSG_ERROR_MAKETTL=Не удается создать 'ttpmenu.TTL'\n

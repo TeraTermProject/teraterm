@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2024-07-07 by TeraTerm Project
+date=2024-07-06 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -1151,7 +1151,7 @@ DLG_CONFIG_PASS=கடவுச்சொல்
 DLG_CONFIG_MACRO=குறிப்பிடப்பட்ட பெரிய கோப்பு
 DLG_CONFIG_LAUNCH=துவங்கம் மட்டும்
 DLG_CONFIG_STARTUP=தொடக்கத்தில் உதை
-DLG_CONFIG_LOCKBOX_CHECK=LockBox ஐப் பயன்படுத்தவும்
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
 DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=பாஓடு பயன்படுத்தவும்
 DLG_CONFIG_KEYFILE=திறவுகோல்கோப்பு
@@ -1169,14 +1169,16 @@ DLG_ETC_PROMPT=அறிவிப்பு
 DLG_ETC_USER=பயனர் பெயர்
 DLG_ETC_PASS=கடவுச்சொல்
 
-DLG_LOCKBOX_TITLE=Tera Term launch tool / TeraTerm Menu
-DLG_LOCKBOX_LABEL=உங்கள் LockBox கடவுச்சொல்லை உள்ளிடவும்:
-DLG_LOCKBOX_SHOW=இந்த கடவுச்சொல் LockBox க்கு பொருந்தும்.
-DLG_LOCKBOX_WRONG=தவறான கடவுச்சொல்.
-DLG_LOCKBOX_STRTOOLONG=மிக அதிகமான எழுத்துக்கள்.
-DLG_LOCKBOX_NOSTR=எழுத்துகள் எதுவும் உள்ளிடப்படவில்லை.
-DLG_LOCKBOX_VALID=கடவுச்சொல் செல்லுபடியாகும்.
-MSG_ERROR_NOLOCKBOX=பிழை: LockBox அமைக்கப்படவில்லை.
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=பதிவேட்டில் தரவைப் படிக்க முடியவில்லை.\n
 MSG_ERROR_MAKETTL='ttpmenu.TTL' ஐ உருவாக்க முடியவில்லை\n

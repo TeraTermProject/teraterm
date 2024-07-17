@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2024-07-07 by TeraTerm Project
+date=2024-07-06 by TeraTerm Project
 contributor=LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -1154,7 +1154,7 @@ DLG_CONFIG_PASS=密码
 DLG_CONFIG_MACRO=指定的宏文件
 DLG_CONFIG_LAUNCH=仅启动
 DLG_CONFIG_STARTUP=启动时运行
-DLG_CONFIG_LOCKBOX_CHECK=使用 LockBox
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
 DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=使用 ttssh
 DLG_CONFIG_KEYFILE=密钥文件
@@ -1172,14 +1172,16 @@ DLG_ETC_PROMPT=提示
 DLG_ETC_USER=用户名
 DLG_ETC_PASS=密码
 
-DLG_LOCKBOX_TITLE=Tera Term launch tool / TeraTerm Menu
-DLG_LOCKBOX_LABEL=输入您的LockBox密码：
-DLG_LOCKBOX_SHOW=该密码用于锁定和解锁LockBox。
-DLG_LOCKBOX_WRONG=密码错误。
-DLG_LOCKBOX_STRTOOLONG=字符太多。
-DLG_LOCKBOX_NOSTR=没有输入任何字符。
-DLG_LOCKBOX_VALID=密码有效。
-MSG_ERROR_NOLOCKBOX=错误：未设置 LockBox。
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=无法从注册表中读取数据。\n
 MSG_ERROR_MAKETTL=无法创建 ttpmenu.TTL。\n
