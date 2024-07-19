@@ -38,12 +38,9 @@
 #include <ctype.h>
 #include <assert.h>
 
-#include "teraterm.h"
-#include "tttypes.h"
 #include "compat_win.h"
 
-#include "../teraterm/unicode_test.h"
-
+#include "ttlib.h"
 
 /**
  *	ウィンドウ上の位置を取得する

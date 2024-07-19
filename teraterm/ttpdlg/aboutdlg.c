@@ -40,13 +40,10 @@
 #include "tt-version.h"
 #include "ttlib.h"
 #include "dlglib.h"
-#include "ttcommon.h"
 #include "dlg_res.h"
 #include "asprintf.h"
-#include "win32helper.h"
-#include "compat_win.h"
-#include "asprintf.h"
 #include "ttwinman.h"
+#include "tttext.h"
 
 // Oniguruma: Regular expression library
 #define ONIG_STATIC
@@ -59,208 +56,6 @@
 
 #undef EFFECT_ENABLED	// エフェクトの有効可否
 #undef TEXTURE_ENABLED	// テクスチャの有効可否
-
-//
-// static textに書かれたURLをダブルクリックすると、ブラウザが起動するようにする。
-// based on sakura editor 1.5.2.1 # CDlgAbout.cpp
-// (2005.4.7 yutaka)
-//
-
-typedef struct {
-	WNDPROC proc;
-	BOOL mouseover;
-	HFONT font;
-	HWND hWnd;
-	int timer_done;
-} url_subclass_t;
-
-static url_subclass_t author_url_class;
-
-// static textに割り当てるプロシージャ
-static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
-{
-	url_subclass_t *parent = (url_subclass_t *)GetWindowLongPtr( hWnd, GWLP_USERDATA );
-	HDC hdc;
-	POINT pt;
-	RECT rc;
-
-	switch (msg) {
-#if 0
-	case WM_SETCURSOR:
-		{
-			// カーソル形状変更
-			HCURSOR hc;
-
-			hc = (HCURSOR)LoadImage(NULL,
-					MAKEINTRESOURCE(IDC_HAND),
-					IMAGE_CURSOR,
-					0,
-					0,
-					LR_DEFAULTSIZE | LR_SHARED);
-			if (hc != NULL) {
-				SetClassLongPtr(hWnd, GCLP_HCURSOR, (LONG_PTR)hc);
-			}
-			return (LRESULT)0;
-		}
-#endif
-
-	// シングルクリックでブラウザが起動するように変更する。(2015.11.16 yutaka)
-	//case WM_LBUTTONDBLCLK:
-	case WM_LBUTTONDOWN:
-	{
-			char url[128];
-
-			// get URL
-			SendMessage(hWnd, WM_GETTEXT , sizeof(url), (LPARAM)url);
-			// kick WWW browser
-			ShellExecute(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
-		}
-		break;
-
-	case WM_MOUSEMOVE:
-		{
-			BOOL bHilighted;
-			pt.x = LOWORD( lParam );
-			pt.y = HIWORD( lParam );
-			GetClientRect( hWnd, &rc );
-			bHilighted = PtInRect( &rc, pt );
-
-			if (parent->mouseover != bHilighted) {
-				parent->mouseover = bHilighted;
-				InvalidateRect( hWnd, NULL, TRUE );
-				if (parent->timer_done == 0) {
-					parent->timer_done = 1;
-					SetTimer( hWnd, 1, 200, NULL );
-				}
-			}
-
-		}
-		break;
-
-	case WM_TIMER:
-		// URLの上にマウスカーソルがあるなら、システムカーソルを変更する。
-		if (author_url_class.mouseover) {
-			HCURSOR hc;
-			//SetCapture(hWnd);
-
-			hc = (HCURSOR)LoadImage(NULL, MAKEINTRESOURCE(IDC_HAND),
-			                        IMAGE_CURSOR, 0, 0,
-			                        LR_DEFAULTSIZE | LR_SHARED);
-
-			SetSystemCursor(CopyCursor(hc), 32512 /* OCR_NORMAL */);    // 矢印
-			SetSystemCursor(CopyCursor(hc), 32513 /* OCR_IBEAM */);     // Iビーム
-
-		} else {
-			//ReleaseCapture();
-			// マウスカーソルを元に戻す。
-			SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
-
-		}
-
-		// カーソルがウィンドウ外にある場合にも WM_MOUSEMOVE を送る
-		GetCursorPos( &pt );
-		ScreenToClient( hWnd, &pt );
-		GetClientRect( hWnd, &rc );
-		if( !PtInRect( &rc, pt ) ) {
-			SendMessage( hWnd, WM_MOUSEMOVE, 0, MAKELONG( pt.x, pt.y ) );
-		}
-		break;
-
-	case WM_PAINT:
-		{
-		// ウィンドウの描画
-		PAINTSTRUCT ps;
-		HFONT hFont;
-		HFONT hOldFont;
-		TCHAR szText[512];
-
-		hdc = BeginPaint( hWnd, &ps );
-
-		// 現在のクライアント矩形、テキスト、フォントを取得する
-		GetClientRect( hWnd, &rc );
-		GetWindowText( hWnd, szText, 512 );
-		hFont = (HFONT)SendMessage( hWnd, WM_GETFONT, (WPARAM)0, (LPARAM)0 );
-
-		// テキスト描画
-		SetBkMode( hdc, TRANSPARENT );
-		SetTextColor( hdc, parent->mouseover ? RGB( 0x84, 0, 0 ): RGB( 0, 0, 0xff ) );
-		hOldFont = (HFONT)SelectObject( hdc, (HGDIOBJ)hFont );
-		TextOut( hdc, 2, 0, szText, lstrlen( szText ) );
-		SelectObject( hdc, (HGDIOBJ)hOldFont );
-
-		// フォーカス枠描画
-		if( GetFocus() == hWnd )
-			DrawFocusRect( hdc, &rc );
-
-		EndPaint( hWnd, &ps );
-		return 0;
-		}
-
-	case WM_ERASEBKGND:
-		hdc = (HDC)wParam;
-		GetClientRect( hWnd, &rc );
-
-		// 背景描画
-		if( parent->mouseover ){
-			// ハイライト時背景描画
-			SetBkColor( hdc, RGB( 0xff, 0xff, 0 ) );
-			ExtTextOut( hdc, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL );
-		}else{
-			// 親にWM_CTLCOLORSTATICを送って背景ブラシを取得し、背景描画する
-			HBRUSH hbr;
-			HBRUSH hbrOld;
-
-			hbr = (HBRUSH)SendMessage( GetParent( hWnd ), WM_CTLCOLORSTATIC, wParam, (LPARAM)hWnd );
-			hbrOld = (HBRUSH)SelectObject( hdc, hbr );
-			FillRect( hdc, &rc, hbr );
-			SelectObject( hdc, hbrOld );
-		}
-		return (LRESULT)1;
-
-	case WM_DESTROY:
-		// 後始末
-		SetWindowLongPtr( hWnd, GWLP_WNDPROC, (LONG_PTR)parent->proc );
-		if( parent->font != NULL ) {
-			DeleteObject( parent->font );
-		}
-
-		// マウスカーソルを元に戻す。
-		SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
-		return (LRESULT)0;
-	}
-
-	return CallWindowProc( parent->proc, hWnd, msg, wParam, lParam );
-}
-
-// static textにプロシージャを設定し、サブクラス化する。
-static void do_subclass_window(HWND hWnd, url_subclass_t *parent)
-{
-	HFONT hFont;
-	LOGFONT lf;
-
-	//SetCapture(hWnd);
-
-	if (!IsWindow(hWnd)) {
-		return;
-	}
-
-	// 親のプロシージャをサブクラスから参照できるように、ポインタを登録しておく。
-	SetWindowLongPtr( hWnd, GWLP_USERDATA, (LONG_PTR)parent );
-	// サブクラスのプロシージャを登録する。
-	parent->proc = (WNDPROC)SetWindowLongPtr( hWnd, GWLP_WNDPROC, (LONG_PTR)UrlWndProc);
-
-	// 下線を付ける
-	hFont = (HFONT)SendMessage( hWnd, WM_GETFONT, (WPARAM)0, (LPARAM)0 );
-	GetObject( hFont, sizeof(lf), &lf );
-	lf.lfUnderline = TRUE;
-	parent->font = hFont = CreateFontIndirect( &lf ); // 不要になったら削除すること
-	if (hFont != NULL) {
-		SendMessage( hWnd, WM_SETFONT, (WPARAM)hFont, (LPARAM)FALSE );
-	}
-
-	parent->hWnd = hWnd;
-	parent->timer_done = 0;
-}
 
 #if defined(_MSC_VER)
 // ビルドしたときに使われたVisual C++のバージョンを取得する(2009.3.3 yutaka)
@@ -430,34 +225,6 @@ static void GetSDKInfo(char *buf, size_t buf_size)
 }
 #endif
 
-// static text のサイズを変更
-static void FitControlSize(HWND Dlg, UINT id)
-{
-	HDC hdc;
-	RECT r;
-	DWORD dwExt;
-	WORD w, h;
-	HWND hwnd;
-	POINT point;
-	wchar_t *text;
-	size_t text_len;
-
-	hwnd = GetDlgItem(Dlg, id);
-	hdc = GetDC(hwnd);
-	SelectObject(hdc, (HFONT)SendMessage(Dlg, WM_GETFONT, 0, 0));
-	hGetDlgItemTextW(Dlg, id, &text);
-	text_len = wcslen(text);
-	dwExt = GetTabbedTextExtentW(hdc, text, (int)text_len, 0, NULL);
-	free(text);
-	w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
-	h = HIWORD(dwExt);
-	GetWindowRect(hwnd, &r);
-	point.x = r.left;
-	point.y = r.top;
-	ScreenToClient(Dlg, &point);
-	MoveWindow(hwnd, point.x, point.y, w, h, TRUE);
-}
-
 static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
@@ -523,13 +290,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			}
 			SetDlgItemTextA(Dialog, IDC_TT_VERSION, buf);
 
-			// Onigurumaのバージョンを設定する
-			// バージョンの取得は onig_version() を呼び出すのが適切だが、そのためだけにライブラリを
-			// リンクしたくなかったので、以下のようにした。Onigurumaのバージョンが上がった場合、
-			// ビルドエラーとなるかもしれない。
-			// (2005.10.8 yutaka)
-			// ライブラリをリンクし、正規の手順でバージョンを得ることにした。
-			// (2006.7.24 yutaka)
+			// Onigurumaのバージョン
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Oniguruma %s", onig_version());
 			SetDlgItemTextA(Dialog, IDC_ONIGURUMA_LABEL, buf);
 
@@ -558,11 +319,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 				free(info);
 			}
 
-			FitControlSize(Dialog, IDC_AUTHOR_URL);
-
-			// static textをサブクラス化する。ただし、tabstop, notifyプロパティを有効にしておかないと
-			// メッセージが拾えない。(2005.4.5 yutaka)
-			do_subclass_window(GetDlgItem(Dialog, IDC_AUTHOR_URL), &author_url_class);
+			TTTextURL(Dialog, IDC_AUTHOR_URL, NULL, NULL);
 
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 			/*

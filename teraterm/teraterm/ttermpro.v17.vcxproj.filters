@@ -69,9 +69,6 @@
     <ClCompile Include="sizetip.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
-    <ClCompile Include="teklib.c">
-      <Filter>Source Files %28C%29</Filter>
-    </ClCompile>
     <ClCompile Include="telnet.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
@@ -195,9 +192,6 @@
     <ClCompile Include="..\ttpfile\filesys_win32.cpp">
       <Filter>ttpfile</Filter>
     </ClCompile>
-    <ClCompile Include="ttdebug.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="setupdirdlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -276,6 +270,15 @@
     <ClCompile Include="general_pp.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="keyboard_pp.c">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="mouse_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="log_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -334,6 +337,9 @@
     <ResourceCompile Include="themedlg.rc">
       <Filter>dialog</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="mouse_pp.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sizetip.h">
@@ -349,9 +355,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ttwinman.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="teklib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\teraterm.h">
@@ -531,9 +534,6 @@
     <ClInclude Include="..\ttpfile\filesys_win32.h">
       <Filter>ttpfile</Filter>
     </ClInclude>
-    <ClInclude Include="ttdebug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="setupdirdlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -589,6 +589,15 @@
       <Filter>dialog</Filter>
     </ClInclude>
     <ClInclude Include="general_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="keyboard_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="mouse_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="log_pp.h">
       <Filter>dialog</Filter>
     </ClInclude>
   </ItemGroup>

@@ -29,9 +29,7 @@ target_sources(
   ${PACKAGE_NAME}
   PRIVATE
   ../teraterm/common/ttlib.h
-  ../teraterm/common/ttlib.c
   ../teraterm/common/i18n.h
-  ../teraterm/common/i18n.c
   ../teraterm/common/codeconv.h
   ../teraterm/common/compat_win.h
   ../teraterm/common/dllutil.h

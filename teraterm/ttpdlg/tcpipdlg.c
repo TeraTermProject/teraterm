@@ -216,7 +216,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			// SSHÚ‘±‚Ì‚Æ‚«‚É‚à TERM ‚ð‘—‚é‚Ì‚ÅAtelnet‚ª–³Œø‚Å‚à disabled ‚É‚µ‚È‚¢B(2005.11.3 yutaka)
 			EnableDlgItem(Dialog, IDC_TCPIPTERMTYPELABEL, IDC_TCPIPTERMTYPE);
 
-			data->resize_helper = ReiseHelperInit(Dialog, resize_info, _countof(resize_info));
+			data->resize_helper = ReiseHelperInit(Dialog, TRUE, resize_info, _countof(resize_info));
 
 			CenterWindow(Dialog, GetParent(Dialog));
 
@@ -390,7 +390,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts)
 {
 	BOOL r;
-	TCPIPDlgData *data = (TCPIPDlgData *)calloc(sizeof(*data), 1);
+	TCPIPDlgData *data = (TCPIPDlgData *)calloc(1, sizeof(*data));
 	data->ts = ts;
 	r= (BOOL)TTDialogBoxParam(hInst,
 							  MAKEINTRESOURCE(IDD_TCPIPDLG),

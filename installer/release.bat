@@ -166,26 +166,8 @@ if exist %PERL_PATH%\perl.exe (
     exit /b 0
 )
 
-set PERL=perl.exe
-where %PERL% > nul 2>&1
-if %errorlevel% == 0 exit /b 0
-set PERL=%CUR%..\buildtools\cygwin64\bin\perl.exe
-if exist %PERL% exit /b 0
-set PERL=%CUR%..\buildtools\perl\perl\bin\perl.exe
-if exist %PERL% exit /b 0
-set PERL=C:\Strawberry\perl\bin\perl.exe
-if exist %PERL% exit /b 0
-set PERL=C:\Perl64\bin\perl.exe
-if exist %PERL% exit /b 0
-set PERL=C:\Perl\bin\perl.exe
-if exist %PERL% exit /b 0
-set PERL=C:\cygwin64\bin\perl.exe
-if exist %PERL% exit /b 0
-set PERL=C:\cygwin\bin\perl.exe
-if exist %PERL% exit /b 0
-echo perl not found
-if not "%NOPAUSE%" == "1" pause
-exit
+call %CUR%..\buildtools\find_perl.bat
+exit /b
 
 rem ####################
 rem :search_svn
@@ -257,7 +239,7 @@ echo INNO_SETUP=%INNO_SETUP%
 goto search_iscc_not_found
 
 :search_iscc_1
-set INNO_SETUP=%CUR%..\buildtools\innosetup6\bin\ISCC.exe
+set INNO_SETUP=%CUR%..\buildtools\innosetup6\ISCC.exe
 if exist %INNO_SETUP% exit /b 0
 set INNO_SETUP="C:\Program Files (x86)\Inno Setup 6\iscc.exe"
 if exist %INNO_SETUP% exit /b 0

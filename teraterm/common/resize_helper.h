@@ -69,8 +69,11 @@ typedef struct {
 
 /**
  *	初期化
+ *
+ *	@param[in]	dlg			ダイアログハンドル
+ *	@param[in]	size_box	TRUE/FALSE	サイズボックスを表示する/しない
  */
-ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg);
+ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg, BOOL size_box);
 
 /**
  *	終了
@@ -84,8 +87,13 @@ void ReiseDlgHelperAdd(ReiseDlgHelper_t *h, UINT id, ResizeHelperAnchor anchor);
 
 /**
  *	初期化 + 連続登録
+ *
+ *	@param[in]	dlg			ダイアログハンドル
+ *	@param[in]	size_box	TRUE/FALSE	サイズボックスを表示する/しない
+ *	@param[in]	infos		リサイズ情報リスト
+ *	@param[in]	info_count	リサイズ情報数
  */
-ReiseDlgHelper_t *ReiseHelperInit(HWND dlg, const ResizeHelperInfo *infos, size_t info_count);
+ReiseDlgHelper_t *ReiseHelperInit(HWND dlg, BOOL size_box, const ResizeHelperInfo *infos, size_t info_count);
 
 /**
  *	ウィンドウのメッセージが発生したら呼び出し

@@ -18,7 +18,7 @@ Displays a list box, and ask an item to user. <em>(version 4.78 or later)</em>
 </p>
 
 <pre class="macro-syntax">
-listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;]
+listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;] ['dclick=on'] ['minmaxbutton=on'] ['minimize=on'] ['maximize=on'] ['size=&lt;N1xN2&gt;']
 </pre>
 
 <h2>Parameters</h2>
@@ -34,7 +34,22 @@ listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;]
 	<dd>It is displayed as the list box items.</dd>
 
 	<dt class="macro">integer &lt;selected&gt; (version 4.89 or later)</dt>
-	<dd>It is selected first item by specifying the zero-based index of the array. This argument is optional.</dd>
+	<dd>It is selected first item by specifying the zero-based index of the array. This argument is optional. When this option is omitted, no item is selected.</dd>
+
+	<dt class="macro">fixed string 'dclick=on' (version 5.3 or later)</dt>
+	<dd>Enable item selection by double-clicking. This argument is optional.</dd>
+
+	<dt class="macro">fixed string 'minmaxbutton=on' (version 5.3 or later)</dt>
+	<dd>Enable Minimize/Maximize button. This argument is optional.</dd>
+
+	<dt class="macro">fixed string 'minimize=on' (version 5.3 or later)</dt>
+	<dd>Display in minimized state. This argument is optional.</dd>
+
+	<dt class="macro">fixed string 'maximize=on' (version 5.3 or later)</dt>
+	<dd>Display in maximized state. This argument is optional.</dd>
+
+	<dt class="macro">string 'size=&lt;N1xN2&gt;' (version 5.3 or later)</dt>
+	<dd>Specify the size of the list box. This argument is optional.</dd>
 </dl>
 
 <h2>Return Value</h2>
@@ -72,8 +87,12 @@ Orange
 <em>(version 4.89 or later)</em><br>
 When the &lt;selected&gt; parameter is specified, an item of the list box can be selected at first. <br />
 If the parameter is omitted, the default value is 0.
+<br><br>
+<em>(version 5.3 or later)</em><br>
+To specify the size of the list box, specify "size=N1xN2".<br>
+Specify the horizontal length for N1 and the vertical length for N2.<br>
+Example 'size=60x20' (for 60 characters horizontally and 20 characters vertically)
 </p>
-
 
 <h2>Example</h2>
 
@@ -105,6 +124,25 @@ msg[6] = 'Unknown'
 listbox "How's today's weather?" 'Confirmation' msg 6
 sprintf2 var "%d" result
 messagebox var "result"
+</pre>
+
+<pre class="macro-example">
+strdim msg 9
+msg[0] = "listbox msg[result] result msg 'size=70x10'"
+msg[1] = "listbox msg[result] result msg 'size=70x10' 'dclick=on'"
+msg[2] = "listbox msg[result] result msg 'size=70x10' 'minmaxbutton=on'"
+msg[3] = "listbox msg[result] result msg 'size=70x10' 'minimize=on'"
+msg[4] = "listbox msg[result] result msg 'size=70x10' 'maximize=on'"
+msg[5] = "listbox msg[result] result msg 'size=70x10' 'minmaxbutton=on' 'dclick=on'"
+msg[6] = "listbox msg[result] result msg 'size=100x10'"
+msg[7] = "listbox msg[result] result msg 'size=10x20'"
+msg[8] = "listbox msg[result] result msg"
+:select
+execcmnd msg[result]
+if result = -1 then
+  exit
+endif
+goto select
 </pre>
 
 <h2>See also</h2>

@@ -34,16 +34,19 @@
 #include "ttlib.h"
 #include "ttm_res.h"
 #include "ttmlib.h"
-#include "tttypes.h"
 #include "dlglib.h"
 #include "ttmdlg.h"
 #include "ttmacro.h"
+#include "ttl.h"
+#include "ttmparse.h"
 
 #include "ListDlg.h"
 
+#define CONTROL_GAP_W	14		// ウィンドウ端とコントロール間との幅
+
 // CListDlg ダイアログ
 
-CListDlg::CListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected, int x, int y)
+CListDlg::CListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected, int x, int y, int ext, int width, int height)
 {
 	m_Text = Text;
 	m_Caption = Caption;
@@ -51,10 +54,14 @@ CListDlg::CListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists,
 	m_Selected = Selected;
 	PosX = x;
 	PosY = y;
+	m_ext = ext;
+	m_width = width;
+	m_height = height;
 }
 
 INT_PTR CListDlg::DoModal(HINSTANCE hInst, HWND hWndParent)
 {
+	m_hInst = hInst;
 	return TTCDialog::DoModal(hInst, hWndParent, IDD);
 }
 
@@ -104,13 +111,18 @@ BOOL CListDlg::OnInitDialog()
 	};
 	RECT R;
 	HWND HList, HOk;
+	int NonClientAreaWidth;
+	int NonClientAreaHeight;
 
-	ResizeHelper = ReiseHelperInit(m_hWnd, resize_info, _countof(resize_info));
-
-	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFileW);
 
 	HList = ::GetDlgItem(m_hWnd, IDC_LISTBOX);
 	InitList(HList);
+
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), 0);
+	if (m_ext & ExtListBoxMinmaxbutton) {
+		ModifyStyle(0, WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
+	}
 
 	// 本文とタイトル
 	SetDlgItemTextW(IDC_LISTTEXT, m_Text);
@@ -119,10 +131,6 @@ BOOL CListDlg::OnInitDialog()
 	CalcTextExtentW(GetDlgItem(IDC_LISTTEXT), NULL, m_Text,&s);
 	TW = s.cx + s.cx/10;
 	TH = s.cy;
-
-	::GetWindowRect(HList,&R);
-	LW = R.right-R.left;
-	LH = R.bottom-R.top;
 
 	HOk = ::GetDlgItem(GetSafeHwnd(), IDOK);
 	::GetWindowRect(HOk,&R);
@@ -133,7 +141,32 @@ BOOL CListDlg::OnInitDialog()
 	WW = R.right-R.left;
 	WH = R.bottom-R.top;
 
+	if (m_ext & ExtListBoxSize) {
+		LW = TH * m_width / 2;
+		LH = TH * m_height;
+		TW = LW;
+		s.cx = s.cx + s.cx/10;
+		::GetClientRect(m_hWnd, &R);
+		NonClientAreaWidth = WW - (R.right - R.left);
+		NonClientAreaHeight = WH - (R.bottom - R.top);
+		WW = TW + NonClientAreaWidth + CONTROL_GAP_W * 4 + BW;
+		WH = TH + LH + (int)(BH*1.5) + NonClientAreaHeight;
+		SetWindowPos(HWND_TOP, 0, 0, WW, WH, SWP_NOMOVE);
+	} else {
+		::GetWindowRect(HList,&R);
+		LW = R.right-R.left;
+		LH = R.bottom-R.top;
+	}
+
+	ResizeHelper = ReiseHelperInit(m_hWnd, FALSE, resize_info, _countof(resize_info));
 	Relocation(TRUE, WW);
+
+	if (m_ext & ExtListBoxMinimize) {
+		ShowWindow(SW_MINIMIZE);
+	} else if (m_ext & ExtListBoxMaximize) {
+		ShowWindow(SW_MAXIMIZE);
+	}
+
 	BringupWindow(m_hWnd);
 
 	return TRUE;
@@ -173,7 +206,6 @@ void CListDlg::Relocation(BOOL is_init, int new_WW)
 	NonClientAreaWidth = WW - CW;
 	NonClientAreaHeight = WH - CH;
 
-#define CONTROL_GAP_W	14		// ウィンドウ端とコントロール間との幅
 	// 初回のみ
 	if (is_init) {
 		// テキストコントロールサイズを補正
@@ -214,15 +246,34 @@ LRESULT CListDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch (msg) {
 		case WM_SIZE:
-			ReiseDlgHelper_WM_SIZE(ResizeHelper);
+			if (wp == SIZE_MINIMIZED) {
+				TTLShowMINIMIZE();
+				ShowWindow(SW_MINIMIZE);
+				return TRUE;
+			}
+			if (ResizeHelper != NULL) {
+				ReiseDlgHelper_WM_SIZE(ResizeHelper);
+			}
 			break;
 		case WM_GETMINMAXINFO:
-			ReiseDlgHelper_WM_GETMINMAXINFO(ResizeHelper, lp);
+			if (ResizeHelper != NULL) {
+				ReiseDlgHelper_WM_GETMINMAXINFO(ResizeHelper, lp);
+			}
 			break;
 		case WM_DESTROY:
-			ReiseDlgHelperDelete(ResizeHelper);
-			ResizeHelper = NULL;
+			if (ResizeHelper != NULL) {
+				ReiseDlgHelperDelete(ResizeHelper);
+				ResizeHelper = NULL;
+			}
 			break;
+		case WM_COMMAND:
+			if (m_ext & ExtListBoxDoubleclick) {
+				if (HIWORD(wp) == LBN_DBLCLK) {
+					OnOK();
+					return TRUE;
+				}
+				break;
+			}
 	}
 	return (LRESULT)FALSE;
 }

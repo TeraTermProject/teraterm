@@ -43,12 +43,11 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 
-#include "teraterm.h"
-#include "tttypes.h"
 #include "compat_win.h"
 #include "codeconv.h"
-#include "ttlib.h"
 #include "ttcommdlg.h"
+
+#include "ttlib.h"
 
 // このファイルはいくつかのプロジェクトに追加されて直接コンパイル,リンクされている
 // common_static は lib として作成されて他のプロジェクトにでリンクされている
@@ -654,33 +653,6 @@ void RestoreNewLine(PCHAR Text)
 	}
 	/* use memcpy to copy with '\0' */
 	memcpy(Text, buf, size);
-}
-
-void GetDownloadFolder(char *dest, int destlen)
-{
-	wchar_t *download = GetDownloadFolderW();
-	WideCharToACP_t(download, dest, destlen);
-	free(download);
-}
-
-/*
- *	UILanguageFileのフルパスを取得する
- *
- *	@param[in]		HomeDir					exe,dllの存在するフォルダ GetHomeDir()で取得できる
- *	@param[in]		UILanguageFileRel		lngファイル、HomeDirからの相対パス
- *	@param[in,out]	UILanguageFileFull		lngファイルptr、フルパス
- *	@param[in]		UILanguageFileFullLen	lngファイルlen、フルパス
- */
-void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
-						   char *UILanguageFileFull, size_t UILanguageFileFullLen)
-{
-	char CurDir[MAX_PATH];
-
-	/* Get UILanguageFile Full Path */
-	GetCurrentDirectoryA(sizeof(CurDir), CurDir);
-	SetCurrentDirectoryA(HomeDir);
-	_fullpath(UILanguageFileFull, UILanguageFileRel, UILanguageFileFullLen);
-	SetCurrentDirectoryA(CurDir);
 }
 
 // 指定したエントリを teraterm.ini から読み取る (2009.3.23 yutaka)

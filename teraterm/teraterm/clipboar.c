@@ -40,11 +40,13 @@
 #include "ttwinman.h"
 #include "ttlib.h"
 #include "codeconv.h"
-
-#include "clipboar.h"
 #include "fileread.h"
 #include "sendmem.h"
 #include "clipboarddlg.h"
+#include "tttypes_charset.h"
+
+#include "clipboar.h"
+
 
 static const wchar_t BracketStartW[] = L"\033[200~";
 static const wchar_t BracketEndW[] = L"\033[201~";
@@ -257,6 +259,24 @@ void CBPreparePaste(HWND HWin, BOOL shouldBeReady, BOOL AddCR, BOOL Bracketed, w
 		str_w = str_w_edited;
 	}
 
+	// ブラケットするかどうか
+	BOOL AddBracket = FALSE;
+	if (ts.BracketedSupport) {
+		if (!ts.BracketedControlOnly) {
+			AddBracket = TRUE;
+		}
+		else {
+			wchar_t *c = str_w;
+			while (*c) {
+				if (iswcntrl(*c)) {
+					AddBracket = TRUE;
+					break;
+				}
+				c++;
+			}
+		}
+	}
+
 	if (AddCR) {
 		size_t str_len = wcslen(str_w) + 2;
 		str_w = realloc(str_w, sizeof(wchar_t) * str_len);
@@ -271,7 +291,7 @@ void CBPreparePaste(HWND HWin, BOOL shouldBeReady, BOOL AddCR, BOOL Bracketed, w
 		str_w = dest;
 	}
 
-	if (Bracketed) {
+	if (Bracketed && AddBracket) {
 		const size_t BracketStartLenW = _countof(BracketStartW) - 1;
 		const size_t BracketEndLenW = _countof(BracketEndW) - 1;
 		size_t str_len = wcslen(str_w);

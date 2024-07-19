@@ -1,5 +1,7 @@
-﻿; Updated by TeraTerm Project (2024-03-30)
-; Last translated (German language) by Frederik Schwarzer (2010-05-17)
+﻿[Info]
+language=German
+date=2024-07-06 by TeraTerm Project
+contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -53,13 +55,11 @@ MENU_EDIT_SELECTALL=&Alles auswählen
 MENU_SETUP=Ein&stellungen
 MENU_SETUP_TERMINAL=&Terminal-Einstellungen
 MENU_SETUP_WINDOW=&Fenster-Einstellungen
-MENU_SETUP_FONT_SUBMENU=&Schriftart
 MENU_SETUP_FONT=&Schriftart...
-MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=&Keyboard-Einstellungen
 MENU_SETUP_SERIALPORT=Serieller Port
 MENU_SETUP_TCPIP=&Hostliste editieren
-MENU_SETUP_GENERAL=&Grundeinstellungen
+MENU_SETUP_GENERAL=&Grundeinstellungen(LanguageUI)
 MENU_SETUP_ADDITION=&Erweiterte Einstellungen
 MENU_SETUP_SAVE=&Setup sichern
 MENU_SETUP_RESTORE=&Setup laden
@@ -271,6 +271,8 @@ DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
 DLG_TAB_LOG_EDITOR=&Auswahl-Editor
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=&Standardprotokoll-Name
 DLG_TAB_LOG_FILEPATH=Standardprotokoll-Ordner
 DLG_TAB_LOG_AUTOSTART=&Automatisch protokollieren
@@ -300,10 +302,13 @@ DLG_BROADCAST_ENTER=Auswahl-Taste
 DLG_BROADCAST_SUBMIT=Absenden
 DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=Echtzeit-Modus
-DLG_BROADCAST_FOREGROUND=to Fore
+DLG_BROADCAST_HELP=Help
 CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
 CMENU_BROADCAST_MINIMIZE=Minimize selected window
 CMENU_BROADCAST_REFRESH=Refresh window list
+CMENU_BROADCAST_SELECT_ALL=Select all
+CMENU_BROADCAST_UNSELECT_ALL=Unselect all
+CMENU_BROADCAST_INVERSE=Inverse selection
 
 DLG_PRNABORT_PRINTING=Printing
 
@@ -365,14 +370,10 @@ MSG_CREATE_THREAD_ERROR=Thread kann nicht erzeugt werden
 ; ttdlg.c
 DLG_ABOUT_TITLE=Über Tera Term
 
-DLG_DIR_TITLE=Verzeichnis wechseln
-DLG_DIR_CURRENT=Aktuell:
-DLG_DIR_NEW=&Neu:
 DLG_SELECT_DIR_TITLE=Neues Verzeichnis wählen
 
 DLG_GEN_TITLE=Tera-Grundeinstellungen
 DLG_GEN_PORT=Standard-Port
-DLG_GEN_LANG=Sprache
 DLG_GEN_LANG_UI=Language&UI:
 
 DLG_HOST_TITLE=Tera Term: Neue Verbindung
@@ -382,7 +383,7 @@ DLG_HOST_TCPIPPROTOCOL=IP Versio&n:
 DLG_HOST_SERIAL=&Seriell
 DLG_HOST_SERIALPORT=Po&rt:
 
-DLG_KEYB_TITLE=Keyboard-Einstellungen
+DLG_KEYB_TITLE=Keyboard
 DLG_KEYB_TRANSMIT=DEL senden mit:
 DLG_KEYB_BS=Backspace
 DLG_KEYB_DEL=Entfernen

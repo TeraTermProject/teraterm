@@ -44,6 +44,8 @@
 #include "asprintf.h"
 #include "win32helper.h"
 #include "ttcmn_notify2.h"
+#include "ttlib_types.h"
+#include "compat_win.h"
 
 #include "general_pp.h"
 
@@ -69,10 +71,8 @@ void CGeneralPropPageDlg::OnInitDialog()
 	TTCPropertyPage::OnInitDialog();
 
 	static const DlgTextInfo TextInfos[] = {
-		{ IDC_CLICKABLE_URL, "DLG_TAB_GENERAL_CLICKURL" },
 		{ IDC_DISABLE_SENDBREAK, "DLG_TAB_GENERAL_DISABLESENDBREAK" },
 		{ IDC_ACCEPT_BROADCAST, "DLG_TAB_GENERAL_ACCEPTBROADCAST" },
-		{ IDC_MOUSEWHEEL_SCROLL_LINE, "DLG_TAB_GENERAL_MOUSEWHEEL_SCROLL_LINE" },
 		{ IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE, "DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE" },
 		{ IDC_CLEAR_ON_RESIZE, "DLG_TAB_GENERAL_CLEAR_ON_RESIZE" },
 		{ IDC_CURSOR_CHANGE_IME, "DLG_TAB_GENERAL_CURSOR_CHANGE_IME" },
@@ -88,6 +88,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 		{ IDC_NOTIFY_SOUND, "DLG_TAB_GENERAL_NOTIFIY_SOUND" },
 		{ IDC_NOTIFICATION_TEST_POPUP, "DLG_TAB_GENERAL_NOTIFICATION_TEST_NOTIFY" },
 		{ IDC_NOTIFICATION_TEST_TRAY, "DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY" },
+		{ IDC_GENPORT_LABEL, "DLG_GEN_PORT" },
 	};
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
@@ -99,9 +100,6 @@ void CGeneralPropPageDlg::OnInitDialog()
 
 	// (3)AcceptBroadcast 337: 2007/03/20
 	SetCheck(IDC_ACCEPT_BROADCAST, ts.AcceptBroadcast);
-
-	// (4)IDC_MOUSEWHEEL_SCROLL_LINE
-	SetDlgItemNum(IDC_SCROLL_LINE, ts.MouseWheelScrollLine);
 
 	// (5)IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE
 	SetCheck(IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE, ts.AutoScrollOnlyInBottomLine);
@@ -126,27 +124,46 @@ void CGeneralPropPageDlg::OnInitDialog()
 	// Notify
 	SetCheck(IDC_NOTIFY_SOUND, ts.NotifySound);
 
+	// default port
+	{
+		WORD w;
+		TTTSet *pts = &ts;
+		SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM) "TCP/IP");
+		for (w=1;w<=pts->MaxComPort;w++) {
+			char Temp[8];
+			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "COM%d", w);
+			SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM)Temp);
+		}
+		if (pts->PortType==IdSerial) {
+			if (pts->ComPort <= pts->MaxComPort) {
+				w = pts->ComPort;
+			}
+			else {
+				w = 1; // COM1
+			}
+		}
+		else {
+			w = 0; // TCP/IP
+		}
+		SendDlgItemMessageA(IDC_GENPORT, CB_SETCURSEL, w, 0);
+	}
+
+	// Download dir
+	SetDlgItemTextW(IDC_DOWNLOAD_DIR, ts.FileDirW);
+
+#if 0
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
+#endif
 }
 
 void CGeneralPropPageDlg::OnOK()
 {
-	int val;
-
 	// (1)
 	ts.DisableAcceleratorSendBreak = GetCheck(IDC_DISABLE_SENDBREAK);
 
-	// (2)
-	ts.EnableClickableUrl = GetCheck(IDC_CLICKABLE_URL);
-
 	// (3) 337: 2007/03/20
 	ts.AcceptBroadcast = GetCheck(IDC_ACCEPT_BROADCAST);
-
-	// (4)IDC_MOUSEWHEEL_SCROLL_LINE
-	val = GetDlgItemInt(IDC_SCROLL_LINE);
-	if (val > 0)
-		ts.MouseWheelScrollLine = val;
 
 	// (5)IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE
 	ts.AutoScrollOnlyInBottomLine = GetCheck(IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE);
@@ -179,6 +196,27 @@ void CGeneralPropPageDlg::OnOK()
 			ts.NotifySound = notify_sound;
 			Notify2SetSound((NotifyIcon *)cv.NotifyIcon, notify_sound);
 		}
+	}
+
+	// default port
+	{
+		TTTSet *pts = &ts;
+		WORD w = (WORD)::GetCurSel(m_hWnd, IDC_GENPORT);
+		if (w>1) {
+			pts->PortType = IdSerial;
+			pts->ComPort = w-1;
+		}
+		else {
+			pts->PortType = IdTCPIP;
+		}
+	}
+
+	// Download dir
+	free(ts.FileDirW);
+	hGetDlgItemTextW(m_hWnd, IDC_DOWNLOAD_DIR, &ts.FileDirW);
+	if (ts.FileDirW != NULL && ts.FileDirW[0] == 0) {
+		ts.FileDirW = NULL;
+		free(ts.FileDirW);
 	}
 }
 
@@ -224,6 +262,32 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			// 通知領域のアイコンを消す
 			Notify2SetBallonDontHide(ni, FALSE);
 			Notify2Hide(ni);
+			break;
+		}
+		case IDC_DOWNLOAD_DIR_SELECT | (BN_CLICKED << 16): {
+			wchar_t *uimsgW;
+			wchar_t *src;
+			wchar_t *dest;
+			GetI18nStrWW("Tera Term", "DLG_SELECT_DIR_TITLE", L"Select new directory", ts.UILanguageFileW, &uimsgW);
+
+			hGetDlgItemTextW(m_hWnd, IDC_DOWNLOAD_DIR, &src);
+			if (src != NULL && src[0] == 0) {
+				free(src);
+				// Windowsのデフォルトのダウンロードフォルダ
+				_SHGetKnownFolderPath(FOLDERID_Downloads, KF_FLAG_CREATE, NULL, &src);
+			}
+			else {
+				wchar_t *FileDirExpanded;
+				hExpandEnvironmentStringsW(src, &FileDirExpanded);
+				free(src);
+				src = FileDirExpanded;
+			}
+			if (doSelectFolderW(m_hWnd, src, uimsgW, &dest)) {
+				SetDlgItemTextW(IDC_DOWNLOAD_DIR, dest);
+				free(dest);
+			}
+			free(src);
+			free(uimsgW);
 			break;
 		}
 		default:

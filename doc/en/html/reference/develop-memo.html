@@ -13,9 +13,11 @@
 
 <ol>
   <li><a href="#ini-entry">Add entry to TERATERM.INI</a></li>
-  <li><a href="#menu-id">Naming rule to add menu ID</a></li>
+  <li><a href="#i18n">Support i18n message</a></li>
   <li><a href="#add-macro-command">What to do when new macro command is added?</a></li>
+  <li><a href="#menu-id">Naming rule to add menu ID</a></li>
   <li><a href="#icon">Icon</a></li>
+  <li><a href="#update-library">Parts that need to be corrected when update a library</a></li>
   <li><a href="#dump">Dump</a></li>
 </ol>
 
@@ -23,42 +25,87 @@
 
 <h2 id="ini-entry">Add entry to TERATERM.INI</h2>
 
+<h3>Entry name</h3>
+
 <p>
-Entry name<br />
 Unfortunately, the confusing entries such as EnableFoo... and DisableBar... are included.<br />
 It recommends that the new name like as Baz....
 </p>
 
+<h3>Changes</h3>
 
-<h2 id="menu-id">Naming rule to add menu ID</h2>
+<ul>
+  <li>source code
+    <ul>
+      <li>read/write INI file<br />
+          teraterm\ttpset\ttset.c</li>
+      <li>struct tttset<br />
+          teraterm\common\tttypes.h</li>
+    </ul>
+  </li>
+  <li>Document
+    <ul>
+      <li>All items of Tera Term setup file<br />
+          setup/teraterm-ini.html</li>
+      <li>help for setup dialog (when UI for change is present in a dialog)<br />
+          dialog page under menu</li>
+      <li>help for setup item (when UI for change is not present in a dialog)<br />
+          category page under setup</li>
+    </ul>
+  </li>
+  <li>Default INI file<br />
+      installer\release\TERATERM.INI</li>
+</ul>
 
-<pre>
-The first digit is 5.
-</pre>
-<pre>
-The second digit is:
-  Tera Term VT window          0
-  Tera Term TEK window         1
-  TTSSH                        2
-  TTProxy                      3
-  TTXKanjiMenu                 4
-</pre>
-<pre>
-The third digit is:
-  [File] menu                  1
-  [Edit] menu                  2
-  [Setup] menu                 3
-  [Control] menu               4
-  [Window] menu                8
-  [Help] menu                  9
-</pre>
 
-<p>
-Example: adding a TTSSH menu under File menu
-</p>
-<pre>
-#define ID_SSHSCPMENU       52110
-</pre>
+<h2 id="i18n">Support i18n message</h2>
+
+<h3>Add new i18n message</h3>
+
+<ul>
+  <li>Source code<br />
+      Read langage file</li>
+  <li>If a message is on dialog, put English message as default text</li>
+  <li>Modify language file<br />
+      Modify files under installer/release/lang_utf8 folder.
+    <ul>
+      <li>English.lng (English)
+        <ul>
+          <li>Add English message.</li>
+          <li>Describe today as message update date.</li>
+          <li>Last translate date is not present in this file.</li>
+          <li>This language file is not read from program. This is a reference for translate to other language.</li>
+        </ul>
+      </li>
+      <li>Japanese.lng (Japanese)
+        <ul>
+          <li>Add Japanese message.</li>
+          <li>Describe today as message update date.</li>
+          <li>Last translate date is not present in this file.</li>
+        </ul>
+      </li>
+      <li>Modify other language file
+        <ul>
+          <li>Add English message</li>
+          <li>Describe today as message update date.</li>
+          <li>Do not update last translate date, because translation is not updated.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3>Translate i18n message</h3>
+
+<ul>
+  <li>Modify language file
+    <ul>
+      <li>Translate English message in language file to target language.</li>
+      <li>Do not update update date.</li>
+      <li>Describe today as last translate date.</li>
+    </ul>
+  </li>
+</ul>
 
 
 <h2 id="add-macro-command">What to do when new macro command is added?</h2>
@@ -92,6 +139,37 @@ Example: adding a TTSSH menu under File menu
     </ul>
   </li>
 </ul>
+
+
+<h2 id="menu-id">Naming rule to add menu ID</h2>
+
+<pre>
+The first digit is 5.
+</pre>
+<pre>
+The second digit is:
+  Tera Term VT window          0
+  Tera Term TEK window         1
+  TTSSH                        2
+  TTProxy                      3
+  TTXKanjiMenu                 4
+</pre>
+<pre>
+The third digit is:
+  [File] menu                  1
+  [Edit] menu                  2
+  [Setup] menu                 3
+  [Control] menu               4
+  [Window] menu                8
+  [Help] menu                  9
+</pre>
+
+<p>
+Example: adding a TTSSH menu under File menu
+</p>
+<pre>
+#define ID_SSHSCPMENU       52110
+</pre>
 
 
 <h2 id="icon">Icon</h2>
@@ -437,6 +515,56 @@ Source file of each icon images are followings:
   </tr>
 </table>
 
+
+<h2 id="update-library">Parts that need to be corrected when update a library</h2>
+
+<h3>Files</h3>
+
+<ul>
+  <li>doc/(en|ja)/html/about/history.html
+    <ul>
+      <li>Add to "Misc" section of a component which uses the library.</li>
+    </ul>
+  </li>
+  <li>doc/(en|ja)/html/reference/develop.html
+    <ul>
+      <li>Modify library version.</li>
+    </ul>
+  </li>
+  <li>libs/download.cmake
+    <ul>
+      <li>Modify version in SRC_URL</li>
+      <li>Modify version in DIR_IN_ARC</li>
+      <li>Modify ARC_HASH (for check corruption due to download)
+        <ul>
+          <li>Use hash from official site. (LibreSSL, Oniguruma, zlib)</li>
+          <li>If official site does not post hash, calc it. (argon2, cJSON, SFMT)</li>
+        </ul>
+      </li>
+      <li>Modify CHECK_HASH (for check version)
+        <ul>
+          <li>Calc hash of a file for version check.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Under add/manual folder of TeraTermProject/update_website repository
+    <ul>
+      <li>License files for web site is managed in TeraTermProject/update_website repository.<br />
+          Replace a license file when it is cahnged.</li>
+    </ul>
+  </li>
+</ul>
+
+
+<h4>Calc hash</h4>
+
+<pre>
+% sha256sum foo.bar
+% openssl dgst -sha256 foo.bar
+</pre>
+
+
 <h2 id="dump">Dump</h2>
 
 About debug with dump file.
@@ -470,6 +598,7 @@ How to use
   <li>click dump file to start Visual Studio</li>
   <li>click [Debugging in native only]</li>
 </ul>
+
 
 </body>
 </html>

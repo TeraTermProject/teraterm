@@ -71,13 +71,21 @@
 #define ErrNotSupported     20
 #define ErrCantExec         21
 
-#define TypUnknown  0
-#define TypInteger  1
-#define TypLogical  2
-#define TypString   3
-#define TypLabel    4
-#define TypIntArray 5
-#define TypStrArray 6
+typedef enum {
+	TypUnknown = 0,
+	TypInteger = 1,
+	TypLogical = 2,		// –¢Žg—p?
+	TypString = 3,
+	TypLabel = 4,
+	TypIntArray = 5,
+	TypStrArray = 6,
+	TypeUnknown = TypUnknown,
+	TypeInteger = TypInteger,
+	TypeString = TypString,
+	TypeLabel = TypLabel,
+	TypeIntArray = TypIntArray,
+	TypeStrArray = TypStrArray,
+} TVariableType;
 
 #define RsvBeep         1
 #define RsvBPlusRecv    2
@@ -281,6 +289,12 @@
 #if defined(OUTPUTDEBUGSTRING_ENABLE)
 #define RsvOutputDebugString	216
 #endif
+#define RsvSendText     217
+#define RsvSendBinary   218
+#define RsvSetPassword2 219
+#define RsvGetPassword2 220
+#define RsvDelPassword2 221
+#define RsvIsPassword2  222
 
 #define RsvOperator     1000
 #define RsvBNot         1001
@@ -306,6 +320,11 @@
 #define RsvALShift      1021 // arithmetic left shift
 #define RsvLRShift      1022 // logical right shift
 
+#define ExtListBoxDoubleclick   1
+#define ExtListBoxMinmaxbutton  2
+#define ExtListBoxMinimize      4
+#define ExtListBoxMaximize      8
+#define ExtListBoxSize         16
 
 // integer type for buffer pointer
 typedef DWORD BINT;
@@ -335,7 +354,7 @@ BOOL GetReservedWord(LPWORD WordId);
 BOOL CheckReservedWord(PCHAR Str, LPWORD WordId);
 BOOL GetLabelName(PCHAR Name);
 BOOL GetString(PCHAR Str, LPWORD Err);
-BOOL CheckVar(const char *Name, LPWORD VarType, PVarId VarId);
+BOOL CheckVar(const char *Name, TVariableType *VarType, PVarId VarId);
 BOOL NewIntVar(const char *Name, int InitVal);
 BOOL NewStrVar(const char *Name, const char *InitVal);
 BOOL NewLabVar(const char *Name, BINT InitVal, WORD ILevel);
@@ -343,7 +362,7 @@ int NewIntAryVar(const char *Name, int size);
 int NewStrAryVar(const char *Name, int size);
 void DelLabVar(WORD ILevel);
 void CopyLabel(WORD ILabel, BINT *Ptr, LPWORD Level);
-BOOL GetExpression(LPWORD ValType, int *Val, LPWORD Err);
+BOOL GetExpression(TVariableType *ValType, int *Val, LPWORD Err);
 void GetIntVal(int *Val, LPWORD Err);
 void SetIntVal(TVarId VarId, int Val);
 int CopyIntVal(TVarId VarId);
@@ -353,7 +372,7 @@ void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion);
 void GetStrVar(PVarId VarId, LPWORD Err);
 void SetStrVal(TVarId VarId, const char *Str);
 const char *StrVarPtr(TVarId VarId);
-void GetVarType(LPWORD ValType, int *Val, LPWORD Err);
+void GetVarType(TVariableType *ValType, int *Val, LPWORD Err);
 TVarId GetIntVarFromArray(TVarId VarId, int Index, LPWORD Err);
 TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err);
 BOOL GetIndex(int *Index, LPWORD Err);

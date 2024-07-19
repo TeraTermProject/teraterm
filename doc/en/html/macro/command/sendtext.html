@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>sendtext</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>sendtext</h1>
+
+<p>
+Sends text data. <em>(Version 5.3 or lator)</em>
+</p>
+
+<pre class="macro-syntax">
+sendtext &lt;data1&gt; &lt;data2&gt;....
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Causes Tera Term to send characters to the host.<br>
+If &lt;data&gt; is a string, the string is sent to the host. <br>
+If &lt;data&gt; is an integer, its lowest-order byte (0-255) is regarded as an ASCII code of the character, and the character is sent to the host.
+</p>
+
+<p>
+  String sent by ttpmacro.exe is received by ttermpro.exe, converted to character code and sent. Use "<a href="sendbinary.html">sendbinary</a>" to send without conversion.
+</p>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="sendbinary.html">sendbinary</a></li>
+  <li><a href="send.html">send</a></li>
+  <li><a href="../syntax/formats.html">Formats of constants</a></li>
+</ul>
+
+</body>
+</html>

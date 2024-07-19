@@ -1,5 +1,7 @@
-﻿; Updated by TeraTerm Project (2024-03-30)
-; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
+﻿[Info]
+language=Traditional Chinese
+date=2024-07-06 by TeraTerm Project
+contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
 DLG_SYSTEM_FONT=新細明體,10,0
@@ -53,13 +55,11 @@ MENU_EDIT_SELECTALL=選擇全部(&A)
 MENU_SETUP=設定(&S)
 MENU_SETUP_TERMINAL=終端機(&T)...
 MENU_SETUP_WINDOW=視窗(&W)...
-MENU_SETUP_FONT_SUBMENU=字型(&F)
 MENU_SETUP_FONT=字型(&F)...
-MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=鍵盤(&K)...
 MENU_SETUP_SERIALPORT=連接埠(&E)...
 MENU_SETUP_TCPIP=T&CP/IP...
-MENU_SETUP_GENERAL=設定(&G)...
+MENU_SETUP_GENERAL=設定(LanguageUI)(&G)...
 MENU_SETUP_ADDITION=附加設定(&D)...
 MENU_SETUP_SAVE=儲存設定(&S)...
 MENU_SETUP_RESTORE=載入設定(&R)...
@@ -270,7 +270,9 @@ DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=no use
 DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
-DLG_TAB_LOG_EDITOR=日誌編輯器(&E)
+DLG_TAB_LOG_EDITOR=日誌編輯器
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=默認日誌名稱 (strftime 格式) (&F)
 DLG_TAB_LOG_FILEPATH=默認日誌路徑(&S)
 DLG_TAB_LOG_AUTOSTART=自動記錄日誌(&U)
@@ -300,10 +302,13 @@ DLG_BROADCAST_ENTER=Enter鍵
 DLG_BROADCAST_SUBMIT=提交
 DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=實時的
-DLG_BROADCAST_FOREGROUND=to Fore
+DLG_BROADCAST_HELP=Help
 CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
 CMENU_BROADCAST_MINIMIZE=Minimize selected window
 CMENU_BROADCAST_REFRESH=Refresh window list
+CMENU_BROADCAST_SELECT_ALL=Select all
+CMENU_BROADCAST_UNSELECT_ALL=Unselect all
+CMENU_BROADCAST_INVERSE=Inverse selection
 
 DLG_PRNABORT_PRINTING=列印中
 
@@ -365,14 +370,10 @@ MSG_CREATE_THREAD_ERROR=創建線程失敗
 ; ttdlg.c
 DLG_ABOUT_TITLE=關於 Tera Term
 
-DLG_DIR_TITLE=Tera Term：更改文件夾
-DLG_DIR_CURRENT=當前文件夾：
-DLG_DIR_NEW=新文件夾(&N)：
 DLG_SELECT_DIR_TITLE=選擇新文件夾
 
 DLG_GEN_TITLE=Tera Term：設定設定
 DLG_GEN_PORT=端口(&P)：
-DLG_GEN_LANG=語言(&L)：
 DLG_GEN_LANG_UI=界面語言(&U)：
 
 DLG_HOST_TITLE=Tera Term：建立新連線
@@ -382,7 +383,7 @@ DLG_HOST_TCPIPPROTOCOL=IP版本(&N)：
 DLG_HOST_SERIAL=連接埠(&S)
 DLG_HOST_SERIALPORT=端口(&R)：
 
-DLG_KEYB_TITLE=Tera Term：鍵盤設定
+DLG_KEYB_TITLE=鍵盤
 DLG_KEYB_TRANSMIT=DEL發送為：
 DLG_KEYB_BS=&Backspace 鍵
 DLG_KEYB_DEL=&Delete 刪除鍵

@@ -65,7 +65,7 @@ version_one_t *ParseJson(const char *json, size_t *info_count)
 		// ƒtƒ@ƒCƒ‹‚ª‚¨‚©‚µ‚¢?
 		return NULL;
 	}
-	version_one_t *results = (version_one_t *)calloc(sizeof(version_one_t), version_count);
+	version_one_t *results = (version_one_t *)calloc(version_count, sizeof(version_one_t));
 	//const char *lang = "japanese";
 	const char *lang = "jp";
 

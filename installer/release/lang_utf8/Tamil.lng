@@ -1,5 +1,7 @@
-﻿; Updated by TeraTerm Project (2024-03-30)
-; Last translated (Tamil language) by திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
+﻿[Info]
+language=Tamil(தமிழ்)
+date=2024-07-06 by TeraTerm Project
+contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -53,13 +55,11 @@ MENU_EDIT_SELECTALL=&அனைத்தையும் தேர்ந்தெ�
 MENU_SETUP=&அமைவு
 MENU_SETUP_TERMINAL=&முனையம்...
 MENU_SETUP_WINDOW=&சாளரம்...
-MENU_SETUP_FONT_SUBMENU=&எழுத்துரு
 MENU_SETUP_FONT=&எழுத்துரு...
-MENU_SETUP_DIALOG_FONT=&உரையாடல் எழுத்துரு...
 MENU_SETUP_KEYBOARD=&விசைப்பலகை...
 MENU_SETUP_SERIALPORT=தொடர் துறைமுகம்...
 MENU_SETUP_TCPIP=பகநெ/இநெ...
-MENU_SETUP_GENERAL=&பொது...
+MENU_SETUP_GENERAL=&பொது(LanguageUI)...
 MENU_SETUP_ADDITION=கூடுதல் அமைப்புகள்...
 MENU_SETUP_SAVE=&அமைப்பைச் சேமி...
 MENU_SETUP_RESTORE=&அமைவை மீட்டமை...
@@ -271,6 +271,8 @@ DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=நிலையான கருபொ�
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=சீரற்ற கருபொருள்  கோப்பு
 
 DLG_TAB_LOG_EDITOR=பதிவு &திருத்தியைக் காண்க
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=இயல்புநிலை பதிவு &கோப்பு பெயர்(உரைவநேரம் வடிவம்)
 DLG_TAB_LOG_FILEPATH=இயல்புநிலை பதிவு சேமி கோப்புறை
 DLG_TAB_LOG_AUTOSTART=தானி உள்நுழைவைத் தொடங்கவும்
@@ -300,10 +302,13 @@ DLG_BROADCAST_ENTER=உள்ளிடு விசை
 DLG_BROADCAST_SUBMIT=சமர்ப்பி
 DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=நிகழ்நேர பயன்முறை
-DLG_BROADCAST_FOREGROUND=to Fore
+DLG_BROADCAST_HELP=Help
 CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
 CMENU_BROADCAST_MINIMIZE=Minimize selected window
 CMENU_BROADCAST_REFRESH=Refresh window list
+CMENU_BROADCAST_SELECT_ALL=Select all
+CMENU_BROADCAST_UNSELECT_ALL=Unselect all
+CMENU_BROADCAST_INVERSE=Inverse selection
 
 DLG_PRNABORT_PRINTING=அச்சிடுதல்
 
@@ -365,14 +370,10 @@ MSG_CREATE_THREAD_ERROR=நூலை உருவாக்க முடியா
 ; ttdlg.c
 DLG_ABOUT_TITLE=தேரா முனைத்தைப் பற்றி
 
-DLG_DIR_TITLE=தேரா முனை: கோப்பகத்தை மாற்றவும்
-DLG_DIR_CURRENT=தற்போதைய கோப்பகம்:
-DLG_DIR_NEW=&புதிய கோப்பகம்:
 DLG_SELECT_DIR_TITLE=புதிய கோப்பகத்தைத் தேர்ந்தெடுக்கவும்
 
 DLG_GEN_TITLE=தேரா முனை: பொது அமைப்பு
 DLG_GEN_PORT=இயல்புநிலை &துறைமுகம்:
-DLG_GEN_LANG=&மொழி:
 DLG_GEN_LANG_UI=மொழி இடைமுகம்:
 
 DLG_HOST_TITLE=தேரா முனை: புதிய இணைப்பு
@@ -382,7 +383,7 @@ DLG_HOST_TCPIPPROTOCOL=இநெ பதிப்பு:
 DLG_HOST_SERIAL=&தொடர்
 DLG_HOST_SERIALPORT=துறைமுகம்:
 
-DLG_KEYB_TITLE=தேரா முனை: விசைப்பலகை அமைவு
+DLG_KEYB_TITLE=விசைப்பலகை அமைவு
 DLG_KEYB_TRANSMIT=நீக்கை அனுப்பு:
 DLG_KEYB_BS=&பின்வெளி விசை
 DLG_KEYB_DEL=&நீக்கு விசை

@@ -97,16 +97,12 @@ size_t RestoreNewLineW(wchar_t *Text);
 BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest);
 void GetNthNum(PCHAR Source, int Nth, int *Num);
 int GetNthNum2(PCHAR Source, int Nth, int defval);
-void GetDownloadFolder(char *dest, int destlen);
-wchar_t *GetDownloadFolderW(void);
 wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file);
 wchar_t *GetDefaultSetupFNameW(const wchar_t *home);
 BOOL GetNthStringW(const wchar_t *Source, int Nth, size_t Size, wchar_t *Dest);
 void GetNthNumW(const wchar_t *Source, int Nth, int *Num);
 int GetNthNum2W(const wchar_t *Source, int Nth, int defval);
-void GetUILanguageFileFull(const char *HomeDir, const char *UILanguageFileRel,
-						   char *UILanguageFileFull, size_t UILanguageFileFullLen);
-wchar_t *GetUILanguageFileFullW(const wchar_t *HomeDir, const wchar_t *UILanguageFileRel);
+wchar_t *GetUILanguageFileFullW(const wchar_t *SetupFNameW);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
 // __declspec(deprecated("Replace GetI18nStrWW()"))
 void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
@@ -140,7 +136,6 @@ DllExport BOOL IsWindows7OrLater();
 DllExport BOOL HasMultiMonitorSupport();
 DllExport BOOL HasDnsQuery();
 DllExport BOOL HasBalloonTipSupport();
-int KanjiCodeTranslate(int lang, int kcode);
 DllExport char *mctimelocal(const char *format, BOOL utc_flag);
 char *strelapsed(DWORD start_time);
 
@@ -218,6 +213,7 @@ int __ismbblead(BYTE b, int code_page);
 void SetDPIAwareness(const wchar_t *SetupFNameW);
 wchar_t *GetFullPathW(const wchar_t *dir, const wchar_t *rel_path);
 char *GetVersionSubstr(void);
+DWORD TTCreateProcess(const wchar_t *cmd, const wchar_t *arg1, const wchar_t *arg2);
 
 #ifdef __cplusplus
 }

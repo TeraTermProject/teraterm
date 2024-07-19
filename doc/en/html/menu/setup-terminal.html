@@ -3,25 +3,13 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <title>Terminal ([Setup] menu; English mode)</title>
+    <title>Terminal ([Setup] menu)</title>
     <META http-equiv="Content-Style-Type" content="text/css">
     <link rel="stylesheet" href="../style.css" type="text/css">
   </head>
 
   <body>
-    <h1>Terminal ([Setup] menu; English mode)</h1>
-
-    <p>
-      This page is described when the <a href="setup-general.html#Language">Language</a> is selected to English on the <a href="setup-general.html">Setup - General</a> dialog.
-      Please refer to below page if another language mode is used.
-    </p>
-
-    <ul>
-      <li><a href="setup-terminal_ja.html">Japanese mode</a></li>
-      <li><a href="setup-terminal_ko.html">Korean mode</a></li>
-      <li><a href="setup-terminal_ru.html">Russian mode</a></li>
-      <li><a href="setup-terminal_utf8.html">UTF-8 mode</a></li>
-    </ul>
+    <h1>Terminal ([Setup] menu)</h1>
 
     <h2>"Terminal setup" dialog box</h2>
     <dl>
@@ -108,6 +96,57 @@
       <dd>
 	Enables auto switching between VT and TEK emulations.
       </dd>
+
+    </dl>
+
+    <hr>
+
+    <dl>
+
+      <dt id="KanjiReceive">Kanji (receive)</dt>
+      <dd>
+	Kanji character that is received from host(SJIS, EUC, JIS and UTF-8).
+      </dd>
+
+      <dt id="KatakanaReceive">7bit katakana (receive)</dt>
+      <dd>
+	When "HANKAKU" katakana code from host is described for 7bit
+	(Shift control with SO/SI is using), please select this entry.
+	This is only enabled when Kanji (receive) is JIS.
+      </dd>
+
+      <dt id="KanjiSend">Kanji (transmit)</dt>
+      <dd>
+	Kanji character that is sent from client(SJIS, EUC, JIS and UTF-8).
+      </dd>
+
+      <dt id="KatakanaSend">7bit katakana (transmit)</dt>
+      <dd>
+	When "HANKAKU" katakana code from host is described for 7bit
+	(Shift control with SO/SI is using), please select this entry.
+	This is only enabled when Kanji (transmit) is JIS.
+      </dd>
+
+      <dt id="KanjiIn">Kanji-in (transmit)</dt>
+      <dd>
+	The escape sequence is used when Kanji (transmit) is JIS.
+	(Sequence regarding Kanji character is specified to G0.
+	^[$@ or ^[$B).
+	The escape sequence from host can use any sequence.
+      </dd>
+
+      <dt id="KanjiOut">Kanji-out (transmit)</dt>
+      <dd>
+	The escape sequence is used when Kanji (transmit) is JIS.
+	(Sequence regarding ASCII and JIS Roman code is specified to G0.
+	^[(B or ^[(J ).
+	The escape sequence from host can use any sequence.
+	<p>
+	  NOTICE: ^[(H can not be selected on initial setting. <br>
+	  <!--a href="../usage/tips/incorrect-kanjiout.html">¨ ^[(H ‚ð‘I‘ð‰Â”\‚É‚·‚éB</a-->
+	</p>
+      </dd>
+
     </dl>
   </body>
 </html>

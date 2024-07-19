@@ -1,8 +1,7 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by ttpdlg.rc
+// Microsoft Visual C++ で生成されたインクルード ファイル。
+// ttpdlg.rc で使用
 //
-#define IDD_TERMDLGJ                    100
 #define IDI_TTERM                       100
 #define IDC_TERMWIDTH                   101
 #define IDC_SERIALPORT_LABEL            101
@@ -115,10 +114,6 @@
 #define IDD_ABOUTDLG                    800
 #define IDC_FONTBOLD                    901
 #define IDD_GENDLG                      1000
-#define IDC_GENPORT                     1001
-#define IDC_GENLANGLABEL                1002
-#define IDC_GENLANG                     1003
-#define IDC_GENPORT_LABEL               1004
 #define IDC_HOSTTCPPROTOCOLLABEL        1019
 #define IDC_HOSTTCPPROTOCOL             1020
 #define IDC_LOCALE_BOX                  1022
@@ -164,16 +159,15 @@
 #define IDC_GENLANG_UI                  1077
 #define IDC_SFMT_VERSION                1078
 #define IDC_SERIALTEXT                  1079
+#define IDC_GENLANUI_INFO               1080
 #define IDC_GENHELP                     1099
 #define IDD_TERMDLG                     1100
 #define IDD_WINLISTDLG                  1200
 #define IDC_WINLISTLIST                 1201
 #define IDC_WINLISTCLOSE                1202
 #define IDC_WINLISTHELP                 1299
-#define IDD_TERMDLGK                    1301
-#define IDC_STATIC                      -1
-#define IDC_GENLANUI_LABEL              -1
-#define IDC_GENLANGUI_LABEL             -1
+#define IDC_GENLANGUI_LABEL             1300
+#define IDC_OPEN_CODING                 1301
 
 // Next default values for new objects
 //
@@ -182,7 +176,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        103
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1080
+#define _APS_NEXT_CONTROL_VALUE         1081
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

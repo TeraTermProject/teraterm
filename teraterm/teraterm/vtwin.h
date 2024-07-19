@@ -29,6 +29,8 @@
 
 /* TERATERM.EXE, VT window */
 
+#include "addsetting.h"
+
 #ifdef __cplusplus
 #include "tipwin.h"
 #include "tmfc.h"
@@ -202,7 +204,6 @@ protected:
 	void OnSetupTerminal();
 	void OnSetupWindow();
 	void OnSetupFont();
-	void OnSetupDlgFont();
 	void OnSetupKeyboard();
 	void OnSetupSerialPort();
 	void OnSetupTCPIP();
@@ -237,8 +238,9 @@ protected:
 
 private:
 	void CodePopup(int client_x, int client_y);
-	void OpenExternalSetup(int page);
 	void SetColor();
+public:
+	void OpenExternalSetup(CAddSettingPropSheetDlg::Page page);
 };
 #endif
 
@@ -247,6 +249,7 @@ extern "C" {
 #endif
 
 void VtwinSetHelpId(DWORD data);
+void OpenExternalSetupOutside(CAddSettingPropSheetDlgPage page);
 
 #ifdef __cplusplus
 }

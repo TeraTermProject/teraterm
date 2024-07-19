@@ -472,5 +472,37 @@ Default:
 IniAutoBackup=on
 </pre>
 
+
+<h1 id="BracketedSupport">ブラケットペーストのサポート</h1>
+
+<p>
+<a href="../about/glossary.html#Bracketed">ブラケットペースト</a>が不要であれば、設定ファイルの [Tera Term] セクションの BracketedSupport 行を以下のように変更してください。
+</p>
+
+<pre>
+BracketedSupport=off
+</pre>
+
+<pre>
+Default:
+BracketedSupport=on
+</pre>
+
+<h1 id="BracketedControlOnly">ブラケットペーストを制御文字を含む場合に限定する</h1>
+<p>
+<a href="../about/glossary.html#Bracketed">ブラケットペースト</a>はペーストした内容を確定する前に確認できるので便利です。
+しかし、改行などの制御文字が含まれていない場合にも貼り付けと確定の二段階の操作が必要になります。
+制御文字が含まれているときだけブラケットペーストを有効にしたい場合には、設定ファイルの [Tera Term] セクションの BracketedControlOnly 行を以下のように変更してください。
+</p>
+
+<pre>
+BracketedControlOnly=on
+</pre>
+
+<pre>
+Default:
+BracketedControlOnly=off
+</pre>
+
 </BODY>
 </HTML>

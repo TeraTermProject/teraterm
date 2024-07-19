@@ -99,7 +99,7 @@ static void InitKeyMap()
 	int i;
 
 	if (KeyMap == NULL) {
-		KeyMap = (PKeyMap)calloc(sizeof(TKeyMap), 1);
+		KeyMap = (PKeyMap)calloc(1, sizeof(TKeyMap));
 		if (KeyMap == NULL) {
 			return;
 		}

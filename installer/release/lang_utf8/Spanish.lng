@@ -1,5 +1,7 @@
-﻿; Updated by TeraTerm Project (2024-03-30)
-; Traducido por Filiberto Olguin Ascona.
+﻿[Info]
+language=Spanish
+date=2024-07-06 by TeraTerm Project
+contributor=Filiberto Olguin Ascona (2022-05-26)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -53,13 +55,11 @@ MENU_EDIT_SELECTALL=Selecionar &todo
 MENU_SETUP=&Configuracion
 MENU_SETUP_TERMINAL=&Terminal...
 MENU_SETUP_WINDOW=&Ventana...
-MENU_SETUP_FONT_SUBMENU=&Fuente...
 MENU_SETUP_FONT=&Fuente...
-MENU_SETUP_DIALOG_FONT=&Dialog fuente...
 MENU_SETUP_KEYBOARD=&Teclado...
 MENU_SETUP_SERIALPORT=Puerto S&erial...
 MENU_SETUP_TCPIP=T&CP/IP...
-MENU_SETUP_GENERAL=&General...
+MENU_SETUP_GENERAL=&General(LanguageUI)...
 MENU_SETUP_ADDITION=Configuracion a&dicional...
 MENU_SETUP_SAVE=&Guardar Configuracion...
 MENU_SETUP_RESTORE=&Restaurar Configuracion...
@@ -270,7 +270,9 @@ DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=no use
 DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
-DLG_TAB_LOG_EDITOR=View log &editor
+DLG_TAB_LOG_EDITOR=View log editor
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=Default log &file name(strftime format)
 DLG_TAB_LOG_FILEPATH=Default log &save folder
 DLG_TAB_LOG_AUTOSTART=A&uto start logging
@@ -300,10 +302,13 @@ DLG_BROADCAST_ENTER=Enter key
 DLG_BROADCAST_SUBMIT=Submit
 DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=Realtime mode
-DLG_BROADCAST_FOREGROUND=to Fore
+DLG_BROADCAST_HELP=Help
 CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
 CMENU_BROADCAST_MINIMIZE=Minimize selected window
 CMENU_BROADCAST_REFRESH=Refresh window list
+CMENU_BROADCAST_SELECT_ALL=Select all
+CMENU_BROADCAST_UNSELECT_ALL=Unselect all
+CMENU_BROADCAST_INVERSE=Inverse selection
 
 DLG_PRNABORT_PRINTING=Printing
 
@@ -365,14 +370,10 @@ MSG_CREATE_THREAD_ERROR=Can't create thread
 ; ttdlg.c
 DLG_ABOUT_TITLE=About Tera Term
 
-DLG_DIR_TITLE=Tera Term: Change directory
-DLG_DIR_CURRENT=Current dir:
-DLG_DIR_NEW=&New dir:
 DLG_SELECT_DIR_TITLE=Select new directory
 
 DLG_GEN_TITLE=Tera Term: General setup
 DLG_GEN_PORT=Default &port:
-DLG_GEN_LANG=&Language:
 DLG_GEN_LANG_UI=Language&UI:
 
 DLG_HOST_TITLE=Tera Term: New connection
@@ -382,7 +383,7 @@ DLG_HOST_TCPIPPROTOCOL=Protoco&l:
 DLG_HOST_SERIAL=&Serial
 DLG_HOST_SERIALPORT=Po&rt:
 
-DLG_KEYB_TITLE=Tera Term: Keyboard setup
+DLG_KEYB_TITLE=Keyboard
 DLG_KEYB_TRANSMIT=Transmit DEL by:
 DLG_KEYB_BS=&Backspace key
 DLG_KEYB_DEL=&Delete key
@@ -703,7 +704,7 @@ DLG_DIFFERENTKEY_WARNING=Your known hosts list has an entry for the server "####
 DLG_DIFFERENTKEY_WARNING2=If you choose to add this new key to the known hosts list and continue, then you will not receive this warning again.
 DLG_DIFFERENTKEY_FINGERPRINT=The server's host key fingerprint is:
 DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
-DLG_DIFFERENTKEY_REPLACE=&Replace the exist key with this new key
+DLG_DIFFERENTKEY_REPLACE=&Replace the existing key with this new key
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=SECURITY WARNING
@@ -1138,7 +1139,7 @@ MENU_NOTRAY=(none)
 DLG_ABOUT_TITLE=Version Information
 DLG_ABOUT_APPNAME=Tera Term launch tool\nTeraTerm Menu
 
-DLG_CONFIG_TITLE=List Cofiguration
+DLG_CONFIG_TITLE=List Configuration
 DLG_CONFIG_ITEM=List Item
 DLG_CONFIG_CONFIG=Configuration
 DLG_CONFIG_NAME=Name

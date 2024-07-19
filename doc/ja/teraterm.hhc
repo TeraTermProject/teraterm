@@ -404,32 +404,10 @@
 			</OBJECT>
 		<UL>
 			<LI> <OBJECT type="text/sitemap">
-				<param name="Name" value="Terminal(Japanese)">
+				<param name="Name" value="Terminal">
 				<param name="Local" value="html\menu\setup-terminal.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
-			<UL>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Terminal(English)">
-					<param name="Local" value="html\menu\setup-terminal_en.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Terminal(Korean)">
-					<param name="Local" value="html\menu\setup-terminal_ko.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Terminal(Russian)">
-					<param name="Local" value="html\menu\setup-terminal_ru.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Terminal(UTF-8)">
-					<param name="Local" value="html\menu\setup-terminal_utf8.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Window">
 				<param name="Local" value="html\menu\setup-window.html">
@@ -493,7 +471,7 @@
 			<UL>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="General タブ">
-					<param name="Local" value="html\menu\setup-additional.html#TabGeneral">
+					<param name="Local" value="html\menu\setup-additional-general.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -539,6 +517,16 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Theme Editor">
 					<param name="Local" value="html\menu\setup-additional-visual-theme.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Keyboard タブ">
+					<param name="Local" value="html\menu\setup-additional-keyboard.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Mouse タブ">
+					<param name="Local" value="html\menu\setup-additional-mouse.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 			</UL>
@@ -842,6 +830,11 @@
 			<param name="Local" value="html\reference\sourcecode.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Win32 API に関するメモ">
+			<param name="Local" value="html\reference\dev\win32api.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="MACRO ヘルプ">
@@ -1099,6 +1092,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="sendbinary">
+					<param name="Local" value="html\macro\command\sendbinary.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="sendbreak">
 					<param name="Local" value="html\macro\command\sendbreak.html">
 					<param name="ImageNumber" value="11">
@@ -1136,6 +1134,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="sendmulticast">
 					<param name="Local" value="html\macro\command\sendmulticast.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="sendtext">
+					<param name="Local" value="html\macro\command\sendtext.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -1653,13 +1656,28 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="delpassword2">
+					<param name="Local" value="html\macro\command\delpassword2.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="getpassword">
 					<param name="Local" value="html\macro\command\getpassword.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="getpassword2">
+					<param name="Local" value="html\macro\command\getpassword2.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="ispassword">
 					<param name="Local" value="html\macro\command\ispassword.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="ispassword2">
+					<param name="Local" value="html\macro\command\ispassword2.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -1670,6 +1688,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="setpassword">
 					<param name="Local" value="html\macro\command\setpassword.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="setpassword2">
+					<param name="Local" value="html\macro\command\setpassword2.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 			</UL>

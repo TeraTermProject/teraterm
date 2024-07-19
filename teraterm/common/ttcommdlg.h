@@ -34,6 +34,10 @@
 extern "C" {
 #endif
 
+#if !defined(DllExport)
+#define DllExport __declspec(dllexport)
+#endif
+
 typedef struct {
 	HWND hwndOwner;
 	HINSTANCE hInstance;

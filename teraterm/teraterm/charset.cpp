@@ -26,8 +26,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "teraterm.h"
-#include "tttypes.h"
 #include <stdio.h>
 #include <string.h>
 #if !defined(_CRTDBG_MAP_ALLOC)
@@ -36,13 +34,15 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <assert.h>
+#include <windows.h>
 
-#include "ttwinman.h"
+#include "ttwinman.h"	// for ts
 #include "codeconv.h"
+#include "codeconv_mb.h"
 #include "unicode.h"
-#include "language.h"	// for JIS2SJIS()
 #include "ttcstd.h"
 #include "vtterm.h"
+#include "tttypes_charset.h"
 
 #include "charset.h"
 
@@ -125,7 +125,7 @@ static void CharSetInit2(CharSetData *w)
  */
 CharSetData *CharSetInit(const CharSetOp *op, void *client_data)
 {
-	CharSetData *w = (CharSetData *)calloc(sizeof(*w), 1);
+	CharSetData *w = (CharSetData *)calloc(1, sizeof(*w));
 	if (w == NULL) {
 		return NULL;
 	}
@@ -254,7 +254,7 @@ static BOOL ParseFirstJP(CharSetData *w, BYTE b)
 			w->Kanji = w->Kanji + b;
 			if (w->ConvJIS) {
 				// JIS -> Shift_JIS(CP932)
-				w->Kanji = JIS2SJIS((WORD)(w->Kanji & 0x7f7f));
+				w->Kanji = CodeConvJIS2SJIS((WORD)(w->Kanji & 0x7f7f));
 			}
 			u32 = CP932ToUTF32(w->Kanji);
 			w->Op.PutU32(u32, w->ClientData);
@@ -734,7 +734,7 @@ static BOOL ParseFirstRus(CharSetData *w, BYTE b)
 		return TRUE;
 	}
 	// CP1251‚É•ÏŠ·
-	BYTE c = RussConv(ts.KanjiCode, IdWindows, b);
+	BYTE c = CodeConvRussConv(ts.KanjiCode, IdWindows, b);
 	// CP1251->Unicode
 	unsigned long u32 = MBCP_UTF32(c, 1251);
 	w->Op.PutU32(u32, w->ClientData);

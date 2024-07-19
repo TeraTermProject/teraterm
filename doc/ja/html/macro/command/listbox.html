@@ -18,7 +18,7 @@
 </p>
 
 <pre class="macro-syntax">
-listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;]
+listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;] ['dclick=on'] ['minmaxbutton=on'] ['minimize=on'] ['maximize=on'] ['size=&lt;N1xN2&gt;']
 </pre>
 
 <h2>パラメータ</h2>
@@ -34,7 +34,22 @@ listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;]
 	<dd>リストボックスの選択項目。</dd>
 
 	<dt class="macro">整数値 &lt;selected&gt; (バージョン 4.89 以降)</dt>
-	<dd>初期選択項目(0オリジンインデックス)。省略可能。</dd>
+	<dd>初期選択項目(0オリジンインデックス)。省略可能。省略されたときは、どの項目も選択されない。</dd>
+
+	<dt class="macro">固定文字列 'dclick=on' (バージョン 5.3 以降)</dt>
+	<dd>ダブルクリックによる項目選択有効化。省略可能。</dd>
+
+	<dt class="macro">固定文字列 'minmaxbutton=on' (バージョン 5.3 以降)</dt>
+	<dd>最小化/最大化ボタン有効化。省略可能。</dd>
+
+	<dt class="macro">固定文字列 'minimize=on' (バージョン 5.3 以降)</dt>
+	<dd>最小化状態で表示。省略可能。</dd>
+
+	<dt class="macro">固定文字列 'maximize=on' (バージョン 5.3 以降)</dt>
+	<dd>最大化状態で表示。省略可能。</dd>
+
+	<dt class="macro">文字列 'size=&lt;N1xN2&gt;' (バージョン 5.3 以降)</dt>
+	<dd>リストボックスのサイズ指定。省略可能。</dd>
 </dl>
 
 <h2>返り値</h2>
@@ -71,6 +86,11 @@ listbox '好きな食べ物を選んでください' 'あなたへの問い' msg
 <em>(バージョン 4.89 以降)</em><br>
 &lt;selected&gt; を指定する事で、初期状態で選択されている項目を指定する事ができます。<br />
 省略した場合は 0 (先頭)が指定されたものとして扱われます。
+<br><br>
+<em>(バージョン 5.3 以降)</em><br>
+'size=N1xN2'を指定する事で、リストボックスのサイズを指定することができます。<br>
+N1に横の長さ、N2に縦の長さを指定します。<br>
+例 'size=60x20' (横60文字、縦20文字の場合)<br>
 </p>
 
 
@@ -104,6 +124,25 @@ msg[6] = '分かりません'
 listbox '今日の天気はどうですか?' 'あなたへの問い' msg 6
 sprintf2 var "%d" result
 messagebox var "result"
+</pre>
+
+<pre class="macro-example">
+strdim msg 9
+msg[0] = "listbox msg[result] result msg 'size=70x10'"
+msg[1] = "listbox msg[result] result msg 'size=70x10' 'dclick=on'"
+msg[2] = "listbox msg[result] result msg 'size=70x10' 'minmaxbutton=on'"
+msg[3] = "listbox msg[result] result msg 'size=70x10' 'minimize=on'"
+msg[4] = "listbox msg[result] result msg 'size=70x10' 'maximize=on'"
+msg[5] = "listbox msg[result] result msg 'size=70x10' 'minmaxbutton=on' 'dclick=on'"
+msg[6] = "listbox msg[result] result msg 'size=100x10'"
+msg[7] = "listbox msg[result] result msg 'size=10x20'"
+msg[8] = "listbox msg[result] result msg"
+:select
+execcmnd msg[result]
+if result = -1 then
+  exit
+endif
+goto select
 </pre>
 
 <h2>参照</h2>

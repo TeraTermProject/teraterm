@@ -41,6 +41,8 @@ void EndDDE();
 void DDEOut1Byte(BYTE B);
 void DDEOut(const char *B);
 void DDESend();
+void DDESendStringU8(const char *strU8);
+void DDESendBinary(const void *ptr, size_t len);
 PCHAR GetRecvLnBuff();
 void FlushRecv();
 void ClearWait();

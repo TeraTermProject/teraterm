@@ -1,5 +1,7 @@
-﻿; Updated by TeraTerm Project (2024-03-30)
-; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
+﻿[Info]
+language=Russian
+date=2024-07-06 by TeraTerm Project
+contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -53,13 +55,11 @@ MENU_EDIT_SELECTALL=&Выделить все
 MENU_SETUP=&Настройка
 MENU_SETUP_TERMINAL=&Терминал...
 MENU_SETUP_WINDOW=&Окно...
-MENU_SETUP_FONT_SUBMENU=&Шрифт
 MENU_SETUP_FONT=&Шрифт...
-MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=&Клавиатура...
 MENU_SETUP_SERIALPORT=&COM-порт...
 MENU_SETUP_TCPIP=T&CP/IP...
-MENU_SETUP_GENERAL=&Общие...
+MENU_SETUP_GENERAL=&Общие(LanguageUI)...
 MENU_SETUP_ADDITION=&Дополнительные настройки...
 MENU_SETUP_SAVE=&Сохранить настройки...
 MENU_SETUP_RESTORE=&Восстановить настройки...
@@ -153,7 +153,7 @@ MSG_CYGTERM_ENV_ALLOC_ERROR=Не удается выделить память д
 MSG_EXEC_CYGTERM_ERROR=Не удается запустить Cygterm
 MSG_EXEC_TTMENU_ERROR=Не удается запустить меню Tera Term (%d).
 MSG_VIEW_LOGFILE_ERROR=Не удается посмотреть лог-файл (%d).
-FILEDLG_OPEN_LOGFILE_TITLE=Посмотреть лог-файл в бинарном режиме 
+FILEDLG_OPEN_LOGFILE_TITLE=Посмотреть лог-файл в бинарном режиме
 FILEDLG_OPEN_LOGFILE_FILTER=all(*.*)\0*.*\0\0
 DIRDLG_CYGTERM_DIR_TITLE=Указать папку Cygwin
 MSG_CYGTERM_CONF_WRITEFILE_ERROR=Не удается записать файл конфигурации CygTerm (%d).
@@ -271,6 +271,8 @@ DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
 DLG_TAB_LOG_EDITOR=&Редактор лог-файла
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=&Имя лог-файла по умолчанию
 DLG_TAB_LOG_FILEPATH=&Папка для хранения лог-файла
 DLG_TAB_LOG_AUTOSTART=&Автостарт лог-файла
@@ -300,10 +302,13 @@ DLG_BROADCAST_ENTER=Кл.Enter
 DLG_BROADCAST_SUBMIT=Передача
 DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=Реальн. время
-DLG_BROADCAST_FOREGROUND=to Fore
+DLG_BROADCAST_HELP=Help
 CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
 CMENU_BROADCAST_MINIMIZE=Minimize selected window
 CMENU_BROADCAST_REFRESH=Refresh window list
+CMENU_BROADCAST_SELECT_ALL=Select all
+CMENU_BROADCAST_UNSELECT_ALL=Unselect all
+CMENU_BROADCAST_INVERSE=Inverse selection
 
 DLG_PRNABORT_PRINTING=Печать
 
@@ -365,14 +370,10 @@ MSG_CREATE_THREAD_ERROR=Не удается создать поток
 ; ttdlg.c
 DLG_ABOUT_TITLE=О программе Tera Term
 
-DLG_DIR_TITLE=Tera Term: Изменить папку
-DLG_DIR_CURRENT=Текущая папка:
-DLG_DIR_NEW=&Новая папка:
 DLG_SELECT_DIR_TITLE=Выбрать новую папку
 
 DLG_GEN_TITLE=Tera Term: Общие настройки
 DLG_GEN_PORT=&Порт:
-DLG_GEN_LANG=&Кодировка:
 DLG_GEN_LANG_UI=&Язык меню:
 
 DLG_HOST_TITLE=Tera Term: Новое соединение
@@ -382,7 +383,7 @@ DLG_HOST_TCPIPPROTOCOL=&IP версия:
 DLG_HOST_SERIAL=&COM
 DLG_HOST_SERIALPORT=&Порт:
 
-DLG_KEYB_TITLE=Tera Term: Настройка клавиатуры
+DLG_KEYB_TITLE=клавиатуры
 DLG_KEYB_TRANSMIT=Передача DEL:
 DLG_KEYB_BS=&Клав. Backspace
 DLG_KEYB_DEL=&Клав. Delete

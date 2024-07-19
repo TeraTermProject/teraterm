@@ -5,7 +5,6 @@ project(${PACKAGE_NAME})
 add_library(
   ${PACKAGE_NAME}
   SHARED
-  ../teraterm/unicode.cpp
   language.c
   language.h
   ttcmn.c

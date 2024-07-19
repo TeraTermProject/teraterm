@@ -22,9 +22,9 @@ endif()
 ##############################
 # cygwin (64bit) latest
 
-# setup-x86_64.exe 2.926
+# setup-x86_64.exe 2.932
 set(SETUP_URL "https://cygwin.com/setup-x86_64.exe")
-set(SETUP_HASH_SHA256 "a17217e66dd7c40fa4851a433335c1f3f003cd627116c708b2f6e66eba886ea9")
+set(SETUP_HASH_SHA256 "e7815d360ab098fdd1f03f10f43f363c73a632e8866e304c72573cf1e6a0dec8")
 set(SETUP "${CYGWIN_ROOT}/setup-x86_64.exe")
 
 set(DOWNLOAD_SITE "http://mirrors.kernel.org/sourceware/cygwin/")
@@ -41,12 +41,12 @@ file(COPY ${PACKAGE}/setup-x86_64.exe DESTINATION ${CYGWIN_ROOT})
 
 # install packages
 execute_process(
-  COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --packages cmake,bash,tar,make,perl,gcc-core,gcc-g++,icoutils
+  COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --upgrade-also --packages cmake,bash,tar,make,perl,gcc-core,gcc-g++,icoutils
   WORKING_DIRECTORY ${CYGWIN_ROOT}
 )
 # install packages for notify
 execute_process(
-  COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --packages perl-JSON,perl-LWP-Protocol-https
+  COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --upgrade-also--packages perl-JSON,perl-LWP-Protocol-https
   WORKING_DIRECTORY ${CYGWIN_ROOT}
 )
 

@@ -243,7 +243,7 @@ INT_PTR clipboarddlg(
 	HWND hWndParent,
 	clipboarddlgdata *data)
 {
-	DlgPrivateData *pdata = (DlgPrivateData * )calloc(sizeof(DlgPrivateData), 1);
+	DlgPrivateData *pdata = (DlgPrivateData * )calloc(1, sizeof(DlgPrivateData));
 	INT_PTR ret;
 	pdata->data = data;
 	ret = TTDialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_CLIPBOARD_DIALOG),

@@ -110,7 +110,6 @@ target_sources(
   ../../teraterm/common/ttcommon.h
   ../../teraterm/common/i18n.h
   ../../teraterm/common/ttlib.h
-  ../../teraterm/common/ttlib.c
   ../../teraterm/common/dlglib.h
   ../../teraterm/common/servicenames.h
   ../../teraterm/common/codeconv.h

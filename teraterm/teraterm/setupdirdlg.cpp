@@ -27,37 +27,30 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "teraterm.h"
-#include "tttypes.h"
-#include "tttypes_key.h"
-
-#include "ttcommon.h"
-#include "ttdialog.h"
-#include "commlib.h"
-#include "ttlib.h"
-#include "dlglib.h"
-
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <string.h>
 #include <assert.h>
-
 #include <shlobj.h>
 #include <windows.h>
 #include <wchar.h>
 #include <htmlhelp.h>
 
+#include "tttypes.h"
+#include "ttcommon.h"
+#include "ttdialog.h"
+#include "ttlib.h"
+#include "dlglib.h"
 #include "tt_res.h"
-#include "vtwin.h"
 #include "compat_win.h"
-#include "codeconv.h"
 #include "asprintf.h"
 #include "helpid.h"
 #include "win32helper.h"
 #include "tipwin2.h"
 #include "scp.h"
+#include "ttlib_types.h"
 
 #include "setupdirdlg.h"
 
@@ -142,17 +135,26 @@ error:
 	return (ret);
 }
 
+static wchar_t *GetExplorerFullPath(void)
+{
+	wchar_t *windows_dir;
+	_SHGetKnownFolderPath(FOLDERID_Windows, 0, NULL, &windows_dir);
+	wchar_t *explorer;
+	aswprintf(&explorer, L"%s\\explorer.exe", windows_dir);
+	free(windows_dir);
+	return explorer;
+}
+
 //
 // 指定したアプリケーションでファイルを開く。
 //
 // return TRUE: success
 //        FALSE: failure
 //
-static BOOL openFileWithApplication(const wchar_t *filename, const char *editor, const wchar_t *UILanguageFile)
+static BOOL openFileWithApplication(const wchar_t *filename,
+									const wchar_t *editor, const wchar_t *arg,
+									const wchar_t *UILanguageFile)
 {
-	wchar_t *commandW = NULL;
-	BOOL ret = FALSE;
-
 	if (GetFileAttributesW(filename) == INVALID_FILE_ATTRIBUTES) {
 		// ファイルが存在しない
 		DWORD no = GetLastError();
@@ -164,18 +166,11 @@ static BOOL openFileWithApplication(const wchar_t *filename, const char *editor,
 		};
 		TTMessageBoxW(NULL, &info, UILanguageFile, no);
 
-		goto error;
+		return FALSE;
 	}
 
-	aswprintf(&commandW, L"%hs \"%s\"", editor, filename);
-
-	STARTUPINFOW si;
-	PROCESS_INFORMATION pi;
-	memset(&si, 0, sizeof(si));
-	GetStartupInfoW(&si);
-	memset(&pi, 0, sizeof(pi));
-
-	if (CreateProcessW(NULL, commandW, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi) == 0) {
+	DWORD e = TTCreateProcess(editor, arg, filename);
+	if (e != NO_ERROR) {
 		// 起動失敗
 		DWORD no = GetLastError();
 		static const TTMessageBoxInfoW info = {
@@ -184,21 +179,10 @@ static BOOL openFileWithApplication(const wchar_t *filename, const char *editor,
 			"DLG_SETUPDIR_OPENFILE_ERROR", L"Cannot open file.(%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(NULL, &info, UILanguageFile, no);
-
-		goto error;
+		TTMessageBoxW(NULL, &info, UILanguageFile, e);
+		return FALSE;
 	}
-	else {
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
-	}
-
-	ret = TRUE;
-
-error:;
-	free(commandW);
-
-	return (ret);
+	return TRUE;
 }
 
 /**
@@ -213,15 +197,14 @@ error:;
 static BOOL openDirectoryWithExplorer(const wchar_t *file, const wchar_t *UILanguageFile)
 {
 	BOOL ret;
-
 	DWORD attr = GetFileAttributesW(file);
 	if (attr == INVALID_FILE_ATTRIBUTES) {
 		// ファイルが存在しない, ディレクトリをオープンする
 		wchar_t *dir = ExtractDirNameW(file);
 		attr = GetFileAttributesW(dir);
-		if ((attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
+		if ((attr != INVALID_FILE_ATTRIBUTES) && (attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 			// フォルダを開く
-			INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", L"explorer.exe", dir, NULL, SW_NORMAL);
+			INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"explore", dir, NULL, NULL, SW_NORMAL);
 			ret = h > 32 ? TRUE : FALSE;
 		}
 		else {
@@ -239,14 +222,16 @@ static BOOL openDirectoryWithExplorer(const wchar_t *file, const wchar_t *UILang
 		free(dir);
 	} else if ((attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 		// 指定されたのがフォルダだった、フォルダを開く
-		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", L"explorer.exe", file, NULL, SW_NORMAL);
+		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"explore", file, NULL, NULL, SW_NORMAL);
 		ret = h > 32 ? TRUE : FALSE;
 	} else {
 		// フォルダを開く + ファイル選択
+		wchar_t *explorer = GetExplorerFullPath();
 		wchar_t *param;
 		aswprintf(&param, L"/select,%s", file);
-		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", L"explorer.exe", param, NULL, SW_NORMAL);
+		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", explorer, param, NULL, SW_NORMAL);
 		free(param);
+		free(explorer);
 		ret = h > 32 ? TRUE : FALSE;
 	}
 	return ret;
@@ -342,25 +327,37 @@ typedef struct {
 } SetupList;
 
 /**
- *	メニューを出して選択された処理を実行する
+ * @brief メニューを出して選択された処理を実行する
+ * @param hWnd			親ウィンドウ
+ * @param pointer_pos	ポインタの位置
+ * @param path			フルパス,file or path
+ * @param pts			*ts
  */
 static void PopupAndExec(HWND hWnd, const POINT *pointer_pos, const wchar_t *path, const TTTSet *pts)
 {
 	const wchar_t *UILanguageFile = pts->UILanguageFileW;
-	const DWORD file_stat = GetFileAttributesW(path);
-	const BOOL dir = (file_stat & FILE_ATTRIBUTE_DIRECTORY) != 0 ? TRUE : FALSE;
+	UINT menu_flag = (path == NULL || path[0] == 0) ? MF_DISABLED : MF_ENABLED;
+	UINT menu_flag_open_file = MF_DISABLED;
+	if (menu_flag == MF_ENABLED) {
+		const DWORD file_stat = GetFileAttributesW(path);
+		if ((file_stat == FILE_INVALID_FILE_ID) || ((file_stat & FILE_ATTRIBUTE_DIRECTORY) != 0)) {
+			menu_flag_open_file = MF_DISABLED;
+		}
+		else {
+			menu_flag_open_file = MF_ENABLED;
+		}
+	}
 
 	HMENU hMenu= CreatePopupMenu();
-	AppendMenuW(hMenu, (dir ? MF_DISABLED : MF_ENABLED) | MF_STRING | 0, 1, L"&Open file");
-	AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 2, L"Open folder(with explorer)");
-	AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 3, L"Send path to clipboard");
+	AppendMenuW(hMenu, menu_flag_open_file | MF_STRING | 0, 1, L"&Open file");
+	AppendMenuW(hMenu, menu_flag | MF_STRING | 0, 2, L"Open folder(with explorer)");
+	AppendMenuW(hMenu, menu_flag | MF_STRING | 0, 3, L"Send path to clipboard");
 	int result = TrackPopupMenu(hMenu, TPM_RETURNCMD, pointer_pos->x, pointer_pos->y, 0 , hWnd, NULL);
 	DestroyMenu(hMenu);
 	switch (result) {
 	case 1: {
 		// アプリで開く
-		const char *editor = pts->ViewlogEditor;
-		openFileWithApplication(path, editor, UILanguageFile);
+		openFileWithApplication(path, pts->ViewlogEditorW, pts->ViewlogEditorArg, UILanguageFile);
 		break;
 	}
 	case 2: {
@@ -444,6 +441,58 @@ static wchar_t *GetCurrentPath(const SetupList *, const TTTSet *)
 	return path;
 }
 
+static wchar_t *_GetTermLogPath(const SetupList *list, const TTTSet *pts)
+{
+	if (list->data_ptr == 0) {
+		// Default log save folder
+		// LogDefaultNameW
+		if (pts->LogDefaultPathW != NULL) {
+			wchar_t *d = GetTermLogDir(pts);
+			int r = wcscmp(d, pts->LogDefaultPathW);
+			free(d);
+			if (r == 0) {
+				// ts->LogDefaultPathW と GetTermLogDir() が同じなら
+				// 表示しない
+				return NULL;
+			}
+			else {
+				return _wcsdup(pts->LogDefaultPathW);
+			}
+		}
+		else {
+			return _wcsdup(L"");
+		}
+	}
+	else {
+		return GetTermLogDir(pts);
+	}
+}
+
+static wchar_t *_GetDownloadDir(const SetupList *list, const TTTSet *pts)
+{
+	if (list->data_ptr == 0) {
+		// raw
+		if (pts->FileDirW != NULL) {
+			wchar_t *d = GetDownloadDir(pts);
+			int r = wcscmp(d, pts->FileDirW);
+			free(d);
+			if (r == 0) {
+				// iniファイルの内容と環境変数展開後が同じとき
+				// (環境変数を含んでいないとき)
+				// 表示しない
+				return NULL;
+			}
+			return _wcsdup(pts->FileDirW);
+		}
+		else {
+			return _wcsdup(L"");
+		}
+	}
+	else {
+		return GetDownloadDir(pts);
+	}
+}
+
 typedef struct {
 	TComVar *pcv;
 	TipWin2 *tipwin;
@@ -507,12 +556,16 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			  LIST_PARAM_STR, pts->HomeDirW, NULL },
 			{ NULL, L"ExeDir",
 			  LIST_PARAM_STR, pts->ExeDirW, NULL },
-			{ NULL, L"LogDir",
-			  LIST_PARAM_STR, pts->LogDirW, NULL },
-			{ NULL, L"LogDefaultPathW",
-			  LIST_PARAM_STR, pts->LogDefaultPathW, NULL },
+			{ NULL, L"Download(FileDir in ini)",
+			  LIST_PARAM_FUNC, (void*)_GetDownloadDir, (void *)0 },
 			{ NULL, L"Download",
-			  LIST_PARAM_STR, pts->FileDirW, NULL },
+			  LIST_PARAM_FUNC, (void*)_GetDownloadDir, (void *)1 },
+			{ NULL, L"LogDir(General)",
+			  LIST_PARAM_STR, pts->LogDirW, NULL },
+			{ NULL, L"Default log save folder",
+			  LIST_PARAM_FUNC, (void*)_GetTermLogPath, (void *)0 },
+			{ NULL, L"LogDir(Terminal)",
+			  LIST_PARAM_FUNC, (void*)_GetTermLogPath, (void *)1 },
 			{ NULL, L"Susie Plugin Path",
 			  LIST_PARAM_STR, pts->EtermLookfeel.BGSPIPathW, NULL },
 			{ NULL, L"UI language file",
@@ -653,7 +706,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 
 void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv)
 {
-	dlg_data_t* dlg_data = (dlg_data_t*)calloc(sizeof(dlg_data_t), 1);
+	dlg_data_t* dlg_data = (dlg_data_t*)calloc(1, sizeof(dlg_data_t));
 	dlg_data->pcv = pcv;
 	TTDialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
 					 hWnd, OnSetupDirectoryDlgProc, (LPARAM)dlg_data);

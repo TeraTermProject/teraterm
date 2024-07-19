@@ -86,7 +86,6 @@
 
 #define INITGUID
 #include <guiddef.h>
-#include <ntddmodm.h>
 
 typedef BOOL (WINAPI *TSetupDiGetDevicePropertyW)(
 	HDEVINFO DeviceInfoSet,
@@ -443,13 +442,18 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 			}
 
 			// check status
+#if !defined(SUPPORT_OLD_WINDOWS)
 			ULONG status  = 0;
 			ULONG problem = 0;
 			CONFIGRET cr = CM_Get_DevNode_Status(&status, &problem, DeviceInfoData.DevInst, 0);
-			if (cr != CR_SUCCESS || problem == CM_PROB_DISABLED) {
-				// ステータス取得に失敗 又は デバイスが無効の時
+			if (cr != CR_SUCCESS) {
 				continue;
 			}
+			if (problem != 0) {
+				// 何らかの問題があった?
+				continue;
+			}
+#endif
 
 			wchar_t *port_name;
 			if (!GetComPortName(hDevInfo, &DeviceInfoData, &port_name)) {

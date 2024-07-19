@@ -41,6 +41,7 @@
 #include "ftdlg.h"
 #include "ttcommon.h"
 #include "ttlib.h"
+#include "ttlib_types.h"
 #include "dlglib.h"
 #include "helpid.h"
 #include "asprintf.h"
@@ -371,6 +372,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			wchar_t *caption;
 			aswprintf(&caption, L"Tera Term: %s", uimsg);
 			free(uimsg);
+			wchar_t *logdir = GetTermLogDir(work->pts);
 
 			TTOPENFILENAMEW ofn = {};
 			//ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
@@ -381,13 +383,14 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			ofn.nFilterIndex = 1;
 			ofn.lpstrFile = fname_ini;
 			ofn.lpstrTitle = caption;
-			ofn.lpstrInitialDir = work->pts->LogDefaultPathW;
+			ofn.lpstrInitialDir = logdir;
 			wchar_t *fname;
 			BOOL Ok = TTGetSaveFileNameW(&ofn, &fname);
 			if (Ok) {
 				SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
 				free(fname);
 			}
+			free(logdir);
 			free(caption);
 			free(FNFilter);
 			free(fname_ini);
@@ -467,7 +470,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
  */
 BOOL FLogOpenDialog(HINSTANCE hInst_, HWND hWnd, FLogDlgInfo_t *info)
 {
-	LogDlgWork_t *work = (LogDlgWork_t *)calloc(sizeof(LogDlgWork_t), 1);
+	LogDlgWork_t *work = (LogDlgWork_t *)calloc(1, sizeof(LogDlgWork_t));
 	work->info = info;
 	work->pts = info->pts;
 	work->pcv = info->pcv;

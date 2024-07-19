@@ -223,7 +223,7 @@ void Notify2SetIconID(NotifyIcon *ni, HINSTANCE hInstance, WORD IconID)
  */
 NotifyIcon *Notify2Initialize(void)
 {
-	NotifyIcon *ni = (NotifyIcon *)calloc(sizeof(NotifyIcon) ,1);
+	NotifyIcon *ni = (NotifyIcon *)calloc(1, sizeof(NotifyIcon));
 	return ni;
 }
 

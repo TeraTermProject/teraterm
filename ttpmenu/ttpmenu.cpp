@@ -2483,22 +2483,6 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
-static void GetUILanguageFile()
-{
-	/* Get LanguageFile name */
-	wchar_t *lng_rel;
-	hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", NULL, SetupFNameW, &lng_rel);
-	if (lng_rel[0] == L'\0') {
-		free(lng_rel);
-		lng_rel = _wcsdup(L"lang\\Default.lng");
-	}
-
-	wchar_t *ExeDirW = GetExeDirW(NULL);
-	UILanguageFileW = GetUILanguageFileFullW(ExeDirW, lng_rel);
-	free(ExeDirW);
-	free(lng_rel);
-}
-
 /* ==========================================================================
 	Function Name	: (int WINAPI) WinMain()
 	Outline			: ÉÅÉCÉìä÷êî
@@ -2548,7 +2532,7 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 
 	SetupFNameW = GetDefaultSetupFNameW(NULL);
 	SetDPIAwareness(SetupFNameW);
-	GetUILanguageFile();
+	UILanguageFileW = GetUILanguageFileFullW(SetupFNameW);
 
 	SetDialogFont(//L"Tahoma", 8, 0,
 				  NULL, 0, 0,

@@ -29,6 +29,10 @@
 
 /* TTTEK.DLL, TEK escape sequences */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void WINAPI TEKInit(PTEKVar tk, PTTSet ts);
 void WINAPI TEKChangeCaret(PTEKVar tk, PTTSet ts);
 void WINAPI TEKDestroyCaret(PTEKVar tk, PTTSet ts);
@@ -48,3 +52,7 @@ void WINAPI TEKSetupFont(PTEKVar tk, PTTSet ts);
 void WINAPI TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld);
 void WINAPI TEKRestoreSetup(PTEKVar tk, PTTSet ts);
 void WINAPI TEKEnd(PTEKVar tk);
+
+#ifdef __cplusplus
+}
+#endif

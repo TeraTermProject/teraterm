@@ -109,23 +109,24 @@ static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 		{	// 制御文字を使用する && CTRLキーが押されている
 			char chars[] = { (char) wParam, 0 };
 
-			SendMessageA(control, EM_REPLACESEL, (WPARAM) TRUE,
-			             (LPARAM)chars);
+			SendMessageA(control, EM_REPLACESEL, (WPARAM) TRUE, (LPARAM)chars);
 
 			if (data->tipwin == NULL) {
-				char uimsg[MAX_UIMSG];
-				RECT rect;
 				PTInstVar pvar = data->pvar;
-				UTIL_get_lang_msg("DLG_AUTH_TIP_CONTROL_CODE", pvar, "control character is entered");
-				strcpy_s(uimsg, _countof(uimsg), pvar->UIMsg);
+				const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
+				wchar_t *uimsg;
+				RECT rect;
+				GetI18nStrWW("TTSSH", "DLG_AUTH_TIP_CONTROL_CODE", L"control character is entered", UILanguageFileW, &uimsg);
 				if (wParam == 'V' - 'A' + 1) {
 					// CTRL + V
-					strcat_s(uimsg, _countof(uimsg), "\n");
-					UTIL_get_lang_msg("DLG_AUTH_TIP_PASTE_KEY", pvar, "Use Shift + Insert to paste from clipboard");
-					strcat_s(uimsg, _countof(uimsg), pvar->UIMsg);
+					wchar_t *uimsg_add;
+					GetI18nStrWW("TTSSH", "DLG_AUTH_TIP_PASTE_KEY", L"Use Shift + Insert to paste from clipboard", UILanguageFileW, &uimsg_add);
+					awcscats(&uimsg, L"\n", uimsg_add, NULL);
+					free(uimsg_add);
 				}
 				GetWindowRect(control, &rect);
-				data->tipwin = TipWinCreateA(hInst, control, rect.left, rect.bottom, uimsg);
+				data->tipwin = TipWinCreateW(hInst, control, rect.left, rect.bottom, uimsg);
+				free(uimsg);
 			}
 
 			return 0;
@@ -307,24 +308,29 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		{ IDCANCEL, "BTN_DISCONNECT" },
 	};
 	int default_method = pvar->session_settings.DefaultAuthMethod;
+	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
+	int focus_id;
 
-	SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
+	SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), UILanguageFileW);
 
 	init_auth_machine_banner(pvar, dlg);
 	init_password_control(pvar, dlg, IDC_SSHPASSWORD, UseControlChar);
+	focus_id = IDC_SSHPASSWORD;
 
 	// 認証失敗後はラベルを書き換え
 	if (pvar->auth_state.failed_method != SSH_AUTH_NONE) {
 		/* must be retrying a failed attempt */
-		wchar_t uimsg[MAX_UIMSG];
+		wchar_t *uimsg;
 		if (pvar->auth_state.partial_success) {
-			UTIL_get_lang_msgW("DLG_AUTH_BANNER2_FURTHER", pvar, L"Further authentication required.", uimsg);
+			GetI18nStrWW("TTSSH", "DLG_AUTH_BANNER2_FURTHER", L"Further authentication required.", UILanguageFileW, &uimsg);
 		} else {
-			UTIL_get_lang_msgW("DLG_AUTH_BANNER2_FAILED", pvar, L"Authentication failed. Please retry.", uimsg);
+			GetI18nStrWW("TTSSH", "DLG_AUTH_BANNER2_FAILED", L"Authentication failed. Please retry.", UILanguageFileW, &uimsg);
 		}
 		SetDlgItemTextW(dlg, IDC_SSHAUTHBANNER2, uimsg);
-		UTIL_get_lang_msgW("DLG_AUTH_TITLE_FAILED", pvar, L"Retrying SSH Authentication", uimsg);
+		free(uimsg);
+		GetI18nStrWW("TTSSH", "DLG_AUTH_TITLE_FAILED", L"Retrying SSH Authentication", UILanguageFileW, &uimsg);
 		SetWindowTextW(dlg, uimsg);
+		free(uimsg);
 		default_method = pvar->auth_state.failed_method;
 	}
 
@@ -339,14 +345,20 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	CheckDlgButton(dlg, IDC_FORWARD_AGENT, pvar->settings.ForwardAgent);
 
 	// SSH バージョンによって TIS のラベルを書き換え
-	if (pvar->settings.ssh_protocol_version == 1) {
-		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE1", pvar,
-		                  "Use challenge/response(&TIS) to log in");
-		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->UIMsg);
-	} else {
-		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE2", pvar,
-		                  "Use keyboard-&interactive to log in");
-		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->UIMsg);
+	{
+		const char *key;
+		const wchar_t *def;
+		wchar_t *uimsg;
+		if (pvar->settings.ssh_protocol_version == 1) {
+			key = "DLG_AUTH_METHOD_CHALLENGE1";
+			def = L"Use challenge/response(&TIS) to log in";
+		} else {
+			key = "DLG_AUTH_METHOD_CHALLENGE2";
+			def = L"Use keyboard-&interactive to log in";
+		}
+		GetI18nStrWW("TTSSH", key, def, UILanguageFileW, &uimsg);
+		SetDlgItemTextW(dlg, IDC_SSHUSETIS, uimsg);
+		free(uimsg);
 	}
 
 	if (pvar->auth_state.user != NULL) {
@@ -396,6 +408,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORDCAPTION), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), FALSE);
+			focus_id = IDCANCEL;
 		}
 	}
 
@@ -424,6 +437,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), FALSE);
 		SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
+		focus_id = IDCANCEL;
 
 	// /auth=pageant を追加
 	} else if (pvar->ssh2_authmethod == SSH_AUTH_PAGEANT) {
@@ -431,6 +445,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), FALSE);
 		SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
+		focus_id = IDCANCEL;
 
 	} else {
 		// デフォルトの認証メソッドをダイアログに反映
@@ -443,19 +458,19 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		// しまうので、自動ログイン有効時は SetFocus しない (2009.1.31 maya)
 		if (default_method == SSH_AUTH_TIS) {
 			/* we disabled the password control, so fix the focus */
-			SetFocus(GetDlgItem(dlg, IDC_SSHUSETIS));
+			focus_id = IDC_SSHUSETIS;
 		}
 		else if (default_method == SSH_AUTH_PAGEANT) {
-			SetFocus(GetDlgItem(dlg, IDC_SSHUSEPAGEANT));
+			focus_id = IDC_SSHUSEPAGEANT;
 		}
 
 	}
 
 	if (GetWindowTextLength(GetDlgItem(dlg, IDC_SSHUSERNAME)) == 0) {
-		SetFocus(GetDlgItem(dlg, IDC_SSHUSERNAME));
+		focus_id = IDC_SSHUSERNAME;
 	}
 	else if (pvar->ask4passwd == 1) {
-		SetFocus(GetDlgItem(dlg, IDC_SSHPASSWORD));
+		focus_id = IDC_SSHPASSWORD;
 	}
 
 	// '/I' 指定があるときのみ最小化する (2005.9.5 yutaka)
@@ -464,6 +479,10 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		ShowWindow(dlg,SW_MINIMIZE);
 		//20050822追加 end T.Takahashi
 	}
+
+	// フォーカスをセットする
+	//SetFocus(GetDlgItem(dlg, focus_id));
+	PostMessage(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, focus_id), TRUE);
 }
 
 static char *alloc_control_text(HWND ctl)
