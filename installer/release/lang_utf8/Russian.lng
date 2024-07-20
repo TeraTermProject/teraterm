@@ -1154,6 +1154,8 @@ DLG_CONFIG_PASS=Пароль
 DLG_CONFIG_MACRO=Указать файл макросов
 DLG_CONFIG_LAUNCH=Только запуск
 DLG_CONFIG_STARTUP=Старт при загрузке
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=Использовать SSH
 DLG_CONFIG_KEYFILE=Файл ключа
 DLG_CONFIG_CHALLENGE=Использовать Challenge
@@ -1169,6 +1171,17 @@ DLG_ETC_LOGFILE=Лог-файл
 DLG_ETC_PROMPT=Подсказка
 DLG_ETC_USER=Имя пользователя
 DLG_ETC_PASS=Пароль
+
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=Не удается прочитать данные из регистра.\n
 MSG_ERROR_MAKETTL=Не удается создать 'ttpmenu.TTL'\n

@@ -19,6 +19,11 @@ Tera Term Menu(ttpmenu.exe) is a launcher tool which can kick the Tera Term easi
 Tera Term Menu copyright belongs to S.Hayakawa, however the Tera Term Menu is currently maintained by TeraTerm Project and this is included into the Tera Term installation package.
 </p>
 
+<b>
+NOTE: Users with administrator privileges can use tools such as Process Explorer to display arguments such as the user name and password of Tera Term started from the TeraTerm Menu.<br>
+Please refrain from using TeraTerm Menu in environments where there is a risk of information leakage.
+</b>
+
 
 <h2 id="registry">2. Registry</h2>
 
@@ -26,7 +31,8 @@ Tera Term Menu copyright belongs to S.Hayakawa, however the Tera Term Menu is cu
 Tera Term Menu configuration is recorded into the registry(HKEY_CURRENT_USER\Software\ShinpeiTools\TTermMenu).
 If the ini file wants to be used instead of the registry, please put the "ttpmenu.ini"(empty size) in the "ttpmenu.exe" directory in advance.<br>
 <b>
-NOTE: The registry database can not be exported into the ini file automatically. Please use the <a href="https://github.com/TeraTermProject/teraterm/tree/main/installer/ttpmenu" target="_blank">converting script</a>.
+NOTE: The registry database can not be exported into the ini file automatically. Please use the <a href="https://github.com/TeraTermProject/teraterm/tree/main/installer/ttpmenu" target="_blank">converting script</a>.<br>
+User names, passwords, etc. are saved in the registry or ini file, so please handle them with care.
 </b>
 </p>
 

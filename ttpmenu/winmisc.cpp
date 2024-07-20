@@ -287,3 +287,126 @@ LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 	return CallWindowProc((WNDPROC) GetWindowLongPtr(control, GWLP_USERDATA),
 	                      control, msg, wParam, lParam);
 }
+
+/* ==========================================================================
+	Function Name	: (int) Encrypt2EncDec()
+	Outline			: パスワードの暗号化/復号処理(aes_256_ctr)
+	Arguments		:										暗号化  復号
+					: char					*szPassword 	(in)	(out)	パスワード(暗号化/復号対象の文字列)
+					: const unsigned char	*szEncryptKey	(in)	(in)	秘密鍵(パスワードを暗号化/復号するためのパスワード)
+					: Encrypt2ProfileP		profile			(out)	(in)	パスワードプロファイル
+					: int					encrypt			(in)	(in)	1:暗号化、0:復号
+	Return Value	: 成功 1
+					: 失敗 0
+	Reference		:
+	Renewal			:
+	Notes			:
+	Attention		:
+	Up Date			:
+   ======1=========2=========3=========4=========5=========6=========7======= */
+int Encrypt2EncDec(char *szPassword, const unsigned char *szEncryptKey, Encrypt2ProfileP profile, int encrypt)
+{
+	unsigned char TmpKeyIV[EVP_MAX_KEY_LENGTH + EVP_MAX_IV_LENGTH];
+	unsigned char Key[EVP_MAX_KEY_LENGTH], IV[EVP_MAX_IV_LENGTH];
+	BIO *Bmem = NULL, *Benc = NULL, *Bio = NULL;
+	EVP_CIPHER_CTX *ctx;
+	Encrypt2Profile Lprofile;
+	unsigned char Buf[ENCRYPT2_PROFILE_LEN - SHA512_DIGEST_LENGTH];
+	unsigned char Hash[SHA512_DIGEST_LENGTH];
+	unsigned int HashLen;
+	int ret = 0;
+
+	if (encrypt) {
+		memcpy(profile->Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1);
+		if (RAND_bytes(profile->PassSalt, ENCRYPT2_SALTLEN) <= 0 ||
+			RAND_bytes(profile->EncSalt, ENCRYPT2_SALTLEN) <= 0) {
+			goto end;
+		}
+	} else {
+		if (CRYPTO_memcmp(profile->Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1) != 0) {
+			goto end;
+		}
+	}
+
+	// 鍵導出
+	if (PKCS5_PBKDF2_HMAC((const char *)szEncryptKey, (int)strlen((const char *)szEncryptKey),
+						  (const unsigned char *)&(profile->PassSalt), ENCRYPT2_SALTLEN,
+						  ENCRYPT2_ITER2, (EVP_MD *)ENCRYPT2_DIGEST,
+						  ENCRYPT2_IKLEN + ENCRYPT2_IVLEN, TmpKeyIV) != 1) {
+		goto end;
+	}
+	memcpy(Key, TmpKeyIV, ENCRYPT2_IKLEN);
+	memcpy(IV, TmpKeyIV + ENCRYPT2_IKLEN, ENCRYPT2_IVLEN);
+
+	// 準備
+	if ((Bmem = BIO_new(BIO_s_mem())) == NULL ||
+		(Benc = BIO_new(BIO_f_cipher())) == NULL ||
+		BIO_get_cipher_ctx(Benc, &ctx) != 1 ||
+		EVP_CipherInit_ex(ctx, ENCRYPT2_CIPHER, NULL, Key, IV, encrypt) != 1 ||
+		(Bio = BIO_push(Benc, Bmem))  == NULL) {
+		goto end;
+	}
+
+	if (encrypt) {
+		int len;
+		// 暗号化
+		len = (int)strlen(szPassword);
+		memcpy(Buf, szPassword, len);
+		memset(Buf + len, 0x00, ENCRYPT2_PWD_MAX_LEN - len);	// nullパディング
+		if (BIO_write(Bio, Buf, ENCRYPT2_PWD_MAX_LEN) != ENCRYPT2_PWD_MAX_LEN ||
+			BIO_write(Bio, profile->EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN ||
+			BIO_flush(Bio) != 1 ||
+			BIO_read(Bmem, profile->PassStr, ENCRYPT2_PWD_MAX_LEN) != ENCRYPT2_PWD_MAX_LEN ||
+			BIO_read(Bmem, profile->EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN) {
+			goto end;
+		}
+		// hmac格納
+		if ((PKCS5_PBKDF2_HMAC((const char *)szEncryptKey, (int)strlen((const char *)szEncryptKey),
+							   (const unsigned char *)&(profile->EncSalt), ENCRYPT2_SALTLEN,
+							   ENCRYPT2_ITER1, (EVP_MD *)ENCRYPT2_DIGEST,
+							   SHA512_DIGEST_LENGTH, Key) != 1) ||
+			HMAC(ENCRYPT2_DIGEST, Key, SHA512_DIGEST_LENGTH,
+				 (const unsigned char *)profile, ENCRYPT2_PROFILE_LEN - SHA512_DIGEST_LENGTH,
+				 Hash, &HashLen) == NULL ||
+			BIO_write(Bio, Hash, SHA512_DIGEST_LENGTH) != SHA512_DIGEST_LENGTH ||
+			BIO_flush(Bio) != 1 ||
+			BIO_read(Bmem, profile->EncHash, SHA512_DIGEST_LENGTH) != SHA512_DIGEST_LENGTH) {
+			goto end;
+		}
+		ret = 1;
+	} else {
+		// 復号
+		if (BIO_write(Bmem, profile->PassStr, ENCRYPT2_PWD_MAX_LEN) != ENCRYPT2_PWD_MAX_LEN ||
+			BIO_write(Bmem, profile->EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN ||
+			BIO_write(Bmem, profile->EncHash, SHA512_DIGEST_LENGTH) != SHA512_DIGEST_LENGTH ||
+			BIO_flush(Bmem) != 1 ||
+			BIO_read(Bio, Lprofile.PassStr, ENCRYPT2_PWD_MAX_LEN) != ENCRYPT2_PWD_MAX_LEN ||
+			BIO_read(Bio, Lprofile.EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN ||
+			BIO_read(Bio, Lprofile.EncHash, SHA512_DIGEST_LENGTH) != SHA512_DIGEST_LENGTH) {
+			goto end;
+		}
+		// hmac比較
+		if ((PKCS5_PBKDF2_HMAC((const char *)szEncryptKey, (int)strlen((const char *)szEncryptKey),
+							   (const unsigned char *)&(profile->EncSalt), ENCRYPT2_SALTLEN,
+							   ENCRYPT2_ITER1, (EVP_MD *)ENCRYPT2_DIGEST,
+							   SHA512_DIGEST_LENGTH, Key) != 1) ||
+			HMAC(ENCRYPT2_DIGEST, Key, SHA512_DIGEST_LENGTH,
+				 (const unsigned char *)profile, ENCRYPT2_PROFILE_LEN - SHA512_DIGEST_LENGTH,
+				 Hash, &HashLen) == NULL ) {
+			goto end;
+		}
+		memcpy(szPassword, Lprofile.PassStr, ENCRYPT2_PWD_MAX_LEN);
+		if (CRYPTO_memcmp(Hash, Lprofile.EncHash, SHA512_DIGEST_LENGTH) == 0) {
+			szPassword[ENCRYPT2_PWD_MAX_LEN] = 0;
+			ret = 1;	// 一致
+		} else {
+			szPassword[0] = 0;
+			ret = 0;	// 不一致
+		}
+	}
+
+ end:
+	BIO_free(Benc);
+	BIO_free(Bmem);
+	return ret;
+}

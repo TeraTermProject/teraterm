@@ -19,6 +19,10 @@ Tera Term Menu(ttpmenu.exe)とは、Tera Termをボタン一発で起動することができるラン
 Tera Term Menuは早川信平氏による著作物ですが、現在ではTeraTerm Projectによりメンテナンスされており、Tera Termのインストールパッケージにも含まれています。
 </p>
 
+<b>
+NOTE: 管理者権限を持つユーザはProcess Explorerなどのツールを用いてTeraTerm Menuから起動されたTera Termのユーザ名、パスワードなどの引数を表示させることが可能です。<br>
+情報漏洩のリスクがある環境では、TeraTerm Menuの利用をお控えください。
+</b>
 
 <h2 id="registry">2. レジストリ</h2>
 
@@ -27,7 +31,8 @@ Tera Term Menuの設定情報は、レジストリ(HKEY_CURRENT_USER\Software\ShinpeiTools\T
 レジストリではなく、iniファイルを使いたい場合は、あらかじめ"ttpmenu.exe"があるディレクトリに"ttpmenu.ini"（0バイトで可）を設置しておきます。<br>
 <b>
 NOTE: レジストリデータは自動的にiniファイルにエクスポートされません。
-<a href="https://github.com/TeraTermProject/teraterm/tree/main/installer/ttpmenu" target="_blank">こちらにある変換スクリプト</a>をご利用ください。
+<a href="https://github.com/TeraTermProject/teraterm/tree/main/installer/ttpmenu" target="_blank">こちらにある変換スクリプト</a>をご利用ください。<br>
+レジストリ、iniファイルにはユーザ名、パスワードなどが保存されていますので取り扱いには注意してください。
 </b>
 </p>
 

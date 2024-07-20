@@ -1154,6 +1154,8 @@ DLG_CONFIG_PASS=密碼
 DLG_CONFIG_MACRO=指定的巨集文件
 DLG_CONFIG_LAUNCH=僅啟動
 DLG_CONFIG_STARTUP=啟動時運行
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=使用 ttssh
 DLG_CONFIG_KEYFILE=密鑰文件
 DLG_CONFIG_CHALLENGE=挑戰/應答認證
@@ -1169,6 +1171,17 @@ DLG_ETC_LOGFILE=日誌文件
 DLG_ETC_PROMPT=提示
 DLG_ETC_USER=用戶名
 DLG_ETC_PASS=密碼
+
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=無法從註冊表中讀取數據。\n
 MSG_ERROR_MAKETTL=無法創建 ttpmenu.TTL。\n
