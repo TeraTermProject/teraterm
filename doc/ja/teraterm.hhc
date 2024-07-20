@@ -904,6 +904,11 @@
 				<param name="Local" value="html\macro\syntax\lineformats.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="引数の形式">
+				<param name="Local" value="html\macro\syntax\parameter.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="TTL コマンドリファレンス">

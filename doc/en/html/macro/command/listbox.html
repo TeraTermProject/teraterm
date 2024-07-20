@@ -14,42 +14,47 @@
 <h1>listbox</h1>
 
 <p>
-Displays a list box, and ask an item to user. <em>(version 4.78 or later)</em>
+Displays a dialog box with a list box, and ask an item to user. <em>(version 4.78 or later)</em>
+
 </p>
 
 <pre class="macro-syntax">
-listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;] ['dclick=on'] ['minmaxbutton=on'] ['minimize=on'] ['maximize=on'] ['size=&lt;N1xN2&gt;']
+listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;] [&lt;keyword parameter&gt;...]
 </pre>
 
 <h2>Parameters</h2>
 
 <dl>
 	<dt class="macro">string &lt;message&gt;</dt>
-	<dd>It is displayed in the list box.</dd>
-	
+	<dd>It is displayed in the dialog box.</dd>
+
 	<dt class="macro">string &lt;title&gt;</dt>
-	<dd>It is displayed as the list box title.</dd>
-	
+	<dd>It is displayed as the dialog box title.</dd>
+
 	<dt class="macro">array &lt;string array&gt;</dt>
 	<dd>It is displayed as the list box items.</dd>
 
 	<dt class="macro">integer &lt;selected&gt; (version 4.89 or later)</dt>
 	<dd>It is selected first item by specifying the zero-based index of the array. This argument is optional. When this option is omitted, no item is selected.</dd>
 
-	<dt class="macro">fixed string 'dclick=on' (version 5.3 or later)</dt>
-	<dd>Enable item selection by double-clicking. This argument is optional.</dd>
+	<dt><br>keyword parameters : optional, multiple allowed, random order</dt>
+	<dd><dl>
+		<dt class="macro">string 'dblclick=on' (default=off) (version 5.3 or later)</dt>
+		<dd>Enable item selection by double-clicking.</dd>
 
-	<dt class="macro">fixed string 'minmaxbutton=on' (version 5.3 or later)</dt>
-	<dd>Enable Minimize/Maximize button. This argument is optional.</dd>
+		<dt class="macro">string 'minmaxbutton=on' (default=off) (version 5.3 or later)</dt>
+		<dd>Enable Minimize/Maximize button.</dd>
 
-	<dt class="macro">fixed string 'minimize=on' (version 5.3 or later)</dt>
-	<dd>Display in minimized state. This argument is optional.</dd>
+		<dt class="macro">string 'minimize=on' (default=off) (version 5.3 or later)</dt>
+		<dd>Display in minimized state.</dd>
 
-	<dt class="macro">fixed string 'maximize=on' (version 5.3 or later)</dt>
-	<dd>Display in maximized state. This argument is optional.</dd>
+		<dt class="macro">string 'maximize=on' (default=off) (version 5.3 or later)</dt>
+		<dd>Display in maximized state.</dd>
 
-	<dt class="macro">string 'size=&lt;N1xN2&gt;' (version 5.3 or later)</dt>
-	<dd>Specify the size of the list box. This argument is optional.</dd>
+		<dt class="macro">string 'listboxsize=WxH' (default=26x6) (version 5.3 or later)</dt>
+		<dd>Specify the size of the list box. W:width (horizontal character count), H:height (vertical character count).</br>
+		    Example 'listboxsize=60x20' (for 60 characters horizontally and 20 characters vertically)</dd>
+	</dl></dd>
 </dl>
 
 <h2>Return Value</h2>
@@ -58,21 +63,20 @@ listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;] ['
 	<dt class="macro">System variable &lt;result&gt;</dt>
 	<dd>If the user selects one of items, it is set to from 0 to N-1.<br>
 	    If the user cancels, it is set to -1.</dd>
-	
 </dl>
 
 <h2>Remarks</h2>
 
 <p>
-The listbox macro command shows all selected items of the &lt;string array&gt; array.<br />
-If the &lt;string array&gt; is defined as bigger entries than selected numbers as follows, 
+The listbox macro command shows all selected items of the &lt;string array&gt; array.<br>
+If the &lt;string array&gt; is defined as bigger entries than selected numbers as follows,
 the empty string will be shown at last.
 </p>
 
 <pre>
 strdim msg 4
-msg[0] = 'Banana' 
-msg[1] = 'Apple' 
+msg[0] = 'Banana'
+msg[1] = 'Apple'
 msg[2] = 'Orange'
 listbox 'Select your favorite food.' 'Confirmation' msg
 
@@ -85,21 +89,16 @@ Orange
 
 <p>
 <em>(version 4.89 or later)</em><br>
-When the &lt;selected&gt; parameter is specified, an item of the list box can be selected at first. <br />
+When the &lt;selected&gt; parameter is specified, an item of the list box can be selected at first. <br>
 If the parameter is omitted, the default value is 0.
-<br><br>
-<em>(version 5.3 or later)</em><br>
-To specify the size of the list box, specify "size=N1xN2".<br>
-Specify the horizontal length for N1 and the vertical length for N2.<br>
-Example 'size=60x20' (for 60 characters horizontally and 20 characters vertically)
 </p>
 
 <h2>Example</h2>
 
 <pre class="macro-example">
 strdim msg 3
-msg[0] = 'Banana' 
-msg[1] = 'Apple' 
+msg[0] = 'Banana'
+msg[1] = 'Apple'
 msg[2] = 'Orange'
 listbox 'Select your favorite food.' 'Confirmation' msg
 sprintf2 var "%d" result
@@ -113,8 +112,8 @@ messagebox var "result"
 
 <pre class="macro-example">
 strdim msg 7
-msg[0] = 'Sunny' 
-msg[1] = 'Cloudy' 
+msg[0] = 'Sunny'
+msg[1] = 'Cloudy'
 msg[2] = 'Rainy'
 msg[3] = 'Windy'
 msg[4] = 'Snowy'
@@ -128,18 +127,21 @@ messagebox var "result"
 
 <pre class="macro-example">
 strdim msg 9
-msg[0] = "listbox msg[result] result msg 'size=70x10'"
-msg[1] = "listbox msg[result] result msg 'size=70x10' 'dclick=on'"
-msg[2] = "listbox msg[result] result msg 'size=70x10' 'minmaxbutton=on'"
-msg[3] = "listbox msg[result] result msg 'size=70x10' 'minimize=on'"
-msg[4] = "listbox msg[result] result msg 'size=70x10' 'maximize=on'"
-msg[5] = "listbox msg[result] result msg 'size=70x10' 'minmaxbutton=on' 'dclick=on'"
-msg[6] = "listbox msg[result] result msg 'size=100x10'"
-msg[7] = "listbox msg[result] result msg 'size=10x20'"
-msg[8] = "listbox msg[result] result msg"
+selected = 0
+msg[0] = "listbox msg[selected] title msg selected 'listboxsize=70x10'"
+msg[1] = "listbox msg[selected] title msg selected 'listboxsize=70x10' 'dblclick=on'"
+msg[2] = "listbox msg[selected] title msg selected 'listboxsize=70x10' 'minmaxbutton=on'"
+msg[3] = "listbox msg[selected] title msg selected 'listboxsize=70x10' 'minimize=on'"
+msg[4] = "listbox msg[selected] title msg selected 'listboxsize=70x10' 'maximize=on'"
+msg[5] = "listbox msg[selected] title msg selected 'listboxsize=70x10' 'minmaxbutton=on' 'dblclick=on'"
+msg[6] = "listbox msg[selected] title msg selected 'listboxsize=100x5'"
+msg[7] = "listbox msg[selected] title msg selected 'listboxsize=10x20'"
+msg[8] = "listbox msg[selected] title msg selected"
 :select
-execcmnd msg[result]
-if result = -1 then
+sprintf2 title 'selected = %d' selected
+execcmnd msg[selected]
+selected=result
+if selected = -1 then
   exit
 endif
 goto select

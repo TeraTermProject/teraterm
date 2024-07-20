@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>引数の形式</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>引数の形式</h1>
+
+TTLコマンドの引数の形式は3種類ある。<br>
+どの形式が使用できるかはTTLコマンドにより異なるため、引数の形式は「<A HREF="../command/index.html">TTL コマンドリファレンス</A>」で確認すること。
+
+<h2>1) 位置引数</h2>
+
+<p>
+引数の位置で値を指定する形式。<br>
+「<A HREF="../command/index.html">TTL コマンドリファレンス</A>」にキーワード引数と明示されていない引数は、位置引数である。
+</p>
+
+<pre>
+例:
+  ttlcommand 10 20
+  第1引数 : 幅
+  第2引数 : 高さ
+</pre>
+
+<h2>2) キーワード引数</h2>
+
+<p>
+キーワードで値を指定する形式。<br>
+key=value形式で任意の順番で引数を渡すことができる。
+</p>
+
+<pre>
+例:
+  ttlcommand 'width=10' 'height=20'
+  幅のキーワード   : width
+  高さのキーワード : height
+</pre>
+
+<h2>3) 位置引数 + キーワード引数</h2>
+
+<p>
+TTLコマンドの引数の最初のいくつかが位置引数、残りがキーワード引数の形式。<br>
+位置引数の部分は順番固定、位置引数より後ろのキーワード引数部分は順不同。
+</p>
+
+<pre>
+例:
+  ttlcommand 'Terminal' 'green' 'width=10' 'height=20'
+  第1引数          : font
+  第2引数          : color
+  幅のキーワード   : width
+  高さのキーワード : height
+</pre>
+
+<h2>経緯</h2>
+
+<p>
+Tera Term バージョン5.3で行われた<A HREF="../command/listbox.html">listbox</A>コマンドの機能拡張で、多くの引数を渡し、かつ引数を最小の書き方で実現するためキーワード引数が導入された。
+</p>
+
+</BODY>
+</HTML>
