@@ -81,6 +81,8 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 		case WM_INITDIALOG: {
 			WORD i;
 			int j;
+			int com_index;
+
 			GetHNRec = (PGetHNRec)lParam;
 			dlg_data = (TTXHostDlgData *)calloc(1, sizeof(*dlg_data));
 			SetWindowLongPtr(Dialog, DWLP_USER, (LPARAM)dlg_data);
@@ -97,11 +99,11 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				GetHNRec->PortType = IdTCPIP;
 			}
 
+			// ホスト (コマンドライン)
 			SetComboBoxHostHistory(Dialog, IDC_HOSTNAME, MAXHOSTLIST, GetHNRec->SetupFNW);
 			ExpandCBWidth(Dialog, IDC_HOSTNAME);
 
-			SendDlgItemMessage(Dialog, IDC_HOSTNAME, EM_LIMITTEXT,
-			                   HostNameMaxLength-1, 0);
+			SendDlgItemMessage(Dialog, IDC_HOSTNAME, EM_LIMITTEXT, HostNameMaxLength-1, 0);
 
 			SendDlgItemMessage(Dialog, IDC_HOSTNAME, CB_SETCURSEL,0,0);
 
@@ -117,6 +119,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			SendDlgItemMessage(Dialog, IDC_HOSTTCPPROTOCOL, CB_SETCURSEL,0,0);
 
 			j = 0;
+			com_index = 1;
 			for (i = 0; i < dlg_data->ComPortInfoCount; i++) {
 				ComPortInfo_t *p = dlg_data->ComPortInfoPtr + i;
 				wchar_t *EntNameW;
@@ -126,11 +129,15 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				if (i > GetHNRec->MaxComPort) {
 					continue;
 				}
-				j++;
 
 				// 使用中のポートは表示しない
 				if (CheckCOMFlag(p->port_no) == 1) {
 					continue;
+				}
+
+				j++;
+				if (GetHNRec->ComPort == p->port_no) {
+					com_index = j;
 				}
 
 				if (p->friendly_name == NULL) {
@@ -144,7 +151,8 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				free(EntNameW);
 			}
 			if (j>0) {
-				SendDlgItemMessage(Dialog, IDC_HOSTCOM, CB_SETCURSEL,0,0);
+				// GetHNRec->ComPort を選択する
+				SendDlgItemMessageA(Dialog, IDC_HOSTCOM, CB_SETCURSEL, com_index - 1, 0);
 			}
 			else { /* All com ports are already used */
 				GetHNRec->PortType = IdTCPIP;
