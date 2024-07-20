@@ -125,8 +125,6 @@ static OSSL_PROVIDER *default_provider = NULL;
 #undef GetPrivateProfileString
 #define GetPrivateProfileInt(p1, p2, p3, p4) GetPrivateProfileIntAFileW(p1, p2, p3, p4)
 #define GetPrivateProfileString(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
-#define GetPrivateProfileStringA(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
-#define WritePrivateProfileStringA(p1, p2, p3, p4) WritePrivateProfileStringAFileW(p1, p2, p3, p4)
 
 /* This extension implements SSH, so we choose a load order in the
    "protocols" range. */
@@ -1069,6 +1067,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 	switch (msg) {
 	case WM_INITDIALOG: {
 		int j;
+		int com_index;
 
 		GetHNRec = (PGetHNRec)lParam;
 		dlg_data = (TTXHostDlgData *)calloc(1, sizeof(*dlg_data));
@@ -1092,13 +1091,11 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			)
 			GetHNRec->PortType = IdTCPIP;
 
+		// ホスト (コマンドライン)
 		SetComboBoxHostHistory(dlg, IDC_HOSTNAME, MAXHOSTLIST, GetHNRec->SetupFNW);
-
-		SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT,
-		                   HostNameMaxLength - 1, 0);
-
+		ExpandCBWidth(dlg, IDC_HOSTNAME);
+		SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
 		SendDlgItemMessage(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
-
 		SetEditboxEmacsKeybind(dlg, IDC_HOSTNAME);
 
 		CheckRadioButton(dlg, IDC_HOSTTELNET, IDC_HOSTOTHER,
@@ -1135,6 +1132,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 
 
 		j = 0;
+		com_index = 1;
 		for (i = 0; i < dlg_data->ComPortInfoCount; i++) {
 			ComPortInfo_t *p = dlg_data->ComPortInfoPtr + i;
 			wchar_t *EntNameW;
@@ -1144,11 +1142,15 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			if (GetHNRec->MaxComPort >= 0 && i > GetHNRec->MaxComPort) {
 				continue;
 			}
-			j++;
 
 			// 使用中のポートは表示しない
 			if (CheckCOMFlag(p->port_no) == 1) {
 				continue;
+			}
+
+			j++;
+			if (GetHNRec->ComPort == p->port_no) {
+				com_index = j;
 			}
 
 			if (p->friendly_name == NULL) {
@@ -1161,18 +1163,19 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			SendDlgItemMessageA(dlg, IDC_HOSTCOM, CB_SETITEMDATA, index, i);
 			free(EntNameW);
 		}
-
-		if (j > 0)
-			SendDlgItemMessage(dlg, IDC_HOSTCOM, CB_SETCURSEL, 0, 0);	// select first com port
-		else {					/* All com ports are already used */
+		if (j > 0) {
+			// GetHNRec->ComPort を選択する
+			SendDlgItemMessageA(dlg, IDC_HOSTCOM, CB_SETCURSEL, com_index - 1, 0);
+		} else {					/* All com ports are already used */
 			GetHNRec->PortType = IdTCPIP;
 			enable_dlg_items(dlg, IDC_HOSTSERIAL, IDC_HOSTSERIAL, FALSE);
 		}
+		ExpandCBWidth(dlg, IDC_HOSTCOM);
 
 		CheckRadioButton(dlg, IDC_HOSTTCPIP, IDC_HOSTSERIAL,
 		                 IDC_HOSTTCPIP + GetHNRec->PortType - 1);
-
 		if (GetHNRec->PortType == IdTCPIP) {
+			SendMessageA(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_HOSTNAME), TRUE);
 			enable_dlg_items(dlg, IDC_HOSTCOMLABEL, IDC_HOSTCOM, FALSE);
 
 			enable_dlg_items(dlg, IDC_SSH_VERSION, IDC_SSH_VERSION, TRUE);
@@ -1181,6 +1184,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			enable_dlg_items(dlg, IDC_HISTORY, IDC_HISTORY, TRUE); // enabled
 		}
 		else {
+			SendMessageA(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_HOSTCOM), TRUE);
 			enable_dlg_items(dlg, IDC_HOSTNAMELABEL, IDC_HOSTTCPPORT,
 			                 FALSE);
 			enable_dlg_items(dlg, IDC_HOSTTCPPROTOCOLLABEL,
@@ -1191,23 +1195,9 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 
 			enable_dlg_items(dlg, IDC_HISTORY, IDC_HISTORY, FALSE); // disabled
 		}
-
-		// Host dialogにフォーカスをあてる (2004.10.2 yutaka)
-		if (GetHNRec->PortType == IdTCPIP) {
-			HWND hwnd = GetDlgItem(dlg, IDC_HOSTNAME);
-			SetFocus(hwnd);
-		} else {
-			HWND hwnd = GetDlgItem(dlg, IDC_HOSTCOM);
-			SetFocus(hwnd);
-		}
-
-		ExpandCBWidth(dlg, IDC_HOSTNAME);
-		ExpandCBWidth(dlg, IDC_HOSTCOM);
 		CenterWindow(dlg, GetParent(dlg));
 
-		// SetFocus()でフォーカスをあわせた場合、FALSEを返す必要がある。
-		// TRUEを返すと、TABSTOP対象の一番はじめのコントロールが選ばれる。
-		// (2004.11.23 yutaka)
+		// TRUEを返すと、フォーカスが移動してしまう
 		return FALSE;
 		//return TRUE;
 	}
