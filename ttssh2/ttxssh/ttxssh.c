@@ -123,8 +123,10 @@ static OSSL_PROVIDER *default_provider = NULL;
 	TTEndDialog(p1, p2)
 #undef GetPrivateProfileInt
 #undef GetPrivateProfileString
+#undef WritePrivateProfileString
 #define GetPrivateProfileInt(p1, p2, p3, p4) GetPrivateProfileIntAFileW(p1, p2, p3, p4)
 #define GetPrivateProfileString(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
+#define WritePrivateProfileString(p1, p2, p3, p4) WritePrivateProfileStringAFileW(p1, p2, p3, p4)
 
 /* This extension implements SSH, so we choose a load order in the
    "protocols" range. */
