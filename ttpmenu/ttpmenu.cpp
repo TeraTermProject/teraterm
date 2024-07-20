@@ -530,10 +530,6 @@ LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 BOOL CreateTooltip(HWND hWnd)
 {
 	wchar_t uimsg[MAX_UIMSG];
-	static const DlgTextInfo text_info[] = {
-		{ IDS_TOOLTIP_CHECK_LOCKBOX,		"MSG_TOOLTIP_CHECK_LOCKBOX" },
-		{ IDS_TOOLTIP_BUTTON_LOCKBOX,		"MSG_TOOLTIP_BUTTON_LOCKBOX" }
-	};
 
 	::InitCommonControls(); 
 
@@ -558,7 +554,6 @@ BOOL CreateTooltip(HWND hWnd)
 	AddTooltip(g_hWndMenu, BUTTON_ETC, L"Configure");
 	AddTooltip(g_hWndMenu, CHECK_TTSSH, L"use SSH");
 
-	SetI18nDlgStrsW(hWnd, "TTMenu", text_info, _countof(text_info), UILanguageFileW);
 	UTIL_get_lang_msgW("MSG_TOOLTIP_CHECK_LOCKBOX", uimsg, _countof(uimsg),
 					   L"If LockBox is enabled, login passwords are stored in LockBox encrypted.",
 					   UILanguageFileW);
@@ -2537,12 +2532,7 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		{ 0,						"DLG_LOCKBOX_TITLE" },
 		{ IDC_LOCKBOX_LABEL,		"DLG_LOCKBOX_LABEL" },
 		{ IDOK,						"BTN_OK" },
-		{ IDCANCEL,					"BTN_CANCEL" },
-		{ IDS_LOCKBOX_SHOW,			"DLG_LOCKBOX_SHOW" },
-		{ IDS_LOCKBOX_WRONG,		"DLG_LOCKBOX_WRONG" },
-		{ IDS_LOCKBOX_STRTOOLONG,	"DLG_LOCKBOX_STRTOOLONG" },
-		{ IDS_LOCKBOX_NOSTR,		"DLG_LOCKBOX_NOSTR" },
-		{ IDS_LOCKBOX_VALID,		"DLG_LOCKBOX_VALID" }
+		{ IDCANCEL,					"BTN_CANCEL" }
 	};
 
 	switch(uMsg) {
