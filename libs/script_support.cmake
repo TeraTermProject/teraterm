@@ -29,10 +29,22 @@ elseif((${CMAKE_GENERATOR} MATCHES "Unix Makefiles") OR
     (${CMAKE_GENERATOR} MATCHES "MSYS Makefiles") OR
     (${CMAKE_GENERATOR} MATCHES "MinGW Makefiles") OR
     (${CMAKE_GENERATOR} MATCHES "Ninja"))
-  if(${ARCHITECTURE} EQUAL 64)
-    set(TOOLSET "mingw_x64")
+  if(DEFINED ARCHITECTURE)
+    # for script
+    if((${ARCHITECTURE} EQUAL 64) OR (${ARCHITECTURE} STREQUAL "x86_64"))
+      set(TOOLSET "mingw_x86_64")
+    elseif((${ARCHITECTURE} EQUAL 32) OR (${ARCHITECTURE} STREQUAL "i686"))
+      set(TOOLSET "mingw_i686")
+    else()
+      message(FATAL_ERROR "check ARCHITECTURE ${ARCHITECTURE}")
+    endif()
   else()
-    set(TOOLSET "mingw")
+    # for generate/build
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(TOOLSET "mingw_x86_64")
+    else()
+      set(TOOLSET "mingw_i686")
+    endif()
   endif()
 elseif(${CMAKE_GENERATOR} MATCHES "NMake Makefiles")
   set(TOOLSET "VS_NMake")
