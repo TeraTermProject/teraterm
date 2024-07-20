@@ -66,6 +66,8 @@ if(NOT EXISTS ${SRC_DIR}/CMakeLists.txt)
     "\n"
     "if(MSVC)\n"
     "  set(CMAKE_DEBUG_POSTFIX \"d\")\n"
+    "  string(REPLACE \"/MD\" \"/MT\" CMAKE_C_FLAGS_DEBUG \${CMAKE_C_FLAGS_DEBUG})\n"
+    "  string(REPLACE \"/MD\" \"/MT\" CMAKE_C_FLAGS_RELEASE \${CMAKE_C_FLAGS_RELEASE})\n"
     "endif()\n"
     "\n"
     "add_library(\n"
