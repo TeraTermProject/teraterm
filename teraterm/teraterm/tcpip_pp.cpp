@@ -110,7 +110,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			}
 			case PSN_HELP: {
 				HWND vtwin = GetParent(GetParent(Dialog));
-				PostMessage(vtwin, WM_USER_DLGHELP2, HlpSetupTCPIP, 0);
+				PostMessage(vtwin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalTCPIP, 0);
 				break;
 			}
 			}
