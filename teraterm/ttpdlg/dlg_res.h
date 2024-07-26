@@ -153,6 +153,7 @@
 #define IDC_SFMT_VERSION                1078
 #define IDC_SERIALTEXT                  1079
 #define IDC_GENLANUI_INFO               1080
+#define IDC_BUTTON_EDITHISTORY          1081
 #define IDC_GENHELP                     1099
 #define IDD_TERMDLG                     1100
 #define IDD_WINLISTDLG                  1200
@@ -163,13 +164,13 @@
 #define IDC_OPEN_CODING                 1301
 
 // Next default values for new objects
-//
+// 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        103
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1081
+#define _APS_NEXT_CONTROL_VALUE         1082
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

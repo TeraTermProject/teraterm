@@ -40,6 +40,7 @@
 #include "helpid.h"
 #include "win32helper.h"
 #include "compat_win.h"
+#include "edithistory.h"
 
 #include "dlg_res.h"
 #include "tcpip_pp.h"
@@ -132,6 +133,12 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 						// SSHÚ‘±‚Ì‚Æ‚«‚É‚à TERM ‚ð‘—‚é‚Ì‚ÅAtelnet‚ª–³Œø‚Å‚à disabled ‚É‚µ‚È‚¢B(2005.11.3 yutaka)
 						EnableDlgItem(Dialog, IDC_TCPIPTERMTYPELABEL, IDC_TCPIPTERMTYPE);
 					}
+					break;
+				}
+				case IDC_BUTTON_EDITHISTORY: {
+					TCPIPDlgData *data = (TCPIPDlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+					PTTSet ts = data->ts;
+					EditHistoryDlg(Dialog, ts);
 					break;
 				}
 			}
