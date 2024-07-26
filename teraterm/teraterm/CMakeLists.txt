@@ -131,6 +131,9 @@ set(SRC_DIALOG
   themedlg.h
   themedlg.rc
   themedlg_res.h
+  #
+  tcpip_pp.h
+  tcpip_pp.cpp
 )
 
 target_sources(
