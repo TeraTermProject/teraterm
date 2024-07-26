@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2024-07-06 by TeraTerm Project
+date=2024-07-25 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -409,7 +409,7 @@ DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=Hostliste editieren
+DLG_TCPIP_TITLE=TCP/IP setup
 DLG_TCPIP_HOSTLIST=Hostliste
 DLG_TCPIP_ADD=Hinzufügen
 DLG_TCPIP_UP=hoch

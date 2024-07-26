@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2024-07-06 by TeraTerm Project
+date=2024-07-25 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -409,7 +409,7 @@ DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=Tera Term: Настройка TCP/IP
+DLG_TCPIP_TITLE=Настройка TCP/IP
 DLG_TCPIP_HOSTLIST=&Перечень хостов
 DLG_TCPIP_ADD=&Добавить
 DLG_TCPIP_UP=&Вверх

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Spanish
-date=2024-07-06 by TeraTerm Project
+date=2024-07-25 by TeraTerm Project
 contributor=Filiberto Olguin Ascona (2022-05-26)
 
 [Tera Term]
@@ -409,7 +409,7 @@ DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=Tera Term: TCP/IP setup
+DLG_TCPIP_TITLE=TCP/IP setup
 DLG_TCPIP_HOSTLIST=Host &list
 DLG_TCPIP_ADD=&Add
 DLG_TCPIP_UP=&Up

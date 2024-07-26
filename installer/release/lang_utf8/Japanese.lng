@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2024-07-18 by TeraTerm Project
+date=2024-07-25 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -409,7 +409,7 @@ DLG_SERIAL_OK_OPEN=新規オープン(&N)
 DLG_SERIAL_OK_CLOSEOPEN=クローズ＆新規オープン(&N)
 DLG_SERIAL_OK_RESET=現在の接続を再設定(&N)
 
-DLG_TCPIP_TITLE=Tera Term: TCP/IP 設定
+DLG_TCPIP_TITLE=TCP/IP 設定
 DLG_TCPIP_HOSTLIST=ホストリスト(&L)
 DLG_TCPIP_ADD=追加(&A)
 DLG_TCPIP_UP=上へ(&U)

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2024-07-06 by TeraTerm Project
+date=2024-07-25 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -409,7 +409,7 @@ DLG_SERIAL_OK_OPEN=&புதிய திறந்தது
 DLG_SERIAL_OK_CLOSEOPEN=மூடு மற்றும் &புதிய திற
 DLG_SERIAL_OK_RESET=&புதிய அமைப்பு
 
-DLG_TCPIP_TITLE=தேரா முனை: பகநெ/இநெ அமைவு
+DLG_TCPIP_TITLE=பகநெ/இநெ அமைவு
 DLG_TCPIP_HOSTLIST=புரவலன் &பட்டியல்
 DLG_TCPIP_ADD=&சேர்
 DLG_TCPIP_UP=&மேல்
