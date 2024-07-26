@@ -81,12 +81,6 @@
 #define IDC_SERIALDELAYLINE             408
 #define IDC_SERIALHELP                  499
 #define IDD_TCPIPDLG                    500
-#define IDC_TCPIPHOST                   501
-#define IDC_TCPIPADD                    502
-#define IDC_TCPIPLIST                   503
-#define IDC_TCPIPUP                     504
-#define IDC_TCPIPREMOVE                 505
-#define IDC_TCPIPDOWN                   506
 #define IDC_TCPIPHISTORY                507
 #define IDC_TCPIPAUTOCLOSE              508
 #define IDC_TCPIPPORT                   509
@@ -137,7 +131,6 @@
 #define IDC_SERIALDELAY                 1046
 #define IDC_TCPIPPROT                   1047
 #define IDC_TCPIPPORTLABEL              1048
-#define IDC_TCPIPHOSTLIST               1049
 #define IDC_WINTITLELABEL               1050
 #define IDC_WINCURSOR                   1051
 #define IDC_WINREDLABEL                 1052

@@ -186,6 +186,15 @@ target_sources(
 target_sources(
   ${PACKAGE_NAME}
   PRIVATE
+  ../../teraterm/common/edithistory.cpp
+  ../../teraterm/common/edithistory.h
+  ../../teraterm/common/edithistory.rc
+  ../../teraterm/common/edithistory_res.h
+)
+
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
   ../susie_plugin/libsusieplugin.cpp
   ../susie_plugin/libsusieplugin.h
 )
