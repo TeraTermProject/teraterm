@@ -1,6 +1,6 @@
 
 #
-# Export Tera Term Menu registry to ini file.
+# Export TeraTerm Menu registry to ini file.
 #   with PowerShell
 #
 # Usage:

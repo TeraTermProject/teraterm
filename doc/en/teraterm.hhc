@@ -132,7 +132,7 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Tera Term Menu">
+			<param name="Name" value="TeraTerm Menu">
 			<param name="Local" value="html\usage\TTMenu\TTMenu.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
