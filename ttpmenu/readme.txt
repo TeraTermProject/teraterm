@@ -225,7 +225,7 @@ TeraTerm Menu 1.20 (2024.7.28)
 ・Detailsダイアログで実行ファイル名に"ttermpro.exe"か含まれている場合に"use SSH"のチェックボックスがONになる処理をなくした。
 ・情報漏洩のリスクを加筆した。
 ・List Configurationダイアログのタイトルの誤字を修正した。(Cofiguration -> Configuration)
-・本ドキュメントがTera Termのインストーラー/アーカイブ(zip)で更新されるよう修正した。
+・本ドキュメントがTera Termのインストーラー/アーカイブ(zip)に反映されるよう修正した。
 
 TeraTerm Menu 1.19 (2024.2.29)
 
