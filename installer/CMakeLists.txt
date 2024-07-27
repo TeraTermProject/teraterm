@@ -49,6 +49,12 @@ install(
   RENAME KEYBOARD.CNF
   )
 
+install(
+  FILES ../ttpmenu/readme.txt
+  DESTINATION .
+  RENAME ttmenu_readme-j.txt
+)
+
 # Inno Setup
 #  Create setup.exe
 if(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
