@@ -57,6 +57,7 @@ typedef struct {
 static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
+		{ IDC_TCPIPHISTORYTITLE, "DLG_TCPIP_HISTORYTITLE" },
 		{ IDC_TCPIPHISTORY, "DLG_TCPIP_HISTORY" },
 		{ IDC_TCPIPAUTOCLOSE, "DLG_TCPIP_AUTOCLOSE" },
 		{ IDC_TCPIPPORTLABEL, "DLG_TCPIP_PORT" },
@@ -135,7 +136,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					}
 					break;
 				}
-				case IDC_BUTTON_EDITHISTORY: {
+				case IDC_TCPIP_EDITHISTORY: {
 					TCPIPDlgData *data = (TCPIPDlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
 					PTTSet ts = data->ts;
 					EditHistoryDlg(Dialog, ts);

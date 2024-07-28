@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2024-07-25 by TeraTerm Project
+date=2024-07-28 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -415,12 +415,13 @@ DLG_TCPIP_ADD=&Ajouter
 DLG_TCPIP_UP=Monte
 DLG_TCPIP_REMOVE=&Supprime
 DLG_TCPIP_DOWN=&Descend
-DLG_TCPIP_HISTORY=H&istori.
+DLG_TCPIP_HISTORYTITLE=History
+DLG_TCPIP_HISTORY=Save h&istory when new connection
 DLG_TCPIP_KEEPALIVE=Temps de maintien
 DLG_TCPIP_KEEPALIVE_SEC=Sec
 DLG_TCPIP_AUTOCLOSE=Fermeture auto de la fenêtre
 DLG_TCPIP_PORT=N° de &Port:
-DLG_TCPIP_TELNET=T&elnet
+DLG_TCPIP_TELNET=T&elnet (Not used when SSH plugin is used)
 DLG_TCPIP_TERMTYPE=Type &Terminal:
 
 DLG_TERM_TITLE=Tera Term: Configuration du Terminal

@@ -89,7 +89,12 @@
 #define IDC_TCPIPTERMTYPE               512
 #define IDC_TCPIPTELNETKEEPALIVE        513
 #define IDC_TCPIPTELNETKEEPALIVESEC     514
-#define IDC_TCPIPHELP                   599
+#define IDC_TCPIP_EDITHISTORY           515
+#define IDC_TCPIPHISTORYTITLE           516
+#define IDC_TCPIPPROT                   517
+#define IDC_TCPIPPORTLABEL              518
+#define IDC_TCPIPTELNETKEEPALIVELABEL   519
+#define IDC_TCPIPTELNETTITLE            520
 #define IDD_HOSTDLG                     600
 #define IDC_HOSTTCPIP                   601
 #define IDC_HOSTSERIAL                  602
@@ -129,8 +134,6 @@
 #define IDC_SERIALDELAYLINE_LABEL       1044
 #define IDC_SERIALDELAYCHAR_LABEL       1045
 #define IDC_SERIALDELAY                 1046
-#define IDC_TCPIPPROT                   1047
-#define IDC_TCPIPPORTLABEL              1048
 #define IDC_WINTITLELABEL               1050
 #define IDC_WINCURSOR                   1051
 #define IDC_WINREDLABEL                 1052
@@ -146,14 +149,12 @@
 #define IDC_TERMKANJILABEL              1062
 #define IDC_TERMKANJISENDLABEL          1063
 #define IDC_WINLISTLABEL                1068
-#define IDC_TCPIPTELNETKEEPALIVELABEL   1069
 #define IDC_SELECT_DIR                  1070
 #define IDC_BUILDTOOL                   1072
 #define IDC_GENLANG_UI                  1077
 #define IDC_SFMT_VERSION                1078
 #define IDC_SERIALTEXT                  1079
 #define IDC_GENLANUI_INFO               1080
-#define IDC_BUTTON_EDITHISTORY          1081
 #define IDC_GENHELP                     1099
 #define IDD_TERMDLG                     1100
 #define IDD_WINLISTDLG                  1200
@@ -164,7 +165,7 @@
 #define IDC_OPEN_CODING                 1301
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1

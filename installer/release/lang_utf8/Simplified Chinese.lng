@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2024-07-25 by TeraTerm Project
+date=2024-07-28 by TeraTerm Project
 contributor=LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -415,12 +415,13 @@ DLG_TCPIP_ADD=添加(&A)
 DLG_TCPIP_UP=上移(&U)
 DLG_TCPIP_REMOVE=移除(&R)
 DLG_TCPIP_DOWN=下移(&D)
-DLG_TCPIP_HISTORY=历史(&I)
+DLG_TCPIP_HISTORYTITLE=历史
+DLG_TCPIP_HISTORY=Save h&istory when new connection
 DLG_TCPIP_KEEPALIVE=保持激活(&K)
 DLG_TCPIP_KEEPALIVE_SEC=秒
 DLG_TCPIP_AUTOCLOSE=自动关闭窗口(&W)
 DLG_TCPIP_PORT=端口(&P)：
-DLG_TCPIP_TELNET=T&elnet
+DLG_TCPIP_TELNET=T&elnet (Not used when SSH plugin is used)
 DLG_TCPIP_TERMTYPE=终端类型(&T)：
 
 DLG_TERM_TITLE=Tera Term：终端设置
