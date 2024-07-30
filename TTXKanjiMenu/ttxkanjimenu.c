@@ -76,7 +76,7 @@ static const MenuInfo MenuNameRecvK[] = {
 	{ ID_MI_USEONESETTING,		0,				L"Use &one setting",	"MENU_USE_ONE_SETTING" },
 };
 
-// 送受同信漢字コード (韓国語)
+// 送受同漢字コード (韓国語)
 static const MenuInfo MenuNameOneK[] = {
 	{ ID_MI_KANJIRECV + 0,		IdKoreanCP949,	L"Recv/Send: &KS5601",	"MENU_KS5601" },
 	{ ID_MI_KANJIRECV + 1,		IdUTF8, 		L"Recv/Send: &UTF-8",	"MENU_UTF8" },
@@ -447,6 +447,14 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 		BOOL r = GetMenuItemInfoW(pvar->hmEncode, cmd, FALSE, &mi);
 		assert(r != FALSE); (void)r;
 		val = (WORD)mi.dwItemData;		// メニューの漢字コード
+		// Hide menu bar あるいは Hide title bar の場合
+		// val が 0 となる問題の ad hoc な対策
+		if (val == 0) {
+			val = cmd % ID_MI_KANJIRECV + 1;
+			if (val >= (ID_MI_KANJISEND - ID_MI_KANJIRECV)) {
+				val -= (ID_MI_KANJISEND - ID_MI_KANJIRECV);
+			}
+		}
 
 		if (cmd < ID_MI_KANJISEND) {
 			if (pvar->UseOneSetting) {
