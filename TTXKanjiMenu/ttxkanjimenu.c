@@ -76,7 +76,7 @@ static const MenuInfo MenuNameRecvK[] = {
 	{ ID_MI_USEONESETTING,		0,				L"Use &one setting",	"MENU_USE_ONE_SETTING" },
 };
 
-// 送受同信漢字コード (韓国語)
+// 送受同漢字コード (韓国語)
 static const MenuInfo MenuNameOneK[] = {
 	{ ID_MI_KANJIRECV + 0,		IdKoreanCP949,	L"Recv/Send: &KS5601",	"MENU_KS5601" },
 	{ ID_MI_KANJIRECV + 1,		IdUTF8, 		L"Recv/Send: &UTF-8",	"MENU_UTF8" },
@@ -433,6 +433,17 @@ static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 	CheckMenuItem(pvar->hmEncode, ID_MI_USEONESETTING, MF_BYCOMMAND | (pvar->UseOneSetting)?MF_CHECKED:0);
 }
 
+static const MenuInfo *SearchMenuItem(const MenuInfo *menu_info_ptr, size_t menu_info_count, UINT cmd_id)
+{
+	size_t i;
+	for (i = 0; i < menu_info_count; i++) {
+		if (menu_info_ptr->id == cmd_id) {
+			return menu_info_ptr;
+		}
+		menu_info_ptr++;
+	}
+	return NULL;
+}
 
 /*
  * This function is called when Tera Term receives a command message.
@@ -441,13 +452,18 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	WORD val;
 
 	if ((cmd >= ID_MI_KANJIRECV) && (cmd < ID_MI_USEONESETTING)) {
-		MENUITEMINFOW mi = {0};
-		mi.cbSize = sizeof(mi);
-		mi.fMask = MIIM_DATA | MIIM_ID;
-		BOOL r = GetMenuItemInfoW(pvar->hmEncode, cmd, FALSE, &mi);
-		assert(r != FALSE); (void)r;
-		val = (WORD)mi.dwItemData;		// メニューの漢字コード
-
+		/*
+		 *	タイトルバーorメニューバーを隠してポップアップメニューで表示しているとき
+		 *	この関数がコールされたとき、メニュは DestroyMenu() されている。
+		 *	この関数内では GetMenuItemInfoW() が使えない
+		 */
+		const MenuInfo *menu_info_ptr = SearchMenuItem(pvar->menu_info_ptr, pvar->menu_info_count, cmd);
+		if (menu_info_ptr == NULL) {
+			// 知らないコマンド?
+			assert(FALSE);
+			return 0;
+		}
+		val = (WORD)menu_info_ptr->data;
 		if (cmd < ID_MI_KANJISEND) {
 			if (pvar->UseOneSetting) {
 				// 送受コード
