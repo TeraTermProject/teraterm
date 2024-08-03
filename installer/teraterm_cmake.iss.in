@@ -108,7 +108,7 @@ Source: @CMAKE_INSTALL_PREFIX@/cygterm.cfg; DestDir: {app}; Components: cygterm
 Source: @CMAKE_INSTALL_PREFIX@/cygterm+-x86_64\cygterm.exe; DestDir: {app}; Components: cygterm
 Source: @CMAKE_INSTALL_PREFIX@/cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: @CMAKE_INSTALL_PREFIX@/ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
-Source: @PROJECT_SOURCE_DIR@/installer\release\ttmenu_readme-j.txt; DestDir: {app}; Components: TeraTerm_Menu
+Source: @PROJECT_SOURCE_DIR@/ttpmenu\readme.txt; DestDir: {app}; DestName: "ttmenu_readme-j.txt"; Components: TeraTerm_Menu
 Source: @CMAKE_INSTALL_PREFIX@/TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion
 Source: @PROJECT_SOURCE_DIR@/installer\release\theme\Advanced.sample; DestDir: {app}\theme\; Components: TeraTerm
 Source: @PROJECT_SOURCE_DIR@/installer\release\theme\ImageFile.INI; DestDir: {app}\theme\; Components: TeraTerm

@@ -520,7 +520,7 @@ void CCopypastePropPageDlg::OnOK()
 
 void CCopypastePropPageDlg::OnHelp()
 {
-	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalCopyAndPaste, 0);
 }
 
 // CVisualPropPageDlg ダイアログ
