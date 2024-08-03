@@ -120,14 +120,14 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>Delimiter characters<a href="../menu/setup-additional.html#DelimiterChar">(dialog</a>, <a href="../setup/teraterm-win.html#delimiter">TERATERM.INI)</a> can use Unicode.</li>
+      <li>Delimiter characters<a href="../menu/setup-additional-copy-and-paste.html#DelimiterChar">(dialog</a>, <a href="../setup/teraterm-win.html#delimiter">TERATERM.INI)</a> can use Unicode.</li>
       <li>Modify TCP/IP setup dialog.</li>
       <ul>
         <li>Dialog can now be resized.</li>
         <li>Host list can be scrolled horizontally.</li>
         <li>Host list is wider.</li>
       </ul>
-      <li><a href="../setup/teraterm-win.html#autocopy">Auto text copying</a> can be enabled/disabled on <a href="../menu/setup-additional.html#AutoTextCopy">Copy and Paste tab of Additional settings dialog</a>.</li>
+      <li><a href="../setup/teraterm-win.html#autocopy">Auto text copying</a> can be enabled/disabled on <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy and Paste tab of Additional settings dialog</a>.</li>
       <li>Add <a href="../menu/setup-additional-theme.html">Theme tab</a> to "Additional settings" dialog.</li>
       <li>Remove UTF8m in <a href="../commandline/teraterm.html#kr">/KR</a>, <a href="../commandline/teraterm.html#kt">/KT</a> command line options.</li>
       <li>MACRO: Dialog displayed using <a href="../macro/command/listbox.html">listbox</a> command can now be resized.</li>
@@ -386,7 +386,7 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>The <a href="../setup/teraterm-win.html#textselect">Disabling text selection when the window is activated by mouse</a> configuration can be set up on the <a href="../menu/setup-additional.html#SelectOnActivate">Additional settings dialog</a>.</li>
+      <li>The <a href="../setup/teraterm-win.html#textselect">Disabling text selection when the window is activated by mouse</a> configuration can be set up on the <a href="../menu/setup-additional-copy-and-paste.html#SelectOnActivate">Additional settings dialog</a>.</li>
       <li>The environment variable included in <a href="../menu/file-chdir.html">directory for file transfers</a> becomes to be expanded.</li>
       <li>Unspecified string font in IME uses your defined font.</li>
       <li>Added help button on Additional settings dialog.</li>
@@ -789,7 +789,7 @@
     <ul>
       <li>added new feature which removes carriage return from end of line with pasting. The default value is off.
         <ul>
-          <li>The function can be enabled at Copy and Paste tab of <a href="../menu/setup-additional.html#TrimTrailingNL">Additional settings dialog</a>.</li>
+          <li>The function can be enabled at Copy and Paste tab of <a href="../menu/setup-additional-copy-and-paste.html#TrimTrailingNL">Additional settings dialog</a>.</li>
         </ul></li>
       <li>When scroll back is used, scroll state is always reset with user input.</li>
       <li>ZMODEM: The default escaped character are added LF and GS by sending.</li>
@@ -1351,7 +1351,7 @@
         </ul></li>
       <li>When the URL string ends at the right row and return code, the URL string continues to next line by mistake.</li>
       <li>The URL string on the mouse hand cursor shifts to the left with half character by mistake.</li>
-      <li>MACRO: The send/sendln command can be affected by the <a href="../menu/setup-additional.html#PasteDelayPerLine">Paste delay per line</a> configuration.</li>
+      <li>MACRO: The send/sendln command can be affected by the <a href="../menu/setup-additional-copy-and-paste.html#PasteDelayPerLine">Paste delay per line</a> configuration.</li>
       <li>MACRO: When the timeout is 0, the <a href="../macro/command/waitn.html">waitn</a> command can not wait any character.</li>
       <li>MACRO: When the break command is executed after the continue command, the Invalid Control error will be occurred.</li>
       <li>MACRO: The box-style macro command can not show the dialog position well on the multi display.</li>
@@ -2092,7 +2092,7 @@
         </ul></li>
       <li>added support for specifying any strings as the ConfirmChangePaste function.
         <ul>
-          <li>added the <a href="../menu/setup-additional.html#ConfirmChangePasteStringFile">ConfirmChangePasteStringFile</a> entry in the teraterm.ini file. A user can specify a text file path enumerating any strings.</li>
+          <li>added the <a href="../menu/setup-additional-copy-and-paste.html#ConfirmChangePasteStringFile">ConfirmChangePasteStringFile</a> entry in the teraterm.ini file. A user can specify a text file path enumerating any strings.</li>
         </ul></li>
       <li>added the Wait4allMacroCommand entry in the teraterm.ini file. The default is off. Turn on the value to enable the "<a href="../macro/command/wait4all.html">wait4all</a>" macro command.</li>
       <li>added the new option of the "<a href="../macro/command/exec.html">exec</a>" macro command that the application exit code is stored in the result variable.</li>
@@ -2525,7 +2525,7 @@
       <li>Bug fix: the transparency of window could not change to 255.</li>
       <li>Bug fix: last 1 character of title string that is sent from server is deleted.</li>
       <li>Bug fix: TeraTerm would use the configuration of TCPLocalEcho/TCPCRSend when the user start telnet connection on New connection dialog.</li>
-      <li>Bug fix: when <a href="../menu/setup-additional.html#EnableContinuedLineCopy">continued line copy</a> is enabled, <a href="../menu/edit.html#copytable">Copy Table</a> does not work correctly</li>
+      <li>Bug fix: when <a href="../menu/setup-additional-copy-and-paste.html#EnableContinuedLineCopy">continued line copy</a> is enabled, <a href="../menu/edit.html#copytable">Copy Table</a> does not work correctly</li>
       <li>Bug fix: when <a href="../menu/setup-additional-keyboard.html#DeleteKey">Transmit DEL by Delete key</a> is enabled and Num Lock status is off, Numeric Keypad "." sends DEL.</li>
       <li>Bug fix: '<a href="../macro/command/wait.html">wait</a>' macro command can't wait a long string. This bug was introduced in 4.54.</li>
       <li>Bug fix: The color value on <a href="../menu/setup-window.html">Window setup dialog</a> would become 255 when the value is less than 16 and the user pushes PageUP key.</li>
