@@ -1,6 +1,6 @@
 ﻿[Info]
 language=English
-date=2024-07-28 by TeraTerm Project
+date=2024-08-03 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -409,19 +409,26 @@ DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=TCP/IP setup
-DLG_TCPIP_HOSTLIST=Host &list
+; edit history
 DLG_TCPIP_ADD=&Add
 DLG_TCPIP_UP=&Up
 DLG_TCPIP_REMOVE=&Remove
 DLG_TCPIP_DOWN=&Down
+
+; TCP/IP tab
+DLG_TCPIP_TITLE=TCP/IP setup
+DLG_TCPIP_HOSTLIST=Host &list
+DLG_TCPIP_NEWCONNECTION=New connection
 DLG_TCPIP_HISTORYTITLE=History
 DLG_TCPIP_HISTORY=Save h&istory when new connection
+DLG_TCPIP_EDITHISTORY=Edit hisotry
+DLG_TCPIP_DEFAULT_PORT=Default &port:
+DLG_TCPIP_SERVICE_TITLE=TCP/IP Service (Ignored when SSH plugin is available)
+DLG_TCPIP_PORT=TCP/IP &Port#:
+DLG_TCPIP_SERIAL_PORT=Serial Port#
 DLG_TCPIP_KEEPALIVE=&Keep alive on Telnet
 DLG_TCPIP_KEEPALIVE_SEC=Sec
 DLG_TCPIP_AUTOCLOSE=Auto &window close
-DLG_TCPIP_PORT=&Port#:
-DLG_TCPIP_TELNET=T&elnet (Not used when SSH plugin is used)
 DLG_TCPIP_TERMTYPE=&Term type:
 
 DLG_TERM_TITLE=Tera Term: Terminal setup

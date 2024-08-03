@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2024-07-28 by TeraTerm Project
+date=2024-08-03 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -409,19 +409,26 @@ DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=TCP/IP 설정
-DLG_TCPIP_HOSTLIST=호스트 목록(&L)
+; edit history
 DLG_TCPIP_ADD=추가(&A)
 DLG_TCPIP_UP=위(&U)
 DLG_TCPIP_REMOVE=삭제(&R)
 DLG_TCPIP_DOWN=아래(&D)
+
+; TCP/IP tab
+DLG_TCPIP_TITLE=TCP/IP 설정
+DLG_TCPIP_HOSTLIST=호스트 목록(&L)
+DLG_TCPIP_NEWCONNECTION=New connection
 DLG_TCPIP_HISTORYTITLE=이력
 DLG_TCPIP_HISTORY=Save h&istory when new connection
+DLG_TCPIP_EDITHISTORY=Edit hisotry
+DLG_TCPIP_DEFAULT_PORT=Default &port:
+DLG_TCPIP_SERVICE_TITLE=TCP/IP Service (Ignored when SSH plugin is available)
+DLG_TCPIP_PORT=TCP/IP 포트#(&P):
+DLG_TCPIP_SERIAL_PORT=Serial Port#
 DLG_TCPIP_KEEPALIVE=연결유지(&K)
 DLG_TCPIP_KEEPALIVE_SEC=초
 DLG_TCPIP_AUTOCLOSE=자동 창닫기(&W)
-DLG_TCPIP_PORT=포트#(&P):
-DLG_TCPIP_TELNET=텔넷(&E) (Not used when SSH plugin is used)
 DLG_TCPIP_TERMTYPE=종류(&T):
 
 DLG_TERM_TITLE=Tera Term: 터미널 설정
