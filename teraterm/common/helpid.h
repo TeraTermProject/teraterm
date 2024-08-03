@@ -313,6 +313,7 @@
 #define HlpMacroCommandGettime          92047
 #define HlpMacroCommandGettitle         92048
 #define HlpMacroCommandGetttdir         92140
+#define HlpMacroCommandGetttpos         92223
 #define HlpMacroCommandGetver           92133
 #define HlpMacroCommandGoto             92049
 #define HlpMacroCommandIfdefined        92115

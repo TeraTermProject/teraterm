@@ -60,6 +60,7 @@
 #include "vtterm.h"
 #include "ttcstd.h"
 #include "ddelib.h"
+#include "vtdisp.h"
 
 #define ServiceName "TERATERM"
 #define ItemName "DATA"
@@ -1071,6 +1072,16 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 				_snprintf_s(ParamFileName, sizeof(ParamFileName), _TRUNCATE, "COM%d", ts.ComPort);
 			}
 		}
+		break;
+
+	case CmdGetTTPos:
+		int x, y, width, height, minimized;
+		DispGetWindowPos(&x, &y, TRUE);
+		DispGetWindowSize(&width, &height, TRUE);
+		minimized = DispWindowIconified() ? 1 : 0;
+		_snprintf_s(ParamFileName, sizeof(ParamFileName), _TRUNCATE,
+			    "%d %d %d %d %d",
+			    x, y, width, height, minimized);
 		break;
 
 	case CmdSendBroadcast: { // 'sendbroadcast'

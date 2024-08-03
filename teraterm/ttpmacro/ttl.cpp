@@ -2878,6 +2878,46 @@ static WORD TTLGetModemStatus(void)
 	return Err;
 }
 
+static WORD TTLGetTTPos(void)
+{
+	WORD Err;
+	TVarId x, y, width, height, minimized;
+	char Str[MaxStrLen];
+
+	Err = 0;
+	GetIntVar(&x,         &Err); // x,y = テキスト領域の左上隅
+	GetIntVar(&y,         &Err);
+	GetIntVar(&width,     &Err);
+	GetIntVar(&height,    &Err);
+	GetIntVar(&minimized, &Err);
+	if ((Err == 0) && (GetFirstChar() != 0)) {
+		Err = ErrSyntax;
+    }
+	if ((Err == 0) && (! Linked)) {
+		Err = ErrLinkFirst;
+	}
+	if (Err != 0) {
+		return Err;
+	}
+
+	Err = GetTTParam(CmdGetTTPos, Str, sizeof(Str));
+	if (Err == 0) {
+		int tmp_x, tmp_y, tmp_width, tmp_height, tmp_minimized;
+		if (sscanf_s(Str, "%d %d %d %d %d", &tmp_x, &tmp_y, &tmp_width, &tmp_height, &tmp_minimized) == 5) {
+			SetIntVal(x,         tmp_x);
+			SetIntVal(y,         tmp_y);
+			SetIntVal(width,     tmp_width);
+			SetIntVal(height,    tmp_height);
+			SetIntVal(minimized, tmp_minimized);
+			SetResult(0);
+		} else {
+			SetResult(-1);
+		}
+	}
+
+	return Err;
+}
+
 //
 // Tera Term のバージョン取得 & 比較
 // バージョン番号はコンパイル時に決定する。
@@ -6052,6 +6092,8 @@ static int ExecCmnd(void)
 			Err = TTLGetTitle(); break;
 		case RsvGetTTDir:
 			Err = TTLGetTTDir(); break;
+		case RsvGetTTPos:
+			Err = TTLGetTTPos(); break;
 		case RsvGetVer:
 			Err = TTLGetVer(); break;
 		case RsvGoto:

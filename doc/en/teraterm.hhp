@@ -281,6 +281,7 @@ HlpMacroCommandGetspecialfolder=html\macro\command\getspecialfolder.html
 HlpMacroCommandGettime=html\macro\command\gettime.html
 HlpMacroCommandGettitle=html\macro\command\gettitle.html
 HlpMacroCommandGetttdir=html\macro\command\getttdir.html
+HlpMacroCommandGetttpos=html\macro\command\getttpos.html
 HlpMacroCommandGetver=html\macro\command\getver.html
 HlpMacroCommandGoto=html\macro\command\goto.html
 HlpMacroCommandIfdefined=html\macro\command\ifdefined.html
