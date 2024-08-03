@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>getttpos</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>getttpos</h1>
+
+<p>
+Retrieve the position, size, and minimized state of the text area in the VT window of Tera Term. <em>(version 5.3 or later)</em>
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+getttpos &lt;x&gt; &lt;y&gt; &lt;width&gt; &lt;height&gt; &lt;minimized&gt;
+</pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">Integer variable &lt;x&gt;</dt>
+	<dd>The X coordinate of the top-left corner of the text area is stored. (Unit:Pixels)<br>
+            If the VT window is in a minimized state, the stored value is incorrect.</dd>
+
+	<dt class="macro">Integer variable &lt;y&gt;</dt>
+	<dd>The Y coordinate of the top-left corner of the text area is stored. (Unit:Pixels)<br>
+            If the VT window is in a minimized state, the stored value is incorrect.</dd>
+
+	<dt class="macro">Integer variable &lt;width&gt;</dt>
+	<dd>The width of the text area is stored. (Unit:Pixels)<br>
+            If the VT window is in a minimized state, the stored value is incorrect.</dd>
+
+	<dt class="macro">Integer variable &lt;height&gt;</dt>
+	<dd>The height of the text area is stored. (Unit:Pixels)<br>
+            If the VT window is in a minimized state, the stored value is incorrect.</dd>
+	</dd>
+
+	<dt class="macro">Integer variable &lt;minimized&gt;</dt>
+	<dd>The minimized state of the VT window is stored.<br>
+            0 : Normal. (non-iconified)<br>
+            1 : Iconified.</dd>
+</dl>
+
+<h2>Return Value</h2>
+
+<dl>
+	<dt class="macro">System variable &lt;result&gt;</dt>
+	<dd>If the information retrieval is successful, the value 0 is stored. <br>
+	    If it fails, the value -1 is stored.</dd>
+</dl>
+
+<h2>Remarks</h2>
+
+<p>
+&lt;x&gt; and &lt;y&gt; represent the screen coordinates (X, Y). The origin (0, 0) refers to the top-left corner of the main display (primary display).<br>
+If the MACRO is not linked to Tera Term, it will result in a macro error and the execution of the macro will be temporarily paused.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+testlink
+if result > 1 then
+:start
+  getttpos x y width height minimized
+  if minimized = 1 then
+    showtt 1
+    goto start
+  endif
+  setdlgpos x y
+  sprintf2 str 'x=%d, y=%d, width=%d, height=%d' x y width height
+  messagebox str 'x,y = top-left of the text area'
+endif
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="testlink.html">testlink</a></li>
+  <li><a href="showtt.html">showtt</a></li>
+  <li><a href="setdlgpos.html">setdlgpos</a></li>
+</ul>
+
+</body>
+</html>
