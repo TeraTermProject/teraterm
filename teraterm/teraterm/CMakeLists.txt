@@ -131,6 +131,9 @@ set(SRC_DIALOG
   themedlg.h
   themedlg.rc
   themedlg_res.h
+  #
+  tcpip_pp.h
+  tcpip_pp.cpp
 )
 
 target_sources(
@@ -181,6 +184,15 @@ target_sources(
   ../common/dllutil.h
   ../common/codeconv.h
   ../common/tipwin.h
+)
+
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
+  ../../teraterm/common/edithistory.cpp
+  ../../teraterm/common/edithistory.h
+  ../../teraterm/common/edithistory.rc
+  ../../teraterm/common/edithistory_res.h
 )
 
 target_sources(

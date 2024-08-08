@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024- TeraTerm Project
+ * (C) 2024- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,16 +26,16 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* tcpip dialog */
+#pragma once
 
 #include <windows.h>
 
-#include "tttypes.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "ttdlg.h"
+HPROPSHEETPAGE TcpIPPageCreate(HINSTANCE inst, TTTSet *pts);
 
-BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts)
-{
-	MessageBoxA(WndParent, "TCPIP Dialog was deleteed", "teraterm", MB_OK);
-	return FALSE;
+#ifdef __cplusplus
 }
+#endif
