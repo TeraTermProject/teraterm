@@ -2881,15 +2881,22 @@ static WORD TTLGetModemStatus(void)
 static WORD TTLGetTTPos(void)
 {
 	WORD Err;
-	TVarId x, y, width, height, minimized;
+	TVarId showflag;
+	TVarId w_x, w_y, w_width, w_height;
+	TVarId c_x, c_y, c_width, c_height;
 	char Str[MaxStrLen];
 
 	Err = 0;
-	GetIntVar(&x,         &Err); // x,y = テキスト領域の左上隅
-	GetIntVar(&y,         &Err);
-	GetIntVar(&width,     &Err);
-	GetIntVar(&height,    &Err);
-	GetIntVar(&minimized, &Err);
+	GetIntVar(&showflag, &Err); // 0:通常状態、1:最小化状態、2:最大化状態、3:非可視状態
+	GetIntVar(&w_x,      &Err); // w_x, w_y = ウインドウ領域の左上隅
+	GetIntVar(&w_y,      &Err);
+	GetIntVar(&w_width,  &Err);
+	GetIntVar(&w_height, &Err);
+	GetIntVar(&c_x,      &Err); // c_x, c_y = クライアント(テキスト)領域の左上隅
+	GetIntVar(&c_y,      &Err);
+	GetIntVar(&c_width,  &Err);
+	GetIntVar(&c_height, &Err);
+
 	if ((Err == 0) && (GetFirstChar() != 0)) {
 		Err = ErrSyntax;
     }
@@ -2902,13 +2909,21 @@ static WORD TTLGetTTPos(void)
 
 	Err = GetTTParam(CmdGetTTPos, Str, sizeof(Str));
 	if (Err == 0) {
-		int tmp_x, tmp_y, tmp_width, tmp_height, tmp_minimized;
-		if (sscanf_s(Str, "%d %d %d %d %d", &tmp_x, &tmp_y, &tmp_width, &tmp_height, &tmp_minimized) == 5) {
-			SetIntVal(x,         tmp_x);
-			SetIntVal(y,         tmp_y);
-			SetIntVal(width,     tmp_width);
-			SetIntVal(height,    tmp_height);
-			SetIntVal(minimized, tmp_minimized);
+		int tmp_showflag;
+		int tmpw_x, tmpw_y, tmpw_width, tmpw_height;
+		int tmpc_x, tmpc_y, tmpc_width, tmpc_height;
+		if (sscanf_s(Str, "%d %d %d %d %d %d %d %d %d", &tmp_showflag,
+					 &tmpw_x, &tmpw_y, &tmpw_width, &tmpw_height,
+					 &tmpc_x, &tmpc_y, &tmpc_width, &tmpc_height) == 9) {
+			SetIntVal(showflag, tmp_showflag);
+			SetIntVal(w_x,      tmpw_x);
+			SetIntVal(w_y,      tmpw_y);
+			SetIntVal(w_width,  tmpw_width);
+			SetIntVal(w_height, tmpw_height);
+			SetIntVal(c_x,      tmpc_x);
+			SetIntVal(c_y,      tmpc_y);
+			SetIntVal(c_width,  tmpc_width);
+			SetIntVal(c_height, tmpc_height);
 			SetResult(0);
 		} else {
 			SetResult(-1);

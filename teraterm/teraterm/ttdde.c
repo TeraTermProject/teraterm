@@ -1075,13 +1075,34 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 
 	case CmdGetTTPos:
-		int x, y, width, height, minimized;
-		DispGetWindowPos(&x, &y, TRUE);
-		DispGetWindowSize(&width, &height, TRUE);
-		minimized = DispWindowIconified() ? 1 : 0;
+		int showflag;
+		int w_x, w_y, w_width, w_height;	// ウインドウ領域
+		int c_x, c_y, c_width, c_height;	// クライアント領域
+		RECT r;
+
+		if (IsIconic(HVTWin) == TRUE) {
+		    showflag = 1;
+		} else if (IsZoomed(HVTWin) == TRUE) {
+		    showflag = 2;
+		} else if (IsWindowVisible(HVTWin) == FALSE) {
+		    showflag = 3;
+		} else {
+		    showflag = 0;
+		}
+
+		GetWindowRect(HVTWin, &r);
+		w_x      = r.left;
+		w_y      = r.top;
+		w_width	 = r.right  - r.left;
+		w_height = r.bottom - r.top;
+
+		DispGetWindowPos(&c_x, &c_y, TRUE);
+		DispGetWindowSize(&c_width, &c_height, TRUE);
+
 		_snprintf_s(ParamFileName, sizeof(ParamFileName), _TRUNCATE,
-			    "%d %d %d %d %d",
-			    x, y, width, height, minimized);
+			    "%d %d %d %d %d %d %d %d %d", showflag,
+			    w_x, w_y, w_width, w_height,
+			    c_x, c_y, c_width, c_height);
 		break;
 
 	case CmdSendBroadcast: { // 'sendbroadcast'

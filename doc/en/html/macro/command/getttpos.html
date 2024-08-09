@@ -14,39 +14,50 @@
 <h1>getttpos</h1>
 
 <p>
-Retrieve the position, size, and minimized state of the text area in the VT window of Tera Term. <em>(version 5.3 or later)</em>
+Retrieve the display status, position, and size of the VT window in Tera Term. <em>(version 5.3 or later)</em>
 </p>
 
 <h2>Format</h2>
 
 <pre class="macro-syntax">
-getttpos &lt;x&gt; &lt;y&gt; &lt;width&gt; &lt;height&gt; &lt;minimized&gt;
+getttpos &lt;showflag&gt; &lt;window x&gt; &lt;window y&gt; &lt;window width&gt; &lt;window height&gt; &lt;client x&gt; &lt;client y&gt; &lt;client width&gt; &lt;client height&gt;
 </pre>
 
 <h2>Parameters</h2>
 
 <dl>
-	<dt class="macro">Integer variable &lt;x&gt;</dt>
-	<dd>The X coordinate of the top-left corner of the text area is stored. (Unit:Pixels)<br>
-            If the VT window is in a minimized state, the stored value is incorrect.</dd>
+	<dt class="macro">Integer variable &lt;showflag&gt;</dt>
+	<dd>The display status of the VT window is stored.<br>
+	    0 : Normal<br>
+	    1 : Minimized (Iconified)<br>
+	    2 : Maximized<br>
+	    3 : Hidden</dd>
 
-	<dt class="macro">Integer variable &lt;y&gt;</dt>
-	<dd>The Y coordinate of the top-left corner of the text area is stored. (Unit:Pixels)<br>
-            If the VT window is in a minimized state, the stored value is incorrect.</dd>
+	<dt class="macro">Integer variable &lt;window x&gt;</dt>
+	<dd>The X coordinate of the top-left corner of the window area is stored. </dd>
 
-	<dt class="macro">Integer variable &lt;width&gt;</dt>
-	<dd>The width of the text area is stored. (Unit:Pixels)<br>
-            If the VT window is in a minimized state, the stored value is incorrect.</dd>
+	<dt class="macro">Integer variable &lt;window y&gt;</dt>
+	<dd>The Y coordinate of the top-left corner of the window area is stored.</dd>
 
-	<dt class="macro">Integer variable &lt;height&gt;</dt>
-	<dd>The height of the text area is stored. (Unit:Pixels)<br>
-            If the VT window is in a minimized state, the stored value is incorrect.</dd>
+	<dt class="macro">Integer variable &lt;window width&gt;</dt>
+	<dd>The width of the window area is stored.</dd>
+
+	<dt class="macro">Integer variable &lt;window height&gt;</dt>
+	<dd>The height of the window area is stored.</dd>
+
+	<dt class="macro">Integer variable &lt;client x&gt;</dt>
+	<dd>The X coordinate of the top-left corner of the client area is stored. </dd>
+
+	<dt class="macro">Integer variable &lt;client y&gt;</dt>
+	<dd>The Y coordinate of the top-left corner of the client area is stored.</dd>
+
+	<dt class="macro">Integer variable &lt;client width&gt;</dt>
+	<dd>The width of the client area is stored.</dd>
+
+	<dt class="macro">Integer variable &lt;client height&gt;</dt>
+	<dd>The height of the client area is stored.</dd>
 	</dd>
 
-	<dt class="macro">Integer variable &lt;minimized&gt;</dt>
-	<dd>The minimized state of the VT window is stored.<br>
-            0 : Normal. (non-iconified)<br>
-            1 : Iconified.</dd>
 </dl>
 
 <h2>Return Value</h2>
@@ -60,7 +71,10 @@ getttpos &lt;x&gt; &lt;y&gt; &lt;width&gt; &lt;height&gt; &lt;minimized&gt;
 <h2>Remarks</h2>
 
 <p>
-&lt;x&gt; and &lt;y&gt; represent the screen coordinates (X, Y). The origin (0, 0) refers to the top-left corner of the main display (primary display).<br>
+The units for coordinates, width, and height are pixels.<br>
+The origin (0,0) refers to the top-left corner of the main display (primary display).<br>
+The window area refers to the entire application window, while the client area refers to the text display area excluding the title bar, menu bar, frame etc from the window area.<br>
+If the VT window is in a minimized or hidden state, the stored values for coordinates, width, and height are incorrect.<br>
 If the MACRO is not linked to Tera Term, it will result in a macro error and the execution of the macro will be temporarily paused.
 </p>
 
@@ -69,15 +83,17 @@ If the MACRO is not linked to Tera Term, it will result in a macro error and the
 <pre class="macro-example">
 testlink
 if result > 1 then
-:start
-  getttpos x y width height minimized
-  if minimized = 1 then
-    showtt 1
-    goto start
+  :start
+  getttpos showflag w_x w_y w_width w_height c_x c_y c_width c_height
+  if showflag != 3 then
+    if showflag = 1 then
+      showtt 1
+      goto start
+    endif
+    setdlgpos c_x c_y
+    sprintf2 str 'x=%d, y=%d, width=%d, height=%d' c_x c_y c_width c_height
+    messagebox str 'Client Area'
   endif
-  setdlgpos x y
-  sprintf2 str 'x=%d, y=%d, width=%d, height=%d' x y width height
-  messagebox str 'x,y = top-left of the text area'
 endif
 </pre>
 

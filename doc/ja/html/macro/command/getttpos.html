@@ -14,39 +14,49 @@
 <h1>getttpos</h1>
 
 <p>
-Tera Term ‚Ì VT window ‚ÌƒeƒLƒXƒg—Ìˆæ‚ÌˆÊ’uAƒTƒCƒYAÅ¬‰»ó‘Ô‚ğæ“¾‚·‚éB<em>(ƒo[ƒWƒ‡ƒ“5.3ˆÈ~)</em>
+Tera Term ‚Ì VT window ‚Ì•\¦ó‘ÔAˆÊ’uAƒTƒCƒY‚ğæ“¾‚·‚éB<em>(ƒo[ƒWƒ‡ƒ“5.3ˆÈ~)</em>
 </p>
 
 <h2>Œ`®</h2>
 
 <pre class="macro-syntax">
-getttpos &lt;x&gt; &lt;y&gt; &lt;width&gt; &lt;height&gt; &lt;minimized&gt;
+getttpos &lt;showflag&gt; &lt;window x&gt; &lt;window y&gt; &lt;window width&gt; &lt;window height&gt; &lt;client x&gt; &lt;client y&gt; &lt;client width&gt; &lt;client height&gt;
 </pre>
 
 <h2>ƒpƒ‰ƒ[ƒ^</h2>
 
 <dl>
-	<dt class="macro">®”Œ^•Ï” &lt;x&gt;</dt>
-	<dd>ƒeƒLƒXƒg—Ìˆæ¶ã‹÷‚Ì X À•W‚ªŠi”[‚³‚ê‚éB(’PˆÊ:ƒsƒNƒZƒ‹)<br>
-	    VT window‚ªÅ¬‰»ó‘Ô‚Ìê‡‚ÍŒë‚Á‚½’l‚ªŠi”[‚³‚ê‚éB</dd>
+	<dt class="macro">®”Œ^•Ï” &lt;showflag&gt;</dt>
+	<dd>VT window‚Ì•\¦ó‘Ô‚ªŠi”[‚³‚ê‚éB<br>
+	    0 : ’Êíó‘Ô<br>
+	    1 : Å¬‰»ó‘Ô<br>
+	    2 : Å‘å‰»ó‘Ô<br>
+	    3 : ”ñ•\¦ó‘Ô</dd>
 
-	<dt class="macro">®”Œ^•Ï” &lt;y&gt;</dt>
-	<dd>ƒeƒLƒXƒg—Ìˆæ¶ã‹÷‚Ì Y À•W‚ªŠi”[‚³‚ê‚éB(’PˆÊ:ƒsƒNƒZƒ‹)<br>
-	    VT window‚ªÅ¬‰»ó‘Ô‚Ìê‡‚ÍŒë‚Á‚½’l‚ªŠi”[‚³‚ê‚éB</dd>
+	<dt class="macro">®”Œ^•Ï” &lt;window x&gt;</dt>
+	<dd>ƒEƒBƒ“ƒhƒE—Ìˆæ¶ã‹÷‚Ì X À•W‚ªŠi”[‚³‚ê‚éB</dd>
 
-	<dt class="macro">®”Œ^•Ï” &lt;width&gt;</dt>
-	<dd>ƒeƒLƒXƒg—Ìˆæ‚Ì•‚ªŠi”[‚³‚ê‚éB(’PˆÊ:ƒsƒNƒZƒ‹)<br>
-	    VT window‚ªÅ¬‰»ó‘Ô‚Ìê‡‚ÍŒë‚Á‚½’l‚ªŠi”[‚³‚ê‚éB</dd>
+	<dt class="macro">®”Œ^•Ï” &lt;window y&gt;</dt>
+	<dd>ƒEƒBƒ“ƒhƒE—Ìˆæ¶ã‹÷‚Ì Y À•W‚ªŠi”[‚³‚ê‚éB</dd>
 
-	<dt class="macro">®”Œ^•Ï” &lt;height&gt;</dt>
-	<dd>ƒeƒLƒXƒg—Ìˆæ‚Ì‚‚³‚ªŠi”[‚³‚ê‚éB(’PˆÊ:ƒsƒNƒZƒ‹)<br>
-	    VT window‚ªÅ¬‰»ó‘Ô‚Ìê‡‚ÍŒë‚Á‚½’l‚ªŠi”[‚³‚ê‚éB</dd>
+	<dt class="macro">®”Œ^•Ï” &lt;window width&gt;</dt>
+	<dd>ƒEƒBƒ“ƒhƒE—Ìˆæ‚Ì•‚ªŠi”[‚³‚ê‚éB</dd>
+
+	<dt class="macro">®”Œ^•Ï” &lt;window height&gt;</dt>
+	<dd>ƒEƒBƒ“ƒhƒE—Ìˆæ‚Ì‚‚³‚ªŠi”[‚³‚ê‚éB</dd>
+
+	<dt class="macro">®”Œ^•Ï” &lt;client x&gt;</dt>
+	<dd>ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ¶ã‹÷‚Ì X À•W‚ªŠi”[‚³‚ê‚éB</dd>
+
+	<dt class="macro">®”Œ^•Ï” &lt;client y&gt;</dt>
+	<dd>ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ¶ã‹÷‚Ì Y À•W‚ªŠi”[‚³‚ê‚éB</dd>
+
+	<dt class="macro">®”Œ^•Ï” &lt;client width&gt;</dt>
+	<dd>ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚Ì•‚ªŠi”[‚³‚ê‚éB</dd>
+
+	<dt class="macro">®”Œ^•Ï” &lt;client height&gt;</dt>
+	<dd>ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚Ì‚‚³‚ªŠi”[‚³‚ê‚éB</dd>
 	</dd>
-
-	<dt class="macro">®”Œ^•Ï” &lt;minimized&gt;</dt>
-	<dd>VT window‚ÌÅ¬‰»ó‘Ô‚ªŠi”[‚³‚ê‚éB<br>
-            0 : ’Êíó‘Ô<br>
-            1 : Å¬‰»ó‘Ô</dd>
 </dl>
 
 <h2>•Ô‚è’l</h2>
@@ -59,8 +69,11 @@ getttpos &lt;x&gt; &lt;y&gt; &lt;width&gt; &lt;height&gt; &lt;minimized&gt;
 <h2>‰ğà</h2>
 
 <p>
-&lt;x&gt; ‚Æ &lt;y&gt; ‚Í‰æ–Ê‚ÌÀ•W (X,Y) ‚ğ•\‚í‚·BŒ´“_ (0,0) ‚ÍƒƒCƒ“ƒfƒBƒXƒvƒŒƒC(ƒvƒ‰ƒCƒ}ƒŠƒfƒBƒXƒvƒŒƒC)‚Ì¶ã‹÷‚ÌˆÊ’uB<br>
-MACRO ‚ª Tera Term ‚ÆƒŠƒ“ƒN‚³‚ê‚Ä‚¢‚È‚¢ê‡‚ÍAƒ}ƒNƒƒGƒ‰[‚Æ‚È‚èƒ}ƒNƒ‚ÌÀs‚ªˆêŸ’â~‚·‚éB
+À•WA•A‚‚³‚Ì’PˆÊ‚ÍƒsƒNƒZƒ‹B<br>
+À•W‚ÌŒ´“_ (0,0) ‚ÍƒƒCƒ“ƒfƒBƒXƒvƒŒƒC(ƒvƒ‰ƒCƒ}ƒŠƒfƒBƒXƒvƒŒƒC)‚Ì¶ã‹÷‚ÌˆÊ’uB<br>
+ƒEƒBƒ“ƒhƒE—Ìˆæ‚ÍƒAƒvƒŠƒP[ƒVƒ‡ƒ“ƒEƒBƒ“ƒhƒE‘S‘Ì‚ğAƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ÍƒEƒBƒ“ƒhƒE—Ìˆæ‚©‚çƒ^ƒCƒgƒ‹ƒo[/ƒƒjƒ…[ƒo[/ƒtƒŒ[ƒ€“™‚ğœ‚¢‚½ƒeƒLƒXƒg•\¦—Ìˆæ‚ğw‚·B<br>
+VT window‚ªÅ¬‰»ó‘Ô‚Ü‚½‚Í”ñ•\¦ó‘Ô‚Ìê‡‚ÍAÀ•WA•A‚‚³‚ÍŒë‚Á‚½’l‚ªŠi”[‚³‚ê‚éB<br>
+MACRO ‚ª Tera Term ‚ÆƒŠƒ“ƒN‚³‚ê‚Ä‚¢‚È‚¢ê‡‚ÍAƒ}ƒNƒƒGƒ‰[‚Æ‚È‚èƒ}ƒNƒ‚ÌÀs‚ªˆê’â~‚·‚éB
 </p>
 
 <h2>—á</h2>
@@ -68,15 +81,17 @@ MACRO ‚ª Tera Term ‚ÆƒŠƒ“ƒN‚³‚ê‚Ä‚¢‚È‚¢ê‡‚ÍAƒ}ƒNƒƒGƒ‰[‚Æ‚È‚èƒ}ƒNƒ‚ÌÀs‚ªˆ
 <pre class="macro-example">
 testlink
 if result > 1 then
-:start
-  getttpos x y width height minimized
-  if minimized = 1 then
-    showtt 1
-    goto start
+  :start
+  getttpos showflag w_x w_y w_width w_height c_x c_y c_width c_height
+  if showflag != 3 then
+    if showflag = 1 then
+      showtt 1
+      goto start
+    endif
+    setdlgpos c_x c_y
+    sprintf2 str 'x=%d, y=%d, width=%d, height=%d' c_x c_y c_width c_height
+    messagebox str 'Client Area'
   endif
-  setdlgpos x y
-  sprintf2 str 'x=%d, y=%d, width=%d, height=%d' x y width height
-  messagebox str 'x,y = top-left of the text area'
 endif
 </pre>
 
