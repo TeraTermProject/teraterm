@@ -6604,13 +6604,18 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 	outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_REQUEST, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
-	buffer_free(msg);
-
 	{
 		logprintf(LOG_LEVEL_VERBOSE,
-			"SSH2_MSG_USERAUTH_REQUEST was sent do_SSH2_authrequest(). (method %d)",
-			pvar->auth_state.cur_cred.method);
+				  "SSH2_MSG_USERAUTH_REQUEST was sent %s(). (method %d)",
+				  __FUNCTION__,
+				  pvar->auth_state.cur_cred.method);
+		logprintf_hexdump(LOG_LEVEL_VERBOSE,
+						  buffer_ptr(msg), len,
+						  "send %s:%d %s() len=%d",
+						  __FILE__, __LINE__,
+						  __FUNCTION__, len);
 	}
+	buffer_free(msg);
 
 	return TRUE;
 
@@ -6783,6 +6788,16 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_SUCCESS was received.");
 
+	{
+		int len = pvar->ssh_state.payloadlen;
+		char *data = pvar->ssh_state.payload;
+		logprintf_hexdump(LOG_LEVEL_VERBOSE,
+						  data, len,
+						  "receive %s:%d %s() len=%d",
+						  __FILE__, __LINE__,
+						  __FUNCTION__, len);
+	}
+
 	// パスワードの破棄 (2006.8.22 yutaka)
 	if (pvar->settings.remember_password == 0) {
 		destroy_malloced_string(&pvar->auth_state.cur_cred.password);
@@ -6837,9 +6852,15 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
 		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
+		{
+			logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN was sent at %s().", __FUNCTION__);
+			logprintf_hexdump(LOG_LEVEL_VERBOSE,
+							  buffer_ptr(msg), len,
+							  "send %s:%d %s() len=%d",
+							  __FILE__, __LINE__,
+							  __FUNCTION__, len);
+		}
 		buffer_free(msg);
-
-		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN was sent at handle_SSH2_userauth_success().");
 	}
 
 	// ハートビート・スレッドの開始 (2004.12.11 yutaka)
@@ -6864,6 +6885,11 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 	data = pvar->ssh_state.payload;
 	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
+
+	logprintf_hexdump(LOG_LEVEL_VERBOSE, data, len,
+					  "receive %s:%d %s() len=%d",
+					  __FILE__, __LINE__,
+					  __FUNCTION__, len);
 
 	cstring = buffer_get_string(&data, NULL); // 認証リストの取得
 	partial = data[0];
@@ -7211,7 +7237,10 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
-	//debug_print(10, data, len);
+	logprintf_hexdump(LOG_LEVEL_VERBOSE, data, len,
+					  "receive %s:%d %s() len=%d",
+					  __FILE__, __LINE__,
+					  __FUNCTION__, len);
 
 	///////// step1
 	// get string
@@ -7304,9 +7333,17 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_INFO_RESPONSE, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
+	{
+		logprintf(LOG_LEVEL_VERBOSE,
+				  "SSH2_MSG_USERAUTH_INFO_RESPONSE was sent %s().",
+				  __FUNCTION__);
+		logprintf_hexdump(LOG_LEVEL_VERBOSE,
+						  buffer_ptr(msg), len, "send %s:%d %s() len=%d",
+						  __FILE__, __LINE__,
+						  __FUNCTION__, len);
+	}
 	buffer_free(msg);
 
-	logprintf(LOG_LEVEL_VERBOSE, "%s: sending SSH2_MSG_USERAUTH_INFO_RESPONSE.", __FUNCTION__);
 	return TRUE;
 }
 
@@ -7417,9 +7454,14 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_REQUEST, len);
 		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
+		{
+			logprintf(LOG_LEVEL_VERBOSE,
+					  "%s: sending SSH2_MSG_USERAUTH_REQUEST method=publickey",
+					  __FUNCTION__);
+			logprintf_hexdump(LOG_LEVEL_VERBOSE,
+							  buffer_ptr(msg), len, "%s: len=%d", __FUNCTION__, len);
+		}
 		buffer_free(msg);
-
-		logprintf(LOG_LEVEL_VERBOSE, "%s: sending SSH2_MSG_USERAUTH_REQUEST method=publickey", __FUNCTION__);
 
 		pvar->pageant_keyfinal = TRUE;
 
@@ -7585,6 +7627,13 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 	outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_REQUEST, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
+	{
+		logprintf(LOG_LEVEL_VERBOSE,
+				  "%s: sending SSH2_MSG_USERAUTH_REQUEST",
+				  __FUNCTION__);
+		logprintf_hexdump(LOG_LEVEL_VERBOSE,
+						  buffer_ptr(msg), len, "%s: len=%d", __FUNCTION__, len);
+	}
 	buffer_free(msg);
 
 	return TRUE;
@@ -7750,6 +7799,10 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
+	logprintf_hexdump(LOG_LEVEL_VERBOSE, data, len,
+					  "receive %s:%d %s() len=%d",
+					  __FILE__, __LINE__,
+					  __FUNCTION__, len);
 	id = get_uint32_MSBfirst(data);
 	data += 4;
 
