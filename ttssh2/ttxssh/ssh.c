@@ -4385,7 +4385,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 		buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
-		memcpy(outmsg, buffer_ptr (msg), len);
+		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
 		buffer_free(msg);
 	}
@@ -4459,7 +4459,7 @@ int SSH_sftp_transaction(PTInstVar pvar)
 	buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
-	memcpy(outmsg, buffer_ptr (msg), len);
+	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
 	buffer_free(msg);
 
@@ -6835,7 +6835,7 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 		buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
-		memcpy(outmsg, buffer_ptr (msg), len);
+		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
 		buffer_free(msg);
 
