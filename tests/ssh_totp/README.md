@@ -6,17 +6,37 @@
 
 - [Linux で SSH の 2 要素認証をセットアップする方法](https://ja.linux-console.net/?p=1141)
 
-## テスト用サーバー起動
+## 作成済みキーペア
 
-- docker desktop をインストールしておく
-- ポート22を使用していない状態にする
-- `docker_build.bat` を実行する
-- ユーザー
-  - user
-    - test
-  - pw
-    - password
-- rootでログインした状態になる
+ユーザー'test'用
+
+- tt_test_key,tt_test_key.pub
+- password
+  - 'pw'
+```
+$ ssh-keygen -f tt_test_key
+Generating public/private ed25519 key pair.
+tt_test_key already exists.
+Overwrite (y/n)? y
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in tt_test_key
+Your public key has been saved in tt_test_key.pub
+The key fingerprint is:
+SHA256:Cv0t1Dstw6kZ3bUAxRaXRkGYm8NTaCXi+da3vQq+Rxk masaaki@carbon
+The key's randomart image is:
++--[ED25519 256]--+
+|          ..+O*o |
+|         . +Bo+  |
+|          ++ =   |
+|     .   . o*E   |
+|    . . S . +o= .|
+|     . + + * = oo|
+|      . + X.+ ...|
+|         =.+..  .|
+|        o  oo... |
++----[SHA256]-----+
+```
 
 ## TOTP設定
 
@@ -25,7 +45,7 @@ TOTP Token Generator サイト(次のURL)を開いておく
 
 次のコマンドを実行(ヒストリに入っているので、上矢印で出てくる)
 ```
-# google-authenticator --time-based --qr-mode=NONE
+# sudo -u test google-authenticator --time-based --qr-mode=NONE
 ```
 例
 ```
@@ -46,22 +66,30 @@ Do you want me to update your "/home/test/.google_authenticator" file? (y/n) y
 - `~/.google_authenticator` が生成される
 - 残りは 'y' でok
 
-`exit`でtestユーザーをログアウト、rootに戻る
+## テスト用sshd 起動
 
-## sshd 起動
+- ポート22を使用していない状態にする
+- Windowsの場合
+  - [Docker Desktop for Windows](https://www.docker.com/get-started/) をインストールしておく
+  - `docker_build.bat` を実行する
+- 作成済みテスト用ユーザー
+  - user
+    - test
+  - pw
+    - password
+- rootでログインした状態になる
 
-```
-$ /usr/sbin/sshd -d
-```
-
-サーバーの準備完了
-localhost:22 に接続可能となる
+- /etc/ssh/sshd_config を調整
+  `vi /etc/ssh/sshd_config`
+- /etc/ssh/sshd_config を調整して sshd を起動
+  `/usr/sbin/sshd -d`
+- localhost:22 に接続可能となる
 
 ### Tera Term から接続
 
 - `ssh://test@localhost` へ接続
-- `キーボードインタラクティブ認証を使う` を選択
 - SSH 認証チャレンジ Password: で
   - `password` と入力
 - SSH 認証チャレンジ Verification code: で
   - TOTP Token Generator サイトの 6桁の数字を入力
+

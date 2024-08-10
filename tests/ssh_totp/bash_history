@@ -1,0 +1,4 @@
+nano /etc/ssh/sshd_config
+nano /etc/pam.d/sshd
+sudo -u test google-authenticator --time-based --qr-mode=NONE
+/usr/sbin/sshd -d

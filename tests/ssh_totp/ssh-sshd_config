@@ -121,5 +121,11 @@ Subsystem	sftp	/usr/lib/openssh/sftp-server
 #	PermitTTY no
 #	ForceCommand cvs server
 
+#
+PasswordAuthentication no
 ChallengeResponseAuthentication yes
 AuthenticationMethods keyboard-interactive
+#AuthenticationMethods publickey
+#AuthenticationMethods password
+#AuthenticationMethods publickey,password
+#AuthenticationMethods password,publickey
