@@ -116,7 +116,7 @@ Source: ..\cygwin\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
 Source: ..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygwin\Release\cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: ..\ttpmenu\Release\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
-Source: release\ttmenu_readme-j.txt; DestDir: {app}; Components: TeraTerm_Menu
+Source: ..\ttpmenu\readme.txt; DestDir: {app}; DestName: "ttmenu_readme-j.txt"; Components: TeraTerm_Menu
 Source: ..\TTProxy\Release\TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion
 Source: release\theme\Advanced.sample; DestDir: {app}\theme\; Components: TeraTerm
 Source: release\theme\ImageFile.INI; DestDir: {app}\theme\; Components: TeraTerm

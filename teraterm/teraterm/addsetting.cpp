@@ -58,6 +58,7 @@
 #include "keyboard_pp.h"
 #include "mouse_pp.h"
 #include "log_pp.h"
+#include "tcpip_pp.h"
 
 #include "addsetting.h"
 
@@ -519,7 +520,7 @@ void CCopypastePropPageDlg::OnOK()
 
 void CCopypastePropPageDlg::OnHelp()
 {
-	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalCopyAndPaste, 0);
 }
 
 // CVisualPropPageDlg ダイアログ
@@ -1520,6 +1521,8 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 	AddPage(page);
 	page = MousePageCreate(hInstance, &ts);
 	AddPage(page);
+	page = TcpIPPageCreate(hInstance, &ts);
+	AddPage(page);
 
 	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFileW);
 	SetCaption(title);
@@ -1548,6 +1551,9 @@ void CAddSettingPropSheetDlg::SetStartPage(Page page)
 		break;
 	case KeyboardPage:
 		start_page = 9;
+		break;
+	case TcpIpPage:
+		start_page = 11;
 		break;
 	default:
 		start_page = 0;

@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>Parameter formats</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Parameter formats</h1>
+
+There are three parameter formats.<br>
+Which format can be used depends on the TTL command, So please check the <A HREF="../command/index.html">command reference</A>.
+
+<h2>1) Positional parameter</h2>
+
+<p>
+Specify the parameters in order.<br>
+Parameters not explicitly listed as "Keyword parameter" in the  <A HREF="../command/index.html">command reference</A> are "Positional parameter".
+</p>
+
+<pre>
+例:
+  ttlcommand 10 20
+  1st : width
+  2nd : height
+</pre>
+
+<h2>2) Keyword parameter</h2>
+
+<p>
+Passing keyword/value pairs as parameter.<br>
+Parameter can be passed in any order.
+</p>
+
+<pre>
+例:
+  ttlcommand 'width=10' 'height=20'
+  width keyword  : width
+  height keyword : height
+</pre>
+
+<h2>3) Positional parameter + Keyword parameter</h2>
+
+<p>
+The first few are "Positional parameter", the rest are "Keyword parameter".<br>
+"Positional parameter" order is fixed, "Keyword parameter" is in no particular order.
+</p>
+
+<pre>
+例:
+  ttlcommand 'Terminal' 'green' 'width=10' 'height=20'
+  1st            : font
+  2nd            : color
+  width keyword  : width
+  height keyword : height
+</pre>
+
+<h2>Background</h2>
+
+<p>
+"Keyword parameters" was introduced in Tera Term version 5.3 when the <A HREF="../command/listbox.html">listbox</A> command enhance to pass many parameters, and besides, to minimize the number of parameters to be specified.
+</p>
+
+</BODY>
+</HTML>

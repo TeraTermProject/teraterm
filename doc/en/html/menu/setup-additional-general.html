@@ -44,12 +44,6 @@
 	When this setting is enabled, whole fonts can be selected on the <a href="setup-font.html">Font setting dialog</a>.
       </dd>
 
-      <dt id="Port">Default port</dt>
-      <dd>
-	Default port type (TCP/IP or Serial) to be used when Tera Term is
-	run without command line parameter.
-      </dd>
-
       <dt id="TitleFormat">Title format</dt>
       <dd>Configures the window title format.
         <dl>
@@ -72,54 +66,55 @@
           <dd>Displays speed of serial port (serial connection only)</dd>
         </dl>
       </dd>
-    </dl>
 
-    <h3>Notification</h3>
+      <dt>Notification</dt>
 
-    <p>
-      Notification area (it was called the Task Tray before Windows XP) settings and test.
-    </p>
-
-    <p>
-      If notification setting is turn off, no notification such as icons or messages will be displayed.<br>
-      If sound setting is no sound (mute), no notification sound will be output.<br>
-      You can check the behavior with test buttons.
-    </p>
-
-    <dl>
-      <dt id="NotifySound">Notify sound</dt>
-      <dd>Notification sound(sound can be muted in Windows XP and later)</dd>
-
-      <dt>Notify Test button</dt>
       <dd>
-        Test Notification.<br>
-        The following behaviors can be checked.
-        <ul>
-          <li>Icon is displayed in notification area (task tray).</li>
-          <li>App notification (Windows 10,11) / Balloon notification (Windows 7, 8.1) is displayed. </li>
-        </ul>
+        <a href="../about/glossary.html#notification_area">Notification Center</a> settings and test.
+
+        <p>
+          If notification setting is turn off, no notification such as icons or messages will be displayed.<br>
+          If sound setting is no sound (mute), no notification sound will be output.<br>
+          You can check the behavior with test buttons.
+        </p>
+
+        <dl>
+          <dt id="NotifySound">Notify sound</dt>
+          <dd>
+            Enable notification sound.<br>
+            Sound can not be muted before Windows XP.
+          </dd>
+
+          <dt>Notify Test button</dt>
+          <dd>
+            Test Notification.<br>
+            The following behaviors can be checked.
+            <ul>
+              <li>Icon is displayed in Notification Center.</li>
+              <li><a href="../about/glossary.html#App_notifications">App notification</a> is displayed. </li>
+            </ul>
+          </dd>
+
+          <dt>Tray Test button</dt>
+          <dd>
+            Icon is displayed in Notification Center.<br>
+            The following behaviors can be checked.
+            <ul>
+              <li>
+                Icon is displayed in Notification Center.<br>
+                The icon disappears when messagebox is closed.
+              </li>
+            </ul>
+            When turn off all notifications for Tera Term,
+            "Tera Term" will not appear in Windows notification settings
+            and you may not be able to change the settings.
+
+            By pushing this button, you can change Windows notification settings
+            when icon is displayed in Notification Center.
+          </dd>
+        </dl>
       </dd>
 
-      <dt>Tray Test button</dt>
-      <dd>
-        Icon is displayed in notification area.<br>
-        The following behaviors can be checked.
-        <ul>
-          <li>
-            Icon is displayed in notification area (task tray).<br>
-            The icon disappears when messagebox is closed.
-          </li>
-        </ul>
-        When turn off all notifications for Tera Term,
-        "Tera Term" will not appear in Windows notification settings
-        and you may not be able to change the settings.
-
-        By pushing this button, you can change Windows notification settings
-        when icon is displayed in notification area.
-      </dd>
-    </dl>
-
-    <dl>
       <dt id="DownloadFolder">Download Folder</dt>
       <dd>
         Sets directory for file transfer.<br>

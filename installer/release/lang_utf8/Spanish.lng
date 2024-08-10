@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Spanish
-date=2024-07-06 by TeraTerm Project
+date=2024-08-03 by TeraTerm Project
 contributor=Filiberto Olguin Ascona (2022-05-26)
 
 [Tera Term]
@@ -409,18 +409,26 @@ DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=Tera Term: TCP/IP setup
-DLG_TCPIP_HOSTLIST=Host &list
+; edit history
 DLG_TCPIP_ADD=&Add
 DLG_TCPIP_UP=&Up
 DLG_TCPIP_REMOVE=&Remove
 DLG_TCPIP_DOWN=&Down
-DLG_TCPIP_HISTORY=H&istory
+
+; TCP/IP tab
+DLG_TCPIP_TITLE=TCP/IP setup
+DLG_TCPIP_HOSTLIST=Host &list
+DLG_TCPIP_NEWCONNECTION=New connection
+DLG_TCPIP_HISTORYTITLE=History
+DLG_TCPIP_HISTORY=Save h&istory when new connection
+DLG_TCPIP_EDITHISTORY=Edit hisotry
+DLG_TCPIP_DEFAULT_PORT=Default &port:
+DLG_TCPIP_SERVICE_TITLE=TCP/IP Service (Ignored when SSH plugin is available)
+DLG_TCPIP_PORT=TCP/IP &Port#:
+DLG_TCPIP_SERIAL_PORT=Serial Port#
 DLG_TCPIP_KEEPALIVE=&Keep alive on Telnet
 DLG_TCPIP_KEEPALIVE_SEC=Sec
 DLG_TCPIP_AUTOCLOSE=Auto &window close
-DLG_TCPIP_PORT=&Port#:
-DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_TERMTYPE=&Term type:
 
 DLG_TERM_TITLE=Tera Term: Terminal setup
@@ -1151,6 +1159,8 @@ DLG_CONFIG_PASS=Password
 DLG_CONFIG_MACRO=specified macro file
 DLG_CONFIG_LAUNCH=launch only
 DLG_CONFIG_STARTUP=kick at starting
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=use SSH
 DLG_CONFIG_KEYFILE=Keyfile
 DLG_CONFIG_CHALLENGE=use Challenge
@@ -1166,6 +1176,17 @@ DLG_ETC_LOGFILE=log file
 DLG_ETC_PROMPT=Prompt
 DLG_ETC_USER=User Name
 DLG_ETC_PASS=Password
+
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=Couldn't read the registry data.\n
 MSG_ERROR_MAKETTL=Could not make 'ttpmenu.TTL'\n

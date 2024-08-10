@@ -124,6 +124,7 @@
     <ClCompile Include="..\..\teraterm\common\ttlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\teraterm\common\edithistory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arc4random.h">
@@ -249,6 +250,12 @@
     <ClInclude Include="cipher-ctr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\teraterm\common\edithistory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\teraterm\common\edithistory_res.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="ttsecure.ico">
@@ -288,6 +295,9 @@
       <Filter>Resource Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="ttxssh.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="..\..\teraterm\common\edithistory.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

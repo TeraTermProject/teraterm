@@ -132,7 +132,7 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Tera Term Menu">
+			<param name="Name" value="TeraTerm Menu">
 			<param name="Local" value="html\usage\TTMenu\TTMenu.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
@@ -442,7 +442,7 @@
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Copy and Paste tab">
-					<param name="Local" value="html\menu\setup-additional.html#TabCopyAndPaste">
+					<param name="Local" value="html\menu\setup-additional-copy-and-paste.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -488,6 +488,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Mouse tab">
 					<param name="Local" value="html\menu\setup-additional-mouse.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="TCP/IP tab">
+					<param name="Local" value="html\menu\setup-additional-tcpip.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 			</UL>
@@ -863,6 +868,11 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Line formats">
 				<param name="Local" value="html\macro\syntax\lineformats.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Parameter formats">
+				<param name="Local" value="html\macro\syntax\parameter.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 		</UL>

@@ -12,7 +12,7 @@
     <h1>Additional settings / "Font" タブ ([Setup] メニュー)</h1>
 
     <dl>
-      <dt>ターミナルフォント</dt>
+      <dt id="VTFont">ターミナルフォント</dt>
       <dd>
         VTWinのフォントを指定します。
         <dl>
@@ -28,17 +28,6 @@
             UnicodeをANSIへ変換するためにコードページを指定する必要があります。
             フォントによってはANSIで描画する必要かもしれません。<br>
             通常は使用しません。
-          </dd>
-
-          <dt id="FontQuality">Font quality</dt>
-          <dd>
-	          フォントの品質を設定することができます。OSが対応している種類のみ有効に動作します。
-<pre>
-Default         = OSの設定(スクリーン フォントの縁を滑らかにする)に依存
-Non-Antialiased = アンチエイリアスを無効にする
-Antialiased     = アンチエイリアスを有効にする
-ClearType       = ClearTypeを利用する
-</pre>
           </dd>
 
           <dt id="ResizedFont">描画幅に合わせてリサイズしたフォントを描画(Drawing resized font to fit cell width)</dt>
@@ -105,6 +94,29 @@ ClearType       = ClearTypeを利用する
       </dd>
 
     </dl>
+
+    <h1>注</h1>
+    <ul>
+      <li>
+	Tera Term 付属のフォント "Tera Special" は
+	<a href="../about/emulations_dec_special.html">DEC Special Graphics</a>表示時に使用されます。
+	このダイアログボックスでは選択できません。
+      </li>
+      <li>
+	デフォルト設定では OS で非表示に設定されたフォントは一覧に現れません。
+	非表示のフォントを選択するには <a href="setup-additional.html">Additiona settings ダイアログ</a>の
+	General タブにある <a href="setup-additional-general.html#ListHiddenFonts">List hidden fonts in font dialog</a>
+	の設定を有効にしてください。
+      </li>
+      <li>
+	<a href="setup-additional.html">Additional settings ダイアログ</a> の Visual タブにある
+	<a href="setup-additional-visual.html#FontQuality">Font quality</a> でフォントの品質を選択することができます。
+      </li>
+      <li>
+	ダイアログフォントに極端に大きなサイズや横幅の広いフォントを設定すると、
+	表示される文字が欠けたり、ダイアログが画面からはみ出して[ok]ボタン等が押せなくなることがあります。
+      </li>
+    </ul>
 
   </body>
 </html>

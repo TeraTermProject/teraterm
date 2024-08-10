@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2024-07-06 by TeraTerm Project
+date=2024-08-03 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -409,18 +409,26 @@ DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=Tera Term: Configuration TCP/IP
-DLG_TCPIP_HOSTLIST=Liste d'hôtes
+; edit history
 DLG_TCPIP_ADD=&Ajouter
 DLG_TCPIP_UP=Monte
 DLG_TCPIP_REMOVE=&Supprime
 DLG_TCPIP_DOWN=&Descend
-DLG_TCPIP_HISTORY=H&istori.
+
+; TCP/IP tab
+DLG_TCPIP_TITLE=Configuration TCP/IP
+DLG_TCPIP_HOSTLIST=Liste d'hôtes
+DLG_TCPIP_NEWCONNECTION=New connection
+DLG_TCPIP_HISTORYTITLE=History
+DLG_TCPIP_HISTORY=Save h&istory when new connection
+DLG_TCPIP_EDITHISTORY=Edit hisotry
+DLG_TCPIP_DEFAULT_PORT=Default &port:
+DLG_TCPIP_SERVICE_TITLE=TCP/IP Service (Ignored when SSH plugin is available)
+DLG_TCPIP_PORT=TCP/IP N° de &Port:
+DLG_TCPIP_SERIAL_PORT=Serial Port#
 DLG_TCPIP_KEEPALIVE=Temps de maintien
 DLG_TCPIP_KEEPALIVE_SEC=Sec
 DLG_TCPIP_AUTOCLOSE=Fermeture auto de la fenêtre
-DLG_TCPIP_PORT=N° de &Port:
-DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_TERMTYPE=Type &Terminal:
 
 DLG_TERM_TITLE=Tera Term: Configuration du Terminal
@@ -1154,6 +1162,8 @@ DLG_CONFIG_PASS=Mot de passe
 DLG_CONFIG_MACRO=fichier de macro
 DLG_CONFIG_LAUNCH=lancement seul
 DLG_CONFIG_STARTUP=kick au démarrage
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=utiliser SSH
 DLG_CONFIG_KEYFILE=Fichier clé
 DLG_CONFIG_CHALLENGE=utiliser Challenge
@@ -1169,6 +1179,17 @@ DLG_ETC_LOGFILE=fichier journal
 DLG_ETC_PROMPT=Prompt
 DLG_ETC_USER=Nom d'utilisateur
 DLG_ETC_PASS=Mot de passe
+
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=Impossible de lire le registre.\n
 MSG_ERROR_MAKETTL=Impossible de créer 'ttpmenu.TTL'\n

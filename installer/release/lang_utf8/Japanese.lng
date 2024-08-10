@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2024-07-06 by TeraTerm Project
+date=2024-08-03 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -409,18 +409,26 @@ DLG_SERIAL_OK_OPEN=新規オープン(&N)
 DLG_SERIAL_OK_CLOSEOPEN=クローズ＆新規オープン(&N)
 DLG_SERIAL_OK_RESET=現在の接続を再設定(&N)
 
-DLG_TCPIP_TITLE=Tera Term: TCP/IP 設定
-DLG_TCPIP_HOSTLIST=ホストリスト(&L)
+; edit history
 DLG_TCPIP_ADD=追加(&A)
 DLG_TCPIP_UP=上へ(&U)
 DLG_TCPIP_REMOVE=削除(&R)
 DLG_TCPIP_DOWN=下へ(&D)
-DLG_TCPIP_HISTORY=履歴(&I)
-DLG_TCPIP_KEEPALIVE=&Keep-alive
+
+; TCP/IP tab
+DLG_TCPIP_TITLE=TCP/IP 設定
+DLG_TCPIP_HOSTLIST=ホストリスト(&L)
+DLG_TCPIP_NEWCONNECTION=新しい接続ダイアログ
+DLG_TCPIP_HISTORYTITLE=履歴
+DLG_TCPIP_HISTORY=新規接続時に履歴に保存(&I)
+DLG_TCPIP_EDITHISTORY=履歴編集
+DLG_TCPIP_DEFAULT_PORT=標準のポート(&P):
+DLG_TCPIP_SERVICE_TITLE=TCP/IP サービス (SSHプラグイン使用時無効)
+DLG_TCPIP_PORT=TCP/IP ポート#(&P):
+DLG_TCPIP_SERIAL_PORT=シリアルポート#
+DLG_TCPIP_KEEPALIVE=Telnet &Keep-alive
 DLG_TCPIP_KEEPALIVE_SEC=秒(0指定で無効)
 DLG_TCPIP_AUTOCLOSE=自動的にウィンドウを閉じる(&W)
-DLG_TCPIP_PORT=ポート#(&P):
-DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_TERMTYPE=端末タイプ(&T):
 
 DLG_TERM_TITLE=Tera Term: 端末の設定
@@ -1152,6 +1160,8 @@ DLG_CONFIG_PASS=パスワード
 DLG_CONFIG_MACRO=マクロファイルを指定して実行
 DLG_CONFIG_LAUNCH=起動のみ
 DLG_CONFIG_STARTUP=起動時に実行
+DLG_CONFIG_LOCKBOX_CHECK=LockBoxを使用
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=sshを使用
 DLG_CONFIG_KEYFILE=鍵ファイル
 DLG_CONFIG_CHALLENGE=チャレンジレスポンス認証
@@ -1167,6 +1177,17 @@ DLG_ETC_LOGFILE=ログファイル
 DLG_ETC_PROMPT=プロンプト
 DLG_ETC_USER=ユーザ名
 DLG_ETC_PASS=パスワード
+
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=LockBoxのパスワードを入力して下さい：
+DLG_LOCKBOX_SHOW=このパスワードはLockBoxの施錠と解錠に使われます。
+DLG_LOCKBOX_WRONG=パスワードに誤りがあります。
+DLG_LOCKBOX_STRTOOLONG=パスワードが長すぎます。
+DLG_LOCKBOX_NOSTR=パスワードが入力されていません。
+DLG_LOCKBOX_VALID=正しいパスワードです。
+MSG_ERROR_NOLOCKBOX=error: LockBoxが未設定です。
+MSG_TOOLTIP_CHECK_LOCKBOX=LockBoxを有効にするとログインパスワードは暗号化されてLockBoxに保存されます。
+MSG_TOOLTIP_BUTTON_LOCKBOX=LockBoxの施錠/解錠用パスワードを設定します。
 
 MSG_ERROR_READREG=レジストリからのデータ読み出しに失敗しました。\n
 MSG_ERROR_MAKETTL=ttpmenu.TTLの作成に失敗しました。\n

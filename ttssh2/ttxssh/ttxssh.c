@@ -107,8 +107,8 @@
 #include "asprintf.h"
 #include "ttcommdlg.h"
 #include "resize_helper.h"
-
 #include "libputty.h"
+#include "edithistory.h"
 
 #ifdef OPENSSL_LEGACY_PROVIDER
 static OSSL_PROVIDER *legacy_provider = NULL;
@@ -123,10 +123,10 @@ static OSSL_PROVIDER *default_provider = NULL;
 	TTEndDialog(p1, p2)
 #undef GetPrivateProfileInt
 #undef GetPrivateProfileString
+#undef WritePrivateProfileString
 #define GetPrivateProfileInt(p1, p2, p3, p4) GetPrivateProfileIntAFileW(p1, p2, p3, p4)
 #define GetPrivateProfileString(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
-#define GetPrivateProfileStringA(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
-#define WritePrivateProfileStringA(p1, p2, p3, p4) WritePrivateProfileStringAFileW(p1, p2, p3, p4)
+#define WritePrivateProfileString(p1, p2, p3, p4) WritePrivateProfileStringAFileW(p1, p2, p3, p4)
 
 /* This extension implements SSH, so we choose a load order in the
    "protocols" range. */
@@ -1041,7 +1041,29 @@ typedef struct {
 	PGetHNRec GetHNRec;
 	ComPortInfo_t *ComPortInfoPtr;
 	int ComPortInfoCount;
+	BOOL HostDropOpen;
 } TTXHostDlgData;
+
+static BOOL IsEditHistorySelected(HWND dlg)
+{
+	LRESULT index = SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCURSEL, 0, 0);
+	LRESULT data = SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETITEMDATA, (WPARAM)index, 0);
+	return data == 999;
+}
+
+static void OpenEditHistory(HWND dlg, TTTSet *ts)
+{
+	if (EditHistoryDlg(dlg, ts)) {
+		// 編集されたので、ドロップダウンを再設定する
+		LRESULT index;
+		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_RESETCONTENT, 0, 0);
+		SetComboBoxHostHistory(dlg, IDC_HOSTNAME, MAXHOSTLIST, ts->SetupFNameW);
+		index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING, 0, (LPARAM)L"<Edit history...>");
+		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
+	}
+	// 一番最初を選択する
+	SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
+}
 
 static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -1069,6 +1091,8 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 	switch (msg) {
 	case WM_INITDIALOG: {
 		int j;
+		int com_index;
+		LRESULT index;
 
 		GetHNRec = (PGetHNRec)lParam;
 		dlg_data = (TTXHostDlgData *)calloc(1, sizeof(*dlg_data));
@@ -1076,6 +1100,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 		dlg_data->GetHNRec = GetHNRec;
 
 		dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount);
+		dlg_data->HostDropOpen = FALSE;
 
 		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
@@ -1092,13 +1117,14 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			)
 			GetHNRec->PortType = IdTCPIP;
 
+		// ホスト (コマンドライン)
 		SetComboBoxHostHistory(dlg, IDC_HOSTNAME, MAXHOSTLIST, GetHNRec->SetupFNW);
+		index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING, 0, (LPARAM)L"<Edit history...>");
+		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
 
-		SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT,
-		                   HostNameMaxLength - 1, 0);
-
+		ExpandCBWidth(dlg, IDC_HOSTNAME);
+		SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
 		SendDlgItemMessage(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
-
 		SetEditboxEmacsKeybind(dlg, IDC_HOSTNAME);
 
 		CheckRadioButton(dlg, IDC_HOSTTELNET, IDC_HOSTOTHER,
@@ -1135,6 +1161,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 
 
 		j = 0;
+		com_index = 1;
 		for (i = 0; i < dlg_data->ComPortInfoCount; i++) {
 			ComPortInfo_t *p = dlg_data->ComPortInfoPtr + i;
 			wchar_t *EntNameW;
@@ -1144,11 +1171,15 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			if (GetHNRec->MaxComPort >= 0 && i > GetHNRec->MaxComPort) {
 				continue;
 			}
-			j++;
 
 			// 使用中のポートは表示しない
 			if (CheckCOMFlag(p->port_no) == 1) {
 				continue;
+			}
+
+			j++;
+			if (GetHNRec->ComPort == p->port_no) {
+				com_index = j;
 			}
 
 			if (p->friendly_name == NULL) {
@@ -1161,18 +1192,19 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			SendDlgItemMessageA(dlg, IDC_HOSTCOM, CB_SETITEMDATA, index, i);
 			free(EntNameW);
 		}
-
-		if (j > 0)
-			SendDlgItemMessage(dlg, IDC_HOSTCOM, CB_SETCURSEL, 0, 0);	// select first com port
-		else {					/* All com ports are already used */
+		if (j > 0) {
+			// GetHNRec->ComPort を選択する
+			SendDlgItemMessageA(dlg, IDC_HOSTCOM, CB_SETCURSEL, com_index - 1, 0);
+		} else {					/* All com ports are already used */
 			GetHNRec->PortType = IdTCPIP;
 			enable_dlg_items(dlg, IDC_HOSTSERIAL, IDC_HOSTSERIAL, FALSE);
 		}
+		ExpandCBWidth(dlg, IDC_HOSTCOM);
 
 		CheckRadioButton(dlg, IDC_HOSTTCPIP, IDC_HOSTSERIAL,
 		                 IDC_HOSTTCPIP + GetHNRec->PortType - 1);
-
 		if (GetHNRec->PortType == IdTCPIP) {
+			SendMessageA(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_HOSTNAME), TRUE);
 			enable_dlg_items(dlg, IDC_HOSTCOMLABEL, IDC_HOSTCOM, FALSE);
 
 			enable_dlg_items(dlg, IDC_SSH_VERSION, IDC_SSH_VERSION, TRUE);
@@ -1181,6 +1213,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			enable_dlg_items(dlg, IDC_HISTORY, IDC_HISTORY, TRUE); // enabled
 		}
 		else {
+			SendMessageA(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_HOSTCOM), TRUE);
 			enable_dlg_items(dlg, IDC_HOSTNAMELABEL, IDC_HOSTTCPPORT,
 			                 FALSE);
 			enable_dlg_items(dlg, IDC_HOSTTCPPROTOCOLLABEL,
@@ -1191,23 +1224,9 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 
 			enable_dlg_items(dlg, IDC_HISTORY, IDC_HISTORY, FALSE); // disabled
 		}
-
-		// Host dialogにフォーカスをあてる (2004.10.2 yutaka)
-		if (GetHNRec->PortType == IdTCPIP) {
-			HWND hwnd = GetDlgItem(dlg, IDC_HOSTNAME);
-			SetFocus(hwnd);
-		} else {
-			HWND hwnd = GetDlgItem(dlg, IDC_HOSTCOM);
-			SetFocus(hwnd);
-		}
-
-		ExpandCBWidth(dlg, IDC_HOSTNAME);
-		ExpandCBWidth(dlg, IDC_HOSTCOM);
 		CenterWindow(dlg, GetParent(dlg));
 
-		// SetFocus()でフォーカスをあわせた場合、FALSEを返す必要がある。
-		// TRUEを返すと、TABSTOP対象の一番はじめのコントロールが選ばれる。
-		// (2004.11.23 yutaka)
+		// TRUEを返すと、フォーカスが移動してしまう
 		return FALSE;
 		//return TRUE;
 	}
@@ -1215,6 +1234,10 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
+			if(IsEditHistorySelected(dlg)) {
+				OpenEditHistory(dlg, pvar->ts);
+				break;
+			}
 			if (IsDlgButtonChecked(dlg, IDC_HOSTTCPIP)) {
 				BOOL Ok;
 				i = GetDlgItemInt(dlg, IDC_HOSTTCPPORT, &Ok, FALSE);
@@ -1325,6 +1348,28 @@ hostssh_enabled:
 
 		case IDC_HOSTHELP:
 			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpFileNewConnection, 0);
+			break;
+
+		case IDC_HOSTNAME: {
+			switch (HIWORD(wParam)) {
+			case CBN_DROPDOWN:
+				dlg_data->HostDropOpen = TRUE;
+				break;
+			case CBN_CLOSEUP:
+				dlg_data->HostDropOpen = FALSE;
+				break;
+			case CBN_SELENDOK:
+				if (dlg_data->HostDropOpen) {
+					//	ドロップダウンしていないときは、キーかホイールで選択している
+					//	決定(Enter or OK押下)すると編集開始
+					if(IsEditHistorySelected(dlg)) {
+						OpenEditHistory(dlg, pvar->ts);
+					}
+				}
+				break;
+			}
+			break;
+		}
 		}
 		break;
 	case WM_DESTROY:

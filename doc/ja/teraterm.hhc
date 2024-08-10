@@ -132,7 +132,7 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Tera Term Menu">
+			<param name="Name" value="TeraTerm Menu">
 			<param name="Local" value="html\usage\TTMenu\TTMenu.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
@@ -481,7 +481,7 @@
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Copy and Paste タブ">
-					<param name="Local" value="html\menu\setup-additional.html#TabCopyAndPaste">
+					<param name="Local" value="html\menu\setup-additional-copy-and-paste.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -527,6 +527,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Mouse タブ">
 					<param name="Local" value="html\menu\setup-additional-mouse.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="TCP/IP タブ">
+					<param name="Local" value="html\menu\setup-additional-tcpip.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 			</UL>
@@ -902,6 +907,11 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="行の形式">
 				<param name="Local" value="html\macro\syntax\lineformats.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="引数の形式">
+				<param name="Local" value="html\macro\syntax\parameter.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 		</UL>

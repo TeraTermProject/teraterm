@@ -473,7 +473,7 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 		while (CheckParameterGiven()) {
 			GetStrVal2(StrTmp, Err, TRUE);
 			if (*Err == 0) {
-				if (_wcsicmp(wc::fromUtf8(StrTmp), L"dclick=on") == 0) {
+				if (_wcsicmp(wc::fromUtf8(StrTmp), L"dblclick=on") == 0) {
 					ext |= ExtListBoxDoubleclick;
 				} else if (_wcsicmp(wc::fromUtf8(StrTmp), L"minmaxbutton=on") == 0) {
 					ext |= ExtListBoxMinmaxbutton;
@@ -483,7 +483,7 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 				} else if (_wcsicmp(wc::fromUtf8(StrTmp), L"maximize=on") == 0) {
 					ext &= ~ExtListBoxMinimize;
 					ext |=  ExtListBoxMaximize;
-				} else if (_wcsnicmp(wc::fromUtf8(StrTmp), L"size=", 5) == 0) {
+				} else if (_wcsnicmp(wc::fromUtf8(StrTmp), L"listboxsize=", 5) == 0) {
 				  	wchar_t dummy1[24], dummy2[24];
 					if (swscanf_s(wc::fromUtf8(StrTmp), L"%[^=]=%d%[xX]%d", dummy1, 24, &width, dummy2, 24, &height) == 4) {
 						if (width < 0 || height < 0) {

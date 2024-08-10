@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2024-07-06 by TeraTerm Project
+date=2024-08-03 by TeraTerm Project
 contributor=LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -409,18 +409,26 @@ DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=Tera Term：TCP/IP 设置
-DLG_TCPIP_HOSTLIST=主机列表(&L)
+; edit history
 DLG_TCPIP_ADD=添加(&A)
 DLG_TCPIP_UP=上移(&U)
 DLG_TCPIP_REMOVE=移除(&R)
 DLG_TCPIP_DOWN=下移(&D)
-DLG_TCPIP_HISTORY=历史(&I)
+
+; TCP/IP tab
+DLG_TCPIP_TITLE=TCP/IP 设置
+DLG_TCPIP_HOSTLIST=主机列表(&L)
+DLG_TCPIP_NEWCONNECTION=New connection
+DLG_TCPIP_HISTORYTITLE=历史
+DLG_TCPIP_HISTORY=Save h&istory when new connection
+DLG_TCPIP_EDITHISTORY=Edit hisotry
+DLG_TCPIP_DEFAULT_PORT=Default &port:
+DLG_TCPIP_SERVICE_TITLE=TCP/IP Service (Ignored when SSH plugin is available)
+DLG_TCPIP_PORT=TCP/IP 端口(&P)：
+DLG_TCPIP_SERIAL_PORT=Serial Port#
 DLG_TCPIP_KEEPALIVE=保持激活(&K)
 DLG_TCPIP_KEEPALIVE_SEC=秒
 DLG_TCPIP_AUTOCLOSE=自动关闭窗口(&W)
-DLG_TCPIP_PORT=端口(&P)：
-DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_TERMTYPE=终端类型(&T)：
 
 DLG_TERM_TITLE=Tera Term：终端设置
@@ -1154,6 +1162,8 @@ DLG_CONFIG_PASS=密码
 DLG_CONFIG_MACRO=指定的宏文件
 DLG_CONFIG_LAUNCH=仅启动
 DLG_CONFIG_STARTUP=启动时运行
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=使用 ttssh
 DLG_CONFIG_KEYFILE=密钥文件
 DLG_CONFIG_CHALLENGE=挑战/应答认证
@@ -1169,6 +1179,17 @@ DLG_ETC_LOGFILE=日志文件
 DLG_ETC_PROMPT=提示
 DLG_ETC_USER=用户名
 DLG_ETC_PASS=密码
+
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=无法从注册表中读取数据。\n
 MSG_ERROR_MAKETTL=无法创建 ttpmenu.TTL。\n

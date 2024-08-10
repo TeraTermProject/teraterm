@@ -222,7 +222,7 @@ void CGeneralPropPageDlg::OnOK()
 
 void CGeneralPropPageDlg::OnHelp()
 {
-	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalGeneral, 0);
 }
 
 BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)

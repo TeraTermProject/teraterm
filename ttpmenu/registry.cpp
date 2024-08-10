@@ -464,10 +464,14 @@ BOOL RegSetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, DWORD dwSi
 	if(bUseINI){
 		wchar_t t[1024] = {0};
 		LPBYTE s = (LPBYTE)buf;
-		for(DWORD i=0; i<dwSize; i++){
+		DWORD i;
+		for(i=0; i<dwSize; i++){
 			wchar_t c[4];
 			swprintf_s(c, L"%02X ", s[i]);
 			wcscat_s(t, c);
+		}
+		if (i > 0) {
+			t[i*3-1] = 0;
 		}
 		BOOL ret =  WritePrivateProfileStringW(szSectionName, lpszValueName, t, getModuleName());
 		return ret;

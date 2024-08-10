@@ -4224,6 +4224,7 @@ void CVTWindow::OpenExternalSetup(CAddSettingPropSheetDlg::Page page)
 
 		// コーディングタブで設定が変化したときコールする必要がある
 		SetupTerm();
+		TelUpdateKeepAliveInterval();
 	}
 }
 
@@ -4423,15 +4424,7 @@ void CVTWindow::OnSetupSerialPort()
 
 void CVTWindow::OnSetupTCPIP()
 {
-	HelpId = HlpSetupTCPIP;
-	if (! LoadTTDLG()) {
-		return;
-	}
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	if ((*SetupTCPIP)(HVTWin, &ts)) {
-		TelUpdateKeepAliveInterval();
-	}
+	OpenExternalSetup(CAddSettingPropSheetDlg::TcpIpPage);
 }
 
 void CVTWindow::OnSetupGeneral()

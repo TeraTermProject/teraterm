@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2024-07-06 by TeraTerm Project
+date=2024-08-03 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -409,18 +409,26 @@ DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=Tera Term: Настройка TCP/IP
-DLG_TCPIP_HOSTLIST=&Перечень хостов
+; edit history
 DLG_TCPIP_ADD=&Добавить
 DLG_TCPIP_UP=&Вверх
 DLG_TCPIP_REMOVE=&Перенос
 DLG_TCPIP_DOWN=&Вниз
-DLG_TCPIP_HISTORY=&История
+
+; TCP/IP tab
+DLG_TCPIP_TITLE=Настройка TCP/IP
+DLG_TCPIP_HOSTLIST=&Перечень хостов
+DLG_TCPIP_NEWCONNECTION=New connection
+DLG_TCPIP_HISTORYTITLE=История
+DLG_TCPIP_HISTORY=Save h&istory when new connection
+DLG_TCPIP_EDITHISTORY=Edit hisotry
+DLG_TCPIP_DEFAULT_PORT=Default &port:
+DLG_TCPIP_SERVICE_TITLE=TCP/IP Service (Ignored when SSH plugin is available)
+DLG_TCPIP_PORT=TCP/IP &Порт#:
+DLG_TCPIP_SERIAL_PORT=Serial Port#
 DLG_TCPIP_KEEPALIVE=&Хранить
 DLG_TCPIP_KEEPALIVE_SEC=сек
 DLG_TCPIP_AUTOCLOSE=&Автоматическое закрытие окон
-DLG_TCPIP_PORT=&Порт#:
-DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_TERMTYPE=&Тип терминала:
 
 DLG_TERM_TITLE=Tera Term: Настройка терминала
@@ -1154,6 +1162,8 @@ DLG_CONFIG_PASS=Пароль
 DLG_CONFIG_MACRO=Указать файл макросов
 DLG_CONFIG_LAUNCH=Только запуск
 DLG_CONFIG_STARTUP=Старт при загрузке
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=Использовать SSH
 DLG_CONFIG_KEYFILE=Файл ключа
 DLG_CONFIG_CHALLENGE=Использовать Challenge
@@ -1169,6 +1179,17 @@ DLG_ETC_LOGFILE=Лог-файл
 DLG_ETC_PROMPT=Подсказка
 DLG_ETC_USER=Имя пользователя
 DLG_ETC_PASS=Пароль
+
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=Не удается прочитать данные из регистра.\n
 MSG_ERROR_MAKETTL=Не удается создать 'ttpmenu.TTL'\n
