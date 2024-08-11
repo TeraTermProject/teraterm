@@ -7367,7 +7367,14 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		ssh_agentflag signflag;
 
 		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_PK_OK was received.");
-
+		{
+			const char *data = pvar->ssh_state.payload;
+			int len = pvar->ssh_state.payloadlen;
+			logprintf_hexdump(LOG_LEVEL_VERBOSE, data, len,
+							  "receive %s:%d %s() len=%d",
+							  __FILE__, __LINE__,
+							  __FUNCTION__, len);
+		}
 		username = pvar->auth_state.user;  // ユーザ名
 
 		// 署名するデータを作成
@@ -7459,7 +7466,9 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 					  "%s: sending SSH2_MSG_USERAUTH_REQUEST method=publickey",
 					  __FUNCTION__);
 			logprintf_hexdump(LOG_LEVEL_VERBOSE,
-							  buffer_ptr(msg), len, "%s: len=%d", __FUNCTION__, len);
+							  buffer_ptr(msg), len, "send %s:%d %s() len=%d",
+							  __FILE__, __LINE__,
+							  __FUNCTION__, len);
 		}
 		buffer_free(msg);
 
