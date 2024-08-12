@@ -6609,11 +6609,13 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 				  "SSH2_MSG_USERAUTH_REQUEST was sent %s(). (method %d)",
 				  __FUNCTION__,
 				  pvar->auth_state.cur_cred.method);
-		logprintf_hexdump(LOG_LEVEL_VERBOSE,
+#if defined(SSH2_DEBUG)
+		logprintf_hexdump(LOG_LEVEL_SSHDUMP,
 						  buffer_ptr(msg), len,
 						  "send %s:%d %s() len=%d",
 						  __FILE__, __LINE__,
 						  __FUNCTION__, len);
+#endif
 	}
 	buffer_free(msg);
 
@@ -6791,7 +6793,7 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 	{
 		int len = pvar->ssh_state.payloadlen;
 		char *data = pvar->ssh_state.payload;
-		logprintf_hexdump(LOG_LEVEL_VERBOSE,
+		logprintf_hexdump(LOG_LEVEL_SSHDUMP,
 						  data, len,
 						  "receive %s:%d %s() len=%d",
 						  __FILE__, __LINE__,
@@ -6853,8 +6855,8 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
 		{
-			logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN was sent at %s().", __FUNCTION__);
-			logprintf_hexdump(LOG_LEVEL_VERBOSE,
+			logprintf(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN was sent at %s().", __FUNCTION__);
+			logprintf_hexdump(LOG_LEVEL_SSHDUMP,
 							  buffer_ptr(msg), len,
 							  "send %s:%d %s() len=%d",
 							  __FILE__, __LINE__,
@@ -6886,7 +6888,8 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
-	logprintf_hexdump(LOG_LEVEL_VERBOSE, data, len,
+	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+					  data, len,
 					  "receive %s:%d %s() len=%d",
 					  __FILE__, __LINE__,
 					  __FUNCTION__, len);
@@ -7243,7 +7246,8 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
-	logprintf_hexdump(LOG_LEVEL_VERBOSE, data, len,
+	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+					  data, len,
 					  "receive %s:%d %s() len=%d",
 					  __FILE__, __LINE__,
 					  __FUNCTION__, len);
@@ -7343,8 +7347,9 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 		logprintf(LOG_LEVEL_VERBOSE,
 				  "SSH2_MSG_USERAUTH_INFO_RESPONSE was sent %s().",
 				  __FUNCTION__);
-		logprintf_hexdump(LOG_LEVEL_VERBOSE,
-						  buffer_ptr(msg), len, "send %s:%d %s() len=%d",
+		logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+						  buffer_ptr(msg), len,
+						  "send %s:%d %s() len=%d",
 						  __FILE__, __LINE__,
 						  __FUNCTION__, len);
 	}
@@ -7376,7 +7381,8 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		{
 			const char *data = pvar->ssh_state.payload;
 			int len = pvar->ssh_state.payloadlen;
-			logprintf_hexdump(LOG_LEVEL_VERBOSE, data, len,
+			logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+							  data, len,
 							  "receive %s:%d %s() len=%d",
 							  __FILE__, __LINE__,
 							  __FUNCTION__, len);
@@ -7471,8 +7477,9 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 			logprintf(LOG_LEVEL_VERBOSE,
 					  "%s: sending SSH2_MSG_USERAUTH_REQUEST method=publickey",
 					  __FUNCTION__);
-			logprintf_hexdump(LOG_LEVEL_VERBOSE,
-							  buffer_ptr(msg), len, "send %s:%d %s() len=%d",
+			logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+							  buffer_ptr(msg), len,
+							  "send %s:%d %s() len=%d",
 							  __FILE__, __LINE__,
 							  __FUNCTION__, len);
 		}
@@ -7646,8 +7653,11 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 		logprintf(LOG_LEVEL_VERBOSE,
 				  "%s: sending SSH2_MSG_USERAUTH_REQUEST",
 				  __FUNCTION__);
-		logprintf_hexdump(LOG_LEVEL_VERBOSE,
-						  buffer_ptr(msg), len, "%s: len=%d", __FUNCTION__, len);
+		logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+						  buffer_ptr(msg), len,
+						  "send %s:%d %s() len=%d",
+						  __FILE__, __LINE__,
+						  __FUNCTION__, len);
 	}
 	buffer_free(msg);
 
@@ -7814,7 +7824,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
-	logprintf_hexdump(LOG_LEVEL_VERBOSE, data, len,
+	logprintf_hexdump(LOG_LEVEL_SSHDUMP, data, len,
 					  "receive %s:%d %s() len=%d",
 					  __FILE__, __LINE__,
 					  __FUNCTION__, len);
