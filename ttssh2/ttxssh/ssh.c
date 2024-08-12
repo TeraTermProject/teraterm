@@ -6940,6 +6940,10 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		pvar->ssh2_authlist = cstring; // 不要になったらフリーすること
 		logprintf(LOG_LEVEL_VERBOSE, "method list from server: %s", cstring);
 
+		if (pvar->auth_state.partial_success) {
+			// 複数認証時、ダイアログを出す処理へ
+			goto auth;
+		}
 		if (pvar->ssh2_authmethod == SSH_AUTH_TIS &&
 		    pvar->ask4passwd &&
 		    pvar->session_settings.CheckAuthListFirst &&
@@ -6997,8 +7001,10 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		return TRUE;
 	}
 
-	// ユーザ認証に失敗したときは、ユーザ名は固定して、パスワードの再入力を
-	// させる。ここの処理は SSH1 と同じ。(2004.10.3 yutaka)
+	// 追加認証の時
+	// ユーザ認証に失敗した時
+	//		ユーザ名は固定して、パスワードの再入力(SSH1 と同じ)
+auth:
 	AUTH_set_generic_mode(pvar);
 	AUTH_advance_to_next_cred(pvar);
 	pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
