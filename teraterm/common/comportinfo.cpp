@@ -376,13 +376,9 @@ static int sort_sub(const void *a_, const void *b_)
 {
 	const ComPortInfo_t *a = (ComPortInfo_t *)a_;
 	const ComPortInfo_t *b = (ComPortInfo_t *)b_;
-	if (wcsncmp(a->port_name, L"COM", 3) == 0 &&
-		wcsncmp(b->port_name, L"COM", 3) == 0) {
-		int a_no = _wtoi(&a->port_name[3]);
-		int b_no = _wtoi(&b->port_name[3]);
-		return a_no > b_no;
-	}
-	return wcscmp(a->port_name, b->port_name);
+	const int a_no = a->port_no;
+	const int b_no = b->port_no;
+	return (a_no == b_no) ? 0 : (a_no > b_no) ? 1 : -1;
 }
 
 /**
