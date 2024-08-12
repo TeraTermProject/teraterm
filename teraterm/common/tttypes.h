@@ -414,6 +414,7 @@ struct tttset {
 	COLORREF VTStrikeoutColor[2];  // SGR 9
 	COLORREF DummyColor[2];
 	WORD Beep;
+	WORD MessageBoxPosParentRelative;
 /*------ KeybSet --------*/
 	WORD BSKey;
 	WORD DelKey;

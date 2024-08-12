@@ -1353,6 +1353,7 @@ static void PASCAL TTXReadINIFile(const wchar_t *fileName, PTTSet ts)
 	pvar->settings = *pvar->ts_SSH;
 	logputs(LOG_LEVEL_VERBOSE, "Reading INI file");
 	FWDUI_load_settings(pvar);
+	MessageBoxPosParentRelative = ts->MessageBoxPosParentRelative;
 }
 
 static void PASCAL TTXWriteINIFile(const wchar_t *fileName, PTTSet ts)

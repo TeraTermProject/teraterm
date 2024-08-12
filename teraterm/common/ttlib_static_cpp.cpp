@@ -50,11 +50,15 @@
 #include "compat_win.h"
 #include "fileread.h"
 #include "tt-version.h"
+#include "tttypes.h"
 
 #include "ttlib.h"
 
 // for isInvalidFileNameCharW / replaceInvalidFileNameCharW
 static const wchar_t *invalidFileNameCharsW = L"\\/:*?\"<>|";
+
+// for TTMessageBoxW()
+WORD MessageBoxPosParentRelative = 0;
 
 /**
  *	MessageBoxÇï\é¶Ç∑ÇÈ
@@ -71,13 +75,11 @@ static const wchar_t *invalidFileNameCharsW = L"\\/:*?\"<>|";
  *		â¬ïœà¯êîÇÃ1Ç¬ñ⁄ÇèëéÆâªï∂éöóÒÇ∆ÇµÇƒégópÇ∑ÇÈ
  */
 
-__declspec(thread) HWINEVENTHOOK TTMessageBoxW_hHook;
-
 static void CALLBACK TTMessageBoxW_WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
 {
 	if ((GetWindowLongPtr(hwnd, GWL_STYLE) & WS_CHILD) == 0) {
 		CenterWindow(hwnd, GetParent(hwnd));
-		UnhookWinEvent(TTMessageBoxW_hHook);
+		UnhookWinEvent(hWinEventHook);
 	}
 }
 
@@ -110,8 +112,8 @@ int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILan
 		free(format);
 	}
 
-	if (hWnd != NULL) {
-		TTMessageBoxW_hHook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL,
+	if (hWnd != NULL && MessageBoxPosParentRelative == 1) {
+		SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL,
 			&TTMessageBoxW_WinEventProc, GetCurrentProcessId(), GetCurrentThreadId(), WINEVENT_OUTOFCONTEXT);
 	}
 

@@ -49,6 +49,8 @@ extern "C" {
 #define _Printf_format_string_
 #endif
 
+extern WORD MessageBoxPosParentRelative;
+
 BOOL GetFileNamePos(const char *PathName, int *DirLen, int *FNPos);
 BOOL GetFileNamePosU8(const char *PathName, int *DirLen, int *FNPos);
 BOOL GetFileNamePosW(const wchar_t *PathName, size_t *DirLen, size_t *FNPos);
