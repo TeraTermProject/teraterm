@@ -172,7 +172,6 @@ static BOOL openFileWithApplication(const wchar_t *filename,
 	DWORD e = TTCreateProcess(editor, arg, filename);
 	if (e != NO_ERROR) {
 		// ‹N“®Ž¸”s
-		DWORD no = GetLastError();
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
@@ -340,7 +339,7 @@ static void PopupAndExec(HWND hWnd, const POINT *pointer_pos, const wchar_t *pat
 	UINT menu_flag_open_file = MF_DISABLED;
 	if (menu_flag == MF_ENABLED) {
 		const DWORD file_stat = GetFileAttributesW(path);
-		if ((file_stat == FILE_INVALID_FILE_ID) || ((file_stat & FILE_ATTRIBUTE_DIRECTORY) != 0)) {
+		if ((file_stat == INVALID_FILE_ATTRIBUTES) || ((file_stat & FILE_ATTRIBUTE_DIRECTORY) != 0)) {
 			menu_flag_open_file = MF_DISABLED;
 		}
 		else {
