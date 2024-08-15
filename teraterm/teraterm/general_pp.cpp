@@ -37,14 +37,10 @@
 
 #include "tttypes.h"
 #include "ttwinman.h"	// for ts
-#include "dlglib.h"
 #include "helpid.h"
 #include "i18n.h"
-#include "codeconv.h"
-#include "asprintf.h"
 #include "win32helper.h"
 #include "ttcmn_notify2.h"
-#include "ttlib_types.h"
 #include "compat_win.h"
 
 #include "general_pp.h"
@@ -88,7 +84,6 @@ void CGeneralPropPageDlg::OnInitDialog()
 		{ IDC_NOTIFY_SOUND, "DLG_TAB_GENERAL_NOTIFIY_SOUND" },
 		{ IDC_NOTIFICATION_TEST_POPUP, "DLG_TAB_GENERAL_NOTIFICATION_TEST_NOTIFY" },
 		{ IDC_NOTIFICATION_TEST_TRAY, "DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY" },
-		{ IDC_GENPORT_LABEL, "DLG_GEN_PORT" },
 	};
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
@@ -123,30 +118,6 @@ void CGeneralPropPageDlg::OnInitDialog()
 
 	// Notify
 	SetCheck(IDC_NOTIFY_SOUND, ts.NotifySound);
-
-	// default port
-	{
-		WORD w;
-		TTTSet *pts = &ts;
-		SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM) "TCP/IP");
-		for (w=1;w<=pts->MaxComPort;w++) {
-			char Temp[8];
-			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "COM%d", w);
-			SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM)Temp);
-		}
-		if (pts->PortType==IdSerial) {
-			if (pts->ComPort <= pts->MaxComPort) {
-				w = pts->ComPort;
-			}
-			else {
-				w = 1; // COM1
-			}
-		}
-		else {
-			w = 0; // TCP/IP
-		}
-		SendDlgItemMessageA(IDC_GENPORT, CB_SETCURSEL, w, 0);
-	}
 
 	// Download dir
 	SetDlgItemTextW(IDC_DOWNLOAD_DIR, ts.FileDirW);
@@ -198,21 +169,9 @@ void CGeneralPropPageDlg::OnOK()
 		}
 	}
 
-	// default port
-	{
-		TTTSet *pts = &ts;
-		WORD w = (WORD)::GetCurSel(m_hWnd, IDC_GENPORT);
-		if (w>1) {
-			pts->PortType = IdSerial;
-			pts->ComPort = w-1;
-		}
-		else {
-			pts->PortType = IdTCPIP;
-		}
-	}
-
 	// Download dir
 	free(ts.FileDirW);
+	ts.FileDirW = NULL;
 	hGetDlgItemTextW(m_hWnd, IDC_DOWNLOAD_DIR, &ts.FileDirW);
 	if (ts.FileDirW != NULL && ts.FileDirW[0] == 0) {
 		ts.FileDirW = NULL;
