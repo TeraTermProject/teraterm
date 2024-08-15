@@ -158,7 +158,8 @@
 #define HlpMenuSetupAdditionalKeyboard      43026
 #define HlpMenuSetupAdditionalMouse         43027
 #define HlpMenuSetupAdditionalGeneral       43028
-#define HlpMenuSetupAdditionalCopyAndPaste  43029
+#define HlpMenuSetupAdditionalTCPIP         43029
+#define HlpMenuSetupAdditionalCopyAndPaste  43030
 #define HlpMenuSetupSave                    43013
 #define HlpMenuSetupRestore                 43014
 #define HlpMenuSetupDir                     43016

@@ -1200,7 +1200,7 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 				logprintf(LOG_LEVEL_WARNING, pvar->UIMsg, WSAGetLastError());
 			}
 			freeaddrinfo(res0);
-			/* free(request->listening_sockets); /* DO NOT FREE HERE, listening_sockets'll be freed in FWD_end */
+			/* free(request->listening_sockets); *//* DO NOT FREE HERE, listening_sockets'll be freed in FWD_end */
 			return FALSE;
 		}
 		freeaddrinfo(res0);

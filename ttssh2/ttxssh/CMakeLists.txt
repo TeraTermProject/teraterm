@@ -100,7 +100,6 @@ target_sources(
   util.h
   x11util.c
   x11util.h
-  ${COMMON_SRC}
   )
 
 target_sources(
@@ -117,6 +116,15 @@ target_sources(
   ../../teraterm/common/compat_win.h
   ../../teraterm/common/dllutil.h
   )
+
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
+  ../../teraterm/common/edithistory.cpp
+  ../../teraterm/common/edithistory.h
+  ../../teraterm/common/edithistory.rc
+  ../../teraterm/common/edithistory_res.h
+)
 
 source_group(
   "common"

@@ -35,17 +35,27 @@ target_sources(
   ../teraterm/common/codeconv.h
   ../teraterm/common/compat_win.h
   ../teraterm/common/dllutil.h
-  ../libs/libressl/include/openssl/sha.h
-  ../libs/libressl/include/openssl/evp.h
-  ../libs/libressl/include/openssl/rand.h
-  ../libs/libressl/include/openssl/hmac.h
-  ../libs/libressl/include/openssl/crypto.h
   )
 
 source_group(
   "common"
   REGULAR_EXPRESSION
   "teraterm\/common\/")
+
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
+  ${LIBRESSL_INCLUDE_DIRS}/openssl/sha.h
+  ${LIBRESSL_INCLUDE_DIRS}/openssl/evp.h
+  ${LIBRESSL_INCLUDE_DIRS}/openssl/rand.h
+  ${LIBRESSL_INCLUDE_DIRS}/openssl/hmac.h
+  ${LIBRESSL_INCLUDE_DIRS}/openssl/crypto.h
+)
+
+source_group(
+  "libressl"
+  REGULAR_EXPRESSION
+  "${LIBRESSL_INCLUDE_DIRS}/openssl/")
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
@@ -95,7 +105,7 @@ target_link_libraries(
   gdi32
   comdlg32
   ${LIBRESSL_LIB}
-  Bcrypt
+  bcrypt
   ws2_32
   )
 

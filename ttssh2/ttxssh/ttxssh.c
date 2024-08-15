@@ -107,8 +107,8 @@
 #include "asprintf.h"
 #include "ttcommdlg.h"
 #include "resize_helper.h"
-
 #include "libputty.h"
+#include "edithistory.h"
 
 #ifdef OPENSSL_LEGACY_PROVIDER
 static OSSL_PROVIDER *legacy_provider = NULL;
@@ -1041,7 +1041,29 @@ typedef struct {
 	PGetHNRec GetHNRec;
 	ComPortInfo_t *ComPortInfoPtr;
 	int ComPortInfoCount;
+	BOOL HostDropOpen;
 } TTXHostDlgData;
+
+static BOOL IsEditHistorySelected(HWND dlg)
+{
+	LRESULT index = SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCURSEL, 0, 0);
+	LRESULT data = SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETITEMDATA, (WPARAM)index, 0);
+	return data == 999;
+}
+
+static void OpenEditHistory(HWND dlg, TTTSet *ts)
+{
+	if (EditHistoryDlg(dlg, ts)) {
+		// 編集されたので、ドロップダウンを再設定する
+		LRESULT index;
+		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_RESETCONTENT, 0, 0);
+		SetComboBoxHostHistory(dlg, IDC_HOSTNAME, MAXHOSTLIST, ts->SetupFNameW);
+		index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING, 0, (LPARAM)L"<Edit history...>");
+		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
+	}
+	// 一番最初を選択する
+	SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
+}
 
 static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -1070,6 +1092,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 	case WM_INITDIALOG: {
 		int j;
 		int com_index;
+		LRESULT index;
 
 		GetHNRec = (PGetHNRec)lParam;
 		dlg_data = (TTXHostDlgData *)calloc(1, sizeof(*dlg_data));
@@ -1077,6 +1100,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 		dlg_data->GetHNRec = GetHNRec;
 
 		dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount);
+		dlg_data->HostDropOpen = FALSE;
 
 		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
@@ -1095,6 +1119,9 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 
 		// ホスト (コマンドライン)
 		SetComboBoxHostHistory(dlg, IDC_HOSTNAME, MAXHOSTLIST, GetHNRec->SetupFNW);
+		index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING, 0, (LPARAM)L"<Edit history...>");
+		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
+
 		ExpandCBWidth(dlg, IDC_HOSTNAME);
 		SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
 		SendDlgItemMessage(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
@@ -1207,6 +1234,10 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
+			if(IsEditHistorySelected(dlg)) {
+				OpenEditHistory(dlg, pvar->ts);
+				break;
+			}
 			if (IsDlgButtonChecked(dlg, IDC_HOSTTCPIP)) {
 				BOOL Ok;
 				i = GetDlgItemInt(dlg, IDC_HOSTTCPPORT, &Ok, FALSE);
@@ -1317,6 +1348,28 @@ hostssh_enabled:
 
 		case IDC_HOSTHELP:
 			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpFileNewConnection, 0);
+			break;
+
+		case IDC_HOSTNAME: {
+			switch (HIWORD(wParam)) {
+			case CBN_DROPDOWN:
+				dlg_data->HostDropOpen = TRUE;
+				break;
+			case CBN_CLOSEUP:
+				dlg_data->HostDropOpen = FALSE;
+				break;
+			case CBN_SELENDOK:
+				if (dlg_data->HostDropOpen) {
+					//	ドロップダウンしていないときは、キーかホイールで選択している
+					//	決定(Enter or OK押下)すると編集開始
+					if(IsEditHistorySelected(dlg)) {
+						OpenEditHistory(dlg, pvar->ts);
+					}
+				}
+				break;
+			}
+			break;
+		}
 		}
 		break;
 	case WM_DESTROY:
