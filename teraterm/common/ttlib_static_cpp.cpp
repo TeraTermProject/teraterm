@@ -50,11 +50,15 @@
 #include "compat_win.h"
 #include "fileread.h"
 #include "tt-version.h"
+#include "tttypes.h"
 
 #include "ttlib.h"
 
 // for isInvalidFileNameCharW / replaceInvalidFileNameCharW
 static const wchar_t *invalidFileNameCharsW = L"\\/:*?\"<>|";
+
+// for TTMessageBoxW()
+WORD MessageBoxPosParentRelative = 0;
 
 /**
  *	MessageBox‚ð•\Ž¦‚·‚é
@@ -70,6 +74,15 @@ static const wchar_t *invalidFileNameCharsW = L"\\/:*?\"<>|";
  *	info.message_key, info.message_default —¼•û‚Æ‚àNULL‚Ìê‡
  *		‰Â•Ïˆø”‚Ì1‚Â–Ú‚ð‘Ž®‰»•¶Žš—ñ‚Æ‚µ‚ÄŽg—p‚·‚é
  */
+
+static void CALLBACK TTMessageBoxW_WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
+{
+	if ((GetWindowLongPtr(hwnd, GWL_STYLE) & WS_CHILD) == 0) {
+		CenterWindow(hwnd, GetParent(hwnd));
+		UnhookWinEvent(hWinEventHook);
+	}
+}
+
 int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILanguageFile, ...)
 {
 	const char *section = info->section;
@@ -97,6 +110,11 @@ int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILan
 		va_start(ap, UILanguageFile);
 		vaswprintf(&message, format, ap);
 		free(format);
+	}
+
+	if (hWnd != NULL && MessageBoxPosParentRelative == 1) {
+		SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL,
+			&TTMessageBoxW_WinEventProc, GetCurrentProcessId(), GetCurrentThreadId(), WINEVENT_OUTOFCONTEXT);
 	}
 
 	int r = MessageBoxW(hWnd, message, title, uType);

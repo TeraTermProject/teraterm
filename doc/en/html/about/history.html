@@ -67,12 +67,15 @@
       <li>Modified to <a href="../setup/teraterm-ssh.html#AuthBanner">display SSH authentication banner in VT window</a> regardless of receiving character code.
       <li>Keyboard setting dialog is moved to Keyboard tab of Additional setting dialog.</li>
       <li>MACRO: <a href="../macro/command/send.html">send</a> macro command check data and sends it as text or binary. added <a href="../macro/command/sendtext.html">sendtext</a> and <a href="../macro/command/sendbinary.html">sendbinary</a> macro command</li>
-      <li>Macro
+      <li>MACRO: password file using aes-256-ctr
         <ul>
           <li>added the <a href="../macro/command/setpassword2.html">setpassword2</a>, <a href="../macro/command/getpassword2.html">getpassword2</a>, <a href="../macro/command/ispassword2.html">ispassword2</a> and <a href="../macro/command/delpassword2.html">delpassword2</a> commands. The contents that is saved with setpassword2 command is protected by a password. This password file is not compatible with prior password file.</li>
         </ul>
+      <li>added the <a href="../macro/command/getttpos.html">getttpos</a> command to retrieve the display status, position, and size in the VT window of Tera Term.</li>
       </li>
       <li>Add ViewlogEditor argument on <a href="../menu/setup-additional-log.html#ViewlogEditorArg">Log Tab</a> in Additional settings.</li>
+      <li>Setup - Font was integrated into <a href="../menu/setup-additional-font.html">Font tab</a> of Additional settings.</li>
+      <li>Added the <a href="../setup/teraterm-misc.html#MessageBoxPosParentRelative">MessageBoxPosParentRelative</a> option to change the display position of the message box (excluding some) from the center of the screen to the center of the parent window.</li>
       <li>Setup - Font was integrated into <a href="../menu/setup-additional-font.html">Font tab</a> of Additional settings.
       <li>Add <a href="../menu/setup-additional-tcpip.html">TCP/IP tab</a> of Additional setting dialog.
         <ul>

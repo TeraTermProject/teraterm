@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>getttpos</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>getttpos</h1>
+
+<p>
+Tera Term の VT window の表示状態、位置、サイズを取得する。<em>(バージョン5.3以降)</em>
+</p>
+
+<h2>形式</h2>
+
+<pre class="macro-syntax">
+getttpos &lt;showflag&gt; &lt;window x&gt; &lt;window y&gt; &lt;window width&gt; &lt;window height&gt; &lt;client x&gt; &lt;client y&gt; &lt;client width&gt; &lt;client height&gt;
+</pre>
+
+<h2>パラメータ</h2>
+
+<dl>
+	<dt class="macro">整数型変数 &lt;showflag&gt;</dt>
+	<dd>VT windowの表示状態が格納される。<br>
+	    0 : 通常状態<br>
+	    1 : 最小化状態<br>
+	    2 : 最大化状態<br>
+	    3 : 非表示状態</dd>
+
+	<dt class="macro">整数型変数 &lt;window x&gt;</dt>
+	<dd>ウィンドウ領域左上隅の X 座標が格納される。</dd>
+
+	<dt class="macro">整数型変数 &lt;window y&gt;</dt>
+	<dd>ウィンドウ領域左上隅の Y 座標が格納される。</dd>
+
+	<dt class="macro">整数型変数 &lt;window width&gt;</dt>
+	<dd>ウィンドウ領域の幅が格納される。</dd>
+
+	<dt class="macro">整数型変数 &lt;window height&gt;</dt>
+	<dd>ウィンドウ領域の高さが格納される。</dd>
+
+	<dt class="macro">整数型変数 &lt;client x&gt;</dt>
+	<dd>クライアント領域左上隅の X 座標が格納される。</dd>
+
+	<dt class="macro">整数型変数 &lt;client y&gt;</dt>
+	<dd>クライアント領域左上隅の Y 座標が格納される。</dd>
+
+	<dt class="macro">整数型変数 &lt;client width&gt;</dt>
+	<dd>クライアント領域の幅が格納される。</dd>
+
+	<dt class="macro">整数型変数 &lt;client height&gt;</dt>
+	<dd>クライアント領域の高さが格納される。</dd>
+	</dd>
+</dl>
+
+<h2>返り値</h2>
+
+<dl>
+	<dt class="macro">システム変数 &lt;result&gt;</dt>
+	<dd>情報取得に成功した場合は 0 が、失敗した場合は -1 が格納される。</dd>
+</dl>
+
+<h2>解説</h2>
+
+<p>
+座標、幅、高さの単位はピクセル。<br>
+座標の原点 (0,0) はメインディスプレイ(プライマリディスプレイ)の左上隅の位置。<br>
+ウィンドウ領域はアプリケーションウィンドウ全体を、クライアント領域はウィンドウ領域からタイトルバー/メニューバー/フレーム等を除いたテキスト表示領域を指す。<br>
+VT windowが最小化状態または非表示状態の場合は、座標、幅、高さは誤った値が格納される。<br>
+MACRO が Tera Term とリンクされていない場合は、マクロエラーとなりマクロの実行が一時停止する。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+testlink
+if result > 1 then
+  :start
+  getttpos showflag w_x w_y w_width w_height c_x c_y c_width c_height
+  if showflag != 3 then
+    if showflag = 1 then
+      showtt 1
+      goto start
+    endif
+    setdlgpos c_x c_y
+    sprintf2 str 'x=%d, y=%d, width=%d, height=%d' c_x c_y c_width c_height
+    messagebox str 'Client Area'
+  endif
+endif
+</pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="testlink.html">testlink</a></li>
+  <li><a href="showtt.html">showtt</a></li>
+  <li><a href="setdlgpos.html">setdlgpos</a></li>
+</ul>
+
+</body>
+</html>

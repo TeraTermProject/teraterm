@@ -2072,6 +2072,10 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->BracketedSupport = GetOnOff(Section, "BracketedSupport", FName, TRUE);
 	ts->BracketedControlOnly = GetOnOff(Section, "BracketedControlOnly", FName, FALSE);
 
+	// MessageBoxの表示位置
+	ts->MessageBoxPosParentRelative = GetOnOff(Section, "MessageBoxPosParentRelative", FName, FALSE);
+	MessageBoxPosParentRelative = ts->MessageBoxPosParentRelative;
+
 	// Experimental
 	ts->ExperimentalTreeProprtySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
 }
@@ -3330,6 +3334,8 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "BracketedSupport", FName, ts->BracketedSupport);
 	WriteOnOff(Section, "BracketedControlOnly", FName, ts->BracketedControlOnly);
 
+	// MessageBoxの表示位置
+	WriteOnOff(Section, "MessageBoxPosParentRelative", FName, ts->MessageBoxPosParentRelative);
 }
 
 void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,

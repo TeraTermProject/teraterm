@@ -67,13 +67,15 @@
       <li><a href="../setup/teraterm-ssh.html#AuthBanner">SSH認証バナーをVT ウィンドウ内に表示する</a>時、受信文字コードによらず表示できるよう変更した。</li>
       <li>キーボード設定ダイアログを Additional settings の Keyboard タブへ移動した。</li>
       <li>MACRO: <a href="../macro/command/send.html">send</a> マクロコマンドは送信データを判定してテキスト又はバイナリとして送信する。<a href="../macro/command/sendtext.html">sendtext</a> と <a href="../macro/command/sendbinary.html">sendbinary</a> マクロコマンドを追加した。</li>
-      <li>マクロ
+      <li>MACRO: aes-256-ctrを使用したパスワードファイル
         <ul>
           <li><a href="../macro/command/setpassword2.html">setpassword2</a>, <a href="../macro/command/getpassword2.html">getpassword2</a>, <a href="../macro/command/ispassword2.html">ispassword2</a>, <a href="../macro/command/delpassword2.html">delpassword2</a> コマンドを追加した。setpassword2 コマンドで保存されたファイルの内容は、パスワードで保護される。このコマンドで扱われるパスワードファイルは、既存のパスワードファイルとは互換性がない。</li>
         </ul>
+      <li>MACRO: Tera Term の VT window の表示状態、位置、サイズを取得する <a href="../macro/command/getttpos.html">getttpos</a> コマンドを追加した。</li>
       </li>
       <li>Additional settings の <a href="../menu/setup-additional-log.html#ViewlogEditorArg">Log タブ</a>に ViewlogEditor の引き数を追加した。</li>
       <li>設定-フォント設定を Additional settings の <a href="../menu/setup-additional-font.html">フォントタブ</a>へ統合した。</li>
+      <li>メッセージボックス(一部を除く)の表示位置を画面中央から親ウィンドウ中央に変更する <a href="../setup/teraterm-misc.html#MessageBoxPosParentRelative">MessageBoxPosParentRelative</a> オプションを追加した。</li>
       <li>Additional settings に <a href="../menu/setup-additional-tcpip.html">TCP/IP タブ</a> を追加した。
         <ul>
           <li>TCP/IP setup ダイアログを TCP/IP タブへ移動した。</li>

@@ -75,6 +75,8 @@ HWND GetHWND()
 
 static void init()
 {
+	wchar_t Temp[4];
+
 	HomeDirW = GetHomeDirW(hInst);
 	SetupFNameW = GetDefaultFNameW(HomeDirW, L"TERATERM.INI");
 
@@ -85,7 +87,6 @@ static void init()
 
 	// DPI Aware (çÇDPIëŒâû)
 	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
-		wchar_t Temp[4];
 		GetPrivateProfileStringW(L"Tera Term", L"DPIAware", NULL, Temp, _countof(Temp), SetupFNameW);
 		if (_wcsicmp(Temp, L"on") == 0) {
 			if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
@@ -99,6 +100,12 @@ static void init()
 	GetI18nLogfontW(L"Tera Term", L"DlgFont", &logfont, 0, SetupFNameW);
 	SetDialogFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet,
 				  UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+
+	// MessageBoxPosParentRelativeÇÃéÊìæ
+	GetPrivateProfileStringW(L"Tera Term", L"MessageBoxPosParentRelative", NULL, Temp, _countof(Temp), SetupFNameW);
+	if (_wcsicmp(Temp, L"on") == 0) {
+		MessageBoxPosParentRelative = 1;
+	}
 }
 
 // TTMACRO main engine

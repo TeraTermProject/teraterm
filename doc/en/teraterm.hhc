@@ -963,6 +963,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="getttpos">
+					<param name="Local" value="html\macro\command\getttpos.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="kmtfinish">
 					<param name="Local" value="html\macro\command\kmtfinish.html">
 					<param name="ImageNumber" value="11">

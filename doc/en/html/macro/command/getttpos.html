@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>getttpos</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>getttpos</h1>
+
+<p>
+Retrieve the display status, position, and size of the VT window in Tera Term. <em>(version 5.3 or later)</em>
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+getttpos &lt;showflag&gt; &lt;window x&gt; &lt;window y&gt; &lt;window width&gt; &lt;window height&gt; &lt;client x&gt; &lt;client y&gt; &lt;client width&gt; &lt;client height&gt;
+</pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">Integer variable &lt;showflag&gt;</dt>
+	<dd>The display status of the VT window is stored.<br>
+	    0 : Normal<br>
+	    1 : Minimized (Iconified)<br>
+	    2 : Maximized<br>
+	    3 : Hidden</dd>
+
+	<dt class="macro">Integer variable &lt;window x&gt;</dt>
+	<dd>The X coordinate of the top-left corner of the window area is stored. </dd>
+
+	<dt class="macro">Integer variable &lt;window y&gt;</dt>
+	<dd>The Y coordinate of the top-left corner of the window area is stored.</dd>
+
+	<dt class="macro">Integer variable &lt;window width&gt;</dt>
+	<dd>The width of the window area is stored.</dd>
+
+	<dt class="macro">Integer variable &lt;window height&gt;</dt>
+	<dd>The height of the window area is stored.</dd>
+
+	<dt class="macro">Integer variable &lt;client x&gt;</dt>
+	<dd>The X coordinate of the top-left corner of the client area is stored. </dd>
+
+	<dt class="macro">Integer variable &lt;client y&gt;</dt>
+	<dd>The Y coordinate of the top-left corner of the client area is stored.</dd>
+
+	<dt class="macro">Integer variable &lt;client width&gt;</dt>
+	<dd>The width of the client area is stored.</dd>
+
+	<dt class="macro">Integer variable &lt;client height&gt;</dt>
+	<dd>The height of the client area is stored.</dd>
+	</dd>
+
+</dl>
+
+<h2>Return Value</h2>
+
+<dl>
+	<dt class="macro">System variable &lt;result&gt;</dt>
+	<dd>If the information retrieval is successful, the value 0 is stored. <br>
+	    If it fails, the value -1 is stored.</dd>
+</dl>
+
+<h2>Remarks</h2>
+
+<p>
+The units for coordinates, width, and height are pixels.<br>
+The origin (0,0) refers to the top-left corner of the main display (primary display).<br>
+The window area refers to the entire application window, while the client area refers to the text display area excluding the title bar, menu bar, frame etc from the window area.<br>
+If the VT window is in a minimized or hidden state, the stored values for coordinates, width, and height are incorrect.<br>
+If the MACRO is not linked to Tera Term, it will result in a macro error and the execution of the macro will be temporarily paused.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+testlink
+if result > 1 then
+  :start
+  getttpos showflag w_x w_y w_width w_height c_x c_y c_width c_height
+  if showflag != 3 then
+    if showflag = 1 then
+      showtt 1
+      goto start
+    endif
+    setdlgpos c_x c_y
+    sprintf2 str 'x=%d, y=%d, width=%d, height=%d' c_x c_y c_width c_height
+    messagebox str 'Client Area'
+  endif
+endif
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="testlink.html">testlink</a></li>
+  <li><a href="showtt.html">showtt</a></li>
+  <li><a href="setdlgpos.html">setdlgpos</a></li>
+</ul>
+
+</body>
+</html>

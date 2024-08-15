@@ -35,6 +35,7 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttplugin.h"
+#include "ttlib.h"
 
 #include "codeconv.h"
 #include "dlglib.h"
@@ -55,6 +56,7 @@ typedef struct {
 	PComVar cv;
 	version_one_t *versions;
 	size_t versions_count;
+	PReadIniFile ReadIniFile;
 } TInstVar;
 
 static TInstVar InstVar;
@@ -239,6 +241,18 @@ static void WINAPI TTXInit(PTTSet ts, PComVar cv)
 	pvar->cv = cv;
 }
 
+static void PASCAL TTXReadINIFile(const wchar_t *fileName, PTTSet ts)
+{
+	(pvar->ReadIniFile) (fileName, ts);
+	MessageBoxPosParentRelative = ts->MessageBoxPosParentRelative;
+}
+
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks)
+{
+	pvar->ReadIniFile = *hooks->ReadIniFile;
+	*hooks->ReadIniFile = TTXReadINIFile;
+}
+
 static void WINAPI TTXModifyMenu(HMENU menu)
 {
 	static const DlgTextInfo MenuTextInfo[] = {
@@ -269,7 +283,7 @@ static TTXExports Exports = {
 
 	TTXInit,
 	NULL,
-	NULL,
+	TTXGetSetupHooks,
 	NULL,
 	NULL,
 	NULL,
