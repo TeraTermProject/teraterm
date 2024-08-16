@@ -21,6 +21,7 @@
 
 Please execute below commands on the top of source tree.
 Use Visual Studio IDE
+(`-A win32` specifies x86; `-A x64` for x64, `-A arm64` for ARM64)
 
     mkdir build_vs2022
     cd build_vs2022
