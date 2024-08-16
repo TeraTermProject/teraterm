@@ -2047,8 +2047,12 @@ char *GetVersionSubstr(void)
 		strncat_s(buf, sizeof_buf, TT_VERSION_SUBSTR " ", _TRUNCATE);
 	}
 #endif
-#if defined(_M_X64)
-	strncat_s(buf, sizeof_buf, "64bit ", _TRUNCATE);
+#if defined(_M_IX86)
+	strncat_s(buf, sizeof_buf, "x86 ", _TRUNCATE);
+#elif defined(_M_X64)
+	strncat_s(buf, sizeof_buf, "x64 ", _TRUNCATE);
+#elif defined(_M_ARM64)
+	strncat_s(buf, sizeof_buf, "ARM64 ", _TRUNCATE);
 #endif
 #if defined(GITVERSION)
 	strncat_s(buf, sizeof_buf, "(Git " GITVERSION ")", _TRUNCATE);
