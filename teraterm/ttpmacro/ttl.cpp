@@ -2912,18 +2912,24 @@ static WORD TTLGetTTPos(void)
 		int tmp_showflag;
 		int tmpw_x, tmpw_y, tmpw_width, tmpw_height;
 		int tmpc_x, tmpc_y, tmpc_width, tmpc_height;
-		if (sscanf_s(Str, "%d %d %d %d %d %d %d %d %d", &tmp_showflag,
+		long long llHVTWin; // VT window‚Ìƒnƒ“ƒhƒ‹
+		float mag = 1;
+
+		if (sscanf_s(Str, "%d %d %d %d %d %d %d %d %d %lld", &tmp_showflag,
 					 &tmpw_x, &tmpw_y, &tmpw_width, &tmpw_height,
-					 &tmpc_x, &tmpc_y, &tmpc_width, &tmpc_height) == 9) {
+					 &tmpc_x, &tmpc_y, &tmpc_width, &tmpc_height, &llHVTWin) == 10) {
+			if (DPIAware == DPI_AWARENESS_CONTEXT_UNAWARE) {
+				mag = GetMonitorDpiFromWindow((HWND)llHVTWin) / 96.f;
+			}
 			SetIntVal(showflag, tmp_showflag);
-			SetIntVal(w_x,      tmpw_x);
-			SetIntVal(w_y,      tmpw_y);
-			SetIntVal(w_width,  tmpw_width);
-			SetIntVal(w_height, tmpw_height);
-			SetIntVal(c_x,      tmpc_x);
-			SetIntVal(c_y,      tmpc_y);
-			SetIntVal(c_width,  tmpc_width);
-			SetIntVal(c_height, tmpc_height);
+			SetIntVal(w_x,      (int)(tmpw_x      * mag));
+			SetIntVal(w_y,      (int)(tmpw_y      * mag));
+			SetIntVal(w_width,  (int)(tmpw_width  * mag));
+			SetIntVal(w_height, (int)(tmpw_height * mag));
+			SetIntVal(c_x,      (int)(tmpc_x      * mag));
+			SetIntVal(c_y,      (int)(tmpc_y      * mag));
+			SetIntVal(c_width,  (int)(tmpc_width  * mag));
+			SetIntVal(c_height, (int)(tmpc_height * mag));
 			SetResult(0);
 		} else {
 			SetResult(-1);

@@ -1100,9 +1100,9 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		DispGetWindowSize(&c_width, &c_height, TRUE);
 
 		_snprintf_s(ParamFileName, sizeof(ParamFileName), _TRUNCATE,
-			    "%d %d %d %d %d %d %d %d %d", showflag,
+			    "%d %d %d %d %d %d %d %d %d %lld", showflag,
 			    w_x, w_y, w_width, w_height,
-			    c_x, c_y, c_width, c_height);
+			    c_x, c_y, c_width, c_height, (long long)HVTWin);
 		break;
 
 	case CmdSendBroadcast: { // 'sendbroadcast'

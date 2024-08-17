@@ -63,6 +63,8 @@ static HINSTANCE hInst;
 static BOOL Busy;
 static CCtrlWindow *pCCtrlWindow;
 
+DPI_AWARENESS_CONTEXT DPIAware;
+
 HINSTANCE GetInstance()
 {
 	return hInst;
@@ -86,11 +88,13 @@ static void init()
 	WinCompatInit();
 
 	// DPI Aware (çÇDPIëŒâû)
+	DPIAware = DPI_AWARENESS_CONTEXT_UNAWARE;
 	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
 		GetPrivateProfileStringW(L"Tera Term", L"DPIAware", NULL, Temp, _countof(Temp), SetupFNameW);
 		if (_wcsicmp(Temp, L"on") == 0) {
 			if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
 				pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+				DPIAware = DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2;
 			}
 		}
 	}
