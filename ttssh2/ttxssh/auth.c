@@ -60,6 +60,8 @@
 
 #define MAX_AUTH_CONTROL IDC_SSHUSEPAGEANT
 
+#define USER_PASSWORD_IS_UTF8	1
+
 #undef DialogBoxParam
 #define DialogBoxParam(p1,p2,p3,p4,p5) \
 	TTDialogBoxParam(p1,p2,p3,p4,p5)
@@ -481,14 +483,63 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	PostMessage(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, focus_id), TRUE);
 }
 
-static char *alloc_control_text(HWND ctl)
+/**
+ *	hGetWindowTextW の UTF-8 版
+ */
+#if defined(USER_PASSWORD_IS_UTF8)
+static DWORD hGetWindowTextU8(HWND ctl, char **textU8)
 {
+	DWORD e;
 	wchar_t *textW;
-	char *textA;
-	hGetWindowTextW(ctl, &textW);
-	textA = ToCharW(textW);
+	e = hGetWindowTextW(ctl, &textW);
+	if (e != NO_ERROR) {
+		*textU8 = NULL;
+		return e;
+	}
+	*textU8 = ToU8W(textW);
 	free(textW);
-	return textA;
+	return NO_ERROR;
+}
+
+static DWORD hGetDlgItemTextU8(HWND hDlg, int id, char **textU8)
+{
+	HWND hWnd = GetDlgItem(hDlg, id);
+	return hGetWindowTextU8(hWnd, textU8);
+}
+#endif
+
+/**
+ *	hGetWindowTextW の ANSI 版
+ */
+#if !defined(USER_PASSWORD_IS_UTF8)
+static DWORD hGetWindowTextA(HWND ctl, char **textA)
+{
+	DWORD e;
+	wchar_t *textW;
+	e = hGetWindowTextW(ctl, &textW);
+	if (e != NO_ERROR) {
+		*textA = NULL;
+		return e;
+	}
+	*textA = ToCharW(textW);
+	free(textW);
+	return NO_ERROR;
+}
+
+static DWORD hGetDlgItemTextA(HWND hDlg, int id, char **textA)
+{
+	HWND hWnd = GetDlgItem(hDlg, id);
+	return hGetWindowTextA(hWnd, textA);
+}
+#endif
+
+static DWORD hGetDlgItemTextAorU8(HWND hDlg, int id, char **text)
+{
+#if defined(USER_PASSWORD_IS_UTF8)
+	return hGetDlgItemTextU8(hDlg, id, text);
+#else
+	return hGetDlgItemTextA(hDlg, id, text);
+#endif
 }
 
 /**
@@ -567,10 +618,10 @@ static void choose_host_RSA_key_file(HWND dlg, PTInstVar pvar)
 static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 {
 	int method = SSH_AUTH_PASSWORD;
-	char *password =
-		alloc_control_text(GetDlgItem(dlg, IDC_SSHPASSWORD));
+	char *password;
 	Key *key_pair = NULL;
 
+	hGetDlgItemTextAorU8(dlg, IDC_SSHPASSWORD, &password);
 	if (IsDlgButtonChecked(dlg, IDC_SSHUSERSA)) {
 		method = SSH_AUTH_RSA;
 	} else if (IsDlgButtonChecked(dlg, IDC_SSHUSERHOSTS)) {
@@ -760,8 +811,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 	/* we can't change the user name once it's set. It may already have
 	   been sent to the server, and it can only be sent once. */
 	if (pvar->auth_state.user == NULL) {
-		pvar->auth_state.user =
-			alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+		hGetDlgItemTextAorU8(dlg, IDC_SSHUSERNAME, &pvar->auth_state.user);
 	}
 
 	// パスワードの保存をするかどうかを決める (2006.8.3 yutaka)
@@ -792,8 +842,8 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 			notify_nonfatal_error(pvar, pvar->UIMsg);
 		}
 
-		pvar->auth_state.cur_cred.rhosts_client_user =
-			alloc_control_text(GetDlgItem(dlg, IDC_LOCALUSERNAME));
+		hGetDlgItemTextAorU8(dlg, IDC_LOCALUSERNAME,
+							 &pvar->auth_state.cur_cred.rhosts_client_user);
 	}
 	pvar->auth_state.auth_dialog = NULL;
 
@@ -890,8 +940,7 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 						// ダイアログのユーザ名を取得する
 						if (pvar->auth_state.user == NULL) {
-							pvar->auth_state.user =
-								alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+							hGetDlgItemTextAorU8(dlg, IDC_SSHUSERNAME, &pvar->auth_state.user);
 						}
 
 						// CheckAuthListFirst が TRUE のときは AuthList が帰ってきていないと
@@ -910,8 +959,7 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 					// ダイアログのユーザ名を取得する
 					if (pvar->auth_state.user == NULL) {
-						pvar->auth_state.user =
-							alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+						hGetDlgItemTextAorU8(dlg, IDC_SSHUSERNAME, &pvar->auth_state.user);
 					}
 
 					SendMessage(dlg, WM_COMMAND, IDOK, 0);
@@ -927,8 +975,7 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 					// ダイアログのユーザ名を取得する
 					if (pvar->auth_state.user == NULL) {
-						pvar->auth_state.user =
-							alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+						hGetDlgItemTextAorU8(dlg, IDC_SSHUSERNAME, &pvar->auth_state.user);
 					}
 
 					// ユーザ名を変更させない
@@ -1018,8 +1065,7 @@ canceled:
 						!pvar->tryed_ssh2_authlist) {
 						// ダイアログのユーザ名を反映
 						if (pvar->auth_state.user == NULL) {
-							pvar->auth_state.user =
-								alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+							hGetDlgItemTextAorU8(dlg, IDC_SSHUSERNAME, &pvar->auth_state.user);
 						}
 
 						// ユーザ名が入力されているかチェックする
@@ -1402,8 +1448,9 @@ static void init_TIS_dlg(PTInstVar pvar, HWND dlg)
 
 static BOOL end_TIS_dlg(PTInstVar pvar, HWND dlg)
 {
-	char *password =
-		alloc_control_text(GetDlgItem(dlg, IDC_SSHPASSWORD));
+	char *password;
+
+	hGetDlgItemTextAorU8(dlg, IDC_SSHPASSWORD, &password);
 
 	pvar->auth_state.cur_cred.method = SSH_AUTH_TIS;
 	pvar->auth_state.cur_cred.password = password;
