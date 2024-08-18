@@ -2930,8 +2930,8 @@ static WORD TTLGetTTPos(void)
 					hMonitor = pMonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
 					if (hMonitor != NULL) {
 						pGetDpiForMonitor(hMonitor, (MONITOR_DPI_TYPE)0 /*0=MDT_EFFECTIVE_DPI*/, &dpi_x, &dpi_y);
+						mag = dpi_x / 96.f;
 					}
-					mag = dpi_x / 96.f;
 				}
 			}
 			SetIntVal(showflag, tmp_showflag);
