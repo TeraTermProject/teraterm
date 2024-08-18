@@ -35,6 +35,7 @@
 #include <string.h>
 #include <time.h>
 #include <errno.h>
+#include "compat_win.h"
 #include "tt-version.h"
 #include "ttmdlg.h"
 #include "ttmbuff.h"
@@ -2912,14 +2913,26 @@ static WORD TTLGetTTPos(void)
 		int tmp_showflag;
 		int tmpw_x, tmpw_y, tmpw_width, tmpw_height;
 		int tmpc_x, tmpc_y, tmpc_width, tmpc_height;
-		long long llHVTWin; // VT window‚Ìƒnƒ“ƒhƒ‹
+		HMONITOR hMonitor;
+		RECT rc;
+		UINT dpi_x, dpi_y;
 		float mag = 1;
 
-		if (sscanf_s(Str, "%d %d %d %d %d %d %d %d %d %lld", &tmp_showflag,
-					 &tmpw_x, &tmpw_y, &tmpw_width, &tmpw_height,
-					 &tmpc_x, &tmpc_y, &tmpc_width, &tmpc_height, &llHVTWin) == 10) {
+		if (sscanf_s(Str, "%d %d %d %d %d %d %d %d %d %d", &tmp_showflag,
+					&tmpw_x, &tmpw_y, &tmpw_width, &tmpw_height,
+					&tmpc_x, &tmpc_y, &tmpc_width, &tmpc_height) == 9) {
 			if (DPIAware == DPI_AWARENESS_CONTEXT_UNAWARE) {
-				mag = GetMonitorDpiFromWindow((HWND)llHVTWin) / 96.f;
+				if (pMonitorFromRect != NULL && pGetDpiForMonitor != NULL) {
+					rc.left   = tmpw_x;
+					rc.top    = tmpw_y;
+					rc.right  = tmpw_x + tmpw_width;
+					rc.bottom = tmpw_y + tmpw_height;
+					hMonitor = pMonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
+					if (hMonitor != NULL) {
+						pGetDpiForMonitor(hMonitor, (MONITOR_DPI_TYPE)0 /*0=MDT_EFFECTIVE_DPI*/, &dpi_x, &dpi_y);
+					}
+					mag = dpi_x / 96.f;
+				}
 			}
 			SetIntVal(showflag, tmp_showflag);
 			SetIntVal(w_x,      (int)(tmpw_x      * mag));
