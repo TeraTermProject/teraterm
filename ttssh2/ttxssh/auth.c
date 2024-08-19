@@ -55,6 +55,7 @@
 #include "asprintf.h"
 #include "win32helper.h"
 #include "compat_win.h"
+#include "win32helper_u8.h"
 
 #define AUTH_START_USER_AUTH_ON_ERROR_END 1
 
@@ -360,7 +361,11 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	}
 
 	if (pvar->auth_state.user != NULL) {
-		SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->auth_state.user);
+#if defined(USER_PASSWORD_IS_UTF8)
+		SetDlgItemTextU8(dlg, IDC_SSHUSERNAME, pvar->auth_state.user);
+#else
+		SetDlgItemTextA(dlg, IDC_SSHUSERNAME, pvar->auth_state.user);
+#endif
 		EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_USERNAME_OPTION), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAMELABEL), FALSE);
@@ -401,7 +406,11 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	}
 
 	if (strlen(pvar->ssh2_password) > 0) {
-		SetDlgItemText(dlg, IDC_SSHPASSWORD, pvar->ssh2_password);
+#if defined(USER_PASSWORD_IS_UTF8)
+		SetDlgItemTextU8(dlg, IDC_SSHPASSWORD, pvar->ssh2_password);
+#else
+		SetDlgItemTextA(dlg, IDC_SSHPASSWORD, pvar->ssh2_password);
+#endif
 		if (pvar->ssh2_autologin == 1) {
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORDCAPTION), FALSE);
@@ -442,7 +451,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSEPAGEANT);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), FALSE);
-		SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
+		SetDlgItemTextA(dlg, IDC_SSHPASSWORD, "");
 		focus_id = IDCANCEL;
 
 	} else {
@@ -482,56 +491,6 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	//SetFocus(GetDlgItem(dlg, focus_id));
 	PostMessage(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, focus_id), TRUE);
 }
-
-/**
- *	hGetWindowTextW ‚Ì UTF-8 ”Å
- */
-#if defined(USER_PASSWORD_IS_UTF8)
-static DWORD hGetWindowTextU8(HWND ctl, char **textU8)
-{
-	DWORD e;
-	wchar_t *textW;
-	e = hGetWindowTextW(ctl, &textW);
-	if (e != NO_ERROR) {
-		*textU8 = NULL;
-		return e;
-	}
-	*textU8 = ToU8W(textW);
-	free(textW);
-	return NO_ERROR;
-}
-
-static DWORD hGetDlgItemTextU8(HWND hDlg, int id, char **textU8)
-{
-	HWND hWnd = GetDlgItem(hDlg, id);
-	return hGetWindowTextU8(hWnd, textU8);
-}
-#endif
-
-/**
- *	hGetWindowTextW ‚Ì ANSI ”Å
- */
-#if !defined(USER_PASSWORD_IS_UTF8)
-static DWORD hGetWindowTextA(HWND ctl, char **textA)
-{
-	DWORD e;
-	wchar_t *textW;
-	e = hGetWindowTextW(ctl, &textW);
-	if (e != NO_ERROR) {
-		*textA = NULL;
-		return e;
-	}
-	*textA = ToCharW(textW);
-	free(textW);
-	return NO_ERROR;
-}
-
-static DWORD hGetDlgItemTextA(HWND hDlg, int id, char **textA)
-{
-	HWND hWnd = GetDlgItem(hDlg, id);
-	return hGetWindowTextA(hWnd, textA);
-}
-#endif
 
 static DWORD hGetDlgItemTextAorU8(HWND hDlg, int id, char **text)
 {

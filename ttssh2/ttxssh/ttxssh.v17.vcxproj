@@ -178,6 +178,7 @@
     <ClCompile Include="ssherr.c" />
     <ClCompile Include="ttxssh.c" />
     <ClCompile Include="util.c" />
+    <ClCompile Include="win32helper_u8.cpp" />
     <ClCompile Include="x11util.c" />
   </ItemGroup>
   <ItemGroup>
@@ -223,6 +224,7 @@
     <ClInclude Include="ttxssh-version.h" />
     <ClInclude Include="ttxssh.h" />
     <ClInclude Include="util.h" />
+    <ClInclude Include="win32helper_u8.h" />
     <ClInclude Include="x11util.h" />
   </ItemGroup>
   <ItemGroup>

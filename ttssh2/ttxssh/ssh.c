@@ -70,6 +70,7 @@
 #include "win32helper.h"
 #include "ttlib_types.h"
 #include "makeoutputstring.h"
+#include "win32helper_u8.h"
 
 #ifndef MAX
 # define MAX(a,b) (((a)>(b))?(a):(b))
@@ -8250,14 +8251,6 @@ static int is_canceled_window(HWND hd)
 		return 1;
 	else
 		return 0;
-}
-
-static BOOL SetDlgItemTextU8(HWND hDlg, int nIDDlgItem, const char *strU8)
-{
-	wchar_t *strW = ToWcharU8(strU8);
-	BOOL retval = SetDlgItemTextW(hDlg, nIDDlgItem, strW);
-	free(strW);
-	return retval;
 }
 
 static unsigned __stdcall ssh_scp_thread(void *p)
