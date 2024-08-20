@@ -2918,7 +2918,7 @@ static WORD TTLGetTTPos(void)
 		UINT dpi_x, dpi_y;
 		float mag = 1;
 
-		if (sscanf_s(Str, "%d %d %d %d %d %d %d %d %d %d", &tmp_showflag,
+		if (sscanf_s(Str, "%d %d %d %d %d %d %d %d %d", &tmp_showflag,
 					&tmpw_x, &tmpw_y, &tmpw_width, &tmpw_height,
 					&tmpc_x, &tmpc_y, &tmpc_width, &tmpc_height) == 9) {
 			if (DPIAware == DPI_AWARENESS_CONTEXT_UNAWARE) {
