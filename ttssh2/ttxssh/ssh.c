@@ -6894,7 +6894,7 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 					  __FILE__, __LINE__,
 					  __FUNCTION__, len);
 
-	cstring = buffer_get_string(&data, NULL); // 認証リストの取得
+	cstring = buffer_get_string(&data, NULL); // 認証方式リストの取得
 	partial = data[0];
 	data += 1;
 
@@ -6919,8 +6919,12 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		}
 	}
 
-	// tryed_ssh2_authlist が FALSE の場合は、まだ認証を試行をしていない。または、partial が TRUEの場合は、追加の認証を行う
-	if (partial || !pvar->tryed_ssh2_authlist) {
+	// 認証ダイアログの準備
+	//   tryed_ssh2_authlist が FALSE のとき = まだ実際の認証を試行をしていない（none の返事が帰ってきたところ）
+	//     CheckAuthListFirst が TRUE のときは、表示中のダイアログが変更される
+	//   partial が TRUE のとき
+	//     "次の認証" のために、このあと表示されるダイアログで利用される
+	if (!pvar->tryed_ssh2_authlist || partial) {
 		int type = 0;
 
 		pvar->tryed_ssh2_authlist = TRUE;
@@ -6947,6 +6951,7 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 			// 複数認証時、ダイアログを出す処理へ
 			goto auth;
 		}
+
 		if (pvar->ssh2_authmethod == SSH_AUTH_TIS &&
 		    pvar->ask4passwd &&
 		    pvar->session_settings.CheckAuthListFirst &&
@@ -6957,11 +6962,14 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		}
 		else {
 			// ひとまず none で試行して返ってきたところなので、実際のログイン処理へ
+			//   CheckAuthListFirst が TRUE の場合は認証方式が確定していないので、ログイン処理は行われない
 			do_SSH2_authrequest(pvar);
 		}
 
 		return TRUE;
 	}
+
+	// none ではない実際の認証の試行に失敗した
 
 	// TCP connection closed
 	//notify_closed_connection(pvar);
@@ -6985,7 +6993,7 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		}
 	}
 
-	if (!pvar->auth_state.partial_success && pvar->ssh2_autologin == 1) {
+	if (pvar->ssh2_autologin == 1 && !pvar->auth_state.partial_success) {
 		char uimsg[MAX_UIMSG];
 		// SSH2自動ログインが有効の場合は、リトライは行わない。(2004.12.4 yutaka)
 		UTIL_get_lang_msg("MSG_SSH_AUTH_FAILURE_ERROR", pvar,
@@ -7004,9 +7012,9 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		return TRUE;
 	}
 
-	// 追加認証の時
-	// ユーザ認証に失敗した時
-	//		ユーザ名は固定して、パスワードの再入力(SSH1 と同じ)
+	// 追加認証のとき
+	// またはユーザ認証に失敗したとき
+	//   ユーザ名は固定して、パスワードの再入力(SSH1 と同じ)
 auth:
 	AUTH_set_generic_mode(pvar);
 	AUTH_advance_to_next_cred(pvar);

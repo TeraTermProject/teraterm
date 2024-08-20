@@ -781,8 +781,8 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 	}
 
 	// 公開鍵認証の場合、セッション複製時にパスワードを使い回したいので解放しないようにする。
-	// (2005.4.8 yutaka)
-	if (!pvar->auth_state.partial_success && (method == SSH_AUTH_PASSWORD || method == SSH_AUTH_RSA)) {
+	if ((method == SSH_AUTH_PASSWORD || method == SSH_AUTH_RSA) &&
+	    !pvar->auth_state.partial_success) {
 		pvar->auth_state.cur_cred.password = password;
 	} else {
 		destroy_malloced_string(&password);
