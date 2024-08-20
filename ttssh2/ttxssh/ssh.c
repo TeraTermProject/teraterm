@@ -6906,17 +6906,16 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		return FALSE;
 	}
 
-	// partial が はじめてTRUE になるとき追加の認証の準備をする
+	// partial が TRUE のときは次の認証の準備をする
 	if (partial) {
 		logprintf(LOG_LEVEL_VERBOSE, "Authenticated using \"%s\" with partial success.", cstring);
-		// はじめて追加認証を要するときは autologin を無効にする
-		// セッションの複製で指定される password をクリアして追加認証に備える
+		// はじめて次の認証を要するときは autologin を無効にする
 		if (!pvar->auth_state.partial_success) {
 			pvar->ssh2_autologin = 0;
-			SecureZeroMemory(pvar->ssh2_password, sizeof(pvar->ssh2_password));
-			pvar->ssh2_authmethod = SSH_AUTH_NONE;
-			//pvar->auth_state.initial_method = pvar->auth_state.cur_cred.method;
 		}
+		// 覚えている password をクリアして次の認証に備える
+		SecureZeroMemory(pvar->ssh2_password, sizeof(pvar->ssh2_password));
+		pvar->ssh2_authmethod = SSH_AUTH_NONE;
 	}
 
 	// 認証ダイアログの準備
