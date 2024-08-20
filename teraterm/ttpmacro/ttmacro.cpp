@@ -144,13 +144,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #endif
 	DebugSetException();
 
-	// DPI Aware (çÇDPIëŒâû)
-	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
-		if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
-			pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-		}
-	}
-
 //	InitCommonControls();
 	init();
 
