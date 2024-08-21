@@ -780,13 +780,15 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		pvar->ts_SSH->remember_password = 0;
 	}
 
-	// 公開鍵認証の場合、セッション複製時にパスワードを使い回したいので解放しないようにする。
-	if ((method == SSH_AUTH_PASSWORD || method == SSH_AUTH_RSA) &&
-	    !pvar->auth_state.partial_success) {
+	// - パスワード認証の場合 pvar->auth_state.cur_cred.password が認証に使われる
+	// - 公開鍵認証の場合 pvar->auth_state.cur_cred.password は認証に使われないが、
+	//   セッション複製時にパスフレーズを使い回したいので解放しないようにする。
+	if (method == SSH_AUTH_PASSWORD || method == SSH_AUTH_RSA) {
 		pvar->auth_state.cur_cred.password = password;
 	} else {
 		destroy_malloced_string(&password);
 	}
+
 	if (method == SSH_AUTH_RHOSTS || method == SSH_AUTH_RHOSTS_RSA) {
 		if (pvar->session_settings.DefaultAuthMethod != SSH_AUTH_RHOSTS) {
 			UTIL_get_lang_msg("MSG_RHOSTS_NOTDEFAULT_ERROR", pvar,
