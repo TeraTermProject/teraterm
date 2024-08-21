@@ -6909,12 +6909,20 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 	// partial が TRUE のときは次の認証の準備をする
 	if (partial) {
 		logprintf(LOG_LEVEL_VERBOSE, "Authenticated using \"%s\" with partial success.", cstring);
-		// はじめて次の認証を要するときは autologin を無効にする
+
+		// はじめて次の認証を要するとき
 		if (!pvar->auth_state.partial_success) {
+			// autologin を無効にする
 			pvar->ssh2_autologin = 0;
+
+			// この接続は複数認証要求をしている
+			pvar->auth_state.multiple_required_auth = 1;
 		}
+
 		// 覚えている password をクリアして次の認証に備える
 		SecureZeroMemory(pvar->ssh2_password, sizeof(pvar->ssh2_password));
+
+		// 次の認証の認証方式が、直前に成功した認証方式にならないよう初期化する
 		pvar->ssh2_authmethod = SSH_AUTH_NONE;
 	}
 
@@ -6973,7 +6981,7 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 	// TCP connection closed
 	//notify_closed_connection(pvar);
 
-	// retry countの追加 (2005.3.10 yutaka)
+	// retry countの追加
 	if (pvar->auth_state.cur_cred.method != SSH_AUTH_PAGEANT) {
 		pvar->userauth_retry_count++;
 	}
@@ -6994,7 +7002,7 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 
 	if (pvar->ssh2_autologin == 1 && !pvar->auth_state.partial_success) {
 		char uimsg[MAX_UIMSG];
-		// SSH2自動ログインが有効の場合は、リトライは行わない。(2004.12.4 yutaka)
+		// SSH2自動ログインが有効の場合は、リトライは行わない。
 		UTIL_get_lang_msg("MSG_SSH_AUTH_FAILURE_ERROR", pvar,
 		                  "SSH2 auto-login error: user authentication failed.");
 		strncpy_s(uimsg, sizeof(uimsg), pvar->UIMsg, _TRUNCATE);
@@ -7019,8 +7027,6 @@ auth:
 	AUTH_advance_to_next_cred(pvar);
 	pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
 	try_send_credentials(pvar);
-	if(!pvar->auth_state.partial_success)
-		pvar->auth_state.initial_method = SSH_AUTH_NONE;
 
 	return TRUE;
 }

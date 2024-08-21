@@ -50,8 +50,8 @@ typedef struct {
   char *user;
   AUTHCred cur_cred;
   SSHAuthMethod failed_method;
-  SSHAuthMethod initial_method;
   int partial_success;
+  int multiple_required_auth; // OpenSSH 6.2 or later, •¡””FØ—v‹
   int flags;
   int supported_types;
   HWND auth_dialog;

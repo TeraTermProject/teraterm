@@ -768,9 +768,6 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 			alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
 	}
 
-	if (pvar->auth_state.initial_method == SSH_AUTH_NONE)
-		pvar->auth_state.initial_method = method;
-
 	// パスワードの保存をするかどうかを決める (2006.8.3 yutaka)
 	if (SendMessage(GetDlgItem(dlg, IDC_REMEMBER_PASSWORD), BM_GETCHECK, 0,0) == BST_CHECKED) {
 		pvar->settings.remember_password = 1;  // 覚えておく
@@ -1692,7 +1689,8 @@ static INT_PTR CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 void AUTH_init(PTInstVar pvar)
 {
 	pvar->auth_state.failed_method = SSH_AUTH_NONE;
-	pvar->auth_state.initial_method = SSH_AUTH_NONE;
+	pvar->auth_state.partial_success = 0;
+	pvar->auth_state.multiple_required_auth = 0;
 	pvar->auth_state.auth_dialog = NULL;
 	pvar->auth_state.user = NULL;
 	pvar->auth_state.flags = 0;
