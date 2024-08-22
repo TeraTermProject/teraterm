@@ -124,7 +124,12 @@
     <ClCompile Include="..\..\teraterm\common\ttlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\teraterm\common\edithistory.cpp" />
+    <ClCompile Include="..\..\teraterm\common\edithistory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32helper_u8.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arc4random.h">
@@ -254,6 +259,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\teraterm\common\edithistory_res.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="win32helper_u8.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
