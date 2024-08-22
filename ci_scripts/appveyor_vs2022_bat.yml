@@ -23,7 +23,7 @@ before_build:
   # 自前の Cygwin をインストール
   # - ci_scripts/install_mycygwin.bat
   # 自前の Inno Setup をインストール
-  - ci_scripts/install_innosetup.bat
+  - ci_scripts/install_myinnosetup.bat
 
 build_script:
   - ci_scripts/build_appveyor_release_bat.bat
