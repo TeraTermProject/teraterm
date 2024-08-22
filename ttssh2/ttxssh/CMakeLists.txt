@@ -100,6 +100,8 @@ target_sources(
   util.h
   x11util.c
   x11util.h
+  win32helper_u8.h
+  win32helper_u8.cpp
   )
 
 target_sources(
