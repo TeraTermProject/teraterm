@@ -1,4 +1,4 @@
-echo %~dp0\install_innosetup.bat
+echo %~dp0\install_myinnosetup.bat
 
 pushd %~dp0
 
