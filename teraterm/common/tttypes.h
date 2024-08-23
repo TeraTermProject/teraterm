@@ -616,7 +616,6 @@ struct tttset {
 	WORD BracketedControlOnly;
 	wchar_t *ViewlogEditorW;
 	wchar_t *ViewlogEditorArg;
-	WORD MessageBoxPosParentRelative;
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;
