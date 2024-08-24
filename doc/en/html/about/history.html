@@ -3527,6 +3527,8 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
+      <li>add support for multiple required authentication.<br>
+          auto login, connect from macro and duplicate session are not supported, because TTSSH cannot receive multiple authentication informations from command line parameters.</li>
       <li>If option(<a href="../commandline/ttssh.html#f">/f</a>, <a href="../commandline/ttssh.html#ssh-f">/ssh-f</a>, <a href="../commandline/ttssh.html#ssh-consume">/ssh-consume</a>, <a href="../commandline/ttssh.html#keyfile">/keyfile</a>) argument file name is not absolute path, modify it to be treated as a relative path from %APPDATA%\teraterm5\.</li>
       <li>Modified private key file name can use Unicode</li>
     </ul>
