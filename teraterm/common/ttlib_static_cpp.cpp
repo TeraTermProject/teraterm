@@ -50,15 +50,11 @@
 #include "compat_win.h"
 #include "fileread.h"
 #include "tt-version.h"
-#include "tttypes.h"
 
 #include "ttlib.h"
 
 // for isInvalidFileNameCharW / replaceInvalidFileNameCharW
 static const wchar_t *invalidFileNameCharsW = L"\\/:*?\"<>|";
-
-// for TTMessageBoxW()
-WORD MessageBoxPosParentRelative = 0;
 
 /**
  *	MessageBox‚ð•\Ž¦‚·‚é
@@ -112,7 +108,7 @@ int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILan
 		free(format);
 	}
 
-	if (hWnd != NULL && MessageBoxPosParentRelative == 1) {
+	if (hWnd != NULL) {
 		SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL,
 			&TTMessageBoxW_WinEventProc, GetCurrentProcessId(), GetCurrentThreadId(), WINEVENT_OUTOFCONTEXT);
 	}

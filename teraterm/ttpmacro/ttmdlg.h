@@ -57,6 +57,7 @@ extern wchar_t ShortName[MAX_PATH];
 extern wchar_t **Params;
 extern int ParamCnt;
 extern BOOL SleepFlag;
+extern DPI_AWARENESS_CONTEXT DPIAware;
 
 #ifdef __cplusplus
 }

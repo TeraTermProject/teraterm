@@ -63,6 +63,8 @@ static HINSTANCE hInst;
 static BOOL Busy;
 static CCtrlWindow *pCCtrlWindow;
 
+DPI_AWARENESS_CONTEXT DPIAware;
+
 HINSTANCE GetInstance()
 {
 	return hInst;
@@ -75,8 +77,6 @@ HWND GetHWND()
 
 static void init()
 {
-	wchar_t Temp[4];
-
 	HomeDirW = GetHomeDirW(hInst);
 	SetupFNameW = GetDefaultFNameW(HomeDirW, L"TERATERM.INI");
 
@@ -86,11 +86,14 @@ static void init()
 	WinCompatInit();
 
 	// DPI Aware (çÇDPIëŒâû)
+	DPIAware = DPI_AWARENESS_CONTEXT_UNAWARE;
 	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
+		wchar_t Temp[4];
 		GetPrivateProfileStringW(L"Tera Term", L"DPIAware", NULL, Temp, _countof(Temp), SetupFNameW);
 		if (_wcsicmp(Temp, L"on") == 0) {
 			if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
 				pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+				DPIAware = DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2;
 			}
 		}
 	}
@@ -100,12 +103,6 @@ static void init()
 	GetI18nLogfontW(L"Tera Term", L"DlgFont", &logfont, 0, SetupFNameW);
 	SetDialogFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet,
 				  UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-
-	// MessageBoxPosParentRelativeÇÃéÊìæ
-	GetPrivateProfileStringW(L"Tera Term", L"MessageBoxPosParentRelative", NULL, Temp, _countof(Temp), SetupFNameW);
-	if (_wcsicmp(Temp, L"on") == 0) {
-		MessageBoxPosParentRelative = 1;
-	}
 }
 
 // TTMACRO main engine
@@ -139,13 +136,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 	DebugSetException();
-
-	// DPI Aware (çÇDPIëŒâû)
-	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
-		if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
-			pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-		}
-	}
 
 //	InitCommonControls();
 	init();
