@@ -23,7 +23,7 @@ before_build:
   # インストール済みの MSYS2 にパッケージを追加
   # - ci_scripts/addpkg_msys2.bat
   # 自前の Cygwin をインストール
-  # - ci_scripts/install_mycygwin.bat
+  # - buildtools/install_cygwin.bat
 
 build_script:
   - ci_scripts/build_appveyor_release_bat.bat
