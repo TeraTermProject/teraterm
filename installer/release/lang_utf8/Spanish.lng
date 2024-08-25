@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Spanish
-date=2024-08-03 by TeraTerm Project
+date=2024-08-25 by TeraTerm Project
 contributor=Filiberto Olguin Ascona (2022-05-26)
 
 [Tera Term]
@@ -655,6 +655,7 @@ DLG_AUTH_TITLE_FAILED=Retrying SSH Authentication
 DLG_AUTH_BANNER=Logging in to %s
 DLG_AUTH_BANNER2=Authentication required.
 DLG_AUTH_BANNER2_FAILED=Authentication failed. Please retry.
+DLG_AUTH_BANNER2_FURTHER=Further authentication required.
 DLG_AUTH_USERNAME=User &name:
 DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
 DLG_AUTH_USE_LOGON_USERNAME=Use &logon username

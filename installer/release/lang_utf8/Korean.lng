@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2024-08-03 by TeraTerm Project
+date=2024-08-25 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -655,6 +655,7 @@ DLG_AUTH_TITLE_FAILED=SSH 인증 재시도 중
 DLG_AUTH_BANNER=%s로 로그인 중
 DLG_AUTH_BANNER2=인증이 필요함.
 DLG_AUTH_BANNER2_FAILED=일증 실패. 다시 시도해주세요.
+DLG_AUTH_BANNER2_FURTHER=Further authentication required.
 DLG_AUTH_USERNAME=사용자 이름(&N):
 DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
 DLG_AUTH_USE_LOGON_USERNAME=Use &logon username

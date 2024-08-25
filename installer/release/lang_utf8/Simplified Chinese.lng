@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2024-08-03 by TeraTerm Project
+date=2024-08-25 by TeraTerm Project
 contributor=LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -655,6 +655,7 @@ DLG_AUTH_TITLE_FAILED=SSH认证失败
 DLG_AUTH_BANNER=登录到 %s
 DLG_AUTH_BANNER2=需要认证。
 DLG_AUTH_BANNER2_FAILED=认证失败，请重试。
+DLG_AUTH_BANNER2_FURTHER=Further authentication required.
 DLG_AUTH_USERNAME=用户名(&N)：
 DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
 DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
