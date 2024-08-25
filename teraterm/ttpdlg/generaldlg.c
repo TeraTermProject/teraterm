@@ -270,11 +270,11 @@ BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts)
 	aswprintf(&folder, L"%s\\%s", ts->ExeDirW, get_lang_folder());
 	infos = LangAppendFileList(folder, infos, &infos_size);
 	free(folder);
-#if 1
-	aswprintf(&folder, L"%s\\%s", ts->HomeDirW, get_lang_folder());
-	infos = LangAppendFileList(folder, infos, &infos_size);
-	free(folder);
-#endif
+	if (strcmp(ts->ExeDirW, ts->HomeDirW) != 0) {
+		aswprintf(&folder, L"%s\\%s", ts->HomeDirW, get_lang_folder());
+		infos = LangAppendFileList(folder, infos, &infos_size);
+		free(folder);
+	}
 	LangRead(infos, infos_size);
 
 	DlgData data;
