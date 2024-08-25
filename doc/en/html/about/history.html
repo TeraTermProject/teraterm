@@ -72,7 +72,6 @@
       <li>Returned the display position of the message box to its previous behavior (center of the parent window) before 4.103, excluding some message boxes.</li>
       <li>Show error messagebox when logging cannot be started with LogAutoStart=on</li>
       <li>allow users to select creating automatic backup or not by <a href="../setup/teraterm-misc.html#IniAutoBackup">IniAutoBackup</a> when overwriting the ini file.
-      <li>Modified to <a href="../setup/teraterm-ssh.html#AuthBanner">display SSH authentication banner in VT window</a> regardless of receiving character code.
       <li>MACRO: <a href="../macro/command/send.html">send</a> macro command check data and sends it as text or binary. added <a href="../macro/command/sendtext.html">sendtext</a> and <a href="../macro/command/sendbinary.html">sendbinary</a> macro command</li>
       <li>MACRO: Added options such as size specification to the listbox command.</li>
       <li>added the <a href="../macro/command/getttpos.html">getttpos</a> command to retrieve the display status, position, and size in the VT window of Tera Term.</li>
@@ -104,7 +103,6 @@
       <li>Apply changes even if only NoFrame is changed at Window setup dialog.</li>
       <li>Fixed window maximization works immediately after startup.</li>
       <li>Added <a href="../setup/folder.html#DownloadDir">download folder</a> for log saving folder same as Tera Term 4.</li>
-      <li>Fixed focus disappears in <a href="../menu/setup-sshauth.html">SSH Authentication</a> dialog and TAB cannot be used.</li>
       <li>MACRO: fixed <a href="../macro/command/send.html">send</a> macro command could not send $00.</li>
       <li>MACRO: Fixed <a href="../macro/command/clipb2var.html">clipb2var</a> is not working.</li>
       <li>MACRO: Fixed path of <a href="../macro/command/basename.html">basename</a> and <a href="../macro/command/dirname.html">dirname</a> macro commands were not Unicode-compatible.</li>
@@ -3539,6 +3537,8 @@ SYNOPSIS:
   <li>Bug fixes
     <ul>
       <li>modified to send username and password in UTF-8 at authentication to comply with RFC 4252.</li>
+      <li>Modified to <a href="../setup/teraterm-ssh.html#AuthBanner">display SSH authentication banner in VT window</a> regardless of receiving character code.
+      <li>Fixed focus disappears in <a href="../menu/setup-sshauth.html">SSH Authentication</a> dialog and TAB cannot be used.</li>
     </ul>
   </li>
 

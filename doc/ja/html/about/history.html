@@ -72,7 +72,6 @@
       <li>メッセージボックスの表示位置を4.103より前の動作(親ウィンドウ中央)に戻した。(一部のメッセージボックスを除く)</li>
       <li>LogAutoStart=on でログ記録が開始できないとき、エラーメッセージを表示するようにした。</li>
       <li>iniファイルを上書きする際に自動バックアップを作成するかどうかを <a href="../setup/teraterm-misc.html#IniAutoBackup">IniAutoBackup</a> で設定できるようにした。</li>
-      <li><a href="../setup/teraterm-ssh.html#AuthBanner">SSH認証バナーをVT ウィンドウ内に表示する</a>時、受信文字コードによらず表示できるよう変更した。</li>
       <li>MACRO: <a href="../macro/command/send.html">send</a> マクロコマンドは送信データを判定してテキスト又はバイナリとして送信する。<a href="../macro/command/sendtext.html">sendtext</a> と <a href="../macro/command/sendbinary.html">sendbinary</a> マクロコマンドを追加した。</li>
       <li>MACRO: listboxコマンドにサイズ指定等のオプション等を追加した。</li>
       <li>MACRO: Tera Term の VT window の表示状態、位置、サイズを取得する <a href="../macro/command/getttpos.html">getttpos</a> コマンドを追加した。</li>
@@ -105,7 +104,6 @@
       <li>ttermpro.exe の <a href="../commandline/teraterm.html#v">/V オプション</a>を使用すると終了時クラッシュする問題を修正した。</li>
       <li>起動直後のウィンドウ最大化が動作するよう修正した。</li>
       <li>ログの<a href="../setup/folder.html#TermLogDir">保存フォルダ</a>に、Tera Term 4 と同様にダウンロードフォルダを追加した。</li>
-      <li><a href="../menu/setup-sshauth.html">SSH Authentication ダイアログ</a>でフォーカスが消えてTAB等が使えなくなる問題を修正した</li>
       <li>MACRO: <a href="../macro/command/send.html">send</a> マクロコマンドで $00 を送信できなったので修正した。</li>
       <li>MACRO: <a href="../macro/command/clipb2var.html">clipb2var</a>が動作しなかったので修正した。</li>
       <li>MACRO: <a href="../macro/command/basename.html">basename</a>, <a href="../macro/command/dirname.html">dirname</a>マクロコマンドのパスがUnicodeに対応していなかったので修正した。</li>
@@ -3548,6 +3546,8 @@
   <li>バグ修正
     <ul>
       <li>RFC 4252 に準拠するよう、認証時にユーザー名とパスワードをUTF-8で送信するよう修正した。</li>
+      <li><a href="../setup/teraterm-ssh.html#AuthBanner">SSH認証バナーをVT ウィンドウ内に表示する</a>時、受信文字コードによらず表示できるよう変更した。</li>
+      <li><a href="../menu/setup-sshauth.html">SSH Authentication ダイアログ</a>でフォーカスが消えてTAB等が使えなくなる問題を修正した</li>
     </ul>
   </li>
 
