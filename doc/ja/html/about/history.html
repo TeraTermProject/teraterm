@@ -47,13 +47,13 @@
       <li><a href="../setup/teraterm-win.html#space">VTFontSpace</a> で負の値を設定できるようにした。</li>
       <li>使用可能なCOMポートのみを一覧に表示するようにした。
         <ul>
-          <li>無効化、初期化に失敗したCOMポートは含まれないようにした。</li>
+          <li>無効化、初期化に失敗したCOMポートは含まれなくなった。</li>
         </ul>
       </li>
       <li><a href="../menu/setup-general.html#UILanguageFile">LanguageUI</a>選択時にlngファイルの情報を表示するようにした。Language設定を削除した。</li>
       <li>Default port 設定を Additional settings の <a href="../menu/setup-additional-tcpip.html#Port">General タブ</a>へ移動した。</li>
       <li>ダウンロードフォルダの設定を Additional settings の <a href="../menu/setup-additional-general.html#DownloadFolder">General タブ</a>へ移動した。</li>
-      <li>Additional settings の <a href="../menu/setup-additional-log.html#ViewlogEditorArg">Log タブ</a>に ViewlogEditor の引き数を追加した。</li>
+      <li>Additional settings の <a href="../menu/setup-additional-log.html#ViewlogEditorArg">Log タブ</a>に ViewlogEditor の引数を追加した。</li>
       <li>設定-フォント設定を Additional settings の <a href="../menu/setup-additional-font.html">フォントタブ</a>へ統合した。</li>
       <li>キーボード設定ダイアログを Additional settings の Keyboard タブへ移動した。</li>
       <li>Additional settings に <a href="../menu/setup-additional-tcpip.html">TCP/IP タブ</a> を追加した。
@@ -98,8 +98,8 @@
       <li>区切り文字をダブルクリックしたとき、連続した同一文字を選択するよう修正した(5.2で変わってしまった選択動作を従来と同じ動作となるよう修正した)。</li>
       <li>送信文字コードがJISの時、誤った文字を送信することがあったので修正した。
         <ul>
-          <li>行末の文字出力の誤りを修正</li>
-          <li>ローカルエコーがON時、正しくエコーされなかったので修正</li>
+          <li>行末の文字出力の誤りを修正した。</li>
+          <li>ローカルエコーがON時、正しくエコーされなかったので修正した。</li>
         </ul>
       </li>
       <li>モデムデバイスのCOMポート検出を修正した。4.x と同様にモデムデバイスも検出できるようになった。</li>
@@ -3541,9 +3541,9 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>複数認証要求に対応しました。
+      <li>複数認証要求に対応した。
         <ul>
-          <li>コマンドラインオプションで複数の認証情報を受け取れないため、自動ログイン・マクロからの接続・セッションの複製には対応していません。</li>
+          <li>コマンドラインオプションで複数の認証情報を受け取れないため、自動ログイン・マクロからの接続・セッションの複製には対応していない。</li>
         </ul>
       </li>
       <li>オプション(<a href="../commandline/ttssh.html#f">/f</a>, <a href="../commandline/ttssh.html#ssh-f">/ssh-f</a>, <a href="../commandline/ttssh.html#ssh-consume">/ssh-consume</a>, <a href="../commandline/ttssh.html#keyfile">/keyfile</a>)のファイル名が絶対パスでないときは、%APPDATA%\teraterm5\ からの相対パスとして扱うように変更した。</li>
