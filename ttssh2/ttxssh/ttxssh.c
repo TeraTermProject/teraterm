@@ -4922,7 +4922,7 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 
 		// ホスト名で /ssh /1, /ssh  /2, /ssh1, /ssh2, /nossh, /telnet が
 		// 指定されたときは、ラジオボタンの SSH および SSH プロトコルバージョンを
-		// 適用するのをやめる (2007.11.1 maya)
+		// 適用するのをやめる
 		if (pvar->hostdlg_Enabled && ssh_enable == -1) {
 			wcsncat_s(cmd, cmdlen, L" /ssh", _TRUNCATE);
 
@@ -4935,7 +4935,7 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 
 		}
 
-		// セッション複製の場合は、自動ログイン用パラメータを付ける。(2005.4.8 yutaka)
+		// セッション複製の場合は、自動ログイン用パラメータを付ける。
 		if (wcsstr(buf, L"DUPLICATE")) {
 			char mark[MAX_PATH];
 			wchar_t tmp[MAX_PATH*2];
@@ -4947,20 +4947,22 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 			}
 
-			// パスワードを覚えている場合のみ、コマンドラインに渡す。(2006.8.3 yutaka)
+			// パスワードを覚えていて、かつ複数認証要求でない場合にのみコマンドラインに渡す。
 			if (pvar->settings.remember_password &&
+			    !pvar->auth_state.multiple_required_auth &&
 			    pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) {
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-							 L" /auth=password /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				             L" /auth=password /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->settings.remember_password &&
+			           !pvar->auth_state.multiple_required_auth &&
 			           pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
 				wchar_t markW[MAX_PATH];
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-							 L" /auth=publickey /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				             L" /auth=publickey /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 				dquote_stringW(pvar->session_settings.DefaultRSAPrivateKeyFile, markW, _countof(markW));
@@ -4968,15 +4970,17 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->settings.remember_password &&
+			           !pvar->auth_state.multiple_required_auth &&
 			           pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-							 L" /auth=challenge /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				             L" /auth=challenge /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
-			} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
+			} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT &&
+			           !pvar->auth_state.multiple_required_auth) {
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-							 L" /auth=pageant /user=%hs", pvar->auth_state.user);
+				             L" /auth=pageant /user=%hs", pvar->auth_state.user);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else {

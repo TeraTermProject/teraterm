@@ -95,7 +95,7 @@ void *buffer_append_space(buffer_t * buf, size_t size)
 
 	n = buf->offset + size;
 	if (n < buf->maxlen) {
-		// 
+		//
 	} else {
 		// バッファが足りないので補充する。(2005.7.2 yutaka)
 		newlen = buf->maxlen + size + BUFFER_INCREASE_MARGIN;
@@ -145,7 +145,7 @@ int buffer_append(buffer_t * buf, char *ptr, int size)
 				goto panic;
 			buf->maxlen = newlen;
 		}
-	} 
+	}
 
 	return (ret);
 
@@ -290,7 +290,7 @@ error:;
 	return (ret);
 }
 
-void buffer_put_string(buffer_t *msg, char *ptr, int size)
+void buffer_put_string(buffer_t *msg, char *ptr, size_t size)
 {
 	char buf[4];
 	int val;
@@ -375,7 +375,7 @@ void buffer_put_bignum(buffer_t *buffer, BIGNUM *value)
 	unsigned char *buf;
 	int oi;
 	char msg[2];
-	
+
 	bits = BN_num_bits(value);
 	bin_size = (bits + 7) / 8;
 	buf = malloc(bin_size);
