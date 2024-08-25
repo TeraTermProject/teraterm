@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2024-08-03 by TeraTerm Project
+date=2024-08-25 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -655,6 +655,7 @@ DLG_AUTH_TITLE_FAILED=Повторная аутентификация SSH
 DLG_AUTH_BANNER=Вход в %s
 DLG_AUTH_BANNER2=Требуется аутентификация.
 DLG_AUTH_BANNER2_FAILED=Ошибка аутентификации. Повторите попытку.
+DLG_AUTH_BANNER2_FURTHER=Further authentication required.
 DLG_AUTH_USERNAME=&Имя пользователя:
 DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
 DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
