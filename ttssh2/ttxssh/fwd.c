@@ -1956,10 +1956,8 @@ void FWD_end(PTInstVar pvar)
 
 BOOL FWD_agent_forward_confirm(PTInstVar pvar)
 {
-	char title[MAX_UIMSG];
-	HWND cur_active = GetActiveWindow();
-
 	if (pvar->session_settings.ForwardAgentNotify) {
+		char title[MAX_UIMSG];
 		UTIL_get_lang_msg("MSG_FWD_AGENT_NOTIFY_TITLE", pvar, "Agent Forwarding");
 		strncpy_s(title, sizeof(title), pvar->UIMsg, _TRUNCATE);
 		UTIL_get_lang_msg("MSG_FWD_AGENT_NOTIFY", pvar, "Remote host access to agent");
@@ -1970,11 +1968,16 @@ BOOL FWD_agent_forward_confirm(PTInstVar pvar)
 	}
 
 	if (pvar->session_settings.ForwardAgentConfirm) {
-		UTIL_get_lang_msg("MSG_FWD_AGENT_FORWARDING_CONFIRM", pvar,
-		                  "Are you sure you want to accept agent-forwarding request?");
-		if (MessageBox(cur_active != NULL ? cur_active : pvar->NotificationWindow,
-		               pvar->UIMsg, "TTSSH",
-		               MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2) == IDYES) {
+		static const TTMessageBoxInfoW info = {
+			"TTSSH",
+			NULL, L"TTSSH",
+			"MSG_FWD_AGENT_FORWARDING_CONFIRM",
+			L"Are you sure you want to accept agent-forwarding request?",
+			MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2
+		};
+		HWND cur_active = GetActiveWindow();
+		HWND parent_hwnd = cur_active != NULL ? cur_active : pvar->NotificationWindow;
+		if (TTMessageBoxW(parent_hwnd, &info, pvar->ts->UILanguageFileW) == IDYES) {
 			return TRUE;
 		}
 		else {

@@ -295,6 +295,7 @@ typedef enum {
 #define RsvGetPassword2 220
 #define RsvDelPassword2 221
 #define RsvIsPassword2  222
+#define RsvGetTTPos     223
 
 #define RsvOperator     1000
 #define RsvBNot         1001

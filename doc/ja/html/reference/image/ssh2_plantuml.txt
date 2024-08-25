@@ -263,7 +263,10 @@ group Service Request [cf. RFC 4253 Section 10]
 end
 
 group Authentication
-  alt CheckAuthListFirst が有効な場合
+
+  C -> U: 認証ダイアログを表示
+
+  alt CheckAuthListFirst が有効な場合、認証ダイアログの表示直後に\nそうでない場合、認証ダイアログのOKボタンを押したあとに
 
     U -> C:
     note left: ユーザ名
@@ -274,17 +277,12 @@ group Authentication
     C <- S: SSH_MSG_USERAUTH_FAILURE
     note right: サポートしている認証方式
 
-  else 無効な場合
-
-    U -> C:
-    note left: ユーザ名
-
   end
 
   group 認証方式ごとの処理 [password\ncf. RFC 4252 Section 8]
 
     U -> C:
-    note left: パスワード
+    note left: ユーザ名\nパスワード
 
     C -> S: SSH_MSG_USERAUTH_REQUEST
     note left: ユーザ名\n"ssh-connection"\n"password"\nパスワード
@@ -298,7 +296,7 @@ group Authentication
   else publickey\ncf. RFC 4252 Section 7
 
     U -> C:
-    note left: 認証用鍵ファイル\nパスフレーズ
+    note left: ユーザ名\n認証用鍵ファイル\nパスフレーズ
     note over C #ffffff: ファイルから公開鍵と秘密鍵を読む
 
     C -> S: SSH_MSG_USERAUTH_REQUEST
@@ -326,6 +324,9 @@ group Authentication
     end
 
   else keyboard-interactive\ncf. RFC 4256
+
+    U -> C:
+    note left: ユーザ名
 
     C -> S: SSH_MSG_USERAUTH_REQUEST
     note left: ユーザ名\n"ssh-connection"\n"keyboard-interactive"
@@ -356,6 +357,9 @@ group Authentication
 
     U -> P:
     note left: （事前に）\n認証用鍵ファイル\nパスフレーズ
+
+    U -> C:
+    note left: ユーザ名
 
     P <- C: SSH2_AGENTC_REQUEST_IDENTITIES
     note right #ffffff: 公開鍵を要求

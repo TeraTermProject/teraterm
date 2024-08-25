@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007- TeraTerm Project
+ * Copyright (C) 2024- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,38 +26,74 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTMACRO.EXE, dialog boxes */
-
-#pragma once
-
-#include "ttmdef.h"
-
-#ifdef __cplusplus
-extern "C" {
+/*
+ *	win32helper ÇÃ UTF-8 î≈
+ *	win32helper Ç…ìùçáÇµÇ»Ç©Ç¡ÇΩóùóR
+ *		- ttxssh Ç≈ÇµÇ©égópÇµÇƒÇ¢Ç»Ç¢
+ *		- codeconv Ç…àÀë∂ÇµÇΩÇ≠Ç»Ç¢
+ */
+#include <windows.h>
+#ifndef _CRTDBG_MAP_ALLOC
+#define _CRTDBG_MAP_ALLOC
 #endif
+#include <stdlib.h>
+#include <crtdbg.h>
 
-void ParseParam(PBOOL IOption, PBOOL VOption);
-BOOL GetFileName(HWND HWin, wchar_t **fname);
-void SetDlgPos(int x, int y);
-int OpenInpDlg(wchar_t *Input, const wchar_t *Text, const wchar_t *Caption,
-                const wchar_t *Default, BOOL Paswd);
-int OpenErrDlg(const char *Msg, const char *Line, int lineno, int start, int end, const char *FileName);
-int OpenMsgDlg(const wchar_t *Text, const wchar_t *Caption, BOOL YesNo);
-void OpenStatDlg(const wchar_t *Text, const wchar_t *Caption);
-void CloseStatDlg();
-void BringupStatDlg();
+#include "codeconv.h"
+#include "win32helper.h"
 
-int OpenListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected, int ext, int DlgWidth, int DlgHeight);
+#include "win32helper_u8.h"
 
-extern wchar_t *HomeDirW;
-extern wchar_t FileName[MAX_PATH];
-extern wchar_t TopicName[11];
-extern wchar_t ShortName[MAX_PATH];
-extern wchar_t **Params;
-extern int ParamCnt;
-extern BOOL SleepFlag;
-extern DPI_AWARENESS_CONTEXT DPIAware;
-
-#ifdef __cplusplus
+BOOL SetDlgItemTextU8(HWND hDlg, int nIDDlgItem, const char *strU8)
+{
+	wchar_t *strW = ToWcharU8(strU8);
+	BOOL retval = SetDlgItemTextW(hDlg, nIDDlgItem, strW);
+	free(strW);
+	return retval;
 }
-#endif
+
+/**
+ *	hGetWindowTextW ÇÃ UTF-8 î≈
+ */
+DWORD hGetWindowTextU8(HWND ctl, char **textU8)
+{
+	DWORD e;
+	wchar_t *textW;
+	e = hGetWindowTextW(ctl, &textW);
+	if (e != NO_ERROR) {
+		*textU8 = NULL;
+		return e;
+	}
+	*textU8 = ToU8W(textW);
+	free(textW);
+	return NO_ERROR;
+}
+
+DWORD hGetDlgItemTextU8(HWND hDlg, int id, char **textU8)
+{
+	HWND hWnd = GetDlgItem(hDlg, id);
+	return hGetWindowTextU8(hWnd, textU8);
+}
+
+/**
+ *	hGetWindowTextW ÇÃ ANSI î≈
+ */
+DWORD hGetWindowTextA(HWND ctl, char **textA)
+{
+	DWORD e;
+	wchar_t *textW;
+	e = hGetWindowTextW(ctl, &textW);
+	if (e != NO_ERROR) {
+		*textA = NULL;
+		return e;
+	}
+	*textA = ToCharW(textW);
+	free(textW);
+	return NO_ERROR;
+}
+
+DWORD hGetDlgItemTextA(HWND hDlg, int id, char **textA)
+{
+	HWND hWnd = GetDlgItem(hDlg, id);
+	return hGetWindowTextA(hWnd, textA);
+}

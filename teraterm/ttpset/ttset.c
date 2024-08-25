@@ -3329,7 +3329,6 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	// Bracketed paste mode
 	WriteOnOff(Section, "BracketedSupport", FName, ts->BracketedSupport);
 	WriteOnOff(Section, "BracketedControlOnly", FName, ts->BracketedControlOnly);
-
 }
 
 void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,

@@ -25,10 +25,25 @@
 
 <h2 id="ini-entry">Add entry to TERATERM.INI</h2>
 
+<h3>When a new entry is added</h3>
+
+<p>
+When a new feature is add, the behavior is changed.
+But some users don't hope new behavior, they hopes traditional behavior.<br>
+Provide a way to select the behavior by adding a new entry to TERATERM.INI.
+</p>
+
+<h3>Default value</h3>
+
+<p>
+For almost users, if new behavior is useful, safety and doesn't make confuse, default value will be `on.'<br>
+Otherwise it should to be 'off.'
+</p>
+
 <h3>Entry name</h3>
 
 <p>
-Unfortunately, the confusing entries such as EnableFoo... and DisableBar... are included.<br />
+Unfortunately, the confusing entries such as EnableFoo... and DisableBar... are included.<br>
 It recommends that the new name like as Baz....
 </p>
 
@@ -37,23 +52,26 @@ It recommends that the new name like as Baz....
 <ul>
   <li>source code
     <ul>
-      <li>read/write INI file<br />
+      <li>read/write INI file<br>
           teraterm\ttpset\ttset.c</li>
-      <li>struct tttset<br />
+      <li>struct tttset<br>
           teraterm\common\tttypes.h</li>
+          To make a plugin work in both Tera Term 4 (TT4) and Tera Term 5 (TT5), it is necessary to ensure compatibility with the structure of TT4.<br>
+          Therefore, new members should be added at the end.<br>
+          Similarly, any members that are no longer needed should not be deleted but renamed to reserve_XXX and kept.</li>
     </ul>
   </li>
   <li>Document
     <ul>
-      <li>All items of Tera Term setup file<br />
+      <li>All items of Tera Term setup file<br>
           setup/teraterm-ini.html</li>
-      <li>help for setup dialog (when UI for change is present in a dialog)<br />
+      <li>help for setup dialog (when UI for change is present in a dialog)<br>
           dialog page under menu</li>
-      <li>help for setup item (when UI for change is not present in a dialog)<br />
+      <li>help for setup item (when UI for change is not present in a dialog)<br>
           category page under setup</li>
     </ul>
   </li>
-  <li>Default INI file<br />
+  <li>Default INI file<br>
       installer\release\TERATERM.INI</li>
 </ul>
 
@@ -63,10 +81,10 @@ It recommends that the new name like as Baz....
 <h3>Add new i18n message</h3>
 
 <ul>
-  <li>Source code<br />
+  <li>Source code<br>
       Read langage file</li>
   <li>If a message is on dialog, put English message as default text</li>
-  <li>Modify language file<br />
+  <li>Modify language file<br>
       Modify files under installer/release/lang_utf8 folder.
     <ul>
       <li>English.lng (English)
@@ -113,28 +131,28 @@ It recommends that the new name like as Baz....
 <ul>
   <li>Coding
     <ul>
-      <li>get a new number of command internal ID.<br />
+      <li>get a new number of command internal ID.<br>
           ... teraterm/ttmacro/ttmparse.h</li>
-      <li>add a if statement to below function.<br />
+      <li>add a if statement to below function.<br>
           ... CheckReservedWord@teraterm/ttmacro/ttmparse.c</li>
-      <li>add a caller doing the macro command.<br />
+      <li>add a caller doing the macro command.<br>
           ... ExecCmnd@teraterm/ttmacro/ttl.c</li>
       <li>make a function code for the macro command.</li>
     </ul>
   </li>
   <li>Help topic
     <ul>
-      <li>make the command help file.<br />
+      <li>make the command help file.<br>
           ... doc/LANG/html/macro/command/hogefunc.html</li>
-      <li>add to command index page.<br />
+      <li>add to command index page.<br>
           ... doc/LANG/html/macro/command/index.html</li>
-      <li>add the file to help topic.<br />
+      <li>add the file to help topic.<br>
           ... doc/LANG/teraterm.hhc</li>
-      <li>get a new number of context ID in help page.<br />
-          The value is internal ID + 92000.<br />
+      <li>get a new number of context ID in help page.<br>
+          The value is internal ID + 92000.<br>
           ... teraterm/common/helpid.h</li>
-      <li>make the alias between context ID and calling file.<br />
-          Open the .hhp file by using Text Editor, added a html line in [ALIAS] tag.<br />
+      <li>make the alias between context ID and calling file.<br>
+          Open the .hhp file by using Text Editor, added a html line in [ALIAS] tag.<br>
           ... doc/LANG/teraterm.hhp</li>
     </ul>
   </li>
@@ -175,7 +193,7 @@ Example: adding a TTSSH menu under File menu
 <h2 id="icon">Icon</h2>
 
 <p>
-Icon file includes 4bit 32px and 16px images, 32bit 256px, 48px, 32px and 16px images.<br />
+Icon file includes 4bit 32px and 16px images, 32bit 256px, 48px, 32px and 16px images.<br>
 Each icon files include following kind images.
 </p>
 
@@ -306,13 +324,13 @@ Each icon files include following kind images.
 </table>
 
 <p>
-The store order of image files in icon file is "bit depth ASC", "pixel size DESC."<br />
+The store order of image files in icon file is "bit depth ASC", "pixel size DESC."<br>
 Otherwise, when a program load an icon image without specifying pixel size for get maximum size image, API returns first image.
 </p>
 
 <p>
-Icon file include 4-bit images.<br />
-Windows NT 4.0 supports only 4-bit icon. And notification area icon on Windows 2000 supports only 4-bit icon.<br />
+Icon file include 4-bit images.<br>
+Windows NT 4.0 supports only 4-bit icon. And notification area icon on Windows 2000 supports only 4-bit icon.<br>
 4-bit color palette is followings:
 </p>
 
@@ -550,7 +568,7 @@ Source file of each icon images are followings:
   </li>
   <li>Under add/manual folder of TeraTermProject/update_website repository
     <ul>
-      <li>License files for web site is managed in TeraTermProject/update_website repository.<br />
+      <li>License files for web site is managed in TeraTermProject/update_website repository.<br>
           Replace a license file when it is cahnged.</li>
     </ul>
   </li>

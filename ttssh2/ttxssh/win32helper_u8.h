@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007- TeraTerm Project
+ * Copyright (C) 2024- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,37 +26,19 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTMACRO.EXE, dialog boxes */
-
 #pragma once
 
-#include "ttmdef.h"
+#include <windows.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void ParseParam(PBOOL IOption, PBOOL VOption);
-BOOL GetFileName(HWND HWin, wchar_t **fname);
-void SetDlgPos(int x, int y);
-int OpenInpDlg(wchar_t *Input, const wchar_t *Text, const wchar_t *Caption,
-                const wchar_t *Default, BOOL Paswd);
-int OpenErrDlg(const char *Msg, const char *Line, int lineno, int start, int end, const char *FileName);
-int OpenMsgDlg(const wchar_t *Text, const wchar_t *Caption, BOOL YesNo);
-void OpenStatDlg(const wchar_t *Text, const wchar_t *Caption);
-void CloseStatDlg();
-void BringupStatDlg();
-
-int OpenListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected, int ext, int DlgWidth, int DlgHeight);
-
-extern wchar_t *HomeDirW;
-extern wchar_t FileName[MAX_PATH];
-extern wchar_t TopicName[11];
-extern wchar_t ShortName[MAX_PATH];
-extern wchar_t **Params;
-extern int ParamCnt;
-extern BOOL SleepFlag;
-extern DPI_AWARENESS_CONTEXT DPIAware;
+BOOL SetDlgItemTextU8(HWND hDlg, int nIDDlgItem, const char *strU8);
+DWORD hGetWindowTextU8(HWND ctl, char **textU8);
+DWORD hGetDlgItemTextU8(HWND hDlg, int id, char **textU8);
+DWORD hGetWindowTextA(HWND ctl, char **textA);
+DWORD hGetDlgItemTextA(HWND hDlg, int id, char **textA);
 
 #ifdef __cplusplus
 }

@@ -70,6 +70,7 @@
 #include "win32helper.h"
 #include "ttlib_types.h"
 #include "makeoutputstring.h"
+#include "win32helper_u8.h"
 
 #ifndef MAX
 # define MAX(a,b) (((a)>(b))?(a):(b))
@@ -4271,7 +4272,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			wchar_t *err_str;
 			hFormatMessageW(error, &err_str);
 			wchar_t *fname = ToWcharU8(sendfile);
-			TTMessageBoxW(NULL, &info, pvar->ts->UILanguageFileW, err_str, fname);
+			TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, err_str, fname);
 			free(fname);
 			free(err_str);
 			goto error;
@@ -4324,7 +4325,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 					MB_OK | MB_ICONERROR
 				};
 				wchar_t *fname = ToWcharU8(c->scp.localfilefull);
-				TTMessageBoxW(NULL, &info, pvar->ts->UILanguageFileW, fname);
+				TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, fname);
 				free(fname);
 				goto error;
 			}
@@ -4335,7 +4336,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 				MB_YESNO | MB_ICONQUESTION
 			};
 			wchar_t *fname = ToWcharU8(c->scp.localfilefull);
-			dlgresult = TTMessageBoxW(NULL, &info, pvar->ts->UILanguageFileW, fname);
+			dlgresult = TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, fname);
 			free(fname);
 			if (dlgresult == IDNO) {
 				goto error;
@@ -4354,7 +4355,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			wchar_t *err_str;
 			hFormatMessageW(error, &err_str);
 			wchar_t *fname = ToWcharU8(c->scp.localfilefull);
-			TTMessageBoxW(NULL, &info, pvar->ts->UILanguageFileW, err_str, fname);
+			TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, err_str, fname);
 			free(fname);
 			free(err_str);
 			goto error;
@@ -8360,14 +8361,6 @@ static int is_canceled_window(HWND hd)
 		return 0;
 }
 
-static BOOL SetDlgItemTextU8(HWND hDlg, int nIDDlgItem, const char *strU8)
-{
-	wchar_t *strW = ToWcharU8(strU8);
-	BOOL retval = SetDlgItemTextW(hDlg, nIDDlgItem, strW);
-	free(strW);
-	return retval;
-}
-
 static unsigned __stdcall ssh_scp_thread(void *p)
 {
 	Channel_t *c = (Channel_t *)p;
@@ -9030,12 +9023,14 @@ error:
 			//ssh2_channel_delete(c);  // free channel
 			//ssh2_channel_send_close(pvar, c);
 		}
-
-		wchar_t uimsgW[MAX_UIMSG];
-		UTIL_get_lang_msgW("MSG_SSH_SCP_ERROR_TITLE", pvar,
-						   L"TTSSH: SCP error", uimsgW);
+		static const TTMessageBoxInfoW info = {
+				"TTSSH",
+				"MSG_SSH_SCP_ERROR_TITLE", L"TTSSH: SCP error",
+				"MSG_SSH_SCP_ERROR_MISC", L"%s",
+				MB_OK | MB_ICONEXCLAMATION
+		};
 		wchar_t *msgW = ToWcharU8(msg);
-		MessageBoxW(pvar->cv->HWin, msgW, uimsgW, MB_OK | MB_ICONEXCLAMATION);
+		TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, msgW);
 		free(msgW);
 	}
 }

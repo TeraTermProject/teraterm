@@ -35,6 +35,7 @@
 #include <string.h>
 #include <time.h>
 #include <errno.h>
+#include "compat_win.h"
 #include "tt-version.h"
 #include "ttmdlg.h"
 #include "ttmbuff.h"
@@ -2873,6 +2874,79 @@ static WORD TTLGetModemStatus(void)
 	}
 	else {
 		SetResult(1);
+	}
+
+	return Err;
+}
+
+static WORD TTLGetTTPos(void)
+{
+	WORD Err;
+	TVarId showflag;
+	TVarId w_x, w_y, w_width, w_height;
+	TVarId c_x, c_y, c_width, c_height;
+	char Str[MaxStrLen];
+
+	Err = 0;
+	GetIntVar(&showflag, &Err); // 0:通常状態、1:最小化状態、2:最大化状態、3:非可視状態
+	GetIntVar(&w_x,      &Err); // w_x, w_y = ウインドウ領域の左上隅
+	GetIntVar(&w_y,      &Err);
+	GetIntVar(&w_width,  &Err);
+	GetIntVar(&w_height, &Err);
+	GetIntVar(&c_x,      &Err); // c_x, c_y = クライアント(テキスト)領域の左上隅
+	GetIntVar(&c_y,      &Err);
+	GetIntVar(&c_width,  &Err);
+	GetIntVar(&c_height, &Err);
+
+	if ((Err == 0) && (GetFirstChar() != 0)) {
+		Err = ErrSyntax;
+    }
+	if ((Err == 0) && (! Linked)) {
+		Err = ErrLinkFirst;
+	}
+	if (Err != 0) {
+		return Err;
+	}
+
+	Err = GetTTParam(CmdGetTTPos, Str, sizeof(Str));
+	if (Err == 0) {
+		int tmp_showflag;
+		int tmpw_x, tmpw_y, tmpw_width, tmpw_height;
+		int tmpc_x, tmpc_y, tmpc_width, tmpc_height;
+		HMONITOR hMonitor;
+		RECT rc;
+		UINT dpi_x, dpi_y;
+		float mag = 1;
+
+		if (sscanf_s(Str, "%d %d %d %d %d %d %d %d %d", &tmp_showflag,
+					&tmpw_x, &tmpw_y, &tmpw_width, &tmpw_height,
+					&tmpc_x, &tmpc_y, &tmpc_width, &tmpc_height) == 9) {
+			if (DPIAware == DPI_AWARENESS_CONTEXT_UNAWARE) {
+				if (pMonitorFromRect != NULL && pGetDpiForMonitor != NULL) {
+					rc.left   = tmpw_x;
+					rc.top    = tmpw_y;
+					rc.right  = tmpw_x + tmpw_width;
+					rc.bottom = tmpw_y + tmpw_height;
+					hMonitor = pMonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
+					if (hMonitor != NULL) {
+						pGetDpiForMonitor(hMonitor, (MONITOR_DPI_TYPE)0 /*0=MDT_EFFECTIVE_DPI*/, &dpi_x, &dpi_y);
+						mag = dpi_x / 96.f;
+					}
+				}
+			}
+			SetIntVal(showflag, tmp_showflag);
+			SetIntVal(w_x,      (int)(tmpw_x      * mag));
+			SetIntVal(w_y,      (int)(tmpw_y      * mag));
+			SetIntVal(w_width,  (int)(tmpw_width  * mag));
+			SetIntVal(w_height, (int)(tmpw_height * mag));
+			SetIntVal(c_x,      (int)(tmpc_x      * mag));
+			SetIntVal(c_y,      (int)(tmpc_y      * mag));
+			SetIntVal(c_width,  (int)(tmpc_width  * mag));
+			SetIntVal(c_height, (int)(tmpc_height * mag));
+			SetResult(0);
+		} else {
+			SetResult(-1);
+		}
 	}
 
 	return Err;
@@ -6052,6 +6126,8 @@ static int ExecCmnd(void)
 			Err = TTLGetTitle(); break;
 		case RsvGetTTDir:
 			Err = TTLGetTTDir(); break;
+		case RsvGetTTPos:
+			Err = TTLGetTTPos(); break;
 		case RsvGetVer:
 			Err = TTLGetVer(); break;
 		case RsvGoto:

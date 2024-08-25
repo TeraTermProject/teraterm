@@ -25,10 +25,24 @@
 
 <h2 id="ini-entry">TERATERM.INI への項目追加</h2>
 
+<h3>どんなときに追加するか</h3>
+
+<p>
+新しい機能が追加されて動作が変わると、これまでどおりの動作を期待するユーザにとっては不便になる。<br>
+動作を切り替えられるように、TERATERM.INI へ項目を追加する。
+</p>
+
+<h3>デフォルト値</h3>
+
+<p>
+新しい動作が大多数のユーザにとって便利になる、安全である、混乱を生まないものであれば「on」としてよい。<br>
+そうでない場合は「off」として、以前と同じ動作になるようにすべき。
+</p>
+
 <h3>項目名</h3>
 
 <p>
-すでに EnableFoo... や DisableBar... が混在してしまっているが、混乱しやすい。<br />
+すでに EnableFoo... や DisableBar... が混在してしまっているが、混乱しやすい。<br>
 今後は Baz... という形式にするのが望ましい。
 </p>
 
@@ -37,23 +51,26 @@
 <ul>
   <li>ソースコード
     <ul>
-      <li>INI ファイルの読み書き部分<br />
+      <li>INI ファイルの読み書き部分<br>
           teraterm\ttpset\ttset.c</li>
-      <li>tttset 構造体<br />
-          teraterm\common\tttypes.h</li>
+      <li>tttset 構造体<br>
+          teraterm\common\tttypes.h<br>
+          Tera Term 4(TT4) と Tera Term 5(TT5) の両方でプラグインを動作させるには TT4 の構造体と互換性を持たせる必要がある<br>
+          そのため、新しいメンバーは末尾に追加する<br>
+          同様に、使用しなくなったメンバーは削除せず reserve_XXX にリネームして残しておく</li>
     </ul>
   </li>
   <li>ドキュメント
     <ul>
-      <li>Tera Term 設定ファイルの全項目一覧<br />
+      <li>Tera Term 設定ファイルの全項目一覧<br>
           setup/teraterm-ini.html</li>
-      <li>設定ダイアログのヘルプ（ダイアログに変更 UI がある場合）<br />
+      <li>設定ダイアログのヘルプ（ダイアログに変更 UI がある場合）<br>
           menu 以下のダイアログのページ</li>
-      <li>設定項目のヘルプ（ダイアログに変更 UI がない場合）<br />
+      <li>設定項目のヘルプ（ダイアログに変更 UI がない場合）<br>
           setup 以下の該当する分類のページ</li>
     </ul>
   </li>
-  <li>デフォルトの INI ファイル<br />
+  <li>デフォルトの INI ファイル<br>
       installer\release\TERATERM.INI</li>
 </ul>
 
@@ -63,10 +80,10 @@
 <h3>新しく国際化メッセージに対応する</h3>
 
 <ul>
-  <li>ソースコード<br />
+  <li>ソースコード<br>
       言語ファイルを読み込む</li>
   <li>ダイアログのメッセージの場合には、リソースファイルに英語のメッセージをデフォルトのテキストとして記述する</li>
-  <li>言語ファイルを修正する<br />
+  <li>言語ファイルを修正する<br>
       修正するのは installer/release/lang_utf8 配下の言語ファイル
     <ul>
       <li>English.lng（英語）
@@ -117,28 +134,28 @@ Tera Termマクロを新設するときの作業手順について、以下に示します。
 <ul>
   <li>ソースコードの修正
     <ul>
-      <li>コマンドの内部 ID を採番する。（「内部 ID」は"helpid.h"にも使用される）<br />
+      <li>コマンドの内部 ID を採番する。（「内部 ID」は"helpid.h"にも使用される）<br>
           ... teraterm/ttmacro/ttmparse.h</li>
-      <li>コマンド名を走査して内部 ID に変換する。<br />
+      <li>コマンド名を走査して内部 ID に変換する。<br>
           ... CheckReservedWord@teraterm/ttmacro/ttmparse.c</li>
-      <li>コマンドの内部 ID から実際に処理をする関数を呼ぶ。<br />
+      <li>コマンドの内部 ID から実際に処理をする関数を呼ぶ。<br>
           ... ExecCmnd@teraterm/ttmacro/ttl.c</li>
       <li>処理する関数を作る。</li>
     </ul>
   </li>
   <li>ヘルプ(言語ごと)
     <ul>
-      <li>コマンドのヘルプを作る。<br />
+      <li>コマンドのヘルプを作る。<br>
           ... doc/LANG/html/macro/command/hogefunc.html</li>
-      <li>コマンド一覧ページに追加する。<br />
+      <li>コマンド一覧ページに追加する。<br>
           ... doc/LANG/html/macro/command/index.html</li>
-      <li>ヘルプトピックに追加する。<br />
+      <li>ヘルプトピックに追加する。<br>
           ... doc/LANG/teraterm.hhc</li>
-      <li>ヘルプページのコンテキスト ID を採番する。<br />
-          値は コマンドの内部 ID + 92000。<br />
+      <li>ヘルプページのコンテキスト ID を採番する。<br>
+          値は コマンドの内部 ID + 92000。<br>
           ... teraterm/common/helpid.h</li>
-      <li>コンテキスト ID と呼び出すファイルのエイリアスを作成する。<br />
-          テキストエディタで直接開き、[ALIAS]にHTMLを追加する。<br />
+      <li>コンテキスト ID と呼び出すファイルのエイリアスを作成する。<br>
+          テキストエディタで直接開き、[ALIAS]にHTMLを追加する。<br>
           ... doc/LANG/teraterm.hhp</li>
     </ul>
   </li>
@@ -179,7 +196,7 @@ Tera Termマクロを新設するときの作業手順について、以下に示します。
 <h2 id="icon">アイコン</h2>
 
 <p>
-アイコンファイルには、4bit の 32px, 16px 画像、32bit の 256px, 48px, 32px, 16px 画像を含めます。<br />
+アイコンファイルには、4bit の 32px, 16px 画像、32bit の 256px, 48px, 32px, 16px 画像を含めます。<br>
 各アイコンファイルには以下の種類の画像が含まれています。
 </p>
 
@@ -310,13 +327,13 @@ Tera Termマクロを新設するときの作業手順について、以下に示します。
 </table>
 
 <p>
-アイコンファイルへの画像の格納順は「ビット数が小さい順、サイズが大きい順」とします。<br />
+アイコンファイルへの画像の格納順は「ビット数が小さい順、サイズが大きい順」とします。<br>
 そうでないと、プログラムがサイズを指定せずに「最大サイズの画像」を取得しようとしたときに「最初の画像」が取り出されるためです。
 </p>
 
 <p>
-アイコンファイルには 4bit 画像を含めます。<br />
-Windows NT 4.0 は 4bit アイコンのみサポートしているためです。また、Windows 2000 の通知領域も 4bit アイコンのみサポートしています。<br />
+アイコンファイルには 4bit 画像を含めます。<br>
+Windows NT 4.0 は 4bit アイコンのみサポートしているためです。また、Windows 2000 の通知領域も 4bit アイコンのみサポートしています。<br>
 4bit アイコンには以下の色が使用できます。
 </p>
 
@@ -554,7 +571,7 @@ Windows NT 4.0 は 4bit アイコンのみサポートしているためです。また、Windows 2000 
   </li>
   <li>TeraTermProject/update_website リポジトリの add/manual フォルダ配下
     <ul>
-      <li>Web サイトで表示するライセンスファイルは TeraTermProject/update_website リポジトリで管理している。<br />
+      <li>Web サイトで表示するライセンスファイルは TeraTermProject/update_website リポジトリで管理している。<br>
           ライセンスファイルに変更があれば差し替える。</li>
     </ul>
   </li>
