@@ -77,7 +77,7 @@
       <li>allow users to select creating automatic backup or not by <a href="../setup/teraterm-misc.html#IniAutoBackup">IniAutoBackup</a> when overwriting the ini file.
       <li>MACRO: <a href="../macro/command/send.html">send</a> macro command check data and sends it as text or binary. added <a href="../macro/command/sendtext.html">sendtext</a> and <a href="../macro/command/sendbinary.html">sendbinary</a> macro command</li>
       <li>MACRO: Added options such as size specification to the listbox command.</li>
-      <li>added the <a href="../macro/command/getttpos.html">getttpos</a> command to retrieve the display status, position, and size in the VT window of Tera Term.</li>
+      <li>MACRO: added the <a href="../macro/command/getttpos.html">getttpos</a> command to retrieve the display status, position, and size in the VT window of Tera Term.</li>
       <li>MACRO: password file using aes-256-ctr encryption
         <ul>
           <li>added the <a href="../macro/command/setpassword2.html">setpassword2</a>, <a href="../macro/command/getpassword2.html">getpassword2</a>, <a href="../macro/command/ispassword2.html">ispassword2</a> and <a href="../macro/command/delpassword2.html">delpassword2</a> commands.</li>
@@ -106,6 +106,7 @@
       <li>Fixed doesn't remember the COM port it used on new connection dialog</li>
       <li>Fixed COM port list was not sorted on new connection dialog.</li>
       <li>Apply changes even if only NoFrame is changed at Window setup dialog.</li>
+      <li>Fixed the issue where specifying the <a href="../commandline/teraterm.html#v">/V option</a> with ttermpro.exe would cause a crash upon exit.</li>
       <li>Fixed window maximization works immediately after startup.</li>
       <li>Added <a href="../setup/folder.html#DownloadDir">download folder</a> for log saving folder same as Tera Term 4.</li>
       <li>MACRO: fixed <a href="../macro/command/send.html">send</a> macro command could not send $00.</li>
