@@ -115,8 +115,6 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			}
 			SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_SETCURSEL, w - 1, 0);
 
-			CenterWindow(Dialog, GetParent(Dialog));
-
 			return TRUE;
 		}
 

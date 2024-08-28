@@ -102,8 +102,6 @@ static INT_PTR CALLBACK proc(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 			ShowWindow(GetDlgItem(Dialog, IDCANCEL), FALSE);
 			ShowWindow(GetDlgItem(Dialog, IDC_KEYBHELP), FALSE);
 
-			CenterWindow(Dialog, GetParent(Dialog));
-
 			return TRUE;
 		}
 
