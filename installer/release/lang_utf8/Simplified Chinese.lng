@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2024-08-25 by TeraTerm Project
+date=2024-08-30 by TeraTerm Project
 contributor=LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -416,7 +416,7 @@ DLG_TCPIP_REMOVE=移除(&R)
 DLG_TCPIP_DOWN=下移(&D)
 
 ; TCP/IP tab
-DLG_TCPIP_TITLE=TCP/IP 设置
+DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=主机列表(&L)
 DLG_TCPIP_NEWCONNECTION=New connection
 DLG_TCPIP_HISTORYTITLE=历史

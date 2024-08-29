@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2024-08-25 by TeraTerm Project
+date=2024-08-30 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -416,7 +416,7 @@ DLG_TCPIP_REMOVE=&Перенос
 DLG_TCPIP_DOWN=&Вниз
 
 ; TCP/IP tab
-DLG_TCPIP_TITLE=Настройка TCP/IP
+DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=&Перечень хостов
 DLG_TCPIP_NEWCONNECTION=New connection
 DLG_TCPIP_HISTORYTITLE=История

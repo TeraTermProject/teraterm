@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2024-08-25 by TeraTerm Project
+date=2024-08-30 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -416,7 +416,7 @@ DLG_TCPIP_REMOVE=削除(&R)
 DLG_TCPIP_DOWN=下へ(&D)
 
 ; TCP/IP tab
-DLG_TCPIP_TITLE=TCP/IP 設定
+DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=ホストリスト(&L)
 DLG_TCPIP_NEWCONNECTION=新しい接続ダイアログ
 DLG_TCPIP_HISTORYTITLE=履歴

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2024-08-25 by TeraTerm Project
+date=2024-08-30 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -416,7 +416,7 @@ DLG_TCPIP_REMOVE=삭제(&R)
 DLG_TCPIP_DOWN=아래(&D)
 
 ; TCP/IP tab
-DLG_TCPIP_TITLE=TCP/IP 설정
+DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=호스트 목록(&L)
 DLG_TCPIP_NEWCONNECTION=New connection
 DLG_TCPIP_HISTORYTITLE=이력

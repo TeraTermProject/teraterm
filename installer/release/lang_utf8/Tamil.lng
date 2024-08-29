@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2024-08-25 by TeraTerm Project
+date=2024-08-30 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -416,7 +416,7 @@ DLG_TCPIP_REMOVE=&நீக்கு
 DLG_TCPIP_DOWN=&கீழ்
 
 ; TCP/IP tab
-DLG_TCPIP_TITLE=பகநெ/இநெ அமைவு
+DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=புரவலன் &பட்டியல்
 DLG_TCPIP_NEWCONNECTION=New connection
 DLG_TCPIP_HISTORYTITLE=வரலாறு
