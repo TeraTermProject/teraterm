@@ -61,10 +61,8 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		{ IDC_TCPIPHISTORYTITLE, "DLG_TCPIP_HISTORYTITLE" },
 		{ IDC_TCPIPHISTORY, "DLG_TCPIP_HISTORY" },
 		{ IDC_TCPIP_EDITHISTORY, "DLG_TCPIP_EDITHISTORY" },
-		{ IDC_TCPIP_PORT_LABEL, "DLG_TCPIP_DEFAULT_PORT" },
 		{ IDC_TCPIP_SERVICE_TITLE, "DLG_TCPIP_SERVICE_TITLE" },
 		{ IDC_TCPIPPORTLABEL, "DLG_TCPIP_PORT" },
-		{ IDC_TCPIPSERIALPORTLABEL, "DLG_TCPIP_SERIAL_PORT" },
 		{ IDC_TCPIPTELNETKEEPALIVELABEL, "DLG_TCPIP_KEEPALIVE" },
 		{ IDC_TCPIPTELNETKEEPALIVESEC, "DLG_TCPIP_KEEPALIVE_SEC" },
 		{ IDC_TCPIPAUTOCLOSE, "DLG_TCPIP_AUTOCLOSE" },
@@ -79,12 +77,6 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			SetWindowLongPtrA(Dialog, DWLP_USER, (LONG_PTR)data);
 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
-
-			// default port
-			SendDlgItemMessageA(Dialog, IDC_TCPIP_PORT, CB_ADDSTRING, 0, (LPARAM)"TCP/IP");
-			SendDlgItemMessageA(Dialog, IDC_TCPIP_PORT, CB_ADDSTRING, 0, (LPARAM)"Serial");
-			w = (ts->PortType == IdSerial) ? 1 : 0;
-			SendDlgItemMessageA(Dialog, IDC_TCPIP_PORT, CB_SETCURSEL, w, 0);
 
 			CheckDlgButton(Dialog, IDC_TCPIPHISTORY,
 						   ts->HistoryList == 0 ? BST_UNCHECKED : BST_CHECKED);
@@ -101,20 +93,6 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			SendDlgItemMessageA(Dialog, IDC_TCPIP_SERVICE, CB_ADDSTRING, 0, (LPARAM)"Other");
 			SendDlgItemMessageA(Dialog, IDC_TCPIP_SERVICE, CB_SETCURSEL, w, 0);
 
-			// Serail Port #
-			for (w = 1; w <= ts->MaxComPort; w++) {
-				char Temp[8];
-				_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "COM%d", (int)w);
-				SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_ADDSTRING, 0, (LPARAM)Temp);
-			}
-			if (ts->ComPort <= ts->MaxComPort) {
-				w = ts->ComPort;
-			}
-			else {
-				w = 1; // COM1
-			}
-			SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_SETCURSEL, w - 1, 0);
-
 			return TRUE;
 		}
 
@@ -125,10 +103,6 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			switch (nmhdr->code) {
 			case PSN_APPLY: {
 				BOOL Ok;
-
-				ts->PortType =
-					SendDlgItemMessageA(Dialog, IDC_TCPIP_PORT, CB_GETCURSEL, 0, 0) == 0 ?
-					IdTCPIP : IdSerial;
 
 				ts->HistoryList =
 					(IsDlgButtonChecked(Dialog, IDC_TCPIPHISTORY) == BST_CHECKED) ? 1 : 0;
@@ -143,9 +117,6 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 				ts->Telnet =
 					SendDlgItemMessageA(Dialog, IDC_TCPIP_SERVICE, CB_GETCURSEL, 0, 0) == 0 ? 1: 0;
-
-				ts->ComPort =
-					(int)SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_GETCURSEL, 0, 0) + 1;
 
 				GetDlgItemTextA(Dialog, IDC_TCPIPTERMTYPE, ts->TermType, sizeof(ts->TermType));
 				break;

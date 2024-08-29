@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2024-08-30 by TeraTerm Project
+date=2024-08-31 by TeraTerm Project
 contributor=LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -422,10 +422,8 @@ DLG_TCPIP_NEWCONNECTION=New connection
 DLG_TCPIP_HISTORYTITLE=历史
 DLG_TCPIP_HISTORY=Save h&istory when new connection
 DLG_TCPIP_EDITHISTORY=Edit hisotry
-DLG_TCPIP_DEFAULT_PORT=Default &port:
 DLG_TCPIP_SERVICE_TITLE=TCP/IP Service (Ignored when SSH plugin is available)
 DLG_TCPIP_PORT=TCP/IP 端口(&P)：
-DLG_TCPIP_SERIAL_PORT=Serial Port#
 DLG_TCPIP_KEEPALIVE=保持激活(&K)
 DLG_TCPIP_KEEPALIVE_SEC=秒
 DLG_TCPIP_AUTOCLOSE=自动关闭窗口(&W)
