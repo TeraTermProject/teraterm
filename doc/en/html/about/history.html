@@ -36,48 +36,45 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li><a href="glossary.html#Bracketed">Bracket paste</a> behavior can be adjusted with <a href="../setup/teraterm-misc.html#BracketedSupport">BracketedSupport</a> and <a href="../setup/teraterm-misc.html#BracketedControlOnly">BracketedControlOnly</a> .
+      <li><a href="glossary.html#Bracketed">Bracket paste</a> behavior become able to adjust with <a href="../setup/teraterm-misc.html#BracketedSupport">BracketedSupport</a> and <a href="../setup/teraterm-misc.html#BracketedControlOnly">BracketedControlOnly</a>.
         <ul>
           <li>When pasting string from clipboard that does not contain control codes such as line feeds, characters are not outputted twice in the log with the default settings.</li>
         </ul>
       </li>
-      <li>Use EnableContinuedLineCopy setting when dragging after selecting a word by double click.</li>
+      <li>EnableContinuedLineCopy setting is now used when dragging after selecting a word by double click.</li>
       <li>Right-click(paste) is not disabled even when <a href="../setup/teraterm-win.html#textselect">SelectOnActivate</a> is off.</li>
       <li>Fixed some Emoji which character widths did not change with Override Emoji Characters width option. (Changed referenced Emoji table.)</li>
       <li>To adjust to narrow the space between characters, <a href="../setup/teraterm-win.html#space">VTFontSpace</a> became to be able to set negative value.</li>
-      <li>Only available COM ports are listed.
+      <li>Only available COM ports are now listed.
         <ul>
           <li>COM ports that are disabled and failed to initialize are not included.</li>
         </ul>
       </li>
-      <li>Display lng file information when <a href="../menu/setup-general.html#UILanguageFile">LanguageUI</a> is selected. Remove language setting.</li>
+      <li>General setup dialog is now shown the information from <a href="../menu/setup-general.html#UILanguageFile">Language file</a> which is selected.</a>
+      <li>Removed Language setting from General setup dialog.</li>
       <li>Download folder setting is moved to <a href="../menu/setup-additional-general.html#DownloadFolder">General tab</a> of Additional settings dialog.</li>
-      <li>Add ViewlogEditor argument on <a href="../menu/setup-additional-log.html#ViewlogEditorArg">Log Tab</a> in Additional settings.</li>
-      <li>Setup - Font was integrated into <a href="../menu/setup-additional-font.html">Font tab</a> of Additional settings.</li>
-      <li>Keyboard setting dialog is moved to Keyboard tab of Additional setting dialog.</li>
-      <li>Add <a href="../menu/setup-additional-tcpip.html">TCP/IP tab</a> of Additional setting dialog.
+      <li>Added ViewlogEditor argument on <a href="../menu/setup-additional-log.html#ViewlogEditorArg">Log Tab</a> in Additional settings dialog.</li>
+      <li>Setup - Font was integrated into <a href="../menu/setup-additional-font.html">Font tab</a> of Additional settings dialog.</li>
+      <li>Keyboard setup dialog is moved to <a href="../menu/setup-additional-keyboard.html">Keyboard tab</a> of Additional settings dialog.</li>
+      <li>TCP/IP setup dialog is moved to <a href="../menu/setup-additional-tcpip.html">TCP/IP tab</a> of Additional settings dialog.</li>
+      <li>Default port settings is moved to <a href="../menu/setup-additional-tcpip.html">TCP/IP tab</a> of Additional settings dialog from General setup dialog.</li>
+      <li>Improved Broadcast command dialog:
         <ul>
-          <li>TCP/IP dialog is moved to TCP/IP tab.</li>
-          <li>Default port settings is moved to TCP/IP tab from General setup dialog.</li>
-        </ul>
-      </li>
-      <li>improve Broadcast command dialog:
-        <ul>
-          <li>edit control now support paste by R/M mouse clicking and Shift-INS.</li>
-          <li>edit control now works the same whether the IME is on or off.</li>
-          <li>add context menu in window list which provides foreground/minimize the selected windows and refresh the window list itself.</li>
-          <li>keep selection state when the window list is refreshed.</li>
-          <li>add help button and normalize Japanese button name.</li>
-          <li>fix left click behavior in the margin of window list.</li>
+          <li>Edit control now support paste by R/M mouse clicking and Shift-INS.</li>
+          <li>Edit control now works the same whether the IME is on or off.</li>
+          <li>Added context menu in window list which provides foreground/minimize the selected windows and refresh the window list itself.</li>
+          <li>The selection state is now keeped when the window list is refreshed.</li>
+          <li>Added help button and normalize Japanese button name.</li>
+          <li>Fixed left click behavior in the margin of window list.</li>
         </ul>
       </li>
       <li>Returned the display position of the message box to its previous behavior (center of the parent window) before 4.103, excluding some message boxes.</li>
-      <li>Show error messagebox when logging cannot be started with LogAutoStart=on</li>
-      <li>allow users to select creating automatic backup or not by <a href="../setup/teraterm-misc.html#IniAutoBackup">IniAutoBackup</a> when overwriting the ini file.
-      <li>MACRO: <a href="../macro/command/send.html">send</a> macro command check data and sends it as text or binary. added <a href="../macro/command/sendtext.html">sendtext</a> and <a href="../macro/command/sendbinary.html">sendbinary</a> macro command</li>
+      <li>Error messagebox is now shown when logging cannot be started with LogAutoStart=on</li>
+      <li>Allow users to select creating automatic backup or not by <a href="../setup/teraterm-misc.html#IniAutoBackup">IniAutoBackup</a> when overwriting the ini file.
+      <li>MACRO: <a href="../macro/command/send.html">send</a> macro command check data and sends it as text or binary. Added <a href="../macro/command/sendtext.html">sendtext</a> and <a href="../macro/command/sendbinary.html">sendbinary</a> macro command</li>
       <li>MACRO: Added options such as size specification to the listbox command.</li>
-      <li>MACRO: added the <a href="../macro/command/getttpos.html">getttpos</a> command to retrieve the display status, position, and size in the VT window of Tera Term.</li>
-      <li>MACRO: password file using aes-256-ctr encryption
+      <li>MACRO: Added the <a href="../macro/command/getttpos.html">getttpos</a> command to retrieve the display status, position, and size in the VT window of Tera Term.</li>
+      <li>MACRO: Added support for password file using aes-256-ctr encryption
         <ul>
           <li>added the <a href="../macro/command/setpassword2.html">setpassword2</a>, <a href="../macro/command/getpassword2.html">getpassword2</a>, <a href="../macro/command/ispassword2.html">ispassword2</a> and <a href="../macro/command/delpassword2.html">delpassword2</a> commands.</li>
           <li>The contents that is saved with setpassword2 command is protected by a password.</li>
@@ -104,17 +101,17 @@
       <li>Fixed COM port detection for modem device. Modem device is also detected the same as 4.x now.</li>
       <li>Fixed doesn't remember the COM port it used on new connection dialog</li>
       <li>Fixed COM port list was not sorted on new connection dialog.</li>
-      <li>Apply changes even if only NoFrame is changed at Window setup dialog.</li>
+      <li>Apply changes even if only No Frame is changed at Window setup dialog.</li>
       <li>Fixed the issue where specifying the <a href="../commandline/teraterm.html#v">/V option</a> with ttermpro.exe would cause a crash upon exit.</li>
       <li>Fixed window maximization works immediately after startup.</li>
       <li>Added <a href="../setup/folder.html#DownloadDir">download folder</a> for log saving folder same as Tera Term 4.</li>
-      <li>MACRO: fixed <a href="../macro/command/send.html">send</a> macro command could not send $00.</li>
+      <li>MACRO: Fixed <a href="../macro/command/send.html">send</a> macro command could not send $00.</li>
       <li>MACRO: Fixed <a href="../macro/command/clipb2var.html">clipb2var</a> is not working.</li>
       <li>MACRO: Fixed path of <a href="../macro/command/basename.html">basename</a> and <a href="../macro/command/dirname.html">dirname</a> macro commands were not Unicode-compatible.</li>
-      <li>MACRO: fixed ttermpro.exe does not crash when file specified in the <a href="../macro/command/xmodemsend.html">xmodemsend</a> macro command does not exist.</li>
-      <li>MACRO: fixed password file name for <a href="../macro/command/getpassword.html">getpassword</a> and <a href="../macro/command/delpassword.html">delpassword</a> macro command is not Unicode compatible.</li>
+      <li>MACRO: Fixed ttermpro.exe does not crash when file specified in the <a href="../macro/command/xmodemsend.html">xmodemsend</a> macro command does not exist.</li>
+      <li>MACRO: Fixed password file name for <a href="../macro/command/getpassword.html">getpassword</a> and <a href="../macro/command/delpassword.html">delpassword</a> macro command is not Unicode compatible.</li>
       <li>MACRO: Fixed ttpmacro.exe crashes when referencing unsetted string array element.</li>
-      <li>MACRO: fixed file name is garbled in status window when Kanji characters are included.</li>
+      <li>MACRO: Fixed file name is garbled in status window when Kanji characters are included.</li>
     </ul>
   </li>
 
@@ -3532,19 +3529,19 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <li>add support for multiple required authentication.
+      <li>Added support for multiple required authentication.
         <ul>
-          <li>auto login, connect from macro and duplicate session are not supported, because TTSSH cannot receive multiple authentication informations from command line parameters.</li>
+          <li>Auto login, connect from macro and duplicate session are not supported, because TTSSH cannot receive multiple authentication informations from command line parameters.</li>
         </ul>
       </li>
       <li>If option(<a href="../commandline/ttssh.html#f">/f</a>, <a href="../commandline/ttssh.html#ssh-f">/ssh-f</a>, <a href="../commandline/ttssh.html#ssh-consume">/ssh-consume</a>, <a href="../commandline/ttssh.html#keyfile">/keyfile</a>) argument file name is not absolute path, modify it to be treated as a relative path from %APPDATA%\teraterm5\.</li>
-      <li>Modified private key file name can use Unicode</li>
+      <li>Modified to private key file name can use Unicode</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <li>modified to send username and password in UTF-8 at authentication to comply with RFC 4252.</li>
+      <li>Modified to send username and password in UTF-8 at authentication to comply with RFC 4252.</li>
       <li>Modified to <a href="../setup/teraterm-ssh.html#AuthBanner">display SSH authentication banner in VT window</a> regardless of receiving character code.</li>
       <li>Fixed focus disappears in <a href="../menu/setup-sshauth.html">SSH Authentication</a> dialog and TAB cannot be used.</li>
     </ul>
@@ -5465,7 +5462,7 @@ SYNOPSIS:
       <li>Added LockBox to encrypt and save passwords.</li>
       <li>In the Details dialog, the "use SSH" checkbox no longer turns on when the executable file name includes "ttermpro.exe".</li>
       <li>Fixed a typo in the title of the List Configuration dialog. (Cofiguration -> Configuration)</li>
-      <li>Added the risk of information leaks.</li>
+      <li>Added the risk of information leaks to <a href="../usage/TTMenu/TTMenu.html">document</a>.</li>
 </ul>
 
 <h3 id="ttmenu_1.19">2024.2.29 (Ver 1.19)</h3>
