@@ -418,12 +418,11 @@ DLG_TCPIP_DOWN=&கீழ்
 ; TCP/IP tab
 DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=புரவலன் &பட்டியல்
-DLG_TCPIP_NEWCONNECTION=New connection
 DLG_TCPIP_HISTORYTITLE=வரலாறு
 DLG_TCPIP_HISTORY=Save h&istory when new connection
 DLG_TCPIP_EDITHISTORY=Edit hisotry
-DLG_TCPIP_SERVICE_TITLE=TCP/IP Service (Ignored when SSH plugin is available)
-DLG_TCPIP_PORT=TCP/IP &துறைமுகம்#:
+DLG_TCPIP_TELNET=T&elnet
+DLG_TCPIP_PORT=&துறைமுகம்#:
 DLG_TCPIP_KEEPALIVE=&தொலைவலையில் உயிருடன் இருங்கள்
 DLG_TCPIP_KEEPALIVE_SEC=நொடி
 DLG_TCPIP_AUTOCLOSE=தானாக &சாளரம் மூடப்படும்

@@ -57,11 +57,9 @@ typedef struct {
 static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
-		{ IDC_TCPIPNEWCONNENTTITLE, "DLG_TCPIP_NEWCONNECTION" },
-		{ IDC_TCPIPHISTORYTITLE, "DLG_TCPIP_HISTORYTITLE" },
 		{ IDC_TCPIPHISTORY, "DLG_TCPIP_HISTORY" },
 		{ IDC_TCPIP_EDITHISTORY, "DLG_TCPIP_EDITHISTORY" },
-		{ IDC_TCPIP_SERVICE_TITLE, "DLG_TCPIP_SERVICE_TITLE" },
+		{ IDC_TCPIP_TELNET, "DLG_TCPIP_TELNET" },
 		{ IDC_TCPIPPORTLABEL, "DLG_TCPIP_PORT" },
 		{ IDC_TCPIPTELNETKEEPALIVELABEL, "DLG_TCPIP_KEEPALIVE" },
 		{ IDC_TCPIPTELNETKEEPALIVESEC, "DLG_TCPIP_KEEPALIVE_SEC" },
@@ -73,7 +71,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		case WM_INITDIALOG: {
 			TCPIPDlgData *data = (TCPIPDlgData *)(((PROPSHEETPAGEW_V1 *)lParam)->lParam);
 			PTTSet ts = data->ts;
-			WPARAM w;
+
 			SetWindowLongPtrA(Dialog, DWLP_USER, (LONG_PTR)data);
 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
@@ -87,11 +85,8 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			SetDlgItemTextA(Dialog, IDC_TCPIPTERMTYPE, ts->TermType);
 			SendDlgItemMessageA(Dialog, IDC_TCPIPTERMTYPE, EM_LIMITTEXT, sizeof(ts->TermType) - 1, 0);
 
-			// TCP/IP service
-			w = (ts->Telnet == 1) ? 0 : 1;
-			SendDlgItemMessageA(Dialog, IDC_TCPIP_SERVICE, CB_ADDSTRING, 0, (LPARAM)"Telnet");
-			SendDlgItemMessageA(Dialog, IDC_TCPIP_SERVICE, CB_ADDSTRING, 0, (LPARAM)"Other");
-			SendDlgItemMessageA(Dialog, IDC_TCPIP_SERVICE, CB_SETCURSEL, w, 0);
+			CheckDlgButton(Dialog, IDC_TCPIP_TELNET,
+						   ts->Telnet == 0 ? BST_UNCHECKED : BST_CHECKED);
 
 			return TRUE;
 		}
@@ -116,7 +111,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 				ts->TelKeepAliveInterval = GetDlgItemInt(Dialog, IDC_TCPIPTELNETKEEPALIVE, &Ok, FALSE);
 
 				ts->Telnet =
-					SendDlgItemMessageA(Dialog, IDC_TCPIP_SERVICE, CB_GETCURSEL, 0, 0) == 0 ? 1: 0;
+					(IsDlgButtonChecked(Dialog, IDC_TCPIP_TELNET) == BST_CHECKED) ? 1 : 0;
 
 				GetDlgItemTextA(Dialog, IDC_TCPIPTERMTYPE, ts->TermType, sizeof(ts->TermType));
 				break;

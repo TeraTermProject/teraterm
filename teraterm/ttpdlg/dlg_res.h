@@ -93,8 +93,7 @@
 #define IDC_TCPIPPROT                   517
 #define IDC_TCPIPPORTLABEL              518
 #define IDC_TCPIPTELNETKEEPALIVELABEL   519
-#define IDC_TCPIP_SERVICE_TITLE         520
-#define IDC_TCPIP_SERVICE               521
+#define IDC_TCPIP_TELNET                520
 #define IDC_TCPIPNEWCONNENTTITLE        525
 #define IDD_HOSTDLG                     600
 #define IDC_HOSTTCPIP                   601

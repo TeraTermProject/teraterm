@@ -418,12 +418,11 @@ DLG_TCPIP_DOWN=&Descend
 ; TCP/IP tab
 DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=Liste d'hôtes
-DLG_TCPIP_NEWCONNECTION=New connection
 DLG_TCPIP_HISTORYTITLE=History
 DLG_TCPIP_HISTORY=Save h&istory when new connection
 DLG_TCPIP_EDITHISTORY=Edit hisotry
-DLG_TCPIP_SERVICE_TITLE=TCP/IP Service (Ignored when SSH plugin is available)
-DLG_TCPIP_PORT=TCP/IP N° de &Port:
+DLG_TCPIP_TELNET=T&elnet
+DLG_TCPIP_PORT=N° de &Port:
 DLG_TCPIP_KEEPALIVE=Temps de maintien
 DLG_TCPIP_KEEPALIVE_SEC=Sec
 DLG_TCPIP_AUTOCLOSE=Fermeture auto de la fenêtre
