@@ -173,7 +173,7 @@ HPROPSHEETPAGE TcpIPPageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.pfnCallback = CallBack;
 	wchar_t *UIMsg;
 	GetI18nStrWW("Tera Term", "DLG_TCPIP_TITLE",
-				 L"TCP/IP setup", pts->UILanguageFileW, &UIMsg);
+	             L"TCP/IP", pts->UILanguageFileW, &UIMsg);
 	psp.pszTitle = UIMsg;
 	psp.pszTemplate = MAKEINTRESOURCEW(IDD_TCPIPDLG);
 #if defined(REWRITE_TEMPLATE)
