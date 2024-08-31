@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2024-08-30 by TeraTerm Project
+date=2024-08-31 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -418,14 +418,11 @@ DLG_TCPIP_DOWN=&Вниз
 ; TCP/IP tab
 DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=&Перечень хостов
-DLG_TCPIP_NEWCONNECTION=New connection
 DLG_TCPIP_HISTORYTITLE=История
 DLG_TCPIP_HISTORY=Save h&istory when new connection
 DLG_TCPIP_EDITHISTORY=Edit hisotry
-DLG_TCPIP_DEFAULT_PORT=Default &port:
-DLG_TCPIP_SERVICE_TITLE=TCP/IP Service (Ignored when SSH plugin is available)
-DLG_TCPIP_PORT=TCP/IP &Порт#:
-DLG_TCPIP_SERIAL_PORT=Serial Port#
+DLG_TCPIP_TELNET=T&elnet
+DLG_TCPIP_PORT=&Порт#:
 DLG_TCPIP_KEEPALIVE=&Хранить
 DLG_TCPIP_KEEPALIVE_SEC=сек
 DLG_TCPIP_AUTOCLOSE=&Автоматическое закрытие окон

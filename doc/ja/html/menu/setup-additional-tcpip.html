@@ -13,45 +13,28 @@
 
     <dl>
 
-      <dt>New connection</dt>
+      <dt id="HistoryList">Save history when new connection</dt>
       <dd>
-        新規接続ダイアログの初期値。
-        <dl>
-          <dt id="HistoryList">History / Save history when new connection</dt>
-          <dd>
-            このオプションを選択すると、<a href="file-new.html">[File] New connection</a>
-            ダイアログボックスで入力されたホスト名がホストリストの先頭に追加されます。
-          </dd>
+        このオプションを選択すると、<a href="file-new.html">[File] New connection</a>
+        ダイアログボックスで入力されたホスト名がホストリストの先頭に追加されます。
+      </dd>
 
-          <dt id="EditHistory">History / Edit history</dt>
-          <dd>
-            接続履歴を編集します。
-          </dd>
+      <dt id="EditHistory">Edit history</dt>
+      <dd>
+        接続履歴を編集します。
+      </dd>
 
-          <dt id="Port">Default port</dt>
-          <dd>
-            Tera Term をコマンドラインパラメーターなしで起動したときに接続するポートの種類。<br>
-            (TCP/IP または Serial)
-          </dd>
+      <dt id="Telnet">Telnet</dt>
+      <dd>
+        Telnet プロトコル を使用する時選択します。<br>
+        SSHプラグインを使用しているときは使用されません。
+      </dd>
 
-          <dt id="Telnet">TCP/IP Service</dt>
-          <dd>
-            Telnet プロトコル 又は その他 を選択します。<br>
-            SSHプラグインを使用しているときは使用されません。
-          </dd>
-
-          <dt id="TCPPort">TCP/IP Port#</dt>
-          <dd>
-            TCP/IP ポート番号。<br>
-            22: SSH<br>
-            23: Telnet
-          </dd>
-
-          <dt>Serial Port#</dt>
-          <dd>
-            使用するシリアルポートを指定します。
-          </dd>
-        </dl>
+      <dt id="TCPPort">Port#</dt>
+      <dd>
+        TCP/IP ポート番号。<br>
+        22: SSH<br>
+        23: Telnet
       </dd>
 
       <dt id="TelKeepAliveInterval">Keep alive</dt>
