@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Additional settings / "TCP/IP" タブ ([Setup] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Additional settings / "TCP/IP" タブ ([Setup] メニュー)</h1>
+
+    <dl>
+
+      <dt id="HistoryList">Save history when new connection</dt>
+      <dd>
+        このオプションを選択すると、<a href="file-new.html">[File] New connection</a>
+        ダイアログボックスで入力されたホスト名がホストリストの先頭に追加されます。
+      </dd>
+
+      <dt id="EditHistory">Edit history</dt>
+      <dd>
+        接続履歴を編集します。
+      </dd>
+
+      <dt id="Telnet">Telnet</dt>
+      <dd>
+        Telnet プロトコル を使用する時選択します。<br>
+        SSHプラグインを使用しているときは使用されません。
+      </dd>
+
+      <dt id="TCPPort">Port#</dt>
+      <dd>
+        TCP/IP ポート番号。<br>
+        22: SSH<br>
+        23: Telnet
+      </dd>
+
+      <dt id="TelKeepAliveInterval">Keep alive</dt>
+      <dd>
+  一定間隔で Telnet サーバに対して、NOP(IAC NOP: 255 241)を送信します。キープアライブ(ハートビート)機能とも呼ばれます。0で当該機能は無効となります。デフォルトは300秒(5分)です。
+      </dd>
+
+      <dt id="AutoWinClose">Auto window close</dt>
+      <dd>
+  このオプションを選択すると、ホストとの接続が切れたとき自動的に
+  Tera Term を終了します。
+      </dd>
+
+      <dt id="TermType">Terminal type</dt>
+      <dd>
+  Telnet プロトコルで接続したときホストに報告する terminal type。<br>
+  TermTypeを"xterm"に設定することにより、ANSIカラーに対応しているvim6などでカラー表示をさせることができます。これはオリジナルからある機能です。<br>
+    Windows の Telnet サーバは "xterm" を正しく受け付けないので、"vt100" か "ANSI" を指定してください。
+      </dd>
+    </dl>
+  </body>
+</html>

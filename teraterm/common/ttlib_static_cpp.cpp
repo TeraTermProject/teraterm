@@ -70,6 +70,15 @@ static const wchar_t *invalidFileNameCharsW = L"\\/:*?\"<>|";
  *	info.message_key, info.message_default 両方ともNULLの場合
  *		可変引数の1つ目を書式化文字列として使用する
  */
+
+static void CALLBACK TTMessageBoxW_WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
+{
+	if ((GetWindowLongPtr(hwnd, GWL_STYLE) & WS_CHILD) == 0) {
+		CenterWindow(hwnd, GetParent(hwnd));
+		UnhookWinEvent(hWinEventHook);
+	}
+}
+
 int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILanguageFile, ...)
 {
 	const char *section = info->section;
@@ -97,6 +106,11 @@ int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILan
 		va_start(ap, UILanguageFile);
 		vaswprintf(&message, format, ap);
 		free(format);
+	}
+
+	if (hWnd != NULL) {
+		SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL,
+			&TTMessageBoxW_WinEventProc, GetCurrentProcessId(), GetCurrentThreadId(), WINEVENT_OUTOFCONTEXT);
 	}
 
 	int r = MessageBoxW(hWnd, message, title, uType);
@@ -1010,16 +1024,27 @@ wchar_t *GetFullPathW(const wchar_t *dir, const wchar_t *rel_path)
 }
 
 /**
- *	UILanguageFileのフルパスを取得する
+ *	UILanguage File (lngファイル)のフルパスを取得
+ *	iniファイルから読み込んでフルパスで返す
  *
- *	@param[in]		ExeDir					exe,dllの存在するフォルダ GetExeDir()で取得できる
- *	@param[in]		UILanguageFileRel		lngファイル、ExeDirからの相対パス
- *	@return			LanguageFile			lngファイルのフルパス
- *											不要になったらfree()すること
+ *	@param[in]		iniファイル
+ *	@return			UILanguageFileパス、不要になったらfree()すること
  */
-wchar_t *GetUILanguageFileFullW(const wchar_t *ExeDir, const wchar_t *UILanguageFileRel)
+wchar_t *GetUILanguageFileFullW(const wchar_t *SetupFNameW)
 {
-	return GetFullPathW(ExeDir, UILanguageFileRel);
+	wchar_t *UILanguageFileIni;
+	hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", L"lang\\Default.lng", SetupFNameW, &UILanguageFileIni);
+	if (!IsRelativePathW(UILanguageFileIni)) {
+		// iniファイルにフルパスで書き込まれていた時、そのまま返す
+		return UILanguageFileIni;
+	}
+
+	// UILanguage File のフルパス = ExeDir + 相対パス(iniの値)
+	wchar_t *ExeDirW = GetExeDirW(NULL);
+	wchar_t *UILanguageFileW = GetFullPathW(ExeDirW, UILanguageFileIni);
+	free(UILanguageFileIni);
+	free(ExeDirW);
+	return UILanguageFileW;
 }
 
 /**
@@ -1202,13 +1227,6 @@ int GetNthNum2W(const wchar_t *Source, int Nth, int defval)
 	}
 
 	return v;
-}
-
-wchar_t *GetDownloadFolderW(void)
-{
-	wchar_t *download;
-	_SHGetKnownFolderPath(FOLDERID_Downloads, KF_FLAG_CREATE, NULL, &download);
-	return download;
 }
 
 /* fit a filename to the windows-filename format */
@@ -2025,8 +2043,12 @@ char *GetVersionSubstr(void)
 		strncat_s(buf, sizeof_buf, TT_VERSION_SUBSTR " ", _TRUNCATE);
 	}
 #endif
-#if defined(_M_X64)
-	strncat_s(buf, sizeof_buf, "64bit ", _TRUNCATE);
+#if defined(_M_IX86)
+	strncat_s(buf, sizeof_buf, "x86 ", _TRUNCATE);
+#elif defined(_M_X64)
+	strncat_s(buf, sizeof_buf, "x64 ", _TRUNCATE);
+#elif defined(_M_ARM64)
+	strncat_s(buf, sizeof_buf, "ARM64 ", _TRUNCATE);
 #endif
 #if defined(GITVERSION)
 	strncat_s(buf, sizeof_buf, "(Git " GITVERSION ")", _TRUNCATE);
@@ -2036,4 +2058,75 @@ char *GetVersionSubstr(void)
 	strncat_s(buf, sizeof_buf, "(Unknown)", _TRUNCATE);
 #endif
 	return buf;
+}
+
+/**
+ *	プロセスの起動
+ *
+ *	@param	cmd		cmd != NULL
+ *							コマンド
+ *							CreateProcessW() が使用される
+ *					cmd == NULLのとき
+ *							ファイル名の拡張子に合わせたプログラムが使用される
+ *							ShellExecuteW() が使用される
+ *	@param	arg1	cmd != NULL のとき
+ *							引き数1,引数のセパレータはスペース,
+ *							スペースを含む引数はダブルクオートで囲む
+ *							NULLのとき引数なし
+ *							cmdがNULL以外の時有効
+ *					cmd == NULL のとき
+ *							ShellExecuteW() の 第二引数
+ *	@param	arg2			引き数2,ファイル名を想定
+ *	@retval	NO_ERROR		エラーなし
+ *	@retval	エラーコード	(NO_ERROR以外)
+ *
+ *	TTWinExec()も参照
+ */
+DWORD TTCreateProcess(const wchar_t *cmd, const wchar_t *arg1, const wchar_t *arg2)
+{
+	DWORD e = NO_ERROR;
+	if (cmd != NULL && cmd[0] != 0) {
+		wchar_t *command;
+		if (cmd[0] == L'\"' || wcschr(cmd, L' ') == NULL) {
+			command = _wcsdup(cmd);
+		}
+		else {
+			aswprintf(&command, L"\"%s\"", cmd);
+		}
+
+		if (arg1 != NULL && arg1[0] != 0) {
+			awcscats(&command, L" ", arg1, NULL);
+		}
+
+		if (arg2 != NULL && arg2[0] != 0) {
+			if (arg2[0] == L'\"' || wcschr(arg2, L' ') == NULL) {
+				awcscats(&command, L" ", arg2, NULL);
+			}
+			else {
+				wchar_t *file;
+				aswprintf(&file, L"\"%s\"", arg2);
+				awcscats(&command, L" ", file, NULL);
+				free(file);
+			}
+		}
+
+		STARTUPINFOW si = {};
+		PROCESS_INFORMATION pi = {};
+		GetStartupInfoW(&si);
+		BOOL r = CreateProcessW(NULL, command, NULL, NULL, FALSE, 0,
+								NULL, NULL, &si, &pi);
+		if (r != 0) {
+			CloseHandle(pi.hThread);
+			CloseHandle(pi.hProcess);
+		}
+		free(command);
+	}
+	else {
+		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", arg2, NULL, NULL, SW_NORMAL);
+		if (h <= 32) {
+			// TODO エラー種別
+			e = ERROR_FILE_NOT_FOUND;
+		}
+	}
+	return e;
 }

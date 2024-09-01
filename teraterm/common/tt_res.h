@@ -56,11 +56,13 @@
 #define IDC_RADIO_LF                    1021
 #define IDC_ENTERGROUP                  1022
 #define IDC_VIEWLOG_LABEL               1023
-#define IDC_VIEWLOG_EDITOR              1024
+#define IDC_VIEWLOG_EDITOR_EXE          1024
 #define IDC_VIEWLOG_PATH                1025
 #define IDC_DEFAULTNAME_LABEL           1026
 #define IDC_DEFAULTNAME_EDITOR          1027
-#define IDC_ETERM_LOOKFEEL              1030
+#define IDC_VIEWLOG_EDITOR_ARG          1028
+#define IDC_VIEWLOG_ARG_LABEL           1029
+#define IDC_VIEWLOG_EXE_LABEL           1030
 #define IDC_DISABLE_PASTE_RBUTTON       1032
 #define IDC_CLICKABLE_URL               1033
 #define IDC_CONFIRM_PASTE_RBUTTON       1034
@@ -243,6 +245,12 @@
 #define IDC_SPIPATH_TITLE               2621
 #define IDC_SPIPATH_EDIT                2622
 #define IDC_SPIPATH_BUTTON              2623
+#define IDC_BROADCAST_HELP              2624
+#define IDC_GENPORT                     2625
+#define IDC_GENPORT_LABEL               2626
+#define IDC_DOWNLOAD_DIR_TITLE          2627
+#define IDC_DOWNLOAD_DIR                2628
+#define IDC_DOWNLOAD_DIR_SELECT         2629
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -297,12 +305,12 @@
 #define ID_SETUP_TERMINAL               50310
 #define ID_SETUP_WINDOW                 50320
 #define ID_SETUP_FONT                   50330
-#define ID_SETUP_DLG_FONT               50331
 #define ID_SETUP_KEYBOARD               50340
 #define ID_SETUP_SERIALPORT             50350
 #define ID_SETUP_TCPIP                  50360
 #define ID_SETUP_GENERAL                50370
 #define ID_SETUP_ADDITIONALSETTINGS     50375
+#define ID_SETUP_ADDITIONALSETTINGS_CODING 50376
 #define ID_SETUP_SAVE                   50380
 #define ID_SETUP_RESTORE                50390
 #define ID_OPEN_SETUP                   50391
@@ -342,7 +350,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2624
+#define _APS_NEXT_CONTROL_VALUE         2630
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

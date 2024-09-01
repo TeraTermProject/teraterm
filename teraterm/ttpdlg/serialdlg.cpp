@@ -435,7 +435,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 BOOL WINAPI _SetupSerialPort(HWND WndParent, PTTSet ts)
 {
 	BOOL r;
-	SerialDlgData *dlg_data = (SerialDlgData *)calloc(sizeof(*dlg_data), 1);
+	SerialDlgData *dlg_data = (SerialDlgData *)calloc(1, sizeof(*dlg_data));
 	dlg_data->pts = ts;
 	dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount);
 	if (dlg_data->ComPortInfoCount == 0) {

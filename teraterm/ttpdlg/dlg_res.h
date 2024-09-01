@@ -1,8 +1,7 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by ttpdlg.rc
+// Microsoft Visual C++ で生成されたインクルード ファイル。
+// ttpdlg.rc で使用
 //
-#define IDD_TERMDLGJ                    100
 #define IDI_TTERM                       100
 #define IDC_TERMWIDTH                   101
 #define IDC_SERIALPORT_LABEL            101
@@ -82,21 +81,20 @@
 #define IDC_SERIALDELAYLINE             408
 #define IDC_SERIALHELP                  499
 #define IDD_TCPIPDLG                    500
-#define IDC_TCPIPHOST                   501
-#define IDC_TCPIPADD                    502
-#define IDC_TCPIPLIST                   503
-#define IDC_TCPIPUP                     504
-#define IDC_TCPIPREMOVE                 505
-#define IDC_TCPIPDOWN                   506
 #define IDC_TCPIPHISTORY                507
 #define IDC_TCPIPAUTOCLOSE              508
 #define IDC_TCPIPPORT                   509
-#define IDC_TCPIPTELNET                 510
 #define IDC_TCPIPTERMTYPELABEL          511
 #define IDC_TCPIPTERMTYPE               512
 #define IDC_TCPIPTELNETKEEPALIVE        513
 #define IDC_TCPIPTELNETKEEPALIVESEC     514
-#define IDC_TCPIPHELP                   599
+#define IDC_TCPIP_EDITHISTORY           515
+#define IDC_TCPIPHISTORYTITLE           516
+#define IDC_TCPIPPROT                   517
+#define IDC_TCPIPPORTLABEL              518
+#define IDC_TCPIPTELNETKEEPALIVELABEL   519
+#define IDC_TCPIP_TELNET                520
+#define IDC_TCPIPNEWCONNENTTITLE        525
 #define IDD_HOSTDLG                     600
 #define IDC_HOSTTCPIP                   601
 #define IDC_HOSTSERIAL                  602
@@ -115,10 +113,6 @@
 #define IDD_ABOUTDLG                    800
 #define IDC_FONTBOLD                    901
 #define IDD_GENDLG                      1000
-#define IDC_GENPORT                     1001
-#define IDC_GENLANGLABEL                1002
-#define IDC_GENLANG                     1003
-#define IDC_GENPORT_LABEL               1004
 #define IDC_HOSTTCPPROTOCOLLABEL        1019
 #define IDC_HOSTTCPPROTOCOL             1020
 #define IDC_LOCALE_BOX                  1022
@@ -140,9 +134,6 @@
 #define IDC_SERIALDELAYLINE_LABEL       1044
 #define IDC_SERIALDELAYCHAR_LABEL       1045
 #define IDC_SERIALDELAY                 1046
-#define IDC_TCPIPPROT                   1047
-#define IDC_TCPIPPORTLABEL              1048
-#define IDC_TCPIPHOSTLIST               1049
 #define IDC_WINTITLELABEL               1050
 #define IDC_WINCURSOR                   1051
 #define IDC_WINREDLABEL                 1052
@@ -158,22 +149,20 @@
 #define IDC_TERMKANJILABEL              1062
 #define IDC_TERMKANJISENDLABEL          1063
 #define IDC_WINLISTLABEL                1068
-#define IDC_TCPIPTELNETKEEPALIVELABEL   1069
 #define IDC_SELECT_DIR                  1070
 #define IDC_BUILDTOOL                   1072
 #define IDC_GENLANG_UI                  1077
 #define IDC_SFMT_VERSION                1078
 #define IDC_SERIALTEXT                  1079
+#define IDC_GENLANUI_INFO               1080
 #define IDC_GENHELP                     1099
 #define IDD_TERMDLG                     1100
 #define IDD_WINLISTDLG                  1200
 #define IDC_WINLISTLIST                 1201
 #define IDC_WINLISTCLOSE                1202
 #define IDC_WINLISTHELP                 1299
-#define IDD_TERMDLGK                    1301
-#define IDC_STATIC                      -1
-#define IDC_GENLANUI_LABEL              -1
-#define IDC_GENLANGUI_LABEL             -1
+#define IDC_GENLANGUI_LABEL             1300
+#define IDC_OPEN_CODING                 1301
 
 // Next default values for new objects
 //
@@ -182,7 +171,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        103
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1080
+#define _APS_NEXT_CONTROL_VALUE         1081
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -41,7 +41,6 @@
 
 #include "teraterm.h"
 #include "ttm_res.h"
-#include "tttypes.h"
 #include "ttlib.h"
 #include "ttmdef.h"
 #include "errdlg.h"
@@ -180,13 +179,13 @@ void SetDlgPos(int x, int y)
 	}
 }
 
-void OpenInpDlg(wchar_t *Buff, const wchar_t *Text, const wchar_t *Caption,
+int OpenInpDlg(wchar_t *Buff, const wchar_t *Text, const wchar_t *Caption,
                 const wchar_t *Default, BOOL Paswd)
 {
 	HINSTANCE hInst = GetInstance();
 	HWND hWndParent = GetHWND();
 	CInpDlg InpDlg(Buff,Text,Caption,Default,Paswd,DlgPosX,DlgPosY);
-	InpDlg.DoModal(hInst, hWndParent);
+	return InpDlg.DoModal(hInst, hWndParent);
 }
 
 int OpenErrDlg(const char *Msg, const char *Line, int lineno, int start, int end, const char *FileName)
@@ -242,11 +241,11 @@ void BringupStatDlg()
  * @retval -1		cancelボタン
  * @retval -2		closeボタン
  */
-int OpenListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected)
+int OpenListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected, int ext, int DlgWidth, int DlgHeight)
 {
 	HINSTANCE hInst = GetInstance();
 	HWND hWndParent = GetHWND();
-	CListDlg ListDlg(Text, Caption, Lists, Selected, DlgPosX, DlgPosY);
+	CListDlg ListDlg(Text, Caption, Lists, Selected, DlgPosX, DlgPosY, ext, DlgWidth, DlgHeight);
 	INT_PTR r = ListDlg.DoModal(hInst, hWndParent);
 	if (r == IDOK) {
 		return ListDlg.m_SelectItem;

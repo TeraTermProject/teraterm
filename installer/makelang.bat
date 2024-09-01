@@ -23,3 +23,4 @@ perl utf8_to.pl windows-1251 release/lang_utf8/Russian.lng release/lang/Russian.
 perl utf8_to.pl cp936 "release/lang_utf8/Simplified Chinese.lng" "release/lang/Simplified Chinese.lng"
 perl utf8_to.pl cp1252 release/lang_utf8/Spanish.lng release/lang/Spanish.lng
 perl utf8_to.pl cp950 "release/lang_utf8/Traditional Chinese.lng" "release/lang/Traditional Chinese.lng"
+perl utf8_to.pl cp65001 release/lang_utf8/Tamil.lng release/lang/Tamil.lng

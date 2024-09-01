@@ -33,6 +33,7 @@
 #include <ws2tcpip.h>
 #include "teraterm.h"
 #include "tttypes.h"
+#include "tttypes_charset.h"
 #include <stdio.h>
 #include <string.h>
 #include <direct.h>
@@ -45,6 +46,7 @@
 
 #include "tt-version.h"
 #include "ttlib.h"
+#include "ttlib_types.h"
 #include "tt_res.h"
 #include "servicenames.h"
 #include "codeconv.h"
@@ -1122,9 +1124,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Default Log file path */
 	hGetPrivateProfileStringW(SectionW, L"LogDefaultPath", ts->LogDirW, FName, &ts->LogDefaultPathW);
 	if (ts->LogDefaultPathW[0] == 0) {
-		// 未指定("LogDefaultPath=")だった、デフォルト値を入れておく
+		// 未指定("LogDefaultPath=")だった、NULLを入れる
 		free(ts->LogDefaultPathW);
-		ts->LogDefaultPathW = _wcsdup(ts->LogDirW);
+		ts->LogDefaultPathW = NULL;
 	}
 
 	/* Auto start logging (2007.5.31 maya) */
@@ -1162,19 +1164,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* Default directory for file transfer */
 	hGetPrivateProfileStringW(SectionW, L"FileDir", L"", FName, &ts->FileDirW);
-	if (ts->FileDirW != NULL && ts->FileDirW[0] != 0) {
-		wchar_t *FileDirExpanded;
-		hExpandEnvironmentStringsW(ts->FileDirW, &FileDirExpanded);
-		if (!DoesFolderExistW(FileDirExpanded)) {
-			free(ts->FileDirW);
-			ts->FileDirW = NULL;
-		}
-		free(FileDirExpanded);
-	}
-	if (ts->FileDirW == NULL || ts->FileDirW[0] == 0) {
-		// デフォルトフォルダをセットする
+	if (ts->FileDirW != NULL && ts->FileDirW[0] == 0) {
 		free(ts->FileDirW);
-		ts->FileDirW = GetDownloadFolderW();
+		ts->FileDirW = NULL;
 	}
 
 	/* filter on file send (2007.6.5 maya) */
@@ -1312,10 +1304,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		ts->KermitOpt |= KmtOptLongPacket;
 	if (GetOnOff(Section, "KmtFileAttr", FName, FALSE))
 		ts->KermitOpt |= KmtOptFileAttr;
-
-	// Enable language selection -- special option
-	if (!GetOnOff(Section, "LanguageSelection", FName, TRUE))
-		ts->MenuFlag |= MF_NOLANGUAGE;
 
 	/* Maximum scroll buffer size  -- special option */
 	ts->ScrollBuffMax =
@@ -1592,26 +1580,11 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	          _TRUNCATE);
 
 	// Viewlog Editor path
-	if (GetWindowsDirectory(Temp, sizeof(Temp)) + 13 < sizeof(Temp)) { // "\\notepad.exe"(12) + NUL(1)
-		strncat_s(Temp, sizeof(Temp), "\\notepad.exe", _TRUNCATE);
-	}
-	else {
-		Temp[0] = '\0';
-	}
-	GetPrivateProfileString(Section, "ViewlogEditor ", Temp,
-	                        ts->ViewlogEditor, sizeof(ts->ViewlogEditor), FName);
-
-	// UI language message file (相対パス)
-	hGetPrivateProfileStringW(SectionW, L"UILanguageFile", NULL, FName, &ts->UILanguageFileW_ini);
-	if (ts->UILanguageFileW_ini[0] == 0) {
-		free(ts->UILanguageFileW_ini);
-		ts->UILanguageFileW_ini = _wcsdup(L"lang\\Default.lng");
-	}
-	WideCharToACP_t(ts->UILanguageFileW_ini, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini));
+	hGetPrivateProfileStringW(SectionW, L"ViewlogEditor", L"notepad.exe", FName, &ts->ViewlogEditorW);
+	hGetPrivateProfileStringW(SectionW, L"ViewlogEditorArg", NULL, FName, &ts->ViewlogEditorArg);
 
 	// UI language message file (full path)
-	ts->UILanguageFileW = GetUILanguageFileFullW(ts->ExeDirW, ts->UILanguageFileW_ini);
-	WideCharToACP_t(ts->UILanguageFileW, ts->UILanguageFile, sizeof(ts->UILanguageFile));
+	ts->UILanguageFileW = GetUILanguageFileFullW(FName);
 
 
 	// Broadcast Command History (2007.3.3 maya)
@@ -2095,9 +2068,33 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	// 自動バックアップ
 	ts->IniAutoBackup = GetOnOff(Section, "IniAutoBackup", FName, TRUE);
 
+	// Bracketed paste mode
+	ts->BracketedSupport = GetOnOff(Section, "BracketedSupport", FName, TRUE);
+	ts->BracketedControlOnly = GetOnOff(Section, "BracketedControlOnly", FName, FALSE);
+
 	// Experimental
 	ts->ExperimentalTreeProprtySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
-	ts->ExperimentalDontUseFontDialog = GetOnOff("Experimental", "DontUseFontDialog", FName, FALSE);
+}
+
+/**
+ *	UILanguage File を ExeDir相対パスに変換
+ *
+ *	@return 相対UILanguageFileパス、不要になったらfree()すること
+ */
+static wchar_t *GetUILanguageFileRelPath(const wchar_t *UILanguageFile)
+{
+	wchar_t *ExeDirW = GetExeDirW(NULL);
+	size_t ExeDirLen = wcslen(ExeDirW);
+	int r = wcsncmp(ExeDirW, UILanguageFile, ExeDirLen);
+	free(ExeDirW);
+	if (r != 0) {
+		// ExeDir フォルダ以下の lng ファイルではないのでそのまま返す
+		return _wcsdup(UILanguageFile);
+	}
+
+	//   ExeDir相対に変換する
+	wchar_t *UILanguageFileRel = _wcsdup(UILanguageFile + ExeDirLen + 1);
+	return UILanguageFileRel;
 }
 
 void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
@@ -2108,6 +2105,8 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	int ret;
 	WORD TmpColor[12][6];
 	wchar_t *TempW;
+
+	WriteIniBom(FName, FALSE);
 
 	/* version */
 	ret = WritePrivateProfileString(Section, "Version", TT_VERSION_STR("."), FName);
@@ -2279,8 +2278,8 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WritePrivateProfileString(Section, "AlphaBlendActive", Temp, FName);
 	WritePrivateProfileString(Section, "CygwinDirectory",
 	                          ts->CygwinDirectory, FName);
-	WritePrivateProfileString(Section, "ViewlogEditor", ts->ViewlogEditor,
-	                          FName);
+	WritePrivateProfileStringW(SectionW, L"ViewlogEditor", ts->ViewlogEditorW, FName);
+	WritePrivateProfileStringW(SectionW, L"ViewlogEditorArg", ts->ViewlogEditorArg, FName);
 
 	// ANSI color(2004.9.5 yutaka)
 	Temp[0] = '\0';
@@ -2596,11 +2595,17 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 							   ts->LogDefaultNameW, FName);
 
 	/* Default Log file path */
-	if (wcscmp(ts->LogDefaultPathW, ts->LogDirW) != 0) {
-		// 異なっているとき、フォルダを指定してる
-		WritePrivateProfileStringW(SectionW, L"LogDefaultPath",
-								   ts->LogDefaultPathW, FName);
+	TempW = NULL;
+	if (ts->LogDefaultPathW != NULL &&
+		wcscmp(ts->LogDefaultPathW, ts->LogDirW) != 0) {
+		// 設定されている && 異なっているとき、フォルダを指定してる
+		TempW = ts->LogDefaultPathW;
 	}
+	else {
+		// 設定されていない, 削除
+		TempW = NULL;
+	}
+	WritePrivateProfileStringW(SectionW, L"LogDefaultPath", TempW, FName);
 
 	/* Auto start logging (2007.5.31 maya) */
 	WriteOnOff(Section, "LogAutoStart", FName, ts->LogAutoStart);
@@ -2753,12 +2758,6 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "KmtLog", FName, (WORD) (ts->LogFlag & LOG_KMT));
 	WriteOnOff(Section, "KmtLongPacket", FName, (WORD) (ts->KermitOpt & KmtOptLongPacket));
 	WriteOnOff(Section, "KmtFileAttr", FName, (WORD) (ts->KermitOpt & KmtOptFileAttr));
-
-	// Enable language selection -- special option
-	if ((ts->MenuFlag & MF_NOLANGUAGE) == 0)
-		WriteOnOff(Section, "LanguageSelection", FName, 1);
-	else
-		WriteOnOff(Section, "LanguageSelection", FName, 0);
 
 	/* Maximum scroll buffer size  -- special option */
 	WriteInt(Section, "MaxBuffSize", FName, ts->ScrollBuffMax);
@@ -2930,8 +2929,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "UseNormalBGColor", FName, ts->UseNormalBGColor);
 
 	// UI language message file
-	WritePrivateProfileStringW(SectionW, L"UILanguageFile",
-							   ts->UILanguageFileW_ini, FName);
+	TempW = GetUILanguageFileRelPath(ts->UILanguageFileW);
+	WritePrivateProfileStringW(SectionW, L"UILanguageFile", TempW, FName);
+	free(TempW);
 
 	// Broadcast Command History (2007.3.3 maya)
 	WriteOnOff(Section, "BroadcastCommandHistory", FName,
@@ -3325,6 +3325,10 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	// 自動バックアップ
 	WriteOnOff(Section, "IniAutoBackup", FName, ts->IniAutoBackup);
+
+	// Bracketed paste mode
+	WriteOnOff(Section, "BracketedSupport", FName, ts->BracketedSupport);
+	WriteOnOff(Section, "BracketedControlOnly", FName, ts->BracketedControlOnly);
 }
 
 void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,
@@ -3378,7 +3382,7 @@ void PASCAL _AddValueToList(const wchar_t *FName, const wchar_t *Host, const wch
 	if ((FName[0] == 0) || (Host[0] == 0))
 		return;
 
-	hostnames = (wchar_t **)calloc(sizeof(wchar_t), MaxList);
+	hostnames = (wchar_t **)calloc(MaxList, sizeof(wchar_t));
 	if (hostnames == NULL) {
 		return;
 	}
@@ -3833,7 +3837,9 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			}
 		}
 		else if (_wcsnicmp(Temp, L"/L=", 3) == 0) {	/* log file */
-			wchar_t *f = GetFilePath(&Temp[3], ts->LogDefaultPathW, NULL);
+			wchar_t *log_dir = GetTermLogDir(ts);
+			wchar_t *f = GetFilePath(&Temp[3], log_dir, NULL);
+			free(log_dir);
 			if (f != NULL) {
 				ts->LogFNW = f;
 				WideCharToACP_t(ts->LogFNW, ts->LogFN, _countof(ts->LogFN));
@@ -4068,7 +4074,6 @@ void TTSetUnInit(TTTSet *ts)
 		(void **)&ts->EtermLookfeel.BGThemeFileW,
 		(void **)&ts->EtermLookfeel.BGSPIPathW,
 		(void **)&ts->UILanguageFileW,
-		(void **)&ts->UILanguageFileW_ini,
 		(void **)&ts->ExeDirW,
 		(void **)&ts->LogDirW,
 		(void **)&ts->FileDirW,
@@ -4077,6 +4082,8 @@ void TTSetUnInit(TTTSet *ts)
 		(void **)&ts->LogFNW,
 		(void **)&ts->LogDefaultNameW,
 		(void **)&ts->DelimListW,
+		(void **)&ts->ViewlogEditorW,
+		(void **)&ts->ViewlogEditorArg,
 	};
 	int i;
 	for(i = 0; i < _countof(ptr_list); i++) {

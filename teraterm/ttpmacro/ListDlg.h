@@ -35,7 +35,7 @@
 class CListDlg : public CMacroDlgBase
 {
 public:
-	CListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected, int x, int y);
+	CListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected, int x, int y, int ext, int width, int height);
 	INT_PTR DoModal(HINSTANCE hInst, HWND hWndParent);
 	int m_SelectItem;
 
@@ -47,7 +47,11 @@ private:
 	int m_Selected;
 	int init_WW, TW, TH, BH, BW, LW, LH;
 	SIZE s;
-	ReiseDlgHelper_t *ResizeHelper;
+	ReiseDlgHelper_t *ResizeHelper = NULL;
+	HINSTANCE m_hInst;
+	int m_ext = 0;
+	int m_width;
+	int m_height;
 
 	void Relocation(BOOL is_init, int WW);
 	void InitList(HWND HList);

@@ -12,7 +12,7 @@
     <h1>Additional settings / "Font" tab ([Setup] menu)</h1>
 
     <dl>
-      <dt>terminal font</dt>
+      <dt id="VTFont">terminal font</dt>
       <dd>
         Specify VTWin font.
         <dl>
@@ -28,17 +28,6 @@
             Codepage needs to convert Unicode to ANSI character.
             Some fonts need to use ANSI Draw API.<br>
             Normally not used.
-          </dd>
-
-          <dt id="FontQuality">Font quality</dt>
-          <dd>
-	Specifies the font quality. This feature will work well only if the operating system supports.
-<pre>
-Default         = Dependent on OS configuration(Smooth edges of screen fonts).
-Non-Antialiased = Disable the anti-aliasing.
-Antialiased     = Enable the anti-aliasing.
-ClearType       = Use the ClearType.
-</pre>
           </dd>
 
           <dt id="ResizedFont">Drawing resized font to fit cell width</dt>
@@ -104,6 +93,26 @@ ClearType       = Use the ClearType.
       </dd>
 
     </dl>
+
+    <h3>Note:</h3>
+    <ul>
+      <li>
+	"Tera Special" font, which is included in the distribution package,
+	is used for displaying <a href="../about/emulations_dec_special.html">DEC Special Graphics</a>.
+	It can not be selected in this dialog box.
+      </li>
+      <li>
+	Hidden fonts specified by OS can not be shown on font list by default.
+	Please enable the <a href="setup-additional-general.html#ListHiddenFonts">List hidden fonts in font dialog</a> setting on the General tab of <a href="setup-additional.html">Additiona settings dialog</a> to select hidden fonts.
+      </li>
+      <li>
+	The font quality can be selected by using the <a href="setup-additional-visual.html#FontQuality">Font quality</a> on the Visual tab of <a href="setup-additional.html">Additional settings dialog</a>.
+      </li>
+      <li>
+	When the dialog font is set to very large size and wide font, 
+	displayed font may be corrupted, and also you may not press [ok] button because the dialog goes out of screen.
+      </li>
+    </ul>
 
   </body>
 </html>

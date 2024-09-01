@@ -1,4 +1,7 @@
-﻿; Updated by TeraTerm Project (2024-03-30)
+﻿[Info]
+language=English
+date=2024-08-31 by TeraTerm Project
+contributor=-
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -52,13 +55,11 @@ MENU_EDIT_SELECTALL=Select &all
 MENU_SETUP=&Setup
 MENU_SETUP_TERMINAL=&Terminal...
 MENU_SETUP_WINDOW=&Window...
-MENU_SETUP_FONT_SUBMENU=&Font
 MENU_SETUP_FONT=&Font...
-MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=&Keyboard...
 MENU_SETUP_SERIALPORT=S&erial port...
 MENU_SETUP_TCPIP=T&CP/IP...
-MENU_SETUP_GENERAL=&General...
+MENU_SETUP_GENERAL=&General(LanguageUI)...
 MENU_SETUP_ADDITION=A&dditional settings...
 MENU_SETUP_SAVE=&Save setup...
 MENU_SETUP_RESTORE=&Restore setup...
@@ -269,7 +270,9 @@ DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=no use
 DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
-DLG_TAB_LOG_EDITOR=View log &editor
+DLG_TAB_LOG_EDITOR=View log editor
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=Default log &file name(strftime format)
 DLG_TAB_LOG_FILEPATH=Default log &save folder
 DLG_TAB_LOG_AUTOSTART=A&uto start logging
@@ -297,7 +300,15 @@ DLG_BROADCAST_HISTORY=History
 DLG_BROADCAST_PARENTONLY=Send to this process only
 DLG_BROADCAST_ENTER=Enter key
 DLG_BROADCAST_SUBMIT=Submit
+DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=Realtime mode
+DLG_BROADCAST_HELP=Help
+CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
+CMENU_BROADCAST_MINIMIZE=Minimize selected window
+CMENU_BROADCAST_REFRESH=Refresh window list
+CMENU_BROADCAST_SELECT_ALL=Select all
+CMENU_BROADCAST_UNSELECT_ALL=Unselect all
+CMENU_BROADCAST_INVERSE=Inverse selection
 
 DLG_PRNABORT_PRINTING=Printing
 
@@ -359,14 +370,10 @@ MSG_CREATE_THREAD_ERROR=Can't create thread
 ; ttdlg.c
 DLG_ABOUT_TITLE=About Tera Term
 
-DLG_DIR_TITLE=Tera Term: Change directory
-DLG_DIR_CURRENT=Current dir:
-DLG_DIR_NEW=&New dir:
 DLG_SELECT_DIR_TITLE=Select new directory
 
 DLG_GEN_TITLE=Tera Term: General setup
 DLG_GEN_PORT=Default &port:
-DLG_GEN_LANG=&Language:
 DLG_GEN_LANG_UI=Language&UI:
 
 DLG_HOST_TITLE=Tera Term: New connection
@@ -376,7 +383,7 @@ DLG_HOST_TCPIPPROTOCOL=IP versio&n:
 DLG_HOST_SERIAL=&Serial
 DLG_HOST_SERIALPORT=Po&rt:
 
-DLG_KEYB_TITLE=Tera Term: Keyboard setup
+DLG_KEYB_TITLE=Keyboard
 DLG_KEYB_TRANSMIT=Transmit DEL by:
 DLG_KEYB_BS=&Backspace key
 DLG_KEYB_DEL=&Delete key
@@ -402,18 +409,23 @@ DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=Tera Term: TCP/IP setup
-DLG_TCPIP_HOSTLIST=Host &list
+; edit history
 DLG_TCPIP_ADD=&Add
 DLG_TCPIP_UP=&Up
 DLG_TCPIP_REMOVE=&Remove
 DLG_TCPIP_DOWN=&Down
-DLG_TCPIP_HISTORY=H&istory
+
+; TCP/IP tab
+DLG_TCPIP_TITLE=TCP/IP
+DLG_TCPIP_HOSTLIST=Host &list
+DLG_TCPIP_HISTORYTITLE=History
+DLG_TCPIP_HISTORY=Save h&istory when new connection
+DLG_TCPIP_EDITHISTORY=Edit hisotry
+DLG_TCPIP_TELNET=T&elnet
+DLG_TCPIP_PORT=&Port#:
 DLG_TCPIP_KEEPALIVE=&Keep alive on Telnet
 DLG_TCPIP_KEEPALIVE_SEC=Sec
 DLG_TCPIP_AUTOCLOSE=Auto &window close
-DLG_TCPIP_PORT=&Port#:
-DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_TERMTYPE=&Term type:
 
 DLG_TERM_TITLE=Tera Term: Terminal setup
@@ -640,6 +652,7 @@ DLG_AUTH_TITLE_FAILED=Retrying SSH Authentication
 DLG_AUTH_BANNER=Logging in to %s
 DLG_AUTH_BANNER2=Authentication required.
 DLG_AUTH_BANNER2_FAILED=Authentication failed. Please retry.
+DLG_AUTH_BANNER2_FURTHER=Further authentication required.
 DLG_AUTH_USERNAME=User &name:
 DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
 DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
@@ -697,7 +710,7 @@ DLG_DIFFERENTKEY_WARNING=Your known hosts list has an entry for the server "%s",
 DLG_DIFFERENTKEY_WARNING2=If you choose to replace this new key to the known hosts list and continue, then you will not receive this warning again.
 DLG_DIFFERENTKEY_FINGERPRINT=The server's host key fingerprint is:
 DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
-DLG_DIFFERENTKEY_REPLACE=&Replace the exist key with this new key
+DLG_DIFFERENTKEY_REPLACE=&Replace the existing key with this new key
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=SECURITY WARNING
@@ -1144,6 +1157,8 @@ DLG_CONFIG_PASS=Password
 DLG_CONFIG_MACRO=specified macro file
 DLG_CONFIG_LAUNCH=launch only
 DLG_CONFIG_STARTUP=kick at starting
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=use SSH
 DLG_CONFIG_KEYFILE=Keyfile
 DLG_CONFIG_CHALLENGE=use Challenge
@@ -1159,6 +1174,17 @@ DLG_ETC_LOGFILE=log file
 DLG_ETC_PROMPT=Prompt
 DLG_ETC_USER=User Name
 DLG_ETC_PASS=Password
+
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=Couldn't read the registry data.\n
 MSG_ERROR_MAKETTL=Could not make 'ttpmenu.TTL'\n

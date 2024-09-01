@@ -40,6 +40,7 @@ UINT GetPrivateProfileIntAFileW(const char *appA, const char *keyA, int def, con
 BOOL WritePrivateProfileIntAFileW(const char *appA, const char *keyA, int val, const wchar_t *filenameW);
 DWORD GetPrivateProfileSectionNamesAFileW(const char *lpszReturnBuffer, DWORD nSize, const wchar_t *filenameW);
 BOOL WritePrivateProfileIntW(const wchar_t *app, const wchar_t *key, int val, const wchar_t *filenameW);
+void WriteIniBom(const wchar_t *filename, BOOL overwrite);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,7 @@
-﻿; Updated by TeraTerm Project (2024-03-30)
-; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
+﻿[Info]
+language=Traditional Chinese
+date=2024-08-31 by TeraTerm Project
+contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
 DLG_SYSTEM_FONT=新細明體,10,0
@@ -53,13 +55,11 @@ MENU_EDIT_SELECTALL=選擇全部(&A)
 MENU_SETUP=設定(&S)
 MENU_SETUP_TERMINAL=終端機(&T)...
 MENU_SETUP_WINDOW=視窗(&W)...
-MENU_SETUP_FONT_SUBMENU=字型(&F)
 MENU_SETUP_FONT=字型(&F)...
-MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=鍵盤(&K)...
 MENU_SETUP_SERIALPORT=連接埠(&E)...
 MENU_SETUP_TCPIP=T&CP/IP...
-MENU_SETUP_GENERAL=設定(&G)...
+MENU_SETUP_GENERAL=設定(LanguageUI)(&G)...
 MENU_SETUP_ADDITION=附加設定(&D)...
 MENU_SETUP_SAVE=儲存設定(&S)...
 MENU_SETUP_RESTORE=載入設定(&R)...
@@ -270,7 +270,9 @@ DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=no use
 DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
-DLG_TAB_LOG_EDITOR=日誌編輯器(&E)
+DLG_TAB_LOG_EDITOR=日誌編輯器
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=默認日誌名稱 (strftime 格式) (&F)
 DLG_TAB_LOG_FILEPATH=默認日誌路徑(&S)
 DLG_TAB_LOG_AUTOSTART=自動記錄日誌(&U)
@@ -298,7 +300,15 @@ DLG_BROADCAST_HISTORY=紀錄
 DLG_BROADCAST_PARENTONLY=僅發送
 DLG_BROADCAST_ENTER=Enter鍵
 DLG_BROADCAST_SUBMIT=提交
+DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=實時的
+DLG_BROADCAST_HELP=Help
+CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
+CMENU_BROADCAST_MINIMIZE=Minimize selected window
+CMENU_BROADCAST_REFRESH=Refresh window list
+CMENU_BROADCAST_SELECT_ALL=Select all
+CMENU_BROADCAST_UNSELECT_ALL=Unselect all
+CMENU_BROADCAST_INVERSE=Inverse selection
 
 DLG_PRNABORT_PRINTING=列印中
 
@@ -360,14 +370,10 @@ MSG_CREATE_THREAD_ERROR=創建線程失敗
 ; ttdlg.c
 DLG_ABOUT_TITLE=關於 Tera Term
 
-DLG_DIR_TITLE=Tera Term：更改文件夾
-DLG_DIR_CURRENT=當前文件夾：
-DLG_DIR_NEW=新文件夾(&N)：
 DLG_SELECT_DIR_TITLE=選擇新文件夾
 
 DLG_GEN_TITLE=Tera Term：設定設定
 DLG_GEN_PORT=端口(&P)：
-DLG_GEN_LANG=語言(&L)：
 DLG_GEN_LANG_UI=界面語言(&U)：
 
 DLG_HOST_TITLE=Tera Term：建立新連線
@@ -377,7 +383,7 @@ DLG_HOST_TCPIPPROTOCOL=IP版本(&N)：
 DLG_HOST_SERIAL=連接埠(&S)
 DLG_HOST_SERIALPORT=端口(&R)：
 
-DLG_KEYB_TITLE=Tera Term：鍵盤設定
+DLG_KEYB_TITLE=鍵盤
 DLG_KEYB_TRANSMIT=DEL發送為：
 DLG_KEYB_BS=&Backspace 鍵
 DLG_KEYB_DEL=&Delete 刪除鍵
@@ -403,18 +409,23 @@ DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=Tera Term：TCP/IP 設定
-DLG_TCPIP_HOSTLIST=主機列表(&L)
+; edit history
 DLG_TCPIP_ADD=添加(&A)
 DLG_TCPIP_UP=上移(&U)
 DLG_TCPIP_REMOVE=移除(&R)
 DLG_TCPIP_DOWN=下移(&D)
-DLG_TCPIP_HISTORY=紀錄(&I)
+
+; TCP/IP tab
+DLG_TCPIP_TITLE=TCP/IP
+DLG_TCPIP_HOSTLIST=主機列表(&L)
+DLG_TCPIP_HISTORYTITLE=紀錄
+DLG_TCPIP_HISTORY=Save h&istory when new connection
+DLG_TCPIP_EDITHISTORY=Edit hisotry
+DLG_TCPIP_TELNET=T&elnet
+DLG_TCPIP_PORT=端口(&P)：
 DLG_TCPIP_KEEPALIVE=保持激活(&K)
 DLG_TCPIP_KEEPALIVE_SEC=秒
 DLG_TCPIP_AUTOCLOSE=自動關閉視窗(&W)
-DLG_TCPIP_PORT=端口(&P)：
-DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_TERMTYPE=終端機類型(&T)：
 
 DLG_TERM_TITLE=Tera Term：終端機設定
@@ -641,6 +652,7 @@ DLG_AUTH_TITLE_FAILED=SSH認證失敗
 DLG_AUTH_BANNER=登錄到 %s
 DLG_AUTH_BANNER2=需要認證。
 DLG_AUTH_BANNER2_FAILED=認證失敗，請重試。
+DLG_AUTH_BANNER2_FURTHER=Further authentication required.
 DLG_AUTH_USERNAME=用戶名(&N)：
 DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
 DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
@@ -1148,6 +1160,8 @@ DLG_CONFIG_PASS=密碼
 DLG_CONFIG_MACRO=指定的巨集文件
 DLG_CONFIG_LAUNCH=僅啟動
 DLG_CONFIG_STARTUP=啟動時運行
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=使用 ttssh
 DLG_CONFIG_KEYFILE=密鑰文件
 DLG_CONFIG_CHALLENGE=挑戰/應答認證
@@ -1163,6 +1177,17 @@ DLG_ETC_LOGFILE=日誌文件
 DLG_ETC_PROMPT=提示
 DLG_ETC_USER=用戶名
 DLG_ETC_PASS=密碼
+
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=無法從註冊表中讀取數據。\n
 MSG_ERROR_MAKETTL=無法創建 ttpmenu.TTL。\n

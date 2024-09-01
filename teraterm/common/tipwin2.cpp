@@ -62,7 +62,7 @@ TipWin2 *TipWin2Create(HINSTANCE hInstance, HWND hDlg)
 	//SendMessageW(hTip, TTM_SETMAXTIPWIDTH, 0, INT_MAX);	// OS‚É‚æ‚Á‚Äˆá‚¤?
 	SendMessageW(hTip, TTM_SETMAXTIPWIDTH, 0, 200);
 
-	TipWin2 *tWin = (TipWin2 *)calloc(sizeof(TipWin2), 1);
+	TipWin2 *tWin = (TipWin2 *)calloc(1, sizeof(TipWin2));
 	if (tWin == NULL) {
 		return NULL;
 	}

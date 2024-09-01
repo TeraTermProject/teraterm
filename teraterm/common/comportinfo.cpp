@@ -29,6 +29,7 @@
 #include <windows.h>
 #include <devguid.h>
 #include <setupapi.h>
+#include <cfgmgr32.h>
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
@@ -85,7 +86,6 @@
 
 #define INITGUID
 #include <guiddef.h>
-#include <ntddmodm.h>
 
 typedef BOOL (WINAPI *TSetupDiGetDevicePropertyW)(
 	HDEVINFO DeviceInfoSet,
@@ -197,8 +197,8 @@ static BOOL GetComPortName(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, w
  * HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\Class\{GUID}\0000
  *
  */
-static void GetComPropartys(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData,
-							wchar_t **friendly_name, wchar_t **prop_str)
+static void GetComProperty(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData,
+						   wchar_t **friendly_name, wchar_t **prop_str)
 {
 	typedef struct {
 		const wchar_t *name;
@@ -376,13 +376,9 @@ static int sort_sub(const void *a_, const void *b_)
 {
 	const ComPortInfo_t *a = (ComPortInfo_t *)a_;
 	const ComPortInfo_t *b = (ComPortInfo_t *)b_;
-	if (wcsncmp(a->port_name, L"COM", 3) == 0 &&
-		wcsncmp(b->port_name, L"COM", 3) == 0) {
-		int a_no = _wtoi(&a->port_name[3]);
-		int b_no = _wtoi(&b->port_name[3]);
-		return a_no > b_no;
-	}
-	return wcscmp(a->port_name, b->port_name);
+	const int a_no = a->port_no;
+	const int b_no = b->port_no;
+	return (a_no == b_no) ? 0 : (a_no > b_no) ? 1 : -1;
 }
 
 /**
@@ -441,6 +437,20 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 				break;
 			}
 
+			// check status
+#if !defined(SUPPORT_OLD_WINDOWS)
+			ULONG status  = 0;
+			ULONG problem = 0;
+			CONFIGRET cr = CM_Get_DevNode_Status(&status, &problem, DeviceInfoData.DevInst, 0);
+			if (cr != CR_SUCCESS) {
+				continue;
+			}
+			if (problem != 0) {
+				// âΩÇÁÇ©ÇÃñ‚ëËÇ™Ç†Ç¡ÇΩ?
+				continue;
+			}
+#endif
+
 			wchar_t *port_name;
 			if (!GetComPortName(hDevInfo, &DeviceInfoData, &port_name)) {
 				continue;
@@ -453,7 +463,7 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 			// èÓïÒéÊìæ
 			wchar_t *str_friendly_name = NULL;
 			wchar_t *str_prop = NULL;
-			GetComPropartys(hDevInfo, &DeviceInfoData, &str_friendly_name, &str_prop);
+			GetComProperty(hDevInfo, &DeviceInfoData, &str_friendly_name, &str_prop);
 
 			ComPortInfo_t *p =
 				(ComPortInfo_t *)realloc(comport_infos,

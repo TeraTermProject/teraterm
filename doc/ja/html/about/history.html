@@ -36,29 +36,82 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>MACRO: TTLファイルを相対パスで指定したとき、ttpmacroのカレントディレクトリ相対で扱うようにした。</li>
+      <li><a href="glossary.html#Bracketed">ブラケットペースト</a>の動作を <a href="../setup/teraterm-misc.html#BracketedSupport">BracketedSupport</a> と <a href="../setup/teraterm-misc.html#BracketedControlOnly">BracketedControlOnly</a> で調整できるようにした。
+        <ul>
+          <li>デフォルト設定で改行などを含まない文字列をクリップボードからペーストしたとき二重にログに出力されなくなった。</li>
+        </ul>
+      </li>
       <li>ダブルクリックでワード選択後のドラッグ時、EnableContinuedLineCopy を反映してするようにした。</li>
-      <li>LogAutoStart=on でログ記録が開始できないとき、エラーメッセージを表示するようにした。</li>
       <li><a href="../setup/teraterm-win.html#textselect">SelectOnActivate</a> が off でも右クリックによる貼り付けは行われるようにした。</li>
+      <li>Override Emoji Characters widthで文字幅が変化しない絵文字があったので修正した。(参照する絵文字テーブルを変更した。)</li>
+      <li>余白が大きいフォントで文字間を狭くするため、<a href="../setup/teraterm-win.html#space">VTFontSpace</a> に負の値を設定できるようにした。</li>
+      <li>使用可能なCOMポートのみを一覧に表示するようにした。
+        <ul>
+          <li>無効化、初期化に失敗したCOMポートは含まれなくなった。</li>
+        </ul>
+      </li>
+      <li>General setup ダイアログで、選択されている <a href="../menu/setup-general.html#UILanguageFile">言語ファイル</a>の情報を表示するようにした。</li>
+      <li>General setup ダイアログの Language 設定を削除した。</li>
+      <li>ダウンロードフォルダの設定を Additional settings の <a href="../menu/setup-additional-general.html#DownloadFolder">General タブ</a>へ移動した。</li>
+      <li>ViewlogEditor の引数を Additional settings の <a href="../menu/setup-additional-log.html#ViewlogEditorArg">Log タブ</a>に追加した。</li>
+      <li>Setup-Font 設定を Additional settings の <a href="../menu/setup-additional-font.html">Font タブ</a>へ統合した。</li>
+      <li>Keyboard setup ダイアログを Additional settings の <a href="../menu/setup-additional-keyboard.html">Keyboard タブ</a>へ移動した。</li>
+      <li>TCP/IP setup ダイアログを Additional settings の <a href="../menu/setup-additional-tcpip.html">TCP/IP タブ</a>へ移動した。</li>
+      <li>Default port 設定を General setup ダイアログから Additional settings の <a href="../menu/setup-additional-tcpip.html">TCP/IP タブ</a>へ移動した。</li>
+      <li>Broadcast commandダイアログの挙動を改善した。
+        <ul>
+          <li>リアルタイムモードでは、コマンド入力コントロールで マウス右クリック・中クリック あるいは Shift-INS によりペーストできるようにした。また、この時の改行の確認は各ウィンドウではなくダイアログで行われるようにした。</li>
+          <li>リアルタイムモードでは、コマンド入力コントロールは IME の ON/OFF に関わらず同じ動きをするようにした。</li>
+          <li>ウィンドウリストにコンテキストメニューを加え、選択したウィンドウを前面に出す また 最小化する、および ウィンドウリスト自体を更新する機能を追加した。</li>
+          <li>ウィンドウリストを更新した際も選択状態を維持するようにした。</li>
+          <li>ヘルプボタンを追加し、日本語のボタン名称を微調整した。</li>
+          <li>ウィンドウリストの余白部分で左クリックした時の挙動を修正した。</li>
+        </ul>
+      </li>
+      <li>メッセージボックスの表示位置を4.103より前の動作(親ウィンドウ中央)に戻した。(一部のメッセージボックスを除く)</li>
+      <li>LogAutoStart=on でログ記録が開始できないとき、エラーメッセージを表示するようにした。</li>
       <li>iniファイルを上書きする際に自動バックアップを作成するかどうかを <a href="../setup/teraterm-misc.html#IniAutoBackup">IniAutoBackup</a> で設定できるようにした。</li>
-      <li><a href="../setup/teraterm-win.html#space">VTFontSpace</a> で負の値を設定できるようにした。</li>
+      <li>MACRO: <a href="../macro/command/send.html">send</a> マクロコマンドは送信データを判定してテキスト又はバイナリとして送信する。<a href="../macro/command/sendtext.html">sendtext</a> と <a href="../macro/command/sendbinary.html">sendbinary</a> マクロコマンドを追加した。</li>
+      <li>MACRO: listboxコマンドにサイズ指定等のオプション等を追加した。</li>
+      <li>MACRO: Tera Term の VT window の表示状態、位置、サイズを取得する <a href="../macro/command/getttpos.html">getttpos</a> コマンドを追加した。</li>
+      <li>MACRO: aes-256-ctr 暗号化を使用したパスワードファイルをサポートした
+        <ul>
+          <li><a href="../macro/command/setpassword2.html">setpassword2</a>, <a href="../macro/command/getpassword2.html">getpassword2</a>, <a href="../macro/command/ispassword2.html">ispassword2</a>, <a href="../macro/command/delpassword2.html">delpassword2</a> コマンドを追加した。</li>
+          <li>setpassword2 コマンドで保存されたファイルの内容は、パスワードで保護される。</li>
+          <li>このコマンドで扱われるパスワードファイルは、既存のパスワードファイルとは互換性がない。</li>
+        </ul>
+      </li>
+      <li>MACRO: TTLファイルを相対パスで指定したとき、ttpmacroのカレントディレクトリ相対で扱うようにした。</li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
-      <li>モデムデバイスのCOMポート検出を修正した。4.x と同様にモデムデバイスも検出できるようになった。</li>
-      <li>MACRO: <a href="../macro/command/xmodemsend.html">xmodemsend</a>マクロコマンドで指定したファイルが存在しない時、ttermpro.exe がクラッシュしないよう修正した。</li>
       <li>SGR 1 + SGR 30(強調+文字色黒)のとき、文字色を黒ではなく灰色で表示するよう修正した。</li>
-      <li>区切り文字をダブルクリックしたとき、連続した同一文字を選択するよう修正した(5.2で変わってしまった選択動作を従来と同じ動作となるよう修正した)。</li>
-      <li>MACRO: ステータスウィンドウのマクロファイル名が文字化けする場合があったので修正した。</li>
       <li>"Drawing resized font to fit cell width"がonのとき、サロゲートペアの文字が連続した場合でも正しく表示するよう修正した。</li>
-      <li>ダブルクリックでワード選択時、EnableContinuedLineCopy を反映するよう修正した。5.2でエンバグ。</li>
-      <li>起動直後のウィンドウ最大化が動作するよう修正した。</li>
-      <li>MACRO: <a href="../macro/command/getpassword.html">getpassword</a>, <a href="../macro/command/delpassword.html">delpassword</a>マクロコマンドのパスワードファイル名がUnicodeに対応していなかったので修正した。</li>
-      <li>ttermpro.exe の <a href="../commandline/teraterm.html#v">/V オプション</a>を使用すると終了時クラッシュする問題を修正した。</li>
       <li>結合文字の表示が崩れることがあったので修正した。</li>
+      <li>ダブルクリックでワード選択時、EnableContinuedLineCopy を反映するよう修正した。5.2でエンバグ。</li>
+      <li>区切り文字をダブルクリックしたとき、連続した同一文字を選択するよう修正した(5.2で変わってしまった選択動作を従来と同じ動作となるよう修正した)。</li>
+      <li>送信文字コードがJISの時、誤った文字を送信することがあったので修正した。
+        <ul>
+          <li>行末の文字出力の誤りを修正した。</li>
+          <li>ローカルエコーがON時、正しくエコーされなかったので修正した。</li>
+        </ul>
+      </li>
+      <li>モデムデバイスのCOMポート検出を修正した。4.x と同様にモデムデバイスも検出できるようになった。</li>
+      <li>新しい接続ダイアログで、直前に使用したCOMポートを選択しなかったので修正した。</li>
+      <li>新しい接続ダイアログで、COMポートリストがソートされなかったので修正した。</li>
       <li>Window setup ダイアログで No Frame だけが変更された場合も変更を適用するようにした。</li>
+      <li>ttermpro.exe の <a href="../commandline/teraterm.html#v">/V オプション</a>を使用すると終了時クラッシュする問題を修正した。</li>
+      <li>起動直後のウィンドウ最大化が動作するよう修正した。</li>
+      <li>ログの<a href="../setup/folder.html#TermLogDir">保存フォルダ</a>に、Tera Term 4 と同様にダウンロードフォルダを追加した。</li>
+      <li>MACRO: <a href="../macro/command/send.html">send</a> マクロコマンドで $00 を送信できなかったので修正した。</li>
+      <li>MACRO: <a href="../macro/command/clipb2var.html">clipb2var</a>が動作しなかったので修正した。</li>
+      <li>MACRO: <a href="../macro/command/basename.html">basename</a>, <a href="../macro/command/dirname.html">dirname</a>マクロコマンドのパスがUnicodeに対応していなかったので修正した。</li>
+      <li>MACRO: <a href="../macro/command/getpassword.html">getpassword</a>, <a href="../macro/command/delpassword.html">delpassword</a>マクロコマンドのパスワードファイル名がUnicodeに対応していなかったので修正した。</li>
+      <li>MACRO: <a href="../macro/command/xmodemsend.html">xmodemsend</a>マクロコマンドで指定したファイルが存在しない時、ttermpro.exe がクラッシュしないよう修正した。</li>
+      <li>MACRO: 文字列配列の未設定要素を参照すると ttpmacro.exe がクラッシュするので修正した。</li>
+      <li>MACRO: ステータスウィンドウのマクロファイル名が文字化けする場合があったので修正した。</li>
     </ul>
   </li>
 
@@ -66,6 +119,7 @@
     <ul>
       <li>言語ファイルにタミル語(Tamil.lng)を追加した。</li>
       <li><a href="#ttssh_3.3">TTSSH(3.3)</a>へ差し替えた。</li>
+      <li><a href="#ttmenu_1.20">TeraTerm Menu(1.20)</a>へ差し替えた。</li>
     </ul>
   </li>
 </ul>
@@ -74,14 +128,14 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>単語の区切り文字<a href="../menu/setup-additional.html#DelimiterChar">(dialog</a>,  <a href="../setup/teraterm-win.html#delimiter">TERATERM.INI)</a>に Unicode を使用できるようにした。</li>
+      <li>単語の区切り文字<a href="../menu/setup-additional-copy-and-paste.html#DelimiterChar">(dialog</a>,  <a href="../setup/teraterm-win.html#delimiter">TERATERM.INI)</a>に Unicode を使用できるようにした。</li>
       <li>TCP/IP setup ダイアログを修正した。</li>
       <ul>
         <li>リサイズできるようにした。</li>
         <li>ホストリストを横スクロールできるようにした。</li>
         <li>ホストリストを広くした。</li>
       </ul>
-      <li><a href="../setup/teraterm-win.html#autocopy">マウスで文字選択時、クリップボードへコピー</a>を<a href="../menu/setup-additional.html#AutoTextCopy">Additional settings ダイアログのCopy and Paste タブ</a>で設定できるようにした。</li>
+      <li><a href="../setup/teraterm-win.html#autocopy">マウスで文字選択時、クリップボードへコピー</a>を<a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Additional settings ダイアログのCopy and Paste タブ</a>で設定できるようにした。</li>
       <li>Additional settings ダイアログに<a href="../menu/setup-additional-theme.html">Theme タブ</a>を追加した  </li>
       <li><a href="../commandline/teraterm.html#kr">/KR</a>, <a href="../commandline/teraterm.html#kt">/KT</a> コマンドラインオプションで、UTF8mを削除した。</li>
       <li>MACRO: <a href="../macro/command/listbox.html">listbox</a> で表示されるダイアログをリサイズできるようにした。</li>
@@ -340,7 +394,7 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li><a href="../setup/teraterm-win.html#textselect">マウスでウィンドウを選択したときの文字の選択を禁止する</a>を<a href="../menu/setup-additional.html#SelectOnActivate">Additional settingsダイアログ</a>で設定できるようにした。</li>
+      <li><a href="../setup/teraterm-win.html#textselect">マウスでウィンドウを選択したときの文字の選択を禁止する</a>を<a href="../menu/setup-additional-copy-and-paste.html#SelectOnActivate">Additional settingsダイアログ</a>で設定できるようにした。</li>
       <li><a href="../menu/file-chdir.html">ファイル転送のためのディレクトリ</a>に含まれる環境変数を展開するようにした。</li>
       <li>IMEの未確定文字のフォントが指定フォントと同一になるようにした。</li>
       <li>Additional settingsダイアログにヘルプボタンを追加した。</li>
@@ -481,7 +535,7 @@
       <li>複数ファイルのドラッグ&amp;ドロップに対応した。</li>
       <li><a href="../usage/mouse.html#dragdropwindow">ファイルをドラッグ&amp;ドロップしたときに表示されるダイアログ</a>を機能強化した。</li>
       <li><a href="../menu/setup-terminal.html#TermIsWin">Term size = win size</a> 設定が on の場合は、タイトルバーをダブルクリックした時にウィンドウサイズを最大化するように変更した。</li>
-      <li><a href="../menu/setup-additional.html#TitleFormat">Additional settingsダイアログ</a>の General タブに<a href="../setup/teraterm-win.html#title">タイトル形式の設定</a>を追加した。</li>
+      <li><a href="../menu/setup-additional-general.html#TitleFormat">Additional settingsダイアログ</a>の General タブに<a href="../setup/teraterm-win.html#title">タイトル形式の設定</a>を追加した。</li>
     </ul>
   </li>
 
@@ -604,7 +658,7 @@
         </ul></li>
       <li>OSで非表示に設定されているフォントをフォント設定ダイアログで選択できるようにする設定を追加した。
         <ul>
-          <li><a href="../menu/setup-additional.html#ListHiddenFonts">Additional settingsダイアログ</a>の General タブで設定を有効化できるようにした。</li>
+          <li><a href="../menu/setup-additional-general.html#ListHiddenFonts">Additional settingsダイアログ</a>の General タブで設定を有効化できるようにした。</li>
         </ul></li>
       <li>シリアルポートおよび名前付きパイプが開けなかった時、エラーメッセージで理由やエラーコードを表示するようにした。</li>
       <li><a href="../macro/command/sendlnbroadcast.html">sendlnbroadcast</a> マクロコマンドで、改行を送信するのを最後のパラメータの後の一回だけに変更した。</li>
@@ -743,7 +797,7 @@
     <ul>
       <li>貼り付け時に末尾の改行を削除する機能を追加した。デフォルトでは無効。
         <ul>
-          <li><a href="../menu/setup-additional.html#TrimTrailingNL">Additional settingsダイアログ</a>のCopy and Paste タブで設定を有効化できるようにした。</li>
+          <li><a href="../menu/setup-additional-copy-and-paste.html#TrimTrailingNL">Additional settingsダイアログ</a>のCopy and Paste タブで設定を有効化できるようにした。</li>
         </ul></li>
       <li>スクロールバックしている時、キー入力で常にスクロール状態をリセットするようにした。</li>
       <li>ZMODEM 送信で、デフォルトのエスケープ対象文字に LF と GS を追加した。</li>
@@ -918,7 +972,7 @@
   <li>バグ修正
     <ul>
       <li>localhostの23番ポート以外の場合、セッションの複製(Alt+D)でCygwin接続となる問題を修正した。</li>
-      <li><a href="../menu/setup-keyboard.html#MetaKey">Metaキー設定</a>をleftまたはrightに設定している時に、KEYBOARD.CNFで設定したAltキーとカーソルキーやInsert等の編集キーパッドとの組み合わせが正しく使えない問題を修正した。</li>
+      <li><a href="../menu/setup-additional-keyboard.html#MetaKey">Metaキー設定</a>をleftまたはrightに設定している時に、KEYBOARD.CNFで設定したAltキーとカーソルキーやInsert等の編集キーパッドとの組み合わせが正しく使えない問題を修正した。</li>
     </ul>
   </li>
 
@@ -1231,7 +1285,7 @@
         <ul>
           <li>teraterm.iniに <a href="../setup/teraterm-term.html#BellLimitting">BellOverUsedTime, BellOverUsedCount, BellSuppressTime</a> エントリを追加した。デフォルトは 2, 5, 5。</li>
         </ul></li>
-      <li><a href="../menu/setup-tcpip.html#AutoWinClose">Auto window close</a>を制御する <a href="../commandline/teraterm.html#autowinclose">/AUTOWINCLOSE</a> コマンドラインオプションを追加した。</li>
+      <li><a href="../menu/setup-additional-tcpip.html#AutoWinClose">Auto window close</a>を制御する <a href="../commandline/teraterm.html#autowinclose">/AUTOWINCLOSE</a> コマンドラインオプションを追加した。</li>
       <li>マクロ
         <ul>
           <li><a href="../macro/appendixes/errormessages.html">エラーメッセージ</a>に"Unknown command."を追加した。</li>
@@ -1305,7 +1359,7 @@
         </ul></li>
       <li>ウィンドウの右端で URL が終わって改行している場合に、次の行まで URL が続いていると判定される問題を修正した。</li>
       <li>URL 文字列としてマウスハンドカーソルの判定される領域が左に半文字分ずれる問題を修正した。</li>
-      <li>マクロからの送信データに対しても<a href="../menu/setup-additional.html#PasteDelayPerLine">Paste delay per line</a>設定が適用される問題を修正した。</li>
+      <li>マクロからの送信データに対しても<a href="../menu/setup-additional-copy-and-paste.html#PasteDelayPerLine">Paste delay per line</a>設定が適用される問題を修正した。</li>
       <li><a href="../macro/command/waitn.html">waitn</a> マクロコマンドで timeout が 0 のときにデータを待たない問題を修正した。</li>
       <li>マクロでcontinue後にbreakするとInvalid Controlエラーが発生する問題を修正した。</li>
       <li>マルチディスプレイ環境で box 系マクロコマンドのダイアログ表示位置がおかしくなる問題を修正した。</li>
@@ -2045,7 +2099,7 @@
         </ul></li>
       <li>ConfirmChangePaste 機能に、任意の文字列を指定することができる新しいしくみを追加した。
         <ul>
-          <li>teraterm.ini に <a href="../menu/setup-additional.html#ConfirmChangePasteStringFile">ConfirmChangePasteStringFile</a> エントリを追加した。文字列を列挙したテキストファイルへのパスを指定する。</li>
+          <li>teraterm.ini に <a href="../menu/setup-additional-copy-and-paste.html#ConfirmChangePasteStringFile">ConfirmChangePasteStringFile</a> エントリを追加した。文字列を列挙したテキストファイルへのパスを指定する。</li>
         </ul></li>
       <li>teraterm.ini に Wait4allMacroCommand エントリを追加した。デフォルトはoff。onにすると、"<a href="../macro/command/wait4all.html">wait4all</a>" マクロコマンドが有効となる。</li>
       <li>マクロコマンド "<a href="../macro/command/exec.html">exec</a>" に、起動したアプリケーションの終了コードを result に格納するためのオプションを追加した。</li>
@@ -2480,8 +2534,8 @@
       <li>ウィンドウの透明度を 255 に変更できない問題を修正した。</li>
       <li>サーバから送信されるタイトル文字列の末尾 1 文字が削られる問題を修正した。</li>
       <li>New connection ダイアログから Telnet 接続を開始したとき、TCPLocalEcho/TCPCRSend の設定が使用されてしまうことがある問題を修正した。</li>
-      <li><a href="../menu/setup-additional.html#EnableContinuedLineCopy">継続行連結コピー</a>を有効に設定している時、<a href="../menu/edit.html#copytable">テーブルをコピー</a>が正しく動作しない場合がある問題を修正した。</li>
-      <li><a href="../menu/setup-keyboard.html#DeleteKey">DeleteキーでDELを送信する</a>設定で Num Lock の状態が Off の時、数値キーパッドの"."でDELが送信されていたのを修正した。</li>
+      <li><a href="../menu/setup-additional-copy-and-paste.html#EnableContinuedLineCopy">継続行連結コピー</a>を有効に設定している時、<a href="../menu/edit.html#copytable">テーブルをコピー</a>が正しく動作しない場合がある問題を修正した。</li>
+      <li><a href="../menu/setup-additional-keyboard.html#DeleteKey">DeleteキーでDELを送信する</a>設定で Num Lock の状態が Off の時、数値キーパッドの"."でDELが送信されていたのを修正した。</li>
       <li>マクロの <a href="../macro/command/wait.html">wait</a> コマンドが長い文字列を待てなくなっていたのを修正した。4.54でのエンバグ。</li>
       <li><a href="../menu/setup-window.html">ウィンドウの設定ダイアログ</a>のカラー設定で、値が15以下の時にPageUpキーを押すと255になるのを修正した。</li>
       <li>COMポート番号を強制付け替えした場合に、レジストリに残っている古いFriendlyNameが表示されてしまう問題を修正した。パッチ作成に感謝します＞xoxo氏</li>
@@ -3483,22 +3537,29 @@
 <ul class="history">
   <li>変更
     <ul>
+      <li>複数認証要求に対応した。
+        <ul>
+          <li>コマンドラインオプションで複数の認証情報を受け取れないため、自動ログイン・マクロからの接続・セッションの複製には対応していない。</li>
+        </ul>
+      </li>
       <li>オプション(<a href="../commandline/ttssh.html#f">/f</a>, <a href="../commandline/ttssh.html#ssh-f">/ssh-f</a>, <a href="../commandline/ttssh.html#ssh-consume">/ssh-consume</a>, <a href="../commandline/ttssh.html#keyfile">/keyfile</a>)のファイル名が絶対パスでないときは、%APPDATA%\teraterm5\ からの相対パスとして扱うように変更した。</li>
-      <li>秘密鍵ファイル名にUnicodeを使用できるよう修正した</li>
+      <li>秘密鍵ファイル名にUnicodeを使用できるよう修正した。</li>
     </ul>
   </li>
 
-  <!--li>バグ修正
+  <li>バグ修正
     <ul>
-      <li></li>
+      <li>RFC 4252 に準拠するよう、認証時にユーザー名とパスワードをUTF-8で送信するよう修正した。</li>
+      <li><a href="../setup/teraterm-ssh.html#AuthBanner">SSH認証バナーをVT ウィンドウ内に表示する</a>時、受信文字コードによらず表示できるよう変更した。</li>
+      <li><a href="../menu/setup-sshauth.html">SSH Authentication ダイアログ</a>でフォーカスが消えてTAB等が使えなくなる問題を修正した</li>
     </ul>
-  </li-->
+  </li>
 
-  <!--li>その他
+  <li>その他
     <ul>
-      <li></li>
+      <li>LibreSSL 3.9.2 へ差し替えた。</li>
     </ul>
-  </li-->
+  </li>
 </ul>
 
 <h3 id="ttssh_3.2">2024.2.29 (Ver 3.2)</h3>
@@ -5404,6 +5465,14 @@
 
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
+
+<h3 id="ttmenu_1.20">2024.7.7(Ver 1.20)</h3>
+<ul class="history">
+      <li>パスワードを暗号化して保存するLockBoxを追加した。</li>
+      <li>Detailsダイアログで実行ファイル名に"ttermpro.exe"か含まれている場合に"use SSH"のチェックボックスがONになる処理をなくした。</li>
+      <li>List Configurationダイアログのタイトルの誤字を修正した。(Cofiguration -> Configuration)</li>
+      <li><a href="../usage/TTMenu/TTMenu.html">ドキュメント</a>に情報漏洩のリスクを加筆した。</li>
+</ul>
 
 <h3 id="ttmenu_1.19">2024.2.29 (Ver 1.19)</h3>
 <ul class="history">

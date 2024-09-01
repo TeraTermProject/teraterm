@@ -61,6 +61,7 @@
 #define		KEY_USERNAME			L"UserName"
 #define		KEY_PASSWDFLAG			L"PasswdFlag"
 #define		KEY_PASSWORD			L"Password"
+#define		KEY_LOCKBOXFLAG			L"LockBoxFlag"
 #define		KEY_INITFILE			L"INI_File"
 #define		KEY_TERATERM			L"TeraTerm"
 #define		KEY_OPTION				L"Option"
@@ -98,6 +99,7 @@ struct JobInfo {
 	wchar_t	szUsername[MAX_PATH];		// ユーザ名
 	BOOL	bPassword;					// パスワードを入力するかどうかのフラグ
 	char	szPassword[MAX_PATH];		// パスワード
+	BOOL	bLockBox;					// パスワードの暗号化/復号するかどうかのフラグ
 
 	// マクロ実行用設定
 	wchar_t	szMacroFile[MAX_PATH];		// 実行するマクロファイルのファイル名
@@ -132,12 +134,21 @@ struct MenuData {
 	COLORREF	crSelMenuTxt;
 };
 
+// 「LockBox入力」ダイアログ LPARAM用構造体
+typedef struct {
+	int		nMessageFlag;				// in : 0:通常メッセージ、1:LockBox誤りメッセージ
+	BOOL	bLockBox;					// in : パスワードの暗号化/復号するかどうかのフラグ
+	char	*pEncryptPassword;			// in : パスワード(暗号文)
+	char	*pDecryptPassword;			// out: パスワード(平文)
+} LockBoxDlgPrivateData;
+
 // 関数一覧
 void	PopupMenu(HWND hWnd);
 void	PopupListMenu(HWND hWnd);
 BOOL	AddTooltip(int idControl);
 BOOL	ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName = NULL);
-BOOL	CreateTooltip(void);
+BOOL	CreateTooltip(HWND hWnd);
+BOOL	DecryptPassword(char *szEncryptPassword, char *szDecryptPassword, HWND hWnd);
 BOOL	DeleteLoginHostInformation(HWND hWnd);
 BOOL	ErrorMessage(HWND hWnd, LPTSTR msg,...);
 BOOL	ExtractAssociatedIconEx(char *szPath, HICON *hLargeIcon, HICON *hSmallIcon);
@@ -149,7 +160,7 @@ BOOL	InitMenu(void);
 BOOL	InitVersionDlg(HWND hWnd);
 BOOL	LoadConfig(void);
 BOOL	LoadLoginHostInformation(HWND hWnd);
-BOOL	MakeTTL(char *TTLName, JobInfo *jobInfo);
+BOOL	MakeTTL(HWND hWnd, char *TTLName, JobInfo *jobInfo);
 BOOL	ManageWMCommand_Config(HWND hWnd, WPARAM wParam);
 BOOL	ManageWMCommand_Etc(HWND hWnd, WPARAM wParam);
 BOOL	ManageWMCommand_Menu(HWND hWnd, WPARAM wParam);
@@ -166,6 +177,7 @@ BOOL	SetMenuFont(HWND hWnd);
 BOOL	SetTaskTray(HWND hWnd, DWORD dwMessage);
 INT_PTR	CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR	CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR	CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 INT_PTR	CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT	CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam);
 LRESULT	CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

@@ -40,15 +40,8 @@
 #define HlpFileZmodemSend       8
 #define HlpFileBPlusSend        9
 #define HlpFileQVSend           10
-#define HlpFileChangeDir        11
 #define HlpFilePrint            12
 #define HlpSetupTerminal        13
-#define HlpSetupTerminalRuss    14
-#define HlpSetupTerminalEn      41
-#define HlpSetupTerminalJa      42
-#define HlpSetupTerminalKo      43
-#define HlpSetupTerminalRu      44
-#define HlpSetupTerminalUtf8    45
 #define HlpSetupWindow          15
 #define HlpSetupFont            16
 #define HlpSetupKeyboard        18
@@ -162,6 +155,11 @@
 #define HlpMenuSetupAdditionalFont          43023
 #define HlpMenuSetupAdditionalTheme         43024
 #define HlpMenuSetupThemeEditor             43025
+#define HlpMenuSetupAdditionalKeyboard      43026
+#define HlpMenuSetupAdditionalMouse         43027
+#define HlpMenuSetupAdditionalGeneral       43028
+#define HlpMenuSetupAdditionalTCPIP         43029
+#define HlpMenuSetupAdditionalCopyAndPaste  43030
 #define HlpMenuSetupSave                    43013
 #define HlpMenuSetupRestore                 43014
 #define HlpMenuSetupDir                     43016
@@ -261,6 +259,7 @@
 #define HlpMacroCommandCrc32File        92139
 #define HlpMacroCommandCygConnect       92130
 #define HlpMacroCommandDelpassword      92011
+#define HlpMacroCommandDelpassword2     92221
 #define HlpMacroCommandDirname          92188
 #define HlpMacroCommandDirnameBox       92214
 #define HlpMacroCommandDisconnect       92012
@@ -310,10 +309,12 @@
 #define HlpMacroCommandGetipv6addr      92200
 #define HlpMacroCommandGetmodemstatus   92213
 #define HlpMacroCommandGetpassword      92046
+#define HlpMacroCommandGetpassword2     92220
 #define HlpMacroCommandGetspecialfolder 92195
 #define HlpMacroCommandGettime          92047
 #define HlpMacroCommandGettitle         92048
 #define HlpMacroCommandGetttdir         92140
+#define HlpMacroCommandGetttpos         92223
 #define HlpMacroCommandGetver           92133
 #define HlpMacroCommandGoto             92049
 #define HlpMacroCommandIfdefined        92115
@@ -323,6 +324,7 @@
 #define HlpMacroCommandInt2str          92053
 #define HlpMacroCommandIntdim           92150
 #define HlpMacroCommandIsPassword       92197
+#define HlpMacroCommandIsPassword2      92222
 #define HlpMacroCommandKmtfinish        92054
 #define HlpMacroCommandKmtget           92055
 #define HlpMacroCommandKmtrecv          92056
@@ -341,6 +343,9 @@
 #define HlpMacroCommandMakepath         92064
 #define HlpMacroCommandMessagebox       92065
 #define HlpMacroCommandMpause           92111
+#if defined(OUTPUTDEBUGSTRING_ENABLE)
+#define HlpMacroCommandOutputdebugstring 92216
+#endif
 #define HlpMacroCommandPasswordbox      92067
 #define HlpMacroCommandPause            92068
 #define HlpMacroCommandQuickvanrecv     92069
@@ -355,14 +360,16 @@
 #define HlpMacroCommandScprecv          92131
 #define HlpMacroCommandScpsend          92132
 #define HlpMacroCommandSend             92074
+#define HlpMacroCommandSendbinary       92218
 #define HlpMacroCommandSendbreak        92075
 #define HlpMacroCommandSendbroadcast    92144
 #define HlpMacroCommandSendlnbroadcast  92147
 #define HlpMacroCommandSendfile         92076
 #define HlpMacroCommandSendkcode        92077
 #define HlpMacroCommandSendln           92078
-#define HlpMacroCommandSendlnmulticast  92216
+#define HlpMacroCommandSendlnmulticast  92157
 #define HlpMacroCommandSendmulticast    92145
+#define HlpMacroCommandSendtext         92217
 #define HlpMacroCommandSetbaud          92134
 #define HlpMacroCommandSetdate          92079
 #define HlpMacroCommandSetDebug         92175
@@ -376,6 +383,7 @@
 #define HlpMacroCommandSetflowctrl      92215
 #define HlpMacroCommandSetMulticastName 92146
 #define HlpMacroCommandSetPassword      92196
+#define HlpMacroCommandSetPassword2     92219
 #define HlpMacroCommandSetrts           92136
 #define HlpMacroCommandSetspeed         92217
 #define HlpMacroCommandSetsync          92084

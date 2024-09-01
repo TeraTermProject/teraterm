@@ -21,29 +21,28 @@
 
 Please execute below commands on the top of source tree.
 Use Visual Studio IDE
-```
-mkdir build_vs2022
-cd build_vs2022
-cmake .. -G "Visual Stuido 17 2022" -A Win32
-cmake --build . --config Release -j
-```
+(`-A win32` specifies x86; `-A x64` for x64, `-A arm64` for ARM64)
+
+    mkdir build_vs2022
+    cd build_vs2022
+    cmake .. -G "Visual Stuido 17 2022" -A Win32
+    cmake --build . --config Release -j
+
 To build installer
-```
-cmake --build . --config Release --target Install
-cmake --build . --config Release --target inno_setup
-cmake --build . --config Release --target zip
-```
+
+    cmake --build . --config Release --target Install
+    cmake --build . --config Release --target inno_setup
+    cmake --build . --config Release --target zip
 
 ### NMake (Visual Studio, very experimental)
 
 Execute vcvars32.bat,etc to prepare an environment where nmake, cl are avaiable,
 Run next commands.
-```
-mkdir build_nmake
-cd build_nmake
-cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
-cmake --build . -j
-```
+
+    mkdir build_nmake
+    cd build_nmake
+    cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
+    cmake --build . -j
 
 ### MinGW (very experimental)
 
@@ -51,17 +50,15 @@ cmake --build . -j
 - EXPERIMENTAL
 
 Please execute below commands on the top of source tree by using the cmake available on MinGW.
-```
-mkdir build_mingw
-cd build_mingw
-cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
-cmake --build . -j
-```
+
+    mkdir build_mingw
+    cd build_mingw
+    cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+    cmake --build . -j
 
 When cygwin, linux
-```
-mkdir build_mingw_cygwin
-cd build_mingw_cygwin
-cmake .. -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-cmake --build . -j
-```
+
+    mkdir build_mingw_cygwin
+    cd build_mingw_cygwin
+    cmake .. -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+    cmake --build . -j

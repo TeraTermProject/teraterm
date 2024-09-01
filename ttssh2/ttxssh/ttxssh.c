@@ -106,8 +106,9 @@
 #include "comportinfo.h"
 #include "asprintf.h"
 #include "ttcommdlg.h"
-
+#include "resize_helper.h"
 #include "libputty.h"
+#include "edithistory.h"
 
 #ifdef OPENSSL_LEGACY_PROVIDER
 static OSSL_PROVIDER *legacy_provider = NULL;
@@ -122,10 +123,10 @@ static OSSL_PROVIDER *default_provider = NULL;
 	TTEndDialog(p1, p2)
 #undef GetPrivateProfileInt
 #undef GetPrivateProfileString
+#undef WritePrivateProfileString
 #define GetPrivateProfileInt(p1, p2, p3, p4) GetPrivateProfileIntAFileW(p1, p2, p3, p4)
 #define GetPrivateProfileString(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
-#define GetPrivateProfileStringA(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
-#define WritePrivateProfileStringA(p1, p2, p3, p4) WritePrivateProfileStringAFileW(p1, p2, p3, p4)
+#define WritePrivateProfileString(p1, p2, p3, p4) WritePrivateProfileStringAFileW(p1, p2, p3, p4)
 
 /* This extension implements SSH, so we choose a load order in the
    "protocols" range. */
@@ -1040,7 +1041,29 @@ typedef struct {
 	PGetHNRec GetHNRec;
 	ComPortInfo_t *ComPortInfoPtr;
 	int ComPortInfoCount;
+	BOOL HostDropOpen;
 } TTXHostDlgData;
+
+static BOOL IsEditHistorySelected(HWND dlg)
+{
+	LRESULT index = SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCURSEL, 0, 0);
+	LRESULT data = SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETITEMDATA, (WPARAM)index, 0);
+	return data == 999;
+}
+
+static void OpenEditHistory(HWND dlg, TTTSet *ts)
+{
+	if (EditHistoryDlg(dlg, ts)) {
+		// 編集されたので、ドロップダウンを再設定する
+		LRESULT index;
+		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_RESETCONTENT, 0, 0);
+		SetComboBoxHostHistory(dlg, IDC_HOSTNAME, MAXHOSTLIST, ts->SetupFNameW);
+		index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING, 0, (LPARAM)L"<Edit history...>");
+		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
+	}
+	// 一番最初を選択する
+	SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
+}
 
 static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -1068,13 +1091,16 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 	switch (msg) {
 	case WM_INITDIALOG: {
 		int j;
+		int com_index;
+		LRESULT index;
 
 		GetHNRec = (PGetHNRec)lParam;
-		dlg_data = (TTXHostDlgData *)calloc(sizeof(*dlg_data), 1);
+		dlg_data = (TTXHostDlgData *)calloc(1, sizeof(*dlg_data));
 		SetWindowLongPtr(dlg, DWLP_USER, (LPARAM)dlg_data);
 		dlg_data->GetHNRec = GetHNRec;
 
 		dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount);
+		dlg_data->HostDropOpen = FALSE;
 
 		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
@@ -1091,13 +1117,14 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			)
 			GetHNRec->PortType = IdTCPIP;
 
+		// ホスト (コマンドライン)
 		SetComboBoxHostHistory(dlg, IDC_HOSTNAME, MAXHOSTLIST, GetHNRec->SetupFNW);
+		index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING, 0, (LPARAM)L"<Edit history...>");
+		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
 
-		SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT,
-		                   HostNameMaxLength - 1, 0);
-
+		ExpandCBWidth(dlg, IDC_HOSTNAME);
+		SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
 		SendDlgItemMessage(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
-
 		SetEditboxEmacsKeybind(dlg, IDC_HOSTNAME);
 
 		CheckRadioButton(dlg, IDC_HOSTTELNET, IDC_HOSTOTHER,
@@ -1134,6 +1161,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 
 
 		j = 0;
+		com_index = 1;
 		for (i = 0; i < dlg_data->ComPortInfoCount; i++) {
 			ComPortInfo_t *p = dlg_data->ComPortInfoPtr + i;
 			wchar_t *EntNameW;
@@ -1143,11 +1171,15 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			if (GetHNRec->MaxComPort >= 0 && i > GetHNRec->MaxComPort) {
 				continue;
 			}
-			j++;
 
 			// 使用中のポートは表示しない
 			if (CheckCOMFlag(p->port_no) == 1) {
 				continue;
+			}
+
+			j++;
+			if (GetHNRec->ComPort == p->port_no) {
+				com_index = j;
 			}
 
 			if (p->friendly_name == NULL) {
@@ -1160,18 +1192,19 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			SendDlgItemMessageA(dlg, IDC_HOSTCOM, CB_SETITEMDATA, index, i);
 			free(EntNameW);
 		}
-
-		if (j > 0)
-			SendDlgItemMessage(dlg, IDC_HOSTCOM, CB_SETCURSEL, 0, 0);	// select first com port
-		else {					/* All com ports are already used */
+		if (j > 0) {
+			// GetHNRec->ComPort を選択する
+			SendDlgItemMessageA(dlg, IDC_HOSTCOM, CB_SETCURSEL, com_index - 1, 0);
+		} else {					/* All com ports are already used */
 			GetHNRec->PortType = IdTCPIP;
 			enable_dlg_items(dlg, IDC_HOSTSERIAL, IDC_HOSTSERIAL, FALSE);
 		}
+		ExpandCBWidth(dlg, IDC_HOSTCOM);
 
 		CheckRadioButton(dlg, IDC_HOSTTCPIP, IDC_HOSTSERIAL,
 		                 IDC_HOSTTCPIP + GetHNRec->PortType - 1);
-
 		if (GetHNRec->PortType == IdTCPIP) {
+			SendMessageA(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_HOSTNAME), TRUE);
 			enable_dlg_items(dlg, IDC_HOSTCOMLABEL, IDC_HOSTCOM, FALSE);
 
 			enable_dlg_items(dlg, IDC_SSH_VERSION, IDC_SSH_VERSION, TRUE);
@@ -1180,6 +1213,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			enable_dlg_items(dlg, IDC_HISTORY, IDC_HISTORY, TRUE); // enabled
 		}
 		else {
+			SendMessageA(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_HOSTCOM), TRUE);
 			enable_dlg_items(dlg, IDC_HOSTNAMELABEL, IDC_HOSTTCPPORT,
 			                 FALSE);
 			enable_dlg_items(dlg, IDC_HOSTTCPPROTOCOLLABEL,
@@ -1190,23 +1224,9 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 
 			enable_dlg_items(dlg, IDC_HISTORY, IDC_HISTORY, FALSE); // disabled
 		}
-
-		// Host dialogにフォーカスをあてる (2004.10.2 yutaka)
-		if (GetHNRec->PortType == IdTCPIP) {
-			HWND hwnd = GetDlgItem(dlg, IDC_HOSTNAME);
-			SetFocus(hwnd);
-		} else {
-			HWND hwnd = GetDlgItem(dlg, IDC_HOSTCOM);
-			SetFocus(hwnd);
-		}
-
-		ExpandCBWidth(dlg, IDC_HOSTNAME);
-		ExpandCBWidth(dlg, IDC_HOSTCOM);
 		CenterWindow(dlg, GetParent(dlg));
 
-		// SetFocus()でフォーカスをあわせた場合、FALSEを返す必要がある。
-		// TRUEを返すと、TABSTOP対象の一番はじめのコントロールが選ばれる。
-		// (2004.11.23 yutaka)
+		// TRUEを返すと、フォーカスが移動してしまう
 		return FALSE;
 		//return TRUE;
 	}
@@ -1214,6 +1234,10 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
+			if(IsEditHistorySelected(dlg)) {
+				OpenEditHistory(dlg, pvar->ts);
+				break;
+			}
 			if (IsDlgButtonChecked(dlg, IDC_HOSTTCPIP)) {
 				BOOL Ok;
 				i = GetDlgItemInt(dlg, IDC_HOSTTCPPORT, &Ok, FALSE);
@@ -1324,6 +1348,28 @@ hostssh_enabled:
 
 		case IDC_HOSTHELP:
 			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpFileNewConnection, 0);
+			break;
+
+		case IDC_HOSTNAME: {
+			switch (HIWORD(wParam)) {
+			case CBN_DROPDOWN:
+				dlg_data->HostDropOpen = TRUE;
+				break;
+			case CBN_CLOSEUP:
+				dlg_data->HostDropOpen = FALSE;
+				break;
+			case CBN_SELENDOK:
+				if (dlg_data->HostDropOpen) {
+					//	ドロップダウンしていないときは、キーかホイールで選択している
+					//	決定(Enter or OK押下)すると編集開始
+					if(IsEditHistorySelected(dlg)) {
+						OpenEditHistory(dlg, pvar->ts);
+					}
+				}
+				break;
+			}
+			break;
+		}
 		}
 		break;
 	case WM_DESTROY:
@@ -2156,18 +2202,34 @@ static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, L
     return CallWindowProc(g_defAboutDlgEditWndProc, hWnd, msg, wp, lp);
 }
 
-static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
-									LPARAM lParam)
+typedef struct {
+	TInstVar *pvar;
+	ReiseDlgHelper_t *resize_helper;
+	HFONT DlgAboutTextFont;
+} AboutDlgData;
+
+static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static HFONT DlgAboutTextFont;
+	static const ResizeHelperInfo resize_info[] = {
+		{ IDC_TTSSH_ICON, RESIZE_HELPER_ANCHOR_RIGHT },
+		{ IDC_WEBSITES, RESIZE_HELPER_ANCHOR_LR },
+		{ IDC_CRYPTOGRAPHY, RESIZE_HELPER_ANCHOR_LR },
+		{ IDC_CREDIT, RESIZE_HELPER_ANCHOR_LR },
+		{ IDC_ABOUTTEXT, RESIZE_HELPER_ANCHOR_LRTB },
+		{ IDOK, RESIZE_HELPER_ANCHOR_B + RESIZE_HELPER_ANCHOR_NONE_H },
+	};
 
 	switch (msg) {
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
+		AboutDlgData *data = (AboutDlgData *)lParam;
+		TInstVar *pvar = data->pvar;
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
+
 		// Edit controlは等幅フォントで表示したいので、別設定情報からフォントをセットする。
 		// (2014.5.5. yutaka)
-		DlgAboutTextFont = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFileW);
-		if (DlgAboutTextFont != NULL) {
-			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutTextFont, MAKELPARAM(TRUE,0));
+		data->DlgAboutTextFont = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFileW);
+		if (data->DlgAboutTextFont != NULL) {
+			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)data->DlgAboutTextFont, MAKELPARAM(TRUE, 0));
 		}
 
 		SetDlgItemIcon(dlg, IDC_TTSSH_ICON, MAKEINTRESOURCEW(pvar->settings.IconID), 0, 0);
@@ -2181,9 +2243,11 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 		g_deltaSumAboutDlg = 0;
 		g_defAboutDlgEditWndProc = (WNDPROC)SetWindowLongPtrW(GetDlgItem(dlg, IDC_ABOUTTEXT), GWLP_WNDPROC, (LONG_PTR)AboutDlgEditWindowProc);
 
+		data->resize_helper = ReiseHelperInit(dlg, TRUE, resize_info, _countof(resize_info));
 		CenterWindow(dlg, GetParent(dlg));
 
 		return FALSE;
+	}
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
@@ -2203,23 +2267,39 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 		}
 		break;
 
-	case WM_DESTROY:
-		if (DlgAboutTextFont != NULL) {
-			DeleteObject(DlgAboutTextFont);
-			DlgAboutTextFont = NULL;
+	case WM_DESTROY: {
+		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
+		if (data->DlgAboutTextFont != NULL) {
+			DeleteObject(data->DlgAboutTextFont);
+			data->DlgAboutTextFont = NULL;
 		}
 		break;
+	}
 
-	case WM_DPICHANGED:
-		if (DlgAboutTextFont != NULL) {
-			DeleteObject(DlgAboutTextFont);
+	case WM_DPICHANGED: {
+		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
+		if (data->DlgAboutTextFont != NULL) {
+			DeleteObject(data->DlgAboutTextFont);
 		}
-		DlgAboutTextFont = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFileW);
-		if (DlgAboutTextFont != NULL) {
-			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutTextFont, MAKELPARAM(TRUE,0));
+		data->DlgAboutTextFont = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFileW);
+		if (data->DlgAboutTextFont != NULL) {
+			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)data->DlgAboutTextFont, MAKELPARAM(TRUE, 0));
 		}
 		SendDlgItemMessage(dlg, IDC_TTSSH_ICON, WM_DPICHANGED, wParam, lParam);
 		return FALSE;
+	}
+
+	case WM_SIZE: {
+		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
+		ReiseDlgHelper_WM_SIZE(data->resize_helper);
+		break;
+	}
+
+	case WM_GETMINMAXINFO: {
+		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
+		ReiseDlgHelper_WM_GETMINMAXINFO(data->resize_helper, lParam);
+		break;
+	}
 	}
 
 	return FALSE;
@@ -3100,9 +3180,15 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		BIGNUM *sp, *sq, *sg, *spub_key;
 
 		// private key
-		priv = DSA_generate_parameters(bits, NULL, 0, NULL, NULL, cbfunc, cbarg);
-		if (priv == NULL)
+		priv = DSA_new();
+		BN_GENCB *cb = BN_GENCB_new();
+		BN_GENCB_set_old(cb, cbfunc, cbarg);
+		int r= DSA_generate_parameters_ex(priv, bits, NULL, 0, NULL, NULL, cb);
+		BN_GENCB_free(cb);
+		if (!r) {
+			DSA_free(priv);
 			goto error;
+		}
 		if (!DSA_generate_key(priv)) {
 			// TODO: free 'priv'?
 			goto error;
@@ -3112,6 +3198,7 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		// public key
 		pub = DSA_new();
 		if (pub == NULL)
+			// TODO: free 'priv'?
 			goto error;
 		p = BN_new();
 		q = BN_new();
@@ -3120,6 +3207,7 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		pub_key = BN_new();
 		DSA_set0_key(pub, pub_key, NULL);
 		if (p == NULL || q == NULL || g == NULL || pub_key == NULL) {
+			// TODO: free 'priv'?
 			DSA_free(pub);
 			goto error;
 		}
@@ -4621,10 +4709,11 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 		}
 		return 1;
 
-	case ID_ABOUTMENU:
+	case ID_ABOUTMENU: {
+		AboutDlgData *data = (AboutDlgData *)calloc(1, sizeof(*data));
 		UTIL_SetDialogFont();
-		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_ABOUTDIALOG),
-		                   hWin, TTXAboutDlg, (LPARAM) pvar) == -1) {
+		data->pvar = pvar;
+		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_ABOUTDIALOG), hWin, TTXAboutDlg, (LPARAM)data) == -1) {
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
 				"MSG_TTSSH_ERROR", L"TTSSH Error",
@@ -4633,7 +4722,9 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			};
 			TTMessageBoxW(hWin, &info, pvar->ts->UILanguageFileW);
 		}
+		free(data);
 		return 1;
+	}
 	case ID_SSHAUTH:
 		UTIL_SetDialogFont();
 		AUTH_do_cred_dialog(pvar);
@@ -4793,6 +4884,7 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 
 	GetTempPathW(_countof(tmpPath), tmpPath);
 	GetTempFileNameW(tmpPath, L"TTX", 0, tmpFile);
+	WriteIniBom(tmpFile, TRUE);
 
 	for (i = 0; cmd[i] != ' ' && cmd[i] != 0; i++) {
 	}
@@ -4830,7 +4922,7 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 
 		// ホスト名で /ssh /1, /ssh  /2, /ssh1, /ssh2, /nossh, /telnet が
 		// 指定されたときは、ラジオボタンの SSH および SSH プロトコルバージョンを
-		// 適用するのをやめる (2007.11.1 maya)
+		// 適用するのをやめる
 		if (pvar->hostdlg_Enabled && ssh_enable == -1) {
 			wcsncat_s(cmd, cmdlen, L" /ssh", _TRUNCATE);
 
@@ -4843,7 +4935,7 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 
 		}
 
-		// セッション複製の場合は、自動ログイン用パラメータを付ける。(2005.4.8 yutaka)
+		// セッション複製の場合は、自動ログイン用パラメータを付ける。
 		if (wcsstr(buf, L"DUPLICATE")) {
 			char mark[MAX_PATH];
 			wchar_t tmp[MAX_PATH*2];
@@ -4855,20 +4947,22 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 			}
 
-			// パスワードを覚えている場合のみ、コマンドラインに渡す。(2006.8.3 yutaka)
+			// パスワードを覚えていて、かつ複数認証要求でない場合にのみコマンドラインに渡す。
 			if (pvar->settings.remember_password &&
+			    !pvar->auth_state.multiple_required_auth &&
 			    pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) {
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-							 L" /auth=password /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				             L" /auth=password /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->settings.remember_password &&
+			           !pvar->auth_state.multiple_required_auth &&
 			           pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
 				wchar_t markW[MAX_PATH];
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-							 L" /auth=publickey /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				             L" /auth=publickey /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 				dquote_stringW(pvar->session_settings.DefaultRSAPrivateKeyFile, markW, _countof(markW));
@@ -4876,15 +4970,17 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->settings.remember_password &&
+			           !pvar->auth_state.multiple_required_auth &&
 			           pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-							 L" /auth=challenge /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				             L" /auth=challenge /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
-			} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
+			} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT &&
+			           !pvar->auth_state.multiple_required_auth) {
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-							 L" /auth=pageant /user=%hs", pvar->auth_state.user);
+				             L" /auth=pageant /user=%hs", pvar->auth_state.user);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else {
@@ -5007,6 +5103,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			pvar->ts_SSH->struct_size = sizeof(TS_SSH);
 			if (__mem_mapping != NULL) {
 				CloseHandle(__mem_mapping);
+				__mem_mapping = NULL;
 			}
 		}
 		break;
@@ -5015,8 +5112,8 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 		if (__mem_mapping == NULL) {
 			free(pvar->ts_SSH);
 		} else {
+			UnmapViewOfFile(__mem_mapping);
 			CloseHandle(__mem_mapping);
-			UnmapViewOfFile(pvar->ts_SSH);
 		}
 		break;
 	}

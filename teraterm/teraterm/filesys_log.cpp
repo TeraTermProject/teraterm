@@ -35,7 +35,6 @@
 #include <crtdbg.h>
 #include <process.h>
 #include <windows.h>
-#include <htmlhelp.h>
 #include <assert.h>
 
 #include "teraterm.h"
@@ -45,11 +44,10 @@
 #include "commlib.h"
 #include "ttcommon.h"
 #include "ttlib.h"
+#include "ttlib_types.h"
 #include "dlglib.h"
 #include "vtterm.h"
 #include "ftlib.h"
-#include "buffer.h"
-#include "helpid.h"
 #include "codeconv.h"
 #include "asprintf.h"
 #include "win32helper.h"
@@ -942,6 +940,10 @@ void FLogWriteStr(const wchar_t *str)
 	}
 }
 
+/**
+ *	ログの情報を取得する
+ *	マクロ用
+ */
 void FLogInfo(char *param_ptr, size_t param_len)
 {
 	PFileVar fv = LogVar;
@@ -1060,33 +1062,28 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 	wchar_t *dir;
 	wchar_t *fname;
 	if (log_filename == NULL) {
-		dir = _wcsdup(ts.LogDefaultPathW);
+		dir = GetTermLogDir(&ts);
 		fname = _wcsdup(ts.LogDefaultNameW);
-	} else if (!IsRelativePathW(log_filename)) {
+	}
+	else if (!IsRelativePathW(log_filename)) {
 		// 絶対パスが入力された
 		dir = ExtractDirNameW(log_filename);
 		fname = ExtractFileNameW(log_filename);
 	}
 	else {
-		dir = _wcsdup(ts.LogDefaultPathW);
+		dir = GetTermLogDir(&ts);
 		fname = _wcsdup(log_filename);
 	}
 
 	wchar_t *formated = FLogGetLogFilenameBase(fname);
 	free(fname);
 
-	// 連結する
-	wchar_t *logfull = NULL;
-	awcscats(&logfull, dir, L"\\", formated, NULL);
+	// 連結,正規化
+	wchar_t *logfull = GetFullPathW(dir, formated);
 	free(formated);
 	free(dir);
 
-	// 正規化
-	wchar_t *normal;
-	hGetFullPathNameW(logfull, &normal, NULL);
-	free(logfull);
-
-	return normal;
+	return logfull;
 }
 
 BOOL FLogIsPause()

@@ -52,7 +52,7 @@ int buffer_append(buffer_t *buf, char *ptr, int size);
 int buffer_append_length(buffer_t *msg, char *ptr, int size);
 void buffer_put_raw(buffer_t *msg, char *ptr, int size);
 char *buffer_get_string(char **data_ptr, int *buflen_ptr);
-void buffer_put_string(buffer_t *msg, char *ptr, int size);
+void buffer_put_string(buffer_t *msg, char *ptr, size_t size);
 void buffer_put_cstring(buffer_t *msg, char *ptr);
 void buffer_put_char(buffer_t *msg, int value);
 void buffer_put_padding(buffer_t *msg, int size);

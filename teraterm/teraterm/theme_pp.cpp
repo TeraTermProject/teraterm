@@ -289,7 +289,7 @@ HPROPSHEETPAGE ThemePageCreate(HINSTANCE inst, TTTSet *pts)
 {
 	const int id = IDD_TABSHEET_THEME;
 
-	ThemePPData *Param = (ThemePPData *)calloc(sizeof(ThemePPData), 1);
+	ThemePPData *Param = (ThemePPData *)calloc(1, sizeof(ThemePPData));
 	Param->hInst = inst;
 	Param->UILanguageFileW = pts->UILanguageFileW;
 	Param->pts = pts;
@@ -299,7 +299,7 @@ HPROPSHEETPAGE ThemePageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
-	psp.pszTitle = _wcsdup(L"Theme");
+	psp.pszTitle = L"Theme";
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if defined(REWRITE_TEMPLATE)
 	psp.dwFlags |= PSP_DLGINDIRECT;

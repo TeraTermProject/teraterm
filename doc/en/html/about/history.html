@@ -36,29 +36,82 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>MACRO: When TTL file is relative path, it is relative from current directory of ttpmacro.</li>
-      <li>Use EnableContinuedLineCopy setting when dragging after selecting a word by double click.</li>
-      <li>Show error messagebox when logging cannot be started with LogAutoStart=on</li>
+      <li><a href="glossary.html#Bracketed">Bracket paste</a> behavior become able to adjust with <a href="../setup/teraterm-misc.html#BracketedSupport">BracketedSupport</a> and <a href="../setup/teraterm-misc.html#BracketedControlOnly">BracketedControlOnly</a>.
+        <ul>
+          <li>When pasting string from clipboard that does not contain control codes such as line feeds, characters are not outputted twice in the log with the default settings.</li>
+        </ul>
+      </li>
+      <li>EnableContinuedLineCopy setting is now used when dragging after selecting a word by double click.</li>
       <li>Right-click(paste) is not disabled even when <a href="../setup/teraterm-win.html#textselect">SelectOnActivate</a> is off.</li>
-      <li>allow users to select creating automatic backup or not by <a href="../setup/teraterm-misc.html#IniAutoBackup">IniAutoBackup</a> when overwriting the ini file.
-      <li><a href="../setup/teraterm-win.html#space">VTFontSpace</a> can be used to adjust to narrow the space between characters.
+      <li>Fixed some Emoji which character widths did not change with Override Emoji Characters width option. (Changed referenced Emoji table.)</li>
+      <li>To adjust to narrow the space between characters, <a href="../setup/teraterm-win.html#space">VTFontSpace</a> became to be able to set negative value.</li>
+      <li>Only available COM ports are now listed.
+        <ul>
+          <li>COM ports that are disabled and failed to initialize are not included.</li>
+        </ul>
+      </li>
+      <li>General setup dialog is now shown the information from <a href="../menu/setup-general.html#UILanguageFile">Language file</a> which is selected.</a>
+      <li>Removed Language setting from General setup dialog.</li>
+      <li>Download folder setting is moved to <a href="../menu/setup-additional-general.html#DownloadFolder">General tab</a> of Additional settings dialog.</li>
+      <li>Added ViewlogEditor argument on <a href="../menu/setup-additional-log.html#ViewlogEditorArg">Log Tab</a> in Additional settings dialog.</li>
+      <li>Setup - Font was integrated into <a href="../menu/setup-additional-font.html">Font tab</a> of Additional settings dialog.</li>
+      <li>Keyboard setup dialog is moved to <a href="../menu/setup-additional-keyboard.html">Keyboard tab</a> of Additional settings dialog.</li>
+      <li>TCP/IP setup dialog is moved to <a href="../menu/setup-additional-tcpip.html">TCP/IP tab</a> of Additional settings dialog.</li>
+      <li>Default port settings is moved to <a href="../menu/setup-additional-tcpip.html">TCP/IP tab</a> of Additional settings dialog from General setup dialog.</li>
+      <li>Improved Broadcast command dialog:
+        <ul>
+          <li>Edit control now support paste by R/M mouse clicking and Shift-INS.</li>
+          <li>Edit control now works the same whether the IME is on or off.</li>
+          <li>Added context menu in window list which provides foreground/minimize the selected windows and refresh the window list itself.</li>
+          <li>The selection state is now keeped when the window list is refreshed.</li>
+          <li>Added help button and normalize Japanese button name.</li>
+          <li>Fixed left click behavior in the margin of window list.</li>
+        </ul>
+      </li>
+      <li>Returned the display position of the message box to its previous behavior (center of the parent window) before 4.103, excluding some message boxes.</li>
+      <li>Error messagebox is now shown when logging cannot be started with LogAutoStart=on</li>
+      <li>Allow users to select creating automatic backup or not by <a href="../setup/teraterm-misc.html#IniAutoBackup">IniAutoBackup</a> when overwriting the ini file.
+      <li>MACRO: <a href="../macro/command/send.html">send</a> macro command check data and sends it as text or binary. Added <a href="../macro/command/sendtext.html">sendtext</a> and <a href="../macro/command/sendbinary.html">sendbinary</a> macro command</li>
+      <li>MACRO: Added options such as size specification to the listbox command.</li>
+      <li>MACRO: Added the <a href="../macro/command/getttpos.html">getttpos</a> command to retrieve the display status, position, and size in the VT window of Tera Term.</li>
+      <li>MACRO: Added support for password file using aes-256-ctr encryption
+        <ul>
+          <li>added the <a href="../macro/command/setpassword2.html">setpassword2</a>, <a href="../macro/command/getpassword2.html">getpassword2</a>, <a href="../macro/command/ispassword2.html">ispassword2</a> and <a href="../macro/command/delpassword2.html">delpassword2</a> commands.</li>
+          <li>The contents that is saved with setpassword2 command is protected by a password.</li>
+          <li>This password file is not compatible with prior password file.</li>
+        </ul>
+      </li>
+      <li>MACRO: When TTL file is relative path, it is relative from current directory of ttpmacro.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <li>Fixed COM port detection for modem device. Modem device is also detected the same as 4.x now.</li>
-      <li>MACRO: fixed ttermpro.exe does not crash when file specified in the <a href="../macro/command/xmodemsend.html">xmodemsend</a> macro command does not exist.</li>
       <li>Fixed text color to be gray instead of black when SGR 1 + SGR 30(Bold + FG Black).</li>
-      <li>Fixed same repeated characters are selected when double click on delimiter character.(Fixed select behavior that changed in 5.2 to be same as before.)</li>
-      <li>MACRO: fixed file name is garbled in status window when Kanji characters are included.</li>
       <li>Fixed to repetition of surrogate pair characters correctly display when "Drawing resized font to fit cell width" is on.</li>
-      <li>Fixed to use EnableContinuedLineCopy setting when double click to select a word. This bug was introduced in 5.2.</li>
-      <li>Fixed window maximization works immediately after startup.</li>
-      <li>MACRO: fixed password file name for <a href="../macro/command/getpassword.html">getpassword</a> and <a href="../macro/command/delpassword.html">delpassword</a> macro command is not Unicode compatible.</li>
-      <li>Fixed crash on exit when using <a href="../commandline/teraterm.html#v">/V option</a> of ttermpro.exe.</li>
       <li>Fixed display of combined characters was corrupted.</li>
-      <li>Apply changes even if only NoFrame is changed at Window setup dialog.</li>
+      <li>Fixed to use EnableContinuedLineCopy setting when double click to select a word. This bug was introduced in 5.2.</li>
+      <li>Fixed same repeated characters are selected when double click on delimiter character.(Fixed select behavior that changed in 5.2 to be same as before.)</li>
+      <li>Fixed wrong characters were sent when transmit character code is JIS.
+        <ul>
+          <li>Fixed wrong character output at end of line.</li>
+          <li>Fixed wrong character output when local echo is on.</li>
+        </ul>
+      </li>
+      <li>Fixed COM port detection for modem device. Modem device is also detected the same as 4.x now.</li>
+      <li>Fixed doesn't remember the COM port it used on new connection dialog</li>
+      <li>Fixed COM port list was not sorted on new connection dialog.</li>
+      <li>Apply changes even if only No Frame is changed at Window setup dialog.</li>
+      <li>Fixed the issue where specifying the <a href="../commandline/teraterm.html#v">/V option</a> with ttermpro.exe would cause a crash upon exit.</li>
+      <li>Fixed window maximization works immediately after startup.</li>
+      <li>Added <a href="../setup/folder.html#DownloadDir">download folder</a> for log saving folder same as Tera Term 4.</li>
+      <li>MACRO: Fixed <a href="../macro/command/send.html">send</a> macro command could not send $00.</li>
+      <li>MACRO: Fixed <a href="../macro/command/clipb2var.html">clipb2var</a> is not working.</li>
+      <li>MACRO: Fixed path of <a href="../macro/command/basename.html">basename</a> and <a href="../macro/command/dirname.html">dirname</a> macro commands were not Unicode-compatible.</li>
+      <li>MACRO: Fixed ttermpro.exe does not crash when file specified in the <a href="../macro/command/xmodemsend.html">xmodemsend</a> macro command does not exist.</li>
+      <li>MACRO: Fixed password file name for <a href="../macro/command/getpassword.html">getpassword</a> and <a href="../macro/command/delpassword.html">delpassword</a> macro command is not Unicode compatible.</li>
+      <li>MACRO: Fixed ttpmacro.exe crashes when referencing unsetted string array element.</li>
+      <li>MACRO: Fixed file name is garbled in status window when Kanji characters are included.</li>
     </ul>
   </li>
 
@@ -66,6 +119,7 @@
     <ul>
       <li>Added Tamil.lng language file.</li>
       <li>Upgraded TTSSH to <a href="#ttssh_3.3">3.3</a>.</li>
+      <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.20">1.20</a>.</li>
     </ul>
   </li>
 </ul>
@@ -74,14 +128,14 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>Delimiter characters<a href="../menu/setup-additional.html#DelimiterChar">(dialog</a>, <a href="../setup/teraterm-win.html#delimiter">TERATERM.INI)</a> can use Unicode.</li>
+      <li>Delimiter characters<a href="../menu/setup-additional-copy-and-paste.html#DelimiterChar">(dialog</a>, <a href="../setup/teraterm-win.html#delimiter">TERATERM.INI)</a> can use Unicode.</li>
       <li>Modify TCP/IP setup dialog.</li>
       <ul>
         <li>Dialog can now be resized.</li>
         <li>Host list can be scrolled horizontally.</li>
         <li>Host list is wider.</li>
       </ul>
-      <li><a href="../setup/teraterm-win.html#autocopy">Auto text copying</a> can be enabled/disabled on <a href="../menu/setup-additional.html#AutoTextCopy">Copy and Paste tab of Additional settings dialog</a>.</li>
+      <li><a href="../setup/teraterm-win.html#autocopy">Auto text copying</a> can be enabled/disabled on <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy and Paste tab of Additional settings dialog</a>.</li>
       <li>Add <a href="../menu/setup-additional-theme.html">Theme tab</a> to "Additional settings" dialog.</li>
       <li>Remove UTF8m in <a href="../commandline/teraterm.html#kr">/KR</a>, <a href="../commandline/teraterm.html#kt">/KT</a> command line options.</li>
       <li>MACRO: Dialog displayed using <a href="../macro/command/listbox.html">listbox</a> command can now be resized.</li>
@@ -340,7 +394,7 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>The <a href="../setup/teraterm-win.html#textselect">Disabling text selection when the window is activated by mouse</a> configuration can be set up on the <a href="../menu/setup-additional.html#SelectOnActivate">Additional settings dialog</a>.</li>
+      <li>The <a href="../setup/teraterm-win.html#textselect">Disabling text selection when the window is activated by mouse</a> configuration can be set up on the <a href="../menu/setup-additional-copy-and-paste.html#SelectOnActivate">Additional settings dialog</a>.</li>
       <li>The environment variable included in <a href="../menu/file-chdir.html">directory for file transfers</a> becomes to be expanded.</li>
       <li>Unspecified string font in IME uses your defined font.</li>
       <li>Added help button on Additional settings dialog.</li>
@@ -481,7 +535,7 @@
       <li>added support for multiple files' drag&amp;drop.</li>
       <li>Functional enhancement: <a href="../usage/mouse.html#dragdropwindow">Confirmation dialog by using drag&amp;drop a file</a>.</li>
       <li>Window size is maximized when the title bar is double-clicked if <a href="../menu/setup-terminal.html#TermIsWin">"Term size = win size"</a> setting is on.</li>
-      <li>added the <a href="../setup/teraterm-win.html#title">Title format configuration</a> on the General tab of the <a href="../menu/setup-additional.html#TitleFormat">Additional settings dialog</a>.</li>
+      <li>added the <a href="../setup/teraterm-win.html#title">Title format configuration</a> on the General tab of the <a href="../menu/setup-additional-general.html#TitleFormat">Additional settings dialog</a>.</li>
     </ul>
   </li>
 
@@ -604,7 +658,7 @@
         </ul></li>
       <li>Hidden font set by OS can be selected with font setting dialog.
         <ul>
-          <li>The setting can be configured on the General tab of <a href="../menu/setup-additional.html#ListHiddenFonts">Additional settings dialog</a>.</li>
+          <li>The setting can be configured on the General tab of <a href="../menu/setup-additional-general.html#ListHiddenFonts">Additional settings dialog</a>.</li>
         </ul></li>
       <li>When the serial port and named pipe can not be opened, the error message contains reason or error code.</li>
       <li>When the <a href="../macro/command/sendlnbroadcast.html">sendlnbroadcast</a> macro command is used, the carriage return is sent one more time after last parameter.</li>
@@ -743,7 +797,7 @@
     <ul>
       <li>added new feature which removes carriage return from end of line with pasting. The default value is off.
         <ul>
-          <li>The function can be enabled at Copy and Paste tab of <a href="../menu/setup-additional.html#TrimTrailingNL">Additional settings dialog</a>.</li>
+          <li>The function can be enabled at Copy and Paste tab of <a href="../menu/setup-additional-copy-and-paste.html#TrimTrailingNL">Additional settings dialog</a>.</li>
         </ul></li>
       <li>When scroll back is used, scroll state is always reset with user input.</li>
       <li>ZMODEM: The default escaped character are added LF and GS by sending.</li>
@@ -918,7 +972,7 @@
   <li>Bug fixes
     <ul>
       <li>When the port number is not 23 on local connection, the Cygwin connection starts by Alt+D(Duplicate session) key.</li>
-      <li>When the <a href="../menu/setup-keyboard.html#MetaKey">Meta key</a> is set to left or right, the combination key with the Alt and the cursor/Insert/etc edit keypad can not work well in the KEYBOARD.CNF.</li>
+      <li>When the <a href="../menu/setup-additional-keyboard.html#MetaKey">Meta key</a> is set to left or right, the combination key with the Alt and the cursor/Insert/etc edit keypad can not work well in the KEYBOARD.CNF.</li>
     </ul>
   </li>
 
@@ -1231,7 +1285,7 @@
         <ul>
           <li>added the <a href="../setup/teraterm-term.html#BellLimitting">BellOverUsedTime, BellOverUsedCount and BellSuppressTime</a> entries in the teraterm.ini file. The default value are 2 , 5 and 5.</li>
         </ul></li>
-      <li>added the <a href="../commandline/teraterm.html#autowinclose">/AUTOWINCLOSE</a> command line option to control the <a href="../menu/setup-tcpip.html#AutoWinClose">Auto window close</a>.</li>
+      <li>added the <a href="../commandline/teraterm.html#autowinclose">/AUTOWINCLOSE</a> command line option to control the <a href="../menu/setup-additional-tcpip.html#AutoWinClose">Auto window close</a>.</li>
       <li>Macro
         <ul>
           <li>added the "Unknown command." new message in the <a href="../macro/appendixes/errormessages.html">Error messages</a>.</li>
@@ -1305,7 +1359,7 @@
         </ul></li>
       <li>When the URL string ends at the right row and return code, the URL string continues to next line by mistake.</li>
       <li>The URL string on the mouse hand cursor shifts to the left with half character by mistake.</li>
-      <li>MACRO: The send/sendln command can be affected by the <a href="../menu/setup-additional.html#PasteDelayPerLine">Paste delay per line</a> configuration.</li>
+      <li>MACRO: The send/sendln command can be affected by the <a href="../menu/setup-additional-copy-and-paste.html#PasteDelayPerLine">Paste delay per line</a> configuration.</li>
       <li>MACRO: When the timeout is 0, the <a href="../macro/command/waitn.html">waitn</a> command can not wait any character.</li>
       <li>MACRO: When the break command is executed after the continue command, the Invalid Control error will be occurred.</li>
       <li>MACRO: The box-style macro command can not show the dialog position well on the multi display.</li>
@@ -2017,7 +2071,7 @@
         <ul>
           <li>added the character set (aka "Script") drop-down combo box.</li>
           <li>moved the Enable bold style to <a href="../menu/setup-window.html">[Setup]-[Window]</a>.</li>
-          <li>moved the Russian Font char set to <a href="../menu/setup-terminal_ru.html">[Setup]-[Terminal] for Russian mode</a>.</li>
+          <li>moved the Russian Font char set to [Setup]-[Terminal] for Russian mode.</li>
         </ul></li>
       <li>added the MSB set character by using the Alt key.
         <ul>
@@ -2046,7 +2100,7 @@
         </ul></li>
       <li>added support for specifying any strings as the ConfirmChangePaste function.
         <ul>
-          <li>added the <a href="../menu/setup-additional.html#ConfirmChangePasteStringFile">ConfirmChangePasteStringFile</a> entry in the teraterm.ini file. A user can specify a text file path enumerating any strings.</li>
+          <li>added the <a href="../menu/setup-additional-copy-and-paste.html#ConfirmChangePasteStringFile">ConfirmChangePasteStringFile</a> entry in the teraterm.ini file. A user can specify a text file path enumerating any strings.</li>
         </ul></li>
       <li>added the Wait4allMacroCommand entry in the teraterm.ini file. The default is off. Turn on the value to enable the "<a href="../macro/command/wait4all.html">wait4all</a>" macro command.</li>
       <li>added the new option of the "<a href="../macro/command/exec.html">exec</a>" macro command that the application exit code is stored in the result variable.</li>
@@ -2479,8 +2533,8 @@
       <li>Bug fix: the transparency of window could not change to 255.</li>
       <li>Bug fix: last 1 character of title string that is sent from server is deleted.</li>
       <li>Bug fix: TeraTerm would use the configuration of TCPLocalEcho/TCPCRSend when the user start telnet connection on New connection dialog.</li>
-      <li>Bug fix: when <a href="../menu/setup-additional.html#EnableContinuedLineCopy">continued line copy</a> is enabled, <a href="../menu/edit.html#copytable">Copy Table</a> does not work correctly</li>
-      <li>Bug fix: when <a href="../menu/setup-keyboard.html#DeleteKey">Transmit DEL by Delete key</a> is enabled and Num Lock status is off, Numeric Keypad "." sends DEL.</li>
+      <li>Bug fix: when <a href="../menu/setup-additional-copy-and-paste.html#EnableContinuedLineCopy">continued line copy</a> is enabled, <a href="../menu/edit.html#copytable">Copy Table</a> does not work correctly</li>
+      <li>Bug fix: when <a href="../menu/setup-additional-keyboard.html#DeleteKey">Transmit DEL by Delete key</a> is enabled and Num Lock status is off, Numeric Keypad "." sends DEL.</li>
       <li>Bug fix: '<a href="../macro/command/wait.html">wait</a>' macro command can't wait a long string. This bug was introduced in 4.54.</li>
       <li>Bug fix: The color value on <a href="../menu/setup-window.html">Window setup dialog</a> would become 255 when the value is less than 16 and the user pushes PageUP key.</li>
       <li>Bug fix: COM port description would be wrong when COM port number is forced to switch another number. Special thanks to xoxo-san.</li>
@@ -3473,22 +3527,29 @@ SYNOPSIS:
 
 <h3 id="ttssh_3.3">YYYY.MM.DD (Ver 3.3 not released yet)</h3>
 <ul class="history">
-  <!--li>Changes
+  <li>Changes
     <ul>
-      <li></li>
+      <li>Added support for multiple required authentication.
+        <ul>
+          <li>Auto login, connect from macro and duplicate session are not supported, because TTSSH cannot receive multiple authentication informations from command line parameters.</li>
+        </ul>
+      </li>
+      <li>If option(<a href="../commandline/ttssh.html#f">/f</a>, <a href="../commandline/ttssh.html#ssh-f">/ssh-f</a>, <a href="../commandline/ttssh.html#ssh-consume">/ssh-consume</a>, <a href="../commandline/ttssh.html#keyfile">/keyfile</a>) argument file name is not absolute path, modify it to be treated as a relative path from %APPDATA%\teraterm5\.</li>
+      <li>Modified to private key file name can use Unicode</li>
     </ul>
-  </li-->
+  </li>
 
-  <!--li>Bug fixes
+  <li>Bug fixes
     <ul>
-      <li></li>
+      <li>Modified to send username and password in UTF-8 at authentication to comply with RFC 4252.</li>
+      <li>Modified to <a href="../setup/teraterm-ssh.html#AuthBanner">display SSH authentication banner in VT window</a> regardless of receiving character code.</li>
+      <li>Fixed focus disappears in <a href="../menu/setup-sshauth.html">SSH Authentication</a> dialog and TAB cannot be used.</li>
     </ul>
-  </li-->
+  </li>
 
   <li>Misc
     <ul>
-      <li>If option(<a href="../commandline/ttssh.html#f">/f</a>, <a href="../commandline/ttssh.html#ssh-f">/ssh-f</a>, <a href="../commandline/ttssh.html#ssh-consume">/ssh-consume</a>, <a href="../commandline/ttssh.html#keyfile">/keyfile</a>) argument file name is not absolute path, modify it to be treated as a relative path from %APPDATA%\teraterm5\.</li>
-      <li>Modified private key file name can use Unicode</li>
+      <li>Upgraded LibreSSL to 3.9.2.</li>
     </ul>
   </li>
 </ul>
@@ -5395,6 +5456,14 @@ SYNOPSIS:
 
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
+
+<h3 id="ttmenu_1.20">2024.7.7 (Ver 1.20)</h3>
+<ul class="history">
+      <li>Added LockBox to encrypt and save passwords.</li>
+      <li>In the Details dialog, the "use SSH" checkbox no longer turns on when the executable file name includes "ttermpro.exe".</li>
+      <li>Fixed a typo in the title of the List Configuration dialog. (Cofiguration -> Configuration)</li>
+      <li>Added the risk of information leaks to <a href="../usage/TTMenu/TTMenu.html">document</a>.</li>
+</ul>
 
 <h3 id="ttmenu_1.19">2024.2.29 (Ver 1.19)</h3>
 <ul class="history">

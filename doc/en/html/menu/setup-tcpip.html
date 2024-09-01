@@ -10,64 +10,8 @@
 
   <body>
     <h1>TCP/IP ([Setup] menu)</h1>
-
-    <h2>"TCP/IP setup" dialog box</h2>
-    <dl>
-      <dt id="hostlist">Host list</dt>
-      <dd>
-	You can edit here the host list to be displayed in the
-	<a href="file-new.html">[File] New connection</a> dialog box.
-	It is convenient to add your favorite hosts to the list.
-	You can add not only host names and IP addresses, but also the
-	<a href="../commandline/teraterm.html">command line parameters</a>
-	like the following:
-
-      <pre>
-      myhost.mydomain                   Host name only.
-      myhost.mydomain:23                Host name with a port number.
-      foohost.foodomain /F=FOOHOST.INI  Host name &amp; setup file name.
-      /C=1                              Specifies the serial port connection.
-      /R=LOG.DAT                        Replays the log file.
-      </pre>
-
-	<dl>
-	  <dt id="HistoryList">History</dt>
-	  <dd>
-	    If this option is selected, a host name entered in the
-	    <a href="file-new.html">[File] New connection</a> dialog box
-	    is appended to the top of host list.
-	  </dd>
-	</dl>
-      </dd>
-
-      <dt id="AutoWinClose">Auto window close</dt>
-      <dd>
-	Closes Tera Term when the connection is closed.
-      </dd>
-
-      <dt id="TCPPort">TCP port#</dt>
-      <dd>
-	TCP port number. Normally, port number 23 is used for the telnet
-	protocol.
-      </dd>
-
-      <dt id="Telnet">Telnet</dt>
-      <dd>
-	Enables the telnet protocol. Usually, you should select this option.
-      </dd>
-
-      <dt id="TelKeepAliveInterval">Keep alive</dt>
-      <dd>
-	This feature is called by Telnet keep-alive(heart-beat) mechanism. If this feature is enabled, Tera Term will send NOP message(IAC NOP: 255 241) periodically. 0 to turn off. The default value is 300 seconds.
-      </dd>
-
-      <dt id="TermType">Terminal type</dt>
-      <dd>
-	Terminal type to be reported to the host when the telnet connection
-	is established.<br>
-	When TermType is set to "xterm" the applications (e.g. vim6) supporting ANSI color will appear in color. This function is from the original Tera Term.<br>
-    You should specify "vt100" or "ANSI" for Windows Telnet Server. "xterm" will cause a problem.
-      </dd>
-    </dl>
+    <p>
+      Open <a href="../menu/setup-additional-tcpip.html">TCP/IP tab</a> of Additional settings dialog.
+    </p>
   </body>
 </html>

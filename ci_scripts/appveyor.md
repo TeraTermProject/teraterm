@@ -1,8 +1,6 @@
 ﻿AppVeyorの使用
 ==============
 
-git(GitHubも含む)リポジトリからのビルド
-
 ## プロジェクト作成 / 設定
 
 - Select repository for your new project
@@ -61,7 +59,59 @@ appveyor_mix.yml
 
 最近使用していない
 
-## build_local_appveyor_*
+build_local_appveyor_*
+======================
 
 - ローカルで build_appveyor.bat をテストするための bat ファイル
 - Visual Studio と msys2 を使用
+
+ローカルでのテスト(Linux)
+=======================
+
+## ビルド準備/WSL
+
+- ストアで debian をインストールする
+  - 21-05-02時点で debian 10(buster)
+- debian を起動
+- 次のコマンドを実行
+
+```
+sudo apt-get update
+sudo apt-get -y upgrade
+sudo apt-get -y install cmake perl subversion
+sudo apt-get -y install g++-mingw-w64
+sudo apt-get -y install fp-utils
+cd /path/to/teraterm
+```
+
+## ビルド準備/debian
+
+- WSLと同じ
+- 次のディストリビューション/バージョンに含まれているmingwでのビルドは確認した
+
+```
+$ cat /etc/os-release
+PRETTY_NAME="Debian GNU/Linux bookworm/sid"
+NAME="Debian GNU/Linux"
+VERSION_CODENAME=bookworm
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+```
+
+## ビルド
+
+gcc 32bit
+
+```
+cmake -DCMAKE_GENERATOR="Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake -P buildall.cmake
+cmake -P ci_scripts/build_local_appveyor_mingw.cmake
+```
+
+
+gcc 64bit
+- `cmake -DCOMPILER_64BIT=ON -P ci_scripts/build_local_appveyor_mingw.cmake`
+
+msys64
+- [build_local_appveyor_mingw_cmake.bat](build_local_appveyor_mingw_cmake.bat)参照

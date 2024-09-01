@@ -2,6 +2,8 @@
 
 project(${PACKAGE_NAME})
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../libs/lib_libressl.cmake)
+
 add_executable(
   ${PACKAGE_NAME} WIN32
   registry.cpp
@@ -29,9 +31,7 @@ target_sources(
   ${PACKAGE_NAME}
   PRIVATE
   ../teraterm/common/ttlib.h
-  ../teraterm/common/ttlib.c
   ../teraterm/common/i18n.h
-  ../teraterm/common/i18n.c
   ../teraterm/common/codeconv.h
   ../teraterm/common/compat_win.h
   ../teraterm/common/dllutil.h
@@ -41,6 +41,21 @@ source_group(
   "common"
   REGULAR_EXPRESSION
   "teraterm\/common\/")
+
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
+  ${LIBRESSL_INCLUDE_DIRS}/openssl/sha.h
+  ${LIBRESSL_INCLUDE_DIRS}/openssl/evp.h
+  ${LIBRESSL_INCLUDE_DIRS}/openssl/rand.h
+  ${LIBRESSL_INCLUDE_DIRS}/openssl/hmac.h
+  ${LIBRESSL_INCLUDE_DIRS}/openssl/crypto.h
+)
+
+source_group(
+  "libressl"
+  REGULAR_EXPRESSION
+  "${LIBRESSL_INCLUDE_DIRS}/openssl/")
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
@@ -67,6 +82,7 @@ target_include_directories(
   ${PACKAGE_NAME}
   PRIVATE
   .
+  ${LIBRESSL_INCLUDE_DIRS}
   )
 
 if(MSVC)
@@ -88,6 +104,9 @@ target_link_libraries(
   user32
   gdi32
   comdlg32
+  ${LIBRESSL_LIB}
+  bcrypt
+  ws2_32
   )
 
 install(

@@ -263,7 +263,10 @@ group Service Request [cf. RFC 4253 Section 10]
 end
 
 group Authentication
-  alt CheckAuthListFirst is enabled
+
+  C -> U: display Authentication dialog
+
+  alt If CheckAuthListFirst is enabled, immediately after the Authentication dialog is displayed.\nOtherwise, after the OK button in the Authentication dialog is pressed.
 
     U -> C:
     note left: user name
@@ -274,17 +277,12 @@ group Authentication
     C <- S: SSH_MSG_USERAUTH_FAILURE
     note right: supported autentication methods
 
-  else disabled
-
-    U -> C:
-    note left: user name
-
   end
 
   group process that corresponds to\nthe authentication method [password\ncf. RFC 4252 Section 8]
 
     U -> C:
-    note left: password
+    note left: user name\npassword
 
     C -> S: SSH_MSG_USERAUTH_REQUEST
     note left: user name\n"ssh-connection"\n"password"\npassword
@@ -298,7 +296,7 @@ group Authentication
   else publickey\ncf. RFC 4252 Section 7
 
     U -> C:
-    note left: key file for authentication\npassphrase
+    note left: user name\nkey file for authentication\npassphrase
     note over C #ffffff: read public key and private key from the file
 
     C -> S: SSH_MSG_USERAUTH_REQUEST
@@ -326,6 +324,9 @@ group Authentication
     end
 
   else keyboard-interactive\ncf. RFC 4256
+
+    U -> C:
+    note left: user name
 
     C -> S: SSH_MSG_USERAUTH_REQUEST
     note left: user name\n"ssh-connection"\n"keyboard-interactive"
@@ -356,6 +357,9 @@ group Authentication
 
     U -> P:
     note left: (preliminarily)\nkey file for authentication\npassphrase
+
+    U -> C:
+    note left: user name
 
     P <- C: SSH2_AGENTC_REQUEST_IDENTITIES
     note right #ffffff: request for public keys

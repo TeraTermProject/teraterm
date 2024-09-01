@@ -1,5 +1,7 @@
-﻿; Updated by TeraTerm Project (2024-03-30)
-; Last translated (Korean language) by Daehong Kim (2013-07-25)
+﻿[Info]
+language=Korean
+date=2024-08-31 by TeraTerm Project
+contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
 DLG_SYSTEM_FONT=굴림,10,128
@@ -53,13 +55,11 @@ MENU_EDIT_SELECTALL=전체 선택(&A)
 MENU_SETUP=설정(&S)
 MENU_SETUP_TERMINAL=터미널(&T)...
 MENU_SETUP_WINDOW=창(&W)...
-MENU_SETUP_FONT_SUBMENU=글꼴(&F)
 MENU_SETUP_FONT=글꼴(&F)...
-MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=키보드(&K)...
 MENU_SETUP_SERIALPORT=시리얼포트(&E)...
 MENU_SETUP_TCPIP=T&CP/IP...
-MENU_SETUP_GENERAL=일반(&G)...
+MENU_SETUP_GENERAL=일반(LanguageUI)(&G)...
 MENU_SETUP_ADDITION=추가설정(&D)...
 MENU_SETUP_SAVE=저장하기(&S)...
 MENU_SETUP_RESTORE=가져오기(&R)...
@@ -270,7 +270,9 @@ DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=no use
 DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
-DLG_TAB_LOG_EDITOR=로그보기 에디터(&E)
+DLG_TAB_LOG_EDITOR=로그보기 에디터
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=기본 로그 파일 이름(strftime 형식)(&F)
 DLG_TAB_LOG_FILEPATH=기본 로그 저장 폴더(&S)
 DLG_TAB_LOG_AUTOSTART=자동 로깅 시작(&U)
@@ -298,7 +300,15 @@ DLG_BROADCAST_HISTORY=이력
 DLG_BROADCAST_PARENTONLY=이 프로세스에만 보내기
 DLG_BROADCAST_ENTER=Enter 키
 DLG_BROADCAST_SUBMIT=제출
+DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=실시간 모드
+DLG_BROADCAST_HELP=Help
+CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
+CMENU_BROADCAST_MINIMIZE=Minimize selected window
+CMENU_BROADCAST_REFRESH=Refresh window list
+CMENU_BROADCAST_SELECT_ALL=Select all
+CMENU_BROADCAST_UNSELECT_ALL=Unselect all
+CMENU_BROADCAST_INVERSE=Inverse selection
 
 DLG_PRNABORT_PRINTING=인쇄
 
@@ -360,14 +370,10 @@ MSG_CREATE_THREAD_ERROR=쓰레드를 만들 수 없습니다
 ; ttdlg.c
 DLG_ABOUT_TITLE=Tera Term에 대하여
 
-DLG_DIR_TITLE=Tera Term: 디렉토리 변경
-DLG_DIR_CURRENT=현재 위치:
-DLG_DIR_NEW=새 위치(&N):
 DLG_SELECT_DIR_TITLE=새로운 경로를 선택하세요
 
 DLG_GEN_TITLE=Tera Term: 일반설정
 DLG_GEN_PORT=기본 포트(&P):
-DLG_GEN_LANG=언어(&L):
 DLG_GEN_LANG_UI=UI 언어(&U):
 
 DLG_HOST_TITLE=Tera Term: 새 연결
@@ -377,7 +383,7 @@ DLG_HOST_TCPIPPROTOCOL=IP 버전(&N):
 DLG_HOST_SERIAL=시리얼(&S)
 DLG_HOST_SERIALPORT=포트(&R):
 
-DLG_KEYB_TITLE=Tera Term: 키보드 설정
+DLG_KEYB_TITLE=키보드
 DLG_KEYB_TRANSMIT=DEL 키 전송 방법:
 DLG_KEYB_BS=Backspace 키(&B)
 DLG_KEYB_DEL=Delete 키(&D)
@@ -403,18 +409,23 @@ DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=Tera Term: TCP/IP 설정
-DLG_TCPIP_HOSTLIST=호스트 목록(&L)
+; edit history
 DLG_TCPIP_ADD=추가(&A)
 DLG_TCPIP_UP=위(&U)
 DLG_TCPIP_REMOVE=삭제(&R)
 DLG_TCPIP_DOWN=아래(&D)
-DLG_TCPIP_HISTORY=이력(&I)
+
+; TCP/IP tab
+DLG_TCPIP_TITLE=TCP/IP
+DLG_TCPIP_HOSTLIST=호스트 목록(&L)
+DLG_TCPIP_HISTORYTITLE=이력
+DLG_TCPIP_HISTORY=Save h&istory when new connection
+DLG_TCPIP_EDITHISTORY=Edit hisotry
+DLG_TCPIP_TELNET=T&elnet
+DLG_TCPIP_PORT=포트#(&P):
 DLG_TCPIP_KEEPALIVE=연결유지(&K)
 DLG_TCPIP_KEEPALIVE_SEC=초
 DLG_TCPIP_AUTOCLOSE=자동 창닫기(&W)
-DLG_TCPIP_PORT=포트#(&P):
-DLG_TCPIP_TELNET=텔넷(&E)
 DLG_TCPIP_TERMTYPE=종류(&T):
 
 DLG_TERM_TITLE=Tera Term: 터미널 설정
@@ -641,6 +652,7 @@ DLG_AUTH_TITLE_FAILED=SSH 인증 재시도 중
 DLG_AUTH_BANNER=%s로 로그인 중
 DLG_AUTH_BANNER2=인증이 필요함.
 DLG_AUTH_BANNER2_FAILED=일증 실패. 다시 시도해주세요.
+DLG_AUTH_BANNER2_FURTHER=Further authentication required.
 DLG_AUTH_USERNAME=사용자 이름(&N):
 DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
 DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
@@ -1148,6 +1160,8 @@ DLG_CONFIG_PASS=암호
 DLG_CONFIG_MACRO=특정 매크로파일
 DLG_CONFIG_LAUNCH=실행만
 DLG_CONFIG_STARTUP=시작시 실행
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=SSH사용
 DLG_CONFIG_KEYFILE=키파일
 DLG_CONFIG_CHALLENGE=use Challenge
@@ -1163,6 +1177,17 @@ DLG_ETC_LOGFILE=로그파일
 DLG_ETC_PROMPT=Prompt
 DLG_ETC_USER=사용자 이름
 DLG_ETC_PASS=암호
+
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=레지스트리 데이터를 읽을 수 없습니다.\n
 MSG_ERROR_MAKETTL='ttpmenu.TTL'를 만들 수 없습니다.\n

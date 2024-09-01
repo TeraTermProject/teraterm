@@ -1,7 +1,8 @@
 ﻿# for SFMT
-# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=64 -P buildsfmt.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=32 -P buildsfmt.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DARCHITECTURE=32 -P buildsfmt.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=win32 -P buildsfmt.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=x64   -P buildsfmt.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm64 -P buildsfmt.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm   -P buildsfmt.cmake
 # cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=64 -P buildsfmt.cmake
 
 include(script_support.cmake)
@@ -10,10 +11,6 @@ set(EXTRACT_DIR "${CMAKE_CURRENT_LIST_DIR}/build/SFMT/src")
 set(SRC_DIR "${EXTRACT_DIR}/SFMT")
 set(INSTALL_DIR "${CMAKE_CURRENT_LIST_DIR}/SFMT_${TOOLSET}")
 set(BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/build/SFMT/build_${TOOLSET}")
-if(${ARCHITECTURE} EQUAL 64)
-  set(INSTALL_DIR "${INSTALL_DIR}_x64")
-  set(BUILD_DIR "${BUILD_DIR}_x64")
-endif()
 
 ########################################
 
@@ -69,6 +66,8 @@ if(NOT EXISTS ${SRC_DIR}/CMakeLists.txt)
     "\n"
     "if(MSVC)\n"
     "  set(CMAKE_DEBUG_POSTFIX \"d\")\n"
+    "  string(REPLACE \"/MD\" \"/MT\" CMAKE_C_FLAGS_DEBUG \${CMAKE_C_FLAGS_DEBUG})\n"
+    "  string(REPLACE \"/MD\" \"/MT\" CMAKE_C_FLAGS_RELEASE \${CMAKE_C_FLAGS_RELEASE})\n"
     "endif()\n"
     "\n"
     "add_library(\n"
@@ -104,14 +103,11 @@ file(MAKE_DIRECTORY "${BUILD_DIR}")
 if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
   # multi-configuration
   unset(GENERATE_OPTIONS)
-  if(${ARCHITECTURE} EQUAL 64)
-    list(APPEND GENERATE_OPTIONS "-A" "x64")
-  else()
-    list(APPEND GENERATE_OPTIONS "-A" "Win32")
+  if(DEFINED ARCHITECTURE)
+    list(APPEND GENERATE_OPTIONS "-A" ${ARCHITECTURE})
   endif()
   list(APPEND GENERATE_OPTIONS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}")
   list(APPEND GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/VSToolchain.cmake")
-
   cmake_generate("${CMAKE_GENERATOR}" "${SRC_DIR}" "${BUILD_DIR}" "${GENERATE_OPTIONS}")
 
   unset(BUILD_OPTIONS)

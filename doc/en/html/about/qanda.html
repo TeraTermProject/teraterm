@@ -83,23 +83,36 @@ Please read message and confirm followings:
 
   <dt>Connection refused</dt>
   <dd>
-    Connection destination does not up a service, or firewall drops the connection.<br>
-    Confirm service status and firewall status.
+    Connection destination does not up a service.<br>
+    Confirm service status.
   </dd>
+
+  <dt>Connection timed out</dt>
+  <dd>
+    No response from destination.<br>
+    Check network, host startup, firefall, etc.
+  </dd>
+
+  <dt>Network cannot be reached</dt>
+  <dd>
+    Unable to reach destination.<br>
+    Check network adapter settings of PC on which Tera Term is running, or route to destination.
+  </dd>
+
 </dl>
 
 <p>
-Please do not ask the author how to configure network properties. Please ask the network administrator.
+Please ask the network administrator how to configure network properties.
 </p>
 
 <p>
 <span class="qanda">Q.</span> Tera Term automatically closes when I logout a telnet host. How to disable closing?<br>
-<span class="qanda">A.</span> Turn "Auto window close" off in the <a href="../menu/setup-tcpip.html">[Setup] TCP/IP</a> dialog box.
+<span class="qanda">A.</span> Turn "Auto window close" off in the <a href="../menu/setup-additional-tcpip.html">[Setup] Additional settings "TCP/IP" tab</a>.
 </p>
 
 <p>
 <span class="qanda">Q.</span> I want to connect to a telnet host, but a serial port is always opened when Tera Term is started.<br>
-<span class="qanda">A.</span> Set "Default port" to "TCP/IP" in the <a href="../menu/setup-general.html">[Setup] General</a> dialog box.
+<span class="qanda">A.</span> Set "Default port" to "TCP/IP" in the <a href="../menu/setup-additional-tcpip.html">[Setup] Additional settings "TCP/IP" tab</a>.
 </p>
 
 <p>
@@ -201,12 +214,12 @@ When "Tera Special" font is used to display Box-drwing characters, the font is s
 
 <ul>
   <li>A user configures the user's shell settings to disable sending the control sequence for the window title changing.</li>
-  <li>A user turns off the "Accept Window Title Change Request" on the General tab of the <a href="../menu/setup-additional.html">[Setup]Additional Setting</a> dialog.</li>
+  <li>A user turns off the "Accept Window Title Change Request" on the General tab of the <a href="../menu/setup-additional-general.html">[Setup]Additional Setting "General" tab</a>.</li>
 </ul>
 
 <p id="window_resize_clear">
   <span class="qanda">Q.</span> Window content is cleared when window is resized.<br>
-  <span class="qanda">A.</span> To prevent this behavior, turn off <a href="../menu/setup-additional.html#ClearOnResize">[Setup]-[Additional settings]-[General]-[Clear display when window resized]</a>.
+  <span class="qanda">A.</span> To prevent this behavior, turn off <a href="../menu/setup-additional-general.html#ClearOnResize">[Setup]-[Additional settings]-[General]-[Clear display when window resized]</a>.
 </p>
 
 <p id="logfile_garbled">

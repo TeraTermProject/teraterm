@@ -38,6 +38,7 @@
 #include <assert.h>
 
 #include "tttypes.h"
+#include "tttypes_charset.h"
 #include "ttwinman.h"
 #include "teraprn.h"
 #include "vtdisp.h"
@@ -5168,7 +5169,7 @@ void BuffSaveScreen(void)
 	if (SaveBuff == NULL) {
 		ScrSize = NumOfColumns * NumOfLines;	// 1画面分のバッファの保存数
 		// 全画面分のバイト数
-		SaveBuff = calloc(sizeof(buff_char_t), ScrSize);
+		SaveBuff = calloc(ScrSize, sizeof(buff_char_t));
 		if (SaveBuff != NULL) {
 			CodeDestW = (buff_char_t *)SaveBuff;
 

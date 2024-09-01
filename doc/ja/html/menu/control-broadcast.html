@@ -21,7 +21,7 @@
 
       <dt>Enter key</dt>
       <dd>
-        上記コントロールで入力したコマンドを送信するとき、改行を付加するか選択します。改行として送信する改行コードを "CRLF", "CR", "LF" から選択します。
+        コマンド入力コントロールで入力したコマンドを送信するとき、改行を付加するか選択します。改行として送信する改行コードを "CRLF", "CR", "LF" から選択します。
       </dd>
 
       <dt>Submit</dt>
@@ -36,13 +36,16 @@
 
       <dt>Send to this process only</dt>
       <dd>
-        この設定を有効にすると、この "Broadcast command" ダイアログを出現させた Tera Term ウィンドウにのみコマンドを送信します。
+        この設定を有効にすると、ウィンドウリストでの選択に関わらず、この "Broadcast command" ダイアログを出現させた Tera Term ウィンドウにのみコマンドを送信します。
       </dd>
 
       <dt>ウィンドウリスト</dt>
       <dd>
-        コマンドを送信するウィンドウを選択します。
+        Tera Term のウィンドウ一覧です。
+        コマンドを送信するウィンドウを左クリックで選択します。
+        右クリックのコンテキストメニューから、選択したウィンドウに対する操作や一覧の更新ができます。
       </dd>
+
     </dl>
 
 
@@ -51,13 +54,20 @@
     <dl>
       <dt>コマンド入力コントロール</dt>
       <dd>
-        このコントロールにフォーカスした状態で押したキーは、下記ウィンドウリストで選択されたウィンドウに送信されます。"<a href="./setup-additional.html">AcceptBroadcast</a>" が無効なウィンドウもコマンドを受信します。
+        このコントロールにフォーカスした状態で押したキーは、下記ウィンドウリストで選択したウィンドウに送信されます。"<a href="./setup-additional.html">AcceptBroadcast</a>" が無効なウィンドウもコマンドを受信します。
+        ただし、Alt-V と Alt-R は、この "Broadcast command" ダイアログを出現させたウィンドウでペーストとして動作します。
+        ウィンドウリストで選択したウィンドウにクリップボードの内容を送信するには、Shift-INS を使用してください。
+        このコントロール上でマウス右クリック・中クリックすることでも、クリップボードの内容を選択したウィンドウに送信できます。
+        クリップボードの内容を送信する時には、"<a href="../menu/setup-additional-copy-and-paste.html#DisablePasteMouseRButton">DisablePasteMouseRButton</a>" や "<a href="../setup/teraterm-misc.html#DisablePasteMouseMButton">DisablePasteMouseMButton</a>"、"<a href="../menu/setup-additional-copy-and-paste.html#ConfirmChangePaste">ConfirmChangePaste</a>" などの設定に従います。
       </dd>
 
       <dt>ウィンドウリスト</dt>
       <dd>
-        コマンドを送信するウィンドウを選択します。
+        Tera Term のウィンドウ一覧です。
+        コマンドを送信するウィンドウを左クリックで選択します。
+        右クリックのコンテキストメニューから、選択したウィンドウに対する操作や一覧の更新ができます。
       </dd>
+
     </dl>
 
   </body>

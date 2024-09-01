@@ -88,6 +88,10 @@
 #define CmdLogAutoClose     'X'
 #define CmdGetModemStatus   'Y'
 #define CmdSetFlowCtrl      'Z'
+#define CmdSendUTF8String   'a'
+#define CmdSendBinary       'b'
+#define CmdSendCompatString 'c'	// ]—ˆ‚Ì•¶š‘—M‚ÆŒİŠ·, String‚©Binary‚©”»’è•K—v
+#define CmdGetTTPos         'd'
 
 #define LogOptBinary        1
 #define LogOptAppend        2

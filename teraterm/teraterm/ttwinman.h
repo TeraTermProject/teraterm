@@ -28,6 +28,9 @@
  */
 
 /* TERATERM.EXE, variables, flags related to VT win and TEK win */
+
+#include "tttypes.h"	// for IdTalk
+
 #ifdef __cplusplus
 extern "C" {
 #endif

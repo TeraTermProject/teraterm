@@ -40,6 +40,7 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "tttypes_key.h"
+#include "tttypes_charset.h"
 
 #include "ttcommon.h"
 #include "ttwinman.h"
@@ -111,6 +112,8 @@
 #include "scp.h"
 #include "ttcommdlg.h"
 #include "logdlg.h"
+#include "makeoutputstring.h"
+#include "ttlib_types.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -146,6 +149,8 @@ typedef struct {
 static vtwin_work_t vtwin_work;
 
 extern "C" PrintFile *PrintFile_;
+
+static CVTWindow *pVTWin;
 
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
@@ -437,6 +442,9 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		::SetMenu(HVTWin,MainMenu);
 	}
 
+	cv.StateEcho = MakeOutputStringCreate();
+	cv.StateSend = MakeOutputStringCreate();
+
 	/* Reset Terminal */
 	ResetTerminal();
 
@@ -453,6 +461,20 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	ChangeTitle();
 	/* Enable drag-drop */
 	::DragAcceptFiles(HVTWin,TRUE);
+
+	DropInit();
+	DropLists = NULL;
+	DropListCount = 0;
+
+#if UNICODE_DEBUG
+	CtrlKeyState = 0;
+#endif
+
+	// TipWin
+	if (ts.HideWindow==0) {
+		TipWin = new CTipWin(hInstance);
+		TipWin->Create(HVTWin);
+	}
 
 	if (ts.HideWindow>0) {
 		if (strlen(TopicName)>0) {
@@ -471,19 +493,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	ShowWindow(CmdShow);
 	ChangeCaret();
 
-	DropInit();
-	DropLists = NULL;
-	DropListCount = 0;
-
-#if UNICODE_DEBUG
-	CtrlKeyState = 0;
-#endif
-
-	// TipWin
-	if (ts.HideWindow==0) {
-		TipWin = new CTipWin(hInstance);
-		TipWin->Create(HVTWin);
-	}
+	pVTWin = this;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -756,8 +766,6 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		{ ID_SETUP_TERMINAL, "MENU_SETUP_TERMINAL" },
 		{ ID_SETUP_WINDOW, "MENU_SETUP_WINDOW" },
 		{ ID_SETUP_FONT, "MENU_SETUP_FONT" },
-		{ ID_SETUP_DLG_FONT, "MENU_SETUP_DIALOG_FONT" },
-		{ 2, "MENU_SETUP_FONT_SUBMENU" },
 		{ ID_SETUP_KEYBOARD, "MENU_SETUP_KEYBOARD" },
 		{ ID_SETUP_SERIALPORT, "MENU_SETUP_SERIALPORT" },
 		{ ID_SETUP_TCPIP, "MENU_SETUP_TCPIP" },
@@ -1447,6 +1455,11 @@ LRESULT CVTWindow::OnNonConfirmClose(WPARAM wParam, LPARAM lParam)
 
 void CVTWindow::OnDestroy()
 {
+	MakeOutputStringDestroy((OutputCharState *)(cv.StateEcho));
+	cv.StateEcho = NULL;
+	MakeOutputStringDestroy((OutputCharState *)(cv.StateSend));
+	cv.StateSend = NULL;
+
 	// remove this window from the window list
 	UnregWin(HVTWin);
 
@@ -1568,7 +1581,7 @@ typedef struct DropData_tag {
  */
 void CVTWindow::DropInit()
 {
-	DropData_t *data =(DropData_t *)calloc(sizeof(*data), 1);
+	DropData_t *data =(DropData_t *)calloc(1, sizeof(*data));
 	data->DefaultDropType = DROP_TYPE_CANCEL;
 	data->DefaultDropTypePaste = DROP_TYPE_PASTE_ESCAPE;
 	data->DefaultShowDialog = ts.ConfirmFileDragAndDrop ? true : false;
@@ -3794,29 +3807,19 @@ void CVTWindow::OnCygwinConnection()
 //
 void CVTWindow::OnTTMenuLaunch()
 {
-	const char *exename = "ttpmenu.exe";
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
+	static const wchar_t *exename = L"ttpmenu.exe";
 
-	memset(&si, 0, sizeof(si));
-	GetStartupInfo(&si);
-	memset(&pi, 0, sizeof(pi));
-
-	if (CreateProcess(exename, NULL, NULL, NULL, FALSE, 0,
-	                  NULL, NULL, &si, &pi) == 0) {
+	DWORD e = TTCreateProcess(exename, NULL, NULL);
+	if (e != NO_ERROR) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
 			"MSG_EXEC_TTMENU_ERROR", L"Can't execute TeraTerm Menu. (%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, GetLastError());
-	} else {
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, e);
 	}
 }
-
 
 void CVTWindow::OnFileLog()
 {
@@ -3872,31 +3875,16 @@ void CVTWindow::OnCommentToLog()
 	FLogAddCommentDlg(m_hInst, HVTWin);
 }
 
-// ログの閲覧 (2005.1.29 yutaka)
+// ログの閲覧
 void CVTWindow::OnViewLog()
 {
-	STARTUPINFOW si;
-	PROCESS_INFORMATION pi;
-
 	if(!FLogIsOpend()) {
 		return;
 	}
 
 	const wchar_t *filename = FLogGetFilename();
-
-	memset(&si, 0, sizeof(si));
-	GetStartupInfoW(&si);
-	memset(&pi, 0, sizeof(pi));
-
-	wchar_t *command;
-	wchar_t *ViewlogEditor = ToWcharA(ts.ViewlogEditor);
-	aswprintf(&command, L"\"%s\" \"%s\"", ViewlogEditor, filename);
-	free(ViewlogEditor);
-
-	BOOL r = CreateProcessW(NULL, command, NULL, NULL, FALSE, 0,
-							NULL, NULL, &si, &pi);
-	free(command);
-	if (r == 0) {
+	DWORD e = TTCreateProcess(ts.ViewlogEditorW, ts.ViewlogEditorArg, filename);
+	if (e != NO_ERROR) {
 		DWORD error = GetLastError();
 		static const TTMessageBoxInfoW mbinfo = {
 			"Tera Term",
@@ -3905,9 +3893,6 @@ void CVTWindow::OnViewLog()
 			MB_OK | MB_ICONWARNING
 		};
 		TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, error);
-	} else {
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
 	}
 }
 
@@ -3936,52 +3921,44 @@ static wchar_t *_get_lang_msg(const char *key, const wchar_t *def, const wchar_t
 	return uimsg;
 }
 
-// ログの再生 (2006.12.13 yutaka)
+// ログの再生
 void CVTWindow::OnReplayLog()
 {
-	wchar_t szFile[MAX_PATH];
-	const wchar_t *exec = L"ttermpro";
+	wchar_t *szFile;
+	static const wchar_t *exec = L"ttermpro.exe";
 
 	// バイナリモードで採取したログファイルを選択する
 	wchar_t *filter = _get_lang_msg("FILEDLG_OPEN_LOGFILE_FILTER", L"all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW);
 	wchar_t *title = _get_lang_msg("FILEDLG_OPEN_LOGFILE_TITLE", L"Select replay log file with binary mode", ts.UILanguageFileW);
-	OPENFILENAMEW ofn = {};
-	szFile[0] = 0;
-	ofn.lStructSize = get_OPENFILENAME_SIZEW();
+	TTOPENFILENAMEW ofn = {};
 	ofn.hwndOwner = HVTWin;
 	ofn.lpstrFilter = filter;
-	ofn.lpstrFile = szFile;
-	ofn.nMaxFile = _countof(szFile);
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	ofn.lpstrDefExt = L"log";
 	ofn.lpstrTitle = title;
-	BOOL r = GetOpenFileNameW(&ofn);
+	BOOL r = TTGetOpenFileNameW(&ofn, &szFile);
 	free(filter);
 	free(title);
 	if (r == FALSE)
 		return;
 
 	// "/R"オプション付きでTera Termを起動する（ログが再生される）
+	wchar_t *exe_dir = GetExeDirW(NULL);
 	wchar_t *Command;
-	aswprintf(&Command, L"%s /R=\"%s\"", exec, szFile);
+	aswprintf(&Command, L"\"%s\\%s\" /R=\"%s\"", exe_dir, exec, szFile);
+	free(exe_dir);
+	free(szFile);
 
-	STARTUPINFOW si = {};
-	PROCESS_INFORMATION pi = {};
-	GetStartupInfoW(&si);
-
-	r = CreateProcessW(NULL, Command, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+	DWORD e = TTWinExec(Command);
 	free(Command);
-	if (r == FALSE) {
+	if (e != NO_ERROR) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
 			"MSG_EXEC_TT_ERROR", L"Can't execute Tera Term. (%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, GetLastError());
-	} else {
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
+		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, e);
 	}
 }
 
@@ -4093,13 +4070,7 @@ void CVTWindow::OnFileQVSend()
 
 void CVTWindow::OnFileChangeDir()
 {
-	HelpId = HlpFileChangeDir;
-	if (! LoadTTDLG()) {
-		return;
-	}
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	(*ChangeDirectory)(HVTWin, &ts);
+	OpenExternalSetup(CAddSettingPropSheetDlg::DefaultPage);
 }
 
 void CVTWindow::OnFilePrint()
@@ -4235,16 +4206,14 @@ void CVTWindow::OnEditCancelSelection()
 	ChangeSelectRegion();
 }
 
-void CVTWindow::OpenExternalSetup(int page)
+void CVTWindow::OpenExternalSetup(CAddSettingPropSheetDlg::Page page)
 {
-	CAddSettingPropSheetDlg::Page additional_page =
-		page == 0 ? CAddSettingPropSheetDlg::DefaultPage : CAddSettingPropSheetDlg::FontPage;
 	BOOL old_use_unicode_api = UnicodeDebugParam.UseUnicodeApi;
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
 	CAddSettingPropSheetDlg CAddSetting(m_hInst, HVTWin);
 	CAddSetting.SetTreeViewMode(ts.ExperimentalTreeProprtySheetEnable);
-	CAddSetting.SetStartPage(additional_page);
+	CAddSetting.SetStartPage(page);
 	INT_PTR ret = CAddSetting.DoModal();
 	if (ret == IDOK) {
 		ChangeWin();
@@ -4255,7 +4224,16 @@ void CVTWindow::OpenExternalSetup(int page)
 
 		// コーディングタブで設定が変化したときコールする必要がある
 		SetupTerm();
+		TelUpdateKeepAliveInterval();
 	}
+}
+
+/**
+ *	クラス外からその他の設定を開くために追加
+ */
+void OpenExternalSetupOutside(CAddSettingPropSheetDlgPage page)
+{
+	pVTWin->OpenExternalSetup((CAddSettingPropSheetDlg::Page)page);
 }
 
 // Additional settings dialog
@@ -4265,33 +4243,14 @@ void CVTWindow::OpenExternalSetup(int page)
 // (2008.5.12 maya) changed to PropertySheet
 void CVTWindow::OnExternalSetup()
 {
-	OpenExternalSetup(0);
+	OpenExternalSetup(CAddSettingPropSheetDlg::DefaultPage);
 }
 
 void CVTWindow::OnSetupTerminal()
 {
 	BOOL Ok;
 
-	switch (ts.Language) {
-	case IdJapanese:
-		HelpId = HlpSetupTerminalJa;
-		break;
-	case IdEnglish:
-		HelpId = HlpSetupTerminalEn;
-		break;
-	case IdKorean:
-		HelpId = HlpSetupTerminalKo;
-		break;
-	case IdRussian:
-		HelpId = HlpSetupTerminalRu;
-		break;
-	case IdUtf8:
-		HelpId = HlpSetupTerminalUtf8;
-		break;
-	default:
-		HelpId = HlpSetupTerminal;
-		break;
-	}
+	HelpId = HlpSetupTerminal;
 	if (! LoadTTDLG()) {
 		return;
 	}
@@ -4364,15 +4323,7 @@ void CVTWindow::OnSetupWindow()
 
 void CVTWindow::OnSetupFont()
 {
-	if (ts.ExperimentalDontUseFontDialog) {
-		OpenExternalSetup(CAddSettingPropSheetDlg::FontPage);
-	}
-	else {
-		HelpId = HlpSetupFont;
-		DispSetupFontDlg(m_hWnd);
-		// ANSI表示用のコードページを設定する
-		BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
-	}
+	OpenExternalSetup(CAddSettingPropSheetDlg::FontPage);
 }
 
 static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
@@ -4393,60 +4344,6 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 	return FALSE;
 }
 
-void CVTWindow::OnSetupDlgFont()
-{
-	if (ts.ExperimentalDontUseFontDialog) {
-		OpenExternalSetup(CAddSettingPropSheetDlg::FontPage);
-	}
-	else {
-		LOGFONTW LogFont;
-		CHOOSEFONTW cf;
-		BOOL result;
-
-		// LOGFONT準備
-		memset(&LogFont, 0, sizeof(LogFont));
-		if (ts.DialogFontNameW[0] == 0) {
-			// フォントが設定されていなかったらOS設定を使用する
-			GetMessageboxFontW(&LogFont);
-		}
-		else {
-			wcsncpy_s(LogFont.lfFaceName, _countof(LogFont.lfFaceName), ts.DialogFontNameW,  _TRUNCATE);
-			LogFont.lfHeight = -GetFontPixelFromPoint(m_hWnd, ts.DialogFontPoint);
-			LogFont.lfCharSet = ts.DialogFontCharSet;
-			LogFont.lfWeight = FW_NORMAL;
-			LogFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
-			LogFont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
-			LogFont.lfQuality = DEFAULT_QUALITY;
-			LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
-		}
-
-		// ダイアログ表示
-		memset(&cf, 0, sizeof(cf));
-		cf.lStructSize = sizeof(cf);
-		cf.hwndOwner = HVTWin;
-		cf.lpLogFont = &LogFont;
-		cf.Flags =
-			CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
-			CF_SHOWHELP | CF_NOVERTFONTS |
-			CF_ENABLEHOOK;
-		if (IsWindows7OrLater() && ts.ListHiddenFonts) {
-			cf.Flags |= CF_INACTIVEFONTS;
-		}
-		cf.lpfnHook = TFontHook;
-		cf.nFontType = REGULAR_FONTTYPE;
-		cf.hInstance = m_hInst;
-		HelpId = HlpSetupFont;
-		result = ChooseFontW(&cf);
-
-		if (result) {
-			// 設定
-			wcsncpy_s(ts.DialogFontNameW, _countof(ts.DialogFontNameW), LogFont.lfFaceName, _TRUNCATE);
-			ts.DialogFontPoint = cf.iPointSize / 10;
-			ts.DialogFontCharSet = LogFont.lfCharSet;
-		}
-	}
-}
-
 void CVTWindow::OnSetupKeyboard()
 {
 	BOOL Ok;
@@ -4461,8 +4358,7 @@ void CVTWindow::OnSetupKeyboard()
 
 	if (Ok) {
 //		ResetKeypadMode(TRUE);
-		if ((ts.Language==IdJapanese) || (ts.Language==IdKorean) || (ts.Language==IdUtf8)) //HKS
-			ResetIME();
+		ResetIME();
 	}
 }
 
@@ -4528,15 +4424,7 @@ void CVTWindow::OnSetupSerialPort()
 
 void CVTWindow::OnSetupTCPIP()
 {
-	HelpId = HlpSetupTCPIP;
-	if (! LoadTTDLG()) {
-		return;
-	}
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	if ((*SetupTCPIP)(HVTWin, &ts)) {
-		TelUpdateKeepAliveInterval();
-	}
+	OpenExternalSetup(CAddSettingPropSheetDlg::TcpIpPage);
 }
 
 void CVTWindow::OnSetupGeneral()
@@ -5325,10 +5213,13 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_EDIT_SELECTALL: OnEditSelectAllBuffer(); break;
 		case ID_EDIT_SELECTSCREEN: OnEditSelectScreenBuffer(); break;
 		case ID_SETUP_ADDITIONALSETTINGS: OnExternalSetup(); break;
+		case ID_SETUP_ADDITIONALSETTINGS_CODING: {
+			OpenExternalSetup(CAddSettingPropSheetDlg::CodingPage);
+			break;
+		}
 		case ID_SETUP_TERMINAL: OnSetupTerminal(); break;
 		case ID_SETUP_WINDOW: OnSetupWindow(); break;
 		case ID_SETUP_FONT: OnSetupFont(); break;
-		case ID_SETUP_DLG_FONT: OnSetupDlgFont(); break;
 		case ID_SETUP_KEYBOARD: OnSetupKeyboard(); break;
 		case ID_SETUP_SERIALPORT: OnSetupSerialPort(); break;
 		case ID_SETUP_TCPIP: OnSetupTCPIP(); break;

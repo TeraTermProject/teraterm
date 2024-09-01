@@ -31,7 +31,6 @@
 #pragma once
 
 #include "teraterm.h"
-#include "tttypes_charset.h"
 
 #define IdBreakTimer         1
 #define IdDelayTimer         2
@@ -159,7 +158,7 @@ enum LogTimestampType {
 // menu flags (used in ts.MenuFlag)
 #define MF_NOSHOWMENU   1
 #define MF_NOPOPUP      2
-#define MF_NOLANGUAGE   4
+//#define MF_NOLANGUAGE   4
 #define MF_SHOWWINMENU  8
 
 // Terminal flags (used in ts.TermFlag)
@@ -459,7 +458,7 @@ struct tttset {
 	char reserve_Locale[80];
 	int reserve_CodePage;
 	int DuplicateSession;
-	char ViewlogEditor[MAX_PATH];
+	char reserve_ViewlogEditor[MAX_PATH];
 	WORD LogTypePlainText;
 	WORD LogTimestamp;
 	char reserve_LogDefaultName[80];		// 廃止,LogDefaultNameW へ移行
@@ -471,7 +470,7 @@ struct tttset {
 	int EnableClickableUrl;
 	eterm_lookfeel_t EtermLookfeel;
 	WORD UseNormalBGColor;
-	char UILanguageFile[MAX_PATH];			// 絶対パス
+	char reserve_UILanguageFile[MAX_PATH];
 	char reserve_UIMsg[1024/*MAX_UIMSG*/];
 	WORD BroadcastCommandHistory;
 	WORD AcceptBroadcast;		// 337: 2007/03/20
@@ -484,7 +483,7 @@ struct tttset {
 	WORD DisableAppCursor;
 	WORD ClearComBuffOnOpen;
 	WORD Send8BitCtrl;
-	char UILanguageFile_ini[MAX_PATH];		// 相対パス,iniファイルの中身
+	char reserve_UILanguageFile_ini[MAX_PATH];
 	WORD SelectOnlyByLButton;
 	WORD TelAutoDetect;
 	char XModemRcvCommand[MAX_PATH];
@@ -598,10 +597,10 @@ struct tttset {
 	wchar_t *LogFNW;
 	wchar_t *MacroFNW;
 	wchar_t *UILanguageFileW;			// 絶対パス
-	wchar_t *UILanguageFileW_ini;		// 相対パス,iniファイルの中身
+	wchar_t *reserve_UILanguageFileW_ini;
 	wchar_t *ExeDirW;					// ttermpro.exe のあるフォルダ
-	wchar_t *LogDirW;					// logやダンプを置くフォルダ
-	wchar_t *FileDirW;					// ダウンロードパス("%APPDATA%" 等が含まれる,使用前に環境変数を展開すること)
+	wchar_t *LogDirW;					// プログラムの動作のlogやダンプを置くフォルダ、GetLogDirW() と同一。端末のログは GetTermLogDir() で取得。
+	wchar_t *FileDirW;					// ダウンロードパス("%APPDATA%" 等が含まれる,使用前に環境変数を展開する, GetDownloadDir()を利用すると便利)
 	wchar_t *LogDefaultPathW;			// ログフォルダ([file]/[log]メニューのログ)
 	HINSTANCE PluginVTIconInstance;
 	WORD PluginVTIconID;
@@ -613,10 +612,13 @@ struct tttset {
 	BOOL Dec2Unicode;
 	wchar_t *DelimListW;
 	WORD IniAutoBackup;
+	WORD BracketedSupport;
+	WORD BracketedControlOnly;
+	wchar_t *ViewlogEditorW;
+	wchar_t *ViewlogEditorArg;
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;
-	BYTE ExperimentalDontUseFontDialog;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -804,21 +806,21 @@ typedef struct {
 
 	BOOL reserve_SendKanjiFlag;
 	BOOL reserve_EchoKanjiFlag;
-	int SendCode;
-	int EchoCode;
+	int reserve_SendCode;
+	int reserve_EchoCode;
 	BYTE reserve_SendKanjiFirst;
 	BYTE reserve_EchoKanjiFirst;
 
 	/* from VTSet */
-	WORD Language;
+	WORD reserve_Language;
 	/* from TermSet */
 	WORD CRSend;
-	WORD KanjiCodeEcho;
-	WORD JIS7KatakanaEcho;
-	WORD KanjiCodeSend;
-	WORD JIS7KatakanaSend;
-	WORD KanjiIn;
-	WORD KanjiOut;
+	WORD KanjiCodeEcho; 	// 削除
+	WORD reserve_JIS7KatakanaEcho;
+	WORD KanjiCodeSend;		// 削除
+	WORD reserve_JIS7KatakanaSend;
+	WORD reserve_KanjiIn;
+	WORD reserve_KanjiOut;
 	WORD reserve_RussHost;
 	WORD reserve_RussClient;
 	/* from PortSet */
@@ -877,6 +879,9 @@ typedef struct {
 	TTTSet *ts;
 
 	wchar_t *TitleRemoteW;
+
+	void *StateSend;
+	void *StateEcho;
 } TComVar;
 typedef TComVar *PComVar;
 

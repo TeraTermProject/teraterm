@@ -442,7 +442,7 @@ typedef struct PrintFileTag {
 /* printer emulation routines */
 PrintFile *OpenPrnFile(void)
 {
-	PrintFile *p = (PrintFile *)calloc(sizeof(PrintFile),1 );
+	PrintFile *p = (PrintFile *)calloc(1, sizeof(PrintFile));
 	if (p == NULL) {
 		return NULL;
 	}

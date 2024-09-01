@@ -40,11 +40,13 @@
 #include "ttwinman.h"
 #include "ttlib.h"
 #include "codeconv.h"
-
-#include "clipboar.h"
 #include "fileread.h"
 #include "sendmem.h"
 #include "clipboarddlg.h"
+#include "tttypes_charset.h"
+
+#include "clipboar.h"
+
 
 static const wchar_t BracketStartW[] = L"\033[200~";
 static const wchar_t BracketEndW[] = L"\033[201~";
@@ -217,12 +219,12 @@ static void CBSendStart(wchar_t *str_w)
 	SendMemStart(sm);
 }
 
-void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
+void CBPreparePaste(HWND HWin, BOOL shouldBeReady, BOOL AddCR, BOOL Bracketed, wchar_t **text)
 {
 	wchar_t *str_w;
 	wchar_t *str_w_edited;
 
-	if (! cv.Ready) {
+	if (shouldBeReady && ! cv.Ready) {
 		return;
 	}
 	if (TalkStatus!=IdTalkKeyb) {
@@ -257,6 +259,24 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		str_w = str_w_edited;
 	}
 
+	// ブラケットするかどうか
+	BOOL AddBracket = FALSE;
+	if (ts.BracketedSupport) {
+		if (!ts.BracketedControlOnly) {
+			AddBracket = TRUE;
+		}
+		else {
+			wchar_t *c = str_w;
+			while (*c) {
+				if (iswcntrl(*c)) {
+					AddBracket = TRUE;
+					break;
+				}
+				c++;
+			}
+		}
+	}
+
 	if (AddCR) {
 		size_t str_len = wcslen(str_w) + 2;
 		str_w = realloc(str_w, sizeof(wchar_t) * str_len);
@@ -271,7 +291,7 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		str_w = dest;
 	}
 
-	if (Bracketed) {
+	if (Bracketed && AddBracket) {
 		const size_t BracketStartLenW = _countof(BracketStartW) - 1;
 		const size_t BracketEndLenW = _countof(BracketEndW) - 1;
 		size_t str_len = wcslen(str_w);
@@ -289,7 +309,16 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		str_w = dest;
 	}
 
-	CBSendStart(str_w);
+	*text = str_w;
+}
+
+void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
+{
+	wchar_t *text = NULL;
+	CBPreparePaste(HWin, TRUE, AddCR, Bracketed, &text);
+	if (text != NULL) {
+		CBSendStart(text);
+	}
 }
 
 void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)

@@ -43,8 +43,6 @@ add_executable(
   sendmem.h
   sizetip.c
   sizetip.h
-  teklib.c
-  teklib.h
   tekwin.cpp
   tekwin.h
   telnet.c
@@ -59,8 +57,6 @@ add_executable(
   tt-version.rc
   ttdde.c
   ttdde.h
-  ttdebug.cpp
-  ttdebug.h
   ttdialog.c
   ttdialog.h
   ttermpro.rc
@@ -76,8 +72,6 @@ add_executable(
   ttwinman.h
   ttwsk.c
   ttwsk.h
-  unicode.cpp
-  unicode.h
   unicode_test.h
   vtdisp.c
   vtdisp.h
@@ -90,6 +84,7 @@ add_executable(
 )
 
 set(SRC_DIALOG
+  ../common/tt_res.h
   addsetting.cpp
   addsetting.h
   clipboarddlg.cpp
@@ -114,10 +109,18 @@ set(SRC_DIALOG
   ftdlg_lite.h
   general_pp.cpp
   general_pp.h
+  keyboard_pp.c
+  keyboard_pp.h
+  log_pp.cpp
+  log_pp.h
   logdlg.cpp
   logdlg.h
+  mouse_pp.cpp
+  mouse_pp.h
+  mouse_pp.rc
   protodlg.cpp
   protodlg.h
+  resource.h
   sendfiledlg.cpp
   sendfiledlg.h
   setupdirdlg.cpp
@@ -128,6 +131,9 @@ set(SRC_DIALOG
   themedlg.h
   themedlg.rc
   themedlg_res.h
+  #
+  tcpip_pp.h
+  tcpip_pp.cpp
 )
 
 target_sources(
@@ -169,7 +175,6 @@ target_sources(
   ../common/ttplugin.h
   ../common/tt-version.h
   ../common/teraterm.h
-  ../common/ttlib.c
   ../common/ttlib.h
   ../common/dlglib.h
   ../common/codemap.h
@@ -179,6 +184,15 @@ target_sources(
   ../common/dllutil.h
   ../common/codeconv.h
   ../common/tipwin.h
+)
+
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
+  ../../teraterm/common/edithistory.cpp
+  ../../teraterm/common/edithistory.h
+  ../../teraterm/common/edithistory.rc
+  ../../teraterm/common/edithistory_res.h
 )
 
 target_sources(
@@ -361,11 +375,6 @@ if(MINGW)
 endif()
 
 if(MSVC AND ENABLE_DEBUG_INFO)
-  target_compile_options(
-    ${PACKAGE_NAME}
-    PRIVATE
-    $<$<CONFIG:Release>:/Zi>
-    )
   if(${CMAKE_VERSION} VERSION_GREATER "3.13")
     target_link_options(
       ${PACKAGE_NAME}
@@ -422,7 +431,6 @@ target_link_libraries(
   comctl32
   comdlg32
   gdi32
-  imagehlp
   kernel32
   ole32
   oleaut32

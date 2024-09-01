@@ -162,7 +162,7 @@ BOOL LoadWinsock()
 
     PWSAAsyncGetHostByName =
       (TWSAAsyncGetHostByName)GetProcAddress(HWinsock, MAKEINTRESOURCE(IdWSAASYNCGETHOSTBYNAME));
-    if (PWSAAsyncSelect==NULL) Err = TRUE;
+    if (PWSAAsyncGetHostByName==NULL) Err = TRUE;
 
     PWSACancelAsyncRequest = (TWSACancelAsyncRequest)GetProcAddress(HWinsock, MAKEINTRESOURCE(IdWSACANCELASYNCREQUEST));
     if (PWSACancelAsyncRequest==NULL) Err = TRUE;

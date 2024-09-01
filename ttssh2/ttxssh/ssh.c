@@ -44,8 +44,6 @@
 #include <openssl/dsa.h>
 #include <openssl/md5.h>
 
-#include <limits.h>
-#include <malloc.h>
 #include <string.h>
 #if !defined(_CRTDBG_MAP_ALLOC)
 #define _CRTDBG_MAP_ALLOC
@@ -53,21 +51,16 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <process.h>
-#include <time.h>
 #include <commctrl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/utime.h>
 #include <assert.h>
 
-#include <direct.h>
 #include <io.h>
 #ifdef _DEBUG	// KEX logging
 #include <fcntl.h>
 #endif
 
 
-#include "buffer.h"
 #include "ssh.h"
 #include "crypt.h"
 #include "fwd.h"
@@ -75,6 +68,9 @@
 #include "kex.h"
 #include "dlglib.h"
 #include "win32helper.h"
+#include "ttlib_types.h"
+#include "makeoutputstring.h"
+#include "win32helper_u8.h"
 
 #ifndef MAX
 # define MAX(a,b) (((a)>(b))?(a):(b))
@@ -4276,7 +4272,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			wchar_t *err_str;
 			hFormatMessageW(error, &err_str);
 			wchar_t *fname = ToWcharU8(sendfile);
-			TTMessageBoxW(NULL, &info, pvar->ts->UILanguageFileW, err_str, fname);
+			TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, err_str, fname);
 			free(fname);
 			free(err_str);
 			goto error;
@@ -4308,7 +4304,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			if (fn && fn[1] == '\0')
 				goto error;
 
-			hExpandEnvironmentStringsW(pvar->ts->FileDirW, &FileDirExpanded);
+			FileDirExpanded = GetDownloadDir(pvar->ts);
 			FileDirExpandedU8 = ToU8W(FileDirExpanded);
 			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s\\%s", FileDirExpandedU8, fn ? fn : sendfile);
 			free(FileDirExpanded);
@@ -4329,7 +4325,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 					MB_OK | MB_ICONERROR
 				};
 				wchar_t *fname = ToWcharU8(c->scp.localfilefull);
-				TTMessageBoxW(NULL, &info, pvar->ts->UILanguageFileW, fname);
+				TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, fname);
 				free(fname);
 				goto error;
 			}
@@ -4340,7 +4336,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 				MB_YESNO | MB_ICONQUESTION
 			};
 			wchar_t *fname = ToWcharU8(c->scp.localfilefull);
-			dlgresult = TTMessageBoxW(NULL, &info, pvar->ts->UILanguageFileW, fname);
+			dlgresult = TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, fname);
 			free(fname);
 			if (dlgresult == IDNO) {
 				goto error;
@@ -4359,7 +4355,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			wchar_t *err_str;
 			hFormatMessageW(error, &err_str);
 			wchar_t *fname = ToWcharU8(c->scp.localfilefull);
-			TTMessageBoxW(NULL, &info, pvar->ts->UILanguageFileW, err_str, fname);
+			TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, err_str, fname);
 			free(fname);
 			free(err_str);
 			goto error;
@@ -4390,7 +4386,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 		buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
-		memcpy(outmsg, buffer_ptr (msg), len);
+		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
 		buffer_free(msg);
 	}
@@ -4464,7 +4460,7 @@ int SSH_sftp_transaction(PTInstVar pvar)
 	buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
-	memcpy(outmsg, buffer_ptr (msg), len);
+	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
 	buffer_free(msg);
 
@@ -6609,13 +6605,20 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 	outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_REQUEST, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
-	buffer_free(msg);
-
 	{
 		logprintf(LOG_LEVEL_VERBOSE,
-			"SSH2_MSG_USERAUTH_REQUEST was sent do_SSH2_authrequest(). (method %d)",
-			pvar->auth_state.cur_cred.method);
+				  "SSH2_MSG_USERAUTH_REQUEST was sent %s(). (method %d)",
+				  __FUNCTION__,
+				  pvar->auth_state.cur_cred.method);
+#if defined(SSH2_DEBUG)
+		logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+						  buffer_ptr(msg), len,
+						  "send %s:%d %s() len=%d",
+						  __FILE__, __LINE__,
+						  __FUNCTION__, len);
+#endif
 	}
+	buffer_free(msg);
 
 	return TRUE;
 
@@ -6788,6 +6791,16 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_SUCCESS was received.");
 
+	{
+		int len = pvar->ssh_state.payloadlen;
+		char *data = pvar->ssh_state.payload;
+		logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+						  data, len,
+						  "receive %s:%d %s() len=%d",
+						  __FILE__, __LINE__,
+						  __FUNCTION__, len);
+	}
+
 	// パスワードの破棄 (2006.8.22 yutaka)
 	if (pvar->settings.remember_password == 0) {
 		destroy_malloced_string(&pvar->auth_state.cur_cred.password);
@@ -6795,6 +6808,7 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 
 	// 認証OK
 	pvar->userauth_success = 1;
+	pvar->auth_state.partial_success = 0;
 
 	// ディスパッチルーチンの再設定
 	do_SSH2_dispatch_setup_for_transfer(pvar);
@@ -6839,11 +6853,17 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 		buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
-		memcpy(outmsg, buffer_ptr (msg), len);
+		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
+		{
+			logprintf(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN was sent at %s().", __FUNCTION__);
+			logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+							  buffer_ptr(msg), len,
+							  "send %s:%d %s() len=%d",
+							  __FILE__, __LINE__,
+							  __FUNCTION__, len);
+		}
 		buffer_free(msg);
-
-		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN was sent at handle_SSH2_userauth_success().");
 	}
 
 	// ハートビート・スレッドの開始 (2004.12.11 yutaka)
@@ -6869,7 +6889,13 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
-	cstring = buffer_get_string(&data, NULL); // 認証リストの取得
+	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+					  data, len,
+					  "receive %s:%d %s() len=%d",
+					  __FILE__, __LINE__,
+					  __FUNCTION__, len);
+
+	cstring = buffer_get_string(&data, NULL); // 認証方式リストの取得
 	partial = data[0];
 	data += 1;
 
@@ -6881,11 +6907,36 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		return FALSE;
 	}
 
-	// tryed_ssh2_authlist が FALSE の場合は、まだ認証を試行をしていない。
-	if (!pvar->tryed_ssh2_authlist) {
+	// partial が TRUE のときは次の認証の準備をする
+	if (partial) {
+		logprintf(LOG_LEVEL_VERBOSE, "Authenticated using \"%s\" with partial success.", cstring);
+
+		// はじめて次の認証を要するとき
+		if (!pvar->auth_state.partial_success) {
+			// autologin を無効にする
+			pvar->ssh2_autologin = 0;
+
+			// この接続は複数認証要求をしている
+			pvar->auth_state.multiple_required_auth = 1;
+		}
+
+		// 覚えている password をクリアして次の認証に備える
+		SecureZeroMemory(pvar->ssh2_password, sizeof(pvar->ssh2_password));
+
+		// 次の認証の認証方式が、直前に成功した認証方式にならないよう初期化する
+		pvar->ssh2_authmethod = SSH_AUTH_NONE;
+	}
+
+	// 認証ダイアログの準備
+	//   tryed_ssh2_authlist が FALSE のとき = まだ実際の認証を試行をしていない（none の返事が帰ってきたところ）
+	//     CheckAuthListFirst が TRUE のときは、表示中のダイアログが変更される
+	//   partial が TRUE のとき
+	//     "次の認証" のために、このあと表示されるダイアログで利用される
+	if (!pvar->tryed_ssh2_authlist || partial) {
 		int type = 0;
 
 		pvar->tryed_ssh2_authlist = TRUE;
+		pvar->auth_state.partial_success = partial;
 
 		// 認証ダイアログのラジオボタンを更新
 		if (strstr(cstring, "password")) {
@@ -6904,6 +6955,11 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		pvar->ssh2_authlist = cstring; // 不要になったらフリーすること
 		logprintf(LOG_LEVEL_VERBOSE, "method list from server: %s", cstring);
 
+		if (pvar->auth_state.partial_success) {
+			// 複数認証時、ダイアログを出す処理へ
+			goto auth;
+		}
+
 		if (pvar->ssh2_authmethod == SSH_AUTH_TIS &&
 		    pvar->ask4passwd &&
 		    pvar->session_settings.CheckAuthListFirst &&
@@ -6914,16 +6970,19 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		}
 		else {
 			// ひとまず none で試行して返ってきたところなので、実際のログイン処理へ
+			//   CheckAuthListFirst が TRUE の場合は認証方式が確定していないので、ログイン処理は行われない
 			do_SSH2_authrequest(pvar);
 		}
 
 		return TRUE;
 	}
 
+	// none ではない実際の認証の試行に失敗した
+
 	// TCP connection closed
 	//notify_closed_connection(pvar);
 
-	// retry countの追加 (2005.3.10 yutaka)
+	// retry countの追加
 	if (pvar->auth_state.cur_cred.method != SSH_AUTH_PAGEANT) {
 		pvar->userauth_retry_count++;
 	}
@@ -6942,9 +7001,9 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		}
 	}
 
-	if (pvar->ssh2_autologin == 1) {
+	if (pvar->ssh2_autologin == 1 && !pvar->auth_state.partial_success) {
 		char uimsg[MAX_UIMSG];
-		// SSH2自動ログインが有効の場合は、リトライは行わない。(2004.12.4 yutaka)
+		// SSH2自動ログインが有効の場合は、リトライは行わない。
 		UTIL_get_lang_msg("MSG_SSH_AUTH_FAILURE_ERROR", pvar,
 		                  "SSH2 auto-login error: user authentication failed.");
 		strncpy_s(uimsg, sizeof(uimsg), pvar->UIMsg, _TRUNCATE);
@@ -6961,8 +7020,10 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		return TRUE;
 	}
 
-	// ユーザ認証に失敗したときは、ユーザ名は固定して、パスワードの再入力を
-	// させる。ここの処理は SSH1 と同じ。(2004.10.3 yutaka)
+	// 追加認証のとき
+	// またはユーザ認証に失敗したとき
+	//   ユーザ名は固定して、パスワードの再入力(SSH1 と同じ)
+auth:
 	AUTH_set_generic_mode(pvar);
 	AUTH_advance_to_next_cred(pvar);
 	pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
@@ -7012,6 +7073,42 @@ void sanitize_str(buffer_t *buff, unsigned char *src, size_t srclen)
 	buffer_append(buff, "\0", 1);
 }
 
+/**
+ *	UTF-8 文字列を受信文字列に変換する
+ */
+static char *ConvertReceiveStr(TComVar *cv, char *strU8, size_t *len)
+{
+	TTTSet *pts = cv->ts;
+
+	OutputCharState *h = MakeOutputStringCreate();
+	MakeOutputStringInit(h, pts->Language, pts->KanjiCode, 0,0,0);
+
+	wchar_t *strW = ToWcharU8(strU8);
+	size_t strW_len = wcslen(strW);
+	size_t str_len = strW_len;
+	char *str = (char *)malloc(str_len);
+	size_t str_pos = 0;
+
+	size_t i = 0;
+	while (i < strW_len) {
+		char tmp_str[8];
+		size_t tmp_len;
+		size_t output_char_count = MakeOutputString(h, &strW[i], strW_len - i, tmp_str, &tmp_len, NULL, cv);
+		memcpy(&str[str_pos], &tmp_str, tmp_len);
+		str_pos += tmp_len;
+		i += output_char_count;
+	}
+
+	MakeOutputStringDestroy(h);
+
+	str[str_pos++] = 0;
+	*len = str_pos - 1;
+
+	free(strW);
+
+	return str;
+}
+
 /*
  * SSH_MSG_USERAUTH_BANNER:
  *    byte      SSH_MSG_USERAUTH_BANNER
@@ -7032,7 +7129,7 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 	}
 
 	if (msglen > 0) {
-		char *msg, *msgA;
+		char *msg;
 		wchar_t *msgW;
 
 		if (pvar->authbanner_buffer == NULL) {
@@ -7058,27 +7155,10 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 			break;
 		case 1:
 			if (pvar->authbanner_buffer != NULL) {
-				if (pvar->ts->Language == IdJapanese) { // とりあえず日本語モードのみ対応
-					switch (pvar->ts->KanjiCode) {
-					case IdSJIS:
-						msgA = ToCharU8(msg);
-						if (msgA) {
-							msg = msgA;
-							msglen = strlen(msg);
-						}
-						break;
-					case IdEUC:
-						// CP51932 への変換で手抜きしようとしたが
-						// 使えなかったのでとりあえず非対応
-						break;
-					case IdJIS:
-						// 使われる事が少ないのと面倒なのでとりあえず非対応
-						break;
-					default:
-						// nothing to do
-						break;
-					}
-				}
+				// 受信文字列に変換する
+				size_t msglen_s;
+				msg = ConvertReceiveStr(pvar->cv, msg, &msglen_s);
+				msglen = (int)msglen_s;
 				new_payload_buffer = msg;
 				pvar->ssh_state.payload_datastart = 0;
 				pvar->ssh_state.payload_datalen = msglen;
@@ -7180,7 +7260,11 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
-	//debug_print(10, data, len);
+	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+					  data, len,
+					  "receive %s:%d %s() len=%d",
+					  __FILE__, __LINE__,
+					  __FUNCTION__, len);
 
 	///////// step1
 	// get string
@@ -7273,9 +7357,18 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_INFO_RESPONSE, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
+	{
+		logprintf(LOG_LEVEL_VERBOSE,
+				  "SSH2_MSG_USERAUTH_INFO_RESPONSE was sent %s().",
+				  __FUNCTION__);
+		logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+						  buffer_ptr(msg), len,
+						  "send %s:%d %s() len=%d",
+						  __FILE__, __LINE__,
+						  __FUNCTION__, len);
+	}
 	buffer_free(msg);
 
-	logprintf(LOG_LEVEL_VERBOSE, "%s: sending SSH2_MSG_USERAUTH_INFO_RESPONSE.", __FUNCTION__);
 	return TRUE;
 }
 
@@ -7299,7 +7392,15 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		ssh_agentflag signflag;
 
 		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_PK_OK was received.");
-
+		{
+			const char *data = pvar->ssh_state.payload;
+			int len = pvar->ssh_state.payloadlen;
+			logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+							  data, len,
+							  "receive %s:%d %s() len=%d",
+							  __FILE__, __LINE__,
+							  __FUNCTION__, len);
+		}
 		username = pvar->auth_state.user;  // ユーザ名
 
 		// 署名するデータを作成
@@ -7386,9 +7487,17 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_REQUEST, len);
 		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
+		{
+			logprintf(LOG_LEVEL_VERBOSE,
+					  "%s: sending SSH2_MSG_USERAUTH_REQUEST method=publickey",
+					  __FUNCTION__);
+			logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+							  buffer_ptr(msg), len,
+							  "send %s:%d %s() len=%d",
+							  __FILE__, __LINE__,
+							  __FUNCTION__, len);
+		}
 		buffer_free(msg);
-
-		logprintf(LOG_LEVEL_VERBOSE, "%s: sending SSH2_MSG_USERAUTH_REQUEST method=publickey", __FUNCTION__);
 
 		pvar->pageant_keyfinal = TRUE;
 
@@ -7554,6 +7663,16 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 	outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_REQUEST, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
+	{
+		logprintf(LOG_LEVEL_VERBOSE,
+				  "%s: sending SSH2_MSG_USERAUTH_REQUEST",
+				  __FUNCTION__);
+		logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+						  buffer_ptr(msg), len,
+						  "send %s:%d %s() len=%d",
+						  __FILE__, __LINE__,
+						  __FUNCTION__, len);
+	}
 	buffer_free(msg);
 
 	return TRUE;
@@ -7719,6 +7838,10 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
+	logprintf_hexdump(LOG_LEVEL_SSHDUMP, data, len,
+					  "receive %s:%d %s() len=%d",
+					  __FILE__, __LINE__,
+					  __FUNCTION__, len);
 	id = get_uint32_MSBfirst(data);
 	data += 4;
 
@@ -8236,14 +8359,6 @@ static int is_canceled_window(HWND hd)
 		return 1;
 	else
 		return 0;
-}
-
-static BOOL SetDlgItemTextU8(HWND hDlg, int nIDDlgItem, const char *strU8)
-{
-	wchar_t *strW = ToWcharU8(strU8);
-	BOOL retval = SetDlgItemTextW(hDlg, nIDDlgItem, strW);
-	free(strW);
-	return retval;
 }
 
 static unsigned __stdcall ssh_scp_thread(void *p)
@@ -8908,12 +9023,14 @@ error:
 			//ssh2_channel_delete(c);  // free channel
 			//ssh2_channel_send_close(pvar, c);
 		}
-
-		wchar_t uimsgW[MAX_UIMSG];
-		UTIL_get_lang_msgW("MSG_SSH_SCP_ERROR_TITLE", pvar,
-						   L"TTSSH: SCP error", uimsgW);
+		static const TTMessageBoxInfoW info = {
+				"TTSSH",
+				"MSG_SSH_SCP_ERROR_TITLE", L"TTSSH: SCP error",
+				"MSG_SSH_SCP_ERROR_MISC", L"%s",
+				MB_OK | MB_ICONEXCLAMATION
+		};
 		wchar_t *msgW = ToWcharU8(msg);
-		MessageBoxW(pvar->cv->HWin, msgW, uimsgW, MB_OK | MB_ICONEXCLAMATION);
+		TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, msgW);
 		free(msgW);
 	}
 }

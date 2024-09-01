@@ -28,12 +28,19 @@
  */
 
 /* TERATERM.EXE, DDE routines */
+#include <stdio.h>
+#include <string.h>
+#include <windows.h>
+#include <ddeml.h>
+#include <stdint.h>
+#include <assert.h>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include "teraterm.h"
 #include "tttypes.h"
 #include "tttypes_key.h"
-#include <stdio.h>
-#include <string.h>
-#include <ddeml.h>
 #include "ttwinman.h"
 #include "ttsetup.h"
 #include "telnet.h"
@@ -51,6 +58,9 @@
 #include "scp.h"
 #include "asprintf.h"
 #include "vtterm.h"
+#include "ttcstd.h"
+#include "ddelib.h"
+#include "vtdisp.h"
 
 #define ServiceName "TERATERM"
 #define ItemName "DATA"
@@ -289,9 +299,10 @@ static HDDEDATA AcceptRequest(HSZ ItemHSz)
 
 	if ((! DDELog) || (ConvH==0)) return 0;
 
-	if (DdeCmpStringHandles(ItemHSz, Item2) == 0) // item "PARAM"
+	if (DdeCmpStringHandles(ItemHSz, Item2) == 0) { // item "PARAM"
 		DH = DdeCreateDataHandle(Inst,ParamFileName,sizeof(ParamFileName),0,
 		                         Item2,CF_OEMTEXT,0);
+	}
 	else if (DdeCmpStringHandles(ItemHSz, Item) == 0) // item "DATA"
 	{
 		Len = DDEGetDataLen();
@@ -326,10 +337,115 @@ static HDDEDATA AcceptRequest(HSZ ItemHSz)
 			DdeUnaccessData(DH);
 		}
 	}
-	else
+	else {
 		return 0;
+	}
 
 	return DH;
+}
+
+/**
+ *	バイナリデータかどうか判定する
+ *
+ *	@retval		TRUE	バイナリデータと解釈
+ *
+ *	データ内に 0x20 未満の値があった場合、バイナリデータと解釈する
+ */
+static BOOL IsBinaryData(const uint8_t *data, size_t len)
+{
+	size_t i;
+	if (len == 0) {
+		return FALSE;
+	}
+	len--;
+	for (i = 0; i < len; i++) {
+		uint8_t c = *data++;
+		if (c != 0x0d && c != 0x0a && c < 0x20) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+static void SendData(const char *DataPtr, DWORD DataSize)
+{
+	// マクロコマンド "send" で送信すると、0x00から0xffまで自由に送信できる
+	// DataPtr のデータはテキストではないこともあるので考慮が必要
+	wchar_t *strW = NULL;
+	BOOL binary_data = IsBinaryData(DataPtr, DataSize);
+	if (binary_data == FALSE) {
+		strW = ToWcharU8(DataPtr);
+		if (strW == NULL) {
+			// UTF-16LEへ変換できないなら、(多分)バイナリではなくテキスト
+			binary_data = TRUE;
+		}
+		else {
+			// UTF-16 -> UTF-8 に変換、再度比較
+			char *strU8 = ToU8W(strW);
+			if (strU8 == NULL) {
+				binary_data = TRUE;
+			}
+			else {
+				if (strcmp(strU8, DataPtr) != 0) {
+					// 異なっていたらバイナリと判定
+					binary_data = TRUE;
+				}
+				free(strU8);
+			}
+		}
+	}
+
+	if (binary_data) {
+		uint8_t *p = (uint8_t *)malloc(DataSize);
+		memcpy(p, DataPtr, DataSize);
+		SendMem *sm = SendMemBinary(p, DataSize - 1);
+		assert(sm != NULL);
+		if (sm != NULL) {
+			SendMemInitEcho(sm, FALSE);
+			SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
+			SendMemStart(sm);
+		}
+	} else {
+		SendMem *sm = SendMemTextW(strW, 0);
+		assert(sm != NULL);
+		if (sm != NULL) {
+			SendMemInitEcho(sm, FALSE);
+			SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
+			SendMemStart(sm);
+		}
+	}
+}
+
+static void SendStringU8(const char *strU8)
+{
+	wchar_t *strW = ToWcharU8(strU8);
+	if (strW == NULL) {
+		return;
+	}
+	SendMem *sm = SendMemTextW(strW, 0);
+	assert(sm != NULL);
+	if (sm != NULL) {
+		SendMemInitEcho(sm, FALSE);
+		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
+		SendMemStart(sm);
+	}
+}
+
+static void SendBinary(const void *data_ptr, DWORD data_size)
+{
+	uint8_t *p = (uint8_t *)malloc(data_size);
+	if (p == NULL) {
+		return;
+	}
+	memcpy(p, data_ptr, data_size);
+	SendMem *sm = SendMemBinary(p, data_size - 1);
+	assert(sm != NULL);
+	if (sm != NULL) {
+		SendMemInitEcho(sm, FALSE);
+		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
+		SendMemStart(sm);
+	}
+	// free(p); 送信完了後に自動で free() される
 }
 
 static HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
@@ -355,16 +471,8 @@ static HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
 	result = (HDDEDATA)DDE_FNOTPROCESSED;
 	DataPtr = DdeAccessData(Data,&DataSize);
 	if (DataPtr != NULL) {
-		wchar_t *strW = ToWcharU8(DataPtr);
-		if (strW != NULL) {
-			SendMem *sm = SendMemTextW(strW, 0);
-			if (sm != NULL) {
-				SendMemInitEcho(sm, FALSE);
-				SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
-				SendMemStart(sm);
-				result = (HDDEDATA)DDE_FACK;
-			}
-		}
+		SendData(DataPtr, DataSize);
+		result = (HDDEDATA)DDE_FACK;
 	}
 	DdeUnaccessData(Data);
 	return result;
@@ -396,18 +504,39 @@ static void SendCallback(void *callback_data)
 	EndDdeCmnd(0);
 }
 
+// 有効時 DdeAccessData() を使って受信データにアクセスする
+// 無効時 DdeGetData() を使って受信データにアクセスする(従来と同じ)
+//		DdeGetData()の場合、データ長上限(MaxStrLen)が存在する
+#define	USE_ACCESSDATA	1
+
 static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
+#if USE_ACCESSDATA
+	char *Command;
+#else
 	char Command[MaxStrLen + 1];
+#endif
 	int i;
 	BOOL r;
-
-	memset(Command, 0, sizeof(Command));
+	DWORD len;
+	HDDEDATA result = (HDDEDATA)DDE_FACK;
 
 	if ((ConvH==0) ||
-		(DdeCmpStringHandles(TopicHSz, Topic) != 0) ||
-		(DdeGetData(Data,Command,sizeof(Command),0) == 0))
+		(DdeCmpStringHandles(TopicHSz, Topic) != 0))
 		return DDE_FNOTPROCESSED;
+
+#if USE_ACCESSDATA
+	Command = DdeAccessData(Data, &len);
+	if (Command == NULL || len == 0) {
+		return DDE_FNOTPROCESSED;
+	}
+#else
+	memset(Command, 0, sizeof(Command));
+	len = DdeGetData(Data,Command,sizeof(Command),0);
+	if (len == 0) {
+		return DDE_FNOTPROCESSED;
+	}
+#endif
 
 	switch (Command[0]) {
 	case CmdSetHWnd:
@@ -445,7 +574,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	case CmdBPlusSend: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
@@ -455,7 +584,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	}
 	case CmdChangeDir:
@@ -541,7 +670,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else {
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		}
 		break;
 	case CmdKmtRecv:
@@ -549,7 +678,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	case CmdKmtGet: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
@@ -559,7 +688,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	}
 	case CmdKmtSend: {
@@ -570,7 +699,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	}
 	case CmdLoadKeyMap: {
@@ -608,7 +737,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	case CmdLogOpen:
 		if (FLogIsOpend()) {
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		}
 		else {
 			wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
@@ -636,7 +765,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	case CmdQVSend: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
@@ -646,7 +775,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	}
 	case CmdRestoreSetup: {
@@ -674,7 +803,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	}
 	case CmdSendKCode: {
@@ -733,7 +862,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	}
 	case CmdXmodemSend: {
@@ -744,7 +873,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	}
 	case CmdZmodemRecv:
@@ -752,7 +881,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	case CmdZmodemSend: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
@@ -762,7 +891,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	}
 	case CmdYmodemRecv:
@@ -771,7 +900,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	case CmdYmodemSend: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
@@ -780,7 +909,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			DdeCmnd = TRUE;
 		}
 		else
-			return DDE_FNOTPROCESSED;
+			result = DDE_FNOTPROCESSED;
 		break;
 	}
 		// add 'callmenu' (2007.11.18 maya)
@@ -809,7 +938,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			if (r == FALSE) {
 				const char *msg = "ttxssh.dll not support scp";
 				MessageBox(NULL, msg, "Tera Term: scprecv command error", MB_OK | MB_ICONERROR);
-				return DDE_FNOTPROCESSED;
+				result = DDE_FNOTPROCESSED;
 			}
 		}
 		break;
@@ -824,7 +953,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			if (r == FALSE) {
 				const char *msg = "ttxssh.dll not support scp";
 				MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
-				return DDE_FNOTPROCESSED;
+				result = DDE_FNOTPROCESSED;
 			}
 		}
 		break;
@@ -833,13 +962,12 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 		int val;
 
-		//OutputDebugPrintf("CmdSetBaud entered\n");
-
-		if (!cv.Open || cv.PortType != IdSerial)
-			return DDE_FNOTPROCESSED;
+		if (!cv.Open || cv.PortType != IdSerial) {
+			result = DDE_FNOTPROCESSED;
+			break;
+		}
 
 		val = atoi(ParamFileName);
-		//OutputDebugPrintf("CmdSetBaud: %d (%d)\n", val, ts.Baud);
 		if (val > 0) {
 			ts.Baud = val;
 			CommResetSerial(&ts,&cv,FALSE);   // reset serial port
@@ -852,8 +980,10 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 		int val;
 
-		if (!cv.Open || cv.PortType != IdSerial)
-			return DDE_FNOTPROCESSED;
+		if (!cv.Open || cv.PortType != IdSerial) {
+			result = DDE_FNOTPROCESSED;
+			break;
+		}
 
 		val = atoi(ParamFileName);
 		switch(val) {
@@ -871,8 +1001,10 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 		int val, ret;
 
-		if (!cv.Open || cv.PortType != IdSerial || ts.Flow != IdFlowNone)
-			return DDE_FNOTPROCESSED;
+		if (!cv.Open || cv.PortType != IdSerial || ts.Flow != IdFlowNone) {
+			result = DDE_FNOTPROCESSED;
+			break;
+		}
 
 		val = atoi(ParamFileName);
 		if (val == 0) {
@@ -888,8 +1020,10 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 		int val, ret;
 
-		if (!cv.Open || cv.PortType != IdSerial || ts.Flow != IdFlowNone)
-			return DDE_FNOTPROCESSED;
+		if (!cv.Open || cv.PortType != IdSerial || ts.Flow != IdFlowNone) {
+			result = DDE_FNOTPROCESSED;
+			break;
+		}
 
 		val = atoi(ParamFileName);
 		if (val == 0) {
@@ -905,11 +1039,15 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 		DWORD val, n;
 
-		if (!cv.Open || cv.PortType != IdSerial)
-			return DDE_FNOTPROCESSED;
+		if (!cv.Open || cv.PortType != IdSerial) {
+			result = DDE_FNOTPROCESSED;
+			break;
+		}
 
-		if (GetCommModemStatus(cv.ComID, &val) == 0) // error
-			return DDE_FNOTPROCESSED;
+		if (GetCommModemStatus(cv.ComID, &val) == 0) { // error
+			result = DDE_FNOTPROCESSED;
+			break;
+		}
 		//val = MS_CTS_ON | MS_DSR_ON | MS_RING_ON | MS_RLSD_ON;
 		n = 0;
 		if (val & MS_CTS_ON)
@@ -934,6 +1072,37 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 				_snprintf_s(ParamFileName, sizeof(ParamFileName), _TRUNCATE, "COM%d", ts.ComPort);
 			}
 		}
+		break;
+
+	case CmdGetTTPos:
+		int showflag;
+		int w_x, w_y, w_width, w_height;	// ウインドウ領域
+		int c_x, c_y, c_width, c_height;	// クライアント領域
+		RECT r;
+
+		if (IsIconic(HVTWin) == TRUE) {
+		    showflag = 1;
+		} else if (IsZoomed(HVTWin) == TRUE) {
+		    showflag = 2;
+		} else if (IsWindowVisible(HVTWin) == FALSE) {
+		    showflag = 3;
+		} else {
+		    showflag = 0;
+		}
+
+		GetWindowRect(HVTWin, &r);
+		w_x      = r.left;
+		w_y      = r.top;
+		w_width	 = r.right  - r.left;
+		w_height = r.bottom - r.top;
+
+		DispGetWindowPos(&c_x, &c_y, TRUE);
+		DispGetWindowSize(&c_width, &c_height, TRUE);
+
+		_snprintf_s(ParamFileName, sizeof(ParamFileName), _TRUNCATE,
+			    "%d %d %d %d %d %d %d %d %d", showflag,
+			    w_x, w_y, w_width, w_height,
+			    c_x, c_y, c_width, c_height);
 		break;
 
 	case CmdSendBroadcast: { // 'sendbroadcast'
@@ -984,10 +1153,48 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		FLogInfo(ParamFileName, sizeof(ParamFileName) - 1);
 		break;
 
-	default:
-		return DDE_FNOTPROCESSED;
+	case CmdSendUTF8String:
+	case CmdSendBinary:
+	case CmdSendCompatString: {
+		const char command_byte = Command[0];
+		const uint8_t *lptr = &Command[1];
+		size_t data_len;
+		uint8_t *data_ptr = DecodeDDEBinary(lptr, len - 1, &data_len);
+		uint32_t slen =
+			(data_ptr[0] << (8*3)) +
+			(data_ptr[1] << (8*2)) +
+			(data_ptr[2] << 8) +
+			data_ptr[3];
+		if (slen <= len - 1 - 4) {
+			char *sptr = &data_ptr[4];
+			switch(command_byte) {
+			case CmdSendUTF8String:
+				SendStringU8(sptr);
+				break;
+			case CmdSendBinary:
+				SendBinary(sptr, slen);
+				break;
+			case CmdSendCompatString:
+				SendData(sptr, slen);
+				break;
+			default:
+				assert(FALSE);
+				SendStringU8(sptr);
+				break;
+			}
+		}
+		free(data_ptr);
+		break;
 	}
-	return (HDDEDATA)DDE_FACK;
+
+	default:
+		result = DDE_FNOTPROCESSED;
+		break;
+	}
+#if USE_ACCESSDATA
+	DdeUnaccessData(Data);
+#endif
+	return result;
 }
 
 static HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
@@ -1197,6 +1404,7 @@ void RunMacroW(const wchar_t *FName, BOOL startup)
 	wchar_t *Cmnd;
 	STARTUPINFOW si;
 	DWORD pri = NORMAL_PRIORITY_CLASS;
+	wchar_t *exe_dir;
 
 	// Control menuからのマクロ呼び出しで、すでにマクロ起動中の場合、
 	// 該当する"ttpmacro"をフラッシュする。
@@ -1209,7 +1417,9 @@ void RunMacroW(const wchar_t *FName, BOOL startup)
 	SetTopic();
 	if (! InitDDE()) return;
 
-	aswprintf(&Cmnd, L"TTPMACRO /D=%hs", TopicName);
+	exe_dir = GetExeDirW(NULL);
+	aswprintf(&Cmnd, L"%s\\TTPMACRO /D=%hs", exe_dir, TopicName);
+	free(exe_dir);
 	if (FName != NULL) {
 		if (wcschr(FName, ' ') != NULL) {
 			// ファイル名にスペースが含まれている -> quote('"'で囲む)する

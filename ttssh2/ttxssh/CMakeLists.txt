@@ -100,7 +100,8 @@ target_sources(
   util.h
   x11util.c
   x11util.h
-  ${COMMON_SRC}
+  win32helper_u8.h
+  win32helper_u8.cpp
   )
 
 target_sources(
@@ -110,7 +111,6 @@ target_sources(
   ../../teraterm/common/ttcommon.h
   ../../teraterm/common/i18n.h
   ../../teraterm/common/ttlib.h
-  ../../teraterm/common/ttlib.c
   ../../teraterm/common/dlglib.h
   ../../teraterm/common/servicenames.h
   ../../teraterm/common/codeconv.h
@@ -118,6 +118,15 @@ target_sources(
   ../../teraterm/common/compat_win.h
   ../../teraterm/common/dllutil.h
   )
+
+target_sources(
+  ${PACKAGE_NAME}
+  PRIVATE
+  ../../teraterm/common/edithistory.cpp
+  ../../teraterm/common/edithistory.h
+  ../../teraterm/common/edithistory.rc
+  ../../teraterm/common/edithistory_res.h
+)
 
 source_group(
   "common"

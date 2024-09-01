@@ -80,6 +80,7 @@ INT_PTR WINAPI _PropertySheetW(PROPSHEETHEADERW *psh)
 	pshA.pszCaption = captionA;
 	pshA.nPages = psh->nPages;
 	pshA.phpage = psh->phpage;
+	pshA.nStartPage = psh->nStartPage;
 	pshA.pfnCallback = psh->pfnCallback;
 
 	INT_PTR retval = PropertySheetA(&pshA);

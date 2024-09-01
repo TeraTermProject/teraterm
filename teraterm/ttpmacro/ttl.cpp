@@ -35,6 +35,7 @@
 #include <string.h>
 #include <time.h>
 #include <errno.h>
+#include "compat_win.h"
 #include "tt-version.h"
 #include "ttmdlg.h"
 #include "ttmbuff.h"
@@ -43,7 +44,8 @@
 #include "ttmlib.h"
 #include "ttlib.h"
 #include "ttmenc.h"
-#include "tttypes.h"
+#include "ttmenc2.h"
+#include "tttypes.h"	// for TitleBuffSize
 #include "ttmonig.h"
 #include <shellapi.h>
 #include <sys/stat.h>
@@ -491,7 +493,8 @@ static WORD TTLBringupBox(void)
 static WORD TTLCall(void)
 {
 	TName LabName;
-	WORD Err, VarType;
+	WORD Err;
+	TVariableType VarType;
 	TVarId VarId;
 
 	if (GetLabelName(LabName) && (GetFirstChar()==0)) {
@@ -877,9 +880,33 @@ static WORD TTLDelPassword(void)
 	return Err;
 }
 
+// delpassword2 <filename> <password name>
+static WORD TTLDelPassword2(void)
+{
+	TStrVal FileNameStr, KeyStr;
+	WORD Err = 0;
+
+	GetStrVal(FileNameStr, &Err);	// ファイル名
+	GetStrVal(KeyStr, &Err);		// キー名
+	if ((Err == 0) && (GetFirstChar() != 0)) {
+		Err = ErrSyntax;
+	}
+	if (Err != 0) {
+		return Err;
+	}
+	if (FileNameStr[0] == 0) {
+		return ErrSyntax;
+	}
+
+	GetAbsPath(FileNameStr, sizeof(FileNameStr));
+	Encrypt2DelPassword(wc::fromUtf8(FileNameStr), KeyStr);
+	return 0;
+}
+
 static WORD TTLDim(WORD type)
 {
-	WORD Err, WordId, VarType;
+	WORD Err, WordId;
+	TVariableType VarType;
 	TName Name;
 	TVarId VarId;
 	int size;
@@ -931,7 +958,8 @@ static WORD TTLDisconnect(void)
 static WORD TTLDispStr(void)
 {
 	TStrVal Str, buff;
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	int Val;
 
 	if (! Linked)
@@ -2574,6 +2602,38 @@ static WORD TTLSetPassword(void)
 	return Err;
 }
 
+// setpassword2 <filename> <password name> <strval> <encryptstr>
+static WORD TTLSetPassword2(void)
+{
+	TStrVal FileNameStr, KeyStr, PassStr, EncryptStr;
+	WORD Err = 0;
+
+	GetStrVal(FileNameStr, &Err);	// ファイル名
+	GetStrVal(KeyStr, &Err);		// キー名
+	GetStrVal(PassStr, &Err);		// パスワード
+	GetStrVal(EncryptStr, &Err);	// パスワード文字列を暗号化するためのパスワード（共通鍵）
+	if ((Err == 0) && (GetFirstChar() != 0)) {
+		Err = ErrSyntax;
+	}
+	if (Err != 0) {
+		return Err;
+	}
+	if (FileNameStr[0] == 0 ||
+		KeyStr[0] == 0 ||
+		PassStr[0] == 0 ||
+		EncryptStr[0] == 0) {
+		return ErrSyntax;
+	}
+
+	GetAbsPath(FileNameStr, sizeof(FileNameStr));
+	if (Encrypt2SetPassword(wc::fromUtf8(FileNameStr), KeyStr, PassStr, EncryptStr) == 0) {
+		SetResult(0);	// 失敗
+		return 0;
+	}
+	SetResult(1);		// 成功
+	return 0;
+}
+
 // ispassword 'password.dat' 'username' ; result: 0=false; 1=true
 static WORD TTLIsPassword(void)
 {
@@ -2608,6 +2668,36 @@ static WORD TTLIsPassword(void)
 
 	SetResult(result);  // 成功可否を設定する。
 	return Err;
+}
+
+// ispassword2 <filename> <password name>
+static WORD TTLIsPassword2(void)
+{
+	TStrVal FileNameStr, KeyStr;
+	WORD Err = 0;
+	int result = 0;
+
+	GetStrVal(FileNameStr, &Err);	// ファイル名
+	GetStrVal(KeyStr, &Err);		// キー名
+	if ((Err == 0) && (GetFirstChar() != 0)) {
+		Err = ErrSyntax;
+	}
+	if (Err != 0) {
+		return Err;
+	}
+	if (FileNameStr[0] == 0 ||
+		KeyStr[0] == 0) {
+		return ErrSyntax;
+	}
+
+	GetAbsPath(FileNameStr, sizeof(FileNameStr));
+	if (Encrypt2IsPassword(wc::fromUtf8(FileNameStr), KeyStr) == 0) {
+		result = 0;		// パスワード無し
+	} else {
+		result = 1;		// パスワード有り
+	}
+	SetResult(result);	// 成功可否を設定する。
+	return 0;
 }
 
 static WORD TTLGetSpecialFolder(void)
@@ -2789,6 +2879,79 @@ static WORD TTLGetModemStatus(void)
 	return Err;
 }
 
+static WORD TTLGetTTPos(void)
+{
+	WORD Err;
+	TVarId showflag;
+	TVarId w_x, w_y, w_width, w_height;
+	TVarId c_x, c_y, c_width, c_height;
+	char Str[MaxStrLen];
+
+	Err = 0;
+	GetIntVar(&showflag, &Err); // 0:通常状態、1:最小化状態、2:最大化状態、3:非可視状態
+	GetIntVar(&w_x,      &Err); // w_x, w_y = ウインドウ領域の左上隅
+	GetIntVar(&w_y,      &Err);
+	GetIntVar(&w_width,  &Err);
+	GetIntVar(&w_height, &Err);
+	GetIntVar(&c_x,      &Err); // c_x, c_y = クライアント(テキスト)領域の左上隅
+	GetIntVar(&c_y,      &Err);
+	GetIntVar(&c_width,  &Err);
+	GetIntVar(&c_height, &Err);
+
+	if ((Err == 0) && (GetFirstChar() != 0)) {
+		Err = ErrSyntax;
+    }
+	if ((Err == 0) && (! Linked)) {
+		Err = ErrLinkFirst;
+	}
+	if (Err != 0) {
+		return Err;
+	}
+
+	Err = GetTTParam(CmdGetTTPos, Str, sizeof(Str));
+	if (Err == 0) {
+		int tmp_showflag;
+		int tmpw_x, tmpw_y, tmpw_width, tmpw_height;
+		int tmpc_x, tmpc_y, tmpc_width, tmpc_height;
+		HMONITOR hMonitor;
+		RECT rc;
+		UINT dpi_x, dpi_y;
+		float mag = 1;
+
+		if (sscanf_s(Str, "%d %d %d %d %d %d %d %d %d", &tmp_showflag,
+					&tmpw_x, &tmpw_y, &tmpw_width, &tmpw_height,
+					&tmpc_x, &tmpc_y, &tmpc_width, &tmpc_height) == 9) {
+			if (DPIAware == DPI_AWARENESS_CONTEXT_UNAWARE) {
+				if (pMonitorFromRect != NULL && pGetDpiForMonitor != NULL) {
+					rc.left   = tmpw_x;
+					rc.top    = tmpw_y;
+					rc.right  = tmpw_x + tmpw_width;
+					rc.bottom = tmpw_y + tmpw_height;
+					hMonitor = pMonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
+					if (hMonitor != NULL) {
+						pGetDpiForMonitor(hMonitor, (MONITOR_DPI_TYPE)0 /*0=MDT_EFFECTIVE_DPI*/, &dpi_x, &dpi_y);
+						mag = dpi_x / 96.f;
+					}
+				}
+			}
+			SetIntVal(showflag, tmp_showflag);
+			SetIntVal(w_x,      (int)(tmpw_x      * mag));
+			SetIntVal(w_y,      (int)(tmpw_y      * mag));
+			SetIntVal(w_width,  (int)(tmpw_width  * mag));
+			SetIntVal(w_height, (int)(tmpw_height * mag));
+			SetIntVal(c_x,      (int)(tmpc_x      * mag));
+			SetIntVal(c_y,      (int)(tmpc_y      * mag));
+			SetIntVal(c_width,  (int)(tmpc_width  * mag));
+			SetIntVal(c_height, (int)(tmpc_height * mag));
+			SetResult(0);
+		} else {
+			SetResult(-1);
+		}
+	}
+
+	return Err;
+}
+
 //
 // Tera Term のバージョン取得 & 比較
 // バージョン番号はコンパイル時に決定する。
@@ -2850,7 +3013,8 @@ static WORD TTLGetVer(void)
 static WORD TTLGoto(void)
 {
 	TName LabName;
-	WORD Err, VarType;
+	WORD Err;
+	TVariableType VarType;
 	TVarId VarId;
 
 	if (GetLabelName(LabName) && (GetFirstChar()==0))
@@ -2872,7 +3036,8 @@ static WORD TTLGoto(void)
 // add 'ifdefined' (2006.9.23 maya)
 static WORD TTLIfDefined(void)
 {
-	WORD VarType, Err;
+	WORD Err;
+	TVariableType VarType;
 	int Val;
 
 	GetVarType(&VarType,&Val,&Err);
@@ -2907,7 +3072,8 @@ static BOOL CheckThen(LPWORD Err)
 
 static WORD TTLIf(void)
 {
-	WORD Err, ValType, Tmp, WId;
+	WORD Err, Tmp, WId;
+	TVariableType ValType;
 	int Val;
 
 	if (! GetExpression(&ValType,&Val,&Err))
@@ -3190,49 +3356,21 @@ static WORD TTLMakePath(void)
 	return Err;
 }
 
-static void basedirname(char *fullpath, char *dest_base, int base_len, char *dest_dir, int dir_len) {
-	char drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
-	char dirname[MAX_PATH];
-	char basename[MAX_PATH];
-
-	_splitpath_s(fullpath, drive, sizeof(drive), dir, sizeof(dir), fname, sizeof(fname), ext, sizeof(ext));
-	strncpy_s(dirname, sizeof(dirname), drive, _TRUNCATE);
-	strncat_s(dirname, sizeof(dirname), dir, _TRUNCATE);
-	DeleteSlash(dirname); // 末尾の \ を取り除く
-	if (strlen(fname) == 0 && strlen(ext) == 0) {
-		_splitpath_s(dirname, drive, sizeof(drive), dir, sizeof(dir), fname, sizeof(fname), ext, sizeof(ext));
-		strncpy_s(dirname, sizeof(dirname), drive, _TRUNCATE);
-		strncat_s(dirname, sizeof(dirname), dir, _TRUNCATE);
-		DeleteSlash(dirname); // 末尾の \ を取り除く
-		strncpy_s(basename, sizeof(basename), fname, _TRUNCATE);
-		strncat_s(basename, sizeof(basename), ext, _TRUNCATE);
-	}
-	else {
-		strncpy_s(basename, sizeof(basename), fname, _TRUNCATE);
-		strncat_s(basename, sizeof(basename), ext, _TRUNCATE);
-	}
-
-	if (dest_dir != NULL) {
-		strncpy_s(dest_dir, dir_len, dirname, _TRUNCATE);
-	}
-	if (dest_base != NULL) {
-		strncpy_s(dest_base, base_len, basename, _TRUNCATE);
-	}
-}
-
-static void basename(char *fullpath, char *dest, int len) {
-	basedirname(fullpath, dest, len, NULL, 0);
-}
-
-static void dirname(char *fullpath, char *dest, int len) {
-	basedirname(fullpath, NULL, 0, dest, len);
+static char *ExtractFileNameU8(const char *PathName)
+{
+	wchar_t *PathNameW = ToWcharU8(PathName);
+	wchar_t *filenameW = ExtractFileNameW(PathNameW);
+	free(PathNameW);
+	char *filenameU8 = ToU8W(filenameW);
+	free(filenameW);
+	return filenameU8;
 }
 
 static WORD TTLBasename(void)
 {
 	TVarId VarId;
 	WORD Err;
-	TStrVal Src, Name;
+	TStrVal Src;
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
@@ -3243,17 +3381,32 @@ static WORD TTLBasename(void)
 
 	if (Err!=0) return Err;
 
-	basename(Src, Name, sizeof(Name));
-	SetStrVal(VarId, Name);
+	char *basename = ExtractFileNameU8(Src);
+	SetStrVal(VarId, basename);
+	free(basename);
 
 	return Err;
+}
+
+static char *ExtractDirNameU8(const char *PathName)
+{
+	wchar_t *PathNameW = ToWcharU8(PathName);
+	wchar_t *PathNameWD = DeleteSlashW(PathNameW);
+	free(PathNameW);
+	wchar_t *dirnameW = ExtractDirNameW(PathNameWD);
+	free(PathNameWD);
+	wchar_t *dirnameWD = DeleteSlashW(dirnameW);
+	free(dirnameW);
+	char *dirnameU8 = ToU8W(dirnameWD);
+	free(dirnameWD);
+	return dirnameU8;
 }
 
 static WORD TTLDirname(void)
 {
 	TVarId VarId;
 	WORD Err;
-	TStrVal Src, Dir;
+	TStrVal Src;
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
@@ -3264,8 +3417,9 @@ static WORD TTLDirname(void)
 
 	if (Err!=0) return Err;
 
-	dirname(Src, Dir, sizeof(Dir));
-	SetStrVal(VarId, Dir);
+	char *dir = ExtractDirNameU8(Src);
+	SetStrVal(VarId, dir);
+	free(dir);
 
 	return Err;
 }
@@ -3366,7 +3520,7 @@ static WORD TTLRandom(void)
 static WORD TTLRecvLn(void)
 {
 	TStrVal Str;
-	WORD ValType;
+	TVariableType ValType;
 	TVarId VarId;
 	int TimeOut;
 
@@ -3732,15 +3886,16 @@ static WORD TTLRotateRight(void)
 	return BitRotate(ROTATE_DIR_RIGHT);
 }
 
-static WORD TTLSend(void)
+/**
+ *	引数の文字列を DDEOut(), DDEOut1Byte() する
+ */
+static WORD GetParamStrings(void)
 {
 	TStrVal Str;
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	int Val;
 	BOOL EndOfLine;
-
-	if (! Linked)
-		return ErrLinkFirst;
 
 	EndOfLine = FALSE;
 	do {
@@ -3762,6 +3917,45 @@ static WORD TTLSend(void)
 		else
 			EndOfLine = TRUE;
 	} while (! EndOfLine);
+	return 0;
+}
+
+static WORD TTLSend(void)
+{
+	if (! Linked)
+		return ErrLinkFirst;
+
+	WORD r = GetParamStrings();
+	if (r != 0) {
+		return r;
+	}
+	DDESend();
+	return 0;
+}
+
+static WORD TTLSendText(void)
+{
+	if (! Linked)
+		return ErrLinkFirst;
+
+	WORD r = GetParamStrings();
+	if (r != 0) {
+		return r;
+	}
+	DDESendStringU8(NULL);
+	return 0;
+}
+
+static WORD TTLSendBinary(void)
+{
+	if (! Linked)
+		return ErrLinkFirst;
+
+	WORD r = GetParamStrings();
+	if (r != 0) {
+		return r;
+	}
+	DDESendBinary(NULL, 0);
 	return 0;
 }
 
@@ -3810,7 +4004,8 @@ static void AddBroadcastString(char *dst, int dstlen, const char *src)
 static WORD GetBroadcastString(char *buff, int bufflen, BOOL crlf)
 {
 	TStrVal Str;
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	int Val;
 	char tmp[3];
 
@@ -3944,22 +4139,21 @@ static WORD TTLSendKCode(void)
 	return SendCmnd(CmdSendKCode,0);
 }
 
+/**
+ *	TTLSend() の改行付加版
+ */
 static WORD TTLSendLn(void)
 {
-	WORD Err;
-	char Str[2];
+	if (! Linked)
+		return ErrLinkFirst;
 
-	Err = TTLSend();
-	if (Err==0)
-	{
-		Str[0] = 0x0D;
-		Str[1] = 0;
-		if (Linked)
-			DDEOut(Str);
-		else
-			Err = ErrLinkFirst;
+	WORD r = GetParamStrings();
+	if (r != 0) {
+		return r;
 	}
-	return Err;
+	DDEOut1Byte(0x0d);
+	DDESend();
+	return 0;
 }
 
 static WORD TTLSetDate(void)
@@ -4157,6 +4351,11 @@ static WORD TTLShow(void)
 	else
 		ShowWindow(HMainWin,SW_HIDE);
 	return Err;
+}
+
+void TTLShowMINIMIZE(void)
+{
+	ShowWindow(HMainWin,SW_MINIMIZE);
 }
 
 // 'sprintf': Format a string in the style of sprintf
@@ -4789,7 +4988,8 @@ static WORD TTLStrRemove(void)
 
 static WORD TTLStrReplace(void)
 {
-	WORD Err, VarType;
+	WORD Err;
+	TVariableType VarType;
 	TVarId DestVarId;
 	TStrVal oldstr;
 	TStrVal newstr;
@@ -5070,7 +5270,7 @@ static WORD TTLStrJoin(void)
 	TStrVal delimchars, buf;
 	WORD Err;
 	TVarId TargetVarId;
-	WORD VarType;
+	TVariableType VarType;
 	int maxvar;
 	int i;
 	BOOL ary = FALSE;
@@ -5241,7 +5441,8 @@ static WORD TTLUptime(void)
 static WORD TTLWait(BOOL Ln)
 {
 	TStrVal Str;
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	TVarId VarId;
 	int i, Val;
 	int TimeOut;
@@ -5336,7 +5537,8 @@ static WORD TTLWaitRegex(BOOL Ln)
 
 static WORD TTLWaitEvent(void)
 {
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	TVarId VarId;
 	int TimeOut;
 
@@ -5369,7 +5571,8 @@ static WORD TTLWaitEvent(void)
 
 static WORD TTLWaitN(void)
 {
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	TVarId VarId;
 	int TimeOut, WaitBytes;
 
@@ -5412,7 +5615,7 @@ static WORD TTLWaitRecv(void)
 	TStrVal Str;
 	WORD Err;
 	int Pos, Len, TimeOut;
-	WORD VarType;
+	TVariableType VarType;
 	TVarId VarId;
 
 	Err = 0;
@@ -5650,9 +5853,8 @@ static int ExecCmnd(void)
 	BOOL StrConst, E, WithIndex, Result;
 	TStrVal Str;
 	TName Cmnd;
-	WORD ValType, VarType;
-	TVarId VarId;
-	int Val, Index;
+	TVariableType ValType, VarType;
+	int Val;
 
 	Err = 0;
 
@@ -5795,6 +5997,8 @@ static int ExecCmnd(void)
 			Err = TTLDoChecksumFile(CRC32); break;
 		case RsvDelPassword:
 			Err = TTLDelPassword(); break;
+		case RsvDelPassword2:
+			Err = TTLDelPassword2(); break;
 		case RsvDirname:
 			Err = TTLDirname(); break;
 		case RsvDirnameBox:
@@ -5906,16 +6110,24 @@ static int ExecCmnd(void)
 			Err = TTLGetModemStatus(); break;
 		case RsvGetPassword:
 			Err = TTLGetPassword(); break;
+		case RsvGetPassword2:
+			Err = TTLGetPassword2(); break;
 		case RsvSetPassword:
 			Err = TTLSetPassword(); break;
+		case RsvSetPassword2:
+			Err = TTLSetPassword2(); break;
 		case RsvIsPassword:
 			Err = TTLIsPassword(); break;
+		case RsvIsPassword2:
+			Err = TTLIsPassword2(); break;
 		case RsvGetSpecialFolder:
 			Err = TTLGetSpecialFolder(); break;
 		case RsvGetTitle:
 			Err = TTLGetTitle(); break;
 		case RsvGetTTDir:
 			Err = TTLGetTTDir(); break;
+		case RsvGetTTPos:
+			Err = TTLGetTTPos(); break;
 		case RsvGetVer:
 			Err = TTLGetVer(); break;
 		case RsvGoto:
@@ -5999,6 +6211,10 @@ static int ExecCmnd(void)
 			Err = TTLScpRecv(); break;      // add 'scprecv' (2008.1.4 yutaka)
 		case RsvSend:
 			Err = TTLSend(); break;
+		case RsvSendText:
+			Err = TTLSendText(); break;
+		case RsvSendBinary:
+			Err = TTLSendBinary(); break;
 		case RsvSendBreak:
 			Err = TTLCommCmd(CmdSendBreak,0); break;
 		case RsvSendBroadcast:
@@ -6139,6 +6355,7 @@ static int ExecCmnd(void)
 			Err = ErrSyntax;
 		}
 	else if (GetIdentifier(Cmnd)) {
+		int Index;
 		if (GetIndex(&Index, &Err)) {
 			WithIndex = TRUE;
 		}
@@ -6155,6 +6372,7 @@ static int ExecCmnd(void)
 					Err = ErrSyntax;
 
 			if (!Err) {
+				TVarId VarId;
 				if (CheckVar(Cmnd,&VarType,&VarId)) {
 					if (WithIndex) {
 						switch (VarType) {
@@ -6241,7 +6459,7 @@ void Exec(void)
 // (2005.10.7 yutaka)
 void SetMatchStr(PCHAR Str)
 {
-	WORD VarType;
+	TVariableType VarType;
 	TVarId VarId;
 
 	if (CheckVar("matchstr",&VarType,&VarId) &&
@@ -6253,7 +6471,7 @@ void SetMatchStr(PCHAR Str)
 // (2005.10.15 yutaka)
 void SetGroupMatchStr(int no, const char *Str)
 {
-	WORD VarType;
+	TVariableType VarType;
 	TVarId VarId;
 	char buf[128];
 	const char *p;
@@ -6272,7 +6490,7 @@ void SetGroupMatchStr(int no, const char *Str)
 
 void SetInputStr(const char *Str)
 {
-	WORD VarType;
+	TVariableType VarType;
 	TVarId VarId;
 
 	if (CheckVar("inputstr",&VarType,&VarId) &&
@@ -6282,8 +6500,8 @@ void SetInputStr(const char *Str)
 
 void SetResult(int ResultCode)
 {
-  WORD VarType;
-  TVarId VarId;
+	TVariableType VarType;
+	TVarId VarId;
 
 	if (CheckVar("result",&VarType,&VarId) &&
 	    (VarType==TypInteger))

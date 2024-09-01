@@ -57,11 +57,10 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 	switch (Message) {
 		case WM_INITDIALOG:
 		{
-			PTTSet ts;
+			const PTTSet ts = (PTTSet)((CHOOSEFONTA *)lParam)->lCustData;
 			wchar_t *uimsg;
 
 			//EnableWindow(GetDlgItem(Dialog, cmb2), FALSE);
-			ts = (PTTSet)((CHOOSEFONTA *)lParam)->lCustData;
 
 			GetI18nStrWW("Tera Term", "DLG_CHOOSEFONT_STC6", L"\"Font style\" selection here won't affect actual font appearance.",
 						 ts->UILanguageFileW, &uimsg);
@@ -96,7 +95,7 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 	return FALSE;
 }
 
-BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, PTTSet ts)
+BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, const TTTSet *ts)
 {
 	CHOOSEFONTA cf;
 	BOOL Ok;
@@ -105,13 +104,16 @@ BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, PTTSet ts)
 	cf.lStructSize = sizeof(cf);
 	cf.hwndOwner = WndParent;
 	cf.lpLogFont = LogFont;
-	cf.Flags = CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
-	           CF_FIXEDPITCHONLY | CF_SHOWHELP | CF_NOVERTFONTS |
-	           CF_ENABLEHOOK;
+	cf.Flags =
+		CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
+		CF_FIXEDPITCHONLY |
+		//CF_SHOWHELP |
+		CF_NOVERTFONTS |
+		CF_ENABLEHOOK;
 	if (ts->ListHiddenFonts) {
 		cf.Flags |= CF_INACTIVEFONTS;
 	}
-	cf.lpfnHook = (LPCFHOOKPROC)(&TFontHook);
+	cf.lpfnHook = TFontHook;
 	cf.nFontType = REGULAR_FONTTYPE;
 	cf.hInstance = hInst;
 	cf.lCustData = (LPARAM)ts;

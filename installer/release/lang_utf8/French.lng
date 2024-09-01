@@ -1,5 +1,7 @@
-﻿; Updated by TeraTerm Project (2024-03-30)
-; Last translated (French language) by Francois MOCQ (2010-07-21)
+﻿[Info]
+language=French
+date=2024-08-31 by TeraTerm Project
+contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -53,13 +55,11 @@ MENU_EDIT_SELECTALL=Tout selectionner
 MENU_SETUP=Config&uration
 MENU_SETUP_TERMINAL=&Terminal...
 MENU_SETUP_WINDOW=&Fenetre...
-MENU_SETUP_FONT_SUBMENU=&Police
 MENU_SETUP_FONT=&Police...
-MENU_SETUP_DIALOG_FONT=&Dialog font...
 MENU_SETUP_KEYBOARD=&Clavier...
 MENU_SETUP_SERIALPORT=Port Serie...
 MENU_SETUP_TCPIP=T&CP/IP...
-MENU_SETUP_GENERAL=&General...
+MENU_SETUP_GENERAL=&General(LanguageUI)...
 MENU_SETUP_ADDITION=Plus de reglages...
 MENU_SETUP_SAVE=&Sauvegarder setup...
 MENU_SETUP_RESTORE=&Restaurer setup...
@@ -271,6 +271,8 @@ DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=fixed theme file
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=random theme file
 
 DLG_TAB_LOG_EDITOR=Prog affich journal
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
 DLG_TAB_LOG_FILENAME=Nom par défaut du fichier journal (format strftime)
 DLG_TAB_LOG_FILEPATH=Répertoire par défaut de sauvegarde du journal
 DLG_TAB_LOG_AUTOSTART=Démarrage auto. du journal
@@ -298,7 +300,15 @@ DLG_BROADCAST_HISTORY=Historique
 DLG_BROADCAST_PARENTONLY=Envoyer à ce seul processus
 DLG_BROADCAST_ENTER=T. Entrée
 DLG_BROADCAST_SUBMIT=Valider
+DLG_BROADCAST_CLOSE=Close
 DLG_BROADCAST_REALTIME=Mode tps-réel
+DLG_BROADCAST_HELP=Help
+CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
+CMENU_BROADCAST_MINIMIZE=Minimize selected window
+CMENU_BROADCAST_REFRESH=Refresh window list
+CMENU_BROADCAST_SELECT_ALL=Select all
+CMENU_BROADCAST_UNSELECT_ALL=Unselect all
+CMENU_BROADCAST_INVERSE=Inverse selection
 
 DLG_PRNABORT_PRINTING=Impression
 
@@ -360,14 +370,10 @@ MSG_CREATE_THREAD_ERROR=Impossible de créer la tâche
 ; ttdlg.c
 DLG_ABOUT_TITLE=A propos de Tera Term
 
-DLG_DIR_TITLE=Tera Term: Changer de répertoire
-DLG_DIR_CURRENT=Répertoire courant:
-DLG_DIR_NEW=Nouveau répertoire:
 DLG_SELECT_DIR_TITLE=Selectionner un nouveau répertoire
 
 DLG_GEN_TITLE=Tera Term: Configuration générale
 DLG_GEN_PORT=Port par défaut:
-DLG_GEN_LANG=&Langage:
 DLG_GEN_LANG_UI=Language&UI:
 
 DLG_HOST_TITLE=Tera Term: Nouvelle connexion
@@ -377,7 +383,7 @@ DLG_HOST_TCPIPPROTOCOL=IP versio&n:
 DLG_HOST_SERIAL=&Serie
 DLG_HOST_SERIALPORT=Po&rt:
 
-DLG_KEYB_TITLE=Tera Term: Configuration clavier
+DLG_KEYB_TITLE=clavier
 DLG_KEYB_TRANSMIT=Envoyer DEL avec:
 DLG_KEYB_BS=Touche &Bkspace
 DLG_KEYB_DEL=Touche &Delete
@@ -403,18 +409,23 @@ DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
 
-DLG_TCPIP_TITLE=Tera Term: Configuration TCP/IP
-DLG_TCPIP_HOSTLIST=Liste d'hôtes
+; edit history
 DLG_TCPIP_ADD=&Ajouter
 DLG_TCPIP_UP=Monte
 DLG_TCPIP_REMOVE=&Supprime
 DLG_TCPIP_DOWN=&Descend
-DLG_TCPIP_HISTORY=H&istori.
+
+; TCP/IP tab
+DLG_TCPIP_TITLE=TCP/IP
+DLG_TCPIP_HOSTLIST=Liste d'hôtes
+DLG_TCPIP_HISTORYTITLE=History
+DLG_TCPIP_HISTORY=Save h&istory when new connection
+DLG_TCPIP_EDITHISTORY=Edit hisotry
+DLG_TCPIP_TELNET=T&elnet
+DLG_TCPIP_PORT=N° de &Port:
 DLG_TCPIP_KEEPALIVE=Temps de maintien
 DLG_TCPIP_KEEPALIVE_SEC=Sec
 DLG_TCPIP_AUTOCLOSE=Fermeture auto de la fenêtre
-DLG_TCPIP_PORT=N° de &Port:
-DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_TERMTYPE=Type &Terminal:
 
 DLG_TERM_TITLE=Tera Term: Configuration du Terminal
@@ -641,6 +652,7 @@ DLG_AUTH_TITLE_FAILED=Réessai SSH Authentification
 DLG_AUTH_BANNER=Logging à %s
 DLG_AUTH_BANNER2=Authentification requise.
 DLG_AUTH_BANNER2_FAILED=Authentification échouée. Réessayez.
+DLG_AUTH_BANNER2_FURTHER=Further authentication required.
 DLG_AUTH_USERNAME=&Nom d'utilisateur:
 DLG_AUTH_USE_DEFAULT_USERNAME=Use &default username
 DLG_AUTH_USE_LOGON_USERNAME=Use &logon username
@@ -1107,7 +1119,7 @@ MSG_PATH_LENGTH_EXCEEDED=Chemin plus long que la longueur maxi admise
 MSG_INVALID_PURPOSE=Utilisation du certificat non correcte
 MSG_CERT_UNTRUSTED=Ce n'est pas un certificat de confiance
 MSG_CERT_REJECTED=Certificat rejeté
-MSG_SUBJECT_ISSUER_MISMATCH=Sujet / émetteur ne co¨ncident pas  
+MSG_SUBJECT_ISSUER_MISMATCH=Sujet / émetteur ne co¨ncident pas
 MSG_AKID_SKID_MISMATCH=Autorité et identifiant de clé Sujet ne coïncident pas
 MSG_AKID_ISSUER_SERIAL_MISMATCH=Autorité et N° de série de l'émetteur ne coïncident pas
 MSG_KEYUSAGE_NO_CERTSIGN=L'usage de la clé n'inclut pas la signature de certificats
@@ -1137,7 +1149,7 @@ DLG_ABOUT_TITLE=Version Information
 DLG_ABOUT_APPNAME=Tera Term outil de lancement\nTeraTerm Menu
 
 DLG_CONFIG_TITLE=Configuration de la liste
-DLG_CONFIG_ITEM=Item 
+DLG_CONFIG_ITEM=Item
 DLG_CONFIG_CONFIG=Configuration
 DLG_CONFIG_NAME=Nom
 DLG_CONFIG_PATTERN=Modèle de lancement
@@ -1148,6 +1160,8 @@ DLG_CONFIG_PASS=Mot de passe
 DLG_CONFIG_MACRO=fichier de macro
 DLG_CONFIG_LAUNCH=lancement seul
 DLG_CONFIG_STARTUP=kick au démarrage
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
 DLG_CONFIG_SSH=utiliser SSH
 DLG_CONFIG_KEYFILE=Fichier clé
 DLG_CONFIG_CHALLENGE=utiliser Challenge
@@ -1163,6 +1177,17 @@ DLG_ETC_LOGFILE=fichier journal
 DLG_ETC_PROMPT=Prompt
 DLG_ETC_USER=Nom d'utilisateur
 DLG_ETC_PASS=Mot de passe
+
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
 
 MSG_ERROR_READREG=Impossible de lire le registre.\n
 MSG_ERROR_MAKETTL=Impossible de créer 'ttpmenu.TTL'\n

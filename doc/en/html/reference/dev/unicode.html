@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Internal block diagram</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Internal block diagram</h1>
+
+<p>
+  Before Tera Term 5, the character set of the internal buffer was DBCS (Double byte Character Set).
+  For example, when "Language" is set to "Japanese", character coding in internal buffer was Shift_JIS.
+</p>
+
+<p>
+  The character encoding of Tera Term 5 internal buffer is Unicode.
+</p>
+
+<p>
+  The data flow is as follows.
+</p>
+
+<font size="1">
+<pre>
+                                                                              +--------------+
+                              +------------------------+ Code:Unicode         |              |
+                              |                        +--------------------->+  Window      |
+                              |  buffer@buffer.c       |                      |   Display    |
+                              |   Code:Unicode         | Code:Unicode         |   Print      |
+                              |                        |  BuffPutUnicode()    |              |                                         +----------+
+                              |                        +<------------------+  +--------------+          +-----------------------+      |          |
+                              +------------------------+                   |                            |                       |      |Log File  |
+                                                                           +----------------------------+ VTParse()@vtterm.c    +----->+          |
+                              +------------------------+ CommRead1Byte()                                |  Terminal             |      |          |
+                              |                        +----------------------------------------------->+                       |      +----------+
+                              |  Input buffer@ttpcmn   |                                                |                       |
++-----------+                 |   Code:Input           | Code:                                          +----+------------------+
+|           |                 |                        |  Unicode to Input    +--------------+               |
+|  Socket   +---------------->+                        +<---------------------+              |               |
+|  Serial   |  CommReceive()  +------------------------+  CommTextEchoW()     |  Talker      |               |
+|  Pipe     |                                             CommBinaryEcho()    |   Keyboard   |               | Code:Unicode(UTF-8)
+|  Plugin   |                 +------------------------+                      |   SendMem    |               |  DDEPut1()
+|           +<----------------+                        | Code:                |    File      |               |
++-----------+  CommSend()     |  Output buffer@ttpcmn  |  Unicode to Output   |    Clipboard |               |
+                              |   Code:Output          +<---------------------+    macro     +<---------+    |
+                              |                        |  CommTextOutW()      |              |          |    |
+                              |                        |  CommBinaryOut()     +--------------+          |    |
+                              +------------------------+  CommRawOut()                                  |    |
+                                                                                                        |    |
+                                                                                                        |    |
+                                                                                                        |    |
+                                                                                                        |    v
+                                           +-------------------+      DDE, UTF-8/binary               +-+----+-----------+
+                                           |                   +------------------------------------->+                  |
+                                           |  ttpmacro.exe     |                                      |  ttdde.c         |
+                                           |                   |                                      |                  |
+                                           |                   |      DDE, UTF-8                      |                  |
+                                           |                   +<-------------------------------------+                  |
+                                           +-------------------+                                      +------------------+
+</pre>
+<font size="3">
+
+<p>
+  On Windows 95/98/Me, key input is converted to Unicode before processing.
+  When drawing, characters are converted from Unicode to MBCS.
+</p>
+
+</BODY>
+</HTML>

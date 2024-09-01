@@ -31,6 +31,8 @@ $v = <$fh>;
 chop($v);
 print $fh_out "// $v\n";
 
+my $block_start = 6;
+my $block_count = 0;
 my $block = 0;
 my $start;
 my $end;
@@ -40,10 +42,16 @@ my $ocomment;
 my $oend = 0;
 while(my $a = <$fh>) {
 	if ($a =~ /^# ======/) {
-		$block = $block + 1;
-		if ($block == 2) {
+		if ($block == 0) {
+			$block_count = $block_count + 1;
+			if ($block_count == $block_start) {
+				$block = 1;
+			}
+		} else {
 			last;
 		}
+	} elsif ($block == 0) {
+		next;
 	}
 
 	if ($a =~ /^([0-9A-F]+)\.\.([0-9A-F]+).+\)\s+(.+)$/) {

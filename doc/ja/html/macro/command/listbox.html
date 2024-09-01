@@ -14,27 +14,46 @@
 <h1>listbox</h1>
 
 <p>
-リストボックスを開き、ユーザーに項目を選択させる。<em>(バージョン4.78以降)</em>
+リストボックスを持つダイアログボックスを開き、ユーザーに項目を選択させる。<em>(バージョン4.78以降)</em>
 </p>
 
 <pre class="macro-syntax">
-listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;]
+listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;] [&lt;keyword parameter&gt;...]
 </pre>
 
 <h2>パラメータ</h2>
 
 <dl>
 	<dt class="macro">文字列 &lt;message&gt;</dt>
-	<dd>リストボックスに表示されるメッセージ。</dd>
-	
+	<dd>ダイアログボックスに表示されるメッセージ。</dd>
+
 	<dt class="macro">文字列 &lt;title&gt;</dt>
-	<dd>リストボックスのタイトル。</dd>
-	
+	<dd>ダイアログボックスのタイトル。</dd>
+
 	<dt class="macro">文字列型配列 &lt;string array&gt;</dt>
 	<dd>リストボックスの選択項目。</dd>
 
 	<dt class="macro">整数値 &lt;selected&gt; (バージョン 4.89 以降)</dt>
-	<dd>初期選択項目(0オリジンインデックス)。省略可能。</dd>
+	<dd>初期選択項目(0オリジンインデックス)。省略可能。省略されたときは、どの項目も選択されない。</dd>
+
+	<dt><br>キーワード引数 : 省略可能、複数指定可、順不同</dt>
+	<dd><dl>
+		<dt class="macro">文字列 'dblclick=on' (デフォルト=off) (バージョン 5.3 以降)</dt>
+		<dd>ダブルクリックによるリストボックスの項目選択有効化。</dd>
+
+		<dt class="macro">文字列 'minmaxbutton=on' (デフォルト=off) (バージョン 5.3 以降)</dt>
+		<dd>最小化/最大化ボタン有効化。</dd>
+
+		<dt class="macro">文字列 'minimize=on' (デフォルト=off) (バージョン 5.3 以降)</dt>
+		<dd>最小化状態で表示。</dd>
+
+		<dt class="macro">文字列 'maximize=on' (デフォルト=off) (バージョン 5.3 以降)</dt>
+		<dd>最大化状態で表示。</dd>
+
+		<dt class="macro">文字列 'listboxsize=WxH'  (デフォルト=26x6) (バージョン 5.3 以降)</dt>
+		<dd>リストボックスのサイズ指定。Wで横の長さを、Hで縦の長さを文字数で指定する。<br>
+		    例 'listboxsize=60x20' (横60文字、縦20文字の場合)</dd>
+	</dl></dd>
 </dl>
 
 <h2>返り値</h2>
@@ -43,20 +62,20 @@ listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;]
 	<dt class="macro">システム変数 &lt;result&gt;</dt>
 	<dd>項目が選択された場合、0 - (N-1)のいずれかの値が格納される。<br>
 	    キャンセルされた場合、-1が格納される。</dd>
-	
+
 </dl>
 
 <h2>解説</h2>
 
 <p>
-listbox マクロコマンドは &lt;string array&gt; の配列要素をすべて選択項目として表示します。<br />
-以下のように、表示しようとする選択項目数より大きい要素数で &lt;string array&gt; を定義すると、最後に空文字列が表示されます。
+listbox マクロコマンドは &lt;string array&gt; の配列要素をすべて選択項目として表示する。<br>
+以下のように、表示しようとする選択項目数より大きい要素数で &lt;string array&gt; を定義すると、最後に空文字列が表示される。
 </p>
 
 <pre>
 strdim msg 4
-msg[0] = 'バナナ' 
-msg[1] = 'りんご' 
+msg[0] = 'バナナ'
+msg[1] = 'りんご'
 msg[2] = 'みかん'
 listbox '好きな食べ物を選んでください' 'あなたへの問い' msg
 
@@ -69,8 +88,8 @@ listbox '好きな食べ物を選んでください' 'あなたへの問い' msg
 
 <p>
 <em>(バージョン 4.89 以降)</em><br>
-&lt;selected&gt; を指定する事で、初期状態で選択されている項目を指定する事ができます。<br />
-省略した場合は 0 (先頭)が指定されたものとして扱われます。
+&lt;selected&gt; を指定する事で、初期状態で選択されている項目を指定する事ができる。<br>
+省略した場合は 0 (先頭)が指定されたものとして扱われる。
 </p>
 
 
@@ -78,8 +97,8 @@ listbox '好きな食べ物を選んでください' 'あなたへの問い' msg
 
 <pre class="macro-example">
 strdim msg 3
-msg[0] = 'バナナ' 
-msg[1] = 'りんご' 
+msg[0] = 'バナナ'
+msg[1] = 'りんご'
 msg[2] = 'みかん'
 listbox '好きな食べ物を選んでください' 'あなたへの問い' msg
 sprintf2 var "%d" result
@@ -93,8 +112,8 @@ messagebox var "result"
 
 <pre class="macro-example">
 strdim msg 7
-msg[0] = '晴れ' 
-msg[1] = '曇り' 
+msg[0] = '晴れ'
+msg[1] = '曇り'
 msg[2] = '雨'
 msg[3] = '風'
 msg[4] = '雪'
@@ -104,6 +123,28 @@ msg[6] = '分かりません'
 listbox '今日の天気はどうですか?' 'あなたへの問い' msg 6
 sprintf2 var "%d" result
 messagebox var "result"
+</pre>
+
+<pre class="macro-example">
+strdim msg 9
+selected = 0
+msg[0] = "listbox msg[selected] title msg selected 'listboxsize=70x10'"
+msg[1] = "listbox msg[selected] title msg selected 'listboxsize=70x10' 'dblclick=on'"
+msg[2] = "listbox msg[selected] title msg selected 'listboxsize=70x10' 'minmaxbutton=on'"
+msg[3] = "listbox msg[selected] title msg selected 'listboxsize=70x10' 'minimize=on'"
+msg[4] = "listbox msg[selected] title msg selected 'listboxsize=70x10' 'maximize=on'"
+msg[5] = "listbox msg[selected] title msg selected 'listboxsize=70x10' 'minmaxbutton=on' 'dblclick=on'"
+msg[6] = "listbox msg[selected] title msg selected 'listboxsize=100x5'"
+msg[7] = "listbox msg[selected] title msg selected 'listboxsize=10x20'"
+msg[8] = "listbox msg[selected] title msg selected"
+:select
+sprintf2 title 'selected = %d' selected
+execcmnd msg[selected]
+selected=result
+if selected = -1 then
+  exit
+endif
+goto select
 </pre>
 
 <h2>参照</h2>

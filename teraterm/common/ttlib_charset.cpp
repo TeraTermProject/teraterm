@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2021- TeraTerm Project
  * All rights reserved.
  *
@@ -28,6 +27,8 @@
  */
 
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "tttypes_charset.h"
 
@@ -225,6 +226,6 @@ int KanjiCodeToISO8859Part(int kanjicode)
 			return list[i].iso8859_part;
 		}
 	}
-	assert(FALSE);
+	assert(0);
 	return 1;
 }

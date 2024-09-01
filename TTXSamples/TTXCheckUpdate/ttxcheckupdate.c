@@ -203,7 +203,13 @@ static void ShowDialog(HWND hWnd)
 	result_bool = GetContent(update_info_url, agent, (void**)&json_raw_ptr, &json_raw_size);
 	free(update_info_url);
 	if (!result_bool) {
-		MessageBoxW(hWnd, L"access error?", L"Tera Term", MB_OK | MB_ICONEXCLAMATION);
+		static const TTMessageBoxInfoW info = {
+			"TTXCheckUpdate",
+			NULL, L"Tera Term",
+			"MSG_ERROR_ACCESS", L"access error?",
+			MB_OK | MB_ICONEXCLAMATION
+		};
+		TTMessageBoxW(hWnd, &info, UILanguageFileW);
 		return;
 	}
 	json_size = json_raw_size + 1;
@@ -218,7 +224,13 @@ static void ShowDialog(HWND hWnd)
 	/* json‚ðƒp[ƒX‚·‚é, versions‚Éî•ñ‚ª“ü‚é */
 	pvar->versions = ParseJson(json_ptr, &pvar->versions_count);
 	if (pvar->versions == NULL) {
-		MessageBoxW(hWnd, L"parse error?", L"Tera Term", MB_OK | MB_ICONEXCLAMATION);
+		static const TTMessageBoxInfoW info = {
+			"TTXCheckUpdate",
+			NULL, L"Tera Term",
+			"MSG_ERROR_PARSE", L"parse error?",
+			MB_OK | MB_ICONEXCLAMATION
+		};
+		TTMessageBoxW(hWnd, &info, UILanguageFileW);
 		return;
 	}
 

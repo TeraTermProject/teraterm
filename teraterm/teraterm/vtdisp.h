@@ -112,7 +112,6 @@ void DispScrollHomePos(void);
 void DispAutoScroll(POINT p);
 void DispHScroll(int Func, int Pos);
 void DispVScroll(int Func, int Pos);
-void DispSetupFontDlg(HWND hwndOwner);
 void DispRestoreWinSize(void);
 void DispSetWinPos(void);
 void DispSetActive(BOOL ActiveFlag);
@@ -135,6 +134,7 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Cou
 			  int Y, int *X);
 void DispEnableResizedFont(BOOL enable);
 BOOL DispIsResizedFont();
+void DispSetLogFont(LOGFONTA *VTlf, BOOL mul);
 
 extern int WinWidth, WinHeight;
 extern HFONT VTFont[AttrFontMask+1];

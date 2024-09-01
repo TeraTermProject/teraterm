@@ -13,126 +13,19 @@
 
     <h2>各タブ</h2>
     <ul>
-      <li><a href="#TabGeneral">"General" タブ</a></li>
+      <li><a href="setup-additional-general.html">"General" タブ</a></li>
       <li><a href="#TabControlSequence">"Control Sequence" タブ</a></li>
-      <li><a href="#TabCopyAndPaste">"Copy and Paste" タブ</a></li>
+      <li><a href="setup-additional-copy-and-paste.html">"Copy and Paste" タブ</a></li>
       <li><a href="setup-additional-visual.html">"Visual" タブ</a></li>
       <li><a href="setup-additional-log.html">"Log" タブ</a></li>
       <li><a href="#TabCygwin">"Cygwin" タブ</a></li>
       <li><a href="setup-additional-coding.html">"Coding" タブ</a></li>
       <li><a href="setup-additional-font.html">"Font" タブ</a></li>
       <li><a href="setup-additional-theme.html">"Theme" タブ</a></li>
+      <li><a href="setup-additional-keyboard.html">"Keyboard" タブ</a></li>
+      <li><a href="setup-additional-mouse.html">"Mouse" タブ</a></li>
+      <li><a href="setup-additional-tcpip.html">"TCP/IP" タブ</a></li>
     </ul>
-
-    <h2 id="TabGeneral">"General" タブ</h2>
-    <dl>
-      <dt id="EnableClickableUrl">Enable clickable URL</dt>
-      <dd>
-	URL をダブルクリックしたときにブラウザを起動する機能を有効にします。
-      </dd>
-
-      <dt id="DisableAcceleratorSendBreak">Disable accelerator send break</dt>
-      <dd>
-	Alt-B で break を送信する機能を無効にします。
-      </dd>
-
-      <dt id="AcceptBroadcast">Accept broadcast</dt>
-      <dd>
-	<a href="control-broadcast.html">ブロードキャストコマンド</a>を受け入れます。<br>
-	この設定は "Realtime mode" が off のブロードキャスト送信に対して有効です。"Realtime mode" が on のブロードキャスト送信は、この設定値にかかわらず受信されます。
-      </dd>
-
-      <dt id="MouseWheelScrollLine">Mouse wheel scroll line</dt>
-      <dd>
-	マウスホイールによるスクロール行数を設定します。
-      </dd>
-
-      <dt id="AutoScrollOnlyInBottomLine">Auto scroll only in bottom line</dt>
-      <dd>
-	最下行を表示していない状態では自動的にスクロールしないようにします。
-      </dd>
-
-      <dt id="ClearOnResize">Clear display when window resized</dt>
-      <dd>
-	VTウィンドウのサイズを変更した時に、表示内容をクリアするかどうかを設定します。
-      </dd>
-
-      <dt id="IMERelatedCursor">Change cursor shape with IME state</dt>
-      <dd>
-	IMEがonの時に、カーソルを網掛けにするか設定します。
-      </dd>
-
-      <dt id="ListHiddenFonts">List hidden fonts in font dialog</dt>
-      <dd>
-	Windows 7以降には各フォントをフォント一覧に表示するか非表示にするかを設定する機能が追加されました。Tera Term のこの設定を有効にすると、OS側で非表示に設定されたフォントも<a href="setup-font.html">フォント設定ダイアログ</a>で選択できるようになります。
-      </dd>
-
-      <dt id="TitleFormat">Title format</dt>
-      <dd>ウィンドウタイトルの形式を設定します。
-        <dl>
-          <dt>Display host/port name</dt>
-          <dd>ホスト名またはシリアルポート名を表示します</dd>
-
-          <dt>Display session number</dt>
-          <dd>セッション番号を表示します</dd>
-
-          <dt>Display VT/TEK</dt>
-          <dd>VTまたはTEKを表示します</dd>
-
-          <dt>Swap hostname and title position</dt>
-          <dd>ホスト名と<a href="setup-window.html#Title">タイトルテキスト</a>の位置を入れ換え、ホスト名を先に表示します</dd>
-
-          <dt>Display tcp port number</dt>
-          <dd>TCP ポート番号を表示します (TCP/IP 接続時のみ)</dd>
-
-          <dt>Display serial port speed</dt>
-          <dd>シリアルポートのスピードを表示します (シリアル接続時のみ)</dd>
-        </dl>
-      </dd>
-    </dl>
-
-    <h3>Notification</h3>
-
-    <p>
-      通知領域(Windows XP以前はタスクトレイと呼ばれていました)の設定とテスト。<br>
-    </p>
-
-    <p>
-      通知を行わない設定にしているとアイコンやメッセージ表示等の通知は行われません。<br>
-      音が出ない設定にしていると通知音は出力されません。<br>
-      テストで動作を確認することができます。
-    </p>
-
-    <dl>
-      <dt id="NotifySound">Notify sound</dt>
-      <dd>通知音を許可する(Windows XP以降は音を消すことができます)</dd>
-
-      <dt>Notify Test ボタン</dt>
-      <dd>
-        通知のテストを行います。<br>
-        次の動作を確認できます。
-        <ul>
-          <li>通知領域(タスクトレイ)にアイコンが表示されます。</li>
-          <li>アプリ通知(Windows 10,11) / バルーン通知(Windows 7, 8.1)が表示されます。</li>
-        </ul>
-      </dd>
-
-      <dt>Tray Test ボタン</dt>
-      <dd>
-        通知領域(タスクトレイ)にアイコンを表示します。<br>
-        次の動作を確認できます。
-        <ul>
-          <li>
-            通知領域(タスクトレイ)にアイコンが表示されます。<br>
-            メッセージボックスを閉じるとアイコンは消えます。
-          </li>
-        </ul>
-        「Tera Term のすべての通知をオフにする」と、「Tera Term」が
-        Windows の「通知」の設定に表示されなくなり、設定を変更できなく
-        なることがあります。このボタンを押して通知領域にアイコンを表示
-        している最中だと、Windows の「通知」の設定を変更できます。
-      </dd>
-    </dl>
 
     <h2 id="TabControlSequence">"Control Sequence" タブ</h2>
     <dl>
@@ -265,75 +158,6 @@ cvvis=\E[?12;25h
     <dd>画面がフラッシュします</dd>
 	</dl>
 	(<a href="../setup/teraterm-term.html#BellLimitting">see also</a>)
-      </dd>
-
-    </dl>
-
-
-    <h2 id="TabCopyAndPaste">"Copy and Paste" タブ</h2>
-    <dl>
-      <dt id="EnableContinuedLineCopy">Enable continued line copy</dt>
-      <dd>
-	継続している行を改行せずにコピーする機能を有効にします。<br>
-	ダブルクリックでワードを選択する時、ダブルクリック後のドラッグでも有効です。<br>
-	<a href="../usage/mouse.html">マウスの使い方</a>を参照ください。
-      </dd>
-
-      <dt id="DisablePasteMouseRButton">Disable mouse R button paste</dt>
-      <dd>
-	右クリックでクリップボードの内容を貼り付ける機能を無効にします。
-      </dd>
-
-      <dt id="ConfirmPasteMouseRButton">Confirm mouse R button paste</dt>
-      <dd>
-	右クリックでクリップボードの内容を貼り付けるとき、
-	ポップアップメニューで確認する機能を有効にします。
-      </dd>
-
-      <dt id="SelectOnlyByLButton">Select only by L button</dt>
-      <dd>
-	マウスドラッグによる選択を、左ボタンでのみ有効にする。
-      </dd>
-
-      <dt id="TrimTrailingNL">Trim trailing new line character when pasting</dt>
-      <dd>
-	貼り付け時に末尾の改行を削除する。
-      </dd>
-
-      <dt id="ConfirmChangePaste">Confirm change paste</dt>
-      <dd>
-	クリップボードに改行コード(CR/LF)を含む場合、マウスの右クリックおよびAlt+Vで
-	Tera Termウィンドウへ貼り付けようとするタイミングで、確認ダイアログを表示させることができます。
-	誤操作により、端末へ予期せぬコマンド投入を防ぐことができます。
-      </dd>
-
-      <dt id="ConfirmChangePasteStringFile">String file</dt>
-      <dd>
-	クリップボードに、この設定で指定したファイル内に存在するテキストが含まれる場合、マウスの右クリックおよびAlt+Vで
-	Tera Termウィンドウへ貼り付けようとするタイミングで、確認ダイアログを表示させることができます。
-	誤操作により、端末へ予期せぬコマンド投入を防ぐことができます。<br>
-	この設定は、ConfirmChangePasteの設定が有効な場合に作用します。
-      </dd>
-
-      <dt id="DelimiterChar">Delimiter characters</dt>
-      <dd>
-	単語選択の区切り文字を設定します。
-      </dd>
-
-      <dt id="PasteDelayPerLine">Paste delay per line</dt>
-      <dd>
-	複数行のデータを貼り付けるとき、改行が現れるごとにデータの送信を遅延させることができます。遅延する時間をミリ秒で設定します。
-      </dd>
-
-      <dt id="SelectOnActivate">Disabling text selection when the window is activated</dt>
-      <dd>
-        非選択状態のウィンドウを、文字領域をマウスでクリックすることで
-        選択するとき、文字の選択を禁止します。
-      </dd>
-
-      <dt id="AutoTextCopy">Copy to windows clipboard when text is selected</dt>
-      <dd>
-        マウスで文字列を選択したとき、クリップボードへコピーします。
       </dd>
 
     </dl>

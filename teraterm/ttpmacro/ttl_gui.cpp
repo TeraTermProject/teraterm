@@ -41,6 +41,7 @@
 #include "ttmlib.h"
 #include "ttlib.h"
 #include "ttmenc.h"
+#include "ttmenc2.h"
 #include "tttypes.h"
 #include "ttmacro.h"
 #include "ttl.h"
@@ -86,7 +87,7 @@ WORD TTLClipb2Var()
 		}
 		cbbuff = ToU8W(cbbuffW);
 		free(cbbuffW);
-		cblen = 0;
+		cblen = strlen(cbbuff);
 	}
 
 	if (cbbuff != NULL && Num >= 0 && Num * (MaxStrLen - 1) < cblen) {
@@ -127,7 +128,8 @@ WORD TTLVar2Clipb()
 WORD TTLFilenameBox()
 {
 	TStrVal Str1;
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	TVarId VarId;
 	BOOL SaveFlag = FALSE;
 	TStrVal InitDir = "";
@@ -223,13 +225,20 @@ WORD TTLGetPassword()
 		wchar_t input_string[MaxStrLen] = {};
 		size_t Temp2_len = sizeof(Temp2);
 		free(passwd_encW);
-		OpenInpDlg(input_string, key, L"Enter password", L"", TRUE);
-		WideCharToUTF8(input_string, NULL, Temp2, &Temp2_len);
-		if (Temp2[0]!=0) {
-			char TempA[512];
-			Encrypt(Temp2, TempA);
-			if (WritePrivateProfileStringW(L"Password", key, wc::fromUtf8(TempA), ini) != 0) {
-				result = 1;  /* success */
+		Err = OpenInpDlg(input_string, key, L"Enter password", L"", TRUE);
+		if (Err == IDCLOSE) {
+			// 閉じるボタン(&確認ダイアログ)で、マクロの終了とする。
+			TTLStatus = IdTTLEnd;
+			return 0;
+		} else {
+			Err = 0;
+			WideCharToUTF8(input_string, NULL, Temp2, &Temp2_len);
+			if (Temp2[0]!=0) {
+				char TempA[512];
+				Encrypt(Temp2, TempA);
+				if (WritePrivateProfileStringW(L"Password", key, wc::fromUtf8(TempA), ini) != 0) {
+					result = 1;  /* success */
+				}
 			}
 		}
 	}
@@ -248,10 +257,62 @@ WORD TTLGetPassword()
 	return Err;
 }
 
+// getpassword2 <filename> <password name> <strvar> <encryptstr>
+WORD TTLGetPassword2()
+{
+	TStrVal FileNameStr, KeyStr, EncryptStr;
+	TVarId PassStr;
+	TStrVal inputU8;
+	WORD Err = 0;
+	int result = 0;
+
+	GetStrVal(FileNameStr, &Err);	// ファイル名
+	GetStrVal(KeyStr, &Err);		// キー名
+	GetStrVar(&PassStr, &Err);		// パスワード更新時にパスワードを格納する変数
+	SetStrVal(PassStr, "");
+	GetStrVal(EncryptStr, &Err);	// パスワード文字列を暗号化するためのパスワード（共通鍵）
+	if ((Err == 0) && (GetFirstChar() != 0)) {
+		Err = ErrSyntax;
+	}
+	if (Err != 0) {
+		return Err;
+	}
+	if (FileNameStr[0] == 0 ||
+		KeyStr[0] == 0 ||
+		EncryptStr[0] == 0) {
+		return ErrSyntax;
+	}
+
+	GetAbsPath(FileNameStr, sizeof(FileNameStr));
+	if (Encrypt2IsPassword(wc::fromUtf8(FileNameStr), KeyStr) == 0) {
+		// キー名にマッチするエントリ無し
+		wchar_t inputW[MaxStrLen] = {};
+		wc key = wc::fromUtf8(KeyStr);
+		size_t inputU8len = sizeof(inputU8);
+
+		OpenInpDlg(inputW, key, L"Enter password", L"", TRUE);
+		WideCharToUTF8(inputW, NULL, inputU8, &inputU8len);
+		if (inputU8[0] != 0) {
+			result = Encrypt2SetPassword(wc::fromUtf8(FileNameStr), KeyStr, inputU8, EncryptStr);
+		}
+	} else {
+		// キー名にマッチするエントリ有り
+		result = Encrypt2GetPassword(wc::fromUtf8(FileNameStr), KeyStr, inputU8, EncryptStr);
+	}
+
+	// パスワード入力がないときは変数を更新しない
+	if (result == 1) {
+		SetStrVal(PassStr, inputU8);
+	}
+	SetResult(result);	// 成功可否を設定する。
+	return 0;
+}
+
 WORD TTLInputBox(BOOL Paswd)
 {
 	TStrVal Str1, Str2, Str3;
-	WORD Err, ValType, P;
+	WORD Err, P;
+	TVariableType ValType;
 	TVarId VarId;
 	int sp = 0;
 
@@ -290,10 +351,17 @@ WORD TTLInputBox(BOOL Paswd)
 	SetInputStr("");
 	if (CheckVar("inputstr",&ValType,&VarId) && (ValType==TypString)) {
 		wchar_t input_string[MaxStrLen];
-		OpenInpDlg(input_string,wc::fromUtf8(Str1),wc::fromUtf8(Str2),wc::fromUtf8(Str3),Paswd);
-		char *u8 = ToU8W(input_string);
-		SetStrVal(VarId, u8);
-		free(u8);
+		Err = OpenInpDlg(input_string,wc::fromUtf8(Str1),wc::fromUtf8(Str2),wc::fromUtf8(Str3),Paswd);
+		if (Err == IDCLOSE) {
+			// 閉じるボタン(&確認ダイアログ)で、マクロの終了とする。
+		  	TTLStatus = IdTTLEnd;
+			SetStrVal(VarId, "");
+		} else {
+			char *u8 = ToU8W(input_string);
+			SetStrVal(VarId, u8);
+			free(u8);
+		}
+		Err = 0;
 	}
 	return Err;
 }
@@ -301,7 +369,8 @@ WORD TTLInputBox(BOOL Paswd)
 WORD TTLDirnameBox()
 {
 	TStrVal Title;
-	WORD Err, ValType;
+	WORD Err;
+	TVariableType ValType;
 	TVarId VarId;
 	TStrVal InitDir = "";
 	BOOL ret;
@@ -355,6 +424,10 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 	int i, ary_size;
 	int sel = 0;
 	TVarId VarId;
+	TStrVal StrTmp;
+	int ext = 0;
+	int width = 0;
+	int height = 0;
 
 	*Err = 0;
 	GetStrVal2(Str1, Err, TRUE);
@@ -397,9 +470,39 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 	} else if (BoxId==IdListBox) {
 		//  リストボックスの選択肢を取得する。
 		GetStrAryVar(&VarId, Err);
-
-		if (CheckParameterGiven()) {
-			GetIntVal(&sel, Err);
+		while (CheckParameterGiven()) {
+			GetStrVal2(StrTmp, Err, TRUE);
+			if (*Err == 0) {
+				if (_wcsicmp(wc::fromUtf8(StrTmp), L"dblclick=on") == 0) {
+					ext |= ExtListBoxDoubleclick;
+				} else if (_wcsicmp(wc::fromUtf8(StrTmp), L"minmaxbutton=on") == 0) {
+					ext |= ExtListBoxMinmaxbutton;
+				} else if (_wcsicmp(wc::fromUtf8(StrTmp), L"minimize=on") == 0) {
+					ext |=  ExtListBoxMinimize;
+					ext &= ~ExtListBoxMaximize;
+				} else if (_wcsicmp(wc::fromUtf8(StrTmp), L"maximize=on") == 0) {
+					ext &= ~ExtListBoxMinimize;
+					ext |=  ExtListBoxMaximize;
+				} else if (_wcsnicmp(wc::fromUtf8(StrTmp), L"listboxsize=", 5) == 0) {
+				  	wchar_t dummy1[24], dummy2[24];
+					if (swscanf_s(wc::fromUtf8(StrTmp), L"%[^=]=%d%[xX]%d", dummy1, 24, &width, dummy2, 24, &height) == 4) {
+						if (width < 0 || height < 0) {
+							*Err = ErrSyntax;
+							break;
+						} else {
+							ext |= ExtListBoxSize;
+						}
+					} else {
+						*Err = ErrSyntax;
+						break;
+					}
+				} else if (sscanf_s(StrTmp, "%d", &sel) != 1) {
+					*Err = ErrSyntax;
+					break;
+				}
+			} else {
+				break;
+			}
 		}
 		if (*Err==0 && GetFirstChar()!=0)
 			*Err = ErrSyntax;
@@ -430,7 +533,7 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 		//   0以上: 選択項目
 		//   -1: キャンセル
 		//	 -2: close
-		ret = OpenListDlg(wc::fromUtf8(Str1), wc::fromUtf8(Str2), s, sel);
+		ret = OpenListDlg(wc::fromUtf8(Str1), wc::fromUtf8(Str2), s, sel, ext, width, height);
 
 		for (i = 0 ; i < ary_size ; i++) {
 			free((void *)s[i]);

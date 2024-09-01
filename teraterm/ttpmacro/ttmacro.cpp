@@ -42,6 +42,7 @@
 #include "dllutil.h"
 #include "codeconv.h"
 #include "win32helper.h"
+#include "ttdebug.h"
 
 #include "ttm_res.h"
 #include "ttmmain.h"
@@ -55,13 +56,14 @@
 #endif
 
 wchar_t *UILanguageFileW;
-char UILanguageFile[MAX_PATH];
 static wchar_t *SetupFNameW;
 static HWND CtrlWnd;
 static HINSTANCE hInst;
 
 static BOOL Busy;
 static CCtrlWindow *pCCtrlWindow;
+
+DPI_AWARENESS_CONTEXT DPIAware;
 
 HINSTANCE GetInstance()
 {
@@ -78,22 +80,20 @@ static void init()
 	HomeDirW = GetHomeDirW(hInst);
 	SetupFNameW = GetDefaultFNameW(HomeDirW, L"TERATERM.INI");
 
-	wchar_t *UILanguageFileRel;
-	hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", L"lang\\Default.lng", SetupFNameW, &UILanguageFileRel);
-	UILanguageFileW = GetUILanguageFileFullW(HomeDirW, UILanguageFileRel);
-	free(UILanguageFileRel);
-	WideCharToACP_t(UILanguageFileW, UILanguageFile, sizeof(UILanguageFile));
+	UILanguageFileW = GetUILanguageFileFullW(SetupFNameW);
 
 	DLLInit();
 	WinCompatInit();
 
 	// DPI Aware (çÇDPIëŒâû)
+	DPIAware = DPI_AWARENESS_CONTEXT_UNAWARE;
 	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
 		wchar_t Temp[4];
 		GetPrivateProfileStringW(L"Tera Term", L"DPIAware", NULL, Temp, _countof(Temp), SetupFNameW);
 		if (_wcsicmp(Temp, L"on") == 0) {
 			if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
 				pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+				DPIAware = DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2;
 			}
 		}
 	}
@@ -135,13 +135,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-
-	// DPI Aware (çÇDPIëŒâû)
-	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
-		if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
-			pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-		}
-	}
+	DebugSetException();
 
 //	InitCommonControls();
 	init();

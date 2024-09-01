@@ -50,6 +50,7 @@
 #include "codeconv.h"
 #include "helpid.h"
 #include "vtwin.h"
+#include "makeoutputstring.h"
 
 static SOCKET OpenSocket(PComVar);
 static void AsyncConnect(PComVar);
@@ -306,16 +307,11 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	cv->ComID = INVALID_HANDLE_VALUE;
 	cv->CanSend = TRUE;
 	cv->RRQ = FALSE;
-	cv->SendCode = IdASCII;
-	cv->EchoCode = IdASCII;
-	cv->Language = ts->Language;
 	cv->CRSend = ts->CRSend;
 	cv->KanjiCodeEcho = ts->KanjiCode;
-	cv->JIS7KatakanaEcho = ts->JIS7Katakana;
 	cv->KanjiCodeSend = ts->KanjiCodeSend;
-	cv->JIS7KatakanaSend = ts->JIS7KatakanaSend;
-	cv->KanjiIn = ts->KanjiIn;
-	cv->KanjiOut = ts->KanjiOut;
+	MakeOutputStringInit(cv->StateEcho, ts->Language, ts->KanjiCode, ts->KanjiIn, ts->KanjiOut, ts->JIS7Katakana);
+	MakeOutputStringInit(cv->StateSend, ts->Language, ts->KanjiCodeSend, ts->KanjiIn, ts->KanjiOut, ts->JIS7KatakanaSend);
 	cv->DelayFlag = TRUE;
 	cv->DelayPerChar = ts->DelayPerChar;
 	cv->DelayPerLine = ts->DelayPerLine;
@@ -727,13 +723,14 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 						GetI18nStrWW("Tera Term", "MSG_COMM_REFUSE_ERROR", L"Connection refused", ts->UILanguageFileW, &UIMsgW);
 						break;
 					case WSAENETUNREACH:
+					case WSAEHOSTUNREACH:
 						GetI18nStrWW("Tera Term", "MSG_COMM_REACH_ERROR", L"Network cannot be reached", ts->UILanguageFileW, &UIMsgW);
 						break;
 					case WSAETIMEDOUT:
-						GetI18nStrWW("Tera Term", "MSG_COMM_CONNECT_ERROR", L"Connection timed out", ts->UILanguageFileW, &UIMsgW);
+						GetI18nStrWW("Tera Term", "MSG_COMM_TIMEOUT_ERROR", L"Connection timed out", ts->UILanguageFileW, &UIMsgW);
 						break;
 					default:
-						GetI18nStrWW("Tera Term", "MSG_COMM_TIMEOUT_ERROR", L"Cannot connect the host", ts->UILanguageFileW, &UIMsgW);
+						GetI18nStrWW("Tera Term", "MSG_COMM_CONNECT_ERROR", L"Cannot connect the host", ts->UILanguageFileW, &UIMsgW);
 						break;
 					}
 

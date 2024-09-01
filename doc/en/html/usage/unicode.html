@@ -24,60 +24,12 @@ When the Language "UTF-8" is selected, below function can not be used beside Jap
 </ul>
 
 <p>
-
 If you set the Language "Japanese" or "Korean", select "Terminal" from the Tera Term "Setup" menu. Inside the dialog-box,
 select "UTF-8" from "Kanji(receive)" or "Kanji(transmit)".
 There is no need to restart Tera Term to activate these configuration changes.<br>
 
 When "UTF8" is specified with '/KT' or '/KR' option in the command line,
 UTF-8 encoding/decoding can be used during transmitting and receiving of data.
-</p>
-
-<h1>Internal block diagram</h1>
-
-<p>
-  Before Tera Term 5, the character set of the internal buffer was DBCS (Double byte Character Set).
-  For example, when "Language" is set to "Japanese", character coding in internal buffer was Shift_JIS.
-</p>
-
-<p>
-  The character encoding of Tera Term 5 internal buffer is Unicode.
-</p>
-
-<p>
-  The data flow is as follows.
-</p>
-
-<pre>
-                                                                              +--------------+
-                              +------------------------+ Code:Unicode         |              |
-                              |                        +--------------------->+  Window      |
-                              |  buffer@buffer.c       |                      |   Display    |
-                              |   Code:Unicode         | Code:                |   Print      |
-                              |                        |  Input to Unicode    |              |
-                              |                        +<------------------+  +--------------+
-                              +------------------------+                   |
-                                                                           |
-                              +------------------------+   CommRead1Byte() |
-                              |                        +-------------------+
-                              |  Input buffer@ttpcmn   |
-+-----------+                 |   Code:Input           | Code:
-|           |                 |                        |  Unicode to Input    +--------------+
-|  Socket   +---------------->+                        +<---------------------+              |
-|  Serial   |  CommReceive()  +------------------------+  CommTextEchoW()     |  Talker      |
-|  Pipe     |                                             CommBinaryEcho()    |   Keyboard   |
-|  Plugin   |                 +------------------------+                      |   SendMem    |
-|           +<----------------+                        | Code:                |    File      |
-+-----------+  CommSend()     |  Output buffer@ttpcmn  |  Unicode to Output   |    Clipboard |
-                              |   Code:Output          +<---------------------+              |
-                              |                        |  CommTextOutW()      +--------------+
-                              |                        |  CommBinaryOut()
-                              +------------------------+  CommRawOut()
-</pre>
-
-<p>
-  On Windows 95/98/Me, key input is converted to Unicode before processing.
-  When drawing, characters are converted from Unicode to MBCS.
 </p>
 
 </BODY>

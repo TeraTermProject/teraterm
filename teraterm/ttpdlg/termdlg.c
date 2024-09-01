@@ -36,6 +36,7 @@
 #include <windows.h>
 
 #include "tttypes.h"
+#include "tttypes_charset.h"
 #include "ttlib.h"
 #include "dlglib.h"
 #include "dlg_res.h"
@@ -43,6 +44,8 @@
 #include "ttlib_charset.h"
 #include "asprintf.h"
 #include "ttwinman.h"
+#include "tttext.h"
+#include "tt_res.h"
 
 #include "ttdlg.h"
 
@@ -120,7 +123,8 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			SetWindowLongPtrW(Dialog, DWLP_USER, lParam);
 
 			SetDlgTextsW(Dialog, TextInfosCom, _countof(TextInfosCom), ts->UILanguageFileW);
-			if (ts->Language==IdJapanese) {
+			switch (ts->Language) {
+			case IdJapanese: {
 				// “ú–{Œê‚ÌŽž‚¾‚¯4‚Â‚Ì€–Ú‚ª‘¶Ý‚·‚é
 				static const DlgTextInfo TextInfosJp[] = {
 					{ IDC_TERMKANA, "DLG_TERM_KANA" },
@@ -129,6 +133,32 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					{ IDC_TERMKOUTTEXT, "DLG_TERM_KOUT" },
 				};
 				SetDlgTextsW(Dialog, TextInfosJp, _countof(TextInfosJp), ts->UILanguageFileW);
+				break;
+			}
+			default:
+				assert(FALSE);
+			case IdKorean: // Korean mode //HKS
+			case IdUtf8:   // UTF-8 mode
+			case IdChinese:
+			case IdRussian:	// Russian mode
+			case IdEnglish: {
+				static const int ids[] = {
+					IDC_TERMKANA,
+					IDC_TERMKANASEND,
+					IDC_TERMKINTEXT,
+					IDC_TERMKANA,
+					IDC_TERMKANASEND,
+					IDC_TERMKINTEXT,
+					IDC_TERMKOUTTEXT,
+					IDC_TERMKIN,
+					IDC_TERMKOUT,
+				};
+				int i;
+				for (i = 0; i < _countof(ids); i++) {
+					ShowWindow(GetDlgItem(Dialog, ids[i]),SW_HIDE);
+				}
+				break;
+			}
 			}
 
 			SetDlgItemInt(Dialog,IDC_TERMWIDTH,ts->TerminalWidth,FALSE);
@@ -200,6 +230,9 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					SetDropDownList(Dialog, IDC_TERMKOUT, kanji_out_list, n);
 				}
 			}
+
+			TTTextMenu(Dialog, IDC_OPEN_CODING, NULL, HVTWin, ID_SETUP_ADDITIONALSETTINGS_CODING);
+
 			CenterWindow(Dialog, GetParent(Dialog));
 			return TRUE;
 		}
@@ -329,27 +362,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					break;
 
 				case IDC_TERMHELP: {
-					WPARAM HelpId;
-					switch (ts->Language) {
-					case IdJapanese:
-						HelpId = HlpSetupTerminalJa;
-						break;
-					case IdEnglish:
-						HelpId = HlpSetupTerminalEn;
-						break;
-					case IdKorean:
-						HelpId = HlpSetupTerminalKo;
-						break;
-					case IdRussian:
-						HelpId = HlpSetupTerminalRu;
-						break;
-					case IdUtf8:
-						HelpId = HlpSetupTerminalUtf8;
-						break;
-					default:
-						HelpId = HlpSetupTerminal;
-						break;
-					}
+					const WPARAM HelpId = HlpSetupTerminal;
 					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HelpId,0);
 					break;
 				}
@@ -362,31 +375,14 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
 {
 	DialogData *data;
-	int i;
 	BOOL r;
 
 	data = (DialogData *)malloc(sizeof(*data));
 	data->pts = ts;
 	data->VTWin = WndParent;
 
-	switch (ts->Language) {
-	case IdJapanese: // Japanese mode
-		i = IDD_TERMDLGJ;
-		break;
-	case IdKorean: // Korean mode //HKS
-	case IdUtf8:   // UTF-8 mode
-	case IdChinese:
-	case IdRussian: // Russian mode
-	case IdEnglish:  // English mode
-		i = IDD_TERMDLGK;
-		break;
-	default:
-		// Žg‚Á‚Ä‚¢‚È‚¢
-		i = IDD_TERMDLG;
-	}
-
 	r = (BOOL)TTDialogBoxParam(hInst,
-							   MAKEINTRESOURCE(i),
+							   MAKEINTRESOURCE(IDD_TERMDLG),
 							   WndParent, TermDlg, (LPARAM)data);
 	free(data);
 	return r;

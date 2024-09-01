@@ -13,129 +13,19 @@
 
     <h2>tabs</h2>
     <ul>
-      <li><a href="#TabGeneral">"General" Tab</a></li>
+      <li><a href="setup-additional-general.html">"General" Tab</a></li>
       <li><a href="#TabControlSequence">"Control Sequence" Tab</a></li>
-      <li><a href="#TabCopyAndPaste">"Copy and Paste" Tab</a></li>
+      <li><a href="setup-additional-copy-and-paste.html">"Copy and Paste" Tab</a></li>
       <li><a href="setup-additional-visual.html">"Visual" Tab</a></li>
       <li><a href="setup-additional-log.html">"Log" Tab</a></li>
       <li><a href="#TabCygwin">"Cygwin" Tab</a></li>
       <li><a href="setup-additional-coding.html">"Coding" Tab</a></li>
       <li><a href="setup-additional-font.html">"Font" Tab</a></li>
       <li><a href="setup-additional-theme.html">"Theme" Tab</a></li>
+      <li><a href="setup-additional-keyboard.html">"Keyboard" Tab</a></li>
+      <li><a href="setup-additional-mouse.html">"Mouse" Tab</a></li>
+      <li><a href="setup-additional-tcpip.html">"TCP/IP" Tab</a></li>
     </ul>
-
-    <h2 id="TabGeneral">"General" Tab</h2>
-    <dl>
-      <dt id="EnableClickableUrl">Enable clickable URL</dt>
-      <dd>
-	Launches the web browser by clicking URL string.
-      </dd>
-
-      <dt id="DisableAcceleratorSendBreak">Disable accelerator send break</dt>
-      <dd>
-	Disables accelerator key of send break.
-      </dd>
-
-      <dt id="AcceptBroadcast">Accept broadcast</dt>
-      <dd>
-	Accept the <a href="control-broadcast.html">broadcast command</a>.<br>
-	Can be only enabled when the "Realtime mode" is off. However, this option is always ignored when the "Realtime mode" is on.
-      </dd>
-
-      <dt id="MouseWheelScrollLine">Mouse wheel scroll line</dt>
-      <dd>
-	Configures the mouse wheel scroll line.
-      </dd>
-
-      <dt id="AutoScrollOnlyInBottomLine">Auto scroll only in bottom line</dt>
-      <dd>
-	Stop auto scrolling except when the bottom line is displayed.
-      </dd>
-
-      <dt id="ClearOnResize">Clear display when window resized</dt>
-      <dd>
-	The current screen is cleared when the VT window resizes.
-      </dd>
-
-      <dt id="IMERelatedCursor">Change cursor shape with IME state</dt>
-      <dd>
-	When the IME is enabled, the caret is gray.
-      </dd>
-
-      <dt id="ListHiddenFonts">List hidden fonts in font dialog</dt>
-      <dd>
-	A feature that some fonts can be shown or not on the font list is added on Windows 7 or later. 
-	When this setting is enabled, whole fonts can be selected on the <a href="setup-font.html">Font setting dialog</a>.
-      </dd>
-
-      <dt id="TitleFormat">Title format</dt>
-      <dd>Configures the window title format.
-        <dl>
-          <dt>Display host/port name</dt>
-          <dd>Displays hostname or serial port name</dd>
-
-          <dt>Display session number</dt>
-          <dd>Displays session number</dd>
-
-          <dt>Display VT/TEK</dt>
-          <dd>Displays VT or TEK</dd>
-
-          <dt>Swap hostname and title position</dt>
-          <dd>Swaps the hostname and <a href="setup-window.html#Title">title text</a>, displays hostname first.</dd>
-
-          <dt>Display tcp port number</dt>
-          <dd>Displays tcp port number (TCP/IP connection only)</dd>
-
-          <dt>Display serial port speed</dt>
-          <dd>Displays speed of serial port (serial connection only)</dd>
-        </dl>
-      </dd>
-    </dl>
-
-    <h3>Notification</h3>
-
-    <p>
-      Notification area (it was called the Task Tray before Windows XP) settings and test.
-    </p>
-
-    <p>
-      If notification setting is turn off, no notification such as icons or messages will be displayed.<br>
-      If sound setting is no sound (mute), no notification sound will be output.<br>
-      You can check the behavior with test buttons.
-    </p>
-
-    <dl>
-      <dt id="NotifySound">Notify sound</dt>
-      <dd>Notification sound(sound can be muted in Windows XP and later)</dd>
-
-      <dt>Notify Test button</dt>
-      <dd>
-        Test Notification.<br>
-        The following behaviors can be checked.
-        <ul>
-          <li>Icon is displayed in notification area (task tray).</li>
-          <li>App notification (Windows 10,11) / Balloon notification (Windows 7, 8.1) is displayed. </li>
-        </ul>
-      </dd>
-
-      <dt>Tray Test button</dt>
-      <dd>
-        Icon is displayed in notification area.<br>
-        The following behaviors can be checked.
-        <ul>
-          <li>
-            Icon is displayed in notification area (task tray).<br>
-            The icon disappears when messagebox is closed.
-          </li>
-        </ul>
-        When turn off all notifications for Tera Term,
-        "Tera Term" will not appear in Windows notification settings
-        and you may not be able to change the settings.
-
-        By pushing this button, you can change Windows notification settings
-        when icon is displayed in notification area.
-      </dd>
-    </dl>
 
     <h2 id="TabControlSequence">"Control Sequence" Tab</h2>
     <dl>
@@ -269,75 +159,6 @@ If the configuration is enabled as whole system, execute the upper command with 
     <dd>Flash screen.</dd>
 	</dl>
 	(<a href="../setup/teraterm-term.html#BellLimitting">see also</a>)
-      </dd>
-
-    </dl>
-
-
-    <h2 id="TabCopyAndPaste">"Copy and Paste" Tab</h2>
-    <dl>
-      <dt id="EnableContinuedLineCopy">Enable continued line copy</dt>
-      <dd>
-	Concatenates current line with the next line including word
-	characters when the whole line is stepped over.<br>
-	This is also effective for double clicking the left button and dragging after double clicking the left button.<br>
-	Please refer to <a href="../usage/mouse.html">mouse</a> page.
-      </dd>
-
-      <dt id="DisablePasteMouseRButton">Disable mouse R button paste</dt>
-      <dd>
-	Disables pasting clipboard data when mouse right button is clicked.
-      </dd>
-
-      <dt id="ConfirmPasteMouseRButton">Confirm mouse R button paste</dt>
-      <dd>
-	Displays popup menu and confirm pasting clipboard data when mouse
-	right button is clicked.
-      </dd>
-
-      <dt id="SelectOnlyByLButton">Select only by L button</dt>
-      <dd>
-	Enable selection by mouse drag only with left button.
-      </dd>
-
-      <dt id="TrimTrailingNL">Trim trailing new line character when pasting</dt>
-      <dd>
-	Remove trailing new line character when pasting.
-      </dd>
-
-      <dt id="ConfirmChangePaste">Confirm change paste</dt>
-      <dd>
-	When the Clipboard includes CR/LF, the confirmation
-	dialog can be shown to paste by right-click or Alt+V.
-	This is a foolproof way.
-      </dd>
-
-      <dt id="ConfirmChangePasteStringFile">String file</dt>
-      <dd>
-	When the Clipboard includes any strings in the specified file,
-	the confirmation dialog can be shown to paste by right-click or Alt+V.
-	This is a foolproof way.<br>
-	This function works when the ConfirmChangePaste is enabled.
-      </dd>
-
-      <dt id="DelimiterChar">Delimiter characters</dt>
-      <dd>
-	Includes delimiter characters for the word selection.
-      </dd>
-
-      <dt id="PasteDelayPerLine">Paste delay per line</dt>
-      <dd>
-	A user can delay to send a line data to the remote host when the user pastes multiple lines. The delay time can be specified by this option on the millisecond time scale.
-      </dd>
-
-      <dt id="SelectOnActivate">Disabling text selection when the window is activated</dt>
-      <dd>
-	When an inactive window is activated by clicking the text area with the mouse, the text selection is disabled.
-      </dd>
-
-      <dt id="AutoTextCopy">Copy to windows clipboard when text is selected</dt>
-      <dd>
-        Automatic copy to windows clipboard when text is selected.
       </dd>
 
     </dl>

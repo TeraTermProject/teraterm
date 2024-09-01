@@ -94,36 +94,68 @@ typedef struct SendMemTag {
 	CheckEOLData_t *ceol;
 } SendMem;
 
-typedef SendMem sendmem_work_t;
-
 extern "C" IdTalk TalkStatus;
 extern "C" HWND HVTWin;
 
-static sendmem_work_t *sendmem_work;
+static SendMem *sendmem_fifo[10];
+static int sendmem_size = 0;
+
+static BOOL smptrPush(SendMem *sm)
+{
+	if (sendmem_size >= _countof(sendmem_fifo)) {
+		return FALSE;
+	}
+	sendmem_fifo[sendmem_size] = sm;
+	sendmem_size++;
+	return TRUE;
+}
+
+static SendMem *smptrFront()
+{
+	if (sendmem_size == 0) {
+		return NULL;
+	}
+	return sendmem_fifo[0];
+}
+
+
+static void smptrPop()
+{
+	if (sendmem_size != 0) {
+		for (int i = 0; i < sendmem_size - 1; i++) {
+			sendmem_fifo[i] = sendmem_fifo[i + 1];
+		}
+		sendmem_size--;
+	}
+}
+
 
 class SendMemDlgObserver : public CFileTransLiteDlg::Observer {
 public:
-	SendMemDlgObserver(HWND hWndParent, void (*OnClose)(), void (*OnPause)(BOOL paused)) {
+	SendMemDlgObserver(HWND hWndParent, SendMem *sm,
+					   void (*OnClose)(SendMem *sm), void (*OnPause)(SendMem *sm, BOOL paused)) {
 		hWndParent_ = hWndParent;
+		sm_ = sm;
 		OnClose_ = OnClose;
 		OnPause_ = OnPause;
 	}
 private:
 	void OnClose()
 	{
-		OnClose_();
+		OnClose_(sm_);
 	};
 	void OnPause(BOOL paused)
 	{
-		OnPause_(paused);
+		OnPause_(sm_, paused);
 	};
 	void OnHelp()
 	{
 		MessageBoxA(hWndParent_, "no help topic", "Tera Term", MB_OK);
 	}
 	HWND hWndParent_;
-	void (*OnClose_)();
-	void (*OnPause_)(BOOL paused);
+	SendMem *sm_;
+	void (*OnClose_)(SendMem *sm);
+	void (*OnPause_)(SendMem *sm, BOOL paused);
 };
 
 static wchar_t *wcsnchr(const wchar_t *str, size_t len, wchar_t chr)
@@ -141,9 +173,9 @@ static wchar_t *wcsnchr(const wchar_t *str, size_t len, wchar_t chr)
 	return NULL;
 }
 
-static void EndPaste()
+static void EndPaste(SendMem *sm)
 {
-	sendmem_work_t *p = sendmem_work;
+	SendMem *p = sm;
 
 	if (p->callback != NULL) {
 		p->callback(p->callback_data);
@@ -153,7 +185,6 @@ static void EndPaste()
 	free((void *)p->send_ptr);
 	p->send_ptr = NULL;
 
-	TalkStatus = IdTalkKeyb;
 	if (p->dlg != NULL) {
 		p->dlg->Destroy();
 		delete p->dlg;
@@ -163,23 +194,30 @@ static void EndPaste()
 	free(p->filename);
 	SendMemFinish(p);
 
-	sendmem_work = NULL;
+	smptrPop();
 
-	// 操作できるようにする
+	if (smptrFront() == NULL) {
+		// 次の送信リクエストがない
+
+		// キー入力に戻す
+		TalkStatus = IdTalkKeyb;
+
+		// 操作できるようにする
 #if USE_ENABLE_WINDOW
-	EnableWindow(HVTWin, TRUE);
-	SetFocus(HVTWin);
+		EnableWindow(HVTWin, TRUE);
+		SetFocus(HVTWin);
 #endif
+	}
 }
 
-static void OnClose()
+static void OnClose(SendMem *sm)
 {
-	EndPaste();
+	EndPaste(sm);
 }
 
-static void OnPause(BOOL paused)
+static void OnPause(SendMem *sm, BOOL paused)
 {
-	sendmem_work_t *p = sendmem_work;
+	SendMem *p = sm;
 	p->pause = paused;
 	if (!paused) {
 		// ポーズ解除時, タイマーイベントで再送のトリガを引く
@@ -189,8 +227,8 @@ static void OnPause(BOOL paused)
 
 static void SendMemStart_i(SendMem *sm)
 {
-	sendmem_work = sm;
-	sendmem_work_t *p = sm;
+	SendMem *p = sm;
+	smptrPush(sm);
 
 	p->send_left = p->send_len;
 	p->send_index = 0;
@@ -207,7 +245,7 @@ static void SendMemStart_i(SendMem *sm)
 		if (p->filename != NULL) {
 			p->dlg->SetFilename(p->filename);
 		}
-		p->dlg_observer = new SendMemDlgObserver(p->hWndParent_, OnClose, OnPause);
+		p->dlg_observer = new SendMemDlgObserver(p->hWndParent_, sm, OnClose, OnPause);
 		p->dlg->SetObserver(p->dlg_observer);
 	}
 
@@ -252,7 +290,7 @@ static void GetInBuffInfo(const TComVar *cv_, size_t *use, size_t *free)
 /**
  *	バッファの空きサイズを調べる
  */
-static size_t GetBufferFreeSpece(sendmem_work_t *p)
+static size_t GetBufferFreeSpece(SendMem *p)
 {
 	size_t buff_len = 0;
 
@@ -288,10 +326,13 @@ static size_t GetBufferFreeSpece(sendmem_work_t *p)
  */
 void SendMemContinuously(void)
 {
-	sendmem_work_t *p = sendmem_work;
+	SendMem *p = smptrFront();
+	if (p == NULL) {
+		return;
+	}
 
 	if (p->send_ptr == NULL) {
-		EndPaste();
+		EndPaste(p);
 		return;
 	}
 
@@ -311,7 +352,7 @@ void SendMemContinuously(void)
 
 		if (out_buff_use == 0) {
 			// 送信バッファも空になった
-			EndPaste();
+			EndPaste(p);
 			return;
 		}
 	}
@@ -469,11 +510,7 @@ void SendMemContinuously(void)
  */
 static SendMem *SendMemInit_()
 {
-	if (sendmem_work != NULL) {
-		// 送信中
-		return NULL;
-	}
-	SendMem *p = (SendMem *)calloc(sizeof(*p), 1);
+	SendMem *p = (SendMem *)calloc(1, sizeof(*p));
 	if (p == NULL) {
 		return NULL;
 	}
@@ -643,11 +680,6 @@ void SendMemInitDialogFilename(SendMem *sm, const wchar_t *filename)
 extern "C" TComVar cv;
 BOOL SendMemStart(SendMem *sm)
 {
-	// 送信中チェック
-	if (sendmem_work != NULL) {
-		return FALSE;
-	}
-
 	sm->cv_ = &cv;		// TODO なくしたい
 	SendMemStart_i(sm);
 	return TRUE;

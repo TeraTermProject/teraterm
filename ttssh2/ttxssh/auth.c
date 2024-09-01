@@ -55,10 +55,13 @@
 #include "asprintf.h"
 #include "win32helper.h"
 #include "compat_win.h"
+#include "win32helper_u8.h"
 
 #define AUTH_START_USER_AUTH_ON_ERROR_END 1
 
 #define MAX_AUTH_CONTROL IDC_SSHUSEPAGEANT
+
+#define USER_PASSWORD_IS_UTF8	1
 
 #undef DialogBoxParam
 #define DialogBoxParam(p1,p2,p3,p4,p5) \
@@ -109,23 +112,24 @@ static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 		{	// 制御文字を使用する && CTRLキーが押されている
 			char chars[] = { (char) wParam, 0 };
 
-			SendMessageA(control, EM_REPLACESEL, (WPARAM) TRUE,
-			             (LPARAM)chars);
+			SendMessageA(control, EM_REPLACESEL, (WPARAM) TRUE, (LPARAM)chars);
 
 			if (data->tipwin == NULL) {
-				char uimsg[MAX_UIMSG];
-				RECT rect;
 				PTInstVar pvar = data->pvar;
-				UTIL_get_lang_msg("DLG_AUTH_TIP_CONTROL_CODE", pvar, "control character is entered");
-				strcpy_s(uimsg, _countof(uimsg), pvar->UIMsg);
+				const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
+				wchar_t *uimsg;
+				RECT rect;
+				GetI18nStrWW("TTSSH", "DLG_AUTH_TIP_CONTROL_CODE", L"control character is entered", UILanguageFileW, &uimsg);
 				if (wParam == 'V' - 'A' + 1) {
 					// CTRL + V
-					strcat_s(uimsg, _countof(uimsg), "\n");
-					UTIL_get_lang_msg("DLG_AUTH_TIP_PASTE_KEY", pvar, "Use Shift + Insert to paste from clipboard");
-					strcat_s(uimsg, _countof(uimsg), pvar->UIMsg);
+					wchar_t *uimsg_add;
+					GetI18nStrWW("TTSSH", "DLG_AUTH_TIP_PASTE_KEY", L"Use Shift + Insert to paste from clipboard", UILanguageFileW, &uimsg_add);
+					awcscats(&uimsg, L"\n", uimsg_add, NULL);
+					free(uimsg_add);
 				}
 				GetWindowRect(control, &rect);
-				data->tipwin = TipWinCreateA(hInst, control, rect.left, rect.bottom, uimsg);
+				data->tipwin = TipWinCreateW(hInst, control, rect.left, rect.bottom, uimsg);
+				free(uimsg);
 			}
 
 			return 0;
@@ -162,6 +166,8 @@ void init_password_control(PTInstVar pvar, HWND dlg, int item, BOOL *UseControlC
 	SetFocus(passwordControl);
 }
 
+// controlID の認証方式を on にし、その関連コントロールを enable にする
+// その他の認証方式の関連コントロールを disable にする
 static void set_auth_options_status(HWND dlg, int controlID)
 {
 	BOOL RSA_enabled = controlID == IDC_SSHUSERSA;
@@ -216,6 +222,9 @@ static void init_auth_machine_banner(PTInstVar pvar, HWND dlg)
 	free(buf);
 }
 
+// pvar->auth_state.supported_types で有効な認証方式に関して、認証方式のラジオボタンを enable にする
+// 有効な認証方式のうち、認証ダイアログで一番上のものを on にする
+// on になっている認証方式に関連するコントロールを有効にする
 static void update_server_supported_types(PTInstVar pvar, HWND dlg)
 {
 	int supported_methods = pvar->auth_state.supported_types;
@@ -306,47 +315,68 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_DISCONNECT" },
 	};
-	int default_method = pvar->session_settings.DefaultAuthMethod;
+	// デフォルト認証方式
+	// 認証失敗時は直前の(失敗した)認証方式
+	SSHAuthMethod method = pvar->session_settings.DefaultAuthMethod;
+	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
+	int focus_id;
 
-	SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
+	SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), UILanguageFileW);
 
 	init_auth_machine_banner(pvar, dlg);
 	init_password_control(pvar, dlg, IDC_SSHPASSWORD, UseControlChar);
+	focus_id = IDC_SSHPASSWORD;
 
 	// 認証失敗後はラベルを書き換え
 	if (pvar->auth_state.failed_method != SSH_AUTH_NONE) {
 		/* must be retrying a failed attempt */
-		wchar_t uimsg[MAX_UIMSG];
-		UTIL_get_lang_msgW("DLG_AUTH_BANNER2_FAILED", pvar, L"Authentication failed. Please retry.", uimsg);
+		wchar_t *uimsg;
+		if (pvar->auth_state.partial_success) {
+			GetI18nStrWW("TTSSH", "DLG_AUTH_BANNER2_FURTHER", L"Further authentication required.", UILanguageFileW, &uimsg);
+		} else {
+			GetI18nStrWW("TTSSH", "DLG_AUTH_BANNER2_FAILED", L"Authentication failed. Please retry.", UILanguageFileW, &uimsg);
+		}
 		SetDlgItemTextW(dlg, IDC_SSHAUTHBANNER2, uimsg);
-		UTIL_get_lang_msgW("DLG_AUTH_TITLE_FAILED", pvar, L"Retrying SSH Authentication", uimsg);
+		free(uimsg);
+		GetI18nStrWW("TTSSH", "DLG_AUTH_TITLE_FAILED", L"Retrying SSH Authentication", UILanguageFileW, &uimsg);
 		SetWindowTextW(dlg, uimsg);
-		default_method = pvar->auth_state.failed_method;
+		free(uimsg);
+		method = pvar->auth_state.failed_method;
 	}
 
-	// パスワードを覚えておくチェックボックスにはデフォルトで有効とする (2006.8.3 yutaka)
+	// パスワードを覚えておくチェックボックスにはデフォルトで有効とする
 	if (pvar->ts_SSH->remember_password) {
 		SendMessage(GetDlgItem(dlg, IDC_REMEMBER_PASSWORD), BM_SETCHECK, BST_CHECKED, 0);
 	} else {
 		SendMessage(GetDlgItem(dlg, IDC_REMEMBER_PASSWORD), BM_SETCHECK, BST_UNCHECKED, 0);
 	}
 
-	// ForwardAgent の設定を反映する (2008.12.4 maya)
+	// ForwardAgent の設定を反映する
 	CheckDlgButton(dlg, IDC_FORWARD_AGENT, pvar->settings.ForwardAgent);
 
 	// SSH バージョンによって TIS のラベルを書き換え
-	if (pvar->settings.ssh_protocol_version == 1) {
-		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE1", pvar,
-		                  "Use challenge/response(&TIS) to log in");
-		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->UIMsg);
-	} else {
-		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE2", pvar,
-		                  "Use keyboard-&interactive to log in");
-		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->UIMsg);
+	{
+		const char *key;
+		const wchar_t *def;
+		wchar_t *uimsg;
+		if (pvar->settings.ssh_protocol_version == 1) {
+			key = "DLG_AUTH_METHOD_CHALLENGE1";
+			def = L"Use challenge/response(&TIS) to log in";
+		} else {
+			key = "DLG_AUTH_METHOD_CHALLENGE2";
+			def = L"Use keyboard-&interactive to log in";
+		}
+		GetI18nStrWW("TTSSH", key, def, UILanguageFileW, &uimsg);
+		SetDlgItemTextW(dlg, IDC_SSHUSETIS, uimsg);
+		free(uimsg);
 	}
 
 	if (pvar->auth_state.user != NULL) {
-		SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->auth_state.user);
+#if defined(USER_PASSWORD_IS_UTF8)
+		SetDlgItemTextU8(dlg, IDC_SSHUSERNAME, pvar->auth_state.user);
+#else
+		SetDlgItemTextA(dlg, IDC_SSHUSERNAME, pvar->auth_state.user);
+#endif
 		EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_USERNAME_OPTION), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAMELABEL), FALSE);
@@ -387,11 +417,16 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	}
 
 	if (strlen(pvar->ssh2_password) > 0) {
-		SetDlgItemText(dlg, IDC_SSHPASSWORD, pvar->ssh2_password);
+#if defined(USER_PASSWORD_IS_UTF8)
+		SetDlgItemTextU8(dlg, IDC_SSHPASSWORD, pvar->ssh2_password);
+#else
+		SetDlgItemTextA(dlg, IDC_SSHPASSWORD, pvar->ssh2_password);
+#endif
 		if (pvar->ssh2_autologin == 1) {
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORDCAPTION), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), FALSE);
+			focus_id = IDCANCEL;
 		}
 	}
 
@@ -402,10 +437,13 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 	SetDlgItemText(dlg, IDC_LOCALUSERNAME,
 	               pvar->session_settings.DefaultRhostsLocalUserName);
 
+	// /auth=passsword
 	if (pvar->ssh2_authmethod == SSH_AUTH_PASSWORD) {
 		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSEPASSWORD);
 
-	} else if (pvar->ssh2_authmethod == SSH_AUTH_RSA) {
+	}
+	// /auth=publickey
+	else if (pvar->ssh2_authmethod == SSH_AUTH_RSA) {
 		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSERSA);
 
 		SetDlgItemTextW(dlg, IDC_RSAFILENAME, pvar->ssh2_keyfile);
@@ -414,62 +452,61 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg, BOOL *UseControlChar)
 			EnableWindow(GetDlgItem(dlg, IDC_RSAFILENAME), FALSE);
 		}
 
-	// /auth=challenge を追加 (2007.10.5 maya)
+	// /auth=challenge
 	} else if (pvar->ssh2_authmethod == SSH_AUTH_TIS) {
 		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSETIS);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), FALSE);
 		SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
+		focus_id = IDOK;
 
-	// /auth=pageant を追加
+	// /auth=pageant
 	} else if (pvar->ssh2_authmethod == SSH_AUTH_PAGEANT) {
 		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSEPAGEANT);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD_OPTION), FALSE);
-		SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
+		SetDlgItemTextA(dlg, IDC_SSHPASSWORD, "");
+		focus_id = IDOK;
 
-	} else {
-		// デフォルトの認証メソッドをダイアログに反映
-		set_auth_options_status(dlg, auth_types_to_control_IDs[default_method]);
+	}
+	// 認証方式の指定がない
+	else {
+		set_auth_options_status(dlg, auth_types_to_control_IDs[method]);
 
 		update_server_supported_types(pvar, dlg);
 
-		// ホスト確認ダイアログから抜けたとき=ウィンドウがアクティブになったとき
-		// に SetFocus が実行され、コマンドラインで渡された認証方式が上書きされて
-		// しまうので、自動ログイン有効時は SetFocus しない (2009.1.31 maya)
-		if (default_method == SSH_AUTH_TIS) {
-			/* we disabled the password control, so fix the focus */
-			SetFocus(GetDlgItem(dlg, IDC_SSHUSETIS));
+		if (method == SSH_AUTH_TIS) {
+			focus_id = IDOK;
 		}
-		else if (default_method == SSH_AUTH_PAGEANT) {
-			SetFocus(GetDlgItem(dlg, IDC_SSHUSEPAGEANT));
+		else if (method == SSH_AUTH_PAGEANT) {
+			focus_id = IDOK;
 		}
-
 	}
 
 	if (GetWindowTextLength(GetDlgItem(dlg, IDC_SSHUSERNAME)) == 0) {
-		SetFocus(GetDlgItem(dlg, IDC_SSHUSERNAME));
+		focus_id = IDC_SSHUSERNAME;
 	}
 	else if (pvar->ask4passwd == 1) {
-		SetFocus(GetDlgItem(dlg, IDC_SSHPASSWORD));
+		focus_id = IDC_SSHPASSWORD;
 	}
 
-	// '/I' 指定があるときのみ最小化する (2005.9.5 yutaka)
+	// '/I' 指定があるときのみ最小化する
 	if (pvar->ts->Minimize) {
-		//20050822追加 start T.Takahashi
 		ShowWindow(dlg,SW_MINIMIZE);
-		//20050822追加 end T.Takahashi
 	}
+
+	// フォーカスをセットする
+	//SetFocus(GetDlgItem(dlg, focus_id));
+	PostMessage(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, focus_id), TRUE);
 }
 
-static char *alloc_control_text(HWND ctl)
+static DWORD hGetDlgItemTextAorU8(HWND hDlg, int id, char **text)
 {
-	wchar_t *textW;
-	char *textA;
-	hGetWindowTextW(ctl, &textW);
-	textA = ToCharW(textW);
-	free(textW);
-	return textA;
+#if defined(USER_PASSWORD_IS_UTF8)
+	return hGetDlgItemTextU8(hDlg, id, text);
+#else
+	return hGetDlgItemTextA(hDlg, id, text);
+#endif
 }
 
 /**
@@ -547,11 +584,11 @@ static void choose_host_RSA_key_file(HWND dlg, PTInstVar pvar)
 
 static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 {
-	int method = SSH_AUTH_PASSWORD;
-	char *password =
-		alloc_control_text(GetDlgItem(dlg, IDC_SSHPASSWORD));
+	SSHAuthMethod method = SSH_AUTH_PASSWORD;
+	char *password;
 	Key *key_pair = NULL;
 
+	hGetDlgItemTextAorU8(dlg, IDC_SSHPASSWORD, &password);
 	if (IsDlgButtonChecked(dlg, IDC_SSHUSERSA)) {
 		method = SSH_AUTH_RSA;
 	} else if (IsDlgButtonChecked(dlg, IDC_SSHUSERHOSTS)) {
@@ -741,8 +778,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 	/* we can't change the user name once it's set. It may already have
 	   been sent to the server, and it can only be sent once. */
 	if (pvar->auth_state.user == NULL) {
-		pvar->auth_state.user =
-			alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+		hGetDlgItemTextAorU8(dlg, IDC_SSHUSERNAME, &pvar->auth_state.user);
 	}
 
 	// パスワードの保存をするかどうかを決める (2006.8.3 yutaka)
@@ -754,13 +790,15 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		pvar->ts_SSH->remember_password = 0;
 	}
 
-	// 公開鍵認証の場合、セッション複製時にパスワードを使い回したいので解放しないようにする。
-	// (2005.4.8 yutaka)
+	// - パスワード認証の場合 pvar->auth_state.cur_cred.password が認証に使われる
+	// - 公開鍵認証の場合 pvar->auth_state.cur_cred.password は認証に使われないが、
+	//   セッション複製時にパスフレーズを使い回したいので解放しないようにする。
 	if (method == SSH_AUTH_PASSWORD || method == SSH_AUTH_RSA) {
 		pvar->auth_state.cur_cred.password = password;
 	} else {
 		destroy_malloced_string(&password);
 	}
+
 	if (method == SSH_AUTH_RHOSTS || method == SSH_AUTH_RHOSTS_RSA) {
 		if (pvar->session_settings.DefaultAuthMethod != SSH_AUTH_RHOSTS) {
 			UTIL_get_lang_msg("MSG_RHOSTS_NOTDEFAULT_ERROR", pvar,
@@ -773,8 +811,8 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 			notify_nonfatal_error(pvar, pvar->UIMsg);
 		}
 
-		pvar->auth_state.cur_cred.rhosts_client_user =
-			alloc_control_text(GetDlgItem(dlg, IDC_LOCALUSERNAME));
+		hGetDlgItemTextAorU8(dlg, IDC_LOCALUSERNAME,
+							 &pvar->auth_state.cur_cred.rhosts_client_user);
 	}
 	pvar->auth_state.auth_dialog = NULL;
 
@@ -871,8 +909,7 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 						// ダイアログのユーザ名を取得する
 						if (pvar->auth_state.user == NULL) {
-							pvar->auth_state.user =
-								alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+							hGetDlgItemTextAorU8(dlg, IDC_SSHUSERNAME, &pvar->auth_state.user);
 						}
 
 						// CheckAuthListFirst が TRUE のときは AuthList が帰ってきていないと
@@ -891,8 +928,7 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 					// ダイアログのユーザ名を取得する
 					if (pvar->auth_state.user == NULL) {
-						pvar->auth_state.user =
-							alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+						hGetDlgItemTextAorU8(dlg, IDC_SSHUSERNAME, &pvar->auth_state.user);
 					}
 
 					SendMessage(dlg, WM_COMMAND, IDOK, 0);
@@ -908,8 +944,7 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 					// ダイアログのユーザ名を取得する
 					if (pvar->auth_state.user == NULL) {
-						pvar->auth_state.user =
-							alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+						hGetDlgItemTextAorU8(dlg, IDC_SSHUSERNAME, &pvar->auth_state.user);
 					}
 
 					// ユーザ名を変更させない
@@ -999,8 +1034,7 @@ canceled:
 						!pvar->tryed_ssh2_authlist) {
 						// ダイアログのユーザ名を反映
 						if (pvar->auth_state.user == NULL) {
-							pvar->auth_state.user =
-								alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+							hGetDlgItemTextAorU8(dlg, IDC_SSHUSERNAME, &pvar->auth_state.user);
 						}
 
 						// ユーザ名が入力されているかチェックする
@@ -1211,6 +1245,7 @@ char *AUTH_get_user_name(PTInstVar pvar)
 	return pvar->auth_state.user;
 }
 
+// pvar->auth_state.supported_types を更新する
 int AUTH_set_supported_auth_types(PTInstVar pvar, int types)
 {
 	logprintf(LOG_LEVEL_VERBOSE, "Server reports supported authentication method mask = %d", types);
@@ -1383,8 +1418,9 @@ static void init_TIS_dlg(PTInstVar pvar, HWND dlg)
 
 static BOOL end_TIS_dlg(PTInstVar pvar, HWND dlg)
 {
-	char *password =
-		alloc_control_text(GetDlgItem(dlg, IDC_SSHPASSWORD));
+	char *password;
+
+	hGetDlgItemTextAorU8(dlg, IDC_SSHPASSWORD, &password);
 
 	pvar->auth_state.cur_cred.method = SSH_AUTH_TIS;
 	pvar->auth_state.cur_cred.password = password;
@@ -1664,6 +1700,8 @@ static INT_PTR CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 void AUTH_init(PTInstVar pvar)
 {
 	pvar->auth_state.failed_method = SSH_AUTH_NONE;
+	pvar->auth_state.partial_success = 0;
+	pvar->auth_state.multiple_required_auth = 0;
 	pvar->auth_state.auth_dialog = NULL;
 	pvar->auth_state.user = NULL;
 	pvar->auth_state.flags = 0;
