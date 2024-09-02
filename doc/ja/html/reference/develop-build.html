@@ -68,27 +68,27 @@ installer\release.bat がインストール済みのツールを見つけられない場合は、installe
 
 <h2 id="build-quick">ビルド手順 (Quick Start)</h2>
 
-<h3 id="build-quick-checkout">ソースコードのチェックアウト</h2>
+<h3 id="build-quick-checkout">ソースコードのチェックアウト</h3>
 
 <p>
 ソースコードを GitHub (https://github.com/TeraTermProject/teraterm) から clone します。
 </p>
 
-<h3 id="build-quick-all">ビルド</h2>
+<h3 id="build-quick-all">ビルド</h3>
 
 <p>
 installer\release.bat を実行し、3を選択します。
 </p>
 
-<h3 id="build-detail">ビルド手順 (詳説)</h2>
+<h3 id="build-detail">ビルド手順 (詳説)</h3>
 
-<h3 id="build-checkout">ソースコードの clone</h2>
+<h3 id="build-checkout">ソースコードの clone</h3>
 
 <p>
 ソースコードを GitHub (https://github.com/TeraTermProject/teraterm) から clone します。
 </p>
 
-<h3 id="build-library">ライブラリのビルド</h2>
+<h3 id="build-library">ライブラリのビルド</h3>
 
 <p>
 "x86 Native Tools Command Prompt for VS 2022" を立ち上げるか、適切な PATH を通しておく必要があります。<br />
@@ -143,7 +143,7 @@ installer\release.bat を実行し、3を選択します。
   </li>
 </ul>
 
-<h3 id="build-teraterm">Tera Termのビルド</h2>
+<h3 id="build-teraterm">Tera Termのビルド</h3>
 
 <ol>
   <li>teraterm\ttermpro.sln をVisual Studioで開く。<br />
@@ -152,7 +152,7 @@ installer\release.bat を実行し、3を選択します。
   <li>ビルドに成功すると teraterm\Debug / teraterm\Release ディレクトリに実行プログラムが生成される。</li>
 </ol>
 
-<h3 id="build-ttssh">TTSSHのビルド</h2>
+<h3 id="build-ttssh">TTSSHのビルド</h3>
 
 あらかじめ teraterm\ttermpro.sln によって common_static.lib がビルドされている必要があります。
 
@@ -162,7 +162,7 @@ installer\release.bat を実行し、3を選択します。
   <li>ビルドに成功すると ttssh2\ttxssh\Debug / ttssh2\ttxssh\Release ディレクトリにDLLが生成される。</li>
 </ol>
 
-<h3 id="build-ttproxy">TTProxyのビルド</h2>
+<h3 id="build-ttproxy">TTProxyのビルド</h3>
 
 あらかじめ teraterm\ttermpro.sln によって common_static.lib がビルドされている必要があります。
 
@@ -172,7 +172,7 @@ installer\release.bat を実行し、3を選択します。
   <li>ビルドに成功すると TTProxy\Debug / TTProxy\Release ディレクトリにDLLが生成される。</li>
 </ol>
 
-<h3 id="build-ttxkanjimenu">TTXKanjiMenuのビルド</h2>
+<h3 id="build-ttxkanjimenu">TTXKanjiMenuのビルド</h3>
 
 あらかじめ teraterm\ttermpro.sln によって common_static.lib がビルドされている必要があります。
 
@@ -182,7 +182,7 @@ installer\release.bat を実行し、3を選択します。
   <li>ビルドに成功すると TTXKanjiMenu\Debug / TTXKanjiMenu\Release ディレクトリに ttxkanjimenu.dll が生成される。</li>
 </ol>
 
-<h3 id="build-ttxsamples">TTXSamplesのビルド</h2>
+<h3 id="build-ttxsamples">TTXSamplesのビルド</h3>
 
 <p>
 リポジトリのTTXSamplesに Tera Term Extension (TTX)のサンプルがあります。TTXを作る際の参考にしてください。
@@ -200,7 +200,7 @@ installer\release.bat を実行し、3を選択します。
 各TTXの詳細については、プロジェクト内のReadMe-ja.txtを参照してください。
 </p>
 
-<h3 id="build-teraterm-menu">TeraTerm Menuのビルド</h2>
+<h3 id="build-teraterm-menu">TeraTerm Menuのビルド</h3>
 
 あらかじめ teraterm\ttermpro.sln によって common_static.lib がビルドされている必要があります。
 
@@ -210,7 +210,7 @@ installer\release.bat を実行し、3を選択します。
   <li>ビルドに成功すると ttpmenu\Debug / ttpmenu\Release ディレクトリに ttpmenu.exe が生成される。</li>
 </ol>
 
-<h3 id="build-cygterm">CygTerm+のビルド</h2>
+<h3 id="build-cygterm">CygTerm+のビルド</h3>
 
 <ol>
   <li>Cygwinのシェルを起動し、cygterm ディレクトリへ移動する。
@@ -226,7 +226,7 @@ installer\release.bat を実行し、3を選択します。
   <li>cygterm.exe が生成される。</li>
 </ol>
 
-<h3 id="build-cyglaunch">Cyglaunchのビルド</h2>
+<h3 id="build-cyglaunch">Cyglaunchのビルド</h3>
 
 事前に teraterm\ttermpro.sln の common_static.lib がビルドされている必要があります。
 
@@ -236,13 +236,13 @@ installer\release.bat を実行し、3を選択します。
   <li>ビルドに成功すると cygwin\Debug / cygwin\Release ディレクトリに cyglaunch.exe が生成される。</li>
 </ol>
 
-<h3 id="build-htmlhelp">ヘルプファイルのビルド</h2>
+<h3 id="build-htmlhelp">ヘルプファイルのビルド</h3>
 
 <ol>
   <li>doc\makechm.bat を実行する。</li>
 </ol>
 
-<h3 id="build-installer">インストーラの作成</h2>
+<h3 id="build-installer">インストーラの作成</h3>
 
 <dl>
   <dt>AppVeyor を使用する場合</dt>
