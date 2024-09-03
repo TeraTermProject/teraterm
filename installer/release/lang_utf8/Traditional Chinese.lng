@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2024-08-31 by TeraTerm Project
+date=2024-09-02 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -420,7 +420,7 @@ DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=主機列表(&L)
 DLG_TCPIP_HISTORYTITLE=紀錄
 DLG_TCPIP_HISTORY=Save h&istory when new connection
-DLG_TCPIP_EDITHISTORY=Edit hisotry
+DLG_TCPIP_EDITHISTORY=Edit history
 DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_PORT=端口(&P)：
 DLG_TCPIP_KEEPALIVE=保持激活(&K)

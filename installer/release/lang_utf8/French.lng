@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2024-08-31 by TeraTerm Project
+date=2024-09-02 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -420,7 +420,7 @@ DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=Liste d'hôtes
 DLG_TCPIP_HISTORYTITLE=History
 DLG_TCPIP_HISTORY=Save h&istory when new connection
-DLG_TCPIP_EDITHISTORY=Edit hisotry
+DLG_TCPIP_EDITHISTORY=Edit history
 DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_PORT=N° de &Port:
 DLG_TCPIP_KEEPALIVE=Temps de maintien

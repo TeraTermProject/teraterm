@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2024-08-31 by TeraTerm Project
+date=2024-09-02 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -420,7 +420,7 @@ DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=호스트 목록(&L)
 DLG_TCPIP_HISTORYTITLE=이력
 DLG_TCPIP_HISTORY=Save h&istory when new connection
-DLG_TCPIP_EDITHISTORY=Edit hisotry
+DLG_TCPIP_EDITHISTORY=Edit history
 DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_PORT=포트#(&P):
 DLG_TCPIP_KEEPALIVE=연결유지(&K)
