@@ -425,12 +425,14 @@ static void PASCAL TTXModifyMenu(HMENU menu)
  */
 static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 	// メニューが呼び出されたら、最新の設定に更新する。(2007.5.25 yutaka)
-	(void)menu;
-	UpdateRecvMenu(pvar->ts->KanjiCode);
-	if (!pvar->UseOneSetting) {
-		UpdateSendMenu(pvar->ts->KanjiCodeSend);
+	if (menu == pvar->hmEncode) {
+		(void)menu;
+		UpdateRecvMenu(pvar->ts->KanjiCode);
+		if (!pvar->UseOneSetting) {
+			UpdateSendMenu(pvar->ts->KanjiCodeSend);
+		}
+		CheckMenuItem(pvar->hmEncode, ID_MI_USEONESETTING, MF_BYCOMMAND | (pvar->UseOneSetting)?MF_CHECKED:0);
 	}
-	CheckMenuItem(pvar->hmEncode, ID_MI_USEONESETTING, MF_BYCOMMAND | (pvar->UseOneSetting)?MF_CHECKED:0);
 }
 
 static const MenuInfo *SearchMenuItem(const MenuInfo *menu_info_ptr, size_t menu_info_count, UINT cmd_id)
