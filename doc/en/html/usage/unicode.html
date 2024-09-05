@@ -9,28 +9,53 @@
 </HEAD>
 <BODY>
 
-<h1>Unicode</h1>
+<h1>Unicode Settings</h1>
 
-<p>
-To use UTF-8, changed from English to "UTF-8" or "Japanese" or "Korean" under Setup-&gt;General menu.<br>
+<a href="../menu/setup-additional-coding.html">Additional settings / "coding" tab</a> for setting character encoding.
+To use UTF-8, select the following character encoding.
 
-<p>
-When the Language "UTF-8" is selected, below function can not be used beside Japanese setting.
-</p>
+<dl>
+  <dt>Chinese/UTF-8<br>
+    Japanese/UTF-8<br>
+    Korean/UTF-8</dt>
+  <dd>
+    Select UTF-8.<br>
+    By default, Ambiguous Characters width is 2 and Emoji Characters width is 2 for <a href="../about/glossary.html#CJK">CJK</a>.
+  </dd>
+
+  <dt>UTF-8</dt>
+  <dd>
+    Select UTF-8.<br>
+    By default, Ambiguous Characters width is 1 and Emoji Characters width is 1.
+  <dd>
+</dl>
+
+<h2>TTXKanjiMenu plug-in</h2>
+
+TTXKanjiMenu plug-in is available only for the following character encodings.
+It is not displayed for other character codes.
+
 <ul>
-  <li>The JIS, EUC and SJIS character code except for UTF-8</li>
-  <li>Specifying Japanese character set of ISO/IEC 2022</li>
-  <li>TTXKanjiMenu plug-in</li>
+  <li>"Japanese/UTF-8"</li>
+  <li>"Japanese/SJIS (CP932)"</li>
+  <li>"Japanese/JIS"</li>
+  <li>"Japanese/EUC"</li>
+  <li>"Korean/KS5601 (CP949)"</li>
+  <li>"Korean/UTF-8"</li>
 </ul>
 
+<h2>Language</h2>
+
+String from the beginning of the character code to "/" (eg. "Japanese") corresponds to "Language"
+that was existed in "Setup" menu - "General" dialog In Tera Term 5.2 or earlier.
+
 <p>
-If you set the Language "Japanese" or "Korean", select "Terminal" from the Tera Term "Setup" menu. Inside the dialog-box,
-select "UTF-8" from "Kanji(receive)" or "Kanji(transmit)".
-There is no need to restart Tera Term to activate these configuration changes.<br>
+  Tera Term has a restriction that sending and receiving character codes must be selected same language.
+
+<h2>command line</h2>
 
 When "UTF8" is specified with '/KT' or '/KR' option in the command line,
 UTF-8 encoding/decoding can be used during transmitting and receiving of data.
-</p>
 
 </BODY>
 </HTML>
