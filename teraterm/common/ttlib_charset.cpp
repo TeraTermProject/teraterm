@@ -70,9 +70,9 @@ static const TKanjiList KanjiList[] = {
 	{ IdRussian,	IdISO,				"Russian/ISO 8859-5",		"ISO8859-5" },
 	{ IdKorean,		IdKoreanCP949,		"Korean/KS5601 (CP949)",	"KS5601" },
 	{ IdKorean,		IdUTF8,				"Korean/UTF-8",				"UTF-8" },
-	{ IdChinese,	IdCnGB2312,			"China/GB2312 (CP936)",		"GB2312" },
-	{ IdChinese,	IdCnBig5,			"China/Big5 (CP950)",		"BIG5" },
-	{ IdChinese,	IdUTF8,				"China/UTF-8",				"UTF-8" },
+	{ IdChinese,	IdCnGB2312,			"Chinese/GB2312 (CP936)",	"GB2312" },
+	{ IdChinese,	IdCnBig5,			"Chinese/Big5 (CP950)",		"BIG5" },
+	{ IdChinese,	IdUTF8,				"Chinese/UTF-8",			"UTF-8" },
 };
 
 const TLanguageList *GetLanguageList(int index)
