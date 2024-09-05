@@ -14,13 +14,13 @@
     <h2>Coding</h2>
 
     <dl>
-      <dt id="KanjiReceive">Kanji (receive)</dt>
+      <dt id="KanjiReceive">receive</dt>
       <dd>
-        Kanji character that is received from host(SJIS, EUC, JIS and UTF-8).
+        Kanji character that is received from host.
       </dd>
-      <dt id="KanjiSend">Kanji (transmit)</dt>
+      <dt id="KanjiSend">transmit</dt>
       <dd>
-        Kanji character that is sent from client(SJIS, EUC, JIS and UTF-8).
+        Kanji character that is sent from client.
       </dd>
     </dl>
 
@@ -32,6 +32,7 @@
     Specify character width assumed by Tera Term connecting destination.<br>
     Refer to <a href="#EastAsianWidth">East_Asian_Width and width (cells)</a>.<br>
     Refer to <a href="setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a> for Tera Term drawing character width.
+    If you change Coding-receive by pull-down, width is changed to typical characte witdh of that code automatically. Nevertheless, that width is not absolutely recommend, you can choose the width what you want for font or other reasons.
 
     <h3>Override Emoji Characters width</h3>
 
@@ -76,13 +77,13 @@
     <h2 id="JapaneseJIS">Japanese JIS</h2>
 
     <dl>
-      <dt id="KatakanaReceive">7bit katakana (receive)</dt>
+      <dt id="KatakanaReceive">Half-width kana (receive)</dt>
       <dd>
         When "HANKAKU" katakana code from host is described for 7bit
         (Shift control with SO/SI is using), please select this entry.
         This is only enabled when Kanji (receive) is JIS.
       </dd>
-      <dt id="KatakanaSend">7bit katakana (transmit)</dt>
+      <dt id="KatakanaSend">Half-width kana (transmit)</dt>
       <dd>
         When "HANKAKU" katakana code from host is described for 7bit
         (Shift control with SO/SI is using), please select this entry.

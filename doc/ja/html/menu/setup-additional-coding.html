@@ -14,13 +14,13 @@
     <h2>Coding</h2>
 
     <dl>
-      <dt id="KanjiReceive">Kanji (receive)</dt>
+      <dt id="KanjiReceive">receive</dt>
       <dd>
-        ホストから送られてくる漢字コード (SJIS, EUC, JIS, UTF-8 の4種類)。
+        ホストから送られてくる漢字コード。
       </dd>
-      <dt id="KanjiSend">Kanji (transmit)</dt>
+      <dt id="KanjiSend">transmit</dt>
       <dd>
-        送出する漢字コード (SJIS, EUC, JIS, UTF-8 の4種類)。
+        送出する漢字コード。
       </dd>
     </dl>
 
@@ -31,7 +31,8 @@
     1 Cell または 2 Cell を選択します。<br>
     Tera Term の接続先が想定している文字幅を指定します。<br>
     <a href="#EastAsianWidth">East_Asian_Width特性とセル数について</a>を参照ください。<br>
-    Tera Term が描画する文字の幅については<a href="setup-additional-font.html#ResizedFont">描画幅に合わせてリサイズしたフォントを描画</a>を参照ください。
+    Tera Term が描画する文字の幅については<a href="setup-additional-font.html#ResizedFont">描画幅に合わせてリサイズしたフォントを描画</a>を参照ください。<br>
+    Coding-receive プルダウンを変更すると、その漢字コードで一般的な文字幅で上書きされます。しかし、その文字幅でなければならないというわけではありません。フォントなどの理由により、使いたい幅を選択してください。
 
     <h3>Override Emoji Characters width</h3>
 
@@ -77,13 +78,13 @@
     <h2 id="JapaneseJIS">Japanese JIS</h2>
 
     <dl>
-      <dt id="KatakanaReceive">7bit katakana (receive)</dt>
+      <dt id="KatakanaReceive">Half-width kana (receive)</dt>
       <dd>
         ホストから送られてくる"半角"片仮名コードが 7 bit で表現されている
         (SO/SI を用いたシフト制御を用いている)場合に選択してください。
         Kanji (receive) が JIS の場合のみ有効です。
       </dd>
-      <dt id="KatakanaSend">7bit katakana (transmit)</dt>
+      <dt id="KatakanaSend">Half-width kana (transmit)</dt>
       <dd>
         送出する"半角"片仮名コードを7bitで表現する
         (SO/SI を用いたシフト制御を用いる)場合に選択してください。
