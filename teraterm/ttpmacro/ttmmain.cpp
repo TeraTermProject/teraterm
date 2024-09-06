@@ -700,7 +700,7 @@ LRESULT CCtrlWindow::OnMacroBringup(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-LRESULT CCtrlWindow::OnDpiChanged(WPARAM wp, LPARAM)
+LRESULT CCtrlWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 {
 	const UINT new_dpi = LOWORD(wp);
 	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), new_dpi);
