@@ -220,7 +220,9 @@ void CInpDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 	SendDlgItemMessage(IDC_INPEDIT, EM_LIMITTEXT, MaxStrLen, 0);
 
 	if (is_init) {
-		SetDlgPos();
+		if (SetDlgPosEX(GetSafeHwnd(), WW, WH, &PosX, &PosY) < 0) {
+			SetDlgPos();
+		}
 	}
 
 	InvalidateRect(NULL, TRUE);
@@ -255,7 +257,9 @@ LRESULT CInpDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 		WH = init_WH;
 
 		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), dpi);
-		::SetWindowPos(m_hWnd, HWND_TOP, 0, 0, WW, WH, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+		if (in_init) {
+			::SetWindowPos(m_hWnd, HWND_TOP, 0, 0, WW, WH, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+		}
 		Relocation(in_init, WW, WH);
 		return TRUE;
 	}

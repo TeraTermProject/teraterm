@@ -102,9 +102,14 @@ BOOL CErrDlg::OnInitDialog()
 		wcsncat_s(buf, _countof(buf), L">>>", _TRUNCATE);
 	SetDlgItemTextW(IDC_EDIT_ERRLINE, buf);
 
-	SetDlgPos();
-
+	in_init = TRUE;
+	RECT R;
+	GetWindowRect(&R);
+	if (SetDlgPosEX(m_hWnd, R.right - R.left, R.bottom - R.top, &PosX, &PosY) < 0) {
+		SetDlgPos();
+	}
 	::SetForegroundWindow(m_hWnd);
+	in_init = FALSE;
 
 	return TRUE;
 }
@@ -130,9 +135,12 @@ LRESULT CErrDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch(msg) {
 	case WM_DPICHANGED:
-		RECT R = *(RECT *)lp;
-		int PosX = R.left;
-		int PosY = R.top;
+		if (in_init == TRUE) {
+			RECT R = *(RECT *)lp;
+			if (SetDlgPosEX(m_hWnd, R.right - R.left, R.bottom - R.top, &PosX, &PosY) < 0) {
+				SetDlgPos();
+			}
+		}
 		return TRUE;
 	}
 	return FALSE;
