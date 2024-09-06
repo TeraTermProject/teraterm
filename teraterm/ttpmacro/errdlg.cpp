@@ -131,6 +131,15 @@ BOOL CErrDlg::OnCommand(WPARAM wp, LPARAM lp)
 	return FALSE;
 }
 
+BOOL CErrDlg::OnClose()
+{
+	const int ret = MessageBoxHaltScript(m_hWnd);
+	if (ret == IDYES) {
+		EndDialog(IDOK); // IDOK = É}ÉNÉçèIóπ
+	}
+	return TRUE;
+}
+
 LRESULT CErrDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch(msg) {
