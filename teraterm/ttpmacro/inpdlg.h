@@ -50,15 +50,16 @@ private:
 	const wchar_t *TitleStr;
 	const wchar_t *DefaultStr;
 	BOOL PaswdFlag;
-	int init_WW, TW, TH, BH, BW, EW, EH;
+	int init_WW = 0, init_WH = 0, TW, TH, BH, BW, EW, EH;
 	SIZE s;
 	HINSTANCE m_hInst;
+	BOOL in_init = FALSE;
+	int dpi = 0;
 
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnOK();
 	virtual BOOL OnClose();
 	virtual LRESULT DlgProc(UINT msg, WPARAM wp, LPARAM lp);
 	LRESULT OnExitSizeMove(WPARAM wp, LPARAM lp);
- 	void Relocation(BOOL is_init, int WW);
+	void Relocation(BOOL is_init, int WW, int WH);
 };
-

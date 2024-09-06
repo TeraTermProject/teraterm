@@ -81,7 +81,8 @@ BOOL CMsgDlg::OnInitDialog()
 		};
 		SetDlgTextsW(m_hWnd, TextInfosOk, _countof(TextInfosOk), UILanguageFileW);
 	}
-	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), 0);
+	dpi = GetMonitorDpiFromWindow(m_hWnd);
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), dpi);
 
 	SetWindowTextW(TitleStr);
 	SetDlgItemTextW(IDC_MSGTEXT,TextStr);
@@ -98,7 +99,9 @@ BOOL CMsgDlg::OnInitDialog()
 	WW = R.right-R.left;
 	WH = R.bottom-R.top;
 
-	Relocation(TRUE, WW);
+	in_init = TRUE;
+	Relocation(TRUE, WW, WH);
+	in_init = FALSE;
 
 	BringupWindow(this->m_hWnd);
 
@@ -108,24 +111,54 @@ BOOL CMsgDlg::OnInitDialog()
 LRESULT CMsgDlg::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 {
 	RECT R;
+	int current_WW, current_WH;
 
 	GetWindowRect(&R);
-		if (R.bottom-R.top == WH && R.right-R.left == WW) {
+	current_WW = R.right - R.left;
+	current_WH = R.bottom - R.top;
+
+	if (current_WW == WW && current_WH == WH) {
 		// サイズが変わっていなければ何もしない
-	}
-	else if (R.bottom-R.top != WH || R.right-R.left < init_WW) {
-		// 高さが変更されたか、最初より幅が狭くなった場合は元に戻す
-		SetWindowPos(HWND_TOP,R.left,R.top,WW,WH,0);
+		PosX = R.left;
+		PosY = R.top;
 	}
 	else {
-		// そうでなければ再配置する
-		Relocation(FALSE, R.right-R.left);
+		int new_WW;
+
+		// 高さが変更されたか、最初より幅が狭くなった場合は元に戻す
+		if (current_WW < init_WW) {
+			new_WW = init_WW;
+			if (PosX != R.left) {
+				PosX = R.right - new_WW;
+			} else {
+				PosX = R.left;
+			}
+		} else {
+			new_WW = current_WW;
+			PosX = R.left;
+		}
+		if (current_WH < init_WH) {
+			if (PosY != R.top) {
+				PosY = R.bottom - init_WH;
+			} else {
+				PosY = R.top;
+			}
+		} else {
+			if (PosY != R.top) {
+				PosY = R.top;
+			} else {
+				PosY = R.bottom - init_WH;
+			}
+		}
+
+		::SetWindowPos(m_hWnd, HWND_TOP, PosX, PosY, new_WW, init_WH, SWP_NOZORDER | SWP_NOACTIVATE);
+		Relocation(FALSE, new_WW, init_WH);
 	}
 
 	return TRUE;
 }
 
-void CMsgDlg::Relocation(BOOL is_init, int new_WW)
+void CMsgDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 {
 	RECT R;
 	HWND HText, HOk, HNo;
@@ -146,12 +179,14 @@ void CMsgDlg::Relocation(BOOL is_init, int new_WW)
 		}
 		// ウインドウサイズの計算
 		WW = TW + (WW - CW);
-		WH = TH + BH + BH*3/2 + (WH - CH);
+		WH = TH + (WH - CH) + BH + BH*3/2;
 		init_WW = WW;
+		init_WH = WH;
 	}
 	else {
 		TW = CW;
 		WW = new_WW;
+		WH = new_WH;
 	}
 
 	HText = ::GetDlgItem(GetSafeHwnd(), IDC_MSGTEXT);
@@ -168,7 +203,9 @@ void CMsgDlg::Relocation(BOOL is_init, int new_WW)
 		::MoveWindow(HOk,(TW-BW)/2,TH+BH,BW,BH,TRUE);
 	}
 
-	SetDlgPos();
+	if (is_init) {
+		SetDlgPos();
+	}
 
 	InvalidateRect(NULL);
 }
@@ -204,13 +241,30 @@ LRESULT CMsgDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 	switch(msg) {
 	case WM_EXITSIZEMOVE:
 		return OnExitSizeMove(wp, lp);
-	case WM_DPICHANGED: {
-		RECT rect;
-		::GetWindowRect(m_hWnd, &rect);
-		WW = rect.right - rect.left;
-		WH = rect.bottom - rect.top;
-		break;
-	}
+	case WM_DPICHANGED:
+		int new_dpi;
+		float mag;
+		RECT R;
+
+		new_dpi = HIWORD(wp);
+		mag = new_dpi / (float)dpi;
+		dpi = new_dpi;
+		init_WW = (int)(init_WW * mag);
+		init_WH = (int)(init_WH * mag);
+		TW      = (int)(TW      * mag);
+		TH      = (int)(TH      * mag);
+		s.cx    = (int)(s.cx    * mag);
+		s.cy    = (int)(s.cy    * mag);
+		BW      = (int)(BW      * mag);
+		BH      = (int)(BH      * mag);
+
+		R = *(RECT *)lp;
+		WW = R.right - R.left;
+		WH = init_WH;
+
+		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), dpi);
+		Relocation(in_init, WW, WH);
+		return TRUE;
 	}
 	return FALSE;
 }

@@ -41,9 +41,11 @@ public:
 private:
 	const wchar_t *TextStr;
 	const wchar_t *TitleStr;
-	int  init_WW, TW, TH;
+	int  init_WW = 0, init_WH = 0, TW, TH;
 	SIZE s;
 	HINSTANCE m_hInst;
+	BOOL in_update = FALSE;
+	int dpi = 0;
 
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnOK();
@@ -55,7 +57,7 @@ private:
 	LRESULT OnExitSizeMove(WPARAM wParam, LPARAM lParam);
 	LRESULT OnSetForceForegroundWindow(WPARAM wParam, LPARAM lParam);
 
-	void Relocation(BOOL is_init, int WW);
+	void Relocation(BOOL is_init, int WW, int WH);
 
 	BOOL CheckAutoCenter();
 };

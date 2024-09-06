@@ -44,6 +44,7 @@
 #include "dlglib.h"
 #include "ttmacro.h"
 #include "codeconv.h"
+#include "ttmdlg.h"
 
 #include "errdlg.h"
 
@@ -120,6 +121,18 @@ BOOL CErrDlg::OnCommand(WPARAM wp, LPARAM lp)
 	const WORD wID = GET_WM_COMMAND_ID(wp, lp);
 	if (wID == IDC_MACROERRHELP) {
 		OnBnClickedMacroerrhelp();
+		return TRUE;
+	}
+	return FALSE;
+}
+
+LRESULT CErrDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
+{
+	switch(msg) {
+	case WM_DPICHANGED:
+		RECT R = *(RECT *)lp;
+		int PosX = R.left;
+		int PosY = R.top;
 		return TRUE;
 	}
 	return FALSE;
