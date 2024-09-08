@@ -41,9 +41,9 @@
           <li>When pasting string from clipboard that does not contain control codes such as line feeds, characters are not outputted twice in the log with the default settings.</li>
         </ul>
       </li>
-      <li>EnableContinuedLineCopy setting is now used when dragging after selecting a word by double click.</li>
+      <li><a href="../menu/setup-additional-copy-and-paste.html#EnableContinuedLineCopy">EnableContinuedLineCopy</a> setting is now used when dragging after selecting a word by double click.</li>
       <li>Right-click(paste) is not disabled even when <a href="../setup/teraterm-win.html#textselect">SelectOnActivate</a> is off.</li>
-      <li>Fixed some Emoji which character widths did not change with Override Emoji Characters width option. (Changed referenced Emoji table.)</li>
+      <li>Fixed some Emoji which character widths did not change with "<a href="../menu/setup-additional-coding.html#UnicodeEmojiOverride">Override Emoji Characters width</a>" option. (Changed referenced Emoji table.)</li>
       <li>To adjust to narrow the space between characters, <a href="../setup/teraterm-win.html#space">VTFontSpace</a> became to be able to set negative value.</li>
       <li>Only available COM ports are now listed.
         <ul>
@@ -51,14 +51,14 @@
         </ul>
       </li>
       <li>General setup dialog is now shown the information from <a href="../menu/setup-general.html#UILanguageFile">Language file</a> which is selected.</a>
+      <li>"Default port" settings is moved to <a href="../menu/setup-additional-general.html#Port">General tab</a> of Additional settings dialog from General setup dialog.</li>
       <li>Removed Language setting from General setup dialog.</li>
       <li>Download folder setting is moved to <a href="../menu/setup-additional-general.html#DownloadFolder">General tab</a> of Additional settings dialog.</li>
       <li>Added ViewlogEditor argument on <a href="../menu/setup-additional-log.html#ViewlogEditorArg">Log Tab</a> in Additional settings dialog.</li>
       <li>Setup - Font was integrated into <a href="../menu/setup-additional-font.html">Font tab</a> of Additional settings dialog.</li>
       <li>Keyboard setup dialog is moved to <a href="../menu/setup-additional-keyboard.html">Keyboard tab</a> of Additional settings dialog.</li>
       <li>TCP/IP setup dialog is moved to <a href="../menu/setup-additional-tcpip.html">TCP/IP tab</a> of Additional settings dialog.</li>
-      <li>Default port settings is moved to <a href="../menu/setup-additional-tcpip.html">TCP/IP tab</a> of Additional settings dialog from General setup dialog.</li>
-      <li>Improved Broadcast command dialog:
+      <li>Improved <a href="../menu/control-broadcast.html">Broadcast command dialog</a>:
         <ul>
           <li>Edit control now support paste by R/M mouse clicking and Shift-INS.</li>
           <li>Edit control now works the same whether the IME is on or off.</li>
@@ -69,10 +69,10 @@
         </ul>
       </li>
       <li>Returned the display position of the message box to its previous behavior (center of the parent window) before 4.103, excluding some message boxes.</li>
-      <li>Error messagebox is now shown when logging cannot be started with LogAutoStart=on</li>
+      <li>Error messagebox is now shown when logging cannot be started with "<a href="../menu/setup-additional-log.html#LogAutoStart">LogAutoStart=on</a>"</li>
       <li>Allow users to select creating automatic backup or not by <a href="../setup/teraterm-misc.html#IniAutoBackup">IniAutoBackup</a> when overwriting the ini file.
       <li>MACRO: <a href="../macro/command/send.html">send</a> macro command check data and sends it as text or binary. Added <a href="../macro/command/sendtext.html">sendtext</a> and <a href="../macro/command/sendbinary.html">sendbinary</a> macro command</li>
-      <li>MACRO: Added options such as size specification to the listbox command.</li>
+      <li>MACRO: Added options such as size specification to the <a href="../macro/command/listbox.html">listbox</a> command.</li>
       <li>MACRO: Added the <a href="../macro/command/getttpos.html">getttpos</a> command to retrieve the display status, position, and size in the VT window of Tera Term.</li>
       <li>MACRO: Added support for password file using aes-256-ctr encryption
         <ul>
@@ -87,10 +87,10 @@
 
   <li>Bug fixes
     <ul>
-      <li>Fixed text color to be gray instead of black when SGR 1 + SGR 30(Bold + FG Black).</li>
-      <li>Fixed to repetition of surrogate pair characters correctly display when "Drawing resized font to fit cell width" is on.</li>
+      <li>Fixed text color to be gray instead of black when received SGR 1 + SGR 30 (Bold + FG Black).</li>
+      <li>Fixed to repetition of surrogate pair characters correctly display when "<a href="../menu/setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a>" is on.</li>
       <li>Fixed display of combined characters was corrupted.</li>
-      <li>Fixed to use EnableContinuedLineCopy setting when double click to select a word. This bug was introduced in 5.2.</li>
+      <li>Fixed to use <a href="../menu/setup-additional-copy-and-paste.html#EnableContinuedLineCopy">EnableContinuedLineCopy</a> setting when double click to select a word. This bug was introduced in 5.2.</li>
       <li>Fixed same repeated characters are selected when double click on delimiter character.(Fixed select behavior that changed in 5.2 to be same as before.)</li>
       <li>Fixed wrong characters were sent when transmit character code is JIS.
         <ul>
@@ -106,7 +106,7 @@
       <li>Fixed window maximization works immediately after startup.</li>
       <li>Added <a href="../setup/folder.html#DownloadDir">download folder</a> for log saving folder same as Tera Term 4.</li>
       <li>MACRO: Fixed <a href="../macro/command/send.html">send</a> macro command could not send $00.</li>
-      <li>MACRO: Fixed <a href="../macro/command/clipb2var.html">clipb2var</a> is not working.</li>
+      <li>MACRO: Fixed <a href="../macro/command/clipb2var.html">clipb2var</a> macro command is not working.</li>
       <li>MACRO: Fixed path of <a href="../macro/command/basename.html">basename</a> and <a href="../macro/command/dirname.html">dirname</a> macro commands were not Unicode-compatible.</li>
       <li>MACRO: Fixed ttermpro.exe does not crash when file specified in the <a href="../macro/command/xmodemsend.html">xmodemsend</a> macro command does not exist.</li>
       <li>MACRO: Fixed password file name for <a href="../macro/command/getpassword.html">getpassword</a> and <a href="../macro/command/delpassword.html">delpassword</a> macro command is not Unicode compatible.</li>
