@@ -66,6 +66,15 @@ installer\release.bat がインストール済みのツールを見つけられない場合は、installe
 また、必要であれば buildtools\svnrev\toolinfo_sample.txt を buildtools\svnrev\toolinfo.txt にコピーし、適宜編集してください。
 </p>
 
+<p>
+installer\release.bat を使わず build.bat を起動する（makearchive.bat を直接起動する・Inno Setup Studio から makearchive.bat が起動されるなど）場合、環境変数を設定してください。
+</p>
+<pre>
+例:
+VS170COMNTOOLS=C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools
+VS160COMNTOOLS=c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools
+</pre>
+
 <h2 id="build-quick">ビルド手順 (Quick Start)</h2>
 
 <h3 id="build-quick-checkout">ソースコードのチェックアウト</h2>
