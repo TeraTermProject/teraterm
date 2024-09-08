@@ -42,8 +42,118 @@
 #include "win32helper.h"
 #include "ttcmn_notify2.h"
 #include "compat_win.h"
+#include "asprintf.h"
 
 #include "general_pp.h"
+
+// moved from generaldlg.c
+typedef struct {
+	wchar_t* fullname;
+	wchar_t* filename;
+	wchar_t* language;
+	wchar_t* date;
+	wchar_t* contributor;
+} LangInfo;
+
+static const wchar_t* get_lang_folder()
+{
+	return (IsWindowsNTKernel()) ? L"lang_utf16le" : L"lang";
+}
+
+static void LangFree(LangInfo* infos, size_t count)
+{
+	size_t i;
+	for (i = 0; i < count; i++) {
+		LangInfo* p = infos + i;
+		free(p->filename);
+		free(p->fullname);
+		free(p->language);
+		free(p->date);
+		free(p->contributor);
+	}
+	free(infos);
+}
+
+/**
+ *	ファイル名をリストする(ファイル名のみ)
+ *	infosに追加してreturnする
+ */
+static LangInfo* LangAppendFileList(const wchar_t* folder, LangInfo* infos, size_t* infos_size)
+{
+	wchar_t* fullpath;
+	HANDLE hFind;
+	WIN32_FIND_DATAW fd;
+	size_t count = *infos_size;
+
+	aswprintf(&fullpath, L"%s\\*.lng", folder);
+	hFind = FindFirstFileW(fullpath, &fd);
+	if (hFind != INVALID_HANDLE_VALUE) {
+		do {
+			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				LangInfo* p = (LangInfo*)realloc(infos, sizeof(LangInfo) * (count + 1));
+				if (p != NULL) {
+					infos = p;
+					p = infos + count;
+					count++;
+					memset(p, 0, sizeof(*p));
+					p->filename = _wcsdup(fd.cFileName);
+					aswprintf(&p->fullname, L"%s\\%s", folder, fd.cFileName);
+				}
+			}
+		} while (FindNextFileW(hFind, &fd));
+		FindClose(hFind);
+	}
+	free(fullpath);
+
+	*infos_size = count;
+	return infos;
+}
+
+/**
+ *	lngファイルの Info セクションを読み込む
+ */
+static void LangRead(LangInfo* infos, size_t infos_size)
+{
+	size_t i;
+
+	for (i = 0; i < infos_size; i++) {
+		LangInfo* p = infos + i;
+		const wchar_t* lng = p->fullname;
+		wchar_t* s;
+		hGetPrivateProfileStringW(L"Info", L"language", NULL, lng, &s);
+		if (s[0] == 0) {
+			free(s);
+			p->language = _wcsdup(p->filename);
+		}
+		else {
+			p->language = s;
+		}
+		hGetPrivateProfileStringW(L"Info", L"date", NULL, lng, &s);
+		if (s[0] == 0) {
+			free(s);
+			p->date = _wcsdup(L"-");
+		}
+		else {
+			p->date = s;
+		}
+		hGetPrivateProfileStringW(L"Info", L"contributor", NULL, lng, &s);
+		if (s[0] == 0) {
+			free(s);
+			p->contributor = _wcsdup(L"-");
+		}
+		else {
+			p->contributor = s;
+		}
+	}
+}
+
+typedef struct {
+	TTTSet* ts;
+	LangInfo* lng_infos;
+	size_t lng_size;
+	size_t selected_lang;	// 選ばれていたlngファイル番号
+} DlgData;
+
 
 CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst)
 	: TTCPropertyPage(inst, CGeneralPropPageDlg::IDD)
@@ -72,7 +182,8 @@ void CGeneralPropPageDlg::OnInitDialog()
 		{ IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE, "DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE" },
 		{ IDC_CLEAR_ON_RESIZE, "DLG_TAB_GENERAL_CLEAR_ON_RESIZE" },
 		{ IDC_CURSOR_CHANGE_IME, "DLG_TAB_GENERAL_CURSOR_CHANGE_IME" },
-		{ IDC_LIST_HIDDEN_FONTS, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
+		// { IDC_LIST_HIDDEN_FONTS, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
+		{ IDC_GENUILANG_LABEL, "DLG_GEN_UILANG" },
 		{ IDC_GENPORT_LABEL, "DLG_GEN_PORT" },
 		{ IDC_TITLEFMT_GROUP, "DLG_TAB_GENERAL_TITLEFMT_GROUP" },
 		{ IDC_TITLEFMT_DISPHOSTNAME, "DLG_TAB_GENERAL_TITLEFMT_DISPHOSTNAME" },
@@ -109,7 +220,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 	SetCheck(IDC_CURSOR_CHANGE_IME, (pts->WindowFlag & WF_IMECURSORCHANGE) != 0);
 
 	// (8)IDC_LIST_HIDDEN_FONTS
-	SetCheck(IDC_LIST_HIDDEN_FONTS, pts->ListHiddenFonts);
+	// SetCheck(IDC_LIST_HIDDEN_FONTS, pts->ListHiddenFonts);
 
 	// (9) Title Format
 	SetCheck(IDC_TITLEFMT_DISPHOSTNAME, (pts->TitleFormat & 1) != 0);
@@ -121,6 +232,52 @@ void CGeneralPropPageDlg::OnInitDialog()
 
 	// Notify
 	SetCheck(IDC_NOTIFY_SOUND, pts->NotifySound);
+
+	// UI Language
+	{
+		LangInfo* infos = NULL;
+		size_t infos_size = 0;
+		wchar_t* folder;
+		aswprintf(&folder, L"%s\\%s", pts->ExeDirW, get_lang_folder());
+		infos = LangAppendFileList(folder, infos, &infos_size);
+		free(folder);
+		if (wcscmp(pts->ExeDirW, pts->HomeDirW) != 0) {
+			aswprintf(&folder, L"%s\\%s", pts->HomeDirW, get_lang_folder());
+			infos = LangAppendFileList(folder, infos, &infos_size);
+			free(folder);
+		}
+		LangRead(infos, infos_size);
+
+		DlgData data;
+		data.ts = pts;
+		data.lng_infos = infos;
+		data.lng_size = infos_size;
+
+		data.selected_lang = 0;
+		{
+			// LangInfo* infos = data.lng_infos;
+			// size_t info_size = data.lng_size;
+			size_t i;
+			for (i = 0; i < data.lng_size; i++) {
+				const LangInfo* p = infos + i;
+				SendDlgItemMessageW(IDC_GENUILANG, CB_ADDSTRING, 0, (LPARAM)p->language);
+				if (wcscmp(p->fullname, ts.UILanguageFileW) == 0) {
+					data.selected_lang = i;
+				}
+			}
+			SendDlgItemMessage(IDC_GENUILANG, CB_SETCURSEL, data.selected_lang, 0);
+			// wchar_t* info_text = LangInfoText(infos + data.selected_lang);
+			// SetDlgItemTextW(IDC_GENUILANG, info_text);
+			// free(info_text);
+		}
+
+		// INT_PTR r = TTDialogBoxParam(hInst,
+		// 		MAKEINTRESOURCE(IDD_GENDLG),
+		//	WndParent, GenDlg, (LPARAM)&data);
+		LangFree(infos, infos_size);
+		// return (BOOL)r;
+
+	}
 
 	// default port
 	{
@@ -178,7 +335,7 @@ void CGeneralPropPageDlg::OnOK()
 	}
 
 	// (8)IDC_LIST_HIDDEN_FONTS
-	pts->ListHiddenFonts = GetCheck(IDC_LIST_HIDDEN_FONTS);
+	// pts->ListHiddenFonts = GetCheck(IDC_LIST_HIDDEN_FONTS);
 
 	// (9) Title Format
 	pts->TitleFormat = GetCheck(IDC_TITLEFMT_DISPHOSTNAME) == BST_CHECKED;
@@ -195,6 +352,59 @@ void CGeneralPropPageDlg::OnOK()
 			pts->NotifySound = notify_sound;
 			Notify2SetSound((NotifyIcon *)cv.NotifyIcon, notify_sound);
 		}
+	}
+
+	// UI Language
+	{
+		// 再読み込み
+		// SetWindowLongPtr しておいて GetWindowLongPtrW できるとよいのですが
+		// テンプレートの構成だとそのように書けなさそう
+		LangInfo* infos = NULL;
+		size_t infos_size = 0;
+		wchar_t* folder;
+		aswprintf(&folder, L"%s\\%s", pts->ExeDirW, get_lang_folder());
+		infos = LangAppendFileList(folder, infos, &infos_size);
+		free(folder);
+		if (wcscmp(pts->ExeDirW, pts->HomeDirW) != 0) {
+			aswprintf(&folder, L"%s\\%s", pts->HomeDirW, get_lang_folder());
+			infos = LangAppendFileList(folder, infos, &infos_size);
+			free(folder);
+		}
+		LangRead(infos, infos_size);
+
+		DlgData data;
+		data.ts = pts;
+		data.lng_infos = infos;
+		data.lng_size = infos_size;
+
+		data.selected_lang = 0;
+		{
+			// LangInfo* infos = data.lng_infos;
+			// size_t info_size = data.lng_size;
+			size_t i;
+			for (i = 0; i < data.lng_size; i++) {
+				const LangInfo* p = infos + i;
+				if (wcscmp(p->fullname, ts.UILanguageFileW) == 0) {
+					data.selected_lang = i;
+				}
+			}
+		}
+
+		LRESULT w = SendDlgItemMessageA(IDC_GENUILANG, CB_GETCURSEL, 0, 0);
+		if (w != data.selected_lang) {
+			const LangInfo* p = data.lng_infos + w;
+			pts->UILanguageFileW = _wcsdup(p->fullname);
+
+			// タイトルの更新を行う。(2014.2.23 yutaka)
+			PostMessage(HVTWin, WM_USER_CHANGETITLE, 0, 0);
+		}
+
+		// TTXKanjiMenu は Language を見てメニューを表示するので、変更の可能性がある
+		// OK 押下時にメニュー再描画のメッセージを飛ばすようにした。 (2007.7.14 maya)
+		// 言語ファイルの変更時にメニューの再描画が必要 (2012.5.5 maya)
+		PostMessage(HVTWin, WM_USER_CHANGEMENU, 0, 0);
+
+		LangFree(infos, infos_size);
 	}
 
 	// default port
