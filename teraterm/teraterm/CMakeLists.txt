@@ -93,6 +93,8 @@ set(SRC_DIALOG
   coding_pp.h
   coding_pp.rc
   coding_pp_res.h
+  color_sample.cpp
+  color_sample.h
   debug_pp.cpp
   debug_pp.h
   debug_pp.rc
@@ -135,6 +137,8 @@ set(SRC_DIALOG
   themedlg.h
   themedlg.rc
   themedlg_res.h
+  win_pp.cpp
+  win_pp.h
 )
 
 target_sources(

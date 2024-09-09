@@ -1,5 +1,5 @@
 /*
- * (C) 2008- TeraTerm Project
+ * Copyright (C) 2024- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,49 +28,9 @@
 
 #pragma once
 
-#ifdef __cplusplus
-#include "tmfc.h"
-#include "tmfc_propdlg.h"
-#endif
+#include <windows.h>
 
-typedef struct {
-	const char *name;
-	LPCTSTR id;
-} mouse_cursor_t;
+typedef struct ColorSampleTag ColorSample;
 
-extern const mouse_cursor_t MouseCursor[];
-
-#ifdef __cplusplus
-
-// AddSetting Property Sheet
-class CAddSettingPropSheetDlg: public TTCPropSheetDlg
-{
-public:
-	CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd);
-	~CAddSettingPropSheetDlg();
-	enum Page {
-		DefaultPage,
-		CodingPage,
-		FontPage,
-		KeyboardPage,
-		TcpIpPage,
-		TermPage,
-		WinPage,
-	};
-	void SetStartPage(Page page);
-
-private:
-	int m_PageCountCPP;
-	TTCPropertyPage *m_Page[7];
-};
-#endif // __cplusplus
-
-typedef enum {
-	DefaultPage,
-	CodingPage,
-	FontPage,
-	KeyboardPage,
-	TcpIpPage,
-	TermPage,
-	WinPage,
-} CAddSettingPropSheetDlgPage;
+ColorSample *ColorSampleInit(HWND hWnd);
+void ColorSampleSetColor(ColorSample *work, COLORREF fore_color, COLORREF back_color);
