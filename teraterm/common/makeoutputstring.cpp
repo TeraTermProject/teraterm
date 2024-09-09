@@ -118,7 +118,7 @@ void MakeOutputStringInit(
  *	@param	TempStr		出力文字ptr
  *	@param	TempLen_	出力文字長
  *	@param	ControlOut	文字検査/出力関数
- *	@param	cv
+ *	@param	data		ControlOut へ渡すデータ
  *	@retval	入力文字列から使用した文字数
  */
 size_t MakeOutputString(
@@ -330,4 +330,57 @@ size_t MakeOutputString(
 
 	*TempLen_ = TempLen;
 	return output_char_count;
+}
+
+char *MakeOutputStringConvW(
+	wchar_t const *strW,
+	WORD Language,
+	WORD kanji_code,
+	WORD KanjiIn,
+	WORD KanjiOut,
+	BOOL jis7katakana,
+	size_t *len)
+{
+	OutputCharState *h = MakeOutputStringCreate();
+	MakeOutputStringInit(h, Language, kanji_code, KanjiIn, KanjiOut, jis7katakana);
+
+	size_t strW_len = wcslen(strW);
+	size_t str_len = strW_len;
+	char *str = (char *)malloc(str_len);
+	size_t str_pos = 0;
+
+	size_t i = 0;
+	while (i < strW_len) {
+		char tmp_str[8];
+		size_t tmp_len;
+		size_t output_char_count = MakeOutputString(h, &strW[i], strW_len - i, tmp_str, &tmp_len, NULL, NULL);
+		memcpy(&str[str_pos], &tmp_str, tmp_len);
+		str_pos += tmp_len;
+		i += output_char_count;
+	}
+
+	MakeOutputStringDestroy(h);
+
+	str[str_pos++] = 0;
+	if (len != NULL) {
+		*len = str_pos - 1;
+	}
+
+	return str;
+}
+
+char *MakeOutputStringConvU8(
+	const char *strU8,
+	WORD Language,
+	WORD kanji_code,
+	WORD KanjiIn,
+	WORD KanjiOut,
+	BOOL jis7katakana,
+	size_t *len)
+{
+	wchar_t *strW = ToWcharU8(strU8);
+	char *str = MakeOutputStringConvW(
+		strW, Language, kanji_code, KanjiIn, KanjiOut, jis7katakana, len);
+	free(strW);
+	return str;
 }

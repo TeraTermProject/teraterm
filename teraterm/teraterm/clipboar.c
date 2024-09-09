@@ -44,6 +44,7 @@
 #include "sendmem.h"
 #include "clipboarddlg.h"
 #include "tttypes_charset.h"
+#include "makeoutputstring.h"
 
 #include "clipboar.h"
 
@@ -345,7 +346,7 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 		str_mb = ToU8W(str_w);
 	}
 	else {
-		str_mb = ToCharW(str_w);
+		str_mb = MakeOutputStringConvW(str_w, 0, ts.KanjiCodeSend, 0, 0, 0, NULL);
 	}
 
 	if (str_mb == NULL) {

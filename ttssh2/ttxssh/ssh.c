@@ -7079,34 +7079,7 @@ void sanitize_str(buffer_t *buff, unsigned char *src, size_t srclen)
 static char *ConvertReceiveStr(TComVar *cv, char *strU8, size_t *len)
 {
 	TTTSet *pts = cv->ts;
-
-	OutputCharState *h = MakeOutputStringCreate();
-	MakeOutputStringInit(h, pts->Language, pts->KanjiCode, 0,0,0);
-
-	wchar_t *strW = ToWcharU8(strU8);
-	size_t strW_len = wcslen(strW);
-	size_t str_len = strW_len;
-	char *str = (char *)malloc(str_len);
-	size_t str_pos = 0;
-
-	size_t i = 0;
-	while (i < strW_len) {
-		char tmp_str[8];
-		size_t tmp_len;
-		size_t output_char_count = MakeOutputString(h, &strW[i], strW_len - i, tmp_str, &tmp_len, NULL, cv);
-		memcpy(&str[str_pos], &tmp_str, tmp_len);
-		str_pos += tmp_len;
-		i += output_char_count;
-	}
-
-	MakeOutputStringDestroy(h);
-
-	str[str_pos++] = 0;
-	*len = str_pos - 1;
-
-	free(strW);
-
-	return str;
+	return MakeOutputStringConvU8(strU8, pts->Language, pts->KanjiCode, 0, 0, 0, len);
 }
 
 /*

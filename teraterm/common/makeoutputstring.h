@@ -52,6 +52,28 @@ size_t MakeOutputString(
 	BOOL (*ControlOut)(unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen, void *data),
 	void *data);
 
+/**
+ *	Unicodeを指定文字コードに変換する
+ *		codeconv.h ではできない JIS コードへの変換可
+ *
+ *	@param[in]	strW	元文字列
+ *	@param[out]	len		変換文字列長 (NULLのとき値を返さない)
+ *	@return				変換文字列
+ */
+char *MakeOutputStringConvW(
+	const wchar_t *strW,
+	WORD Language, WORD kanji_code, WORD KanjiIn, WORD KanjiOut,BOOL jis7katakana,
+	size_t *len);
+
+/**
+ *	Unicodeを指定文字コードに変換する
+ *		MakeOutputStringConvW()のUTF-8版
+ */
+char *MakeOutputStringConvU8(
+	const char *strU8,
+	WORD Language, WORD kanji_code, WORD KanjiIn, WORD KanjiOut,BOOL jis7katakana,
+	size_t *len);
+
 #ifdef __cplusplus
 }
 #endif
