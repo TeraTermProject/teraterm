@@ -64,38 +64,11 @@ static WORD TermJ_Term[] = {1, 1, 2, 3, 3, 4, 4, 5, 6, 7, 8, 9};
 static const char *TermListJ[] =
 	{"VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
 	 "VT320", "VT382", "VT420", "VT520", "VT525", NULL};
-static const char *KanjiInList[] = {"^[$@","^[$B",NULL};
-static const char *KanjiOutList[] = {"^[(B","^[(J",NULL};
-static const char *KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
 
 typedef struct {
 	TTTSet *pts;
 	HWND VTWin;
 } DialogData;
-
-static void SetKanjiCodeDropDownList(HWND HDlg, int id, int language, int sel_code)
-{
-	int i;
-	LRESULT sel_index = 0;
-
-	for(i = 0;; i++) {
-		LRESULT index;
-		const TKanjiList *p = GetKanjiList(i);
-		if (p == NULL) {
-			break;
-		}
-		if (p->lang != language) {
-			continue;
-		}
-
-		index = SendDlgItemMessageA(HDlg, id, CB_ADDSTRING, 0, (LPARAM)p->KanjiCode);
-		SendDlgItemMessageA(HDlg, id, CB_SETITEMDATA, index, p->coding);
-		if (p->coding == sel_code) {
-			sel_index = index;
-		}
-	}
-	SendDlgItemMessageA(HDlg, id, CB_SETCURSEL, sel_index, 0);
-}
 
 static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -111,8 +84,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 		{ IDC_TERMLOCALECHO, "DLG_TERM_LOCALECHO" },
 		{ IDC_TERMANSBACKTEXT, "DLG_TERM_ANSBACK" },
 		{ IDC_TERMAUTOSWITCH, "DLG_TERM_AUTOSWITCH" },
-		{ IDC_TERMKANJILABEL, "DLG_TERM_KANJI" },
-		{ IDC_TERMKANJISENDLABEL, "DLG_TERM_KANJISEND" },
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_TERMHELP, "BTN_HELP" },
@@ -126,18 +97,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			SetWindowLongPtrW(Dialog, DWLP_USER, (LONG_PTR)data);
 
 			SetDlgTextsW(Dialog, TextInfosCom, _countof(TextInfosCom), ts->UILanguageFileW);
-#if 0
-			if (ts->Language==IdJapanese) {
-				// “ú–{Œê‚ÌŽž‚¾‚¯4‚Â‚Ì€–Ú‚ª‘¶Ý‚·‚é
-				static const DlgTextInfo TextInfosJp[] = {
-					{ IDC_TERMKANA, "DLG_TERM_KANA" },
-					{ IDC_TERMKANASEND, "DLG_TERM_KANASEND" },
-					{ IDC_TERMKINTEXT, "DLG_TERM_KIN" },
-					{ IDC_TERMKOUTTEXT, "DLG_TERM_KOUT" },
-				};
-				SetDlgTextsW(Dialog, TextInfosJp, _countof(TextInfosJp), ts->UILanguageFileW);
-			}
-#endif
+
 			SetDlgItemInt(Dialog,IDC_TERMWIDTH,ts->TerminalWidth,FALSE);
 			SendDlgItemMessage(Dialog, IDC_TERMWIDTH, EM_LIMITTEXT,3, 0);
 
@@ -152,6 +112,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			SetDropDownList(Dialog, IDC_TERMCRRCV, NLListRcv, ts->CRReceive); // add 'LF' (2007.1.21 yutaka), added "AUTO" (9th Apr 2012, tentner)
 			SetDropDownList(Dialog, IDC_TERMCRSEND, NLList, ts->CRSend);
 
+#if 0
 			if ( ts->Language!=IdJapanese ) { /* non-Japanese mode */
 				if ((ts->TerminalID>=1) &&
 					(ts->TerminalID <= sizeof(TermJ_Term)/sizeof(WORD))) {
@@ -165,6 +126,18 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			else {
 				SetDropDownList(Dialog, IDC_TERMID, TermListJ, ts->TerminalID);
 			}
+#else
+			{
+				if ((ts->TerminalID>=1) &&
+					(ts->TerminalID <= sizeof(TermJ_Term)/sizeof(WORD))) {
+					w = TermJ_Term[ts->TerminalID-1];
+				}
+				else {
+					w = 1;
+				}
+				SetDropDownList(Dialog, IDC_TERMID, TermList, w);
+			}
+#endif
 
 			SetRB(Dialog,ts->LocalEcho,IDC_TERMLOCALECHO,IDC_TERMLOCALECHO);
 
@@ -182,39 +155,10 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 			SetRB(Dialog,ts->AutoWinSwitch,IDC_TERMAUTOSWITCH,IDC_TERMAUTOSWITCH);
 
-			SetKanjiCodeDropDownList(Dialog, IDC_TERMKANJI, ts->Language, ts->KanjiCode);
-			SetKanjiCodeDropDownList(Dialog, IDC_TERMKANJISEND, ts->Language, ts->KanjiCodeSend);
-			if (ts->Language==IdJapanese) {
-				if ( ts->KanjiCode!=IdJIS ) {
-					DisableDlgItem(Dialog,IDC_TERMKANA,IDC_TERMKANA);
-				}
-				SetRB(Dialog,ts->JIS7Katakana,IDC_TERMKANA,IDC_TERMKANA);
-				if ( ts->KanjiCodeSend!=IdJIS ) {
-					DisableDlgItem(Dialog,IDC_TERMKANASEND,IDC_TERMKOUT);
-				}
-				SetRB(Dialog,ts->JIS7KatakanaSend,IDC_TERMKANASEND,IDC_TERMKANASEND);
-
-				{
-					const char **kanji_out_list;
-					int n;
-					n = ts->KanjiIn;
-					n = (n <= 0 || 2 < n) ? IdKanjiInB : n;
-					SetDropDownList(Dialog, IDC_TERMKIN, KanjiInList, n);
-
-					kanji_out_list = (ts->TermFlag & TF_ALLOWWRONGSEQUENCE) ? KanjiOutList2 : KanjiOutList;
-					n = ts->KanjiOut;
-					n = (n <= 0 || 3 < n) ? IdKanjiOutB : n;
-					SetDropDownList(Dialog, IDC_TERMKOUT, kanji_out_list, n);
-				}
-			}
-
 			ShowWindow(GetDlgItem(Dialog, IDOK), FALSE);
 			ShowWindow(GetDlgItem(Dialog, IDCANCEL), FALSE);
 			ShowWindow(GetDlgItem(Dialog, IDC_TERMHELP), FALSE);
 
-//			TTTextMenu(Dialog, IDC_OPEN_CODING, NULL, HVTWin, ID_SETUP_ADDITIONALSETTINGS_CODING);
-
-//			CenterWindow(Dialog, GetParent(Dialog));
 			return TRUE;
 		}
 
@@ -260,10 +204,12 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				}
 
 				if ((w = (WORD)GetCurSel(Dialog, IDC_TERMID)) > 0) {
+#if 0
 					if ( ts->Language!=IdJapanese ) { /* non-Japanese mode */
 						if (w > sizeof(Term_TermJ)/sizeof(WORD)) w = 1;
 						w = Term_TermJ[w-1];
 					}
+#endif
 					ts->TerminalID = w;
 				}
 
@@ -277,31 +223,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 				GetRB(Dialog,&ts->AutoWinSwitch,IDC_TERMAUTOSWITCH,IDC_TERMAUTOSWITCH);
 
-				if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKANJI)) > 0) {
-					w = (int)SendDlgItemMessageA(Dialog, IDC_TERMKANJI, CB_GETITEMDATA, w - 1, 0);
-					ts->KanjiCode = w;
-				}
-				if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND)) > 0) {
-					w = (int)SendDlgItemMessageA(Dialog, IDC_TERMKANJISEND, CB_GETITEMDATA, w - 1, 0);
-					ts->KanjiCodeSend = w;
-				}
-				if (ts->Language==IdJapanese) {
-					GetRB(Dialog,&ts->JIS7Katakana,IDC_TERMKANA,IDC_TERMKANA);
-					GetRB(Dialog,&ts->JIS7KatakanaSend,IDC_TERMKANASEND,IDC_TERMKANASEND);
-					if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKIN)) > 0) {
-						ts->KanjiIn = w;
-					}
-					if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKOUT)) > 0) {
-						ts->KanjiOut = w;
-					}
-				}
-				else {
-					ts->JIS7KatakanaSend=0;
-					ts->JIS7Katakana=0;
-					ts->KanjiIn = 0;
-					ts->KanjiOut = 0;
-				}
-
 				return TRUE;
 			}
 			else if (nmhdr->code == PSN_HELP) {
@@ -314,10 +235,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			break;
 		}
 		case WM_COMMAND: {
-			DialogData *data = (DialogData *)GetWindowLongPtrW(Dialog, DWLP_USER);
-			TTTSet *ts;
-			assert(data != NULL);
-			ts = data->pts;
 			switch (LOWORD(wParam)) {
 				case IDC_TERMISWIN:
 					GetRB(Dialog,&w,IDC_TERMISWIN,IDC_TERMISWIN);
@@ -328,35 +245,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 						DisableDlgItem(Dialog,IDC_TERMRESIZE,IDC_TERMRESIZE);
 					}
 					break;
-
-				case IDC_TERMKANJI:
-					w = (WORD)GetCurSel(Dialog, IDC_TERMKANJI);
-					w = (WORD)SendDlgItemMessageA(Dialog, IDC_TERMKANJI, CB_GETITEMDATA, w - 1, 0);
-					if (w==IdJIS) {
-						EnableDlgItem(Dialog,IDC_TERMKANA,IDC_TERMKANA);
-					}
-					else {
-						DisableDlgItem(Dialog,IDC_TERMKANA,IDC_TERMKANA);
-						}
-					break;
-
-				case IDC_TERMKANJISEND:
-					w = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND);
-					w = (WORD)SendDlgItemMessageA(Dialog, IDC_TERMKANJISEND, CB_GETITEMDATA, w - 1, 0);
-					if (w==IdJIS) {
-						EnableDlgItem(Dialog,IDC_TERMKANASEND,IDC_TERMKOUT);
-					}
-					else {
-						DisableDlgItem(Dialog,IDC_TERMKANASEND,IDC_TERMKOUT);
-					}
-					break;
-
-				case IDC_CODING_BUTTON: {
-					HWND hWnd = GetParent(Dialog);
-					WPARAM tab_index = 6;
-					SendMessageW(hWnd, PSM_SETCURSEL, tab_index, 0);
-					break;
-				}
 			}
 			break;
 		}
@@ -388,31 +276,10 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 
 HPROPSHEETPAGE CreateTerminalPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
 {
-	int id;
-	PROPSHEETPAGEW_V1 psp = { 0 };
+	int id = IDD_TERMDLG;
+	PROPSHEETPAGEW_V1 psp = {};
 	DialogData *data;
 	wchar_t *uimsg;
-//	BOOL r;
-
-//	id = IDD_TERMDLGK;
-	id = IDD_TERMDLG;
-#if 0
-	switch (pts->Language) {
-	case IdJapanese: // Japanese mode
-		id = IDD_TERMDLGJ;
-		break;
-	case IdKorean: // Korean mode //HKS
-	case IdUtf8:   // UTF-8 mode
-	case IdChinese:
-	case IdRussian: // Russian mode
-	case IdEnglish:  // English mode
-		id = IDD_TERMDLGK;
-		break;
-	default:
-		// Žg‚Á‚Ä‚¢‚È‚¢
-		id = IDD_TERMDLG;
-	}
-#endif
 
 	data = (DialogData *)malloc(sizeof(*data));
 	data->pts = &ts;
