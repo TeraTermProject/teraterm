@@ -342,7 +342,7 @@ struct tttset {
 	int QVWinSize;
 	char reserve_FileDir[256];		// switch FileDirW
 	char FileSendFilter[128];
-	WORD Language;
+	WORD reserve_Language;
 	char reserver_DelimList[52];
 	WORD DelimDBCS;
 	WORD Minimize;

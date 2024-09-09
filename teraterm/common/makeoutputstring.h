@@ -61,7 +61,6 @@ OutputCharState *MakeOutputStringCreate(void);
 void MakeOutputStringDestroy(OutputCharState *state);
 void MakeOutputStringInit(
 	OutputCharState *state,
-	WORD Language,
 	WORD kanji_code,
 	WORD KanjiIn,
 	WORD KanjiOut,
@@ -83,7 +82,7 @@ size_t MakeOutputString(
  */
 char *MakeOutputStringConvW(
 	const wchar_t *strW,
-	WORD Language, WORD kanji_code, WORD KanjiIn, WORD KanjiOut,BOOL jis7katakana,
+	WORD kanji_code, WORD KanjiIn, WORD KanjiOut,BOOL jis7katakana,
 	size_t *len);
 
 /**
@@ -92,7 +91,7 @@ char *MakeOutputStringConvW(
  */
 char *MakeOutputStringConvU8(
 	const char *strU8,
-	WORD Language, WORD kanji_code, WORD KanjiIn, WORD KanjiOut,BOOL jis7katakana,
+	WORD kanji_code, WORD KanjiIn, WORD KanjiOut,BOOL jis7katakana,
 	size_t *len);
 
 #ifdef __cplusplus

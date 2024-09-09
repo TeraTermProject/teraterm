@@ -28,9 +28,11 @@
 #define IniSection "TTXKanjiMenu"
 #define ORDER 5000
 
-#define ID_MI_KANJIRECV 54010		// 受信/送受
-#define ID_MI_KANJISEND 54110		// 送信
-#define ID_MI_USEONESETTING 54200	// Use one setting
+#define ID_MI_KANJIRECV		54010	// 受信/送受
+#define ID_MI_KANJISEND		54110	// 送信
+#define ID_MI_USEONESETTING	54200	// Use one setting
+#define ID_MI_JAPANESE		54201	// 日本語メニュー
+#define ID_MI_KOREAN		54202	// 韓国語メニュー
 
 // メニュー項目名の情報
 typedef struct {
@@ -53,6 +55,8 @@ static const MenuInfo MenuNameRecvJ[] = {
 	{ ID_MI_KANJISEND + 3,		IdUTF8, L"Send: U&TF-8",		"MENU_SEND_UTF8" },
 	{ 0,  						0,		NULL,					NULL },
 	{ ID_MI_USEONESETTING,		0,		L"Use &one setting",	"MENU_USE_ONE_SETTING" },
+	{ 0,  						0,		NULL,					NULL },
+	{ ID_MI_KOREAN,				0,		L"Korean menu",			NULL },
 };
 
 // 送受同漢字コード (日本語)
@@ -63,6 +67,8 @@ static const MenuInfo MenuNameOneJ[] = {
 	{ ID_MI_KANJIRECV + 3,		IdUTF8, L"Recv/Send: &UTF-8",		"MENU_UTF8" },
 	{ 0,						0,		NULL,						NULL },
 	{ ID_MI_USEONESETTING,		0,		L"Use &one setting",		"MENU_USE_ONE_SETTING" },
+	{ 0,  						0,		NULL,						NULL },
+	{ ID_MI_KOREAN,				0,		L"Korean menu",				NULL },
 };
 
 // 送受別漢字コード (韓国語)
@@ -74,6 +80,8 @@ static const MenuInfo MenuNameRecvK[] = {
 	{ ID_MI_KANJISEND + 1,		IdUTF8,			L"Send: U&TF-8",		"MENU_SEND_UTF8" },
 	{ 0,  						0,				NULL,					NULL },
 	{ ID_MI_USEONESETTING,		0,				L"Use &one setting",	"MENU_USE_ONE_SETTING" },
+	{ 0,  						0,				NULL,					NULL },
+	{ ID_MI_JAPANESE,			0,				L"Japanese menu",		NULL },
 };
 
 // 送受同漢字コード (韓国語)
@@ -82,6 +90,8 @@ static const MenuInfo MenuNameOneK[] = {
 	{ ID_MI_KANJIRECV + 1,		IdUTF8, 		L"Recv/Send: &UTF-8",	"MENU_UTF8" },
 	{ 0,  						0,				NULL,					NULL },
 	{ ID_MI_USEONESETTING,		0,				L"Use &one setting",  	"MENU_USE_ONE_SETTING" },
+	{ 0,  						0,				NULL,					NULL },
+	{ ID_MI_JAPANESE,			0,				L"Japanese menu",		NULL },
 };
 
 static HANDLE hInst; /* Instance handle of TTX*.DLL */
@@ -95,6 +105,10 @@ typedef struct {
 	PWriteIniFile origWriteIniFile;
 	BOOL UseOneSetting;
 	BOOL NeedResetCharSet;
+	enum {
+		MENU_JAPANESE,
+		MENU_KOREAN,
+	} language;
 	const MenuInfo *menu_info_ptr;
 	size_t menu_info_count;
 } TInstVar;
@@ -274,7 +288,7 @@ static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks) {
 		// 内部状態リセットの為に呼び出された場合
 		*hooks->SetupTerminal = ResetCharSet;
 	}
-	else if (pvar->UseOneSetting && (pvar->ts->Language == IdJapanese || pvar->ts->Language == IdKorean)) {
+	else if (pvar->UseOneSetting && (pvar->language == MENU_JAPANESE || pvar->language == MENU_KOREAN)) {
 		// UseOneSetting が TRUE の時は端末設定ダイアログの後処理の為にフックする
 		pvar->origSetupTermDlg = *hooks->SetupTerminal;
 		*hooks->SetupTerminal = TTXKanjiMenuSetupTerminal;
@@ -306,9 +320,9 @@ static void PASCAL TTXKanjiMenuReadIniFile(const wchar_t *fn, PTTSet ts) {
 	else {
 		pvar->UseOneSetting = TRUE;
 		// UseOneSetting が on の場合は、送受信設定が同じになるように調整する
-		switch (pvar->ts->Language){
-		case IdJapanese:
-		case IdKorean:
+		switch (pvar->language){
+		case MENU_JAPANESE:
+		case MENU_KOREAN:
 			pvar->ts->KanjiCodeSend = pvar->ts->KanjiCode;
 			break;
 		}
@@ -353,8 +367,8 @@ static void UpdateMenu(HMENU menu, BOOL UseOneSetting)
 	const MenuInfo *menu_info_ptr;
 	size_t menu_info_count;
 
-	switch (pvar->ts->Language) {
-	case IdJapanese:
+	switch (pvar->language) {
+	case MENU_JAPANESE:
 		if (UseOneSetting) {
 			menu_info_ptr = MenuNameOneJ;
 			menu_info_count = _countof(MenuNameOneJ);
@@ -364,7 +378,7 @@ static void UpdateMenu(HMENU menu, BOOL UseOneSetting)
 			menu_info_count = _countof(MenuNameRecvJ);
 		}
 		break;
-	case IdKorean:
+	case MENU_KOREAN:
 		if (UseOneSetting) {
 			menu_info_ptr = MenuNameOneK;
 			menu_info_count = _countof(MenuNameOneK);
@@ -393,16 +407,16 @@ static void PASCAL TTXModifyMenu(HMENU menu)
 	MENUITEMINFOW mi = {0};
 	wchar_t *uimsg;
 	// 言語が日本語または韓国語の時のみメニューに追加する
-	if (pvar->ts->Language != IdJapanese && pvar->ts->Language != IdKorean) {
+	if (pvar->language != MENU_JAPANESE && pvar->language != MENU_KOREAN) {
 		return;
 	}
 
 	pvar->hmEncode = CreateMenu();
 
-	if (pvar->ts->Language == IdJapanese) {
+	if (pvar->language == MENU_JAPANESE) {
 		GetI18nStrWW(IniSection, "MENU_KANJI", L"&KanjiCode", pvar->ts->UILanguageFileW, &uimsg);
 	}
-	else { // IdKorean
+	else { // MENU_KOREAN
 		GetI18nStrWW(IniSection, "MENU_KANJI_K", L"Coding(&K)", pvar->ts->UILanguageFileW, &uimsg);
 	}
 
@@ -498,6 +512,16 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 		UpdateMenu(pvar->hmEncode, pvar->UseOneSetting);
 		return 1;
 	}
+	else if (cmd == ID_MI_KOREAN) {
+		DeleteMenus(pvar->hmEncode);
+		pvar->language = MENU_KOREAN;
+		UpdateMenu(pvar->hmEncode, pvar->UseOneSetting);
+	}
+	else if (cmd == ID_MI_JAPANESE) {
+		DeleteMenus(pvar->hmEncode);
+		pvar->language = MENU_JAPANESE;
+		UpdateMenu(pvar->hmEncode, pvar->UseOneSetting);
+	}
 
 	return 0;
 }
@@ -564,6 +588,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			/* do process initialization */
 			hInst = hInstance;
 			pvar = &InstVar;
+			pvar->language = MENU_JAPANESE;
 			break;
 		case DLL_PROCESS_DETACH:
 			/* do process cleanup */

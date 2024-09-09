@@ -47,7 +47,6 @@ typedef enum {
 } CharSet;
 
 typedef struct OutputCharStateTag {
-	WORD Language;		// 出力文字コード
 	WORD KanjiCode;		// 出力文字コード(sjis,jisなど)
 
 	// JIS 漢字IN/OUT/カナ
@@ -137,7 +136,6 @@ void MakeOutputStringDestroy(OutputCharState *state)
  * 出力設定
  *
  *	@param	states
- *	@param	Language	IdLanguage
  *	@param	kanji_code	IdSJIS / IdEUC など
  *	@param	KanjiIn		IdKanjiInA / IdKanjiInB
  *	@param	KanjiOut	IdKanjiOutB / IdKanjiOutJ / IdKanjiOutH
@@ -145,7 +143,6 @@ void MakeOutputStringDestroy(OutputCharState *state)
  */
 void MakeOutputStringInit(
 	OutputCharState *state,
-	WORD Language,
 	WORD kanji_code,
 	WORD KanjiIn,
 	WORD KanjiOut,
@@ -153,7 +150,6 @@ void MakeOutputStringInit(
 {
 	assert(state != NULL);
 
-	state->Language = Language;
 	state->KanjiCode = kanji_code;
 	state->KanjiIn = KanjiIn;
 	state->KanjiOut = KanjiOut;
@@ -204,7 +200,7 @@ size_t MakeOutputString(
 
 	// 各種シフト状態を通常に戻す
 	if (u32 < 0x100 || (ControlOut != NULL && ControlOut(u32, TRUE, NULL, NULL, data))) {
-		if (states->Language == IdJapanese && states->KanjiCode == IdJIS) {
+		if (states->KanjiCode == IdJIS) {
 			// 今のところ、日本語,JISしかない
 			if (states->SendCode == IdKanji) {
 				// 漢字ではないので、漢字OUT
@@ -238,16 +234,14 @@ size_t MakeOutputString(
 		TempLen += TempLen2;
 		output_char_count = 1;
 	}
-	else if ((states->Language == IdUtf8) ||
-			 (states->Language == IdJapanese && states->KanjiCode == IdUTF8) ||
-			 (states->Language == IdKorean && states->KanjiCode == IdUTF8) ||
-			 (states->Language == IdChinese && states->KanjiCode == IdUTF8))
-	{
+	else if (states->KanjiCode == IdUTF8) {
 		// UTF-8 で出力
 		size_t utf8_len = sizeof(TempStr);
 		utf8_len = UTF32ToUTF8(u32, TempStr, utf8_len);
 		TempLen += utf8_len;
-	} else if (states->Language == IdJapanese) {
+	} else if (states->KanjiCode == IdEUC ||
+			   states->KanjiCode == IdJIS ||
+			   states->KanjiCode == IdSJIS) {
 		// 日本語
 		// まず CP932(SJIS) に変換してから出力
 		char mb_char[2];
@@ -322,7 +316,10 @@ size_t MakeOutputString(
 				break;
 			}
 		}
-	} else if (states->Language == IdRussian) {
+	} else if (states->KanjiCode == IdWindows ||
+			   states->KanjiCode == IdKOI8 ||
+			   states->KanjiCode == Id866 ||
+			   states->KanjiCode == IdISO) {
 		/* まずCP1251に変換して出力 */
 		char mb_char[2];
 		size_t mb_len = sizeof(mb_char);
@@ -335,29 +332,26 @@ size_t MakeOutputString(
 		}
 		TempStr[TempLen++] = b;
 	}
-	else if (states->Language == IdKorean || states->Language == IdChinese) {
+	else if (states->KanjiCode == IdKoreanCP949 ||
+			 states->KanjiCode == IdCnGB2312 ||
+			 states->KanjiCode == IdCnBig5) {
 		int code_page;
 		char mb_char[2];
 		size_t mb_len;
-		if (states->Language == IdKorean) {
+		switch (states->KanjiCode) {
+		case IdKoreanCP949:
 			code_page = 949;
-		}
-		else if (states->Language == IdChinese) {
-			switch (states->KanjiCode) {
-			case IdCnGB2312:
-				code_page = 936;
-				break;
-			case IdCnBig5:
-				code_page = 950;
-				break;
-			default:
-				assert(FALSE);
-				code_page = 936;
-				break;
-			}
-		} else {
+			break;
+		case IdCnGB2312:
+			code_page = 936;
+			break;
+		case IdCnBig5:
+			code_page = 950;
+			break;
+		default:
 			assert(FALSE);
 			code_page = 0;
+			break;
 		}
 		/* code_page に変換して出力 */
 		mb_len = sizeof(mb_char);
@@ -372,7 +366,22 @@ size_t MakeOutputString(
 			TempStr[TempLen++] = mb_char[1];
 		}
 	}
-	else if (states->Language == IdEnglish) {
+	else if (states->KanjiCode == IdISO8859_1 ||
+			 states->KanjiCode == IdISO8859_2 ||
+			 states->KanjiCode == IdISO8859_3 ||
+			 states->KanjiCode == IdISO8859_4 ||
+			 states->KanjiCode == IdISO8859_5 ||
+			 states->KanjiCode == IdISO8859_6 ||
+			 states->KanjiCode == IdISO8859_7 ||
+			 states->KanjiCode == IdISO8859_8 ||
+			 states->KanjiCode == IdISO8859_9 ||
+			 states->KanjiCode == IdISO8859_10 ||
+			 states->KanjiCode == IdISO8859_11 ||
+			 states->KanjiCode == IdISO8859_13 ||
+			 states->KanjiCode == IdISO8859_14 ||
+			 states->KanjiCode == IdISO8859_15 ||
+			 states->KanjiCode == IdISO8859_16) {
+		// SBCS
 		unsigned char byte;
 		int part = KanjiCodeToISO8859Part(states->KanjiCode);
 		int r = UnicodeToISO8859(part, u32, &byte);
@@ -391,7 +400,6 @@ size_t MakeOutputString(
 
 char *MakeOutputStringConvW(
 	wchar_t const *strW,
-	WORD Language,
 	WORD kanji_code,
 	WORD KanjiIn,
 	WORD KanjiOut,
@@ -399,7 +407,7 @@ char *MakeOutputStringConvW(
 	size_t *len)
 {
 	OutputCharState *h = MakeOutputStringCreate();
-	MakeOutputStringInit(h, Language, kanji_code, KanjiIn, KanjiOut, jis7katakana);
+	MakeOutputStringInit(h, kanji_code, KanjiIn, KanjiOut, jis7katakana);
 
 	size_t strW_len = wcslen(strW);
 	size_t str_len = strW_len;
@@ -428,7 +436,6 @@ char *MakeOutputStringConvW(
 
 char *MakeOutputStringConvU8(
 	const char *strU8,
-	WORD Language,
 	WORD kanji_code,
 	WORD KanjiIn,
 	WORD KanjiOut,
@@ -436,8 +443,7 @@ char *MakeOutputStringConvU8(
 	size_t *len)
 {
 	wchar_t *strW = ToWcharU8(strU8);
-	char *str = MakeOutputStringConvW(
-		strW, Language, kanji_code, KanjiIn, KanjiOut, jis7katakana, len);
+	char *str = MakeOutputStringConvW(strW, kanji_code, KanjiIn, KanjiOut, jis7katakana, len);
 	free(strW);
 	return str;
 }
