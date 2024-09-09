@@ -428,7 +428,7 @@ DLG_TCPIP_KEEPALIVE_SEC=நொடி
 DLG_TCPIP_AUTOCLOSE=தானாக &சாளரம் மூடப்படும்
 DLG_TCPIP_TERMTYPE=&முனை வகை:
 
-DLG_TERM_TITLE=தேரா முனை: முனையம் அமைவு
+DLG_TERM_TITLE=முனையம்
 DLG_TERM_WIDTHLABEL=&முனையம் அளவு
 DLG_TERM_ISWIN=முனை &அளவு = சாளர அளவு
 DLG_TERM_RESIZE=தானியங்கு &சாளர மறுஅளவு

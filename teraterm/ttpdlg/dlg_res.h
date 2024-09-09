@@ -155,6 +155,7 @@
 #define IDC_SFMT_VERSION                1078
 #define IDC_SERIALTEXT                  1079
 #define IDC_GENLANUI_INFO               1080
+#define IDC_CODING_BUTTON               1081
 #define IDC_GENHELP                     1099
 #define IDD_TERMDLG                     1100
 #define IDD_WINLISTDLG                  1200

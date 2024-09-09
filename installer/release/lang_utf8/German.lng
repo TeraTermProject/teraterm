@@ -428,7 +428,7 @@ DLG_TCPIP_KEEPALIVE_SEC=Sec
 DLG_TCPIP_AUTOCLOSE=Fenster automatisch schließen
 DLG_TCPIP_TERMTYPE=Terminal-Typ:
 
-DLG_TERM_TITLE=Terminal-Einstellungen
+DLG_TERM_TITLE=Terminal
 DLG_TERM_WIDTHLABEL=Terminal-Größe
 DLG_TERM_ISWIN=Term = Fenstergröße
 DLG_TERM_RESIZE=Größe automatisch anpassen

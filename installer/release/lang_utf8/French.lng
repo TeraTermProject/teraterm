@@ -428,7 +428,7 @@ DLG_TCPIP_KEEPALIVE_SEC=Sec
 DLG_TCPIP_AUTOCLOSE=Fermeture auto de la fenêtre
 DLG_TCPIP_TERMTYPE=Type &Terminal:
 
-DLG_TERM_TITLE=Tera Term: Configuration du Terminal
+DLG_TERM_TITLE=Terminal
 DLG_TERM_WIDTHLABEL=Taille du &Terminal
 DLG_TERM_ISWIN=Terminal = taille fenêtre
 DLG_TERM_RESIZE=Redim Auto fenêtre

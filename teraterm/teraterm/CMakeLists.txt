@@ -125,15 +125,16 @@ set(SRC_DIALOG
   sendfiledlg.h
   setupdirdlg.cpp
   setupdirdlg.h
+  tcpip_pp.cpp
+  tcpip_pp.h
+  term_pp.cpp
+  term_pp.h
   theme_pp.cpp
   theme_pp.h
   themedlg.cpp
   themedlg.h
   themedlg.rc
   themedlg_res.h
-  #
-  tcpip_pp.h
-  tcpip_pp.cpp
 )
 
 target_sources(
