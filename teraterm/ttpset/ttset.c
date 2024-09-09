@@ -56,6 +56,7 @@
 #include "asprintf.h"
 #include "compat_win.h"
 #include "vtdisp.h"
+#include "makeoutputstring.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
@@ -790,20 +791,12 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* KanjiIn */
 	GetPrivateProfileString(Section, "KanjiIn", "",
 	                        Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "@") == 0)
-		ts->KanjiIn = IdKanjiInA;
-	else
-		ts->KanjiIn = IdKanjiInB;
+	ts->KanjiIn = GetKanjiInCodeFromIni(Temp);
 
 	/* KanjiOut */
 	GetPrivateProfileString(Section, "KanjiOut", "",
 	                        Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "B") == 0)
-		ts->KanjiOut = IdKanjiOutB;
-	else if (_stricmp(Temp, "H") == 0)
-		ts->KanjiOut = IdKanjiOutH;
-	else
-		ts->KanjiOut = IdKanjiOutJ;
+	ts->KanjiOut = GetKanjiOutCodeFromIni(Temp);
 
 	/* Auto Win Switch VT<->TEK */
 	ts->AutoWinSwitch = GetOnOff(Section, "AutoWinSwitch", FName, FALSE);

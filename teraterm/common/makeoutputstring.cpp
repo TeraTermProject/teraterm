@@ -38,6 +38,14 @@
 
 #include "makeoutputstring.h"
 
+/* Character sets */
+typedef enum {
+	IdASCII,
+	IdKatakana,
+	IdKanji,
+	IdSpecial,
+} CharSet;
+
 typedef struct OutputCharStateTag {
 	WORD Language;		// 出力文字コード
 	WORD KanjiCode;		// 出力文字コード(sjis,jisなど)
@@ -48,8 +56,57 @@ typedef struct OutputCharStateTag {
 	BOOL JIS7Katakana;	// (Kanji JIS)kana
 
 	// state
-	int SendCode;		// [in,out](Kanji JIS)直前の送信コード Ascii/Kana/Kanji
+	CharSet SendCode;		// [in,out](Kanji JIS)直前の送信コード Ascii/Kana/Kanji
 } OutputCharState;
+
+static const KanjiInOutSt KanjiInList[] = {
+	{ IdKanjiInA, "^[$@", "@", 1 },
+	{ IdKanjiInB, "^[$B", "B", 1 },
+};
+
+static const KanjiInOutSt KanjiOutList[] = {
+	{ IdKanjiOutB, "^[(B", "B", 1 },
+	{ IdKanjiOutJ, "^[(J", "J", 1 },
+	{ IdKanjiOutH, "^[(H", "H", 0 },
+};
+
+WORD GetKanjiInCodeFromIni(const char *ini_str)
+{
+	for (int i = 0; i < _countof(KanjiInList); i++) {
+		const KanjiInOutSt *p = &KanjiInList[i];
+		if (strcmp(ini_str, p->ini_str) == 0) {
+			return p->code;
+		}
+	}
+	return IdKanjiInB;
+}
+
+WORD GetKanjiOutCodeFromIni(const char *ini_str)
+{
+	for (int i = 0; i < _countof(KanjiOutList); i++) {
+		const KanjiInOutSt *p = &KanjiOutList[i];
+		if (strcmp(ini_str, p->ini_str) == 0) {
+			return p->code;
+		}
+	}
+	return IdKanjiOutJ;
+}
+
+const KanjiInOutSt *GetKanjiInList(int index)
+{
+	if (index >= _countof(KanjiInList)) {
+		return NULL;
+	}
+	return &KanjiInList[index];
+}
+
+const KanjiInOutSt *GetKanjiOutList(int index)
+{
+	if (index >= _countof(KanjiOutList)) {
+		return NULL;
+	}
+	return &KanjiOutList[index];
+}
 
 /**
  *	@retval	true	日本語の半角カタカナ

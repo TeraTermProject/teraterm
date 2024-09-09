@@ -56,12 +56,6 @@ typedef enum {
 	IdTalkSendMem,
 } IdTalk;
 
-  /* Character sets */
-#define IdASCII    0
-#define IdKatakana 1
-#define IdKanji    2
-#define IdSpecial  3
-
   /* Color codes */
 #define IdBack    0
 #define IdRed     1

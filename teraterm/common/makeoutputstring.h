@@ -36,6 +36,27 @@ extern "C" {
 
 typedef struct OutputCharStateTag OutputCharState;
 
+  /* KanjiIn modes */
+#define IdKanjiInA 1
+#define IdKanjiInB 2
+  /* KanjiOut modes */
+#define IdKanjiOutB 1
+#define IdKanjiOutJ 2
+#define IdKanjiOutH 3
+
+typedef struct {
+	int code;
+	const char *menu_str;
+	const char *ini_str;
+	int regular;
+} KanjiInOutSt;
+
+WORD GetKanjiInCodeFromIni(const char *ini_str);
+WORD GetKanjiOutCodeFromIni(const char *ini_str);
+
+const KanjiInOutSt *GetKanjiInList(int index);
+const KanjiInOutSt *GetKanjiOutList(int index);
+
 OutputCharState *MakeOutputStringCreate(void);
 void MakeOutputStringDestroy(OutputCharState *state);
 void MakeOutputStringInit(

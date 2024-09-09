@@ -42,15 +42,13 @@
 #include "setting.h"
 #include "helpid.h"
 #include "ttlib_charset.h"
+#include "makeoutputstring.h"
 
 #include "coding_pp.h"
 
 // テンプレートの書き換えを行う
 #define REWRITE_TEMPLATE
 
-static const char *KanjiInList[] = {"^[$@","^[$B",NULL};
-static const char *KanjiOutList[] = {"^[(B","^[(J",NULL};
-static const char *KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
 static const char *CellWidthList[] = { "1 Cell", "2 Cell", NULL };
 
 struct CodingPPData {
@@ -198,18 +196,42 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SetRB(hWnd, ts->JIS7Katakana, IDC_TERMKANA, IDC_TERMKANA);
 			SetRB(hWnd, ts->JIS7KatakanaSend, IDC_TERMKANASEND, IDC_TERMKANASEND);
 
-			{
-				const char **kanji_out_list;
-				int n;
-				n = ts->KanjiIn;
-				n = (n <= 0 || 2 < n) ? IdKanjiInB : n;
-				SetDropDownList(hWnd, IDC_TERMKIN, KanjiInList, n);
-
-				kanji_out_list = (ts->TermFlag & TF_ALLOWWRONGSEQUENCE) ? KanjiOutList2 : KanjiOutList;
-				n = ts->KanjiOut;
-				n = (n <= 0 || 3 < n) ? IdKanjiOutB : n;
-				SetDropDownList(hWnd, IDC_TERMKOUT, kanji_out_list, n);
+			// Kanji In
+			int kanji_in_index = 0;
+			for (int i = 0;; i++) {
+				const KanjiInOutSt *p = GetKanjiInList(i);
+				if (p == NULL) {
+					break;
+				}
+				int code = p->code;
+				LRESULT index = SendDlgItemMessageA(hWnd, IDC_TERMKIN, CB_ADDSTRING, 0, (LPARAM)p->menu_str);
+				SendDlgItemMessageA(hWnd, IDC_TERMKIN, CB_SETITEMDATA, index, code);
+				if (ts->KanjiIn == code) {
+					kanji_in_index = i;
+				}
 			}
+			ExpandCBWidth(hWnd, IDC_TERMKIN);
+			SendDlgItemMessageA(hWnd, IDC_TERMKIN, CB_SETCURSEL, kanji_in_index, 0);
+
+			// Kanji Out
+			int kanji_out_index = 0;
+			for (int i = 0;; i++) {
+				const KanjiInOutSt *p = GetKanjiOutList(i);
+				if (p == NULL) {
+					break;
+				}
+				if (p->regular == 0 && ((ts->TermFlag & TF_ALLOWWRONGSEQUENCE) == 0)) {
+					continue;
+				}
+				int code = p->code;
+				LRESULT index = SendDlgItemMessageA(hWnd, IDC_TERMKOUT, CB_ADDSTRING, 0, (LPARAM)p->menu_str);
+				SendDlgItemMessageA(hWnd, IDC_TERMKOUT, CB_SETITEMDATA, index, code);
+				if (ts->KanjiOut == code) {
+					kanji_out_index = i;
+				}
+			}
+			ExpandCBWidth(hWnd, IDC_TERMKOUT);
+			SendDlgItemMessageA(hWnd, IDC_TERMKOUT, CB_SETCURSEL, kanji_out_index, 0);
 
 			// DEC Special Graphics
 			CheckDlgButton(hWnd, IDC_UNICODE2DEC, ts->Dec2Unicode ? BST_UNCHECKED : BST_CHECKED);
