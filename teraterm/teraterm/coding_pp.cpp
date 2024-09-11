@@ -102,7 +102,13 @@ static void ArrenageItems(HWND hWnd)
 	else {
 		EnableWindows(hWnd, UnicodeItems, _countof(UnicodeItems), FALSE);
 	}
-	if (LangIsJapanese(coding_send) || coding_send == IdKoreanCP949 || coding_send == IdCnGB2312 || coding_send == IdCnBig5) {
+	const int code_page = GetACP();
+	if ((coding_send == IdUTF8 &&
+		 (code_page == 932 || code_page == 949 || code_page == 936 || code_page == 950)) ||
+		coding_send == IdSJIS || coding_send == IdEUC || coding_send == IdJIS ||
+		coding_send == IdKoreanCP949 || coding_send == IdCnGB2312 || coding_send == IdCnBig5) {
+		// UTF-8 ‚Å CJK(CP932, CP949, CP936, CP950) ‚Ì‚Æ‚«
+		//   or DBCS(Unicode‚Å‚Í‚È‚¢‚Ì‚Å‘I‘ð‚Å‚«‚È‚¢)‚Ì‚Æ‚«
 		SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
 		CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_CHECKED);
 		SendDlgItemMessage(hWnd, IDC_EMOJI_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
@@ -234,7 +240,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			ArrenageItems(hWnd);
 
-			// character width
+			// character width (Œ»Ý‚Ì’l)
 			SetDropDownList(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CellWidthList, ts->UnicodeAmbiguousWidth == 1 ? 1 : 2);
 			CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, ts->UnicodeEmojiOverride ? BST_CHECKED : BST_UNCHECKED);
 			SetDropDownList(hWnd, IDC_EMOJI_WIDTH_COMBO, CellWidthList, ts->UnicodeEmojiWidth == 1 ? 1 : 2);

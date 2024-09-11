@@ -588,7 +588,13 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			/* do process initialization */
 			hInst = hInstance;
 			pvar = &InstVar;
-			pvar->language = MENU_JAPANESE;
+			if (GetACP() == 949) {
+				// CP949 = Korean
+				pvar->language = MENU_KOREAN;
+			}
+			else {
+				pvar->language = MENU_JAPANESE;
+			}
 			break;
 		case DLL_PROCESS_DETACH:
 			/* do process cleanup */
