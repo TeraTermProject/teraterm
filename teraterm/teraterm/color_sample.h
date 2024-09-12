@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2024- TeraTerm Project
+ * Copyright (C) 2024- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,17 +26,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* terminal dialog */
+#pragma once
 
 #include <windows.h>
-#include "vtwin.h"
 
-#include "ttdlg.h"
+typedef struct ColorSampleTag ColorSample;
 
-BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
-{
-	(void)WndParent;
-	(void)ts;
-	OpenExternalSetupOutside(TermPage);
-	return FALSE;
-}
+ColorSample *ColorSampleInit(HWND hWnd);
+void ColorSampleSetColor(ColorSample *work, COLORREF fore_color, COLORREF back_color);

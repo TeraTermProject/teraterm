@@ -5246,7 +5246,12 @@ void BuffSelectedEraseCurToEnd(void)
 	int i, j, YEnd;
 
 	NewLine(PageStart+CursorY);
-	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
+
+	if (ts.KanjiCode == IdSJIS ||
+		ts.KanjiCode == IdEUC ||
+		ts.KanjiCode == IdJIS ||
+		ts.KanjiCode == IdKoreanCP949 ||
+		ts.KanjiCode == IdUTF8) {
 		if (!(CodeLineW[CursorX].attr2 & Attr2Protect)) {
 			EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
 		}
@@ -5280,7 +5285,11 @@ void BuffSelectedEraseHomeToCur(void)
 	int i, j, YHome;
 
 	NewLine(PageStart+CursorY);
-	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
+	if (ts.KanjiCode == IdSJIS ||
+		ts.KanjiCode == IdEUC ||
+		ts.KanjiCode == IdJIS ||
+		ts.KanjiCode == IdKoreanCP949 ||
+		ts.KanjiCode == IdUTF8) {
 		if (!(CodeLineW[CursorX].attr2 & Attr2Protect)) {
 			EraseKanji(0); /* if cursor is on left half of a kanji, erase the kanji */
 		}
@@ -5371,7 +5380,11 @@ void BuffSelectedEraseCharsInLine(int XStart, int Count)
 		LineContinued = TRUE;
 	}
 
-	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
+	if (ts.KanjiCode == IdSJIS ||
+		ts.KanjiCode == IdEUC ||
+		ts.KanjiCode == IdJIS ||
+		ts.KanjiCode == IdKoreanCP949 ||
+		ts.KanjiCode == IdUTF8) {
 		if (!(CodeLineW[CursorX].attr2 & Attr2Protect)) {
 			EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
 		}

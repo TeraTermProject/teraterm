@@ -285,6 +285,15 @@
     <ClCompile Include="tcpip_pp.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="win_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="term_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="color_sample.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -617,6 +626,15 @@
     </ClInclude>
     <ClInclude Include="tcpip_pp.h">
       <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="win_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="term_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="color_sample.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

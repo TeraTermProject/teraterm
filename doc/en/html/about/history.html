@@ -34,11 +34,13 @@
 
 <h3 id="teraterm_5.4">YYYY.MM.DD (Ver 5.4 not released yet)</h3>
 <ul class="history">
-  <!--li>Changes
+  <li>Changes
     <ul>
-      <li></li>
+      <li>changed to use transmit character code when sending clipboard (OSC 52).<br>
+        Before fix, when transmit character code is not UTF-8, it used ACP.</li>
+      <li>Remove /LA command line options because language mode was removed</li>
     </ul>
-  </li-->
+  </li>
 
   <!--li>Bug fixes
     <ul>
@@ -46,11 +48,11 @@
     </ul>
   </li-->
 
-  <!--li>Misc
+  <li>Misc
     <ul>
-      <li>Upgraded TTSSH to <a href="#ttssh_3.4">3.4</a>.</li>
+      <li>Upgraded TTX KanjiMenu Plug-in to <a href="#kanjimenu_0.1.10">0.1.10</a></li>
     </ul>
-  </li-->
+  </li>
 </ul>
 
 <h3 id="teraterm_5.3">2024.09.08 (Ver 5.3)</h3>
@@ -2078,12 +2080,12 @@
       <li>Changed the BroadcastCommand functional specification. When the BroadcastCommand is not the real-time mode, a user can send a message at the selected window in the list box.</li>
       <li>added UTF-8 language
         <ul>
-          <li>added the <a href="../commandline/teraterm.html#la">/LA</a> command line option for <a href="../menu/setup-general.html">language mode</a> specification.</li>
+          <li>added the /LA command line option for <a href="../menu/setup-general.html">language mode</a> specification.</li>
         </ul></li>
       <li>In UTF-8 transmission mode, when the input character is recognized as invalid character, Tera Term sends the Replacement Character(U+FFFD).</li>
       <li>changed Korean language implementation
         <ul>
-          <li>added support for Korean mode with <a href="../commandline/teraterm.html#la">/LA</a> command line option, which specifies the <a href="../menu/setup-general.html">language mode</a>.</li>
+          <li>added support for Korean mode with /LA command line option, which specifies the <a href="../menu/setup-general.html">language mode</a>.</li>
           <li>added support for the IME in-line conversion.</li>
           <li>added the `UTF-8m' selection for the receiving character code.</li>
           <li>added the KS5601 at the KanjiSend and KanjiReceive entry in the teraterm.ini file.</li>
@@ -5628,6 +5630,11 @@ SYNOPSIS:
 
 
 <h2 id="kanjimenu">TTX KanjiMenu</h2>
+
+<h3 id="kanjimenu_0.1.10">YYYY.MM.DD (Ver 0.1.10)</h3>
+<ul class="history">
+  <li>Japanese mode and Korean mode can be changed at any time.</li>
+</ul>
 
 <h3 id="kanjimenu_0.1.9">2024.9.6 (Ver 0.1.9)</h3>
 <ul class="history">

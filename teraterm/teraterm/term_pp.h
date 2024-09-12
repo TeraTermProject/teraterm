@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2024- TeraTerm Project
  * All rights reserved.
  *
@@ -27,17 +26,16 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* terminal dialog */
+#pragma once
 
 #include <windows.h>
-#include "vtwin.h"
 
-#include "ttdlg.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
-{
-	(void)WndParent;
-	(void)ts;
-	OpenExternalSetupOutside(TermPage);
-	return FALSE;
+HPROPSHEETPAGE CreateTerminalPP(HINSTANCE inst, HWND vtwin, TTTSet *pts);
+
+#ifdef __cplusplus
 }
+#endif

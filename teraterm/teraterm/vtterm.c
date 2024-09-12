@@ -60,6 +60,7 @@
 #include "charset.h"
 #include "ttcstd.h"
 #include "makeoutputstring.h"
+#include "ttlib_charset.h"
 
 #include "vtterm.h"
 #include "tttypes_charset.h"
@@ -364,8 +365,8 @@ void ResetCharSet()
 {
 	cv.CRSend = ts.CRSend;
 
-	MakeOutputStringInit(cv.StateEcho, ts.Language, ts.KanjiCode, ts.KanjiIn, ts.KanjiOut, ts.JIS7Katakana);
-	MakeOutputStringInit(cv.StateSend, ts.Language, ts.KanjiCodeSend, ts.KanjiIn, ts.KanjiOut, ts.JIS7KatakanaSend);
+	MakeOutputStringInit(cv.StateEcho, ts.KanjiCode, ts.KanjiIn, ts.KanjiOut, ts.JIS7Katakana);
+	MakeOutputStringInit(cv.StateSend, ts.KanjiCodeSend, ts.KanjiIn, ts.KanjiOut, ts.JIS7KatakanaSend);
 	cv.KanjiCodeEcho = ts.KanjiCode;
 	cv.KanjiCodeSend = ts.KanjiCodeSend;
 
@@ -918,8 +919,7 @@ static void PrnParseControl(BYTE b) // printer mode
 		return;
 	case SO:
 		if ((ts.ISO2022Flag & ISO2022_SO) && ! DirectPrn) {
-			if ((ts.Language==IdJapanese) &&
-			    (ts.KanjiCode==IdJIS) &&
+			if ((ts.KanjiCode==IdJIS) &&
 			    (ts.JIS7Katakana==1) &&
 			    ((ts.TermFlag & TF_FIXEDJIS)!=0))
 			{
@@ -970,7 +970,8 @@ static void ParseControl(BYTE b)
 	}
 
 	if (b>=0x80) { /* C1 char */
-		if (ts.Language==IdEnglish) { /* English mode */
+		if (LangIsEnglish(ts.KanjiCode)) {
+			/* English mode */
 			if (!Accept8BitCtrl) {
 				PutChar(b); /* Disp C1 char in VT100 mode */
 				return;
@@ -1060,8 +1061,7 @@ static void ParseControl(BYTE b)
 		break;
 	case SO: /* LS1 */
 		if (ts.ISO2022Flag & ISO2022_SO) {
-			if ((ts.Language==IdJapanese) &&
-			    (ts.KanjiCode==IdJIS) &&
+			if ((ts.KanjiCode==IdJIS) &&
 			    (ts.JIS7Katakana==1) &&
 			    ((ts.TermFlag & TF_FIXEDJIS)!=0))
 			{
@@ -1264,7 +1264,7 @@ static void ESCDBCSSelect(BYTE b)
 {
 	int Dist;
 
-	if (ts.Language!=IdJapanese) return;
+	if (!LangIsJapanese(ts.KanjiCode)) return;
 
 	switch (ICount) {
 		case 1:
@@ -1343,7 +1343,7 @@ static void ESCSBCSSelect(BYTE b)
 		CharSet2022Designate(charset_data, Dist, IdASCII);
 		break;
 	case 'I':
-		if (ts.Language==IdJapanese)
+		if (LangIsJapanese(ts.KanjiCode))
 			CharSet2022Designate(charset_data, Dist, IdKatakana);
 		break;
 	case 'J':
@@ -2916,7 +2916,7 @@ static void CSQ_h_Mode() // DECSET
 			}
 			break;
 		  case 59:
-			if (ts.Language==IdJapanese) {
+			if (LangIsJapanese(ts.KanjiCode)) {
 				/* kanji terminal */
 				CharSet2022Designate(charset_data, 0, IdASCII);
 				CharSet2022Designate(charset_data, 1, IdKatakana);
@@ -3086,7 +3086,7 @@ static void CSQ_l_Mode()		// DECRST
 			}
 			break;
 		  case 59:
-			if (ts.Language==IdJapanese) {
+			if (LangIsJapanese(ts.KanjiCode)) {
 				/* katakana terminal */
 				CharSet2022Designate(charset_data, 0, IdASCII);
 				CharSet2022Designate(charset_data, 1, IdKatakana);
@@ -3421,7 +3421,7 @@ static void CSDolRequestMode(void) // DECRQM
 				resp = 2;
 			break;
 		  case 59:	// DECKKDM
-			if (ts.Language!=IdJapanese)
+			if (!LangIsJapanese(ts.KanjiCode))
 				resp = 0;
 			else if ((ts.KanjiCode == IdJIS) && (!ts.JIS7Katakana))
 				resp = 4;
@@ -4141,7 +4141,7 @@ static void ControlSequence(BYTE b)
 
 static int CheckUTF8Seq(BYTE b, int utf8_stat)
 {
-	if (ts.Language == IdUtf8 || (ts.Language==IdJapanese && ts.KanjiCode==IdUTF8)) {
+	if (ts.KanjiCode == IdUTF8) {
 		if (utf8_stat > 0) {
 			if (b >= 0x80 && b < 0xc0) {
 				utf8_stat -= 1;
@@ -5015,7 +5015,7 @@ static void XSequence(BYTE b)
 	else if (b == BEL) {
 		TermChar = BEL;
 	}
-	else if (b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS) && utf8_stat==0) {
+	else if (b == ST && Accept8BitCtrl && ts.KanjiCode != IdSJIS && utf8_stat == 0) {
 		TermChar = ST;
 	}
 

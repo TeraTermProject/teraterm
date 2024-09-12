@@ -43,6 +43,7 @@
 #include "ttcstd.h"
 #include "vtterm.h"
 #include "tttypes_charset.h"
+#include "ttlib_charset.h"
 
 #include "charset.h"
 
@@ -99,7 +100,7 @@ static BOOL IsC1(char32_t b)
  */
 static void CharSetInit2(CharSetData *w)
 {
-	if (ts.Language==IdJapanese) {
+	if (LangIsJapanese(ts.KanjiCode)) {
 		w->Gn[0] = IdASCII;
 		w->Gn[1] = IdKatakana;
 		w->Gn[2] = IdKatakana;
@@ -160,25 +161,19 @@ void CharSetFinish(CharSetData *w)
 /**
  *	1byte目チェック
  */
-static BOOL CheckFirstByte(BYTE b, int lang, int kanji_code)
+static BOOL CheckFirstByte(BYTE b, int kanji_code)
 {
-	switch (lang) {
-		case IdKorean:
+	switch (kanji_code) {
+		case IdKoreanCP949:
 			return __ismbblead(b, 949);
-		case IdChinese:
-			if (kanji_code == IdCnGB2312) {
-				return __ismbblead(b, 936);
-			}
-			else if (ts.KanjiCode == IdCnBig5) {
-				return __ismbblead(b, 950);
-			}
-			break;
+		case IdCnGB2312:
+			return __ismbblead(b, 936);
+		case IdCnBig5:
+			return __ismbblead(b, 950);
 		default:
 			assert(FALSE);
-			break;
+			return FALSE;
 	}
-	assert(FALSE);
-	return FALSE;
 }
 
 /**
@@ -204,8 +199,9 @@ static BOOL CheckKanji(CharSetData *w, BYTE b)
 {
 	BOOL Check;
 
-	if (ts.Language!=IdJapanese)
+	if (!LangIsJapanese(ts.KanjiCode) && ts.KanjiCode != IdUTF8) {
 		return FALSE;
+	}
 
 	w->ConvJIS = FALSE;
 
@@ -412,7 +408,7 @@ static BOOL ParseFirstKR(CharSetData *w, BYTE b)
 		}
 	}
 
-	if ((!w->KanjiIn) && CheckFirstByte(b, ts.Language, ts.KanjiCode)) {
+	if ((!w->KanjiIn) && CheckFirstByte(b, ts.KanjiCode)) {
 		w->Kanji = b << 8;
 		w->KanjiIn = TRUE;
 		return TRUE;
@@ -483,7 +479,7 @@ static BOOL ParseFirstCn(CharSetData *w, BYTE b)
 		}
 	}
 
-	if ((!w->KanjiIn) && CheckFirstByte(b, ts.Language, ts.KanjiCode)) {
+	if ((!w->KanjiIn) && CheckFirstByte(b, ts.KanjiCode)) {
 		w->Kanji = b << 8;
 		w->KanjiIn = TRUE;
 		return TRUE;
@@ -639,7 +635,7 @@ recheck:
 		// UTF-8で1byteに出現しないコードのとき
 		if (ts.FallbackToCP932) {
 			// fallbackする場合
-			if ((ts.Language == IdJapanese) && ismbbleadSJIS(b)) {
+			if (LangIsJapanese(ts.KanjiCode) && ismbbleadSJIS(b)) {
 				// 日本語の場合 && Shift_JIS 1byte目
 				// Shift_JIS に fallback
 				w->Fallbacked = TRUE;
@@ -814,77 +810,69 @@ static void PutDebugChar(CharSetData *w, BYTE b)
 
 void ParseFirst(CharSetData *w, BYTE b)
 {
-	WORD language = ts.Language;
+	IdKanjiCode kanji_code = (IdKanjiCode)ts.KanjiCode;
 	if (w->DebugFlag != DEBUG_FLAG_NONE) {
-		language = IdDebug;
+		kanji_code = IdDebug;
 	}
 
-	switch (language) {
-	default:
-		assert(FALSE);
-		language = IdUtf8;
-		// FALLTHROUGH
-	case IdUtf8:
+	switch (kanji_code) {
+	case IdSJIS:
+	case IdEUC:
+	case IdJIS:
+		if (ParseFirstJP(w, b))  {
+			return;
+		}
+		break;
+
+	case IdISO8859_1:
+	case IdISO8859_2:
+	case IdISO8859_3:
+	case IdISO8859_4:
+	case IdISO8859_5:
+	case IdISO8859_6:
+	case IdISO8859_7:
+	case IdISO8859_8:
+	case IdISO8859_9:
+	case IdISO8859_10:
+	case IdISO8859_11:
+	case IdISO8859_13:
+	case IdISO8859_14:
+	case IdISO8859_15:
+	case IdISO8859_16:
+		if (ParseEnglish(w, b)) {
+			return;
+		}
+		break;
+
+	case IdUTF8:
 		ParseFirstUTF8(w, b);
 		return;
 
-	case IdJapanese:
-		switch (ts.KanjiCode) {
-		case IdUTF8:
-			if (ParseFirstUTF8(w, b)) {
-				return;
-			}
-			break;
-		default:
-			if (ParseFirstJP(w, b))  {
-				return;
-			}
+	case IdKoreanCP949:
+		if (ParseFirstKR(w, b))  {
+			return;
 		}
 		break;
 
-	case IdKorean:
-		switch (ts.KanjiCode) {
-		case IdUTF8:
-			if (ParseFirstUTF8(w, b)) {
-				return;
-			}
-			break;
-		default:
-			if (ParseFirstKR(w, b))  {
-				return;
-			}
-		}
-		break;
-
-	case IdRussian:
+	case IdWindows:
+	case IdKOI8:
+	case Id866:
+	case IdISO:
 		if (ParseFirstRus(w, b)) {
 			return;
 		}
 		break;
 
-	case IdChinese:
-		switch (ts.KanjiCode) {
-		case IdUTF8:
-			if (ParseFirstUTF8(w, b)) {
-				return;
-			}
-			break;
-		default:
-			if (ParseFirstCn(w, b)) {
-				return;
-			}
-		}
-		break;
-	case IdEnglish: {
-		if (ParseEnglish(w, b)) {
+	case IdCnGB2312:
+	case IdCnBig5:
+		if (ParseFirstCn(w, b)) {
 			return;
 		}
 		break;
-	}
-	case IdDebug: {
+
+	case IdDebug:
 		PutDebugChar(w, b);
 		return;
-	}
 	}
 
 	if (w->SSflag) {
