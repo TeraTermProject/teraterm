@@ -77,27 +77,34 @@
 
     <h2 id="JapaneseJIS">Japanese JIS</h2>
 
+    <h3>Reveive</h3>
+
     <dl>
-      <dt id="KatakanaReceive">Half-width kana (receive)</dt>
+      <dt id="KatakanaReceive">Half-width kana</dt>
       <dd>
         ホストから送られてくる"半角"片仮名コードが 7 bit で表現されている
         (SO/SI を用いたシフト制御を用いている)場合に選択してください。
         Kanji (receive) が JIS の場合のみ有効です。
       </dd>
-      <dt id="KatakanaSend">Half-width kana (transmit)</dt>
+    </dl>
+
+    <h3>Transmit</h3>
+
+    <dl>
+      <dt id="KatakanaSend">Half-width kana</dt>
       <dd>
         送出する"半角"片仮名コードを7bitで表現する
         (SO/SI を用いたシフト制御を用いる)場合に選択してください。
         Kanji (transmit) が JIS の場合のみ有効です。
       </dd>
-      <dt id="KanjiIn">Kanji-in (transmit)</dt>
+      <dt id="KanjiIn">Kanji-in</dt>
       <dd>
         Kanji (transmit) が JIS のときに使用するエスケープシーケンス
         (漢字コードを G0 に指示するシーケンス。
         ^[$@ または ^[$B )。
         ホストから送られてくるエスケープシーケンスはどちらでも構いません。
       </dd>
-      <dt id="KanjiOut">Kanji-out (transmit)</dt>
+      <dt id="KanjiOut">Kanji-out</dt>
       <dd>
         Kanji (transmit) が JIS のときに使用するエスケープシーケンス
         (ASCII または JIS ローマ字コードを G0 に指示するシーケンス。

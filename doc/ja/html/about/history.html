@@ -38,6 +38,9 @@
     <ul>
       <li>Setup-General 設定を Additional settings の <a href="../menu/setup-additional-general.html">General タブ</a>へ統合した。</li>
       <li>Additional settings の "Coding" を、より一般的な "Encoding" に改めた。</li>
+      <li>クリップボードの送信(OSC 52)時、送信文字コードで送信するように変更した<br>
+        修正前はUTF-8 以外の時、ACPで送信していた。</li>
+      <li>言語モードを削除したため /LA コマンドラインオプションを削除した</li>
     </ul>
   </li>
 
@@ -47,11 +50,11 @@
     </ul>
   </li-->
 
-  <!--li>その他
+  <li>その他
     <ul>
-      <li><a href="#ttssh_3.4">TTSSH(3.4)</a>へ差し替えた。</li>
+      <li><a href="#kanjimenu_0.1.10">TTX KanjiMenu Plugin(0.1.10)</a>へ差し替えた。</li>
     </ul>
-  </li-->
+
 </ul>
 
 <h3 id="teraterm_5.3">2024.09.08 (Ver 5.3)</h3>
@@ -2078,12 +2081,12 @@
       <li>BroadcastCommand（非Realtime mode）において、リストボックスで選択された端末に対してのみ、メッセージを送信するようにした。</li>
       <li>UTF-8モードを追加
         <ul>
-          <li><a href="../menu/setup-general.html">言語モード</a>を指定する <a href="../commandline/teraterm.html#la">/LA</a> コマンドラインオプションで、UTF-8モードを指定できるようにした。</li>
+          <li><a href="../menu/setup-general.html">言語モード</a>を指定する /LA コマンドラインオプションで、UTF-8モードを指定できるようにした。</li>
         </ul></li>
       <li>送信漢字コードの設定がUTF-8の時、入力された文字がUTF-8に変換出来ない場合(不正な文字)は代わりにReplacement Character(U+FFFD)を送信するようにした。</li>
       <li>韓国語モードの調整
         <ul>
-          <li><a href="../menu/setup-general.html">言語モード</a>を指定する <a href="../commandline/teraterm.html#la">/LA</a> コマンドラインオプションで、韓国語モードを指定できるようにした。</li>
+          <li><a href="../menu/setup-general.html">言語モード</a>を指定する /LA コマンドラインオプションで、韓国語モードを指定できるようにした。</li>
           <li>IMEのインライン変換を韓国語モードでも行えるようにした。</li>
           <li>受信文字コードの選択肢に UTF-8m を追加した。</li>
           <li>teraterm.iniのKanjiSend/KanjiReceiveエントリで、KS5601を受け付けるようにした。</li>
@@ -5639,6 +5642,11 @@
 
 
 <h2 id="kanjimenu">TTX KanjiMenu</h2>
+
+<h3 id="kanjimenu_0.1.10">YYYY.MM.DD (Ver 0.1.10)</h3>
+<ul class="history">
+      <li>日本語モードと韓国語モードをいつでも変更できるようにした。</li>
+</ul>
 
 <h3 id="kanjimenu_0.1.9">2024.9.6 (Ver 0.1.9)</h3>
 <ul class="history">

@@ -18,7 +18,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
          [/F=&lt;setup file&gt;] [/FD=&lt;file transfer directory&gt;]
          [/H] [/I] [/K=&lt;keyboard setup file&gt;]
          [/KR=&lt;kanji code (receive)&gt;] [/KT=&lt;kanji code (transmit)&gt;]
-         [/L=&lt;log file&gt;] [/LA=&lt;language&gt;] [/M=&lt;macro file&gt;] [/NOLOG]
+         [/L=&lt;log file&gt;] [/M=&lt;macro file&gt;] [/NOLOG]
          [/P=&lt;TCP port#&gt;] [/R=&lt;replay file&gt;] [/SPEED=&lt;speed&gt;] [/T=&lt;telnet flag&gt;]
          [/TEKICON=&lt;icon name&gt;] [/TIMEOUT=&lt;connecting timeout value&gt;]
          [/V] [/VTICON=&lt;icon name&gt;] [/W="&lt;window title&gt;"] [/WAITCOM]
@@ -193,16 +193,6 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>Start Tera Term with logging.<br />
       File name can include <a href="../menu/setup-additional-log.html#LogFileNameFormat">formats of Tera Term and strftime</a>.<br />
       If this value is not a full path, file name is <a href="../menu/setup-additional-log.html#LogFullpath">converted to fullpath</a> before open.</dd>
-
-  <dt id="la">/LA=&lt;language&gt;</dt>
-  <dd>Language mode.
-      <ul>
-        <li><span class="syntax">/LA=E</span> English</li>
-        <li><span class="syntax">/LA=J</span> Japanese</li>
-        <li><span class="syntax">/LA=K</span> Korean</li>
-        <li><span class="syntax">/LA=R</span> Russian</li>
-        <li><span class="syntax">/LA=U</span> UTF-8</li>
-      </ul></dd>
 
   <dt id="m">/M=&lt;macro file&gt;</dt>
   <dd>Start Tera Term with macro.<br>

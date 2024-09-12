@@ -55,6 +55,8 @@ public:
 		KeyboardPage,
 		TcpIpPage,
 		GeneralPage,
+		TermPage,
+		WinPage,
 	};
 	void SetStartPage(Page page);
 
@@ -71,4 +73,6 @@ typedef enum {
 	KeyboardPage,
 	TcpIpPage,
 	GeneralPage,
+	TermPage,
+	WinPage,
 } CAddSettingPropSheetDlgPage;
