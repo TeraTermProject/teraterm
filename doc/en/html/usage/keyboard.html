@@ -27,11 +27,13 @@ You can modify key assignments by editing the keyboard setup file. See also <A H
 <dt>Alt+B</dt>
 <dd>Sends a break signal to the host.</dd>
 
-<dt>Alt+C</dt>
-<dd>Copies selected text to the clipboard.</dd>
+<dt>Alt+C, Ctrl+Insert</dt>
+<dd>Copies selected text to the clipboard.
+If <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">AutoTextCopy</a> is enabled, text is copied when selected with the mouse.</dd>
+</dd>
 
 <dt>Alt+D</dt>
-<dd>Duplicates the current session.</dd>
+<dd>Duplicates the current session (SSH, telnet only).</dd>
 
 <dt>Alt+G</dt>
 <dd>Connects to the local Cygwin.</dd>
@@ -54,11 +56,47 @@ You can modify key assignments by editing the keyboard setup file. See also <A H
 <dt>Alt+T</dt>
 <dd>Sends a AYT (Are You There) telnet signal to the host. Usually, the host sends back some message responding to it. This key is available only with a telnet connection.</dd>
 
-<dt>Alt+V</dt>
-<dd>Sends text in the clipboard to the host.</dd>
+<dt>Alt+V, Shift+Insert</dt>
+<dd>Sends text in the clipboard to the host.
+You can also use right-click on the mouse.
+If <a href="../setup/teraterm-misc.html#DisablePasteMouseMButton">DisablePasteMouseMButton</a> is set to off, You can also use middle-click on the mouse.
+</dd>
 
-<dt>Ctrl+Esc</dt>
-<dd>Switches to another window.</dd>
+<dt>Ctrl+Tab, Ctrl+Shift+Tab</dt>
+<dd>Switch to Tera Term next/prev window.</dd>
+
+<dt>Ctrl+Up/Down cursor</dt>
+<dd>LineUp or LineDown.</dd>
+
+<dt>Ctrl+PageUp/PageDown</dt>
+<dd>PageUp or PageDown.</dd>
+
+<dt>Ctrl+Home</dt>
+<dd>Move to top of buffer.</dd>
+
+<dt>Ctrl+End</dt>
+<dd>Move to bottom of buffer.</dd>
+
+<dt>ScrollLock</dt>
+<dd>Tera Term window scroll locked or unlocked(toggle)</dd>
+
+<dt>Alt+Enter</dt>
+<dd>Maximize Tera Term window(toggle).
+Unless the title bar is hidden with <a href="../menu/setup-window.html#HideTitle">HideTitle</a>,
+you can also use Alt+X from the context menu of the active window with Alt+Space.
+</dd>
+
+<dt>F1 key</dt>
+<dd>Push Num pad NumLock key.</dd>
+
+<dt>F2 key</dt>
+<dd>Push Num pad '/'.</dd>
+
+<dt>F3 key</dt>
+<dd>Push Num pad '*'.</dd>
+
+<dt>F4 key</dt>
+<dd>Push Num pad '-'.</dd>
 
 </dl>
 
@@ -83,8 +121,8 @@ You can modify key assignments by editing the keyboard setup file. See also <A H
 <dt>Alt+V</dt>
 <dd>Same as VT window.</dd>
 
-<dt>Ctrl+Esc</dt>
-<dd>Switches to another window.</dd>
+<dt>Ctrl+Tab</dt>
+<dd>Same as VT window.</dd>
 
 </dl>
 
