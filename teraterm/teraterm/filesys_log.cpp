@@ -869,7 +869,7 @@ void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd)
 	if (fv == NULL) {
 		return;
 	}
-	TTDialogBox(hInst, MAKEINTRESOURCE(IDD_COMMENT_DIALOG),
+	TTDialogBox(hInst, MAKEINTRESOURCEW(IDD_COMMENT_DIALOG),
 				hWnd, OnCommentDlgProc);
 }
 

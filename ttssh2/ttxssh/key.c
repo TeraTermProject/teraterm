@@ -34,13 +34,6 @@
 #include <openssl/ecdsa.h>
 #include <openssl/buffer.h>
 
-#undef DialogBoxParam
-#define DialogBoxParam(p1,p2,p3,p4,p5) \
-	TTDialogBoxParam(p1,p2,p3,p4,p5)
-#undef EndDialog
-#define EndDialog(p1,p2) \
-	TTEndDialog(p1, p2)
-
 #define INTBLOB_LEN 20
 #define SIGBLOB_LEN (2*INTBLOB_LEN)
 
@@ -2436,11 +2429,11 @@ static INT_PTR CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wPar
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			EndDialog(dlg, 1);
+			TTEndDialog(dlg, 1);
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDC_FP_HASH_ALG_MD5:
@@ -2476,7 +2469,7 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 		HWND cur_active = GetActiveWindow();
 
 		pvar->hostkey_ctx = ctx;
-		dlgresult = DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHUPDATE_HOSTKEY),
+		dlgresult = TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHUPDATE_HOSTKEY),
 			cur_active != NULL ? cur_active : pvar->NotificationWindow,
 			hosts_updatekey_dlg_proc, (LPARAM)pvar);
 		if (dlgresult != 1) {

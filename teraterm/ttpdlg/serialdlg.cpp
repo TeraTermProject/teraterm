@@ -450,7 +450,7 @@ BOOL WINAPI _SetupSerialPort(HWND WndParent, PTTSet ts)
 	}
 
 	r = (BOOL)TTDialogBoxParam(hInst,
-							   MAKEINTRESOURCE(IDD_SERIALDLG),
+							   MAKEINTRESOURCEW(IDD_SERIALDLG),
 							   WndParent, SerialDlg, (LPARAM)dlg_data);
 
 	ComPortInfoFree(dlg_data->ComPortInfoPtr, dlg_data->ComPortInfoCount);

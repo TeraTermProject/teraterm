@@ -178,7 +178,7 @@ HPROPSHEETPAGE KeyboardPageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if defined(REWRITE_TEMPLATE)
 	psp.dwFlags |= PSP_DLGINDIRECT;
-	Param->dlg_templ = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
+	Param->dlg_templ = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(id));
 	psp.pResource = Param->dlg_templ;
 #endif
 

@@ -6693,7 +6693,7 @@ static LRESULT CALLBACK ssh_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, L
 					}
 
 				case IDCANCEL:
-					EndDialog(hWnd, 0);
+					TTEndDialog(hWnd, 0);
 					return TRUE;
 				default:
 					return FALSE;
@@ -7548,13 +7548,13 @@ static INT_PTR CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, 
 			strncpy_s(cp->passwd, sizeof(cp->passwd), old_passwd, _TRUNCATE);
 			strncpy_s(cp->new_passwd, sizeof(cp->new_passwd), new_passwd, _TRUNCATE);
 
-			EndDialog(dlg, 1); // dialog close
+			TTEndDialog(dlg, 1); // dialog close
 			return TRUE;
 
 		case IDCANCEL:
 			// 接続を切る
 			notify_closed_connection(pvar, "authentication cancelled");
-			EndDialog(dlg, 0); // dialog close
+			TTEndDialog(dlg, 0); // dialog close
 			return TRUE;
 		}
 	}
@@ -7578,7 +7578,7 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 
 	memset(&cp, 0, sizeof(cp));
 	cp.pvar = pvar;
-	ret = DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHPASSWD_INPUT), pvar->cv->HWin, passwd_change_dialog, (LPARAM)&cp);
+	ret = TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHPASSWD_INPUT), pvar->cv->HWin, passwd_change_dialog, (LPARAM)&cp);
 
 	if (ret == -1) {
 		logprintf(LOG_LEVEL_WARNING, "%s: DialogBoxParam failed.", __FUNCTION__);
@@ -8487,7 +8487,7 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 		HANDLE thread;
 		unsigned int tid;
 
-		hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCE(IDD_SSHSCP_PROGRESS),
+		hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_SSHSCP_PROGRESS),
 								 pvar->cv->HWin, ssh_scp_dlg_proc);
 		if (hDlgWnd != NULL) {
 			static const DlgTextInfo text_info[] = {
@@ -8833,7 +8833,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 
 			// 進捗ウィンドウ
 			c->scp.pvar = pvar;
-			hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCE(IDD_SSHSCP_PROGRESS),
+			hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_SSHSCP_PROGRESS),
 									 pvar->cv->HWin, ssh_scp_dlg_proc);
 			if (hDlgWnd != NULL) {
 				static const DlgTextInfo text_info[] = {

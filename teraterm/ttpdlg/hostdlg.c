@@ -301,6 +301,6 @@ BOOL WINAPI _GetHostName(HWND WndParent, PGetHNRec GetHNRec)
 {
 	return
 		(BOOL)TTDialogBoxParam(hInst,
-							   MAKEINTRESOURCE(IDD_HOSTDLG),
+							   MAKEINTRESOURCEW(IDD_HOSTDLG),
 							   WndParent, HostDlg, (LPARAM)GetHNRec);
 }

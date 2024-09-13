@@ -57,7 +57,7 @@ BOOL TTEndDialog(HWND hDlgWnd, INT_PTR nResult)
  */
 HWND TTCreateDialogIndirectParam(
 	HINSTANCE hInstance,
-	LPCTSTR lpTemplateName,
+	LPCWSTR lpTemplateName,
 	HWND hWndParent,			// オーナーウィンドウのハンドル
 	DLGPROC lpDialogFunc,		// ダイアログボックスプロシージャへのポインタ
 	LPARAM lParamInit)			// 初期化値
@@ -73,7 +73,7 @@ HWND TTCreateDialogIndirectParam(
  */
 HWND TTCreateDialogParam(
 	HINSTANCE hInstance,
-	LPCTSTR lpTemplateName,
+	LPCWSTR lpTemplateName,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc,
 	LPARAM lParamInit)
@@ -87,7 +87,7 @@ HWND TTCreateDialogParam(
  */
 HWND TTCreateDialog(
 	HINSTANCE hInstance,
-	LPCTSTR lpTemplateName,
+	LPCWSTR lpTemplateName,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc)
 {
@@ -99,7 +99,7 @@ HWND TTCreateDialog(
  *	DialogBoxParam() 互換関数
  *		EndDialog()ではなく、TTEndDialog()を使用すること
  */
-INT_PTR TTDialogBoxParam(HINSTANCE hInstance, LPCTSTR lpTemplateName,
+INT_PTR TTDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplateName,
 						 HWND hWndParent,		// オーナーウィンドウのハンドル
 						 DLGPROC lpDialogFunc,  // ダイアログボックスプロシージャへのポインタ
 						 LPARAM lParamInit)		// 初期化値
@@ -114,7 +114,7 @@ INT_PTR TTDialogBoxParam(HINSTANCE hInstance, LPCTSTR lpTemplateName,
  *	DialogBox() 互換関数
  *		EndDialog()ではなく、TTEndDialog()を使用すること
  */
-INT_PTR TTDialogBox(HINSTANCE hInstance, LPCTSTR lpTemplateName, HWND hWndParent, DLGPROC lpDialogFunc)
+INT_PTR TTDialogBox(HINSTANCE hInstance, LPCWSTR lpTemplateName, HWND hWndParent, DLGPROC lpDialogFunc)
 {
 	return TTDialogBoxParam(hInstance, lpTemplateName, hWndParent, lpDialogFunc, (LPARAM)NULL);
 }

@@ -42,13 +42,6 @@ See LICENSE.TXT for the license.
 #include "servicenames.h"
 #include "helpid.h"
 
-#undef DialogBoxParam
-#define DialogBoxParam(p1,p2,p3,p4,p5) \
-	TTDialogBoxParam(p1,p2,p3,p4,p5)
-#undef EndDialog
-#define EndDialog(p1,p2) \
-	TTEndDialog(p1, p2)
-
 typedef struct {
 	FWDRequestSpec *spec;
 	PTInstVar pvar;
@@ -631,7 +624,7 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 	FWD_set_request_specs(pvar, specs, num_specs);
 	FWDUI_save_settings(pvar);
 	free_all_listbox_specs(dlg);
-	EndDialog(dlg, 1);
+	TTEndDialog(dlg, 1);
 
 	free(specs);
 
@@ -929,7 +922,7 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 
 	*spec = new_spec;
 
-	EndDialog(dlg, 1);
+	TTEndDialog(dlg, 1);
 	return TRUE;
 }
 
@@ -963,7 +956,7 @@ static INT_PTR CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPA
 			return result;
 
 		case IDCANCEL:
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDC_SSHFWDLOCALTOREMOTE:
@@ -993,8 +986,8 @@ static void add_forwarding_entry(PTInstVar pvar, HWND dlg)
 	new_spec.to_host[0] = 0;
 	new_spec.to_port_name[0] = 0;
 
-	result = DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHFWDEDIT),
-	                        dlg, fwd_edit_dlg_proc, (LPARAM) & closure);
+	result = TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHFWDEDIT),
+							  dlg, fwd_edit_dlg_proc, (LPARAM) & closure);
 
 	if (result == -1) {
 		UTIL_get_lang_msg("MSG_CREATEWINDOW_FWDEDIT_ERROR", pvar,
@@ -1024,8 +1017,8 @@ static void edit_forwarding_entry(PTInstVar pvar, HWND dlg)
 			FWDEditClosure closure = { spec, pvar };
 
 			INT_PTR result =
-				DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHFWDEDIT),
-				               dlg, fwd_edit_dlg_proc, (LPARAM) & closure);
+				TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHFWDEDIT),
+								 dlg, fwd_edit_dlg_proc, (LPARAM) & closure);
 
 			if (result == -1) {
 				UTIL_get_lang_msg("MSG_CREATEWINDOW_FWDEDIT_ERROR", pvar,
@@ -1083,7 +1076,7 @@ static INT_PTR CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPARAM l
 
 		case IDCANCEL:
 			free_all_listbox_specs(dlg);
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDC_SSHFWDSETUP_HELP:
@@ -1119,8 +1112,8 @@ void FWDUI_do_forwarding_dialog(PTInstVar pvar)
 {
 	HWND cur_active = GetActiveWindow();
 
-	if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHFWDSETUP),
-		               cur_active != NULL ? cur_active
+	if (TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHFWDSETUP),
+						 cur_active != NULL ? cur_active
 		                                  : pvar->NotificationWindow,
 		               fwd_dlg_proc, (LPARAM) pvar) == -1) {
 		UTIL_get_lang_msg("MSG_CREATEWINDOW_FWDSETUP_ERROR", pvar,
