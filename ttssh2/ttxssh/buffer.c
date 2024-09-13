@@ -29,14 +29,35 @@
 // buffer.c
 //
 
-#include <winsock2.h>
-#include <malloc.h>
-#include "buffer.h"
-#include "ttxssh.h"
-#include "util.h"
+#if !defined(_CRTDBG_MAP_ALLOC)
+#define _CRTDBG_MAP_ALLOC
+#endif
+#include <stdlib.h>
+#include <crtdbg.h>
+#include <assert.h>
+
 #include <openssl/bn.h>
 #include <openssl/ec.h>
 #include <zlib.h>
+
+#include "ttxssh.h"	// for logprintf()
+
+#include "buffer.h"
+
+/* buffer_t.buf の拡張の上限値 (16MB) */
+#define BUFFER_SIZE_MAX 0x1000000
+
+/* buffer_t.buf の拡張時に追加で確保する量 (32KB) */
+#define BUFFER_INCREASE_MARGIN (32*1024)
+
+#if 0
+typedef struct buffer {
+	char *buf;      /* バッファの先頭ポインタ。realloc()により変動する。*/
+	size_t offset;     /* 現在の読み出し位置 */
+	size_t maxlen;     /* バッファの最大サイズ */
+	size_t len;        /* バッファに含まれる有効なデータサイズ */
+} buffer_t;
+#endif
 
 // バッファのオフセットを初期化し、まだ読んでいない状態にする。
 // Tera Term(TTSSH)オリジナル関数。
@@ -55,7 +76,7 @@ buffer_t *buffer_init(void)
 {
 	void *ptr;
 	buffer_t *buf;
-	unsigned int size = 4096;
+	size_t size = 4096;
 
 	buf = malloc(sizeof(buffer_t));
 	ptr = malloc(size);
@@ -89,8 +110,8 @@ void buffer_free(buffer_t * buf)
 // return: 拡張前のバッファポインター
 void *buffer_append_space(buffer_t * buf, size_t size)
 {
-	unsigned int n;
-	unsigned int newlen;
+	size_t n;
+	size_t newlen;
 	void *p;
 
 	n = buf->offset + size;
@@ -119,11 +140,11 @@ panic:
 	return (NULL);
 }
 
-int buffer_append(buffer_t * buf, char *ptr, int size)
+int buffer_append(buffer_t * buf, const void *ptr, size_t size)
 {
-	unsigned int n;
+	size_t n;
 	int ret = -1;
-	unsigned int newlen;
+	size_t newlen;
 
 	for (;;) {
 		n = buf->offset + size;
@@ -154,13 +175,14 @@ panic:
 	return (ret);
 }
 
-int buffer_append_length(buffer_t * msg, char *ptr, int size)
+int buffer_append_length(buffer_t * msg, const void *ptr, size_t size)
 {
 	char buf[4];
 	int val;
 	int ret = -1;
 
-	val = htonl(size);
+	assert(size == (size_t)(int)size);
+	val = htonl((int)size);
 	memcpy(buf, &val, sizeof(val));
 	ret = buffer_append(msg, buf, sizeof(buf));
 	if (ptr != NULL) {
@@ -170,7 +192,7 @@ int buffer_append_length(buffer_t * msg, char *ptr, int size)
 	return (ret);
 }
 
-void buffer_put_raw(buffer_t *msg, char *ptr, int size)
+void buffer_put_raw(buffer_t *msg, const void *ptr, size_t size)
 {
 	int ret = -1;
 
@@ -269,7 +291,7 @@ void *buffer_get_string_msg(buffer_t *msg, int *buflen_ptr)
 {
 	char *data, *olddata;
 	void *ret = NULL;
-	int off;
+	size_t off;
 	int len, datalen;
 
 	// Check size
@@ -290,14 +312,15 @@ error:;
 	return (ret);
 }
 
-void buffer_put_string(buffer_t *msg, char *ptr, size_t size)
+void buffer_put_string(buffer_t *msg, const char *ptr, size_t size)
 {
 	char buf[4];
 	int val;
 	int ret = -1;
 
+	assert(size == (size_t)(int)size);
 	// 「サイズ＋文字列」で書き込む。サイズは4byteのbig-endian。
-	val = htonl(size);
+	val = htonl((int)size);
 	memcpy(buf, &val, sizeof(val));
 	ret = buffer_append(msg, buf, sizeof(buf));
 	if (ptr != NULL) {
@@ -305,22 +328,22 @@ void buffer_put_string(buffer_t *msg, char *ptr, size_t size)
 	}
 }
 
-void buffer_put_cstring(buffer_t *msg, char *ptr)
+void buffer_put_cstring(buffer_t *msg, const char *ptr)
 {
 	buffer_put_string(msg, ptr, strlen(ptr));
 }
 
 void buffer_put_char(buffer_t *msg, int value)
 {
-	char ch = value;
+	char ch = (char)value;
 
 	buffer_append(msg, &ch, 1);
 }
 
-void buffer_put_padding(buffer_t *msg, int size)
+void buffer_put_padding(buffer_t *msg, size_t size)
 {
 	char ch = ' ';
-	int i;
+	size_t i;
 
 	for (i = 0 ; i < size ; i++) {
 		buffer_append(msg, &ch, 1);
@@ -337,13 +360,13 @@ void buffer_put_int(buffer_t *msg, int value)
 
 int buffer_len(buffer_t *msg)
 {
-	return (msg->len);
+	return (int)(msg->len);
 }
 
 // まだ読み込んでいない残りのサイズを返す。本来はこちらが OpenSSH スタイル。
 int buffer_remain_len(buffer_t *msg)
 {
-	return (msg->len - msg->offset);
+	return (int)(msg->len - msg->offset);
 }
 
 // buffer_append() や buffer_append_space() でメッセージバッファに追加を行うと、
@@ -360,7 +383,7 @@ char *buffer_tail_ptr(buffer_t *msg)
 	return (char *)(msg->buf + msg->offset);
 }
 
-int buffer_overflow_verify(buffer_t *msg, int len)
+int buffer_overflow_verify(buffer_t *msg, size_t len)
 {
 	if (msg->offset + len > msg->maxlen) {
 		return -1;  // error
@@ -369,7 +392,7 @@ int buffer_overflow_verify(buffer_t *msg, int len)
 }
 
 // for SSH1
-void buffer_put_bignum(buffer_t *buffer, BIGNUM *value)
+void buffer_put_bignum(buffer_t *buffer, const BIGNUM *value)
 {
 	unsigned int bits, bin_size;
 	unsigned char *buf;
@@ -403,7 +426,7 @@ error:
 }
 
 // for SSH2
-void buffer_put_bignum2(buffer_t *msg, BIGNUM *value)
+void buffer_put_bignum2(buffer_t *msg, const BIGNUM *value)
 {
 	unsigned int bytes;
 	unsigned char *buf;
@@ -444,7 +467,7 @@ void buffer_get_bignum2(char **data, BIGNUM *value)
 void buffer_get_bignum2_msg(buffer_t *msg, BIGNUM *value)
 {
 	char *data, *olddata;
-	int off;
+	size_t off;
 
 	data = olddata = buffer_tail_ptr(msg);
 	buffer_get_bignum2(&data, value);
@@ -527,7 +550,7 @@ void buffer_get_ecpoint(char **data, const EC_GROUP *curve, EC_POINT *point)
 void buffer_get_ecpoint_msg(buffer_t *msg, const EC_GROUP *curve, EC_POINT *point)
 {
 	char *data, *olddata;
-	int off;
+	size_t off;
 
 	data = olddata = buffer_tail_ptr(msg);
 	buffer_get_ecpoint(&data, curve, point);
@@ -574,14 +597,15 @@ void buffer_consume_end(buffer_t *buf, size_t shift_byte)
 
 
 // パケットの圧縮
-int buffer_compress(z_stream *zstream, char *payload, int len, buffer_t *compbuf)
+int buffer_compress(z_stream *zstream, char *payload, size_t len, buffer_t *compbuf)
 {
 	unsigned char buf[4096];
 	int status;
 
 	// input buffer
 	zstream->next_in = payload;
-	zstream->avail_in = len;
+	zstream->avail_in = (uInt)len;
+	assert(len == (size_t)(uInt)len);
 
 	do {
 		// output buffer
@@ -601,14 +625,15 @@ int buffer_compress(z_stream *zstream, char *payload, int len, buffer_t *compbuf
 }
 
 // パケットの展開
-int buffer_decompress(z_stream *zstream, char *payload, int len, buffer_t *compbuf)
+int buffer_decompress(z_stream *zstream, char *payload, size_t len, buffer_t *compbuf)
 {
 	unsigned char buf[4096];
 	int status;
 
 	// input buffer
 	zstream->next_in = payload;
-	zstream->avail_in = len;
+	zstream->avail_in = (uInt)len;
+	assert(len == (size_t)(uInt)len);
 
 	do {
 		// output buffer

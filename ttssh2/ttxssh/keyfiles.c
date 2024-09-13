@@ -1097,7 +1097,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		cipher_init_SSH2(&cc, ciphertype, cipherkey, 32, cipheriv, 16, CIPHER_DECRYPT, pvar);
 		len = buffer_len(private_blob);
 		decrypted = (char *)malloc(len);
-		ret = EVP_Cipher(cc->evp, decrypted, private_blob->buf, len);
+		ret = EVP_Cipher(cc->evp, decrypted, buffer_ptr(private_blob), len);
 		if (ret == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 			free(decrypted);
@@ -1122,8 +1122,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		buffer_put_cstring(macdata, get_ssh2_hostkey_type_name(result->type));
 		buffer_put_cstring(macdata, encryption);
 		buffer_put_cstring(macdata, comment);
-		buffer_put_string(macdata, public_blob->buf, public_blob->len);
-		buffer_put_string(macdata, private_blob->buf, private_blob->len);
+		buffer_put_string(macdata, buffer_ptr(public_blob), buffer_len(public_blob));
+		buffer_put_string(macdata, buffer_ptr(private_blob), buffer_len(private_blob));
 
 		if (fmt_version == 2) {
 			md = EVP_sha1();
@@ -1131,7 +1131,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		else {
 			md = EVP_sha256();
 		}
-		mac_simple(md, (unsigned char *)mackey, mackey_len, macdata->buf, macdata->len, binary);
+		mac_simple(md, (unsigned char *)mackey, mackey_len, buffer_ptr(macdata), buffer_len(macdata), binary);
 
 		buffer_free(macdata);
 
@@ -1158,8 +1158,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		char *pubkey_type, *pub, *pri;
 		BIGNUM *e, *n, *d, *iqmp, *p, *q;
 
-		pub = public_blob->buf;
-		pri = private_blob->buf;
+		pub = buffer_ptr(public_blob);
+		pri = buffer_ptr(private_blob);
 		pubkey_type = buffer_get_string(&pub, NULL);
 		if (strcmp(pubkey_type, "ssh-rsa") != 0) {
 			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
@@ -1207,8 +1207,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		char *pubkey_type, *pub, *pri;
 		BIGNUM *p, *q, *g, *pub_key, *priv_key;
 
-		pub = public_blob->buf;
-		pri = private_blob->buf;
+		pub = buffer_ptr(public_blob);
+		pri = buffer_ptr(private_blob);
 		pubkey_type = buffer_get_string(&pub, NULL);
 		if (strcmp(pubkey_type, "ssh-dss") != 0) {
 			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
@@ -1259,8 +1259,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		BIGNUM *exponent = NULL;
 		EC_POINT *q = NULL;
 
-		pub = public_blob->buf;
-		pri = private_blob->buf;
+		pub = buffer_ptr(public_blob);
+		pri = buffer_ptr(private_blob);
 		pubkey_type = buffer_get_string(&pub, NULL);
 		if ((result->type == KEY_ECDSA256 && strcmp(pubkey_type, "ecdsa-sha2-nistp256") != 0) ||
 		    (result->type == KEY_ECDSA384 && strcmp(pubkey_type, "ecdsa-sha2-nistp384") != 0) ||
@@ -1314,8 +1314,8 @@ ecdsa_error:
 		char *pubkey_type, *pub, *pri;
 		unsigned int pklen, sklen;
 		char *sk;
-		pub = public_blob->buf;
-		pri = private_blob->buf;
+		pub = buffer_ptr(public_blob);
+		pri = buffer_ptr(private_blob);
 		pubkey_type = buffer_get_string(&pub, NULL);
 		if (strcmp(pubkey_type, "ssh-ed25519") != 0) {
 			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
@@ -1514,7 +1514,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	buffer_rewind(blob);
 	}
 
-	if (blob->len < 8) {
+	if (buffer_len(blob) < 8) {
 		strncpy_s(errmsg, errmsg_len, "key body not present", _TRUNCATE);
 		goto error;
 	}
@@ -1524,7 +1524,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		goto error;
 	}
 	len = buffer_get_int(blob);
-	if (len == 0 || len > blob->len) {
+	if (len == 0 || len > buffer_len(blob)) {
 		strncpy_s(errmsg, errmsg_len, "body size error", _TRUNCATE);
 		goto error;
 	}

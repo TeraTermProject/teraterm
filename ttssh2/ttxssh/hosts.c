@@ -884,8 +884,6 @@ int HOSTS_compare_public_key(Key *src, Key *key)
 	Key *a, *b;
 	BIGNUM *e = NULL, *n = NULL;
 	BIGNUM *se = NULL, *sn = NULL;
-	BIGNUM *p, *q, *g, *pub_key;
-	BIGNUM *sp, *sq, *sg, *spub_key;
 
 	if (src->type != key->type) {
 		return -1;
@@ -912,7 +910,10 @@ int HOSTS_compare_public_key(Key *src, Key *key)
 			BN_cmp(e, se) == 0 &&
 			BN_cmp(n, sn) == 0;
 
-	case KEY_DSA: // SSH2 DSA host public key
+	case KEY_DSA: { // SSH2 DSA host public key
+		BIGNUM *p, *q, *g, *pub_key;
+		BIGNUM *sp, *sq, *sg, *spub_key;
+
 		DSA_get0_pqg(key->dsa, &p, &q, &g);
 		DSA_get0_pqg(src->dsa, &sp, &sq, &sg);
 		DSA_get0_key(key->dsa, &pub_key, NULL);
@@ -922,6 +923,7 @@ int HOSTS_compare_public_key(Key *src, Key *key)
 			BN_cmp(q, sq) == 0 &&
 			BN_cmp(g, sg) == 0 &&
 			BN_cmp(pub_key, spub_key) == 0;
+	}
 
 	case KEY_ECDSA256:
 	case KEY_ECDSA384:

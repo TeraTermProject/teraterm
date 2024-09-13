@@ -418,6 +418,13 @@ static void WriteFont(PCHAR Sect, PCHAR Key, const wchar_t *FName,
 	WritePrivateProfileStringA(Sect, Key, Temp, FName);
 }
 
+static int GetNthNumA(/*const*/ char *str, int Nth)
+{
+	int i;
+	GetNthNum(str, Nth, &i);
+	return i;
+}
+
 // フォント情報読み込み、4パラメータ版
 static void ReadFont(
 	const char *Sect, const char *Key, const char *Default, const wchar_t *FName,
@@ -434,9 +441,9 @@ static void ReadFont(
 		*FontCharSet = 0;
 	} else {
 		GetNthString(Temp, 1, FontNameLen, FontName);
-		GetNthNum(Temp, 2, &(FontSize->x));
-		GetNthNum(Temp, 3, &(FontSize->y));
-		GetNthNum(Temp, 4, FontCharSet);
+		FontSize->x = GetNthNumA(Temp, 2);
+		FontSize->y = GetNthNumA(Temp, 3);
+		*FontCharSet = GetNthNumA(Temp, 4);
 		// TODO ちゃんとパースする
 	}
 }
@@ -1579,8 +1586,8 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	// Size of paste confirm dialog
 	GetPrivateProfileString(Section, "PasteDialogSize", "330,220",
 	                        Temp, sizeof(Temp), FName);
-	GetNthNum(Temp, 1, &ts->PasteDialogSize.cx);
-	GetNthNum(Temp, 2, &ts->PasteDialogSize.cy);
+	ts->PasteDialogSize.cx = GetNthNumA(Temp, 1);
+	ts->PasteDialogSize.cy = GetNthNumA(Temp, 2);
 	if (ts->PasteDialogSize.cx < 0)
 		ts->PasteDialogSize.cx = 330;
 	if (ts->PasteDialogSize.cy < 0)

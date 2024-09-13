@@ -7414,7 +7414,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 
 		// Pageant ‚É–¼‚µ‚Ä‚à‚ç‚¤
 		signedmsg = putty_sign_ssh2_key(pvar->pageant_curkey,
-		                                signbuf->buf, signbuf->len,
+		                                buffer_ptr(signbuf), buffer_len(signbuf),
 		                                &signedlen, signflag);
 		buffer_free(signbuf);
 		if (signedmsg == NULL) {
@@ -9619,7 +9619,7 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 		agent_request_len = &fc->agent_request_len;
 	}
 
-	if (agent_msg->len == 0) {
+	if (buffer_len(agent_msg) == 0) {
 		req_len = get_uint32_MSBfirst(data);
 		if (req_len > AGENT_MAX_MSGLEN - 4) {
 			logprintf(LOG_LEVEL_NOTICE,
@@ -9649,13 +9649,13 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 	}
 	else {
 		buffer_put_raw(agent_msg, data, buflen);
-		if (*agent_request_len > agent_msg->len) {
+		if (*agent_request_len > buffer_len(agent_msg)) {
 			return TRUE;
 		}
-		data = agent_msg->buf;
+		data = buffer_ptr(agent_msg);
 	}
 
-	putty_agent_query_synchronous(data, *agent_request_len, &response, &resplen);
+	putty_agent_query_synchronous(data, *agent_request_len, (void **)&response, &resplen);
 	if (response == NULL || resplen < 5) {
 		logprintf(LOG_LEVEL_NOTICE, "%s Agent Forwarding Error: putty_agent_query_synchronous is failed.", __FUNCTION__);
 		goto error;

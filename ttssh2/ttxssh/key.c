@@ -458,8 +458,8 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	}
 
 	ECDSA_SIG_set0(sig, r, s);
-	buffer_get_bignum2(&sigblob, r);
-	buffer_get_bignum2(&sigblob, s);
+	buffer_get_bignum2((char **)&sigblob, r);
+	buffer_get_bignum2((char **)&sigblob, s);
 	if (sigblob != ptr) {
 		ret = -7;
 		goto error;
@@ -2560,7 +2560,7 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 		buffer_clear(b);
 		buffer_put_cstring(b, "hostkeys-prove-00@openssh.com");
 		buffer_put_string(b, pvar->session_id, pvar->session_id_len);
-		key_to_blob(ctx->keys[i], &blob, &bloblen);
+		key_to_blob(ctx->keys[i], (char **)&blob, &bloblen);
 		buffer_put_string(b, blob, bloblen);
 		free(blob);
 		blob = NULL;
@@ -2716,7 +2716,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		for (i = 0; i < ctx->nkeys; i++) {
 			if (ctx->keys_seen[i])
 				continue;
-			key_to_blob(ctx->keys[i], &blob, &len);
+			key_to_blob(ctx->keys[i], (char **) & blob, &len);
 			buffer_put_string(b, blob, len);
 			free(blob);
 			blob = NULL;

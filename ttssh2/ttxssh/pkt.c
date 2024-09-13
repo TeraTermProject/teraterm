@@ -177,7 +177,7 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 		else if (pvar->pkt_state.seen_server_ID && pvar->pkt_state.datalen >= SSH_get_min_packet_size(pvar)) {
 			char *data = pvar->pkt_state.buf + pvar->pkt_state.datastart;
 			uint32 padding_size = 0;
-			uint32 pktsize = 0;
+			u_int pktsize = 0;
 			uint32 total_packet_size;
 			struct Mac *mac = &pvar->ssh2_keys[MODE_IN].mac;
 			struct Enc *enc = &pvar->ssh2_keys[MODE_IN].enc;
