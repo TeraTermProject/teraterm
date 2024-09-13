@@ -119,7 +119,7 @@ int TCharAttrCmp(TCharAttr a, TCharAttr b);
 void DispSetColor(unsigned int num, COLORREF color);
 void DispResetColor(unsigned int num);
 COLORREF DispGetColor(unsigned int num);
-void DispSetCurCharAttr(TCharAttr Attr);
+void DispSetCurCharAttr(const TCharAttr *Attr);
 void DispMoveWindow(int x, int y);
 void DispShowWindow(int mode);
 void DispResizeWin(int w, int h);

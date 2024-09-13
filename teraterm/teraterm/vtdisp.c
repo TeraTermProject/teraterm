@@ -3610,9 +3610,10 @@ COLORREF DispGetColor(unsigned int num)
 	return color;
 }
 
-void DispSetCurCharAttr(TCharAttr Attr) {
-  CurCharAttr = Attr;
-  UpdateBGBrush();
+void DispSetCurCharAttr(const TCharAttr *Attr)
+{
+	CurCharAttr = *Attr;
+	UpdateBGBrush();
 }
 
 static void UpdateBGBrush(void)
