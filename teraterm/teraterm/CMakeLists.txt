@@ -93,6 +93,8 @@ set(SRC_DIALOG
   coding_pp.h
   coding_pp.rc
   coding_pp_res.h
+  color_sample.cpp
+  color_sample.h
   debug_pp.cpp
   debug_pp.h
   debug_pp.rc
@@ -125,15 +127,18 @@ set(SRC_DIALOG
   sendfiledlg.h
   setupdirdlg.cpp
   setupdirdlg.h
+  tcpip_pp.cpp
+  tcpip_pp.h
+  term_pp.cpp
+  term_pp.h
   theme_pp.cpp
   theme_pp.h
   themedlg.cpp
   themedlg.h
   themedlg.rc
   themedlg_res.h
-  #
-  tcpip_pp.h
-  tcpip_pp.cpp
+  win_pp.cpp
+  win_pp.h
 )
 
 target_sources(

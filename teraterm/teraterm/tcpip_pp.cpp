@@ -178,7 +178,7 @@ HPROPSHEETPAGE TcpIPPageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.pszTemplate = MAKEINTRESOURCEW(IDD_TCPIPDLG);
 #if defined(REWRITE_TEMPLATE)
 	psp.dwFlags |= PSP_DLGINDIRECT;
-	Param->dlg_templ = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(IDD_TCPIPDLG));
+	Param->dlg_templ = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(IDD_TCPIPDLG));
 	psp.pResource = Param->dlg_templ;
 #endif
 

@@ -274,7 +274,7 @@ enum drop_type ShowDropDialogBox(
 	Param.UILanguageFile = pts->UILanguageFileW;
 
 	INT_PTR ret = TTDialogBoxParam(
-		hInstance, MAKEINTRESOURCE(IDD_DAD_DIALOG),
+		hInstance, MAKEINTRESOURCEW(IDD_DAD_DIALOG),
 		hWndParent, (DLGPROC)OnDragDropDlgProc,
 		(LPARAM)&Param);
 	if (ret != IDOK) {

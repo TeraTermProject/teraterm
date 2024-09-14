@@ -56,12 +56,6 @@ typedef enum {
 	IdTalkSendMem,
 } IdTalk;
 
-  /* Character sets */
-#define IdASCII    0
-#define IdKatakana 1
-#define IdKanji    2
-#define IdSpecial  3
-
   /* Color codes */
 #define IdBack    0
 #define IdRed     1
@@ -348,7 +342,7 @@ struct tttset {
 	int QVWinSize;
 	char reserve_FileDir[256];		// switch FileDirW
 	char FileSendFilter[128];
-	WORD Language;
+	WORD reserve_Language;
 	char reserver_DelimList[52];
 	WORD DelimDBCS;
 	WORD Minimize;

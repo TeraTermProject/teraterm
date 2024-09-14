@@ -56,6 +56,7 @@
 #include "asprintf.h"
 #include "compat_win.h"
 #include "vtdisp.h"
+#include "makeoutputstring.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
@@ -417,6 +418,13 @@ static void WriteFont(PCHAR Sect, PCHAR Key, const wchar_t *FName,
 	WritePrivateProfileStringA(Sect, Key, Temp, FName);
 }
 
+static int GetNthNumA(/*const*/ char *str, int Nth)
+{
+	int i;
+	GetNthNum(str, Nth, &i);
+	return i;
+}
+
 // フォント情報読み込み、4パラメータ版
 static void ReadFont(
 	const char *Sect, const char *Key, const char *Default, const wchar_t *FName,
@@ -433,9 +441,9 @@ static void ReadFont(
 		*FontCharSet = 0;
 	} else {
 		GetNthString(Temp, 1, FontNameLen, FontName);
-		GetNthNum(Temp, 2, &(FontSize->x));
-		GetNthNum(Temp, 3, &(FontSize->y));
-		GetNthNum(Temp, 4, FontCharSet);
+		FontSize->x = GetNthNumA(Temp, 2);
+		FontSize->y = GetNthNumA(Temp, 3);
+		*FontCharSet = GetNthNumA(Temp, 4);
 		// TODO ちゃんとパースする
 	}
 }
@@ -533,73 +541,11 @@ static void DispWriteIni(const wchar_t *FName, PTTSet ts)
 }
 
 /**
- *	GetUserDefaultUILanguage() の代替
- *
- *	@retval		IdEnglish, IdJapanese など(tttypes_charset.h)
- *
- *	TODO
- *		GetLocaleInfo() のほうが妥当?
- */
-static int TTGetUserDefaultUILanguage(void)
-{
-	static const struct {
-		int codepage;
-		int lang;
-	} codepage_table[] = {
-		{ 932, IdJapanese },
-		{ 949, IdKorean },
-		{ 936, IdChinese },		// Chinese (Traditional)
-		{ 950, IdChinese },		// Chinese (Traditional)
-		{ 866, IdRussian },
-	};
-	static const struct {
-		LANGID langid;
-		int lang;
-	} lang_table[] = {
-		{ 0x0411, IdJapanese },
-		{ 0x0412, IdKorean },
-		{ 0x0404, IdChinese },		// Chinese (Traditional)
-		{ 0x8004, IdChinese },		// Chinese (Simplified)
-		//{ 0xxxxx, IdRussian },
-	};
-	int i;
-	int codepage;
-
-	if (pGetUserDefaultUILanguage != NULL) {
-		// GetUserDefaultUILanguage() が利用可能な場合
-
-		const LANGID langid = pGetUserDefaultUILanguage();
-		for (i = 0; i < _countof(lang_table); i++) {
-			if (lang_table[i].langid == langid) {
-				return lang_table[i].lang;
-			}
-		}
-		return IdEnglish;
-	}
-
-	codepage = GetACP();
-	for (i = 0; i < _countof(codepage_table); i++) {
-		if (codepage_table[i].codepage == codepage) {
-			return codepage_table[i].lang;
-		}
-	}
-	return IdEnglish;
-}
-
-/**
  *	Unicode Ambiguous,Emoji のデフォルト幅
  */
 static int GetDefaultUnicodeWidth(void)
 {
-	int ret_val = 1;
-	const int lang = TTGetUserDefaultUILanguage();
-	if (lang == IdJapanese ||
-		lang == IdKorean ||
-		lang == IdChinese)
-	{
-		ret_val = 2;
-	}
-	return ret_val;
+	return 2;
 }
 
 static void GetPrivateProfileColor2(const char *appA, const char *keyA, const char *defA, const wchar_t *fname,
@@ -669,16 +615,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	// TTX で 確認できるよう、Tera Term のバージョンを格納しておく
 	ts->RunningVersion = TT_VERSION_MAJOR * 10000 + TT_VERSION_MINOR;
-
-	/* Language */
-	GetPrivateProfileString(Section, "Language", "",
-	                        Temp, sizeof(Temp), FName);
-	if (Temp[0] != 0) {
-		ts->Language = GetLanguageFromStr(Temp);
-	}
-	else {
-		ts->Language = TTGetUserDefaultUILanguage();
-	}
 
 	/* Port type */
 	GetPrivateProfileString(Section, "Port", "",
@@ -764,7 +700,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Kanji Code (receive) */
 	GetPrivateProfileString(Section, "KanjiReceive", "",
 	                        Temp, sizeof(Temp), FName);
-	ts->KanjiCode = GetKanjiCodeFromStr(ts->Language, Temp);
+	ts->KanjiCode = GetKanjiCodeFromStr(Temp);
 
 	/* Katakana (receive) */
 	GetPrivateProfileString(Section, "KatakanaReceive", "",
@@ -777,7 +713,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Kanji Code (transmit) */
 	GetPrivateProfileString(Section, "KanjiSend", "",
 	                        Temp, sizeof(Temp), FName);
-	ts->KanjiCodeSend = GetKanjiCodeFromStr(ts->Language, Temp);
+	ts->KanjiCodeSend = GetKanjiCodeFromStr(Temp);
 
 	/* Katakana (receive) */
 	GetPrivateProfileString(Section, "KatakanaSend", "",
@@ -790,20 +726,12 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* KanjiIn */
 	GetPrivateProfileString(Section, "KanjiIn", "",
 	                        Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "@") == 0)
-		ts->KanjiIn = IdKanjiInA;
-	else
-		ts->KanjiIn = IdKanjiInB;
+	ts->KanjiIn = GetKanjiInCodeFromIni(Temp);
 
 	/* KanjiOut */
 	GetPrivateProfileString(Section, "KanjiOut", "",
 	                        Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "B") == 0)
-		ts->KanjiOut = IdKanjiOutB;
-	else if (_stricmp(Temp, "H") == 0)
-		ts->KanjiOut = IdKanjiOutH;
-	else
-		ts->KanjiOut = IdKanjiOutJ;
+	ts->KanjiOut = GetKanjiOutCodeFromIni(Temp);
 
 	/* Auto Win Switch VT<->TEK */
 	ts->AutoWinSwitch = GetOnOff(Section, "AutoWinSwitch", FName, FALSE);
@@ -1658,8 +1586,8 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	// Size of paste confirm dialog
 	GetPrivateProfileString(Section, "PasteDialogSize", "330,220",
 	                        Temp, sizeof(Temp), FName);
-	GetNthNum(Temp, 1, &ts->PasteDialogSize.cx);
-	GetNthNum(Temp, 2, &ts->PasteDialogSize.cy);
+	ts->PasteDialogSize.cx = GetNthNumA(Temp, 1);
+	ts->PasteDialogSize.cy = GetNthNumA(Temp, 2);
 	if (ts->PasteDialogSize.cx < 0)
 		ts->PasteDialogSize.cx = 330;
 	if (ts->PasteDialogSize.cy < 0)
@@ -2128,12 +2056,6 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 		free(title);
 	}
 
-	/* Language */
-	{
-		const char *language_str = GetLanguageStr(ts->Language);
-		WritePrivateProfileString(Section, "Language", language_str, FName);
-	}
-
 	/* Port type */
 	WritePrivateProfileString(Section, "Port", (ts->PortType==IdSerial)?"serial":"tcpip", FName);
 
@@ -2192,7 +2114,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* Kanji Code (receive)  */
 	{
-		const char *code_str = GetKanjiCodeStr(ts->Language, ts->KanjiCode);
+		const char *code_str = GetKanjiCodeStr(ts->KanjiCode);
 		WritePrivateProfileString(Section, "KanjiReceive", code_str, FName);
 	}
 
@@ -2206,7 +2128,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* Kanji Code (transmit)  */
 	{
-		const char *code_str = GetKanjiCodeStr(ts->Language, ts->KanjiCodeSend);
+		const char *code_str = GetKanjiCodeStr(ts->KanjiCodeSend);
 		WritePrivateProfileString(Section, "KanjiSend", code_str, FName);
 	}
 
@@ -3851,25 +3773,6 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 				WideCharToACP_t(ts->LogFNW, ts->LogFN, _countof(ts->LogFN));
 			}
 		}
-		else if (_wcsnicmp(Temp, L"/LA=", 4) == 0) {	/* language */
-			switch (Temp[4]) {
-			  case 'E':
-			  case 'e':
-				ts->Language = IdEnglish; break;
-			  case 'J':
-			  case 'j':
-				ts->Language = IdJapanese; break;
-			  case 'K':
-			  case 'k':
-				ts->Language = IdKorean; break;
-			  case 'R':
-			  case 'r':
-				ts->Language = IdRussian; break;
-			  case 'U':
-			  case 'u':
-				ts->Language = IdUtf8; break;
-			}
-		}
 		else if (_wcsnicmp(Temp, L"/MN=", 4) == 0) {	/* multicastname */
 			WideCharToACP_t(&Temp[4], ts->MulticastName, _countof(ts->MulticastName));
 		}
@@ -4000,12 +3903,10 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 	}
 
 	// Language が変更されたかもしれないので、
-	// KanjiCode/KanjiCodeSend を現在の Language に存在する値に置き換える
+	// KanjiCode/KanjiCodeSend をチェックする
 	{
-		WORD KanjiCode = ts->KanjiCode;
-		WORD KanjiCodeSend = ts->KanjiCodeSend;
-		ts->KanjiCode = KanjiCodeTranslate(ts->Language,KanjiCode);
-		ts->KanjiCodeSend = KanjiCodeTranslate(ts->Language,KanjiCodeSend);
+		ts->KanjiCode = KanjiCodeTranslate(ts->KanjiCode);
+		ts->KanjiCodeSend = KanjiCodeTranslate(ts->KanjiCodeSend);
 	}
 
 	if ((DDETopic != NULL) && (DDETopic[0] != 0)) {

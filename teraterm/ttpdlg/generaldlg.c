@@ -282,7 +282,7 @@ BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts)
 	data.lng_infos = infos;
 	data.lng_size = infos_size;
 	INT_PTR r = TTDialogBoxParam(hInst,
-								 MAKEINTRESOURCE(IDD_GENDLG),
+								 MAKEINTRESOURCEW(IDD_GENDLG),
 								 WndParent, GenDlg, (LPARAM)&data);
 	LangFree(infos, infos_size);
 	return (BOOL)r;

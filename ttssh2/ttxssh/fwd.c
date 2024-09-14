@@ -741,7 +741,7 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 #endif
 
 			if (channel->filter != NULL) {
-				action = channel->filter(channel->filter_closure, FWD_FILTER_FROM_CLIENT, &amount, &new_buf);
+				action = channel->filter(channel->filter_closure, FWD_FILTER_FROM_CLIENT, &amount, (unsigned char**)&new_buf);
 			}
 
 			if (amount > 0 && (channel->status & FWD_CLOSED_REMOTE_OUT) == 0) {

@@ -481,7 +481,7 @@ INT_PTR TTCDialog::DoModal(HINSTANCE hInstance, HWND hParent, int idd)
 #if defined(REWRITE_TEMPLATE)
 	INT_PTR result =
 		TTDialogBoxParam(hInstance,
-						 MAKEINTRESOURCE(idd),
+						 MAKEINTRESOURCEW(idd),
 						 hParent,
 						 &DlgProcStub, (LPARAM)this);
 #else
@@ -503,7 +503,7 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 	m_hInst = hInstance;
 	m_hParentWnd = hParent;
 #if defined(REWRITE_TEMPLATE)
-	DLGTEMPLATE *lpTemplate = TTGetDlgTemplate(hInstance, MAKEINTRESOURCE(idd));
+	DLGTEMPLATE *lpTemplate = TTGetDlgTemplate(hInstance, MAKEINTRESOURCEW(idd));
 #else
 	HRSRC hResource = ::FindResource(hInstance, MAKEINTRESOURCE(idd), RT_DIALOG);
 	HANDLE hDlgTemplate = ::LoadResource(hInstance, hResource);

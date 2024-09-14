@@ -475,7 +475,7 @@ BOOL FLogOpenDialog(HINSTANCE hInst_, HWND hWnd, FLogDlgInfo_t *info)
 	work->pts = info->pts;
 	work->pcv = info->pcv;
 	INT_PTR ret = TTDialogBoxParam(
-		hInst_, MAKEINTRESOURCE(IDD_LOGDLG),
+		hInst_, MAKEINTRESOURCEW(IDD_LOGDLG),
 		hWnd, LogFnHook, (LPARAM)work);
 	free(work);
 	return ret == IDOK ? TRUE : FALSE;

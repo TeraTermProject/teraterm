@@ -1020,7 +1020,7 @@ void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd)
 	// CreateDialogW() で生成したダイアログは、
 	// エディットボックスにIMEからの入力が化けることがある (20/05/27,Windows10 64bit)
 	//   ペーストはok
-	hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
+	hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_BROADCAST_DIALOG),
 							 hWnd, BroadcastCommandDlgProc);
 
 	if (hDlgWnd == NULL) {

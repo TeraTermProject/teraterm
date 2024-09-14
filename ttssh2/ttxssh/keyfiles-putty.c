@@ -274,6 +274,7 @@ void ssh2_ppk_derive_keys(
 	size_t mac_keylen = 0;
 	u_int ivlen;
 	unsigned int cipherkey_offset = 0;
+	char *storage_buf;
 
 	ivlen = (ciphertype->iv_len == 0) ? ciphertype->block_size : ciphertype->iv_len;
 
@@ -345,10 +346,11 @@ void ssh2_ppk_derive_keys(
 		}
 	}
 
-	*cipherkey = storage->buf;
+	storage_buf = buffer_ptr(storage);
+	*cipherkey = storage_buf;
 	*cipherkey_len = ciphertype->key_len;
-	*cipheriv = storage->buf + ciphertype->key_len + cipherkey_offset;
+	*cipheriv = storage_buf + ciphertype->key_len + cipherkey_offset;
 	*cipheriv_len = ivlen;
-	*mackey = storage->buf + ciphertype->key_len + cipherkey_offset + ivlen;
+	*mackey = storage_buf + ciphertype->key_len + cipherkey_offset + ivlen;
 	*mackey_len = mac_keylen;
 }

@@ -59,13 +59,6 @@ See LICENSE.TXT for the license.
 #include "codeconv.h"
 #include "asprintf.h"
 
-#undef DialogBoxParam
-#define DialogBoxParam(p1,p2,p3,p4,p5) \
-	TTDialogBoxParam(p1,p2,p3,p4,p5)
-#undef EndDialog
-#define EndDialog(p1,p2) \
-	TTEndDialog(p1, p2)
-
 // BASE64構成文字列（ここでは'='は含まれていない）
 static char base64[] ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -884,8 +877,6 @@ int HOSTS_compare_public_key(Key *src, Key *key)
 	Key *a, *b;
 	BIGNUM *e = NULL, *n = NULL;
 	BIGNUM *se = NULL, *sn = NULL;
-	BIGNUM *p, *q, *g, *pub_key;
-	BIGNUM *sp, *sq, *sg, *spub_key;
 
 	if (src->type != key->type) {
 		return -1;
@@ -912,7 +903,10 @@ int HOSTS_compare_public_key(Key *src, Key *key)
 			BN_cmp(e, se) == 0 &&
 			BN_cmp(n, sn) == 0;
 
-	case KEY_DSA: // SSH2 DSA host public key
+	case KEY_DSA: { // SSH2 DSA host public key
+		BIGNUM *p, *q, *g, *pub_key;
+		BIGNUM *sp, *sq, *sg, *spub_key;
+
 		DSA_get0_pqg(key->dsa, &p, &q, &g);
 		DSA_get0_pqg(src->dsa, &sp, &sq, &sg);
 		DSA_get0_key(key->dsa, &pub_key, NULL);
@@ -922,6 +916,7 @@ int HOSTS_compare_public_key(Key *src, Key *key)
 			BN_cmp(q, sq) == 0 &&
 			BN_cmp(g, sg) == 0 &&
 			BN_cmp(pub_key, spub_key) == 0;
+	}
 
 	case KEY_ECDSA256:
 	case KEY_ECDSA384:
@@ -1867,14 +1862,14 @@ static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 			pvar->hosts_state.hosts_dialog = NULL;
 
-			EndDialog(dlg, 1);
+			TTEndDialog(dlg, 1);
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
 canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDCLOSE:
@@ -1883,7 +1878,7 @@ canceled:
 			 * ダイアログのみを閉じる。
 			 */
 			pvar->hosts_state.hosts_dialog = NULL;
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDC_FP_HASH_ALG_MD5:
@@ -2015,14 +2010,14 @@ static INT_PTR CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam
 
 			pvar->hosts_state.hosts_dialog = NULL;
 
-			EndDialog(dlg, 1);
+			TTEndDialog(dlg, 1);
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
 canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDCLOSE:
@@ -2031,7 +2026,7 @@ canceled:
 			 * ダイアログのみを閉じる。
 			 */
 			pvar->hosts_state.hosts_dialog = NULL;
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDC_FP_HASH_ALG_MD5:
@@ -2164,14 +2159,14 @@ static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 			pvar->hosts_state.hosts_dialog = NULL;
 
-			EndDialog(dlg, 1);
+			TTEndDialog(dlg, 1);
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
 canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDCLOSE:
@@ -2180,7 +2175,7 @@ canceled:
 			 * ダイアログのみを閉じる。
 			 */
 			pvar->hosts_state.hosts_dialog = NULL;
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDC_FP_HASH_ALG_MD5:
@@ -2233,9 +2228,9 @@ void HOSTS_do_unknown_host_dialog(HWND wnd, PTInstVar pvar)
 		 */
 		HWND cur_active = NULL;
 
-		DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHUNKNOWNHOST),
-		               cur_active != NULL ? cur_active : wnd,
-		               hosts_add_dlg_proc, (LPARAM) pvar);
+		TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHUNKNOWNHOST),
+						 cur_active != NULL ? cur_active : wnd,
+						 hosts_add_dlg_proc, (LPARAM) pvar);
 	}
 }
 
@@ -2252,9 +2247,9 @@ void HOSTS_do_different_key_dialog(HWND wnd, PTInstVar pvar)
 		 */
 		HWND cur_active = NULL;
 
-		DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHDIFFERENTKEY),
-		               cur_active != NULL ? cur_active : wnd,
-		               hosts_replace_dlg_proc, (LPARAM) pvar);
+		TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHDIFFERENTKEY),
+						 cur_active != NULL ? cur_active : wnd,
+						 hosts_replace_dlg_proc, (LPARAM) pvar);
 	}
 }
 
@@ -2271,9 +2266,9 @@ void HOSTS_do_different_type_key_dialog(HWND wnd, PTInstVar pvar)
 		 */
 		HWND cur_active = NULL;
 
-		DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHDIFFERENTTYPEKEY),
-		               cur_active != NULL ? cur_active : wnd,
-		               hosts_add2_dlg_proc, (LPARAM) pvar);
+		TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHDIFFERENTTYPEKEY),
+						 cur_active != NULL ? cur_active : wnd,
+						 hosts_add2_dlg_proc, (LPARAM) pvar);
 	}
 }
 

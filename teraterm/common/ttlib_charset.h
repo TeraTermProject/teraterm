@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <windows.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,7 +40,6 @@ typedef struct {
 } TLanguageList;
 
 typedef struct {
-	int lang;
 	int coding;
 	const char *CodeName;
 	const char *KanjiCode;
@@ -49,11 +50,14 @@ const char *GetLanguageStr(int language);
 int GetLanguageFromStr(const char *language_str);
 
 const TKanjiList *GetKanjiList(int index);
-const char *GetKanjiCodeStr(int language, int kanji_code);
-int GetKanjiCodeFromStr(int language, const char *kanji_code_str);
+const char *GetKanjiCodeStr(int kanji_code);
+int GetKanjiCodeFromStr(const char *kanji_code_str);
 
 int KanjiCodeToISO8859Part(int kanjicode);
-int KanjiCodeTranslate(int lang, int kcode);
+int KanjiCodeTranslate(int kcode);
+
+BOOL LangIsEnglish(WORD kanji_code);
+BOOL LangIsJapanese(WORD kanji_code);
 
 #ifdef __cplusplus
 }
