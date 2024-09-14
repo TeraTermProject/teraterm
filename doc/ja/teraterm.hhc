@@ -500,7 +500,7 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Coding タブ">
+					<param name="Name" value="Encoding タブ">
 					<param name="Local" value="html\menu\setup-additional-coding.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
