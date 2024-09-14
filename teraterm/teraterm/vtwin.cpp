@@ -3404,14 +3404,16 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 			ts.LogFNW = FLogGetLogFilename(NULL);
 		}
 		WideCharToACP_t(ts.LogFNW, ts.LogFN, sizeof(ts.LogFN));
-		BOOL r = FLogOpen(ts.LogFNW, LOG_UTF8, FALSE);
-		if (r != TRUE && (ts.HideWindow != 1 && ts.Minimize != 1)) {
-			static const TTMessageBoxInfoW mbinfo = {
-				"Tera Term",
-				"MSG_TT_FILE_OPEN_ERROR", L"Tera Term: File open error",
-				"MSG_LOGFILE_WRITE_ERROR", L"Cannot write log file.\n%s",
-				MB_OK | MB_ICONERROR};
-			TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, ts.LogFNW);
+		if (!FLogIsOpend) {
+			BOOL r = FLogOpen(ts.LogFNW, LOG_UTF8, FALSE);
+			if (r != TRUE && (ts.HideWindow != 1 && ts.Minimize != 1)) {
+				static const TTMessageBoxInfoW mbinfo = {
+					"Tera Term",
+					"MSG_TT_FILE_OPEN_ERROR", L"Tera Term: File open error",
+					"MSG_LOGFILE_WRITE_ERROR", L"Cannot write log file.\n%s",
+					MB_OK | MB_ICONERROR };
+				TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, ts.LogFNW);
+			}
 		}
 	}
 
