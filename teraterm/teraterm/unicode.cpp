@@ -244,6 +244,13 @@ int UnicodeIsCombiningCharacter(unsigned long u32)
  */
 int UnicodeIsEmoji(unsigned long u32)
 {
+	const static UnicodeTable_t X0208Symbols[] = {
+#include "unicode_x0208_symbols.tbl"
+	};
+	const int issymbol = SearchTableSimple(X0208Symbols, _countof(X0208Symbols), u32);
+	if (issymbol != -1) {
+		return 0;
+	}
 	const static UnicodeTable_t EmojiList[] = {
 #include "unicode_emoji.tbl"
 	};
