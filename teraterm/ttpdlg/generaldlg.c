@@ -33,26 +33,8 @@
 
 BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts)
 {
-	LangInfo *infos = NULL;
-	size_t infos_size = 0;
-	wchar_t *folder;
-	aswprintf(&folder, L"%s\\%s", ts->ExeDirW, get_lang_folder());
-	infos = LangAppendFileList(folder, infos, &infos_size);
-	free(folder);
-	if (wcscmp(ts->ExeDirW, ts->HomeDirW) != 0) {
-		aswprintf(&folder, L"%s\\%s", ts->HomeDirW, get_lang_folder());
-		infos = LangAppendFileList(folder, infos, &infos_size);
-		free(folder);
-	}
-	LangRead(infos, infos_size);
-
-	DlgData data;
-	data.ts = ts;
-	data.lng_infos = infos;
-	data.lng_size = infos_size;
-	INT_PTR r = TTDialogBoxParam(hInst,
-								 MAKEINTRESOURCEW(IDD_GENDLG),
-								 WndParent, GenDlg, (LPARAM)&data);
-	LangFree(infos, infos_size);
-	return (BOOL)r;
+	(void)WndParent;
+	(void)ts;
+	OpenExternalSetupOutside(GeneralPage);
+	return FALSE;
 }
