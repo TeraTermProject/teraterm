@@ -2337,6 +2337,13 @@ static BOOL BuffIsHalfWidthFromCode(const TTTSet *ts_, unsigned int u32, char *w
 {
 	*width_property = UnicodeGetWidthProperty(u32);
 	*emoji = (char)UnicodeIsEmoji(u32);
+	if (*emoji) {
+		if (ts_->ExcludeX0208SymbolsFromEmoji) {
+			if (UnicodeIsX0208Symbol(u32)) {
+				*emoji = 0;
+			}
+		}
+	}
 	if (ts_->UnicodeEmojiOverride) {
 		if (*emoji) {
 			// ŠG•¶š‚¾‚Á‚½ê‡

@@ -2,7 +2,7 @@
   "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 <HEAD>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <TITLE>Miscellaneous (Tera Term setup file)</TITLE>
 <META http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
@@ -472,6 +472,25 @@ BracketedControlOnly=on
 <pre>
 Default:
 BracketedControlOnly=off
+</pre>
+
+<h1 id="ExcludeX0208SymbolsFromEmoji">Do not handle JIS X 0208 symbols as emoji</h1>
+<p>
+Tera Term handles whether a character is a emoji or not according to the corresponding Unicode specification.
+However, the list of emoji defined by the Unicode Consortium is inconsistent, for example
+"★" (U+2605, SJIS 819A) is a emoji, but the character immediately following it in the code point
+"☆" (U+2606, SJIS 819B) is not a emoji.
+So, even if a character in the JIS X 0208 range is expected to be drawn in 2 Cells, if "1 Cell" is set in <a href="../menu/setup-additional-coding.html#AmbiguousCharactersWidth">Override Emoji Characters width</a>, the character will be treated as a emoji and drawn in 1 Cell, resulting in confusion.
+To exclude JIS X 0208 Symboles from emoji, change the ExcludeX0208SymbolsFromEmoji entry of [Tera Term] section as the following:
+</p>
+
+<pre>
+ExcludeX0208SymbolsFromEmoji=on
+</pre>
+
+<pre>
+Default:
+ExcludeX0208SymbolsFromEmoji=off
 </pre>
 
 </BODY>

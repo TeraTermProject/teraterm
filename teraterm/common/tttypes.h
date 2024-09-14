@@ -614,6 +614,7 @@ struct tttset {
 	WORD IniAutoBackup;
 	WORD BracketedSupport;
 	WORD BracketedControlOnly;
+	WORD ExcludeX0208SymbolsFromEmoji;
 	wchar_t *ViewlogEditorW;
 	wchar_t *ViewlogEditorArg;
 

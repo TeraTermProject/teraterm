@@ -244,17 +244,25 @@ int UnicodeIsCombiningCharacter(unsigned long u32)
  */
 int UnicodeIsEmoji(unsigned long u32)
 {
-	const static UnicodeTable_t X0208Symbols[] = {
-#include "unicode_x0208_symbols.tbl"
-	};
-	const int issymbol = SearchTableSimple(X0208Symbols, _countof(X0208Symbols), u32);
-	if (issymbol != -1) {
-		return 0;
-	}
 	const static UnicodeTable_t EmojiList[] = {
 #include "unicode_emoji.tbl"
 	};
 	const int index = SearchTableSimple(EmojiList, _countof(EmojiList), u32);
+	return index != -1 ? 1 : 0;
+}
+
+/**
+ *  JIS X 0208 ÇÃãLçÜÇ≈Ç†ÇÈÇ©Ç«Ç§Ç©
+ *
+ *  @retval  0   JIS X 0208 ÇÃãLçÜÇ≈ÇÕÇ»Ç¢
+ *  @retval  1   JIS X 0208 ÇÃãLçÜÇ≈Ç†ÇÈ
+ */
+int UnicodeIsX0208Symbol(unsigned long u32)
+{
+	const static UnicodeTable_t X0208Symbols[] = {
+#include "unicode_x0208_symbols.tbl"
+	};
+	const int index = SearchTableSimple(X0208Symbols, _countof(X0208Symbols), u32);
 	return index != -1 ? 1 : 0;
 }
 

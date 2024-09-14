@@ -2072,6 +2072,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->BracketedSupport = GetOnOff(Section, "BracketedSupport", FName, TRUE);
 	ts->BracketedControlOnly = GetOnOff(Section, "BracketedControlOnly", FName, FALSE);
 
+	// JIS X 0208 記号 を絵文字として扱わない
+	ts->ExcludeX0208SymbolsFromEmoji = GetOnOff(Section, "ExcludeX0208SymbolsFromEmoji", FName, FALSE);
+
 	// Experimental
 	ts->ExperimentalTreeProprtySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
 }
@@ -3325,6 +3328,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	// 自動バックアップ
 	WriteOnOff(Section, "IniAutoBackup", FName, ts->IniAutoBackup);
+
+	// JIS X 0208 記号 を絵文字として扱わない
+	WriteOnOff(Section, "ExcludeX0208SymbolsFromEmoji", FName, ts->ExcludeX0208SymbolsFromEmoji);
 
 	// Bracketed paste mode
 	WriteOnOff(Section, "BracketedSupport", FName, ts->BracketedSupport);
