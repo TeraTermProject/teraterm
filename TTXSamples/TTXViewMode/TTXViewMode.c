@@ -224,7 +224,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
         if (strcmp(pvar->password, "") != 0) {
           SetDialogFont(pvar->ts->DialogFontNameW, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
 						pvar->ts->UILanguageFileW, "TTXViewMode", "DLG_TAHOMA_FONT");
-          switch (TTDialogBoxParam(hInst, MAKEINTRESOURCE(IDD_INPUT_PASSWORD), hWin, ViewModeInputPass, (LPARAM)NULL)) {
+          switch (TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_INPUT_PASSWORD), hWin, ViewModeInputPass, (LPARAM)NULL)) {
             case IDOK:
               pvar->enable = FALSE;
 	      CheckMenuItem(pvar->ControlMenu, ID_MENU_VIEWMODE, MF_BYCOMMAND | MF_UNCHECKED);
@@ -251,7 +251,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
     case ID_MENU_SETPASS:
 	  SetDialogFont(pvar->ts->DialogFontNameW, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
 					pvar->ts->UILanguageFileW, "TTXViewMode", "DLG_TAHOMA_FONT");
-      switch (TTDialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SET_PASSWORD), hWin, ViewModeSetPass, (LPARAM)NULL)) {
+      switch (TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SET_PASSWORD), hWin, ViewModeSetPass, (LPARAM)NULL)) {
 	case IDOK:
 	  break;
 	case IDCANCEL:

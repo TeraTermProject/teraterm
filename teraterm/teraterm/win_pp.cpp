@@ -565,7 +565,7 @@ HPROPSHEETPAGE CreateWinPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if defined(REWRITE_TEMPLATE)
 	psp.dwFlags |= PSP_DLGINDIRECT;
-	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
+	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(id));
 #endif
 	psp.pfnDlgProc = WinDlg;
 	psp.lParam = (LPARAM)data;

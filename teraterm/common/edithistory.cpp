@@ -336,7 +336,7 @@ BOOL EditHistoryDlg(HWND WndParent, PTTSet ts)
 	const HINSTANCE hinst = (HINSTANCE)GetWindowLongPtr(WndParent, GWLP_HINSTANCE);
 	data->ts = ts;
 	r= (BOOL)TTDialogBoxParam(hinst,
-							  MAKEINTRESOURCE(IDD_EDITHISTORYDLG),
+							  MAKEINTRESOURCEW(IDD_EDITHISTORYDLG),
 							  WndParent, TCPIPDlg, (LPARAM)data);
 	free(data);
 	return r;

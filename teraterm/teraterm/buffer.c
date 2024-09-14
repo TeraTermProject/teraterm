@@ -1199,15 +1199,16 @@ void BuffFillWithE(void)
 	BuffUpdateRect(WinOrgX,WinOrgY,WinOrgX+WinWidth-1,WinOrgY+WinHeight-1);
 }
 
-void BuffDrawLine(TCharAttr Attr, int Direction, int C)
+void BuffDrawLine(const TCharAttr *Attr, int Direction, int C)
 { // IO-8256 terminal
 	LONG Ptr;
 	int i, X, Y;
+	BYTE Attr_Attr = Attr->Attr;
 
 	if (C==0) {
 		return;
 	}
-	Attr.Attr |= AttrSpecial;
+	Attr_Attr |= AttrSpecial;
 
 	switch (Direction) {
 		case 3:
@@ -1228,7 +1229,7 @@ void BuffDrawLine(TCharAttr Attr, int Direction, int C)
 				C = NumOfColumns-CursorX;
 			}
 			Ptr = GetLinePtr(PageStart+Y);
-			memsetW(&(CodeBuffW[Ptr+CursorX]),'q', Attr.Fore, Attr.Back, Attr.Attr, Attr.Attr2, C);
+			memsetW(&(CodeBuffW[Ptr+CursorX]),'q', Attr->Fore, Attr->Back, Attr_Attr, Attr->Attr2, C);
 			BuffUpdateRect(CursorX,Y,CursorX+C-1,Y);
 			break;
 		case 5:
@@ -1252,7 +1253,7 @@ void BuffDrawLine(TCharAttr Attr, int Direction, int C)
 				C = NumOfLines-StatusLine-CursorY;
 			}
 			for (i=1; i<=C; i++) {
-				BuffSetChar4(&CodeBuffW[Ptr+X], 'x', Attr.Fore, Attr.Back, Attr.Attr, Attr.Attr2, 'H');
+				BuffSetChar4(&CodeBuffW[Ptr+X], 'x', Attr->Fore, Attr->Back, Attr_Attr | AttrSpecial, Attr->Attr2, 'H');
 				Ptr = NextLinePtr(Ptr);
 			}
 			BuffUpdateRect(X,CursorY,X,CursorY+C-1);
@@ -1402,7 +1403,7 @@ void BuffCopyBox(
 	BuffUpdateRect(DstX,DstY,DstX+C-1,DstY+L-1);
 }
 
-void BuffChangeAttrBox(int XStart, int YStart, int XEnd, int YEnd, PCharAttr attr, PCharAttr mask)
+void BuffChangeAttrBox(int XStart, int YStart, int XEnd, int YEnd, const PCharAttr attr, const PCharAttr mask)
 {
 	int C, i, j;
 	LONG Ptr;
@@ -2910,15 +2911,16 @@ static unsigned short ConvertACPChar(const buff_char_t *b)
  *	@param[in]	Insert	Insert flag
  *	@return		ƒJ[ƒ\ƒ‹ˆÚ“®—Ê(0 or 1 or 2)
  */
-int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
+int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 {
 	buff_char_t * CodeLineW = &CodeBuffW[LinePtr];
 	int move_x = 0;
 	static BOOL show_str_change = FALSE;
 	buff_char_t *p;
 	int combining_type;
+	BYTE Attr_Attr = Attr->Attr;
 
-	assert(Attr.Attr == (Attr.AttrEx & 0xff));
+	assert(Attr_Attr == (Attr->AttrEx & 0xff));
 
 #if 0
 	OutputDebugPrintfW(L"BuffPutUnicode(U+%06x,(%d,%d)\n", u32, CursorX, CursorY);
@@ -2931,7 +2933,7 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 	}
 
 	if (ts.EnableContinuedLineCopy && CursorX == 0 && (CodeLineW[0].attr & AttrLineContinued)) {
-		Attr.Attr |= AttrLineContinued;
+		Attr_Attr |= AttrLineContinued;
 	}
 
 	// Œ‹‡•¶Žš or 1‚Â‘O‚Ì•¶Žš‚Ì‰e‹¿‚ÅŒ‹‡‚·‚é?
@@ -2983,10 +2985,10 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 				if (add_base_char == FALSE) {
 					BuffSetChar(&CodeLineW[CursorX], 0, 'H');
 					CodeLineW[CursorX].Padding = TRUE;
-					CodeLineW[CursorX].attr = Attr.Attr;
-					CodeLineW[CursorX].attr2 = Attr.Attr2;
-					CodeLineW[CursorX].fg = Attr.Fore;
-					CodeLineW[CursorX].bg = Attr.Back;
+					CodeLineW[CursorX].attr = Attr_Attr;
+					CodeLineW[CursorX].attr2 = Attr->Attr2;
+					CodeLineW[CursorX].fg = Attr->Fore;
+					CodeLineW[CursorX].bg = Attr->Back;
 				}
 			}
 		}
@@ -3130,17 +3132,17 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			}
 
 			BuffSetChar2(&CodeLineW[CursorX], u32, width_property, half_width, emoji);
-			CodeLineW[CursorX].attr = Attr.Attr;
-			CodeLineW[CursorX].attr2 = Attr.Attr2;
-			CodeLineW[CursorX].fg = Attr.Fore;
-			CodeLineW[CursorX].bg = Attr.Back;
+			CodeLineW[CursorX].attr = Attr_Attr;
+			CodeLineW[CursorX].attr2 = Attr->Attr2;
+			CodeLineW[CursorX].fg = Attr->Fore;
+			CodeLineW[CursorX].bg = Attr->Back;
 			if (!half_width && CursorX < LineEnd) {
 				BuffSetChar(&CodeLineW[CursorX + 1], 0, 'H');
 				CodeLineW[CursorX + 1].Padding = TRUE;
-				CodeLineW[CursorX + 1].attr = Attr.Attr;
-				CodeLineW[CursorX + 1].attr2 = Attr.Attr2;
-				CodeLineW[CursorX + 1].fg = Attr.Fore;
-				CodeLineW[CursorX + 1].bg = Attr.Back;
+				CodeLineW[CursorX + 1].attr = Attr_Attr;
+				CodeLineW[CursorX + 1].attr2 = Attr->Attr2;
+				CodeLineW[CursorX + 1].fg = Attr->Fore;
+				CodeLineW[CursorX + 1].bg = Attr->Back;
 			}
 #if 0
 			/* begin - ishizaki */
@@ -3169,15 +3171,15 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 			BuffUpdateRect(XStart, CursorY, LineEnd + extr, CursorY);
 		}
 		else {
-			if ((Attr.AttrEx & AttrPadding) != 0) {
+			if ((Attr->AttrEx & AttrPadding) != 0) {
 				// ‹l‚ß•¨
 				buff_char_t *b = &CodeLineW[CursorX];
 				BuffSetChar(b, u32, 'H');
 				b->Padding = TRUE;
-				b->attr = Attr.Attr;
-				b->attr2 = Attr.Attr2;
-				b->fg = Attr.Fore;
-				b->bg = Attr.Back;
+				b->attr = Attr_Attr;
+				b->attr2 = Attr->Attr2;
+				b->fg = Attr->Fore;
+				b->bg = Attr->Back;
 				move_x = 1;
 			}
 			else {
@@ -3198,15 +3200,15 @@ int BuffPutUnicode(unsigned int u32, TCharAttr Attr, BOOL Insert)
 
 				BuffSetChar2(&CodeLineW[CursorX], u32, width_property, half_width, emoji);
 				if (half_width) {
-					CodeLineW[CursorX].attr = Attr.Attr;
+					CodeLineW[CursorX].attr = Attr_Attr;
 				}
 				else {
 					// ‘SŠp
-					CodeLineW[CursorX].attr = Attr.Attr | AttrKanji;
+					CodeLineW[CursorX].attr = Attr_Attr | AttrKanji;
 				}
-				CodeLineW[CursorX].attr2 = Attr.Attr2;
-				CodeLineW[CursorX].fg = Attr.Fore;
-				CodeLineW[CursorX].bg = Attr.Back;
+				CodeLineW[CursorX].attr2 = Attr->Attr2;
+				CodeLineW[CursorX].fg = Attr->Fore;
+				CodeLineW[CursorX].bg = Attr->Back;
 
 				if (!half_width) {
 					// ‘SŠp‚ÌŽž‚ÍŽŸ‚ÌƒZƒ‹‚Í‹l‚ß•¨
@@ -5154,8 +5156,9 @@ void BuffLineContinued(BOOL mode)
 	}
 }
 
-void BuffSetCurCharAttr(TCharAttr Attr) {
-	CurCharAttr = Attr;
+void BuffSetCurCharAttr(const TCharAttr *Attr)
+{
+	CurCharAttr = *Attr;
 	DispSetCurCharAttr(Attr);
 }
 
@@ -5874,13 +5877,13 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 	return str_ptr;
 }
 
-void BuffSetCursorCharAttr(int x, int y, TCharAttr Attr)
+void BuffSetCursorCharAttr(int x, int y, const TCharAttr *Attr)
 {
 	const LONG TmpPtr = GetLinePtr(PageStart+y);
-	CodeBuffW[TmpPtr + x].attr = Attr.Attr;
-	CodeBuffW[TmpPtr + x].attr2 = Attr.Attr2;
-	CodeBuffW[TmpPtr + x].fg = Attr.Fore;
-	CodeBuffW[TmpPtr + x].bg = Attr.Back;
+	CodeBuffW[TmpPtr + x].attr = Attr->Attr;
+	CodeBuffW[TmpPtr + x].attr2 = Attr->Attr2;
+	CodeBuffW[TmpPtr + x].fg = Attr->Fore;
+	CodeBuffW[TmpPtr + x].bg = Attr->Back;
 }
 
 TCharAttr BuffGetCursorCharAttr(int x, int y)

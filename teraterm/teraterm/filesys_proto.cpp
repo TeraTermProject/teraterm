@@ -854,7 +854,7 @@ static BOOL _GetGetFname(HWND HWin, PFileVarProto fv, PTTSet ts)
 	SetDialogFont(ts->DialogFontNameW, ts->DialogFontPoint, ts->DialogFontCharSet,
 				  ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	return (BOOL)TTDialogBoxParam(hInst,
-								  MAKEINTRESOURCE(IDD_GETFNDLG),
+								  MAKEINTRESOURCEW(IDD_GETFNDLG),
 								  HWin, GetFnDlg, (LPARAM)fv);
 }
 

@@ -85,7 +85,7 @@ BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PT
 	SetDialogFont(m_ts->DialogFontNameW, m_ts->DialogFontPoint, m_ts->DialogFontCharSet,
 				  m_ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	HWND hWnd = TTCreateDialogParam(
-		hInstance, MAKEINTRESOURCE(IDD_PRNABORTDLG), hParent,
+		hInstance, MAKEINTRESOURCEW(IDD_PRNABORTDLG), hParent,
 		(DLGPROC)OnDlgProc, (LPARAM)this);
 	if (hWnd == NULL)
 	{

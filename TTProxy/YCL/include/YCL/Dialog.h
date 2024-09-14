@@ -92,7 +92,7 @@ public:
 		SendMessage(WM_NEXTDLGCTL, previous, FALSE);
 	}
 	void gotoDlgCtrl(HWND control) {
-		SendMessage(WM_NEXTDLGCTL, (WPARAM) control, TRUE); 
+		SendMessage(WM_NEXTDLGCTL, (WPARAM) control, TRUE);
 	}
 
 
@@ -101,11 +101,7 @@ public:
 	}
 	INT_PTR open(HINSTANCE instance, int resourceId, HWND owner = NULL) {
 		YCLVERIFY(prepareOpen(this) == NULL, "Another dialog has been opening yet.");
-#if 0
-		return ::DialogBoxParam(instance, MAKEINTRESOURCE(resourceId), owner, DialogProc, NULL);
-#else
-		return TTDialogBoxParam(instance, MAKEINTRESOURCE(resourceId), owner, DialogProc, NULL);
-#endif
+		return TTDialogBoxParam(instance, MAKEINTRESOURCEW(resourceId), owner, DialogProc, NULL);
 	}
 protected:
 	virtual bool dispatch(UINT message, WPARAM wparam, LPARAM lparam) {

@@ -403,11 +403,13 @@ static DLGTEMPLATE *GetDlgTemplate(
 }
 
 static DLGTEMPLATE *GetDlgTemplate(
-	HINSTANCE hInst, LPCTSTR lpTemplateName,
+	HINSTANCE hInst, LPCWSTR lpTemplateName,
 	const WCHAR *FontFaceName, LONG FontHeight, BYTE FontCharSet,
 	size_t *PrevTemplSize, size_t *NewTemplSize)
 {
-	HRSRC hResource = ::FindResource(hInst, lpTemplateName, RT_DIALOG);
+#define RT_DIALOG_W MAKEINTRESOURCEW(5)
+
+	HRSRC hResource = ::FindResourceW(hInst, lpTemplateName, RT_DIALOG_W);
 	assert(hResource != NULL);
 	HANDLE hDlgTemplate = ::LoadResource(hInst, hResource);
 	const DLGTEMPLATE *src = (DLGTEMPLATE *)::LockResource(hDlgTemplate);
@@ -471,7 +473,7 @@ DLGTEMPLATE *TTGetNewDlgTemplate(
 	return DlgTemplate;
 }
 
-DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCTSTR lpTemplateName)
+DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCWSTR lpTemplateName)
 {
 	DLGTEMPLATE *DlgTemplate =
 		GetDlgTemplate(hInst, lpTemplateName,

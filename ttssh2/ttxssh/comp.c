@@ -94,7 +94,7 @@ void SSH2_update_compression_myproposal(PTInstVar pvar)
 {
 	static char buf[128]; // TODO: malloc()にすべき
 	int index;
-	int len, i;
+	size_t len, i;
 
 	// 通信中に呼ばれるということはキー再作成
 	// キー再作成の場合は何もしない

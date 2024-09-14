@@ -529,6 +529,6 @@ BOOL WINAPI _AboutDialog(HWND WndParent)
 {
 	return
 		(BOOL)TTDialogBox(hInst,
-						  MAKEINTRESOURCE(IDD_ABOUTDLG),
+						  MAKEINTRESOURCEW(IDD_ABOUTDLG),
 						  WndParent, AboutDlg);
 }

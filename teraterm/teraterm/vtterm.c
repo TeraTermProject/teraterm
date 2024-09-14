@@ -263,7 +263,7 @@ static void RestoreCursor()
 	MoveCursor(Buff->CursorX, Buff->CursorY);
 
 	CharAttr = Buff->Attr;
-	BuffSetCurCharAttr(CharAttr);
+	BuffSetCurCharAttr(&CharAttr);
 	CharSetLoadState(charset_data, &Buff->CharSetState);
 
 	AutoWrapMode = Buff->AutoWrapMode;
@@ -277,7 +277,7 @@ void ResetTerminal() /*reset variables but don't update screen */
 
 	/* Attribute */
 	CharAttr = DefCharAttr;
-	BuffSetCurCharAttr(CharAttr);
+	BuffSetCurCharAttr(&CharAttr);
 
 	/* Various modes */
 	InsertMode = FALSE;
@@ -803,7 +803,7 @@ static void PutU32NoLog(unsigned int code)
 			TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
 			t.Attr |= AttrLineContinued;
 			t.AttrEx = t.Attr;
-			BuffSetCursorCharAttr(CursorX, CursorY, t);
+			BuffSetCursorCharAttr(CursorX, CursorY, &t);
 
 			// 行継続アトリビュートをつける
 			CharAttrTmp.Attr |= AttrLineContinued;
@@ -820,7 +820,7 @@ static void PutU32NoLog(unsigned int code)
 	//		エラー時はカーソル位置を検討する
 	CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 retry:
-	r = BuffPutUnicode(code, CharAttrTmp, InsertMode);
+	r = BuffPutUnicode(code, &CharAttrTmp, InsertMode);
 	if (r == -1) {
 		// 文字全角で行末、入力できない
 
@@ -836,7 +836,7 @@ retry:
 			//&& BuffIsHalfWidthFromCode(&ts, code)) {
 
 			// full width出力が半分出力にならないように0x20を出力
-			BuffPutUnicode(0x20, CharAttrTmp, FALSE);
+			BuffPutUnicode(0x20, &CharAttrTmp, FALSE);
 			CharAttrTmp.AttrEx = CharAttrTmp.AttrEx & ~AttrPadding;
 
 			// 次の行の行頭へ
@@ -2391,7 +2391,7 @@ static void CSSetAttr(void)		// SGR
 {
 	UpdateStr();
 	ParseSGRParams(&CharAttr, NULL, 1);
-	BuffSetCurCharAttr(CharAttr);
+	BuffSetCurCharAttr(&CharAttr);
 }
 
 static void CSSetScrollRegion()	// DECSTBM
@@ -2821,7 +2821,7 @@ static void CSGT(BYTE b)
 			  case 4:
 			  case 5:
 			  case 6: // Draw Line
-				BuffDrawLine(CharAttr, Param[2], Param[3]);
+				BuffDrawLine(&CharAttr, Param[2], Param[3]);
 				break;
 
 			  case 12: // Text color
@@ -2834,7 +2834,7 @@ static void CSGT(BYTE b)
 					  default: CharAttr.Fore = Param[3]; break;
 					}
 					CharAttr.Attr2 |= Attr2Fore;
-					BuffSetCurCharAttr(CharAttr);
+					BuffSetCurCharAttr(&CharAttr);
 				}
 				break;
 			}
@@ -3210,7 +3210,7 @@ static void SoftReset()
 
 	/* Attribute */
 	CharAttr = DefCharAttr;
-	BuffSetCurCharAttr(CharAttr);
+	BuffSetCurCharAttr(&CharAttr);
 
 	// status buffers
 	{
@@ -3274,11 +3274,11 @@ static void CSDouble(BYTE b)
 		  case 0:
 		  case 2:
 			CharAttr.Attr2 &= ~Attr2Protect;
-			BuffSetCurCharAttr(CharAttr);
+			BuffSetCurCharAttr(&CharAttr);
 			break;
 		  case 1:
 			CharAttr.Attr2 |= Attr2Protect;
-			BuffSetCurCharAttr(CharAttr);
+			BuffSetCurCharAttr(&CharAttr);
 			break;
 		  default:
 			/* nothing to do */

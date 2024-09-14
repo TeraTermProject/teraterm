@@ -539,7 +539,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	  case ID_MENU_SETUP:
 		SetDialogFont(pvar->ts->DialogFontNameW, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
 					  pvar->ts->UILanguageFileW, SECTION, "DLG_TAHOMA_FONT");
-		switch (TTDialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_RECURRINGCOMMAND),
+		switch (TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SETUP_RECURRINGCOMMAND),
 								 hWin, RecurringCommandSetting, (LPARAM)NULL)) {
 		  case IDOK:
 			break;

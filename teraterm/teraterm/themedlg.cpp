@@ -472,7 +472,7 @@ static HPROPSHEETPAGE ThemeEditorCreate(ThemeDlgData *dlg_data)
 	psp.pszTitle = title;
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 	psp.dwFlags |= PSP_DLGINDIRECT;
-	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
+	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(id));
 
 	psp.pfnDlgProc = BGThemeProc;
 	psp.lParam = (LPARAM)dlg_data;
@@ -813,7 +813,7 @@ static HPROPSHEETPAGE ColorThemeEditorCreate(ThemeDlgData *dlg_data)
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if 1
 	psp.dwFlags |= PSP_DLGINDIRECT;
-	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
+	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(id));
 #endif
 
 	psp.pfnDlgProc = ColorThemeProc;
@@ -1013,7 +1013,7 @@ static HPROPSHEETPAGE ThemeEditorFile(ThemeDlgData* dlg_data)
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if 1
 	psp.dwFlags |= PSP_DLGINDIRECT;
-	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
+	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(id));
 #endif
 
 	psp.pfnDlgProc = FileProc;
@@ -1118,7 +1118,7 @@ static HPROPSHEETPAGE BGAlphaCreate(ThemeDlgData *dlg_data)
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if 1
 	psp.dwFlags |= PSP_DLGINDIRECT;
-	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
+	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(id));
 #endif
 
 	psp.pfnDlgProc = BGAlphaProc;

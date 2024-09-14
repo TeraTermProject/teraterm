@@ -34,13 +34,6 @@
 #include <openssl/ecdsa.h>
 #include <openssl/buffer.h>
 
-#undef DialogBoxParam
-#define DialogBoxParam(p1,p2,p3,p4,p5) \
-	TTDialogBoxParam(p1,p2,p3,p4,p5)
-#undef EndDialog
-#define EndDialog(p1,p2) \
-	TTEndDialog(p1, p2)
-
 #define INTBLOB_LEN 20
 #define SIGBLOB_LEN (2*INTBLOB_LEN)
 
@@ -458,8 +451,8 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	}
 
 	ECDSA_SIG_set0(sig, r, s);
-	buffer_get_bignum2(&sigblob, r);
-	buffer_get_bignum2(&sigblob, s);
+	buffer_get_bignum2((char **)&sigblob, r);
+	buffer_get_bignum2((char **)&sigblob, s);
 	if (sigblob != ptr) {
 		ret = -7;
 		goto error;
@@ -2436,11 +2429,11 @@ static INT_PTR CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wPar
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			EndDialog(dlg, 1);
+			TTEndDialog(dlg, 1);
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDC_FP_HASH_ALG_MD5:
@@ -2476,7 +2469,7 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 		HWND cur_active = GetActiveWindow();
 
 		pvar->hostkey_ctx = ctx;
-		dlgresult = DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHUPDATE_HOSTKEY),
+		dlgresult = TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHUPDATE_HOSTKEY),
 			cur_active != NULL ? cur_active : pvar->NotificationWindow,
 			hosts_updatekey_dlg_proc, (LPARAM)pvar);
 		if (dlgresult != 1) {
@@ -2560,7 +2553,7 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 		buffer_clear(b);
 		buffer_put_cstring(b, "hostkeys-prove-00@openssh.com");
 		buffer_put_string(b, pvar->session_id, pvar->session_id_len);
-		key_to_blob(ctx->keys[i], &blob, &bloblen);
+		key_to_blob(ctx->keys[i], (char **)&blob, &bloblen);
 		buffer_put_string(b, blob, bloblen);
 		free(blob);
 		blob = NULL;
@@ -2716,7 +2709,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		for (i = 0; i < ctx->nkeys; i++) {
 			if (ctx->keys_seen[i])
 				continue;
-			key_to_blob(ctx->keys[i], &blob, &len);
+			key_to_blob(ctx->keys[i], (char **) & blob, &len);
 			buffer_put_string(b, blob, len);
 			free(blob);
 			blob = NULL;

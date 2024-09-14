@@ -45,7 +45,7 @@ char *myproposal[PROPOSAL_MAX] = {
 
 struct ssh2_kex_algorithm_t {
 	kex_algorithm kextype;
-	char *name;
+	const char *name;
 	const EVP_MD *(*evp_md)(void);
 };
 
@@ -64,7 +64,7 @@ static const struct ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
 };
 
 
-char* get_kex_algorithm_name(kex_algorithm kextype)
+const char* get_kex_algorithm_name(kex_algorithm kextype)
 {
 	const struct ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
 
@@ -166,7 +166,7 @@ void SSH2_update_kex_myproposal(PTInstVar pvar)
 	// Enables RFC 8308 Extension Negotiation & Strict KEX mode (for CVE-2023-48795)
 	strncat_s(buf, sizeof(buf), "ext-info-c,kex-strict-c-v00@openssh.com", _TRUNCATE);
 
-	myproposal[PROPOSAL_KEX_ALGS] = buf; 
+	myproposal[PROPOSAL_KEX_ALGS] = buf;
 }
 
 

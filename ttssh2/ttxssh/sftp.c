@@ -827,7 +827,7 @@ cmd_parsed:
 	// コマンドライン解析
 	path1 = path2 = NULL;
 	cmd = buf;
-	cmdnum = parse_args(&cmd, &pflag, &rflag, &lflag, &iflag, &hflag,
+	cmdnum = parse_args((const char **)&cmd, &pflag, &rflag, &lflag, &iflag, &hflag,
 		&sflag, &n_arg, &path1, &path2);
 
 	if (iflag != 0)

@@ -6693,7 +6693,7 @@ static LRESULT CALLBACK ssh_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, L
 					}
 
 				case IDCANCEL:
-					EndDialog(hWnd, 0);
+					TTEndDialog(hWnd, 0);
 					return TRUE;
 				default:
 					return FALSE;
@@ -7414,7 +7414,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 
 		// Pageant に署名してもらう
 		signedmsg = putty_sign_ssh2_key(pvar->pageant_curkey,
-		                                signbuf->buf, signbuf->len,
+		                                buffer_ptr(signbuf), buffer_len(signbuf),
 		                                &signedlen, signflag);
 		buffer_free(signbuf);
 		if (signedmsg == NULL) {
@@ -7548,13 +7548,13 @@ static INT_PTR CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, 
 			strncpy_s(cp->passwd, sizeof(cp->passwd), old_passwd, _TRUNCATE);
 			strncpy_s(cp->new_passwd, sizeof(cp->new_passwd), new_passwd, _TRUNCATE);
 
-			EndDialog(dlg, 1); // dialog close
+			TTEndDialog(dlg, 1); // dialog close
 			return TRUE;
 
 		case IDCANCEL:
 			// 接続を切る
 			notify_closed_connection(pvar, "authentication cancelled");
-			EndDialog(dlg, 0); // dialog close
+			TTEndDialog(dlg, 0); // dialog close
 			return TRUE;
 		}
 	}
@@ -7578,7 +7578,7 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 
 	memset(&cp, 0, sizeof(cp));
 	cp.pvar = pvar;
-	ret = DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHPASSWD_INPUT), pvar->cv->HWin, passwd_change_dialog, (LPARAM)&cp);
+	ret = TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHPASSWD_INPUT), pvar->cv->HWin, passwd_change_dialog, (LPARAM)&cp);
 
 	if (ret == -1) {
 		logprintf(LOG_LEVEL_WARNING, "%s: DialogBoxParam failed.", __FUNCTION__);
@@ -8487,7 +8487,7 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 		HANDLE thread;
 		unsigned int tid;
 
-		hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCE(IDD_SSHSCP_PROGRESS),
+		hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_SSHSCP_PROGRESS),
 								 pvar->cv->HWin, ssh_scp_dlg_proc);
 		if (hDlgWnd != NULL) {
 			static const DlgTextInfo text_info[] = {
@@ -8833,7 +8833,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 
 			// 進捗ウィンドウ
 			c->scp.pvar = pvar;
-			hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCE(IDD_SSHSCP_PROGRESS),
+			hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_SSHSCP_PROGRESS),
 									 pvar->cv->HWin, ssh_scp_dlg_proc);
 			if (hDlgWnd != NULL) {
 				static const DlgTextInfo text_info[] = {
@@ -9619,7 +9619,7 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 		agent_request_len = &fc->agent_request_len;
 	}
 
-	if (agent_msg->len == 0) {
+	if (buffer_len(agent_msg) == 0) {
 		req_len = get_uint32_MSBfirst(data);
 		if (req_len > AGENT_MAX_MSGLEN - 4) {
 			logprintf(LOG_LEVEL_NOTICE,
@@ -9649,13 +9649,13 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 	}
 	else {
 		buffer_put_raw(agent_msg, data, buflen);
-		if (*agent_request_len > agent_msg->len) {
+		if (*agent_request_len > buffer_len(agent_msg)) {
 			return TRUE;
 		}
-		data = agent_msg->buf;
+		data = buffer_ptr(agent_msg);
 	}
 
-	putty_agent_query_synchronous(data, *agent_request_len, &response, &resplen);
+	putty_agent_query_synchronous(data, *agent_request_len, (void **)&response, &resplen);
 	if (response == NULL || resplen < 5) {
 		logprintf(LOG_LEVEL_NOTICE, "%s Agent Forwarding Error: putty_agent_query_synchronous is failed.", __FUNCTION__);
 		goto error;
