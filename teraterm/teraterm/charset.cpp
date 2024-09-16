@@ -55,7 +55,7 @@ typedef struct CharSetDataTag {
 	/* GL, GR code group */
 	int Glr[2];
 	/* G0, G1, G2, G3 code group */
-	int Gn[4];
+	CharSetCS Gn[4];
 	/* GL for single shift 2/3 */
 	int GLtmp;
 	/* single shift 2/3 flag */
@@ -900,7 +900,7 @@ void ParseFirst(CharSetData *w, BYTE b)
  *						IdKanji	   2
  *						IdSpecial  3
  */
-void CharSet2022Designate(CharSetData *w, int gn, int cs)
+void CharSet2022Designate(CharSetData *w, int gn, CharSetCS cs)
 {
 	w->Gn[gn] = cs;
 }
@@ -997,7 +997,7 @@ static void CharSetSaveStateLow(CharSetState *state, const CharSetData *w)
 	state->infos[0] = w->Glr[0];
 	state->infos[1] = w->Glr[1];
 	for (i=0 ; i<=3; i++) {
-		state->infos[2 + i] = w->Gn[i];
+		state->infos[2 + i] = (int)w->Gn[i];
 	}
 }
 
@@ -1018,7 +1018,7 @@ void CharSetLoadState(CharSetData *w, const CharSetState *state)
 	w->Glr[0] = state->infos[0];
 	w->Glr[1] = state->infos[1];
 	for (i=0 ; i<=3; i++) {
-		w->Gn[i] = state->infos[2 + i];
+		w->Gn[i] = (CharSetCS)state->infos[2 + i];
 	}
 }
 
