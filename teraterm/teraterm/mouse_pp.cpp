@@ -127,8 +127,8 @@ HPROPSHEETPAGE MousePageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
-	wchar_t *UIMsg;
-	GetI18nStrWW("Tera Term", "DLG_MOUSE_TITLE",
+	wchar_t* UIMsg;
+	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_MOUSE",
 				 L"Mouse", pts->UILanguageFileW, &UIMsg);
 	psp.pszTitle = UIMsg;
 	psp.pszTemplate = MAKEINTRESOURCEW(IDD_TABSHEET_MOUSE);
