@@ -47,10 +47,12 @@ typedef struct CharSetOpTag {
 } CharSetOp;
 
 /* Character sets */
-#define IdASCII    0
-#define IdKatakana 1
-#define IdKanji    2
-#define IdSpecial  3
+typedef enum {
+	IdASCII,
+	IdKatakana,
+	IdKanji,
+	IdSpecial,
+} CharSetCS;
 
 // input
 void ParseFirst(CharSetData *w, BYTE b);
@@ -70,7 +72,7 @@ typedef enum {
 
 CharSetData *CharSetInit(const CharSetOp *op, void *client_data);
 void CharSetFinish(CharSetData *w);
-void CharSet2022Designate(CharSetData *w, int gn, int cs);
+void CharSet2022Designate(CharSetData *w, int gn, CharSetCS cs);
 void CharSet2022Invoke(CharSetData *w, CharSet2022Shift shift);
 BOOL CharSetIsSpecial(CharSetData *w, BYTE b);
 void CharSetSaveState(CharSetData *w, CharSetState *state);

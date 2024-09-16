@@ -251,6 +251,8 @@
 #define IDC_DOWNLOAD_DIR_TITLE          2627
 #define IDC_DOWNLOAD_DIR                2628
 #define IDC_DOWNLOAD_DIR_SELECT         2629
+#define IDC_GENUILANG                   2630
+#define IDC_GENUILANG_LABEL             2631
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003

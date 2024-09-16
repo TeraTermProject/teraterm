@@ -36,6 +36,8 @@
 <ul class="history">
   <li>変更
     <ul>
+      <li>Setup-General 設定を Additional settings の <a href="../menu/setup-additional-general.html">General タブ</a>へ統合した。</li>
+      <li>Additional settings の "Coding" を、より一般的な "Encoding" に改めた。</li>
       <li>クリップボードの送信(OSC 52)時、送信文字コードで送信するように変更した<br>
         修正前はUTF-8 以外の時、ACPで送信していた。</li>
       <li>言語モードを削除したため /LA コマンドラインオプションを削除した</li>
@@ -44,11 +46,11 @@
     </ul>
   </li>
 
-  <!--li>バグ修正
+  <li>バグ修正
     <ul>
-      <li></li>
+      <li>LogAutoStart=on で AutoWinClose=off の時、ログ出力中に切断して新規接続するとエラーが表示される問題を修正した。</li>
     </ul>
-  </li-->
+  </li>
 
   <li>その他
     <ul>
@@ -75,7 +77,7 @@
           <li>無効化、初期化に失敗したCOMポートは含まれなくなった。</li>
         </ul>
       </li>
-      <li>General setup ダイアログで、選択されている <a href="../menu/setup-general.html#UILanguageFile">言語ファイル</a>の情報を表示するようにした。</li>
+      <li>General setup ダイアログで、選択されている <a href="../menu/setup-additional-general.html#UILanguageFile">言語ファイル</a>の情報を表示するようにした。</li>
       <li>General setup ダイアログの Language 設定を削除した。</li>
       <li>"Default port" 設定を General setup ダイアログから Additional settings の <a href="../menu/setup-additional-general.html#Port">General タブ</a>へ移動した。</li>
       <li>ダウンロードフォルダの設定を Additional settings の <a href="../menu/setup-additional-general.html#DownloadFolder">General タブ</a>へ移動した。</li>
@@ -354,9 +356,9 @@
       <li>REP 制御シーケンスに対応した。</li>
       <li>xterm の ED 3 (スクロールバッファ消去) 制御シーケンスに対応した。
         <ul>
-	  <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>の<a href="../menu/setup-additional.html#TabControlSequence">Control Sequenceタブ</a>に<a href="../menu/setup-additional.html#ed3">「リモートからのスクロールバッファ消去を受け入れる」</a>を追加した。デフォルトはoff。</li>
+	  <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>の<a href="../menu/setup-additional-ctrlseq.html">Control Sequenceタブ</a>に<a href="../menu/setup-additional-ctrlseq.html#ed3">「リモートからのスクロールバッファ消去を受け入れる」</a>を追加した。デフォルトはoff。</li>
         </ul></li>
-	<li><a href="../menu/setup-additional.html#ClipboardAccessFromRemote">「リモートからのクリップボードアクセス」</a>設定を変更する為のコマンドラインオプションとして<a href="../commandline/teraterm.html#osc52">/OSC52=</a>を追加した。</li>
+	<li><a href="../menu/setup-additional-ctrlseq.html#ClipboardAccessFromRemote">「リモートからのクリップボードアクセス」</a>設定を変更する為のコマンドラインオプションとして<a href="../commandline/teraterm.html#osc52">/OSC52=</a>を追加した。</li>
       <li><a href="../menu/file.html">[File]</a> メニューに <a href="../menu/file.html#PauseLog">[Pause Logging]</a> / <a href="../menu/file.html#StopLog">[Stop Logging]</a> を追加した。</li>
       <li>マウスでのテキスト選択の開始を、設定で遅らせる事が出来るようにした。
         <ul>
@@ -526,13 +528,13 @@
         <ul>
           <li>10: フルスクリーンモード</li>
           <li>13;2: ウィンドウ位置方向(テキスト領域)</li>
-          <li>14;2: ウインドウサイズ報告(ウィンドウ全体)</li>
+          <li>14;2: ウィンドウサイズ報告(ウィンドウ全体)</li>
           <li>15: ルートウィンドウサイズ報告(ピクセル)</li>
           <li>16: 文字サイズ報告(ピクセル)</li>
         </ul></li>
       <li>以下の dtterm のウィンドウ操作シーケンスの動作を変更した。
         <ul>
-          <li>14: ウインドウサイズ報告: 報告する領域をウィンドウ全体からテキスト領域に変更した。</li>
+          <li>14: ウィンドウサイズ報告: 報告する領域をウィンドウ全体からテキスト領域に変更した。</li>
         </ul></li>
       <li>ウィンドウサイズ変更時に左右マージンモードをリセットしないようにした。</li>
       <li>ファイル名を受け取るコマンドラインオプションで、`/' もパス区切り記号として扱うようにした。</li>
@@ -684,7 +686,7 @@
         </ul></li>
       <li>OSで非表示に設定されているフォントをフォント設定ダイアログで選択できるようにする設定を追加した。
         <ul>
-          <li><a href="../menu/setup-additional-general.html#ListHiddenFonts">Additional settingsダイアログ</a>の General タブで設定を有効化できるようにした。</li>
+          <li>Additional settingsダイアログの General タブで設定を有効化できるようにした。</li>
         </ul></li>
       <li>シリアルポートおよび名前付きパイプが開けなかった時、エラーメッセージで理由やエラーコードを表示するようにした。</li>
       <li><a href="../macro/command/sendlnbroadcast.html">sendlnbroadcast</a> マクロコマンドで、改行を送信するのを最後のパラメータの後の一回だけに変更した。</li>
@@ -953,7 +955,7 @@
         </ul></li>
       <li>Eterm look-feel: 背景画像の明るさを設定できるようにした。</li>
       <li><a href="../menu/setup-directory.html">設定フォルダ(Setup directory)</a>に Virtual Store パスを追加した。</li>
-      <li><a href="../menu/setup-additional.html#CygTerm">Additional settingsのCygTerm設定</a>で、ダイアログを閉じた時に設定を保存するのではなく、Save setup時に cygterm.cfg を保存するように変更した。</li>
+      <li><a href="../menu/setup-additional-cygwin.html">Additional settingsのCygTerm設定</a>で、ダイアログを閉じた時に設定を保存するのではなく、Save setup時に cygterm.cfg を保存するように変更した。</li>
       <li>コマンドラインオプションのパース処理を変更し、パラメータの途中からでも '"' によるクオートを可能にした。</li>
       <li>バージョン情報ダイアログのURLをシングルクリックでブラウザが起動するようにした。</li>
       <li><a href="../macro/command/listbox.html">listbox</a> マクロコマンドで、初期状態で選択している項目を指定できるようにした。</li>
@@ -2063,7 +2065,7 @@
     <ul>
       <li>カーソル形状/点滅変更制御シーケンスに対応した。
         <ul>
-          <li>teraterm.ini に <a href="../menu/setup-additional.html#CursorCtrlSequence">CursorCtrlSequence</a> エントリを追加した。デフォルトは off。</li>
+          <li>teraterm.ini に <a href="../menu/setup-additional-ctrlseq.html#CursorCtrlSequence">CursorCtrlSequence</a> エントリを追加した。デフォルトは off。</li>
         </ul></li>
       <li>ウィンドウ操作/報告制御シーケンスに対応した。
         <ul>
@@ -5732,7 +5734,7 @@
 
 <h3 id="resizemenu_1.05">2018.11.30 (Ver 1.05)</h3>
 <ul class="history">
-  <li>ウインドウサイズを増減させる為のメニューIDを追加した。(ショートカットキー定義用)</li>
+  <li>ウィンドウサイズを増減させる為のメニューIDを追加した。(ショートカットキー定義用)</li>
 </ul>
 
 <h3 id="resizemenu_1.04">2018.08.31 (Ver 1.04)</h3>

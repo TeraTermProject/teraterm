@@ -36,6 +36,8 @@
 <ul class="history">
   <li>Changes
     <ul>
+      <li>Setup - General was integrated into <a href="../menu/setup-additional-general.html">General tab</a> of Additional settings dialog.</li>
+      <li>Renamed the Additional setting "Coding" to "Encoding" for better clarity.</li>
       <li>changed to use transmit character code when sending clipboard (OSC 52).<br>
         Before fix, when transmit character code is not UTF-8, it used ACP.</li>
       <li>Remove /LA command line options because language mode was removed</li>
@@ -44,11 +46,11 @@
     </ul>
   </li>
 
-  <!--li>Bug fixes
+  <li>Bug fixes
     <ul>
-      <li></li>
+      <li>Fixed a problem that an error is displayed when a new connection is made after disconnecting during log output in the case of LogAutoStart=on.</li>
     </ul>
-  </li-->
+  </li>
 
   <li>Misc
     <ul>
@@ -75,7 +77,7 @@
           <li>COM ports that are disabled and failed to initialize are not included.</li>
         </ul>
       </li>
-      <li>General setup dialog is now shown the information from <a href="../menu/setup-general.html#UILanguageFile">Language file</a> which is selected.</a>
+      <li>General setup dialog is now shown the information from <a href="../menu/setup-additional-general.html#UILanguageFile">Language file</a> which is selected.</a>
       <li>"Default port" settings is moved to <a href="../menu/setup-additional-general.html#Port">General tab</a> of Additional settings dialog from General setup dialog.</li>
       <li>Removed Language setting from General setup dialog.</li>
       <li>Download folder setting is moved to <a href="../menu/setup-additional-general.html#DownloadFolder">General tab</a> of Additional settings dialog.</li>
@@ -354,9 +356,9 @@
       <li>Added support for REP control sequence.</li>
       <li>Added support for xterm ED 3 (clear scroll buffer) control sequence.
         <ul>
-          <li>Added the <a href="../menu/setup-additional.html#ed3">"Accept clearing scroll buffer from remote"</a> setting on the <a href="../menu/setup-additional.html#TabControlSequence">Control Sequence tab</a> of the <a href="../menu/setup-additional.html">Additional settings dialog</a>. The default value is off.</li>
+          <li>Added the <a href="../menu/setup-additional-ctrlseq.html#ed3">"Accept clearing scroll buffer from remote"</a> setting on the <a href="../menu/setup-additional-ctrlseq.html">Control Sequence tab</a> of the <a href="../menu/setup-additional.html">Additional settings dialog</a>. The default value is off.</li>
         </ul></li>
-	<li>Added <a href="../commandline/teraterm.html#osc52">/OSC52=</a> command line option for change the <a href="../menu/setup-additional.html#ClipboardAccessFromRemote">"Clipboard access from remote"</a> setting.</li>
+	<li>Added <a href="../commandline/teraterm.html#osc52">/OSC52=</a> command line option for change the <a href="../menu/setup-additional-ctrlseq.html#ClipboardAccessFromRemote">"Clipboard access from remote"</a> setting.</li>
       <li>Added the <a href="../menu/file.html#PauseLog">[Pause Logging]</a> and the <a href="../menu/file.html#StopLog">[Stop Logging]</a> menu into the <a href="../menu/file.html">[File]</a> menu.</li>
       <li>The start of the text selection with the mouse can be delayed by setting.
         <ul>
@@ -684,7 +686,7 @@
         </ul></li>
       <li>Hidden font set by OS can be selected with font setting dialog.
         <ul>
-          <li>The setting can be configured on the General tab of <a href="../menu/setup-additional-general.html#ListHiddenFonts">Additional settings dialog</a>.</li>
+          <li>The setting can be configured on the General tab of Additional settings dialog.</li>
         </ul></li>
       <li>When the serial port and named pipe can not be opened, the error message contains reason or error code.</li>
       <li>When the <a href="../macro/command/sendlnbroadcast.html">sendlnbroadcast</a> macro command is used, the carriage return is sent one more time after last parameter.</li>
@@ -953,7 +955,7 @@
         </ul></li>
       <li>Eterm look-feel: added the Image Brightness configuration.</li>
       <li>added the Virtual Store path to <a href="../menu/setup-directory.html">Setup directory</a>.</li>
-      <li>The cygterm.cfg is not saved on dialog closing but is saved on the Save setup when <a href="../menu/setup-additional.html#CygTerm">the CygTerm configuration of the Additional settings</a> is used.</li>
+      <li>The cygterm.cfg is not saved on dialog closing but is saved on the Save setup when <a href="../menu/setup-additional-cygwin.html#CygTerm">the CygTerm configuration of the Additional settings</a> is used.</li>
       <li>The command line option can be quoted from an offset when the '"' is used.</li>
       <li>When the click-able URL is not double-clicked but single-clicked on the version dialog, the browser can be launched.</li>
       <li>MACRO: added new parameter which can specify an index of selected item at the <a href="../macro/command/listbox.html">listbox</a> macro command.</li>
@@ -2064,7 +2066,7 @@
     <ul>
       <li>added support for cursor control sequences.
         <ul>
-          <li>added the <a href="../menu/setup-additional.html#CursorCtrlSequence">CursorCtrlSequence</a> entry in the teraterm.ini file. The default is off.</li>
+          <li>added the <a href="../menu/setup-additional-ctrlseq.html#CursorCtrlSequence">CursorCtrlSequence</a> entry in the teraterm.ini file. The default is off.</li>
         </ul></li>
       <li>added support for the control sequences for window operation.
         <ul>

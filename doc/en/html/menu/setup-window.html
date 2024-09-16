@@ -16,7 +16,7 @@
       <dt id="Title">Title</dt>
       <dd>
 	Text displayed in the window title.<br>
-	See <a href="setup-additional.html#AcceptTitleChangeRequest">Accept window title change request</a> for behavior when a remote title is set.<br>
+	See <a href="setup-additional-ctrlseq.html#AcceptTitleChangeRequest">Accept window title change request</a> for behavior when a remote title is set.<br>
 	The remote title can be reset with <a href="control.html#RsetRemoteTitle">Reset Remote Title</a>.
       </dd>
 
@@ -34,15 +34,23 @@
       <dd>
 	Hides the title bar and menu bar. You can move the window by
 	dragging it with the left mouse button while pressing the Alt key.
+	Rectangle selection will not be available.
 	You can minimize the window by clicking the right mouse button
 	while pressing the Alt key. Clicking the left mouse button while
 	pressing the Ctrl key causes the pop-up menu to appear. 
+	You can also resize the window by holding down the Shift and Alt keys and dragging the window with the left mouse button.
+      </dd>
+
+      <dt id="NoFrame">No Frame</dt>
+      <dd>
+	Hides the window frame. It is no longer possible to resize the window using the window frame.
+	To resize the window, drag the window with the left mouse button while pressing the Shift and Alt keys.
       </dd>
 
       <dt id="PopupMenu">Hide menu bar</dt>
       <dd>
-	Hides the menu bar. Clicking the left mouse button while pressing
-	the Ctrl key causes the pop-up menu to appear.
+	Hides the menu bar. Menus with no shortcut key set will not be accessible with the accelerator key.
+	Clicking the left mouse button while pressing the Ctrl key causes the pop-up menu to appear.
       </dd>
 
       <dt id="PcBoldColor">16 Colors (PC style)</dt>
