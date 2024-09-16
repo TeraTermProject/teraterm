@@ -42,6 +42,11 @@ VT window
 <dd>Selects a line,<br>
   Depending <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">setting</a>, Selected text is copied to the clipboard.</dd>
 
+<dt>Left click , then Shift + Left click</dt>
+<dd>Select several pages of output from Tera Term window, and stretch or shrink the selected text area.
+The first click is the start position and the next Shift+click is the end position.
+</dd>
+
 <dt>Dragging with the right button</dt>
 <dd>Selects text, copies it to the clipboard, and then sends it to the host.<br>
     It is effective when both <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> and <a href="../menu/setup-additional.html">SelectOnlyByLButton</a> are disabled.</dd>
@@ -49,6 +54,10 @@ VT window
 <dt>Clicking the right button</dt>
 <dd>Sends text in the clipboard to the host.<br>
     It is effective when <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> is disabled.</dd>
+
+<dt>Clicking the middle button</dt>
+<dd>Sends text in the clipboard to the host.<br>
+    It is effective when <a href="../setup/teraterm-misc.html#DisablePasteMouseMButton">DisableMouseMButtonPaste</a> is disabled.</dd>
 
 <dt>Double clicking the left button on the title bar</dt>
 <dd>
@@ -62,10 +71,13 @@ VT window
 </dd>
 
 <dt>Clicking the left button while pressing the Ctrl key</dt>
-<dd>If the menu bar is hidden, the pop-up menu appears. To hide the menu bar, check the Hide menu bar option in the [Setup] Window dialog box.</dd>
+<dd>If the menu bar is hidden, the pop-up menu appears. To hide the menu bar, check the Hide menu bar option in the <A HREF="../menu/setup-window.html">[Setup] Window</A> dialog box.</dd>
 
 <dt>Dragging the window by the left button while pressing the Alt key</dt>
-<dd>Moves the window, if the title bar is hidden. To hide the title bar, check the Hide title bar option in the [Setup] Window dialog box.</dd>
+<dd>Moves the window, if the title bar is hidden. To hide the title bar, check the Hide title bar option in the <A HREF="../menu/setup-window.html">[Setup] Window</A> dialog box.</dd>
+
+<dt>Dragging the window by the left button while pressing the Alt+Shift key</dt>
+<dd>Resizes the window, if the title bar or window frame is hidden. To hide the window frame, check the No Frame option in the <A HREF="../menu/setup-window.html">[Setup] Window</A> dialog box.</dd>
 
 <dt>Clicking the right button while pressing the Alt key</dt>
 <dd>Minimizes the window, if the title bar is hidden.</dd>
@@ -196,7 +208,7 @@ VT window
     </dd>
   </dl>
 
-<dt>Dragging with the middle button, Clicking the middle button</dt>
+<dt>Dragging with the middle button</dt>
 <dd>These actions are no longer supported.</dd>
 </dl>
 

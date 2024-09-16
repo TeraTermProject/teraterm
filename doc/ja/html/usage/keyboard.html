@@ -32,11 +32,12 @@
 <dt>Alt+B</dt>
 <dd>ブレーク信号を送出します。</dd>
 
-<dt>Alt+C</dt>
-<dd>マウスで選択した文字列をクリップボードへコピーします。</dd>
+<dt>Alt+C, Ctrl+Insert</dt>
+<dd>マウスで選択した文字列をクリップボードへコピーします。
+<a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">AutoTextCopy</a> が有効な場合は、マウスで選択した時点でコピーされています。</dd>
 
 <dt>Alt+D</dt>
-<dd>セッションを複製します。</dd>
+<dd>セッションを複製します。（SSH, telnetのみ）</dd>
 
 <dt>Alt+G</dt>
 <dd>Cygwin接続を呼び出します。</dd>
@@ -59,11 +60,47 @@
 <dt>Alt+T</dt>
 <dd>Telnet の AYT (Are You There) コマンドを送出します。通常ホストはこれに呼応して何等かのメッセージを送り返してきます。Telnet 接続のときだけ使用できます。</dd>
 
-<dt>Alt+V</dt>
-<dd>クリップボードの中の文字列をホストへ送出します。</dd>
+<dt>Alt+V, Shift+Insert</dt>
+<dd>クリップボードの中の文字列をホストへ送出します。
+マウス右クリックでも同じです。
+<a href="../setup/teraterm-misc.html#DisablePasteMouseMButton">DisablePasteMouseMButton</a> を off にしている場合は、マウス中ボタンクリックでも同じです。
+</dd>
 
-<dt>Ctrl+Esc</dt>
-<dd>アプリケーションの切り替えをします。</dd>
+<dt>Ctrl+Tab, Ctrl+Shift+Tab</dt>
+<dd>Tera Termウィンドウを切り替えます。</dd>
+
+<dt>Ctrl+Up/Down cursor</dt>
+<dd>上下方向へ一行スクロールします。</dd>
+
+<dt>Ctrl+PageUp/PageDown</dt>
+<dd>上下方向へページ単位スクロールします。</dd>
+
+<dt>Ctrl+Home</dt>
+<dd>バッファの先頭へ移動します。</dd>
+
+<dt>Ctrl+End</dt>
+<dd>バッファの末尾へ移動します。</dd>
+
+<dt>ScrollLock</dt>
+<dd>Tera Termウィンドウのスクロールロック/ロック解除（トグル）</dd>
+
+<dt>Alt+Enter</dt>
+<dd>ウィンドウの最大化（トグル）
+タイトルバーが <a href="../menu/setup-window.html#HideTitle">HideTitle</a> で非表示になっていなければ、
+Alt+Space でアクティブウィンドウのコンテキストメニューから Alt+X でも最大化できます。
+</dd>
+
+<dt>F1 key</dt>
+<dd>Num pad NumLockキー押下。</dd>
+
+<dt>F2 key</dt>
+<dd>Num pad '/' キー押下。</dd>
+
+<dt>F3 key</dt>
+<dd>Num pad '*' キー押下。</dd>
+
+<dt>F4 key</dt>
+<dd>Num pad '-' キー押下。</dd>
 
 </dl>
 
@@ -88,7 +125,7 @@
 <dt>Alt+V</dt>
 <dd>VT window と同じ。</dd>
 
-<dt>Ctrl+Esc</dt>
+<dt>Ctrl+Tab</dt>
 <dd>VT window と同じ。</dd>
 
 </dl>
