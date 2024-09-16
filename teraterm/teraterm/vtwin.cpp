@@ -3404,7 +3404,7 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 			ts.LogFNW = FLogGetLogFilename(NULL);
 		}
 		WideCharToACP_t(ts.LogFNW, ts.LogFN, sizeof(ts.LogFN));
-		if (!FLogIsOpend) {
+		if (!FLogIsOpend()) {
 			BOOL r = FLogOpen(ts.LogFNW, LOG_UTF8, FALSE);
 			if (r != TRUE && (ts.HideWindow != 1 && ts.Minimize != 1)) {
 				static const TTMessageBoxInfoW mbinfo = {
