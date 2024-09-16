@@ -47,7 +47,7 @@ CInpDlg::CInpDlg(wchar_t *Input, const wchar_t *Text, const wchar_t *Title,
                  int x, int y)
 {
 	InputStr = Input;
-	TextStr = Text;
+	wcscpy_s(TextStr, MaxStrLen, Text);
 	TitleStr = Title;
 	DefaultStr = Default;
 	PaswdFlag = Paswd;
@@ -79,7 +79,7 @@ BOOL CInpDlg::OnInitDialog()
 	SetDlgItemTextW(IDC_INPEDIT,DefaultStr);
 
 	CalcTextExtentW(GetDlgItem(IDC_INPTEXT), NULL, TextStr, &s);
-	TW = s.cx + s.cx/10;
+	TW = s.cx + (int)(16 * dpi / 96.f);
 	TH = s.cy;
 
 	HEdit = GetDlgItem(IDC_INPEDIT);
@@ -176,25 +176,31 @@ void CInpDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 {
 	RECT R;
 	HWND HText, HOk, HEdit;
-	int CW, CH, CONTROL_GAP_W;
+	int c_WW, c_WH, CW, CH, CONTROL_GAP_W, CONTROL_GAP_H;
 
+	GetWindowRect(&R);
+	c_WW = R.right - R.left;
+	c_WH = R.bottom - R.top;
 	GetClientRect(&R);
-	CW = R.right-R.left;
-	CH = R.bottom-R.top;
-	CONTROL_GAP_W = new_WW -CW;
+	CW = R.right - R.left;
+	CH = R.bottom - R.top;
+	CONTROL_GAP_W = c_WW - CW;
+	CONTROL_GAP_H = c_WH - CH;
 
 	// 初回のみ
 	if (is_init) {
 		// テキストコントロールサイズを補正
-		if (TW < CW) {
-			TW = CW;
+		if (TW < (int)(224 * dpi / 96.f)) {
+			TW = (int)(224 * dpi / 96.f);
 		}
 		if (EW < s.cx) {
 			EW = s.cx;
 		}
 		// ウインドウサイズの計算
-		WW = TW + (WW - CW);
-		WH = TH + EH + BH + BH*2 + (WH - CH);
+		TW += (int)(26 * dpi / 96.f);
+		WW = TW + CONTROL_GAP_W;
+		WH = TH + CONTROL_GAP_H + EH + BH + BH*2;
+		EW = WW - CONTROL_GAP_W - (int)(26 * dpi / 96.f);
 		init_WW = WW;
 		init_WH = WH;
 	}
@@ -234,27 +240,41 @@ LRESULT CInpDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_EXITSIZEMOVE:
 		return OnExitSizeMove(wp, lp);
 	case WM_DPICHANGED:
-		int new_dpi;
+		int new_dpi, CW, CH, CONTROL_GAP_W, CONTROL_GAP_H;
 		float mag;
 		RECT R;
 
 		new_dpi = HIWORD(wp);
 		mag = new_dpi / (float)dpi;
 		dpi = new_dpi;
-		init_WW = (int)(init_WW * mag);
-		init_WH = (int)(init_WH * mag);
-		TW      = (int)(TW      * mag);
-		TH      = (int)(TH      * mag);
-		s.cx    = (int)(s.cx    * mag);
-		s.cy    = (int)(s.cy    * mag);
-		BW      = (int)(BW      * mag);
-		BH      = (int)(BH      * mag);
-		EW      = (int)(EW      * mag);
-		EH      = (int)(EH      * mag);
-
+		CalcTextExtentW(GetDlgItem(IDC_INPTEXT), NULL, TextStr, &s);
+		TW = s.cx + (int)(16 * dpi / 96.f);
+		TH = s.cy;
+		::GetWindowRect(GetDlgItem(IDC_INPEDIT), &R);
+		EW = R.right-R.left;
+		EH = R.bottom-R.top;
+		::GetWindowRect(GetDlgItem(IDOK), &R);
+		BW = R.right-R.left;
+		BH = R.bottom-R.top;
 		R = *(RECT *)lp;
 		WW = R.right - R.left;
-		WH = init_WH;
+		WH = R.bottom - R.top;
+		GetClientRect(&R);
+		CW = R.right-R.left;
+		CH = R.bottom-R.top;
+		CONTROL_GAP_W = WW - CW;
+		CONTROL_GAP_H = WH - CH;
+		if (TW < (int)(224 * dpi / 96.f)) {
+			TW = (int)(224 * dpi / 96.f);
+		}
+		if (EW < s.cx) {
+			EW = s.cx;
+		}
+		TW += (int)(26 * dpi / 96.f);
+		EW += CONTROL_GAP_W;
+		init_WW = TW + CONTROL_GAP_W;
+		init_WH = TH + CONTROL_GAP_H + EH + BH + BH*2;
+		EW = WW - CONTROL_GAP_W - (int)(26 * dpi / 96.f);
 
 		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), dpi);
 		if (in_init) {

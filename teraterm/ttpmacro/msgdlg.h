@@ -42,7 +42,7 @@ public:
 private:
 	enum { IDD = IDD_MSGDLG };
 
-	const wchar_t *TextStr;
+	wchar_t TextStr[MaxStrLen];
 	const wchar_t *TitleStr;
 	BOOL YesNoFlag;
 	int  init_WW = 0, init_WH = 0, TW, TH, BH, BW;

@@ -36,6 +36,11 @@
 <ul class="history">
   <li>Changes
     <ul>
+      <li>changed to use transmit character code when sending clipboard (OSC 52).<br>
+        Before fix, when transmit character code is not UTF-8, it used ACP.</li>
+      <li>Remove /LA command line options because language mode was removed</li>
+      <li>Changed method of creating backup files for TERATERM.INI.</li>
+      <li>Updated Unicode information to Unicode 16.0. Before update, Unicode 15.1 compliant since Tera Term 5.0.</li>
       <li>MACRO: <a href="../macro/command/setdlgpos.html">setdlgpos</a> Expanded the options for specifying the display position of the dialog box.</li>
     </ul>
   </li>
@@ -43,19 +48,8 @@
   <li>Bug fixes
     <ul>
       <li>MACRO: Improved the issue where DPI scaling was not properly adjusted when the dialog spans across monitors with different scaling factors.</li>
-      <li>changed to use transmit character code when sending clipboard (OSC 52).<br>
-        Before fix, when transmit character code is not UTF-8, it used ACP.</li>
-      <li>Remove /LA command line options because language mode was removed</li>
-      <li>Changed method of creating backup files for TERATERM.INI.</li>
-      <li>Updated Unicode information to Unicode 16.0. Before update, Unicode 15.1 compliant since Tera Term 5.0.</li>
     </ul>
   </li>
-
-  <!--li>Bug fixes
-    <ul>
-      <li></li>
-    </ul>
-  </li-->
 
   <li>Misc
     <ul>
@@ -64,7 +58,6 @@
   </li>
 </ul>
 
-<h3 id="teraterm_5.3">YYYY.MM.DD (Ver 5.3 not released yet)</h3>
 <h3 id="teraterm_5.3">2024.09.08 (Ver 5.3)</h3>
 <ul class="history">
   <li>Changes

@@ -39,7 +39,7 @@ public:
 	void Bringup();
 	enum { IDD = IDD_STATDLG };
 private:
-	const wchar_t *TextStr;
+	wchar_t TextStr[MaxStrLen];
 	const wchar_t *TitleStr;
 	int  init_WW = 0, init_WH = 0, TW, TH;
 	SIZE s;

@@ -48,7 +48,7 @@
 
 BOOL CStatDlg::Create(HINSTANCE hInst, const wchar_t *Text, const wchar_t *Title, int x, int y)
 {
-	TextStr = Text;
+	wcscpy_s(TextStr, MaxStrLen, Text);
 	TitleStr = Title;
 	PosX = x;
 	PosY = y;
@@ -66,11 +66,11 @@ void CStatDlg::Update(const wchar_t *Text, const wchar_t *Title, int x, int y)
 	if (Text!=NULL) {
 		HWND hWnd = GetDlgItem(IDC_STATTEXT);
 		CalcTextExtentW(hWnd, NULL, Text, &s);
-		TW = s.cx + 32;
-		TH = s.cy + 32;
+		TW = s.cx + (int)(16 * dpi / 96.f);
+		TH = s.cy + (int)(16 * dpi / 96.f);
 
 		SetDlgItemTextW(IDC_STATTEXT,Text);
-		TextStr = Text;
+		wcscpy_s(TextStr, MaxStrLen, Text);
 	}
 
 	if (x!=32767) {
@@ -270,20 +270,24 @@ LRESULT CStatDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_EXITSIZEMOVE:
 		return OnExitSizeMove(wp, lp);
 	case WM_DPICHANGED:
-		int new_dpi;
+		int new_dpi, new_WW, new_WH, new_CW, new_CH;
 		float mag;
+		RECT R;
 
 		new_dpi = HIWORD(wp);
 		mag = new_dpi / (float)dpi;
 		dpi = new_dpi;
-		init_WW = (int)(init_WW * mag);
-		init_WH = (int)(init_WH * mag);
-		TW      = (int)(TW      * mag);
-		TH      = (int)(TH      * mag);
-		s.cx    = (int)(s.cx    * mag);
-		s.cy    = (int)(s.cy    * mag);
-		WW      = (int)(WW      * mag);
-		WH      = (int)(WH      * mag);
+		CalcTextExtentW(GetDlgItem(IDC_STATTEXT), NULL, TextStr, &s);
+		TW = s.cx + (int)(16 * dpi / 96.f);
+		TH = s.cy + (int)(16 * dpi / 96.f);
+		R = *(RECT *)lp;
+		new_WW = R.right - R.left;
+		new_WH = R.bottom - R.top;
+		GetClientRect(&R);
+		new_CW = R.right-R.left;
+		new_CH = R.bottom-R.top;
+		init_WW = TW + new_WW - new_CW;
+		init_WH = TH + new_WH - new_CH;
 
 		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), dpi);
 		Relocation(in_update, WW, WH);

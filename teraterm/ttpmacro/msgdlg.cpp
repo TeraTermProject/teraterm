@@ -48,7 +48,7 @@
 CMsgDlg::CMsgDlg(const wchar_t *Text, const wchar_t *Title, BOOL YesNo,
                  int x, int y)
 {
-	TextStr = Text;
+	wcscpy_s(TextStr, MaxStrLen, Text);
 	TitleStr = Title;
 	YesNoFlag = YesNo;
 	PosX = x;
@@ -87,7 +87,7 @@ BOOL CMsgDlg::OnInitDialog()
 	SetWindowTextW(TitleStr);
 	SetDlgItemTextW(IDC_MSGTEXT,TextStr);
 	CalcTextExtentW(GetDlgItem(IDC_MSGTEXT), NULL, TextStr, &s);
-	TW = s.cx + s.cx/10;
+	TW = s.cx + (int)(16 * dpi / 96.f);
 	TH = s.cy;
 
 	HOk = ::GetDlgItem(GetSafeHwnd(), IDOK);
@@ -171,17 +171,25 @@ void CMsgDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 	// 初回のみ
 	if (is_init) {
 		// テキストコントロールサイズを補正
-		if (TW < CW) {
-			TW = CW;
+		if (TW < BW) {
+			TW = BW * 2;
 		}
 		if (YesNoFlag && (TW < 7*BW/2)) {
 			TW = 7*BW/2;
 		}
 		// ウインドウサイズの計算
-		WW = TW + (WW - CW);
-		WH = TH + (WH - CH) + BH + BH*3/2;
+		GetWindowRect(&R);
+		WW = TW + (R.right - R.left - CW);
+		WH = TH + (R.bottom - R.top - CH) + BH + BH*3/2;
 		init_WW = WW;
 		init_WH = WH;
+		// 実際のサイズを取得
+		::SetWindowPos(m_hWnd, HWND_TOP, 0, 0, WW, WH, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+		GetClientRect(&R);
+		TW = R.right - R.left;
+		GetWindowRect(&R);
+		WW = R.right - R.left;
+		WH = R.bottom - R.top;
 	}
 	else {
 		TW = CW;
@@ -244,25 +252,33 @@ LRESULT CMsgDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_EXITSIZEMOVE:
 		return OnExitSizeMove(wp, lp);
 	case WM_DPICHANGED:
-		int new_dpi;
+		int new_dpi, CW, CH;
 		float mag;
 		RECT R;
 
 		new_dpi = HIWORD(wp);
 		mag = new_dpi / (float)dpi;
 		dpi = new_dpi;
-		init_WW = (int)(init_WW * mag);
-		init_WH = (int)(init_WH * mag);
-		TW      = (int)(TW      * mag);
-		TH      = (int)(TH      * mag);
-		s.cx    = (int)(s.cx    * mag);
-		s.cy    = (int)(s.cy    * mag);
-		BW      = (int)(BW      * mag);
-		BH      = (int)(BH      * mag);
-
+		CalcTextExtentW(GetDlgItem(IDC_MSGTEXT), NULL, TextStr, &s);
+		TW = s.cx + (int)(16 * dpi / 96.f);
+		TH = s.cy;
+		::GetWindowRect(GetDlgItem(IDOK), &R);
+		BW = R.right - R.left;
+		BH = R.bottom - R.top;
 		R = *(RECT *)lp;
 		WW = R.right - R.left;
-		WH = init_WH;
+		WH = R.bottom - R.top;
+		GetClientRect(&R);
+		CW = R.right - R.left;
+		CH = R.bottom - R.top;
+		if (TW < BW) {
+			TW = BW * 2;
+		}
+		if (YesNoFlag && (TW < 7*BW/2)) {
+			TW = 7*BW/2;
+		}
+		init_WW = TW + WW - CW;
+		init_WH = TH + WH - CH + BH + BH*3/2;
 
 		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), dpi);
 		if (in_init) {

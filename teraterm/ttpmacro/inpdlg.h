@@ -46,7 +46,7 @@ private:
 	enum { IDD = IDD_INPDLG };
 
 	wchar_t *InputStr;
-	const wchar_t *TextStr;
+	wchar_t TextStr[MaxStrLen];
 	const wchar_t *TitleStr;
 	const wchar_t *DefaultStr;
 	BOOL PaswdFlag;
