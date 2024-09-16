@@ -36,11 +36,31 @@ extern "C" {
 
 typedef struct OutputCharStateTag OutputCharState;
 
+  /* KanjiIn modes */
+#define IdKanjiInA 1
+#define IdKanjiInB 2
+  /* KanjiOut modes */
+#define IdKanjiOutB 1
+#define IdKanjiOutJ 2
+#define IdKanjiOutH 3
+
+typedef struct {
+	int code;
+	const char *menu_str;
+	const char *ini_str;
+	int regular;
+} KanjiInOutSt;
+
+WORD GetKanjiInCodeFromIni(const char *ini_str);
+WORD GetKanjiOutCodeFromIni(const char *ini_str);
+
+const KanjiInOutSt *GetKanjiInList(int index);
+const KanjiInOutSt *GetKanjiOutList(int index);
+
 OutputCharState *MakeOutputStringCreate(void);
 void MakeOutputStringDestroy(OutputCharState *state);
 void MakeOutputStringInit(
 	OutputCharState *state,
-	WORD Language,
 	WORD kanji_code,
 	WORD KanjiIn,
 	WORD KanjiOut,
@@ -51,6 +71,28 @@ size_t MakeOutputString(
 	char *TempStr, size_t *TempLen_,
 	BOOL (*ControlOut)(unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen, void *data),
 	void *data);
+
+/**
+ *	Unicodeを指定文字コードに変換する
+ *		codeconv.h ではできない JIS コードへの変換可
+ *
+ *	@param[in]	strW	元文字列
+ *	@param[out]	len		変換文字列長 (NULLのとき値を返さない)
+ *	@return				変換文字列
+ */
+char *MakeOutputStringConvW(
+	const wchar_t *strW,
+	WORD kanji_code, WORD KanjiIn, WORD KanjiOut,BOOL jis7katakana,
+	size_t *len);
+
+/**
+ *	Unicodeを指定文字コードに変換する
+ *		MakeOutputStringConvW()のUTF-8版
+ */
+char *MakeOutputStringConvU8(
+	const char *strU8,
+	WORD kanji_code, WORD KanjiIn, WORD KanjiOut,BOOL jis7katakana,
+	size_t *len);
 
 #ifdef __cplusplus
 }

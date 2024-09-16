@@ -59,6 +59,8 @@
 #include "mouse_pp.h"
 #include "log_pp.h"
 #include "tcpip_pp.h"
+#include "term_pp.h"
+#include "win_pp.h"
 
 #include "addsetting.h"
 
@@ -1523,6 +1525,10 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 	AddPage(page);
 	page = TcpIPPageCreate(hInstance, &ts);
 	AddPage(page);
+	page = CreateTerminalPP(hInstance, hParentWnd, & ts);
+	AddPage(page);
+	page = CreateWinPP(hInstance, hParentWnd, &ts);
+	AddPage(page);
 
 	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFileW);
 	SetCaption(title);
@@ -1554,6 +1560,12 @@ void CAddSettingPropSheetDlg::SetStartPage(Page page)
 		break;
 	case TcpIpPage:
 		start_page = 11;
+		break;
+	case TermPage:
+		start_page = 12;
+		break;
+	case WinPage:
+		start_page = 13;
 		break;
 	default:
 		start_page = 0;

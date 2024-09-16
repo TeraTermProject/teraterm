@@ -2026,7 +2026,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		return TRUE;
 	case BUTTON_ETC:
 		::GetDlgItemTextW(hWnd, EDIT_ENTRY, g_JobInfo.szName, MAX_PATH);
-		TTDialogBox(g_hI, MAKEINTRESOURCE(DIALOG_ETC), hWnd, DlgCallBack_Etc);
+		TTDialogBox(g_hI, MAKEINTRESOURCEW(DIALOG_ETC), hWnd, DlgCallBack_Etc);
 		return TRUE;
 	case LIST_HOST:
 		if (HIWORD(wParam) == LBN_SELCHANGE)
@@ -2065,7 +2065,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 				pData.pEncryptPassword = g_JobInfo.szPassword;
 				pData.pDecryptPassword = szPassword;
 				pData.nMessageFlag = 0;
-				if (TTDialogBoxParam(g_hI, MAKEINTRESOURCE(DIALOG_LOCKBOX), hWnd, DlgCallBack_LockBox, (LPARAM)&pData) == TRUE) {
+				if (TTDialogBoxParam(g_hI, MAKEINTRESOURCEW(DIALOG_LOCKBOX), hWnd, DlgCallBack_LockBox, (LPARAM)&pData) == TRUE) {
 					::CheckDlgButton(hWnd, CHECK_LOCKBOX, 1);
 					::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) 1);
 				}
@@ -2077,7 +2077,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		pData.pEncryptPassword = g_JobInfo.szPassword;
 		pData.pDecryptPassword = szPassword;
 		pData.nMessageFlag = 0;
-		if (TTDialogBoxParam(g_hI, MAKEINTRESOURCE(DIALOG_LOCKBOX), hWnd, DlgCallBack_LockBox, (LPARAM)&pData) == TRUE) {
+		if (TTDialogBoxParam(g_hI, MAKEINTRESOURCEW(DIALOG_LOCKBOX), hWnd, DlgCallBack_LockBox, (LPARAM)&pData) == TRUE) {
 			if (g_JobInfo.bLockBox == TRUE) {
 				::SetDlgItemTextA(hWnd, EDIT_PASSWORD, pData.pDecryptPassword);
 			}
@@ -2263,13 +2263,13 @@ BOOL ManageWMCommand_Menu(HWND hWnd, WPARAM wParam)
 
 	switch(LOWORD(wParam)) {
 	case ID_TMENU_ADD:
-		TTDialogBox(g_hI, MAKEINTRESOURCE(DIALOG_CONFIG), 0, DlgCallBack_Config);
+		TTDialogBox(g_hI, MAKEINTRESOURCEW(DIALOG_CONFIG), 0, DlgCallBack_Config);
 		return TRUE;
 	case ID_TMENU_CLOSE:
 		::DestroyWindow(hWnd);
 		return	TRUE;
 	case ID_VERSION:
-		TTDialogBox(g_hI, MAKEINTRESOURCE(DIALOG_VERSION), hWnd, DlgCallBack_Version);
+		TTDialogBox(g_hI, MAKEINTRESOURCEW(DIALOG_VERSION), hWnd, DlgCallBack_Version);
 		return TRUE;
 	case ID_ICON:
 		if (GetMenuState(g_hConfigMenu, ID_ICON, MF_BYCOMMAND & MF_CHECKED) != 0) {
@@ -2496,7 +2496,7 @@ BOOL DecryptPassword(char *szEncryptPassword, char *szDecryptPassword, HWND hWnd
 		pData.bLockBox = TRUE;
 		pData.pEncryptPassword = szEncryptPassword;
 		pData.pDecryptPassword = szDecryptPassword;
-		if ((ret = (BOOL)TTDialogBoxParam(g_hI, MAKEINTRESOURCE(DIALOG_LOCKBOX), hWnd, DlgCallBack_LockBox, (LPARAM)&pData)) == FALSE) {
+		if ((ret = (BOOL)TTDialogBoxParam(g_hI, MAKEINTRESOURCEW(DIALOG_LOCKBOX), hWnd, DlgCallBack_LockBox, (LPARAM)&pData)) == FALSE) {
 			szDecryptPassword[0] = 0;
 		}
 	}

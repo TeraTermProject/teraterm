@@ -134,7 +134,7 @@ HPROPSHEETPAGE MousePageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.pszTemplate = MAKEINTRESOURCEW(IDD_TABSHEET_MOUSE);
 #if defined(REWRITE_TEMPLATE)
 	psp.dwFlags |= PSP_DLGINDIRECT;
-	Param->dlg_templ = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(IDD_TABSHEET_MOUSE));
+	Param->dlg_templ = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(IDD_TABSHEET_MOUSE));
 	psp.pResource = Param->dlg_templ;
 #endif
 

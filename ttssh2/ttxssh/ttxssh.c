@@ -115,12 +115,6 @@ static OSSL_PROVIDER *legacy_provider = NULL;
 static OSSL_PROVIDER *default_provider = NULL;
 #endif
 
-#undef DialogBoxParam
-#define DialogBoxParam(p1,p2,p3,p4,p5) \
-	TTDialogBoxParam(p1,p2,p3,p4,p5)
-#undef EndDialog
-#define EndDialog(p1,p2) \
-	TTEndDialog(p1, p2)
 #undef GetPrivateProfileInt
 #undef GetPrivateProfileString
 #undef WritePrivateProfileString
@@ -1291,11 +1285,11 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 				index = (int)SendDlgItemMessageA(dlg, IDC_HOSTCOM, CB_GETITEMDATA, pos, 0);
 				GetHNRec->ComPort = dlg_data->ComPortInfoPtr[index].port_no;
 			}
-			EndDialog(dlg, 1);
+			TTEndDialog(dlg, 1);
 			return TRUE;
 
 		case IDCANCEL:
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDC_HOSTTCPIP:
@@ -1391,7 +1385,7 @@ static BOOL PASCAL TTXGetHostName(HWND parent, PGetHNRec rec)
 	SetDialogFont(pvar->ts->DialogFontNameW, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
 	              pvar->ts->UILanguageFileW, "TTSSH", "DLG_TAHOMA_FONT");
 //	              pvar->ts->UILanguageFile, "TTSSH", "DLG_SYSTEM_FONT");
-	return (BOOL)DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_HOSTDLG), parent, TTXHostDlg, (LPARAM)rec);
+	return (BOOL)TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_HOSTDLG), parent, TTXHostDlg, (LPARAM)rec);
 }
 
 static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks)
@@ -2252,11 +2246,11 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lP
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			EndDialog(dlg, 1);
+			TTEndDialog(dlg, 1);
 			return TRUE;
 		case IDCANCEL:			/* there isn't a cancel button, but other Windows
 								   UI things can send this message */
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 		case IDC_FP_HASH_ALG_MD5:
 			about_dlg_set_abouttext(pvar, dlg, SSH_DIGEST_MD5);
@@ -2975,11 +2969,11 @@ static INT_PTR CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 		switch (LOWORD(wParam)) {
 		case IDOK:
 			complete_setup_dlg((PTInstVar) GetWindowLongPtr(dlg, DWLP_USER), dlg);
-			EndDialog(dlg, 1);
+			TTEndDialog(dlg, 1);
 			return TRUE;
 		case IDCANCEL:			/* there isn't a cancel button, but other Windows
 								   UI things can send this message */
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 		case IDC_SSHSETUP_HELP:
 			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpMenuSetupSsh, 0);
@@ -3524,7 +3518,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 
 				SavePaths(dlg, pvar->ts);
 
-				EndDialog(dlg, 1); // dialog close
+				TTEndDialog(dlg, 1); // dialog close
 				return TRUE;
 			}
 			return FALSE;
@@ -3533,7 +3527,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 		case IDCANCEL: {
 			SavePaths(dlg, pvar->ts);
 
-			EndDialog(dlg, 0); // dialog close
+			TTEndDialog(dlg, 0); // dialog close
 			return TRUE;
 		}
 
@@ -3580,7 +3574,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 
 				SavePaths(dlg, pvar->ts);
 
-				EndDialog(dlg, 1); // dialog close
+				TTEndDialog(dlg, 1); // dialog close
 				return TRUE;
 			}
 			return FALSE;
@@ -4051,7 +4045,7 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		case IDCANCEL:
 			// don't forget to free SSH resource!
 			free_ssh_key();
-			EndDialog(dlg, 0); // dialog close
+			TTEndDialog(dlg, 0); // dialog close
 			return TRUE;
 
 		case IDC_SSHKEYGENSETUP_HELP:
@@ -4683,7 +4677,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 
 	case ID_SSHSCPMENU:
 		UTIL_SetDialogFont();
-		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHSCP), hWin, TTXScpDialog,
+		if (TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHSCP), hWin, TTXScpDialog,
 			(LPARAM) pvar) == -1) {
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
@@ -4697,7 +4691,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 
 	case ID_SSHKEYGENMENU:
 		UTIL_SetDialogFont();
-		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHKEYGEN), hWin, TTXKeyGenerator,
+		if (TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHKEYGEN), hWin, TTXKeyGenerator,
 			(LPARAM) pvar) == -1) {
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
@@ -4713,7 +4707,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 		AboutDlgData *data = (AboutDlgData *)calloc(1, sizeof(*data));
 		UTIL_SetDialogFont();
 		data->pvar = pvar;
-		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_ABOUTDIALOG), hWin, TTXAboutDlg, (LPARAM)data) == -1) {
+		if (TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_ABOUTDIALOG), hWin, TTXAboutDlg, (LPARAM)data) == -1) {
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
 				"MSG_TTSSH_ERROR", L"TTSSH Error",
@@ -4731,8 +4725,8 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 		return 1;
 	case ID_SSHSETUPMENU:
 		UTIL_SetDialogFont();
-		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHSETUP),
-		                   hWin, TTXSetupDlg, (LPARAM) pvar) == -1) {
+		if (TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHSETUP),
+							 hWin, TTXSetupDlg, (LPARAM) pvar) == -1) {
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
 				"MSG_TTSSH_ERROR", L"TTSSH Error",

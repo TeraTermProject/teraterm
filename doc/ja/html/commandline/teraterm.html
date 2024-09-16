@@ -22,7 +22,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
          [/F=&lt;setup file&gt;] [/FD=&lt;file transfer directory&gt;]
          [/H] [/I] [/K=&lt;keyboard setup file&gt;]
          [/KR=&lt;kanji code (receive)&gt;] [/KT=&lt;kanji code (transmit)&gt;]
-         [/L=&lt;log file&gt;] [/LA=&lt;language&gt;] [/M=&lt;macro file&gt;] [/NOLOG]
+         [/L=&lt;log file&gt;] [/M=&lt;macro file&gt;] [/NOLOG]
          [/P=&lt;TCP port#&gt;] [/R=&lt;replay file&gt;] [/SPEED=&lt;speed&gt;] [/T=&lt;telnet flag&gt;]
          [/TEKICON=&lt;icon name&gt;] [/TIMEOUT=&lt;connecting timeout value&gt;]
          [/V] [/VTICON=&lt;icon name&gt;] [/W="&lt;window title&gt;"] [/WAITCOM]
@@ -194,16 +194,6 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>起動時にログを開始<br />
       ファイル名に含まれた<a href="../menu/setup-additional-log.html#LogFileNameFormat">Tera Term と strftime の書式</a>が解釈されます。<br />
       ファイル名がフルパスでないときは、<a href="../menu/setup-additional-log.html#LogFullpath">フルパスに変換</a>して開かれます。</dd>
-
-  <dt id="la">/LA=&lt;language&gt;</dt>
-  <dd>言語モード
-      <ul>
-        <li><span class="syntax">/LA=E</span> 英語</li>
-        <li><span class="syntax">/LA=J</span> 日本語</li>
-        <li><span class="syntax">/LA=K</span> 韓国語</li>
-        <li><span class="syntax">/LA=R</span> ロシア語</li>
-        <li><span class="syntax">/LA=U</span> UTF-8</li>
-      </ul></dd>
 
   <dt id="m">/M=&lt;macro file&gt;</dt>
   <dd>起動時にマクロを実行<br>

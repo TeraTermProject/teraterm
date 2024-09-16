@@ -382,7 +382,7 @@ void SSH2_update_cipher_myproposal(PTInstVar pvar)
 {
 	static char buf[512]; // TODO: malloc()‚É‚·‚×‚«
 	int cipher;
-	int len, i;
+	size_t len, i;
 	char *c_str;
 
 	// ’ÊM’†‚ÉŒÄ‚Î‚ê‚é‚Æ‚¢‚¤‚±‚Æ‚ÍƒL[Äì¬

@@ -707,7 +707,7 @@ void SetupDirectoryDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv)
 {
 	dlg_data_t* dlg_data = (dlg_data_t*)calloc(1, sizeof(dlg_data_t));
 	dlg_data->pcv = pcv;
-	TTDialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
+	TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SETUP_DIR_DIALOG),
 					 hWnd, OnSetupDirectoryDlgProc, (LPARAM)dlg_data);
 	free(dlg_data);
 }

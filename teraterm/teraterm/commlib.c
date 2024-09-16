@@ -310,8 +310,8 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	cv->CRSend = ts->CRSend;
 	cv->KanjiCodeEcho = ts->KanjiCode;
 	cv->KanjiCodeSend = ts->KanjiCodeSend;
-	MakeOutputStringInit(cv->StateEcho, ts->Language, ts->KanjiCode, ts->KanjiIn, ts->KanjiOut, ts->JIS7Katakana);
-	MakeOutputStringInit(cv->StateSend, ts->Language, ts->KanjiCodeSend, ts->KanjiIn, ts->KanjiOut, ts->JIS7KatakanaSend);
+	MakeOutputStringInit(cv->StateEcho, ts->KanjiCode, ts->KanjiIn, ts->KanjiOut, ts->JIS7Katakana);
+	MakeOutputStringInit(cv->StateSend, ts->KanjiCodeSend, ts->KanjiIn, ts->KanjiOut, ts->JIS7KatakanaSend);
 	cv->DelayFlag = TRUE;
 	cv->DelayPerChar = ts->DelayPerChar;
 	cv->DelayPerLine = ts->DelayPerLine;

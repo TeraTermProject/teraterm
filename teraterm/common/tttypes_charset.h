@@ -29,23 +29,9 @@
 
 #pragma once
 
-/* Language */
 typedef enum {
-	IdEnglish  = 1,
-	IdJapanese,
-	IdRussian,
-	IdKorean,  	//HKS
-	IdUtf8,
-	IdChinese,
-	IdDebug,
-	IdLangMax,
-} IdLanguage;
-
-  /* Kanji Code ID */
-  /*  ts.KanjiCode, ts.KanjiCodeSend ÇÃíl */
-
-// ts.Language == IdEnglish
-typedef enum {
+	IdUTF8,
+	// English
 	IdISO8859_1,
 	IdISO8859_2,
 	IdISO8859_3,
@@ -61,34 +47,20 @@ typedef enum {
 	IdISO8859_14,
 	IdISO8859_15,
 	IdISO8859_16,
+	// Japanese
+	IdSJIS,
+	IdEUC,
+	IdJIS,
+	// Russian code sets
+	IdWindows,			// CP1251
+	IdKOI8,
+	Id866,
+	IdISO,
+	// Korean
+	IdKoreanCP949,		// CP949, KS5601
+	// Chinese
+	IdCnGB2312,			// CP936, GB2312
+	IdCnBig5,			// CP950, Big5
+	// Debug
+	IdDebug,
 } IdKanjiCode;
-
-// ts.Language == IdJapanese
-#define IdSJIS  1
-#define IdEUC   2
-#define IdJIS   3
-#define IdUTF8  4		// IdUtf8 (è¨ï∂éö)ÇÕ ts.Language óp
-
-// ts.Language == IdRussian
-// Russian code sets
-#define IdWindows 1
-#define IdKOI8    2
-#define Id866     3
-#define IdISO     4
-
-// ts.Language == IdKorean
-// Korean
-#define	IdKoreanCP949 1		// CP949, KS5601
-
-// ts.Language == IdChinese
-// Chinese
-#define	IdCnGB2312		1	// 1 CP936, GB2312
-#define	IdCnBig5		2	// 2 CP950, Big5
-
-  /* KanjiIn modes */
-#define IdKanjiInA 1
-#define IdKanjiInB 2
-  /* KanjiOut modes */
-#define IdKanjiOutB 1
-#define IdKanjiOutJ 2
-#define IdKanjiOutH 3

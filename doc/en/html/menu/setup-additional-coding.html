@@ -34,7 +34,7 @@
     Refer to <a href="setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a> for Tera Term drawing character width.
     If you change Coding-receive by pull-down, width is changed to typical characte witdh of that code automatically. Nevertheless, that width is not absolutely recommend, you can choose the width what you want for font or other reasons.
 
-    <h3>Override Emoji Characters width</h3>
+    <h3 id="UnicodeEmojiOverride">Override Emoji Characters width</h3>
 
     When checked, Overrides characters width from East_Asian_Width.<br>
     Refer to <a href="#emoji">About Emoji width (cells)</a>.
@@ -76,27 +76,34 @@
 
     <h2 id="JapaneseJIS">Japanese JIS</h2>
 
+    <h3>Reveive</h3>
+
     <dl>
-      <dt id="KatakanaReceive">Half-width kana (receive)</dt>
+      <dt id="KatakanaReceive">Half-width kana</dt>
       <dd>
         When "HANKAKU" katakana code from host is described for 7bit
         (Shift control with SO/SI is using), please select this entry.
         This is only enabled when Kanji (receive) is JIS.
       </dd>
-      <dt id="KatakanaSend">Half-width kana (transmit)</dt>
+    </dl>
+
+    <h3>Transmit</h3>
+
+    <dl>
+      <dt id="KatakanaSend">Half-width kana</dt>
       <dd>
         When "HANKAKU" katakana code from host is described for 7bit
         (Shift control with SO/SI is using), please select this entry.
         This is only enabled when Kanji (transmit) is JIS.
       </dd>
-      <dt id="KanjiIn">Kanji-in (transmit)</dt>
+      <dt id="KanjiIn">Kanji-in</dt>
       <dd>
         The escape sequence is used when Kanji (transmit) is JIS.
         (Sequence regarding Kanji character is specified to G0.
         ^[$@ or ^[$B).
         The escape sequence from host can use any sequence.
       </dd>
-      <dt id="KanjiOut">Kanji-out (transmit)</dt>
+      <dt id="KanjiOut">Kanji-out</dt>
       <dd>
         The escape sequence is used when Kanji (transmit) is JIS.
         (Sequence regarding ASCII and JIS Roman code is specified to G0.
@@ -111,15 +118,7 @@
 
     <hr>
 
-    <h2>Easy to setup</h2>
-    <dl>
-      <dt>Use with Chinese, Japanese, and Korean (<a href="../about/glossary.html#CJK">CJK</a>)</dt>
-      <dd>
-        Select coding with "Japanese/" etc. such as Japanese/UTF-8<br>
-        - Ambiguous Characters Width = 2Cell<br>
-        - Override Emoji Characters Width is checkd, width = 2Cell
-      </dd>
-    </dl>
+    <h1>Unicode setting</h1>
 
     <h2>Charactor width (cells)</h2>
 
@@ -227,7 +226,7 @@ cells(2=full/1=half)
 
     <p>
       Attributes are determined based on the following data<br>
-      http://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt
+      <a href="http://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt" target="_blank">http://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt</a>
     </p>
 
     <h2 id="emoji">About Emoji width (cells)</h2>
@@ -248,7 +247,7 @@ cells(2=full/1=half)
 
     <p>
       The following information is used to determine Emoji.<br>
-      https://www.unicode.org/Public/emoji/12.1/emoji-data.txt<br>
+      <a href="https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt</a><br>
       However, code points less than U+0080 are not treated as Emoji
     </p>
 

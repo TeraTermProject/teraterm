@@ -74,9 +74,14 @@ function(GetMsys2Path path)
     endif()
   elseif(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
     # msys2/mingw64 or msys2/mingw32 or Windows のcmake
-    set(PATH "c:/msys64/usr/bin")   # msys2インストールフォルダ
-    if (EXISTS ${PATH})
+    set(PATH "${CMAKE_CURRENT_LIST_DIR}/../../buildtools/msys64/usr/bin")
+    if (NOT EXISTS ${PATH})
+      set(PATH "c:/msys64/usr/bin")   # msys2インストールフォルダ
+    endif()
+    if (EXISTS "${PATH}/msys-2.0.dll")
       set(${path} ${PATH} PARENT_SCOPE)
+    else()
+      unset(${path} PARENT_SCOPE)
     endif()
   elseif(${CMAKE_HOST_SYSTEM_NAME} MATCHES "CYGWIN")
     # cygwin の cmake ,未実装

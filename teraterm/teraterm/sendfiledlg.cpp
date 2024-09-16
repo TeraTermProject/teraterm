@@ -248,6 +248,6 @@ INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data)
 {
 	INT_PTR ret;
 	data->method_4 = FALSE;
-	ret = TTDialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_SENDFILEDLG), hWndParent, SendFileDlgProc, (LPARAM)data);
+	ret = TTDialogBoxParam(hInstance, MAKEINTRESOURCEW(IDD_SENDFILEDLG), hWndParent, SendFileDlgProc, (LPARAM)data);
 	return ret;
 }

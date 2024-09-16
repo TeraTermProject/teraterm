@@ -141,7 +141,7 @@ BOOL WINAPI _WindowWindow(HWND WndParent, PBOOL Close)
 	*Close = FALSE;
 	return
 		(BOOL)TTDialogBoxParam(hInst,
-							   MAKEINTRESOURCE(IDD_WINLISTDLG),
+							   MAKEINTRESOURCEW(IDD_WINLISTDLG),
 							   WndParent,
 							   WinListDlg, (LPARAM)Close);
 }

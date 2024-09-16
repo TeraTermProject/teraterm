@@ -20,14 +20,6 @@
 #define IDC_TERMANSBACKTEXT             109
 #define IDC_TERMANSBACK                 110
 #define IDC_TERMAUTOSWITCH              111
-#define IDC_TERMKANJI                   112
-#define IDC_TERMKANA                    113
-#define IDC_TERMKANJISEND               114
-#define IDC_TERMKANASEND                115
-#define IDC_TERMKINTEXT                 116
-#define IDC_TERMKIN                     117
-#define IDC_TERMKOUTTEXT                118
-#define IDC_TERMKOUT                    119
 #define IDC_TERMRUSSHOST                120
 #define IDC_TERMRUSSCLIENT              121
 #define IDC_TERMHELP                    199
@@ -146,8 +138,6 @@
 #define IDC_TERMCRRCVLABEL              1059
 #define IDC_TERMCRSENDLABEL             1060
 #define IDC_TERMIDLABEL                 1061
-#define IDC_TERMKANJILABEL              1062
-#define IDC_TERMKANJISENDLABEL          1063
 #define IDC_WINLISTLABEL                1068
 #define IDC_SELECT_DIR                  1070
 #define IDC_BUILDTOOL                   1072
@@ -162,7 +152,6 @@
 #define IDC_WINLISTCLOSE                1202
 #define IDC_WINLISTHELP                 1299
 #define IDC_GENLANGUI_LABEL             1300
-#define IDC_OPEN_CODING                 1301
 
 // Next default values for new objects
 //

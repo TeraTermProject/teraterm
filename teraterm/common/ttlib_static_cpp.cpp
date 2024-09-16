@@ -1438,8 +1438,8 @@ void CreateBakupFile(const wchar_t *fname, const wchar_t *prev_str)
 	free(dup);
 	free(name);
 
-	MoveFileW(fname, bak_fname);
-	CopyFileW(bak_fname, fname, TRUE);
+	CopyFileW(fname, bak_fname, TRUE);
+
 	free(bak_fname);
 	if (date_str != NULL) {
 		free(date_str);

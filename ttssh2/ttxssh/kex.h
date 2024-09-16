@@ -71,7 +71,7 @@ typedef enum {
 	KEX_DH_MAX = KEX_DH_UNKNOWN,
 } kex_algorithm;
 
-char* get_kex_algorithm_name(kex_algorithm kextype);
+const char* get_kex_algorithm_name(kex_algorithm kextype);
 const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype);
 
 void normalize_kex_order(char *buf);
