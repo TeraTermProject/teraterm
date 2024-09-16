@@ -51,7 +51,7 @@ TTCPropertyPage::TTCPropertyPage(HINSTANCE inst, int id)
 	m_psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if defined(REWRITE_TEMPLATE)
 	m_psp.dwFlags |= PSP_DLGINDIRECT;
-	m_psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEA(id));
+	m_psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(id));
 #endif
 	m_psp.pfnDlgProc = Proc;
 	m_psp.lParam = (LPARAM)this;

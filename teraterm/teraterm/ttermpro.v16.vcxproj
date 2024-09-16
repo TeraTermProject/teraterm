@@ -177,6 +177,7 @@
     <ClCompile Include="checkeol.cpp" />
     <ClCompile Include="clipboar.c" />
     <ClCompile Include="coding_pp.cpp" />
+    <ClCompile Include="color_sample.cpp" />
     <ClCompile Include="commlib.c" />
     <ClCompile Include="dnddlg.cpp" />
     <ClCompile Include="filesys.cpp" />
@@ -201,6 +202,7 @@
     <ClCompile Include="telnet.c" />
     <ClCompile Include="teraprn.cpp" />
     <ClCompile Include="teraterm.cpp" />
+    <ClCompile Include="term_pp.cpp" />
     <ClCompile Include="themedlg.cpp" />
     <ClCompile Include="themefile.cpp" />
     <ClCompile Include="theme_pp.cpp" />
@@ -216,6 +218,7 @@
     <ClCompile Include="vtterm.c" />
     <ClCompile Include="vtwin.cpp" />
     <ClCompile Include="winjump.c" />
+    <ClCompile Include="win_pp.cpp" />
     <ClCompile Include="WSAAsyncGetAddrInfo.c" />
     <ClCompile Include="unicode.cpp" />
     <ClInclude Include="../ttpdlg/dlg_res.h" />
@@ -248,6 +251,7 @@
     <ClInclude Include="checkeol.h" />
     <ClInclude Include="coding_pp.h" />
     <ClInclude Include="coding_pp_res.h" />
+    <ClInclude Include="color_sample.h" />
     <ClInclude Include="filesys_log_res.h" />
     <ClInclude Include="font_pp.h" />
     <ClInclude Include="font_pp_res.h" />
@@ -266,6 +270,8 @@
     <ClCompile Include="clipboarddlg.cpp" />
     <ClInclude Include="debug_pp.h" />
     <ClCompile Include="debug_pp.cpp" />
+    <ClInclude Include="term_pp.h" />
+    <ClInclude Include="win_pp.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico" />

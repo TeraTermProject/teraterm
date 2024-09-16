@@ -53,7 +53,7 @@ void SetEditboxEmacsKeybind(HWND hDlg, int nID);
 void TTSetDlgFontA(const char *face, int height, int charset);
 void TTSetDlgFontW(const wchar_t *face, int height, int charset);
 const wchar_t *TTGetClassName(const DLGTEMPLATE *DlgTempl);
-DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCTSTR lpTemplateName);
+DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCWSTR lpTemplateName);
 DLGTEMPLATE *TTGetNewDlgTemplate(
 	HINSTANCE hInst, const DLGTEMPLATE *src,
 	size_t *PrevTemplSize, size_t *NewTemplSize);
@@ -66,24 +66,24 @@ HWND TTCreateDialogIndirectParam(
 	LPARAM lParamInit);
 HWND TTCreateDialogParam(
 	HINSTANCE hInstance,
-	LPCTSTR lpTemplateName,
+	LPCWSTR lpTemplateName,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc,
 	LPARAM lParamInit);
 HWND TTCreateDialog(
 	HINSTANCE hInstance,
-	LPCTSTR lpTemplateName,
+	LPCWSTR lpTemplateName,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc);
 INT_PTR TTDialogBoxParam(
 	HINSTANCE hInstance,
-	LPCTSTR lpTemplateName,
+	LPCWSTR lpTemplateName,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc,
 	LPARAM lParamInit);
 INT_PTR TTDialogBox(
 	HINSTANCE hInstance,
-	LPCTSTR lpTemplateName,
+	LPCWSTR lpTemplateName,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc);
 void SetDialogFont(const wchar_t *FontName, int FontHeight, int FontCharSet,

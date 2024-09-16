@@ -690,7 +690,7 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 
 	if ((u_int)mac->mac_len > sizeof(m)) {
 		logprintf(LOG_LEVEL_VERBOSE, "HMAC len(%d) is larger than %d bytes(seq %lu len %d)",
-		          mac->mac_len, sizeof(m), sequence_number, len);
+		          mac->mac_len, (int)sizeof(m), sequence_number, len);
 		goto error;
 	}
 

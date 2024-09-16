@@ -63,13 +63,6 @@
 
 #define USER_PASSWORD_IS_UTF8	1
 
-#undef DialogBoxParam
-#define DialogBoxParam(p1,p2,p3,p4,p5) \
-	TTDialogBoxParam(p1,p2,p3,p4,p5)
-#undef EndDialog
-#define EndDialog(p1,p2) \
-	TTEndDialog(p1, p2)
-
 void destroy_malloced_string(char **str)
 {
 	if (*str != NULL) {
@@ -835,7 +828,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		do_SSH2_userauth(pvar);
 	}
 
-	EndDialog(dlg, 1);
+	TTEndDialog(dlg, 1);
 
 	return TRUE;
 }
@@ -1013,13 +1006,13 @@ static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 canceled:
 			pvar->auth_state.auth_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDCLOSE:
 			// 認証中にネットワーク切断された場合、当該メッセージでダイアログを閉じる。
 			pvar->auth_state.auth_dialog = NULL;
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDC_SSHUSERNAME:
@@ -1434,7 +1427,7 @@ static BOOL end_TIS_dlg(PTInstVar pvar, HWND dlg)
 
 	SSH_notify_cred(pvar);
 
-	EndDialog(dlg, 1);
+	TTEndDialog(dlg, 1);
 	return TRUE;
 }
 
@@ -1470,13 +1463,13 @@ static INT_PTR CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case IDCANCEL:			/* kill the connection */
 			pvar->auth_state.auth_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDCLOSE:
 			// 認証中にネットワーク切断された場合、当該メッセージでダイアログを閉じる。
 			pvar->auth_state.auth_dialog = NULL;
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		default:
@@ -1493,24 +1486,24 @@ void AUTH_do_cred_dialog(PTInstVar pvar)
 	if (pvar->auth_state.auth_dialog == NULL) {
 		HWND cur_active = GetActiveWindow();
 		DLGPROC dlg_proc;
-		LPCTSTR dialog_template;
+		LPCWSTR dialog_template;
 		INT_PTR r;
 
 		switch (pvar->auth_state.mode) {
 		case TIS_AUTH_MODE:
-			dialog_template = MAKEINTRESOURCE(IDD_SSHTISAUTH);
+			dialog_template = MAKEINTRESOURCEW(IDD_SSHTISAUTH);
 			dlg_proc = TIS_dlg_proc;
 			break;
 		case GENERIC_AUTH_MODE:
 		default:
-			dialog_template = MAKEINTRESOURCE(IDD_SSHAUTH);
+			dialog_template = MAKEINTRESOURCEW(IDD_SSHAUTH);
 			dlg_proc = auth_dlg_proc;
 		}
 
-		r = DialogBoxParam(hInst, dialog_template,
-						   cur_active !=
-						   NULL ? cur_active : pvar->NotificationWindow,
-						   dlg_proc, (LPARAM) pvar);
+		r = TTDialogBoxParam(hInst, dialog_template,
+							 cur_active !=
+							 NULL ? cur_active : pvar->NotificationWindow,
+							 dlg_proc, (LPARAM) pvar);
 		if (r == -1) {
 			UTIL_get_lang_msg("MSG_CREATEWINDOW_AUTH_ERROR", pvar,
 			                  "Unable to display authentication dialog box.\n"
@@ -1647,7 +1640,7 @@ static BOOL end_default_auth_dlg(PTInstVar pvar, HWND dlg)
 		pvar->settings.CheckAuthListFirst = FALSE;
 	}
 
-	EndDialog(dlg, 1);
+	TTEndDialog(dlg, 1);
 	return TRUE;
 }
 
@@ -1673,7 +1666,7 @@ static INT_PTR CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 			return end_default_auth_dlg(pvar, dlg);
 
 		case IDCANCEL:
-			EndDialog(dlg, 0);
+			TTEndDialog(dlg, 0);
 			return TRUE;
 
 		case IDC_SSHAUTHSETUP_HELP:
@@ -1740,10 +1733,10 @@ void AUTH_do_default_cred_dialog(PTInstVar pvar)
 {
 	HWND cur_active = GetActiveWindow();
 
-	if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHAUTHSETUP),
-		               cur_active != NULL ? cur_active
+	if (TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_SSHAUTHSETUP),
+						 cur_active != NULL ? cur_active
 		                                  : pvar->NotificationWindow,
-		               default_auth_dlg_proc, (LPARAM) pvar) == -1) {
+						 default_auth_dlg_proc, (LPARAM) pvar) == -1) {
 		UTIL_get_lang_msg("MSG_CREATEWINDOW_AUTHSETUP_ERROR", pvar,
 		                  "Unable to display authentication setup dialog box.");
 		notify_nonfatal_error(pvar, pvar->UIMsg);

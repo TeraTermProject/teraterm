@@ -46,6 +46,12 @@ typedef struct CharSetOpTag {
 	void (*ParseControl)(BYTE b, void *client_data);
 } CharSetOp;
 
+/* Character sets */
+#define IdASCII    0
+#define IdKatakana 1
+#define IdKanji    2
+#define IdSpecial  3
+
 // input
 void ParseFirst(CharSetData *w, BYTE b);
 
