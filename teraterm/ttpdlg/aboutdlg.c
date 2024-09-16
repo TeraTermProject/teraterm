@@ -300,7 +300,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 			// build info
 			{
-				// コンパイラ、日時、SDK
+				// コンパイラ、SDK、日時、Gitブランチ名(あれば)
 				char *info;
 				char tmpbuf[128];
 				char sdk[128];
@@ -309,11 +309,20 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 				asprintf(&info,
 						 "Build info:\r\n"
 						 "  Compiler: %s\r\n"
+						 "  SDK: %s\r\n"
 						 "  Date and Time: %s %s\r\n"
-						 "  SDK: %s",
+#if defined(BRANCH_NAME)
+						 "  Git Branch: %s"
+#endif
+						 ,
 						 tmpbuf,
-						 __DATE__, __TIME__,
-						 sdk);
+						 sdk,
+						 __DATE__, __TIME__
+#if defined(BRANCH_NAME)
+						,
+						 BRANCH_NAME
+#endif
+					     );
 
 				SetDlgItemTextA(Dialog, IDC_BUILDTOOL, info);
 				free(info);
