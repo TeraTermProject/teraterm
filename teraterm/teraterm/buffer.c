@@ -4578,10 +4578,9 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 	TmpPtr = GetLinePtr(Y);
 	LockBuffer();
 
-	X = LeftHalfOfDBCS(TmpPtr, X);
+	// X = LeftHalfOfDBCS(TmpPtr, X);
 
 	// check if the cursor is on the right half of a character
-#if 0
 	if ((X>0) &&
 	    (((CodeBuffW[TmpPtr+X-1].attr & AttrKanji) != 0) || (X<NumOfColumns)) &&
 	    ((CodeBuffW[TmpPtr+X].attr & AttrKanji) == 0) &&
@@ -4592,7 +4591,6 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 	if (X > NumOfColumns) {
 		X = NumOfColumns;
 	}
-#endif
 
 	SelectEnd.x = X;
 	SelectEnd.y = Y;
