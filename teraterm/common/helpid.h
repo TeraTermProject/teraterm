@@ -160,6 +160,8 @@
 #define HlpMenuSetupAdditionalGeneral       43028
 #define HlpMenuSetupAdditionalTCPIP         43029
 #define HlpMenuSetupAdditionalCopyAndPaste  43030
+#define HlpMenuSetupAdditionalCtrlSeq       43031
+#define HlpMenuSetupAdditionalCygwin        43032
 #define HlpMenuSetupSave                    43013
 #define HlpMenuSetupRestore                 43014
 #define HlpMenuSetupDir                     43016

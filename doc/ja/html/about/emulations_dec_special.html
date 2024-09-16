@@ -72,14 +72,14 @@ echo -e "_abcdefghijklmnopqrstuvwxyz\x7b\x7c\x7e\r\n\x0e_abcdefghijklmnopqrstuvw
 
 <p>
   CJK(日本語)環境ではTera Termは罫線や一部の記号を2カラム幅で表示します。
-  (文字の幅は設定で変更できます。<a href="../menu/setup-additional-coding.html#AmbiguousCharactersWidth">Additional settings / "coding" タブ, Ambiguous Characters width</a>を参照ください。)
+  (文字の幅は設定で変更できます。<a href="../menu/setup-additional-coding.html#AmbiguousCharactersWidth">Additional settings / "Encoding" タブ, Ambiguous Characters width</a>を参照ください。)
 </p>
 
 <p>
   しかし、ホスト側のアプリケーションによってはUTF-8エンコーディング時にはこれらの文字が1カラム幅で表示されると期待した出力を行う物があり、その結果画面出力が崩れる場合があります。<br>
 また英語環境では罫線を+-|を使って表示したり、対応していない文字を??と表示したりします。<br>
 Tera Termでは、これらの文字でDEC Special Graphicsに近い物がある物は、それを使って表示するようにする事ができ、それによって表示の崩れを軽減する事ができます。
-<a href="../menu/setup-additional-coding.html#DecSpecial">Additional settings / "coding" タブ, DEC Special Graphics</a>で設定できます。<br>
+<a href="../menu/setup-additional-coding.html#DecSpecial">Additional settings / "Encoding" タブ, DEC Special Graphics</a>で設定できます。<br>
 ただし、マウスで選択した時にクリップボードにコピーされる文字が本来とは別の文字になってしまうという副作用があります。
 </p>
 

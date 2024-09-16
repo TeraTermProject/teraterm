@@ -299,7 +299,10 @@ HPROPSHEETPAGE ThemePageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
-	psp.pszTitle = L"Theme";
+	wchar_t* UIMsg;
+	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_THEME",
+		         L"Theme", pts->UILanguageFileW, &UIMsg);
+	psp.pszTitle = UIMsg;
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 #if defined(REWRITE_TEMPLATE)
 	psp.dwFlags |= PSP_DLGINDIRECT;
@@ -311,5 +314,6 @@ HPROPSHEETPAGE ThemePageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.lParam = (LPARAM)Param;
 
 	HPROPSHEETPAGE hpsp = CreatePropertySheetPageW((LPPROPSHEETPAGEW)&psp);
+	free(UIMsg);
 	return hpsp;
 }
