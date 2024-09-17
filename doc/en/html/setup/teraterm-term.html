@@ -95,6 +95,48 @@ Default:
 Send8BitCtrl=off
 </pre>
 
+<h1 id="kout">Enable incorrect "kanji-out"</h1>
+
+<p>
+The "kanji-out" sequence ^[(H used in some systems does not comply with JIS/ISO standards. Do not use it unless it is really necessary. Bay default, ^[(H can not be selected in the [Setup] terminal dialog box to prevent mistakes.
+</p>
+
+<p>
+To select ^[(H as "kanji-out" sequence, edit the AllowWrongSequence line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+AllowWrongSequence=on
+</pre>
+
+<pre>
+Default:
+AllowWrongSequence=off
+</pre>
+
+
+<h1 id="kctrl">Invalidate first character of a 2-byte character(Kanji) when a control character is placed between the first and second bytes</h1>
+
+<p>
+Even if a control character (e.g. line feed character) is placed between the first and second bytes of a 2-byte character (Kanji) sent from the host, both the 2-byte character and the control character will be handled correctly by Tera Term's default settings.
+</p>
+
+<p>
+To invalidate the first character of a 2-byte character(Kanji) when a control character is placed between the first and second bytes, edit the CtrlInKanji line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+CtrlInKanji=off
+</pre>
+
+<p>
+If a second byte comes after this, it will be shown as garbage. For applications that do not handle 2-byte characters correctly, this may result in fewer garbled screen characters. For example, if there is an application that produces a newline character after the first byte of a Kanji character, but not the second byte after it, the Kanji character will be discarded, but the characters that come after the newline character will not be garbled.
+</p>
+
+<pre>
+Default:
+CtrlInKanji=on
+</pre>
 
 <h1 id="displayall">Displaying all received characters</h1>
 
@@ -238,7 +280,7 @@ ScrollWindowClearScreen=on
   See next pages.
   <ul>
     <li><a href="../about/emulations_dec_special.html">DEC Special Graphics</a></li>
-    <li><a href="../menu/setup-additional-coding.html#DecSpecial">Additional settings / "coding" tab, DEC Special Graphics</a></li>
+    <li><a href="../menu/setup-additional-coding.html#DecSpecial">Additional settings / "Encoding" tab, DEC Special Graphics</a></li>
     <li><a href="../about/qanda.html#dec_special_graphic">Frequently asked questions</a></li>
   </ul>
 </p>

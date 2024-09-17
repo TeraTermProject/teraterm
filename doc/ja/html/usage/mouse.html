@@ -42,22 +42,29 @@ VT window
 <dd>1行選択します。<br>
   選択文字列は<a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">設定</a>されていればクリップボードにコピーされます。</dd>
 
+<dt>左クリック の後、 Shift+左クリック</dt>
+<dd>ページをまたぐテキスト選択、選択済みテキスト領域の伸縮ができます。最初のクリックで開始位置を指定し、次の Shift+クリックで終了位置を指定します。</dd>
+
 <dt>右ボタンでドラッグ</dt>
-<dd>文字列を選択し、それをクリップボードにコピーし、さらにそれをホストへ送出する。<br>
-    <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> および <a href="../menu/setup-additional.html">SelectOnlyByLButton</a> が無効のときに動作する。</dd>
+<dd>文字列を選択し、それをクリップボードにコピーし、さらにそれをホストへ送出します。<br>
+    <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> および <a href="../menu/setup-additional.html">SelectOnlyByLButton</a> が無効のときに動作します。</dd>
 
 <dt>右ボタンをクリック</dt>
-<dd>クリップボードの中の文字列をホストへ送出する。<br>
-    <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> が無効のときに動作する。</dd>
+<dd>クリップボードの中の文字列をホストへ送出します。<br>
+    <a href="../menu/setup-additional-copy-and-paste.html">DisableMouseRButtonPaste</a> が無効のときに動作します。</dd>
+
+<dt>中ボタンをクリック</dt>
+<dd>クリップボードの中の文字列をホストへ送出します。<br>
+    <a href="../setup/teraterm-misc.html#DisablePasteMouseMButton">DisableMouseMButtonPaste</a> が無効のときに動作します。</dd>
 
 <dt>タイトルバーの上で左ボタンをダブルクリック</dt>
 <dd><a href="../menu/setup-terminal.html#TermIsWin">Term size = win size</a>の設定によって動作が変わります。
   <dl>
     <dt>onの時</dt>
-    <dd>ウィンドウのサイズを最大化します。既に最大化されている場合は、もとのサイズに戻します。</dd>
+    <dd>ウィンドウを最大化します。既に最大化されている場合は、もとのサイズに戻します。</dd>
 
     <dt>offの時</dt>
-    <dd>ウインドウサイズ(ウインドウの実際の大きさ)がターミナルサイズ(端末の論理的な画面の大きさ)と異なるとき、ウィンドウサイズをターミナルサイズと同じになるように変更します。その後、もう一度タイトルバーをダブルクリックすると、もとのウインドウサイズに戻ります。</dd>
+    <dd>ウィンドウサイズ(ウィンドウの実際の大きさ)がターミナルサイズ(端末の論理的な画面の大きさ)と異なるとき、ウィンドウサイズをターミナルサイズと同じになるように変更します。その後、もう一度タイトルバーをダブルクリックすると、もとのウインドウサイズに戻ります。</dd>
   </dl>
 </dd>
 
@@ -66,6 +73,11 @@ VT window
 
 <dt>Alt キーを押しながら左ボタンでウィンドウをドラッグ</dt>
 <dd>タイトルバーがない場合、ウィンドウを移動します。タイトルバーを隠すには、<A HREF="../menu/setup-window.html">[Setup] Window</A> で Hide title bar を選択してください。</dd>
+
+<dt>Alt+Shift キーを押しながら左ボタンでウィンドウをドラッグ</dt>
+<dd>タイトルバーあるいはウィンドウ枠がない場合、ウィンドウサイズを変更します。
+ウィンドウ枠をなくすには、<A HREF="../menu/setup-window.html">[Setup] Window</A> で No Frame を選択してください。
+</dd>
 
 <dt>Alt キーを押しながら右ボタンをクリック</dt>
 <dd>タイトルバーがない場合、ウィンドウを最小化します。</dd>
@@ -203,8 +215,8 @@ VT window
   </dl>
 </dd>
 
-<dt>中ボタンでドラッグ・中ボタンをクリック</dt>
-<dd>これらのアクションはサポートされなくなりました。</dd>
+<dt>中ボタンでドラッグ</dt>
+<dd>このアクションはサポートされなくなりました。</dd>
 </dl>
 
 <h2>
@@ -216,10 +228,10 @@ TEK window
 <dd>画像を選択します。</dd>
 
 <dt>右ボタンをクリック</dt>
-<dd>VT window と同じ。</dd>
+<dd>VT window と同じです。</dd>
 
-<dt>Ctrlキーを押しながら左ボタンを押す</dt>
-<dd>VT window と同じ。</dd>
+<dt>Ctrlキーを押しながら左ボタンをクリック</dt>
+<dd>VT window と同じです。</dd>
 
 </dl>
 

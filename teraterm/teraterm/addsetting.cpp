@@ -298,7 +298,7 @@ void CSequencePropPageDlg::OnOK()
 
 void CSequencePropPageDlg::OnHelp()
 {
-	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalCtrlSeq, 0);
 }
 
 // CCopypastePropPageDlg ダイアログ
@@ -1483,7 +1483,7 @@ void CCygwinPropPageDlg::OnOK()
 
 void CCygwinPropPageDlg::OnHelp()
 {
-	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditional, 0);
+	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalCygwin, 0);
 }
 
 //////////////////////////////////////////////////////////////////////////////

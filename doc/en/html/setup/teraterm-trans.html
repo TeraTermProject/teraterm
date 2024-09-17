@@ -137,6 +137,45 @@ KmtFileAttr=off
 </pre>
 
 
+<h1 id="qvlog">Logging of Quick-VAN</h1>
+
+<p>
+To make the contents of the exchanged packets are recorded in the file QUICKVAN.LOG while transferring between the host and Tera Term using Quick-VAN, edit the QVLog line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+QVLog=on
+</pre>
+
+<pre>
+Default:
+QVLog=off
+</pre>
+
+
+<h1 id="qvwinsize">Window size of Quick-VAN</h1>
+
+<p>
+To set the parameter Window Size used in the Quick-VAN protocol, edit the QVWinSize line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+QVWinSize=&lt;window size (Decimal(positive))&gt;
+</pre>
+
+<p>
+Possible window size values are from 1 to 99. In general, if the line is fast enough and error-free, the larger the window size, the faster the transfer rate. However, if a slow or error-prone line is used, or if the host or PC is not able to retrieve data, too large a window size will adversely affect the transfer rate.
+</p>
+
+<p>
+The window size value actually used is the smaller of the Tera Term setting and the host (PC-VAN) setting. Therefore, if the Tera Term setting value is set larger than a certain value, the transfer rate will not change any more.
+</p>
+
+<pre>
+Default:
+QVWinSize=8
+</pre>
+
 <h1 id="xmlog">XMODEM log</h1>
 
 <p>
