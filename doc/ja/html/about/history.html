@@ -4245,12 +4245,18 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>Curve25519楕円曲線DH（Diffe Hellman）アルゴリズムを使った鍵交換をサポートした。
+      <li>Ed25519 鍵による公開鍵認証をサポートした。</li>
+      <li>Ed25519 サーバホスト鍵をサポートした。
         <ul>
-          <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a>で ED25519 鍵の作成に対応した。</li>
-          <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a>で RSA/DSA/ECDSA 秘密鍵ファイルに bcrypt KDF 形式を選択可能とした。</li>
-          <li>Host Key algorithmに ED25519 を追加した。teraterm.ini の HostKeyOrder エントリを変更した。</li>
-        </ul></li>
+          <li>teraterm.ini の HostKeyOrder エントリを変更した。</li>
+        </ul>
+      </li>
+      <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a> で ED25519 鍵の作成に対応した。
+        <ul>
+          <li>Ed25519 秘密鍵ファイルは bcrypt KDF 形式で保存されます。</li>
+        </ul>
+      </li>
+      <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a> で RSA/DSA/ECDSA 秘密鍵ファイルを保存するときに bcrypt KDF 形式を選択可能とした。</li>
       <li>"About TTSSH" ダイアログにホスト公開鍵の指紋およびランダムアートを表示するようにした。</li>
       <li>端末オプションのONLCR設定をサーバに通知するようにした。</li>
     </ul>
