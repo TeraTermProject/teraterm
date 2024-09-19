@@ -4240,12 +4240,18 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <li>added support for the key exchange of Curve25519 elliptic curve DH(Diffie Hellman) algorithm.
+      <li>Added support for Ed25519 public key authentication.</li>
+      <li>Added support for Ed25519 server host key.
         <ul>
-          <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a> supports the ED25519 authentication key.</li>
-          <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a> supports the bcrypt KDF format of the RSA/DSA/ECDSA private key.</li>
-          <li>added the ED25519 into the Host Key algorithm, and then changed the HostKeyOrder entry in the teraterm.ini file.</li>
-        </ul></li>
+          <li>Changed the HostKeyOrder entry in the teraterm.ini file.</li>
+        </ul>
+      </li>
+      <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a> supports the Ed25519 authentication key.
+        <ul>
+          <li>Ed25519 private key file is saved as bcrypt KDF format.</li>
+        </ul>
+      </li>
+      <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a> now supports save the bcrypt KDF format of the RSA/DSA/ECDSA private key.</li>
       <li>added the host key's fingerprint and the random art into the "About TTSSH" dialog.</li>
       <li>TTY option ONLCR can be sent to the remote server.</li>
     </ul>
