@@ -272,8 +272,7 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 BOOL CFileTransDlg::OnClose()
 {
-	// TTSetIcon(m_hInst, m_hWnd, NULL, 0);
-	return OnCancel();
+	return FALSE;
 }
 
 BOOL CFileTransDlg::PostNcDestroy()
