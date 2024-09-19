@@ -233,7 +233,7 @@ BOOL CFileTransDlg::OnInitDialog()
 	return TRUE;
 }
 
-BOOL CFileTransDlg::OnCancel( )
+BOOL CFileTransDlg::OnCancel()
 {
 	if (OpId == OpLog) {
 		FLogClose();
@@ -241,6 +241,7 @@ BOOL CFileTransDlg::OnCancel( )
 	else {
 		FileSendEnd();
 	}
+	TTSetIcon(m_hInst, m_hWnd, NULL, 0);
 	return TRUE;
 }
 
@@ -271,8 +272,8 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 BOOL CFileTransDlg::OnClose()
 {
-	TTSetIcon(m_hInst, m_hWnd, NULL, 0);
-	return TRUE;
+	// TTSetIcon(m_hInst, m_hWnd, NULL, 0);
+	return OnCancel();
 }
 
 BOOL CFileTransDlg::PostNcDestroy()
