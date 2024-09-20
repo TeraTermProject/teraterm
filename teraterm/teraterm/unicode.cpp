@@ -252,6 +252,21 @@ int UnicodeIsEmoji(unsigned long u32)
 }
 
 /**
+ *  JIS X 0208 の記号であるかどうか
+ *
+ *  @retval  0   JIS X 0208 の記号ではない
+ *  @retval  1   JIS X 0208 の記号である
+ */
+int UnicodeIsX0208Symbol(unsigned long u32)
+{
+	const static UnicodeTable_t X0208Symbols[] = {
+#include "unicode_x0208_symbols.tbl"
+	};
+	const int index = SearchTableSimple(X0208Symbols, _countof(X0208Symbols), u32);
+	return index != -1 ? 1 : 0;
+}
+
+/**
  *	異体字セレクタかチェックする
  *
  *	UnicodeIsCombiningCharacter() で同時にチェックできるので使用しなくなった
