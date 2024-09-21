@@ -3304,7 +3304,11 @@ void PASCAL _AddValueToList(const wchar_t *FName, const wchar_t *Host, const wch
 	if ((FName[0] == 0) || (Host[0] == 0))
 		return;
 
-	hostnames = (wchar_t **)calloc(MaxList, sizeof(wchar_t));
+	if (MaxList <= 0) {
+		return;
+	}
+
+	hostnames = (wchar_t **)calloc(MaxList, sizeof(wchar_t *));
 	if (hostnames == NULL) {
 		return;
 	}
@@ -3322,8 +3326,9 @@ void PASCAL _AddValueToList(const wchar_t *FName, const wchar_t *Host, const wch
 		hGetPrivateProfileStringW(section, EntName, L"", FName, &hostname);
 		free(EntName);
 
-		if (hostname == NULL || hostname[0] == 0) {
-			// から
+		if (hostname == NULL || hostname[0] == L'\0') {
+			// 値がセットされていない = 最後まで読み込んだ
+			// hostname[0] == L'\0' のとき L"" を free() する必要がある
 			free(hostname);
 			break;
 		}

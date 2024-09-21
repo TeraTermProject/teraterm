@@ -110,7 +110,7 @@ static void ApplyBroadCastCommandHisotry(HWND Dialog, wchar_t *historyfile)
 	int i = 1;
 
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_RESETCONTENT, 0, 0);
-	do {
+	for (i = 1; i <= ts.MaxBroadcatHistory; i++) {
 		wchar_t *EntName;
 		wchar_t *Command;
 		aswprintf(&EntName, L"Command%d", i);
@@ -125,8 +125,7 @@ static void ApplyBroadCastCommandHisotry(HWND Dialog, wchar_t *historyfile)
 		}
 		free(Command);
 		free(EntName);
-		i++;
-	} while (i <= ts.MaxBroadcatHistory);
+	}
 
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_SETCURSEL,0,0);
 }
@@ -222,6 +221,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 				SendCB(dlg);
 				return FALSE;
 			}
+			/* FALLTHROUGH */
 		case WM_KEYUP:
 		case WM_SYSKEYDOWN:
 		case WM_SYSKEYUP:
