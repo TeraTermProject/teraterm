@@ -525,6 +525,27 @@ BeepSuppressTime=5
 </pre>
 
 
+<h1 id="BeepVBellWait">Beep が Visual Bell のときのフラッシュ時間</h1>
+<p>
+ホスト側から BEL 文字 (ASCII $07) が送られて来た時、Tera Term では画面を点滅させることができます。
+</p>
+
+<p>
+画面の点滅は、端末を反転表示したのち一定時間待ち、再び端末を反転表示して元に戻しています。<br>
+ユーザはこの待ち時間を調節することができます。
+</p>
+
+<pre>
+; Wait time (ms) when Beep is Visual Bell
+BeepVBellWait=100
+</pre>
+
+<pre>
+省略時:
+BeepVBellWait=10
+</pre>
+
+
 <h1 id="MaxOSCBufferSize">OSC文字列用バッファサイズ</h1>
 <p>
 Tera Term では OSC 文字列の処理時に処理用のバッファが足りなくなると自動的にバッファを拡張するようになっています。
