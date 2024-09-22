@@ -142,6 +142,11 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="使用可能文字コード">
+			<param name="Local" value="html\usage\character_encoding.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="ヒント">
 			<param name="Local" value="html\usage\tips\index.html">
 			<param name="ImageNumber" value="1">
