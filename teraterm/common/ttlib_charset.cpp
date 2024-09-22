@@ -30,40 +30,41 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "codeconv.h"
 #include "tttypes_charset.h"
 
 #include "ttlib_charset.h"
 
 static const TKanjiList KanjiList[] = {
-	{ /*IdUtf8,*/		IdUTF8,				"UTF-8",					"UTF-8" },
-	{ /*IdEnglish,*/	IdISO8859_1,		"English/ISO8859-1",		"ISO8859-1" },
-	{ /*IdEnglish,*/	IdISO8859_2,		"English/ISO8859-2",		"ISO8859-2" },
-	{ /*IdEnglish,*/	IdISO8859_3,		"English/ISO8859-3",		"ISO8859-3" },
-	{ /*IdEnglish,*/	IdISO8859_4,		"English/ISO8859-4",		"ISO8859-4" },
-	{ /*IdEnglish,*/	IdISO8859_5,		"English/ISO8859-5",		"ISO8859-5" },
-	{ /*IdEnglish,*/	IdISO8859_6,		"English/ISO8859-6",		"ISO8859-6" },
-	{ /*IdEnglish,*/	IdISO8859_7,		"English/ISO8859-7",		"ISO8859-7" },
-	{ /*IdEnglish,*/	IdISO8859_8,		"English/ISO8859-8",		"ISO8859-8" },
-	{ /*IdEnglish,*/	IdISO8859_9,		"English/ISO8859-9",		"ISO8859-9" },
-	{ /*IdEnglish,*/	IdISO8859_10,		"English/ISO8859-10",		"ISO8859-10" },
-	{ /*IdEnglish,*/	IdISO8859_11,		"English/ISO8859-11",		"ISO8859-11" },
-	{ /*IdEnglish,*/	IdISO8859_13,		"English/ISO8859-13",		"ISO8859-13" },
-	{ /*IdEnglish,*/	IdISO8859_14,		"English/ISO8859-14",		"ISO8859-14" },
-	{ /*IdEnglish,*/	IdISO8859_15,		"English/ISO8859-15",		"ISO8859-15" },
-	{ /*IdEnglish,*/	IdISO8859_16,		"English/ISO8859-16",		"ISO8859-16" },
-//	{ /*IdJapanese,*/	IdUTF8,				"Japanese/UTF-8",			"UTF-8" },
-	{ /*IdJapanese,*/	IdSJIS,				"Japanese/SJIS (CP932)",	"SJIS" },
-	{ /*IdJapanese,*/	IdEUC,				"Japanese/EUC",				"EUC" },
-	{ /*IdJapanese,*/	IdJIS,				"Japanese/JIS",				"JIS" },
-	{ /*IdRussian,*/	IdWindows,			"Russian/Windows (CP1251)",	"Windows(CP1251)" },
-	{ /*IdRussian,*/	IdKOI8,				"Russian/KOI8-R",			"KOI8-R" },
-	{ /*IdRussian,*/	Id866,				"Russian/CP866",			"CP866" },
-	{ /*IdRussian,*/	IdISO,				"Russian/ISO 8859-5",		"ISO8859-5" },
-	{ /*IdKorean,*/		IdKoreanCP949,		"Korean/KS5601 (CP949)",	"KS5601" },
-//	{ /*IdKorean,*/		IdUTF8,				"Korean/UTF-8",				"UTF-8" },
-	{ /*IdChinese,*/	IdCnGB2312,			"Chinese/GB2312 (CP936)",	"GB2312" },
-	{ /*IdChinese,*/	IdCnBig5,			"Chinese/Big5 (CP950)",		"BIG5" },
-//	{ /*IdChinese,*/	IdUTF8,				"Chinese/UTF-8",			"UTF-8" },
+	// coding			GUI					INI
+	{ IdUTF8,			"UTF-8",			"UTF-8" },
+	{ IdISO8859_1,		"ISO8859-1",		"ISO8859-1" },
+	{ IdISO8859_2,		"ISO8859-2",		"ISO8859-2" },
+	{ IdISO8859_3,		"ISO8859-3",		"ISO8859-3" },
+	{ IdISO8859_4,		"ISO8859-4",		"ISO8859-4" },
+	{ IdISO8859_5,		"ISO8859-5",		"ISO8859-5" },
+	{ IdISO8859_6,		"ISO8859-6",		"ISO8859-6" },
+	{ IdISO8859_7,		"ISO8859-7",		"ISO8859-7" },
+	{ IdISO8859_8,		"ISO8859-8",		"ISO8859-8" },
+	{ IdISO8859_9,		"ISO8859-9",		"ISO8859-9" },
+	{ IdISO8859_10,		"ISO8859-10",		"ISO8859-10" },
+	{ IdISO8859_11,		"ISO8859-11",		"ISO8859-11" },
+	{ IdISO8859_13,		"ISO8859-13",		"ISO8859-13" },
+	{ IdISO8859_14,		"ISO8859-14",		"ISO8859-14" },
+	{ IdISO8859_15,		"ISO8859-15",		"ISO8859-15" },
+	{ IdISO8859_16,		"ISO8859-16",		"ISO8859-16" },
+	{ IdSJIS,			"SJIS (CP932)",		"SJIS" },
+	{ IdEUC,			NULL,				"EUC-JP" },
+	{ IdEUC,			"EUC",				"EUC" },
+	{ IdJIS,			"JIS",				"JIS" },
+	{ IdWindows,		"Windows (CP1251)",	"Windows(CP1251)" },
+	{ IdKOI8,			"KOI8-R",			"KOI8-R" },
+	{ Id866,			"CP866",			"CP866" },
+//	{ IdISO,			NULL,				"ISO8859-5" },
+	{ IdISO8859_5,		NULL,				"ISO8859-5" },
+	{ IdKoreanCP949,	"KS5601 (CP949)",	"KS5601" },
+	{ IdCnGB2312,		"GB2312 (CP936)",	"GB2312" },
+	{ IdCnBig5,			"Big5 (CP950)",		"BIG5" },
 };
 
 /**
@@ -89,8 +90,8 @@ const TKanjiList *GetKanjiList(int index)
 const char *GetKanjiCodeStr(int kanji_code)
 {
 	for (int i = 0; i < _countof(KanjiList); i++) {
-		if (KanjiList[i].coding == kanji_code) {
-			return KanjiList[i].KanjiCode;
+		if (KanjiList[i].coding == kanji_code && KanjiList[i].CodeStrINI != NULL) {
+			return KanjiList[i].CodeStrINI;
 		}
 	}
 	return "UTF-8";
@@ -111,35 +112,23 @@ int GetKanjiCodeFromStr(const char *kanji_code_str)
 	}
 
 	for (int i = 0; i < _countof(KanjiList); i++) {
-		if (strcmp(KanjiList[i].KanjiCode, kanji_code_str) == 0) {
+		if (KanjiList[i].CodeStrINI != NULL && strcmp(KanjiList[i].CodeStrINI, kanji_code_str) == 0) {
 			return KanjiList[i].coding;
 		}
 	}
 	return IdUTF8;
 }
 
-/**
- *	KanjiCodeTranslate(KanjiCodeID(source)) returns KanjiCodeID
- *
- *	@param[in]	kcode (IdSJIS, IdEUC, ... IdKOI8 ... ) (IdKanjiCode)
- *	@return		存在する漢字コードを返す
- *
- *	漢字コードが妥当かチェックする
- *		- iniファイルの読み込み時
- *		- 設定でlangを切り替えた時
- */
-int KanjiCodeTranslate(int kcode)
+int GetKanjiCodeFromStrW(const wchar_t *kanji_code_strW)
 {
-	// 組み合わせが存在している?
-	for (int i = 0; i < _countof(KanjiList); i++) {
-		if (KanjiList[i].coding == kcode) {
-			// 存在している
-			return kcode;
-		}
+	if (kanji_code_strW == NULL || kanji_code_strW[0] == 0) {
+		return IdUTF8;
 	}
 
-	assert(0);	// ありえない
-	return IdUTF8;
+	char *kanji_code_str = ToCharW(kanji_code_strW);
+	int r = GetKanjiCodeFromStr(kanji_code_str);
+	free(kanji_code_str);
+	return r;
 }
 
 /**

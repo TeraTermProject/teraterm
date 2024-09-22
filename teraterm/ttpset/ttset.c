@@ -3737,26 +3737,11 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 				ts->KeyCnfFNW = f;
 			}
 		}
-		else if ((_wcsnicmp(Temp, L"/KR=", 4) == 0) ||
-		         (_wcsnicmp(Temp, L"/KT=", 4) == 0)) {	/* kanji code */
-			if (_wcsicmp(&Temp[4], L"UTF8") == 0 ||
-			         _wcsicmp(&Temp[4], L"UTF-8") == 0)
-				c = IdUTF8;
-			else if (_wcsicmp(&Temp[4], L"SJIS") == 0 ||
-			         _wcsicmp(&Temp[4], L"KS5601") == 0)
-				c = IdSJIS;
-			else if (_wcsicmp(&Temp[4], L"EUC") == 0)
-				c = IdEUC;
-			else if (_wcsicmp(&Temp[4], L"JIS") == 0)
-				c = IdJIS;
-			else
-				c = -1;
-			if (c != -1) {
-				if (_wcsnicmp(Temp, L"/KR=", 4) == 0)
-					ts->KanjiCode = c;
-				else
-					ts->KanjiCodeSend = c;
-			}
+		else if (_wcsnicmp(Temp, L"/KR=", 4) == 0) {
+			ts->KanjiCode = GetKanjiCodeFromStrW(&Temp[4]);
+		}
+		else if (_wcsnicmp(Temp, L"/KT=", 4) == 0) {
+			ts->KanjiCodeSend = GetKanjiCodeFromStrW(&Temp[4]);
 		}
 		else if (_wcsnicmp(Temp, L"/L=", 3) == 0) {	/* log file */
 			wchar_t *log_dir = GetTermLogDir(ts);
@@ -3894,13 +3879,6 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 		}
 		JustAfterHost = FALSE;
 		cur = next;
-	}
-
-	// Language が変更されたかもしれないので、
-	// KanjiCode/KanjiCodeSend をチェックする
-	{
-		ts->KanjiCode = KanjiCodeTranslate(ts->KanjiCode);
-		ts->KanjiCodeSend = KanjiCodeTranslate(ts->KanjiCodeSend);
 	}
 
 	if ((DDETopic != NULL) && (DDETopic[0] != 0)) {
