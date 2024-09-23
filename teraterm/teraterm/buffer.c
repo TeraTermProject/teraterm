@@ -4529,13 +4529,16 @@ void BuffStartSelect(int Xw, int Yw, BOOL Box)
 	SelectStartTmp.y = range_check(Y, 0, BuffEnd-1);
 
 	TmpPtr = GetLinePtr(SelectStart.y);
+	SelectStartTmp.x = LeftHalfOfDBCS(TmpPtr, SelectStartTmp.x);
 	// check if the cursor is on the right half of a character
+#if 0
 	if ((SelectStartTmp.x>0) &&
 	    (((CodeBuffW[TmpPtr+SelectStartTmp.x-1].attr & AttrKanji) != 0) ||
 		 ((CodeBuffW[TmpPtr+SelectStartTmp.x].attr & AttrKanji) == 0)) &&
 	     Right) {
 		SelectStartTmp.x++;
 	}
+#endif
 
 	SelectEnd = SelectStartTmp;
 	SelectEndOld = SelectEnd;
