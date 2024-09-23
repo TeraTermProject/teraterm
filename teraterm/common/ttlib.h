@@ -154,7 +154,6 @@ BOOL GetPositionOnWindow(
 DllExport void GetMessageboxFont(LOGFONTA *logfont);
 void GetMessageboxFontW(LOGFONTW *logfont);
 void GetDesktopRect(HWND hWnd, RECT *rect);
-void GetDesktopRectFromPoint(const POINT *p, RECT *rect);
 void CenterWindow(HWND hWnd, HWND hWndParent);
 void MoveWindowToDisplay(HWND hWnd);
 void MoveWindowToDisplayPoint(HWND hWnd, const POINT *p);

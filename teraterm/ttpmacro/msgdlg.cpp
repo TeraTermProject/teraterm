@@ -212,9 +212,7 @@ void CMsgDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 	}
 
 	if (is_init) {
-		if (SetDlgPosEX(GetSafeHwnd(), WW, WH, &PosX, &PosY) < 0) {
-			SetDlgPos();
-		}
+		SetDlgPos();
 	}
 
 	InvalidateRect(NULL);
