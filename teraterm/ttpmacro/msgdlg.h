@@ -42,12 +42,14 @@ public:
 private:
 	enum { IDD = IDD_MSGDLG };
 
-	const wchar_t *TextStr;
+	wchar_t TextStr[MaxStrLen];
 	const wchar_t *TitleStr;
 	BOOL YesNoFlag;
-	int  init_WW, TW, TH, BH, BW;
+	int  init_WW = 0, init_WH = 0, TW, TH, BH, BW;
 	SIZE s;
 	HINSTANCE m_hInst;
+	BOOL in_init = FALSE;
+	int dpi = 0;
 
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnClose();
@@ -55,5 +57,5 @@ private:
 	virtual LRESULT DlgProc(UINT msg, WPARAM wp, LPARAM lp);
 
 	LRESULT OnExitSizeMove(WPARAM wParam, LPARAM lParam);
-	void Relocation(BOOL is_init, int WW);
+	void Relocation(BOOL is_init, int WW, int WH);
 };

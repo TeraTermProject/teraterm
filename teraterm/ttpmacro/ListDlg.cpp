@@ -42,13 +42,13 @@
 
 #include "ListDlg.h"
 
-#define CONTROL_GAP_W	14		// ウィンドウ端とコントロール間との幅
-
 // CListDlg ダイアログ
 
 CListDlg::CListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected, int x, int y, int ext, int width, int height)
 {
-	m_Text = Text;
+	m_SelectItem = 0;
+	CONTROL_GAP_W = 14;
+	wcscpy_s(m_Text, MaxStrLen, Text);
 	m_Caption = Caption;
 	m_Lists = Lists;
 	m_Selected = Selected;
@@ -103,12 +103,6 @@ BOOL CListDlg::OnInitDialog()
 		{ IDOK, "BTN_YES" },
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
-	static const ResizeHelperInfo resize_info[] = {
-		{ IDC_LISTBOX, RESIZE_HELPER_ANCHOR_LRTB },
-		{ IDOK, RESIZE_HELPER_ANCHOR_RIGHT },
-		{ IDCANCEL, RESIZE_HELPER_ANCHOR_RIGHT },
-		{ IDC_LISTTEXT, RESIZE_HELPER_ANCHOR_LRB },
-	};
 	RECT R;
 	HWND HList, HOk;
 	int NonClientAreaWidth;
@@ -119,7 +113,9 @@ BOOL CListDlg::OnInitDialog()
 	HList = ::GetDlgItem(m_hWnd, IDC_LISTBOX);
 	InitList(HList);
 
-	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), 0);
+	dpi = GetMonitorDpiFromWindow(m_hWnd);
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), dpi);
+	CONTROL_GAP_W = (int)(14 * dpi / 96.f);
 	if (m_ext & ExtListBoxMinmaxbutton) {
 		ModifyStyle(0, WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
 	}
@@ -129,7 +125,7 @@ BOOL CListDlg::OnInitDialog()
 	SetWindowTextW(m_Caption);
 
 	CalcTextExtentW(GetDlgItem(IDC_LISTTEXT), NULL, m_Text,&s);
-	TW = s.cx + s.cx/10;
+	TW = s.cx + (int)(16 * dpi / 96.f);
 	TH = s.cy;
 
 	HOk = ::GetDlgItem(GetSafeHwnd(), IDOK);
@@ -142,15 +138,15 @@ BOOL CListDlg::OnInitDialog()
 	WH = R.bottom-R.top;
 
 	if (m_ext & ExtListBoxSize) {
-		LW = TH * m_width / 2;
-		LH = TH * m_height;
-		TW = LW;
-		s.cx = s.cx + s.cx/10;
+		SIZE tmp_s;
+		CalcTextExtentW(GetDlgItem(IDC_LISTBOX), NULL, L"A", &tmp_s);
+		LW = tmp_s.cy * m_width / 2; // 横幅は縦の半分とみなす
+		LH = tmp_s.cy * m_height;
 		::GetClientRect(m_hWnd, &R);
-		NonClientAreaWidth = WW - (R.right - R.left);
+		NonClientAreaWidth  = WW - (R.right - R.left);
 		NonClientAreaHeight = WH - (R.bottom - R.top);
-		WW = TW + NonClientAreaWidth + CONTROL_GAP_W * 4 + BW;
-		WH = TH + LH + (int)(BH*1.5) + NonClientAreaHeight;
+		WW = LW + NonClientAreaWidth + BW + CONTROL_GAP_W * 4;
+		WH = LH + NonClientAreaHeight+ TH + (int)(BH*1.5);
 		SetWindowPos(HWND_TOP, 0, 0, WW, WH, SWP_NOMOVE);
 	} else {
 		::GetWindowRect(HList,&R);
@@ -158,8 +154,9 @@ BOOL CListDlg::OnInitDialog()
 		LH = R.bottom-R.top;
 	}
 
-	ResizeHelper = ReiseHelperInit(m_hWnd, FALSE, resize_info, _countof(resize_info));
-	Relocation(TRUE, WW);
+	in_init = TRUE;
+	Relocation(TRUE, WW, WH);
+	in_init = FALSE;
 
 	if (m_ext & ExtListBoxMinimize) {
 		ShowWindow(SW_MINIMIZE);
@@ -192,7 +189,7 @@ BOOL CListDlg::OnClose()
 	return TRUE;
 }
 
-void CListDlg::Relocation(BOOL is_init, int new_WW)
+void CListDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 {
 	RECT R;
 	HWND HText, HOk, HCancel, HList;
@@ -203,7 +200,7 @@ void CListDlg::Relocation(BOOL is_init, int new_WW)
 	::GetClientRect(m_hWnd, &R);
 	CW = R.right-R.left;
 	CH = R.bottom-R.top;
-	NonClientAreaWidth = WW - CW;
+	NonClientAreaWidth  = WW - CW;
 	NonClientAreaHeight = WH - CH;
 
 	// 初回のみ
@@ -211,20 +208,27 @@ void CListDlg::Relocation(BOOL is_init, int new_WW)
 		// テキストコントロールサイズを補正
 		if (TW < CW) {
 			TW = CW;
+			use_TW = FALSE;
+		} else {
+			use_TW = TRUE;
 		}
 		// ウインドウサイズの計算
 		WW = TW + NonClientAreaWidth;
 		CW = WW - NonClientAreaWidth;
 		WH = TH + LH + (int)(BH*1.5) + NonClientAreaHeight;		// (ボタンの高さ/2) がウィンドウ端とコントロール間との高さ
-		init_WW = WW;
 		// リストボックスサイズの計算
 		if (LW < CW - BW - CONTROL_GAP_W * 3) {
 			LW = CW - BW - CONTROL_GAP_W * 3;
 		}
+		init_WW = WW;
+		init_WH = WH;
+		init_LW = LW;
+		init_LH = LH;
 	}
 	else {
 		TW = CW;
 		WW = new_WW;
+		WH = new_WH;
 	}
 
 	HText = ::GetDlgItem(GetSafeHwnd(), IDC_LISTTEXT);
@@ -237,43 +241,111 @@ void CListDlg::Relocation(BOOL is_init, int new_WW)
 	::MoveWindow(HOk,CONTROL_GAP_W+CONTROL_GAP_W+LW,BH/2,BW,BH,TRUE);
 	::MoveWindow(HCancel,CONTROL_GAP_W+CONTROL_GAP_W+LW,BH*2,BW,BH,TRUE);
 
-	SetDlgPos();
+	if (is_init) {
+		SetDlgPos();
+	}
 
 	::InvalidateRect(m_hWnd, NULL, TRUE);
 }
 
 LRESULT CListDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 {
+	RECT R;
+	int CW, CH;
+	LPMINMAXINFO pmmi = (LPMINMAXINFO)lp;
+
 	switch (msg) {
 		case WM_SIZE:
-			if (wp == SIZE_MINIMIZED) {
-				TTLShowMINIMIZE();
-				ShowWindow(SW_MINIMIZE);
+			if (GetMonitorDpiFromWindow(m_hWnd) == dpi) {
+				if (wp == SIZE_MINIMIZED) {
+					TTLShowMINIMIZE();
+					ShowWindow(SW_MINIMIZE);
+					return TRUE;
+				}
+				// 実際の位置とサイズを反映
+				GetWindowRect(&R);
+				PosX = R.left;
+				PosY = R.top;
+				WW = R.right-R.left;
+				WH = R.bottom-R.top;
+				// LWとLHを更新
+				GetClientRect(&R);
+				CW = R.right-R.left;
+				CH = R.bottom-R.top;
+				LW = CW - BW - CONTROL_GAP_W * 3;
+				LH = CH - TH - (int)(BH*1.5);
+				Relocation(FALSE, WW, WH);
 				return TRUE;
 			}
-			if (ResizeHelper != NULL) {
-				ReiseDlgHelper_WM_SIZE(ResizeHelper);
-			}
-			break;
 		case WM_GETMINMAXINFO:
-			if (ResizeHelper != NULL) {
-				ReiseDlgHelper_WM_GETMINMAXINFO(ResizeHelper, lp);
+			if (GetMonitorDpiFromWindow(m_hWnd) == dpi) {
+				pmmi->ptMinTrackSize.x = init_WW;
+				pmmi->ptMinTrackSize.y = init_WH;
+				return TRUE;
 			}
-			break;
-		case WM_DESTROY:
-			if (ResizeHelper != NULL) {
-				ReiseDlgHelperDelete(ResizeHelper);
-				ResizeHelper = NULL;
-			}
-			break;
 		case WM_COMMAND:
 			if (m_ext & ExtListBoxDoubleclick) {
 				if (HIWORD(wp) == LBN_DBLCLK) {
 					OnOK();
 					return TRUE;
 				}
-				break;
 			}
+			break;
+		case WM_DPICHANGED:
+			int new_dpi, NonClientAreaWidth, NonClientAreaHeight;
+			float mag;
+			RECT R;
+
+			new_dpi = HIWORD(wp);
+			mag = new_dpi / (float)dpi;
+			dpi = new_dpi;
+			CONTROL_GAP_W = (int)(14 * dpi / 96.f);
+			GetWindowRect(&R);
+			WW = R.right - R.left;
+			WH = R.bottom - R.top;
+			GetClientRect(&R);
+			CW = R.right - R.left;
+			CH = R.bottom - R.top;
+			NonClientAreaWidth  = WW - CW;
+			NonClientAreaHeight = WH - CH;
+			::GetWindowRect(GetDlgItem(IDOK), &R);
+			BW = R.right - R.left;
+			BH = R.bottom - R.top;
+			CalcTextExtentW(GetDlgItem(IDC_LISTTEXT), NULL, m_Text, &s);
+			TW = s.cx + (int)(16 * dpi / 96.f);
+			TH = s.cy;
+			::GetWindowRect(GetDlgItem(IDC_LISTBOX), &R);
+			LW = R.right - R.left;
+			LH = R.bottom - R.top;
+			if (m_ext & ExtListBoxSize) {
+				SIZE tmp_s;
+				CalcTextExtentW(GetDlgItem(IDC_LISTBOX), NULL, L"A", &tmp_s);
+				init_LW = tmp_s.cy * m_width / 2; // 横幅は縦の半分とみなす
+				init_LH = tmp_s.cy * m_height;
+				init_WW = init_LW + NonClientAreaWidth  + BW + CONTROL_GAP_W * 4;
+				init_WH = init_LH + NonClientAreaHeight + TH + (int)(BH*1.5);
+			} else {
+				init_LW = (int)(init_LW * mag);
+				init_LH = (int)(init_LH * mag);
+				if (use_TW) {
+					// dpiによる拡大/縮小には変換誤差があるため、CW < IDC_LISTTEXT の場合は、IDC_LISTTEXTのサイズで計算する
+					init_WW = TW + NonClientAreaWidth;
+				} else {
+					init_WW = init_LW + NonClientAreaWidth + BW + CONTROL_GAP_W * 3;
+				}
+				init_WH = init_LH + NonClientAreaHeight + TH + (int)(BH*1.5);
+			}
+
+			TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), dpi);
+			::SetWindowPos(m_hWnd, HWND_TOP, 0, 0, WW, WH, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+
+			if (in_init) {
+				Relocation(FALSE, init_WW, init_WH);
+				SetDlgPos();
+			} else {
+				Relocation(FALSE, WW, WH);
+			}
+			return TRUE;
 	}
 	return (LRESULT)FALSE;
 }
