@@ -36,11 +36,11 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>Setup - General was integrated into <a href="../menu/setup-additional-general.html">General tab</a> of Additional settings dialog.</li>
-      <li>Renamed the Additional setting "Coding" to "Encoding" for better clarity.</li>
-      <li>changed to use transmit character code when sending clipboard (OSC 52).<br>
+      <li>Changed to use transmit character code when sending clipboard (OSC 52).<br>
         Before fix, when transmit character code is not UTF-8, it used ACP.</li>
-      <li>Remove /LA command line options because language mode was removed</li>
+      <li>Setup - General dialog was integrated into <a href="../menu/setup-additional-general.html">General tab</a> of Additional settings dialog.</li>
+      <li>Renamed the Additional setting "Coding" to "Encoding" for better clarity.</li>
+      <li>Removed /LA command line options because language mode was removed.</li>
       <li>Changed method of creating backup files for TERATERM.INI.</li>
       <li>Updated Unicode information to Unicode 16.0. Before update, Unicode 15.1 compliant since Tera Term 5.0.</li>
     </ul>
@@ -50,6 +50,7 @@
     <ul>
       <li>Fixed a problem that an error is displayed when a new connection is made after disconnecting during log output in the case of LogAutoStart=on.</li>
       <li>Fixed a problem that a left click on backgrounded terminal window makes text selection 1 char sensitively.</li>
+      <li>Fixed X button of "Log" dialog doesn't work.</li>
     </ul>
   </li>
 

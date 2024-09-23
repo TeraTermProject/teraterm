@@ -36,13 +36,13 @@
 <ul class="history">
   <li>変更
     <ul>
+      <li>クリップボードの送信(OSC 52)時、送信文字コードで送信するように変更した。<br>
+        修正前はUTF-8 以外の時、ACPで送信していた。</li>
       <li>Setup-General 設定を Additional settings の <a href="../menu/setup-additional-general.html">General タブ</a>へ統合した。</li>
       <li>Additional settings の "Coding" を、より一般的な "Encoding" に改めた。</li>
-      <li>クリップボードの送信(OSC 52)時、送信文字コードで送信するように変更した<br>
-        修正前はUTF-8 以外の時、ACPで送信していた。</li>
-      <li>言語モードを削除したため /LA コマンドラインオプションを削除した</li>
+      <li>言語モードを削除したため /LA コマンドラインオプションを削除した。</li>
       <li>TERATERM.INI のバックアップファイルの作成方法を変更した。</li>
-      <li>Unicode の文字情報を Unicode 16.0 に更新した。更新前、Tera Term 5.0 から Unicode 15.1 準拠だった</li>
+      <li>Unicode の文字情報を Unicode 16.0 に更新した。更新前、Tera Term 5.0 から Unicode 15.1 準拠だった。</li>
     </ul>
   </li>
 
@@ -50,6 +50,7 @@
     <ul>
       <li>LogAutoStart=on で AutoWinClose=off の時、ログ出力中に切断して新規接続するとエラーが表示される問題を修正した。</li>
       <li>バックグラウンドにある teraterm ウィンドウを左クリックで前面化した時に過敏に 1キャラクタ選択されてしまう問題を修正した。</li>
+      <li>"Log" ダイアログの「×」ボタンが動作しない問題を修正した。</li>
     </ul>
   </li>
 
