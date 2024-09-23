@@ -49,6 +49,7 @@ private:
 	const wchar_t *MacroFileName;
 
 	virtual BOOL OnInitDialog();
+	virtual BOOL OnClose();
 	BOOL OnCommand(WPARAM wp, LPARAM lp);
 	void OnBnClickedMacroerrhelp();
 };
