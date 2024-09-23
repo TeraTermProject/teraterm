@@ -242,7 +242,9 @@ void CListDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 	::MoveWindow(HCancel,CONTROL_GAP_W+CONTROL_GAP_W+LW,BH*2,BW,BH,TRUE);
 
 	if (is_init) {
-		SetDlgPos();
+		if (SetDlgPosEX(GetSafeHwnd(), WW, WH, &PosX, &PosY) < 0) {
+			SetDlgPos();
+		}
 	}
 
 	::InvalidateRect(m_hWnd, NULL, TRUE);
@@ -341,7 +343,9 @@ LRESULT CListDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 
 			if (in_init) {
 				Relocation(FALSE, init_WW, init_WH);
-				SetDlgPos();
+				if (SetDlgPosEX(GetSafeHwnd(), WW, WH, &PosX, &PosY) < 0) {
+					SetDlgPos();
+				}
 			} else {
 				Relocation(FALSE, WW, WH);
 			}
