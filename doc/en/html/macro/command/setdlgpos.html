@@ -18,18 +18,83 @@ Sets the position of dialog box.
 </p>
 
 <pre class="macro-syntax">
-setdlgpos [&lt;x&gt; &lt;y&gt;]
+setdlgpos [&lt;x&gt; &lt;y&gt; [&lt;position&gt; [&lt;offset x&gt; &lt;offset y&gt;]]]
 </pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">integer &lt;x&gt;</dt>
+	<dd>X coordinate of the top-left corner of the dialog box.</dd>
+
+	<dt class="macro">integer &lt;y&gt;</dt>
+	<dd>Y coordinate of the top-left corner of the dialog box.</dd>
+
+	<dt class="macro">integer &lt;position&gt; (version 5.4 or later)</dt>
+	<dd>Display position of the dialog box.<br>
+	  1 : Top-left of the display.<br>
+	  2 : Top-right of the display.<br>
+	  3 : Bottom-left of the display.<br>
+	  4 : Bottom-right of the display.<br>
+	  5 : Center of the display.<br>
+	  6 : Top-left of the Tera Term VT window.<br>
+	  7 : Top-right of the Tera Term VT window.<br>
+	  8 : Bottom-left of the Tera Term VT window.<br>
+	  9 : Bottom-right of the Tera Term VT window.<br>
+	 10 : Center of the Tera Term VT window.<br>
+	</dd>
+
+	<dt class="macro">integer &lt;offset x&gt; (version 5.4 or later)</dt>
+	<dd>X coordinate adjustment value for the display position specified by &lt;position&gt;.</dd>
+
+	<dt class="macro">integer &lt;offset y&gt; (version 5.4 or later)</dt>
+	<dd>Y coordinate adjustment value for the display position specified by &lt;position&gt;.</dd>
+</dl>
+
+<h2>Return Value</h2>
+
+<dl>
+	<dt class="macro">No return value.</dt>
+</dl>
 
 <h2>Remarks</h2>
 
 <p>
-  Changes the initial position for dialog boxes opened by the "<a href="inputbox.html">inputbox</a>", "<a href="listbox.html">listbox</a>", "<a href="messagebox.html">messagebox</a>", "<a href="passwordbox.html">passwordbox</a>", "<a href="statusbox.html">statusbox</a>", "<a href="yesnobox.html">yesnobox</a>" commands and error dialogbox. If the status dialog box is displayed, the "setdlgpos" command also moves the dialog box.<br>
-Set dialog box position to default in main(primary) display when no argument is given. (version 4.105 or later)<br>
-&lt;x&gt; and &lt;y&gt; specify the position (x,y) in the screen coordinate.<br>
-The origin (0,0) is upper left corner of the screen(primary display).<br>
-Move into display, if dialog box position is outside display. (version 4.105 or later)
+Change the display position of the dialog boxes and the error dialog shown by the <a href="inputbox.html">"inputbox"</a>, <a href="listbox.html">"listbox"</a>, <a href="messagebox.html">"messagebox"</a>, <a href="passwordbox.html">"passwordbox"</a>, <a href="statusbox.html">"statusbox"</a>, <a href="yesnobox.html">"yesnobox"</a>.<br>
+If the status dialog box is displayed, the setdlgpos command will move that dialog box.<br>
+If the dialog extends beyond the display, it will be moved within the display.<em>(version 4.105 or later)</em><br>
+The unit is pixels.<br>
 </p>
+
+<ol>
+  <li>setdlgpos <em>(version 4.105 or later)</em><br>
+    When the parameter is omitted, the display position will be centered on the main display (the primary display)."
+  </li>
+  <li>setdlgpos &lt;x&gt; &lt;y&gt;<br>
+    Specify the coordinates (x,y) of the top-left corner of the dialog box using &lt;x&gt; and &lt;y&gt;.<br>
+    The origin (0,0) is the top-left corner of the main display.
+  </li>
+  <li>setdlgpos &lt;x&gt; &lt;y&gt; &lt;position&gt; <em>(version 5.4 or later)</em>
+    <ul>
+      <li>If &lt;position&gt; is between 1 and 5,<br>
+        If the MACRO is linked with Tera Term, the dialog box will be shown on the display where the VT window is displayed.<br>
+        If the MACRO is not linked with Tera Term, the dialog box will be shown on the main display.<br>
+        The display position of the dialog box will be the location specified by &lt;position&gt;.
+      </li>
+      <li>If &lt;position&gt; is between 6 and 10,<br>
+        If the MACRO is linked with Tera Term, the dialog box will be shown on the display where the VT window is displayed.<br>
+        If the MACRO is linked with Tera Term, the display position will be the location specified by &lt;position&gt;.<br>
+        If the MACRO is not linked with Tera Term or if Tera Term is minimized or hidden, the dialog box will be shown on the main display. <br>
+        In this case, the display position will be the &lt;x&gt; &lt;y&gt; coordinates.
+      </li>
+    </ul>
+  </li>
+  <li>setdlgpos &lt;x&gt; &lt;y&gt; &lt;position&gt; &lt;offset x&gt; &lt;offset y&gt; <em>(version 5.4 or later)</em><br>
+    The display position of the dialog box will be the location obtained by adding &lt;offset x&gt; &lt;offset y&gt; to the display position (x,y coordinates) specified by setdlgpos &lt;x&gt; &lt;y&gt; &lt;position&gt;.<br>
+    When specifying negative values, please refer to the <a href="../appendixes/negative.html">Note on negative integer constants</a>.
+
+  </li>
+</ol>
 
 <h2>Example</h2>
 
@@ -47,6 +112,54 @@ for i 0 200
   setdlgpos i 200
 next
 </pre>
+
+<pre class="macro-example">
+strdim message_string_array 11
+message_string_array[1]  = 'top-left of the display'
+message_string_array[2]  = 'top-right of the display'
+message_string_array[3]  = 'bottom-left of the display'
+message_string_array[4]  = 'bottom-right of the display'
+message_string_array[5]  = 'center of the display'
+message_string_array[6]  = 'top-left of the VT window'
+message_string_array[7]  = 'top-right of the VT window'
+message_string_array[8]  = 'bottom-left of the VT window'
+message_string_array[9]  = 'bottom-right of the VT window'
+message_string_array[10] = 'center of the VT window'
+
+strdim listbox_string_array 3
+listbox_string_array[0] = 'Banana'
+listbox_string_array[1] = 'Apple'
+listbox_string_array[2] = 'Orange'
+
+x = 0
+y = 0
+offset_x = 0
+offset_y = 0
+
+for position 1 10
+  sprintf2 message 'setdlgpos %d %d %d %d %d\n(%s)' x y position offset_x offset_y message_string_array[position]
+  strspecial message
+  setdlgpos x y position offset_x offset_y
+  statusbox   message 'statusbox'
+  messagebox  message 'messagebox'
+  yesnobox    message 'yesnobox'
+  inputbox    message 'inputbox'
+  passwordbox message 'passwordbox'
+  listbox     message 'listbox' listbox_string_array
+next
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="inputbox.html">inputbox</a></li>
+  <li><a href="listbox.html">listbox</a></li>
+  <li><a href="messagebox.html">messagebox</a></li>
+  <li><a href="passwordbox.html">passwordbox</a></li>
+  <li><a href="statusbox.html">statusbox</a></li>
+  <li><a href="yesnobox.html">yesnobox</a></li>
+  <li><a href="getttpos.html">getttpos</a></li>
+  <li><a href="../appendixes/negative.html">Note on negative integer constants</a></li>
+</ul>
 
 </body>
 </html>

@@ -105,7 +105,9 @@ BOOL CErrDlg::OnInitDialog()
 	in_init = TRUE;
 	RECT R;
 	GetWindowRect(&R);
-	SetDlgPos();
+	if (SetDlgPosEX(m_hWnd, R.right - R.left, R.bottom - R.top, &PosX, &PosY) < 0) {
+		SetDlgPos();
+	}
 	::SetForegroundWindow(m_hWnd);
 	in_init = FALSE;
 
@@ -135,7 +137,9 @@ LRESULT CErrDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_DPICHANGED:
 		if (in_init == TRUE) {
 			RECT R = *(RECT *)lp;
-			SetDlgPos();
+			if (SetDlgPosEX(m_hWnd, R.right - R.left, R.bottom - R.top, &PosX, &PosY) < 0) {
+				SetDlgPos();
+			}
 		}
 		return TRUE;
 	}
