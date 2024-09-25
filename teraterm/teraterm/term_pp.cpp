@@ -227,8 +227,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			}
 			else if (nmhdr->code == PSN_HELP) {
 				wParam = IDC_TERMHELP;
-				const WPARAM HelpId = HlpSetupTerminal;
-				//PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,HelpId,0);
+				const WPARAM HelpId = HlpMenuSetupAdditionalTerminal;
 				PostMessage(data->VTWin, WM_USER_DLGHELP2, HelpId, 0);
 				break;
 			}

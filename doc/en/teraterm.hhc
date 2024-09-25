@@ -496,6 +496,16 @@
 					<param name="Local" value="html\menu\setup-additional-tcpip.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Terminal tab">
+					<param name="Local" value="html\menu\setup-additional-terminal.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Window tab">
+					<param name="Local" value="html\menu\setup-additional-window.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
 			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Save setup">
@@ -703,7 +713,7 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="All items of Tera Term setup file">
+					<param name="Name" value="All items of Tera Term setup file">
 					<param name="Local" value="html\setup\teraterm-ini.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>

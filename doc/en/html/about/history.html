@@ -502,7 +502,7 @@
       <li>The value of transparency can be temporarily changed by moving the mouse wheel on the title bar of the VT window.</li>
       <li>The internal implementation of the VT window was speeded up.</li>
       <li>UTF-8: Four bytes character can not be shown yet but can be decoded, the impact range of character corruption was be minimized.</li>
-      <li>The language code(CodePage) of the "<a href="../menu/setup-terminal.html">Terminal ([Setup] menu)</a>" dialog(<a href="../usage/unicode.html">Unicode usage</a>).</li>
+      <li>The language code(CodePage) of the "<a href="../menu/setup-additional-terminal.html">Terminal ([Setup] menu)</a>" dialog(<a href="../usage/unicode.html">Unicode usage</a>).</li>
       <li>MACRO: The macro file can support UTF-8 and UTF-16(with BOM) encoding.</li>
       <li>MACRO: The <a href="../macro/command/getfileattr.html">getfileattr</a> command can be based on the current directory same as other command.</li>
       <li>MACRO: The <a href="../macro/command/fileopen.html">fileopen</a> command can cause an error when a file is not found with read only mode.</li>
@@ -565,7 +565,7 @@
     <ul>
       <li>added support for multiple files' drag&amp;drop.</li>
       <li>Functional enhancement: <a href="../usage/mouse.html#dragdropwindow">Confirmation dialog by using drag&amp;drop a file</a>.</li>
-      <li>Window size is maximized when the title bar is double-clicked if <a href="../menu/setup-terminal.html#TermIsWin">"Term size = win size"</a> setting is on.</li>
+      <li>Window size is maximized when the title bar is double-clicked if <a href="../menu/setup-additional-terminal.html#TermIsWin">"Term size = win size"</a> setting is on.</li>
       <li>added the <a href="../setup/teraterm-win.html#title">Title format configuration</a> on the General tab of the <a href="../menu/setup-additional-general.html#TitleFormat">Additional settings dialog</a>.</li>
     </ul>
   </li>
@@ -874,7 +874,7 @@
           <li>added the <a href="../commandline/teraterm.html#waitcom">/WAITCOM</a> command line option.</li>
           <li>added the <a href="../setup/teraterm-com.html#WaitCom">WaitCom</a> entry in the teraterm.ini file. The default value is off.</li>
         </ul></li>
-      <li>added the LF entry in the <a href="../menu/setup-terminal.html#CRSend">New-line(transmit)</a>.</li>
+      <li>added the LF entry in the <a href="../menu/setup-additional-terminal.html#CRSend">New-line(transmit)</a>.</li>
       <li>When <a href="../setup/teraterm-trans.html#zmauto">ZmodemAuto=on</a> is enabled and ZRINIT packet is received, the file selection dialog of ZMODEM sending is opened.</li>
       <li>updated to new Tera Term icon file(teraterm.ico, vt.ico) and macro icon file(ttmacro.ico). Special thanks to Tatsu Sakamoto.</li>
     </ul>
@@ -1515,7 +1515,7 @@
           <li>A named pipe can be specified into the TCP/IP:Host entry of <a href="../menu/file-new.html">New connection dialog</a>.</li>
           <li>added the <a href="../commandline/teraterm.html#pipe">/PIPE</a> option by specifying the named pipe.</li>
         </ul></li>
-      <li>added the AUTO entry in the <a href="../menu/setup-terminal.html#CRReceive">New-line(receive)</a>. Special thanks to tentner.</li>
+      <li>added the AUTO entry in the <a href="../menu/setup-additional-terminal.html#CRReceive">New-line(receive)</a>. Special thanks to tentner.</li>
       <li>added the selection of the font quality.
         <ul>
           <li>added the Font quality configuration on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
@@ -1777,7 +1777,7 @@
     <ul>
       <li>When the terminal width is 257 columns over, Tera Term does not display well.</li>
       <li>When the terminal ID is VT520 and VT525, the Primary DA (DA1) reply is incorrect.</li>
-      <li>When the language is other than Japanese, the VT420, VT520 and VT525 on the <a href="../menu/setup-terminal.html">Terminal Setup</a> dialog do not work well.</li>
+      <li>When the language is other than Japanese, the VT420, VT520 and VT525 on the <a href="../menu/setup-additional-terminal.html">Terminal Setup</a> dialog do not work well.</li>
       <li>When <a href="../setup/teraterm-prn.html#direct">PassThruPort</a> is specified as a local device mapping the network share, Tera Term printing does not work. cf.<a href="http://logmett.com/forum/viewtopic.php?f=2&amp;t=1383" target="_blank">print with WINDOWS 7 net use LPT PERSISTENT:Yes </a></li>
       <li>Tera Term can not ignore the unsupported OSC control string. </li>
       <li>Tera Term can not understand a character after the DCS, SOS, APC and PM Control string.</li>
@@ -2510,7 +2510,7 @@
       <li>Bug fix: extension filters on file dialog didn't work when the <a href="../setup/teraterm-trans.html#filter">FileSendFilter</a> is specified.</li>
       <li>Bug fix: double close a local file handle when same file already exists on the remote host by sending the local file with ZMODEM protocol.</li>
       <li>Bug fix: Telnet keep-alive mechanism could not been thread-safe.</li>
-      <li>Bug fix: New-line (transmit) of <a href="../menu/setup-terminal.html">Terminal Setup</a> would be empty when a user connects.</li>
+      <li>Bug fix: New-line (transmit) of <a href="../menu/setup-additional-terminal.html">Terminal Setup</a> would be empty when a user connects.</li>
       <li>Bug fix: Up and Down key could not work with DELL USB keyboard. Added the workaround. Special thanks to chuckf.<br> cf. <a href="http://www.neocom.ca/forum/viewtopic.php?p=2565" target="_blank">http://www.neocom.ca/forum/viewtopic.php?p=2565</a></li>
       <li>upgraded TTSSH version supporting SSH2 to <a href="#ttssh_2.45">2.45</a></li>
       <li>upgraded CygTerm+ to <a href="#cygterm_1.07_14">1.07_14</a></li>

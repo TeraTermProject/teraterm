@@ -446,7 +446,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					break;
 
 				case IDC_WINHELP: {
-					const WPARAM HelpId = work->VTFlag > 0 ? HlpSetupWindow : HlpTEKSetupWindow;
+					const WPARAM HelpId = work->VTFlag > 0 ? HlpMenuSetupAdditionalWindow : HlpTEKSetupWindow;
 					PostMessage(work->VTWin, WM_USER_DLGHELP2, HelpId, 0);
 					break;
 				}

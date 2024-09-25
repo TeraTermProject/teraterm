@@ -162,6 +162,8 @@
 #define HlpMenuSetupAdditionalCopyAndPaste  43030
 #define HlpMenuSetupAdditionalCtrlSeq       43031
 #define HlpMenuSetupAdditionalCygwin        43032
+#define HlpMenuSetupAdditionalWindow        43033
+#define HlpMenuSetupAdditionalTerminal      43034
 #define HlpMenuSetupSave                    43013
 #define HlpMenuSetupRestore                 43014
 #define HlpMenuSetupDir                     43016
