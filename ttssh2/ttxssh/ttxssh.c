@@ -1369,7 +1369,7 @@ hostssh_enabled:
 	case WM_DESTROY:
 		ComPortInfoFree(dlg_data->ComPortInfoPtr, dlg_data->ComPortInfoCount);
 		free(dlg_data);
-		SetWindowLongPtrW(dlg, DWLP_USER, NULL);
+		SetWindowLongPtrW(dlg, DWLP_USER, 0);
 		break;
 	}
 	return FALSE;
