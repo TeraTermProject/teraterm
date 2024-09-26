@@ -1151,6 +1151,11 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (GetOnOff(Section, "BeepOnConnect", FName, FALSE))
 		ts->PortFlag |= PF_BEEPONCONNECT;
 
+	/* Wait time (ms) when Beep is Visual Bell -- special option */
+	ts->BeepVBellWait = GetPrivateProfileInt(Section, "BeepVBellWait", 10, FName);
+	if (ts->BeepVBellWait < 1)
+		ts->BeepVBellWait = 1;
+
 	/* Auto B-Plus activation -- special option */
 	if (GetOnOff(Section, "BPAuto", FName, FALSE))
 		ts->FTFlag |= FT_BPAUTO;
@@ -2613,6 +2618,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	/* Beep on connection & disconnection -- special option */
 	WriteOnOff(Section, "BeepOnConnect", FName,
 	           (WORD) (ts->PortFlag & PF_BEEPONCONNECT));
+
+	/* Wait time (ms) when Beep is Visual Bell -- special option */
+	WriteInt(Section, "BeepVBellWait", FName, ts->BeepVBellWait);
 
 	/* Auto B-Plus activation -- special option */
 	WriteOnOff(Section, "BPAuto", FName, (WORD) (ts->FTFlag & FT_BPAUTO));

@@ -5686,7 +5686,7 @@ void FocusReport(BOOL focus) {
 static void VisualBell(void)
 {
 	CSQExchangeColor();
-	Sleep(10);
+	Sleep(ts.BeepVBellWait);
 	CSQExchangeColor();
 }
 
