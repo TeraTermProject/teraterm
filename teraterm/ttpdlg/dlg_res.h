@@ -22,7 +22,6 @@
 #define IDC_TERMAUTOSWITCH              111
 #define IDC_TERMRUSSHOST                120
 #define IDC_TERMRUSSCLIENT              121
-#define IDC_TERMHELP                    199
 #define IDD_WINDLG                      200
 #define IDC_WINTITLE                    201
 #define IDC_WINBLOCK                    202
@@ -50,7 +49,6 @@
 #define IDC_NO_FRAME                    224
 #define IDC_DRAW_SAMPLE_AREA            225
 #define IDC_WINUSENORMALBG              231
-#define IDC_WINHELP                     299
 #define IDD_KEYBDLG                     300
 #define IDC_KEYBBS                      301
 #define IDC_KEYBDEL                     302

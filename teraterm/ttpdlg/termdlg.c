@@ -36,8 +36,6 @@
 
 BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
 {
-	(void)WndParent;
 	(void)ts;
-	OpenExternalSetupOutside(TermPage);
-	return FALSE;
+	return OpenExternalSetupOutside(WndParent, TermPage);
 }

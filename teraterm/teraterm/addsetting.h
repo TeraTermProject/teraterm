@@ -76,3 +76,10 @@ typedef enum {
 	TermPage,
 	WinPage,
 } CAddSettingPropSheetDlgPage;
+
+typedef enum {
+	ADDSETTING_WIN_VT,
+	ADDSETTING_WIN_TEK,
+} AddsettingWin;
+
+AddsettingWin AddsettingCheckWin(HWND hWnd);

@@ -30,11 +30,12 @@
 #include <windows.h>
 
 #include "tttypes.h"
+#include "vtwin.h"
 
 #include "ttdlg.h"
 
 BOOL WINAPI _ChangeDirectory(HWND WndParent, PTTSet ts)
 {
-	MessageBoxA(WndParent, "ChangeDirectory Dialog was deleteed", "teraterm", MB_OK);
-	return FALSE;
+	(void)ts;
+	return OpenExternalSetupOutside(WndParent, GeneralPage);
 }

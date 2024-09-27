@@ -240,7 +240,7 @@ private:
 	void CodePopup(int client_x, int client_y);
 	void SetColor();
 public:
-	void OpenExternalSetup(CAddSettingPropSheetDlg::Page page);
+	BOOL OpenExternalSetup(HWND hWndParent, CAddSettingPropSheetDlg::Page page);
 };
 #endif
 
@@ -249,7 +249,7 @@ extern "C" {
 #endif
 
 void VtwinSetHelpId(DWORD data);
-void OpenExternalSetupOutside(CAddSettingPropSheetDlgPage page);
+BOOL OpenExternalSetupOutside(HWND hWndParent, CAddSettingPropSheetDlgPage page);
 
 #ifdef __cplusplus
 }

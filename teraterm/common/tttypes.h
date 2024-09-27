@@ -379,7 +379,7 @@ struct tttset {
 	WORD TerminalID;
 	WORD TermFlag;
 /*------ WinSet --------*/
-	WORD VTFlag;
+	WORD reserve_VTFlag;
 	HFONT SampleFont;
 	WORD reserve_TmpColor[12][6];
 	/* Tera Term window setup variables */

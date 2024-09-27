@@ -73,7 +73,6 @@ typedef struct {
 static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfosCom[] = {
-		{ 0, "DLG_TERM_TITLE" },
 		{ IDC_TERMWIDTHLABEL, "DLG_TERM_WIDTHLABEL" },
 		{ IDC_TERMISWIN, "DLG_TERM_ISWIN" },
 		{ IDC_TERMRESIZE, "DLG_TERM_RESIZE" },
@@ -84,9 +83,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 		{ IDC_TERMLOCALECHO, "DLG_TERM_LOCALECHO" },
 		{ IDC_TERMANSBACKTEXT, "DLG_TERM_ANSBACK" },
 		{ IDC_TERMAUTOSWITCH, "DLG_TERM_AUTOSWITCH" },
-		{ IDOK, "BTN_OK" },
-		{ IDCANCEL, "BTN_CANCEL" },
-		{ IDC_TERMHELP, "BTN_HELP" },
 	};
 	WORD w;
 
@@ -155,10 +151,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 			SetRB(Dialog,ts->AutoWinSwitch,IDC_TERMAUTOSWITCH,IDC_TERMAUTOSWITCH);
 
-			ShowWindow(GetDlgItem(Dialog, IDOK), FALSE);
-			ShowWindow(GetDlgItem(Dialog, IDCANCEL), FALSE);
-			ShowWindow(GetDlgItem(Dialog, IDC_TERMHELP), FALSE);
-
 			return TRUE;
 		}
 
@@ -226,7 +218,6 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				return TRUE;
 			}
 			else if (nmhdr->code == PSN_HELP) {
-				wParam = IDC_TERMHELP;
 				const WPARAM HelpId = HlpMenuSetupAdditionalTerminal;
 				PostMessage(data->VTWin, WM_USER_DLGHELP2, HelpId, 0);
 				break;
@@ -275,25 +266,22 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 
 HPROPSHEETPAGE CreateTerminalPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
 {
-	int id = IDD_TERMDLG;
-	PROPSHEETPAGEW_V1 psp = {};
-	DialogData *data;
-	wchar_t *uimsg;
-
-	data = (DialogData *)malloc(sizeof(*data));
+	DialogData *data = (DialogData *)calloc(1, sizeof(*data));
 	data->pts = &ts;
 	data->VTWin = vtwin;
 
+	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
 	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
+	wchar_t *uimsg;
 	GetI18nStrWW("Tera Term", "DLG_TERM_TITLE", L"Tera Term: Terminal setup", pts->UILanguageFileW, &uimsg);
 	psp.pszTitle = uimsg;
-	psp.pszTemplate = MAKEINTRESOURCEW(id);
+	psp.pszTemplate = MAKEINTRESOURCEW(IDD_TERMDLG);
 #if defined(REWRITE_TEMPLATE)
 	psp.dwFlags |= PSP_DLGINDIRECT;
-	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(id));
+	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(IDD_TERMDLG));
 #endif
 	psp.pfnDlgProc = TermDlg;
 	psp.lParam = (LPARAM)data;

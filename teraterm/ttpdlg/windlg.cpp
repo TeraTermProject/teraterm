@@ -35,8 +35,6 @@
 
 BOOL WINAPI _SetupWin(HWND WndParent, PTTSet ts)
 {
-	(void)WndParent;
 	(void)ts;
-	OpenExternalSetupOutside(WinPage);
-	return FALSE;
+	return OpenExternalSetupOutside(WndParent, WinPage);
 }
