@@ -524,6 +524,16 @@
 					<param name="Local" value="html\menu\setup-additional-tcpip.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Terminal タブ">
+					<param name="Local" value="html\menu\setup-additional-terminal.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Window タブ">
+					<param name="Local" value="html\menu\setup-additional-window.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
 			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Save setup">

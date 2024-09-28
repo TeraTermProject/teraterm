@@ -1151,6 +1151,11 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (GetOnOff(Section, "BeepOnConnect", FName, FALSE))
 		ts->PortFlag |= PF_BEEPONCONNECT;
 
+	/* Wait time (ms) when Beep is Visual Bell -- special option */
+	ts->BeepVBellWait = GetPrivateProfileInt(Section, "BeepVBellWait", 10, FName);
+	if (ts->BeepVBellWait < 1)
+		ts->BeepVBellWait = 1;
+
 	/* Auto B-Plus activation -- special option */
 	if (GetOnOff(Section, "BPAuto", FName, FALSE))
 		ts->FTFlag |= FT_BPAUTO;
@@ -2614,6 +2619,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "BeepOnConnect", FName,
 	           (WORD) (ts->PortFlag & PF_BEEPONCONNECT));
 
+	/* Wait time (ms) when Beep is Visual Bell -- special option */
+	WriteInt(Section, "BeepVBellWait", FName, ts->BeepVBellWait);
+
 	/* Auto B-Plus activation -- special option */
 	WriteOnOff(Section, "BPAuto", FName, (WORD) (ts->FTFlag & FT_BPAUTO));
 
@@ -3304,7 +3312,11 @@ void PASCAL _AddValueToList(const wchar_t *FName, const wchar_t *Host, const wch
 	if ((FName[0] == 0) || (Host[0] == 0))
 		return;
 
-	hostnames = (wchar_t **)calloc(MaxList, sizeof(wchar_t));
+	if (MaxList <= 0) {
+		return;
+	}
+
+	hostnames = (wchar_t **)calloc(MaxList, sizeof(wchar_t *));
 	if (hostnames == NULL) {
 		return;
 	}
@@ -3322,8 +3334,9 @@ void PASCAL _AddValueToList(const wchar_t *FName, const wchar_t *Host, const wch
 		hGetPrivateProfileStringW(section, EntName, L"", FName, &hostname);
 		free(EntName);
 
-		if (hostname == NULL || hostname[0] == 0) {
-			// から
+		if (hostname == NULL || hostname[0] == L'\0') {
+			// 値がセットされていない = 最後まで読み込んだ
+			// hostname[0] == L'\0' のとき L"" を free() する必要がある
 			free(hostname);
 			break;
 		}

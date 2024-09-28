@@ -31,6 +31,7 @@
 
 #include <assert.h>
 #include <crtdbg.h>
+#include "compat_win.h"
 #include "teraterm.h"
 #include "ttlib.h"
 #include "ttm_res.h"
@@ -39,6 +40,7 @@
 #include "tttypes.h"	// for WM_USER_MSTATBRINGUP
 #include "ttmacro.h"
 #include "dlglib.h"
+#include "ttmdlg.h"
 
 #include "statdlg.h"
 
@@ -46,7 +48,7 @@
 
 BOOL CStatDlg::Create(HINSTANCE hInst, const wchar_t *Text, const wchar_t *Title, int x, int y)
 {
-	TextStr = Text;
+	wcscpy_s(TextStr, MaxStrLen, Text);
 	TitleStr = Title;
 	PosX = x;
 	PosY = y;
@@ -56,29 +58,19 @@ BOOL CStatDlg::Create(HINSTANCE hInst, const wchar_t *Text, const wchar_t *Title
 
 void CStatDlg::Update(const wchar_t *Text, const wchar_t *Title, int x, int y)
 {
-	RECT R;
-
 	if (Title!=NULL) {
 		SetWindowTextW(Title);
 		TitleStr = Title;
 	}
 
-	GetWindowRect(&R);
-	PosX = R.left;
-	PosY = R.top;
-	WW = R.right-R.left;
-	WH = R.bottom-R.top;
-
 	if (Text!=NULL) {
-		SIZE textSize;
 		HWND hWnd = GetDlgItem(IDC_STATTEXT);
-		CalcTextExtentW(hWnd, NULL, Text, &textSize);
-		TW = textSize.cx + textSize.cx/10;	// (cx * (1+0.1)) ?
-		TH = textSize.cy;
-		s = textSize;			// TODO s!?
+		CalcTextExtentW(hWnd, NULL, Text, &s);
+		TW = s.cx + (int)(16 * dpi / 96.f);
+		TH = s.cy + (int)(16 * dpi / 96.f);
 
 		SetDlgItemTextW(IDC_STATTEXT,Text);
-		TextStr = Text;
+		wcscpy_s(TextStr, MaxStrLen, Text);
 	}
 
 	if (x!=32767) {
@@ -86,14 +78,17 @@ void CStatDlg::Update(const wchar_t *Text, const wchar_t *Title, int x, int y)
 		PosY = y;
 	}
 
-	Relocation(TRUE, WW);
+	in_update = TRUE;
+	Relocation(TRUE, 0, 0);
+	in_update = FALSE;
 }
 
 // CStatDlg message handler
 
 BOOL CStatDlg::OnInitDialog()
 {
-	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), 0);
+	dpi = GetMonitorDpiFromWindow(m_hWnd);
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), dpi);
 	// 閉じるボタンを無効化
 	RemoveMenu(GetSystemMenu(m_hWnd, FALSE), SC_CLOSE, MF_BYCOMMAND);
 
@@ -138,18 +133,48 @@ BOOL CStatDlg::PostNcDestroy()
 LRESULT CStatDlg::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 {
 	RECT R;
+	int current_WW, current_WH;
 
 	::GetWindowRect(m_hWnd, &R);
-	if (R.bottom-R.top == WH && R.right-R.left == WW) {
+	current_WW = R.right - R.left;
+	current_WH = R.bottom - R.top;
+
+	if (current_WW == WW && current_WH == WH) {
 		// サイズが変わっていなければ何もしない
-	}
-	else if (R.bottom-R.top != WH || R.right-R.left < init_WW) {
-		// 高さが変更されたか、最初より幅が狭くなった場合は元に戻す
-		::SetWindowPos(m_hWnd, HWND_TOP, R.left,R.top,WW,WH,0);
+		PosX = R.left;
+		PosY = R.top;
 	}
 	else {
-		// そうでなければ再配置する
-		Relocation(FALSE, R.right-R.left);
+		int new_WW;
+
+		// 高さが変更されたか、最初より幅が狭くなった場合は元に戻す
+		if (current_WW < init_WW) {
+			new_WW = init_WW;
+			if (PosX != R.left) {
+				PosX = R.right - new_WW;
+			} else {
+				PosX = R.left;
+			}
+		} else {
+			new_WW = current_WW;
+			PosX = R.left;
+		}
+		if (current_WH < init_WH) {
+			if (PosY != R.top) {
+				PosY = R.bottom - init_WH;
+			} else {
+				PosY = R.top;
+			}
+		} else {
+			if (PosY != R.top) {
+				PosY = R.top;
+			} else {
+				PosY = R.bottom - init_WH;
+			}
+		}
+
+		::SetWindowPos(m_hWnd, HWND_TOP, PosX, PosY, new_WW, init_WH, SWP_NOZORDER | SWP_NOACTIVATE);
+		Relocation(FALSE, new_WW, init_WH);
 	}
 
 	return TRUE;
@@ -177,39 +202,42 @@ LRESULT CStatDlg::OnSetForceForegroundWindow(WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 
-void CStatDlg::Relocation(BOOL is_init, int new_WW)
+void CStatDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 {
 	RECT R;
-	HWND HText;
 	int CW, CH;
 
 	if (TextStr != NULL) {
-		HText = GetDlgItem(IDC_STATTEXT);
-
 		GetClientRect(&R);
 		CW = R.right-R.left;
 		CH = R.bottom-R.top;
-
 		// 初回のみ
 		if (is_init) {
-			// テキストコントロールサイズを補正
-			if (TW < CW) {
-				TW = CW;
-			}
 			// ウインドウサイズの計算
-			WW = TW + (WW - CW);
-			WH = TH + 10 + (WH - CH);
+			GetWindowRect(&R);
+			WW = TW + R.right - R.left - CW;
+			WH = TH + R.bottom - R.top - CH;
+			// 実際のサイズを取得
+			::SetWindowPos(m_hWnd, HWND_TOP, 0, 0, WW, WH, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+			GetWindowRect(&R);
+			WW = R.right - R.left;
+			WH = R.bottom - R.top;
 			init_WW = WW;
-		}
-		else {
-			TW = CW;
+			init_WH = WH;
+			// CW,CHに反映
+			GetClientRect(&R);
+			CW = R.right-R.left;
+			CH = R.bottom-R.top;
+		} else {
 			WW = new_WW;
+			WH = new_WH;
 		}
-
-		::MoveWindow(HText,(TW-s.cx)/2,5,TW,TH,TRUE);
+		::MoveWindow(GetDlgItem(IDC_STATTEXT), (CW - s.cx) / 2, (CH - s.cy) / 2, TW, TH, TRUE);
 	}
 
-	SetDlgPos();
+	if (is_init) {
+		SetDlgPos();
+	}
 
 	InvalidateRect(NULL, TRUE);
 }
@@ -237,8 +265,31 @@ LRESULT CStatDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 	switch(msg) {
 	case WM_USER_MSTATBRINGUP:
 		return OnSetForceForegroundWindow(wp, lp);
-	case WM_EXITSIZEMOVE :
+	case WM_EXITSIZEMOVE:
 		return OnExitSizeMove(wp, lp);
+	case WM_DPICHANGED:
+		int new_dpi, new_WW, new_WH, new_CW, new_CH;
+		float mag;
+		RECT R;
+
+		new_dpi = HIWORD(wp);
+		mag = new_dpi / (float)dpi;
+		dpi = new_dpi;
+		CalcTextExtentW(GetDlgItem(IDC_STATTEXT), NULL, TextStr, &s);
+		TW = s.cx + (int)(16 * dpi / 96.f);
+		TH = s.cy + (int)(16 * dpi / 96.f);
+		R = *(RECT *)lp;
+		new_WW = R.right - R.left;
+		new_WH = R.bottom - R.top;
+		GetClientRect(&R);
+		new_CW = R.right-R.left;
+		new_CH = R.bottom-R.top;
+		init_WW = TW + new_WW - new_CW;
+		init_WH = TH + new_WH - new_CH;
+
+		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), dpi);
+		Relocation(in_update, WW, WH);
+		return TRUE;
 	}
 	return FALSE;
 }

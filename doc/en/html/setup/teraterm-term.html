@@ -499,6 +499,27 @@ BeepSuppressTime=5
 </pre>
 
 
+<h1 id="BeepVBellWait">Flash time when Beep is Visual Bell</h1>
+<p>
+When the BEL character(ASCII $07) is sent from the host server, Tera Term can blink a screen.
+</p>
+
+<p>
+Blinking is inpremented by reverse terminal and wait for a certain time, and revser terminal again.<br>
+A user can configure the wait time.
+</p>
+
+<pre>
+; Wait time (ms) when Beep is Visual Bell
+BeepVBellWait=100
+</pre>
+
+<pre>
+省略時:
+BeepVBellWait=10
+</pre>
+
+
 <h1 id="MaxOSCBufferSize">OSC string buffer size</h1>
 <p>
 Tera Term will expand the buffer size of the OSC string when the buffer size is lack. 

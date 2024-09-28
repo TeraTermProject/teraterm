@@ -610,6 +610,7 @@ struct tttset {
 	WORD BracketedControlOnly;
 	wchar_t *ViewlogEditorW;
 	wchar_t *ViewlogEditorArg;
+	int BeepVBellWait;
 
 	// Experimental
 	BYTE ExperimentalTreeProprtySheetEnable;

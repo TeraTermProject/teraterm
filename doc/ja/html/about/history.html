@@ -38,12 +38,16 @@
     <ul>
       <li>クリップボードの送信(OSC 52)時、送信文字コードで送信するように変更した。<br>
         修正前はUTF-8 以外の時、ACPで送信していた。</li>
+      <li>Beep が Visual Bell のときのフラッシュ時間を設定できるようにした。
+        <ul>
+          <li>teraterm.iniに <a href="../setup/teraterm-term.html#BeepVBellWait">BeepVBellWait</a> エントリを追加した。</li>
+        </ul>
+      </li>
       <li>Setup-General 設定を Additional settings の <a href="../menu/setup-additional-general.html">General タブ</a>へ統合した。</li>
       <li>Additional settings の "Coding" を、より一般的な "Encoding" に改めた。</li>
       <li>言語モードを削除したため /LA コマンドラインオプションを削除した。</li>
       <li>TERATERM.INI のバックアップファイルの作成方法を変更した。</li>
       <li>Unicode の文字情報を Unicode 16.0 に更新した。更新前、Tera Term 5.0 から Unicode 15.1 準拠だった。</li>
-      <li>Unicode の文字情報を Unicode 16.0 に更新した。更新前、Tera Term 5.0 から Unicode 15.1 準拠だった</li>
       <li>コマンドラインオプションで使用可能文字コードを全て指定できるようにした。</li>
     </ul>
   </li>
@@ -52,6 +56,9 @@
     <ul>
       <li>LogAutoStart=on で AutoWinClose=off の時、ログ出力中に切断して新規接続するとエラーが表示される問題を修正した。</li>
       <li>"Log" ダイアログの「×」ボタンが動作しない問題を修正した。</li>
+      <li><a href="../menu/control-broadcast.html">Broadcast command ダイアログ</a>でリアルタイムモードが off 、ヒストリが on のとき、コマンドの履歴を保存する時にクラッシュする問題を修正した。</li>
+      <li>バックグラウンドにある teraterm ウィンドウを左クリックで前面化した時に過敏に 1キャラクタ選択されてしまう問題を修正した。</li>
+      <li>MACRO: ダイアログが拡大/縮小率の異なるモニタをまたぐ時、DPI調整がうまく行われない問題を改善した。</li>
     </ul>
   </li>
 
@@ -59,7 +66,7 @@
     <ul>
       <li><a href="#kanjimenu_0.1.10">TTX KanjiMenu Plugin(0.1.10)</a>へ差し替えた。</li>
     </ul>
-
+  </li>
 </ul>
 
 <h3 id="teraterm_5.3">2024.09.08 (Ver 5.3)</h3>
@@ -502,7 +509,7 @@
       <li>VT ウィンドウのタイトルバー上でマウスホイールを操作することで、ウィンドウの透過値を一時的に変更できるようにした。</li>
       <li>VT ウィンドウの内部処理を高速化した。</li>
       <li>UTF-8 で 4 バイトになる文字を（表示できないが）正しくデコードするようにし、文字化けする範囲が最小限になるようにした。</li>
-      <li>"<a href="../menu/setup-terminal.html">Terminal setup[端末の設定]</a>" ダイアログの言語コード(CodePage)設定を削除した。(<a href="../usage/unicode.html">Unicode設定</a>)</li>
+      <li>"Terminal setup[端末の設定]" ダイアログの言語コード(CodePage)設定を削除した。(<a href="../usage/unicode.html">Unicode設定</a>)</li>
       <li>マクロファイルのエンコーディングとして UTF-8, UTF-16(with BOM)に対応した。</li>
       <li><a href="../macro/command/getfileattr.html">getfileattr</a> マクロコマンドで、他のコマンドと同様にカレントフォルダを基準とするようにした。</li>
       <li><a href="../macro/command/fileopen.html">fileopen</a> マクロコマンドで、読み取り専用モード時にファイルがない場合はエラーとなるようにした。</li>
@@ -565,7 +572,7 @@
     <ul>
       <li>複数ファイルのドラッグ&amp;ドロップに対応した。</li>
       <li><a href="../usage/mouse.html#dragdropwindow">ファイルをドラッグ&amp;ドロップしたときに表示されるダイアログ</a>を機能強化した。</li>
-      <li><a href="../menu/setup-terminal.html#TermIsWin">Term size = win size</a> 設定が on の場合は、タイトルバーをダブルクリックした時にウィンドウサイズを最大化するように変更した。</li>
+      <li><a href="../menu/setup-additional-terminal.html#TermIsWin">Term size = win size</a> 設定が on の場合は、タイトルバーをダブルクリックした時にウィンドウサイズを最大化するように変更した。</li>
       <li><a href="../menu/setup-additional-general.html#TitleFormat">Additional settingsダイアログ</a>の General タブに<a href="../setup/teraterm-win.html#title">タイトル形式の設定</a>を追加した。</li>
     </ul>
   </li>
@@ -874,7 +881,7 @@
           <li>起動時にシリアルポートの接続を待つ<a href="../commandline/teraterm.html#waitcom">/WAITCOM</a> コマンドラインオプションを追加した。</li>
           <li>teraterm.ini に <a href="../setup/teraterm-com.html#WaitCom">WaitCom</a> エントリを追加した。デフォルトはoff。</li>
         </ul></li>
-      <li><a href="../menu/setup-terminal.html#CRSend">送信改行モード</a>に LF を追加した。</li>
+      <li><a href="../menu/setup-additional-terminal.html#CRSend">送信改行モード</a>に LF を追加した。</li>
       <li><a href="../setup/teraterm-trans.html#zmauto">ZmodemAuto=on</a> の時、ZRINIT パケットを受信時に ZMODEM 送信のファイル選択ダイアログを開くようにした。</li>
       <li>Tera Term アイコン(teraterm.ico, vt.ico)とマクロアイコン(ttmacro.ico)を新しくした。坂本龍彦氏に感謝します。</li>
     </ul>
@@ -1515,7 +1522,7 @@
           <li><a href="../menu/file-new.html">New connectionダイアログ</a>のTCP/IP:Hostに名前付きパイプを指定できるようにした。</li>
           <li><a href="../commandline/teraterm.html#pipe">/PIPE</a> オプションで名前付きパイプを指定できるようにした。</li>
         </ul></li>
-      <li><a href="../menu/setup-terminal.html#CRReceive">受信改行モード</a>にAUTOを追加した。tentner氏に感謝します。</li>
+      <li><a href="../menu/setup-additional-terminal.html#CRReceive">受信改行モード</a>にAUTOを追加した。tentner氏に感謝します。</li>
       <li>表示フォントの品質を選択できるようにした。
         <ul>
           <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>に Font quality 設定項目を追加した。</li>
@@ -1776,7 +1783,7 @@
     <ul>
       <li>端末の横幅が 257 桁より大きいと正常に表示できない問題を修正した。</li>
       <li>端末ID設定が VT520, VT525 の時に、Primary DA (DA1) への応答が壊れていた問題を修正した。</li>
-      <li>言語モードが日本語以外の時、<a href="../menu/setup-terminal.html">Terminal Setup</a> ダイアログで端末IDに VT420, VT520, VT525 を指定しても実際には VT100 に設定される問題を修正した。</li>
+      <li>言語モードが日本語以外の時、<a href="../menu/setup-additional-terminal.html">Terminal Setup</a> ダイアログで端末IDに VT420, VT520, VT525 を指定しても実際には VT100 に設定される問題を修正した。</li>
       <li>ネットワーク共有をマップしたローカルデバイスを<a href="../setup/teraterm-prn.html#direct">PassThruPort</a>に指定した場合、印刷ができない問題を修正した。cf.<a href="http://logmett.com/forum/viewtopic.php?f=2&amp;t=1383" target="_blank">print with WINDOWS 7 net use LPT PERSISTENT:Yes </a></li>
       <li>対応していない OSC 制御文字列を正しく無視出来ない場合があった問題を修正した。</li>
       <li>DCS, SOS, APC, PM 制御文字列の直後の文字を正しく扱えていなかった問題を修正した。</li>
@@ -2511,7 +2518,7 @@
       <li><a href="../setup/teraterm-trans.html#filter">FileSendFilter</a> が設定されていると、ファイルダイアログの拡張子フィルタが正しく動作しない問題を修正した。</li>
       <li>ZMODEMによるファイル送信時に、すでにサーバ側に同一ファイルが存在した場合、ファイルハンドルの二重クローズをしていたバグを修正した。</li>
       <li>telnet キープアライブ処理が thread-safe になっていなかった問題を修正した。</li>
-      <li><a href="../menu/setup-terminal.html">Terminal Setup</a> の New-line (transmit) が空欄になる問題を修正した。</li>
+      <li><a href="../menu/setup-additional-terminal.html">Terminal Setup</a> の New-line (transmit) が空欄になる問題を修正した。</li>
       <li>Dell の USB キーボードで矢印キーが効かないことがある問題に対応した。<br> cf. <a href="http://www.neocom.ca/forum/viewtopic.php?p=2565" target="_blank">http://www.neocom.ca/forum/viewtopic.php?p=2565</a></li>
       <li><a href="#ttssh_2.45">SSH2対応TTSSH(2.45)</a>へ差し替えた</li>
       <li><a href="#cygterm_1.07_14">CygTerm+ 1.07_14</a>へ差し替えた</li>
@@ -4248,12 +4255,18 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>Curve25519楕円曲線DH（Diffe Hellman）アルゴリズムを使った鍵交換をサポートした。
+      <li>Ed25519 鍵による公開鍵認証をサポートした。</li>
+      <li>Ed25519 サーバホスト鍵をサポートした。
         <ul>
-          <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a>で ED25519 鍵の作成に対応した。</li>
-          <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a>で RSA/DSA/ECDSA 秘密鍵ファイルに bcrypt KDF 形式を選択可能とした。</li>
-          <li>Host Key algorithmに ED25519 を追加した。teraterm.ini の HostKeyOrder エントリを変更した。</li>
-        </ul></li>
+          <li>teraterm.ini の HostKeyOrder エントリを変更した。</li>
+        </ul>
+      </li>
+      <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a> で ED25519 鍵の作成に対応した。
+        <ul>
+          <li>Ed25519 秘密鍵ファイルは bcrypt KDF 形式で保存されます。</li>
+        </ul>
+      </li>
+      <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a> で RSA/DSA/ECDSA 秘密鍵ファイルを保存するときに bcrypt KDF 形式を選択可能とした。</li>
       <li>"About TTSSH" ダイアログにホスト公開鍵の指紋およびランダムアートを表示するようにした。</li>
       <li>端末オプションのONLCR設定をサーバに通知するようにした。</li>
     </ul>

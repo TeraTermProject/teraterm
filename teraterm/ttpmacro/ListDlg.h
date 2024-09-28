@@ -29,7 +29,7 @@
 
 #include "../common/tmfc.h"
 #include "macrodlgbase.h"
-#include "resize_helper.h"
+#include "winuser.h"
 
 // CListDlg ダイアログ
 class CListDlg : public CMacroDlgBase
@@ -40,20 +40,23 @@ public:
 	int m_SelectItem;
 
 private:
+	int CONTROL_GAP_W;				// ウィンドウ端とコントロール間との幅
 	enum { IDD = IDD_LISTDLG };
-	const wchar_t *m_Text;
+	wchar_t m_Text[MaxStrLen];
 	const wchar_t *m_Caption;
 	wchar_t **m_Lists;
 	int m_Selected;
-	int init_WW, TW, TH, BH, BW, LW, LH;
+	int init_WW = 0, init_WH = 0, init_LW = 0, init_LH = 0, TW, TH, BH, BW, LW, LH;
 	SIZE s;
-	ReiseDlgHelper_t *ResizeHelper = NULL;
 	HINSTANCE m_hInst;
 	int m_ext = 0;
 	int m_width;
 	int m_height;
+	BOOL in_init = FALSE;
+	int dpi = 0;
+	BOOL use_TW = FALSE; // TRUE = 初期サイズの計算の際、TWの値を使用する
 
-	void Relocation(BOOL is_init, int WW);
+	void Relocation(BOOL is_init, int WW, int WH);
 	void InitList(HWND HList);
 
 	virtual BOOL OnInitDialog();
