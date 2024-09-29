@@ -111,6 +111,14 @@ statusbox 'Message' 'Title'
 for i 0 200
   setdlgpos i 200
 next
+
+; Message box at the top-left of the VT window.
+setdlgpos 0 0 6
+messagebox 'top-left' 'VT window'
+
+; Message box at the top-right offset 10px of the display.
+setdlgpos 0 0 2 (-10) 10
+messagebox 'top-right offset 10px' 'Display'
 </pre>
 
 <pre class="macro-example">

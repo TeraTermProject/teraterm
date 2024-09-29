@@ -110,6 +110,14 @@ statusbox 'Message' 'Title'
 for i 0 200
   setdlgpos i 200
 next
+
+; VTウィンドウの左上を基準に表示する
+setdlgpos 0 0 6
+messagebox 'top-left' 'VT window'
+
+; ディスプレイの右上を基準に、下に10px、左に10pxに表示する
+setdlgpos 0 0 2 (-10) 10
+messagebox 'top-right offset 10px' 'Display'
 </pre>
 
 <pre class="macro-example">
