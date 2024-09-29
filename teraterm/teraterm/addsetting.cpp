@@ -1492,14 +1492,18 @@ void CCygwinPropPageDlg::OnHelp()
 CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd):
 	TTCPropSheetDlg(hInstance, hParentWnd, ts.UILanguageFileW)
 {
+	AddsettingWin parent_win = AddsettingCheckWin(hParentWnd);
+
 	// CPP,tmfcのTTCPropertyPage派生クラスから生成
 	int i = 0;
-	m_Page[i++] = new CGeneralPropPageDlg(hInstance);
-	m_Page[i++] = new CSequencePropPageDlg(hInstance);
-	m_Page[i++] = new CCopypastePropPageDlg(hInstance);
-	m_Page[i++] = new CVisualPropPageDlg(hInstance);
-	m_Page[i++] = new CLogPropPageDlg(hInstance);
-	m_Page[i++] = new CCygwinPropPageDlg(hInstance);
+	if (parent_win == ADDSETTING_WIN_VT) {
+		m_Page[i++] = new CGeneralPropPageDlg(hInstance);
+		m_Page[i++] = new CSequencePropPageDlg(hInstance);
+		m_Page[i++] = new CCopypastePropPageDlg(hInstance);
+		m_Page[i++] = new CVisualPropPageDlg(hInstance);
+		m_Page[i++] = new CLogPropPageDlg(hInstance);
+		m_Page[i++] = new CCygwinPropPageDlg(hInstance);
+	}
 	if ((GetKeyState(VK_CONTROL) & 0x8000) != 0 ||
 		(GetKeyState(VK_SHIFT) & 0x8000) != 0 ) {
 		m_Page[i++] = new CDebugPropPage(hInstance);
@@ -1513,20 +1517,22 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 	}
 
 	// TTCPropertyPage を使用しない PropertyPage
-	page = CodingPageCreate(hInstance, &ts);
-	AddPage(page);
-	page = FontPageCreate(hInstance, &ts);
-	AddPage(page);
-	page = ThemePageCreate(hInstance, &ts);
-	AddPage(page);
-	page = KeyboardPageCreate(hInstance, &ts);
-	AddPage(page);
-	page = MousePageCreate(hInstance, &ts);
-	AddPage(page);
-	page = TcpIPPageCreate(hInstance, &ts);
-	AddPage(page);
-	page = CreateTerminalPP(hInstance, hParentWnd, & ts);
-	AddPage(page);
+	if (parent_win == ADDSETTING_WIN_VT) {
+		page = CodingPageCreate(hInstance, &ts);
+		AddPage(page);
+		page = FontPageCreate(hInstance, &ts);
+		AddPage(page);
+		page = ThemePageCreate(hInstance, &ts);
+		AddPage(page);
+		page = KeyboardPageCreate(hInstance, &ts);
+		AddPage(page);
+		page = MousePageCreate(hInstance, &ts);
+		AddPage(page);
+		page = TcpIPPageCreate(hInstance, &ts);
+		AddPage(page);
+		page = CreateTerminalPP(hInstance, hParentWnd, & ts);
+		AddPage(page);
+	}
 	page = CreateWinPP(hInstance, hParentWnd, &ts);
 	AddPage(page);
 
@@ -1572,4 +1578,28 @@ void CAddSettingPropSheetDlg::SetStartPage(Page page)
 		break;
 	}
 	TTCPropSheetDlg::SetStartPage(start_page);
+}
+
+/**
+ *	hWnd がどのウィンドウか調べる
+ *		hWnd は VTWINかTEKWINのはず
+ */
+AddsettingWin AddsettingCheckWin(HWND hWnd)
+{
+	if (hWnd == NULL) {
+		// ActiveWin が使える?
+		assert(false);
+		if (ActiveWin == IdTEK)
+			hWnd = HTEKWin;
+		else
+			hWnd = HVTWin;
+	}
+	if (hWnd == HVTWin) {
+		return ADDSETTING_WIN_VT;
+	}
+	else if (hWnd == HTEKWin) {
+		return ADDSETTING_WIN_TEK;
+	}
+	assert(false);
+	return ADDSETTING_WIN_VT;
 }
