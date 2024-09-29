@@ -276,7 +276,7 @@ HPROPSHEETPAGE CreateTerminalPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
 	wchar_t *uimsg;
-	GetI18nStrWW("Tera Term", "DLG_TERM_TITLE", L"Tera Term: Terminal setup", pts->UILanguageFileW, &uimsg);
+	GetI18nStrWW("Tera Term", "DLG_TERM_TITLE", L"Terminal", pts->UILanguageFileW, &uimsg);
 	psp.pszTitle = uimsg;
 	psp.pszTemplate = MAKEINTRESOURCEW(IDD_TERMDLG);
 #if defined(REWRITE_TEMPLATE)

@@ -533,7 +533,7 @@ HPROPSHEETPAGE CreateWinPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
 	wchar_t *uimsg;
-	GetI18nStrWW("Tera Term", "DLG_WIN_TITLE", L"Tera Term: Terminal win...", pts->UILanguageFileW, &uimsg);
+	GetI18nStrWW("Tera Term", "DLG_WIN_TITLE", L"Window", pts->UILanguageFileW, &uimsg);
 	psp.pszTitle = uimsg;
 	psp.pszTemplate = MAKEINTRESOURCEW(IDD_WINDLG);
 #if defined(REWRITE_TEMPLATE)
