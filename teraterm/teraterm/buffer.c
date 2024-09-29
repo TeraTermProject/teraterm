@@ -3275,9 +3275,9 @@ static BOOL CheckSelect(int x, int y)
 /**
  *	1行描画
  *
- *	@param	SY				スクリーン上の位置(Charactor)  !バッファ上の位置
+ *	@param	SY				スクリーン上の位置(Character)  !バッファ上の位置
  *							PageStart + YStart など
- *	@param	IStart,IEnd		スクリーン上の位置(Charactor)
+ *	@param	IStart,IEnd		スクリーン上の位置(Character)
  *							指定した間を描画する
  *  @param	disp_strW()		wchar_t 文字を描画用関数 (Unicode用)
  *  @param	disp_strA()		char 文字を描画用関数 (ANSI用)
@@ -3484,9 +3484,9 @@ static void l_disp_strA(const char *buf, const char *width_info, int count, void
  *	1行描画 画面用
  *
  *	@param	DrawX,Y			Clint領域描画位置(pixel)
- *	@param	SY				スクリーン上の位置(Charactor)  !バッファ上の位置
+ *	@param	SY				スクリーン上の位置(Character)  !バッファ上の位置
  *							PageStart + YStart など
- *	@param	IStart,IEnd		スクリーン上の位置(Charactor)
+ *	@param	IStart,IEnd		スクリーン上の位置(Character)
  *							指定した間を描画する
  */
 static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
@@ -3526,9 +3526,9 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 /**
  *	1行描画 プリンタ用
  *
- *	@param	SY				スクリーン上の位置(Charactor)  !バッファ上の位置
+ *	@param	SY				スクリーン上の位置(Character)  !バッファ上の位置
  *							PageStart + YStart など
- *	@param	IStart,IEnd		スクリーン上の位置(Charactor)
+ *	@param	IStart,IEnd		スクリーン上の位置(Character)
  *							指定した間を描画する
  */
 static void BuffDrawLineIPrn(int SY, int IStart, int IEnd)

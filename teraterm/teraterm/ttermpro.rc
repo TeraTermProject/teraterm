@@ -175,7 +175,7 @@ BEGIN
     CONTROL         "Flickerless move",IDC_CHECK_FLICKER_LESS_MOVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,148,44,105,12
     CONTROL         "Window corner don't round",IDC_CHECK_CORNERDONTROUND,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,148,59,105,12
-    LTEXT           "Charactor attributes",IDC_STATIC,137,75,63,8
+    LTEXT           "Character attributes",IDC_STATIC,137,75,63,8
     CONTROL         "Enable B&old attribute color",IDC_ENABLE_ATTR_COLOR_BOLD,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,148,87,124,12
     CONTROL         "Enable Bold attribute font",IDC_ENABLE_ATTR_FONT_BOLD,

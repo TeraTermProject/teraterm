@@ -160,21 +160,25 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			int recv_index = 0;
 			int send_index = 0;
-			for (int i = 0;; i++) {
-				const TKanjiList *p = GetKanjiList(i);
+			int i = 0;
+			while(1) {
+				const TKanjiList *p = GetKanjiList(i++);
 				if (p == NULL) {
 					break;
 				}
-				LRESULT index = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_ADDSTRING, 0, (LPARAM)p->CodeName);
+				if (p->CodeStrGUI == NULL) {
+					continue;
+				}
+				LRESULT index = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_ADDSTRING, 0, (LPARAM)p->CodeStrGUI);
 				SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_SETITEMDATA, index, (LPARAM)p->coding);
 				if (ts->KanjiCode == p->coding) {
-					recv_index = i;
+					recv_index = index;
 				}
 
-				index =	SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_ADDSTRING, 0, (LPARAM)p->CodeName);
+				index = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_ADDSTRING, 0, (LPARAM)p->CodeStrGUI);
 				SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETITEMDATA, index, (LPARAM)p->coding);
 				if (ts->KanjiCodeSend == p->coding) {
-					send_index = i;
+					send_index = index;
 				}
 			}
 			ExpandCBWidth(hWnd, IDC_TERMKANJI);
@@ -242,8 +246,14 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			// character width (Œ»Ý‚Ì’l)
 			SetDropDownList(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CellWidthList, ts->UnicodeAmbiguousWidth == 1 ? 1 : 2);
-			CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, ts->UnicodeEmojiOverride ? BST_CHECKED : BST_UNCHECKED);
 			SetDropDownList(hWnd, IDC_EMOJI_WIDTH_COMBO, CellWidthList, ts->UnicodeEmojiWidth == 1 ? 1 : 2);
+			if (ts->UnicodeEmojiOverride) {
+				CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_CHECKED);
+				EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), TRUE);
+			} else {
+				CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_UNCHECKED);
+				EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), FALSE);
+			}
 
 			return TRUE;
 		}
