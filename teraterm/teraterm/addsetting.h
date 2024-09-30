@@ -66,6 +66,10 @@ private:
 };
 #endif // __cplusplus
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
 	DefaultPage,
 	CodingPage,
@@ -83,3 +87,7 @@ typedef enum {
 } AddsettingWin;
 
 AddsettingWin AddsettingCheckWin(HWND hWnd);
+
+#ifdef __cplusplus
+}
+#endif
