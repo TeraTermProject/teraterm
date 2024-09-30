@@ -4332,24 +4332,6 @@ void CVTWindow::OnSetupFont()
 	(*ChooseFontDlg)(HVTWin, NULL, &ts);
 }
 
-static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
-{
-	if (Message == WM_INITDIALOG) {
-		wchar_t *uimsg;
-		GetI18nStrWW("Tera Term",
-					 "DLG_CHOOSEFONT_STC6",
-					 L"\"Font style\" selection here won't affect actual font appearance.",
-					 ts.UILanguageFileW, &uimsg);
-		SetDlgItemTextW(Dialog, stc6, uimsg);
-		free(uimsg);
-
-		SetFocus(GetDlgItem(Dialog,cmb1));
-
-		CenterWindow(Dialog, GetParent(Dialog));
-	}
-	return FALSE;
-}
-
 void CVTWindow::OnSetupKeyboard()
 {
 	HelpId = HlpSetupKeyboard;
@@ -4359,11 +4341,38 @@ void CVTWindow::OnSetupKeyboard()
 	(*SetupKeyboard)(HVTWin, &ts);
 }
 
+static void OpenNewComport(const TTTSet *pts)
+{
+	char Command[MAXPATHLEN + HostNameMaxLength];
+	char Temp[MAX_PATH], Str[MAX_PATH];
+
+	_snprintf_s(Command, sizeof(Command),
+				"ttermpro /C=%u /SPEED=%lu /CDELAYPERCHAR=%u /CDELAYPERLINE=%u ",
+				pts->ComPort, pts->Baud, pts->DelayPerChar, pts->DelayPerLine);
+
+	if (SerialPortConfconvertId2Str(COM_DATABIT, pts->DataBit, Temp, sizeof(Temp))) {
+		_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CDATABIT=%s ", Temp);
+		strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+	}
+	if (SerialPortConfconvertId2Str(COM_PARITY, pts->Parity, Temp, sizeof(Temp))) {
+		_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CPARITY=%s ", Temp);
+		strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+	}
+	if (SerialPortConfconvertId2Str(COM_STOPBIT, pts->StopBit, Temp, sizeof(Temp))) {
+		_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CSTOPBIT=%s ", Temp);
+		strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+	}
+	if (SerialPortConfconvertId2Str(COM_FLOWCTRL, pts->Flow, Temp, sizeof(Temp))) {
+		_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CFLOWCTRL=%s ", Temp);
+		strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+	}
+
+	TTWinExecA(Command);
+}
+
 void CVTWindow::OnSetupSerialPort()
 {
 	BOOL Ok;
-	char Command[MAXPATHLEN + HostNameMaxLength];
-	char Temp[MAX_PATH], Str[MAX_PATH];
 
 	HelpId = HlpSetupSerialPort;
 	if (! LoadTTDLG()) {
@@ -4379,28 +4388,7 @@ void CVTWindow::OnSetupSerialPort()
 		 * New connectionからシリアル接続する動作と基本的に同じ動作となる。
 		 */
 		if ( cv.Ready && (cv.PortType != IdSerial) ) {
-			_snprintf_s(Command, sizeof(Command),
-				"ttermpro /C=%u /SPEED=%lu /CDELAYPERCHAR=%u /CDELAYPERLINE=%u ",
-				ts.ComPort, ts.Baud, ts.DelayPerChar, ts.DelayPerLine);
-
-			if (SerialPortConfconvertId2Str(COM_DATABIT, ts.DataBit, Temp, sizeof(Temp))) {
-				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CDATABIT=%s ", Temp);
-				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
-			}
-			if (SerialPortConfconvertId2Str(COM_PARITY, ts.Parity, Temp, sizeof(Temp))) {
-				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CPARITY=%s ", Temp);
-				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
-			}
-			if (SerialPortConfconvertId2Str(COM_STOPBIT, ts.StopBit, Temp, sizeof(Temp))) {
-				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CSTOPBIT=%s ", Temp);
-				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
-			}
-			if (SerialPortConfconvertId2Str(COM_FLOWCTRL, ts.Flow, Temp, sizeof(Temp))) {
-				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CFLOWCTRL=%s ", Temp);
-				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
-			}
-
-			TTWinExecA(Command);
+			OpenNewComport(&ts);
 			return;
 		}
 
@@ -4489,7 +4477,7 @@ void CVTWindow::OnSetupSave()
 
 	if (LoadTTSET())
 	{
-		int w, h;
+		int w = 0, h = 0;
 
 #ifdef WINDOW_MAXMIMUM_ENABLED
 		if (::IsZoomed(m_hWnd)) {
