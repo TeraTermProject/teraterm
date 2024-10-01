@@ -137,12 +137,12 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Background transparency">
+			<param name="Name" value="Change look and feel">
 			<param name="Local" value="html\usage\transparent.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="available character encoding">
+			<param name="Name" value="Available character encoding">
 			<param name="Local" value="html\usage\character_encoding.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
