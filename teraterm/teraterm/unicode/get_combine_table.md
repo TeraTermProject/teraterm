@@ -1,4 +1,4 @@
-﻿# combining charactors
+﻿# combining characters
 
 - 結合文字
 - 濁点など、前のもじとくっつける処理

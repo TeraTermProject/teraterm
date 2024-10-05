@@ -1,4 +1,4 @@
-﻿# virama charactors
+﻿# virama characters
 
 - 結合文字
 - 次の文字を、前の文字とくっつける
