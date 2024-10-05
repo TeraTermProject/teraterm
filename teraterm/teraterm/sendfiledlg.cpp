@@ -69,7 +69,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 	};
 	static const I18nTextInfo delaytype_list[] = {
 		{"DLG_SENDFILE_DELAYTYPE_NO_DELAY", L"no delay"},
-		{"DLG_SENDFILE_DELAYTYPE_PER_CHAR", L"per charactor"},
+		{"DLG_SENDFILE_DELAYTYPE_PER_CHAR", L"per character"},
 		{"DLG_SENDFILE_DELAYTYPE_PER_LINE", L"per line"},
 		{"DLG_SENDFILE_DELAYTYPE_PER_SENDSIZE", L"per sendsize"},
 	};

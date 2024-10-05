@@ -61,7 +61,7 @@ typedef struct {
 						// 2ˆÈã‚Ì‚Æ‚«A‚±‚Ì•¶š‚ÌŒã‚ë‚Épadding‚ªcell-1ŒÂ‘±‚­
 	char Padding;					// TRUE = ‘SŠp‚ÌŸ‚Ì‹l‚ß•¨ or s––‚Ì‹l‚ß•¨
 	char Emoji;						// TRUE = ŠG•¶š
-	unsigned char CombinationCharCount16;	// charactor count
+	unsigned char CombinationCharCount16;	// character count
 	unsigned char CombinationCharSize16;		// buffer size
 	unsigned char CombinationCharCount32;
 	unsigned char CombinationCharSize32;
