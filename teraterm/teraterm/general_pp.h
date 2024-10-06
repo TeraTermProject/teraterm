@@ -36,7 +36,7 @@
 class CGeneralPropPageDlg : public TTCPropertyPage
 {
 public:
-	CGeneralPropPageDlg(HINSTANCE inst);
+	CGeneralPropPageDlg(HINSTANCE inst, HWND hVTWin, TComVar *pcv);
 	virtual ~CGeneralPropPageDlg();
 private:
 	void OnInitDialog();

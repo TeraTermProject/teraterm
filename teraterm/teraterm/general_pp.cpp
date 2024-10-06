@@ -36,7 +36,6 @@
 #include <assert.h>
 
 #include "tttypes.h"
-#include "ttwinman.h"	// for ts
 #include "helpid.h"
 #include "i18n.h"
 #include "win32helper.h"
@@ -164,27 +163,34 @@ static wchar_t *LangInfoText(const LangInfo *p)
 }
 
 typedef struct DlgDataTag {
-	TTTSet* ts;
+	TComVar *pcv;
+	TTTSet* pts;
 	LangInfo* lng_infos;
 	size_t lng_size;
 	size_t selected_lang;	// 選ばれていたlngファイル番号
 	TipWin2 *tipwin2;
+	HWND hVTWin;
+	HINSTANCE hInst;
 } DlgData;
 
 
-CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst)
+CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst, HWND hVTWin, TComVar *pcv)
 	: TTCPropertyPage(inst, CGeneralPropPageDlg::IDD)
 {
+	data = (DlgData *)calloc(1, sizeof(*data));
+	data->pcv = pcv;
+	TTTSet *pts = pcv->ts;
+	data->pts = pts;
+	data->hInst = inst;
+	data->hVTWin = hVTWin;
+
 	wchar_t *UIMsg;
 	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_GENERAL",
-				 L"General", ts.UILanguageFileW, &UIMsg);
+				 L"General", pts->UILanguageFileW, &UIMsg);
 	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
-	data = (DlgData *)calloc(1, sizeof(*data));
-	data->ts = &ts;
 
 	// UI Language, 読み込み
-	TTTSet *pts = data->ts;
 	LangInfo* infos = NULL;
 	size_t infos_size = 0;
 	wchar_t* folder;
@@ -204,8 +210,10 @@ CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst)
 
 CGeneralPropPageDlg::~CGeneralPropPageDlg()
 {
-	TipWin2Destroy(data->tipwin2);
-	data->tipwin2 = NULL;
+	if (data->tipwin2 != NULL) {
+		TipWin2Destroy(data->tipwin2);
+		data->tipwin2 = NULL;
+	}
 	LangFree(data->lng_infos, data->lng_size);
 	data->lng_infos = NULL;
 	data->lng_size = 0;
@@ -241,7 +249,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 		{ IDC_NOTIFICATION_TEST_POPUP, "DLG_TAB_GENERAL_NOTIFICATION_TEST_NOTIFY" },
 		{ IDC_NOTIFICATION_TEST_TRAY, "DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY" },
 	};
-	TTTSet *pts = data->ts;
+	TTTSet *pts = data->pts;
 
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), pts->UILanguageFileW);
 
@@ -278,7 +286,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 	SetCheck(IDC_NOTIFY_SOUND, pts->NotifySound);
 
 	// UI Language用 tipwin
-	data->tipwin2 = TipWin2Create(NULL, m_hWnd);
+	data->tipwin2 = TipWin2Create(data->hInst, m_hWnd);
 
 	// UI Language, 選択
 	{
@@ -288,7 +296,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 		for (size_t i = 0; i < info_size; i++) {
 			const LangInfo* p = infos + i;
 			SendDlgItemMessageW(IDC_GENUILANG, CB_ADDSTRING, 0, (LPARAM)p->language);
-			if (wcscmp(p->fullname, ts.UILanguageFileW) == 0) {
+			if (wcscmp(p->fullname, pts->UILanguageFileW) == 0) {
 				data->selected_lang = i;
 				wchar_t *info_text = LangInfoText(p);
 				TipWin2SetTextW(data->tipwin2, IDC_GENUILANG, info_text);
@@ -332,7 +340,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 
 void CGeneralPropPageDlg::OnOK()
 {
-	TTTSet *pts = data->ts;
+	TTTSet *pts = data->pts;
 
 	// (1)
 	pts->DisableAcceleratorSendBreak = GetCheck(IDC_DISABLE_SENDBREAK);
@@ -369,7 +377,7 @@ void CGeneralPropPageDlg::OnOK()
 		BOOL notify_sound = (BOOL)GetCheck(IDC_NOTIFY_SOUND);
 		if (notify_sound != pts->NotifySound) {
 			pts->NotifySound = notify_sound;
-			Notify2SetSound((NotifyIcon *)cv.NotifyIcon, notify_sound);
+			Notify2SetSound((NotifyIcon *)data->pcv->NotifyIcon, notify_sound);
 		}
 	}
 
@@ -381,13 +389,13 @@ void CGeneralPropPageDlg::OnOK()
 			pts->UILanguageFileW = _wcsdup(p->fullname);
 
 			// タイトルの更新を行う。(2014.2.23 yutaka)
-			PostMessage(HVTWin, WM_USER_CHANGETITLE, 0, 0);
+			PostMessage(data->hVTWin, WM_USER_CHANGETITLE, 0, 0);
 		}
 
 		// TTXKanjiMenu は Language を見てメニューを表示するので、変更の可能性がある
 		// OK 押下時にメニュー再描画のメッセージを飛ばすようにした。 (2007.7.14 maya)
 		// 言語ファイルの変更時にメニューの再描画が必要 (2012.5.5 maya)
-		PostMessage(HVTWin, WM_USER_CHANGEMENU, 0, 0);
+		PostMessage(data->hVTWin, WM_USER_CHANGEMENU, 0, 0);
 	}
 
 	// default port
@@ -413,7 +421,7 @@ void CGeneralPropPageDlg::OnOK()
 
 void CGeneralPropPageDlg::OnHelp()
 {
-	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalGeneral, 0);
+	PostMessage(data->hVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalGeneral, 0);
 }
 
 BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -421,7 +429,7 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	switch (wParam) {
 		case IDC_NOTIFICATION_TEST_POPUP | (BN_CLICKED << 16): {
 			// popupを出すテスト
-			NotifyIcon *ni = (NotifyIcon *)cv.NotifyIcon;
+			NotifyIcon *ni = (NotifyIcon *)data->pcv->NotifyIcon;
 			const wchar_t *msg = L"Test button was pushed";
 			BOOL prev_sound = Notify2GetSound(ni);
 			BOOL notify_sound = (BOOL)GetCheck(IDC_NOTIFY_SOUND);
@@ -432,7 +440,7 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		}
 		case IDC_NOTIFICATION_TEST_TRAY | (BN_CLICKED << 16): {
 			// trayにiconを出す(自動で消えない)
-			NotifyIcon *ni = (NotifyIcon *)cv.NotifyIcon;
+			NotifyIcon* ni = (NotifyIcon*)data->pcv->NotifyIcon;
 			BOOL prev_sound = Notify2GetSound(ni);
 			BOOL notify_sound = (BOOL)GetCheck(IDC_NOTIFY_SOUND);
 			Notify2SetSound(ni, notify_sound);
@@ -448,7 +456,7 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				"MSG_TT_NOTICE", L"Tera Term: Notice",
 				"DLG_TAB_GENERAL_NOTIFICATION_TEST_MESSAGE", msg,
 				MB_OK };
-			TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
+			TTMessageBoxW(m_hWnd, &info, data->pts->UILanguageFileW);
 
 			// 通知領域のアイコンを消す
 			Notify2SetBallonDontHide(ni, FALSE);
@@ -459,7 +467,7 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			wchar_t *uimsgW;
 			wchar_t *src;
 			wchar_t *dest;
-			GetI18nStrWW("Tera Term", "DLG_SELECT_DIR_TITLE", L"Select new directory", ts.UILanguageFileW, &uimsgW);
+			GetI18nStrWW("Tera Term", "DLG_SELECT_DIR_TITLE", L"Select new directory", data->pts->UILanguageFileW, &uimsgW);
 
 			hGetDlgItemTextW(m_hWnd, IDC_DOWNLOAD_DIR, &src);
 			if (src != NULL && src[0] == 0) {

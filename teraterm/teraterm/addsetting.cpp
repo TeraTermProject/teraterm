@@ -1497,7 +1497,7 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 	// CPP,tmfcÇÃTTCPropertyPageîhê∂ÉNÉâÉXÇ©ÇÁê∂ê¨
 	int i = 0;
 	if (parent_win == ADDSETTING_WIN_VT) {
-		m_Page[i++] = new CGeneralPropPageDlg(hInstance);
+		m_Page[i++] = new CGeneralPropPageDlg(hInstance, hParentWnd, &cv);
 		m_Page[i++] = new CSequencePropPageDlg(hInstance);
 		m_Page[i++] = new CCopypastePropPageDlg(hInstance);
 		m_Page[i++] = new CVisualPropPageDlg(hInstance);
