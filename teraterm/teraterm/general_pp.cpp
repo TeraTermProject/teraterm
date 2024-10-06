@@ -43,10 +43,10 @@
 #include "ttcmn_notify2.h"
 #include "compat_win.h"
 #include "asprintf.h"
+#include "tipwin2.h"
 
 #include "general_pp.h"
 
-// moved from generaldlg.c
 typedef struct {
 	wchar_t* fullname;
 	wchar_t* filename;
@@ -147,11 +147,28 @@ static void LangRead(LangInfo* infos, size_t infos_size)
 	}
 }
 
-typedef struct {
+static wchar_t *LangInfoText(const LangInfo *p)
+{
+	wchar_t *info;
+	aswprintf(&info,
+			  L"language\r\n"
+			  L"  %s\r\n"
+			  L"filename\r\n"
+			  L"  %s\r\n"
+			  L"date\r\n"
+			  L"  %s\r\n"
+			  L"contributor\r\n"
+			  L"  %s",
+			  p->language, p->filename, p->date, p->contributor);
+	return info;
+}
+
+typedef struct DlgDataTag {
 	TTTSet* ts;
 	LangInfo* lng_infos;
 	size_t lng_size;
 	size_t selected_lang;	// 選ばれていたlngファイル番号
+	TipWin2 *tipwin2;
 } DlgData;
 
 
@@ -163,11 +180,38 @@ CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst)
 				 L"General", ts.UILanguageFileW, &UIMsg);
 	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
+	data = (DlgData *)calloc(1, sizeof(*data));
+	data->ts = &ts;
+
+	// UI Language, 読み込み
+	TTTSet *pts = data->ts;
+	LangInfo* infos = NULL;
+	size_t infos_size = 0;
+	wchar_t* folder;
+	aswprintf(&folder, L"%s\\%s", pts->ExeDirW, get_lang_folder());
+	infos = LangAppendFileList(folder, infos, &infos_size);
+	free(folder);
+	if (wcscmp(pts->ExeDirW, pts->HomeDirW) != 0) {
+		aswprintf(&folder, L"%s\\%s", pts->HomeDirW, get_lang_folder());
+		infos = LangAppendFileList(folder, infos, &infos_size);
+		free(folder);
+	}
+	LangRead(infos, infos_size);
+
+	data->lng_infos = infos;
+	data->lng_size = infos_size;
 }
 
 CGeneralPropPageDlg::~CGeneralPropPageDlg()
 {
+	TipWin2Destroy(data->tipwin2);
+	data->tipwin2 = NULL;
+	LangFree(data->lng_infos, data->lng_size);
+	data->lng_infos = NULL;
+	data->lng_size = 0;
 	free((void *)m_psp.pszTitle);
+	free(data);
+	data = NULL;
 }
 
 // CGeneralPropPageDlg メッセージ ハンドラ
@@ -197,7 +241,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 		{ IDC_NOTIFICATION_TEST_POPUP, "DLG_TAB_GENERAL_NOTIFICATION_TEST_NOTIFY" },
 		{ IDC_NOTIFICATION_TEST_TRAY, "DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY" },
 	};
-	TTTSet *pts = &ts;
+	TTTSet *pts = data->ts;
 
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), pts->UILanguageFileW);
 
@@ -233,50 +277,25 @@ void CGeneralPropPageDlg::OnInitDialog()
 	// Notify
 	SetCheck(IDC_NOTIFY_SOUND, pts->NotifySound);
 
-	// UI Language
+	// UI Language用 tipwin
+	data->tipwin2 = TipWin2Create(NULL, m_hWnd);
+
+	// UI Language, 選択
 	{
-		LangInfo* infos = NULL;
-		size_t infos_size = 0;
-		wchar_t* folder;
-		aswprintf(&folder, L"%s\\%s", pts->ExeDirW, get_lang_folder());
-		infos = LangAppendFileList(folder, infos, &infos_size);
-		free(folder);
-		if (wcscmp(pts->ExeDirW, pts->HomeDirW) != 0) {
-			aswprintf(&folder, L"%s\\%s", pts->HomeDirW, get_lang_folder());
-			infos = LangAppendFileList(folder, infos, &infos_size);
-			free(folder);
-		}
-		LangRead(infos, infos_size);
-
-		DlgData data;
-		data.ts = pts;
-		data.lng_infos = infos;
-		data.lng_size = infos_size;
-
-		data.selected_lang = 0;
-		{
-			// LangInfo* infos = data.lng_infos;
-			// size_t info_size = data.lng_size;
-			size_t i;
-			for (i = 0; i < data.lng_size; i++) {
-				const LangInfo* p = infos + i;
-				SendDlgItemMessageW(IDC_GENUILANG, CB_ADDSTRING, 0, (LPARAM)p->language);
-				if (wcscmp(p->fullname, ts.UILanguageFileW) == 0) {
-					data.selected_lang = i;
-				}
+		data->selected_lang = 0;
+		LangInfo* infos = data->lng_infos;
+		size_t info_size = data->lng_size;
+		for (size_t i = 0; i < info_size; i++) {
+			const LangInfo* p = infos + i;
+			SendDlgItemMessageW(IDC_GENUILANG, CB_ADDSTRING, 0, (LPARAM)p->language);
+			if (wcscmp(p->fullname, ts.UILanguageFileW) == 0) {
+				data->selected_lang = i;
+				wchar_t *info_text = LangInfoText(p);
+				TipWin2SetTextW(data->tipwin2, IDC_GENUILANG, info_text);
+				free(info_text);
 			}
-			SendDlgItemMessage(IDC_GENUILANG, CB_SETCURSEL, data.selected_lang, 0);
-			// wchar_t* info_text = LangInfoText(infos + data.selected_lang);
-			// SetDlgItemTextW(IDC_GENUILANG, info_text);
-			// free(info_text);
 		}
-
-		// INT_PTR r = TTDialogBoxParam(hInst,
-		// 		MAKEINTRESOURCE(IDD_GENDLG),
-		//	WndParent, GenDlg, (LPARAM)&data);
-		LangFree(infos, infos_size);
-		// return (BOOL)r;
-
+		SendDlgItemMessage(IDC_GENUILANG, CB_SETCURSEL, data->selected_lang, 0);
 	}
 
 	// default port
@@ -313,7 +332,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 
 void CGeneralPropPageDlg::OnOK()
 {
-	TTTSet *pts = &ts;
+	TTTSet *pts = data->ts;
 
 	// (1)
 	pts->DisableAcceleratorSendBreak = GetCheck(IDC_DISABLE_SENDBREAK);
@@ -354,45 +373,11 @@ void CGeneralPropPageDlg::OnOK()
 		}
 	}
 
-	// UI Language
 	{
-		// 再読み込み
-		// SetWindowLongPtr しておいて GetWindowLongPtrW できるとよいのですが
-		// テンプレートの構成だとそのように書けなさそう
-		LangInfo* infos = NULL;
-		size_t infos_size = 0;
-		wchar_t* folder;
-		aswprintf(&folder, L"%s\\%s", pts->ExeDirW, get_lang_folder());
-		infos = LangAppendFileList(folder, infos, &infos_size);
-		free(folder);
-		if (wcscmp(pts->ExeDirW, pts->HomeDirW) != 0) {
-			aswprintf(&folder, L"%s\\%s", pts->HomeDirW, get_lang_folder());
-			infos = LangAppendFileList(folder, infos, &infos_size);
-			free(folder);
-		}
-		LangRead(infos, infos_size);
-
-		DlgData data;
-		data.ts = pts;
-		data.lng_infos = infos;
-		data.lng_size = infos_size;
-
-		data.selected_lang = 0;
-		{
-			// LangInfo* infos = data.lng_infos;
-			// size_t info_size = data.lng_size;
-			size_t i;
-			for (i = 0; i < data.lng_size; i++) {
-				const LangInfo* p = infos + i;
-				if (wcscmp(p->fullname, ts.UILanguageFileW) == 0) {
-					data.selected_lang = i;
-				}
-			}
-		}
-
 		LRESULT w = SendDlgItemMessageA(IDC_GENUILANG, CB_GETCURSEL, 0, 0);
-		if (w != data.selected_lang) {
-			const LangInfo* p = data.lng_infos + w;
+		if (w != data->selected_lang) {
+			const LangInfo* p = data->lng_infos + w;
+			free(pts->UILanguageFileW);
 			pts->UILanguageFileW = _wcsdup(p->fullname);
 
 			// タイトルの更新を行う。(2014.2.23 yutaka)
@@ -403,8 +388,6 @@ void CGeneralPropPageDlg::OnOK()
 		// OK 押下時にメニュー再描画のメッセージを飛ばすようにした。 (2007.7.14 maya)
 		// 言語ファイルの変更時にメニューの再描画が必要 (2012.5.5 maya)
 		PostMessage(HVTWin, WM_USER_CHANGEMENU, 0, 0);
-
-		LangFree(infos, infos_size);
 	}
 
 	// default port
@@ -423,8 +406,8 @@ void CGeneralPropPageDlg::OnOK()
 	free(pts->FileDirW);
 	hGetDlgItemTextW(m_hWnd, IDC_DOWNLOAD_DIR, &pts->FileDirW);
 	if (pts->FileDirW != NULL && pts->FileDirW[0] == 0) {
-		pts->FileDirW = NULL;
 		free(pts->FileDirW);
+		pts->FileDirW = NULL;
 	}
 }
 
@@ -496,6 +479,13 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			}
 			free(src);
 			free(uimsgW);
+			break;
+		}
+		case IDC_GENUILANG | (CBN_SELCHANGE << 16): {
+			size_t ui_sel = (size_t)SendDlgItemMessageA(IDC_GENUILANG, CB_GETCURSEL, 0, 0);
+			wchar_t *info_text = LangInfoText(data->lng_infos + ui_sel);
+			TipWin2SetTextW(data->tipwin2, IDC_GENUILANG, info_text);
+			free(info_text);
 			break;
 		}
 		default:

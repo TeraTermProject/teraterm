@@ -44,4 +44,6 @@ private:
 	enum { IDD = IDD_TABSHEET_GENERAL };
 	void OnHelp();
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+
+	struct DlgDataTag *data;
 };
