@@ -35,10 +35,12 @@
 #if !defined(_CRTDBG_MAP_ALLOC)
 #define _CRTDBG_MAP_ALLOC
 #endif
+#include <stdio.h>
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <assert.h>
 
+#include "compat_win.h"
 #include "teraterm.h"
 #include "ttm_res.h"
 #include "ttlib.h"
@@ -51,6 +53,8 @@
 #include "ttmlib.h"
 #include "ttmdlg.h"
 #include "ttmacro.h"
+#include "ttmparse.h"
+#include "ttmdde.h"
 
 #include "ttmdlg.h"
 
@@ -66,6 +70,9 @@ BOOL SleepFlag;
 // (x,y) = (CW_USEDEFAULT, CW_USEDEFAULT)のときセンターに表示
 static int DlgPosX = CW_USEDEFAULT;
 static int DlgPosY = CW_USEDEFAULT;
+static int DlgPosition = 0;
+static int DlgOffsetX = 0;
+static int DlgOffsetY = 0;
 
 static CStatDlg *StatDlg = NULL;
 
@@ -170,13 +177,153 @@ BOOL GetFileName(HWND HWin, wchar_t **fname)
 	return TRUE;
 }
 
-void SetDlgPos(int x, int y)
+void SetDlgPos(int x, int y, int position, int offset_x, int offset_y)
 {
 	DlgPosX = x;
 	DlgPosY = y;
+	DlgPosition = position;
+	DlgOffsetX = offset_x;
+	DlgOffsetY = offset_y;
 	if (StatDlg!=NULL) { // update status box position
 		StatDlg->Update(NULL,NULL,DlgPosX,DlgPosY);
 	}
+}
+
+/*
+  SetDlgPosEX()
+
+   setdlgpos のパラメータ指定のうち、下記のNo.3と4を処理する。
+   No.1とNo.2は macrodlgbase.h の SetDlgPos() で処理する。
+
+   setdlgpos [<x> <y> [<position> [<offset x> <offset y>]]]
+   1. setdlgpos
+   2. setdlgpos <x> <y>
+   3. setdlgpos <x> <y> <position>
+   4. setdlgpos <x> <y> <position> <offset x> <offset y>
+
+*/
+int SetDlgPosEX(HWND hWnd, int width, int height, int *PosX, int *PosY) {
+	char Str[MaxStrLen];
+	int showflag;
+	int w_x, w_y, w_width, w_height;
+	int c_x, c_y, c_width, c_height;
+	RECT rcDesktop;
+	float vtwin_mag;
+	int new_x = 0, new_y = 0, new_width, new_height, position;
+	POINT pt;
+
+	if (hWnd == NULL || DlgPosition == 0) {
+		return -1;		// 固定位置
+	}
+
+	vtwin_mag = 1;
+	if (Linked) {
+		if (GetTTParam(CmdGetTTPos, Str, sizeof(Str)) != 0) {
+			return -1;
+		}
+		if (sscanf_s(Str, "%d %d %d %d %d %d %d %d %d", &showflag,
+					 &w_x, &w_y, &w_width, &w_height,
+					 &c_x, &c_y, &c_width, &c_height) != 9) {
+			return -1;
+		}
+
+		// Tera TermとMACROのメインウインドウの表示先ディスプレイが別でDPIが異なる場合の補正
+		if (DPIAware == DPI_AWARENESS_CONTEXT_UNAWARE) {
+			if (pMonitorFromRect != NULL && pGetDpiForMonitor != NULL) {
+				HMONITOR hMonitor;
+				RECT rc;
+				UINT dpi_x, dpi_y;
+				rc.left   = w_x;
+				rc.top    = w_y;
+				rc.right  = w_x + w_width;
+				rc.bottom = w_y + w_height;
+				hMonitor = pMonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
+				if (hMonitor != NULL) {
+					pGetDpiForMonitor(hMonitor, (MONITOR_DPI_TYPE)0 /*0=MDT_EFFECTIVE_DPI*/, &dpi_x, &dpi_y);
+					vtwin_mag = ((float)GetMonitorDpiFromWindow(hWnd)) / dpi_x;
+				}
+			}
+		}
+	}
+
+	new_width  = (int)(width  * vtwin_mag);
+	new_height = (int)(height * vtwin_mag);
+
+	if (Linked && showflag != 1 && showflag != 3) {
+		pt.x = w_x + w_width  / 2;
+		pt.y = w_y + w_height / 2;
+	} else {
+		pt.x = 0;
+		pt.y = 0;
+	}
+	GetDesktopRectFromPoint(&pt, &rcDesktop);
+
+	if (DlgPosition >= 1 && DlgPosition <= 5) {					// ディスプレイ基準
+		c_x = rcDesktop.left;
+		c_y = rcDesktop.top;
+		c_width  = rcDesktop.right - rcDesktop.left;
+		c_height = rcDesktop.bottom - rcDesktop.top;
+		position = DlgPosition;
+	} else if (DlgPosition >= 6 && DlgPosition <= 10) {			// vt window基準
+		if (! Linked || showflag == 1 || showflag == 3) {
+			return -1; // 非リンク、1:最小化、3:非表示 の場合は固定位置
+		}
+		// DpiAware=offの場合の補正
+		if (DPIAware == DPI_AWARENESS_CONTEXT_UNAWARE) {
+			c_x 	 = (int)(c_x 	  * vtwin_mag);
+			c_y 	 = (int)(c_y 	  * vtwin_mag);
+			c_width  = (int)(c_width  * vtwin_mag);
+			c_height = (int)(c_height * vtwin_mag);
+		}
+		position = DlgPosition - 5;
+	} else {
+		return -1;
+	}
+
+	switch (position) {
+	case 1: // 左上隅
+		new_x = c_x;
+		new_y = c_y;
+		break;
+	case 2: // 右上隅
+		new_x = c_x + c_width - new_width;
+		new_y = c_y;
+		break;
+	case 3: // 左下隅
+		new_x = c_x;
+		new_y = c_y + c_height - new_height;
+		break;
+	case 4: // 右下隅
+		new_x = c_x + c_width  - new_width;
+		new_y = c_y + c_height - new_height;
+		break;
+	case 5: // 中央
+		new_x = c_x + c_width  / 2 - new_width  / 2;
+		new_y = c_y + c_height / 2 - new_height / 2;
+		break;
+	}
+	new_x += int(DlgOffsetX / vtwin_mag);
+	new_y += int(DlgOffsetY / vtwin_mag);
+
+	// デスクトップからはみ出さないよう調整
+	if (new_x + new_width > rcDesktop.right) {
+		new_x = rcDesktop.right - new_width;
+	}
+	if (new_x < rcDesktop.left){
+		new_x = rcDesktop.left;
+	}
+	if (new_y + new_height > rcDesktop.bottom) {
+		new_y = rcDesktop.bottom - new_height;
+	}
+	if (new_y < rcDesktop.top) {
+		new_y = rcDesktop.top;
+	}
+	*PosX = new_x;
+	*PosY = new_y;
+
+	SetWindowPos(hWnd, HWND_TOP, new_x, new_y, new_width, new_height, 0);
+
+	return 0;
 }
 
 int OpenInpDlg(wchar_t *Buff, const wchar_t *Text, const wchar_t *Caption,
