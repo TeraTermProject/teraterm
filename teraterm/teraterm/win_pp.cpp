@@ -45,8 +45,8 @@
 #include "win32helper.h"
 #include "compat_win.h"
 #include "asprintf.h"
-#include "ttwinman.h"
 #include "color_sample.h"
+#include "addsetting.h" // for AddsettingCheckWin()
 
 #include "win_pp.h"
 
@@ -56,12 +56,10 @@
 typedef struct {
 	WORD TmpColor[12][6];
 	PTTSet ts;
-	HFONT SampleFont;
 	WORD VTFlag;
 	HWND VTWin;
+	ColorSample *cs;
 } WinDlgWork;
-
-static ColorSample *cs;
 
 static void DispSample(HWND Dialog, WinDlgWork *work, int IAttr)
 {
@@ -72,7 +70,7 @@ static void DispSample(HWND Dialog, WinDlgWork *work, int IAttr)
 	Back = RGB(work->TmpColor[IAttr][3],
 	           work->TmpColor[IAttr][4],
 	           work->TmpColor[IAttr][5]);
-	ColorSampleSetColor(cs, Text, Back);
+	ColorSampleSetColor(work->cs, Text, Back);
 }
 
 static void ChangeColor(HWND Dialog, WinDlgWork *work, int IAttr, int IOffset)
@@ -121,7 +119,6 @@ static void RestoreVar(HWND Dialog, WinDlgWork* work, int *IAttr, int *IOffset)
 static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
-		{ 0, "DLG_WIN_TITLE" },
 		{ IDC_WINTITLELABEL, "DLG_WIN_TITLELABEL" },
 		{ IDC_WINCURSOR, "DLG_WIN_CURSOR" },
 		{ IDC_WINBLOCK, "DLG_WIN_BLOCK" },
@@ -143,9 +140,6 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		{ IDC_WINGREENLABEL, "DLG_WIN_G" },
 		{ IDC_WINBLUELABEL, "DLG_WIN_B" },
 		{ IDC_WINUSENORMALBG, "DLG_WIN_ALWAYSBG" },
-		{ IDOK, "BTN_OK" },
-		{ IDCANCEL, "BTN_CANCEL" },
-		{ IDC_WINHELP, "BTN_HELP" },
 	};
 	PTTSet ts;
 	HWND Wnd, HRed, HGreen, HBlue;
@@ -250,7 +244,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 			SetRB(Dialog,ts->CursorShape,IDC_WINBLOCK,IDC_WINHORZ);
 
-			cs = ColorSampleInit(GetDlgItem(Dialog, IDC_DRAW_SAMPLE_AREA));
+			work->cs = ColorSampleInit(GetDlgItem(Dialog, IDC_DRAW_SAMPLE_AREA));
 
 			IAttr = 0;
 			IOffset = 0;
@@ -266,135 +260,124 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 			ChangeSB(Dialog,work,IAttr,IOffset);
 
-			//CenterWindow(Dialog, GetParent(Dialog));
-
-			ShowWindow(GetDlgItem(Dialog, IDOK), SW_HIDE);
-			ShowWindow(GetDlgItem(Dialog, IDCANCEL), SW_HIDE);
-			ShowWindow(GetDlgItem(Dialog, IDC_WINHELP), SW_HIDE);
-
-
 			return TRUE;
 
-		case WM_NOTIFY:
+		case WM_NOTIFY: {
+			ts = work->ts;
+			RestoreVar(Dialog,work,&IAttr,&IOffset);
+			assert(IAttr < _countof(work->TmpColor));
+			NMHDR *nmhdr = (NMHDR *)lParam;
+			switch (nmhdr->code) {
+			case PSN_APPLY: {
+				WORD w;
+				//HDC DC;
+				GetDlgItemText(Dialog, IDC_WINTITLE, ts->Title, sizeof(ts->Title));
+				GetRB(Dialog, &ts->HideTitle, IDC_WINHIDETITLE, IDC_WINHIDETITLE);
+				GetRB(Dialog, &w, IDC_NO_FRAME, IDC_NO_FRAME);
+				ts->EtermLookfeel.BGNoFrame = w;
+				GetRB(Dialog, &ts->PopupMenu, IDC_WINHIDEMENU, IDC_WINHIDEMENU);
+				// DC = GetDC(Dialog);
+				if (work->VTFlag > 0) {
+					GetRB(Dialog, &i, IDC_WINCOLOREMU, IDC_WINCOLOREMU);
+					if (i != 0) {
+						ts->ColorFlag |= CF_PCBOLD16;
+					}
+					else {
+						ts->ColorFlag &= ~(WORD)CF_PCBOLD16;
+					}
+					GetRB(Dialog, &i, IDC_WINAIXTERM16, IDC_WINAIXTERM16);
+					if (i != 0) {
+						ts->ColorFlag |= CF_AIXTERM16;
+					}
+					else {
+						ts->ColorFlag &= ~(WORD)CF_AIXTERM16;
+					}
+					GetRB(Dialog, &i, IDC_WINXTERM256, IDC_WINXTERM256);
+					if (i != 0) {
+						ts->ColorFlag |= CF_XTERM256;
+					}
+					else {
+						ts->ColorFlag &= ~(WORD)CF_XTERM256;
+					}
+					GetRB(Dialog, &ts->EnableScrollBuff, IDC_WINSCROLL1, IDC_WINSCROLL1);
+					if (ts->EnableScrollBuff > 0) {
+						ts->ScrollBuffSize =
+							GetDlgItemInt(Dialog,IDC_WINSCROLL2,NULL,FALSE);
+					}
+					for (i = 0; i <= 1; i++) {
+						ts->VTColor[i] =
+							RGB(work->TmpColor[0][i*3],
+								work->TmpColor[0][i*3+1],
+								work->TmpColor[0][i*3+2]);
+						ts->VTBoldColor[i] =
+							RGB(work->TmpColor[1][i*3],
+								work->TmpColor[1][i*3+1],
+								work->TmpColor[1][i*3+2]);
+						ts->VTBlinkColor[i] =
+							RGB(work->TmpColor[2][i*3],
+								work->TmpColor[2][i*3+1],
+								work->TmpColor[2][i*3+2]);
+						ts->VTReverseColor[i] =
+							RGB(work->TmpColor[3][i*3],
+								work->TmpColor[3][i*3+1],
+								work->TmpColor[3][i*3+2]);
+						ts->URLColor[i] =
+							RGB(work->TmpColor[4][i*3],
+								work->TmpColor[4][i*3+1],
+								work->TmpColor[4][i*3+2]);
+						ts->VTUnderlineColor[i] =
+							RGB(work->TmpColor[5][i * 3],
+								work->TmpColor[5][i * 3 + 1],
+								work->TmpColor[5][i * 3 + 2]);
+#if 0
+						ts->VTColor[i] = GetNearestColor(DC, ts->VTColor[i]);
+						ts->VTBoldColor[i] = GetNearestColor(DC, ts->VTBoldColor[i]);
+						ts->VTBlinkColor[i] = GetNearestColor(DC, ts->VTBlinkColor[i]);
+						ts->VTReverseColor[i] = GetNearestColor(DC, ts->VTReverseColor[i]);
+						ts->URLColor[i] = GetNearestColor(DC, ts->URLColor[i]);
+#endif
+					}
+					GetRB(Dialog, &ts->UseNormalBGColor,
+						  IDC_WINUSENORMALBG, IDC_WINUSENORMALBG);
+					GetRB(Dialog, &i, IDC_FONTBOLD, IDC_FONTBOLD);
+					if (i > 0) {
+						ts->FontFlag |= FF_BOLD;
+					}
+					else {
+						ts->FontFlag &= ~(WORD)FF_BOLD;
+					}
+				}
+				else {
+					for (i = 0; i <= 1; i++) {
+						ts->TEKColor[i] =
+							RGB(work->TmpColor[0][i*3],
+								work->TmpColor[0][i*3+1],
+								work->TmpColor[0][i*3+2]);
+#if 0
+						ts->TEKColor[i] = GetNearestColor(DC, ts->TEKColor[i]);
+#endif
+					}
+					GetRB(Dialog, &ts->TEKColorEmu, IDC_WINCOLOREMU, IDC_WINCOLOREMU);
+				}
+				// ReleaseDC(Dialog,DC);
+
+				GetRB(Dialog, &ts->CursorShape, IDC_WINBLOCK, IDC_WINHORZ);
+				//EndDialog(Dialog, 1);
+				return TRUE;
+			}
+			case PSN_HELP: {
+				const WPARAM HelpId = work->VTFlag > 0 ? HlpMenuSetupAdditionalWindow : HlpTEKSetupWindow;
+				PostMessage(work->VTWin, WM_USER_DLGHELP2, HelpId, 0);
+				break;
+			}
+			}
+			break;
+		}
 		case WM_COMMAND:
 			ts = work->ts;
 			RestoreVar(Dialog,work,&IAttr,&IOffset);
 			assert(IAttr < _countof(work->TmpColor));
-			if (Message == WM_NOTIFY) {
-				NMHDR *nmhdr = (NMHDR *)lParam;
-				if (nmhdr->code == PSN_APPLY) {
-					wParam = IDOK;
-				}
-				else if (nmhdr->code == PSN_HELP) {
-					wParam = IDC_WINHELP;
-				}
-				else {
-					break;
-				}
-			}
 			switch (LOWORD(wParam)) {
-				case IDOK: {
-					WORD w;
-					//HDC DC;
-					GetDlgItemText(Dialog, IDC_WINTITLE, ts->Title, sizeof(ts->Title));
-					GetRB(Dialog, &ts->HideTitle, IDC_WINHIDETITLE, IDC_WINHIDETITLE);
-					GetRB(Dialog, &w, IDC_NO_FRAME, IDC_NO_FRAME);
-					ts->EtermLookfeel.BGNoFrame = w;
-					GetRB(Dialog, &ts->PopupMenu, IDC_WINHIDEMENU, IDC_WINHIDEMENU);
-					// DC = GetDC(Dialog);
-					if (work->VTFlag > 0) {
-						GetRB(Dialog, &i, IDC_WINCOLOREMU, IDC_WINCOLOREMU);
-						if (i != 0) {
-							ts->ColorFlag |= CF_PCBOLD16;
-						}
-						else {
-							ts->ColorFlag &= ~(WORD)CF_PCBOLD16;
-						}
-						GetRB(Dialog, &i, IDC_WINAIXTERM16, IDC_WINAIXTERM16);
-						if (i != 0) {
-							ts->ColorFlag |= CF_AIXTERM16;
-						}
-						else {
-							ts->ColorFlag &= ~(WORD)CF_AIXTERM16;
-						}
-						GetRB(Dialog, &i, IDC_WINXTERM256, IDC_WINXTERM256);
-						if (i != 0) {
-							ts->ColorFlag |= CF_XTERM256;
-						}
-						else {
-							ts->ColorFlag &= ~(WORD)CF_XTERM256;
-						}
-						GetRB(Dialog, &ts->EnableScrollBuff, IDC_WINSCROLL1, IDC_WINSCROLL1);
-						if (ts->EnableScrollBuff > 0) {
-								ts->ScrollBuffSize =
-									GetDlgItemInt(Dialog,IDC_WINSCROLL2,NULL,FALSE);
-						}
-						for (i = 0; i <= 1; i++) {
-							ts->VTColor[i] =
-								RGB(work->TmpColor[0][i*3],
-									work->TmpColor[0][i*3+1],
-									work->TmpColor[0][i*3+2]);
-							ts->VTBoldColor[i] =
-								RGB(work->TmpColor[1][i*3],
-									work->TmpColor[1][i*3+1],
-									work->TmpColor[1][i*3+2]);
-							ts->VTBlinkColor[i] =
-								RGB(work->TmpColor[2][i*3],
-									work->TmpColor[2][i*3+1],
-									work->TmpColor[2][i*3+2]);
-							ts->VTReverseColor[i] =
-								RGB(work->TmpColor[3][i*3],
-									work->TmpColor[3][i*3+1],
-									work->TmpColor[3][i*3+2]);
-							ts->URLColor[i] =
-								RGB(work->TmpColor[4][i*3],
-									work->TmpColor[4][i*3+1],
-									work->TmpColor[4][i*3+2]);
-							ts->VTUnderlineColor[i] =
-								RGB(work->TmpColor[5][i * 3],
-									work->TmpColor[5][i * 3 + 1],
-									work->TmpColor[5][i * 3 + 2]);
-#if 0
-							ts->VTColor[i] = GetNearestColor(DC, ts->VTColor[i]);
-							ts->VTBoldColor[i] = GetNearestColor(DC, ts->VTBoldColor[i]);
-							ts->VTBlinkColor[i] = GetNearestColor(DC, ts->VTBlinkColor[i]);
-							ts->VTReverseColor[i] = GetNearestColor(DC, ts->VTReverseColor[i]);
-							ts->URLColor[i] = GetNearestColor(DC, ts->URLColor[i]);
-#endif
-						}
-						GetRB(Dialog, &ts->UseNormalBGColor,
-							  IDC_WINUSENORMALBG, IDC_WINUSENORMALBG);
-						GetRB(Dialog, &i, IDC_FONTBOLD, IDC_FONTBOLD);
-						if (i > 0) {
-							ts->FontFlag |= FF_BOLD;
-						}
-						else {
-							ts->FontFlag &= ~(WORD)FF_BOLD;
-						}
-					}
-					else {
-						for (i = 0; i <= 1; i++) {
-							ts->TEKColor[i] =
-								RGB(work->TmpColor[0][i*3],
-									work->TmpColor[0][i*3+1],
-									work->TmpColor[0][i*3+2]);
-#if 0
-							ts->TEKColor[i] = GetNearestColor(DC, ts->TEKColor[i]);
-#endif
-						}
-						GetRB(Dialog, &ts->TEKColorEmu, IDC_WINCOLOREMU, IDC_WINCOLOREMU);
-					}
-					// ReleaseDC(Dialog,DC);
-
-					GetRB(Dialog, &ts->CursorShape, IDC_WINBLOCK, IDC_WINHORZ);
-					//EndDialog(Dialog, 1);
-					return TRUE;
-				}
-
-				case IDCANCEL:
-					//EndDialog(Dialog, 0);
-					return TRUE;
-
 				case IDC_WINHIDETITLE:
 					GetRB(Dialog,&i,IDC_WINHIDETITLE,IDC_WINHIDETITLE);
 					if (i>0) {
@@ -444,13 +427,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 				case IDC_WINATTR:
 					ChangeSB(Dialog,work,IAttr,IOffset);
 					break;
-
-				case IDC_WINHELP: {
-					const WPARAM HelpId = work->VTFlag > 0 ? HlpMenuSetupAdditionalWindow : HlpTEKSetupWindow;
-					PostMessage(work->VTWin, WM_USER_DLGHELP2, HelpId, 0);
-					break;
 				}
-			}
 			break;
 
 		case WM_HSCROLL:
@@ -545,27 +522,23 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 
 HPROPSHEETPAGE CreateWinPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
 {
-	int id;
-	PROPSHEETPAGEW_V1 psp = { 0 };
-	WinDlgWork *data;
-	wchar_t *uimsg;
-//	BOOL r;
+	WinDlgWork *data = (WinDlgWork *)calloc(1, sizeof(*data));
+	data->ts = pts;
+	data->VTWin = vtwin;
+	data->VTFlag = AddsettingCheckWin(vtwin) == ADDSETTING_WIN_VT ? 1 : 0;
 
-	id = IDD_WINDLG;
-	data = (WinDlgWork *)malloc(sizeof(*data));
-	data->ts = &ts;
-	data-> VTWin = vtwin;
-
+	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
 	psp.dwFlags = PSP_DEFAULT | PSP_USECALLBACK | PSP_USETITLE | PSP_HASHELP;
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
-	GetI18nStrWW("Tera Term", "DLG_WIN_TITLE", L"Tera Term: Terminal win...", pts->UILanguageFileW, &uimsg);
+	wchar_t *uimsg;
+	GetI18nStrWW("Tera Term", "DLG_WIN_TITLE", L"Window", pts->UILanguageFileW, &uimsg);
 	psp.pszTitle = uimsg;
-	psp.pszTemplate = MAKEINTRESOURCEW(id);
+	psp.pszTemplate = MAKEINTRESOURCEW(IDD_WINDLG);
 #if defined(REWRITE_TEMPLATE)
 	psp.dwFlags |= PSP_DLGINDIRECT;
-	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(id));
+	psp.pResource = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(IDD_WINDLG));
 #endif
 	psp.pfnDlgProc = WinDlg;
 	psp.lParam = (LPARAM)data;
@@ -574,18 +547,3 @@ HPROPSHEETPAGE CreateWinPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
 	free(uimsg);
 	return hpsp;
 }
-
-#if 0
-BOOL WINAPI _SetupWin(HWND WndParent, PTTSet ts)
-{
-	WinDlgWork *work = (WinDlgWork *)calloc(sizeof(*work), 1);
-	INT_PTR r;
-	work->ts = ts;
-	work->SampleFont = ts->SampleFont;
-	work->VTFlag = ts->VTFlag;
-	work->VTWin = WndParent;
-	r = TTDialogBoxParam(hInst, MAKEINTRESOURCE(IDD_WINDLG), WndParent, WinDlg, (LPARAM)work);
-	free(work);
-	return (BOOL)r;
-}
-#endif

@@ -721,7 +721,6 @@ void CTEKWindow::OnSetupWindow()
 	WORD OldEmu;
 
 	HelpId = HlpTEKSetupWindow;
-	ts.VTFlag = 0;
 	ts.SampleFont = tk.TEKFont[0];
 
 	if (! LoadTTDLG()) {
@@ -744,7 +743,6 @@ void CTEKWindow::OnSetupFont()
 	BOOL Ok;
 
 	HelpId = HlpTEKSetupFont;
-	ts.VTFlag = 0;
 	if (! LoadTTDLG()) {
 		return;
 	}

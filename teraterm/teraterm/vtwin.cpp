@@ -4072,7 +4072,10 @@ void CVTWindow::OnFileQVSend()
 
 void CVTWindow::OnFileChangeDir()
 {
-	OpenExternalSetup(CAddSettingPropSheetDlg::DefaultPage);
+	if (! LoadTTDLG()) {
+		return;
+	}
+	(*ChangeDirectory)(HVTWin, &ts);
 }
 
 void CVTWindow::OnFilePrint()
@@ -4208,60 +4211,86 @@ void CVTWindow::OnEditCancelSelection()
 	ChangeSelectRegion();
 }
 
-void CVTWindow::OpenExternalSetup(CAddSettingPropSheetDlg::Page page)
+/**
+ *	Additional Setting を表示する
+ */
+BOOL CVTWindow::OpenExternalSetup(HWND hWndParent, CAddSettingPropSheetDlg::Page page)
 {
 	BOOL old_use_unicode_api = UnicodeDebugParam.UseUnicodeApi;
+	char *orgTitle = _strdup(ts.Title);
+	ts.SampleFont = VTFont[0];	// for Windowタブ
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
-	CAddSettingPropSheetDlg CAddSetting(m_hInst, HVTWin);
+	CAddSettingPropSheetDlg CAddSetting(m_hInst, hWndParent);
 	CAddSetting.SetTreeViewMode(ts.ExperimentalTreeProprtySheetEnable);
 	CAddSetting.SetStartPage(page);
 	INT_PTR ret = CAddSetting.DoModal();
 	if (ret == IDOK) {
-		ChangeWin();
-		ChangeFont();
-		if (old_use_unicode_api != UnicodeDebugParam.UseUnicodeApi) {
-			BuffSetDispAPI(UnicodeDebugParam.UseUnicodeApi);
+		// Generalタブ
+		{
+			ResetCharSet();
+			ResetIME();
+		}
+		// Windowタブ
+		{
+			SetColor();
+
+			// タイトルが変更されていたら、リモートタイトルをクリアする
+			if ((ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) &&
+				(strcmp(orgTitle, ts.Title) != 0)) {
+				free(cv.TitleRemoteW);
+				cv.TitleRemoteW = NULL;
+			}
 		}
 
-		// コーディングタブで設定が変化したときコールする必要がある
-		SetupTerm();
+		ChangeWin();
+		ChangeFont();
+
+		// Encodingタブ
+		{
+			if (old_use_unicode_api != UnicodeDebugParam.UseUnicodeApi) {
+				BuffSetDispAPI(UnicodeDebugParam.UseUnicodeApi);
+			}
+
+			// コーディングタブ(Terminal tab)で設定が変化したときコールする必要がある
+			SetupTerm();
+		}
 		TelUpdateKeepAliveInterval();
+
+		// keyboardタブ
+		{
+			//ResetKeypadMode(TRUE);
+			//ResetIME();
+		}
 	}
+	free(orgTitle);
+
+	return (ret == IDOK) ? TRUE : FALSE;
 }
 
 /**
  *	クラス外からその他の設定を開くために追加
  */
-void OpenExternalSetupOutside(CAddSettingPropSheetDlgPage page)
+BOOL OpenExternalSetupOutside(HWND hWndParent, CAddSettingPropSheetDlgPage page)
 {
-	pVTWin->OpenExternalSetup((CAddSettingPropSheetDlg::Page)page);
+	return pVTWin->OpenExternalSetup(hWndParent, (CAddSettingPropSheetDlg::Page)page);
 }
 
-// Additional settings dialog
-//
-// (2004.9.5 yutaka) new added
-// (2005.2.22 yutaka) changed to Tab Control
-// (2008.5.12 maya) changed to PropertySheet
+/**
+ * Additional settings dialog
+ */
 void CVTWindow::OnExternalSetup()
 {
-	OpenExternalSetup(CAddSettingPropSheetDlg::DefaultPage);
+	OpenExternalSetup(m_hWnd, CAddSettingPropSheetDlg::DefaultPage);
 }
 
 void CVTWindow::OnSetupTerminal()
 {
-	BOOL Ok;
-
 	HelpId = HlpSetupTerminal;
 	if (! LoadTTDLG()) {
 		return;
 	}
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	Ok = (*SetupTerminal)(HVTWin, &ts);
-	if (Ok) {
-		SetupTerm();
-	}
+	(*SetupTerminal)(HVTWin, &ts);
 }
 
 /**
@@ -4291,84 +4320,59 @@ void CVTWindow::SetColor()
 
 void CVTWindow::OnSetupWindow()
 {
-	BOOL Ok;
-
-	HelpId = HlpSetupWindow;
-	ts.VTFlag = 1;
 	ts.SampleFont = VTFont[0];
-
 	if (! LoadTTDLG()) {
 		return;
 	}
-
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	char *orgTitle = _strdup(ts.Title);
-	Ok = (*SetupWin)(HVTWin, &ts);
-
-	if (Ok) {
-		SetColor();
-
-		// タイトルが変更されていたら、リモートタイトルをクリアする
-		if ((ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) &&
-		    (strcmp(orgTitle, ts.Title) != 0)) {
-			free(cv.TitleRemoteW);
-			cv.TitleRemoteW = NULL;
-		}
-
-		ChangeFont();
-		ChangeWin();
-	}
-
-	free(orgTitle);
+	(*SetupWin)(HVTWin, &ts);
 }
 
 void CVTWindow::OnSetupFont()
 {
-	OpenExternalSetup(CAddSettingPropSheetDlg::FontPage);
-}
-
-static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
-{
-	if (Message == WM_INITDIALOG) {
-		wchar_t *uimsg;
-		GetI18nStrWW("Tera Term",
-					 "DLG_CHOOSEFONT_STC6",
-					 L"\"Font style\" selection here won't affect actual font appearance.",
-					 ts.UILanguageFileW, &uimsg);
-		SetDlgItemTextW(Dialog, stc6, uimsg);
-		free(uimsg);
-
-		SetFocus(GetDlgItem(Dialog,cmb1));
-
-		CenterWindow(Dialog, GetParent(Dialog));
-	}
-	return FALSE;
+	(*ChooseFontDlg)(HVTWin, NULL, &ts);
 }
 
 void CVTWindow::OnSetupKeyboard()
 {
-	BOOL Ok;
-
 	HelpId = HlpSetupKeyboard;
 	if (! LoadTTDLG()) {
 		return;
 	}
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	Ok = (*SetupKeyboard)(HVTWin, &ts);
+	(*SetupKeyboard)(HVTWin, &ts);
+}
 
-	if (Ok) {
-//		ResetKeypadMode(TRUE);
-		ResetIME();
+static void OpenNewComport(const TTTSet *pts)
+{
+	char Command[MAXPATHLEN + HostNameMaxLength];
+	char Temp[MAX_PATH], Str[MAX_PATH];
+
+	_snprintf_s(Command, sizeof(Command),
+				"ttermpro /C=%u /SPEED=%lu /CDELAYPERCHAR=%u /CDELAYPERLINE=%u ",
+				pts->ComPort, pts->Baud, pts->DelayPerChar, pts->DelayPerLine);
+
+	if (SerialPortConfconvertId2Str(COM_DATABIT, pts->DataBit, Temp, sizeof(Temp))) {
+		_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CDATABIT=%s ", Temp);
+		strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
 	}
+	if (SerialPortConfconvertId2Str(COM_PARITY, pts->Parity, Temp, sizeof(Temp))) {
+		_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CPARITY=%s ", Temp);
+		strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+	}
+	if (SerialPortConfconvertId2Str(COM_STOPBIT, pts->StopBit, Temp, sizeof(Temp))) {
+		_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CSTOPBIT=%s ", Temp);
+		strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+	}
+	if (SerialPortConfconvertId2Str(COM_FLOWCTRL, pts->Flow, Temp, sizeof(Temp))) {
+		_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CFLOWCTRL=%s ", Temp);
+		strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
+	}
+
+	TTWinExecA(Command);
 }
 
 void CVTWindow::OnSetupSerialPort()
 {
 	BOOL Ok;
-	char Command[MAXPATHLEN + HostNameMaxLength];
-	char Temp[MAX_PATH], Str[MAX_PATH];
 
 	HelpId = HlpSetupSerialPort;
 	if (! LoadTTDLG()) {
@@ -4384,28 +4388,7 @@ void CVTWindow::OnSetupSerialPort()
 		 * New connectionからシリアル接続する動作と基本的に同じ動作となる。
 		 */
 		if ( cv.Ready && (cv.PortType != IdSerial) ) {
-			_snprintf_s(Command, sizeof(Command),
-				"ttermpro /C=%u /SPEED=%lu /CDELAYPERCHAR=%u /CDELAYPERLINE=%u ",
-				ts.ComPort, ts.Baud, ts.DelayPerChar, ts.DelayPerLine);
-
-			if (SerialPortConfconvertId2Str(COM_DATABIT, ts.DataBit, Temp, sizeof(Temp))) {
-				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CDATABIT=%s ", Temp);
-				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
-			}
-			if (SerialPortConfconvertId2Str(COM_PARITY, ts.Parity, Temp, sizeof(Temp))) {
-				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CPARITY=%s ", Temp);
-				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
-			}
-			if (SerialPortConfconvertId2Str(COM_STOPBIT, ts.StopBit, Temp, sizeof(Temp))) {
-				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CSTOPBIT=%s ", Temp);
-				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
-			}
-			if (SerialPortConfconvertId2Str(COM_FLOWCTRL, ts.Flow, Temp, sizeof(Temp))) {
-				_snprintf_s(Str, sizeof(Str), _TRUNCATE, "/CFLOWCTRL=%s ", Temp);
-				strncat_s(Command, sizeof(Command), Str, _TRUNCATE);
-			}
-
-			TTWinExecA(Command);
+			OpenNewComport(&ts);
 			return;
 		}
 
@@ -4426,7 +4409,7 @@ void CVTWindow::OnSetupSerialPort()
 
 void CVTWindow::OnSetupTCPIP()
 {
-	OpenExternalSetup(CAddSettingPropSheetDlg::TcpIpPage);
+	(*SetupTCPIP)(HVTWin, &ts);
 }
 
 void CVTWindow::OnSetupGeneral()
@@ -4435,12 +4418,7 @@ void CVTWindow::OnSetupGeneral()
 	if (! LoadTTDLG()) {
 		return;
 	}
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	if ((*SetupGeneral)(HVTWin,&ts)) {
-		ResetCharSet();
-		ResetIME();
-	}
+	(*SetupGeneral)(HVTWin,&ts);
 }
 
 void CVTWindow::OnSetupSave()
@@ -4499,7 +4477,7 @@ void CVTWindow::OnSetupSave()
 
 	if (LoadTTSET())
 	{
-		int w, h;
+		int w = 0, h = 0;
 
 #ifdef WINDOW_MAXMIMUM_ENABLED
 		if (::IsZoomed(m_hWnd)) {
@@ -5216,7 +5194,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_EDIT_SELECTSCREEN: OnEditSelectScreenBuffer(); break;
 		case ID_SETUP_ADDITIONALSETTINGS: OnExternalSetup(); break;
 		case ID_SETUP_ADDITIONALSETTINGS_CODING: {
-			OpenExternalSetup(CAddSettingPropSheetDlg::CodingPage);
+			OpenExternalSetup(m_hWnd, CAddSettingPropSheetDlg::CodingPage);
 			break;
 		}
 		case ID_SETUP_TERMINAL: OnSetupTerminal(); break;

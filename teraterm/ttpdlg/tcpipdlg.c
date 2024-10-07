@@ -31,11 +31,12 @@
 #include <windows.h>
 
 #include "tttypes.h"
+#include "vtwin.h"
 
 #include "ttdlg.h"
 
 BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts)
 {
-	MessageBoxA(WndParent, "TCPIP Dialog was deleteed", "teraterm", MB_OK);
-	return FALSE;
+	(void)ts;
+	return OpenExternalSetupOutside(WndParent, TcpIpPage);
 }

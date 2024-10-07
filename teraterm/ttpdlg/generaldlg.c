@@ -33,8 +33,6 @@
 
 BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts)
 {
-	(void)WndParent;
 	(void)ts;
-	OpenExternalSetupOutside(GeneralPage);
-	return FALSE;
+	return OpenExternalSetupOutside(WndParent, GeneralPage);
 }

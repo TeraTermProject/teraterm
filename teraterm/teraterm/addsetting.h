@@ -66,6 +66,10 @@ private:
 };
 #endif // __cplusplus
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
 	DefaultPage,
 	CodingPage,
@@ -76,3 +80,14 @@ typedef enum {
 	TermPage,
 	WinPage,
 } CAddSettingPropSheetDlgPage;
+
+typedef enum {
+	ADDSETTING_WIN_VT,
+	ADDSETTING_WIN_TEK,
+} AddsettingWin;
+
+AddsettingWin AddsettingCheckWin(HWND hWnd);
+
+#ifdef __cplusplus
+}
+#endif

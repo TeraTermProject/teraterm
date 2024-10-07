@@ -35,8 +35,6 @@
 
 BOOL WINAPI _SetupKeyboard(HWND WndParent, PTTSet ts)
 {
-	(void)WndParent;
 	(void)ts;
-	OpenExternalSetupOutside(KeyboardPage);
-	return FALSE;
+	return OpenExternalSetupOutside(WndParent, KeyboardPage);
 }

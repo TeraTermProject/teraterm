@@ -30,31 +30,27 @@
 
 #include <windows.h>
 
+#include "tttypes_charset.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct {
-	int language;
-	const char *str;
-} TLanguageList;
-
-typedef struct {
-	int coding;
-	const char *CodeName;
-	const char *KanjiCode;
+	IdKanjiCode coding;		// 内部のコード
+	const char *CodeStrGUI;	// GUIで表示する文字列
+	const char *CodeStrINI;	// iniファイル、コマンドラインの文字列
 } TKanjiList;
 
-const TLanguageList *GetLanguageList(int index);
 const char *GetLanguageStr(int language);
 int GetLanguageFromStr(const char *language_str);
 
 const TKanjiList *GetKanjiList(int index);
 const char *GetKanjiCodeStr(int kanji_code);
 int GetKanjiCodeFromStr(const char *kanji_code_str);
+int GetKanjiCodeFromStrW(const wchar_t *kanji_code_strW);
 
 int KanjiCodeToISO8859Part(int kanjicode);
-int KanjiCodeTranslate(int kcode);
 
 BOOL LangIsEnglish(WORD kanji_code);
 BOOL LangIsJapanese(WORD kanji_code);

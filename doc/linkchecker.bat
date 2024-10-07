@@ -3,20 +3,18 @@ setlocal
 set CUR=%~dp0
 cd /d %CUR%
 
+set NOPAUSE=1
+call ..\buildtools\install_linkchecker.bat
 call ..\buildtools\find_perl.bat
-
-if not exist linkchecker.pl (
-   curl https://raw.githubusercontent.com/saoyagi2/linkchecker/master/linkchecker.pl -o linkchecker.pl
-)
 
 pushd ja\html
 echo ja
-%PERL% ../../linkchecker.pl .
+%PERL% %CUR%/../buildtools/linkchecker/linkchecker.pl .
 popd
 
 pushd en\html
 echo en
-%PERL% ../../linkchecker.pl .
+%PERL% %CUR%/../buildtools/linkchecker/linkchecker.pl .
 popd
 
 pause

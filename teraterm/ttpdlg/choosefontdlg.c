@@ -31,24 +31,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <commdlg.h>
-#include <dlgs.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <assert.h>
+#include <dlgs.h>
 
 #include "tttypes.h"
-#include "ttlib.h"
-#include "dlglib.h"
-#include "ttcommon.h"
-#include "dlg_res.h"
-#include "codeconv.h"
-#include "helpid.h"
-#include "asprintf.h"
-#include "win32helper.h"
-#include "compat_win.h"
-#include "asprintf.h"
-#include "ttwinman.h"
+#include "ttwinman.h"	// for hInst
+#include "vtwin.h"
+#include "addsetting.h"
 
 #include "ttdlg.h"
 
@@ -95,7 +87,7 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 	return FALSE;
 }
 
-BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, const TTTSet *ts)
+static BOOL ChooseFontDlgForTek(HWND WndParent, LPLOGFONTA LogFont, const TTTSet *ts)
 {
 	CHOOSEFONTA cf;
 	BOOL Ok;
@@ -119,4 +111,15 @@ BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, const TTTSet *ts)
 	cf.lCustData = (LPARAM)ts;
 	Ok = ChooseFontA(&cf);
 	return Ok;
+}
+
+BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, const TTTSet *ts)
+{
+	if (AddsettingCheckWin(WndParent) == ADDSETTING_WIN_TEK) {
+		// TEK Window からコールされた場合
+		// フォント選択ダイアログを使用する
+		return ChooseFontDlgForTek(WndParent, LogFont, ts);
+	}
+
+	return OpenExternalSetupOutside(WndParent, FontPage);
 }

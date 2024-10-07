@@ -36,7 +36,7 @@
 class CGeneralPropPageDlg : public TTCPropertyPage
 {
 public:
-	CGeneralPropPageDlg(HINSTANCE inst);
+	CGeneralPropPageDlg(HINSTANCE inst, HWND hVTWin, TComVar *pcv);
 	virtual ~CGeneralPropPageDlg();
 private:
 	void OnInitDialog();
@@ -44,4 +44,6 @@ private:
 	enum { IDD = IDD_TABSHEET_GENERAL };
 	void OnHelp();
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+
+	struct DlgDataTag *data;
 };
