@@ -39,6 +39,10 @@
 #include "dllutil.h"
 #include "codeconv.h"
 
+#if defined(_MSC_VER)
+#pragma comment(lib, "setupapi.lib")
+#endif
+
 /*
  *	devpkey.h ‚ª‚ ‚éŠÂ‹«?
  *		HAS_DEVPKEY_H ‚ª define ‚³‚ê‚é
