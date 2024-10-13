@@ -38,6 +38,7 @@
 #include <windows.h>
 #include <imagehlp.h>	// for SymGetLineFromAddr()
 #include <shlobj.h>		// for SHGetKnownFolderPath()
+#include <setupapi.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -222,6 +223,37 @@ extern HRESULT (WINAPI *pDwmGetWindowAttribute)(HWND hwnd, DWORD dwAttribute, PV
 // msimg32.dll
 extern BOOL(WINAPI *pTransparentBlt)(HDC hdcDest, int xoriginDest, int yoriginDest, int wDest, int hDest, HDC hdcSrc,
 									 int xoriginSrc, int yoriginSrc, int wSrc, int hSrc, UINT crTransparent);
+
+// advapi32.dll
+extern LSTATUS (WINAPI *pRegQueryValueExW)(
+	HKEY hKey,
+	LPCWSTR lpValueName,
+	LPDWORD lpReserved,
+	LPDWORD lpType,
+	LPBYTE lpData,
+	LPDWORD lpcbData);
+LSTATUS _RegQueryValueExW(
+	HKEY hKey,
+	LPCWSTR lpValueName,
+	LPDWORD lpReserved,
+	LPDWORD lpType,
+	LPBYTE lpData,
+	LPDWORD lpcbData);
+
+// setupapi.dll
+extern BOOL (WINAPI *pSetupDiGetDevicePropertyW)(
+	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, CONST DEVPROPKEY *PropertyKey,
+	DEVPROPTYPE *PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize,
+	PDWORD RequiredSize, DWORD Flags);
+extern BOOL (WINAPI *pSetupDiGetDeviceRegistryPropertyW)(
+	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
+	DWORD Property, PDWORD PropertyRegDataType,
+	PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize);
+BOOL _SetupDiGetDevicePropertyW(
+	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
+	const DEVPROPKEY *PropertyKey, DEVPROPTYPE *PropertyType,
+	PBYTE PropertyBuffer, DWORD PropertyBufferSize,
+	PDWORD RequiredSize, DWORD Flags);
 
 void WinCompatInit();
 

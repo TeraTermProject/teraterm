@@ -27,11 +27,15 @@
  */
 
 #include <windows.h>
+#include <stdio.h>
+
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
+#include <assert.h>
 
 #include "asprintf.h"
+#include "compat_win.h"
 
 #include "win32helper.h"
 
@@ -290,13 +294,14 @@ LSTATUS hRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LP
 {
 	BYTE *p;
 	DWORD len = 0;
-	LSTATUS r = RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, NULL, &len);
+	LSTATUS r;
+	r = _RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, NULL, &len);
 	if (r != ERROR_SUCCESS) {
 		*lpData = NULL;
 		goto finish;
 	}
 	p = (BYTE *)malloc(len);
-	r = RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, p, &len);
+	r = _RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, p, &len);
 	if (r != ERROR_SUCCESS) {
 		free(p);
 		*lpData = NULL;
@@ -363,4 +368,72 @@ DWORD hFormatMessageW(DWORD error, wchar_t **message)
 		return ERROR_NOT_ENOUGH_MEMORY;
 	}
 	return NO_ERROR;
+}
+
+BOOL WINAPI hSetupDiGetDevicePropertyW(
+	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
+	const DEVPROPKEY *PropertyKey,
+	void **buf, size_t *buf_size)
+{
+	BOOL r;
+	DEVPROPTYPE ulPropertyType;
+	DWORD size;
+	r = _SetupDiGetDevicePropertyW(DeviceInfoSet, DeviceInfoData, PropertyKey,
+								   &ulPropertyType, NULL, 0, &size, 0);
+	_CrtCheckMemory();
+	if (r == FALSE && GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
+		*buf = NULL;
+		if (buf_size != NULL) {
+			*buf_size = 0;
+		}
+		return FALSE;
+	}
+
+	BYTE *b = (BYTE *)malloc(size);
+	r = _SetupDiGetDevicePropertyW(DeviceInfoSet, DeviceInfoData, PropertyKey,
+								   &ulPropertyType, b, size, &size, 0);
+	if (r == FALSE) {
+		return FALSE;
+	}
+	_CrtCheckMemory();
+	if (ulPropertyType == DEVPROP_TYPE_STRING) {
+		// ポインタをそのまま返せばok (文字列)
+		*buf = b;
+		if (buf_size != NULL) {
+			*buf_size = size;
+		}
+		return TRUE;
+	} else if (ulPropertyType ==  DEVPROP_TYPE_FILETIME) {
+		// buf = FILETIME 構造体の8バイト
+		SYSTEMTIME stFileTime = {};
+		FileTimeToSystemTime((FILETIME *)b, &stFileTime);
+		free(b);
+		int wbuflen = 64;
+		int buflen = sizeof(wchar_t) * wbuflen;
+		wchar_t *prop = (wchar_t *)malloc(buflen);
+		_snwprintf_s(prop, wbuflen, _TRUNCATE, L"%d-%d-%d",
+					 stFileTime.wMonth, stFileTime.wDay, stFileTime.wYear
+			);
+		*buf = prop;
+		if (buf_size != NULL) {
+			*buf_size = buflen;
+		}
+		return TRUE;
+	}
+	else if (ulPropertyType == DEVPROP_TYPE_GUID) {
+		memcpy(buf, b, size);
+		free(b);
+		if (buf_size != NULL) {
+			*buf_size = 0;
+		}
+		return TRUE;
+	} else {
+		assert(FALSE);
+		free(b);
+		*buf = NULL;
+		if (buf_size != NULL) {
+			*buf_size = 0;
+		}
+	}
+	return FALSE;
 }

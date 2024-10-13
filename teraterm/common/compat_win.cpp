@@ -31,12 +31,60 @@
 #include <windows.h>
 #include <windns.h>
 #include <assert.h>
+#include <devguid.h>
 
 #include "compat_win.h"
 #include "compat_windns.h"
 
 #include "dllutil.h"
 #include "codeconv.h"
+
+/*
+ *	devpkey.h Ç™Ç†ÇÈä¬ã´?
+ *		HAS_DEVPKEY_H Ç™ define Ç≥ÇÍÇÈ
+ */
+#if	defined(_MSC_VER)
+#if	(_MSC_VER > 1400)
+
+// VS2019ÇÃÇ∆Ç´(VS2005ÇÊÇËëÂÇ´Ç¢Ç∆ÇµÇƒÇ¢ÇÈ)
+#define HAS_DEVPKEY_H	1
+
+#else // _MSC_VER > 1400
+
+// VS2008ÇÃÇ∆Ç´
+#if defined(_INC_SDKDDKVER)
+
+// VS2008 + SDK 7.0Ç≈ÇÕÇ»Ç¢Ç∆Ç´(SDK 7.1ÇÃÇ∆Ç´)
+//   SDK 7.0 ÇÃèÍçáÇÕ sdkddkver.h Ç™ include Ç≥ÇÍÇƒÇ¢Ç»Ç¢
+#define HAS_DEVPKEY_H	1
+
+#endif  //  defined(_INC_SDKDDKVER)
+#endif
+#elif defined(__MINGW32__)
+
+#if	__MINGW64_VERSION_MAJOR >= 8
+// mingw64 8+ ÇÃÇ∆Ç´
+#define HAS_DEVPKEY_H	1
+#endif
+
+#endif  // defined(_MSC_VER)
+
+/*
+ *	devpkey.h ÇÃ include
+ */
+#if defined(HAS_DEVPKEY_H)
+
+#define INITGUID
+#include <devpkey.h>
+
+#else //  defined(HAS_DEVPKEY_H)
+
+#include "devpkey_teraterm.h"
+
+#endif //  defined(HAS_DEVPKEY_H)
+
+#define INITGUID
+#include <guiddef.h>
 
 // for debug
 //#define UNICODE_API_DISABLE	1
@@ -112,6 +160,21 @@ HRESULT (WINAPI *pDwmGetWindowAttribute)(HWND hwnd, DWORD dwAttribute, PVOID pvA
 // msimg32.dll
 BOOL (WINAPI *pTransparentBlt)(HDC hdcDest, int xoriginDest, int yoriginDest, int wDest, int hDest, HDC hdcSrc,
 							   int xoriginSrc, int yoriginSrc, int wSrc, int hSrc, UINT crTransparent);
+
+// advapi32.dll
+LSTATUS (WINAPI *pRegQueryValueExW)(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved,
+									LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData);
+
+// setupapi.dll
+BOOL (WINAPI *pSetupDiGetDevicePropertyW)(
+	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, CONST DEVPROPKEY *PropertyKey,
+	DEVPROPTYPE *PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize,
+	PDWORD RequiredSize, DWORD Flags);
+
+BOOL (WINAPI *pSetupDiGetDeviceRegistryPropertyW)(
+	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
+	DWORD Property, PDWORD PropertyRegDataType,
+	PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize);
 
 class Initializer {
 public:
@@ -263,6 +326,17 @@ static const APIInfo Lists_dwmapi[] = { // Windows Vista or later
 	{},
 };
 
+static const APIInfo Lists_advapi32[] = {
+	{ "RegQueryValueExW", (void **)&pRegQueryValueExW },
+	{},
+};
+
+static const APIInfo Lists_setupapi[] = {
+	{ "SetupDiGetDevicePropertyW", (void **)&pSetupDiGetDevicePropertyW },
+	{ "SetupDiGetDeviceRegistryPropertyW", (void **)&pSetupDiGetDeviceRegistryPropertyW},
+	{},
+};
+
 static const DllInfo DllInfos[] = {
 	{ L"user32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
 	{ L"msimg32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
@@ -276,6 +350,8 @@ static const DllInfo DllInfos[] = {
 	{ L"shell32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_shell32 },
 	{ L"comctl32.dll", DLL_LOAD_LIBRARY_SxS, DLL_ACCEPT_NOT_EXIST, Lists_comctl32 },
 	{ L"dwmapi.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dwmapi },
+	{ L"advapi32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_advapi32 },
+	{ L"setupapi.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_setupapi },
 	{},
 };
 
@@ -371,6 +447,8 @@ void WinCompatInit()
 		// Windows 9x Ç…ë∂ç›ÇµÇƒÇ¢ÇÈÇ™ê≥ÇµÇ≠ìÆçÏÇµÇ»Ç¢ÇΩÇﬂñ≥å¯âªÇ∑ÇÈ
 		pOutputDebugStringW = NULL;
 		pExpandEnvironmentStringsW = NULL;
+		pRegQueryValueExW = NULL;
+		pSetupDiGetDeviceRegistryPropertyW = NULL;
 	}
 
 	// GetConsoleWindowì¡ï èàóù
@@ -706,4 +784,169 @@ HRESULT _LoadIconWithScaleDown(HINSTANCE hinst, PCWSTR pszName, int cx, int cy, 
 	}
 	*phico = hIcon;
 	return S_OK;
+}
+
+static DWORD SearchProperty(const DEVPROPKEY *PropertyKey)
+{
+	static const struct {
+		const DEVPROPKEY *PropertyKey;	// for SetupDiGetDeviceProperty() Vista+
+		DWORD Property;					// for SetupDiGetDeviceRegistryProperty() 2000+
+	} list[] = {
+		{ &DEVPKEY_Device_FriendlyName, SPDRP_FRIENDLYNAME },
+		{ &DEVPKEY_Device_Class, SPDRP_CLASS },
+		{ &DEVPKEY_Device_InstanceId, SPDRP_MAXIMUM_PROPERTY },
+		{ &DEVPKEY_Device_Manufacturer, SPDRP_MFG },
+	};
+
+	for (int i = 0; i < _countof(list); i++) {
+		if (list[i].PropertyKey == PropertyKey) {
+			return list[i].Property;
+		}
+	}
+	return SPDRP_MAXIMUM_PROPERTY;
+}
+
+BOOL WINAPI _SetupDiGetDevicePropertyW(
+	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
+	const DEVPROPKEY *PropertyKey, DEVPROPTYPE *PropertyType,
+	PBYTE PropertyBuffer, DWORD PropertyBufferSize,
+	PDWORD RequiredSize, DWORD Flags)
+{
+	BOOL r;
+	if (pSetupDiGetDevicePropertyW != NULL) {
+		r = pSetupDiGetDevicePropertyW(DeviceInfoSet, DeviceInfoData,
+									 PropertyKey, PropertyType,
+									  PropertyBuffer, PropertyBufferSize,
+									  RequiredSize, Flags);
+		return r;
+	}
+
+	//	Windows 7 à»ëOóp
+	if (PropertyKey == &DEVPKEY_Device_InstanceId) {
+		// InstanceIdÇÕAånÇ≈åàÇﬂë≈Çø
+		DWORD len_a;
+		r = SetupDiGetDeviceInstanceIdA(DeviceInfoSet,
+										DeviceInfoData,
+										NULL, 0,
+										&len_a);
+		if (r == FALSE && GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
+			return FALSE;
+		}
+		char *str = (char *)malloc(len_a);
+		r = SetupDiGetDeviceInstanceIdA(DeviceInfoSet,
+										DeviceInfoData,
+										str, len_a,
+										&len_a);
+		wchar_t *strW = ToWcharA(str);
+		free(str);
+		DWORD len_w = (DWORD)((wcslen(strW) + 1) * sizeof(wchar_t));  // +1 ÇÕ L'\0'
+		*RequiredSize = len_w;
+		if (PropertyBuffer != NULL) {
+			wcscpy((wchar_t *)PropertyBuffer, strW);
+		}
+		*PropertyType = DEVPROP_TYPE_STRING;
+		free(strW);
+		return TRUE;
+	}
+
+	DWORD property_key = SearchProperty(PropertyKey);
+	if (property_key == SPDRP_MAXIMUM_PROPERTY) {
+		RequiredSize = 0;
+		if (PropertyBuffer != NULL && PropertyBufferSize > 1) {
+			PropertyBuffer[0] = 0;
+		}
+		return FALSE;
+	}
+
+	if (pSetupDiGetDeviceRegistryPropertyW != NULL) {
+		r = pSetupDiGetDeviceRegistryPropertyW(DeviceInfoSet,
+											  DeviceInfoData, property_key,
+											  NULL,
+											  PropertyBuffer, PropertyBufferSize,
+											  RequiredSize);
+		*PropertyType = DEVPROP_TYPE_STRING;
+		return r;
+	}
+	else
+	{
+		DWORD len_a;
+		r = SetupDiGetDeviceRegistryPropertyA(DeviceInfoSet,
+											  DeviceInfoData, property_key, NULL,
+											  NULL, 0,
+											  &len_a);
+		if (r == FALSE && GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
+			return FALSE;
+		}
+		char *str = (char *)malloc(len_a);
+		r = SetupDiGetDeviceRegistryPropertyA(DeviceInfoSet,
+											  DeviceInfoData, property_key, NULL,
+											  (PBYTE)str, len_a,
+											  &len_a);
+		wchar_t *strW = ToWcharA(str);
+		free(str);
+		DWORD len_w = (DWORD)((wcslen(strW) + 1) * sizeof(wchar_t));  // +1 ÇÕ L'\0'
+		*RequiredSize = len_w;
+		if (PropertyBuffer != NULL) {
+			wcscpy((wchar_t *)PropertyBuffer, strW);
+		}
+		*PropertyType = DEVPROP_TYPE_STRING;
+		free(strW);
+		return TRUE;
+	}
+}
+
+/*
+ *	TODO
+ *		layer_for_unicode Ç÷íuÇ≠ÇÃÇ™Ç™ë√ìñÇ©
+ */
+LSTATUS _RegQueryValueExW(
+	HKEY hKey,
+	LPCWSTR lpValueName,
+	LPDWORD lpReserved,
+	LPDWORD lpType,
+	LPBYTE lpData,
+	LPDWORD lpcbData)
+{
+	if (pRegQueryValueExW != NULL) {
+		return pRegQueryValueExW(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
+	}
+	else {
+		DWORD type = 0;
+		DWORD len;
+		BYTE *p = NULL;
+		char *lpValueNameA = ToCharW(lpValueName);
+		LSTATUS r = RegQueryValueExA(hKey, lpValueNameA, 0, &type, NULL, &len);
+		if (r != ERROR_SUCCESS) {
+			len = 0;
+			goto finish;
+		}
+		p = (BYTE*)malloc(len);
+		r = RegQueryValueExA(hKey, lpValueNameA, 0, &type, p, &len);
+		if (r != ERROR_SUCCESS) {
+			free(p);
+			p = NULL;
+			goto finish;
+		}
+		if (type == REG_SZ) {
+			wchar_t *strW = ToWcharA((char *)p);
+			free(p);
+			p = (BYTE *)strW;
+			len = (wcslen(strW) + 1) * sizeof(wchar_t);
+		}
+	finish:
+		free(lpValueNameA);
+		if (lpData != NULL) {
+			if (p != NULL) {
+				memcpy(lpData, p, len);
+			}
+		}
+		free(p);
+		if (lpType != NULL) {
+			*lpType = type;
+		}
+		if (lpcbData != NULL) {
+			*lpcbData = len;
+		}
+		return r;
+	}
 }
