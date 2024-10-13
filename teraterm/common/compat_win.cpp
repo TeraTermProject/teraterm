@@ -806,7 +806,7 @@ static DWORD SearchProperty(const DEVPROPKEY *PropertyKey)
 	return SPDRP_MAXIMUM_PROPERTY;
 }
 
-BOOL WINAPI _SetupDiGetDevicePropertyW(
+BOOL _SetupDiGetDevicePropertyW(
 	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
 	const DEVPROPKEY *PropertyKey, DEVPROPTYPE *PropertyType,
 	PBYTE PropertyBuffer, DWORD PropertyBufferSize,

@@ -370,7 +370,7 @@ DWORD hFormatMessageW(DWORD error, wchar_t **message)
 	return NO_ERROR;
 }
 
-BOOL WINAPI hSetupDiGetDevicePropertyW(
+BOOL hSetupDiGetDevicePropertyW(
 	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
 	const DEVPROPKEY *PropertyKey,
 	void **buf, size_t *buf_size)
