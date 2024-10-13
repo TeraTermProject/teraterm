@@ -29,6 +29,7 @@
 #pragma once
 
 #include <windows.h>
+#include <setupapi.h>
 
 // VS2005(SDK7.1ˆÈ‰º)‚Ì‚Æ‚«,LSTATUS‚ª‚È‚¢
 #if defined(_MSC_VER) && !defined(__MINGW32__) && _MSC_VER == 1400
@@ -51,6 +52,10 @@ LSTATUS hRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LP
 DWORD hGetMenuStringW(HMENU hMenu, UINT uIDItem, UINT flags, wchar_t **text);
 DWORD hDragQueryFileW(HDROP hDrop, UINT iFile, wchar_t **filename);
 DWORD hFormatMessageW(DWORD error, wchar_t **message);
+BOOL hSetupDiGetDevicePropertyW(
+	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
+	const DEVPROPKEY *PropertyKey,
+	void **buf, size_t *buf_size);
 
 #ifdef __cplusplus
 }
