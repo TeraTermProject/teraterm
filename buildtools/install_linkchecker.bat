@@ -1,4 +1,4 @@
-echo %~dp0\install_innosetup.bat
+echo %~dp0\install_linkchecker.bat
 
 pushd %~dp0
 
