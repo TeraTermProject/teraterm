@@ -39,6 +39,12 @@
 #include "dllutil.h"
 #include "codeconv.h"
 
+/*
+ * このソースで SetupDiGetDevicePropertyW() を使用している
+ * common_static.lib をリンクしているプロジェクトで setupapi.lib のリンクが必要となる
+ * すべてのプロジェクトの "追加の依存ファイル" に追加するのは大変（特にプロジェクト外のプラグイン）
+ * そのため、このライブラリのリンク指定はソースに記述する
+ */
 #if defined(_MSC_VER)
 #pragma comment(lib, "setupapi.lib")
 #endif
