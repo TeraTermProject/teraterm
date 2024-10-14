@@ -331,13 +331,17 @@ static const APIInfo Lists_dwmapi[] = { // Windows Vista or later
 };
 
 static const APIInfo Lists_advapi32[] = {
+#ifndef UNICODE_API_DISABLE
 	{ "RegQueryValueExW", (void **)&pRegQueryValueExW },
+#endif
 	{},
 };
 
 static const APIInfo Lists_setupapi[] = {
+#ifndef UNICODE_API_DISABLE
 	{ "SetupDiGetDevicePropertyW", (void **)&pSetupDiGetDevicePropertyW },
 	{ "SetupDiGetDeviceRegistryPropertyW", (void **)&pSetupDiGetDeviceRegistryPropertyW},
+#endif
 	{},
 };
 
@@ -896,61 +900,5 @@ BOOL _SetupDiGetDevicePropertyW(
 		*PropertyType = DEVPROP_TYPE_STRING;
 		free(strW);
 		return TRUE;
-	}
-}
-
-/*
- *	TODO
- *		layer_for_unicode ‚Ö’u‚­‚Ì‚ª‚ª‘Ã“–‚©
- */
-LSTATUS _RegQueryValueExW(
-	HKEY hKey,
-	LPCWSTR lpValueName,
-	LPDWORD lpReserved,
-	LPDWORD lpType,
-	LPBYTE lpData,
-	LPDWORD lpcbData)
-{
-	if (pRegQueryValueExW != NULL) {
-		return pRegQueryValueExW(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
-	}
-	else {
-		DWORD type = 0;
-		DWORD len;
-		BYTE *p = NULL;
-		char *lpValueNameA = ToCharW(lpValueName);
-		LSTATUS r = RegQueryValueExA(hKey, lpValueNameA, 0, &type, NULL, &len);
-		if (r != ERROR_SUCCESS) {
-			len = 0;
-			goto finish;
-		}
-		p = (BYTE*)malloc(len);
-		r = RegQueryValueExA(hKey, lpValueNameA, 0, &type, p, &len);
-		if (r != ERROR_SUCCESS) {
-			free(p);
-			p = NULL;
-			goto finish;
-		}
-		if (type == REG_SZ) {
-			wchar_t *strW = ToWcharA((char *)p);
-			free(p);
-			p = (BYTE *)strW;
-			len = (wcslen(strW) + 1) * sizeof(wchar_t);
-		}
-	finish:
-		free(lpValueNameA);
-		if (lpData != NULL) {
-			if (p != NULL) {
-				memcpy(lpData, p, len);
-			}
-		}
-		free(p);
-		if (lpType != NULL) {
-			*lpType = type;
-		}
-		if (lpcbData != NULL) {
-			*lpcbData = len;
-		}
-		return r;
 	}
 }

@@ -295,13 +295,13 @@ LSTATUS hRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LP
 	BYTE *p;
 	DWORD len = 0;
 	LSTATUS r;
-	r = _RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, NULL, &len);
+	r = RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, NULL, &len);
 	if (r != ERROR_SUCCESS) {
 		*lpData = NULL;
 		goto finish;
 	}
 	p = (BYTE *)malloc(len);
-	r = _RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, p, &len);
+	r = RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, p, &len);
 	if (r != ERROR_SUCCESS) {
 		free(p);
 		*lpData = NULL;
