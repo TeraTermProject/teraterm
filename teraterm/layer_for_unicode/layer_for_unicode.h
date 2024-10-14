@@ -130,6 +130,10 @@ HWND WINAPI _CreateDialogIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEW lpT
 INT_PTR WINAPI _DialogBoxIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEA hDialogTemplate, HWND hWndParent,
 								 DLGPROC lpDialogFunc, LPARAM lParamInit);
 
+// advapi32.lib
+LSTATUS WINAPI _RegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved,
+								 LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData);
+
 #ifdef __cplusplus
 }
 #endif

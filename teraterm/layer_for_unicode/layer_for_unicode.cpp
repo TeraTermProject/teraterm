@@ -913,3 +913,50 @@ DWORD WINAPI _GetTabbedTextExtentW(HDC hdc, LPCWSTR lpString, int chCount,
 	free(strA);
 	return r;
 }
+
+LSTATUS WINAPI _RegQueryValueExW(
+	HKEY hKey,
+	LPCWSTR lpValueName,
+	LPDWORD lpReserved,
+	LPDWORD lpType,
+	LPBYTE lpData,
+	LPDWORD lpcbData)
+{
+	DWORD type = 0;
+	DWORD len;
+	BYTE *p = NULL;
+	char *lpValueNameA = ToCharW(lpValueName);
+	LSTATUS r = RegQueryValueExA(hKey, lpValueNameA, 0, &type, NULL, &len);
+	if (r != ERROR_SUCCESS) {
+		len = 0;
+		goto finish;
+	}
+	p = (BYTE*)malloc(len);
+	r = RegQueryValueExA(hKey, lpValueNameA, 0, &type, p, &len);
+	if (r != ERROR_SUCCESS) {
+		free(p);
+		p = NULL;
+		goto finish;
+	}
+	if (type == REG_SZ) {
+		wchar_t *strW = ToWcharA((char *)p);
+		free(p);
+		p = (BYTE *)strW;
+		len = (wcslen(strW) + 1) * sizeof(wchar_t);
+	}
+finish:
+	free(lpValueNameA);
+	if (lpData != NULL) {
+		if (p != NULL) {
+			memcpy(lpData, p, len);
+		}
+	}
+	free(p);
+	if (lpType != NULL) {
+		*lpType = type;
+	}
+	if (lpcbData != NULL) {
+		*lpcbData = len;
+	}
+	return r;
+}

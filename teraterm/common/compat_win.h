@@ -232,13 +232,6 @@ extern LSTATUS (WINAPI *pRegQueryValueExW)(
 	LPDWORD lpType,
 	LPBYTE lpData,
 	LPDWORD lpcbData);
-LSTATUS _RegQueryValueExW(
-	HKEY hKey,
-	LPCWSTR lpValueName,
-	LPDWORD lpReserved,
-	LPDWORD lpType,
-	LPBYTE lpData,
-	LPDWORD lpcbData);
 
 // setupapi.dll
 extern BOOL (WINAPI *pSetupDiGetDevicePropertyW)(
