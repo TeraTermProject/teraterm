@@ -829,9 +829,9 @@ BOOL _SetupDiGetDevicePropertyW(
 	BOOL r;
 	if (pSetupDiGetDevicePropertyW != NULL) {
 		r = pSetupDiGetDevicePropertyW(DeviceInfoSet, DeviceInfoData,
-									 PropertyKey, PropertyType,
-									  PropertyBuffer, PropertyBufferSize,
-									  RequiredSize, Flags);
+									   PropertyKey, PropertyType,
+									   PropertyBuffer, PropertyBufferSize,
+									   RequiredSize, Flags);
 		return r;
 	}
 

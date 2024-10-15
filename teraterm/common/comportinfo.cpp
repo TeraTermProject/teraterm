@@ -287,9 +287,12 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 				wchar_t *str;
 				r = hSetupDiGetDevicePropertyW(hDevInfo, &DeviceInfoData, &DEVPKEY_Device_Class, (void **)&str, NULL);
 				if (r == TRUE) {
-					// "Ports" が含まれていたら シリアルポートと判定する
-					wchar_t *cmp = wcsstr(str, L"Ports");
-					if (cmp != 0) {
+					if (wcsstr(str, L"Ports") != 0) {
+						// "Ports" が含まれていたら シリアルポートと判定する
+						class_str = str;
+						break;
+					} else if (wcsstr(str, L"Modem") != 0) {
+						// "Modem" が含まれていたら シリアルポートと判定する
 						class_str = str;
 						break;
 					}
