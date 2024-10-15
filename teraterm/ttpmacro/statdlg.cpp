@@ -236,7 +236,9 @@ void CStatDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 	}
 
 	if (is_init) {
-		SetDlgPos();
+		if (SetDlgPosEX(GetSafeHwnd(), WW, WH, &PosX, &PosY) < 0) {
+			SetDlgPos();
+		}
 	}
 
 	InvalidateRect(NULL, TRUE);

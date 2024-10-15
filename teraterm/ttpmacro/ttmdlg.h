@@ -39,7 +39,8 @@ extern "C" {
 
 void ParseParam(PBOOL IOption, PBOOL VOption);
 BOOL GetFileName(HWND HWin, wchar_t **fname);
-void SetDlgPos(int x, int y);
+void SetDlgPos(int x, int y, int position, int offset_x, int offset_y);
+int SetDlgPosEX(HWND hWnd, int width, int height, int *PosX, int *PosY);
 int OpenInpDlg(wchar_t *Input, const wchar_t *Text, const wchar_t *Caption,
                 const wchar_t *Default, BOOL Paswd);
 int OpenErrDlg(const char *Msg, const char *Line, int lineno, int start, int end, const char *FileName);
