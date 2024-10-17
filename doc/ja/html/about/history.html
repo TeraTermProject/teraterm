@@ -37,29 +37,26 @@
   <li>変更
     <ul>
       <li>クリップボードの送信(OSC 52)時、送信文字コードで送信するように変更した。<br>
-        修正前はUTF-8 以外の時、ACPで送信していた。</li>
-      <li>言語モードを削除したため /LA コマンドラインオプションを削除した</li>
-      <li>Unicode の文字情報を Unicode 16.0 に更新した。</li>
-      <li>Beep が Visual Bell のときのフラッシュ時間を設定できるようにした。
+        修正前はUTF-8 以外の時、ACPで送信していた。 (no issue)</li>
+      <li>Beep が Visual Bell のときのフラッシュ時間を設定できるようにした。 #333
         <ul>
           <li>teraterm.iniに <a href="../setup/teraterm-term.html#BeepVBellWait">BeepVBellWait</a> エントリを追加した。</li>
         </ul>
       </li>
-      <li>Setup-General 設定を Additional settings の <a href="../menu/setup-additional-general.html">General タブ</a>へ統合した。</li>
-      <li>Additional settings の "Coding" を、より一般的な "Encoding" に改めた。</li>
-      <li>言語モードを削除したため /LA コマンドラインオプションを削除した。</li>
-      <li>TERATERM.INI のバックアップファイルの作成方法を変更した。</li>
-      <li>Unicode の文字情報を Unicode 16.0 に更新した。更新前、Tera Term 5.0 から Unicode 15.1 準拠だった。</li>
+      <li>Setup-General 設定を Additional settings の <a href="../menu/setup-additional-general.html">General タブ</a>へ統合した。 #312</li>
+      <li>Additional settings の "Coding" を、より一般的な "Encoding" に改めた。 #312</li>
+      <li>TERATERM.INI のバックアップファイルの作成方法を変更した。 #303</li>
+      <li>Unicode の文字情報を Unicode 16.0 に更新した。更新前、Tera Term 5.0 から Unicode 15.1 準拠だった。 #322</li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
-      <li>LogAutoStart=on で AutoWinClose=off の時、ログ出力中に切断して新規接続するとエラーが表示される問題を修正した。</li>
-      <li>"Log" ダイアログの「×」ボタンが動作しない問題を修正した。</li>
-      <li>バックグラウンドにある teraterm ウィンドウを左クリックで前面化した時に過敏に 1キャラクタ選択されてしまう問題を修正した。</li>
-      <li><a href="../menu/control-broadcast.html">Broadcast command ダイアログ</a>でリアルタイムモードが off 、ヒストリが on のとき、コマンドの履歴を保存する時にクラッシュする問題を修正した。</li>
-      <li>MACRO: ダイアログが拡大/縮小率の異なるモニタをまたぐ時、DPI調整がうまく行われない問題を改善した。</li>
+      <li>LogAutoStart=on で AutoWinClose=off の時、ログ出力中に切断して新規接続するとエラーが表示される問題を修正した。 #323</li>
+      <li>"Log" ダイアログの「×」ボタンが動作しない問題を修正した。 #334 </li>
+      <li>バックグラウンドにある teraterm ウィンドウを左クリックで前面化した時に過敏に 1キャラクタ選択されてしまう問題を修正した。 #332 </li>
+      <li><a href="../menu/control-broadcast.html">Broadcast command ダイアログ</a>でリアルタイムモードが off 、ヒストリが on のとき、コマンドの履歴を保存する時にクラッシュする問題を修正した。 #314</li>
+      <li>MACRO: ダイアログが拡大/縮小率の異なるモニタをまたぐ時、DPI調整がうまく行われない問題を改善した。 #277</li>
     </ul>
   </li>
 
