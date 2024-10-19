@@ -88,7 +88,7 @@ static void SetDlgLogFont(HWND hWnd, const LOGFONTW *logfont, TTTSet *ts)
 static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	if (Message == WM_INITDIALOG) {
-		FontPPData *dlg_data = (FontPPData *)(((CHOOSEFONTA *)lParam)->lCustData);
+		FontPPData *dlg_data = (FontPPData *)(((CHOOSEFONTW *)lParam)->lCustData);
 		wchar_t *uimsg;
 		static const wchar_t def[] = L"\"Font style\" selection here won't affect actual font appearance.";
 		GetI18nStrWW("Tera Term", "DLG_CHOOSEFONT_STC6", def, dlg_data->UILanguageFileW, &uimsg);
@@ -185,19 +185,58 @@ static int GetCodePageFromFontCharSet(BYTE char_set)
 	return CP_ACP;
 }
 
-static BOOL ChooseVTFont(HWND hwndOwner, FontPPData *dlg_data)
+static UINT_PTR CALLBACK TVTFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+	switch (Message) {
+		case WM_INITDIALOG:
+		{
+			const PTTSet ts = (PTTSet)((CHOOSEFONTA *)lParam)->lCustData;
+			wchar_t *uimsg;
+
+			//EnableWindow(GetDlgItem(Dialog, cmb2), FALSE);
+
+			GetI18nStrWW("Tera Term", "DLG_CHOOSEFONT_STC6", L"\"Font style\" selection here won't affect actual font appearance.",
+						 ts->UILanguageFileW, &uimsg);
+			SetDlgItemTextW(Dialog, stc6, uimsg);
+			free(uimsg);
+
+			SetFocus(GetDlgItem(Dialog,cmb1));
+
+			CenterWindow(Dialog, GetParent(Dialog));
+
+			break;
+		}
+	}
+	return FALSE;
+}
+
+static BOOL ChooseVTFont(HWND WndParent, FontPPData *dlg_data)
 {
 	const TTTSet *ts = dlg_data->pts;
 	BOOL Ok;
-	LOGFONTA VTlf = dlg_data->VTFont;
-
-	Ok = _ChooseFontDlg(hwndOwner, &VTlf, ts);
-	if (! Ok) {
-		return FALSE;
+	LOGFONTA VTFontA = dlg_data->VTFont;
+	CHOOSEFONTA cf = {};
+	cf.lStructSize = sizeof(cf);
+	cf.hwndOwner = WndParent;
+	cf.lpLogFont = &VTFontA;
+	cf.Flags =
+		CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
+		CF_FIXEDPITCHONLY |
+		//CF_SHOWHELP |
+		CF_NOVERTFONTS |
+		CF_ENABLEHOOK;
+	if (ts->ListHiddenFonts) {
+		cf.Flags |= CF_INACTIVEFONTS;
 	}
-
-	dlg_data->VTFont = VTlf;
-	return TRUE;
+	cf.lpfnHook = TVTFontHook;
+	cf.nFontType = REGULAR_FONTTYPE;
+	cf.hInstance = dlg_data->hInst;
+	cf.lCustData = (LPARAM)ts;
+	Ok = ChooseFontA(&cf);
+	if (Ok) {
+		dlg_data->VTFont = VTFontA;
+	}
+	return Ok;
 }
 
 static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
