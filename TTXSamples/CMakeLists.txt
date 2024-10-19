@@ -47,3 +47,8 @@ set_target_properties(TTXViewMode PROPERTIES FOLDER TTXSamples)
 
 add_subdirectory(TTXCheckUpdate)
 set_target_properties(TTXCheckUpdate PROPERTIES FOLDER TTXSamples)
+
+if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/TTXChangeFontSize/TTXChangeFontSize/ReadMe.txt)
+  add_subdirectory(TTXChangeFontSize)
+  set_target_properties(TTXChangeFontSize PROPERTIES FOLDER TTXSamples)
+endif()
