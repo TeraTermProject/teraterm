@@ -294,6 +294,9 @@
     <ClCompile Include="color_sample.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="externalsetup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -634,6 +637,9 @@
       <Filter>dialog</Filter>
     </ClInclude>
     <ClInclude Include="color_sample.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="externalsetup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

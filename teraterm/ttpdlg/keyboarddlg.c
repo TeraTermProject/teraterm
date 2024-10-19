@@ -29,12 +29,12 @@
 /* keyboard dialog */
 
 #include <windows.h>
-#include "vtwin.h"
+#include "externalsetup.h"
 
 #include "ttdlg.h"
 
 BOOL WINAPI _SetupKeyboard(HWND WndParent, PTTSet ts)
 {
 	(void)ts;
-	return OpenExternalSetupOutside(WndParent, KeyboardPage);
+	return OpenExternalSetupTab(WndParent, KeyboardPage);
 }

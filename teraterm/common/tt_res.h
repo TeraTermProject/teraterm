@@ -312,7 +312,6 @@
 #define ID_SETUP_TCPIP                  50360
 #define ID_SETUP_GENERAL                50370
 #define ID_SETUP_ADDITIONALSETTINGS     50375
-#define ID_SETUP_ADDITIONALSETTINGS_CODING 50376
 #define ID_SETUP_SAVE                   50380
 #define ID_SETUP_RESTORE                50390
 #define ID_OPEN_SETUP                   50391

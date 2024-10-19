@@ -41,6 +41,7 @@
 #include "ttwinman.h"	// for hInst
 #include "vtwin.h"
 #include "addsetting.h"
+#include "externalsetup.h"
 
 #include "ttdlg.h"
 
@@ -121,5 +122,5 @@ BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, const TTTSet *ts)
 		return ChooseFontDlgForTek(WndParent, LogFont, ts);
 	}
 
-	return OpenExternalSetupOutside(WndParent, FontPage);
+	return OpenExternalSetupTab(WndParent, FontPage);
 }

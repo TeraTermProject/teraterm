@@ -238,10 +238,11 @@ protected:
 
 private:
 	void CodePopup(int client_x, int client_y);
-	void SetColor();
 public:
-	BOOL OpenExternalSetup(HWND hWndParent, CAddSettingPropSheetDlg::Page page);
+	void SetColor();
 };
+
+extern CVTWindow *pVTWin;
 #endif
 
 #ifdef __cplusplus
@@ -249,7 +250,6 @@ extern "C" {
 #endif
 
 void VtwinSetHelpId(DWORD data);
-BOOL OpenExternalSetupOutside(HWND hWndParent, CAddSettingPropSheetDlgPage page);
 
 #ifdef __cplusplus
 }

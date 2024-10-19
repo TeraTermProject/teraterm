@@ -29,12 +29,12 @@
 // WinDlg
 
 #include <windows.h>
-#include "vtwin.h"
+#include "externalsetup.h"
 
 #include "ttdlg.h"
 
 BOOL WINAPI _SetupWin(HWND WndParent, PTTSet ts)
 {
 	(void)ts;
-	return OpenExternalSetupOutside(WndParent, WinPage);
+	return OpenExternalSetupTab(WndParent, WinPage);
 }

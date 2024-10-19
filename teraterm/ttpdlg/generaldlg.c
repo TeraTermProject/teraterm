@@ -28,11 +28,11 @@
 
 /* general dialog */
 #include <windows.h>
-#include "vtwin.h"
+#include "externalsetup.h"
 #include "ttdlg.h"
 
 BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts)
 {
 	(void)ts;
-	return OpenExternalSetupOutside(WndParent, GeneralPage);
+	return OpenExternalSetupTab(WndParent, GeneralPage);
 }

@@ -26,6 +26,8 @@ add_executable(
   clipboar.h
   commlib.c
   commlib.h
+  externalsetup.cpp
+  externalsetup.h
   filesys.cpp
   filesys.h
   filesys_log.cpp
