@@ -62,7 +62,7 @@ struct FontPPData {
 static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
 {
 	memset(logfont, 0, sizeof(*logfont));
-	if (ts->DialogFontNameW == NULL || ts->DialogFontNameW[0] == 0) {
+	if (ts->DialogFontNameW[0] == 0) {
 		// フォントが設定されていなかったらOSのフォントを使用する
 		GetMessageboxFontW(logfont);
 	}
@@ -400,7 +400,7 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 		free((void *)ppsp->pResource);
 		ppsp->pResource = NULL;
 		free((void *)ppsp->lParam);
-		ppsp->lParam = NULL;
+		ppsp->lParam = 0;
 		break;
 	default:
 		break;
