@@ -613,7 +613,7 @@ struct tttset {
 	int BeepVBellWait;
 
 	// Experimental
-	BYTE ExperimentalTreeProprtySheetEnable;
+	BYTE ExperimentalTreePropertySheetEnable;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

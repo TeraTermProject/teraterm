@@ -2006,7 +2006,8 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->BracketedControlOnly = GetOnOff(Section, "BracketedControlOnly", FName, FALSE);
 
 	// Experimental
-	ts->ExperimentalTreeProprtySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
+	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
+	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreePropertySheet", FName, ts->ExperimentalTreePropertySheetEnable);
 }
 
 /**

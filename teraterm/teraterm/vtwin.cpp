@@ -4222,7 +4222,7 @@ BOOL CVTWindow::OpenExternalSetup(HWND hWndParent, CAddSettingPropSheetDlg::Page
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
 	CAddSettingPropSheetDlg CAddSetting(m_hInst, hWndParent);
-	CAddSetting.SetTreeViewMode(ts.ExperimentalTreeProprtySheetEnable);
+	CAddSetting.SetTreeViewMode(ts.ExperimentalTreePropertySheetEnable);
 	CAddSetting.SetStartPage(page);
 	INT_PTR ret = CAddSetting.DoModal();
 	if (ret == IDOK) {
