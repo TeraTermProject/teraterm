@@ -344,6 +344,10 @@ static BOOL GetOpenSaveFileNameW(const TTOPENFILENAMEW *ofn, bool save, wchar_t 
 
 	DWORD options;
 	pFile->GetOptions(&options);
+	// 呼び出し側で未設定ならばクリア
+	if (!(OFN_OVERWRITEPROMPT & ofn->Flags)) {
+		options &= ~FOS_OVERWRITEPROMPT;
+	}
 	pFile->SetOptions(options | FOS_NOCHANGEDIR);
 
 	// 初期フォルダ
