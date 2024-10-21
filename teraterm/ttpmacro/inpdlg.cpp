@@ -226,7 +226,9 @@ void CInpDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 	SendDlgItemMessage(IDC_INPEDIT, EM_LIMITTEXT, MaxStrLen, 0);
 
 	if (is_init) {
-		SetDlgPos();
+		if (SetDlgPosEX(GetSafeHwnd(), WW, WH, &PosX, &PosY) < 0) {
+			SetDlgPos();
+		}
 	}
 
 	InvalidateRect(NULL, TRUE);

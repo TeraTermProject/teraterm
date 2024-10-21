@@ -150,7 +150,7 @@ void GetDesktopRect(HWND hWnd, RECT *rect)
 /**
  *	pointが存在するディスプレイのデスクトップの範囲を取得する
  */
-static void GetDesktopRectFromPoint(const POINT *p, RECT *rect)
+void GetDesktopRectFromPoint(const POINT *p, RECT *rect)
 {
 	if (pMonitorFromPoint == NULL) {
 		// NT4.0, 95 はマルチモニタAPIに非対応
