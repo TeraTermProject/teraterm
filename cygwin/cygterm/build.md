@@ -43,3 +43,23 @@
 
 - パッケージに含まれるファイルは次のURLから調べることができる
   - https://cygwin.com/packages/
+
+# msys2termのビルドについて
+
+MSYS2 のシェルを起動する。
+Git BashなどをTera Term 内で動作させることができる。
+
+## 準備
+
+- MSYS2 MSYSで行う
+- makeコマンドの時 `pacman -S gcc make`
+- cmakeビルドの時 `pacman -S gcc cmake`
+
+## ビルド
+
+- make
+  - MSYS2 MSYS からシェルを起動
+  - `make` 実行
+- cmakeビルドのとき
+  - teratermをビルドすると自動的に
+    バイナリフォルダ(ttermpro.exeと同じフォルダ)に作成される

@@ -8,11 +8,12 @@ set_target_properties(
   cyglib
   PROPERTIES FOLDER cygwin)
 
-if((CMAKE_HOST_SYSTEM_NAME MATCHES "Linux") OR MINGW)
-  # linux, MinGW上ではcygwinが必要なものはビルドできない
+if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
+  # linuxでは、以下はビルドしない
   return()
 endif()
 
+# cygtool, innosetupで利用する 32bit nativeなdll
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
   # 32bit build
   add_subdirectory(cygtool)
@@ -39,6 +40,7 @@ else()
   endif()
 endif()
 
+# cygterm
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
   add_subdirectory(cygterm_build)
   set_target_properties(

@@ -1,5 +1,6 @@
 @echo off
 setlocal
+chcp 65001
 set CUR=%~dp0
 cd /d %CUR%
 

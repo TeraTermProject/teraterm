@@ -5,30 +5,33 @@
   - AppVeyor用スクリプトをローカルでテスト
   - これを使えば簡単にビルドすることができる
 
-## Visual Studio 2005
+## 準備
 
-- Visual Studio 2005 をインストールする
-- 次のバッチファイルを実行する
-  - build_local_appveyor_vs2005.bat
+あらかじめ次のツールをインストールしておく
 
-注
- Visual Studio 2005 関連のファイルは入手が難しいため
- 新たにインストールするのは困難
+- Visual Studio 2022
+  - arm64をビルドするときは次のパッケージを入れる
+    - `MSVC v143 - VS 2022 C++ ARM64/ARM64EC ビルド ツール (最新)`
+- MinGW
+  - c:\msys64 を削除
+  - https://www.msys2.org/ からインストーラをダウンロード
+  - インストール
 
-## Visual Studio 2019
+## ビルド
 
-- Visual Studio 2019 をインストールする
-- 次のバッチファイルを実行する
-  - build_local_appveyor_vs2019.bat
-  - build_local_appveyor_vs2019_x64.bat
+- `ci_scripts\build_local_appveyor.bat` を実行
 
-## msys2
+## 再度ビルドするとき
 
-- msys2を使ったビルド
-- インストーラーをダウンロード、インストールする
-  - https://www.msys2.org/
-- 次のどれか一つバッチファイルを実行する
-  - ci_scripts\build_local_appveyor_mingw_x64_gcc.bat
-  - ci_scripts\build_local_appveyor_mingw_clang.bat
-  - ci_scripts\build_local_appveyor_mingw_gcc.bat
-  - ci_scripts\build_local_appveyor_mingw_x64_clang.bat
+### Visual Studioの場合
+
+- ビルドフォルダの teraterm_all.sln をダブルクリック
+
+### MinGWの場合
+
+- スタートから MSYS2 / MSYS2 MINGW64 を起動
+  - win32系をビルドするときは MINGW32 を起動
+- ビルドフォルダへ移動
+  - `cd ..../build_mingw_x64_clang_msys2`
+- `make`
+  - `make -j 4` などで複数プロセスでビルド

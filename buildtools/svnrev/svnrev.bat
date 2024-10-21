@@ -17,24 +17,8 @@ goto finish
 if NOT "%PERL%" == "" goto found_perl
 
 :search_perl
-set PERL=perl.exe
-where %PERL% > nul 2>&1
-if %errorlevel% == 0 goto found_perl
-set PERL=%~dp0..\cygwin64\bin\perl.exe
-if exist %PERL% goto found_perl
-set PERL=%~dp0..\perl\perl\bin\perl.exe
-if exist %PERL% goto found_perl
-set PERL=C:\Strawberry\perl\bin\perl.exe
-if exist %PERL% goto found_perl
-set PERL=C:\Perl64\bin\perl.exe
-if exist %PERL% goto found_perl
-set PERL=C:\Perl\bin\perl.exe
-if exist %PERL% goto found_perl
-set PERL=C:\cygwin64\usr\bin\perl.exe
-if exist %PERL% goto found_perl
-set PERL=C:\cygwin\usr\bin\perl.exe
-if exist %PERL% goto found_perl
-goto no_perl
+call ..\find_perl.bat
+if not "%PERL%" == "" goto found_perl
 
 :no_perl
 @echo %BAT%: perl not found
