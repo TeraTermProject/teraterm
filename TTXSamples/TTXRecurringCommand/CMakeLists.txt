@@ -75,8 +75,8 @@ target_link_libraries(
   gdi32
   )
 
-install(
-  TARGETS ${PACKAGE_NAME}
-  RUNTIME
-  DESTINATION .
-  )
+#install(
+#  TARGETS ${PACKAGE_NAME}
+#  RUNTIME
+#  DESTINATION .
+#)

@@ -40,8 +40,8 @@ target_include_directories(
   ../../teraterm/common
   )
 
-install(
-  TARGETS ${PACKAGE_NAME}
-  RUNTIME
-  DESTINATION .
-  )
+#install(
+#  TARGETS ${PACKAGE_NAME}
+#  RUNTIME
+#  DESTINATION .
+#)
