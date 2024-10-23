@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Spanish
-date=2025-01-04 by TeraTerm Project
+date=2025-01-20 by TeraTerm Project
 contributor=Filiberto Olguin Ascona (2022-05-26)
 
 [Tera Term]
@@ -373,7 +373,7 @@ DLG_ABOUT_TITLE=About Tera Term
 DLG_SELECT_DIR_TITLE=Select new directory
 
 DLG_GEN_TITLE=Tera Term: General setup
-DLG_GEN_PORT=Default &port:
+DLG_GEN_PORT=New &connection default
 DLG_GEN_LANG_UI=Language&UI:
 
 DLG_HOST_TITLE=Tera Term: New connection
@@ -393,7 +393,7 @@ DLG_KEYB_DISABLE=Disabled mode:
 DLG_KEYB_APPKEY=&Application Keypad
 DLG_KEYB_APPCUR=Application &Cursor
 
-DLG_SERIAL_TITLE=Tera Term: Serial port setup
+DLG_SERIAL_TITLE=Serial port
 DLG_SERIAL_PORT=&Port:
 DLG_SERIAL_BAUD=&Baud rate:
 DLG_SERIAL_DATA=&Data:
@@ -403,7 +403,6 @@ DLG_SERIAL_FLOW=&Flow control:
 DLG_SERIAL_DELAY=Transmit delay
 DLG_SERIAL_DELAYCHAR=msec/&char
 DLG_SERIAL_DELAYLINE=msec/&line
-DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
 DLG_SERIAL_OK_CONNECTION=Connect with &New window
 DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open

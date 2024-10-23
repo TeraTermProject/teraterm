@@ -90,6 +90,9 @@ static void ExternalSetupPreProcess(CAddSettingPropSheetDlgPage page)
 	if (all || page == CAddSettingPropSheetDlgPage::WinPage) {
 		ExternalSetupData.orgTitle = _strdup(ts.Title);
 	}
+	if (all || page == CAddSettingPropSheetDlgPage::SerialPortPage) {
+		;
+	}
 }
 
 /**
@@ -158,6 +161,42 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 		}
 		free(ExternalSetupData.orgTitle);
 		ExternalSetupData.orgTitle = NULL;
+	}
+	if (all || page == CAddSettingPropSheetDlgPage::SerialPortPage) {
+		if (ok) {
+			if (ts.ComPort > 0) {
+
+				if (cv.Ready && (cv.PortType != IdSerial)) {
+					// シリアル以外に接続中の場合
+					//  TODO cv.Ready と cv.Openの差は?
+#if 0
+					OpenNewComport(&ts);
+					return;
+#endif
+				}
+				else if (!cv.Open) {
+					// 未接続の場合
+#if 0
+					CommOpen(m_hWnd,&ts,&cv);
+#endif
+				}
+				else {
+					// シリアルに接続中の場合
+#if 0
+					if (ts.ComPort != cv.ComPort) {
+						// ポートを変更する
+						CommClose(&cv);
+						CommOpen(HVTWin,&ts,&cv);
+					}
+					else
+#endif
+					{
+						// 通信パラメータを変更する
+						CommResetSerial(&ts, &cv, ts.ClearComBuffOnOpen);
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -286,3 +325,14 @@ void OpenSetupGeneral()
 	BOOL r = (*SetupGeneral)(HVTWin,&ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::GeneralPage, r);
 }
+
+void OpenSetupSerialPort()
+{
+	if (! LoadTTDLG()) {
+		return;
+	}
+	ExternalSetupPreProcess(CAddSettingPropSheetDlgPage::SerialPortPage);
+	BOOL r = (*SetupSerialPort)(HVTWin, &ts);
+	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::SerialPortPage, r);
+}
+

@@ -60,6 +60,12 @@
       <li>Added <a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">skip Send file dialog</a> setting.</li>
       <li>Macro commands for sending and receiving files are also from File transfer folder.</li>
       <li>ZMODEM send: CANFDX flag handling is implemented when receiving ZRINIT. While the receiver cannot receive data, the sender(Tera Term) can wait for the receiver.
+      <li>Additional settings - <a href="../menu/setup-additional-serialport.html">Serial Port tab</a></li>
+      <ul>
+        <li>Setup - Serial dialog was integrated into Serial Port tab of Additional settings.</li>
+        <li>Only settings in this tab.(New connections are made from <a href="../menu/file-new.html">New connection dialog</a>.)</li>
+        <li>Select TCP/IP or Serial as <a href="../menu/setup-additional-general.html#Port">new connection default</a> for New connection dialog on General tab. Select default Serial port on Serial tab.</li>
+      </ul>
     </ul>
   </li>
 
@@ -410,15 +416,15 @@
         <ul>
           <li>Added support for hardware flow control DSR/DTR with serial connection.
             <ul>
-              <li>The hardware is renamed to RTS/CTS, and DSR/DTR is newly added on the Flow control of <a href="../menu/setup-serialport.html">Serial port ([Setup] menu)</a>.</li>
+              <li>The hardware is renamed to RTS/CTS, and DSR/DTR is newly added on the Flow control of <a href="../menu/setup-additional-serialport.html">Serial port ([Setup] menu)</a>.</li>
               <li>MACRO: The DSR/DTR can be specified in <a href="../macro/command/setflowctrl.html">setflowctrl</a> command.</li>
             </ul></li>
-          <li>The <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog can be called even while TCP/IP connection.</li>
-          <li>The title of <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog is changed from "Serial port setup" to "Serial port setup and connection".</li>
-          <li>The detail information of COM port is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
-          <li>The tooltip of the speed setting is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
-          <li>The OK button notation in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog is changed referring to the connection state. </li>
-          <li>The OK button can not be pressed in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog when no COM ports are available.</li>
+          <li>The <a href="../menu/setup-additional-serialport.html">[Setup]-[Serial port]</a> dialog can be called even while TCP/IP connection.</li>
+          <li>The title of <a href="../menu/setup-additional-serialport.html">[Setup]-[Serial port]</a> dialog is changed from "Serial port setup" to "Serial port setup and connection".</li>
+          <li>The detail information of COM port is added on the <a href="../menu/setup-additional-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
+          <li>The tooltip of the speed setting is added on the <a href="../menu/setup-additional-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
+          <li>The OK button notation in the <a href="../menu/setup-additional-serialport.html">[Setup]-[Serial port]</a> dialog is changed referring to the connection state. </li>
+          <li>The OK button can not be pressed in the <a href="../menu/setup-additional-serialport.html">[Setup]-[Serial port]</a> dialog when no COM ports are available.</li>
           <li>Added <a href="../commandline/teraterm.html#cdatabit">/CDATABIT=</a>,  <a href="../commandline/teraterm.html#cparity">/CPARITY=</a>, <a href="../commandline/teraterm.html#cstopbit">/CSTOPBIT=</a>, <a href="../commandline/teraterm.html#cflowctrl">/CFLOWCTRL=</a>, <a href="../commandline/teraterm.html#cdelayperchar">/CDELAYPERCHAR=</a>, <a href="../commandline/teraterm.html#cdelayperline">/CDELAYPERLINE=</a> command line options.</li>
         </ul>
       </li>
@@ -1870,7 +1876,7 @@
   <li>Bug fixes
     <ul>
       <li>Security fix: A class of vulnerabilities affecting applications that load DLL's in an insecure manner.</li>
-      <li>The baud rate can not be properly selected on the <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog.</li>
+      <li>The baud rate can not be properly selected on the <a href="../menu/setup-additional-serialport.html">[Setup]-[Serial port]</a> dialog.</li>
       <li><a href="../setup/teraterm-term.html#beep">Beep setting</a> does not work.</li>
       <li>The scroll region can not be cleared by using the DECALN (DEC Screen Alignment Test) control sequence.</li>
       <li>An empty string can not reply by using the window title and icon label reporting request.</li>
@@ -1952,7 +1958,7 @@
         </ul></li>
       <li>added support for specifying any baud rate of the serial port connection.
         <ul>
-          <li>A user can specify any baud rate at the <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> menu.</li>
+          <li>A user can specify any baud rate at the <a href="../menu/setup-additional-serialport.html">[Setup]-[Serial port]</a> menu.</li>
           <li>A user can specify any baud rate at the <a href="../commandline/teraterm.html#baud">/BAUD</a> option.</li>
           <li>A user can specify any baud rate at the "<a href="../macro/command/setbaud.html">setbaud</a>" macro command.</li>
         </ul></li>
