@@ -238,6 +238,7 @@ void ExpandCBWidth(HWND dlg, int ID)
 		free(text);
 	}
 	max_width += GetSystemMetrics(SM_CXVSCROLL);  // スクロールバーの幅も足し込んでおく
+	max_width += 2 * GetSystemMetrics( SM_CYFIXEDFRAME );
 	SendMessageW(hCtrlWnd, CB_SETDROPPEDWIDTH, max_width, 0);
 	SelectObject(TmpDC, hFont);
 	ReleaseDC(hCtrlWnd, TmpDC);

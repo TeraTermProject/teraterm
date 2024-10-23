@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>Additional settings / "Serial port" tab ([Setup] menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Additional settings / "Serial port" tab ([Setup] menu)</h1>
+
+    <dl>
+
+      <dt id="OK">OK button</dt>
+      <dd>
+	The label of OK button is changed according to the connection state. <br>
+	    Connect with New window   ...  Serial connection is launched with new window since TCP/IP connection is using. <br>
+	    New open ...  Serial connection starts.<br>
+	    Close and New open  ... Current COM port is closed and serial connection starts with new COM port.<br>
+	    New setting  ... The setting of current COM port is changed.<br>
+      </dd>
+
+      <dt id="ComPort">Port</dt>
+      <dd>
+	Serial port to be used. By default, maximum serial port number in the list is 256. It is configurable in <a href="../setup/teraterm-com.html#maxport">MaxComPort</a> setting.
+      </dd>
+
+      <dt id="Speed">Speed, Data, Parity, Stop bits, Flow control</dt>
+      <dd>
+	Serial port parameters. Choose the appropriate parameters for
+	the modem or the host.
+	<p>
+	  The Speed can be specified with any number. Actually, the serial port driver may not reflect your speed.
+	</p>
+	<p>
+	  Flow control can be configured in the following:<br>
+	     Xon/Xoff  ...  Software flow<br>
+	     RTS/CTS  ... Hardware flow(RTS/CTS)<br>
+	     DSR/DTR  ... Hardware flow(DSR/DTR)<br>
+	     none  ...  No flow control<br>
+	</p>
+	<p>
+	  Note: If Data is 7 bit, the XMODEM, ZMODEM, B PLUS and Quick-VAN
+	  protocols are disabled. If Flow control is Xon/Xoff, the XMODEM
+	  and Quick-VAN protocols are disabled.
+	</p>
+	<p>
+	  Note: The "hardware" prior to version 4.104 applies to RTS/CTS.
+	</p>
+      </dd>
+
+      <dt id="Delay">Transmit delay</dt>
+      <dd>
+	Time intervals between characters (lines) being sent, in milliseconds.
+      </dd>
+
+      <dt id="Information">Detail information of COM port</dt>
+      <dd>
+	The detail information of selected port is shown in the text box. <br>
+	You can select all data by using CTRL+A.
+	You can scroll horizontally by using CTRL/SHIFT + wheel. 
+      </dd>
+
+    </dl>
+  </body>
+</html>

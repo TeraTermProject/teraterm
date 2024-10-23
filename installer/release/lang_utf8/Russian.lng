@@ -373,7 +373,7 @@ DLG_ABOUT_TITLE=О программе Tera Term
 DLG_SELECT_DIR_TITLE=Выбрать новую папку
 
 DLG_GEN_TITLE=Tera Term: Общие настройки
-DLG_GEN_PORT=&Порт:
+DLG_GEN_PORT=New &connection default
 DLG_GEN_LANG_UI=&Язык меню:
 
 DLG_HOST_TITLE=Tera Term: Новое соединение
@@ -393,7 +393,7 @@ DLG_KEYB_DISABLE=Альтернатива:
 DLG_KEYB_APPKEY=&Применить Keypad
 DLG_KEYB_APPCUR=Применить &Cursor
 
-DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
+DLG_SERIAL_TITLE=Serial port
 DLG_SERIAL_PORT=&Порт:
 DLG_SERIAL_BAUD=&Скорость:
 DLG_SERIAL_DATA=&Данные:

@@ -34,7 +34,6 @@
 #include "ttdlg.h"
 
 #include "ttdialog.h"
-#include "ttwinman.h"
 
 PSetupTerminal SetupTerminal;
 PSetupWin SetupWin;

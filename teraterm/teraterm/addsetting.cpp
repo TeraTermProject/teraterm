@@ -61,6 +61,7 @@
 #include "tcpip_pp.h"
 #include "term_pp.h"
 #include "win_pp.h"
+#include "serial_pp.h"
 
 #include "addsetting.h"
 
@@ -1532,6 +1533,8 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 		AddPage(page);
 		page = CreateTerminalPP(hInstance, hParentWnd, & ts);
 		AddPage(page);
+		page = SerialPageCreate(hInstance, &ts);
+		AddPage(page);
 	}
 	page = CreateWinPP(hInstance, hParentWnd, &ts);
 	AddPage(page);
@@ -1571,6 +1574,9 @@ void CAddSettingPropSheetDlg::SetStartPage(Page page)
 		start_page = 12;
 		break;
 	case WinPage:
+		start_page = 14;
+		break;
+	case SerialPortPage:
 		start_page = 13;
 		break;
 	default:

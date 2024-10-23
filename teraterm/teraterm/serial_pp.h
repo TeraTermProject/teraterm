@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2024- TeraTerm Project
+ * (C) 2020- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,15 +26,14 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* serial dialog */
-
 #include <windows.h>
-#include "externalsetup.h"
 
-#include "ttdlg.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-BOOL WINAPI _SetupSerialPort(HWND WndParent, PTTSet ts)
-{
-	(void)ts;
-	return OpenExternalSetupTab(WndParent, SerialPortPage);
+HPROPSHEETPAGE SerialPageCreate(HINSTANCE inst, TTTSet *pts);
+
+#ifdef __cplusplus
 }
+#endif

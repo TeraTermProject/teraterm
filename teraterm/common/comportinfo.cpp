@@ -90,6 +90,9 @@
 #define INITGUID
 #include <guiddef.h>
 
+// 1のとき、"COM%d" のみ検出する
+#define DETECT_COM_ONLY		1
+
 /**
  *	ポート名を取得
  */
@@ -326,7 +329,7 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 				continue;
 			}
 
-#if 1
+#if DETECT_COM_ONLY
 			// "COM%d" ではない場合、検出しない
 			if (wcsncmp(port_name, L"COM", 3) != 0) {
 				free(port_name);

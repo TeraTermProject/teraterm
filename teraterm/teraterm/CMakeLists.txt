@@ -127,6 +127,8 @@ set(SRC_DIALOG
   resource.h
   sendfiledlg.cpp
   sendfiledlg.h
+  serial_pp.cpp
+  serial_pp.h
   setupdirdlg.cpp
   setupdirdlg.h
   tcpip_pp.cpp

@@ -373,7 +373,7 @@ DLG_ABOUT_TITLE=தேரா முனைத்தைப் பற்றி
 DLG_SELECT_DIR_TITLE=புதிய கோப்பகத்தைத் தேர்ந்தெடுக்கவும்
 
 DLG_GEN_TITLE=தேரா முனை: பொது அமைப்பு
-DLG_GEN_PORT=இயல்புநிலை &துறைமுகம்:
+DLG_GEN_PORT=New &connection default
 DLG_GEN_LANG_UI=மொழி இடைமுகம்:
 
 DLG_HOST_TITLE=தேரா முனை: புதிய இணைப்பு
@@ -393,7 +393,7 @@ DLG_KEYB_DISABLE=முடக்கப்பட்ட பயன்முறை:
 DLG_KEYB_APPKEY=&பயன்பாட்டு விசைப்பலகை
 DLG_KEYB_APPCUR=பயன்பாடு &சிமிட்டும் கோடு
 
-DLG_SERIAL_TITLE=தேரா முனை: தொடர் துறைமுகம் அமைவு மற்றும் இணைப்பு
+DLG_SERIAL_TITLE=தொடர் துறைமுகம்
 DLG_SERIAL_PORT=&துறைமுகம்:
 DLG_SERIAL_BAUD=வேகம்:
 DLG_SERIAL_DATA=&தரவு:

@@ -294,6 +294,9 @@
     <ClCompile Include="color_sample.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="serial_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
     <ClCompile Include="externalsetup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -638,6 +641,9 @@
     </ClInclude>
     <ClInclude Include="color_sample.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serial_pp.h">
+      <Filter>dialog</Filter>
     </ClInclude>
     <ClInclude Include="externalsetup.h">
       <Filter>Header Files</Filter>
