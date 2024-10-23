@@ -180,6 +180,7 @@
     <ClCompile Include="color_sample.cpp" />
     <ClCompile Include="commlib.c" />
     <ClCompile Include="dnddlg.cpp" />
+    <ClCompile Include="externalsetup.cpp" />
     <ClCompile Include="filesys.cpp" />
     <ClCompile Include="filesys_log.cpp" />
     <ClCompile Include="filesys_proto.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="coding_pp.h" />
     <ClInclude Include="coding_pp_res.h" />
     <ClInclude Include="color_sample.h" />
+    <ClInclude Include="externalsetup.h" />
     <ClInclude Include="filesys_log_res.h" />
     <ClInclude Include="font_pp.h" />
     <ClInclude Include="font_pp_res.h" />

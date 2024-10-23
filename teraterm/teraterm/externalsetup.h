@@ -26,17 +26,29 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* tcpip dialog */
+#pragma once
 
 #include <windows.h>
 
-#include "tttypes.h"
-#include "externalsetup.h"
+#include "addsetting.h"
 
-#include "ttdlg.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts)
-{
-	(void)ts;
-	return OpenExternalSetupTab(WndParent, TcpIpPage);
+// “à•”—p
+BOOL OpenExternalSetupTab(HWND hWndParent, CAddSettingPropSheetDlgPage page);
+
+// vtwin‚©‚çŽg—p
+void OpenExternalSetup(HWND hWndParent);
+void OpenSetupTerminal();
+void OpenSetupWin();
+void OpenSetupFont();
+void OpenSetupKeyboard();
+void OpenSetupSerialPort();
+void OpenSetupTCPIP();
+void OpenSetupGeneral();
+
+#ifdef __cplusplus
 }
+#endif

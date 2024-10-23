@@ -30,12 +30,12 @@
 /* terminal dialog */
 
 #include <windows.h>
-#include "vtwin.h"
+#include "externalsetup.h"
 
 #include "ttdlg.h"
 
 BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
 {
 	(void)ts;
-	return OpenExternalSetupOutside(WndParent, TermPage);
+	return OpenExternalSetupTab(WndParent, TermPage);
 }

@@ -114,6 +114,7 @@
 #include "logdlg.h"
 #include "makeoutputstring.h"
 #include "ttlib_types.h"
+#include "externalsetup.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -149,8 +150,6 @@ typedef struct {
 static vtwin_work_t vtwin_work;
 
 extern "C" PrintFile *PrintFile_;
-
-static CVTWindow *pVTWin;
 
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
@@ -4072,10 +4071,7 @@ void CVTWindow::OnFileQVSend()
 
 void CVTWindow::OnFileChangeDir()
 {
-	if (! LoadTTDLG()) {
-		return;
-	}
-	(*ChangeDirectory)(HVTWin, &ts);
+	OpenSetupGeneral();
 }
 
 void CVTWindow::OnFilePrint()
@@ -4212,86 +4208,18 @@ void CVTWindow::OnEditCancelSelection()
 }
 
 /**
- *	Additional Setting を表示する
- */
-BOOL CVTWindow::OpenExternalSetup(HWND hWndParent, CAddSettingPropSheetDlg::Page page)
-{
-	BOOL old_use_unicode_api = UnicodeDebugParam.UseUnicodeApi;
-	char *orgTitle = _strdup(ts.Title);
-	ts.SampleFont = VTFont[0];	// for Windowタブ
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
-	CAddSettingPropSheetDlg CAddSetting(m_hInst, hWndParent);
-	CAddSetting.SetTreeViewMode(ts.ExperimentalTreePropertySheetEnable);
-	CAddSetting.SetStartPage(page);
-	INT_PTR ret = CAddSetting.DoModal();
-	if (ret == IDOK) {
-		// Generalタブ
-		{
-			ResetCharSet();
-			ResetIME();
-		}
-		// Windowタブ
-		{
-			SetColor();
-
-			// タイトルが変更されていたら、リモートタイトルをクリアする
-			if ((ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) &&
-				(strcmp(orgTitle, ts.Title) != 0)) {
-				free(cv.TitleRemoteW);
-				cv.TitleRemoteW = NULL;
-			}
-		}
-
-		ChangeWin();
-		ChangeFont();
-
-		// Encodingタブ
-		{
-			if (old_use_unicode_api != UnicodeDebugParam.UseUnicodeApi) {
-				BuffSetDispAPI(UnicodeDebugParam.UseUnicodeApi);
-			}
-
-			// コーディングタブ(Terminal tab)で設定が変化したときコールする必要がある
-			SetupTerm();
-		}
-		TelUpdateKeepAliveInterval();
-
-		// keyboardタブ
-		{
-			//ResetKeypadMode(TRUE);
-			//ResetIME();
-		}
-	}
-	free(orgTitle);
-
-	return (ret == IDOK) ? TRUE : FALSE;
-}
-
-/**
- *	クラス外からその他の設定を開くために追加
- */
-BOOL OpenExternalSetupOutside(HWND hWndParent, CAddSettingPropSheetDlgPage page)
-{
-	return pVTWin->OpenExternalSetup(hWndParent, (CAddSettingPropSheetDlg::Page)page);
-}
-
-/**
  * Additional settings dialog
  */
 void CVTWindow::OnExternalSetup()
 {
-	OpenExternalSetup(m_hWnd, CAddSettingPropSheetDlg::DefaultPage);
+	OpenExternalSetup(m_hWnd);
 }
 
 void CVTWindow::OnSetupTerminal()
 {
-	HelpId = HlpSetupTerminal;
-	if (! LoadTTDLG()) {
-		return;
-	}
-	(*SetupTerminal)(HVTWin, &ts);
+	OpenSetupTerminal();
 }
+
 
 /**
  *  色をセットする、テーマが使用されているときはセットしてよいか問い合わせる
@@ -4315,32 +4243,27 @@ void CVTWindow::SetColor()
 	if (set_color) {
 		DispResetColor(CS_ALL);
 	}
-
 }
 
 void CVTWindow::OnSetupWindow()
 {
-	ts.SampleFont = VTFont[0];
-	if (! LoadTTDLG()) {
-		return;
-	}
-	(*SetupWin)(HVTWin, &ts);
+	OpenSetupWin();
 }
 
 void CVTWindow::OnSetupFont()
 {
-	(*ChooseFontDlg)(HVTWin, NULL, &ts);
+	OpenSetupFont();
 }
 
 void CVTWindow::OnSetupKeyboard()
 {
-	HelpId = HlpSetupKeyboard;
-	if (! LoadTTDLG()) {
-		return;
-	}
-	(*SetupKeyboard)(HVTWin, &ts);
+	OpenSetupKeyboard();
 }
 
+/*
+ *	シリアル接続で新しいプロセスを起動
+ *	 New connectionからシリアル接続する動作と基本的に同じ動作
+ */
 static void OpenNewComport(const TTTSet *pts)
 {
 	char Command[MAXPATHLEN + HostNameMaxLength];
@@ -4409,16 +4332,12 @@ void CVTWindow::OnSetupSerialPort()
 
 void CVTWindow::OnSetupTCPIP()
 {
-	(*SetupTCPIP)(HVTWin, &ts);
+	OpenSetupTCPIP();
 }
 
 void CVTWindow::OnSetupGeneral()
 {
-	HelpId = HlpSetupGeneral;
-	if (! LoadTTDLG()) {
-		return;
-	}
-	(*SetupGeneral)(HVTWin,&ts);
+	OpenSetupGeneral();
 }
 
 void CVTWindow::OnSetupSave()
@@ -5193,10 +5112,6 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_EDIT_SELECTALL: OnEditSelectAllBuffer(); break;
 		case ID_EDIT_SELECTSCREEN: OnEditSelectScreenBuffer(); break;
 		case ID_SETUP_ADDITIONALSETTINGS: OnExternalSetup(); break;
-		case ID_SETUP_ADDITIONALSETTINGS_CODING: {
-			OpenExternalSetup(m_hWnd, CAddSettingPropSheetDlg::CodingPage);
-			break;
-		}
 		case ID_SETUP_TERMINAL: OnSetupTerminal(); break;
 		case ID_SETUP_WINDOW: OnSetupWindow(); break;
 		case ID_SETUP_FONT: OnSetupFont(); break;

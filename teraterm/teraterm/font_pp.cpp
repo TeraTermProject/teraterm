@@ -39,7 +39,6 @@
 #include "dlglib.h"
 #include "setting.h"
 #include "vtdisp.h"		// for DispSetLogFont()
-#include "buffer.h"
 #include "compat_win.h"	// for CF_INACTIVEFONTS
 #include "helpid.h"
 #include "codeconv.h"
@@ -296,8 +295,6 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						IsDlgButtonChecked(hWnd, IDC_VTFONT_UNICODE) == BST_CHECKED;
 					UnicodeDebugParam.CodePageForANSIDraw =
 						GetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, NULL, FALSE);
-					// ANSI表示用のコードページを設定する
-					BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
 					ts->ListHiddenFonts = IsDlgButtonChecked(hWnd, IDC_LIST_HIDDEN_FONTS) == BST_CHECKED;
 
 					strncpy_s(ts->VTFont, _countof(ts->VTFont), dlg_data->VTFont.lfFaceName, _TRUNCATE);

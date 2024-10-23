@@ -67,7 +67,7 @@
 
 static BOOL AddFontFlag;
 static wchar_t *TSpecialFont;
-static CVTWindow* pVTWin;
+CVTWindow* pVTWin;
 static DWORD HtmlHelpCookie;
 
 static void LoadSpecialFont(void)

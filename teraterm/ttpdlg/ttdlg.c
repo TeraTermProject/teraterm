@@ -30,12 +30,12 @@
 #include <windows.h>
 
 #include "tttypes.h"
-#include "vtwin.h"
+#include "externalsetup.h"
 
 #include "ttdlg.h"
 
 BOOL WINAPI _ChangeDirectory(HWND WndParent, PTTSet ts)
 {
 	(void)ts;
-	return OpenExternalSetupOutside(WndParent, GeneralPage);
+	return OpenExternalSetupTab(WndParent, GeneralPage);
 }
