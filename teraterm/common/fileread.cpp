@@ -181,6 +181,22 @@ char *LoadFileU8C(FILE *fp, size_t *_len, LoadFileCode *_code)
 			buf = (uint8_t *)u8;
 			code = FILE_CODE_ACP;
 		}
+		else {
+			// UTF-8 -> UTF-16LE
+			wchar_t *w = ToWcharU8((char *)buf);
+			if (w != NULL) {
+				// buf ÇÕ UTF-8 Ç…à·Ç¢Ç»Ç¢
+				free(w);
+			}
+			else {
+				// buf ÇÃï∂éöÉRÅ[ÉhÇÕï™Ç©ÇÁÇ»Ç¢
+				free(buf);
+				if (_code != NULL) {
+					*_code = FILE_CODE_NONE;
+				}
+				return NULL;
+			}
+		}
 	}
 
 	if (_len != NULL) {
