@@ -4208,14 +4208,26 @@ static WORD TTLSetDlgPos(void)
 		int x, y;
 		GetIntVal(&x,&Err);
 		GetIntVal(&y,&Err);
+		// 追加パラメータ(省略可能)
+		int position = 0, offset_x = 0, offset_y = 0;
+		if (CheckParameterGiven()) {
+			GetIntVal(&position,&Err);
+			if (position < 1 || position > 10) {
+				Err = ErrSyntax;
+			}
+			if (CheckParameterGiven()) {
+				GetIntVal(&offset_x,&Err);
+				GetIntVal(&offset_y,&Err);
+			}
+		}
 		if ((Err==0) && (GetFirstChar()!=0))
 			Err = ErrSyntax;
 		if (Err!=0) return Err;
-		SetDlgPos(x,y);
+		SetDlgPos(x, y, position, offset_x, offset_y);
 	}
 	else {
 		// パラメータがなければデフォルト位置に戻す
-		SetDlgPos(CW_USEDEFAULT, CW_USEDEFAULT);
+		SetDlgPos(CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, 0);
 	}
 	return Err;
 }
