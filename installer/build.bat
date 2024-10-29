@@ -103,7 +103,6 @@ if "%BUILD%" == "rebuild" (
     make cygterm+-x86_64-clean
 )
 make cygterm+-x86_64 -j
-make archive
 popd
 
 rem msys2term
@@ -118,8 +117,12 @@ if "%BUILD%" == "rebuild" (
 make msys2term -j
 endlocal
 popd
-
 :msys2term_pass
+
+rem cygterm+.tar.gz
+pushd ..\cygwin\cygterm
+make archive
+popd
 
 rem lng ƒtƒ@ƒCƒ‹‚ğì¬
 call makelang.bat
