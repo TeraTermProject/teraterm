@@ -113,8 +113,18 @@ set_target_properties(
 # zip
 add_custom_target(
   zip
-#  COMMAND "${CMAKE_COMMAND}" --build . --target install
+  #  COMMAND "${CMAKE_COMMAND}" --build . --target install
+  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXFixedWinSize.dll ${CMAKE_INSTALL_PREFIX}/_TTXFixedWinSize.dll
+  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXOutputBuffering.dll ${CMAKE_INSTALL_PREFIX}/_TTXOutputBuffering.dll
+  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXResizeWin.dll ${CMAKE_INSTALL_PREFIX}/_TTXResizeWin.dll
+  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXShowCommandLine.dll ${CMAKE_INSTALL_PREFIX}/_TTXShowCommandLine.dll
+  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXtest.dll ${CMAKE_INSTALL_PREFIX}/_TTXtest.dll
   COMMAND "${CMAKE_COMMAND}" -E tar cvf ${SETUP_ZIP} --format=zip ${CMAKE_INSTALL_PREFIX}
+  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXFixedWinSize.dll ${CMAKE_INSTALL_PREFIX}/TTXFixedWinSize.dll
+  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXOutputBuffering.dll ${CMAKE_INSTALL_PREFIX}/TTXOutputBuffering.dll
+  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXResizeWin.dll ${CMAKE_INSTALL_PREFIX}/TTXResizeWin.dll
+  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXShowCommandLine.dll ${CMAKE_INSTALL_PREFIX}/TTXShowCommandLine.dll
+  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXtest.dll ${CMAKE_INSTALL_PREFIX}/TTXtest.dll
   WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
   )
 

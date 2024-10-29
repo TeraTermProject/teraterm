@@ -113,8 +113,8 @@ set_target_properties(
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
-#install(
-#  TARGETS TTXttyrec TTXttyplay
-#  RUNTIME
-#  DESTINATION .
-#)
+install(
+  TARGETS TTXttyrec TTXttyplay
+  RUNTIME
+  DESTINATION .
+)

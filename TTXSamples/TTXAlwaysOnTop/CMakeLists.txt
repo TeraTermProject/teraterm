@@ -54,8 +54,8 @@ target_link_libraries(
   ttpcmn
 )
 
-#install(
-#  TARGETS ${PACKAGE_NAME}
-#  RUNTIME
-#  DESTINATION .
-#)
+install(
+  TARGETS ${PACKAGE_NAME}
+  RUNTIME
+  DESTINATION .
+)

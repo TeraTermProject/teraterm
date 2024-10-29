@@ -48,3 +48,9 @@ target_link_libraries(
   PRIVATE
   ttpcmn
   )
+
+install(
+  TARGETS ${PACKAGE_NAME}
+  RUNTIME
+  DESTINATION .
+)

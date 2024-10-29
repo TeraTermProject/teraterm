@@ -42,3 +42,9 @@ target_include_directories(
   ../../teraterm/teraterm
   ../../teraterm/common
   )
+
+install(
+  TARGETS ${PACKAGE_NAME}
+  RUNTIME
+  DESTINATION .
+)

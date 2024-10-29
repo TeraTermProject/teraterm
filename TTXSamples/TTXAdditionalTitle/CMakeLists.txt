@@ -53,3 +53,9 @@ target_link_libraries(
   ttpcmn
   common_static
   )
+
+install(
+  TARGETS ${PACKAGE_NAME}
+  RUNTIME
+  DESTINATION .
+)
