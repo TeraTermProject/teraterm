@@ -107,11 +107,9 @@ call ..\buildtools\svnrev\svnrev.bat
 call ..\buildtools\svnrev\sourcetree_info.bat
 
 if "%RELEASE%" == "1" (
-    call build.bat rebuild
     call makearchive.bat release
 ) else if "%1" == "rebuild" (
-    call build.bat rebuild
-    call makearchive.bat
+    call makearchive.bat rebuild
 ) else (
     call makearchive.bat
 )
