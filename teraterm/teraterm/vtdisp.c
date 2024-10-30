@@ -2887,6 +2887,12 @@ static void DrawStrWSub(HDC DC, HDC BGDC, const wchar_t *StrW, const int *Dx,
  *			StrW	U+307B	U+309A
  *			cells	0		2
  *
+ *		 len=4
+ *					‹g(‚Â‚¿‚æ‚µ)  –ì	 ‰Æ
+ *					0			  1		 2
+ *			StrW	0xd842 0xdfb7 0x91ce 0x5bb6
+ *			cells	0	   2	  2		 2
+ *
  */
 void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *cells, int len, int font_width, int font_height,
 			  int Y, int *X)
@@ -2926,7 +2932,7 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *cells, int len,
 			else {
 				SIZE size;
 				GetTextExtentPoint32W(DC, &StrW[i - zero_count], 1 + zero_count, &size);
-				if ((size.cx == Dx[i]) || (size.cx == Dx[i] + 1)) {
+				if (zero_count == 0 && ((size.cx == Dx[i]) || (size.cx == Dx[i] + 1))) {
 					wchar_count++;
 					cell_count += cells[i];
 				}
@@ -2938,10 +2944,10 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *cells, int len,
 					}
 					DrawChar(DC, BGDC, *X, Y, &StrW[i - zero_count], 1 + zero_count, cells[i]);
 					*X += cells[i] * FontWidth;
+					start_idx += 1 + zero_count;
 					zero_count = 0;
 					cell_count = 0;
 					wchar_count = 0;
-					start_idx++;
 				}
 			}
 		}
