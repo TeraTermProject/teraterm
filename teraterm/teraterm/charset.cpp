@@ -709,7 +709,7 @@ recheck:
 	// 4byte(21bit)
 	assert(w->count == 4);
 	assert((w->buf[0] & 0xf8) == 0xf0);
-	if ((w->buf[0] == 0xf0 && (w->buf[1] < 0x90 || 0x9f < w->buf[1])) ||
+	if ((w->buf[0] == 0xf0 && (w->buf[1] < 0x90 || 0xbf < w->buf[1])) ||
 		(w->buf[0] == 0xf4 && (w->buf[1] < 0x80 || 0x8f < w->buf[1]))) {
 		// •s³‚È UTF-8
 		PutReplacementChr(w, w->buf, 3, ts.FallbackToCP932);
