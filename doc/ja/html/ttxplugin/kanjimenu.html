@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>漢字コード変更プラグイン</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>漢字コード変更プラグイン</h1>
+
+<p>
+  TTXKanjiMenu プラグインを入れると、Tera Term のメニューに [漢字コード] メニューが追加されます。<br>
+  メニュー内の項目から送受信文字コード、Ambiguous Character Width を変更することができます。
+</p>
+
+<p>
+  メニューから[設定]を選ぶと、このプラグインの設定ダイアログが表示されます。
+</p>
+
+<h1>保存される設定</h1>
+
+TERATERM.INI の KanjiMemu セクションに次のキーを保存します。
+<pre>
+| キー                        | 内容                       | 値                  | デフォルト値       |
+|-----------------------------|----------------------------|---------------------|--------------------|
+| UseOneSetting               | 送受文字コードを同一とする | ON 同一             | ON                 |
+|                             |                            | OFF 同一ではない    |                    |
+|-----------------------------|----------------------------|---------------------|--------------------|
+| Language                    | 文字コードメニュー         | Japanese 日本語向け | OSの言語設定による |
+|                             |                            | Korean 韓国語向け   |                    |
+|                             |                            | Disable 表示しない  |                    |
+|-----------------------------|----------------------------|---------------------|--------------------|
+| AmbiguousCharacterWidthMenu | メニューを表示             | ON 表示する         | OFF                |
+|                             |                            | OFF 表示しない      |                    |
+|-----------------------------|----------------------------|---------------------|--------------------|
+| SettingMenu                 | メニューを表示             | ON 表示する         | ON                 |
+|                             |                            | OFF 表示しない      |                    |
+</pre>
+
+<p>
+  Language=Disable にするとメニューが出てこなくなるため設定変更などができなくなります。<br>
+  SettingMenu=OFF にすると設定ダイアログを開けなくなります。<br>
+  設定を保存すると Tera Term を再起動しても元の状態に戻りません。
+</p>
+
+<p>
+  表示できるようにするにはTERATERM.INI を編集してください。<br>
+  次のように変更して、Tera Term を再起動してください。
+  <pre>
+    [KanjiMemu]
+    SettingMenu=ON
+    Language=
+  </pre>
+</p>
+
+</body>
+</html>

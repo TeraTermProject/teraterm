@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>KanjiMenu plugin</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>KanjiMenu plugin</h1>
+
+<p>
+  When TTXKanjiMenu plugin is installed, [KanjiCode] menu is added to Tera Term.<br>
+  Sending/receiving character code and Ambiguous Character Width can be changed using menus.
+</p>
+
+<p>
+  Setting dialog for this plugin is opend selecting [Setting] from menu.
+</p>
+
+<h1>Saved Settings</h1>
+
+List of keys stored in KanjiMemu section of TERATERM.INI.
+<pre>
+| key                         | Description                                       | value                  | default value |
+|-----------------------------|---------------------------------------------------|------------------------|---------------|
+| UseOneSetting               | Use same character encoding for sending/receiving | ON  same encoding      | ON            |
+|                             |                                                   | OFF  not same encoding |               |
+|-----------------------------|---------------------------------------------------|------------------------|---------------|
+| Language                    | Character Encoding Menu                           | Japanese  for Japanese | OS setting    |
+|                             |                                                   | Korean  for Korean     |               |
+|                             |                                                   | Disable Not Displayed  |               |
+|-----------------------------|---------------------------------------------------|------------------------|---------------|
+| AmbiguousCharacterWidthMenu | Show ambiguous character width menu               | ON  Show menu          | OFF           |
+|                             |                                                   | OFF Do not show        |               |
+|-----------------------------|---------------------------------------------------|------------------------|---------------|
+| SettingMenu                 | Show setting menu                                 | ON  Show menu          | ON            |
+|                             |                                                   | OFF Do not show        |               |
+</pre>
+
+<p>
+  If Language=Disable, menu will not appear and you will not be able to change settings.<br>
+  If SettingMenu=OFF, settings dialog cannot be opened.<br>
+  Once the settings are saved, The menu is not displayed after restarting Tera Term.
+</p>
+
+<p>
+  Edit TERATERM.INI to make it visible.<br>
+  Make following changes and restart Tera Term.
+  <pre>
+    [KanjiMemu]
+    SettingMenu=ON
+    Language=
+  </pre>
+</p>
+
+</body>
+</html>

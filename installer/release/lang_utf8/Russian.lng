@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2024-09-02 by TeraTerm Project
+date=2024-11-01 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -1239,6 +1239,11 @@ MENU_EUCJP=Прием/Передача: &EUC-JP
 MENU_JIS=Прием/Передача: &JIS
 MENU_UTF8=Прием/Передача: &UTF-8
 MENU_KS5601=Прием/Передача: &KS5601
+MENU_SETTING=&Setting
+MENU_SETTING_TITLE=KanjiMenu Setting
+MENU_LANGUAGE=&Language
+MENU_AMB_MENU=Show &Ambiguous Characters width menu
+MENU_SETTING_MENU=&Show Setting menu
 
 
 [TTXAlwaysOnTop]

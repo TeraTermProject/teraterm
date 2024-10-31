@@ -790,6 +790,18 @@
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="プラグイン">
+		<param name="ImageNumber" value="1">
+		<param name="Local" value="html\index.html#plugin">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="TTX KanjiMenu">
+			<param name="Local" value="html\ttxplugin/kanjimenu.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="参考資料">
 		<param name="Local" value="html\index.html#reference">
 		<param name="ImageNumber" value="1">

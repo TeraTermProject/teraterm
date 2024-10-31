@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2024-09-02 by TeraTerm Project
+date=2024-11-01 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -1239,6 +1239,11 @@ MENU_EUCJP=Recep/Envoi: &EUC-JP
 MENU_JIS=Recep/Envoi: &JIS
 MENU_UTF8=Recv/Send: &UTF-8
 MENU_KS5601=Recep/Envoi: &KS5601
+MENU_SETTING=&Setting
+MENU_SETTING_TITLE=KanjiMenu Setting
+MENU_LANGUAGE=&Language
+MENU_AMB_MENU=Show &Ambiguous Characters width menu
+MENU_SETTING_MENU=&Show Setting menu
 
 
 [TTXAlwaysOnTop]
