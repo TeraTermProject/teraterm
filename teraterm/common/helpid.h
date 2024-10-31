@@ -78,7 +78,6 @@
 
 #define HlpUsageKeyboard                30100
 #define HlpUsageMouse                   30200
-#define HlpUsageShortcut                30300
 #define HlpUsageSsh                     30400
 #define HlpUsageCygwin                  30500
 #define HlpUsageProxy                   30600

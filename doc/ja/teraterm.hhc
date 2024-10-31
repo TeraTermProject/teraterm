@@ -10,11 +10,12 @@
 <UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="目次">
-		<param name="Local" value="html\index.html">
+		<param name="Local" value="html\index.html#toc">
 		<param name="ImageNumber" value="11">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Tera Term について">
+		<param name="Local" value="html\index.html#about">
 		<param name="ImageNumber" value="1">
 		</OBJECT>
 	<UL>
@@ -98,6 +99,7 @@
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="使いかた">
+		<param name="Local" value="html\index.html#usage">
 		<param name="ImageNumber" value="1">
 		</OBJECT>
 	<UL>
@@ -272,10 +274,21 @@
 				<param name="Local" value="html\usage\resizemenu.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="TTYレコーダー">
+				<param name="Local" value="html\usage\ttyrec.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="繰り返しコマンド">
+				<param name="Local" value="html\usage\recurringcommand.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
 		</UL>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="VT window のコマンド">
+		<param name="Local" value="html\index.html#vtwindow">
 		<param name="ImageNumber" value="1">
 		</OBJECT>
 	<UL>
@@ -599,6 +612,7 @@
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="TEK window のコマンド">
+		<param name="Local" value="html\index.html#tekwindow">
 		<param name="ImageNumber" value="1">
 		</OBJECT>
 	<UL>
@@ -654,6 +668,7 @@
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="コマンドライン">
+		<param name="Local" value="html\index.html#commandline">
 		<param name="ImageNumber" value="1">
 		</OBJECT>
 	<UL>
@@ -694,8 +709,10 @@
 				</OBJECT>
 		</UL>
 	</UL>
+
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="設定ファイル">
+		<param name="Local" value="html\index.html#setup">
 		<param name="ImageNumber" value="1">
 		</OBJECT>
 	<UL>
@@ -774,6 +791,7 @@
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="参考資料">
+		<param name="Local" value="html\index.html#reference">
 		<param name="ImageNumber" value="1">
 		</OBJECT>
 	<UL>

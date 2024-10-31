@@ -59,7 +59,6 @@ HlpAboutDifference=html\about\difference.html
 HlpAboutForeword=html\about\foreword.html
 HlpUsageKeyboard=html\usage\keyboard.html
 HlpUsageMouse=html\usage\mouse.html
-HlpUsageShortcut=html\usage\shortcut.html
 HlpUsageSsh=html\usage\ssh.html
 HlpUsageCygwin=html\usage\cygwin.html
 HlpUsageProxy=html\usage\proxy.html
