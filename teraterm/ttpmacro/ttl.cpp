@@ -1238,7 +1238,7 @@ static WORD TTLExpandEnv(void)
 {
 	WORD Err;
 	TVarId VarId;
-	TStrVal deststr, srcptr;
+	TStrVal srcptr;
 
 	Err = 0;
 	GetStrVar(&VarId, &Err);
@@ -1252,14 +1252,27 @@ static WORD TTLExpandEnv(void)
 			return Err;
 		}
 
-		// ファイルパスに環境変数が含まれているならば、展開する。
-		ExpandEnvironmentStrings(srcptr, deststr, MaxStrLen);
-		SetStrVal(VarId, deststr);
+		// 環境変数が含まれているならば、展開する。
+		wchar_t *srcW = ToWcharU8(srcptr);
+		wchar_t *destW;
+		hExpandEnvironmentStringsW(srcW, &destW);
+		free(srcW);
+		char *destU8 = ToU8W(destW);
+		free(destW);
+		SetStrVal(VarId, destU8);
+		free(destU8);
 	}
 	else { // expandenv strvar
-		// ファイルパスに環境変数が含まれているならば、展開する。
-		ExpandEnvironmentStrings(StrVarPtr(VarId), deststr, MaxStrLen);
-		SetStrVal(VarId, deststr);
+		// 環境変数が含まれているならば、展開する。
+		const char *srcU8 = StrVarPtr(VarId);
+		wchar_t *srcW = ToWcharU8(srcU8);
+		wchar_t *destW;
+		hExpandEnvironmentStringsW(srcW, &destW);
+		free(srcW);
+		char *destU8 = ToU8W(destW);
+		free(destW);
+		SetStrVal(VarId, destU8);
+		free(destU8);
 	}
 
 	return Err;
@@ -2360,7 +2373,6 @@ static WORD TTLGetEnv(void)
 	WORD Err;
 	TVarId VarId;
 	TStrVal Str;
-	PCHAR Str2;
 
 	Err = 0;
 	GetStrVal(Str,&Err);
