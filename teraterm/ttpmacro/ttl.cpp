@@ -2369,12 +2369,16 @@ static WORD TTLGetEnv(void)
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	Str2 = getenv(Str);
-
-	if (Str2!=NULL)
-		SetStrVal(VarId,Str2);
-	else
-		SetStrVal(VarId,"");
+	wchar_t *varnameW = ToWcharU8(Str);
+	const wchar_t *envW = _wgetenv(varnameW);
+	if (envW != NULL) {
+		char *envU8 = ToU8W(envW);
+		SetStrVal(VarId, envU8);
+		free(envU8);
+	} else {
+		SetStrVal(VarId, "");
+	}
+	free(varnameW);
 	return Err;
 }
 
