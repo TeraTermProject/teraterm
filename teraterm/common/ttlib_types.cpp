@@ -41,11 +41,11 @@
 
 #include "ttlib_types.h"
 
-wchar_t *GetDownloadDir(const TTTSet *pts)
+wchar_t *GetFileDir(const TTTSet *pts)
 {
 	wchar_t *dir = NULL;
 	if (pts->FileDirW != NULL && pts->FileDirW[0] != 0) {
-		// ダウンロードフォルダが設定されている
+		// ファイル転送用フォルダが設定されている
 		// 環境変数を展開
 		hExpandEnvironmentStringsW(pts->FileDirW, &dir);
 		if (DoesFolderExistW(dir)) {
@@ -67,9 +67,9 @@ wchar_t *GetTermLogDir(const TTTSet *pts)
 		return _wcsdup(pts->LogDefaultPathW);
 	}
 
-	// ダウンロードフォルダ
+	// ファイル転送用フォルダ
 	if (pts->FileDirW != NULL && pts->FileDirW[0] != 0) {
-		// ダウンロードフォルダが設定されている
+		// ファイル転送用フォルダが設定されている
 		// 環境変数を展開
 		wchar_t *dir;
 		hExpandEnvironmentStringsW(pts->FileDirW, &dir);

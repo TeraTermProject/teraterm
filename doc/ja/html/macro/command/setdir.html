@@ -28,7 +28,14 @@ MACRO の現在のディレクトリを &lt;dir&gt; に変更する。
 </p>
 
 <p>
-ファイル操作コマンド(fileopen 等)で指定されるファイル名はMACRO の現在のディレクトリを基準にする。
+ファイル操作コマンド(fileopen 等)で指定されるファイル名は "MACRO の現在のディレクトリ" を基準にする。
+</p>
+
+<h3>注意</h3>
+
+<p>
+setdir コマンドは "MACRO の現在のディレクトリ" を変更する。<br>
+<a href="changedir.html">changedir</a> コマンドは "Tera Term のファイル転送用ディレクトリ" を変更する。
 </p>
 
 <h2>例</h2>
@@ -39,6 +46,7 @@ setdir 'c:\'
 
 <h2>参照</h2>
 <ul>
+  <li><a href="getdir.html">setdir</a></li>
   <li><a href="changedir.html">changedir</a></li>
 </ul>
 

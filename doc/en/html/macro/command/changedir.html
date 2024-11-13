@@ -14,7 +14,7 @@
 <h1>changedir</h1>
 
 <p>
-Changes the Download directory.
+Changes the File transfer directory.
 </p>
 
 <pre class="macro-syntax">
@@ -24,19 +24,25 @@ changedir &lt;path&gt;
 <h2>Remarks</h2>
 
 <p>
-Changes the Download directory for Tera Term to &lt;path&gt;.
+Changes the File transfer directory for Tera Term to &lt;path&gt;.
 </p>
 
 <p>
-File names specified for the communication commands (e.g. kmtsend) are based on the current directory for Tera Term.
+File name specified for the send communication commands (e.g. sendfile, kmtsend) and destination folder for receive commands (e.g. zmodemrecv) are based on the "File transfer directory for Tera Term."
 </p>
 
 <p>
-You must specify a fullpath name to the communication commands (e.g. sendfile, kmtsend) because these commands are not affected by `changedir' command.
+You must specify a fullpath name to the communication commands because these commands are not affected by `changedir' command.
 </p>
 
+<h3>Note</h3>
+
 <p>
-The download folder also affects log storage.
+The changedir command changes "File transfer directory for Tera Term."<br>
+The <a href="setdir.html">setdir</a> command changes "current working directory for MACRO."<br>
+</p>
+<p>
+The File transfer folder also affects log save location.
 Reffer to <a href="../../setup/folder.html#TermLogDir">Folder to put setup files</a>.
 </p>
 

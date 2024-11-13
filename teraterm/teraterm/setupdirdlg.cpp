@@ -467,12 +467,12 @@ static wchar_t *_GetTermLogPath(const SetupList *list, const TTTSet *pts)
 	}
 }
 
-static wchar_t *_GetDownloadDir(const SetupList *list, const TTTSet *pts)
+static wchar_t *_GetFileDir(const SetupList *list, const TTTSet *pts)
 {
 	if (list->data_ptr == 0) {
 		// raw
 		if (pts->FileDirW != NULL) {
-			wchar_t *d = GetDownloadDir(pts);
+			wchar_t *d = GetFileDir(pts);
 			int r = wcscmp(d, pts->FileDirW);
 			free(d);
 			if (r == 0) {
@@ -488,7 +488,7 @@ static wchar_t *_GetDownloadDir(const SetupList *list, const TTTSet *pts)
 		}
 	}
 	else {
-		return GetDownloadDir(pts);
+		return GetFileDir(pts);
 	}
 }
 
@@ -555,10 +555,10 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			  LIST_PARAM_STR, pts->HomeDirW, NULL },
 			{ NULL, L"ExeDir",
 			  LIST_PARAM_STR, pts->ExeDirW, NULL },
-			{ NULL, L"Download(FileDir in ini)",
-			  LIST_PARAM_FUNC, (void*)_GetDownloadDir, (void *)0 },
-			{ NULL, L"Download",
-			  LIST_PARAM_FUNC, (void*)_GetDownloadDir, (void *)1 },
+			{ NULL, L"FileDir (INI file)",
+			  LIST_PARAM_FUNC, (void*)_GetFileDir, (void *)0 },
+			{ NULL, L"FileDir",
+			  LIST_PARAM_FUNC, (void*)_GetFileDir, (void *)1 },
 			{ NULL, L"LogDir(General)",
 			  LIST_PARAM_STR, pts->LogDirW, NULL },
 			{ NULL, L"Default log save folder",

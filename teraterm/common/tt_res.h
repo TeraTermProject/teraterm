@@ -248,9 +248,9 @@
 #define IDC_BROADCAST_HELP              2624
 #define IDC_GENPORT                     2625
 #define IDC_GENPORT_LABEL               2626
-#define IDC_DOWNLOAD_DIR_TITLE          2627
-#define IDC_DOWNLOAD_DIR                2628
-#define IDC_DOWNLOAD_DIR_SELECT         2629
+#define IDC_FILE_DIR_TITLE              2627
+#define IDC_FILE_DIR                    2628
+#define IDC_FILE_DIR_SELECT             2629
 #define IDC_GENUILANG                   2630
 #define IDC_GENUILANG_LABEL             2631
 #define ID_ACC_SENDBREAK                50001

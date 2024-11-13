@@ -220,7 +220,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 
 	// 受信フォルダ
 	{
-		wchar_t *dir = GetDownloadDir(&ts);
+		wchar_t *dir = GetFileDir(&ts);
 		size_t len = wcslen(dir) + 2;
 		dir = (wchar_t *)realloc(dir, sizeof(wchar_t) * len);
 		AppendSlashW(dir, len);
@@ -688,7 +688,7 @@ wchar_t **MakeFileArrayMultiSelect(const wchar_t *lpstrFile)
 
 static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPLONG Option)
 {
-	wchar_t *CurDir = GetDownloadDir(&ts);
+	wchar_t *CurDir = GetFileDir(&ts);
 	wchar_t *filterW = ToWcharA(ts.FileSendFilter);
 	wchar_t *FNFilter = GetCommonDialogFilterWW(!Receive ? filterW : NULL, ts.UILanguageFileW);
 	free(filterW);
@@ -940,7 +940,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 #define FnStrMemSize 4096
 	wchar_t TempDir[MAX_PATH];
 	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
-	wchar_t *CurDir = GetDownloadDir(&ts);
+	wchar_t *CurDir = GetFileDir(&ts);
 
 	/* save current dir */
 	GetCurrentDirectoryW(_countof(TempDir), TempDir);
@@ -1504,7 +1504,7 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 	wchar_t TempDir[MAX_PATH];
 	wchar_t FileName[MAX_PATH];
 	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
-	wchar_t *CurDir = GetDownloadDir(&ts);
+	wchar_t *CurDir = GetFileDir(&ts);
 
 	/* save current dir */
 	GetCurrentDirectoryW(_countof(TempDir), TempDir);
