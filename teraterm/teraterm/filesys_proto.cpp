@@ -1513,6 +1513,7 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 	wchar_t *FNFilter = GetCommonDialogFilterWW(filterW, UILanguageFileW);
 	free(filterW);
 
+	FileName[0] = 0;
 	OPENFILENAMEW ofn = {};
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner   = hWnd;
