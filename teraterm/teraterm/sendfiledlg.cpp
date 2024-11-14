@@ -37,6 +37,7 @@
 #include "i18n.h"
 #include "tt_res.h"
 #include "ttlib.h"
+#include "ttlib_types.h"
 #include "dlglib.h"
 #include "tttypes.h"		// for WM_USER_DLGHELP2
 #include "helpid.h"
@@ -178,6 +179,8 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					free(uimsg);
 					uimsg = NULL;
 
+					TTTSet *ts = data->pts;
+					wchar_t *FileDir = GetFileDir(ts);
 					wchar_t *filterW = GetCommonDialogFilterWW(data->filesend_filter, data->UILanguageFileW);
 					wchar_t filename[MAX_PATH];
 					filename[0] = 0;
@@ -189,8 +192,10 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					ofn.lpstrFilter = filterW;
 					ofn.nFilterIndex = 0;
 					ofn.lpstrTitle = title;
+					ofn.lpstrInitialDir = FileDir;
 					ofn.Flags = OFN_FILEMUSTEXIST | OFN_SHOWHELP | OFN_HIDEREADONLY;
 					BOOL Ok = GetOpenFileNameW(&ofn);
+					free(FileDir);
 					free(filterW);
 					free(title);
 

@@ -37,6 +37,7 @@ typedef struct {
 	// in
 	const wchar_t* UILanguageFileW;
 	const wchar_t *filesend_filter;
+	TTTSet *pts;
 	// out
 	wchar_t* filename;		// IDOK時、選択ファイル名が返る,使用後free()すること
 	BOOL binary;			// TRUE/FALSE = バイナリ/テキスト

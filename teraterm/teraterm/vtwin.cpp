@@ -3972,6 +3972,7 @@ void CVTWindow::OnFileSend()
 	data.UILanguageFileW = ts.UILanguageFileW;
 	wchar_t *filterW = ToWcharA(ts.FileSendFilter);
 	data.filesend_filter = filterW;
+	data.pts = &ts;
 	INT_PTR ok = sendfiledlg(m_hInst, m_hWnd, &data);
 	free(filterW);
 	if (ok != IDOK) {
