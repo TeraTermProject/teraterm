@@ -4249,7 +4249,11 @@ static WORD TTLSetEnv(void)
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	_putenv_s(Str,Str2);
+	wchar_t *varnameW = ToWcharU8(Str);
+	wchar_t *value_stringW = ToWcharU8(Str2);
+	_wputenv_s(varnameW, value_stringW);
+	free(varnameW);
+	free(value_stringW);
 	return Err;
 }
 
