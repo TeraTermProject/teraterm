@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2024-11-01 by TeraTerm Project
+date=2024-11-16 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -1242,9 +1242,10 @@ MENU_KS5601=收發: &KS5601
 MENU_SETTING=&Setting
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_LANGUAGE=&Language
+MENU_TITLE=Menu
 MENU_AMB_MENU=Show &Ambiguous Characters width menu
-MENU_SETTING_MENU=&Show Setting menu
-
+MENU_SETTING_MENU=Show &Setting menu
+MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=最上層顯示(&A)

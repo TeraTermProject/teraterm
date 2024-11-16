@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2024-11-01 by TeraTerm Project
+date=2024-11-16 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -1222,7 +1222,7 @@ BTN_DEFAULT=Default
 
 [TTXKanjiMenu]
 MENU_KANJI=&KanjiCode
-MENU_KANJI_K=&Coding(&K)
+MENU_KANJI_K=Coding(&K)
 MENU_RECV_SJIS=Recv: &Shift_JIS
 MENU_RECV_EUCJP=Recv: &EUC-JP
 MENU_RECV_JIS=Recv: &JIS
@@ -1232,7 +1232,7 @@ MENU_SEND_SJIS=Send: S&hift_JIS
 MENU_SEND_EUCJP=Send: EU&C-JP
 MENU_SEND_JIS=Send: J&IS
 MENU_SEND_UTF8=Send: U&TF-8
-MENU_SEND_KS5601=Send: KS&5601
+MENU_SEND_KS5601=Send: K&S5601
 MENU_USE_ONE_SETTING=Use &one setting
 MENU_SJIS=Recv/Send: &Shift_JIS
 MENU_EUCJP=Recv/Send: &EUC-JP
@@ -1242,9 +1242,10 @@ MENU_KS5601=Recv/Send: &KS5601
 MENU_SETTING=&Setting
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_LANGUAGE=&Language
+MENU_TITLE=Menu
 MENU_AMB_MENU=Show &Ambiguous Characters width menu
-MENU_SETTING_MENU=&Show Setting menu
-
+MENU_SETTING_MENU=Show &Setting menu
+MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=&Immer im Vordergrund

@@ -12,49 +12,98 @@
 <h1>漢字コード変更プラグイン</h1>
 
 <p>
-  TTXKanjiMenu プラグインを入れると、Tera Term のメニューに [漢字コード] メニューが追加されます。<br>
-  メニュー内の項目から送受信文字コード、Ambiguous Character Width を変更することができます。
+  TTXKanjiMenu プラグインを有効にすると、Tera Term のメニューに [漢字コード] メニューが追加されます。<br>
+  言語設定で選択した日本語または韓国語環境向けの文字コードがメニューに表示されます。
+  メニュー内の項目から送受信文字コード、Unicode(UTF-8)時の Ambiguous Character Width を変更することができます。
 </p>
 
 <p>
-  メニューから[設定]を選ぶと、このプラグインの設定ダイアログが表示されます。
+  文字コードが UTF-8 以外のとき Ambiguous Character Width は無効になります。
+</p>
+
+<p>
+  メニューから[設定]を選択すると、このプラグインの設定ダイアログが表示されます。
+</p>
+
+<p>
+  設定メニューを表示しない設定にすると、設定ダイアログを開けなくなります。<br>
+  表示されない状態で設定を保存した場合、TERATERM.INI を直接編集すれば表示できるようになります。<br>
+  次のように変更して、Tera Term を再起動してください。
+  <pre>
+    [KanjiMemu]
+    SettingMenu=ON
+  </pre>
+  設定ファイル TERATERM.INI があるフォルダについては<a href="../setup/folder.html">Tera Term が使用するフォルダ</a>を参照ください
 </p>
 
 <h1>保存される設定</h1>
 
 TERATERM.INI の KanjiMemu セクションに次のキーを保存します。
-<pre>
-| キー                        | 内容                       | 値                  | デフォルト値       |
-|-----------------------------|----------------------------|---------------------|--------------------|
-| UseOneSetting               | 送受文字コードを同一とする | ON 同一             | ON                 |
-|                             |                            | OFF 同一ではない    |                    |
-|-----------------------------|----------------------------|---------------------|--------------------|
-| Language                    | 文字コードメニュー         | Japanese 日本語向け | OSの言語設定による |
-|                             |                            | Korean 韓国語向け   |                    |
-|                             |                            | Disable 表示しない  |                    |
-|-----------------------------|----------------------------|---------------------|--------------------|
-| AmbiguousCharacterWidthMenu | メニューを表示             | ON 表示する         | OFF                |
-|                             |                            | OFF 表示しない      |                    |
-|-----------------------------|----------------------------|---------------------|--------------------|
-| SettingMenu                 | メニューを表示             | ON 表示する         | ON                 |
-|                             |                            | OFF 表示しない      |                    |
-</pre>
+
+<dl>
+  <dt id="UseOneSetting">UseOneSetting</dt>
+  <dd>
+    送受文字コードを同一とする
+    <dl>
+      <dt>ON</dt>
+      <dd>同一</dd>
+      <dt>OFF</dt>
+      <dd>同一ではない</dd>
+    </dl>
+  </dd>
+  <dt id="Language">Language</dt>
+  <dd>
+    表示する言語メニューを選択
+    <dl>
+      <dt>Auto (未設定)</dt>
+      <dd>OSの設定から自動で 日本語向け/韓国語向け/表示しない を選択します</dd>
+      <dt>Japanese</dt>
+      <dd>日本語向け</dd>
+      <dt>Korean</dt>
+      <dd>韓国語向け</dd>
+      <dt>Disable</dt>
+      <dd>表示しない</dd>
+    </dl>
+  </dd>
+  <dt id="UseOneSettingMenu">UseOneSettingMenu</dt>
+  <dd>
+    UseOneSettingMenu(送受信両方を変更メニュー)を表示
+    <dl>
+      <dt>ON</dt>
+      <dd>表示する</dd>
+      <dt>OFF</dt>
+      <dd>表示しない</dd>
+    </dl>
+  </dd>
+  <dt id="AmbiguousCharacterWidthMenu">AmbiguousCharacterWidthMenu</dt>
+  <dd>
+    AmbiguousCharacterWidth メニューを表示
+    <dl>
+      <dt>ON</dt>
+      <dd>表示する</dd>
+      <dt>OFF</dt>
+      <dd>表示しない</dd>
+    </dl>
+  </dd>
+  <dt id="SettingMenu">SettingMenu</dt>
+  <dd>
+    SettingMenu メニューを表示
+    <dl>
+      <dt>ON</dt>
+      <dd>表示する</dd>
+      <dt>OFF</dt>
+      <dd>表示しない</dd>
+    </dl>
+  </dd>
+</dd>
 
 <p>
-  Language=Disable にするとメニューが出てこなくなるため設定変更などができなくなります。<br>
-  SettingMenu=OFF にすると設定ダイアログを開けなくなります。<br>
-  設定を保存すると Tera Term を再起動しても元の状態に戻りません。
+  デフォルト値、iniファイルの初期値は<a href="../setup/teraterm-ini.html#TTXKanjiMenu">設定ファイルの全項目一覧</a>を参照ください。
 </p>
 
-<p>
-  表示できるようにするにはTERATERM.INI を編集してください。<br>
-  次のように変更して、Tera Term を再起動してください。
-  <pre>
-    [KanjiMemu]
-    SettingMenu=ON
-    Language=
-  </pre>
-</p>
+<h1>変更履歴</h1>
+
+<a href="../about/history.html#kanjimenu">改版履歴</a>
 
 </body>
 </html>

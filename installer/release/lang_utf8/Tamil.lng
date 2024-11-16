@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2024-11-01 by TeraTerm Project
+date=2024-11-16 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -1239,9 +1239,10 @@ MENU_KS5601=பெறு/அனுப்பு: &கேச்5601
 MENU_SETTING=&Setting
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_LANGUAGE=&Language
+MENU_TITLE=Menu
 MENU_AMB_MENU=Show &Ambiguous Characters width menu
-MENU_SETTING_MENU=&Show Setting menu
-
+MENU_SETTING_MENU=Show &Setting menu
+MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=&எப்போதும் மேலே
