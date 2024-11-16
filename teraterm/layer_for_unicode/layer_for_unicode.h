@@ -104,6 +104,8 @@ BOOL WINAPI _SystemParametersInfoW(UINT uiAction, UINT uiParam,
 								   PVOID pvParam, UINT fWinIni);
 DWORD WINAPI _GetTabbedTextExtentW(HDC hdc, LPCWSTR lpString, int chCount,
 								   int nTabPositions, const int *lpnTabStopPositions);
+HRSRC WINAPI _FindResourceW(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType);
+BOOL WINAPI _CreateDirectoryW(LPCWSTR lpPathName,LPSECURITY_ATTRIBUTES lpSecurityAttributes);
 
 // gdi32.lib
 int WINAPI _AddFontResourceW(LPCWSTR lpFileName);

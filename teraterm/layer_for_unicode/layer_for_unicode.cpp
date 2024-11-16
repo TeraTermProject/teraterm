@@ -960,3 +960,19 @@ finish:
 	}
 	return r;
 }
+
+/**
+ *	ƒ|ƒCƒ“ƒ^‚µ‚©ˆµ‚í‚È‚¢
+ */
+HRSRC WINAPI _FindResourceW(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType)
+{
+	return FindResourceA(hModule, (LPCSTR)lpName, (LPCSTR)lpType);
+}
+
+BOOL WINAPI _CreateDirectoryW(LPCWSTR lpPathName,LPSECURITY_ATTRIBUTES lpSecurityAttributes)
+{
+	char *lpPathNameA = ToCharW(lpPathName);
+	BOOL r = CreateDirectoryA(lpPathNameA, lpSecurityAttributes);
+	free(lpPathNameA);
+	return r;
+}
