@@ -1,5 +1,6 @@
 @echo off
 setlocal
+chcp 65001
 cd /d %~dp0
 
 if NOT "%CMAKE_COMMAND%" == "" goto pass_set_cmake
@@ -48,7 +49,7 @@ where "%CMAKE_COMMAND%" 2> nul
 if %errorlevel% == 0 goto build_all_2
 echo cmake not found
 pause
-exit
+exit /b
 
 :build_all_2
 set C="%CMAKE_COMMAND%" -DCMAKE_GENERATOR=%GENERATOR% %OPT% -P buildall.cmake
@@ -61,7 +62,7 @@ pause
 echo build complete
 endlocal
 pause
-exit
+exit /b
 
 :cmake_3_11_4
 set CMAKE_COMMAND=%~dp0..\buildtools\cmake-3.11.4-win32-x86\bin\cmake.exe
