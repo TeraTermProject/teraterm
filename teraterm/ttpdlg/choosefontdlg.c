@@ -114,7 +114,7 @@ static BOOL ChooseFontDlgForTek(HWND WndParent, LPLOGFONTA LogFont, const TTTSet
 	return Ok;
 }
 
-BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, const TTTSet *ts)
+BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, /*const*/ TTTSet *ts)
 {
 	if (AddsettingCheckWin(WndParent) == ADDSETTING_WIN_TEK) {
 		// TEK Window Ç©ÇÁÉRÅ[ÉãÇ≥ÇÍÇΩèÍçá

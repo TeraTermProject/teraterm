@@ -133,6 +133,14 @@ source_group(
   REGULAR_EXPRESSION
   "teraterm\/common\/")
 
+if(MINGW)
+  target_compile_options(
+    ${PACKAGE_NAME}
+    PRIVATE
+    -Wno-error=incompatible-pointer-types
+  )
+endif(MINGW)
+
 if(SUPPORT_OLD_WINDOWS)
   if(MSVC)
     if(${CMAKE_VERSION} VERSION_LESS "3.12.0")

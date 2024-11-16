@@ -73,7 +73,8 @@ typedef struct {									//	   計 381バイト(base64エンコード後は508バイト + \r\n
 // 復帰値 -1:エラー、n:読み込みバイト数
 static int PwdFileReadln(HANDLE FH, unsigned char *lpBuffer, UINT uBytes)
 {
-	UINT Count, Rnum;
+	DWORD Count;
+	UINT Rnum;
 	BOOL Result, EndFile, EndLine;
 	unsigned char Byte[1];
 

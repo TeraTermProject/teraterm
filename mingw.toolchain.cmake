@@ -41,9 +41,6 @@ endif()
 
 set(THREAD_MODEL "-win32")
 #set(THREAD_MODEL "-posix")
-message("msys=${MSYS}")
-message("msys2=${MSYS2}")
-message("CMAKE_COMMAND=${CMAKE_COMMAND}")
 if(MSYS OR (${CMAKE_COMMAND} MATCHES "msys2") OR (${CMAKE_COMMAND} MATCHES "mingw") OR (${CMAKE_COMMAND} MATCHES "clang64"))
   # msys2はposix版のみ
   unset(THREAD_MODEL)
