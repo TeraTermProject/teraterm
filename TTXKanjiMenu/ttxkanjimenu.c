@@ -16,6 +16,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <winsock2.h>
+#include <windows.h>
+#include <htmlhelp.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -26,6 +29,7 @@
 #include "inifile_com.h"
 #include "dlglib.h"
 #include "asprintf.h"
+#include "helpid.h"
 
 #include "ttxkanjimenu.h"
 #include "resource.h"
@@ -565,6 +569,7 @@ static INT_PTR CALLBACK SettingDlgProc(HWND dlg, UINT msg, WPARAM wp, LPARAM lp)
 			{ IDC_CHECK_SETTING, "MENU_SETTING_MENU" },
 			{ IDOK, "BTN_OK" },
 			{ IDCANCEL, "BTN_CANCEL" },
+			{ IDHELP, "BTN_HELP" },
 		};
 
 		SetI18nDlgStrsW(dlg, "TTXKanjiMenu", TextInfos, _countof(TextInfos), pvar->ts->UILanguageFileW);
@@ -625,6 +630,9 @@ static INT_PTR CALLBACK SettingDlgProc(HWND dlg, UINT msg, WPARAM wp, LPARAM lp)
 		}
 		case IDCANCEL:
 			TTEndDialog(dlg, IDCANCEL);
+			break;
+		case IDHELP:
+			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpTTXPluginKanjiMenu, 0);
 			break;
 		default:
 			return FALSE;
