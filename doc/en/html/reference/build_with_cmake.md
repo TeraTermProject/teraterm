@@ -25,7 +25,7 @@ Use Visual Studio IDE
 
     mkdir build_vs2022
     cd build_vs2022
-    cmake .. -G "Visual Stuido 17 2022" -A Win32
+    cmake .. -G "Visual Studio 17 2022" -A Win32
     cmake --build . --config Release -j
 
 To build installer

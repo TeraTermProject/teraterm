@@ -24,9 +24,9 @@
 Visual Studio の IDE を使用する場合の例
 (`-A win32` はx86指定。x64の場合は `-A x64`, ARM64の場合は `-A arm64`)
 
-    mkdir build_vs2022`
+    mkdir build_vs2022
     cd build_vs2022
-    cmake .. -G "Visual Stuido 17 2022" -A Win32
+    cmake .. -G "Visual Studio 17 2022" -A Win32
     cmake --build . --config Release -j
 
 インストーラを作成する
