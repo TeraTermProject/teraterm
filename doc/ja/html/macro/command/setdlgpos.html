@@ -72,25 +72,27 @@ setdlgpos [&lt;x&gt; &lt;y&gt; [&lt;position&gt; [&lt;offset x&gt; &lt;offset y&
   </li>
   <li>setdlgpos &lt;x&gt; &lt;y&gt;<br>
     &lt;x&gt; と &lt;y&gt; でダイアログボックス左上隅の座標 (x,y) を指定する。<br>
+    &lt;x&gt; と &lt;y&gt; は、ペアで指定しなければならない。<br>
     原点 (0,0)はメインディスプレイ左上隅。
   </li>
   <li>setdlgpos &lt;x&gt; &lt;y&gt; &lt;position&gt; <em>(バージョン 5.4 以降)</em>
     <ul>
       <li>&lt;position&gt; が 1 から 5 の場合<br>
-	MACRO が Tera Term とリンクされている場合は、VT ウインドウが表示されているディスプレイにダイアログボックスを表示する。<br>
-	MACRO が Tera Term とリンクされていない場合は、メインディスプレイにダイアログボックスを表示する。<br>
-	ダイアログボックスの表示位置は、&lt;position&gt; で指定した場所となる。
+        MACRO が Tera Term とリンクされている場合は、VT ウインドウが表示されているディスプレイにダイアログボックスを表示する。<br>
+        MACRO が Tera Term とリンクされていない場合は、メインディスプレイにダイアログボックスを表示する。<br>
+        ダイアログボックスの表示位置は、&lt;position&gt; で指定した場所となり、&lt;x&gt; &lt;y&gt; は無視される。
       </li>
       <li>&lt;position&gt; が 6 から 10 の場合<br>
-	MACRO が Tera Term とリンクされている場合は、VT ウインドウが表示されているディスプレイにダイアログボックスを表示する。<br>
-	MACRO が Tera Term とリンクされている場合の表示位置は、&lt;position&gt; で指定した場所となる。<br>
-	MACRO が Tera Term とリンクされていない、もしくは、Tera Term が最小化状態または非表示状態の場合は、メインディスプレイにダイアログボックスを表示する。<br>
-	この場合の表示位置は &lt;x&gt; &lt;y&gt; 座標となる。
+        MACRO が Tera Term とリンクされている場合は、VT ウインドウが表示されているディスプレイにダイアログボックスを表示する。<br>
+        MACRO が Tera Term とリンクされている場合の表示位置は、&lt;position&gt; で指定した場所となる。<br>
+        MACRO が Tera Term とリンクされていない、もしくは、Tera Term が最小化状態または非表示状態の場合は、メインディスプレイにダイアログボックスを表示する。<br>
+        この場合の表示位置は &lt;x&gt; &lt;y&gt; 座標となる。
       </li>
     </ul>
   </li>
   <li>setdlgpos &lt;x&gt; &lt;y&gt; &lt;position&gt; &lt;offset x&gt; &lt;offset y&gt; <em>(バージョン 5.4 以降)</em><br>
     ダイアログボックスの表示位置は、setdlgpos &lt;x&gt; &lt;y&gt; &lt;position&gt; の表示位置(x,y座標)に &lt;offset x&gt; &lt;offset y&gt; を加算した場所となる。<br>
+    &lt;offset x&gt; と &lt;offset y&gt; はペアで指定しなければならない。<br>
     負の値を指定する場合は、<a href="../appendixes/negative.html">負の整数定数についての注意</a>を参照のこと。
   </li>
 </ol>

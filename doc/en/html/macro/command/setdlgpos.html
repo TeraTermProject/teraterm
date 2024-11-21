@@ -72,6 +72,7 @@ The unit is pixels.<br>
   </li>
   <li>setdlgpos &lt;x&gt; &lt;y&gt;<br>
     Specify the coordinates (x,y) of the top-left corner of the dialog box using &lt;x&gt; and &lt;y&gt;.<br>
+    &lt;x&gt; and &lt;y&gt; must be specified as a pair.<br>
     The origin (0,0) is the top-left corner of the main display.
   </li>
   <li>setdlgpos &lt;x&gt; &lt;y&gt; &lt;position&gt; <em>(version 5.4 or later)</em>
@@ -79,7 +80,7 @@ The unit is pixels.<br>
       <li>If &lt;position&gt; is between 1 and 5,<br>
         If the MACRO is linked with Tera Term, the dialog box will be shown on the display where the VT window is displayed.<br>
         If the MACRO is not linked with Tera Term, the dialog box will be shown on the main display.<br>
-        The display position of the dialog box will be the location specified by &lt;position&gt;.
+        The display position of the dialog box will be the location specified by &lt;position&gt;, and &lt;x&gt; and &lt;y&gt; will be ignored.
       </li>
       <li>If &lt;position&gt; is between 6 and 10,<br>
         If the MACRO is linked with Tera Term, the dialog box will be shown on the display where the VT window is displayed.<br>
@@ -91,8 +92,8 @@ The unit is pixels.<br>
   </li>
   <li>setdlgpos &lt;x&gt; &lt;y&gt; &lt;position&gt; &lt;offset x&gt; &lt;offset y&gt; <em>(version 5.4 or later)</em><br>
     The display position of the dialog box will be the location obtained by adding &lt;offset x&gt; &lt;offset y&gt; to the display position (x,y coordinates) specified by setdlgpos &lt;x&gt; &lt;y&gt; &lt;position&gt;.<br>
+    &lt;offset x&gt; and &lt;offset y&gt; must be specified as a pair.<br>
     When specifying negative values, please refer to the <a href="../appendixes/negative.html">Note on negative integer constants</a>.
-
   </li>
 </ol>
 
