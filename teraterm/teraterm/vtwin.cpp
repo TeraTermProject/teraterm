@@ -3965,28 +3965,43 @@ void CVTWindow::OnReplayLog()
 
 void CVTWindow::OnFileSend()
 {
-	// new file send
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
-	sendfiledlgdata data;
+	sendfiledlgdata data = {};
 	data.UILanguageFileW = ts.UILanguageFileW;
 	wchar_t *filterW = ToWcharA(ts.FileSendFilter);
 	data.filesend_filter = filterW;
-	data.pts = &ts;
+	wchar_t *initial_dir = GetFileDir(&ts);
+	data.initial_dir = initial_dir;
+	data.skip_dialog = (BOOL)ts.SendfileSkipOptionDialog;
+	data.binary = ts.TransBin;
+	data.delay_type = (SendMemDelayType)ts.SendfileDelayType;
+	data.delay_tick = ts.SendfileDelayTick;
+	data.send_size = ts.SendfileSize;
+	data.method_4 = ts.SendfileMethod4;
+
 	INT_PTR ok = sendfiledlg(m_hInst, m_hWnd, &data);
+	free(initial_dir);
 	free(filterW);
 	if (ok != IDOK) {
 		return;
 	}
+	ts.SendfileSkipOptionDialog = data.skip_dialog;
+	ts.TransBin = data.binary;
+	ts.SendfileDelayType = data.delay_type;
+	ts.SendfileDelayTick = data.delay_tick;
+	ts.SendfileSize = data.send_size;
+	ts.SendfileMethod4 = data.method_4;
 
 	wchar_t *filename = data.filename;
 	if (!data.method_4) {
-		SendMemSendFile(filename, data.binary, (SendMemDelayType)data.delay_type, data.delay_tick, data.send_size);
+		// new file send
+		SendMemSendFile(filename, data.binary, data.delay_type, data.delay_tick, data.send_size);
 	}
 	else {
 		// file send same as teraterm 4
 		HelpId = HlpFileSend;
-		FileSendStart(filename, 0);
+		FileSendStart(filename, data.binary);
 	}
 	free(filename);
 }

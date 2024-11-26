@@ -22,7 +22,7 @@
         By dropping a file into dialog, You can also enter file name.
       </dd>
 
-      <dt>Send in same way as Tera Term 4</dt>
+      <dt id="Method4">Send in same way as Tera Term 4</dt>
       <dd>
           <dl>
               <dt>Checked(same way as Tera Term 4)</dt>
@@ -38,14 +38,14 @@
           </dl>
       </dd>
 
-      <dt>Binary</dt>
+      <dt id="Binary">Binary</dt>
       <dd>
 	If you select this option, received characters are sent without any
 	modifications. Otherwise, new-line codes are converted and control
 	characters (except TAB, LF and CR) are stripped out.
       </dd>
 
-      <dt>delay type</dt>
+      <dt id="DelayType">delay type</dt>
       <dd>
         <dl>
           <dt>no delay</dt>
@@ -71,16 +71,24 @@
 
       </dd>
 
-      <dt>send size</dt>
+      <dt id="Size">send size</dt>
       <dd>
         Send size (valid when delay type is "per sendsize")
       </dd>
 
-      <dt>delay time(ms)</dt>
+      <dt id="DelayTick">delay time(ms)</dt>
       <dd>
         Delay time (valid when delay type is not "no delay")
       </dd>
     </dl>
+
+    <h3>Special options in the Tera Term setup file</h3>
+    See also the following settings
+    <ul>
+      <li><a href="../setup/teraterm-trans.html#FileSendHighSpeedMode">High Speed File Transfer on Serial Connection (When [same way as Tera Term 4]=on)</a>
+      <li><a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">Skip Send file dialog</a>
+    </ul>
+
 
     <h3>Send size</h3>
 

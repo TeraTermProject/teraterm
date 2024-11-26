@@ -611,6 +611,11 @@ struct tttset {
 	wchar_t *ViewlogEditorW;
 	wchar_t *ViewlogEditorArg;
 	int BeepVBellWait;
+	WORD SendfileDelayType;
+	WORD SendfileDelayTick;
+	DWORD SendfileSize;
+	WORD SendfileMethod4;
+	WORD SendfileSkipOptionDialog;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;

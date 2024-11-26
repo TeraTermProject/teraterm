@@ -2005,6 +2005,17 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->BracketedSupport = GetOnOff(Section, "BracketedSupport", FName, TRUE);
 	ts->BracketedControlOnly = GetOnOff(Section, "BracketedControlOnly", FName, FALSE);
 
+	// Sendfile
+	GetPrivateProfileString(Section, "SendfileDelayType", "NoDelay", Temp, sizeof(Temp), FName);
+	ts->SendfileDelayType =
+		(_stricmp(Temp, "PerChar") == 0) ? 1 :
+		(_stricmp(Temp, "PerLine") == 0) ? 2 :
+		(_stricmp(Temp, "PerSendSize") == 0) ? 3 : /*NoDelay*/ 0;
+	ts->SendfileDelayTick = GetPrivateProfileInt(Section, "SendfileDelayTick", 0, FName);
+	ts->SendfileSize = GetPrivateProfileInt(Section, "SendfileSize", 4096, FName);
+	ts->SendfileMethod4 = GetOnOff(Section, "SendfileMethod4", FName, FALSE);
+	ts->SendfileSkipOptionDialog = GetOnOff(Section, "SendfileSkipOptionDialog", FName, FALSE);
+
 	// Experimental
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreePropertySheet", FName, ts->ExperimentalTreePropertySheetEnable);
@@ -3260,6 +3271,18 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	// Bracketed paste mode
 	WriteOnOff(Section, "BracketedSupport", FName, ts->BracketedSupport);
 	WriteOnOff(Section, "BracketedControlOnly", FName, ts->BracketedControlOnly);
+
+	// Sendfile
+	WritePrivateProfileString(Section, "SendfileDelayType",
+							  ts->SendfileDelayType == 1 ? "PerChar" :
+							  ts->SendfileDelayType == 2 ? "PerLine" :
+							  ts->SendfileDelayType == 3 ? "PerSendSize" :
+							  "NoDelay",
+							  FName);
+	WriteInt(Section, "SendfileDelayTick", FName, 2);
+	WriteInt(Section, "SendfileSize", FName, ts->SendfileSize);
+	WriteOnOff(Section, "SendfileMethod4", FName, ts->SendfileMethod4);
+	WriteOnOff(Section, "SendfileSkipOptionDialog", FName, ts->SendfileSkipOptionDialog);
 }
 
 void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,

@@ -1303,12 +1303,12 @@ BOOL IsRelativePathW(const wchar_t *path)
 	return TRUE;
 }
 
-BOOL IsRelativePathA(const char *path)
+BOOL IsRelativePathA(const char *pathA)
 {
-	if (path[0] == '\\' || path[0] == '/' || (path[0] != '\0' && path[1] == ':')) {
-		return FALSE;
-	}
-	return TRUE;
+	wchar_t *pathW = ToWcharA(pathA);
+	BOOL r = IsRelativePathW(pathW);
+	free(pathW);
+	return r;
 }
 
 // OSが 指定されたバージョンと等しい かどうかを判別する。
