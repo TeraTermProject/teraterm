@@ -177,6 +177,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			TipWin2Destroy(work->tip);
 			work->tip = NULL;
 			free(work);
+			SetWindowLongPtr(hDlgWnd, DWLP_USER, 0);
 			return FALSE;
 		}
 		case WM_COMMAND:
@@ -224,7 +225,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 
 				case IDC_SENDFILE_CHECK_4 | (BN_CLICKED << 16):
 					ArrangeControls(hDlgWnd);
-					break;
+					return TRUE;
 
 				case IDC_SENDFILE_FILENAME_BUTTON | (BN_CLICKED << 16): {
 					wchar_t *filename_ini;
@@ -251,6 +252,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 				default:
 					return FALSE;
 			}
+			break;
 
 		case WM_DROPFILES: {
 			// •¡”ƒhƒƒbƒv‚³‚ê‚Ä‚àÅ‰‚Ì1‚Â‚¾‚¯‚ðˆµ‚¤
