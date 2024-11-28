@@ -419,6 +419,15 @@ char *MakeOutputStringConvW(
 		char tmp_str[8];
 		size_t tmp_len;
 		size_t output_char_count = MakeOutputString(h, &strW[i], strW_len - i, tmp_str, &tmp_len, NULL, NULL);
+		if (str_pos + tmp_len + 1 > str_len) {
+			str_len += 32;
+			char *p = (char *)realloc(str, str_len);
+			if (p == NULL) {
+				break;
+			}
+			str = p;
+		}
+		assert(str_pos + tmp_len <= str_len);
 		memcpy(&str[str_pos], &tmp_str, tmp_len);
 		str_pos += tmp_len;
 		i += output_char_count;
@@ -426,6 +435,7 @@ char *MakeOutputStringConvW(
 
 	MakeOutputStringDestroy(h);
 
+	assert(str_pos + 1 <= str_len);
 	str[str_pos++] = 0;
 	if (len != NULL) {
 		*len = str_pos - 1;
