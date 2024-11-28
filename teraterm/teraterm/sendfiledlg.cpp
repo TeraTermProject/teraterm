@@ -32,18 +32,18 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <wchar.h>
-#include <commctrl.h>
 
 #include "i18n.h"
 #include "tt_res.h"
 #include "ttlib.h"
+#include "ttlib_types.h"
 #include "dlglib.h"
 #include "tttypes.h"		// for WM_USER_DLGHELP2
 #include "helpid.h"
-#include "codeconv.h"
 #include "asprintf.h"
 #include "win32helper.h"
 #include "tipwin2.h"
+#include "sendmem.h"
 
 #include "sendfiledlg.h"
 
@@ -54,26 +54,79 @@ typedef struct {
 	UINT MsgDlgHelp;
 } SendFileDlgWork_t;
 
+static void ArrangeControls(HWND hDlgWnd)
+{
+	LRESULT index = SendDlgItemMessageA(hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, CB_GETCURSEL, 0, 0);
+	SendMemDelayType sel = (SendMemDelayType)SendDlgItemMessageA(hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, CB_GETITEMDATA, (WPARAM)index, 0);
+
+	if (IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_CHECK_4) == BST_CHECKED) {
+		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTYPE_LABEL), FALSE);
+		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN), FALSE);
+		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_SEND_SIZE_LABEL), FALSE);
+		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN), FALSE);
+		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTIME_LABEL), FALSE);
+		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTIME_EDIT), FALSE);
+	}
+	else {
+		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTYPE_LABEL), TRUE);
+		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN), TRUE);
+		BOOL enable = (sel == SENDMEM_DELAYTYPE_PER_SENDSIZE) ? TRUE : FALSE;
+		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_SEND_SIZE_LABEL), enable);
+		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN), enable);
+		enable = (sel == SENDMEM_DELAYTYPE_NO_DELAY) ? FALSE : TRUE;
+		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTIME_LABEL), enable);
+		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTIME_EDIT), enable);
+	}
+}
+
+static BOOL SelectFile(HWND hDlgWnd, const sendfiledlgdata *data, const wchar_t *filename_ini, wchar_t **filename)
+{
+	wchar_t *uimsg;
+	GetI18nStrWW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", L"Send file", data->UILanguageFileW, &uimsg);
+	wchar_t *title;
+	aswprintf(&title, L"Tera Term: %s", uimsg);
+	free(uimsg);
+	uimsg = NULL;
+
+	wchar_t *filterW = GetCommonDialogFilterWW(data->filesend_filter, data->UILanguageFileW);
+
+	TTOPENFILENAMEW ofn = {};
+	ofn.hwndOwner = hDlgWnd;
+	ofn.lpstrFilter = filterW;
+	ofn.nFilterIndex = 0;
+	ofn.lpstrTitle = title;
+	ofn.lpstrFile = filename_ini;		// 初期ファイル名
+	ofn.lpstrInitialDir = data->initial_dir;	// 初期フォルダ
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_SHOWHELP | OFN_HIDEREADONLY;
+	BOOL Ok = TTGetOpenFileNameW(&ofn, filename);
+
+	free(filterW);
+	free(title);
+
+	return Ok;
+}
+
 static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
-		{0, "FILEDLG_TRANS_TITLE_SENDFILE"},
-		{IDC_SENDFILE_FILENAME_TITLE, "DLG_SENDFILE_FILENAME_TITLE"},
-		{IDC_SENDFILE_CHECK_BINARY, "DLG_FOPT_BINARY"},
-		{IDC_SENDFILE_DELAYTYPE_LABEL, "DLG_SENDFILE_DELAYTYPE_TITLE"},
-		{IDC_SENDFILE_SEND_SIZE_LABEL, "DLG_SENDFILE_SEND_SIZE_TITLE"},
-		{IDC_SENDFILE_DELAYTIME_LABEL, "DLG_SENDFILE_DELAYTIME_TITLE"},
-		{IDC_SENDFILE_CHECK_4, "DLG_SENDFILE_TERATERM4"},
-		{IDCANCEL, "BTN_CANCEL"},
-		{IDOK, "BTN_OK"},
+		{ 0, "FILEDLG_TRANS_TITLE_SENDFILE" },
+		{ IDC_SENDFILE_FILENAME_TITLE, "DLG_SENDFILE_FILENAME_TITLE" },
+		{ IDC_SENDFILE_CHECK_BINARY, "DLG_FOPT_BINARY" },
+		{ IDC_SENDFILE_DELAYTYPE_LABEL, "DLG_SENDFILE_DELAYTYPE_TITLE" },
+		{ IDC_SENDFILE_SEND_SIZE_LABEL, "DLG_SENDFILE_SEND_SIZE_TITLE" },
+		{ IDC_SENDFILE_DELAYTIME_LABEL, "DLG_SENDFILE_DELAYTIME_TITLE" },
+		{ IDC_SENDFILE_CHECK_4, "DLG_SENDFILE_TERATERM4" },
+		{ IDHELP, "BTN_HELP" },
+		{ IDCANCEL, "BTN_CANCEL" },
+		{ IDOK, "BTN_OK" },
 	};
 	static const I18nTextInfo delaytype_list[] = {
-		{"DLG_SENDFILE_DELAYTYPE_NO_DELAY", L"no delay"},
-		{"DLG_SENDFILE_DELAYTYPE_PER_CHAR", L"per character"},
-		{"DLG_SENDFILE_DELAYTYPE_PER_LINE", L"per line"},
-		{"DLG_SENDFILE_DELAYTYPE_PER_SENDSIZE", L"per sendsize"},
+		{ "DLG_SENDFILE_DELAYTYPE_NO_DELAY", L"no delay", SENDMEM_DELAYTYPE_NO_DELAY },
+		{ "DLG_SENDFILE_DELAYTYPE_PER_CHAR", L"per character", SENDMEM_DELAYTYPE_PER_CHAR },
+		{ "DLG_SENDFILE_DELAYTYPE_PER_LINE", L"per line", SENDMEM_DELAYTYPE_PER_LINE },
+		{ "DLG_SENDFILE_DELAYTYPE_PER_SENDSIZE", L"per sendsize", SENDMEM_DELAYTYPE_PER_SENDSIZE },
 	};
-	static const int send_size_list[] = {16, 256, 4 * 1024};
+	static const size_t send_size_list[] = {16, 256, 4 * 1024};
 	SendFileDlgWork_t *work = (SendFileDlgWork_t *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
 	sendfiledlgdata *data = work != NULL ? work->create_param : NULL;
 
@@ -89,19 +142,25 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			CenterWindow(hDlgWnd, GetParent(hDlgWnd));
 
 			SetI18nListW("Tera Term", hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, delaytype_list, _countof(delaytype_list),
-						data->UILanguageFileW, 0);
+						 data->UILanguageFileW, data->delay_type);
 
+			if (data->initial_file != NULL) {
+				SetDlgItemTextW(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT, data->initial_file);
+			}
+
+			// 送信サイズ
 			for (size_t i = 0; i < _countof(send_size_list); i++) {
 				char buf[32];
-				sprintf(buf, "%d", send_size_list[i]);
+				sprintf(buf, "%lu", (unsigned long)send_size_list[i]);
 				SendDlgItemMessageA(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN, CB_ADDSTRING, 0, (LPARAM)buf);
 			}
-			SendDlgItemMessage(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN, CB_SETCURSEL, _countof(send_size_list) - 1, 0);
+			SetDlgNum(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN, (LONG)data->send_size);
 
-			SetDlgItemTextA(hDlgWnd, IDC_SENDFILE_DELAYTIME_EDIT, "1");
+			SetDlgNum(hDlgWnd, IDC_SENDFILE_DELAYTIME_EDIT, data->delay_tick);
+			CheckDlgButton(hDlgWnd, IDC_SENDFILE_CHECK_BINARY, data->binary ? BST_CHECKED : BST_UNCHECKED);
+			CheckDlgButton(hDlgWnd, IDC_SENDFILE_CHECK_4, data->method_4 ? BST_CHECKED : BST_UNCHECKED);
 
-			EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN), FALSE);
-			EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTIME_EDIT), FALSE);
+			ArrangeControls(hDlgWnd);
 
 			TipWin2 *tip = TipWin2Create(NULL, hDlgWnd);
 			work->tip = tip;
@@ -111,8 +170,6 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 				TipWin2SetTextW(tip, IDC_SENDFILE_CHECK_4, text);
 				free(text);
 			}
-			//TipWin2SetTextW(tip, IDC_SENDFILE_FILENAME_EDIT, L"ファイル名を入れる"); // test
-			//TipWin2SetTextW(tip, IDC_SENDFILE_FILENAME_BUTTON, L"ファイル選択"); // test
 
 			return TRUE;
 		}
@@ -120,6 +177,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			TipWin2Destroy(work->tip);
 			work->tip = NULL;
 			free(work);
+			SetWindowLongPtr(hDlgWnd, DWLP_USER, 0);
 			return FALSE;
 		}
 		case WM_COMMAND:
@@ -145,14 +203,12 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					}
 
 					data->filename = filename;
-					data->binary =
-						SendMessage(GetDlgItem(hDlgWnd, IDC_SENDFILE_CHECK_BINARY), BM_GETCHECK, 0, 0) == BST_CHECKED
-							? TRUE
-							: FALSE;
-					data->delay_type = (int)SendDlgItemMessage(hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, CB_GETCURSEL, 0, 0);
+					data->binary = IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_CHECK_BINARY) == BST_CHECKED ? TRUE : FALSE;
+					LRESULT index = SendDlgItemMessageA(hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, CB_GETCURSEL, 0, 0);
+					data->delay_type = (SendMemDelayType)SendDlgItemMessageA(hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, CB_GETITEMDATA, (WPARAM)index, 0);
 					data->delay_tick = GetDlgItemInt(hDlgWnd, IDC_SENDFILE_DELAYTIME_EDIT, NULL, FALSE);
 					data->send_size = GetDlgItemInt(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN, NULL, FALSE);
-					data->method_4 = IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_CHECK_4);
+					data->method_4 = IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_CHECK_4) == BST_CHECKED ? TRUE : FALSE;
 
 					TTEndDialog(hDlgWnd, IDOK);
 					return TRUE;
@@ -167,53 +223,36 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					TTEndDialog(hDlgWnd, IDCANCEL);
 					return TRUE;
 
+				case IDC_SENDFILE_CHECK_4 | (BN_CLICKED << 16):
+					ArrangeControls(hDlgWnd);
+					return TRUE;
+
 				case IDC_SENDFILE_FILENAME_BUTTON | (BN_CLICKED << 16): {
-					wchar_t TempDir[MAX_PATH];
-					GetCurrentDirectoryW(_countof(TempDir), TempDir);
+					wchar_t *filename_ini;
+					hGetDlgItemTextW(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT, &filename_ini);
 
-					wchar_t *uimsg;
-					GetI18nStrWW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", L"Send file", data->UILanguageFileW, &uimsg);
-					wchar_t *title;
-					aswprintf(&title, L"Tera Term: %s", uimsg);
-					free(uimsg);
-					uimsg = NULL;
-
-					wchar_t *filterW = GetCommonDialogFilterWW(data->filesend_filter, data->UILanguageFileW);
-					wchar_t filename[MAX_PATH];
-					filename[0] = 0;
-					OPENFILENAMEW ofn = {};
-					ofn.lStructSize = get_OPENFILENAME_SIZEW();
-					ofn.hwndOwner = hDlgWnd;
-					ofn.lpstrFile = filename;
-					ofn.nMaxFile = MAX_PATH;
-					ofn.lpstrFilter = filterW;
-					ofn.nFilterIndex = 0;
-					ofn.lpstrTitle = title;
-					ofn.Flags = OFN_FILEMUSTEXIST | OFN_SHOWHELP | OFN_HIDEREADONLY;
-					BOOL Ok = GetOpenFileNameW(&ofn);
-					free(filterW);
-					free(title);
-
-					SetCurrentDirectoryW(TempDir);
+					wchar_t *filename;
+					BOOL Ok = SelectFile(hDlgWnd,data, filename_ini, &filename);
+					free(filename_ini);
 
 					if (Ok) {
 						SetDlgItemTextW(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT, filename);
 						PostMessage(hDlgWnd, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(hDlgWnd, IDOK), TRUE);
+						free(filename);
 					}
 
 					return TRUE;
 				}
 
 				case IDC_SENDFILE_DELAYTYPE_DROPDOWN | (CBN_SELCHANGE << 16): {
-					int sel = (int)SendDlgItemMessage(hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, CB_GETCURSEL, 0, 0);
-					EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN), sel != 3 ? FALSE : TRUE);
-					EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTIME_EDIT), sel == 0 ? FALSE : TRUE);
+					ArrangeControls(hDlgWnd);
 					return TRUE;
 				}
 
 				default:
 					return FALSE;
 			}
+			break;
 
 		case WM_DROPFILES: {
 			// 複数ドロップされても最初の1つだけを扱う
@@ -246,8 +285,23 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 
 INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data)
 {
-	INT_PTR ret;
-	data->method_4 = FALSE;
-	ret = TTDialogBoxParam(hInstance, MAKEINTRESOURCEW(IDD_SENDFILEDLG), hWndParent, SendFileDlgProc, (LPARAM)data);
-	return ret;
+	BOOL skip_dialog = data->skip_dialog;
+	if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0) {
+		skip_dialog = !skip_dialog;
+	}
+
+	if (!skip_dialog) {
+		INT_PTR ret;
+		ret = TTDialogBoxParam(hInstance, MAKEINTRESOURCEW(IDD_SENDFILEDLG), hWndParent, SendFileDlgProc, (LPARAM)data);
+		return ret;
+	}
+	else {
+		wchar_t *filename_ini = data->filename;
+		wchar_t *filename;
+		BOOL Ok = SelectFile(hWndParent, data, filename_ini, &filename);
+		if (Ok) {
+			data->filename = filename;
+		}
+		return Ok ? (INT_PTR)IDOK : (INT_PTR)IDCANCEL;
+	}
 }

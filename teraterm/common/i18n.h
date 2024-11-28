@@ -49,6 +49,7 @@ typedef struct {
 typedef struct {
 	const char *key;				// NULLの場合は常にdefault_text が使用される
 	const wchar_t *default_text;	// key == NULL && default_text == NULLの場合終端
+	uintptr_t data;
 } I18nTextInfo;
 
 DllExport size_t WINAPI GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
@@ -76,7 +77,7 @@ void SetI18nMenuStrsW(HMENU hMenu, const char *section, const DlgTextInfo *infos
 void SetI18nMenuStrsA(HMENU hMenu, const char *section, const DlgTextInfo *infos, size_t infoCount,
 					  const char *UILanguageFile);
 void SetI18nListW(const char *section, HWND hDlg, int nIDDlgItem, const I18nTextInfo *infos, size_t infoCount,
-				  const wchar_t *UILanguageFile, int nsel);
+				  const wchar_t *UILanguageFile, uintptr_t nsel);
 void SetI18nList(const char *section, HWND hDlg, int nIDDlgItem, const I18nTextInfo *infos, size_t infoCount,
 				 const char *UILanguageFile, int nsel);
 int GetI18nLogfontAW(const char *section, const char *key, PLOGFONTA logfont, int ppi, const wchar_t *iniFile);

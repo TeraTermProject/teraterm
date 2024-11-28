@@ -121,28 +121,36 @@ void GetI18nStrU8(const char *section, const char *key, char *buf, int buf_len, 
  *	@param[in]	I18nTextInfo	テキスト情報
  *	@param[in]	infoCount		テキスト情報数
  *	@param[in]	UILanguageFile	lng file
- *	@param[in]	nsel			CB_SETCURSEL の引数と同じ
- *								-1	未選択
- *								0～	選択項目
+ *	@param[in]	nsel			I18nTextInfo の data メンバがセットされていないとき
+ *									CB_SETCURSEL の引数と同じ
+ *										-1	未選択
+ *										0～	選択項目
+ *								I18nTextInfo の data メンバがセットされているとき
+ *									data の値と同じアイテムが選択される
+ *									同じ値がないとき、最初の値が選択される
  */
 void SetI18nListW(const char *section, HWND hDlg, int nIDDlgItem, const I18nTextInfo *infos, size_t infoCount,
-				  const wchar_t *UILanguageFile, int nsel)
+				  const wchar_t *UILanguageFile, uintptr_t nsel)
 {
 	UINT ADDSTRING;
 	UINT SETCURSEL;
+	UINT SETITEMDATA;
 	size_t i;
 	char ClassName[32];
 	int r = GetClassNameA(GetDlgItem(hDlg, nIDDlgItem), ClassName, _countof(ClassName));
 	assert(r != 0);
 	(void)r;
+	BOOL data_available = TRUE;
 
 	if (strcmp(ClassName, "ListBox") == 0) {
 		ADDSTRING = LB_ADDSTRING;
+		SETITEMDATA = LB_SETITEMDATA;
 		SETCURSEL = LB_SETCURSEL;
 	}
 	else {
 		// "ComboBox"
 		ADDSTRING = CB_ADDSTRING;
+		SETITEMDATA = CB_SETITEMDATA;
 		SETCURSEL = CB_SETCURSEL;
 	}
 
@@ -155,19 +163,39 @@ void SetI18nListW(const char *section, HWND hDlg, int nIDDlgItem, const I18nText
 		infoCount = i;
 	}
 
+	// dataに値が入っている?
 	for (i = 0; i < infoCount; i++) {
-		if (infos->key != NULL) {
+		if (infos[i].data != 0) {
+			data_available = TRUE;
+		}
+	}
+
+	for (i = 0; i < infoCount; i++) {
+		LRESULT index;
+		if (infos[i].key != NULL) {
 			wchar_t *uimsg;
-			GetI18nStrWW(section, infos->key, infos->default_text, UILanguageFile, &uimsg);
-			SendDlgItemMessageW(hDlg, nIDDlgItem, ADDSTRING, 0, (LPARAM)uimsg);
+			GetI18nStrWW(section, infos[i].key, infos[i].default_text, UILanguageFile, &uimsg);
+			index = SendDlgItemMessageW(hDlg, nIDDlgItem, ADDSTRING, 0, (LPARAM)uimsg);
 			free(uimsg);
 		}
 		else {
-			SendDlgItemMessageW(hDlg, nIDDlgItem, ADDSTRING, 0, (LPARAM)infos->default_text);
+			index = SendDlgItemMessageW(hDlg, nIDDlgItem, ADDSTRING, 0, (LPARAM)infos[i].default_text);
 		}
-		infos++;
+		SendDlgItemMessageA(hDlg, nIDDlgItem, SETITEMDATA, index, infos[i].data);
 	}
-	SendDlgItemMessageA(hDlg, nIDDlgItem, SETCURSEL, nsel, 0);
+
+	if (data_available) {
+		uintptr_t sel = 0;
+		for (i = 0; i < infoCount; i++) {
+			if (infos[i].data == nsel) {
+				sel = i;
+				break;
+			}
+		}
+		nsel = sel;
+	}
+
+	SendDlgItemMessageA(hDlg, nIDDlgItem, SETCURSEL, (WPARAM)nsel, 0);
 }
 
 void SetI18nList(const char *section, HWND hDlg, int nIDDlgItem, const I18nTextInfo *infos, size_t infoCount,

@@ -14,7 +14,7 @@
 <h1>changedir</h1>
 
 <p>
-Tera Term のダウンロードディレクトリを変更する。
+Tera Term のファイル転送用ディレクトリを変更する。
 </p>
 
 <pre class="macro-syntax">
@@ -24,19 +24,25 @@ changedir &lt;path&gt;
 <h2>解説</h2>
 
 <p>
-Tera Term のダウンロードディレクトリを &lt;path&gt; に変更する。
+Tera Term のファイル転送用ディレクトリを &lt;path&gt; に変更する。
 </p>
 
 <p>
-通信コマンド(kmtsend 等)で指定されるファイル名は Tera Term の現在のディレクトリを基準にする。
+通信コマンドの送信時(sendfile, kmtsend 等)に指定されるファイル名、受信コマンド(zmodemrecv 等)のファイル保存先は "Tera Term のファイル転送用ディレクトリ" を基準にする。
 </p>
 
 <p>
-通信コマンド（sendfile, kmtsend等）に指定されるファイル名は、changedirコマンドの影響を受けないため、絶対パスである必要がある。
+通信コマンドに指定されるファイル名は、changedirコマンドの影響を受けないため、絶対パスである必要がある。
 </p>
 
+<h3>注意</h3>
+
 <p>
-ダウンロードフォルダはログの保存にも影響します。
+changedir コマンドは "Tera Term のファイル転送用ディレクトリ" を変更する。<br>
+<a href="setdir.html">setdir</a> コマンドは "MACRO のカレントディレクトリ" を変更する。<br>
+</p>
+<p>
+ファイル転送用フォルダはログの保存先にも影響します。
 <a href="../../setup/folder.html#TermLogDir">Tera Term が使用するフォルダ</a>を参照ください。
 </p>
 

@@ -55,6 +55,8 @@
         </ul>
       <li>コマンドラインオプションで使用可能文字コードを全て指定できるようにした。</li>
       <li>com0com(virtual serial port driver) の Ports class ではない "COM%d" 形式のシリアルポートを選択できるようにした。</li>
+      <li>送信ファイルを選択するダイアログの初期ディレクトリが<a href="../setup/folder.html#FileDir">ファイル転送用のフォルダ</a>になるようにした。</li>
+      <li>ファイル送信オプションをTERATERM.INIに保存するようにした。</li>
     </ul>
   </li>
 
@@ -70,6 +72,7 @@
       <li>UTF-8 の U+20000 から U+3FFFF を正しく扱うよう修正した。</li>
       <li>"<a href="../menu/setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a>" が on のとき、サロゲートペアの文字が存在したとき正しく表示するよう修正した。</li>
       <li>MACRO: <a href="../macro/command/getenv.html">getenv</a>, <a href="../macro/command/expandenv.html">expandenv</a>, <a href="../macro/command/setenv.html">setenv</a> マクロコマンド が Unicode に対応していなかったので修正した。</li>
+      <li>B-Plusの送信ができなくなっていたので修正した。</li>
     </ul>
   </li>
 
@@ -101,7 +104,7 @@
       <li>General setup ダイアログで、選択されている <a href="../menu/setup-additional-general.html#UILanguageFile">言語ファイル</a>の情報を表示するようにした。</li>
       <li>General setup ダイアログの Language 設定を削除した。</li>
       <li>"Default port" 設定を General setup ダイアログから Additional settings の <a href="../menu/setup-additional-general.html#Port">General タブ</a>へ移動した。</li>
-      <li>ダウンロードフォルダの設定を Additional settings の <a href="../menu/setup-additional-general.html#DownloadFolder">General タブ</a>へ移動した。</li>
+      <li>ダウンロードフォルダの設定を Additional settings の <a href="../menu/setup-additional-general.html#FileFolder">General タブ</a>へ移動した。</li>
       <li>ViewlogEditor の引数を Additional settings の <a href="../menu/setup-additional-log.html#ViewlogEditorArg">Log タブ</a>に追加した。</li>
       <li>Setup-Font 設定を Additional settings の <a href="../menu/setup-additional-font.html">Font タブ</a>へ統合した。</li>
       <li>Keyboard setup ダイアログを Additional settings の <a href="../menu/setup-additional-keyboard.html">Keyboard タブ</a>へ移動した。</li>

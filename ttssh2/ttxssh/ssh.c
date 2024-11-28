@@ -4304,7 +4304,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			if (fn && fn[1] == '\0')
 				goto error;
 
-			FileDirExpanded = GetDownloadDir(pvar->ts);
+			FileDirExpanded = GetFileDir(pvar->ts);
 			FileDirExpandedU8 = ToU8W(FileDirExpanded);
 			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s\\%s", FileDirExpandedU8, fn ? fn : sendfile);
 			free(FileDirExpanded);

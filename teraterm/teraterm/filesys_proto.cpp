@@ -220,7 +220,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 
 	// 受信フォルダ
 	{
-		wchar_t *dir = GetDownloadDir(&ts);
+		wchar_t *dir = GetFileDir(&ts);
 		size_t len = wcslen(dir) + 2;
 		dir = (wchar_t *)realloc(dir, sizeof(wchar_t) * len);
 		AppendSlashW(dir, len);
@@ -688,7 +688,7 @@ wchar_t **MakeFileArrayMultiSelect(const wchar_t *lpstrFile)
 
 static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPLONG Option)
 {
-	wchar_t *CurDir = GetDownloadDir(&ts);
+	wchar_t *FileDir = GetFileDir(&ts);
 	wchar_t *filterW = ToWcharA(ts.FileSendFilter);
 	wchar_t *FNFilter = GetCommonDialogFilterWW(!Receive ? filterW : NULL, ts.UILanguageFileW);
 	free(filterW);
@@ -696,7 +696,7 @@ static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPL
 	wchar_t FullName[MAX_PATH];
 	FullName[0] = 0;
 	if (!Receive) {
-		wchar_t *default_filename = GetCommonDialogDefaultFilenameW(CurDir);
+		wchar_t *default_filename = GetCommonDialogDefaultFilenameW(FileDir);
 		if (default_filename != NULL) {
 			wcsncpy_s(FullName, _countof(FullName), default_filename, _TRUNCATE);
 			free(default_filename);
@@ -710,7 +710,7 @@ static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPL
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = FullName;
 	ofn.nMaxFile = _countof(FullName);
-	ofn.lpstrInitialDir = CurDir;
+	ofn.lpstrInitialDir = FileDir;
 	LONG opt = *Option;
 	if (! Receive)
 	{
@@ -740,7 +740,7 @@ static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPL
 		Ok = GetSaveFileNameW(&ofn);
 	}
 	free(FNFilter);
-	free(CurDir);
+	free(FileDir);
 	SetCurrentDirectoryW(TempDir);
 
 	wchar_t **ret = NULL;
@@ -940,7 +940,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 #define FnStrMemSize 4096
 	wchar_t TempDir[MAX_PATH];
 	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
-	wchar_t *CurDir = GetDownloadDir(&ts);
+	wchar_t *FileDir = GetFileDir(&ts);
 
 	/* save current dir */
 	GetCurrentDirectoryW(_countof(TempDir), TempDir);
@@ -956,7 +956,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 	wchar_t *FNFilter = GetCommonDialogFilterWW(filterW, UILanguageFileW);
 	free(filterW);
 
-	wchar_t *default_filename = GetCommonDialogDefaultFilenameW(CurDir);
+	wchar_t *default_filename = GetCommonDialogDefaultFilenameW(FileDir);
 	if (default_filename != NULL) {
 		wcsncpy_s(FnStrMem, FnStrMemSize, default_filename, _TRUNCATE);
 		free(default_filename);
@@ -970,7 +970,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 	ofn.lpstrFile = FnStrMem;
 	ofn.nMaxFile = FnStrMemSize;
 	ofn.lpstrTitle= caption;
-	ofn.lpstrInitialDir = CurDir;
+	ofn.lpstrInitialDir = FileDir;
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	ofn.Flags |= OFN_ALLOWMULTISELECT | OFN_EXPLORER;
 	ofn.Flags |= OFN_SHOWHELP;
@@ -996,7 +996,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 		ret = MakeFileArrayMultiSelect(FnStrMem);
 	}
 	free(FnStrMem);
-	free(CurDir);
+	free(FileDir);
 
 	/* restore dir */
 	SetCurrentDirectoryW(TempDir);
@@ -1504,7 +1504,7 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 	wchar_t TempDir[MAX_PATH];
 	wchar_t FileName[MAX_PATH];
 	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
-	wchar_t *CurDir = GetDownloadDir(&ts);
+	wchar_t *FileDir = GetFileDir(&ts);
 
 	/* save current dir */
 	GetCurrentDirectoryW(_countof(TempDir), TempDir);
@@ -1513,6 +1513,7 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 	wchar_t *FNFilter = GetCommonDialogFilterWW(filterW, UILanguageFileW);
 	free(filterW);
 
+	FileName[0] = 0;
 	OPENFILENAMEW ofn = {};
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner   = hWnd;
@@ -1520,14 +1521,14 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = FileName;
 	ofn.nMaxFile = _countof(FileName);
-	ofn.lpstrInitialDir = CurDir;
+	ofn.lpstrInitialDir = FileDir;
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_SHOWHELP;
 	ofn.lpstrTitle = DlgCaption;
 	ofn.hInstance = hInst;
 
 	BOOL Ok = GetOpenFileNameW(&ofn);
 	free(FNFilter);
-	free(CurDir);
+	free(FileDir);
 
 	wchar_t **ret = NULL;
 	if (Ok) {

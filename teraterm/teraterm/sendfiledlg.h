@@ -29,21 +29,27 @@
 #pragma once
 #include <windows.h>
 
+#include "sendmem.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct {
 	// in
-	const wchar_t* UILanguageFileW;
+	const wchar_t *UILanguageFileW;
 	const wchar_t *filesend_filter;
-	// out
-	wchar_t* filename;		// IDOK時、選択ファイル名が返る,使用後free()すること
-	BOOL binary;			// TRUE/FALSE = バイナリ/テキスト
-	int delay_type;
+	const wchar_t *initial_dir;
+	const wchar_t *initial_file;	// 初期ファイル名, NULL=指定なし
+	// in/out
+	BOOL skip_dialog;
+	BOOL binary;					// TRUE/FALSE = バイナリ/テキスト
+	SendMemDelayType delay_type;
 	DWORD delay_tick;
 	size_t send_size;
-	BOOL method_4;			// Tera Term 4 のルーチンを使用する
+	BOOL method_4;					// Tera Term 4 のルーチンを使用する
+	// out
+	wchar_t *filename;				// IDOK時、選択ファイル名が返る,使用後free()すること
 } sendfiledlgdata;
 
 INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data);

@@ -22,7 +22,7 @@
     ダイアログにファイルをドロップすることでファイル名を入力することもできます。
       </dd>
 
-      <dt>Tera Term 4 と同じ方法で送信</dt>
+      <dt id="Method4">Tera Term 4 と同じ方法で送信</dt>
       <dd>
           <dl>
               <dt>チェックを入れたとき(Tera Term 4 と同じ方法)</dt>
@@ -38,14 +38,14 @@
           </dl>
       </dd>
 
-      <dt>Binary</dt>
+      <dt id="Binary">Binary</dt>
       <dd>
 	ファイルの内容をそのまま送信したい場合は選択してください。
 	選択しない場合は、漢字コード、改行文字が変換されて送信され、
 	TAB ($09), LF ($0A), CR ($0D)以外の制御文字は送信されません。
       </dd>
 
-      <dt>delay type</dt>
+      <dt id="DelayType">delay type</dt>
       <dd>
         <dl>
           <dt>no delay</dt>
@@ -71,16 +71,24 @@
 
       </dd>
 
-      <dt>send size</dt>
+      <dt id="Size">send size</dt>
       <dd>
         送信サイズ(delay typeが "per sendsize"のとき有効)
       </dd>
 
-      <dt>delay time(ms)</dt>
+      <dt id="DelayTick">delay time(ms)</dt>
       <dd>
         ディレイ時間(delay typeが "no delay"以外のとき有効)
       </dd>
     </dl>
+
+    <h3>設定ファイルの特別オプション</h3>
+    次の設定も参照ください
+    <ul>
+      <li><a href="../setup/teraterm-trans.html#FileSendHighSpeedMode">シリアル接続における高速なファイル転送 ([Tera Term 4 と同じ方法で送信]=on 時に有効)</a>
+      <li><a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">ファイル送信ダイアログをスキップする</a>
+    </ul>
+
 
     <h3>送信サイズ</h3>
 

@@ -329,8 +329,8 @@ void CGeneralPropPageDlg::OnInitDialog()
 		SendDlgItemMessageA(IDC_GENPORT, CB_SETCURSEL, w, 0);
 	}
 
-	// Download dir
-	SetDlgItemTextW(IDC_DOWNLOAD_DIR, pts->FileDirW);
+	// File transfer dir
+	SetDlgItemTextW(IDC_FILE_DIR, pts->FileDirW);
 
 #if 0
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
@@ -410,9 +410,9 @@ void CGeneralPropPageDlg::OnOK()
 		}
 	}
 
-	// Download dir
+	// File transfer dir
 	free(pts->FileDirW);
-	hGetDlgItemTextW(m_hWnd, IDC_DOWNLOAD_DIR, &pts->FileDirW);
+	hGetDlgItemTextW(m_hWnd, IDC_FILE_DIR, &pts->FileDirW);
 	if (pts->FileDirW != NULL && pts->FileDirW[0] == 0) {
 		free(pts->FileDirW);
 		pts->FileDirW = NULL;
@@ -463,13 +463,13 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			Notify2Hide(ni);
 			break;
 		}
-		case IDC_DOWNLOAD_DIR_SELECT | (BN_CLICKED << 16): {
+		case IDC_FILE_DIR_SELECT | (BN_CLICKED << 16): {
 			wchar_t *uimsgW;
 			wchar_t *src;
 			wchar_t *dest;
 			GetI18nStrWW("Tera Term", "DLG_SELECT_DIR_TITLE", L"Select new directory", data->pts->UILanguageFileW, &uimsgW);
 
-			hGetDlgItemTextW(m_hWnd, IDC_DOWNLOAD_DIR, &src);
+			hGetDlgItemTextW(m_hWnd, IDC_FILE_DIR, &src);
 			if (src != NULL && src[0] == 0) {
 				free(src);
 				// Windowsのデフォルトのダウンロードフォルダ
@@ -482,7 +482,7 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				src = FileDirExpanded;
 			}
 			if (doSelectFolderW(m_hWnd, src, uimsgW, &dest)) {
-				SetDlgItemTextW(IDC_DOWNLOAD_DIR, dest);
+				SetDlgItemTextW(IDC_FILE_DIR, dest);
 				free(dest);
 			}
 			free(src);

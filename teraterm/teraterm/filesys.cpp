@@ -170,6 +170,10 @@ static void FreeFileVar(PFileVar *pfv)
 
 /**
  *	ファイル送信
+ *		Tera Term 4 方式のファイル送信
+ *
+ *	@param	filename	ファイル名
+ *	@param	binaryy		0/1 = text / binary
  */
 BOOL FileSendStart(const wchar_t *filename, int binary)
 {

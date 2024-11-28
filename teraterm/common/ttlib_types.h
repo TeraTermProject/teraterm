@@ -35,11 +35,11 @@ extern "C" {
 #endif
 
 /**
- * @brief	ダウンロードフォルダを取得
+ * @brief	ファイル転送用フォルダを取得
  * @param	pts	TTTSet
  * @return	フォルダ 不要になったら free() すること
  */
-wchar_t *GetDownloadDir(const TTTSet *pts);
+wchar_t *GetFileDir(const TTTSet *pts);
 
 /**
  * @brief	端末ログを保存するフォルダを取得
