@@ -69,7 +69,7 @@ private:
 		ProxyWSockHook::save(inifile);
 	}
 	static String get_teraterm_dir_relative_name(char* basename) {
-		if (basename[0] == '\\' || basename[0] == '/' || basename[0] != '\0' && basename[1] == ':') {
+		if (!IsRelativePathA(basename)) {
 			return basename;
 		}
 		char buf[1024];
