@@ -1083,7 +1083,15 @@ BOOL KermitGet(const wchar_t *filename)
 		}
 	}
 	else {
-		FileVar->FileNames = MakeStrArrayFromStr(filename);
+		if (IsRelativePathW(filename)) {
+			wchar_t *fullpath = GetFileDir(&ts);
+			awcscats(&fullpath, L"\\", filename, NULL);
+			FileVar->FileNames = MakeStrArrayFromStr(fullpath);
+			free(fullpath);
+		}
+		else {
+			FileVar->FileNames = MakeStrArrayFromStr(filename);
+		}
 		FileVar->NoMsg = TRUE;
 	}
 	KermitStart(IdKmtGet);
@@ -1186,7 +1194,15 @@ BOOL XMODEMStartReceive(const wchar_t *filename, WORD ParamBinaryFlag, WORD Para
 		ts.XmodemBin = LOWORD(Option);
 	}
 	else {
-		fv->FileNames = MakeStrArrayFromStr(filename);
+		if (IsRelativePathW(filename)) {
+			wchar_t *fullpath = GetFileDir(&ts);
+			awcscats(&fullpath, L"\\", filename, NULL);
+			FileVar->FileNames = MakeStrArrayFromStr(fullpath);
+			free(fullpath);
+		}
+		else {
+			FileVar->FileNames = MakeStrArrayFromStr(filename);
+		}
 		if (IsXopt1k(ts.XmodemOpt)) {
 			if (IsXoptCRC(ParamXmodemOpt)) {
 				// CRC
