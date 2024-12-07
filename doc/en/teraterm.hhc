@@ -585,6 +585,11 @@
 				<param name="Local" value="html\menu\resize.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="[KanjiCode] menu">
+				<param name="Local" value="html\ttxplugin/kanjimenu.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
 		</UL>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
@@ -762,18 +767,6 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="theme file">
 			<param name="Local" value="html\setup\theme.html">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-	</UL>
-	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="plugin">
-		<param name="ImageNumber" value="1">
-		<param name="Local" value="html\index.html#plugin">
-		</OBJECT>
-	<UL>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="TTX KanjiMenu">
-			<param name="Local" value="html\ttxplugin/kanjimenu.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 	</UL>

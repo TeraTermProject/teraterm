@@ -3,17 +3,17 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-<title>漢字コード変更プラグイン</title>
+<title>[漢字コード] メニュー</title>
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
 </head>
 <body>
 
-<h1>漢字コード変更プラグイン</h1>
+<h1>[漢字コード] メニュー</h1>
 
 <p>
   TTXKanjiMenu プラグインを有効にすると、Tera Term のメニューに [漢字コード] メニューが追加されます。<br>
-  言語設定で選択した日本語または韓国語環境向けの文字コードがメニューに表示されます。
+  メニュー内容で選択した日本語または韓国語環境向けの文字コードがメニューに表示されます。
   メニュー内の項目から送受信文字コード、Unicode(UTF-8)時の Ambiguous Character Width を変更することができます。
 </p>
 
@@ -25,22 +25,21 @@
   メニューから[設定]を選択すると、このプラグインの設定ダイアログが表示されます。
 </p>
 
-<p>
-  設定メニューを表示しない設定にすると、設定ダイアログを開けなくなります。<br>
-  表示されない状態で設定を保存した場合、TERATERM.INI を直接編集すれば表示できるようになります。<br>
-  次のように変更して、Tera Term を再起動してください。
-  <pre>
-    [KanjiMemu]
-    SettingMenu=ON
-    Language=Auto</pre>
-  設定ファイル TERATERM.INI があるフォルダについては<a href="../setup/folder.html">Tera Term が使用するフォルダ</a>を参照ください
-</p>
-
 <h1>保存される設定</h1>
 
 TERATERM.INI の KanjiMemu セクションに次のキーを保存します。
 
 <dl>
+  <dt id="CharCodeMenu">CharCodeMenu</dt>
+  <dd>
+    送受文字コードメニューを表示
+    <dl>
+      <dt>ON</dt>
+      <dd>表示する</dd>
+      <dt>OFF</dt>
+      <dd>表示しない</dd>
+    </dl>
+  </dd>
   <dt id="UseOneSetting">UseOneSetting</dt>
   <dd>
     送受文字コードを同一とする
@@ -53,16 +52,14 @@ TERATERM.INI の KanjiMemu セクションに次のキーを保存します。
   </dd>
   <dt id="Language">Language</dt>
   <dd>
-    表示する言語メニューを選択
+    送受文字コードメニューの内容を選択
     <dl>
-      <dt>Auto (未設定)</dt>
-      <dd>OSの設定から自動で 日本語向け/韓国語向け/表示しない を選択します</dd>
+      <dt>Auto</dt>
+      <dd>OSの設定から自動で 日本語向け/韓国語向け を選択します</dd>
       <dt>Japanese</dt>
       <dd>日本語向け</dd>
       <dt>Korean</dt>
       <dd>韓国語向け</dd>
-      <dt>Disable</dt>
-      <dd>表示しない</dd>
     </dl>
   </dd>
   <dt id="UseOneSettingMenu">UseOneSettingMenu</dt>
@@ -78,16 +75,6 @@ TERATERM.INI の KanjiMemu セクションに次のキーを保存します。
   <dt id="AmbiguousCharacterWidthMenu">AmbiguousCharacterWidthMenu</dt>
   <dd>
     AmbiguousCharacterWidth メニューを表示
-    <dl>
-      <dt>ON</dt>
-      <dd>表示する</dd>
-      <dt>OFF</dt>
-      <dd>表示しない</dd>
-    </dl>
-  </dd>
-  <dt id="SettingMenu">SettingMenu</dt>
-  <dd>
-    SettingMenu メニューを表示
     <dl>
       <dt>ON</dt>
       <dd>表示する</dd>

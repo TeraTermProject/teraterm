@@ -3,17 +3,17 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title>KanjiMenu plugin</title>
+<title>[KanjiCode] menu</title>
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
 </head>
 <body>
 
-<h1>KanjiMenu plugin</h1>
+<h1>[KanjiCode] menu</h1>
 
 <p>
   When TTXKanjiMenu plugin is installed, [KanjiCode] menu is added to Tera Term.<br>
-  Menu display character code for Japanese or Korean environment selected in language settings.
+  Menu display character code for Japanese or Korean environment selected in settings.
   Sending/receiving character code and Ambiguous Character Width can be changed using menus.
 </p>
 
@@ -25,22 +25,21 @@
   Setting dialog for this plugin is opend selecting [Setting] from menu.
 </p>
 
-<p>
-  If SettingMenu=OFF, settings dialog cannot be opened.<br>
-  If settings are saved, setting menu can be displayed by editing TERATERM.INI directly.
-  Make following changes and restart Tera Term.
-  <pre>
-    [KanjiMemu]
-    SettingMenu=ON
-    Language=Auto</pre>
-  Refer to <a href="../setup/folder.html">Folders used by Tera Term</a> for folder containing TERATERM.INI.
-</p>
-
 <h1>Saved Settings</h1>
 
 List of keys stored in KanjiMemu section of TERATERM.INI.
 
 <dl>
+  <dt id="CharCodeMenu">CharCodeMenu</dt>
+  <dd>
+    Use Character code menu
+    <dl>
+      <dt>ON</dt>
+      <dd>Display</dd>
+      <dt>OFF</dt>
+      <dd>Don't display</dd>
+    </dl>
+  </dd>
   <dt id="UseOneSetting">UseOneSetting</dt>
   <dd>
     Use same character code for both send and receive.
@@ -55,14 +54,12 @@ List of keys stored in KanjiMemu section of TERATERM.INI.
   <dd>
     Select language for display menu.
     <dl>
-      <dt>Auto (unset)</dt>
-      <dd>Select "For Japanese/Korean/Don't display" automatically from OS settings</dd>
+      <dt>Auto</dt>
+      <dd>Select "For Japanese/Korean" automatically from OS settings</dd>
       <dt>Japanese</dt>
       <dd>For Japanese</dd>
       <dt>Korean</dt>
       <dd>For Korean</dd>
-      <dt>Disable</dt>
-      <dd>Don't display</dd>
     </dl>
   </dd>
   <dt id="UseOneSettingMenu">UseOneSettingMenu</dt>
@@ -78,16 +75,6 @@ List of keys stored in KanjiMemu section of TERATERM.INI.
   <dt id="AmbiguousCharacterWidthMenu">AmbiguousCharacterWidthMenu</dt>
   <dd>
     Use AmbiguousCharacterWidth menu
-    <dl>
-      <dt>ON</dt>
-      <dd>Display</dd>
-      <dt>OFF</dt>
-      <dd>Don't display</dd>
-    </dl>
-  </dd>
-  <dt id="SettingMenu">SettingMenu</dt>
-  <dd>
-    Use Setting menu
     <dl>
       <dt>ON</dt>
       <dd>Display</dd>
