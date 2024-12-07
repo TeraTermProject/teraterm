@@ -3279,7 +3279,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 							  ts->SendfileDelayType == 3 ? "PerSendSize" :
 							  "NoDelay",
 							  FName);
-	WriteInt(Section, "SendfileDelayTick", FName, 2);
+	WriteInt(Section, "SendfileDelayTick", FName, ts->SendfileDelayTick);
 	WriteInt(Section, "SendfileSize", FName, ts->SendfileSize);
 	WriteOnOff(Section, "SendfileMethod4", FName, ts->SendfileMethod4);
 	WriteOnOff(Section, "SendfileSkipOptionDialog", FName, ts->SendfileSkipOptionDialog);
