@@ -57,6 +57,7 @@
 #include "compat_win.h"
 #include "vtdisp.h"
 #include "makeoutputstring.h"
+#include "history_store.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
@@ -3328,11 +3329,6 @@ void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const
 void PASCAL _AddValueToList(const wchar_t *FName, const wchar_t *Host, const wchar_t *section,
 							const wchar_t *key, int MaxList)
 {
-	int ent_no;
-	int host_index;
-	BOOL Update;
-	wchar_t **hostnames;
-
 	if ((FName[0] == 0) || (Host[0] == 0))
 		return;
 
@@ -3340,81 +3336,12 @@ void PASCAL _AddValueToList(const wchar_t *FName, const wchar_t *Host, const wch
 		return;
 	}
 
-	hostnames = (wchar_t **)calloc(MaxList, sizeof(wchar_t *));
-	if (hostnames == NULL) {
-		return;
+	HistoryStore *hs = HistoryStoreCreate(MaxList);
+	HistoryStoreReadIni(hs, FName, section, key);
+	if (HistoryStoreAddTop(hs, Host, FALSE)) {
+		HistoryStoreSaveIni(hs, FName, section, key);
 	}
-
-	hostnames[0] = _wcsdup(Host);
-	ent_no = 1;
-	host_index = 1;
-	Update = TRUE;
-	do {
-		wchar_t *EntName;
-		wchar_t *hostname;
-
-		aswprintf(&EntName, L"%s%i", key, ent_no);
-		/* Get a hostname */
-		hGetPrivateProfileStringW(section, EntName, L"", FName, &hostname);
-		free(EntName);
-
-		if (hostname == NULL || hostname[0] == L'\0') {
-			// 値がセットされていない = 最後まで読み込んだ
-			// hostname[0] == L'\0' のとき L"" を free() する必要がある
-			free(hostname);
-			break;
-		}
-		else if (_wcsicmp(hostname, Host) == 0) {
-			// 同じのがあるとリストに加えない
-			if (host_index == 1) {
-				// 先頭が同一だったら更新不要
-				Update = FALSE;
-			}
-			free(hostname);
-		}
-		else {
-			hostnames[host_index] = hostname;
-			host_index++;
-		}
-		ent_no++;
-	} while ((ent_no <= MaxList) && Update);
-
-	if (Update) {
-		// sectionを全部消す
-		WritePrivateProfileStringW(section, NULL, NULL, FName);
-
-		ent_no = 1;
-		host_index = 0;
-		do {
-			wchar_t *EntName;
-			wchar_t *hostname;
-
-			hostname = hostnames[host_index];
-			if (hostname == NULL) {
-				break;
-			}
-			aswprintf(&EntName, L"%s%i", key, ent_no);
-			WritePrivateProfileStringW(section, EntName, hostname, FName);
-			free(EntName);
-			host_index++;
-			ent_no++;
-		} while (ent_no <= MaxList);
-
-		/* update file */
-		WritePrivateProfileStringW(NULL, NULL, NULL, FName);
-	}
-
-	host_index = 0;
-	do {
-		wchar_t *hostname = hostnames[host_index];
-		if (hostname == NULL) {
-			break;
-		}
-		free(hostname);
-		hostnames[host_index] = NULL;
-		host_index++;
-	} while (host_index < MaxList);
-	free(hostnames);
+	HistoryStoreDestroy(hs);
 }
 
  /* copy hostlist from source IniFile to dest IniFile */

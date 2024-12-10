@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * (C) 2023- TeraTerm Project
  * All rights reserved.
  *
@@ -46,6 +46,7 @@
 #include "helpid.h"
 #include "asprintf.h"
 #include "win32helper.h"
+#include "history_store.h"
 
 #include "filesys_log_res.h"
 #include "filesys_log.h"
@@ -58,7 +59,7 @@ typedef struct {
 	FLogDlgInfo_t *info;
 	// work
 	bool file_exist;
-	int current_bom; // ‘¶Ý‚·‚éƒtƒ@ƒCƒ‹‚ÌƒGƒ“ƒR[ƒfƒBƒ“ƒOiƒtƒ@ƒCƒ‹‚ÌBOM‚©‚ç”»’èj
+	int current_bom; // å­˜åœ¨ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ï¼ˆãƒ•ã‚¡ã‚¤ãƒ«ã®BOMã‹ã‚‰åˆ¤å®šï¼‰
 	bool available_timer;
 	bool enable_timer;
 	bool on_initdialog;
@@ -67,12 +68,14 @@ typedef struct {
 	TComVar *pcv;
 } LogDlgWork_t;
 
+static HistoryStore *hs;
+
 /**
- *	ƒ_ƒCƒAƒƒO‚Ì“à—e‚ð ts ‚É‘‚«–ß‚µ
+ *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®å†…å®¹ã‚’ ts ã«æ›¸ãæˆ»ã—
  *
  *	TODO
- *		ƒ_ƒCƒAƒƒO‚ÅÝ’è‚µ‚½’l‚ÍˆêŽž“I‚È‚à‚Ì‚Å
- *		Ý’è‚ðã‘‚«‚·‚é‚Ì‚Í—Ç‚­‚È‚¢‚Ì‚Å‚Í‚È‚¢‚¾‚ë‚¤‚©?
+ *		ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§è¨­å®šã—ãŸå€¤ã¯ä¸€æ™‚çš„ãªã‚‚ã®ã§
+ *		è¨­å®šã‚’ä¸Šæ›¸ãã™ã‚‹ã®ã¯è‰¯ããªã„ã®ã§ã¯ãªã„ã ã‚ã†ã‹?
  */
 static void SetLogFlags(HWND Dialog, TTTSet *pts)
 {
@@ -102,7 +105,7 @@ static void SetLogFlags(HWND Dialog, TTTSet *pts)
 }
 
 /**
- *	ƒƒOƒtƒ@ƒCƒ‹ƒ`ƒFƒbƒN
+ *	ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ãƒã‚§ãƒƒã‚¯
  *
  *	@param[in]	filename
  *	@param[out]	exist	ture/false
@@ -116,13 +119,13 @@ static void CheckLogFile(const wchar_t *filename, bool *exist, int *bom)
 	*exist = FALSE;
 	*bom = 0;
 
-	// ƒtƒ@ƒCƒ‹‚ª‘¶Ý‚·‚é?
+	// ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹?
 	DWORD logdir = GetFileAttributesW(filename);
 	if ((logdir != INVALID_FILE_ATTRIBUTES) && ((logdir & FILE_ATTRIBUTE_DIRECTORY) == 0)) {
-		// ƒtƒ@ƒCƒ‹‚ª‚ ‚Á‚½
+		// ãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã£ãŸ
 		*exist = TRUE;
 
-		// BOM—L‚è/–³‚µƒ`ƒFƒbƒN
+		// BOMæœ‰ã‚Š/ç„¡ã—ãƒã‚§ãƒƒã‚¯
 		FILE *fp;
 		errno_t e = _wfopen_s(&fp, filename, L"rb");
 		if (e == 0 && fp != NULL) {
@@ -157,17 +160,17 @@ static void CheckLogFile(const wchar_t *filename, LogDlgWork_t *work)
 }
 
 /**
- * ƒ‰ƒWƒIƒ{ƒ^ƒ“Aƒtƒ@ƒCƒ‹‚Ìó‘Ô‚©‚çƒRƒ“ƒgƒ[ƒ‹‚ðEnable/Disable‚·‚é
+ * ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³ã€ãƒ•ã‚¡ã‚¤ãƒ«ã®çŠ¶æ…‹ã‹ã‚‰ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚’Enable/Disableã™ã‚‹
  */
 static void ArrangeControls(HWND Dialog, LogDlgWork_t *work)
 {
-	// Append ƒ‰ƒWƒIƒ{ƒ^ƒ“
+	// Append ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³
 	if (work->file_exist) {
-		// Žw’è‚³‚ê‚½ƒtƒ@ƒCƒ‹‚ª‘¶Ý‚·‚éê‡‚Í Enable
+		// æŒ‡å®šã•ã‚ŒãŸãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹å ´åˆã¯ Enable
 		EnableWindow(GetDlgItem(Dialog, IDC_APPEND), TRUE);
 	}
 	else {
-		// Žw’è‚³‚ê‚½ƒtƒ@ƒCƒ‹‚ª‘¶Ý‚µ‚È‚¢ê‡‚Í Disable
+		// æŒ‡å®šã•ã‚ŒãŸãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãªã„å ´åˆã¯ Disable
 		EnableWindow(GetDlgItem(Dialog, IDC_APPEND), FALSE);
 	}
 
@@ -176,43 +179,43 @@ static void ArrangeControls(HWND Dialog, LogDlgWork_t *work)
 
 	// BOM, Encoding
 	if (!log_binary && new_overwrite) {
-		// Text ‚©‚Â New/Overwrite ‚Ìê‡‚É Enable
+		// Text ã‹ã¤ New/Overwrite ã®å ´åˆã« Enable
 		EnableWindow(GetDlgItem(Dialog, IDC_BOM), TRUE);
 		EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), TRUE);
 	}
 	else {
-		// ‚»‚¤‚Å‚È‚¢ê‡‚É Disable
-		//   BOM ‚Íƒtƒ@ƒCƒ‹‚Ìæ“ª‚©‚ç‘‚«ž‚Þ‚Æ‚«‚µ‚©ˆÓ–¡‚ª‚È‚¢
-		//   Encoding ‚Í’Ç‹L‚Å‚àˆÓ–¡‚ª‚ ‚é‚ªAŠù‘¶ƒtƒ@ƒCƒ‹‚ÌƒGƒ“ƒR[ƒfƒBƒ“ƒO‚ð
-		//   ‹­§“I‚Éƒ_ƒCƒAƒƒO‚É”½‰f‚·‚é‚Ì‚ÅAƒ†[ƒU‚É‚æ‚éŽw’è‚Í‚³‚¹‚È‚¢
+		// ãã†ã§ãªã„å ´åˆã« Disable
+		//   BOM ã¯ãƒ•ã‚¡ã‚¤ãƒ«ã®å…ˆé ­ã‹ã‚‰æ›¸ãè¾¼ã‚€ã¨ãã—ã‹æ„å‘³ãŒãªã„
+		//   Encoding ã¯è¿½è¨˜ã§ã‚‚æ„å‘³ãŒã‚ã‚‹ãŒã€æ—¢å­˜ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã‚’
+		//   å¼·åˆ¶çš„ã«ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«åæ˜ ã™ã‚‹ã®ã§ã€ãƒ¦ãƒ¼ã‚¶ã«ã‚ˆã‚‹æŒ‡å®šã¯ã•ã›ãªã„
 		EnableWindow(GetDlgItem(Dialog, IDC_BOM), FALSE);
 		EnableWindow(GetDlgItem(Dialog, IDC_TEXTCODING_DROPDOWN), FALSE);
 	}
 
-	// Plain Text, Timestamp, Timestamp Ží•Ê
+	// Plain Text, Timestamp, Timestamp ç¨®åˆ¥
 	if (log_binary) {
-		// Binary ‚Ìê‡‚Í Disable
+		// Binary ã®å ´åˆã¯ Disable
 		DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
 		DisableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
 		DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
 	}
 	else {
-		// Text ‚Ìê‡‚Í Enable
+		// Text ã®å ´åˆã¯ Enable
 		EnableDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
 		EnableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
 
-		// Timestamp Ží•Ê
+		// Timestamp ç¨®åˆ¥
 		if (IsDlgButtonChecked(Dialog, IDC_TIMESTAMP) == BST_UNCHECKED) {
-			// Timestamp=off ‚Ìê‡‚Í Disable
+			// Timestamp=off ã®å ´åˆã¯ Disable
 			DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
 		} else {
-			// Timestamp=on ‚Ìê‡‚Í Enable
+			// Timestamp=on ã®å ´åˆã¯ Enable
 			EnableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
 		}
 	}
 
 	if (work->file_exist && !new_overwrite) {
-		// Šù‘¶ƒtƒ@ƒCƒ‹‚ÌƒGƒ“ƒR[ƒfƒBƒ“ƒO‚ð”½‰f‚·‚é
+		// æ—¢å­˜ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã‚’åæ˜ ã™ã‚‹
 		int bom = work->current_bom;
 		int cur =
 			bom == 1 ? 0 :
@@ -263,7 +266,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 	LogDlgWork_t *work = (LogDlgWork_t *)GetWindowLongPtr(Dialog, DWLP_USER);
 
 	if (Message == RegisterWindowMessage(HELPMSGSTRING)) {
-		// ƒRƒ‚ƒ“ƒ_ƒCƒAƒƒO‚©‚ç‚Ìƒwƒ‹ƒvƒƒbƒZ[ƒW‚ð•t‚¯‘Ö‚¦‚é
+		// ã‚³ãƒ¢ãƒ³ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‹ã‚‰ã®ãƒ˜ãƒ«ãƒ—ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ä»˜ã‘æ›¿ãˆã‚‹
 		Message = WM_COMMAND;
 		wParam = IDHELP;
 	}
@@ -291,7 +294,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		// timestamp
 		CheckDlgButton(Dialog, IDC_TIMESTAMP, pts->LogTimestamp == 0 ? BST_UNCHECKED : BST_CHECKED);
 
-		// timestamp Ží•Ê
+		// timestamp ç¨®åˆ¥
 		int tstype = pts->LogTimestampType == TIMESTAMP_LOCAL ? 0 :
 		             pts->LogTimestampType == TIMESTAMP_UTC ? 1 :
 		             pts->LogTimestampType == TIMESTAMP_ELAPSED_LOGSTART ? 2 :
@@ -301,12 +304,12 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		// plain text
 		CheckDlgButton(Dialog, IDC_PLAINTEXT, pts->LogTypePlainText == 0 ? BST_UNCHECKED : BST_CHECKED);
 
-		// Hide dialog ƒ`ƒFƒbƒNƒ{ƒbƒNƒX
+		// Hide dialog ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹
 		if (pts->LogHideDialog) {
 			SetRB(Dialog, 1, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
 		}
 
-		// Include screen buffer ƒ`ƒFƒbƒNƒ{ƒbƒNƒX
+		// Include screen buffer ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹
 		if (pts->LogAllBuffIncludedInFirst) {
 			SetRB(Dialog, 1, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
 		}
@@ -314,15 +317,18 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		// text/binary radio button
 		CheckRadioButton(Dialog, IDC_FOPTBIN, IDC_FOPTTEXT, pts->LogBinary == 0 ? IDC_FOPTTEXT : IDC_FOPTBIN);
 
-		// ƒtƒ@ƒCƒ‹–¼‚ðÝ’è‚·‚é
-		//   ƒtƒ@ƒCƒ‹‚Ìƒ`ƒFƒbƒNAƒRƒ“ƒgƒ[ƒ‹‚ÌÝ’è‚às‚í‚ê‚é
-		//		WM_COMMAND, EN_CHANGE ‚ª”­¶‚·‚é
+		// ãƒ•ã‚¡ã‚¤ãƒ«åã‚’è¨­å®šã™ã‚‹
+		//   ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒã‚§ãƒƒã‚¯ã€ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®è¨­å®šã‚‚è¡Œã‚ã‚Œã‚‹
+		//		WM_COMMAND, EN_CHANGE ãŒç™ºç”Ÿã™ã‚‹
 		wchar_t *fname = FLogGetLogFilename(work->info->filename);
 		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
-		free(fname);
 		HWND file_edit = GetDlgItem(Dialog, IDC_FOPT_FILENAME_EDIT);
 		SetWindowLongPtr(file_edit, GWLP_USERDATA, (LONG_PTR)work);
 		work->proc = (WNDPROC)SetWindowLongPtrW(file_edit, GWLP_WNDPROC, (LONG_PTR)FNameEditProc);
+
+		HistoryStoreSetControl(hs, Dialog, IDC_FOPT_FILENAME_EDIT);
+		ExpandCBWidth(Dialog, IDC_FOPT_FILENAME_EDIT);
+		free(fname);
 
 		CenterWindow(Dialog, GetParent(Dialog));
 
@@ -413,12 +419,12 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				free(filename);
 				if (work->on_initdialog || file_exist_prev != work->file_exist) {
 					if (work->file_exist) {
-						// ƒtƒ@ƒCƒ‹‚ª‘¶Ý‚·‚éAÝ’è‚É‡‚í‚¹‚ÄV‹K(ã‘‚«)/’Ç‹L‚ð‘I‘ð‚·‚é
+						// ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹ã€è¨­å®šã«åˆã‚ã›ã¦æ–°è¦(ä¸Šæ›¸ã)/è¿½è¨˜ã‚’é¸æŠžã™ã‚‹
 						CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND,
 										 work->pts->Append == 0 ? IDC_NEW_OVERWRITE : IDC_APPEND);
 					}
 					else {
-						// ƒtƒ@ƒCƒ‹‚ª‘¶Ý‚µ‚È‚¢AV‹K‚ð‘I‘ð‚·‚é
+						// ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãªã„ã€æ–°è¦ã‚’é¸æŠžã™ã‚‹
 						CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
 					}
 					ArrangeControls(Dialog, work);
@@ -428,7 +434,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		}
 		break;
 	case WM_DROPFILES: {
-		// •¡”ƒhƒƒbƒv‚³‚ê‚Ä‚àÅ‰‚Ì1‚Â‚¾‚¯‚ðˆµ‚¤
+		// è¤‡æ•°ãƒ‰ãƒ­ãƒƒãƒ—ã•ã‚Œã¦ã‚‚æœ€åˆã®1ã¤ã ã‘ã‚’æ‰±ã†
 		HDROP hDrop = (HDROP)wParam;
 		wchar_t *filename;
 		hDragQueryFileW(hDrop, 0, &filename);
@@ -462,14 +468,18 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 }
 
 /**
- *	ƒƒOƒ_ƒCƒAƒƒO‚ðŠJ‚­
- *	@param[in,out]	info.filename	ƒtƒ@ƒCƒ‹–¼‰Šú’l
- *									OKŽžAƒtƒ@ƒCƒ‹–¼A•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
- *	@retval	TRUE	[ok] ‚ª‰Ÿ‚³‚ê‚½
- *	@retval	FALSE	ƒLƒƒƒ“ƒZƒ‹‚³‚ê‚½
+ *	ãƒ­ã‚°ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‹ã
+ *	@param[in,out]	info.filename	ãƒ•ã‚¡ã‚¤ãƒ«ååˆæœŸå€¤
+ *									OKæ™‚ã€ãƒ•ã‚¡ã‚¤ãƒ«åã€ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
+ *	@retval	TRUE	[ok] ãŒæŠ¼ã•ã‚ŒãŸ
+ *	@retval	FALSE	ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã•ã‚ŒãŸ
  */
 BOOL FLogOpenDialog(HINSTANCE hInst_, HWND hWnd, FLogDlgInfo_t *info)
 {
+	if (hs == NULL) {
+		hs = HistoryStoreCreate(20);
+	}
+
 	LogDlgWork_t *work = (LogDlgWork_t *)calloc(1, sizeof(LogDlgWork_t));
 	work->info = info;
 	work->pts = info->pts;
@@ -478,5 +488,19 @@ BOOL FLogOpenDialog(HINSTANCE hInst_, HWND hWnd, FLogDlgInfo_t *info)
 		hInst_, MAKEINTRESOURCEW(IDD_LOGDLG),
 		hWnd, LogFnHook, (LPARAM)work);
 	free(work);
-	return ret == IDOK ? TRUE : FALSE;
+	if (ret == IDOK) {
+		HistoryStoreAddTop(hs, info->filename, FALSE);
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+void FLogOpenDialogUnInit(void)
+{
+	if (hs != NULL) {
+		HistoryStoreDestroy(hs);
+		hs = NULL;
+	}
 }

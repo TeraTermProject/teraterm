@@ -1,5 +1,5 @@
 /*
- * (C) 2020- TeraTerm Project
+ * Copyright (C) 2024- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,33 +27,25 @@
  */
 
 #pragma once
-#include <windows.h>
 
-#include "sendmem.h"
+#include <windows.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct {
-	// in
-	const wchar_t *UILanguageFileW;
-	const wchar_t *filesend_filter;
-	const wchar_t *initial_dir;
-	const wchar_t *initial_file;	// 初期ファイル名, NULL=指定なし
-	// in/out
-	BOOL skip_dialog;
-	BOOL binary;					// TRUE/FALSE = バイナリ/テキスト
-	SendMemDelayType delay_type;
-	DWORD delay_tick;
-	size_t send_size;
-	BOOL method_4;					// Tera Term 4 のルーチンを使用する
-	// out
-	wchar_t *filename;				// IDOK時、選択ファイル名が返る,使用後free()すること
-} sendfiledlgdata;
+typedef struct HistoryStoreTag HistoryStore;
 
-INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data);
-void sendfiledlgUnInit(void);
+HistoryStore *HistoryStoreCreate(size_t max);
+void HistoryStoreDestroy(HistoryStore *h);
+void HistoryStoreClear(HistoryStore *h);
+BOOL HistoryStoreAddTop(HistoryStore *h, const wchar_t *add_str, BOOL enable_duplicate);
+void HistoryStoreReadIni(HistoryStore *h, const wchar_t *FName, const wchar_t *section, const wchar_t *key);
+void HistoryStoreSaveIni(HistoryStore *h, const wchar_t *FName, const wchar_t *section, const wchar_t *key);
+void HistoryStoreSetControl(HistoryStore *h, HWND dlg, int dlg_item);
+void HistoryStoreGetControl(HistoryStore *h, HWND dlg, int dlg_item);
+const wchar_t *HistoryStoreGet(HistoryStore *h, size_t index);
+void HistoryStoreSet(HistoryStore *h, size_t index, const wchar_t *str);
 
 #ifdef __cplusplus
 }
