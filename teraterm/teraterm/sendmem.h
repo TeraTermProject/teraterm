@@ -59,8 +59,8 @@ void SendMemContinuously(void);
 
 // convenient function
 BOOL SendMemPasteString(wchar_t *str);
-BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max);
-BOOL SendMemSendFile2(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max, void (*callback)(void *data), void *callback_data);
+BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max, BOOL local_echo);
+BOOL SendMemSendFile2(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max, BOOL local_echo, void (*callback)(void *data), void *callback_data);
 
 #ifdef __cplusplus
 }

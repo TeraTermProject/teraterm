@@ -712,7 +712,7 @@ BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType dela
 	return r;
 }
 #else
-SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max)
+SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max, BOOL local_echo)
 {
 	SendMem *sm;
 	if (!binary) {
@@ -743,20 +743,22 @@ SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayTy
 	SendMemInitDialogCaption(sm, L"send file");			// title
 	SendMemInitDialogFilename(sm, filename);
 	SendMemInitDelay(sm, delay_type, delay_tick, send_max);
+	SendMemInitEcho(sm, local_echo);
+
 	SendMemStart(sm);
 	return sm;
 }
 #endif
 
-BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max)
+BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max, BOOL local_echo)
 {
-	SendMem *sm = SendMemSendFileCom(filename, binary, delay_type, delay_tick, send_max);
+	SendMem *sm = SendMemSendFileCom(filename, binary, delay_type, delay_tick, send_max, local_echo);
 	return (sm != NULL) ? TRUE : FALSE;
 }
 
-BOOL SendMemSendFile2(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max, void (*callback)(void *data), void *callback_data)
+BOOL SendMemSendFile2(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max, BOOL local_echo, void (*callback)(void *data), void *callback_data)
 {
-	SendMem *sm = SendMemSendFileCom(filename, binary, delay_type, delay_tick, send_max);
+	SendMem *sm = SendMemSendFileCom(filename, binary, delay_type, delay_tick, send_max, local_echo);
 	if (sm == NULL) {
 		return FALSE;
 	}
