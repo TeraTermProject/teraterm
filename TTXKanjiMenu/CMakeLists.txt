@@ -6,6 +6,7 @@ add_library(
   ${PACKAGE_NAME} SHARED
   resource.h
   ttxkanjimenu.c
+  ttxkanjimenu.h
   ttxkanjimenu.rc
   )
 

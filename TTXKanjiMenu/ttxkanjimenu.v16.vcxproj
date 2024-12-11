@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ttxkanjimenu.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttxkanjimenu.rc" />

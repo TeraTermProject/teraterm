@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2024-09-02 by TeraTerm Project
+date=2024-11-16 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -1234,13 +1234,18 @@ MENU_SEND_EUCJP=送信: EU&C-JP
 MENU_SEND_JIS=送信: J&IS
 MENU_SEND_UTF8=送信: U&TF-8
 MENU_SEND_KS5601=送信: K&S5601
-MENU_USE_ONE_SETTING=送受信両方を変更(&o)
+MENU_USE_ONE_SETTING=送受信両方を変更(&O)
 MENU_SJIS=送受信: &Shift_JIS
 MENU_EUCJP=送受信: &EUC-JP
 MENU_JIS=送受信: &JIS
 MENU_UTF8=送受信: &UTF-8
 MENU_KS5601=送受信: &KS5601
-
+MENU_SETTING=設定(&S)
+MENU_SETTING_TITLE=KanjiMenu設定
+MENU_CHARCODE=文字コードメニューを表示(&W)
+MENU_CONTENTS=メニュー内容(&C)
+MENU_AMB_MENU=Ambiguous(曖昧)文字幅メニューを表示(&A)
+MENU_USE_ONE_SETTING_MENU=送受信両方を変更メニューを表示(&N)
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=常に最前面に表示(&A)

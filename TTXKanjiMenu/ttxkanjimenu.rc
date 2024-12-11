@@ -7,19 +7,83 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include <windows.h>
+#include "afxres.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// 日本語 (日本) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG_SETTING DIALOGEX 0, 0, 201, 151
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "KanjiMenu Setting"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Sho&w Character code menu",IDC_CHECK_CHARCODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,187,10
+    LTEXT           "Menu &contents",IDC_MENU_CONTENTS,17,21,177,8
+    COMBOBOX        IDC_LANGUAGE_DROPBOX,27,35,79,59,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Show Use o&ne setting",IDC_CHECK_USE_ONE_SETTING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,54,177,10
+    CONTROL         "Use &one setting",IDC_CHECK_ONE_SETTING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,69,177,10
+    CONTROL         "Show &Ambiguous Characters width menu",IDC_CHECK_AMB_WIDTH,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,86,173,10
+    CONTROL         "KanjiMenu version X.XX\nGit Hash",IDC_VERSION,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,7,104,187,18
+    DEFPUSHBUTTON   "OK",IDOK,36,128,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,90,128,50,14
+    PUSHBUTTON      "&HELP",IDHELP,144,128,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_DIALOG_SETTING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 194
+        VERTGUIDE, 17
+        VERTGUIDE, 27
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_DIALOG_SETTING AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // 英語 (米国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -53,8 +117,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,1,9,0
- PRODUCTVERSION 0,1,9,0
+ FILEVERSION 1,10,0,0
+ PRODUCTVERSION 1,10,0,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,12 +134,12 @@ BEGIN
         BLOCK "041104b0"
         BEGIN
             VALUE "FileDescription", "TTX KanjiMenu Plug-in"
-            VALUE "FileVersion", "0, 1, 9, 0"
+            VALUE "FileVersion", "1, 10, 0, 0"
             VALUE "InternalName", "ttxkanjimenu"
             VALUE "LegalCopyright", "Copyright (C) 2007 Sunao HARA, (C) 2007-2024 TeraTerm Project"
             VALUE "OriginalFilename", "ttxkanjimenu.dll"
             VALUE "ProductName", "TTX KanjiMenu Plug-in"
-            VALUE "ProductVersion", "0, 1, 9, 0"
+            VALUE "ProductVersion", "1.10 dev 1f4001ca1"
         END
     END
     BLOCK "VarFileInfo"

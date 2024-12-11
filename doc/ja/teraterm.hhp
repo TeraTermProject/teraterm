@@ -414,6 +414,7 @@ HlpMacroAppendixesNegative=html\macro\appendixes\negative.html
 HlpMacroAppendixesAscii=html\macro\appendixes\ascii.html
 HlpMacroAppendixesRegex=html\reference\RE.txt
 HlpMacroAppendixesDisconnect=html\macro\appendixes\disconnecttiming.html
+HlpTTXPluginKanjiMenu=html\ttxplugin\kanjimenu.html
 HlpUninstall=html\uninstall.html
 
 [MAP]

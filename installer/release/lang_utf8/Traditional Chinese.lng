@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2024-09-02 by TeraTerm Project
+date=2024-11-16 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -1239,7 +1239,12 @@ MENU_EUCJP=收發: &EUC-JP
 MENU_JIS=收發: &JIS
 MENU_UTF8=收發: &UTF-8
 MENU_KS5601=收發: &KS5601
-
+MENU_SETTING=&Setting
+MENU_SETTING_TITLE=KanjiMenu Setting
+MENU_CHARCODE=Sho&w charcode menu
+MENU_CONTENTS=Menu &contents
+MENU_AMB_MENU=Show &Ambiguous Characters width menu
+MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=最上層顯示(&A)

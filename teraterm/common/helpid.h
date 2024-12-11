@@ -444,4 +444,6 @@
 #define HlpMacroAppendixesRegex         93005
 #define HlpMacroAppendixesDisconnect    93006
 
+#define HlpTTXPluginKanjiMenu    93101
+
 #define HlpUninstall    100000
