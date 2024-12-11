@@ -1,31 +1,34 @@
-﻿set(PACKAGE_NAME "TTXShowCommandLine")
-
-project(${PACKAGE_NAME})
+﻿project("TTXShowCommandLine")
 
 add_library(
-  ${PACKAGE_NAME} SHARED
+  ${PROJECT_NAME} SHARED
   TTXShowCommandLine.c
   ReadMe.txt
   ReadMe-ja.txt
-  )
+)
+
+target_link_libraries(
+  ${PROJECT_NAME}
+  PRIVATE
+  common_static
+)
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     layer_for_unicode
-    common_static
-    )
+  )
   if(MSVC)
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/common/compat_w95_vs2005.c
-      )
+    )
   endif()
   if(MINGW)
     target_link_libraries(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       -Wl,--whole-archive
       mingw_msvcrt
@@ -36,21 +39,21 @@ if(SUPPORT_OLD_WINDOWS)
 endif(SUPPORT_OLD_WINDOWS)
 
 set_target_properties(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PROPERTIES
   PREFIX ""
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../../teraterm/teraterm
   ../../teraterm/common
   )
 
 install(
-  TARGETS ${PACKAGE_NAME}
+  TARGETS ${PROJECT_NAME}
   RUNTIME
   DESTINATION .
 )

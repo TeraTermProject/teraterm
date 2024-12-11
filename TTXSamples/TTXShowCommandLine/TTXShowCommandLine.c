@@ -11,13 +11,21 @@ static HANDLE hInst; /* Instance handle of TTX*.DLL */
 
 typedef struct {
   PParseParam origParseParam;
+  PTTSet ts;
+  PComVar cv;
 } TInstVar;
 
 static TInstVar *pvar;
 static TInstVar InstVar;
 
 static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
-  MessageBoxW(NULL, Param, L"TTXShowCommandLine", MB_OK|MB_ICONEXCLAMATION);
+  static const TTMessageBoxInfoW mbinfo = {
+    NULL,
+    NULL, L"TTXShowCommandLine",
+    NULL, L"%s",
+    MB_OK | MB_ICONEXCLAMATION };
+  TTMessageBoxW(pvar->cv->HWin, &mbinfo, pvar->ts->UILanguageFileW, Param);
+
   pvar->origParseParam(Param, ts, DDETopic);
 }
 
@@ -26,11 +34,17 @@ static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
   *hooks->ParseParam = TTXParseParam;
 }
 
+static void PASCAL TTXInit(PTTSet ts, PComVar cv)
+{
+  pvar->ts = ts;
+  pvar->cv = cv;
+}
+
 static TTXExports Exports = {
   sizeof(TTXExports),
   ORDER,
 
-  NULL, // TTXInit,
+  TTXInit,
   NULL, // TTXGetUIHooks,
   TTXGetSetupHooks,
   NULL, // TTXOpenTCP,
