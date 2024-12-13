@@ -28,11 +28,13 @@ Changes the File transfer directory for Tera Term to &lt;path&gt;.
 </p>
 
 <p>
-File name specified for the send communication commands (e.g. sendfile, kmtsend) and destination folder for receive commands (e.g. zmodemrecv) are based on the "File transfer directory for Tera Term."
+File name specified for the send communication commands (e.g. sendfile, kmtsend) and destination folder for receive commands (e.g. zmodemrecv) are based on the "File transfer directory used by Tera Term."
 </p>
 
 <p>
-You must specify a fullpath name to the communication commands because these commands are not affected by `changedir' command.
+If filename specified in communication command is a relative path,
+it is based on "File transfer directory used by Tera Term".
+If the file name is an absolute path, it is not affected.
 </p>
 
 <h3>Note</h3>
@@ -56,6 +58,7 @@ sendfile 'd:\source\code.dat' 1
 <h2>See also</h2>
 <ul>
   <li><a href="setdir.html">setdir</a></li>
+  <li><a href="../../setup/folder.html#FileDir">File transfer folder used by Tera Term</a></li>
 </ul>
 
 </body>

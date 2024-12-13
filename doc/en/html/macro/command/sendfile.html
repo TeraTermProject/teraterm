@@ -25,6 +25,13 @@ sendfile &lt;filename&gt; &lt;binary flag&gt;
 
 <p>
 Causes Tera Term to send the file &lt;filename&gt; to the host. Pauses until the end of the file transfer.<br>
+</p>
+
+<p>
+When &lt;filename&gt; is relative path, file is saved relative to <a href="../../setup/folder.html#FileDir">file transfer folder</a>.
+</p>
+
+<p>
 If &lt;binary flag&gt; is non-zero, the file is sent without any modifications.<br>
 If &lt;binary flag&gt; is zero, new-line characters are converted (CR -&gt; CR/CRLF) and control characters except TAB, LF and CR are stripped out.
 </p>
@@ -34,6 +41,11 @@ If &lt;binary flag&gt; is zero, new-line characters are converted (CR -&gt; CR/C
 <pre class="macro-example">
 sendfile 'data.dat' 1
 </pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="changedir.html">changedir</a></li>
+</ul>
 
 </body>
 </html>

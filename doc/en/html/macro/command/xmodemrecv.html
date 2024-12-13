@@ -29,6 +29,10 @@ If the file is transferred successfully, the system variable "result" is set to 
 </p>
 
 <p>
+When &lt;filename&gt; is relative path, file is saved relative to <a href="../../setup/folder.html#FileDir">file transfer folder</a>.
+</p>
+
+<p>
 If the file is a binary file, &lt;binary flag&gt; must be non-zero.<br>
 If the file is a text file, &lt;binary flag&gt; must be zero.
 </p>
@@ -72,6 +76,11 @@ Packet size (1K) can be only specified at sender side. <em>(version 4.90 or late
 ; XMODEM receive, text file, CRC
 xmodemrecv 'readme.txt' 0 2
 </pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="changedir.html">changedir</a></li>
+</ul>
 
 </body>
 </html>
