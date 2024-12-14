@@ -886,6 +886,8 @@ void CommClose(PComVar cv)
 	}
 	cv->ComID = INVALID_HANDLE_VALUE;
 	cv->PortType = 0;
+	free(cv->TitleRemoteW);
+	cv->TitleRemoteW = NULL;
 }
 
 void CommProcRRQ(PComVar cv)
