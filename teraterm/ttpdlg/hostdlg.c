@@ -91,7 +91,11 @@ static void SetHostDropdown(HWND dlg, const TTTSet *ts)
 
 static void OpenEditHistory(HWND dlg, TTTSet *ts)
 {
-	if (EditHistoryDlg(dlg, ts)) {
+	EditHistoryDlgData data;
+	data.UILanguageFileW = ts->UILanguageFileW;
+	data.SetupFNameW = ts->SetupFNameW;
+	data.vtwin = HVTWin;
+	if (EditHistoryDlg(NULL, dlg, &data)) {
 		// 編集されたので、ドロップダウンを再設定する
 		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_RESETCONTENT, 0, 0);
 

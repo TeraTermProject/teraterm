@@ -128,9 +128,13 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		case WM_COMMAND: {
 			switch (LOWORD(wParam)) {
 				case IDC_TCPIP_EDITHISTORY: {
-					TCPIPDlgData *data = (TCPIPDlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
-					PTTSet ts = data->ts;
-					EditHistoryDlg(Dialog, ts);
+					TCPIPDlgData *pdata = (TCPIPDlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+					PTTSet ts = pdata->ts;
+					EditHistoryDlgData data;
+					data.UILanguageFileW = ts->UILanguageFileW;
+					data.SetupFNameW = ts->SetupFNameW;
+					data.vtwin = GetParent(GetParent(Dialog));
+					EditHistoryDlg(NULL, Dialog, &data);
 					break;
 				}
 			}

@@ -158,6 +158,7 @@
 #define HlpMenuSetupAdditionalMouse         43027
 #define HlpMenuSetupAdditionalGeneral       43028
 #define HlpMenuSetupAdditionalTCPIP         43029
+#define HlpMenuSetupAdditionalTCPIPEditHistory 43035
 #define HlpMenuSetupAdditionalCopyAndPaste  43030
 #define HlpMenuSetupAdditionalCtrlSeq       43031
 #define HlpMenuSetupAdditionalCygwin        43032

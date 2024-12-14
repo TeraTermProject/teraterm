@@ -30,13 +30,17 @@
 
 #include <windows.h>
 
-#include "tttypes.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-BOOL EditHistoryDlg(HWND WndParent, PTTSet ts);
+typedef struct {
+	const wchar_t *UILanguageFileW;
+	const wchar_t *SetupFNameW;
+	HWND vtwin;
+} EditHistoryDlgData;
+
+BOOL EditHistoryDlg(HINSTANCE hInstance, HWND WndParent, EditHistoryDlgData *parent_data);
 
 #ifdef __cplusplus
 }
