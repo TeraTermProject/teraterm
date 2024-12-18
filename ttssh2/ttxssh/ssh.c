@@ -7532,7 +7532,7 @@ static INT_PTR CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, 
 			SendMessage(GetDlgItem(dlg, IDC_NEW_PASSWD), WM_GETTEXT , sizeof(new_passwd), (LPARAM)new_passwd);
 			SendMessage(GetDlgItem(dlg, IDC_CONFIRM_PASSWD), WM_GETTEXT , sizeof(retype_passwd), (LPARAM)retype_passwd);
 
-			if (strcmp(new_passwd, retype_passwd) == 1) {
+			if (strcmp(new_passwd, retype_passwd) != 0) {
 				UTIL_get_lang_msg("MSG_PASSCHG_MISMATCH", pvar, "Mismatch; try again.");
 				MessageBox(NULL, pvar->UIMsg, "ERROR", MB_OK | MB_ICONEXCLAMATION);
 				return FALSE;
