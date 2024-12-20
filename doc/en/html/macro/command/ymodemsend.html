@@ -28,6 +28,10 @@ Causes Tera Term to send the file &lt;filename&gt; to the host with the YMODEM p
 If the file is transferred successfully, the system variable "result" is set to 1. Otherwise, "result" is set to zero.
 </p>
 
+<p>
+When &lt;filename&gt; is relative path, file is saved relative to <a href="../../setup/folder.html#FileDir">file transfer folder</a>.
+</p>
+
 <h2>Example</h2>
 
 <pre class="macro-example">
@@ -62,6 +66,7 @@ endif
 
 <h2>See also</h2>
 <ul>
+  <li><a href="changedir.html">changedir</a></li>
   <li><a href="ymodemrecv.html">ymodemrecv</a></li>
 </ul>
 

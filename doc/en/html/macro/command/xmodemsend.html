@@ -29,6 +29,10 @@ If the file is transferred successfully, the system variable "result" is set to 
 </p>
 
 <p>
+When &lt;filename&gt; is relative path, file is saved relative to <a href="../../setup/folder.html#FileDir">file transfer folder</a>.
+</p>
+
+<p>
 &lt;option&gt; specifies the XMODEM option (packet size), and can be one of the following: <br>
 Type of error detection (Checksum/CRC) can be specified at receiver side. <em>(version 4.90 or later)</em>
 </p>
@@ -70,6 +74,11 @@ xmodemsend 'readme.txt' 1
 ; XMODEM send, 1K
 xmodemsend 'readme.txt' 3
 </code></pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="changedir.html">changedir</a></li>
+</ul>
 
 </body>
 </html>

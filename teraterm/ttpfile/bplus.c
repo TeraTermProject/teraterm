@@ -650,7 +650,7 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 
       RecievePath = fv->GetRecievePath(fv);
       free((void *)bv->FullName);
-      bv->FullName = fileio->GetRecieveFilename(fileio, RecievePath, FALSE, Temp, !fv->OverWrite);
+      bv->FullName = fileio->GetRecieveFilename(fileio, Temp, FALSE, RecievePath, !fv->OverWrite);
       free(RecievePath);
 
 

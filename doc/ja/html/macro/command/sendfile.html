@@ -25,6 +25,13 @@ sendfile &lt;filename&gt; &lt;binary flag&gt;
 
 <p>
 &lt;filename&gt; で指定されたファイルを送信する。送信が終わるまで次のコマンドは実行されない。<br>
+</p>
+
+<p>
+&lt;filename&gt; が相対パスの時、<a href="../../setup/folder.html#FileDir">ファイル転送用ディレクトリ</a>相対として扱う。
+</p>
+
+<p>
 &lt;binary flag&gt; の値が 0 以外のとき、ファイルの内容をそのまま送信する。<br>
 &lt;binary flag&gt; の値が 0 のとき、ファイルの中に含まれる漢字、改行文字を変換して送信する。TAB ($09), LF ($0A), CR ($0D) 以外の制御文字は送信されない。
 </p>
@@ -34,6 +41,11 @@ sendfile &lt;filename&gt; &lt;binary flag&gt;
 <pre class="macro-example">
 sendfile 'data.dat' 1
 </pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="changedir.html">changedir</a></li>
+</ul>
 
 </body>
 </html>
