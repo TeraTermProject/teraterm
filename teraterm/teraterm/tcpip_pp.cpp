@@ -130,10 +130,11 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 				case IDC_TCPIP_EDITHISTORY: {
 					TCPIPDlgData *pdata = (TCPIPDlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
 					PTTSet ts = pdata->ts;
-					EditHistoryDlgData data;
+					EditHistoryDlgData data = {};
 					data.UILanguageFileW = ts->UILanguageFileW;
 					data.SetupFNameW = ts->SetupFNameW;
 					data.vtwin = GetParent(GetParent(Dialog));
+					data.title = L"Edit Host list";
 					EditHistoryDlg(NULL, Dialog, &data);
 					break;
 				}

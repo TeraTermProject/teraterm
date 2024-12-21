@@ -37,7 +37,8 @@ extern "C" {
 typedef struct {
 	const wchar_t *UILanguageFileW;
 	const wchar_t *SetupFNameW;
-	HWND vtwin;
+	const wchar_t *title;
+	HWND vtwin;		// ƒwƒ‹ƒv‚ð•\Ž¦‚·‚é‚½‚ß
 } EditHistoryDlgData;
 
 BOOL EditHistoryDlg(HINSTANCE hInstance, HWND WndParent, EditHistoryDlgData *parent_data);

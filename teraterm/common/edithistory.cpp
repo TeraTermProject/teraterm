@@ -148,7 +148,6 @@ typedef struct {
 static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
-		//{ 0, "DLG_TCPIP_TITLE" },
 		{ IDC_TCPIPADD, "DLG_TCPIP_ADD" },
 		{ IDC_TCPIPUP, "DLG_TCPIP_UP" },
 		{ IDC_TCPIPREMOVE, "DLG_TCPIP_REMOVE" },
@@ -175,6 +174,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), data->parent_data->UILanguageFileW);
+			SetWindowTextW(Dialog, data->parent_data->title);
 
 			SendDlgItemMessage(Dialog, IDC_TCPIPHOST, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
 
