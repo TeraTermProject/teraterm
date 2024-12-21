@@ -171,6 +171,16 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 				free(text);
 			}
 
+			// ドロップダウンのエディットコントロールで数字のみ入力
+			{
+				COMBOBOXINFO cbi;
+				cbi.cbSize = sizeof(COMBOBOXINFO);
+				HWND hComboBox = GetDlgItem(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN);
+				GetComboBoxInfo(hComboBox, &cbi);
+				HWND hEdit = cbi.hwndItem;
+				SetWindowLongW(hEdit, GWL_STYLE, ES_NUMBER | GetWindowLongW(hEdit, GWL_STYLE));
+			}
+
 			return TRUE;
 		}
 		case WM_DESTROY: {
