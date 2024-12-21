@@ -63,6 +63,7 @@ typedef struct {
 	bool available_timer;
 	bool enable_timer;
 	bool on_initdialog;
+	HWND file_edit;
 	WNDPROC proc;
 	TTTSet *pts;
 	TComVar *pcv;
@@ -322,17 +323,22 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		//		WM_COMMAND, EN_CHANGE が発生する
 		wchar_t *fname = FLogGetLogFilename(work->info->filename);
 		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
-		HWND file_edit = GetDlgItem(Dialog, IDC_FOPT_FILENAME_EDIT);
-		SetWindowLongPtr(file_edit, GWLP_USERDATA, (LONG_PTR)work);
-		work->proc = (WNDPROC)SetWindowLongPtrW(file_edit, GWLP_WNDPROC, (LONG_PTR)FNameEditProc);
+
+		// ドロップダウンのエディットコントロールのウィンドウハンドルを取得
+		COMBOBOXINFO cbi;
+		cbi.cbSize = sizeof(COMBOBOXINFO);
+		GetComboBoxInfo(GetDlgItem(Dialog, IDC_FOPT_FILENAME_EDIT), &cbi);
+		work->file_edit = cbi.hwndItem;
+
+		// サブクラス化
+		SetWindowLongPtrW(work->file_edit, GWLP_USERDATA, (LONG_PTR)work);
+		work->proc = (WNDPROC)SetWindowLongPtrW(work->file_edit, GWLP_WNDPROC, (LONG_PTR)FNameEditProc);
 
 		HistoryStoreSetControl(hs, Dialog, IDC_FOPT_FILENAME_EDIT);
 		ExpandCBWidth(Dialog, IDC_FOPT_FILENAME_EDIT);
 		free(fname);
 
 		CenterWindow(Dialog, GetParent(Dialog));
-
-		SetFocus(GetDlgItem(Dialog, IDC_FOPT_FILENAME_EDIT));
 
 		work->enable_timer = true;
 		work->available_timer = true;
@@ -411,7 +417,8 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			ArrangeControls(Dialog, work);
 			break;
 		case IDC_FOPT_FILENAME_EDIT:
-			if (HIWORD(wParam) == EN_CHANGE){
+			switch (HIWORD(wParam)) {
+			case EN_CHANGE: {
 				wchar_t *filename;
 				hGetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, &filename);
 				const bool file_exist_prev = work->file_exist;
@@ -429,6 +436,12 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 					}
 					ArrangeControls(Dialog, work);
 				}
+				break;
+			}
+			case CBN_DROPDOWN: {
+				work->enable_timer = false;
+				break;
+			}
 			}
 			break;
 		}
@@ -452,8 +465,8 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			break;
 		}
 		wchar_t *fname = FLogGetLogFilename(work->info->filename);
-		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
-		SendDlgItemMessageW(Dialog, IDC_FOPT_FILENAME_EDIT, EM_SETSEL, 0, -1);
+		SetWindowTextW(work->file_edit, fname);
+		SendMessageW(work->file_edit, EM_SETSEL, 0, -1);
 		free(fname);
 		break;
 	}
