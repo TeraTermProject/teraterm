@@ -140,6 +140,7 @@
     <ClCompile Include="dlglib_cpp.cpp" />
     <ClCompile Include="dlglib_tmpl.cpp" />
     <ClCompile Include="fileread.cpp" />
+    <ClCompile Include="history_store.cpp" />
     <ClCompile Include="i18n.c" />
     <ClCompile Include="inifile_com.cpp" />
     <ClCompile Include="makeoutputstring.cpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="ddelib.h" />
     <ClInclude Include="dlglib.h" />
     <ClInclude Include="fileread.h" />
+    <ClInclude Include="history_store.h" />
     <ClInclude Include="inifile_com.h" />
     <ClInclude Include="makeoutputstring.h" />
     <ClInclude Include="resize_helper.h" />
