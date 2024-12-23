@@ -178,7 +178,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 				HWND hComboBox = GetDlgItem(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN);
 				GetComboBoxInfo(hComboBox, &cbi);
 				HWND hEdit = cbi.hwndItem;
-				SetWindowLongW(hEdit, GWL_STYLE, ES_NUMBER | GetWindowLongW(hEdit, GWL_STYLE));
+				SetWindowLongPtrW(hEdit, GWL_STYLE, GetWindowLongPtrW(hEdit, GWL_STYLE) | ES_NUMBER);
 			}
 
 			return TRUE;
