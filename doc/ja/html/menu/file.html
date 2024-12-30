@@ -51,11 +51,25 @@
       <dt id="StopLog">Stop Logging</dt>
       <dd>
         ログの記録を終了します。
-      </dt>
+      </dd>
 
       <dt><a href="file-sendfile.html">Send file...</a></dt>
       <dd>
-        ファイルを送信します。
+        ファイルを送信します。<br>
+        <dl>
+          <dt>選択したとき</dt>
+          <dd>
+            "Send file" ダイアログ が表示されます。
+          </dd>
+          <dt>CTRL を押しながら選択したとき</dt>
+          <dd>
+            "Send file" ダイアログがスキップされて、ファイル選択ダイアログが表示されます。<br>
+            前回と同じ送信オプションが使用されます。
+          </dd>
+        </dl>
+
+        <a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">設定</a>を変更することで
+        動作を入れ替えることができます。
       </dd>
 
       <dt><a href="file-transfer.html">Transfer</a></dt>

@@ -307,6 +307,7 @@ INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data)
 
 	BOOL skip_dialog = data->skip_dialog;
 	if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0) {
+		// CTRL ‚ª‰Ÿ‚³‚ê‚Ä‚¢‚½ŽžA‹t‚Ì“®ì‚Æ‚È‚é
 		skip_dialog = !skip_dialog;
 	}
 
@@ -321,8 +322,12 @@ INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data)
 		BOOL Ok = SelectFile(hWndParent, data, filename_ini, &filename);
 		if (Ok) {
 			data->filename = filename;
+			return (INT_PTR)IDOK;
 		}
-		return Ok ? (INT_PTR)IDOK : (INT_PTR)IDCANCEL;
+		else {
+			data->filename = NULL;
+			return (INT_PTR)IDCANCEL;
+		}
 	}
 }
 
