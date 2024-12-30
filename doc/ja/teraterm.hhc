@@ -517,11 +517,13 @@
 					<param name="Local" value="html\menu\setup-additional-theme.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Theme Editor">
-					<param name="Local" value="html\menu\setup-additional-visual-theme.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
+				<UL>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Theme Editor">
+						<param name="Local" value="html\menu\setup-additional-visual-theme.html">
+						<param name="ImageNumber" value="11">
+						</OBJECT>
+				</UL>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Keyboard タブ">
 					<param name="Local" value="html\menu\setup-additional-keyboard.html">
@@ -537,6 +539,13 @@
 					<param name="Local" value="html\menu\setup-additional-tcpip.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
+				<UL>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Edit Hisotry">
+						<param name="Local" value="html\menu\setup-additional-tcpip_edithistory.html">
+						<param name="ImageNumber" value="11">
+						</OBJECT>
+				</UL>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Terminal タブ">
 					<param name="Local" value="html\menu\setup-additional-terminal.html">
@@ -606,6 +615,11 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="[Resize] メニュー">
 				<param name="Local" value="html\menu\resize.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="[漢字コード] メニュー">
+				<param name="Local" value="html\ttxplugin/kanjimenu.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 		</UL>

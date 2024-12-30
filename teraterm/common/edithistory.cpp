@@ -36,13 +36,14 @@
 #include <assert.h>
 
 #include "teraterm.h"
-#include "tttypes.h"
+#include "tttypes.h"		// for MAXHOSTLIST
 #include "hostname_rec.h"	// for HostNameMaxLength
 #include "ttlib.h"
 #include "dlglib.h"
 #include "helpid.h"
 #include "win32helper.h"
 #include "resize_helper.h"
+#include "history_store.h"
 
 #include "edithistory_res.h"
 #include "edithistory.h"
@@ -87,28 +88,10 @@ static void ModifyListboxHScrollWidth(HWND dlg, int dlg_item)
  */
 static void WriteListBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar_t *SetupFNW)
 {
-	LRESULT item_count;
-	LRESULT i;
-
-	item_count = SendDlgItemMessageW(dlg, dlg_item, LB_GETCOUNT, 0, 0);
-	if (item_count == LB_ERR) {
-		return;
-	}
-
-	// [Hosts] ‚ð‚·‚×‚Äíœ
-	WritePrivateProfileStringW(L"Hosts", NULL, NULL, SetupFNW);
-
-	if (item_count > maxhostlist) {
-		item_count = maxhostlist;
-	}
-	for (i = 0; i < item_count; i++) {
-		wchar_t EntNameW[10];
-		wchar_t *strW;
-		GetDlgItemIndexTextW(dlg, dlg_item, (WPARAM)i, &strW);
-		_snwprintf_s(EntNameW, _countof(EntNameW), _TRUNCATE, L"Host%i", (int)i + 1);
-		WritePrivateProfileStringW(L"Hosts", EntNameW, strW, SetupFNW);
-		free(strW);
-	}
+	HistoryStore *hs = HistoryStoreCreate(maxhostlist);
+	HistoryStoreGetControl(hs, dlg, dlg_item);
+	HistoryStoreSaveIni(hs, SetupFNW, L"Hosts", L"host");
+	HistoryStoreDestroy(hs);
 }
 
 /**
@@ -141,8 +124,8 @@ static void TCPIPDlgButtons(HWND Dialog)
 }
 
 typedef struct {
-	const TTTSet *ts;
 	ReiseDlgHelper_t *resize_helper;
+	const EditHistoryDlgData *parent_data;
 } DlgData;
 
 static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
@@ -172,14 +155,13 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	switch (Message) {
 		case WM_INITDIALOG: {
 			DlgData *data = (DlgData *)lParam;
-			const TTTSet *ts = data->ts;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
-			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
+			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), data->parent_data->UILanguageFileW);
 
 			SendDlgItemMessage(Dialog, IDC_TCPIPHOST, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
 
-			SetComboBoxHostHistory(Dialog, IDC_TCPIPLIST, MAXHOSTLIST, ts->SetupFNameW);
+			SetComboBoxHostHistory(Dialog, IDC_TCPIPLIST, MAXHOSTLIST, data->parent_data->SetupFNameW);
 			ModifyListboxHScrollWidth(Dialog, IDC_TCPIPLIST);
 
 			/* append a blank item to the bottom */
@@ -196,8 +178,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			switch (LOWORD(wParam)) {
 				case IDOK: {
 					DlgData *data = (DlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
-					const TTTSet *ts = data->ts;
-					WriteListBoxHostHistory(Dialog, IDC_TCPIPLIST, MAXHOSTLIST, ts->SetupFNameW);
+					WriteListBoxHostHistory(Dialog, IDC_TCPIPLIST, MAXHOSTLIST, data->parent_data->SetupFNameW);
 					EndDialog(Dialog, 1);
 					return TRUE;
 				}
@@ -301,9 +282,12 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					free(host);
 					break;
 				}
-				case IDC_TCPIPHELP:
-					PostMessage(GetParent(Dialog), WM_USER_DLGHELP2, HlpSetupTCPIP, 0);
+				case IDC_TCPIPHELP: {
+					DlgData *data = (DlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+					PostMessage(data->parent_data->vtwin, WM_USER_DLGHELP2,
+								HlpMenuSetupAdditionalTCPIPEditHistory, 0);
 					break;
+				}
 			}
 			break;
 
@@ -329,13 +313,15 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	return FALSE;
 }
 
-BOOL EditHistoryDlg(HWND WndParent, PTTSet ts)
+BOOL EditHistoryDlg(HINSTANCE hInstance, HWND WndParent, EditHistoryDlgData *parent_data)
 {
 	BOOL r;
 	DlgData *data = (DlgData *)calloc(1, sizeof(*data));
-	const HINSTANCE hinst = (HINSTANCE)GetWindowLongPtr(WndParent, GWLP_HINSTANCE);
-	data->ts = ts;
-	r= (BOOL)TTDialogBoxParam(hinst,
+	if (hInstance == NULL) {
+		HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(WndParent, GWLP_HINSTANCE);
+	}
+	data->parent_data = parent_data;
+	r= (BOOL)TTDialogBoxParam(hInstance,
 							  MAKEINTRESOURCEW(IDD_EDITHISTORYDLG),
 							  WndParent, TCPIPDlg, (LPARAM)data);
 	free(data);

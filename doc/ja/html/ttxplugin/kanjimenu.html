@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>[漢字コード] メニュー</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>[漢字コード] メニュー</h1>
+
+<p>
+  TTXKanjiMenu プラグインを有効にすると、Tera Term のメニューに [漢字コード] メニューが追加されます。<br>
+  メニュー内容で選択した日本語または韓国語環境向けの文字コードがメニューに表示されます。
+  メニュー内の項目から送受信文字コード、Unicode(UTF-8)時の Ambiguous Character Width を変更することができます。
+</p>
+
+<p>
+  文字コードが UTF-8 以外のとき Ambiguous Character Width は無効になります。
+</p>
+
+<p>
+  メニューから[設定]を選択すると、このプラグインの設定ダイアログが表示されます。
+</p>
+
+<h1>保存される設定</h1>
+
+TERATERM.INI の KanjiMemu セクションに次のキーを保存します。
+
+<dl>
+  <dt id="CharCodeMenu">CharCodeMenu</dt>
+  <dd>
+    送受文字コードメニューを表示
+    <dl>
+      <dt>ON</dt>
+      <dd>表示する</dd>
+      <dt>OFF</dt>
+      <dd>表示しない</dd>
+    </dl>
+  </dd>
+  <dt id="UseOneSetting">UseOneSetting</dt>
+  <dd>
+    送受文字コードを同一とする
+    <dl>
+      <dt>ON</dt>
+      <dd>同一</dd>
+      <dt>OFF</dt>
+      <dd>同一ではない</dd>
+    </dl>
+  </dd>
+  <dt id="Language">Language</dt>
+  <dd>
+    送受文字コードメニューの内容を選択
+    <dl>
+      <dt>Auto</dt>
+      <dd>OSの設定から自動で 日本語向け/韓国語向け を選択します</dd>
+      <dt>Japanese</dt>
+      <dd>日本語向け</dd>
+      <dt>Korean</dt>
+      <dd>韓国語向け</dd>
+    </dl>
+  </dd>
+  <dt id="UseOneSettingMenu">UseOneSettingMenu</dt>
+  <dd>
+    UseOneSettingMenu(送受信両方を変更メニュー)を表示
+    <dl>
+      <dt>ON</dt>
+      <dd>表示する</dd>
+      <dt>OFF</dt>
+      <dd>表示しない</dd>
+    </dl>
+  </dd>
+  <dt id="AmbiguousCharacterWidthMenu">AmbiguousCharacterWidthMenu</dt>
+  <dd>
+    AmbiguousCharacterWidth メニューを表示
+    <dl>
+      <dt>ON</dt>
+      <dd>表示する</dd>
+      <dt>OFF</dt>
+      <dd>表示しない</dd>
+    </dl>
+  </dd>
+</dl>
+
+<p>
+  デフォルト値、iniファイルの初期値は<a href="../setup/teraterm-ini.html#TTXKanjiMenu">設定ファイルの全項目一覧</a>を参照ください。
+</p>
+
+<h1>変更履歴</h1>
+
+<a href="../about/history.html#kanjimenu">改版履歴</a>
+
+</body>
+</html>

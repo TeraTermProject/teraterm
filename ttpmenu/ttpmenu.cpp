@@ -74,7 +74,7 @@ wchar_t		*UILanguageFileW;
 
 static char g_szLockBox[MAX_PATH];	// パスワード暗号化用パスワード
 
-#if defined(__MINGW32__) || (defined(_MSC_VER) && (_MSC_VER == 1400))
+#if (defined(__MINGW32__) && (__MINGW64_VERSION_MAJOR < 13)) || (defined(_MSC_VER) && (_MSC_VER == 1400))
 // MinGW or VS2005(VC8.0)
 static wchar_t* _wcstok(wchar_t *strToken, const wchar_t *strDelimit)
 {

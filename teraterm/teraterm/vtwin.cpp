@@ -1495,6 +1495,8 @@ void CVTWindow::OnDestroy()
 
 	EndTerm();
 	EndDisp();
+	sendfiledlgUnInit();
+	FLogOpenDialogUnInit();
 
 	FreeBuffer();
 
@@ -1770,12 +1772,8 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 			// cancel
 			break;
 		case DROP_TYPE_SEND_FILE: {
-			if (!data->TransBin) {
-				SendMemSendFile2(FileName, FALSE, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0, DropSendCallback, data);
-			}
-			else {
-				SendMemSendFile2(FileName, TRUE, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0, DropSendCallback, data);
-			}
+			const BOOL binary = data->TransBin ? TRUE : FALSE;
+			SendMemSendFile2(FileName, binary, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0, ts.LocalEcho, DropSendCallback, data);
 			break;
 		}
 		case DROP_TYPE_PASTE_FILENAME:
@@ -3996,7 +3994,7 @@ void CVTWindow::OnFileSend()
 	wchar_t *filename = data.filename;
 	if (!data.method_4) {
 		// new file send
-		SendMemSendFile(filename, data.binary, data.delay_type, data.delay_tick, data.send_size);
+		SendMemSendFile(filename, data.binary, data.delay_type, data.delay_tick, data.send_size, ts.LocalEcho);
 	}
 	else {
 		// file send same as teraterm 4

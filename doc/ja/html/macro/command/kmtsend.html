@@ -29,11 +29,20 @@ kmtsend &lt;filename&gt;
 ファイルが正しく転送された場合、システム変数 result に1が格納される。それ以外の場合、 result に0が格納される。
 </p>
 
+<p>
+&lt;filename&gt; が相対パスの時、<a href="../../setup/folder.html#FileDir">ファイル転送用ディレクトリ</a>相対として扱う。
+</p>
+
 <h2>例</h2>
 
 <pre class="macro-example">
 kmtsend 'readme.txt'
 </pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="changedir.html">changedir</a></li>
+</ul>
 
 </body>
 </html>

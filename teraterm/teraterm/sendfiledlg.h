@@ -53,6 +53,7 @@ typedef struct {
 } sendfiledlgdata;
 
 INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data);
+void sendfiledlgUnInit(void);
 
 #ifdef __cplusplus
 }

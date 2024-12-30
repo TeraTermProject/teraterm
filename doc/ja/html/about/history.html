@@ -58,6 +58,7 @@
       <li>送信ファイルを選択するダイアログの初期ディレクトリが<a href="../setup/folder.html#FileDir">ファイル転送用のフォルダ</a>になるようにした。</li>
       <li>ファイル送信オプションをTERATERM.INIに保存するようにした。</li>
       <li><a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">ファイル送信ダイアログをスキップする</a>設定を追加した。</li>
+      <li>ファイル送受信マクロコマンドもファイル転送用フォルダを起点とするようにした。</li>
     </ul>
   </li>
 
@@ -74,6 +75,14 @@
       <li>"<a href="../menu/setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a>" が on のとき、サロゲートペアの文字が存在したとき正しく表示するよう修正した。</li>
       <li>MACRO: <a href="../macro/command/getenv.html">getenv</a>, <a href="../macro/command/expandenv.html">expandenv</a>, <a href="../macro/command/setenv.html">setenv</a> マクロコマンド が Unicode に対応していなかったので修正した。</li>
       <li>B-Plusの送信ができなくなっていたので修正した。</li>
+      <li>次の時 local echo 設定を反映していなかったので修正した。
+        <ul>
+          <li>ファイル送信 (<a href="../menu/file-sendfile.html">file - Send file</a>)</li>
+          <li>ファイル送信 (<a href="../usage/mouse.html#SendFile">Drop File</a>)</li>
+          <li><a href="../macro/command/sendfile.html">sendfile</a> マクロコマンド</li>
+        </ul>
+      </li>
+      <li>接続履歴がないとき、エディットボックスに"&lt;Edit History...&gt;"が入力されていたので修正した。</li>
     </ul>
   </li>
 
@@ -110,6 +119,7 @@
       <li>Setup-Font 設定を Additional settings の <a href="../menu/setup-additional-font.html">Font タブ</a>へ統合した。</li>
       <li>Keyboard setup ダイアログを Additional settings の <a href="../menu/setup-additional-keyboard.html">Keyboard タブ</a>へ移動した。</li>
       <li>TCP/IP setup ダイアログを Additional settings の <a href="../menu/setup-additional-tcpip.html">TCP/IP タブ</a>へ移動した。</li>
+      <li>TCP/IP setup ダイアログから<a href="../menu/setup-additional-tcpip_edithistory.html">接続履歴編集</a>を分離した。<a href="../menu/file-new.html#Host">New connection" ダイアログボックス</a>からも編集できるようにした。</li>
       <li><a href="../menu/control-broadcast.html">Broadcast command ダイアログ</a>の挙動を改善した。
         <ul>
           <li>リアルタイムモードでは、コマンド入力コントロールで マウス右クリック・中クリック あるいは Shift-INS によりペーストできるようにした。また、この時の改行の確認は各ウィンドウではなくダイアログで行われるようにした。</li>
@@ -5678,12 +5688,15 @@
 
 <h3 id="kanjimenu_0.1.10">YYYY.MM.DD (Ver 0.1.10)</h3>
 <ul class="history">
-      <li>日本語モードと韓国語モードをいつでも変更できるようにした。</li>
+      <li>設定ダイアログを追加。使用するメニューを設定できるようにした。</li>
+      <li>日本語モードと韓国語モードを設定できるようにした。</li>
+      <li>UTF-8 時に Ambiguous Characters width を変更できるようにした。</li>
 </ul>
 
 <h3 id="kanjimenu_0.1.9">2024.9.6 (Ver 0.1.9)</h3>
 <ul class="history">
       <li>メニューの作成部分のコードを見直した。</li>
+      <li>UTF-8m を削除した。</li>
 </ul>
 
 <h3 id="kanjimenu_0.1.8">2021.6.5 (Ver 0.1.8)</h3>

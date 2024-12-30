@@ -601,7 +601,7 @@ static wchar_t *GetCommonDialogDefaultFilenameW(const wchar_t *path)
 	return filename;
 }
 
-wchar_t **MakeStrArrayFromArray(wchar_t **strs)
+static wchar_t **MakeStrArrayFromArray(wchar_t **strs)
 {
 	// ”‚ð”‚¦‚é
 	size_t strs_count = 0;
@@ -632,7 +632,7 @@ wchar_t **MakeStrArrayFromArray(wchar_t **strs)
 	return ptrs;
 }
 
-wchar_t **MakeStrArrayFromStr(const wchar_t *str)
+static wchar_t **MakeStrArrayFromStr(const wchar_t *str)
 {
 	const wchar_t *strs[2];
 	strs[0] = str;
@@ -641,7 +641,7 @@ wchar_t **MakeStrArrayFromStr(const wchar_t *str)
 	return ret;
 }
 
-wchar_t **MakeFileArrayMultiSelect(const wchar_t *lpstrFile)
+static wchar_t **MakeFileArrayMultiSelect(const wchar_t *lpstrFile)
 {
 	// ”‚ð”‚¦‚é
 	size_t file_count = 0;
@@ -1045,7 +1045,15 @@ BOOL KermitStartSend(const wchar_t *filename)
 		fv->FileNames = filenames;
 	}
 	else {
-		fv->FileNames = MakeStrArrayFromStr(filename);
+		if (IsRelativePathW(filename)) {
+			wchar_t *fullpath = GetFileDir(&ts);
+			awcscats(&fullpath, L"\\", filename, NULL);
+			fv->FileNames = MakeStrArrayFromStr(fullpath);
+			free(fullpath);
+		}
+		else {
+			fv->FileNames = MakeStrArrayFromStr(filename);
+		}
 		FileVar->NoMsg = TRUE;
 	}
 	KermitStart(IdKmtSend);
@@ -1075,7 +1083,15 @@ BOOL KermitGet(const wchar_t *filename)
 		}
 	}
 	else {
-		FileVar->FileNames = MakeStrArrayFromStr(filename);
+		if (IsRelativePathW(filename)) {
+			wchar_t *fullpath = GetFileDir(&ts);
+			awcscats(&fullpath, L"\\", filename, NULL);
+			FileVar->FileNames = MakeStrArrayFromStr(fullpath);
+			free(fullpath);
+		}
+		else {
+			FileVar->FileNames = MakeStrArrayFromStr(filename);
+		}
 		FileVar->NoMsg = TRUE;
 	}
 	KermitStart(IdKmtGet);
@@ -1178,7 +1194,15 @@ BOOL XMODEMStartReceive(const wchar_t *filename, WORD ParamBinaryFlag, WORD Para
 		ts.XmodemBin = LOWORD(Option);
 	}
 	else {
-		fv->FileNames = MakeStrArrayFromStr(filename);
+		if (IsRelativePathW(filename)) {
+			wchar_t *fullpath = GetFileDir(&ts);
+			awcscats(&fullpath, L"\\", filename, NULL);
+			FileVar->FileNames = MakeStrArrayFromStr(fullpath);
+			free(fullpath);
+		}
+		else {
+			FileVar->FileNames = MakeStrArrayFromStr(filename);
+		}
 		if (IsXopt1k(ts.XmodemOpt)) {
 			if (IsXoptCRC(ParamXmodemOpt)) {
 				// CRC
@@ -1263,7 +1287,15 @@ BOOL XMODEMStartSend(const wchar_t *filename, WORD ParamXmodemOpt)
 		}
 	}
 	else {
-		fv->FileNames = MakeStrArrayFromStr(filename);
+		if (IsRelativePathW(filename)) {
+			wchar_t *fullpath = GetFileDir(&ts);
+			awcscats(&fullpath, L"\\", filename, NULL);
+			fv->FileNames = MakeStrArrayFromStr(fullpath);
+			free(fullpath);
+		}
+		else {
+			fv->FileNames = MakeStrArrayFromStr(filename);
+		}
 		if (IsXoptCRC(ts.XmodemOpt)) {
 			if (IsXopt1k(ParamXmodemOpt)) {
 				ts.XmodemOpt = Xopt1kCRC;
@@ -1380,7 +1412,15 @@ BOOL YMODEMStartSend(const wchar_t *filename)
 		fv->FileNames = filenames;
 	}
 	else {
-		fv->FileNames = MakeStrArrayFromStr(filename);
+		if (IsRelativePathW(filename)) {
+			wchar_t *fullpath = GetFileDir(&ts);
+			awcscats(&fullpath, L"\\", filename, NULL);
+			fv->FileNames = MakeStrArrayFromStr(fullpath);
+			free(fullpath);
+		}
+		else {
+			fv->FileNames = MakeStrArrayFromStr(filename);
+		}
 		FileVar->NoMsg = TRUE;
 	}
 
@@ -1481,7 +1521,15 @@ BOOL ZMODEMStartSend(const wchar_t *filename, WORD ParamBinaryFlag, BOOL autosta
 		ts.XmodemBin = Opt;
 	}
 	else {
-		fv->FileNames = MakeStrArrayFromStr(filename);
+		if (IsRelativePathW(filename)) {
+			wchar_t *fullpath = GetFileDir(&ts);
+			awcscats(&fullpath, L"\\", filename, NULL);
+			fv->FileNames = MakeStrArrayFromStr(fullpath);
+			free(fullpath);
+		}
+		else {
+			fv->FileNames = MakeStrArrayFromStr(filename);
+		}
 		ts.XmodemBin = ParamBinaryFlag;
 		FileVar->NoMsg = TRUE;
 	}
@@ -1565,7 +1613,15 @@ BOOL BPStartSend(const wchar_t *filename)
 		fv->FileNames = filenames;
 	}
 	else {
-		fv->FileNames = MakeStrArrayFromStr(filename);
+		if (IsRelativePathW(filename)) {
+			wchar_t *fullpath = GetFileDir(&ts);
+			awcscats(&fullpath, L"\\", filename, NULL);
+			fv->FileNames = MakeStrArrayFromStr(fullpath);
+			free(fullpath);
+		}
+		else {
+			fv->FileNames = MakeStrArrayFromStr(filename);
+		}
 		fv->NoMsg = TRUE;
 	}
 
@@ -1681,7 +1737,15 @@ BOOL QVStartSend(const wchar_t *filename)
 		fv->FileNames = filenames;
 	}
 	else {
-		fv->FileNames = MakeStrArrayFromStr(filename);
+		if (IsRelativePathW(filename)) {
+			wchar_t *fullpath = GetFileDir(&ts);
+			awcscats(&fullpath, L"\\", filename, NULL);
+			fv->FileNames = MakeStrArrayFromStr(fullpath);
+			free(fullpath);
+		}
+		else {
+			fv->FileNames = MakeStrArrayFromStr(filename);
+		}
 		FileVar->NoMsg = TRUE;
 	}
 

@@ -469,27 +469,7 @@ static wchar_t *_GetTermLogPath(const SetupList *list, const TTTSet *pts)
 
 static wchar_t *_GetFileDir(const SetupList *list, const TTTSet *pts)
 {
-	if (list->data_ptr == 0) {
-		// raw
-		if (pts->FileDirW != NULL) {
-			wchar_t *d = GetFileDir(pts);
-			int r = wcscmp(d, pts->FileDirW);
-			free(d);
-			if (r == 0) {
-				// iniファイルの内容と環境変数展開後が同じとき
-				// (環境変数を含んでいないとき)
-				// 表示しない
-				return NULL;
-			}
-			return _wcsdup(pts->FileDirW);
-		}
-		else {
-			return _wcsdup(L"");
-		}
-	}
-	else {
-		return GetFileDir(pts);
-	}
+	return GetFileDir(pts);
 }
 
 typedef struct {
@@ -555,10 +535,8 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			  LIST_PARAM_STR, pts->HomeDirW, NULL },
 			{ NULL, L"ExeDir",
 			  LIST_PARAM_STR, pts->ExeDirW, NULL },
-			{ NULL, L"FileDir (INI file)",
-			  LIST_PARAM_FUNC, (void*)_GetFileDir, (void *)0 },
-			{ NULL, L"FileDir",
-			  LIST_PARAM_FUNC, (void*)_GetFileDir, (void *)1 },
+			{ NULL, L"File Transfer Dir",
+			  LIST_PARAM_FUNC, (void*)_GetFileDir, NULL },
 			{ NULL, L"LogDir(General)",
 			  LIST_PARAM_STR, pts->LogDirW, NULL },
 			{ NULL, L"Default log save folder",

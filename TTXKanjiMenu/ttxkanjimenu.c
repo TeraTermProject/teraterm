@@ -16,6 +16,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <winsock2.h>
+#include <windows.h>
+#include <htmlhelp.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -24,15 +27,24 @@
 #include "tt_res.h"
 #include "i18n.h"
 #include "inifile_com.h"
+#include "dlglib.h"
+#include "asprintf.h"
+#include "helpid.h"
+
+#include "ttxkanjimenu.h"
+#include "resource.h"
 
 #define IniSection "TTXKanjiMenu"
+#define IniSectionW L"TTXKanjiMenu"
+
 #define ORDER 5000
 
 #define ID_MI_KANJIRECV		54010	// 受信/送受
 #define ID_MI_KANJISEND		54110	// 送信
 #define ID_MI_USEONESETTING	54200	// Use one setting
-#define ID_MI_JAPANESE		54201	// 日本語メニュー
-#define ID_MI_KOREAN		54202	// 韓国語メニュー
+#define ID_MI_SETTING		54201	// 設定
+#define ID_MI_AMB_WIDTH_1	54202
+#define ID_MI_AMB_WIDTH_2	54203
 
 // メニュー項目名の情報
 typedef struct {
@@ -53,10 +65,6 @@ static const MenuInfo MenuNameRecvJ[] = {
 	{ ID_MI_KANJISEND + 1,		IdEUC,	L"Send: EU&C-JP",		"MENU_SEND_EUCJP" },
 	{ ID_MI_KANJISEND + 2,		IdJIS,	L"Send: J&IS",			"MENU_SEND_JIS" },
 	{ ID_MI_KANJISEND + 3,		IdUTF8, L"Send: U&TF-8",		"MENU_SEND_UTF8" },
-	{ 0,  						0,		NULL,					NULL },
-	{ ID_MI_USEONESETTING,		0,		L"Use &one setting",	"MENU_USE_ONE_SETTING" },
-	{ 0,  						0,		NULL,					NULL },
-	{ ID_MI_KOREAN,				0,		L"Korean menu",			NULL },
 };
 
 // 送受同漢字コード (日本語)
@@ -65,10 +73,6 @@ static const MenuInfo MenuNameOneJ[] = {
 	{ ID_MI_KANJIRECV + 1,		IdEUC,	L"Recv/Send: &EUC-JP",		"MENU_EUCJP" },
 	{ ID_MI_KANJIRECV + 2,		IdJIS,	L"Recv/Send: &JIS",			"MENU_JIS" },
 	{ ID_MI_KANJIRECV + 3,		IdUTF8, L"Recv/Send: &UTF-8",		"MENU_UTF8" },
-	{ 0,						0,		NULL,						NULL },
-	{ ID_MI_USEONESETTING,		0,		L"Use &one setting",		"MENU_USE_ONE_SETTING" },
-	{ 0,  						0,		NULL,						NULL },
-	{ ID_MI_KOREAN,				0,		L"Korean menu",				NULL },
 };
 
 // 送受別漢字コード (韓国語)
@@ -78,23 +82,37 @@ static const MenuInfo MenuNameRecvK[] = {
 	{ 0,  						0,				NULL,					NULL },
 	{ ID_MI_KANJISEND + 0,		IdKoreanCP949,	L"Send: K&S5601",		"MENU_SEND_KS5601" },
 	{ ID_MI_KANJISEND + 1,		IdUTF8,			L"Send: U&TF-8",		"MENU_SEND_UTF8" },
-	{ 0,  						0,				NULL,					NULL },
-	{ ID_MI_USEONESETTING,		0,				L"Use &one setting",	"MENU_USE_ONE_SETTING" },
-	{ 0,  						0,				NULL,					NULL },
-	{ ID_MI_JAPANESE,			0,				L"Japanese menu",		NULL },
 };
 
 // 送受同漢字コード (韓国語)
 static const MenuInfo MenuNameOneK[] = {
 	{ ID_MI_KANJIRECV + 0,		IdKoreanCP949,	L"Recv/Send: &KS5601",	"MENU_KS5601" },
 	{ ID_MI_KANJIRECV + 1,		IdUTF8, 		L"Recv/Send: &UTF-8",	"MENU_UTF8" },
+};
+
+// OneSetting
+static const MenuInfo MenuOneSetting[] = {
 	{ 0,  						0,				NULL,					NULL },
 	{ ID_MI_USEONESETTING,		0,				L"Use &one setting",  	"MENU_USE_ONE_SETTING" },
-	{ 0,  						0,				NULL,					NULL },
-	{ ID_MI_JAPANESE,			0,				L"Japanese menu",		NULL },
+};
+
+// Ambiguous Character Width
+static const MenuInfo MenuAmbiguousWidth[] = {
+	{ ID_MI_AMB_WIDTH_1,		0,	L"Ambiguous Character Width 1",	NULL },
+	{ ID_MI_AMB_WIDTH_2,		0,	L"Ambiguous Character Width 2",	NULL },
+};
+
+static const MenuInfo MenuSetting[] = {
+	{ ID_MI_SETTING,			0,	L"Setting",	"MENU_SETTING" },
 };
 
 static HANDLE hInst; /* Instance handle of TTX*.DLL */
+
+typedef enum {
+	MENU_AUTO,
+	MENU_JAPANESE,
+	MENU_KOREAN,
+} LanguageEnum;
 
 typedef struct {
 	PTTSet ts;
@@ -103,14 +121,19 @@ typedef struct {
 	PSetupTerminal origSetupTermDlg;
 	PReadIniFile origReadIniFile;
 	PWriteIniFile origWriteIniFile;
-	BOOL UseOneSetting;
+	BOOL UseOneSetting;		// TRUE時送受同一、INIファイルに保存
 	BOOL NeedResetCharSet;
-	enum {
-		MENU_JAPANESE,
-		MENU_KOREAN,
-	} language;
+	LanguageEnum language;
 	const MenuInfo *menu_info_ptr;
 	size_t menu_info_count;
+	// INIファイルに保存する項目
+	struct {
+		BOOL charcode_menu;
+		LanguageEnum language_ini;
+		BOOL ambiguous_menu;
+		BOOL setting_menu;
+		BOOL one_setting_menu;
+	} ini;
 } TInstVar;
 
 static TInstVar *pvar;
@@ -240,6 +263,13 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->origWriteIniFile = NULL;
 	pvar->UseOneSetting = TRUE;
 	pvar->NeedResetCharSet = FALSE;
+	// iniファイル
+	//		iniファイル読み込み部に実際の初期値がある
+	pvar->ini.charcode_menu = TRUE;
+	pvar->ini.one_setting_menu = TRUE;
+	pvar->ini.language_ini = MENU_AUTO;
+	pvar->ini.ambiguous_menu = FALSE;
+	pvar->ini.setting_menu = TRUE;
 }
 
 /*
@@ -308,26 +338,35 @@ static void CallResetCharSet(HWND hWin){
  * 設定の読み込み
  */
 static void PASCAL TTXKanjiMenuReadIniFile(const wchar_t *fn, PTTSet ts) {
-	char buff[20];
+	wchar_t buff[20];
 
 	/* Call original ReadIniFile */
 	pvar->origReadIniFile(fn, ts);
 
-	GetPrivateProfileStringAFileW(IniSection, "UseOneSetting", "on", buff, sizeof(buff), fn);
-	if (_stricmp(buff, "off") == 0) {
-		pvar->UseOneSetting = FALSE;
+	GetPrivateProfileStringW(IniSectionW, L"CharCodeMenu", L"on", buff, _countof(buff), fn);
+	pvar->ini.charcode_menu = _wcsicmp(buff, L"off") == 0 ? FALSE : TRUE;
+	GetPrivateProfileStringW(IniSectionW, L"UseOneSetting", L"on", buff, _countof(buff), fn);
+	pvar->UseOneSetting = _wcsicmp(buff, L"off") == 0 ? FALSE : TRUE;
+	GetPrivateProfileStringW(IniSectionW, L"Language", L"Auto", buff, _countof(buff), fn);
+	if (_wcsicmp(buff, L"Japanese") == 0) {
+		pvar->ini.language_ini = MENU_JAPANESE;
+		pvar->language = pvar->ini.language_ini;
+	} else if (_wcsicmp(buff, L"Korean") == 0) {
+		pvar->ini.language_ini = MENU_KOREAN;
+		pvar->language = pvar->ini.language_ini;
+	} else {
+		// 自動設定(未設定)
+		pvar->ini.language_ini = MENU_AUTO;
 	}
-	else {
-		pvar->UseOneSetting = TRUE;
-		// UseOneSetting が on の場合は、送受信設定が同じになるように調整する
-		switch (pvar->language){
-		case MENU_JAPANESE:
-		case MENU_KOREAN:
-			pvar->ts->KanjiCodeSend = pvar->ts->KanjiCode;
-			break;
-		}
+	GetPrivateProfileStringW(IniSectionW, L"UseOneSettingMenu", L"on", buff, _countof(buff), fn);
+	pvar->ini.one_setting_menu = _wcsicmp(buff, L"off") == 0 ? FALSE : TRUE;
+	GetPrivateProfileStringW(IniSectionW, L"AmbiguousCharacterWidthMenu", L"off", buff, _countof(buff), fn);
+	pvar->ini.ambiguous_menu = _wcsicmp(buff, L"off") == 0 ? FALSE : TRUE;
+
+	// UseOneSetting が on の場合は、送受信設定が同じになるように調整する
+	if (pvar->UseOneSetting) {
+		pvar->ts->KanjiCodeSend = pvar->ts->KanjiCode;
 	}
-	return;
 }
 
 /*
@@ -337,9 +376,18 @@ static void PASCAL TTXKanjiMenuWriteIniFile(const wchar_t *fn, PTTSet ts) {
 	/* Call original WriteIniFile */
 	pvar->origWriteIniFile(fn, ts);
 
-	WritePrivateProfileStringAFileW(IniSection, "UseOneSetting", pvar->UseOneSetting?"on":"off", fn);
-
-	return;
+	WritePrivateProfileStringW(IniSectionW, L"CharCodeMenu",
+							   pvar->ini.charcode_menu ? L"on" : L"off", fn);
+	WritePrivateProfileStringW(IniSectionW, L"UseOneSetting",
+							   pvar->UseOneSetting ? L"on" : L"off", fn);
+	WritePrivateProfileStringW(IniSectionW, L"Language",
+							   pvar->ini.language_ini == MENU_JAPANESE ? L"Japanese" :
+							   pvar->ini.language_ini == MENU_KOREAN ? L"Korean" :
+							   L"Auto", fn);
+	WritePrivateProfileStringW(IniSectionW, L"UseOneSettingMenu",
+							   pvar->ini.one_setting_menu ? L"on" : L"off",  fn);
+	WritePrivateProfileStringW(IniSectionW, L"AmbiguousCharacterWidthMenu",
+							   pvar->ini.ambiguous_menu ? L"on" : L"off", fn);
 }
 
 /*
@@ -364,39 +412,67 @@ static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
  */
 static void UpdateMenu(HMENU menu, BOOL UseOneSetting)
 {
-	const MenuInfo *menu_info_ptr;
-	size_t menu_info_count;
+	if (pvar->ini.charcode_menu) {
+		const MenuInfo *menu_info_ptr;
+		size_t menu_info_count;
 
-	switch (pvar->language) {
-	case MENU_JAPANESE:
-		if (UseOneSetting) {
-			menu_info_ptr = MenuNameOneJ;
-			menu_info_count = _countof(MenuNameOneJ);
+		switch (pvar->language) {
+		case MENU_JAPANESE:
+			if (UseOneSetting) {
+				menu_info_ptr = MenuNameOneJ;
+				menu_info_count = _countof(MenuNameOneJ);
+			}
+			else {
+				menu_info_ptr = MenuNameRecvJ;
+				menu_info_count = _countof(MenuNameRecvJ);
+			}
+			break;
+		case MENU_KOREAN:
+			if (UseOneSetting) {
+				menu_info_ptr = MenuNameOneK;
+				menu_info_count = _countof(MenuNameOneK);
+			}
+			else {
+				menu_info_ptr = MenuNameRecvK;
+				menu_info_count = _countof(MenuNameRecvK);
+			}
+			break;
+		default:
+			assert(FALSE);
+			break;
 		}
-		else {
-			menu_info_ptr = MenuNameRecvJ;
-			menu_info_count = _countof(MenuNameRecvJ);
+
+		CreateMenuInfo(menu, menu_info_ptr, menu_info_count,
+					   pvar->ts->UILanguageFileW, IniSection);
+		if (pvar->ini.one_setting_menu) {
+			CreateMenuInfo(menu, MenuOneSetting, _countof(MenuOneSetting),
+						   pvar->ts->UILanguageFileW, IniSection);
 		}
-		break;
-	case MENU_KOREAN:
-		if (UseOneSetting) {
-			menu_info_ptr = MenuNameOneK;
-			menu_info_count = _countof(MenuNameOneK);
-		}
-		else {
-			menu_info_ptr = MenuNameRecvK;
-			menu_info_count = _countof(MenuNameRecvK);
-		}
-		break;
-	default:
-		assert(FALSE);
-		return;
+
+		pvar->menu_info_ptr = menu_info_ptr;
+		pvar->menu_info_count = menu_info_count;
 	}
 
-	pvar->menu_info_ptr = menu_info_ptr;
-	pvar->menu_info_count = menu_info_count;
-
-	CreateMenuInfo(menu, menu_info_ptr, menu_info_count, pvar->ts->UILanguageFileW, IniSection);
+	if (pvar->ini.ambiguous_menu) {
+		if (pvar->ini.charcode_menu) {
+			AppendMenuA(menu, MF_SEPARATOR, 0, NULL);
+		}
+		CreateMenuInfo(menu, MenuAmbiguousWidth, _countof(MenuAmbiguousWidth),
+					   pvar->ts->UILanguageFileW, IniSection);
+		UINT check = pvar->ts->UnicodeAmbiguousWidth == 1 ? ID_MI_AMB_WIDTH_1 : ID_MI_AMB_WIDTH_2;
+		CheckMenuRadioItem(menu, ID_MI_AMB_WIDTH_1, ID_MI_AMB_WIDTH_2, check, MF_BYCOMMAND);
+		if (pvar->ts->KanjiCode != IdUTF8 && pvar->ts->KanjiCodeSend != IdUTF8) {
+			EnableMenuItem(menu, ID_MI_AMB_WIDTH_1, MF_BYCOMMAND | MF_GRAYED);
+			EnableMenuItem(menu, ID_MI_AMB_WIDTH_2, MF_BYCOMMAND | MF_GRAYED);
+		}
+	}
+	if (pvar->ini.setting_menu) {
+		if (pvar->ini.ambiguous_menu || pvar->ini.charcode_menu) {
+			AppendMenuA(menu, MF_SEPARATOR, 0, NULL);
+		}
+		CreateMenuInfo(menu, MenuSetting, _countof(MenuSetting),
+					   pvar->ts->UILanguageFileW, IniSection);
+	}
 }
 
 /*
@@ -406,9 +482,19 @@ static void PASCAL TTXModifyMenu(HMENU menu)
 {
 	MENUITEMINFOW mi = {0};
 	wchar_t *uimsg;
-	// 言語が日本語または韓国語の時のみメニューに追加する
-	if (pvar->language != MENU_JAPANESE && pvar->language != MENU_KOREAN) {
-		return;
+
+	if (pvar->ini.language_ini == MENU_AUTO) {
+		switch (GetACP()) {
+		case 932:	// CP932 = Shift_JIS
+			pvar->language = MENU_JAPANESE;
+			break;
+		case 949:	// CP949 = Korean
+			pvar->language = MENU_KOREAN;
+			break;
+		default:
+			pvar->language = MENU_JAPANESE;
+			break;
+		}
 	}
 
 	pvar->hmEncode = CreateMenu();
@@ -440,10 +526,11 @@ static void PASCAL TTXModifyMenu(HMENU menu)
 static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 	// メニューが呼び出されたら、最新の設定に更新する。(2007.5.25 yutaka)
 	if (menu == pvar->hmEncode) {
-		(void)menu;
-		UpdateRecvMenu(pvar->ts->KanjiCode);
-		if (!pvar->UseOneSetting) {
-			UpdateSendMenu(pvar->ts->KanjiCodeSend);
+		if (pvar->ini.charcode_menu) {
+			UpdateRecvMenu(pvar->ts->KanjiCode);
+			if (!pvar->UseOneSetting) {
+				UpdateSendMenu(pvar->ts->KanjiCodeSend);
+			}
 		}
 		CheckMenuItem(pvar->hmEncode, ID_MI_USEONESETTING, MF_BYCOMMAND | (pvar->UseOneSetting)?MF_CHECKED:0);
 	}
@@ -459,6 +546,108 @@ static const MenuInfo *SearchMenuItem(const MenuInfo *menu_info_ptr, size_t menu
 		menu_info_ptr++;
 	}
 	return NULL;
+}
+
+static void ArrangeControls(HWND dlg)
+{
+	const BOOL enabled = (IsDlgButtonChecked(dlg, IDC_CHECK_CHARCODE) == BST_CHECKED) ? TRUE : FALSE;
+	EnableWindow(GetDlgItem(dlg, IDC_MENU_CONTENTS), enabled);
+	EnableWindow(GetDlgItem(dlg, IDC_LANGUAGE_DROPBOX), enabled);
+	EnableWindow(GetDlgItem(dlg, IDC_CHECK_USE_ONE_SETTING), enabled);
+	EnableWindow(GetDlgItem(dlg, IDC_CHECK_ONE_SETTING), enabled);
+}
+
+static INT_PTR CALLBACK SettingDlgProc(HWND dlg, UINT msg, WPARAM wp, LPARAM lp)
+{
+	switch (msg) {
+	case WM_INITDIALOG: {
+		static const DlgTextInfo TextInfos[] = {
+			{ 0, "MENU_SETTING_TITLE" },
+			{ IDC_CHECK_CHARCODE, "MENU_CHARCODE" },
+			{ IDC_CHECK_ONE_SETTING, "MENU_USE_ONE_SETTING" },
+			{ IDC_MENU_CONTENTS, "MENU_CONTENTS" },
+			{ IDC_CHECK_USE_ONE_SETTING, "MENU_USE_ONE_SETTING_MENU" },
+			{ IDC_CHECK_AMB_WIDTH, "MENU_AMB_MENU" },
+			{ IDOK, "BTN_OK" },
+			{ IDCANCEL, "BTN_CANCEL" },
+			{ IDHELP, "BTN_HELP" },
+		};
+
+		SetI18nDlgStrsW(dlg, "TTXKanjiMenu", TextInfos, _countof(TextInfos), pvar->ts->UILanguageFileW);
+		CheckDlgButton(dlg, IDC_CHECK_CHARCODE,
+					   pvar->ini.charcode_menu ? BST_CHECKED : BST_UNCHECKED);
+		SendDlgItemMessageW(dlg, IDC_LANGUAGE_DROPBOX, CB_ADDSTRING, 0, (LPARAM)L"Auto");
+		SendDlgItemMessageW(dlg, IDC_LANGUAGE_DROPBOX, CB_ADDSTRING, 0, (LPARAM)L"Japanese");
+		SendDlgItemMessageW(dlg, IDC_LANGUAGE_DROPBOX, CB_ADDSTRING, 0, (LPARAM)L"Korean");
+		SendDlgItemMessageA(dlg, IDC_LANGUAGE_DROPBOX, CB_SETCURSEL,
+							pvar->ini.language_ini == MENU_JAPANESE ? 1 :
+							pvar->ini.language_ini == MENU_KOREAN ? 2 :
+							0 , 0);
+		CheckDlgButton(dlg, IDC_CHECK_ONE_SETTING,
+					   pvar->UseOneSetting ? BST_CHECKED : BST_UNCHECKED);
+		CheckDlgButton(dlg, IDC_CHECK_USE_ONE_SETTING,
+					   pvar->ini.one_setting_menu ? BST_CHECKED : BST_UNCHECKED);
+		CheckDlgButton(dlg, IDC_CHECK_AMB_WIDTH,
+					   pvar->ini.ambiguous_menu ? BST_CHECKED : BST_UNCHECKED);
+		ArrangeControls(dlg);
+
+		wchar_t *s;
+		char *ver_substr = GetVersionSubstr();
+		aswprintf(&s,
+				  L"KanjiMenu version %d.%d\r\n%hs",
+				  TTXKANJIMENU_VERSION_MAJOR, TTXKANJIMENU_VERSION_MINOR,
+				  ver_substr);
+		free(ver_substr);
+		SetDlgItemTextW(dlg, IDC_VERSION, s);
+		free(s);
+
+		CenterWindow(dlg, pvar->cv->HWin);
+
+		return TRUE;
+	}
+
+	case WM_COMMAND:
+		switch (wp) {
+		case IDC_CHECK_CHARCODE | (BN_CLICKED << 16): {
+			ArrangeControls(dlg);
+			break;
+		}
+		case IDOK | (BN_CLICKED << 16): {
+			int cur = (int)SendDlgItemMessageA(dlg, IDC_LANGUAGE_DROPBOX, CB_GETCURSEL, 0, 0);
+			pvar->ini.charcode_menu = (IsDlgButtonChecked(dlg, IDC_CHECK_CHARCODE) == BST_CHECKED) ? TRUE : FALSE;
+			pvar->ini.language_ini =
+				cur == 1 ? MENU_JAPANESE :
+				cur == 2 ? MENU_KOREAN :
+				MENU_AUTO;
+			pvar->language = pvar->ini.language_ini;
+			pvar->UseOneSetting =
+				IsDlgButtonChecked(dlg, IDC_CHECK_ONE_SETTING) == BST_CHECKED ? TRUE : FALSE;
+			pvar->ini.one_setting_menu =
+				IsDlgButtonChecked(dlg, IDC_CHECK_USE_ONE_SETTING) == BST_CHECKED ? TRUE : FALSE;
+			pvar->ini.ambiguous_menu =
+				IsDlgButtonChecked(dlg, IDC_CHECK_AMB_WIDTH) == BST_CHECKED ? TRUE : FALSE;
+
+			CallResetCharSet(pvar->cv->HWin);
+
+			TTEndDialog(dlg, IDOK);
+			break;
+		}
+		case IDCANCEL | (BN_CLICKED << 16):
+			TTEndDialog(dlg, IDCANCEL);
+			break;
+		case IDHELP | (BN_CLICKED << 16):
+			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpTTXPluginKanjiMenu, 0);
+			break;
+		default:
+			return FALSE;
+		}
+		return TRUE;
+	case WM_DESTROY:
+		return 0;
+
+	default:
+		return FALSE;
+	}
 }
 
 /*
@@ -512,15 +701,19 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 		UpdateMenu(pvar->hmEncode, pvar->UseOneSetting);
 		return 1;
 	}
-	else if (cmd == ID_MI_KOREAN) {
-		DeleteMenus(pvar->hmEncode);
-		pvar->language = MENU_KOREAN;
-		UpdateMenu(pvar->hmEncode, pvar->UseOneSetting);
+	else if (cmd == ID_MI_SETTING) {
+		SetDialogFont(pvar->ts->DialogFontNameW, pvar->ts->DialogFontPoint,
+					  pvar->ts->DialogFontCharSet, pvar->ts->UILanguageFileW,
+					  "Tera Term", "DLG_TAHOMA_FONT");
+		TTDialogBoxParam(hInst, MAKEINTRESOURCEW(IDD_DIALOG_SETTING), hWin, SettingDlgProc, 0);
 	}
-	else if (cmd == ID_MI_JAPANESE) {
-		DeleteMenus(pvar->hmEncode);
-		pvar->language = MENU_JAPANESE;
-		UpdateMenu(pvar->hmEncode, pvar->UseOneSetting);
+	else if (cmd == ID_MI_AMB_WIDTH_1) {
+		pvar->ts->UnicodeAmbiguousWidth = 1;
+		CallResetCharSet(hWin);
+	}
+	else if (cmd == ID_MI_AMB_WIDTH_2) {
+		pvar->ts->UnicodeAmbiguousWidth = 2;
+		CallResetCharSet(hWin);
 	}
 
 	return 0;
@@ -588,13 +781,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			/* do process initialization */
 			hInst = hInstance;
 			pvar = &InstVar;
-			if (GetACP() == 949) {
-				// CP949 = Korean
-				pvar->language = MENU_KOREAN;
-			}
-			else {
-				pvar->language = MENU_JAPANESE;
-			}
 			break;
 		case DLL_PROCESS_DETACH:
 			/* do process cleanup */

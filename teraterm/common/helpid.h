@@ -158,6 +158,7 @@
 #define HlpMenuSetupAdditionalMouse         43027
 #define HlpMenuSetupAdditionalGeneral       43028
 #define HlpMenuSetupAdditionalTCPIP         43029
+#define HlpMenuSetupAdditionalTCPIPEditHistory 43035
 #define HlpMenuSetupAdditionalCopyAndPaste  43030
 #define HlpMenuSetupAdditionalCtrlSeq       43031
 #define HlpMenuSetupAdditionalCygwin        43032
@@ -443,5 +444,7 @@
 #define HlpMacroAppendixesAscii         93004
 #define HlpMacroAppendixesRegex         93005
 #define HlpMacroAppendixesDisconnect    93006
+
+#define HlpTTXPluginKanjiMenu    93101
 
 #define HlpUninstall    100000

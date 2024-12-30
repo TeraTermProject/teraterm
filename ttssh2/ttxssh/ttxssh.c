@@ -1045,18 +1045,45 @@ static BOOL IsEditHistorySelected(HWND dlg)
 	return data == 999;
 }
 
+static void SetHostDropdown(HWND dlg, const TTTSet *ts)
+{
+	LRESULT index;
+	SetComboBoxHostHistory(dlg, IDC_HOSTNAME, MAXHOSTLIST, ts->SetupFNameW);
+	ExpandCBWidth(dlg, IDC_HOSTNAME);
+	SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
+	if (SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) != 0) {
+		// 一番最初を選択する
+		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
+	} else {
+		// 選択しない、エディットボックスは空になる
+		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
+	}
+
+	// Edit historyを追加(ITEMDATA=999)
+	index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING, 0, (LPARAM)L"<Edit history...>");
+	SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
+}
+
 static void OpenEditHistory(HWND dlg, TTTSet *ts)
 {
-	if (EditHistoryDlg(dlg, ts)) {
+	EditHistoryDlgData data;
+	data.UILanguageFileW = ts->UILanguageFileW;
+	data.SetupFNameW = ts->SetupFNameW;
+	data.vtwin = pvar->cv->HWin;
+	if (EditHistoryDlg(NULL, dlg, &data)) {
 		// 編集されたので、ドロップダウンを再設定する
-		LRESULT index;
 		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_RESETCONTENT, 0, 0);
-		SetComboBoxHostHistory(dlg, IDC_HOSTNAME, MAXHOSTLIST, ts->SetupFNameW);
-		index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING, 0, (LPARAM)L"<Edit history...>");
-		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
+
+		SetHostDropdown(dlg, ts);
 	}
-	// 一番最初を選択する
-	SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
+
+	if (SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) > 1) {
+		// 一番最初を選択する
+		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
+	} else {
+		// "<Edit History...>のみ、選択しない、エディットボックスは空になる
+		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
+	}
 }
 
 static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -1086,7 +1113,6 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 	case WM_INITDIALOG: {
 		int j;
 		int com_index;
-		LRESULT index;
 
 		GetHNRec = (PGetHNRec)lParam;
 		dlg_data = (TTXHostDlgData *)calloc(1, sizeof(*dlg_data));
@@ -1112,13 +1138,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			GetHNRec->PortType = IdTCPIP;
 
 		// ホスト (コマンドライン)
-		SetComboBoxHostHistory(dlg, IDC_HOSTNAME, MAXHOSTLIST, GetHNRec->SetupFNW);
-		index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING, 0, (LPARAM)L"<Edit history...>");
-		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
-
-		ExpandCBWidth(dlg, IDC_HOSTNAME);
-		SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
-		SendDlgItemMessage(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
+		SetHostDropdown(dlg, pvar->ts);
 		SetEditboxEmacsKeybind(dlg, IDC_HOSTNAME);
 
 		CheckRadioButton(dlg, IDC_HOSTTELNET, IDC_HOSTOTHER,

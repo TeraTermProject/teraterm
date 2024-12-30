@@ -128,6 +128,7 @@ HlpMenuSetupAdditionalTheme=html\menu\setup-additional-theme.html
 HlpMenuSetupAdditionalKeyboard=html\menu\setup-additional-keyboard.html
 HlpMenuSetupAdditionalMouse=html\menu\setup-additional-Mouse.html
 HlpMenuSetupAdditionalTCPIP=html\menu\setup-additional-tcpip.html
+HlpMenuSetupAdditionalTCPIPEditHistory=html\menu\setup-additional-tcpip_edithistory.html
 HlpMenuSetupAdditionalCtrlSeq=html\menu\setup-additional-ctrlseq.html
 HlpMenuSetupAdditionalCygwin=html\menu\setup-additional-cygwin.html
 HlpMenuSetupAdditionalWindow=html\menu\setup-additional-window.html
@@ -408,6 +409,7 @@ HlpMacroAppendixesNegative=html\macro\appendixes\negative.html
 HlpMacroAppendixesAscii=html\macro\appendixes\ascii.html
 HlpMacroAppendixesRegex=html\reference\RE.txt
 HlpMacroAppendixesDisconnect=html\macro\appendixes\disconnecttiming.html
+HlpTTXPluginKanjiMenu=html\ttxplugin\kanjimenu.html
 HlpUninstall=html\uninstall.html
 
 [MAP]

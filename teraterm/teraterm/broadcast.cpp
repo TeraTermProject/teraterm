@@ -54,6 +54,7 @@
 #include "sendmem.h"
 #include "clipboar.h"	// for CBPreparePaste()
 #include "ttime.h"
+#include "history_store.h"
 
 #include "helpid.h"
 #include "broadcast.h"
@@ -105,28 +106,13 @@ static wchar_t *GetHistoryFileName(TTTSet *ts_)
 	return fname;
 }
 
-static void ApplyBroadCastCommandHisotry(HWND Dialog, wchar_t *historyfile)
+static void ApplyBroadCastCommandHisotry(HWND Dialog, const wchar_t *historyfile)
 {
-	int i = 1;
-
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_RESETCONTENT, 0, 0);
-	for (i = 1; i <= ts.MaxBroadcatHistory; i++) {
-		wchar_t *EntName;
-		wchar_t *Command;
-		aswprintf(&EntName, L"Command%d", i);
-		hGetPrivateProfileStringW(L"BroadcastCommands", EntName, L"", historyfile, &Command);
-		if (Command != NULL && Command[0] != 0) {
-			SendDlgItemMessageW(Dialog, IDC_COMMAND_EDIT, CB_ADDSTRING,
-								0, (LPARAM)Command);
-		}
-		else {
-			// I—¹
-			i = ts.MaxBroadcatHistory;
-		}
-		free(Command);
-		free(EntName);
-	}
-
+	HistoryStore *hs = HistoryStoreCreate(ts.MaxBroadcatHistory);
+	HistoryStoreReadIni(hs, historyfile, L"BroadcastCommands", L"Command");
+	HistoryStoreSetControl(hs, Dialog, IDC_COMMAND_EDIT);
+	HistoryStoreDestroy(hs);
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_SETCURSEL,0,0);
 }
 

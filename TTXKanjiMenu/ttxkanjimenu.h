@@ -1,5 +1,5 @@
 /*
- * (C) 2024- TeraTerm Project
+ * Copyright (C) 2024- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,20 +28,19 @@
 
 #pragma once
 
-#include <windows.h>
+#include "tt-version.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define TTXKANJIMENU_VERSION_MAJOR             1
+#define TTXKANJIMENU_VERSION_MINOR             10
+#define TTXKANJIMENU_VERSION_STR(sep)          TT_TOSTR(TTXKANJIMENU_VERSION_MAJOR) sep TT_TOSTR(TTXKANJIMENU_VERSION_MINOR)
+#define TTXKANJIMENU_RES_VERSION_STR           TTXKANJIMENU_VERSION_STR(", ") ", 0, 0"
 
-typedef struct {
-	const wchar_t *UILanguageFileW;
-	const wchar_t *SetupFNameW;
-	HWND vtwin;
-} EditHistoryDlgData;
-
-BOOL EditHistoryDlg(HINSTANCE hInstance, HWND WndParent, EditHistoryDlgData *parent_data);
-
-#ifdef __cplusplus
-}
+// TTXKANJIMENU_RES_PRODUCT_VERSION_STR
+//	リソースファイル(rcファイル) ProductVersion 用
+#if defined(TT_VERSION_SUBSTR_HASH)
+#define TTXKANJIMENU_RES_PRODUCT_VERSION_STR \
+	TTXKANJIMENU_VERSION_STR(".") " " TT_VERSION_SUBSTR_HASH
+#else
+#define TTXKANJIMENU_RES_PRODUCT_VERSION_STR \
+	TTXKANJIMENU_VERSION_STR(".")
 #endif

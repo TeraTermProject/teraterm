@@ -40,14 +40,9 @@
 
 #include "ttwinman.h"		// for ts
 #include "codeconv.h"
-
-#define	SENDMEM_USE_OLD_API	0
-
-#if SENDMEM_USE_OLD_API
-#include "filesys.h"		// for FileSendStart()
-#else
 #include "fileread.h"
-#endif
+#include "ttlib_types.h"	// GetFileDir()
+#include "asprintf.h"
 
 #include "sendmem.h"
 
@@ -701,26 +696,28 @@ void SendMemFinish(SendMem *sm)
  *	@param[in]	binary		FALSE	text file
  *							TRUE	binary file
  */
-#if SENDMEM_USE_OLD_API
-BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max)
-{
-	(void)delay_type;
-	(void)delay_tick;
-	(void)send_max;
-
-	BOOL r = FileSendStart(filename, binary == FALSE ? 0 : 1);
-	return r;
-}
-#else
-SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max)
+SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max, BOOL local_echo)
 {
 	SendMem *sm;
+	wchar_t *fullpath;
+
+	if (IsRelativePathW(filename)) {
+		// ファイル名をフルパスにする
+		fullpath = GetFileDir(&ts);
+		awcscats(&fullpath, L"\\", filename, NULL);
+		free(fullpath);
+	}
+	else {
+		fullpath = _wcsdup(filename);
+	}
+
 	if (!binary) {
 		size_t str_len;
-		wchar_t *str_ptr = LoadFileWW(filename, &str_len);
+		wchar_t *str_ptr = LoadFileWW(fullpath, &str_len);
 		assert(str_ptr != NULL);
 		if (str_ptr == NULL) {
-			return NULL;
+			sm = NULL;
+			goto finish;
 		}
 
 		// 改行を CR のみに正規化
@@ -732,31 +729,38 @@ SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayTy
 	}
 	else {
 		size_t data_len;
-		unsigned char *data_ptr = LoadFileBinary(filename, &data_len);
+		unsigned char *data_ptr = LoadFileBinary(fullpath, &data_len);
 		assert(data_ptr != NULL);
 		if (data_ptr == NULL) {
-			return NULL;
+			sm = NULL;
+			goto finish;
 		}
 		sm = SendMemBinary(data_ptr, data_len);
 	}
+	if (sm == NULL) {
+		goto finish;
+	}
 	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFileW);
 	SendMemInitDialogCaption(sm, L"send file");			// title
-	SendMemInitDialogFilename(sm, filename);
+	SendMemInitDialogFilename(sm, fullpath);
 	SendMemInitDelay(sm, delay_type, delay_tick, send_max);
+	SendMemInitEcho(sm, local_echo);
+
 	SendMemStart(sm);
+finish:
+	free(fullpath);
 	return sm;
 }
-#endif
 
-BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max)
+BOOL SendMemSendFile(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max, BOOL local_echo)
 {
-	SendMem *sm = SendMemSendFileCom(filename, binary, delay_type, delay_tick, send_max);
+	SendMem *sm = SendMemSendFileCom(filename, binary, delay_type, delay_tick, send_max, local_echo);
 	return (sm != NULL) ? TRUE : FALSE;
 }
 
-BOOL SendMemSendFile2(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max, void (*callback)(void *data), void *callback_data)
+BOOL SendMemSendFile2(const wchar_t *filename, BOOL binary, SendMemDelayType delay_type, DWORD delay_tick, size_t send_max, BOOL local_echo, void (*callback)(void *data), void *callback_data)
 {
-	SendMem *sm = SendMemSendFileCom(filename, binary, delay_type, delay_tick, send_max);
+	SendMem *sm = SendMemSendFileCom(filename, binary, delay_type, delay_tick, send_max, local_echo);
 	if (sm == NULL) {
 		return FALSE;
 	}
