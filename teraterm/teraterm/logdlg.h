@@ -40,3 +40,4 @@ typedef struct {
 } FLogDlgInfo_t;
 
 BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info);
+void FLogOpenDialogUnInit(void);

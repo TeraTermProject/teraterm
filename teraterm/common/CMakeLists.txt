@@ -29,6 +29,8 @@ add_library(
   fileread.h
   getcontent.cpp
   getcontent.h
+  history_store.cpp
+  history_store.h
   i18n.c
   i18n.h
   i18n_static.c

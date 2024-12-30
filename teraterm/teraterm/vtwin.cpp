@@ -1495,6 +1495,8 @@ void CVTWindow::OnDestroy()
 
 	EndTerm();
 	EndDisp();
+	sendfiledlgUnInit();
+	FLogOpenDialogUnInit();
 
 	FreeBuffer();
 

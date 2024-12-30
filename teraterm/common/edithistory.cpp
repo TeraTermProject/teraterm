@@ -43,6 +43,7 @@
 #include "helpid.h"
 #include "win32helper.h"
 #include "resize_helper.h"
+#include "history_store.h"
 
 #include "edithistory_res.h"
 #include "edithistory.h"
@@ -87,28 +88,10 @@ static void ModifyListboxHScrollWidth(HWND dlg, int dlg_item)
  */
 static void WriteListBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar_t *SetupFNW)
 {
-	LRESULT item_count;
-	LRESULT i;
-
-	item_count = SendDlgItemMessageW(dlg, dlg_item, LB_GETCOUNT, 0, 0);
-	if (item_count == LB_ERR) {
-		return;
-	}
-
-	// [Hosts] ‚ð‚·‚×‚Äíœ
-	WritePrivateProfileStringW(L"Hosts", NULL, NULL, SetupFNW);
-
-	if (item_count > maxhostlist) {
-		item_count = maxhostlist;
-	}
-	for (i = 0; i < item_count; i++) {
-		wchar_t EntNameW[10];
-		wchar_t *strW;
-		GetDlgItemIndexTextW(dlg, dlg_item, (WPARAM)i, &strW);
-		_snwprintf_s(EntNameW, _countof(EntNameW), _TRUNCATE, L"Host%i", (int)i + 1);
-		WritePrivateProfileStringW(L"Hosts", EntNameW, strW, SetupFNW);
-		free(strW);
-	}
+	HistoryStore *hs = HistoryStoreCreate(maxhostlist);
+	HistoryStoreGetControl(hs, dlg, dlg_item);
+	HistoryStoreSaveIni(hs, SetupFNW, L"Hosts", L"host");
+	HistoryStoreDestroy(hs);
 }
 
 /**
@@ -142,7 +125,7 @@ static void TCPIPDlgButtons(HWND Dialog)
 
 typedef struct {
 	ReiseDlgHelper_t *resize_helper;
-	EditHistoryDlgData *parent_data;
+	const EditHistoryDlgData *parent_data;
 } DlgData;
 
 static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
