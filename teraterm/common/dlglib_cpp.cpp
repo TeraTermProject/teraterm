@@ -487,42 +487,6 @@ void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name, int cx, int cy)
 }
 
 /**
- *	接続したホスト履歴をコンボボックスまたはリストボックスにセットする
- */
-void SetComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar_t *SetupFNW)
-{
-	char class_name[32];
-	UINT message;
-	int r = GetClassNameA(GetDlgItem(dlg, dlg_item), class_name, _countof(class_name));
-	if (r == 0) {
-		return;
-	}
-	if (strcmp(class_name, "ComboBox") == 0) {
-		message = CB_ADDSTRING;
-	}
-	else if (strcmp(class_name, "ListBox") == 0) {
-		message = LB_ADDSTRING;
-	}
-	else {
-		assert(FALSE);
-		return;
-	}
-
-	int i = 1;
-	do {
-		wchar_t EntNameW[128];
-		wchar_t *TempHostW;
-		_snwprintf_s(EntNameW, _countof(EntNameW), _TRUNCATE, L"host%d", i);
-		hGetPrivateProfileStringW(L"Hosts", EntNameW, L"", SetupFNW, &TempHostW);
-		if (TempHostW[0] != 0) {
-			SendDlgItemMessageW(dlg, dlg_item, message, 0, (LPARAM)TempHostW);
-		}
-		free(TempHostW);
-		i++;
-	} while (i <= maxhostlist);
-}
-
-/**
  *	ウィンドウにアイコンをセットする
  *
  *	@param	hInst		アイコンを保持しているモジュールのinstance

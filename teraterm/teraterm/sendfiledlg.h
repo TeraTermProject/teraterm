@@ -41,8 +41,8 @@ typedef struct {
 	const wchar_t *filesend_filter;
 	const wchar_t *initial_dir;
 	const wchar_t *initial_file;	// 初期ファイル名, NULL=指定なし
+	BOOL skip_dialog;				// TRUEの時オプションダイアログをスキップする
 	// in/out
-	BOOL skip_dialog;
 	BOOL binary;					// TRUE/FALSE = バイナリ/テキスト
 	SendMemDelayType delay_type;
 	DWORD delay_tick;
@@ -53,6 +53,7 @@ typedef struct {
 } sendfiledlgdata;
 
 INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data);
+void sendfiledlgUnInit(void);
 
 #ifdef __cplusplus
 }

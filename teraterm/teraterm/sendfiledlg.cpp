@@ -44,6 +44,7 @@
 #include "win32helper.h"
 #include "tipwin2.h"
 #include "sendmem.h"
+#include "history_store.h"
 
 #include "sendfiledlg.h"
 
@@ -53,6 +54,8 @@ typedef struct {
 	TipWin2 *tip;
 	UINT MsgDlgHelp;
 } SendFileDlgWork_t;
+
+static HistoryStore *hs;
 
 static void ArrangeControls(HWND hDlgWnd)
 {
@@ -145,8 +148,10 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 						 data->UILanguageFileW, data->delay_type);
 
 			if (data->initial_file != NULL) {
-				SetDlgItemTextW(hDlgWnd, IDC_SENDFILE_FILENAME_EDIT, data->initial_file);
+				HistoryStoreAddTop(hs, data->initial_file, FALSE);
 			}
+
+			HistoryStoreSetControl(hs, hDlgWnd, IDC_SENDFILE_FILENAME_EDIT);
 
 			// 送信サイズ
 			for (size_t i = 0; i < _countof(send_size_list); i++) {
@@ -169,6 +174,16 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			if (text != NULL) {
 				TipWin2SetTextW(tip, IDC_SENDFILE_CHECK_4, text);
 				free(text);
+			}
+
+			// ドロップダウンのエディットコントロールで数字のみ入力
+			{
+				COMBOBOXINFO cbi;
+				cbi.cbSize = sizeof(COMBOBOXINFO);
+				HWND hComboBox = GetDlgItem(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN);
+				GetComboBoxInfo(hComboBox, &cbi);
+				HWND hEdit = cbi.hwndItem;
+				SetWindowLongPtrW(hEdit, GWL_STYLE, GetWindowLongPtrW(hEdit, GWL_STYLE) | ES_NUMBER);
 			}
 
 			return TRUE;
@@ -201,6 +216,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 
 						return TRUE;
 					}
+					HistoryStoreAddTop(hs, filename, FALSE);
 
 					data->filename = filename;
 					data->binary = IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_CHECK_BINARY) == BST_CHECKED ? TRUE : FALSE;
@@ -285,8 +301,13 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 
 INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data)
 {
+	if (hs == NULL) {
+		hs = HistoryStoreCreate(20);
+	}
+
 	BOOL skip_dialog = data->skip_dialog;
 	if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0) {
+		// CTRL が押されていた時、逆の動作となる
 		skip_dialog = !skip_dialog;
 	}
 
@@ -301,7 +322,19 @@ INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data)
 		BOOL Ok = SelectFile(hWndParent, data, filename_ini, &filename);
 		if (Ok) {
 			data->filename = filename;
+			return (INT_PTR)IDOK;
 		}
-		return Ok ? (INT_PTR)IDOK : (INT_PTR)IDCANCEL;
+		else {
+			data->filename = NULL;
+			return (INT_PTR)IDCANCEL;
+		}
+	}
+}
+
+void sendfiledlgUnInit(void)
+{
+	if (hs != NULL) {
+		HistoryStoreDestroy(hs);
+		hs = NULL;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * (C) 2023- TeraTerm Project
+ * Copyright (C) 2024- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,16 +28,25 @@
 
 #pragma once
 
-#include "filesys_log.h"	// for LogCode_t
+#include <windows.h>
 
-typedef struct {
-	wchar_t *filename;		// [in] ファイル名初期値(NULL=default) [out] 入力ファイル名、free()すること
-	BOOL append;			// TRUE/FALSE = append/new(overwrite)
-	BOOL bom;				// TRUE = BOMあり
-	LogCode_t code;
-	TTTSet *pts;
-	TComVar *pcv;
-} FLogDlgInfo_t;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-BOOL FLogOpenDialog(HINSTANCE hInst, HWND hWnd, FLogDlgInfo_t *info);
-void FLogOpenDialogUnInit(void);
+typedef struct HistoryStoreTag HistoryStore;
+
+HistoryStore *HistoryStoreCreate(size_t max);
+void HistoryStoreDestroy(HistoryStore *h);
+void HistoryStoreClear(HistoryStore *h);
+BOOL HistoryStoreAddTop(HistoryStore *h, const wchar_t *add_str, BOOL enable_duplicate);
+void HistoryStoreReadIni(HistoryStore *h, const wchar_t *FName, const wchar_t *section, const wchar_t *key);
+void HistoryStoreSaveIni(HistoryStore *h, const wchar_t *FName, const wchar_t *section, const wchar_t *key);
+void HistoryStoreSetControl(HistoryStore *h, HWND dlg, int dlg_item);
+void HistoryStoreGetControl(HistoryStore *h, HWND dlg, int dlg_item);
+const wchar_t *HistoryStoreGet(HistoryStore *h, size_t index);
+void HistoryStoreSet(HistoryStore *h, size_t index, const wchar_t *str);
+
+#ifdef __cplusplus
+}
+#endif
