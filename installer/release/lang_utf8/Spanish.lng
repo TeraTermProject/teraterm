@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Spanish
-date=2024-11-16 by TeraTerm Project
+date=2025-01-01 by TeraTerm Project
 contributor=Filiberto Olguin Ascona (2022-05-26)
 
 [Tera Term]
@@ -419,8 +419,8 @@ DLG_TCPIP_DOWN=&Down
 DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=Host &list
 DLG_TCPIP_HISTORYTITLE=History
-DLG_TCPIP_HISTORY=Save h&istory when new connection
-DLG_TCPIP_EDITHISTORY=Edit history
+DLG_TCPIP_HISTORY=Add host l&ist when new connection
+DLG_TCPIP_EDITHISTORY=Edit host list
 DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_PORT=&Port#:
 DLG_TCPIP_KEEPALIVE=&Keep alive on Telnet
@@ -761,7 +761,7 @@ MSG_FWD_DYNAMIC=Local "%s" port %s to remote dynamic
 ; dlg host
 DLG_HOST_TITLE=Tera Term: New connection
 DLG_HOST_TCPIPHOST=Hos&t:
-DLG_HOST_TCPIPHISTORY=Hist&ory
+DLG_HOST_TCPIPHISTORY=Add h&ost list
 DLG_HOST_TCPIPSERVICE=Service
 DLG_HOST_TCPIPOTHER=Other
 DLG_HOST_TCPIPPORT=TCP &port#:

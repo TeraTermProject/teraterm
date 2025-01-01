@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2024-11-16 by TeraTerm Project
+date=2025-01-01 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -419,8 +419,8 @@ DLG_TCPIP_DOWN=아래(&D)
 DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=호스트 목록(&L)
 DLG_TCPIP_HISTORYTITLE=이력
-DLG_TCPIP_HISTORY=Save h&istory when new connection
-DLG_TCPIP_EDITHISTORY=Edit history
+DLG_TCPIP_HISTORY=Add host l&ist when new connection
+DLG_TCPIP_EDITHISTORY=Edit host list
 DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_PORT=포트#(&P):
 DLG_TCPIP_KEEPALIVE=연결유지(&K)
@@ -764,7 +764,7 @@ MSG_FWD_DYNAMIC=Local "%s" port %s to remote dynamic
 ; dlg host
 DLG_HOST_TITLE=Tera Term: 새 연결
 DLG_HOST_TCPIPHOST=호스트(&T):
-DLG_HOST_TCPIPHISTORY=기록(&O)
+DLG_HOST_TCPIPHISTORY=Add h&ost list
 DLG_HOST_TCPIPSERVICE=서비스
 DLG_HOST_TCPIPOTHER=Other
 DLG_HOST_TCPIPPORT=TCP 포트#(&P):

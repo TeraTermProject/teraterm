@@ -84,25 +84,14 @@ static void ModifyListboxHScrollWidth(HWND dlg, int dlg_item)
 }
 
 /**
- *	リストボックス(ホスト履歴)をファイルに書き出す
- */
-static void WriteListBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar_t *SetupFNW)
-{
-	HistoryStore *hs = HistoryStoreCreate(maxhostlist);
-	HistoryStoreGetControl(hs, dlg, dlg_item);
-	HistoryStoreSaveIni(hs, SetupFNW, L"Hosts", L"host");
-	HistoryStoreDestroy(hs);
-}
-
-/**
  *	Up/Remove/Downボタンをenable/disableする
  */
 static void TCPIPDlgButtons(HWND Dialog)
 {
 	LRESULT item_count;
 	LRESULT cur_pos;
-	item_count = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCOUNT, 0, 0);
-	cur_pos = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
+	item_count = SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_GETCOUNT, 0, 0);
+	cur_pos = SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
 	if ((cur_pos == LB_ERR) || (item_count == LB_ERR)) {
 		DisableDlgItem(Dialog, IDC_TCPIPUP, IDC_TCPIPDOWN);
 	}
@@ -126,12 +115,12 @@ static void TCPIPDlgButtons(HWND Dialog)
 typedef struct {
 	ReiseDlgHelper_t *resize_helper;
 	const EditHistoryDlgData *parent_data;
+	HistoryStore *hs;
 } DlgData;
 
 static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
-		//{ 0, "DLG_TCPIP_TITLE" },
 		{ IDC_TCPIPADD, "DLG_TCPIP_ADD" },
 		{ IDC_TCPIPUP, "DLG_TCPIP_UP" },
 		{ IDC_TCPIPREMOVE, "DLG_TCPIP_REMOVE" },
@@ -155,17 +144,18 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	switch (Message) {
 		case WM_INITDIALOG: {
 			DlgData *data = (DlgData *)lParam;
-			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
+			SetWindowLongPtrW(Dialog, DWLP_USER, lParam);
 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), data->parent_data->UILanguageFileW);
+			SetWindowTextW(Dialog, data->parent_data->title);
 
-			SendDlgItemMessage(Dialog, IDC_TCPIPHOST, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
+			SendDlgItemMessageW(Dialog, IDC_TCPIPHOST, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
 
-			SetComboBoxHostHistory(Dialog, IDC_TCPIPLIST, MAXHOSTLIST, data->parent_data->SetupFNameW);
+			HistoryStoreSetControl(data->hs, Dialog, IDC_TCPIPLIST);
 			ModifyListboxHScrollWidth(Dialog, IDC_TCPIPLIST);
 
 			/* append a blank item to the bottom */
-			SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_ADDSTRING, 0, 0);
+			SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_ADDSTRING, 0, 0);
 
 			data->resize_helper = ReiseHelperInit(Dialog, TRUE, resize_info, _countof(resize_info));
 
@@ -177,8 +167,8 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK: {
-					DlgData *data = (DlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
-					WriteListBoxHostHistory(Dialog, IDC_TCPIPLIST, MAXHOSTLIST, data->parent_data->SetupFNameW);
+					DlgData *data = (DlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
+					HistoryStoreGetControl(data->hs, Dialog, IDC_TCPIPLIST);
 					EndDialog(Dialog, 1);
 					return TRUE;
 				}
@@ -205,7 +195,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					hGetDlgItemTextW(Dialog, IDC_TCPIPHOST, &host);
 					if (wcslen(host) > 0) {
 						LRESULT cur_pos;
-						cur_pos = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
+						cur_pos = SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
 						if (cur_pos == LB_ERR) {
 							cur_pos = 0;
 						}
@@ -258,13 +248,13 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					LRESULT item_count;
 					LRESULT cur_pos;
 					wchar_t *host;
-					item_count = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCOUNT, 0, 0);
-					cur_pos = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
+					item_count = SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_GETCOUNT, 0, 0);
+					cur_pos = SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
 					if ((item_count == LB_ERR) || (cur_pos == LB_ERR)) {
 						return TRUE;
 					}
 					GetDlgItemIndexTextW(Dialog, IDC_TCPIPLIST, cur_pos, &host);
-					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_DELETESTRING, cur_pos, 0);
+					SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_DELETESTRING, cur_pos, 0);
 					ModifyListboxHScrollWidth(Dialog, IDC_TCPIPLIST);
 					if (item_count - 1 == 0) {
 						// 0個になった
@@ -283,7 +273,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					break;
 				}
 				case IDC_TCPIPHELP: {
-					DlgData *data = (DlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+					DlgData *data = (DlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
 					PostMessage(data->parent_data->vtwin, WM_USER_DLGHELP2,
 								HlpMenuSetupAdditionalTCPIPEditHistory, 0);
 					break;
@@ -292,19 +282,19 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			break;
 
 		case WM_SIZE: {
-			DlgData *data = (DlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+			DlgData *data = (DlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
 			ReiseDlgHelper_WM_SIZE(data->resize_helper);
 			break;
 		}
 
 		case WM_GETMINMAXINFO: {
-			DlgData *data = (DlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+			DlgData *data = (DlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
 			ReiseDlgHelper_WM_GETMINMAXINFO(data->resize_helper, lParam);
 			break;
 		}
 
 		case WM_DESTROY: {
-			DlgData *data = (DlgData *)GetWindowLongPtr(Dialog, DWLP_USER);
+			DlgData *data = (DlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
 			ReiseDlgHelperDelete(data->resize_helper);
 			data->resize_helper = NULL;
 			break;
@@ -317,13 +307,26 @@ BOOL EditHistoryDlg(HINSTANCE hInstance, HWND WndParent, EditHistoryDlgData *par
 {
 	BOOL r;
 	DlgData *data = (DlgData *)calloc(1, sizeof(*data));
+	if (data == NULL) {
+		return FALSE;
+	}
 	if (hInstance == NULL) {
-		HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(WndParent, GWLP_HINSTANCE);
+		hInstance = (HINSTANCE)GetWindowLongPtrW(WndParent, GWLP_HINSTANCE);
 	}
 	data->parent_data = parent_data;
+
+	// TERATERM.INI の Hosts セクション読み込み
+	data->hs = HistoryStoreCreate(MAXHOSTLIST);
+	HistoryStoreReadIni(data->hs, parent_data->SetupFNameW, L"Hosts", L"host");
+
 	r= (BOOL)TTDialogBoxParam(hInstance,
 							  MAKEINTRESOURCEW(IDD_EDITHISTORYDLG),
 							  WndParent, TCPIPDlg, (LPARAM)data);
+	if (r == TRUE) {
+		// TERATERM.INI へ書き出し
+		HistoryStoreSaveIni(data->hs, parent_data->SetupFNameW, L"Hosts", L"host");
+	}
+	HistoryStoreDestroy(data->hs);
 	free(data);
 	return r;
 }

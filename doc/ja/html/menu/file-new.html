@@ -21,14 +21,9 @@
     <dl>
       <dt id="Host">Host</dt>
       <dd>
-	接続するホスト名または IP address(IPv4 &amp; IPv6) 、名前付きパイプをキーボードで入力して指定するか、
-	リストの中から選択してください。リストを編集するには
-	<a href="setup-additional-tcpip.html#EditHistory">[Setup] Additional Setting の TCP/IP タブの履歴編集</a> 又は、リストの "&lt; Edit History... &gt;" を選択してください。<br>
+	接続するホスト名または IP address(IPv4 &amp; IPv6) 、名前付きパイプを入力します。<br>
 	IPv6アドレスは角括弧（大括弧）で囲みます（<a href="http://tools.ietf.org/html/rfc3986" target="_blank">RFC3986</a> / <a href="http://tools.ietf.org/html/rfc5952#section-6" target="_blank">RFC5952</a> 参照）。<br>
-	また、ホスト名だけでなく以下のような、
-	<a href="../commandline/teraterm.html">コマンドライン</a>
-	文字列を指定することもできます。<br>
-
+	また、ホスト名だけでなく以下のような、<a href="../commandline/teraterm.html">コマンドライン</a>文字列を指定することもできます。
     <pre>
     myhost.example.com                  通常はホスト名または IP address だけ
     myhost.example.com:23               ホスト名とポート番号
@@ -42,14 +37,50 @@
     \\.\pipe\vmware-serial-port         名前付きパイプへの接続
     </pre>
 
-    このエディットコントロールでは、Ctrl+a(キャレットを先頭へ移動) Ctrl+e(キャレットを最後尾へ移動) Ctrl+b(キャレットを1文字後ろへ移動) Ctrl+f(キャレットを1文字前へ移動) Ctrl+n(1つ下のHost設定を選択) Ctrl+p(1つ上のHost設定を選択) Ctrl+d(一文字削除) Ctrl+k(行末まで削除) Ctrl+u(行頭まで削除) を使うことができます。
+    <dl>
+      <dt id="HostList">Host List</dt>
+      <dd>
+        ドロップダウンを使用してホストリストからホスト(コマンドライン)を選択することができます。<br>
+        ホストリストは次の方法で編集することができます。
+        <ul>
+          <li><a href="setup-additional-tcpip.html#EditHistory">[Setup] Additional Setting の TCP/IP タブのホストリストの編集</a></li>
+          <li>ドロップダウンから "&lt; Edit host list... &gt;" を選択</li>
+        </ul>
+        Windowsのジャンプリストでもホストリストが表示されます(Windows 10,11 では既定でジャンプリストは表示されません)。<br>
+        ホストリストは <a href="../setup/teraterm-ini.html#HostList">TERATERM.INI の Hosts セクション</a>に保存されています。
       </dd>
+      <dt id="keybind">keybind</dt>
+      <dd>
+        このエディットコントロールでは、次のキーを使用できます。
+        <dl>
+          <dt>Ctrl+a</dt>
+          <dd>キャレットを先頭へ移動</dd>
+          <dt>Ctrl+e</dt>
+          <dd>キャレットを最後尾へ移動</dd>
+          <dt>Ctrl+b</dt>
+          <dd>キャレットを1文字後ろへ移動</dd>
+          <dt>Ctrl+f</dt>
+          <dd>キャレットを1文字前へ移動</dd>
+          <dt>Ctrl+n</dt>
+          <dd>1つ下のHost設定を選択</dd>
+          <dt>Ctrl+p</dt>
+          <dd>1つ上のHost設定を選択</dd>
+          <dt>Ctrl+d</dt>
+          <dd>一文字削除</dd>
+          <dt>Ctrl+k</dt>
+          <dd>行末まで削除</dd>
+          <dt>Ctrl+u</dt>
+          <dd>行頭まで削除</dd>
+        </dl>
+      </dd>
+    </dl>
 
-      <dt>History</dt>
+      <dt>Add host list</dt>
       <dd>
         TTSSH 有効時に表示されます。<br>
-        このオプションを選択すると入力したホスト名は、対象のホストへ接続しようとした場合にホストリストの先頭に追加されます。<br>
-        このチェックボックスは <a href="setup-additional-tcpip.html">[Setup] メニュー</a> の <a href="setup-additional-tcpip.html#HistoryList">History</a> の機能を利用します。
+        このオプションを選択すると、対象のホストへ接続しようとした時に、入力したホスト名がホストリストの先頭に追加されます。<br>
+        ホストリストに存在している場合は、先頭に移動します。<br>
+        <a href="setup-additional-tcpip.html">Additional settings / "TCP/IP" タブ</a> の <a href="setup-additional-tcpip.html#HistoryList">Add host list when new connection</a> がこのチェックボックスの初期値となります。
       </dd>
 
       <dt>Telnet</dt>
