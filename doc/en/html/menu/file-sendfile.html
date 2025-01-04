@@ -33,20 +33,40 @@
         By dropping a file into dialog, You can also enter file name.
       </dd>
 
-      <dt id="Method4">Send in same way as Tera Term 4</dt>
+      <dt id="Sequential">File reading method</dt>
       <dd>
-          <dl>
-              <dt>Checked(same way as Tera Term 4)</dt>
-              <dd>
-                  Send while reading from a file.<br>
-                  Textfile is read as ACP encoding and is not automatically determined.
-              </dd>
-              <dt>Unchecked</dt>
-              <dd>
-                  File is read into memory and then sent.<br>
-                  Encoding of text files is automatically determined.
-              </dd>
-          </dl>
+        How to read file to be sent.
+        <dl>
+          <dt>Bulk read</dt>
+          <dd>
+            <ul>
+              <li>Entire file is read into memory before sending.</li>
+              <ul>
+                <li>When file is large, it may not be readable.</li>
+                <li>Transmission processing is faster than sequential reading..</li>
+                <li>Delay setting can be used to adjust transmission speed.</li>
+              </ul>
+              <li>Encoding of text files is automatically detected.</li>
+              <li>This method is implemented in Tera Term 5.</li>
+            </ul>
+          </dd>
+          <dt>Sequential read</dt>
+          <dd>
+            <ul>
+              <li>Reads 1 byte at a time from a file, and sends it.</li>
+              <ul>
+                <li>Large file can be sent without consuming memory.</li>
+                <li>Send in bulk(8Ki byte) under specific conditions (<a href="../setup/teraterm-trans.html#FileSendHighSpeedMode">High Speed File Transfer on Serial Connection</a>).</li>
+              </ul>
+              <li>Text files are read as ACP and encoding is not automatically detected.</li>
+              <ul>
+                <li>UTF-8 files cannot be handled correctly.</li>
+              </ul>
+              <li>Delay settings are not available.</li>
+              <li>This sending method is same as that of Tera Term 4.</li>
+            </ul>
+          </dd>
+        </dl>
       </dd>
 
       <dt id="Binary">Binary</dt>
@@ -56,47 +76,53 @@
 	characters (except TAB, LF and CR) are stripped out.
       </dd>
 
-      <dt id="DelayType">delay type</dt>
+      <dt>Delay setting</dt>
       <dd>
+        Delay settings are available when bulk read.
         <dl>
-          <dt>no delay</dt>
+          <dt id="DelayType">delay type</dt>
           <dd>
-            Without delay processing
+            <dl>
+              <dt>no delay</dt>
+              <dd>
+                Without delay processing
+              </dd>
+
+              <dt>per character</dt>
+              <dd>
+                Delay processing for each character
+              </dd>
+
+              <dt>per line</dt>
+              <dd>
+                Delay processing for each line.
+              </dd>
+
+              <dt>per sendsize</dt>
+              <dd>
+                Delay processing for each specified transmission size.
+              </dd>
+            </dl>
+
           </dd>
 
-          <dt>per character</dt>
+          <dt id="Size">send size</dt>
           <dd>
-            Delay processing for each character
+            Send size (valid when delay type is "per sendsize")
           </dd>
 
-          <dt>per line</dt>
+          <dt id="DelayTick">delay time(ms)</dt>
           <dd>
-            Delay processing for each line.
-          </dd>
-
-          <dt>per sendsize</dt>
-          <dd>
-            Delay processing for each specified transmission size.
+            Delay time (valid when delay type is not "no delay")
           </dd>
         </dl>
-
-      </dd>
-
-      <dt id="Size">send size</dt>
-      <dd>
-        Send size (valid when delay type is "per sendsize")
-      </dd>
-
-      <dt id="DelayTick">delay time(ms)</dt>
-      <dd>
-        Delay time (valid when delay type is not "no delay")
       </dd>
     </dl>
 
     <h3 id="SpecialOption">Special options in the Tera Term setup file</h3>
     See also the following settings
     <ul>
-      <li><a href="../setup/teraterm-trans.html#FileSendHighSpeedMode">High Speed File Transfer on Serial Connection (When [same way as Tera Term 4]=on)</a>
+      <li><a href="../setup/teraterm-trans.html#FileSendHighSpeedMode">High Speed File Transfer on Serial Connection (When sequential read)</a>
       <li><a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">Skip Send file dialog</a>
     </ul>
 

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2024-11-16 by TeraTerm Project
+date=2025-01-04 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -590,8 +590,11 @@ MSG_INI_ERROR=Tera Term: エラー
 MSG_INI_WRITE_ERROR=iniファイルに書き込みができません
 
 ; sendfile
-DLG_SENDFILE_TERATERM4=Tera Term 4と同じ方法で送信
-DLG_SENDFILE_TERATERM4_TOOLTIP=Tera Term 4の場合\n・ファイルから読み込みながら送信する\n・テキストファイルはACPとして読み込み,エンコードは自動判定されない\nTera Term 5の場合\n・ファイルをメモリに読み込んでから送信する\n・テキストファイルのエンコードは自動判定される
+DLG_SENDFILE_READING_METHOD_TITLE=ファイルの読み込み方法
+DLG_SENDFILE_READING_METHOD_BULK=バルク(一括)読み込み(&U)
+DLG_SENDFILE_READING_METHOD_SEQUENTIAL=シーケンシャル(逐次)読み込み(&Q)
+DLG_SENDFILE_READING_METOHD_TOOLTIP=Bulk read:\n・ファイルをメモリに読み込んでから送信する\n・テキストファイルのエンコードは自動判定される\nSequential read:\n・ファイルから読み込みながら送信する\n・テキストファイルはACPとして読み込み,エンコードは自動判定されない
+DLG_SENDFILE_BINARY=バイナリ(&B)
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=プレビュー/ファイル

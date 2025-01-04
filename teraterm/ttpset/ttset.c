@@ -2014,7 +2014,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		(_stricmp(Temp, "PerSendSize") == 0) ? 3 : /*NoDelay*/ 0;
 	ts->SendfileDelayTick = GetPrivateProfileInt(Section, "SendfileDelayTick", 0, FName);
 	ts->SendfileSize = GetPrivateProfileInt(Section, "SendfileSize", 4096, FName);
-	ts->SendfileMethod4 = GetOnOff(Section, "SendfileMethod4", FName, FALSE);
+	ts->SendfileSequential = GetOnOff(Section, "SendfileSequential", FName, FALSE);
 	ts->SendfileSkipOptionDialog = GetOnOff(Section, "SendfileSkipOptionDialog", FName, FALSE);
 
 	// Experimental
@@ -3282,7 +3282,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 							  FName);
 	WriteInt(Section, "SendfileDelayTick", FName, ts->SendfileDelayTick);
 	WriteInt(Section, "SendfileSize", FName, ts->SendfileSize);
-	WriteOnOff(Section, "SendfileMethod4", FName, ts->SendfileMethod4);
+	WriteOnOff(Section, "SendfileSequential", FName, ts->SendfileSequential);
 	WriteOnOff(Section, "SendfileSkipOptionDialog", FName, ts->SendfileSkipOptionDialog);
 }
 

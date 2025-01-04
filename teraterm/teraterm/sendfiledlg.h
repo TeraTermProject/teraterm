@@ -47,7 +47,7 @@ typedef struct {
 	SendMemDelayType delay_type;
 	DWORD delay_tick;
 	size_t send_size;
-	BOOL method_4;					// Tera Term 4 のルーチンを使用する
+	BOOL sequential_read;			// Tera Term 4 のルーチンを使用する
 	// out
 	wchar_t *filename;				// IDOK時、選択ファイル名が返る,使用後free()すること
 } sendfiledlgdata;

@@ -30,24 +30,44 @@
     <dl>
       <dt>File Name</dt>
       <dd>
-	送信するファイルのファイル名を入力または選択してください。<br>
+    送信するファイルのファイル名を入力または選択してください。<br>
     ダイアログにファイルをドロップすることでファイル名を入力することもできます。
       </dd>
 
-      <dt id="Method4">Tera Term 4 と同じ方法で送信</dt>
+      <dt id="Sequential">ファイルの読み込み方法</dt>
       <dd>
-          <dl>
-              <dt>チェックを入れたとき(Tera Term 4 と同じ方法)</dt>
-              <dd>
-                  ファイルから読み込みながら送信します。<br>
-                  テキストファイルはACPとして読み込み、エンコードは自動判定されません。
-              </dd>
-              <dt>チェックを外した時</dt>
-              <dd>
-                  ファイルをメモリに読み込んでから送信します。<br>
-                  テキストファイルのエンコードは自動判定します。
-              </dd>
-          </dl>
+        送信するファイルの読み込み方法
+        <dl>
+          <dt>一括読み込み</dt>
+          <dd>
+            <ul>
+              <li>ファイル全体をメモリに読み込んでから送信します。</li>
+              <ul>
+                <li>ファイルが大きいと読み込めない可能性があります。</li>
+                <li>送信処理は逐次読み込みより高速になります。</li>
+                <li>ディレイ設定を行って送信速度を調整できます。</li>
+              </ul>
+              <li>テキストファイルのエンコードは自動判定します。</li>
+              <li>Tera Term 5 で実装された方法です</li>
+            </ul>
+          </dd>
+          <dt>逐次読み込み</dt>
+          <dd>
+            <ul>
+              <li>ファイルから1byteずつ読み込みながら送信します。</li>
+              <ul>
+                <li>メモリを消費せずに大きなファイルを送信可能です。</li>
+                <li>特定の条件下でデータをまとめて(8Ki byte)送信します(<a href="../setup/teraterm-trans.html#FileSendHighSpeedMode">シリアル接続における高速なファイル転送</a>)。</li>
+              </ul>
+              <li>テキストファイルはACPとして読み込み、エンコードは自動判定されません。</li>
+              <ul>
+                <li>UTF-8のファイルを正しく扱うことはできません。</li>
+              </ul>
+              <li>ディレイ設定は行えません。</li>
+              <li>Tera Term 4 の Send file と同じ方法です。</li>
+            </ul>
+          </dd>
+        </dl>
       </dd>
 
       <dt id="Binary">Binary</dt>
@@ -57,40 +77,46 @@
 	TAB ($09), LF ($0A), CR ($0D)以外の制御文字は送信されません。
       </dd>
 
-      <dt id="DelayType">delay type</dt>
+      <dt>ディレイ設定</dt>
       <dd>
+        ファイル一括読み込み時のみ使用可能です。
         <dl>
-          <dt>no delay</dt>
+          <dt id="DelayType">delay type</dt>
           <dd>
-            ディレイ処理なし
+            <dl>
+              <dt>no delay</dt>
+              <dd>
+                ディレイ処理なし
+              </dd>
+
+              <dt>per character</dt>
+              <dd>
+                1文字毎にディレイ処理を行う
+              </dd>
+
+              <dt>per line</dt>
+              <dd>
+                1行毎にディレイ処理を行う
+              </dd>
+
+              <dt>per sendsize</dt>
+              <dd>
+                指定送信文字毎にディレイ処理を行う
+              </dd>
+            </dl>
+
           </dd>
 
-          <dt>per character</dt>
+          <dt id="Size">send size</dt>
           <dd>
-            1文字毎にディレイ処理を行う
+            送信サイズ(delay typeが "per sendsize"のとき有効)
           </dd>
 
-          <dt>per line</dt>
+          <dt id="DelayTick">delay time(ms)</dt>
           <dd>
-            1行毎にディレイ処理を行う
-          </dd>
-
-          <dt>per sendsize</dt>
-          <dd>
-            指定送信文字毎にディレイ処理を行う
+            ディレイ時間(delay typeが "no delay"以外のとき有効)
           </dd>
         </dl>
-
-      </dd>
-
-      <dt id="Size">send size</dt>
-      <dd>
-        送信サイズ(delay typeが "per sendsize"のとき有効)
-      </dd>
-
-      <dt id="DelayTick">delay time(ms)</dt>
-      <dd>
-        ディレイ時間(delay typeが "no delay"以外のとき有効)
       </dd>
     </dl>
 
