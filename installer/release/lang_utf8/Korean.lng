@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2025-01-01 by TeraTerm Project
+date=2025-01-04 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -419,8 +419,8 @@ DLG_TCPIP_DOWN=아래(&D)
 DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=호스트 목록(&L)
 DLG_TCPIP_HISTORYTITLE=이력
-DLG_TCPIP_HISTORY=Add host l&ist when new connection
-DLG_TCPIP_EDITHISTORY=Edit host list
+DLG_TCPIP_HISTORY=Save h&istory when new connection
+DLG_TCPIP_EDITHISTORY=Edit history
 DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_PORT=포트#(&P):
 DLG_TCPIP_KEEPALIVE=연결유지(&K)
@@ -586,8 +586,11 @@ MSG_INI_ERROR=Tera Term: 오류
 MSG_INI_WRITE_ERROR=ini 파일을 저장할 수 없습니다.
 
 ; sendfile
-DLG_SENDFILE_TERATERM4=Send in same way as Tera Term 4
-DLG_SENDFILE_TERATERM4_TOOLTIP=Checked(same way as Tera Term 4)\n- Send while reading from a file.\n- Textfile is read as ACP encoding and is not automatically determined.\nUnchecked\n- File is read into memory and then sent.\n- Encoding of text files is automatically determined.\n
+DLG_SENDFILE_READING_METHOD_TITLE=File reading method
+DLG_SENDFILE_READING_METHOD_BULK=B&ulk read
+DLG_SENDFILE_READING_METHOD_SEQUENTIAL=Se&quential read
+DLG_SENDFILE_READING_METOHD_TOOLTIP=Bulk read:\n- Send while reading from a file.\n- Textfile is read as ACP encoding and is not automatically determined.\nSequencal read:\n- File is read into memory and then sent.\n- Encoding of text files is automatically determined.\n
+DLG_SENDFILE_BINARY=&Binary
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=Preview/File
@@ -764,7 +767,7 @@ MSG_FWD_DYNAMIC=Local "%s" port %s to remote dynamic
 ; dlg host
 DLG_HOST_TITLE=Tera Term: 새 연결
 DLG_HOST_TCPIPHOST=호스트(&T):
-DLG_HOST_TCPIPHISTORY=Add h&ost list
+DLG_HOST_TCPIPHISTORY=기록(&O)
 DLG_HOST_TCPIPSERVICE=서비스
 DLG_HOST_TCPIPOTHER=Other
 DLG_HOST_TCPIPPORT=TCP 포트#(&P):

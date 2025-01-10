@@ -614,7 +614,7 @@ struct tttset {
 	WORD SendfileDelayType;
 	WORD SendfileDelayTick;
 	DWORD SendfileSize;
-	WORD SendfileMethod4;
+	WORD SendfileSequential;
 	WORD SendfileSkipOptionDialog;
 
 	// Experimental

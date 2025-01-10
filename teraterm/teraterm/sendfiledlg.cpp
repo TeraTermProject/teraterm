@@ -62,7 +62,7 @@ static void ArrangeControls(HWND hDlgWnd)
 	LRESULT index = SendDlgItemMessageA(hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, CB_GETCURSEL, 0, 0);
 	SendMemDelayType sel = (SendMemDelayType)SendDlgItemMessageA(hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, CB_GETITEMDATA, (WPARAM)index, 0);
 
-	if (IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_CHECK_4) == BST_CHECKED) {
+	if (IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_RADIO_SEQUENTIAL) == BST_CHECKED) {
 		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTYPE_LABEL), FALSE);
 		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN), FALSE);
 		EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_SEND_SIZE_LABEL), FALSE);
@@ -114,14 +114,16 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "FILEDLG_TRANS_TITLE_SENDFILE" },
 		{ IDC_SENDFILE_FILENAME_TITLE, "DLG_SENDFILE_FILENAME_TITLE" },
-		{ IDC_SENDFILE_CHECK_BINARY, "DLG_FOPT_BINARY" },
+		{ IDC_SENDFILE_READING_METHOD_LABEL, "DLG_SENDFILE_READING_METHOD_TITLE" },
+		{ IDC_SENDFILE_RADIO_BULK, "DLG_SENDFILE_READING_METHOD_BULK" },
+		{ IDC_SENDFILE_RADIO_SEQUENTIAL, "DLG_SENDFILE_READING_METHOD_SEQUENTIAL" },
+		{ IDC_SENDFILE_CHECK_BINARY, "DLG_SENDFILE_BINARY" },
 		{ IDC_SENDFILE_DELAYTYPE_LABEL, "DLG_SENDFILE_DELAYTYPE_TITLE" },
 		{ IDC_SENDFILE_SEND_SIZE_LABEL, "DLG_SENDFILE_SEND_SIZE_TITLE" },
 		{ IDC_SENDFILE_DELAYTIME_LABEL, "DLG_SENDFILE_DELAYTIME_TITLE" },
-		{ IDC_SENDFILE_CHECK_4, "DLG_SENDFILE_TERATERM4" },
-		{ IDHELP, "BTN_HELP" },
-		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" },
+		{ IDHELP, "BTN_HELP" },
 	};
 	static const I18nTextInfo delaytype_list[] = {
 		{ "DLG_SENDFILE_DELAYTYPE_NO_DELAY", L"no delay", SENDMEM_DELAYTYPE_NO_DELAY },
@@ -163,16 +165,19 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 
 			SetDlgNum(hDlgWnd, IDC_SENDFILE_DELAYTIME_EDIT, data->delay_tick);
 			CheckDlgButton(hDlgWnd, IDC_SENDFILE_CHECK_BINARY, data->binary ? BST_CHECKED : BST_UNCHECKED);
-			CheckDlgButton(hDlgWnd, IDC_SENDFILE_CHECK_4, data->method_4 ? BST_CHECKED : BST_UNCHECKED);
+			CheckDlgButton(hDlgWnd,
+						   data->sequential_read == TRUE ? IDC_SENDFILE_RADIO_SEQUENTIAL : IDC_SENDFILE_RADIO_BULK,
+						   BST_CHECKED);
 
 			ArrangeControls(hDlgWnd);
 
 			TipWin2 *tip = TipWin2Create(NULL, hDlgWnd);
 			work->tip = tip;
 			wchar_t *text;
-			GetI18nStrWW("Tera Term", "DLG_SENDFILE_TERATERM4_TOOLTIP", NULL, data->UILanguageFileW, &text);
+			GetI18nStrWW("Tera Term", "DLG_SENDFILE_READING_METOHD_TOOLTIP", NULL, data->UILanguageFileW, &text);
 			if (text != NULL) {
-				TipWin2SetTextW(tip, IDC_SENDFILE_CHECK_4, text);
+				TipWin2SetTextW(tip, IDC_SENDFILE_RADIO_SEQUENTIAL, text);
+				TipWin2SetTextW(tip, IDC_SENDFILE_RADIO_BULK, text);
 				free(text);
 			}
 
@@ -224,7 +229,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 					data->delay_type = (SendMemDelayType)SendDlgItemMessageA(hDlgWnd, IDC_SENDFILE_DELAYTYPE_DROPDOWN, CB_GETITEMDATA, (WPARAM)index, 0);
 					data->delay_tick = GetDlgItemInt(hDlgWnd, IDC_SENDFILE_DELAYTIME_EDIT, NULL, FALSE);
 					data->send_size = GetDlgItemInt(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN, NULL, FALSE);
-					data->method_4 = IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_CHECK_4) == BST_CHECKED ? TRUE : FALSE;
+					data->sequential_read = IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_RADIO_SEQUENTIAL) == BST_CHECKED ? TRUE : FALSE;
 
 					TTEndDialog(hDlgWnd, IDOK);
 					return TRUE;
@@ -237,10 +242,6 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 				case IDCANCEL | (BN_CLICKED << 16):
 					data->filename = NULL;
 					TTEndDialog(hDlgWnd, IDCANCEL);
-					return TRUE;
-
-				case IDC_SENDFILE_CHECK_4 | (BN_CLICKED << 16):
-					ArrangeControls(hDlgWnd);
 					return TRUE;
 
 				case IDC_SENDFILE_FILENAME_BUTTON | (BN_CLICKED << 16): {
@@ -261,6 +262,12 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 				}
 
 				case IDC_SENDFILE_DELAYTYPE_DROPDOWN | (CBN_SELCHANGE << 16): {
+					ArrangeControls(hDlgWnd);
+					return TRUE;
+				}
+
+				case IDC_SENDFILE_RADIO_BULK | (BN_CLICKED << 16):
+				case IDC_SENDFILE_RADIO_SEQUENTIAL | (BN_CLICKED << 16): {
 					ArrangeControls(hDlgWnd);
 					return TRUE;
 				}

@@ -3976,7 +3976,7 @@ void CVTWindow::OnFileSend()
 	data.delay_type = (SendMemDelayType)ts.SendfileDelayType;
 	data.delay_tick = ts.SendfileDelayTick;
 	data.send_size = ts.SendfileSize;
-	data.method_4 = ts.SendfileMethod4;
+	data.sequential_read = ts.SendfileSequential;
 
 	INT_PTR ok = sendfiledlg(m_hInst, m_hWnd, &data);
 	free(initial_dir);
@@ -3989,10 +3989,10 @@ void CVTWindow::OnFileSend()
 	ts.SendfileDelayType = data.delay_type;
 	ts.SendfileDelayTick = data.delay_tick;
 	ts.SendfileSize = data.send_size;
-	ts.SendfileMethod4 = data.method_4;
+	ts.SendfileSequential = data.sequential_read;
 
 	wchar_t *filename = data.filename;
-	if (!data.method_4) {
+	if (!data.sequential_read) {
 		// new file send
 		SendMemSendFile(filename, data.binary, data.delay_type, data.delay_tick, data.send_size, ts.LocalEcho);
 	}
