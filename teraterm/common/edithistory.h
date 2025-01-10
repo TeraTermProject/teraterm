@@ -35,11 +35,21 @@ extern "C" {
 #endif
 
 typedef struct {
-	const wchar_t *UILanguageFileW;
-	const wchar_t *SetupFNameW;
-	HWND vtwin;
+	const wchar_t *UILanguageFileW;		// lngファイル
+	const wchar_t *SetupFNameW;			// TERATERM.INI
+	const wchar_t *title;				// タイトル
+	HWND vtwin;							// ヘルプを表示するため
 } EditHistoryDlgData;
 
+/**
+ *	ホストリストを編集する
+ *
+ *	@param		hInstance
+ *	@param		WndParent
+ *	@param		parent_data
+ *	@retval		TRUE		OK(編集した)
+ *	@retval		FALSE		Cancelした
+ */
 BOOL EditHistoryDlg(HINSTANCE hInstance, HWND WndParent, EditHistoryDlgData *parent_data);
 
 #ifdef __cplusplus

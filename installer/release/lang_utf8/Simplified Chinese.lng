@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2024-11-16 by TeraTerm Project
+date=2025-01-01 by TeraTerm Project
 contributor=LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -419,8 +419,8 @@ DLG_TCPIP_DOWN=下移(&D)
 DLG_TCPIP_TITLE=TCP/IP
 DLG_TCPIP_HOSTLIST=主机列表(&L)
 DLG_TCPIP_HISTORYTITLE=历史
-DLG_TCPIP_HISTORY=Save h&istory when new connection
-DLG_TCPIP_EDITHISTORY=Edit history
+DLG_TCPIP_HISTORY=Add host l&ist when new connection
+DLG_TCPIP_EDITHISTORY=Edit host list
 DLG_TCPIP_TELNET=T&elnet
 DLG_TCPIP_PORT=端口(&P)：
 DLG_TCPIP_KEEPALIVE=保持激活(&K)
@@ -764,7 +764,7 @@ MSG_FWD_DYNAMIC=Local "%s" port %s to remote dynamic
 ; dlg host
 DLG_HOST_TITLE=Tera Term：新建连接
 DLG_HOST_TCPIPHOST=主机(&T)：
-DLG_HOST_TCPIPHISTORY=历史(&O)
+DLG_HOST_TCPIPHISTORY=Add h&ost list
 DLG_HOST_TCPIPSERVICE=服务：
 DLG_HOST_TCPIPOTHER=其他
 DLG_HOST_TCPIPPORT=TCP端口(&P)：
