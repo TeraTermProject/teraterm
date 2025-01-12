@@ -2611,7 +2611,7 @@ static WORD TTLSetPassword(void)
 	// パスワードを暗号化する。
 	Encrypt(PassStr, Temp);
 
-	if (WritePrivateProfileString("Password", KeyStr, Temp, FileNameStr) != 0)
+	if (WritePrivateProfileStringW(L"Password", wc::fromUtf8(KeyStr), wc::fromUtf8(Temp), wc::fromUtf8(FileNameStr)) != 0)
 		result = 1;  /* success */
 
 	SetResult(result);  // 成功可否を設定する。
@@ -2654,7 +2654,7 @@ static WORD TTLSetPassword2(void)
 static WORD TTLIsPassword(void)
 {
 	TStrVal FileNameStr, KeyStr;
-	char Temp[512];
+	wchar_t Temp[512];
 	WORD Err;
 	int result = 0;
 
@@ -2674,8 +2674,8 @@ static WORD TTLIsPassword(void)
 	GetAbsPath(FileNameStr, sizeof(FileNameStr));
 
 	Temp[0] = 0;
-	GetPrivateProfileString("Password", KeyStr,"",
-	                        Temp, sizeof(Temp), FileNameStr);
+	GetPrivateProfileStringW(L"Password", wc::fromUtf8(KeyStr), L"",
+							 Temp, _countof(Temp), wc::fromUtf8(FileNameStr));
 	if (Temp[0] == 0) { // password not exist
 		result = 0;
 	} else {
