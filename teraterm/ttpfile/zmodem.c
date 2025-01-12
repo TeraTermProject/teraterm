@@ -880,6 +880,10 @@ static void ZParseRInit(PFileVarProto fv, PZVar zv)
 	/* file open */
 	zv->FileOpen = file->OpenRead(file, zv->FullName);
 
+	if ((zv->RxHdr[ZF0] & CANFDX) == 0) {
+		zv->WinSize = 0;
+	}
+
 	if (zv->CtlEsc) {
 		if ((zv->RxHdr[ZF0] & ESCCTL) == 0) {
 			zv->ZState = Z_SendInitHdr;
@@ -888,10 +892,6 @@ static void ZParseRInit(PFileVarProto fv, PZVar zv)
 		}
 	} else
 		zv->CtlEsc = (zv->RxHdr[ZF0] & ESCCTL) != 0;
-
-	if ((zv->RxHdr[ZF0] & CANFDX) == 0) {
-		zv->WinSize = 0;
-	}
 
 	Max = (zv->RxHdr[ZP1] << 8) + zv->RxHdr[ZP0];
 	if (Max <= 0)
