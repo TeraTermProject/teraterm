@@ -3587,9 +3587,7 @@ void CVTWindow::OnFileNewConnection()
 				(*AddHostToList)(ts.SetupFNameW, hostname);
 			}
 			if (ts.JumpList) {
-				char *HostNameA = ToCharW(hostname);
-				add_session_to_jumplist(HostNameA, GetHNRec.SetupFN);
-				free(HostNameA);
+				add_session_to_jumplist(hostname, GetHNRec.SetupFNW);
 			}
 			FreeTTSET();
 		}
