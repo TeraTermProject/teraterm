@@ -418,9 +418,7 @@ static const PROPERTYKEY PKEY_Title = {
 
 // LPCWSTR AppID = L"TeraTermProject.TeraTerm.ttermpro";
 
-static char *IniFile = NULL;
-
-BOOL isJumpListSupported(void)
+static BOOL isJumpListSupported(void)
 {
 	return IsWindows7OrLater();
 }
@@ -441,12 +439,12 @@ BOOL isJumpListSupported(void)
  * sessionname), and launch another app using e.g.
  * make_shell_link("puttygen.exe", NULL).
  */
-static IShellLink *make_shell_link(const char *appname,
-                                   const char *sessionname)
+static IShellLinkW *make_shell_link(const wchar_t *appname,
+                                    const wchar_t *sessionname)
 {
-	IShellLink *ret;
-	char *app_path, *param_string, *desc_string, *tmp_ptr;
-	static char tt_path[2048];
+	IShellLinkW *ret;
+	wchar_t *app_path, *param_string, *desc_string, *tmp_ptr;
+	static wchar_t tt_path[2048];
 	//void *psettings_tmp;
 	IPropertyStore *pPS;
 	PROPVARIANT pv;
@@ -454,24 +452,24 @@ static IShellLink *make_shell_link(const char *appname,
 
 	/* Retrieve path to executable. */
 	if (!tt_path[0])
-		GetModuleFileName(NULL, tt_path, sizeof(tt_path) - 1);
+		GetModuleFileNameW(NULL, tt_path, _countof(tt_path) - 1);
 
 	if (appname) {
 		size_t len;
-		tmp_ptr = strrchr(tt_path, '\\');
-		len = (tmp_ptr - tt_path) + strlen(appname) + 2;
-		app_path = malloc(len);
-		strncpy_s(app_path, len, tt_path, (tmp_ptr - tt_path + 1));
-		strcat_s(app_path, len, appname);
+		tmp_ptr = wcsrchr(tt_path, L'\\');
+		len = (tmp_ptr - tt_path) + wcslen(appname) + 2;
+		app_path = malloc(len * sizeof(wchar_t));
+		wcscpy_s(app_path, len, tt_path);
+		wcscat_s(app_path, len, appname);
 	}
 	else {
-		app_path = _strdup(tt_path);
+		app_path = _wcsdup(tt_path);
 	}
 
 	/* Create the new item. */
 	if (!SUCCEEDED(CoCreateInstance(&CLSID_ShellLink, NULL,
 		CLSCTX_INPROC_SERVER,
-		COMPTR(IShellLink, &ret))))
+		COMPTR(IShellLinkW, &ret))))
 		return NULL;
 
 	/* Set path, parameters, icon and description. */
@@ -481,7 +479,7 @@ static IShellLink *make_shell_link(const char *appname,
 		OutputDebugPrintf("SetPath failed. (%ld)\n", result);
 #endif
 
-	param_string = _strdup(sessionname);
+	param_string = _wcsdup(sessionname);
 	result = ret->lpVtbl->SetArguments(ret, param_string);
 #if _DEBUG
 	if (result != S_OK)
@@ -489,7 +487,7 @@ static IShellLink *make_shell_link(const char *appname,
 #endif
 	free(param_string);
 
-	desc_string = _strdup("Connect to Tera Term session");
+	desc_string = _wcsdup(L"Connect to Tera Term session");
 	result = ret->lpVtbl->SetDescription(ret, desc_string);
 #if _DEBUG
 	if (result != S_OK)
@@ -506,8 +504,8 @@ static IShellLink *make_shell_link(const char *appname,
 	/* To set the link title, we require the property store of the link. */
 	if (SUCCEEDED(ret->lpVtbl->QueryInterface(ret, COMPTR(IPropertyStore, &pPS)))) {
 		PropVariantInit(&pv);
-		pv.vt = VT_LPSTR;
-		pv.pszVal = _strdup(sessionname);
+		pv.vt = VT_LPWSTR;
+		pv.pwszVal = _wcsdup(sessionname);
 		result = pPS->lpVtbl->SetValue(pPS, &PKEY_Title, &pv);
 #if _DEBUG
 		if (result != S_OK)
@@ -526,18 +524,15 @@ static IShellLink *make_shell_link(const char *appname,
 #endif
 	}
 
+	(void)result;
 	free(app_path);
 
 	return ret;
 }
 
 /* Updates jumplist from registry. */
-static void update_jumplist_from_registry(void)
+static void update_jumplist_from_registry(const wchar_t *IniFile)
 {
-	char EntName[128];
-	char TempHost[1024];
-
-	const char *piterator = TempHost;
 	UINT num_items;
 	UINT nremoved;
 	int i;
@@ -549,7 +544,7 @@ static void update_jumplist_from_registry(void)
 	ICustomDestinationList *pCDL = NULL;
 	IObjectCollection *collection = NULL;
 	IObjectArray *array = NULL;
-	IShellLink *link = NULL;
+	IShellLinkW *link = NULL;
 	IObjectArray *pRemoved = NULL;
 	int need_abort = FALSE;
 
@@ -590,14 +585,17 @@ static void update_jumplist_from_registry(void)
 	 * one to the collection.
 	 */
 	for (i = 1; i <= MAX_JUMPLIST_ITEMS; i++) {
-		_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%d", i);
-		GetPrivateProfileString("Hosts", EntName, "", TempHost, sizeof(TempHost), IniFile);
-		if (strlen(TempHost) == 0) {
+		wchar_t EntName[128];
+		wchar_t TempHost[1024];
+		const wchar_t *piterator = TempHost;
+		_snwprintf_s(EntName, _countof(EntName), _TRUNCATE, L"Host%d", i);
+		GetPrivateProfileStringW(L"Hosts", EntName, L"", TempHost, _countof(TempHost), IniFile);
+		if (TempHost[0] == 0) {
 			break;
 		}
 
 #if _DEBUG
-		OutputDebugPrintf("%s\n", piterator);
+		OutputDebugPrintfW(L"%s\n", piterator);
 #endif
 		link = make_shell_link(NULL, piterator);
 		if (link) {
@@ -608,15 +606,15 @@ static void update_jumplist_from_registry(void)
 			 * Check that the link isn't in the user-removed list.
 			 */
 			for (j = 0, found = FALSE; j < nremoved && !found; j++) {
-				IShellLink *rlink;
+				IShellLinkW *rlink;
 				if (SUCCEEDED(pRemoved->lpVtbl->GetAt
-					(pRemoved, j, COMPTR(IShellLink, &rlink)))) {
-					char desc1[2048], desc2[2048];
+					(pRemoved, j, COMPTR(IShellLinkW, &rlink)))) {
+					wchar_t desc1[2048], desc2[2048];
 					if (SUCCEEDED(link->lpVtbl->GetDescription
-						(link, desc1, sizeof(desc1) - 1)) &&
+						(link, desc1, _countof(desc1) - 1)) &&
 						SUCCEEDED(rlink->lpVtbl->GetDescription
-							(rlink, desc2, sizeof(desc2) - 1)) &&
-						!strcmp(desc1, desc2)) {
+							(rlink, desc2, _countof(desc2) - 1)) &&
+						!wcscmp(desc1, desc2)) {
 						found = TRUE;
 					}
 					result = rlink->lpVtbl->Release(rlink);
@@ -747,6 +745,7 @@ static void update_jumplist_from_registry(void)
 		OutputDebugPrintf("CommitList failed. (%ld)\n", result);
 #endif
 	need_abort = FALSE;
+	(void)result;
 
 	/*
 	 * Clean up.
@@ -760,9 +759,10 @@ cleanup:
 	if (link) link->lpVtbl->Release(link);
 }
 
-void add_to_recent_docs(const char * const sessionname)
+#if 0
+static void add_to_recent_docs(const wchar_t * const sessionname)
 {
-    IShellLink *link = NULL;
+    IShellLinkW *link = NULL;
 
     link = make_shell_link(NULL, sessionname);
 
@@ -770,6 +770,7 @@ void add_to_recent_docs(const char * const sessionname)
 
     return;
 }
+#endif
 
 /* Clears the entire jumplist. */
 void clear_jumplist(void)
@@ -785,25 +786,25 @@ void clear_jumplist(void)
 }
 
 /* Adds a saved session to the Windows 7 jumplist. */
-void add_session_to_jumplist(const char * const sessionname, char *inifile)
+void add_session_to_jumplist(const wchar_t * const sessionname, const wchar_t *inifile)
 {
+	(void)sessionname;
 	if (!isJumpListSupported())
 		return;                        /* do nothing on pre-Win7 systems */
 
 	//    add_to_recent_docs(sessionname);
 
-	IniFile = inifile;
-
-	update_jumplist_from_registry();
+	update_jumplist_from_registry(inifile);
 	return;
 }
 
 /* Removes a saved session from the Windows jumplist. */
-void remove_session_from_jumplist(const char * const sessionname)
+void remove_session_from_jumplist(const wchar_t *const sessionname, const wchar_t *inifile)
 {
+	(void)sessionname;
 	if (!isJumpListSupported())
 		return;                        /* do nothing on pre-Win7 systems */
 
-	update_jumplist_from_registry();
+	update_jumplist_from_registry(inifile);
 	return;
 }

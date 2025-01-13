@@ -31,8 +31,8 @@ extern "C" {
 #endif
 
 void clear_jumplist(void);
-void add_session_to_jumplist(const char * const sessionname, char *inifile);
-void remove_session_from_jumplist(const char * const sessionname);
+void add_session_to_jumplist(const wchar_t * const sessionname, const wchar_t *inifile);
+void remove_session_from_jumplist(const wchar_t * const sessionname, const wchar_t *inifile);
 
 #ifdef __cplusplus
 }
