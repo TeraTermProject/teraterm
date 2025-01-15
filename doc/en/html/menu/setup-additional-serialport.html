@@ -11,56 +11,101 @@
   <body>
     <h1>Additional settings / "Serial port" tab ([Setup] menu)</h1>
 
+    <p>
+      Settings related to the serial port.
+
     <dl>
-
-      <dt id="OK">OK button</dt>
-      <dd>
-	The label of OK button is changed according to the connection state. <br>
-	    Connect with New window   ...  Serial connection is launched with new window since TCP/IP connection is using. <br>
-	    New open ...  Serial connection starts.<br>
-	    Close and New open  ... Current COM port is closed and serial connection starts with new COM port.<br>
-	    New setting  ... The setting of current COM port is changed.<br>
-      </dd>
-
       <dt id="ComPort">Port</dt>
       <dd>
-	Serial port to be used. By default, maximum serial port number in the list is 256. It is configurable in <a href="../setup/teraterm-com.html#maxport">MaxComPort</a> setting.
+        When the serial port is not connected,
+        Sets the default serial port for <a href="file-new.html#Port">New connection Dialog</a>.
+        A non existent serial port can be set.
+        New connection dialog does not show any non existent serial ports.<br>
+        By default, maximum serial port number in the list is 256. It is configurable in <a href="../setup/teraterm-com.html#maxport">MaxComPort</a> setting.
+        <p>
+          When the serial port is connected,
+          displays the serial port to which it is connected.
+        </p>
       </dd>
 
-      <dt id="Speed">Speed, Data, Parity, Stop bits, Flow control</dt>
+      <dt id="Speed">Serial parameters</dt>
       <dd>
-	Serial port parameters. Choose the appropriate parameters for
-	the modem or the host.
-	<p>
-	  The Speed can be specified with any number. Actually, the serial port driver may not reflect your speed.
-	</p>
-	<p>
-	  Flow control can be configured in the following:<br>
-	     Xon/Xoff  ...  Software flow<br>
-	     RTS/CTS  ... Hardware flow(RTS/CTS)<br>
-	     DSR/DTR  ... Hardware flow(DSR/DTR)<br>
-	     none  ...  No flow control<br>
-	</p>
-	<p>
-	  Note: If Data is 7 bit, the XMODEM, ZMODEM, B PLUS and Quick-VAN
-	  protocols are disabled. If Flow control is Xon/Xoff, the XMODEM
-	  and Quick-VAN protocols are disabled.
-	</p>
-	<p>
-	  Note: The "hardware" prior to version 4.104 applies to RTS/CTS.
-	</p>
+        Serial port parameters.
+        Choose the appropriate parameters for the modem or the host.<br>
+        Whether the selected or specified settings are actually applied depends on serial port chip or driver.
+
+        <p>
+          When the serial port is not connected,
+          Sets the parameters for connecting to the serial port.<br>
+          Use <a href="file-new.html">New connection</a> when connecting to a serial port.
+        </p>
+        <p>
+          When the serial port is connected,
+          Set parameters for the connected serial port.
+        </p>
+
+        <dl>
+          <dt id="Speed">Speed</dt>
+          <dd>
+            The Speed can be specified with any number.
+          </dd>
+
+          <dt>Data</dt>
+          <dd>
+            8 bit / 7 bit
+            <p>
+              Note: If Data is 7 bit, the XMODEM, ZMODEM, B PLUS and Quick-VAN
+              protocols are disabled.
+            </p>
+          </dd>
+
+          <dt>Parity</dt>
+          <dd>
+            none / odd / even / mark / space
+          </dd>
+
+          <dt>Stop bits</dt>
+          <dd>
+            1 bit / 2 bit
+          </dd>
+
+          <dt>Flow control</dt>
+          <dd>
+            <dl>
+              <dt>Xon/Xoff</dt>
+              <dd>
+                Software flow
+                <p>
+                  Note: If Flow control is Xon/Xoff, the XMODEM and Quick-VAN protocols are disabled.
+                </p>
+              </dd>
+              <dt>RTS/CTS</dt>
+              <dd>
+                Hardware flow(RTS/CTS)
+                <p>
+                  Note: The "hardware" prior to version 4.104 applies to RTS/CTS.
+                </p>
+              </dd>
+              <dt>DSR/DTR</dt><dd>Hardware flow(DSR/DTR)</dd>
+              <dt>none</dt><dd>No flow control<br>
+            </dl>
+
+          </dd>
+        </dl>
       </dd>
 
       <dt id="Delay">Transmit delay</dt>
       <dd>
-	Time intervals between characters (lines) being sent, in milliseconds.
+  Time intervals between characters (lines) being sent, in milliseconds.
+  The unit is milliseconds. You can set the wait time per character (line).
+  If the modem or host drops characters when Tera Term sends a large number of characters, try setting an appropriate delay time.
       </dd>
 
       <dt id="Information">Detail information of COM port</dt>
       <dd>
-	The detail information of selected port is shown in the text box. <br>
-	You can select all data by using CTRL+A.
-	You can scroll horizontally by using CTRL/SHIFT + wheel. 
+  The detail information of selected port is shown in the text box. <br>
+  You can select all data by using CTRL+A.
+  You can scroll horizontally by using CTRL/SHIFT + wheel.
       </dd>
 
     </dl>
