@@ -233,7 +233,7 @@ git push origin v5.0
       <li>Twitter (<a href="https://twitter.com/Tera_Term" target="_blank">https://twitter.com/Tera_Term</a>)</li>
     </ul>
   </li>
-  <li id="increment_version">バージョンをインクリメントする
+  <li id="increment_version">次のリリースに向けてバージョンをインクリメントする
     <ul>
       <li>
         teraterm/common/tt-version.h<br>
@@ -276,7 +276,30 @@ git push origin v5.0
       </li>
     </ul>
   </li>
-  <li>Chocolatey の登録を更新する</li>
+  <li>インストーラバイナリのダウンロードに関する確認をする
+    <p>
+      ダウンロードしたファイルを実行すると、SmartScreen が「WindowsによってPCが保護されました」という警告を出すことがある。<br>
+      これが解消されないと、窓の杜はインストーラを掲載しない。
+    </p>
+    <p>
+      Microsoft Edge でダウンロードすると、SmartScreen が「一般的にダウンロードされていません」という警告を出す。
+    </p>
+    <p>
+      ウイルス対策ソフトが誤検出することがある。<br>
+      keycode.exe がキーロガーとして検出されやすいらしい。
+    </p>
+    <p>
+      Microsoft には誤検出の申し立てができる。「PCが保護されました」の解消のため報告する。
+      <ul>
+        <li>Microsoft アカウントでログインする</li>
+        <li>https://www.microsoft.com/en-us/wdsi/filesubmission にアクセスする</li>
+        <li>"Software developer" を選んで報告する</li>
+      </ul>
+    </p>
+  </li>
+  <li>Chocolatey の登録を更新する
+    <p>ウイルス対策ソフトに検出されている状態だと登録が承認されず、同じバージョンを複数回登録できないので詰む。</p>
+  </li>
 </ol>
 
 <h2 id="code-freeze">コードフリーズについて</h2>
