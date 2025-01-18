@@ -534,7 +534,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 				}
 				break;
 			case NAK:
-				if (xv->PktNum == 0 && xv->PktNumOffset == 0) {
+				if ((xv->PktNum == 0) && (xv->PktNumOffset == 0) && (xv->PktNumSent == 0)) {
 					if (!is0x43Received) { //先にCRC要求'C'(0x43)を受け付けていた場合はCRCモードを維持。(CRCで送って受け付けなかった場合はNAKを送ってくるはずなのでCheckSumでの再送に切り替わる)
 						if (xv->XOpt == XoptCRC) {
 							// receiver wants to use checksum.
