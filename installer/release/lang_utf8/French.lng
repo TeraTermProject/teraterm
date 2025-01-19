@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2025-01-04 by TeraTerm Project
+date=2025-01-20 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -404,7 +404,6 @@ DLG_SERIAL_FLOW=Ctrl. de flux:
 DLG_SERIAL_DELAY=Délai de transmission
 DLG_SERIAL_DELAYCHAR=msec/&car
 DLG_SERIAL_DELAYLINE=msec/&ligne
-DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
 DLG_SERIAL_OK_CONNECTION=Connect with &New window
 DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open

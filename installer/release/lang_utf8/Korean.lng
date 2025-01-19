@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2025-01-04 by TeraTerm Project
+date=2025-01-20 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -403,7 +403,6 @@ DLG_SERIAL_FLOW=흐름제어(&F):
 DLG_SERIAL_DELAY=전송지연
 DLG_SERIAL_DELAYCHAR=msec/&char
 DLG_SERIAL_DELAYLINE=msec/&line
-DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
 DLG_SERIAL_OK_CONNECTION=Connect with &New window
 DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2025-01-04 by TeraTerm Project
+date=2025-01-20 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -403,7 +403,6 @@ DLG_SERIAL_FLOW=&Управление:
 DLG_SERIAL_DELAY=Задержка передачи
 DLG_SERIAL_DELAYCHAR=мс/&символ
 DLG_SERIAL_DELAYLINE=мс/&строка
-DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
 DLG_SERIAL_OK_CONNECTION=Connect with &New window
 DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2025-01-04 by TeraTerm Project
+date=2025-01-20 by TeraTerm Project
 contributor=LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -403,7 +403,6 @@ DLG_SERIAL_FLOW=流量控制(&F)：
 DLG_SERIAL_DELAY=传输延迟
 DLG_SERIAL_DELAYCHAR=毫秒/字符
 DLG_SERIAL_DELAYLINE=毫秒/行
-DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
 DLG_SERIAL_OK_CONNECTION=Connect with &New window
 DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open

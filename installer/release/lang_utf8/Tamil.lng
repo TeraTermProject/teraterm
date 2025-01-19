@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2025-01-04 by TeraTerm Project
+date=2025-01-20 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -403,7 +403,6 @@ DLG_SERIAL_FLOW=&ஓட்டம் கட்டுப்பாடு:
 DLG_SERIAL_DELAY=அனுப்பும் தாமதம்
 DLG_SERIAL_DELAYCHAR=மிநொடி/&எழுத்து
 DLG_SERIAL_DELAYLINE=மிநொடி/&வரி
-DLG_SERIAL_SPEED_TOOLTIP=நீங்கள் நேரடியாக எண்ணைக் குறிப்பிடலாம்
 DLG_SERIAL_OK_CONNECTION=&புதிய சாளரத்துடன் இணைக்கவும்
 DLG_SERIAL_OK_OPEN=&புதிய திறந்தது
 DLG_SERIAL_OK_CLOSEOPEN=மூடு மற்றும் &புதிய திற

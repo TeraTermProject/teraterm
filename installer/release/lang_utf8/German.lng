@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2025-01-04 by TeraTerm Project
+date=2025-01-20 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -403,7 +403,6 @@ DLG_SERIAL_FLOW=Flow control:
 DLG_SERIAL_DELAY=Transmit delay
 DLG_SERIAL_DELAYCHAR=msec/char
 DLG_SERIAL_DELAYLINE=msec/line
-DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
 DLG_SERIAL_OK_CONNECTION=Connect with &New window
 DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
