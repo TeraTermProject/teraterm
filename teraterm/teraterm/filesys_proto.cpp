@@ -791,12 +791,21 @@ void ProtoDlgTimeOut(void)
 	}
 }
 
+/**
+ *	ダイアログの "Cancel" が押された
+ */
 void ProtoDlgCancel(void)
 {
 	if (PtDlg!=NULL) {
 		PFileVarProto fv = FileVar;
+
+		// キャンセルが押されたことを通知する
 		fv->ProtoOp->Cancel(fv, &cv);
-		ProtoEnd();
+
+		if (ProtoId != PROTO_ZM) {
+			// ダイアログを閉じる
+			ProtoEnd();
+		}
 	}
 }
 
