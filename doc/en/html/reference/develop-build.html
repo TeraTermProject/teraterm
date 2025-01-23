@@ -66,6 +66,15 @@ If installer\release.bat cannot find a installed tool, copy installer\toolinfo_s
 And if necessary, copy buildtools\svnrev\toolinfo_sample.txt as buildtools\svnrev\toolinfo.txt, and edit it.
 </p>
 
+<p>
+If you run build.bat not via installer\release.bat (e.g. run makearchive.bat directly, makearchive.bat is run via Inno Setup Studio), set environment variable.
+</p>
+<pre>
+Example:
+VS170COMNTOOLS=C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools
+VS160COMNTOOLS=c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools
+</pre>
+
 <h2 id="build-quick">How to build (Quick Start)</h2>
 
 <h3 id="build-quick-checkout">Checkout source code</h3>
