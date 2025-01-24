@@ -128,6 +128,16 @@ static int XWrite(PFileVarProto fv, PXVar xv, PComVar cv, const void *_B, size_t
 	return i;
 }
 
+static void XFlushReceiveBuf(PFileVarProto fv, PXVar xv, PComVar cv)
+{
+	BYTE b;
+	int r;
+
+	do {
+		r = XRead1Byte(fv, xv, cv, &b);
+	} while (r != 0);
+}
+
 static void XSetOpt(PFileVarProto fv, PXVar xv, WORD Opt)
 {
 	char Tmp[21];
@@ -255,6 +265,7 @@ static BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		}
 		xv->FileSize = (LONG)size;
 		fv->InfoOp->InitDlgProgress(fv, &xv->ProgStat);
+		XFlushReceiveBuf(fv, xv, cv);
 	} else {
 		xv->FileOpen = file->OpenWrite(file, xv->FullName);
 		if (xv->FileOpen == FALSE) {
@@ -324,7 +335,7 @@ static void XCancel(PFileVarProto fv, PComVar cv)
 {
 	PXVar xv = fv->data;
 	// five cancels & five backspaces per spec
-	BYTE cancel[] = { CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS };
+	static const BYTE cancel[] = { CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS };
 
 	XWrite(fv,xv,cv, (PCHAR)&cancel, sizeof(cancel));
 	xv->XMode = 0;				// quit
@@ -523,7 +534,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 
 			switch (b) {
 			case ACK:
-					if (!xv->FileOpen) {
+				if (!xv->FileOpen) {
 					fv->Success = TRUE;
 					return FALSE;
 				} else if (xv->PktNumSent == (BYTE) (xv->PktNum + 1)) {
