@@ -60,6 +60,9 @@
 //#define ENABLE_SWITCH_PORT_DISPLAY	1
 #define ENABLE_SWITCH_PORT_DISPLAY	0
 
+// MaxComPortより大きなポートが存在するとき、MaxComPortをオーバーライドする
+#define ENABLE_MAXCOMPORT_OVERRIDE	0
+
 static const char *BaudList[] = {
 	"110","300","600","1200","2400","4800","9600",
 	"14400","19200","38400","57600","115200",
@@ -176,12 +179,14 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 	if (max_com < ts->ComPort) {
 		max_com = ts->ComPort;
 	}
+#if ENABLE_MAXCOMPORT_OVERRIDE
 	if (dlg_data->ComPortInfoCount != 0) {
 		int max_exist_port = dlg_data->ComPortInfoPtr[dlg_data->ComPortInfoCount-1].port_no;
 		if (max_com < max_exist_port) {
 			max_com = max_exist_port;
 		}
 	}
+#endif
 	if (dlg_data->ComPortInfoCount == 0) {
 		// ポートが存在していないときはすべて表示する
 		show_all_port = TRUE;
