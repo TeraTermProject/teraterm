@@ -308,20 +308,20 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 			}
 
 			// check status
-#if !defined(SUPPORT_OLD_WINDOWS)
-			ULONG status  = 0;
-			ULONG problem = 0;
-			CONFIGRET cr = CM_Get_DevNode_Status(&status, &problem, DeviceInfoData.DevInst, 0);
-			if (cr != CR_SUCCESS) {
-				free(class_str);
-				continue;
+			if (pCM_Get_DevNode_Status != NULL) {
+				ULONG status  = 0;
+				ULONG problem = 0;
+				CONFIGRET cr = pCM_Get_DevNode_Status(&status, &problem, DeviceInfoData.DevInst, 0);
+				if (cr != CR_SUCCESS) {
+					free(class_str);
+					continue;
+				}
+				if (problem != 0) {
+					// ‰½‚ç‚©‚Ì–â‘è‚ª‚ ‚Á‚½?
+					free(class_str);
+					continue;
+				}
 			}
-			if (problem != 0) {
-				// ‰½‚ç‚©‚Ì–â‘è‚ª‚ ‚Á‚½?
-				free(class_str);
-				continue;
-			}
-#endif
 
 			wchar_t *port_name;
 			if (!GetComPortName(hDevInfo, &DeviceInfoData, &port_name)) {

@@ -164,6 +164,12 @@ extern LONG_PTR (WINAPI *pGetWindowLongPtrW)(HWND hWnd, int nIndex);
 extern int (WINAPI *pGetSystemMetricsForDpi)(int  nIndex, UINT dpi);
 extern HDEVNOTIFY (WINAPI *pRegisterDeviceNotificationA)(HANDLE hRecipient, LPVOID NotificationFilter, DWORD Flags);
 extern BOOL (WINAPI *pUnregisterDeviceNotification)(HDEVNOTIFY Handle);
+extern HWINEVENTHOOK(WINAPI *pSetWinEventHook)(
+	DWORD eventMin, DWORD eventMax, HMODULE hmodWinEventProc,
+	WINEVENTPROC pfnWinEventProc, DWORD idProcess, DWORD idThread,
+	DWORD dwFlags);
+extern BOOL (WINAPI *pUnhookWinEvent)(HWINEVENTHOOK hWinEventHook);
+BOOL WINAPI _GetComboBoxInfo(HWND hWndCombo, PCOMBOBOXINFO info);
 
 // kernel32
 extern void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
@@ -242,11 +248,12 @@ extern BOOL (WINAPI *pSetupDiGetDeviceRegistryPropertyW)(
 	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
 	DWORD Property, PDWORD PropertyRegDataType,
 	PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize);
-BOOL _SetupDiGetDevicePropertyW(
-	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
-	const DEVPROPKEY *PropertyKey, DEVPROPTYPE *PropertyType,
-	PBYTE PropertyBuffer, DWORD PropertyBufferSize,
-	PDWORD RequiredSize, DWORD Flags);
+extern DWORD (WINAPI *pCM_Get_DevNode_Status)(
+	PULONG pulStatus, PULONG pulProblemNumber, DWORD dnDevInst,
+	ULONG ulFlags);
+BOOL _SetupDiGetDevicePropertyW(HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, const DEVPROPKEY *PropertyKey,
+								DEVPROPTYPE *PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize,
+								PDWORD RequiredSize, DWORD Flags);
 
 void WinCompatInit();
 
