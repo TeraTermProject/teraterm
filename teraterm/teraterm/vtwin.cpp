@@ -4307,39 +4307,7 @@ static void OpenNewComport(const TTTSet *pts)
 
 void CVTWindow::OnSetupSerialPort()
 {
-	BOOL Ok;
-
-	HelpId = HlpSetupSerialPort;
-	if (! LoadTTDLG()) {
-		return;
-	}
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	Ok = (*SetupSerialPort)(HVTWin, &ts);
-
-	if (Ok && ts.ComPort > 0) {
-		/*
-		 * TCP/IPによる接続中の場合は新規プロセスとして起動する。
-		 * New connectionからシリアル接続する動作と基本的に同じ動作となる。
-		 */
-		if ( cv.Ready && (cv.PortType != IdSerial) ) {
-			OpenNewComport(&ts);
-			return;
-		}
-
-		if (cv.Open) {
-			if (ts.ComPort != cv.ComPort) {
-				CommClose(&cv);
-				CommOpen(HVTWin,&ts,&cv);
-			}
-			else {
-				CommResetSerial(&ts, &cv, ts.ClearComBuffOnOpen);
-			}
-		}
-		else {
-			CommOpen(HVTWin,&ts,&cv);
-		}
-	}
+	OpenSetupSerialPort();
 }
 
 void CVTWindow::OnSetupTCPIP()

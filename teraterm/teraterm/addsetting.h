@@ -57,6 +57,7 @@ public:
 		GeneralPage,
 		TermPage,
 		WinPage,
+		SerialPortPage,
 	};
 	void SetStartPage(Page page);
 
@@ -79,6 +80,7 @@ typedef enum {
 	GeneralPage,
 	TermPage,
 	WinPage,
+	SerialPortPage,
 } CAddSettingPropSheetDlgPage;
 
 typedef enum {

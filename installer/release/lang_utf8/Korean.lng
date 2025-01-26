@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2025-01-04 by TeraTerm Project
+date=2025-01-20 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -373,7 +373,7 @@ DLG_ABOUT_TITLE=Tera Term에 대하여
 DLG_SELECT_DIR_TITLE=새로운 경로를 선택하세요
 
 DLG_GEN_TITLE=Tera Term: 일반설정
-DLG_GEN_PORT=기본 포트(&P):
+DLG_GEN_PORT=New &connection default
 DLG_GEN_LANG_UI=UI 언어(&U):
 
 DLG_HOST_TITLE=Tera Term: 새 연결
@@ -393,7 +393,7 @@ DLG_KEYB_DISABLE=비활성화 모드:
 DLG_KEYB_APPKEY=어플리케이션 키패드(&A)
 DLG_KEYB_APPCUR=어플리케이션 커서(&C)
 
-DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
+DLG_SERIAL_TITLE=Serial port
 DLG_SERIAL_PORT=포트(&P):
 DLG_SERIAL_BAUD=속도(&E):
 DLG_SERIAL_DATA=데이터(&D):
@@ -403,7 +403,6 @@ DLG_SERIAL_FLOW=흐름제어(&F):
 DLG_SERIAL_DELAY=전송지연
 DLG_SERIAL_DELAYCHAR=msec/&char
 DLG_SERIAL_DELAYLINE=msec/&line
-DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
 DLG_SERIAL_OK_CONNECTION=Connect with &New window
 DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
