@@ -262,6 +262,8 @@ static void FreeFileVar_(PFileVarProto *pfv)
 	fv->file->FileSysDestroy(fv->file);
 	free(fv->DlgCaption);
 	fv->DlgCaption = NULL;
+	free(fv->RecievePath);
+	fv->RecievePath = NULL;
 	free(fv);
 
 	*pfv = NULL;
