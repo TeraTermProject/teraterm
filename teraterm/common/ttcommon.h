@@ -55,6 +55,11 @@ DllExport void PASCAL ShowAllWin(int stat);
 DllExport void PASCAL ShowAllWinSidebySide(HWND);
 DllExport void PASCAL ShowAllWinStacked(HWND);
 DllExport void PASCAL ShowAllWinCascade(HWND);
+DllExport int PASCAL GetWinUndoStyle(void);
+DllExport void PASCAL ShowAllWinSwitch(HWND);
+DllExport void PASCAL SwitchWin(HWND);
+DllExport void PASCAL SwitchWinPrev(HWND);
+DllExport void PASCAL SwitchWinNext(HWND);
 DllExport void PASCAL BroadcastClosingMessage(HWND myhwnd);
 DllExport void PASCAL UndoAllWin(void);
 

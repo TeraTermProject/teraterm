@@ -227,6 +227,9 @@ protected:
 	void OnWindowCascade();
 	void OnWindowStacked();
 	void OnWindowSidebySide();
+	void OnWindowSwitch();
+	void OnWindowSwitchWinPrev();
+	void OnWindowSwitchWinNext();
 	void OnWindowRestoreAll();
 	void OnWindowUndo();
 	void OnHelpIndex();

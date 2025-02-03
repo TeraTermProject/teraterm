@@ -30,6 +30,13 @@
 
 #include "tttypes.h"	// for MAXNWIN
 
+enum window_style {
+	WIN_CASCADE,
+	WIN_STACKED,
+	WIN_SIDEBYSIDE,
+	WIN_SWITCH,
+};
+
 /* shared memory */
 typedef struct {
 	size_t size_tmap;		/* sizeof TMap */
@@ -50,5 +57,6 @@ typedef struct {
 	// Duplicate Teraterm data
 	HANDLE DuplicateDataHandle;
 	DWORD DuplicateDataSizeLow;
+	int WinSwitchCurrent;
 } TMap;
 typedef TMap *PMap;

@@ -83,3 +83,9 @@ EXPORTS
   GetMessageboxFont
 
   SetPMPtr
+
+  GetWinUndoStyle
+  ShowAllWinSwitch
+  SwitchWin
+  SwitchWinPrev
+  SwitchWinNext

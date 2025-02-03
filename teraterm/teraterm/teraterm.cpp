@@ -60,6 +60,8 @@
 #if ENABLE_GDIPLUS
 #include "ttgdiplus.h"
 #endif
+#include "ttcommon.h"
+#include "ttcmn_shared_memory.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -316,6 +318,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	// [Tera Term]セクションのDLG_SYSTEM_FONTをとりあえずセットする
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+	if (GetWinUndoStyle() == WIN_SWITCH) {
+		SwitchWin(main_window);
+	}
 
 	BOOL bIdle = TRUE;	// idle状態か?
 	LONG lCount = 0;

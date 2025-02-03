@@ -48,6 +48,7 @@
 #include "dlglib.h"
 #include "codeconv.h"
 #include "compat_win.h"
+#include "ttcmn_shared_memory.h"
 
 #define TEKClassName L"TEKWin32"
 
@@ -187,11 +188,17 @@ void CTEKWindow::InitMenu(HMENU *Menu)
 
 	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
 		wchar_t *uimsg;
+		if (GetWinUndoStyle() == WIN_SWITCH) {
+			::InsertMenuW(*Menu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SWITCH_NEXT, L">");
+		}
 		WinMenu = CreatePopupMenu();
 		GetI18nStrWW("Tera Term", "TEKMENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
 		::InsertMenuW(*Menu,4,MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 					  (UINT_PTR)WinMenu, uimsg);
 		free(uimsg);
+		if (GetWinUndoStyle() == WIN_SWITCH) {
+			::InsertMenuW(*Menu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SWITCH_PREV, L"<");
+		}
 	}
 }
 
@@ -581,6 +588,18 @@ LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 		tk.AdjustSize = TRUE;
 		::SetMenu(tk.HWin, MainMenu);
 		::DrawMenuBar(HTEKWin);
+	} else if (Show && GetWinUndoStyle() == WIN_SWITCH || GetWinUndoStyle() == WIN_SWITCH * -1) {
+		if (WinMenu != NULL) {
+			DestroyMenu(WinMenu);
+			WinMenu = NULL;
+		}
+		if (MainMenu != NULL) {
+			DestroyMenu(MainMenu);
+			MainMenu = NULL;
+		}
+		InitMenu(&MainMenu);
+		::SetMenu(HTEKWin, MainMenu);
+		::DrawMenuBar(HTEKWin);
 	}
 
 	B1 = ((ts.MenuFlag & MF_SHOWWINMENU)!=0);
@@ -589,12 +608,18 @@ LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 	    (B1 != B2)) {
 		if (WinMenu==NULL) {
 			wchar_t *uimsg;
+			if (GetWinUndoStyle() == WIN_SWITCH) {
+				::InsertMenuW(MainMenu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SWITCH_NEXT, L">");
+			}
 			WinMenu = CreatePopupMenu();
 			GetI18nStrWW("Tera Term", "TEKMENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
 			::InsertMenuW(MainMenu,4,
 						  MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 						  (UINT_PTR)WinMenu, uimsg);
 			free(uimsg);
+			if (GetWinUndoStyle() == WIN_SWITCH) {
+				::InsertMenuW(MainMenu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SWITCH_PREV, L"<");
+			}
 		}
 		else {
 			RemoveMenu(MainMenu,4,MF_BYPOSITION);
@@ -775,6 +800,26 @@ void CTEKWindow::OnWindowWindow()
 	}
 }
 
+void CTEKWindow::OnWindowSwitch()
+{
+	ShowAllWinSwitch(HTEKWin);
+}
+
+void CTEKWindow::OnWindowSwitchWinPrev()
+{
+	SwitchWinPrev(HTEKWin);
+}
+
+void CTEKWindow::OnWindowSwitchWinNext()
+{
+	SwitchWinNext(HTEKWin);
+}
+
+void CTEKWindow::OnWindowUndo()
+{
+	UndoAllWin();
+}
+
 void CTEKWindow::OnHelpIndex()
 {
 	OpenHelpCV(&cv, HH_DISPLAY_TOPIC, 0);
@@ -898,6 +943,10 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_TEKSETUP_FONT: OnSetupFont(); break;
 		case ID_TEKVTWIN: OnVTWin(); break;
 		case ID_TEKWINDOW_WINDOW: OnWindowWindow(); break;
+		case ID_WINDOW_SWITCH: OnWindowSwitch(); break;
+		case ID_WINDOW_SWITCH_PREV: OnWindowSwitchWinPrev(); break;
+		case ID_WINDOW_SWITCH_NEXT: OnWindowSwitchWinNext(); break;
+		case ID_WINDOW_UNDO: OnWindowUndo(); break;
 		case ID_TEKHELP_INDEX: OnHelpIndex(); break;
 		case ID_TEKHELP_ABOUT: OnHelpAbout(); break;
 		default:
