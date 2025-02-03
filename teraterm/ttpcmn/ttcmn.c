@@ -210,9 +210,9 @@ void WINAPI SetWinMenuW(HMENU menu, const wchar_t *langFile, int VTFlag)
 		AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_STACKED, "&Stacked");
 		AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SIDEBYSIDE, "Side &by Side");
 		if (GetWinUndoStyle() == WIN_SWITCH) {
-			AppendMenuA(menu, MF_GRAYED | MF_STRING, ID_WINDOW_SWITCH, "S&witch");
+			AppendMenuA(menu, MF_GRAYED | MF_STRING, ID_WINDOW_SWITCH, "Swi&tch");
 		} else {
-			AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SWITCH, "S&witch");
+			AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SWITCH, "Swi&tch");
 		}
 
 		SetI18nMenuStrsW(menu, "Tera Term", MenuTextInfo, _countof(MenuTextInfo), langFile);
@@ -245,7 +245,7 @@ void WINAPI SetWinMenuW(HMENU menu, const wchar_t *langFile, int VTFlag)
 		GetI18nStrWW("Tera Term", "MENU_WINDOW_WINDOW", L"&Window", langFile, &uimsg);
 		AppendMenuW(menu,MF_ENABLED | MF_STRING,ID_TEKWINDOW_WINDOW, uimsg);
 		free(uimsg);
-		GetI18nStrWW("Tera Term", "MENU_WINDOW_SWITCH", L"S&witch", langFile, &uimsg);
+		GetI18nStrWW("Tera Term", "MENU_WINDOW_SWITCH", L"Swi&tch", langFile, &uimsg);
 		if (GetWinUndoStyle() == WIN_SWITCH) {
 			AppendMenuW(menu, MF_GRAYED | MF_STRING, ID_WINDOW_SWITCH, uimsg);
 		} else {

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2025-01-20 by TeraTerm Project
+date=2025-02-04 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -84,10 +84,12 @@ MENU_WINDOW_MINIMIZEALL=창 최소화(&M)
 MENU_WINDOW_CASCADE=&Cascade
 MENU_WINDOW_STACKED=&Stacked
 MENU_WINDOW_SIDEBYSIDE=Side &By Side
+MENU_WINDOW_SWITCH=Swi&tch
 MENU_WINDOW_RESTOREALL=창 복구(&R)
 MENU_WINDOW_CASCADE_UNDO=&Undo - Cascade
 MENU_WINDOW_STACKED_UNDO=&Undo - Stacked
 MENU_WINDOW_SIDEBYSIDE_UNDO=&Undo - Side By Side
+MENU_WINDOW_SWITCH_UNDO=&Undo - Switch
 
 MENU_HELP=도움말(&H)
 MENU_HELP_INDEX=차례(&I)

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2025-01-20 by TeraTerm Project
+date=2025-02-04 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -84,10 +84,12 @@ MENU_WINDOW_MINIMIZEALL=すべて最小化(&M)
 MENU_WINDOW_CASCADE=重ねて表示(&C)
 MENU_WINDOW_STACKED=上下に並べて表示(&S)
 MENU_WINDOW_SIDEBYSIDE=左右に並べて表示(&B)
+MENU_WINDOW_SWITCH=切り替えて表示(&T)
 MENU_WINDOW_RESTOREALL=すべて復元(&R)
 MENU_WINDOW_CASCADE_UNDO=元に戻す - 重ねて表示(&U)
 MENU_WINDOW_STACKED_UNDO=元に戻す - 上下に並べて表示(&U)
 MENU_WINDOW_SIDEBYSIDE_UNDO=元に戻す - 左右に並べて表示(&U)
+MENU_WINDOW_SWITCH_UNDO=元に戻す - 切り替えて表示(&U)
 
 MENU_HELP=ヘルプ(&H)
 MENU_HELP_INDEX=目次(&I)
