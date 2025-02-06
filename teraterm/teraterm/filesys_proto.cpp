@@ -262,6 +262,8 @@ static void FreeFileVar_(PFileVarProto *pfv)
 	fv->file->FileSysDestroy(fv->file);
 	free(fv->DlgCaption);
 	fv->DlgCaption = NULL;
+	free(fv->RecievePath);
+	fv->RecievePath = NULL;
 	free(fv);
 
 	*pfv = NULL;
@@ -761,7 +763,7 @@ static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPL
  *		cv_ProtoFlag が 0 以外のとき
  *	@retval		0		continue
  *				1/2		ActiveWin(グローバル変数)の値(IdVT=1/IdTek=2)
- *				注 今のところ捨てられている
+ *						注 今のところ捨てられている
  */
 int ProtoDlgParse(void)
 {
@@ -775,28 +777,44 @@ int ProtoDlgParse(void)
 
 	PFileVarProto fv = FileVar;
 	if (fv->ProtoOp->Parse(fv, &cv))
-		P = 0; /* continue */
+		// 処理を継続する
+		P = 0;
 	else {
+		// 処理終了
 		CommSend(&cv);
 		ProtoEnd();
 	}
 	return P;
 }
 
+/**
+ *	タイムアウト発生
+ */
 void ProtoDlgTimeOut(void)
 {
 	if (PtDlg!=NULL) {
 		PFileVarProto fv = FileVar;
+
+		// タイムアウトが発生したことを通知する
 		fv->ProtoOp->TimeOutProc(fv, &cv);
 	}
 }
 
+/**
+ *	ダイアログの "Cancel" が押された
+ */
 void ProtoDlgCancel(void)
 {
 	if (PtDlg!=NULL) {
 		PFileVarProto fv = FileVar;
+
+		// キャンセルが押されたことを通知する
 		fv->ProtoOp->Cancel(fv, &cv);
-		ProtoEnd();
+
+		if (ProtoId != PROTO_ZM) {
+			// ダイアログを閉じる
+			ProtoEnd();
+		}
 	}
 }
 
