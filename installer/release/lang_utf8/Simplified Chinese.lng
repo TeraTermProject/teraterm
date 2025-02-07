@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2025-02-04 by TeraTerm Project
+date=2025-02-07 by TeraTerm Project
 contributor=LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -84,12 +84,12 @@ MENU_WINDOW_MINIMIZEALL=最小化全部窗口(&M)
 MENU_WINDOW_CASCADE=层叠窗口(&C)
 MENU_WINDOW_STACKED=堆叠显示窗口(&S)
 MENU_WINDOW_SIDEBYSIDE=并排显示窗口(&B)
-MENU_WINDOW_SWITCH=切换窗口(&T)
 MENU_WINDOW_RESTOREALL=还原全部窗口(&R)
 MENU_WINDOW_CASCADE_UNDO=撤销-层叠窗口(&U)
 MENU_WINDOW_STACKED_UNDO=撤销-堆叠显示窗口(&U)
 MENU_WINDOW_SIDEBYSIDE_UNDO=撤销-并排显示窗口(&U)
-MENU_WINDOW_SWITCH_UNDO=撤销-切换窗口(&U)
+MENU_WINDOW_SINGLE_ENTER=进入单窗口模式(&E)
+MENU_WINDOW_SINGLE_EXIT=退出单窗口模式(&E)
 
 MENU_HELP=帮助(&H)
 MENU_HELP_INDEX=索引(&I)

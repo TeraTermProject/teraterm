@@ -318,8 +318,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	// [Tera Term]セクションのDLG_SYSTEM_FONTをとりあえずセットする
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	if (GetWinUndoStyle() == WIN_SWITCH) {
-		SwitchWin(main_window);
+	if (GetWinUndoStyle() == WIN_SINGLE) {
+		WindowSingleShow(main_window);
 	}
 
 	BOOL bIdle = TRUE;	// idle状態か?

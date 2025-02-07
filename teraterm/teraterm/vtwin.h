@@ -227,11 +227,12 @@ protected:
 	void OnWindowCascade();
 	void OnWindowStacked();
 	void OnWindowSidebySide();
-	void OnWindowSwitch();
-	void OnWindowSwitchWinPrev();
-	void OnWindowSwitchWinNext();
 	void OnWindowRestoreAll();
 	void OnWindowUndo();
+	void OnWindowSingleEnter();
+	void OnWindowSinglePrev();
+	void OnWindowSingleNext();
+	void OnWindowSingleExit();
 	void OnHelpIndex();
 	void OnHelpAbout();
 	LRESULT OnDropNotify(WPARAM ShowMenu, LPARAM lParam);

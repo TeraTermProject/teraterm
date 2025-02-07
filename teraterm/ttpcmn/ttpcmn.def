@@ -85,7 +85,8 @@ EXPORTS
   SetPMPtr
 
   GetWinUndoStyle
-  ShowAllWinSwitch
-  SwitchWin
-  SwitchWinPrev
-  SwitchWinNext
+  WindowSingleEnter
+  WindowSingleShow
+  WindowSinglePrev
+  WindowSingleNext
+  WindowSingleExit

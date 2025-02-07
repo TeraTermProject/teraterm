@@ -1,6 +1,6 @@
 ﻿[Info]
 language=English
-date=2025-02-04 by TeraTerm Project
+date=2025-02-07 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -84,12 +84,12 @@ MENU_WINDOW_MINIMIZEALL=&Minimize All
 MENU_WINDOW_CASCADE=&Cascade
 MENU_WINDOW_STACKED=&Stacked
 MENU_WINDOW_SIDEBYSIDE=Side &By Side
-MENU_WINDOW_SWITCH=Swi&tch
 MENU_WINDOW_RESTOREALL=&Restore All
 MENU_WINDOW_CASCADE_UNDO=&Undo - Cascade
 MENU_WINDOW_STACKED_UNDO=&Undo - Stacked
 MENU_WINDOW_SIDEBYSIDE_UNDO=&Undo - Side By Side
-MENU_WINDOW_SWITCH_UNDO=&Undo - Switch
+MENU_WINDOW_SINGLE_ENTER=&Entering Single Window Mode
+MENU_WINDOW_SINGLE_EXIT=&Exiting Single Window Mode
 
 MENU_HELP=&Help
 MENU_HELP_INDEX=&Index

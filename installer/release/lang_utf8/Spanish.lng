@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Spanish
-date=2025-02-04 by TeraTerm Project
+date=2025-02-07 by TeraTerm Project
 contributor=Filiberto Olguin Ascona (2022-05-26)
 
 [Tera Term]
@@ -84,12 +84,12 @@ MENU_WINDOW_MINIMIZEALL=&Minimizar Todo
 MENU_WINDOW_CASCADE=&Cascada
 MENU_WINDOW_STACKED=&Apilar
 MENU_WINDOW_SIDEBYSIDE=Lado &a Lado
-MENU_WINDOW_SWITCH=Cam&biar
 MENU_WINDOW_RESTOREALL=&Restaurar Todo
 MENU_WINDOW_CASCADE_UNDO=&Deshacer - Cascada
 MENU_WINDOW_STACKED_UNDO=&Deshacer - Apilado
 MENU_WINDOW_SIDEBYSIDE_UNDO=&Deshacer - Lado a Lado
-MENU_WINDOW_SWITCH_UNDO=&Deshacer - Cambiar
+MENU_WINDOW_SINGLE_ENTER=&Entrando en modo de ventana unica
+MENU_WINDOW_SINGLE_EXIT=Sali&endo del modo de ventana unica
 
 MENU_HELP=&Ayuda
 MENU_HELP_INDEX=&Indice

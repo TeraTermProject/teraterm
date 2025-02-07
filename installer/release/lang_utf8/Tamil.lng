@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2025-02-04 by TeraTerm Project
+date=2025-02-07 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -84,12 +84,12 @@ MENU_WINDOW_MINIMIZEALL=&அனைத்தையும் குறைக்க
 MENU_WINDOW_CASCADE=&பல்நிலை
 MENU_WINDOW_STACKED=&அடுக்கப்பட்டது
 MENU_WINDOW_SIDEBYSIDE=அருகருகே
-MENU_WINDOW_SWITCH=&மாறுதல்
 MENU_WINDOW_RESTOREALL=&அனைத்தையும் மீட்டமை
 MENU_WINDOW_CASCADE_UNDO=&செயல்தவிர் - பல்நிலை
 MENU_WINDOW_STACKED_UNDO=&செயல்தவிர் - அடுக்கப்பட்டது
 MENU_WINDOW_SIDEBYSIDE_UNDO=&செயல்தவிர் - அருகருகே
-MENU_WINDOW_SWITCH_UNDO=&செயல்தவிர் - மாறுதல்
+MENU_WINDOW_SINGLE_ENTER=&ஒற்றை சாளர முறையில் நுழைகிறது
+MENU_WINDOW_SINGLE_EXIT=&ஒற்றை சாளர முறையிலிருந்து வெளியேறுகிறது
 
 MENU_HELP=&உதவி
 MENU_HELP_INDEX=&சுட்டுவரிசையாக்கம்

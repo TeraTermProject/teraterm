@@ -87,10 +87,11 @@ protected:
 	void OnSetupFont();
 	void OnVTWin();
 	void OnWindowWindow();
-	void OnWindowSwitch();
-	void OnWindowSwitchWinPrev();
-	void OnWindowSwitchWinNext();
 	void OnWindowUndo();
+	void OnWindowSingleEnter();
+	void OnWindowSinglePrev();
+	void OnWindowSingleNext();
+	void OnWindowSingleExit();
 	void OnHelpIndex();
 	void OnHelpAbout();
 	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);

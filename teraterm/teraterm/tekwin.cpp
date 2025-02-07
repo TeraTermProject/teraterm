@@ -188,16 +188,16 @@ void CTEKWindow::InitMenu(HMENU *Menu)
 
 	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
 		wchar_t *uimsg;
-		if (GetWinUndoStyle() == WIN_SWITCH) {
-			::InsertMenuW(*Menu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SWITCH_NEXT, L">");
+		if (GetWinUndoStyle() == WIN_SINGLE) {
+			::InsertMenuW(*Menu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SINGLE_NEXT, L">");
 		}
 		WinMenu = CreatePopupMenu();
 		GetI18nStrWW("Tera Term", "TEKMENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
 		::InsertMenuW(*Menu,4,MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 					  (UINT_PTR)WinMenu, uimsg);
 		free(uimsg);
-		if (GetWinUndoStyle() == WIN_SWITCH) {
-			::InsertMenuW(*Menu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SWITCH_PREV, L"<");
+		if (GetWinUndoStyle() == WIN_SINGLE) {
+			::InsertMenuW(*Menu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SINGLE_PREV, L"<");
 		}
 	}
 }
@@ -588,7 +588,7 @@ LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 		tk.AdjustSize = TRUE;
 		::SetMenu(tk.HWin, MainMenu);
 		::DrawMenuBar(HTEKWin);
-	} else if (Show && GetWinUndoStyle() == WIN_SWITCH || GetWinUndoStyle() == WIN_SWITCH * -1) {
+	} else if (Show && GetWinUndoStyle() == WIN_SINGLE || GetWinUndoStyle() == WIN_SINGLE * -1) {
 		if (WinMenu != NULL) {
 			DestroyMenu(WinMenu);
 			WinMenu = NULL;
@@ -608,8 +608,8 @@ LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 	    (B1 != B2)) {
 		if (WinMenu==NULL) {
 			wchar_t *uimsg;
-			if (GetWinUndoStyle() == WIN_SWITCH) {
-				::InsertMenuW(MainMenu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SWITCH_NEXT, L">");
+			if (GetWinUndoStyle() == WIN_SINGLE) {
+				::InsertMenuW(MainMenu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SINGLE_NEXT, L">");
 			}
 			WinMenu = CreatePopupMenu();
 			GetI18nStrWW("Tera Term", "TEKMENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
@@ -617,8 +617,8 @@ LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 						  MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 						  (UINT_PTR)WinMenu, uimsg);
 			free(uimsg);
-			if (GetWinUndoStyle() == WIN_SWITCH) {
-				::InsertMenuW(MainMenu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SWITCH_PREV, L"<");
+			if (GetWinUndoStyle() == WIN_SINGLE) {
+				::InsertMenuW(MainMenu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SINGLE_PREV, L"<");
 			}
 		}
 		else {
@@ -800,24 +800,24 @@ void CTEKWindow::OnWindowWindow()
 	}
 }
 
-void CTEKWindow::OnWindowSwitch()
+void CTEKWindow::OnWindowSingleEnter()
 {
-	ShowAllWinSwitch(HTEKWin);
+	WindowSingleEnter(HTEKWin);
 }
 
-void CTEKWindow::OnWindowSwitchWinPrev()
+void CTEKWindow::OnWindowSinglePrev()
 {
-	SwitchWinPrev(HTEKWin);
+	WindowSinglePrev(HTEKWin);
 }
 
-void CTEKWindow::OnWindowSwitchWinNext()
+void CTEKWindow::OnWindowSingleNext()
 {
-	SwitchWinNext(HTEKWin);
+	WindowSingleNext(HTEKWin);
 }
 
-void CTEKWindow::OnWindowUndo()
+void CTEKWindow::OnWindowSingleExit()
 {
-	UndoAllWin();
+	WindowSingleExit();
 }
 
 void CTEKWindow::OnHelpIndex()
@@ -943,10 +943,10 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_TEKSETUP_FONT: OnSetupFont(); break;
 		case ID_TEKVTWIN: OnVTWin(); break;
 		case ID_TEKWINDOW_WINDOW: OnWindowWindow(); break;
-		case ID_WINDOW_SWITCH: OnWindowSwitch(); break;
-		case ID_WINDOW_SWITCH_PREV: OnWindowSwitchWinPrev(); break;
-		case ID_WINDOW_SWITCH_NEXT: OnWindowSwitchWinNext(); break;
-		case ID_WINDOW_UNDO: OnWindowUndo(); break;
+		case ID_WINDOW_SINGLE_ENTER: OnWindowSingleEnter(); break;
+		case ID_WINDOW_SINGLE_PREV: OnWindowSinglePrev(); break;
+		case ID_WINDOW_SINGLE_NEXT: OnWindowSingleNext(); break;
+		case ID_WINDOW_SINGLE_EXIT: OnWindowSingleExit(); break;
 		case ID_TEKHELP_INDEX: OnHelpIndex(); break;
 		case ID_TEKHELP_ABOUT: OnHelpAbout(); break;
 		default:

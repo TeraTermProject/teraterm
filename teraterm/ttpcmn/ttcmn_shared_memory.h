@@ -34,7 +34,7 @@ enum window_style {
 	WIN_CASCADE,
 	WIN_STACKED,
 	WIN_SIDEBYSIDE,
-	WIN_SWITCH,
+	WIN_SINGLE,
 };
 
 /* shared memory */
@@ -57,6 +57,6 @@ typedef struct {
 	// Duplicate Teraterm data
 	HANDLE DuplicateDataHandle;
 	DWORD DuplicateDataSizeLow;
-	int WinSwitchCurrent;
+	int WinSingleCurrent;
 } TMap;
 typedef TMap *PMap;

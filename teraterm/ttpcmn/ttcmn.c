@@ -52,7 +52,7 @@ static PMap pm;
 
 #define VTCLASSNAME "VTWin32"
 #define TEKCLASSNAME "TEKWin32"
-#define SWITCHSTYLE SW_HIDE // or SW_MINIMIZE (デバッグ用)
+#define SINGLESTYLE SW_HIDE // or SW_MINIMIZE (Single Window Modeのデバッグ用)
 
 void WINAPI SetCOMFlag(int Com)
 {
@@ -94,7 +94,7 @@ int WINAPI RegWin(HWND HWinVT, HWND HWinTEK)
 	} else {
 		pm->WinList[pm->NWin++] = HWinVT;
 	}
-	if (GetWinUndoStyle() == WIN_SWITCH) {
+	if (GetWinUndoStyle() == WIN_SINGLE) {
 		WINDOWPLACEMENT wndPlace;
 		wndPlace.length = sizeof(WINDOWPLACEMENT);
 		GetWindowPlacement(pm->WinList[pm->NWin - 1], &wndPlace);
@@ -118,8 +118,8 @@ void WINAPI UnregWin(HWND HWin)
 {
 	int i, j;
 
-	if (GetWinUndoStyle() == WIN_SWITCH && pm->NWin >= 2) {
-		SwitchWinPrev(HWin);
+	if (GetWinUndoStyle() == WIN_SINGLE && pm->NWin >= 2) {
+		WindowSinglePrev(HWin);
 	}
 	i = 0;
 	while ((i<pm->NWin) && (pm->WinList[i]!=HWin)) {
@@ -199,7 +199,7 @@ void WINAPI SetWinMenuW(HMENU menu, const wchar_t *langFile, int VTFlag)
 			{ ID_WINDOW_CASCADEALL, "MENU_WINDOW_CASCADE" },
 			{ ID_WINDOW_STACKED, "MENU_WINDOW_STACKED" },
 			{ ID_WINDOW_SIDEBYSIDE, "MENU_WINDOW_SIDEBYSIDE" },
-			{ ID_WINDOW_SWITCH, "MENU_WINDOW_SWITCH" },
+			{ ID_WINDOW_SINGLE_ENTER, "MENU_WINDOW_SINGLE_ENTER" },
 		};
 
 		AppendMenuA(menu, MF_SEPARATOR, 0, NULL);
@@ -209,16 +209,15 @@ void WINAPI SetWinMenuW(HMENU menu, const wchar_t *langFile, int VTFlag)
 		AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_CASCADEALL, "&Cascade");
 		AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_STACKED, "&Stacked");
 		AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SIDEBYSIDE, "Side &by Side");
-		if (GetWinUndoStyle() == WIN_SWITCH) {
-			AppendMenuA(menu, MF_GRAYED | MF_STRING, ID_WINDOW_SWITCH, "Swi&tch");
-		} else {
-			AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SWITCH, "Swi&tch");
+		if (GetWinUndoStyle() != WIN_SINGLE) {
+			AppendMenuA(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SINGLE_ENTER, "&Entering Single Window Mode");
 		}
 
 		SetI18nMenuStrsW(menu, "Tera Term", MenuTextInfo, _countof(MenuTextInfo), langFile);
 
 		if (pm->WinUndoFlag) {
 			wchar_t *uimsg;
+			UINT_PTR id = ID_WINDOW_UNDO;
 			if (pm->WinUndoStyle == WIN_CASCADE)
 				GetI18nStrWW("Tera Term", "MENU_WINDOW_CASCADE_UNDO", L"&Undo - Cascade", langFile, &uimsg);
 			else if (pm->WinUndoStyle == WIN_STACKED)
@@ -226,16 +225,17 @@ void WINAPI SetWinMenuW(HMENU menu, const wchar_t *langFile, int VTFlag)
 			else if (pm->WinUndoStyle == WIN_SIDEBYSIDE)
 				GetI18nStrWW("Tera Term", "MENU_WINDOW_SIDEBYSIDE_UNDO", L"&Undo - Side by Side", langFile, &uimsg);
 			else {
-				GetI18nStrWW("Tera Term", "MENU_WINDOW_SWITCH_UNDO", L"&Undo - Switch", langFile, &uimsg);
+				id = ID_WINDOW_SINGLE_EXIT;
+				GetI18nStrWW("Tera Term", "MENU_WINDOW_SINGLE_EXIT", L"&Exiting Single Window Mode", langFile, &uimsg);
 				HWND HWin = GetActiveWindow();
 				for (i = 0; i < pm->NWin; i++) {
 					if (pm->WinList[i] == HWin) {
-						pm->WinSwitchCurrent = i;
+						pm->WinSingleCurrent = i;
 						break;
 					}
 				}
 			}
-			AppendMenuW(menu, MF_ENABLED | MF_STRING, ID_WINDOW_UNDO, uimsg);
+			AppendMenuW(menu, MF_ENABLED | MF_STRING, id, uimsg);
 			free(uimsg);
 		}
 
@@ -245,21 +245,18 @@ void WINAPI SetWinMenuW(HMENU menu, const wchar_t *langFile, int VTFlag)
 		GetI18nStrWW("Tera Term", "MENU_WINDOW_WINDOW", L"&Window", langFile, &uimsg);
 		AppendMenuW(menu,MF_ENABLED | MF_STRING,ID_TEKWINDOW_WINDOW, uimsg);
 		free(uimsg);
-		GetI18nStrWW("Tera Term", "MENU_WINDOW_SWITCH", L"Swi&tch", langFile, &uimsg);
-		if (GetWinUndoStyle() == WIN_SWITCH) {
-			AppendMenuW(menu, MF_GRAYED | MF_STRING, ID_WINDOW_SWITCH, uimsg);
+		if (GetWinUndoStyle() != WIN_SINGLE) {
+			GetI18nStrWW("Tera Term", "MENU_WINDOW_SINGLE_ENTER", L"&Entering Single Window Mode", langFile, &uimsg);
+			AppendMenuW(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SINGLE_ENTER, uimsg);
+			free(uimsg);
 		} else {
-			AppendMenuW(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SWITCH, uimsg);
-		}
-		free(uimsg);
-		if (pm->WinUndoFlag && pm->WinUndoStyle == WIN_SWITCH) {
-			GetI18nStrWW("Tera Term", "MENU_WINDOW_SWITCH_UNDO", L"&Undo - Switch", langFile, &uimsg);
-			AppendMenuW(menu, MF_ENABLED | MF_STRING, ID_WINDOW_UNDO, uimsg);
+			GetI18nStrWW("Tera Term", "MENU_WINDOW_SINGLE_EXIT", L"&Exiting Single Window Mode", langFile, &uimsg);
+			AppendMenuW(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SINGLE_EXIT, uimsg);
 			free(uimsg);
 			HWND HWin = GetActiveWindow();
 			for (i = 0; i < pm->NWin; i++) {
 				if (pm->WinList[i] == HWin) {
-					pm->WinSwitchCurrent = i;
+					pm->WinSingleCurrent = i;
 					break;
 				}
 			}
@@ -295,15 +292,15 @@ void WINAPI SetWinList(HWND HWin, HWND HDlg, int IList)
 
 void WINAPI SelectWin(int WinId)
 {
-	if (GetWinUndoStyle() == WIN_SWITCH && pm->NWin >= 2) {
+	if (GetWinUndoStyle() == WIN_SINGLE && pm->NWin >= 2) {
 		RECT rc;
-		if (WinId != pm->WinSwitchCurrent) {
-			GetWindowRect(pm->WinList[pm->WinSwitchCurrent], &rc);
-			SetWindowPos(pm->WinList[WinId], HWND_TOP, rc.left, rc.top, (rc.right - rc.left), (rc.bottom - rc.top), SWP_SHOWWINDOW); // ちらつき軽減用
-			ShowWindow(pm->WinList[WinId], SW_NORMAL);
-			SetWindowPos(pm->WinList[WinId], HWND_TOP, rc.left, rc.top, (rc.right - rc.left), (rc.bottom - rc.top), SWP_SHOWWINDOW);
-			ShowWindow(pm->WinList[pm->WinSwitchCurrent], SWITCHSTYLE);
+		if (WinId != pm->WinSingleCurrent) {
+			GetWindowRect(pm->WinList[pm->WinSingleCurrent], &rc);
+			SetWindowPos(pm->WinList[WinId], HWND_TOPMOST, rc.left, rc.top, (rc.right - rc.left), (rc.bottom - rc.top), SWP_SHOWWINDOW);
+			SetWindowPos(pm->WinList[WinId], HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+			ShowWindow(pm->WinList[pm->WinSingleCurrent], SINGLESTYLE);
 		}
+		pm->WinSingleCurrent = WinId;
 		return;
 	}
 	if ((WinId>=0) && (WinId<pm->NWin)) {
@@ -332,11 +329,11 @@ void WINAPI SelectNextWin(HWND HWin, int Next, BOOL SkipIconic)
 {
 	int i;
 
-	if (GetWinUndoStyle() == WIN_SWITCH && pm->NWin >= 2) {
+	if (GetWinUndoStyle() == WIN_SINGLE && pm->NWin >= 2) {
 		if (Next == -1) {
-			SwitchWinPrev(HWin);
+			WindowSinglePrev(HWin);
 		} else {
-			SwitchWinNext(HWin);
+			WindowSingleNext(HWin);
 		}
 		return;
 	}
@@ -391,8 +388,11 @@ void WINAPI UndoAllWin(void) {
 	memset(&rc0, 0, sizeof(rc0));
 
 	for (i=0; i < pm->NWin; i++) {
-		if (pm->WinUndoStyle == WIN_SWITCH) {
+		if (pm->WinUndoStyle == WIN_SINGLE) {
 			PostMessage(pm->WinList[i], WM_USER_CHANGEMENU, 0, 0);
+			if (i == pm->WinSingleCurrent) {
+				continue;
+			}
 		}
 		// 復元指定で、前回の状態が残っている場合は、ウィンドウの状態を元に戻す。
 		if (stat == SW_RESTORE && memcmp(&pm->WinPrevRect[i], &rc0, sizeof(rc0)) != 0) {
@@ -533,31 +533,31 @@ int WINAPI GetWinUndoStyle(void)
 	if (pm->WinUndoFlag) {
 		return pm->WinUndoStyle;
 	} else {
-		return pm->WinUndoStyle * -1;
+		return pm->WinUndoStyle * -1; // 注意：WIN_CASCADEは値が0のため、生負での判定は出来ない
 	}
 }
 
-// ウィンドウを切り替えて表示する(Switch)
-void WINAPI ShowAllWinSwitch(HWND myhwnd)
+// Single Window Modeに入る
+void WINAPI WindowSingleEnter(HWND myhwnd)
 {
 	int n, i;
 	HWND hwnd[MAXNWIN];
 
-	if (GetWinUndoStyle() == WIN_SWITCH) {
+	if (GetWinUndoStyle() == WIN_SINGLE) {
 		UndoAllWin();
 	} else {
-		get_valid_window_and_memorize_rect(myhwnd, hwnd, &n, WIN_SWITCH);
+		get_valid_window_and_memorize_rect(myhwnd, hwnd, &n, WIN_SINGLE);
 		for (i = 0 ; i < pm->NWin; i++) {
 			PostMessage(pm->WinList[i], WM_USER_CHANGEMENU, 0, 0);
 			if (pm->WinList[i] != myhwnd) {
-				ShowWindow(pm->WinList[i], SWITCHSTYLE);
+				ShowWindow(pm->WinList[i], SINGLESTYLE);
 			}
 		}
 	}
 }
 
-// HWNDで指定されたウィンドウに切り替える
-void WINAPI SwitchWin(HWND myhwnd)
+// Single Window Mode : HWNDで指定されたウィンドウに切り替える
+void WINAPI WindowSingleShow(HWND myhwnd)
 {
 	int i;
 	RECT rc;
@@ -565,21 +565,20 @@ void WINAPI SwitchWin(HWND myhwnd)
 	if (pm->NWin == 1) {
 		return;
 	}
-	GetWindowRect(pm->WinList[pm->WinSwitchCurrent], &rc);
-	SetWindowPos(myhwnd, HWND_TOP, rc.left, rc.top, (rc.right - rc.left), (rc.bottom - rc.top), SWP_SHOWWINDOW); // ちらつき軽減用
-	ShowWindow(myhwnd, SW_NORMAL);
-	SetWindowPos(myhwnd, HWND_TOP, rc.left, rc.top, (rc.right - rc.left), (rc.bottom - rc.top), SWP_SHOWWINDOW);
-	ShowWindow(pm->WinList[pm->WinSwitchCurrent], SWITCHSTYLE);
+	GetWindowRect(pm->WinList[pm->WinSingleCurrent], &rc);
+	SetWindowPos(myhwnd, HWND_TOPMOST, rc.left, rc.top, (rc.right - rc.left), (rc.bottom - rc.top), SWP_SHOWWINDOW);
+	SetWindowPos(myhwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	ShowWindow(pm->WinList[pm->WinSingleCurrent], SINGLESTYLE);
 	for (i = 0; i < pm->NWin; i++) {
 		if (pm->WinList[i] == myhwnd) {
-			pm->WinSwitchCurrent = i;
+			pm->WinSingleCurrent = i;
 			break;
 		}
 	}
 }
 
-// 前のウィンドウに切り替える
-void WINAPI SwitchWinPrev(HWND myhwnd)
+// Single Window Mode : 前のウィンドウに切り替える
+void WINAPI WindowSinglePrev(HWND myhwnd)
 {
 	int i;
 	RECT rc;
@@ -596,15 +595,14 @@ void WINAPI SwitchWinPrev(HWND myhwnd)
 		i = pm->NWin;
 	}
 	GetWindowRect(myhwnd, &rc);
-	SetWindowPos(pm->WinList[i - 1], HWND_TOP, rc.left, rc.top, (rc.right - rc.left), (rc.bottom - rc.top), SWP_SHOWWINDOW); // ちらつき軽減用
-	ShowWindow(pm->WinList[i - 1], SW_NORMAL);
-	SetWindowPos(pm->WinList[i - 1], HWND_TOP, rc.left, rc.top, (rc.right - rc.left), (rc.bottom - rc.top), SWP_SHOWWINDOW);
-	ShowWindow(myhwnd, SWITCHSTYLE);
-	pm->WinSwitchCurrent = i - 1;
+	SetWindowPos(pm->WinList[i - 1], HWND_TOPMOST, rc.left, rc.top, (rc.right - rc.left), (rc.bottom - rc.top), SWP_SHOWWINDOW);
+	SetWindowPos(pm->WinList[i - 1], HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	ShowWindow(myhwnd, SINGLESTYLE);
+	pm->WinSingleCurrent = i - 1;
 }
 
-// 次のウィンドウに切り替える
-void WINAPI SwitchWinNext(HWND myhwnd)
+// Single Window Mode : 次のウィンドウに切り替える
+void WINAPI WindowSingleNext(HWND myhwnd)
 {
 	int i;
 	RECT rc;
@@ -621,11 +619,20 @@ void WINAPI SwitchWinNext(HWND myhwnd)
 		i = -1;
 	}
 	GetWindowRect(myhwnd, &rc);
-	SetWindowPos(pm->WinList[i + 1], HWND_TOP, rc.left, rc.top, (rc.right - rc.left), (rc.bottom - rc.top), SWP_SHOWWINDOW); // ちらつき軽減用
-	ShowWindow(pm->WinList[i + 1], SW_NORMAL);
-	SetWindowPos(pm->WinList[i + 1], HWND_TOP, rc.left, rc.top, (rc.right - rc.left), (rc.bottom - rc.top), SWP_SHOWWINDOW);
-	ShowWindow(myhwnd, SWITCHSTYLE);
-	pm->WinSwitchCurrent = i + 1;
+	SetWindowPos(pm->WinList[i + 1], HWND_TOPMOST, rc.left, rc.top, (rc.right - rc.left), (rc.bottom - rc.top), SWP_SHOWWINDOW);
+	SetWindowPos(pm->WinList[i + 1], HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	ShowWindow(myhwnd, SINGLESTYLE);
+	pm->WinSingleCurrent = i + 1;
+}
+
+// Single Window Modeを終了する
+void WINAPI WindowSingleExit(void)
+{
+	if (GetWinUndoStyle() == WIN_SINGLE) {
+		UndoAllWin();
+	}
+	SetWindowPos(pm->WinList[pm->WinSingleCurrent], HWND_TOPMOST,   0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+	SetWindowPos(pm->WinList[pm->WinSingleCurrent], HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 }
 
 // 全Tera Termに終了指示を出す。
