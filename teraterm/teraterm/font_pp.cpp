@@ -266,7 +266,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			GetDlgLogFont(GetParent(hWnd), ts, &dlg_data->DlgFont);
 			SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
 
-			DispSetLogFont(&dlg_data->VTFont, FALSE);
+			DispSetLogFont(&dlg_data->VTFont, 0);
 			SetFontString(hWnd, IDC_VTFONT_EDIT, &dlg_data->VTFont);
 
 			CheckDlgButton(hWnd,
@@ -321,7 +321,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 										ts->FontDW = dlgw;
 										ts->FontDY = dlgy;
 										ts->FontDH = dlgh;
-										ChangeFont();
+										ChangeFont(0);
 										DispChangeWinSize(ts->TerminalWidth, ts->TerminalHeight);
 									}
 								}
@@ -330,7 +330,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					}
 
 					// ÉtÉHÉìÉgÇÃê›íË
-					ChangeFont();
+					ChangeFont(0);
 					DispChangeWinSize(WinWidth,WinHeight);
 					ChangeCaret();
 
