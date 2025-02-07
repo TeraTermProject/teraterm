@@ -156,7 +156,7 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 				cv.TitleRemoteW = NULL;
 			}
 			ChangeWin();
-			ChangeFont();
+			ChangeFont(0);
 
 		}
 		free(ExternalSetupData.orgTitle);

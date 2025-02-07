@@ -451,7 +451,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		::PostMessage(HVTWin,WM_USER_CHANGEMENU,0,0);
 	}
 
-	ChangeFont();
+	ChangeFont(0);
 
 	ResetIME();
 
@@ -1020,7 +1020,7 @@ void CVTWindow::InitPasteMenu(HMENU *Menu)
 
 void CVTWindow::ResetSetup()
 {
-	ChangeFont();
+	ChangeFont(0);
 	BuffChangeWinSize(WinWidth,WinHeight);
 	ChangeCaret();
 
@@ -2451,7 +2451,7 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 			h = ts.TerminalHeight;
 
 			if (FontChanged) {
-				ChangeFont();
+				ChangeFont(0);
 			}
 		}
 		else {
@@ -4691,7 +4691,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 
 	// 新しいDPIに合わせてフォントを生成、
 	// クライアント領域のサイズを決定する
-	ChangeFont();
+	ChangeFont(NewDPI);
 	ScreenWidth = WinWidth * FontWidth;
 	ScreenHeight = WinHeight * FontHeight;
 	//AdjustScrollBar();
