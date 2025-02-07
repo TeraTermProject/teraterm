@@ -60,6 +60,7 @@
       <li><a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">ファイル送信ダイアログをスキップする</a>設定を追加した。</li>
       <li>ファイル送受信マクロコマンドもファイル転送用フォルダを起点とするようにした。</li>
       <li>ZMODEM send: 受信 ZRINIT 内の CANFDX フラグの処理を実装した。受信側がデータを受信できない間、送信側(Tera Term)は受信側を待てるようになった。</li>
+      <li>XMODEM send: 送信開始時に受信バッファをクリアするようにした</li>
       <li>Additional settings - <a href="../menu/setup-additional-serialport.html">Serial Port タブ</a></li>
       <ul>
         <li>Setup-Serial 設定を Additional settings の Serial Port タブへ統合した。</li>
@@ -67,6 +68,7 @@
         <li>Additional settings - General タブの<a href="../menu/setup-additional-general.html#Port">新しい接続のデフォルト</a>は TCP/IP 又は Serial を選択、デフォルトのSerial portはこのタブで選択するようにした。</li>
       </ul>
       <li>複数の Tera Term ウインドウを1つの Tera Term ウインドウで扱う <a href="../menu/window.html#enteringsinglewindowmode">Single Window Mode</a> を [Window] メニューに追加した。</li>
+      <li>DPIが異なるディスプレイをまたいで移動した時、Windows 11(24H2)が誤ったモニタ情報を返す問題を解決して、ウィンドウが正しいDPIで表示するようにした。</li>
     </ul>
   </li>
 
@@ -94,6 +96,8 @@
       <li>ジャンプリストの表示をUnicodeに対応した。</li>
       <li>MACRO: <a href="../macro/command/setpassword.html">setpassword</a>, <a href="../macro/command/ispassword.html">ispassword</a> マクロコマンド が Unicode に対応していなかったので修正した。</li>
       <li>XMODEM Send: XMODEM(CRC)からXMODEM(checksum)に切り替わってしまう問題を修正した</li>
+      <li><a href="../menu/file-new.html#HostList">ホストリスト</a>に250以上保存しようとすると不正な処理が発生する問題を修正した。</li>
+      <li>ブロードキャストコマンドの履歴が最大数のとき、コマンドを履歴に追加すると不正な処理が発生する問題を修正した(最大値はTERATERM.INIのMaxBroadcatHistory=99がデフォルト値)</li>
     </ul>
   </li>
 

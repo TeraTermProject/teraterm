@@ -60,6 +60,7 @@
       <li>Added <a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">skip Send file dialog</a> setting.</li>
       <li>Macro commands for sending and receiving files are also from File transfer folder.</li>
       <li>ZMODEM send: CANFDX flag handling is implemented when receiving ZRINIT. While the receiver cannot receive data, the sender(Tera Term) can wait for the receiver.
+      <li>XMODEM send: flush receive buffer when start sending</li>
       <li>Additional settings - <a href="../menu/setup-additional-serialport.html">Serial Port tab</a></li>
       <ul>
         <li>Setup - Serial dialog was integrated into Serial Port tab of Additional settings.</li>
@@ -67,6 +68,7 @@
         <li>Select TCP/IP or Serial as <a href="../menu/setup-additional-general.html#Port">new connection default</a> for New connection dialog on General tab. Select default Serial port on Serial tab.</li>
       </ul>
       <li>Added the <a href="../menu/window.html#enteringsinglewindowmode">Single Window Mode</a> to the [Window] menu, which allows handling multiple Tera Term windows within a single Tera Term window.</li>
+      <li>Resolved problem that Windows 11 24H2 returns incorrectly monitor information when moving across displays with different DPI, so that window are displayed at correct DPI.</li>
     </ul>
   </li>
 
@@ -94,6 +96,8 @@
       <li>Unicode support for jump list display.</li>
       <li>MACRO: Fixed <a href="../macro/command/setpassword.html">setpassword</a> and <a href="../macro/command/ispassword.html">ispassword</a> macro commands were not Unicode compatible.</li>
       <li>XMODEM Send: Fixed problem switching from XMODEM(CRC) to XMODEM(checksum).</li>
+      <li>Fixed an application fault occurs when saving more than 250 in the <a href="../menu/file-new.html#HostList">Host list</a>.</li>
+      <li>Fixed an application fault occurs when adding a command to the maximum size of broadcast history. (default is MaxBroadcatHistory=99 in TERATERM.INI)</li>
     </ul>
   </li>
 

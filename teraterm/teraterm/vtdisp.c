@@ -1784,10 +1784,10 @@ void DispConvScreenToWin
  *	VTFont の取得
  *
  *	@param[out]		VTlf	取得したフォント情報
- *	@param[in]		mul		TRUE の時、DPIに合わせたサイズを取得
- *
+ *	@param[in]		dpi		DPIに合わせたサイズのフォントを取得
+ *							0 の時DPIに合わせた拡大をしない
  */
-void DispSetLogFont(LOGFONTA *VTlf, BOOL mul)
+void DispSetLogFont(LOGFONTA *VTlf, unsigned int dpi)
 {
   memset(VTlf, 0, sizeof(*VTlf));
   VTlf->lfWeight = FW_NORMAL;
@@ -1802,14 +1802,19 @@ void DispSetLogFont(LOGFONTA *VTlf, BOOL mul)
   VTlf->lfQuality       = (BYTE)ts.FontQuality;
   VTlf->lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
   strncpy_s(VTlf->lfFaceName, sizeof(VTlf->lfFaceName),ts.VTFont, _TRUNCATE);
-  if (mul) {
-	  const UINT uDpi = GetMonitorDpiFromWindow(HVTWin);
-	  VTlf->lfWidth = MulDiv(VTlf->lfWidth, uDpi, 96);
-	  VTlf->lfHeight = MulDiv(VTlf->lfHeight, uDpi, 96);
+  if (dpi != 0) {
+	  VTlf->lfWidth = MulDiv(VTlf->lfWidth, dpi, 96);
+	  VTlf->lfHeight = MulDiv(VTlf->lfHeight, dpi, 96);
   }
 }
 
-void ChangeFont(void)
+/**
+ *	フォントを変更
+ *
+ *	@param	dpi		DPIを指定する
+ *					0のとき現在のディスプレイのDPI
+ */
+void ChangeFont(unsigned int dpi)
 {
 	int i, j;
 	LOGFONTA VTlf;
@@ -1824,8 +1829,12 @@ void ChangeFont(void)
 			DeleteObject(VTFont[i]);
 	}
 
+	if (dpi == 0) {
+		dpi = GetMonitorDpiFromWindow(HVTWin);
+	}
+
 	/* Normal Font */
-	DispSetLogFont(&VTlf, TRUE);
+	DispSetLogFont(&VTlf, dpi);
 	VTFont[AttrDefault] = CreateFontIndirect(&VTlf);
 
 	if (ts.UseIME > 0) {
@@ -1940,7 +1949,7 @@ void ResetIME(void)
 		if (ts.UseIME > 0) {
 			if (ts.IMEInline>0) {
 				LOGFONTA VTlf;
-				DispSetLogFont(&VTlf, TRUE);
+				DispSetLogFont(&VTlf, 0);
 				SetConversionLogFont(HVTWin, &VTlf);
 			}
 			else {
