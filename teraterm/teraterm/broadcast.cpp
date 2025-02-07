@@ -106,7 +106,7 @@ static wchar_t *GetHistoryFileName(TTTSet *ts_)
 	return fname;
 }
 
-static void ApplyBroadCastCommandHisotry(HWND Dialog, const wchar_t *historyfile)
+static void ApplyBroadCastCommandHistory(HWND Dialog, const wchar_t *historyfile)
 {
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_RESETCONTENT, 0, 0);
 	HistoryStore *hs = HistoryStoreCreate(ts.MaxBroadcatHistory);
@@ -579,7 +579,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 			}
 			wchar_t *historyfile = GetHistoryFileName(&ts);
-			ApplyBroadCastCommandHisotry(hWnd, historyfile);
+			ApplyBroadCastCommandHistory(hWnd, historyfile);
 			free(historyfile);
 
 			// エディットコントロールにフォーカスをあてる
@@ -720,7 +720,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 													  ts.MaxBroadcatHistory);
 									FreeTTSET();
 								}
-								ApplyBroadCastCommandHisotry(hWnd, historyfile);
+								ApplyBroadCastCommandHistory(hWnd, historyfile);
 								free(historyfile);
 								ts.BroadcastCommandHistory = TRUE;
 							}
@@ -773,7 +773,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				case IDC_COMMAND_EDIT:
 					if (HIWORD(wp) == CBN_DROPDOWN) {
 						wchar_t *historyfile = GetHistoryFileName(&ts);
-						ApplyBroadCastCommandHisotry(hWnd, historyfile);
+						ApplyBroadCastCommandHistory(hWnd, historyfile);
 						free(historyfile);
 					}
 					return FALSE;

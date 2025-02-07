@@ -541,7 +541,7 @@
 					</OBJECT>
 				<UL>
 					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="Edit Hisotry">
+						<param name="Name" value="Edit History">
 						<param name="Local" value="html\menu\setup-additional-tcpip_edithistory.html">
 						<param name="ImageNumber" value="11">
 						</OBJECT>
