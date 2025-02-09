@@ -229,6 +229,10 @@ protected:
 	void OnWindowSidebySide();
 	void OnWindowRestoreAll();
 	void OnWindowUndo();
+	void OnWindowSingleEnter();
+	void OnWindowSinglePrev();
+	void OnWindowSingleNext();
+	void OnWindowSingleExit();
 	void OnHelpIndex();
 	void OnHelpAbout();
 	LRESULT OnDropNotify(WPARAM ShowMenu, LPARAM lParam);

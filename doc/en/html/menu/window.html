@@ -36,22 +36,40 @@
       <dd>
 	Cascade, which puts windows in a single stack that has been fanned out so that the window title appear.
       </dd>
-      
+
       <dt id="stacked">Stacked</dt>
       <dd>
 	Stacked, which puts windows in one or more vertical stacks depending on how many windows you have open.
       </dd>
-      
+
       <dt id="sidebyside">Side By Side</dt>
       <dd>
 	Side by side, which places each window -open, but not maximized- on the desktop so you can see all the windows at once.
       </dd>
 
-      <dt id="undo">Undo - Cascade|Stacked|Side By Side</dt>
+      <dt id="enteringsinglewindowmode">Entering Single Window Mode</dt>
       <dd>
-	Undo the Tera Term window position after arranging windows.
+	In Single Window Mode, only one Tera Term window will be displayed.<br>
+	When switching Tera Term windows, the window that appears after the switch will be displayed in the same position as the one before the switch.<br>
+	The method for switching Tera Term windows is as follows.
+      <ol>
+        <li>Click "&lt;" or "&gt" on the menu bar.</li>
+        In Single Window Mode only, the menu bar will display '<' and '>'.<br>
+        "&lt;" : Switch to the previous window.<br>
+        "&gt;" : Switch to the next window.<br>
+        <li>Press CTRL+SHIFT+TAB or CTRL+TAB.</li>
+        "CTRL+SHIFT+TAB" : Switch to the previous window.<br>
+        "CTRL+TAB" : Switch to the next window.<br>
+        <li>Use the window list in the [Window] menu or the Window command within the menu.</li>
+      </ol>
       </dd>
-      
+
+      <dt id="exitingsinglewindowmode">Exiting Single Window Mode</dt>
+      <dd>
+	Exiting Single Window Mode.<br>
+	If you select Minimize All, Restore All, Cascade, Stacked, or Side By Side, you will exit Single Window Mode and the selected window arrangement will be applied.
+      </dd>
+
     </dl>
   </body>
 </html>
