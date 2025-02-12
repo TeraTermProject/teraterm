@@ -212,8 +212,9 @@ void CVTWindow::SetWindowAlpha(BYTE alpha)
  */
 class SerialReconnect {
 
-#define DEBUG_WM_DEVICECHANGE	0
-#define RECONNECT_DELAY			2000	// (ms)
+#define DEBUG_WM_DEVICECHANGE	1
+#define RECONNECT_DELAY_NORMAL	500		// (ms)
+#define RECONNECT_DELAY_ILLEGAL	2000	// (ms)
 
 public:
 	void Init(CVTWindow *vtwin)
@@ -318,7 +319,7 @@ public:
 				if (timer_id_ == 0) {
 					// メッセージが来たらタイマーをセットする
 					// 想定した順にメッセージが発生しない場合、タイマータイムアウトで接続する
-					timer_id_ = ::SetTimer(vtwin_->m_hWnd, (UINT_PTR)this, RECONNECT_DELAY, OpenSerialTimerEntry);
+					timer_id_ = ::SetTimer(vtwin_->m_hWnd, (UINT_PTR)this, RECONNECT_DELAY_ILLEGAL, OpenSerialTimerEntry);
 					Connecting = TRUE;
 				}
 				switch(state_) {
@@ -338,8 +339,17 @@ public:
 					if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
 						if (comport == ts.ComPort) {
 							// 接続する
+#if 0
 							state_ = NONE;
 							OpenSerial();
+#else
+							KillTimer(vtwin_->m_hWnd, timer_id_);
+#if DEBUG_WM_DEVICECHANGE
+							OutputDebugPrintf(" delay %d ms\n", RECONNECT_DELAY_NORMAL);
+#endif
+							timer_id_ = ::SetTimer(vtwin_->m_hWnd, (UINT_PTR)this, RECONNECT_DELAY_ILLEGAL, OpenSerialTimerEntry);
+							state_ = WAIT_TIMER;
+#endif
 						}
 					}
 					else {
