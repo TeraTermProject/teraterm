@@ -32,8 +32,9 @@
 
 #define TTSSH_VERSION_MAJOR             3
 #define TTSSH_VERSION_MINOR             4
-#define TTSSH_VERSION_STR(sep)          TT_TOSTR(TTSSH_VERSION_MAJOR) sep TT_TOSTR(TTSSH_VERSION_MINOR)
-#define TTSSH_RES_VERSION_STR           TTSSH_VERSION_STR(", ") ", 0, 0"
+#define TTSSH_VERSION_PATCH             0
+#define TTSSH_VERSION_STR(sep)          TT_TOSTR(TTSSH_VERSION_MAJOR) sep TT_TOSTR(TTSSH_VERSION_MINOR) sep TT_TOSTR(TTSSH_VERSION_PATCH)
+#define TTSSH_RES_VERSION_STR           TTSSH_VERSION_STR(", ") ", 0"
 
 // TTSSH_RES_PRODUCT_VERSION_STR
 //	リソースファイル(rcファイル) ProductVersion 用
