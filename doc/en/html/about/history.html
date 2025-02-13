@@ -106,6 +106,12 @@
       <li>Upgraded Oniguruma to 6.9.10.</li>
       <li>Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.4.0" target="_blank">6.4.0</a>.</li>
       <li>Upgraded TTSSH to <a href="#ttssh_3.4">3.4</a>.</li>
+      <li>Added /E option to command line, which is execute from TELNET protocol, that is associated by the installer.
+        <ul>
+          <li>Even if specified port number by URL is not 23, Telnet option negotiation is start.</li>
+          <li>Normally, Tera Term does not handle other than <a href="../usage/tips/not_port23.html">port 23</a> as TELNET.</li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>
