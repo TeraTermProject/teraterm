@@ -215,6 +215,8 @@ class SerialReconnect {
 #define DEBUG_WM_DEVICECHANGE	1
 #define RECONNECT_DELAY_NORMAL	500		// (ms)
 #define RECONNECT_DELAY_ILLEGAL	2000	// (ms)
+#define RECONNECT_RETRY			3
+#define RECONNECT_INTERVAL		1000	// (ms)
 
 public:
 	void Init(CVTWindow *vtwin)
@@ -234,7 +236,8 @@ public:
 		DEV_BROADCAST_DEVICEINTERFACE_A filter = {};
 		filter.dbcc_size = sizeof(filter);
 		filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
-		filter.dbcc_classguid = GUID_DEVINTERFACE_USB_DEVICE;
+		//filter.dbcc_classguid = GUID_DEVINTERFACE_USB_DEVICE;	// USBマウスなどにも反応
+		filter.dbcc_classguid = GUID_DEVINTERFACE_COMPORT;	// シリアルポートだけに反応
 
 		hDevNotify = pRegisterDeviceNotificationA(vtwin->m_hWnd, &filter, DEVICE_NOTIFY_WINDOW_HANDLE);
 	}
@@ -316,22 +319,19 @@ public:
 				ts.AutoComPortReconnect &&
 				AutoDisconnectedPort == ts.ComPort &&
 				(!cv.Open)) {
-				if (timer_id_ == 0) {
-					// メッセージが来たらタイマーをセットする
-					// 想定した順にメッセージが発生しない場合、タイマータイムアウトで接続する
-					timer_id_ = ::SetTimer(vtwin_->m_hWnd, (UINT_PTR)this, RECONNECT_DELAY_ILLEGAL, OpenSerialTimerEntry);
-					Connecting = TRUE;
-				}
 				switch(state_) {
 				case NONE:
 					break;
 				case WAIT_DEVTYP_DEVICEINTERFACE:
+					Connecting = TRUE;	// ポートが分からない、とりあえず接続中にする
 					if (pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
+						SetTimer(RECONNECT_DELAY_ILLEGAL);
 						state_ = WAIT_DEVTYP_PORT;
 					}
 					else {
 						// DEVTYP_DEVICEINTERFACE のはずが DBT_DEVTYP_PORT が発生した
 						// 遅延を入れて接続すると安定するようだ タイマーを使って接続する
+						SetTimer(RECONNECT_DELAY_ILLEGAL);
 						state_ = WAIT_TIMER;
 					}
 					break;
@@ -339,17 +339,12 @@ public:
 					if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
 						if (comport == ts.ComPort) {
 							// 接続する
-#if 0
-							state_ = NONE;
-							OpenSerial();
-#else
-							KillTimer(vtwin_->m_hWnd, timer_id_);
+							Connecting = TRUE;	// 接続中
 #if DEBUG_WM_DEVICECHANGE
 							OutputDebugPrintf(" delay %d ms\n", RECONNECT_DELAY_NORMAL);
 #endif
-							timer_id_ = ::SetTimer(vtwin_->m_hWnd, (UINT_PTR)this, RECONNECT_DELAY_ILLEGAL, OpenSerialTimerEntry);
+							SetTimer(RECONNECT_DELAY_NORMAL);
 							state_ = WAIT_TIMER;
-#endif
 						}
 					}
 					else {
@@ -358,6 +353,9 @@ public:
 				}
 				case WAIT_TIMER:
 					// タイマーで接続する
+					break;
+				case RECONNECTING:
+					// 再接続中
 					break;
 				}
 			}
@@ -392,8 +390,8 @@ public:
 						//  - DBT_DEVTYP_PORT
 						if (CheckComPort(cv.ComPort) == 0) {
 							/* ポートが無効 */
-							SetAutoConnectPort(ts.ComPort);
 							vtwin_->Disconnect(TRUE);
+							SetAutoConnectPort(ts.ComPort);
 						}
 					}
 				}
@@ -413,6 +411,7 @@ public:
 		}
 		AutoDisconnectedPort = port;
 		state_ = WAIT_DEVTYP_DEVICEINTERFACE;
+		retry_left_ = RECONNECT_RETRY;
 		ChangeTitle();
 	}
 
@@ -424,23 +423,70 @@ public:
 		AutoDisconnectedPort = -1;
 	}
 
+	BOOL IsReconnecting()
+	{
+		return state_ == RECONNECTING;
+	}
+
 private:
+	void SetTimer(UINT uElapse)
+	{
+		if (timer_id_ != 0) {
+			KillTimer(vtwin_->m_hWnd, timer_id_);
+		}
+		timer_id_ = ::SetTimer(vtwin_->m_hWnd, (UINT_PTR)this, uElapse, OpenSerialTimerEntry);
+	}
+
 	/**
 	 *	シリアルをオープンする
 	 */
 	void OpenSerial()
 	{
+		state_ = RECONNECTING;
 #if DEBUG_WM_DEVICECHANGE
 		OutputDebugPrintf("%s() %d %d\n", __FUNCTION__, AutoDisconnectedPort, state_);
 #endif
-		KillTimer(vtwin_->m_hWnd, timer_id_);
-		timer_id_ = 0;
-		AutoDisconnectedPort = -1;
-		state_ = NONE;
-		CommOpen(vtwin_->m_hWnd, &ts, &cv);
+		if (timer_id_ != 0) {
+			KillTimer(vtwin_->m_hWnd, timer_id_);
+			timer_id_ = 0;
+		}
+		if (CheckComPort(AutoDisconnectedPort) != 0) {
+			// ポートが存在している、オープンを試みる
+			int NoMsg_prev = cv.NoMsg;
+			if (retry_left_ != 0) {
+				cv.NoMsg = 1;
+			}
+			CommOpen(vtwin_->m_hWnd, &ts, &cv);
+			cv.NoMsg = NoMsg_prev;
 #if DEBUG_WM_DEVICECHANGE
-		OutputDebugPrintf("%s() return from CommOpen()\n", __FUNCTION__);
+			OutputDebugPrintf("%s() return from CommOpen()\n", __FUNCTION__);
 #endif
+		}
+		if (cv.Open == TRUE) {
+			// シリアルオープン成功
+			state_ = NONE;
+			AutoDisconnectedPort = -1;
+#if DEBUG_WM_DEVICECHANGE
+			OutputDebugPrintf("%s() Open success\n", __FUNCTION__);
+#endif
+		}
+		else if (retry_left_ ==0) {
+			// シリアルオープン失敗
+#if DEBUG_WM_DEVICECHANGE
+			OutputDebugPrintf("%s() Open fail\n", __FUNCTION__);
+#endif
+			state_ = NONE;
+			AutoDisconnectedPort = -1;
+		}
+		else {
+			// シリアルオープン失敗,リトライする
+#if DEBUG_WM_DEVICECHANGE
+			OutputDebugPrintf("%s() Open fail, retry left %d\n", __FUNCTION__, retry_left_);
+#endif
+			SetTimer(RECONNECT_INTERVAL);
+			retry_left_--;
+		}
+
 		ChangeTitle();
 	}
 
@@ -461,9 +507,11 @@ private:
 		WAIT_DEVTYP_DEVICEINTERFACE,
 		WAIT_DEVTYP_PORT,
 		WAIT_TIMER,
+		RECONNECTING,
 	} state_;
 	HDEVNOTIFY hDevNotify;
 	int AutoDisconnectedPort;
+	int retry_left_;
 };
 
 static SerialReconnect *serail_reconnect;
@@ -3529,7 +3577,9 @@ LRESULT CVTWindow::OnCommNotify(WPARAM wParam, LPARAM lParam)
 					cv.CRSend = ts.CRSend_ini;
 				}
 			}
-			Connecting = FALSE;
+			if (!serail_reconnect->IsReconnecting()) {
+				Connecting = FALSE;
+			}
 			TCPIPClosed = TRUE;
 			// disable transmition
 			cv.OutBuffCount = 0;
