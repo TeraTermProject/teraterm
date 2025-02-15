@@ -276,6 +276,32 @@ Default:
 AutoComPortReconnect=on
 </pre>
 
+<h3>Reconnect sequence</h3>
+The following figure shows reconnecting sequence.<br>
+<a href="serial_reconnect.png"><img src="serial_reconnect.png" width=200></a><br>
+(click to enlarge)
+
+<h3>Reconnection Parameters</h3>
+
+Reconnect after the following time(ms) ,after the USB serial cable is available.
+<pre id="AutoComPortReconnectDelayNormal">
+Default:
+AutoComPortReconnectDelayNormal=300
+</pre>
+
+Reconnect after the following time (ms) has elapsed, when connection notification is invalid.
+<pre id="AutoComPortReconnectDelayIllegal">
+Default:
+AutoComPortReconnectDelayIllegal=2000
+</pre>
+
+If reconnection fails, retries after the next specified number of times and time (ms).
+<pre id="AutoComPortReconnectRetryCount">
+Default:
+AutoComPortReconnectRetryCount=3
+AutoComPortReconnectRetryInterval=1000
+</pre>
+
 
 <h1 id="WaitCom">Wait for COM port connection</h1>
 
