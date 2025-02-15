@@ -236,8 +236,8 @@ public:
 		DEV_BROADCAST_DEVICEINTERFACE_A filter = {};
 		filter.dbcc_size = sizeof(filter);
 		filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
-		//filter.dbcc_classguid = GUID_DEVINTERFACE_USB_DEVICE;	// USBマウスなどにも反応
-		filter.dbcc_classguid = GUID_DEVINTERFACE_COMPORT;	// シリアルポートだけに反応
+		filter.dbcc_classguid = GUID_DEVINTERFACE_USB_DEVICE;	// USBマウスなどにも反応
+		//filter.dbcc_classguid = GUID_DEVINTERFACE_COMPORT;	// シリアルポートだけに反応
 
 		hDevNotify = pRegisterDeviceNotificationA(vtwin->m_hWnd, &filter, DEVICE_NOTIFY_WINDOW_HANDLE);
 	}
@@ -322,29 +322,33 @@ public:
 				switch(state_) {
 				case NONE:
 					break;
-				case WAIT_DEVTYP_DEVICEINTERFACE:
+				case WAIT_DEVTYP_DEVICEINTERFACE: {
 					Connecting = TRUE;	// ポートが分からない、とりあえず接続中にする
+					UINT delay = ts.AutoComPortReconnectDelayIllegal;
+					SetTimer(delay);
 					if (pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
-						SetTimer(RECONNECT_DELAY_ILLEGAL);
 						state_ = WAIT_DEVTYP_PORT;
 					}
 					else {
-						// DEVTYP_DEVICEINTERFACE のはずが DBT_DEVTYP_PORT が発生した
-						// 遅延を入れて接続すると安定するようだ タイマーを使って接続する
-						SetTimer(RECONNECT_DELAY_ILLEGAL);
+						// DEVTYP_DEVICEINTERFACE のはずが DBT_DEVTYP_PORT 等が発生した
 						state_ = WAIT_TIMER;
 					}
+#if DEBUG_WM_DEVICECHANGE
+					OutputDebugPrintf(" state %d timer illegal %d ms\n", state_, delay);
+#endif
 					break;
+				}
 				case WAIT_DEVTYP_PORT: {
 					if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
-						if (comport == ts.ComPort) {
+						if (comport == AutoDisconnectedPort) {
 							// 接続する
+							UINT delay = ts.AutoComPortReconnectDelayNormal;
 							Connecting = TRUE;	// 接続中
-#if DEBUG_WM_DEVICECHANGE
-							OutputDebugPrintf(" delay %d ms\n", RECONNECT_DELAY_NORMAL);
-#endif
-							SetTimer(RECONNECT_DELAY_NORMAL);
+							SetTimer(delay);
 							state_ = WAIT_TIMER;
+#if DEBUG_WM_DEVICECHANGE
+							OutputDebugPrintf(" state %d timer normal %d ms\n", state_, delay);
+#endif
 						}
 					}
 					else {
@@ -368,32 +372,43 @@ public:
 			if ((pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT ||
 				 pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) &&
 				ts.PortType == IdSerial &&
-				ts.AutoComPortReconnect &&
-				AutoDisconnectedPort == -1) {
-
-				if (cv.Open) {
-					BOOL disconnected = FALSE;
-					if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
-						if (comport == cv.ComPort) {
-							SetAutoConnectPort(ts.ComPort);
-							vtwin_->Disconnect(TRUE);
-							disconnected = TRUE;
+				ts.AutoComPortReconnect) {
+				if (state_ == NONE) {
+					// 切断された、再接続準備
+					if (cv.Open) {
+						BOOL disconnected = FALSE;
+						if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
+							if (comport == cv.ComPort) {
+								SetAutoConnectPort(ts.ComPort);
+								vtwin_->Disconnect(TRUE);
+								disconnected = TRUE;
+							}
+						}
+						if (disconnected == FALSE) {
+							// DBT_DEVTYP_PORT が発生しない場合対応
+							//   HHD Software Virtual Serial Port Tool 6.20.00.1466 では
+							//		ポートをオープンしていると DBT_DEVTYP_PORT を投げてこないようだ
+							//
+							// 次の順でメッセージが来るため事実上 DBT_DEVTYP_PORT のコードは使用されない
+							//  - DBT_DEVTYP_DEVICEINTERFACE
+							//  - DBT_DEVTYP_PORT
+							if (CheckComPort(cv.ComPort) == 0) {
+								/* オープンしているポートが無効になった,クローズする */
+								vtwin_->Disconnect(TRUE);
+								SetAutoConnectPort(ts.ComPort);
+							}
 						}
 					}
-					if (disconnected == FALSE) {
-						// DBT_DEVTYP_PORT が発生しない場合対応
-						//   HHD Software Virtual Serial Port Tool 6.20.00.1466 では
-						//		ポートをオープンしていると DBT_DEVTYP_PORT を投げてこないようだ
-						//
-						// 次の順でメッセージが来るため事実上 DBT_DEVTYP_PORT のコードは使用されない
-						//  - DBT_DEVTYP_DEVICEINTERFACE
-						//  - DBT_DEVTYP_PORT
-						if (CheckComPort(cv.ComPort) == 0) {
-							/* ポートが無効 */
-							vtwin_->Disconnect(TRUE);
-							SetAutoConnectPort(ts.ComPort);
-						}
+				}
+				else {
+					// 再接続中に抜かれた?
+					state_ = NONE;
+					if (timer_id_ != 0) {
+						KillTimer(vtwin_->m_hWnd, timer_id_);
 					}
+					SetAutoConnectPort(ts.ComPort);
+					Connecting = FALSE;		// 通常状態(接続中ではない)
+					ChangeTitle();
 				}
 			}
 			break;
@@ -411,7 +426,7 @@ public:
 		}
 		AutoDisconnectedPort = port;
 		state_ = WAIT_DEVTYP_DEVICEINTERFACE;
-		retry_left_ = RECONNECT_RETRY;
+		retry_left_ = ts.AutoComPortReconnectRetryCount;
 		ChangeTitle();
 	}
 
@@ -450,11 +465,16 @@ private:
 			KillTimer(vtwin_->m_hWnd, timer_id_);
 			timer_id_ = 0;
 		}
+		BOOL try_open = FALSE;
 		if (CheckComPort(AutoDisconnectedPort) != 0) {
 			// ポートが存在している、オープンを試みる
 			int NoMsg_prev = cv.NoMsg;
+			try_open = TRUE;
 			if (retry_left_ != 0) {
-				cv.NoMsg = 1;
+				cv.NoMsg = 1;	// ポップアップを出さない
+			}
+			else {
+				state_ = NONE;
 			}
 			CommOpen(vtwin_->m_hWnd, &ts, &cv);
 			cv.NoMsg = NoMsg_prev;
@@ -464,11 +484,11 @@ private:
 		}
 		if (cv.Open == TRUE) {
 			// シリアルオープン成功
-			state_ = NONE;
-			AutoDisconnectedPort = -1;
 #if DEBUG_WM_DEVICECHANGE
 			OutputDebugPrintf("%s() Open success\n", __FUNCTION__);
 #endif
+			state_ = NONE;
+			AutoDisconnectedPort = -1;
 		}
 		else if (retry_left_ ==0) {
 			// シリアルオープン失敗
@@ -477,13 +497,17 @@ private:
 #endif
 			state_ = NONE;
 			AutoDisconnectedPort = -1;
+			if (try_open == FALSE) {
+				Connecting = FALSE;
+			}
 		}
 		else {
 			// シリアルオープン失敗,リトライする
+			UINT delay = ts.AutoComPortReconnectRetryInterval;
 #if DEBUG_WM_DEVICECHANGE
-			OutputDebugPrintf("%s() Open fail, retry left %d\n", __FUNCTION__, retry_left_);
+			OutputDebugPrintf("%s() Open fail, retry left %d interval %dms\n", __FUNCTION__, retry_left_, delay);
 #endif
-			SetTimer(RECONNECT_INTERVAL);
+			SetTimer(delay);
 			retry_left_--;
 		}
 
