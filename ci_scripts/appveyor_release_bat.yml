@@ -8,6 +8,12 @@ environment:
 build: off
 
 init:
+  # システムロケールを日本語に切り替えて再起動
+  #   日本語 chm の文字化け対策
+  - ps: Set-WinSystemLocale ja-JP
+  - ps: Start-Sleep -s 10
+  - ps: Restart-Computer
+  - ps: Start-Sleep -s 10
   # タイムゾーンを JST に変更
   - tzutil /s "Tokyo Standard Time"
 
