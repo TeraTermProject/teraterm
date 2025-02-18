@@ -213,7 +213,7 @@ TCPCRSend=
 
 <p>
 非 Telnet 接続時でも、Tera Term はホストから送られてきた telnet コマンドに応答し、以降の通信を Telnet 接続として扱うようになります。<br>
-しかし、Tera Term 側から文字'0xFF'を送ってそれがエコーバックされた時に、そのエコーバックされた文字列を telnet コマンドとみなしてしまい、以降の通信が Telnet 接続として扱われてしまう事があります。 
+しかし、Tera Term 側から文字'0xFF'を送ってそれがエコーバックされた時に、そのエコーバックされた文字列を telnet コマンドとみなしてしまい、以降の通信が Telnet 接続として扱われてしまう事があります。
 </p>
 
 <p>
@@ -304,6 +304,31 @@ AutoComPortReconnect=off
 AutoComPortReconnect=on
 </pre>
 
+<h3>再接続動作</h3>
+再接続時の動作を次の図に示します。<br>
+<a href="serial_reconnect.png"><img src="serial_reconnect.png" width=200></a><br>
+(clickで拡大します)
+
+<h3>再接続パラメータ</h3>
+
+USBシリアルケーブルが利用できるようになってから次の時間(ms)経過後再接続します。
+<pre id="AutoComPortReconnectDelayNormal">
+省略時:
+AutoComPortReconnectDelayNormal=300
+</pre>
+
+接続通知が不正な時、次の時間(ms)経過後再接続します。
+<pre id="AutoComPortReconnectDelayIllegal">
+省略時:
+AutoComPortReconnectDelayIllegal=2000
+</pre>
+
+再接続時できなかった場合、次の指定回数、指定時間(ms)経過後再試行します。
+<pre id="AutoComPortReconnectRetryCount">
+省略時:
+AutoComPortReconnectRetryCount=3
+AutoComPortReconnectRetryInterval=1000
+</pre>
 
 <h1 id="WaitCom">シリアルポートの接続を待つ</h1>
 
