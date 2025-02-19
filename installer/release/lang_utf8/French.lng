@@ -377,8 +377,7 @@ DLG_SELECT_DIR_TITLE=Selectionner un nouveau répertoire
 
 DLG_GEN_TITLE=Tera Term: Configuration générale
 DLG_GEN_PORT=New &connection default
-DLG_GEN_LANG_UI=Language&UI:
-DLG_GEN_UILANG=UI &Language:
+DLG_GEN_LANG_UI=UI &Language:
 
 DLG_HOST_TITLE=Tera Term: Nouvelle connexion
 DLG_HOST_TCPIPHOST=Hôte:

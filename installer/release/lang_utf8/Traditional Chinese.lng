@@ -377,7 +377,7 @@ DLG_SELECT_DIR_TITLE=選擇新文件夾
 
 DLG_GEN_TITLE=Tera Term：設定設定
 DLG_GEN_PORT=New &connection default
-DLG_GEN_LANG_UI=界面語言(&U)：
+DLG_GEN_LANG_UI=界面語言(&L)：
 
 DLG_HOST_TITLE=Tera Term：建立新連線
 DLG_HOST_TCPIPHOST=主機(&O)：
