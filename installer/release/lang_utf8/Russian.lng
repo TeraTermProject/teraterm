@@ -179,6 +179,9 @@ DLG_TABSHEET_TITLE_VISUAL=Экран
 DLG_TABSHEET_TITLE_LOG=Лог
 DLG_TABSHEET_TITLE_CYGWIN=Cygwin
 DLG_TABSHEET_TITLE_FONT=Font
+DLG_TABSHEET_TITLE_ENCODING=Encoding
+DLG_TABSHEET_TITLE_THEME=Theme
+DLG_TABSHEET_TITLE_MOUSE=Mouse
 
 DLG_TAB_GENERAL_CLICKURL=&Запуск URL одним кликом
 DLG_TAB_GENERAL_DISABLESENDBREAK=&Отключить ускоритель и послать останов
@@ -374,7 +377,7 @@ DLG_SELECT_DIR_TITLE=Выбрать новую папку
 
 DLG_GEN_TITLE=Tera Term: Общие настройки
 DLG_GEN_PORT=New &connection default
-DLG_GEN_LANG_UI=&Язык меню:
+DLG_GEN_LANG_UI=Язык меню(&L):
 
 DLG_HOST_TITLE=Tera Term: Новое соединение
 DLG_HOST_TCPIPHOST=&Хост:
