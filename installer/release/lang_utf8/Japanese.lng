@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2025-01-20 by TeraTerm Project
+date=2025-02-21 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -1241,7 +1241,7 @@ MENU_EUCJP=送受信: &EUC-JP
 MENU_JIS=送受信: &JIS
 MENU_UTF8=送受信: &UTF-8
 MENU_KS5601=送受信: &KS5601
-MENU_SETTING=設定(&S)
+MENU_SETTING=設定(&I)
 MENU_SETTING_TITLE=KanjiMenu設定
 MENU_CHARCODE=文字コードメニューを表示(&W)
 MENU_CONTENTS=メニュー内容(&C)
