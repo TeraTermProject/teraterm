@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2025-02-21 by TeraTerm Project
+date=2025-02-22 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -472,7 +472,7 @@ DLG_WIN_COLOR=Farben
 DLG_WIN_TEXT=Text
 DLG_WIN_BG=Hintergrund
 DLG_WIN_ATTRIB=Attribute
-DLG_WIN_REVERSE=Umkehren
+DLG_WIN_SWAP_COLORS=S&wap colors
 DLG_WIN_R=&R:
 DLG_WIN_G=&G:
 DLG_WIN_B=&B:

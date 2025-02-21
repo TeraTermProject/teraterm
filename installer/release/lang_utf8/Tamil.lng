@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2025-02-21 by TeraTerm Project
+date=2025-02-22 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -472,7 +472,7 @@ DLG_WIN_COLOR=வண்ணம்
 DLG_WIN_TEXT=உரை
 DLG_WIN_BG=பின்னணிபடம்
 DLG_WIN_ATTRIB=&பண்பு
-DLG_WIN_REVERSE=தலைகீழ்
+DLG_WIN_SWAP_COLORS=S&wap colors
 DLG_WIN_R=&சி:
 DLG_WIN_G=&ப:
 DLG_WIN_B=&நீ:

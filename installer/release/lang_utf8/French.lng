@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2025-02-21 by TeraTerm Project
+date=2025-02-22 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -472,7 +472,7 @@ DLG_WIN_COLOR=Couleur
 DLG_WIN_TEXT=Te&xte
 DLG_WIN_BG=Fond
 DLG_WIN_ATTRIB=&Attribut
-DLG_WIN_REVERSE=Inv&ersé
+DLG_WIN_SWAP_COLORS=S&wap colors
 DLG_WIN_R=&R:
 DLG_WIN_G=&G:
 DLG_WIN_B=&B:

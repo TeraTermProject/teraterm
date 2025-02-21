@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2025-02-21 by TeraTerm Project
+date=2025-02-22 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -472,7 +472,7 @@ DLG_WIN_COLOR=顏色
 DLG_WIN_TEXT=文本(&X)
 DLG_WIN_BG=背景(&K)
 DLG_WIN_ATTRIB=屬性(&A)
-DLG_WIN_REVERSE=翻轉(&E)
+DLG_WIN_SWAP_COLORS=S&wap colors
 DLG_WIN_R=紅(&R)：
 DLG_WIN_G=綠(&G)：
 DLG_WIN_B=藍(&B)：

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2025-02-21 by TeraTerm Project
+date=2025-02-22 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -472,7 +472,7 @@ DLG_WIN_COLOR=カラー
 DLG_WIN_TEXT=文字(&X)
 DLG_WIN_BG=背景(&K)
 DLG_WIN_ATTRIB=属性(&A)
-DLG_WIN_REVERSE=反転(&E)
+DLG_WIN_SWAP_COLORS=色入れ替え(&W)
 DLG_WIN_R=赤(&R):
 DLG_WIN_G=緑(&G):
 DLG_WIN_B=青(&B):

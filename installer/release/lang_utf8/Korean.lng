@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean
-date=2025-02-21 by TeraTerm Project
+date=2025-02-22 by TeraTerm Project
 contributor=Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -472,7 +472,7 @@ DLG_WIN_COLOR=색상
 DLG_WIN_TEXT=문자(&X)
 DLG_WIN_BG=배경(&K)
 DLG_WIN_ATTRIB=속성(&A)
-DLG_WIN_REVERSE=반전(&E)
+DLG_WIN_SWAP_COLORS=S&wap colors
 DLG_WIN_R=&R:
 DLG_WIN_G=&G:
 DLG_WIN_B=&B:
