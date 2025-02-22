@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2025-02-07 by TeraTerm Project
+date=2025-02-21 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -181,6 +181,9 @@ DLG_TABSHEET_TITLE_VISUAL=顯示
 DLG_TABSHEET_TITLE_LOG=日誌
 DLG_TABSHEET_TITLE_CYGWIN=Cygwin
 DLG_TABSHEET_TITLE_FONT=Font
+DLG_TABSHEET_TITLE_ENCODING=Encoding
+DLG_TABSHEET_TITLE_THEME=Theme
+DLG_TABSHEET_TITLE_MOUSE=Mouse
 
 DLG_TAB_GENERAL_CLICKURL=啟用鏈接可點擊(&E)
 DLG_TAB_GENERAL_DISABLESENDBREAK=禁止加速器發送中斷(&S)
@@ -376,7 +379,7 @@ DLG_SELECT_DIR_TITLE=選擇新文件夾
 
 DLG_GEN_TITLE=Tera Term：設定設定
 DLG_GEN_PORT=New &connection default
-DLG_GEN_LANG_UI=界面語言(&U)：
+DLG_GEN_LANG_UI=界面語言(&L)：
 
 DLG_HOST_TITLE=Tera Term：建立新連線
 DLG_HOST_TCPIPHOST=主機(&O)：
@@ -1243,7 +1246,7 @@ MENU_EUCJP=收發: &EUC-JP
 MENU_JIS=收發: &JIS
 MENU_UTF8=收發: &UTF-8
 MENU_KS5601=收發: &KS5601
-MENU_SETTING=&Setting
+MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents

@@ -69,6 +69,12 @@
       </ul>
       <li>複数の Tera Term ウインドウを1つの Tera Term ウインドウで扱う <a href="../menu/window.html#enteringsinglewindowmode">Single Window Mode</a> を [Window] メニューに追加した。</li>
       <li>DPIが異なるディスプレイをまたいで移動した時、Windows 11(24H2)が誤ったモニタ情報を返す問題を解決して、ウィンドウが正しいDPIで表示するようにした。</li>
+      <li>シリアル再接続を改善した。
+        <ul>
+          <li>デバイスからの通知のチェックを詳細に行うようにした。</li>
+          <li>再接続時のパラメータをTERATERM.INIに追加した。</li>
+        </ul>
+      </li>
     </ul>
   </li>
 
@@ -98,6 +104,7 @@
       <li>XMODEM Send: XMODEM(CRC)からXMODEM(checksum)に切り替わってしまう問題を修正した</li>
       <li><a href="../menu/file-new.html#HostList">ホストリスト</a>に250以上保存しようとすると不正な処理が発生する問題を修正した。</li>
       <li>ブロードキャストコマンドの履歴が最大数のとき、コマンドを履歴に追加すると不正な処理が発生する問題を修正した(最大値はTERATERM.INIのMaxBroadcatHistory=99がデフォルト値)</li>
+      <li>ZMODEM send: 送信キャンセル時、CAN x8 を送信するようにした。</li>
     </ul>
   </li>
 
@@ -106,6 +113,7 @@
       <li><a href="#kanjimenu_0.1.10">TTX KanjiMenu Plugin(0.1.10)</a>へ差し替えた。</li>
       <li>Oniguruma 6.9.10へ差し替えた。</li>
       <li>インストーラに使用している Inno Setup のバージョンを<a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.4.0" target="_blank">6.4.0</a>へ差し替えた。</li>
+      <li><a href="#ttssh_3.4">TTSSH(3.4)</a>へ差し替えた。</li>
     </ul>
   </li>
 </ul>
@@ -3624,6 +3632,7 @@
   <li>バグ修正
     <ul>
       <li>SSH_MSG_USERAUTH_BANNER の文字コード変換時にメモリを破壊することがあったので修正</li>
+      <li>パスワード変更ダイアログで、「新パスワード」と「新パスワード確認」が一致しなくてもパスワードが変更されることがあったので修正</li>
     </ul>
   </li>
 

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Spanish
-date=2025-02-07 by TeraTerm Project
+date=2025-02-21 by TeraTerm Project
 contributor=Filiberto Olguin Ascona (2022-05-26)
 
 [Tera Term]
@@ -181,6 +181,9 @@ DLG_TABSHEET_TITLE_VISUAL=Visual
 DLG_TABSHEET_TITLE_LOG=Log
 DLG_TABSHEET_TITLE_CYGWIN=Cygwin
 DLG_TABSHEET_TITLE_FONT=Font
+DLG_TABSHEET_TITLE_ENCODING=Encoding
+DLG_TABSHEET_TITLE_THEME=Theme
+DLG_TABSHEET_TITLE_MOUSE=Mouse
 
 DLG_TAB_GENERAL_CLICKURL=&Enable clickable URL
 DLG_TAB_GENERAL_DISABLESENDBREAK=Disable accelerator &send break
@@ -376,7 +379,7 @@ DLG_SELECT_DIR_TITLE=Select new directory
 
 DLG_GEN_TITLE=Tera Term: General setup
 DLG_GEN_PORT=New &connection default
-DLG_GEN_LANG_UI=Language&UI:
+DLG_GEN_LANG_UI=UI &Language:
 
 DLG_HOST_TITLE=Tera Term: New connection
 DLG_HOST_TCPIPHOST=H&ost:
@@ -1240,7 +1243,7 @@ MENU_EUCJP=Recv/Send: &EUC-JP
 MENU_JIS=Recv/Send: &JIS
 MENU_UTF8=Recv/Send: &UTF-8
 MENU_KS5601=Recv/Send: &KS5601
-MENU_SETTING=&Setting
+MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents

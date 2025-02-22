@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2025-02-07 by TeraTerm Project
+date=2025-02-21 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -181,6 +181,9 @@ DLG_TABSHEET_TITLE_VISUAL=காட்சி
 DLG_TABSHEET_TITLE_LOG=பதிவு
 DLG_TABSHEET_TITLE_CYGWIN=சிக்வின்
 DLG_TABSHEET_TITLE_FONT=எழுத்துரு
+DLG_TABSHEET_TITLE_ENCODING=Encoding
+DLG_TABSHEET_TITLE_THEME=Theme
+DLG_TABSHEET_TITLE_MOUSE=Mouse
 
 DLG_TAB_GENERAL_CLICKURL=&சொடுக்கம் செய்யக்கூடிய முகவரியை இயக்கு
 DLG_TAB_GENERAL_DISABLESENDBREAK=முடுக்கியை முடக்கு & இடைவெளியை அனுப்பு
@@ -1240,7 +1243,7 @@ MENU_EUCJP=பெறு/அனுப்பு: &இயுசி-சேபி
 MENU_JIS=பெறு/அனுப்பு: &சேஐச்
 MENU_UTF8=பெறு/அனுப்பு: &ஒபசெ-8
 MENU_KS5601=பெறு/அனுப்பு: &கேச்5601
-MENU_SETTING=&Setting
+MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents

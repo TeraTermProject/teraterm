@@ -95,6 +95,7 @@ public:
 	void SetupTerm();
 	void Startup();
 	void OpenTEK();
+	void Disconnect(BOOL confirm);
 
 protected:
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
@@ -237,7 +238,6 @@ protected:
 	void OnHelpAbout();
 	LRESULT OnDropNotify(WPARAM ShowMenu, LPARAM lParam);
 	LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
-	void Disconnect(BOOL confirm);
 	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
 
 private:
