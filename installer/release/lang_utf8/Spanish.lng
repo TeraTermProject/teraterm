@@ -88,6 +88,8 @@ MENU_WINDOW_RESTOREALL=&Restaurar Todo
 MENU_WINDOW_CASCADE_UNDO=&Deshacer - Cascada
 MENU_WINDOW_STACKED_UNDO=&Deshacer - Apilado
 MENU_WINDOW_SIDEBYSIDE_UNDO=&Deshacer - Lado a Lado
+MENU_WINDOW_SINGLE_ENTER=&Entrando en modo de ventana unica
+MENU_WINDOW_SINGLE_EXIT=Sali&endo del modo de ventana unica
 
 MENU_HELP=&Ayuda
 MENU_HELP_INDEX=&Indice
