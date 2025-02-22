@@ -69,6 +69,13 @@
       </ul>
     </ul>
   </li>
+      <li>Resolved problem that Windows 11 24H2 returns incorrectly monitor information when moving across displays with different DPI, so that window are displayed at correct DPI.</li>
+      <li>Improved serial reconnection.
+        <ul>
+          <li>Checking for notifications from devices is more detailed.</li>
+          <li>Added parameters for reconnecting to TERATERM.INI.</li>
+        </ul>
+      </li>
 
   <li>Bug fixes
     <ul>
@@ -97,6 +104,7 @@
       <li>Fixed an application fault occurs when saving more than 250 in the <a href="../menu/file-new.html#HostList">Host list</a>.</li>
       <li>Fixed an application fault occurs when adding a command to the maximum size of broadcast history. (default is MaxBroadcatHistory=99 in TERATERM.INI)</li>
       <li>Fixed an issue in Windows 11 (24H2) where windows were not displayed at the correct size when moved across displays with different DPI settings.</li>
+      <li>ZMODEM send: CAN x8 is sent when send is canceled.</li>
     </ul>
   </li>
 
@@ -105,6 +113,7 @@
       <li>Upgraded TTX KanjiMenu Plug-in to <a href="#kanjimenu_0.1.10">0.1.10</a></li>
       <li>Upgraded Oniguruma to 6.9.10.</li>
       <li>Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.4.0" target="_blank">6.4.0</a>.</li>
+      <li>Upgraded TTSSH to <a href="#ttssh_3.4">3.4</a>.</li>
     </ul>
   </li>
 </ul>
@@ -3615,6 +3624,7 @@ SYNOPSIS:
   <li>Bug fixes
     <ul>
       <li>Fixed heap corruption during character code conversion of SSH_MSG_USERAUTH_BANNER</li>
+      <li>Fixed password was changed even if the ÅgNew PasswordÅh and ÅgConfirm New PasswordÅh did not match in the password change dialog.</li>
     </ul>
   </li>
 
