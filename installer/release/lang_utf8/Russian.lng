@@ -88,6 +88,8 @@ MENU_WINDOW_RESTOREALL=&Восстановить окна
 MENU_WINDOW_CASCADE_UNDO=&Восстановить окна каскадом
 MENU_WINDOW_STACKED_UNDO=&Восстановить окна мозаикой
 MENU_WINDOW_SIDEBYSIDE_UNDO=&Восстановить окна сторона к стороне
+MENU_WINDOW_SINGLE_ENTER=В&ход в режим одного окна
+MENU_WINDOW_SINGLE_EXIT=Вы&ход из режима одного окна
 
 MENU_HELP=&Помощь
 MENU_HELP_INDEX=&Поиск

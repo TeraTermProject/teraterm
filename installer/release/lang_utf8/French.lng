@@ -88,6 +88,8 @@ MENU_WINDOW_RESTOREALL=&Restore All
 MENU_WINDOW_CASCADE_UNDO=&Undo - Cascade
 MENU_WINDOW_STACKED_UNDO=&Undo - Stacked
 MENU_WINDOW_SIDEBYSIDE_UNDO=&Undo - Side By Side
+MENU_WINDOW_SINGLE_ENTER=&Entree en mode fenetre unique
+MENU_WINDOW_SINGLE_EXIT=Sorti&e du mode fenetre unique
 
 MENU_HELP=&Aide
 MENU_HELP_INDEX=&Index

@@ -88,6 +88,8 @@ MENU_WINDOW_RESTOREALL=すべて復元(&R)
 MENU_WINDOW_CASCADE_UNDO=元に戻す - 重ねて表示(&U)
 MENU_WINDOW_STACKED_UNDO=元に戻す - 上下に並べて表示(&U)
 MENU_WINDOW_SIDEBYSIDE_UNDO=元に戻す - 左右に並べて表示(&U)
+MENU_WINDOW_SINGLE_ENTER=シングルウィンドウモードに入る(&E)
+MENU_WINDOW_SINGLE_EXIT=シングルウィンドウモードを終了する(&E)
 
 MENU_HELP=ヘルプ(&H)
 MENU_HELP_INDEX=目次(&I)
