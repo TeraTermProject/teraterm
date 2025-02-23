@@ -66,7 +66,7 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: installer-BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.vs-version }}
+        name: installer-BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}
         path: |
           installer/Output/*.exe
           installer/Output/*.zip
