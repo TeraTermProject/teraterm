@@ -47,7 +47,8 @@
           <li>ドロップダウンから "&lt; Edit host list... &gt;" を選択</li>
         </ul>
         Windowsのジャンプリストでもホストリストが表示されます(Windows 10,11 では既定でジャンプリストは表示されません)。<br>
-        ホストリストは <a href="../setup/teraterm-ini.html#HostList">TERATERM.INI の Hosts セクション</a>に保存されています。
+        ホストリストは <a href="../setup/teraterm-ini.html#HostList">TERATERM.INI の Hosts セクション</a>に保存されています。<br>
+        保存できるホスト数は最大500です。<br>
       </dd>
       <dt id="keybind">keybind</dt>
       <dd>
@@ -161,7 +162,7 @@
 
     <h3>Serial</h3>
     <dl>
-      <dt>Port</dt>
+      <dt id="SerialPort">Port</dt>
       <dd>
         接続するシリアルポートをリストの中から選択してください。リストに表示されるシリアルポート番号の最大値はデフォルトで256となっています。また、利用可能なシリアルポートが存在しない場合は表示されません。<a href="../setup/teraterm-com.html#maxport">MaxComPort</a>で最大値を変更できます。<br>
       </dd>

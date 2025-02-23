@@ -194,6 +194,7 @@
     <ClCompile Include="mouse_pp.cpp" />
     <ClCompile Include="scp.cpp" />
     <ClCompile Include="sendfiledlg.cpp" />
+    <ClCompile Include="serial_pp.cpp" />
     <ClCompile Include="setupdirdlg.cpp" />
     <ClCompile Include="sizetip.c" />
     <ClCompile Include="prnabort.cpp" />
@@ -272,6 +273,7 @@
     <ClCompile Include="clipboarddlg.cpp" />
     <ClInclude Include="debug_pp.h" />
     <ClCompile Include="debug_pp.cpp" />
+    <ClInclude Include="serial_pp.h" />
     <ClInclude Include="term_pp.h" />
     <ClInclude Include="win_pp.h" />
   </ItemGroup>

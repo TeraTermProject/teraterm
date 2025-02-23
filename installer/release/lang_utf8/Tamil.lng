@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2025-01-04 by TeraTerm Project
+date=2025-02-21 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -179,6 +179,9 @@ DLG_TABSHEET_TITLE_VISUAL=காட்சி
 DLG_TABSHEET_TITLE_LOG=பதிவு
 DLG_TABSHEET_TITLE_CYGWIN=சிக்வின்
 DLG_TABSHEET_TITLE_FONT=எழுத்துரு
+DLG_TABSHEET_TITLE_ENCODING=Encoding
+DLG_TABSHEET_TITLE_THEME=Theme
+DLG_TABSHEET_TITLE_MOUSE=Mouse
 
 DLG_TAB_GENERAL_CLICKURL=&சொடுக்கம் செய்யக்கூடிய முகவரியை இயக்கு
 DLG_TAB_GENERAL_DISABLESENDBREAK=முடுக்கியை முடக்கு & இடைவெளியை அனுப்பு
@@ -373,7 +376,7 @@ DLG_ABOUT_TITLE=தேரா முனைத்தைப் பற்றி
 DLG_SELECT_DIR_TITLE=புதிய கோப்பகத்தைத் தேர்ந்தெடுக்கவும்
 
 DLG_GEN_TITLE=தேரா முனை: பொது அமைப்பு
-DLG_GEN_PORT=இயல்புநிலை &துறைமுகம்:
+DLG_GEN_PORT=New &connection default
 DLG_GEN_LANG_UI=மொழி இடைமுகம்:
 
 DLG_HOST_TITLE=தேரா முனை: புதிய இணைப்பு
@@ -393,7 +396,7 @@ DLG_KEYB_DISABLE=முடக்கப்பட்ட பயன்முறை:
 DLG_KEYB_APPKEY=&பயன்பாட்டு விசைப்பலகை
 DLG_KEYB_APPCUR=பயன்பாடு &சிமிட்டும் கோடு
 
-DLG_SERIAL_TITLE=தேரா முனை: தொடர் துறைமுகம் அமைவு மற்றும் இணைப்பு
+DLG_SERIAL_TITLE=தொடர் துறைமுகம்
 DLG_SERIAL_PORT=&துறைமுகம்:
 DLG_SERIAL_BAUD=வேகம்:
 DLG_SERIAL_DATA=&தரவு:
@@ -403,7 +406,6 @@ DLG_SERIAL_FLOW=&ஓட்டம் கட்டுப்பாடு:
 DLG_SERIAL_DELAY=அனுப்பும் தாமதம்
 DLG_SERIAL_DELAYCHAR=மிநொடி/&எழுத்து
 DLG_SERIAL_DELAYLINE=மிநொடி/&வரி
-DLG_SERIAL_SPEED_TOOLTIP=நீங்கள் நேரடியாக எண்ணைக் குறிப்பிடலாம்
 DLG_SERIAL_OK_CONNECTION=&புதிய சாளரத்துடன் இணைக்கவும்
 DLG_SERIAL_OK_OPEN=&புதிய திறந்தது
 DLG_SERIAL_OK_CLOSEOPEN=மூடு மற்றும் &புதிய திற
@@ -1239,7 +1241,7 @@ MENU_EUCJP=பெறு/அனுப்பு: &இயுசி-சேபி
 MENU_JIS=பெறு/அனுப்பு: &சேஐச்
 MENU_UTF8=பெறு/அனுப்பு: &ஒபசெ-8
 MENU_KS5601=பெறு/அனுப்பு: &கேச்5601
-MENU_SETTING=&Setting
+MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents

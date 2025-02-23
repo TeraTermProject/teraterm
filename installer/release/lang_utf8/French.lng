@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2025-01-04 by TeraTerm Project
+date=2025-02-21 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -179,6 +179,9 @@ DLG_TABSHEET_TITLE_VISUAL=Apparence
 DLG_TABSHEET_TITLE_LOG=Journal
 DLG_TABSHEET_TITLE_CYGWIN=Cygwin
 DLG_TABSHEET_TITLE_FONT=Font
+DLG_TABSHEET_TITLE_ENCODING=Encoding
+DLG_TABSHEET_TITLE_THEME=Theme
+DLG_TABSHEET_TITLE_MOUSE=Mouse
 
 DLG_TAB_GENERAL_CLICKURL=&Autoriser URL cliquable
 DLG_TAB_GENERAL_DISABLESENDBREAK=Dévalider accélération envoi de break
@@ -373,8 +376,8 @@ DLG_ABOUT_TITLE=A propos de Tera Term
 DLG_SELECT_DIR_TITLE=Selectionner un nouveau répertoire
 
 DLG_GEN_TITLE=Tera Term: Configuration générale
-DLG_GEN_PORT=Port par défaut:
-DLG_GEN_LANG_UI=Language&UI:
+DLG_GEN_PORT=New &connection default
+DLG_GEN_LANG_UI=UI &Language:
 
 DLG_HOST_TITLE=Tera Term: Nouvelle connexion
 DLG_HOST_TCPIPHOST=Hôte:
@@ -393,7 +396,7 @@ DLG_KEYB_DISABLE=Dévalider le mode:
 DLG_KEYB_APPKEY=Codes pavé numérique
 DLG_KEYB_APPCUR=Codes Curseur pavé numérique
 
-DLG_SERIAL_TITLE=Tera Term: Serial port setup and connection
+DLG_SERIAL_TITLE=Serial port
 DLG_SERIAL_PORT=&Port:
 DLG_SERIAL_BAUD=&Vitesse:
 DLG_SERIAL_DATA=&Données:
@@ -403,7 +406,6 @@ DLG_SERIAL_FLOW=Ctrl. de flux:
 DLG_SERIAL_DELAY=Délai de transmission
 DLG_SERIAL_DELAYCHAR=msec/&car
 DLG_SERIAL_DELAYLINE=msec/&ligne
-DLG_SERIAL_SPEED_TOOLTIP=You can directly specify a number
 DLG_SERIAL_OK_CONNECTION=Connect with &New window
 DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
@@ -1242,7 +1244,7 @@ MENU_EUCJP=Recep/Envoi: &EUC-JP
 MENU_JIS=Recep/Envoi: &JIS
 MENU_UTF8=Recv/Send: &UTF-8
 MENU_KS5601=Recep/Envoi: &KS5601
-MENU_SETTING=&Setting
+MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents

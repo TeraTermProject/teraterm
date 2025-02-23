@@ -75,7 +75,7 @@ void DispConvWinToScreen
   (int Xw, int Yw, int *Xs, int *Ys, PBOOL Right);
 void DispConvScreenToWin
   (int Xs, int Ys, int *Xw, int *Yw);
-void ChangeFont(void);
+void ChangeFont(unsigned int dpi);
 void ResetIME(void);
 void ChangeCaret(void);
 void CaretKillFocus(BOOL show);
@@ -134,7 +134,7 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Cou
 			  int Y, int *X);
 void DispEnableResizedFont(BOOL enable);
 BOOL DispIsResizedFont();
-void DispSetLogFont(LOGFONTA *VTlf, BOOL mul);
+void DispSetLogFont(LOGFONTA *VTlf, unsigned int dpi);
 
 extern int WinWidth, WinHeight;
 extern HFONT VTFont[AttrFontMask+1];

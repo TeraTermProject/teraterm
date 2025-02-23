@@ -60,8 +60,20 @@
       <li>Added <a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">skip Send file dialog</a> setting.</li>
       <li>Macro commands for sending and receiving files are also from File transfer folder.</li>
       <li>ZMODEM send: CANFDX flag handling is implemented when receiving ZRINIT. While the receiver cannot receive data, the sender(Tera Term) can wait for the receiver.
-    </ul>
-  </li>
+      <li>XMODEM send: flush receive buffer when start sending</li>
+      <li>Additional settings - <a href="../menu/setup-additional-serialport.html">Serial Port tab</a></li>
+      <ul>
+        <li>Setup - Serial dialog was integrated into Serial Port tab of Additional settings.</li>
+        <li>Only settings in this tab.(New connections are made from <a href="../menu/file-new.html">New connection dialog</a>.)</li>
+        <li>Select TCP/IP or Serial as <a href="../menu/setup-additional-general.html#Port">new connection default</a> for New connection dialog on General tab. Select default Serial port on Serial tab.</li>
+      </ul>
+      <li>Resolved problem that Windows 11 24H2 returns incorrectly monitor information when moving across displays with different DPI, so that window are displayed at correct DPI.</li>
+      <li>Improved serial reconnection.
+        <ul>
+          <li>Checking for notifications from devices is more detailed.</li>
+          <li>Added parameters for reconnecting to TERATERM.INI.</li>
+        </ul>
+      </li>
 
   <li>Bug fixes
     <ul>
@@ -87,12 +99,19 @@
       <li>Unicode support for jump list display.</li>
       <li>MACRO: Fixed <a href="../macro/command/setpassword.html">setpassword</a> and <a href="../macro/command/ispassword.html">ispassword</a> macro commands were not Unicode compatible.</li>
       <li>ZMODEM send: When sending is aborted on Tera Term, cancel sequence is now sent.</li>
+      <li>XMODEM Send: Fixed problem switching from XMODEM(CRC) to XMODEM(checksum).</li>
+      <li>Fixed an application fault occurs when saving more than 250 in the <a href="../menu/file-new.html#HostList">Host list</a>.</li>
+      <li>Fixed an application fault occurs when adding a command to the maximum size of broadcast history. (default is MaxBroadcatHistory=99 in TERATERM.INI)</li>
+      <li>ZMODEM send: CAN x8 is sent when send is canceled.</li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
       <li>Upgraded TTX KanjiMenu Plug-in to <a href="#kanjimenu_0.1.10">0.1.10</a></li>
+      <li>Upgraded Oniguruma to 6.9.10.</li>
+      <li>Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.4.0" target="_blank">6.4.0</a>.</li>
+      <li>Upgraded TTSSH to <a href="#ttssh_3.4">3.4</a>.</li>
     </ul>
   </li>
 </ul>
@@ -408,15 +427,15 @@
         <ul>
           <li>Added support for hardware flow control DSR/DTR with serial connection.
             <ul>
-              <li>The hardware is renamed to RTS/CTS, and DSR/DTR is newly added on the Flow control of <a href="../menu/setup-serialport.html">Serial port ([Setup] menu)</a>.</li>
+              <li>The hardware is renamed to RTS/CTS, and DSR/DTR is newly added on the Flow control of <a href="../menu/setup-additional-serialport.html">Serial port ([Setup] menu)</a>.</li>
               <li>MACRO: The DSR/DTR can be specified in <a href="../macro/command/setflowctrl.html">setflowctrl</a> command.</li>
             </ul></li>
-          <li>The <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog can be called even while TCP/IP connection.</li>
-          <li>The title of <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog is changed from "Serial port setup" to "Serial port setup and connection".</li>
-          <li>The detail information of COM port is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
-          <li>The tooltip of the speed setting is added on the <a href="../menu/setup-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
-          <li>The OK button notation in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog is changed referring to the connection state. </li>
-          <li>The OK button can not be pressed in the <a href="../menu/setup-serialport.html#OK">[Setup]-[Serial port]</a> dialog when no COM ports are available.</li>
+          <li>The <a href="../menu/setup-additional-serialport.html">[Setup]-[Serial port]</a> dialog can be called even while TCP/IP connection.</li>
+          <li>The title of <a href="../menu/setup-additional-serialport.html">[Setup]-[Serial port]</a> dialog is changed from "Serial port setup" to "Serial port setup and connection".</li>
+          <li>The detail information of COM port is added on the <a href="../menu/setup-additional-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
+          <li>The tooltip of the speed setting is added on the <a href="../menu/setup-additional-serialport.html#Information">[Setup]-[Serial port]</a> dialog.</li>
+          <li>The OK button notation in the <a href="../menu/setup-additional-serialport.html">[Setup]-[Serial port]</a> dialog is changed referring to the connection state. </li>
+          <li>The OK button can not be pressed in the <a href="../menu/setup-additional-serialport.html">[Setup]-[Serial port]</a> dialog when no COM ports are available.</li>
           <li>Added <a href="../commandline/teraterm.html#cdatabit">/CDATABIT=</a>,  <a href="../commandline/teraterm.html#cparity">/CPARITY=</a>, <a href="../commandline/teraterm.html#cstopbit">/CSTOPBIT=</a>, <a href="../commandline/teraterm.html#cflowctrl">/CFLOWCTRL=</a>, <a href="../commandline/teraterm.html#cdelayperchar">/CDELAYPERCHAR=</a>, <a href="../commandline/teraterm.html#cdelayperline">/CDELAYPERLINE=</a> command line options.</li>
         </ul>
       </li>
@@ -1868,7 +1887,7 @@
   <li>Bug fixes
     <ul>
       <li>Security fix: A class of vulnerabilities affecting applications that load DLL's in an insecure manner.</li>
-      <li>The baud rate can not be properly selected on the <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog.</li>
+      <li>The baud rate can not be properly selected on the <a href="../menu/setup-additional-serialport.html">[Setup]-[Serial port]</a> dialog.</li>
       <li><a href="../setup/teraterm-term.html#beep">Beep setting</a> does not work.</li>
       <li>The scroll region can not be cleared by using the DECALN (DEC Screen Alignment Test) control sequence.</li>
       <li>An empty string can not reply by using the window title and icon label reporting request.</li>
@@ -1950,7 +1969,7 @@
         </ul></li>
       <li>added support for specifying any baud rate of the serial port connection.
         <ul>
-          <li>A user can specify any baud rate at the <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> menu.</li>
+          <li>A user can specify any baud rate at the <a href="../menu/setup-additional-serialport.html">[Setup]-[Serial port]</a> menu.</li>
           <li>A user can specify any baud rate at the <a href="../commandline/teraterm.html#baud">/BAUD</a> option.</li>
           <li>A user can specify any baud rate at the "<a href="../macro/command/setbaud.html">setbaud</a>" macro command.</li>
         </ul></li>
@@ -3603,6 +3622,7 @@ SYNOPSIS:
   <li>Bug fixes
     <ul>
       <li>Fixed heap corruption during character code conversion of SSH_MSG_USERAUTH_BANNER</li>
+      <li>Fixed password was changed even if the ÅgNew PasswordÅh and ÅgConfirm New PasswordÅh did not match in the password change dialog.</li>
     </ul>
   </li>
 

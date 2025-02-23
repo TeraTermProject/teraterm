@@ -134,6 +134,18 @@ static void NewLine(TProtoLog *pv)
 	pv->WriteRaw(pv,"\015\012",2);	// 0x0d 0x0a "\r\n"
 }
 
+/*
+ * 環境によってコントロール文字も0以外を返すのでisprint()を使用しない
+ *		VS2022 は 0x09 も 0 以外を返す
+ */
+static int ttisprint(int c)
+{
+	if (0x20 <= c && c <= 0x7e) {
+		return 1;
+	}
+	return 0;
+}
+
 static void DumpFlush(TProtoLog *pv)
 {
 	PrivateData_t *pdata = (PrivateData_t *)pv->private_data;
@@ -147,7 +159,7 @@ static void DumpFlush(TProtoLog *pv)
 	pv->WriteRaw(pv,"    ", 4);
 	for (i = 0 ; i < pdata->LogCount ; i++) {
 		char ch[5];
-		if (isprint(pdata->LogLineBuf[i])) {
+		if (ttisprint(pdata->LogLineBuf[i])) {
 			_snprintf_s(ch, sizeof(ch), _TRUNCATE, "%c", pdata->LogLineBuf[i]);
 			pv->WriteRaw(pv, ch, 1);
 
@@ -187,6 +199,26 @@ static void ProtoLogDestroy(TProtoLog *pv)
 	free(pv);
 }
 
+static void DumpBytes(struct ProtoLog *pv, const BYTE *ptr, size_t len)
+{
+	size_t i;
+	for (i = 0; i < len; i++) {
+		BYTE b = *ptr++;
+		pv->DumpByte(pv, b);
+	};
+	pv->DumpFlush(pv);
+}
+
+static void printfA(struct ProtoLog *pv, const char *fmt, ...)
+{
+	char s[1024];
+	va_list arg;
+	va_start(arg, fmt);
+	_vsnprintf_s(s, _countof(s), _TRUNCATE, fmt, arg);
+	va_end(arg);
+	pv->WriteStr(pv, s);
+}
+
 TProtoLog *ProtoLogCreate()
 {
 	TProtoLog *pv = (TProtoLog *)calloc(1, sizeof(*pv));
@@ -210,6 +242,8 @@ TProtoLog *ProtoLogCreate()
 	pv->DumpByte = DumpByte;
 	pv->DumpFlush = DumpFlush;
 	pv->WriteRaw = WriteRawData;
+	pv->DumpBytes = DumpBytes;
+	pv->printfA = printfA;
 	pv->Destory = ProtoLogDestroy;
 	pv->private_data = pdata;
 

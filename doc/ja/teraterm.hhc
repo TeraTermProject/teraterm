@@ -541,7 +541,7 @@
 					</OBJECT>
 				<UL>
 					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="Edit Hisotry">
+						<param name="Name" value="Edit History">
 						<param name="Local" value="html\menu\setup-additional-tcpip_edithistory.html">
 						<param name="ImageNumber" value="11">
 						</OBJECT>
@@ -554,6 +554,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Window タブ">
 					<param name="Local" value="html\menu\setup-additional-window.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="シリアルポート タブ">
+					<param name="Local" value="html\menu\setup-additional-serialport.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 			</UL>

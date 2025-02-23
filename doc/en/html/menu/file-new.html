@@ -50,7 +50,8 @@
           <li>select "&lt; Edit host list... &gt;" from dropdown</li>
         </ul>
         The host list is also used in Windows jump list (jump list is not available by default in Windows 10 and 11).<br>
-        host list is saved <a href="../setup/teraterm-ini.html#HostList">Hosts section in TERATERM.INI</a>.
+        host list is saved <a href="../setup/teraterm-ini.html#HostList">Hosts section in TERATERM.INI</a>.<br>
+        The maximum number of hosts that can be saved is 500.
       </dd>
       <dt id="keybind">keybind</dt>
       <dd>
@@ -83,7 +84,7 @@
         Displayed when TTSSH is enabled. <br>
         This option is select, the entered hostname will be added to the top of the host list when connecting to the input host.<br>
         If already exist in host list, move to the top.<br>
-        <a href="setup-additional-tcpip.html#HistoryList">Add host list when new connection</a> in <a href="setup-additional-tcpip.html">Additional settings / "TCP/IP" tab</a> is default value for this checkbox.
+        <a href="setup-additional-tcpip.html#HistoryList">Add host list when new connection</a> in <a href="setup-additional-tcpip.html">Additional settings / "TCP/IP" tab</a> is default value for this checkbox.<br>
       </dd>
 
       <dt>Telnet</dt>
@@ -164,7 +165,7 @@
 
     <h3>Serial</h3>
     <dl>
-      <dt>Port</dt>
+      <dt id="SerialPort">Port</dt>
       <dd>
         Select a port from the list. By default, maximum serial port number in the list is 256. Also, the serial port does not show when there is no available port. It is configurable in <a href="../setup/teraterm-com.html#maxport">MaxComPort</a> setting.
       </dd>

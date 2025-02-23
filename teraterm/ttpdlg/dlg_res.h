@@ -69,7 +69,6 @@
 #define IDC_SERIALFLOW                  406
 #define IDC_SERIALDELAYCHAR             407
 #define IDC_SERIALDELAYLINE             408
-#define IDC_SERIALHELP                  499
 #define IDD_TCPIPDLG                    500
 #define IDC_TCPIPHISTORY                507
 #define IDC_TCPIPAUTOCLOSE              508
@@ -158,7 +157,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        103
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1081
+#define _APS_NEXT_CONTROL_VALUE         1082
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

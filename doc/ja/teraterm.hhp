@@ -139,6 +139,7 @@ HlpMenuSetupAdditionalCtrlSeq=html\menu\setup-additional-ctrlseq.html
 HlpMenuSetupAdditionalCygwin=html\menu\setup-additional-cygwin.html
 HlpMenuSetupAdditionalWindow=html\menu\setup-additional-window.html
 HlpMenuSetupAdditionalTerminal=html\menu\setup-additional-terminal.html
+HlpMenuSetupAdditionalSerialPort=html\menu\setup-additional-serialport.html
 HlpMenuSetupThemeEditor=html\menu\setup-additional-visual-theme.html
 HlpMenuSetupSave=html\menu\setup-save.html
 HlpMenuSetupRestore=html\menu\setup-restore.html

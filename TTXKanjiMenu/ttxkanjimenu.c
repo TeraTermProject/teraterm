@@ -98,12 +98,12 @@ static const MenuInfo MenuOneSetting[] = {
 
 // Ambiguous Character Width
 static const MenuInfo MenuAmbiguousWidth[] = {
-	{ ID_MI_AMB_WIDTH_1,		0,	L"Ambiguous Character Width 1",	NULL },
-	{ ID_MI_AMB_WIDTH_2,		0,	L"Ambiguous Character Width 2",	NULL },
+	{ ID_MI_AMB_WIDTH_1,		0,	L"Ambiguous Character Width &1",	NULL },
+	{ ID_MI_AMB_WIDTH_2,		0,	L"Ambiguous Character Width &2",	NULL },
 };
 
 static const MenuInfo MenuSetting[] = {
-	{ ID_MI_SETTING,			0,	L"Setting",	"MENU_SETTING" },
+	{ ID_MI_SETTING,			0,	L"Sett&ing",	"MENU_SETTING" },
 };
 
 static HANDLE hInst; /* Instance handle of TTX*.DLL */

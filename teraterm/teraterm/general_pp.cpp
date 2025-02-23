@@ -235,7 +235,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 		{ IDC_CLEAR_ON_RESIZE, "DLG_TAB_GENERAL_CLEAR_ON_RESIZE" },
 		{ IDC_CURSOR_CHANGE_IME, "DLG_TAB_GENERAL_CURSOR_CHANGE_IME" },
 		// { IDC_LIST_HIDDEN_FONTS, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
-		{ IDC_GENUILANG_LABEL, "DLG_GEN_UILANG" },
+		{ IDC_GENUILANG_LABEL, "DLG_GEN_LANG_UI" },
 		{ IDC_GENPORT_LABEL, "DLG_GEN_PORT" },
 		{ IDC_TITLEFMT_GROUP, "DLG_TAB_GENERAL_TITLEFMT_GROUP" },
 		{ IDC_TITLEFMT_DISPHOSTNAME, "DLG_TAB_GENERAL_TITLEFMT_DISPHOSTNAME" },
@@ -307,27 +307,9 @@ void CGeneralPropPageDlg::OnInitDialog()
 	}
 
 	// default port
-	{
-		WORD w;
-		SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM) "TCP/IP");
-		for (w=1;w<=pts->MaxComPort;w++) {
-			char Temp[8];
-			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "COM%d", w);
-			SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM)Temp);
-		}
-		if (pts->PortType==IdSerial) {
-			if (pts->ComPort <= pts->MaxComPort) {
-				w = pts->ComPort;
-			}
-			else {
-				w = 1; // COM1
-			}
-		}
-		else {
-			w = 0; // TCP/IP
-		}
-		SendDlgItemMessageA(IDC_GENPORT, CB_SETCURSEL, w, 0);
-	}
+	SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM)"TCP/IP");
+	SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM)"Serial");
+	SendDlgItemMessageA(IDC_GENPORT, CB_SETCURSEL, (pts->PortType == IdSerial) ? 1 : 0, 0);
 
 	// File transfer dir
 	SetDlgItemTextW(IDC_FILE_DIR, pts->FileDirW);

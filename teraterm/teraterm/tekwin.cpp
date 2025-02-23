@@ -751,7 +751,7 @@ void CTEKWindow::OnSetupFont()
 		return;
 	}
 
-	(*TEKSetupFont)(&tk,&ts);
+	TEKSetupFont(&tk,&ts);
 }
 
 void CTEKWindow::OnVTWin()

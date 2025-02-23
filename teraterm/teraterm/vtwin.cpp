@@ -137,10 +137,6 @@ static BOOL TCPCRSendUsed = FALSE;
 
 static BOOL IgnoreRelease = FALSE;
 
-static HDEVNOTIFY hDevNotify = NULL;
-
-static int AutoDisconnectedPort = -1;
-
 UnicodeDebugParam_t UnicodeDebugParam;
 typedef struct {
 	char dbcs_lead_byte;
@@ -211,27 +207,338 @@ void CVTWindow::SetWindowAlpha(BYTE alpha)
 	Alpha = alpha;
 }
 
-static HDEVNOTIFY RegDeviceNotify(HWND hWnd)
-{
-	DEV_BROADCAST_DEVICEINTERFACE filter;
-	HDEVNOTIFY h;
+/**
+ *	シリアルの再接続/切断を行う
+ */
+class SerialReconnect {
 
-	if (pRegisterDeviceNotificationA == NULL) {
-		return NULL;
+#define DEBUG_WM_DEVICECHANGE	1
+#define RECONNECT_DELAY_NORMAL	500		// (ms)
+#define RECONNECT_DELAY_ILLEGAL	2000	// (ms)
+#define RECONNECT_RETRY			3
+#define RECONNECT_INTERVAL		1000	// (ms)
+
+public:
+	void Init(CVTWindow *vtwin)
+	{
+		hDevNotify = NULL;
+		state_ = NONE;
+		AutoDisconnectedPort = -1;
+		vtwin_ = vtwin;
+		if (pRegisterDeviceNotificationA == NULL) {
+			return;
+		}
+
+		/*
+		 *	USBデバイス変化通知登録
+		 *	WM_DEVICECHANGE で通知を受けることができる
+		 */
+		DEV_BROADCAST_DEVICEINTERFACE_A filter = {};
+		filter.dbcc_size = sizeof(filter);
+		filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
+		filter.dbcc_classguid = GUID_DEVINTERFACE_USB_DEVICE;	// USBマウスなどにも反応
+		//filter.dbcc_classguid = GUID_DEVINTERFACE_COMPORT;	// シリアルポートだけに反応
+
+		hDevNotify = pRegisterDeviceNotificationA(vtwin->m_hWnd, &filter, DEVICE_NOTIFY_WINDOW_HANDLE);
 	}
 
-	ZeroMemory(&filter, sizeof(filter));
-	filter.dbcc_size = sizeof(filter);
-	filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
-	filter.dbcc_classguid = GUID_DEVINTERFACE_USB_DEVICE;
-	h = pRegisterDeviceNotificationA(hWnd, &filter, DEVICE_NOTIFY_WINDOW_HANDLE);
-	return h;
-}
+	void Exit()
+	{
+		if (hDevNotify != NULL && pUnregisterDeviceNotification != NULL) {
+			pUnregisterDeviceNotification(hDevNotify);
+			hDevNotify = NULL;
+		}
+	}
 
-void SetAutoConnectPort(int port)
-{
-	AutoDisconnectedPort = port;
-}
+	/**
+	 *	WM_DEVICECHANGE が発生したときコールする
+	 */
+	BOOL OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
+	{
+		PDEV_BROADCAST_HDR pDevHdr;
+		int comport = 0;
+
+		pDevHdr = (PDEV_BROADCAST_HDR)dwData;
+		if (nEventType == DBT_DEVICEARRIVAL || nEventType == DBT_DEVICEREMOVECOMPLETE) {
+			if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
+				// メッセージからポートを取得
+				PDEV_BROADCAST_PORT_A pDevPortA = (PDEV_BROADCAST_PORT_A)pDevHdr;
+				if (pDevPortA->dbcp_name[1] != 0) {
+					// ANSI版
+					(void)sscanf(&pDevPortA->dbcp_name[3], "%d", &comport);
+				}
+				else {
+					PDEV_BROADCAST_PORT_W pDevPortW = (PDEV_BROADCAST_PORT_W)pDevHdr;
+					(void)swscanf(&pDevPortW->dbcp_name[3], L"%d", &comport);
+				}
+			}
+		}
+#if DEBUG_WM_DEVICECHANGE
+		OutputDebugPrintf(
+			"nEventType=%s(0x%x)\n",
+			nEventType == DBT_DEVICEARRIVAL ? "DBT_DEVICEARRIVAL" :
+			nEventType == DBT_DEVICEREMOVECOMPLETE ? "DBT_DEVICEREMOVECOMPLETE" :
+			nEventType == DBT_DEVNODES_CHANGED ? "DBT_DEVNODES_CHANGED" :
+			"-",
+			nEventType);
+		if (nEventType == DBT_DEVICEARRIVAL || nEventType == DBT_DEVICEREMOVECOMPLETE) {
+			OutputDebugPrintf(
+				" devicetype=%s(%d)\n",
+				pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT ? "DBT_DEVTYP_PORT" :
+				pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE ? "DBT_DEVTYP_DEVICEINTERFACE" :
+				"-",
+				pDevHdr->dbch_devicetype);
+			if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
+				PDEV_BROADCAST_PORT_A pDevPortA = (PDEV_BROADCAST_PORT_A)pDevHdr;
+				if (pDevPortA->dbcp_name[1] != 0) {
+					OutputDebugPrintf(" %s (%d)\n", pDevPortA->dbcp_name, comport);
+				}
+				else {
+					PDEV_BROADCAST_PORT_W pDevPortW = (PDEV_BROADCAST_PORT_W)pDevHdr;
+					OutputDebugPrintfW(L" %s (%d)\n", pDevPortW->dbcp_name, comport);
+				}
+			}
+		}
+#endif
+		switch (nEventType) {
+		case DBT_DEVICEARRIVAL:
+			// デバイスまたはメディアの一部が挿入されて使用可能になった
+#if DEBUG_WM_DEVICECHANGE
+			OutputDebugPrintf(" PortType=%d AutoDisconnectedPort=%d state_=%d\n",
+							  ts.PortType, AutoDisconnectedPort, state_);
+#endif
+			// - 正しくは次の順で2メッセージが送られてくるようだ
+			// 		DBT_DEVTYP_DEVICEINTERFACE
+			// 		DBT_DEVTYP_PORT
+			// - DBT_DEVTYP_PORT を投げず DBT_DEVTYP_DEVICEINTERFACE しか投げないドライバがあるらしい
+			// - DBT_DEVTYP_PORT しか投げてこない場合は Windows 2000 以前 or 古いドライバ?
+			//   - DBT_DEVTYP_DEVICEINTERFACE は WINVER >= 0x040A(Windows2000?) のときだけ発生するらしい
+			if ((pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT ||
+				 pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) &&
+				ts.PortType == IdSerial &&
+				ts.AutoComPortReconnect &&
+				AutoDisconnectedPort == ts.ComPort &&
+				(!cv.Open)) {
+				switch(state_) {
+				case NONE:
+					break;
+				case WAIT_DEVTYP_DEVICEINTERFACE: {
+					Connecting = TRUE;	// ポートが分からない、とりあえず接続中にする
+					UINT delay = ts.AutoComPortReconnectDelayIllegal;
+					SetTimer(delay);
+					if (pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
+						state_ = WAIT_DEVTYP_PORT;
+					}
+					else {
+						// DEVTYP_DEVICEINTERFACE のはずが DBT_DEVTYP_PORT 等が発生した
+						state_ = WAIT_TIMER;
+					}
+#if DEBUG_WM_DEVICECHANGE
+					OutputDebugPrintf(" state %d timer illegal %d ms\n", state_, delay);
+#endif
+					break;
+				}
+				case WAIT_DEVTYP_PORT: {
+					if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
+						if (comport == AutoDisconnectedPort) {
+							// 接続する
+							UINT delay = ts.AutoComPortReconnectDelayNormal;
+							Connecting = TRUE;	// 接続中
+							SetTimer(delay);
+							state_ = WAIT_TIMER;
+#if DEBUG_WM_DEVICECHANGE
+							OutputDebugPrintf(" state %d timer normal %d ms\n", state_, delay);
+#endif
+						}
+					}
+					else {
+						state_ = WAIT_TIMER;
+					}
+				}
+				case WAIT_TIMER:
+					// タイマーで接続する
+					break;
+				case RECONNECTING:
+					// 再接続中
+					break;
+				}
+			}
+			break;
+		case DBT_DEVICEREMOVECOMPLETE:
+			// デバイスまたはメディアが削除された
+#if DEBUG_WM_DEVICECHANGE
+			OutputDebugPrintf(" PortType=%d AutoDisconnectedPort=%d\n", ts.PortType, AutoDisconnectedPort);
+#endif
+			if ((pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT ||
+				 pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) &&
+				ts.PortType == IdSerial &&
+				ts.AutoComPortReconnect) {
+				if (state_ == NONE) {
+					// 切断された、再接続準備
+					if (cv.Open) {
+						BOOL disconnected = FALSE;
+						if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
+							if (comport == cv.ComPort) {
+								SetAutoConnectPort(ts.ComPort);
+								vtwin_->Disconnect(TRUE);
+								disconnected = TRUE;
+							}
+						}
+						if (disconnected == FALSE) {
+							// DBT_DEVTYP_PORT が発生しない場合対応
+							//   HHD Software Virtual Serial Port Tool 6.20.00.1466 では
+							//		ポートをオープンしていると DBT_DEVTYP_PORT を投げてこないようだ
+							//
+							// 次の順でメッセージが来るため事実上 DBT_DEVTYP_PORT のコードは使用されない
+							//  - DBT_DEVTYP_DEVICEINTERFACE
+							//  - DBT_DEVTYP_PORT
+							if (CheckComPort(cv.ComPort) == 0) {
+								/* オープンしているポートが無効になった,クローズする */
+								vtwin_->Disconnect(TRUE);
+								SetAutoConnectPort(ts.ComPort);
+							}
+						}
+					}
+				}
+				else {
+					// 再接続中に抜かれた?
+					state_ = NONE;
+					if (timer_id_ != 0) {
+						KillTimer(vtwin_->m_hWnd, timer_id_);
+					}
+					SetAutoConnectPort(ts.ComPort);
+					Connecting = FALSE;		// 通常状態(接続中ではない)
+					ChangeTitle();
+				}
+			}
+			break;
+		}
+		return TRUE;
+	}
+
+	void SetAutoConnectPort(int port)
+	{
+#if DEBUG_WM_DEVICECHANGE
+		OutputDebugPrintf("%s() %d\n", __FUNCTION__, state_);
+#endif
+		if (state_ != NONE) {
+			return;
+		}
+		AutoDisconnectedPort = port;
+		state_ = WAIT_DEVTYP_DEVICEINTERFACE;
+		retry_left_ = ts.AutoComPortReconnectRetryCount;
+		ChangeTitle();
+	}
+
+	void ResetAutoConnectPort()
+	{
+#if DEBUG_WM_DEVICECHANGE
+		OutputDebugPrintf("%s() %d\n", __FUNCTION__, state_);
+#endif
+		AutoDisconnectedPort = -1;
+	}
+
+	BOOL IsReconnecting()
+	{
+		return state_ == RECONNECTING;
+	}
+
+private:
+	void SetTimer(UINT uElapse)
+	{
+		if (timer_id_ != 0) {
+			KillTimer(vtwin_->m_hWnd, timer_id_);
+		}
+		timer_id_ = ::SetTimer(vtwin_->m_hWnd, (UINT_PTR)this, uElapse, OpenSerialTimerEntry);
+	}
+
+	/**
+	 *	シリアルをオープンする
+	 */
+	void OpenSerial()
+	{
+		state_ = RECONNECTING;
+#if DEBUG_WM_DEVICECHANGE
+		OutputDebugPrintf("%s() %d %d\n", __FUNCTION__, AutoDisconnectedPort, state_);
+#endif
+		if (timer_id_ != 0) {
+			KillTimer(vtwin_->m_hWnd, timer_id_);
+			timer_id_ = 0;
+		}
+		BOOL try_open = FALSE;
+		if (CheckComPort(AutoDisconnectedPort) != 0) {
+			// ポートが存在している、オープンを試みる
+			int NoMsg_prev = cv.NoMsg;
+			try_open = TRUE;
+			if (retry_left_ != 0) {
+				cv.NoMsg = 1;	// ポップアップを出さない
+			}
+			else {
+				state_ = NONE;
+			}
+			CommOpen(vtwin_->m_hWnd, &ts, &cv);
+			cv.NoMsg = NoMsg_prev;
+#if DEBUG_WM_DEVICECHANGE
+			OutputDebugPrintf("%s() return from CommOpen()\n", __FUNCTION__);
+#endif
+		}
+		if (cv.Open == TRUE) {
+			// シリアルオープン成功
+#if DEBUG_WM_DEVICECHANGE
+			OutputDebugPrintf("%s() Open success\n", __FUNCTION__);
+#endif
+			state_ = NONE;
+			AutoDisconnectedPort = -1;
+		}
+		else if (retry_left_ ==0) {
+			// シリアルオープン失敗
+#if DEBUG_WM_DEVICECHANGE
+			OutputDebugPrintf("%s() Open fail\n", __FUNCTION__);
+#endif
+			state_ = NONE;
+			AutoDisconnectedPort = -1;
+			if (try_open == FALSE) {
+				Connecting = FALSE;
+			}
+		}
+		else {
+			// シリアルオープン失敗,リトライする
+			UINT delay = ts.AutoComPortReconnectRetryInterval;
+#if DEBUG_WM_DEVICECHANGE
+			OutputDebugPrintf("%s() Open fail, retry left %d interval %dms\n", __FUNCTION__, retry_left_, delay);
+#endif
+			SetTimer(delay);
+			retry_left_--;
+		}
+
+		ChangeTitle();
+	}
+
+	static void CALLBACK OpenSerialTimerEntry(HWND, UINT, UINT_PTR data, DWORD)
+	{
+		SerialReconnect *ptr = (SerialReconnect *)data;
+#if DEBUG_WM_DEVICECHANGE
+		OutputDebugPrintf("%s()\n", __FUNCTION__);
+#endif
+		ptr->OpenSerial();
+	}
+
+private:
+	CVTWindow *vtwin_;
+	UINT_PTR timer_id_;
+	enum {
+		NONE,
+		WAIT_DEVTYP_DEVICEINTERFACE,
+		WAIT_DEVTYP_PORT,
+		WAIT_TIMER,
+		RECONNECTING,
+	} state_;
+	HDEVNOTIFY hDevNotify;
+	int AutoDisconnectedPort;
+	int retry_left_;
+};
+
+static SerialReconnect *serail_reconnect;
 
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow constructor
@@ -423,7 +730,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	}
 
 	// USBデバイス変化通知登録
-	hDevNotify = RegDeviceNotify(HVTWin);
+	serail_reconnect = new SerialReconnect();
+	serail_reconnect->Init(this);
 
 	// 通知領域初期化
 	NotifyIcon *ni = Notify2Initialize();
@@ -451,7 +759,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		::PostMessage(HVTWin,WM_USER_CHANGEMENU,0,0);
 	}
 
-	ChangeFont();
+	ChangeFont(0);
 
 	ResetIME();
 
@@ -1020,7 +1328,7 @@ void CVTWindow::InitPasteMenu(HMENU *Menu)
 
 void CVTWindow::ResetSetup()
 {
-	ChangeFont();
+	ChangeFont(0);
 	BuffChangeWinSize(WinWidth,WinHeight);
 	ChangeCaret();
 
@@ -1463,10 +1771,10 @@ void CVTWindow::OnDestroy()
 	UnregWin(HVTWin);
 
 	// USBデバイス変化通知解除
-	if (hDevNotify != NULL && pUnregisterDeviceNotification != NULL) {
-		pUnregisterDeviceNotification(hDevNotify);
-		hDevNotify = NULL;
-	}
+	serail_reconnect->Exit();
+	delete serail_reconnect;
+	serail_reconnect = NULL;
+
 
 	EndKeyboard();
 
@@ -2451,7 +2759,7 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 			h = ts.TerminalHeight;
 
 			if (FontChanged) {
-				ChangeFont();
+				ChangeFont(0);
 			}
 		}
 		else {
@@ -2786,71 +3094,7 @@ void CVTWindow::OnVScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 
 BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 {
-	PDEV_BROADCAST_HDR pDevHdr;
-#ifdef DEBUG
-	char port_name[8]; /* COMxxxx + NULL */
-#endif
-
-	pDevHdr = (PDEV_BROADCAST_HDR)dwData;
-
-	switch (nEventType) {
-	case DBT_DEVICEARRIVAL:
-#ifdef DEBUG
-		OutputDebugPrintf("DBT_DEVICEARRIVAL devicetype=%d PortType=%d AutoDisconnectedPort=%d\n", pDevHdr->dbch_devicetype, ts.PortType, AutoDisconnectedPort);
-#endif
-		// DBT_DEVTYP_PORT を投げず DBT_DEVTYP_DEVICEINTERFACE しか投げないドライバがあるため
-		if ((pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT || pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) &&
-		    ts.PortType == IdSerial &&
-		    ts.AutoComPortReconnect &&
-		    AutoDisconnectedPort == ts.ComPort) {
-#ifdef DEBUG
-			if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
-				PDEV_BROADCAST_PORT pDevPort;
-				pDevPort = (PDEV_BROADCAST_PORT)pDevHdr;
-				strncpy_s(port_name, sizeof(port_name), pDevPort->dbcp_name, _TRUNCATE);
-				OutputDebugPrintf("%s\n", port_name);
-			}
-#endif
-			if (!cv.Open) {
-				/* Tera Term 未接続 */
-				if (CheckComPort(ts.ComPort) == 1) {
-					/* ポートが有効 */
-					AutoDisconnectedPort = -1;
-					Connecting = TRUE;
-					ChangeTitle();
-					CommOpen(HVTWin, &ts, &cv);
-				}
-			}
-		}
-		break;
-	case DBT_DEVICEREMOVECOMPLETE:
-#ifdef DEBUG
-		OutputDebugPrintf("DBT_DEVICEREMOVECOMPLETE devicetype=%d PortType=%d AutoDisconnectedPort=%d\n", pDevHdr->dbch_devicetype, ts.PortType, AutoDisconnectedPort);
-#endif
-		if ((pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT || pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) &&
-		    ts.PortType == IdSerial &&
-		    ts.AutoComPortReconnect &&
-		    AutoDisconnectedPort == -1) {
-#ifdef DEBUG
-			if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
-				PDEV_BROADCAST_PORT pDevPort;
-				pDevPort = (PDEV_BROADCAST_PORT)pDevHdr;
-				strncpy_s(port_name, sizeof(port_name), pDevPort->dbcp_name, _TRUNCATE);
-				OutputDebugPrintf("%s\n", port_name);
-			}
-#endif
-			if (cv.Open) {
-				/* Tera Term 接続中 */
-				if (CheckComPort(cv.ComPort) == 0) {
-					/* ポートが無効 */
-					AutoDisconnectedPort = cv.ComPort;
-					Disconnect(TRUE);
-				}
-			}
-		}
-		break;
-	}
-	return TRUE;
+	return serail_reconnect->OnDeviceChange(nEventType, dwData);
 }
 
 LRESULT CVTWindow::OnWindowPosChanging(WPARAM wParam, LPARAM lParam)
@@ -3357,7 +3601,9 @@ LRESULT CVTWindow::OnCommNotify(WPARAM wParam, LPARAM lParam)
 					cv.CRSend = ts.CRSend_ini;
 				}
 			}
-			Connecting = FALSE;
+			if (!serail_reconnect->IsReconnecting()) {
+				Connecting = FALSE;
+			}
 			TCPIPClosed = TRUE;
 			// disable transmition
 			cv.OutBuffCount = 0;
@@ -3371,7 +3617,7 @@ LRESULT CVTWindow::OnCommNotify(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 {
-	AutoDisconnectedPort = -1;
+	serail_reconnect->ResetAutoConnectPort();
 
 	CommStart(&cv,lParam,&ts);
 	if (ts.PortType == IdTCPIP && cv.RetryWithOtherProtocol == TRUE) {
@@ -3481,7 +3727,7 @@ LRESULT CVTWindow::OnCommStart(WPARAM wParam, LPARAM lParam)
 		ChangeTitle();
 		if (ts.AutoComPortReconnect && ts.WaitCom && ts.PortType == IdSerial) {
 			if (CheckComPort(ts.ComPort) == 0) {
-				SetAutoConnectPort(ts.ComPort);
+				serail_reconnect->SetAutoConnectPort(ts.ComPort);
 				return 0;
 			}
 		}
@@ -4307,39 +4553,7 @@ static void OpenNewComport(const TTTSet *pts)
 
 void CVTWindow::OnSetupSerialPort()
 {
-	BOOL Ok;
-
-	HelpId = HlpSetupSerialPort;
-	if (! LoadTTDLG()) {
-		return;
-	}
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	Ok = (*SetupSerialPort)(HVTWin, &ts);
-
-	if (Ok && ts.ComPort > 0) {
-		/*
-		 * TCP/IPによる接続中の場合は新規プロセスとして起動する。
-		 * New connectionからシリアル接続する動作と基本的に同じ動作となる。
-		 */
-		if ( cv.Ready && (cv.PortType != IdSerial) ) {
-			OpenNewComport(&ts);
-			return;
-		}
-
-		if (cv.Open) {
-			if (ts.ComPort != cv.ComPort) {
-				CommClose(&cv);
-				CommOpen(HVTWin,&ts,&cv);
-			}
-			else {
-				CommResetSerial(&ts, &cv, ts.ClearComBuffOnOpen);
-			}
-		}
-		else {
-			CommOpen(HVTWin,&ts,&cv);
-		}
-	}
+	OpenSetupSerialPort();
 }
 
 void CVTWindow::OnSetupTCPIP()
@@ -4723,7 +4937,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 
 	// 新しいDPIに合わせてフォントを生成、
 	// クライアント領域のサイズを決定する
-	ChangeFont();
+	ChangeFont(NewDPI);
 	ScreenWidth = WinWidth * FontWidth;
 	ScreenHeight = WinHeight * FontHeight;
 	//AdjustScrollBar();

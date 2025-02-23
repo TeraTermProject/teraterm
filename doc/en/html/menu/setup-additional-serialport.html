@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>Additional settings / "Serial port" tab ([Setup] menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Additional settings / "Serial port" tab ([Setup] menu)</h1>
+
+    <p>
+      Settings related to the serial port.
+
+    <dl>
+      <dt id="ComPort">Port</dt>
+      <dd>
+        When the serial port is not connected,
+        Sets the default serial port for <a href="file-new.html#SerialPort">New connection Dialog</a>.
+        A non existent serial port can be set.
+        New connection dialog does not show any non existent serial ports.<br>
+        By default, maximum serial port number in the list is 256. It is configurable in <a href="../setup/teraterm-com.html#maxport">MaxComPort</a> setting.
+        <p>
+          When the serial port is connected,
+          displays the serial port to which it is connected.
+        </p>
+      </dd>
+
+      <dt id="Speed">Serial parameters</dt>
+      <dd>
+        Serial port parameters.
+        Choose the appropriate parameters for the modem or the host.<br>
+        Whether the selected or specified settings are actually applied depends on serial port chip or driver.
+
+        <p>
+          When the serial port is not connected,
+          Sets the parameters for connecting to the serial port.<br>
+          Use <a href="file-new.html">New connection</a> when connecting to a serial port.
+        </p>
+        <p>
+          When the serial port is connected,
+          Set parameters for the connected serial port.
+        </p>
+
+        <dl>
+          <dt id="Speed">Speed</dt>
+          <dd>
+            The Speed can be specified with any number.
+          </dd>
+
+          <dt>Data</dt>
+          <dd>
+            8 bit / 7 bit
+            <p>
+              Note: If Data is 7 bit, the XMODEM, ZMODEM, B PLUS and Quick-VAN
+              protocols are disabled.
+            </p>
+          </dd>
+
+          <dt>Parity</dt>
+          <dd>
+            none / odd / even / mark / space
+          </dd>
+
+          <dt>Stop bits</dt>
+          <dd>
+            1 bit / 2 bit
+          </dd>
+
+          <dt>Flow control</dt>
+          <dd>
+            <dl>
+              <dt>Xon/Xoff</dt>
+              <dd>
+                Software flow
+                <p>
+                  Note: If Flow control is Xon/Xoff, the XMODEM and Quick-VAN protocols are disabled.
+                </p>
+              </dd>
+              <dt>RTS/CTS</dt>
+              <dd>
+                Hardware flow(RTS/CTS)
+                <p>
+                  Note: The "hardware" prior to version 4.104 applies to RTS/CTS.
+                </p>
+              </dd>
+              <dt>DSR/DTR</dt><dd>Hardware flow(DSR/DTR)</dd>
+              <dt>none</dt><dd>No flow control<br>
+            </dl>
+
+          </dd>
+        </dl>
+      </dd>
+
+      <dt id="Delay">Transmit delay</dt>
+      <dd>
+  Time intervals between characters (lines) being sent, in milliseconds.
+  The unit is milliseconds. You can set the wait time per character (line).
+  If the modem or host drops characters when Tera Term sends a large number of characters, try setting an appropriate delay time.
+      </dd>
+
+      <dt id="Information">Detail information of COM port</dt>
+      <dd>
+  The detail information of selected port is shown in the text box. <br>
+  You can select all data by using CTRL+A.
+  You can scroll horizontally by using CTRL/SHIFT + wheel.
+      </dd>
+
+    </dl>
+  </body>
+</html>

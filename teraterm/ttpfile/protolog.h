@@ -52,6 +52,8 @@ typedef struct ProtoLog {
 	void (*DumpByte)(struct ProtoLog *pv, BYTE b);
 	void (*DumpFlush)(struct ProtoLog *pv);
 	void (*Destory)(struct ProtoLog *pv);
+	void (*DumpBytes)(struct ProtoLog *pv, const BYTE *ptr, size_t len);
+	void (*printfA)(struct ProtoLog *pv, const char *fmt, ...);
 	// private
 	void *private_data;
 } TProtoLog;

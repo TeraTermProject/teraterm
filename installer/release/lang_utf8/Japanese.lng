@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2025-01-04 by TeraTerm Project
+date=2025-02-21 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -376,9 +376,8 @@ DLG_ABOUT_TITLE=Tera Term について
 DLG_SELECT_DIR_TITLE=新しいディレクトリを選択してください
 
 DLG_GEN_TITLE=Tera Term: 全般設定
-DLG_GEN_PORT=標準のポート(&P):
-DLG_GEN_LANG_UI=言語UI(&U):
-DLG_GEN_UILANG=UI言語(&L):
+DLG_GEN_PORT=新しい接続のデフォルト(&C):
+DLG_GEN_LANG_UI=UI言語(&L):
 
 DLG_HOST_TITLE=Tera Term: 新しい接続
 DLG_HOST_TCPIPHOST=ホスト(&O):
@@ -397,7 +396,7 @@ DLG_KEYB_DISABLE=無効化するモード
 DLG_KEYB_APPKEY=アプリケーションキーパッド(&A)
 DLG_KEYB_APPCUR=アプリケーションカーソル(&C)
 
-DLG_SERIAL_TITLE=Tera Term: シリアルポート 設定と接続
+DLG_SERIAL_TITLE=シリアルポート
 DLG_SERIAL_PORT=ポート(&P):
 DLG_SERIAL_BAUD=スピード(&E):
 DLG_SERIAL_DATA=データ(&D):
@@ -407,7 +406,6 @@ DLG_SERIAL_FLOW=フロー制御(&F):
 DLG_SERIAL_DELAY=送信遅延
 DLG_SERIAL_DELAYCHAR=ミリ秒/字(&C)
 DLG_SERIAL_DELAYLINE=ミリ秒/行(&L)
-DLG_SERIAL_SPEED_TOOLTIP=数値を直接入力できます
 DLG_SERIAL_OK_CONNECTION=新しいウィンドウで接続(&N)
 DLG_SERIAL_OK_OPEN=新規オープン(&N)
 DLG_SERIAL_OK_CLOSEOPEN=クローズ＆新規オープン(&N)
@@ -1243,7 +1241,7 @@ MENU_EUCJP=送受信: &EUC-JP
 MENU_JIS=送受信: &JIS
 MENU_UTF8=送受信: &UTF-8
 MENU_KS5601=送受信: &KS5601
-MENU_SETTING=設定(&S)
+MENU_SETTING=設定(&I)
 MENU_SETTING_TITLE=KanjiMenu設定
 MENU_CHARCODE=文字コードメニューを表示(&W)
 MENU_CONTENTS=メニュー内容(&C)

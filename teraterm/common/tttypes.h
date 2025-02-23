@@ -616,6 +616,10 @@ struct tttset {
 	DWORD SendfileSize;
 	WORD SendfileSequential;
 	WORD SendfileSkipOptionDialog;
+	WORD AutoComPortReconnectDelayNormal;		// (ms)
+	WORD AutoComPortReconnectDelayIllegal;		// (ms)
+	WORD AutoComPortReconnectRetryInterval;		// (ms)
+	WORD AutoComPortReconnectRetryCount;		// 0~
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;
