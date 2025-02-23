@@ -41,6 +41,7 @@
 typedef struct tagTipWinData {
 	HWND hDlg;
 	HWND hTip;
+	int EdittextId = -1; // EDITTEXTのツールチップ消去用
 } TipWin2;
 
 TipWin2 *TipWin2Create(HINSTANCE hInstance, HWND hDlg)
@@ -128,4 +129,68 @@ void TipWin2Delete(TipWin2 *tWin, int id)
 void TipWin2Activate(TipWin2 *tWin, BOOL active)
 {
 	PostMessageW(tWin->hTip, TTM_ACTIVATE ,active, 0);
+}
+
+/**
+ * @brief	EDITTEXTの入力制限用のツールチップの消去用タイマー
+ * @param	hTip ツールチップのウィンドウハンドル
+ * @param	id EDITTEXTのコントロールID
+ */
+static void CALLBACK TipWin2HideEdittextErrMsgProc(HWND hTip, UINT /*uMsg*/, UINT_PTR id, DWORD /*dwTime*/) // uMsg,dwTime is unused
+{
+	KillTimer(hTip, id);
+	TOOLINFOW toolInfo = {};
+	toolInfo.cbSize = sizeof(toolInfo);
+	toolInfo.hwnd = GetParent(hTip);
+	toolInfo.uId = id;
+	SendMessageW(hTip, TTM_TRACKACTIVATE, FALSE, (LPARAM)&toolInfo);
+}
+
+/**
+ * @brief	EDITTEXTに入力制限用のツールチップを表示する(ES_NUMBER相当)
+ * @param	tWin
+ * @param	hEdit EDITTEXTのウィンドウハンドル
+ * @param	id EDITTEXTのコントロールID
+ * @param	icon ツールチップのアイコン
+ * @param	title ツールチップのタイトル
+ * @param	text ツールチップのメッセージ
+ */
+void TipWin2ShowEdittextErrMsgW(TipWin2 *tWin, HWND hEdit, const int id, const int icon, const wchar_t *title, const wchar_t *text)
+{
+	// ツールチップのタイトルとメッセージを設定
+	SendMessage(tWin->hTip, TTM_SETTITLEW, icon, (LPARAM)title);
+	TOOLINFOW toolInfo = {};
+	toolInfo.cbSize = sizeof(toolInfo);
+	toolInfo.hwnd = tWin->hDlg;
+	toolInfo.uFlags = TTF_IDISHWND | TTF_TRACK | TTF_ABSOLUTE;
+	toolInfo.uId = (UINT_PTR)id;
+	toolInfo.lpszText = (LPWSTR)text;
+	SendMessageW(tWin->hTip, TTM_ADDTOOLW, 0, (LPARAM)&toolInfo);
+
+	// ツールチップの位置を計算
+	RECT rect;
+	POINT point;
+	SendMessage(hEdit, EM_GETRECT, 0, (LPARAM)(&rect));
+	point.y = rect.bottom - rect.top;
+	DWORD startPos, endPos;
+	SendMessage(hEdit, EM_GETSEL, (WPARAM)(&startPos), (LPARAM)(&endPos));
+	int nDim = SendMessage(hEdit, EM_POSFROMCHAR, startPos, 0);
+	if (nDim == -1) {
+		point.x = rect.right - rect.left;
+	} else {
+		point.x = LOWORD(nDim);
+	}
+	point.y += HIWORD(nDim);
+	ClientToScreen(hEdit, &point);
+
+	// ツールチップを表示
+	SendMessageW(tWin->hTip, TTM_TRACKPOSITION, 0, (LPARAM)MAKELONG(point.x, point.y));
+	SendMessageW(tWin->hTip, TTM_TRACKACTIVATE, TRUE, (LPARAM)&toolInfo);
+
+	// ツールチップ消去用のタイマーを設定
+	if (tWin->EdittextId != -1) {
+		KillTimer(tWin->hTip, tWin->EdittextId);
+	}
+	tWin->EdittextId = id;
+	SetTimer(tWin->hTip, id, 1500, TipWin2HideEdittextErrMsgProc);
 }

@@ -43,12 +43,14 @@
 #include "helpid.h"
 #include "codeconv.h"
 #include "ttdlg.h"	// _ChooseFontDlg()
+#include "tipwin2.h"
 
 #include "font_pp.h"
 
 // テンプレートの書き換えを行う
 #define REWRITE_TEMPLATE
 
+#define IDC_SPACE_MAXLEN 6 	  // IDC_SPACE(FontDX, FontDW, FontDY, FontDH)の最大桁数
 #define IDC_CODEPAGE_MAXLEN 5 // IDC_CODEPAGE(CodePageForANSIDraw)の最大桁数
 
 struct FontPPData {
@@ -58,6 +60,7 @@ struct FontPPData {
 	DLGTEMPLATE *dlg_templ;
 	LOGFONTA VTFont;
 	LOGFONTW DlgFont;
+	TipWin2 *Tipwin = NULL;
 };
 
 static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
@@ -119,6 +122,9 @@ static BOOL ChooseDlgFont(HWND hWnd, FontPPData *dlg_data)
 		CF_ENABLEHOOK;
 	if (IsWindows7OrLater() && (IsDlgButtonChecked(hWnd, IDC_LIST_HIDDEN_FONTS) == BST_CHECKED)) {
 		cf.Flags |= CF_INACTIVEFONTS;
+	}
+	if (IsDlgButtonChecked(hWnd, IDC_LIST_PRO_FONTS_DLG) != BST_CHECKED) {
+		cf.Flags |= CF_FIXEDPITCHONLY;
 	}
 	cf.lpfnHook = TFontHook;
 	cf.nFontType = REGULAR_FONTTYPE;
@@ -222,12 +228,15 @@ static BOOL ChooseVTFont(HWND WndParent, FontPPData *dlg_data)
 	cf.lpLogFont = &VTFontA;
 	cf.Flags =
 		CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
-		CF_FIXEDPITCHONLY |
+		//CF_FIXEDPITCHONLY |
 		//CF_SHOWHELP |
 		CF_NOVERTFONTS |
 		CF_ENABLEHOOK;
 	if (IsDlgButtonChecked(WndParent, IDC_LIST_HIDDEN_FONTS) == BST_CHECKED) {
 		cf.Flags |= CF_INACTIVEFONTS;
+	}
+	if (IsDlgButtonChecked(WndParent, IDC_LIST_PRO_FONTS_VT) != BST_CHECKED) {
+		cf.Flags |= CF_FIXEDPITCHONLY;
 	}
 	cf.lpfnHook = TVTFontHook;
 	cf.nFontType = REGULAR_FONTTYPE;
@@ -251,7 +260,8 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		{ IDC_DLGFONT_CHOOSE, "DLG_TAB_FONT_BTN_SELECT" },
 		{ IDC_DLGFONT_DEFAULT, "DLG_TAB_FONT_BTN_DEFAULT" },
 		{ IDC_LIST_HIDDEN_FONTS, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
-		{ IDC_LIST_PRO_FONTS, "DLG_TAB_FONT_LIST_PRO_FONTS" },
+		{ IDC_LIST_PRO_FONTS_VT, "DLG_TAB_FONT_LIST_PRO_FONTS" },
+		{ IDC_LIST_PRO_FONTS_DLG, "DLG_TAB_FONT_LIST_PRO_FONTS" },
 		{ IDC_CHARACTER_SPACE_TITLE, "DLG_TAB_FONT_CHARACTER_SPACE" },
 		{ IDC_RESIZED_FONT, "DLG_TAB_FONT_RESIZED_FONT" },
 	};
@@ -285,8 +295,15 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SetDlgItemInt(hWnd, IDC_SPACE_RIGHT, ts->FontDW, TRUE);
 			SetDlgItemInt(hWnd, IDC_SPACE_TOP, ts->FontDY, TRUE);
 			SetDlgItemInt(hWnd, IDC_SPACE_BOTTOM, ts->FontDH, TRUE);
+			SendDlgItemMessage(hWnd, IDC_SPACE_LEFT,   EM_LIMITTEXT, IDC_SPACE_MAXLEN, 0);
+			SendDlgItemMessage(hWnd, IDC_SPACE_RIGHT,  EM_LIMITTEXT, IDC_SPACE_MAXLEN, 0);
+			SendDlgItemMessage(hWnd, IDC_SPACE_TOP,    EM_LIMITTEXT, IDC_SPACE_MAXLEN, 0);
+			SendDlgItemMessage(hWnd, IDC_SPACE_BOTTOM, EM_LIMITTEXT, IDC_SPACE_MAXLEN, 0);
+			dlg_data->Tipwin = TipWin2Create(dlg_data->hInst, hWnd);
 
 			CheckDlgButton(hWnd, IDC_RESIZED_FONT, DispIsResizedFont());
+
+			CheckDlgButton(hWnd, IDC_LIST_PRO_FONTS_DLG, BST_CHECKED);
 
 			break;
 		}
@@ -351,6 +368,59 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			break;
 		}
 		case WM_COMMAND: {
+			if (HIWORD(wp) == EN_UPDATE) {
+				int id = LOWORD(wp);
+				if (id == IDC_SPACE_LEFT ||
+					id == IDC_SPACE_RIGHT ||
+					id == IDC_SPACE_TOP ||
+					id == IDC_SPACE_BOTTOM) {
+					BOOL parsed;
+					int dlg = GetDlgItemInt(hWnd, id, &parsed, TRUE);
+					if (! parsed) {
+						HWND hEdit = (HWND)lp;
+						if (GetWindowTextLengthW(hEdit) == 0) {
+							SetWindowTextW(hEdit, L"0");
+							break;
+						}
+						// ツールチップを表示
+						wchar_t *uiTitle, *uiText;
+						GetI18nStrWW("Tera Term", "MSG_TOOLTIP_EDITERR_TITLE1", L"Unacceptable Character", ts->UILanguageFileW, &uiTitle);
+						GetI18nStrWW("Tera Term", "MSG_TOOLTIP_EDITERR_TEXT1", L"Only positive and negative integers are acceptable.", ts->UILanguageFileW, &uiText);
+						TipWin2ShowEdittextErrMsgW(dlg_data->Tipwin, hEdit, id, TTI_ERROR, uiTitle, uiText);
+						free(uiTitle);
+						free(uiText);
+
+						// 無効な文字を削除
+						wchar_t text[IDC_SPACE_MAXLEN + 1];
+						GetWindowTextW(hEdit, &text[0], IDC_SPACE_MAXLEN + 1);
+						wchar_t *orgp = text, *newp = text;
+						while (*orgp) {
+							if (newp == text) {
+								if (wcsncmp(orgp, L"-", 1) == 0 || iswdigit(*orgp)) {
+									*newp++ = *orgp;
+								}
+							} else if (iswdigit(*orgp)) {
+								*newp++ = *orgp;
+							}
+							orgp++;
+						}
+						*newp = '\0';
+						if (wcscmp(text, L"-") == 0) {
+							text[0] = L'0';
+							text[1] = '\0';
+						}
+
+						// EDITコントロールを更新
+						DWORD startPos, endPos;
+						SendMessage(hEdit, EM_GETSEL, (WPARAM)(&startPos), (LPARAM)(&endPos));
+						SetWindowTextW(hEdit, text);
+						startPos--;
+						SendMessage(hEdit, EM_SETSEL, startPos, startPos);
+					}
+				}
+				break;
+			}
+
 			switch (wp) {
 			case IDC_VTFONT_ANSI | (BN_CLICKED << 16):
 			case IDC_VTFONT_UNICODE | (BN_CLICKED << 16): {
@@ -382,6 +452,12 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			}
 			break;
 		}
+
+		case WM_DESTROY:
+			TipWin2Destroy(dlg_data->Tipwin);
+			dlg_data->Tipwin = NULL;
+			break;
+
 		default:
 			return FALSE;
 	}

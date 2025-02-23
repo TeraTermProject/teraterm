@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2025-02-21 by TeraTerm Project
+date=2025-02-23 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -289,12 +289,14 @@ DLG_TAB_CYGWIN_PATH=Cygwin-Installationspfad
 DLG_TAB_FONT_VTWINFONT=&VTWindow Font
 DLG_TAB_FONT_BTN_SELECT=&Select...
 DLG_TAB_FONT_VTFONT_TITLE=API for drawing
-DLG_TAB_FONT_DLGFONT=&Dialog font
+DLG_TAB_FONT_DLGFONT=&Dialog Font
 DLG_TAB_FONT_BTN_DEFAULT=D&efault
 DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
 DLG_TAB_FONT_LIST_PRO_FONTS=List &proportional fonts in font dialog
 DLG_TAB_FONT_CHARACTER_SPACE=character space
 DLG_TAB_FONT_RESIZED_FONT=Drawing resized font to fit cell width
+MSG_TOOLTIP_EDITERR_TITLE1=Unzulässiges Zeichen
+MSG_TOOLTIP_EDITERR_TEXT1=Nur positive und negative ganze Zahlen sind akzeptabel.
 
 DLG_COMMENT_TITLE=Comment to Log
 
