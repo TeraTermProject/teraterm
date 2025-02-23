@@ -115,7 +115,7 @@ static BOOL ChooseDlgFont(HWND hWnd, FontPPData *dlg_data)
 		//CF_SHOWHELP |
 		CF_NOVERTFONTS |
 		CF_ENABLEHOOK;
-	if (IsWindows7OrLater() && ts->ListHiddenFonts) {
+	if (IsWindows7OrLater() && (IsDlgButtonChecked(hWnd, IDC_LIST_HIDDEN_FONTS) == BST_CHECKED)) {
 		cf.Flags |= CF_INACTIVEFONTS;
 	}
 	cf.lpfnHook = TFontHook;
@@ -224,7 +224,7 @@ static BOOL ChooseVTFont(HWND WndParent, FontPPData *dlg_data)
 		//CF_SHOWHELP |
 		CF_NOVERTFONTS |
 		CF_ENABLEHOOK;
-	if (ts->ListHiddenFonts) {
+	if (IsDlgButtonChecked(WndParent, IDC_LIST_HIDDEN_FONTS) == BST_CHECKED) {
 		cf.Flags |= CF_INACTIVEFONTS;
 	}
 	cf.lpfnHook = TVTFontHook;
