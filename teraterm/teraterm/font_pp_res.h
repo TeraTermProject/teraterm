@@ -23,12 +23,13 @@
 #define IDC_DLGFONT_CHOOSE              1017
 #define IDC_DLGFONT_DEFAULT             1018
 #define IDC_LIST_HIDDEN_FONTS           1019
-#define IDC_LIST_PRO_FONTS              1020
+#define IDC_LIST_PRO_FONTS_VT           1020
 #define IDC_SCALED_FONT                 1021
 #define IDC_RESIZED_FONT                1021
+#define IDC_LIST_PRO_FONTS_DLG          1022
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        102

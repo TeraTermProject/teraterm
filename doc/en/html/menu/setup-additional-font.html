@@ -12,7 +12,7 @@
     <h1>Additional settings / "Font" tab ([Setup] menu)</h1>
 
     <dl>
-      <dt id="VTFont">terminal font</dt>
+      <dt id="VTFont">VTWindow Font</dt>
       <dd>
         Specify VTWin font.
         <dl>
@@ -62,15 +62,19 @@
             </dl>
           </dd>
 
-          <dt>Character space</dt>
+          <dt>List proportional fonts in font dialog</dt>
           <dd>
-            Under construction.<br>
+            Proportional fonts are also displayed in the font dialog list.
+          </dd>
+
+          <dt>character space</dt>
+          <dd>
             see <a href="../setup/teraterm-win.html#space">Space between characters (lines)</a>.
           </dd>
         </dl>
       </dd>
 
-      <dt>Dialog font</dt>
+      <dt id="DLGFont">Dialog Font</dt>
       <dd>Specify Dialog font.
         <dl>
           <dt>default button</dt>
@@ -78,20 +82,19 @@
             Set default font<br>
             SystemParametersInfo(SPI_GETNONCLIENTMETRICS) API is used to get font from Windows.
           </dd>
+
+          <dt>List proportional fonts in font dialog</dt>
+          <dd>
+            Proportional fonts are also displayed in the font dialog list.
+          </dd>
         </dl>
       </dd>
 
       <dt id="ListHiddenFonts">List hidden fonts in font dialog</dt>
       <dd>
-	A feature that some fonts can be shown or not on the font list is added on Windows 7 or later. 
+	A feature that some fonts can be shown or not on the font list is added on Windows 7 or later.<br>
 	When this setting is enabled, whole fonts can be selected on the Font setting dialog.
       </dd>
-
-      <dt>List proportional font in font dialog</dt>
-      <dd>
-        Under construction.
-      </dd>
-
     </dl>
 
     <h3>Note:</h3>
@@ -102,14 +105,10 @@
 	It can not be selected in this dialog box.
       </li>
       <li>
-	Hidden fonts specified by OS can not be shown on font list by default.
-	Please enable the <a href="#ListHiddenFonts">List hidden fonts</a> to select hidden fonts.
-      </li>
-      <li>
 	The font quality can be selected by using the <a href="setup-additional-visual.html#FontQuality">Font quality</a> on the Visual tab of Additional settings dialog.
       </li>
       <li>
-	When the dialog font is set to very large size and wide font, 
+	When the dialog font is set to very large size and wide font,
 	displayed font may be corrupted, and also you may not press [ok] button because the dialog goes out of screen.
       </li>
     </ul>

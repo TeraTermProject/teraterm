@@ -41,6 +41,7 @@ void TipWin2Destroy(TipWin2 *tWin);
 void TipWin2SetTextW(TipWin2 *tWin, int id, const wchar_t *text);
 void TipWin2Delete(TipWin2 *tWin, int id);
 void TipWin2Activate(TipWin2 *tWin, BOOL active);
+void TipWin2ShowEdittextErrMsgW(TipWin2 *tWin, HWND hEdit, const int id, const int icon, const wchar_t *title, const wchar_t *text);
 
 #ifdef __cplusplus
 }
