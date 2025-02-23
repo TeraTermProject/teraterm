@@ -49,6 +49,8 @@
 // テンプレートの書き換えを行う
 #define REWRITE_TEMPLATE
 
+#define IDC_CODEPAGE_MAXLEN 5 // IDC_CODEPAGE(CodePageForANSIDraw)の最大桁数
+
 struct FontPPData {
 	HINSTANCE hInst;
 	const wchar_t *UILanguageFileW;
@@ -274,6 +276,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						   BST_CHECKED);
 			SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, UnicodeDebugParam.CodePageForANSIDraw, FALSE);
 			EnableCodePage(hWnd, UnicodeDebugParam.UseUnicodeApi ? FALSE : TRUE);
+			SendDlgItemMessage(hWnd, IDC_VTFONT_CODEPAGE_EDIT, EM_LIMITTEXT, IDC_CODEPAGE_MAXLEN, 0);
 
 			CheckDlgButton(hWnd, IDC_LIST_HIDDEN_FONTS, ts->ListHiddenFonts);
 			EnableWindow(GetDlgItem(hWnd, IDC_LIST_HIDDEN_FONTS), IsWindows7OrLater() ? TRUE : FALSE);
