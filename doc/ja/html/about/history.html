@@ -115,6 +115,12 @@
       <li>Oniguruma 6.9.10へ差し替えた。</li>
       <li>インストーラに使用している Inno Setup のバージョンを<a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.4.0" target="_blank">6.4.0</a>へ差し替えた。</li>
       <li><a href="#ttssh_3.4">TTSSH(3.4)</a>へ差し替えた。</li>
+      <li>インストーラによる TELNET プロトコルへの関連付けで、起動するコマンドラインオプションに /E を追加した。
+        <ul>
+          <li>これにより、URL で指定されたポート番号が 23 でなくても Telnet option negotiation が開始される。</li>
+          <li>Tera Term は通常 <a href="../usage/tips/not_port23.html">port 23</a> 以外を TELNET として扱わないため。</li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>
