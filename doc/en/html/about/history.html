@@ -75,6 +75,7 @@
         </ul>
       </li>
       <li>Renamed [Reverse] button on Window tab of Additional settings dialog to [Swap Colors]</li>
+      <li>Made "List proportional fonts in font dialog" available in the <a href="../menu/setup-additional-font.html">[Setup] menu/font dialog</a>.</li>
     </ul>
   </li>
 
@@ -104,7 +105,7 @@
       <li>XMODEM Send: Fixed problem switching from XMODEM(CRC) to XMODEM(checksum).</li>
       <li>Fixed an application fault occurs when saving more than 250 in the <a href="../menu/file-new.html#HostList">Host list</a>.</li>
       <li>Fixed an application fault occurs when adding a command to the maximum size of broadcast history. (default is MaxBroadcatHistory=99 in TERATERM.INI)</li>
-      <li>ZMODEM send: CAN x8 is sent when send is canceled.</li>
+      <li>ZMODEM send: When sending is aborted on Tera Term, cancel sequence is now sent.</li>
     </ul>
   </li>
 
@@ -3624,7 +3625,7 @@ SYNOPSIS:
   <li>Bug fixes
     <ul>
       <li>Fixed heap corruption during character code conversion of SSH_MSG_USERAUTH_BANNER</li>
-      <li>Fixed password was changed even if the ÅgNew PasswordÅh and ÅgConfirm New PasswordÅh did not match in the password change dialog.</li>
+      <li>Fixed password was changed even if the "New Password" and "Confirm New Password" did not match in the password change dialog.</li>
     </ul>
   </li>
 
