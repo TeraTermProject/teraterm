@@ -378,7 +378,7 @@ begin
   if FileExists(FileName) then
     begin
       TmpFileName := FileName + '.' + GetDateTimeString('yyyymmddhhnnss', #0, #0); // Tmp file ends with timestamp
-      if FileCopy(FileName, TmpFileName, True) then
+      if CopyFile(FileName, TmpFileName, True) then
         if DeleteFile(FileName) then
           if RenameFile(TmpFileName, FileName) then
             Result := 0
