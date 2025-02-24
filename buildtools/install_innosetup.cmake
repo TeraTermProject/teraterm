@@ -12,6 +12,17 @@ set(INNOSETUP_HASH "f41760e1f1ae15d2089bb6ab162e21720b92ae7506ed70667b39200063d6
 set(CHECK_FILE innosetup6/ISCC.exe)
 set(CHECK_HASH "3a34c0beaf8c9c66774c1c1286a504db403e97e1b2fba691b3ba865dbce7edb2")
 
+# check innosetup
+if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${CHECK_FILE})
+  file(SHA256 ${CMAKE_CURRENT_LIST_DIR}/${CHECK_FILE} HASH)
+  if(${HASH} STREQUAL ${CHECK_HASH})
+    return()
+  endif()
+  message("file ${CMAKE_CURRENT_LIST_DIR}/${CHECK_FILE}")
+  message("actual HASH=${HASH}")
+  message("expect HASH=${CHECK_HASH}")
+endif()
+
 # download
 message("download ${INNOSETUP_EXE} from ${INNOSETUP_URL}")
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/download/innosetup6")
@@ -34,15 +45,3 @@ execute_process(
 if(REMOVE_TMP)
   file(REMOVE_RECURSE "${CMAKE_CURRENT_LIST_DIR}/download/innosetup6")
 endif()
-
-# check innosetup
-if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${CHECK_FILE})
-  file(SHA256 ${CMAKE_CURRENT_LIST_DIR}/${CHECK_FILE} HASH)
-  if(${HASH} STREQUAL ${CHECK_HASH})
-    return()
-  endif()
-  message("file ${CMAKE_CURRENT_LIST_DIR}/${CHECK_FILE}")
-  message("actual HASH=${HASH}")
-  message("expect HASH=${CHECK_HASH}")
-endif()
-
