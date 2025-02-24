@@ -62,22 +62,24 @@ BEGIN
     CONTROL         "&Unicode API",IDC_VTFONT_UNICODE,"Button",BS_AUTORADIOBUTTON,31,64,93,10
     CONTROL         "&ANSI API",IDC_VTFONT_ANSI,"Button",BS_AUTORADIOBUTTON,31,82,88,10
     LTEXT           "&Code page for display character conversion",IDC_VTFONT_CODEPAGE_LABEL,43,97,131,8
-    EDITTEXT        IDC_VTFONT_CODEPAGE_EDIT,44,108,40,12,ES_AUTOHSCROLL
-    LTEXT           "&Dialog font",IDC_DLGFONT,7,145,115,8
-    EDITTEXT        IDC_DLGFONT_EDIT,19,162,148,12,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "Select...",IDC_DLGFONT_CHOOSE,177,161,50,14
-    PUSHBUTTON      "&default",IDC_DLGFONT_DEFAULT,231,161,50,14
-    CONTROL         "List &hidden fonts in font dialog",IDC_LIST_HIDDEN_FONTS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,181,234,10
-    CONTROL         "List &proportional fonts in font dialog",IDC_LIST_PRO_FONTS,
-                    "Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,7,196,240,10
+    EDITTEXT        IDC_VTFONT_CODEPAGE_EDIT,44,108,40,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Dra&wing resized font to fit cell width",IDC_RESIZED_FONT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,125,178,10
     LTEXT           "character space",IDC_CHARACTER_SPACE_TITLE,187,51,115,8
+    CONTROL         "List &proportional fonts in font dialog",IDC_LIST_PRO_FONTS_VT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,143,240,10
     EDITTEXT        IDC_SPACE_TOP,208,74,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
     EDITTEXT        IDC_SPACE_BOTTOM,208,123,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
     EDITTEXT        IDC_SPACE_LEFT,176,98,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
     EDITTEXT        IDC_SPACE_RIGHT,242,98,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
-    CONTROL         "Drawing resized font to fit cell width",IDC_RESIZED_FONT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,125,140,10
+    LTEXT           "&Dialog Font",IDC_DLGFONT,7,170,115,8
+    EDITTEXT        IDC_DLGFONT_EDIT,19,189,148,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "&Select...",IDC_DLGFONT_CHOOSE,177,188,50,14
+    PUSHBUTTON      "D&efault",IDC_DLGFONT_DEFAULT,231,188,50,14
+    CONTROL         "List p&roportional fonts in font dialog",IDC_LIST_PRO_FONTS_DLG,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,208,240,10
+    CONTROL         "List &hidden fonts in font dialog",IDC_LIST_HIDDEN_FONTS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,234,234,10
 END
 
 
