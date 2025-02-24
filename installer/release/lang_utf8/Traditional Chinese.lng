@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2025-02-23 by TeraTerm Project
+date=2025-02-24 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -292,9 +292,10 @@ DLG_TAB_FONT_VTFONT_TITLE=API for drawing
 DLG_TAB_FONT_DLGFONT=&Dialog Font
 DLG_TAB_FONT_BTN_DEFAULT=D&efault
 DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
-DLG_TAB_FONT_LIST_PRO_FONTS=List &proportional fonts in font dialog
+DLG_TAB_FONT_LIST_PRO_FONTS_VT=List &proportional fonts in font dialog
+DLG_TAB_FONT_LIST_PRO_FONTS_DLG=List p&roportional fonts in font dialog
 DLG_TAB_FONT_CHARACTER_SPACE=character space
-DLG_TAB_FONT_RESIZED_FONT=Drawing resized font to fit cell width
+DLG_TAB_FONT_RESIZED_FONT=Dra&wing resized font to fit cell width
 MSG_TOOLTIP_EDITERR_TITLE1=不可接受的字符
 MSG_TOOLTIP_EDITERR_TEXT1=僅接受正整數和負整數。
 

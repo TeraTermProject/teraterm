@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2025-02-23 by TeraTerm Project
+date=2025-02-24 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -292,9 +292,10 @@ DLG_TAB_FONT_VTFONT_TITLE=வரைவதற்கான பநிஇ
 DLG_TAB_FONT_DLGFONT=&உரையாடல் எழுத்துரு
 DLG_TAB_FONT_BTN_DEFAULT=இயல்புநிலை
 DLG_TAB_FONT_CODEPAGE_LABEL=&காட்சி எழுத்து மாற்றத்திற்கான குறியீடு பக்கம்
-DLG_TAB_FONT_LIST_PRO_FONTS=எழுத்துரு உரையாடலில் &விகிதாசார எழுத்துருக்களை பட்டியலிடு
+DLG_TAB_FONT_LIST_PRO_FONTS_VT=&எழுத்துரு உரையாடலில் &விகிதாசார எழுத்துருக்களை பட்டியலிடு
+DLG_TAB_FONT_LIST_PRO_FONTS_DLG=எ&ழுத்துரு உரையாடலில் &விகிதாசார எழுத்துருக்களை பட்டியலிடு
 DLG_TAB_FONT_CHARACTER_SPACE=எழுத்து இடம்
-DLG_TAB_FONT_RESIZED_FONT=செல் அகலத்திற்கு ஏற்றவாறு அளவு மாற்றப்பட்ட எழுத்துருவை வரைதல்
+DLG_TAB_FONT_RESIZED_FONT=&செல் அகலத்திற்கு ஏற்றவாறு அளவு மாற்றப்பட்ட எழுத்துருவை வரைதல்
 MSG_TOOLTIP_EDITERR_TITLE1=ஏற்றுக்கொள்ள முடியாத எழுத்து
 MSG_TOOLTIP_EDITERR_TEXT1=நன்மை மற்றும் தீமை முழு எண்கள் மட்டுமே ஏற்றுக்கொள்ளப்படும்.
 
