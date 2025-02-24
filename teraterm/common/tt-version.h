@@ -30,6 +30,7 @@
 
 #define TT_VERSION_MAJOR             5
 #define TT_VERSION_MINOR             4
+#define TT_VERSION_PATCH             0
 #define TT_VERSION_SUBSTR            "dev"
 //#undef TT_VERSION_SUBSTR
 // SUBSTR が不要な時は undef する
@@ -37,7 +38,7 @@
 
 #define TT_TOSTR(x)					TT_TOSTR_HELPER(x)
 #define TT_TOSTR_HELPER(x)			#x
-#define TT_VERSION_STR(sep)			TT_TOSTR(TT_VERSION_MAJOR) sep TT_TOSTR(TT_VERSION_MINOR)
+#define TT_VERSION_STR(sep)			TT_TOSTR(TT_VERSION_MAJOR) sep TT_TOSTR(TT_VERSION_MINOR) sep TT_TOSTR(TT_VERSION_PATCH)
 
 #include "svnversion.h"
 
@@ -83,4 +84,4 @@
 // 	リソースファイル(rcファイル) FileVersion 用
 // 	ex "5, 1, 0, 0"
 #undef TT_RES_VERSION_STR
-#define TT_RES_VERSION_STR	TT_VERSION_STR(", ") ", 0, 0"
+#define TT_RES_VERSION_STR	TT_VERSION_STR(", ") ", 0"
