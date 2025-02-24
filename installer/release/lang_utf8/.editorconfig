@@ -1,0 +1,3 @@
+[*.lng]
+end_of_line = crlf
+charset = utf-8-bom
