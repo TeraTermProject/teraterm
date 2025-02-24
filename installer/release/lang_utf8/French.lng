@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2025-01-20 by TeraTerm Project
+date=2025-02-24 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -179,6 +179,9 @@ DLG_TABSHEET_TITLE_VISUAL=Apparence
 DLG_TABSHEET_TITLE_LOG=Journal
 DLG_TABSHEET_TITLE_CYGWIN=Cygwin
 DLG_TABSHEET_TITLE_FONT=Font
+DLG_TABSHEET_TITLE_ENCODING=Encoding
+DLG_TABSHEET_TITLE_THEME=Theme
+DLG_TABSHEET_TITLE_MOUSE=Mouse
 
 DLG_TAB_GENERAL_CLICKURL=&Autoriser URL cliquable
 DLG_TAB_GENERAL_DISABLESENDBREAK=Dévalider accélération envoi de break
@@ -286,12 +289,15 @@ DLG_TAB_CYGWIN_PATH=Répertoire d'install. de Cygwin
 DLG_TAB_FONT_VTWINFONT=&VTWindow Font
 DLG_TAB_FONT_BTN_SELECT=&Select...
 DLG_TAB_FONT_VTFONT_TITLE=API for drawing
-DLG_TAB_FONT_DLGFONT=&Dialog font
+DLG_TAB_FONT_DLGFONT=&Dialog Font
 DLG_TAB_FONT_BTN_DEFAULT=D&efault
 DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
-DLG_TAB_FONT_LIST_PRO_FONTS=List &proportional fonts in font dialog
+DLG_TAB_FONT_LIST_PRO_FONTS_VT=List &proportional fonts in font dialog
+DLG_TAB_FONT_LIST_PRO_FONTS_DLG=List p&roportional fonts in font dialog
 DLG_TAB_FONT_CHARACTER_SPACE=character space
-DLG_TAB_FONT_RESIZED_FONT=Drawing resized font to fit cell width
+DLG_TAB_FONT_RESIZED_FONT=Dra&wing resized font to fit cell width
+MSG_TOOLTIP_EDITERR_TITLE1=Caractère inacceptable
+MSG_TOOLTIP_EDITERR_TEXT1=Seuls les entiers positifs et négatifs sont acceptables.
 
 DLG_COMMENT_TITLE=Ajouter commentaire au journal
 
@@ -374,8 +380,7 @@ DLG_SELECT_DIR_TITLE=Selectionner un nouveau répertoire
 
 DLG_GEN_TITLE=Tera Term: Configuration générale
 DLG_GEN_PORT=New &connection default
-DLG_GEN_LANG_UI=Language&UI:
-DLG_GEN_UILANG=UI &Language:
+DLG_GEN_LANG_UI=UI &Language:
 
 DLG_HOST_TITLE=Tera Term: Nouvelle connexion
 DLG_HOST_TCPIPHOST=Hôte:
@@ -470,7 +475,7 @@ DLG_WIN_COLOR=Couleur
 DLG_WIN_TEXT=Te&xte
 DLG_WIN_BG=Fond
 DLG_WIN_ATTRIB=&Attribut
-DLG_WIN_REVERSE=Inv&ersé
+DLG_WIN_SWAP_COLORS=S&wap colors
 DLG_WIN_R=&R:
 DLG_WIN_G=&G:
 DLG_WIN_B=&B:
@@ -1242,7 +1247,7 @@ MENU_EUCJP=Recep/Envoi: &EUC-JP
 MENU_JIS=Recep/Envoi: &JIS
 MENU_UTF8=Recv/Send: &UTF-8
 MENU_KS5601=Recep/Envoi: &KS5601
-MENU_SETTING=&Setting
+MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents

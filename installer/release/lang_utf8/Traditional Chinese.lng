@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2025-01-20 by TeraTerm Project
+date=2025-02-24 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -179,6 +179,9 @@ DLG_TABSHEET_TITLE_VISUAL=顯示
 DLG_TABSHEET_TITLE_LOG=日誌
 DLG_TABSHEET_TITLE_CYGWIN=Cygwin
 DLG_TABSHEET_TITLE_FONT=Font
+DLG_TABSHEET_TITLE_ENCODING=Encoding
+DLG_TABSHEET_TITLE_THEME=Theme
+DLG_TABSHEET_TITLE_MOUSE=Mouse
 
 DLG_TAB_GENERAL_CLICKURL=啟用鏈接可點擊(&E)
 DLG_TAB_GENERAL_DISABLESENDBREAK=禁止加速器發送中斷(&S)
@@ -286,12 +289,15 @@ DLG_TAB_CYGWIN_PATH=Cygwin 安裝路徑(&P)
 DLG_TAB_FONT_VTWINFONT=&VTWindow Font
 DLG_TAB_FONT_BTN_SELECT=&Select...
 DLG_TAB_FONT_VTFONT_TITLE=API for drawing
-DLG_TAB_FONT_DLGFONT=&Dialog font
+DLG_TAB_FONT_DLGFONT=&Dialog Font
 DLG_TAB_FONT_BTN_DEFAULT=D&efault
 DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
-DLG_TAB_FONT_LIST_PRO_FONTS=List &proportional fonts in font dialog
+DLG_TAB_FONT_LIST_PRO_FONTS_VT=List &proportional fonts in font dialog
+DLG_TAB_FONT_LIST_PRO_FONTS_DLG=List p&roportional fonts in font dialog
 DLG_TAB_FONT_CHARACTER_SPACE=character space
-DLG_TAB_FONT_RESIZED_FONT=Drawing resized font to fit cell width
+DLG_TAB_FONT_RESIZED_FONT=Dra&wing resized font to fit cell width
+MSG_TOOLTIP_EDITERR_TITLE1=不可接受的字符
+MSG_TOOLTIP_EDITERR_TEXT1=僅接受正整數和負整數。
 
 DLG_COMMENT_TITLE=添加註釋到日誌
 
@@ -374,7 +380,7 @@ DLG_SELECT_DIR_TITLE=選擇新文件夾
 
 DLG_GEN_TITLE=Tera Term：設定設定
 DLG_GEN_PORT=New &connection default
-DLG_GEN_LANG_UI=界面語言(&U)：
+DLG_GEN_LANG_UI=界面語言(&L)：
 
 DLG_HOST_TITLE=Tera Term：建立新連線
 DLG_HOST_TCPIPHOST=主機(&O)：
@@ -469,7 +475,7 @@ DLG_WIN_COLOR=顏色
 DLG_WIN_TEXT=文本(&X)
 DLG_WIN_BG=背景(&K)
 DLG_WIN_ATTRIB=屬性(&A)
-DLG_WIN_REVERSE=翻轉(&E)
+DLG_WIN_SWAP_COLORS=S&wap colors
 DLG_WIN_R=紅(&R)：
 DLG_WIN_G=綠(&G)：
 DLG_WIN_B=藍(&B)：
@@ -1241,7 +1247,7 @@ MENU_EUCJP=收發: &EUC-JP
 MENU_JIS=收發: &JIS
 MENU_UTF8=收發: &UTF-8
 MENU_KS5601=收發: &KS5601
-MENU_SETTING=&Setting
+MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents

@@ -135,7 +135,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		{ IDC_WINTEXT, "DLG_WIN_TEXT" },
 		{ IDC_WINBACK, "DLG_WIN_BG" },
 		{ IDC_WINATTRTEXT, "DLG_WIN_ATTRIB" },
-		{ IDC_WINREV, "DLG_WIN_REVERSE" },
+		{ IDC_WIN_SWAP_COLORS, "DLG_WIN_SWAP_COLORS" },
 		{ IDC_WINREDLABEL, "DLG_WIN_R" },
 		{ IDC_WINGREENLABEL, "DLG_WIN_G" },
 		{ IDC_WINBLUELABEL, "DLG_WIN_B" },
@@ -410,7 +410,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					ChangeSB(Dialog,work,IAttr,IOffset);
 					break;
 
-				case IDC_WINREV:
+				case IDC_WIN_SWAP_COLORS:
 					i = work->TmpColor[IAttr][0];
 					work->TmpColor[IAttr][0] = work->TmpColor[IAttr][3];
 					work->TmpColor[IAttr][3] = i;

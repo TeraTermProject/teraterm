@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2025-01-20 by TeraTerm Project
+date=2025-02-24 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -179,6 +179,9 @@ DLG_TABSHEET_TITLE_VISUAL=காட்சி
 DLG_TABSHEET_TITLE_LOG=பதிவு
 DLG_TABSHEET_TITLE_CYGWIN=சிக்வின்
 DLG_TABSHEET_TITLE_FONT=எழுத்துரு
+DLG_TABSHEET_TITLE_ENCODING=Encoding
+DLG_TABSHEET_TITLE_THEME=Theme
+DLG_TABSHEET_TITLE_MOUSE=Mouse
 
 DLG_TAB_GENERAL_CLICKURL=&சொடுக்கம் செய்யக்கூடிய முகவரியை இயக்கு
 DLG_TAB_GENERAL_DISABLESENDBREAK=முடுக்கியை முடக்கு & இடைவெளியை அனுப்பு
@@ -289,9 +292,12 @@ DLG_TAB_FONT_VTFONT_TITLE=வரைவதற்கான பநிஇ
 DLG_TAB_FONT_DLGFONT=&உரையாடல் எழுத்துரு
 DLG_TAB_FONT_BTN_DEFAULT=இயல்புநிலை
 DLG_TAB_FONT_CODEPAGE_LABEL=&காட்சி எழுத்து மாற்றத்திற்கான குறியீடு பக்கம்
-DLG_TAB_FONT_LIST_PRO_FONTS=எழுத்துரு உரையாடலில் &விகிதாசார எழுத்துருக்களை பட்டியலிடு
+DLG_TAB_FONT_LIST_PRO_FONTS_VT=&எழுத்துரு உரையாடலில் &விகிதாசார எழுத்துருக்களை பட்டியலிடு
+DLG_TAB_FONT_LIST_PRO_FONTS_DLG=எ&ழுத்துரு உரையாடலில் &விகிதாசார எழுத்துருக்களை பட்டியலிடு
 DLG_TAB_FONT_CHARACTER_SPACE=எழுத்து இடம்
-DLG_TAB_FONT_RESIZED_FONT=செல் அகலத்திற்கு ஏற்றவாறு அளவு மாற்றப்பட்ட எழுத்துருவை வரைதல்
+DLG_TAB_FONT_RESIZED_FONT=&செல் அகலத்திற்கு ஏற்றவாறு அளவு மாற்றப்பட்ட எழுத்துருவை வரைதல்
+MSG_TOOLTIP_EDITERR_TITLE1=ஏற்றுக்கொள்ள முடியாத எழுத்து
+MSG_TOOLTIP_EDITERR_TEXT1=நன்மை மற்றும் தீமை முழு எண்கள் மட்டுமே ஏற்றுக்கொள்ளப்படும்.
 
 DLG_COMMENT_TITLE=பதிவிற்கான கருத்து
 
@@ -469,7 +475,7 @@ DLG_WIN_COLOR=வண்ணம்
 DLG_WIN_TEXT=உரை
 DLG_WIN_BG=பின்னணிபடம்
 DLG_WIN_ATTRIB=&பண்பு
-DLG_WIN_REVERSE=தலைகீழ்
+DLG_WIN_SWAP_COLORS=S&wap colors
 DLG_WIN_R=&சி:
 DLG_WIN_G=&ப:
 DLG_WIN_B=&நீ:
@@ -1238,7 +1244,7 @@ MENU_EUCJP=பெறு/அனுப்பு: &இயுசி-சேபி
 MENU_JIS=பெறு/அனுப்பு: &சேஐச்
 MENU_UTF8=பெறு/அனுப்பு: &ஒபசெ-8
 MENU_KS5601=பெறு/அனுப்பு: &கேச்5601
-MENU_SETTING=&Setting
+MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents

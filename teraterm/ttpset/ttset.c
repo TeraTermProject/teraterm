@@ -1123,6 +1123,14 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	// Detect disconnect/reconnect of serial port --- special option
 	ts->AutoComPortReconnect = GetOnOff(Section, "AutoComPortReconnect", FName, TRUE);
+	ts->AutoComPortReconnectDelayNormal =
+		GetPrivateProfileInt(Section, "AutoComPortReconnectDelayNormal", 500, FName);
+	ts->AutoComPortReconnectDelayIllegal =
+		GetPrivateProfileInt(Section, "AutoComPortReconnectDelayIllegal", 2000, FName);
+	ts->AutoComPortReconnectRetryInterval =
+		GetPrivateProfileInt(Section, "AutoComPortReconnectRetryInterval", 1000, FName);
+	ts->AutoComPortReconnectRetryCount =
+		GetPrivateProfileInt(Section, "AutoComPortReconnectRetryCount", 3, FName);
 
 	// Auto file renaming --- special option
 	if (GetOnOff(Section, "AutoFileRename", FName, FALSE))

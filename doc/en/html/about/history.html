@@ -68,6 +68,14 @@
         <li>Select TCP/IP or Serial as <a href="../menu/setup-additional-general.html#Port">new connection default</a> for New connection dialog on General tab. Select default Serial port on Serial tab.</li>
       </ul>
       <li>Resolved problem that Windows 11 24H2 returns incorrectly monitor information when moving across displays with different DPI, so that window are displayed at correct DPI.</li>
+      <li>Improved serial reconnection.
+        <ul>
+          <li>Checking for notifications from devices is more detailed.</li>
+          <li>Added parameters for reconnecting to TERATERM.INI.</li>
+        </ul>
+      </li>
+      <li>Renamed [Reverse] button on Window tab of Additional settings dialog to [Swap Colors]</li>
+      <li>Made "List proportional fonts in font dialog" available in the <a href="../menu/setup-additional-font.html">[Setup] menu/font dialog</a>.</li>
     </ul>
   </li>
 
@@ -97,6 +105,7 @@
       <li>XMODEM Send: Fixed problem switching from XMODEM(CRC) to XMODEM(checksum).</li>
       <li>Fixed an application fault occurs when saving more than 250 in the <a href="../menu/file-new.html#HostList">Host list</a>.</li>
       <li>Fixed an application fault occurs when adding a command to the maximum size of broadcast history. (default is MaxBroadcatHistory=99 in TERATERM.INI)</li>
+      <li>ZMODEM send: When sending is aborted on Tera Term, cancel sequence is now sent.</li>
     </ul>
   </li>
 
@@ -107,6 +116,13 @@
       <li>Upgraded Oniguruma to 6.9.10.</li>
       <li>Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.4.0" target="_blank">6.4.0</a>.</li>
       <li>Upgraded TTSSH to <a href="#ttssh_3.4.0">3.4.0</a>.</li>
+      <li>Upgraded TTSSH to <a href="#ttssh_3.4">3.4</a>.</li>
+      <li>Added /E option to command line, which is execute from TELNET protocol, that is associated by the installer.
+        <ul>
+          <li>Even if specified port number by URL is not 23, Telnet option negotiation is start.</li>
+          <li>Normally, Tera Term does not handle other than <a href="../usage/tips/not_port23.html">port 23</a> as TELNET.</li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>
@@ -3617,7 +3633,7 @@ SYNOPSIS:
   <li>Bug fixes
     <ul>
       <li>Fixed heap corruption during character code conversion of SSH_MSG_USERAUTH_BANNER</li>
-      <li>Fixed password was changed even if the ÅgNew PasswordÅh and ÅgConfirm New PasswordÅh did not match in the password change dialog.</li>
+      <li>Fixed password was changed even if the "New Password" and "Confirm New Password" did not match in the password change dialog.</li>
     </ul>
   </li>
 
