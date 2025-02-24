@@ -83,3 +83,10 @@ EXPORTS
   GetMessageboxFont
 
   SetPMPtr
+
+  GetWinUndoStyle
+  WindowSingleEnter
+  WindowSingleShow
+  WindowSinglePrev
+  WindowSingleNext
+  WindowSingleExit
