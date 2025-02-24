@@ -2149,7 +2149,8 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 
 	// TTSSHÇÃÉoÅ[ÉWÉáÉìÇê›íËÇ∑ÇÈ (2005.2.28 yutaka)
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d ", TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR);
+	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d.%d ",
+	            TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR,  TTSSH_VERSION_PATCH);
 	{
 		char *substr = GetVersionSubstr();
 		strncat_s(buf, sizeof(buf), substr, _TRUNCATE);

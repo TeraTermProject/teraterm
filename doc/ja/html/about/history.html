@@ -32,7 +32,7 @@
 
 <h2 id="teraterm">Tera Term</h2>
 
-<h3 id="teraterm_5.4">YYYY.MM.DD (Ver 5.4 not released yet)</h3>
+<h3 id="teraterm_5.4.0">YYYY.MM.DD (Ver 5.4.0 not released yet)</h3>
 <ul class="history">
   <li>変更
     <ul>
@@ -73,6 +73,8 @@
           <li>再接続時のパラメータをTERATERM.INIに追加した。</li>
         </ul>
       </li>
+      <li>その他の設定ダイアログのWindowタブの[反転]ボタンを[色入れ替え]に改名
+      <li><a href="../menu/setup-additional-font.html">[Setup] メニュー/フォントダイアログ</a>の"プロポーショナルフォントをフォントダイアログの一覧に表示する"を使用可能にした。</li>
     </ul>
   </li>
 
@@ -104,15 +106,24 @@
       <li>ブロードキャストコマンドの履歴が最大数のとき、コマンドを履歴に追加すると不正な処理が発生する問題を修正した(最大値はTERATERM.INIのMaxBroadcatHistory=99がデフォルト値)</li>
       <li>Windows 11(24H2) で DPI が異なるディスプレイをまたいでウインドウを移動した際、ウインドウが正しいサイズで表示されない不具合を修正した。</li>
       <li>ZMODEM send: 送信キャンセル時、CAN x8 を送信するようにした。</li>
+      <li>ZMODEM send: Tera Term 側で送信を中断したとき、キャンセルシーケンスが送信されるようにした。</li>
     </ul>
   </li>
 
   <li>その他
     <ul>
+      <li>バージョン番号形式を x.y.z に変更した。</li>
       <li><a href="#kanjimenu_0.1.10">TTX KanjiMenu Plugin(0.1.10)</a>へ差し替えた。</li>
       <li>Oniguruma 6.9.10へ差し替えた。</li>
       <li>インストーラに使用している Inno Setup のバージョンを<a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.4.0" target="_blank">6.4.0</a>へ差し替えた。</li>
+      <li><a href="#ttssh_3.4.0">TTSSH(3.4.0)</a>へ差し替えた。</li>
       <li><a href="#ttssh_3.4">TTSSH(3.4)</a>へ差し替えた。</li>
+      <li>インストーラによる TELNET プロトコルへの関連付けで、起動するコマンドラインオプションに /E を追加した。
+        <ul>
+          <li>これにより、URL で指定されたポート番号が 23 でなくても Telnet option negotiation が開始される。</li>
+          <li>Tera Term は通常 <a href="../usage/tips/not_port23.html">port 23</a> 以外を TELNET として扱わないため。</li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>
@@ -3620,7 +3631,7 @@
 
 <h2 id="ttssh">TTSSH</h2>
 
-<h3 id="ttssh_3.4">YYYY.MM.DD (Ver 3.4 not released yet)</h3>
+<h3 id="ttssh_3.4.0">YYYY.MM.DD (Ver 3.4.0 not released yet)</h3>
 <ul class="history">
   <!--li>変更
     <ul>
@@ -3637,6 +3648,7 @@
 
   <li>その他
     <ul>
+      <li>バージョン番号形式を x.y.z に変更した。</li>
       <li>LibreSSL 4.0.0 へ差し替えた。</li>
     </ul>
   </li>

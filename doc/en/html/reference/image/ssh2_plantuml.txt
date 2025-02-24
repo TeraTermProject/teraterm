@@ -302,7 +302,7 @@ group Authentication
     C -> S: SSH_MSG_USERAUTH_REQUEST
     note left: user name\n"ssh-connection"\n"publickey"\nFALSE\npublic key algorithm name\npublic key
 
-    note over S #ffffff: confirm that received public key is acceptable\n(included in authorized_keys, etc.Åj
+    note over S #ffffff: confirm that received public key is acceptable\n(included in authorized_keys, etc.)
 
     alt acceptable
       C <- S: SSH_MSG_USERAUTH_PK_OK
@@ -371,7 +371,7 @@ group Authentication
       C -> S: SSH_MSG_USERAUTH_REQUEST
       note left: user name\n"ssh-connection"\n"publickey"\nFALSE\npublic key algorithm name\npublic key
 
-      note over S #ffffff: confirm that received public key is acceptable\n(included in authorized_keys, etc.Åj
+      note over S #ffffff: confirm that received public key is acceptable\n(included in authorized_keys, etc.)
 
       alt acceptable
         C <- S: SSH_MSG_USERAUTH_PK_OK
