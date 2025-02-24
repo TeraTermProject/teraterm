@@ -5021,12 +5021,19 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 	for (size_t i = 0; i < _countof(NewWindowRect); i++) {
 		const RECT *r = &NewWindowRect[i];
 		HMONITOR hMonitor = pMonitorFromRect(r, MONITOR_DEFAULTTONULL);
-		UINT dpiX;
-		UINT dpiY;
-		pGetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
-		if (NewDPI == dpiX) {
-			NewRect = r;
-			break;
+		MONITORINFOEXW monitorInfo;
+		RtlZeroMemory(&monitorInfo, sizeof(monitorInfo));
+		monitorInfo.cbSize = sizeof(monitorInfo);
+		if (GetMonitorInfoW(hMonitor, &monitorInfo)) {
+			HDC hdc = CreateDCW(NULL, monitorInfo.szDevice, NULL, NULL);
+			if (hdc) {
+				UINT dpiX = (UINT)GetDeviceCaps(hdc, LOGPIXELSX);
+				DeleteDC(hdc);
+				if (NewDPI == dpiX) {
+					NewRect = r;
+					break;
+				}
+			}
 		}
 	}
 

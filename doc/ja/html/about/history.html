@@ -67,7 +67,6 @@
         <li>設定のみ行うようになった。(新しい接続は<a href="../menu/file-new.html">New connection ダイアログ</a>から行う。)</li>
         <li>Additional settings - General タブの<a href="../menu/setup-additional-general.html#Port">新しい接続のデフォルト</a>は TCP/IP 又は Serial を選択、デフォルトのSerial portはこのタブで選択するようにした。</li>
       </ul>
-      <li>DPIが異なるディスプレイをまたいで移動した時、Windows 11(24H2)が誤ったモニタ情報を返す問題を解決して、ウィンドウが正しいDPIで表示するようにした。</li>
       <li>シリアル再接続を改善した。
         <ul>
           <li>デバイスからの通知のチェックを詳細に行うようにした。</li>
@@ -105,6 +104,7 @@
       <li>XMODEM Send: XMODEM(CRC)からXMODEM(checksum)に切り替わってしまう問題を修正した</li>
       <li><a href="../menu/file-new.html#HostList">ホストリスト</a>に250以上保存しようとすると不正な処理が発生する問題を修正した。</li>
       <li>ブロードキャストコマンドの履歴が最大数のとき、コマンドを履歴に追加すると不正な処理が発生する問題を修正した(最大値はTERATERM.INIのMaxBroadcatHistory=99がデフォルト値)</li>
+      <li>Windows 11(24H2) で DPI が異なるディスプレイをまたいでウインドウを移動した際、ウインドウが正しいサイズで表示されない不具合を修正した。</li>
       <li>ZMODEM send: Tera Term 側で送信を中断したとき、キャンセルシーケンスが送信されるようにした。</li>
     </ul>
   </li>
