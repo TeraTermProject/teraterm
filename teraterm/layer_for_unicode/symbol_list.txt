@@ -22,6 +22,10 @@ user32 GetMenuStringW@20
 user32 LoadImageW@24
 user32 SystemParametersInfoW@16
 user32 GetTabbedTextExtentW@20
+user32 GetMessageW@16
+user32 IsDialogMessageW@8
+user32 TranslateAcceleratorW@12
+user32 DispatchMessageW@4
 
 kernel32 GetFileAttributesW@4
 kernel32 GetModuleFileNameW@12
