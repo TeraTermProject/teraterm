@@ -34,6 +34,7 @@
 #include <windows.h>
 #include <htmlhelp.h>
 #include <locale.h>
+#include <assert.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -243,17 +244,75 @@ HWND GetHWND(void)
 	return main_window;
 }
 
-static HWND hModelessDlg;
+class ModelessDlg
+{
+public:
+	ModelessDlg()
+	{
+		count_ = 0;
+		hWnds_ = NULL;
+	}
+	void Add(HWND hWnd)
+	{
+		int index = FindHandle(hWnd);
+		if (index != -1) {
+			return;
+		}
+		hWnds_ = (HWND *)realloc(hWnds_, sizeof(HWND) * (count_ + 1));
+		hWnds_[count_] = hWnd;
+		count_++;
+	}
+
+	void Remove(HWND hWnd)
+	{
+		int index = FindHandle(hWnd);
+		if (index == -1) {
+			assert(index == -1);
+			return;
+		}
+		int move_count = count_ - index;
+		memmove(&hWnds_[index], &hWnds_[index + 1], move_count);
+		count_--;
+		assert(count_ >= 0);
+		hWnds_ = (HWND *)realloc(hWnds_, sizeof(HWND) * count_);
+	}
+
+	BOOL HandleMessage(MSG *msg)
+	{
+		for (int i = 0; i < count_; i++) {
+			HWND hWnd = hWnds_[i];
+			if (::IsDialogMessageW(hWnd, msg) != FALSE) {
+				return TRUE;
+			}
+		}
+		return FALSE;
+	}
+
+private:
+	int FindHandle(HWND hWnd)
+	{
+		for (int i = 0; i < count_; i++) {
+			if (hWnds_[i] == hWnd) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	int count_;
+	HWND *hWnds_;
+};
+
+static ModelessDlg modeless_dlg;
 
 void AddModelessHandle(HWND hWnd)
 {
-	hModelessDlg = hWnd;
+	modeless_dlg.Add(hWnd);
 }
 
 void RemoveModelessHandle(HWND hWnd)
 {
-	(void)hWnd;
-	hModelessDlg = 0;
+	modeless_dlg.Remove(hWnd);
 }
 
 static UINT nMsgLast;
@@ -323,7 +382,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	for (;;) {
 		// idle状態でメッセージがない場合
 		while (bIdle) {
-			if (::PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE) != FALSE) {
+			if (::PeekMessageA(&msg, NULL, NULL, NULL, PM_NOREMOVE) != FALSE) {
 				// メッセージが存在する
 				break;
 			}
@@ -339,20 +398,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 		// メッセージが空になるまで処理する
 		for(;;) {
 			// メッセージが何もない場合、GetMessage()でブロックすることがある
-			if (::GetMessage(&msg, NULL, 0, 0) == FALSE) {
+			if (::GetMessageW(&msg, NULL, 0, 0) == FALSE) {
 				// WM_QUIT
 				goto exit_message_loop;
 			}
 
-			if (hModelessDlg == 0 ||
-				::IsDialogMessage(hModelessDlg, &msg) == FALSE)
-			{
+			if (modeless_dlg.HandleMessage(&msg) == FALSE) {
 				bool message_processed = false;
 
 				if (m_pMainWnd->m_hAccel != NULL) {
 					if (!MetaKey(ts.MetaKey)) {
 						// matakeyが押されていない
-						if (::TranslateAccelerator(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg)) {
+						if (::TranslateAcceleratorW(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg)) {
 							// アクセラレーターキーを処理した
 							message_processed = true;
 						}
@@ -361,7 +418,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 
 				if (!message_processed) {
 					::TranslateMessage(&msg);
-					::DispatchMessage(&msg);
+					::DispatchMessageW(&msg);
 				}
 			}
 
@@ -371,7 +428,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				lCount = 0;
 			}
 
-			if (::PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE) == FALSE) {
+			if (::PeekMessageA(&msg, NULL, NULL, NULL, PM_NOREMOVE) == FALSE) {
 				// メッセージがなくなった
 				break;
 			}

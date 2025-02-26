@@ -55,6 +55,7 @@
 #include "clipboar.h"	// for CBPreparePaste()
 #include "ttime.h"
 #include "history_store.h"
+#include "teraterml.h"
 
 #include "helpid.h"
 #include "broadcast.h"
@@ -641,6 +642,8 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			// リスト更新タイマーの開始
 			SetTimer(hWnd, list_timer_id, list_timer_tick, NULL);
 
+			AddModelessHandle(hWnd);
+
 			return FALSE;
 		}
 
@@ -982,6 +985,10 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			}
 			return TRUE;
 
+		case WM_NCDESTROY:
+			RemoveModelessHandle(hWnd);
+			return FALSE;
+
 		default:
 			//OutputDebugPrintf("msg %x wp %x lp %x\n", msg, wp, lp);
 			return FALSE;
@@ -1003,9 +1010,6 @@ void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd)
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 
-	// CreateDialogW() で生成したダイアログは、
-	// エディットボックスにIMEからの入力が化けることがある (20/05/27,Windows10 64bit)
-	//   ペーストはok
 	hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_BROADCAST_DIALOG),
 							 hWnd, BroadcastCommandDlgProc);
 

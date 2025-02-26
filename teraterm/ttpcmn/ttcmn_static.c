@@ -253,6 +253,7 @@ BOOL StartTeraTerm(HINSTANCE hInst, PTTSet ts)
 		static const wchar_t *filelist[] = {
 			L"TERATERM.INI",
 			L"KEYBOARD.CNF",
+			L"broadcast.log",	// broadcast.cpp
 			NULL,
 		};
 
