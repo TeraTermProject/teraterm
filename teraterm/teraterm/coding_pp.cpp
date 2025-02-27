@@ -249,10 +249,8 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SetDropDownList(hWnd, IDC_EMOJI_WIDTH_COMBO, CellWidthList, ts->UnicodeEmojiWidth == 1 ? 1 : 2);
 			if (ts->UnicodeEmojiOverride) {
 				CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_CHECKED);
-				EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), TRUE);
 			} else {
 				CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_UNCHECKED);
-				EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), FALSE);
 			}
 
 			return TRUE;
