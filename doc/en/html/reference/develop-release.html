@@ -98,14 +98,15 @@ To release Tera Term installation package is shown in the following step:
         set TT_VERSION_SUBSTR to "RC".
 <pre>
   #define TT_VERSION_MAJOR             5
-  #define TT_VERSION_MINOR             0
+  #define TT_VERSION_MINOR             4
+  #define TT_VERSION_PATCH             0
 - #define TT_VERSION_SUBSTR            "dev"
 + #define TT_VERSION_SUBSTR            "RC"
 </pre>
-        TT_VERSION_MINOR is already incremented yet. It is incremented immediately after previous release.
+        TT_VERSION_MINOR or TT_VERSION_PATCH is already incremented yet. It is incremented immediately after previous release.
       </li>
       <li>ttssh2\ttxssh\ttxssh-version.h<br>
-        TTSSH_VERSION_MINOR is already incremented yet. It is incremented immediately after previous release.
+        TTSSH_VERSION_MINOR or TTSSH_VERSION_PATCH is already incremented yet. It is incremented immediately after previous release.
       </li>
       <li>ttpmenu\ttpmenu.rc // only modifying</li>
       <li>TTProxy\TTProxy.rc // only modifying</li>
@@ -114,8 +115,8 @@ To release Tera Term installation package is shown in the following step:
         installer\teraterm.iss<br>
         Change to "RC" and enable create archive.
 <pre>
-- #define AppVer "5.0-dev"
-+ #define AppVer "5.0-RC"
+- #define AppVer "5.4.0-dev"
++ #define AppVer "5.4.0-RC"
 
   [PreCompile]
   Name: makechm.bat
@@ -182,7 +183,8 @@ To release Tera Term installation package is shown in the following step:
         teraterm\common\tt-version.h
 <pre>
   #define TT_VERSION_MAJOR             5
-  #define TT_VERSION_MINOR             0
+  #define TT_VERSION_MINOR             4
+  #define TT_VERSION_PATCH             0
 - #define TT_VERSION_SUBSTR            "RC"
 + #undef TT_VERSION_SUBSTR
 </pre>
@@ -190,8 +192,8 @@ To release Tera Term installation package is shown in the following step:
       <li>
         installer\teraterm.iss<br>
 <pre>
-- #define AppVer "5.0-RC"
-+ #define AppVer "5.0"
+- #define AppVer "5.4.0-RC"
++ #define AppVer "5.4.0"
 </pre>
      </li>
     </ul>
@@ -210,11 +212,11 @@ To release Tera Term installation package is shown in the following step:
   <li>Create SVN tag.
     <p>
       Use annotated tags.
-      The naming rule is `v(version)' (e.g. v5.0).
+      The naming rule is `v(version)' (e.g. v5.4.0).
     </p>
 <pre>
-git tag -a v5.0 -m "Release 5.0"
-git push origin v5.0
+git tag -a v5.4.0 -m "Release 5.4.0"
+git push origin v5.4.0
 </pre>
   </li>
   <li>Create installer.
@@ -243,34 +245,58 @@ git push origin v5.0
       <li>Twitter (<a href="https://twitter.com/Tera_Term" target="_blank">https://twitter.com/Tera_Term</a>)</li>
     </ul>
   </li>
+  <li id="increment_version">When periodic release, create stable branch.
+<pre>
+git checkout -b stable_5_4
+</pre>
+  </li>
   <li id="increment_version">Increment the version for text release
+    <p>When periodic release,</p>
     <ul>
       <li>
         teraterm/common/tt-version.h<br>
-        Increment TT_VERSION_MINOR and set SUBSTR to "dev".
+        Increment TT_VERSION_MINOR and set SUBSTR to "dev" in main branch.
 <pre>
   #define TT_VERSION_MAJOR             5
-- #define TT_VERSION_MINOR             0
+- #define TT_VERSION_MINOR             4
++ #define TT_VERSION_MINOR             5
+  #define TT_VERSION_PATCH             0
 - #undef TT_VERSION_SUBSTR
-+ #define TT_VERSION_MINOR             1
++ #define TT_VERSION_SUBSTR            "dev"
+</pre>
+        Increment TT_VERSION_PATCH and set SUBSTR to "dev" in stable branch.
+<pre>
+  #define TT_VERSION_MAJOR             5
+  #define TT_VERSION_MINOR             4
+- #define TT_VERSION_PATCH             0
+- #undef TT_VERSION_SUBSTR
++ #define TT_VERSION_PATCH             1
 + #define TT_VERSION_SUBSTR            "dev"
 </pre>
       </li>
       <li>
         ttssh2/ttssh/ttxssh-version.h<br>
-        Increment TT_VERSION_MINOR.
+        Increment TT_VERSION_MINOR in main branch.
 <pre>
   #define TTSSH_VERSION_MAJOR             3
-- #define TTSSH_VERSION_MINOR             0
-+ #define TTSSH_VERSION_MINOR             1
+- #define TTSSH_VERSION_MINOR             4
++ #define TTSSH_VERSION_MINOR             5
+  #define TTSSH_VERSION_PATCH             0
+</pre>
+        Increment TTSSH_VERSION_PATCH in stable branch.
+<pre>
+  #define TTSSH_VERSION_MAJOR             3
+  #define TTSSH_VERSION_MINOR             4
+- #define TTSSH_VERSION_PATCH             0
++ #define TTSSH_VERSION_PATCH             1
 </pre>
       </li>
       <li>
         installer\teraterm.iss<br>
-        Set AppVer to [next version]-dev.
+        Set AppVer to [next version]-dev in main branch.
 <pre>
-- #define AppVer "5.0"
-+ #define AppVer "5.1-dev"
+- #define AppVer "5.4.0"
++ #define AppVer "5.5.0-dev"
 
   [PreCompile]
   Name: makechm.bat
@@ -278,7 +304,67 @@ git push origin v5.0
 - Name: build.bat; Parameters: rebuild
 + Name: build.bat
 + ;Name: build.bat; Parameters: rebuild
-  
+
+  [PostCompile]
+- Name: makearchive.bat; Parameters: release
++ ;Name: makearchive.bat; Parameters: release
+</pre>
+        Set AppVer to [next version]-dev in stable branch too.
+<pre>
+- #define AppVer "5.4.0"
++ #define AppVer "5.4.1-dev"
+
+  [PreCompile]
+  Name: makechm.bat
+- ;Name: build.bat
+- Name: build.bat; Parameters: rebuild
++ Name: build.bat
++ ;Name: build.bat; Parameters: rebuild
+
+  [PostCompile]
+- Name: makearchive.bat; Parameters: release
++ ;Name: makearchive.bat; Parameters: release
+</pre>
+      </li>
+    </ul>
+    <p>When stable release,</p>
+    <ul>
+      <li>
+        teraterm/common/tt-version.h<br>
+        Increment TT_VERSION_PATCH and set SUBSTR to "dev" in stable branch.
+<pre>
+  #define TT_VERSION_MAJOR             5
+  #define TT_VERSION_MINOR             4
+- #define TT_VERSION_PATCH             1
+- #undef TT_VERSION_SUBSTR
++ #define TT_VERSION_PATCH             2
++ #define TT_VERSION_SUBSTR            "dev"
+</pre>
+      </li>
+      <li>
+        ttssh2/ttssh/ttxssh-version.h<br>
+        Increment TTSSH_VERSION_PATCH in stable branch.
+<pre>
+  #define TTSSH_VERSION_MAJOR             3
+  #define TTSSH_VERSION_MINOR             4
+- #define TTSSH_VERSION_PATCH             1
++ #define TTSSH_VERSION_PATCH             2
+</pre>
+      </li>
+      <li>
+        installer\teraterm.iss<br>
+        Set AppVer to [next version]-dev in stable branch.
+<pre>
+- #define AppVer "5.4.1"
++ #define AppVer "5.4.2-dev"
+
+  [PreCompile]
+  Name: makechm.bat
+- ;Name: build.bat
+- Name: build.bat; Parameters: rebuild
++ Name: build.bat
++ ;Name: build.bat; Parameters: rebuild
+
   [PostCompile]
 - Name: makearchive.bat; Parameters: release
 + ;Name: makearchive.bat; Parameters: release
