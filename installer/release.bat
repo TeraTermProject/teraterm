@@ -113,8 +113,16 @@ if "%RELEASE%" == "1" (
 ) else (
     call makearchive.bat
 )
+if ERRORLEVEL 1 (
+	echo ERROR call makearchive.bat
+	exit /b 1
+)
 call iscc.bat
 
+if ERRORLEVEL 1 (
+	echo ERROR call iscc.bat
+	exit /b 1
+)
 endlocal
 exit /b 0
 

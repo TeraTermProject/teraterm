@@ -147,5 +147,4 @@ echo ===================================================
 echo.
 echo ƒrƒ‹ƒh‚ÉŽ¸”s‚µ‚Ü‚µ‚½ (Failed to build source code)
 endlocal
-exit /b
-
+exit 1
