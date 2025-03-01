@@ -63,19 +63,13 @@ jobs:
         chcp 932
         ci_scripts/build_appveyor_release_bat_pre_cache.bat
 
-    - name: Upload artifacts (zip)
-      uses: actions/upload-artifact@v4
-      with:
-        name: binary-BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}
-        path: |
-          installer/Output/*.zip
-
-    - name: Upload artifacts (exe)
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: installer-BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}
         path: |
           installer/Output/*.exe
+          installer/Output/*.zip
 
     - name: Save libs
       id: cache-libs-save
