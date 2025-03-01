@@ -12,8 +12,8 @@
 <h1 class="center">How to release Tera Term installation package</h1>
 
 <ol>
-  <li><a href="#start-rc">From start release until create RC</a></li>
-  <li><a href="#rc-release">From create RC until release</a></li>
+  <li><a href="#start-rc">Start release operation</a></li>
+  <li><a href="#rc-release">Create RC, and after that</a></li>
   <li><a href="#release-operation">Release</a></li>
   <li><a href="#code-freeze">About code freeze</a></li>
 </ol>
@@ -24,7 +24,7 @@
 To release Tera Term installation package is shown in the following step:
 </p>
 
-<h2 id="start-rc">From start release until create RC</h2>
+<h2 id="start-rc">Start release operation</h2>
 
 <ol>
   <li>Confirm ticket and branches.
@@ -123,7 +123,7 @@ To release Tera Term installation package is shown in the following step:
 - ;Name: build.bat; Parameters: rebuild
 + ;Name: build.bat
 + Name: build.bat; Parameters: rebuild
-  
+
   [PostCompile]
 - ;Name: makearchive.bat; Parameters: release
 + Name: makearchive.bat; Parameters: release
