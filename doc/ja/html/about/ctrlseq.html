@@ -790,11 +790,11 @@ filter rectangle ‚Íí‚Éƒƒ“ƒVƒ‡ƒbƒgƒ‚[ƒhˆµ‚¢‚É‚È‚éBˆê“xƒtƒBƒ‹ƒ^ƒCƒxƒ“ƒg‚ğ‘—M‚
 <table border="1">
 <tr><th>”Ô†</th>	<th>‘®«</th></tr>
 <tr><td> 0</td>		<td>‘S‚Ä‚Ì‘®«‚ğ‰ğœ‚·‚éB</td></tr>
-<tr><td> 1</td>		<td>‘¾š‘®«‚ğİ’è‚·‚éB</td></tr>
+<tr><td> 1</td>		<td>‘¾š‘®«<a href="#Bold">*</a> ‚ğİ’è‚·‚éB</td></tr>
 <tr><td> 4</td>		<td>‰ºü‘®«‚ğİ’è‚·‚éB</td></tr>
 <tr><td> 5</td>		<td>“_–Å‘®«‚ğİ’è‚·‚éB</td></tr>
 <tr><td> 7</td>		<td>”½“]‘®«‚ğİ’è‚·‚éB</td></tr>
-<tr><td>22</td>		<td>‘¾š‘®«‚ğ‰ğœ‚·‚éB</td></tr>
+<tr><td>22</td>		<td>‘¾š‘®«<a href="#Bold">*</a> ‚ğ‰ğœ‚·‚éB</td></tr>
 <tr><td>24</td>		<td>‰ºü‘®«‚ğ‰ğœ‚·‚éB</td></tr>
 <tr><td>25</td>		<td>“_–Å‘®«‚ğ‰ğœ‚·‚éB</td></tr>
 <tr><td>27</td>		<td>”½“]‘®«‚ğ‰ğœ‚·‚éB</td></tr>
@@ -933,12 +933,13 @@ OSC 4 ; <i>c</i> ; rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i> ST
 <i>Pt</i> ‚Í <i>c</i> ; <i>spec</i> ‚Æ‚¢‚¤‘®‚ÅA<i>c</i> ‚É‘Î‰‚·‚é•¶š‘®«‚ÌF‚ğ <i>spec</i> ‚Éİ’è‚·‚éB<br>
 <i>c</i> ‚Æ•¶š‘®«‚Ì‘Î‰‚ÍˆÈ‰º‚Ì’Ê‚èB<br>
 <pre>
-<i>c</i> = 0   ‚‹P“x
+<i>c</i> = 0   ‘¾š
   = 1   ‰ºü
   = 2   “_–Å
   = 3   ”½“]
 </pre>
-<i>spec</i> ‚ÌŒ`®‚ÍAOSC 4 ‚Ì <i>spec</i> ‚Æ“¯‚¶B
+<i>spec</i> ‚ÌŒ`®‚ÍAOSC 4 ‚Ì <i>spec</i> ‚Æ“¯‚¶B<br>
+‘¾š‘®«‚É‚Â‚¢‚Ä‚Í<a href="#Bold">‰º‹L</a>‚ğQÆ
 </td></tr>
 <tr><td> 10 </td>		<td>VTƒEƒBƒ“ƒhƒE‚Ì•¶šF‚ğ <i>Pt</i> ‚Éİ’è‚·‚éB<i>Pt</i> ‚ÌŒ`®‚ÍAOSC 4 ‚Ì <i>spec</i> ‚Æ“¯‚¶B</td></tr>
 <tr><td> 11 </td>		<td>VTƒEƒBƒ“ƒhƒE‚Ì”wŒiF‚ğ <i>Pt</i> ‚Éİ’è‚·‚éB<i>Pt</i> ‚ÌŒ`®‚ÍAOSC 4 ‚Ì <i>spec</i> ‚Æ“¯‚¶B</td></tr>
@@ -990,14 +991,17 @@ OSC 4 ; <i>c</i> ; rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i> ST
 <pre>APC <i>Pt</i> ST</pre>
 <p>‘Î‰‚µ‚Ä‚¢‚éAPCƒV[ƒPƒ“ƒX‚Í‚ ‚è‚Ü‚¹‚ñB‚·‚×‚Ä–³‹‚µ‚Ü‚·B</p>
 
+<h2 id="Bold">‘¾š‘®«‚É‚Â‚¢‚Ä</h2>
+‘¾š (‰p: Bold) ‘®«‚ÍA‹KŠi‚É‚æ‚Á‚Ä‚Íu‘¾š–”‚Í‚‹P“xv(‰p: bold or increased intensity) ‚Æ‚È‚Á‚Ä‚¢‚Ü‚·B
+
 <h2 id="ref">Ql•¶Œ£</h2>
 <ul>
-  <li><a href="http://www.ecma-international.org/publications/standards/Ecma-048.htm" target="_blank">ECMA-48</a></li>
-  <li><a href="http://vt100.net/" target="_blank">VT100.net</a></li>
-  <li><a href="http://invisible-island.net/xterm/ctlseqs/ctlseqs.html" target="_blank">Xterm control sequences</a></li>
-  <li><a href="http://www.cs.utk.edu/~shuford/terminal/dec_vt_mouse.html" target="_blank">Locator input models for ANSI Terminals (sixth revision)</a></li>
-  <li><a href="http://bjh21.me.uk/all-escapes/all-escapes.txt" target="_blank">all-escapes.txt</a></li>
-  <li><a href="http://publib.boulder.ibm.com/infocenter/aix/v7r1/index.jsp?topic=/com.ibm.aix.cmds/doc/aixcmds1/aixterm.htm" target="_blank">aixterm</a></li>
+  <li><a href="https://ecma-international.org/publications-and-standards/standards/ecma-48/" target="_blank">ECMA-48</a></li>
+  <li><a href="https://vt100.net/" target="_blank">VT100.net</a></li>
+  <li><a href="https://invisible-island.net/xterm/ctlseqs/ctlseqs.html" target="_blank">Xterm control sequences</a></li>
+  <li><a href="https://shuford.invisible-island.net/dec_vt_mouse.html" target="_blank">Locator input models for ANSI Terminals (sixth revision)</a></li>
+  <li><a href="https://bjh21.me.uk/all-escapes/all-escapes.txt" target="_blank">all-escapes.txt</a></li>
+  <li><a href="https://www.ibm.com/docs/aix/7.3?topic=aixterm-command" target="_blank">aixterm</a></li>
 </ul>
 
 </body>

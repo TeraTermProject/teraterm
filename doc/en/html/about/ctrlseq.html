@@ -784,11 +784,11 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> &amp; w
 <table border="1">
 <tr><th>No.</th>	<th>Attribute</th></tr>
 <tr><td> 0</td>		<td>Normal</td></tr>
-<tr><td> 1</td>		<td>Bold</td></tr>
+<tr><td> 1</td>		<td>Bold<a href="#Bold">*</a></td></tr>
 <tr><td> 4</td>		<td>Underlined</td></tr>
 <tr><td> 5</td>		<td>Blink</td></tr>
 <tr><td> 7</td>		<td>Inverse</td></tr>
-<tr><td>22</td>		<td>Normal (neither bold nor faint)</td></tr>
+<tr><td>22</td>		<td>Normal (neither bold<a href="#Bold">*</a> nor faint)</td></tr>
 <tr><td>24</td>		<td>Not underlined</td></tr>
 <tr><td>25</td>		<td>Steady (not blinking)</td></tr>
 <tr><td>27</td>		<td>Positive (not inverse)</td></tr>
@@ -940,7 +940,8 @@ The <i>c</i>  and character attribute are in the following: <br>
   = 2   Blink
   = 3   Reverse
 </pre>
-Format of <i>spec</i> is same as OSC 4's <i>spec</i>.
+Format of <i>spec</i> is same as OSC 4's <i>spec</i>.<br>
+About Bold attribute, see <a href="#Bold">below</a>.
 </td></tr>
 <tr><td> 10 </td>		<td>Change VT Window's text color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
 <tr><td> 11 </td>		<td>Change VT Window's background color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
@@ -993,14 +994,17 @@ When the <i>Pd</i> is the "?", the request does. The clipboard content responses
 <pre>APC <i>Pt</i> ST</pre>
 <p>Tera Term implements no APC functions; <i>Pt</i> is ignored.</p>
 
+<h2 id="Bold">About Bold attribute</h2>
+Bold attribute is defined as "bold or increased intensity" in some standards.
+
 <h2 id="ref">References</h2>
 <ul>
-  <li><a href="http://www.ecma-international.org/publications/standards/Ecma-048.htm" target="_blank">ECMA-48</a></li>
-  <li><a href="http://vt100.net/" target="_blank">VT100.net</a></li>
-  <li><a href="http://invisible-island.net/xterm/ctlseqs/ctlseqs.html" target="_blank">Xterm control sequences</a></li>
-  <li><a href="http://www.cs.utk.edu/~shuford/terminal/dec_vt_mouse.html" target="_blank">Locator input models for ANSI Terminals (sixth revision)</a></li>
-  <li><a href="http://bjh21.me.uk/all-escapes/all-escapes.txt" target="_blank">all-escapes.txt</a></li>
-  <li><a href="http://publib.boulder.ibm.com/infocenter/aix/v7r1/index.jsp?topic=/com.ibm.aix.cmds/doc/aixcmds1/aixterm.htm" target="_blank">aixterm</a></li>
+  <li><a href="https://ecma-international.org/publications-and-standards/standards/ecma-48/" target="_blank">ECMA-48</a></li>
+  <li><a href="https://vt100.net/" target="_blank">VT100.net</a></li>
+  <li><a href="https://invisible-island.net/xterm/ctlseqs/ctlseqs.html" target="_blank">Xterm control sequences</a></li>
+  <li><a href="https://shuford.invisible-island.net/dec_vt_mouse.html" target="_blank">Locator input models for ANSI Terminals (sixth revision)</a></li>
+  <li><a href="https://bjh21.me.uk/all-escapes/all-escapes.txt" target="_blank">all-escapes.txt</a></li>
+  <li><a href="https://www.ibm.com/docs/aix/7.3?topic=aixterm-command" target="_blank">aixterm</a></li>
 </ul>
 
 </body>
