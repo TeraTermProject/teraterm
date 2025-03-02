@@ -6,8 +6,8 @@ SET rebuild=
 SET release=
 
 if "%1"=="/?" goto help
-if "%1"=="rebuild" SET rebuild=rebuild && goto build
-if "%1"=="release" SET release=yes && goto build
+if "%1"=="rebuild" SET rebuild=rebuild&& goto build
+if "%1"=="release" SET release=yes&& goto build
 if "%1"=="" goto build
 goto help
 

@@ -4,6 +4,7 @@ environment:
 # リリースではキャッシュを使わない
 # APPVEYOR_SAVE_CACHE_ON_ERROR: true
   VS_VERSION: 2022
+  NOPAUSE: 1
 
 build: off
 
@@ -24,6 +25,8 @@ before_build:
   # - ci_scripts/addpkg_msys2.bat
   # 自前の Cygwin をインストール
   # - buildtools/install_cygwin.bat
+  # 自前の Inno Setup をインストール
+  - buildtools/install_innosetup.bat
 
 build_script:
   - ci_scripts/build_appveyor_release_bat.bat
