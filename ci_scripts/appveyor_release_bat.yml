@@ -4,6 +4,7 @@ environment:
 # リリースではキャッシュを使わない
 # APPVEYOR_SAVE_CACHE_ON_ERROR: true
   VS_VERSION: 2022
+  NOPAUSE: 1
 
 build: off
 
