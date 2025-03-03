@@ -32,10 +32,17 @@
 
 <h2 id="teraterm">Tera Term</h2>
 
-<h3 id="teraterm_5.4">YYYY.MM.DD (Ver 5.4 not released yet)</h3>
+<h3 id="teraterm_5.4.0">YYYY.MM.DD (Ver 5.4.0 not released yet)</h3>
 <ul class="history">
   <li>変更
     <ul>
+      <li>シリアル再接続を改善した。
+        <ul>
+          <li>デバイスからの通知のチェックを詳細に行うようにした。</li>
+          <li>再接続時のパラメータをTERATERM.INIに追加した。</li>
+        </ul>
+      </li>
+      <li>com0com (virtual serial port driver) の Ports class ではない "COM%d" 形式のシリアルポートを選択できるようにした。</li>
       <li>クリップボードの送信(OSC 52)時、送信文字コードで送信するように変更した。<br>
         修正前はUTF-8 以外の時、ACPで送信していた。</li>
       <li>Beep が Visual Bell のときのフラッシュ時間を設定できるようにした。
@@ -43,35 +50,44 @@
           <li>teraterm.iniに <a href="../setup/teraterm-term.html#BeepVBellWait">BeepVBellWait</a> エントリを追加した。</li>
         </ul>
       </li>
-      <li>Setup-General 設定を Additional settings の <a href="../menu/setup-additional-general.html">General タブ</a>へ統合した。</li>
-      <li>Additional settings の "Coding" を、より一般的な "Encoding" に改めた。</li>
+      <li>Unicode の文字情報を Unicode 16.0 に更新した。<br>
+        Tera Term 5.0 から 5.3 は Unicode 15.1 準拠だった。</li>
+      <li>[Setup]-[Window] 設定を Additional settings の <a href="../menu/setup-additional-window.html">Window タブ</a>へ統合した。</li>
+      <li>[Setup]-[Terminal] 設定を Additional settings の <a href="../menu/setup-additional-terminal.html">Terminal タブ</a>へ統合した。</li>
+      <li>[Setup]-[Serial port] 設定を Additional settings の <a href="../menu/setup-additional-serialport.html">Serial port タブ</a>へ統合した。
+        <ul>
+          <li>Serial port タブから接続を開始することはできず、設定のみ行えるようになった。<br>
+            新しい接続は <a href="../menu/file-new.html">New connection ダイアログ</a>から行う。</li>
+        </ul>
+      </li>
+      <li>[Setup]-[General] 設定を Additional settings の <a href="../menu/setup-additional-general.html">General タブ</a>へ統合した。</li>
+      <li>[Additional settings] の [Coding] タブを [<a href="../menu/setup-additional-coding.html">Encoding</a>] タブに改名した。</li>
+      <li>[Additional settings]-[General] タブで設定する、新規接続ダイアログの "<a href="../menu/setup-additional-general.html#Port">Default port</a>" は "TCP/IP" または "Serial" の選択になった。<br>
+        デフォルトのシリアルポート番号は <a href="../menu/setup-additional-serialport.html">Serial port タブ</a>で選択するようになった。
+      </li>
+      <li>[Additional settings]-[<a href="../menu/setup-additional-window.html#">Window</a>] タブの "Reverse" ボタンを "Swap colors" に改名した。
+      <li>[Additional settings]-[<a href="../menu/setup-font.html#">Font</a>] タブの "List proportional fonts in font dialog" を使用可能にした。</li>
+      <li><a href="../menu/file-sendfile.html#dialog">Send file ダイアログ</a>の送信ファイル選択の初期ディレクトリが<a href="../setup/folder.html#FileDir">ファイル転送用のフォルダ</a>になるようにした。</li>
+      <li><a href="../menu/file-sendfile.html#dialog">Send file ダイアログ</a>のオプションを TERATERM.INI に保存するようにした。
+        <ul>
+          <li>teraterm.iniに <a href="../setup/teraterm-ini.html#SendfileSequential">SendfileSequential</a>, <a href="../setup/teraterm-ini.html#SendfileDelayType">SendfileDelayType</a>, <a href="../setup/teraterm-ini.html#SendfileSize">SendfileSize</a>, <a href="../setup/teraterm-ini.html#SendfileDelayTick">SendfileDelayTick</a> エントリを追加した。</li>
+        </ul>
+      </li>
+      <li>[File] メニューの [<a href="../menu/file.html#Sendfile">Send file</a>] を選択したとき <a href="../menu/file-sendfile.html#dialog">Send file ダイアログ</a>をスキップする設定を追加した。
+        <ul>
+          <li>teraterm.iniに <a href="../setup/teraterm-ini.html#SendfileSkipOptionDialog">SendfileSkipOptionDialog</a> エントリを追加した。</li>
+        </ul>
+      </li>
+      <li>XMODEM send: 送信開始時に受信バッファをクリアするようにした</li>
+      <li>ZMODEM send: 受信 ZRINIT 内の CANFDX フラグの処理を実装した。受信側がデータを受信できない間、送信側(Tera Term)は受信側を待てるようになった。</li>
+      <li>コマンドラインオプションで使用可能文字コードを全て指定できるようにした。</li>
       <li>言語モードを削除したため /LA コマンドラインオプションを削除した。</li>
       <li>TERATERM.INI のバックアップファイルの作成方法を変更した。</li>
-      <li>Unicode の文字情報を Unicode 16.0 に更新した。更新前、Tera Term 5.0 から Unicode 15.1 準拠だった。</li>
-      <li>MACRO: <a href="../macro/command/setdlgpos.html">setdlgpos</a> コマンドの表示位置の指定方法を拡張した。</li>
+      <li>ファイル送受信マクロコマンドが<a href="../setup/folder.html#FileDir">ファイル転送用のフォルダ</a>を起点とするようにした。</li>
+      <li>MACRO: <a href="../macro/command/setdlgpos.html">setdlgpos</a> コマンドの表示位置の指定方法を拡張した。
         <ul>
           <li>座標の基準として、ディスプレイの四隅と中央、VT ウインドウの四隅と中央を指定できるようにした。</li>
           <li>表示位置を補正するパラメータを指定できるようにした。</li>
-        </ul>
-      <li>コマンドラインオプションで使用可能文字コードを全て指定できるようにした。</li>
-      <li>com0com(virtual serial port driver) の Ports class ではない "COM%d" 形式のシリアルポートを選択できるようにした。</li>
-      <li>送信ファイルを選択するダイアログの初期ディレクトリが<a href="../setup/folder.html#FileDir">ファイル転送用のフォルダ</a>になるようにした。</li>
-      <li>ファイル送信オプションをTERATERM.INIに保存するようにした。</li>
-      <li><a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">ファイル送信ダイアログをスキップする</a>設定を追加した。</li>
-      <li>ファイル送受信マクロコマンドもファイル転送用フォルダを起点とするようにした。</li>
-      <li>ZMODEM send: 受信 ZRINIT 内の CANFDX フラグの処理を実装した。受信側がデータを受信できない間、送信側(Tera Term)は受信側を待てるようになった。</li>
-      <li>XMODEM send: 送信開始時に受信バッファをクリアするようにした</li>
-      <li>Additional settings - <a href="../menu/setup-additional-serialport.html">Serial Port タブ</a></li>
-      <ul>
-        <li>Setup-Serial 設定を Additional settings の Serial Port タブへ統合した。</li>
-        <li>設定のみ行うようになった。(新しい接続は<a href="../menu/file-new.html">New connection ダイアログ</a>から行う。)</li>
-        <li>Additional settings - General タブの<a href="../menu/setup-additional-general.html#Port">新しい接続のデフォルト</a>は TCP/IP 又は Serial を選択、デフォルトのSerial portはこのタブで選択するようにした。</li>
-      </ul>
-      <li>DPIが異なるディスプレイをまたいで移動した時、Windows 11(24H2)が誤ったモニタ情報を返す問題を解決して、ウィンドウが正しいDPIで表示するようにした。</li>
-      <li>シリアル再接続を改善した。
-        <ul>
-          <li>デバイスからの通知のチェックを詳細に行うようにした。</li>
-          <li>再接続時のパラメータをTERATERM.INIに追加した。</li>
         </ul>
       </li>
     </ul>
@@ -79,40 +95,50 @@
 
   <li>バグ修正
     <ul>
+      <li>バックグラウンドにある teraterm ウィンドウを左クリックで前面化した時に過敏に 1キャラクタ選択されてしまう問題を修正した。</li>
+      <li>Windows 11(24H2) で DPI が異なるディスプレイをまたいでウインドウを移動した際、ウインドウが正しいサイズで表示されない不具合を修正した。</li>
+      <li>"<a href="../menu/setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a>" が on のとき、サロゲートペアの文字が存在したとき正しく表示するよう修正した。</li>
+      <li>UTF-8 の U+20000 から U+3FFFF を正しく扱うよう修正した。</li>
+      <li>ログファイルとしてファイル選択ダイアログで既存のファイルを指定した時に上書き確認ダイアログを表示しないようにした。</li>
       <li>LogAutoStart=on で AutoWinClose=off の時、ログ出力中に切断して新規接続するとエラーが表示される問題を修正した。</li>
       <li>"Log" ダイアログの「×」ボタンが動作しない問題を修正した。</li>
+      <li>接続履歴がないとき、エディットボックスに "&lt;Edit History...&gt;" が入力される問題を修正した。</li>
+      <li><a href="../menu/file-new.html#HostList">ホストリスト</a>に250以上保存しようとすると不正な処理が発生する問題を修正した。</li>
+      <li>ブロードキャストコマンドの履歴が最大数のとき、コマンドを履歴に追加すると不正な処理が発生する問題を修正した。<br>
+        最大値は TERATERM.INI の <a href="../setup/teraterm-ini.html#MaxBroadcatHistory">MaxBroadcatHistory</a> で、デフォルトは 99。
+      </li>
       <li><a href="../menu/control-broadcast.html">Broadcast command ダイアログ</a>でリアルタイムモードが off 、ヒストリが on のとき、コマンドの履歴を保存する時にクラッシュする問題を修正した。</li>
-      <li>バックグラウンドにある teraterm ウィンドウを左クリックで前面化した時に過敏に 1キャラクタ選択されてしまう問題を修正した。</li>
-      <li>MACRO: ダイアログが拡大/縮小率の異なるモニタをまたぐ時、DPI調整がうまく行われない問題を改善した。</li>
-      <li>ログファイルとしてファイル選択ダイアログで既存のファイルを指定した時に上書き確認ダイアログを表示しないようにした。</li>
-      <li>MACRO: TTL ファイルが BOM なし UTF-8 の場合、実行できない問題を修正した。</li>
-      <li>UTF-8 の U+20000 から U+3FFFF を正しく扱うよう修正した。</li>
-      <li>"<a href="../menu/setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a>" が on のとき、サロゲートペアの文字が存在したとき正しく表示するよう修正した。</li>
-      <li>MACRO: <a href="../macro/command/getenv.html">getenv</a>, <a href="../macro/command/expandenv.html">expandenv</a>, <a href="../macro/command/setenv.html">setenv</a> マクロコマンド が Unicode に対応していなかったので修正した。</li>
-      <li>B-Plusの送信ができなくなっていたので修正した。</li>
+      <li>ジャンプリストの表示をUnicodeに対応した。</li>
       <li>次の時 local echo 設定を反映していなかったので修正した。
         <ul>
-          <li>ファイル送信 (<a href="../menu/file-sendfile.html">file - Send file</a>)</li>
-          <li>ファイル送信 (<a href="../usage/mouse.html#SendFile">Drop File</a>)</li>
+          <li>ファイル送信 ([File]-[<a href="../menu/file.html#Sendfile">Send file</a>])</li>
+          <li>ファイル送信 (<a href="../usage/mouse.html#SendFile">VT Window へのファイルドロップ</a>)</li>
           <li><a href="../macro/command/sendfile.html">sendfile</a> マクロコマンド</li>
         </ul>
       </li>
-      <li>接続履歴がないとき、エディットボックスに"&lt;Edit History...&gt;"が入力されていたので修正した。</li>
-      <li>ジャンプリストの表示をUnicodeに対応した。</li>
-      <li>MACRO: <a href="../macro/command/setpassword.html">setpassword</a>, <a href="../macro/command/ispassword.html">ispassword</a> マクロコマンド が Unicode に対応していなかったので修正した。</li>
+      <li>B-Plusの送信ができなくなっていたので修正した。</li>
       <li>XMODEM Send: XMODEM(CRC)からXMODEM(checksum)に切り替わってしまう問題を修正した</li>
-      <li><a href="../menu/file-new.html#HostList">ホストリスト</a>に250以上保存しようとすると不正な処理が発生する問題を修正した。</li>
-      <li>ブロードキャストコマンドの履歴が最大数のとき、コマンドを履歴に追加すると不正な処理が発生する問題を修正した(最大値はTERATERM.INIのMaxBroadcatHistory=99がデフォルト値)</li>
-      <li>ZMODEM send: 送信キャンセル時、CAN x8 を送信するようにした。</li>
+      <li>ZMODEM send: Tera Term 側で送信を中断したとき、キャンセルシーケンスが送信されるようにした。</li>
+      <li>MACRO: TTL ファイルが BOM なし UTF-8 の場合、実行できない問題を修正した。</li>
+      <li>MACRO: ダイアログが拡大/縮小率の異なるモニタをまたぐ時、DPI調整がうまく行われない問題を改善した。</li>
+      <li>MACRO: <a href="../macro/command/getenv.html">getenv</a>, <a href="../macro/command/expandenv.html">expandenv</a>, <a href="../macro/command/setenv.html">setenv</a> マクロコマンド が Unicode に対応していなかったので修正した。</li>
+      <li>MACRO: <a href="../macro/command/setpassword.html">setpassword</a>, <a href="../macro/command/ispassword.html">ispassword</a> マクロコマンド が Unicode に対応していなかったので修正した。</li>
     </ul>
   </li>
 
   <li>その他
     <ul>
+      <li>バージョン番号形式を x.y.z に変更した。</li>
+      <li><a href="#ttssh_3.4.0">TTSSH(3.4.0)</a>へ差し替えた。</li>
       <li><a href="#kanjimenu_0.1.10">TTX KanjiMenu Plugin(0.1.10)</a>へ差し替えた。</li>
       <li>Oniguruma 6.9.10へ差し替えた。</li>
-      <li>インストーラに使用している Inno Setup のバージョンを<a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.4.0" target="_blank">6.4.0</a>へ差し替えた。</li>
-      <li><a href="#ttssh_3.4">TTSSH(3.4)</a>へ差し替えた。</li>
+      <li>インストーラに使用している Inno Setup のバージョンを<a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.4.1" target="_blank">6.4.1</a>へ差し替えた。</li>
+      <li>インストーラによる TELNET プロトコルへの関連付けで、起動するコマンドラインオプションに /E を追加した。
+        <ul>
+          <li>これにより、URL で指定されたポート番号が 23 でなくても Telnet option negotiation が開始される。</li>
+          <li>Tera Term は通常 <a href="../usage/tips/not_port23.html">port 23</a> 以外を TELNET として扱わないため。</li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>
@@ -3620,7 +3646,7 @@
 
 <h2 id="ttssh">TTSSH</h2>
 
-<h3 id="ttssh_3.4">YYYY.MM.DD (Ver 3.4 not released yet)</h3>
+<h3 id="ttssh_3.4.0">YYYY.MM.DD (Ver 3.4.0 not released yet)</h3>
 <ul class="history">
   <!--li>変更
     <ul>
@@ -3631,12 +3657,13 @@
   <li>バグ修正
     <ul>
       <li>SSH_MSG_USERAUTH_BANNER の文字コード変換時にメモリを破壊することがあったので修正</li>
-      <li>パスワード変更ダイアログで、「新パスワード」と「新パスワード確認」が一致しなくてもパスワードが変更されることがあったので修正</li>
+      <li>SSH_MSG_USERAUTH_PASSWD_CHANGEREQ のパスワード変更ダイアログで、「新パスワード」と「新パスワード確認」が一致しなくてもパスワードが変更されることがあったので修正</li>
     </ul>
   </li>
 
   <li>その他
     <ul>
+      <li>バージョン番号形式を x.y.z に変更した。</li>
       <li>LibreSSL 4.0.0 へ差し替えた。</li>
     </ul>
   </li>

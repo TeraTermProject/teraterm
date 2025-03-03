@@ -35,7 +35,7 @@
 #define IDC_WINSCROLL3                  210
 #define IDC_WINTEXT                     211
 #define IDC_WINBACK                     212
-#define IDC_WINREV                      213
+#define IDC_WIN_SWAP_COLORS             213
 #define IDC_WINRED                      214
 #define IDC_WINGREEN                    215
 #define IDC_WINBLUE                     216

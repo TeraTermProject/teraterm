@@ -282,7 +282,8 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
 			// Tera Term 本体のバージョン
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d ", TT_VERSION_MAJOR, TT_VERSION_MINOR);
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d.%d ",
+			            TT_VERSION_MAJOR, TT_VERSION_MINOR, TT_VERSION_PATCH);
 			{
 				char *substr = GetVersionSubstr();
 				strncat_s(buf, sizeof(buf), substr, _TRUNCATE);

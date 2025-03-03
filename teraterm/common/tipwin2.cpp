@@ -36,11 +36,13 @@
 #include <crtdbg.h>
 #include <assert.h>
 
+#include "ttlib.h"
 #include "tipwin2.h"
 
 typedef struct tagTipWinData {
 	HWND hDlg;
 	HWND hTip;
+	int EdittextId = -1; // EDITTEXTのツールチップ消去用
 } TipWin2;
 
 TipWin2 *TipWin2Create(HINSTANCE hInstance, HWND hDlg)
@@ -77,6 +79,9 @@ void TipWin2Destroy(TipWin2 *tWin)
 	if (tWin == NULL) {
 		assert(FALSE);
 		return;
+	}
+	if (tWin->EdittextId != -1) {
+		KillTimer(tWin->hTip, tWin->EdittextId);
 	}
 	DestroyWindow(tWin->hTip);
 	tWin->hTip = NULL;
@@ -128,4 +133,106 @@ void TipWin2Delete(TipWin2 *tWin, int id)
 void TipWin2Activate(TipWin2 *tWin, BOOL active)
 {
 	PostMessageW(tWin->hTip, TTM_ACTIVATE ,active, 0);
+}
+
+/**
+ * @brief	ツールチップの座標をディスプレイからはみ出さないようずらす
+ * @param	tWin
+ * @param	point ツールチップ左上隅の座標 (in, out)
+ */
+void TipWin2MovePointToDisplay(const TipWin2 *tWin, POINT *point)
+{
+	RECT desktop, rect;
+	int win_x, win_y, win_width, win_height;
+
+	GetWindowRect(tWin->hTip, &rect);
+	win_x = point->x;
+	win_y = point->y;
+	win_height = rect.bottom - rect.top;
+	win_width  = rect.right - rect.left;
+
+	GetDesktopRect(tWin->hDlg, &desktop);
+	if (win_y < desktop.top) {
+		win_y = desktop.top;
+	}
+	else if (win_y + win_height > desktop.bottom) {
+		win_y = desktop.bottom - win_height;
+	}
+	if (win_x < desktop.left) {
+		win_x = desktop.left;
+	}
+	else if (win_x + win_width > desktop.right) {
+		win_x = desktop.right - win_width;
+	}
+
+	point->x = win_x;
+	point->y = win_y;
+}
+
+/**
+ * @brief	EDITTEXTの入力制限用のツールチップの消去用タイマー
+ * @param	hTip ツールチップのウィンドウハンドル
+ * @param	id EDITTEXTのコントロールID
+ */
+static void CALLBACK TipWin2HideEdittextErrMsgProc(const HWND hTip, const UINT /*uMsg*/, const UINT_PTR id, const DWORD /*dwTime*/) // uMsg,dwTime is unused
+{
+	KillTimer(hTip, id);
+	TOOLINFOW toolInfo = {};
+	toolInfo.cbSize = sizeof(toolInfo);
+	toolInfo.hwnd = GetParent(hTip);
+	toolInfo.uId = id;
+	SendMessageW(hTip, TTM_TRACKACTIVATE, FALSE, (LPARAM)&toolInfo);
+}
+
+/**
+ * @brief	EDITTEXTに入力制限用のツールチップを表示する(ES_NUMBER相当)
+ * @param	tWin
+ * @param	hEdit EDITTEXTのウィンドウハンドル
+ * @param	id EDITTEXTのコントロールID
+ * @param	icon ツールチップのアイコン
+ * @param	title ツールチップのタイトル
+ * @param	text ツールチップのメッセージ
+ */
+void TipWin2ShowEdittextErrMsgW(TipWin2 *tWin, const HWND hEdit, const int id, const int icon, const wchar_t *title, const wchar_t *text)
+{
+	// ツールチップのアイコン、タイトル、メッセージを設定
+	SendMessage(tWin->hTip, TTM_SETTITLEW, icon, (LPARAM)title);
+	TOOLINFOW toolInfo = {};
+	toolInfo.cbSize = sizeof(toolInfo);
+	toolInfo.hwnd = tWin->hDlg;
+	toolInfo.uFlags = TTF_IDISHWND | TTF_TRACK | TTF_ABSOLUTE;
+	toolInfo.uId = (UINT_PTR)id;
+	toolInfo.lpszText = (LPWSTR)text;
+	SendMessageW(tWin->hTip, TTM_ADDTOOLW, 0, (LPARAM)&toolInfo);
+
+	// ツールチップの位置を計算
+	RECT rect;
+	POINT point;
+	SendMessage(hEdit, EM_GETRECT, 0, (LPARAM)(&rect));
+	point.y = rect.bottom - rect.top;
+	DWORD startPos, endPos;
+	SendMessage(hEdit, EM_GETSEL, (WPARAM)(&startPos), (LPARAM)(&endPos));
+	int nDim = SendMessage(hEdit, EM_POSFROMCHAR, startPos, 0);
+	if (nDim == -1) {
+		point.x = rect.right - rect.left;
+	} else {
+		point.x = LOWORD(nDim);
+	}
+	ClientToScreen(hEdit, &point);
+
+	// ツールチップを有効化
+	SendMessageW(tWin->hTip, TTM_TRACKACTIVATE, TRUE, (LPARAM)&toolInfo);
+
+	// ツールチップがディスプレイからはみ出さない座標を取得
+	TipWin2MovePointToDisplay(tWin, &point);
+
+	// ツールチップを表示
+	SendMessageW(tWin->hTip, TTM_TRACKPOSITION, 0, (LPARAM)MAKELONG(point.x, point.y));
+
+	// ツールチップ消去用のタイマーを設定
+	if (tWin->EdittextId != -1) {
+		KillTimer(tWin->hTip, tWin->EdittextId);
+	}
+	tWin->EdittextId = id;
+	SetTimer(tWin->hTip, id, 1500, TipWin2HideEdittextErrMsgProc);
 }

@@ -1,36 +1,36 @@
 ﻿#define AppName "Tera Term"
 #ifndef AppVer
-#define AppVer "5.4-dev"
+#define AppVer "5.4.0-RC"
 #endif
 ;#define VerSubStr
 ;#define OutputSubStr
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
-Name: build.bat
-;Name: build.bat; Parameters: rebuild
+;Name: build.bat
+Name: build.bat; Parameters: rebuild
 
 [InnoIDE_PostCompile]
-;Name: makearchive.bat; Parameters: release
+Name: makearchive.bat; Parameters: release
 
 [PreCompile]
 Name: makechm.bat
-Name: build.bat
-;Name: build.bat; Parameters: rebuild
+;Name: build.bat
+Name: build.bat; Parameters: rebuild
 
 [PostCompile]
-;Name: makearchive.bat; Parameters: release
+Name: makearchive.bat; Parameters: release
 
 [_ISToolPreCompile]
 Name: makechm.bat
-Name: build.bat
-;Name: build.bat; Parameters: rebuild
+;Name: build.bat
+Name: build.bat; Parameters: rebuild
 
 [_ISToolPostCompile]
-;Name: makearchive.bat; Parameters: release
+Name: makearchive.bat; Parameters: release
 
 [Setup]
-AppCopyright=(C) 2004-2024 TeraTerm Project
+AppCopyright=(C) 2004-2025 TeraTerm Project
 AppPublisher=TeraTerm Project
 AppPublisherURL=https://teratermproject.github.io/
 AppSupportURL=https://teratermproject.github.io/
@@ -186,7 +186,7 @@ Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile\DefaultIcon; ValueType: 
 Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile\shell\open\command; ValueType: string; ValueData: """{app}\ttpmacro.exe"" ""%1"""; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
 ; Associate with telnet://
 Root: HKCU; Subkey: Software\Classes\telnet\shell; ValueType: string; ValueData: Open with Tera Term; Flags: uninsclearvalue; Components: TeraTerm; Tasks: telnetassoc
-Root: HKCU; Subkey: Software\Classes\telnet\shell\Open with Tera Term\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /T=1 /nossh %1"; Flags: uninsdeletekey; Components: TeraTerm; Tasks: telnetassoc
+Root: HKCU; Subkey: Software\Classes\telnet\shell\Open with Tera Term\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /T=1 /nossh /E %1"; Flags: uninsdeletekey; Components: TeraTerm; Tasks: telnetassoc
 ; Associate with ssh://
 Root: HKCU; Subkey: Software\Classes\ssh; ValueType: string; ValueData: URL: SSH Protocol; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
 Root: HKCU; Subkey: Software\Classes\ssh; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
@@ -378,7 +378,7 @@ begin
   if FileExists(FileName) then
     begin
       TmpFileName := FileName + '.' + GetDateTimeString('yyyymmddhhnnss', #0, #0); // Tmp file ends with timestamp
-      if FileCopy(FileName, TmpFileName, True) then
+      if CopyFile(FileName, TmpFileName, True) then
         if DeleteFile(FileName) then
           if RenameFile(TmpFileName, FileName) then
             Result := 0

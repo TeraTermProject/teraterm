@@ -8,6 +8,7 @@ binmode STDOUT, ':encoding(utf8)';
 
 my $tt_version_major = 0;
 my $tt_version_minor = 0;
+my $tt_version_patch = 0;
 my $tt_version_substr = "";
 my $tt_version_h = "../../teraterm/common/tt-version.h";
 my $version;
@@ -239,6 +240,7 @@ sub read_tt_version_h()
 		printf("no header\n");
 		$tt_version_major = 0;
 		$tt_version_minor = 0;
+		$tt_version_patch = 0;
 		$tt_version_substr = "no_header";
 		return;
 	}
@@ -250,6 +252,9 @@ sub read_tt_version_h()
 		}
 		elsif (/^\s*#define\s+TT_VERSION_MINOR\s+(\d+)/) {
 			$tt_version_minor = $1;
+		}
+		elsif (/^\s*#define\s+TT_VERSION_PATCH\s+(\d+)/) {
+			$tt_version_patch = $1;
 		}
 		elsif (/^\s*#define\s+TT_VERSION_SUBSTR\s+\"(.+)\"/) {
 			$tt_version_substr = $1;
@@ -280,15 +285,16 @@ $svn =~ s/"//g;
 $svn =~ s/\\/\//g;
 
 if ($tt_version_substr eq "") {
-	$version = "$tt_version_major.$tt_version_minor";
+	$version = "$tt_version_major.$tt_version_minor.$tt_version_patch";
 } else {
-	$version = "$tt_version_major.$tt_version_minor-$tt_version_substr";
+	$version = "$tt_version_major.$tt_version_minor.$tt_version_patch-$tt_version_substr";
 }
 
 if ($verbose != 0) {
 	print "root=$source_root\n";
 	print "tt_version_major=$tt_version_major\n";
 	print "tt_version_minor=$tt_version_minor\n";
+	print "tt_version_patch=$tt_version_patch\n";
 	print "tt_version_substr=$tt_version_substr\n";
 	print "svn=\"$svn\"\n";
 	print "git=\"$git\"\n";

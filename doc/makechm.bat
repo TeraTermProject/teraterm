@@ -33,5 +33,3 @@ if "%updated%"=="updated" (
 )
 
 endlocal
-
-if not "%NOPAUSE%" == "1" pause
