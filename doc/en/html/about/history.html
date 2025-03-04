@@ -110,26 +110,6 @@
           <li>The four corners and center of the display, as well as the four corners and center of the VT window, can now be specified as the reference for the dialog's display position.</li>
           <li>The specification of a parameter to adjust the display position of the dialog is possible.</li>
         </ul>
-      <li>All available character codes can be specified using command line options.</li>
-      <li>Supports "COM%d" style serial ports of com0com (virtual serial port driver), which are not Ports class.</li>
-      <li>Changed initial directory for file select dialog of send file to <a href="../setup/folder.html#FileDir">File transfer folder</a>.</li>
-      <li>SendFile options are saved in TERATERM.INI.</li>
-      <li>Added <a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">skip Send file dialog</a> setting.</li>
-      <li>Macro commands for sending and receiving files are also from File transfer folder.</li>
-      <li>ZMODEM send: CANFDX flag handling is implemented when receiving ZRINIT. While the receiver cannot receive data, the sender(Tera Term) can wait for the receiver.
-      <li>XMODEM send: flush receive buffer when start sending</li>
-      <li>Additional settings - <a href="../menu/setup-additional-serialport.html">Serial Port tab</a></li>
-      <ul>
-        <li>Setup - Serial dialog was integrated into Serial Port tab of Additional settings.</li>
-        <li>Only settings in this tab.(New connections are made from <a href="../menu/file-new.html">New connection dialog</a>.)</li>
-        <li>Select TCP/IP or Serial as <a href="../menu/setup-additional-general.html#Port">new connection default</a> for New connection dialog on General tab. Select default Serial port on Serial tab.</li>
-      </ul>
-      <li>Resolved problem that Windows 11 24H2 returns incorrectly monitor information when moving across displays with different DPI, so that window are displayed at correct DPI.</li>
-      <li>Improved serial reconnection.
-        <ul>
-          <li>Checking for notifications from devices is more detailed.</li>
-          <li>Added parameters for reconnecting to TERATERM.INI.</li>
-        </ul>
       </li>
     </ul>
   </li>

@@ -110,26 +110,6 @@
           <li>座標の基準として、ディスプレイの四隅と中央、VT ウインドウの四隅と中央を指定できるようにした。</li>
           <li>表示位置を補正するパラメータを指定できるようにした。</li>
         </ul>
-      <li>コマンドラインオプションで使用可能文字コードを全て指定できるようにした。</li>
-      <li>com0com(virtual serial port driver) の Ports class ではない "COM%d" 形式のシリアルポートを選択できるようにした。</li>
-      <li>送信ファイルを選択するダイアログの初期ディレクトリが<a href="../setup/folder.html#FileDir">ファイル転送用のフォルダ</a>になるようにした。</li>
-      <li>ファイル送信オプションをTERATERM.INIに保存するようにした。</li>
-      <li><a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">ファイル送信ダイアログをスキップする</a>設定を追加した。</li>
-      <li>ファイル送受信マクロコマンドもファイル転送用フォルダを起点とするようにした。</li>
-      <li>ZMODEM send: 受信 ZRINIT 内の CANFDX フラグの処理を実装した。受信側がデータを受信できない間、送信側(Tera Term)は受信側を待てるようになった。</li>
-      <li>XMODEM send: 送信開始時に受信バッファをクリアするようにした</li>
-      <li>Additional settings - <a href="../menu/setup-additional-serialport.html">Serial Port タブ</a></li>
-      <ul>
-        <li>Setup-Serial 設定を Additional settings の Serial Port タブへ統合した。</li>
-        <li>設定のみ行うようになった。(新しい接続は<a href="../menu/file-new.html">New connection ダイアログ</a>から行う。)</li>
-        <li>Additional settings - General タブの<a href="../menu/setup-additional-general.html#Port">新しい接続のデフォルト</a>は TCP/IP 又は Serial を選択、デフォルトのSerial portはこのタブで選択するようにした。</li>
-      </ul>
-      <li>DPIが異なるディスプレイをまたいで移動した時、Windows 11(24H2)が誤ったモニタ情報を返す問題を解決して、ウィンドウが正しいDPIで表示するようにした。</li>
-      <li>シリアル再接続を改善した。
-        <ul>
-          <li>デバイスからの通知のチェックを詳細に行うようにした。</li>
-          <li>再接続時のパラメータをTERATERM.INIに追加した。</li>
-        </ul>
       </li>
     </ul>
   </li>
