@@ -10,8 +10,8 @@
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION TT_VERSION_MAJOR,TT_VERSION_MINOR,0,0
- PRODUCTVERSION TT_VERSION_MAJOR,TT_VERSION_MINOR,0,0
+ FILEVERSION TT_VERSION_MAJOR,TT_VERSION_MINOR,TT_VERSION_PATCH,0
+ PRODUCTVERSION TT_VERSION_MAJOR,TT_VERSION_MINOR,TT_VERSION_PATCH,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -30,7 +30,7 @@ BEGIN
             VALUE "FileDescription", "Tera Term Common Routines"
             VALUE "FileVersion", TT_RES_VERSION_STR
             VALUE "InternalName", "TTPCMN"
-            VALUE "LegalCopyright", "Copyright (C) 1994-1998 T. Teranishi, (C) 2004-2024 TeraTerm Project"
+            VALUE "LegalCopyright", "Copyright (C) 1994-1998 T. Teranishi, (C) 2004-2025 TeraTerm Project"
             VALUE "OriginalFilename", "ttpcmn.dll"
             VALUE "ProductName", "Tera Term"
             VALUE "ProductVersion", TT_RES_PRODUCT_VERSION_STR

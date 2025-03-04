@@ -103,7 +103,7 @@ BEGIN
             VALUE "FileDescription", "プロキシプラグイン"
             VALUE "FileVersion", "1, 0, 0, 26"
             VALUE "InternalName", "TTProxy"
-            VALUE "LegalCopyright", "Copyright (C) 2003-2006 蛭子屋本舗, (C) 2004-2024 TeraTerm Project"
+            VALUE "LegalCopyright", "Copyright (C) 2003-2006 蛭子屋本舗, (C) 2004-2025 TeraTerm Project"
             VALUE "OriginalFilename", "TTXProxy.dll"
             VALUE "ProductName", "蛭子屋本舗プロキシプラグイン集"
             VALUE "ProductVersion", "1, 0, 0, 26"

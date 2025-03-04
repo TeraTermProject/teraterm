@@ -323,28 +323,15 @@ void CenterWindow(HWND hWnd, HWND hWndParent)
  */
 int GetMonitorDpiFromWindow(HWND hWnd)
 {
-	if (pGetDpiForMonitor == NULL) {
-		// ダイアログ内では自動スケーリングが効いているので
-		// 常に96を返すようだ
+	if (pGetDpiForWindow == NULL || hWnd == NULL) {
 		int dpiY;
 		HDC hDC = GetDC(hWnd);
 		dpiY = GetDeviceCaps(hDC,LOGPIXELSY);
 		ReleaseDC(hWnd, hDC);
 		return dpiY;
-	} else {
-		UINT dpiX;
-		UINT dpiY;
-		HMONITOR hMonitor;
-		if (hWnd == NULL) {
-			// https://devblogs.microsoft.com/oldnewthing/20070809-00/?p=25643
-			const POINT ptZero = { 0, 0 };
-			hMonitor = pMonitorFromPoint(ptZero, MONITOR_DEFAULTTOPRIMARY);
-		}
-		else {
-			hMonitor = pMonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
-		}
-		pGetDpiForMonitor(hMonitor, 0 /*0=MDT_EFFECTIVE_DPI*/, &dpiX, &dpiY);
-		return (int)dpiY;
+	}
+	else {
+		return (int)pGetDpiForWindow(hWnd);
 	}
 }
 

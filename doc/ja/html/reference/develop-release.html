@@ -12,8 +12,8 @@
 <h1>リリースの手順</h1>
 
 <ol>
-  <li><a href="#start-rc">リリース作業の開始からRC作成まで</a></li>
-  <li><a href="#rc-release">RC作成からリリースまで</a></li>
+  <li><a href="#start-rc">リリース作業の開始</a></li>
+  <li><a href="#rc-release">RC作成とその後</a></li>
   <li><a href="#release-operation">リリース作業</a></li>
   <li><a href="#code-freeze">コードフリーズについて</a></li>
 </ol>
@@ -24,7 +24,7 @@
 TeraTerm Project でのリリース手順について以下に示します。
 </p>
 
-<h2 id="start-rc">リリース作業の開始からRC作成まで</h2>
+<h2 id="start-rc">リリース作業の開始</h2>
 
 <ol>
   <li>チケット、ブランチなどを確認する
@@ -36,10 +36,10 @@ TeraTerm Project でのリリース手順について以下に示します。
       </li>
       <li>ブランチをマージする
         <ul>
-          <li>trunk と 4-stable 間、作業中のブランチなど</li>
+          <li>作業中のブランチ・安定版ブランチへの cherry-pick</li>
         </ul>
       </li>
-      <li>チケットをクローズする
+      <li>issue をクローズする
         <ul>
           <li>すでに修正済み、処理済みのものはクローズする<br />
               リリース時には、対象のマイルストーンのチケットはすべてクローズされている状態になる</li>
@@ -70,7 +70,7 @@ TeraTerm Project でのリリース手順について以下に示します。
   <li>今回のリリースに入れたいものが落ち着く</li>
 </ol>
 
-<h2 id="rc-release">RC作成からリリースまで</h2>
+<h2 id="rc-release">RC作成とその後</h2>
 
 <ol>
   <li>ドキュメントを確認する
@@ -88,14 +88,15 @@ TeraTerm Project でのリリース手順について以下に示します。
         TT_VERSION_SUBSTR を "RC" にする
 <pre>
   #define TT_VERSION_MAJOR             5
-  #define TT_VERSION_MINOR             0
+  #define TT_VERSION_MINOR             4
+  #define TT_VERSION_PATCH             0
 - #define TT_VERSION_SUBSTR            "dev"
 + #define TT_VERSION_SUBSTR            "RC"
 </pre>
-        TT_VERSION_MINOR は、前回のリリース直後にインクリメントされている。
+        TT_VERSION_MINOR または TT_VERSION_PATCH は、前回のリリース直後にインクリメントされている。
       </li>
       <li>ttssh2\ttxssh\ttxssh-version.h<br>
-        TTSSH_VERSION_MINOR は、前回のリリース直後にインクリメントされている。
+        TTSSH_VERSION_MINOR または TTSSH_VERSION_PATCH は、前回のリリース直後にインクリメントされている。
       </li>
       <li>ttpmenu\ttpmenu.rc // 変更時のみ</li>
       <li>TTProxy\TTProxy.rc // 変更時のみ</li>
@@ -104,8 +105,8 @@ TeraTerm Project でのリリース手順について以下に示します。
         installer\teraterm.iss<br>
         RC に変更し、アーカイブの作成も有効にします。
 <pre>
-- #define AppVer "5.0-dev"
-+ #define AppVer "5.0-RC"
+- #define AppVer "5.4.0-dev"
++ #define AppVer "5.4.0-RC"
 
   [PreCompile]
   Name: makechm.bat
@@ -172,7 +173,8 @@ TeraTerm Project でのリリース手順について以下に示します。
         teraterm\common\tt-version.h
 <pre>
   #define TT_VERSION_MAJOR             5
-  #define TT_VERSION_MINOR             0
+  #define TT_VERSION_MINOR             4
+  #define TT_VERSION_PATCH             0
 - #define TT_VERSION_SUBSTR            "RC"
 + #undef TT_VERSION_SUBSTR
 </pre>
@@ -180,8 +182,8 @@ TeraTerm Project でのリリース手順について以下に示します。
       <li>
         installer\teraterm.iss<br>
 <pre>
-- #define AppVer "5.0-RC"
-+ #define AppVer "5.0"
+- #define AppVer "5.4.0-RC"
++ #define AppVer "5.4.0"
 </pre>
      </li>
     </ul>
@@ -200,11 +202,11 @@ TeraTerm Project でのリリース手順について以下に示します。
   <li>タグを作成する
     <p>
       タグは annotated tags とする。<br/>
-      タグ名は「v(バージョン)」。（例: 5.0ならば "v5.0" ）
+      タグ名は「v(バージョン)」。（例: 5.4.0ならば "v5.4.0" ）
     </p>
 <pre>
-git tag -a v5.0 -m "Release 5.0"
-git push origin v5.0
+git tag -a v5.4.0 -m "Release 5.4.0"
+git push origin v5.4.0
 </pre>
   </li>
   <li>インストーラを作成する
@@ -233,34 +235,118 @@ git push origin v5.0
       <li>Twitter (<a href="https://twitter.com/Tera_Term" target="_blank">https://twitter.com/Tera_Term</a>)</li>
     </ul>
   </li>
+  <li id="increment_version">定期リリースの場合は、安定版ブランチを作成する
+<pre>
+git checkout -b stable_5_4
+</pre>
+  </li>
   <li id="increment_version">次のリリースに向けてバージョンをインクリメントする
+    <p>定期リリースの場合</p>
     <ul>
       <li>
         teraterm/common/tt-version.h<br>
-        TT_VERSION_MINOR を1つ進めて、SUBSTR を "dev" にする。
+        main ブランチで、TT_VERSION_MINOR を1つ進めて、SUBSTR を "dev" にする。
 <pre>
   #define TT_VERSION_MAJOR             5
-- #define TT_VERSION_MINOR             0
+- #define TT_VERSION_MINOR             4
++ #define TT_VERSION_MINOR             5
+  #define TT_VERSION_PATCH             0
 - #undef TT_VERSION_SUBSTR
-+ #define TT_VERSION_MINOR             1
++ #define TT_VERSION_SUBSTR            "dev"
+</pre>
+        安定版ブランチで、TT_VERSION_PATCH を1つ進めて、SUBSTR を "dev" にする。
+<pre>
+  #define TT_VERSION_MAJOR             5
+  #define TT_VERSION_MINOR             4
+- #define TT_VERSION_PATCH             0
+- #undef TT_VERSION_SUBSTR
++ #define TT_VERSION_PATCH             1
 + #define TT_VERSION_SUBSTR            "dev"
 </pre>
       </li>
       <li>
         ttssh2/ttssh/ttxssh-version.h<br>
-        TTSSH_VERSION_MINOR を1つ進める。
+        main ブランチで、TTSSH_VERSION_MINOR を1つ進める。
 <pre>
   #define TTSSH_VERSION_MAJOR             3
-- #define TTSSH_VERSION_MINOR             0
-+ #define TTSSH_VERSION_MINOR             1
+- #define TTSSH_VERSION_MINOR             4
++ #define TTSSH_VERSION_MINOR             5
+  #define TTSSH_VERSION_PATCH             0
+</pre>
+        安定版ブランチで、TTSSH_VERSION_PATCH を1つ進める。
+<pre>
+  #define TTSSH_VERSION_MAJOR             3
+  #define TTSSH_VERSION_MINOR             4
+- #define TTSSH_VERSION_PATCH             0
++ #define TTSSH_VERSION_PATCH             1
 </pre>
       </li>
       <li>
         installer\teraterm.iss<br>
-        AppVer を「次のバージョン-dev」とする
+        main ブランチで、AppVer を「次のバージョン-dev」とする
 <pre>
-- #define AppVer "5.0"
-+ #define AppVer "5.1-dev"
+- #define AppVer "5.4.0"
++ #define AppVer "5.5.0-dev"
+
+  [PreCompile]
+  Name: makechm.bat
+- ;Name: build.bat
+- Name: build.bat; Parameters: rebuild
++ Name: build.bat
++ ;Name: build.bat; Parameters: rebuild
+
+  [PostCompile]
+- Name: makearchive.bat; Parameters: release
++ ;Name: makearchive.bat; Parameters: release
+</pre>
+        安定版ブランチでも、AppVer を「次のバージョン-dev」とする
+<pre>
+- #define AppVer "5.4.0"
++ #define AppVer "5.4.1-dev"
+
+  [PreCompile]
+  Name: makechm.bat
+- ;Name: build.bat
+- Name: build.bat; Parameters: rebuild
++ Name: build.bat
++ ;Name: build.bat; Parameters: rebuild
+
+  [PostCompile]
+- Name: makearchive.bat; Parameters: release
++ ;Name: makearchive.bat; Parameters: release
+</pre>
+      </li>
+    </ul>
+    <p>安定版リリースの場合</p>
+    <ul>
+      <li>
+        teraterm/common/tt-version.h<br>
+        安定版ブランチで、TT_VERSION_PATCH を1つ進めて、SUBSTR を "dev" にする。
+<pre>
+  #define TT_VERSION_MAJOR             5
+  #define TT_VERSION_MINOR             4
+- #define TT_VERSION_PATCH             1
+- #undef TT_VERSION_SUBSTR
++ #define TT_VERSION_PATCH             2
++ #define TT_VERSION_SUBSTR            "dev"
+</pre>
+      </li>
+      <li>
+        ttssh2/ttssh/ttxssh-version.h<br>
+        安定版ブランチで、TTSSH_VERSION_MINOR を1つ進める。
+<pre>
+  #define TTSSH_VERSION_MAJOR             3
+  #define TTSSH_VERSION_MINOR             4
+- #define TTSSH_VERSION_PATCH             1
++ #define TTSSH_VERSION_PATCH             2
+</pre>
+      </li>
+      <li>
+        installer\teraterm.iss<br>
+        安定版ブランチで、AppVer を「次のバージョン-dev」とする
+<pre>
+- #define AppVer "5.4.1"
++ #define AppVer "5.4.2-dev"
 
   [PreCompile]
   Name: makechm.bat
