@@ -976,3 +976,23 @@ BOOL WINAPI _CreateDirectoryW(LPCWSTR lpPathName,LPSECURITY_ATTRIBUTES lpSecurit
 	free(lpPathNameA);
 	return r;
 }
+
+BOOL WINAPI _GetMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax)
+{
+	return GetMessageA(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax);
+}
+
+int WINAPI _TranslateAcceleratorW(HWND hWnd, HACCEL hAccTable, LPMSG lpMsg)
+{
+	return TranslateAcceleratorA(hWnd, hAccTable, lpMsg);
+}
+
+LRESULT WINAPI _DispatchMessageW(MSG *lpMsg)
+{
+	return DispatchMessageA(lpMsg);
+}
+
+BOOL WINAPI _IsDialogMessageW(HWND hDlg, LPMSG lpMsg)
+{
+	return IsDialogMessageA(hDlg, lpMsg);
+}
