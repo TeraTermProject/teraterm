@@ -467,7 +467,12 @@ LRESULT TTCDialog::WndProcBase(UINT msg, WPARAM wp, LPARAM lp)
 
 	// DlgProcをオーバライドするのではなく、
 	// DefWindowProcをオーバーライドすること
-	return DefWindowProc(msg, wp, lp);
+	LRESULT r = DefWindowProc(msg, wp, lp);
+
+	if (msg == WM_NCDESTROY) {
+		m_hWnd = nullptr;
+	}
+	return r;
 }
 
 /**
@@ -585,7 +590,6 @@ void TTCDialog::DestroyWindow()
 			::SetFocus(m_hParentWnd);
 		}
 		hWnd = m_hWnd;
-		m_hWnd = nullptr;
 		::DestroyWindow(hWnd);
 	}
 }
