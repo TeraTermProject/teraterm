@@ -492,7 +492,7 @@ void CLogPropPageDlg::OnOK()
 		ts.Append = 1;
 	}
 	else {
-		ts.Append = 0;
+		ts.Append = 0
 	}
 
 	if (GetCheck(IDC_OPT_PLAINTEXT)) {
