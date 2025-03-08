@@ -44,12 +44,12 @@ jobs:
 
     - uses: msys2/setup-msys2@v2
 
-    - name: before_build (install_cygwin)
+    - name: install_cygwin
       run: |
         chcp 932
         buildtools/install_cygwin.bat
 
-    - name: before_build (install_innosetup)
+    - name: install_innosetup
       run: |
         chcp 932
         buildtools/install_innosetup.bat
