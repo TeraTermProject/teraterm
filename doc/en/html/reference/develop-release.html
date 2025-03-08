@@ -63,13 +63,10 @@ To release Tera Term installation package is shown in the following step:
       <li>cJSON (<a href="https://github.com/DaveGamble/cJSON/" target="_blank">https://github.com/DaveGamble/cJSON/</a>)</li>
       <li>Unicode (<a href="https://www.unicode.org/versions/latest/" target="_blank">https://www.unicode.org/versions/latest/</a>)</li>
     </ul>
-<!--
-    <p>リリースに使うバージョンはこの時点でおおむね決定する。</p>
--->
+    <p>Library versions are mostly determined at this timing.</p>
+    <p>We use CI tool for release build. For this reason, the detailed version of Visual Studio is uncontrollable. The detailed version will depend on what version is adopted by the CI tool.</p>
   </li>
-<!--
-  <li>今回のリリースに入れたいものが落ち着く</li>
--->
+  <li>What change is included in this release of not included is mostly determined.</li>
 </ol>
 
 <h2 id="rc-release">From create RC until release</h2>
@@ -77,12 +74,10 @@ To release Tera Term installation package is shown in the following step:
 <ol>
   <li>Confirm documents.
     <ul>
-<!--
-      <li>ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。</li>
-      <li>変更履歴を確認し、書き忘れがあれば追記する。</li>
-      <li>変更履歴の順番を変更する。だいたいの指針としては、ターミナルエミュレーション関係・アプリケーションとしての変更・マクロの順。</li>
-      <li>ドキュメント差分が翻訳されていることを確認し、翻訳忘れがあれば翻訳する。</li>
--->
+      <li>Check for missing parts of documents. Configuration item on dialog, special options without UI, command line parameters, new macro command and so on.</li>
+      <li>Check for changelog. Add it if found missing.</li>
+      <li>Change order of changelog. Important changes will be located at upper position. Order is terminal emulation, application and macro.</li>
+      <li>Check for translations of changed documents. Translate them if they are not translated.</li>
     </ul>
   </li>
   <li>Increment the version while RC release process.
@@ -127,7 +122,7 @@ To release Tera Term installation package is shown in the following step:
     </ul>
     <p>
       By way of exception, CygTerm+ always upgrades not regarding Tera Term release process when the patch is committed.<br />
-      The release date is the day committed by a developer. <!--そのため、修正・バージョンのインクリメント・変更履歴を同時にコミットする。--><br />
+      The release date is the day committed by a developer. Therefore, the code modify, version increment and add changelog should be committed at the same time.<br />
       Because user can get gcc compiler for free.
     </p>
   </li>
