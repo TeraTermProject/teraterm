@@ -34,7 +34,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: libs
-        key: ${{ matrix.VS_VERSION }}-${{ hashFiles('.github/workflows/msbuild.yml') }}
+        key: ${{ matrix.VS_VERSION }}-${{ github.event_name }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.bat', 'ci_scripts/*.bat') }}
 
     - name: download setup-x86_64.exe
       run: |
@@ -73,10 +73,11 @@ jobs:
           installer/Output/*.zip
 
     - name: Save libs
+      if: steps.cache-libs-restore.outputs.cache-hit != 'true'
       id: cache-libs-save
       uses: actions/cache/save@v4
       with:
         path: |
           libs
-        key: ${{ matrix.VS_VERSION }}-${{ hashFiles('.github/workflows/msbuild.yml') }}
+        key: ${{ matrix.VS_VERSION }}-${{ github.event_name }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.bat', 'ci_scripts/*.bat') }}
 
