@@ -65,7 +65,8 @@ TeraTerm Project でのリリース手順について以下に示します。
       <li>cJSON (<a href="https://github.com/DaveGamble/cJSON/" target="_blank">https://github.com/DaveGamble/cJSON/</a>)</li>
       <li>Unicode (<a href="https://www.unicode.org/versions/latest/" target="_blank">https://www.unicode.org/versions/latest/</a>)</li>
     </ul>
-    <p>リリースに使うバージョンはこの時点でおおむね決定する。</p>
+    <p>リリースに使うライブラリのバージョンはこの時点でおおむね決定する。</p>
+    <p>リリースビルドには CI ツールを使っているため、Visual Studio の詳細バージョンはコントロールできない。どのバージョンになるかは CI ツールがどのバージョンを採用するかに左右される。</p>
   </li>
   <li>今回のリリースに入れたいものが落ち着く</li>
 </ol>
@@ -77,8 +78,8 @@ TeraTerm Project でのリリース手順について以下に示します。
     <ul>
       <li>ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。</li>
       <li>変更履歴を確認し、書き忘れがあれば追記する。</li>
-      <li>変更履歴の順番を変更する。だいたいの指針としては、ターミナルエミュレーション関係・アプリケーションとしての変更・マクロの順。</li>
-      <li>ドキュメント差分が翻訳されていることを確認し、翻訳忘れがあれば翻訳する。</li>
+      <li>変更履歴の順番を変更する。重要なものが先に来るようにする。だいたいの指針としては、ターミナルエミュレーション関係・アプリケーションとしての変更・マクロの順。</li>
+      <li>ドキュメント変更点が翻訳されていることを確認し、翻訳忘れがあれば翻訳する。</li>
     </ul>
   </li>
   <li>バージョンをインクリメントする
@@ -149,13 +150,16 @@ TeraTerm Project でのリリース手順について以下に示します。
       <li>doc\ja\html\macro\index.html</li>
     </ul>
   </li>
-  <li id="RC_commit">この状態でコミットする</li>
-  <li>インストーラを作成する</li>
+  <li>インストーラを作成する（確認用）</li>
   <li>サポートされている全 OS でインストーラの実行、起動、接続をチェックする</li>
-  <li>push して AppVeyor でビルドする</li>
+  <li id="RC_commit">コミット・push する</li>
+  <li>AppVeyor でビルドする
+    <p>AppVeyor の "github-main" プロジェクトを使用する。</p>
+  </li>
+  <!-- ローカルでリリースビルドする場合は、この時点で再度インストーラを作成する。コミットハッシュが変わっているため。 -->
   <li>RCの作成をアナウンスする
     <ul>
-      <li>Twitter (<a href="https://twitter.com/Tera_Term" target="_blank">https://twitter.com/Tera_Term</a>)</li>
+      <li>X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)</li>
     </ul>
   </li>
   <li>フィードバックを受け入れる
@@ -193,13 +197,13 @@ TeraTerm Project でのリリース手順について以下に示します。
       <li>html/about/history.html</li>
     </ul>
   </li>
-  <li>インストーラを作成する
+  <li>インストーラを作成する（確認用）
     <p>
       ビルド・インストーラの生成がエラーなくできることを確認する。
     </p>
   </li>
-  <li>この状態でコミットする</li>
-  <li>タグを作成する
+  <li>コミットする</li>
+  <li>タグを作成し、push する
     <p>
       タグは annotated tags とする。<br/>
       タグ名は「v(バージョン)」。（例: 5.4.0ならば "v5.4.0" ）
@@ -212,6 +216,7 @@ git push origin v5.4.0
   <li>インストーラを作成する
     <p>AppVeyor の "github-release" プロジェクトを使用する。</p>
   </li>
+  <!-- ローカルでリリースビルドする場合は、この時点で再度インストーラを作成する。コミットハッシュが変わっているため。 -->
   <li>GitHub の Releases に追加する
     <ul>
       <li>上で追加したタグを選択する</li>
@@ -232,10 +237,10 @@ git push origin v5.4.0
   </li>
   <li>リリースをアナウンスする
     <ul>
-      <li>Twitter (<a href="https://twitter.com/Tera_Term" target="_blank">https://twitter.com/Tera_Term</a>)</li>
+      <li>X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)</li>
     </ul>
   </li>
-  <li id="increment_version">定期リリースの場合は、安定版ブランチを作成する
+  <li>定期リリースの場合は、安定版ブランチを作成する
 <pre>
 git checkout -b stable_5_4
 </pre>
@@ -244,8 +249,11 @@ git checkout -b stable_5_4
     <p>定期リリースの場合</p>
     <ul>
       <li>
-        teraterm/common/tt-version.h<br>
-        main ブランチで、TT_VERSION_MINOR を1つ進めて、SUBSTR を "dev" にする。
+        main ブランチで作業する。
+        <ul>
+          <li>
+            teraterm/common/tt-version.h<br>
+            TT_VERSION_MINOR を1つ進めて、SUBSTR を "dev" にする。
 <pre>
   #define TT_VERSION_MAJOR             5
 - #define TT_VERSION_MINOR             4
@@ -254,36 +262,20 @@ git checkout -b stable_5_4
 - #undef TT_VERSION_SUBSTR
 + #define TT_VERSION_SUBSTR            "dev"
 </pre>
-        安定版ブランチで、TT_VERSION_PATCH を1つ進めて、SUBSTR を "dev" にする。
-<pre>
-  #define TT_VERSION_MAJOR             5
-  #define TT_VERSION_MINOR             4
-- #define TT_VERSION_PATCH             0
-- #undef TT_VERSION_SUBSTR
-+ #define TT_VERSION_PATCH             1
-+ #define TT_VERSION_SUBSTR            "dev"
-</pre>
-      </li>
-      <li>
-        ttssh2/ttssh/ttxssh-version.h<br>
-        main ブランチで、TTSSH_VERSION_MINOR を1つ進める。
+          </li>
+          <li>
+            ttssh2/ttssh/ttxssh-version.h<br>
+            TTSSH_VERSION_MINOR を1つ進める。
 <pre>
   #define TTSSH_VERSION_MAJOR             3
 - #define TTSSH_VERSION_MINOR             4
 + #define TTSSH_VERSION_MINOR             5
   #define TTSSH_VERSION_PATCH             0
 </pre>
-        安定版ブランチで、TTSSH_VERSION_PATCH を1つ進める。
-<pre>
-  #define TTSSH_VERSION_MAJOR             3
-  #define TTSSH_VERSION_MINOR             4
-- #define TTSSH_VERSION_PATCH             0
-+ #define TTSSH_VERSION_PATCH             1
-</pre>
-      </li>
-      <li>
-        installer\teraterm.iss<br>
-        main ブランチで、AppVer を「次のバージョン-dev」とする
+          </li>
+          <li>
+            installer\teraterm.iss<br>
+            AppVer を「次のバージョン-dev」とする
 <pre>
 - #define AppVer "5.4.0"
 + #define AppVer "5.5.0-dev"
@@ -299,7 +291,45 @@ git checkout -b stable_5_4
 - Name: makearchive.bat; Parameters: release
 + ;Name: makearchive.bat; Parameters: release
 </pre>
-        安定版ブランチでも、AppVer を「次のバージョン-dev」とする
+          </li>
+          <li>
+            doc\en/ja\html\about\history.html<br>
+            次バージョンの変更履歴のひな形を追加する。
+<pre>
+&lt;h3 id="teraterm_5.5.0"&gt;YYYY.MM.DD (Ver 5.5.0 not released yet)&lt;/h3&gt;
+</pre>
+          </li>
+          <li>コミット、push する。</li>
+        </ul>
+      </li>
+      <li>
+        安定版ブランチで作業する。
+        <ul>
+          <li>
+            teraterm/common/tt-version.h<br>
+            TT_VERSION_PATCH を1つ進めて、SUBSTR を "dev" にする。
+<pre>
+  #define TT_VERSION_MAJOR             5
+  #define TT_VERSION_MINOR             4
+- #define TT_VERSION_PATCH             0
+- #undef TT_VERSION_SUBSTR
++ #define TT_VERSION_PATCH             1
++ #define TT_VERSION_SUBSTR            "dev"
+</pre>
+          </li>
+          <li>
+            ttssh2/ttssh/ttxssh-version.h<br>
+            TTSSH_VERSION_PATCH を1つ進める。
+<pre>
+  #define TTSSH_VERSION_MAJOR             3
+  #define TTSSH_VERSION_MINOR             4
+- #define TTSSH_VERSION_PATCH             0
++ #define TTSSH_VERSION_PATCH             1
+</pre>
+          </li>
+          <li>
+            installer\teraterm.iss<br>
+            AppVer を「次のバージョン-dev」とする
 <pre>
 - #define AppVer "5.4.0"
 + #define AppVer "5.4.1-dev"
@@ -315,13 +345,26 @@ git checkout -b stable_5_4
 - Name: makearchive.bat; Parameters: release
 + ;Name: makearchive.bat; Parameters: release
 </pre>
+          </li>
+          <li>
+            doc\en/ja\html\about\history.html<br>
+            次バージョンの変更履歴のひな形を追加する。
+<pre>
+&lt;h3 id="teraterm_5.4.1"&gt;YYYY.MM.DD (Ver 5.4.1 not released yet)&lt;/h3&gt;
+</pre>
+          </li>
+          <li>コミット、push する。</li>
+        </ul>
       </li>
     </ul>
     <p>安定版リリースの場合</p>
     <ul>
       <li>
-        teraterm/common/tt-version.h<br>
-        安定版ブランチで、TT_VERSION_PATCH を1つ進めて、SUBSTR を "dev" にする。
+        安定版ブランチで作業する。
+        <ul>
+          <li>
+            teraterm/common/tt-version.h<br>
+            TT_VERSION_PATCH を1つ進めて、SUBSTR を "dev" にする。
 <pre>
   #define TT_VERSION_MAJOR             5
   #define TT_VERSION_MINOR             4
@@ -330,20 +373,20 @@ git checkout -b stable_5_4
 + #define TT_VERSION_PATCH             2
 + #define TT_VERSION_SUBSTR            "dev"
 </pre>
-      </li>
-      <li>
-        ttssh2/ttssh/ttxssh-version.h<br>
-        安定版ブランチで、TTSSH_VERSION_MINOR を1つ進める。
+          </li>
+          <li>
+            ttssh2/ttssh/ttxssh-version.h<br>
+            安定版ブランチで、TTSSH_VERSION_MINOR を1つ進める。
 <pre>
   #define TTSSH_VERSION_MAJOR             3
   #define TTSSH_VERSION_MINOR             4
 - #define TTSSH_VERSION_PATCH             1
 + #define TTSSH_VERSION_PATCH             2
 </pre>
-      </li>
-      <li>
-        installer\teraterm.iss<br>
-        安定版ブランチで、AppVer を「次のバージョン-dev」とする
+          </li>
+          <li>
+            installer\teraterm.iss<br>
+            安定版ブランチで、AppVer を「次のバージョン-dev」とする
 <pre>
 - #define AppVer "5.4.1"
 + #define AppVer "5.4.2-dev"
@@ -359,6 +402,16 @@ git checkout -b stable_5_4
 - Name: makearchive.bat; Parameters: release
 + ;Name: makearchive.bat; Parameters: release
 </pre>
+          </li>
+          <li>
+            doc\en/ja\html\about\history.html<br>
+            次バージョンの変更履歴のひな形を追加する。
+<pre>
+&lt;h3 id="teraterm_5.4.2"&gt;YYYY.MM.DD (Ver 5.4.2 not released yet)&lt;/h3&gt;
+</pre>
+          </li>
+          <li>コミット、push する。</li>
+        </ul>
       </li>
     </ul>
   </li>
@@ -395,7 +448,7 @@ git checkout -b stable_5_4
 
 <p>
 コードフリース中は、原則的には致命的なバグの修正のみ可能となります。<br />
-コードフリーズは、RC作成（<a href="#RC_commit">開発ブランチ で teraterm.iss に RC を付けるコミット</a>）から（<a href="#increment_version">バージョンをインクリメントするコミット</a>）までとします。
+コードフリーズは、RC作成（<a href="#RC_commit">teraterm.iss に RC を付けるコミット</a>）から（<a href="#increment_version">バージョンをインクリメントするコミット</a>）までとします。
 </p>
 
 </body>

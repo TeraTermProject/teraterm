@@ -63,13 +63,10 @@ To release Tera Term installation package is shown in the following step:
       <li>cJSON (<a href="https://github.com/DaveGamble/cJSON/" target="_blank">https://github.com/DaveGamble/cJSON/</a>)</li>
       <li>Unicode (<a href="https://www.unicode.org/versions/latest/" target="_blank">https://www.unicode.org/versions/latest/</a>)</li>
     </ul>
-<!--
-    <p>リリースに使うバージョンはこの時点でおおむね決定する。</p>
--->
+    <p>Library versions are mostly determined at this timing.</p>
+    <p>We use CI tool for release build. For this reason, the detailed version of Visual Studio is uncontrollable. The detailed version will depend on what version is adopted by the CI tool.</p>
   </li>
-<!--
-  <li>今回のリリースに入れたいものが落ち着く</li>
--->
+  <li>What change is included in this release of not included is mostly determined.</li>
 </ol>
 
 <h2 id="rc-release">From create RC until release</h2>
@@ -77,12 +74,10 @@ To release Tera Term installation package is shown in the following step:
 <ol>
   <li>Confirm documents.
     <ul>
-<!--
-      <li>ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。</li>
-      <li>変更履歴を確認し、書き忘れがあれば追記する。</li>
-      <li>変更履歴の順番を変更する。だいたいの指針としては、ターミナルエミュレーション関係・アプリケーションとしての変更・マクロの順。</li>
-      <li>ドキュメント差分が翻訳されていることを確認し、翻訳忘れがあれば翻訳する。</li>
--->
+      <li>Check for missing parts of documents. Configuration item on dialog, special options without UI, command line parameters, new macro command and so on.</li>
+      <li>Check for changelog. Add it if found missing.</li>
+      <li>Change order of changelog. Important changes will be located at upper position. Order is terminal emulation, application and macro.</li>
+      <li>Check for translations of changed documents. Translate them if they are not translated.</li>
     </ul>
   </li>
   <li>Increment the version while RC release process.
@@ -127,7 +122,7 @@ To release Tera Term installation package is shown in the following step:
     </ul>
     <p>
       By way of exception, CygTerm+ always upgrades not regarding Tera Term release process when the patch is committed.<br />
-      The release date is the day committed by a developer. <!--そのため、修正・バージョンのインクリメント・変更履歴を同時にコミットする。--><br />
+      The release date is the day committed by a developer. Therefore, the code modify, version increment and add changelog should be committed at the same time.<br />
       Because user can get gcc compiler for free.
     </p>
   </li>
@@ -153,13 +148,15 @@ To release Tera Term installation package is shown in the following step:
       <li>doc\ja\html\macro\index.html</li>
     </ul>
   </li>
-  <li id="RC_commit">Commit this state.</li>
-  <li>Create installer.</li>
+  <li>Create installer. (for check)</li>
   <li>Test run installer, run and connect in all supported OS.</li>
-  <li>Push and build on AppVeyor</li>
+  <li id="RC_commit">Commit and push.</li>
+  <li>Build on AppVeyor.
+    <p>use "github-main" project on AppVeyor.</p>
+  </li>
   <li>Announce RC release.
     <ul>
-      <li>Twitter (<a href="https://twitter.com/Tera_Term" target="_blank">https://twitter.com/Tera_Term</a>)</li>
+      <li>X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)</li>
     </ul>
   </li>
   <li>Get feedbacks.
@@ -197,13 +194,13 @@ To release Tera Term installation package is shown in the following step:
       <li>html/about/history.html</li>
     </ul>
   </li>
-  <li>Create installer.
+  <li>Create installer. (for check)
     <p>
       Check that build and installer generation without error.
     </p>
   </li>
-  <li>Commit this state.</li>
-  <li>Create SVN tag.
+  <li>Commit.</li>
+  <li>Create a tag and push.
     <p>
       Use annotated tags.
       The naming rule is `v(version)' (e.g. v5.4.0).
@@ -236,10 +233,10 @@ git push origin v5.4.0
   </li>
   <li>Announce release.
     <ul>
-      <li>Twitter (<a href="https://twitter.com/Tera_Term" target="_blank">https://twitter.com/Tera_Term</a>)</li>
+      <li>X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)</li>
     </ul>
   </li>
-  <li id="increment_version">When periodic release, create stable branch.
+  <li>When periodic release, create stable branch.
 <pre>
 git checkout -b stable_5_4
 </pre>
@@ -248,8 +245,11 @@ git checkout -b stable_5_4
     <p>When periodic release,</p>
     <ul>
       <li>
-        teraterm/common/tt-version.h<br>
-        Increment TT_VERSION_MINOR and set SUBSTR to "dev" in main branch.
+        At main branch.
+        <ul>
+          <li>
+            teraterm/common/tt-version.h<br>
+            Increment TT_VERSION_MINOR and set SUBSTR to "dev."
 <pre>
   #define TT_VERSION_MAJOR             5
 - #define TT_VERSION_MINOR             4
@@ -258,36 +258,20 @@ git checkout -b stable_5_4
 - #undef TT_VERSION_SUBSTR
 + #define TT_VERSION_SUBSTR            "dev"
 </pre>
-        Increment TT_VERSION_PATCH and set SUBSTR to "dev" in stable branch.
-<pre>
-  #define TT_VERSION_MAJOR             5
-  #define TT_VERSION_MINOR             4
-- #define TT_VERSION_PATCH             0
-- #undef TT_VERSION_SUBSTR
-+ #define TT_VERSION_PATCH             1
-+ #define TT_VERSION_SUBSTR            "dev"
-</pre>
-      </li>
-      <li>
-        ttssh2/ttssh/ttxssh-version.h<br>
-        Increment TT_VERSION_MINOR in main branch.
+          </li>
+          <li>
+            ttssh2/ttssh/ttxssh-version.h<br>
+            Increment TT_VERSION_MINOR.
 <pre>
   #define TTSSH_VERSION_MAJOR             3
 - #define TTSSH_VERSION_MINOR             4
 + #define TTSSH_VERSION_MINOR             5
   #define TTSSH_VERSION_PATCH             0
 </pre>
-        Increment TTSSH_VERSION_PATCH in stable branch.
-<pre>
-  #define TTSSH_VERSION_MAJOR             3
-  #define TTSSH_VERSION_MINOR             4
-- #define TTSSH_VERSION_PATCH             0
-+ #define TTSSH_VERSION_PATCH             1
-</pre>
-      </li>
-      <li>
-        installer\teraterm.iss<br>
-        Set AppVer to [next version]-dev in main branch.
+          </li>
+          <li>
+            installer\teraterm.iss<br>
+            Set AppVer to [next version]-dev.
 <pre>
 - #define AppVer "5.4.0"
 + #define AppVer "5.5.0-dev"
@@ -303,7 +287,45 @@ git checkout -b stable_5_4
 - Name: makearchive.bat; Parameters: release
 + ;Name: makearchive.bat; Parameters: release
 </pre>
-        Set AppVer to [next version]-dev in stable branch too.
+          </li>
+          <li>
+            doc\en/ja\html\about\history.html<br>
+            Add template of changelog for next release.
+<pre>
+&lt;h3 id="teraterm_5.5.0"&gt;YYYY.MM.DD (Ver 5.5.0 not released yet)&lt;/h3&gt;
+</pre>
+          </li>
+          <li>Commit and push.</li>
+        </ul>
+      </li>
+      <li>
+        At stable branch.
+        <ul>
+          <li>
+            teraterm/common/tt-version.h<br>
+            Increment TT_VERSION_PATCH and set SUBSTR to "dev."
+<pre>
+  #define TT_VERSION_MAJOR             5
+  #define TT_VERSION_MINOR             4
+- #define TT_VERSION_PATCH             0
+- #undef TT_VERSION_SUBSTR
++ #define TT_VERSION_PATCH             1
++ #define TT_VERSION_SUBSTR            "dev"
+</pre>
+          </li>
+          <li>
+            ttssh2/ttssh/ttxssh-version.h<br>
+            Increment TTSSH_VERSION_PATCH.
+<pre>
+  #define TTSSH_VERSION_MAJOR             3
+  #define TTSSH_VERSION_MINOR             4
+- #define TTSSH_VERSION_PATCH             0
++ #define TTSSH_VERSION_PATCH             1
+</pre>
+          </li>
+          <li>
+            installer\teraterm.iss<br>
+            Set AppVer to [next version]-dev.
 <pre>
 - #define AppVer "5.4.0"
 + #define AppVer "5.4.1-dev"
@@ -319,13 +341,26 @@ git checkout -b stable_5_4
 - Name: makearchive.bat; Parameters: release
 + ;Name: makearchive.bat; Parameters: release
 </pre>
+          </li>
+          <li>
+            doc\en/ja\html\about\history.html<br>
+            Add template of changelog for next release.
+<pre>
+&lt;h3 id="teraterm_5.4.1"&gt;YYYY.MM.DD (Ver 5.4.1 not released yet)&lt;/h3&gt;
+</pre>
+          </li>
+          <li>Commit and push.</li>
+        </ul>
       </li>
     </ul>
     <p>When stable release,</p>
     <ul>
       <li>
-        teraterm/common/tt-version.h<br>
-        Increment TT_VERSION_PATCH and set SUBSTR to "dev" in stable branch.
+        At stable branch.
+        <ul>
+          <li>
+            teraterm/common/tt-version.h<br>
+            Increment TT_VERSION_PATCH and set SUBSTR to "dev" in stable branch.
 <pre>
   #define TT_VERSION_MAJOR             5
   #define TT_VERSION_MINOR             4
@@ -334,20 +369,20 @@ git checkout -b stable_5_4
 + #define TT_VERSION_PATCH             2
 + #define TT_VERSION_SUBSTR            "dev"
 </pre>
-      </li>
-      <li>
-        ttssh2/ttssh/ttxssh-version.h<br>
-        Increment TTSSH_VERSION_PATCH in stable branch.
+          </li>
+          <li>
+            ttssh2/ttssh/ttxssh-version.h<br>
+            Increment TTSSH_VERSION_PATCH in stable branch.
 <pre>
   #define TTSSH_VERSION_MAJOR             3
   #define TTSSH_VERSION_MINOR             4
 - #define TTSSH_VERSION_PATCH             1
 + #define TTSSH_VERSION_PATCH             2
 </pre>
-      </li>
-      <li>
-        installer\teraterm.iss<br>
-        Set AppVer to [next version]-dev in stable branch.
+          </li>
+          <li>
+            installer\teraterm.iss<br>
+            Set AppVer to [next version]-dev in stable branch.
 <pre>
 - #define AppVer "5.4.1"
 + #define AppVer "5.4.2-dev"
@@ -363,6 +398,16 @@ git checkout -b stable_5_4
 - Name: makearchive.bat; Parameters: release
 + ;Name: makearchive.bat; Parameters: release
 </pre>
+          </li>
+          <li>
+            doc\en/ja\html\about\history.html<br>
+            Add template of changelog for next release on stable branch.
+<pre>
+&lt;h3 id="teraterm_5.4.2"&gt;YYYY.MM.DD (Ver 5.4.2 not released yet)&lt;/h3&gt;
+</pre>
+          </li>
+          <li>Commit and push.</li>
+        </ul>
       </li>
     </ul>
   </li>
@@ -384,7 +429,7 @@ git checkout -b stable_5_4
 
 <p>
 After code freeze, only critical bug fix is able to committed.<br />
-Code freeze start with <a href="#RC_commit">RC commit in development branch</a>, and end with <a href="#increment_version">version increment commit.</a>.
+Code freeze start with <a href="#RC_commit">RC commit</a>, and end with <a href="#increment_version">version increment commit.</a>.
 </p>
 
 </body>
