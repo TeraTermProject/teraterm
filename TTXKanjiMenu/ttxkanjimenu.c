@@ -506,8 +506,6 @@ static void PASCAL TTXModifyMenu(HMENU menu)
 		GetI18nStrWW(IniSection, "MENU_KANJI_K", L"Coding(&K)", pvar->ts->UILanguageFileW, &uimsg);
 	}
 
-	// TODO
-	//		Windows 9x ‚Å‚Í ANSI ”ÅAPI‚ðŽg‚¤‚æ‚¤‚É‚·‚é
 	mi.cbSize = sizeof(mi);
 	mi.fMask  = MIIM_TYPE | MIIM_SUBMENU;
 	mi.fType  = MFT_STRING;

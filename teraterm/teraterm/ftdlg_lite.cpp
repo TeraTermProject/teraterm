@@ -296,6 +296,6 @@ void CFileTransLiteDlg::SetObserver(CFileTransLiteDlg::Observer *observer)
 
 void CFileTransLiteDlg::Destroy()
 {
-	pData->EndDialog(IDOK);
+	pData->DestroyWindow();
 	pData = NULL;
 }
