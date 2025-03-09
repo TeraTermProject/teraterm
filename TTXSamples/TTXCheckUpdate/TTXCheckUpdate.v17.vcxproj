@@ -63,7 +63,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
+      <AssemblerOutput>AssemblyCode</AssemblerOutput>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(SolutionDir)..\teraterm\$(Configuration)\common_static.lib;$(SolutionDir)..\teraterm\$(Configuration)\ttpcmn.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -82,7 +82,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
+      <AssemblerOutput>AssemblyCode</AssemblerOutput>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(SolutionDir)..\teraterm\$(Configuration)\common_static.lib;$(SolutionDir)..\teraterm\$(Configuration)\ttpcmn.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
