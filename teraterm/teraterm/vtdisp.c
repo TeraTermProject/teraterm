@@ -1949,7 +1949,7 @@ void ResetIME(void)
 		if (ts.UseIME > 0) {
 			if (ts.IMEInline>0) {
 				LOGFONTA VTlf;
-				DispSetLogFont(&VTlf, 0);
+				DispSetLogFont(&VTlf, GetMonitorDpiFromWindow(HVTWin));
 				SetConversionLogFont(HVTWin, &VTlf);
 			}
 			else {
