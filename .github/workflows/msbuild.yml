@@ -59,6 +59,13 @@ jobs:
         chcp 932
         ci_scripts/build_appveyor_release_bat.bat
 
+    - name: Upload artifacts (asm)
+      uses: actions/upload-artifact@v4
+      with:
+        name: asm-files-BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}
+        path: |
+          **/*.asm
+
     - name: after_build
       run: |
         chcp 932
