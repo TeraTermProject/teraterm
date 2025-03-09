@@ -996,3 +996,26 @@ BOOL WINAPI _IsDialogMessageW(HWND hDlg, LPMSG lpMsg)
 {
 	return IsDialogMessageA(hDlg, lpMsg);
 }
+
+BOOL WINAPI _InsertMenuItemW(HMENU hmenu, UINT item, BOOL fByPosition, LPCMENUITEMINFOW lpmi)
+{
+	char *strA = ToCharW(lpmi->dwTypeData);
+
+	MENUITEMINFOA mi = {0};
+	mi.cbSize = sizeof(mi);
+	mi.fMask  = lpmi->fMask;
+	mi.fType  = lpmi->fType;
+	mi.fState = lpmi->fState;
+	mi.wID = lpmi->wID;
+	mi.hSubMenu = lpmi->hSubMenu;
+	mi.hbmpChecked = lpmi->hbmpChecked;
+	mi.hbmpUnchecked = lpmi->hbmpUnchecked;
+	mi.dwItemData = lpmi->dwItemData;
+	mi.dwTypeData = strA;
+	mi.cch = lpmi->cch;
+	BOOL r = InsertMenuItemA(hmenu, item, fByPosition, &mi);
+
+	free(strA);
+
+	return r;
+}

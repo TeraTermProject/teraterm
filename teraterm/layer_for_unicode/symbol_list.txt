@@ -26,6 +26,7 @@ user32 GetMessageW@16
 user32 IsDialogMessageW@8
 user32 TranslateAcceleratorW@12
 user32 DispatchMessageW@4
+user32 InsertMenuItemW@16
 
 kernel32 GetFileAttributesW@4
 kernel32 GetModuleFileNameW@12

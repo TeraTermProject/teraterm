@@ -72,6 +72,7 @@ BOOL WINAPI _GetMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFi
 int WINAPI _TranslateAcceleratorW(HWND hWnd, HACCEL hAccTable, LPMSG lpMsg);
 LRESULT WINAPI _DispatchMessageW(MSG *lpMsg);
 BOOL WINAPI _IsDialogMessageW(HWND hDlg, LPMSG lpMsg);
+BOOL WINAPI _InsertMenuItemW(HMENU hmenu, UINT item, BOOL fByPosition, LPCMENUITEMINFOW lpmi);
 
 // kernel32.dll
 DWORD WINAPI _GetFileAttributesW(LPCWSTR lpFileName);
