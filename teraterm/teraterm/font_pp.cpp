@@ -145,7 +145,15 @@ static void SetFontString(HWND hWnd, int item, const LOGFONTW *logfont)
 	// https://docs.microsoft.com/en-us/windows/win32/api/dimm/ns-dimm-logfonta
 	// http://www.coara.or.jp/~tkuri/D/015.htm#D2002-09-14
 	wchar_t b[128];
-	swprintf_s(b, L"%s (%d,%d) %d", logfont->lfFaceName, logfont->lfWidth, logfont->lfHeight, logfont->lfCharSet);
+	HDC DC = GetDC(hWnd);
+	int dpi = GetDeviceCaps(DC, LOGPIXELSY);
+	ReleaseDC(hWnd, DC);
+	swprintf_s(b, L"%s (%d,%d) %d ; %.1f point",
+			   logfont->lfFaceName,
+			   logfont->lfWidth,
+			   logfont->lfHeight,
+			   logfont->lfCharSet,
+			   abs(logfont->lfHeight) * 72.0f / dpi);
 	SetDlgItemTextW(hWnd, item, b);
 }
 
@@ -278,7 +286,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			GetDlgLogFont(GetParent(hWnd), ts, &dlg_data->DlgFont);
 			SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
 
-			DispSetLogFont(&dlg_data->VTFont, 0);
+			HDC DC = GetDC(hWnd);
+			int dpi = GetDeviceCaps(DC, LOGPIXELSY);
+			ReleaseDC(hWnd, DC);
+			DispSetLogFont(&dlg_data->VTFont, dpi);
+
 			SetFontString(hWnd, IDC_VTFONT_EDIT, &dlg_data->VTFont);
 
 			CheckDlgButton(hWnd,
@@ -318,8 +330,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ts->ListHiddenFonts = IsDlgButtonChecked(hWnd, IDC_LIST_HIDDEN_FONTS) == BST_CHECKED;
 
 					strncpy_s(ts->VTFont, _countof(ts->VTFont), dlg_data->VTFont.lfFaceName, _TRUNCATE);
-					ts->VTFontSize.x = dlg_data->VTFont.lfWidth;
-					ts->VTFontSize.y = dlg_data->VTFont.lfHeight;
+					HDC DC = GetDC(hWnd);
+					int dpi = GetDeviceCaps(DC, LOGPIXELSY);
+					ReleaseDC(hWnd, DC);
+					ts->VTFontSize.x = dlg_data->VTFont.lfWidth  * 96 / dpi;
+					ts->VTFontSize.y = dlg_data->VTFont.lfHeight * 96 / dpi;
 					ts->VTFontCharSet = dlg_data->VTFont.lfCharSet;
 
 					SetDlgLogFont(GetParent(hWnd), &dlg_data->DlgFont, ts);
