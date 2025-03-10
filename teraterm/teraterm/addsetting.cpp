@@ -151,6 +151,13 @@ void CSequencePropPageDlg::OnInitDialog()
 	SetI18nListW("Tera Term", m_hWnd, IDC_CLIPBOARD_ACCESS, sequence_clipboard_access,
 				 _countof(sequence_clipboard_access), ts.UILanguageFileW, 0);
 
+	const static I18nTextInfo beep_type[] = {
+		{"DLG_TAB_SEQUENCE_BEEP_DISABLE", L"disable"},		  // IdBeepOff = 0
+		{"DLG_TAB_SEQUENCE_BEEP_SOUND", L"sound"},			  // IdBeepOn = 1
+		{"DLG_TAB_SEQUENCE_BEEP_VISUALBELL", L"visualbell"},  // IdBeepVisual = 2
+	};
+	SetI18nListW("Tera Term", m_hWnd, IDC_BEEP_DROPDOWN, beep_type, _countof(beep_type), ts.UILanguageFileW, ts.Beep);
+
 	// (1)IDC_ACCEPT_MOUSE_EVENT_TRACKING
 	SetCheck(IDC_ACCEPT_MOUSE_EVENT_TRACKING, ts.MouseEventTracking);
 	EnableDlgItem(IDC_DISABLE_MOUSE_TRACKING_CTRL, ts.MouseEventTracking ? TRUE : FALSE);
@@ -190,15 +197,11 @@ void CSequencePropPageDlg::OnInitDialog()
 	// (10)IDC_ACCEPT_CLEAR_SBUFF
 	SetCheck(IDC_ACCEPT_CLEAR_SBUFF, (ts.TermFlag & TF_REMOTECLEARSBUFF) != 0);
 
+	// IDC_DISABLE_PRINT_START
 	SetCheck(IDC_DISABLE_PRINT_START, (ts.TermFlag & TF_PRINTERCTRL) == 0);
 
-	const static I18nTextInfo beep_type[] = {
-		{ "DLG_TAB_SEQUENCE_BEEP_DISABLE", L"disable" },		// IdBeepOff = 0
-		{ "DLG_TAB_SEQUENCE_BEEP_SOUND", L"sound" },			// IdBeepOn = 1
-		{ "DLG_TAB_SEQUENCE_BEEP_VISUALBELL", L"visualbell" },	// IdBeepVisual = 2
-	};
-	SetI18nListW("Tera Term", m_hWnd, IDC_BEEP_DROPDOWN, beep_type,
-				 _countof(beep_type), ts.UILanguageFileW, ts.Beep);
+	// IDC_BEEP_DROPDOWN
+	SetCurSel(IDC_BEEP_DROPDOWN, ts.Beep);
 
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ACCEPT_MOUSE_EVENT_TRACKING));
