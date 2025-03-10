@@ -976,3 +976,46 @@ BOOL WINAPI _CreateDirectoryW(LPCWSTR lpPathName,LPSECURITY_ATTRIBUTES lpSecurit
 	free(lpPathNameA);
 	return r;
 }
+
+BOOL WINAPI _GetMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax)
+{
+	return GetMessageA(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax);
+}
+
+int WINAPI _TranslateAcceleratorW(HWND hWnd, HACCEL hAccTable, LPMSG lpMsg)
+{
+	return TranslateAcceleratorA(hWnd, hAccTable, lpMsg);
+}
+
+LRESULT WINAPI _DispatchMessageW(MSG *lpMsg)
+{
+	return DispatchMessageA(lpMsg);
+}
+
+BOOL WINAPI _IsDialogMessageW(HWND hDlg, LPMSG lpMsg)
+{
+	return IsDialogMessageA(hDlg, lpMsg);
+}
+
+BOOL WINAPI _InsertMenuItemW(HMENU hmenu, UINT item, BOOL fByPosition, LPCMENUITEMINFOW lpmi)
+{
+	char *strA = ToCharW(lpmi->dwTypeData);
+
+	MENUITEMINFOA mi = {0};
+	mi.cbSize = sizeof(mi);
+	mi.fMask  = lpmi->fMask;
+	mi.fType  = lpmi->fType;
+	mi.fState = lpmi->fState;
+	mi.wID = lpmi->wID;
+	mi.hSubMenu = lpmi->hSubMenu;
+	mi.hbmpChecked = lpmi->hbmpChecked;
+	mi.hbmpUnchecked = lpmi->hbmpUnchecked;
+	mi.dwItemData = lpmi->dwItemData;
+	mi.dwTypeData = strA;
+	mi.cch = lpmi->cch;
+	BOOL r = InsertMenuItemA(hmenu, item, fByPosition, &mi);
+
+	free(strA);
+
+	return r;
+}

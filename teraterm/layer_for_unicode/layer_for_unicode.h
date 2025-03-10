@@ -68,6 +68,11 @@ BOOL WINAPI _ModifyMenuW(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNe
 int WINAPI _GetMenuStringW(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags);
 HANDLE WINAPI _LoadImageW(HINSTANCE hInst, LPCWSTR name, UINT type,
 						  int cx, int cy, UINT fuLoad);
+BOOL WINAPI _GetMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax);
+int WINAPI _TranslateAcceleratorW(HWND hWnd, HACCEL hAccTable, LPMSG lpMsg);
+LRESULT WINAPI _DispatchMessageW(MSG *lpMsg);
+BOOL WINAPI _IsDialogMessageW(HWND hDlg, LPMSG lpMsg);
+BOOL WINAPI _InsertMenuItemW(HMENU hmenu, UINT item, BOOL fByPosition, LPCMENUITEMINFOW lpmi);
 
 // kernel32.dll
 DWORD WINAPI _GetFileAttributesW(LPCWSTR lpFileName);
