@@ -1120,12 +1120,18 @@ void CVTWindow::InitMenu(HMENU *Menu)
 
 	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
 		wchar_t *uimsg;
+		if (GetWinUndoStyle() == WIN_SINGLE) {
+			InsertMenuW(hMenu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SINGLE_NEXT, L">");
+		}
 		WinMenu = CreatePopupMenu();
 		GetI18nStrWW("Tera Term", "MENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
 		InsertMenuW(hMenu, ID_HELPMENU,
 					MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 					(UINT_PTR)WinMenu, uimsg);
 		free(uimsg);
+		if (GetWinUndoStyle() == WIN_SINGLE) {
+			InsertMenuW(hMenu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SINGLE_PREV, L"<");
+		}
 	}
 
 	TTXModifyMenu(hMenu); /* TTPLUG */
@@ -1454,6 +1460,9 @@ void CVTWindow::OpenTEK()
 	ActiveWin = IdTEK;
 	if (HTEKWin==NULL) {
 		pTEKWin = new CTEKWindow(m_hInst);
+		if (GetWinUndoStyle() == WIN_SINGLE) {
+			WindowSingleShow(HTEKWin);
+		}
 	}
 	else {
 		::ShowWindow(HTEKWin,SW_SHOWNORMAL);
@@ -3495,12 +3504,18 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 	    (B1 != B2)) {
 		if (WinMenu==NULL) {
 			wchar_t *uimsg;
+			if (GetWinUndoStyle() == WIN_SINGLE) {
+				::InsertMenuW(MainMenu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SINGLE_NEXT, L">");
+			}
 			WinMenu = CreatePopupMenu();
 			GetI18nStrWW("Tera Term", "MENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
 			::InsertMenuW(MainMenu,ID_HELPMENU,
 						  MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 						  (UINT_PTR)WinMenu, uimsg);
 			free(uimsg);
+			if (GetWinUndoStyle() == WIN_SINGLE) {
+				::InsertMenuW(MainMenu, ID_HELPMENU, MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_WINDOW_SINGLE_PREV, L"<");
+			}
 		}
 		else {
 			RemoveMenu(MainMenu,ID_HELPMENU,MF_BYPOSITION);
@@ -4887,32 +4902,67 @@ void CVTWindow::OnWindowWindow()
 
 void CVTWindow::OnWindowMinimizeAll()
 {
+	if (GetWinUndoStyle() == WIN_SINGLE) {
+		UndoAllWin();
+	}
 	ShowAllWin(SW_MINIMIZE);
 }
 
 void CVTWindow::OnWindowCascade()
 {
+	if (GetWinUndoStyle() == WIN_SINGLE) {
+		UndoAllWin();
+	}
 	ShowAllWinCascade(HVTWin);
 }
 
 void CVTWindow::OnWindowStacked()
 {
+	if (GetWinUndoStyle() == WIN_SINGLE) {
+		UndoAllWin();
+	}
 	ShowAllWinStacked(HVTWin);
 }
 
 void CVTWindow::OnWindowSidebySide()
 {
+	if (GetWinUndoStyle() == WIN_SINGLE) {
+		UndoAllWin();
+	}
 	ShowAllWinSidebySide(HVTWin);
 }
 
 void CVTWindow::OnWindowRestoreAll()
 {
+	if (GetWinUndoStyle() == WIN_SINGLE) {
+		UndoAllWin();
+	}
 	ShowAllWin(SW_RESTORE);
 }
 
 void CVTWindow::OnWindowUndo()
 {
 	UndoAllWin();
+}
+
+void CVTWindow::OnWindowSingleEnter()
+{
+	WindowSingleEnter(HVTWin);
+}
+
+void CVTWindow::OnWindowSinglePrev()
+{
+	WindowSinglePrev(HVTWin);
+}
+
+void CVTWindow::OnWindowSingleNext()
+{
+	WindowSingleNext(HVTWin);
+}
+
+void CVTWindow::OnWindowSingleExit()
+{
+	WindowSingleExit();
 }
 
 void CVTWindow::OnHelpIndex()
@@ -5373,6 +5423,10 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_WINDOW_SIDEBYSIDE: OnWindowSidebySide(); break;
 		case ID_WINDOW_RESTOREALL: OnWindowRestoreAll(); break;
 		case ID_WINDOW_UNDO: OnWindowUndo(); break;
+		case ID_WINDOW_SINGLE_ENTER: OnWindowSingleEnter(); break;
+		case ID_WINDOW_SINGLE_PREV: OnWindowSinglePrev(); break;
+		case ID_WINDOW_SINGLE_NEXT: OnWindowSingleNext(); break;
+		case ID_WINDOW_SINGLE_EXIT: OnWindowSingleExit(); break;
 		case ID_HELP_INDEX2: OnHelpIndex(); break;
 		case ID_HELP_ABOUT: OnHelpAbout(); break;
 		default:
