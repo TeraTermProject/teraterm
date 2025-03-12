@@ -4807,6 +4807,12 @@ static unsigned int XtColor2TTColor(int mode, unsigned int xt_color)
 	  case 16:
 		colornum = CS_TEK_BG;
 		break;
+	  case 17:
+		colornum = CS_VT_BOLDBG;
+		break;
+	  case 19:
+		colornum = CS_VT_BOLDFG;
+		break;
 	}
 	return colornum;
 }
