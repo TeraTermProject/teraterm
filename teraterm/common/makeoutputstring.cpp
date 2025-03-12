@@ -47,7 +47,7 @@ typedef enum {
 } CharSet;
 
 typedef struct OutputCharStateTag {
-	WORD KanjiCode;		// 出力文字コード(sjis,jisなど)
+	IdKanjiCode KanjiCode;		// 出力文字コード(sjis,jisなど)
 
 	// JIS 漢字IN/OUT/カナ
 	WORD KanjiIn;		// IdKanjiInA / IdKanjiInB
@@ -150,7 +150,7 @@ void MakeOutputStringInit(
 {
 	assert(state != NULL);
 
-	state->KanjiCode = kanji_code;
+	state->KanjiCode = (IdKanjiCode)kanji_code;
 	state->KanjiIn = KanjiIn;
 	state->KanjiOut = KanjiOut;
 	state->JIS7Katakana = jis7katakana;
@@ -383,8 +383,15 @@ size_t MakeOutputString(
 			 states->KanjiCode == IdISO8859_16) {
 		// SBCS
 		unsigned char byte;
-		int part = KanjiCodeToISO8859Part(states->KanjiCode);
-		int r = UnicodeToISO8859(part, u32, &byte);
+		int r = UnicodeToISO8859(states->KanjiCode, u32, &byte);
+		if (r == 0) {
+			// 変換できない文字コードだった
+			byte = '?';
+		}
+		TempStr[TempLen++] = byte;
+	} else if (states->KanjiCode == IdCP437) {
+		unsigned char byte;
+		int r = UnicodeToCodePage(states->KanjiCode, u32, &byte);
 		if (r == 0) {
 			// 変換できない文字コードだった
 			byte = '?';

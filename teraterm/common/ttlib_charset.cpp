@@ -65,6 +65,33 @@ static const TKanjiList KanjiList[] = {
 	{ IdKoreanCP949,	"KS5601 (CP949)",			"KS5601" },
 	{ IdCnGB2312,		"GB2312 (CP936)",			"GB2312" },
 	{ IdCnBig5,			"Big5 (CP950)",				"BIG5" },
+	// ↓https://www.unicode.org/L2/L1999/99325-E.htm
+	{ IdCP437,			"CP437 Latin (US)",			"CP437" },
+	{ IdCP737,			"CP737 Greek (A)",			"CP737" },
+	{ IdCP775,			"CP775 BaltRim",			"CP775" },
+	{ IdCP850,			"CP850 Latin (A)",			"CP850" },
+	{ IdCP852,			"CP852 Latin (B)",			"CP852" },
+	{ IdCP855,			"CP855 Cyrillic (A)",		"CP855" },
+	{ IdCP857,			"CP857 Turkish",			"CP857" },
+	{ IdCP860,			"CP860 Portuguese",			"CP860" },
+	{ IdCP861,			"CP861 Icelandic",			"CP861" },
+	{ IdCP862,			"CP862 Hebrew",				"CP862" },
+	{ IdCP863,			"CP863 Canada F",			"CP863" },
+	{ IdCP864,			"CP864 Arabic",				"CP864" },
+	{ IdCP865,			"CP865 Nordic",				"CP865" },
+	{ IdCP866,			"CP866 Cyrillic (B)",		"CP866" },
+	{ IdCP869,			"CP869 Greek (B)",			"CP869" },
+	{ IdCP874,			"CP874 Thai",				"CP874" },
+	// ↓https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
+	{ IdCP1250,			"CP1250 Central European",	"CP1250" },
+	{ IdCP1251,			"CP1251 Cyrillic",			"CP1251" },
+	{ IdCP1252,			"CP1252 Latin 1",			"CP1252" },
+	{ IdCP1253,			"CP1253 Greek",				"CP1253" },
+	{ IdCP1254,			"CP1254 Turkish",			"CP1254" },
+	{ IdCP1255,			"CP1255 Hebrew",			"CP1255" },
+	{ IdCP1256,			"CP1256 Arabic",			"CP1256" },
+	{ IdCP1257,			"CP1257 Baltic",			"CP1257" },
+	{ IdCP1258,			"CP1258 Vietnamese",		"CP1258" },
 };
 
 /**
@@ -129,42 +156,6 @@ int GetKanjiCodeFromStrW(const wchar_t *kanji_code_strW)
 	int r = GetKanjiCodeFromStr(kanji_code_str);
 	free(kanji_code_str);
 	return r;
-}
-
-/**
- *	漢字コードから ISO8859の部番号を返す
- *	@param	kanjicode	IdISO8859-1...16
- *	@return 1...16		ISO8859に関係ない漢字コードの場合は1を返す
- */
-int KanjiCodeToISO8859Part(int kanjicode)
-{
-	static const struct {
-		IdKanjiCode kanji_code;
-		int iso8859_part;
-	} list[] = {
-		{ IdISO8859_1, 1 },
-		{ IdISO8859_2, 2 },
-		{ IdISO8859_3, 3 },
-		{ IdISO8859_4, 4 },
-		{ IdISO8859_5, 5 },
-		{ IdISO8859_6, 6 },
-		{ IdISO8859_7, 7 },
-		{ IdISO8859_8, 8 },
-		{ IdISO8859_9, 9 },
-		{ IdISO8859_10, 10 },
-		{ IdISO8859_11, 11 },
-		{ IdISO8859_13, 13 },
-		{ IdISO8859_14, 14 },
-		{ IdISO8859_15, 15 },
-		{ IdISO8859_16, 16 },
-	};
-	for (size_t i = 0; i < _countof(list); i++) {
-		if (list[i].kanji_code == kanjicode) {
-			return list[i].iso8859_part;
-		}
-	}
-	assert(0);
-	return 1;
 }
 
 BOOL LangIsEnglish(WORD kanji_code)

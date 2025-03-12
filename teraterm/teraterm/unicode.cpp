@@ -417,7 +417,7 @@ typedef struct {
 /**
  *	ISO8859テーブル
  */
-const ISO8859Table_t *GetISO8859Table(int iso8859_part)
+const ISO8859Table_t *GetISO8859Table(IdKanjiCode iso8859_part)
 {
 	static const ISO8859Table_t iso8859_2[] = {
 #include "iso8859-2.tbl"
@@ -462,37 +462,39 @@ const ISO8859Table_t *GetISO8859Table(int iso8859_part)
 #include "iso8859-16.tbl"
 	};
 
-	static const ISO8859Table_t *tables[] = {
-		NULL,	// 0
-		NULL,	// ISO8859-1
-		iso8859_2,
-		iso8859_3,
-		iso8859_4,
-		iso8859_5,
-		iso8859_6,
-		iso8859_7,
-		iso8859_8,
-		iso8859_9,
-		iso8859_10,
-		iso8859_11,
-		NULL,
-		iso8859_13,
-		iso8859_14,
-		iso8859_15,
-		iso8859_16,
+	static const struct {
+		IdKanjiCode kanji_code;
+		const ISO8859Table_t *table;
+	} tables[] = {
+		{ IdISO8859_1, NULL },	// ISO8859-1
+		{ IdISO8859_2, iso8859_2 },
+		{ IdISO8859_3, iso8859_3 },
+		{ IdISO8859_4, iso8859_4 },
+		{ IdISO8859_5, iso8859_5 },
+		{ IdISO8859_6, iso8859_6 },
+		{ IdISO8859_7, iso8859_7 },
+		{ IdISO8859_8, iso8859_8 },
+		{ IdISO8859_9, iso8859_9 },
+		{ IdISO8859_10, iso8859_10 },
+		{ IdISO8859_11, iso8859_11 },
+		{ IdISO8859_13, iso8859_13 },
+		{ IdISO8859_14, iso8859_14 },
+		{ IdISO8859_15, iso8859_15 },
+		{ IdISO8859_16, iso8859_16 },
 	};
-	if (iso8859_part >= _countof(tables)) {
-		assert(0);
-		return NULL;
+	for (int i = 0; i < _countof(tables); i++) {
+		if (iso8859_part == tables[i].kanji_code) {
+			return tables[i].table;
+		}
 	}
-	assert(tables[iso8859_part] != NULL);
-	return tables[iso8859_part];
+	assert(0);
+	return NULL;
 }
 
 /**
  *	ISO8859からUnicodeへ変換
  */
-int UnicodeFromISO8859(int part, unsigned char b, unsigned short *u16)
+int UnicodeFromISO8859(IdKanjiCode part, unsigned char b, unsigned short *u16)
 {
 	if (part == 1) {
 		// ISO8859-1 は unicode と同一
@@ -524,7 +526,7 @@ int UnicodeFromISO8859(int part, unsigned char b, unsigned short *u16)
  *	@retval		0		変換できない
  *	@retval		1		変換できた
  */
-int UnicodeToISO8859(int part, unsigned long u32, unsigned char *b)
+int UnicodeToISO8859(IdKanjiCode part, unsigned long u32, unsigned char *b)
 {
 	if (part == 1) {
 		// ISO8859-1 は unicode と同一
@@ -538,6 +540,181 @@ int UnicodeToISO8859(int part, unsigned long u32, unsigned char *b)
 	}
 	const unsigned short u16 = (unsigned short)u32;
 	const ISO8859Table_t *table = GetISO8859Table(part);
+	if (table == NULL) {
+		// 見つからなかった
+		*b = 0;
+		return 0;
+	}
+	for (int i = 0; i < 0xff; i++ ){
+		if (table[i].unicode == u16) {
+			*b = table[i].code;
+			return 1;
+		}
+	}
+	*b = 0;
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+ *	CodePageテーブル
+ */
+const ISO8859Table_t *GetCodePageTable(IdKanjiCode kanji_code)
+{
+	static const ISO8859Table_t cp1250[] = {
+#include "mapping/cp1250.map"
+	};
+	static const ISO8859Table_t cp1251[] = {
+#include "mapping/cp1251.map"
+	};
+	static const ISO8859Table_t cp1252[] = {
+#include "mapping/cp1252.map"
+	};
+	static const ISO8859Table_t cp1253[] = {
+#include "mapping/cp1253.map"
+	};
+	static const ISO8859Table_t cp1254[] = {
+#include "mapping/cp1254.map"
+	};
+	static const ISO8859Table_t cp1255[] = {
+#include "mapping/cp1255.map"
+	};
+	static const ISO8859Table_t cp1256[] = {
+#include "mapping/cp1256.map"
+	};
+	static const ISO8859Table_t cp1257[] = {
+#include "mapping/cp1257.map"
+	};
+	static const ISO8859Table_t cp1258[] = {
+#include "mapping/cp1258.map"
+	};
+	static const ISO8859Table_t cp437[] = {
+#include "mapping/cp437.map"
+	};
+	static const ISO8859Table_t cp737[] = {
+#include "mapping/cp737.map"
+	};
+	static const ISO8859Table_t cp775[] = {
+#include "mapping/cp775.map"
+	};
+	static const ISO8859Table_t cp850[] = {
+#include "mapping/cp850.map"
+	};
+	static const ISO8859Table_t cp852[] = {
+#include "mapping/cp852.map"
+	};
+	static const ISO8859Table_t cp855[] = {
+#include "mapping/cp855.map"
+	};
+	static const ISO8859Table_t cp857[] = {
+#include "mapping/cp857.map"
+	};
+	static const ISO8859Table_t cp860[] = {
+#include "mapping/cp860.map"
+	};
+	static const ISO8859Table_t cp861[] = {
+#include "mapping/cp861.map"
+	};
+	static const ISO8859Table_t cp862[] = {
+#include "mapping/cp862.map"
+	};
+	static const ISO8859Table_t cp863[] = {
+#include "mapping/cp863.map"
+	};
+	static const ISO8859Table_t cp864[] = {
+#include "mapping/cp864.map"
+	};
+	static const ISO8859Table_t cp865[] = {
+#include "mapping/cp865.map"
+	};
+	static const ISO8859Table_t cp866[] = {
+#include "mapping/cp866.map"
+	};
+	static const ISO8859Table_t cp869[] = {
+#include "mapping/cp869.map"
+	};
+	static const ISO8859Table_t cp874[] = {
+#include "mapping/cp874.map"
+	};
+	static const struct {
+		IdKanjiCode code_page;
+		const ISO8859Table_t *table;
+	} tables[] = {
+		{ IdCP437, cp437 },
+		{ IdCP737, cp737 },
+		{ IdCP775, cp775 },
+		{ IdCP850, cp850 },
+		{ IdCP852, cp852 },
+		{ IdCP855, cp855 },
+		{ IdCP857, cp857 },
+		{ IdCP860, cp860 },
+		{ IdCP861, cp861 },
+		{ IdCP862, cp862 },
+		{ IdCP863, cp863 },
+		{ IdCP864, cp864 },
+		{ IdCP865, cp865 },
+		{ IdCP866, cp866 },
+		{ IdCP869, cp869 },
+		{ IdCP874, cp874 },
+		{ IdCP1250, cp1250 },
+		{ IdCP1251, cp1251 },
+		{ IdCP1252, cp1252 },
+		{ IdCP1253, cp1253 },
+		{ IdCP1254, cp1254 },
+		{ IdCP1255, cp1255 },
+		{ IdCP1256, cp1256 },
+		{ IdCP1257, cp1257 },
+		{ IdCP1258, cp1258 },
+	};
+	for (size_t i = 0; i < _countof(tables); i++) {
+		if (tables[i].code_page == kanji_code) {
+			return tables[i].table;
+		}
+	}
+	return NULL;
+}
+
+/**
+ *	CodePageからUnicodeへ変換
+ */
+int UnicodeFromCodePage(IdKanjiCode kanji_code, unsigned char b, unsigned short *u16)
+{
+	// テーブルを探す
+	const ISO8859Table_t *table = GetCodePageTable(kanji_code);
+	if (table == NULL) {
+		// 見つからなかった
+		*u16 = 0;
+		return 0;
+	}
+	for (int i = 0; i < 0xff; i++ ){
+		if (table[i].code == b) {
+			*u16 = table[i].unicode;
+			return 1;
+		}
+	}
+	*u16 = 0;
+	return 0;
+}
+
+/**
+ *	UnicodeからCodePageへ変換
+ *
+ *	@param[in]	code_page
+ *	@param[in]	u32		Unicode
+ *	@param[out]	*b		ISO8859 char
+ *	@retval		0		変換できない
+ *	@retval		1		変換できた
+ */
+int UnicodeToCodePage(IdKanjiCode kanji_code, unsigned long u32, unsigned char *b)
+{
+	if (u32 >= 0x10000) {
+		// 変換先に存在しないコード
+		*b = 0;
+		return 0;
+	}
+	const unsigned short u16 = (unsigned short)u32;
+	const ISO8859Table_t *table = GetCodePageTable(kanji_code);
 	if (table == NULL) {
 		// 見つからなかった
 		*b = 0;

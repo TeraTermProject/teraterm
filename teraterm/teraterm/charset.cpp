@@ -740,8 +740,23 @@ static BOOL ParseFirstRus(CharSetData *w, BYTE b)
 static BOOL ParseEnglish(CharSetData *w, BYTE b)
 {
 	unsigned short u16 = 0;
-	int part = KanjiCodeToISO8859Part(ts.KanjiCode);
-	int r = UnicodeFromISO8859(part, b, &u16);
+	int r = UnicodeFromISO8859((IdKanjiCode)ts.KanjiCode, b, &u16);
+	if (r == 0) {
+		return FALSE;
+	}
+	if (u16 < 0x100) {
+		ParseASCII(w, (BYTE)u16);
+	}
+	else {
+		w->Op.PutU32(u16, w->ClientData);
+	}
+	return TRUE;
+}
+
+static BOOL ParseCodePage(IdKanjiCode kanji_code, CharSetData *w, BYTE b)
+{
+	unsigned short u16 = 0;
+	int r = UnicodeFromCodePage(kanji_code, b, &u16);
 	if (r == 0) {
 		return FALSE;
 	}
@@ -873,6 +888,42 @@ void ParseFirst(CharSetData *w, BYTE b)
 	case IdDebug:
 		PutDebugChar(w, b);
 		return;
+
+	case IdCP437:
+	case IdCP737:
+	case IdCP775:
+	case IdCP850:
+	case IdCP852:
+	case IdCP855:
+	case IdCP857:
+	case IdCP860:
+	case IdCP861:
+	case IdCP862:
+	case IdCP863:
+	case IdCP864:
+	case IdCP865:
+	case IdCP866:
+	case IdCP869:
+	case IdCP874:
+	case IdCP1250:
+	case IdCP1251:
+	case IdCP1252:
+	case IdCP1253:
+	case IdCP1254:
+	case IdCP1255:
+	case IdCP1256:
+	case IdCP1257:
+	case IdCP1258:
+		if (ParseCodePage(kanji_code, w, b)) {
+			return;
+		}
+		return;
+#if !defined(__MINGW32__)
+	default:
+		// gcc/clang‚Å‚Íswitch‚Éenum‚Ìƒƒ“ƒo‚ª‚·‚×‚Ä‚È‚¢‚Æ‚«Œx‚ªo‚é
+		assert(FALSE);
+		break;
+#endif
 	}
 
 	if (w->SSflag) {

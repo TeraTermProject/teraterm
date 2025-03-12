@@ -302,6 +302,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					else if (LangIsEnglish(coding)) {
 						;
 					}
+					else if (coding == IdCP437) {
+						// SBCS(Single Byte Code Set)
+						;
+					}
 					else {
 						assert(FALSE);
 					}
