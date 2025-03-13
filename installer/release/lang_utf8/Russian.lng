@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2025-02-24 by TeraTerm Project
+date=2025-03-04 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -88,6 +88,8 @@ MENU_WINDOW_RESTOREALL=&Восстановить окна
 MENU_WINDOW_CASCADE_UNDO=&Восстановить окна каскадом
 MENU_WINDOW_STACKED_UNDO=&Восстановить окна мозаикой
 MENU_WINDOW_SIDEBYSIDE_UNDO=&Восстановить окна сторона к стороне
+MENU_WINDOW_SINGLE_ENTER=В&ход в режим одного окна
+MENU_WINDOW_SINGLE_EXIT=Вы&ход из режима одного окна
 
 MENU_HELP=&Помощь
 MENU_HELP_INDEX=&Поиск
