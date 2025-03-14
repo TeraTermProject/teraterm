@@ -100,25 +100,6 @@ typedef enum {
 #define IdFile   3
 #define IdNamedPipe   4
 
-  /* XMODEM option */
-#define XoptCheck   1
-#define XoptCRC     2
-#define Xopt1kCRC   3
-#define Xopt1kCksum 4
-
-#define IsXoptCRC(x)	((x) & 2)
-#define IsXopt1k(x)	(((x)-1) & 2)
-
-  /* YMODEM option */
-#define Yopt1K 1
-#define YoptG   2
-#define YoptSingle    3
-
-  /* KERMIT option */
-#define KmtOptLongPacket 1
-#define KmtOptFileAttr 2
-#define KmtOptSlideWin 4
-
 // log rotate mode
 enum rotate_mode {
 	ROTATE_NONE,

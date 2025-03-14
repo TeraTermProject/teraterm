@@ -27,9 +27,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, Kermit protocol */
+/* Kermit protocol */
 
-#include "filesys_proto.h"
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,12 +41,17 @@ extern "C" {
 #define IdKmtSend    3
 #define IdKmtFinish  4
 
+  /* KERMIT option */
+#define KmtOptLongPacket 1
+#define KmtOptFileAttr 2
+#define KmtOptSlideWin 4
+
 enum {
 	KMT_MODE
 };
 
 /* prototypes */
-BOOL KmtCreate(PFileVarProto fv);
+BOOL KmtCreate(struct FileVarProto *fv);
 
 #ifdef __cplusplus
 }

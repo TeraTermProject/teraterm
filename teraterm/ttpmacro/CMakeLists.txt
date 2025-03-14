@@ -108,6 +108,7 @@ target_include_directories(
   ${ONIGURUMA_INCLUDE_DIRS}
   ${SFMT_INCLUDE_DIRS}
   ${LIBRESSL_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/../ttpfile
   )
 
 if (MSVC)

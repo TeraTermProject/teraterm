@@ -60,28 +60,6 @@
 #include "bplus.h"
 #include "quickvan.h"
 
-#define OpKmtRcv   3
-#define OpKmtGet   4
-#define OpKmtSend  5
-#define OpKmtFin   6
-#define OpXRcv     7
-#define OpXSend    8
-#define OpZRcv     9
-#define OpZSend    10
-#define OpBPRcv    11
-#define OpBPSend   12
-#define OpQVRcv    13
-#define OpQVSend   14
-#define OpYRcv     15
-#define OpYSend    16
-
-#define PROTO_KMT 1
-#define PROTO_XM  2
-#define PROTO_ZM  3
-#define PROTO_BP  4
-#define PROTO_QV  5
-#define PROTO_YM  6
-
 #define TitKmtRcv   L"Kermit Receive"
 #define TitKmtGet   L"Kermit Get"
 #define TitKmtSend  L"Kermit Send"
@@ -95,8 +73,10 @@
 #define TitQVRcv    L"Quick-VAN Receive"
 #define TitQVSend   L"Quick-VAN Send"
 
+#define IsXoptCRC(x)	((x) & 2)
+#define IsXopt1k(x)	(((x)-1) & 2)
+
 static PFileVarProto FileVar = NULL;
-static int ProtoId;
 static PProtoDlg PtDlg = NULL;
 static BOOL cv_ProtoFlag = FALSE;
 
@@ -278,13 +258,11 @@ static int _ProtoSetOpt(PFileVarProto fv, int request, ...)
 	return r;
 }
 
-static BOOL OpenProtoDlg(PFileVarProto fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
+static BOOL OpenProtoDlg(PFileVarProto fv, ProtoId_t IdProto, int Mode, WORD Opt1, WORD Opt2)
 {
 	PProtoDlg pd;
 
-	ProtoId = IdProto;
-
-	switch (ProtoId) {
+	switch (IdProto) {
 		case PROTO_KMT:
 			KmtCreate(fv);
 			break;
@@ -308,8 +286,9 @@ static BOOL OpenProtoDlg(PFileVarProto fv, int IdProto, int Mode, WORD Opt1, WOR
 			return FALSE;
 			break;
 	}
+	fv->ProtoId = IdProto;
 
-	switch (ProtoId) {
+	switch (fv->ProtoId) {
 		case PROTO_KMT:
 			_ProtoSetOpt(fv, KMT_MODE, Mode);
 			break;
@@ -811,9 +790,22 @@ void ProtoDlgCancel(void)
 		// キャンセルが押されたことを通知する
 		fv->ProtoOp->Cancel(fv, &cv);
 
-		if (ProtoId != PROTO_ZM) {
+		// 特別処理
+		// 		通常何もしない
+		switch (fv->ProtoId) {
+		case PROTO_ZM:
+		case PROTO_XM:
+			break;
+		case PROTO_KMT:
+		case PROTO_BP:
+		case PROTO_QV:
+		case PROTO_YM:
 			// ダイアログを閉じる
 			ProtoEnd();
+			break;
+		default:
+			assert(FALSE);
+			break;
 		}
 	}
 }
@@ -1780,11 +1772,31 @@ BOOL QVStartSend(const wchar_t *filename)
 	return TRUE;
 }
 
+/**
+ *	ファイル転送を行っているか?
+ *
+ *	vtwin.cpp で多く使われている
+ *	メニュの表示時等で利用
+ *	ProtoGetProtoFlag() と同じでは?
+ *
+ *	@retval	TRUE	転送していない
+ *	@retval	FALSE	転送中
+ */
 BOOL IsFileVarNULL()
 {
 	return FileVar == NULL;
 }
 
+/**
+ *	ファイル転送を行っているか?
+ *
+ *	filesys_log.c で多く使われている
+ *	転送を行っているときはログを取らない
+ *	IsFileVarNULL() と同じでは?
+ *
+ *	@retval	TRUE	転送中
+ *	@retval	FALSE	転送していない
+ */
 BOOL ProtoGetProtoFlag(void)
 {
 	return cv_ProtoFlag;

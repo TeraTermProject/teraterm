@@ -30,9 +30,37 @@
 
 #include "filesys_io.h"
 
+typedef enum {
+	PROTO_KMT = 1,
+	PROTO_XM = 2,
+	PROTO_ZM = 3,
+	PROTO_BP = 4,
+	PROTO_QV = 5,
+	PROTO_YM = 6,
+} ProtoId_t;
+
+typedef enum {
+	OpKmtRcv  = 3,
+	OpKmtGet  = 4,
+	OpKmtSend = 5,
+	OpKmtFin  = 6,
+	OpXRcv    = 7,
+	OpXSend   = 8,
+	OpZRcv    = 9,
+	OpZSend   = 10,
+	OpBPRcv   = 11,
+	OpBPSend  = 12,
+	OpQVRcv   = 13,
+	OpQVSend  = 14,
+	OpYRcv    = 15,
+	OpYSend   = 16,
+} OpId_t;
+
 typedef struct FileVarProto {
 	// Å´protosys_proto.cppì‡ÇÃÇ›égóp
-	WORD OpId;
+
+	ProtoId_t ProtoId;
+	OpId_t OpId;
 
 	HWND HMainWin;
 	HWND HWin;

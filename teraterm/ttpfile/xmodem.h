@@ -27,9 +27,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, XMODEM protocol */
+/* XMODEM protocol */
 
-#include "filesys_proto.h"
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,13 +39,19 @@ extern "C" {
 #define IdXReceive 1
 #define IdXSend    2
 
+  /* XMODEM option */
+#define XoptCheck   1
+#define XoptCRC     2
+#define Xopt1kCRC   3
+#define Xopt1kCksum 4
+
 enum {
 	XMODEM_MODE,
 	XMODEM_OPT,
 	XMODEM_TEXT_FLAG,
 };
 
-BOOL XCreate(PFileVarProto fv);
+BOOL XCreate(struct FileVarProto *fv);
 
 #ifdef __cplusplus
 }

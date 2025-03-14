@@ -27,7 +27,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, ZMODEM protocol */
+/* ZMODEM protocol */
 
 #pragma once
 #include "filesys_proto.h"

@@ -26,9 +26,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, YMODEM protocol */
+/* YMODEM protocol */
 
-#include "filesys_proto.h"
+#pragma once
+
+#include "xmodem.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,13 +40,18 @@ extern "C" {
 #define IdYReceive 1
 #define IdYSend    2
 
+  /* YMODEM option */
+#define Yopt1K 1
+#define YoptG   2
+#define YoptSingle    3
+
 enum {
 	YMODEM_MODE,
 	YMODEM_OPT,
 };
 
 /* prototypes */
-BOOL YCreate(PFileVarProto fv);
+BOOL YCreate(struct FileVarProto *fv);
 
 #ifdef __cplusplus
 }
