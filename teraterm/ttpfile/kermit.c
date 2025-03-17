@@ -34,6 +34,7 @@
 #include "tttypes.h"
 #include "ttcommon.h"
 #include "protolog.h"
+#include "filesys_proto.h"
 
 #include "kermit.h"
 

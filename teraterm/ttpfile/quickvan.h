@@ -27,7 +27,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, Quick-VAN protocol */
+/* Quick-VAN protocol */
 
 #pragma once
 #include "filesys_proto.h"

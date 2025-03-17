@@ -56,7 +56,8 @@ typedef struct {
 	BYTE PktNum, PktNumSent;
 	int PktNumOffset;
 	PKT_READ_MODE PktReadMode;
-	WORD XMode, XOpt;
+	WORD XMode;		// IdXSend or IdXReceive
+	WORD XOpt;		// XoptCheck or XoptCRC or Xopt1kCRC or Xopt1kCksum
 	BOOL TextFlagConvertCRLF;
 	BOOL TextFlagTrim1A;
 	NAK_MODE NAKMode;
@@ -86,6 +87,7 @@ typedef struct {
 	enum {
 		STATE_FLUSH,
 		STATE_NORMAL,
+		STATE_CANCELD,
 	} state;
 
 } TXVar;
@@ -344,7 +346,7 @@ static void XCancel(PFileVarProto fv, PComVar cv)
 	static const BYTE cancel[] = { CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS };
 
 	XWrite(fv,xv,cv, (PCHAR)&cancel, sizeof(cancel));
-	xv->XMode = 0;				// quit
+	xv->state = STATE_CANCELD;		// quit
 }
 
 static void XTimeOutProc(PFileVarProto fv, PComVar cv)
@@ -352,7 +354,7 @@ static void XTimeOutProc(PFileVarProto fv, PComVar cv)
 	PXVar xv = fv->data;
 	switch (xv->XMode) {
 	case IdXSend:
-		xv->XMode = 0;			// quit
+		xv->state = STATE_CANCELD;	// quit
 		break;
 	case IdXReceive:
 		XSendNAK(fv, xv, cv);
@@ -575,6 +577,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 				}
 				break;
 			case 0x43:
+				// 0x43 = 'C' crcƒ‚[ƒh‚ð—v‹‚µ‚Ä‚¢‚é
 				if ((xv->PktNum == 0) && (xv->PktNumOffset == 0) && (xv->PktNumSent == 0)) {
 					if (xv->XOpt == XoptCheck) {
 						XSetOpt(fv, xv, XoptCRC);
@@ -696,6 +699,9 @@ static BOOL XParse(PFileVarProto fv, PComVar cv)
 		default:
 			return FALSE;
 		}
+	case STATE_CANCELD:
+		XFlushReceiveBuf(fv, xv, cv);
+		return FALSE;
 	}
 	return FALSE;
 }
@@ -757,6 +763,8 @@ BOOL XCreate(PFileVarProto fv)
 	}
 	memset(xv, 0, sizeof(*xv));
 	xv->FileOpen = FALSE;
+	xv->XOpt = XoptCRC;
+	xv->state = STATE_FLUSH;
 	fv->data = xv;
 	fv->ProtoOp = &Op;
 

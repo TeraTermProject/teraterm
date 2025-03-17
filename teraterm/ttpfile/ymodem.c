@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, YMODEM protocol */
+/* YMODEM protocol */
 #include <stdio.h>
 #include <assert.h>
 
@@ -34,6 +34,7 @@
 #include "ttcommon.h"
 #include "ftlib.h"
 #include "protolog.h"
+#include "filesys_proto.h"
 
 #include "ymodem.h"
 

@@ -28,17 +28,26 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "asprintf.h"
 #include "codeconv.h"
+#include "ttlib.h"
 
 #include "protolog.h"
 
+#define USE_STDIO	1
+
 typedef struct {
-	HANDLE LogFile;
 	WORD LogCount;
 	BYTE LogLineBuf[16];
 	wchar_t *Folder;
+	BOOL opend;
+#if USE_STDIO
+	FILE *fp;
+#else
+	HANDLE LogFile;
+#endif
 } PrivateData_t;
 
 static BOOL OpenW(struct ProtoLog *pv, const wchar_t *file)
@@ -50,12 +59,18 @@ static BOOL OpenW(struct ProtoLog *pv, const wchar_t *file)
 	} else {
 		full_path = _wcsdup(file);
 	}
+#if USE_STDIO
+	pdata->opend = (_wfopen_s(&pdata->fp, full_path, L"a+") == 0) ? TRUE : FALSE;
+#else
 	pdata->LogFile = CreateFileW(full_path,
 								 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
 								 CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	pdata->opend = pdata->LogFile == INVALID_HANDLE_VALUE ? FALSE : TRUE;
+#endif
+	assert(pdata->opend == TRUE);
 	free(full_path);
 	pdata->LogCount = 0;
-	return pdata->LogFile == INVALID_HANDLE_VALUE ? FALSE : TRUE;
+	return pdata->opend;
 }
 
 static BOOL OpenA(TProtoLog *pv, const char *file)
@@ -77,24 +92,41 @@ static BOOL OpenU8(TProtoLog *pv, const char *fileU8)
 static void Close(TProtoLog *pv)
 {
 	PrivateData_t *pdata = (PrivateData_t *)pv->private_data;
-	if (pdata->LogFile != INVALID_HANDLE_VALUE) {
+	if (pdata->opend) {
 		if (pdata->LogCount > 0) {
 			pv->DumpFlush(pv);
 		}
+#if USE_STDIO
+		fclose(pdata->fp);
+		pdata->fp = NULL;
+#else
 		CloseHandle(pdata->LogFile);
 		pdata->LogFile = INVALID_HANDLE_VALUE;
+#endif
+		pdata->opend = FALSE;
 	}
 }
 
 static size_t WriteRawData(struct ProtoLog *pv, const void *data, size_t len)
 {
 	PrivateData_t *pdata = (PrivateData_t *)pv->private_data;
-	DWORD NumberOfBytesWritten;
-	BOOL result = WriteFile(pdata->LogFile, data, (DWORD)len, &NumberOfBytesWritten, NULL);
-	if (result == FALSE) {
-		return 0;
+	size_t written;
+	if (pdata->opend) {
+#if USE_STDIO
+		written = fwrite(data, 1, len, pdata->fp);
+		assert(written == len);
+#else
+		DWORD NumberOfBytesWritten;
+		BOOL result = WriteFile(pdata->LogFile, data, (DWORD)len, &NumberOfBytesWritten, NULL);
+		assert(NumberOfBytesWritten == len);
+		assert(result == TRUE);
+		if (result == FALSE) {
+			NumberOfBytesWritten = 0;
+		}
+		written = NumberOfBytesWritten;
+#endif
 	}
-	return NumberOfBytesWritten;
+	return written;
 }
 
 static size_t WriteStr(TProtoLog *pv, const char *str)
@@ -131,7 +163,11 @@ static void DumpByte(TProtoLog *pv, BYTE b)
 
 static void NewLine(TProtoLog *pv)
 {
+#if USE_STDIO
+	pv->WriteRaw(pv,"\n",1);
+#else
 	pv->WriteRaw(pv,"\015\012",2);	// 0x0d 0x0a "\r\n"
+#endif
 }
 
 /*
@@ -149,26 +185,32 @@ static int ttisprint(int c)
 static void DumpFlush(TProtoLog *pv)
 {
 	PrivateData_t *pdata = (PrivateData_t *)pv->private_data;
+	assert(pdata->opend == TRUE);
 	int rest = 16 - pdata->LogCount;
 	int i;
+	char b[16*3+4+16+2];
+	int len;
 
-	for (i = 0 ; i < rest ; i++)
-		pv->WriteRaw(pv,"   ", 3);
-
-	// ASCII•\Ž¦‚ð’Ç‰Á (2008.6.3 yutaka)
-	pv->WriteRaw(pv,"    ", 4);
-	for (i = 0 ; i < pdata->LogCount ; i++) {
-		char ch[5];
-		if (ttisprint(pdata->LogLineBuf[i])) {
-			_snprintf_s(ch, sizeof(ch), _TRUNCATE, "%c", pdata->LogLineBuf[i]);
-			pv->WriteRaw(pv, ch, 1);
-
-		} else {
-			pv->WriteRaw(pv, ".", 1);
-
-		}
-
+	len = 0;
+	b[0] = 0;
+	for (i = 0 ; i < rest ; i++) {
+		len += 3;
+		strcat(b, "   ");
 	}
+
+	strcat(b, "    ");	// 4 space
+	len += 4;
+	for (i = 0 ; i < pdata->LogCount ; i++) {
+		char ch = pdata->LogLineBuf[i];
+		if (!ttisprint(ch)) {
+			ch = '.';
+		}
+		b[len] = ch;
+		len++;
+	}
+	b[len] = 0;
+
+	pv->WriteRaw(pv, b, len);
 	pdata->LogCount = 0;
 
 	NewLine(pv);
@@ -231,6 +273,7 @@ TProtoLog *ProtoLogCreate()
 		free(pv);
 		return NULL;
 	}
+	pdata->opend = FALSE;
 
 	pv->Open = OpenA;
 	pv->OpenA = OpenA;
@@ -247,7 +290,11 @@ TProtoLog *ProtoLogCreate()
 	pv->Destory = ProtoLogDestroy;
 	pv->private_data = pdata;
 
+#if USE_STDIO
+	pdata->fp = NULL;
+#else
 	pdata->LogFile = INVALID_HANDLE_VALUE;
+#endif
 
 	return pv;
 }

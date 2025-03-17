@@ -27,7 +27,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTFILE.DLL, B-Plus protocol */
+/* B-Plus protocol */
 
 #pragma once
 #include "filesys_proto.h"

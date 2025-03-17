@@ -67,6 +67,7 @@
 #include "dllutil.h"
 #include "asprintf.h"
 #include "win32helper.h"
+#include "xmodem.h"
 
 #define TTERMCOMMAND "TTERMPRO"
 #define CYGTERMCOMMAND "cyglaunch -o"

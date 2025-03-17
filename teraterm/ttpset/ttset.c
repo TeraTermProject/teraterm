@@ -58,6 +58,9 @@
 #include "vtdisp.h"
 #include "makeoutputstring.h"
 #include "history_store.h"
+#include "xmodem.h"
+#include "ymodem.h"
+#include "kermit.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
