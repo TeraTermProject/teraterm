@@ -4761,7 +4761,7 @@ static unsigned int XtColor2TTColor(int mode, unsigned int xt_color)
 			colornum = CS_VT_BLINKFG;
 			break;
 		  case 259:
-			colornum = CS_VT_REVERSEBG;
+			colornum = CS_VT_REVERSEFG;
 			break;
 		  case CS_UNSPEC:
 			if (mode == 104) {
@@ -4806,6 +4806,12 @@ static unsigned int XtColor2TTColor(int mode, unsigned int xt_color)
 		break;
 	  case 16:
 		colornum = CS_TEK_BG;
+		break;
+	  case 17:
+		colornum = CS_VT_BOLDBG;
+		break;
+	  case 19:
+		colornum = CS_VT_BOLDFG;
 		break;
 	}
 	return colornum;

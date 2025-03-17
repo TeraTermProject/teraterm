@@ -912,6 +912,17 @@ OSC <i>Ps</i> ; <i>Pt</i> BEL
 <tr><td> 0, 1, 2 </td>		<td>ウィンドウタイトルを <i>Pt</i> に変更する。</td></tr>
 <tr><td> 4 </td>		<td>色を設定する。
 <i>Pt</i> は <i>c</i> ; <i>spec</i> という書式で、色番号 <i>c</i> の色を <i>spec</i> に設定する。<br>
+<i>c</i> は次の値を受け付ける。
+
+<table border="1">
+<tr><th>値</th>	<th>機能</th></tr>
+<tr><td>0-255</td> <td>色番号</td></tr>
+<tr><td>256</td> <td>太字(bold)属性<a href="#Bold">*</a>の文字色</td></tr>
+<tr><td>257</td> <td>下線(underline)属性の文字色</td></tr>
+<tr><td>258</td> <td>点滅(blink)属性の文字色</td></tr>
+<tr><td>259</td> <td>反転(reverse)属性の文字色</td></tr>
+</table>
+
 <i>spec</i> は以下の形式を受け付ける。
 <pre>
 rgb:<i>r</i>/<i>g</i>/<i>b</i>
@@ -932,12 +943,13 @@ OSC 4 ; <i>c</i> ; rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i> ST
 <tr><td> 5 </td>		<td>文字属性の色を設定する。
 <i>Pt</i> は <i>c</i> ; <i>spec</i> という書式で、<i>c</i> に対応する文字属性の色を <i>spec</i> に設定する。<br>
 <i>c</i> と文字属性の対応は以下の通り。<br>
-<pre>
-<i>c</i> = 0   太字
-  = 1   下線
-  = 2   点滅
-  = 3   反転
-</pre>
+<table border="1">
+<tr><th><i>c</i></th>	<th>文字属性</th></tr>
+<tr><td>0</td> <td>太字(bold)属性<a href="#Bold">*</a>の文字色</td></tr>
+<tr><td>1</td> <td>下線(underline)属性の文字色</td></tr>
+<tr><td>2</td> <td>点滅(blink)属性の文字色</td></tr>
+<tr><td>3</td> <td>反転(reverse)属性の文字色</td></tr>
+</table>
 <i>spec</i> の形式は、OSC 4 の <i>spec</i> と同じ。<br>
 太字属性については<a href="#Bold">下記</a>を参照
 </td></tr>
@@ -948,9 +960,9 @@ OSC 4 ; <i>c</i> ; rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i> ST
 <!-- tr><td> 14 </td>		<td>VTウィンドウのマウスカーソル背景色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr -->
 <tr><td> 15 </td>		<td>TEKウィンドウの文字色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
 <tr><td> 16 </td>		<td>TEKウィンドウの背景色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
-<!-- tr><td> 17 </td>		<td>強調文字背景色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr -->
+<tr><td> 17 </td>		<td>太字属性の背景色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
 <!-- tr><td> 18 </td>		<td>TEKウィンドウのカーソル色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr -->
-<!-- tr><td> 19 </td>		<td>強調文字色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr -->
+<tr><td> 19 </td>		<td>太字属性の文字色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
 <tr><td> 52 </td>		<td>クリップボードへのアクセス。
 <pre>
 <i>Pt</i> = <i>Pc</i> ; <i>Pd</i>
@@ -971,9 +983,9 @@ OSC 4 ; <i>c</i> ; rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i> ST
 <!-- tr><td> 114 </td>		<td>VTウィンドウのマウスカーソル背景色を初期値に戻す。</td></tr -->
 <tr><td> 115 </td>		<td>TEKウィンドウの文字色を初期値に戻す。</td></tr>
 <tr><td> 116 </td>		<td>TEKウィンドウの背景色を初期値に戻す。</td></tr>
-<!-- tr><td> 117 </td>		<td>強調文字背景色を初期値に戻す。</td></tr -->
+<tr><td> 117 </td>		<td>太字属性の背景色を初期値に戻す。</td></tr>
 <!-- tr><td> 118 </td>		<td>TEKウィンドウのカーソル色を初期値に戻す。</td></tr -->
-<!-- tr><td> 119 </td>		<td>強調文字色を初期値に戻す。</td></tr -->
+<tr><td> 119 </td>		<td>太字属性の文字色を初期値に戻す。</td></tr>
 </table>
 
 <h2 id="SOS">SOSシーケンス</h2>
