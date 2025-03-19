@@ -106,9 +106,11 @@ static int NumOfLinesInBuff;
 static int BuffStartAbs, BuffEndAbs;
 
 // 選択
-static BOOL Selected;		// TRUE=領域選択が行われている
-static BOOL Selecting;
-static POINT SelectStart, SelectStartTmp, SelectEnd;
+static BOOL Selected;			// TRUE = 領域選択されている
+static BOOL Selecting;			// ?
+static POINT SelectStart;
+static POINT SelectEnd;
+static POINT ClickCell;			// クリックした文字cell
 static POINT SelectEndOld;
 static DWORD SelectStartTime;
 static BOOL BoxSelect;
@@ -4383,7 +4385,7 @@ void BuffDblClk(int Xw, int Yw)
 	CaretOff();
 
 	if (!Selecting) {
-		SelectStart = SelectStartTmp;
+		SelectStart = ClickCell;
 		Selecting = TRUE;
 	}
 
@@ -4494,6 +4496,66 @@ void BuffSeveralPagesSelect(int Xw, int Yw)
 	SeveralPageSelect = TRUE;
 }
 
+/**
+ *	文字の存在するcell位置を返す
+ *
+ *	VT Window上の(x,y)のcell位置から文字の存在するcell位置を返す
+ *	文字のcell数と、cell上の右側か左側か(right)を判断してcell位置を返す
+ *
+ *	@param[in]	x		VT Windows上の文字(セル)位置
+ *	@param[in]	y		バッファ上のy(PageStart加算済み)
+ *	@param[in]	right	FALSE/TRUE = cell上の左側/右側
+ *	@return		文字のcell位置
+ */
+static POINT GetCharCell(int x, int y, BOOL right)
+{
+//	y = y + PageStart;
+
+	// clip
+	x = x < 0 ? 0 : x > NumOfColumns ? NumOfColumns : x;
+	y = y < 0 ? 0 : y > BuffEnd - 1 ? BuffEnd - 1 : y;
+
+	int ptr = GetLinePtr(y);
+	int x_char = LeftHalfOfDBCS(ptr, x);		// 文字の先頭
+
+	const buff_char_t *b = CodeBuffW + ptr + x_char;
+	int cell = b->cell;
+	if ((cell & 1) == 0) {
+		// 偶数長cell文字(2cellなど)
+		int pos = x - x_char;
+		if (pos >= (cell / 2)) {
+			// 文字の中央より右側なので、一つ右の文字を選択
+			if ((x_char + cell) < (NumOfColumns - 1)) {
+				x = x_char + cell;
+			}
+		}
+	} else {
+		// 奇数長cell文字(1cell,3cellなど)
+		int x_th = x_char + (cell + 1) / 2 - 1;
+		if (x == x_th) {
+			// ちょうど真ん中のcellだった時
+			if (right == FALSE) {
+				// cellの左側なので、文字の先頭
+				x = x_char;
+			} else {
+				// cellの右側なので、一つ右の文字を選択
+				x = x_char + cell;
+			}
+		} else if (x < x_th) {
+			// 文字の左側なので、文字の先頭
+			x = x_char;
+		} else {
+			// 文字の右側なので、一つ右の文字を選択
+			x = x_char + cell;
+		}
+	}
+
+	POINT pos;
+	pos.x = x;
+	pos.y = y;
+	return pos;
+}
+
 void BuffStartSelect(int Xw, int Yw, BOOL Box)
 //  Start text selection by mouse button down
 //    Xw: horizontal position in window coordinate (pixels)
@@ -4502,7 +4564,6 @@ void BuffStartSelect(int Xw, int Yw, BOOL Box)
 {
 	int X, Y;
 	BOOL Right;
-	LONG TmpPtr;
 
 	DispConvWinToScreen(Xw,Yw, &X,&Y,&Right);
 	Y = Y + PageStart;
@@ -4524,51 +4585,39 @@ void BuffStartSelect(int Xw, int Yw, BOOL Box)
 	SelectStartTime = GetTickCount();
 	Selecting = FALSE;
 
-#define range_check(v, min, max)	((v)<(min) ? (min) : (v)>(max) ? (max) : (v))
-	SelectStartTmp.x = range_check(X, 0, NumOfColumns);
-	SelectStartTmp.y = range_check(Y, 0, BuffEnd-1);
+	ClickCell = GetCharCell(X, Y, Right);
 
-	TmpPtr = GetLinePtr(SelectStart.y);
-	SelectStartTmp.x = LeftHalfOfDBCS(TmpPtr, SelectStartTmp.x);
-	// check if the cursor is on the right half of a character
-#if 0
-	if ((SelectStartTmp.x>0) &&
-	    (((CodeBuffW[TmpPtr+SelectStartTmp.x-1].attr & AttrKanji) != 0) ||
-		 ((CodeBuffW[TmpPtr+SelectStartTmp.x].attr & AttrKanji) == 0)) &&
-	     Right) {
-		SelectStartTmp.x++;
-	}
-#endif
-
-	SelectEnd = SelectStartTmp;
+	SelectEnd = ClickCell;
 	SelectEndOld = SelectEnd;
 	CaretOff();
 	Selected = TRUE;
 	BoxSelect = Box;
 }
 
+/**
+ *  Change selection region by mouse move
+ *	マウスが移動して選択領域が変化
+ *
+ *	@param Xw		horizontal position of the mouse cursor
+ *					in window coordinate
+ *	@param Yw		vertical
+ *	@param NClick	1/2/3	ポインタ移動直前のクリック数
+ */
 void BuffChangeSelect(int Xw, int Yw, int NClick)
-//  Change selection region by mouse move
-//    Xw: horizontal position of the mouse cursor
-//			in window coordinate
-//    Yw: vertical
 {
 	int X, Y;
 	BOOL Right;
-	LONG TmpPtr;
-//	int i;
-//	BYTE b;
-//	BOOL DBCS;
+
+	DispConvWinToScreen(Xw,Yw,&X,&Y,&Right);
 
 	if (!Selecting) {
 		if (GetTickCount() - SelectStartTime < ts.SelectStartDelay) {
 			return;
 		}
-		SelectStart = SelectStartTmp;
+		SelectStart = ClickCell;
 		Selecting = TRUE;
 	}
 
-	DispConvWinToScreen(Xw,Yw,&X,&Y,&Right);
 	Y = Y + PageStart;
 
 	if (X<0) X = 0;
@@ -4580,27 +4629,11 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 		Y = BuffEnd - 1;
 	}
 
-	TmpPtr = GetLinePtr(Y);
 	LockBuffer();
 
-	X = LeftHalfOfDBCS(TmpPtr, X);
-
-	// check if the cursor is on the right half of a character
-#if 0
-	if ((X>0) &&
-	    (((CodeBuffW[TmpPtr+X-1].attr & AttrKanji) != 0) || (X<NumOfColumns)) &&
-	    ((CodeBuffW[TmpPtr+X].attr & AttrKanji) == 0) &&
-	    Right) {
-		X++;
-	}
-
-	if (X > NumOfColumns) {
-		X = NumOfColumns;
-	}
-#endif
-
-	SelectEnd.x = X;
-	SelectEnd.y = Y;
+	SelectEnd = GetCharCell(X, Y, Right);
+	X = SelectEnd.x;
+	Y = SelectEnd.y;
 
 	if (NClick==2) { // drag after double click
 		if ((DblClkStart.y > Y) ||
@@ -4613,11 +4646,11 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 			SelectEnd.y = dest_y;
 			SelectStart = DblClkEnd;
 		} else if ((DblClkEnd.y < Y) ||
-				   (DblClkEnd.y == Y && X >= DblClkEnd.x)) {
+				   (DblClkEnd.y == Y && X > DblClkEnd.x)) {
 			// ダブルクリック選択領域より後ろを選択
 			int dest_x;
 			int dest_y;
-			SearchDelimiterNext(X, Y, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
+			SearchDelimiterNext(X - 1, Y, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
 			SelectEnd.x = dest_x + 1;
 			SelectEnd.y = dest_y;
 			SelectStart = DblClkStart;
@@ -4668,7 +4701,7 @@ wchar_t *BuffEndSelect(void)
 			Selected = FALSE;
 			return NULL;
 		}
-		SelectStart = SelectStartTmp;
+		SelectStart = ClickCell;
 	}
 
 	Selected = (SelectStart.x!=SelectEnd.x) ||
