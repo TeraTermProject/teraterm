@@ -739,36 +739,8 @@ static void PutU32NoLog(unsigned int code)
 		dec_special = CharSetIsSpecial(charset_data, code);
 	}
 
-	if (ts.Dec2Unicode) {
-		if (dec_special) {
-			// DEC特殊文字からUnicodeへのマッピング
-			if (ts.Dec2Unicode) {
-				// 0x5fから0x7e を Unicode に割り振る
-				//  Unicodeへのマッピングは
-				//  DEC Special Graphics(Wikipedia en)のUnicodeを参考にした
-				//	 https://en.wikipedia.org/wiki/DEC_Special_Graphics
-				static const char16_t dec2unicode[] = {
-											0x00a0,		// 0x5f
-
-					0x25c6, 0x2592, 0x2409,	0x240c,		// 0x60 -
-					0x240d, 0x240a, 0x00b0, 0x00b1,
-					0x2424, 0x240b, 0x2518, 0x2510,
-					0x250c, 0x2514, 0x253c, 0x23ba,		// 0x6c - 0x6f
-
-					0x23bb, 0x2500, 0x23bc, 0x23bd,		// 0x70 -
-					0x251c, 0x2524, 0x2534, 0x252c,
-					0x2502, 0x2264, 0x2265, 0x03c0,
-					0x2260, 0x00a3, 0x00b7,				// 0x7c - 0x7e
-				};
-				code = code & 0x7F;
-				if (0x5f <= code && code <= 0x7e) {
-					code = dec2unicode[code - 0x5f];
-					dec_special = FALSE;
-				}
-			}
-		}
-	}
-	else {
+	switch ((IdDecSpecial)ts.Dec2Unicode) {
+	case IdDecSpecialUniToDec: {
 		// UnicodeからDEC特殊文字へのマッピング
 		if (dec_special == FALSE && ts.UnicodeDecSpMapping) {
 			unsigned short cset;
@@ -778,6 +750,41 @@ static void PutU32NoLog(unsigned int code)
 				code = cset & 0xff;
 			}
 		}
+		break;
+	}
+	case IdDecSpecialDecToUni:
+		// DEC特殊文字からUnicodeへのマッピングする
+		if (dec_special) {
+			// 0x5fから0x7e を Unicode に割り振る
+			//  Unicodeへのマッピングは
+			//  DEC Special Graphics(Wikipedia en)のUnicodeを参考にした
+			//	 https://en.wikipedia.org/wiki/DEC_Special_Graphics
+			static const char16_t dec2unicode[] = {
+										0x00a0,		// 0x5f
+
+				0x25c6, 0x2592, 0x2409, 0x240c,		// 0x60 -
+				0x240d, 0x240a, 0x00b0, 0x00b1,
+				0x2424, 0x240b, 0x2518, 0x2510,
+				0x250c, 0x2514, 0x253c, 0x23ba,		// 0x6c - 0x6f
+
+				0x23bb, 0x2500, 0x23bc, 0x23bd,		// 0x70 -
+				0x251c, 0x2524, 0x2534, 0x252c,
+				0x2502, 0x2264, 0x2265, 0x03c0,
+				0x2260, 0x00a3, 0x00b7,				// 0x7c - 0x7e
+			};
+			code = code & 0x7F;
+			if (0x5f <= code && code <= 0x7e) {
+				code = dec2unicode[code - 0x5f];
+				dec_special = FALSE;
+			}
+		}
+		break;
+	case IdDecSpecialDoNot:
+		// DEC Special Graphics に関連たマッピングは行わない
+		break;
+	default:
+		assert(FALSE);
+		break;
 	}
 
 	CharAttrTmp = CharAttr;

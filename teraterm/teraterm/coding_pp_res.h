@@ -17,15 +17,16 @@
 #define IDC_AMBIGUOUS_WIDTH_COMBO       2607
 #define IDC_EMOJI_WIDTH_CHECK           2608
 #define IDC_EMOJI_WIDTH_COMBO           2609
-#define IDC_UNICODE2DEC                 2612
-#define IDC_DEC2UNICODE                 2613
-#define IDC_DEC2UNICODE_BOXDRAWING      2614
-#define IDC_DEC2UNICODE_PUNCTUATION     2615
-#define IDC_DEC2UNICODE_MIDDLEDOT       2616
-#define IDC_AMBIGUOUS_WIDTH_TITLE       2617
+#define IDC_DECSP_UNI2DEC               2610
+#define IDC_DECSP_DEC2UNI               2611
+#define IDC_DECSP_DO_NOT                2612
+#define IDC_DEC2UNICODE_BOXDRAWING      2613
+#define IDC_DEC2UNICODE_PUNCTUATION     2614
+#define IDC_DEC2UNICODE_MIDDLEDOT       2615
+#define IDC_AMBIGUOUS_WIDTH_TITLE       2616
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1

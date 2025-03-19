@@ -70,6 +70,7 @@ add_library(
   ttlib_types.h
   tttext.cpp
   tttext.h
+  tttypes.h
   win32helper.cpp
   win32helper.h
 )
