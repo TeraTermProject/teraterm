@@ -26,6 +26,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "tttypes_charset.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -37,11 +41,17 @@ int UnicodeIsVariationSelector(unsigned long u32);
 #endif
 int UnicodeIsEmoji(unsigned long u32);
 unsigned short UnicodeCombining(unsigned short first_code, unsigned short code);
-int UnicodeFromISO8859(int part, unsigned char b, unsigned short *u16);
-int UnicodeToISO8859(int part, unsigned long u32, unsigned char *b);
 int UnicodeIsVirama(unsigned long u32);
 int UnicodeBlockIndex(unsigned long u32);
 const char *UnicodeBlockName(int);
+#if 1
+int UnicodeFromISO8859(IdKanjiCode part, unsigned char b, unsigned short *u16);
+int UnicodeToISO8859(IdKanjiCode part, unsigned long u32, unsigned char *b);
+int UnicodeFromCodePage(IdKanjiCode kanji_code, unsigned char b, unsigned short *u16);
+int UnicodeToCodePage(IdKanjiCode kanji_code, unsigned long u32, unsigned char *b);
+#endif
+int UnicodeFromSBCS(IdKanjiCode kanji_code, unsigned char b, unsigned short *u16);
+int UnicodeToSBCS(IdKanjiCode kanji_code, unsigned long u32, unsigned char *b);
 
 #ifdef __cplusplus
 }

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/perl
+#!/usr/bin/perl
 use strict;
 use utf8;
 
@@ -18,7 +18,8 @@ open(FILE_OUT, ">:crlf:utf8", $fname_out) || die "Cannot open $fname_out.";
 printf FILE_OUT "\x{feff}";# BOM
 printf FILE_OUT "// $fname_in\n";
 while(my $a = <FILE_IN>) {
-	if ($a =~ /^0x([0-9A-F]+)\s+0x([0-9A-F]+)\s+#\s+(.+)$/) {
+	#if ($a =~ /^0x([0-9A-F]+)\s+0x([0-9A-F]+)\s+#\s+(.+)$/) {
+	if ($a =~ /^0x([0-9A-Fa-f]+)\s+0x([0-9A-Fa-f]+)\s+#\s*(.+)$/) {
 		my $code = hex $1;
 		my $unicode = hex $2;
 		my $name = $3;

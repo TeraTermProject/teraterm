@@ -87,7 +87,11 @@ DllExport BYTE PASCAL RussConv(int cin, int cout, BYTE b)
 // cin: input character set (IdWindows/IdKOI8/Id866/IdISO)
 // cin: output character set (IdWindows/IdKOI8/Id866/IdISO)
 {
+#if 0
 	return CodeConvRussConv(cin, cout, b);
+#else
+	return 0;
+#endif
 }
 
 // Russian character set conversion for a character string

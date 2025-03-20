@@ -36,35 +36,74 @@
 #include "ttlib_charset.h"
 
 static const TKanjiList KanjiList[] = {
-	// coding			GUI							INI
-	{ IdUTF8,			"UTF-8",					"UTF-8" },
-	{ IdISO8859_1,		"ISO8859-1",				"ISO8859-1" },
-	{ IdISO8859_2,		"ISO8859-2",				"ISO8859-2" },
-	{ IdISO8859_3,		"ISO8859-3",				"ISO8859-3" },
-	{ IdISO8859_4,		"ISO8859-4",				"ISO8859-4" },
-	{ IdISO8859_5,		"ISO8859-5",				"ISO8859-5" },
-	{ IdISO8859_6,		"ISO8859-6",				"ISO8859-6" },
-	{ IdISO8859_7,		"ISO8859-7",				"ISO8859-7" },
-	{ IdISO8859_8,		"ISO8859-8",				"ISO8859-8" },
-	{ IdISO8859_9,		"ISO8859-9",				"ISO8859-9" },
-	{ IdISO8859_10,		"ISO8859-10",				"ISO8859-10" },
-	{ IdISO8859_11,		"ISO8859-11",				"ISO8859-11" },
-	{ IdISO8859_13,		"ISO8859-13",				"ISO8859-13" },
-	{ IdISO8859_14,		"ISO8859-14",				"ISO8859-14" },
-	{ IdISO8859_15,		"ISO8859-15",				"ISO8859-15" },
-	{ IdISO8859_16,		"ISO8859-16",				"ISO8859-16" },
+	// coding			GUI												INI
+	{ IdUTF8,			"UTF-8",										"UTF-8" },
+	{ IdISO8859_1,		"ISO8859-1 Latin-1 Western European",			"ISO8859-1" },
+	{ IdISO8859_2,		"ISO8859-2 Latin-2 Central European",			"ISO8859-2" },
+	{ IdISO8859_3,		"ISO8859-3 Latin-3 South European",				"ISO8859-3" },
+	{ IdISO8859_4,		"ISO8859-4 Latin-4 North European",				"ISO8859-4" },
+	{ IdISO8859_5,		"ISO8859-5 Latin/Cyrillic",						"ISO8859-5" },
+	{ IdISO8859_6,		"ISO8859-6 Latin/Arabic",						"ISO8859-6" },
+	{ IdISO8859_7,		"ISO8859-7 Latin/Greek",						"ISO8859-7" },
+	{ IdISO8859_8,		"ISO8859-8 Latin/Hebrew",						"ISO8859-8" },
+	{ IdISO8859_9,		"ISO8859-9 Latin-5 Turkish",					"ISO8859-9" },
+	{ IdISO8859_10,		"ISO8859-10 Latin-6 Nordic",					"ISO8859-10" },
+	{ IdISO8859_11,		"ISO8859-11 Latin/Thai",						"ISO8859-11" },
+	{ IdISO8859_13,		"ISO8859-13 Latin-7 Baltic Rim",				"ISO8859-13" },
+	{ IdISO8859_14,		"ISO8859-14 Latin-8 Celtic",					"ISO8859-14" },
+	{ IdISO8859_15,		"ISO8859-15 Latin-9",							"ISO8859-15" },
+	{ IdISO8859_16,		"ISO8859-16 Latin-10 South-Eastern European",	"ISO8859-16" },
+	// 日本語
 	{ IdSJIS,			"SJIS (CP932)",				"SJIS" },
 	{ IdEUC,			NULL,						"EUC-JP" },
 	{ IdEUC,			"EUC",						"EUC" },
 	{ IdJIS,			"JIS",						"JIS" },
+	// Russian
+#if 0
 	{ IdWindows,		"Windows-1251 (CP1251)",	"Windows-1251" },
 	{ IdKOI8,			"KOI8-R",					"KOI8-R" },
 	{ Id866,			"CP866",					"CP866" },
 //	{ IdISO,			NULL,						"ISO8859-5" },
 	{ IdISO8859_5,		NULL,						"ISO8859-5" },
+#endif
+	// Russian
+#if 1
+	{ IdCP1251,			"CP1251 Windows-1251",		"Windows-1251" },
+	{ IdKOI8_NEW,		"KOI8-R (RFC 1489)",		"KOI8-R" },
+	{ IdCP866,			"CP866 Cyrillic Russian",	"CP866" },
+	{ IdISO8859_5,		"ISO8859-5 Latin/Cyrillic",	"ISO8859-5" },
+#endif
+	// Korean
 	{ IdKoreanCP949,	"KS5601 (CP949)",			"KS5601" },
 	{ IdCnGB2312,		"GB2312 (CP936)",			"GB2312" },
 	{ IdCnBig5,			"Big5 (CP950)",				"BIG5" },
+	// ↓https://www.unicode.org/L2/L1999/99325-E.htm
+	{ IdCP437,			"CP437 Latin (US)",			"CP437" },
+	{ IdCP737,			"CP737 Greek (A)",			"CP737" },
+	{ IdCP775,			"CP775 BaltRim",			"CP775" },
+	{ IdCP850,			"CP850 Latin (A)",			"CP850" },
+	{ IdCP852,			"CP852 Latin (B)",			"CP852" },
+	{ IdCP855,			"CP855 Cyrillic (A)",		"CP855" },
+	{ IdCP857,			"CP857 Turkish",			"CP857" },
+	{ IdCP860,			"CP860 Portuguese",			"CP860" },
+	{ IdCP861,			"CP861 Icelandic",			"CP861" },
+	{ IdCP862,			"CP862 Hebrew",				"CP862" },
+	{ IdCP863,			"CP863 Canada F",			"CP863" },
+	{ IdCP864,			"CP864 Arabic",				"CP864" },
+	{ IdCP865,			"CP865 Nordic",				"CP865" },
+	{ IdCP866,			"CP866 Cyrillic Russian",	"CP866" },
+	{ IdCP869,			"CP869 Greek (B)",			"CP869" },
+	{ IdCP874,			"CP874 Thai",				"CP874" },
+	// ↓https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
+	{ IdCP1250,			"CP1250 Central European",	"CP1250" },
+	{ IdCP1251,			"CP1251 Cyrillic",			"CP1251" },
+	{ IdCP1252,			"CP1252 Latin 1",			"CP1252" },
+	{ IdCP1253,			"CP1253 Greek",				"CP1253" },
+	{ IdCP1254,			"CP1254 Turkish",			"CP1254" },
+	{ IdCP1255,			"CP1255 Hebrew",			"CP1255" },
+	{ IdCP1256,			"CP1256 Arabic",			"CP1256" },
+	{ IdCP1257,			"CP1257 Baltic",			"CP1257" },
+	{ IdCP1258,			"CP1258 Vietnamese",		"CP1258" },
 };
 
 /**
@@ -129,42 +168,6 @@ int GetKanjiCodeFromStrW(const wchar_t *kanji_code_strW)
 	int r = GetKanjiCodeFromStr(kanji_code_str);
 	free(kanji_code_str);
 	return r;
-}
-
-/**
- *	漢字コードから ISO8859の部番号を返す
- *	@param	kanjicode	IdISO8859-1...16
- *	@return 1...16		ISO8859に関係ない漢字コードの場合は1を返す
- */
-int KanjiCodeToISO8859Part(int kanjicode)
-{
-	static const struct {
-		IdKanjiCode kanji_code;
-		int iso8859_part;
-	} list[] = {
-		{ IdISO8859_1, 1 },
-		{ IdISO8859_2, 2 },
-		{ IdISO8859_3, 3 },
-		{ IdISO8859_4, 4 },
-		{ IdISO8859_5, 5 },
-		{ IdISO8859_6, 6 },
-		{ IdISO8859_7, 7 },
-		{ IdISO8859_8, 8 },
-		{ IdISO8859_9, 9 },
-		{ IdISO8859_10, 10 },
-		{ IdISO8859_11, 11 },
-		{ IdISO8859_13, 13 },
-		{ IdISO8859_14, 14 },
-		{ IdISO8859_15, 15 },
-		{ IdISO8859_16, 16 },
-	};
-	for (size_t i = 0; i < _countof(list); i++) {
-		if (list[i].kanji_code == kanjicode) {
-			return list[i].iso8859_part;
-		}
-	}
-	assert(0);
-	return 1;
 }
 
 BOOL LangIsEnglish(WORD kanji_code)

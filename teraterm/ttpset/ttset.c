@@ -945,7 +945,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Russian keyboard type */
 	GetPrivateProfileString(Section, "RussKeyb", "",
 	                        Temp, sizeof(Temp), FName);
-	ts->RussKeyb = str2id(RussList2, Temp, IdWindows);
+	ts->RussKeyb = str2id(RussList2, Temp, /*IdWindows*/0);
 
 	/* Serial port ID */
 	ts->ComPort = GetPrivateProfileInt(Section, "ComPort", 1, FName);
@@ -2452,7 +2452,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "DisableAppCursor", FName, ts->DisableAppCursor);
 
 	/* Russian keyboard type */
-	id2str(RussList2, ts->RussKeyb, IdWindows, Temp, sizeof(Temp));
+	id2str(RussList2, ts->RussKeyb, /*IdWindows*/0, Temp, sizeof(Temp));
 	WritePrivateProfileString(Section, "RussKeyb", Temp, FName);
 
 	/* Serial port ID */

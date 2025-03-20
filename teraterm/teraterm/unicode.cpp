@@ -410,104 +410,216 @@ unsigned short UnicodeCombining(unsigned short first_code, unsigned short code)
 }
 
 typedef struct {
-	unsigned char code;
-	unsigned short unicode;
-} ISO8859Table_t;
+	unsigned char code;			// 0x00...0xff SBCS
+	unsigned short unicode;		// Unicode (...U+ffff)
+} SBCSTable_t;
 
-/**
- *	ISO8859テーブル
- */
-const ISO8859Table_t *GetISO8859Table(int iso8859_part)
+const SBCSTable_t *GetSBCSTable(IdKanjiCode kanji_code, int *table_size)
 {
-	static const ISO8859Table_t iso8859_2[] = {
-#include "iso8859-2.tbl"
+	static const SBCSTable_t iso8859_2[] = {
+#include "mapping/iso8859-2.map"
 	};
-	static const ISO8859Table_t iso8859_3[] = {
-#include "iso8859-3.tbl"
+	static const SBCSTable_t iso8859_3[] = {
+#include "mapping/iso8859-3.map"
 	};
-	static const ISO8859Table_t iso8859_4[] = {
-#include "iso8859-4.tbl"
+	static const SBCSTable_t iso8859_4[] = {
+#include "mapping/iso8859-4.map"
 	};
-	static const ISO8859Table_t iso8859_5[] = {
-#include "iso8859-5.tbl"
+	static const SBCSTable_t iso8859_5[] = {
+#include "mapping/iso8859-5.map"
 	};
-	static const ISO8859Table_t iso8859_6[] = {
-#include "iso8859-6.tbl"
+	static const SBCSTable_t iso8859_6[] = {
+#include "mapping/iso8859-6.map"
 	};
-	static const ISO8859Table_t iso8859_7[] = {
-#include "iso8859-7.tbl"
+	static const SBCSTable_t iso8859_7[] = {
+#include "mapping/iso8859-7.map"
 	};
-	static const ISO8859Table_t iso8859_8[] = {
-#include "iso8859-8.tbl"
+	static const SBCSTable_t iso8859_8[] = {
+#include "mapping/iso8859-8.map"
 	};
-	static const ISO8859Table_t iso8859_9[] = {
-#include "iso8859-9.tbl"
+	static const SBCSTable_t iso8859_9[] = {
+#include "mapping/iso8859-9.map"
 	};
-	static const ISO8859Table_t iso8859_10[] = {
-#include "iso8859-10.tbl"
+	static const SBCSTable_t iso8859_10[] = {
+#include "mapping/iso8859-10.map"
 	};
-	static const ISO8859Table_t iso8859_11[] = {
-#include "iso8859-11.tbl"
+	static const SBCSTable_t iso8859_11[] = {
+#include "mapping/iso8859-11.map"
 	};
-	static const ISO8859Table_t iso8859_13[] = {
-#include "iso8859-13.tbl"
+	static const SBCSTable_t iso8859_13[] = {
+#include "mapping/iso8859-13.map"
 	};
-	static const ISO8859Table_t iso8859_14[] = {
-#include "iso8859-14.tbl"
+	static const SBCSTable_t iso8859_14[] = {
+#include "mapping/iso8859-14.map"
 	};
-	static const ISO8859Table_t iso8859_15[] = {
-#include "iso8859-15.tbl"
+	static const SBCSTable_t iso8859_15[] = {
+#include "mapping/iso8859-15.map"
 	};
-	static const ISO8859Table_t iso8859_16[] = {
-#include "iso8859-16.tbl"
+	static const SBCSTable_t iso8859_16[] = {
+#include "mapping/iso8859-16.map"
+	};
+	static const SBCSTable_t cp1250[] = {
+#include "mapping/cp1250.map"
+	};
+	static const SBCSTable_t cp1251[] = {
+#include "mapping/cp1251.map"
+	};
+	static const SBCSTable_t cp1252[] = {
+#include "mapping/cp1252.map"
+	};
+	static const SBCSTable_t cp1253[] = {
+#include "mapping/cp1253.map"
+	};
+	static const SBCSTable_t cp1254[] = {
+#include "mapping/cp1254.map"
+	};
+	static const SBCSTable_t cp1255[] = {
+#include "mapping/cp1255.map"
+	};
+	static const SBCSTable_t cp1256[] = {
+#include "mapping/cp1256.map"
+	};
+	static const SBCSTable_t cp1257[] = {
+#include "mapping/cp1257.map"
+	};
+	static const SBCSTable_t cp1258[] = {
+#include "mapping/cp1258.map"
+	};
+	static const SBCSTable_t cp437[] = {
+#include "mapping/cp437.map"
+	};
+	static const SBCSTable_t cp737[] = {
+#include "mapping/cp737.map"
+	};
+	static const SBCSTable_t cp775[] = {
+#include "mapping/cp775.map"
+	};
+	static const SBCSTable_t cp850[] = {
+#include "mapping/cp850.map"
+	};
+	static const SBCSTable_t cp852[] = {
+#include "mapping/cp852.map"
+	};
+	static const SBCSTable_t cp855[] = {
+#include "mapping/cp855.map"
+	};
+	static const SBCSTable_t cp857[] = {
+#include "mapping/cp857.map"
+	};
+	static const SBCSTable_t cp860[] = {
+#include "mapping/cp860.map"
+	};
+	static const SBCSTable_t cp861[] = {
+#include "mapping/cp861.map"
+	};
+	static const SBCSTable_t cp862[] = {
+#include "mapping/cp862.map"
+	};
+	static const SBCSTable_t cp863[] = {
+#include "mapping/cp863.map"
+	};
+	static const SBCSTable_t cp864[] = {
+#include "mapping/cp864.map"
+	};
+	static const SBCSTable_t cp865[] = {
+#include "mapping/cp865.map"
+	};
+	static const SBCSTable_t cp866[] = {
+#include "mapping/cp866.map"
+	};
+	static const SBCSTable_t cp869[] = {
+#include "mapping/cp869.map"
+	};
+	static const SBCSTable_t cp874[] = {
+#include "mapping/cp874.map"
+	};
+	static const SBCSTable_t koi8r[] = {
+#include "mapping/koi8-r.map"
 	};
 
-	static const ISO8859Table_t *tables[] = {
-		NULL,	// 0
-		NULL,	// ISO8859-1
-		iso8859_2,
-		iso8859_3,
-		iso8859_4,
-		iso8859_5,
-		iso8859_6,
-		iso8859_7,
-		iso8859_8,
-		iso8859_9,
-		iso8859_10,
-		iso8859_11,
-		NULL,
-		iso8859_13,
-		iso8859_14,
-		iso8859_15,
-		iso8859_16,
+	static const struct {
+		IdKanjiCode kanji_code;
+		const SBCSTable_t *table;
+		int size;
+	} tables[] = {
+		// https://www.unicode.org/L2/L1999/99325-E.htm
+		// ISO 8859
+		{ IdISO8859_1, NULL, 0 },	// ISO8859-1
+		{ IdISO8859_2, iso8859_2, _countof(iso8859_2) },
+		{ IdISO8859_3, iso8859_3, _countof(iso8859_3) },
+		{ IdISO8859_4, iso8859_4, _countof(iso8859_4) },
+		{ IdISO8859_5, iso8859_5, _countof(iso8859_5) },
+		{ IdISO8859_6, iso8859_6, _countof(iso8859_6) },
+		{ IdISO8859_7, iso8859_7, _countof(iso8859_7) },
+		{ IdISO8859_8, iso8859_8, _countof(iso8859_8) },
+		{ IdISO8859_9, iso8859_9, _countof(iso8859_9) },
+		{ IdISO8859_10, iso8859_10, _countof(iso8859_10) },
+		{ IdISO8859_11, iso8859_11, _countof(iso8859_11) },
+		{ IdISO8859_13, iso8859_13, _countof(iso8859_13) },
+		{ IdISO8859_14, iso8859_14, _countof(iso8859_14) },
+		{ IdISO8859_15, iso8859_15, _countof(iso8859_15) },
+		{ IdISO8859_16, iso8859_16, _countof(iso8859_16) },
+		// DOS
+		{ IdCP437, cp437, _countof(cp437) },
+		{ IdCP737, cp737, _countof(cp737) },
+		{ IdCP775, cp775, _countof(cp775) },
+		{ IdCP850, cp850, _countof(cp850) },
+		{ IdCP852, cp852, _countof(cp852) },
+		{ IdCP855, cp855, _countof(cp855) },
+		{ IdCP857, cp857, _countof(cp857) },
+		{ IdCP860, cp860, _countof(cp860) },
+		{ IdCP861, cp861, _countof(cp861) },
+		{ IdCP862, cp862, _countof(cp862) },
+		{ IdCP863, cp863, _countof(cp863) },
+		{ IdCP864, cp864, _countof(cp864) },
+		{ IdCP865, cp865, _countof(cp865) },
+		{ IdCP866, cp866, _countof(cp866) },
+		{ IdCP869, cp869, _countof(cp869) },
+		// Windows
+		{ IdCP874, cp874, _countof(cp874) },
+		{ IdCP1250, cp1250, _countof(cp1250) },
+		{ IdCP1251, cp1251, _countof(cp1251) },
+		{ IdCP1252, cp1252, _countof(cp1252) },
+		{ IdCP1253, cp1253, _countof(cp1253) },
+		{ IdCP1254, cp1254, _countof(cp1254) },
+		{ IdCP1255, cp1255, _countof(cp1255) },
+		{ IdCP1256, cp1256, _countof(cp1256) },
+		{ IdCP1257, cp1257, _countof(cp1257) },
+		{ IdCP1258, cp1258, _countof(cp1258) },
+		// Other ASCII-based
+		{ IdKOI8_NEW, koi8r, _countof(koi8r) },
 	};
-	if (iso8859_part >= _countof(tables)) {
-		assert(0);
-		return NULL;
+	for (int i = 0; i < _countof(tables); i++) {
+		if (kanji_code == tables[i].kanji_code) {
+			if (table_size != NULL) {
+				*table_size = tables[i].size;
+			}
+			return tables[i].table;
+		}
 	}
-	assert(tables[iso8859_part] != NULL);
-	return tables[iso8859_part];
+	assert(0);
+	if (table_size != NULL) {
+		*table_size = 0;
+	}
+	return NULL;
 }
 
-/**
- *	ISO8859からUnicodeへ変換
- */
-int UnicodeFromISO8859(int part, unsigned char b, unsigned short *u16)
+static int UnicodeFromSBCSTable(const SBCSTable_t *table_ptr, int table_size, unsigned char b,
+								unsigned short *u16)
 {
-	if (part == 1) {
-		// ISO8859-1 は unicode と同一
-		*u16 = b;
-		return 1;
-	}
-	const ISO8859Table_t *table = GetISO8859Table(part);
-	if (table == NULL) {
-		// 見つからなかった
+	if (table_ptr == NULL || table_size == 0) {
 		*u16 = 0;
 		return 0;
 	}
+	if (table_size == 0x100) {
+		// 検索不要
+		*u16 = table_ptr[b].unicode;
+		return 1;
+	}
+	// テーブルを検索
 	for (int i = 0; i < 0xff; i++ ){
-		if (table[i].code == b) {
-			*u16 = table[i].unicode;
+		if (table_ptr[i].code == b) {
+			*u16 = table_ptr[i].unicode;
 			return 1;
 		}
 	}
@@ -515,18 +627,59 @@ int UnicodeFromISO8859(int part, unsigned char b, unsigned short *u16)
 	return 0;
 }
 
-/**
- *	UnicodeからISO8859へ変換
- *
- *	@param[in]	part	IS8859の部 1...11,13...16
- *	@param[in]	u32		Unicode
- *	@param[out]	*b		ISO8859 char
- *	@retval		0		変換できない
- *	@retval		1		変換できた
- */
-int UnicodeToISO8859(int part, unsigned long u32, unsigned char *b)
+static int UnicodeToSBCTable(const SBCSTable_t *table_ptr, int table_size, unsigned long u32,
+							 unsigned char *b)
 {
-	if (part == 1) {
+	if (u32 >= 0x10000) {
+		// 変換先に存在しないコード
+		*b = 0;
+		return 0;
+	}
+	const unsigned short u16 = (unsigned short)u32;
+	for (int i = 0; i < table_size; i++ ){
+		if (table_ptr[i].unicode == u16) {
+			*b = table_ptr[i].code;
+			return 1;
+		}
+	}
+	*b = 0;
+	return 0;
+}
+
+/**
+ *	SBCS文字コードからUnicodeへ変換
+ *
+ *	@param[in]	kanji_code	SBCSの文字コードenum
+ *	@param[in]	b			SBCS文字コード
+ *	@param[out]	u16			変換したUnicode
+ *	@retval		0			変換できない
+ *	@retval		1			変換できた
+ */
+int UnicodeFromSBCS(IdKanjiCode kanji_code, unsigned char b, unsigned short *u16)
+{
+	if (kanji_code == IdISO8859_1) {
+		// ISO8859-1 は unicode と同一
+		*u16 = b;
+		return 1;
+	}
+	int table_size;
+	const SBCSTable_t *table_ptr = GetSBCSTable(kanji_code, &table_size);
+	return UnicodeFromSBCSTable(table_ptr, table_size, b, u16);
+}
+
+/**
+ *	UnicodeからSBCS文字コードへ変換
+ *
+ *	@param[in]	kanji_code	SBCSの文字コードenum
+ *	@param[in]	u32			Unicode
+ *	@param[out]	*b			変換したSBCSの文字コード
+ *							変換できなかった時は 0
+ *	@retval		0			変換できない
+ *	@retval		1			変換できた
+ */
+int UnicodeToSBCS(IdKanjiCode kanji_code, unsigned long u32, unsigned char *b)
+{
+	if (kanji_code == IdISO8859_1) {
 		// ISO8859-1 は unicode と同一
 		*b = (unsigned char)u32;
 		return 1;
@@ -536,19 +689,40 @@ int UnicodeToISO8859(int part, unsigned long u32, unsigned char *b)
 		*b = 0;
 		return 0;
 	}
-	const unsigned short u16 = (unsigned short)u32;
-	const ISO8859Table_t *table = GetISO8859Table(part);
-	if (table == NULL) {
-		// 見つからなかった
-		*b = 0;
-		return 0;
-	}
-	for (int i = 0; i < 0xff; i++ ){
-		if (table[i].unicode == u16) {
-			*b = table[i].code;
-			return 1;
-		}
-	}
-	*b = 0;
-	return 0;
+	int table_size = 0;
+	const SBCSTable_t *table_ptr = GetSBCSTable(kanji_code, &table_size);
+	return UnicodeToSBCTable(table_ptr, table_size, u32, b);
+}
+
+/**
+ *	ISO8859からUnicodeへ変換
+ */
+int UnicodeFromISO8859(IdKanjiCode part, unsigned char b, unsigned short *u16)
+{
+	return UnicodeFromSBCS(part, b, u16);
+}
+
+/**
+ *	UnicodeからISO8859へ変換
+ */
+int UnicodeToISO8859(IdKanjiCode part, unsigned long u32, unsigned char *b)
+{
+	return UnicodeToSBCS(part, u32, b);
+}
+
+/**
+ *	CodePageからUnicodeへ変換
+ */
+int UnicodeFromCodePage(IdKanjiCode kanji_code, unsigned char b, unsigned short *u16)
+{
+	return UnicodeFromSBCS(kanji_code, b, u16);
+}
+
+/**
+ *	UnicodeからCodePageへ変換
+ *
+ */
+int UnicodeToCodePage(IdKanjiCode kanji_code, unsigned long u32, unsigned char *b)
+{
+	return UnicodeToSBCS(kanji_code, u32, b);
 }
