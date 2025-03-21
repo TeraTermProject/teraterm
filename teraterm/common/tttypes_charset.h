@@ -64,3 +64,10 @@ typedef enum {
 	// Debug
 	IdDebug,
 } IdKanjiCode;
+
+// DEC Special Graphics
+typedef enum {
+	IdDecSpecialUniToDec,		// 0 = Unicode -> DEC Special
+	IdDecSpecialDecToUni,		// 1 = DEC Special -> Unicode
+	IdDecSpecialDoNot,			// 2 = Do not map
+} IdDecSpecial;

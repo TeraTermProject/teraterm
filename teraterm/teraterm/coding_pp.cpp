@@ -144,8 +144,9 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		//{ IDC_TERMKANASEND, "DLG_TERM_KANASEND" },
 		{ IDC_TERMKINTEXT, "DLG_TERM_KIN" },
 		{ IDC_TERMKOUTTEXT, "DLG_TERM_KOUT" },
-		{ IDC_UNICODE2DEC, "DLG_CODING_UNICODE_TO_DEC" },
-		{ IDC_DEC2UNICODE, "DLG_CODING_DEC_TO_UNICODE" },
+		{ IDC_DECSP_UNI2DEC, "DLG_CODING_DECSP_UNICODE_TO_DEC" },
+		{ IDC_DECSP_DEC2UNI, "DLG_CODING_DECSP_DEC_TO_UNICODE" },
+		{ IDC_DECSP_DO_NOT, "DLG_CODING_DECSP_DO_NOT_MAP" },
 		{ IDC_DEC2UNICODE_BOXDRAWING, "DLG_CODING_UNICODE_TO_DEC_BOXDRAWING" },
 		{ IDC_DEC2UNICODE_PUNCTUATION, "DLG_CODING_UNICODE_TO_DEC_PUNCTUATION" },
 		{ IDC_DEC2UNICODE_MIDDLEDOT, "DLG_CODING_UNICODE_TO_DEC_MIDDLEDOT" },
@@ -233,8 +234,12 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SendDlgItemMessageA(hWnd, IDC_TERMKOUT, CB_SETCURSEL, kanji_out_index, 0);
 
 			// DEC Special Graphics
-			CheckDlgButton(hWnd, IDC_UNICODE2DEC, ts->Dec2Unicode ? BST_UNCHECKED : BST_CHECKED);
-			CheckDlgButton(hWnd, IDC_DEC2UNICODE, ts->Dec2Unicode ? BST_CHECKED : BST_UNCHECKED);
+			CheckDlgButton(hWnd,
+						   ts->Dec2Unicode == IdDecSpecialUniToDec ? IDC_DECSP_UNI2DEC:
+						   ts->Dec2Unicode == IdDecSpecialDecToUni ? IDC_DECSP_DEC2UNI:
+						   IDC_DECSP_DO_NOT,
+						   BST_CHECKED);
+
 			CheckDlgButton(hWnd, IDC_DEC2UNICODE_BOXDRAWING,
 						   (ts->UnicodeDecSpMapping & 0x01) != 0 ? BST_CHECKED : BST_UNCHECKED);
 			CheckDlgButton(hWnd, IDC_DEC2UNICODE_PUNCTUATION,
@@ -317,7 +322,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ts->UnicodeEmojiWidth = (BYTE)GetCurSel(hWnd, IDC_EMOJI_WIDTH_COMBO);
 
 					// DEC Special Graphics
-					ts->Dec2Unicode = (BYTE)IsDlgButtonChecked(hWnd, IDC_DEC2UNICODE);
+					ts->Dec2Unicode =
+						(DWORD)(IsDlgButtonChecked(hWnd, IDC_DECSP_DEC2UNI) ? IdDecSpecialDecToUni:
+								IsDlgButtonChecked(hWnd, IDC_DECSP_UNI2DEC) ? IdDecSpecialUniToDec:
+								IdDecSpecialDoNot);
+
 					ts->UnicodeDecSpMapping =
 						(WORD)((IsDlgButtonChecked(hWnd, IDC_DEC2UNICODE_BOXDRAWING) << 0) |
 							   (IsDlgButtonChecked(hWnd, IDC_DEC2UNICODE_PUNCTUATION) << 1) |

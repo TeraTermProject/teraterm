@@ -584,7 +584,7 @@ struct tttset {
 	wchar_t DialogFontNameW[LF_FACESIZE];
 	BOOL NotifySound;
 	wchar_t *LogDefaultNameW;
-	BOOL Dec2Unicode;
+	DWORD Dec2Unicode;					// IdDecSpecial
 	wchar_t *DelimListW;
 	WORD IniAutoBackup;
 	WORD BracketedSupport;
