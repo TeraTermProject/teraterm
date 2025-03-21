@@ -52,10 +52,12 @@ typedef enum {
 	IdEUC,
 	IdJIS,
 	// Russian code sets
-	IdWindows,			// CP1251
-	IdKOI8,
-	Id866,
-	IdISO,
+#if 0
+	IdWindows,			// Å®IdCP1251
+	IdKOI8,				// Å®IdKOI8_NEW
+	Id866,				// Å®IdCP866
+	IdISO,				// Å®IdISO8859_5
+#endif
 	// Korean
 	IdKoreanCP949,		// CP949, KS5601
 	// Chinese
@@ -63,6 +65,34 @@ typedef enum {
 	IdCnBig5,			// CP950, Big5
 	// Debug
 	IdDebug,
+	// CodePage (Single Byte Character Sets)
+	IdCP437,
+	IdCP737,
+	IdCP775,
+	IdCP850,
+	IdCP852,
+	IdCP855,
+	IdCP857,
+	IdCP860,
+	IdCP861,
+	IdCP862,
+	IdCP863,
+	IdCP864,
+	IdCP865,
+	IdCP866,
+	IdCP869,
+	IdCP874,
+	IdCP1250,
+	IdCP1251,
+	IdCP1252,
+	IdCP1253,
+	IdCP1254,
+	IdCP1255,
+	IdCP1256,
+	IdCP1257,
+	IdCP1258,
+	// Other ASCII-based
+	IdKOI8_NEW,
 } IdKanjiCode;
 
 // DEC Special Graphics

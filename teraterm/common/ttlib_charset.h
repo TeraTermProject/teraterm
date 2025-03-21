@@ -50,8 +50,6 @@ const char *GetKanjiCodeStr(int kanji_code);
 int GetKanjiCodeFromStr(const char *kanji_code_str);
 int GetKanjiCodeFromStrW(const wchar_t *kanji_code_strW);
 
-int KanjiCodeToISO8859Part(int kanjicode);
-
 BOOL LangIsEnglish(WORD kanji_code);
 BOOL LangIsJapanese(WORD kanji_code);
 
