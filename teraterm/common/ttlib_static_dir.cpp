@@ -177,7 +177,7 @@ BOOL IsPortableMode(void)
  *		ttypes.HomeDirW と同一
  *		TERATERM.INI などがおいてあるフォルダ
  *		ttermpro.exe があるフォルダは GetHomeDirW() ではなく GetExeDirW() で取得できる
- *		ExeDirW に portable.ini がある場合、又は、ディレクトリ作成に失敗した場合
+ *		ExeDirW に portable.ini がある場合
  *			ExeDirW
  *		ExeDirW に portable.ini がない場合
  *			%APPDATA%\teraterm5 (%USERPROFILE%\AppData\Roaming\teraterm5)
@@ -196,15 +196,7 @@ wchar_t *GetHomeDirW(HINSTANCE hInst)
 		wchar_t *ret = NULL;
 		awcscats(&ret, path, L"\\teraterm5", NULL);
 		free(path);
-		if (CreateDirectoryW(ret, NULL) == 0) {
-			// タスクスケジューラ経由で実行する際、タスクの実行時に使うユーザアカウントに System、Local Service、Network Service等を
-			// 指定すると、個人用設定ファイルフォルダがシステムフォルダ(下記)になり、フォルダ作成に失敗するため、
-			// ttermpro.exe, プラグインがあるフォルダを返すことにする。
-			// 例 System          : %SystemRoot%\system32\config\systemprofile\AppData\Roaming\teraterm5
-			//    Local Service   : %SystemRoot%\ServiceProfiles\LocalService\AppData\Roaming\teraterm5
-			//    Network Service : %SystemRoot%\ServiceProfiles\NetworkService\AppData\Roaming\teraterm5
-			return GetExeDirW(hInst);
-		}
+		CreateDirectoryW(ret, NULL);
 		return ret;
 	}
 }
@@ -213,7 +205,7 @@ wchar_t *GetHomeDirW(HINSTANCE hInst)
  * Get log directory
  *		ログ保存フォルダ取得
  *		ttypes.LogDirW と同一
- *		ExeDirW に portable.ini がある場合、又は、ディレクトリ作成に失敗した場合
+ *		ExeDirW に portable.ini がある場合
  *			ExeDirW\log
  *		ExeDirW に portable.ini がない場合
  *			%LOCALAPPDATA%\teraterm5 (%USERPROFILE%\AppData\Local\teraterm5)
@@ -235,13 +227,7 @@ wchar_t* GetLogDirW(HINSTANCE hInst)
 		awcscats(&ret, path, L"\\teraterm5", NULL);
 		free(path);
 	}
-	if (CreateDirectoryW(ret, NULL) == 0) {
-		*ret = NULL;
-		wchar_t *ExeDirW = GetExeDirW(hInst);
-		awcscats(&ret, ExeDirW, L"\\log", NULL);
-		free(ExeDirW);
-		CreateDirectoryW(ret, NULL);
-	}
+	CreateDirectoryW(ret, NULL);
 	return ret;
 }
 
