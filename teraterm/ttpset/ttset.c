@@ -945,7 +945,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Russian keyboard type */
 	GetPrivateProfileString(Section, "RussKeyb", "",
 	                        Temp, sizeof(Temp), FName);
-	ts->RussKeyb = str2id(RussList2, Temp, IdWindows);
+	ts->RussKeyb = str2id(RussList2, Temp, /*IdWindows*/0);
 
 	/* Serial port ID */
 	ts->ComPort = GetPrivateProfileInt(Section, "ComPort", 1, FName);
@@ -1566,6 +1566,15 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		ts->MaximizedBugTweak = atoi(Temp);
 	}
 
+	{
+		const UINT ui = GetPrivateProfileIntW(SectionW, L"DecSpMappingDir",
+											  (INT)IdDecSpecialUniToDec, FName);
+		ts->Dec2Unicode =
+			ui == 0 ? IdDecSpecialUniToDec :
+			ui == 1 ? IdDecSpecialDecToUni :
+			ui == 2 ? IdDecSpecialDoNot : IdDecSpecialUniToDec;
+	}
+
 	// Convert Unicode symbol characters to DEC Special characters
 	ts->UnicodeDecSpMapping =
 		GetPrivateProfileInt(Section, "UnicodeToDecSpMapping", 3, FName);
@@ -2008,8 +2017,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	// 通知音
 	ts->NotifySound = GetOnOff(Section, "NotifySound", FName, TRUE);
 
-	ts->Dec2Unicode = FALSE;
-
 	// 自動バックアップ
 	ts->IniAutoBackup = GetOnOff(Section, "IniAutoBackup", FName, TRUE);
 
@@ -2445,7 +2452,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "DisableAppCursor", FName, ts->DisableAppCursor);
 
 	/* Russian keyboard type */
-	id2str(RussList2, ts->RussKeyb, IdWindows, Temp, sizeof(Temp));
+	id2str(RussList2, ts->RussKeyb, /*IdWindows*/0, Temp, sizeof(Temp));
 	WritePrivateProfileString(Section, "RussKeyb", Temp, FName);
 
 	/* Serial port ID */
@@ -2912,6 +2919,12 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	// Maximized bug tweak
 	WriteInt(Section, "MaximizedBugTweak", FName, ts->MaximizedBugTweak);
+
+	WritePrivateProfileIntW(
+		SectionW, L"DecSpMappingDir",
+		(INT)(ts->Dec2Unicode == 0 ? IdDecSpecialUniToDec :
+			  ts->Dec2Unicode == 1 ? IdDecSpecialDecToUni : IdDecSpecialDoNot),
+		FName);
 
 	// Convert Unicode symbol characters to DEC Special characters
 	WriteUint(Section, "UnicodeToDecSpMapping", FName, ts->UnicodeDecSpMapping);

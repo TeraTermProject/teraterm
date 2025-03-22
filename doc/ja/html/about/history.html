@@ -36,8 +36,18 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>シーケンス OSC 17, 19, 117, 119 を実装した。
+      <li>
+        シーケンス OSC 17, 19, 117, 119 を実装した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/532" target="_blank">issue #532</a>)
+      </li>
+      <li>
+        DEC Special Graphics のマッピングしない設定を追加、設定をINIファイルに保存できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/538" target="_blank">issue #538</a>)
+      </li>
+      <li>
+        <a href="../usage/character_encoding.html">使用可能文字コード</a>を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/510" target="_blank">issue #510</a>)
+      </li>
     </ul>
   </li>
 
@@ -58,6 +68,19 @@
       <li>
         MACRO: タスクスケジューラ経由でマクロを実行出来ない不具合を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/196" target="_blank">issue #196</a>)
+        シーケンス OCS 4 259を反転属性の文字色設定に修正した(背景色設定になっていた)
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/532" target="_blank">issue #532</a>)
+      </li>
+      <li>
+        マウスで文字を選択するとき、文字の左右を考慮するよう修正した。
+        Tera Term 5.1以前の動作となった。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/468" target="_blank">issue #468</a>)
+      </li>
+      <li>VTウインドウの<a href="../menu/setup-additional-font.html">フォント選択</a>に下記の修正を行った。(<a href="https://github.com/TeraTermProject/teraterm/issues/335">issue #335</a>)
+        <ul>
+          <li>フォント選択ダイアログで選択したポイントサイズと画面に表示される文字のポイントサイズが一致するよう修正した。</li>
+          <li>画面の解像度が96DPI以外の場合でも、フォント選択ダイアログで選択したポイントサイズが96DPIの場合の値と同じになるよう修正した。</li>
+        </ul>
       </li>
     </ul>
   </li>

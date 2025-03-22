@@ -1626,17 +1626,18 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		}
 		else if (acp == 1251) {
 			// CP1251	Russian,Cyrillic ƒLƒŠƒ‹
-			BYTE c;
-			if (ts.RussKeyb == IdWindows) {
-				// key = CP1251
-				c = (char)nChar;
+			UINT code_page = CP_ACP;
+			if (ts.RussKeyb != /*IdWindows*/0) {
+				code_page = 20866; /*koi8-r*/
 			}
-			else {
-				// key -> CP1251
-				c = RussConv(ts.RussKeyb, IdWindows, nChar);
+			char mb_str[2];
+			size_t mb_len;
+			mb_str[0] = (char)nChar;
+			unsigned int u32;
+			mb_len = MBCPToUTF32(mb_str, 1, code_page, &u32);
+			if (mb_len == 0) {
+				return;
 			}
-			// CP1251 -> UTF-32 -> UTF-16
-			unsigned long u32 = MBCP_UTF32(c, 1251);
 			u16 = (wchar_t)u32;
 		}
 		else {

@@ -47,7 +47,7 @@ typedef enum {
 } CharSet;
 
 typedef struct OutputCharStateTag {
-	WORD KanjiCode;		// 出力文字コード(sjis,jisなど)
+	IdKanjiCode KanjiCode;		// 出力文字コード(sjis,jisなど)
 
 	// JIS 漢字IN/OUT/カナ
 	WORD KanjiIn;		// IdKanjiInA / IdKanjiInB
@@ -150,7 +150,7 @@ void MakeOutputStringInit(
 {
 	assert(state != NULL);
 
-	state->KanjiCode = kanji_code;
+	state->KanjiCode = (IdKanjiCode)kanji_code;
 	state->KanjiIn = KanjiIn;
 	state->KanjiOut = KanjiOut;
 	state->JIS7Katakana = jis7katakana;
@@ -234,164 +234,198 @@ size_t MakeOutputString(
 		TempLen += TempLen2;
 		output_char_count = 1;
 	}
-	else if (states->KanjiCode == IdUTF8) {
-		// UTF-8 で出力
-		size_t utf8_len = sizeof(TempStr);
-		utf8_len = UTF32ToUTF8(u32, TempStr, utf8_len);
-		TempLen += utf8_len;
-	} else if (states->KanjiCode == IdEUC ||
-			   states->KanjiCode == IdJIS ||
-			   states->KanjiCode == IdSJIS) {
-		// 日本語
-		// まず CP932(SJIS) に変換してから出力
-		char mb_char[2];
-		size_t mb_len = sizeof(mb_char);
-		mb_len = UTF32ToMBCP(u32, 932, mb_char, mb_len);
-		if (mb_len == 0) {
-			// SJISに変換できない
-			TempStr[TempLen++] = '?';
-		} else {
-			switch (states->KanjiCode) {
-			case IdEUC:
-				// TODO 半角カナ
-				if (mb_len == 1) {
-					TempStr[TempLen++] = mb_char[0];
-				} else {
-					WORD K;
-					K = (((WORD)(unsigned char)mb_char[0]) << 8) +
-						(WORD)(unsigned char)mb_char[1];
-					K = CodeConvSJIS2EUC(K);
-					TempStr[TempLen++] = HIBYTE(K);
-					TempStr[TempLen++] = LOBYTE(K);
-				}
-				break;
-			case IdJIS:
-				if (u32 < 0x100) {
-					// ASCII
-					TempStr[TempLen++] = mb_char[0];
-					states->SendCode = IdASCII;
-				} else if (IsHalfWidthKatakana(u32)) {
-					// 半角カタカナ
-					if (states->JIS7Katakana==1) {
-						if (states->SendCode != IdKatakana) {
-							TempStr[TempLen++] = SI;
+	else {
+		switch (states->KanjiCode) {
+		case IdUTF8: {
+			// UTF-8 で出力
+			size_t utf8_len = sizeof(TempStr);
+			utf8_len = UTF32ToUTF8(u32, TempStr, utf8_len);
+			TempLen += utf8_len;
+			break;
+		}
+		case IdEUC:
+		case IdJIS:
+		case IdSJIS: {
+			// 日本語
+			// まず CP932(SJIS) に変換してから出力
+			char mb_char[2];
+			size_t mb_len = sizeof(mb_char);
+			mb_len = UTF32ToMBCP(u32, 932, mb_char, mb_len);
+			if (mb_len == 0) {
+				// SJISに変換できない
+				TempStr[TempLen++] = '?';
+			} else {
+				switch (states->KanjiCode) {
+				case IdEUC:
+					// TODO 半角カナ
+					if (mb_len == 1) {
+						TempStr[TempLen++] = mb_char[0];
+					} else {
+						WORD K;
+						K = (((WORD)(unsigned char)mb_char[0]) << 8) +
+							(WORD)(unsigned char)mb_char[1];
+						K = CodeConvSJIS2EUC(K);
+						TempStr[TempLen++] = HIBYTE(K);
+						TempStr[TempLen++] = LOBYTE(K);
+					}
+					break;
+				case IdJIS:
+					if (u32 < 0x100) {
+						// ASCII
+						TempStr[TempLen++] = mb_char[0];
+						states->SendCode = IdASCII;
+					} else if (IsHalfWidthKatakana(u32)) {
+						// 半角カタカナ
+						if (states->JIS7Katakana==1) {
+							if (states->SendCode != IdKatakana) {
+								TempStr[TempLen++] = SI;
+							}
+							TempStr[TempLen++] = mb_char[0] & 0x7f;
+						} else {
+							TempStr[TempLen++] = mb_char[0];
 						}
-						TempStr[TempLen++] = mb_char[0] & 0x7f;
+						states->SendCode = IdKatakana;
+					} else {
+						// 漢字
+						WORD K;
+						K = (((WORD)(unsigned char)mb_char[0]) << 8) +
+							(WORD)(unsigned char)mb_char[1];
+						K = CodeConvSJIS2JIS(K);
+						if (states->SendCode != IdKanji) {
+							// 漢字IN
+							TempStr[TempLen++] = 0x1B;
+							TempStr[TempLen++] = '$';
+							if (states->KanjiIn == IdKanjiInB) {
+								TempStr[TempLen++] = 'B';
+							}
+							else {
+								TempStr[TempLen++] = '@';
+							}
+							states->SendCode = IdKanji;
+						}
+						TempStr[TempLen++] = HIBYTE(K);
+						TempStr[TempLen++] = LOBYTE(K);
+					}
+					break;
+				case IdSJIS:
+					if (mb_len == 1) {
+						TempStr[TempLen++] = mb_char[0];
 					} else {
 						TempStr[TempLen++] = mb_char[0];
+						TempStr[TempLen++] = mb_char[1];
 					}
-					states->SendCode = IdKatakana;
-				} else {
-					// 漢字
-					WORD K;
-					K = (((WORD)(unsigned char)mb_char[0]) << 8) +
-						(WORD)(unsigned char)mb_char[1];
-					K = CodeConvSJIS2JIS(K);
-					if (states->SendCode != IdKanji) {
-						// 漢字IN
-						TempStr[TempLen++] = 0x1B;
-						TempStr[TempLen++] = '$';
-						if (states->KanjiIn == IdKanjiInB) {
-							TempStr[TempLen++] = 'B';
-						}
-						else {
-							TempStr[TempLen++] = '@';
-						}
-						states->SendCode = IdKanji;
-					}
-					TempStr[TempLen++] = HIBYTE(K);
-					TempStr[TempLen++] = LOBYTE(K);
+					break;
+				default:
+					assert(FALSE);
+					break;
 				}
+			}
+			break;
+		}
+		case IdKoreanCP949:
+		case IdCnGB2312:
+		case IdCnBig5: {
+			int code_page;
+			char mb_char[2];
+			size_t mb_len;
+			switch (states->KanjiCode) {
+			case IdKoreanCP949:
+				code_page = 949;
 				break;
-			case IdSJIS:
-				if (mb_len == 1) {
-					TempStr[TempLen++] = mb_char[0];
-				} else {
-					TempStr[TempLen++] = mb_char[0];
-					TempStr[TempLen++] = mb_char[1];
-				}
+			case IdCnGB2312:
+				code_page = 936;
+				break;
+			case IdCnBig5:
+				code_page = 950;
 				break;
 			default:
 				assert(FALSE);
+				code_page = 0;
 				break;
 			}
+			/* code_page に変換して出力 */
+			mb_len = sizeof(mb_char);
+			mb_len = UTF32ToMBCP(u32, code_page, mb_char, mb_len);
+			if (mb_len == 0) {
+				TempStr[TempLen++] = '?';
+			}
+			else if (mb_len == 1) {
+				TempStr[TempLen++] = mb_char[0];
+			} else  {
+				TempStr[TempLen++] = mb_char[0];
+				TempStr[TempLen++] = mb_char[1];
+			}
+			break;
 		}
-	} else if (states->KanjiCode == IdWindows ||
-			   states->KanjiCode == IdKOI8 ||
-			   states->KanjiCode == Id866 ||
-			   states->KanjiCode == IdISO) {
-		/* まずCP1251に変換して出力 */
-		char mb_char[2];
-		size_t mb_len = sizeof(mb_char);
-		BYTE b;
-		mb_len = UTF32ToMBCP(u32, 1251, mb_char, mb_len);
-		if (mb_len != 1) {
-			b = '?';
-		} else {
-			b = CodeConvRussConv(IdWindows, states->KanjiCode, mb_char[0]);
+		case IdISO8859_1:
+		case IdISO8859_2:
+		case IdISO8859_3:
+		case IdISO8859_4:
+		case IdISO8859_5:
+		case IdISO8859_6:
+		case IdISO8859_7:
+		case IdISO8859_8:
+		case IdISO8859_9:
+		case IdISO8859_10:
+		case IdISO8859_11:
+		case IdISO8859_13:
+		case IdISO8859_14:
+		case IdISO8859_15:
+		case IdISO8859_16: {
+			// SBCS
+			unsigned char byte;
+			int r = UnicodeToISO8859(states->KanjiCode, u32, &byte);
+			if (r == 0) {
+				// 変換できない文字コードだった
+				byte = '?';
+			}
+			TempStr[TempLen++] = byte;
+			break;
 		}
-		TempStr[TempLen++] = b;
-	}
-	else if (states->KanjiCode == IdKoreanCP949 ||
-			 states->KanjiCode == IdCnGB2312 ||
-			 states->KanjiCode == IdCnBig5) {
-		int code_page;
-		char mb_char[2];
-		size_t mb_len;
-		switch (states->KanjiCode) {
-		case IdKoreanCP949:
-			code_page = 949;
+		case IdCP437:
+		case IdCP737:
+		case IdCP775:
+		case IdCP850:
+		case IdCP852:
+		case IdCP855:
+		case IdCP857:
+		case IdCP860:
+		case IdCP861:
+		case IdCP862:
+		case IdCP863:
+		case IdCP864:
+		case IdCP865:
+		case IdCP866:
+		case IdCP869:
+		case IdCP874:
+		case IdCP1250:
+		case IdCP1251:
+		case IdCP1252:
+		case IdCP1253:
+		case IdCP1254:
+		case IdCP1255:
+		case IdCP1256:
+		case IdCP1257:
+		case IdCP1258:
+		case IdKOI8_NEW: {
+			unsigned char byte;
+			int r = UnicodeToCodePage(states->KanjiCode, u32, &byte);
+			if (r == 0) {
+				// 変換できない文字コードだった
+				byte = '?';
+			}
+			TempStr[TempLen++] = byte;
 			break;
-		case IdCnGB2312:
-			code_page = 936;
+		}
+		case IdDebug:
 			break;
-		case IdCnBig5:
-			code_page = 950;
-			break;
+#if !defined(__MINGW32__)
 		default:
+			// gcc/clangではswitchにenumのメンバがすべてないとき警告が出る
 			assert(FALSE);
-			code_page = 0;
 			break;
+#endif
 		}
-		/* code_page に変換して出力 */
-		mb_len = sizeof(mb_char);
-		mb_len = UTF32ToMBCP(u32, code_page, mb_char, mb_len);
-		if (mb_len == 0) {
-			TempStr[TempLen++] = '?';
-		}
-		else if (mb_len == 1) {
-			TempStr[TempLen++] = mb_char[0];
-		} else  {
-			TempStr[TempLen++] = mb_char[0];
-			TempStr[TempLen++] = mb_char[1];
-		}
-	}
-	else if (states->KanjiCode == IdISO8859_1 ||
-			 states->KanjiCode == IdISO8859_2 ||
-			 states->KanjiCode == IdISO8859_3 ||
-			 states->KanjiCode == IdISO8859_4 ||
-			 states->KanjiCode == IdISO8859_5 ||
-			 states->KanjiCode == IdISO8859_6 ||
-			 states->KanjiCode == IdISO8859_7 ||
-			 states->KanjiCode == IdISO8859_8 ||
-			 states->KanjiCode == IdISO8859_9 ||
-			 states->KanjiCode == IdISO8859_10 ||
-			 states->KanjiCode == IdISO8859_11 ||
-			 states->KanjiCode == IdISO8859_13 ||
-			 states->KanjiCode == IdISO8859_14 ||
-			 states->KanjiCode == IdISO8859_15 ||
-			 states->KanjiCode == IdISO8859_16) {
-		// SBCS
-		unsigned char byte;
-		int part = KanjiCodeToISO8859Part(states->KanjiCode);
-		int r = UnicodeToISO8859(part, u32, &byte);
-		if (r == 0) {
-			// 変換できない文字コードだった
-			byte = '?';
-		}
-		TempStr[TempLen++] = byte;
-	} else {
-		assert(FALSE);
 	}
 
 	*TempLen_ = TempLen;

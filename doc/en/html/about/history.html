@@ -36,9 +36,17 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>Sequences OSC 17, 19, 117, 119 implemented.
+      <li>
+        Sequences OSC 17, 19, 117, 119 implemented.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/532" target="_blank">issue #532</a>)
-
+      </li>
+      <li>
+        Added a setting to not map DEC Special Graphics, and enabled the setting to be saved in an INI file.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/538" target="_blank">issue #538</a>)
+      </li>
+      <li>
+        Add available <a href="../usage/character_encoding.html">character encodings</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/510" target="_blank">issue #510</a>)
       </li>
     </ul>
   </li>
@@ -60,6 +68,19 @@
       <li>
         MACRO: Fixed the issue where macro could not be executed through the task scheduler.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/196" target="_blank">issue #196</a>)
+        Fixed Corrected Sequences OSC 4 259 to reverse attribute text color setting (was set to background color setting)
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/532" target="_blank">issue #532</a>)
+      </li>
+      <li>
+        Fixed to take into account left and right sides of characters when selecting characters with mouse.
+        The same behavior as before Tera Term 5.1.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/468" target="_blank">issue #468</a>)
+      </li>
+      <li>We made the following modifications to the <a href="../menu/setup-additional-font.html">font selection</a> in the VT window.(<a href="https://github.com/TeraTermProject/teraterm/issues/335">issue #335</a>)
+        <ul>
+          <li>Adjusted so that the point size of the selected font in the font selection dialog matches the point size of the displayed characters on the screen. </li>
+          <li>Even if the screen resolution is not 96 DPI, adjusted so that the point size selected in the font selection dialog matches the value for 96 DPI.</li>
+        </ul>
       </li>
     </ul>
   </li>

@@ -42,16 +42,17 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,129,131,10
     COMBOBOX        IDC_EMOJI_WIDTH_COMBO,34,146,48,50,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "DEC Special Graphics",IDC_STATIC,153,97,110,8
-    CONTROL         "Mapping Unicode to DEC Special Graphics",IDC_UNICODE2DEC,
+    CONTROL         "Mapping Unicode to DEC Special Graphics",IDC_DECSP_UNI2DEC,
                     "Button",BS_AUTORADIOBUTTON,165,110,160,10
+    CONTROL         "Mapping DEC Special Graphics to Unicode",IDC_DECSP_DEC2UNI,
+                    "Button",BS_AUTORADIOBUTTON,165,165,161,10
+    CONTROL         "Do not mapping",IDC_DECSP_DO_NOT,"Button",BS_AUTORADIOBUTTON,165,179,161,10
     CONTROL         "Box-drawing character (U+2500-U+257F)",IDC_DEC2UNICODE_BOXDRAWING,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,177,125,151,10
     CONTROL         "Punctuation, Block Elements, Shade",IDC_DEC2UNICODE_PUNCTUATION,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,177,138,132,10
     CONTROL         "Middle dots (U+00B7,U+2024,U+2219)",IDC_DEC2UNICODE_MIDDLEDOT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,177,152,141,10
-    CONTROL         "Mapping DEC Special Graphics to Unicode",IDC_DEC2UNICODE,
-                    "Button",BS_AUTORADIOBUTTON,165,165,161,10
     LTEXT           "Japanese JIS",IDC_STATIC,10,164,110,8
     LTEXT           "Receive",IDC_STATIC,22,176,110,8
     CONTROL         "Hal&f-width kana",IDC_TERMKANA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,34,186,115,10

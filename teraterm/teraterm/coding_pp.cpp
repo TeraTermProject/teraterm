@@ -144,8 +144,9 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		//{ IDC_TERMKANASEND, "DLG_TERM_KANASEND" },
 		{ IDC_TERMKINTEXT, "DLG_TERM_KIN" },
 		{ IDC_TERMKOUTTEXT, "DLG_TERM_KOUT" },
-		{ IDC_UNICODE2DEC, "DLG_CODING_UNICODE_TO_DEC" },
-		{ IDC_DEC2UNICODE, "DLG_CODING_DEC_TO_UNICODE" },
+		{ IDC_DECSP_UNI2DEC, "DLG_CODING_DECSP_UNICODE_TO_DEC" },
+		{ IDC_DECSP_DEC2UNI, "DLG_CODING_DECSP_DEC_TO_UNICODE" },
+		{ IDC_DECSP_DO_NOT, "DLG_CODING_DECSP_DO_NOT_MAP" },
 		{ IDC_DEC2UNICODE_BOXDRAWING, "DLG_CODING_UNICODE_TO_DEC_BOXDRAWING" },
 		{ IDC_DEC2UNICODE_PUNCTUATION, "DLG_CODING_UNICODE_TO_DEC_PUNCTUATION" },
 		{ IDC_DEC2UNICODE_MIDDLEDOT, "DLG_CODING_UNICODE_TO_DEC_MIDDLEDOT" },
@@ -233,8 +234,12 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SendDlgItemMessageA(hWnd, IDC_TERMKOUT, CB_SETCURSEL, kanji_out_index, 0);
 
 			// DEC Special Graphics
-			CheckDlgButton(hWnd, IDC_UNICODE2DEC, ts->Dec2Unicode ? BST_UNCHECKED : BST_CHECKED);
-			CheckDlgButton(hWnd, IDC_DEC2UNICODE, ts->Dec2Unicode ? BST_CHECKED : BST_UNCHECKED);
+			CheckDlgButton(hWnd,
+						   ts->Dec2Unicode == IdDecSpecialUniToDec ? IDC_DECSP_UNI2DEC:
+						   ts->Dec2Unicode == IdDecSpecialDecToUni ? IDC_DECSP_DEC2UNI:
+						   IDC_DECSP_DO_NOT,
+						   BST_CHECKED);
+
 			CheckDlgButton(hWnd, IDC_DEC2UNICODE_BOXDRAWING,
 						   (ts->UnicodeDecSpMapping & 0x01) != 0 ? BST_CHECKED : BST_UNCHECKED);
 			CheckDlgButton(hWnd, IDC_DEC2UNICODE_PUNCTUATION,
@@ -272,13 +277,12 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					IdKanjiCode coding =
 						(IdKanjiCode)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETITEMDATA, curPos, 0);
 					ts->KanjiCode = coding;
-					if (coding == IdUTF8) {
-						;
-					}
-					else if (coding == IdSJIS || coding == IdEUC) {
-						;
-					}
-					else if (coding == IdJIS) {
+					switch (coding) {
+					case IdUTF8:
+					case IdSJIS:
+					case IdEUC:
+						break;
+					case IdJIS: {
 						ts->JIS7Katakana = (IsDlgButtonChecked(hWnd, IDC_TERMKANA) == BST_CHECKED);
 						ts->JIS7KatakanaSend = (IsDlgButtonChecked(hWnd, IDC_TERMKANASEND) == BST_CHECKED);
 						WORD w = (WORD)GetCurSel(hWnd, IDC_TERMKIN);
@@ -289,21 +293,62 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						if (w > 0) {
 							ts->KanjiOut = w;
 						}
+						break;
 					}
-					else if (coding == IdWindows || coding == IdKOI8 || coding == Id866 || coding == IdISO) {
-						;
-					}
-					else if (coding == IdKoreanCP949) {
-						;
-					}
-					else if (coding == IdCnGB2312 || coding == IdCnBig5) {
-						;
-					}
-					else if (LangIsEnglish(coding)) {
-						;
-					}
-					else {
+					case IdKoreanCP949:
+					case IdCnGB2312:
+					case IdCnBig5:
+					case IdISO8859_1:
+					case IdISO8859_2:
+					case IdISO8859_3:
+					case IdISO8859_4:
+					case IdISO8859_5:
+					case IdISO8859_6:
+					case IdISO8859_7:
+					case IdISO8859_8:
+					case IdISO8859_9:
+					case IdISO8859_10:
+					case IdISO8859_11:
+					case IdISO8859_13:
+					case IdISO8859_14:
+					case IdISO8859_15:
+					case IdISO8859_16:
+					case IdCP437:
+					case IdCP737:
+					case IdCP775:
+					case IdCP850:
+					case IdCP852:
+					case IdCP855:
+					case IdCP857:
+					case IdCP860:
+					case IdCP861:
+					case IdCP862:
+					case IdCP863:
+					case IdCP864:
+					case IdCP865:
+					case IdCP866:
+					case IdCP869:
+					case IdCP874:
+					case IdCP1250:
+					case IdCP1251:
+					case IdCP1252:
+					case IdCP1253:
+					case IdCP1254:
+					case IdCP1255:
+					case IdCP1256:
+					case IdCP1257:
+					case IdCP1258:
+					case IdKOI8_NEW:
+						// SBCS(Single Byte Code Set)
+						break;
+					case IdDebug:	// MinGW警告対策
+						break;
+#if !defined(__MINGW32__)
+					default:
+						// gcc/clangではswitchにenumのメンバがすべてないとき警告が出る
 						assert(FALSE);
+						break;
+#endif
 					}
 
 					// 送信コード
@@ -317,7 +362,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ts->UnicodeEmojiWidth = (BYTE)GetCurSel(hWnd, IDC_EMOJI_WIDTH_COMBO);
 
 					// DEC Special Graphics
-					ts->Dec2Unicode = (BYTE)IsDlgButtonChecked(hWnd, IDC_DEC2UNICODE);
+					ts->Dec2Unicode =
+						(DWORD)(IsDlgButtonChecked(hWnd, IDC_DECSP_DEC2UNI) ? IdDecSpecialDecToUni:
+								IsDlgButtonChecked(hWnd, IDC_DECSP_UNI2DEC) ? IdDecSpecialUniToDec:
+								IdDecSpecialDoNot);
+
 					ts->UnicodeDecSpMapping =
 						(WORD)((IsDlgButtonChecked(hWnd, IDC_DEC2UNICODE_BOXDRAWING) << 0) |
 							   (IsDlgButtonChecked(hWnd, IDC_DEC2UNICODE_PUNCTUATION) << 1) |
@@ -396,7 +445,7 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 		free((void *)ppsp->pResource);
 		ppsp->pResource = NULL;
 		free((void *)ppsp->lParam);
-		ppsp->lParam = NULL;
+		ppsp->lParam = 0;
 		break;
 	default:
 		break;
