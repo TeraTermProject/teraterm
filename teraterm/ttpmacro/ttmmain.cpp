@@ -353,6 +353,7 @@ BOOL CCtrlWindow::OnInitDialog()
 	CenterWindow(m_hWnd, NULL);
 
 	if (VOption) {
+		::PostMessage(m_hWnd, WM_NULL, 0, 0); // message pumpを始動させるため、NULLメッセージをpostしておく
 		return TRUE;
 	}
 	if (IOption) {
