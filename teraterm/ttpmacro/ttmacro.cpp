@@ -150,17 +150,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 
 	// message pump
 	MSG msg;
-	while (GetMessage(&msg, NULL, 0, 0)) {
+	for (;;) {
+		// Windowsのメッセージがない場合のループ
+		for(;;) {
+			if (PeekMessageA(&msg, NULL, NULL, NULL, PM_NOREMOVE) != FALSE) {
+				// メッセージが存在した、ループを抜ける
+				break;
+			}
 
-		if (IsDialogMessage(hWnd, &msg) != 0) {
-			/* 処理された*/
-		} else {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-
-		while (!PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE)) {
-			// メッセージがない
 			if (!OnIdle(lCount)) {
 				// idle不要
 				if (SleepTick < 500) {	// 最大 501ms未満
@@ -174,7 +171,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				lCount++;
 			}
 		}
+
+		// Windowsのメッセージが空になるまで処理する
+		for(;;) {
+			if (GetMessageW(&msg, NULL, 0, 0) == FALSE) {
+				// WM_QUIT
+				goto exit_message_loop;
+			}
+			if (IsDialogMessageW(hWnd, &msg) != 0) {
+				/* 処理された*/
+			} else {
+				TranslateMessage(&msg);
+				DispatchMessageW(&msg);
+			}
+
+			if (PeekMessageA(&msg, NULL, NULL, NULL, PM_NOREMOVE) == FALSE) {
+				// メッセージがなくなった、ループを抜ける
+				break;
+			}
+		}
 	}
+exit_message_loop:
 
 	pCCtrlWindow->DestroyWindow();
 	delete pCCtrlWindow;
