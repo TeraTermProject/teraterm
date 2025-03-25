@@ -47,6 +47,7 @@
 #include "asprintf.h"
 #include "win32helper.h"
 #include "history_store.h"
+#include "compat_win.h"
 
 #include "filesys_log_res.h"
 #include "filesys_log.h"
@@ -327,7 +328,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		// ドロップダウンのエディットコントロールのウィンドウハンドルを取得
 		COMBOBOXINFO cbi;
 		cbi.cbSize = sizeof(COMBOBOXINFO);
-		GetComboBoxInfo(GetDlgItem(Dialog, IDC_FOPT_FILENAME_EDIT), &cbi);
+		_GetComboBoxInfo(GetDlgItem(Dialog, IDC_FOPT_FILENAME_EDIT), &cbi);
 		work->file_edit = cbi.hwndItem;
 
 		// サブクラス化

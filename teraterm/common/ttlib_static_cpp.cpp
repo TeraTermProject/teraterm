@@ -75,7 +75,7 @@ static void CALLBACK TTMessageBoxW_WinEventProc(HWINEVENTHOOK hWinEventHook, DWO
 {
 	if ((GetWindowLongPtr(hwnd, GWL_STYLE) & WS_CHILD) == 0) {
 		CenterWindow(hwnd, GetParent(hwnd));
-		UnhookWinEvent(hWinEventHook);
+		pUnhookWinEvent(hWinEventHook);
 	}
 }
 
@@ -109,8 +109,11 @@ int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILan
 	}
 
 	if (hWnd != NULL) {
-		SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL,
-			&TTMessageBoxW_WinEventProc, GetCurrentProcessId(), GetCurrentThreadId(), WINEVENT_OUTOFCONTEXT);
+		// ウィンドウを親ウィンドウの中央へ移動する
+		if (pSetWinEventHook != NULL) {
+			pSetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, &TTMessageBoxW_WinEventProc,
+							 GetCurrentProcessId(), GetCurrentThreadId(), WINEVENT_OUTOFCONTEXT);
+		}
 	}
 
 	int r = MessageBoxW(hWnd, message, title, uType);

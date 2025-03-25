@@ -116,6 +116,11 @@ LONG_PTR (WINAPI *pGetWindowLongPtrW)(HWND hWnd, int nIndex);
 int (WINAPI *pGetSystemMetricsForDpi)(int nIndex, UINT dpi);
 HDEVNOTIFY (WINAPI *pRegisterDeviceNotificationA)(HANDLE hRecipient, LPVOID NotificationFilter, DWORD Flags);
 BOOL (WINAPI *pUnregisterDeviceNotification)(HDEVNOTIFY Handle);
+HWINEVENTHOOK(WINAPI *pSetWinEventHook)(
+	DWORD eventMin, DWORD eventMax, HMODULE hmodWinEventProc,
+	WINEVENTPROC pfnWinEventProc, DWORD idProcess, DWORD idThread,
+	DWORD dwFlags);
+BOOL (WINAPI *pUnhookWinEvent)(HWINEVENTHOOK hWinEventHook);
 
 // kernel32
 void (WINAPI *pOutputDebugStringW)(LPCWSTR lpOutputString);
@@ -185,6 +190,9 @@ BOOL (WINAPI *pSetupDiGetDeviceRegistryPropertyW)(
 	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
 	DWORD Property, PDWORD PropertyRegDataType,
 	PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize);
+DWORD (WINAPI *pCM_Get_DevNode_Status)(
+	PULONG pulStatus, PULONG pulProblemNumber, DWORD dnDevInst,
+	ULONG ulFlags);
 
 class Initializer {
 public:
@@ -259,6 +267,8 @@ static const APIInfo Lists_user32[] = {
 	{ "GetSystemMetricsForDpi", (void **)&pGetSystemMetricsForDpi },
 	{ "RegisterDeviceNotificationA", (void **)&pRegisterDeviceNotificationA },
 	{ "UnregisterDeviceNotification", (void **)&pUnregisterDeviceNotification },
+	{ "SetWinEventHook", (void **)&pSetWinEventHook },
+	{ "UnhookWinEvent", (void **)&pUnhookWinEvent },
 	{},
 };
 
@@ -346,8 +356,9 @@ static const APIInfo Lists_advapi32[] = {
 static const APIInfo Lists_setupapi[] = {
 #ifndef UNICODE_API_DISABLE
 	{ "SetupDiGetDevicePropertyW", (void **)&pSetupDiGetDevicePropertyW },
-	{ "SetupDiGetDeviceRegistryPropertyW", (void **)&pSetupDiGetDeviceRegistryPropertyW},
+	{ "SetupDiGetDeviceRegistryPropertyW", (void **)&pSetupDiGetDeviceRegistryPropertyW },
 #endif
+	{ "CM_Get_DevNode_Status", (void **)&pCM_Get_DevNode_Status },
 	{},
 };
 
@@ -907,4 +918,13 @@ BOOL _SetupDiGetDevicePropertyW(
 		free(strW);
 		return TRUE;
 	}
+}
+
+/**
+ *	GetComboBoxInfo() ë„ë÷ä÷êî
+ *	 Windows 98Ç©ÇÁ
+ */
+BOOL WINAPI _GetComboBoxInfo(HWND hWndCombo, PCOMBOBOXINFO info)
+{
+	return (BOOL)SendMessageA(hWndCombo, CB_GETCOMBOBOXINFO, 0, (LPARAM)info);
 }

@@ -45,6 +45,7 @@
 #include "tipwin2.h"
 #include "sendmem.h"
 #include "history_store.h"
+#include "compat_win.h"
 
 #include "sendfiledlg.h"
 
@@ -186,7 +187,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 				COMBOBOXINFO cbi;
 				cbi.cbSize = sizeof(COMBOBOXINFO);
 				HWND hComboBox = GetDlgItem(hDlgWnd, IDC_SENDFILE_SEND_SIZE_DROPDOWN);
-				GetComboBoxInfo(hComboBox, &cbi);
+				_GetComboBoxInfo(hComboBox, &cbi);
 				HWND hEdit = cbi.hwndItem;
 				SetWindowLongPtrW(hEdit, GWL_STYLE, GetWindowLongPtrW(hEdit, GWL_STYLE) | ES_NUMBER);
 			}
