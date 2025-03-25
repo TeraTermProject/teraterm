@@ -1066,7 +1066,7 @@ static void SetHostDropdown(HWND dlg, const TTTSet *ts)
 
 static void OpenEditHistory(HWND dlg, TTTSet *ts)
 {
-	EditHistoryDlgData data = {};
+	EditHistoryDlgData data = {0};
 	data.UILanguageFileW = ts->UILanguageFileW;
 	data.SetupFNameW = ts->SetupFNameW;
 	data.vtwin = pvar->cv->HWin;
