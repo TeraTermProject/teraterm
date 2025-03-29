@@ -46,127 +46,9 @@
 
 #include "general_pp.h"
 
-typedef struct {
-	wchar_t* fullname;
-	wchar_t* filename;
-	wchar_t* language;
-	wchar_t* date;
-	wchar_t* contributor;
-} LangInfo;
-
-static const wchar_t* get_lang_folder()
-{
-	return (IsWindowsNTKernel()) ? L"lang_utf16le" : L"lang";
-}
-
-static void LangFree(LangInfo* infos, size_t count)
-{
-	size_t i;
-	for (i = 0; i < count; i++) {
-		LangInfo* p = infos + i;
-		free(p->filename);
-		free(p->fullname);
-		free(p->language);
-		free(p->date);
-		free(p->contributor);
-	}
-	free(infos);
-}
-
-/**
- *	ファイル名をリストする(ファイル名のみ)
- *	infosに追加してreturnする
- */
-static LangInfo* LangAppendFileList(const wchar_t* folder, LangInfo* infos, size_t* infos_size)
-{
-	wchar_t* fullpath;
-	HANDLE hFind;
-	WIN32_FIND_DATAW fd;
-	size_t count = *infos_size;
-
-	aswprintf(&fullpath, L"%s\\*.lng", folder);
-	hFind = FindFirstFileW(fullpath, &fd);
-	if (hFind != INVALID_HANDLE_VALUE) {
-		do {
-			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				LangInfo* p = (LangInfo*)realloc(infos, sizeof(LangInfo) * (count + 1));
-				if (p != NULL) {
-					infos = p;
-					p = infos + count;
-					count++;
-					memset(p, 0, sizeof(*p));
-					p->filename = _wcsdup(fd.cFileName);
-					aswprintf(&p->fullname, L"%s\\%s", folder, fd.cFileName);
-				}
-			}
-		} while (FindNextFileW(hFind, &fd));
-		FindClose(hFind);
-	}
-	free(fullpath);
-
-	*infos_size = count;
-	return infos;
-}
-
-/**
- *	lngファイルの Info セクションを読み込む
- */
-static void LangRead(LangInfo* infos, size_t infos_size)
-{
-	size_t i;
-
-	for (i = 0; i < infos_size; i++) {
-		LangInfo* p = infos + i;
-		const wchar_t* lng = p->fullname;
-		wchar_t* s;
-		hGetPrivateProfileStringW(L"Info", L"language", NULL, lng, &s);
-		if (s[0] == 0) {
-			free(s);
-			p->language = _wcsdup(p->filename);
-		}
-		else {
-			p->language = s;
-		}
-		hGetPrivateProfileStringW(L"Info", L"date", NULL, lng, &s);
-		if (s[0] == 0) {
-			free(s);
-			p->date = _wcsdup(L"-");
-		}
-		else {
-			p->date = s;
-		}
-		hGetPrivateProfileStringW(L"Info", L"contributor", NULL, lng, &s);
-		if (s[0] == 0) {
-			free(s);
-			p->contributor = _wcsdup(L"-");
-		}
-		else {
-			p->contributor = s;
-		}
-	}
-}
-
-static wchar_t *LangInfoText(const LangInfo *p)
-{
-	wchar_t *info;
-	aswprintf(&info,
-			  L"language\r\n"
-			  L"  %s\r\n"
-			  L"filename\r\n"
-			  L"  %s\r\n"
-			  L"date\r\n"
-			  L"  %s\r\n"
-			  L"contributor\r\n"
-			  L"  %s",
-			  p->language, p->filename, p->date, p->contributor);
-	return info;
-}
-
 typedef struct DlgDataTag {
 	TComVar *pcv;
 	TTTSet* pts;
-	LangInfo* lng_infos;
-	size_t lng_size;
 	size_t selected_lang;	// 選ばれていたlngファイル番号
 	TipWin2 *tipwin2;
 	HWND hVTWin;
@@ -189,23 +71,6 @@ CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst, HWND hVTWin, TComVar *p
 				 L"General", pts->UILanguageFileW, &UIMsg);
 	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
-
-	// UI Language, 読み込み
-	LangInfo* infos = NULL;
-	size_t infos_size = 0;
-	wchar_t* folder;
-	aswprintf(&folder, L"%s\\%s", pts->ExeDirW, get_lang_folder());
-	infos = LangAppendFileList(folder, infos, &infos_size);
-	free(folder);
-	if (wcscmp(pts->ExeDirW, pts->HomeDirW) != 0) {
-		aswprintf(&folder, L"%s\\%s", pts->HomeDirW, get_lang_folder());
-		infos = LangAppendFileList(folder, infos, &infos_size);
-		free(folder);
-	}
-	LangRead(infos, infos_size);
-
-	data->lng_infos = infos;
-	data->lng_size = infos_size;
 }
 
 CGeneralPropPageDlg::~CGeneralPropPageDlg()
@@ -214,9 +79,6 @@ CGeneralPropPageDlg::~CGeneralPropPageDlg()
 		TipWin2Destroy(data->tipwin2);
 		data->tipwin2 = NULL;
 	}
-	LangFree(data->lng_infos, data->lng_size);
-	data->lng_infos = NULL;
-	data->lng_size = 0;
 	free((void *)m_psp.pszTitle);
 	free(data);
 	data = NULL;
@@ -235,7 +97,6 @@ void CGeneralPropPageDlg::OnInitDialog()
 		{ IDC_CLEAR_ON_RESIZE, "DLG_TAB_GENERAL_CLEAR_ON_RESIZE" },
 		{ IDC_CURSOR_CHANGE_IME, "DLG_TAB_GENERAL_CURSOR_CHANGE_IME" },
 		// { IDC_LIST_HIDDEN_FONTS, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
-		{ IDC_GENUILANG_LABEL, "DLG_GEN_LANG_UI" },
 		{ IDC_GENPORT_LABEL, "DLG_GEN_PORT" },
 		{ IDC_TITLEFMT_GROUP, "DLG_TAB_GENERAL_TITLEFMT_GROUP" },
 		{ IDC_TITLEFMT_DISPHOSTNAME, "DLG_TAB_GENERAL_TITLEFMT_DISPHOSTNAME" },
@@ -284,27 +145,6 @@ void CGeneralPropPageDlg::OnInitDialog()
 
 	// Notify
 	SetCheck(IDC_NOTIFY_SOUND, pts->NotifySound);
-
-	// UI Language用 tipwin
-	data->tipwin2 = TipWin2Create(data->hInst, m_hWnd);
-
-	// UI Language, 選択
-	{
-		data->selected_lang = 0;
-		LangInfo* infos = data->lng_infos;
-		size_t info_size = data->lng_size;
-		for (size_t i = 0; i < info_size; i++) {
-			const LangInfo* p = infos + i;
-			SendDlgItemMessageW(IDC_GENUILANG, CB_ADDSTRING, 0, (LPARAM)p->language);
-			if (wcscmp(p->fullname, pts->UILanguageFileW) == 0) {
-				data->selected_lang = i;
-				wchar_t *info_text = LangInfoText(p);
-				TipWin2SetTextW(data->tipwin2, IDC_GENUILANG, info_text);
-				free(info_text);
-			}
-		}
-		SendDlgItemMessage(IDC_GENUILANG, CB_SETCURSEL, data->selected_lang, 0);
-	}
 
 	// default port
 	SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM)"TCP/IP");
@@ -361,23 +201,6 @@ void CGeneralPropPageDlg::OnOK()
 			pts->NotifySound = notify_sound;
 			Notify2SetSound((NotifyIcon *)data->pcv->NotifyIcon, notify_sound);
 		}
-	}
-
-	{
-		LRESULT w = SendDlgItemMessageA(IDC_GENUILANG, CB_GETCURSEL, 0, 0);
-		if (w != data->selected_lang) {
-			const LangInfo* p = data->lng_infos + w;
-			free(pts->UILanguageFileW);
-			pts->UILanguageFileW = _wcsdup(p->fullname);
-
-			// タイトルの更新を行う。(2014.2.23 yutaka)
-			PostMessage(data->hVTWin, WM_USER_CHANGETITLE, 0, 0);
-		}
-
-		// TTXKanjiMenu は Language を見てメニューを表示するので、変更の可能性がある
-		// OK 押下時にメニュー再描画のメッセージを飛ばすようにした。 (2007.7.14 maya)
-		// 言語ファイルの変更時にメニューの再描画が必要 (2012.5.5 maya)
-		PostMessage(data->hVTWin, WM_USER_CHANGEMENU, 0, 0);
 	}
 
 	// default port
@@ -469,13 +292,6 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			}
 			free(src);
 			free(uimsgW);
-			break;
-		}
-		case IDC_GENUILANG | (CBN_SELCHANGE << 16): {
-			size_t ui_sel = (size_t)SendDlgItemMessageA(IDC_GENUILANG, CB_GETCURSEL, 0, 0);
-			wchar_t *info_text = LangInfoText(data->lng_infos + ui_sel);
-			TipWin2SetTextW(data->tipwin2, IDC_GENUILANG, info_text);
-			free(info_text);
 			break;
 		}
 		default:
