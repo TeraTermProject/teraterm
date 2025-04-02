@@ -29,7 +29,6 @@
 #include "ttxssh.h"
 #include "kex.h"
 
-
 char *myproposal[PROPOSAL_MAX] = {
 	KEX_DEFAULT_KEX,
 	KEX_DEFAULT_PK_ALG,
@@ -421,7 +420,8 @@ int dh_estimate(int bits)
 }
 
 
-// shared secret を計算する (DH 固定グループ用)
+// hash を計算する (DH 固定グループ用)
+// from kexdh.c
 unsigned char *kex_dh_hash(const EVP_MD *evp_md,
                            char *client_version_string,
                            char *server_version_string,
@@ -458,7 +458,6 @@ unsigned char *kex_dh_hash(const EVP_MD *evp_md,
 	buffer_put_bignum2(b, server_dh_pub);
 	buffer_put_bignum2(b, shared_secret);
 
-	// yutaka
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
 	EVP_DigestInit(md, evp_md);
@@ -479,7 +478,8 @@ error:
 }
 
 
-// shared secret を計算する (DH GEX用)
+// hash を計算する (DH GEX用)
+// from kexgex.c: kexgex_hash()
 unsigned char *kex_dh_gex_hash(const EVP_MD *evp_md,
                                char *client_version_string,
                                char *server_version_string,
@@ -531,7 +531,6 @@ unsigned char *kex_dh_gex_hash(const EVP_MD *evp_md,
 	buffer_put_bignum2(b, server_dh_pub);
 	buffer_put_bignum2(b, shared_secret);
 
-	// yutaka
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
 	EVP_DigestInit(md, evp_md);
@@ -552,6 +551,8 @@ error:
 }
 
 
+// hash を計算する (ECDH用)
+// from kexecdh.c
 unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
                              const EC_GROUP *ec_group,
                              char *client_version_string,
@@ -590,7 +591,6 @@ unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
 	buffer_put_ecpoint(b, ec_group, server_dh_pub);
 	buffer_put_bignum2(b, shared_secret);
 
-	// yutaka
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
 	EVP_DigestInit(md, evp_md);
@@ -611,6 +611,7 @@ error:
 }
 
 
+// from dh.c
 int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 {
 	int i;
@@ -639,6 +640,7 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 }
 
 
+// from kex.c
 static u_char *derive_key(int id, int need, u_char *hash, BIGNUM *shared_secret,
                           char *session_id, int session_id_len,
                           const EVP_MD *evp_md)
@@ -695,6 +697,7 @@ skip:;
 /*
  * 鍵交換の結果から各鍵を生成し newkeys にセットして戻す。
  */
+// from kex.c
 void kex_derive_keys(PTInstVar pvar, SSHKeys *newkeys, int need, u_char *hash, BIGNUM *shared_secret,
                      char *session_id, int session_id_len)
 {

@@ -133,7 +133,7 @@ typedef enum {
 	SSH2_MSG_NEWKEYS = 21,
 
 	// 30..49 Key excahnge method specific
-	// Diffie-Hellman Key Exchange (RFC 4253)
+	// Diffie-Hellman Key Exchange (RFC 4253, RFC 8268)
 	SSH2_MSG_KEXDH_INIT  = 30,
 	SSH2_MSG_KEXDH_REPLY = 31,
 

@@ -5177,9 +5177,13 @@ error:;
 }
 
 
-//
-// 固定 DH Groups (RFC 4253, draft-baushke-ssh-dh-group-sha2-04)
-//
+/*
+ * Fixed DH Groups (RFC 4253, RFC 8268)
+ *
+ * SSH_MSG_KEYDH_INIT:
+ *   byte    SSH_MSG_KEYDH_INIT (30)
+ *   mpint   e
+ */
 static void SSH2_dh_kex_init(PTInstVar pvar)
 {
 	DH *dh = NULL;
@@ -5249,7 +5253,6 @@ error:;
 }
 
 
-
 /*
  * DH-GEX (RFC 4419)
  *
@@ -5259,7 +5262,6 @@ error:;
  *   uint32  n, preferred size in bits of the group the server will send
  *   uint32  max, maximal size in bits of an acceptable group
  */
-
 static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 {
 	buffer_t *msg = NULL;
@@ -5350,7 +5352,7 @@ error:;
 
 /*
  * SSH2_MSG_KEX_DH_GEX_GROUP:
- *   byte    SSH_MSG_KEX_DH_GEX_GROUP
+ *   byte    SSH_MSG_KEX_DH_GEX_GROUP (31)
  *   mpint   p, safe prime
  *   mpint   g, generator for subgroup in GF(p)
  */
@@ -5491,10 +5493,14 @@ error:;
 }
 
 
-//
-// KEX_ECDH_SHA2_256 or KEX_ECDH_SHA2_384 or KEX_ECDH_SHA2_521
-//
-
+/*
+ * ECDH (RFC 5656)
+ *   KEX_ECDH_SHA2_256 or KEX_ECDH_SHA2_384 or KEX_ECDH_SHA2_521
+ *
+ * SSH2_MSG_KEX_ECDH_INIT:
+ *   byte    SSH_MSG_KEX_ECDH_INIT (31)
+ *   string  Q_C, client's ephemeral public key octet string
+ */
 static void SSH2_ecdh_kex_init(PTInstVar pvar)
 {
 	EC_KEY *client_key = NULL;
@@ -5714,9 +5720,9 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
 	len = pvar->ssh_state.payloadlen - 1;
 
-	// for debug
 	push_memdump("KEXDH_REPLY", "key exchange: receiving", data, len);
 
+	/* hostkey */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = data; // for hash
@@ -5732,7 +5738,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	}
 	data += bloblen;
 
-	// known_hosts対応 (2006.3.20 yutaka)
+	// known_hosts対応 (2006.3.20)
 	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
@@ -5744,6 +5750,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		goto error;
 	}
 
+	/* DH parameter f, server public DH key */
 	server_public = BN_new();
 	if (server_public == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
@@ -5751,9 +5758,9 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
-
 	buffer_get_bignum2(&data, server_public);
 
+	/* signed H */
 	siglen = get_uint32_MSBfirst(data);
 	data += 4;
 	signature = data;
@@ -5768,6 +5775,8 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
+
+	/* calc shared secret K */
 	// 共通鍵の生成
 	dh_len = DH_size(pvar->kexdh);
 	dh_buf = malloc(dh_len);
@@ -5785,12 +5794,12 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
-	// 'share_key'がサーバとクライアントで共有する鍵（G^A×B mod P）となる。
 	BN_bin2bn(dh_buf, share_len, share_key);
 	//debug_print(40, dh_buf, share_len);
 
-	// ハッシュの計算
 	/* calc and verify H */
+	// ハッシュの計算
+	// verify は ssh2_kex_finish() で行う
 	DH_get0_key(pvar->kexdh, &pub_key, NULL);
 	hash = kex_dh_hash(
 		get_kex_algorithm_EVP_MD(pvar->kex_type),
@@ -5876,9 +5885,9 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
 	len = pvar->ssh_state.payloadlen - 1;
 
-	// for debug
 	push_memdump("DH_GEX_REPLY", "key exchange: receiving", data, len);
 
+	/* hostkey */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = data; // for hash
@@ -5894,7 +5903,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	}
 	data += bloblen;
 
-	// known_hosts対応 (2006.3.20 yutaka)
+	// known_hosts対応 (2006.3.20)
 	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
@@ -5906,6 +5915,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		goto error;
 	}
 
+	/* DH parameter f, server public DH key */
 	server_public = BN_new();
 	if (server_public == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
@@ -5913,9 +5923,9 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
-
 	buffer_get_bignum2(&data, server_public);
 
+	/* signed H */
 	siglen = get_uint32_MSBfirst(data);
 	data += 4;
 	signature = data;
@@ -5930,6 +5940,8 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
+
+	/* calc shared secret K */
 	// 共通鍵の生成
 	dh_len = DH_size(pvar->kexdh);
 	dh_buf = malloc(dh_len);
@@ -5947,12 +5959,12 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
-	// 'share_key'がサーバとクライアントで共有する鍵（G^A×B mod P）となる。
 	BN_bin2bn(dh_buf, share_len, share_key);
 	//debug_print(40, dh_buf, share_len);
 
-	// ハッシュの計算
 	/* calc and verify H */
+	// ハッシュの計算
+	// verify は ssh2_kex_finish() で行う
 	DH_get0_pqg(pvar->kexdh, &p, NULL, &g);
 	DH_get0_key(pvar->kexdh, &pub_key, NULL);
 	hash = kex_dh_gex_hash(
@@ -6044,9 +6056,9 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
 	len = pvar->ssh_state.payloadlen - 1;
 
-	// for debug
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
+	/* hostkey */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = data; // for hash
@@ -6062,7 +6074,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	}
 	data += bloblen;
 
-	// known_hosts対応 (2006.3.20 yutaka)
+	// known_hosts対応 (2006.3.20)
 	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
@@ -6083,9 +6095,9 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
-
 	buffer_get_ecpoint(&data, group, server_public);
 
+	/* signed H */
 	siglen = get_uint32_MSBfirst(data);
 	data += 4;
 	signature = data;
@@ -6100,6 +6112,8 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
+
+	/* calc shared secret K */
 	// 共通鍵の生成
 	ecdh_len = (EC_GROUP_get_degree(group) + 7) / 8;
 	ecdh_buf = malloc(ecdh_len);
@@ -6123,12 +6137,12 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
-	// 'share_key'がサーバとクライアントで共有する鍵（G^A×B mod P）となる。
 	BN_bin2bn(ecdh_buf, ecdh_len, share_key);
 	//debug_print(40, ecdh_buf, ecdh_len);
 
-	// ハッシュの計算
 	/* calc and verify H */
+	// ハッシュの計算
+	// verify は ssh2_kex_finish() で行う
 	hash = kex_ecdh_hash(
 		get_kex_algorithm_EVP_MD(pvar->kex_type),
 		group,
