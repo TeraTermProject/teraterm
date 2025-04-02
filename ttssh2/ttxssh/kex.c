@@ -28,6 +28,7 @@
 
 #include "ttxssh.h"
 #include "kex.h"
+#include "openbsd-compat.h"
 
 char *myproposal[PROPOSAL_MAX] = {
 	KEX_DEFAULT_KEX,
@@ -59,6 +60,8 @@ static const struct ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
 	{KEX_DH_GRP14_SHA256, "diffie-hellman-group14-sha256",      EVP_sha256}, // RFC8268
 	{KEX_DH_GRP16_SHA512, "diffie-hellman-group16-sha512",      EVP_sha512}, // RFC8268
 	{KEX_DH_GRP18_SHA512, "diffie-hellman-group18-sha512",      EVP_sha512}, // RFC8268
+	{KEX_CURVE25519_SHA256_OLD, "curve25519-sha256@libssh.org", EVP_sha256}, // not RFC8731, PROTOCOL of OpenSSH
+	{KEX_CURVE25519_SHA256,     "curve25519-sha256",            EVP_sha256}, // RFC8731
 	{KEX_DH_NONE      , NULL,                                   NULL},
 };
 
@@ -96,6 +99,8 @@ const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype)
 void normalize_kex_order(char *buf)
 {
 	static char default_strings[] = {
+		KEX_CURVE25519_SHA256,
+		KEX_CURVE25519_SHA256_OLD,
 		KEX_ECDH_SHA2_256,
 		KEX_ECDH_SHA2_384,
 		KEX_ECDH_SHA2_521,
@@ -611,6 +616,96 @@ error:
 }
 
 
+// from smult_curve25519_ref.c
+extern int crypto_scalarmult_curve25519(unsigned char *, const unsigned char *, const unsigned char *);
+
+// hash を計算する (Curve25519用)
+// from kexc25519.c OpenSSH 7.9
+unsigned char *kex_c25519_hash(const EVP_MD *evp_md,
+                               char *client_version_string,
+                               char *server_version_string,
+                               char *ckexinit, int ckexinitlen,
+                               char *skexinit, int skexinitlen,
+                               u_char *serverhostkeyblob, int sbloblen,
+                               u_char client_dh_pub[CURVE25519_SIZE],
+                               u_char server_dh_pub[CURVE25519_SIZE],
+                               u_char *shared_secret, int secretlen,
+                               unsigned int *hashlen)
+{
+	buffer_t *b;
+	static unsigned char digest[EVP_MAX_MD_SIZE];
+	EVP_MD_CTX *md = NULL;
+
+	md = EVP_MD_CTX_new();
+	if (md == NULL)
+		goto error;
+
+	b = buffer_init();
+	buffer_put_string(b, client_version_string, strlen(client_version_string));
+	buffer_put_string(b, server_version_string, strlen(server_version_string));
+
+	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
+	buffer_put_int(b, ckexinitlen+1);
+	buffer_put_char(b, SSH2_MSG_KEXINIT);
+	buffer_append(b, ckexinit, ckexinitlen);
+	buffer_put_int(b, skexinitlen+1);
+	buffer_put_char(b, SSH2_MSG_KEXINIT);
+	buffer_append(b, skexinit, skexinitlen);
+
+	buffer_put_string(b, serverhostkeyblob, sbloblen);
+
+	buffer_put_string(b, client_dh_pub, CURVE25519_SIZE);
+	buffer_put_string(b, server_dh_pub, CURVE25519_SIZE);
+	buffer_put_raw(b, shared_secret, secretlen);
+
+	//debug_print(38, buffer_ptr(b), buffer_len(b));
+
+	EVP_DigestInit(md, evp_md);
+	EVP_DigestUpdate(md, buffer_ptr(b), buffer_len(b));
+	EVP_DigestFinal(md, digest, NULL);
+
+	buffer_free(b);
+
+	//write_buffer_file(digest, EVP_MD_size(evp_md));
+
+	*hashlen = EVP_MD_size(evp_md);
+
+error:
+	if (md)
+		EVP_MD_CTX_free(md);
+
+	return digest;
+}
+
+// from kexc25519.c OpenSSH 7.9
+void kexc25519_keygen(u_char key[CURVE25519_SIZE], u_char pub[CURVE25519_SIZE])
+{
+	static const u_char basepoint[CURVE25519_SIZE] = {9};
+
+	arc4random_buf(key, CURVE25519_SIZE);
+	crypto_scalarmult_curve25519(pub, key, basepoint);
+}
+
+// from kexc25519.c OpenSSH 7.9
+int kexc25519_shared_key(const u_char key[CURVE25519_SIZE],
+                         const u_char pub[CURVE25519_SIZE], buffer_t *out)
+{
+	u_char shared_key[CURVE25519_SIZE];
+	int r;
+
+	/* Check for all-zero public key */
+	SecureZeroMemory(shared_key, CURVE25519_SIZE);
+	if (timingsafe_bcmp(pub, shared_key, CURVE25519_SIZE) == 0)
+		return -20; // SSH_ERR_KEY_INVALID_EC_VALUE
+
+	crypto_scalarmult_curve25519(shared_key, key, pub);
+	buffer_clear(out);
+	r = buffer_put_bignum2_bytes(out, shared_key, CURVE25519_SIZE);
+	SecureZeroMemory(shared_key, CURVE25519_SIZE);
+	return r;
+}
+
+
 // from dh.c
 int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 {
@@ -641,11 +736,10 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 
 
 // from kex.c
-static u_char *derive_key(int id, int need, u_char *hash, BIGNUM *shared_secret,
+static u_char *derive_key(int id, int need, u_char *hash, buffer_t *shared_secret,
                           char *session_id, int session_id_len,
                           const EVP_MD *evp_md)
 {
-	buffer_t *b;
 	EVP_MD_CTX *md = NULL;
 	char c = id;
 	int have;
@@ -659,15 +753,9 @@ static u_char *derive_key(int id, int need, u_char *hash, BIGNUM *shared_secret,
 	if (digest == NULL)
 		goto skip;
 
-	b = buffer_init();
-	if (b == NULL)
-		goto skip;
-
-	buffer_put_bignum2(b, shared_secret);
-
 	/* K1 = HASH(K || H || "A" || session_id) */
 	EVP_DigestInit(md, evp_md);
-	EVP_DigestUpdate(md, buffer_ptr(b), buffer_len(b));
+	EVP_DigestUpdate(md, buffer_ptr(shared_secret), buffer_len(shared_secret));
 	EVP_DigestUpdate(md, hash, mdsz);
 	EVP_DigestUpdate(md, &c, 1);
 	EVP_DigestUpdate(md, session_id, session_id_len);
@@ -680,12 +768,11 @@ static u_char *derive_key(int id, int need, u_char *hash, BIGNUM *shared_secret,
 	 */
 	for (have = mdsz; need > have; have += mdsz) {
 		EVP_DigestInit(md, evp_md);
-		EVP_DigestUpdate(md, buffer_ptr(b), buffer_len(b));
+		EVP_DigestUpdate(md, buffer_ptr(shared_secret), buffer_len(shared_secret));
 		EVP_DigestUpdate(md, hash, mdsz);
 		EVP_DigestUpdate(md, digest, have);
 		EVP_DigestFinal(md, digest + have, NULL);
 	}
-	buffer_free(b);
 
 skip:;
 	if (md)
@@ -698,7 +785,7 @@ skip:;
  * 鍵交換の結果から各鍵を生成し newkeys にセットして戻す。
  */
 // from kex.c
-void kex_derive_keys(PTInstVar pvar, SSHKeys *newkeys, int need, u_char *hash, BIGNUM *shared_secret,
+void kex_derive_keys(PTInstVar pvar, SSHKeys *newkeys, int need, u_char *hash, buffer_t *shared_secret,
                      char *session_id, int session_id_len)
 {
 #define NKEYS	6

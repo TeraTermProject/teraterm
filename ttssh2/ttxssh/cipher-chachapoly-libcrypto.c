@@ -32,41 +32,7 @@
 
 #include "ssherr.h"
 #include "cipher-chachapoly.h"
-
-
-// import from sshbuf.h
-/*	$OpenBSD: sshbuf.h,v 1.23 2020/06/22 05:54:10 djm Exp $	*/
-#define PEEK_U32(p) \
-	(((u_int32_t)(((const u_char *)(p))[0]) << 24) | \
-	 ((u_int32_t)(((const u_char *)(p))[1]) << 16) | \
-	 ((u_int32_t)(((const u_char *)(p))[2]) << 8) | \
-	  (u_int32_t)(((const u_char *)(p))[3]))
-#define POKE_U64(p, v) \
-	do { \
-		const u_int64_t __v = (v); \
-		((u_char *)(p))[0] = (__v >> 56) & 0xff; \
-		((u_char *)(p))[1] = (__v >> 48) & 0xff; \
-		((u_char *)(p))[2] = (__v >> 40) & 0xff; \
-		((u_char *)(p))[3] = (__v >> 32) & 0xff; \
-		((u_char *)(p))[4] = (__v >> 24) & 0xff; \
-		((u_char *)(p))[5] = (__v >> 16) & 0xff; \
-		((u_char *)(p))[6] = (__v >> 8) & 0xff; \
-		((u_char *)(p))[7] = __v & 0xff; \
-	} while (0)
-
-
-// import from openbsd-compat/timingsafe_bcmp.c
-/*	$OpenBSD: timingsafe_bcmp.c,v 1.1 2010/09/24 13:33:00 matthew Exp $	*/
-int
-timingsafe_bcmp(const void* b1, const void* b2, size_t n)
-{
-	const unsigned char* p1 = b1, * p2 = b2;
-	int ret = 0;
-
-	for (; n > 0; n--)
-		ret |= *p1++ ^ *p2++;
-	return (ret != 0);
-}
+#include "openbsd-compat.h"
 
 
 struct chachapoly_ctx {

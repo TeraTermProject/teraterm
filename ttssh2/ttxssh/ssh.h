@@ -144,6 +144,7 @@ typedef enum {
 	SSH2_MSG_KEX_DH_GEX_REQUEST = 34,
 
 	// RFC 5656 - Elliptic Curve Algorithm Integration in the Secure Shell Transport Layer
+	// RFC 8731 - Secure Shell (SSH) Key Exchange Method Using Curve25519 and Curve448
 	SSH2_MSG_KEX_ECDH_INIT  = 30,
 	SSH2_MSG_KEX_ECDH_REPLY = 31,
 

@@ -122,6 +122,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar);
 static void SSH2_dh_kex_init(PTInstVar pvar);
 static void SSH2_dh_gex_kex_init(PTInstVar pvar);
 static void SSH2_ecdh_kex_init(PTInstVar pvar);
+static void SSH2_curve25519_kex_init(PTInstVar pvar);
 static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar);
 static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar);
 static BOOL handle_SSH2_newkeys(PTInstVar pvar);
@@ -5160,6 +5161,10 @@ skip:
 		case KEX_ECDH_SHA2_521:
 			SSH2_ecdh_kex_init(pvar);
 			break;
+		case KEX_CURVE25519_SHA256_OLD:
+		case KEX_CURVE25519_SHA256:
+			SSH2_curve25519_kex_init(pvar);
+			break;
 		default:
 			// TODO
 			break;
@@ -5565,6 +5570,56 @@ error:;
 }
 
 
+/*
+ * curve25519 (RFC 8731)
+ *   KEX_CURVE25519_SHA256_OLD or KEX_CURVE25519_SHA256
+ *
+ * SSH2_MSG_KEX_ECDH_INIT:
+ *   byte    SSH_MSG_KEX_ECDH_INIT (31)
+ *   string  Q_C, client's ephemeral public key octet string
+ */
+static void SSH2_curve25519_kex_init(PTInstVar pvar)
+{
+	buffer_t *msg = NULL;
+	unsigned char *outmsg;
+
+	EC_KEY *client_key = NULL;
+	int len;
+	char buf[128];
+
+
+	kexc25519_keygen(pvar->c25519_client_key, pvar->c25519_client_pubkey);
+
+	msg = buffer_init();
+	if (msg == NULL) {
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: buffer_init was failed", __FUNCTION__);
+		goto error;
+	}
+
+	buffer_put_string(msg, pvar->c25519_client_pubkey, sizeof(pvar->c25519_client_pubkey));
+
+	len = buffer_len(msg);
+	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
+	memcpy(outmsg, buffer_ptr(msg), len);
+	finish_send_packet(pvar);
+
+	SSH2_dispatch_init(pvar, 2);
+	SSH2_dispatch_add_message(SSH2_MSG_KEX_ECDH_REPLY);
+
+	buffer_free(msg);
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_INIT was sent at SSH2_ecdh_kex_init().");
+
+	return;
+
+error:;
+	buffer_free(msg);
+
+	notify_fatal_error(pvar, buf, TRUE);
+}
+
+
 static void ssh2_set_newkeys(PTInstVar pvar, int mode)
 {
 	// free already allocated buffer
@@ -5581,7 +5636,7 @@ static void ssh2_set_newkeys(PTInstVar pvar, int mode)
 	pvar->ssh2_keys[mode] = current_keys[mode];
 }
 
-static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, BIGNUM *share_key, Key *hostkey, char *signature, int siglen)
+static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, buffer_t *shared_secret, Key *hostkey, char *signature, int siglen)
 {
 	int ret;
 	char emsg[1024];  // error message
@@ -5630,7 +5685,7 @@ static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, BIGNUM *sha
 	}
 
 cont:
-	kex_derive_keys(pvar, current_keys, pvar->we_need, hash, share_key, pvar->session_id, pvar->session_id_len);
+	kex_derive_keys(pvar, current_keys, pvar->we_need, hash, shared_secret, pvar->session_id, pvar->session_id_len);
 
 	prep_compression(pvar);
 
@@ -5703,6 +5758,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	int dh_len, share_len;
 	char *dh_buf = NULL;
 	BIGNUM *share_key = NULL;
+	buffer_t *shared_secret = NULL;
 	char *hash;
 	char *emsg = NULL, emsg_tmp[1024];  // error message
 	int hashlen;
@@ -5828,7 +5884,9 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	pvar->client_key_bits = BN_num_bits(pub_key);
 	pvar->server_key_bits = BN_num_bits(server_public);
 
-	result = ssh2_kex_finish(pvar, hash, hashlen, share_key, hostkey, signature, siglen);
+	shared_secret = buffer_init();
+	buffer_put_bignum2(shared_secret, share_key);
+	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, hostkey, signature, siglen);
 
 	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
 	if (ret == TRUE) {
@@ -5843,6 +5901,7 @@ error:
 	key_free(hostkey);
 	free(dh_buf);
 	BN_free(share_key);
+	buffer_free(shared_secret);
 
 	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
@@ -5867,6 +5926,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	int dh_len, share_len;
 	char *dh_buf = NULL;
 	BIGNUM *share_key = NULL;
+	buffer_t *shared_secret = NULL;
 	char *hash;
 	char *emsg = NULL, emsg_tmp[1024];  // error message
 	int hashlen;
@@ -5999,7 +6059,9 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	pvar->client_key_bits = BN_num_bits(pub_key);
 	pvar->server_key_bits = BN_num_bits(server_public);
 
-	result = ssh2_kex_finish(pvar, hash, hashlen, share_key, hostkey, signature, siglen);
+	shared_secret = buffer_init();
+	buffer_put_bignum2(shared_secret, share_key);
+	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, hostkey, signature, siglen);
 
 	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
 	if (ret == TRUE) {
@@ -6014,6 +6076,7 @@ error:
 	key_free(hostkey);
 	free(dh_buf);
 	BN_free(share_key);
+	buffer_free(shared_secret);
 
 	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
@@ -6040,6 +6103,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	int ecdh_len;
 	char *ecdh_buf = NULL;
 	BIGNUM *share_key = NULL;
+	buffer_t *shared_secret = NULL;
 	char *hash;
 	char *emsg = NULL, emsg_tmp[1024];  // error message
 	int hashlen;
@@ -6184,7 +6248,9 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 			break;
 	}
 
-	result = ssh2_kex_finish(pvar, hash, hashlen, share_key, hostkey, signature, siglen);
+	shared_secret = buffer_init();
+	buffer_put_bignum2(shared_secret, share_key);
+	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, hostkey, signature, siglen);
 
 	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
 	if (ret == TRUE) {
@@ -6199,6 +6265,152 @@ error:
 	key_free(hostkey);
 	free(ecdh_buf);
 	BN_free(share_key);
+	buffer_free(shared_secret);
+
+	if (emsg)
+		notify_fatal_error(pvar, emsg, TRUE);
+
+	return result;
+}
+
+
+/*
+ * Elliptic Curve Diffie-Hellman Key Exchange Reply (SSH2_MSG_KEX_ECDH_REPLY:31)
+ *
+ * return TRUE: 成功
+ *        FALSE: 失敗
+ */
+static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
+{
+	char *data;
+	int len;
+	char *server_host_key_blob;
+	int bloblen, siglen, pklen;
+	u_char *server_pubkey = NULL;
+	char *signature;
+	buffer_t *shared_secret = NULL;
+	char *hash;
+	char *emsg = NULL, emsg_tmp[1024];  // error message
+	int hashlen;
+	Key *hostkey = NULL;  // hostkey
+	BOOL result = FALSE;
+	int ret;
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
+
+	memset(&hostkey, 0, sizeof(hostkey));
+
+	// メッセージタイプの後に続くペイロードの先頭
+	data = pvar->ssh_state.payload;
+	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
+	len = pvar->ssh_state.payloadlen - 1;
+
+	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
+
+	/* hostkey */
+	bloblen = get_uint32_MSBfirst(data);
+	data += 4;
+	server_host_key_blob = data; // for hash
+
+	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob", server_host_key_blob, bloblen);
+
+	hostkey = key_from_blob(data, bloblen);
+	if (hostkey == NULL) {
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+					"%s: key_from_blob error", __FUNCTION__);
+		emsg = emsg_tmp;
+		goto error;
+	}
+	data += bloblen;
+
+	// known_hosts対応
+	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->hostkey_type)) {  // ホストキーの種別比較
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
+		            /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
+		            get_ssh2_hostkey_type_name_from_algorithm(pvar->hostkey_type),
+		            get_ssh2_hostkey_algorithm_name(pvar->hostkey_type),
+		            get_ssh2_hostkey_type_name(hostkey->type));
+		emsg = emsg_tmp;
+		goto error;
+	}
+
+	/* Q_S, server public key */
+	server_pubkey = buffer_get_string(&data, &pklen);
+
+	/* signed H */
+	siglen = get_uint32_MSBfirst(data);
+	data += 4;
+	signature = data;
+	data += siglen;
+
+	push_memdump("KEX_ECDH_REPLY", "signature", signature, siglen);
+
+	// check public key
+	if (pklen != CURVE25519_SIZE) {
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+					"%s: invalid server public key", __FUNCTION__);
+		emsg = emsg_tmp;
+		goto error;
+	}
+
+	/* calc shared secret K */
+	// 共通鍵の生成
+	shared_secret = buffer_init();
+	if (shared_secret == NULL) {
+		// TODO: error check
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
+		goto error;
+	}
+	if ((ret = kexc25519_shared_key(pvar->c25519_client_key, server_pubkey,
+	                                shared_secret)) < 0) {
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+					"%s: kexc25519_shared_key() was failed(ret %d)", __FUNCTION__, ret);
+		emsg = emsg_tmp;
+		goto error;
+	}
+
+	/* calc and verify H */
+	// ハッシュの計算
+	// verify は ssh2_kex_finish() で行う
+	hash = kex_c25519_hash(
+		get_kex_algorithm_EVP_MD(pvar->kex_type),
+		pvar->client_version_string,
+		pvar->server_version_string,
+		buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
+		buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex),
+		server_host_key_blob, bloblen,
+		pvar->c25519_client_pubkey, server_pubkey,
+		buffer_ptr(shared_secret), buffer_len(shared_secret),
+		&hashlen);
+
+	{
+		push_memdump("KEX_ECDH_REPLY curve25519_kex_reply", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
+		push_memdump("KEX_ECDH_REPLY ecdh_kecurve25519_kex_replyx_reply", "peer_kex", buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
+
+		push_memdump("KEX_ECDH_REPLY curve25519_kex_reply", "shared_secret", buffer_ptr(shared_secret), buffer_len(shared_secret));
+
+		push_memdump("KEX_ECDH_REPLY curve25519_kex_reply", "hash", hash, hashlen);
+	}
+
+	// TTSSHバージョン情報に表示するキービット数を求めておく
+	pvar->client_key_bits = 256;
+	pvar->server_key_bits = 256;
+
+	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, hostkey, signature, siglen);
+
+	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
+	if (ret == TRUE) {
+		// ホスト鍵の確認が成功したので、後続の処理を行う
+		SSH_notify_host_OK(pvar);
+		// known_hostsダイアログの呼び出したので、以降、何もしない。
+	}
+
+error:
+	free(server_pubkey);
+	SecureZeroMemory(pvar->c25519_client_key, sizeof(pvar->c25519_client_key));
+	key_free(hostkey);
+	buffer_free(shared_secret);
 
 	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
@@ -6226,6 +6438,10 @@ static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar)
 		case KEX_ECDH_SHA2_384:
 		case KEX_ECDH_SHA2_521:
 			handle_SSH2_ecdh_kex_reply(pvar);
+			break;
+		case KEX_CURVE25519_SHA256_OLD:
+		case KEX_CURVE25519_SHA256:
+			handle_SSH2_curve25519_kex_reply(pvar);
 			break;
 		default:
 			// TODO
