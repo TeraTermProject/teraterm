@@ -7,6 +7,12 @@
     <ClCompile Include="auth.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="bcrypt_pbkdf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="blowfish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="buffer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -37,30 +43,6 @@
     <ClCompile Include="ed25519.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ed25519_bcrypt_pbkdf.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ed25519_blocks.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ed25519_blowfish.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ed25519_fe25519.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ed25519_ge25519.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ed25519_hash.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ed25519_sc25519.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ed25519_verify.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="fwd-socks.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -71,6 +53,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="hostkey.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hash.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="hosts.c">
@@ -153,6 +138,9 @@
     <ClInclude Include="auth.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="blf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -171,19 +159,7 @@
     <ClInclude Include="crypt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ed25519_blf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ed25519_crypto_api.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ed25519_fe25519.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ed25519_ge25519.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ed25519_sc25519.h">
+    <ClInclude Include="crypto_api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fwd-socks.h">
