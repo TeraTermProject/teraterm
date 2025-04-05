@@ -6432,7 +6432,7 @@ static BOOL handle_SSH2_ext_info(PTInstVar pvar)
 				logprintf(LOG_LEVEL_WARNING, "%s: can't get extension value", __FUNCTION__);
 				return FALSE;
 			}
-			logprintf(LOG_LEVEL_VERBOSE, "%s: extension: ext_name", __FUNCTION__, ext_name);
+			logprintf(LOG_LEVEL_VERBOSE, "%s: extension: ext_name: %s", __FUNCTION__, ext_name);
 		}
 	}
 
