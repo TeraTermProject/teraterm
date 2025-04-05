@@ -16,6 +16,7 @@
     <ProjectGuid>{b5323378-e523-4cb3-8484-85445b35d39b}</ProjectGuid>
     <RootNamespace>sshagentc</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>sshagentc</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
