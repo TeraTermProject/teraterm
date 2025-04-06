@@ -2055,22 +2055,22 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len)
 				int TTSSH_ID_len;
 
 				// SSH バージョンを teraterm 側にセットする
-				// SCP コマンドのため (2008.2.3 maya)
+				// SCP コマンドのため (2008.2.3)
 				pvar->cv->isSSH = pvar->protocol_major;
 
-				// 自分自身のバージョンを取得する (2005.3.3 yutaka)
+				// 自分自身のバージョンを取得する (2005.3.3)
 				_snprintf_s(TTSSH_ID, sizeof(TTSSH_ID), _TRUNCATE,
-				            "SSH-%d.%d-TTSSH/%d.%d Win32\r\n",
+				            "SSH-%d.%d-TTSSH/%d.%d.%d Win32\r\n",
 				            pvar->protocol_major, pvar->protocol_minor,
-				            TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR);
+				            TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR, TTSSH_VERSION_PATCH);
 				TTSSH_ID_len = strlen(TTSSH_ID);
 
-				// for SSH2(yutaka)
+				// for SSH2
 				// クライアントバージョンの保存（改行は取り除くこと）
 				strncpy_s(pvar->client_version_string, sizeof(pvar->client_version_string),
 				          TTSSH_ID, _TRUNCATE);
 
-				// サーババージョンの保存（改行は取り除くこと）(2005.3.9 yutaka)
+				// サーババージョンの保存（改行は取り除くこと）(2005.3.9)
 				_snprintf_s(pvar->server_version_string,
 				            sizeof(pvar->server_version_string), _TRUNCATE,
 				            "%s", pvar->ssh_state.server_ID);
