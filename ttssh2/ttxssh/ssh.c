@@ -5834,6 +5834,9 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	/* calc shared secret K */
 	// ã§í åÆÇÃê∂ê¨
+	//   K = B^a mod p = g^(a*b) mod p
+	// Writing using RFC 4253 notation:
+	//   K = f^x mod p
 	dh_len = DH_size(pvar->kexdh);
 	dh_buf = malloc(dh_len);
 	if (dh_buf == NULL) {
@@ -6003,6 +6006,9 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	/* calc shared secret K */
 	// ã§í åÆÇÃê∂ê¨
+	//   K = B^a mod p = g^(a*b) mod p
+	// Writing using RFC 4253 notation:
+	//   K = f^x mod p
 	dh_len = DH_size(pvar->kexdh);
 	dh_buf = malloc(dh_len);
 	if (dh_buf == NULL) {
@@ -6179,6 +6185,11 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	/* calc shared secret K */
 	// ã§í åÆÇÃê∂ê¨
+	//   (xk, yk) = dA * QB
+	//   xk is a shared secret
+	// Writing using RFC 5656 notation:
+	//   (x', y') = d_C * Q_S
+	//   x' is a shared secret K
 	ecdh_len = (EC_GROUP_get_degree(group) + 7) / 8;
 	ecdh_buf = malloc(ecdh_len);
 	if (ecdh_buf == NULL) {
@@ -6356,6 +6367,11 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 
 	/* calc shared secret K */
 	// ã§í åÆÇÃê∂ê¨
+	//   (xk, yk) = dA * QB
+	//   xk is a shared secret
+	// Writing using RFC 5656 notation:
+	//   (x', y') = d_C * Q_S
+	//   x' is a shared secret K
 	shared_secret = buffer_init();
 	if (shared_secret == NULL) {
 		// TODO: error check
