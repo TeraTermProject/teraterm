@@ -26,6 +26,9 @@ target_sources(
   arc4random.h
   auth.c
   auth.h
+  bcrypt_pbkdf.c
+  blf.h
+  blowfish.c
   buffer.c
   buffer.h
   chacha.c
@@ -43,28 +46,17 @@ target_sources(
   config.h
   crypt.c
   crypt.h
+  crypto_api.h
   dns.c
   dns.h
   ed25519.c
-  ed25519_bcrypt_pbkdf.c
-  ed25519_blf.h
-  ed25519_blocks.c
-  ed25519_blowfish.c
-  ed25519_crypto_api.h
-  ed25519_fe25519.c
-  ed25519_fe25519.h
-  ed25519_ge25519.c
-  ed25519_ge25519.h
-  ed25519_hash.c
-  ed25519_sc25519.c
-  ed25519_sc25519.h
-  ed25519_verify.c
   fwd-socks.c
   fwd-socks.h
   fwd.c
   fwd.h
   fwdui.c
   fwdui.h
+  hash.c
   hostkey.c
   hostkey.h
   hosts.c

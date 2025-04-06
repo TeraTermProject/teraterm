@@ -30,7 +30,7 @@
 #define __KEY_H_
 
 #include "ttxssh.h"
-#include "ed25519_crypto_api.h"
+#include "crypto_api.h"
 
 #define	ED25519_SK_SZ	crypto_sign_ed25519_SECRETKEYBYTES
 #define	ED25519_PK_SZ	crypto_sign_ed25519_PUBLICKEYBYTES

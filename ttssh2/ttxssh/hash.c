@@ -26,38 +26,26 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __ED25519_GE25519_H
-#define __ED25519_GE25519_H
+// from hash.c
 
-#include "ed25519_fe25519.h"
-#include "ed25519_sc25519.h"
+/* $OpenBSD: hash.c,v 1.6 2019/11/29 00:11:21 djm Exp $ */
+/*
+ * Public domain. Author: Christian Weisgerber <naddy@openbsd.org>
+ * API compatible reimplementation of function from nacl
+ */
 
-#define ge25519                           crypto_sign_ed25519_ref_ge25519
-#define ge25519_base                      crypto_sign_ed25519_ref_ge25519_base
-#define ge25519_unpackneg_vartime         crypto_sign_ed25519_ref_unpackneg_vartime
-#define ge25519_pack                      crypto_sign_ed25519_ref_pack
-#define ge25519_isneutral_vartime         crypto_sign_ed25519_ref_isneutral_vartime
-#define ge25519_double_scalarmult_vartime crypto_sign_ed25519_ref_double_scalarmult_vartime
-#define ge25519_scalarmult_base           crypto_sign_ed25519_ref_scalarmult_base
+#include "crypto_api.h"
 
-typedef struct
+#include <stdarg.h>
+
+#include <openssl/evp.h>
+
+int
+crypto_hash_sha512(unsigned char *out, const unsigned char *in,
+    unsigned long long inlen)
 {
-  fe25519 x;
-  fe25519 y;
-  fe25519 z;
-  fe25519 t;
-} ge25519;
 
-extern const ge25519 ge25519_base;
-
-int ge25519_unpackneg_vartime(ge25519 *r, const unsigned char p[32]);
-
-void ge25519_pack(unsigned char r[32], const ge25519 *p);
-
-int ge25519_isneutral_vartime(const ge25519 *p);
-
-void ge25519_double_scalarmult_vartime(ge25519 *r, const ge25519 *p1, const sc25519 *s1, const ge25519 *p2, const sc25519 *s2);
-
-void ge25519_scalarmult_base(ge25519 *r, const sc25519 *s);
-
-#endif
+	if (!EVP_Digest(in, (size_t)inlen, out, NULL, EVP_sha512(), NULL))
+		return -1;
+	return 0;
+}
