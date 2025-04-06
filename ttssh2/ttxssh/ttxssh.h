@@ -341,6 +341,9 @@ typedef struct _TInstVar {
 
 	EC_KEY *ecdh_client_key;
 
+	u_char c25519_client_key[CURVE25519_SIZE];
+	u_char c25519_client_pubkey[CURVE25519_SIZE];
+
 	int dns_key_check;
 
 	unsigned int server_compat_flag;

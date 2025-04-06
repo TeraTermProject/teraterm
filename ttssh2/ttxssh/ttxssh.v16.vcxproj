@@ -171,9 +171,11 @@
     <ClCompile Include="keyfiles.c" />
     <ClCompile Include="keyfiles-putty.c" />
     <ClCompile Include="mac.c" />
+    <ClCompile Include="openbsd-compat.c" />
     <ClCompile Include="pkt.c" />
     <ClCompile Include="poly1305.c" />
     <ClCompile Include="sftp.c" />
+    <ClCompile Include="smult_curve25519_ref.c" />
     <ClCompile Include="ssh.c" />
     <ClCompile Include="ssherr.c" />
     <ClCompile Include="ttxssh.c" />
@@ -215,6 +217,7 @@
     <ClInclude Include="keyfiles.h" />
     <ClInclude Include="keyfiles-putty.h" />
     <ClInclude Include="mac.h" />
+    <ClInclude Include="openbsd-compat.h" />
     <ClInclude Include="pkt.h" />
     <ClInclude Include="poly1305.h" />
     <ClInclude Include="resource.h" />

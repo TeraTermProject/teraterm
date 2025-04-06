@@ -103,6 +103,9 @@
     <ClCompile Include="sftp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="smult_curve25519_ref.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ssh.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -128,6 +131,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="win32helper_u8.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openbsd-compat.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -262,6 +268,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="win32helper_u8.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openbsd-compat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

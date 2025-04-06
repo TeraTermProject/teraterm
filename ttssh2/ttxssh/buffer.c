@@ -41,6 +41,7 @@
 #include <zlib.h>
 
 #include "ttxssh.h"	// for logprintf()
+#include "openbsd-compat.h"
 
 #include "buffer.h"
 
@@ -499,6 +500,32 @@ void buffer_get_bignum_SECSH(buffer_t *buffer, BIGNUM *value)
 	}
 
 	buffer->offset += bytes;
+}
+
+int buffer_put_bignum2_bytes(buffer_t *buf, const void *v, size_t len)
+{
+	u_char *d;
+	const u_char *s = (const u_char *)v;
+	int prepend;
+
+	if (len > BUFFER_SIZE_MAX - 5)
+		return -9; // SSH_ERR_NO_BUFFER_SPACE
+
+	/* Skip leading zero bytes */
+	for (; len > 0 && *s == 0; len--, s++)
+		;
+	/*
+	 * If most significant bit is set then prepend a zero byte to
+	 * avoid interpretation as a negative number.
+	 */
+	prepend = len > 0 && (s[0] & 0x80) != 0;
+
+	d = buffer_append_space(buf, len + 4 + prepend);
+	POKE_U32(d, len + prepend);
+	if (prepend)
+		d[4] = 0;
+	memcpy(d + 4 + prepend, s, len);
+	return 0;
 }
 
 void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *point)

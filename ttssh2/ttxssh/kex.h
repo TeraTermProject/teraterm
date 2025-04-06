@@ -67,6 +67,8 @@ typedef enum {
 	KEX_DH_GRP14_SHA256,
 	KEX_DH_GRP16_SHA512,
 	KEX_DH_GRP18_SHA512,
+	KEX_CURVE25519_SHA256_OLD,
+	KEX_CURVE25519_SHA256,
 	KEX_DH_UNKNOWN,
 	KEX_DH_MAX = KEX_DH_UNKNOWN,
 } kex_algorithm;
@@ -131,10 +133,24 @@ unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
                              const EC_POINT *client_dh_pub,
                              const EC_POINT *server_dh_pub,
                              BIGNUM *shared_secret,
+                             unsigned int *hashlen);
+#define CURVE25519_SIZE 32
+unsigned char *kex_c25519_hash(const EVP_MD *evp_md,
+                               char *client_version_string,
+                               char *server_version_string,
+                               char *ckexinit, int ckexinitlen,
+                               char *skexinit, int skexinitlen,
+                               u_char *serverhostkeyblob, int sbloblen,
+                               u_char client_dh_pub[CURVE25519_SIZE],
+                               u_char server_dh_pub[CURVE25519_SIZE],
+                               u_char *shared_secret, int secretlen,
                                unsigned int *hashlen);
+void kexc25519_keygen(u_char key[CURVE25519_SIZE], u_char pub[CURVE25519_SIZE]);
+int kexc25519_shared_key(const u_char key[CURVE25519_SIZE],
+                         const u_char pub[CURVE25519_SIZE], buffer_t *out);
 
 int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub);
-void kex_derive_keys(PTInstVar pvar, SSHKeys *newkeys, int need, u_char *hash, BIGNUM *shared_secret,
+void kex_derive_keys(PTInstVar pvar, SSHKeys *newkeys, int need, u_char *hash, buffer_t *shared_secret,
                      char *session_id, int session_id_len);
 
 #endif				/* KEX_H */
