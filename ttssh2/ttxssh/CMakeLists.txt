@@ -79,6 +79,8 @@ target_sources(
   keyfiles-putty.h
   mac.c
   mac.h
+  openbsd-compat.c
+  openbsd-compat.h
   pkt.c
   pkt.h
   poly1305.c
@@ -86,6 +88,7 @@ target_sources(
   resource.h
   sftp.c
   sftp.h
+  smult_curve25519_ref.c
   ssh.c
   ssh.h
   ssherr.c
