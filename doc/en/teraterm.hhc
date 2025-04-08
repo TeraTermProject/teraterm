@@ -450,13 +450,13 @@
 				</OBJECT>
 			<UL>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="UI tab">
-					<param name="Local" value="html\menu\setup-additional-ui.html">
+					<param name="Name" value="General tab">
+					<param name="Local" value="html\menu\setup-additional-general.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="General tab">
-					<param name="Local" value="html\menu\setup-additional-general.html">
+					<param name="Name" value="UI tab">
+					<param name="Local" value="html\menu\setup-additional-ui.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">

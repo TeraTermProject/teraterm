@@ -9,7 +9,7 @@
   </head>
 
   <body>
-    <h1>Additional settings / "Font" タブ ([Setup] メニュー)</h1>
+    <h1><a href="setup-additional.html">Additional settings<a> / "Font" タブ ([Setup] メニュー)</h1>
 
     <dl>
       <dt id="VTFont">VTウィンドウフォント</dt>
@@ -63,33 +63,17 @@
             フォントダイアログの一覧にプロポーショナルフォントを表示します。
           </dd>
 
-          <dt>文字間スペース</dt>
+          <dt id="ListHiddenFonts">OSで非表示のフォントもフォントダイアログの一覧に表示する</dt>
           <dd>
-            <a href="../setup/teraterm-win.html#space">文字(行)間のすきまを調整する</a>を参照ください。
+            Windows 7以降には各フォントをフォント一覧に表示するか非表示にするかを設定する機能が追加されました。<br>
+            この設定を有効にすると、OS側で非表示に設定されたフォントも選択できるようになります。
           </dd>
         </dl>
       </dd>
 
-      <dt id="DLGFont">ダイアログフォント</dt>
-      <dd>ダイアログで使用するフォントを指定します
-        <dl>
-          <dt>デフォルト ボタン</dt>
-          <dd>
-            デフォルトのダイアログフォントを使用します。<br>
-            SystemParametersInfo(SPI_GETNONCLIENTMETRICS) を使用してWindowsからフォントを取得しています。
-          </dd>
-
-          <dt>プロポーショナルフォントをフォントダイアログの一覧に表示する</dt>
-          <dd>
-            フォントダイアログの一覧にプロポーショナルフォントを表示します。
-          </dd>
-        </dl>
-      </dd>
-
-      <dt id="ListHiddenFonts">OSで非表示のフォントもフォントダイアログの一覧に表示する</dt>
+      <dt>文字間スペース</dt>
       <dd>
-        Windows 7以降には各フォントをフォント一覧に表示するか非表示にするかを設定する機能が追加されました。<br>
-        この設定を有効にすると、OS側で非表示に設定されたフォントも選択できるようになります。
+        <a href="../setup/teraterm-win.html#space">文字(行)間のすきまを調整する</a>を参照ください。
       </dd>
 
     </dl>
@@ -104,10 +88,6 @@
       <li>
 	Additional settings ダイアログの Visual タブにある
 	<a href="setup-additional-visual.html#FontQuality">Font quality</a> でフォントの品質を選択することができます。
-      </li>
-      <li>
-	ダイアログフォントに極端に大きなサイズや横幅の広いフォントを設定すると、
-	表示される文字が欠けたり、ダイアログが画面からはみ出して[ok]ボタン等が押せなくなることがあります。
       </li>
     </ul>
 

@@ -99,6 +99,8 @@ void SetComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar
 HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi, BOOL notify);
 void TTSetIcon(HINSTANCE hInst, HWND hWnd, const wchar_t *icon_name, UINT dpi);
 DWORD GetDlgItemIndexTextW(HWND hDlg, int nIDDlgItem, WPARAM index, wchar_t **text);
+void SetFontStringW(HWND hWnd, int item, const LOGFONTW *logfont);
+void SetFontStringA(HWND hWnd, int item, const LOGFONTA *logfont);
 
 #ifdef __cplusplus
 }

@@ -170,14 +170,91 @@ struct UIPPData {
 	size_t lng_size;
 	size_t selected_lang;	// 選ばれていたlngファイル番号
 	TipWin2 *tipwin2;
+	LOGFONTW DlgFont;
 	HWND hVTWin;
 	HINSTANCE hInst;
 };
+
+static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
+{
+	memset(logfont, 0, sizeof(*logfont));
+	if (ts->DialogFontNameW[0] == 0) {
+		// フォントが設定されていなかったらOSのフォントを使用する
+		GetMessageboxFontW(logfont);
+	}
+	else {
+		wcsncpy_s(logfont->lfFaceName, _countof(logfont->lfFaceName), ts->DialogFontNameW,  _TRUNCATE);
+		logfont->lfHeight = -GetFontPixelFromPoint(hWnd, ts->DialogFontPoint);
+		logfont->lfCharSet = ts->DialogFontCharSet;
+		logfont->lfWeight = FW_NORMAL;
+		logfont->lfOutPrecision = OUT_DEFAULT_PRECIS;
+		logfont->lfClipPrecision = CLIP_DEFAULT_PRECIS;
+		logfont->lfQuality = DEFAULT_QUALITY;
+		logfont->lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
+	}
+}
+
+static void SetDlgLogFont(HWND hWnd, const LOGFONTW *logfont, TTTSet *ts)
+{
+	wcsncpy_s(ts->DialogFontNameW, _countof(ts->DialogFontNameW), logfont->lfFaceName, _TRUNCATE);
+	ts->DialogFontPoint = GetFontPointFromPixel(hWnd, -logfont->lfHeight);
+	ts->DialogFontCharSet = logfont->lfCharSet;
+}
+
+static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+	if (Message == WM_INITDIALOG) {
+		UIPPData *dlg_data = (UIPPData *)(((CHOOSEFONTW *)lParam)->lCustData);
+		wchar_t *uimsg;
+		static const wchar_t def[] = L"\"Font style\" selection here won't affect actual font appearance.";
+		GetI18nStrWW("Tera Term", "DLG_CHOOSEFONT_STC6", def, dlg_data->UILanguageFileW, &uimsg);
+		SetDlgItemTextW(Dialog, stc6, uimsg);
+		free(uimsg);
+
+		SetFocus(GetDlgItem(Dialog,cmb1));
+
+		CenterWindow(Dialog, GetParent(Dialog));
+	}
+	return FALSE;
+}
+
+static BOOL ChooseDlgFont(HWND hWnd, UIPPData *dlg_data)
+{
+	const TTTSet *ts = dlg_data->pts;
+
+	// ダイアログ表示
+	CHOOSEFONTW cf = {};
+	cf.lStructSize = sizeof(cf);
+	cf.hwndOwner = hWnd;
+	cf.lpLogFont = &dlg_data->DlgFont;
+	cf.Flags =
+		CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
+		//CF_SHOWHELP |
+		CF_NOVERTFONTS |
+		CF_ENABLEHOOK;
+	if (IsWindows7OrLater() && (IsDlgButtonChecked(hWnd, IDC_LIST_HIDDEN_FONTS_DLG) == BST_CHECKED)) {
+		cf.Flags |= CF_INACTIVEFONTS;
+	}
+	if (IsDlgButtonChecked(hWnd, IDC_LIST_PRO_FONTS_DLG) != BST_CHECKED) {
+		cf.Flags |= CF_FIXEDPITCHONLY;
+	}
+	cf.lpfnHook = TFontHook;
+	cf.nFontType = REGULAR_FONTTYPE;
+	cf.hInstance = dlg_data->hInst;
+	cf.lCustData = (LPARAM)dlg_data;
+	BOOL result = ChooseFontW(&cf);
+	return result;
+}
 
 static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ IDC_GENUILANG_LABEL, "DLG_GEN_LANG_UI" },
+		{ IDC_DLGFONT, "DLG_TAB_FONT_DLGFONT"},
+		{ IDC_DLGFONT_CHOOSE, "DLG_TAB_FONT_BTN_SELECT" },
+		{ IDC_DLGFONT_DEFAULT, "DLG_TAB_FONT_BTN_DEFAULT" },
+		{ IDC_LIST_PRO_FONTS_DLG, "DLG_TAB_FONT_LIST_PRO_FONTS_DLG" },
+		{ IDC_LIST_HIDDEN_FONTS_DLG, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
 	};
 
 	switch (msg) {
@@ -222,36 +299,50 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			}
 			SendDlgItemMessageW(hWnd, IDC_GENUILANG, CB_SETCURSEL, data->selected_lang, 0);
 
+			GetDlgLogFont(GetParent(hWnd), pts, &data->DlgFont);
+			SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
+
+			CheckDlgButton(hWnd, IDC_LIST_HIDDEN_FONTS_DLG, BST_UNCHECKED);
+			EnableWindow(GetDlgItem(hWnd, IDC_LIST_HIDDEN_FONTS_DLG), IsWindows7OrLater() ? TRUE : FALSE);
+
+			CheckDlgButton(hWnd, IDC_LIST_PRO_FONTS_DLG, BST_CHECKED);
 
 			return TRUE;
 		}
 		case WM_DESTROY: {
 			UIPPData *data = (UIPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
+
 			LangFree(data->lng_infos, data->lng_size);
 			data->lng_infos = NULL;
 			data->lng_size = 0;
+
+			TipWin2Destroy(data->tipwin2);
+			data->tipwin2 = NULL;
+
 			break;
 		}
 		case WM_NOTIFY: {
 			NMHDR *nmhdr = (NMHDR *)lp;
 			switch (nmhdr->code) {
 				case PSN_APPLY: {
-					UIPPData *data = (UIPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
-					TTTSet *pts = data->pts;
+					UIPPData *dlg_data = (UIPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
+					TTTSet *pts = dlg_data->pts;
 					LRESULT w = SendDlgItemMessageA(hWnd, IDC_GENUILANG, CB_GETCURSEL, 0, 0);
-					if (w != data->selected_lang) {
-						const LangInfo* p = data->lng_infos + w;
+					if (w != dlg_data->selected_lang) {
+						const LangInfo* p = dlg_data->lng_infos + w;
 						free(pts->UILanguageFileW);
 						pts->UILanguageFileW = _wcsdup(p->fullname);
 
 						// タイトルの更新を行う。(2014.2.23 yutaka)
-						PostMessage(data->hVTWin, WM_USER_CHANGETITLE, 0, 0);
+						PostMessage(dlg_data->hVTWin, WM_USER_CHANGETITLE, 0, 0);
 					}
+
+					SetDlgLogFont(GetParent(hWnd), &dlg_data->DlgFont, pts);
 
 					// TTXKanjiMenu は Language を見てメニューを表示するので、変更の可能性がある
 					// OK 押下時にメニュー再描画のメッセージを飛ばすようにした。 (2007.7.14 maya)
 					// 言語ファイルの変更時にメニューの再描画が必要 (2012.5.5 maya)
-					PostMessage(data->hVTWin, WM_USER_CHANGEMENU, 0, 0);
+					PostMessage(dlg_data->hVTWin, WM_USER_CHANGEMENU, 0, 0);
 
 					break;
 				}
@@ -276,6 +367,17 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					free(info_text);
 					break;
 				}
+				case IDC_DLGFONT_CHOOSE | (BN_CLICKED << 16):
+					if (ChooseDlgFont(hWnd, data) != FALSE) {
+						SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
+					}
+					break;
+
+				case IDC_DLGFONT_DEFAULT | (BN_CLICKED << 16):
+					GetMessageboxFontW(&data->DlgFont);
+					SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
+					break;
+
 				default:
 					break;
 			}
@@ -312,9 +414,9 @@ HPROPSHEETPAGE UIPageCreate(HINSTANCE inst, TTTSet *pts)
 	// 注 common/tt_res.h と ui_pp_res.h で値を一致させること
 	int id = IDD_TABSHEET_UI;
 
-	UIPPData *Param = (UIPPData *)calloc(1, sizeof(UIPPData));
-	Param->UILanguageFileW = pts->UILanguageFileW;
-	Param->pts = pts;
+	UIPPData *dlg_data = (UIPPData *)calloc(1, sizeof(UIPPData));
+	dlg_data->UILanguageFileW = pts->UILanguageFileW;
+	dlg_data->pts = pts;
 
 	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
@@ -327,11 +429,11 @@ HPROPSHEETPAGE UIPageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.pszTitle = UIMsg;
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 	psp.dwFlags |= PSP_DLGINDIRECT;
-	Param->dlg_templ = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(id));
-	psp.pResource = Param->dlg_templ;
+	dlg_data->dlg_templ = TTGetDlgTemplate(inst, MAKEINTRESOURCEW(id));
+	psp.pResource = dlg_data->dlg_templ;
 
 	psp.pfnDlgProc = Proc;
-	psp.lParam = (LPARAM)Param;
+	psp.lParam = (LPARAM)dlg_data;
 
 	HPROPSHEETPAGE hpsp = CreatePropertySheetPageW((LPCPROPSHEETPAGEW)&psp);
 	free(UIMsg);

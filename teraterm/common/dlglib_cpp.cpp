@@ -552,3 +552,41 @@ DWORD GetDlgItemIndexTextW(HWND hDlg, int nIDDlgItem, WPARAM index, wchar_t **te
 	*text = str;
 	return NO_ERROR;
 }
+
+/**
+ *	ƒtƒHƒ“ƒg•¶Žš—ñ‚ð hWnd ‚ÉÝ’è‚·‚é
+ */
+void SetFontStringW(HWND hWnd, int item, const LOGFONTW *logfont)
+{
+	// https://docs.microsoft.com/en-us/windows/win32/api/dimm/ns-dimm-logfonta
+	// http://www.coara.or.jp/~tkuri/D/015.htm#D2002-09-14
+	wchar_t b[128];
+	HDC DC = GetDC(hWnd);
+	int dpi = GetDeviceCaps(DC, LOGPIXELSY);
+	ReleaseDC(hWnd, DC);
+	swprintf_s(b, L"%s (%d,%d) %d ; %.1f point",
+			   logfont->lfFaceName,
+			   logfont->lfWidth,
+			   logfont->lfHeight,
+			   logfont->lfCharSet,
+			   abs(logfont->lfHeight) * 72.0f / dpi);
+	SetDlgItemTextW(hWnd, item, b);
+}
+
+static void ConvertLOGFONTWA(const LOGFONTA *logfontA, LOGFONTW *logfontW)
+{
+	logfontW->lfWidth = logfontA->lfWidth;
+	logfontW->lfHeight = logfontA->lfHeight;
+	logfontW->lfCharSet = logfontA->lfCharSet;
+	ACPToWideChar_t(logfontA->lfFaceName, logfontW->lfFaceName, _countof(logfontW->lfFaceName));
+}
+
+/**
+ *	SetFontStringW() ANSI”Å
+ */
+void SetFontStringA(HWND hWnd, int item, const LOGFONTA *logfont)
+{
+	LOGFONTW logfontW = {};
+	ConvertLOGFONTWA(logfont, &logfontW);
+	SetFontStringW(hWnd, item, &logfontW);
+}

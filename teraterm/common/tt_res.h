@@ -193,7 +193,6 @@
 #define IDC_OPT_TIMESTAMP_TYPE          2541
 #define IDC_TRIMNLCHAR                  2564
 #define IDC_CLIPBOARD_NOTIFY            2566
-#define IDC_LIST_HIDDEN_FONTS           2567
 #define IDC_TITLEFMT_GROUP              2568
 #define IDC_TITLEFMT_DISPHOSTNAME       2569
 #define IDC_TITLEFMT_DISPSESSION        2570
