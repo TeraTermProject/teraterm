@@ -36,13 +36,13 @@
 #endif
 #endif
 
-#include <string.h>
 #include <windows.h>
-#include <wchar.h>
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <assert.h>
+#include <string.h>
+#include <wchar.h>
 
 #include "teraterm.h"
 #include "tttypes.h"

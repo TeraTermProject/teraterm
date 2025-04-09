@@ -57,12 +57,13 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include <wchar.h>
-#include <assert.h>
 #if !defined(_CRTDBG_MAP_ALLOC)
 #define _CRTDBG_MAP_ALLOC
 #endif
+#include <stdlib.h>
 #include <crtdbg.h>
+#include <wchar.h>
+#include <assert.h>
 
 #include "ttlib.h"		// for GetMessageboxFont()
 #include "codeconv.h"
