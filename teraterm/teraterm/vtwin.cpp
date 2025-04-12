@@ -4930,21 +4930,48 @@ void CVTWindow::OnHelpAbout()
 	(*AboutDialog)(HVTWin);
 }
 
-LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
+LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 {
+	// BOOL calcOnly
+	//   TRUE  = WM_GETDPISCALEDSIZE
+	//   FALSE = WM_DPICHANGED
+
 	const UINT NewDPI = LOWORD(wp);
 	const RECT SuggestedWindowRect = *(RECT *)lp;
-
-	// 新しいDPIに合わせてフォントを生成、
-	// クライアント領域のサイズを決定する
-	ChangeFont(NewDPI);
-	ScreenWidth = WinWidth * FontWidth;
-	ScreenHeight = WinHeight * FontHeight;
-	//AdjustScrollBar();
-
-	// スクリーンサイズ(=Client Areaのサイズ)からウィンドウサイズを算出
+	SIZE *sz = (SIZE *)lp;
+	RECT NewWindowRect[4]; // 新しいウィンドウ領域候補
+	const RECT *NewRect;
 	int NewWindowWidth;
 	int NewWindowHeight;
+	int tmpScreenWidth;
+	int	tmpScreenHeight;
+
+	if (calcOnly) {
+		// 新DPIのフォントのサイズからスクリーンサイズを算出
+		LOGFONTA VTlfDefault;
+		DispSetLogFont(&VTlfDefault, NewDPI); // Normal Font
+		HFONT VTFontDefault = CreateFontIndirect(&VTlfDefault);
+		HDC TmpDC = GetDC(m_hWnd);
+		SelectObject(TmpDC, VTFontDefault);
+		TEXTMETRIC Metrics;
+		GetTextMetrics(TmpDC, &Metrics);
+		int tmpFontWidth = Metrics.tmAveCharWidth + ts.FontDW;
+		int tmpFontHeight = Metrics.tmHeight + ts.FontDH;
+		DeleteObject(VTFontDefault);
+		ReleaseDC(m_hWnd, TmpDC);
+
+		tmpScreenWidth = WinWidth * tmpFontWidth;
+		tmpScreenHeight = WinHeight * tmpFontHeight;
+	} else {
+		// 新しいDPIに合わせてフォントを生成、
+		// クライアント領域のサイズを決定する
+		ChangeFont(NewDPI);
+		tmpScreenWidth = WinWidth * FontWidth;
+		tmpScreenHeight = WinHeight * FontHeight;
+		//AdjustScrollBar();
+	}
+
+	// スクリーンサイズ(=Client Areaのサイズ)からウィンドウサイズを算出
 	if (pAdjustWindowRectExForDpi != NULL || pAdjustWindowRectEx != NULL) {
 		const DWORD Style = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
 		const DWORD ExStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
@@ -4956,14 +4983,14 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 			int max_pos;
 			GetScrollRange(m_hWnd, SB_VERT, &min_pos, &max_pos);
 			if (min_pos != max_pos) {
-				ScreenWidth += pGetSystemMetricsForDpi(SM_CXVSCROLL, NewDPI);
+				tmpScreenWidth += pGetSystemMetricsForDpi(SM_CXVSCROLL, NewDPI);
 			}
 			GetScrollRange(m_hWnd, SB_HORZ, &min_pos, &max_pos);
 			if (min_pos != max_pos) {
-				ScreenHeight += pGetSystemMetricsForDpi(SM_CXHSCROLL, NewDPI);
+				tmpScreenHeight += pGetSystemMetricsForDpi(SM_CXHSCROLL, NewDPI);
 			}
 		}
-		RECT Rect = {0, 0, ScreenWidth, ScreenHeight};
+		RECT Rect = {0, 0, tmpScreenWidth, tmpScreenHeight};
 		if (pAdjustWindowRectExForDpi != NULL) {
 			// Windows 10, version 1607+
 			pAdjustWindowRectExForDpi(&Rect, Style, bMenu, ExStyle, NewDPI);
@@ -4985,12 +5012,18 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 		GetClientRect(&ClientRect);
 		const int ClientWidth =  ClientRect.right - ClientRect.left;
 		const int ClientHeight = ClientRect.bottom - ClientRect.top;
-		NewWindowWidth = WindowWidth - ClientWidth + ScreenWidth;
-		NewWindowHeight = WindowHeight - ClientHeight + ScreenHeight;
+		NewWindowWidth = WindowWidth - ClientWidth + tmpScreenWidth;
+		NewWindowHeight = WindowHeight - ClientHeight + tmpScreenHeight;
 	}
 
-	// 新しいウィンドウ領域候補
-	RECT NewWindowRect[4];
+	if (calcOnly) {
+		sz->cx = NewWindowWidth;
+		sz->cy = NewWindowHeight;
+		return TRUE;
+	} else {
+		ScreenWidth = tmpScreenWidth;
+		ScreenHeight = tmpScreenHeight;
+	}
 
 	// 推奨領域に右上寄せ
 	NewWindowRect[0].top = SuggestedWindowRect.top;
@@ -5017,15 +5050,15 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 	NewWindowRect[3].right = SuggestedWindowRect.left + NewWindowWidth;
 
 	// 確認
-	const RECT *NewRect = &NewWindowRect[0];
+	NewRect = &NewWindowRect[0];
 	HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
-						0, 0, NewWindowWidth, NewWindowHeight,
-						NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
+								   0, 0, NewWindowWidth, NewWindowHeight,
+								   NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
 	if (tmphWnd) {
 		for (size_t i = 0; i < _countof(NewWindowRect); i++) {
 			const RECT *r = &NewWindowRect[i];
 			if (::SetWindowPos(tmphWnd, HWND_BOTTOM, r->left, r->top, 0, 0,
-						SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOSENDCHANGING | SWP_NOZORDER | SWP_NOREDRAW)) {
+							   SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOSENDCHANGING | SWP_NOZORDER | SWP_NOREDRAW)) {
 				if (NewDPI == GetDpiForWindow(tmphWnd)) {
 					NewRect = r;
 					break;
@@ -5053,7 +5086,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 		TTSetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), NewDPI);
 	}
 
-	return TRUE;
+	return 0;
 }
 
 LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
@@ -5295,8 +5328,11 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_USER_DROPNOTIFY:
 		OnDropNotify(wp, lp);
 		break;
+	case WM_GETDPISCALEDSIZE:
+		retval = OnDpiChanged(wp, lp, TRUE);
+		break;
 	case WM_DPICHANGED:
-		OnDpiChanged(wp, lp);
+		OnDpiChanged(wp, lp, FALSE);
 		break;
 	case WM_COMMAND:
 	{
