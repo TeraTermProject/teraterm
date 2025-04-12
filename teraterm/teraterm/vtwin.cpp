@@ -640,6 +640,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	vtwin_work.dbcs_lead_byte = 0;
 	vtwin_work.monitor_DPI = 0;
 	vtwin_work.help_id = 0;
+	isSizing = FALSE;
 
 	// UnicodeDebugParam
 	{
@@ -2846,6 +2847,7 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 		pRect->bottom = pRect->top + fixed_height;
 		break;
 	}
+	isSizing = TRUE;
 }
 
 void CVTWindow::OnSysChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
@@ -3125,7 +3127,7 @@ LRESULT CVTWindow::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 	BGOnExitSizeMove();
 
 	EnableSizeTip(0);
-
+	isSizing = FALSE;
 	return TTCFrameWnd::DefWindowProc(WM_EXITSIZEMOVE,wParam,lParam);
 }
 
@@ -4943,129 +4945,144 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 	const RECT *NewRect;
 	int NewWindowWidth;
 	int NewWindowHeight;
-	int tmpScreenWidth;
-	int	tmpScreenHeight;
 
-	if (calcOnly) {
-		// 新DPIのフォントのサイズからスクリーンサイズを算出
-		LOGFONTA VTlfDefault;
-		DispSetLogFont(&VTlfDefault, NewDPI); // Normal Font
-		HFONT VTFontDefault = CreateFontIndirect(&VTlfDefault);
-		HDC TmpDC = GetDC(m_hWnd);
-		SelectObject(TmpDC, VTFontDefault);
-		TEXTMETRIC Metrics;
-		GetTextMetrics(TmpDC, &Metrics);
-		int tmpFontWidth = Metrics.tmAveCharWidth + ts.FontDW;
-		int tmpFontHeight = Metrics.tmHeight + ts.FontDH;
-		DeleteObject(VTFontDefault);
-		ReleaseDC(m_hWnd, TmpDC);
-
-		tmpScreenWidth = WinWidth * tmpFontWidth;
-		tmpScreenHeight = WinHeight * tmpFontHeight;
+	if (isSizing) {
+		if (calcOnly) {
+			RECT rc;
+			::GetWindowRect(m_hWnd, &rc);
+			sz->cx = rc.right  - rc.left;
+			sz->cy = rc.bottom - rc.top;
+			return TRUE;
+		} else {
+			NewRect = &SuggestedWindowRect;
+			NewWindowWidth  = NewRect->right  - NewRect->left;
+			NewWindowHeight = NewRect->bottom - NewRect->top;
+		}
 	} else {
-		// 新しいDPIに合わせてフォントを生成、
-		// クライアント領域のサイズを決定する
-		ChangeFont(NewDPI);
-		tmpScreenWidth = WinWidth * FontWidth;
-		tmpScreenHeight = WinHeight * FontHeight;
-		//AdjustScrollBar();
-	}
+		int tmpScreenWidth;
+		int tmpScreenHeight;
 
-	// スクリーンサイズ(=Client Areaのサイズ)からウィンドウサイズを算出
-	if (pAdjustWindowRectExForDpi != NULL || pAdjustWindowRectEx != NULL) {
-		const DWORD Style = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
-		const DWORD ExStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
-		const BOOL bMenu = (ts.PopupMenu != 0) ? FALSE : TRUE;
-		if (pGetSystemMetricsForDpi != NULL) {
-			// スクロールバーが表示されている場合は、
-			// スクリーンサイズ(クライアントエリアのサイズ)に追加する
-			int min_pos;
-			int max_pos;
-			GetScrollRange(m_hWnd, SB_VERT, &min_pos, &max_pos);
-			if (min_pos != max_pos) {
-				tmpScreenWidth += pGetSystemMetricsForDpi(SM_CXVSCROLL, NewDPI);
-			}
-			GetScrollRange(m_hWnd, SB_HORZ, &min_pos, &max_pos);
-			if (min_pos != max_pos) {
-				tmpScreenHeight += pGetSystemMetricsForDpi(SM_CXHSCROLL, NewDPI);
-			}
+		if (calcOnly) {
+			// 新DPIのフォントのサイズからスクリーンサイズを算出
+			LOGFONTA VTlfDefault;
+			DispSetLogFont(&VTlfDefault, NewDPI); // Normal Font
+			HFONT VTFontDefault = CreateFontIndirect(&VTlfDefault);
+			HDC TmpDC = GetDC(m_hWnd);
+			SelectObject(TmpDC, VTFontDefault);
+			TEXTMETRIC Metrics;
+			GetTextMetrics(TmpDC, &Metrics);
+			int tmpFontWidth = Metrics.tmAveCharWidth + ts.FontDW;
+			int tmpFontHeight = Metrics.tmHeight + ts.FontDH;
+			DeleteObject(VTFontDefault);
+			ReleaseDC(m_hWnd, TmpDC);
+
+			tmpScreenWidth = WinWidth * tmpFontWidth;
+			tmpScreenHeight = WinHeight * tmpFontHeight;
+		} else {
+			// 新しいDPIに合わせてフォントを生成、
+			// クライアント領域のサイズを決定する
+			ChangeFont(NewDPI);
+			tmpScreenWidth = WinWidth * FontWidth;
+			tmpScreenHeight = WinHeight * FontHeight;
+			//AdjustScrollBar();
 		}
-		RECT Rect = {0, 0, tmpScreenWidth, tmpScreenHeight};
-		if (pAdjustWindowRectExForDpi != NULL) {
-			// Windows 10, version 1607+
-			pAdjustWindowRectExForDpi(&Rect, Style, bMenu, ExStyle, NewDPI);
-		}
-		else {
-			// Windows 2000+
-			pAdjustWindowRectEx(&Rect, Style, bMenu, ExStyle);
-		}
-		NewWindowWidth = Rect.right - Rect.left;
-		NewWindowHeight = Rect.bottom - Rect.top;
-	}
-	else {
-		// WM_DPICHANGEDが発生しない環境のはず、念の為実装
-		RECT WindowRect;
-		GetWindowRect(&WindowRect);
-		const int WindowWidth = WindowRect.right - WindowRect.left;
-		const int WindowHeight = WindowRect.bottom - WindowRect.top;
-		RECT ClientRect;
-		GetClientRect(&ClientRect);
-		const int ClientWidth =  ClientRect.right - ClientRect.left;
-		const int ClientHeight = ClientRect.bottom - ClientRect.top;
-		NewWindowWidth = WindowWidth - ClientWidth + tmpScreenWidth;
-		NewWindowHeight = WindowHeight - ClientHeight + tmpScreenHeight;
-	}
 
-	if (calcOnly) {
-		sz->cx = NewWindowWidth;
-		sz->cy = NewWindowHeight;
-		return TRUE;
-	} else {
-		ScreenWidth = tmpScreenWidth;
-		ScreenHeight = tmpScreenHeight;
-	}
-
-	// 推奨領域に右上寄せ
-	NewWindowRect[0].top = SuggestedWindowRect.top;
-	NewWindowRect[0].bottom = SuggestedWindowRect.top + NewWindowHeight;
-	NewWindowRect[0].left = SuggestedWindowRect.right - NewWindowWidth;
-	NewWindowRect[0].right = SuggestedWindowRect.right;
-
-	// 推奨領域に左上寄せ
-	NewWindowRect[1].top = SuggestedWindowRect.top;
-	NewWindowRect[1].bottom = SuggestedWindowRect.top + NewWindowHeight;
-	NewWindowRect[1].left = SuggestedWindowRect.left;
-	NewWindowRect[1].right = SuggestedWindowRect.left + NewWindowWidth;
-
-	// 推奨位置に右下寄せ
-	NewWindowRect[2].top = SuggestedWindowRect.bottom - NewWindowHeight;
-	NewWindowRect[2].bottom = SuggestedWindowRect.top;
-	NewWindowRect[2].left = SuggestedWindowRect.right - NewWindowWidth;
-	NewWindowRect[2].right = SuggestedWindowRect.right;
-
-	// 推奨位置に左下寄せ
-	NewWindowRect[3].top = SuggestedWindowRect.bottom - NewWindowHeight;
-	NewWindowRect[3].bottom = SuggestedWindowRect.top;
-	NewWindowRect[3].left = SuggestedWindowRect.left;
-	NewWindowRect[3].right = SuggestedWindowRect.left + NewWindowWidth;
-
-	// 確認
-	NewRect = &NewWindowRect[0];
-	HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
-								   0, 0, NewWindowWidth, NewWindowHeight,
-								   NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
-	if (tmphWnd) {
-		for (size_t i = 0; i < _countof(NewWindowRect); i++) {
-			const RECT *r = &NewWindowRect[i];
-			if (::SetWindowPos(tmphWnd, HWND_BOTTOM, r->left, r->top, 0, 0,
-							   SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOSENDCHANGING | SWP_NOZORDER | SWP_NOREDRAW)) {
-				if (NewDPI == GetDpiForWindow(tmphWnd)) {
-					NewRect = r;
-					break;
+		// スクリーンサイズ(=Client Areaのサイズ)からウィンドウサイズを算出
+		if (pAdjustWindowRectExForDpi != NULL || pAdjustWindowRectEx != NULL) {
+			const DWORD Style = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
+			const DWORD ExStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
+			const BOOL bMenu = (ts.PopupMenu != 0) ? FALSE : TRUE;
+			if (pGetSystemMetricsForDpi != NULL) {
+				// スクロールバーが表示されている場合は、
+				// スクリーンサイズ(クライアントエリアのサイズ)に追加する
+				int min_pos;
+				int max_pos;
+				GetScrollRange(m_hWnd, SB_VERT, &min_pos, &max_pos);
+				if (min_pos != max_pos) {
+					tmpScreenWidth += pGetSystemMetricsForDpi(SM_CXVSCROLL, NewDPI);
+				}
+				GetScrollRange(m_hWnd, SB_HORZ, &min_pos, &max_pos);
+				if (min_pos != max_pos) {
+					tmpScreenHeight += pGetSystemMetricsForDpi(SM_CXHSCROLL, NewDPI);
 				}
 			}
+			RECT Rect = {0, 0, tmpScreenWidth, tmpScreenHeight};
+			if (pAdjustWindowRectExForDpi != NULL) {
+				// Windows 10, version 1607+
+				pAdjustWindowRectExForDpi(&Rect, Style, bMenu, ExStyle, NewDPI);
+			}
+			else {
+				// Windows 2000+
+				pAdjustWindowRectEx(&Rect, Style, bMenu, ExStyle);
+			}
+			NewWindowWidth = Rect.right - Rect.left;
+			NewWindowHeight = Rect.bottom - Rect.top;
 		}
-		::DestroyWindow(tmphWnd);
+		else {
+			// WM_DPICHANGEDが発生しない環境のはず、念の為実装
+			RECT WindowRect;
+			GetWindowRect(&WindowRect);
+			const int WindowWidth = WindowRect.right - WindowRect.left;
+			const int WindowHeight = WindowRect.bottom - WindowRect.top;
+			RECT ClientRect;
+			GetClientRect(&ClientRect);
+			const int ClientWidth =  ClientRect.right - ClientRect.left;
+			const int ClientHeight = ClientRect.bottom - ClientRect.top;
+			NewWindowWidth = WindowWidth - ClientWidth + tmpScreenWidth;
+			NewWindowHeight = WindowHeight - ClientHeight + tmpScreenHeight;
+		}
+
+		if (calcOnly) {
+			sz->cx = NewWindowWidth;
+			sz->cy = NewWindowHeight;
+			return TRUE;
+		} else {
+			ScreenWidth = tmpScreenWidth;
+			ScreenHeight = tmpScreenHeight;
+		}
+
+		// 推奨領域に右上寄せ
+		NewWindowRect[0].top = SuggestedWindowRect.top;
+		NewWindowRect[0].bottom = SuggestedWindowRect.top + NewWindowHeight;
+		NewWindowRect[0].left = SuggestedWindowRect.right - NewWindowWidth;
+		NewWindowRect[0].right = SuggestedWindowRect.right;
+
+		// 推奨領域に左上寄せ
+		NewWindowRect[1].top = SuggestedWindowRect.top;
+		NewWindowRect[1].bottom = SuggestedWindowRect.top + NewWindowHeight;
+		NewWindowRect[1].left = SuggestedWindowRect.left;
+		NewWindowRect[1].right = SuggestedWindowRect.left + NewWindowWidth;
+
+		// 推奨位置に右下寄せ
+		NewWindowRect[2].top = SuggestedWindowRect.bottom - NewWindowHeight;
+		NewWindowRect[2].bottom = SuggestedWindowRect.top;
+		NewWindowRect[2].left = SuggestedWindowRect.right - NewWindowWidth;
+		NewWindowRect[2].right = SuggestedWindowRect.right;
+
+		// 推奨位置に左下寄せ
+		NewWindowRect[3].top = SuggestedWindowRect.bottom - NewWindowHeight;
+		NewWindowRect[3].bottom = SuggestedWindowRect.top;
+		NewWindowRect[3].left = SuggestedWindowRect.left;
+		NewWindowRect[3].right = SuggestedWindowRect.left + NewWindowWidth;
+
+		// 確認
+		NewRect = &NewWindowRect[0];
+		HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
+							0, 0, NewWindowWidth, NewWindowHeight,
+							NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
+		if (tmphWnd) {
+			for (size_t i = 0; i < _countof(NewWindowRect); i++) {
+				const RECT *r = &NewWindowRect[i];
+				if (::SetWindowPos(tmphWnd, HWND_BOTTOM, r->left, r->top, 0, 0,
+							SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOSENDCHANGING | SWP_NOZORDER | SWP_NOREDRAW)) {
+					if (NewDPI == GetDpiForWindow(tmphWnd)) {
+						NewRect = r;
+						break;
+					}
+				}
+			}
+			::DestroyWindow(tmphWnd);
+		}
 	}
 
 	::SetWindowPos(m_hWnd, NULL,
