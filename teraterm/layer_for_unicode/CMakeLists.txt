@@ -92,6 +92,11 @@ elseif(MSVC)
     $<$<CONFIG:Debug>:libcmtd.lib libcpmtd.lib>
     )
 elseif(MINGW)
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    PUBLIC
+    common_static
+  )
 else()
 endif()
 
