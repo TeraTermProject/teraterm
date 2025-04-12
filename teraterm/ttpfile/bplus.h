@@ -49,7 +49,8 @@ enum {
 };
 
 /* prototypes */
-BOOL BPCreate(PFileVarProto fv);
+struct FileVarProto;
+BOOL BPCreate(struct FileVarProto *fv);
 
 #ifdef __cplusplus
 }

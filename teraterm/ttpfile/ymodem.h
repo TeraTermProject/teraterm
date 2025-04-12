@@ -51,6 +51,7 @@ enum {
 };
 
 /* prototypes */
+struct FileVarProto;
 BOOL YCreate(struct FileVarProto *fv);
 
 #ifdef __cplusplus
