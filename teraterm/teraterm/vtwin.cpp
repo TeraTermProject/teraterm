@@ -5018,23 +5018,21 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 
 	// Šm”F
 	const RECT *NewRect = &NewWindowRect[0];
-	for (size_t i = 0; i < _countof(NewWindowRect); i++) {
-		const RECT *r = &NewWindowRect[i];
-		HMONITOR hMonitor = pMonitorFromRect(r, MONITOR_DEFAULTTONULL);
-		MONITORINFOEXW monitorInfo;
-		RtlZeroMemory(&monitorInfo, sizeof(monitorInfo));
-		monitorInfo.cbSize = sizeof(monitorInfo);
-		if (GetMonitorInfoW(hMonitor, &monitorInfo)) {
-			HDC hdc = CreateDCW(NULL, monitorInfo.szDevice, NULL, NULL);
-			if (hdc) {
-				UINT dpiX = (UINT)GetDeviceCaps(hdc, LOGPIXELSX);
-				DeleteDC(hdc);
-				if (NewDPI == dpiX) {
+	HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
+						0, 0, NewWindowWidth, NewWindowHeight,
+						NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
+	if (tmphWnd) {
+		for (size_t i = 0; i < _countof(NewWindowRect); i++) {
+			const RECT *r = &NewWindowRect[i];
+			if (::SetWindowPos(tmphWnd, HWND_BOTTOM, r->left, r->top, 0, 0,
+						SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOSENDCHANGING | SWP_NOZORDER | SWP_NOREDRAW)) {
+				if (NewDPI == GetDpiForWindow(tmphWnd)) {
 					NewRect = r;
 					break;
 				}
 			}
 		}
+		::DestroyWindow(tmphWnd);
 	}
 
 	::SetWindowPos(m_hWnd, NULL,
