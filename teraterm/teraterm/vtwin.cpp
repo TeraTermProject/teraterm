@@ -4946,6 +4946,17 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 	int NewWindowWidth;
 	int NewWindowHeight;
 
+#ifdef WINDOW_MAXMIMUM_ENABLED
+	if (IsZoomed(m_hWnd)) {
+		if (calcOnly) {
+			return FALSE;
+		}
+		GetDesktopRect(m_hWnd, &NewWindowRect[0]);
+		NewRect = &NewWindowRect[0];
+		NewWindowWidth  = NewRect->right  - NewRect->left;
+		NewWindowHeight = NewRect->bottom - NewRect->top;
+	} else
+#endif
 	if (isSizing) {
 		if (calcOnly) {
 			RECT rc;
