@@ -81,6 +81,9 @@ private:
   // for html help
   LONG HelpId;
 
+  // サイズ変更中(WM_SIZING ～ WM_EXITSIZEMOVE)はTRUE
+  BOOL isSizing;
+
 public:
 	CVTWindow(HINSTANCE hInstance);
 	~CVTWindow();
