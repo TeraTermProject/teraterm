@@ -83,6 +83,14 @@ target_include_directories(
   ../teraterm
 )
 
+if(SUPPORT_OLD_WINDOWS)
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    PUBLIC
+    layer_for_unicode
+  )
+endif()
+
 target_link_libraries(
   ${PACKAGE_NAME}
   PUBLIC

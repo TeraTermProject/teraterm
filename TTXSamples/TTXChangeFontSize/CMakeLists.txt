@@ -1,9 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.8)
 
-set(PACKAGE_NAME "TTXChangeFontSize")
-project(${PACKAGE_NAME})
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
+project("TTXChangeFontSize")
 
 if(USE_UNICODE_API)
   add_definitions(-DUNICODE -D_UNICODE)
@@ -15,25 +12,26 @@ include_directories(
 )
 
 add_library(
-  ${PACKAGE_NAME} SHARED
+  ${PROJECT_NAME} SHARED
   TTXChangeFontSize/TTXChangeFontSize.c
   TTXChangeFontSize/ReadMe.txt
   TTXChangeFontSize/ReadMe-ja.txt
   TTXChangeFontSize/LICENSE
 )
 
-target_compile_definitions(${PACKAGE_NAME}
+target_compile_definitions(${PROJECT_NAME}
   PRIVATE
   TT_VERSION_MAJOR=5)
 
 set_target_properties(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PROPERTIES
   PREFIX ""
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   common_static
   #
 #  gdi32

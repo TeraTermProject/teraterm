@@ -1,30 +1,31 @@
-﻿set(PACKAGE_NAME "TTXAlwaysOnTop")
-
-project(${PACKAGE_NAME})
+﻿project("TTXAlwaysOnTop")
 
 add_library(
-  ${PACKAGE_NAME} SHARED
+  ${PROJECT_NAME} SHARED
   TTXAlwaysOnTop.c
   ReadMe.txt
   ReadMe-ja.txt
   )
 
+target_link_libraries(
+  ${PROJECT_NAME}
+  PRIVATE
+  common_static
+  ttpcmn
+)
+
+
 if(SUPPORT_OLD_WINDOWS)
-  target_link_libraries(
-    ${PACKAGE_NAME}
-    PRIVATE
-    common_static
-    )
   if(MSVC)
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/common/compat_w95_vs2005.c
       )
   endif()
   if(MINGW)
     target_link_libraries(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       -Wl,--whole-archive
       mingw_msvcrt
@@ -35,27 +36,20 @@ if(SUPPORT_OLD_WINDOWS)
 endif(SUPPORT_OLD_WINDOWS)
 
 set_target_properties(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PROPERTIES
   PREFIX ""
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../../teraterm/teraterm
 )
 
-target_link_libraries(
-  ${PACKAGE_NAME}
-  PRIVATE
-  common_static
-  ttpcmn
-)
-
 install(
-  TARGETS ${PACKAGE_NAME}
+  TARGETS ${PROJECT_NAME}
   RUNTIME
   DESTINATION .
 )
