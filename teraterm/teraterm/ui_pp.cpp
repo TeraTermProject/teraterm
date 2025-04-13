@@ -175,6 +175,47 @@ struct UIPPData {
 	HINSTANCE hInst;
 };
 
+/**
+ *	フォントが非表示フォントか調べる
+ */
+static BOOL IsHiddenFont(const wchar_t *font_name)
+{
+	const wchar_t *reg_str = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Font Management";
+	const wchar_t *reg_key = L"Inactive Fonts";
+
+	HKEY hKey;
+	if (RegOpenKeyExW(HKEY_CURRENT_USER, reg_str, 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
+		return FALSE;
+	}
+
+	DWORD size = 0;
+	DWORD type = 0;
+
+	// 値のサイズを取得
+	BOOL find = FALSE;
+	if (RegQueryValueExW(hKey, reg_key, nullptr, &type, nullptr, &size) == ERROR_SUCCESS) {
+		if (type == REG_MULTI_SZ) {
+			BYTE *buf = (BYTE *)malloc(size);
+			if (buf != NULL &&
+				RegQueryValueExW(hKey, reg_key, nullptr, nullptr, buf, &size) == ERROR_SUCCESS) {
+				const wchar_t *p = (wchar_t *)buf;
+				while (*p) {
+					if (wcscmp(p, font_name) == 0) {
+						// フォント名が見つかった
+						find = TRUE;
+						break;
+					}
+					p += wcslen(p) + 1;	 // 次の文字列に移動
+				}
+			}
+			free(buf);
+		}
+	}
+	RegCloseKey(hKey);
+
+	return find;
+}
+
 static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
 {
 	memset(logfont, 0, sizeof(*logfont));
@@ -191,6 +232,21 @@ static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
 		logfont->lfClipPrecision = CLIP_DEFAULT_PRECIS;
 		logfont->lfQuality = DEFAULT_QUALITY;
 		logfont->lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
+
+		{
+			HDC hDC = GetDC(hWnd);
+			HFONT hFont = CreateFontIndirectW(logfont);
+			HFONT prev_font = (HFONT)SelectObject(hDC, hFont);
+			TEXTMETRIC tm;
+			GetTextMetrics(hDC, &tm);
+			SelectObject(hDC, prev_font);
+			DeleteObject(hFont);
+			ReleaseDC(hWnd, hDC);
+			if ((tm.tmPitchAndFamily & TMPF_FIXED_PITCH) != 0) {
+				// TMPF_FIXED_PITCH bit が 1 だったら、可変ピッチ(プロポーショナルフォント)
+				logfont->lfPitchAndFamily = VARIABLE_PITCH | FF_ROMAN;
+			}
+		}
 	}
 }
 
@@ -244,6 +300,29 @@ static BOOL ChooseDlgFont(HWND hWnd, UIPPData *dlg_data)
 	cf.lCustData = (LPARAM)dlg_data;
 	BOOL result = ChooseFontW(&cf);
 	return result;
+}
+
+/**
+ *	選択中フォントが表示できない状態で ChooseFontW() すると、
+ *	デフォルトで選択された状態とならない(CF_INITTOLOGFONTSTRUCT)。
+ *	回避するため選択中フォントの状態に合わせて
+ *	プロポーショナル,非表示チェックボックスを調整する
+ *	(Windows 7以降、各フォントをフォント一覧に表示/非表示する設定ができる)
+ */
+static void ArrangeControls(HWND hWnd, UIPPData *data)
+{
+	// Hidden
+	UINT check =
+		(IsWindows7OrLater() && IsHiddenFont(data->DlgFont.lfFaceName)) ? BST_CHECKED : BST_UNCHECKED;
+	BOOL enable =
+		(IsWindows7OrLater() && !IsHiddenFont(data->DlgFont.lfFaceName)) ? TRUE : FALSE;
+	CheckDlgButton(hWnd, IDC_LIST_HIDDEN_FONTS_DLG, check);
+	EnableWindow(GetDlgItem(hWnd, IDC_LIST_HIDDEN_FONTS_DLG), enable);
+
+	// Proportional
+	enable = (data->DlgFont.lfPitchAndFamily & VARIABLE_PITCH) != 0 ? FALSE : TRUE;
+	CheckDlgButton(hWnd, IDC_LIST_PRO_FONTS_DLG, BST_CHECKED);
+	EnableWindow(GetDlgItem(hWnd, IDC_LIST_PRO_FONTS_DLG), enable);
 }
 
 static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -302,10 +381,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			GetDlgLogFont(GetParent(hWnd), pts, &data->DlgFont);
 			SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
 
-			CheckDlgButton(hWnd, IDC_LIST_HIDDEN_FONTS_DLG, BST_UNCHECKED);
-			EnableWindow(GetDlgItem(hWnd, IDC_LIST_HIDDEN_FONTS_DLG), IsWindows7OrLater() ? TRUE : FALSE);
-
-			CheckDlgButton(hWnd, IDC_LIST_PRO_FONTS_DLG, BST_CHECKED);
+			ArrangeControls(hWnd, data);
 
 			return TRUE;
 		}
@@ -370,6 +446,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				case IDC_DLGFONT_CHOOSE | (BN_CLICKED << 16):
 					if (ChooseDlgFont(hWnd, data) != FALSE) {
 						SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
+						ArrangeControls(hWnd, data);
 					}
 					break;
 
