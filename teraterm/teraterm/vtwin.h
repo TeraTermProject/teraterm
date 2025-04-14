@@ -81,6 +81,9 @@ private:
   // for html help
   LONG HelpId;
 
+  // サイズ変更中(WM_SIZING ～ WM_EXITSIZEMOVE)はTRUE
+  BOOL isSizing;
+
 public:
 	CVTWindow(HINSTANCE hInstance);
 	~CVTWindow();
@@ -233,7 +236,7 @@ protected:
 	void OnHelpIndex();
 	void OnHelpAbout();
 	LRESULT OnDropNotify(WPARAM ShowMenu, LPARAM lParam);
-	LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
+	LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam, BOOL calcOnly);
 	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
 
 private:
