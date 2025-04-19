@@ -590,3 +590,99 @@ void SetFontStringA(HWND hWnd, int item, const LOGFONTA *logfont)
 	ConvertLOGFONTWA(logfont, &logfontW);
 	SetFontStringW(hWnd, item, &logfontW);
 }
+
+/**
+ *	ChooseFont() のフォント一覧で非表示フォントか調べる
+ *
+ *	@param	font_name
+ */
+BOOL IsHiddenFont(const wchar_t *font_name)
+{
+	static const wchar_t *reg_str = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Font Management";
+	static const wchar_t *reg_key = L"Inactive Fonts";
+
+	HKEY hKey;
+	if (RegOpenKeyExW(HKEY_CURRENT_USER, reg_str, 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
+		return FALSE;
+	}
+
+	DWORD size = 0;
+	DWORD type = 0;
+
+	// 値のサイズを取得
+	BOOL find = FALSE;
+	if (RegQueryValueExW(hKey, reg_key, nullptr, &type, nullptr, &size) == ERROR_SUCCESS) {
+		if (type == REG_MULTI_SZ) {
+			BYTE *buf = (BYTE *)malloc(size);
+			if (buf != NULL &&
+				RegQueryValueExW(hKey, reg_key, nullptr, nullptr, buf, &size) == ERROR_SUCCESS) {
+				const wchar_t *p = (wchar_t *)buf;
+				while (*p) {
+					if (wcscmp(p, font_name) == 0) {
+						// フォント名が見つかった
+						find = TRUE;
+						break;
+					}
+					p += wcslen(p) + 1;	 // 次の文字列に移動
+				}
+			}
+			free(buf);
+		}
+	}
+	RegCloseKey(hKey);
+
+	return find;
+}
+
+/**
+ *	ChooseFont()用チェックボックスの調整
+ *	フォントとシステムの状態からチェックボックスを調整する
+ *
+ *	選択中フォントが表示できない状態で ChooseFontW() すると、
+ *	デフォルトで選択された状態とならない(CF_INITTOLOGFONTSTRUCT)。
+ *	回避するため選択中フォントの状態に合わせて
+ *	プロポーショナル,非表示チェックボックスを調整する
+ *	(Windows 7以降、各フォントをフォント一覧に表示/非表示する設定ができる)
+ *
+ *	@param	hWnd		ダイアログ
+ *	@param	lfont		フォント構造体
+ *	@param	id_hidden	HiddenチェックボックスID
+ *	@param	id_pro		ProportionalチェックボックスID
+ */
+void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidden, int id_pro)
+{
+	// Hidden
+	UINT check =
+		(IsWindows7OrLater() && IsHiddenFont(lfont->lfFaceName)) ? BST_CHECKED : BST_UNCHECKED;
+	BOOL enable =
+		(IsWindows7OrLater() && !IsHiddenFont(lfont->lfFaceName)) ? TRUE : FALSE;
+	CheckDlgButton(hWnd, id_hidden, check);
+	EnableWindow(GetDlgItem(hWnd, id_hidden), enable);
+
+	// Proportional
+	enable = (lfont->lfPitchAndFamily & VARIABLE_PITCH) != 0 ? FALSE : TRUE;
+	CheckDlgButton(hWnd, id_pro, BST_CHECKED);
+	EnableWindow(GetDlgItem(hWnd, id_pro), enable);
+}
+
+/**
+ *	logfont の lfPitchAndFamily をセットする
+ *	プロポーショナルフォントかどうかを調べる為に作成
+ */
+void GetFontPitchAndFamily(HWND hWnd, LOGFONTW *logfont)
+{
+	HDC hDC = GetDC(hWnd);
+	logfont->lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
+	HFONT hFont = CreateFontIndirectW(logfont);
+	HFONT prev_font = (HFONT)SelectObject(hDC, hFont);
+	TEXTMETRIC tm;
+	GetTextMetrics(hDC, &tm);
+	SelectObject(hDC, prev_font);
+	DeleteObject(hFont);
+	ReleaseDC(hWnd, hDC);
+
+	if ((tm.tmPitchAndFamily & TMPF_FIXED_PITCH) != 0) {
+		// TMPF_FIXED_PITCH bit が 1 だったら、可変ピッチ(プロポーショナルフォント)
+		logfont->lfPitchAndFamily = VARIABLE_PITCH | FF_ROMAN;
+	}
+}

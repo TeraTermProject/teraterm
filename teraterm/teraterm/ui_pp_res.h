@@ -9,17 +9,19 @@
 #define IDC_DLGFONT_DEFAULT             1018
 #define IDC_LIST_HIDDEN_FONTS_DLG       1019
 #define IDC_LIST_PRO_FONTS_DLG          1022
+#define IDC_FONT_FOLDER_LABEL           2615
+#define IDC_FONT_FOLDER_BUTTON          2616
 #define IDC_GENUILANG                   2630
 #define IDC_GENUILANG_LABEL             2631
 
 // Next default values for new objects
-//
+// 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        116
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2615
+#define _APS_NEXT_CONTROL_VALUE         2619
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -1493,31 +1493,33 @@ void CCygwinPropPageDlg::OnHelp()
 
 //////////////////////////////////////////////////////////////////////////////
 
+// タブ
+// この順にタブが表示される
+enum {
+	PP_GENERAL,
+	PP_UI,
+	PP_SEQUENCE,
+	PP_COPY_PASTE,
+	PP_VISUAL,
+	PP_LOG,
+	PP_CYGWIN,
+	PP_ENCODING,
+	PP_FONT,
+	PP_THEME,
+	PP_KEYBOARD,
+	PP_MOUSE,
+	PP_TCPIP,
+	PP_TERMINAL,
+	PP_SERIAL,
+	PP_WINDOW,
+	PP_DEBUG,
+	PP_MAX,
+};
+
 // CAddSettingPropSheetDlg
 CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd):
 	TTCPropSheetDlg(hInstance, hParentWnd, ts.UILanguageFileW)
 {
-	// この順にタブが表示される
-	enum {
-		PP_GENERAL,
-		PP_UI,
-		PP_SEQUENCE,
-		PP_COPY_PASTE,
-		PP_VISUAL,
-		PP_LOG,
-		PP_CYGWIN,
-		PP_ENCODING,
-		PP_FONT,
-		PP_THEME,
-		PP_KEYBOARD,
-		PP_MOUSE,
-		PP_TCPIP,
-		PP_TERMINAL,
-		PP_SERIAL,
-		PP_WINDOW,
-		PP_DEBUG,
-		PP_MAX,
-	};
 	HPROPSHEETPAGE pages[PP_MAX] = {0};
 
 	AddsettingWin parent_win = AddsettingCheckWin(hParentWnd);
@@ -1581,34 +1583,34 @@ CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 
 void CAddSettingPropSheetDlg::SetStartPage(Page page)
 {
-	int start_page = 0;
+	int start_page = PP_GENERAL;
 	switch (page) {
 	case DefaultPage:
-		start_page = 0;
+		start_page = PP_GENERAL;
 		break;
 	case CodingPage:
-		start_page = 6;
+		start_page = PP_ENCODING;
 		break;
 	case FontPage:
-		start_page = 7;
+		start_page = PP_FONT;
 		break;
 	case KeyboardPage:
-		start_page = 9;
+		start_page = PP_KEYBOARD;
 		break;
 	case TcpIpPage:
-		start_page = 11;
+		start_page = PP_TCPIP;
 		break;
 	case TermPage:
-		start_page = 12;
+		start_page = PP_TERMINAL;
 		break;
 	case WinPage:
-		start_page = 14;
+		start_page = PP_WINDOW;
 		break;
 	case SerialPortPage:
-		start_page = 13;
+		start_page = PP_SERIAL;
 		break;
 	default:
-		start_page = 0;
+		start_page = PP_GENERAL;
 		break;
 	}
 	TTCPropSheetDlg::SetStartPage(start_page);

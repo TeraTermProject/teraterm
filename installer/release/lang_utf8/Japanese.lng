@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2025-03-20 by TeraTerm Project
+date=2025-04-19 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -298,6 +298,7 @@ DLG_TAB_FONT_CHARACTER_SPACE=文字間スペース
 DLG_TAB_FONT_RESIZED_FONT=描画幅に合わせてリサイズしたフォントを描画(&W)
 MSG_TOOLTIP_EDITERR_TITLE1=許可されていない文字
 MSG_TOOLTIP_EDITERR_TEXT1=正と負の整数のみ使用できます。
+DLG_TAB_FONT_FOLDER_LABEL=プレビュー、表示/非表示設定するためのフォントフォルダ(%s)
 
 DLG_COMMENT_TITLE=ログにコメントを付加
 
