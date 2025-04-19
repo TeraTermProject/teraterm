@@ -40,7 +40,7 @@ BOOL LoadIME(void);
 void FreeIME(HWND hWnd);
 BOOL CanUseIME(void);
 void SetConversionWindow(HWND HWnd, int X, int Y);
-void SetConversionLogFont(HWND HWnd, const LOGFONTA *lf);
+void SetConversionLogFont(HWND HWnd, const LOGFONTW *lf);
 void ResetConversionLogFont(HWND HWnd);
 BOOL GetIMEOpenStatus(HWND hWnd);
 void SetIMEOpenStatus(HWND hWnd, BOOL stat);

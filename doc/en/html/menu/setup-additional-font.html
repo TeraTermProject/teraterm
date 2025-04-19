@@ -16,10 +16,72 @@
       <dd>
         Specify VTWin font.
         <dl>
+
+          <dt>Select Button</dt>
+          <dd>
+            Opens font dialog to select font to use.
+            When opened, the currently selected font is selected.<br>
+            Fonts displayed in the font dialog list can be modified using the checkboxes below.
+          </dd>
+
+          <dt>List proportional fonts in font dialog</dt>
+          <dd>
+            Proportional fonts are displayed in font list in font dialog.
+            If the currently selected font is a proportional font, this checkbox is automatically checked and cannot be changed.
+          </dd>
+
+          <dt id="ListHiddenFonts">List hidden fonts in font dialog</dt>
+          <dd>
+            Displays fonts set as hidden by the OS in font list in font dialog.<br>
+            If the currently selected font is a hidden font, this checkbox is automatically checked and cannot be changed.
+          </dd>
+
+          <dt>Windows font folder to preview, show and hidden fonts</dt>
+          <dd>
+            Open button opens font folder where you can preview fonts and show/hide settings.
+          </dd>
+        </dl>
+      </dd>
+
+      <dt id="ResizedFont">Drawing resized font to fit cell width</dt>
+      <dd>
+        Character width to be displayed, such as "&copy;"(U+00A9),
+        can be either 1 or 2cell, and depending on the font design (font file),
+        the font width can also be either 1 or 2cell.<br>
+        Depending on the language and font, font width may not match width to display.<br>
+        When the text is drawn to fit the cell width, looks natural,
+        but drawing may be slower and the font design may differ from the font developer's intent.<br>
+        And refer to
+        <a href="setup-additional-coding.html#AmbiguousCharactersWidth">Ambiguous Characters width</a>,
+        <a href="setup-additional-coding.html#EastAsianWidth">East_Asian_Width and width (cells)</a>
+        for character width assumed by Tera Term connecting destination.
+        <dl>
+          <dt>ON</dt>
+          <dd>
+            When the width to be displayed and the width of the font to be drawn are different,
+            text is drawn with resizing font to the cell width.
+          </dd>
+
+          <dt>OFF</dt>
+          <dd>
+            Displays the design of the font file as it is.
+            <ul>
+              <li>When Tera Term displays as 2Cell and the font design is 1Cell,
+                1Cell character and 1Cell space are drawn.
+              <li>When Tera Term displays as 1Cell and the font design is 2Cell,
+                The left half of 2Cell is drawn.
+            </ul>
+          </dd>
+        </dl>
+      </dd>
+
+      <dt>API for drawing</dt>
+      <dd>
+        <dl>
           <dt>Unicode API</dt>
           <dd>
-            User Unicode Draw API.<br>
-            Normally not used.
+            Use Unicode Draw API.<br>
+            Normally used.
           </dd>
 
           <dt>ANSI API</dt>
@@ -29,52 +91,8 @@
             Some fonts need to use ANSI Draw API.<br>
             Normally not used.
           </dd>
-
-          <dt id="ResizedFont">Drawing resized font to fit cell width</dt>
-          <dd>
-            Character width to be displayed, such as "&copy;"(U+00A9),
-            can be either 1 or 2cell, and depending on the font design (font file),
-            the font width can also be either 1 or 2cell.<br>
-            Depending on the language and font, font width may not match width to display.<br>
-            When the text is drawn to fit the cell width, looks natural,
-            but drawing may be slower and the font design may differ from the font developer's intent.<br>
-            And refer to
-            <a href="setup-additional-coding.html#AmbiguousCharactersWidth">Ambiguous Characters width</a>,
-            <a href="setup-additional-coding.html#EastAsianWidth">East_Asian_Width and width (cells)</a>
-            for character width assumed by Tera Term connecting destination.
-            <dl>
-              <dt>ON</dt>
-              <dd>
-                When the width to be displayed and the width of the font to be drawn are different,
-                text is drawn with resizing font to the cell width.
-              </dd>
-
-              <dt>OFF</dt>
-              <dd>
-                Displays the design of the font file as it is.
-                <ul>
-                  <li>When Tera Term displays as 2Cell and the font design is 1Cell,
-                    1Cell character and 1Cell space are drawn.
-                  <li>When Tera Term displays as 1Cell and the font design is 2Cell,
-                    The left half of 2Cell is drawn.
-                </ul>
-              </dd>
-            </dl>
-          </dd>
-
-          <dt>List proportional fonts in font dialog</dt>
-          <dd>
-            Proportional fonts are also displayed in the font dialog list.
-          </dd>
-
-          <dt id="ListHiddenFonts">List hidden fonts in font dialog</dt>
-          <dd>
-	A feature that some fonts can be shown or not on the font list is added on Windows 7 or later.<br>
-	When this setting is enabled, whole fonts can be selected on the Font setting dialog.
-          </dd>
         </dl>
       </dd>
-
       <dt>character space</dt>
       <dd>
         see <a href="../setup/teraterm-win.html#space">Space between characters (lines)</a>.

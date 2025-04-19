@@ -582,16 +582,6 @@ static void ConvertLOGFONTWA(const LOGFONTA *logfontA, LOGFONTW *logfontW)
 }
 
 /**
- *	SetFontStringW() ANSI版
- */
-void SetFontStringA(HWND hWnd, int item, const LOGFONTA *logfont)
-{
-	LOGFONTW logfontW = {};
-	ConvertLOGFONTWA(logfont, &logfontW);
-	SetFontStringW(hWnd, item, &logfontW);
-}
-
-/**
  *	ChooseFont() のフォント一覧で非表示フォントか調べる
  *
  *	@param	font_name

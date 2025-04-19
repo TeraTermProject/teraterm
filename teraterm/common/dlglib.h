@@ -100,7 +100,6 @@ HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi,
 void TTSetIcon(HINSTANCE hInst, HWND hWnd, const wchar_t *icon_name, UINT dpi);
 DWORD GetDlgItemIndexTextW(HWND hDlg, int nIDDlgItem, WPARAM index, wchar_t **text);
 void SetFontStringW(HWND hWnd, int item, const LOGFONTW *logfont);
-void SetFontStringA(HWND hWnd, int item, const LOGFONTA *logfont);
 BOOL IsHiddenFont(const wchar_t *font_name);
 void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidden, int id_pro);
 void GetFontPitchAndFamily(HWND hWnd, LOGFONTW *logfont);
