@@ -5066,13 +5066,13 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 
 		// êÑèßà íuÇ…âEâ∫äÒÇπ
 		NewWindowRect[2].top = SuggestedWindowRect.bottom - NewWindowHeight;
-		NewWindowRect[2].bottom = SuggestedWindowRect.top;
+		NewWindowRect[2].bottom = SuggestedWindowRect.bottom;
 		NewWindowRect[2].left = SuggestedWindowRect.right - NewWindowWidth;
 		NewWindowRect[2].right = SuggestedWindowRect.right;
 
 		// êÑèßà íuÇ…ç∂â∫äÒÇπ
 		NewWindowRect[3].top = SuggestedWindowRect.bottom - NewWindowHeight;
-		NewWindowRect[3].bottom = SuggestedWindowRect.top;
+		NewWindowRect[3].bottom = SuggestedWindowRect.bottom;
 		NewWindowRect[3].left = SuggestedWindowRect.left;
 		NewWindowRect[3].right = SuggestedWindowRect.left + NewWindowWidth;
 
