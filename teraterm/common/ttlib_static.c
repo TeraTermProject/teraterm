@@ -334,7 +334,7 @@ int GetMonitorDpiFromWindow(HWND hWnd)
 		int dpi = 96;
 		RECT r;
 		GetWindowRect(hWnd, &r);
-		HINSTANCE hInst = (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE);
+		HINSTANCE hInst = (HINSTANCE)GetWindowLongW(hWnd, GWLP_HINSTANCE);
 		HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
 							r.left, r.top, r.right - r.left, r.bottom - r.top,
 							NULL, (HMENU)0x00, hInst, (LPVOID)NULL);
