@@ -49,7 +49,6 @@
 typedef struct DlgDataTag {
 	TComVar *pcv;
 	TTTSet* pts;
-	size_t selected_lang;	// 選ばれていたlngファイル番号
 	TipWin2 *tipwin2;
 	HWND hVTWin;
 	HINSTANCE hInst;
@@ -96,7 +95,6 @@ void CGeneralPropPageDlg::OnInitDialog()
 		{ IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE, "DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE" },
 		{ IDC_CLEAR_ON_RESIZE, "DLG_TAB_GENERAL_CLEAR_ON_RESIZE" },
 		{ IDC_CURSOR_CHANGE_IME, "DLG_TAB_GENERAL_CURSOR_CHANGE_IME" },
-		// { IDC_LIST_HIDDEN_FONTS, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
 		{ IDC_GENPORT_LABEL, "DLG_GEN_PORT" },
 		{ IDC_TITLEFMT_GROUP, "DLG_TAB_GENERAL_TITLEFMT_GROUP" },
 		{ IDC_TITLEFMT_DISPHOSTNAME, "DLG_TAB_GENERAL_TITLEFMT_DISPHOSTNAME" },
@@ -131,9 +129,6 @@ void CGeneralPropPageDlg::OnInitDialog()
 
 	// (7)IDC_CURSOR_CHANGE_IME
 	SetCheck(IDC_CURSOR_CHANGE_IME, (pts->WindowFlag & WF_IMECURSORCHANGE) != 0);
-
-	// (8)IDC_LIST_HIDDEN_FONTS
-	// SetCheck(IDC_LIST_HIDDEN_FONTS, pts->ListHiddenFonts);
 
 	// (9) Title Format
 	SetCheck(IDC_TITLEFMT_DISPHOSTNAME, (pts->TitleFormat & 1) != 0);
@@ -182,9 +177,6 @@ void CGeneralPropPageDlg::OnOK()
 	if (((pts->WindowFlag & WF_IMECURSORCHANGE) != 0) != GetCheck(IDC_CURSOR_CHANGE_IME)) {
 		pts->WindowFlag ^= WF_IMECURSORCHANGE;
 	}
-
-	// (8)IDC_LIST_HIDDEN_FONTS
-	// pts->ListHiddenFonts = GetCheck(IDC_LIST_HIDDEN_FONTS);
 
 	// (9) Title Format
 	pts->TitleFormat = GetCheck(IDC_TITLEFMT_DISPHOSTNAME) == BST_CHECKED;

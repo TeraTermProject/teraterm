@@ -103,7 +103,7 @@ static BOOL ChooseFontDlgForTek(HWND WndParent, LPLOGFONTA LogFont, const TTTSet
 		//CF_SHOWHELP |
 		CF_NOVERTFONTS |
 		CF_ENABLEHOOK;
-	if (ts->ListHiddenFonts) {
+	if (TRUE) {			// TODO
 		cf.Flags |= CF_INACTIVEFONTS;
 	}
 	cf.lpfnHook = TFontHook;

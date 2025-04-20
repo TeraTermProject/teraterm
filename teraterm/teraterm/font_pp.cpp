@@ -262,7 +262,6 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						IsDlgButtonChecked(hWnd, IDC_VTFONT_UNICODE) == BST_CHECKED;
 					UnicodeDebugParam.CodePageForANSIDraw =
 						GetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, NULL, FALSE);
-					ts->ListHiddenFonts = IsDlgButtonChecked(hWnd, IDC_LIST_HIDDEN_FONTS) == BST_CHECKED;
 
 					WideCharToACP_t(dlg_data->VTFont.lfFaceName, ts->VTFont, sizeof(ts->VTFont));
 					HDC DC = GetDC(hWnd);

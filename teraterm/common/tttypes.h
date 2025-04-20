@@ -553,7 +553,7 @@ struct tttset {
 	int ZmodemTimeOutInit;
 	int ZmodemTimeOutFin;
 	WORD WaitCom;
-	WORD ListHiddenFonts;
+	WORD reserve_ListHiddenFonts;
 	char LogTimestampFormat[48];
 	int TerminalInputSpeed;
 	int TerminalOutputSpeed;
