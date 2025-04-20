@@ -5052,29 +5052,29 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 			ScreenHeight = tmpScreenHeight;
 		}
 
-		// 推奨領域に右上寄せ
+		// 推奨領域に左上寄せ
 		NewWindowRect[0].top = SuggestedWindowRect.top;
 		NewWindowRect[0].bottom = SuggestedWindowRect.top + NewWindowHeight;
-		NewWindowRect[0].left = SuggestedWindowRect.right - NewWindowWidth;
-		NewWindowRect[0].right = SuggestedWindowRect.right;
+		NewWindowRect[0].left = SuggestedWindowRect.left;
+		NewWindowRect[0].right = SuggestedWindowRect.left + NewWindowWidth;
 
-		// 推奨領域に左上寄せ
+		// 推奨領域に右上寄せ
 		NewWindowRect[1].top = SuggestedWindowRect.top;
 		NewWindowRect[1].bottom = SuggestedWindowRect.top + NewWindowHeight;
-		NewWindowRect[1].left = SuggestedWindowRect.left;
-		NewWindowRect[1].right = SuggestedWindowRect.left + NewWindowWidth;
-
-		// 推奨位置に右下寄せ
-		NewWindowRect[2].top = SuggestedWindowRect.bottom - NewWindowHeight;
-		NewWindowRect[2].bottom = SuggestedWindowRect.bottom;
-		NewWindowRect[2].left = SuggestedWindowRect.right - NewWindowWidth;
-		NewWindowRect[2].right = SuggestedWindowRect.right;
+		NewWindowRect[1].left = SuggestedWindowRect.right - NewWindowWidth;
+		NewWindowRect[1].right = SuggestedWindowRect.right;
 
 		// 推奨位置に左下寄せ
+		NewWindowRect[2].top = SuggestedWindowRect.bottom - NewWindowHeight;
+		NewWindowRect[2].bottom = SuggestedWindowRect.bottom;
+		NewWindowRect[2].left = SuggestedWindowRect.left;
+		NewWindowRect[2].right = SuggestedWindowRect.left + NewWindowWidth;
+
+		// 推奨位置に右下寄せ
 		NewWindowRect[3].top = SuggestedWindowRect.bottom - NewWindowHeight;
 		NewWindowRect[3].bottom = SuggestedWindowRect.bottom;
-		NewWindowRect[3].left = SuggestedWindowRect.left;
-		NewWindowRect[3].right = SuggestedWindowRect.left + NewWindowWidth;
+		NewWindowRect[3].left = SuggestedWindowRect.right - NewWindowWidth;
+		NewWindowRect[3].right = SuggestedWindowRect.right;
 
 		// 確認
 		NewRect = &NewWindowRect[0];
