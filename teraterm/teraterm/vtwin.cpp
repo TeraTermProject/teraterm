@@ -2685,7 +2685,8 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 	// DPIのチェックを行わない
 	// ウィンドウ生成時、WM_SIZE, WM_MOVE とメッセージが発生する
 	if (vtwin_work.monitor_DPI != 0 &&
-		GetMonitorDpiFromWindow(m_hWnd) != vtwin_work.monitor_DPI) {
+		GetMonitorDpiFromWindow(m_hWnd) != vtwin_work.monitor_DPI &&
+		isSizing == FALSE) {
 		// DPIの異なるディスプレイをまたぐと WM_DPICHANGE が発生する
 		//
 		// 「ドラッグ中にウィンドウの内容を表示する=OFF」設定時
@@ -2695,9 +2696,7 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 		// 2. ウィンドウがリサイズしたとき
 		//    (WM_MOVE,)WM_SIZE, WM_DPICHANGED の順でメッセージが発生する
 		//
-		// メッセージからは、セル数かフォントサイズか、
-		// どちらを変更すべきか判断できない
-		// ここでは 1 が妥当となるよう実装した
+		// WM_SIZEの処理のため、2 が妥当となるよう実装した
 		return;
 	}
 	RECT R;
@@ -2765,8 +2764,14 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 			}
 		}
 		else {
-			w = cx / FontWidth;
-			h = cy / FontHeight;
+			if (isSizing) {
+				// ウィンドウがリサイズした
+				w = cx / FontWidth;
+				h = cy / FontHeight;
+			} else {
+				// ウィンドウが移動した
+				return;
+			}
 		}
 
 		HideStatusLine();
