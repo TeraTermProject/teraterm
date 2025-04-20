@@ -42,6 +42,24 @@
 
 #include "ttlib.h"
 
+#define DEBUG_GetMonitorDpiFromWindow 1
+
+void myfprintf(const char *format, ...) {
+	static FILE *debugfp = NULL;
+	if (debugfp == NULL) {
+		debugfp = fopen("C:\\tmp\\debug.txt", "w+");
+	}
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+	fprintf(debugfp, "%02d:%02d:%02d.%03d ", st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+
+	va_list arg;
+	va_start(arg, format);
+	vfprintf(debugfp, format, arg);
+	va_end(arg);
+	fflush(debugfp);
+}
+
 /**
  *	ウィンドウ上の位置を取得する
  *	@Param[in]		hWnd
@@ -323,6 +341,76 @@ void CenterWindow(HWND hWnd, HWND hWndParent)
  */
 int GetMonitorDpiFromWindow(HWND hWnd)
 {
+#if DEBUG_GetMonitorDpiFromWindow
+	{
+		// dpi1 = GetDpiForWindow()
+		// dpi2 = GetDpiForMonitor()
+		// dpi3 = CreateWindow() + GetDpiForWindow()
+
+		int dpi1 = (int)pGetDpiForWindow(hWnd);
+
+		int dpi2;
+		{
+			if (pGetDpiForMonitor == NULL) {
+				// ダイアログ内では自動スケーリングが効いているので
+				// 常に96を返すようだ
+				HDC hDC = GetDC(hWnd);
+				dpi2 = GetDeviceCaps(hDC,LOGPIXELSY);
+				ReleaseDC(hWnd, hDC);
+			} else {
+				UINT dpiX;
+				UINT dpiY;
+				HMONITOR hMonitor;
+				if (hWnd == NULL) {
+					// https://devblogs.microsoft.com/oldnewthing/20070809-00/?p=25643
+					const POINT ptZero = { 0, 0 };
+					hMonitor = pMonitorFromPoint(ptZero, MONITOR_DEFAULTTOPRIMARY);
+ 				}
+				else {
+					hMonitor = pMonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+				}
+				pGetDpiForMonitor(hMonitor, 0 /*0=MDT_EFFECTIVE_DPI*/, &dpiX, &dpiY);
+				dpi2 = dpiX;
+			}
+		}
+
+		int dpi3;
+		{
+			if (pGetDpiForWindow == NULL || hWnd == NULL) {
+				HDC hDC = GetDC(hWnd);
+				dpi3 = GetDeviceCaps(hDC,LOGPIXELSY);
+				ReleaseDC(hWnd, hDC);
+			}
+			else {
+				dpi3 = 96;
+				RECT r;
+				GetWindowRect(hWnd, &r);
+				HINSTANCE hInst = (HINSTANCE)GetWindowLongW(hWnd, GWLP_HINSTANCE);
+				HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
+											   r.left, r.top, r.right - r.left, r.bottom - r.top,
+											   NULL, (HMENU)0x00, hInst, (LPVOID)NULL);
+				if (tmphWnd) {
+					dpi3 = pGetDpiForWindow(tmphWnd);
+					DestroyWindow(tmphWnd);
+				}
+			}
+		}
+
+		if (dpi1 != dpi2 || dpi2 != dpi3 || dpi1 != dpi3) {
+			RECT R;
+			GetWindowRect(hWnd, &R);
+			myfprintf("[%s():%d VTWin x=%d y=%d (%dx%d), dpi1=%d dpi2=%d dpi3=%d] !!\n",
+					  __FUNCTION__, __LINE__, R.left, R.top, R.right - R.left, R.bottom - R.top, dpi1, dpi2, dpi3);
+		} else {
+			RECT R;
+			GetWindowRect(hWnd, &R);
+			myfprintf("[%s():%d VTWin x=%d y=%d (%dx%d), dpi1=%d dpi2=%d dpi3=%d]\n",
+					  __FUNCTION__, __LINE__, R.left, R.top, R.right - R.left, R.bottom - R.top, dpi1, dpi2, dpi3);
+		}
+
+		return dpi3;
+	}
+#endif
 	if (pGetDpiForWindow == NULL || hWnd == NULL) {
 		int dpiY;
 		HDC hDC = GetDC(hWnd);
@@ -334,7 +422,7 @@ int GetMonitorDpiFromWindow(HWND hWnd)
 		int dpi = 96;
 		RECT r;
 		GetWindowRect(hWnd, &r);
-		HINSTANCE hInst = (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE);
+		HINSTANCE hInst = (HINSTANCE)GetWindowLongW(hWnd, GWLP_HINSTANCE);
 		HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
 							r.left, r.top, r.right - r.left, r.bottom - r.top,
 							NULL, (HMENU)0x00, hInst, (LPVOID)NULL);

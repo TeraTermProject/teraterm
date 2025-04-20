@@ -147,6 +147,13 @@ static vtwin_work_t vtwin_work;
 
 extern "C" PrintFile *PrintFile_;
 
+extern "C" void myfprintf(const char *format, ...);
+#define DEBUG_OnMove       1
+#define DEBUG_OnSize       1
+#define DEBUG_OnSizing     1
+#define DEBUG_OnDpiChanged 1
+#define DEBUG_UseWM_GETDPISCALEDSIZE 1
+
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
 
@@ -2485,6 +2492,18 @@ void CVTWindow::OnMouseMove(WPARAM nFlags, POINTS point)
 
 void CVTWindow::OnMove(int x, int y)
 {
+#if DEBUG_OnMove
+	{
+		RECT R;
+		::GetWindowRect(HVTWin, &R);
+		myfprintf("%s():%d S x=%d y=%d (%dx%d), arg x=%d y=%d, vtwin_work.monitor_DPI=%d GetMonitorDpiFromWindow(m_hWnd)=%d\n",
+				  __FUNCTION__, __LINE__,
+				  R.left, R.top, R.right - R.left, R.bottom - R.top,
+				  x, y,
+				  vtwin_work.monitor_DPI, GetMonitorDpiFromWindow(m_hWnd));
+	}
+#endif
+
 	// ウィンドウ位置を保存
 	// 		注 x,y はクライアント領域の左上の座標
 	RECT R;
@@ -2499,6 +2518,16 @@ void CVTWindow::OnMove(int x, int y)
 		//	モニタのDPIを保存しておく
 		vtwin_work.monitor_DPI = GetMonitorDpiFromWindow(m_hWnd);
 	}
+#if DEBUG_OnMove
+	{
+		RECT R;
+		::GetWindowRect(HVTWin, &R);
+		myfprintf("%s():%d R x=%d y=%d (%dx%d), vtwin_work.monitor_DPI=%d\n",
+				  __FUNCTION__, __LINE__,
+				  R.left, R.top, R.right - R.left, R.bottom - R.top,
+				  vtwin_work.monitor_DPI);
+	}
+#endif
 }
 
 // マウスホイールの回転
@@ -2681,11 +2710,26 @@ void CVTWindow::OnSetFocus(HWND hOldWnd)
 
 void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 {
+#if DEBUG_OnSize
+	{
+		RECT R;
+		::GetWindowRect(HVTWin, &R);
+		myfprintf("%s():%d S x=%d y=%d (%dx%d), arg cx=%d cy=%d, ts.TerminalWidth=%d ts.TerminalHeight=%d isSizing=%d AdjustSize=%d FirstPaint=%d DontChangeSize=%d, vtwin_work.monitor_DPI=%d GetMonitorDpiFromWindow(m_hWnd)=%d\n",
+				  __FUNCTION__, __LINE__,
+				  R.left, R.top, R.right - R.left, R.bottom - R.top,
+				  cx, cy,
+				  ts.TerminalWidth, ts.TerminalHeight,
+				  isSizing, AdjustSize,
+				  FirstPaint, DontChangeSize,
+				  vtwin_work.monitor_DPI, GetMonitorDpiFromWindow(m_hWnd));
+	}
+#endif
 	// ウィンドウ生成時の最初のWM_SIZE時(monitor_DPI==0のとき)は
 	// DPIのチェックを行わない
 	// ウィンドウ生成時、WM_SIZE, WM_MOVE とメッセージが発生する
 	if (vtwin_work.monitor_DPI != 0 &&
-		GetMonitorDpiFromWindow(m_hWnd) != vtwin_work.monitor_DPI) {
+		GetMonitorDpiFromWindow(m_hWnd) != vtwin_work.monitor_DPI &&
+		isSizing == FALSE) {
 		// DPIの異なるディスプレイをまたぐと WM_DPICHANGE が発生する
 		//
 		// 「ドラッグ中にウィンドウの内容を表示する=OFF」設定時
@@ -2695,9 +2739,16 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 		// 2. ウィンドウがリサイズしたとき
 		//    (WM_MOVE,)WM_SIZE, WM_DPICHANGED の順でメッセージが発生する
 		//
-		// メッセージからは、セル数かフォントサイズか、
-		// どちらを変更すべきか判断できない
-		// ここでは 1 が妥当となるよう実装した
+		// 2 が妥当となるよう実装した
+#if DEBUG_OnSize
+		{
+			RECT R;
+			::GetWindowRect(HVTWin, &R);
+			myfprintf("%s():%d R1 x=%d y=%d (%dx%d)\n",
+					  __FUNCTION__, __LINE__,
+					  R.left, R.top, R.right - R.left, R.bottom - R.top);
+		}
+#endif
 		return;
 	}
 	RECT R;
@@ -2714,9 +2765,27 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 		}
 		FirstPaint = FALSE;
 		Startup();
+#if DEBUG_OnSize
+		{
+			RECT R;
+			::GetWindowRect(HVTWin, &R);
+			myfprintf("%s():%d R2 x=%d y=%d (%dx%d)\n",
+					  __FUNCTION__, __LINE__,
+					  R.left, R.top, R.right - R.left, R.bottom - R.top);
+		}
+#endif
 		return;
 	}
 	if (Minimized || DontChangeSize) {
+#if DEBUG_OnSize
+		{
+			RECT R;
+			::GetWindowRect(HVTWin, &R);
+			myfprintf("%s():%d R3 x=%d y=%d (%dx%d)\n",
+					  __FUNCTION__, __LINE__,
+					  R.left, R.top, R.right - R.left, R.bottom - R.top);
+		}
+#endif
 		return;
 	}
 
@@ -2765,8 +2834,23 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 			}
 		}
 		else {
-			w = cx / FontWidth;
-			h = cy / FontHeight;
+			if (isSizing) {
+				// 2. ウィンドウがリサイズした
+				w = cx / FontWidth;
+				h = cy / FontHeight;
+			} else {
+				// 1. ウィンドウが移動した
+#if DEBUG_OnSize
+				{
+					RECT R;
+					::GetWindowRect(HVTWin, &R);
+					myfprintf("%s():%d R4 x=%d y=%d (%dx%d)\n",
+							  __FUNCTION__, __LINE__,
+							  R.left, R.top, R.right - R.left, R.bottom - R.top);
+				}
+#endif
+				return;
+			}
 		}
 
 		HideStatusLine();
@@ -2776,6 +2860,15 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 #ifdef WINDOW_MAXMIMUM_ENABLED
 	if (nType == SIZE_MAXIMIZED) {
 		AdjustSize = FALSE;
+	}
+#endif
+#if DEBUG_OnSize
+	{
+			RECT R;
+			::GetWindowRect(HVTWin, &R);
+			myfprintf("%s():%d R5 x=%d y=%d (%dx%d)\n",
+					  __FUNCTION__, __LINE__,
+					  R.left, R.top, R.right - R.left, R.bottom - R.top);
 	}
 #endif
 }
@@ -2795,6 +2888,13 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 	::GetWindowRect(HVTWin, &wr);
 	::GetClientRect(HVTWin, &cr);
 
+#if DEBUG_OnSizing
+	{
+		myfprintf("%s():%d S x=%d y=%d (%dx%d)\n",
+				  __FUNCTION__, __LINE__,
+				  wr.left, wr.top, wr.right - wr.left, wr.bottom - wr.top);
+	}
+#endif
 	margin_width = wr.right - wr.left - cr.right + cr.left;
 	margin_height = wr.bottom - wr.top - cr.bottom + cr.top;
 	nWidth = (pRect->right) - (pRect->left) - margin_width;
@@ -2849,6 +2949,14 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 		break;
 	}
 	isSizing = TRUE;
+#if DEBUG_OnSizing
+	{
+		myfprintf("%s():%d R x=%d y=%d (%dx%d), fixed_width=%d fixed_height=%d\n",
+				  __FUNCTION__, __LINE__,
+				  pRect->left,  pRect->top,  pRect->right -  pRect->left,  pRect->bottom - pRect->top,
+				  fixed_width, fixed_height);
+	}
+#endif
 }
 
 void CVTWindow::OnSysChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
@@ -4946,10 +5054,32 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 	const RECT *NewRect;
 	int NewWindowWidth;
 	int NewWindowHeight;
+#if DEBUG_OnDpiChanged
+	{
+		RECT R;
+		::GetWindowRect(HVTWin, &R);
+		myfprintf("%s():%d S x=%d y=%d (%dx%d), NewDPI=%d calcOnly=%d, SRect x=%d y=%d (%dx%d)\n",
+				  __FUNCTION__, __LINE__,
+				  R.left, R.top, R.right - R.left, R.bottom - R.top,
+				  NewDPI, calcOnly,
+				  SuggestedWindowRect.left, SuggestedWindowRect.top,
+				  SuggestedWindowRect.right - SuggestedWindowRect.left,
+				  SuggestedWindowRect.bottom - SuggestedWindowRect.top);
+	}
+#endif
 
 #ifdef WINDOW_MAXMIMUM_ENABLED
 	if (IsZoomed(m_hWnd)) {
 		if (calcOnly) {
+#if DEBUG_OnDpiChanged
+			{
+				RECT R;
+				::GetWindowRect(HVTWin, &R);
+				myfprintf("%s():%d R1 x=%d y=%d (%dx%d)\n",
+						  __FUNCTION__, __LINE__,
+						  R.left, R.top, R.right - R.left, R.bottom - R.top);
+			}
+#endif
 			return FALSE;
 		}
 		GetDesktopRect(m_hWnd, &NewWindowRect[0]);
@@ -4958,18 +5088,10 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 		NewWindowHeight = NewRect->bottom - NewRect->top;
 	} else
 #endif
-	if (isSizing) {
-		if (calcOnly) {
-			RECT rc;
-			::GetWindowRect(m_hWnd, &rc);
-			sz->cx = rc.right  - rc.left;
-			sz->cy = rc.bottom - rc.top;
-			return TRUE;
-		} else {
-			NewRect = &SuggestedWindowRect;
-			NewWindowWidth  = NewRect->right  - NewRect->left;
-			NewWindowHeight = NewRect->bottom - NewRect->top;
-		}
+	if (isSizing && (calcOnly == FALSE)) {
+		NewRect = &SuggestedWindowRect;
+		NewWindowWidth  = NewRect->right  - NewRect->left;
+		NewWindowHeight = NewRect->bottom - NewRect->top;
 	} else {
 		int tmpScreenWidth;
 		int tmpScreenHeight;
@@ -5047,12 +5169,22 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 		if (calcOnly) {
 			sz->cx = NewWindowWidth;
 			sz->cy = NewWindowHeight;
+#if DEBUG_OnDpiChanged
+			{
+				RECT R;
+				::GetWindowRect(HVTWin, &R);
+				myfprintf("%s():%d R2 x=%d y=%d (%dx%d)\n",
+						  __FUNCTION__, __LINE__,
+						  R.left, R.top, R.right - R.left, R.bottom - R.top);
+			}
+#endif
 			return TRUE;
 		} else {
 			ScreenWidth = tmpScreenWidth;
 			ScreenHeight = tmpScreenHeight;
 		}
 
+#if 0
 		// 推奨領域に右上寄せ
 		NewWindowRect[0].top = SuggestedWindowRect.top;
 		NewWindowRect[0].bottom = SuggestedWindowRect.top + NewWindowHeight;
@@ -5076,27 +5208,127 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 		NewWindowRect[3].bottom = SuggestedWindowRect.top;
 		NewWindowRect[3].left = SuggestedWindowRect.left;
 		NewWindowRect[3].right = SuggestedWindowRect.left + NewWindowWidth;
+#else
+		// 推奨領域に左上寄せ
+		NewWindowRect[0].top = SuggestedWindowRect.top;
+		NewWindowRect[0].bottom = SuggestedWindowRect.top + NewWindowHeight;
+		NewWindowRect[0].left = SuggestedWindowRect.left;
+		NewWindowRect[0].right = SuggestedWindowRect.left + NewWindowWidth;
 
+		// 推奨領域に右上寄せ
+		NewWindowRect[1].top = SuggestedWindowRect.top;
+		NewWindowRect[1].bottom = SuggestedWindowRect.top + NewWindowHeight;
+		NewWindowRect[1].left = SuggestedWindowRect.right - NewWindowWidth;
+		NewWindowRect[1].right = SuggestedWindowRect.right;
+
+		// 推奨位置に左下寄せ
+		NewWindowRect[2].top = SuggestedWindowRect.bottom - NewWindowHeight;
+		NewWindowRect[2].bottom = SuggestedWindowRect.bottom;
+		NewWindowRect[2].left = SuggestedWindowRect.left;
+		NewWindowRect[2].right = SuggestedWindowRect.left + NewWindowWidth;
+
+		// 推奨位置に右下寄せ
+		NewWindowRect[3].top = SuggestedWindowRect.bottom - NewWindowHeight;
+		NewWindowRect[3].bottom = SuggestedWindowRect.bottom;
+		NewWindowRect[3].left = SuggestedWindowRect.right - NewWindowWidth;
+		NewWindowRect[3].right = SuggestedWindowRect.right;
+#endif
+
+#if DEBUG_OnDpiChanged
+// 案1 CreateWindow() + SetWindowPos() + GetDpiForWindow()
+// 案2 CreateWindow() + GetDpiForWindow()
+
+// 案1
 		// 確認
 		NewRect = &NewWindowRect[0];
 		HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
 							0, 0, NewWindowWidth, NewWindowHeight,
 							NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
+		myfprintf("%s() X1 Suggested L=%d T=%d R=%d B=%d (%dx%d), NewDPI=%d\n",
+				  __FUNCTION__,
+				  SuggestedWindowRect.left,
+				  SuggestedWindowRect.top,
+				  SuggestedWindowRect.right,
+				  SuggestedWindowRect.bottom,
+				  SuggestedWindowRect.right - SuggestedWindowRect.left,
+				  SuggestedWindowRect.bottom - SuggestedWindowRect.top, NewDPI);
 		if (tmphWnd) {
 			for (size_t i = 0; i < _countof(NewWindowRect); i++) {
 				const RECT *r = &NewWindowRect[i];
 				if (::SetWindowPos(tmphWnd, HWND_BOTTOM, r->left, r->top, 0, 0,
-							SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOSENDCHANGING | SWP_NOZORDER | SWP_NOREDRAW)) {
-					if (NewDPI == GetDpiForWindow(tmphWnd)) {
-						NewRect = r;
-						break;
+							// SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOSENDCHANGING | SWP_NOZORDER | SWP_NOREDRAW)) {
+							SWP_NOSIZE)) {
+					BOOL match;
+					int myDPI = GetDpiForWindow(tmphWnd);
+					if (NewDPI == myDPI) {
+						match = TRUE;
+					} else {
+						match = FALSE;
 					}
+					myfprintf("%s() X1 i=%d match=%d, L=%d T=%d R=%d B=%d (%dx%d) GetDpiForWindow()=%d\n",
+							  __FUNCTION__, i, match,
+							  r->left, r->top, r->right, r->bottom,
+							  NewWindowWidth, NewWindowHeight, myDPI);
 				}
 			}
 			::DestroyWindow(tmphWnd);
 		}
+// 案2
+		// 確認
+		myfprintf("%s() X2 Suggested L=%d T=%d R=%d B=%d (%dx%d), NewDPI=%d\n",
+				  __FUNCTION__,
+				  SuggestedWindowRect.left,
+				  SuggestedWindowRect.top,
+				  SuggestedWindowRect.right,
+				  SuggestedWindowRect.bottom,
+				  SuggestedWindowRect.right - SuggestedWindowRect.left,
+				  SuggestedWindowRect.bottom - SuggestedWindowRect.top, NewDPI);
+		NewRect = &NewWindowRect[0];
+		for (size_t i = 0; i < _countof(NewWindowRect); i++) {
+			const RECT *r = &NewWindowRect[i];
+			HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
+									r->left, r->top, NewWindowWidth, NewWindowHeight,
+									NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
+			if (tmphWnd) {
+				BOOL match;
+				int myDPI = GetDpiForWindow(tmphWnd);
+				if (NewDPI == myDPI) {
+					match = TRUE;
+				} else {
+					match = FALSE;
+				}
+				::DestroyWindow(tmphWnd);
+				myfprintf("%s() X2 i=%d match=%d, L=%d T=%d R=%d B=%d (%dx%d) GetDpiForWindow()=%d\n",
+						  __FUNCTION__, i, match,
+						  r->left, r->top, r->right, r->bottom,
+						  NewWindowWidth, NewWindowHeight, myDPI);
+			}
+		}
+#endif
+// 案2
+		// 確認
+		NewRect = &NewWindowRect[0];
+		for (size_t i = 0; i < _countof(NewWindowRect); i++) {
+			const RECT *r = &NewWindowRect[i];
+			HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
+									r->left, r->top, NewWindowWidth, NewWindowHeight,
+									NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
+			if (tmphWnd) {
+				int myDPI = GetDpiForWindow(tmphWnd);
+				::DestroyWindow(tmphWnd);
+				if (NewDPI == myDPI) {
+					NewRect = r;
+					break;
+				}
+			}
+		}
 	}
-
+#if DEBUG_OnDpiChanged
+	myfprintf("%s() Z L=%d T=%d R=%d B=%d (%dx%d)\n",
+			  __FUNCTION__,
+			  NewRect->left, NewRect->top, NewRect->right, NewRect->bottom,
+			  NewWindowWidth, NewWindowHeight);
+#endif
 	::SetWindowPos(m_hWnd, NULL,
 				   NewRect->left, NewRect->top,
 				   NewWindowWidth, NewWindowHeight,
@@ -5115,6 +5347,15 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 		TTSetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), NewDPI);
 	}
 
+#if DEBUG_OnDpiChanged
+	{
+		RECT R;
+		::GetWindowRect(HVTWin, &R);
+		myfprintf("%s():%d R3 x=%d y=%d (%dx%d)\n",
+				  __FUNCTION__, __LINE__,
+				  R.left, R.top, R.right - R.left, R.bottom - R.top);
+	}
+#endif
 	return 0;
 }
 
@@ -5357,9 +5598,11 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_USER_DROPNOTIFY:
 		OnDropNotify(wp, lp);
 		break;
+#if DEBUG_UseWM_GETDPISCALEDSIZE
 	case WM_GETDPISCALEDSIZE:
 		retval = OnDpiChanged(wp, lp, TRUE);
 		break;
+#endif
 	case WM_DPICHANGED:
 		OnDpiChanged(wp, lp, FALSE);
 		break;
