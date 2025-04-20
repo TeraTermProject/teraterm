@@ -85,9 +85,9 @@ typedef struct {
 	DWORD FileMtime;
 
 	enum {
-		STATE_FLUSH,
+		STATE_FLUSH,		// 処理開始時に受信データを捨てる
 		STATE_NORMAL,
-		STATE_CANCELD,
+		STATE_CANCELED,		// キャンセル通知を受けた
 	} state;
 
 } TXVar;
@@ -346,7 +346,7 @@ static void XCancel(PFileVarProto fv, PComVar cv)
 	static const BYTE cancel[] = { CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS };
 
 	XWrite(fv,xv,cv, (PCHAR)&cancel, sizeof(cancel));
-	xv->state = STATE_CANCELD;		// quit
+	xv->state = STATE_CANCELED;		// quit
 }
 
 static void XTimeOutProc(PFileVarProto fv, PComVar cv)
@@ -354,7 +354,7 @@ static void XTimeOutProc(PFileVarProto fv, PComVar cv)
 	PXVar xv = fv->data;
 	switch (xv->XMode) {
 	case IdXSend:
-		xv->state = STATE_CANCELD;	// quit
+		xv->state = STATE_CANCELED;	// quit
 		break;
 	case IdXReceive:
 		XSendNAK(fv, xv, cv);
@@ -699,7 +699,7 @@ static BOOL XParse(PFileVarProto fv, PComVar cv)
 		default:
 			return FALSE;
 		}
-	case STATE_CANCELD:
+	case STATE_CANCELED:
 		XFlushReceiveBuf(fv, xv, cv);
 		return FALSE;
 	}

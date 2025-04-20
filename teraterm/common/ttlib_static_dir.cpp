@@ -71,7 +71,13 @@
 static wchar_t *GetAppdataDir(void)
 {
 	wchar_t *path;
-	_SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &path);
+	HRESULT r = _SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &path);
+	if (r != S_OK) {
+		// AppData フォルダが存在しない環境
+		// = %USERPROFILE%\Documents, C:\My Documents を使用する
+		r = _SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_CREATE, NULL, &path);
+		assert(r == S_OK);
+	}
 	return path;
 }
 #else
@@ -114,7 +120,13 @@ static wchar_t *GetAppdataDir(void)
 static wchar_t *GetLocalAppdataDir(void)
 {
 	wchar_t *path;
-	_SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &path);
+	HRESULT r = _SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &path);
+	if (r != S_OK) {
+		// AppData フォルダが存在しない環境
+		// = %USERPROFILE%\Documents, C:\My Documents を使用する
+		r = _SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_CREATE, NULL, &path);
+		assert(r == S_OK);
+	}
 	return path;
 }
 #endif

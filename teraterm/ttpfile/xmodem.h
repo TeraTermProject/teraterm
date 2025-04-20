@@ -51,6 +51,8 @@ enum {
 	XMODEM_TEXT_FLAG,
 };
 
+/* prototypes */
+struct FileVarProto;
 BOOL XCreate(struct FileVarProto *fv);
 
 #ifdef __cplusplus

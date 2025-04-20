@@ -514,7 +514,7 @@ BOOL WINAPI _SHGetPathFromIDListW(LPITEMIDLIST pidl, LPWSTR pszPath)
 }
 
 DWORD WINAPI _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPCWSTR lpDefault,
-								LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName)
+									   LPWSTR lpReturnedString, DWORD nSize, LPCWSTR lpFileName)
 {
 	assert(lpFileName != NULL);
 	if (lpDefault == NULL) {
@@ -687,7 +687,8 @@ BOOL WINAPI _RemoveDirectoryW(LPCWSTR lpPathName)
 	return r;
 }
 
-DWORD WINAPI _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart)
+DWORD WINAPI _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer,
+							   LPWSTR *lpFilePart)
 {
 	if (nBufferLength == 0 || lpBuffer == NULL) {
 		char *filenameA = ToCharW(lpFileName);
@@ -713,21 +714,20 @@ DWORD WINAPI _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR l
 		} else {
 			// パスをコピーして、文字列長を返す('\0'含まない)
 			wcsncpy_s(lpBuffer, nBufferLength, bufW, _TRUNCATE);
+
 			if (lpFilePart != NULL) {
-				// パス部分を取り出し(ANSI->Unicode)
-				const size_t countA = filepartA - bufA;
-				char *pathA = (char *)malloc(countA+1);
-				memcpy(pathA, bufA, countA);
-				pathA[countA] = 0;
-				wchar_t *pathW = ToWcharA(pathA);
-
-				// パス部分の文字長(Unicode)
-				size_t countW = wcslen(pathW);
-				free(pathW);
-				free(pathA);
-
-				// ファイル名部分へのポインタ
-				*lpFilePart = lpBuffer + countW;
+				wchar_t *sep = wcsrchr(lpBuffer, L'\\');
+				if (sep == NULL) {
+					// パス区切りがない
+					*lpFilePart = NULL;
+				}
+				else if (*(sep + 1) == 0) {
+					// パス区切りが文字列の最後
+					*lpFilePart = NULL;
+				}
+				else {
+					*lpFilePart = sep + 1;
+				}
 			}
 		}
 		free(filenameA);
