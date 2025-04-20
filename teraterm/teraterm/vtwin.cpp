@@ -5078,21 +5078,19 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 
 		// Šm”F
 		NewRect = &NewWindowRect[0];
-		HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
-							0, 0, NewWindowWidth, NewWindowHeight,
-							NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
-		if (tmphWnd) {
-			for (size_t i = 0; i < _countof(NewWindowRect); i++) {
-				const RECT *r = &NewWindowRect[i];
-				if (::SetWindowPos(tmphWnd, HWND_BOTTOM, r->left, r->top, 0, 0,
-							SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOSENDCHANGING | SWP_NOZORDER | SWP_NOREDRAW)) {
-					if (NewDPI == GetDpiForWindow(tmphWnd)) {
-						NewRect = r;
-						break;
-					}
+		for (size_t i = 0; i < _countof(NewWindowRect); i++) {
+			const RECT *r = &NewWindowRect[i];
+			HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
+									r->left, r->top, NewWindowWidth, NewWindowHeight,
+									NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
+			if (tmphWnd) {
+				int myDPI = GetDpiForWindow(tmphWnd);
+				::DestroyWindow(tmphWnd);
+				if (NewDPI == myDPI) {
+					NewRect = r;
+					break;
 				}
 			}
-			::DestroyWindow(tmphWnd);
 		}
 	}
 
