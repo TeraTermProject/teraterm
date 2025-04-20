@@ -4962,18 +4962,10 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 		NewWindowHeight = NewRect->bottom - NewRect->top;
 	} else
 #endif
-	if (isSizing) {
-		if (calcOnly) {
-			RECT rc;
-			::GetWindowRect(m_hWnd, &rc);
-			sz->cx = rc.right  - rc.left;
-			sz->cy = rc.bottom - rc.top;
-			return TRUE;
-		} else {
-			NewRect = &SuggestedWindowRect;
-			NewWindowWidth  = NewRect->right  - NewRect->left;
-			NewWindowHeight = NewRect->bottom - NewRect->top;
-		}
+	if (isSizing && (calcOnly == FALSE)) {
+		NewRect = &SuggestedWindowRect;
+		NewWindowWidth  = NewRect->right  - NewRect->left;
+		NewWindowHeight = NewRect->bottom - NewRect->top;
 	} else {
 		int tmpScreenWidth;
 		int tmpScreenHeight;
