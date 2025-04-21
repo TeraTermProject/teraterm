@@ -28,26 +28,29 @@
         <dl>
           <dt>Select Button</dt>
           <dd>
-            Opens font dialog to select font to use.
-            When opened, the currently selected font is selected.<br>
+            Opens font dialog to select font to use.<br>
             Fonts displayed in the font dialog list can be modified using the checkboxes below.
           </dd>
 
           <dt>default button</dt>
           <dd>
-            Selects the default dialog font used by Windows.
+            Discards current font setting, and selects the default dialog font used by Windows.
           </dd>
 
           <dt>List proportional fonts in font dialog</dt>
           <dd>
             Proportional fonts are displayed in font list in font dialog.
-            If the currently selected font is a proportional font, this checkbox is automatically checked and cannot be changed.
+            If the currently font is a proportional font,
+            this checkbox is automatically checked and cannot be changed.<br>
+            Note: This checkbox value is not saved in TERATERM.INI.
           </dd>
 
           <dt id="ListHiddenFonts">List hidden fonts in font dialog</dt>
           <dd>
             Displays fonts set as hidden by the OS in font list in font dialog.<br>
-            If the currently selected font is a hidden font, this checkbox is automatically checked and cannot be changed.
+            If the currently font is a hidden font,
+            this checkbox is automatically checked and cannot be changed.<br>
+            Note: This checkbox value is not saved in TERATERM.INI.
             <p>
               This feature to hide certain fonts in font dialog is available on Windows 7 and later.
             </p>
