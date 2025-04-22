@@ -344,7 +344,6 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 			info.class_name = class_str;
 			GetComProperty(hDevInfo, &DeviceInfoData, &info);
 			CreatePropertyStr(&info);
-			int port_no = 0;
 			if (wcsncmp(port_name, L"COM", 3) == 0) {
 				info.port_no = _wtoi(port_name + 3);
 			}

@@ -1035,9 +1035,18 @@ wchar_t *GetFullPathW(const wchar_t *dir, const wchar_t *rel_path)
  */
 wchar_t *GetUILanguageFileFullW(const wchar_t *SetupFNameW)
 {
+	const wchar_t *default_lng = L"lang\\Default.lng";
 	wchar_t *UILanguageFileIni;
-	hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", L"lang\\Default.lng", SetupFNameW, &UILanguageFileIni);
-	if (!IsRelativePathW(UILanguageFileIni)) {
+	if (SetupFNameW == NULL || SetupFNameW[0] == 0) {
+		UILanguageFileIni = wcsdup(default_lng);
+	}
+	else {
+		hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", default_lng, SetupFNameW,
+								  &UILanguageFileIni);
+	}
+
+	const size_t len = wcslen(UILanguageFileIni);
+	if (len >= 3 && !IsRelativePathW(UILanguageFileIni)) {
 		// iniファイルにフルパスで書き込まれていた時、そのまま返す
 		return UILanguageFileIni;
 	}
@@ -1292,6 +1301,7 @@ void ConvFNameW(const wchar_t *HomeDir, wchar_t *Temp, size_t templen, const wch
 
 /**
  *	pathが相対パスかどうかを返す
+ *	NULLのとき FALSE
  *		TODO
  *			- "\path\path" ("c:\path"などドライブがない場合)は相対パス?
  *			- "a:path" は相対パス?
@@ -1300,6 +1310,9 @@ void ConvFNameW(const wchar_t *HomeDir, wchar_t *Temp, size_t templen, const wch
  */
 BOOL IsRelativePathW(const wchar_t *path)
 {
+	if (path == NULL) {
+		return FALSE;
+	}
 	if (path[0] == '\\' || path[0] == '/' || (path[0] != '\0' && path[1] == ':')) {
 		return FALSE;
 	}

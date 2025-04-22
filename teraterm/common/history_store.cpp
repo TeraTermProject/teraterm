@@ -252,8 +252,9 @@ void HistoryStoreSetControl(HistoryStore *h, HWND dlg, int dlg_item)
 
 void HistoryStoreGetControl(HistoryStore *h, HWND dlg, int dlg_item)
 {
-	LRESULT item_count;
-	LRESULT i;
+	LRESULT getcount_result;
+	size_t item_count;
+	size_t i;
 	char class_name[32];
 	UINT GETCOUNT;
 	int r = GetClassNameA(GetDlgItem(dlg, dlg_item), class_name, _countof(class_name));
@@ -268,10 +269,11 @@ void HistoryStoreGetControl(HistoryStore *h, HWND dlg, int dlg_item)
 		return;
 	}
 
-	item_count = SendDlgItemMessageW(dlg, dlg_item, GETCOUNT, 0, 0);
-	if (item_count == LB_ERR) {
+	getcount_result = SendDlgItemMessageW(dlg, dlg_item, GETCOUNT, 0, 0);
+	if (getcount_result == LB_ERR) {
 		return;
 	}
+	item_count = (size_t)getcount_result;
 	if (item_count > h->max) {
 		item_count = h->max;
 	}

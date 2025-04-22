@@ -1,9 +1,7 @@
-﻿set(PACKAGE_NAME "TTXCheckUpdate")
-
-project(${PACKAGE_NAME})
+﻿project("TTXCheckUpdate")
 
 add_library(
-  ${PACKAGE_NAME} SHARED
+  ${PROJECT_NAME} SHARED
   ttxcheckupdate.c
   parse.h
   parse.cpp
@@ -22,19 +20,19 @@ add_library(
 if(SUPPORT_OLD_WINDOWS)
   if(MSVC)
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/common/compat_w95_vs2005.c
       )
   endif()
   if(MINGW)
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/libmingw/tlssup.c
       )
     target_link_libraries(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       -Wl,--whole-archive
       mingw_msvcrt
@@ -56,7 +54,7 @@ source_group(
   )
 
 set_target_properties(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PROPERTIES
   PREFIX ""
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
@@ -78,14 +76,14 @@ if(MSVC_VERSION STRLESS 1600)
 endif()
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../../libs/cJSON
   ../../teraterm/teraterm
 )
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   common_static
   ttpcmn
@@ -93,20 +91,20 @@ target_link_libraries(
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     layer_for_unicode
     )
 endif(SUPPORT_OLD_WINDOWS)
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   wininet.lib
   )
 
 #install(
-#  TARGETS ${PACKAGE_NAME}
+#  TARGETS ${PROJECT_NAME}
 #  RUNTIME
 #  DESTINATION .
 #)

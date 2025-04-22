@@ -30,13 +30,13 @@
 
 #include "dlglib.h"
 
-#include <wchar.h>
-#include <assert.h>
 #if !defined(_CRTDBG_MAP_ALLOC)
 #define _CRTDBG_MAP_ALLOC
 #endif
 #include <stdlib.h>
 #include <crtdbg.h>
+#include <wchar.h>
+#include <assert.h>
 
 // https://docs.microsoft.com/ja-jp/windows/desktop/dlgbox/dlgtemplateex
 // https://www.pg-fl.jp/program/tips/dlgmem.htm

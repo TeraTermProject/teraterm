@@ -48,6 +48,7 @@ enum {
 };
 
 /* prototypes */
+struct FileVarProto;
 BOOL ZCreate(PFileVarProto fv);
 
 #ifdef __cplusplus
