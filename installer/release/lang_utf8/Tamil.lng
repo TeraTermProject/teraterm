@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2025-04-19 by TeraTerm Project
+date=2025-04-22 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -298,7 +298,7 @@ DLG_TAB_FONT_CHARACTER_SPACE=எழுத்து இடம்
 DLG_TAB_FONT_RESIZED_FONT=&செல் அகலத்திற்கு ஏற்றவாறு அளவு மாற்றப்பட்ட எழுத்துருவை வரைதல்
 MSG_TOOLTIP_EDITERR_TITLE1=ஏற்றுக்கொள்ள முடியாத எழுத்து
 MSG_TOOLTIP_EDITERR_TEXT1=நன்மை மற்றும் தீமை முழு எண்கள் மட்டுமே ஏற்றுக்கொள்ளப்படும்.
-DLG_TAB_FONT_FOLDER_LABEL=Windows font folder (%s) to preview, show and hidden fonts
+DLG_TAB_FONT_FOLDER_LABEL=Windows font folder to preview, show and hidden fonts
 
 DLG_COMMENT_TITLE=பதிவிற்கான கருத்து
 

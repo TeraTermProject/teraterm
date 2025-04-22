@@ -10,12 +10,12 @@
 #define IDC_LIST_HIDDEN_FONTS_DLG       1019
 #define IDC_LIST_PRO_FONTS_DLG          1022
 #define IDC_FONT_FOLDER_LABEL           2615
-#define IDC_FONT_FOLDER_BUTTON          2616
-#define IDC_GENUILANG                   2630
-#define IDC_GENUILANG_LABEL             2631
+#define IDC_FONT_FOLDER                 2616
+#define IDC_GENUILANG                   2617
+#define IDC_GENUILANG_LABEL             2618
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1

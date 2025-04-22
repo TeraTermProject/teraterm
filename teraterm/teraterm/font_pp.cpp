@@ -46,6 +46,7 @@
 #include "tipwin2.h"
 #include "asprintf.h"
 #include "win32helper.h"
+#include "tttext.h"
 
 #include "font_pp.h"
 
@@ -239,18 +240,12 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			CheckDlgButton(hWnd, IDC_RESIZED_FONT, DispIsResizedFont());
 
-			wchar_t *font_label;
-			hGetWindowTextW(GetDlgItem(hWnd, IDC_FONT_FOLDER_LABEL), &font_label);
 			wchar_t *font_folder;
 			HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
 			if (r == S_OK) {
-				wchar_t *font_label_formatted;
-				aswprintf(&font_label_formatted, font_label, font_folder);
-				SetWindowTextW(GetDlgItem(hWnd, IDC_FONT_FOLDER_LABEL), font_label_formatted);
+				TTTextMenu(hWnd, IDC_FONT_FOLDER, font_folder, NULL, 0);
 				free(font_folder);
-				free(font_label_formatted);
 			}
-			free(font_label);
 
 			break;
 		}
@@ -386,7 +381,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				break;
 			}
 
-			case IDC_FONT_FOLDER_BUTTON | (BN_CLICKED << 16): {
+			case IDC_FONT_FOLDER: {
 				wchar_t *font_folder;
 				HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
 				if (r ==S_OK) {

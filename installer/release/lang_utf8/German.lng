@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2025-04-19 by TeraTerm Project
+date=2025-04-22 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -298,7 +298,7 @@ DLG_TAB_FONT_CHARACTER_SPACE=character space
 DLG_TAB_FONT_RESIZED_FONT=Dra&wing resized font to fit cell width
 MSG_TOOLTIP_EDITERR_TITLE1=Unzulässiges Zeichen
 MSG_TOOLTIP_EDITERR_TEXT1=Nur positive und negative ganze Zahlen sind akzeptabel.
-DLG_TAB_FONT_FOLDER_LABEL=Windows font folder (%s) to preview, show and hidden fonts
+DLG_TAB_FONT_FOLDER_LABEL=Windows font folder to preview, show and hidden fonts
 
 DLG_COMMENT_TITLE=Comment to Log
 

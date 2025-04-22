@@ -63,7 +63,6 @@ BEGIN
     CONTROL         "List &hidden fonts in font dialog",IDC_LIST_HIDDEN_FONTS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,59,234,10
     LTEXT           "Windows font folder (%s) to preview, show and hidden fonts",IDC_FONT_FOLDER_LABEL,19,76,320,8
-    PUSHBUTTON      "Open",IDC_FONT_FOLDER_BUTTON,33,93,57,13
     CONTROL         "Dra&wing resized font to fit cell width",IDC_RESIZED_FONT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,112,178,10
     LTEXT           "API for drawing",IDC_VTFONT_TITLE,7,130,123,8
@@ -76,6 +75,7 @@ BEGIN
     EDITTEXT        IDC_SPACE_BOTTOM,233,183,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
     EDITTEXT        IDC_SPACE_LEFT,201,158,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
     EDITTEXT        IDC_SPACE_RIGHT,267,158,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
+    LTEXT           "??????",IDC_FONT_FOLDER,28,91,99,8,WS_TABSTOP
 END
 
 

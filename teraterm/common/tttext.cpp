@@ -98,8 +98,10 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 		}
 #endif
 
-	// シングルクリックでブラウザが起動するように変更する。(2015.11.16 yutaka)
+	// ダブルクリック
 	//case WM_LBUTTONDBLCLK:
+
+	// シングルクリック
 	case WM_LBUTTONDOWN: {
 		switch(parent->type) {
 		case URL: {
@@ -110,8 +112,9 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 		case MENU: {
 			HWND menu_wnd = parent->menu_wnd;
 			int menu_id = parent->menu_id;
-			PostMessageA(parent->hParentWnd, WM_COMMAND, IDCANCEL, 0);
-			PostMessageA(menu_wnd, WM_COMMAND, MAKELONG(menu_id, 0), 0);
+			if (menu_wnd != NULL && menu_id != 0) {
+				PostMessageA(menu_wnd, WM_COMMAND, MAKELONG(menu_id, 0), 0);
+			}
 			break;
 		}
 		default:

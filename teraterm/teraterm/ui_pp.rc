@@ -66,7 +66,7 @@ BEGIN
     CONTROL         "List &hidden fonts in font dialog",IDC_LIST_HIDDEN_FONTS_DLG,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,99,205,11
     LTEXT           "Windows font folder (%s) to preview, show and hidden fonts",IDC_FONT_FOLDER_LABEL,17,118,280,8
-    PUSHBUTTON      "Open",IDC_FONT_FOLDER_BUTTON,29,134,50,14
+    LTEXT           "font folder",IDC_FONT_FOLDER,29,134,124,8,WS_TABSTOP
 END
 
 
@@ -80,7 +80,7 @@ GUIDELINES DESIGNINFO
 BEGIN
     IDD_TABSHEET_UI, DIALOG
     BEGIN
-        RIGHTMARGIN, 259
+        RIGHTMARGIN, 297
         VERTGUIDE, 6
         VERTGUIDE, 17
         BOTTOMMARGIN, 162
