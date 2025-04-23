@@ -736,39 +736,6 @@ begin
         iniFile := GetDefaultIniFilename();
         SetIniFile(iniFile);
 
-        if not WizardIsTaskSelected('cygtermhere') then
-        begin;
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\Folder\shell\cygterm');
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\Directory\Background\shell\cygterm');
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\LibraryFolder\Background\shell\cygterm');
-        end;
-
-        if not WizardIsTaskSelected('macroassoc') then
-        begin;
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.ttl');
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\TeraTerm.MacroFile');
-        end;
-
-        if not WizardIsTaskSelected('telnetassoc') then
-        begin;
-          // デフォルトで telnet プロトコルに関連付けがある Windows バージョンがあるため、Tera Term への関連付けだけを削除する
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell\Open with Tera Term');
-          RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell', '');
-        end;
-
-        if not WizardIsTaskSelected('sshassoc') then
-        begin;
-          // デフォルトの関連付けがないので、プロトコルごと削除
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\ssh');
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\slogin');
-        end;
-
-        if not WizardIsTaskSelected('ttyplayassoc') then
-        begin;
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.tty');
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\TTYRecordFile');
-        end;
-
         // HKEY_CURRENT_USER への設定は HKEY_LOCAL_MACHINE より優先されて邪魔になるので削除する
         //   専用拡張子なので丸ごと削除する
         RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.ttl');
