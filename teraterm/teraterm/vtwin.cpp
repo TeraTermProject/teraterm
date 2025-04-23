@@ -5081,7 +5081,25 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 									r->left, r->top, NewWindowWidth, NewWindowHeight,
 									NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
 			if (tmphWnd) {
-				int myDPI = GetDpiForWindow(tmphWnd);
+				assert(pGetDpiForWindow); // GetDpiForWindow()は、Windows 10 v1607 Red Stone 1 (RS1)以降で使用可能
+				int myDPI = pGetDpiForWindow(tmphWnd);
+				/*
+				  ・Tera Term の高 DPI(Per-Monitor V2) 対応環境は、Windows 10 v1703 以降。
+				    Windows 10 v1703 未満、及び Windows 8.1、Windows 7環境では、
+				    WM_DPICHANGED と WM_GETDPISCALEDSIZE は送信されない。
+				  ・CVTWindow::OnDpiChanged() 内では、GetDpiForWindow() は常に使用可能だが、
+				    他の箇所では GetDpiForWindow() の存在を確認するコードとすること。
+
+				  機能                 最小要件                             リリース日 備考
+				  ------------------------------------------------------------------------------------------
+				  WM_DPICHANGED        Windows 8.1                          2013/10/18
+				  GetDpiForMonitor()   Windows 8.1                          2013/10/18 Per-Monitor V2 非対応
+				  GetDpiForWindow()    Windows 10 v1607  Red Stone 1 (RS1)  2016/08/XX
+				  ------------------------------------------------------------------------------------------
+				  Per-Monitor V2       Windows 10 v1703  Red Stone 2 (RS2)  2017/04/XX
+				  WM_GETDPISCALEDSIZE  Windows 10 v1703  Red Stone 2 (RS2)  2017/04/XX
+				  ------------------------------------------------------------------------------------------
+				*/
 				::DestroyWindow(tmphWnd);
 				if (NewDPI == myDPI) {
 					NewRect = r;
