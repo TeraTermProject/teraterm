@@ -180,6 +180,12 @@ Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh; ValueName: EditFlags; ValueTy
 Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh; ValueName: URL Protocol; ValueType: string; Components: TTSSH; Tasks: telnetassoc
 Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Components: TTSSH; Tasks: sshassoc
 Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /ssh %1"; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.MacroFile; ValueType: string; ValueData: "Tera Term Macro File"; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.MacroFile\DefaultIcon; ValueType: string; ValueData: """{app}\ttpmacro.exe"",3"; Components: TeraTerm; Tasks: macroassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.MacroFile\shell\open\command; ValueType: string; ValueData: """{app}\ttpmacro.exe"" ""%1"""; Components: TeraTerm; Tasks: macroassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.TTYRecordFile; ValueType: string; ValueData: "Tera Term TTY Record File"; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.TTYRecordFile\DefaultIcon; ValueType: string; ValueData: """{app}\ttermpro.exe"",0"; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.TTYRecordFile\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /R=""%1"" /TTYPLAY"; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
 
 ; Register Application
 ;   Software\RegisteredApplications MUST NOT uninsdeletekey
@@ -210,6 +216,12 @@ Root: HKLM; Subkey: Software\Classes\slogin; ValueName: URL Protocol; ValueType:
 Root: HKLM; Subkey: Software\Classes\slogin; ValueName: EditFlags; ValueType: dword; ValueData: 2; Components: TTSSH; Tasks: sshassoc
 Root: HKLM; Subkey: Software\Classes\slogin\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
 Root: HKLM; Subkey: Software\Classes\slogin\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /ssh %1"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+;   拡張子 と プログラム の関連付け
+;   この拡張子がほかのプログラムとバッティングすることはないと思われるので、RegisteredApplications への登録はしない。
+;   Inno Setup のサンプルでも Classes\.ext に直接書き込んでいる（Examples\Example3.iss）。
+;   アンインストール時 .ext は残す。
+Root: HKLM; Subkey: Software\Classes\.ttl\OpenWithProgids; ValueType: string; ValueName: "TeraTerm.MacroFile"; Flags: uninsdeletevalue; Components: TeraTerm; Tasks: macroassoc
+Root: HKLM; Subkey: Software\Classes\.tty\OpenWithProgids; ValueType: string; ValueName: "TeraTerm.TTYRecordFile"; Flags: uninsdeletevalue; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
 
 ; Cygterm Here
 Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
@@ -222,16 +234,6 @@ Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm\command;
 Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
 Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
 Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%V\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
-; Associate with .TTL
-Root: HKCU; Subkey: Software\Classes\.ttl; ValueType: string; ValueData: TeraTerm.MacroFile; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
-Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile; ValueType: string; ValueData: Tera Term Macro File; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
-Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile\DefaultIcon; ValueType: string; ValueData: {app}\ttpmacro.exe,3; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
-Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile\shell\open\command; ValueType: string; ValueData: """{app}\ttpmacro.exe"" ""%1"""; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
-; Associate with .TTY
-Root: HKCU; Subkey: Software\Classes\.tty; ValueType: string; ValueData: TTYRecordFile; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
-Root: HKCU; Subkey: Software\Classes\TTYRecordFile; ValueType: string; ValueData: TTY Record File; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
-Root: HKCU; Subkey: Software\Classes\TTYRecordFile\DefaultIcon; ValueType: string; ValueData: {app}\ttermpro.exe,0; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
-Root: HKCU; Subkey: Software\Classes\TTYRecordFile\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /R=""%1"" /TTYPLAY"; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
 
 [Tasks]
 Name: desktopicon; Description: {cm:task_desktopicon}; Components: TeraTerm
