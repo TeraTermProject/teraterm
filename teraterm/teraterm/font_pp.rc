@@ -62,7 +62,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,42,240,10
     CONTROL         "List &hidden fonts in font dialog",IDC_LIST_HIDDEN_FONTS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,59,234,10
-    LTEXT           "Windows font folder to preview, show and hidden fonts",IDC_FONT_FOLDER_LABEL,19,76,320,8
+    LTEXT           "Use the link below to open the Fonts folder and view font visibility",IDC_FONT_FOLDER_LABEL,19,76,320,8
     CONTROL         "Dra&wing resized font to fit cell width",IDC_RESIZED_FONT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,112,178,10
     LTEXT           "API for drawing",IDC_VTFONT_TITLE,7,130,123,8
