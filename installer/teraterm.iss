@@ -175,6 +175,11 @@ Root: HKLM; Subkey: Software\Classes\TeraTerm.telnet; ValueName: EditFlags; Valu
 Root: HKLM; Subkey: Software\Classes\TeraTerm.telnet; ValueName: URL Protocol; ValueType: string; Components: TeraTerm; Tasks: telnetassoc
 Root: HKLM; Subkey: Software\Classes\TeraTerm.telnet\DefaultIcon; ValueType: string; ValueData: """{app}\ttermpro.exe"",0"; Components: TeraTerm; Tasks: telnetassoc
 Root: HKLM; Subkey: Software\Classes\TeraTerm.telnet\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /T=1 /nossh /E %1"; Components: TeraTerm; Tasks: telnetassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh; ValueType: string; ValueData: "URL: SSH Protocol"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh; ValueName: EditFlags; ValueType: dword; ValueData: 2; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh; ValueName: URL Protocol; ValueType: string; Components: TTSSH; Tasks: telnetassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /ssh %1"; Components: TTSSH; Tasks: sshassoc
 
 ; Register Application
 ;   Software\RegisteredApplications MUST NOT uninsdeletekey
@@ -186,19 +191,25 @@ Root: HKLM; Subkey: Software\Tera Term\Capabilities; ValueType: string; ValueNam
 ; Associate ProgId to Protocol
 ;   プロトコル と 選択できるプログラム の関連付け
 Root: HKLM; Subkey: Software\Tera Term\Capabilities\UrlAssociations; ValueType: string; ValueName: "telnet"; ValueData: "TeraTerm.telnet"; Components: TeraTerm; Tasks: telnetassoc
+Root: HKLM; Subkey: Software\Tera Term\Capabilities\UrlAssociations; ValueType: string; ValueName: "ssh"; ValueData: "TeraTerm.ssh"; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Tera Term\Capabilities\UrlAssociations; ValueType: string; ValueName: "slogin"; ValueData: "TeraTerm.ssh"; Components: TTSSH; Tasks: sshassoc
 
-; Associate with ssh://
-Root: HKCU; Subkey: Software\Classes\ssh; ValueType: string; ValueData: URL: SSH Protocol; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-; Associate with slogin://
-Root: HKCU; Subkey: Software\Classes\slogin; ValueType: string; ValueData: URL: slogin Protocol; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+; Legacy Association
+;   プロトコルにプログラムを直接指定する XP 以前の登録の仕方だが、
+;   これがないと プロトコル/リンクの種類 の関連付け画面に プロトコル が出てこない。
+;   HKCR に登録してもプロトコルは出てこない。
+;   telnet は Windows に元々あるので追加しなくてよい。
+;   アンインストール時にはプロトコルだけ残す。
+Root: HKLM; Subkey: Software\Classes\ssh; ValueType: string; ValueData: "URL: SSH Protocol"; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\ssh; ValueName: URL Protocol; ValueType: string; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\ssh; ValueName: EditFlags; ValueType: dword; ValueData: 2; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\ssh\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\ssh\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /ssh %1"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\slogin; ValueType: string; ValueData: "URL: slogin Protocol"; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\slogin; ValueName: URL Protocol; ValueType: string; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\slogin; ValueName: EditFlags; ValueType: dword; ValueData: 2; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\slogin\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\slogin\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /ssh %1"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
 
 ; Cygterm Here
 Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
