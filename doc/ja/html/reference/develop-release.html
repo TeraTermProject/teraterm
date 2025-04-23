@@ -221,6 +221,16 @@ git push origin v5.4.0
     <ul>
       <li>上で追加したタグを選択する</li>
       <li>インストーラとポータブル版の zip ファイルを追加する</li>
+      <li>ハッシュファイルを追加する
+        <ul>
+          <li>AppVeyor からダウンロードしたファイルのハッシュを計算する
+            <pre>
+sha256sum teraterm-5.4.0.exe teraterm-5.4.0.zip teraterm-5.4.0_pdb.zip > sha256sums.txt
+sha512sum teraterm-5.4.0.exe teraterm-5.4.0.zip teraterm-5.4.0_pdb.zip > sha512sums.txt</pre>
+          </li>
+          <li>ハッシュファイルを追加する</li>
+        </ul>
+      </li>
       <li>ドキュメントの変更履歴からリリースノートの概要を（日本語・英語ともに）記述する</li>
     </ul>
   </li>
