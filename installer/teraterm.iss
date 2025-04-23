@@ -728,6 +728,7 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   iniFile : String;
+  strValue : String;
 begin
   case CurStep of
     ssPostInstall:
@@ -766,6 +767,83 @@ begin
         begin;
           RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.tty');
           RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\TTYRecordFile');
+        end;
+
+        // HKEY_CURRENT_USER への設定は HKEY_LOCAL_MACHINE より優先されて邪魔になるので削除する
+        //   専用拡張子なので丸ごと削除する
+        RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.ttl');
+        RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.tty');
+        //   ProgId を削除する
+        //     TeraTerm.MacroFile という名前は変わらないが、 HKLM で使う
+        //     TTYRecordFile という名前は廃止した
+        RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\TeraTerm.MacroFile');
+        RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\TTYRecordFile');
+        //  Tera Term のものが登録されていたらプロトコルから削除する
+        strValue := '';
+        if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell', '', strValue) then
+        begin
+          if Pos('Open with Tera Term', strValue) > 0 then
+          begin
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell', '');
+          end
+        end;
+        strValue := '';
+        if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell\Open with Tera Term\command', '', strValue) then
+        begin
+          if Pos('ttermpro.exe', strValue) > 0 then
+          begin
+            RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell\Open with Tera Term');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\telnet');
+          end
+        end;
+        strValue := '';
+        if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Classes\ssh\DefaultIcon', '', strValue) then
+        begin
+          if Pos('ttxssh.dll', strValue) > 0 then
+          begin
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\ssh\DefaultIcon', '');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\ssh\DefaultIcon');
+          end;
+        end;
+        strValue := '';
+        if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Classes\ssh\shell\open\command', '', strValue) then
+        begin
+          if Pos('ttermpro.exe', strValue) > 0 then
+          begin
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\ssh\shell\open\command', '');
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\ssh', 'EditFlags');
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\ssh', 'URL Protocol');
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\ssh', '');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\ssh\shell\open\command');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\ssh\shell\open');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\ssh\shell');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\ssh');
+          end;
+        end;
+        strValue := '';
+        if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Classes\slogin\DefaultIcon', '', strValue) then
+        begin
+          if Pos('ttxssh.dll', strValue) > 0 then
+          begin
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\slogin\DefaultIcon', '');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\slogin\DefaultIcon');
+          end;
+        end;
+        strValue := '';
+        if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Classes\slogin\shell\open\command', '', strValue) then
+        begin
+          if Pos('ttermpro.exe', strValue) > 0 then
+          begin
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\slogin\shell\open\command', '');
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\slogin', 'EditFlags');
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\slogin', 'URL Protocol');
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\slogin', '');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\slogin\shell\open\command');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\slogin\shell\open');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\slogin\shell');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\slogin');
+          end;
         end;
 
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
