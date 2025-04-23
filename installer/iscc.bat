@@ -31,4 +31,14 @@ if "%RELEASE%" == "1" (
 )
 %INNO_SETUP% %INNO_SETUP_OPT_VERSION% /DAppVer=%VERSION% %INNO_SETUP_OPT_OUTPUT% teraterm.iss
 
+if "%RELEASE%" == "1" (
+    pushd Output
+    %CMAKE% -DOUTPUT=teraterm-%TT_VERSION%.sha256sum -P ../sha256sum.cmake teraterm-%TT_VERSION%.exe teraterm-%TT_VERSION%.zip teraterm-%TT_VERSION%_pdb.zip
+    popd
+) else (
+    pushd Output
+    %CMAKE% -DOUTPUT=%SNAPSHOT_PORTABLE_OUTPUT%.sha256sum -P ../sha256sum.cmake %SNAPSHOT_PORTABLE_OUTPUT%.exe %SNAPSHOT_PORTABLE_OUTPUT%.zip %SNAPSHOT_PORTABLE_OUTPUT%_pdb.zip
+    popd
+)
+
 endlocal

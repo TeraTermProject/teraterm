@@ -78,6 +78,13 @@ jobs:
         path: |
           installer/Output/*.exe
 
+    - name: Upload artifacts (sha256sum)
+      uses: actions/upload-artifact@v4
+      with:
+        name: sha256sum-BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}
+        path: |
+          installer/Output/*.sha256sum
+
     - name: Save libs
       if: steps.cache-libs-restore.outputs.cache-hit != 'true'
       id: cache-libs-save
