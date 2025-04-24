@@ -253,9 +253,9 @@ static BOOL ChooseDlgFont(HWND hWnd, UIPPData *dlg_data)
 	return result;
 }
 
-static void ArrangeControls(HWND hWnd, UIPPData *data)
+static void ArrangeControls(HWND hWnd, UIPPData *data,ACFCF_MODE mode)
 {
-	ArrangeControlsForChooseFont(hWnd, &data->DlgFont, IDC_LIST_HIDDEN_FONTS_DLG, IDC_LIST_PRO_FONTS_DLG);
+	ArrangeControlsForChooseFont(hWnd, &data->DlgFont, IDC_LIST_HIDDEN_FONTS_DLG, IDC_LIST_PRO_FONTS_DLG, mode);
 }
 
 static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -315,7 +315,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			GetDlgLogFont(GetParent(hWnd), pts, &data->DlgFont);
 			SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
 
-			ArrangeControls(hWnd, data);
+			ArrangeControls(hWnd, data, ACFCF_INIT_DIALOG);
 
 			wchar_t *font_folder;
 			HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
@@ -387,7 +387,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				case IDC_DLGFONT_CHOOSE | (BN_CLICKED << 16):
 					if (ChooseDlgFont(hWnd, data) != FALSE) {
 						SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
-						ArrangeControls(hWnd, data);
+						ArrangeControls(hWnd, data, ACFCF_CONTINUE);
 					}
 					break;
 
@@ -395,7 +395,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					GetMessageboxFontW(&data->DlgFont);
 					GetFontPitchAndFamily(hWnd, &data->DlgFont);
 					SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
-					ArrangeControls(hWnd, data);
+					ArrangeControls(hWnd, data, ACFCF_CONTINUE);
 					break;
 
 				case IDC_FONT_FOLDER: {

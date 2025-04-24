@@ -638,20 +638,61 @@ BOOL IsHiddenFont(const wchar_t *font_name)
  *	@param	lfont		フォント構造体
  *	@param	id_hidden	HiddenチェックボックスID
  *	@param	id_pro		ProportionalチェックボックスID
+ *	@param	mode		ACFCF_MODE
  */
-void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidden, int id_pro)
+void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidden, int id_pro, ACFCF_MODE mode)
 {
+	UINT check;
+	BOOL enable;
+
 	// Hidden
-	UINT check =
-		(IsWindows7OrLater() && IsHiddenFont(lfont->lfFaceName)) ? BST_CHECKED : BST_UNCHECKED;
-	BOOL enable =
-		(IsWindows7OrLater() && !IsHiddenFont(lfont->lfFaceName)) ? TRUE : FALSE;
+	if (IsWindows7OrLater()) {
+		// Windows 7 以降
+		const BOOL is_hidden = IsHiddenFont(lfont->lfFaceName);
+		enable = !is_hidden ? TRUE : FALSE;
+		switch(mode) {
+		case ACFCF_INIT_DIALOG:
+		case ACFCF_INIT_VTWIN:
+			check = is_hidden ? BST_CHECKED : BST_UNCHECKED;
+			break;
+		case ACFCF_CONTINUE:
+			check = is_hidden ? BST_CHECKED : IsDlgButtonChecked(hWnd, id_hidden);
+			break;
+		default:
+			assert(FALSE);
+		}
+	}
+	else {
+		// Windows 7 より前のときは使えない
+		check = BST_CHECKED;
+		enable = FALSE;
+	}
 	CheckDlgButton(hWnd, id_hidden, check);
 	EnableWindow(GetDlgItem(hWnd, id_hidden), enable);
 
 	// Proportional
-	enable = (lfont->lfPitchAndFamily & VARIABLE_PITCH) != 0 ? FALSE : TRUE;
-	CheckDlgButton(hWnd, id_pro, BST_CHECKED);
+	const BOOL is_proportional = (lfont->lfPitchAndFamily & VARIABLE_PITCH) != 0;
+	enable = is_proportional ? FALSE : TRUE;
+	switch(mode) {
+	case ACFCF_INIT_DIALOG:
+	case ACFCF_INIT_VTWIN:
+		if (is_proportional) {
+			check = BST_CHECKED;
+		} else {
+			check = (mode == ACFCF_INIT_DIALOG) ? BST_CHECKED : BST_UNCHECKED;
+		}
+		break;
+	default:
+		assert(FALSE);
+	case ACFCF_CONTINUE:
+		if (is_proportional) {
+			check = BST_CHECKED;
+		} else {
+			check = IsDlgButtonChecked(hWnd, id_pro);
+		}
+		break;
+	}
+	CheckDlgButton(hWnd, id_pro, check);
 	EnableWindow(GetDlgItem(hWnd, id_pro), enable);
 }
 

@@ -101,7 +101,14 @@ void TTSetIcon(HINSTANCE hInst, HWND hWnd, const wchar_t *icon_name, UINT dpi);
 DWORD GetDlgItemIndexTextW(HWND hDlg, int nIDDlgItem, WPARAM index, wchar_t **text);
 void SetFontStringW(HWND hWnd, int item, const LOGFONTW *logfont);
 BOOL IsHiddenFont(const wchar_t *font_name);
-void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidden, int id_pro);
+
+typedef enum {
+	ACFCF_INIT_DIALOG = 0,	// ダイアログフォント用初期化
+	ACFCF_INIT_VTWIN,		// VTWin用初期化
+	ACFCF_CONTINUE,			// フォント設定後の再設定
+} ACFCF_MODE;
+void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidden, int id_pro, ACFCF_MODE mode);
+
 void GetFontPitchAndFamily(HWND hWnd, LOGFONTW *logfont);
 
 #ifdef __cplusplus
