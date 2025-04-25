@@ -178,7 +178,6 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 		{
 		// ウィンドウの描画
 		PAINTSTRUCT ps;
-		HFONT hFont;
 		HFONT hOldFont;
 		TCHAR szText[512];
 
@@ -187,12 +186,16 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 		// 現在のクライアント矩形、テキスト、フォントを取得する
 		GetClientRect( hWnd, &rc );
 		GetWindowText( hWnd, szText, 512 );
-		hFont = (HFONT)SendMessage( hWnd, WM_GETFONT, (WPARAM)0, (LPARAM)0 );
 
 		// テキスト描画
 		SetBkMode( hdc, TRANSPARENT );
-		SetTextColor( hdc, parent->mouseover ? RGB( 0x84, 0, 0 ): RGB( 0, 0, 0xff ) );
-		hOldFont = (HFONT)SelectObject( hdc, (HGDIOBJ)hFont );
+		SetTextColor(hdc, GetSysColor(COLOR_HOTLIGHT));
+		if (parent->mouseover) {
+			hOldFont = (HFONT)SelectObject(hdc, (HGDIOBJ)parent->font);
+		} else {
+			HFONT hFont = (HFONT)SendMessage( hWnd, WM_GETFONT, (WPARAM)0, (LPARAM)0 );
+			hOldFont = (HFONT)SelectObject(hdc, (HGDIOBJ)hFont);
+		}
 		TextOut( hdc, 2, 0, szText, lstrlen( szText ) );
 		SelectObject( hdc, (HGDIOBJ)hOldFont );
 
@@ -209,11 +212,14 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 		GetClientRect( hWnd, &rc );
 
 		// 背景描画
+#if 0
 		if( parent->mouseover ){
 			// ハイライト時背景描画
 			SetBkColor( hdc, RGB( 0xff, 0xff, 0 ) );
 			ExtTextOut( hdc, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL );
-		}else{
+		}else
+#endif
+		{
 			// 親にWM_CTLCOLORSTATICを送って背景ブラシを取得し、背景描画する
 			HBRUSH hbr;
 			HBRUSH hbrOld;
@@ -239,6 +245,11 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 		free(parent);
 
 		return (LRESULT)0;
+
+	case WM_SETFOCUS:
+	case WM_KILLFOCUS:
+		InvalidateRect(hWnd, NULL, TRUE);
+		break;
 	}
 
 	return CallWindowProcW( parent->proc, hWnd, msg, wParam, lParam );
@@ -261,14 +272,11 @@ static void do_subclass_window(HWND hWnd, url_subclass_t *parent)
 	// サブクラスのプロシージャを登録する。
 	parent->proc = (WNDPROC)SetWindowLongPtrW( hWnd, GWLP_WNDPROC, (LONG_PTR)UrlWndProc);
 
-	// 下線を付ける
+	// 下線を付けたフォントを生成, 終了時削除すること
 	hFont = (HFONT)SendMessage( hWnd, WM_GETFONT, (WPARAM)0, (LPARAM)0 );
 	GetObject( hFont, sizeof(lf), &lf );
 	lf.lfUnderline = TRUE;
-	parent->font = hFont = CreateFontIndirect( &lf ); // 不要になったら削除すること
-	if (hFont != NULL) {
-		SendMessage( hWnd, WM_SETFONT, (WPARAM)hFont, (LPARAM)FALSE );
-	}
+	parent->font = hFont = CreateFontIndirect( &lf );
 
 	parent->hWnd = hWnd;
 	parent->timer_done = 0;
