@@ -27,7 +27,7 @@
  */
 
 #include <dwrite.h>
-#include <assert.H>
+#include <assert.h>
 
 #include "compat_dwrite.h"
 
