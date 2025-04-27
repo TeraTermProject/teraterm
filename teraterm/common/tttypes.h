@@ -660,6 +660,7 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdMouseTrackExtUTF8  1
 #define IdMouseTrackExtSGR   2
 #define IdMouseTrackExtURXVT 3
+#define IdMouseTrackExtSGRP  4
 
   /* Mouse event */
 #define IdMouseEventCurStat  0
