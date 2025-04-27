@@ -100,7 +100,7 @@ HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi,
 void TTSetIcon(HINSTANCE hInst, HWND hWnd, const wchar_t *icon_name, UINT dpi);
 DWORD GetDlgItemIndexTextW(HWND hDlg, int nIDDlgItem, WPARAM index, wchar_t **text);
 void SetFontStringW(HWND hWnd, int item, const LOGFONTW *logfont);
-BOOL IsHiddenFont(const wchar_t *font_name);
+BOOL IsHiddenFont(const LOGFONTW *logfont);
 
 typedef enum {
 	ACFCF_INIT_DIALOG = 0,	// ダイアログフォント用初期化

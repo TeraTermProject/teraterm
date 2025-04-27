@@ -43,6 +43,7 @@
 #include "asprintf.h"
 #include "compat_win.h"
 #include "win32helper.h"
+#include "directx.h"
 
 /**
  *	EndDialog() 互換関数
@@ -583,16 +584,25 @@ static void ConvertLOGFONTWA(const LOGFONTA *logfontA, LOGFONTW *logfontW)
 
 /**
  *	ChooseFont() のフォント一覧で非表示フォントか調べる
+ *	Windows 7 未満の場合、常にFALSEが返る
  *
- *	@param	font_name
+ *	@param	logfont
  */
-BOOL IsHiddenFont(const wchar_t *font_name)
+BOOL IsHiddenFont(const LOGFONTW *logfont)
 {
 	static const wchar_t *reg_str = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Font Management";
 	static const wchar_t *reg_key = L"Inactive Fonts";
 
+	wchar_t *font_family;
+	BOOL r = DXGetFontFamilyName(logfont, &font_family);
+	if (!r) {
+		// Windows 7 未満
+		return FALSE;
+	}
+
 	HKEY hKey;
 	if (RegOpenKeyExW(HKEY_CURRENT_USER, reg_str, 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
+		free(font_family);
 		return FALSE;
 	}
 
@@ -608,12 +618,12 @@ BOOL IsHiddenFont(const wchar_t *font_name)
 				RegQueryValueExW(hKey, reg_key, nullptr, nullptr, buf, &size) == ERROR_SUCCESS) {
 				const wchar_t *p = (wchar_t *)buf;
 				while (*p) {
-					if (wcscmp(p, font_name) == 0) {
+					if (wcscmp(p, font_family) == 0) {
 						// フォント名が見つかった
 						find = TRUE;
 						break;
 					}
-					p += wcslen(p) + 1;	 // 次の文字列に移動
+					p += wcslen(p) + 1;	// 次の文字列に移動
 				}
 			}
 			free(buf);
@@ -621,6 +631,7 @@ BOOL IsHiddenFont(const wchar_t *font_name)
 	}
 	RegCloseKey(hKey);
 
+	free(font_family);
 	return find;
 }
 
@@ -648,7 +659,7 @@ void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidde
 	// Hidden
 	if (IsWindows7OrLater()) {
 		// Windows 7 以降
-		const BOOL is_hidden = IsHiddenFont(lfont->lfFaceName);
+		const BOOL is_hidden = IsHiddenFont(lfont);
 		enable = !is_hidden ? TRUE : FALSE;
 		switch(mode) {
 		case ACFCF_INIT_DIALOG:

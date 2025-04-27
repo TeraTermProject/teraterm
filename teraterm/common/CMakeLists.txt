@@ -15,6 +15,7 @@ add_library(
   codeconv_mb.h
   compat_win.cpp
   compat_win.h
+  compat_dwrite.h
   comportinfo.cpp
   comportinfo.h
   ddelib.cpp
@@ -25,6 +26,8 @@ add_library(
   dlglib_tmpl.cpp
   dllutil.cpp
   dllutil.h
+  directx.h
+  directx.cpp
   fileread.cpp
   fileread.h
   getcontent.cpp
