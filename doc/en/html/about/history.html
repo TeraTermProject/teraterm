@@ -48,6 +48,29 @@
         Add available <a href="../usage/character_encoding.html">character encodings</a>.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/510" target="_blank">issue #510</a>)
       </li>
+      <li>
+        Added [UI] tab in Additional settings and moved <a href="../menu/setup-additional-ui.html#UILanguageFile">UI languages</a> and <a href="../menu/setup-additional-ui.html#DLGFont">Dialog font</a> setting.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/460" target="_blank">issue #460</a>)
+      </li>
+      <li>Reorganize tabs with font selection buttons.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/460" target="_blank">issue #460</a>)
+        <ul>
+          <li>Tabs have button to open font dialog.
+            <ul>
+              <li>[UI] tab</li>
+              <li>[Font] tab</li>
+              <li>[Tek] tab (TODO)</li>
+            </ul>
+          </li>
+          <li>Added settings for display options to font list in font dialog for each tab.
+            <ul>
+              <li>Show proportional fonts or not show proportional fonts</li>
+              <li>Show hidden fonts or not show hidden fonts</li>
+            </ul>
+          </li>
+          <li>ListHiddenFonts entry in TERATERM.INI, which show hiden font or not to show hidden fonts, was removed.</li>
+        </ul>
+      </li>
     </ul>
   </li>
 
@@ -227,7 +250,7 @@
           <li>COM ports that are disabled and failed to initialize are not included.</li>
         </ul>
       </li>
-      <li>General setup dialog is now shown the information from <a href="../menu/setup-additional-general.html#UILanguageFile">Language file</a> which is selected.</a>
+      <li>General setup dialog is now shown the information from <a href="../menu/setup-additional-ui.html#UILanguageFile">Language file</a> which is selected.</a>
       <li>"Default port" settings is moved to <a href="../menu/setup-additional-general.html#Port">General tab</a> of Additional settings dialog from General setup dialog.</li>
       <li>Removed Language setting from General setup dialog.</li>
       <li>Download folder setting is moved to <a href="../menu/setup-additional-general.html#FileFolder">General tab</a> of Additional settings dialog.</li>

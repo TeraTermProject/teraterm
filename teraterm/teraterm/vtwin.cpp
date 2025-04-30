@@ -4973,9 +4973,9 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 
 		if (calcOnly) {
 			// 新DPIのフォントのサイズからスクリーンサイズを算出
-			LOGFONTA VTlfDefault;
+			LOGFONTW VTlfDefault;
 			DispSetLogFont(&VTlfDefault, NewDPI); // Normal Font
-			HFONT VTFontDefault = CreateFontIndirect(&VTlfDefault);
+			HFONT VTFontDefault = CreateFontIndirectW(&VTlfDefault);
 			HDC TmpDC = GetDC(m_hWnd);
 			SelectObject(TmpDC, VTFontDefault);
 			TEXTMETRIC Metrics;

@@ -44,6 +44,9 @@
 #include "codeconv.h"
 #include "ttdlg.h"	// _ChooseFontDlg()
 #include "tipwin2.h"
+#include "asprintf.h"
+#include "win32helper.h"
+#include "tttext.h"
 
 #include "font_pp.h"
 
@@ -58,9 +61,8 @@ struct FontPPData {
 	const wchar_t *UILanguageFileW;
 	TTTSet *pts;
 	DLGTEMPLATE *dlg_templ;
-	LOGFONTA VTFont;
-	LOGFONTW DlgFont;
-	TipWin2 *Tipwin = NULL;
+	LOGFONTW VTFont;
+	TipWin2 *Tipwin;
 };
 
 static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
@@ -82,13 +84,6 @@ static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
 	}
 }
 
-static void SetDlgLogFont(HWND hWnd, const LOGFONTW *logfont, TTTSet *ts)
-{
-	wcsncpy_s(ts->DialogFontNameW, _countof(ts->DialogFontNameW), logfont->lfFaceName, _TRUNCATE);
-	ts->DialogFontPoint = GetFontPointFromPixel(hWnd, -logfont->lfHeight);
-	ts->DialogFontCharSet = logfont->lfCharSet;
-}
-
 static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	if (Message == WM_INITDIALOG) {
@@ -106,73 +101,10 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPA
 	return FALSE;
 }
 
-static BOOL ChooseDlgFont(HWND hWnd, FontPPData *dlg_data)
-{
-	const TTTSet *ts = dlg_data->pts;
-
-	// ダイアログ表示
-	CHOOSEFONTW cf = {};
-	cf.lStructSize = sizeof(cf);
-	cf.hwndOwner = hWnd;
-	cf.lpLogFont = &dlg_data->DlgFont;
-	cf.Flags =
-		CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
-		//CF_SHOWHELP |
-		CF_NOVERTFONTS |
-		CF_ENABLEHOOK;
-	if (IsWindows7OrLater() && (IsDlgButtonChecked(hWnd, IDC_LIST_HIDDEN_FONTS) == BST_CHECKED)) {
-		cf.Flags |= CF_INACTIVEFONTS;
-	}
-	if (IsDlgButtonChecked(hWnd, IDC_LIST_PRO_FONTS_DLG) != BST_CHECKED) {
-		cf.Flags |= CF_FIXEDPITCHONLY;
-	}
-	cf.lpfnHook = TFontHook;
-	cf.nFontType = REGULAR_FONTTYPE;
-	cf.hInstance = dlg_data->hInst;
-	cf.lCustData = (LPARAM)dlg_data;
-	BOOL result = ChooseFontW(&cf);
-	return result;
-}
-
 static void EnableCodePage(HWND hWnd, BOOL enable)
 {
 	EnableWindow(GetDlgItem(hWnd, IDC_VTFONT_CODEPAGE_LABEL), enable);
 	EnableWindow(GetDlgItem(hWnd, IDC_VTFONT_CODEPAGE_EDIT), enable);
-}
-
-static void SetFontString(HWND hWnd, int item, const LOGFONTW *logfont)
-{
-	// https://docs.microsoft.com/en-us/windows/win32/api/dimm/ns-dimm-logfonta
-	// http://www.coara.or.jp/~tkuri/D/015.htm#D2002-09-14
-	wchar_t b[128];
-	HDC DC = GetDC(hWnd);
-	int dpi = GetDeviceCaps(DC, LOGPIXELSY);
-	ReleaseDC(hWnd, DC);
-	swprintf_s(b, L"%s (%d,%d) %d ; %.1f point",
-			   logfont->lfFaceName,
-			   logfont->lfWidth,
-			   logfont->lfHeight,
-			   logfont->lfCharSet,
-			   abs(logfont->lfHeight) * 72.0f / dpi);
-	SetDlgItemTextW(hWnd, item, b);
-}
-
-/**
- *	conver LOGFONTA -> LOGFONTW
- */
-static void ConvertLOGFONTWA(const LOGFONTA *logfontA, LOGFONTW *logfontW)
-{
-	logfontW->lfWidth = logfontA->lfWidth;
-	logfontW->lfHeight = logfontA->lfHeight;
-	logfontW->lfCharSet = logfontA->lfCharSet;
-	ACPToWideChar_t(logfontA->lfFaceName, logfontW->lfFaceName, _countof(logfontW->lfFaceName));
-}
-
-static void SetFontString(HWND hWnd, int item, const LOGFONTA *logfont)
-{
-	LOGFONTW logfontW = {};
-	ConvertLOGFONTWA(logfont, &logfontW);
-	SetFontString(hWnd, item, &logfontW);
 }
 
 /**
@@ -229,14 +161,13 @@ static BOOL ChooseVTFont(HWND WndParent, FontPPData *dlg_data)
 {
 	const TTTSet *ts = dlg_data->pts;
 	BOOL Ok;
-	LOGFONTA VTFontA = dlg_data->VTFont;
-	CHOOSEFONTA cf = {};
+	LOGFONTW VTFontW = dlg_data->VTFont;
+	CHOOSEFONTW cf = {};
 	cf.lStructSize = sizeof(cf);
 	cf.hwndOwner = WndParent;
-	cf.lpLogFont = &VTFontA;
+	cf.lpLogFont = &VTFontW;
 	cf.Flags =
 		CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
-		//CF_FIXEDPITCHONLY |
 		//CF_SHOWHELP |
 		CF_NOVERTFONTS |
 		CF_ENABLEHOOK;
@@ -250,9 +181,9 @@ static BOOL ChooseVTFont(HWND WndParent, FontPPData *dlg_data)
 	cf.nFontType = REGULAR_FONTTYPE;
 	cf.hInstance = dlg_data->hInst;
 	cf.lCustData = (LPARAM)ts;
-	Ok = ChooseFontA(&cf);
+	Ok = ChooseFontW(&cf);
 	if (Ok) {
-		dlg_data->VTFont = VTFontA;
+		dlg_data->VTFont = VTFontW;
 	}
 	return Ok;
 }
@@ -264,14 +195,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		{ IDC_VTFONT_CHOOSE, "DLG_TAB_FONT_BTN_SELECT" },
 		{ IDC_VTFONT_TITLE, "DLG_TAB_FONT_VTFONT_TITLE" },
 		{ IDC_VTFONT_CODEPAGE_LABEL, "DLG_TAB_FONT_CODEPAGE_LABEL" },
-		{ IDC_DLGFONT, "DLG_TAB_FONT_DLGFONT"},
-		{ IDC_DLGFONT_CHOOSE, "DLG_TAB_FONT_BTN_SELECT" },
-		{ IDC_DLGFONT_DEFAULT, "DLG_TAB_FONT_BTN_DEFAULT" },
 		{ IDC_LIST_HIDDEN_FONTS, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
 		{ IDC_LIST_PRO_FONTS_VT, "DLG_TAB_FONT_LIST_PRO_FONTS_VT" },
-		{ IDC_LIST_PRO_FONTS_DLG, "DLG_TAB_FONT_LIST_PRO_FONTS_DLG" },
 		{ IDC_CHARACTER_SPACE_TITLE, "DLG_TAB_FONT_CHARACTER_SPACE" },
 		{ IDC_RESIZED_FONT, "DLG_TAB_FONT_RESIZED_FONT" },
+		{ IDC_FONT_FOLDER_LABEL, "DLG_TAB_FONT_FOLDER_LABEL" },
 	};
 	FontPPData *dlg_data = (FontPPData *)GetWindowLongPtr(hWnd, DWLP_USER);
 	TTTSet *ts = dlg_data == NULL ? NULL : dlg_data->pts;
@@ -283,15 +211,13 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)dlg_data);
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), dlg_data->pts->UILanguageFileW);
 
-			GetDlgLogFont(GetParent(hWnd), ts, &dlg_data->DlgFont);
-			SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
-
 			HDC DC = GetDC(hWnd);
 			int dpi = GetDeviceCaps(DC, LOGPIXELSY);
 			ReleaseDC(hWnd, DC);
 			DispSetLogFont(&dlg_data->VTFont, dpi);
+			GetFontPitchAndFamily(hWnd, &dlg_data->VTFont);
 
-			SetFontString(hWnd, IDC_VTFONT_EDIT, &dlg_data->VTFont);
+			SetFontStringW(hWnd, IDC_VTFONT_EDIT, &dlg_data->VTFont);
 
 			CheckDlgButton(hWnd,
 						   UnicodeDebugParam.UseUnicodeApi ? IDC_VTFONT_UNICODE : IDC_VTFONT_ANSI,
@@ -300,8 +226,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			EnableCodePage(hWnd, UnicodeDebugParam.UseUnicodeApi ? FALSE : TRUE);
 			SendDlgItemMessage(hWnd, IDC_VTFONT_CODEPAGE_EDIT, EM_LIMITTEXT, IDC_CODEPAGE_MAXLEN, 0);
 
-			CheckDlgButton(hWnd, IDC_LIST_HIDDEN_FONTS, ts->ListHiddenFonts);
-			EnableWindow(GetDlgItem(hWnd, IDC_LIST_HIDDEN_FONTS), IsWindows7OrLater() ? TRUE : FALSE);
+			ArrangeControlsForChooseFont(hWnd, &dlg_data->VTFont, IDC_LIST_HIDDEN_FONTS, IDC_LIST_PRO_FONTS_VT, ACFCF_INIT_VTWIN);
 
 			SetDlgItemInt(hWnd, IDC_SPACE_LEFT, ts->FontDX, TRUE);
 			SetDlgItemInt(hWnd, IDC_SPACE_RIGHT, ts->FontDW, TRUE);
@@ -315,7 +240,12 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			CheckDlgButton(hWnd, IDC_RESIZED_FONT, DispIsResizedFont());
 
-			CheckDlgButton(hWnd, IDC_LIST_PRO_FONTS_DLG, BST_CHECKED);
+			wchar_t *font_folder;
+			HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
+			if (r == S_OK) {
+				TTTextMenu(hWnd, IDC_FONT_FOLDER, font_folder, NULL, 0);
+				free(font_folder);
+			}
 
 			break;
 		}
@@ -327,17 +257,14 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						IsDlgButtonChecked(hWnd, IDC_VTFONT_UNICODE) == BST_CHECKED;
 					UnicodeDebugParam.CodePageForANSIDraw =
 						GetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, NULL, FALSE);
-					ts->ListHiddenFonts = IsDlgButtonChecked(hWnd, IDC_LIST_HIDDEN_FONTS) == BST_CHECKED;
 
-					strncpy_s(ts->VTFont, _countof(ts->VTFont), dlg_data->VTFont.lfFaceName, _TRUNCATE);
+					WideCharToACP_t(dlg_data->VTFont.lfFaceName, ts->VTFont, sizeof(ts->VTFont));
 					HDC DC = GetDC(hWnd);
 					int dpi = GetDeviceCaps(DC, LOGPIXELSY);
 					ReleaseDC(hWnd, DC);
 					ts->VTFontSize.x = dlg_data->VTFont.lfWidth  * 96 / dpi;
 					ts->VTFontSize.y = dlg_data->VTFont.lfHeight * 96 / dpi;
 					ts->VTFontCharSet = dlg_data->VTFont.lfCharSet;
-
-					SetDlgLogFont(GetParent(hWnd), &dlg_data->DlgFont, ts);
 
 					DispEnableResizedFont(IsDlgButtonChecked(hWnd, IDC_RESIZED_FONT) == BST_CHECKED);
 
@@ -447,19 +374,21 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				if (ChooseVTFont(hWnd, dlg_data)) {
 					const int codepage = GetCodePageFromFontCharSet(dlg_data->VTFont.lfCharSet);
 					SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, codepage, FALSE);
-					SetFontString(hWnd, IDC_VTFONT_EDIT, &dlg_data->VTFont);
+
+					ArrangeControlsForChooseFont(hWnd, &dlg_data->VTFont, IDC_LIST_HIDDEN_FONTS, IDC_LIST_PRO_FONTS_VT, ACFCF_CONTINUE);
+					SetFontStringW(hWnd, IDC_VTFONT_EDIT, &dlg_data->VTFont);
 				}
 				break;
 			}
-			case IDC_DLGFONT_CHOOSE | (BN_CLICKED << 16):
-				if (ChooseDlgFont(hWnd, dlg_data) != FALSE) {
-					SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
+
+			case IDC_FONT_FOLDER: {
+				wchar_t *font_folder;
+				HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
+				if (r ==S_OK) {
+					ShellExecuteW(NULL, L"explore", font_folder, NULL, NULL, SW_NORMAL);
+					free(font_folder);
 				}
 				break;
-
-			case IDC_DLGFONT_DEFAULT | (BN_CLICKED << 16): {
-				GetMessageboxFontW(&dlg_data->DlgFont);
-				SetFontString(hWnd, IDC_DLGFONT_EDIT, &dlg_data->DlgFont);
 			}
 
 			default:

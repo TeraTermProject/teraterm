@@ -216,6 +216,7 @@
     <ClCompile Include="ttsetup.c" />
     <ClCompile Include="ttwinman.c" />
     <ClCompile Include="ttwsk.c" />
+    <ClCompile Include="ui_pp.cpp" />
     <ClCompile Include="vtdisp.c" />
     <ClCompile Include="vtterm.c" />
     <ClCompile Include="vtwin.cpp" />
@@ -275,6 +276,8 @@
     <ClCompile Include="debug_pp.cpp" />
     <ClInclude Include="serial_pp.h" />
     <ClInclude Include="term_pp.h" />
+    <ClInclude Include="ui_pp.h" />
+    <ClInclude Include="ui_pp_res.h" />
     <ClInclude Include="win_pp.h" />
   </ItemGroup>
   <ItemGroup>
@@ -300,6 +303,7 @@
     <ResourceCompile Include="themedlg.rc" />
     <ResourceCompile Include="tt-version.rc" />
     <ResourceCompile Include="ttermpro.rc" />
+    <ResourceCompile Include="ui_pp.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\codeconv.h" />

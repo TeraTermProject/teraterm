@@ -243,9 +243,11 @@ int CALLBACK TTCPropSheetDlg::PropSheetProc(HWND hWnd, UINT msg, LPARAM lp)
 			{ IDCANCEL, "BTN_CANCEL" },
 			{ IDHELP, "BTN_HELP" },
 		};
+		static const int ID_APPLY_NOW = 0x3021;		// afxres.h ‚Å’è‹`‚³‚ê‚Ä‚¢‚é
 		TTCPropSheetDlg*self = gTTCPS;
 		self->m_hWnd = hWnd;
 		SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), self->m_UiLanguageFile);
+		SetDlgItemTextW(hWnd, ID_APPLY_NOW, L"");	// &A ‚ªŽg‚¦‚é‚æ‚¤ "&Apply" ‚ðíœ‚·‚é
 		self->m_OrgProc = SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)WndProcStatic);
 		self->m_OrgUserData = SetWindowLongPtrW(hWnd, GWLP_USERDATA, (LONG_PTR)self);
 		break;

@@ -134,7 +134,7 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Cou
 			  int Y, int *X);
 void DispEnableResizedFont(BOOL enable);
 BOOL DispIsResizedFont();
-void DispSetLogFont(LOGFONTA *VTlf, unsigned int dpi);
+void DispSetLogFont(LOGFONTW *VTlf, unsigned int dpi);
 
 extern int WinWidth, WinHeight;
 extern HFONT VTFont[AttrFontMask+1];

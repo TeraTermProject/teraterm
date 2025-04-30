@@ -62,6 +62,7 @@
 #include "term_pp.h"
 #include "win_pp.h"
 #include "serial_pp.h"
+#include "ui_pp.h"
 
 #include "addsetting.h"
 
@@ -1492,55 +1493,81 @@ void CCygwinPropPageDlg::OnHelp()
 
 //////////////////////////////////////////////////////////////////////////////
 
+// タブ
+// この順にタブが表示される
+enum {
+	PP_GENERAL,
+	PP_UI,
+	PP_SEQUENCE,
+	PP_COPY_PASTE,
+	PP_VISUAL,
+	PP_LOG,
+	PP_CYGWIN,
+	PP_ENCODING,
+	PP_FONT,
+	PP_THEME,
+	PP_KEYBOARD,
+	PP_MOUSE,
+	PP_TCPIP,
+	PP_TERMINAL,
+	PP_SERIAL,
+	PP_WINDOW,
+	PP_DEBUG,
+	PP_MAX,
+};
+
 // CAddSettingPropSheetDlg
 CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd):
 	TTCPropSheetDlg(hInstance, hParentWnd, ts.UILanguageFileW)
 {
+	HPROPSHEETPAGE pages[PP_MAX] = {0};
+
 	AddsettingWin parent_win = AddsettingCheckWin(hParentWnd);
 
 	// CPP,tmfcのTTCPropertyPage派生クラスから生成
 	int i = 0;
 	if (parent_win == ADDSETTING_WIN_VT) {
-		m_Page[i++] = new CGeneralPropPageDlg(hInstance, hParentWnd, &cv);
-		m_Page[i++] = new CSequencePropPageDlg(hInstance);
-		m_Page[i++] = new CCopypastePropPageDlg(hInstance);
-		m_Page[i++] = new CVisualPropPageDlg(hInstance);
-		m_Page[i++] = new CLogPropPageDlg(hInstance);
-		m_Page[i++] = new CCygwinPropPageDlg(hInstance);
+		m_Page[i] = new CGeneralPropPageDlg(hInstance, hParentWnd, &cv);
+		pages[PP_GENERAL] = m_Page[i++]->CreatePropertySheetPage();
+		m_Page[i] = new CSequencePropPageDlg(hInstance);
+		pages[PP_SEQUENCE] = m_Page[i++]->CreatePropertySheetPage();
+		m_Page[i] = new CCopypastePropPageDlg(hInstance);
+		pages[PP_COPY_PASTE] = m_Page[i++]->CreatePropertySheetPage();
+		m_Page[i] = new CVisualPropPageDlg(hInstance);
+		pages[PP_VISUAL] = m_Page[i++]->CreatePropertySheetPage();
+		m_Page[i] = new CLogPropPageDlg(hInstance);
+		pages[PP_LOG] = m_Page[i++]->CreatePropertySheetPage();
+		m_Page[i] = new CCygwinPropPageDlg(hInstance);
+		pages[PP_CYGWIN] = m_Page[i++]->CreatePropertySheetPage();
 	}
 	if ((GetKeyState(VK_CONTROL) & 0x8000) != 0 ||
 		(GetKeyState(VK_SHIFT) & 0x8000) != 0 ) {
-		m_Page[i++] = new CDebugPropPage(hInstance);
+		m_Page[i] = new CDebugPropPage(hInstance);
+		pages[PP_DEBUG] = m_Page[i++]->CreatePropertySheetPage();
 	}
 	m_PageCountCPP = i;
 
-	HPROPSHEETPAGE page;
-	for (i = 0; i < m_PageCountCPP; i++) {
-		page = m_Page[i]->CreatePropertySheetPage();
-		AddPage(page);
-	}
-
 	// TTCPropertyPage を使用しない PropertyPage
 	if (parent_win == ADDSETTING_WIN_VT) {
-		page = CodingPageCreate(hInstance, &ts);
-		AddPage(page);
-		page = FontPageCreate(hInstance, &ts);
-		AddPage(page);
-		page = ThemePageCreate(hInstance, &ts);
-		AddPage(page);
-		page = KeyboardPageCreate(hInstance, &ts);
-		AddPage(page);
-		page = MousePageCreate(hInstance, &ts);
-		AddPage(page);
-		page = TcpIPPageCreate(hInstance, &ts);
-		AddPage(page);
-		page = CreateTerminalPP(hInstance, hParentWnd, & ts);
-		AddPage(page);
-		page = SerialPageCreate(hInstance, &ts);
-		AddPage(page);
+		pages[PP_ENCODING] = CodingPageCreate(hInstance, &ts);
+		pages[PP_FONT] = FontPageCreate(hInstance, &ts);
+		pages[PP_THEME] = ThemePageCreate(hInstance, &ts);
+		pages[PP_KEYBOARD] = KeyboardPageCreate(hInstance, &ts);
+		pages[PP_MOUSE] = MousePageCreate(hInstance, &ts);
+		pages[PP_TCPIP] = TcpIPPageCreate(hInstance, &ts);
+		pages[PP_TERMINAL] = CreateTerminalPP(hInstance, hParentWnd, & ts);
+		pages[PP_SERIAL] = SerialPageCreate(hInstance, &ts);
+		pages[PP_UI] = UIPageCreate(hInstance, &ts);
 	}
-	page = CreateWinPP(hInstance, hParentWnd, &ts);
-	AddPage(page);
+	pages[PP_WINDOW] = CreateWinPP(hInstance, hParentWnd, &ts);
+
+
+	for (int i = 0; i < PP_MAX; i++) {
+		HPROPSHEETPAGE page = pages[i];
+		if (page != 0) {
+			AddPage(page);
+		}
+	}
 
 	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFileW);
 	SetCaption(title);
@@ -1556,34 +1583,34 @@ CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 
 void CAddSettingPropSheetDlg::SetStartPage(Page page)
 {
-	int start_page = 0;
+	int start_page = PP_GENERAL;
 	switch (page) {
 	case DefaultPage:
-		start_page = 0;
+		start_page = PP_GENERAL;
 		break;
 	case CodingPage:
-		start_page = 6;
+		start_page = PP_ENCODING;
 		break;
 	case FontPage:
-		start_page = 7;
+		start_page = PP_FONT;
 		break;
 	case KeyboardPage:
-		start_page = 9;
+		start_page = PP_KEYBOARD;
 		break;
 	case TcpIpPage:
-		start_page = 11;
+		start_page = PP_TCPIP;
 		break;
 	case TermPage:
-		start_page = 12;
+		start_page = PP_TERMINAL;
 		break;
 	case WinPage:
-		start_page = 14;
+		start_page = PP_WINDOW;
 		break;
 	case SerialPortPage:
-		start_page = 13;
+		start_page = PP_SERIAL;
 		break;
 	default:
-		start_page = 0;
+		start_page = PP_GENERAL;
 		break;
 	}
 	TTCPropSheetDlg::SetStartPage(start_page);

@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007- TeraTerm Project
+ * (C) 2025- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,33 +25,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/* Tera Term */
-/* TERATERM.EXE, IME interface */
 
-#pragma once
+#include <windows.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* proto types */
-BOOL LoadIME(void);
-void FreeIME(HWND hWnd);
-BOOL CanUseIME(void);
-void SetConversionWindow(HWND HWnd, int X, int Y);
-void SetConversionLogFont(HWND HWnd, const LOGFONTW *lf);
-void ResetConversionLogFont(HWND HWnd);
-BOOL GetIMEOpenStatus(HWND hWnd);
-void SetIMEOpenStatus(HWND hWnd, BOOL stat);
-const wchar_t *GetConvStringW(HWND hWnd, LPARAM lParam, size_t *len);
-//const char *GetConvStringA(HWND hWnd, LPARAM lParam, size_t *len);
-void *CreateReconvStringStW(HWND hWnd,
-							const wchar_t *str_ptr, size_t str_count,
-							size_t cx, size_t *st_size_);
-void *CreateReconvStringStA(HWND hWnd,
-							const char *str_ptr, size_t str_count,
-							size_t cx, size_t *st_size_);
-BOOL IMEEnabled(void);
+HPROPSHEETPAGE UIPageCreate(HINSTANCE inst, TTTSet *pts);
 
 #ifdef __cplusplus
 }

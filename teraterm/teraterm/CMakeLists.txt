@@ -143,6 +143,10 @@ set(SRC_DIALOG
   themedlg_res.h
   win_pp.cpp
   win_pp.h
+  ui_pp.cpp
+  ui_pp.h
+  ui_pp.rc
+  ui_pp_res.h
 )
 
 target_sources(
