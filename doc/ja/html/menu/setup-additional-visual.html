@@ -9,7 +9,7 @@
   </head>
 
   <body>
-    <h1>Additional settings / "Visual" タブ ([Setup] メニュー)</h1>
+    <h1><a href="setup-additional.html">Additional settings</a> / "Visual" タブ ([Setup] メニュー)</h1>
 
     <dl>
       <dt id="AlphaBlendActive">Window Opacity / Active</dt>
@@ -31,6 +31,9 @@ HAND  = ハンドカーソル
 </pre>
       </dd>
 
+      <dt id="ANSIColor">ANSI color</dt>
+      <dd>PC形式およびaixterm形式の16色モードで使用する色のRGB値を設定します。</dd>
+
       <dt id="FontQuality">Font quality</dt>
       <dd>
 	フォントの品質を設定することができます。OSが対応している種類のみ有効に動作します。
@@ -42,8 +45,19 @@ ClearType       = ClearTypeを利用する
 </pre>
       </dd>
 
-      <dt id="ANSIColor">ANSI color</dt>
-      <dd>PC形式およびaixterm形式の16色モードで使用する色のRGB値を設定します。</dd>
+      <dt id="FlickerlessMove">Flickerless move</dt>
+      <dd>
+        ウィンドウの移動、リサイズ時にウィンドウ内の描画のちらつきを低減します。<br>
+        具体的な動作:<br>
+        ウィンドウメッセージ WM_WINDOWPOSCHANGING で
+        WINDOWPOS 構造体(lParam)の flags に SWP_NOCOPYBITS をセットします。
+      </dd>
+
+      <dt id="WindowCornerDontround">Window corner don't round</dt>
+      <dd>
+	Windows 11 ではウィンドウの角が丸くなるため、表示が欠ける領域があります。<br>
+	VT ウィンドウと TEK ウィンドウの角を丸くしないようにします。
+      </dd>
 
       <dt id="EnableBoldAttrColor">Enable Bold attribute color</dt>
       <dt id="EnableBoldAttrFont">Enable Bold attribute font</dt>
@@ -60,14 +74,6 @@ ClearType       = ClearTypeを利用する
       <dt id="EnableANSIColor">Enable ANSI color</dt>
       <dd>
 	もしANSI colorを無効にした場合、16色および256色モードも無効になります。
-      </dd>
-
-      <dt id="FlickerlessMove">Flickerless move</dt>
-      <dd>
-        ウィンドウの移動、リサイズ時にウィンドウ内の描画のちらつきを低減します。<br>
-        具体的な動作:<br>
-        ウィンドウメッセージ WM_WINDOWPOSCHANGING で
-        WINDOWPOS 構造体(lParam)の flags に SWP_NOCOPYBITS をセットします。
       </dd>
 
     </dl>

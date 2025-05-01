@@ -9,10 +9,10 @@
   </head>
 
   <body>
-    <h1>Additional settings / "Window" tab ([Setup] menu)</h1>
+    <h1><a href="setup-additional.html">Additional settings</a> / "Window" tab ([Setup] menu)</h1>
 
     <dl>
-      <dt id="Title">Title</dt>
+      <dt id="Title">Title:</dt>
       <dd>
 	Text displayed in the window title.<br>
 	See <a href="setup-additional-ctrlseq.html#AcceptTitleChangeRequest">Accept window title change request</a> for behavior when a remote title is set.<br>
@@ -36,7 +36,7 @@
 	Rectangle selection will not be available.
 	You can minimize the window by clicking the right mouse button
 	while pressing the Alt key. Clicking the left mouse button while
-	pressing the Ctrl key causes the pop-up menu to appear. 
+	pressing the Ctrl key causes the pop-up menu to appear.
 	You can also resize the window by holding down the Shift and Alt keys and dragging the window with the left mouse button.
       </dd>
 
@@ -65,7 +65,7 @@
 	Enables aixterm style 16 colors mode.
 	This option increases the number of colors for text and
 	background specified by escape sequences twice, from 8 to 16.<br>
-	
+
 	<b>NOTE</b>: The escape sequence(&lt;CSI&gt;100m) which changes the background color to the color number nine would conflict the escape sequence of the resetting rxvt-style characters and background color. So, if a user enables this mode, the behavior of &lt;CSI&gt;100m escape sequence will work never before.<br>
 	If a user does not like this behavior, turn off this option.
       </dd>
@@ -90,16 +90,6 @@
       <dt>Color</dt>
       <dd>
 	<dl>
-	  <dt>Text</dt>
-	  <dd>
-	    Text color.
-	  </dd>
-
-	  <dt>Background</dt>
-	  <dd>
-	    Background color.
-	  </dd>
-
 	  <dt id="Attribute">Attribute</dt>
 	  <dd>
 	    Attribute of characters whose colors are being changed.
@@ -113,12 +103,22 @@
       </ul>
 	  </dd>
 
+	  <dt>Text</dt>
+	  <dd>
+	    Text color.
+	  </dd>
+
+	  <dt>Background</dt>
+	  <dd>
+	    Background color.
+	  </dd>
+
 	  <dt>Swap colors</dt>
 	  <dd>
 	    Exchanges the text color and background color of the specified character attribute.
 	  </dd>
 
-	  <dt>R, G, B</dt>
+	  <dt>R:, G:, B:</dt>
 	  <dd>
 	    Specifies the RGB value of the color of the specified character attribute.
 	  </dd>
