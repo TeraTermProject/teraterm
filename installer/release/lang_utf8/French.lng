@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2025-03-20 by TeraTerm Project
+date=2025-04-23 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -298,6 +298,7 @@ DLG_TAB_FONT_CHARACTER_SPACE=character space
 DLG_TAB_FONT_RESIZED_FONT=Dra&wing resized font to fit cell width
 MSG_TOOLTIP_EDITERR_TITLE1=Caractère inacceptable
 MSG_TOOLTIP_EDITERR_TEXT1=Seuls les entiers positifs et négatifs sont acceptables.
+DLG_TAB_FONT_FOLDER_LABEL=Use the link below to open the Fonts folder and view font visibility
 
 DLG_COMMENT_TITLE=Ajouter commentaire au journal
 

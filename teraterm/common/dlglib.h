@@ -99,6 +99,17 @@ void SetComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar
 HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi, BOOL notify);
 void TTSetIcon(HINSTANCE hInst, HWND hWnd, const wchar_t *icon_name, UINT dpi);
 DWORD GetDlgItemIndexTextW(HWND hDlg, int nIDDlgItem, WPARAM index, wchar_t **text);
+void SetFontStringW(HWND hWnd, int item, const LOGFONTW *logfont);
+BOOL IsHiddenFont(const LOGFONTW *logfont);
+
+typedef enum {
+	ACFCF_INIT_DIALOG = 0,	// ダイアログフォント用初期化
+	ACFCF_INIT_VTWIN,		// VTWin用初期化
+	ACFCF_CONTINUE,			// フォント設定後の再設定
+} ACFCF_MODE;
+void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidden, int id_pro, ACFCF_MODE mode);
+
+void GetFontPitchAndFamily(HWND hWnd, LOGFONTW *logfont);
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,105 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "ui_pp_res.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <winresrc.h>
+#define IDC_STATIC -1
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 (日本) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "ui_pp_res.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include <winresrc.h>\r\n"
+    "#define IDC_STATIC -1\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TABSHEET_UI DIALOGEX 0, 0, 302, 168
+STYLE DS_SETFONT | WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "プロパティ ページ"
+FONT 9, "MS UI Gothic", 400, 0, 0x0
+BEGIN
+    LTEXT           "UI &Language:",IDC_GENUILANG_LABEL,6,7,53,12
+    COMBOBOX        IDC_GENUILANG,17,22,86,76,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Dialog Font",IDC_DLGFONT,6,43,101,9
+    EDITTEXT        IDC_DLGFONT_EDIT,17,61,130,13,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "&Select...",IDC_DLGFONT_CHOOSE,155,60,44,15
+    PUSHBUTTON      "D&efault",IDC_DLGFONT_DEFAULT,202,60,44,15
+    CONTROL         "List p&roportional fonts in font dialog",IDC_LIST_PRO_FONTS_DLG,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,82,210,11
+    CONTROL         "List &hidden fonts in font dialog",IDC_LIST_HIDDEN_FONTS_DLG,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,99,205,11
+    LTEXT           "Use the link below to open the Fonts folder and view font visibility",IDC_FONT_FOLDER_LABEL,17,118,280,8
+    LTEXT           "font folder",IDC_FONT_FOLDER,29,134,124,8,WS_TABSTOP
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_TABSHEET_UI, DIALOG
+    BEGIN
+        RIGHTMARGIN, 297
+        VERTGUIDE, 6
+        VERTGUIDE, 17
+        BOTTOMMARGIN, 162
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

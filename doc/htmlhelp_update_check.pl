@@ -1,7 +1,7 @@
 #! /usr/bin/perl
 
 #
-# HTMLƒwƒ‹ƒvƒ\[ƒX‚ª‚Ğ‚Æ‚Â‚Å‚àXV‚³‚ê‚Ä‚¢‚é‚©ƒ`ƒFƒbƒN‚·‚é
+# HTMLãƒ˜ãƒ«ãƒ—ã‚½ãƒ¼ã‚¹ãŒã²ã¨ã¤ã§ã‚‚æ›´æ–°ã•ã‚Œã¦ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
 #
 # Usage(ActivePerl):
 #  perl htmlhelp_update_check.pl ja chm_file_name
@@ -30,18 +30,18 @@ sub get_file_paths {
 	my @paths=();
 	my @temp = ();
 
-	#-- ƒJƒŒƒ“ƒg‚Ìˆê——‚ğæ“¾ --#
+	#-- ã‚«ãƒ¬ãƒ³ãƒˆã®ä¸€è¦§ã‚’å–å¾— --#
 	opendir(DIR, $top_dir);
 	@temp = readdir(DIR);
 	closedir(DIR);
 	foreach my $path (sort @temp) {
-		next if( $path =~ /^\.{1,2}$/ );              # '.' ‚Æ '..' ‚ÍƒXƒLƒbƒv
-		next if( $path =~ /^\.svn$/ );                # '.svn' ‚ÍƒXƒLƒbƒv
-		next if( $path =~ /^.\.chm$/ );               # '*.chm' ‚ÍƒXƒLƒbƒv
+		next if( $path =~ /^\.{1,2}$/ );              # '.' ã¨ '..' ã¯ã‚¹ã‚­ãƒƒãƒ—
+		next if( $path =~ /^\.svn$/ );                # '.svn' ã¯ã‚¹ã‚­ãƒƒãƒ—
+		next if( $path =~ /^.\.chm$/ );               # '*.chm' ã¯ã‚¹ã‚­ãƒƒãƒ—
 		
 		my $full_path = "$top_dir" . '/' . "$path";
 		
-		if( -d "$top_dir/$path" ){                      #-- ƒfƒBƒŒƒNƒgƒŠ‚Ìê‡‚Í©•ª©g‚ğŒÄ‚Ño‚·
+		if( -d "$top_dir/$path" ){                      #-- ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®å ´åˆã¯è‡ªåˆ†è‡ªèº«ã‚’å‘¼ã³å‡ºã™
 			if (&get_file_paths("$full_path", $chmupdated)) {
 				return 1;
 			}

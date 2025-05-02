@@ -157,27 +157,34 @@ void ResetConversionLogFont(HWND HWnd)
 	}
 }
 
-void SetConversionLogFont(HWND HWnd, const LOGFONTA *lf)
+static void ConvertLogfontWA(const LOGFONTW *lfW, LOGFONTA *lfA)
+{
+	LOGFONTA *p = lfA;
+	p->lfWeight = lfW->lfWeight;
+	p->lfItalic = lfW->lfItalic;
+	p->lfUnderline = lfW->lfUnderline;
+	p->lfStrikeOut = lfW->lfStrikeOut;
+	p->lfWidth = lfW->lfWidth;
+	p->lfHeight = lfW->lfHeight;
+	p->lfCharSet = lfW->lfCharSet;
+	p->lfOutPrecision = lfW->lfOutPrecision;
+	p->lfClipPrecision = lfW->lfClipPrecision;
+	p->lfQuality = lfW->lfQuality ;
+	p->lfPitchAndFamily = lfW->lfPitchAndFamily;
+	BOOL use_default_char = 0;
+	WideCharToMultiByte(CP_ACP, 0,
+						lfW->lfFaceName, _countof(lfW->lfFaceName),
+						p->lfFaceName, sizeof(p->lfFaceName),
+						NULL, &use_default_char); 
+}
+
+void SetConversionLogFont(HWND HWnd, const LOGFONTW *lf)
 {
 	if (HIMEDLL == NULL) return;
 
-	memcpy(&IMELogFontA,lf,sizeof(LOGFONT));
+	ConvertLogfontWA(lf, &IMELogFontA);
 	if (PImmSetCompositionFontW != NULL) {
-		LOGFONTW *p = &IMELogFontW;
-		p->lfWeight = lf->lfWeight;
-		p->lfItalic = lf->lfItalic;
-		p->lfUnderline = lf->lfUnderline;
-		p->lfStrikeOut = lf->lfStrikeOut;
-		p->lfWidth = lf->lfWidth;
-		p->lfHeight = lf->lfHeight;
-		p->lfCharSet = lf->lfCharSet;
-		p->lfOutPrecision = lf->lfOutPrecision;
-		p->lfClipPrecision = lf->lfClipPrecision;
-		p->lfQuality = lf->lfQuality ;
-		p->lfPitchAndFamily = lf->lfPitchAndFamily;
-		MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS,
-							lf->lfFaceName, sizeof(lf->lfFaceName),
-							p->lfFaceName, _countof(p->lfFaceName));
+		IMELogFontW = *lf;
 	}
 	ResetConversionLogFont(HWnd);
 }

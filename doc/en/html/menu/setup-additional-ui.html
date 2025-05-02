@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>Additional settings / "UI" Tab ([Setup] Menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1><a href="setup-additional.html">Additional settings</a> / "UI" Tab ([Setup] Menu)</h1>
+
+    <dl>
+      <dt id="UILanguageFile">UI Language</dt>
+      <dd>
+	The message catalog(menu and dialog message) can be changed by specifying the language file(lang\*.lng).
+	Refer to <A HREF="../setup/lng.html">Language file</a>.
+      </dd>
+
+      <dt id="DLGFont">Dialog Font</dt>
+      <dd>Specify Dialog font.
+        <p>
+        If you set large size or wide font for the dialog font, characters may be cut off,
+        or dialog may be missing characters or dialog may extend beyond the screen,
+        making it impossible to press [ok] button.
+        </p>
+        <dl>
+          <dt>Select Button</dt>
+          <dd>
+            Opens font dialog to select font to use.<br>
+            Fonts displayed in the font dialog list can be modified using the checkboxes below.
+          </dd>
+
+          <dt>default button</dt>
+          <dd>
+            Discards current font setting, and selects the default dialog font used by Windows.
+          </dd>
+
+          <dt>List proportional fonts in font dialog</dt>
+          <dd>
+            Proportional fonts are displayed in font list in font dialog.
+            If the currently selected font is a proportional font, this checkbox is automatically checked and cannot be changed.<br>
+            This checkbox changes behavior of font dialog and is not saved in settings file.
+          </dd>
+
+          <dt id="ListHiddenFonts">List hidden fonts in font dialog</dt>
+          <dd>
+            Displays fonts set as hidden by the OS in font list in font dialog.<br>
+            If the currently selected font is a hidden font, this checkbox is automatically checked and cannot be changed.<br>
+            This checkbox changes behavior of font dialog and is not saved in settings file.
+            <p>
+              This feature to hide certain fonts in font dialog is available on Windows 7 and later.
+            </p>
+          </dd>
+
+          <dt>Windows font folder to preview, show and hidden fonts</dt>
+          <dd>
+            Click Font Folder link to open font folder where you can preview fonts and show/hide settings.
+          </dd>
+        </dl>
+      </dd>
+    </dl>
+
+  </body>
+</html>

@@ -32,6 +32,7 @@
 #define IDD_TABSHEET_FONT               129
 #define IDI_TTERM_FLAT                  130
 #define IDI_VT_FLAT                     131
+#define IDD_TABSHEET_UI                 132
 #define IDR_TEKMENU                     1000
 #define IDC_EDIT_FULLPATH               1001
 #define IDC_FULLPATH_LABEL              1002
@@ -192,7 +193,6 @@
 #define IDC_OPT_TIMESTAMP_TYPE          2541
 #define IDC_TRIMNLCHAR                  2564
 #define IDC_CLIPBOARD_NOTIFY            2566
-#define IDC_LIST_HIDDEN_FONTS           2567
 #define IDC_TITLEFMT_GROUP              2568
 #define IDC_TITLEFMT_DISPHOSTNAME       2569
 #define IDC_TITLEFMT_DISPSESSION        2570
@@ -215,7 +215,6 @@
 #define IDC_DONTSHOW_CHECK              2587
 #define IDC_DAD_NOTE                    2588
 #define IDC_SELECT_ON_ACTIVATE          2589
-#define IDC_MIXED_THEME_FILE            2590
 #define IDC_ACCEPT_CLEAR_SBUFF          2591
 #define IDC_AUTO_TEXT_COPY              2592
 #define IDC_SENDFILE_FILENAME_BUTTON    2596
@@ -230,7 +229,6 @@
 #define IDC_SENDFILE_DELAYTIME_EDIT     2605
 #define IDC_SENDFILE_READING_METHOD_LABEL 2606
 #define IDC_SENDFILE_RADIO_SEQUENTIAL   2607
-#define IDC_SENDFILE_RADIO_BULK         2632
 #define IDC_SETUP_DIR_LIST              2608
 #define IDC_THEME_FILE                  2609
 #define IDC_THEME_BUTTON                2610
@@ -253,8 +251,7 @@
 #define IDC_FILE_DIR_TITLE              2627
 #define IDC_FILE_DIR                    2628
 #define IDC_FILE_DIR_SELECT             2629
-#define IDC_GENUILANG                   2630
-#define IDC_GENUILANG_LABEL             2631
+#define IDC_SENDFILE_RADIO_BULK         2632
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -292,7 +289,6 @@
 #define ID_FILE_YSEND                   50158
 #define ID_FILE_CHANGEDIR               50170
 #define ID_FILE_REPLAYLOG               50171
-#define ID_FILE_LOGMEIN                 50172
 #define ID_FILE_PRINT2                  50180
 #define ID_FILE_DISCONNECT              50190
 #define ID_FILE_EXIT                    50199
@@ -341,7 +337,6 @@
 #define ID_TEKSETUP_FONT                51320
 #define ID_TEKVTWIN                     51410
 #define ID_TEKHELP_INDEX                51910
-#define ID_TEKHELP_USING                51920
 #define ID_TEKHELP_ABOUT                51990
 #define ID_EDIT_EXTERNALSETUP           52005
 #define ID_FILE_TERATERMMENU            52006

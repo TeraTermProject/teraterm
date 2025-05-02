@@ -478,6 +478,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="UI タブ">
+					<param name="Local" value="html\menu\setup-additional-ui.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Control Sequence タブ">
 					<param name="Local" value="html\menu\setup-additional-ctrlseq.html">
 					<param name="ImageNumber" value="11">

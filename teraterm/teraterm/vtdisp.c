@@ -1787,7 +1787,7 @@ void DispConvScreenToWin
  *	@param[in]		dpi		DPIに合わせたサイズのフォントを取得
  *							0 の時DPIに合わせた拡大をしない
  */
-void DispSetLogFont(LOGFONTA *VTlf, unsigned int dpi)
+void DispSetLogFont(LOGFONTW *VTlf, unsigned int dpi)
 {
   memset(VTlf, 0, sizeof(*VTlf));
   VTlf->lfWeight = FW_NORMAL;
@@ -1801,7 +1801,7 @@ void DispSetLogFont(LOGFONTA *VTlf, unsigned int dpi)
   VTlf->lfClipPrecision = CLIP_CHARACTER_PRECIS;
   VTlf->lfQuality       = (BYTE)ts.FontQuality;
   VTlf->lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
-  strncpy_s(VTlf->lfFaceName, sizeof(VTlf->lfFaceName),ts.VTFont, _TRUNCATE);
+  ACPToWideChar_t(ts.VTFont, VTlf->lfFaceName, _countof(VTlf->lfFaceName));
   if (dpi != 0) {
 	  VTlf->lfWidth = MulDiv(VTlf->lfWidth, dpi, 96);
 	  VTlf->lfHeight = MulDiv(VTlf->lfHeight, dpi, 96);
@@ -1817,7 +1817,7 @@ void DispSetLogFont(LOGFONTA *VTlf, unsigned int dpi)
 void ChangeFont(unsigned int dpi)
 {
 	int i, j;
-	LOGFONTA VTlf;
+	LOGFONTW VTlf;
 
 	/* Delete Old Fonts */
 	for (i = 0 ; i <= AttrFontMask ; i++)
@@ -1835,7 +1835,7 @@ void ChangeFont(unsigned int dpi)
 
 	/* Normal Font */
 	DispSetLogFont(&VTlf, dpi);
-	VTFont[AttrDefault] = CreateFontIndirect(&VTlf);
+	VTFont[AttrDefault] = CreateFontIndirectW(&VTlf);
 
 	if (ts.UseIME > 0) {
 		if (ts.IMEInline > 0) {
@@ -1859,7 +1859,7 @@ void ChangeFont(unsigned int dpi)
 	/* Underline */
 	if ((ts.FontFlag & FF_UNDERLINE) || (ts.FontFlag & FF_URLUNDERLINE)) {
 		VTlf.lfUnderline = 1;
-		VTFont[AttrUnder] = CreateFontIndirect(&VTlf);
+		VTFont[AttrUnder] = CreateFontIndirectW(&VTlf);
 	}
 	else {
 		VTFont[AttrUnder] = VTFont[AttrDefault];
@@ -1869,12 +1869,12 @@ void ChangeFont(unsigned int dpi)
 		/* Bold */
 		VTlf.lfUnderline = 0;
 		VTlf.lfWeight = FW_BOLD;
-		VTFont[AttrBold] = CreateFontIndirect(&VTlf);
+		VTFont[AttrBold] = CreateFontIndirectW(&VTlf);
 
 		/* Bold + Underline */
 		if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
 			VTlf.lfUnderline = 1;
-			VTFont[AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
+			VTFont[AttrBold | AttrUnder] = CreateFontIndirectW(&VTlf);
 		}
 		else {
 			VTFont[AttrBold | AttrUnder] = VTFont[AttrBold];
@@ -1892,14 +1892,14 @@ void ChangeFont(unsigned int dpi)
 	VTlf.lfHeight = FontHeight;
 	VTlf.lfCharSet = SYMBOL_CHARSET;
 
-	strncpy_s(VTlf.lfFaceName, sizeof(VTlf.lfFaceName),"Tera Special", _TRUNCATE);
-	VTFont[AttrSpecial] = CreateFontIndirect(&VTlf);
+	wcsncpy_s(VTlf.lfFaceName, _countof(VTlf.lfFaceName), L"Tera Special", _TRUNCATE);
+	VTFont[AttrSpecial] = CreateFontIndirectW(&VTlf);
 
 	/* Special font (Underline) */
 	if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
 		VTlf.lfUnderline = 1;
 		VTlf.lfHeight = FontHeight - 1; // adjust for underline
-		VTFont[AttrSpecial | AttrUnder] = CreateFontIndirect(&VTlf);
+		VTFont[AttrSpecial | AttrUnder] = CreateFontIndirectW(&VTlf);
 	}
 	else {
 		VTFont[AttrSpecial | AttrUnder] = VTFont[AttrSpecial];
@@ -1910,13 +1910,13 @@ void ChangeFont(unsigned int dpi)
 		VTlf.lfUnderline = 0;
 		VTlf.lfHeight = FontHeight;
 		VTlf.lfWeight = FW_BOLD;
-		VTFont[AttrSpecial | AttrBold] = CreateFontIndirect(&VTlf);
+		VTFont[AttrSpecial | AttrBold] = CreateFontIndirectW(&VTlf);
 
 		/* Special font (Bold + Underline) */
 		if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
 			VTlf.lfUnderline = 1;
 			VTlf.lfHeight = FontHeight - 1; // adjust for underline
-			VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
+			VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirectW(&VTlf);
 		}
 		else {
 			VTFont[AttrSpecial | AttrBold | AttrUnder] = VTFont[AttrSpecial | AttrBold];
@@ -1948,7 +1948,7 @@ void ResetIME(void)
 
 		if (ts.UseIME > 0) {
 			if (ts.IMEInline>0) {
-				LOGFONTA VTlf;
+				LOGFONTW VTlf;
 				DispSetLogFont(&VTlf, GetMonitorDpiFromWindow(HVTWin));
 				SetConversionLogFont(HVTWin, &VTlf);
 			}

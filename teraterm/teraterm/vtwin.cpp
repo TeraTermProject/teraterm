@@ -4973,9 +4973,9 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 
 		if (calcOnly) {
 			// 新DPIのフォントのサイズからスクリーンサイズを算出
-			LOGFONTA VTlfDefault;
+			LOGFONTW VTlfDefault;
 			DispSetLogFont(&VTlfDefault, NewDPI); // Normal Font
-			HFONT VTFontDefault = CreateFontIndirect(&VTlfDefault);
+			HFONT VTFontDefault = CreateFontIndirectW(&VTlfDefault);
 			HDC TmpDC = GetDC(m_hWnd);
 			SelectObject(TmpDC, VTFontDefault);
 			TEXTMETRIC Metrics;
@@ -5082,7 +5082,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 									r->left, r->top, NewWindowWidth, NewWindowHeight,
 									NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
 			if (tmphWnd) {
-				assert(pGetDpiForWindow); // GetDpiForWindow()は、Windows 10 v1607 Red Stone 1 (RS1)以降で使用可能
+				assert(pGetDpiForWindow); // GetDpiForWindow()は、Windows 10 v1607 Red Stone 1 (RS1)以降で使用可能_
 				int myDPI = pGetDpiForWindow(tmphWnd);
 				/*
 				  ・Tera Term の高 DPI(Per-Monitor V2) 対応環境は、Windows 10 v1703 以降。

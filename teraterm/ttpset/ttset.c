@@ -1904,9 +1904,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (GetOnOff(Section, "TrimTrailingNLonPaste", FName, FALSE))
 		ts->PasteFlag |= CPF_TRIM_TRAILING_NL;
 
-	// List Inactive Font
-	ts->ListHiddenFonts = GetOnOff(Section, "ListHiddenFonts", FName, FALSE);
-
 	// ISO2022ShiftFunction
 	GetPrivateProfileString(Section, "ISO2022ShiftFunction", "on", Temp, sizeof(Temp), FName);
 	ts->ISO2022Flag = ISO2022_SHIFT_NONE;
@@ -3205,9 +3202,6 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	// Trim trailing new line character when pasting
 	WriteOnOff(Section, "TrimTrailingNLonPaste", FName,
 		(WORD) (ts->PasteFlag & CPF_TRIM_TRAILING_NL));
-
-	// List Inactive Font
-	WriteOnOff(Section, "ListHiddenFonts", FName, ts->ListHiddenFonts);
 
 	// ISO2022ShiftFunction
 	if (ts->ISO2022Flag == ISO2022_SHIFT_ALL) {

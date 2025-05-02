@@ -136,6 +136,7 @@
     <ClCompile Include="codeconv_mb.cpp" />
     <ClCompile Include="comportinfo.cpp" />
     <ClCompile Include="ddelib.cpp" />
+    <ClCompile Include="directx.cpp" />
     <ClCompile Include="dlglib.c" />
     <ClCompile Include="dlglib_cpp.cpp" />
     <ClCompile Include="dlglib_tmpl.cpp" />
@@ -173,8 +174,11 @@
     <ClInclude Include="..\teraterm\unicode.h" />
     <ClInclude Include="asprintf.h" />
     <ClInclude Include="codeconv_mb.h" />
+    <ClInclude Include="compat_dwrite.h" />
+    <ClInclude Include="compat_windns.h" />
     <ClInclude Include="comportinfo.h" />
     <ClInclude Include="ddelib.h" />
+    <ClInclude Include="directx.h" />
     <ClInclude Include="dlglib.h" />
     <ClInclude Include="fileread.h" />
     <ClInclude Include="history_store.h" />

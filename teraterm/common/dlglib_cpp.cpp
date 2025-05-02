@@ -43,6 +43,7 @@
 #include "asprintf.h"
 #include "compat_win.h"
 #include "win32helper.h"
+#include "directx.h"
 
 /**
  *	EndDialog() 互換関数
@@ -551,4 +552,179 @@ DWORD GetDlgItemIndexTextW(HWND hDlg, int nIDDlgItem, WPARAM index, wchar_t **te
 	SendDlgItemMessageW(hDlg, nIDDlgItem, LB_GETTEXT, index, (LPARAM)str);
 	*text = str;
 	return NO_ERROR;
+}
+
+/**
+ *	フォント文字列を hWnd に設定する
+ */
+void SetFontStringW(HWND hWnd, int item, const LOGFONTW *logfont)
+{
+	// https://docs.microsoft.com/en-us/windows/win32/api/dimm/ns-dimm-logfonta
+	// http://www.coara.or.jp/~tkuri/D/015.htm#D2002-09-14
+	wchar_t b[128];
+	HDC DC = GetDC(hWnd);
+	int dpi = GetDeviceCaps(DC, LOGPIXELSY);
+	ReleaseDC(hWnd, DC);
+	swprintf_s(b, L"%s (%d,%d) %d ; %.1f point",
+			   logfont->lfFaceName,
+			   logfont->lfWidth,
+			   logfont->lfHeight,
+			   logfont->lfCharSet,
+			   abs(logfont->lfHeight) * 72.0f / dpi);
+	SetDlgItemTextW(hWnd, item, b);
+}
+
+static void ConvertLOGFONTWA(const LOGFONTA *logfontA, LOGFONTW *logfontW)
+{
+	logfontW->lfWidth = logfontA->lfWidth;
+	logfontW->lfHeight = logfontA->lfHeight;
+	logfontW->lfCharSet = logfontA->lfCharSet;
+	ACPToWideChar_t(logfontA->lfFaceName, logfontW->lfFaceName, _countof(logfontW->lfFaceName));
+}
+
+/**
+ *	ChooseFont() のフォント一覧で非表示フォントか調べる
+ *	Windows 7 未満の場合、常にFALSEが返る
+ *
+ *	@param	logfont
+ */
+BOOL IsHiddenFont(const LOGFONTW *logfont)
+{
+	static const wchar_t *reg_str = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Font Management";
+	static const wchar_t *reg_key = L"Inactive Fonts";
+
+	wchar_t *font_family;
+	BOOL r = DXGetFontFamilyName(logfont, &font_family);
+	if (!r) {
+		// Windows 7 未満
+		return FALSE;
+	}
+
+	HKEY hKey;
+	if (RegOpenKeyExW(HKEY_CURRENT_USER, reg_str, 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
+		free(font_family);
+		return FALSE;
+	}
+
+	DWORD size = 0;
+	DWORD type = 0;
+
+	// 値のサイズを取得
+	BOOL find = FALSE;
+	if (RegQueryValueExW(hKey, reg_key, nullptr, &type, nullptr, &size) == ERROR_SUCCESS) {
+		if (type == REG_MULTI_SZ) {
+			BYTE *buf = (BYTE *)malloc(size);
+			if (buf != NULL &&
+				RegQueryValueExW(hKey, reg_key, nullptr, nullptr, buf, &size) == ERROR_SUCCESS) {
+				const wchar_t *p = (wchar_t *)buf;
+				while (*p) {
+					if (wcscmp(p, font_family) == 0) {
+						// フォント名が見つかった
+						find = TRUE;
+						break;
+					}
+					p += wcslen(p) + 1;	// 次の文字列に移動
+				}
+			}
+			free(buf);
+		}
+	}
+	RegCloseKey(hKey);
+
+	free(font_family);
+	return find;
+}
+
+/**
+ *	ChooseFont()用チェックボックスの調整
+ *	フォントとシステムの状態からチェックボックスを調整する
+ *
+ *	選択中フォントが表示できない状態で ChooseFontW() すると、
+ *	デフォルトで選択された状態とならない(CF_INITTOLOGFONTSTRUCT)。
+ *	回避するため選択中フォントの状態に合わせて
+ *	プロポーショナル,非表示チェックボックスを調整する
+ *	(Windows 7以降、各フォントをフォント一覧に表示/非表示する設定ができる)
+ *
+ *	@param	hWnd		ダイアログ
+ *	@param	lfont		フォント構造体
+ *	@param	id_hidden	HiddenチェックボックスID
+ *	@param	id_pro		ProportionalチェックボックスID
+ *	@param	mode		ACFCF_MODE
+ */
+void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidden, int id_pro, ACFCF_MODE mode)
+{
+	UINT check;
+	BOOL enable;
+
+	// Hidden
+	if (IsWindows7OrLater()) {
+		// Windows 7 以降
+		const BOOL is_hidden = IsHiddenFont(lfont);
+		enable = !is_hidden ? TRUE : FALSE;
+		switch(mode) {
+		case ACFCF_INIT_DIALOG:
+		case ACFCF_INIT_VTWIN:
+			check = is_hidden ? BST_CHECKED : BST_UNCHECKED;
+			break;
+		case ACFCF_CONTINUE:
+			check = is_hidden ? BST_CHECKED : IsDlgButtonChecked(hWnd, id_hidden);
+			break;
+		default:
+			assert(FALSE);
+		}
+	}
+	else {
+		// Windows 7 より前のときは使えない
+		check = BST_CHECKED;
+		enable = FALSE;
+	}
+	CheckDlgButton(hWnd, id_hidden, check);
+	EnableWindow(GetDlgItem(hWnd, id_hidden), enable);
+
+	// Proportional
+	const BOOL is_proportional = (lfont->lfPitchAndFamily & VARIABLE_PITCH) != 0;
+	enable = is_proportional ? FALSE : TRUE;
+	switch(mode) {
+	case ACFCF_INIT_DIALOG:
+	case ACFCF_INIT_VTWIN:
+		if (is_proportional) {
+			check = BST_CHECKED;
+		} else {
+			check = (mode == ACFCF_INIT_DIALOG) ? BST_CHECKED : BST_UNCHECKED;
+		}
+		break;
+	default:
+		assert(FALSE);
+	case ACFCF_CONTINUE:
+		if (is_proportional) {
+			check = BST_CHECKED;
+		} else {
+			check = IsDlgButtonChecked(hWnd, id_pro);
+		}
+		break;
+	}
+	CheckDlgButton(hWnd, id_pro, check);
+	EnableWindow(GetDlgItem(hWnd, id_pro), enable);
+}
+
+/**
+ *	logfont の lfPitchAndFamily をセットする
+ *	プロポーショナルフォントかどうかを調べる為に作成
+ */
+void GetFontPitchAndFamily(HWND hWnd, LOGFONTW *logfont)
+{
+	HDC hDC = GetDC(hWnd);
+	logfont->lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
+	HFONT hFont = CreateFontIndirectW(logfont);
+	HFONT prev_font = (HFONT)SelectObject(hDC, hFont);
+	TEXTMETRIC tm;
+	GetTextMetrics(hDC, &tm);
+	SelectObject(hDC, prev_font);
+	DeleteObject(hFont);
+	ReleaseDC(hWnd, hDC);
+
+	if ((tm.tmPitchAndFamily & TMPF_FIXED_PITCH) != 0) {
+		// TMPF_FIXED_PITCH bit が 1 だったら、可変ピッチ(プロポーショナルフォント)
+		logfont->lfPitchAndFamily = VARIABLE_PITCH | FF_ROMAN;
+	}
 }

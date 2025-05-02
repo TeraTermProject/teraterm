@@ -35,6 +35,7 @@
 
 #include "compat_win.h"
 #include "compat_windns.h"
+#include "compat_dwrite.h"
 
 #include "dllutil.h"
 #include "codeconv.h"
@@ -193,6 +194,9 @@ BOOL (WINAPI *pSetupDiGetDeviceRegistryPropertyW)(
 DWORD (WINAPI *pCM_Get_DevNode_Status)(
 	PULONG pulStatus, PULONG pulProblemNumber, DWORD dnDevInst,
 	ULONG ulFlags);
+
+// dwrite.dll
+HRESULT (WINAPI *pDWriteCreateFactory)(DWRITE_FACTORY_TYPE factoryType, REFIID iid, IUnknown **factory);
 
 class Initializer {
 public:
@@ -362,6 +366,11 @@ static const APIInfo Lists_setupapi[] = {
 	{},
 };
 
+static const APIInfo Lists_dwrite[] = {
+	{ "DWriteCreateFactory", (void **)&pDWriteCreateFactory },
+	{},
+};
+
 static const DllInfo DllInfos[] = {
 	{ L"user32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
 	{ L"msimg32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
@@ -377,6 +386,7 @@ static const DllInfo DllInfos[] = {
 	{ L"dwmapi.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dwmapi },
 	{ L"advapi32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_advapi32 },
 	{ L"setupapi.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_setupapi },
+	{ L"dwrite.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dwrite },
 	{},
 };
 

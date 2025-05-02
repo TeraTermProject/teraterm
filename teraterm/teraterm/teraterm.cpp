@@ -61,6 +61,7 @@
 #if ENABLE_GDIPLUS
 #include "ttgdiplus.h"
 #endif
+#include "directx.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -368,6 +369,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #if ENABLE_GDIPLUS
 	GDIPInit();
 #endif
+	DXInit();
 
 	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);
 	pVTWin = m_pMainWnd;
@@ -439,6 +441,7 @@ exit_message_loop:
 	delete m_pMainWnd;
 	m_pMainWnd = NULL;
 
+	DXUninit();
 #if ENABLE_GDIPLUS
 	GDIPUninit();
 #endif
