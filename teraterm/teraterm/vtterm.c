@@ -2972,6 +2972,10 @@ static void CSQ_h_Mode() // DECSET
 			if (ts.MouseEventTracking)
 				MouseReportExtMode = IdMouseTrackExtURXVT;
 			break;
+		  case 1016: // Extended Mouse Tracking (rxvt-unicode)
+			if (ts.MouseEventTracking)
+				MouseReportExtMode = IdMouseTrackExtSGRP;
+			break;
 		  case 1047: // Alternate Screen Buffer
 			if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
 				BuffSaveScreen();
@@ -3126,6 +3130,7 @@ static void CSQ_l_Mode()		// DECRST
 		  case 1005: // Extended Mouse Tracking (UTF-8)
 		  case 1006: // Extended Mouse Tracking (SGR)
 		  case 1015: // Extended Mouse Tracking (rxvt-unicode)
+		  case 1016: // Extended Mouse Tracking (SGR-Pixels)
 			MouseReportExtMode = IdMouseTrackExtNone;
 			break;
 		  case 1047: // Alternate Screen Buffer
@@ -3517,6 +3522,14 @@ static void CSDolRequestMode(void) // DECRQM
 			if (!ts.MouseEventTracking)
 				resp = 4;
 			else if (MouseReportExtMode == IdMouseTrackExtURXVT)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 1016:	// SGR-Pixels extended mouse tracking
+			if (!ts.MouseEventTracking)
+				resp = 4;
+			else if (MouseReportExtMode == IdMouseTrackExtSGRP)
 				resp = 1;
 			else
 				resp = 2;
@@ -5518,6 +5531,7 @@ int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
 		break;
 
 	case IdMouseTrackExtSGR:
+	case IdMouseTrackExtSGRP:
 		return _snprintf_s_l(buff, buffsize, _TRUNCATE, "<%d;%d;%d%c", CLocale, mb&0x7f, x, y, (mb&0x80)?'m':'M');
 		break;
 
@@ -5556,17 +5570,23 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	if (MouseReportMode == IdMouseTrackDECELR)
 		return DecLocatorReport(Event, Button);
 
-	DispConvWinToScreen(Xpos, Ypos, &x, &y, NULL);
-	x++; y++;
+	if (MouseReportExtMode == IdMouseTrackExtSGRP) {
+	  	x = (Xpos<1) ? 1 : Xpos;
+	  	y = (Ypos<1) ? 1 : Ypos;
+	}
+	else {
+		DispConvWinToScreen(Xpos, Ypos, &x, &y, NULL);
+		x++; y++;
 
-	if (x < 1)
-		x = 1;
-	else if (x > NumOfColumns)
-		x = NumOfColumns;
-	if (y < 1)
-		y = 1;
-	else if (y > NumOfLines)
-		y = NumOfLines;
+		if (x < 1)
+			x = 1;
+		else if (x > NumOfColumns)
+			x = NumOfColumns;
+		if (y < 1)
+			y = 1;
+		else if (y > NumOfLines)
+			y = NumOfLines;
+	}
 
 	if (ShiftKey())
 		modifier = 4;
@@ -5613,7 +5633,7 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 		case IdMouseTrackVT200:
 		case IdMouseTrackBtnEvent:
 		case IdMouseTrackAllEvent:
-			if (MouseReportExtMode == IdMouseTrackExtSGR) {
+			if (MouseReportExtMode == IdMouseTrackExtSGR || MouseReportExtMode == IdMouseTrackExtSGRP) {
 				modifier |= 128;
 			}
 			else {
