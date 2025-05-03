@@ -36,6 +36,7 @@ after_build:
 artifacts:
   - path: installer/Output/*.exe
   - path: installer/Output/*.zip
+  - path: installer/Output/*.sha256sum
 
 # AppVeyor のプロジェクトの Settings - Environment に WEBHOOK_URL を設定するかどうかで制御する
 on_success:
