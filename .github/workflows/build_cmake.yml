@@ -45,6 +45,7 @@ jobs:
           cmake --build . --config Release --target install
           cmake --build . --config Release --target inno_setup
           cmake --build . --config Release --target zip
+          cmake --build . --config Release --target calc_hash
       - name: artifacts zip
         uses: actions/upload-artifact@v4
         with:
@@ -57,6 +58,18 @@ jobs:
           name: ${{ matrix.arch }}-installer
           path: |
             build/teraterm*.exe
+      - name: artifacts sha256sum
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arch }}-sha256sum
+          path: |
+            build/teraterm*.sha256sum
+      - name: artifacts sha512sum
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arch }}-sha512sum
+          path: |
+            build/teraterm*.sha512sum
       - name: Save libs&buildtools
         id: cache-libs-save
         uses: actions/cache/save@v4
