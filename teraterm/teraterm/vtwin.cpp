@@ -159,7 +159,10 @@ static void SetMouseCursor(const char *cursor)
 
 	for (i = 0 ; MouseCursor[i].name ; i++) {
 		if (_stricmp(cursor, MouseCursor[i].name) == 0) {
-			name = MouseCursor[i].id;
+			// ANSI”Å‚ÌƒŠƒ\[ƒXID‚ğUnicode”Å‚É•ÏŠ·
+			LPCSTR nameA = MouseCursor[i].id;
+			assert(IS_INTRESOURCE(nameA));
+			name = (LPCWSTR)nameA;
 			break;
 		}
 	}
