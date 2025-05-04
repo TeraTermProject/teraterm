@@ -22,9 +22,9 @@
       <dd>Temporary theme settings(preview), loading and saveing theme files.</dd>
       <dt><a href="#bg">Background tab</a></dt>
       <dd>BG(Backgroud) related settings.</dd>
-      <dt><a href="#bg_alpha">Background alpha tab</a></dt>
+      <dt><a href="#bg_alpha">Background image alpha tab</a></dt>
       <dd>Transparency of the background image and text background color.</dd>
-      <dt><a href="#color">Color tab</a></dt>
+      <dt><a href="#color">Text color tab</a></dt>
       <dd>Settings related to the text color.</dd>
     </dl>
 
@@ -34,23 +34,23 @@
 
     <h2 id="preview">Preview/File</h2>
 
-    preview<br>
+    Preview<br>
     Temporarily set (preview), undo a theme.
 
     <dl>
-      <dt>[preview]</dt>
+      <dt>[Preview]</dt>
       <dd>Temporarily set (preview) theme.</dd>
-      <dt>[undo]</dt>
+      <dt>[Undo]</dt>
       <dd>Undo changed theme before opening the dialog</dd>
     </dl>
 
-    file<br>
+    Theme file<br>
     Load a theme from a theme file and save theme.
 
     <dl>
-      <dt>[load]</dt>
+      <dt>[Load]</dt>
       <dd>Load theme file.</dd>
-      <dt>[save]</dt>
+      <dt>[Save]</dt>
       <dd>
         Export theme to a file.<br>
         Export a BG theme, a Color theme, or both.
@@ -75,7 +75,7 @@
           <dt>Color</dt>
           <dd>Plane color</dd>
 
-          <dt>alpha</dt>
+          <dt>Alpha (Opaque right):</dt>
           <dd>Alpha blend value</dd>
         </dl>
       </dd>
@@ -85,7 +85,7 @@
         Background image.<br>
         Some image files support per-pixel alpha values.
         <dl>
-          <dt>Image file name</dt>
+          <dt>Image file</dt>
           <dd>
             bmp, png, gif, jpg etc<br>
             32-bit bmp and transparent png has 8-bit alpha channel.<br>
@@ -115,7 +115,7 @@
             the area will be patinted with this color too.
           </dd>
 
-          <dt>alpha</dt>
+          <dt>Alpha (Opaque right):</dt>
           <dd>
             Alpha blend value with desktop wallpaper image<br>
             Setting values from transparent to opaque<br>
@@ -123,7 +123,7 @@
         </dl>
       </dd>
 
-      <dt>desktop wallpaper image</dt>
+      <dt>Desktop wallpaper image</dt>
       <dd>
         Windows Wallpaper Images
       </dd>
@@ -132,22 +132,22 @@
 
     <hr>
 
-    <h2 id="bg_alpha">Transparency for background image and text background color</h2>
+    <h2 id="bg_alpha">Background image alpha</h2>
 
     <dl>
-      <dt>Transparency of normal text background color</dt>
+      <dt>Normal back alpha (Opaque right direction):</dt>
       <dd>
         Transparency of background image and normal text background color<br>
         Setting values from transparent to opaque<br>
         (1) in the image
       </dd>
-      <dt>transparency of reverse text background color</dt>
+      <dt>Reverse back alpha:</dt>
       <dd>
         Transparency of background image and reverse text background color<br>
         Setting values from transparent to opaque<br>
         (2) in the image
       </dd>
-      <dt>Transparency of other text background colors</dt>
+      <dt>Other back alpha:</dt>
       <dd>
         transparency of Background image and other text background colors<br>
         Setting values from transparent to opaque<br>
@@ -160,7 +160,7 @@
 
     <hr>
 
-    <h2 id="color">Color (color theme)</h2>
+    <h2 id="color">Text color (color theme)</h2>
 
     <p>
       The color theme sets colors overriding default colors.<br>
@@ -189,7 +189,7 @@ wget https://raw.githubusercontent.com/TeraTermProject/teraterm/main/tests/color
 wget https://raw.githubusercontent.com/TeraTermProject/teraterm/main/tests/color-sgr-decscnm.pl -O - | perl</pre>
 
     <dl>
-      <dt>[default]</dt>
+      <dt>[Default]</dt>
       <dd>Set default color</dd>
     </dl>
 

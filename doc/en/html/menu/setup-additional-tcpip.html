@@ -9,7 +9,7 @@
   </head>
 
   <body>
-    <h1>Additional settings / "TCP/IP" tab ([Setup] menu)</h1>
+    <h1><a href="setup-additional.html">Additional settings</a> / "TCP/IP" tab ([Setup] menu)</h1>
 
     <dl>
 
@@ -30,14 +30,14 @@
         Use the telnet protocol. Usually, you should select this option.
       </dd>
 
-      <dt id="TCPPort">TCP/IP Port#</dt>
+      <dt id="TCPPort">Port#:</dt>
       <dd>
         TCP port number.<br>
         22: SSH<br>
         23: Telnet
       </dd>
 
-      <dt id="TelKeepAliveInterval">Keep alive</dt>
+      <dt id="TelKeepAliveInterval">Keep alive on Telnet</dt>
       <dd>
   This feature is called by Telnet keep-alive(heart-beat) mechanism. If this feature is enabled, Tera Term will send NOP message(IAC NOP: 255 241) periodically. 0 to turn off. The default value is 300 seconds.
       </dd>
@@ -47,7 +47,7 @@
   Closes Tera Term when the connection is closed.
       </dd>
 
-      <dt id="TermType">Terminal type</dt>
+      <dt id="TermType">Term type:</dt>
       <dd>
   Terminal type to be reported to the host when the telnet connection
   is established.<br>
