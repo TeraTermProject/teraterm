@@ -154,7 +154,7 @@ extern "C" PrintFile *PrintFile_;
 static void SetMouseCursor(const char *cursor)
 {
 	HCURSOR hc;
-	LPCTSTR name = NULL;
+	LPCWSTR name = NULL;
 	int i;
 
 	for (i = 0 ; MouseCursor[i].name ; i++) {
@@ -167,11 +167,11 @@ static void SetMouseCursor(const char *cursor)
 		return;
 	}
 
-	hc = (HCURSOR)LoadImage(NULL, name, IMAGE_CURSOR,
-	                        0, 0, LR_DEFAULTSIZE | LR_SHARED);
+	hc = (HCURSOR)LoadImageW(NULL, name, IMAGE_CURSOR,
+							 0, 0, LR_DEFAULTSIZE | LR_SHARED);
 
 	if (hc != NULL) {
-		SetClassLongPtr(HVTWin, GCLP_HCURSOR, (LONG_PTR)hc);
+		SetClassLongPtrW(HVTWin, GCLP_HCURSOR, (LONG_PTR)hc);
 	}
 }
 
