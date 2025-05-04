@@ -6,10 +6,7 @@ add_custom_target(
   SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/setini.pl
   )
 
-set_target_properties(
-  teraterm_ini
-  PROPERTIES FOLDER installer
-  )
+set_target_properties(teraterm_ini PROPERTIES FOLDER installer)
 
 add_custom_command(
   OUTPUT ${BINARY_DIR}/TERATERM.INI
@@ -103,6 +100,8 @@ else()
   add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_EXE}.exe
     COMMAND ${ISCC} ${ISCC_OPTION} teraterm_cmake.iss
+    COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
+    COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
     WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
   )
   add_custom_target(
@@ -111,10 +110,7 @@ else()
     DEPENDS ${CMAKE_BINARY_DIR}/${SETUP_EXE}.exe
     )
 endif()
-set_target_properties(
-  inno_setup
-  PROPERTIES FOLDER installer
-  )
+set_target_properties(inno_setup PROPERTIES FOLDER installer)
 
 # zip
 add_custom_command(
@@ -131,6 +127,7 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXShowCommandLine.dll ${CMAKE_INSTALL_PREFIX}/TTXShowCommandLine.dll
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXtest.dll ${CMAKE_INSTALL_PREFIX}/TTXtest.dll
   COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
+  COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
   WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 )
 
@@ -138,11 +135,7 @@ add_custom_target(
   zip
   DEPENDS ${CMAKE_BINARY_DIR}/${SETUP_ZIP}
 )
-
-set_target_properties(
-  zip
-  PROPERTIES FOLDER installer
-  )
+set_target_properties(zip PROPERTIES FOLDER installer)
 
 add_subdirectory(release/lang)
 set_target_properties(lang PROPERTIES FOLDER installer)
@@ -159,6 +152,7 @@ add_custom_target(
   sha256sum
   DEPENDS ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
 )
+set_target_properties(sha256sum PROPERTIES FOLDER installer)
 
 # sha512sum
 add_custom_command(
@@ -170,6 +164,7 @@ add_custom_target(
   sha512sum
   DEPENDS ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
 )
+set_target_properties(sha512sum PROPERTIES FOLDER installer)
 
 # calc_sha
 add_custom_target(
@@ -177,3 +172,4 @@ add_custom_target(
   DEPENDS sha256sum
   DEPENDS sha512sum
 )
+set_target_properties(calc_hash PROPERTIES FOLDER installer)
