@@ -60,7 +60,7 @@ BOOL TTCFrameWnd::CreateW(
 	DWORD dwStyle,
 	const RECT& rect,
 	HWND hParentWnd,
-	LPCTSTR lpszMenuName,
+	LPCWSTR lpszMenuName,
 	DWORD dwExStyle)
 {
 	m_hInst = hInstance;

@@ -96,7 +96,7 @@ public:
 				 DWORD dwStyle = WS_OVERLAPPEDWINDOW,
 				 const RECT& rect = rectDefault,
 				 HWND pParentWnd = NULL,
-				 LPCTSTR lpszMenuName = NULL,
+				 LPCWSTR lpszMenuName = NULL,
 				 DWORD dwExStyle = 0);
 	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp) = 0;
 	static const RECT rectDefault;

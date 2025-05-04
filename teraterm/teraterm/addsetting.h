@@ -35,7 +35,7 @@
 
 typedef struct {
 	const char *name;
-	LPCTSTR id;
+	LPCWSTR id;
 } mouse_cursor_t;
 
 extern const mouse_cursor_t MouseCursor[];
