@@ -52,23 +52,14 @@
         [Additional settings] に [UI] タブを追加、<a href="../menu/setup-additional-ui.html#UILanguageFile">UI言語設定</a>と<a href="../menu/setup-additional-ui.html#DLGFont">ダイアログフォント設定</a>を移動した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/460" target="_blank">issue #460</a>)
       </li>
-      <li>フォントを選択するフォントダイアログのあるタブを整理した
+      <li>
+        フォントダイアログのフォントリストに特定のフォントを表示するかどうかをタブごとに選択できるようにした。
+        これは保存されない。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/460" target="_blank">issue #460</a>)
         <ul>
-          <li>フォントダイアログを開くボタンが存在するタブ
-            <ul>
-              <li>[UI]タブ</li>
-              <li>[Font]タブ</li>
-              <li>[Tek]タブ (TODO)</li>
-            </ul>
-          </li>
-          <li>フォントダイアログのフォントリストに表示オプションを各タブ/ダイアログごとに設定できるようにした。
-            <ul>
-              <li>プロポーショナルフォントを表示する/しない</li>
-              <li>非表示フォントを表示する/しない</li>
-            </ul>
-          </li>
-          <li>非表示フォントを表示する/しないを保存している TERATERM.INI の ListHiddenFonts エントリを廃止した。</li>
+          <li>プロポーショナルフォントを表示する/しない</li>
+          <li>非表示フォントを表示する/しない</li>
+          <li>VTフォント選択時に非表示フォントを表示する/しないを保存する TERATERM.INI の ListHiddenFonts エントリを廃止した。</li>
         </ul>
       </li>
     </ul>
