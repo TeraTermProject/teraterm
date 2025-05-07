@@ -6,10 +6,7 @@ add_custom_target(
   SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/setini.pl
   )
 
-set_target_properties(
-  teraterm_ini
-  PROPERTIES FOLDER installer
-  )
+set_target_properties(teraterm_ini PROPERTIES FOLDER installer)
 
 add_custom_command(
   OUTPUT ${BINARY_DIR}/TERATERM.INI
@@ -100,22 +97,24 @@ else()
   elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     list(APPEND ISCC_OPTION "-DM_X64=1")
   endif()
+  add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_EXE}.exe
+    COMMAND ${ISCC} ${ISCC_OPTION} teraterm_cmake.iss
+    COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
+    COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
+  )
   add_custom_target(
     inno_setup
     DEPENDS cygtool
-    COMMAND ${ISCC} ${ISCC_OPTION} teraterm_cmake.iss
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
+    DEPENDS ${CMAKE_BINARY_DIR}/${SETUP_EXE}.exe
     )
 endif()
-set_target_properties(
-  inno_setup
-  PROPERTIES FOLDER installer
-  )
+set_target_properties(inno_setup PROPERTIES FOLDER installer)
 
 # zip
-add_custom_target(
-  zip
-  #  COMMAND "${CMAKE_COMMAND}" --build . --target install
+add_custom_command(
+  OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_ZIP}
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXFixedWinSize.dll ${CMAKE_INSTALL_PREFIX}/_TTXFixedWinSize.dll
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXOutputBuffering.dll ${CMAKE_INSTALL_PREFIX}/_TTXOutputBuffering.dll
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXResizeWin.dll ${CMAKE_INSTALL_PREFIX}/_TTXResizeWin.dll
@@ -127,15 +126,50 @@ add_custom_target(
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXResizeWin.dll ${CMAKE_INSTALL_PREFIX}/TTXResizeWin.dll
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXShowCommandLine.dll ${CMAKE_INSTALL_PREFIX}/TTXShowCommandLine.dll
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXtest.dll ${CMAKE_INSTALL_PREFIX}/TTXtest.dll
+  COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
+  COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
   WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-  )
+)
 
-set_target_properties(
+add_custom_target(
   zip
-  PROPERTIES FOLDER installer
-  )
+  DEPENDS ${CMAKE_BINARY_DIR}/${SETUP_ZIP}
+)
+set_target_properties(zip PROPERTIES FOLDER installer)
 
 add_subdirectory(release/lang)
 set_target_properties(lang PROPERTIES FOLDER installer)
 add_subdirectory(release/lang_utf16le)
 set_target_properties(lang_utf16le PROPERTIES FOLDER installer)
+
+# sha256sum
+add_custom_command(
+  OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
+  COMMAND ${CMAKE_COMMAND} -DOUTPUT=${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum -P ${CMAKE_CURRENT_LIST_DIR}/sha256sum.cmake ${SETUP_EXE}.exe ${SETUP_ZIP}
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+add_custom_target(
+  sha256sum
+  DEPENDS ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
+)
+set_target_properties(sha256sum PROPERTIES FOLDER installer)
+
+# sha512sum
+add_custom_command(
+  OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
+  COMMAND ${CMAKE_COMMAND} -DOUTPUT=${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum -P ${CMAKE_CURRENT_LIST_DIR}/sha512sum.cmake ${SETUP_EXE}.exe ${SETUP_ZIP}
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+add_custom_target(
+  sha512sum
+  DEPENDS ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
+)
+set_target_properties(sha512sum PROPERTIES FOLDER installer)
+
+# calc_sha
+add_custom_target(
+  calc_hash
+  DEPENDS sha256sum
+  DEPENDS sha512sum
+)
+set_target_properties(calc_hash PROPERTIES FOLDER installer)
