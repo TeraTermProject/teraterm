@@ -11,6 +11,7 @@ perl utf8_to.pl utf16le "release/lang_utf8/Simplified Chinese.lng" "release/lang
 perl utf8_to.pl utf16le release/lang_utf8/Spanish.lng release/lang_utf16le/Spanish.lng
 perl utf8_to.pl utf16le "release/lang_utf8/Traditional Chinese.lng" "release/lang_utf16le/Traditional Chinese.lng"
 perl utf8_to.pl utf16le "release/lang_utf8/Tamil.lng" "release/lang_utf16le/Tamil.lng"
+perl utf8_to.pl utf16le "release/lang_utf8/Portuguese.lng" "release/lang_utf16le/Portuguese.lng"
 
 if not exist release\lang mkdir release\lang
 perl utf8_to.pl cp1252 release/lang_utf8/Default.lng release/lang/Default.lng
@@ -24,3 +25,4 @@ perl utf8_to.pl cp936 "release/lang_utf8/Simplified Chinese.lng" "release/lang/S
 perl utf8_to.pl cp1252 release/lang_utf8/Spanish.lng release/lang/Spanish.lng
 perl utf8_to.pl cp950 "release/lang_utf8/Traditional Chinese.lng" "release/lang/Traditional Chinese.lng"
 perl utf8_to.pl cp65001 release/lang_utf8/Tamil.lng release/lang/Tamil.lng
+perl utf8_to.pl cp1252 "release/lang_utf8/Portuguese.lng" "release/lang/Portuguese.lng"
