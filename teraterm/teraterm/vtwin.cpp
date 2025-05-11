@@ -4060,6 +4060,8 @@ void CVTWindow::OnTTMenuLaunch()
 
 void CVTWindow::OnFileLog()
 {
+	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
+				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	FLogDlgInfo_t info;
 	info.filename = NULL;
 	info.pts = &ts;
