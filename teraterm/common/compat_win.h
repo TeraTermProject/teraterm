@@ -63,6 +63,9 @@ typedef enum MONITOR_DPI_TYPE {
 #if !defined(WM_DPICHANGED)
 #define WM_DPICHANGED					0x02E0
 #endif
+#if !defined(WM_GETDPISCALEDSIZE)
+#define WM_GETDPISCALEDSIZE             0x02E4
+#endif
 #if !defined(CF_INACTIVEFONTS)
 #define CF_INACTIVEFONTS				0x02000000L
 #endif

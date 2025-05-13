@@ -215,7 +215,7 @@ void CVTWindow::SetWindowAlpha(BYTE alpha)
  */
 class SerialReconnect {
 
-#define DEBUG_WM_DEVICECHANGE	1
+#define DEBUG_WM_DEVICECHANGE	0
 #define RECONNECT_DELAY_NORMAL	500		// (ms)
 #define RECONNECT_DELAY_ILLEGAL	2000	// (ms)
 #define RECONNECT_RETRY			3
@@ -286,7 +286,7 @@ public:
 			nEventType);
 		if (nEventType == DBT_DEVICEARRIVAL || nEventType == DBT_DEVICEREMOVECOMPLETE) {
 			OutputDebugPrintf(
-				" devicetype=%s(%d)\n",
+				" devicetype=%s(%ld)\n",
 				pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT ? "DBT_DEVTYP_PORT" :
 				pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE ? "DBT_DEVTYP_DEVICEINTERFACE" :
 				"-",
@@ -4533,6 +4533,7 @@ void CVTWindow::OnSetupKeyboard()
  *	シリアル接続で新しいプロセスを起動
  *	 New connectionからシリアル接続する動作と基本的に同じ動作
  */
+#if 0
 static void OpenNewComport(const TTTSet *pts)
 {
 	char Command[MAXPATHLEN + HostNameMaxLength];
@@ -4561,6 +4562,7 @@ static void OpenNewComport(const TTTSet *pts)
 
 	TTWinExecA(Command);
 }
+#endif
 
 void CVTWindow::OnSetupSerialPort()
 {
