@@ -146,6 +146,7 @@ set_target_properties(lang_utf16le PROPERTIES FOLDER installer)
 add_custom_command(
   OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
   COMMAND ${CMAKE_COMMAND} -DOUTPUT=${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum -P ${CMAKE_CURRENT_LIST_DIR}/sha256sum.cmake ${SETUP_EXE}.exe ${SETUP_ZIP}
+  COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 add_custom_target(
@@ -158,6 +159,7 @@ set_target_properties(sha256sum PROPERTIES FOLDER installer)
 add_custom_command(
   OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
   COMMAND ${CMAKE_COMMAND} -DOUTPUT=${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum -P ${CMAKE_CURRENT_LIST_DIR}/sha512sum.cmake ${SETUP_EXE}.exe ${SETUP_ZIP}
+  COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 add_custom_target(
