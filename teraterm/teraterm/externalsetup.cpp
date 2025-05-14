@@ -197,6 +197,13 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 				}
 			}
 		}
+
+		// ダイアログフォントの変更
+		if (ok) {
+			SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint,
+						  ts.DialogFontCharSet, ts.UILanguageFileW,
+						  "Tera Term", "DLG_SYSTEM_FONT");
+		}
 	}
 }
 
@@ -335,4 +342,3 @@ void OpenSetupSerialPort()
 	BOOL r = (*SetupSerialPort)(HVTWin, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::SerialPortPage, r);
 }
-
