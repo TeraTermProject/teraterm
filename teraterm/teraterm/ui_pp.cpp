@@ -311,6 +311,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				}
 			}
 			SendDlgItemMessageW(hWnd, IDC_GENUILANG, CB_SETCURSEL, data->selected_lang, 0);
+			ExpandCBWidth(hWnd, IDC_GENUILANG);
 
 			GetDlgLogFont(GetParent(hWnd), pts, &data->DlgFont);
 			SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
