@@ -622,7 +622,7 @@ LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 	DWORD Style;
 	HMENU SysMenu;
 
-	Style = GetWindowLongPtr (GWL_STYLE);
+	Style = (DWORD)GetWindowLongPtr (GWL_STYLE);
 	TBar = ((Style & WS_SYSMENU)!=0);
 	if (TBar == (ts.HideTitle==0)) {
 		return 0;
@@ -721,7 +721,6 @@ void CTEKWindow::OnSetupWindow()
 	WORD OldEmu;
 
 	HelpId = HlpTEKSetupWindow;
-	ts.SampleFont = tk.TEKFont[0];
 
 	if (! LoadTTDLG()) {
 		return;

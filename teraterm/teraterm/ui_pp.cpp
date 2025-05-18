@@ -42,6 +42,7 @@
 #include "win32helper.h"
 #include "tipwin2.h"
 #include "tttext.h"
+#include "tslib.h"
 
 #include "ui_pp.h"
 #include "ui_pp_res.h"
@@ -176,40 +177,6 @@ struct UIPPData {
 	HINSTANCE hInst;
 };
 
-static void CreateLogfont(HWND hWnd, const wchar_t *face_name, int point, BYTE char_set, LOGFONTW *logfont)
-{
-	wcsncpy_s(logfont->lfFaceName, _countof(logfont->lfFaceName), face_name,  _TRUNCATE);
-	logfont->lfHeight = -GetFontPixelFromPoint(hWnd, point);
-	logfont->lfCharSet = char_set;
-	logfont->lfWeight = FW_NORMAL;
-	logfont->lfOutPrecision = OUT_DEFAULT_PRECIS;
-	logfont->lfClipPrecision = CLIP_DEFAULT_PRECIS;
-	logfont->lfQuality = DEFAULT_QUALITY;
-	logfont->lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
-
-	GetFontPitchAndFamily(hWnd, logfont);
-}
-
-static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
-{
-	memset(logfont, 0, sizeof(*logfont));
-	if (ts->DialogFontNameW[0] == 0) {
-		// フォントが設定されていなかったらOSのフォントを使用する
-		GetMessageboxFontW(logfont);
-		GetFontPitchAndFamily(hWnd, logfont);
-	}
-	else {
-		CreateLogfont(hWnd, ts->DialogFontNameW, ts->DialogFontPoint, (BYTE)ts->DialogFontCharSet, logfont);
-	}
-}
-
-static void SetDlgLogFont(HWND hWnd, const LOGFONTW *logfont, TTTSet *ts)
-{
-	wcsncpy_s(ts->DialogFontNameW, _countof(ts->DialogFontNameW), logfont->lfFaceName, _TRUNCATE);
-	ts->DialogFontPoint = GetFontPointFromPixel(hWnd, -logfont->lfHeight);
-	ts->DialogFontCharSet = logfont->lfCharSet;
-}
-
 static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM /*wParam*/, LPARAM lParam)
 {
 	if (Message == WM_INITDIALOG) {
@@ -312,7 +279,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			}
 			SendDlgItemMessageW(hWnd, IDC_GENUILANG, CB_SETCURSEL, data->selected_lang, 0);
 
-			GetDlgLogFont(GetParent(hWnd), pts, &data->DlgFont);
+			TSGetLogFont(GetParent(hWnd), pts, 2, 0, &data->DlgFont);
 			SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
 
 			ArrangeControls(hWnd, data, ACFCF_INIT_DIALOG);
@@ -354,7 +321,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						PostMessage(dlg_data->hVTWin, WM_USER_CHANGETITLE, 0, 0);
 					}
 
-					SetDlgLogFont(GetParent(hWnd), &dlg_data->DlgFont, pts);
+					TSSetLogFont(GetParent(hWnd), &dlg_data->DlgFont, 2, 0, pts);
 
 					// TTXKanjiMenu は Language を見てメニューを表示するので、変更の可能性がある
 					// OK 押下時にメニュー再描画のメッセージを飛ばすようにした。 (2007.7.14 maya)

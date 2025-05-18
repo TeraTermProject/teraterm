@@ -574,14 +574,6 @@ void SetFontStringW(HWND hWnd, int item, const LOGFONTW *logfont)
 	SetDlgItemTextW(hWnd, item, b);
 }
 
-static void ConvertLOGFONTWA(const LOGFONTA *logfontA, LOGFONTW *logfontW)
-{
-	logfontW->lfWidth = logfontA->lfWidth;
-	logfontW->lfHeight = logfontA->lfHeight;
-	logfontW->lfCharSet = logfontA->lfCharSet;
-	ACPToWideChar_t(logfontA->lfFaceName, logfontW->lfFaceName, _countof(logfontW->lfFaceName));
-}
-
 /**
  *	ChooseFont() のフォント一覧で非表示フォントか調べる
  *	Windows 7 未満の場合、常にFALSEが返る

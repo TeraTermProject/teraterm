@@ -115,6 +115,7 @@
 #include "makeoutputstring.h"
 #include "ttlib_types.h"
 #include "externalsetup.h"
+#include "tslib.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -4979,7 +4980,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 		if (calcOnly) {
 			// 新DPIのフォントのサイズからスクリーンサイズを算出
 			LOGFONTW VTlfDefault;
-			DispSetLogFont(&VTlfDefault, NewDPI); // Normal Font
+			TSGetLogFont(m_hWnd, &ts, 0, NewDPI, &VTlfDefault); // Normal Font
 			HFONT VTFontDefault = CreateFontIndirectW(&VTlfDefault);
 			HDC TmpDC = GetDC(m_hWnd);
 			SelectObject(TmpDC, VTFontDefault);

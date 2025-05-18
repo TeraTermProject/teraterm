@@ -46,6 +46,7 @@
 #include "compat_win.h"
 #include "asprintf.h"
 #include "color_sample.h"
+#include "tslib.h"
 #include "addsetting.h" // for AddsettingCheckWin()
 
 #include "win_pp.h"
@@ -59,6 +60,7 @@ typedef struct {
 	WORD VTFlag;
 	HWND VTWin;
 	ColorSample *cs;
+	HFONT sample_font;
 } WinDlgWork;
 
 static void DispSample(HWND Dialog, WinDlgWork *work, int IAttr)
@@ -244,7 +246,13 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 			SetRB(Dialog,ts->CursorShape,IDC_WINBLOCK,IDC_WINHORZ);
 
-			work->cs = ColorSampleInit(GetDlgItem(Dialog, IDC_DRAW_SAMPLE_AREA));
+			{
+				// サンプル用フォント作成
+				LOGFONTW logfont;
+				TSGetLogFont(Dialog, ts, (work->VTFlag > 0) ? 0 : 1, 0, &logfont);
+				work->sample_font = CreateFontIndirectW(&logfont);
+			}
+			work->cs = ColorSampleInit(GetDlgItem(Dialog, IDC_DRAW_SAMPLE_AREA), work->sample_font);
 
 			IAttr = 0;
 			IOffset = 0;
@@ -496,6 +504,12 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			SetScrollPos(Wnd,SB_CTL,pos,TRUE);
 			ChangeColor(Dialog,work,IAttr,IOffset);
 			return FALSE;
+
+		case WM_DESTROY:
+			// サンプル用フォント破棄
+			DeleteObject(work->sample_font);
+			work->sample_font = 0;
+			break;
 	}
 	return FALSE;
 }

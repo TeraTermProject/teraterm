@@ -361,7 +361,7 @@ struct tttset {
 	WORD TermFlag;
 /*------ WinSet --------*/
 	WORD reserve_VTFlag;
-	HFONT SampleFont;
+	HFONT reserve_SampleFont;
 	WORD reserve_TmpColor[12][6];
 	/* Tera Term window setup variables */
 	char Title[TitleBuffSize];

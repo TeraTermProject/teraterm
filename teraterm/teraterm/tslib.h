@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024- TeraTerm Project
+ * (C) 2025- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,15 @@
 
 #include <windows.h>
 
-typedef struct ColorSampleTag ColorSample;
+#include "tttypes.h"
 
-ColorSample *ColorSampleInit(HWND hWnd, HFONT hFont);
-void ColorSampleSetColor(ColorSample *work, COLORREF fore_color, COLORREF back_color);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void TSGetLogFont(HWND hWnd, const TTTSet *pts, int type, unsigned int dpi, LOGFONTW *logfont);
+void TSSetLogFont(HWND hWnd, const LOGFONTW *logfont, int type, unsigned int dpi, TTTSet *pts);
+
+#ifdef __cplusplus
+}
+#endif

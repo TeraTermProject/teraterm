@@ -56,6 +56,8 @@ add_executable(
   teraterml.h
   theme.h
   themefile.cpp
+  tslib.h
+  tslib.cpp
   tt-version.rc
   ttdde.c
   ttdde.h

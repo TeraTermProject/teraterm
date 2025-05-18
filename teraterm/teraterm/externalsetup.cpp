@@ -72,7 +72,6 @@ static void ExternalSetupPreProcess(CAddSettingPropSheetDlgPage page)
 		;
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::FontPage) {
-		ts.SampleFont = VTFont[0];
 		ExternalSetupData.old_use_unicode_api = UnicodeDebugParam.UseUnicodeApi;
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::KeyboardPage) {

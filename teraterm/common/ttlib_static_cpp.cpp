@@ -1038,7 +1038,7 @@ wchar_t *GetUILanguageFileFullW(const wchar_t *SetupFNameW)
 	const wchar_t *default_lng = L"lang\\Default.lng";
 	wchar_t *UILanguageFileIni;
 	if (SetupFNameW == NULL || SetupFNameW[0] == 0) {
-		UILanguageFileIni = wcsdup(default_lng);
+		UILanguageFileIni = _wcsdup(default_lng);
 	}
 	else {
 		hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", default_lng, SetupFNameW,
