@@ -200,6 +200,7 @@
     <ClCompile Include="prnabort.cpp" />
     <ClCompile Include="protodlg.cpp" />
     <ClCompile Include="tcpip_pp.cpp" />
+    <ClCompile Include="tekfont_pp.cpp" />
     <ClCompile Include="tekwin.cpp" />
     <ClCompile Include="telnet.c" />
     <ClCompile Include="teraprn.cpp" />
@@ -276,6 +277,8 @@
     <ClInclude Include="debug_pp.h" />
     <ClCompile Include="debug_pp.cpp" />
     <ClInclude Include="serial_pp.h" />
+    <ClInclude Include="tekfont_pp.h" />
+    <ClInclude Include="tekfont_pp_res.h" />
     <ClInclude Include="term_pp.h" />
     <ClInclude Include="tslib.h" />
     <ClInclude Include="ui_pp.h" />
@@ -301,6 +304,7 @@
     <ResourceCompile Include="filesys_log.rc" />
     <ResourceCompile Include="font_pp.rc" />
     <ResourceCompile Include="mouse_pp.rc" />
+    <ResourceCompile Include="tekfont_pp.rc" />
     <ResourceCompile Include="teraterm_manifest.rc" />
     <ResourceCompile Include="themedlg.rc" />
     <ResourceCompile Include="tt-version.rc" />

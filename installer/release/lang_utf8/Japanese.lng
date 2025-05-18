@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2025-04-23 by TeraTerm Project
+date=2025-05-18 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -182,6 +182,7 @@ DLG_TABSHEET_TITLE_FONT=フォント
 DLG_TABSHEET_TITLE_ENCODING=エンコーディング
 DLG_TABSHEET_TITLE_THEME=テーマ
 DLG_TABSHEET_TITLE_MOUSE=マウス
+DLG_TABSHEET_TITLE_FONT_TEK=フォント(TEK)
 
 DLG_TAB_GENERAL_CLICKURL=クリッカブルURLを有効にする(&E)
 DLG_TAB_GENERAL_DISABLESENDBREAK=ブレーク送信のアクセラレータキーを無効にする(&S)
@@ -290,6 +291,7 @@ DLG_TAB_FONT_VTWINFONT=VTウィンドウフォント(&V)
 DLG_TAB_FONT_BTN_SELECT=選択(&S)...
 DLG_TAB_FONT_VTFONT_TITLE=文字描画で使用するAPI
 DLG_TAB_FONT_DLGFONT=ダイアログフォント(&D)
+DLG_TAB_FONT_TEKFONT=TEKフォント
 DLG_TAB_FONT_BTN_DEFAULT=デフォルト(&E)
 DLG_TAB_FONT_CODEPAGE_LABEL=表示用文字変換コードページ(&C)
 DLG_TAB_FONT_LIST_PRO_FONTS_VT=プロポーショナルフォントをフォントダイアログの一覧に表示する(&P)
@@ -459,6 +461,7 @@ DLG_CODING_DECSP_DEC_TO_UNICODE=DEC Special GraphicsをUnicodeへマッピング
 DLG_CODING_DECSP_DO_NOT_MAP=DEC Special Graphicsをマッピングしない
 
 DLG_WIN_TITLE=ウィンドウ
+DLG_WIN_TEK_TITLE=ウィンドウ(TEK)
 DLG_WIN_TITLELABEL=タイトル(&T):
 DLG_WIN_CURSOR=カーソルの形
 DLG_WIN_BLOCK=四角(&L):

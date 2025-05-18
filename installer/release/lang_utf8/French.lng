@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2025-04-23 by TeraTerm Project
+date=2025-05-18 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -182,6 +182,7 @@ DLG_TABSHEET_TITLE_FONT=Font
 DLG_TABSHEET_TITLE_ENCODING=Encoding
 DLG_TABSHEET_TITLE_THEME=Theme
 DLG_TABSHEET_TITLE_MOUSE=Mouse
+DLG_TABSHEET_TITLE_FONT_TEK=Font(TEK)
 
 DLG_TAB_GENERAL_CLICKURL=&Autoriser URL cliquable
 DLG_TAB_GENERAL_DISABLESENDBREAK=Dévalider accélération envoi de break
@@ -290,6 +291,7 @@ DLG_TAB_FONT_VTWINFONT=&VTWindow Font
 DLG_TAB_FONT_BTN_SELECT=&Select...
 DLG_TAB_FONT_VTFONT_TITLE=API for drawing
 DLG_TAB_FONT_DLGFONT=&Dialog Font
+DLG_TAB_FONT_TEKFONT=TEK Font
 DLG_TAB_FONT_BTN_DEFAULT=D&efault
 DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
 DLG_TAB_FONT_LIST_PRO_FONTS_VT=List &proportional fonts in font dialog
@@ -459,6 +461,7 @@ DLG_CODING_DECSP_DEC_TO_UNICODE=Mapping DEC Special Graphics to Unicode
 DLG_CODING_DECSP_DO_NOT_MAP=Do not mapping
 
 DLG_WIN_TITLE=Fenêtre
+DLG_WIN_TEK_TITLE=Window(TEK)
 DLG_WIN_TITLELABEL=&Titre:
 DLG_WIN_CURSOR=Forme du curseur
 DLG_WIN_BLOCK=B&loc

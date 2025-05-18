@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024- TeraTerm Project
+ * (C) 2025- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,30 +26,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-
 #include <windows.h>
-
-#include "addsetting.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// “à•”—p
-BOOL OpenExternalSetupTab(HWND hWndParent, CAddSettingPropSheetDlgPage page);
-
-// vtwin‚©‚çŽg—p
-void OpenExternalSetup(HWND hWndParent);
-void OpenSetupTerminal();
-void OpenSetupWin();
-void OpenSetupFont(HWND hWnd);
-void OpenSetupKeyboard();
-void OpenSetupSerialPort();
-void OpenSetupTCPIP();
-void OpenSetupGeneral();
-void OpenSetupTekWindow();
-void OpenSetupTekFont();
+HPROPSHEETPAGE TEKFontPageCreate(HINSTANCE inst, HWND hWnd, TTTSet *pts);
 
 #ifdef __cplusplus
 }

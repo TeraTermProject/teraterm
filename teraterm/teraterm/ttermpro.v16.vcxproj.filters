@@ -306,6 +306,9 @@
     <ClCompile Include="tslib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tekfont_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -371,6 +374,9 @@
       <Filter>dialog</Filter>
     </ResourceCompile>
     <ResourceCompile Include="ui_pp.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="tekfont_pp.rc">
       <Filter>dialog</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -665,6 +671,12 @@
     </ClInclude>
     <ClInclude Include="tslib.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tekfont_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="tekfont_pp_res.h">
+      <Filter>dialog</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

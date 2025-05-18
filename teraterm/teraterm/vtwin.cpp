@@ -4522,7 +4522,7 @@ void CVTWindow::OnSetupWindow()
 
 void CVTWindow::OnSetupFont()
 {
-	OpenSetupFont();
+	OpenSetupFont(m_hWnd);
 }
 
 void CVTWindow::OnSetupKeyboard()

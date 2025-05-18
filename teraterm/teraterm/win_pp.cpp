@@ -47,7 +47,6 @@
 #include "asprintf.h"
 #include "color_sample.h"
 #include "tslib.h"
-#include "addsetting.h" // for AddsettingCheckWin()
 
 #include "win_pp.h"
 
@@ -534,12 +533,15 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 	return ret_val;
 }
 
-HPROPSHEETPAGE CreateWinPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
+/**
+ *	@param	is_vt	TRUE: VTWin, FALSE: TEKWin
+ */
+static HPROPSHEETPAGE CreateWinPP(HINSTANCE inst, HWND vtwin, TTTSet *pts, BOOL is_vt)
 {
 	WinDlgWork *data = (WinDlgWork *)calloc(1, sizeof(*data));
 	data->ts = pts;
 	data->VTWin = vtwin;
-	data->VTFlag = AddsettingCheckWin(vtwin) == ADDSETTING_WIN_VT ? 1 : 0;
+	data->VTFlag = is_vt ? 1 : 0;
 
 	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
@@ -547,7 +549,12 @@ HPROPSHEETPAGE CreateWinPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
 	wchar_t *uimsg;
-	GetI18nStrWW("Tera Term", "DLG_WIN_TITLE", L"Window", pts->UILanguageFileW, &uimsg);
+	if (is_vt) {
+		GetI18nStrWW("Tera Term", "DLG_WIN_TITLE", L"Window", pts->UILanguageFileW, &uimsg);
+	}
+	else {
+		GetI18nStrWW("Tera Term", "DLG_WIN_TEK_TITLE", L"Window(TEK)", pts->UILanguageFileW, &uimsg);
+	}
 	psp.pszTitle = uimsg;
 	psp.pszTemplate = MAKEINTRESOURCEW(IDD_WINDLG);
 #if defined(REWRITE_TEMPLATE)
@@ -560,4 +567,14 @@ HPROPSHEETPAGE CreateWinPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
 	HPROPSHEETPAGE hpsp = CreatePropertySheetPageW((LPCPROPSHEETPAGEW)&psp);
 	free(uimsg);
 	return hpsp;
+}
+
+HPROPSHEETPAGE CreateWinVTPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
+{
+	return CreateWinPP(inst, vtwin, pts, TRUE);
+}
+
+HPROPSHEETPAGE CreateWinTEKPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
+{
+	return CreateWinPP(inst, vtwin, pts, FALSE);
 }

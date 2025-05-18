@@ -39,6 +39,8 @@
 #include "telnet.h"
 #include "setting.h"
 #include "ttdialog.h"
+#include "ttwinman.h"
+#include "tekwin.h"
 
 #include "externalsetup.h"
 
@@ -91,6 +93,11 @@ static void ExternalSetupPreProcess(CAddSettingPropSheetDlgPage page)
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::SerialPortPage) {
 		;
+	}
+
+	// TEK Win
+	if (pTEKWin != NULL) {
+		((CTEKWindow*)pTEKWin)->OnSetupPreProcess();
 	}
 }
 
@@ -197,6 +204,11 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 			}
 		}
 	}
+
+	// TEK Win
+	if (pTEKWin != NULL) {
+		((CTEKWindow*)pTEKWin)->OnSetupPostProcess(ok);
+	}
 }
 
 /**
@@ -217,28 +229,30 @@ BOOL OpenExternalSetupTab(HWND hWndParent, CAddSettingPropSheetDlgPage page)
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
 
+	// PreProcesが呼ばれているかチェック
+	assert(ExternalSetupData.PerProcessCalled == TRUE);
+
 	// TEKWin特別処理
 	if (AddsettingCheckWin(hWndParent) == ADDSETTING_WIN_TEK) {
 		if (page == CAddSettingPropSheetDlgPage::WinPage) {
 			// Window Setup
-			CAddSettingPropSheetDlg CAddSetting(hInst, hWndParent);
-			INT_PTR ret = CAddSetting.DoModal();
-			return (ret == IDOK) ? TRUE : FALSE;
+			page = TekWinPage;
 		}
-		assert(FALSE);
+		else if (page == FontPage) {
+			page = TekFontPage;
+		}
+		else {
+			assert(FALSE);
+		}
 	}
 
 	// VTWin
 
-	// PreProcesが呼ばれているかチェック
-	assert(ExternalSetupData.PerProcessCalled == TRUE);
-
 	int one_page = DefaultPage;
-	CAddSettingPropSheetDlg CAddSetting(hInst, hWndParent);
+	CAddSettingPropSheetDlg CAddSetting(hInst, hWndParent, (CAddSettingPropSheetDlg::Page)page);
 	if (one_page == CAddSettingPropSheetDlgPage::DefaultPage) {
 		CAddSetting.SetTreeViewMode(ts.ExperimentalTreePropertySheetEnable);
 	}
-	CAddSetting.SetStartPage((CAddSettingPropSheetDlg::Page)page);
 	INT_PTR ret = CAddSetting.DoModal();
 	return (ret == IDOK) ? TRUE : FALSE;
 }
@@ -285,14 +299,23 @@ void OpenSetupWin()
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::WinPage, r);
 }
 
-void OpenSetupFont()
+void OpenSetupFont(HWND hWnd)
 {
 	if (! LoadTTDLG()) {
 		return;
 	}
-	ExternalSetupPreProcess(CAddSettingPropSheetDlgPage::FontPage);
-	BOOL r = (*ChooseFontDlg)(HVTWin, NULL, &ts);
-	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::FontPage, r);
+	CAddSettingPropSheetDlgPage page;
+	if (AddsettingCheckWin(hWnd) == ADDSETTING_WIN_VT) {
+		page = FontPage;
+	}
+	else {
+		page = TekFontPage;
+	}
+
+
+	ExternalSetupPreProcess(page);
+	BOOL r = (*ChooseFontDlg)(hWnd, NULL, &ts);
+	ExternalSetupPostProcess(page, r);
 }
 
 void OpenSetupKeyboard()
@@ -335,3 +358,17 @@ void OpenSetupSerialPort()
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::SerialPortPage, r);
 }
 
+void OpenSetupTekWindow()
+{
+	if (! LoadTTDLG()) {
+		return;
+	}
+	ExternalSetupPreProcess(CAddSettingPropSheetDlgPage::TekWinPage);
+	BOOL r = (*SetupWin)(HTEKWin, &ts);
+	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::TekWinPage, r);
+}
+
+void OpenSetupTekFont()
+{
+	return OpenSetupFont(HTEKWin);
+}
