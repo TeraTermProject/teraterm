@@ -45,6 +45,7 @@ ConvertLNG("Simplified Chinese.lng" cp936)
 ConvertLNG(Spanish.lng cp1252)
 ConvertLNG("Traditional Chinese.lng" cp950)
 ConvertLNG("Tamil.lng" cp65001)
+ConvertLNG("pt_BR.lng" cp1252)
 
 add_custom_target(
   ${PACKAGE_NAME} ALL
