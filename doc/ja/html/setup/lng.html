@@ -1,28 +1,28 @@
-﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
   "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 <HEAD>
 <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-<TITLE>言語ファイル</TITLE>
+<TITLE>����t�@�C��</TITLE>
 <META http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
 </HEAD>
 <BODY>
 
-<h1>言語ファイル</h1>
+<h1>����t�@�C��</h1>
 
 <p>
-Tera Term のメニューやダイアログには、英語のメッセージが割り当てられています。<br>
-言語ファイルを作成することにより、メッセージをローカライズすることができます。<br>
-また、このファイルにはダイアログのフォントとフォントサイズも指定することができます。
+Tera Term �̃��j���[��_�C�A���O�ɂ́A�p��̃��b�Z�[�W�����蓖�Ă��Ă��܂��B<br>
+����t�@�C�����쐬���邱�Ƃɂ��A���b�Z�[�W�����[�J���C�Y���邱�Ƃ��ł��܂��B<br>
+�܂��A���̃t�@�C���ɂ̓_�C�A���O�̃t�H���g�ƃt�H���g�T�C�Y���w�肷�邱�Ƃ��ł��܂��B
 </p>
 
 <p>
-インストーラは、lang フォルダ、lang_utf16le フォルダの中に言語ファイルをコピーします。<br>
-また、インストーラは指定された言語が使用されるように、TERATERM.INI の UILanguageFile に言語ファイル名を指定します。
+�C���X�g�[���́Alang �t�H���_�Alang_utf16le �t�H���_�̒��Ɍ���t�@�C�����R�s�[���܂��B<br>
+�܂��A�C���X�g�[���͎w�肳�ꂽ���ꂪ�g�p�����悤�ɁATERATERM.INI �� UILanguageFile �Ɍ���t�@�C�������w�肵�܂��B
 </p>
 
-<h2>言語ファイル</h2>
+<h2>����t�@�C��</h2>
 
 <table border="1">
 <tr>
@@ -99,69 +99,69 @@ Tera Term のメニューやダイアログには、英語のメッセージが�
   <td>Tamil</td>
   <td>Tamil.lng</td>
   <td>2024-02-24</td>
-  <td>திட்டத்தால் புதுப்பிக்கப்பட்டது</td>
+  <td><a href="https://github.com/TamilNeram" target="_blank">TamilNeram</a></td>
 </tr>
 
 <tr>
   <td>Portuguese - Brazil</td>
   <td>pt_BR.lng</td>
   <td>2025-05-07</td>
-  <td>Waldemar Vaz Passarinho Neto</td>
+  <td><a href="https://github.com/WaldemarOficial" target="_blank">Waldemar Vaz Passarinho Neto</a></td>
 </tr>
 
 </table>
 
 
-<h2>フォントの指定</h2>
+<h2>�t�H���g�̎w��</h2>
 
 <p>
-インストーラは、フォントだけを指定するテンプレートとして Default.lng をコピーします。<br>
-フォントの指定は以下のようなフォーマットで行います。
+�C���X�g�[���́A�t�H���g�������w�肷��e���v���[�g�Ƃ��� Default.lng ���R�s�[���܂��B<br>
+�t�H���g�̎w��͈ȉ��̂悤�ȃt�H�[�}�b�g�ōs���܂��B
 </p>
 
 <pre>
-; 大きいフォント
+; �傫���t�H���g
 DLG_SYSTEM_FONT=System,12,0
-; 小さいフォント
+; �������t�H���g
 DLG_TAHOMA_FONT=Tahoma,8,0
 </pre>
 
 <p>
-一つ目にはフォント名を指定します。
+��ڂɂ̓t�H���g�����w�肵�܂��B
 </p>
 
 <p>
-二つ目にはフォントサイズを数字で指定します。
+��ڂɂ̓t�H���g�T�C�Y�𐔎��Ŏw�肵�܂��B
 </p>
 
 <p>
-三つ目にはフォントのキャラクタセットを数字で指定します。
+�O�ڂɂ̓t�H���g�̃L�����N�^�Z�b�g�𐔎��Ŏw�肵�܂��B
 </p>
 
 <pre>
 0   ANSI
-1   既定の文字セット
-2   シンボル(記号)
+1   ����̕����Z�b�g
+2   �V���{��(�L��)
 77  Mac
-128 日本語(Shift_JIS)
-129 韓国語(EUC-KR)
-130 韓国語(Johab)
-134 簡体字中国語(GB2312)
-136 繁体字中国語(Big5)
-161 ギリシャ語
-162 トルコ語
-163 ベトナム語
-177 ヘブライ語
-178 アラビア語
-186 バルト言語
-204 キリル言語
-222 タイ語
-238 中央ヨーロッパ言語
+128 ���{��(Shift_JIS)
+129 �؍���(EUC-KR)
+130 �؍���(Johab)
+134 �ȑ̎�������(GB2312)
+136 �ɑ̎�������(Big5)
+161 �M���V����
+162 �g���R��
+163 �x�g�i����
+177 �w�u���C��
+178 �A���r�A��
+186 �o���g����
+204 �L��������
+222 �^�C��
+238 �������[���b�p����
 255 OEM/DOS
 </pre>
 
 <p>
-詳しくは msdn ライブラリの <a href="http://msdn.microsoft.com/en-us/library/bb773327(VS.85).aspx" target="_blank">LOGFONT 構造体</a>の lfCharset の説明を参照してください。
+�ڂ����� msdn ���C�u������ <a href="http://msdn.microsoft.com/en-us/library/bb773327(VS.85).aspx" target="_blank">LOGFONT �\����</a>�� lfCharset �̐������Q�Ƃ��Ă��������B
 </p>
 
 
