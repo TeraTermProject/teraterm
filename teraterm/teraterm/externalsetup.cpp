@@ -48,6 +48,7 @@ static struct {
 	BOOL PerProcessCalled;
 	BOOL old_use_unicode_api;
 	char *orgTitle;
+	HWND hWnd_disable;
 } ExternalSetupData;
 
 /*
@@ -62,7 +63,7 @@ static struct {
  *	@param	page	処理するタブ
  *					削除予定
  */
-static void ExternalSetupPreProcess(CAddSettingPropSheetDlgPage page)
+static void ExternalSetupPreProcess(HWND hWnd, CAddSettingPropSheetDlgPage page)
 {
 	ExternalSetupData.PerProcessCalled = TRUE;
 	BOOL all = TRUE;
@@ -98,6 +99,13 @@ static void ExternalSetupPreProcess(CAddSettingPropSheetDlgPage page)
 	// TEK Win
 	if (pTEKWin != NULL) {
 		((CTEKWindow*)pTEKWin)->OnSetupPreProcess();
+	}
+
+	// 入力の無効化(アプリケーションモーダル状態にする)
+	HWND hWnd_disable = hWnd == HVTWin ? HTEKWin : HVTWin;
+	ExternalSetupData.hWnd_disable = hWnd_disable;
+	if (hWnd_disable != NULL) {
+		EnableWindow(hWnd_disable, FALSE);
 	}
 }
 
@@ -209,6 +217,12 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 	if (pTEKWin != NULL) {
 		((CTEKWindow*)pTEKWin)->OnSetupPostProcess(ok);
 	}
+
+	// 通常状態にする
+	HWND hWnd_disable = ExternalSetupData.hWnd_disable;
+	if (hWnd_disable != NULL) {
+		EnableWindow(hWnd_disable, TRUE);
+	}
 }
 
 /**
@@ -262,10 +276,10 @@ BOOL OpenExternalSetupTab(HWND hWndParent, CAddSettingPropSheetDlgPage page)
  *		OpenExternalSetup() 以外はフックされていてダイアログが開かない場合がある
  *		ダイアログが開く場合は OpenExternalSetupTab() がコールされる
  */
-void OpenExternalSetup(HWND hWndParent)
+void OpenExternalSetup(HWND hWnd)
 {
-	ExternalSetupPreProcess(CAddSettingPropSheetDlgPage::DefaultPage);
-	BOOL r = OpenExternalSetupTab(hWndParent, CAddSettingPropSheetDlgPage::DefaultPage);
+	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::DefaultPage);
+	BOOL r = OpenExternalSetupTab(hWnd, CAddSettingPropSheetDlgPage::DefaultPage);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::DefaultPage, r);
 }
 
@@ -279,8 +293,9 @@ void OpenSetupTerminal()
 	if (! LoadTTDLG()) {
 		return;
 	}
-	ExternalSetupPreProcess(CAddSettingPropSheetDlgPage::TermPage);
-	BOOL r = (*SetupTerminal)(HVTWin, &ts);
+	HWND hWnd = HVTWin;
+	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::TermPage);
+	BOOL r = (*SetupTerminal)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::TermPage, r);
 }
 
@@ -294,8 +309,9 @@ void OpenSetupWin()
 	if (! LoadTTDLG()) {
 		return;
 	}
-	ExternalSetupPreProcess(CAddSettingPropSheetDlgPage::WinPage);
-	BOOL r = (*SetupWin)(HVTWin, &ts);
+	HWND hWnd = HVTWin;
+	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::WinPage);
+	BOOL r = (*SetupWin)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::WinPage, r);
 }
 
@@ -305,15 +321,17 @@ void OpenSetupFont(HWND hWnd)
 		return;
 	}
 	CAddSettingPropSheetDlgPage page;
-	if (AddsettingCheckWin(hWnd) == ADDSETTING_WIN_VT) {
+	if (AddsettingCheckWin(NULL) == ADDSETTING_WIN_VT) {
 		page = FontPage;
+		hWnd = HVTWin;
 	}
 	else {
 		page = TekFontPage;
+		hWnd = HTEKWin;
 	}
 
 
-	ExternalSetupPreProcess(page);
+	ExternalSetupPreProcess(hWnd, page);
 	BOOL r = (*ChooseFontDlg)(hWnd, NULL, &ts);
 	ExternalSetupPostProcess(page, r);
 }
@@ -323,8 +341,9 @@ void OpenSetupKeyboard()
 	if (! LoadTTDLG()) {
 		return;
 	}
-	ExternalSetupPreProcess(CAddSettingPropSheetDlgPage::KeyboardPage);
-	BOOL r = (*SetupKeyboard)(HVTWin, &ts);
+	HWND hWnd = HVTWin;
+	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::KeyboardPage);
+	BOOL r = (*SetupKeyboard)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::KeyboardPage, r);
 }
 
@@ -333,8 +352,9 @@ void OpenSetupTCPIP()
 	if (! LoadTTDLG()) {
 		return;
 	}
-	ExternalSetupPreProcess(CAddSettingPropSheetDlgPage::TcpIpPage);
-	BOOL r = (*SetupTCPIP)(HVTWin, &ts);
+	HWND hWnd = HVTWin;
+	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::TcpIpPage);
+	BOOL r = (*SetupTCPIP)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::TcpIpPage, r);
 }
 
@@ -343,8 +363,9 @@ void OpenSetupGeneral()
 	if (! LoadTTDLG()) {
 		return;
 	}
-	ExternalSetupPreProcess(CAddSettingPropSheetDlgPage::GeneralPage);
-	BOOL r = (*SetupGeneral)(HVTWin,&ts);
+	HWND hWnd = HVTWin;
+	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::GeneralPage);
+	BOOL r = (*SetupGeneral)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::GeneralPage, r);
 }
 
@@ -353,8 +374,9 @@ void OpenSetupSerialPort()
 	if (! LoadTTDLG()) {
 		return;
 	}
-	ExternalSetupPreProcess(CAddSettingPropSheetDlgPage::SerialPortPage);
-	BOOL r = (*SetupSerialPort)(HVTWin, &ts);
+	HWND hWnd = HVTWin;
+	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::SerialPortPage);
+	BOOL r = (*SetupSerialPort)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::SerialPortPage, r);
 }
 
@@ -363,8 +385,9 @@ void OpenSetupTekWindow()
 	if (! LoadTTDLG()) {
 		return;
 	}
-	ExternalSetupPreProcess(CAddSettingPropSheetDlgPage::TekWinPage);
-	BOOL r = (*SetupWin)(HTEKWin, &ts);
+	HWND hWnd = HTEKWin;
+	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::TekWinPage);
+	BOOL r = (*SetupWin)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::TekWinPage, r);
 }
 
