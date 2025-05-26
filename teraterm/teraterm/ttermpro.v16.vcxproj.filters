@@ -84,9 +84,6 @@
     <ClCompile Include="..\common\ttlib.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
-    <ClCompile Include="ttplug.c">
-      <Filter>Source Files %28C%29</Filter>
-    </ClCompile>
     <ClCompile Include="ttsetup.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
@@ -303,6 +300,12 @@
     <ClCompile Include="ui_pp.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="ttplug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="plugin_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -368,6 +371,9 @@
       <Filter>dialog</Filter>
     </ResourceCompile>
     <ResourceCompile Include="ui_pp.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="plugin_pp.rc">
       <Filter>dialog</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -658,6 +664,12 @@
       <Filter>dialog</Filter>
     </ClInclude>
     <ClInclude Include="ui_pp_res.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="plugin_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="plugin_pp_res.h">
       <Filter>dialog</Filter>
     </ClInclude>
   </ItemGroup>

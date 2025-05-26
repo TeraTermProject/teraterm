@@ -66,7 +66,7 @@ add_executable(
   ttfileio.h
   ttime.c
   ttime.h
-  ttplug.c
+  ttplug.cpp
   ttplug.h
   ttsetup.c
   ttsetup.h
@@ -122,6 +122,10 @@ set(SRC_DIALOG
   mouse_pp.cpp
   mouse_pp.h
   mouse_pp.rc
+  plugin_pp.cpp
+  plugin_pp.h
+  plugin_pp.rc
+  plugin_pp_res.h
   protodlg.cpp
   protodlg.h
   resource.h

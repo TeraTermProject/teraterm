@@ -63,6 +63,7 @@
 #include "win_pp.h"
 #include "serial_pp.h"
 #include "ui_pp.h"
+#include "plugin_pp.h"
 
 #include "addsetting.h"
 
@@ -1512,6 +1513,7 @@ enum {
 	PP_TERMINAL,
 	PP_SERIAL,
 	PP_WINDOW,
+	PP_PLUGIN,
 	PP_DEBUG,
 	PP_MAX,
 };
@@ -1560,7 +1562,7 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 		pages[PP_UI] = UIPageCreate(hInstance, &ts);
 	}
 	pages[PP_WINDOW] = CreateWinPP(hInstance, hParentWnd, &ts);
-
+	pages[PP_PLUGIN] = PluginPageCreate(hInstance, &ts);
 
 	for (int i = 0; i < PP_MAX; i++) {
 		HPROPSHEETPAGE page = pages[i];

@@ -192,6 +192,7 @@
     <ClCompile Include="logdlg.cpp" />
     <ClCompile Include="log_pp.cpp" />
     <ClCompile Include="mouse_pp.cpp" />
+    <ClCompile Include="plugin_pp.cpp" />
     <ClCompile Include="scp.cpp" />
     <ClCompile Include="sendfiledlg.cpp" />
     <ClCompile Include="serial_pp.cpp" />
@@ -212,7 +213,7 @@
     <ClCompile Include="ttdialog.c" />
     <ClCompile Include="ttfileio.c" />
     <ClCompile Include="ttime.c" />
-    <ClCompile Include="ttplug.c" />
+    <ClCompile Include="ttplug.cpp" />
     <ClCompile Include="ttsetup.c" />
     <ClCompile Include="ttwinman.c" />
     <ClCompile Include="ttwsk.c" />
@@ -264,6 +265,8 @@
     <ClInclude Include="logdlg.h" />
     <ClInclude Include="log_pp.h" />
     <ClInclude Include="mouse_pp.h" />
+    <ClInclude Include="plugin_pp.h" />
+    <ClInclude Include="plugin_pp_res.h" />
     <ClInclude Include="scp.h" />
     <ClInclude Include="sendfiledlg.h" />
     <ClInclude Include="sendmem.h" />
@@ -299,6 +302,7 @@
     <ResourceCompile Include="filesys_log.rc" />
     <ResourceCompile Include="font_pp.rc" />
     <ResourceCompile Include="mouse_pp.rc" />
+    <ResourceCompile Include="plugin_pp.rc" />
     <ResourceCompile Include="teraterm_manifest.rc" />
     <ResourceCompile Include="themedlg.rc" />
     <ResourceCompile Include="tt-version.rc" />
