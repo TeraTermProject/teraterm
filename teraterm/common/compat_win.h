@@ -258,6 +258,9 @@ BOOL _SetupDiGetDevicePropertyW(HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceI
 								DEVPROPTYPE *PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize,
 								PDWORD RequiredSize, DWORD Flags);
 
+// wintrust.dll
+extern LONG (WINAPI *pWinVerifyTrust)(HWND hwnd, GUID *pgActionID, LPVOID pWVTData);
+
 void WinCompatInit();
 
 #ifdef __cplusplus

@@ -32,6 +32,8 @@
 #include <string.h>
 #include <assert.h>
 #include <windows.h>
+#include <wintrust.h>
+#include <softpub.h>
 
 #include "tttypes.h"
 #include "ttcommon.h"
@@ -94,6 +96,51 @@ static void SetFromListView(HWND hWnd)
 		info.enable = enable;
 		PluginAddInfo(&info);
 	}
+}
+
+/**
+ * 署名検証
+ */
+static wchar_t *VerifySignature(LPCWSTR pwszSourceFile)
+{
+	if (pWinVerifyTrust == NULL) {
+		// WinVerifyTrustが使用できない (XP未満)
+		return _wcsdup(L"-");
+	}
+
+	WINTRUST_FILE_INFO FileData = {};
+	FileData.cbStruct = sizeof(WINTRUST_FILE_INFO);
+	FileData.pcwszFilePath = pwszSourceFile;
+
+	WINTRUST_DATA WinTrustData = {};
+	WinTrustData.cbStruct = sizeof(WinTrustData);
+	WinTrustData.dwUIChoice = WTD_UI_NONE;
+	WinTrustData.fdwRevocationChecks = WTD_REVOKE_NONE;
+	WinTrustData.dwUnionChoice = WTD_CHOICE_FILE;
+	WinTrustData.dwStateAction = WTD_STATEACTION_VERIFY;
+	WinTrustData.pFile = &FileData;
+
+	GUID guidAction = WINTRUST_ACTION_GENERIC_VERIFY_V2;
+	LONG r = pWinVerifyTrust(NULL, &guidAction, &WinTrustData);	// XP+
+
+	wchar_t *str;
+	switch (r) {
+	case ERROR_SUCCESS:
+		str = _wcsdup(L"verified");
+		break;
+	case TRUST_E_NOSIGNATURE:
+		str = _wcsdup(L"no signature");
+		break;
+	default:
+		aswprintf(&str, L"not verified(%08x)", r);
+		break;
+	}
+
+	// 状態データを閉じる
+	WinTrustData.dwStateAction = WTD_STATEACTION_CLOSE;
+	pWinVerifyTrust(NULL, &guidAction, &WinTrustData);
+
+	return str;
 }
 
 /**
@@ -171,6 +218,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		lvcol.iSubItem = 3;
 		SendMessageA(hWndList, LVM_INSERTCOLUMNA, 3, (LPARAM)&lvcol);
 
+		lvcol.pszText = (LPSTR)"verify";
+		lvcol.iSubItem = 4;
+		SendMessageA(hWndList, LVM_INSERTCOLUMNA, 4, (LPARAM)&lvcol);
+
 		for (int i = 0;; i++) {
 			PluginInfo info;
 			if(PluginGetInfo(i, &info) == FALSE) {
@@ -209,10 +260,16 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			item.pszText = (LPWSTR)order_str;
 			SendMessageW(hWndList, LVM_SETITEMW, 0, (LPARAM)&item);
 			free(order_str);
+
+			wchar_t *verify_str = VerifySignature(info.filename);
+			item.iSubItem = 4;
+			item.pszText = verify_str;
+			SendMessageW(hWndList, LVM_SETITEMW, 0, (LPARAM)&item);
+			free(verify_str);
 		}
 
 		// 幅を調整
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 5; i++) {
 			ListView_SetColumnWidth(hWndList, i, LVSCW_AUTOSIZE);
 		}
 
