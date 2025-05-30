@@ -35,6 +35,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXOutputBuffering", "TTXOu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXCheckUpdate", "TTXCheckUpdate\TTXCheckUpdate.v17.vcxproj", "{937DFA65-5709-4643-B778-482C15DEC581}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXChangeFontSize", "TTXChangeFontSize\TTXChangeFontSize\TTXChangeFontSize.v17.vcxproj", "{56807EC2-1793-438F-942E-DE7F09283971}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -109,6 +111,10 @@ Global
 		{937DFA65-5709-4643-B778-482C15DEC581}.Debug|Win32.Build.0 = Debug|Win32
 		{937DFA65-5709-4643-B778-482C15DEC581}.Release|Win32.ActiveCfg = Release|Win32
 		{937DFA65-5709-4643-B778-482C15DEC581}.Release|Win32.Build.0 = Release|Win32
+		{56807EC2-1793-438F-942E-DE7F09283971}.Debug|Win32.ActiveCfg = Debug|Win32
+		{56807EC2-1793-438F-942E-DE7F09283971}.Debug|Win32.Build.0 = Debug|Win32
+		{56807EC2-1793-438F-942E-DE7F09283971}.Release|Win32.ActiveCfg = Release|Win32
+		{56807EC2-1793-438F-942E-DE7F09283971}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
