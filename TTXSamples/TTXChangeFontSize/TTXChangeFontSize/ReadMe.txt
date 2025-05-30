@@ -16,7 +16,7 @@ Example configuration (TERATERM.INI):
   FontSize2 = -19
 
 Example configuration (KEYBOARD.CNF):
-  [User]
+  [User keys]
   ; Control-1 -> Increase font size.
   User1=1026,3,58151
   ; Control-2 -> Decrease font size.

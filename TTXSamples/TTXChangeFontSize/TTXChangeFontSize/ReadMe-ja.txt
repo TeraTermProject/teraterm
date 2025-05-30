@@ -21,7 +21,7 @@ TTXChangeFontSize -- Tera TermのVTウィンドウにフォントサイズ変更メニューを表示す
   FontSize2 = -19
 
 設定例(KEYBOARD.CNF):
-  [User]
+  [User keys]
   ; Control-1 -> フォントサイズ拡大
   User1=1026,3,58151
   ; Control-2 -> フォントサイズ縮小
