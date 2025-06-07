@@ -33,14 +33,10 @@ jobs:
       id: cache-libs-restore
       uses: actions/cache/restore@v4
       with:
-        path: libs
-        key: ${{ matrix.VS_VERSION }}-${{ github.event_name }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.bat', 'ci_scripts/*.bat') }}
-
-    - name: download setup-x86_64.exe
-      run: |
-        chcp 932
-        mkdir buildtools\cygwin64
-        curl https://www.cygwin.com/setup-x86_64.exe --output buildtools\cygwin64\setup-x86_64.exe
+        path: |
+          libs
+          buildtools
+        key: ${{ matrix.VS_VERSION }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.bat', 'ci_scripts/*.bat') }}
 
     - uses: msys2/setup-msys2@v2
 
@@ -58,11 +54,6 @@ jobs:
       run: |
         chcp 932
         ci_scripts/build_appveyor_release_bat.bat
-
-    - name: after_build
-      run: |
-        chcp 932
-        ci_scripts/build_appveyor_release_bat_pre_cache.bat
 
     - name: Upload artifacts (zip)
       uses: actions/upload-artifact@v4
@@ -100,12 +91,18 @@ jobs:
         path: |
           installer/Output/*.sha512sum
 
-    - name: Save libs
+    - name: pre_cache
+      run: |
+        chcp 932
+        ci_scripts/build_appveyor_release_bat_pre_cache.bat
+
+    - name: save cache
       if: steps.cache-libs-restore.outputs.cache-hit != 'true'
       id: cache-libs-save
       uses: actions/cache/save@v4
       with:
         path: |
           libs
-        key: ${{ matrix.VS_VERSION }}-${{ github.event_name }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.bat', 'ci_scripts/*.bat') }}
+          buildtools
+        key: ${{ matrix.VS_VERSION }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.bat', 'ci_scripts/*.bat') }}
 
