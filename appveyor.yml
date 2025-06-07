@@ -70,7 +70,7 @@ after_build:
   #   リリースではキャッシュを使わないので呼ばなくてよい
   # - ci_scripts/build_appveyor_release_bat_pre_cache.bat
   # 署名用スクリプトにバージョンを入れてコピーする
-  - ps: (Get-Content ci_scripts/create_installer.ps1) -replace 'TT_VERSION', "%TT_VERSION%" | Set-Content installer/Output/create_installer.ps1
+  - ps: (Get-Content ci_scripts/create_installer.ps1) -replace 'TT_VERSION', ${env:TT_VERSION} | Set-Content installer/Output/create_installer.ps1
 
 artifacts:
   - path: installer/Output/*.zip
