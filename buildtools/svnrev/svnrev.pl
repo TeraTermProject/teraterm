@@ -345,9 +345,8 @@ elsif((-d "$source_root/.git" || -f "$source_root/.git") && $git ne "") {
 		$branch =~ s/[\r\n]$//g;
 		$svninfo{'name'} = $branch;
 
-		my $revision = `\"$git\" log --oneline -1`;
-		chomp($revision);
-		$revision =~ s/^(\w+) .+/$1/;
+		my $revision = `\"$git\" rev-parse --short HEAD`;
+		$revision =~ s/[\r\n]$//g;
 		$svninfo{'Revision'} = $revision;
 	}
 }
