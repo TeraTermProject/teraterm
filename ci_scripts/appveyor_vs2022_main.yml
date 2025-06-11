@@ -1,0 +1,54 @@
+image: Visual Studio 2022
+
+environment:
+  APPVEYOR_SAVE_CACHE_ON_ERROR: true
+  VS_VERSION: 2022
+  NOPAUSE: 1
+
+branches:
+  only:
+    - main
+
+init:
+  # 実行している yml を表示
+  - echo ci_scripts\appveyor_vs2022_main.yml
+  # タイムゾーンを JST に変更
+  - tzutil /s "Tokyo Standard Time"
+
+cache:
+  - libs
+
+before_build:
+  # インストール済みの Cygwin を更新
+  # - ci_scripts/upgrade_syscygwin.bat
+  # インストール済みの Cygwin にパッケージを追加
+  - ci_scripts/addpkg_syscygwin.bat
+  # インストール済みの MSYS2 にパッケージを追加
+  # - ci_scripts/addpkg_msys2.bat
+  # 自前の Cygwin をインストール
+  # - buldtools/install_cygwin.bat
+  # 自前の Inno Setup をインストール
+  - buildtools/install_innosetup.bat
+
+build_script:
+  - ci_scripts/build_appveyor_release_bat.bat
+
+after_build:
+  # ソース管理しているファイルがキャッシュされて更新されなくなるのを防ぐため削除
+  - ci_scripts/build_appveyor_release_bat_pre_cache.bat
+
+artifacts:
+  - path: installer/Output/*.exe
+  - path: installer/Output/*.zip
+  - path: installer/Output/*.sha256sum
+  - path: installer/Output/*.sha512sum
+
+# AppVeyor のプロジェクトの Settings - Environment に WEBHOOK_URL を設定するかどうかで制御する
+on_success:
+  - ci_scripts\notify.bat success
+on_failure:
+  - ci_scripts\notify.bat failure
+
+on_finish:
+# ビルド完了後に RDP が有効になる。blockRdp を指定しているので、完了後にも終了しない。
+# - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

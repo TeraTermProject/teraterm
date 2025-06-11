@@ -5,9 +5,13 @@ environment:
   VS_VERSION: 2022
   NOPAUSE: 1
 
-build: off
+branches:
+  except:
+    - main
 
 init:
+  # 実行している yml を表示
+  - echo ci_scripts\appveyor_vs2022_snapshot.yml
   # タイムゾーンを JST に変更
   - tzutil /s "Tokyo Standard Time"
 
