@@ -88,6 +88,7 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 	// 1929      2019     16.11.x           14.29
 	// 1930      2022     17.0.x            14.30
 	// 1936      2022     17.6.x            14.36
+	// 1944      2022     17.14.x           14.44
 	msc_ver = (_MSC_FULL_VER / 10000000);
 	msc_low_ver = (_MSC_FULL_VER / 100000) % 100;
 	if (msc_ver < 19) {
@@ -140,7 +141,11 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 
 #if defined(WDK_NTDDI_VERSION)
 // ビルドしたときに使われた SDK のバージョンを取得する
-// URL: https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
+// 
+// https://developer.microsoft.com/en-us/windows/downloads/windows-SDK
+// https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
+// https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/index-legacy
+// 
 // バージョン番号には
 // (1) Visual Studio でプロジェクトのプロパティの "Windows SDK バージョン" に列挙されるバージョン
 // (2) インストールされた SDK が「アプリと機能」で表示されるバージョン
@@ -155,14 +160,35 @@ static void GetSDKInfo(char *buf, size_t buf_size)
 		strncpy_s(buf, buf_size, "Windows SDK", _TRUNCATE);
 		switch (WDK_NTDDI_VERSION) {
 			case 0x0A00000B: // NTDDI_WIN10_CO
-				             // 10.0.22000.194 も存在するが判定できない
-				strncat_s(buf, buf_size, " for Windows 11 (10.0.22000.832)", _TRUNCATE);
+				             //   10.0.22000.194
+				             //   10.0.22000.832  July 29, 2022
+				strncat_s(buf, buf_size, " for Windows 11 (10.0.22000)", _TRUNCATE);
 				break;
 			case 0x0A00000C: // NTDDI_WIN10_NI
-				             // 10.0.22621.1 も存在するが判定できない
-				             // (2)インストーラ, (3)URL では別扱いの 10.0.22621.1778 も同じ判定になる
-				             // AppVeyor で使われているはずのバージョン番号を返す
-				strncat_s(buf, buf_size, " for Windows 11 (10.0.22621.755)", _TRUNCATE);
+				             //   10.0.22621.1
+				             //   10.0.22621.755   October 25, 2022
+				             //   10.0.22621.1778  May 2023
+				             //   10.0.22621.2428  May 2023
+				             //   10.0.22621.5040  April 2025
+				strncat_s(buf, buf_size, " for Windows 11 (10.0.22621)", _TRUNCATE);
+				break;
+			case 0x0A00000D: // NTDDI_WIN10_CU
+				             // Only in Insider program?
+				strncat_s(buf, buf_size, " for Windows 11 (10.0.25236)", _TRUNCATE);
+				break;
+			case 0x0A00000E: // NTDDI_WIN11_ZN
+				strncat_s(buf, buf_size, " for Windows 11 (10.0.25398)", _TRUNCATE);
+				break;
+			case 0x0A00000F: // NTDDI_WIN11_GA
+				             // Only in Insider program?
+				strncat_s(buf, buf_size, " for Windows 11 (10.0.25941)", _TRUNCATE);
+				break;
+			case 0x0A000010: // NTDDI_WIN11_GE
+				             //   10.0.26100.1742  September 2024
+				             //   10.0.26100.3323  March 2025
+				             //   10.0.26100.3916  April 2025
+				             //   10.0.26100.4188  May 2025
+				strncat_s(buf, buf_size, " for Windows 11 (10.0.26100)", _TRUNCATE);
 				break;
 			default: {
 				char str[32];
@@ -201,13 +227,16 @@ static void GetSDKInfo(char *buf, size_t buf_size)
 				strncat_s(buf, buf_size, " Version 1903 (10.0.18362.1)", _TRUNCATE);
 				break;
 			case 0x0A000008: // NTDDI_WIN10_VB, 2004
-				strncat_s(buf, buf_size, " Version 2004 (10.0.19041.685)", _TRUNCATE);
+				             //   10.0.19041.0
+				             //   10.0.19041.685   12/16/20
+				             //   10.0.19041.5609  4/2/2025
+				strncat_s(buf, buf_size, " Version 2004 (10.0.19041)", _TRUNCATE);
 				break;
 			case 0x0A000009: // NTDDI_WIN10_MN, 2004? cf. _PCW_REGISTRATION_INFORMATION
-				strncat_s(buf, buf_size, " Version 2004 (10.0.19645.0)", _TRUNCATE);
+				strncat_s(buf, buf_size, " Version 2004 (10.0.19645)", _TRUNCATE);
 				break;
 			case 0x0A00000A: // NTDDI_WIN10_FE, 2104
-				strncat_s(buf, buf_size, " Version 2104 (10.0.20348.1)", _TRUNCATE);
+				strncat_s(buf, buf_size, " Version 2104 (10.0.20348)", _TRUNCATE);
 				break;
 			default:
 				strncat_s(buf, buf_size, " (unknown)", _TRUNCATE);
