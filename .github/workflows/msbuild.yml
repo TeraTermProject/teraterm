@@ -36,7 +36,10 @@ jobs:
         path: |
           libs
           buildtools
-        key: ${{ matrix.VS_VERSION }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.bat', 'ci_scripts/*.bat') }}
+        key: cache-${{ matrix.VS_VERSION }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        restore-keys: |
+            cache-${{ matrix.VS_VERSION }}-
+            cache-
 
     - uses: msys2/setup-msys2@v2
 
@@ -91,18 +94,25 @@ jobs:
         path: |
           installer/Output/*.sha512sum
 
+    - name: Calculate cache hash
+      id: cache_hash
+      shell: bash
+      run: |
+        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
+
     - name: pre_cache
       run: |
         chcp 932
         ci_scripts/build_appveyor_release_bat_pre_cache.bat
 
     - name: save cache
-      if: steps.cache-libs-restore.outputs.cache-hit != 'true'
+      if: steps.cache-libs-restore.outputs.cache-hit != 'true'   # restore時keyが完全に一致したときtrue
       id: cache-libs-save
       uses: actions/cache/save@v4
       with:
         path: |
           libs
           buildtools
-        key: ${{ matrix.VS_VERSION }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.bat', 'ci_scripts/*.bat') }}
+        key: cache-${{ matrix.VS_VERSION }}-${{ steps.cache_hash.outputs.hash_value }}
 
