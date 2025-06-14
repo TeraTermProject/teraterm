@@ -20,6 +20,10 @@ jobs:
     env:
       NOPAUSE: 1
       VS_VERSION: ${{ matrix.VS_VERSION }}
+      ORGANIZATION_ID: 78e41f48-55fc-4f33-8ea5-08ac32f65ac8
+      PROJECT_SLUG: teraterm
+      SIGNING_POLICY_SLUG: test-signing
+      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
 
     steps:
     - uses: actions/checkout@v4
@@ -52,6 +56,52 @@ jobs:
       run: |
         chcp 932
         buildtools/install_innosetup.bat
+
+    - name: build_config
+      shell: bash
+      run: |
+        cd buildtools/svnrev/
+        perl svnrev.pl --root ../.. --header ../../teraterm/common/svnversion.h --cmake build_config.cmake --json build_config.json
+
+    - name: read buildinfo.json
+      id: read_buildinfo
+      shell: bash
+      run: |
+        json_content=$(cat buildtools/svnrev/build_config.json | jq -c .)
+        echo "json=$json_content" >> $GITHUB_OUTPUT
+
+    - name: set vars
+      id: vars
+      shell: bash
+      run: |
+        VERSION=${{ fromJson(steps.read_buildinfo.outputs.json).VERSION }}
+        DATE_TIME=${{ fromJson(steps.read_buildinfo.outputs.json).DATE }}-${{ fromJson(steps.read_buildinfo.outputs.json).TIME }}
+        VCSVERSION=${{ fromJson(steps.read_buildinfo.outputs.json).GITVERSION }}
+        SNAPSHOT_OUTPUT=teraterm-${VERSION}-${DATE_TIME}-${VCSVERSION}-snapshot
+        RELEASE_OUTPUT=teraterm-${VERSION}
+        RELEASE=${{ fromJson(steps.read_buildinfo.outputs.json).RELEASE }}
+        if [ "$RELEASE" = "0" ]; then
+          OUTPUT=${SNAPSHOT_OUTPUT}
+        else
+          OUTPUT=${RELEASE_OUTPUT}
+        fi
+        OUTPUT_ZIP=${OUTPUT}_ZIP
+        OUTPUT_EXE=${OUTPUT}_EXE
+        OUTPUT_FILES=${OUTPUT}_FILES
+        echo "SNAPSHOT_OUTPUT=${SNAPSHOT_OUTPUT}" >> $GITHUB_OUTPUT
+        echo "RELEASE_OUTPUT=${RELEASE_OUTPUT}" >> $GITHUB_OUTPUT
+        echo "RELEASE=${RELEASE}" >> $GITHUB_OUTPUT
+        echo "OUTPUT=${OUTPUT}" >> $GITHUB_OUTPUT
+        echo "OUTPUT_ZIP=${OUTPUT_ZIP}" >> $GITHUB_OUTPUT
+        echo "OUTPUT_EXE=${OUTPUT_EXE}" >> $GITHUB_OUTPUT
+        echo "OUTPUT_FILES=${OUTPUT_FILES}" >> $GITHUB_OUTPUT
+        echo "SNAPSHOT_OUTPUT=${SNAPSHOT_OUTPUT}"
+        echo "RELEASE_OUTPUT=${RELEASE_OUTPUT}"
+        echo "RELEASE=${RELEASE}"
+        echo "OUTPUT=${OUTPUT}"
+        echo "OUTPUT_ZIP=${OUTPUT_ZIP}"
+        echo "OUTPUT_EXE=${OUTPUT_EXE}"
+        echo "OUTPUT_FILES=${OUTPUT_FILES}"
 
     - name: build_script
       run: |
@@ -93,6 +143,116 @@ jobs:
         name: sha512sum-BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}
         path: |
           installer/Output/*.sha512sum
+
+    - name: Upload artifacts for sign (tareterm_portable.zip)
+      if: env.SIGNPATH_API_TOKEN != ''
+      id: upload-portable
+      uses: actions/upload-artifact@v4
+      with:
+        name: portable_unsigned
+        path: |
+          installer/Output/portable
+
+    - name: sign portable zip
+      if: env.SIGNPATH_API_TOKEN != ''
+      uses: signpath/github-action-submit-signing-request@v1
+      with:
+        api-token: '${{ env.SIGNPATH_API_TOKEN }}'
+        organization-id: '${{ env.ORGANIZATION_ID }}'
+        project-slug: '${{ env.PROJECT_SLUG }}'
+        signing-policy-slug: '${{ env.SIGNING_POLICY_SLUG }}'
+        artifact-configuration-slug: 'teraterm_portable'
+        github-artifact-id: '${{steps.upload-portable.outputs.artifact-id}}'
+        output-artifact-directory: 'installer/Output/portable_signed'
+        wait-for-completion: true
+        wait-for-completion-timeout-in-seconds: 1800
+
+    - name: rename portable signed zip
+      if: env.SIGNPATH_API_TOKEN != ''
+      shell: bash
+      run: |
+        OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
+        mkdir installer/Output/setup_src
+        cp -R installer/Output/portable_signed/teraterm installer/Output/setup_src/
+        mv installer/Output/portable_signed/teraterm "installer/Output/portable_signed/${OUTPUT}"
+
+    - name: Upload artifacts (portable signed zip)
+      if: env.SIGNPATH_API_TOKEN != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.vars.outputs.OUTPUT_ZIP }}
+        path: |
+          installer/Output/portable_signed
+
+    - name: unsigned setup
+      if: env.SIGNPATH_API_TOKEN != ''
+      run: |
+        cmake -P installer/iscc_signed.cmake
+
+    - name: Upload artifacts for sign (setup.exe)
+      if: env.SIGNPATH_API_TOKEN != ''
+      id: upload-setup
+      uses: actions/upload-artifact@v4
+      with:
+        name: setup_unsigned
+        path: |
+          installer/Output/setup
+
+    - name: sign setup
+      if: env.SIGNPATH_API_TOKEN != ''
+      uses: signpath/github-action-submit-signing-request@v1
+      with:
+        api-token: '${{ env.SIGNPATH_API_TOKEN }}'
+        organization-id: '${{ env.ORGANIZATION_ID }}'
+        project-slug: '${{ env.PROJECT_SLUG }}'
+        signing-policy-slug: '${{ env.SIGNING_POLICY_SLUG }}'
+        artifact-configuration-slug: 'ziped_installer'
+        github-artifact-id: '${{steps.upload-setup.outputs.artifact-id}}'
+        output-artifact-directory: 'installer/Output/setup_signed'
+        wait-for-completion: true
+        wait-for-completion-timeout-in-seconds: 1800
+
+    - name: rename signed setup
+      if: env.SIGNPATH_API_TOKEN != ''
+      shell: bash
+      run: |
+        OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
+        ls installer/Output/setup_signed/
+        echo mv installer/Output/setup_signed/teraterm-unsigned.exe installer/Output/setup_signed/${OUTPUT}.exe
+        mv installer/Output/setup_signed/teraterm-unsigned.exe installer/Output/setup_signed/${OUTPUT}.exe
+        ls installer/Output/setup_signed/
+
+    - name: Upload artifacts (signed setup)
+      if: env.SIGNPATH_API_TOKEN != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.vars.outputs.OUTPUT_EXE }}
+        path: |
+          installer/Output/setup_signed
+
+    - name: release files
+      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1'
+      shell: bash
+      run: |
+        OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
+        mkdir installer/Output/release
+        cp installer/Output/setup_signed/${OUTPUT}.exe installer/Output/release
+        pushd installer/Output/portable_signed
+        cmake -E tar cf ../release/${OUTPUT}.zip ${OUTPUT}
+        popd
+        cp installer/Output/*_pdb.zip installer/Output/release
+        pushd installer/Output/release
+        sha256sum *.zip *.exe > ${OUTPUT}.sha256sum
+        sha512sum *.zip *.exe > ${OUTPUT}.sha512sum
+        ls
+
+    - name: Upload artifacts (release files)
+      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1'
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.vars.outputs.OUTPUT_FILES }}
+        path: |
+          installer/Output/release
 
     - name: Calculate cache hash
       id: cache_hash
