@@ -21,13 +21,13 @@
     - [doc/ja/html/reference/develop.html](../doc/ja/html/reference/develop.html)
 - Tera Termをビルドしたときの最終的な生成ファイル
   - Release時
-    - installer/Output/teraterm-x.y.exe
-    - installer/Output/teraterm_x.y.zip
-    - installer/Output/teraterm_x.y_pdb.zip
+    - installer/Output/teraterm-x.y.z.exe
+    - installer/Output/teraterm_x.y.z.zip
+    - installer/Output/teraterm_x.y.z_pdb.zip
   - 通常ビルド(snapshot)時
-    - installer/Output/teraterm-x.y-rREV-YYMMDD_HHMMSS-username-snapshot.exe
-    - installer/Output/teraterm-x.y-rREV-YYMMDD_HHMMSS-username-snapshot.zip
-    - installer/Output/teraterm-x.y-rREV-YYMMDD_HHMMSS-username-snapshot_pdb.zip
+    - installer/Output/teraterm-x.y.z-YYMMDD_HHMMSS-githash-username-snapshot.exe
+    - installer/Output/teraterm-x.y.z-YYMMDD_HHMMSS-githash-username-snapshot.zip
+    - installer/Output/teraterm-x.y.z-YYMMDD_HHMMSS-githash-username-snapshot_pdb.zip
 
 ## pdbファイル
 
