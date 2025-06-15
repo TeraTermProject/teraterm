@@ -887,7 +887,7 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> &amp; w
 Response: DCS <i>Ps</i> $ r <i>Pt</i> ST
 <i>Ps</i> = 0    Valid request.
           <i>Pt</i> indicates the current setting of a valid control function
-          that the host asked about. 
+          that the host asked about.
           <i>Pt</i> consists of all the characters in the control function,
           except the CSI or ESC [ introducer characters.
    = 1    Invalid request. Does not send <i>Pt</i>.
@@ -926,9 +926,11 @@ Change color number <i>c</i> to the color specified by <i>spec</i>.<br>
 <tr><td>256</td> <td>bold attribute text color</td></tr>
 <tr><td>257</td> <td>underline attribute text color</td></tr>
 <tr><td>258</td> <td>blink attribute text color</td></tr>
-<tr><td>259</td> <td>reverse attribute text color</td></tr>
+<tr><td>259</td> <td>reverse attribute background color</td></tr>
 </table>
+After 256, same as OSC 5.
 
+<p>
 <i>spec</i> accepts following formats.
 <pre>
 rgb:<i>r</i>/<i>g</i>/<i>b</i>
@@ -958,7 +960,7 @@ The <i>c</i>  and character attribute are in the following: <br>
 <tr><td>0</td> <td>bold attribute text color</td></tr>
 <tr><td>1</td> <td>underline attribute text color</td></tr>
 <tr><td>2</td> <td>blink attribute text color</td></tr>
-<tr><td>3</td> <td>reverse attribute text color</td></tr>
+<tr><td>3</td> <td>reverse attribute background color</td></tr>
 </table>
 Format of <i>spec</i> is same as OSC 4's <i>spec</i>.<br>
 About Bold attribute, see <a href="#Bold">below</a>.
