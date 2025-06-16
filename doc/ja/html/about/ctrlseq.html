@@ -344,7 +344,7 @@
    = 2      画面全体の保護されていない文字を消去する。
 </pre>
 </td></tr>
-<tr><td>CSI ? <i>Ps</i> K</td>	<td>DECSEL</td>	<td>選択的行消去。保護されていない文字のみを消去する。<i>Ps</i> の省略時の値は 0。 
+<tr><td>CSI ? <i>Ps</i> K</td>	<td>DECSEL</td>	<td>選択的行消去。保護されていない文字のみを消去する。<i>Ps</i> の省略時の値は 0。
 <pre>
 <i>Ps</i> = 0      カーソル位置から行末までの保護されていない文字を消去する。
    = 1      行頭からカーソル位置までの保護されていない文字を消去する。
@@ -921,14 +921,16 @@ OSC <i>Ps</i> ; <i>Pt</i> BEL
 <i>c</i> は次の値を受け付ける。
 
 <table border="1">
-<tr><th>値</th>	<th>機能</th></tr>
+<tr><th><i>c</i></th>	<th>色番号/文字属性</th></tr>
 <tr><td>0-255</td> <td>色番号</td></tr>
 <tr><td>256</td> <td>太字(bold)属性<a href="#Bold">*</a>の文字色</td></tr>
 <tr><td>257</td> <td>下線(underline)属性の文字色</td></tr>
 <tr><td>258</td> <td>点滅(blink)属性の文字色</td></tr>
-<tr><td>259</td> <td>反転(reverse)属性の文字色</td></tr>
+<tr><td>259</td> <td>反転(reverse)属性の背景色</td></tr>
 </table>
+256以降は OSC 5 と同等。
 
+<p>
 <i>spec</i> は以下の形式を受け付ける。
 <pre>
 rgb:<i>r</i>/<i>g</i>/<i>b</i>
@@ -954,7 +956,7 @@ OSC 4 ; <i>c</i> ; rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i> ST
 <tr><td>0</td> <td>太字(bold)属性<a href="#Bold">*</a>の文字色</td></tr>
 <tr><td>1</td> <td>下線(underline)属性の文字色</td></tr>
 <tr><td>2</td> <td>点滅(blink)属性の文字色</td></tr>
-<tr><td>3</td> <td>反転(reverse)属性の文字色</td></tr>
+<tr><td>3</td> <td>反転(reverse)属性の背景色</td></tr>
 </table>
 <i>spec</i> の形式は、OSC 4 の <i>spec</i> と同じ。<br>
 太字属性については<a href="#Bold">下記</a>を参照
