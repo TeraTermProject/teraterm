@@ -93,6 +93,8 @@ copy /y ..\TTXSamples\Release\TTXttyplay.dll %dst%
 copy /y ..\TTXSamples\Release\TTXttyplay.pdb %dst%_pdb
 copy /y ..\TTXSamples\Release\TTXttyrec.dll %dst%
 copy /y ..\TTXSamples\Release\TTXttyrec.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release\TTXChangeFontSize.dll %dst%
+copy /y ..\TTXSamples\Release\TTXChangeFontSize.pdb %dst%_pdb
 
 pushd %dst%
 ren TTXFixedWinSize.dll _TTXFixedWinSize.dll
