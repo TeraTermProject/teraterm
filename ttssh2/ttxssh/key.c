@@ -2107,89 +2107,41 @@ error:
 	return (k);
 }
 
-
-int key_ec_validate_private(EC_KEY *key)
-{
-	BN_CTX *bnctx = NULL;
-	BIGNUM *order, *tmp;
-	int ret = -1;
-
-	if ((bnctx = BN_CTX_new()) == NULL)
-		goto out;
-	BN_CTX_start(bnctx);
-
-	if ((order = BN_CTX_get(bnctx)) == NULL ||
-	    (tmp = BN_CTX_get(bnctx)) == NULL)
-		goto out;
-
-	/* log2(private) > log2(order)/2 */
-	if (EC_GROUP_get_order(EC_KEY_get0_group(key), order, bnctx) != 1)
-		goto out;
-	if (BN_num_bits(EC_KEY_get0_private_key(key)) <=
-	    BN_num_bits(order) / 2) {
-		goto out;
-	}
-
-	/* private < order - 1 */
-	if (!BN_sub(tmp, order, BN_value_one()))
-		goto out;
-	if (BN_cmp(EC_KEY_get0_private_key(key), tmp) >= 0) {
-		goto out;
-	}
-	ret = 0;
-
-out:
-	if (bnctx)
-		BN_CTX_free(bnctx);
-	return ret;
-}
-
-// from openssh 5.8p1 key.c
+// from OpenSSH 10.0p2 sshkey.c
 int key_ec_validate_public(const EC_GROUP *group, const EC_POINT *public)
 {
-	BN_CTX *bnctx;
 	EC_POINT *nq = NULL;
-	BIGNUM *order, *x, *y, *tmp;
+	BIGNUM *order = NULL, *x = NULL, *y = NULL, *tmp = NULL;
 	int ret = -1;
 
-	if ((bnctx = BN_CTX_new()) == NULL) {
-		return ret;
-	}
-	BN_CTX_start(bnctx);
-
 	/*
-	* We shouldn't ever hit this case because bignum_get_ecpoint()
-	* refuses to load GF2m points.
-	*/
-	if (EC_METHOD_get_field_type(EC_GROUP_method_of(group)) !=
-		NID_X9_62_prime_field) {
-		goto out;
-	}
+	 * NB. This assumes OpenSSL has already verified that the public
+	 * point lies on the curve. This is done by EC_POINT_oct2point()Add commentMore actions
+	 * implicitly calling EC_POINT_is_on_curve(). If this code is ever
+	 * reachable with public points not unmarshalled using
+	 * EC_POINT_oct2point then the caller will need to explicitly check.
+	 */
 
 	/* Q != infinity */
 	if (EC_POINT_is_at_infinity(group, public)) {
 		goto out;
 	}
 
-	if ((x = BN_CTX_get(bnctx)) == NULL ||
-		(y = BN_CTX_get(bnctx)) == NULL ||
-		(order = BN_CTX_get(bnctx)) == NULL ||
-		(tmp = BN_CTX_get(bnctx)) == NULL) {
+	if ((x = BN_new()) == NULL ||
+	    (y = BN_new()) == NULL ||
+	    (order = BN_new()) == NULL ||
+	    (tmp = BN_new()) == NULL) {
 		goto out;
 	}
 
 	/* log2(x) > log2(order)/2, log2(y) > log2(order)/2 */
-	if (EC_GROUP_get_order(group, order, bnctx) != 1) {
+	if (EC_GROUP_get_order(group, order, NULL) != 1 ||
+	    EC_POINT_get_affine_coordinates_GFp(group, public,
+	    x, y, NULL) != 1) {
 		goto out;
 	}
-	if (EC_POINT_get_affine_coordinates_GFp(group, public,
-		x, y, bnctx) != 1) {
-		goto out;
-	}
-	if (BN_num_bits(x) <= BN_num_bits(order) / 2) {
-		goto out;
-	}
-	if (BN_num_bits(y) <= BN_num_bits(order) / 2) {
+	if (BN_num_bits(x) <= BN_num_bits(order) / 2 ||
+	    BN_num_bits(y) <= BN_num_bits(order) / 2) {
 		goto out;
 	}
 
@@ -2197,7 +2149,7 @@ int key_ec_validate_public(const EC_GROUP *group, const EC_POINT *public)
 	if ((nq = EC_POINT_new(group)) == NULL) {
 		goto out;
 	}
-	if (EC_POINT_mul(group, nq, NULL, public, order, bnctx) != 1) {
+	if (EC_POINT_mul(group, nq, NULL, public, order, NULL) != 1) {
 		goto out;
 	}
 	if (EC_POINT_is_at_infinity(group, nq) != 1) {
@@ -2208,16 +2160,49 @@ int key_ec_validate_public(const EC_GROUP *group, const EC_POINT *public)
 	if (!BN_sub(tmp, order, BN_value_one())) {
 		goto out;
 	}
-	if (BN_cmp(x, tmp) >= 0) {
-		goto out;
-	}
-	if (BN_cmp(y, tmp) >= 0) {
+	if (BN_cmp(x, tmp) >= 0 || BN_cmp(y, tmp) >= 0) {
 		goto out;
 	}
 	ret = 0;
 out:
-	BN_CTX_free(bnctx);
+	BN_clear_free(x);
+	BN_clear_free(y);
+	BN_clear_free(order);
+	BN_clear_free(tmp);
 	EC_POINT_free(nq);
+	return ret;
+}
+
+// from OpenSSH 10.0p2 sshkey.c
+int key_ec_validate_private(EC_KEY *key)
+{
+	BIGNUM *order = NULL, *tmp = NULL;
+	int ret = -1;
+
+	if ((order = BN_new()) == NULL || (tmp = BN_new()) == NULL) {
+		goto out;
+	}
+
+	/* log2(private) > log2(order)/2 */
+	if (EC_GROUP_get_order(EC_KEY_get0_group(key), order, NULL) != 1) {
+		goto out;
+	}
+	if (BN_num_bits(EC_KEY_get0_private_key(key)) <=
+	    BN_num_bits(order) / 2) {
+		goto out;
+	}
+
+	/* private < order - 1 */
+	if (!BN_sub(tmp, order, BN_value_one())) {
+		goto out;
+	}
+	if (BN_cmp(EC_KEY_get0_private_key(key), tmp) >= 0) {
+		goto out;
+	}
+	ret = 0;
+out:
+	BN_clear_free(order);
+	BN_clear_free(tmp);
 	return ret;
 }
 
