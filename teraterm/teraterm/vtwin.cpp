@@ -4341,7 +4341,7 @@ void CVTWindow::OnFileQVSend()
 
 void CVTWindow::OnFileChangeDir()
 {
-	OpenSetupGeneral();
+	OpenSetupGeneral(m_hWnd);
 }
 
 void CVTWindow::OnFilePrint()
@@ -4487,7 +4487,7 @@ void CVTWindow::OnExternalSetup()
 
 void CVTWindow::OnSetupTerminal()
 {
-	OpenSetupTerminal();
+	OpenSetupTerminal(m_hWnd);
 }
 
 
@@ -4517,7 +4517,7 @@ void CVTWindow::SetColor()
 
 void CVTWindow::OnSetupWindow()
 {
-	OpenSetupWin();
+	OpenSetupWin(m_hWnd);
 }
 
 void CVTWindow::OnSetupFont()
@@ -4527,7 +4527,7 @@ void CVTWindow::OnSetupFont()
 
 void CVTWindow::OnSetupKeyboard()
 {
-	OpenSetupKeyboard();
+	OpenSetupKeyboard(m_hWnd);
 }
 
 /*
@@ -4567,17 +4567,17 @@ static void OpenNewComport(const TTTSet *pts)
 
 void CVTWindow::OnSetupSerialPort()
 {
-	OpenSetupSerialPort();
+	OpenSetupSerialPort(m_hWnd);
 }
 
 void CVTWindow::OnSetupTCPIP()
 {
-	OpenSetupTCPIP();
+	OpenSetupTCPIP(m_hWnd);
 }
 
 void CVTWindow::OnSetupGeneral()
 {
-	OpenSetupGeneral();
+	OpenSetupGeneral(m_hWnd);
 }
 
 void CVTWindow::OnSetupSave()

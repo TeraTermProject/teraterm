@@ -36,7 +36,7 @@
 #include "vtterm.h"
 #include "commlib.h"
 #include "dlglib.h"
-#include "telnet.h"
+//#include "telnet.h"
 #include "setting.h"
 #include "ttdialog.h"
 #include "ttwinman.h"
@@ -288,12 +288,11 @@ void OpenExternalSetup(HWND hWnd)
  *	プラグインからの呼び出し
  *		SendMessage(HWin, WM_COMMAND, MAKELONG(ID_SETUP_TERMINAL, 0), 0);
  */
-void OpenSetupTerminal()
+void OpenSetupTerminal(HWND hWnd)
 {
 	if (! LoadTTDLG()) {
 		return;
 	}
-	HWND hWnd = HVTWin;
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::TermPage);
 	BOOL r = (*SetupTerminal)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::TermPage, r);
@@ -304,12 +303,11 @@ void OpenSetupTerminal()
  *	プラグインからの呼び出し
  *		SendMessage(HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
  */
-void OpenSetupWin()
+void OpenSetupWin(HWND hWnd)
 {
 	if (! LoadTTDLG()) {
 		return;
 	}
-	HWND hWnd = HVTWin;
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::WinPage);
 	BOOL r = (*SetupWin)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::WinPage, r);
@@ -321,7 +319,7 @@ void OpenSetupFont(HWND hWnd)
 		return;
 	}
 	CAddSettingPropSheetDlgPage page;
-	if (AddsettingCheckWin(NULL) == ADDSETTING_WIN_VT) {
+	if (AddsettingCheckWin(hWnd) == ADDSETTING_WIN_VT) {
 		page = FontPage;
 		hWnd = HVTWin;
 	}
@@ -336,62 +334,57 @@ void OpenSetupFont(HWND hWnd)
 	ExternalSetupPostProcess(page, r);
 }
 
-void OpenSetupKeyboard()
+void OpenSetupKeyboard(HWND hWnd)
 {
 	if (! LoadTTDLG()) {
 		return;
 	}
-	HWND hWnd = HVTWin;
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::KeyboardPage);
 	BOOL r = (*SetupKeyboard)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::KeyboardPage, r);
 }
 
-void OpenSetupTCPIP()
+void OpenSetupTCPIP(HWND hWnd)
 {
 	if (! LoadTTDLG()) {
 		return;
 	}
-	HWND hWnd = HVTWin;
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::TcpIpPage);
 	BOOL r = (*SetupTCPIP)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::TcpIpPage, r);
 }
 
-void OpenSetupGeneral()
+void OpenSetupGeneral(HWND hWnd)
 {
 	if (! LoadTTDLG()) {
 		return;
 	}
-	HWND hWnd = HVTWin;
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::GeneralPage);
 	BOOL r = (*SetupGeneral)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::GeneralPage, r);
 }
 
-void OpenSetupSerialPort()
+void OpenSetupSerialPort(HWND hWnd)
 {
 	if (! LoadTTDLG()) {
 		return;
 	}
-	HWND hWnd = HVTWin;
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::SerialPortPage);
 	BOOL r = (*SetupSerialPort)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::SerialPortPage, r);
 }
 
-void OpenSetupTekWindow()
+void OpenSetupTekWindow(HWND hWnd)
 {
 	if (! LoadTTDLG()) {
 		return;
 	}
-	HWND hWnd = HTEKWin;
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::TekWinPage);
 	BOOL r = (*SetupWin)(hWnd, &ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::TekWinPage, r);
 }
 
-void OpenSetupTekFont()
+void OpenSetupTekFont(HWND hWnd)
 {
-	return OpenSetupFont(HTEKWin);
+	return OpenSetupFont(hWnd);
 }

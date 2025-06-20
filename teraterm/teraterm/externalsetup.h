@@ -41,15 +41,17 @@ BOOL OpenExternalSetupTab(HWND hWndParent, CAddSettingPropSheetDlgPage page);
 
 // vtwinから使用
 void OpenExternalSetup(HWND hWndParent);
-void OpenSetupTerminal();
-void OpenSetupWin();
+void OpenSetupTerminal(HWND hWnd);
+void OpenSetupWin(HWND hWnd);
 void OpenSetupFont(HWND hWnd);
-void OpenSetupKeyboard();
-void OpenSetupSerialPort();
-void OpenSetupTCPIP();
-void OpenSetupGeneral();
-void OpenSetupTekWindow();
-void OpenSetupTekFont();
+void OpenSetupKeyboard(HWND hWnd);
+void OpenSetupSerialPort(HWND hWnd);
+void OpenSetupTCPIP(HWND hWnd);
+void OpenSetupGeneral(HWND hWnd);
+
+// TEKウィンドウ
+void OpenSetupTekWindow(HWND hWnd);
+void OpenSetupTekFont(HWND hWnd);
 
 #ifdef __cplusplus
 }

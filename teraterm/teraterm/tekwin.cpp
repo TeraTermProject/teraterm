@@ -719,12 +719,12 @@ void CTEKWindow::OnEditClearScreen()
 
 void CTEKWindow::OnSetupWindow()
 {
-	OpenSetupTekWindow();
+	OpenSetupTekWindow(m_hWnd);
 }
 
 void CTEKWindow::OnSetupFont()
 {
-	OpenSetupTekFont();
+	OpenSetupTekFont(m_hWnd);
 }
 
 /**
