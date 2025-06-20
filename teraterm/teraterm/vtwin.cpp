@@ -2767,14 +2767,8 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 			}
 		}
 		else {
-			if (isSizing) {
-				// ウィンドウがリサイズした
-				w = cx / FontWidth;
-				h = cy / FontHeight;
-			} else {
-				// ウィンドウが移動した
-				return;
-			}
+			w = cx / FontWidth;
+			h = cy / FontHeight;
 		}
 
 		HideStatusLine();
