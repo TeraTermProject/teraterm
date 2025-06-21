@@ -168,6 +168,7 @@
     <ClCompile Include="ttlib_static_dir.cpp" />
     <ClCompile Include="ttlib_types.cpp" />
     <ClCompile Include="tttext.cpp" />
+    <ClCompile Include="tttypes_termid.cpp" />
     <ClCompile Include="win32helper.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -203,6 +204,9 @@
     <ClInclude Include="ttlib_static_dir.h" />
     <ClInclude Include="ttlib_types.h" />
     <ClInclude Include="tttext.h" />
+    <ClInclude Include="tttypes_charset.h" />
+    <ClInclude Include="tttypes_key.h" />
+    <ClInclude Include="tttypes_termid.h" />
     <ClInclude Include="win32helper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
