@@ -159,11 +159,6 @@ exit /b 0
 
 rem ####################
 :search_perl
-if exist %PERL_PATH%\perl.exe (
-    set PERL=%PERL_PATH%\perl.exe
-    exit /b 0
-)
-
 call %CUR%..\buildtools\find_perl.bat
 exit /b
 

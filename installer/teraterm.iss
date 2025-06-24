@@ -1,9 +1,17 @@
 ﻿#define AppName "Tera Term"
 #ifndef AppVer
-#define AppVer "5.4.1-dev"
+#define AppVer "5.5.0-dev"
 #endif
-;#define VerSubStr
-;#define OutputSubStr
+
+; App Version
+#ifndef AppVersion
+#define AppVersion "wild_build"
+#endif
+
+; source dir
+#ifndef SrcDir
+#define SrcDir "teraterm"
+#endif
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
@@ -36,25 +44,27 @@ AppPublisherURL=https://teratermproject.github.io/
 AppSupportURL=https://teratermproject.github.io/
 AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 AppName={#AppName}
-#ifndef VerSubStr
-AppVersion={#AppVer}
-#else
-AppVersion={#AppVer} {#VerSubStr}
-#endif
-LicenseFile=release\license.txt
+AppVersion={#AppVersion}
+LicenseFile={#SrcDir}\license.txt
 DefaultDirName={commonpf}\teraterm5
 DefaultGroupName={#AppName} 5
 ShowLanguageDialog=yes
 AllowNoIcons=true
 UninstallDisplayIcon={app}\ttermpro.exe
-#ifndef OutputSubStr
-OutputBaseFilename=teraterm-{#AppVer}
-#else
-OutputBaseFilename=teraterm-{#AppVer}-{#OutputSubStr}
-#endif
+OutputBaseFilename={#OutputBaseFilename}
 PrivilegesRequired=none
 SolidCompression=yes
 Compression=lzma2/ultra64
+#if defined(M_X64)
+ArchitecturesAllowed=win64
+ArchitecturesInstallIn64BitMode=x64os
+#elif defined(M_ARM64)
+ArchitecturesAllowed=arm64
+ArchitecturesInstallIn64BitMode=arm64
+#else
+ArchitecturesAllowed=x86compatible
+ArchitecturesInstallIn64BitMode=
+#endif
 
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl
@@ -91,25 +101,27 @@ Source: release\screencapture.ttl; DestDir: {app}; Components: TeraTerm
 Source: release\ssh2login.ttl; DestDir: {app}; Components: TeraTerm
 Source: release\wait_regex.ttl; DestDir: {app}; Components: TeraTerm
 Source: release\lang\Default.lng; DestDir: {app}\lang; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: release\lang\Japanese.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\German.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\French.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\Russian.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\Korean.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\Simplified Chinese.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\Spanish.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\Traditional Chinese.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\Tamil.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\ja_JP.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\de_DE.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\fr_FR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\ru_RU.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\ko_KR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\zh_CN.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\es_ES.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\zh_TW.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\ta_IN.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\pt_BR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang_utf16le\Default.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: release\lang_utf16le\Japanese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\German.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\French.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\Russian.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\Korean.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\Simplified Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\Spanish.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\Traditional Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\Tamil.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\ja_JP.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\de_DE.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\fr_FR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\ru_RU.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\ko_KR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\zh_CN.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\es_ES.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\zh_TW.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\ta_IN.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\pt_BR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: ..\ttssh2\ttxssh\Release\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH
 Source: ..\cygwin\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm
