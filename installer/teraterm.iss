@@ -91,26 +91,26 @@ Source: release\screencapture.ttl; DestDir: {app}; Components: TeraTerm
 Source: release\ssh2login.ttl; DestDir: {app}; Components: TeraTerm
 Source: release\wait_regex.ttl; DestDir: {app}; Components: TeraTerm
 Source: release\lang\Default.lng; DestDir: {app}\lang; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: release\lang\Japanese.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\German.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\French.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\Russian.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\Korean.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\Simplified Chinese.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\Spanish.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\Traditional Chinese.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\Tamil.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\ja_JP.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\de_DE.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\fr_FR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\ru_RU.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\ko_KR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\zh_CN.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\es_ES.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\zh_TW.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\ta_IN.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang\pt_BR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang_utf16le\Default.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: release\lang_utf16le\Japanese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\German.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\French.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\Russian.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\Korean.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\Simplified Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\Spanish.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\Traditional Chinese.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\Tamil.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\ja_JP.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\de_DE.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\fr_FR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\ru_RU.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\ko_KR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\zh_CN.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\es_ES.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\zh_TW.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang_utf16le\ta_IN.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang_utf16le\pt_BR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: ..\ttssh2\ttxssh\Release\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH
@@ -568,23 +568,23 @@ begin
 
   case UILangFilePage.SelectedValueIndex of
     1:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Japanese.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\ja_JP.lng', iniFile);
     2:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\German.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\de_DE.lng', iniFile);
     3:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\French.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\fr_FR.lng', iniFile);
     4:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Russian.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\ru_RU.lng', iniFile);
     5:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Korean.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\ko_KR.lng', iniFile);
     6:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Simplified Chinese.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\zh_CN.lng', iniFile);
     7:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Traditional Chinese.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\zh_TW.lng', iniFile);
     8:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Spanish.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\es_ES.lng', iniFile);
     9:
-      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Tamil.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\ta_IN.lng', iniFile);
     else
       SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Default.lng', iniFile);
   end;
@@ -704,23 +704,23 @@ begin
         if FileExists(GetDefaultIniFileName()) then
         begin
           iniFile := Lowercase(GetIniString('Tera Term', 'UILanguageFile', '', GetDefaultIniFilename()));
-          if iniFile = 'lang_utf16le\japanese.lng' then
+          if iniFile = 'lang_utf16le\ja_JP.lng' then
             UILangFilePage.SelectedValueIndex := 1
-          else if iniFile = 'lang_utf16le\german.lng' then
+          else if iniFile = 'lang_utf16le\de_DE.lng' then
             UILangFilePage.SelectedValueIndex := 2
-          else if iniFile = 'lang_utf16le\french.lng' then
+          else if iniFile = 'lang_utf16le\fr_FR.lng' then
             UILangFilePage.SelectedValueIndex := 3
-          else if iniFile = 'lang_utf16le\russian.lng' then
+          else if iniFile = 'lang_utf16le\ru_RU.lng' then
             UILangFilePage.SelectedValueIndex := 4
-          else if iniFile = 'lang_utf16le\korean.lng' then
+          else if iniFile = 'lang_utf16le\ko_KR.lng' then
             UILangFilePage.SelectedValueIndex := 5
-          else if iniFile = 'lang_utf16le\simplified chinese.lng' then
+          else if iniFile = 'lang_utf16le\zh_CN.lng' then
             UILangFilePage.SelectedValueIndex := 6
-          else if iniFile = 'lang_utf16le\traditional chinese.lng' then
+          else if iniFile = 'lang_utf16le\zh_TW.lng' then
             UILangFilePage.SelectedValueIndex := 7
-          else if iniFile = 'lang_utf16le\Spanish.lng' then
+          else if iniFile = 'lang_utf16le\es_ES.lng' then
             UILangFilePage.SelectedValueIndex := 8
-          else if iniFile = 'lang_utf16le\Tamil.lng' then
+          else if iniFile = 'lang_utf16le\ta_IN.lng' then
             UILangFilePage.SelectedValueIndex := 9
           else
             UILangFilePage.SelectedValueIndex := 0;
