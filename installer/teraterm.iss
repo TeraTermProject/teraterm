@@ -1,9 +1,19 @@
 ﻿#define AppName "Tera Term"
-#ifndef AppVer
-#define AppVer "5.5.0-dev"
+
+; 出力ファイル名(exeなし)
+#ifndef OutputBaseFilename
+#define OutputBaseFilename "teraterm-wild_build"
 #endif
-;#define VerSubStr
-;#define OutputSubStr
+
+; App Version
+#ifndef AppVersion
+#define AppVersion "wild_build"
+#endif
+
+; source dir
+#ifndef SrcDir
+#define SrcDir "teraterm"
+#endif
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
@@ -36,25 +46,27 @@ AppPublisherURL=https://teratermproject.github.io/
 AppSupportURL=https://teratermproject.github.io/
 AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 AppName={#AppName}
-#ifndef VerSubStr
-AppVersion={#AppVer}
-#else
-AppVersion={#AppVer} {#VerSubStr}
-#endif
-LicenseFile=release\license.txt
+AppVersion={#AppVersion}
+LicenseFile={#SrcDir}\license.txt
 DefaultDirName={commonpf}\teraterm5
 DefaultGroupName={#AppName} 5
 ShowLanguageDialog=yes
 AllowNoIcons=true
 UninstallDisplayIcon={app}\ttermpro.exe
-#ifndef OutputSubStr
-OutputBaseFilename=teraterm-{#AppVer}
-#else
-OutputBaseFilename=teraterm-{#AppVer}-{#OutputSubStr}
-#endif
+OutputBaseFilename={#OutputBaseFilename}
 PrivilegesRequired=none
 SolidCompression=yes
 Compression=lzma2/ultra64
+#if defined(M_X64)
+ArchitecturesAllowed=win64
+ArchitecturesInstallIn64BitMode=x64os
+#elif defined(M_ARM64)
+ArchitecturesAllowed=arm64
+ArchitecturesInstallIn64BitMode=arm64
+#else
+ArchitecturesAllowed=x86compatible
+ArchitecturesInstallIn64BitMode=
+#endif
 
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl
@@ -69,74 +81,74 @@ Name: {app}\lang; Components: TeraTerm
 Name: {app}\lang_utf16le; Components: TeraTerm
 
 [Files]
-Source: ..\teraterm\release\ttermpro.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
-Source: ..\teraterm\release\ttpcmn.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
-Source: release\TERATERM.INI; DestDir: {app}; Components: TeraTerm
-Source: release\TSPECIAL1.TTF; DestDir: {commonfonts}; Components: TeraTerm; Attribs: readonly; Flags: onlyifdoesntexist overwritereadonly uninsneveruninstall; FontInstall: Tera Special; Check: isAbleToInstallFont
-;Source: release\TSPECIAL1.TTF; DestDir: {app}; Components: TeraTerm
-Source: ..\doc\en\teraterm.chm; DestDir: {app}; Components: TeraTerm
-Source: ..\doc\ja\teratermj.chm; DestDir: {app}; Components: TeraTerm
-Source: release\license.txt; DestDir: {app}; Components: TeraTerm
-Source: release\IBMKEYB.CNF; DestDir: {app}; Components: TeraTerm
-Source: release\IBMKEYB.CNF; DestDir: {app}; Components: TeraTerm; DestName: KEYBOARD.CNF
-Source: release\VT200.CNF; DestDir: {app}; Components: TeraTerm
-Source: ..\teraterm\release\keycode.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
-Source: ..\teraterm\release\ttpmacro.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
-Source: release\delpassw.ttl; DestDir: {app}; Components: TeraTerm
-Source: release\dialup.ttl; DestDir: {app}; Components: TeraTerm
-Source: release\login.ttl; DestDir: {app}; Components: TeraTerm
-Source: release\mpause.ttl; DestDir: {app}; Components: TeraTerm
-Source: release\random.ttl; DestDir: {app}; Components: TeraTerm
-Source: release\screencapture.ttl; DestDir: {app}; Components: TeraTerm
-Source: release\ssh2login.ttl; DestDir: {app}; Components: TeraTerm
-Source: release\wait_regex.ttl; DestDir: {app}; Components: TeraTerm
-Source: release\lang\Default.lng; DestDir: {app}\lang; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: release\lang\ja_JP.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\de_DE.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\fr_FR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\ru_RU.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\ko_KR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\zh_CN.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\es_ES.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\zh_TW.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\ta_IN.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang\pt_BR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\Default.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: release\lang_utf16le\ja_JP.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\de_DE.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\fr_FR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\ru_RU.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\ko_KR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\zh_CN.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\es_ES.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\zh_TW.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\ta_IN.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: release\lang_utf16le\pt_BR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
-Source: ..\ttssh2\ttxssh\Release\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
-Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH
-Source: ..\cygwin\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm
-Source: ..\cygwin\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
-Source: ..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}; Components: cygterm
-Source: ..\cygwin\Release\cyglaunch.exe; DestDir: {app}; Components: cygterm
-Source: ..\ttpmenu\Release\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
-Source: ..\ttpmenu\readme.txt; DestDir: {app}; DestName: "ttmenu_readme-j.txt"; Components: TeraTerm_Menu
-Source: ..\TTProxy\Release\TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion
-Source: release\theme\Advanced.sample; DestDir: {app}\theme\; Components: TeraTerm
-Source: release\theme\ImageFile.INI; DestDir: {app}\theme\; Components: TeraTerm
-Source: release\theme\Scale.INI; DestDir: {app}\theme\; Components: TeraTerm
-Source: release\theme\Tile.INI; DestDir: {app}\theme\; Components: TeraTerm
-Source: release\theme\scale\23.jpg; DestDir: {app}\theme\scale; Components: TeraTerm
-Source: release\theme\scale\43.jpg; DestDir: {app}\theme\scale; Components: TeraTerm
-Source: release\theme\tile\03.jpg; DestDir: {app}\theme\tile; Components: TeraTerm
-Source: release\theme\tile\44.jpg; DestDir: {app}\theme\tile; Components: TeraTerm
-Source: ..\TTXKanjiMenu\release\ttxkanjimenu.dll; DestDir: {app}\; Components: Additional_Plugins/TTXKanjiMenu; Flags: ignoreversion
-Source: ..\TTXSamples\release\TTXResizeMenu.dll; DestDir: {app}\; Components: Additional_Plugins/TTXResizeMenu; Flags: ignoreversion
-Source: ..\TTXSamples\release\TTXttyrec.dll; DestDir: {app}\; Components: Additional_Plugins/TTXttyrec; Flags: ignoreversion
-Source: ..\TTXSamples\release\TTXttyplay.dll; DestDir: {app}\; Components: Additional_Plugins/TTXttyrec; Flags: ignoreversion
-Source: ..\TTXSamples\release\TTXKcodeChange.dll; DestDir: {app}\; Components: Additional_Plugins/TTXKcodeChange; Flags: ignoreversion
-Source: ..\TTXSamples\release\TTXViewMode.dll; DestDir: {app}\; Components: Additional_Plugins/TTXViewMode; Flags: ignoreversion
-Source: ..\TTXSamples\release\TTXAlwaysOnTop.dll; DestDir: {app}\; Components: Additional_Plugins/TTXAlwaysOnTop; Flags: ignoreversion
-Source: ..\TTXSamples\release\TTXRecurringCommand.dll; DestDir: {app}\; Components: Additional_Plugins/TTXRecurringCommand; Flags: ignoreversion
+Source: {#SrcDir}\ttermpro.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
+Source: {#SrcDir}\ttpcmn.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
+Source: {#SrcDir}\TERATERM.INI; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\TSPECIAL1.TTF; DestDir: {commonfonts}; Components: TeraTerm; Attribs: readonly; Flags: onlyifdoesntexist overwritereadonly uninsneveruninstall; FontInstall: Tera Special; Check: isAbleToInstallFont
+;Source: {#SrcDir}\TSPECIAL1.TTF; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\teraterm.chm; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\teratermj.chm; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\license.txt; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\IBMKEYB.CNF; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\IBMKEYB.CNF; DestDir: {app}; Components: TeraTerm; DestName: KEYBOARD.CNF
+Source: {#SrcDir}\VT200.CNF; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\keycode.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
+Source: {#SrcDir}\ttpmacro.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
+Source: {#SrcDir}\delpassw.ttl; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\dialup.ttl; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\login.ttl; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\mpause.ttl; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\random.ttl; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\screencapture.ttl; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\ssh2login.ttl; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\wait_regex.ttl; DestDir: {app}; Components: TeraTerm
+Source: {#SrcDir}\lang\Default.lng; DestDir: {app}\lang; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
+Source: {#SrcDir}\lang\ja_JP.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang\de_DE.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang\fr_FR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang\ru_RU.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang\ko_KR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang\zh_CN.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang\es_ES.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang\zh_TW.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang\ta_IN.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang\pt_BR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang_utf16le\Default.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
+Source: {#SrcDir}\lang_utf16le\ja_JP.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang_utf16le\de_DE.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang_utf16le\fr_FR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang_utf16le\ru_RU.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang_utf16le\ko_KR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang_utf16le\zh_CN.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang_utf16le\es_ES.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang_utf16le\zh_TW.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang_utf16le\ta_IN.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang_utf16le\pt_BR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
+Source: {#SrcDir}\ssh_known_hosts; DestDir: {app}; Components: TTSSH
+Source: {#SrcDir}\cygterm.cfg; DestDir: {app}; Components: cygterm
+Source: {#SrcDir}\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
+Source: {#SrcDir}\cygterm.exe; DestDir: {app}; Components: cygterm
+Source: {#SrcDir}\cyglaunch.exe; DestDir: {app}; Components: cygterm
+Source: {#SrcDir}\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
+Source: {#SrcDir}\ttmenu_readme-j.txt; DestDir: {app}; DestName: "ttmenu_readme-j.txt"; Components: TeraTerm_Menu
+Source: {#SrcDir}\TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion
+Source: {#SrcDir}\theme\Advanced.sample; DestDir: {app}\theme\; Components: TeraTerm
+Source: {#SrcDir}\theme\ImageFile.INI; DestDir: {app}\theme\; Components: TeraTerm
+Source: {#SrcDir}\theme\Scale.INI; DestDir: {app}\theme\; Components: TeraTerm
+Source: {#SrcDir}\theme\Tile.INI; DestDir: {app}\theme\; Components: TeraTerm
+Source: {#SrcDir}\theme\scale\23.jpg; DestDir: {app}\theme\scale; Components: TeraTerm
+Source: {#SrcDir}\theme\scale\43.jpg; DestDir: {app}\theme\scale; Components: TeraTerm
+Source: {#SrcDir}\theme\tile\03.jpg; DestDir: {app}\theme\tile; Components: TeraTerm
+Source: {#SrcDir}\theme\tile\44.jpg; DestDir: {app}\theme\tile; Components: TeraTerm
+Source: {#SrcDir}\ttxkanjimenu.dll; DestDir: {app}\; Components: Additional_Plugins/TTXKanjiMenu; Flags: ignoreversion
+Source: {#SrcDir}\TTXResizeMenu.dll; DestDir: {app}\; Components: Additional_Plugins/TTXResizeMenu; Flags: ignoreversion
+Source: {#SrcDir}\TTXttyrec.dll; DestDir: {app}\; Components: Additional_Plugins/TTXttyrec; Flags: ignoreversion
+Source: {#SrcDir}\TTXttyplay.dll; DestDir: {app}\; Components: Additional_Plugins/TTXttyrec; Flags: ignoreversion
+Source: {#SrcDir}\TTXKcodeChange.dll; DestDir: {app}\; Components: Additional_Plugins/TTXKcodeChange; Flags: ignoreversion
+Source: {#SrcDir}\TTXViewMode.dll; DestDir: {app}\; Components: Additional_Plugins/TTXViewMode; Flags: ignoreversion
+Source: {#SrcDir}\TTXAlwaysOnTop.dll; DestDir: {app}\; Components: Additional_Plugins/TTXAlwaysOnTop; Flags: ignoreversion
+Source: {#SrcDir}\TTXRecurringCommand.dll; DestDir: {app}\; Components: Additional_Plugins/TTXRecurringCommand; Flags: ignoreversion
 
 [Types]
 Name: standard; Description: {cm:type_standard}
