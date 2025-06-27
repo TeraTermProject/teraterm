@@ -1,7 +1,7 @@
 ﻿[Info]
-language=Korean
-date=2025-02-24 by TeraTerm Project
-contributor=Daehong Kim (2013-07-25)
+language=Korean(한국어)
+date=2025-06-27 by TeraTerm Project
+contributor=Daeehong Kim (2013-07-25)
 
 [Tera Term]
 DLG_SYSTEM_FONT=굴림,10,128
@@ -380,6 +380,8 @@ DLG_SELECT_DIR_TITLE=새로운 경로를 선택하세요
 
 DLG_GEN_TITLE=Tera Term: 일반설정
 DLG_GEN_PORT=New &connection default
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Serial
 DLG_GEN_LANG_UI=UI 언어(&L):
 
 DLG_HOST_TITLE=Tera Term: 새 연결
@@ -395,6 +397,10 @@ DLG_KEYB_BS=Backspace 키(&B)
 DLG_KEYB_DEL=Delete 키(&D)
 DLG_KEYB_KEYB=키보드(&K):
 DLG_KEYB_META=메타키(&M):
+DLG_KEYB_META_OFF=끄기
+DLG_KEYB_META_ON=켜기
+DLG_KEYB_META_LEFT=왼쪽
+DLG_KEYB_META_RIGHT=오른쪽
 DLG_KEYB_DISABLE=비활성화 모드:
 DLG_KEYB_APPKEY=어플리케이션 키패드(&A)
 DLG_KEYB_APPCUR=어플리케이션 커서(&C)
@@ -464,6 +470,7 @@ DLG_WIN_VERT=세로(&V)
 DLG_WIN_HORZ=가로(&O)
 DLG_WIN_BOLDFONT=굵게(&D)
 DLG_WIN_HIDETITLE=타이틀 숨기기(&I)
+DLG_WIN_NO_FRAME=프레임 없음(&F)
 DLG_WIN_HIDEMENU=메뉴 숨기기(&M)
 DLG_WIN_COLOREMU=&Color emulation
 DLG_WIN_PCBOLD16=&16색 (PC 스타일)
@@ -484,6 +491,8 @@ DLG_WIN_NORMAL=일반
 DLG_WIN_BOLD=굵게
 DLG_WIN_BLINK=반짝임
 DLG_WIN_REVERSEATTR=반전
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=밑줄
 
 DLG_CHOOSEFONT_STC6=여기서 "글꼴 스타일" 선택은 실제 글꼴 모양에 영향을 주지 않습니다.
 
@@ -1251,8 +1260,14 @@ MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents
+MENU_CONTENTS_AUTO=자동
+MENU_CONTENTS_JAPANESE=일본어
+MENU_CONTENTS_KOREAN=한국어
 MENU_AMB_MENU=Show &Ambiguous Characters width menu
 MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
+BTN_OK=확인
+BTN_CANCEL=취소
+BTN_HELP=도움말
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=항상 위(&A)
@@ -1270,6 +1285,42 @@ DLG_INTERVAL=간격(sec)(&I)
 DLG_COMMAND=명령(&C)
 DLG_ADD_NEWLINE=&Add new line
 
+BTN_OK=확인
+BTN_CANCEL=취소
+
 [TTXCheckUpdate]
 MSG_CHECKUPDATE=Check for updates automatically?\n  %s
 MENU_CHECKUPDATE=Check for &Updates...
+
+
+[TTXttyrec]
+MENU_RECORD=TTY 기록(&Y)
+MENU_REPLAY=TTY 재생(&E)
+MENU_REPLAYAGAIN=다시 재생
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0모든 파일(*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=속도: %d, 일시 정지: %s
+TITLE_STATUS_ON=켜기
+TITLE_STATUS_OFF=끄기
+TITLE_TRIM=%d.%06d 초 대기 중. %d 초로 잘라내기.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), 비활성화됨.
+
+
+[TTXViewMode]
+MENU_SETPASS=보기 모드 비밀번호(&V)
+MENU_VIEWMODE=보기 모드(&V)
+DLG_SETPASSWORD_TITLE=비밀번호 설정
+DLG_SETPASSWORD_CURPASS=이전 비밀번호
+DLG_SETPASSWORD_NEWPASS=새 비밀번호
+DLG_SETPASSWORD_RETPASS=비밀번호 재입력
+DLG_INPUTPASSWORD_TITLE=비밀번호 입력
+DLG_INPUTPASSWORD_PASSWORD=비밀번호
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=비밀번호 변경됨
+MSG_INVALID=잘못된 비밀번호
+MSG_NOTMATCHED=새 비밀번호가 일치하지 않음.
+MSG_TITLE_ERROR=TTXViewMode 오류
+MSG_CANNOTDISPLAY=대화 상자를 표시할 수 없습니다.
+BTN_OK=확인
+BTN_CANCEL=취소
