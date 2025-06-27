@@ -572,13 +572,16 @@ static INT_PTR CALLBACK SettingDlgProc(HWND dlg, UINT msg, WPARAM wp, LPARAM lp)
 			{ IDCANCEL, "BTN_CANCEL" },
 			{ IDHELP, "BTN_HELP" },
 		};
+		static const I18nTextInfo infos[] = {
+			{ "MENU_CONTENTS_AUTO", L"Auto" },
+			{ "MENU_CONTENTS_JAPANESE", L"Japanese" },
+			{ "MENU_CONTENTS_KOREAN", L"Korean" }
+		};
 
 		SetI18nDlgStrsW(dlg, "TTXKanjiMenu", TextInfos, _countof(TextInfos), pvar->ts->UILanguageFileW);
 		CheckDlgButton(dlg, IDC_CHECK_CHARCODE,
 					   pvar->ini.charcode_menu ? BST_CHECKED : BST_UNCHECKED);
-		SendDlgItemMessageW(dlg, IDC_LANGUAGE_DROPBOX, CB_ADDSTRING, 0, (LPARAM)L"Auto");
-		SendDlgItemMessageW(dlg, IDC_LANGUAGE_DROPBOX, CB_ADDSTRING, 0, (LPARAM)L"Japanese");
-		SendDlgItemMessageW(dlg, IDC_LANGUAGE_DROPBOX, CB_ADDSTRING, 0, (LPARAM)L"Korean");
+		SetI18nListW("TTXKanjiMenu", dlg, IDC_LANGUAGE_DROPBOX, infos, _countof(infos), pvar->ts->UILanguageFileW, 0);
 		SendDlgItemMessageA(dlg, IDC_LANGUAGE_DROPBOX, CB_SETCURSEL,
 							pvar->ini.language_ini == MENU_JAPANESE ? 1 :
 							pvar->ini.language_ini == MENU_KOREAN ? 2 :
