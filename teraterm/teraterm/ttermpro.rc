@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// âpåÍ (ïƒçë) resources
+// ÔøΩpÔøΩÔøΩ (ÔøΩƒçÔøΩ) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -82,8 +82,8 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,173,130,10
     LTEXT           "Notification",IDC_NOTIFICATION_TITLE,10,191,73,8
     CONTROL         "&Notify sound",IDC_NOTIFY_SOUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,204,220,10
-    PUSHBUTTON      "&Notify test",IDC_NOTIFICATION_TEST_POPUP,20,218,50,14
-    PUSHBUTTON      "&Tray test",IDC_NOTIFICATION_TEST_TRAY,75,218,50,14
+    PUSHBUTTON      "&Notify test",IDC_NOTIFICATION_TEST_POPUP,20,218,76,14
+    PUSHBUTTON      "&Tray test",IDC_NOTIFICATION_TEST_TRAY,101,218,76,14
     LTEXT           "File transfer folder",IDC_FILE_DIR_TITLE,10,237,125,8
     EDITTEXT        IDC_FILE_DIR,21,249,210,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_FILE_DIR_SELECT,235,249,17,14
@@ -753,7 +753,7 @@ BEGIN
     "I",            ID_ACC_DISCONNECT,      VIRTKEY, ALT, NOINVERT
 END
 
-#endif    // âpåÍ (ïƒçë) resources
+#endif    // ÔøΩpÔøΩÔøΩ (ÔøΩƒçÔøΩ) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

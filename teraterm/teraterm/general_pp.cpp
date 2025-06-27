@@ -307,8 +307,11 @@ void CGeneralPropPageDlg::OnInitDialog()
 	}
 
 	// default port
-	SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM)"TCP/IP");
-	SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM)"Serial");
+	static const I18nTextInfo infos[] = {
+		{ "DLG_GEN_PORT_TCPIP", L"TCP/IP" },
+		{ "DLG_GEN_PORT_SERIAL", L"Serial" }
+	};
+	SetI18nListW("Tera Term", m_hWnd, IDC_GENPORT, infos, _countof(infos), pts->UILanguageFileW, 0);
 	SendDlgItemMessageA(IDC_GENPORT, CB_SETCURSEL, (pts->PortType == IdSerial) ? 1 : 0, 0);
 
 	// File transfer dir
