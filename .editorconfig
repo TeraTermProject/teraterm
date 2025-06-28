@@ -59,7 +59,7 @@ end_of_line = crlf
 indent_style = space
 indent_size = 4
 
-[{*.iss,*.iss.in}]
+[{*.iss,*.iss.in,*.isl}]
 end_of_line = crlf
 charset = utf-8-bom
 indent_style = space
