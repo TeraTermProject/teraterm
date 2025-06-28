@@ -17,9 +17,22 @@ jobs:
             VS_VERSION: 2022
             windows: windows-2022
     runs-on: ${{ matrix.windows }}
+    environment:
+      # 環境を切り替える
+      #   release (ブランチ名が 'release' で始まる場合)
+      #     secrets.SIGNPATH_API_TOKEN が設定してある
+      #   dev (release以外の場合)
+      #     特に何も設定していない
+      name: ${{ startsWith(github.ref_name, 'release') && 'release' || 'dev' }}
+
     env:
       NOPAUSE: 1
       VS_VERSION: ${{ matrix.VS_VERSION }}
+      ORGANIZATION_ID: 78e41f48-55fc-4f33-8ea5-08ac32f65ac8
+      PROJECT_SLUG: teraterm
+      SIGNING_POLICY_SLUG: test-signing
+      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+      SIGNPATH_PASS: 1
 
     steps:
     - uses: actions/checkout@v4
@@ -43,9 +56,15 @@ jobs:
 
     - uses: msys2/setup-msys2@v2
 
+    # キャッシュに含まれたソースを最新に戻す
+    - name: restore source
+      run: |
+        git checkout .
+
     - name: install_cygwin
       run: |
         chcp 932
+        git checkout .
         buildtools/install_cygwin.bat
 
     - name: install_innosetup
@@ -112,6 +131,29 @@ jobs:
           installer\release.bat 2
         )
 
+    - name: Calculate cache hash
+      id: cache_hash
+      shell: bash
+      run: |
+        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
+
+    - name: pre_cache
+      run: |
+        chcp 932
+        ci_scripts/build_appveyor_release_bat_pre_cache.bat
+
+    - name: save cache
+      if: steps.cache-libs-restore.outputs.cache-hit != 'true'   # restore時keyが完全に一致したときtrue
+      id: cache-libs-save
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          libs
+          buildtools
+          !buildtools/svnrev
+        key: cache-${{ matrix.VS_VERSION }}-${{ steps.cache_hash.outputs.hash_value }}
+
     - name: Upload artifacts (zip)
       uses: actions/upload-artifact@v4
       with:
@@ -148,25 +190,129 @@ jobs:
         path: |
           installer/Output/*.sha512sum
 
-    - name: Calculate cache hash
-      id: cache_hash
+    - name: Upload artifacts for sign (tareterm_portable.zip)
+      if: env.SIGNPATH_API_TOKEN != ''
+      id: upload-portable
+      uses: actions/upload-artifact@v4
+      with:
+        name: portable_unsigned
+        retention-days: 1
+        path: |
+          installer/Output/portable
+
+    - name: sign portable zip
+      if: env.SIGNPATH_API_TOKEN != '' && env.SIGNPATH_PASS == 1
+      uses: signpath/github-action-submit-signing-request@v1.1
+      with:
+        api-token: '${{ env.SIGNPATH_API_TOKEN }}'
+        organization-id: '${{ env.ORGANIZATION_ID }}'
+        project-slug: '${{ env.PROJECT_SLUG }}'
+        signing-policy-slug: '${{ env.SIGNING_POLICY_SLUG }}'
+        artifact-configuration-slug: 'teraterm_portable'
+        github-artifact-id: '${{steps.upload-portable.outputs.artifact-id}}'
+        output-artifact-directory: 'installer/Output/portable_signed'
+        wait-for-completion: true
+        wait-for-completion-timeout-in-seconds: 1800
+
+    - name: sign portable zip (pass)
+      if: env.SIGNPATH_API_TOKEN != '' && env.SIGNPATH_PASS == 0
       shell: bash
       run: |
-        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
-        echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
+        mkdir installer/Output/portable_signed
+        cp -R installer/Output/portable installer/Output/portable_signed
 
-    - name: pre_cache
+    - name: rename portable signed zip
+      if: env.SIGNPATH_API_TOKEN != ''
+      shell: bash
       run: |
-        chcp 932
-        ci_scripts/build_appveyor_release_bat_pre_cache.bat
+        OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
+        mkdir installer/Output/setup_src
+        cp -R installer/Output/portable_signed/teraterm installer/Output/setup_src/
+        mv installer/Output/portable_signed/teraterm "installer/Output/portable_signed/${OUTPUT}"
 
-    - name: save cache
-      if: steps.cache-libs-restore.outputs.cache-hit != 'true'   # restore時keyが完全に一致したときtrue
-      id: cache-libs-save
-      uses: actions/cache/save@v4
+    - name: Upload artifacts (portable signed zip)
+      if: env.SIGNPATH_API_TOKEN != ''
+      uses: actions/upload-artifact@v4
       with:
+        name: ${{ steps.vars.outputs.OUTPUT_ZIP }}
         path: |
-          libs
-          buildtools
-        key: cache-${{ matrix.VS_VERSION }}-${{ steps.cache_hash.outputs.hash_value }}
+          installer/Output/portable_signed
+
+    - name: unsigned setup
+      if: env.SIGNPATH_API_TOKEN != ''
+      run: |
+        cmake -P installer/iscc_signed.cmake
+
+    - name: Upload artifacts for sign (setup.exe)
+      if: env.SIGNPATH_API_TOKEN != ''
+      id: upload-setup
+      uses: actions/upload-artifact@v4
+      with:
+        name: setup_unsigned
+        retention-days: 1
+        path: |
+          installer/Output/setup
+
+    - name: sign setup
+      if: env.SIGNPATH_API_TOKEN != '' && env.SIGNPATH_PASS == 1
+      uses: signpath/github-action-submit-signing-request@v1.1
+      with:
+        api-token: '${{ env.SIGNPATH_API_TOKEN }}'
+        organization-id: '${{ env.ORGANIZATION_ID }}'
+        project-slug: '${{ env.PROJECT_SLUG }}'
+        signing-policy-slug: '${{ env.SIGNING_POLICY_SLUG }}'
+        artifact-configuration-slug: 'ziped_installer'
+        github-artifact-id: '${{steps.upload-setup.outputs.artifact-id}}'
+        output-artifact-directory: 'installer/Output/setup_signed'
+        wait-for-completion: true
+        wait-for-completion-timeout-in-seconds: 1800
+
+    - name: sign setup (pass)
+      if: env.SIGNPATH_API_TOKEN != '' && env.SIGNPATH_PASS == 0
+      shell: bash
+      run: |
+        mkdir installer/Output/setup_signed
+        cp -R installer/Output/setup installer/Output/setup_signed
+
+    - name: rename signed setup
+      if: env.SIGNPATH_API_TOKEN != ''
+      shell: bash
+      run: |
+        OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
+        ls installer/Output/setup_signed/
+        echo mv installer/Output/setup_signed/teraterm-unsigned.exe installer/Output/setup_signed/${OUTPUT}.exe
+        mv installer/Output/setup_signed/teraterm-unsigned.exe installer/Output/setup_signed/${OUTPUT}.exe
+        ls installer/Output/setup_signed/
+
+    - name: Upload artifacts (signed setup)
+      if: env.SIGNPATH_API_TOKEN != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.vars.outputs.OUTPUT_EXE }}
+        path: |
+          installer/Output/setup_signed
+
+    - name: release files
+      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1'
+      shell: bash
+      run: |
+        OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
+        mkdir installer/Output/release
+        cp installer/Output/setup_signed/${OUTPUT}.exe installer/Output/release
+        pushd installer/Output/portable_signed
+        cmake -E tar cf ../release/${OUTPUT}.zip ${OUTPUT}
+        popd
+        cp installer/Output/*_pdb.zip installer/Output/release
+        pushd installer/Output/release
+        sha256sum *.zip *.exe > ${OUTPUT}.sha256sum
+        sha512sum *.zip *.exe > ${OUTPUT}.sha512sum
+        ls
+
+    - name: Upload artifacts (release files)
+      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1'
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.vars.outputs.OUTPUT_FILES }}
+        path: |
+          installer/Output/release
 
