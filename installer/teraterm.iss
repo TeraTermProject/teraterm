@@ -38,23 +38,24 @@ AppVersion={#AppVer}
 AppVersion={#AppVer} {#VerSubStr}
 #endif
 
+; properties of installer executable
 VersionInfoDescription={#AppName} installer
 AppCopyright=(C) 2004-2025 TeraTerm Project
-
+; Apps in Settings
 AppPublisher=TeraTerm Project
 AppPublisherURL=https://teratermproject.github.io/
 AppSupportURL=https://github.com/TeraTermProject/teraterm/issues
-
+; execute
 PrivilegesRequired=none
-
+; during installer execution
 ShowLanguageDialog=yes
 LicenseFile=release\license.txt
 DefaultDirName={commonpf}\teraterm5
 AllowNoIcons=true
 DefaultGroupName={#AppName} 5
-
+; uninstall
 UninstallDisplayIcon={app}\ttermpro.exe
-
+; create installer exe
 #ifndef OutputSubStr
 OutputBaseFilename=teraterm-{#AppVer}
 #else

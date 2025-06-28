@@ -1,4 +1,5 @@
-﻿#if defined(M_X64)
+﻿
+#if defined(M_X64)
 #define AppName "Tera Term x64"
 #elif defined(M_ARM64)
 #define AppName "Tera Term arm64"
@@ -31,32 +32,24 @@ Name: build.bat
 ;Name: makearchive.bat; Parameters: release
 
 [Setup]
-AppName={#AppName}
-AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
-AppVersion=@VERSION@
-
-VersionInfoDescription={#AppName} installer
 AppCopyright=(C) 2004-2025 TeraTerm Project
-
 AppPublisher=TeraTerm Project
 AppPublisherURL=https://teratermproject.github.io/
-AppSupportURL=https://github.com/TeraTermProject/teraterm/issues
-
-PrivilegesRequired=none
-
-ShowLanguageDialog=yes
+AppSupportURL=https://teratermproject.github.io/
+AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
+AppName={#AppName}
+AppVersion=@VERSION@
 LicenseFile=@PROJECT_SOURCE_DIR@/installer\release\license.txt
 DefaultDirName={commonpf}\teraterm5
-AllowNoIcons=true
 DefaultGroupName={#AppName} 5
-
+ShowLanguageDialog=yes
+AllowNoIcons=true
 UninstallDisplayIcon={app}\ttermpro.exe
-
-OutputDir=@PROJECT_BINARY_DIR@
 OutputBaseFilename=@SETUP_EXE@
+PrivilegesRequired=none
 SolidCompression=yes
 Compression=lzma2/ultra64
-
+OutputDir=@PROJECT_BINARY_DIR@
 #if defined(M_X64)
 ArchitecturesAllowed=win64
 ArchitecturesInstallIn64BitMode=x64os
