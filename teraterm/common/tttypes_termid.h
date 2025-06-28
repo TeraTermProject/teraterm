@@ -39,6 +39,7 @@ typedef enum {
 	IdVT101,
 	IdVT102,
 	IdVT102J,
+	IdVT220,
 	IdVT220J,
 	IdVT282,
 	IdVT320,
@@ -62,17 +63,23 @@ const TermIDList *TermIDGetList(int index);
 
 /**
  * @brief 文字からIDへ変換
- * @param term_id_str 
+ * @param term_id_str
  * @return IdTerminalID (文字列から見つけられなかったときは idVT100)
  */
 int TermIDGetID(const char *term_id_str);
 
 /**
  * @brief IDから文字列へ変換
- * @param term_id 
+ * @param term_id
  * @return 文字列
  */
 const char *TermIDGetStr(int term_id);
+
+/**
+ * @brief 端末IDのレベルを取得
+ * @return 端末IDのレベル
+ */
+int TermIDGetVTLevel(int term_id);
 
 #ifdef __cplusplus
 }

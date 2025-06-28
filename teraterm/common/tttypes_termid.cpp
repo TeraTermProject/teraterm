@@ -28,6 +28,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "tttypes_termid.h"
 
@@ -37,6 +38,7 @@ const static TermIDList TermIDLists[] = {
 	{IdVT101, "VT101"},
 	{IdVT102, "VT102"},
 	{IdVT102J, "VT102J"},
+	{IdVT220, "VT220"},
 	{IdVT220J, "VT220J"},
 	{IdVT282, "VT282"},
 	{IdVT320, "VT320"},
@@ -74,5 +76,42 @@ const char *TermIDGetStr(int term_id)
 			return TermIDLists[i].TermIDStr;
 		}
 	}
+	assert(0);
 	return NULL;
+}
+
+int TermIDGetVTLevel(int term_id)
+{
+	int VTlevel;
+
+	switch (term_id) {
+	case IdVT100:
+	case IdVT100J:
+	case IdVT101:
+		VTlevel = 1;
+		break;
+	case IdVT102:
+	case IdVT102J:
+	case IdVT220:
+	case IdVT220J:
+		VTlevel = 2;
+		break;
+	case IdVT282:
+	case IdVT320:
+	case IdVT382:
+		VTlevel = 3;
+		break;
+	case IdVT420:
+		VTlevel = 4;
+		break;
+	case IdVT520:
+	case IdVT525:
+		VTlevel = 5;
+		break;
+	default:
+		assert(0);
+		VTlevel = 1;
+		break;
+	}
+	return VTlevel;
 }
