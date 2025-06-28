@@ -39,7 +39,6 @@ AppVersion={#AppVer} {#VerSubStr}
 #endif
 
 VersionInfoDescription={#AppName} installer
-VersionInfoVersion={#AppVersion}
 AppCopyright=(C) 2004-2025 TeraTerm Project
 
 AppPublisher=TeraTerm Project

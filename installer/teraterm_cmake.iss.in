@@ -36,7 +36,6 @@ AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 AppVersion=@VERSION@
 
 VersionInfoDescription={#AppName} installer
-VersionInfoVersion={#AppVersion}
 AppCopyright=(C) 2004-2025 TeraTerm Project
 
 AppPublisher=TeraTerm Project
