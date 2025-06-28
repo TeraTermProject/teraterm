@@ -252,6 +252,7 @@
 #define IDC_FILE_DIR                    2628
 #define IDC_FILE_DIR_SELECT             2629
 #define IDC_SENDFILE_RADIO_BULK         2632
+#define IDC_TRANSHIDEDLG                2633
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
