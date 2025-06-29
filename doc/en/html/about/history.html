@@ -111,6 +111,14 @@
         Fixed log dialog font was not changed when dialog font was changed and log dialog was opened.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/590" target="_blank">issue #590</a>)
       </li>
+      <li>
+        Fixed the following issues that occur when changing the font size while the VT Window is maximized.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/631" target="_blank">issue #631</a>)
+        <ul>
+          <li>When selecting a font size smaller than the current font, the screen rendering is not being done correctly.</li>
+          <li>When selecting a font size larger than the current font, the window size exceeds that of the desktop.</li>
+        </ul>
+      </li>
     </ul>
   </li>
 
