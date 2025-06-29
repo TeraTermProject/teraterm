@@ -22,7 +22,36 @@
     - build.bat
 
 - iscc.bat
-  - インストーラー,zipを作成します。
+  - バイナリから署名のないポータブルzip,インストーラを作成
+  - コピー(ポータブル署名用)
+    - src
+      - ./teraterm/
+    - dest
+      - ./Output/portable/teraterm/
+  - インストーラー(署名なし)
+    - src
+      - ./teraterm/
+    - dest
+      - ./teraterm-X.Y.Z.exe
+          or
+      - ./teratern-X.Y.Z-YYMMDD_HHMMSS-HASH-snapshot.exe
+  - ポータブル(署名なし)
+    - src
+      - ./teraterm/
+      - ./teraterm_pdb/
+    - src(copy)
+      - ./teraterm-X.Y.Z/
+      - ./teraterm-X.Y.Z_pdb/
+          or
+      - ./teratern-X.Y.Z-YYMMDD_HHMMSS-HASH-snapshot/
+      - ./teratern-X.Y.Z-YYMMDD_HHMMSS-HASH-snapshot_pdb/
+    - dest
+      - ./teraterm-X.Y.Z.zip
+      - ./teraterm-X.Y.Z_pdb.zip
+          or
+      - ./teratern-X.Y.Z-YYMMDD_HHMMSS-HASH-snapshot.zip
+      - ./teratern-X.Y.Z-YYMMDD_HHMMSS-HASH-snapshot_pdb.zip
+  - hash(sha256,sha512)
 
 - build.bat
   - バイナリをビルドします。
