@@ -84,13 +84,10 @@ elseif(NOT TARGET ttxssh)
     COMMAND "${CMAKE_COMMAND}" -E echo "ttxssh was not build"
   )
 else()
-  configure_file(
-    teraterm_cmake.iss.in teraterm_cmake.iss
-    NEWLINE_STYLE CRLF
-    )
-
   if (RELEASE)
-    set(ISCC_OPTION "-DSETUP_RELEASE=1")
+    list(APPEND ISCC_OPTION "/DAppVersion=${VERSION}")
+  else()
+    list(APPEND ISCC_OPTION "/DAppVersion=${VERSION}_${DATE}_${TIME}-${GITVERSION}")
   endif()
   if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "arm64")
     list(APPEND ISCC_OPTION "-DM_ARM64=1")
@@ -99,10 +96,11 @@ else()
   endif()
   add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_EXE}.exe
-    COMMAND ${ISCC} ${ISCC_OPTION} teraterm_cmake.iss
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_INSTALL_PREFIX}/cygterm+.tar.gz
+    COMMAND ${ISCC} ${ISCC_OPTION} /O${CMAKE_BINARY_DIR} /DOutputBaseFilename=${SETUP_EXE} /DSrcDir=${CMAKE_INSTALL_PREFIX} ${CMAKE_CURRENT_LIST_DIR}/teraterm.iss
     COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
     COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
   add_custom_target(
     inno_setup
@@ -145,8 +143,7 @@ set_target_properties(lang_utf16le PROPERTIES FOLDER installer)
 # sha256sum
 add_custom_command(
   OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
-  COMMAND ${CMAKE_COMMAND} -DOUTPUT=${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum -P ${CMAKE_CURRENT_LIST_DIR}/sha256sum.cmake ${SETUP_EXE}.exe ${SETUP_ZIP}
-  COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
+  COMMAND ${CMAKE_COMMAND} -E sha256sum ${SETUP_EXE}.exe ${SETUP_ZIP} > ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 add_custom_target(
@@ -158,8 +155,7 @@ set_target_properties(sha256sum PROPERTIES FOLDER installer)
 # sha512sum
 add_custom_command(
   OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
-  COMMAND ${CMAKE_COMMAND} -DOUTPUT=${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum -P ${CMAKE_CURRENT_LIST_DIR}/sha512sum.cmake ${SETUP_EXE}.exe ${SETUP_ZIP}
-  COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
+  COMMAND ${CMAKE_COMMAND} -E sha512sum ${SETUP_EXE}.exe ${SETUP_ZIP} > ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 add_custom_target(
