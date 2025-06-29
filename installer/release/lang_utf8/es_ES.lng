@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Spanish
-date=2025-04-23 by TeraTerm Project
+date=2025-06-27 by TeraTerm Project
 contributor=Filiberto Olguin Ascona (2022-05-26)
 
 [Tera Term]
@@ -381,6 +381,8 @@ DLG_SELECT_DIR_TITLE=Select new directory
 
 DLG_GEN_TITLE=Tera Term: General setup
 DLG_GEN_PORT=New &connection default
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Serial
 DLG_GEN_LANG_UI=UI &Language:
 
 DLG_HOST_TITLE=Tera Term: New connection
@@ -396,6 +398,10 @@ DLG_KEYB_BS=&Backspace key
 DLG_KEYB_DEL=&Delete key
 DLG_KEYB_KEYB=&Keyboard:
 DLG_KEYB_META=&Meta key:
+DLG_KEYB_META_OFF=apagado
+DLG_KEYB_META_ON=encendido
+DLG_KEYB_META_LEFT=izquierda
+DLG_KEYB_META_RIGHT=derecha
 DLG_KEYB_DISABLE=Disabled mode:
 DLG_KEYB_APPKEY=&Application Keypad
 DLG_KEYB_APPCUR=Application &Cursor
@@ -466,6 +472,7 @@ DLG_WIN_VERT=&Vertical line
 DLG_WIN_HORZ=H&orizontal line
 DLG_WIN_BOLDFONT=Enable bol&d font
 DLG_WIN_HIDETITLE=H&ide title bar
+DLG_WIN_NO_FRAME=Sin marco
 DLG_WIN_HIDEMENU=Hide &menu bar
 DLG_WIN_COLOREMU=&Color emulation
 DLG_WIN_PCBOLD16=&16 Colors (PC style)
@@ -486,6 +493,8 @@ DLG_WIN_NORMAL=Normal
 DLG_WIN_BOLD=Bold
 DLG_WIN_BLINK=Blink
 DLG_WIN_REVERSEATTR=Reverse
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=Subrayar
 
 DLG_CHOOSEFONT_STC6="Font style" selection here won't affect actual font appearance.
 
@@ -1250,8 +1259,14 @@ MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents
+MENU_CONTENTS_AUTO=Auto
+MENU_CONTENTS_JAPANESE=Japones
+MENU_CONTENTS_KOREAN=Coreano
 MENU_AMB_MENU=Show &Ambiguous Characters width menu
 MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
+BTN_OK=OK
+BTN_CANCEL=Cancel
+BTN_HELP=Help
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=&Always on top
@@ -1269,6 +1284,42 @@ DLG_INTERVAL=&Interval(sec)
 DLG_COMMAND=&Command
 DLG_ADD_NEWLINE=&Add new line
 
+BTN_OK=OK
+BTN_CANCEL=Cancel
+
 [TTXCheckUpdate]
 MSG_CHECKUPDATE=Check for updates automatically?\n  %s
 MENU_CHECKUPDATE=Check for &Updates...
+
+
+[TTXttyrec]
+MENU_RECORD=Grabacion TT&Y
+MENU_REPLAY=R&eproduccion TTY
+MENU_REPLAYAGAIN=Reproducir de nuevo
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0Todos los archivos(*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=Velocidad: %d, Pausa: %s
+TITLE_STATUS_ON=ENCENDIDO
+TITLE_STATUS_OFF=APAGADO
+TITLE_TRIM=%d.%06d segundos inactivo. recortar a %d segundos.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), Desactivado.
+
+
+[TTXViewMode]
+MENU_SETPASS=Contrasena del modo de &vista
+MENU_VIEWMODE=Modo de &vista
+DLG_SETPASSWORD_TITLE=Establecer contrasena
+DLG_SETPASSWORD_CURPASS=Contrasena antigua
+DLG_SETPASSWORD_NEWPASS=Nueva contrasena
+DLG_SETPASSWORD_RETPASS=Volver a escribir la contrasena
+DLG_INPUTPASSWORD_TITLE=Introducir contrasena
+DLG_INPUTPASSWORD_PASSWORD=Contrasena
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=Contrasena cambiada
+MSG_INVALID=Contrasena invalida
+MSG_NOTMATCHED=La nueva contrasena no coincide.
+MSG_TITLE_ERROR=Error de TTXViewMode
+MSG_CANNOTDISPLAY=No se puede mostrar el cuadro de dialogo.
+BTN_OK=OK
+BTN_CANCEL=&Cancel

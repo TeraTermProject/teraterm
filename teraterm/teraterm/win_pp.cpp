@@ -126,6 +126,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		{ IDC_WINHORZ, "DLG_WIN_HORZ" },
 		{ IDC_FONTBOLD, "DLG_WIN_BOLDFONT" },
 		{ IDC_WINHIDETITLE, "DLG_WIN_HIDETITLE" },
+		{ IDC_NO_FRAME, "DLG_WIN_NO_FRAME" },
 		{ IDC_WINHIDEMENU, "DLG_WIN_HIDEMENU" },
 		{ IDC_WINAIXTERM16, "DLG_WIN_AIXTERM16" },
 		{ IDC_WINXTERM256, "DLG_WIN_XTERM256" },
@@ -221,8 +222,8 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 						{ "DLG_WIN_BOLD", L"Bold" },
 						{ "DLG_WIN_BLINK", L"Blink" },
 						{ "DLG_WIN_REVERSEATTR", L"Reverse" },
-						{ NULL, L"URL" },
-						{ NULL, L"Underline" },
+						{ "DLG_WIN_URL", L"URL" },
+						{ "DLG_WIN_UNDERLINE", L"Underline" },
 					};
 					SetI18nListW("Tera Term", Dialog, IDC_WINATTR, infos, _countof(infos), ts->UILanguageFileW, 0);
 				}
