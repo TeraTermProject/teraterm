@@ -115,7 +115,7 @@ xcopy /s /e /y /i /exclude:archive-exclude.txt release\theme %dst%\theme
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\plugin %dst%\plugin
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\lang %dst%\lang
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\lang_utf16le %dst%\lang_utf16le
-del /f %dst%\lang\English.lng
+del /f %dst%\lang\en_US.lng
 
 perl setini.pl release\TERATERM.INI > %dst%\TERATERM.INI
 

@@ -70,6 +70,8 @@
       <li>
         Added "VT220" to <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a>.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
+        Added "Hide dialog" button on <a href="../menu/file-log.html#Logging">"Log" dialog box (displayed while logging)</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/630" target="_blank">issue #630</a>)
       </li>
     </ul>
   </li>
@@ -114,13 +116,19 @@
       <li>
         <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> "VT100J", "VT102J", and "VT220J" were not selectable Since 5.3, which remove Language setting.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
+        Fixed the following issues that occur when changing the font size while the VT Window is maximized.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/631" target="_blank">issue #631</a>)
+        <ul>
+          <li>When selecting a font size smaller than the current font, the screen rendering is not being done correctly.</li>
+          <li>When selecting a font size larger than the current font, the window size exceeds that of the desktop.</li>
+        </ul>
       </li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
-      <li>Added Portuguese.lng language file.
+      <li>Added Portuguese (pt_BR.lng) language file. Rename language file name.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/589" target="_blank">issue #589</a>)
       </li>
       <li>Upgraded TTSSH to <a href="#ttssh_3.5.0">3.5.0</a>.</li>
