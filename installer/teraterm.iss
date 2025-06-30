@@ -69,8 +69,8 @@ ArchitecturesInstallIn64BitMode=
 #endif
 
 [Languages]
-Name: en; MessagesFile: compiler:Default.isl
-Name: ja; MessagesFile: compiler:Languages\Japanese.isl
+Name: en; MessagesFile: compiler:Default.isl,message_en_US.isl
+Name: ja; MessagesFile: compiler:Languages\Japanese.isl,message_en_US.isl,message_ja_JP.isl
 
 [Dirs]
 Name: {app}\theme; Components: TeraTerm
@@ -264,84 +264,6 @@ Name: ttyplayassoc; Description: {cm:task_ttyplayassoc}; Components: Additional_
 [Run]
 Filename: {app}\ttermpro.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_teraterm}; Components: TeraTerm
 Filename: {app}\ttpmenu.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_ttmenu}; Components: TeraTerm_Menu
-
-[CustomMessages]
-en.task_desktopicon=Create Tera Term shortcut to &Desktop
-en.task_startupttmenuicon=Create TeraTerm &Menu shortcut to Startup
-en.task_cygtermhere=Add "Cy&gterm Here" to Context menu
-en.task_macroassoc=Associate .&ttl file to ttpmacro.exe
-en.task_telnetassoc=Associate t&elnet protocol to ttermpro.exe
-en.task_sshassoc=Associate &ssh protocol to ttermpro.exe
-en.task_ttyplayassoc=Associate .tty file to tterm&pro.exe
-ja.task_desktopicon=デスクトップに Tera Term のショートカットを作る(&D)
-ja.task_startupttmenuicon=スタートアップに TeraTerm &Menu のショートカットを作る
-ja.task_cygtermhere=コンテキストメニューに "Cy&gterm Here" を追加する
-ja.task_macroassoc=.&ttl ファイルを ttpmacro.exe に関連付ける
-ja.task_telnetassoc=t&elnet プロトコルを ttermpro.exe に関連付ける
-ja.task_sshassoc=&ssh プロトコルを ttermpro.exe に関連付ける
-ja.task_ttyplayassoc=.tty ファイルを tterm&pro.exe に関連付ける
-en.type_standard=Standard installation
-en.type_full=Full installation
-en.type_compact=Compact installation
-en.type_custom=Custom installation
-ja.type_standard=標準インストール
-ja.type_full=フルインストール
-ja.type_compact=コンパクトインストール
-ja.type_custom=カスタムインストール
-en.launch_teraterm=Launch &Tera Term
-en.launch_ttmenu=Launch TeraTerm &Menu
-ja.launch_teraterm=今すぐ &Tera Term を実行する
-ja.launch_ttmenu=今すぐ TeraTerm &Menu を実行する
-en.msg_language_caption=Select Language
-en.msg_language_description=Which language shoud be used?
-en.msg_language_subcaption=Select the language of application's menu and dialog, then click Next.
-en.msg_language_none=&English
-en.msg_language_japanese=&Japanese
-en.msg_language_german=&German
-en.msg_language_french=&French
-en.msg_language_russian=&Russian
-en.msg_language_korean=&Korean
-en.msg_language_chinese=&Chinese(Simplified)
-en.msg_language_tchinese=Chinese(&Traditional)
-en.msg_language_spanish=&Spanish
-en.msg_language_tamil=T&amil
-ja.msg_language_caption=言語の選択
-ja.msg_language_description=ユーザーインターフェースの言語を選択してください。
-ja.msg_language_subcaption=アプリケーションのメニューやダイアログ等の表示言語を選択して、「次へ」をクリックしてください。
-ja.msg_language_none=英語(&E)
-ja.msg_language_japanese=日本語(&J)
-ja.msg_language_german=ドイツ語(&G)
-ja.msg_language_french=フランス語(&F)
-ja.msg_language_russian=ロシア語(&R)
-ja.msg_language_korean=韓国語(&K)
-ja.msg_language_chinese=簡体字中国語(&C)
-ja.msg_language_tchinese=繁体字中国語(&T)
-ja.msg_language_spanish=スペイン語(&S)
-ja.msg_language_tamil=タミル語(&A)
-en.msg_del_confirm=Are you sure that you want to delete %s ?
-ja.msg_del_confirm=%s を削除しますか？
-en.msg_uninstall_confirm=It seems a former version is installed. You are recommended to uninstall it previously. Do you uninstall former version ?
-ja.msg_uninstall_confirm=以前のバージョンがインストールされているようです。先にアンインストールすることをお勧めします。アンインストールしますか？
-en.comp_TTX=Additional Plugins
-ja.comp_TTX=追加プラグイン
-en.comp_TTXResizeMenu=VT-Window size can be changed from preset
-ja.comp_TTXResizeMenu=VTウィンドウのサイズをプリセット値の中から変更できるようにする
-en.comp_TTXttyrec=ttyrec format record data can be recorded or playback
-ja.comp_TTXttyrec=ttyrec形式の録画データを記録/再生できるようにする
-en.comp_TTXKanjiMenu=Changes Japanese Kanji Code from VT-Window menu
-ja.comp_TTXKanjiMenu=日本語の漢字コードをVTウィンドウのメニューから設定できるようにする
-en.comp_TTXKcodeChange=Change Japanese Kanji code by remote sequence
-ja.comp_TTXKcodeChange=リモートからのシーケンスで日本語の漢字コードを変更する
-en.comp_TTXViewMode=View-only mode can be used
-ja.comp_TTXViewMode=表示専用モードにすることができる
-en.comp_TTXAlwaysOnTop=Always On Top can be used
-ja.comp_TTXAlwaysOnTop=常に最前面に表示できるようにする
-en.comp_TTXRecurringCommand=Recurring Command can be used
-ja.comp_TTXRecurringCommand=定期的に文字列を送信する
-en.comp_installer=Other installer is started
-ja.comp_installer=インストーラが起動します
-en.msg_AppRunningError=Setup has detected that %s is currently running.%n%nPlease close all instances of it now, then click Next to continue.
-ja.msg_AppRunningError=セットアップは実行中の %s を検出しました。%n%n開いているアプリケーションをすべて閉じてから「次へ」をクリックしてください。
 
 [Code]
 const
