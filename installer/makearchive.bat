@@ -1,3 +1,10 @@
+rem Copyright (C) 2025- Tera Term Project
+rem All rights reserved.
+rem
+rem  次のフォルダにバイナリを作成
+rem   - ./teraterm
+rem   - ./teraterm_pdb
+
 @echo off
 rem この外で set された RELEASE を上書きしないために setlocal する
 setlocal
@@ -13,24 +20,23 @@ goto help
 
 :build
 @echo on
-if "%release%"=="yes" SET plugins=yes
 if "%release%"=="yes" SET rebuild=rebuild
 
 CALL makechm.bat
 CALL build.bat %rebuild%
 if ERRORLEVEL 1 goto fail
-set release_bak=%release%
-CALL ..\buildtools\svnrev\sourcetree_info.bat
-set release=%release_bak%
 
-rem  change folder name
-if not "%release%"=="yes" goto snapshot
-set dst=Output\teraterm-%VERSION%
-goto create
+set dst=%~dp0teraterm
+echo dst=%dst%
+call :create
 
-:snapshot
-set dst=snapshot-%DATE%_%TIME%
+endlocal
+exit /b
 
+
+rem create archive
+rem  ファイルを %dst%, %dist%_pdb にコピーする
+rem
 :create
 del /s /q %dst%\*.*
 mkdir %dst%
@@ -115,26 +121,26 @@ xcopy /s /e /y /i /exclude:archive-exclude.txt release\theme %dst%\theme
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\plugin %dst%\plugin
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\lang %dst%\lang
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\lang_utf16le %dst%\lang_utf16le
-del /f %dst%\lang\en_US.lng
+del /f %dst%\lang\English.lng
 
 perl setini.pl release\TERATERM.INI > %dst%\TERATERM.INI
 
-if "%release%"=="yes" (
 copy nul %dst%\ttpmenu.ini
 copy nul %dst%\portable.ini
-)
 
-echo dst=%~dp0%dst%
-
-endlocal
-exit /b
+exit /b 0
 
 :help
 echo Tera Termをビルド。(build Tera Term)
 echo.
 echo   %0          通常のビルド(Normal building)
+echo   %0 release  リリースビルド(same as rebuild)
 echo   %0 rebuild  リビルド(Re-building)
-echo   %0 release  リリースビルド(rebuild + フォルダ名が特殊(Normal + Plugins building + unique folder naming))
+echo.
+echo   次のフォルダにバイナリを作成
+echo     - %~dp0teraterm
+echo     - %~dp0teraterm_pdb
+echo.
 echo ex
 echo   %0 rebuild ^>build.log 2^>^&1  ビルドログを採取する(Retrieve building log)
 echo.
