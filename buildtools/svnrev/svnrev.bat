@@ -30,7 +30,7 @@ goto finish
 :found_perl
 @echo %BAT%: perl=%PERL%
 if EXIST %SVNVERSION_H_OLD% del %SVNVERSION_H_OLD%
-%PERL% svnrev.pl --root ../.. --header %SVNVERSION_H%
+%PERL% svnrev.pl --root ../.. --header %SVNVERSION_H% --cmake build_config.cmake --json build_config.json
 goto finish
 
 

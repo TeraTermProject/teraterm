@@ -74,6 +74,10 @@ add_library(
   tttext.cpp
   tttext.h
   tttypes.h
+  tttypes_charset.h
+  tttypes_key.h
+  tttypes_termid.cpp
+  tttypes_termid.h
   win32helper.cpp
   win32helper.h
 )

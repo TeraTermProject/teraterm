@@ -31,6 +31,7 @@
 #pragma once
 
 #include "teraterm.h"
+#include "tttypes_termid.h"
 
 #define IdBreakTimer         1
 #define IdDelayTimer         2
@@ -613,20 +614,6 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdCRLF 2
 #define IdLF   3
 #define IdAUTO 4
-
-  /* Terminal ID */
-#define IdVT100  1
-#define IdVT100J 2
-#define IdVT101  3
-#define IdVT102  4
-#define IdVT102J 5
-#define IdVT220J 6
-#define IdVT282  7
-#define IdVT320  8
-#define IdVT382  9
-#define IdVT420  10
-#define IdVT520  11
-#define IdVT525  12
 
 #define TermWidthMax  1000
 #define TermHeightMax 500
