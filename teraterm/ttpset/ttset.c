@@ -72,10 +72,6 @@
 
 #define MaxStrLen (LONG)512
 
-static const PCHAR TermList[] =
-	{ "VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
-	"VT320", "VT382", "VT420", "VT520", "VT525", NULL };
-
 static const PCHAR RussList2[] = { "Windows", "KOI8-R", NULL };
 
 
@@ -743,7 +739,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Terminal ID */
 	GetPrivateProfileString(Section, "TerminalID", "",
 	                        Temp, sizeof(Temp), FName);
-	ts->TerminalID = str2id(TermList, Temp, IdVT100);
+	ts->TerminalID = TermIDGetID(Temp);
 
 	/* Title String */
 	GetPrivateProfileString(Section, "Title", "Tera Term",
@@ -2261,8 +2257,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "AutoWinSwitch", FName, ts->AutoWinSwitch);
 
 	/* Terminal ID */
-	id2str(TermList, ts->TerminalID, IdVT100, Temp, sizeof(Temp));
-	WritePrivateProfileString(Section, "TerminalID", Temp, FName);
+	WritePrivateProfileString(Section, "TerminalID", TermIDGetStr(ts->TerminalID), FName);
 
 	/* Title text */
 	WritePrivateProfileString(Section, "Title", ts->Title, FName);

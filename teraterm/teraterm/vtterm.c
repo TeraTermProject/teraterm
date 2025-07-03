@@ -1209,6 +1209,9 @@ static void AnswerTerminalType(void)
 	case IdVT102J:
 		strncat_s(Tmp,sizeof(Tmp),"15",_TRUNCATE);
 		break;
+	case IdVT220:
+		strncat_s(Tmp,sizeof(Tmp),"60;1;2;6;8;9;15;",_TRUNCATE);
+		break;
 	case IdVT220J:
 		strncat_s(Tmp,sizeof(Tmp),"62;1;2;5;6;7;8",_TRUNCATE);
 		break;
@@ -5782,27 +5785,9 @@ BOOL WheelToCursorMode() {
 	return AcceptWheelToCursor && AppliCursorMode && !ts.DisableAppCursor && !(ControlKey() && ts.DisableWheelToCursorByCtrl);
 }
 
-void ChangeTerminalID() {
-	switch (ts.TerminalID) {
-	case IdVT220J:
-	case IdVT282:
-		VTlevel = 2;
-		break;
-	case IdVT320:
-	case IdVT382:
-		VTlevel = 3;
-		break;
-	case IdVT420:
-		VTlevel = 4;
-		break;
-	case IdVT520:
-	case IdVT525:
-		VTlevel = 5;
-		break;
-	default:
-		VTlevel = 1;
-	}
-
+void ChangeTerminalID()
+{
+	VTlevel = TermIDGetVTLevel(ts.TerminalID);
 	if (VTlevel == 1) {
 		Send8BitMode = FALSE;
 	}

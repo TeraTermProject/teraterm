@@ -11,8 +11,14 @@
     - iscc.bat
 
 - makearchive.bat
-  - Visual Studioコマンドプロンプトから実行すると、一括して全ソースコードをビルドします
+  - Visual Studioコマンドプロンプトから実行すると、
+    - ヘルプを作成
+    - ソースコードをビルド、バイナリを作成
+    - バイナリを一か所に集める
+      - ./teraterm/
+      - ./teraterm_pdb/
   - 次のファイルを呼び出します。
+    - makechm.bat
     - build.bat
 
 - iscc.bat
