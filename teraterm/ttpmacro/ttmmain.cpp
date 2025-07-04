@@ -271,8 +271,6 @@ BOOL CCtrlWindow::OnInitDialog()
 		{ IDC_CTRLPAUSESTART, "BTN_PAUSE" },
 		{ IDC_CTRLEND, "BTN_END" },
 	};
-	BOOL IOption, VOption;
-	int CmdShow;
 	RECT rc_dlg, rc_filename, rc_lineno;
 	LONG dlg_len, len;
 
@@ -282,7 +280,7 @@ BOOL CCtrlWindow::OnInitDialog()
 
 	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), 0);
 
-	ParseParam(&IOption,&VOption);
+	ParseParam();
 
 	if (FileName[0] == 0 || FileName[0] == '*') {
 		// TTLファイル指定がない(or "*")のときダイアログから入力してもらう
@@ -351,17 +349,6 @@ BOOL CCtrlWindow::OnInitDialog()
 		CCS_BOTTOM | SBARS_SIZEGRIP, NULL, GetSafeHwnd(), 1);
 
 	CenterWindow(m_hWnd, NULL);
-
-	if (VOption) {
-		return TRUE;
-	}
-	if (IOption) {
-		CmdShow = SW_SHOWMINIMIZED;
-	}
-	else {
-		CmdShow = SW_SHOWDEFAULT;
-	}
-	ShowWindow(CmdShow);
 
 	return TRUE;
 }

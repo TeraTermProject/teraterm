@@ -50,6 +50,7 @@
 #include "ttmacro.h"
 #include "ttmlib.h"
 #include "ttlib.h"
+#include "ttmdlg.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -143,6 +144,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	Busy = TRUE;
 	pCCtrlWindow = new CCtrlWindow(hInst);
 	pCCtrlWindow->Create();
+
+	if (!VOption) {
+		if (IOption) {
+			nCmdShow = SW_SHOWMINIMIZED;
+		}
+		ShowWindow(pCCtrlWindow->m_hWnd, nCmdShow);
+	}
+
 	Busy = FALSE;
 
 	HWND hWnd = pCCtrlWindow->GetSafeHwnd();
