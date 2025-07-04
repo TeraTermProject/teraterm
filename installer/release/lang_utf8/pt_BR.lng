@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Portuguese (Português) - Brazil
-date=2025-05-10 by TeraTerm Project
+date=2025-06-27 by TeraTerm Project
 contributor=Waldemar Vaz Passarinho Neto (2025-05-07)
 
 [Tera Term]
@@ -380,6 +380,8 @@ DLG_SELECT_DIR_TITLE=Selecionar novo diretório
 
 DLG_GEN_TITLE=Tera Term: Configurações gerais
 DLG_GEN_PORT=Padrão para nova &conexão
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Serial
 DLG_GEN_LANG_UI=Idioma:
 
 DLG_HOST_TITLE=Tera Term: Nova conexão
@@ -395,6 +397,10 @@ DLG_KEYB_BS=Tecla &Backspace
 DLG_KEYB_DEL=Tecla &Delete
 DLG_KEYB_KEYB=&Teclado:
 DLG_KEYB_META=Tecla &Meta:
+DLG_KEYB_META_OFF=desligado
+DLG_KEYB_META_ON=ligado
+DLG_KEYB_META_LEFT=esquerda
+DLG_KEYB_META_RIGHT=direita
 DLG_KEYB_DISABLE=Modo desabilitado:
 DLG_KEYB_APPKEY=Teclado &Numérico Aplicativo
 DLG_KEYB_APPCUR=&Cursor Aplicativo
@@ -465,6 +471,7 @@ DLG_WIN_VERT=Linha &vertical
 DLG_WIN_HORZ=Linha &horizontal
 DLG_WIN_BOLDFONT=Ativar fonte &negrito
 DLG_WIN_HIDETITLE=Ocultar barra de &título
+DLG_WIN_NO_FRAME=Sem &Quadro
 DLG_WIN_HIDEMENU=Ocultar barra de &menu
 DLG_WIN_COLOREMU=Emulação de &cor
 DLG_WIN_PCBOLD16=16 cores (&estilo PC)
@@ -485,6 +492,8 @@ DLG_WIN_NORMAL=Normal
 DLG_WIN_BOLD=Negrito
 DLG_WIN_BLINK=Piscante
 DLG_WIN_REVERSEATTR=Invertido
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=Sublinhado
 
 DLG_CHOOSEFONT_STC6=A seleção de "Estilo da fonte" aqui não afetará a aparência real da fonte.
 
@@ -1248,8 +1257,14 @@ MENU_SETTING=Config&uração
 MENU_SETTING_TITLE=Configuração do KanjiMenu
 MENU_CHARCODE=Exibir menu de &código de caractere
 MENU_CONTENTS=&Conteúdo do menu
+MENU_CONTENTS_AUTO=Automatico
+MENU_CONTENTS_JAPANESE=Japones
+MENU_CONTENTS_KOREAN=Coreano
 MENU_AMB_MENU=Exibir menu de largura de &caracteres ambíguos
 MENU_USE_ONE_SETTING_MENU=Usar menu de &única configuração
+BTN_OK=OK
+BTN_CANCEL=Cancelar
+BTN_HELP=Ajuda
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=&Sempre visível
@@ -1267,6 +1282,42 @@ DLG_INTERVAL=&Intervalo (seg)
 DLG_COMMAND=&Comando
 DLG_ADD_NEWLINE=&Adicionar nova linha
 
+BTN_OK=OK
+BTN_CANCEL=Cancelar
+
 [TTXCheckUpdate]
 MSG_CHECKUPDATE=Verificar atualizações automaticamente?\n  %s
 MENU_CHECKUPDATE=Verificar &atualizações...
+
+
+[TTXttyrec]
+MENU_RECORD=Gravar TT&Y
+MENU_REPLAY=R&eproduzir TTY
+MENU_REPLAYAGAIN=Reproduzir novamente
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0Todos os arquivos(*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=Velocidade: %d, Pausa: %s
+TITLE_STATUS_ON=LIGADO
+TITLE_STATUS_OFF=DESLIGADO
+TITLE_TRIM=%d.%06d segundos ocioso. cortar para %d segundos.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), Desativado.
+
+
+[TTXViewMode]
+MENU_SETPASS=Senha do Modo de &Visualizacao
+MENU_VIEWMODE=Modo de &Visualizacao
+DLG_SETPASSWORD_TITLE=Definir senha
+DLG_SETPASSWORD_CURPASS=Senha antiga
+DLG_SETPASSWORD_NEWPASS=Nova senha
+DLG_SETPASSWORD_RETPASS=Redigitar senha
+DLG_INPUTPASSWORD_TITLE=Inserir senha
+DLG_INPUTPASSWORD_PASSWORD=Senha
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=Senha alterada
+MSG_INVALID=Senha invalida
+MSG_NOTMATCHED=Nova senha nao corresponde.
+MSG_TITLE_ERROR=Erro no TTXViewMode
+MSG_CANNOTDISPLAY=Nao e possivel exibir a caixa de dialogo.
+BTN_OK=OK
+BTN_CANCEL=&Cancelar

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2025-04-23 by TeraTerm Project
+date=2025-06-27 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -381,6 +381,8 @@ DLG_SELECT_DIR_TITLE=Выбрать новую папку
 
 DLG_GEN_TITLE=Tera Term: Общие настройки
 DLG_GEN_PORT=New &connection default
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Serial
 DLG_GEN_LANG_UI=Язык меню(&L):
 
 DLG_HOST_TITLE=Tera Term: Новое соединение
@@ -396,6 +398,10 @@ DLG_KEYB_BS=&Клав. Backspace
 DLG_KEYB_DEL=&Клав. Delete
 DLG_KEYB_KEYB=&Клавиатура:
 DLG_KEYB_META=&Клав. Meta:
+DLG_KEYB_META_OFF=выключить
+DLG_KEYB_META_ON=включить
+DLG_KEYB_META_LEFT=налево
+DLG_KEYB_META_RIGHT=направо
 DLG_KEYB_DISABLE=Альтернатива:
 DLG_KEYB_APPKEY=&Применить Keypad
 DLG_KEYB_APPCUR=Применить &Cursor
@@ -466,6 +472,7 @@ DLG_WIN_VERT=&Вертикально
 DLG_WIN_HORZ=&Горизонтально
 DLG_WIN_BOLDFONT=&Полужирный шрифт
 DLG_WIN_HIDETITLE=&Скрыть название
+DLG_WIN_NO_FRAME=Без &рамки
 DLG_WIN_HIDEMENU=&Скрыть меню
 DLG_WIN_COLOREMU=&Эмуляция цвета
 DLG_WIN_PCBOLD16=&16 цветов (стиль PC)
@@ -486,6 +493,8 @@ DLG_WIN_NORMAL=Норма
 DLG_WIN_BOLD=Полужирный
 DLG_WIN_BLINK=Мигание
 DLG_WIN_REVERSEATTR=Инверсия
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=Подчеркнуть
 
 DLG_CHOOSEFONT_STC6=Выбор "Стиль шрифта" не повлияет на фактический внешний вид шрифта.
 
@@ -1253,8 +1262,14 @@ MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents
+MENU_CONTENTS_AUTO=Авто
+MENU_CONTENTS_JAPANESE=Японский
+MENU_CONTENTS_KOREAN=Корейский
 MENU_AMB_MENU=Show &Ambiguous Characters width menu
 MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
+BTN_OK=ОК
+BTN_CANCEL=Отмена
+BTN_HELP=Помощь
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=&Всегда вверху
@@ -1272,6 +1287,42 @@ DLG_INTERVAL=&Интервал(сек)
 DLG_COMMAND=&Команда
 DLG_ADD_NEWLINE=&Добавить новую строку
 
+BTN_OK=ОК
+BTN_CANCEL=Отмена
+
 [TTXCheckUpdate]
 MSG_CHECKUPDATE=Check for updates automatically?\n  %s
 MENU_CHECKUPDATE=Check for &Updates...
+
+
+[TTXttyrec]
+MENU_RECORD=Запись TT&Y
+MENU_REPLAY=&Воспроизведение TTY
+MENU_REPLAYAGAIN=Воспроизвести снова
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0Все файлы(*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=Скорость: %d, Пауза: %s
+TITLE_STATUS_ON=ВКЛ
+TITLE_STATUS_OFF=ВЫКЛ
+TITLE_TRIM=%d.%06d секунд бездействия. обрезать до %d секунд.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), Отключено.
+
+
+[TTXViewMode]
+MENU_SETPASS=Пароль режима &просмотра
+MENU_VIEWMODE=Режим &просмотра
+DLG_SETPASSWORD_TITLE=Установить пароль
+DLG_SETPASSWORD_CURPASS=Старый пароль
+DLG_SETPASSWORD_NEWPASS=Новый пароль
+DLG_SETPASSWORD_RETPASS=Повторите пароль
+DLG_INPUTPASSWORD_TITLE=Введите пароль
+DLG_INPUTPASSWORD_PASSWORD=Пароль
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=Пароль изменен
+MSG_INVALID=Неверный пароль
+MSG_NOTMATCHED=Новый пароль не совпадает.
+MSG_TITLE_ERROR=Ошибка TTXViewMode
+MSG_CANNOTDISPLAY=Невозможно отобразить диалоговое окно.
+BTN_OK=ОК
+BTN_CANCEL=&Отмена
