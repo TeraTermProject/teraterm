@@ -598,7 +598,7 @@ struct tttset {
 	wchar_t *LogDefaultPathW;			// ログフォルダ([file]/[log]メニューのログ)
 	HINSTANCE PluginVTIconInstance;
 	WORD PluginVTIconID;
-	HINSTANCE TeraTermInstance;
+	HINSTANCE TeraTermInstance;			// WinMain() 1番目の引数
 	WORD WindowCornerDontround;
 	wchar_t DialogFontNameW[LF_FACESIZE];
 	BOOL NotifySound;
@@ -620,6 +620,7 @@ struct tttset {
 	WORD AutoComPortReconnectDelayIllegal;		// (ms)
 	WORD AutoComPortReconnectRetryInterval;		// (ms)
 	WORD AutoComPortReconnectRetryCount;		// 0~
+	int nCmdShow;						// WinMain() 4番目の引数の値
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;

@@ -293,7 +293,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 {
 	(void)hPreInst;
 	(void)lpszCmdLine;
-	(void)nCmdShow;
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
@@ -302,6 +301,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	setlocale(LC_ALL, "");
 
 	ts.TeraTermInstance = hInstance;
+	ts.nCmdShow = nCmdShow;
 	hInst = hInstance;
 	init();
 	_HtmlHelpW(NULL, NULL, HH_INITIALIZE, (DWORD_PTR)&HtmlHelpCookie);
@@ -313,6 +313,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);
 	pVTWin = m_pMainWnd;
 	main_window = m_pMainWnd->m_hWnd;
+
+	if (ts.Minimize>0) {
+		nCmdShow = SW_SHOWMINIMIZED;
+	}
+	ShowWindow(main_window, nCmdShow);
+
 	// [Tera Term]セクションのDLG_SYSTEM_FONTをとりあえずセットする
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
