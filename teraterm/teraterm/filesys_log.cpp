@@ -1068,6 +1068,9 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 	else if (!IsRelativePathW(log_filename)) {
 		// â‘ÎƒpƒX‚ª“ü—Í‚³‚ê‚½
 		dir = ExtractDirNameW(log_filename);
+		if (dir == NULL) {
+			return NULL;
+		}
 		fname = ExtractFileNameW(log_filename);
 	}
 	else {

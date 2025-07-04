@@ -989,8 +989,10 @@ wchar_t *ExtractDirNameW(const wchar_t *PathName)
 {
 	size_t i;
 	wchar_t *DirName = _wcsdup(PathName);
-	if (!GetFileNamePosW(DirName, &i, NULL))
+	if (!GetFileNamePosW(DirName, &i, NULL)) {
+		free(DirName);
 		return NULL;
+	}
 	DirName[i] = 0;
 	return DirName;
 }
