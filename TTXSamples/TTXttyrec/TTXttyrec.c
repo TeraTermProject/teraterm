@@ -215,7 +215,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 				CloseHandle(pvar->fh);
 			}
 
-			GetI18nStrWW("TTXttyrec", "FILE_FILTER", L"ttyrec(*.tty)\0*.tty\0All files(*.*)\0*.*\0\0", pvar->ts->UILanguageFileW, &uimsg1);
+			GetI18nStrWW("TTXttyrec", "FILE_FILTER", L"ttyrec(*.tty)\\0*.tty\\0All files(*.*)\\0*.*\\0\\0", pvar->ts->UILanguageFileW, &uimsg1);
 			GetI18nStrWW("TTXttyrec", "FILE_DEFAULTEXTENSION", L"tty", pvar->ts->UILanguageFileW, &uimsg2);
 			memset(&ofn, 0, sizeof(ofn));
 			ofn.hwndOwner = hWin;
