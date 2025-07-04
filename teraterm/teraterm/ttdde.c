@@ -740,10 +740,16 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			result = DDE_FNOTPROCESSED;
 		}
 		else {
+			BOOL ret;
+
 			wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
 			wchar_t *log_filenameW = FLogGetLogFilename(ParamFileNameW);
-			BOOL ret = FLogOpen(log_filenameW, LOG_UTF8, FALSE);
-			free(log_filenameW);
+			if (log_filenameW == NULL) {
+				ret = 0;
+			} else {
+				ret = FLogOpen(log_filenameW, LOG_UTF8, FALSE);
+				free(log_filenameW);
+			}
 			free(ParamFileNameW);
 			strncpy_s(ParamFileName, sizeof(ParamFileName), ret ? "1" : "0", _TRUNCATE);
 		}
