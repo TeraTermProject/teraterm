@@ -162,7 +162,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	for (;;) {
 		// Windowsのメッセージがない場合のループ
 		for(;;) {
-			if (PeekMessageA(&msg, NULL, NULL, NULL, PM_NOREMOVE) != FALSE) {
+			if (PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) != FALSE) {
 				// メッセージが存在した、ループを抜ける
 				break;
 			}
@@ -194,7 +194,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				DispatchMessageW(&msg);
 			}
 
-			if (PeekMessageA(&msg, NULL, NULL, NULL, PM_NOREMOVE) == FALSE) {
+			if (PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) == FALSE) {
 				// メッセージがなくなった、ループを抜ける
 				break;
 			}

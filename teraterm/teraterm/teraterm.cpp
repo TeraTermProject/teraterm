@@ -329,7 +329,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	for (;;) {
 		// idle状態でメッセージがない場合
 		while (bIdle) {
-			if (::PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE) != FALSE) {
+			if (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) != FALSE) {
 				// メッセージが存在する
 				break;
 			}
@@ -377,7 +377,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				lCount = 0;
 			}
 
-			if (::PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE) == FALSE) {
+			if (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) == FALSE) {
 				// メッセージがなくなった
 				break;
 			}
