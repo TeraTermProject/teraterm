@@ -82,14 +82,21 @@ void RestoreOLDTitle() {
 void ChangeTitleStatus() {
   char tbuff[TitleBuffSize];
   wchar_t *uimsg1, *uimsg2, *uimsg3;
+  char *msg1, *msg2, *msg3;
 
   GetI18nStrWW("TTXttyrec", "TITLE_STATUS_MSG", L"Speed: %d, Pause: %s", pvar->ts->UILanguageFileW, &uimsg1);
   GetI18nStrWW("TTXttyrec", "TITLE_STATUS_ON",  L"ON",                   pvar->ts->UILanguageFileW, &uimsg2);
   GetI18nStrWW("TTXttyrec", "TITLE_STATUS_OFF", L"OFF",                  pvar->ts->UILanguageFileW, &uimsg3);
-  _snprintf_s(tbuff, sizeof(tbuff), _TRUNCATE, ToCharW(uimsg1), pvar->speed, pvar->pause ? ToCharW(uimsg2): ToCharW(uimsg3));
+  msg1 = ToCharW(uimsg1);
+  msg2 = ToCharW(uimsg2);
+  msg3 = ToCharW(uimsg3);
   free(uimsg1);
   free(uimsg2);
   free(uimsg3);
+  _snprintf_s(tbuff, sizeof(tbuff), _TRUNCATE, msg1, pvar->speed, pvar->pause ? msg2: msg3);
+  free(msg1);
+  free(msg2);
+  free(msg3);
   strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
   pvar->ChangeTitle = TRUE;
   SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
@@ -230,10 +237,12 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 			if (pvar->maxwait != 0 && pvar->wait.tv_sec >= pvar->maxwait) {
 				char tbuff[TitleBuffSize];
 				wchar_t *uimsg;
+				char *msg;
 				GetI18nStrWW("TTXttyrec", "TITLE_TRIM", L"%d.%06d secs idle. trim to %d secs.", pvar->ts->UILanguageFileW, &uimsg);
-				_snprintf_s(tbuff, sizeof(tbuff), _TRUNCATE, ToCharW(uimsg),
-				pvar->wait.tv_sec, pvar->wait.tv_usec, pvar->maxwait);
+				msg = ToCharW(uimsg);
 				free(uimsg);
+				_snprintf_s(tbuff, sizeof(tbuff), _TRUNCATE, msg, pvar->wait.tv_sec, pvar->wait.tv_usec, pvar->maxwait);
+				free(msg);
 				pvar->wait.tv_sec = pvar->maxwait;
 				pvar->wait.tv_usec = 0;
 				title_changed = TRUE;
@@ -502,7 +511,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 			wchar_t *openfn;
 			wchar_t *uimsg1, *uimsg2;
 
-			GetI18nStrWW("TTXttyrec", "FILE_FILTER", L"ttyrec(*.tty)\0*.tty\0All files(*.*)\0*.*\0\0", pvar->ts->UILanguageFileW, &uimsg1);
+			GetI18nStrWW("TTXttyrec", "FILE_FILTER", L"ttyrec(*.tty)\\0*.tty\\0All files(*.*)\\0*.*\\0\\0", pvar->ts->UILanguageFileW, &uimsg1);
 			GetI18nStrWW("TTXttyrec", "FILE_DEFAULTEXTENSION", L"tty", pvar->ts->UILanguageFileW, &uimsg2);
 			memset(&ofn, 0, sizeof(ofn));
 			ofn.hwndOwner = hWin;
