@@ -57,7 +57,7 @@ static const struct ssh2_mac_t ssh2_macs[] = {
 	{HMAC_SHA1_96_EtM,  "hmac-sha1-96-etm@openssh.com",  SSH_DIGEST_SHA1,      96, 1},
 	{HMAC_MD5_96_EtM,   "hmac-md5-96-etm@openssh.com",   SSH_DIGEST_MD5,       96, 1},
 	{HMAC_RIPEMD160_EtM,"hmac-ripemd160-etm@openssh.com",SSH_DIGEST_RIPEMD160, 0,  1},
-	{HMAC_SHA2_256_EtM, "hmac-sha2-256-etm@openssh.com", SSH_DIGEST_SHA512,    0,  1},
+	{HMAC_SHA2_256_EtM, "hmac-sha2-256-etm@openssh.com", SSH_DIGEST_SHA256,    0,  1},
 	{HMAC_SHA2_512_EtM, "hmac-sha2-512-etm@openssh.com", SSH_DIGEST_SHA512,    0,  1},
 	{HMAC_IMPLICIT,     "<implicit>",                    SSH_DIGEST_MAX,       0,  0}, // for AEAD cipher
 	{HMAC_NONE,         NULL,                            SSH_DIGEST_MAX,       0,  0},
