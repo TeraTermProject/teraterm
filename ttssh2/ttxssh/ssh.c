@@ -6226,6 +6226,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	/* calc and verify H */
 	// ハッシュの計算
 	// verify は ssh2_kex_finish() で行う
+	hashlen = sizeof(hash);
 	ret = kex_ecdh_hash(
 		get_kex_hash_algorithm(pvar->kex_type),
 		group,
