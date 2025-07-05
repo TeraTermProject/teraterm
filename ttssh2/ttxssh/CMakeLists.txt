@@ -47,6 +47,8 @@ target_sources(
   crypt.c
   crypt.h
   crypto_api.h
+  digest.c
+  digest.h
   dns.c
   dns.h
   ed25519.c
@@ -57,6 +59,8 @@ target_sources(
   fwdui.c
   fwdui.h
   hash.c
+  hmac.c
+  hmac.h
   hostkey.c
   hostkey.h
   hosts.c
