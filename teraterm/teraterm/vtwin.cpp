@@ -548,7 +548,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	WNDCLASSW wc;
 	RECT rect;
 	DWORD Style;
-	int CmdShow;
 	BOOL isFirstInstance;
 	m_hInst = hInstance;
 
@@ -793,15 +792,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		Startup();
 		return;
 	}
-	CmdShow = SW_SHOWDEFAULT;
-	if (ts.Minimize>0) {
-		CmdShow = SW_SHOWMINIMIZED;
-	}
 	SetWindowAlpha(ts.AlphaBlendActive);
-	ShowWindow(CmdShow);
 	ChangeCaret();
-
-	pVTWin = this;
 }
 
 /////////////////////////////////////////////////////////////////////////////
