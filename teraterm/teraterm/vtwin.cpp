@@ -640,6 +640,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	vtwin_work.dbcs_lead_byte = 0;
 	vtwin_work.monitor_DPI = 0;
 	vtwin_work.help_id = 0;
+	isSizing = FALSE;
 
 	// UnicodeDebugParam
 	{
@@ -2683,7 +2684,8 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 	// DPIのチェックを行わない
 	// ウィンドウ生成時、WM_SIZE, WM_MOVE とメッセージが発生する
 	if (vtwin_work.monitor_DPI != 0 &&
-		GetMonitorDpiFromWindow(m_hWnd) != vtwin_work.monitor_DPI) {
+		GetMonitorDpiFromWindow(m_hWnd) != vtwin_work.monitor_DPI &&
+		isSizing == FALSE) {
 		// DPIの異なるディスプレイをまたぐと WM_DPICHANGE が発生する
 		//
 		// 「ドラッグ中にウィンドウの内容を表示する=OFF」設定時
@@ -2693,9 +2695,7 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 		// 2. ウィンドウがリサイズしたとき
 		//    (WM_MOVE,)WM_SIZE, WM_DPICHANGED の順でメッセージが発生する
 		//
-		// メッセージからは、セル数かフォントサイズか、
-		// どちらを変更すべきか判断できない
-		// ここでは 1 が妥当となるよう実装した
+		// WM_SIZEの処理のため、2 が妥当となるよう実装した
 		return;
 	}
 	RECT R;
@@ -2846,6 +2846,7 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 		pRect->bottom = pRect->top + fixed_height;
 		break;
 	}
+	isSizing = TRUE;
 }
 
 void CVTWindow::OnSysChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
@@ -3125,7 +3126,7 @@ LRESULT CVTWindow::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 	BGOnExitSizeMove();
 
 	EnableSizeTip(0);
-
+	isSizing = FALSE;
 	return TTCFrameWnd::DefWindowProc(WM_EXITSIZEMOVE,wParam,lParam);
 }
 
@@ -4930,112 +4931,177 @@ void CVTWindow::OnHelpAbout()
 	(*AboutDialog)(HVTWin);
 }
 
-LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
+LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 {
+	// BOOL calcOnly
+	//   TRUE  = WM_GETDPISCALEDSIZE
+	//   FALSE = WM_DPICHANGED
+
 	const UINT NewDPI = LOWORD(wp);
 	const RECT SuggestedWindowRect = *(RECT *)lp;
-
-	// 新しいDPIに合わせてフォントを生成、
-	// クライアント領域のサイズを決定する
-	ChangeFont(NewDPI);
-	ScreenWidth = WinWidth * FontWidth;
-	ScreenHeight = WinHeight * FontHeight;
-	//AdjustScrollBar();
-
-	// スクリーンサイズ(=Client Areaのサイズ)からウィンドウサイズを算出
+	SIZE *sz = (SIZE *)lp;
+	RECT NewWindowRect[4]; // 新しいウィンドウ領域候補
+	const RECT *NewRect;
 	int NewWindowWidth;
 	int NewWindowHeight;
-	if (pAdjustWindowRectExForDpi != NULL || pAdjustWindowRectEx != NULL) {
-		const DWORD Style = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
-		const DWORD ExStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
-		const BOOL bMenu = (ts.PopupMenu != 0) ? FALSE : TRUE;
-		if (pGetSystemMetricsForDpi != NULL) {
-			// スクロールバーが表示されている場合は、
-			// スクリーンサイズ(クライアントエリアのサイズ)に追加する
-			int min_pos;
-			int max_pos;
-			GetScrollRange(m_hWnd, SB_VERT, &min_pos, &max_pos);
-			if (min_pos != max_pos) {
-				ScreenWidth += pGetSystemMetricsForDpi(SM_CXVSCROLL, NewDPI);
-			}
-			GetScrollRange(m_hWnd, SB_HORZ, &min_pos, &max_pos);
-			if (min_pos != max_pos) {
-				ScreenHeight += pGetSystemMetricsForDpi(SM_CXHSCROLL, NewDPI);
-			}
+
+	if (isSizing && (calcOnly == FALSE)) {
+		NewRect = &SuggestedWindowRect;
+		NewWindowWidth  = NewRect->right  - NewRect->left;
+		NewWindowHeight = NewRect->bottom - NewRect->top;
+	} else {
+		int tmpScreenWidth;
+		int tmpScreenHeight;
+
+		if (calcOnly) {
+			// 新DPIのフォントのサイズからスクリーンサイズを算出
+			LOGFONTA VTlfDefault;
+			DispSetLogFont(&VTlfDefault, NewDPI); // Normal Font
+			HFONT VTFontDefault = CreateFontIndirect(&VTlfDefault);
+			HDC TmpDC = GetDC(m_hWnd);
+			SelectObject(TmpDC, VTFontDefault);
+			TEXTMETRIC Metrics;
+			GetTextMetrics(TmpDC, &Metrics);
+			int tmpFontWidth = Metrics.tmAveCharWidth + ts.FontDW;
+			int tmpFontHeight = Metrics.tmHeight + ts.FontDH;
+			DeleteObject(VTFontDefault);
+			ReleaseDC(m_hWnd, TmpDC);
+
+			tmpScreenWidth = WinWidth * tmpFontWidth;
+			tmpScreenHeight = WinHeight * tmpFontHeight;
+		} else {
+			// 新しいDPIに合わせてフォントを生成、
+			// クライアント領域のサイズを決定する
+			ChangeFont(NewDPI);
+			tmpScreenWidth = WinWidth * FontWidth;
+			tmpScreenHeight = WinHeight * FontHeight;
+			//AdjustScrollBar();
 		}
-		RECT Rect = {0, 0, ScreenWidth, ScreenHeight};
-		if (pAdjustWindowRectExForDpi != NULL) {
-			// Windows 10, version 1607+
-			pAdjustWindowRectExForDpi(&Rect, Style, bMenu, ExStyle, NewDPI);
+
+		// スクリーンサイズ(=Client Areaのサイズ)からウィンドウサイズを算出
+		if (pAdjustWindowRectExForDpi != NULL || pAdjustWindowRectEx != NULL) {
+			const DWORD Style = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
+			const DWORD ExStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
+			const BOOL bMenu = (ts.PopupMenu != 0) ? FALSE : TRUE;
+			if (pGetSystemMetricsForDpi != NULL) {
+				// スクロールバーが表示されている場合は、
+				// スクリーンサイズ(クライアントエリアのサイズ)に追加する
+				int min_pos;
+				int max_pos;
+				GetScrollRange(m_hWnd, SB_VERT, &min_pos, &max_pos);
+				if (min_pos != max_pos) {
+					tmpScreenWidth += pGetSystemMetricsForDpi(SM_CXVSCROLL, NewDPI);
+				}
+				GetScrollRange(m_hWnd, SB_HORZ, &min_pos, &max_pos);
+				if (min_pos != max_pos) {
+					tmpScreenHeight += pGetSystemMetricsForDpi(SM_CXHSCROLL, NewDPI);
+				}
+			}
+			RECT Rect = {0, 0, tmpScreenWidth, tmpScreenHeight};
+			if (pAdjustWindowRectExForDpi != NULL) {
+				// Windows 10, version 1607+
+				pAdjustWindowRectExForDpi(&Rect, Style, bMenu, ExStyle, NewDPI);
+			}
+			else {
+				// Windows 2000+
+				pAdjustWindowRectEx(&Rect, Style, bMenu, ExStyle);
+			}
+			NewWindowWidth = Rect.right - Rect.left;
+			NewWindowHeight = Rect.bottom - Rect.top;
 		}
 		else {
-			// Windows 2000+
-			pAdjustWindowRectEx(&Rect, Style, bMenu, ExStyle);
+			// WM_DPICHANGEDが発生しない環境のはず、念の為実装
+			RECT WindowRect;
+			GetWindowRect(&WindowRect);
+			const int WindowWidth = WindowRect.right - WindowRect.left;
+			const int WindowHeight = WindowRect.bottom - WindowRect.top;
+			RECT ClientRect;
+			GetClientRect(&ClientRect);
+			const int ClientWidth =  ClientRect.right - ClientRect.left;
+			const int ClientHeight = ClientRect.bottom - ClientRect.top;
+			NewWindowWidth = WindowWidth - ClientWidth + tmpScreenWidth;
+			NewWindowHeight = WindowHeight - ClientHeight + tmpScreenHeight;
 		}
-		NewWindowWidth = Rect.right - Rect.left;
-		NewWindowHeight = Rect.bottom - Rect.top;
-	}
-	else {
-		// WM_DPICHANGEDが発生しない環境のはず、念の為実装
-		RECT WindowRect;
-		GetWindowRect(&WindowRect);
-		const int WindowWidth = WindowRect.right - WindowRect.left;
-		const int WindowHeight = WindowRect.bottom - WindowRect.top;
-		RECT ClientRect;
-		GetClientRect(&ClientRect);
-		const int ClientWidth =  ClientRect.right - ClientRect.left;
-		const int ClientHeight = ClientRect.bottom - ClientRect.top;
-		NewWindowWidth = WindowWidth - ClientWidth + ScreenWidth;
-		NewWindowHeight = WindowHeight - ClientHeight + ScreenHeight;
-	}
 
-	// 新しいウィンドウ領域候補
-	RECT NewWindowRect[4];
+		if (calcOnly) {
+			sz->cx = NewWindowWidth;
+			sz->cy = NewWindowHeight;
+			return TRUE;
+		} else {
+			ScreenWidth = tmpScreenWidth;
+			ScreenHeight = tmpScreenHeight;
+		}
 
-	// 推奨領域に右上寄せ
-	NewWindowRect[0].top = SuggestedWindowRect.top;
-	NewWindowRect[0].bottom = SuggestedWindowRect.top + NewWindowHeight;
-	NewWindowRect[0].left = SuggestedWindowRect.right - NewWindowWidth;
-	NewWindowRect[0].right = SuggestedWindowRect.right;
+		// 推奨領域に左上寄せ
+		NewWindowRect[0].top = SuggestedWindowRect.top;
+		NewWindowRect[0].bottom = SuggestedWindowRect.top + NewWindowHeight;
+		NewWindowRect[0].left = SuggestedWindowRect.left;
+		NewWindowRect[0].right = SuggestedWindowRect.left + NewWindowWidth;
 
-	// 推奨領域に左上寄せ
-	NewWindowRect[1].top = SuggestedWindowRect.top;
-	NewWindowRect[1].bottom = SuggestedWindowRect.top + NewWindowHeight;
-	NewWindowRect[1].left = SuggestedWindowRect.left;
-	NewWindowRect[1].right = SuggestedWindowRect.left + NewWindowWidth;
+		// 推奨領域に右上寄せ
+		NewWindowRect[1].top = SuggestedWindowRect.top;
+		NewWindowRect[1].bottom = SuggestedWindowRect.top + NewWindowHeight;
+		NewWindowRect[1].left = SuggestedWindowRect.right - NewWindowWidth;
+		NewWindowRect[1].right = SuggestedWindowRect.right;
 
-	// 推奨位置に右下寄せ
-	NewWindowRect[2].top = SuggestedWindowRect.bottom - NewWindowHeight;
-	NewWindowRect[2].bottom = SuggestedWindowRect.top;
-	NewWindowRect[2].left = SuggestedWindowRect.right - NewWindowWidth;
-	NewWindowRect[2].right = SuggestedWindowRect.right;
+		// 推奨位置に左下寄せ
+		NewWindowRect[2].top = SuggestedWindowRect.bottom - NewWindowHeight;
+		NewWindowRect[2].bottom = SuggestedWindowRect.bottom;
+		NewWindowRect[2].left = SuggestedWindowRect.left;
+		NewWindowRect[2].right = SuggestedWindowRect.left + NewWindowWidth;
 
-	// 推奨位置に左下寄せ
-	NewWindowRect[3].top = SuggestedWindowRect.bottom - NewWindowHeight;
-	NewWindowRect[3].bottom = SuggestedWindowRect.top;
-	NewWindowRect[3].left = SuggestedWindowRect.left;
-	NewWindowRect[3].right = SuggestedWindowRect.left + NewWindowWidth;
+		// 推奨位置に右下寄せ
+		NewWindowRect[3].top = SuggestedWindowRect.bottom - NewWindowHeight;
+		NewWindowRect[3].bottom = SuggestedWindowRect.bottom;
+		NewWindowRect[3].left = SuggestedWindowRect.right - NewWindowWidth;
+		NewWindowRect[3].right = SuggestedWindowRect.right;
 
-	// 確認
-	const RECT *NewRect = &NewWindowRect[0];
-	for (size_t i = 0; i < _countof(NewWindowRect); i++) {
-		const RECT *r = &NewWindowRect[i];
-		HMONITOR hMonitor = pMonitorFromRect(r, MONITOR_DEFAULTTONULL);
-		MONITORINFOEXW monitorInfo;
-		RtlZeroMemory(&monitorInfo, sizeof(monitorInfo));
-		monitorInfo.cbSize = sizeof(monitorInfo);
-		if (GetMonitorInfoW(hMonitor, &monitorInfo)) {
-			HDC hdc = CreateDCW(NULL, monitorInfo.szDevice, NULL, NULL);
-			if (hdc) {
-				UINT dpiX = (UINT)GetDeviceCaps(hdc, LOGPIXELSX);
-				DeleteDC(hdc);
-				if (NewDPI == dpiX) {
+		// 確認
+		NewRect = &NewWindowRect[0];
+		for (size_t i = 0; i < _countof(NewWindowRect); i++) {
+			const RECT *r = &NewWindowRect[i];
+			HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
+									r->left, r->top, NewWindowWidth, NewWindowHeight,
+									NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
+			if (tmphWnd) {
+				assert(pGetDpiForWindow); // GetDpiForWindow()は、Windows 10 v1607 Red Stone 1 (RS1)以降で使用可能
+				int myDPI = pGetDpiForWindow(tmphWnd);
+				/*
+				  ・Tera Term の高 DPI(Per-Monitor V2) 対応環境は、Windows 10 v1703 以降。
+				    Windows 10 v1703 未満、及び Windows 8.1、Windows 7環境では、
+				    WM_DPICHANGED と WM_GETDPISCALEDSIZE は送信されない。
+				  ・CVTWindow::OnDpiChanged() 内では、GetDpiForWindow() は常に使用可能だが、
+				    他の箇所では GetDpiForWindow() の存在を確認するコードとすること。
+
+				  機能                 最小要件                             リリース日 備考
+				  ------------------------------------------------------------------------------------------
+				  WM_DPICHANGED        Windows 8.1                          2013/10/18
+				  GetDpiForMonitor()   Windows 8.1                          2013/10/18 Per-Monitor V2 非対応
+				  GetDpiForWindow()    Windows 10 v1607  Red Stone 1 (RS1)  2016/08/XX
+				  ------------------------------------------------------------------------------------------
+				  Per-Monitor V2       Windows 10 v1703  Red Stone 2 (RS2)  2017/04/XX
+				  WM_GETDPISCALEDSIZE  Windows 10 v1703  Red Stone 2 (RS2)  2017/04/XX
+				  ------------------------------------------------------------------------------------------
+				*/
+				::DestroyWindow(tmphWnd);
+				if (NewDPI == myDPI) {
 					NewRect = r;
 					break;
 				}
 			}
 		}
 	}
+
+#ifdef WINDOW_MAXMIMUM_ENABLED
+	if (IsZoomed(m_hWnd)) {
+		ts.TerminalOldWidth = NewWindowWidth;
+		ts.TerminalOldHeight = NewWindowHeight;
+		GetDesktopRect(m_hWnd, &NewWindowRect[0]);
+		NewRect = &NewWindowRect[0];
+		NewWindowWidth  = NewRect->right  - NewRect->left;
+		NewWindowHeight = NewRect->bottom - NewRect->top;
+	}
+#endif
 
 	::SetWindowPos(m_hWnd, NULL,
 				   NewRect->left, NewRect->top,
@@ -5055,7 +5121,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp)
 		TTSetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), NewDPI);
 	}
 
-	return TRUE;
+	return 0;
 }
 
 LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
@@ -5297,8 +5363,11 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_USER_DROPNOTIFY:
 		OnDropNotify(wp, lp);
 		break;
+	case WM_GETDPISCALEDSIZE:
+		retval = OnDpiChanged(wp, lp, TRUE);
+		break;
 	case WM_DPICHANGED:
-		OnDpiChanged(wp, lp);
+		OnDpiChanged(wp, lp, FALSE);
 		break;
 	case WM_COMMAND:
 	{
