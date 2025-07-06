@@ -36,7 +36,6 @@
 #include "vtterm.h"
 #include "commlib.h"
 #include "dlglib.h"
-//#include "telnet.h"
 #include "setting.h"
 #include "ttdialog.h"
 #include "ttwinman.h"

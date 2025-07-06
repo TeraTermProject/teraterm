@@ -1603,8 +1603,8 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
 		pages[PP_UI] = UIPageCreate(hInstance, &ts);
 		pages[PP_WINDOW] = CreateWinVTPP(hInstance, hParentWnd, &ts);
 	}
-//	if (parent_win == ADDSETTING_WIN_TEK) {	// TEKから呼び出されたときだけ表示する
-	{										// いつも表示する
+	if (parent_win == ADDSETTING_WIN_TEK) {	// TEKから呼び出されたときだけ表示する
+//	{										// いつも表示する
 		pages[PP_TEK_WINDOW] = CreateWinTEKPP(hInstance, hParentWnd, &ts);
 		pages[PP_TEK_FONT] = TEKFontPageCreate(hInstance, hParentWnd, &ts);
 	}
