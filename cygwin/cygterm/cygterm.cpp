@@ -722,7 +722,7 @@ DWORD WINAPI term_thread(LPVOID param)
 	asprintf(&term, cfg->term, inet_ntoa(addr), (int)ntohs(listen_port));
 	if (cfg->termopt != NULL) {
 		char *tmp;
-		asprintf(&tmp, "%s %s", tmp, cfg->termopt);
+		asprintf(&tmp, "%s %s", term, cfg->termopt);
 		free(term);
 		term = tmp;
 	}
@@ -749,8 +749,10 @@ DWORD WINAPI term_thread(LPVOID param)
 	free(termT);
 	if (!r) {
 		api_error(term);
+		free(term);
 		return 0;
 	}
+	free(term);
 	WaitForSingleObject(pi.hProcess, INFINITE);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
