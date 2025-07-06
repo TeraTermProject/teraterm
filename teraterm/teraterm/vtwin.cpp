@@ -783,7 +783,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		TipWin->Create(HVTWin);
 	}
 
-	if (ts.nCmdShow == SW_HIDE || ts.HideWindow > 0) {
+	if (ts.nCmdShow == SW_HIDE || ts.nCmdShow == SW_SHOWMINIMIZED ||
+		ts.nCmdShow == SW_MINIMIZE || ts.HideWindow > 0) {
 		if (strlen(TopicName)>0) {
 			InitDDE();
 			SendDDEReady();
