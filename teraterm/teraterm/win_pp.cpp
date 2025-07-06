@@ -157,14 +157,18 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
 			{
 				// VTWin‚ÆTEKWin‚Åƒ‰ƒxƒ‹‚ªˆÙ‚È‚Á‚Ä‚¢‚é
-				static const DlgTextInfo TextInfosVT[] = {
-					{ IDC_WINCOLOREMU, "DLG_WIN_PCBOLD16" },
-				};
-				static const DlgTextInfo TextInfosTEK[] = {
-					{ IDC_WINCOLOREMU, "DLG_WIN_COLOREMU" },
-				};
-				const DlgTextInfo *TextInfosVTTEK = (work->VTFlag>0) ? TextInfosVT : TextInfosTEK;
-				SetDlgTextsW(Dialog, TextInfosVTTEK, 1, ts->UILanguageFileW);
+				wchar_t *UIMsg;
+				if (work->VTFlag>0) {
+					GetI18nStrWW("Tera Term", "DLG_WIN_PCBOLD16",
+								 L"&16 Colors (PC style)",
+								 ts->UILanguageFileW, &UIMsg);
+				} else {
+					GetI18nStrWW("Tera Term", "DLG_WIN_TITLE",
+								 L"&Color emulation",
+								 ts->UILanguageFileW, &UIMsg);
+				}
+				SetDlgItemTextW(Dialog, IDC_WINCOLOREMU, UIMsg);
+				free(UIMsg);
 			}
 
 			SetDlgItemTextA(Dialog, IDC_WINTITLE, ts->Title);
