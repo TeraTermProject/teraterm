@@ -17,14 +17,23 @@
     <dl>
       <dt id="ComPort">Port</dt>
       <dd>
-        When the serial port is not connected,
-        Sets the default serial port for <a href="file-new.html#SerialPort">New connection Dialog</a>.
-        A non existent serial port can be set.
-        New connection dialog does not show any non existent serial ports.<br>
-        By default, maximum serial port number in the list is 256. It is configurable in <a href="../setup/teraterm-com.html#maxport">MaxComPort</a> setting.
+        Sets the default serial port or displays the currently connected serial port.
+
+        <p>
+          When the serial port is not connected,
+          Sets the default serial port for <a href="file-new.html#SerialPort">New connection Dialog</a>.<br>
+          A non existent serial port can be set.
+          New connection dialog does not show any non existent serial ports.<br>
+          By default, maximum serial port number in the list is 256. It is configurable in <a href="../setup/teraterm-com.html#maxport">MaxComPort</a> setting.<br>
+          You cannot start connecting from this dialog. (version 5.4.0 or later)
+          You should use <a href="file-new.html">New connection</a> dialog for connecting to a serial port.
+        </p>
+
         <p>
           When the serial port is connected,
-          displays the serial port to which it is connected.
+          displays the serial port to which it is connected.<br>
+          You cannot change the port number while connected from this dialog. (version 5.4.0 or later)
+          To change the connection port number, disconnect once using <a href="file.html#disconnect">[File]-[Disconnect]</a> menu and connect to other port using the <a href="file-new.html">New connection</a> dialog.
         </p>
       </dd>
 
@@ -36,8 +45,7 @@
 
         <p>
           When the serial port is not connected,
-          Sets the parameters for connecting to the serial port.<br>
-          Use <a href="file-new.html">New connection</a> when connecting to a serial port.
+          Sets the parameters for connecting to the serial port.
         </p>
         <p>
           When the serial port is connected,
