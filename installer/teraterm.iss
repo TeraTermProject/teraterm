@@ -168,42 +168,75 @@ Name: {userdesktop}\Tera Term 5; Filename: {app}\ttermpro.exe; WorkingDir: {app}
 Name: {userstartup}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app}; IconFilename: {app}\ttpmenu.exe; Components: TeraTerm_Menu; IconIndex: 0; Tasks: startupttmenuicon; Flags: createonlyiffileexists
 
 [Registry]
+; Register ProgId
+;   アンインストール時にはキーごと削除する。
+Root: HKLM; Subkey: Software\Classes\TeraTerm.telnet; ValueType: string; ValueData: "URL: TELNET Protocol"; Flags: uninsdeletekey; Components: TeraTerm; Tasks: telnetassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.telnet; ValueName: EditFlags; ValueType: dword; ValueData: 2; Components: TeraTerm; Tasks: telnetassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.telnet; ValueName: URL Protocol; ValueType: string; Components: TeraTerm; Tasks: telnetassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.telnet\DefaultIcon; ValueType: string; ValueData: """{app}\ttermpro.exe"",0"; Components: TeraTerm; Tasks: telnetassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.telnet\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /T=1 /nossh /E %1"; Components: TeraTerm; Tasks: telnetassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh; ValueType: string; ValueData: "URL: SSH Protocol"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh; ValueName: EditFlags; ValueType: dword; ValueData: 2; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh; ValueName: URL Protocol; ValueType: string; Components: TTSSH; Tasks: telnetassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.ssh\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /ssh %1"; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.MacroFile; ValueType: string; ValueData: "Tera Term Macro File"; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.MacroFile\DefaultIcon; ValueType: string; ValueData: """{app}\ttpmacro.exe"",3"; Components: TeraTerm; Tasks: macroassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.MacroFile\shell\open\command; ValueType: string; ValueData: """{app}\ttpmacro.exe"" ""%1"""; Components: TeraTerm; Tasks: macroassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.TTYRecordFile; ValueType: string; ValueData: "Tera Term TTY Record File"; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.TTYRecordFile\DefaultIcon; ValueType: string; ValueData: """{app}\ttermpro.exe"",0"; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKLM; Subkey: Software\Classes\TeraTerm.TTYRecordFile\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /R=""%1"" /TTYPLAY"; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+
+; Register Application
+;   Software\RegisteredApplications MUST NOT uninsdeletekey
+Root: HKLM; Subkey: Software\RegisteredApplications; ValueType: string; ValueName: "Tera Term"; ValueData: "Software\Tera Term\Capabilities"; Flags: uninsdeletevalue; Components: TeraTerm; Tasks: telnetassoc sshassoc
+;   アンインストール時にはキーごと削除する。
+Root: HKLM; Subkey: Software\Tera Term; Flags: uninsdeletekey; Components: TeraTerm; Tasks: telnetassoc sshassoc
+Root: HKLM; Subkey: Software\Tera Term\Capabilities; ValueType: string; ValueName: "ApplicationDescription"; ValueData: "Tera Term"; Components: TeraTerm; Tasks: telnetassoc sshassoc
+
+; Associate ProgId to Protocol
+;   プロトコル と 選択できるプログラム の関連付け
+Root: HKLM; Subkey: Software\Tera Term\Capabilities\UrlAssociations; ValueType: string; ValueName: "telnet"; ValueData: "TeraTerm.telnet"; Components: TeraTerm; Tasks: telnetassoc
+Root: HKLM; Subkey: Software\Tera Term\Capabilities\UrlAssociations; ValueType: string; ValueName: "ssh"; ValueData: "TeraTerm.ssh"; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Tera Term\Capabilities\UrlAssociations; ValueType: string; ValueName: "slogin"; ValueData: "TeraTerm.ssh"; Components: TTSSH; Tasks: sshassoc
+
+; Legacy Association
+;   プロトコルにプログラムを直接指定する XP 以前の登録の仕方だが、
+;   これがないと プロトコル/リンクの種類 の関連付け画面に プロトコル が出てこない。
+;   HKCR に登録してもプロトコルは出てこない。
+;   telnet は Windows に元々あるので追加しなくてよい。
+;   アンインストール時にはプロトコルだけ残す。
+Root: HKLM; Subkey: Software\Classes\ssh; ValueType: string; ValueData: "URL: SSH Protocol"; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\ssh; ValueName: URL Protocol; ValueType: string; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\ssh; ValueName: EditFlags; ValueType: dword; ValueData: 2; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\ssh\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\ssh\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /ssh %1"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\slogin; ValueType: string; ValueData: "URL: slogin Protocol"; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\slogin; ValueName: URL Protocol; ValueType: string; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\slogin; ValueName: EditFlags; ValueType: dword; ValueData: 2; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\slogin\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+Root: HKLM; Subkey: Software\Classes\slogin\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /ssh %1"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
+;   拡張子 と プログラム の関連付け
+;   この拡張子がほかのプログラムとバッティングすることはないと思われるので、RegisteredApplications への登録はしない。
+;   Inno Setup のサンプルでも Classes\.ext に直接書き込んでいる（Examples\Example3.iss）。
+;   アンインストール時 .ext は残す。
+Root: HKLM; Subkey: Software\Classes\.ttl\OpenWithProgids; ValueType: string; ValueName: "TeraTerm.MacroFile"; Flags: uninsdeletevalue; Components: TeraTerm; Tasks: macroassoc
+Root: HKLM; Subkey: Software\Classes\.tty\OpenWithProgids; ValueType: string; ValueName: "TeraTerm.TTYRecordFile"; Flags: uninsdeletevalue; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+
 ; Cygterm Here
-Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
-Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
-Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%L\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%L\"""""; Components: cygterm; Tasks: cygtermhere
 ; Cygterm Here from folder Background
-Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
-Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
-Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%V\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
-Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
-Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
-Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%V\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
-; Associate with .TTL
-Root: HKCU; Subkey: Software\Classes\.ttl; ValueType: string; ValueData: TeraTerm.MacroFile; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
-Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile; ValueType: string; ValueData: Tera Term Macro File; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
-Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile\DefaultIcon; ValueType: string; ValueData: {app}\ttpmacro.exe,3; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
-Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile\shell\open\command; ValueType: string; ValueData: """{app}\ttpmacro.exe"" ""%1"""; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
-; Associate with telnet://
-Root: HKCU; Subkey: Software\Classes\telnet\shell; ValueType: string; ValueData: Open with Tera Term; Flags: uninsclearvalue; Components: TeraTerm; Tasks: telnetassoc
-Root: HKCU; Subkey: Software\Classes\telnet\shell\Open with Tera Term\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /T=1 /nossh /E %1"; Flags: uninsdeletekey; Components: TeraTerm; Tasks: telnetassoc
-; Associate with ssh://
-Root: HKCU; Subkey: Software\Classes\ssh; ValueType: string; ValueData: URL: SSH Protocol; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-; Associate with slogin://
-Root: HKCU; Subkey: Software\Classes\slogin; ValueType: string; ValueData: URL: slogin Protocol; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
-; Associate with .TTY
-Root: HKCU; Subkey: Software\Classes\.tty; ValueType: string; ValueData: TTYRecordFile; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
-Root: HKCU; Subkey: Software\Classes\TTYRecordFile; ValueType: string; ValueData: TTY Record File; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
-Root: HKCU; Subkey: Software\Classes\TTYRecordFile\DefaultIcon; ValueType: string; ValueData: {app}\ttermpro.exe,0; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
-Root: HKCU; Subkey: Software\Classes\TTYRecordFile\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /R=""%1"" /TTYPLAY"; Flags: uninsdeletekey; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%V\"""""; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Components: cygterm; Tasks: cygtermhere
+Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%V\"""""; Components: cygterm; Tasks: cygtermhere
 
 [Tasks]
 Name: desktopicon; Description: {cm:task_desktopicon}; Components: TeraTerm
@@ -698,6 +731,7 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   iniFile : String;
+  strValue : String;
 begin
   case CurStep of
     ssPostInstall:
@@ -705,37 +739,81 @@ begin
         iniFile := GetDefaultIniFilename();
         SetIniFile(iniFile);
 
-        if not WizardIsTaskSelected('cygtermhere') then
-        begin;
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\Folder\shell\cygterm');
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\Directory\Background\shell\cygterm');
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\LibraryFolder\Background\shell\cygterm');
+        // HKEY_CURRENT_USER への設定は HKEY_LOCAL_MACHINE より優先されて邪魔になるので削除する
+        //   専用拡張子なので丸ごと削除する
+        RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.ttl');
+        RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.tty');
+        //   ProgId を削除する
+        //     TeraTerm.MacroFile という名前は変わらないが、 HKLM で使う
+        //     TTYRecordFile という名前は廃止した
+        RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\TeraTerm.MacroFile');
+        RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\TTYRecordFile');
+        //  Tera Term のものが登録されていたらプロトコルから削除する
+        strValue := '';
+        if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell', '', strValue) then
+        begin
+          if Pos('Open with Tera Term', strValue) > 0 then
+          begin
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell', '');
+          end
         end;
-
-        if not WizardIsTaskSelected('macroassoc') then
-        begin;
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.ttl');
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\TeraTerm.MacroFile');
+        strValue := '';
+        if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell\Open with Tera Term\command', '', strValue) then
+        begin
+          if Pos('ttermpro.exe', strValue) > 0 then
+          begin
+            RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell\Open with Tera Term');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\telnet');
+          end
         end;
-
-        if not WizardIsTaskSelected('telnetassoc') then
-        begin;
-          // デフォルトで telnet プロトコルに関連付けがある Windows バージョンがあるため、Tera Term への関連付けだけを削除する
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell\Open with Tera Term');
-          RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\telnet\shell', '');
+        strValue := '';
+        if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Classes\ssh\DefaultIcon', '', strValue) then
+        begin
+          if Pos('ttxssh.dll', strValue) > 0 then
+          begin
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\ssh\DefaultIcon', '');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\ssh\DefaultIcon');
+          end;
         end;
-
-        if not WizardIsTaskSelected('sshassoc') then
-        begin;
-          // デフォルトの関連付けがないので、プロトコルごと削除
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\ssh');
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\slogin');
+        strValue := '';
+        if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Classes\ssh\shell\open\command', '', strValue) then
+        begin
+          if Pos('ttermpro.exe', strValue) > 0 then
+          begin
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\ssh\shell\open\command', '');
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\ssh', 'EditFlags');
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\ssh', 'URL Protocol');
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\ssh', '');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\ssh\shell\open\command');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\ssh\shell\open');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\ssh\shell');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\ssh');
+          end;
         end;
-
-        if not WizardIsTaskSelected('ttyplayassoc') then
-        begin;
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\.tty');
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\TTYRecordFile');
+        strValue := '';
+        if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Classes\slogin\DefaultIcon', '', strValue) then
+        begin
+          if Pos('ttxssh.dll', strValue) > 0 then
+          begin
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\slogin\DefaultIcon', '');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\slogin\DefaultIcon');
+          end;
+        end;
+        strValue := '';
+        if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Classes\slogin\shell\open\command', '', strValue) then
+        begin
+          if Pos('ttermpro.exe', strValue) > 0 then
+          begin
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\slogin\shell\open\command', '');
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\slogin', 'EditFlags');
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\slogin', 'URL Protocol');
+            RegDeleteValue(HKEY_CURRENT_USER, 'Software\Classes\slogin', '');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\slogin\shell\open\command');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\slogin\shell\open');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\slogin\shell');
+            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\Classes\slogin');
+          end;
         end;
 
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
