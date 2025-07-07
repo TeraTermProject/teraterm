@@ -68,25 +68,17 @@ private:
 		IniFile inifile(filename, "TTProxy");
 		ProxyWSockHook::save(inifile);
 	}
-	static String get_teraterm_dir_relative_name(char* basename) {
-		if (!IsRelativePathA(basename)) {
-			return basename;
-		}
-		char buf[1024];
-		::GetModuleFileName(NULL, buf, sizeof buf);
-		char* filename = NULL;
-		for (char* dst = buf; *dst != '\0'; dst++) {
-			if (*dst == '\\' || *dst == '/' || *dst == ':') {
-				filename = dst + 1;
-			}
-		}
-		if (filename == NULL)
-			return basename;
+	static wchar_t *get_home_dir_relative_nameW(const wchar_t *basename) {
+		wchar_t *full_path = NULL, *dir;
 
-		*filename = '\0';
-		StringBuffer buffer(buf);
-		buffer.append(basename);
-		return buffer.toString();
+		if (!IsRelativePathW(basename)) {
+			return _wcsdup(basename);
+		}
+
+		dir = GetHomeDirW(NULL);
+		awcscats(&full_path, dir, L"\\", basename, NULL);
+		free(dir);
+		return full_path;
 	}
 
 	static void PASCAL TTXReadINIFile(const wchar_t *fileName, PTTSet ts) {
@@ -117,12 +109,11 @@ private:
 
 			if ((option[0] == '-' || option[0] == '/')) {
 				if ((option[1] == 'F' || option[1] == 'f') && option[2] == '=') {
-					char *optA = ToCharW(option + 3);
-					String f = get_teraterm_dir_relative_name(optA);
-					free(optA);
-					wchar_t *fW = ToWcharA(f);
-					read_options(fW);
-					free(fW);
+					if (option[3] != NULL) {
+						wchar_t *f = get_home_dir_relative_nameW(option + 3);
+						read_options(f);
+						free(f);
+					}
 				}
 			}
 
