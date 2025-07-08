@@ -4624,8 +4624,16 @@ void SSH2_send_kexinit(PTInstVar pvar)
 
 void normalize_generic_order(char *buf, char default_strings[], int default_strings_len)
 {
-	char listed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_ALGO_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
-	char allowed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_ALGO_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
+	char listed[max((unsigned int)KEX_DH_MAX,
+	                max((unsigned int)SSH_CIPHER_MAX,
+	                    max((unsigned int)KEY_ALGO_MAX,
+	                        max((unsigned int)HMAC_MAX,
+	                            (unsigned int)COMP_MAX)))) + 1];
+	char allowed[max((unsigned int)KEX_DH_MAX,
+	                 max((unsigned int)SSH_CIPHER_MAX,
+	                     max((unsigned int)KEY_ALGO_MAX,
+	                         max((unsigned int)HMAC_MAX,
+	                             (unsigned int)COMP_MAX)))) + 1];
 	int i, j, k=-1;
 
 	memset(listed, 0, sizeof(listed));
