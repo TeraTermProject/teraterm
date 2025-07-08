@@ -74,7 +74,7 @@ typedef enum {
 } kex_algorithm;
 
 const char* get_kex_algorithm_name(kex_algorithm kextype);
-const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype);
+const digest_algorithm get_kex_hash_algorithm(kex_algorithm kextype);
 
 void normalize_kex_order(char *buf);
 kex_algorithm choose_SSH2_kex_algorithm(char *server_proposal, char *my_proposal);
@@ -98,59 +98,59 @@ DH *dh_new_group18(void);
 void dh_gen_key(PTInstVar pvar, DH *dh, int we_need /* bytes */ );
 int dh_estimate(int bits);
 
-unsigned char *kex_dh_hash(const EVP_MD *evp_md,
-                           char *client_version_string,
-                           char *server_version_string,
-                           char *ckexinit, int ckexinitlen,
-                           char *skexinit, int skexinitlen,
-                           u_char *serverhostkeyblob, int sbloblen,
-                           BIGNUM *client_dh_pub,
-                           BIGNUM *server_dh_pub,
-                           BIGNUM *shared_secret,
-                           unsigned int *hashlen);
-unsigned char *kex_dh_gex_hash(const EVP_MD *evp_md,
-                               char *client_version_string,
-                               char *server_version_string,
-                               char *ckexinit, int ckexinitlen,
-                               char *skexinit, int skexinitlen,
-                               u_char *serverhostkeyblob, int sbloblen,
-                               int kexgex_min,
-                               int kexgex_bits,
-                               int kexgex_max,
-                               BIGNUM *kexgex_p,
-                               BIGNUM *kexgex_g,
-                               BIGNUM *client_dh_pub,
-                               BIGNUM *server_dh_pub,
-                               BIGNUM *shared_secret,
-                               unsigned int *hashlen);
-unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
-                             const EC_GROUP *ec_group,
-                             char *client_version_string,
-                             char *server_version_string,
-                             char *ckexinit, int ckexinitlen,
-                             char *skexinit, int skexinitlen,
-                             u_char *serverhostkeyblob, int sbloblen,
-                             const EC_POINT *client_dh_pub,
-                             const EC_POINT *server_dh_pub,
-                             BIGNUM *shared_secret,
-                             unsigned int *hashlen);
+int kex_dh_hash(const digest_algorithm hash_alg,
+                char *client_version_string,
+                char *server_version_string,
+                char *ckexinit, int ckexinitlen,
+                char *skexinit, int skexinitlen,
+                u_char *serverhostkeyblob, int sbloblen,
+                BIGNUM *client_dh_pub,
+                BIGNUM *server_dh_pub,
+                BIGNUM *shared_secret,
+                char *hash, unsigned int *hashlen);
+int kexgex_hash(const digest_algorithm hash_alg,
+                char *client_version_string,
+                char *server_version_string,
+                char *ckexinit, int ckexinitlen,
+                char *skexinit, int skexinitlen,
+                u_char *serverhostkeyblob, int sbloblen,
+                int kexgex_min,
+                int kexgex_bits,
+                int kexgex_max,
+                BIGNUM *kexgex_p,
+                BIGNUM *kexgex_g,
+                BIGNUM *client_dh_pub,
+                BIGNUM *server_dh_pub,
+                BIGNUM *shared_secret,
+                char *hash, unsigned int *hashlen);
+int kex_ecdh_hash(const digest_algorithm hash_alg,
+                  const EC_GROUP *ec_group,
+                  char *client_version_string,
+                  char *server_version_string,
+                  char *ckexinit, int ckexinitlen,
+                  char *skexinit, int skexinitlen,
+                  u_char *serverhostkeyblob, int sbloblen,
+                  const EC_POINT *client_dh_pub,
+                  const EC_POINT *server_dh_pub,
+                  BIGNUM *shared_secret,
+                  char *hash, unsigned int *hashlen);
 #define CURVE25519_SIZE 32
-unsigned char *kex_c25519_hash(const EVP_MD *evp_md,
-                               char *client_version_string,
-                               char *server_version_string,
-                               char *ckexinit, int ckexinitlen,
-                               char *skexinit, int skexinitlen,
-                               u_char *serverhostkeyblob, int sbloblen,
-                               u_char client_dh_pub[CURVE25519_SIZE],
-                               u_char server_dh_pub[CURVE25519_SIZE],
-                               u_char *shared_secret, int secretlen,
-                               unsigned int *hashlen);
+int kex_c25519_hash(const digest_algorithm hash_alg,
+                    char *client_version_string,
+                    char *server_version_string,
+                    char *ckexinit, int ckexinitlen,
+                    char *skexinit, int skexinitlen,
+                    u_char *serverhostkeyblob, int sbloblen,
+                    u_char client_dh_pub[CURVE25519_SIZE],
+                    u_char server_dh_pub[CURVE25519_SIZE],
+                    u_char *shared_secret, int secretlen,
+                    char *hash, unsigned int *hashlen);
 void kexc25519_keygen(u_char key[CURVE25519_SIZE], u_char pub[CURVE25519_SIZE]);
 int kexc25519_shared_key(const u_char key[CURVE25519_SIZE],
                          const u_char pub[CURVE25519_SIZE], buffer_t *out);
 
 int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub);
-void kex_derive_keys(PTInstVar pvar, SSHKeys *newkeys, int need, u_char *hash, buffer_t *shared_secret,
-                     char *session_id, int session_id_len);
+void kex_derive_keys(PTInstVar pvar, SSHKeys *newkeys, u_char *hash, u_int hash_len,
+	buffer_t *shared_secret);
 
 #endif				/* KEX_H */
