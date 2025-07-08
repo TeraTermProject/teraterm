@@ -4742,13 +4742,305 @@ found:
 	}
 }
 
-// 暗号アルゴリズムのキーサイズ、ブロックサイズ、MACサイズのうち最大値(we_need)を決定する。
-static void choose_SSH2_key_maxlength(PTInstVar pvar)
+/*
+ * 鍵交換アルゴリズム・ホスト鍵アルゴリズム・暗号アルゴリズム・MACアルゴリズム・圧縮アルゴリズムの決定
+ *
+ * サーバからはカンマ区切りでのリストが送られて来る。
+ * クライアントとサーバ両方がサポートしている物のうち、クライアント側で最も前に指定した物が使われる。
+ */
+static int
+choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 {
-	int mode;
+	char tmp[1024+512];
+	int mode, r, payload_len;
 	unsigned int need = 0;
 	const struct ssh2cipher *cipher;
 	const struct ssh2_mac_t *mac;
+
+	// 鍵交換アルゴリズム
+	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
+	case GetPayloadError:
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		            "%s: truncated packet (kex algorithms)", __FUNCTION__);
+		msg = tmp;
+		r = -1;
+		goto error;
+	case GetPayloadTruncate:
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed kex algorithms is too long.", __FUNCTION__);
+		break;
+	}
+
+	logprintf(LOG_LEVEL_VERBOSE, "server proposal: KEX algorithm: %s", buf);
+
+	pvar->kex_type = choose_SSH2_kex_algorithm(buf, myproposal[PROPOSAL_KEX_ALGS]);
+	if (pvar->kex_type == KEX_DH_UNKNOWN) { // not match
+		strncpy_s(tmp, sizeof(tmp), "unknown KEX algorithm: ", _TRUNCATE);
+		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
+		msg = tmp;
+		r = -2;
+		goto error;
+	}
+
+	if (pvar->kex_status == 0) {
+		// サーバー側がStrict KEXに対応しているかの確認
+		choose_SSH2_proposal(buf, "kex-strict-s-v00@openssh.com", tmp, sizeof(tmp));
+		if (tmp[0] != '\0') {
+			pvar->server_strict_kex = TRUE;
+			logprintf(LOG_LEVEL_INFO, "Server supports strict kex. Strict kex will be enabled.");
+		}
+	}
+
+	// ホスト鍵アルゴリズム
+	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
+	case GetPayloadError:
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		            "%s: truncated packet (hostkey algorithms)", __FUNCTION__);
+		msg = tmp;
+		r = -3;
+		goto error;
+	case GetPayloadTruncate:
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed hostkey algorithms is too long.", __FUNCTION__);
+		break;
+	}
+
+	logprintf(LOG_LEVEL_VERBOSE, "server proposal: server host key algorithm: %s", buf);
+
+	pvar->hostkey_type = choose_SSH2_host_key_algorithm(buf, myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS]);
+	if (pvar->hostkey_type == KEY_ALGO_UNSPEC) {
+		strncpy_s(tmp, sizeof(tmp), "unknown host KEY algorithm: ", _TRUNCATE);
+		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
+		msg = tmp;
+		r = -4;
+		goto error;
+	}
+
+	// 暗号アルゴリズム(クライアント -> サーバ)
+	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
+	case GetPayloadError:
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		            "%s: truncated packet (encryption algorithms client to server)", __FUNCTION__);
+		msg = tmp;
+		r = -5;
+		goto error;
+	case GetPayloadTruncate:
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed encryption algorithms (client to server) is too long.", __FUNCTION__);
+		break;
+	}
+
+	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm client to server: %s", buf);
+
+	pvar->ciphers[MODE_OUT] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_CTOS]);
+	if (pvar->ciphers[MODE_OUT] == NULL) {
+		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(client to server): ", _TRUNCATE);
+		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
+		msg = tmp;
+		r = -6;
+		goto error;
+	}
+
+	// 暗号アルゴリズム(サーバ -> クライアント)
+	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
+	case GetPayloadError:
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		            "%s: truncated packet (encryption algorithms server to client)", __FUNCTION__);
+		msg = tmp;
+		r = -7;
+		goto error;
+	case GetPayloadTruncate:
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed encryption algorithms (server to client) is too long.", __FUNCTION__);
+		break;
+	}
+
+	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm server to client: %s", buf);
+
+	pvar->ciphers[MODE_IN] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_STOC]);
+	if (pvar->ciphers[MODE_IN] == NULL) {
+		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(server to client): ", _TRUNCATE);
+		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
+		msg = tmp;
+		r = -8;
+		goto error;
+	}
+
+	// MACアルゴリズム(クライアント -> サーバ)
+	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
+	case GetPayloadError:
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		            "%s: truncated packet (MAC algorithms client to server)", __FUNCTION__);
+		msg = tmp;
+		r = -9;
+		goto error;
+	case GetPayloadTruncate:
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed MAC algorithms (client to server) is too long.", __FUNCTION__);
+		break;
+	}
+
+	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm client to server: %s", buf);
+
+	if (get_cipher_auth_len(pvar->ciphers[MODE_OUT]) > 0) {
+		logputs(LOG_LEVEL_VERBOSE, "AEAD cipher is selected, ignoring MAC algorithms. (client to server)");
+		pvar->macs[MODE_OUT] = get_ssh2_mac(HMAC_IMPLICIT);
+	}
+	else {
+		pvar->macs[MODE_OUT] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_CTOS]);
+		if (pvar->macs[MODE_OUT] == NULL) { // not match
+			strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
+			strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
+			msg = tmp;
+			r = -10;
+			goto error;
+		}
+	}
+
+	// MACアルゴリズム(サーバ -> クライアント)
+	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
+	case GetPayloadError:
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		            "%s: truncated packet (MAC algorithms server to client)", __FUNCTION__);
+		msg = tmp;
+		r = -11;
+		goto error;
+	case GetPayloadTruncate:
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed MAC algorithms (server to client) is too long.", __FUNCTION__);
+		break;
+	}
+
+	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm server to client: %s", buf);
+
+	if (get_cipher_auth_len(pvar->ciphers[MODE_IN]) > 0) {
+		logputs(LOG_LEVEL_VERBOSE, "AEAD cipher is selected, ignoring MAC algorithms. (server to client)");
+		pvar->macs[MODE_IN] = get_ssh2_mac(HMAC_IMPLICIT);
+	}
+	else {
+		pvar->macs[MODE_IN] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_STOC]);
+		if (pvar->macs[MODE_IN] == NULL) { // not match
+			strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
+			strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
+			msg = tmp;
+			r = -12;
+			goto error;
+		}
+	}
+
+	// 圧縮アルゴリズム(クライアント -> サーバ)
+	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
+	case GetPayloadError:
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		            "%s: truncated packet (compression algorithms client to server)", __FUNCTION__);
+		msg = tmp;
+		r = -13;
+		goto error;
+	case GetPayloadTruncate:
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed compression algorithms (client to server) is too long.", __FUNCTION__);
+		break;
+	}
+
+	logprintf(LOG_LEVEL_VERBOSE, "server proposal: compression algorithm client to server: %s", buf);
+
+	pvar->ctos_compression = choose_SSH2_compression_algorithm(buf, myproposal[PROPOSAL_COMP_ALGS_CTOS]);
+	if (pvar->ctos_compression == COMP_UNKNOWN) { // not match
+		strncpy_s(tmp, sizeof(tmp), "unknown Packet Compression algorithm: ", _TRUNCATE);
+		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
+		msg = tmp;
+		r = -14;
+		goto error;
+	}
+
+	// 圧縮アルゴリズム(サーバ -> クライアント)
+	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
+	case GetPayloadError:
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		            "%s: truncated packet (compression algorithms server to client)", __FUNCTION__);
+		msg = tmp;
+		r = -15;
+		goto error;
+	case GetPayloadTruncate:
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed compression algorithms (server to client) is too long.", __FUNCTION__);
+		break;
+	}
+
+	logprintf(LOG_LEVEL_VERBOSE, "server proposal: compression algorithm server to client: %s", buf);
+
+	pvar->stoc_compression = choose_SSH2_compression_algorithm(buf, myproposal[PROPOSAL_COMP_ALGS_STOC]);
+	if (pvar->stoc_compression == COMP_UNKNOWN) { // not match
+		strncpy_s(tmp, sizeof(tmp), "unknown Packet Compression algorithm: ", _TRUNCATE);
+		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
+		msg = tmp;
+		r = -16;
+		goto error;
+	}
+
+	// 言語(クライアント -> サーバ)
+	// 現状では未使用。ログに記録するだけ。
+	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
+	case GetPayloadError:
+		// 言語の name-list が取れないという事は KEXINIT パケットのフォーマット自体が想定外であり
+		// 異常な状態であるが、通信に必要なアルゴリズムはすでにネゴ済みで通信自体は行える。
+		// 今まではこの部分のチェックを行っていなかったので、警告を記録するのみで処理を続行する。
+		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (language client to server)", __FUNCTION__);
+		goto skip;
+	case GetPayloadTruncate:
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed language (client to server) is too long.", __FUNCTION__);
+		break;
+	}
+
+	logprintf(LOG_LEVEL_VERBOSE, "server proposal: language client to server: %s", buf);
+
+	// 言語(サーバ -> クライアント)
+	// 現状では未使用。ログに記録するだけ。
+	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
+	case GetPayloadError:
+		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
+		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (language server to client)", __FUNCTION__);
+		goto skip;
+	case GetPayloadTruncate:
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed language (server to client) is too long.", __FUNCTION__);
+		break;
+	}
+
+	logprintf(LOG_LEVEL_VERBOSE, "server proposal: language server to client: %s", buf);
+
+	// first_kex_packet_follows:
+	// KEXINIT パケットの後に、アルゴリズムのネゴ結果を推測して鍵交換パケットを送っているか。
+	// SSH_MSG_KEXINIT の後の鍵交換はクライアント側から送るのでサーバ側が 1 にする事はないはず。
+	if (!get_boolean_from_payload(pvar, buf)) {
+		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
+		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (first_kex_packet_follows)", __FUNCTION__);
+		goto skip;
+	}
+	if (buf[0] != 0) {
+		// 前述のようにサーバ側は 0 以外にする事はないはずなので、警告を記録する。
+		logprintf(LOG_LEVEL_WARNING, "%s: first_kex_packet_follows is not 0. (%d)", __FUNCTION__, buf[0]);
+	}
+
+	// reserved: 現状は常に 0 となる。
+	if (!get_uint32_from_payload(pvar, &payload_len)) {
+		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
+		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (reserved)", __FUNCTION__ );
+		goto skip;
+	}
+	if (payload_len != 0) {
+		logprintf(LOG_LEVEL_INFO, "%s: reserved data is not 0. (%d)", __FUNCTION__, payload_len);
+	}
+
+skip:
+	// 決定した方式をログに出力
+	logprintf(LOG_LEVEL_VERBOSE, "KEX algorithm: %s",
+		get_kex_algorithm_name(pvar->kex_type));
+	logprintf(LOG_LEVEL_VERBOSE, "server host key algorithm: %s",
+		get_ssh2_hostkey_algorithm_name(pvar->hostkey_type));
+	logprintf(LOG_LEVEL_VERBOSE, "encryption algorithm client to server: %s",
+		get_cipher_string(pvar->ciphers[MODE_OUT]));
+	logprintf(LOG_LEVEL_VERBOSE, "encryption algorithm server to client: %s",
+		get_cipher_string(pvar->ciphers[MODE_IN]));
+	logprintf(LOG_LEVEL_VERBOSE, "MAC algorithm client to server: %s",
+		get_ssh2_mac_name(pvar->macs[MODE_OUT]));
+	logprintf(LOG_LEVEL_VERBOSE, "MAC algorithm server to client: %s",
+		get_ssh2_mac_name(pvar->macs[MODE_IN]));
+	logprintf(LOG_LEVEL_VERBOSE, "compression algorithm client to server: %s",
+		get_ssh2_comp_name(pvar->ctos_compression));
+	logprintf(LOG_LEVEL_VERBOSE, "compression algorithm server to client: %s",
+		get_ssh2_comp_name(pvar->stoc_compression));
 
 	for (mode = 0; mode < MODE_MAX; mode++) {
 		cipher = pvar->ciphers[mode];
@@ -4771,12 +5063,18 @@ static void choose_SSH2_key_maxlength(PTInstVar pvar)
 		pvar->ssh2_keys[mode].mac.enabled = 0;
 		pvar->ssh2_keys[mode].comp.enabled = 0;
 
+		// 暗号アルゴリズムのキーサイズ、ブロックサイズ、MACサイズのうち最大値(we_need)を決定する
 		need = max(need, current_keys[mode].enc.key_len);
 		need = max(need, current_keys[mode].enc.block_size);
 		need = max(need, current_keys[mode].enc.iv_len);
 		need = max(need, current_keys[mode].mac.key_len);
 	}
 	pvar->we_need = need;
+
+	r = 0;
+
+error:
+	return r;
 }
 
 
@@ -4804,7 +5102,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 {
 	char buf[1024];
 	char *data;
-	int len, size;
+	int len, r;
 	char *msg = NULL;
 	char tmp[1024+512];
 
@@ -4853,289 +5151,11 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 	CRYPT_set_server_cookie(pvar, buf);
 
-	// 各要素(鍵交換,暗号化等)で使用するアルゴリズムの決定。
-	// サーバからはカンマ区切りでのリストが送られて来る。
-	// クライアントとサーバ両方がサポートしている物のうち、
-	// クライアント側で最も前に指定した物が使われる。
-
-	// 鍵交換アルゴリズム
-	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
-	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-					"%s: truncated packet (kex algorithms)", __FUNCTION__);
-		msg = tmp;
-		goto error;
-	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed kex algorithms is too long.", __FUNCTION__);
-		break;
-	}
-
-	logprintf(LOG_LEVEL_VERBOSE, "server proposal: KEX algorithm: %s", buf);
-
-	pvar->kex_type = choose_SSH2_kex_algorithm(buf, myproposal[PROPOSAL_KEX_ALGS]);
-	if (pvar->kex_type == KEX_DH_UNKNOWN) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown KEX algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+	// 使用するアルゴリズムの決定
+	r = choose_SSH2_kex_choose_conf(pvar, buf, sizeof(buf), msg);
+	if (r != 0) {
 		goto error;
 	}
-
-	if (pvar->kex_status == 0) {
-		// サーバー側がStrict KEXに対応しているかの確認
-		choose_SSH2_proposal(buf, "kex-strict-s-v00@openssh.com", tmp, sizeof(tmp));
-		if (tmp[0] != '\0') {
-			pvar->server_strict_kex = TRUE;
-			logprintf(LOG_LEVEL_INFO, "Server supports strict kex. Strict kex will be enabled.");
-		}
-	}
-
-	// ホスト鍵アルゴリズム
-	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
-	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-					"%s: truncated packet (hostkey algorithms)", __FUNCTION__);
-		msg = tmp;
-		goto error;
-	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed hostkey algorithms is too long.", __FUNCTION__);
-		break;
-	}
-
-	logprintf(LOG_LEVEL_VERBOSE, "server proposal: server host key algorithm: %s", buf);
-
-	pvar->hostkey_type = choose_SSH2_host_key_algorithm(buf, myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS]);
-	if (pvar->hostkey_type == KEY_ALGO_UNSPEC) {
-		strncpy_s(tmp, sizeof(tmp), "unknown host KEY algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
-		goto error;
-	}
-
-	// 暗号アルゴリズム(クライアント -> サーバ)
-	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
-	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-					"%s: truncated packet (encryption algorithms client to server)", __FUNCTION__);
-		msg = tmp;
-		goto error;
-	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed encryption algorithms (client to server) is too long.", __FUNCTION__);
-		break;
-	}
-
-	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm client to server: %s", buf);
-
-	pvar->ciphers[MODE_OUT] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_CTOS]);
-	if (pvar->ciphers[MODE_OUT] == NULL) {
-		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(client to server): ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
-		goto error;
-	}
-
-	// 暗号アルゴリズム(サーバ -> クライアント)
-	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
-	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-					"%s: truncated packet (encryption algorithms server to client)", __FUNCTION__);
-		msg = tmp;
-		goto error;
-	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed encryption algorithms (server to client) is too long.", __FUNCTION__);
-		break;
-	}
-
-	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm server to client: %s", buf);
-
-	pvar->ciphers[MODE_IN] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_STOC]);
-	if (pvar->ciphers[MODE_IN] == NULL) {
-		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(server to client): ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
-		goto error;
-	}
-
-	// MACアルゴリズム(クライアント -> サーバ)
-	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
-	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-					"%s: truncated packet (MAC algorithms client to server)", __FUNCTION__);
-		msg = tmp;
-		goto error;
-	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed MAC algorithms (client to server) is too long.", __FUNCTION__);
-		break;
-	}
-
-	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm client to server: %s", buf);
-
-	if (get_cipher_auth_len(pvar->ciphers[MODE_OUT]) > 0) {
-		logputs(LOG_LEVEL_VERBOSE, "AEAD cipher is selected, ignoring MAC algorithms. (client to server)");
-		pvar->macs[MODE_OUT] = get_ssh2_mac(HMAC_IMPLICIT);
-	}
-	else {
-		pvar->macs[MODE_OUT] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_CTOS]);
-		if (pvar->macs[MODE_OUT] == NULL) { // not match
-			strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
-			strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-			msg = tmp;
-			goto error;
-		}
-	}
-
-	// MACアルゴリズム(サーバ -> クライアント)
-	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
-	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-					"%s: truncated packet (MAC algorithms server to client)", __FUNCTION__);
-		msg = tmp;
-		goto error;
-	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed MAC algorithms (server to client) is too long.", __FUNCTION__);
-		break;
-	}
-
-	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm server to client: %s", buf);
-
-	if (get_cipher_auth_len(pvar->ciphers[MODE_IN]) > 0) {
-		logputs(LOG_LEVEL_VERBOSE, "AEAD cipher is selected, ignoring MAC algorithms. (server to client)");
-		pvar->macs[MODE_IN] = get_ssh2_mac(HMAC_IMPLICIT);
-	}
-	else {
-		pvar->macs[MODE_IN] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_STOC]);
-		if (pvar->macs[MODE_IN] == NULL) { // not match
-			strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
-			strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-			msg = tmp;
-			goto error;
-		}
-	}
-
-	// 圧縮アルゴリズム(クライアント -> サーバ)
-	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
-	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-					"%s: truncated packet (compression algorithms client to server)", __FUNCTION__);
-		msg = tmp;
-		goto error;
-	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed compression algorithms (client to server) is too long.", __FUNCTION__);
-		break;
-	}
-
-	logprintf(LOG_LEVEL_VERBOSE, "server proposal: compression algorithm client to server: %s", buf);
-
-	pvar->ctos_compression = choose_SSH2_compression_algorithm(buf, myproposal[PROPOSAL_COMP_ALGS_CTOS]);
-	if (pvar->ctos_compression == COMP_UNKNOWN) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown Packet Compression algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
-		goto error;
-	}
-
-	// 圧縮アルゴリズム(サーバ -> クライアント)
-	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
-	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-					"%s: truncated packet (compression algorithms server to client)", __FUNCTION__);
-		msg = tmp;
-		goto error;
-	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed compression algorithms (server to client) is too long.", __FUNCTION__);
-		break;
-	}
-
-	logprintf(LOG_LEVEL_VERBOSE, "server proposal: compression algorithm server to client: %s", buf);
-
-	pvar->stoc_compression = choose_SSH2_compression_algorithm(buf, myproposal[PROPOSAL_COMP_ALGS_STOC]);
-	if (pvar->stoc_compression == COMP_UNKNOWN) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown Packet Compression algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
-		goto error;
-	}
-
-	// 言語(クライアント -> サーバ)
-	// 現状では未使用。ログに記録するだけ。
-	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
-	case GetPayloadError:
-		// 言語の name-list が取れないという事は KEXINIT パケットのフォーマット自体が想定外であり
-		// 異常な状態であるが、通信に必要なアルゴリズムはすでにネゴ済みで通信自体は行える。
-		// 今まではこの部分のチェックを行っていなかったので、警告を記録するのみで処理を続行する。
-		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (language client to server)", __FUNCTION__);
-		goto skip;
-	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed language (client to server) is too long.", __FUNCTION__);
-		break;
-	}
-
-	logprintf(LOG_LEVEL_VERBOSE, "server proposal: language client to server: %s", buf);
-
-	// 言語(サーバ -> クライアント)
-	// 現状では未使用。ログに記録するだけ。
-	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
-	case GetPayloadError:
-		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
-		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (language server to client)", __FUNCTION__);
-		goto error;
-	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed language (server to client) is too long.", __FUNCTION__);
-		break;
-	}
-
-	logprintf(LOG_LEVEL_VERBOSE, "server proposal: language server to client: %s", buf);
-
-	// first_kex_packet_follows:
-	// KEXINIT パケットの後に、アルゴリズムのネゴ結果を推測して鍵交換パケットを送っているか。
-	// SSH_MSG_KEXINIT の後の鍵交換はクライアント側から送るのでサーバ側が 1 にする事はないはず。
-	if (!get_boolean_from_payload(pvar, buf)) {
-		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
-		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (first_kex_packet_follows)", __FUNCTION__);
-		goto skip;
-	}
-	if (buf[0] != 0) {
-		// 前述のようにサーバ側は 0 以外にする事はないはずなので、警告を記録する。
-		logprintf(LOG_LEVEL_WARNING, "%s: first_kex_packet_follows is not 0. (%d)", __FUNCTION__, buf[0]);
-	}
-
-	// reserved: 現状は常に 0 となる。
-	if (!get_uint32_from_payload(pvar, &size)) {
-		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
-		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (reserved)", __FUNCTION__ );
-		goto skip;
-	}
-	if (size != 0) {
-		logprintf(LOG_LEVEL_INFO, "%s: reserved data is not 0. (%d)", __FUNCTION__, size);
-	}
-
-skip:
-	// 決定した方式をログに出力
-	logprintf(LOG_LEVEL_VERBOSE, "KEX algorithm: %s",
-		get_kex_algorithm_name(pvar->kex_type));
-
-	logprintf(LOG_LEVEL_VERBOSE, "server host key algorithm: %s",
-		get_ssh2_hostkey_algorithm_name(pvar->hostkey_type));
-
-	logprintf(LOG_LEVEL_VERBOSE, "encryption algorithm client to server: %s",
-		get_cipher_string(pvar->ciphers[MODE_OUT]));
-
-	logprintf(LOG_LEVEL_VERBOSE, "encryption algorithm server to client: %s",
-		get_cipher_string(pvar->ciphers[MODE_IN]));
-
-	logprintf(LOG_LEVEL_VERBOSE, "MAC algorithm client to server: %s",
-		get_ssh2_mac_name(pvar->macs[MODE_OUT]));
-
-	logprintf(LOG_LEVEL_VERBOSE, "MAC algorithm server to client: %s",
-		get_ssh2_mac_name(pvar->macs[MODE_IN]));
-
-	logprintf(LOG_LEVEL_VERBOSE, "compression algorithm client to server: %s",
-		get_ssh2_comp_name(pvar->ctos_compression));
-
-	logprintf(LOG_LEVEL_VERBOSE, "compression algorithm server to client: %s",
-		get_ssh2_comp_name(pvar->stoc_compression));
-
-	// we_needの決定
-	choose_SSH2_key_maxlength(pvar);
 
 	// send DH kex init
 	switch (pvar->kex_type) {
