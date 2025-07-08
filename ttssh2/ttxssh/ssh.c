@@ -5134,11 +5134,8 @@ skip:
 	logprintf(LOG_LEVEL_VERBOSE, "compression algorithm server to client: %s",
 		get_ssh2_comp_name(pvar->stoc_compression));
 
-	// we_needの決定 (2004.11.6 yutaka)
-	// キー再作成の場合はスキップする。
-	if ((pvar->kex_status & KEX_FLAG_REKEYING) == 0) {
-		choose_SSH2_key_maxlength(pvar);
-	}
+	// we_needの決定
+	choose_SSH2_key_maxlength(pvar);
 
 	// send DH kex init
 	switch (pvar->kex_type) {
