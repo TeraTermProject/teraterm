@@ -440,7 +440,6 @@ int kex_dh_hash(const digest_algorithm hash_alg,
                 char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
-	int r;
 
 	if (*hashlen < ssh_digest_bytes(hash_alg))
 		return SSH_ERR_INVALID_ARGUMENT;
@@ -498,7 +497,6 @@ int kexgex_hash(const digest_algorithm hash_alg,
                 char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
-	int r;
 
 	if (*hashlen < ssh_digest_bytes(hash_alg))
 		return SSH_ERR_INVALID_ARGUMENT;
@@ -562,7 +560,6 @@ int kex_ecdh_hash(const digest_algorithm hash_alg,
                              char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
-	int r;
 
 	if (*hashlen < ssh_digest_bytes(hash_alg))
 		return SSH_ERR_INVALID_ARGUMENT;
@@ -619,7 +616,6 @@ int kex_c25519_hash(const digest_algorithm hash_alg,
                     char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
-	int r;
 
 	if (*hashlen < ssh_digest_bytes(hash_alg))
 		return SSH_ERR_INVALID_ARGUMENT;
