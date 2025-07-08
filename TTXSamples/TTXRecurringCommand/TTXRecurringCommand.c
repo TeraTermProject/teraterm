@@ -472,6 +472,8 @@ static INT_PTR CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 		{ IDC_INTERVAL_LABEL, "DLG_INTERVAL" },
 		{ IDC_COMMAND_LABEL, "DLG_COMMAND" },
 		{ IDC_ADD_NL, "DLG_ADD_NEWLINE" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" },
 	};
 
 	switch (msg) {
