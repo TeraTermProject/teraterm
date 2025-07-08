@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007- TeraTerm Project
+ * (C) 2025- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,41 +26,26 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TTMACRO.EXE, dialog boxes */
+/*
+ * Import from OpenSSH 7.9p1
+ * $OpenBSD: hmac.h,v 1.9 2014/06/24 01:13:21 djm Exp $
+ */
 
-#pragma once
+#ifndef HMAC_H
+#define HMAC_H
 
-#include "ttmdef.h"
+#include "ttxssh.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* Returns the algorithm's digest length in bytes or 0 for invalid algorithm */
+size_t ssh_hmac_bytes(int alg);
 
-void ParseParam(void);
-BOOL GetFileName(HWND HWin, wchar_t **fname);
-void SetDlgPos(int x, int y, int position, int offset_x, int offset_y);
-int SetDlgPosEX(HWND hWnd, int width, int height, int *PosX, int *PosY);
-int OpenInpDlg(wchar_t *Input, const wchar_t *Text, const wchar_t *Caption,
-                const wchar_t *Default, BOOL Paswd);
-int OpenErrDlg(const char *Msg, const char *Line, int lineno, int start, int end, const char *FileName);
-int OpenMsgDlg(const wchar_t *Text, const wchar_t *Caption, BOOL YesNo);
-void OpenStatDlg(const wchar_t *Text, const wchar_t *Caption);
-void CloseStatDlg();
-void BringupStatDlg();
+struct ssh_hmac_ctx *ssh_hmac_start(int alg);
 
-int OpenListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected, int ext, int DlgWidth, int DlgHeight);
+/* Sets the state of the HMAC or resets the state if key == NULL */
+int ssh_hmac_init(struct ssh_hmac_ctx *ctx, const void *key, size_t klen);
+int ssh_hmac_update(struct ssh_hmac_ctx *ctx, const void *m, size_t mlen);
+int ssh_hmac_update_buffer(struct ssh_hmac_ctx *ctx, buffer_t *b);
+int ssh_hmac_final(struct ssh_hmac_ctx *ctx, u_char *d, size_t dlen);
+void ssh_hmac_free(struct ssh_hmac_ctx *ctx);
 
-extern wchar_t *HomeDirW;
-extern wchar_t FileName[MAX_PATH];
-extern wchar_t TopicName[11];
-extern wchar_t ShortName[MAX_PATH];
-extern wchar_t **Params;
-extern int ParamCnt;
-extern BOOL SleepFlag;
-extern BOOL IOption;
-extern BOOL VOption;
-extern DPI_AWARENESS_CONTEXT DPIAware;
-
-#ifdef __cplusplus
-}
-#endif
+#endif /* HMAC_H */

@@ -1322,7 +1322,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		data[4] = (unsigned char) padding_size;
 		if (msg) {
 			// パケット圧縮の場合、バッファを拡張する。(2011.6.10 yutaka)
-			buffer_append_space(msg, padding_size + EVP_MAX_MD_SIZE);
+			buffer_append_space(msg, padding_size + SSH_DIGEST_MAX_LENGTH);
 			// realloc()されると、ポインタが変わる可能性があるので、再度取り直す。
 			data = buffer_ptr(msg);
 		}
@@ -3510,22 +3510,20 @@ void SSH_end(PTInstVar pvar)
 	pvar->use_subsystem = FALSE;
 	pvar->nosession = FALSE;
 
-	// support of "Compression delayed" (2006.6.23 maya)
-	if (pvar->ssh_state.compressing ||
-		pvar->ctos_compression == COMP_ZLIB || // add SSH2 flag (2005.7.10 yutaka)
-		pvar->ctos_compression == COMP_DELAYED && pvar->userauth_success) {
+	if (pvar->ssh_state.compressing || // SSH1
+		pvar->ctos_compression == COMP_ZLIB || // SSH2
+		pvar->ctos_compression == COMP_DELAYED && pvar->userauth_success) { // SSH2 compression delayed
 		deflateEnd(&pvar->ssh_state.compress_stream);
 		pvar->ssh_state.compressing = FALSE;
 	}
-	// support of "Compression delayed" (2006.6.23 maya)
-	if (pvar->ssh_state.decompressing ||
-		pvar->stoc_compression == COMP_ZLIB || // add SSH2 flag (2005.7.10 yutaka)
-		pvar->stoc_compression == COMP_DELAYED && pvar->userauth_success) {
+	if (pvar->ssh_state.decompressing || // SSH1
+		pvar->stoc_compression == COMP_ZLIB || // SSH2
+		pvar->stoc_compression == COMP_DELAYED && pvar->userauth_success) { // SSH2 compression delayed
 		inflateEnd(&pvar->ssh_state.decompress_stream);
 		pvar->ssh_state.decompressing = FALSE;
 	}
 
-	// SSH2のデータを解放する (2004.12.27 yutaka)
+	// SSH2のデータを解放する
 	if (SSHv2(pvar)) {
 		if (pvar->kexdh) {
 			DH_free(pvar->kexdh);
@@ -3572,7 +3570,7 @@ void SSH_end(PTInstVar pvar)
 			pvar->authbanner_buffer = NULL;
 		}
 
-		if (pvar->ssh2_authlist != NULL) { // (2007.4.27 yutaka)
+		if (pvar->ssh2_authlist != NULL) {
 			free(pvar->ssh2_authlist);
 			pvar->ssh2_authlist = NULL;
 		}
@@ -3582,17 +3580,23 @@ void SSH_end(PTInstVar pvar)
 		free(pvar->server_sig_algs);
 		pvar->server_sig_algs = NULL;
 
-		// add (2008.3.2 yutaka)
 		for (mode = 0 ; mode < MODE_MAX ; mode++) {
 			if (pvar->ssh2_keys[mode].enc.iv != NULL) {
+				SecureZeroMemory(pvar->ssh2_keys[mode].enc.iv,
+				                 sizeof(pvar->ssh2_keys[mode].enc.iv));
 				free(pvar->ssh2_keys[mode].enc.iv);
 				pvar->ssh2_keys[mode].enc.iv = NULL;
 			}
 			if (pvar->ssh2_keys[mode].enc.key != NULL) {
+				SecureZeroMemory(pvar->ssh2_keys[mode].enc.key,
+				                 sizeof(pvar->ssh2_keys[mode].enc.key));
 				free(pvar->ssh2_keys[mode].enc.key);
 				pvar->ssh2_keys[mode].enc.key = NULL;
 			}
+			mac_clear(&pvar->ssh2_keys[mode].mac);
 			if (pvar->ssh2_keys[mode].mac.key != NULL) {
+				SecureZeroMemory(pvar->ssh2_keys[mode].mac.key,
+				                 sizeof(pvar->ssh2_keys[mode].mac.key));
 				free(pvar->ssh2_keys[mode].mac.key);
 				pvar->ssh2_keys[mode].mac.key = NULL;
 			}
@@ -4741,38 +4745,31 @@ found:
 // 暗号アルゴリズムのキーサイズ、ブロックサイズ、MACサイズのうち最大値(we_need)を決定する。
 static void choose_SSH2_key_maxlength(PTInstVar pvar)
 {
-	int mode, val;
+	int mode;
 	unsigned int need = 0;
-	const EVP_MD *md;
 	const struct ssh2cipher *cipher;
-	const struct SSH2Mac *mac;
+	const struct ssh2_mac_t *mac;
 
 	for (mode = 0; mode < MODE_MAX; mode++) {
 		cipher = pvar->ciphers[mode];
 		mac = pvar->macs[mode];
 
-		// current_keys[]に設定しておいて、あとで pvar->ssh2_keys[] へコピーする。
-		md = get_ssh2_mac_EVP_MD(mac);
-		current_keys[mode].mac.md = md;
-		current_keys[mode].mac.key_len = current_keys[mode].mac.mac_len = EVP_MD_size(md);
-		val = get_ssh2_mac_truncatebits(mac);
-		if (val != 0) {
-			current_keys[mode].mac.mac_len = val / 8;
-		}
-		current_keys[mode].mac.etm = get_ssh2_mac_etm(mac);
+		// current_keys[] に設定しておいて、あとで pvar->ssh2_keys[] へコピーする。
+		mac_setup_by_alg(&current_keys[mode].mac, mac);
 
-		// キーサイズとブロックサイズもここで設定しておく (2004.11.7 yutaka)
+		// キーサイズとブロックサイズもここで設定しておく
 		current_keys[mode].enc.key_len = get_cipher_key_len(cipher);
 		current_keys[mode].enc.block_size = get_cipher_block_size(cipher);
 		current_keys[mode].enc.iv_len = get_cipher_iv_len(cipher);
 		current_keys[mode].enc.auth_len = get_cipher_auth_len(cipher);
 
 		current_keys[mode].mac.enabled = 0;
-		current_keys[mode].comp.enabled = 0; // (2005.7.9 yutaka)
+		current_keys[mode].comp.enabled = 0;
 
-		// 現時点ではMACはdisable
+
+		// この時点では disable
 		pvar->ssh2_keys[mode].mac.enabled = 0;
-		pvar->ssh2_keys[mode].comp.enabled = 0; // (2005.7.9 yutaka)
+		pvar->ssh2_keys[mode].comp.enabled = 0;
 
 		need = max(need, current_keys[mode].enc.key_len);
 		need = max(need, current_keys[mode].enc.block_size);
@@ -5137,11 +5134,8 @@ skip:
 	logprintf(LOG_LEVEL_VERBOSE, "compression algorithm server to client: %s",
 		get_ssh2_comp_name(pvar->stoc_compression));
 
-	// we_needの決定 (2004.11.6 yutaka)
-	// キー再作成の場合はスキップする。
-	if ((pvar->kex_status & KEX_FLAG_REKEYING) == 0) {
-		choose_SSH2_key_maxlength(pvar);
-	}
+	// we_needの決定
+	choose_SSH2_key_maxlength(pvar);
 
 	// send DH kex init
 	switch (pvar->kex_type) {
@@ -5634,6 +5628,9 @@ static void ssh2_set_newkeys(PTInstVar pvar, int mode)
 	}
 
 	pvar->ssh2_keys[mode] = current_keys[mode];
+	if (pvar->ssh2_keys[mode].enc.auth_len == 0) {
+		mac_init(&pvar->ssh2_keys[mode].mac);
+	}
 }
 
 static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, buffer_t *shared_secret, Key *hostkey, char *signature, int siglen)
@@ -5685,7 +5682,7 @@ static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, buffer_t *s
 	}
 
 cont:
-	kex_derive_keys(pvar, current_keys, pvar->we_need, hash, shared_secret, pvar->session_id, pvar->session_id_len);
+	kex_derive_keys(pvar, current_keys, hash, hashlen, shared_secret);
 
 	prep_compression(pvar);
 
@@ -5759,7 +5756,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	char *dh_buf = NULL;
 	BIGNUM *share_key = NULL;
 	buffer_t *shared_secret = NULL;
-	char *hash;
+	char hash[SSH_DIGEST_MAX_LENGTH];
 	char *emsg = NULL, emsg_tmp[1024];  // error message
 	int hashlen;
 	Key *hostkey = NULL;  // hostkey
@@ -5860,8 +5857,9 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	// ハッシュの計算
 	// verify は ssh2_kex_finish() で行う
 	DH_get0_key(pvar->kexdh, &pub_key, NULL);
-	hash = kex_dh_hash(
-		get_kex_algorithm_EVP_MD(pvar->kex_type),
+	hashlen = sizeof(hash);
+	ret = kex_dh_hash(
+		get_kex_hash_algorithm(pvar->kex_type),
 		pvar->client_version_string,
 		pvar->server_version_string,
 		buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
@@ -5870,7 +5868,10 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		pub_key,
 		server_public,
 		share_key,
-		&hashlen);
+		hash, &hashlen);
+	if (ret < 0) {
+		goto error;
+	}
 
 	{
 		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
@@ -5930,7 +5931,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	char *dh_buf = NULL;
 	BIGNUM *share_key = NULL;
 	buffer_t *shared_secret = NULL;
-	char *hash;
+	char hash[SSH_DIGEST_MAX_LENGTH];
 	char *emsg = NULL, emsg_tmp[1024];  // error message
 	int hashlen;
 	Key *hostkey = NULL;  // hostkey
@@ -6033,8 +6034,9 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	// verify は ssh2_kex_finish() で行う
 	DH_get0_pqg(pvar->kexdh, &p, NULL, &g);
 	DH_get0_key(pvar->kexdh, &pub_key, NULL);
-	hash = kex_dh_gex_hash(
-		get_kex_algorithm_EVP_MD(pvar->kex_type),
+	hashlen = sizeof(hash);
+	ret = kexgex_hash(
+		get_kex_hash_algorithm(pvar->kex_type),
 		pvar->client_version_string,
 		pvar->server_version_string,
 		buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
@@ -6048,16 +6050,19 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		pub_key,
 		server_public,
 		share_key,
-		&hashlen);
+		hash, &hashlen);
+	if (ret < 0) {
+		goto error;
+	}
 
 	{
-		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
-		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "peer_kex", buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
+		push_memdump("DH_GEX_REPLY kexgex_hash", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
+		push_memdump("DH_GEX_REPLY kexgex_hash", "peer_kex", buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
 
-		push_bignum_memdump("DH_GEX_REPLY kex_dh_gex_hash", "server_public", server_public);
-		push_bignum_memdump("DH_GEX_REPLY kex_dh_gex_hash", "share_key", share_key);
+		push_bignum_memdump("DH_GEX_REPLY kexgex_hash", "server_public", server_public);
+		push_bignum_memdump("DH_GEX_REPLY kexgex_hash", "share_key", share_key);
 
-		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "hash", hash, hashlen);
+		push_memdump("DH_GEX_REPLY kexgex_hash", "hash", hash, hashlen);
 	}
 
 	// TTSSHバージョン情報に表示するキービット数を求めておく
@@ -6110,7 +6115,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	char *ecdh_buf = NULL;
 	BIGNUM *share_key = NULL;
 	buffer_t *shared_secret = NULL;
-	char *hash;
+	char hash[SSH_DIGEST_MAX_LENGTH];
 	char *emsg = NULL, emsg_tmp[1024];  // error message
 	int hashlen;
 	Key *hostkey = NULL;  // hostkey
@@ -6218,8 +6223,9 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	/* calc and verify H */
 	// ハッシュの計算
 	// verify は ssh2_kex_finish() で行う
-	hash = kex_ecdh_hash(
-		get_kex_algorithm_EVP_MD(pvar->kex_type),
+	hashlen = sizeof(hash);
+	ret = kex_ecdh_hash(
+		get_kex_hash_algorithm(pvar->kex_type),
 		group,
 		pvar->client_version_string,
 		pvar->server_version_string,
@@ -6229,7 +6235,10 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 		EC_KEY_get0_public_key(pvar->ecdh_client_key),
 		server_public,
 		share_key,
-		&hashlen);
+		hash, &hashlen);
+	if (ret < 0) {
+		goto error;
+	}
 
 	{
 		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
@@ -6300,7 +6309,7 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	u_char *server_pubkey = NULL;
 	char *signature;
 	buffer_t *shared_secret = NULL;
-	char *hash;
+	char hash[SSH_DIGEST_MAX_LENGTH];
 	char *emsg = NULL, emsg_tmp[1024];  // error message
 	int hashlen;
 	Key *hostkey = NULL;  // hostkey
@@ -6389,8 +6398,9 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	/* calc and verify H */
 	// ハッシュの計算
 	// verify は ssh2_kex_finish() で行う
-	hash = kex_c25519_hash(
-		get_kex_algorithm_EVP_MD(pvar->kex_type),
+	hashlen = sizeof(hash);
+	ret = kex_c25519_hash(
+		get_kex_hash_algorithm(pvar->kex_type),
 		pvar->client_version_string,
 		pvar->server_version_string,
 		buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
@@ -6398,7 +6408,10 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 		server_host_key_blob, bloblen,
 		pvar->c25519_client_pubkey, server_pubkey,
 		buffer_ptr(shared_secret), buffer_len(shared_secret),
-		&hashlen);
+		hash, &hashlen);
+	if (ret < 0) {
+		goto error;
+	}
 
 	{
 		push_memdump("KEX_ECDH_REPLY curve25519_kex_reply", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));

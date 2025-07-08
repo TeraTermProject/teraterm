@@ -305,11 +305,11 @@ struct Enc {
 struct Mac {
 	char            *name;
 	int             enabled;
-	const EVP_MD    *md;
 	unsigned int    mac_len;
 	u_char          *key;
 	unsigned int    key_len;
 	int             etm;
+	struct ssh_hmac_ctx	*hmac_ctx;
 };
 
 struct Comp {

@@ -53,23 +53,6 @@ static const struct ssh2_host_key_t ssh2_host_key[] = {
 	{KEY_ALGO_NONE,     KEY_NONE,     NID_undef,  SSH_AGENT_SIGN_DEFAULT, NULL},
 };
 
-struct ssh_digest_t {
-	digest_algorithm id;
-	char *name;
-};
-
-/* NB. Indexed directly by algorithm number */
-static const struct ssh_digest_t ssh_digests[] = {
-	{ SSH_DIGEST_MD5,       "MD5" },
-	{ SSH_DIGEST_RIPEMD160, "RIPEMD160" },
-	{ SSH_DIGEST_SHA1,      "SHA1" },
-	{ SSH_DIGEST_SHA256,    "SHA256" },
-	{ SSH_DIGEST_SHA384,    "SHA384" },
-	{ SSH_DIGEST_SHA512,    "SHA512" },
-	{ SSH_DIGEST_MAX,       NULL },
-};
-
-
 ssh_keytype get_hostkey_type_from_name(char *name)
 {
 	if (strcmp(name, "rsa1") == 0) {
@@ -159,6 +142,29 @@ int get_ssh2_key_hashtype(ssh_keyalgo algo)
 	return NID_sha1;
 }
 
+digest_algorithm get_ssh2_key_hash_alg(ssh_keyalgo algo)
+{
+	int nid = get_ssh2_key_hashtype(algo);
+	digest_algorithm hash_alg = SSH_DIGEST_MAX;
+
+	switch (nid) {
+		case NID_sha1:
+			hash_alg = SSH_DIGEST_SHA1;
+			break;
+		case NID_sha256:
+			hash_alg = SSH_DIGEST_SHA256;
+			break;
+		case NID_sha384:
+			hash_alg = SSH_DIGEST_SHA384;
+			break;
+		case NID_sha512:
+			hash_alg = SSH_DIGEST_SHA512;
+			break;
+	}
+
+	return hash_alg;
+}
+
 int get_ssh2_agent_flag(ssh_keyalgo algo)
 {
 	const struct ssh2_host_key_t *ptr = ssh2_host_key;
@@ -192,21 +198,6 @@ ssh_keytype get_ssh2_hostkey_type_from_algorithm(ssh_keyalgo algo)
 const char* get_ssh2_hostkey_type_name_from_algorithm(ssh_keyalgo algo)
 {
 	return get_ssh2_hostkey_type_name(get_ssh2_hostkey_type_from_algorithm(algo));
-}
-
-char* get_digest_algorithm_name(digest_algorithm id)
-{
-	const struct ssh_digest_t *ptr = ssh_digests;
-
-	while (ptr->name != NULL) {
-		if (id == ptr->id) {
-			return ptr->name;
-		}
-		ptr++;
-	}
-
-	// not found.
-	return "unknown";
 }
 
 void normalize_host_key_order(char *buf)

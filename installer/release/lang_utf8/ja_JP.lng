@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2025-04-23 by TeraTerm Project
+date=2025-06-27 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -381,6 +381,8 @@ DLG_SELECT_DIR_TITLE=新しいディレクトリを選択してください
 
 DLG_GEN_TITLE=Tera Term: 全般設定
 DLG_GEN_PORT=新しい接続のデフォルト(&C):
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Serial
 DLG_GEN_LANG_UI=UI言語(&L):
 
 DLG_HOST_TITLE=Tera Term: 新しい接続
@@ -396,6 +398,10 @@ DLG_KEYB_BS=&Backspace キー
 DLG_KEYB_DEL=&Delete キー
 DLG_KEYB_KEYB=キーボード(&K):
 DLG_KEYB_META=&Meta キー:
+DLG_KEYB_META_OFF=off
+DLG_KEYB_META_ON=on
+DLG_KEYB_META_LEFT=left
+DLG_KEYB_META_RIGHT=right
 DLG_KEYB_DISABLE=無効化するモード
 DLG_KEYB_APPKEY=アプリケーションキーパッド(&A)
 DLG_KEYB_APPCUR=アプリケーションカーソル(&C)
@@ -466,6 +472,7 @@ DLG_WIN_VERT=垂直線(&V):
 DLG_WIN_HORZ=下線(&O):
 DLG_WIN_BOLDFONT=太字を有効(&D)
 DLG_WIN_HIDETITLE=タイトルバーを隠す(&I):
+DLG_WIN_NO_FRAME=ウインドウ枠を隠す(&F):
 DLG_WIN_HIDEMENU=メニューバーを隠す(&M):
 DLG_WIN_COLOREMU=カラーエミュレーション(&C):
 DLG_WIN_PCBOLD16=&16色モード(PC形式):
@@ -486,6 +493,8 @@ DLG_WIN_NORMAL=標準
 DLG_WIN_BOLD=太字
 DLG_WIN_BLINK=点滅
 DLG_WIN_REVERSEATTR=反転
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=下線
 
 DLG_CHOOSEFONT_STC6="スタイル" を選択しても実際のフォント表示には反映されません。
 
@@ -1250,8 +1259,14 @@ MENU_SETTING=設定(&I)
 MENU_SETTING_TITLE=KanjiMenu設定
 MENU_CHARCODE=文字コードメニューを表示(&W)
 MENU_CONTENTS=メニュー内容(&C)
+MENU_CONTENTS_AUTO=自動選択
+MENU_CONTENTS_JAPANESE=日本語
+MENU_CONTENTS_KOREAN=韓国語
 MENU_AMB_MENU=Ambiguous(曖昧)文字幅メニューを表示(&A)
 MENU_USE_ONE_SETTING_MENU=送受信両方を変更メニューを表示(&N)
+BTN_OK=OK
+BTN_CANCEL=キャンセル
+BTN_HELP=ヘルプ
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=常に最前面に表示(&A)
@@ -1269,6 +1284,42 @@ DLG_INTERVAL=間隔(秒)(&I)
 DLG_COMMAND=コマンド(&C)
 DLG_ADD_NEWLINE=改行を追加(&A)
 
+BTN_OK=OK
+BTN_CANCEL=キャンセル
+
 [TTXCheckUpdate]
 MSG_CHECKUPDATE=アップデートの確認を行いますか?\n  %s
 MENU_CHECKUPDATE=更新の確認(&U)...
+
+
+[TTXttyrec]
+MENU_RECORD=TTY 録画(&Y)
+MENU_REPLAY=TTY 再生(&E)
+MENU_REPLAYAGAIN=TTY 再生 再実行
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0All files(*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=Speed: %d, Pause: %s
+TITLE_STATUS_ON=ON
+TITLE_STATUS_OFF=OFF
+TITLE_TRIM=%d.%06d secs idle. trim to %d secs.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), Disabled.
+
+
+[TTXViewMode]
+MENU_SETPASS=ViewModeパスワード設定(&V)
+MENU_VIEWMODE=View modeに入る(&V)
+DLG_SETPASSWORD_TITLE=パスワード設定
+DLG_SETPASSWORD_CURPASS=旧パスワード
+DLG_SETPASSWORD_NEWPASS=新パスワード
+DLG_SETPASSWORD_RETPASS=新パスワード(再入力)
+DLG_INPUTPASSWORD_TITLE=パスワード入力
+DLG_INPUTPASSWORD_PASSWORD=パスワード
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=パスワードを変更しました。
+MSG_INVALID=パスワードに誤りがあります。
+MSG_NOTMATCHED=新しいパスワードが一致しません。
+MSG_TITLE_ERROR=TTXViewMode エラー
+MSG_CANNOTDISPLAY=ダイアログボックスを表示できません。
+BTN_OK=OK
+BTN_CANCEL=キャンセル
