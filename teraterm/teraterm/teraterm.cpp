@@ -293,7 +293,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 {
 	(void)hPreInst;
 	(void)lpszCmdLine;
-	(void)nCmdShow;
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
@@ -302,6 +301,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	setlocale(LC_ALL, "");
 
 	ts.TeraTermInstance = hInstance;
+	ts.nCmdShow = nCmdShow;
 	hInst = hInstance;
 	init();
 	_HtmlHelpW(NULL, NULL, HH_INITIALIZE, (DWORD_PTR)&HtmlHelpCookie);
@@ -313,17 +313,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);
 	pVTWin = m_pMainWnd;
 	main_window = m_pMainWnd->m_hWnd;
+
+	if (ts.Minimize>0) {
+		nCmdShow = SW_SHOWMINIMIZED;
+	}
+	ShowWindow(main_window, nCmdShow);
+
 	// [Tera Term]セクションのDLG_SYSTEM_FONTをとりあえずセットする
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 
-	BOOL bIdle = TRUE;	// idle状態か?
 	LONG lCount = 0;
 	MSG msg;
 	for (;;) {
 		// idle状態でメッセージがない場合
-		while (bIdle) {
-			if (::PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE) != FALSE) {
+		for (;;) {
+			if (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) != FALSE) {
 				// メッセージが存在する
 				break;
 			}
@@ -331,8 +336,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 			const BOOL continue_idle = OnIdle(lCount++);
 			if (!continue_idle) {
 				// FALSEが戻ってきたらidle処理は不要
-				bIdle = FALSE;
-				break;
+				Sleep(2);
+				lCount = 0;
 			}
 		}
 
@@ -352,7 +357,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				if (m_pMainWnd->m_hAccel != NULL) {
 					if (!MetaKey(ts.MetaKey)) {
 						// matakeyが押されていない
-						if (::TranslateAccelerator(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg)) {
+						if (::TranslateAcceleratorW(m_pMainWnd->m_hWnd, m_pMainWnd->m_hAccel, &msg)) {
 							// アクセラレーターキーを処理した
 							message_processed = true;
 						}
@@ -367,11 +372,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 
 			// idle状態に入るか?
 			if (IsIdleMessage(&msg)) {
-				bIdle = TRUE;
 				lCount = 0;
 			}
 
-			if (::PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE) == FALSE) {
+			if (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) == FALSE) {
 				// メッセージがなくなった
 				break;
 			}

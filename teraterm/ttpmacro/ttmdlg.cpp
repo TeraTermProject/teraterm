@@ -66,6 +66,8 @@ wchar_t **Params = NULL;
 int ParamCnt;
 int ParamsSize;
 BOOL SleepFlag;
+BOOL IOption;
+BOOL VOption;
 
 // (x,y) = (CW_USEDEFAULT, CW_USEDEFAULT)のときセンターに表示
 static int DlgPosX = CW_USEDEFAULT;
@@ -76,7 +78,7 @@ static int DlgOffsetY = 0;
 
 static CStatDlg *StatDlg = NULL;
 
-void ParseParam(PBOOL IOption, PBOOL VOption)
+void ParseParam(void)
 {
 	wchar_t *Param, **ptmp;
 	wchar_t Temp[MaxStrLen];
@@ -86,8 +88,8 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	FileName[0] = 0;
 	TopicName[0] = 0;
 	SleepFlag = FALSE;
-	*IOption = FALSE;
-	*VOption = FALSE;
+	IOption = FALSE;
+	VOption = FALSE;
 	Param = GetCommandLineW();
 
 	ParamsSize = 50;
@@ -109,7 +111,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 				continue;
 			}
 			else if (_wcsicmp(Temp, L"/I")==0) {
-				*IOption = TRUE;
+				IOption = TRUE;
 				continue;
 			}
 			else if (_wcsicmp(Temp, L"/S")==0) {
@@ -117,7 +119,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 				continue;
 			}
 			else if (_wcsicmp(Temp, L"/V")==0) {
-				*VOption = TRUE;
+				VOption = TRUE;
 				continue;
 			}
 		}
