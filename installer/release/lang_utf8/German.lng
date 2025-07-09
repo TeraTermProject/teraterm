@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2025-02-24 by TeraTerm Project
+date=2025-06-27 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -380,6 +380,8 @@ DLG_SELECT_DIR_TITLE=Neues Verzeichnis wählen
 
 DLG_GEN_TITLE=Tera-Grundeinstellungen
 DLG_GEN_PORT=New &connection default
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Serial
 DLG_GEN_LANG_UI=UI &Language:
 
 DLG_HOST_TITLE=Tera Term: Neue Verbindung
@@ -395,6 +397,10 @@ DLG_KEYB_BS=Backspace
 DLG_KEYB_DEL=Entfernen
 DLG_KEYB_KEYB=Keyboard:
 DLG_KEYB_META=Meta-Taste:
+DLG_KEYB_META_OFF=aus
+DLG_KEYB_META_ON=an
+DLG_KEYB_META_LEFT=links
+DLG_KEYB_META_RIGHT=rechts
 DLG_KEYB_DISABLE=Abschalten:
 DLG_KEYB_APPKEY=Anwendungs-Keypad
 DLG_KEYB_APPCUR=Anwendungs-Cursor
@@ -464,6 +470,7 @@ DLG_WIN_VERT=Vertikale Linie
 DLG_WIN_HORZ=Horizontale Linie
 DLG_WIN_BOLDFONT=fettschreiben
 DLG_WIN_HIDETITLE=Titelleiste ausblenden
+DLG_WIN_NO_FRAME=Kein Rahm&en
 DLG_WIN_HIDEMENU=Menüleiste ausblenden
 DLG_WIN_COLOREMU=&Farbemulation
 DLG_WIN_PCBOLD16=&16 Colors (PC style)
@@ -484,6 +491,8 @@ DLG_WIN_NORMAL=Normal
 DLG_WIN_BOLD=Fett
 DLG_WIN_BLINK=Blink
 DLG_WIN_REVERSEATTR=Umkehren
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=Unterstreichen
 
 DLG_CHOOSEFONT_STC6="Font style" selection here won't affect actual font appearance.
 
@@ -1251,8 +1260,14 @@ MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents
+MENU_CONTENTS_AUTO=Auto
+MENU_CONTENTS_JAPANESE=Japanisch
+MENU_CONTENTS_KOREAN=Koreanisch
 MENU_AMB_MENU=Show &Ambiguous Characters width menu
 MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
+BTN_OK=OK
+BTN_CANCEL=Abbrechen
+BTN_HELP=HILFE
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=&Immer im Vordergrund
@@ -1270,6 +1285,42 @@ DLG_INTERVAL=&Intervall (sek)
 DLG_COMMAND=&Befehl
 DLG_ADD_NEWLINE=&Add new line
 
+BTN_OK=OK
+BTN_CANCEL=Abbrechen
+
 [TTXCheckUpdate]
 MSG_CHECKUPDATE=Check for updates automatically?\n  %s
 MENU_CHECKUPDATE=Check for &Updates...
+
+
+[TTXttyrec]
+MENU_RECORD=TT&Y Aufzeichnung
+MENU_REPLAY=TTY Wi&edergabe
+MENU_REPLAYAGAIN=Nochmals wiedergeben
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0Alle Dateien(*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=Geschwindigkeit: %d, Pause: %s
+TITLE_STATUS_ON=EIN
+TITLE_STATUS_OFF=AUS
+TITLE_TRIM=%d.%06d sekunden inaktiv. auf %d sekunden trimmen.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), Deaktiviert.
+
+
+[TTXViewMode]
+MENU_SETPASS=&ViewMode passwort
+MENU_VIEWMODE=&Ansichtmodus
+DLG_SETPASSWORD_TITLE=Passwort festlegen
+DLG_SETPASSWORD_CURPASS=Altes Passwort
+DLG_SETPASSWORD_NEWPASS=Neues Passwort
+DLG_SETPASSWORD_RETPASS=Passwort erneut eingeben
+DLG_INPUTPASSWORD_TITLE=Passwort eingeben
+DLG_INPUTPASSWORD_PASSWORD=Passwort
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=Passwort geandert
+MSG_INVALID=Ungultiges Passwort
+MSG_NOTMATCHED=Neues Passwort stimmt nicht uberein.
+MSG_TITLE_ERROR=TTXViewMode Fehler
+MSG_CANNOTDISPLAY=Dialogfeld kann nicht angezeigt werden.
+BTN_OK=OK
+BTN_CANCEL=Abbrechen

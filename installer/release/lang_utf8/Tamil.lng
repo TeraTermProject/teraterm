@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2025-02-24 by TeraTerm Project
+date=2025-06-27 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -380,6 +380,8 @@ DLG_SELECT_DIR_TITLE=புதிய கோப்பகத்தைத் தே
 
 DLG_GEN_TITLE=தேரா முனை: பொது அமைப்பு
 DLG_GEN_PORT=New &connection default
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Serial
 DLG_GEN_LANG_UI=மொழி இடைமுகம்:
 
 DLG_HOST_TITLE=தேரா முனை: புதிய இணைப்பு
@@ -395,6 +397,10 @@ DLG_KEYB_BS=&பின்வெளி விசை
 DLG_KEYB_DEL=&நீக்கு விசை
 DLG_KEYB_KEYB=&விசைப்பலகை:
 DLG_KEYB_META=&மெட்டா விசை:
+DLG_KEYB_META_OFF=ஆஃப்
+DLG_KEYB_META_ON=உள்ள
+DLG_KEYB_META_LEFT=இடது
+DLG_KEYB_META_RIGHT=வலது
 DLG_KEYB_DISABLE=முடக்கப்பட்ட பயன்முறை:
 DLG_KEYB_APPKEY=&பயன்பாட்டு விசைப்பலகை
 DLG_KEYB_APPCUR=பயன்பாடு &சிமிட்டும் கோடு
@@ -464,6 +470,7 @@ DLG_WIN_VERT=&செங்குத்து கோடு
 DLG_WIN_HORZ=கிடைமட்ட கோடு
 DLG_WIN_BOLDFONT=தடித்த எழுத்துருவை இயக்கு
 DLG_WIN_HIDETITLE=தலைப்புப் பட்டி மறை
+DLG_WIN_NO_FRAME=&கட்டமைப்பு இல்லை
 DLG_WIN_HIDEMENU=&பட்டியல் பட்டியை மறை
 DLG_WIN_COLOREMU=&வண்ண எமுலேஷன்
 DLG_WIN_PCBOLD16=&16 நிறங்கள் (பிசி பாணி)
@@ -484,6 +491,8 @@ DLG_WIN_NORMAL=இயல்பானது
 DLG_WIN_BOLD=தடித்த
 DLG_WIN_BLINK=இமைக்க
 DLG_WIN_REVERSEATTR=தலைகீழ்
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=அடிக்கோடு
 
 DLG_CHOOSEFONT_STC6=இங்கே "எழுத்துரு நடை" தேர்வு உண்மையான எழுத்துரு தோற்றத்தை பாதிக்காது.
 
@@ -1248,8 +1257,14 @@ MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents
+MENU_CONTENTS_AUTO=தானாக
+MENU_CONTENTS_JAPANESE=ஜப்பானிய
+MENU_CONTENTS_KOREAN=கொரியன்
 MENU_AMB_MENU=Show &Ambiguous Characters width menu
 MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
+BTN_OK=சரி
+BTN_CANCEL=ரத்து செய்யவும்
+BTN_HELP=உதவி
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=&எப்போதும் மேலே
@@ -1267,6 +1282,42 @@ DLG_INTERVAL=&இடைவெளி(நொடி)
 DLG_COMMAND=&கட்டளை
 DLG_ADD_NEWLINE=&புதிய வரியைச் சேர்
 
+BTN_OK=சரி
+BTN_CANCEL=ரத்து செய்யவும்
+
 [TTXCheckUpdate]
 MSG_CHECKUPDATE=Check for updates automatically?\n  %s
 MENU_CHECKUPDATE=Check for &Updates...
+
+
+[TTXttyrec]
+MENU_RECORD=TTY &பதிவு
+MENU_REPLAY=TTY &மீள்பார்வை
+MENU_REPLAYAGAIN=மீண்டும் மீள்பார்வை
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0எல்லா கோப்புகள்(*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=வேகம்: %d, இடைவேளை: %s
+TITLE_STATUS_ON=உள்ள
+TITLE_STATUS_OFF=ஆஃப்
+TITLE_TRIM=%d.%06d நொடிகள் சுமந்து கொண்டிருக்கிறது. %d நொடிகளுக்கு வெட்டி.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), முடக்கப்பட்டது.
+
+
+[TTXViewMode]
+MENU_SETPASS=&காணும் முறை கடவுச்சொல்
+MENU_VIEWMODE=&காணும் முறை
+DLG_SETPASSWORD_TITLE=கடவுச்சொல்லை அமைக்கவும்
+DLG_SETPASSWORD_CURPASS=பழைய கடவுச்சொல்
+DLG_SETPASSWORD_NEWPASS=புதிய கடவுச்சொல்
+DLG_SETPASSWORD_RETPASS=மீண்டும் கடவுச்சொல்
+DLG_INPUTPASSWORD_TITLE=கடவுச்சொல்லை உள்ளிடவும்
+DLG_INPUTPASSWORD_PASSWORD=கடவுச்சொல்
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=கடவுச்சொல் மாற்றப்பட்டது
+MSG_INVALID=தவறான கடவுச்சொல்
+MSG_NOTMATCHED=புதிய கடவுச்சொல் பொருந்தவில்லை.
+MSG_TITLE_ERROR=TTXViewMode பிழை
+MSG_CANNOTDISPLAY=உள்ளீடு பெட்டி காட்சியிட முடியாது.
+BTN_OK=சரி
+BTN_CANCEL=&ரத்து செய்யவும்

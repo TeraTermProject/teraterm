@@ -70,7 +70,7 @@ static const char *BaudList[] = {
 static const char *DataList[] = {"7 bit","8 bit",NULL};
 static const char *ParityList[] = {"none", "odd", "even", "mark", "space", NULL};
 static const char *StopList[] = {"1 bit", "2 bit", NULL};
-static const char *FlowList[] = {"Xon/Xoff", "RTS/CTS", "DSR/DTR", "none", NULL};
+static const char *FlowList[] = {"XON/XOFF", "RTS/CTS", "DSR/DTR", "NONE", NULL};
 
 typedef struct {
 	PTTSet pts;

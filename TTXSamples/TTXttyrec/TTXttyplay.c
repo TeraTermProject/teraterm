@@ -81,8 +81,22 @@ void RestoreOLDTitle() {
 
 void ChangeTitleStatus() {
   char tbuff[TitleBuffSize];
+  wchar_t *uimsg1, *uimsg2, *uimsg3;
+  char *msg1, *msg2, *msg3;
 
-  _snprintf_s(tbuff, sizeof(tbuff), _TRUNCATE, "Speed: %d, Pause: %s", pvar->speed, pvar->pause ? "ON": "OFF");
+  GetI18nStrWW("TTXttyrec", "TITLE_STATUS_MSG", L"Speed: %d, Pause: %s", pvar->ts->UILanguageFileW, &uimsg1);
+  GetI18nStrWW("TTXttyrec", "TITLE_STATUS_ON",  L"ON",                   pvar->ts->UILanguageFileW, &uimsg2);
+  GetI18nStrWW("TTXttyrec", "TITLE_STATUS_OFF", L"OFF",                  pvar->ts->UILanguageFileW, &uimsg3);
+  msg1 = ToCharW(uimsg1);
+  msg2 = ToCharW(uimsg2);
+  msg3 = ToCharW(uimsg3);
+  free(uimsg1);
+  free(uimsg2);
+  free(uimsg3);
+  _snprintf_s(tbuff, sizeof(tbuff), _TRUNCATE, msg1, pvar->speed, pvar->pause ? msg2: msg3);
+  free(msg1);
+  free(msg2);
+  free(msg3);
   strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
   pvar->ChangeTitle = TRUE;
   SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
@@ -204,7 +218,13 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 			return TRUE;
 		}
 		else if (rsize != sizeof(b)) {
-			MessageBox(pvar->cv->HWin, "rsize != sizeof(b), Disabled.", "TTXttyplay", MB_ICONEXCLAMATION);
+			static const TTMessageBoxInfoW info = {
+				"TTXttyrec",
+				"MSG_TITLE", L"TTXttyplay",
+				"MSG_RSIZE", L"rsize != sizeof(b), Disabled.",
+				MB_ICONEXCLAMATION
+			};
+			TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW);
 			pvar->enable = FALSE;
 			RestoreOLDTitle();
 			return FALSE;
@@ -216,8 +236,13 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 			pvar->wait = tvshift(tvdiff(prh.tv, h.tv), pvar->speed);
 			if (pvar->maxwait != 0 && pvar->wait.tv_sec >= pvar->maxwait) {
 				char tbuff[TitleBuffSize];
-				_snprintf_s(tbuff, sizeof(tbuff), _TRUNCATE, "%d.%06d secs idle. trim to %d secs.",
-				pvar->wait.tv_sec, pvar->wait.tv_usec, pvar->maxwait);
+				wchar_t *uimsg;
+				char *msg;
+				GetI18nStrWW("TTXttyrec", "TITLE_TRIM", L"%d.%06d secs idle. trim to %d secs.", pvar->ts->UILanguageFileW, &uimsg);
+				msg = ToCharW(uimsg);
+				free(uimsg);
+				_snprintf_s(tbuff, sizeof(tbuff), _TRUNCATE, msg, pvar->wait.tv_sec, pvar->wait.tv_usec, pvar->maxwait);
+				free(msg);
 				pvar->wait.tv_sec = pvar->maxwait;
 				pvar->wait.tv_usec = 0;
 				title_changed = TRUE;
@@ -417,9 +442,15 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
 	if (pvar->enable) {
 		flag |= MF_GRAYED;
 	}
-	InsertMenu(pvar->FileMenu, ID_FILE_PRINT2, flag, ID_MENU_REPLAY, "TTY R&eplay");
+
+	wchar_t *uimsg;
+	GetI18nStrWW("TTXttyrec", "MENU_REPLAY", L"TTY R&eplay", pvar->ts->UILanguageFileW, &uimsg);
+	InsertMenuW(pvar->FileMenu, ID_FILE_PRINT2, flag, ID_MENU_REPLAY, uimsg);
+	free(uimsg);
 	if (pvar->played) {
-		InsertMenu(pvar->FileMenu, ID_FILE_PRINT2, flag, ID_MENU_AGAIN, "Replay again");
+		GetI18nStrWW("TTXttyrec", "MENU_REPLAYAGAIN", L"Replay again", pvar->ts->UILanguageFileW, &uimsg);
+		InsertMenuW(pvar->FileMenu, ID_FILE_PRINT2, flag, ID_MENU_AGAIN, uimsg);
+		free(uimsg);
 	}
 	InsertMenu(pvar->FileMenu, ID_FILE_PRINT2, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 
@@ -478,11 +509,14 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 		if (!pvar->enable) {
 			TTOPENFILENAMEW ofn;
 			wchar_t *openfn;
+			wchar_t *uimsg1, *uimsg2;
 
+			GetI18nStrWW("TTXttyrec", "FILE_FILTER", L"ttyrec(*.tty)\\0*.tty\\0All files(*.*)\\0*.*\\0\\0", pvar->ts->UILanguageFileW, &uimsg1);
+			GetI18nStrWW("TTXttyrec", "FILE_DEFAULTEXTENSION", L"tty", pvar->ts->UILanguageFileW, &uimsg2);
 			memset(&ofn, 0, sizeof(ofn));
 			ofn.hwndOwner = hWin;
-			ofn.lpstrFilter = L"ttyrec(*.tty)\0*.tty\0All files(*.*)\0*.*\0\0";
-			ofn.lpstrDefExt = L"tty";
+			ofn.lpstrFilter = uimsg1;
+			ofn.lpstrDefExt = uimsg2;
 			// ofn.lpstrTitle = L"";
 			ofn.Flags = OFN_FILEMUSTEXIST;
 
@@ -493,6 +527,8 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 				// Call New-Connection dialog
 				SendMessage(hWin, WM_COMMAND, MAKELONG(ID_FILE_NEWCONNECTION, 0), 0);
 			}
+			free(uimsg1);
+			free(uimsg2);
 		}
 		return 1;
 	case ID_MENU_AGAIN:
