@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// ï¿½pï¿½ï¿½ (ï¿½Äï¿½) resources
+// ‰pŒê (•Ä‘) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -753,7 +753,7 @@ BEGIN
     "I",            ID_ACC_DISCONNECT,      VIRTKEY, ALT, NOINVERT
 END
 
-#endif    // ï¿½pï¿½ï¿½ (ï¿½Äï¿½) resources
+#endif    // ‰pŒê (•Ä‘) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
