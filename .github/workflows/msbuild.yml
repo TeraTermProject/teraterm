@@ -21,11 +21,11 @@ jobs:
     env:
       NOPAUSE: 1
       VS_VERSION: ${{ matrix.VS_VERSION }}
-      ORGANIZATION_ID: 78e41f48-55fc-4f33-8ea5-08ac32f65ac8
+      ORGANIZATION_ID: ${{ vars.ORGANIZATION_ID }}
       PROJECT_SLUG: teraterm
       SIGNING_POLICY_SLUG: test-signing
       SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
-      SIGNPATH_PASS: 1
+      EXECUTE_CODE_SIGNING: 1       # 1の時実際にコード署名を行う(0=テスト用,署名を行わない)
 
     steps:
     - uses: actions/checkout@v4
@@ -183,21 +183,20 @@ jobs:
         path: |
           installer/Output/*.sha512sum
 
-    # 
+    #
     # 以下はコード署名のための処理
-    # 
+    #
     - name: Upload artifacts for sign (tareterm_portable.zip)
       if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1'
       id: upload-portable
       uses: actions/upload-artifact@v4
       with:
         name: portable_unsigned
-        retention-days: 1
         path: |
           installer/Output/portable
 
     - name: sign portable zip
-      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1' && env.SIGNPATH_PASS == 1
+      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1' && env.EXECUTE_CODE_SIGNING == 1
       uses: signpath/github-action-submit-signing-request@v1.1
       with:
         api-token: '${{ env.SIGNPATH_API_TOKEN }}'
@@ -211,7 +210,7 @@ jobs:
         wait-for-completion-timeout-in-seconds: 1800
 
     - name: sign portable zip (pass)
-      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1' && env.SIGNPATH_PASS == 0
+      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1' && env.EXECUTE_CODE_SIGNING == 0
       shell: bash
       run: |
         mkdir installer/Output/portable_signed
@@ -245,12 +244,11 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: setup_unsigned
-        retention-days: 1
         path: |
           installer/Output/setup
 
     - name: sign setup
-      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1' && env.SIGNPATH_PASS == 1
+      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1' && env.EXECUTE_CODE_SIGNING == 1
       uses: signpath/github-action-submit-signing-request@v1.1
       with:
         api-token: '${{ env.SIGNPATH_API_TOKEN }}'
@@ -264,7 +262,7 @@ jobs:
         wait-for-completion-timeout-in-seconds: 1800
 
     - name: sign setup (pass)
-      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1' && env.SIGNPATH_PASS == 0
+      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1' && env.EXECUTE_CODE_SIGNING == 0
       shell: bash
       run: |
         mkdir installer/Output/setup_signed
@@ -289,7 +287,7 @@ jobs:
           installer/Output/setup_signed
 
     - name: release files
-      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1' && steps.vars.outputs.RELEASE == '1'
+      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1'
       shell: bash
       run: |
         OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
@@ -305,10 +303,9 @@ jobs:
         ls
 
     - name: Upload artifacts (release files)
-      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1' && steps.vars.outputs.RELEASE == '1'
+      if: env.SIGNPATH_API_TOKEN != '' && steps.vars.outputs.RELEASE == '1'
       uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.vars.outputs.OUTPUT_FILES }}
         path: |
           installer/Output/release
-
