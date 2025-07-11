@@ -210,7 +210,7 @@ jobs:
     #     GitHub で SIGNPATH_FORCE に 1 を設定する
     #
     - name: Upload artifacts for sign (tareterm_portable.zip)
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || steps.vars.outputs.SIGNPATH_FORCE == '1')
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       id: upload-portable
       uses: actions/upload-artifact@v4
       with:
@@ -218,8 +218,8 @@ jobs:
         path: |
           installer/Output/portable
 
-    - name: sign portable zip
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || steps.vars.outputs.SIGNPATH_FORCE == '1') && env.SIGNPATH_SKIP != '1'
+    - name: Sign portable zip
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1') && env.SIGNPATH_SKIP != '1'
       uses: signpath/github-action-submit-signing-request@v1.1
       with:
         api-token: '${{ env.SIGNPATH_API_TOKEN }}'
@@ -233,14 +233,14 @@ jobs:
         wait-for-completion-timeout-in-seconds: 1800
 
     - name: Sign portable zip skipped - copying files
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || steps.vars.outputs.SIGNPATH_FORCE == '1') && env.SIGNPATH_SKIP == '1'
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1') && env.SIGNPATH_SKIP == '1'
       shell: bash
       run: |
         mkdir installer/Output/portable_signed
         cp -R installer/Output/portable installer/Output/portable_signed
 
     - name: Rename portable signed zip
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || steps.vars.outputs.SIGNPATH_FORCE == '1')
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       shell: bash
       run: |
         OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
@@ -249,7 +249,7 @@ jobs:
         mv installer/Output/portable_signed/teraterm "installer/Output/portable_signed/${OUTPUT}"
 
     - name: Upload artifacts (portable signed zip)
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || steps.vars.outputs.SIGNPATH_FORCE == '1')
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.vars.outputs.OUTPUT_ZIP }}
@@ -257,12 +257,12 @@ jobs:
           installer/Output/portable_signed
 
     - name: Build unsigned setup.exe
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || steps.vars.outputs.SIGNPATH_FORCE == '1')
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       run: |
         cmake -P installer/iscc_signed.cmake
 
     - name: Upload artifacts for sign (setup.exe)
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || steps.vars.outputs.SIGNPATH_FORCE == '1')
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       id: upload-setup
       uses: actions/upload-artifact@v4
       with:
@@ -270,8 +270,8 @@ jobs:
         path: |
           installer/Output/setup
 
-    - name: sign setup
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || steps.vars.outputs.SIGNPATH_FORCE == '1') && env.SIGNPATH_SKIP != '1'
+    - name: sign setup.exe
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1') && env.SIGNPATH_SKIP != '1'
       uses: signpath/github-action-submit-signing-request@v1.1
       with:
         api-token: '${{ env.SIGNPATH_API_TOKEN }}'
@@ -286,14 +286,14 @@ jobs:
 
     # The folder name is 'signed', but the contained setup.exe is unsigned
     - name: Sign setup.exe skipped - copying file
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || steps.vars.outputs.SIGNPATH_FORCE == '1') && env.SIGNPATH_SKIP == '1'
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1') && env.SIGNPATH_SKIP == '1'
       shell: bash
       run: |
         mkdir installer/Output/setup_signed
         cp -R installer/Output/setup installer/Output/setup_signed
 
     - name: Rename signed setup.exe
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || steps.vars.outputs.SIGNPATH_FORCE == '1')
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       shell: bash
       run: |
         OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
@@ -303,7 +303,7 @@ jobs:
         ls installer/Output/setup_signed/
 
     - name: Upload artifacts (signed setup.exe)
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || steps.vars.outputs.SIGNPATH_FORCE == '1')
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.vars.outputs.OUTPUT_EXE }}
@@ -311,7 +311,7 @@ jobs:
           installer/Output/setup_signed
 
     - name: release files
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || steps.vars.outputs.SIGNPATH_FORCE == '1')
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       shell: bash
       run: |
         OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
@@ -327,7 +327,7 @@ jobs:
         ls
 
     - name: Upload artifacts (release files)
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || steps.vars.outputs.SIGNPATH_FORCE == '1')
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.vars.outputs.OUTPUT_FILES }}
