@@ -318,7 +318,7 @@ jobs:
         mkdir installer/Output/release
         cp installer/Output/setup_signed/${OUTPUT}.exe installer/Output/release
         pushd installer/Output/portable_signed
-        cmake -E tar cf ../release/${OUTPUT}.zip ${OUTPUT}
+        cmake -E tar cf ../release/${OUTPUT}.zip --format=zip ${OUTPUT}
         popd
         cp installer/Output/*_pdb.zip installer/Output/release
         pushd installer/Output/release
