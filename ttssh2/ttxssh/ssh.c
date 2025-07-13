@@ -90,7 +90,7 @@
 //
 
 // channel data structure
-#define CHANNEL_MAX 100
+#define CHANNEL_MAX 7200
 
 //
 // msg ‚ª NULL ‚Å‚Í–³‚¢–‚Ì•ÛØBNULL ‚Ìê‡‚Í "(null)" ‚ğ•Ô‚·B
