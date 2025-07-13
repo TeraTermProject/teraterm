@@ -153,6 +153,7 @@
     <ClCompile Include="cipher-ctr.c" />
     <ClCompile Include="comp.c" />
     <ClCompile Include="crypt.c" />
+    <ClCompile Include="digest.c" />
     <ClCompile Include="dns.c" />
     <ClCompile Include="ed25519.c" />
     <ClCompile Include="fwd-socks.c" />
@@ -160,6 +161,7 @@
     <ClCompile Include="fwdui.c" />
     <ClCompile Include="hash.c" />
     <ClCompile Include="hostkey.c" />
+    <ClCompile Include="hmac.c" />
     <ClCompile Include="hosts.c" />
     <ClCompile Include="kex.c" />
     <ClCompile Include="key.c" />
@@ -198,11 +200,13 @@
     <ClInclude Include="config.h" />
     <ClInclude Include="crypt.h" />
     <ClInclude Include="crypto_api.h" />
+    <ClInclude Include="digest.h" />
     <ClInclude Include="dns.h" />
     <ClInclude Include="fwd-socks.h" />
     <ClInclude Include="fwd.h" />
     <ClInclude Include="fwdui.h" />
     <ClInclude Include="hostkey.h" />
+    <ClInclude Include="hmac.h" />
     <ClInclude Include="hosts.h" />
     <ClInclude Include="kex.h" />
     <ClInclude Include="key.h" />

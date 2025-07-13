@@ -532,12 +532,10 @@ void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *po
 {
 	unsigned char *buf = NULL;
 	size_t len;
-	BN_CTX *bnctx;
 
 	/* Determine length */
-	bnctx = BN_CTX_new();
 	len = EC_POINT_point2oct(curve, point, POINT_CONVERSION_UNCOMPRESSED,
-	    NULL, 0, bnctx);
+	    NULL, 0, NULL);
 	/* Convert */
 	buf = malloc(len);
 	if (buf == NULL) {
@@ -545,7 +543,7 @@ void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *po
 		goto error;
 	}
 	if (EC_POINT_point2oct(curve, point, POINT_CONVERSION_UNCOMPRESSED,
-	    buf, len, bnctx) != len) {
+	    buf, len, NULL) != len) {
 		goto error;
 	}
 	/* Append */
@@ -553,25 +551,19 @@ void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *po
 
 error:
 	free(buf);
-	BN_CTX_free(bnctx);
 }
 
 void buffer_get_ecpoint(char **data, const EC_GROUP *curve, EC_POINT *point)
 {
 	char *buf = *data;
 	size_t len;
-	BN_CTX *bnctx;
-
-	bnctx = BN_CTX_new();
 
 	len = get_uint32_MSBfirst(buf);
 	buf += 4;
-	EC_POINT_oct2point(curve, point, buf, len, bnctx);
+	EC_POINT_oct2point(curve, point, buf, len, NULL);
 	buf += len;
 
 	*data = buf;
-
-	BN_CTX_free(bnctx);
 }
 
 void buffer_get_ecpoint_msg(buffer_t *msg, const EC_GROUP *curve, EC_POINT *point)

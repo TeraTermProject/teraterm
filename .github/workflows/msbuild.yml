@@ -24,6 +24,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set timezone to JST
+      run: |
+        tzutil /s "Tokyo Standard Time"
+
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
       with:
@@ -33,14 +37,13 @@ jobs:
       id: cache-libs-restore
       uses: actions/cache/restore@v4
       with:
-        path: libs
-        key: ${{ matrix.VS_VERSION }}-${{ github.event_name }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.bat', 'ci_scripts/*.bat') }}
-
-    - name: download setup-x86_64.exe
-      run: |
-        chcp 932
-        mkdir buildtools\cygwin64
-        curl https://www.cygwin.com/setup-x86_64.exe --output buildtools\cygwin64\setup-x86_64.exe
+        path: |
+          libs
+          buildtools
+        key: cache-${{ matrix.VS_VERSION }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        restore-keys: |
+            cache-${{ matrix.VS_VERSION }}-
+            cache-
 
     - uses: msys2/setup-msys2@v2
 
@@ -54,15 +57,64 @@ jobs:
         chcp 932
         buildtools/install_innosetup.bat
 
-    - name: build_script
+    - name: build_config
+      shell: bash
       run: |
-        chcp 932
-        ci_scripts/build_appveyor_release_bat.bat
+        cd buildtools/svnrev/
+        perl svnrev.pl --root ../.. --header ../../teraterm/common/svnversion.h --cmake build_config.cmake --json build_config.json
 
-    - name: after_build
+    - name: read buildinfo.json
+      id: read_buildinfo
+      shell: bash
+      run: |
+        json_content=$(cat buildtools/svnrev/build_config.json | jq -c .)
+        echo "json=$json_content" >> $GITHUB_OUTPUT
+
+    - name: set vars
+      id: vars
+      shell: bash
+      run: |
+        VERSION=${{ fromJson(steps.read_buildinfo.outputs.json).VERSION }}
+        DATE_TIME=${{ fromJson(steps.read_buildinfo.outputs.json).DATE }}-${{ fromJson(steps.read_buildinfo.outputs.json).TIME }}
+        VCSVERSION=${{ fromJson(steps.read_buildinfo.outputs.json).GITVERSION }}
+        SNAPSHOT_OUTPUT=teraterm-${VERSION}-${DATE_TIME}-${VCSVERSION}-snapshot
+        RELEASE_OUTPUT=teraterm-${VERSION}
+        RELEASE=${{ fromJson(steps.read_buildinfo.outputs.json).RELEASE }}
+        if [ "$RELEASE" = "0" ]; then
+          OUTPUT=${SNAPSHOT_OUTPUT}
+        else
+          OUTPUT=${RELEASE_OUTPUT}
+        fi
+        OUTPUT_ZIP=${OUTPUT}_ZIP
+        OUTPUT_EXE=${OUTPUT}_EXE
+        OUTPUT_FILES=${OUTPUT}_FILES
+        echo "SNAPSHOT_OUTPUT=${SNAPSHOT_OUTPUT}" >> $GITHUB_OUTPUT
+        echo "RELEASE_OUTPUT=${RELEASE_OUTPUT}" >> $GITHUB_OUTPUT
+        echo "RELEASE=${RELEASE}" >> $GITHUB_OUTPUT
+        echo "OUTPUT=${OUTPUT}" >> $GITHUB_OUTPUT
+        echo "OUTPUT_ZIP=${OUTPUT_ZIP}" >> $GITHUB_OUTPUT
+        echo "OUTPUT_EXE=${OUTPUT_EXE}" >> $GITHUB_OUTPUT
+        echo "OUTPUT_FILES=${OUTPUT_FILES}" >> $GITHUB_OUTPUT
+        echo "SNAPSHOT_OUTPUT=${SNAPSHOT_OUTPUT}"
+        echo "RELEASE_OUTPUT=${RELEASE_OUTPUT}"
+        echo "RELEASE=${RELEASE}"
+        echo "OUTPUT=${OUTPUT}"
+        echo "OUTPUT_ZIP=${OUTPUT_ZIP}"
+        echo "OUTPUT_EXE=${OUTPUT_EXE}"
+        echo "OUTPUT_FILES=${OUTPUT_FILES}"
+
+    - name: build_script
+      shell: cmd
+      env:
+        RELEASE: ${{ steps.vars.outputs.RELEASE }}
       run: |
         chcp 932
-        ci_scripts/build_appveyor_release_bat_pre_cache.bat
+        if "%RELEASE%"=="0" (
+          installer\release.bat 3
+        ) else (
+          rem for release build
+          installer\release.bat 2
+        )
 
     - name: Upload artifacts (zip)
       uses: actions/upload-artifact@v4
@@ -100,12 +152,25 @@ jobs:
         path: |
           installer/Output/*.sha512sum
 
-    - name: Save libs
-      if: steps.cache-libs-restore.outputs.cache-hit != 'true'
+    - name: Calculate cache hash
+      id: cache_hash
+      shell: bash
+      run: |
+        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
+
+    - name: pre_cache
+      run: |
+        chcp 932
+        ci_scripts/build_appveyor_release_bat_pre_cache.bat
+
+    - name: save cache
+      if: steps.cache-libs-restore.outputs.cache-hit != 'true'   # restore時keyが完全に一致したときtrue
       id: cache-libs-save
       uses: actions/cache/save@v4
       with:
         path: |
           libs
-        key: ${{ matrix.VS_VERSION }}-${{ github.event_name }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.bat', 'ci_scripts/*.bat') }}
+          buildtools
+        key: cache-${{ matrix.VS_VERSION }}-${{ steps.cache_hash.outputs.hash_value }}
 

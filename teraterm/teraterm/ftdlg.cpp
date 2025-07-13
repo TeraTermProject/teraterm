@@ -95,6 +95,8 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlg::Info *info)
 	hwnd = GetForegroundWindow();
 	if (OpId == OpLog) { // parent window is desktop
 		Ok = TTCDialog::Create(hInstance, GetDesktopWindow(), IDD_FILETRANSDLG);
+		HWND HControl = ::GetDlgItem(m_hWnd, IDC_TRANSHIDEDLG);
+		::ShowWindow(HControl, SW_SHOW);
 	}
 	else { // parent window is VT window
 		Ok = TTCDialog::Create(hInstance, NULL, IDD_FILETRANSDLG);
@@ -206,6 +208,7 @@ BOOL CFileTransDlg::OnInitDialog()
 		{ IDC_FULLPATH_LABEL, "DLG_FILETRANS_FULLPATH" },
 		{ IDC_TRANS_TRANS, "DLG_FILETRANS_TRNAS" },
 		{ IDC_TRANS_ELAPSED, "DLG_FILETRANS_ELAPSED" },
+		{ IDC_TRANSHIDEDLG, "DLG_FOPT_HIDEDIALOG" },
 		{ IDCANCEL, "DLG_FILETRANS_CLOSE" },
 		{ IDC_TRANSPAUSESTART, "DLG_FILETRANS_PAUSE" },
 		{ IDC_TRANSHELP, "BTN_HELP" },
@@ -264,6 +267,9 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			else {
 				::PostMessage(HMainWin, WM_USER_DLGHELP2, HlpFileSend, 0);
 			}
+			return TRUE;
+		case IDC_TRANSHIDEDLG:
+			ShowWindow(SW_HIDE);
 			return TRUE;
 		default:
 			return (TTCDialog::OnCommand(wParam,lParam));

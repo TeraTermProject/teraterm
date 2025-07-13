@@ -176,8 +176,12 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
   if (pvar->record) {
     flag |= MF_CHECKED;
   }
-  InsertMenu(pvar->FileMenu, ID_FILE_PRINT2,
-		flag, ID_MENUITEM, "TT&Y Record");
+
+  wchar_t *uimsg;
+  GetI18nStrWW("TTXttyrec", "MENU_RECORD", L"TT&Y Record", pvar->ts->UILanguageFileW, &uimsg);
+  InsertMenuW(pvar->FileMenu, ID_FILE_PRINT2,
+		flag, ID_MENUITEM, uimsg);
+  free(uimsg);
 //  InsertMenu(pvar->FileMenu, ID_FILE_SENDFILE,
 //		MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 }
@@ -205,16 +209,19 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 		else {
 			TTOPENFILENAMEW ofn;
 			wchar_t *fname;
+			wchar_t *uimsg1, *uimsg2;
 
 			if (pvar->fh != INVALID_HANDLE_VALUE) {
 				CloseHandle(pvar->fh);
 			}
 
+			GetI18nStrWW("TTXttyrec", "FILE_FILTER", L"ttyrec(*.tty)\\0*.tty\\0All files(*.*)\\0*.*\\0\\0", pvar->ts->UILanguageFileW, &uimsg1);
+			GetI18nStrWW("TTXttyrec", "FILE_DEFAULTEXTENSION", L"tty", pvar->ts->UILanguageFileW, &uimsg2);
 			memset(&ofn, 0, sizeof(ofn));
 			ofn.hwndOwner = hWin;
-			ofn.lpstrFilter = L"ttyrec(*.tty)\0*.tty\0All files(*.*)\0*.*\0\0";
+			ofn.lpstrFilter = uimsg1;
 			ofn.lpstrFile = NULL;
-			ofn.lpstrDefExt = L"tty";
+			ofn.lpstrDefExt = uimsg2;
 			ofn.lpstrInitialDir = pvar->ts->LogDirW;
 			//ofn.lpstrTitle = L"";
 			ofn.Flags = OFN_OVERWRITEPROMPT;
@@ -232,6 +239,8 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 					}
 				}
 			}
+			free(uimsg1);
+			free(uimsg2);
 		}
 		return 1;
 	}

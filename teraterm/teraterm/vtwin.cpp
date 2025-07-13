@@ -552,7 +552,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	WNDCLASSW wc;
 	RECT rect;
 	DWORD Style;
-	int CmdShow;
 	BOOL isFirstInstance;
 	m_hInst = hInstance;
 
@@ -788,7 +787,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		TipWin->Create(HVTWin);
 	}
 
-	if (ts.HideWindow>0) {
+	if (ts.nCmdShow == SW_HIDE || ts.nCmdShow == SW_SHOWMINIMIZED ||
+		ts.nCmdShow == SW_MINIMIZE || ts.HideWindow > 0) {
 		if (strlen(TopicName)>0) {
 			InitDDE();
 			SendDDEReady();
@@ -797,15 +797,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		Startup();
 		return;
 	}
-	CmdShow = SW_SHOWDEFAULT;
-	if (ts.Minimize>0) {
-		CmdShow = SW_SHOWMINIMIZED;
-	}
 	SetWindowAlpha(ts.AlphaBlendActive);
-	ShowWindow(CmdShow);
 	ChangeCaret();
-
-	pVTWin = this;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2768,14 +2761,8 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 			}
 		}
 		else {
-			if (isSizing) {
-				// ウィンドウがリサイズした
-				w = cx / FontWidth;
-				h = cy / FontHeight;
-			} else {
-				// ウィンドウが移動した
-				return;
-			}
+			w = cx / FontWidth;
+			h = cy / FontHeight;
 		}
 
 		HideStatusLine();
@@ -4078,6 +4065,8 @@ void CVTWindow::OnTTMenuLaunch()
 
 void CVTWindow::OnFileLog()
 {
+	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
+				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	FLogDlgInfo_t info;
 	info.filename = NULL;
 	info.pts = &ts;
@@ -4958,17 +4947,6 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 	int NewWindowWidth;
 	int NewWindowHeight;
 
-#ifdef WINDOW_MAXMIMUM_ENABLED
-	if (IsZoomed(m_hWnd)) {
-		if (calcOnly) {
-			return FALSE;
-		}
-		GetDesktopRect(m_hWnd, &NewWindowRect[0]);
-		NewRect = &NewWindowRect[0];
-		NewWindowWidth  = NewRect->right  - NewRect->left;
-		NewWindowHeight = NewRect->bottom - NewRect->top;
-	} else
-#endif
 	if (isSizing && (calcOnly == FALSE)) {
 		NewRect = &SuggestedWindowRect;
 		NewWindowWidth  = NewRect->right  - NewRect->left;
@@ -5115,6 +5093,17 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 			}
 		}
 	}
+
+#ifdef WINDOW_MAXMIMUM_ENABLED
+	if (IsZoomed(m_hWnd)) {
+		ts.TerminalOldWidth = NewWindowWidth;
+		ts.TerminalOldHeight = NewWindowHeight;
+		GetDesktopRect(m_hWnd, &NewWindowRect[0]);
+		NewRect = &NewWindowRect[0];
+		NewWindowWidth  = NewRect->right  - NewRect->left;
+		NewWindowHeight = NewRect->bottom - NewRect->top;
+	}
+#endif
 
 	::SetWindowPos(m_hWnd, NULL,
 				   NewRect->left, NewRect->top,

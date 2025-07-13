@@ -284,7 +284,16 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 					// フォントの設定
 					ChangeFont(0);
-					DispChangeWinSize(WinWidth,WinHeight);
+					HWND vtwin = GetParent(GetParent(hWnd));
+					if (::IsZoomed(vtwin)) {
+						// 最大化されている場合は、サイズ変更により WM_SIZE を発生させる。
+						RECT r;
+						::GetWindowRect(vtwin, &r);
+						SetWindowPos(vtwin, NULL, 0, 0, r.right - r.left, 0, SWP_NOMOVE);
+						SetWindowPos(vtwin, NULL, 0, 0, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+					} else {
+						DispChangeWinSize(WinWidth,WinHeight);
+					}
 					ChangeCaret();
 
 					break;

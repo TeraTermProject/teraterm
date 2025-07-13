@@ -7,10 +7,13 @@
 #define IDC_CURPASS                     2001
 #define IDC_NEWPASS                     2002
 #define IDC_RETPASS                     2003
-#define IDC_STATIC                      -1
+#define IDC_CURPASS_LABEL               3001
+#define IDC_NEWPASS_LABEL               3002
+#define IDC_RETPASS_LABEL               3003
+#define IDC_PASSWORD_LABEL              4001
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1

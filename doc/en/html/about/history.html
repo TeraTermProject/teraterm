@@ -26,6 +26,7 @@
  <li><a href="#viewmode">TTXViewMode</a></li>
  <li><a href="#recurringcommand">TTXRecurringCommand</a></li>
  <li><a href="#commandlineopt">TTXCommandLineOpt</a></li>
+ <li><a href="#changefontsize">TTXChangeFontSize</a></li>
 </ul>
 
 <hr>
@@ -66,6 +67,14 @@
           <li>ListHiddenFonts entry in TERATERM.INI, used to show or hide hidden fonts when selecting a VT font, was removed.</li>
         </ul>
       </li>
+      <li>
+        Added "Hide dialog" button on <a href="../menu/file-log.html#Logging">"Log" dialog box (displayed while logging)</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/630" target="_blank">issue #630</a>)
+      </li>
+      <li>
+        Added "VT220" to <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
+      </li>
     </ul>
   </li>
 
@@ -82,10 +91,6 @@
       <li>
         Fixed the issue the configuration value is not reflected to "Beep" dropdown on [Additional settings]-[<a href="../menu/setup-additional-ctrlseq.html">Control Sequence</a>] tab.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/529" target="_blank">issue #529</a>)
-      </li>
-      <li>
-        Fixed Corrected Sequences OSC 4 259 to reverse attribute text color setting (was set to background color setting)
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/532" target="_blank">issue #532</a>)
       </li>
       <li>
         Fixed to take into account left and right sides of characters when selecting characters with mouse.
@@ -106,16 +111,48 @@
         MACRO: Fixed the issue where macro could not be executed through the task scheduler.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/196" target="_blank">issue #196</a>)
       </li>
+      <li>
+        Fixed log dialog font was not changed when dialog font was changed and log dialog was opened.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/590" target="_blank">issue #590</a>)
+      </li>
+      <li>
+        Fixed the following issues that occur when changing the font size while the VT Window is maximized.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/631" target="_blank">issue #631</a>)
+        <ul>
+          <li>When selecting a font size smaller than the current font, the screen rendering is not being done correctly.</li>
+          <li>When selecting a font size larger than the current font, the window size exceeds that of the desktop.</li>
+        </ul>
+      </li>
+      <li>
+        <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> "VT100J", "VT102J", and "VT220J" were not selectable Since 5.3, which remove Language setting.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
+      </li>
+      <li>
+        Fixed the bug where Tera Term crashes when a filename using ':' in a location other than the drive letter is specified in the logopen of the Tera Term macro.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/648" target="_blank">issue #648</a>)
+      </li>
+      <li>
+        Fixed Tera Term may stop working when Tera Term macro is executed in hidden mode and Tera Term is executed by <a href="../macro/command/connect.html">connect</a> macro command.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/607" target="_blank">issue #607</a>)
+      </li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
+      <li>Added Portuguese (pt_BR.lng) language file. Rename language file name.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/589" target="_blank">issue #589</a>)
+      </li>
       <li>Upgraded TTSSH to <a href="#ttssh_3.5.0">3.5.0</a>.</li>
       <li>
         installer: Tera Term now appears as a candidate for "Default apps" of protocol and file extension.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/471" target="_blank">issue #471</a>)
       </li>
+      <li>Upgraded TTXttyrec Plug-in to <a href="#ttyrec_1.06">1.06 not released yet</a>.</li>
+      <li>Upgraded TTXViewMode Plug-in to <a href="#viewmode_1.01">1.01 not released yet</a>.</li>
+      <li>Upgraded CygTerm+ to <a href="#cygterm_1.07_30">1.07_30</a>.</li>
+      <li>Added <a href="#changefontsize_1.00">TTXChangeFontSize</a>.</li>
+      <li>Upgraded TTProxy to <a href="#ttproxy_1.0.0.27">1.0.0.27</a>.</li>
     </ul>
   </li>
 </ul>
@@ -3746,11 +3783,14 @@ SYNOPSIS:
     </ul>
   </li>
 
-  <!--li>Misc
+  <li>Misc
     <ul>
-      <li></li>
+      <li>
+        Upgraded LibreSSL to 4.1.0.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/588" target="_blank">issue #588</a>)
+      </li>
     </ul>
-  </li-->
+  </li>
 </ul>
 
 <h3 id="ttssh_3.4.0">2025.03.03 (Ver 3.4.0)</h3>
@@ -5319,6 +5359,13 @@ SYNOPSIS:
 
 
 <h2 id="cygterm">CygTerm+</h2>
+<h3 id="cygterm_1.07_30">v1.07_30 YYYY/MM/DD (not released yet)</h3>
+<ul class="history">
+      <li>
+        The issue where executing cygconnect in the Tera Term macro resulted in the message "/D=XXXXXXXX\nThe specified file could not be found" and prevented Cygterm from launching has been fixed.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/645" target="_blank">issue #645</a>)
+      </li>
+</ul>
 
 <h3 id="cygterm_1.07_29">v1.07_29 2016/11/26 (by maya)</h3>
 <ul class="history">
@@ -5577,14 +5624,20 @@ SYNOPSIS:
 
 <h2 id="ttproxy">TTProxy</h2>
 
+<h3 id="ttproxy_1.0.0.27">YYYY.MM.DD (Ver 1.0.0.27 not released yet)</h3>
+<ul class="history">
+  <li>Bug fixes
+    <ul>
+      <li>
+        The issue where the relative path specified by the Tera Term command line option /F=<setup file> was not treated as a relative path from %APPDATA%\teraterm5 has been fixed.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/653" target="_blank">issue #653</a>)
+      </li>
+    </ul>
+  </li>
+</ul>
+
 <h3 id="ttproxy_1.0.0.26">2019.12.7 (Ver 1.0.0.26)</h3>
 <ul class="history">
-  <!-- li>Changes
-    <ul>
-      <li></li>
-    </ul>
-  </li -->
-
   <li>Bug fixes
     <ul>
       <li>When the HTTP proxy connection fails and the status code is other than 400,401,403,405,406,407, invalid string is shown in the message box.</li>
@@ -5965,6 +6018,14 @@ SYNOPSIS:
 </ul>
 
 <h2 id="ttyrec">TTXttyrec</h2>
+<h3 id="ttyrec_1.06">YYYY.MM.DD (Ver 1.06 not released yet)</h3>
+<ul class="history">
+  <li>
+    Supported language files.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/624" target="_blank">issue #624</a>)
+  </li>
+</ul>
+
 <h3 id="ttyrec_1.05">2023.10.15 (Ver 1.05)</h3>
 <ul class="history">
   <li>Fixed [Replay again] is not working when playing from command line.</li>
@@ -6007,6 +6068,14 @@ SYNOPSIS:
 </ul>
 
 <h2 id="viewmode">TTXViewMode</h2>
+<h3 id="viewmode_1.01">YYYY.MM.DD (Ver 1.01 not released yet)</h3>
+<ul class="history">
+  <li>
+    Supported language files.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/624" target="_blank">issue #624</a>)
+  </li>
+</ul>
+
 <h3 id="viewmode_1.00">2008.12.16 (Ver 1.00)</h3>
 <ul class="history">
   <li>first release</li>
@@ -6051,6 +6120,15 @@ SYNOPSIS:
 <h3 id="commandlineopt_20231030">2023.10.30</h3>
 <ul class="history">
   <li>Fixed /FG=, /BG= options did not work.</li>
+</ul>
+
+<h2 id="changefontsize">TTXChangeFontSize</h2>
+<h3 id="changefontsize_1.00">YYYY.MM.DD (Ver 1.00 not released yet)</h3>
+<ul class="history">
+  <li>
+    Imported the source with permission of original author Kouichi IWAMOTO.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/599" target="_blank">issue #599</a>)
+  </li>
 </ul>
 
 </body>

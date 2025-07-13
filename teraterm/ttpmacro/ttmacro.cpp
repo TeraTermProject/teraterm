@@ -50,6 +50,7 @@
 #include "ttmacro.h"
 #include "ttmlib.h"
 #include "ttlib.h"
+#include "ttmdlg.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -143,6 +144,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	Busy = TRUE;
 	pCCtrlWindow = new CCtrlWindow(hInst);
 	pCCtrlWindow->Create();
+
+	if (!VOption) {
+		if (IOption) {
+			nCmdShow = SW_SHOWMINIMIZED;
+		}
+		ShowWindow(pCCtrlWindow->m_hWnd, nCmdShow);
+	}
+
 	Busy = FALSE;
 
 	HWND hWnd = pCCtrlWindow->GetSafeHwnd();
@@ -153,7 +162,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	for (;;) {
 		// Windowsのメッセージがない場合のループ
 		for(;;) {
-			if (PeekMessageA(&msg, NULL, NULL, NULL, PM_NOREMOVE) != FALSE) {
+			if (PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) != FALSE) {
 				// メッセージが存在した、ループを抜ける
 				break;
 			}
@@ -185,7 +194,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				DispatchMessageW(&msg);
 			}
 
-			if (PeekMessageA(&msg, NULL, NULL, NULL, PM_NOREMOVE) == FALSE) {
+			if (PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) == FALSE) {
 				// メッセージがなくなった、ループを抜ける
 				break;
 			}

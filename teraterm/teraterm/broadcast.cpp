@@ -55,7 +55,6 @@
 #include "clipboar.h"	// for CBPreparePaste()
 #include "ttime.h"
 #include "history_store.h"
-#include "teraterml.h"
 
 #include "helpid.h"
 #include "broadcast.h"
@@ -642,8 +641,6 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			// リスト更新タイマーの開始
 			SetTimer(hWnd, list_timer_id, list_timer_tick, NULL);
 
-			AddModelessHandle(hWnd);
-
 			return FALSE;
 		}
 
@@ -984,10 +981,6 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				}
 			}
 			return TRUE;
-
-		case WM_NCDESTROY:
-			RemoveModelessHandle(hWnd);
-			return FALSE;
 
 		default:
 			//OutputDebugPrintf("msg %x wp %x lp %x\n", msg, wp, lp);

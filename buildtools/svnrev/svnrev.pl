@@ -17,7 +17,8 @@ my $git = "git";
 my $out_header = "svnversion.h";
 my $out_bat = "sourcetree_info.bat";
 my $out_cmake = "";
-my $source_root = "..";
+my $out_json = "";
+my $source_root = "../..";
 my $date = strftime "%Y%m%d", localtime;
 my $time = strftime "%H%M%S", localtime;
 my $verbose = 0;
@@ -233,6 +234,35 @@ sub write_info_cmake {
 	close($FD);
 }
 
+sub write_info_json {
+	my ($out_json, %svninfo) = @_;
+	my $revision = $svninfo{'Revision'};
+	my $vcs = $svninfo{'vcs'};
+
+	open(my $FD, ">$out_json") or die "error $out_json";
+	print $FD "{\n";
+	print $FD "  \"VERSION\": \"$version\",\n";
+	if ($vcs eq 'git') {
+		if ($revision ne '') {
+			print $FD "  \"GITVERSION\": \"$revision\",\n";
+		} else {
+			print $FD "  \"GITVERSION\": \"0000\",\n";
+		}
+	}
+	elsif ($vcs eq 'svn') {
+		if ($revision ne '') {
+			print $FD "  \"SVNVERSION\": \"$revision\",\n";
+		} else {
+			print $FD "  \"SVNVERSION\": \"0000\",\n";
+		}
+	}
+	print $FD "  \"RELEASE\": \"$svninfo{'release'}\",\n";
+	print $FD "  \"DATE\": \"$date\",\n";
+	print $FD "  \"TIME\": \"$time\"\n";
+	print $FD "}\n";
+	close($FD);
+}
+
 sub read_tt_version_h()
 {
 	# ヘッダーファイルがない場合
@@ -275,6 +305,7 @@ GetOptions(
 	'header=s' => \$out_header,
 	'bat=s' => \$out_bat,
 	'cmake=s' => \$out_cmake,
+	'json=s' => \$out_json,
 	'verbose' => \$verbose,
 	'overwrite' => \$overwrite
 );
@@ -301,6 +332,7 @@ if ($verbose != 0) {
 	print "header=\"$out_header\"\n";
 	print "bat=\"$out_bat\"\n";
 	print "cmake=\"$out_cmake\"\n";
+	print "json=\"$out_json\"\n";
 	print "overwrite $overwrite\n";
 }
 
@@ -345,9 +377,8 @@ elsif((-d "$source_root/.git" || -f "$source_root/.git") && $git ne "") {
 		$branch =~ s/[\r\n]$//g;
 		$svninfo{'name'} = $branch;
 
-		my $revision = `\"$git\" log --oneline -1`;
-		chomp($revision);
-		$revision =~ s/^(\w+) .+/$1/;
+		my $revision = `\"$git\" rev-parse --short HEAD`;
+		$revision =~ s/[\r\n]$//g;
 		$svninfo{'Revision'} = $revision;
 	}
 }
@@ -418,5 +449,24 @@ if ($out_cmake ne "") {
 	}
 	if ($verbose != 0) {
 		printf("%s '$out_cmake'\n", $same == 1 ? "exists" : "update" );
+	}
+}
+
+# output for json
+if ($out_json ne "") {
+	my $out_json_tmp = $out_json . ".tmp";
+	&write_info_json($out_json_tmp, %svninfo);
+	$same = 0;
+	if (!$overwrite && &compare_file($out_json, $out_json_tmp) == 0) {
+		# same
+		unlink $out_json_tmp;
+		$same = 1;
+	} else {
+		# diff
+		unlink $out_json;
+		rename $out_json_tmp,  $out_json;
+	}
+	if ($verbose != 0) {
+		printf("%s '$out_json'\n", $same == 1 ? "exists" : "update" );
 	}
 }

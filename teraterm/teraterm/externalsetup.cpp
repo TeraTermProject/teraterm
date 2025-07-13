@@ -210,6 +210,13 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 				}
 			}
 		}
+
+		// ダイアログフォントの変更
+		if (ok) {
+			SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint,
+						  ts.DialogFontCharSet, ts.UILanguageFileW,
+						  "Tera Term", "DLG_SYSTEM_FONT");
+		}
 	}
 
 	// TEK Win

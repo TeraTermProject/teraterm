@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2025-05-18 by TeraTerm Project
+date=2025-06-27 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -383,6 +383,8 @@ DLG_SELECT_DIR_TITLE=選擇新文件夾
 
 DLG_GEN_TITLE=Tera Term：設定設定
 DLG_GEN_PORT=New &connection default
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Serial
 DLG_GEN_LANG_UI=界面語言(&L)：
 
 DLG_HOST_TITLE=Tera Term：建立新連線
@@ -398,6 +400,10 @@ DLG_KEYB_BS=&Backspace 鍵
 DLG_KEYB_DEL=&Delete 刪除鍵
 DLG_KEYB_KEYB=鍵盤(&K)：
 DLG_KEYB_META=&Meta 鍵：
+DLG_KEYB_META_OFF=關閉
+DLG_KEYB_META_ON=開啟
+DLG_KEYB_META_LEFT=左
+DLG_KEYB_META_RIGHT=右
 DLG_KEYB_DISABLE=禁用模式：
 DLG_KEYB_APPKEY=使用鍵盤(&A)
 DLG_KEYB_APPCUR=使用滑鼠(&C)
@@ -469,6 +475,7 @@ DLG_WIN_VERT=豎線(&V)
 DLG_WIN_HORZ=橫線(&O)
 DLG_WIN_BOLDFONT=啟用粗體(&D)
 DLG_WIN_HIDETITLE=隱藏標題欄(&I)
+DLG_WIN_NO_FRAME=無框架(&F)
 DLG_WIN_HIDEMENU=隱藏選單欄(&M)
 DLG_WIN_COLOREMU=次像素平滑(&C)
 DLG_WIN_PCBOLD16=&16色(PC風格)
@@ -489,6 +496,8 @@ DLG_WIN_NORMAL=正常
 DLG_WIN_BOLD=高亮
 DLG_WIN_BLINK=閃爍
 DLG_WIN_REVERSEATTR=反色
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=底線
 
 DLG_CHOOSEFONT_STC6=這裡的字型選項不會影響實際的字型外觀
 
@@ -1256,8 +1265,14 @@ MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents
+MENU_CONTENTS_AUTO=自動
+MENU_CONTENTS_JAPANESE=日文
+MENU_CONTENTS_KOREAN=韓文
 MENU_AMB_MENU=Show &Ambiguous Characters width menu
 MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
+BTN_OK=確定
+BTN_CANCEL=取消
+BTN_HELP=幫助
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=最上層顯示(&A)
@@ -1275,6 +1290,42 @@ DLG_INTERVAL=間隔(秒)(&I)
 DLG_COMMAND=命令(&C)
 DLG_ADD_NEWLINE=&Add new line
 
+BTN_OK=確定
+BTN_CANCEL=取消
+
 [TTXCheckUpdate]
 MSG_CHECKUPDATE=Check for updates automatically?\n  %s
 MENU_CHECKUPDATE=Check for &Updates...
+
+
+[TTXttyrec]
+MENU_RECORD=TT&Y 記錄TTY
+MENU_REPLAY=TTY 回放(&E)
+MENU_REPLAYAGAIN=再次回放
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0所有檔案(*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=速度: %d, 暫停: %s
+TITLE_STATUS_ON=開啟
+TITLE_STATUS_OFF=關閉
+TITLE_TRIM=%d.%06d 秒空閒. 修剪至 %d 秒.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), 已禁用.
+
+
+[TTXViewMode]
+MENU_SETPASS=檢視模式密碼(&V)
+MENU_VIEWMODE=檢視模式(&V)
+DLG_SETPASSWORD_TITLE=設定密碼
+DLG_SETPASSWORD_CURPASS=舊密碼
+DLG_SETPASSWORD_NEWPASS=新密碼
+DLG_SETPASSWORD_RETPASS=重新輸入密碼
+DLG_INPUTPASSWORD_TITLE=輸入密碼
+DLG_INPUTPASSWORD_PASSWORD=密碼
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=密碼已更改
+MSG_INVALID=無效密碼
+MSG_NOTMATCHED=新密碼不匹配。
+MSG_TITLE_ERROR=TTXViewMode 錯誤
+MSG_CANNOTDISPLAY=無法顯示對話框.
+BTN_OK=確定
+BTN_CANCEL=取消
