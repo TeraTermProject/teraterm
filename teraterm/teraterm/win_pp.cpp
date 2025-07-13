@@ -163,7 +163,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 								 L"&16 Colors (PC style)",
 								 ts->UILanguageFileW, &UIMsg);
 				} else {
-					GetI18nStrWW("Tera Term", "DLG_WIN_TITLE",
+					GetI18nStrWW("Tera Term", "DLG_WIN_COLOREMU",
 								 L"&Color emulation",
 								 ts->UILanguageFileW, &UIMsg);
 				}
