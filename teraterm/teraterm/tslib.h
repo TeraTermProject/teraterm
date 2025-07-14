@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024- TeraTerm Project
+ * (C) 2025- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,16 +26,19 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* choosefont dialog */
-#include "teraterm.h"
+#pragma once
+
+#include <windows.h>
 
 #include "tttypes.h"
-#include "addsetting.h"
-#include "externalsetup.h"
 
-#include "ttdlg.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, /*const*/ TTTSet *ts)
-{
-	return OpenExternalSetupTab(WndParent, FontPage);
+void TSGetLogFont(HWND hWnd, const TTTSet *pts, int type, unsigned int dpi, LOGFONTW *logfont);
+void TSSetLogFont(HWND hWnd, const LOGFONTW *logfont, int type, unsigned int dpi, TTTSet *pts);
+
+#ifdef __cplusplus
 }
+#endif

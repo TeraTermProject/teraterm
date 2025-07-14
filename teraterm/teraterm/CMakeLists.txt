@@ -56,6 +56,8 @@ add_executable(
   teraterml.h
   theme.h
   themefile.cpp
+  tslib.h
+  tslib.cpp
   tt-version.rc
   ttdde.c
   ttdde.h
@@ -131,6 +133,10 @@ set(SRC_DIALOG
   serial_pp.h
   setupdirdlg.cpp
   setupdirdlg.h
+  tekfont_pp.cpp
+  tekfont_pp.h
+  tekfont_pp.rc
+  tekfont_pp_res.h
   tcpip_pp.cpp
   tcpip_pp.h
   term_pp.cpp

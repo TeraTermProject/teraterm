@@ -38,7 +38,7 @@
 #include "font_pp_res.h"
 #include "dlglib.h"
 #include "setting.h"
-#include "vtdisp.h"		// for DispSetLogFont()
+#include "vtdisp.h"		// for DispIsResizedFont()
 #include "compat_win.h"	// for CF_INACTIVEFONTS
 #include "helpid.h"
 #include "codeconv.h"
@@ -47,6 +47,7 @@
 #include "asprintf.h"
 #include "win32helper.h"
 #include "tttext.h"
+#include "tslib.h"
 
 #include "font_pp.h"
 
@@ -211,11 +212,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)dlg_data);
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), dlg_data->pts->UILanguageFileW);
 
-			HDC DC = GetDC(hWnd);
-			int dpi = GetDeviceCaps(DC, LOGPIXELSY);
-			ReleaseDC(hWnd, DC);
-			DispSetLogFont(&dlg_data->VTFont, dpi);
-			GetFontPitchAndFamily(hWnd, &dlg_data->VTFont);
+			TSGetLogFont(hWnd, ts, 0, 0, &dlg_data->VTFont);
 
 			SetFontStringW(hWnd, IDC_VTFONT_EDIT, &dlg_data->VTFont);
 
@@ -258,13 +255,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					UnicodeDebugParam.CodePageForANSIDraw =
 						GetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, NULL, FALSE);
 
-					WideCharToACP_t(dlg_data->VTFont.lfFaceName, ts->VTFont, sizeof(ts->VTFont));
-					HDC DC = GetDC(hWnd);
-					int dpi = GetDeviceCaps(DC, LOGPIXELSY);
-					ReleaseDC(hWnd, DC);
-					ts->VTFontSize.x = dlg_data->VTFont.lfWidth  * 96 / dpi;
-					ts->VTFontSize.y = dlg_data->VTFont.lfHeight * 96 / dpi;
-					ts->VTFontCharSet = dlg_data->VTFont.lfCharSet;
+					TSSetLogFont(hWnd, &dlg_data->VTFont, 0, 0, ts);
 
 					DispEnableResizedFont(IsDlgButtonChecked(hWnd, IDC_RESIZED_FONT) == BST_CHECKED);
 

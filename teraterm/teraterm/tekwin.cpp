@@ -48,6 +48,8 @@
 #include "dlglib.h"
 #include "codeconv.h"
 #include "compat_win.h"
+#include "externalsetup.h"
+#include "tslib.h"
 
 #define TEKClassName L"TEKWin32"
 
@@ -622,7 +624,7 @@ LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 	DWORD Style;
 	HMENU SysMenu;
 
-	Style = GetWindowLongPtr (GWL_STYLE);
+	Style = (DWORD)GetWindowLongPtr (GWL_STYLE);
 	TBar = ((Style & WS_SYSMENU)!=0);
 	if (TBar == (ts.HideTitle==0)) {
 		return 0;
@@ -717,41 +719,39 @@ void CTEKWindow::OnEditClearScreen()
 
 void CTEKWindow::OnSetupWindow()
 {
-	BOOL Ok;
-	WORD OldEmu;
-
-	HelpId = HlpTEKSetupWindow;
-	ts.SampleFont = tk.TEKFont[0];
-
-	if (! LoadTTDLG()) {
-		return;
-	}
-	OldEmu = ts.TEKColorEmu;
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	Ok = (*SetupWin)(HTEKWin, &ts);
-	if (Ok) {
-		(*TEKResetWin)(&tk,&ts,OldEmu);
-		ChangeTitle();
-		SwitchMenu();
-		SwitchTitleBar();
-	}
+	OpenSetupTekWindow(m_hWnd);
 }
 
 void CTEKWindow::OnSetupFont()
 {
-	BOOL Ok;
+	OpenSetupTekFont(m_hWnd);
+}
 
-	HelpId = HlpTEKSetupFont;
-	if (! LoadTTDLG()) {
-		return;
-	}
-	Ok = (*ChooseFontDlg)(HTEKWin,&tk.TEKlf,&ts);
-	if (! Ok) {
-		return;
-	}
+/**
+ *	設定ダイアログが開くときに呼ばれる
+ */
+void CTEKWindow::OnSetupPreProcess()
+{
+	m_OldEmu = ts.TEKColorEmu;
+}
 
-	TEKSetupFont(&tk,&ts);
+/**
+ *	設定ダイアログが閉じるときに呼ばれる
+ *
+ *	@param	Ok	TRUEのときOKボタンを押した
+ */
+void CTEKWindow::OnSetupPostProcess(BOOL Ok)
+{
+	if (Ok) {
+		// window tab
+		TEKResetWin(&tk,&ts, m_OldEmu);
+		ChangeTitle();
+		SwitchMenu();
+		SwitchTitleBar();
+
+		// font tab
+		TEKSetupFont(&tk,&ts);
+	}
 }
 
 void CTEKWindow::OnVTWin()

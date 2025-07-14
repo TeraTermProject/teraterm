@@ -46,7 +46,7 @@
 #include "compat_win.h"
 #include "asprintf.h"
 #include "color_sample.h"
-#include "addsetting.h" // for AddsettingCheckWin()
+#include "tslib.h"
 
 #include "win_pp.h"
 
@@ -59,6 +59,7 @@ typedef struct {
 	WORD VTFlag;
 	HWND VTWin;
 	ColorSample *cs;
+	HFONT sample_font;
 } WinDlgWork;
 
 static void DispSample(HWND Dialog, WinDlgWork *work, int IAttr)
@@ -157,14 +158,18 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
 			{
 				// VTWinとTEKWinでラベルが異なっている
-				static const DlgTextInfo TextInfosVT[] = {
-					{ IDC_WINCOLOREMU, "DLG_WIN_PCBOLD16" },
-				};
-				static const DlgTextInfo TextInfosTEK[] = {
-					{ IDC_WINCOLOREMU, "DLG_WIN_COLOREMU" },
-				};
-				const DlgTextInfo *TextInfosVTTEK = (work->VTFlag>0) ? TextInfosVT : TextInfosTEK;
-				SetDlgTextsW(Dialog, TextInfosVTTEK, 1, ts->UILanguageFileW);
+				wchar_t *UIMsg;
+				if (work->VTFlag>0) {
+					GetI18nStrWW("Tera Term", "DLG_WIN_PCBOLD16",
+								 L"&16 Colors (PC style)",
+								 ts->UILanguageFileW, &UIMsg);
+				} else {
+					GetI18nStrWW("Tera Term", "DLG_WIN_COLOREMU",
+								 L"&Color emulation",
+								 ts->UILanguageFileW, &UIMsg);
+				}
+				SetDlgItemTextW(Dialog, IDC_WINCOLOREMU, UIMsg);
+				free(UIMsg);
 			}
 
 			SetDlgItemTextA(Dialog, IDC_WINTITLE, ts->Title);
@@ -245,7 +250,13 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 			SetRB(Dialog,ts->CursorShape,IDC_WINBLOCK,IDC_WINHORZ);
 
-			work->cs = ColorSampleInit(GetDlgItem(Dialog, IDC_DRAW_SAMPLE_AREA));
+			{
+				// サンプル用フォント作成
+				LOGFONTW logfont;
+				TSGetLogFont(Dialog, ts, (work->VTFlag > 0) ? 0 : 1, 0, &logfont);
+				work->sample_font = CreateFontIndirectW(&logfont);
+			}
+			work->cs = ColorSampleInit(GetDlgItem(Dialog, IDC_DRAW_SAMPLE_AREA), work->sample_font);
 
 			IAttr = 0;
 			IOffset = 0;
@@ -497,6 +508,12 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			SetScrollPos(Wnd,SB_CTL,pos,TRUE);
 			ChangeColor(Dialog,work,IAttr,IOffset);
 			return FALSE;
+
+		case WM_DESTROY:
+			// サンプル用フォント破棄
+			DeleteObject(work->sample_font);
+			work->sample_font = 0;
+			break;
 	}
 	return FALSE;
 }
@@ -521,12 +538,15 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 	return ret_val;
 }
 
-HPROPSHEETPAGE CreateWinPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
+/**
+ *	@param	is_vt	TRUE: VTWin, FALSE: TEKWin
+ */
+static HPROPSHEETPAGE CreateWinPP(HINSTANCE inst, HWND vtwin, TTTSet *pts, BOOL is_vt)
 {
 	WinDlgWork *data = (WinDlgWork *)calloc(1, sizeof(*data));
 	data->ts = pts;
 	data->VTWin = vtwin;
-	data->VTFlag = AddsettingCheckWin(vtwin) == ADDSETTING_WIN_VT ? 1 : 0;
+	data->VTFlag = is_vt ? 1 : 0;
 
 	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
@@ -534,7 +554,12 @@ HPROPSHEETPAGE CreateWinPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
 	wchar_t *uimsg;
-	GetI18nStrWW("Tera Term", "DLG_WIN_TITLE", L"Window", pts->UILanguageFileW, &uimsg);
+	if (is_vt) {
+		GetI18nStrWW("Tera Term", "DLG_WIN_TITLE", L"Window", pts->UILanguageFileW, &uimsg);
+	}
+	else {
+		GetI18nStrWW("Tera Term", "DLG_WIN_TEK_TITLE", L"Window(TEK)", pts->UILanguageFileW, &uimsg);
+	}
 	psp.pszTitle = uimsg;
 	psp.pszTemplate = MAKEINTRESOURCEW(IDD_WINDLG);
 #if defined(REWRITE_TEMPLATE)
@@ -547,4 +572,14 @@ HPROPSHEETPAGE CreateWinPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
 	HPROPSHEETPAGE hpsp = CreatePropertySheetPageW((LPCPROPSHEETPAGEW)&psp);
 	free(uimsg);
 	return hpsp;
+}
+
+HPROPSHEETPAGE CreateWinVTPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
+{
+	return CreateWinPP(inst, vtwin, pts, TRUE);
+}
+
+HPROPSHEETPAGE CreateWinTEKPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
+{
+	return CreateWinPP(inst, vtwin, pts, FALSE);
 }

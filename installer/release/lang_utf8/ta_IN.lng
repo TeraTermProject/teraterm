@@ -182,6 +182,7 @@ DLG_TABSHEET_TITLE_FONT=எழுத்துரு
 DLG_TABSHEET_TITLE_ENCODING=Encoding
 DLG_TABSHEET_TITLE_THEME=Theme
 DLG_TABSHEET_TITLE_MOUSE=Mouse
+DLG_TABSHEET_TITLE_FONT_TEK=Font(TEK)
 
 DLG_TAB_GENERAL_CLICKURL=&சொடுக்கம் செய்யக்கூடிய முகவரியை இயக்கு
 DLG_TAB_GENERAL_DISABLESENDBREAK=முடுக்கியை முடக்கு & இடைவெளியை அனுப்பு
@@ -290,6 +291,7 @@ DLG_TAB_FONT_VTWINFONT=&விடிசாளரம் எழுத்துர�
 DLG_TAB_FONT_BTN_SELECT=&தேர்ந்தெடு...
 DLG_TAB_FONT_VTFONT_TITLE=வரைவதற்கான பநிஇ
 DLG_TAB_FONT_DLGFONT=&உரையாடல் எழுத்துரு
+DLG_TAB_FONT_TEKFONT=TEK Font
 DLG_TAB_FONT_BTN_DEFAULT=இயல்புநிலை
 DLG_TAB_FONT_CODEPAGE_LABEL=&காட்சி எழுத்து மாற்றத்திற்கான குறியீடு பக்கம்
 DLG_TAB_FONT_LIST_PRO_FONTS_VT=&எழுத்துரு உரையாடலில் &விகிதாசார எழுத்துருக்களை பட்டியலிடு
@@ -465,6 +467,7 @@ DLG_CODING_DECSP_DEC_TO_UNICODE=பதின்மம் சிறப்பு �
 DLG_CODING_DECSP_DO_NOT_MAP=Do not mapping
 
 DLG_WIN_TITLE=சாளர
+DLG_WIN_TEK_TITLE=Window(TEK)
 DLG_WIN_TITLELABEL=&தலைப்பு:
 DLG_WIN_CURSOR=சிமிட்டும் கோடு வடிவம்
 DLG_WIN_BLOCK=தடு
