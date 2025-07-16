@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2025-06-27 by TeraTerm Project
+date=2025-07-17 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -19,7 +19,7 @@ MENU_FILE_SHOWLOGDIALOG=Boite de dialogue du Journal...
 MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=&Envoyer un fichier...
 MENU_FILE_CHANGEDIR=&Changer de dossier...
-MENU_FILE_REPLAYLOG=&Reafficher le journal...
+MENU_FILE_REPLAYLOG=&Réafficher le journal...
 MENU_FILE_PRINT=&Imprimer...\tAlt+P
 MENU_FILE_DISCONNECT=&Déconnecter\tAlt+I
 MENU_FILE_EXIT=Quitter\tAlt+Q
@@ -27,7 +27,7 @@ MENU_FILE_EXITALL=Exit &All
 
 MENU_TRANS=&Transfert
 MENU_TRANS_KERMIT_RCV=&Recevoir
-MENU_TRANS_KERMIT_GET=&Acquerir...
+MENU_TRANS_KERMIT_GET=&Acquérir...
 MENU_TRANS_KERMIT_SEND=&Envoyer...
 MENU_TRANS_KERMIT_FINISH=&Terminer
 MENU_TRANS_X_RCV=&Recevoir...
@@ -46,11 +46,11 @@ MENU_EDIT_COPY=&Copier\tAlt+C
 MENU_EDIT_COPYTABLE=Copier &tableau
 MENU_EDIT_PASTE=&Coller\tAlt+V
 MENU_EDIT_PASTECR=Coller<C&R>\tAlt+R
-MENU_EDIT_CLSCREEN=Effac&er l'ecran
+MENU_EDIT_CLSCREEN=Effac&er l'écran
 MENU_EDIT_CLBUFFER=Effacer le &buffer
-MENU_EDIT_CANCELSELECT=Effacer la se&lection
-MENU_EDIT_SELECTSCREEN=Sélectionner l'ecran
-MENU_EDIT_SELECTALL=Tout selectionner
+MENU_EDIT_CANCELSELECT=Effacer la sé&lection
+MENU_EDIT_SELECTSCREEN=Sélectionner l'écran
+MENU_EDIT_SELECTALL=Tout sélectionner
 
 MENU_SETUP=Config&uration
 MENU_SETUP_TERMINAL=&Terminal...

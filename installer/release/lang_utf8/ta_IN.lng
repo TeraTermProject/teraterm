@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2025-06-27 by TeraTerm Project
+date=2025-07-17 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -46,7 +46,7 @@ MENU_EDIT_COPY=&நகலெடு\tமாற்று+ஒ
 MENU_EDIT_COPYTABLE=&அட்டவணையை நகலெடு
 MENU_EDIT_PASTE=&ஒட்டு\tமாற்று+வ
 MENU_EDIT_PASTECR=ஒட்டு<வ&தி>\tமாற்று+ஐ
-MENU_EDIT_CLSCREEN=அழி & திரை
+MENU_EDIT_CLSCREEN=அழி &திரை
 MENU_EDIT_CLBUFFER= தாங்கலை அழி
 MENU_EDIT_CANCELSELECT=தேர்வை ரத்துசெய்
 MENU_EDIT_SELECTSCREEN=திரை தேர்ந்தெடு
@@ -69,7 +69,7 @@ MENU_SETUP_LOADKEYMAP=&விசை வரைபடத்தை ஏற்று.
 MENU_CONTROL=கட்டுப்பாடு
 MENU_CONTROL_RESET=&முனையத்தை மீட்டமை
 MENU_CONTROL_RESETTITLE=தொலை தலைப்பை மீட்டமை
-MENU_CONTROL_AREYOUTHERE=நீங்கள் & அங்கே இருக்கிறீர்களா\tமாற்று+ஏ
+MENU_CONTROL_AREYOUTHERE=நீங்கள் &அங்கே இருக்கிறீர்களா\tமாற்று+ஏ
 MENU_CONTROL_SENDBREAK=&தடை அனுப்பு\tமாற்று+ங
 MENU_CONTROL_RESETPORT=&துறைமுகம் மீட்டமை
 MENU_CONTROL_BROADCAST=&ஒலிபரப்பு கட்டளை
