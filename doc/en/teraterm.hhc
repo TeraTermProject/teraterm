@@ -71,6 +71,13 @@
 			<param name="Local" value="html\about\ctrlseq.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+		<UL>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Device Attributes">
+				<param name="Local" value="html\about\ctrlseq_device_attributes.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Q &amp; A ">
 			<param name="Local" value="html\about\qanda.html">
