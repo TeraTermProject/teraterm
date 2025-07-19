@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean(한국어)
-date=2025-06-27 by TeraTerm Project
+date=2025-07-17 by TeraTerm Project
 contributor=Daeehong Kim (2013-07-25)
 
 [Tera Term]
@@ -117,7 +117,7 @@ TEKMENU_WINDOW=창(&W)
 
 TEKMENU_HELP=도움말(&H)
 TEKMENU_HELP_INDEX=차례(&I)
-TEKMENU_HELP_USING=다움말 사용(&H)
+TEKMENU_HELP_USING=도움말 사용법(&H)
 TEKMENU_HELP_ABOUT=Tera Term에 대하여(&A)...
 
 TEKMENU_SHOW_MENUBAR=메뉴바 보이기(&B)
@@ -149,7 +149,7 @@ MSG_ALL_TERMINATE_CONF=Terminate ALL Tera Term(s)?
 MSG_DISCONNECT_CONF=연결을 끊을까요?
 MSG_EXEC_TT_ERROR=Tera Term을 실행할 수 없습니다. (%d)
 MSG_FIND_CYGTERM_DIR_ERROR=Cygwin 디렉토리를 찾을 수 없습니다.
-MSG_CYGTERM_ENV_ALLOC_ERROR=환경변소를 위한 메모리를 할당할 수 없습니다.
+MSG_CYGTERM_ENV_ALLOC_ERROR=환경 변수 메모리 할당에 실패했습니다.
 MSG_EXEC_CYGTERM_ERROR=Cygterm을 실행할 수 없습니다.
 MSG_EXEC_TTMENU_ERROR=TeraTerm 메뉴를 실행할 수 없습니다. (%d)
 MSG_VIEW_LOGFILE_ERROR=로그파일을 볼 수 없습니다. (%d)
