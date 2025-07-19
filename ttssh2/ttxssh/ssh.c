@@ -90,7 +90,7 @@
 //
 
 // channel data structure
-#define CHANNEL_MAX 100
+#define CHANNEL_ADD_NUM 50  // チャネル構造体の配列(channels)の要素数の初期値 兼 realloc時の増加数
 
 //
 // msg が NULL では無い事の保証。NULL の場合は "(null)" を返す。
@@ -105,7 +105,8 @@ typedef enum {
 
 static struct global_confirm global_confirms;
 
-static Channel_t channels[CHANNEL_MAX];
+static Channel_t *channels = NULL;  // チャネル構造体の配列
+static int channel_max_num = 0;     // channelsの要素数
 
 static char ssh_ttymodes[] = "\x01\x03\x02\x1c\x03\x08\x04\x15\x05\x04";
 
@@ -209,14 +210,21 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 	logprintf(LOG_LEVEL_VERBOSE, "%s: local_num %d", __FUNCTION__, local_num);
 
 	found = -1;
-	for (i = 0 ; i < CHANNEL_MAX ; i++) {
+	for (i = 0 ; i < channel_max_num ; i++) {
 		if (channels[i].used == 0) { // free channel
 			found = i;
 			break;
 		}
 	}
-	if (found == -1) { // not free channel
-		return (NULL);
+	if (found == -1) { // no free channels
+		Channel_t *p = realloc(channels, sizeof(Channel_t) * (channel_max_num + CHANNEL_ADD_NUM));
+		if (p == NULL) {
+			return (NULL);
+		}
+		channels = p;
+		found = i;
+		channel_max_num += CHANNEL_ADD_NUM;
+		memset(&channels[i], 0, sizeof(Channel_t) * CHANNEL_ADD_NUM);
 	}
 
 	// setup
@@ -396,7 +404,7 @@ void ssh2_channel_free(void)
 	int i;
 	Channel_t *c;
 
-	for (i = 0 ; i < CHANNEL_MAX ; i++) {
+	for (i = 0 ; i < channel_max_num ; i++) {
 		c = &channels[i];
 		ssh2_channel_delete(c);
 	}
@@ -406,7 +414,7 @@ static Channel_t *ssh2_channel_lookup(int id)
 {
 	Channel_t *c;
 
-	if (id < 0 || id >= CHANNEL_MAX) {
+	if (id < 0 || id >= channel_max_num) {
 		logprintf(LOG_LEVEL_VERBOSE, "%s: invalid channel id. (%d)", __FUNCTION__, id);
 		return (NULL);
 	}
@@ -426,7 +434,7 @@ Channel_t *ssh2_local_channel_lookup(int local_num)
 	int i;
 	Channel_t *c;
 
-	for (i = 0 ; i < CHANNEL_MAX ; i++) {
+	for (i = 0 ; i < channel_max_num ; i++) {
 		c = &channels[i];
 		if (c->type != TYPE_PORTFWD)
 			continue;
@@ -3602,6 +3610,10 @@ void SSH_end(PTInstVar pvar)
 			}
 		}
 	}
+
+	free(channels);
+	channels = NULL;
+	channel_max_num = 0;
 }
 
 void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen, int retry)
@@ -6559,7 +6571,7 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 			do_SSH2_dispatch_setup_for_transfer(pvar);
 
 			// 送らずバッファに保存しておいたデータを送る
-			for (i = 0 ; i < CHANNEL_MAX ; i++) {
+			for (i = 0 ; i < channel_max_num ; i++) {
 				c = &channels[i];
 				if (c->used) {
 					ssh2_channel_retry_send_bufchain(pvar, c);
