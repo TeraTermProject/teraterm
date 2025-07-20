@@ -52,7 +52,7 @@ jobs:
 
     - uses: msys2/setup-msys2@v2
 
-    # キャッシュに含まれたソースを最新に戻す
+    # キャッシュから古いソースが復元されるかもしれないので、変更を取り消して最新に戻す
     - name: restore source
       run: |
         git checkout .
@@ -60,7 +60,6 @@ jobs:
     - name: install_cygwin
       run: |
         chcp 932
-        git checkout .
         buildtools/install_cygwin.bat
 
     - name: install_innosetup
