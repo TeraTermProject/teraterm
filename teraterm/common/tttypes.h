@@ -294,7 +294,7 @@ struct tttset {
 	char HomeDir[MAXPATHLEN];		// 個人設定ファイルのあるフォルダ switch HomeDirW
 
 	/* Setup file name */
-	char SetupFName[MAX_PATH];
+	char SetupFName[MAX_PATH];			// "TERATERM.INI" のフルパス ANSI版
 	char reserve_KeyCnfFN[MAX_PATH];	// switch KeyCnfFNW
 	char LogFN[MAX_PATH];
 	char reserve_MacroFN[MAX_PATH];		// switch MacroFNW
