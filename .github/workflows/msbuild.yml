@@ -33,7 +33,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Restore cached libs
+    - name: Restore cached files
       id: cache-libs-restore
       uses: actions/cache/restore@v4
       with:
@@ -46,7 +46,7 @@ jobs:
             cache-
 
     # キャッシュから古いソースが復元されるかもしれないので、変更を取り消して最新に戻す
-    - name: restore source
+    - name: Revert source to state before cache restore
       run: |
         git checkout .
 
@@ -57,30 +57,30 @@ jobs:
 
     - uses: msys2/setup-msys2@v2
 
-    - name: install_cygwin
+    - name:  Install Cygwin to buildtools
       run: |
         chcp 932
         buildtools/install_cygwin.bat
 
-    - name: install_innosetup
+    - name: Install Inno Setup to buildtools
       run: |
         chcp 932
         buildtools/install_innosetup.bat
 
-    - name: build_config
+    - name: Create buildinfo.json
       shell: bash
       run: |
         cd buildtools/svnrev/
         perl svnrev.pl --root ../.. --header ../../teraterm/common/svnversion.h --cmake build_config.cmake --json build_config.json
 
-    - name: read buildinfo.json
+    - name: Read buildinfo.json
       id: read_buildinfo
       shell: bash
       run: |
         json_content=$(cat buildtools/svnrev/build_config.json | jq -c .)
         echo "json=$json_content" >> $GITHUB_OUTPUT
 
-    - name: set vars
+    - name: Set vars
       id: vars
       shell: bash
       run: |
@@ -113,7 +113,7 @@ jobs:
         echo "OUTPUT_EXE=${OUTPUT_EXE}"
         echo "OUTPUT_FILES=${OUTPUT_FILES}"
 
-    - name: build_script
+    - name: Build
       shell: cmd
       env:
         RELEASE: ${{ steps.vars.outputs.RELEASE }}
@@ -133,12 +133,12 @@ jobs:
         HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
         echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
 
-    - name: pre_cache
+    - name: Clean up files before caching
       run: |
         chcp 932
         ci_scripts/build_appveyor_release_bat_pre_cache.bat
 
-    - name: save cache
+    - name: Save cache
       if: steps.cache-libs-restore.outputs.cache-hit != 'true'   # restore時keyが完全に一致したときtrue
       id: cache-libs-save
       uses: actions/cache/save@v4
@@ -271,7 +271,7 @@ jobs:
         path: |
           installer/Output/setup
 
-    - name: sign setup.exe
+    - name: Sign setup.exe
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1') && env.SIGNPATH_SKIP != '1'
       uses: signpath/github-action-submit-signing-request@v1.1
       with:
@@ -311,7 +311,7 @@ jobs:
         path: |
           installer/Output/setup_signed
 
-    - name: release files
+    - name: Collect release files
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       shell: bash
       run: |
