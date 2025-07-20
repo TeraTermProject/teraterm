@@ -8,6 +8,15 @@ on:
 permissions:
   contents: read
 
+env:
+  NOPAUSE: 1
+  ORGANIZATION_ID: ${{ vars.ORGANIZATION_ID }}
+  PROJECT_SLUG: teraterm
+  SIGNING_POLICY_SLUG: test-signing
+  SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+  SIGNPATH_SKIP: ${{ vars.SIGNPATH_SKIP }}
+  SIGNPATH_FORCE: ${{ vars.SIGNPATH_FORCE }}
+
 jobs:
   build:
     strategy:
@@ -19,14 +28,7 @@ jobs:
     runs-on: ${{ matrix.windows }}
 
     env:
-      NOPAUSE: 1
       VS_VERSION: ${{ matrix.VS_VERSION }}
-      ORGANIZATION_ID: ${{ vars.ORGANIZATION_ID }}
-      PROJECT_SLUG: teraterm
-      SIGNING_POLICY_SLUG: test-signing
-      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
-      SIGNPATH_SKIP: ${{ vars.SIGNPATH_SKIP }}
-      SIGNPATH_FORCE: ${{ vars.SIGNPATH_FORCE }}
 
     steps:
     - uses: actions/checkout@v4
