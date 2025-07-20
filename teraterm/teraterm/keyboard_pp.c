@@ -83,19 +83,19 @@ static INT_PTR CALLBACK proc(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 
 			if (!IsWindowsNTKernel()) {
 				static const I18nTextInfo infos[] = {
-					{ "DLG_KEYB_META_OFF", L"off" },
-					{ "DLG_KEYB_META_ON", L"on" }
+					{ "DLG_KEYB_META_OFF", L"off", IdMetaOff },
+					{ "DLG_KEYB_META_ON", L"on", IdMetaOn }
 				};
-				SetI18nListW("Tera Term", Dialog, IDC_KEYBMETA, infos, _countof(infos), ts->UILanguageFileW, 0);
+				SetI18nListW("Tera Term", Dialog, IDC_KEYBMETA, infos, _countof(infos), ts->UILanguageFileW, ts->MetaKey);
 			}
 			else {
 				static const I18nTextInfo infos[] = {
-					{ "DLG_KEYB_META_OFF", L"off" },
-					{ "DLG_KEYB_META_ON", L"on" },
-					{ "DLG_KEYB_META_LEFT", L"left" },
-					{ "DLG_KEYB_META_RIGHT", L"right" }
+					{ "DLG_KEYB_META_OFF", L"off", IdMetaOff },
+					{ "DLG_KEYB_META_ON", L"on", IdMetaOn },
+					{ "DLG_KEYB_META_LEFT", L"left", IdMetaLeft },
+					{ "DLG_KEYB_META_RIGHT", L"right", IdMetaRight }
 				};
-				SetI18nListW("Tera Term", Dialog, IDC_KEYBMETA, infos, _countof(infos), ts->UILanguageFileW, 0);
+				SetI18nListW("Tera Term", Dialog, IDC_KEYBMETA, infos, _countof(infos), ts->UILanguageFileW, ts->MetaKey);
 			}
 
 			SetDropDownList(Dialog, IDC_KEYBKEYB, RussList2, ts->RussKeyb);
