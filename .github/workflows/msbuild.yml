@@ -33,11 +33,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v2
-      with:
-        vs-version: ${{ matrix.vs-version }}
-
     - name: Restore cached libs
       id: cache-libs-restore
       uses: actions/cache/restore@v4
@@ -50,12 +45,17 @@ jobs:
             cache-${{ matrix.VS_VERSION }}-
             cache-
 
-    - uses: msys2/setup-msys2@v2
-
     # キャッシュから古いソースが復元されるかもしれないので、変更を取り消して最新に戻す
     - name: restore source
       run: |
         git checkout .
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+      with:
+        vs-version: ${{ matrix.vs-version }}
+
+    - uses: msys2/setup-msys2@v2
 
     - name: install_cygwin
       run: |
