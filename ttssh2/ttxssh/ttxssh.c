@@ -418,7 +418,7 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 
 	settings->AuthBanner = GetPrivateProfileInt("TTSSH", "AuthBanner", 3, fileName);
 
-	settings->MaxChannel = GetPrivateProfileInt("TTSSH", "MaxChannel", 0, fileName);
+	settings->MaxChannel = GetPrivateProfileInt("TTSSH", "MaxChannel", CHANNEL_MAX_DEFAULT, fileName);
 
 #ifdef _DEBUG
 	GetPrivateProfileStringW(L"TTSSH", L"KexKeyLogFile", L"", settings->KexKeyLogFile, _countof(settings->KexKeyLogFile), fileName);

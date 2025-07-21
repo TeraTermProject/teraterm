@@ -89,9 +89,6 @@
 // SSH2 data structure
 //
 
-// channel data structure
-#define CHANNEL_ADD_NUM 50  // チャネル構造体の配列(channels)の要素数の初期値 兼 realloc時の増加数
-
 //
 // msg が NULL では無い事の保証。NULL の場合は "(null)" を返す。
 //
