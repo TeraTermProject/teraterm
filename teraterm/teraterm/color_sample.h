@@ -32,5 +32,5 @@
 
 typedef struct ColorSampleTag ColorSample;
 
-ColorSample *ColorSampleInit(HWND hWnd);
+ColorSample *ColorSampleInit(HWND hWnd, HFONT hFont);
 void ColorSampleSetColor(ColorSample *work, COLORREF fore_color, COLORREF back_color);

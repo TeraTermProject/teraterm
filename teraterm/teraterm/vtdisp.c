@@ -1787,7 +1787,7 @@ void DispConvScreenToWin
  *	@param[in]		dpi		DPIに合わせたサイズのフォントを取得
  *							0 の時DPIに合わせた拡大をしない
  */
-void DispSetLogFont(LOGFONTW *VTlf, unsigned int dpi)
+static void DispSetLogFont(LOGFONTW *VTlf, unsigned int dpi)
 {
   memset(VTlf, 0, sizeof(*VTlf));
   VTlf->lfWeight = FW_NORMAL;

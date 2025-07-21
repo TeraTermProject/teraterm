@@ -24,7 +24,7 @@ fileread &lt;file handle&gt; &lt;read byte&gt; &lt;strvar&gt;
 <h2>解説</h2>
 
 <p>
-&lt;file handle&gt; により指定されたファイルから特定したバイト数のデータを読み出す。<br>
+&lt;file handle&gt; により指定されたファイルから指定したバイト数のデータを読み出す。<br>
 データは文字列変数 &lt;strvar&gt; へ記憶され、ファイルポインタは読み込んだバイト数分進められる。<br>
 データを読み込み終わる前にファイルポインタがファイルの終わりまで行った場合は、システム変数 "result" に 1 が格納される。 それ以外は、"result" に 0 が格納される。<br>
 変数 &lt;read byte&gt; のとる値の範囲は 1 から 511 でなければならない。<br>
@@ -59,7 +59,7 @@ fileseek fhandle 16 1   ; seek past next 16 without sending
 call send_16_bytes      ; send next (last) 16 bytes
 fileclose fhandle
 goto the_end
- 
+
 ;#########################################
 :send_16_bytes
     for i 1 16

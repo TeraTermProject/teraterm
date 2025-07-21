@@ -33,6 +33,7 @@
 #define IDI_TTERM_FLAT                  130
 #define IDI_VT_FLAT                     131
 #define IDD_TABSHEET_UI                 132
+#define IDD_TABSHEET_TEKFONT            133
 #define IDR_TEKMENU                     1000
 #define IDC_EDIT_FULLPATH               1001
 #define IDC_FULLPATH_LABEL              1002

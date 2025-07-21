@@ -34,7 +34,8 @@
 extern "C" {
 #endif
 
-HPROPSHEETPAGE CreateWinPP(HINSTANCE inst, HWND vtwin, TTTSet *pts);
+HPROPSHEETPAGE CreateWinVTPP(HINSTANCE inst, HWND vtwin, TTTSet *pts);
+HPROPSHEETPAGE CreateWinTEKPP(HINSTANCE inst, HWND vtwin, TTTSet *pts);
 
 #ifdef __cplusplus
 }

@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* ui property page */
+/* tekfont property page */
 
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
@@ -38,141 +38,19 @@
 #include "dlglib.h"
 #include "compat_win.h"
 #include "helpid.h"
-#include "asprintf.h"
-#include "win32helper.h"
-#include "tipwin2.h"
 #include "tttext.h"
+#include "codeconv.h"
 #include "tslib.h"
 
-#include "ui_pp.h"
-#include "ui_pp_res.h"
-
-typedef struct {
-	wchar_t* fullname;
-	wchar_t* filename;
-	wchar_t* language;
-	wchar_t* date;
-	wchar_t* contributor;
-} LangInfo;
-
-static const wchar_t* get_lang_folder()
-{
-	return (IsWindowsNTKernel()) ? L"lang_utf16le" : L"lang";
-}
-
-static void LangFree(LangInfo* infos, size_t count)
-{
-	size_t i;
-	for (i = 0; i < count; i++) {
-		LangInfo* p = infos + i;
-		free(p->filename);
-		free(p->fullname);
-		free(p->language);
-		free(p->date);
-		free(p->contributor);
-	}
-	free(infos);
-}
-
-/**
- *	ファイル名をリストする(ファイル名のみ)
- *	infosに追加してreturnする
- */
-static LangInfo* LangAppendFileList(const wchar_t* folder, LangInfo* infos, size_t* infos_size)
-{
-	wchar_t* fullpath;
-	HANDLE hFind;
-	WIN32_FIND_DATAW fd;
-	size_t count = *infos_size;
-
-	aswprintf(&fullpath, L"%s\\*.lng", folder);
-	hFind = FindFirstFileW(fullpath, &fd);
-	if (hFind != INVALID_HANDLE_VALUE) {
-		do {
-			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				LangInfo* p = (LangInfo*)realloc(infos, sizeof(LangInfo) * (count + 1));
-				if (p != NULL) {
-					infos = p;
-					p = infos + count;
-					count++;
-					memset(p, 0, sizeof(*p));
-					p->filename = _wcsdup(fd.cFileName);
-					aswprintf(&p->fullname, L"%s\\%s", folder, fd.cFileName);
-				}
-			}
-		} while (FindNextFileW(hFind, &fd));
-		FindClose(hFind);
-	}
-	free(fullpath);
-
-	*infos_size = count;
-	return infos;
-}
-
-/**
- *	lngファイルの Info セクションを読み込む
- */
-static void LangRead(LangInfo* infos, size_t infos_size)
-{
-	size_t i;
-
-	for (i = 0; i < infos_size; i++) {
-		LangInfo* p = infos + i;
-		const wchar_t* lng = p->fullname;
-		wchar_t* s;
-		hGetPrivateProfileStringW(L"Info", L"language", NULL, lng, &s);
-		if (s[0] == 0) {
-			free(s);
-			p->language = _wcsdup(p->filename);
-		}
-		else {
-			p->language = s;
-		}
-		hGetPrivateProfileStringW(L"Info", L"date", NULL, lng, &s);
-		if (s[0] == 0) {
-			free(s);
-			p->date = _wcsdup(L"-");
-		}
-		else {
-			p->date = s;
-		}
-		hGetPrivateProfileStringW(L"Info", L"contributor", NULL, lng, &s);
-		if (s[0] == 0) {
-			free(s);
-			p->contributor = _wcsdup(L"-");
-		}
-		else {
-			p->contributor = s;
-		}
-	}
-}
-
-static wchar_t *LangInfoText(const LangInfo *p)
-{
-	wchar_t *info;
-	aswprintf(&info,
-			  L"language\r\n"
-			  L"  %s\r\n"
-			  L"filename\r\n"
-			  L"  %s\r\n"
-			  L"date\r\n"
-			  L"  %s\r\n"
-			  L"contributor\r\n"
-			  L"  %s",
-			  p->language, p->filename, p->date, p->contributor);
-	return info;
-}
+#include "tekfont_pp.h"
+#include "tekfont_pp_res.h"
 
 struct UIPPData {
 	TTTSet *pts;
 	const wchar_t *UILanguageFileW;
 	DLGTEMPLATE *dlg_templ;
 	TComVar *pcv;
-	LangInfo* lng_infos;
-	size_t lng_size;
-	size_t selected_lang;	// 選ばれていたlngファイル番号
-	TipWin2 *tipwin2;
-	LOGFONTW DlgFont;
+	LOGFONTW tek_font;
 	HWND hVTWin;
 	HINSTANCE hInst;
 };
@@ -200,7 +78,7 @@ static BOOL ChooseDlgFont(HWND hWnd, UIPPData *dlg_data)
 	CHOOSEFONTW cf = {};
 	cf.lStructSize = sizeof(cf);
 	cf.hwndOwner = hWnd;
-	cf.lpLogFont = &dlg_data->DlgFont;
+	cf.lpLogFont = &dlg_data->tek_font;
 	cf.Flags =
 		CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
 		//CF_SHOWHELP |
@@ -222,16 +100,14 @@ static BOOL ChooseDlgFont(HWND hWnd, UIPPData *dlg_data)
 
 static void ArrangeControls(HWND hWnd, UIPPData *data,ACFCF_MODE mode)
 {
-	ArrangeControlsForChooseFont(hWnd, &data->DlgFont, IDC_LIST_HIDDEN_FONTS_DLG, IDC_LIST_PRO_FONTS_DLG, mode);
+	ArrangeControlsForChooseFont(hWnd, &data->tek_font, IDC_LIST_HIDDEN_FONTS_DLG, IDC_LIST_PRO_FONTS_DLG, mode);
 }
 
 static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
-		{ IDC_GENUILANG_LABEL, "DLG_GEN_LANG_UI" },
-		{ IDC_DLGFONT, "DLG_TAB_FONT_DLGFONT"},
+		{ IDC_DLGFONT, "DLG_TAB_FONT_TEKFONT"},
 		{ IDC_DLGFONT_CHOOSE, "DLG_TAB_FONT_BTN_SELECT" },
-		{ IDC_DLGFONT_DEFAULT, "DLG_TAB_FONT_BTN_DEFAULT" },
 		{ IDC_LIST_PRO_FONTS_DLG, "DLG_TAB_FONT_LIST_PRO_FONTS_DLG" },
 		{ IDC_LIST_HIDDEN_FONTS_DLG, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
 		{ IDC_FONT_FOLDER_LABEL, "DLG_TAB_FONT_FOLDER_LABEL" },
@@ -246,42 +122,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), data->pts->UILanguageFileW);
 
-			// UI Language, 読み込み
-			LangInfo* infos = NULL;
-			size_t infos_size = 0;
-			wchar_t* folder;
-			aswprintf(&folder, L"%s\\%s", pts->ExeDirW, get_lang_folder());
-			infos = LangAppendFileList(folder, infos, &infos_size);
-			free(folder);
-			if (wcscmp(pts->ExeDirW, pts->HomeDirW) != 0) {
-				aswprintf(&folder, L"%s\\%s", pts->HomeDirW, get_lang_folder());
-				infos = LangAppendFileList(folder, infos, &infos_size);
-				free(folder);
-			}
-			LangRead(infos, infos_size);
-			data->lng_infos = infos;
-			data->lng_size = infos_size;
-
-			// UI Language用 tipwin
-			data->tipwin2 = TipWin2Create(data->hInst, hWnd);
-
-			// UI Language, 選択
-			data->selected_lang = 0;
-			for (size_t i = 0; i < infos_size; i++) {
-				const LangInfo* p = infos + i;
-				SendDlgItemMessageW(hWnd, IDC_GENUILANG, CB_ADDSTRING, 0, (LPARAM)p->language);
-				if (wcscmp(p->fullname, pts->UILanguageFileW) == 0) {
-					data->selected_lang = i;
-					wchar_t *info_text = LangInfoText(p);
-					TipWin2SetTextW(data->tipwin2, IDC_GENUILANG, info_text);
-					free(info_text);
-				}
-			}
-			SendDlgItemMessageW(hWnd, IDC_GENUILANG, CB_SETCURSEL, data->selected_lang, 0);
-			ExpandCBWidth(hWnd, IDC_GENUILANG);
-
-			TSGetLogFont(GetParent(hWnd), pts, 2, 0, &data->DlgFont);
-			SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
+			SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->tek_font);
 
 			ArrangeControls(hWnd, data, ACFCF_INIT_DIALOG);
 
@@ -297,13 +138,6 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		case WM_DESTROY: {
 			UIPPData *data = (UIPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
 
-			LangFree(data->lng_infos, data->lng_size);
-			data->lng_infos = NULL;
-			data->lng_size = 0;
-
-			TipWin2Destroy(data->tipwin2);
-			data->tipwin2 = NULL;
-
 			break;
 		}
 		case WM_NOTIFY: {
@@ -312,29 +146,15 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				case PSN_APPLY: {
 					UIPPData *dlg_data = (UIPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
 					TTTSet *pts = dlg_data->pts;
-					LRESULT w = SendDlgItemMessageA(hWnd, IDC_GENUILANG, CB_GETCURSEL, 0, 0);
-					if (w != (LRESULT)dlg_data->selected_lang) {
-						const LangInfo* p = dlg_data->lng_infos + w;
-						free(pts->UILanguageFileW);
-						pts->UILanguageFileW = _wcsdup(p->fullname);
 
-						// タイトルの更新を行う。(2014.2.23 yutaka)
-						PostMessage(dlg_data->hVTWin, WM_USER_CHANGETITLE, 0, 0);
-					}
-
-					TSSetLogFont(GetParent(hWnd), &dlg_data->DlgFont, 2, 0, pts);
-
-					// TTXKanjiMenu は Language を見てメニューを表示するので、変更の可能性がある
-					// OK 押下時にメニュー再描画のメッセージを飛ばすようにした。 (2007.7.14 maya)
-					// 言語ファイルの変更時にメニューの再描画が必要 (2012.5.5 maya)
-					PostMessage(dlg_data->hVTWin, WM_USER_CHANGEMENU, 0, 0);
+					TSSetLogFont(hWnd, &dlg_data->tek_font, 1, 0, pts);
 
 					break;
 				}
 				case PSN_HELP: {
 					HWND vtwin = GetParent(hWnd);
 					vtwin = GetParent(vtwin);
-					PostMessageA(vtwin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalUI, 0);
+					PostMessageA(vtwin, WM_USER_DLGHELP2, HlpTEKSetupFont, 0);
 					break;
 				}
 				default:
@@ -345,25 +165,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		case WM_COMMAND: {
 			UIPPData *data = (UIPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
 			switch (wp) {
-				case IDC_GENUILANG | (CBN_SELCHANGE << 16): {
-					size_t ui_sel = (size_t)SendDlgItemMessageA(hWnd, IDC_GENUILANG, CB_GETCURSEL, 0, 0);
-					wchar_t *info_text = LangInfoText(data->lng_infos + ui_sel);
-					TipWin2SetTextW(data->tipwin2, IDC_GENUILANG, info_text);
-					free(info_text);
-					break;
-				}
 				case IDC_DLGFONT_CHOOSE | (BN_CLICKED << 16):
 					if (ChooseDlgFont(hWnd, data) != FALSE) {
-						SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
+						SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->tek_font);
 						ArrangeControls(hWnd, data, ACFCF_CONTINUE);
 					}
-					break;
-
-				case IDC_DLGFONT_DEFAULT | (BN_CLICKED << 16):
-					GetMessageboxFontW(&data->DlgFont);
-					GetFontPitchAndFamily(hWnd, &data->DlgFont);
-					SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
-					ArrangeControls(hWnd, data, ACFCF_CONTINUE);
 					break;
 
 				case IDC_FONT_FOLDER: {
@@ -407,14 +213,16 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 	return ret_val;
 }
 
-HPROPSHEETPAGE UIPageCreate(HINSTANCE inst, TTTSet *pts)
+HPROPSHEETPAGE TEKFontPageCreate(HINSTANCE inst, HWND hWnd, TTTSet *pts)
 {
 	// 注 common/tt_res.h と ui_pp_res.h で値を一致させること
-	int id = IDD_TABSHEET_UI;
+	int id = IDD_TABSHEET_TEKFONT;
 
 	UIPPData *dlg_data = (UIPPData *)calloc(1, sizeof(UIPPData));
 	dlg_data->UILanguageFileW = pts->UILanguageFileW;
 	dlg_data->pts = pts;
+
+	TSGetLogFont(hWnd, pts, 1, 0, &dlg_data->tek_font);
 
 	PROPSHEETPAGEW_V1 psp = {};
 	psp.dwSize = sizeof(psp);
@@ -422,8 +230,8 @@ HPROPSHEETPAGE UIPageCreate(HINSTANCE inst, TTTSet *pts)
 	psp.hInstance = inst;
 	psp.pfnCallback = CallBack;
 	wchar_t* UIMsg;
-	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_UI",
-		         L"UI", pts->UILanguageFileW, &UIMsg);
+	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_FONT_TEK",
+		         L"Font(TEK)", pts->UILanguageFileW, &UIMsg);
 	psp.pszTitle = UIMsg;
 	psp.pszTemplate = MAKEINTRESOURCEW(id);
 	psp.dwFlags |= PSP_DLGINDIRECT;

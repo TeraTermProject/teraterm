@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2025-06-27 by TeraTerm Project
+date=2025-07-17 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -69,7 +69,7 @@ MENU_SETUP_LOADKEYMAP=&Загрузить настройки клавиш...
 MENU_CONTROL=&Управление
 MENU_CONTROL_RESET=&Сброс терминала
 MENU_CONTROL_RESETTITLE=&Сброс удаленный
-MENU_CONTROL_AREYOUTHERE=&Вы уверены?\tAlt+T
+MENU_CONTROL_AREYOUTHERE=Отправьте AY&T\tAlt+T
 MENU_CONTROL_SENDBREAK=&Послать останов\tAlt+B
 MENU_CONTROL_RESETPORT=&Сброс порта
 MENU_CONTROL_BROADCAST=&Общие команды
@@ -141,7 +141,7 @@ MSG_CBACCESS_TITLE=Доступ к буферу
 MSG_CBACCESS_REJECT_TITLE=Отклонить доступ к буферу
 MSG_CBACCESS_READ=Удаленный хост читает из буфера
 MSG_CBACCESS_WRITE=Удаленный хост пишет в буфер
-MSG_CBACCESS_READ_REJECT=Отклонить удаленное чтение из буфера
+MSG_CBACCESS_READ_REJECT=Отклонить удалённое чтение из буфера
 MSG_CBACCESS_WRITE_REJECT=Отклонить удаленную запись в буфер
 
 ; vtwin.cpp
@@ -182,6 +182,7 @@ DLG_TABSHEET_TITLE_FONT=Font
 DLG_TABSHEET_TITLE_ENCODING=Encoding
 DLG_TABSHEET_TITLE_THEME=Theme
 DLG_TABSHEET_TITLE_MOUSE=Mouse
+DLG_TABSHEET_TITLE_FONT_TEK=Font(TEK)
 
 DLG_TAB_GENERAL_CLICKURL=&Запуск URL одним кликом
 DLG_TAB_GENERAL_DISABLESENDBREAK=&Отключить ускоритель и послать останов
@@ -290,6 +291,7 @@ DLG_TAB_FONT_VTWINFONT=&VTWindow Font
 DLG_TAB_FONT_BTN_SELECT=&Select...
 DLG_TAB_FONT_VTFONT_TITLE=API for drawing
 DLG_TAB_FONT_DLGFONT=&Dialog Font
+DLG_TAB_FONT_TEKFONT=TEK Font
 DLG_TAB_FONT_BTN_DEFAULT=D&efault
 DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
 DLG_TAB_FONT_LIST_PRO_FONTS_VT=List &proportional fonts in font dialog
@@ -465,6 +467,7 @@ DLG_CODING_DECSP_DEC_TO_UNICODE=Mapping DEC Special Graphics to Unicode
 DLG_CODING_DECSP_DO_NOT_MAP=Do not mapping
 
 DLG_WIN_TITLE=окон
+DLG_WIN_TEK_TITLE=Window(TEK)
 DLG_WIN_TITLELABEL=&Название:
 DLG_WIN_CURSOR=Вид курсора
 DLG_WIN_BLOCK=&Блок
@@ -1090,7 +1093,7 @@ DLG_OTHER_REFER=&Запись
 DLG_OTHER_SOCKS=Настройка SOCKS proxy
 DLG_OTHER_RESOLV=&Разрешающее имя
 DLG_OTHER_RESOLV_AUTO=авторазрешение
-DLG_OTHER_RESOLV_REMOTE=разрешение удаленное
+DLG_OTHER_RESOLV_REMOTE=разрешение удалённое
 DLG_OTHER_RESOLV_LOCAL=разрешение местное
 DLG_OTHER_TELNET=Настройка TELNET Proxy
 DLG_OTHER_HOST=&Запрос имени хоста
