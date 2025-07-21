@@ -115,6 +115,7 @@
 #include "makeoutputstring.h"
 #include "ttlib_types.h"
 #include "externalsetup.h"
+#include "tslib.h"
 #include "../ttpset/ttset.h"
 
 #include <initguid.h>
