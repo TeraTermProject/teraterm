@@ -107,6 +107,7 @@ static struct global_confirm global_confirms;
 
 static Channel_t *channels = NULL;  // チャネル構造体の配列
 static int channel_max_num = 0;     // channelsの要素数
+static int channel_used_num = 0;    // 使用チャネル数
 
 static char ssh_ttymodes[] = "\x01\x03\x02\x1c\x03\x08\x04\x15\x05\x04";
 
@@ -202,12 +203,17 @@ static int client_global_request_reply(PTInstVar pvar, int type, unsigned int se
 //
 // channel function
 //
-static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
+static Channel_t *ssh2_channel_new(PTInstVar pvar, unsigned int window, unsigned int maxpack,
                                    enum channel_type type, int local_num)
 {
 	int i, found;
 	Channel_t *c;
 	logprintf(LOG_LEVEL_VERBOSE, "%s: local_num %d", __FUNCTION__, local_num);
+
+	if (pvar->settings.MaxChannel != 0 && channel_used_num + 1 > pvar->settings.MaxChannel) {
+		logprintf(LOG_LEVEL_VERBOSE, "%s: channel_used_num %d: upper limit exceeded", __FUNCTION__, channel_used_num);
+		return (NULL);
+	}
 
 	found = -1;
 	for (i = 0 ; i < channel_max_num ; i++) {
@@ -225,11 +231,13 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 		found = i;
 		channel_max_num += CHANNEL_ADD_NUM;
 		memset(&channels[i], 0, sizeof(Channel_t) * CHANNEL_ADD_NUM);
+		logprintf(LOG_LEVEL_VERBOSE, "%s: new channel_max_num %d", __FUNCTION__, channel_max_num);
 	}
 
 	// setup
 	c = &channels[found];
 	memset(c, 0, sizeof(Channel_t));
+	channel_used_num++;
 	c->used = 1;
 	c->self_id = i;
 	c->remote_id = SSH_CHANNEL_INVALID;
@@ -396,6 +404,7 @@ static void ssh2_channel_delete(Channel_t *c)
 
 	memset(c, 0, sizeof(Channel_t));
 	c->used = 0;
+	channel_used_num--;
 }
 
 // connection close時に呼ばれる
@@ -3614,6 +3623,7 @@ void SSH_end(PTInstVar pvar)
 	free(channels);
 	channels = NULL;
 	channel_max_num = 0;
+	channel_used_num = 0;
 }
 
 void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen, int retry)
@@ -4130,7 +4140,7 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 
 			// changed window size from 128KB to 32KB. (2006.3.6 yutaka)
 			// changed window size from 32KB to 128KB. (2007.10.29 maya)
-			c = ssh2_channel_new(CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, local_channel_num);
+			c = ssh2_channel_new(pvar, CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, local_channel_num);
 			if (c == NULL) {
 				// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
 				FWD_free_channel(pvar, local_channel_num);
@@ -4262,7 +4272,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 		goto error;
 
 	// チャネル設定
-	c = ssh2_channel_new(CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SCP, -1);
+	c = ssh2_channel_new(pvar, CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SCP, -1);
 	if (c == NULL) {
 		UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
 		                  "Could not open new channel. TTSSH is already opening too many channels.");
@@ -4457,7 +4467,7 @@ int SSH_sftp_transaction(PTInstVar pvar)
 		goto error;
 
 	// チャネル設定
-	c = ssh2_channel_new(CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SFTP, -1);
+	c = ssh2_channel_new(pvar, CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SFTP, -1);
 	if (c == NULL) {
 		UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
 		                  "Could not open new channel. TTSSH is already opening too many channels.");
@@ -7123,10 +7133,10 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 		// changed window size from 64KB to 32KB. (2006.3.6 yutaka)
 		// changed window size from 32KB to 128KB. (2007.10.29 maya)
 		if (pvar->use_subsystem) {
-			c = ssh2_channel_new(CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SUBSYSTEM_GEN, -1);
+			c = ssh2_channel_new(pvar, CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SUBSYSTEM_GEN, -1);
 		}
 		else {
-			c = ssh2_channel_new(CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SHELL, -1);
+			c = ssh2_channel_new(pvar, CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SHELL, -1);
 		}
 
 		if (c == NULL) {
@@ -9594,7 +9604,7 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 			// channelをアロケートし、必要な情報（remote window size）をここで取っておく。
 			// changed window size from 128KB to 32KB. (2006.3.6 yutaka)
 			// changed window size from 32KB to 128KB. (2007.10.29 maya)
-			c = ssh2_channel_new(CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, chan_num);
+			c = ssh2_channel_new(pvar, CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, chan_num);
 			if (c == NULL) {
 				// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
 				FWD_free_channel(pvar, chan_num);
@@ -9635,7 +9645,7 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 		// channelをアロケートし、必要な情報（remote window size）をここで取っておく。
 		// changed window size from 128KB to 32KB. (2006.3.6 yutaka)
 		// changed window size from 32KB to 128KB. (2007.10.29 maya)
-		c = ssh2_channel_new(CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, chan_num);
+		c = ssh2_channel_new(pvar, CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, chan_num);
 		if (c == NULL) {
 			// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
 			FWD_free_channel(pvar, chan_num);
@@ -9650,7 +9660,7 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 
 	} else if (strcmp(ctype, "auth-agent@openssh.com") == 0) { // agent forwarding
 		if (pvar->agentfwd_enable && FWD_agent_forward_confirm(pvar)) {
-			c = ssh2_channel_new(CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_AGENT, -1);
+			c = ssh2_channel_new(pvar, CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_AGENT, -1);
 			if (c == NULL) {
 				UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
 				                  "Could not open new channel. TTSSH is already opening too many channels.");
