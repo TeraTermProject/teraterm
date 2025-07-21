@@ -55,6 +55,7 @@ AppSupportURL=https://github.com/TeraTermProject/teraterm/issues
 PrivilegesRequired=none
 ; during installer execution
 ShowLanguageDialog=yes
+UsePreviousLanguage=no
 LicenseFile={#SrcDir}\license.txt
 DefaultDirName={commonpf}\teraterm5
 AllowNoIcons=true
