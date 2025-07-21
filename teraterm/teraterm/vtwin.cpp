@@ -116,6 +116,7 @@
 #include "ttlib_types.h"
 #include "externalsetup.h"
 #include "tslib.h"
+#include "../ttpset/ttset.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -562,6 +563,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	TTXInit(&ts, &cv); /* TTPLUG */
 
 	MsgDlgHelp = RegisterWindowMessage(HELPMSGSTRING);
+
+	ParseFOption(&ts);
 
 	if (isFirstInstance) {
 		/* first instance */
@@ -3985,6 +3988,12 @@ void CVTWindow::OnDuplicateSession()
 	if (ts.KeyCnfFNW != NULL) {
 		wcsncat_s(Command, _countof(Command), L" /K=", _TRUNCATE);
 		wcsncat_s(Command, _countof(Command), ts.KeyCnfFNW, _TRUNCATE);
+	}
+
+	// セッション複製を行う際、/F= があれば引き継ぎを行うようにする。
+	if (ParseFOption(&ts)) {
+		wcsncat_s(Command, _countof(Command), L" /F=", _TRUNCATE);
+		wcsncat_s(Command, _countof(Command), ts.SetupFNameW, _TRUNCATE);
 	}
 
 	DWORD e = TTWinExec(Command);
