@@ -80,6 +80,7 @@ ArchitecturesInstallIn64BitMode=
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl,message_en_US.isl
 Name: ja; MessagesFile: compiler:Languages\Japanese.isl,message_en_US.isl,message_ja_JP.isl
+Name: it; MessagesFile: compiler:Languages\Italian.isl,message_en_US.isl,message_it_IT.isl
 
 [Dirs]
 Name: {app}\theme; Components: TeraTerm
