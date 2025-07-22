@@ -219,6 +219,8 @@ typedef struct _TS_SSH {
 	//   for publickey authentication (not for server hostkey)
 	//   for RSA key only
 	char RSAPubkeySignAlgorithmOrder[RSA_PUBKEY_SIGN_ALGO_MAX+1];
+
+	int MaxChannel;
 } TS_SSH;
 
 typedef struct _TInstVar {

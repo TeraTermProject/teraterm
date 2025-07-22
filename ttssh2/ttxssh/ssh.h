@@ -96,6 +96,9 @@ enum channel_type {
 	TYPE_SHELL, TYPE_PORTFWD, TYPE_SCP, TYPE_SFTP, TYPE_AGENT, TYPE_SUBSYSTEM_GEN,
 };
 
+#define CHANNEL_ADD_NUM 50       // チャネル構造体の配列(channels)の要素数の初期値 兼 realloc時の増加数
+#define CHANNEL_MAX_DEFAULT 1000 // 最大チャネル数のデフォルト値。iniファイルのMaxChannelの値の方が優先される。0の場合は無制限。
+
 // for SSH1
 #define SSH_MAX_SEND_PACKET_SIZE   250000
 
