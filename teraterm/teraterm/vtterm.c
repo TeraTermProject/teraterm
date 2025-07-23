@@ -1228,10 +1228,10 @@ static void AnswerTerminalType(void)
 		strncat_s(Tmp,sizeof(Tmp),"64;1;2;6;7;8;9;15;18;19;21",_TRUNCATE);
 		break;
 	case IdVT520:
-		strncat_s(Tmp,sizeof(Tmp),"65;1;2;7;8;9;12;18;19;21;23;24;42;44;45;46",_TRUNCATE);
+		strncat_s(Tmp,sizeof(Tmp),"65;1;2;7;9;12;18;19;21;23;24;42;44;45;46",_TRUNCATE);
 		break;
 	case IdVT525:
-		strncat_s(Tmp,sizeof(Tmp),"65;1;2;7;8;9;12;18;19;21;22;23;24;42;44;45;46",_TRUNCATE);
+		strncat_s(Tmp,sizeof(Tmp),"65;1;2;7;9;12;18;19;21;22;23;24;42;44;45;46",_TRUNCATE);
 		break;
 	}
 	strncat_s(Tmp,sizeof(Tmp),"c",_TRUNCATE);
