@@ -45,6 +45,7 @@ typedef enum {
 	SSH_DIGEST_MAX,
 } digest_algorithm;
 
+struct ssh_digest_ctx;
 
 char* get_digest_algorithm_name(digest_algorithm id);
 
