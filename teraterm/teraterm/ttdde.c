@@ -786,8 +786,10 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	}
 	case CmdRestoreSetup: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+		wchar_t *fnameW = GetFullPathW(ts.HomeDirW, ParamFileNameW);
+		free(ParamFileNameW);
 		free(ts.SetupFNameW);
-		ts.SetupFNameW = ParamFileNameW;
+		ts.SetupFNameW = fnameW;
 		WideCharToACP_t(ts.SetupFNameW, ts.SetupFName, _countof(ts.SetupFName));
 		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdRestoreSetup,0);
 		break;
