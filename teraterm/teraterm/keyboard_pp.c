@@ -47,8 +47,6 @@
 #define REWRITE_TEMPLATE
 
 static const char *RussList2[] = {"Windows","KOI8-R",NULL};
-static const char *MetaList[] = {"off", "on", "left", "right", NULL};
-static const char *MetaList2[] = {"off", "on", NULL};
 
 typedef struct {
 	HINSTANCE hInst;
@@ -84,10 +82,20 @@ static INT_PTR CALLBACK proc(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 			SetRB(Dialog,ts->DisableAppCursor,IDC_KEYBAPPCUR,IDC_KEYBAPPCUR);
 
 			if (!IsWindowsNTKernel()) {
-				SetDropDownList(Dialog, IDC_KEYBMETA, MetaList2, ts->MetaKey + 1);
+				static const I18nTextInfo infos[] = {
+					{ "DLG_KEYB_META_OFF", L"off", IdMetaOff },
+					{ "DLG_KEYB_META_ON", L"on", IdMetaOn }
+				};
+				SetI18nListW("Tera Term", Dialog, IDC_KEYBMETA, infos, _countof(infos), ts->UILanguageFileW, ts->MetaKey);
 			}
 			else {
-				SetDropDownList(Dialog, IDC_KEYBMETA, MetaList, ts->MetaKey + 1);
+				static const I18nTextInfo infos[] = {
+					{ "DLG_KEYB_META_OFF", L"off", IdMetaOff },
+					{ "DLG_KEYB_META_ON", L"on", IdMetaOn },
+					{ "DLG_KEYB_META_LEFT", L"left", IdMetaLeft },
+					{ "DLG_KEYB_META_RIGHT", L"right", IdMetaRight }
+				};
+				SetI18nListW("Tera Term", Dialog, IDC_KEYBMETA, infos, _countof(infos), ts->UILanguageFileW, ts->MetaKey);
 			}
 
 			SetDropDownList(Dialog, IDC_KEYBKEYB, RussList2, ts->RussKeyb);

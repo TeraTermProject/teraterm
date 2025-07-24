@@ -40,21 +40,30 @@ Name: build.bat
 ;Name: makearchive.bat; Parameters: release
 
 [Setup]
+AppName={#AppName}
+AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
+AppVersion={#AppVersion}
+
+; properties of installer executable
+VersionInfoDescription={#AppName} installer
 AppCopyright=(C) 2004-2025 TeraTerm Project
+; Apps in Settings
 AppPublisher=TeraTerm Project
 AppPublisherURL=https://teratermproject.github.io/
-AppSupportURL=https://teratermproject.github.io/
-AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
-AppName={#AppName}
-AppVersion={#AppVersion}
+AppSupportURL=https://github.com/TeraTermProject/teraterm/issues
+; execute
+PrivilegesRequired=none
+; during installer execution
+ShowLanguageDialog=yes
+UsePreviousLanguage=no
 LicenseFile={#SrcDir}\license.txt
 DefaultDirName={commonpf}\teraterm5
-DefaultGroupName={#AppName} 5
-ShowLanguageDialog=yes
 AllowNoIcons=true
+DefaultGroupName={#AppName} 5
+; uninstall
 UninstallDisplayIcon={app}\ttermpro.exe
+; create installer exe
 OutputBaseFilename={#OutputBaseFilename}
-PrivilegesRequired=none
 SolidCompression=yes
 Compression=lzma2/ultra64
 #if defined(M_X64)

@@ -41,6 +41,7 @@
 #include <openssl/dsa.h>
 #include "cipher.h"
 #include "ssh.h"
+#include "ssherr.h"
 
 #define do_crc(buf, len) (~(uint32)crc32(0xFFFFFFFF, (buf), (len)))
 #define get_uint32(buf) get_uint32_MSBfirst((buf))
@@ -668,14 +669,11 @@ unsigned int CRYPT_get_receiver_MAC_size(PTInstVar pvar)
 
 // HMACの検証
 // ※本関数は SSH2 でのみ使用される。
-// (2004.12.17 yutaka)
 BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
                                char *data, int len, char *MAC)
 {
-	HMAC_CTX *c = NULL;
-	unsigned char m[EVP_MAX_MD_SIZE];
-	unsigned char b[4];
 	struct Mac *mac;
+	int ret;
 
 	mac = &pvar->ssh2_keys[MODE_IN].mac;
 
@@ -688,38 +686,22 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 		goto error;
 	}
 
-	if ((u_int)mac->mac_len > sizeof(m)) {
-		logprintf(LOG_LEVEL_VERBOSE, "HMAC len(%d) is larger than %d bytes(seq %lu len %d)",
-		          mac->mac_len, (int)sizeof(m), sequence_number, len);
-		goto error;
-	}
-
-	c = HMAC_CTX_new();
-	if (c == NULL)
-		goto error;
-
-	HMAC_Init_ex(c, mac->key, mac->key_len, mac->md, NULL);
-	set_uint32_MSBfirst(b, sequence_number);
-	HMAC_Update(c, b, sizeof(b));
-	HMAC_Update(c, data, len);
-	HMAC_Final(c, m, NULL);
-	// HMAC_cleanup()はOpenSSL 1.1.0で削除され、HMAC_CTX_free()に集約された。
-
-	if (memcmp(m, MAC, mac->mac_len)) {
+	// mac_check() の mlen は sizeof(theirmac) を想定しているが、
+	// MAC は buf のポインタなので本当はよくない？
+	ret = mac_check(mac, sequence_number, data, len, MAC, mac->mac_len);
+	if (ret == SSH_ERR_MAC_INVALID) {
 		logprintf(LOG_LEVEL_VERBOSE, "HMAC key is not matched(seq %lu len %d)", sequence_number, len);
-		logprintf_hexdump(LOG_LEVEL_VERBOSE, m, mac->mac_len, "m:");
-		logprintf_hexdump(LOG_LEVEL_VERBOSE, MAC, mac->mac_len, "MAC:");
+		// logprintf_hexdump(LOG_LEVEL_VERBOSE, m, mac->mac_len, "m:"); // ourmac in mac_check() should be logged
+		logprintf_hexdump(LOG_LEVEL_VERBOSE, MAC, mac->mac_len, "MAC:"); // theirmac in mac_check()
 		goto error;
 	}
-
-	HMAC_CTX_free(c);
+	else if (ret != 0) {
+		goto error;
+	}
 
 	return TRUE;
 
 error:
-	if (c)
-		HMAC_CTX_free(c);
-
 	return FALSE;
 }
 
@@ -742,32 +724,20 @@ unsigned int CRYPT_get_sender_MAC_size(PTInstVar pvar)
 BOOL CRYPT_build_sender_MAC(PTInstVar pvar, uint32 sequence_number,
                             char *data, int len, char *MAC)
 {
-	HMAC_CTX *c = NULL;
-	static u_char m[EVP_MAX_MD_SIZE];
-	u_char b[4];
 	struct Mac *mac;
+	int ret;
 
-	if (SSHv2(pvar)) { // for SSH2(yutaka)
+	if (SSHv2(pvar)) {
 		mac = &pvar->ssh2_keys[MODE_OUT].mac;
 		if (mac == NULL || mac->enabled == 0)
 			return FALSE;
 
-		c = HMAC_CTX_new();
-		if (c == NULL)
+		// mac_compute() の dlen は sizeof(digest) を想定しているが、
+		// MAC は buf のポインタなので本当はよくない？
+		ret = mac_compute(mac, sequence_number, data, len, MAC, mac->mac_len);
+		if (ret != 0) {
 			return FALSE;
-
-		HMAC_Init_ex(c, mac->key, mac->key_len, mac->md, NULL);
-		set_uint32_MSBfirst(b, sequence_number);
-		HMAC_Update(c, b, sizeof(b));
-		HMAC_Update(c, data, len);
-		HMAC_Final(c, m, NULL);
-		// HMAC_cleanup()はOpenSSL 1.1.0で削除され、HMAC_CTX_free()に集約された。
-
-		// 20バイト分だけコピー
-		memcpy(MAC, m, pvar->ssh2_keys[MODE_OUT].mac.mac_len);
-	//	memcpy(MAC, m, sizeof(m));
-
-		HMAC_CTX_free(c);
+		}
 
 		return TRUE;
 	}

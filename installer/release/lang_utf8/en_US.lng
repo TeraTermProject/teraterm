@@ -1,6 +1,6 @@
 ﻿[Info]
 language=English
-date=2025-04-23 by TeraTerm Project
+date=2025-06-27 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -182,6 +182,7 @@ DLG_TABSHEET_TITLE_FONT=Font
 DLG_TABSHEET_TITLE_ENCODING=Encoding
 DLG_TABSHEET_TITLE_THEME=Theme
 DLG_TABSHEET_TITLE_MOUSE=Mouse
+DLG_TABSHEET_TITLE_FONT_TEK=Font(TEK)
 
 DLG_TAB_GENERAL_CLICKURL=&Enable clickable URL
 DLG_TAB_GENERAL_DISABLESENDBREAK=Disable accelerator &send break
@@ -290,6 +291,7 @@ DLG_TAB_FONT_VTWINFONT=&VTWindow Font
 DLG_TAB_FONT_BTN_SELECT=&Select...
 DLG_TAB_FONT_VTFONT_TITLE=API for drawing
 DLG_TAB_FONT_DLGFONT=&Dialog Font
+DLG_TAB_FONT_TEKFONT=TEK Font
 DLG_TAB_FONT_BTN_DEFAULT=D&efault
 DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
 DLG_TAB_FONT_LIST_PRO_FONTS_VT=List &proportional fonts in font dialog
@@ -381,6 +383,8 @@ DLG_SELECT_DIR_TITLE=Select new directory
 
 DLG_GEN_TITLE=Tera Term: General setup
 DLG_GEN_PORT=New &connection default
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Serial
 DLG_GEN_LANG_UI=UI &Language:
 
 DLG_HOST_TITLE=Tera Term: New connection
@@ -396,6 +400,10 @@ DLG_KEYB_BS=&Backspace key
 DLG_KEYB_DEL=&Delete key
 DLG_KEYB_KEYB=&Keyboard:
 DLG_KEYB_META=&Meta key:
+DLG_KEYB_META_OFF=off
+DLG_KEYB_META_ON=on
+DLG_KEYB_META_LEFT=left
+DLG_KEYB_META_RIGHT=right
 DLG_KEYB_DISABLE=Disabled mode:
 DLG_KEYB_APPKEY=&Application Keypad
 DLG_KEYB_APPCUR=Application &Cursor
@@ -459,6 +467,7 @@ DLG_CODING_DECSP_DEC_TO_UNICODE=Mapping DEC Special Graphics to Unicode
 DLG_CODING_DECSP_DO_NOT_MAP=Do not mapping
 
 DLG_WIN_TITLE=Window
+DLG_WIN_TEK_TITLE=Window(TEK)
 DLG_WIN_TITLELABEL=&Title:
 DLG_WIN_CURSOR=Cursor shape
 DLG_WIN_BLOCK=B&lock
@@ -466,6 +475,7 @@ DLG_WIN_VERT=&Vertical line
 DLG_WIN_HORZ=H&orizontal line
 DLG_WIN_BOLDFONT=Enable bol&d font
 DLG_WIN_HIDETITLE=H&ide title bar
+DLG_WIN_NO_FRAME=No Fram&e
 DLG_WIN_HIDEMENU=Hide &menu bar
 DLG_WIN_COLOREMU=&Color emulation
 DLG_WIN_PCBOLD16=&16 Colors (PC style)
@@ -486,6 +496,8 @@ DLG_WIN_NORMAL=Normal
 DLG_WIN_BOLD=Bold
 DLG_WIN_BLINK=Blink
 DLG_WIN_REVERSEATTR=Reverse
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=Underline
 
 DLG_CHOOSEFONT_STC6="Font style" selection here won't affect actual font appearance.
 
@@ -1250,8 +1262,14 @@ MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents
+MENU_CONTENTS_AUTO=Auto
+MENU_CONTENTS_JAPANESE=Japanese
+MENU_CONTENTS_KOREAN=Korean
 MENU_AMB_MENU=Show &Ambiguous Characters width menu
 MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
+BTN_OK=OK
+BTN_CANCEL=Cancel
+BTN_HELP=Help
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=&Always on top
@@ -1269,6 +1287,42 @@ DLG_INTERVAL=&Interval(sec)
 DLG_COMMAND=&Command
 DLG_ADD_NEWLINE=&Add new line
 
+BTN_OK=OK
+BTN_CANCEL=Cancel
+
 [TTXCheckUpdate]
 MSG_CHECKUPDATE=Check for updates automatically?\n  %s
 MENU_CHECKUPDATE=Check for &Updates...
+
+
+[TTXttyrec]
+MENU_RECORD=TT&Y Record
+MENU_REPLAY=TTY R&eplay
+MENU_REPLAYAGAIN=Replay again
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0All files(*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=Speed: %d, Pause: %s
+TITLE_STATUS_ON=ON
+TITLE_STATUS_OFF=OFF
+TITLE_TRIM=%d.%06d secs idle. trim to %d secs.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), Disabled.
+
+
+[TTXViewMode]
+MENU_SETPASS=&ViewMode password
+MENU_VIEWMODE=&View mode
+DLG_SETPASSWORD_TITLE=Set password
+DLG_SETPASSWORD_CURPASS=Old password
+DLG_SETPASSWORD_NEWPASS=New password
+DLG_SETPASSWORD_RETPASS=Retype password
+DLG_INPUTPASSWORD_TITLE=Input Password
+DLG_INPUTPASSWORD_PASSWORD=Password
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=Password changed
+MSG_INVALID=Invalid Password
+MSG_NOTMATCHED=New password not matched.
+MSG_TITLE_ERROR=TTXViewMode Error
+MSG_CANNOTDISPLAY=Can't display dialog box.
+BTN_OK=OK
+BTN_CANCEL=&Cancel

@@ -28,6 +28,7 @@
 
 #include "ttxssh.h"
 #include "kex.h"
+#include "ssherr.h"
 #include "openbsd-compat.h"
 
 char *myproposal[PROPOSAL_MAX] = {
@@ -46,23 +47,23 @@ char *myproposal[PROPOSAL_MAX] = {
 struct ssh2_kex_algorithm_t {
 	kex_algorithm kextype;
 	const char *name;
-	const EVP_MD *(*evp_md)(void);
+	digest_algorithm hash_alg;
 };
 
 static const struct ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
-	{KEX_DH_GRP1_SHA1,  "diffie-hellman-group1-sha1",           EVP_sha1},   // RFC4253
-	{KEX_DH_GRP14_SHA1, "diffie-hellman-group14-sha1",          EVP_sha1},   // RFC4253
-	{KEX_DH_GEX_SHA1,   "diffie-hellman-group-exchange-sha1",   EVP_sha1},   // RFC4419
-	{KEX_DH_GEX_SHA256, "diffie-hellman-group-exchange-sha256", EVP_sha256}, // RFC4419
-	{KEX_ECDH_SHA2_256, "ecdh-sha2-nistp256",                   EVP_sha256}, // RFC5656
-	{KEX_ECDH_SHA2_384, "ecdh-sha2-nistp384",                   EVP_sha384}, // RFC5656
-	{KEX_ECDH_SHA2_521, "ecdh-sha2-nistp521",                   EVP_sha512}, // RFC5656
-	{KEX_DH_GRP14_SHA256, "diffie-hellman-group14-sha256",      EVP_sha256}, // RFC8268
-	{KEX_DH_GRP16_SHA512, "diffie-hellman-group16-sha512",      EVP_sha512}, // RFC8268
-	{KEX_DH_GRP18_SHA512, "diffie-hellman-group18-sha512",      EVP_sha512}, // RFC8268
-	{KEX_CURVE25519_SHA256_OLD, "curve25519-sha256@libssh.org", EVP_sha256}, // not RFC8731, PROTOCOL of OpenSSH
-	{KEX_CURVE25519_SHA256,     "curve25519-sha256",            EVP_sha256}, // RFC8731
-	{KEX_DH_NONE      , NULL,                                   NULL},
+	{KEX_DH_GRP1_SHA1,  "diffie-hellman-group1-sha1",           SSH_DIGEST_SHA1},   // RFC4253
+	{KEX_DH_GRP14_SHA1, "diffie-hellman-group14-sha1",          SSH_DIGEST_SHA1},   // RFC4253
+	{KEX_DH_GEX_SHA1,   "diffie-hellman-group-exchange-sha1",   SSH_DIGEST_SHA1},   // RFC4419
+	{KEX_DH_GEX_SHA256, "diffie-hellman-group-exchange-sha256", SSH_DIGEST_SHA256}, // RFC4419
+	{KEX_ECDH_SHA2_256, "ecdh-sha2-nistp256",                   SSH_DIGEST_SHA256}, // RFC5656
+	{KEX_ECDH_SHA2_384, "ecdh-sha2-nistp384",                   SSH_DIGEST_SHA384}, // RFC5656
+	{KEX_ECDH_SHA2_521, "ecdh-sha2-nistp521",                   SSH_DIGEST_SHA512}, // RFC5656
+	{KEX_DH_GRP14_SHA256, "diffie-hellman-group14-sha256",      SSH_DIGEST_SHA256}, // RFC8268
+	{KEX_DH_GRP16_SHA512, "diffie-hellman-group16-sha512",      SSH_DIGEST_SHA512}, // RFC8268
+	{KEX_DH_GRP18_SHA512, "diffie-hellman-group18-sha512",      SSH_DIGEST_SHA512}, // RFC8268
+	{KEX_CURVE25519_SHA256_OLD, "curve25519-sha256@libssh.org", SSH_DIGEST_SHA256}, // not RFC8731, PROTOCOL of OpenSSH
+	{KEX_CURVE25519_SHA256,     "curve25519-sha256",            SSH_DIGEST_SHA256}, // RFC8731
+	{KEX_DH_NONE      , NULL,                                   SSH_DIGEST_MAX},
 };
 
 
@@ -81,19 +82,19 @@ const char* get_kex_algorithm_name(kex_algorithm kextype)
 	return "unknown";
 }
 
-const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype)
+const digest_algorithm get_kex_hash_algorithm(kex_algorithm kextype)
 {
 	const struct ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
 
 	while (ptr->name != NULL) {
 		if (kextype == ptr->kextype) {
-			return ptr->evp_md();
+			return ptr->hash_alg;
 		}
 		ptr++;
 	}
 
 	// not found.
-	return EVP_md_null();
+	return SSH_DIGEST_MAX;
 }
 
 void normalize_kex_order(char *buf)
@@ -426,27 +427,26 @@ int dh_estimate(int bits)
 
 
 // hash を計算する (DH 固定グループ用)
-// from kexdh.c
-unsigned char *kex_dh_hash(const EVP_MD *evp_md,
-                           char *client_version_string,
-                           char *server_version_string,
-                           char *ckexinit, int ckexinitlen,
-                           char *skexinit, int skexinitlen,
-                           u_char *serverhostkeyblob, int sbloblen,
-                           BIGNUM *client_dh_pub,
-                           BIGNUM *server_dh_pub,
-                           BIGNUM *shared_secret,
-                           unsigned int *hashlen)
+// from kexdh.c OpenSSH 7.9p1
+int kex_dh_hash(const digest_algorithm hash_alg,
+                char *client_version_string,
+                char *server_version_string,
+                char *ckexinit, int ckexinitlen,
+                char *skexinit, int skexinitlen,
+                u_char *serverhostkeyblob, int sbloblen,
+                BIGNUM *client_dh_pub,
+                BIGNUM *server_dh_pub,
+                BIGNUM *shared_secret,
+                char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
-	static unsigned char digest[EVP_MAX_MD_SIZE];
-	EVP_MD_CTX *md = NULL;
 
-	md = EVP_MD_CTX_new();
-	if (md == NULL)
-		goto error;
-
+	if (*hashlen < ssh_digest_bytes(hash_alg))
+		return SSH_ERR_INVALID_ARGUMENT;
 	b = buffer_init();
+	if (b == NULL)
+		return SSH_ERR_ALLOC_FAIL;
+
 	buffer_put_string(b, client_version_string, strlen(client_version_string));
 	buffer_put_string(b, server_version_string, strlen(server_version_string));
 
@@ -465,51 +465,45 @@ unsigned char *kex_dh_hash(const EVP_MD *evp_md,
 
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
-	EVP_DigestInit(md, evp_md);
-	EVP_DigestUpdate(md, buffer_ptr(b), buffer_len(b));
-	EVP_DigestFinal(md, digest, NULL);
-
+	if (ssh_digest_buffer(hash_alg, b, hash, *hashlen) != 0) {
+		buffer_free(b);
+		return SSH_ERR_LIBCRYPTO_ERROR;
+	}
 	buffer_free(b);
 
-	//write_buffer_file(digest, EVP_MD_size(evp_md));
+	*hashlen = ssh_digest_bytes(hash_alg);
+	//write_buffer_file(digest, *hashlen);
 
-	*hashlen = EVP_MD_size(evp_md);
-
-error:
-	if (md)
-		EVP_MD_CTX_free(md);
-
-	return digest;
+	return 0;
 }
 
 
 // hash を計算する (DH GEX用)
-// from kexgex.c: kexgex_hash()
-unsigned char *kex_dh_gex_hash(const EVP_MD *evp_md,
-                               char *client_version_string,
-                               char *server_version_string,
-                               char *ckexinit, int ckexinitlen,
-                               char *skexinit, int skexinitlen,
-                               u_char *serverhostkeyblob, int sbloblen,
-                               int kexgex_min,
-                               int kexgex_bits,
-                               int kexgex_max,
-                               BIGNUM *kexgex_p,
-                               BIGNUM *kexgex_g,
-                               BIGNUM *client_dh_pub,
-                               BIGNUM *server_dh_pub,
-                               BIGNUM *shared_secret,
-                               unsigned int *hashlen)
+// from kexgex.c OpenSSH 7.9p1
+int kexgex_hash(const digest_algorithm hash_alg,
+                char *client_version_string,
+                char *server_version_string,
+                char *ckexinit, int ckexinitlen,
+                char *skexinit, int skexinitlen,
+                u_char *serverhostkeyblob, int sbloblen,
+                int kexgex_min,
+                int kexgex_bits,
+                int kexgex_max,
+                BIGNUM *kexgex_p,
+                BIGNUM *kexgex_g,
+                BIGNUM *client_dh_pub,
+                BIGNUM *server_dh_pub,
+                BIGNUM *shared_secret,
+                char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
-	static unsigned char digest[EVP_MAX_MD_SIZE];
-	EVP_MD_CTX *md = NULL;
 
-	md = EVP_MD_CTX_new();
-	if (md == NULL)
-		goto error;
-
+	if (*hashlen < ssh_digest_bytes(hash_alg))
+		return SSH_ERR_INVALID_ARGUMENT;
 	b = buffer_init();
+	if (b == NULL)
+		return SSH_ERR_ALLOC_FAIL;
+
 	buffer_put_string(b, client_version_string, strlen(client_version_string));
 	buffer_put_string(b, server_version_string, strlen(server_version_string));
 
@@ -538,27 +532,22 @@ unsigned char *kex_dh_gex_hash(const EVP_MD *evp_md,
 
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
-	EVP_DigestInit(md, evp_md);
-	EVP_DigestUpdate(md, buffer_ptr(b), buffer_len(b));
-	EVP_DigestFinal(md, digest, NULL);
-
+	if (ssh_digest_buffer(hash_alg, b, hash, *hashlen) != 0) {
+		buffer_free(b);
+		return SSH_ERR_LIBCRYPTO_ERROR;
+	}
 	buffer_free(b);
 
-	//write_buffer_file(digest, EVP_MD_size(evp_md));
+	*hashlen = ssh_digest_bytes(hash_alg);
+	//write_buffer_file(digest, *hashlen);
 
-	*hashlen = EVP_MD_size(evp_md);
-
-error:
-	if (md)
-		EVP_MD_CTX_free(md);
-
-	return digest;
+	return 0;
 }
 
 
 // hash を計算する (ECDH用)
-// from kexecdh.c
-unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
+// from kexecdh.c OpenSSH 7.9p1
+int kex_ecdh_hash(const digest_algorithm hash_alg,
                              const EC_GROUP *ec_group,
                              char *client_version_string,
                              char *server_version_string,
@@ -568,17 +557,16 @@ unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
                              const EC_POINT *client_dh_pub,
                              const EC_POINT *server_dh_pub,
                              BIGNUM *shared_secret,
-                             unsigned int *hashlen)
+                             char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
-	static unsigned char digest[EVP_MAX_MD_SIZE];
-	EVP_MD_CTX *md = NULL;
 
-	md = EVP_MD_CTX_new();
-	if (md == NULL)
-		goto error;
-
+	if (*hashlen < ssh_digest_bytes(hash_alg))
+		return SSH_ERR_INVALID_ARGUMENT;
 	b = buffer_init();
+	if (b == NULL)
+		return SSH_ERR_ALLOC_FAIL;
+
 	buffer_put_string(b, client_version_string, strlen(client_version_string));
 	buffer_put_string(b, server_version_string, strlen(server_version_string));
 
@@ -598,21 +586,16 @@ unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
 
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
-	EVP_DigestInit(md, evp_md);
-	EVP_DigestUpdate(md, buffer_ptr(b), buffer_len(b));
-	EVP_DigestFinal(md, digest, NULL);
-
+	if (ssh_digest_buffer(hash_alg, b, hash, *hashlen) != 0) {
+		buffer_free(b);
+		return SSH_ERR_LIBCRYPTO_ERROR;
+	}
 	buffer_free(b);
 
-	//write_buffer_file(digest, EVP_MD_size(evp_md));
+	*hashlen = ssh_digest_bytes(hash_alg);
+	//write_buffer_file(digest, *hashlen);
 
-	*hashlen = EVP_MD_size(evp_md);
-
-error:
-	if (md)
-		EVP_MD_CTX_free(md);
-
-	return digest;
+	return 0;
 }
 
 
@@ -621,26 +604,25 @@ extern int crypto_scalarmult_curve25519(unsigned char *, const unsigned char *, 
 
 // hash を計算する (Curve25519用)
 // from kexc25519.c OpenSSH 7.9
-unsigned char *kex_c25519_hash(const EVP_MD *evp_md,
-                               char *client_version_string,
-                               char *server_version_string,
-                               char *ckexinit, int ckexinitlen,
-                               char *skexinit, int skexinitlen,
-                               u_char *serverhostkeyblob, int sbloblen,
-                               u_char client_dh_pub[CURVE25519_SIZE],
-                               u_char server_dh_pub[CURVE25519_SIZE],
-                               u_char *shared_secret, int secretlen,
-                               unsigned int *hashlen)
+int kex_c25519_hash(const digest_algorithm hash_alg,
+                    char *client_version_string,
+                    char *server_version_string,
+                    char *ckexinit, int ckexinitlen,
+                    char *skexinit, int skexinitlen,
+                    u_char *serverhostkeyblob, int sbloblen,
+                    u_char client_dh_pub[CURVE25519_SIZE],
+                    u_char server_dh_pub[CURVE25519_SIZE],
+                    u_char *shared_secret, int secretlen,
+                    char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
-	static unsigned char digest[EVP_MAX_MD_SIZE];
-	EVP_MD_CTX *md = NULL;
 
-	md = EVP_MD_CTX_new();
-	if (md == NULL)
-		goto error;
-
+	if (*hashlen < ssh_digest_bytes(hash_alg))
+		return SSH_ERR_INVALID_ARGUMENT;
 	b = buffer_init();
+	if (b == NULL)
+		return SSH_ERR_ALLOC_FAIL;
+
 	buffer_put_string(b, client_version_string, strlen(client_version_string));
 	buffer_put_string(b, server_version_string, strlen(server_version_string));
 
@@ -660,21 +642,16 @@ unsigned char *kex_c25519_hash(const EVP_MD *evp_md,
 
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
-	EVP_DigestInit(md, evp_md);
-	EVP_DigestUpdate(md, buffer_ptr(b), buffer_len(b));
-	EVP_DigestFinal(md, digest, NULL);
-
+	if (ssh_digest_buffer(hash_alg, b, hash, *hashlen) != 0) {
+		buffer_free(b);
+		return SSH_ERR_LIBCRYPTO_ERROR;
+	}
 	buffer_free(b);
 
-	//write_buffer_file(digest, EVP_MD_size(evp_md));
+	*hashlen = ssh_digest_bytes(hash_alg);
+	//write_buffer_file(digest, *hashlen);
 
-	*hashlen = EVP_MD_size(evp_md);
-
-error:
-	if (md)
-		EVP_MD_CTX_free(md);
-
-	return digest;
+	return 0;
 }
 
 // from kexc25519.c OpenSSH 7.9
@@ -735,31 +712,35 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 }
 
 
-// from kex.c
-static u_char *derive_key(int id, int need, u_char *hash, buffer_t *shared_secret,
-                          char *session_id, int session_id_len,
-                          const EVP_MD *evp_md)
+// from kex.c OpenSSH 7.9p1
+static u_char *derive_key(PTInstVar pvar, int id, int need, u_char *hash, u_int hashlen,
+	buffer_t *shared_secret)
 {
-	EVP_MD_CTX *md = NULL;
+	digest_algorithm hash_alg = get_kex_hash_algorithm(pvar->kex_type);
+	struct ssh_digest_ctx *hashctx = NULL;
 	char c = id;
 	int have;
-	int mdsz = EVP_MD_size(evp_md);
-	u_char *digest = malloc(roundup(need, mdsz));
+	int mdsz;
+	u_char *digest = NULL;
 
-	md = EVP_MD_CTX_new();
-	if (md == NULL)
+	if ((mdsz = ssh_digest_bytes(hash_alg)) == 0)
 		goto skip;
-
-	if (digest == NULL)
+	if ((digest = calloc(1, roundup(need, mdsz))) == NULL)
 		goto skip;
 
 	/* K1 = HASH(K || H || "A" || session_id) */
-	EVP_DigestInit(md, evp_md);
-	EVP_DigestUpdate(md, buffer_ptr(shared_secret), buffer_len(shared_secret));
-	EVP_DigestUpdate(md, hash, mdsz);
-	EVP_DigestUpdate(md, &c, 1);
-	EVP_DigestUpdate(md, session_id, session_id_len);
-	EVP_DigestFinal(md, digest, NULL);
+
+	if ((hashctx = ssh_digest_start(hash_alg)) == NULL ||
+	    ssh_digest_update_buffer(hashctx, shared_secret) != 0 ||
+	    ssh_digest_update(hashctx, hash, hashlen) != 0 ||
+	    ssh_digest_update(hashctx, &c, 1) != 0 ||
+	    ssh_digest_update(hashctx, pvar->session_id,
+	    pvar->session_id_len) != 0 ||
+	    ssh_digest_final(hashctx, digest, mdsz) != 0) {
+		goto skip;
+	}
+	ssh_digest_free(hashctx);
+	hashctx = NULL;
 
 	/*
 	 * expand key:
@@ -767,35 +748,35 @@ static u_char *derive_key(int id, int need, u_char *hash, buffer_t *shared_secre
 	 * Key = K1 || K2 || ... || Kn
 	 */
 	for (have = mdsz; need > have; have += mdsz) {
-		EVP_DigestInit(md, evp_md);
-		EVP_DigestUpdate(md, buffer_ptr(shared_secret), buffer_len(shared_secret));
-		EVP_DigestUpdate(md, hash, mdsz);
-		EVP_DigestUpdate(md, digest, have);
-		EVP_DigestFinal(md, digest + have, NULL);
+		if ((hashctx = ssh_digest_start(hash_alg)) == NULL ||
+		    ssh_digest_update_buffer(hashctx, shared_secret) != 0 ||
+		    ssh_digest_update(hashctx, hash, hashlen) != 0 ||
+		    ssh_digest_update(hashctx, digest, have) != 0 ||
+		    ssh_digest_final(hashctx, digest + have, mdsz) != 0) {
+			goto skip;
+		}
 	}
+	ssh_digest_free(hashctx);
+	hashctx = NULL;
 
-skip:;
-	if (md)
-		EVP_MD_CTX_free(md);
-
+skip:
 	return digest;
 }
 
 /*
  * 鍵交換の結果から各鍵を生成し newkeys にセットして戻す。
  */
-// from kex.c
-void kex_derive_keys(PTInstVar pvar, SSHKeys *newkeys, int need, u_char *hash, buffer_t *shared_secret,
-                     char *session_id, int session_id_len)
+// from kex.c OpenSSH 7.9p1
+void kex_derive_keys(PTInstVar pvar, SSHKeys *newkeys, u_char *hash, u_int hashlen,
+	buffer_t *shared_secret)
 {
 #define NKEYS	6
 	u_char *keys[NKEYS];
 	int i, mode, ctos;
 
 	for (i = 0; i < NKEYS; i++) {
-		keys[i] = derive_key('A'+i, need, hash, shared_secret, session_id, session_id_len,
-		                     get_kex_algorithm_EVP_MD(pvar->kex_type));
-		//debug_print(i, keys[i], need);
+		keys[i] = derive_key(pvar, 'A'+i, pvar->we_need, hash, hashlen, shared_secret);
+		//debug_print(i, keys[i], pvar->we_need);
 	}
 
 	for (mode = 0; mode < MODE_MAX; mode++) {

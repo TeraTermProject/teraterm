@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Spanish
-date=2025-04-23 by TeraTerm Project
+date=2025-07-17 by TeraTerm Project
 contributor=Filiberto Olguin Ascona (2022-05-26)
 
 [Tera Term]
@@ -9,13 +9,13 @@ DLG_TAHOMA_FONT=Tahoma,8,0
 
 MENU_FILE=&Archivo
 MENU_FILE_NEW=&Nueva Conexion...\tAlt+N
-MENU_FILE_DUPLICATE=D&uplicar sesion\tAlt+D
-MENU_FILE_GYGWIN=Conexion Cy&gwin\tAlt+G
+MENU_FILE_DUPLICATE=D&uplicar sesión\tAlt+D
+MENU_FILE_GYGWIN=Conexión Cy&gwin\tAlt+G
 MENU_FILE_LOG=&Log...
 MENU_FILE_PAUSELOG=Pause Logg&ing
 MENU_FILE_COMMENTLOG=C&omentar en Log...
 MENU_FILE_VIEWLOG=&Ver Log
-MENU_FILE_SHOWLOGDIALOG=Mostrar dialogo de log...
+MENU_FILE_SHOWLOGDIALOG=Mostrar diálogo de log...
 MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=&Enviar archivo...
 MENU_FILE_CHANGEDIR=&Cambiar carpeta...
@@ -48,9 +48,9 @@ MENU_EDIT_PASTE=&Pegar\tAlt+V
 MENU_EDIT_PASTECR=Pegar<C&R>\tAlt+R
 MENU_EDIT_CLSCREEN=Limpiar &pantalla
 MENU_EDIT_CLBUFFER=Limpiar &buffer
-MENU_EDIT_CANCELSELECT=Cancelar se&leccion
-MENU_EDIT_SELECTSCREEN=S&elecionar pantalla
-MENU_EDIT_SELECTALL=Selecionar &todo
+MENU_EDIT_CANCELSELECT=Cancelar se&lección
+MENU_EDIT_SELECTSCREEN=S&eleccionar pantalla
+MENU_EDIT_SELECTALL=Seleccionar &todo
 
 MENU_SETUP=&Configuracion
 MENU_SETUP_TERMINAL=&Terminal...
@@ -182,6 +182,7 @@ DLG_TABSHEET_TITLE_FONT=Font
 DLG_TABSHEET_TITLE_ENCODING=Encoding
 DLG_TABSHEET_TITLE_THEME=Theme
 DLG_TABSHEET_TITLE_MOUSE=Mouse
+DLG_TABSHEET_TITLE_FONT_TEK=Font(TEK)
 
 DLG_TAB_GENERAL_CLICKURL=&Enable clickable URL
 DLG_TAB_GENERAL_DISABLESENDBREAK=Disable accelerator &send break
@@ -290,6 +291,7 @@ DLG_TAB_FONT_VTWINFONT=&VTWindow Font
 DLG_TAB_FONT_BTN_SELECT=&Select...
 DLG_TAB_FONT_VTFONT_TITLE=API for drawing
 DLG_TAB_FONT_DLGFONT=&Dialog Font
+DLG_TAB_FONT_TEKFONT=TEK Font
 DLG_TAB_FONT_BTN_DEFAULT=D&efault
 DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
 DLG_TAB_FONT_LIST_PRO_FONTS_VT=List &proportional fonts in font dialog
@@ -381,6 +383,8 @@ DLG_SELECT_DIR_TITLE=Select new directory
 
 DLG_GEN_TITLE=Tera Term: General setup
 DLG_GEN_PORT=New &connection default
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Serial
 DLG_GEN_LANG_UI=UI &Language:
 
 DLG_HOST_TITLE=Tera Term: New connection
@@ -396,6 +400,10 @@ DLG_KEYB_BS=&Backspace key
 DLG_KEYB_DEL=&Delete key
 DLG_KEYB_KEYB=&Keyboard:
 DLG_KEYB_META=&Meta key:
+DLG_KEYB_META_OFF=apagado
+DLG_KEYB_META_ON=encendido
+DLG_KEYB_META_LEFT=izquierda
+DLG_KEYB_META_RIGHT=derecha
 DLG_KEYB_DISABLE=Disabled mode:
 DLG_KEYB_APPKEY=&Application Keypad
 DLG_KEYB_APPCUR=Application &Cursor
@@ -459,6 +467,7 @@ DLG_CODING_DECSP_DEC_TO_UNICODE=Mapping DEC Special Graphics to Unicode
 DLG_CODING_DECSP_DO_NOT_MAP=Do not mapping
 
 DLG_WIN_TITLE=Window
+DLG_WIN_TEK_TITLE=Window(TEK)
 DLG_WIN_TITLELABEL=&Title:
 DLG_WIN_CURSOR=Cursor shape
 DLG_WIN_BLOCK=B&lock
@@ -466,6 +475,7 @@ DLG_WIN_VERT=&Vertical line
 DLG_WIN_HORZ=H&orizontal line
 DLG_WIN_BOLDFONT=Enable bol&d font
 DLG_WIN_HIDETITLE=H&ide title bar
+DLG_WIN_NO_FRAME=Sin marco
 DLG_WIN_HIDEMENU=Hide &menu bar
 DLG_WIN_COLOREMU=&Color emulation
 DLG_WIN_PCBOLD16=&16 Colors (PC style)
@@ -486,6 +496,8 @@ DLG_WIN_NORMAL=Normal
 DLG_WIN_BOLD=Bold
 DLG_WIN_BLINK=Blink
 DLG_WIN_REVERSEATTR=Reverse
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=Subrayar
 
 DLG_CHOOSEFONT_STC6="Font style" selection here won't affect actual font appearance.
 
@@ -1250,8 +1262,14 @@ MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents
+MENU_CONTENTS_AUTO=Auto
+MENU_CONTENTS_JAPANESE=Japones
+MENU_CONTENTS_KOREAN=Coreano
 MENU_AMB_MENU=Show &Ambiguous Characters width menu
 MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
+BTN_OK=OK
+BTN_CANCEL=Cancel
+BTN_HELP=Help
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=&Always on top
@@ -1269,6 +1287,42 @@ DLG_INTERVAL=&Interval(sec)
 DLG_COMMAND=&Command
 DLG_ADD_NEWLINE=&Add new line
 
+BTN_OK=OK
+BTN_CANCEL=Cancel
+
 [TTXCheckUpdate]
 MSG_CHECKUPDATE=Check for updates automatically?\n  %s
 MENU_CHECKUPDATE=Check for &Updates...
+
+
+[TTXttyrec]
+MENU_RECORD=Grabacion TT&Y
+MENU_REPLAY=R&eproduccion TTY
+MENU_REPLAYAGAIN=Reproducir de nuevo
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0Todos los archivos(*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=Velocidad: %d, Pausa: %s
+TITLE_STATUS_ON=ENCENDIDO
+TITLE_STATUS_OFF=APAGADO
+TITLE_TRIM=%d.%06d segundos inactivo. recortar a %d segundos.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), Desactivado.
+
+
+[TTXViewMode]
+MENU_SETPASS=Contrasena del modo de &vista
+MENU_VIEWMODE=Modo de &vista
+DLG_SETPASSWORD_TITLE=Establecer contrasena
+DLG_SETPASSWORD_CURPASS=Contrasena antigua
+DLG_SETPASSWORD_NEWPASS=Nueva contrasena
+DLG_SETPASSWORD_RETPASS=Volver a escribir la contrasena
+DLG_INPUTPASSWORD_TITLE=Introducir contrasena
+DLG_INPUTPASSWORD_PASSWORD=Contrasena
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=Contrasena cambiada
+MSG_INVALID=Contrasena invalida
+MSG_NOTMATCHED=La nueva contrasena no coincide.
+MSG_TITLE_ERROR=Error de TTXViewMode
+MSG_CANNOTDISPLAY=No se puede mostrar el cuadro de diálogo.
+BTN_OK=OK
+BTN_CANCEL=&Cancel

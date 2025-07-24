@@ -61,6 +61,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 
 int kextype_to_cipher_nid(kex_algorithm type);
 int keytype_to_hash_nid(ssh_keytype type);
+digest_algorithm keytype_to_hash_alg(ssh_keytype type);
 int keytype_to_cipher_nid(ssh_keytype type);
 ssh_keytype nid_to_keytype(int nid);
 

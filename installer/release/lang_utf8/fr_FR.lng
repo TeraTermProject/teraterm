@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2025-04-23 by TeraTerm Project
+date=2025-07-17 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -19,7 +19,7 @@ MENU_FILE_SHOWLOGDIALOG=Boite de dialogue du Journal...
 MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=&Envoyer un fichier...
 MENU_FILE_CHANGEDIR=&Changer de dossier...
-MENU_FILE_REPLAYLOG=&Reafficher le journal...
+MENU_FILE_REPLAYLOG=&Réafficher le journal...
 MENU_FILE_PRINT=&Imprimer...\tAlt+P
 MENU_FILE_DISCONNECT=&Déconnecter\tAlt+I
 MENU_FILE_EXIT=Quitter\tAlt+Q
@@ -27,7 +27,7 @@ MENU_FILE_EXITALL=Exit &All
 
 MENU_TRANS=&Transfert
 MENU_TRANS_KERMIT_RCV=&Recevoir
-MENU_TRANS_KERMIT_GET=&Acquerir...
+MENU_TRANS_KERMIT_GET=&Acquérir...
 MENU_TRANS_KERMIT_SEND=&Envoyer...
 MENU_TRANS_KERMIT_FINISH=&Terminer
 MENU_TRANS_X_RCV=&Recevoir...
@@ -46,11 +46,11 @@ MENU_EDIT_COPY=&Copier\tAlt+C
 MENU_EDIT_COPYTABLE=Copier &tableau
 MENU_EDIT_PASTE=&Coller\tAlt+V
 MENU_EDIT_PASTECR=Coller<C&R>\tAlt+R
-MENU_EDIT_CLSCREEN=Effac&er l'ecran
+MENU_EDIT_CLSCREEN=Effac&er l'écran
 MENU_EDIT_CLBUFFER=Effacer le &buffer
-MENU_EDIT_CANCELSELECT=Effacer la se&lection
-MENU_EDIT_SELECTSCREEN=Sélectionner l'ecran
-MENU_EDIT_SELECTALL=Tout selectionner
+MENU_EDIT_CANCELSELECT=Effacer la sé&lection
+MENU_EDIT_SELECTSCREEN=Sélectionner l'écran
+MENU_EDIT_SELECTALL=Tout sélectionner
 
 MENU_SETUP=Config&uration
 MENU_SETUP_TERMINAL=&Terminal...
@@ -182,6 +182,7 @@ DLG_TABSHEET_TITLE_FONT=Font
 DLG_TABSHEET_TITLE_ENCODING=Encoding
 DLG_TABSHEET_TITLE_THEME=Theme
 DLG_TABSHEET_TITLE_MOUSE=Mouse
+DLG_TABSHEET_TITLE_FONT_TEK=Font(TEK)
 
 DLG_TAB_GENERAL_CLICKURL=&Autoriser URL cliquable
 DLG_TAB_GENERAL_DISABLESENDBREAK=Dévalider accélération envoi de break
@@ -290,6 +291,7 @@ DLG_TAB_FONT_VTWINFONT=&VTWindow Font
 DLG_TAB_FONT_BTN_SELECT=&Select...
 DLG_TAB_FONT_VTFONT_TITLE=API for drawing
 DLG_TAB_FONT_DLGFONT=&Dialog Font
+DLG_TAB_FONT_TEKFONT=TEK Font
 DLG_TAB_FONT_BTN_DEFAULT=D&efault
 DLG_TAB_FONT_CODEPAGE_LABEL=&Code page for display character conversion
 DLG_TAB_FONT_LIST_PRO_FONTS_VT=List &proportional fonts in font dialog
@@ -381,6 +383,8 @@ DLG_SELECT_DIR_TITLE=Selectionner un nouveau répertoire
 
 DLG_GEN_TITLE=Tera Term: Configuration générale
 DLG_GEN_PORT=New &connection default
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Serial
 DLG_GEN_LANG_UI=UI &Language:
 
 DLG_HOST_TITLE=Tera Term: Nouvelle connexion
@@ -396,6 +400,10 @@ DLG_KEYB_BS=Touche &Bkspace
 DLG_KEYB_DEL=Touche &Delete
 DLG_KEYB_KEYB=&Clavier:
 DLG_KEYB_META=Alt = &Meta:
+DLG_KEYB_META_OFF=eteint
+DLG_KEYB_META_ON=allume
+DLG_KEYB_META_LEFT=gauche
+DLG_KEYB_META_RIGHT=droite
 DLG_KEYB_DISABLE=Dévalider le mode:
 DLG_KEYB_APPKEY=Codes pavé numérique
 DLG_KEYB_APPCUR=Codes Curseur pavé numérique
@@ -459,6 +467,7 @@ DLG_CODING_DECSP_DEC_TO_UNICODE=Mapping DEC Special Graphics to Unicode
 DLG_CODING_DECSP_DO_NOT_MAP=Do not mapping
 
 DLG_WIN_TITLE=Fenêtre
+DLG_WIN_TEK_TITLE=Window(TEK)
 DLG_WIN_TITLELABEL=&Titre:
 DLG_WIN_CURSOR=Forme du curseur
 DLG_WIN_BLOCK=B&loc
@@ -466,6 +475,7 @@ DLG_WIN_VERT=Ligne &verticale
 DLG_WIN_HORZ=Ligne H&orizontale
 DLG_WIN_BOLDFONT=Autoriser carac. gras
 DLG_WIN_HIDETITLE=Cacher barre de titre
+DLG_WIN_NO_FRAME=&Pas de cadre
 DLG_WIN_HIDEMENU=Cacher barre de menu
 DLG_WIN_COLOREMU=Emulation &Couleurs
 DLG_WIN_PCBOLD16=&16 Colors (PC style)
@@ -486,6 +496,8 @@ DLG_WIN_NORMAL=Normal
 DLG_WIN_BOLD=Gras
 DLG_WIN_BLINK=Clignotant
 DLG_WIN_REVERSEATTR=Inversé
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=Souligner
 
 DLG_CHOOSEFONT_STC6=La sélection d'un "Style de police" ici n'affectera pas l'aspect actuel de la police.
 
@@ -1253,8 +1265,14 @@ MENU_SETTING=Sett&ing
 MENU_SETTING_TITLE=KanjiMenu Setting
 MENU_CHARCODE=Sho&w charcode menu
 MENU_CONTENTS=Menu &contents
+MENU_CONTENTS_AUTO=AUTO
+MENU_CONTENTS_JAPANESE=Japonais
+MENU_CONTENTS_KOREAN=Coreen
 MENU_AMB_MENU=Show &Ambiguous Characters width menu
 MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
+BTN_OK=OK
+BTN_CANCEL=Annuler
+BTN_HELP=Aide
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=Toujours au dessus
@@ -1272,6 +1290,42 @@ DLG_INTERVAL=&Intervalle(sec)
 DLG_COMMAND=&Commande
 DLG_ADD_NEWLINE=&Add new line
 
+BTN_OK=OK
+BTN_CANCEL=Annuler
+
 [TTXCheckUpdate]
 MSG_CHECKUPDATE=Check for updates automatically?\n  %s
 MENU_CHECKUPDATE=Check for &Updates...
+
+
+[TTXttyrec]
+MENU_RECORD=Enregistrement TT&Y
+MENU_REPLAY=L&ecture TTY
+MENU_REPLAYAGAIN=Rejouer encore
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0Tous les fichiers(*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=Vitesse: %d, Pause: %s
+TITLE_STATUS_ON=ON
+TITLE_STATUS_OFF=OFF
+TITLE_TRIM=%d.%06d secondes inactives. reduire a %d secondes.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), Desactive.
+
+
+[TTXViewMode]
+MENU_SETPASS=Mot de passe du mode de &vue
+MENU_VIEWMODE=Mode de &vue
+DLG_SETPASSWORD_TITLE=Definir le mot de passe
+DLG_SETPASSWORD_CURPASS=Ancien mot de passe
+DLG_SETPASSWORD_NEWPASS=Nouveau mot de passe
+DLG_SETPASSWORD_RETPASS=Retaper le mot de passe
+DLG_INPUTPASSWORD_TITLE=Saisir le mot de passe
+DLG_INPUTPASSWORD_PASSWORD=Mot de passe
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=Mot de passe change
+MSG_INVALID=Mot de passe invalide
+MSG_NOTMATCHED=Le nouveau mot de passe ne correspond pas.
+MSG_TITLE_ERROR=Erreur de TTXViewMode
+MSG_CANNOTDISPLAY=Impossible d'afficher la boite de dialogue.
+BTN_OK=OK
+BTN_CANCEL=Annuler

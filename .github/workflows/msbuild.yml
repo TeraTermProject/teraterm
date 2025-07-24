@@ -33,6 +33,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set timezone to JST
+      run: |
+        tzutil /s "Tokyo Standard Time"
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+      with:
+        vs-version: ${{ matrix.vs-version }}
+
     - name: Restore cached files
       id: cache-libs-restore
       uses: actions/cache/restore@v4

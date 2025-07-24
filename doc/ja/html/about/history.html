@@ -127,6 +127,23 @@
         <a href="../menu/setup-additional-terminal.html#TerminalID">TerminalID</a> で "VT100J", "VT102J", "VT220J" が選択できなくなっていたので修正した。5.3でLanguage設定をなくしたときから選択できなくなっていた。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
       </li>
+      <li>
+        Tera Term マクロの logopen でドライブレター以外の場所に":"を使用したファイル名を指定した場合に、Tera Term がクラッシュする不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/648" target="_blank">issue #648</a>)
+      </li>
+      <li>
+        Tera Termマクロを非表示で実行して、<a href="../macro/command/connect.html">connect</a>マクロコマンドでTera Termを起動すると動作が停止する場合があったので修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/607" target="_blank">issue #607</a>)
+      </li>
+      <li>
+        Tera Term のコマンドラインオプション <a href="../commandline/teraterm.html#f">/F=</a> がプラグインに反映されるように修正した。<br>
+        加えて、[ファイル] → [セッションの複製]で複製されたセッションに <a href="../commandline/teraterm.html#f">/F=</a> オプションが引き継がれるよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/692" target="_blank">issue #692</a>)
+      </li>
+      <li>
+        MACRO: <a href="../macro/command/restoresetup.html">restoresetup</a>コマンドで INI ファイルが相対パスで指定された場合に、%APPDATA%\teraterm5\ からの相対パスと見なされない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/706" target="_blank">issue #706</a>)
+      </li>
     </ul>
   </li>
 
@@ -146,6 +163,12 @@
         コード署名を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/316" target="_blank">issue #316</a>)
       </li>
+      <li><a href="#ttyrec_1.06">TTXttyrec Plugin(1.06 not released yet)</a>へ差し替えた。</li>
+      <li><a href="#viewmode_1.01">TTXViewMode Plugin(1.01 not released yet)</a>へ差し替えた。</li>
+      <li><a href="#cygterm_1.07_30">CygTerm+ 1.07_30</a>へ差し替えた。</li>
+      <li><a href="#changefontsize_1.00">TTXChangeFontSize</a>を追加した。</li>
+      <li><a href="#ttproxy_1.0.0.27">TTProxy 1.0.0.27</a>へ差し替えた。</li>
+      <li><a href="#recurringcommand_1.06">TTXRecurringCommand 1.06</a>へ差し替えた。</li>
     </ul>
   </li>
 </ul>
@@ -5359,6 +5382,13 @@
 
 
 <h2 id="cygterm">CygTerm+</h2>
+<h3 id="cygterm_1.07_30">v1.07_30 YYYY/MM/DD (not released yet)</h3>
+<ul class="history">
+      <li>
+        Tera Term マクロで cygconnect を実行すると「/D=XXXXXXXX\n指定されたファイルがみつかりません。」と表示され、cygterm が起動しない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/645" target="_blank">issue #645</a>)
+      </li>
+</ul>
 
 <h3 id="cygterm_1.07_29">v1.07_29 2016/11/26 (by maya)</h3>
 <ul class="history">
@@ -5617,14 +5647,20 @@
 
 <h2 id="ttproxy">TTProxy</h2>
 
+<h3 id="ttproxy_1.0.0.27">YYYY.MM.DD (Ver 1.0.0.27 not released yet)</h3>
+<ul class="history">
+  <li>バグ修正
+    <ul>
+      <li>
+        Tera Term のコマンドラインオプション /F=<setup file> で相対パスが指定された場合に %APPDATA%\teraterm5\ からの相対パスと見なされない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/653" target="_blank">issue #653</a>)
+      </li>
+    </ul>
+  </li>
+</ul>
+
 <h3 id="ttproxy_1.0.0.26">2019.12.7 (Ver 1.0.0.26)</h3>
 <ul class="history">
-  <!--li>変更
-    <ul>
-      <li></li>
-    </ul>
-  </li -->
-
   <li>バグ修正
     <ul>
       <li>HTTPプロキシ接続がエラーとなり、ステータスコードが400,401,403,405,406,407以外だった場合、メッセージボックスにゴミが表示される問題を修正した。</li>
@@ -6008,6 +6044,14 @@
 </ul>
 
 <h2 id="ttyrec">TTXttyrec</h2>
+<h3 id="ttyrec_1.06">YYYY.MM.DD (Ver 1.06 not released yet)</h3>
+<ul class="history">
+  <li>
+    言語ファイルに対応した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/624" target="_blank">issue #624</a>)
+  </li>
+</ul>
+
 <h3 id="ttyrec_1.05">2023.10.15 (Ver 1.05)</h3>
 <ul class="history">
   <li>コマンドラインから再生したとき、[Replay again] が使えなかった問題を修正した。</li>
@@ -6050,12 +6094,28 @@
 </ul>
 
 <h2 id="viewmode">TTXViewMode</h2>
+<h3 id="viewmode_1.01">YYYY.MM.DD (Ver 1.01 not released yet)</h3>
+<ul class="history">
+  <li>
+    言語ファイルに対応した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/624" target="_blank">issue #624</a>)
+  </li>
+</ul>
+
 <h3 id="viewmode_1.00">2008.12.16 (Ver 1.00)</h3>
 <ul class="history">
   <li>初版。</li>
 </ul>
 
 <h2 id="recurringcommand">TTXRecurringCommand</h2>
+<h3 id="recurringcommand_1.06">YYYY.MM.DD (Ver 1.06 not released yet)</h3>
+<ul class="history">
+  <li>
+    Tera Term のコマンドラインオプション /F=<setup file> で相対パスが指定された場合に %APPDATA%\teraterm5\ からの相対パスと見なされない不具合を修正した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/692" target="_blank">issue #692</a>)
+  </li>
+</ul>
+
 <h3 id="recurringcommand_1.05">2016.11.30 (Ver 1.05)</h3>
 <ul class="history">
   <li>送信するコマンドの末尾に改行を付加する設定を追加した。</li>
@@ -6097,9 +6157,12 @@
 </ul>
 
 <h2 id="changefontsize">TTXChangeFontSize</h2>
-<h3 id="changefontsize_1.00">2025.5.31 (Ver 1.00)</h3>
+<h3 id="changefontsize_1.00">YYYY.MM.DD (Ver 1.00 not released yet)</h3>
 <ul class="history">
-  <li>原作者のいわもとこういちさんに許諾を得て、ソースをインポートした。</li>
+  <li>
+    原作者のいわもとこういちさんに許諾を得て、ソースをインポートした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/599" target="_blank">issue #599</a>)
+  </li>
 </ul>
 
 </body>

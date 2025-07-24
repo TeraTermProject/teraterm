@@ -63,6 +63,7 @@
 #include "win_pp.h"
 #include "serial_pp.h"
 #include "ui_pp.h"
+#include "tekfont_pp.h"
 
 #include "addsetting.h"
 
@@ -1512,12 +1513,54 @@ enum {
 	PP_TERMINAL,
 	PP_SERIAL,
 	PP_WINDOW,
+	PP_TEK_WINDOW,
+	PP_TEK_FONT,
 	PP_DEBUG,
 	PP_MAX,
 };
 
+static int GetStartPageNo(CAddSettingPropSheetDlg::Page page)
+{
+	int start_page = PP_GENERAL;
+	switch (page) {
+	case DefaultPage:
+		start_page = PP_GENERAL;
+		break;
+	case CodingPage:
+		start_page = PP_ENCODING;
+		break;
+	case FontPage:
+		start_page = PP_FONT;
+		break;
+	case KeyboardPage:
+		start_page = PP_KEYBOARD;
+		break;
+	case TcpIpPage:
+		start_page = PP_TCPIP;
+		break;
+	case TermPage:
+		start_page = PP_TERMINAL;
+		break;
+	case WinPage:
+		start_page = PP_WINDOW;
+		break;
+	case SerialPortPage:
+		start_page = PP_SERIAL;
+		break;
+	case TekFontPage:
+		start_page = PP_TEK_FONT;
+		break;
+	default:
+		start_page = PP_GENERAL;
+		break;
+	}
+	return start_page;
+}
+
 // CAddSettingPropSheetDlg
-CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd):
+CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
+	HINSTANCE hInstance, HWND hParentWnd,
+	CAddSettingPropSheetDlg::Page StartPage):
 	TTCPropSheetDlg(hInstance, hParentWnd, ts.UILanguageFileW)
 {
 	HPROPSHEETPAGE pages[PP_MAX] = {0};
@@ -1555,19 +1598,31 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hPare
 		pages[PP_KEYBOARD] = KeyboardPageCreate(hInstance, &ts);
 		pages[PP_MOUSE] = MousePageCreate(hInstance, &ts);
 		pages[PP_TCPIP] = TcpIPPageCreate(hInstance, &ts);
-		pages[PP_TERMINAL] = CreateTerminalPP(hInstance, hParentWnd, & ts);
+		pages[PP_TERMINAL] = CreateTerminalPP(hInstance, hParentWnd, &ts);
 		pages[PP_SERIAL] = SerialPageCreate(hInstance, &ts);
 		pages[PP_UI] = UIPageCreate(hInstance, &ts);
+		pages[PP_WINDOW] = CreateWinVTPP(hInstance, hParentWnd, &ts);
 	}
-	pages[PP_WINDOW] = CreateWinPP(hInstance, hParentWnd, &ts);
+	if (parent_win == ADDSETTING_WIN_TEK) {	// TEKÇ©ÇÁåƒÇ—èoÇ≥ÇÍÇΩÇ∆Ç´ÇæÇØï\é¶Ç∑ÇÈ
+//	{										// Ç¢Ç¬Ç‡ï\é¶Ç∑ÇÈ
+		pages[PP_TEK_WINDOW] = CreateWinTEKPP(hInstance, hParentWnd, &ts);
+		pages[PP_TEK_FONT] = TEKFontPageCreate(hInstance, hParentWnd, &ts);
+	}
 
-
+	const int start_page_no = GetStartPageNo(StartPage);
+	int available_page_count = 0;
+	int start_page_index = 0;
 	for (int i = 0; i < PP_MAX; i++) {
 		HPROPSHEETPAGE page = pages[i];
 		if (page != 0) {
 			AddPage(page);
+			if (i == start_page_no) {
+				start_page_index = available_page_count;
+			}
+			available_page_count++;
 		}
 	}
+	TTCPropSheetDlg::SetStartPage(start_page_index);
 
 	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFileW);
 	SetCaption(title);
@@ -1579,41 +1634,6 @@ CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 	for (int i = 0; i < m_PageCountCPP; i++) {
 		delete m_Page[i];
 	}
-}
-
-void CAddSettingPropSheetDlg::SetStartPage(Page page)
-{
-	int start_page = PP_GENERAL;
-	switch (page) {
-	case DefaultPage:
-		start_page = PP_GENERAL;
-		break;
-	case CodingPage:
-		start_page = PP_ENCODING;
-		break;
-	case FontPage:
-		start_page = PP_FONT;
-		break;
-	case KeyboardPage:
-		start_page = PP_KEYBOARD;
-		break;
-	case TcpIpPage:
-		start_page = PP_TCPIP;
-		break;
-	case TermPage:
-		start_page = PP_TERMINAL;
-		break;
-	case WinPage:
-		start_page = PP_WINDOW;
-		break;
-	case SerialPortPage:
-		start_page = PP_SERIAL;
-		break;
-	default:
-		start_page = PP_GENERAL;
-		break;
-	}
-	TTCPropSheetDlg::SetStartPage(start_page);
 }
 
 /**

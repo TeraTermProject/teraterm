@@ -331,39 +331,23 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 // TTXReadIniFile, TTXWriteIniFile -- 設定ファイルの読み書き
 //
 void ReadINI(const wchar_t *fn, PTTSet ts) {
-	wchar_t sect[OutBuffSize];
-	wchar_t *p;
-
-	// DLL ファイル名から、INI のセクション名を決める
-	if (fn[0] == '\\' || fn[0] == '/' || (fn[0] != 0 && fn[1] == ':')) {
-		wcsncpy_s(sect, _countof(sect), fn, _TRUNCATE);
-	}
-	else {
-		GetModuleFileNameW(NULL, sect, _countof(sect));
-		p = wcsrchr(sect, '\\');
-		if (!p) {
-			return;
-		}
-		wcsncpy_s(p+1, _countof(sect) - ((p+1)-sect), fn, _TRUNCATE);
-	}
-
-	GetPrivateProfileStringAFileW(SECTION, "Command", "", pvar->orgCommand, sizeof(pvar->orgCommand), sect);
+	GetPrivateProfileStringAFileW(SECTION, "Command", "", pvar->orgCommand, sizeof(pvar->orgCommand), fn);
 	strncpy_s(pvar->command, sizeof(pvar->command), pvar->orgCommand, _TRUNCATE);
 	UnEscapeStr(pvar->command);
 	pvar->cmdLen = (int)strlen(pvar->command);
 
-	pvar->add_nl = GetOnOff(SECTION, "AddNewLine", sect, FALSE);
+	pvar->add_nl = GetOnOff(SECTION, "AddNewLine", fn, FALSE);
 	if (pvar->add_nl && pvar->cmdLen < sizeof(pvar->command) - 1) {
 		pvar->command[pvar->cmdLen++] = '\n';
 		pvar->command[pvar->cmdLen] = '\0';
 	}
 
-	pvar->interval = GetPrivateProfileIntAFileW(SECTION, "Interval", DEFAULT_INTERVAL, sect);
+	pvar->interval = GetPrivateProfileIntAFileW(SECTION, "Interval", DEFAULT_INTERVAL, fn);
 	if (pvar->interval < MINIMUM_INTERVAL) {
 		pvar->interval = MINIMUM_INTERVAL;
 	}
 
-	pvar->enable = GetOnOff(SECTION, "Enable", sect, FALSE);
+	pvar->enable = GetOnOff(SECTION, "Enable", fn, FALSE);
 }
 
 static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
@@ -393,21 +377,10 @@ static void PASCAL TTXWriteIniFile(const wchar_t *fn, PTTSet ts) {
 //
 // TTXParseParam -- コマンドラインオプションの解釈
 //	今のところ固有のコマンドラインオプションは無い。(必要?)
-//	/F= による設定ファイルの切り替えのみ対応。
 //
 
 static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
-	wchar_t buff[1024];
-	wchar_t *next;
 	pvar->origParseParam(Param, ts, DDETopic);
-
-	next = Param;
-	while (next = GetParam(buff, sizeof(buff), next)) {
-		DequoteParam(buff, sizeof(buff), buff);
-		if (_wcsnicmp(buff, L"/F=", 3) == 0) {
-			ReadINI(buff+3, ts);
-		}
-	}
 
 	return;
 }
@@ -472,6 +445,8 @@ static INT_PTR CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 		{ IDC_INTERVAL_LABEL, "DLG_INTERVAL" },
 		{ IDC_COMMAND_LABEL, "DLG_COMMAND" },
 		{ IDC_ADD_NL, "DLG_ADD_NEWLINE" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" },
 	};
 
 	switch (msg) {

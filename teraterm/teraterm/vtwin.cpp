@@ -115,6 +115,8 @@
 #include "makeoutputstring.h"
 #include "ttlib_types.h"
 #include "externalsetup.h"
+#include "tslib.h"
+#include "../ttpset/ttset.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -551,7 +553,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	WNDCLASSW wc;
 	RECT rect;
 	DWORD Style;
-	int CmdShow;
 	BOOL isFirstInstance;
 	m_hInst = hInstance;
 
@@ -562,6 +563,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	TTXInit(&ts, &cv); /* TTPLUG */
 
 	MsgDlgHelp = RegisterWindowMessage(HELPMSGSTRING);
+
+	ParseFOption(&ts);
 
 	if (isFirstInstance) {
 		/* first instance */
@@ -787,7 +790,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		TipWin->Create(HVTWin);
 	}
 
-	if (ts.HideWindow>0) {
+	if (ts.nCmdShow == SW_HIDE || ts.nCmdShow == SW_SHOWMINIMIZED ||
+		ts.nCmdShow == SW_MINIMIZE || ts.HideWindow > 0) {
 		if (strlen(TopicName)>0) {
 			InitDDE();
 			SendDDEReady();
@@ -796,15 +800,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		Startup();
 		return;
 	}
-	CmdShow = SW_SHOWDEFAULT;
-	if (ts.Minimize>0) {
-		CmdShow = SW_SHOWMINIMIZED;
-	}
 	SetWindowAlpha(ts.AlphaBlendActive);
-	ShowWindow(CmdShow);
 	ChangeCaret();
-
-	pVTWin = this;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -3993,6 +3990,12 @@ void CVTWindow::OnDuplicateSession()
 		wcsncat_s(Command, _countof(Command), ts.KeyCnfFNW, _TRUNCATE);
 	}
 
+	// セッション複製を行う際、/F= があれば引き継ぎを行うようにする。
+	if (ParseFOption(&ts)) {
+		wcsncat_s(Command, _countof(Command), L" /F=", _TRUNCATE);
+		wcsncat_s(Command, _countof(Command), ts.SetupFNameW, _TRUNCATE);
+	}
+
 	DWORD e = TTWinExec(Command);
 	if (e != NO_ERROR) {
 		static const TTMessageBoxInfoW info = {
@@ -4336,7 +4339,7 @@ void CVTWindow::OnFileQVSend()
 
 void CVTWindow::OnFileChangeDir()
 {
-	OpenSetupGeneral();
+	OpenSetupGeneral(m_hWnd);
 }
 
 void CVTWindow::OnFilePrint()
@@ -4482,7 +4485,7 @@ void CVTWindow::OnExternalSetup()
 
 void CVTWindow::OnSetupTerminal()
 {
-	OpenSetupTerminal();
+	OpenSetupTerminal(m_hWnd);
 }
 
 
@@ -4512,17 +4515,17 @@ void CVTWindow::SetColor()
 
 void CVTWindow::OnSetupWindow()
 {
-	OpenSetupWin();
+	OpenSetupWin(m_hWnd);
 }
 
 void CVTWindow::OnSetupFont()
 {
-	OpenSetupFont();
+	OpenSetupFont(m_hWnd);
 }
 
 void CVTWindow::OnSetupKeyboard()
 {
-	OpenSetupKeyboard();
+	OpenSetupKeyboard(m_hWnd);
 }
 
 /*
@@ -4562,17 +4565,17 @@ static void OpenNewComport(const TTTSet *pts)
 
 void CVTWindow::OnSetupSerialPort()
 {
-	OpenSetupSerialPort();
+	OpenSetupSerialPort(m_hWnd);
 }
 
 void CVTWindow::OnSetupTCPIP()
 {
-	OpenSetupTCPIP();
+	OpenSetupTCPIP(m_hWnd);
 }
 
 void CVTWindow::OnSetupGeneral()
 {
-	OpenSetupGeneral();
+	OpenSetupGeneral(m_hWnd);
 }
 
 void CVTWindow::OnSetupSave()
@@ -4964,7 +4967,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 		if (calcOnly) {
 			// 新DPIのフォントのサイズからスクリーンサイズを算出
 			LOGFONTW VTlfDefault;
-			DispSetLogFont(&VTlfDefault, NewDPI); // Normal Font
+			TSGetLogFont(m_hWnd, &ts, 0, NewDPI, &VTlfDefault); // Normal Font
 			HFONT VTFontDefault = CreateFontIndirectW(&VTlfDefault);
 			HDC TmpDC = GetDC(m_hWnd);
 			SelectObject(TmpDC, VTFontDefault);

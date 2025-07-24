@@ -546,7 +546,7 @@
 					</OBJECT>
 				<UL>
 					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="Edit History">
+						<param name="Name" value="ホストリストの編集">
 						<param name="Local" value="html\menu\setup-additional-tcpip_edithistory.html">
 						<param name="ImageNumber" value="11">
 						</OBJECT>
