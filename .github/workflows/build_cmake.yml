@@ -1,0 +1,81 @@
+﻿name: Bulid with cmake (experimental)
+on:
+  workflow_dispatch:
+
+env:
+  NOPAUSE: 1
+  REMOVE_TMP: 1
+  RETENTION_DAYS: 3
+
+jobs:
+  build_cmake:
+    strategy:
+      fail-fast: true
+      matrix:
+        arch: [win32, x64, arm64]
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Restore cached libs
+        id: cache-libs-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            libs
+            buildtools
+          key: cache-${{ matrix.arch }}-${{ hashFiles('libs/download.cmake', 'buildtools/download/cygwin_package/https%3a%2f%2fmirrors.kernel.org%2fsourceware%2fcygwin%2f/x86_64/setup.ini') }}
+      - name: Checkout 2nd
+        run: |
+          git checkout .
+      - name: build
+        run: |
+          cd buildtools
+          cmake -P install_sbapplocale.cmake
+          cmake -P install_innosetup.cmake
+          cmake -P install_cygwin.cmake
+          cd ..
+          cd libs
+          cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=${{ matrix.arch }} -P buildall.cmake
+          cd ..
+          mkdir build
+          cd build
+          cmake .. -G "Visual Studio 17 2022" -A ${{ matrix.arch }}
+          cmake --build . --config Release
+          cmake --build . --config Release --target install
+          cmake --build . --config Release --target inno_setup
+          cmake --build . --config Release --target zip
+          cmake --build . --config Release --target calc_hash
+      - name: artifacts zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arch }}-zip
+          path: |
+            build/teraterm*.zip
+      - name: artifacts installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arch }}-installer
+          path: |
+            build/teraterm*.exe
+      - name: artifacts sha256sum
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arch }}-sha256sum
+          path: |
+            build/teraterm*.sha256sum
+      - name: artifacts sha512sum
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arch }}-sha512sum
+          path: |
+            build/teraterm*.sha512sum
+      - name: Save libs&buildtools
+        id: cache-libs-save
+        uses: actions/cache/save@v4
+        if: steps.cache-libs-restore.outputs.cache-hit != 'true'
+        with:
+          path: |
+            libs
+            buildtools
+          key: cache-${{ matrix.arch }}-${{ hashFiles('libs/download.cmake', 'buildtools/download/cygwin_package/https%3a%2f%2fmirrors.kernel.org%2fsourceware%2fcygwin%2f/x86_64/setup.ini') }}

@@ -6,29 +6,46 @@ setlocal
 cd /d %~dp0
 
 if not exist Output mkdir Output
-set TT_VERSION=%VERSION%
+if not exist Output\portable mkdir Output\portable
 SET VCSVERSION=%GITVERSION%
 IF NOT "%SVNVERSION%" == "unknown" (
     SET VCSVERSION=r%SVNVERSION%
 )
-set SNAPSHOT_PORTABLE_OUTPUT="teraterm-%TT_VERSION%-%DATE%_%TIME%-%VCSVERSION%-%USERNAME%-snapshot"
+
+set SNAPSHOT_OUTPUT="teraterm-%VERSION%-%DATE%_%TIME%-%VCSVERSION%-%USERNAME%-snapshot"
+set RELEASE_OUTPUT="teraterm-%VERSION%"
 if "%RELEASE%" == "1" (
-    pushd Output
-    %CMAKE% -E tar cf teraterm-%TT_VERSION%.zip --format=zip teraterm-%TT_VERSION%/
-    %CMAKE% -E tar cf teraterm-%TT_VERSION%_pdb.zip --format=zip teraterm-%TT_VERSION%_pdb/
-    popd
-    set INNO_SETUP_OPT_VERSION=
-    set INNO_SETUP_OPT_OUTPUT=
+    set OUTPUT=%RELEASE_OUTPUT%
 ) else (
-    %CMAKE% -E rename snapshot-%DATE%_%TIME% %SNAPSHOT_PORTABLE_OUTPUT%
-    %CMAKE% -E rename snapshot-%DATE%_%TIME%_pdb %SNAPSHOT_PORTABLE_OUTPUT%_pdb
-    %CMAKE% -E tar cf Output/%SNAPSHOT_PORTABLE_OUTPUT%.zip --format=zip %SNAPSHOT_PORTABLE_OUTPUT%
-    %CMAKE% -E tar cf Output/%SNAPSHOT_PORTABLE_OUTPUT%_pdb.zip --format=zip %SNAPSHOT_PORTABLE_OUTPUT%_pdb
-    %CMAKE% -E rename %SNAPSHOT_PORTABLE_OUTPUT% snapshot-%DATE%_%TIME%
-    %CMAKE% -E rename %SNAPSHOT_PORTABLE_OUTPUT%_pdb snapshot-%DATE%_%TIME%_pdb
-    set INNO_SETUP_OPT_VERSION="/DVerSubStr=%DATE%_%TIME%"-%VCSVERSION%
-    set INNO_SETUP_OPT_OUTPUT="/DOutputSubStr=%DATE%_%TIME%-%VCSVERSION%-%USERNAME%-snapshot"
+    set OUTPUT=%SNAPSHOT_OUTPUT%
 )
-%INNO_SETUP% %INNO_SETUP_OPT_VERSION% /DAppVer=%VERSION% %INNO_SETUP_OPT_OUTPUT% teraterm.iss
+
+rem ポータブル版をコピーして取っておく(署名に使用する)
+%CMAKE% -E rm -rf Output/portable/teraterm
+%CMAKE% -E copy_directory teraterm Output/portable/teraterm
+
+
+rem (署名なし)インストーラ作成
+set INNO_SETUP_OUTPUT="/DOutputBaseFilename=%OUTPUT%"
+if "%RELEASE%" == "1" (
+    set INNO_SETUP_APPVERSION="/DAppVersion=%VERSION%"
+) else (
+    set INNO_SETUP_APPVERSION="/DAppVersion=%VERSION% %DATE%_%TIME%-%VCSVERSION%"
+)
+%INNO_SETUP% %INNO_SETUP_APPVERSION% /OOutput %INNO_SETUP_OUTPUT% /DSrcDir=teraterm teraterm.iss
+
+rem (署名なし)ポータブル版のzipを作成
+%CMAKE% -E rm -rf %OUTPUT%
+%CMAKE% -E rm -rf %OUTPUT%_pdb
+%CMAKE% -E copy_directory teraterm %OUTPUT%
+%CMAKE% -E copy_directory teraterm_pdb %OUTPUT%_pdb
+%CMAKE% -E tar cf Output/%OUTPUT%.zip --format=zip %OUTPUT%/
+%CMAKE% -E tar cf Output/%OUTPUT%_pdb.zip --format=zip %OUTPUT%_pdb/
+
+rem hash
+pushd Output
+%CMAKE% -E sha256sum %OUTPUT%.exe %OUTPUT%.zip %OUTPUT%_pdb.zip > %OUTPUT%.sha256sum
+%CMAKE% -E sha512sum %OUTPUT%.exe %OUTPUT%.zip %OUTPUT%_pdb.zip > %OUTPUT%.sha512sum
+popd
 
 endlocal

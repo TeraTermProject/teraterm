@@ -6,10 +6,7 @@ add_custom_target(
   SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/setini.pl
   )
 
-set_target_properties(
-  teraterm_ini
-  PROPERTIES FOLDER installer
-  )
+set_target_properties(teraterm_ini PROPERTIES FOLDER installer)
 
 add_custom_command(
   OUTPUT ${BINARY_DIR}/TERATERM.INI
@@ -87,35 +84,35 @@ elseif(NOT TARGET ttxssh)
     COMMAND "${CMAKE_COMMAND}" -E echo "ttxssh was not build"
   )
 else()
-  configure_file(
-    teraterm_cmake.iss.in teraterm_cmake.iss
-    NEWLINE_STYLE CRLF
-    )
-
   if (RELEASE)
-    set(ISCC_OPTION "-DSETUP_RELEASE=1")
+    list(APPEND ISCC_OPTION "/DAppVersion=${VERSION}")
+  else()
+    list(APPEND ISCC_OPTION "/DAppVersion=${VERSION}_${DATE}_${TIME}-${GITVERSION}")
   endif()
   if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "arm64")
     list(APPEND ISCC_OPTION "-DM_ARM64=1")
   elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     list(APPEND ISCC_OPTION "-DM_X64=1")
   endif()
+  add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_EXE}.exe
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_INSTALL_PREFIX}/cygterm+.tar.gz
+    COMMAND ${ISCC} ${ISCC_OPTION} /O${CMAKE_BINARY_DIR} /DOutputBaseFilename=${SETUP_EXE} /DSrcDir=${CMAKE_INSTALL_PREFIX} ${CMAKE_CURRENT_LIST_DIR}/teraterm.iss
+    COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
+    COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
   add_custom_target(
     inno_setup
     DEPENDS cygtool
-    COMMAND ${ISCC} ${ISCC_OPTION} teraterm_cmake.iss
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
+    DEPENDS ${CMAKE_BINARY_DIR}/${SETUP_EXE}.exe
     )
 endif()
-set_target_properties(
-  inno_setup
-  PROPERTIES FOLDER installer
-  )
+set_target_properties(inno_setup PROPERTIES FOLDER installer)
 
 # zip
-add_custom_target(
-  zip
-  #  COMMAND "${CMAKE_COMMAND}" --build . --target install
+add_custom_command(
+  OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_ZIP}
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXFixedWinSize.dll ${CMAKE_INSTALL_PREFIX}/_TTXFixedWinSize.dll
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXOutputBuffering.dll ${CMAKE_INSTALL_PREFIX}/_TTXOutputBuffering.dll
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXResizeWin.dll ${CMAKE_INSTALL_PREFIX}/_TTXResizeWin.dll
@@ -127,15 +124,50 @@ add_custom_target(
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXResizeWin.dll ${CMAKE_INSTALL_PREFIX}/TTXResizeWin.dll
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXShowCommandLine.dll ${CMAKE_INSTALL_PREFIX}/TTXShowCommandLine.dll
   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXtest.dll ${CMAKE_INSTALL_PREFIX}/TTXtest.dll
+  COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
+  COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
   WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-  )
+)
 
-set_target_properties(
+add_custom_target(
   zip
-  PROPERTIES FOLDER installer
-  )
+  DEPENDS ${CMAKE_BINARY_DIR}/${SETUP_ZIP}
+)
+set_target_properties(zip PROPERTIES FOLDER installer)
 
 add_subdirectory(release/lang)
 set_target_properties(lang PROPERTIES FOLDER installer)
 add_subdirectory(release/lang_utf16le)
 set_target_properties(lang_utf16le PROPERTIES FOLDER installer)
+
+# sha256sum
+add_custom_command(
+  OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
+  COMMAND ${CMAKE_COMMAND} -E sha256sum ${SETUP_EXE}.exe ${SETUP_ZIP} > ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+add_custom_target(
+  sha256sum
+  DEPENDS ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha256sum
+)
+set_target_properties(sha256sum PROPERTIES FOLDER installer)
+
+# sha512sum
+add_custom_command(
+  OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
+  COMMAND ${CMAKE_COMMAND} -E sha512sum ${SETUP_EXE}.exe ${SETUP_ZIP} > ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+add_custom_target(
+  sha512sum
+  DEPENDS ${CMAKE_BINARY_DIR}/${SETUP_EXE}.sha512sum
+)
+set_target_properties(sha512sum PROPERTIES FOLDER installer)
+
+# calc_sha
+add_custom_target(
+  calc_hash
+  DEPENDS sha256sum
+  DEPENDS sha512sum
+)
+set_target_properties(calc_hash PROPERTIES FOLDER installer)
