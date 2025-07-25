@@ -87,6 +87,13 @@
         Fixed Tera Term may stop working when Tera Term macro is executed in hidden mode and Tera Term is executed by <a href="../macro/command/connect.html">connect</a> macro command.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/607" target="_blank">issue #607</a>)
       </li>
+      <li>
+        The command line option <a href="../commandline/teraterm.html#f">/F=</a> of the Tera Term has been modified to be reflected in the plugin.<br>
+        In addition, modified it so that the <a href="../commandline/teraterm.html#f">/F=</a> option is carried over to the duplicated session created by [File] - [Duplicate Session].
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/692" target="_blank">issue #692</a>)
+        MACRO: The issue where the INI file specified with a relative path in the <a href="../macro/command/restoresetup.html">restoresetup</a> command was not recognized as a relative path from %APPDATA%\teraterm5\ has been fixed.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/706" target="_blank">issue #706</a>)
+      </li>
     </ul>
   </li>
 
@@ -101,8 +108,7 @@
       <li>upgraded TTXViewMode Plug-in to <a href="#viewmode_1.01">1.01</a>.</li>
       <li>Upgraded CygTerm+ to <a href="#cygterm_1.07_30">1.07_30</a>.</li>
       <li>Upgraded TTProxy to <a href="#ttproxy_1.0.0.27">1.0.0.27</a>.</li>
-      <li>Added <a href="#changefontsize_1.00">TTXChangeFontSize</a>.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/599" target="_blank">issue #599</a>)</li>
+      <li>Upgraded TTXRecurringCommand to <a href="#recurringcommand_1.06">1.06</a>.</li>
       <li>
         Added code signing.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/316" target="_blank">issue #316</a>)
@@ -6030,6 +6036,14 @@ SYNOPSIS:
 </ul>
 
 <h2 id="recurringcommand">TTXRecurringCommand</h2>
+<h3 id="recurringcommand_1.06">YYYY.MM.DD (Ver 1.06 not released yet)</h3>
+<ul class="history">
+  <li>
+    The issue where the relative path specified by the Tera Term command line option /F=<setup file> was not treated as a relative path from %APPDATA%\teraterm5 has been fixed.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/692" target="_blank">issue #692</a>)
+  </li>
+</ul>
+
 <h3 id="recurringcommand_1.05">2016.11.30 (Ver 1.05)</h3>
 <ul class="history">
   <li>added new configuration that carriage return can add at end of sending command.</li>

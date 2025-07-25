@@ -3555,6 +3555,34 @@ static wchar_t *GetFilePath(const wchar_t *command_line, const wchar_t *default_
 	return full_path;
 }
 
+BOOL ParseFOption(PTTSet ts) {
+	wchar_t Temp[MaxStrLen]; // ttpmacroから呼ばれることを想定しMaxStrLenサイズとする
+	wchar_t *Param, *start, *cur, *next;
+	BOOL isFopt = FALSE;
+
+	/* the first term shuld be executable filename of Tera Term */
+	Param = _wcsdup(GetCommandLineW());
+	start = GetParam(Temp, _countof(Temp), Param);
+
+	cur = start;
+	while ((next = GetParam(Temp, _countof(Temp), cur))) {
+		DequoteParam(Temp, _countof(Temp), Temp);
+		if (_wcsnicmp(Temp, L"/F=", 3) == 0) {	/* setup filename */
+			isFopt = TRUE;
+			wchar_t *f = GetFilePath(&Temp[3], ts->HomeDirW, L".INI");
+			if (f != NULL && _wcsicmp(ts->SetupFNameW, f) != 0) {
+				free(ts->SetupFNameW);
+				ts->SetupFNameW = f;
+				WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
+			}
+			break;
+		}
+		cur = next;
+	}
+	free(Param);
+	return isFopt;
+}
+
 void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 {
 	int pos, c;
@@ -3596,6 +3624,7 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 				WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
 				_ReadIniFile(ts->SetupFNameW, ts);
 			}
+			break;
 		}
 		cur = next;
 	}
