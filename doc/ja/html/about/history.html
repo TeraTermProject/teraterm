@@ -43,36 +43,20 @@
   <li>バグ修正
     <ul>
       <li>
-        ディスプレイの拡大率100%(96DPI)以外の環境でVTウインドウに漢字を入力する際、変換中のフォントサイズと確定後のフォントサイズが一致しない不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/525" target="_blank">issue #525</a>)
-      <li>
-        [Additional settings]-[<a href="../menu/setup-additional-ctrlseq.html">Control Sequence</a>] タブの "Beep" プルダウンに設定値が反映されない問題を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/529" target="_blank">issue #529</a>)
-      </li>
-      <li>
         マウスで文字を選択するとき、文字の左右を考慮するよう修正した。
         Tera Term 5.1以前の動作となった。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/468" target="_blank">issue #468</a>)
-      <li>VTウインドウの<a href="../menu/setup-additional-font.html">フォント選択</a>に下記の修正を行った。(<a href="https://github.com/TeraTermProject/teraterm/issues/335">issue #335</a>)
-        <ul>
-          <li>フォント選択ダイアログで選択したポイントサイズと画面に表示される文字のポイントサイズが一致するよう修正した。</li>
-          <li>画面の解像度が96DPI以外の場合でも、フォント選択ダイアログで選択したポイントサイズが96DPIの場合の値と同じになるよう修正した。</li>
-        </ul>
       </li>
       <li>
-        DPI が異なるディスプレイをまたいでウインドウを移動またはリサイズした際、ウインドウが正しいサイズで表示されない不具合を修正した。
+        ディスプレイの拡大率100%(96DPI)以外の環境でVTウィンドウに漢字を入力する際、変換中のフォントサイズと確定後のフォントサイズが一致しない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/525" target="_blank">issue #525</a>)
+      </li>
+      <li>
+        DPI が異なるディスプレイをまたいでウィンドウを移動またはリサイズした際、ウィンドウが正しいサイズで表示されない不具合を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/555" target="_blank">issue #555</a>)
       </li>
       <li>
-        MACRO: タスクスケジューラ経由でマクロを実行出来ない不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/196" target="_blank">issue #196</a>)
-      </li>
-      <li>
-        ダイアログフォント変更してログダイアログを開くと、ログダイアログのフォントが変更されていない不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/590" target="_blank">issue #590</a>)
-      </li>
-      <li>
-        VT Window を最大化した状態でフォントサイズを変更した際の下記の不具合を修正した。
+        VTウィンドウを最大化した状態でフォントサイズを変更した際の下記の不具合を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/631" target="_blank">issue #631</a>)
         <ul>
           <li>使用中のフォントより小さいフォントサイズを選ぶと画面描画が乱れる。</li>
@@ -80,30 +64,46 @@
         </ul>
       </li>
       <li>
-        Tera Term マクロの logopen でドライブレター以外の場所に":"を使用したファイル名を指定した場合に、Tera Term がクラッシュする不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/648" target="_blank">issue #648</a>)
+        ログダイアログにダイアログフォントが反映されない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/590" target="_blank">issue #590</a>)
+      </li>
+      <li>VTウィンドウの<a href="../menu/setup-additional-font.html">フォント選択</a>に下記の修正を行った。(<a href="https://github.com/TeraTermProject/teraterm/issues/335">issue #335</a>)
+        <ul>
+          <li>フォント選択ダイアログで選択したポイントサイズと画面に表示される文字のポイントサイズが一致するよう修正した。</li>
+          <li>画面の解像度が96DPI以外の場合でも、フォント選択ダイアログで選択したポイントサイズが96DPIの場合の値と同じになるよう修正した。</li>
+        </ul>
+      </li>
+      <li>
+        [Additional settings]-[<a href="../menu/setup-additional-ctrlseq.html">Control Sequence</a>] タブの "Beep" プルダウンに設定値が反映されない問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/529" target="_blank">issue #529</a>)
+      </li>
+      <li>
+        Tera Term のコマンドラインオプション <a href="../commandline/teraterm.html#f">/F=</a> がプラグインに反映されるように修正した。<br>
+        加えて、[File]-[Duplicate session]で複製されたセッションに <a href="../commandline/teraterm.html#f">/F=</a> オプションが引き継がれるよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/692" target="_blank">issue #692</a>)
+      </li>
+      <li>
+        タスクスケジューラ経由でマクロを実行出来ない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/196" target="_blank">issue #196</a>)
       </li>
       <li>
         Tera Termマクロを非表示で実行して、<a href="../macro/command/connect.html">connect</a>マクロコマンドでTera Termを起動すると動作が停止する場合があったので修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/607" target="_blank">issue #607</a>)
       </li>
       <li>
-        Tera Term のコマンドラインオプション <a href="../commandline/teraterm.html#f">/F=</a> がプラグインに反映されるように修正した。<br>
-        加えて、[ファイル] → [セッションの複製]で複製されたセッションに <a href="../commandline/teraterm.html#f">/F=</a> オプションが引き継がれるよう修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/692" target="_blank">issue #692</a>)
-        MACRO: <a href="../macro/command/restoresetup.html">restoresetup</a>コマンドで INI ファイルが相対パスで指定された場合に、%APPDATA%\teraterm5\ からの相対パスと見なされない不具合を修正した。
+        <a href="../macro/command/restoresetup.html">restoresetup</a>マクロコマンドで INI ファイルが相対パスで指定された場合に、%APPDATA%\teraterm5\ からの相対パスと見なされない不具合を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/706" target="_blank">issue #706</a>)
+      </li>
+      <li>
+        <a href="../macro/command/logopen.html">logopen</a>マクロコマンドでドライブレター以外の場所に":"を使用したファイル名を指定した場合に、Tera Term がクラッシュする不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/648" target="_blank">issue #648</a>)
       </li>
     </ul>
   </li>
 
   <li>その他
     <ul>
-      <li><a href="#ttssh_3.5.0">TTSSH(3.5.0)</a>へ差し替えた。</li>
-      <li>
-        インストーラ: Tera Term がプロトコルや拡張子の「既定のアプリ」の候補に出てくるようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/471" target="_blank">issue #471</a>)
-      </li>
+      <li><a href="#ttssh_3.4.1">TTSSH(3.4.1)</a>へ差し替えた。</li>
       <li><a href="#ttyrec_1.06">TTXttyrec Plugin(1.06)</a>へ差し替えた。</li>
       <li><a href="#viewmode_1.01">TTXViewMode Plugin(1.01)</a>へ差し替えた。</li>
       <li><a href="#cygterm_1.07_30">CygTerm+ 1.07_30</a>へ差し替えた。</li>
@@ -112,6 +112,10 @@
       <li>
         コード署名を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/316" target="_blank">issue #316</a>)
+      </li>
+      <li>
+        インストーラ: Tera Term がプロトコルや拡張子の「既定のアプリ」の候補に出てくるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/471" target="_blank">issue #471</a>)
       </li>
     </ul>
   </li>
