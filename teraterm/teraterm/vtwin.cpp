@@ -2083,7 +2083,8 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 			break;
 		case DROP_TYPE_SEND_FILE: {
 			const BOOL binary = data->TransBin ? TRUE : FALSE;
-			SendMemSendFile2(FileName, binary, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0, ts.LocalEcho, DropSendCallback, data);
+			SendMemSendFile2(FileName, binary, (SendMemDelayType)ts.SendfileDelayType, ts.SendfileDelayTick,
+							 ts.SendfileSize, ts.LocalEcho, DropSendCallback, data);
 			break;
 		}
 		case DROP_TYPE_PASTE_FILENAME:
