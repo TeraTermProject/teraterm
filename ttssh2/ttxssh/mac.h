@@ -57,6 +57,8 @@ typedef enum {
 	HMAC_MAX = HMAC_UNKNOWN,
 } mac_algorithm;
 
+struct Mac;
+
 char* get_ssh2_mac_name(const struct ssh2_mac_t *mac);
 char* get_ssh2_mac_name_by_id(mac_algorithm id);
 // const EVP_MD* get_ssh2_mac_EVP_MD(const struct SSH2Mac *mac);
