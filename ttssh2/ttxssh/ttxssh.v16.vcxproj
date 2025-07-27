@@ -82,7 +82,7 @@
     <Link>
       <AdditionalDependencies>common_static.lib;ws2_32.lib;crypto.lib;Bcrypt.lib;zlibstaticd.lib;ttpcmn.lib;dnsapi.lib;comctl32.lib;setupapi.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\crypto\Debug;$(SolutionDir)..\libs\zlib\build\$(Platform)\$(Configuration);$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\build\$(Platform)\crypto\$(Configuration);$(SolutionDir)..\libs\zlib\build\$(Platform)\$(Configuration);$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
       <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -126,7 +126,7 @@
     <Link>
       <AdditionalDependencies>common_static.lib;ws2_32.lib;crypto.lib;Bcrypt.lib;zlibstatic.lib;ttpcmn.lib;dnsapi.lib;comctl32.lib;setupapi.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\crypto\Release;$(SolutionDir)..\libs\zlib\build\$(Platform)\$(Configuration);$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\build\$(Platform)\crypto\$(Configuration);$(SolutionDir)..\libs\zlib\build\$(Platform)\$(Configuration);$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
       <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
