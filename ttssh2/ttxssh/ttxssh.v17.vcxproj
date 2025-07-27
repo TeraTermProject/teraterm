@@ -62,7 +62,7 @@
     <ClCompile>
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\libressl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)libsshagentc;$(SolutionDir)argon2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\libressl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\libs\zlib\build\$(Platform);$(SolutionDir)matcher;$(SolutionDir)libsshagentc;$(SolutionDir)argon2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRTDBG_MAP_ALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -80,9 +80,9 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>common_static.lib;ws2_32.lib;crypto.lib;Bcrypt.lib;zlibd.lib;ttpcmn.lib;dnsapi.lib;comctl32.lib;setupapi.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;ws2_32.lib;crypto.lib;Bcrypt.lib;zlibstaticd.lib;ttpcmn.lib;dnsapi.lib;comctl32.lib;setupapi.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\crypto\Debug;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\crypto\Debug;$(SolutionDir)..\libs\zlib\build\$(Platform)\$(Configuration);$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
       <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -107,7 +107,7 @@
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\libressl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)libsshagentc;$(SolutionDir)argon2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\libressl\include;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\libs\zlib\build\$(Platform);$(SolutionDir)matcher;$(SolutionDir)libsshagentc;$(SolutionDir)argon2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -124,9 +124,9 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>common_static.lib;ws2_32.lib;crypto.lib;Bcrypt.lib;zlib.lib;ttpcmn.lib;dnsapi.lib;comctl32.lib;setupapi.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;ws2_32.lib;crypto.lib;Bcrypt.lib;zlibstatic.lib;ttpcmn.lib;dnsapi.lib;comctl32.lib;setupapi.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\crypto\Release;$(SolutionDir)..\libs\zlib;$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\crypto\Release;$(SolutionDir)..\libs\zlib\build\$(Platform)\$(Configuration);$(SolutionDir)..\teraterm\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
       <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
