@@ -1,11 +1,9 @@
-rem LibreSSLのビルド
+rem Build LibreSSL
 
-cd libressl
-
-
-if exist "CMakeCache.txt" goto end
+pushd libressl
 
 
+rem Find Visual Studio
 if not "%VSINSTALLDIR%" == "" goto vsinstdir
 
 :check_2019
@@ -25,7 +23,7 @@ echo "Can't find Visual Studio"
 goto fail
 
 :vsinstdir
-rem Visual Studioのバージョン判別
+rem Check Visual Studio version
 set VSCMNDIR="%VSINSTALLDIR%\Common7\Tools\"
 set VSCMNDIR=%VSCMNDIR:\\=\%
 
@@ -35,34 +33,30 @@ if /I %VSCMNDIR% EQU "%VS170COMNTOOLS%" goto vs2022
 echo Unknown Visual Studio version
 goto fail
 
+
+rem Generate Makefile
 :vs2019
-set CMAKE_PARAMETER=-G "Visual Studio 16 2019" -A Win32
-goto vsend
+set CMAKE_PARAMETER=-G "Visual Studio 16 2019" -A Win32 -B build\Win32
+goto gen_end
 
 :vs2022
-set CMAKE_PARAMETER=-G "Visual Studio 17 2022" -A Win32
-goto vsend
+set CMAKE_PARAMETER=-G "Visual Studio 17 2022" -A Win32 -B build\Win32
+goto gen_end
 
-:vsend
+:gen_end
 
-set CMAKE=cmake
-rem set CMAKE="C:\Program Files\CMake\bin\cmake"
-rem set CMAKE="%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake"
-
-%CMAKE% -DMSVC=on -DUSE_STATIC_MSVC_RUNTIMES=on %CMAKE_PARAMETER%
-
-devenv /build Debug LibreSSL.sln /project crypto /projectconfig Debug
-
-devenv /build Release LibreSSL.sln /project crypto /projectconfig Release
+cmake -DMSVC=on -DUSE_STATIC_MSVC_RUNTIMES=on %CMAKE_PARAMETER%
+cmake --build build\Win32 --target crypto --config Debug
+cmake --build build\Win32 --target crypto --config Release
 
 
 :end
-cd ..
+popd
 exit /b 0
 
 
 :fail
-cd ..
-echo "buildlibressl.bat を終了します"
+popd
+echo "buildlibressl.bat failed"
 @echo on
 exit /b 1
