@@ -1,42 +1,54 @@
+rem Build SFMT
+
+pushd SFMT
+
+
 SET filename=SFMT_version_for_teraterm.h
 
-cd SFMT
 
-if exist "Makefile.msc.release" goto end_mk_release
-echo CFLAGS = /MT /O2 /nologo> Makefile.msc.release
-echo;>> Makefile.msc.release
-echo SFMT.lib: SFMT.c>> Makefile.msc.release
-echo 	cl $(CFLAGS) /c SFMT.c>> Makefile.msc.release
-echo 	lib /out:SFMT.lib SFMT.obj>> Makefile.msc.release
-echo;>> Makefile.msc.release
-echo clean:>> Makefile.msc.release
-echo 	del *.lib *.obj>> Makefile.msc.release
-:end_mk_release
+rem Generate Makefile
+SET SFMT_MAKEFILE=Makefile.msc.Win32.debug
+SET SFMT_OUTDIR=build\Win32\Debug
 
-if exist "Makefile.msc.debug" goto end_mk_debug
-echo CFLAGS = /MTd /Od /nologo> Makefile.msc.debug
-echo;>> Makefile.msc.debug
-echo SFMTd.lib: SFMT.c>> Makefile.msc.debug
-echo 	cl $(CFLAGS) /c SFMT.c>> Makefile.msc.debug
-echo 	lib /out:SFMTd.lib SFMT.obj>> Makefile.msc.debug
-echo;>> Makefile.msc.debug
-echo clean:>> Makefile.msc.debug
-echo 	del *.lib *.obj>> Makefile.msc.debug
-:end_mk_debug
+if exist "%SFMT_MAKEFILE%" goto end_Win32_debug_gen
+echo CFLAGS = /MTd /Od /nologo> %SFMT_MAKEFILE%
+echo;>> %SFMT_MAKEFILE%
+echo %SFMT_OUTDIR%\SFMTd.lib: SFMT.c>> %SFMT_MAKEFILE%
+echo 	cl $(CFLAGS) /Fo%SFMT_OUTDIR%\SFMT.obj /c SFMT.c>> %SFMT_MAKEFILE%
+echo 	lib /out:%SFMT_OUTDIR%\SFMTd.lib %SFMT_OUTDIR%\SFMT.obj>> %SFMT_MAKEFILE%
 
-nmake /f Makefile.msc.debug
-nmake /f Makefile.msc.release
+:end_Win32_debug_gen
 
-rem バージョンファイルがなければ作る
+IF NOT EXIST %SFMT_OUTDIR% MKDIR %SFMT_OUTDIR%
+nmake /f Makefile.msc.Win32.debug
+
+
+SET SFMT_MAKEFILE=Makefile.msc.Win32.release
+SET SFMT_OUTDIR=build\Win32\Release
+
+if exist "%SFMT_MAKEFILE%" goto end_Win32_release_gen
+echo CFLAGS = /MT /O2 /nologo> %SFMT_MAKEFILE%
+echo;>> %SFMT_MAKEFILE%
+echo %SFMT_OUTDIR%\SFMT.lib: SFMT.c>> %SFMT_MAKEFILE%
+echo 	cl $(CFLAGS) /Fo%SFMT_OUTDIR%\SFMT.obj /c SFMT.c>> %SFMT_MAKEFILE%
+echo 	lib /out:%SFMT_OUTDIR%\SFMT.lib %SFMT_OUTDIR%\SFMT.obj>> %SFMT_MAKEFILE%
+
+:end_Win32_release_gen
+
+IF NOT EXIST %SFMT_OUTDIR% MKDIR %SFMT_OUTDIR%
+nmake /f Makefile.msc.Win32.release
+
+
+rem Create version file
 IF EXIST %filename% (GOTO FILE_TRUE) ELSE GOTO FILE_FALSE
 :FILE_TRUE
-ECHO "バージョンファイルが見つかりました"
+ECHO "Found file: %filename%"
 GOTO END
 
 :FILE_FALSE
-ECHO "バージョンファイルが見つからないので新規作成します"
-echo #define SFMT_VERSION "Unknown" > %filename%
+ECHO "%filename% file was not fould. Generating it."
+echo #define SFMT_VERSION "Unknown"> %filename%
 GOTO END
 
 :END
-cd ..
+popd

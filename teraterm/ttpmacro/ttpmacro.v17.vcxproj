@@ -85,7 +85,7 @@
     <Link>
       <AdditionalDependencies>common_static.lib;crypto.lib;LIBCMT.lib;onig.lib;SFMT.lib;Comctl32.lib;ws2_32.lib;imagehlp.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\build\$(Platform)\crypto\$(Configuration);$(SolutionDir)..\libs\oniguruma\build\$(Platform)\$(Configuration);$(SolutionDir)..\libs\SFMT;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\build\$(Platform)\crypto\$(Configuration);$(SolutionDir)..\libs\oniguruma\build\$(Platform)\$(Configuration);$(SolutionDir)..\libs\SFMT\build\$(Platform)\$(Configuration);$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -121,7 +121,7 @@
     <Link>
       <AdditionalDependencies>common_static.lib;crypto.lib;LIBCMTD.lib;onig.lib;SFMTd.lib;Comctl32.lib;ws2_32.lib;imagehlp.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\build\$(Platform)\crypto\$(Configuration);$(SolutionDir)..\libs\oniguruma\build\$(Platform)\$(Configuration);$(SolutionDir)..\libs\SFMT;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\libressl\build\$(Platform)\crypto\$(Configuration);$(SolutionDir)..\libs\oniguruma\build\$(Platform)\$(Configuration);$(SolutionDir)..\libs\SFMT\build\$(Platform)\$(Configuration);$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
