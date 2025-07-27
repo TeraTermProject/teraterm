@@ -12,7 +12,9 @@ use strict;
 use warnings;
 use utf8;
 use Cwd;
-use Getopt::Long
+use Getopt::Long;
+use Encode;
+use Encode::Guess;
 
 binmode STDOUT, ":utf8";
 
@@ -32,6 +34,39 @@ do_main($ARGV[0], $ARGV[1]);
 
 close $OUT;
 exit(0);
+
+sub detect_encoding {
+	my $filename = shift;
+	open(my $fp, '<:raw', $filename) or return undef;
+	local $/;
+	my $data = <$fp>;
+	close($fp);
+
+	my $decoder = Encode::Guess->guess($data, 'shiftjis', 'utf8');
+	if (ref($decoder)) {
+		return $decoder->name;	# 例: 'shiftjis', 'utf8', 'euc-jp'
+	} else {
+		return undef;  # 判定できなかった場合
+	}
+}
+
+# 文字コードを自動判定して、ファイルをオープンする
+sub open_auto {
+	my $filename = $_[0];
+	my $enc = detect_encoding($filename);
+	if ($verbose != 0) {
+		print "read '$filename' $enc\n";
+	}
+	my $FP;
+	if (($enc eq 'shiftjis') || ($enc eq 'ascii')) {
+		open($FP, "<:crlf:encoding(sjis)", "$filename") || return;
+	} elsif ($enc eq 'utf8') {
+		open($FP, "<:crlf:encoding(utf8)", "$filename") || return;
+	} else {
+		die "bad encode '$filename' $enc\n";
+	}
+	return $FP;
+}
 
 sub do_main {
 	my($path, $body) = @_;
@@ -90,9 +125,13 @@ sub get_title {
 	my $title = "";
 	my($line, $no, $val);
 
-	open(FP, "<:crlf:encoding(sjis)", "$filename") || return;
+	my $FP = open_auto($filename);
 	$no = 1;
-	while ($line = <FP>) {
+	while(1) {
+		$line = <$FP>;
+		if (!defined($line)) {
+			last;  # EOFチェック
+		};
 #		$line = chomp($line);
 #		print "$line\n";
 		if ($line =~ /<TITLE>(.+)<\/TITLE>/i) {
@@ -106,7 +145,7 @@ sub get_title {
 
 		$no++;
 	}
-	close(FP);
+	close($FP);
 
 	return $title;
 }
@@ -140,5 +179,8 @@ sub write_add_index {
 <param name="Local" value="$filename">
 </OBJECT>
 EOD
+	if ($verbose != 0) {
+		print "$title\r\n";
+	}
 
 }
