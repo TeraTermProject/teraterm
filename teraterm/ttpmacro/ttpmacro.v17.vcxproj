@@ -83,9 +83,9 @@
       <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>common_static.lib;$(SolutionDir)..\libs\libressl\crypto\$(Configuration)\crypto.lib;LIBCMT.lib;onig_s.lib;SFMT.lib;Comctl32.lib;ws2_32.lib;imagehlp.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;$(SolutionDir)..\libs\libressl\crypto\$(Configuration)\crypto.lib;LIBCMT.lib;onig.lib;SFMT.lib;Comctl32.lib;ws2_32.lib;imagehlp.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\build\$(Platform)\$(Configuration);$(SolutionDir)..\libs\SFMT;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -119,9 +119,9 @@
       <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>common_static.lib;$(SolutionDir)..\libs\libressl\crypto\$(Configuration)\crypto.lib;LIBCMTD.lib;onig_sd.lib;SFMTd.lib;Comctl32.lib;ws2_32.lib;imagehlp.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;$(SolutionDir)..\libs\libressl\crypto\$(Configuration)\crypto.lib;LIBCMTD.lib;onig.lib;SFMTd.lib;Comctl32.lib;ws2_32.lib;imagehlp.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\build\$(Platform)\$(Configuration);$(SolutionDir)..\libs\SFMT;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs>user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>

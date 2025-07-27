@@ -1,32 +1,63 @@
-pushd oniguruma\src
+rem Build oniguruma
 
-SET ONIG_DIR=.
-SET BUILD_DIR=.
+pushd oniguruma
 
-if not exist "%ONIG_DIR%\Makefile" goto mkmf
-for %%F in (Makefile) do set mftime=%%~tF
-for %%F in (..\..\buildoniguruma6.bat) do set battime=%%~tF
-if "%battime%" leq "%mftime%" goto build
 
-del %ONIG_DIR%\onig_sd.lib
-nmake -f %ONIG_DIR%\Makefile clean
+rem Find Visual Studio
+if not "%VSINSTALLDIR%" == "" goto vsinstdir
 
-:mkmf
-copy %ONIG_DIR%\config.h.win32 %ONIG_DIR%\config.h
-perl -e "open(IN,'%ONIG_DIR%\Makefile.windows');while(<IN>){s|CFLAGS =|CFLAGS = /MT|;print $_;}close(IN);" > %ONIG_DIR%\Makefile
-perl -e "open(IN,'%ONIG_DIR%\Makefile.windows');while(<IN>){s|CFLAGS = -O2|CFLAGS = /MTd -Od|;s|_s.lib|_sd.lib|;print $_;}close(IN);" > %ONIG_DIR%\Makefile.debug
+:check_2019
+if "%VS160COMNTOOLS%" == "" goto check_2022
+if not exist "%VS160COMNTOOLS%\VsDevCmd.bat" goto check_2022
+call "%VS160COMNTOOLS%\VsDevCmd.bat"
+goto vs2019
 
-:build
-if exist "%ONIG_DIR%\onig_sd.lib" goto build_release
-nmake -f %ONIG_DIR%\Makefile.debug clean
-nmake -f %ONIG_DIR%\Makefile.debug
-move %ONIG_DIR%\onig_sd.lib %ONIG_DIR%\..\sample\
-nmake -f %ONIG_DIR%\Makefile.debug clean
-move %ONIG_DIR%\..\sample\onig_sd.lib %ONIG_DIR%
+:check_2022
+if "%VS170COMNTOOLS%" == "" goto novs
+if not exist "%VS170COMNTOOLS%\VsDevCmd.bat" goto novs
+call "%VS170COMNTOOLS%\VsDevCmd.bat"
+goto vs2022
 
-:build_release
-if exist "%ONIG_DIR%\onig_s.lib" goto end
-nmake -f %ONIG_DIR%\Makefile
+:novs
+echo "Can't find Visual Studio"
+goto fail
+
+:vsinstdir
+rem Check Visual Studio version
+set VSCMNDIR="%VSINSTALLDIR%\Common7\Tools\"
+set VSCMNDIR=%VSCMNDIR:\\=\%
+
+if /I %VSCMNDIR% EQU "%VS160COMNTOOLS%" goto vs2019
+if /I %VSCMNDIR% EQU "%VS170COMNTOOLS%" goto vs2022
+
+echo Unknown Visual Studio version
+goto fail
+
+
+rem Generate Makefile
+:vs2019
+cmake -G "Visual Studio 16 2019" -A Win32 -DBUILD_SHARED_LIBS=OFF -DMSVC_STATIC_RUNTIME=ON -S . -B build\Win32
+goto gen_end
+
+:vs2022
+cmake -G "Visual Studio 17 2022" -A Win32 -DBUILD_SHARED_LIBS=OFF -DMSVC_STATIC_RUNTIME=ON -S . -B build\Win32
+goto gen_end
+
+:gen_end
+
+
+rem Build
+cmake --build build\Win32 --target onig --config Debug
+cmake --build build\Win32 --target onig --config Release
+
 
 :end
 popd
+exit /b 0
+
+
+:fail
+popd
+echo "buildoniguruma6.bat failed"
+@echo on
+exit /b 1
