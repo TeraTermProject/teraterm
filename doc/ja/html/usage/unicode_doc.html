@@ -1,0 +1,303 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<TITLE>Unicode</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+
+
+<BODY>
+
+<p>Unicodeの実装について。 <a
+href="https://github.com/TeraTermProject/teraterm/wiki/TODO-Unicode">wiki</a>から移動。</p>
+<p>markdownからhtmlへの変換</p>
+<pre><code>pandoc unicode_doc.md -t html -o unicode_doc.html</code></pre>
+<h3 id="unicode内部文字コード">Unicode(内部文字コード)</h3>
+<p>Tera Termが認識するUnicode仕様について。</p>
+<p>Tera Term内部では認識しますが、
+Windowsのバージョンや使用フォントによって実際の表示は変化します。
+(カラー絵文字は未サポートです)</p>
+<ul>
+<li>2cell(全角)の行末処理
+<ul>
+<li>2cellより大きな文字の行末処理は未テスト</li>
+</ul></li>
+<li>各文字の文字幅
+<ul>
+<li>“A”(U+0041)は1cell、“あ”(U+3042)は2cellなど、各文字ごとに文字幅が異なっている</li>
+<li>Unicodeの仕様を元にしている
+<ul>
+<li><a
+href="http://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt">EastAsianWidth.txt</a></li>
+<li>Ambiguous character
+<ul>
+<li>場合によって文字幅が変化する文字</li>
+<li>文字幅の設定可</li>
+</ul></li>
+</ul></li>
+<li>絵文字
+<ul>
+<li>文字幅設定可</li>
+<li>絵文字幅上書き設定OFF時
+<ul>
+<li>Unicode文字幅</li>
+</ul></li>
+<li>絵文字幅上書き設定ON時
+<ul>
+<li><a
+href="https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt">emoji-data.txt</a>
+をもとに絵文字を判定</li>
+<li>設定が2cell設定の時
+<ul>
+<li>すべてを2cellとして扱う</li>
+</ul></li>
+<li>1cell設定時
+<ul>
+<li>U+1f000未満は1cell</li>
+<li>U+1f000以上は2cell</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>結合文字
+<ul>
+<li><a
+href="https://www.unicode.org/Public/UCD/latest/ucd/UnicodeData.txt">UnicodeData.txt</a>をもとに決定</li>
+<li>Bengali, Khmer, Tibetan など</li>
+</ul></li>
+<li>VariationSelector(異体字セレクタ)
+<ul>
+<li>U+FE00…FE0F VARIATION SELECTOR-1…16
+<ul>
+<li>U+FE0E VARIATION SELECTOR-15 (TPVS)
+<ul>
+<li>テキストスタイル</li>
+</ul></li>
+<li>U+FE0F VARIATION SELECTOR-16 (EPVS)
+<ul>
+<li>絵文字スタイル</li>
+</ul></li>
+</ul></li>
+<li>U+E0100…E01EF VARIATION SELECTOR-17…256
+<ul>
+<li>17番以降は漢字の異体字用</li>
+</ul></li>
+</ul></li>
+<li>EMOJI MODIFIER
+<ul>
+<li>U+1F3FB EMOJI MODIFIER FITZPATRICK TYPE-1-2</li>
+<li>U+1F3FC…F EMOJI MODIFIER FITZPATRICK TYPE-3…6</li>
+</ul></li>
+<li>Zero Width Joiner(ZWJ,ゼロ幅接合子)
+<ul>
+<li>U+200D</li>
+</ul></li>
+<li>Zero Width non-joiner(ZWNJ, ゼロ幅非接合子)
+<ul>
+<li>U+200C</li>
+</ul></li>
+</ul>
+<h4 id="例結合文字">例/結合文字</h4>
+<pre><code>$ echo -e &#39;\U0061\U0041&#39;
+aA
+$ echo -e &#39;\U0061\U0302\U0041\U0302&#39;
+âÂ
+$ echo -e &#39;\U037B&#39;
+ほ
+$ echo -e &#39;\U037B\309A&#39;
+ぽ
+$ echo -e &#39;\U0938\U094d\U0924\U0947&#39;
+स्ते
+$ echo -e &#39;\U0ab8\U0acd\U0aa4\U0ac7&#39;
+સ્તે</code></pre>
+<h4 id="例漢字異体字">例/漢字異体字</h4>
+<pre><code>$ echo -e &#39;\u845B&#39;
+葛
+$ echo -e &#39;\u845B\UE0100&#39;
+葛󠄀
+$ echo -e &#39;\u845B\UE0101&#39;
+葛󠄁</code></pre>
+<h4
+id="例絵文字スタイルpresentation-style">例/絵文字スタイル(presentation
+style)</h4>
+<p>未指定時はシステムによって異なります。
+(カラー絵文字の描画は未サポートです)</p>
+<pre><code>$ echo -e &#39;\U1F308&#39;
+🌈
+$ echo -e &#39;\U1F308\UFE0E&#39;
+🌈︎
+$ echo -e &#39;\U1F308\UFE0F&#39;
+🌈️</code></pre>
+<h4 id="例emoji-modifier">例/EMOJI MODIFIER</h4>
+<p>色が変化します。 (カラー絵文字の描画は未サポートです)</p>
+<pre><code>$ echo -e &#39;\U1F476&#39;
+👶
+$ echo -e &#39;\U1F476\U1F3FB&#39;
+👶🏻
+$ echo -e &#39;\U1F476\U1F3FC&#39;
+👶🏼
+$ echo -e &#39;\U1F476\U1F3FD&#39;
+👶🏽
+$ echo -e &#39;\U1F476\U1F3FE&#39;
+👶🏾
+$ echo -e &#39;\U1F476\U1F3FF&#39;
+👶🏿</code></pre>
+<h4 id="例zero-width-joiner">例/Zero Width Joiner</h4>
+<pre><code>$ echo -e &#39;\U1F468\U200D\U1F469\U200D\U1F466\U200D\U1F467&#39;
+👨‍👩‍👦‍👧</code></pre>
+<h3 id="画面描画">画面描画</h3>
+<ul>
+<li>WindowsのAPIを使用して描画を行う
+<ul>
+<li>独自の描画は行っていない</li>
+<li>Windowsのバージョン,使用フォントによって結果が異なる</li>
+<li>使用するフォントファイルによって結果が異なる</li>
+</ul></li>
+<li>Unicode系APIと非Unicode系APIのどちらでも利用可能
+<ul>
+<li>設定で選択可
+<ul>
+<li>9x系でなければ通常はUnicode系APIを使用する</li>
+<li>ExtTextOutW() 又は ExtTextOutA()</li>
+</ul></li>
+<li>9x系のExtTextOutW() について
+<ul>
+<li>存在するが動作がNT系と異なるようだ
+<ul>
+<li><a href="http://seclan.dll.jp/dtdiary/2010/dt20100310.htm">seclan
+のほえほえルーム</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>カラー絵文字 未実装
+<ul>
+<li>DirectWrite というDirect Xの機能を使う</li>
+<li>Windows8以降のサポートとなる</li>
+</ul></li>
+</ul>
+<h3 id="表示機能">表示,機能</h3>
+<p>Unicode化されている機能</p>
+<ul>
+<li>ダイアログ、メニュなどの文字表示</li>
+<li>URL
+<ul>
+<li>強調表示</li>
+<li>クリッカブルURL
+<ul>
+<li>クリックでブラウザなど実行</li>
+<li>アルファベットのみ、漢字などを使ったURLは認識しない</li>
+</ul></li>
+</ul></li>
+<li>クリップボード
+<ul>
+<li>クリップボードへセット
+<ul>
+<li><a
+href="https://docs.microsoft.com/en-us/windows/win32/dataxchg/clipboard-formats">Synthesized
+Clipboard Formats</a>を利用</li>
+</ul></li>
+<li>クリップボードからゲット</li>
+<li>9x系でのサポートがどうなっているか未検証</li>
+</ul></li>
+<li>ファイルドロップ
+<ul>
+<li>ファイル名のペースト</li>
+<li>ファイルの送信
+<ul>
+<li>バイナリ</li>
+<li>テキスト</li>
+<li>ファイルの文字コードの自動判定</li>
+<li><a
+href="https://teratermproject.github.io/manual/5/ja/macro/syntax/file.html">ttlファイルのエンコード</a>のファイル読み込みと同じ</li>
+</ul></li>
+<li>scp
+<ul>
+<li>ファイル名は UTF-8でホストに送る</li>
+</ul></li>
+</ul></li>
+<li>ファイル送信
+<ul>
+<li>バイナリ</li>
+<li>テキスト
+<ul>
+<li>ファイルの文字コードの判定</li>
+<li><a
+href="https://teratermproject.github.io/manual/5/ja/macro/syntax/file.html">ttlファイルのエンコード</a>のファイル読み込みと同じ</li>
+</ul></li>
+</ul></li>
+<li>ファイル転送
+<ul>
+<li>ローカルのファイル名は Unicodeに対応</li>
+<li>送信するファイル名は ANSIで送る(UTF-8/ANSI切り替えUIがほしい)</li>
+</ul></li>
+<li>ファイル受信(ログ)
+<ul>
+<li>文字コード選択できるUIを追加</li>
+</ul></li>
+<li>印字
+<ul>
+<li>[ファイル]/[印刷] Unicode対応</li>
+<li>エスケープシーケンスによる印刷
+<ul>
+<li>印刷
+<ul>
+<li>(△) 難しそう、ANSIで実装しておく</li>
+</ul></li>
+<li>パススルー印字
+<ul>
+<li>文字コードを何で送るか設定が必要</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>ttxsshのduplicate session</li>
+<li>パス、ファイル名など
+<ul>
+<li>設定ファイル(iniファイル)のデフォルト保存場所のファイル名など</li>
+</ul></li>
+<li>iniファイルのパースなど</li>
+</ul>
+<h3 id="plugin">plugin</h3>
+<ul>
+<li>作業中…</li>
+<li>Tera Term 4 以前とのバイナリ互換性は失われる</li>
+<li>新しい機能は入れず、なるべく変更なくソース再コンパイル(ソース互換)で使えるようにする方針</li>
+</ul>
+<h3 id="追加設定">追加設定</h3>
+<ul>
+<li>Debug設定
+<ul>
+<li>文字情報ポップアップ
+<ul>
+<li>on/off</li>
+<li>キー設定</li>
+</ul></li>
+</ul></li>
+</ul>
+<h3 id="x対応">9x対応</h3>
+<ul>
+<li>最新OSで動作することを優先、低プライオリティで対応</li>
+<li>非Unicode系APIしかない場合は、Unicode
+APIの動作を内部でエミュレートする
+<ul>
+<li>ある程度は9xでも動作</li>
+</ul></li>
+<li>ツール/ライブラリ/OSの対応
+<ul>
+<li>古いOSで動作させるためには古いツールセットを使用する必要がある</li>
+<li>新しいバージョンのライブラリは古いツールセットではビルドできないことがある</li>
+<li>新しいバージョンのライブラリは古いOSでは利用できないことがある</li>
+</ul></li>
+</ul>
+<h3 id="実装未検討">実装未検討</h3>
+<ul>
+<li>左横書き
+<ul>
+<li>アラビア語など</li>
+</ul></li>
+</ul>
+
+</BODY>
+</HTML>

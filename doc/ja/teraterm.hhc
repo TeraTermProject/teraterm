@@ -139,6 +139,11 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Unicode">
+			<param name="Local" value="html\usage\unicode_doc.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="look and feel�̕ύX">
 			<param name="Local" value="html\usage\transparent.html">
 			<param name="ImageNumber" value="11">
