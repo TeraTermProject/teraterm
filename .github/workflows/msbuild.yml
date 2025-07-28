@@ -211,7 +211,7 @@ jobs:
     #     GitHub で SIGNPATH_FORCE に 1 を設定する
     #
     - name: Change signing policy
-      if: env.GITHUB_REPOSITORY == 'TeraTermProject/teraterm'
+      if: github.repository == 'TeraTermProject/teraterm'
       run: echo "SIGNING_POLICY_SLUG=release-signing" >> $GITHUB_ENV
 
     - name: Upload artifacts for sign (tareterm_portable.zip)
