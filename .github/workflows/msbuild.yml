@@ -12,7 +12,7 @@ env:
   NOPAUSE: 1
   ORGANIZATION_ID: ${{ vars.ORGANIZATION_ID }}
   PROJECT_SLUG: teraterm
-  SIGNING_POLICY_SLUG: release-signing
+  SIGNING_POLICY_SLUG: test-signing
   SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
   SIGNPATH_SKIP: ${{ vars.SIGNPATH_SKIP }}
   SIGNPATH_FORCE: ${{ vars.SIGNPATH_FORCE }}
@@ -214,6 +214,10 @@ jobs:
     #   リリース中ではないときにコード署名したい場合
     #     GitHub で SIGNPATH_FORCE に 1 を設定する
     #
+    - name: Change signing policy
+      if: env.GITHUB_REPOSITORY == 'TeraTermProject/teraterm'
+      run: echo "SIGNING_POLICY_SLUG=release-signing" >> $GITHUB_ENV
+
     - name: Upload artifacts for sign (tareterm_portable.zip)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       id: upload-portable
