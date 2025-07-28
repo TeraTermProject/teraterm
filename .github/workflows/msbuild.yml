@@ -12,7 +12,7 @@ env:
   NOPAUSE: 1
   ORGANIZATION_ID: ${{ vars.ORGANIZATION_ID }}
   PROJECT_SLUG: teraterm
-  SIGNING_POLICY_SLUG: test-signing
+  SIGNING_POLICY_SLUG: ${{ vars.SIGNING_POLICY_SLUG }}
   SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
   SIGNPATH_SKIP: ${{ vars.SIGNPATH_SKIP }}
   SIGNPATH_FORCE: ${{ vars.SIGNPATH_FORCE }}
@@ -198,6 +198,8 @@ jobs:
     #     GitHub リポジトリの Settings > Secrets and variables > Actions > Variables > Repository variables > SIGNPATH_SKIP で設定する
     #   env.SIGNPATH_FORCE
     #     GitHub リポジトリの Settings > Secrets and variables > Actions > Variables > Repository variables > SIGNPATH_FORCE で設定する
+    #   env.SIGNING_POLICY_SLUG
+    #     GitHub リポジトリの Settings > Secrets and variables > Actions > Variables > Repository variables > SIGNING_POLICY_SLUG で設定する
     #
     #   リリース中ではないとき（通常の開発中）
     #     GitHub で SIGNPATH_SKIP, SIGNPATH_FORCE ともに設定しない
@@ -210,10 +212,6 @@ jobs:
     #   リリース中ではないときにコード署名したい場合
     #     GitHub で SIGNPATH_FORCE に 1 を設定する
     #
-    - name: Change signing policy
-      if: env.GITHUB_REPOSITORY == 'TeraTermProject/teraterm'
-      run: echo "SIGNING_POLICY_SLUG=release-signing" >> $GITHUB_ENV
-
     - name: Upload artifacts for sign (tareterm_portable.zip)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       id: upload-portable
