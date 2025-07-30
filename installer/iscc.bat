@@ -22,7 +22,7 @@ if "%RELEASE%" == "1" (
 
 rem ポータブル版をコピーして取っておく(署名に使用する)
 %CMAKE% -E rm -rf Output/portable/teraterm
-%CMAKE% -E copy_directory teraterm Output/portable/teraterm
+%CMAKE% -E copy_directory Output/build/teraterm Output/portable/teraterm
 
 
 rem (署名なし)インストーラ作成
@@ -32,15 +32,17 @@ if "%RELEASE%" == "1" (
 ) else (
     set INNO_SETUP_APPVERSION="/DAppVersion=%VERSION% %DATE%_%TIME%-%VCSVERSION%"
 )
-%INNO_SETUP% %INNO_SETUP_APPVERSION% /OOutput %INNO_SETUP_OUTPUT% /DSrcDir=teraterm teraterm.iss
+%INNO_SETUP% %INNO_SETUP_APPVERSION% /OOutput %INNO_SETUP_OUTPUT% /DSrcDir=Output\build\teraterm teraterm.iss
 
 rem (署名なし)ポータブル版のzipを作成
+pushd Output
 %CMAKE% -E rm -rf %OUTPUT%
 %CMAKE% -E rm -rf %OUTPUT%_pdb
-%CMAKE% -E copy_directory teraterm %OUTPUT%
-%CMAKE% -E copy_directory teraterm_pdb %OUTPUT%_pdb
-%CMAKE% -E tar cf Output/%OUTPUT%.zip --format=zip %OUTPUT%/
-%CMAKE% -E tar cf Output/%OUTPUT%_pdb.zip --format=zip %OUTPUT%_pdb/
+%CMAKE% -E copy_directory build\teraterm %OUTPUT%
+%CMAKE% -E copy_directory build\teraterm_pdb %OUTPUT%_pdb
+%CMAKE% -E tar cf %OUTPUT%.zip --format=zip %OUTPUT%/
+%CMAKE% -E tar cf %OUTPUT%_pdb.zip --format=zip %OUTPUT%_pdb/
+popd
 
 rem hash
 pushd Output
