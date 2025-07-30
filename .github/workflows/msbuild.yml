@@ -240,7 +240,7 @@ jobs:
       shell: bash
       run: |
         mkdir installer/Output/portable_signed
-        cp -R installer/Output/portable installer/Output/portable_signed
+        cp -R installer/Output/portable/* installer/Output/portable_signed
 
     - name: Rename portable signed zip
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
@@ -293,7 +293,7 @@ jobs:
       shell: bash
       run: |
         mkdir installer/Output/setup_signed
-        cp -R installer/Output/setup installer/Output/setup_signed
+        cp -R installer/Output/setup/* installer/Output/setup_signed
 
     - name: Rename signed setup.exe
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
