@@ -15,7 +15,7 @@ set(ISCC "${CMAKE_CURRENT_LIST_DIR}/../buildtools/innosetup6/ISCC.exe")
 #else()
 #  set(SETUP_EXE "teraterm-${VERSION}-${DATE}_${TIME}-${GITVERSION}-$ENV{USERNAME}")
 #endif()
-set(SRC_DIR "Output/setup_src/teraterm") # teraterm.iss相対
+set(SRC_DIR "Output/portable_signed/teraterm") # teraterm.iss相対
 set(SETUP_DIR "${CMAKE_CURRENT_LIST_DIR}/Output/setup")
 set(SETUP_EXE "teraterm-unsigned")
 
