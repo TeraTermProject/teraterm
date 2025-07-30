@@ -10,14 +10,14 @@ include(${CMAKE_CURRENT_LIST_DIR}/../buildtools/svnrev/build_config.cmake)
 
 set(ISCC "${CMAKE_CURRENT_LIST_DIR}/../buildtools/innosetup6/ISCC.exe")
 
-#if(RELEASE)
-#  set(SETUP_EXE "teraterm-${VERSION}")
-#else()
-#  set(SETUP_EXE "teraterm-${VERSION}-${DATE}_${TIME}-${GITVERSION}-$ENV{USERNAME}")
-#endif()
+if(RELEASE)
+  set(SETUP_EXE "teraterm-${VERSION}")
+else()
+  set(SETUP_EXE "teraterm-${VERSION}-${DATE}_${TIME}-${GITVERSION}-snapshot")
+endif()
 set(SRC_DIR "Output/portable_signed/teraterm") # teraterm.iss相対
 set(SETUP_DIR "${CMAKE_CURRENT_LIST_DIR}/Output/setup")
-set(SETUP_EXE "teraterm-unsigned")
+#set(SETUP_EXE "teraterm-unsigned")
 
 file(MAKE_DIRECTORY ${SETUP_DIR})
 execute_process(

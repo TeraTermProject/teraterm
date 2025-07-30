@@ -85,7 +85,7 @@ jobs:
       shell: bash
       run: |
         VERSION=${{ fromJson(steps.read_buildinfo.outputs.json).VERSION }}
-        DATE_TIME=${{ fromJson(steps.read_buildinfo.outputs.json).DATE }}-${{ fromJson(steps.read_buildinfo.outputs.json).TIME }}
+        DATE_TIME=${{ fromJson(steps.read_buildinfo.outputs.json).DATE }}_${{ fromJson(steps.read_buildinfo.outputs.json).TIME }}
         VCSVERSION=${{ fromJson(steps.read_buildinfo.outputs.json).GITVERSION }}
         SNAPSHOT_OUTPUT=teraterm-${VERSION}-${DATE_TIME}-${VCSVERSION}-snapshot
         RELEASE_OUTPUT=teraterm-${VERSION}
@@ -264,7 +264,7 @@ jobs:
         organization-id: '${{ env.ORGANIZATION_ID }}'
         project-slug: '${{ env.PROJECT_SLUG }}'
         signing-policy-slug: '${{ env.SIGNING_POLICY_SLUG }}'
-        artifact-configuration-slug: 'ziped_installer'
+        artifact-configuration-slug: 'zipped_installer'
         github-artifact-id: '${{steps.upload-setup.outputs.artifact-id}}'
         output-artifact-directory: 'installer/Output/setup_signed'
         wait-for-completion: true
@@ -277,16 +277,6 @@ jobs:
       run: |
         mkdir installer/Output/setup_signed
         cp -R installer/Output/setup/* installer/Output/setup_signed
-
-    - name: Rename signed setup.exe
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
-      shell: bash
-      run: |
-        OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
-        ls installer/Output/setup_signed/
-        echo mv installer/Output/setup_signed/teraterm-unsigned.exe installer/Output/setup_signed/${OUTPUT}.exe
-        mv installer/Output/setup_signed/teraterm-unsigned.exe installer/Output/setup_signed/${OUTPUT}.exe
-        ls installer/Output/setup_signed/
 
     - name: Upload artifacts (signed setup.exe)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
