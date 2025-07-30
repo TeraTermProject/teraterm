@@ -418,6 +418,8 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 
 	settings->AuthBanner = GetPrivateProfileInt("TTSSH", "AuthBanner", 3, fileName);
 
+	settings->MaxChannel = GetPrivateProfileInt("TTSSH", "MaxChannel", CHANNEL_MAX_DEFAULT, fileName);
+
 #ifdef _DEBUG
 	GetPrivateProfileStringW(L"TTSSH", L"KexKeyLogFile", L"", settings->KexKeyLogFile, _countof(settings->KexKeyLogFile), fileName);
 	if (settings->KexKeyLogFile[0] == 0) {
@@ -565,6 +567,9 @@ static void write_ssh_options(PTInstVar pvar, const wchar_t *fileName,
 
 	_itoa_s(settings->AuthBanner, buf, sizeof(buf), 10);
 	WritePrivateProfileString("TTSSH", "AuthBanner", buf, fileName);
+
+	_itoa_s(settings->MaxChannel, buf, sizeof(buf), 10);
+	WritePrivateProfileString("TTSSH", "MaxChannel", buf, fileName);
 
 #ifdef _DEBUG
 	WritePrivateProfileStringW(L"TTSSH", L"KexKeyLogFile", settings->KexKeyLogFile, fileName);
