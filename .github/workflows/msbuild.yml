@@ -242,23 +242,6 @@ jobs:
         mkdir installer/Output/portable_signed
         cp -R installer/Output/portable/* installer/Output/portable_signed
 
-    - name: Rename portable signed zip
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
-      shell: bash
-      run: |
-        OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
-        mkdir installer/Output/setup_src
-        cp -R installer/Output/portable_signed/teraterm installer/Output/setup_src/
-        mv installer/Output/portable_signed/teraterm "installer/Output/portable_signed/${OUTPUT}"
-
-    - name: Upload artifacts (portable signed zip)
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ steps.vars.outputs.OUTPUT_ZIP }}
-        path: |
-          installer/Output/portable_signed
-
     - name: Build unsigned setup.exe
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       run: |
@@ -312,6 +295,21 @@ jobs:
         name: ${{ steps.vars.outputs.OUTPUT_EXE }}
         path: |
           installer/Output/setup_signed
+
+    - name: Rename portable signed folder
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
+      shell: bash
+      run: |
+        OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
+        mv installer/Output/portable_signed/teraterm "installer/Output/portable_signed/${OUTPUT}"
+
+    - name: Upload artifacts (portable signed zip)
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.vars.outputs.OUTPUT_ZIP }}
+        path: |
+          installer/Output/portable_signed
 
     - name: Collect release files
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')

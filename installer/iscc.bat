@@ -12,8 +12,8 @@ IF NOT "%SVNVERSION%" == "unknown" (
     SET VCSVERSION=r%SVNVERSION%
 )
 
-set SNAPSHOT_OUTPUT="teraterm-%VERSION%-%DATE%_%TIME%-%VCSVERSION%-%USERNAME%-snapshot"
-set RELEASE_OUTPUT="teraterm-%VERSION%"
+set SNAPSHOT_OUTPUT=teraterm-%VERSION%-%DATE%_%TIME%-%VCSVERSION%-%USERNAME%-snapshot
+set RELEASE_OUTPUT=teraterm-%VERSION%
 if "%RELEASE%" == "1" (
     set OUTPUT=%RELEASE_OUTPUT%
 ) else (
