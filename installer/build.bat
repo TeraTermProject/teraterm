@@ -1,3 +1,9 @@
+rem architecture for VsDevCmd.bat
+if "%TARGET%" == "" (set TARGET=Win32)
+if "%TARGET%" == "Win32" (set ARCHITECTURE=x86)
+if "%TARGET%" == "x64"   (set ARCHITECTURE=x64)
+if "%TARGET%" == "ARM64" (set ARCHITECTURE=arm64)
+if "%TARGET%" == "ARM64" if "%HOST_ARCHITECTURE%" == "" (set HOST_ARCHITECTURE=amd64)
 
 if not "%VSINSTALLDIR%" == "" goto vsinstdir
 
@@ -9,13 +15,13 @@ rem goto check_2019
 :check_2022
 if "%VS170COMNTOOLS%" == "" goto check_2019
 if not exist "%VS170COMNTOOLS%\VsDevCmd.bat" goto novs
-call "%VS170COMNTOOLS%\VsDevCmd.bat"
+call "%VS170COMNTOOLS%\VsDevCmd.bat" -arch=%ARCHITECTURE% -host_arch=%HOST_ARCHITECTURE%
 goto vs2022
 
 :check_2019
 if "%VS160COMNTOOLS%" == "" goto novs
 if not exist "%VS160COMNTOOLS%\VsDevCmd.bat" goto novs
-call "%VS160COMNTOOLS%\VsDevCmd.bat"
+call "%VS160COMNTOOLS%\VsDevCmd.bat" -arch=%ARCHITECTURE% -host_arch=%HOST_ARCHITECTURE%
 goto vs2019
 
 :novs
@@ -81,19 +87,19 @@ rem リビジョンが変化していれば svnversion.h を更新する。
 call ..\buildtools\svnrev\svnrev.bat
 
 
-devenv /%BUILD% release %TERATERMSLN%
+devenv /%BUILD% "Release|%TARGET%" %TERATERMSLN%
 if ERRORLEVEL 1 goto fail
-devenv /%BUILD% release %TTSSHSLN%
+devenv /%BUILD% "Release|%TARGET%" %TTSSHSLN%
 if ERRORLEVEL 1 goto fail
-devenv /%BUILD% release %TTPROXYSLN%
+devenv /%BUILD% "Release|%TARGET%" %TTPROXYSLN%
 if ERRORLEVEL 1 goto fail
-devenv /%BUILD% release %TTXKANJISLN%
+devenv /%BUILD% "Release|%TARGET%" %TTXKANJISLN%
 if ERRORLEVEL 1 goto fail
-devenv /%BUILD% release %TTPMENUSLN%
+devenv /%BUILD% "Release|%TARGET%" %TTPMENUSLN%
 if ERRORLEVEL 1 goto fail
-devenv /%BUILD% release %TTXSAMPLESLN%
+devenv /%BUILD% "Release|%TARGET%" %TTXSAMPLESLN%
 if ERRORLEVEL 1 goto fail
-devenv /%BUILD% release %CYGWINSLN%
+devenv /%BUILD% "Release|%TARGET%" %CYGWINSLN%
 if ERRORLEVEL 1 goto fail
 
 rem cygterm をコンパイル

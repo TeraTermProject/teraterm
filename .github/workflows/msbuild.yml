@@ -25,10 +25,12 @@ jobs:
           - vs-version: '17'
             VS_VERSION: 2022
             windows: windows-2022
+            TARGET: Win32
     runs-on: ${{ matrix.windows }}
 
     env:
       VS_VERSION: ${{ matrix.VS_VERSION }}
+      TARGET: ${{ matrix.TARGET }}
 
     steps:
     - uses: actions/checkout@v4
