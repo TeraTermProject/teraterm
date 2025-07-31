@@ -804,7 +804,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		BOOL r = FileSendStart(ParamFileNameW, ParamBinaryFlag);
 #else
 		// 5 Ç≈í«â¡ÇµÇΩï˚ñ@Ç≈ëóêM
-		BOOL r = SendMemSendFile2(ParamFileNameW, ParamBinaryFlag, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0, ts.LocalEcho, SendCallback, NULL);
+		BOOL r = SendMemSendFile2(ParamFileNameW, ParamBinaryFlag, (SendMemDelayType)ts.SendfileDelayType,
+								  ts.SendfileDelayTick, ts.SendfileSize, ts.LocalEcho, SendCallback, NULL);
 #endif
 		free(ParamFileNameW);
 		if (r) {

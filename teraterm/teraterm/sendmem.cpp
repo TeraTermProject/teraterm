@@ -705,7 +705,6 @@ SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayTy
 		// ファイル名をフルパスにする
 		fullpath = GetFileDir(&ts);
 		awcscats(&fullpath, L"\\", filename, NULL);
-		free(fullpath);
 	}
 	else {
 		fullpath = _wcsdup(filename);
@@ -714,7 +713,7 @@ SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayTy
 	if (!binary) {
 		size_t str_len;
 		wchar_t *str_ptr = LoadFileWW(fullpath, &str_len);
-		assert(str_ptr != NULL);
+		assert(str_ptr != NULL); // マクロコマンド sendfile で存在しないファイルを指定した場合は、str_ptr は NULLになる。
 		if (str_ptr == NULL) {
 			sm = NULL;
 			goto finish;
@@ -730,7 +729,7 @@ SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayTy
 	else {
 		size_t data_len;
 		unsigned char *data_ptr = LoadFileBinary(fullpath, &data_len);
-		assert(data_ptr != NULL);
+		assert(data_ptr != NULL); // マクロコマンド sendfile で存在しないファイルを指定した場合は、str_ptr は NULLになる。
 		if (data_ptr == NULL) {
 			sm = NULL;
 			goto finish;
