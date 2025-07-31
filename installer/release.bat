@@ -252,16 +252,24 @@ exit
 rem ####################
 :set_vs_env
 
+rem architecture for VsDevCmd.bat
+if "%TARGET%" == "" (set TARGET=Win32)
+if "%TARGET%" == "Win32" (set ARCHITECTURE=x86)
+if "%TARGET%" == "x64"   (set ARCHITECTURE=x64)
+if "%TARGET%" == "ARM64" (set ARCHITECTURE=arm64)
+if "%TARGET%" == "ARM64" if "%HOST_ARCHITECTURE%" == "" (set HOST_ARCHITECTURE=amd64)
+
+rem libs\buildxxx.bat Ç≈ÇÕ %VSxxxCOMNTOOLS% Ç©ÇÁíTÇµÇƒÇ¢ÇÈÇ™ÅAà·Ç¢ÇÕÇ»Ç¢ÇÕÇ∏
 if exist "%VS_BASE%\Community" (
-    call "%VS_BASE%\Community\VC\Auxiliary\Build\vcvars32.bat"
+    call "%VS_BASE%\Community\Common7\Tools\VsDevCmd.bat" -arch=%ARCHITECTURE% -host_arch=%HOST_ARCHITECTURE%
     exit /b 0
 )
 if exist "%VS_BASE%\Professional" (
-    call "%VS_BASE%\Profssional\VC\Auxiliary\Build\vcvars32.bat"
+    call "%VS_BASE%\Profssional\Common7\Tools\VsDevCmd.bat" -arch=%ARCHITECTURE% -host_arch=%HOST_ARCHITECTURE%
     exit /b 0
 )
 if exist "%VS_BASE%\Enterprise" (
-    call "%VS_BASE%\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
+    call "%VS_BASE%\Enterprise\Common7\Tools\VsDevCmd.bat" -arch=%ARCHITECTURE% -host_arch=%HOST_ARCHITECTURE%
     exit /b 0
 )
 :vs_not_found

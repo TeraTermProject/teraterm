@@ -9,6 +9,8 @@ rem   - ./teraterm_pdb
 rem Ç±ÇÃäOÇ≈ set Ç≥ÇÍÇΩ RELEASE Çè„èëÇ´ÇµÇ»Ç¢ÇΩÇﬂÇ… setlocal Ç∑ÇÈ
 setlocal
 
+if "%TARGET%" == "" (set TARGET=Win32)
+
 if not exist Output mkdir Output
 if not exist Output\build mkdir Output\build
 
@@ -46,17 +48,17 @@ mkdir %dst%
 del /s /q %dst%_pdb\*.*
 mkdir %dst%_pdb
 
-copy /y ..\teraterm\Release.Win32\*.exe %dst%
-copy /y ..\teraterm\Release.Win32\*.dll %dst%
-copy /y ..\teraterm\Release.Win32\*.pdb %dst%_pdb
-copy /y ..\ttssh2\ttxssh\Release.Win32\ttxssh.dll %dst%
-copy /y ..\ttssh2\ttxssh\Release.Win32\ttxssh.pdb %dst%_pdb
-copy /y ..\TTProxy\Release.Win32\TTXProxy.dll %dst%
-copy /y ..\TTProxy\Release.Win32\TTXProxy.pdb %dst%_pdb
-copy /y ..\TTXKanjiMenu\Release.Win32\ttxkanjimenu.dll %dst%
-copy /y ..\TTXKanjiMenu\Release.Win32\ttxkanjimenu.pdb %dst%_pdb
+copy /y ..\teraterm\Release.%TARGET%\*.exe %dst%
+copy /y ..\teraterm\Release.%TARGET%\*.dll %dst%
+copy /y ..\teraterm\Release.%TARGET%\*.pdb %dst%_pdb
+copy /y ..\ttssh2\ttxssh\Release.%TARGET%\ttxssh.dll %dst%
+copy /y ..\ttssh2\ttxssh\Release.%TARGET%\ttxssh.pdb %dst%_pdb
+copy /y ..\TTProxy\Release.%TARGET%\TTXProxy.dll %dst%
+copy /y ..\TTProxy\Release.%TARGET%\TTXProxy.pdb %dst%_pdb
+copy /y ..\TTXKanjiMenu\Release.%TARGET%\ttxkanjimenu.dll %dst%
+copy /y ..\TTXKanjiMenu\Release.%TARGET%\ttxkanjimenu.pdb %dst%_pdb
 
-copy /y ..\cygwin\Release.Win32\cyglaunch.exe %dst%
+copy /y ..\cygwin\Release.%TARGET%\cyglaunch.exe %dst%
 copy /y ..\cygwin\cygterm\cygterm.cfg %dst%
 copy /y "..\cygwin\cygterm\cygterm+.tar.gz" %dst%
 copy /y "..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe" %dst%
@@ -66,44 +68,44 @@ copy /y ..\cygwin\cygterm\msys2term\msys2term.exe %dst%
 copy /y ..\cygwin\cygterm\msys2term.cfg %dst%
 :msys2term_pass
 
-copy /y ..\ttpmenu\Release.Win32\ttpmenu.exe %dst%
-copy /y ..\ttpmenu\Release.Win32\ttpmenu.pdb %dst%_pdb
+copy /y ..\ttpmenu\Release.%TARGET%\ttpmenu.exe %dst%
+copy /y ..\ttpmenu\Release.%TARGET%\ttpmenu.pdb %dst%_pdb
 copy /y ..\ttpmenu\readme.txt %dst%\ttmenu_readme-j.txt
 
-copy /y ..\TTXSamples\Release.Win32\TTXAdditionalTitle.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXAdditionalTitle.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXAlwaysOnTop.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXAlwaysOnTop.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXCallSysMenu.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXCallSysMenu.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXCommandLineOpt.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXCommandLineOpt.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXCopyIniFile.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXCopyIniFile.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXFixedWinSize.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXFixedWinSize.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXKcodeChange.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXKcodeChange.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXOutputBuffering.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXOutputBuffering.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXRecurringCommand.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXRecurringCommand.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXResizeMenu.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXResizeMenu.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXResizeWin.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXResizeWin.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXShowCommandLine.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXShowCommandLine.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXViewMode.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXViewMode.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXtest.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXtest.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXttyplay.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXttyplay.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXttyrec.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXttyrec.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.Win32\TTXChangeFontSize.dll %dst%
-copy /y ..\TTXSamples\Release.Win32\TTXChangeFontSize.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXAdditionalTitle.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXAdditionalTitle.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXAlwaysOnTop.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXAlwaysOnTop.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXCallSysMenu.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXCallSysMenu.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXCommandLineOpt.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXCommandLineOpt.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXCopyIniFile.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXCopyIniFile.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXFixedWinSize.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXFixedWinSize.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXKcodeChange.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXKcodeChange.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXOutputBuffering.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXOutputBuffering.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXRecurringCommand.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXRecurringCommand.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXResizeMenu.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXResizeMenu.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXResizeWin.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXResizeWin.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXShowCommandLine.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXShowCommandLine.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXViewMode.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXViewMode.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXtest.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXtest.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXttyplay.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXttyplay.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXttyrec.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXttyrec.pdb %dst%_pdb
+copy /y ..\TTXSamples\Release.%TARGET%\TTXChangeFontSize.dll %dst%
+copy /y ..\TTXSamples\Release.%TARGET%\TTXChangeFontSize.pdb %dst%_pdb
 
 pushd %dst%
 ren TTXFixedWinSize.dll _TTXFixedWinSize.dll
