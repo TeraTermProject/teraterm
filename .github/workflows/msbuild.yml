@@ -236,7 +236,7 @@ jobs:
         wait-for-completion-timeout-in-seconds: 1800
 
     - name: Sign portable zip skipped - copying files
-      if: env.SIGNPATH_API_TOKEN == '' || (steps.vars.outputs.RELEASE != '1' && env.SIGNPATH_FORCE != '1') || env.SIGNPATH_SKIP == '1'
+      if: env.SIGNPATH_API_TOKEN != '' && ((steps.vars.outputs.RELEASE != '1' && env.SIGNPATH_FORCE != '1') || env.SIGNPATH_SKIP == '1')
       shell: bash
       run: |
         mkdir installer/Output/portable_signed
@@ -272,7 +272,7 @@ jobs:
 
     # The folder name is 'signed', but the contained setup.exe is unsigned
     - name: Sign setup.exe skipped - copying file
-      if: env.SIGNPATH_API_TOKEN == '' || (steps.vars.outputs.RELEASE != '1' && env.SIGNPATH_FORCE != '1') || env.SIGNPATH_SKIP == '1'
+      if: env.SIGNPATH_API_TOKEN != '' && ((steps.vars.outputs.RELEASE != '1' && env.SIGNPATH_FORCE != '1') || env.SIGNPATH_SKIP == '1')
       shell: bash
       run: |
         mkdir installer/Output/setup_signed
