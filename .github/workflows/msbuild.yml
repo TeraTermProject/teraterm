@@ -203,14 +203,16 @@ jobs:
     #
     #   リリース中ではないとき（通常の開発中）
     #     GitHub で SIGNPATH_SKIP, SIGNPATH_FORCE ともに設定しない
-    #     署名されない
+    #     署名のための step が実行されない
     #   リリース中
     #     GitHub で SIGNPATH_SKIP, SIGNPATH_FORCE ともに設定しない
-    #     署名される
-    #   リリース中ではないときにコード署名したい場合 ... RELEASE が 1 でなくても署名する
+    #     署名のための step が実行される
+    #   リリース中ではないときにコード署名したい場合
     #     GitHub で SIGNPATH_FORCE に 1 を設定する
-    #   リリース中にコード署名したくない場合 ... 署名はしないがファイルは作成される
+    #     RELEASE が 1 でなくても署名のための step が実行される
+    #   コード署名される条件のときにコード署名したくない場合
     #     GitHub で SIGNPATH_SKIP に 1 を設定する
+    #     署名のための step が実行されるとき、署名はしないがファイルは作成される
     #
     - name: Upload artifacts for sign (tareterm_portable.zip)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
@@ -236,7 +238,7 @@ jobs:
         wait-for-completion-timeout-in-seconds: 1800
 
     - name: Sign portable zip skipped - copying files
-      if: env.SIGNPATH_API_TOKEN != '' && ((steps.vars.outputs.RELEASE != '1' && env.SIGNPATH_FORCE != '1') || env.SIGNPATH_SKIP == '1')
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1') && env.SIGNPATH_SKIP == '1'
       shell: bash
       run: |
         mkdir installer/Output/portable_signed
@@ -272,7 +274,7 @@ jobs:
 
     # The folder name is 'signed', but the contained setup.exe is unsigned
     - name: Sign setup.exe skipped - copying file
-      if: env.SIGNPATH_API_TOKEN != '' && ((steps.vars.outputs.RELEASE != '1' && env.SIGNPATH_FORCE != '1') || env.SIGNPATH_SKIP == '1')
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1') && env.SIGNPATH_SKIP == '1'
       shell: bash
       run: |
         mkdir installer/Output/setup_signed
