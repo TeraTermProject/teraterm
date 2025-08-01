@@ -89,7 +89,7 @@ jobs:
       shell: bash
       run: |
         VERSION=${{ fromJson(steps.read_buildinfo.outputs.json).VERSION }}
-        DATE_TIME=${{ fromJson(steps.read_buildinfo.outputs.json).DATE }}-${{ fromJson(steps.read_buildinfo.outputs.json).TIME }}
+        DATE_TIME=${{ fromJson(steps.read_buildinfo.outputs.json).DATE }}_${{ fromJson(steps.read_buildinfo.outputs.json).TIME }}
         VCSVERSION=${{ fromJson(steps.read_buildinfo.outputs.json).GITVERSION }}
         SNAPSHOT_OUTPUT=teraterm-${VERSION}-${DATE_TIME}-${VCSVERSION}-snapshot
         RELEASE_OUTPUT=teraterm-${VERSION}
@@ -197,7 +197,7 @@ jobs:
     #   steps.vars.outputs.RELEASE
     #     tt-version.h に TT_VERSION_SUBSTR がない = リリース
     #     build_info.json / RELEASE=1
-    #     この yml の read buildinfo.json step で読み込まれる
+    #     この yml の Read buildinfo.json step で読み込まれる
     #   env.SIGNPATH_SKIP
     #     GitHub リポジトリの Settings > Secrets and variables > Actions > Variables > Repository variables > SIGNPATH_SKIP で設定する
     #   env.SIGNPATH_FORCE
@@ -207,14 +207,16 @@ jobs:
     #
     #   リリース中ではないとき（通常の開発中）
     #     GitHub で SIGNPATH_SKIP, SIGNPATH_FORCE ともに設定しない
-    #     署名されない
+    #     署名のための step が実行されない
     #   リリース中
     #     GitHub で SIGNPATH_SKIP, SIGNPATH_FORCE ともに設定しない
-    #     署名される
-    #   リリース中にコード署名したくない場合
-    #     GitHub で SIGNPATH_SKIP に 1 を設定する
+    #     署名のための step が実行される
     #   リリース中ではないときにコード署名したい場合
     #     GitHub で SIGNPATH_FORCE に 1 を設定する
+    #     RELEASE が 1 でなくても署名のための step が実行される
+    #   コード署名される条件のときにコード署名したくない場合
+    #     GitHub で SIGNPATH_SKIP に 1 を設定する
+    #     署名のための step が実行されるとき、署名はしないがファイルは作成される
     #
     - name: Upload artifacts for sign (tareterm_portable.zip)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
@@ -244,24 +246,7 @@ jobs:
       shell: bash
       run: |
         mkdir installer/Output/portable_signed
-        cp -R installer/Output/portable installer/Output/portable_signed
-
-    - name: Rename portable signed zip
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
-      shell: bash
-      run: |
-        OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
-        mkdir installer/Output/setup_src
-        cp -R installer/Output/portable_signed/teraterm installer/Output/setup_src/
-        mv installer/Output/portable_signed/teraterm "installer/Output/portable_signed/${OUTPUT}"
-
-    - name: Upload artifacts (portable signed zip)
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ steps.vars.outputs.OUTPUT_ZIP }}
-        path: |
-          installer/Output/portable_signed
+        cp -R installer/Output/portable/* installer/Output/portable_signed
 
     - name: Build unsigned setup.exe
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
@@ -285,7 +270,7 @@ jobs:
         organization-id: '${{ env.ORGANIZATION_ID }}'
         project-slug: '${{ env.PROJECT_SLUG }}'
         signing-policy-slug: '${{ env.SIGNING_POLICY_SLUG }}'
-        artifact-configuration-slug: 'ziped_installer'
+        artifact-configuration-slug: 'zipped_installer'
         github-artifact-id: '${{steps.upload-setup.outputs.artifact-id}}'
         output-artifact-directory: 'installer/Output/setup_signed'
         wait-for-completion: true
@@ -297,17 +282,7 @@ jobs:
       shell: bash
       run: |
         mkdir installer/Output/setup_signed
-        cp -R installer/Output/setup installer/Output/setup_signed
-
-    - name: Rename signed setup.exe
-      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
-      shell: bash
-      run: |
-        OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
-        ls installer/Output/setup_signed/
-        echo mv installer/Output/setup_signed/teraterm-unsigned.exe installer/Output/setup_signed/${OUTPUT}.exe
-        mv installer/Output/setup_signed/teraterm-unsigned.exe installer/Output/setup_signed/${OUTPUT}.exe
-        ls installer/Output/setup_signed/
+        cp -R installer/Output/setup/* installer/Output/setup_signed
 
     - name: Upload artifacts (signed setup.exe)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
@@ -316,6 +291,21 @@ jobs:
         name: ${{ steps.vars.outputs.OUTPUT_EXE }}
         path: |
           installer/Output/setup_signed
+
+    - name: Rename portable signed folder
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
+      shell: bash
+      run: |
+        OUTPUT="${{ steps.vars.outputs.OUTPUT }}"
+        mv installer/Output/portable_signed/teraterm "installer/Output/portable_signed/${OUTPUT}"
+
+    - name: Upload artifacts (portable signed zip)
+      if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.vars.outputs.OUTPUT_ZIP }}
+        path: |
+          installer/Output/portable_signed
 
     - name: Collect release files
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
