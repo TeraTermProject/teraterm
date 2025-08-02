@@ -1,3 +1,10 @@
+rem Copyright (C) 2007- Tera Term Project
+rem All rights reserved.
+rem
+rem アーキテクチャごとの成果物をビルドする
+setlocal
+
+
 rem architecture for VsDevCmd.bat
 if "%TARGET%" == "" (set TARGET=Win32)
 if "%TARGET%" == "Win32" (set ARCHITECTURE=x86)
@@ -5,12 +12,18 @@ if "%TARGET%" == "x64"   (set ARCHITECTURE=x64)
 if "%TARGET%" == "ARM64" (set ARCHITECTURE=arm64)
 if "%TARGET%" == "ARM64" if "%HOST_ARCHITECTURE%" == "" (set HOST_ARCHITECTURE=amd64)
 
-if not "%VSINSTALLDIR%" == "" goto vsinstdir
 
-rem InnoSetup からビルドする時は、標準で環境変数に設定されている
-rem Visual Studioが選択される。VS2019決め打ちでビルドしたい場合は
-rem 下記 goto 文を有効にすること。
-rem goto check_2019
+rem build or rebuild
+set BUILD_CONF=build
+if "%1" == "rebuild" (set BUILD_CONF=rebuild)
+
+
+rem Change the working directory to the location of this BAT file
+pushd %~dp0
+
+
+rem Find Visual Studio
+if not "%VSINSTALLDIR%" == "" goto vsinstdir
 
 :check_2022
 if "%VS170COMNTOOLS%" == "" goto check_2019
@@ -24,20 +37,8 @@ if not exist "%VS160COMNTOOLS%\VsDevCmd.bat" goto novs
 call "%VS160COMNTOOLS%\VsDevCmd.bat" -arch=%ARCHITECTURE% -host_arch=%HOST_ARCHITECTURE%
 goto vs2019
 
-:novs
-@echo off
-echo "Can't find Visual Studio"
-echo.
-echo InnoSetupからVS2019でビルドするためには、環境変数を設定してください。
-echo.
-echo 例
-echo VS160COMNTOOLS=c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\
-@echo on
-pause
-goto fail
-
 :vsinstdir
-rem Visual Studioのバージョン判別
+rem Check Visual Studio version
 set VSCMNDIR="%VSINSTALLDIR%\Common7\Tools\"
 set VSCMNDIR=%VSCMNDIR:\\=\%
 
@@ -69,73 +70,32 @@ goto vsend
 
 :vsend
 
-set BUILD=build
-if "%1" == "rebuild" (set BUILD=rebuild)
-pushd %~dp0
-
-rem ライブラリをコンパイル
-pushd ..\libs
-CALL buildall.bat
-if ERRORLEVEL 1 (
-    echo "build.bat を終了します"
-    goto fail
-)
-popd
-
 
 rem リビジョンが変化していれば svnversion.h を更新する。
 call ..\buildtools\svnrev\svnrev.bat
 
 
-devenv /%BUILD% "Release|%TARGET%" %TERATERMSLN%
+devenv /%BUILD_CONF% "Release|%TARGET%" %TERATERMSLN%
 if ERRORLEVEL 1 goto fail
-devenv /%BUILD% "Release|%TARGET%" %TTSSHSLN%
+devenv /%BUILD_CONF% "Release|%TARGET%" %TTSSHSLN%
 if ERRORLEVEL 1 goto fail
-devenv /%BUILD% "Release|%TARGET%" %TTPROXYSLN%
+devenv /%BUILD_CONF% "Release|%TARGET%" %TTPROXYSLN%
 if ERRORLEVEL 1 goto fail
-devenv /%BUILD% "Release|%TARGET%" %TTXKANJISLN%
+devenv /%BUILD_CONF% "Release|%TARGET%" %TTXKANJISLN%
 if ERRORLEVEL 1 goto fail
-devenv /%BUILD% "Release|%TARGET%" %TTPMENUSLN%
+devenv /%BUILD_CONF% "Release|%TARGET%" %TTPMENUSLN%
 if ERRORLEVEL 1 goto fail
-devenv /%BUILD% "Release|%TARGET%" %TTXSAMPLESLN%
+devenv /%BUILD_CONF% "Release|%TARGET%" %TTXSAMPLESLN%
 if ERRORLEVEL 1 goto fail
-devenv /%BUILD% "Release|%TARGET%" %CYGWINSLN%
+devenv /%BUILD_CONF% "Release|%TARGET%" %CYGWINSLN%
 if ERRORLEVEL 1 goto fail
 
-rem cygterm をコンパイル
-pushd ..\cygwin\cygterm
-if "%BUILD%" == "rebuild" (
-    make clean
-    make cygterm+-x86_64-clean
-)
-make cygterm+-x86_64 -j
 popd
-
-rem msys2term
-if not exist c:\msys64\usr\bin\msys-2.0.dll goto msys2term_pass
-setlocal
-PATH=C:\msys64\usr\bin
-pushd ..\cygwin\cygterm
-if "%BUILD%" == "rebuild" (
-    make clean
-    make msys2term-clean
-)
-make msys2term -j
 endlocal
-popd
-:msys2term_pass
-
-rem cygterm+.tar.gz
-pushd ..\cygwin\cygterm
-make archive
-popd
-
-rem lng ファイルを作成
-call makelang.bat
-
-popd
 exit /b 0
+
 
 :fail
 popd
+endlocal
 exit /b 1
