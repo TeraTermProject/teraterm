@@ -1,5 +1,11 @@
 ﻿# cmake -P iscc_signed.cmake
 
+if(DEFINED ENV{arch})
+  set(arch $ENV{arch})
+else()
+  set(arch "x86")
+endif()
+
 include(${CMAKE_CURRENT_LIST_DIR}/../buildtools/svnrev/build_config.cmake)
 
 #file(REMOVE_RECURSE ${CMAKE_CURRENT_LIST_DIR}/Output/portable_signed/unzip)
@@ -11,17 +17,24 @@ include(${CMAKE_CURRENT_LIST_DIR}/../buildtools/svnrev/build_config.cmake)
 set(ISCC "${CMAKE_CURRENT_LIST_DIR}/../buildtools/innosetup6/ISCC.exe")
 
 if(RELEASE)
-  set(SETUP_EXE "teraterm-${VERSION}")
+  set(SETUP_EXE "teraterm-${VERSION}-${arch}")
 else()
-  set(SETUP_EXE "teraterm-${VERSION}-${DATE}_${TIME}-${GITVERSION}-snapshot")
+  set(SETUP_EXE "teraterm-${VERSION}-${arch}-${DATE}_${TIME}-${GITVERSION}-snapshot")
 endif()
-set(SRC_DIR "Output/portable_signed/teraterm") # teraterm.iss相対
+set(SRC_DIR "Output/portable_signed/teraterm-${arch}") # teraterm.iss相対
 set(SETUP_DIR "${CMAKE_CURRENT_LIST_DIR}/Output/setup")
 #set(SETUP_EXE "teraterm-unsigned")
 
+set(INNO_SETUP_ARCH "")
+if(arch STREQUAL "x64")
+  set(INNO_SETUP_ARCH "M_X64")
+elseif(arch STREQUAL "arm64")
+  set(INNO_SETUP_ARCH "M_ARM64")
+endif()
+
 file(MAKE_DIRECTORY ${SETUP_DIR})
 execute_process(
-  COMMAND ${ISCC} /DAppVersion=${VERSION} /DOutputBaseFilename=${SETUP_EXE} /DSrcDir=${SRC_DIR} /O${SETUP_DIR} ${CMAKE_CURRENT_LIST_DIR}/teraterm.iss
+  COMMAND ${ISCC} /DAppVersion=${VERSION} /DOutputBaseFilename=${SETUP_EXE} /DSrcDir=${SRC_DIR} /D${INNO_SETUP_ARCH} /O${SETUP_DIR} ${CMAKE_CURRENT_LIST_DIR}/teraterm.iss
   WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/Output/portable_signed"
   ENCODING AUTO
   RESULT_VARIABLE rv
