@@ -61,10 +61,10 @@ $ echo -e '\U0061\U0041'
 aA
 $ echo -e '\U0061\U0302\U0041\U0302'
 âÂ
-$ echo -e '\U037B'
-ほ
-$ echo -e '\U037B\309A'
-ぽ
+$ echo -e '\U307B\U30D2'
+ほヒ
+$ echo -e '\U307B\U309A\U30D2\U309A'
+ぽピ
 $ echo -e '\U0938\U094d\U0924\U0947'
 स्ते
 $ echo -e '\U0ab8\U0acd\U0aa4\U0ac7'
