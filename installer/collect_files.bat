@@ -1,48 +1,35 @@
-rem Copyright (C) 2025- Tera Term Project
+rem Copyright (C) 2006- Tera Term Project
 rem All rights reserved.
 rem
-rem  次のフォルダにバイナリを作成
-rem   - ./teraterm
-rem   - ./teraterm_pdb
-
-@echo off
-rem この外で set された RELEASE を上書きしないために setlocal する
+rem  - build_common.bat でビルドされたバイナリ（Output/build/teraterm_common へコピー済み）
+rem  - build_arch.bat でビルドされたバイナリ
+rem  を次のフォルダにまとめる
+rem  - Output/build/teraterm-%arch%
+rem  - Output/build/teraterm-%arch%_pdb
 setlocal
 
+
+rem arch for package
+if "%arch%" == "" (set arch=x86)
+
+
+rem TARGET for package
 if "%TARGET%" == "" (set TARGET=Win32)
+
+
+rem Change the working directory to the location of this BAT file
+pushd %~dp0
+
 
 if not exist Output mkdir Output
 if not exist Output\build mkdir Output\build
 
-SET rebuild=
-SET release=
-
-if "%1"=="/?" goto help
-if "%1"=="rebuild" SET rebuild=rebuild&& goto build
-if "%1"=="release" SET release=yes&& goto build
-if "%1"=="" goto build
-goto help
-
-:build
-@echo on
-if "%release%"=="yes" SET rebuild=rebuild
-
-CALL makechm.bat
-CALL build.bat %rebuild%
-if ERRORLEVEL 1 goto fail
-
-set dst=%~dp0Output\build\teraterm
+set common=%~dp0Output\build\teraterm_common
+set dst=%~dp0Output\build\teraterm-%arch%
 echo dst=%dst%
-call :create
-
-endlocal
-exit /b
 
 
-rem create archive
-rem  ファイルを %dst%, %dist%_pdb にコピーする
-rem
-:create
+rem ファイルを %dst%, %dist%_pdb にコピーする
 del /s /q %dst%\*.*
 mkdir %dst%
 del /s /q %dst%_pdb\*.*
@@ -59,13 +46,14 @@ copy /y ..\TTXKanjiMenu\Release.%TARGET%\ttxkanjimenu.dll %dst%
 copy /y ..\TTXKanjiMenu\Release.%TARGET%\ttxkanjimenu.pdb %dst%_pdb
 
 copy /y ..\cygwin\Release.%TARGET%\cyglaunch.exe %dst%
-copy /y ..\cygwin\cygterm\cygterm.cfg %dst%
-copy /y "..\cygwin\cygterm\cygterm+.tar.gz" %dst%
-copy /y "..\cygwin\cygterm\cygterm+-x86_64\cygterm.exe" %dst%
 
-if not exist ..\cygwin\cygterm\msys2term\msys2term.exe goto msys2term_pass
-copy /y ..\cygwin\cygterm\msys2term\msys2term.exe %dst%
-copy /y ..\cygwin\cygterm\msys2term.cfg %dst%
+copy /y %common%\cygterm.cfg %dst%
+copy /y "%common%\cygterm+.tar.gz" %dst%
+copy /y "%common%\cygterm.exe" %dst%
+
+if not exist %common%\msys2term.exe goto msys2term_pass
+copy /y %common%\msys2term.exe %dst%
+copy /y %common%\msys2term.cfg %dst%
 :msys2term_pass
 
 copy /y ..\ttpmenu\Release.%TARGET%\ttpmenu.exe %dst%
@@ -117,40 +105,33 @@ ren TTXShowCommandLine.dll _TTXShowCommandLine.dll
 ren TTXtest.dll _TTXtest.dll
 popd
 
-copy /y ..\doc\ja\teratermj.chm %dst%
-copy /y ..\doc\en\teraterm.chm %dst%
+copy /y %common%\teratermj.chm %dst%
+copy /y %common%\teraterm.chm %dst%
 
 copy /y release\*.* %dst%
 copy /y release\IBMKEYB.CNF %dst%\KEYBOARD.CNF
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\theme %dst%\theme
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\plugin %dst%\plugin
-xcopy /s /e /y /i /exclude:archive-exclude.txt release\lang %dst%\lang
-xcopy /s /e /y /i /exclude:archive-exclude.txt release\lang_utf16le %dst%\lang_utf16le
-del /f %dst%\lang\English.lng
+xcopy /s /e /y /i /exclude:archive-exclude.txt %common%\lang %dst%\lang
+xcopy /s /e /y /i /exclude:archive-exclude.txt %common%\lang_utf16le %dst%\lang_utf16le
+del /f %dst%\lang\en_US.lng
 
 perl setini.pl release\TERATERM.INI > %dst%\TERATERM.INI
 
 copy nul %dst%\ttpmenu.ini
 copy nul %dst%\portable.ini
 
+popd
 exit /b 0
 
 :help
-echo Tera Termをビルド。(build Tera Term)
-echo.
-echo   %0          通常のビルド(Normal building)
-echo   %0 release  リリースビルド(same as rebuild)
-echo   %0 rebuild  リビルド(Re-building)
-echo.
-echo   次のフォルダにバイナリを作成
-echo     - %~dp0teraterm
-echo     - %~dp0teraterm_pdb
 echo.
 echo ex
 echo   %0 rebuild ^>build.log 2^>^&1  ビルドログを採取する(Retrieve building log)
 echo.
+popd
 endlocal
-exit /b
+exit /b 0
 
 :fail
 @echo off
@@ -159,5 +140,6 @@ echo ================= E R R O R =======================
 echo ===================================================
 echo.
 echo ビルドに失敗しました (Failed to build source code)
+popd
 endlocal
-exit 1
+exit /b 1

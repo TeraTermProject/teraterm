@@ -15,30 +15,6 @@
 #define SrcDir "teraterm"
 #endif
 
-[InnoIDE_PreCompile]
-Name: makechm.bat
-Name: build.bat
-;Name: build.bat; Parameters: rebuild
-
-[InnoIDE_PostCompile]
-;Name: makearchive.bat; Parameters: release
-
-[PreCompile]
-Name: makechm.bat
-Name: build.bat
-;Name: build.bat; Parameters: rebuild
-
-[PostCompile]
-;Name: makearchive.bat; Parameters: release
-
-[_ISToolPreCompile]
-Name: makechm.bat
-Name: build.bat
-;Name: build.bat; Parameters: rebuild
-
-[_ISToolPostCompile]
-;Name: makearchive.bat; Parameters: release
-
 [Setup]
 AppName={#AppName}
 AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
@@ -68,14 +44,14 @@ OutputBaseFilename={#OutputBaseFilename}
 SolidCompression=yes
 Compression=lzma2/ultra64
 #if defined(M_X64)
-ArchitecturesAllowed=win64
-ArchitecturesInstallIn64BitMode=x64os
+  ArchitecturesAllowed=win64
+  ArchitecturesInstallIn64BitMode=x64os
 #elif defined(M_ARM64)
-ArchitecturesAllowed=arm64
-ArchitecturesInstallIn64BitMode=arm64
+  ArchitecturesAllowed=arm64
+  ArchitecturesInstallIn64BitMode=arm64
 #else
-ArchitecturesAllowed=x86compatible
-ArchitecturesInstallIn64BitMode=
+  ArchitecturesAllowed=x86compatible
+  ArchitecturesInstallIn64BitMode=
 #endif
 
 [Languages]
