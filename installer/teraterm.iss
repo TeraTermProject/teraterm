@@ -1,6 +1,6 @@
 ﻿#define AppName "Tera Term"
 #ifndef AppVer
-#define AppVer "5.5.0"
+#define AppVer "5.4.2-dev"
 #endif
 
 ; App Version
