@@ -81,39 +81,53 @@
   <li>Bug fixes
     <ul>
       <li>
-        Fixed the issue where the font size during conversion and the font size after confirmation did not match when entering kanji characters in the VT window in an environment other than 100% display magnification (96 DPI).
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/525" target="_blank">issue #525</a>)
-      </li>
-      <li>
         Broadcast dialog is not Unicode compatible.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/500" target="_blank">issue #500</a>)
       </li>
       <li>
-        Fixed the issue the configuration value is not reflected to "Beep" dropdown on [Additional settings]-[<a href="../menu/setup-additional-ctrlseq.html">Control Sequence</a>] tab.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/529" target="_blank">issue #529</a>)
+        <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> "VT100J", "VT102J", and "VT220J" were not selectable Since 5.3, which remove Language setting.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
       </li>
+    </ul>
+  </li>
+
+  <li>Misc
+    <ul>
+      <li>
+        Added Portuguese (pt_BR.lng) language file. Rename language file name.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/589" target="_blank">issue #589</a>)
+      </li>
+      <li>Upgraded TTSSH to <a href="#ttssh_3.5.0">3.5.0</a>.</li>
+      <li>
+        Added <a href="#changefontsize_1.00">TTXChangeFontSize</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/599" target="_blank">issue #599</a>)
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_5.4.1">2025.08.03 (Ver 5.4.1)</h3>
+<ul class="history">
+  <!--li>Changes
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>Bug fixes
+    <ul>
       <li>
         Fixed to take into account left and right sides of characters when selecting characters with mouse.
-        The same behavior as before Tera Term 5.1.
+        Restored the behavior to that of Tera Term 5.1 and earlier.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/468" target="_blank">issue #468</a>)
       </li>
-      <li>We made the following modifications to the <a href="../menu/setup-additional-font.html">font selection</a> in the VT window.(<a href="https://github.com/TeraTermProject/teraterm/issues/335">issue #335</a>)
-        <ul>
-          <li>Adjusted so that the point size of the selected font in the font selection dialog matches the point size of the displayed characters on the screen. </li>
-          <li>Even if the screen resolution is not 96 DPI, adjusted so that the point size selected in the font selection dialog matches the value for 96 DPI.</li>
-        </ul>
+      <li>
+        Fixed the issue where the font size during conversion and the font size after confirmation did not match when entering kanji characters in the VT window in an environment other than 100% display magnification (96 DPI).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/525" target="_blank">issue #525</a>)
       </li>
       <li>
         Fixed an issue where windows were not displayed at the correct size when moved or resized across displays with different DPI settings.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/555" target="_blank">issue #555</a>)
-      </li>
-      <li>
-        MACRO: Fixed the issue where macro could not be executed through the task scheduler.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/196" target="_blank">issue #196</a>)
-      </li>
-      <li>
-        Fixed log dialog font was not changed when dialog font was changed and log dialog was opened.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/590" target="_blank">issue #590</a>)
       </li>
       <li>
         Fixed the following issues that occur when changing the font size while the VT Window is maximized.
@@ -124,16 +138,18 @@
         </ul>
       </li>
       <li>
-        <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> "VT100J", "VT102J", and "VT220J" were not selectable Since 5.3, which remove Language setting.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
+        Fixed an issue where the dialog font was not applied to the log dialog.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/590" target="_blank">issue #590</a>)
+      </li>
+      <li>We made the following modifications to the <a href="../menu/setup-additional-font.html">font selection</a> in the VT window.(<a href="https://github.com/TeraTermProject/teraterm/issues/335" target="_blank">issue #335</a>)
+        <ul>
+          <li>Adjusted so that the point size of the selected font in the font selection dialog matches the point size of the displayed characters on the screen. </li>
+          <li>Even if the screen resolution is not 96 DPI, adjusted so that the point size selected in the font selection dialog matches the value for 96 DPI.</li>
+        </ul>
       </li>
       <li>
-        Fixed the bug where Tera Term crashes when a filename using ':' in a location other than the drive letter is specified in the logopen of the Tera Term macro.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/648" target="_blank">issue #648</a>)
-      </li>
-      <li>
-        Fixed Tera Term may stop working when Tera Term macro is executed in hidden mode and Tera Term is executed by <a href="../macro/command/connect.html">connect</a> macro command.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/607" target="_blank">issue #607</a>)
+        Fixed the issue the configuration value is not reflected to "Beep" dropdown on [Additional settings]-[<a href="../menu/setup-additional-ctrlseq.html">Control Sequence</a>] tab.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/529" target="_blank">issue #529</a>)
       </li>
       <li>
         The command line option <a href="../commandline/teraterm.html#f">/F=</a> of the Tera Term has been modified to be reflected in the plugin.<br>
@@ -141,34 +157,40 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/692" target="_blank">issue #692</a>)
       </li>
       <li>
-        MACRO: The issue where the INI file specified with a relative path in the <a href="../macro/command/restoresetup.html">restoresetup</a> command was not recognized as a relative path from %APPDATA%\teraterm5\ has been fixed.
+        Fixed the issue where macro could not be executed through the task scheduler.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/196" target="_blank">issue #196</a>)
+      </li>
+      <li>
+        Fixed Tera Term may stop working when Tera Term macro is executed in hidden mode and Tera Term is executed by <a href="../macro/command/connect.html">connect</a> macro command.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/607" target="_blank">issue #607</a>)
+      </li>
+      <li>
+        The issue where the INI file specified with a relative path in the <a href="../macro/command/restoresetup.html">restoresetup</a> macro command was not recognized as a relative path from %APPDATA%\teraterm5\ has been fixed.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/706" target="_blank">issue #706</a>)
+      </li>
+      <li>
+        Fixed the bug where Tera Term crashes when a filename using ':' in a location other than the drive letter is specified in the <a href="../macro/command/logopen.html">logopen</a> macro command.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/648" target="_blank">issue #648</a>)
       </li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
-      <li>Added Portuguese (pt_BR.lng) language file. Rename language file name.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/589" target="_blank">issue #589</a>)
-      </li>
-      <li>Upgraded TTSSH to <a href="#ttssh_3.5.0">3.5.0</a>.</li>
-      <li>
-        installer: Tera Term now appears as a candidate for "Default apps" of protocol and file extension.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/471" target="_blank">issue #471</a>)
-      </li>
-      <li>Added <a href="#changefontsize_1.00">TTXChangeFontSize</a>.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/599" target="_blank">issue #599</a>)</li>
+      <li>Upgraded TTSSH to <a href="#ttssh_3.4.1">3.4.1</a>.</li>
+      <li>Upgraded CygTerm+ to <a href="#cygterm_1.07_31">1.07_31</a>.</li>
+      <li>Upgraded TTProxy to <a href="#ttproxy_1.0.0.27">1.0.0.27</a>.</li>
+      <li>upgraded TTXttyrec Plug-in to <a href="#ttyrec_1.06">1.06</a>.</li>
+      <li>upgraded TTXViewMode Plug-in to <a href="#viewmode_1.01">1.01</a>.</li>
+      <li>Upgraded TTXRecurringCommand to <a href="#recurringcommand_1.06">1.06</a>.</li>
       <li>
         Added code signing.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/316" target="_blank">issue #316</a>)
       </li>
-      <li>Upgraded TTXttyrec Plug-in to <a href="#ttyrec_1.06">1.06 not released yet</a>.</li>
-      <li>Upgraded TTXViewMode Plug-in to <a href="#viewmode_1.01">1.01 not released yet</a>.</li>
-      <li>Upgraded CygTerm+ to <a href="#cygterm_1.07_31">1.07_31</a>.</li>
-      <li>Added <a href="#changefontsize_1.00">TTXChangeFontSize</a>.</li>
-      <li>Upgraded TTProxy to <a href="#ttproxy_1.0.0.27">1.0.0.27</a>.</li>
-      <li>Upgraded TTXRecurringCommand to <a href="#recurringcommand_1.06">1.06</a>.</li>
+      <li>
+        installer: Tera Term now appears as a candidate for "Default apps" of protocol and file extension.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/471" target="_blank">issue #471</a>)
+      </li>
     </ul>
   </li>
 </ul>
@@ -3791,14 +3813,10 @@ SYNOPSIS:
     </ul>
   </li>
 
-  <li>Bug fixes
+  <!--li>Bug fixes
     <ul>
-      <li>
-        Fixed the version number of TTSSH that is sent to SSH server. x.y.z format is sent now. x.y format was used.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/547" target="_blank">issue #547</a>)
-        </li>
     </ul>
-  </li>
+  </li-->
 
   <li>Misc
     <ul>
@@ -3808,6 +3826,30 @@ SYNOPSIS:
       </li>
     </ul>
   </li>
+</ul>
+
+<h3 id="ttssh_3.4.1">2025.08.03 (Ver 3.4.1)</h3>
+<ul class="history">
+  <!--li>Changes
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>Bug fixes
+    <ul>
+      <li>
+        Fixed the version number of TTSSH that is sent to SSH server. x.y.z format is sent now. x.y format was used.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/547" target="_blank">issue #547</a>)
+        </li>
+    </ul>
+  </li>
+
+  <!--li>Misc
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
 </ul>
 
 <h3 id="ttssh_3.4.0">2025.03.03 (Ver 3.4.0)</h3>
@@ -5376,7 +5418,7 @@ SYNOPSIS:
 
 
 <h2 id="cygterm">CygTerm+</h2>
-<h3 id="cygterm_1.07_31">v1.07_31 YYYY/MM/DD (not released yet)</h3>
+<h3 id="cygterm_1.07_31">v1.07_31 2025/08/03</h3>
 <ul class="history">
       <li>
         The issue where executing cygconnect in the Tera Term macro resulted in the message "/D=XXXXXXXX\nThe specified file could not be found" and prevented Cygterm from launching has been fixed.
@@ -5655,7 +5697,7 @@ SYNOPSIS:
 
 <h2 id="ttproxy">TTProxy</h2>
 
-<h3 id="ttproxy_1.0.0.27">YYYY.MM.DD (Ver 1.0.0.27 not released yet)</h3>
+<h3 id="ttproxy_1.0.0.27">2025.08.03 (Ver 1.0.0.27)</h3>
 <ul class="history">
   <li>Bug fixes
     <ul>
@@ -6049,7 +6091,7 @@ SYNOPSIS:
 </ul>
 
 <h2 id="ttyrec">TTXttyrec</h2>
-<h3 id="ttyrec_1.06">YYYY.MM.DD (Ver 1.06 not released yet)</h3>
+<h3 id="ttyrec_1.06">2025.08.03 (Ver 1.06)</h3>
 <ul class="history">
   <li>
     Supported language files.
@@ -6099,7 +6141,7 @@ SYNOPSIS:
 </ul>
 
 <h2 id="viewmode">TTXViewMode</h2>
-<h3 id="viewmode_1.01">YYYY.MM.DD (Ver 1.01 not released yet)</h3>
+<h3 id="viewmode_1.01">2025.08.02 (Ver 1.01)</h3>
 <ul class="history">
   <li>
     Supported language files.
@@ -6113,7 +6155,7 @@ SYNOPSIS:
 </ul>
 
 <h2 id="recurringcommand">TTXRecurringCommand</h2>
-<h3 id="recurringcommand_1.06">YYYY.MM.DD (Ver 1.06 not released yet)</h3>
+<h3 id="recurringcommand_1.06">2025.08.03 (Ver 1.06)</h3>
 <ul class="history">
   <li>
     The issue where the relative path specified by the Tera Term command line option /F=<setup file> was not treated as a relative path from %APPDATA%\teraterm5 has been fixed.
