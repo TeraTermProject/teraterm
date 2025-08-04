@@ -25,6 +25,7 @@ msg_language_chinese=簡体字中国語(&C)
 msg_language_tchinese=繁体字中国語(&T)
 msg_language_spanish=スペイン語(&S)
 msg_language_tamil=タミル語(&A)
+msg_language_italian=イタリア語(&I)
 msg_del_confirm=%s を削除しますか？
 msg_uninstall_confirm=以前のバージョンがインストールされているようです。先にアンインストールすることをお勧めします。アンインストールしますか？
 comp_TTX=追加プラグイン
