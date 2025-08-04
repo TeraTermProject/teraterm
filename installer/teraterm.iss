@@ -43,9 +43,7 @@ Name: build.bat
 AppName={#AppName}
 AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 AppVersion={#AppVersion}
-AppVerName={#AppName} {#AppVersion}
 
-WizardStyle=modern
 ; properties of installer executable
 VersionInfoDescription={#AppName} installer
 AppCopyright=(C) 2004-2025 TeraTerm Project
