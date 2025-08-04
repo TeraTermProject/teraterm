@@ -123,6 +123,7 @@ Source: {#SrcDir}\lang\es_ES.lng; DestDir: {app}\lang; Components: TeraTerm; Att
 Source: {#SrcDir}\lang\zh_TW.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: {#SrcDir}\lang\ta_IN.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: {#SrcDir}\lang\pt_BR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang\tr_TR.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: {#SrcDir}\lang_utf16le\Default.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
 Source: {#SrcDir}\lang_utf16le\ja_JP.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: {#SrcDir}\lang_utf16le\de_DE.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
@@ -134,6 +135,7 @@ Source: {#SrcDir}\lang_utf16le\es_ES.lng; DestDir: {app}\lang_utf16le; Component
 Source: {#SrcDir}\lang_utf16le\zh_TW.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: {#SrcDir}\lang_utf16le\ta_IN.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: {#SrcDir}\lang_utf16le\pt_BR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: {#SrcDir}\lang_utf16le\tr_TR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: {#SrcDir}\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: {#SrcDir}\ssh_known_hosts; DestDir: {app}; Components: TTSSH
 Source: {#SrcDir}\cygterm.cfg; DestDir: {app}; Components: cygterm
@@ -529,6 +531,8 @@ begin
       SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\es_ES.lng', iniFile);
     9:
       SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\ta_IN.lng', iniFile);
+    10:
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\tr_TR.lng', iniFile);
     else
       SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Default.lng', iniFile);
   end;
@@ -581,6 +585,7 @@ var
   UILangFilePageTChinese    : String;
   UILangFilePageSpanish     : String;
   UILangFilePageTamil       : String;
+  UILangFilePageTurkish     : String;
 begin
   UILangFilePageCaption     := CustomMessage('msg_language_caption');
   UILangFilePageDescription := CustomMessage('msg_language_description');
@@ -595,6 +600,7 @@ begin
   UILangFilePageTChinese    := CustomMessage('msg_language_tchinese');
   UILangFilePageSpanish     := CustomMessage('msg_language_spanish');
   UILangFilePageTamil       := CustomMessage('msg_language_tamil');
+  UILangFilePageTurkish     := CustomMessage('msg_language_turkish');
 
   UILangFilePage := CreateInputOptionPage(wpSelectComponents,
     UILangFilePageCaption, UILangFilePageDescription,
@@ -609,6 +615,8 @@ begin
   UILangFilePage.Add(UILangFilePageTChinese);
   UILangFilePage.Add(UILangFilePageSpanish);
   UILangFilePage.Add(UILangFilePageTamil);
+  UILangFilePage.Add(UILangFilePageTurkish);
+
   case ActiveLanguage of
     'ja':
       UILangFilePage.SelectedValueIndex := 1;
@@ -666,6 +674,8 @@ begin
             UILangFilePage.SelectedValueIndex := 8
           else if iniFile = 'lang_utf16le\ta_IN.lng' then
             UILangFilePage.SelectedValueIndex := 9
+          else if iniFile = 'lang_utf16le\tr_TR.lng' then
+            UILangFilePage.SelectedValueIndex := 10
           else
             UILangFilePage.SelectedValueIndex := 0;
         end;
