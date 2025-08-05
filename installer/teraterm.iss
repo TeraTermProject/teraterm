@@ -532,6 +532,8 @@ begin
     9:
       SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\ta_IN.lng', iniFile);
     10:
+      SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\pt_BR.lng', iniFile);
+    11:
       SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\it_IT.lng', iniFile);
     else
       SetIniString('Tera Term', 'UILanguageFile', 'lang_utf16le\Default.lng', iniFile);
@@ -585,6 +587,7 @@ var
   UILangFilePageTChinese    : String;
   UILangFilePageSpanish     : String;
   UILangFilePageTamil       : String;
+  UILangFilePagePortuguese  : String;
   UILangFilePageItalian     : String;
 begin
   UILangFilePageCaption     := CustomMessage('msg_language_caption');
@@ -600,6 +603,7 @@ begin
   UILangFilePageTChinese    := CustomMessage('msg_language_tchinese');
   UILangFilePageSpanish     := CustomMessage('msg_language_spanish');
   UILangFilePageTamil       := CustomMessage('msg_language_tamil');
+  UILangFilePagePortuguese  := CustomMessage('msg_language_portuguese');
   UILangFilePageItalian     := CustomMessage('msg_language_italian');
 
   UILangFilePage := CreateInputOptionPage(wpSelectComponents,
@@ -615,6 +619,7 @@ begin
   UILangFilePage.Add(UILangFilePageTChinese);
   UILangFilePage.Add(UILangFilePageSpanish);
   UILangFilePage.Add(UILangFilePageTamil);
+  UILangFilePage.Add(UILangFilePagePortuguese);
   UILangFilePage.Add(UILangFilePageItalian);
   case ActiveLanguage of
     'ja':
@@ -673,8 +678,10 @@ begin
             UILangFilePage.SelectedValueIndex := 8
           else if iniFile = 'lang_utf16le\ta_IN.lng' then
             UILangFilePage.SelectedValueIndex := 9
-          else if iniFile = 'lang_utf16le\it_IT.lng' then
+          else if iniFile = 'lang_utf16le\pt_BR.lng' then
             UILangFilePage.SelectedValueIndex := 10
+          else if iniFile = 'lang_utf16le\it_IT.lng' then
+            UILangFilePage.SelectedValueIndex := 11
           else
             UILangFilePage.SelectedValueIndex := 0;
         end;
