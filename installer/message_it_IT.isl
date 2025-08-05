@@ -1,6 +1,6 @@
 ﻿[CustomMessages]
 task_desktopicon=Crea collegamento a Tera Term sul &desktop
-task_starttmenuicon=Crea collegamento al menu Tera Term nel menu Start
+task_startupttmenuicon=Crea collegamento al menu Tera Term nel menu Start
 task_cygtermhere=Aggiungi "Cyg&term qui" al menu contestuale
 task_macroassoc=Associa i file .&ttl a ttpmacro.exe
 task_telnetassoc=Associa il protocollo t&elnet a ttermpro.exe
