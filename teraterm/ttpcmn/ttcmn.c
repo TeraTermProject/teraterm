@@ -270,13 +270,8 @@ void WINAPI ForegroundWin(HWND hWnd)
 	else {
 		ShowWindow(hWnd, SW_SHOW);
 	}
-	// フォアグラウンドにならないウインドウが発生する場合があるため、即時再描画を2回行う。
 	SetForegroundWindow(hWnd);
- 	InvalidateRect(hWnd, NULL, FALSE);
- 	UpdateWindow(hWnd);
- 	SetForegroundWindow(hWnd);
- 	InvalidateRect(hWnd, NULL, FALSE);
- 	UpdateWindow(hWnd);
+	Sleep(25); // フォアグラウンドになるまで待つ(動作環境によっては25ミリ秒では不足かもしれない)
 }
 
 void WINAPI SelectNextWin(HWND HWin, int Next, BOOL SkipIconic)
