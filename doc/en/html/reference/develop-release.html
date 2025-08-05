@@ -69,9 +69,14 @@ To release Tera Term installation package is shown in the following step:
   <li>What change is included in this release of not included is mostly determined.</li>
 </ol>
 
-<h2 id="rc-release">From create RC until release</h2>
+<h2 id="rc-release">Create RC, and aftet that</h2>
 
 <ol>
+  <li>Create a working branch.
+<pre>
+git checkout -b release/5_4_0-RC
+</pre>
+  </li>
   <li>Confirm documents.
     <ul>
       <li>Check for missing parts of documents. Configuration item on dialog, special options without UI, command line parameters, new macro command and so on.</li>
@@ -150,9 +155,12 @@ To release Tera Term installation package is shown in the following step:
   </li>
   <li>Create installer. (for check)</li>
   <li>Test run installer, run and connect in all supported OS.</li>
-  <li id="RC_commit">Commit and push.</li>
-  <li>Build on AppVeyor.
-    <p>use "github-main" project on AppVeyor.</p>
+  <li>Commit and push.</li>
+  <li>Create Pull Request to merge working branch.</li>
+  <li id="RC_commit">Merge the Pull Request.</li>
+  <li>A Build workflow of GitHub Actions is run.<br>
+    Three builds are triggered on: push to the working branch, Pull Request creation, and merge commit to the main or stable branch.<br>
+    The merge commit is considered the release candidate.
   </li>
   <li>Announce RC release.
     <ul>
@@ -167,6 +175,11 @@ To release Tera Term installation package is shown in the following step:
 <h2 id="release-operation">Release</h2>
 
 <ol>
+  <li>Create a working branch.
+<pre>
+git checkout -b release/5_4_0
+</pre>
+  </li>
   <li>Confirm documents. (same as above)</li>
   <li>Remove "RC" string.
     <ul>
@@ -199,19 +212,25 @@ To release Tera Term installation package is shown in the following step:
       Check that build and installer generation without error.
     </p>
   </li>
-  <li>Commit.</li>
+  <li>Commit and push.</li>
+  <li>Create Pull Request to merge working branch.</li>
+  <li>Merge the Pull Request.</li>
   <li>Create a tag and push.
     <p>
       Use annotated tags.
       The naming rule is `v(version)' (e.g. v5.4.0).
     </p>
 <pre>
+git switch main
+git pull --rebase
 git tag -a v5.4.0 -m "Release 5.4.0"
 git push origin v5.4.0
 </pre>
   </li>
-  <li>Create installer.
-    <p>use "github-release" project on AppVeyor.</p>
+  <li>The build workflow of GitHub Actions is run.<br>
+    Four builds are triggered on: push to the working branch, Pull Request creation, merge commit to the main or stable branch, and tag creation.<br>
+    The tag creation is considered the release.<br>
+    On release, the build workflow waits for approval in SignPath. Login to SignPath.io and Approve signing requests.
   </li>
   <li>Add to GitHub "Releases."
     <ul>
