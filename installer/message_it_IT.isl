@@ -25,6 +25,7 @@ msg_language_chinese=Cinese (&semplificato)
 msg_language_tchinese=Cinese (&tradizionale)
 msg_language_spanish=S&pagnolo
 msg_language_tamil=T&amil
+msg_language_portuguese=P&ortoghese (brasiliano)
 msg_language_italian=Ita&liano
 msg_del_confirm=Vuoi eliminare %s?
 msg_uninstall_confirm=Sembra che è installata una versione precedente del programma.%n%nPrima di proseguire ti consigliamo di disinstallare la versione precedente.%n%nVuoi disinstallare la versione precedente?

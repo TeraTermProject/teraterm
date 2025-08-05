@@ -25,6 +25,7 @@ msg_language_chinese=&Chinese(Simplified)
 msg_language_tchinese=Chinese(&Traditional)
 msg_language_spanish=&Spanish
 msg_language_tamil=T&amil
+msg_language_portuguese=P&ortuguese (Brazil)
 msg_language_italian=&Italian
 msg_del_confirm=Are you sure that you want to delete %s ?
 msg_uninstall_confirm=It seems a former version is installed. You are recommended to uninstall it previously. Do you uninstall former version ?
