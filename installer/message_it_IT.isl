@@ -1,4 +1,4 @@
-﻿[CustomMessages]
+[CustomMessages]
 task_desktopicon=Crea collegamento a Tera Term sul &desktop
 task_startupttmenuicon=Crea collegamento al menu Tera Term nel menu Start
 task_cygtermhere=Aggiungi "Cyg&term qui" al menu contestuale
@@ -27,6 +27,7 @@ msg_language_spanish=S&pagnolo
 msg_language_tamil=T&amil
 msg_language_portuguese=P&ortoghese (brasiliano)
 msg_language_italian=Ita&liano
+msg_language_turkish=T&urca
 msg_del_confirm=Vuoi eliminare %s?
 msg_uninstall_confirm=Sembra che è installata una versione precedente del programma.%n%nPrima di proseguire ti consigliamo di disinstallare la versione precedente.%n%nVuoi disinstallare la versione precedente?
 comp_TTX=Plugin aggiuntivi

@@ -1,4 +1,4 @@
-﻿[CustomMessages]
+[CustomMessages]
 task_desktopicon=Create Tera Term shortcut to &Desktop
 task_startupttmenuicon=Create TeraTerm &Menu shortcut to Startup
 task_cygtermhere=Add "Cy&gterm Here" to Context menu
@@ -25,6 +25,7 @@ msg_language_chinese=&Chinese(Simplified)
 msg_language_tchinese=Chinese(&Traditional)
 msg_language_spanish=&Spanish
 msg_language_tamil=T&amil
+msg_language_turkish=T&urkish
 msg_language_portuguese=P&ortuguese (Brazil)
 msg_language_italian=&Italian
 msg_del_confirm=Are you sure that you want to delete %s ?
