@@ -46,6 +46,7 @@ ConvertLNG(es_ES.lng utf16le)
 ConvertLNG("zh_TW.lng" utf16le)
 ConvertLNG("ta_IN.lng" utf16le)
 ConvertLNG("pt_BR.lng" utf16le)
+ConvertLNG("it_IT.lng" utf16le)
 
 add_custom_target(
   ${PACKAGE_NAME} ALL
