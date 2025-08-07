@@ -270,8 +270,18 @@ void WINAPI ForegroundWin(HWND hWnd)
 	else {
 		ShowWindow(hWnd, SW_SHOW);
 	}
-	SetForegroundWindow(hWnd);
-	Sleep(25); // フォアグラウンドになるまで待つ(動作環境によっては25ミリ秒では不足かもしれない)
+
+	DWORD thisThreadId = GetCurrentThreadId();
+	DWORD fgThreadId = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+	if (thisThreadId == fgThreadId) {
+		SetForegroundWindow(hWnd);
+		BringWindowToTop(hWnd);
+	} else {
+		AttachThreadInput(thisThreadId, fgThreadId, TRUE);
+		SetForegroundWindow(hWnd);
+		BringWindowToTop(hWnd);
+		AttachThreadInput(thisThreadId, fgThreadId, FALSE);
+	}
 }
 
 void WINAPI SelectNextWin(HWND HWin, int Next, BOOL SkipIconic)
