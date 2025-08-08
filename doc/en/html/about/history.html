@@ -3835,6 +3835,12 @@ SYNOPSIS:
         added support for SSH2 key exchange methods: curve25519-sha256, curve25519-sha256@libssh.org
         (<a href="https://github.com/TeraTermProject/teraterm/issues/89" target="_blank">issue #89</a>)
       </li>
+      <li>
+        Removed the upper limit on the number of SSH channels.<br>
+        Added the <a href="../setup/teraterm-ini.html#MaxChannel">MaxChannel</a> entry in the teraterm.ini file to set the limit on the number of SSH channels.<br>
+        The default value for <a href="../setup/teraterm-ini.html#MaxChannel">MaxChannel</a> is 1000, and specifying 0 will set it to unlimited.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/694" target="_blank">issue #694</a>)
+      </li>
     </ul>
   </li>
 
