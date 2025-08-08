@@ -9,6 +9,9 @@ rem   - ./teraterm_pdb
 rem ‚±‚ÌŠO‚Å set ‚³‚ê‚½ RELEASE ‚ğã‘‚«‚µ‚È‚¢‚½‚ß‚É setlocal ‚·‚é
 setlocal
 
+if not exist Output mkdir Output
+if not exist Output\build mkdir Output\build
+
 SET rebuild=
 SET release=
 
@@ -26,7 +29,7 @@ CALL makechm.bat
 CALL build.bat %rebuild%
 if ERRORLEVEL 1 goto fail
 
-set dst=%~dp0teraterm
+set dst=%~dp0Output\build\teraterm
 echo dst=%dst%
 call :create
 

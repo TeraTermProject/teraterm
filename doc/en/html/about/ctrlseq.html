@@ -174,11 +174,11 @@
 <pre id="TerminalID">
 <i>Ps</i> = 0    Asks for the terminal's architectural class and basic attributes.
 Response: Depends the <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> setting. (same as <a href="#ESC_Z">ESC Z</a>.)
-  VT100     CSI ? 1 ; 2 c
-  VT100J    CSI ? 5 ; 2 c
-  VT101     CSI ? 1 ; 0 c
-  VT102     CSI ? 6 c
-  VT102J    CSI ? 15 c
+  VT100     ESC [ ? 1 ; 2 c
+  VT100J    ESC [ ? 5 ; 2 c
+  VT101     ESC [ ? 1 ; 0 c
+  VT102     ESC [ ? 6 c
+  VT102J    ESC [ ? 15 c
   VT220     CSI ? 60 ; 1 ; 2 ; 6 ; 8 ; 9 ; 15 ; c
   VT220J    CSI ? 62 ; 1 ; 2 ; 5 ; 6 ; 7 ; 8 c
   VT282     CSI ? 62 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 11 c
@@ -187,7 +187,10 @@ Response: Depends the <a href="../menu/setup-additional-terminal.html#TerminalID
   VT420     CSI ? 64 ; 1 ; 2 ; 7 ; 8 ; 9 ; 15 ; 18 ; 21 c
   VT520     CSI ? 65 ; 1 ; 2 ; 7 ; 8 ; 9 ; 12 ; 18 ; 19 ; 21 ; 23 ; 24 ; 42 ; 44 ; 45 ; 46 c
   VT525     CSI ? 65 ; 1 ; 2 ; 7 ; 9 ; 12 ; 18 ; 19 ; 21 ; 22 ; 23 ; 24 ; 42 ; 44 ; 45 ; 46 c
+
+Note The VT100 series has only 7-bit mode. Therefore, explicitly use "ESC [" instead of CSI.
 </pre>
+<a href="ctrlseq_device_attributes.html">Parameter Details</a>
 </td></tr>
 <tr><td>CSI <i>Ps</i> d</td>	<td>VPA</td>	<td> Move to the corresponding vertical position (line <i>Ps</i>) of the current column. The default value of <i>Ps</i> is 1. </tr>
 <tr><td>CSI <i>Ps</i> e</td>	<td>VPR</td>	<td> Moves cursor down <i>Ps</i> lines in the same column. The default value of <i>Ps</i> is 1. </td></tr>

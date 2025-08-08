@@ -1,4 +1,4 @@
-﻿[CustomMessages]
+[CustomMessages]
 task_desktopicon=デスクトップに Tera Term のショートカットを作る(&D)
 task_startupttmenuicon=スタートに TeraTerm Menu のショートカットを作る(&M)
 task_cygtermhere=コンテキストメニューに "Cy&gterm Here" を追加する
@@ -25,6 +25,9 @@ msg_language_chinese=簡体字中国語(&C)
 msg_language_tchinese=繁体字中国語(&T)
 msg_language_spanish=スペイン語(&S)
 msg_language_tamil=タミル語(&A)
+msg_language_portuguese=ポルトガル語 (ブラジル) (&O)
+msg_language_italian=イタリア語(&I)
+msg_language_turkish=トルコ語(&U)
 msg_del_confirm=%s を削除しますか？
 msg_uninstall_confirm=以前のバージョンがインストールされているようです。先にアンインストールすることをお勧めします。アンインストールしますか？
 comp_TTX=追加プラグイン

@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.11)
 
 set(PACKAGE_NAME "lang")
 project(${PACKAGE_NAME})
@@ -46,6 +46,8 @@ ConvertLNG(es_ES.lng cp1252)
 ConvertLNG("zh_TW.lng" cp950)
 ConvertLNG("ta_IN.lng" cp65001)
 ConvertLNG("pt_BR.lng" cp1252)
+ConvertLNG("it_IT.lng" cp1252)
+ConvertLNG("tr_TR.lng" cp1254)
 
 add_custom_target(
   ${PACKAGE_NAME} ALL
