@@ -139,12 +139,14 @@ jobs:
     strategy:
       matrix:
         windows: [windows-2022]
-        arch: [x86]
+        arch: [x86, x64]
         include:
           - windows: windows-2022
             VS_VERSION: 2022
           - arch: x86
             TARGET: Win32
+          - arch: x64
+            TARGET: x64
 
     runs-on: ${{ matrix.windows }}
 
