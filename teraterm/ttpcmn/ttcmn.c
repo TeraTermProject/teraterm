@@ -270,7 +270,18 @@ void WINAPI ForegroundWin(HWND hWnd)
 	else {
 		ShowWindow(hWnd, SW_SHOW);
 	}
-	SetForegroundWindow(hWnd);
+
+	DWORD thisThreadId = GetCurrentThreadId();
+	DWORD fgThreadId = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+	if (thisThreadId == fgThreadId) {
+		SetForegroundWindow(hWnd);
+		BringWindowToTop(hWnd);
+	} else {
+		AttachThreadInput(thisThreadId, fgThreadId, TRUE);
+		SetForegroundWindow(hWnd);
+		BringWindowToTop(hWnd);
+		AttachThreadInput(thisThreadId, fgThreadId, FALSE);
+	}
 }
 
 void WINAPI SelectNextWin(HWND HWin, int Next, BOOL SkipIconic)
