@@ -1,4 +1,4 @@
-#define AppName "Tera Term"
+﻿#define AppName "Tera Term"
 
 ; 出力ファイル名(exeなし)
 #ifndef OutputBaseFilename
@@ -578,9 +578,11 @@ end;
 
 procedure InitializeWizard;
 var
+  UserConfigDir             : String;
   UILangFilePageCaption     : String;
   UILangFilePageDescription : String;
   UILangFilePageSubCaption  : String;
+  UILangFilePageSubCaption2 : String;
   UILangFilePageNone        : String;
   UILangFilePageJapanese    : String;
   UILangFilePageGerman      : String;
@@ -595,9 +597,11 @@ var
   UILangFilePageItalian     : String;
   UILangFilePageTurkish     : String;
 begin
+  UserConfigDir             := ExpandConstant('{userappdata}\teraterm5');
   UILangFilePageCaption     := CustomMessage('msg_language_caption');
   UILangFilePageDescription := CustomMessage('msg_language_description');
   UILangFilePageSubCaption  := CustomMessage('msg_language_subcaption');
+  UILangFilePageSubCaption2 := CustomMessage('msg_language_subcaption2');
   UILangFilePageNone        := CustomMessage('msg_language_none');
   UILangFilePageJapanese    := CustomMessage('msg_language_japanese');
   UILangFilePageGerman      := CustomMessage('msg_language_german');
@@ -612,6 +616,10 @@ begin
   UILangFilePageItalian     := CustomMessage('msg_language_italian');
   UILangFilePageTurkish     := CustomMessage('msg_language_turkish');
 
+  if FileExists(UserConfigDir + '\TERATERM.INI') then
+  begin
+    UILangFilePageSubCaption := UILangFilePageSubCaption + #13#10 + ExpandConstant(UILangFilePageSubCaption2)
+  end;
   UILangFilePage := CreateInputOptionPage(wpSelectComponents,
     UILangFilePageCaption, UILangFilePageDescription,
     UILangFilePageSubCaption, True, False);

@@ -15,6 +15,7 @@ launch_ttmenu=Launch TeraTerm &Menu
 msg_language_caption=Select Language
 msg_language_description=Which language shoud be used?
 msg_language_subcaption=Select the language of application's menu and dialog, then click Next.
+msg_language_subcaption2=This selection is written to the configuration file in the installation directory. Please note that it is not written to the configuration file used by the application located in {userappdata}\teraterm5.
 msg_language_none=&English
 msg_language_japanese=&Japanese
 msg_language_german=&German

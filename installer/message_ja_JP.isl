@@ -1,4 +1,4 @@
-[CustomMessages]
+﻿[CustomMessages]
 task_desktopicon=デスクトップに Tera Term のショートカットを作る(&D)
 task_startupttmenuicon=スタートに TeraTerm Menu のショートカットを作る(&M)
 task_cygtermhere=コンテキストメニューに "Cy&gterm Here" を追加する
@@ -15,6 +15,7 @@ launch_ttmenu=今すぐ TeraTerm &Menu を実行する
 msg_language_caption=言語の選択
 msg_language_description=ユーザーインターフェースの言語を選択してください。
 msg_language_subcaption=アプリケーションのメニューやダイアログ等の表示言語を選択して、「次へ」をクリックしてください。
+msg_language_subcaption2=この選択はインストール先の設定ファイルに反映されますが、プログラムから使用される {userappdata}\teraterm5 の設定ファイルには適用されませんので注意してください。
 msg_language_none=英語(&E)
 msg_language_japanese=日本語(&J)
 msg_language_german=ドイツ語(&G)
