@@ -73,6 +73,7 @@ char TopicName[21] = "";
 static HCONV ConvH = 0;
 BOOL AdvFlag = FALSE;
 BOOL CloseTT = FALSE;
+BOOL isSetSerialDelay = FALSE;	// for setserialdelaychar, setserialdelayline
 
 static BOOL DdeCmnd = FALSE;
 
@@ -1044,7 +1045,59 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		}
 		break;
 
-	case CmdGetModemStatus: // add 'getmodemstatus' (2015.1.8 yutaka)
+	case CmdSetSerialDelayChar:
+		{
+			int val;
+
+			if (!cv.Open || cv.PortType != IdSerial) {
+				result = DDE_FNOTPROCESSED;
+				break;
+			}
+
+			val = atoi(ParamFileName);
+			if (val >= 0) {
+				ts.DelayPerChar = val;
+				size_t use;
+				GetOutBuffInfo(&cv, &use, NULL);
+				if (use == 0) {
+					cv.DelayPerChar = val;
+					if (HWndDdeCli != NULL) {
+						PostMessage(HWndDdeCli,WM_USER_DDECMNDEND,1,0);
+					}
+				} else {
+					isSetSerialDelay = TRUE;
+				}
+			}
+		}
+		break;
+
+	case CmdSetSerialDelayLine:
+		{
+			int val;
+
+			if (!cv.Open || cv.PortType != IdSerial) {
+				result = DDE_FNOTPROCESSED;
+				break;
+			}
+
+			val = atoi(ParamFileName);
+			if (val >= 0) {
+				ts.DelayPerLine = val;
+				size_t use;
+				GetOutBuffInfo(&cv, &use, NULL);
+				if (use == 0) {
+					cv.DelayPerLine = val;
+					if (HWndDdeCli != NULL) {
+						PostMessage(HWndDdeCli,WM_USER_DDECMNDEND,1,0);
+					}
+				} else {
+					isSetSerialDelay = TRUE;
+				}
+			}
+		}
+		break;
+
+	case CmdGetModemStatus:	 // add 'getmodemstatus' (2015.1.8 yutaka)
 		{
 		DWORD val, n;
 
@@ -1485,4 +1538,14 @@ void RunMacro(PCHAR FName, BOOL Startup)
 	wchar_t *fnameW = ToWcharA(FName);
 	RunMacroW(fnameW, Startup);
 	free(fnameW);
+}
+
+void SetSerialDelayEnd(int Result)
+{
+	isSetSerialDelay = FALSE;
+	cv.DelayPerChar = ts.DelayPerChar;
+	cv.DelayPerLine = ts.DelayPerLine;
+	if (HWndDdeCli != NULL) {
+		PostMessage(HWndDdeCli,WM_USER_DDECMNDEND,(WPARAM)Result,0);
+	}
 }

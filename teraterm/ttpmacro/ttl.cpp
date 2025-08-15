@@ -6273,6 +6273,10 @@ static int ExecCmnd(void)
 			Err = TTLCommCmdInt(CmdSetFlowCtrl,0); break;
 		case RsvSetRts:
 			Err = TTLCommCmdInt(CmdSetRts,0); break;
+		case RsvSetSerialDelayChar:
+			Err = TTLCommCmdInt(CmdSetSerialDelayChar,IdTTLWaitCmndResult); break;
+		case RsvSetSerialDelayLine:
+			Err = TTLCommCmdInt(CmdSetSerialDelayLine,IdTTLWaitCmndResult); break;
 		case RsvSetSync:
 			Err = TTLSetSync(); break;
 		case RsvSetTime:

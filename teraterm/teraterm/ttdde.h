@@ -42,10 +42,12 @@ void EndDdeCmnd(int Result);
 void SetDdeComReady(WORD Ready);
 void RunMacro(PCHAR FName, BOOL Startup);
 void RunMacroW(const wchar_t *FNameW, BOOL Startup);
+void SetSerialDelayEnd(int Result);
 
 extern char TopicName[21];
 extern BOOL AdvFlag;
 extern BOOL CloseTT;
+extern BOOL isSetSerialDelay;
 
 // DDE buffer
 extern BOOL DDELog;

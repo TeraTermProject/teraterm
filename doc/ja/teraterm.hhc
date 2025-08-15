@@ -1245,6 +1245,16 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="setserialdelaychar">
+					<param name="Local" value="html\macro\command\setserialdelaychar.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="setserialdelayline">
+					<param name="Local" value="html\macro\command\setserialdelayline.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="setsync">
 					<param name="Local" value="html\macro\command\setsync.html">
 					<param name="ImageNumber" value="11">
