@@ -1552,7 +1552,7 @@ void KeyCodeSend(WORD KCode, WORD Count)
 
 	if (CodeLength == 0)
 		return;
-	if (TalkStatus == IdTalkKeyb) {
+	if (TalkStatus == IdTalkKeyb || TalkStatus == IdTalkSendMem) {
 		switch (CodeType) {
 			case IdBinary:
 				SendBinary(Code, CodeLength, Count);

@@ -459,7 +459,7 @@ static HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
 	// コマンドの貼り付けを行っていない場合、TalkStatusは IdTalkCB になので、DDE_FNOTPROCESSEDを
 	// 返すことがある。DDE_FBUSYに変更。
 	// (2006.11.6 yutaka)
-	if (TalkStatus != IdTalkKeyb)
+	if (TalkStatus != IdTalkKeyb  && TalkStatus != IdTalkSendMem)
 		return (HDDEDATA)DDE_FBUSY;
 
 	if (ConvH==0) return DDE_FNOTPROCESSED;
