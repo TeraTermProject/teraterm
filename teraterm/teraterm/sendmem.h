@@ -42,6 +42,7 @@ typedef enum {
 	SENDMEM_DELAYTYPE_PER_SENDSIZE,
 } SendMemDelayType;
 
+void GetOutBuffInfo(const TComVar *cv_, size_t *use, size_t *free);
 SendMem *SendMemTextW(wchar_t *ptr, size_t len);
 SendMem *SendMemBinary(void *ptr, size_t len);
 void SendMemInitEcho(SendMem *sm, BOOL echo);
