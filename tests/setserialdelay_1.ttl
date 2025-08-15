@@ -1,0 +1,339 @@
+; シリアルポートの送信遅延をマクロコマンドで設定できませんか？ #562
+; setserialdelaychar と setserialdelayline の動作確認用TTL(その1)
+;
+; com0comを使用したCOM2→COM1折り返しで確認
+; 確認対象は下記の5種類
+; 1. send
+; 2. sendln
+; 3. sendbinary
+; 4. sendtext
+; 5. sendfile
+
+connect '/C=1'
+unlink
+connect '/C=2'
+
+;--------------------------------------------------------------------------------
+setserialdelaychar 0
+setserialdelayline 0
+messagebox 'send' 'start'
+
+; char
+setserialdelaychar 0
+send 'setserialdelaychar 0'
+send 13 10
+send 'setserialdelaychar 0'
+send 13 10
+
+setserialdelaychar 10
+send 'setserialdelaychar 10'
+send 13 10
+send 'setserialdelaychar 10'
+send 13 10
+
+setserialdelaychar 400
+send 'setserialdelaychar 400'
+send 13 10
+send 'setserialdelaychar 400'
+send 13 10
+
+setserialdelaychar 40
+send 'setserialdelaychar 40'
+send 13 10
+send 'setserialdelaychar 40'
+send 13 10
+
+; line
+setserialdelaychar 0
+setserialdelayline 0
+
+setserialdelayline 10
+send 'setserialdelayline 10'
+send 13 10
+send 'setserialdelayline 10'
+send 13 10
+
+setserialdelayline 80
+send 'setserialdelayline 80'
+send 13 10
+send 'setserialdelayline 80'
+send 13 10
+
+setserialdelayline 400
+send 'setserialdelayline 400'
+send 13 10
+send 'setserialdelayline 400'
+send 13 10
+
+; char + line
+setserialdelaychar 40
+setserialdelayline 80
+send 'delaychar 40 delayline 80'
+send 13 10
+send 'delaychar 40 delayline 80'
+send 13 10
+send 'delaychar 40 delayline 80'
+send 13 10
+send 'delaychar 40 delayline 80'
+send 13 10
+send 'delaychar 40 delayline 80'
+send 13 10
+
+setserialdelaychar 40
+setserialdelayline 400
+send 'delaychar 40 delayline 400'
+send 13 10
+send 'delaychar 40 delayline 400'
+send 13 10
+send 'delaychar 40 delayline 400'
+send 13 10
+send 'delaychar 40 delayline 400'
+send 13 10
+send 'delaychar 40 delayline 400'
+send 13 10
+
+;--------------------------------------------------------------------------------
+setserialdelaychar 0
+setserialdelayline 0
+messagebox 'sendln' 'start'
+
+; char
+setserialdelaychar 0
+sendln 'setserialdelaychar 0'
+sendln 10
+sendln 'setserialdelaychar 0'
+sendln 10
+
+setserialdelaychar 10
+sendln 'setserialdelaychar 10'
+sendln 10
+sendln 'setserialdelaychar 10'
+sendln 10
+
+setserialdelaychar 400
+sendln 'setserialdelaychar 400'
+sendln 10
+sendln 'setserialdelaychar 400'
+sendln 10
+
+setserialdelaychar 40
+sendln 'setserialdelaychar 40'
+sendln 10
+sendln 'setserialdelaychar 40'
+sendln 10
+
+; line
+setserialdelaychar 0
+setserialdelayline 0
+
+setserialdelayline 10
+sendln 'setserialdelayline 10'
+sendln 10
+sendln 'setserialdelayline 10'
+sendln 10
+
+setserialdelayline 80
+sendln 'setserialdelayline 80'
+sendln 10
+sendln 'setserialdelayline 80'
+sendln 10
+
+setserialdelayline 400
+sendln 'setserialdelayline 400'
+sendln 10
+sendln 'setserialdelayline 400'
+sendln 10
+
+; char + line
+setserialdelaychar 40
+setserialdelayline 80
+sendln 'delaychar 40 delayline 80'
+sendln 10
+sendln 'delaychar 40 delayline 80'
+sendln 10
+sendln 'delaychar 40 delayline 80'
+sendln 10
+sendln 'delaychar 40 delayline 80'
+sendln 10
+sendln 'delaychar 40 delayline 80'
+sendln 10
+
+setserialdelaychar 40
+setserialdelayline 400
+sendln 'delaychar 40 delayline 400'
+sendln 10
+sendln 'delaychar 40 delayline 400'
+sendln 10
+sendln 'delaychar 40 delayline 400'
+sendln 10
+sendln 'delaychar 40 delayline 400'
+sendln 10
+sendln 'delaychar 40 delayline 400'
+sendln 10
+
+;--------------------------------------------------------------------------------
+setserialdelaychar 0
+setserialdelayline 0
+messagebox 'sendbinary' 'start' 
+
+; char
+setserialdelaychar 0
+sendbinary 'setserialdelaychar 0'
+sendbinary 13 10
+sendbinary 'setserialdelaychar 0'
+sendbinary 13 10
+
+setserialdelaychar 10
+sendbinary 'setserialdelaychar 10'
+sendbinary 13 10
+sendbinary 'setserialdelaychar 10'
+sendbinary 13 10
+
+setserialdelaychar 400
+sendbinary 'setserialdelaychar 400'
+sendbinary 13 10
+sendbinary 'setserialdelaychar 400'
+sendbinary 13 10
+
+setserialdelaychar 40
+sendbinary 'setserialdelaychar 40'
+sendbinary 13 10
+sendbinary 'setserialdelaychar 40'
+sendbinary 13 10
+
+; line
+setserialdelaychar 0
+setserialdelayline 0
+
+setserialdelayline 10
+sendbinary 'setserialdelayline 10'
+sendbinary 13 10
+sendbinary 'setserialdelayline 10'
+sendbinary 13 10
+
+setserialdelayline 80
+sendbinary 'setserialdelayline 80'
+sendbinary 13 10
+sendbinary 'setserialdelayline 80'
+sendbinary 13 10
+
+setserialdelayline 400
+sendbinary 'setserialdelayline 400'
+sendbinary 13 10
+sendbinary 'setserialdelayline 400'
+sendbinary 13 10
+
+; char + line
+setserialdelaychar 40
+setserialdelayline 80
+sendbinary 'delaychar 40 delayline 80'
+sendbinary 13 10
+sendbinary 'delaychar 40 delayline 80'
+sendbinary 13 10
+sendbinary 'delaychar 40 delayline 80'
+sendbinary 13 10
+sendbinary 'delaychar 40 delayline 80'
+sendbinary 13 10
+sendbinary 'delaychar 40 delayline 80'
+sendbinary 13 10
+
+setserialdelaychar 40
+setserialdelayline 400
+sendbinary 'delaychar 40 delayline 400'
+sendbinary 13 10
+sendbinary 'delaychar 40 delayline 400'
+sendbinary 13 10
+sendbinary 'delaychar 40 delayline 400'
+sendbinary 13 10
+sendbinary 'delaychar 40 delayline 400'
+sendbinary 13 10
+sendbinary 'delaychar 40 delayline 400'
+sendbinary 13 10
+
+;--------------------------------------------------------------------------------
+setserialdelaychar 0
+setserialdelayline 0
+messagebox 'sendtext' 'start'
+
+; char
+setserialdelaychar 0
+sendtext 'setserialdelaychar 0'
+sendtext 13 10
+sendtext 'setserialdelaychar 0'
+sendtext 13 10
+
+setserialdelaychar 10
+sendtext 'setserialdelaychar 10'
+sendtext 13 10
+sendtext 'setserialdelaychar 10'
+sendtext 13 10
+
+setserialdelaychar 400
+sendtext 'setserialdelaychar 400'
+sendtext 13 10
+sendtext 'setserialdelaychar 400'
+sendtext 13 10
+
+setserialdelaychar 40
+sendtext 'setserialdelaychar 40'
+sendtext 13 10
+sendtext 'setserialdelaychar 40'
+sendtext 13 10
+
+; line
+setserialdelaychar 0
+setserialdelayline 0
+
+setserialdelayline 10
+sendtext 'setserialdelayline 10'
+sendtext 13 10
+sendtext 'setserialdelayline 10'
+sendtext 13 10
+
+setserialdelayline 80
+sendtext 'setserialdelayline 80'
+sendtext 13 10
+sendtext 'setserialdelayline 80'
+sendtext 13 10
+
+setserialdelayline 400
+sendtext 'setserialdelayline 400'
+sendtext 13 10
+sendtext 'setserialdelayline 400'
+sendtext 13 10
+
+; char + line
+setserialdelaychar 40
+setserialdelayline 80
+sendtext 'delaychar 40 delayline 80'
+sendtext 13 10
+sendtext 'delaychar 40 delayline 80'
+sendtext 13 10
+sendtext 'delaychar 40 delayline 80'
+sendtext 13 10
+sendtext 'delaychar 40 delayline 80'
+sendtext 13 10
+sendtext 'delaychar 40 delayline 80'
+sendtext 13 10
+
+setserialdelaychar 40
+setserialdelayline 400
+sendtext 'delaychar 40 delayline 400'
+sendtext 13 10
+sendtext 'delaychar 40 delayline 400'
+sendtext 13 10
+sendtext 'delaychar 40 delayline 400'
+sendtext 13 10
+sendtext 'delaychar 40 delayline 400'
+sendtext 13 10
+sendtext 'delaychar 40 delayline 400'
+sendtext 13 10
+
+;--------------------------------------------------------------------------------
+setserialdelaychar 0
+setserialdelayline 0
+messagebox 'sendfile' 'start'
+
+setserialdelaychar 40
+setserialdelayline 100
+sendfile 'testfile.txt' 0
