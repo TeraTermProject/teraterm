@@ -1,4 +1,4 @@
-#define AppName "Tera Term"
+﻿#define AppName "Tera Term"
 
 ; 出力ファイル名(exeなし)
 #ifndef OutputBaseFilename
@@ -43,6 +43,7 @@ Name: build.bat
 AppName={#AppName}
 AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 AppVersion={#AppVersion}
+AppVerName={#AppName} {#AppVersion}
 
 ; properties of installer executable
 VersionInfoDescription={#AppName} installer
