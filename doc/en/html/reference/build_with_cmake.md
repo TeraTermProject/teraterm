@@ -1,7 +1,7 @@
 ﻿# How to build by using cmake
 
 - You can build Tera Term by using [cmake](<https://cmake.org/>)(EXPERIMENTAL).
-- You can bulid using Visual Studio, NMake, MinGW
+- You can build using Visual Studio, NMake, MinGW
 
 ## cmake version
 
@@ -36,7 +36,7 @@ To build installer
 
 ### NMake (Visual Studio, very experimental)
 
-Execute vcvars32.bat,etc to prepare an environment where nmake, cl are avaiable,
+Execute vcvars32.bat,etc to prepare an environment where nmake, cl are available,
 Run next commands.
 
     mkdir build_nmake
