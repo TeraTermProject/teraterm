@@ -1,4 +1,4 @@
-[CustomMessages]
+﻿[CustomMessages]
 task_desktopicon=Crea collegamento a Tera Term sul &desktop
 task_startupttmenuicon=Crea collegamento al menu Tera Term nel menu Start
 task_cygtermhere=Aggiungi "Cyg&term qui" al menu contestuale
@@ -15,6 +15,7 @@ launch_ttmenu=Esegui &menu Tera Term
 msg_language_caption=Seleziona lingua
 msg_language_description=Quale lingua vuoi usare?
 msg_language_subcaption=Seleziona la lingua del menu e della finestra di dialogo dell'applicazione, quindi seleziona 'Avanti'.
+msg_language_subcaption2=This selection is written to the configuration file in the installation directory. Please note that it is not written to the configuration file used by the application located in {userappdata}\teraterm5.
 msg_language_none=I&nglese
 msg_language_japanese=&Giapponese
 msg_language_german=&Tedesco
