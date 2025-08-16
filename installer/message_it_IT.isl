@@ -1,4 +1,4 @@
-[CustomMessages]
+﻿[CustomMessages]
 task_desktopicon=Crea collegamento a Tera Term sul &desktop
 task_startupttmenuicon=Crea collegamento al menu Tera Term nel menu Start
 task_cygtermhere=Aggiungi "Cyg&term qui" al menu contestuale
