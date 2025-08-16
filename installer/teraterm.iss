@@ -637,13 +637,51 @@ begin
   UILangFilePage.Add(UILangFilePagePortuguese);
   UILangFilePage.Add(UILangFilePageItalian);
   UILangFilePage.Add(UILangFilePageTurkish);
-  case ActiveLanguage of
-    'ja':
-      UILangFilePage.SelectedValueIndex := 1;
-    // 他の言語は最新版に追従していないので、日本語だけ特別扱い
-    else
-      UILangFilePage.SelectedValueIndex := 0;
+
+  case GetUILanguage and $3FF of
+    $11: // Japanese
+     UILangFilePage.SelectedValueIndex := 1;
+    $07: // German
+      UILangFilePage.SelectedValueIndex := 2;
+    $0C: // French
+      UILangFilePage.SelectedValueIndex := 3;
+    $19: // Russian
+      UILangFilePage.SelectedValueIndex := 4;
+    $12: // Korean
+      UILangFilePage.SelectedValueIndex := 5;
+    $04: // Chinese
+      begin
+        case GetUILanguage of
+          $0004, $7800, $0804, $1004: // zh-Hans, zh, zh-CN, zh-SG
+            // Chinese (Simplified)
+            UILangFilePage.SelectedValueIndex := 6;
+        else
+          // Chinese (Traditional)
+          UILangFilePage.SelectedValueIndex := 7;
+        end;
+      end;
+    $0A: // Spanish
+      UILangFilePage.SelectedValueIndex := 8;
+    $49: // Tamil
+      UILangFilePage.SelectedValueIndex := 9;
+    $16: // Portuguese
+      begin
+        case GetUILanguage of
+          $0416: // pt-BR
+            UILangFilePage.SelectedValueIndex := 10;
+        else
+          // pt-PT and other Portuguese file is not created. pt-BR is used instead.
+          UILangFilePage.SelectedValueIndex := 10;
+        end;
+      end;
+    $10: // Italian
+      UILangFilePage.SelectedValueIndex := 11;
+    $1F: // Turkish
+      UILangFilePage.SelectedValueIndex := 12;
+  else // Other
+    UILangFilePage.SelectedValueIndex := 0;
   end;
+
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
