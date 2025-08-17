@@ -268,8 +268,18 @@ static wchar_t *CreateDumpFilename()
 #else
 	char *version = _strdup("unknown");
 #endif
+#if defined(_M_IX86)
+	const char *platform = "x86";
+#elif defined(_M_X64)
+	const char *platform = "x64";
+#elif defined(_M_ARM64)
+	const char *platform = "arm64";
+#else
+	const char *platform = "unknown";
+#endif
 	wchar_t *dump_file;
-	aswprintf(&dump_file, L"teraterm_%04u%02u%02u-%02u%02u%02u_%hs.dmp",
+	aswprintf(&dump_file, L"teraterm_%hs_%04u%02u%02u-%02u%02u%02u_%hs.dmp",
+			  platform,
 			  local_time.wYear, local_time.wMonth, local_time.wDay,
 			  local_time.wHour, local_time.wMinute, local_time.wSecond,
 			  version);
@@ -314,14 +324,15 @@ static BOOL DumpFile = TRUE;
 
 static LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS* pExceptionPointers)
 {
+	bool dumped = false;
 	if (DumpFile) {
 		wchar_t *dumpfile = NULL;
 		wchar_t *fname = CreateDumpFilename();
 		wchar_t *logdir = GetLogDirW(NULL);
 		aswprintf(&dumpfile, L"%s\\%s", logdir, fname);
 
-		bool r = DumpMiniDump(dumpfile, pExceptionPointers);
-		if (r) {
+		dumped = DumpMiniDump(dumpfile, pExceptionPointers);
+		if (dumped) {
 			const wchar_t *msg_base =
 				L"minidump '%s'\r\n"
 				L" refer to https://teratermproject.github.io/manual/5/ja/reference/develop.html";
@@ -335,7 +346,9 @@ static LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS* pExceptionPointer
 	}
 
 #if defined(_M_IX86)
-	ApplicationFaultHandler(pExceptionPointers);
+	if (!dumped) {
+		ApplicationFaultHandler(pExceptionPointers);
+	}
 #endif
 
 //	return EXCEPTION_EXECUTE_HANDLER;  /* そのままプロセスを終了させる */
