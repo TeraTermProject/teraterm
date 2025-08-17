@@ -44,7 +44,8 @@ typedef struct {
 	int PktInCount, PktInPtr;
 	int PktOutCount, PktOutPtr, PktOutLen;
 	WORD Ver, WinSize;
-	WORD QVMode, QVState, PktState;
+	QV_MODE_T QVMode;
+	WORD QVState, PktState;
 	WORD AValue;
 	WORD SeqNum;
 	WORD FileNum;
@@ -203,6 +204,8 @@ static BOOL QVInit(PFileVarProto fv, PComVar cv, PTTSet ts)
       qv->RetryCount = 10;
       QVSendNAK(fv,qv,cv);
       break;
+    default:
+      return FALSE;
   }
 
   return TRUE;
@@ -658,9 +661,9 @@ static BOOL QVReadPacket(PFileVarProto fv, PQVVar qv, PComVar cv)
 	  else
 	    w0 = qv->SeqNum + 1 - qv->WinSize;
 	  w1 = qv->SeqNum+1;
-	  if ((qv->SeqNum==0) && (qv->PktIn[1]==1) ||
-	      (qv->SeqNum>0) &&
-	      QVCheckWindow8(qv,w0,w1,qv->PktIn[1],&w))
+	  if (((qv->SeqNum==0) && (qv->PktIn[1]==1)) ||
+	      ((qv->SeqNum>0) &&
+		   QVCheckWindow8(qv,w0,w1,qv->PktIn[1],&w)))
 	  {
 	    qv->CheckSum = 0;
 	    qv->PktInPtr = 3;
@@ -1326,9 +1329,9 @@ static BOOL QVParse(PFileVarProto fv, PComVar cv)
 	PQVVar qv = fv->data;
 	switch (qv->QVMode) {
 	case IdQVReceive:
-		return QVReadPacket(fv,qv,cv);
+		return QVReadPacket(fv,qv,cv);	// ˆ—‚ªI‚í‚Á‚½‚ç FALSE ‚ð•Ô‚·
 	case IdQVSend:
-		return QVSendPacket(fv,qv,cv);
+		return QVSendPacket(fv,qv,cv);	// ˆ—‚ªI‚í‚Á‚½‚ç FALSE ‚ð•Ô‚·
 	default:
 		return FALSE;
 	}
@@ -1339,7 +1342,7 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 	PQVVar qv = fv->data;
 	switch(request) {
 	case QUICKVAN_MODE: {
-		int Mode = va_arg(ap, int);
+		QV_MODE_T Mode = va_arg(ap, QV_MODE_T);
 		qv->QVMode = Mode;
 		return 0;
 	}

@@ -100,12 +100,28 @@ typedef struct FileVarProto {
 typedef TFileVarProto *PFileVarProto;
 
 // プロトコルのオペレーション
+//   各プロトコルの実装
 typedef struct ProtoOp_ {
+	// 初期化処理
+	// メモリ確保、状態初期化等を行う
+	//	@retval	TRUE	正常終了
+	//	@retval	FALSE	異常終了、初期化失敗
 	BOOL (*Init)(struct FileVarProto *fv, PComVar cv, PTTSet ts);
+	// 処理の継続
+	//	@retval	TRUE	正常、処理を継続終了
+	//	@retval	FALSE	終了、引き続きParse()を呼ぶ必要なし
 	BOOL (*Parse)(struct FileVarProto *fv, PComVar cv);
+	// タイムアウト通知
+	//	タイムアウトが発生したことをプロトコル処理に通知
 	void (*TimeOutProc)(struct FileVarProto *fv, PComVar cv);
+	// キャンセル通知
+	//	ユーザーがキャンセルしたことをプロトコル処理に通知
 	void (*Cancel)(struct FileVarProto *fv, PComVar cv);
+	// パラメータ設定
+	//	プロトコルごとのパラメータ設定
 	int (*SetOptV)(struct FileVarProto *fv, int request, va_list ap);
+	// 終了処理
+	//	メモリの開放などを行う
 	void (*Destroy)(struct FileVarProto *fv);
 } TProtoOp;
 

@@ -36,10 +36,13 @@ extern "C" {
 #endif
 
   /* Kermit function id */
-#define IdKmtReceive 1
-#define IdKmtGet     2
-#define IdKmtSend    3
-#define IdKmtFinish  4
+typedef enum {
+	IdKmtQuit    = 0,	// “à•”‚Åg—pAˆ—‚ªŠ®—¹‚µ‚½ó‘Ô
+	IdKmtReceive = 1,
+	IdKmtGet     = 2,
+	IdKmtSend    = 3,
+	IdKmtFinish  = 4,
+} KMT_MODE_T;
 
   /* KERMIT option */
 #define KmtOptLongPacket 1
