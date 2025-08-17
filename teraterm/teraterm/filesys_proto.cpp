@@ -789,24 +789,6 @@ void ProtoDlgCancel(void)
 
 		// キャンセルが押されたことを通知する
 		fv->ProtoOp->Cancel(fv, &cv);
-
-		// 特別処理
-		// 		通常何もしない
-		switch (fv->ProtoId) {
-		case PROTO_ZM:
-		case PROTO_XM:
-			break;
-		case PROTO_KMT:
-		case PROTO_BP:
-		case PROTO_QV:
-		case PROTO_YM:
-			// ダイアログを閉じる
-			ProtoEnd();
-			break;
-		default:
-			assert(FALSE);
-			break;
-		}
 	}
 }
 

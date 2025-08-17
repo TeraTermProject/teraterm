@@ -30,6 +30,7 @@
 /* Kermit protocol */
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "tttypes.h"
 #include "ttcommon.h"
@@ -54,7 +55,8 @@ typedef struct {
 	int PktInLen, PktInCount;
 	int PktNum, PktNumOffset;
 	int PktReadMode;
-	int KmtMode, KmtState;
+	KMT_MODE_T KmtMode;
+	int KmtState;
 	BOOL Quote8, RepeatFlag;
 	char ByteStr[6];
 	BOOL NextByteFlag;
@@ -73,7 +75,6 @@ typedef struct {
 	const wchar_t *UILanguageFileW;
 
 	BOOL FileOpen;
-	//LONG FileSize;
 	LONG ByteCount;
 
 	int ProgStat;
@@ -1268,6 +1269,9 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	case IdKmtFinish:
 		KmtSendInitPkt(fv,kv,cv,'I');
 		break;
+	default:
+		assert(0);
+		return FALSE;
 	}
 
 	return TRUE;
@@ -1346,6 +1350,11 @@ static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 	char FNBuff[50];
 	int Len;
 	PKmtVar kv = fv->data;
+
+	if (kv->KmtMode == IdKmtQuit) {
+		// I—¹ó‘Ô
+		return FALSE;
+	}
 
 	c = CommRead1Byte(cv,&b);
 
@@ -1603,6 +1612,9 @@ read_end:
 				case IdKmtFinish:
 					KmtSendFinish(fv,kv,cv);
 					break;
+				default:
+					assert(0);
+					break;
 				}
 			}
 			break;
@@ -1657,6 +1669,7 @@ static void KmtCancel(PFileVarProto fv, PComVar cv)
 	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'E',
 		strlen(&(kv->PktOut[4])));
 	KmtSendPacket(fv,kv,cv);
+	kv->KmtMode = IdKmtQuit;
 }
 
 static int SetOptV(PFileVarProto fv, int request, va_list ap)
@@ -1664,7 +1677,7 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 	PKmtVar kv = fv->data;
 	switch(request) {
 	case KMT_MODE: {
-		int Mode = va_arg(ap, int);
+		KMT_MODE_T Mode = va_arg(ap, KMT_MODE_T);
 		kv->KmtMode = Mode;
 		return 0;
 	}

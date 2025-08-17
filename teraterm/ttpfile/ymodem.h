@@ -30,15 +30,16 @@
 
 #pragma once
 
-#include "xmodem.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
   /* YMODEM function id */
-#define IdYReceive 1
-#define IdYSend    2
+typedef enum {
+	IdYQuit = 0,	// “à•”‚Åg—pAˆ—‚ªŠ®—¹‚µ‚½ó‘Ô
+	IdYReceive = 1,
+	IdYSend = 2,
+} YMODEM_MODE_T;
 
   /* YMODEM option */
 #define Yopt1K 1
