@@ -17,9 +17,21 @@
 
 [Setup]
 AppName={#AppName}
-AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 AppVersion={#AppVersion}
-AppVerName={#AppName} {#AppVersion}
+#if defined(M_X64)
+  AppVerName={#AppName} {#AppVersion} x64
+#elif defined(M_ARM64)
+  AppVerName={#AppName} {#AppVersion} arm64
+#else
+  AppVerName={#AppName} {#AppVersion} x86
+#endif
+#if defined(M_X64)
+  AppId={{3F29ABAB-6EEF-40BF-B1EA-ACA276CB133B}
+#elif defined(M_ARM64)
+  AppId={{9D4C2E5D-2AA7-4041-A098-E6750542350E}
+#else
+  AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
+#endif
 
 ; properties of installer executable
 VersionInfoDescription={#AppName} installer
