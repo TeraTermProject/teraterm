@@ -496,7 +496,7 @@
       <li>MACRO: fixed <a href="../macro/command/sendfile.html">sendfile</a> command stuck even if transmission is completed to send.</li>
       <li>MACRO: <a href="../macro/command/settitle.html">settitle</a> command using Kanji characters will be crashed.
         <ul>
-          <li>Fixed <a href="../macro/command/settitle.html">settitle</a>, <a href="../macro/command/gettitle.html">gettitle</a>, <a href="../macro/command/loadkeymap.html">loadkeymap</a> to handel string in Unicode.
+          <li>Fixed <a href="../macro/command/settitle.html">settitle</a>, <a href="../macro/command/gettitle.html">gettitle</a>, <a href="../macro/command/loadkeymap.html">loadkeymap</a> to handle string in Unicode.
           <li>Currently, Tera Term handle local title strings in ANSI strings. Characters that cannot be converted are replaced by "?".</li>
         </ul>
       </li>
@@ -524,9 +524,9 @@
         </ul></li>
       <li>Added setting Underline attribute(SGR 4) color and font</li>
       <li>if log file name from command line or default log file name is not full path, now it is considered as relative path from <a href="../setup/folder.html#LogDir">log folder</a> or <a href="../menu/setup-additional-log.html#LogDefaultPath">default log save folder</a>.</li>
-      <li>Exchanged foreground and background colors of characters that attributes is setted ANSIColor when colors are reversed with DECSCNM set.</li>
+      <li>Exchanged foreground and background colors of characters that attributes is set ANSIColor when colors are reversed with DECSCNM set.</li>
       <li>U+00A0(NBSP) and U+2000..U+2003 are converted to SPACE and displayed. tree command output is displayed correctly.</li>
-      <li>XMODEM: Fix to check all received datas and process correctly, even if received datas are accumulated.</li>
+      <li>XMODEM: Fix to check all received data and process correctly, even if received data are accumulated.</li>
       <li>YMODEM: ignore continuous 'C' when waiting for sending.</li>
       <li>Changed window position to specified in TERATERM.INI when duplicate a session.</li>
       <li>added a setting that can disable corner rounding of VT Window and TEK Window in Windows 11.
@@ -2529,7 +2529,7 @@
     <ul>
       <li>disabled the Plain text and Timestamp flag when the Binary flag is enabled.</li>
       <li>added the display method of <a href="../menu/setup-additional.html">Accept Window Title Change Request</a>. The title can insert before or after the canonical title.</li>
-      <li>moved the "Delimitter Characters" configuration from "General" tab to "Copy and Paste" tab on the <a href="../menu/setup-additional.html">"Additional settings" dialog</a>.</li>
+      <li>moved the "Delimiter Characters" configuration from "General" tab to "Copy and Paste" tab on the <a href="../menu/setup-additional.html">"Additional settings" dialog</a>.</li>
       <li>added the <a href="../commandline/teraterm.html">/DS</a> command line option. It disables the "New connection" dialog.</li>
       <li>Preserved the comment and the position of the entry in teraterm.ini file when a user saved the Tera Term configuration.</li>
       <li>added support for replace the command of UK character set with the US-ASCII. This is the workaround that the lower-case alphabet can not properly display after showing DEC special character.</li>
@@ -3385,7 +3385,7 @@ SYNOPSIS:
       <li>added saving log type(plain text) information to teraterm.ini(LogTypePlainText).</li>
       <li>added CygTerm settings on Additional settings dialog.</li>
       <li>added CygTerm settings on Additional settings dialog.</li>
-      <li>added support of selecting several pages(also expansion ans contraction of text area that has been selected). Start selected region is saved with mouse left click. End selected region is saved with Shift + mouse left click.</li>
+      <li>added support of selecting several pages(also expansion and contraction of text area that has been selected). Start selected region is saved with mouse left click. End selected region is saved with Shift + mouse left click.</li>
       <li>added scroll out the current buffer when TeraTerm clear screen at receiving &lt;ESC&gt;[J.</li>
       <li>added the workaround of CPU time 100% using TeraTerm macro(insert 100msec sleep after send and sendln). </li>
 </ul>
@@ -3916,7 +3916,7 @@ SYNOPSIS:
     <ul>
       <li>Added support for multiple required authentication.
         <ul>
-          <li>Auto login, connect from macro and duplicate session are not supported, because TTSSH cannot receive multiple authentication informations from command line parameters.</li>
+          <li>Auto login, connect from macro and duplicate session are not supported, because TTSSH cannot receive multiple authentication information from command line parameters.</li>
         </ul>
       </li>
       <li>If option(<a href="../commandline/ttssh.html#f">/f</a>, <a href="../commandline/ttssh.html#ssh-f">/ssh-f</a>, <a href="../commandline/ttssh.html#ssh-consume">/ssh-consume</a>, <a href="../commandline/ttssh.html#keyfile">/keyfile</a>) argument file name is not absolute path, modify it to be treated as a relative path from %APPDATA%\teraterm5\.</li>

@@ -1,4 +1,4 @@
-#define AppName "Tera Term"
+﻿#define AppName "Tera Term"
 
 ; 出力ファイル名(exeなし)
 #ifndef OutputBaseFilename
@@ -43,6 +43,7 @@ Name: build.bat
 AppName={#AppName}
 AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 AppVersion={#AppVersion}
+AppVerName={#AppName} {#AppVersion}
 
 ; properties of installer executable
 VersionInfoDescription={#AppName} installer
@@ -578,9 +579,11 @@ end;
 
 procedure InitializeWizard;
 var
+  UserConfigDir             : String;
   UILangFilePageCaption     : String;
   UILangFilePageDescription : String;
   UILangFilePageSubCaption  : String;
+  UILangFilePageSubCaption2 : String;
   UILangFilePageNone        : String;
   UILangFilePageJapanese    : String;
   UILangFilePageGerman      : String;
@@ -595,9 +598,11 @@ var
   UILangFilePageItalian     : String;
   UILangFilePageTurkish     : String;
 begin
+  UserConfigDir             := ExpandConstant('{userappdata}\teraterm5');
   UILangFilePageCaption     := CustomMessage('msg_language_caption');
   UILangFilePageDescription := CustomMessage('msg_language_description');
   UILangFilePageSubCaption  := CustomMessage('msg_language_subcaption');
+  UILangFilePageSubCaption2 := CustomMessage('msg_language_subcaption2');
   UILangFilePageNone        := CustomMessage('msg_language_none');
   UILangFilePageJapanese    := CustomMessage('msg_language_japanese');
   UILangFilePageGerman      := CustomMessage('msg_language_german');
@@ -612,6 +617,10 @@ begin
   UILangFilePageItalian     := CustomMessage('msg_language_italian');
   UILangFilePageTurkish     := CustomMessage('msg_language_turkish');
 
+  if FileExists(UserConfigDir + '\TERATERM.INI') then
+  begin
+    UILangFilePageSubCaption := UILangFilePageSubCaption + #13#10 + ExpandConstant(UILangFilePageSubCaption2)
+  end;
   UILangFilePage := CreateInputOptionPage(wpSelectComponents,
     UILangFilePageCaption, UILangFilePageDescription,
     UILangFilePageSubCaption, True, False);
@@ -628,13 +637,51 @@ begin
   UILangFilePage.Add(UILangFilePagePortuguese);
   UILangFilePage.Add(UILangFilePageItalian);
   UILangFilePage.Add(UILangFilePageTurkish);
-  case ActiveLanguage of
-    'ja':
-      UILangFilePage.SelectedValueIndex := 1;
-    // 他の言語は最新版に追従していないので、日本語だけ特別扱い
-    else
-      UILangFilePage.SelectedValueIndex := 0;
+
+  case GetUILanguage and $3FF of
+    $11: // Japanese
+     UILangFilePage.SelectedValueIndex := 1;
+    $07: // German
+      UILangFilePage.SelectedValueIndex := 2;
+    $0C: // French
+      UILangFilePage.SelectedValueIndex := 3;
+    $19: // Russian
+      UILangFilePage.SelectedValueIndex := 4;
+    $12: // Korean
+      UILangFilePage.SelectedValueIndex := 5;
+    $04: // Chinese
+      begin
+        case GetUILanguage of
+          $0004, $7800, $0804, $1004: // zh-Hans, zh, zh-CN, zh-SG
+            // Chinese (Simplified)
+            UILangFilePage.SelectedValueIndex := 6;
+        else
+          // Chinese (Traditional)
+          UILangFilePage.SelectedValueIndex := 7;
+        end;
+      end;
+    $0A: // Spanish
+      UILangFilePage.SelectedValueIndex := 8;
+    $49: // Tamil
+      UILangFilePage.SelectedValueIndex := 9;
+    $16: // Portuguese
+      begin
+        case GetUILanguage of
+          $0416: // pt-BR
+            UILangFilePage.SelectedValueIndex := 10;
+        else
+          // pt-PT and other Portuguese file is not created. pt-BR is used instead.
+          UILangFilePage.SelectedValueIndex := 10;
+        end;
+      end;
+    $10: // Italian
+      UILangFilePage.SelectedValueIndex := 11;
+    $1F: // Turkish
+      UILangFilePage.SelectedValueIndex := 12;
+  else // Other
+    UILangFilePage.SelectedValueIndex := 0;
   end;
+
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
