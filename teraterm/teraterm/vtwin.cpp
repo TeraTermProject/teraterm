@@ -4846,7 +4846,7 @@ LRESULT CVTWindow::OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam)
 	}
 
 	// 送信可能な状態でなければエラー
-	if (TalkStatus != IdTalkKeyb) {
+	if (TalkStatus != IdTalkKeyb && TalkStatus != IdTalkSendMem) {
 		return 0;
 	}
 
