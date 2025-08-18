@@ -344,7 +344,7 @@ static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL ut
 	// to fullpath
 	char *full;
 	if (path == NULL) {
-		full = new_name_safe;
+		full = _strdup(new_name_safe);
 	}
 	else {
 		size_t full_len = strlen(new_name_safe) + strlen(path) + 1;
