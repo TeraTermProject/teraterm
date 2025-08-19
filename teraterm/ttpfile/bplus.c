@@ -853,6 +853,10 @@ static BOOL BPParse(PFileVarProto fv, PComVar cv)
   BYTE b;
   PBPVar bv = fv->data;
 
+  if (bv->BPState==BP_Close) {
+    return FALSE;
+  }
+
   do {
 
     /* Send packet */

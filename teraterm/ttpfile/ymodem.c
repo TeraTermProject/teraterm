@@ -45,7 +45,8 @@ typedef struct {
 	BYTE PktNum, PktNumSent;
 	int PktNumOffset;
 	int PktReadMode;
-	WORD YMode, YOpt, TextFlag;
+	YMODEM_MODE_T YMode;
+	WORD YOpt, TextFlag;
 	WORD NAKMode;
 	int NAKCount;
 	WORD __DataLen, CheckLen;
@@ -190,7 +191,7 @@ static void YSendNAK(PFileVarProto fv, PYVar yv, PComVar cv)
 	{
 		if (yv->NAKMode==YnakC)
 		{
-			YSetOpt(fv,yv,XoptCheck);
+			YSetOpt(fv,yv,Yopt1K);
 			yv->NAKMode = YnakC;
 			yv->NAKCount = 9;
 		}
@@ -231,7 +232,7 @@ static void YSendNAKTimeout(PFileVarProto fv, PYVar yv, PComVar cv)
 	{
 		if (yv->NAKMode==YnakC)
 		{
-			YSetOpt(fv,yv,XoptCheck);
+			YSetOpt(fv,yv,Yopt1K);
 			yv->NAKMode = YnakC;
 			yv->NAKCount = 9;
 		}
@@ -423,6 +424,9 @@ static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		YSendNAK(fv,yv,cv);
 
 		break;
+	default:
+		assert(0);
+		break;
 	}
 
 	return TRUE;
@@ -431,11 +435,13 @@ static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 static void YCancel(PFileVarProto fv, PComVar cv)
 {
 	// five cancels & five backspaces per spec
-	BYTE cancel[] = { CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS };
+	static const BYTE cancel[] = {
+		CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS
+	};
 	PYVar yv = fv->data;
 
 	YWrite(fv,yv,cv, (PCHAR)&cancel, sizeof(cancel));
-	yv->YMode = 0; // quit
+	yv->YMode = IdYQuit;	// quit
 }
 
 static void YTimeOutProc(PFileVarProto fv, PComVar cv)
@@ -443,13 +449,19 @@ static void YTimeOutProc(PFileVarProto fv, PComVar cv)
 	PYVar yv = fv->data;
 	switch (yv->YMode) {
 	case IdYSend:
-		yv->YMode = 0; // quit
+		yv->YMode = IdYQuit;	// quit
 		break;
 	case IdYReceive:
 		if ((yv->PktNum == 0) && yv->PktNumOffset == 0)
 			YSendNAK(fv,yv,cv);
 		else
 			YSendNAKTimeout(fv,yv,cv);
+		break;
+	case IdYQuit:
+		// ƒLƒƒƒ“ƒZƒ‹‚ª˜A‘±‚µ‚Ä”­¶?
+		break;
+	default:
+		assert(0);
 		break;
 	}
 }
@@ -1138,7 +1150,10 @@ static BOOL YParse(PFileVarProto fv, PComVar cv)
 	case IdYSend:
 		return YSendPacket(fv,pv,cv);
 		break;
+	case IdYQuit:
+		return FALSE;
 	default:
+		assert(0);
 		return FALSE;
 	}
 }
@@ -1148,7 +1163,7 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 	PYVar pv = fv->data;
 	switch(request) {
 	case YMODEM_MODE: {
-		int Mode = va_arg(ap, int);
+		YMODEM_MODE_T Mode = va_arg(ap, YMODEM_MODE_T);
 		pv->YMode = Mode;
 		return 0;
 	}
