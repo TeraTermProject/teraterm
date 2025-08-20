@@ -1148,6 +1148,7 @@ static void KmtSendReceiveInit(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	kv->PktNum = 0;
 	kv->PktNumOffset = 0;
 
+	kv->FullName = fv->GetNextFname(fv);
 	filename = file->GetRecieveFilename(file, kv->FullName, FALSE, NULL, FALSE);
 	if (strlen(filename) >= filename_len_max) {
 		filename[filename_len_max] = 0;
