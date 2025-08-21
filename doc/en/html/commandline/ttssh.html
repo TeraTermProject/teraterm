@@ -91,7 +91,10 @@ You can use the following command line parameters on TTSSH.
   <dd>your username is specified</dd>
 
   <dt id="passwd">/passwd=&lt;password&gt;</dt>
-  <dd>your password is specified</dd>
+  <dd>
+    your password is specified<br>
+    Please refer to <a href="#passwd_specify">Notes on Specifying a Password</a>.
+  </dd>
 
   <dt id="keyfile">/keyfile=&lt;file&gt;</dt>
   <dd>
@@ -201,6 +204,52 @@ ttermpro.exe ssh://user:password@server5/ /auth=password
 ttermpro.exe server6:22 /ssh /2 /auth=publickey /user=guest /keyfile="C:\Users\foo\Documents\My keys\id_ed25519" /passwd="Yu/eA;G2"
 ttermpro.exe server7:22 /ssh /2 /auth=password /user=guest /passwd="foo""bar"
 </pre>
+
+
+<h2 id="passwd_specify">Notes on Specifying a Password</h2>
+
+<p>
+If you specify a password as a command line argument for ttermpro.exe, the password can be viewed by checking the command line arguments of the running process.<br>
+It cannot be viewed without the appropriate permissions to access command line arguments, but it cannot be said that the possibility of misuse is completely eliminated.<br>
+Below are some cases in which a password may be specified, along with whether a workaround is available.
+</p>
+
+<dl>
+  <dt>Run with a command line arguments</dt>
+  <dd>
+    Start using one of the following methods: from the Command Prompt, the "Run" dialog, or a shortcut.<br>
+    <pre>ttermpro.exe server3:22 /ssh /2 /auth=password /user=guest /passwd=guest</pre>
+    When started in this way, the command line arguments of that process will be visible.
+  </dd>
+  <dt>File &gt; Duplicate session</dt>
+  <dd>
+    Tera Term internally generates command line arguments to launch ttermpro.exe. As a result, the command-line arguments of that process can be viewed.
+  </dd>
+  <dt>Specify command line arguments in the "Host" field of the New Connection dialog and connect</dt>
+  <dd>
+    The "Host" field of the New Connection dialog can accept command line arguments.<br>
+    If the Tera Term is not connected, Tera Term does not start new ttermpro.exe. There is no problem in this case.<br>
+    If the Tera Term is already connected, Tera Term starts new ttermpro.exe with command line arguments. As a result, the command-line arguments of that process can be viewed.<br>
+    The workaround is: "Do not start a new connection from an already connected Tera Term."
+  </dd>
+  <dt>Specify an argument of connect macro command</dt>
+  <dd>
+    The argument of connect macro command is the argument used to lauch ttermpro.exe.<br>
+    The connect macro command starts new ttermpro.exe when the Macro is not connected to Tera Term. As a result, the command-line arguments of that process can be viewed.<br>
+    <pre>connect 'server3:22 /ssh /2 /auth=password /user=guest /passwd=guest'</pre>
+    If you first link to Tera Term and then run the connect command again, a new ttermpro.exe is not started.
+    <pre>
+; '/DS' option suppresses "New Connection" dialog 
+connect '/DS'
+connect 'server3:22 /ssh /2 /auth=password /user=guest /passwd=guest'
+    </pre>
+  </dd>
+  <dt>Start from TeraTerm Menu</dt>
+  <dd>
+    TeraTerm Menu constructs command line arguments from the input values and starts ttermpro.exe. As a result, the command-line arguments of that process can be viewed.<br>
+    A possible workaround is to write a macro as shown above and use the macro file instead of an SSH configuration.
+  </dd>
+</dl>
 
 
 <h2 id="example2">Example: Pageant collaboration</h2>
