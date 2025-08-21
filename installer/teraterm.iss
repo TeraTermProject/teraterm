@@ -15,35 +15,23 @@
 #define SrcDir "teraterm"
 #endif
 
-[InnoIDE_PreCompile]
-Name: makechm.bat
-Name: build.bat
-;Name: build.bat; Parameters: rebuild
-
-[InnoIDE_PostCompile]
-;Name: makearchive.bat; Parameters: release
-
-[PreCompile]
-Name: makechm.bat
-Name: build.bat
-;Name: build.bat; Parameters: rebuild
-
-[PostCompile]
-;Name: makearchive.bat; Parameters: release
-
-[_ISToolPreCompile]
-Name: makechm.bat
-Name: build.bat
-;Name: build.bat; Parameters: rebuild
-
-[_ISToolPostCompile]
-;Name: makearchive.bat; Parameters: release
-
 [Setup]
 AppName={#AppName}
-AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 AppVersion={#AppVersion}
-AppVerName={#AppName} {#AppVersion}
+#if defined(M_X64)
+  AppVerName={#AppName} {#AppVersion} x64
+#elif defined(M_ARM64)
+  AppVerName={#AppName} {#AppVersion} arm64
+#else
+  AppVerName={#AppName} {#AppVersion} x86
+#endif
+#if defined(M_X64)
+  AppId={{3F29ABAB-6EEF-40BF-B1EA-ACA276CB133B}
+#elif defined(M_ARM64)
+  AppId={{9D4C2E5D-2AA7-4041-A098-E6750542350E}
+#else
+  AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
+#endif
 
 ; properties of installer executable
 VersionInfoDescription={#AppName} installer
@@ -68,14 +56,14 @@ OutputBaseFilename={#OutputBaseFilename}
 SolidCompression=yes
 Compression=lzma2/ultra64
 #if defined(M_X64)
-ArchitecturesAllowed=win64
-ArchitecturesInstallIn64BitMode=x64os
+  ArchitecturesAllowed=win64
+  ArchitecturesInstallIn64BitMode=x64os
 #elif defined(M_ARM64)
-ArchitecturesAllowed=arm64
-ArchitecturesInstallIn64BitMode=arm64
+  ArchitecturesAllowed=arm64
+  ArchitecturesInstallIn64BitMode=arm64
 #else
-ArchitecturesAllowed=x86compatible
-ArchitecturesInstallIn64BitMode=
+  ArchitecturesAllowed=x86compatible
+  ArchitecturesInstallIn64BitMode=
 #endif
 
 [Languages]
