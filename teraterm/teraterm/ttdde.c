@@ -53,8 +53,6 @@
 #include "codeconv.h"
 #include "broadcast.h"
 #include "filesys.h"
-#include "sendmem.h"
-#include "codeconv.h"
 #include "scp.h"
 #include "asprintf.h"
 #include "vtterm.h"
