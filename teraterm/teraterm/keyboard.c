@@ -36,6 +36,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <crtdbg.h>
+#include <assert.h>
+#include <wchar.h>
 
 #include "tttypes_key.h"
 #include "ttlib.h"
@@ -45,6 +47,7 @@
 #include "ttdde.h"
 #include "codeconv.h"
 #include "vtterm.h"
+#include "sendmem.h"
 
 #include "keyboard.h"
 #include "keyboard_i.h"
@@ -1311,7 +1314,7 @@ static WORD GetKeyCode(PKeyMap KeyMap_, WORD Scan)
 	return Key;
 }
 
-static void SendBinary(const wchar_t *strW, size_t len, size_t repeat)
+static void SendBinary(const wchar_t *strW, size_t len, size_t repeat, BOOL isMacro)
 {
 	unsigned char *strA = malloc(len + 1);
 	unsigned char *p = strA;
@@ -1324,10 +1327,24 @@ static void SendBinary(const wchar_t *strW, size_t len, size_t repeat)
 		*p++ = c;
 	}
 
-	for (i = 1; i <= repeat; i++) {
-		CommBinaryBuffOut(&cv, strA, len);
-		if (ts.LocalEcho > 0)
-			CommBinaryEcho(&cv, strA, len);
+	if (isMacro == FALSE) {
+		for (i = 1; i <= repeat; i++) {
+			CommBinaryBuffOut(&cv, strA, len);
+			if (ts.LocalEcho > 0)
+				CommBinaryEcho(&cv, strA, len);
+		}
+	} else {
+		for (i = 1; i <= repeat; i++) {
+			wchar_t *p = malloc(len);
+			memcpy_s(p, len, strA, len);
+			SendMem *sm = SendMemBinary(p, len);
+			assert(sm != NULL);
+			if (sm != NULL) {
+				SendMemInitEcho(sm, ts.LocalEcho);
+				SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
+				SendMemStart(sm);
+			}
+		}
 	}
 
 	free(strA);
@@ -1461,7 +1478,7 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 		switch (CodeType) {
 			case IdBinary:
 				if (TalkStatus == IdTalkKeyb) {
-					SendBinary(Code, CodeLength, CodeCount);
+					SendBinary(Code, CodeLength, CodeCount, FALSE);
 				}
 				break;
 			case IdText:
@@ -1555,18 +1572,28 @@ void KeyCodeSend(WORD KCode, WORD Count)
 	if (TalkStatus == IdTalkKeyb || TalkStatus == IdTalkSendMem) {
 		switch (CodeType) {
 			case IdBinary:
-				SendBinary(Code, CodeLength, Count);
+				SendBinary(Code, CodeLength, Count, TRUE);
 				break;
 			case IdText:
 				for (i = 1; i <= Count; i++) {
-					if (ts.LocalEcho > 0)
-						CommTextEchoW(&cv, Code, CodeLength);
-					CommTextOutW(&cv, Code, CodeLength);
+					wchar_t *p = malloc(CodeLength * sizeof(wchar_t));
+					wmemcpy_s(p, CodeLength * sizeof(wchar_t), Code, CodeLength);
+					SendMem *sm = SendMemTextW(p, CodeLength);
+					assert(sm != NULL);
+					if (sm != NULL) {
+						SendMemInitEcho(sm, ts.LocalEcho);
+						SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
+						SendMemStart(sm);
+					}
 				}
 				break;
 			case IdMacro:
 				Code[CodeLength] = 0;
 				RunMacroW(Code, FALSE);
+				break;
+			case IdCommand:
+				// sendkcode によるメニューコマンドの実行は未サポート
+				// (マクロコマンド callmenu で代替可能)
 				break;
 		}
 	}
