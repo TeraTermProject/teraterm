@@ -44,6 +44,7 @@ typedef enum {
 
 SendMem *SendMemTextW(wchar_t *ptr, size_t len);
 SendMem *SendMemBinary(void *ptr, size_t len);
+SendMem *SendMemSetDelay(HWND HWndDdeCli, WORD DelayPerChar, WORD DelayPerLine);
 void SendMemInitEcho(SendMem *sm, BOOL echo);
 void SendMemInitSend(SendMem *sm, BOOL echo_only);
 void SendMemInitSetCallback(SendMem *sm, void (*callback)(void *data), void *callback_data);

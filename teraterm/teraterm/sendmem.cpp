@@ -46,9 +46,12 @@
 
 #include "sendmem.h"
 
+#include "ttdde.h"
+
 typedef enum {
 	SendMemTypeText,
 	SendMemTypeBinary,
+	SendMemTypeSetDelay,
 } SendMemType;
 
 // 送信中にVTWINに排他をかける
@@ -89,16 +92,25 @@ typedef struct SendMemTag {
 	CheckEOLData_t *ceol;
 } SendMem;
 
+typedef SendMem *PSendMem;
+
 extern "C" IdTalk TalkStatus;
 extern "C" HWND HVTWin;
 
-static SendMem *sendmem_fifo[10];
+#define SENDMEM_FIFO_ADD_NUM 10
+static PSendMem *sendmem_fifo = NULL;
 static int sendmem_size = 0;
+static int sendmem_max = 0;
 
 static BOOL smptrPush(SendMem *sm)
 {
-	if (sendmem_size >= _countof(sendmem_fifo)) {
-		return FALSE;
+	if (sendmem_size >= sendmem_max) {
+		PSendMem *p = (PSendMem *)realloc(sendmem_fifo, sizeof(PSendMem) * (sendmem_max + SENDMEM_FIFO_ADD_NUM));
+		if (p == NULL) {
+			return FALSE;
+		}
+		sendmem_fifo = p;
+		sendmem_max += SENDMEM_FIFO_ADD_NUM;
 	}
 	sendmem_fifo[sendmem_size] = sm;
 	sendmem_size++;
@@ -332,6 +344,16 @@ void SendMemContinuously(void)
 	}
 
 	if (p->pause) {
+		return;
+	}
+
+	// マクロコマンド setserialdelaychar、setserialdelayline による送信遅延を反映する
+	if (p->type == SendMemTypeSetDelay) {
+		p->cv_->DelayPerChar = (WORD)p->delay_per_char;
+		p->cv_->DelayPerLine = (WORD)p->delay_per_line;
+		PostMessage((HWND)p->send_ptr, WM_USER_DDECMNDEND, (WPARAM)1, 0);
+		p->send_ptr = NULL;
+		EndPaste(p);
 		return;
 	}
 
@@ -585,6 +607,33 @@ SendMem *SendMemBinary(void *ptr, size_t len)
 	p->send_ptr = (BYTE *)ptr;
 	p->send_len = len;
 	p->type = SendMemTypeBinary;
+	return p;
+}
+
+/**
+ *	マクロコマンド setserialdelaychar、setserialdelayline による送信遅延を送信バッファにpushする
+ *
+ *  SendMemSetDelay()  初期化とパラメタ設定
+ *  SendMemInitEcho()  使用しない
+ *  SendMemInitDelay() 使用しない
+ *  SendMemStart()     送信バッファへのpush
+ *
+ *	@param	HWndDdeCli    Tera Term マクロのウインドウハンドル
+ *	@param	DelayPerChar  シリアルポートの送信待ち時間(1文字ごと) 単位:ms
+ *	@param	DelayPerLine  シリアルポートの送信待ち時間(1行ごと)   単位:ms
+ */
+SendMem *SendMemSetDelay(HWND HWndDdeCli, WORD DelayPerChar, WORD DelayPerLine)
+{
+	SendMem *p = SendMemInit_();
+	if (p == NULL) {
+		return NULL;
+	}
+
+	p->send_ptr = (BYTE *)HWndDdeCli;
+	p->send_len = 0;
+	p->type = SendMemTypeSetDelay;
+	p->delay_per_char = DelayPerChar;
+	p->delay_per_line = DelayPerLine;
 	return p;
 }
 

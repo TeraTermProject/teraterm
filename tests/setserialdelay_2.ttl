@@ -1,0 +1,217 @@
+; シリアルポートの送信遅延をマクロコマンドで設定できませんか？ #562
+; setserialdelaychar と setserialdelayline の動作確認用TTL(その2)
+;
+; com0comを使用したCOM2→COM1折り返しで確認
+; 確認対象は下記の5種類
+;
+; 1. sendbroadcast
+; 2. sendlnbroadcast
+; 3. sendmulticast
+; 4. sendlnmulticast
+; 5. sendkcode
+
+count = 10
+
+connect '/C=1'
+setmulticastname 'COM1'
+setserialdelaychar 0
+setserialdelayline 0
+unlink
+
+connect '/C=2'
+setmulticastname 'COM2'
+setserialdelaychar 0
+setserialdelayline 0
+
+;--------------------------------------------------------------------------------
+
+yesnobox 'delay: char=0, line=0' ''
+setserialdelaychar 0
+setserialdelayline 0
+call test
+
+yesnobox 'delay: char=15, line=400' ''
+setserialdelaychar 15
+setserialdelayline 400
+call test
+
+yesnobox 'delay: char=30, line=800' ''
+setserialdelaychar 30
+setserialdelayline 800
+call test
+
+exit
+
+;--------------------------------------------------------------------------------
+:test
+
+messagebox 'sendbroadcast' 'start'
+call sendbroadcast
+
+messagebox 'sendlnbroadcast' 'start'
+call sendlnbroadcast
+
+messagebox 'sendmulticast' 'start'
+call sendmulticast
+
+messagebox 'sendlnmulticast' 'start'
+call sendlnmulticast
+
+messagebox 'sendkcode' 'start'
+call sendkcode
+
+return
+
+;--------------------------------------------------------------------------------
+:sendbroadcast
+i = 0
+do while i < count
+    i = i + 1
+    sprintf2 ver '%d abcdefghijklmnopqrstuvwxyz ' i
+    sendbroadcast ver '1'
+    sendbroadcast 13 10
+    sendbroadcast ver '2'
+    sendbroadcast 13 10
+    sendbroadcast ver '3'
+    sendbroadcast 13 10
+    sendbroadcast ver '4'
+    sendbroadcast 13 10
+    sendbroadcast ver '5'
+    sendbroadcast 13 10
+    sendbroadcast ver '6'
+    sendbroadcast 13 10
+    sendbroadcast ver '7'
+    sendbroadcast 13 10
+    sendbroadcast ver '8'
+    sendbroadcast 13 10
+    sendbroadcast ver '9'
+    sendbroadcast 13 10
+    sendbroadcast ver '10'
+    sendbroadcast 13 10
+loop
+return
+
+;--------------------------------------------------------------------------------
+:sendlnbroadcast
+i = 0
+do while i < count
+    i = i + 1
+    sprintf2 ver '%d abcdefghijklmnopqrstuvwxyz ' i
+    sendlnbroadcast ver '1'
+    sendlnbroadcast ver '2'
+    sendlnbroadcast ver '3'
+    sendlnbroadcast ver '4'
+    sendlnbroadcast ver '5'
+    sendlnbroadcast ver '6'
+    sendlnbroadcast ver '7'
+    sendlnbroadcast ver '8'
+    sendlnbroadcast ver '9'
+    sendlnbroadcast ver '10'
+loop
+return
+
+;--------------------------------------------------------------------------------
+:sendmulticast
+i = 0
+do while i < count
+    i = i + 1
+    sprintf2 ver '%d abcdefghijklmnopqrstuvwxyz ' i
+    sendmulticast 'COM1' ver '1'
+    sendmulticast 'COM1' 13 10
+    sendmulticast 'COM2' ver '1'
+    sendmulticast 'COM2' 13 10
+    sendmulticast 'COM1' ver '2'
+    sendmulticast 'COM1' 13 10
+    sendmulticast 'COM2' ver '2'
+    sendmulticast 'COM2' 13 10
+    sendmulticast 'COM1' ver '3'
+    sendmulticast 'COM1' 13 10
+    sendmulticast 'COM2' ver '3'
+    sendmulticast 'COM2' 13 10
+    sendmulticast 'COM1' ver '4'
+    sendmulticast 'COM1' 13 10
+    sendmulticast 'COM2' ver '4'
+    sendmulticast 'COM2' 13 10
+    sendmulticast 'COM1' ver '5'
+    sendmulticast 'COM1' 13 10
+    sendmulticast 'COM2' ver '5'
+    sendmulticast 'COM2' 13 10
+    sendmulticast 'COM1' ver '6'
+    sendmulticast 'COM1' 13 10
+    sendmulticast 'COM2' ver '6'
+    sendmulticast 'COM2' 13 10
+    sendmulticast 'COM1' ver '7'
+    sendmulticast 'COM1' 13 10
+    sendmulticast 'COM2' ver '7'
+    sendmulticast 'COM2' 13 10
+    sendmulticast 'COM1' ver '8'
+    sendmulticast 'COM1' 13 10
+    sendmulticast 'COM2' ver '8'
+    sendmulticast 'COM2' 13 10
+    sendmulticast 'COM1' ver '9'
+    sendmulticast 'COM1' 13 10
+    sendmulticast 'COM2' ver '9'
+    sendmulticast 'COM2' 13 10
+    sendmulticast 'COM1' ver '10'
+    sendmulticast 'COM1' 13 10
+    sendmulticast 'COM2' ver '10'
+    sendmulticast 'COM2' 13 10
+loop
+return
+
+;--------------------------------------------------------------------------------
+:sendlnmulticast
+i = 0
+do while i < count
+    i = i + 1
+    sprintf2 ver '%d abcdefghijklmnopqrstuvwxyz ' i
+    sendlnmulticast 'COM1' ver '1'
+    sendlnmulticast 'COM2' ver '1'
+    sendlnmulticast 'COM1' ver '2'
+    sendlnmulticast 'COM2' ver '2'
+    sendlnmulticast 'COM1' ver '3'
+    sendlnmulticast 'COM2' ver '3'
+    sendlnmulticast 'COM1' ver '4'
+    sendlnmulticast 'COM2' ver '4'
+    sendlnmulticast 'COM1' ver '5'
+    sendlnmulticast 'COM2' ver '5'
+    sendlnmulticast 'COM1' ver '6'
+    sendlnmulticast 'COM2' ver '6'
+    sendlnmulticast 'COM1' ver '7'
+    sendlnmulticast 'COM2' ver '7'
+    sendlnmulticast 'COM1' ver '8'
+    sendlnmulticast 'COM2' ver '8'
+    sendlnmulticast 'COM1' ver '9'
+    sendlnmulticast 'COM2' ver '9'
+    sendlnmulticast 'COM1' ver '10'
+    sendlnmulticast 'COM2' ver '10'
+loop
+return
+
+;--------------------------------------------------------------------------------
+:sendkcode
+i = 0
+do while i < count
+    i = i + 1
+    sendkcode 82 20
+    send 13 10
+    sendkcode 79 20
+    send 13 10
+    sendkcode 80 20
+    send 13 10
+    sendkcode 81 20
+    send 13 10
+    sendkcode 75 20
+    send 13 10
+    sendkcode 76 20
+    send 13 10
+    sendkcode 77 20
+    send 13 10
+    sendkcode 71 20
+    send 13 10
+    sendkcode 72 20
+    send 13 10
+    sendkcode 73 20
+    send 13 10
+loop
+return

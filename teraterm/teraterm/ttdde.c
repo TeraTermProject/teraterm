@@ -1054,8 +1054,15 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			}
 
 			val = atoi(ParamFileName);
-			if (val > 0) {
+			if (val >= 0) {
 				ts.DelayPerChar = val;
+				SendMem *sm = SendMemSetDelay(HWndDdeCli, ts.DelayPerChar, ts.DelayPerLine);
+				assert(sm != NULL);
+				if (sm != NULL) {
+					// SendMemInitEcho(sm, FALSE); 使用しない
+					// SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0); 使用しない
+					SendMemStart(sm);
+				}
 			}
 		}
 		break;
@@ -1070,8 +1077,15 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			}
 
 			val = atoi(ParamFileName);
-			if (val > 0) {
+			if (val >= 0) {
 				ts.DelayPerLine = val;
+				SendMem *sm = SendMemSetDelay(HWndDdeCli, ts.DelayPerChar, ts.DelayPerLine);
+				assert(sm != NULL);
+				if (sm != NULL) {
+					// SendMemInitEcho(sm, FALSE); 使用しない
+					// SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0); 使用しない
+					SendMemStart(sm);
+				}
 			}
 		}
 		break;
