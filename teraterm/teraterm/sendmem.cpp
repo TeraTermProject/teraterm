@@ -351,9 +351,9 @@ void SendMemContinuously(void)
 	if (p->type == SendMemTypeSetDelay) {
 		p->cv_->DelayPerChar = (WORD)p->delay_per_char;
 		p->cv_->DelayPerLine = (WORD)p->delay_per_line;
+		PostMessage((HWND)p->send_ptr, WM_USER_DDECMNDEND, (WPARAM)1, 0);
 		p->send_ptr = NULL;
 		EndPaste(p);
-		PostMessage((HWND)p->send_ptr, WM_USER_DDECMNDEND, (WPARAM)1, 0);
 		return;
 	}
 
