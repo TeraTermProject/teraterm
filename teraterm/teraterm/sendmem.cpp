@@ -51,6 +51,7 @@
 typedef enum {
 	SendMemTypeText,
 	SendMemTypeBinary,
+	SendMemTypeSetDelay,
 } SendMemType;
 
 // 送信中にVTWINに排他をかける
@@ -213,9 +214,6 @@ static void EndPaste(SendMem *sm)
 		EnableWindow(HVTWin, TRUE);
 		SetFocus(HVTWin);
 #endif
-		if (isSetSerialDelay == TRUE) {
-			SetSerialDelayEnd(1);
-		}
 	}
 }
 
@@ -271,7 +269,7 @@ static void SendMemStart_i(SendMem *sm)
  *	@param[out]		use		使用byte
  *	@param[out]		free	空きbyte
  */
-void GetOutBuffInfo(const TComVar *cv_, size_t *use, size_t *free)
+static void GetOutBuffInfo(const TComVar *cv_, size_t *use, size_t *free)
 {
 	if (use != NULL) {
 		*use = cv_->OutBuffCount;
@@ -346,6 +344,16 @@ void SendMemContinuously(void)
 	}
 
 	if (p->pause) {
+		return;
+	}
+
+	// マクロコマンド setserialdelaychar、setserialdelayline による送信遅延を反映する
+	if (p->type == SendMemTypeSetDelay) {
+		p->cv_->DelayPerChar = (WORD)p->delay_per_char;
+		p->cv_->DelayPerLine = (WORD)p->delay_per_line;
+		p->send_ptr = NULL;
+		EndPaste(p);
+		PostMessage((HWND)p->send_ptr, WM_USER_DDECMNDEND, (WPARAM)1, 0);
 		return;
 	}
 
@@ -599,6 +607,33 @@ SendMem *SendMemBinary(void *ptr, size_t len)
 	p->send_ptr = (BYTE *)ptr;
 	p->send_len = len;
 	p->type = SendMemTypeBinary;
+	return p;
+}
+
+/**
+ *	マクロコマンド setserialdelaychar、setserialdelayline による送信遅延を送信バッファにpushする
+ *
+ *  SendMemSetDelay()  初期化とパラメタ設定
+ *  SendMemInitEcho()  使用しない
+ *  SendMemInitDelay() 使用しない
+ *  SendMemStart()     送信バッファへのpush
+ *
+ *	@param	HWndDdeCli    Tera Term マクロのウインドウハンドル
+ *	@param	DelayPerChar  シリアルポートの送信待ち時間(1文字ごと) 単位:ms
+ *	@param	DelayPerLine  シリアルポートの送信待ち時間(1行ごと)   単位:ms
+ */
+SendMem *SendMemSetDelay(HWND HWndDdeCli, WORD DelayPerChar, WORD DelayPerLine)
+{
+	SendMem *p = SendMemInit_();
+	if (p == NULL) {
+		return NULL;
+	}
+
+	p->send_ptr = (BYTE *)HWndDdeCli;
+	p->send_len = 0;
+	p->type = SendMemTypeSetDelay;
+	p->delay_per_char = DelayPerChar;
+	p->delay_per_line = DelayPerLine;
 	return p;
 }
 

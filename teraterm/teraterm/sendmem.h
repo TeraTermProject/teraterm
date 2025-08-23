@@ -42,9 +42,9 @@ typedef enum {
 	SENDMEM_DELAYTYPE_PER_SENDSIZE,
 } SendMemDelayType;
 
-void GetOutBuffInfo(const TComVar *cv_, size_t *use, size_t *free);
 SendMem *SendMemTextW(wchar_t *ptr, size_t len);
 SendMem *SendMemBinary(void *ptr, size_t len);
+SendMem *SendMemSetDelay(HWND HWndDdeCli, WORD DelayPerChar, WORD DelayPerLine);
 void SendMemInitEcho(SendMem *sm, BOOL echo);
 void SendMemInitSend(SendMem *sm, BOOL echo_only);
 void SendMemInitSetCallback(SendMem *sm, void (*callback)(void *data), void *callback_data);
