@@ -1044,7 +1044,39 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		}
 		break;
 
-	case CmdGetModemStatus: // add 'getmodemstatus' (2015.1.8 yutaka)
+	case CmdSetSerialDelayChar:
+		{
+			int val;
+
+			if (!cv.Open || cv.PortType != IdSerial) {
+				result = DDE_FNOTPROCESSED;
+				break;
+			}
+
+			val = atoi(ParamFileName);
+			if (val > 0) {
+				ts.DelayPerChar = val;
+			}
+		}
+		break;
+
+	case CmdSetSerialDelayLine:
+		{
+			int val;
+
+			if (!cv.Open || cv.PortType != IdSerial) {
+				result = DDE_FNOTPROCESSED;
+				break;
+			}
+
+			val = atoi(ParamFileName);
+			if (val > 0) {
+				ts.DelayPerLine = val;
+			}
+		}
+		break;
+
+	case CmdGetModemStatus:	 // add 'getmodemstatus' (2015.1.8 yutaka)
 		{
 		DWORD val, n;
 

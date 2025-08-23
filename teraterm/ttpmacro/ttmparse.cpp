@@ -375,6 +375,8 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"setpassword")==0) *WordId = RsvSetPassword;    // add 'setpassword'  (2012.5.23 yutaka)
 		else if (_stricmp(Str,"setpassword2")==0) *WordId = RsvSetPassword2;
 		else if (_stricmp(Str,"setrts")==0) *WordId = RsvSetRts;    // add 'setrts'  (2008.3.12 maya)
+		else if (_stricmp(Str,"setserialdelaychar")==0) *WordId = RsvSetSerialDelayChar;
+		else if (_stricmp(Str,"setserialdelayline")==0) *WordId = RsvSetSerialDelayLine;
 		else if (_stricmp(Str,"setspeed")==0) *WordId = RsvSetBaud;
 		else if (_stricmp(Str,"setsync")==0) *WordId = RsvSetSync;
 		else if (_stricmp(Str,"settime")==0) *WordId = RsvSetTime;

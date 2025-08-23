@@ -391,6 +391,8 @@
 #define HlpMacroCommandSetPassword      92196
 #define HlpMacroCommandSetPassword2     92219
 #define HlpMacroCommandSetrts           92136
+#define HlpMacroCommandSetSerialDelayChar 92224
+#define HlpMacroCommandSetSerialDelayLine 92225
 #define HlpMacroCommandSetspeed         92217
 #define HlpMacroCommandSetsync          92084
 #define HlpMacroCommandSettime          92085
