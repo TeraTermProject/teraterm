@@ -1569,33 +1569,31 @@ void KeyCodeSend(WORD KCode, WORD Count)
 
 	if (CodeLength == 0)
 		return;
-	if (TalkStatus == IdTalkKeyb || TalkStatus == IdTalkSendMem) {
-		switch (CodeType) {
-			case IdBinary:
-				SendBinary(Code, CodeLength, Count, TRUE);
-				break;
-			case IdText:
-				for (i = 1; i <= Count; i++) {
-					wchar_t *p = malloc(CodeLength * sizeof(wchar_t));
-					wmemcpy_s(p, CodeLength * sizeof(wchar_t), Code, CodeLength);
-					SendMem *sm = SendMemTextW(p, CodeLength);
-					assert(sm != NULL);
-					if (sm != NULL) {
-						SendMemInitEcho(sm, ts.LocalEcho);
-						SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
-						SendMemStart(sm);
-					}
+	switch (CodeType) {
+		case IdBinary:
+			SendBinary(Code, CodeLength, Count, TRUE);
+			break;
+		case IdText:
+			for (i = 1; i <= Count; i++) {
+				wchar_t *p = malloc(CodeLength * sizeof(wchar_t));
+				wmemcpy_s(p, CodeLength * sizeof(wchar_t), Code, CodeLength);
+				SendMem *sm = SendMemTextW(p, CodeLength);
+				assert(sm != NULL);
+				if (sm != NULL) {
+					SendMemInitEcho(sm, ts.LocalEcho);
+					SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
+					SendMemStart(sm);
 				}
-				break;
-			case IdMacro:
-				Code[CodeLength] = 0;
-				RunMacroW(Code, FALSE);
-				break;
-			case IdCommand:
-				// sendkcode によるメニューコマンドの実行は未サポート
-				// (マクロコマンド callmenu で代替可能)
-				break;
-		}
+			}
+			break;
+		case IdMacro:
+			Code[CodeLength] = 0;
+			RunMacroW(Code, FALSE);
+			break;
+		case IdCommand:
+			// sendkcode によるメニューコマンドの実行は未サポート
+			// (マクロコマンド callmenu で代替可能)
+			break;
 	}
 }
 
