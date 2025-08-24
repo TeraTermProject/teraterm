@@ -4837,11 +4837,6 @@ LRESULT CVTWindow::OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam)
 		SendMemContinuously();	// TODO 必要?
 	}
 
-	// 送信可能な状態でなければエラー
-	if (TalkStatus != IdTalkKeyb) {
-		return 0;
-	}
-
 	const COPYDATASTRUCT *cds = (COPYDATASTRUCT *)lParam;
 	BroadCastReceive(cds);
 
