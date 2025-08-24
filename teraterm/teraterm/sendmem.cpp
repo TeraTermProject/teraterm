@@ -89,16 +89,25 @@ typedef struct SendMemTag {
 	CheckEOLData_t *ceol;
 } SendMem;
 
+typedef SendMem *PSendMem;
+
 extern "C" IdTalk TalkStatus;
 extern "C" HWND HVTWin;
 
-static SendMem *sendmem_fifo[10];
+#define SENDMEM_FIFO_ADD_NUM 10
+static PSendMem *sendmem_fifo = NULL;
 static int sendmem_size = 0;
+static int sendmem_max = 0;
 
 static BOOL smptrPush(SendMem *sm)
 {
-	if (sendmem_size >= _countof(sendmem_fifo)) {
-		return FALSE;
+	if (sendmem_size >= sendmem_max) {
+		PSendMem *p = (PSendMem *)realloc(sendmem_fifo, sizeof(PSendMem) * (sendmem_max + SENDMEM_FIFO_ADD_NUM));
+		if (p == NULL) {
+			return FALSE;
+		}
+		sendmem_fifo = p;
+		sendmem_max += SENDMEM_FIFO_ADD_NUM;
 	}
 	sendmem_fifo[sendmem_size] = sm;
 	sendmem_size++;
