@@ -140,6 +140,7 @@ static void ReadKeyboardMap(PKeyMap KeyMap, const wchar_t* FName)
 		{ IdUDK17, L"UDK17" },
 		{ IdUDK18, L"UDK18" },
 		{ IdUDK19, L"UDK19" },
+		{ IdUDK20, L"UDK20" },
 	};
 
 	static const keymap_list_t xterm_list[] = {

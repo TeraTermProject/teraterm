@@ -53,8 +53,6 @@
 #include "codeconv.h"
 #include "broadcast.h"
 #include "filesys.h"
-#include "sendmem.h"
-#include "codeconv.h"
 #include "scp.h"
 #include "asprintf.h"
 #include "vtterm.h"
@@ -817,7 +815,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	case CmdSendKCode: {
 		WORD w = HexStr2Word(ParamFileName);
 		WORD c = HexStr2Word(&ParamFileName[4]);
-		PostMessage(HVTWin,WM_USER_KEYCODE,w,(LPARAM)c);
+		KeyCodeSend(w, c);
 		break;
 	}
 	case CmdSetEcho:
