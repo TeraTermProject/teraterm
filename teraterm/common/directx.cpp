@@ -63,8 +63,10 @@ BOOL DXInit(void)
  */
 void DXUninit(void)
 {
-	pDWriteFactory->Release();
-	pDWriteFactory = NULL;
+	if (pDWriteFactory != NULL) {
+		pDWriteFactory->Release();
+		pDWriteFactory = NULL;
+	}
 }
 
 /**
