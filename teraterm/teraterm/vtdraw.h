@@ -1,5 +1,5 @@
 /*
- * (C) 2020- TeraTerm Project
+ * (C) 2025- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,14 +32,13 @@
 extern "C" {
 #endif
 
-typedef struct
-{
-	BOOL CodePopupEnable;
-	WORD CodePopupKey1;
-	WORD CodePopupKey2;
-} UnicodeDebugParam_t;
+typedef enum {
+	IdVtDrawAPIUnicode,
+	IdVtDrawAPIANSI,
+} IdVtDrawAPI;
 
-extern UnicodeDebugParam_t UnicodeDebugParam;
+IdVtDrawAPI VTDrawFromIni(const wchar_t *str, BOOL *auto_flag);
+const wchar_t *VTDrawToIni(IdVtDrawAPI api);
 
 #ifdef __cplusplus
 }

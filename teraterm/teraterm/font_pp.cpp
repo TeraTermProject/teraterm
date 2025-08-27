@@ -48,6 +48,7 @@
 #include "win32helper.h"
 #include "tttext.h"
 #include "tslib.h"
+#include "vtdraw.h"
 
 #include "font_pp.h"
 
@@ -217,10 +218,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SetFontStringW(hWnd, IDC_VTFONT_EDIT, &dlg_data->VTFont);
 
 			CheckDlgButton(hWnd,
-						   UnicodeDebugParam.UseUnicodeApi ? IDC_VTFONT_UNICODE : IDC_VTFONT_ANSI,
+						   ts->VTDrawAPI == IdVtDrawAPIUnicode ? IDC_VTFONT_UNICODE : IDC_VTFONT_ANSI,
 						   BST_CHECKED);
-			SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, UnicodeDebugParam.CodePageForANSIDraw, FALSE);
-			EnableCodePage(hWnd, UnicodeDebugParam.UseUnicodeApi ? FALSE : TRUE);
+			SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, ts->VTDrawAnsiCodePage, FALSE);
+			EnableCodePage(hWnd, ts->VTDrawAPI == IdVtDrawAPIUnicode ? FALSE : TRUE);
 			SendDlgItemMessage(hWnd, IDC_VTFONT_CODEPAGE_EDIT, EM_LIMITTEXT, IDC_CODEPAGE_MAXLEN, 0);
 
 			ArrangeControlsForChooseFont(hWnd, &dlg_data->VTFont, IDC_LIST_HIDDEN_FONTS, IDC_LIST_PRO_FONTS_VT, ACFCF_INIT_VTWIN);
@@ -250,9 +251,9 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			NMHDR *nmhdr = (NMHDR *)lp;
 			switch (nmhdr->code) {
 				case PSN_APPLY: {
-					UnicodeDebugParam.UseUnicodeApi =
-						IsDlgButtonChecked(hWnd, IDC_VTFONT_UNICODE) == BST_CHECKED;
-					UnicodeDebugParam.CodePageForANSIDraw =
+					ts->VTDrawAPI = IsDlgButtonChecked(hWnd, IDC_VTFONT_UNICODE) == BST_CHECKED ?
+						IdVtDrawAPIUnicode : IdVtDrawAPIANSI;
+					ts->VTDrawAnsiCodePage =
 						GetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, NULL, FALSE);
 
 					TSSetLogFont(hWnd, &dlg_data->VTFont, 0, 0, ts);

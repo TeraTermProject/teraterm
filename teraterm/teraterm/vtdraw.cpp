@@ -1,5 +1,5 @@
 /*
- * (C) 2020- TeraTerm Project
+ * (C) 2025- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,21 +26,38 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include <windows.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "tttypes.h"
 
-typedef struct
+#include "vtdraw.h"
+
+IdVtDrawAPI VTDrawFromIni(const wchar_t *str, BOOL *auto_flag)
 {
-	BOOL CodePopupEnable;
-	WORD CodePopupKey1;
-	WORD CodePopupKey2;
-} UnicodeDebugParam_t;
-
-extern UnicodeDebugParam_t UnicodeDebugParam;
-
-#ifdef __cplusplus
+	IdVtDrawAPI ret = IdVtDrawAPIUnicode;
+	if (_wcsicmp(str, L"auto") == 0) {
+		*auto_flag = TRUE;
+		ret = IsWindowsNTKernel() ? IdVtDrawAPIUnicode : IdVtDrawAPIANSI;
+	} else if (_wcsicmp(str, L"ansi") == 0) {
+		*auto_flag = FALSE;
+		ret = IdVtDrawAPIANSI;
+	} else if (_wcsicmp(str, L"unicode") == 0) {
+		*auto_flag = FALSE;
+		ret = IdVtDrawAPIUnicode;
+	}
+	return ret;
 }
-#endif
+
+const wchar_t *VTDrawToIni(IdVtDrawAPI api)
+{
+	if (IsWindowsNTKernel()) {
+		// Unicode
+		if (api == IdVtDrawAPIUnicode) {
+			return L"Unicode";
+		}
+		return L"ANSI";
+	} else {
+		// 9xŒn‚ÍANSI‚Ì‚Ý
+		return L"ANSI";
+	}
+}

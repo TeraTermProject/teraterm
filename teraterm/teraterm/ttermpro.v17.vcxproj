@@ -464,6 +464,7 @@
     <ClCompile Include="ttwsk.c" />
     <ClCompile Include="ui_pp.cpp" />
     <ClCompile Include="vtdisp.c" />
+    <ClCompile Include="vtdraw.cpp" />
     <ClCompile Include="vtterm.c" />
     <ClCompile Include="vtwin.cpp" />
     <ClCompile Include="winjump.c" />
@@ -527,6 +528,7 @@
     <ClInclude Include="tslib.h" />
     <ClInclude Include="ui_pp.h" />
     <ClInclude Include="ui_pp_res.h" />
+    <ClInclude Include="vtdraw.h" />
     <ClInclude Include="win_pp.h" />
   </ItemGroup>
   <ItemGroup>

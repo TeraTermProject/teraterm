@@ -657,14 +657,11 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 #endif
 		UnicodeDebugParam.CodePopupKey1 = VK_CONTROL;
 		UnicodeDebugParam.CodePopupKey2 = VK_CONTROL;
-		UnicodeDebugParam.UseUnicodeApi = FALSE;
-        UnicodeDebugParam.CodePageForANSIDraw = GetACP();
 	}
 
 	/* Initialize scroll buffer */
-	UnicodeDebugParam.UseUnicodeApi = IsWindowsNTKernel() ? TRUE : FALSE;
-	InitBuffer(UnicodeDebugParam.UseUnicodeApi);
-	BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
+	InitBuffer((IdVtDrawAPI)ts.VTDrawAPI);
+	BuffSetDispCodePage(ts.VTDrawAnsiCodePage);
 
 	InitDisp();
 	BGLoadThemeFile(&ts);

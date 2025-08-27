@@ -603,6 +603,10 @@ struct tttset {
 	WORD AutoComPortReconnectRetryInterval;		// (ms)
 	WORD AutoComPortReconnectRetryCount;		// 0~
 	int nCmdShow;						// WinMain() 4”Ô–Ú‚Ìˆø”‚Ì’l
+	BOOL VTDrawAPIAuto;					// ini•Û‘¶ATRUE‚ÌAPI="auto"‚Å•Û‘¶‚·‚é
+	WORD VTDrawAPI;
+	BOOL VTDrawAnsiCodePageAuto;				// ini•Û‘¶ATRUE‚ÌACP=0‚Å•Û‘¶‚·‚é
+	WORD VTDrawAnsiCodePage;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;

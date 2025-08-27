@@ -49,6 +49,7 @@
 #include "buffer.h"
 #include "asprintf.h"
 #include "ttcstd.h"
+#include "vtdraw.h"
 
 #define	ENABLE_CELL_INDEX	0
 
@@ -579,11 +580,11 @@ allocate_error:
 	return FALSE;
 }
 
-void InitBuffer(BOOL use_unicode_api)
+void InitBuffer(IdVtDrawAPI draw_api)
 {
 	int Ny;
 
-	UseUnicodeApi = use_unicode_api;
+	UseUnicodeApi = draw_api == IdVtDrawAPIUnicode ? TRUE : FALSE;
 
 	/* setup terminal */
 	NumOfColumns = ts.TerminalWidth;

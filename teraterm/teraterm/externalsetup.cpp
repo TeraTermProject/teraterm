@@ -45,7 +45,8 @@
 
 static struct {
 	BOOL PerProcessCalled;
-	BOOL old_use_unicode_api;
+	BOOL old_VTDrawAPI;
+	int old_VTDrawAnsiCodePage;
 	char *orgTitle;
 	HWND hWnd_disable;
 } ExternalSetupData;
@@ -74,7 +75,8 @@ static void ExternalSetupPreProcess(HWND hWnd, CAddSettingPropSheetDlgPage page)
 		;
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::FontPage) {
-		ExternalSetupData.old_use_unicode_api = UnicodeDebugParam.UseUnicodeApi;
+		ExternalSetupData.old_VTDrawAPI = ts.VTDrawAPI;
+		ExternalSetupData.old_VTDrawAnsiCodePage = ts.VTDrawAnsiCodePage;
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::KeyboardPage) {
 		;
@@ -122,6 +124,7 @@ static void ExternalSetupPreProcess(HWND hWnd, CAddSettingPropSheetDlgPage page)
 static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 {
 	ExternalSetupData.PerProcessCalled = FALSE;
+	TTTSet *pts = &ts;
 
 	//BOOL all = FALSE;
 	BOOL all = TRUE;
@@ -133,11 +136,15 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::FontPage) {
 		// Fontタブ
-		if (ExternalSetupData.old_use_unicode_api != UnicodeDebugParam.UseUnicodeApi) {
-			BuffSetDispAPI(UnicodeDebugParam.UseUnicodeApi);
+		if (ExternalSetupData.old_VTDrawAPI != pts->VTDrawAPI) {
+			BuffSetDispAPI(pts->VTDrawAPI);
+			pts->VTDrawAPIAuto = FALSE;
 		}
 		// ANSI表示用のコードページを設定する
-		BuffSetDispCodePage(UnicodeDebugParam.CodePageForANSIDraw);
+		BuffSetDispCodePage(pts->VTDrawAnsiCodePage);
+		if (ExternalSetupData.old_VTDrawAnsiCodePage != ts.VTDrawAnsiCodePage) {
+			pts->VTDrawAnsiCodePageAuto = FALSE;
+		}
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::KeyboardPage) {
 		//ResetKeypadMode(TRUE);
