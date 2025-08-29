@@ -32,32 +32,48 @@
 
 #include "vtdraw.h"
 
-IdVtDrawAPI VTDrawFromIni(const wchar_t *str, BOOL *auto_flag)
+/**
+ * iniファイルのIDから実際の描画で使うIDを返す
+ * @param ini_id iniファイルのID,IdVtDrawAPIAutoの場合あり
+ * @return API ID Autoの場合、自動判定してUnicodeかANSIを返す
+ */
+IdVtDrawAPI VTDrawFromID(IdVtDrawAPI ini_id)
 {
-	IdVtDrawAPI ret = IdVtDrawAPIUnicode;
-	if (_wcsicmp(str, L"auto") == 0) {
-		*auto_flag = TRUE;
-		ret = IsWindowsNTKernel() ? IdVtDrawAPIUnicode : IdVtDrawAPIANSI;
-	} else if (_wcsicmp(str, L"ansi") == 0) {
-		*auto_flag = FALSE;
-		ret = IdVtDrawAPIANSI;
-	} else if (_wcsicmp(str, L"unicode") == 0) {
-		*auto_flag = FALSE;
-		ret = IdVtDrawAPIUnicode;
+	if (ini_id == IdVtDrawAPIAuto) {
+		return IsWindowsNTKernel() ? IdVtDrawAPIUnicode : IdVtDrawAPIANSI;
+	} else {
+		return ini_id;
 	}
-	return ret;
+}
+
+/**
+ *
+ *	@param ini	iniファイル内のIdVtDrawAPI
+ *	@retval		実際に使用する IdVtDrawAPI
+ */
+IdVtDrawAPI VTDrawFromIni(const wchar_t *str, IdVtDrawAPI *ini)
+{
+	if (_wcsicmp(str, L"auto") == 0) {
+		*ini = IdVtDrawAPIAuto;
+	} else if (_wcsicmp(str, L"ansi") == 0) {
+		*ini = IdVtDrawAPIANSI;
+	} else if (_wcsicmp(str, L"unicode") == 0) {
+		*ini = IdVtDrawAPIUnicode;
+	} else {
+		*ini = IdVtDrawAPIAuto;
+	}
+	return VTDrawFromID(*ini);
 }
 
 const wchar_t *VTDrawToIni(IdVtDrawAPI api)
 {
-	if (IsWindowsNTKernel()) {
-		// Unicode
-		if (api == IdVtDrawAPIUnicode) {
-			return L"Unicode";
-		}
+	switch (api) {
+	case IdVtDrawAPIUnicode:
+		return L"Unicode";
+	case IdVtDrawAPIANSI:
 		return L"ANSI";
-	} else {
-		// 9x系はANSIのみ
-		return L"ANSI";
+	case IdVtDrawAPIAuto:
+	default:
+		return L"Auto";
 	}
 }

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Turkish
-date=2025-06-27 by TeraTerm Project
+date=2025-08-30 by TeraTerm Project
 contributor= Mehmet Cagri Aksoy (2025-08-04)
 
 [Tera Term]
@@ -293,7 +293,7 @@ DLG_TAB_FONT_VTFONT_TITLE=Çizim için API
 DLG_TAB_FONT_DLGFONT=&Dialog Yazı Tipi
 DLG_TAB_FONT_TEKFONT=TEK Yazı Tipi
 DLG_TAB_FONT_BTN_DEFAULT=&Varsayılan
-DLG_TAB_FONT_CODEPAGE_LABEL=Görüntü karakter dönüşümü için &kod sayfası
+DLG_TAB_FONT_CODEPAGE_LABEL=Görüntü karakter dönüşümü için &kod sayfası(Auto when 0, %d)
 DLG_TAB_FONT_LIST_PRO_FONTS_VT=Yazı tipi penceresinde &orantılı yazı tiplerini listele
 DLG_TAB_FONT_LIST_PRO_FONTS_DLG=Yazı tipi penceresinde p&orantılı yazı tiplerini listele
 DLG_TAB_FONT_CHARACTER_SPACE=karakter aralığı

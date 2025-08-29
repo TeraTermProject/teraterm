@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Italian
-date=11.07.2025 by RB
+date=2025-08-30 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -293,7 +293,7 @@ DLG_TAB_FONT_VTFONT_TITLE=API disegno
 DLG_TAB_FONT_DLGFONT=Font finestra &dialogo
 DLG_TAB_FONT_TEKFONT=Font TEK
 DLG_TAB_FONT_BTN_DEFAULT=Pred&efinita
-DLG_TAB_FONT_CODEPAGE_LABEL=Pagina &codice visualizzazione conversione carattere
+DLG_TAB_FONT_CODEPAGE_LABEL=Pagina &codice visualizzazione conversione carattere(Auto when 0, %d)
 DLG_TAB_FONT_LIST_PRO_FONTS_VT=Visualizza font &proporzionali nella finestra font
 DLG_TAB_FONT_LIST_PRO_FONTS_DLG=Visualizza font p&roporzionali nella finestra font
 DLG_TAB_FONT_CHARACTER_SPACE=Carattere spazio

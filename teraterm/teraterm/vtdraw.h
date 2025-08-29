@@ -33,11 +33,13 @@ extern "C" {
 #endif
 
 typedef enum {
+	IdVtDrawAPIAuto,	// é©ìÆê›íË
 	IdVtDrawAPIUnicode,
 	IdVtDrawAPIANSI,
 } IdVtDrawAPI;
 
-IdVtDrawAPI VTDrawFromIni(const wchar_t *str, BOOL *auto_flag);
+IdVtDrawAPI VTDrawFromID(IdVtDrawAPI ini_id);
+IdVtDrawAPI VTDrawFromIni(const wchar_t *str, IdVtDrawAPI *ini);
 const wchar_t *VTDrawToIni(IdVtDrawAPI api);
 
 #ifdef __cplusplus

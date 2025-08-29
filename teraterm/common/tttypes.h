@@ -603,9 +603,9 @@ struct tttset {
 	WORD AutoComPortReconnectRetryInterval;		// (ms)
 	WORD AutoComPortReconnectRetryCount;		// 0~
 	int nCmdShow;						// WinMain() 4番目の引数の値
-	BOOL VTDrawAPIAuto;					// ini保存時、TRUEの時API="auto"で保存する
+	WORD VTDrawAPI_ini;					// ini保存時、TRUEの時API="auto"で保存する
 	WORD VTDrawAPI;
-	BOOL VTDrawAnsiCodePageAuto;				// ini保存時、TRUEの時ACP=0で保存する
+	WORD VTDrawAnsiCodePage_ini;		// ini保存時、TRUEの時ACP=0で保存する
 	WORD VTDrawAnsiCodePage;
 
 	// Experimental

@@ -2031,14 +2031,15 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	wchar_t *tmpw;
 	hGetPrivateProfileStringW(SectionW, L"VTDrawAPI", L"Auto", FName, &tmpw);
-	ts->VTDrawAPI = (DWORD)VTDrawFromIni(tmpw, &ts->VTDrawAPIAuto);
+	DWORD ini;
+	ts->VTDrawAPI = (DWORD)VTDrawFromIni(tmpw, &ini);
+	ts->VTDrawAPI_ini = (DWORD)ini;
 	free(tmpw);
-	ts->VTDrawAnsiCodePage = GetPrivateProfileIntW(SectionW, L"VTDrawACP", 0, FName);
-	if (ts->VTDrawAnsiCodePage == 0) {
-		ts->VTDrawAnsiCodePageAuto = TRUE;
+	ts->VTDrawAnsiCodePage_ini = GetPrivateProfileIntW(SectionW, L"VTDrawACP", 0, FName);
+	if (ts->VTDrawAnsiCodePage_ini == 0) {
 		ts->VTDrawAnsiCodePage = GetACP();
 	} else {
-		ts->VTDrawAnsiCodePageAuto = FALSE;
+		ts->VTDrawAnsiCodePage = ts->VTDrawAnsiCodePage_ini;
 	}
 
 	// Experimental
@@ -3312,11 +3313,10 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "SendfileSkipOptionDialog", FName, ts->SendfileSkipOptionDialog);
 
 	WritePrivateProfileStringW(
-		SectionW, L"VTDrawAPI",
-		ts->VTDrawAPIAuto ? L"Auto" : VTDrawToIni(ts->VTDrawAPI), FName);
+		SectionW, L"VTDrawAPI", VTDrawToIni(ts->VTDrawAPI_ini), FName);
 	WritePrivateProfileIntW(
-		SectionW, L"VTDrawACP",
-		ts->VTDrawAnsiCodePageAuto ? 0 : ts->VTDrawAnsiCodePage, FName);
+		SectionW, L"VTDrawACP", ts->VTDrawAnsiCodePage_ini, FName);
+
 }
 
 void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,

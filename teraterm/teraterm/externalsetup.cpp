@@ -46,7 +46,6 @@
 static struct {
 	BOOL PerProcessCalled;
 	BOOL old_VTDrawAPI;
-	int old_VTDrawAnsiCodePage;
 	char *orgTitle;
 	HWND hWnd_disable;
 } ExternalSetupData;
@@ -76,7 +75,6 @@ static void ExternalSetupPreProcess(HWND hWnd, CAddSettingPropSheetDlgPage page)
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::FontPage) {
 		ExternalSetupData.old_VTDrawAPI = ts.VTDrawAPI;
-		ExternalSetupData.old_VTDrawAnsiCodePage = ts.VTDrawAnsiCodePage;
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::KeyboardPage) {
 		;
@@ -138,13 +136,9 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 		// Fontタブ
 		if (ExternalSetupData.old_VTDrawAPI != pts->VTDrawAPI) {
 			BuffSetDispAPI(pts->VTDrawAPI);
-			pts->VTDrawAPIAuto = FALSE;
 		}
 		// ANSI表示用のコードページを設定する
 		BuffSetDispCodePage(pts->VTDrawAnsiCodePage);
-		if (ExternalSetupData.old_VTDrawAnsiCodePage != ts.VTDrawAnsiCodePage) {
-			pts->VTDrawAnsiCodePageAuto = FALSE;
-		}
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::KeyboardPage) {
 		//ResetKeypadMode(TRUE);
