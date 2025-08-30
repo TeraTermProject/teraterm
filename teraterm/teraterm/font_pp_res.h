@@ -7,8 +7,7 @@
 #define IDC_VTFONT_TITLE                1001
 #define IDC_VTFONT_EDIT                 1002
 #define IDC_VTFONT_CHOOSE               1003
-#define IDC_VTFONT_UNICODE              1004
-#define IDC_VTFONT_ANSI                 1005
+#define IDC_VTFONT_COMBO                1004
 #define IDC_VTFONT_CODEPAGE_LABEL       1006
 #define IDC_VTFONT_CODEPAGE_EDIT        1007
 #define IDC_CHARACTER_SPACE_TITLE       1010
@@ -23,7 +22,7 @@
 #define IDC_FONT_FOLDER                 1023
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        102

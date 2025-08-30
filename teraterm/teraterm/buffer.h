@@ -32,6 +32,7 @@
 #pragma once
 
 #include "teraprnfile.h"
+#include "vtdraw.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,7 +72,7 @@ typedef struct {
 
 typedef TCharAttr *PCharAttr;
 
-void InitBuffer(BOOL use_unicode_api);
+void InitBuffer(IdVtDrawAPI draw_api);
 void LockBuffer(void);
 void UnlockBuffer(void);
 void FreeBuffer(void);

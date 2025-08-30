@@ -79,6 +79,8 @@ add_executable(
   unicode_test.h
   vtdisp.c
   vtdisp.h
+  vtdraw.cpp
+  vtdraw.h
   vtterm.c
   vtterm.h
   vtwin.cpp

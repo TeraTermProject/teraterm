@@ -48,6 +48,7 @@
 #include "win32helper.h"
 #include "tttext.h"
 #include "tslib.h"
+#include "vtdraw.h"
 
 #include "font_pp.h"
 
@@ -216,12 +217,36 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			SetFontStringW(hWnd, IDC_VTFONT_EDIT, &dlg_data->VTFont);
 
-			CheckDlgButton(hWnd,
-						   UnicodeDebugParam.UseUnicodeApi ? IDC_VTFONT_UNICODE : IDC_VTFONT_ANSI,
-						   BST_CHECKED);
-			SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, UnicodeDebugParam.CodePageForANSIDraw, FALSE);
-			EnableCodePage(hWnd, UnicodeDebugParam.UseUnicodeApi ? FALSE : TRUE);
-			SendDlgItemMessage(hWnd, IDC_VTFONT_CODEPAGE_EDIT, EM_LIMITTEXT, IDC_CODEPAGE_MAXLEN, 0);
+			{
+				static const wchar_t *unicode = L"Unicode API";
+				static const wchar_t *ansi = L"ANSI API";
+				wchar_t *s;
+				aswprintf(&s, L"Auto (%s)",
+						  VTDrawFromID(IdVtDrawAPIAuto) == IdVtDrawAPIUnicode ? unicode : ansi);
+				SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_ADDSTRING, 0, (LPARAM)s);
+				free(s);
+				SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_ADDSTRING, 0, (LPARAM)unicode);
+				SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_ADDSTRING, 0, (LPARAM)ansi);
+				if (IsWindowsNTKernel() == TRUE) {
+					SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_SETCURSEL,
+										ts->VTDrawAPI_ini == IdVtDrawAPIAuto ? 0 :
+										ts->VTDrawAPI_ini == IdVtDrawAPIUnicode ? 1 : 2, 0);
+				} else {
+					SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_SETCURSEL, 0, 0);
+					EnableWindow(GetDlgItem(hWnd, IDC_VTFONT_COMBO), FALSE);
+				}
+
+				wchar_t *fmt;
+				hGetDlgItemTextW(hWnd, IDC_VTFONT_CODEPAGE_LABEL, &fmt);
+				aswprintf(&s, fmt, GetACP());
+				free(fmt);
+				SetDlgItemTextW(hWnd, IDC_VTFONT_CODEPAGE_LABEL, s);
+				free(s);
+
+				SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, ts->VTDrawAnsiCodePage_ini, FALSE);
+				EnableCodePage(hWnd, ts->VTDrawAPI == IdVtDrawAPIUnicode ? FALSE : TRUE);
+				SendDlgItemMessageA(hWnd, IDC_VTFONT_CODEPAGE_EDIT, EM_LIMITTEXT, IDC_CODEPAGE_MAXLEN, 0);
+			}
 
 			ArrangeControlsForChooseFont(hWnd, &dlg_data->VTFont, IDC_LIST_HIDDEN_FONTS, IDC_LIST_PRO_FONTS_VT, ACFCF_INIT_VTWIN);
 
@@ -250,10 +275,13 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			NMHDR *nmhdr = (NMHDR *)lp;
 			switch (nmhdr->code) {
 				case PSN_APPLY: {
-					UnicodeDebugParam.UseUnicodeApi =
-						IsDlgButtonChecked(hWnd, IDC_VTFONT_UNICODE) == BST_CHECKED;
-					UnicodeDebugParam.CodePageForANSIDraw =
+					LRESULT r = SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_GETCURSEL, 0, 0);
+					ts->VTDrawAPI_ini = (IdVtDrawAPI)r;
+					ts->VTDrawAPI = VTDrawFromID((IdVtDrawAPI)r);
+					ts->VTDrawAnsiCodePage_ini =
 						GetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, NULL, FALSE);
+					ts->VTDrawAnsiCodePage =
+						ts->VTDrawAnsiCodePage_ini == 0 ? GetACP() : ts->VTDrawAnsiCodePage_ini;
 
 					TSSetLogFont(hWnd, &dlg_data->VTFont, 0, 0, ts);
 
@@ -364,9 +392,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			}
 
 			switch (wp) {
-			case IDC_VTFONT_ANSI | (BN_CLICKED << 16):
-			case IDC_VTFONT_UNICODE | (BN_CLICKED << 16): {
-				BOOL enable = (wp & 0xffff) == IDC_VTFONT_ANSI ? TRUE : FALSE;
+			case IDC_VTFONT_COMBO | (CBN_SELCHANGE << 16): {
+				IdVtDrawAPI r = (IdVtDrawAPI)SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_GETCURSEL, 0, 0);
+				r = VTDrawFromID(r);
+				BOOL enable = r == IdVtDrawAPIANSI ? TRUE : FALSE;
 				EnableCodePage(hWnd, enable);
 				break;
 			}

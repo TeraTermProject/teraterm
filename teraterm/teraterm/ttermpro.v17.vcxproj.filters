@@ -309,6 +309,9 @@
     <ClCompile Include="tekfont_pp.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="vtdraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -677,6 +680,9 @@
     </ClInclude>
     <ClInclude Include="tekfont_pp_res.h">
       <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="vtdraw.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

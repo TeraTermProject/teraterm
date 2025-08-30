@@ -61,6 +61,7 @@
 #include "xmodem.h"
 #include "ymodem.h"
 #include "kermit.h"
+#include "vtdraw.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
@@ -2028,6 +2029,18 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->SendfileSequential = GetOnOff(Section, "SendfileSequential", FName, FALSE);
 	ts->SendfileSkipOptionDialog = GetOnOff(Section, "SendfileSkipOptionDialog", FName, FALSE);
 
+	wchar_t *tmpw;
+	hGetPrivateProfileStringW(SectionW, L"VTDrawAPI", L"Auto", FName, &tmpw);
+	ts->VTDrawAPI_ini = (DWORD)VTDrawFromIni(tmpw);
+	free(tmpw);
+	ts->VTDrawAPI = (DWORD)VTDrawFromID(ts->VTDrawAPI);
+	ts->VTDrawAnsiCodePage_ini = GetPrivateProfileIntW(SectionW, L"VTDrawACP", 0, FName);
+	if (ts->VTDrawAnsiCodePage_ini == 0) {
+		ts->VTDrawAnsiCodePage = GetACP();
+	} else {
+		ts->VTDrawAnsiCodePage = ts->VTDrawAnsiCodePage_ini;
+	}
+
 	// Experimental
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreePropertySheet", FName, ts->ExperimentalTreePropertySheetEnable);
@@ -3297,6 +3310,12 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteInt(Section, "SendfileSize", FName, ts->SendfileSize);
 	WriteOnOff(Section, "SendfileSequential", FName, ts->SendfileSequential);
 	WriteOnOff(Section, "SendfileSkipOptionDialog", FName, ts->SendfileSkipOptionDialog);
+
+	WritePrivateProfileStringW(
+		SectionW, L"VTDrawAPI", VTDrawToIni(ts->VTDrawAPI_ini), FName);
+	WritePrivateProfileIntW(
+		SectionW, L"VTDrawACP", ts->VTDrawAnsiCodePage_ini, FName);
+
 }
 
 void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,

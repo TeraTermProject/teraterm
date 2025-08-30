@@ -1,5 +1,5 @@
 /*
- * (C) 2020- TeraTerm Project
+ * (C) 2025- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,21 +26,65 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include <windows.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "tttypes.h"
 
-typedef struct
+#include "vtdraw.h"
+
+/**
+ * iniファイルのIDから実際の描画で使うIDを返す
+ * @param	ini_id iniファイルのID
+ *			IdVtDrawAPIAutoの場合あり
+ * @return	NTの場合
+ *				IdVtDrawAPIUnicode/ANSIのときそのまま返す
+ *				IdVtDrawAPIAutoのときUnicodeを返す
+ *			NTではない場合
+ *				dVtDrawAPIANSIを返す
+ */
+IdVtDrawAPI VTDrawFromID(IdVtDrawAPI ini_id)
 {
-	BOOL CodePopupEnable;
-	WORD CodePopupKey1;
-	WORD CodePopupKey2;
-} UnicodeDebugParam_t;
-
-extern UnicodeDebugParam_t UnicodeDebugParam;
-
-#ifdef __cplusplus
+	if (IsWindowsNTKernel()) {
+		if (ini_id == IdVtDrawAPIAuto) {
+			return IsWindowsNTKernel() ? IdVtDrawAPIUnicode : IdVtDrawAPIANSI;
+		} else {
+			return ini_id;
+		}
+	} else {
+		return IdVtDrawAPIANSI;
+	}
 }
-#endif
+
+/**
+ *	iniファイルを解析してenumに変換する
+ *	@param	str		iniファイルのキーワード
+ *	@retval			enum, IdVtDrawAPI*
+ */
+IdVtDrawAPI VTDrawFromIni(const wchar_t *str)
+{
+	if (_wcsicmp(str, L"auto") == 0) {
+		return IdVtDrawAPIAuto;
+	} else if (_wcsicmp(str, L"ansi") == 0) {
+		return IdVtDrawAPIANSI;
+	} else if (_wcsicmp(str, L"unicode") == 0) {
+		return IdVtDrawAPIUnicode;
+	} else {
+		return IdVtDrawAPIAuto;
+	}
+}
+
+/**
+ *	enumをiniファイル内の文字列へ変換する
+ */
+const wchar_t *VTDrawToIni(IdVtDrawAPI api)
+{
+	switch (api) {
+	case IdVtDrawAPIUnicode:
+		return L"Unicode";
+	case IdVtDrawAPIANSI:
+		return L"ANSI";
+	case IdVtDrawAPIAuto:
+	default:
+		return L"Auto";
+	}
+}
