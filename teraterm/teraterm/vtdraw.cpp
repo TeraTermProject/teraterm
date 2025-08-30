@@ -34,37 +34,48 @@
 
 /**
  * iniファイルのIDから実際の描画で使うIDを返す
- * @param ini_id iniファイルのID,IdVtDrawAPIAutoの場合あり
- * @return API ID Autoの場合、自動判定してUnicodeかANSIを返す
+ * @param	ini_id iniファイルのID
+ *			IdVtDrawAPIAutoの場合あり
+ * @return	NTの場合
+ *				IdVtDrawAPIUnicode/ANSIのときそのまま返す
+ *				IdVtDrawAPIAutoのときUnicodeを返す
+ *			NTではない場合
+ *				dVtDrawAPIANSIを返す
  */
 IdVtDrawAPI VTDrawFromID(IdVtDrawAPI ini_id)
 {
-	if (ini_id == IdVtDrawAPIAuto) {
-		return IsWindowsNTKernel() ? IdVtDrawAPIUnicode : IdVtDrawAPIANSI;
+	if (IsWindowsNTKernel()) {
+		if (ini_id == IdVtDrawAPIAuto) {
+			return IsWindowsNTKernel() ? IdVtDrawAPIUnicode : IdVtDrawAPIANSI;
+		} else {
+			return ini_id;
+		}
 	} else {
-		return ini_id;
+		return IdVtDrawAPIANSI;
 	}
 }
 
 /**
- *
- *	@param ini	iniファイル内のIdVtDrawAPI
- *	@retval		実際に使用する IdVtDrawAPI
+ *	iniファイルを解析してenumに変換する
+ *	@param	str		iniファイルのキーワード
+ *	@retval			enum, IdVtDrawAPI*
  */
-IdVtDrawAPI VTDrawFromIni(const wchar_t *str, IdVtDrawAPI *ini)
+IdVtDrawAPI VTDrawFromIni(const wchar_t *str)
 {
 	if (_wcsicmp(str, L"auto") == 0) {
-		*ini = IdVtDrawAPIAuto;
+		return IdVtDrawAPIAuto;
 	} else if (_wcsicmp(str, L"ansi") == 0) {
-		*ini = IdVtDrawAPIANSI;
+		return IdVtDrawAPIANSI;
 	} else if (_wcsicmp(str, L"unicode") == 0) {
-		*ini = IdVtDrawAPIUnicode;
+		return IdVtDrawAPIUnicode;
 	} else {
-		*ini = IdVtDrawAPIAuto;
+		return IdVtDrawAPIAuto;
 	}
-	return VTDrawFromID(*ini);
 }
 
+/**
+ *	enumをiniファイル内の文字列へ変換する
+ */
 const wchar_t *VTDrawToIni(IdVtDrawAPI api)
 {
 	switch (api) {

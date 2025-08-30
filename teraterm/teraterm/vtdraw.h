@@ -39,7 +39,7 @@ typedef enum {
 } IdVtDrawAPI;
 
 IdVtDrawAPI VTDrawFromID(IdVtDrawAPI ini_id);
-IdVtDrawAPI VTDrawFromIni(const wchar_t *str, IdVtDrawAPI *ini);
+IdVtDrawAPI VTDrawFromIni(const wchar_t *str);
 const wchar_t *VTDrawToIni(IdVtDrawAPI api);
 
 #ifdef __cplusplus

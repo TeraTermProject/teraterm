@@ -227,9 +227,14 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				free(s);
 				SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_ADDSTRING, 0, (LPARAM)unicode);
 				SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_ADDSTRING, 0, (LPARAM)ansi);
-				SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_SETCURSEL,
-									ts->VTDrawAPI_ini == IdVtDrawAPIAuto ? 0 :
-									ts->VTDrawAPI_ini == IdVtDrawAPIUnicode ? 1 : 2, 0);
+				if (IsWindowsNTKernel() == TRUE) {
+					SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_SETCURSEL,
+										ts->VTDrawAPI_ini == IdVtDrawAPIAuto ? 0 :
+										ts->VTDrawAPI_ini == IdVtDrawAPIUnicode ? 1 : 2, 0);
+				} else {
+					SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_SETCURSEL, 0, 0);
+					EnableWindow(GetDlgItem(hWnd, IDC_VTFONT_COMBO), FALSE);
+				}
 
 				wchar_t *fmt;
 				hGetDlgItemTextW(hWnd, IDC_VTFONT_CODEPAGE_LABEL, &fmt);

@@ -2031,10 +2031,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	wchar_t *tmpw;
 	hGetPrivateProfileStringW(SectionW, L"VTDrawAPI", L"Auto", FName, &tmpw);
-	DWORD ini;
-	ts->VTDrawAPI = (DWORD)VTDrawFromIni(tmpw, &ini);
-	ts->VTDrawAPI_ini = (DWORD)ini;
+	ts->VTDrawAPI_ini = (DWORD)VTDrawFromIni(tmpw);
 	free(tmpw);
+	ts->VTDrawAPI = (DWORD)VTDrawFromID(ts->VTDrawAPI);
 	ts->VTDrawAnsiCodePage_ini = GetPrivateProfileIntW(SectionW, L"VTDrawACP", 0, FName);
 	if (ts->VTDrawAnsiCodePage_ini == 0) {
 		ts->VTDrawAnsiCodePage = GetACP();
