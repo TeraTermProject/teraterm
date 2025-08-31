@@ -63,12 +63,12 @@ BEGIN
     CONTROL         "List &hidden fonts in font dialog",IDC_LIST_HIDDEN_FONTS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,59,234,10
     LTEXT           "Use the link below to open the Fonts folder and view font visibility",IDC_FONT_FOLDER_LABEL,19,76,320,8
-    LTEXT           "??????",IDC_FONT_FOLDER,28,91,99,8,WS_TABSTOP
+    LTEXT           "C:\\WINDOWS\\Fonts",IDC_FONT_FOLDER,28,91,99,8,WS_TABSTOP
     CONTROL         "Dra&wing resized font to fit cell width",IDC_RESIZED_FONT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,112,178,10
     LTEXT           "API for drawing",IDC_VTFONT_TITLE,7,130,123,8
     COMBOBOX        IDC_VTFONT_COMBO,19,141,106,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "&Code page for character conversion(Auto when 0, %d)",IDC_VTFONT_CODEPAGE_LABEL,19,158,218,8
+    LTEXT           "&Code page for character conversion(Auto when 0, %d)",IDC_VTFONT_CODEPAGE_LABEL,19,158,199,8
     EDITTEXT        IDC_VTFONT_CODEPAGE_EDIT,19,171,40,12,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "character space",IDC_CHARACTER_SPACE_TITLE,220,114,115,8
     EDITTEXT        IDC_SPACE_TOP,254,134,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
