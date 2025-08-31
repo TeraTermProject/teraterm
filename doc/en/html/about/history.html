@@ -38,24 +38,36 @@
   <li>Changes
     <ul>
       <li>
+        Added support for xterm(SGR-Pixels) style extended mouse tracking mode.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/575" target="_blank">issue #575</a>)
+      </li>
+      <li>
         Sequences OSC 17, 19, 117, 119 implemented.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/532" target="_blank">issue #532</a>)
       </li>
       <li>
-        Added a setting to not map DEC Special Graphics, and enabled the setting to be saved in an INI file.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/538" target="_blank">issue #538</a>)
+        Added "VT220" to <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
+      </li>
+      <li>
+        The <a href="../menu/file-sendfile.html">delay settings</a> have been implemented to ensure they are applied when <a href="../setup/teraterm-trans.html#draganddrop">sending files via drag & drop</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/594" target="_blank">issue #594</a>)
       </li>
       <li>
         Add available <a href="../usage/character_encoding.html">character encodings</a>.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/510" target="_blank">issue #510</a>)
       </li>
       <li>
-        Added support for xterm(SGR-Pixels) style extended mouse tracking mode.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/575" target="_blank">issue #575</a>)
+        Added "Hide dialog" button on <a href="../menu/file-log.html#Logging">"Log" dialog box (displayed while logging)</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/630" target="_blank">issue #630</a>)
       </li>
       <li>
         Added [UI] tab in Additional settings and moved <a href="../menu/setup-additional-ui.html#UILanguageFile">UI languages</a> and <a href="../menu/setup-additional-ui.html#DLGFont">Dialog font</a> setting.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/460" target="_blank">issue #460</a>)
+      </li>
+      <li>
+        Added a setting to not map DEC Special Graphics, and enabled the setting to be saved in an INI file.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/538" target="_blank">issue #538</a>)
       </li>
       <li>
         Added selections for display options to font list in font dialog for each tab.
@@ -68,16 +80,11 @@
         </ul>
       </li>
       <li>
-        Added "Hide dialog" button on <a href="../menu/file-log.html#Logging">"Log" dialog box (displayed while logging)</a>.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/630" target="_blank">issue #630</a>)
+        <a href="../menu/setup-additional-font.html#DrawAPI">API for drawing</a> option saved in TERATERM.INI.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/812" target="_blank">issue #812</a>)
       </li>
       <li>
-        Added "VT220" to <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a>.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
-      </li>
-      <li>
-        The <a href="../menu/file-sendfile.html">delay settings</a> have been implemented to ensure they are applied when <a href="../setup/teraterm-trans.html#draganddrop">sending files via drag & drop</a>.<br>
-        MACRO: <a href="../menu/file-sendfile.html">delay settings</a> have been incorporated to ensure they are applied during the execution of the <a href="../macro/command/sendfile.html">sendfile</a> command.
+        <a href="../menu/file-sendfile.html">delay settings</a> have been incorporated to ensure they are applied during the execution of the <a href="../macro/command/sendfile.html">sendfile</a> macro command.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/594" target="_blank">issue #594</a>)
       </li>
       <li>
@@ -88,19 +95,11 @@
         Added <a href="ctrlseq_device_attributes.html">device attributes list</a> to the manual.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/689" target="_blank">issue #689</a>)
       </li>
-      <li>
-        <a href="../menu/setup-additional-font.html#DrawAPI">API for drawing</a> option saved in TERATERM.INI.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/812" target="_blank">issue #812</a>)
-      </li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <li>
-        Broadcast dialog is not Unicode compatible.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/500" target="_blank">issue #500</a>)
-      </li>
       <li>
         <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> "VT100J", "VT102J", and "VT220J" were not selectable Since 5.3, which remove Language setting.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
@@ -110,16 +109,20 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/689" target="_blank">issue #689</a>)
       </li>
       <li>
+        Fixed crash when using [Kermit]-[Get].
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/785" target="_blank">issue #785</a>)
+      </li>
+      <li>
         The issue where some windows were not displayed in the foreground after right-clicking in the <a href="../menu/control-broadcast.html">Broadcast command</a> dialog's window list and selecting "Bring selected window to foreground" has been fixed.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/736" target="_blank">issue #736</a>)
       </li>
       <li>
-        MACRO: Fixed the issue where the <a href="../macro/command/sendbroadcast.html">send(ln)broadcast</a>, <a href="../macro/command/sendmulticast.html">send(ln)multicast</a> and <a href="../macro/command/sendkcode.html">sendkcode</a> commands could lose sent data.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/774" target="_blank">issue #774</a>)
+        <a href="../menu/control-broadcast.html">Broadcast command</a> dialog is not Unicode compatible.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/500" target="_blank">issue #500</a>)
       </li>
       <li>
-        Fixed crash when using [Kermit]-[Get].
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/785" target="_blank">issue #785</a>)
+        Fixed the issue where the <a href="../macro/command/sendbroadcast.html">send(ln)broadcast</a>, <a href="../macro/command/sendmulticast.html">send(ln)multicast</a> and <a href="../macro/command/sendkcode.html">sendkcode</a> macro commands could lose sent data.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/774" target="_blank">issue #774</a>)
       </li>
     </ul>
   </li>

@@ -36,7 +36,7 @@
 
 // MessageBoxのタイトルで使用 TODO exeファイル名に変更
 static char Program[] = "CygTerm+";
-//static char Version[] = "version 1.07_30_beta (2021/11/14)";
+//static char Version[] = "version 1.07_31 (2025/08/03)";
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -38,24 +38,36 @@
   <li>変更
     <ul>
       <li>
+        xterm(SGR-Pixels) 形式の拡張マウスイベント通知に対応した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/575" target="_blank">issue #575</a>)
+      </li>
+      <li>
         シーケンス OSC 17, 19, 117, 119 を実装した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/532" target="_blank">issue #532</a>)
       </li>
       <li>
-        DEC Special Graphics のマッピングしない設定を追加、設定をINIファイルに保存できるようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/538" target="_blank">issue #538</a>)
+        <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> に "VT220" を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
+      </li>
+      <li>
+        <a href="../setup/teraterm-trans.html#draganddrop">ドラッグ&ドロップによるファイル送信</a>を行った際、<a href="../menu/file-sendfile.html">ディレイ設定</a>が反映されるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/594" target="_blank">issue #594</a>)
       </li>
       <li>
         <a href="../usage/character_encoding.html">使用可能文字コード</a>を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/510" target="_blank">issue #510</a>)
       </li>
       <li>
-        xterm(SGR-Pixels) 形式の拡張マウスイベント通知に対応した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/575" target="_blank">issue #575</a>)
+        <a href="../menu/file-log.html#Logging">"Log" ダイアログボックス(ファイルへ書き込み中)</a>に "Hide dialog" ボタンを追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/630" target="_blank">issue #630</a>)
       </li>
       <li>
         [Additional settings] に [UI] タブを追加、<a href="../menu/setup-additional-ui.html#UILanguageFile">UI言語設定</a>と<a href="../menu/setup-additional-ui.html#DLGFont">ダイアログフォント設定</a>を移動した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/460" target="_blank">issue #460</a>)
+      </li>
+      <li>
+        DEC Special Graphics のマッピングしない設定を追加、設定をINIファイルに保存できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/538" target="_blank">issue #538</a>)
       </li>
       <li>
         フォントダイアログのフォントリストに特定のフォントを表示するかどうかをタブごとに選択できるようにした。
@@ -68,16 +80,11 @@
         </ul>
       </li>
       <li>
-        <a href="../menu/file-log.html#Logging">"Log" ダイアログボックス(ファイルへ書き込み中)</a>に "Hide dialog" ボタンを追加した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/630" target="_blank">issue #630</a>)
+        <a href="../menu/setup-additional-font.html#DrawAPI">文字描画で使用するAPI</a>をTERATERM.INIに保存するようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/812" target="_blank">issue #812</a>)
       </li>
       <li>
-        <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> に "VT220" を追加した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
-      </li>
-      <li>
-        <a href="../setup/teraterm-trans.html#draganddrop">ドラッグ&ドロップによるファイル送信</a>を行った際、<a href="../menu/file-sendfile.html">ディレイ設定</a>が反映されるようにした。<br>
-        MACRO: <a href="../macro/command/sendfile.html">sendfile</a>コマンド実行時、<a href="../menu/file-sendfile.html">ディレイ設定</a>が反映されるようにした。
+        <a href="../macro/command/sendfile.html">sendfile</a> マクロコマンド実行時、<a href="../menu/file-sendfile.html">ディレイ設定</a>が反映されるようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/594" target="_blank">issue #594</a>)
       </li>
       <li>
@@ -88,19 +95,11 @@
         マニュアルに<a href="ctrlseq_device_attributes.html">Device Attribute一覧</a>を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/689" target="_blank">issue #689</a>)
       </li>
-      <li>
-        <a href="../menu/setup-additional-font.html#DrawAPI">文字描画で使用するAPI</a>をTERATERM.INIに保存するようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/812" target="_blank">issue #812</a>)
-      </li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
-      <li>
-        ブロードキャストダイアログがUnicodeに対応していなかったので修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/500" target="_blank">issue #500</a>)
-      </li>
       <li>
         <a href="../menu/setup-additional-terminal.html#TerminalID">TerminalID</a> で "VT100J", "VT102J", "VT220J" が選択できなくなっていたので修正した。5.3でLanguage設定をなくしたときから選択できなくなっていた。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
@@ -110,16 +109,20 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/689" target="_blank">issue #689</a>)
       </li>
       <li>
+        [Kermit]-[Get] で Tera Term がクラッシュする不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/785" target="_blank">issue #785</a>)
+      </li>
+      <li>
         <a href="../menu/control-broadcast.html">Broadcast command</a>ダイアログのウィンドウリストで右クリック後、Bring selected window to foreground を選択した際、一部のウィンドウがフォアグラウンドで表示されない不具合を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/736" target="_blank">issue #736</a>)
       </li>
       <li>
-        MACRO: <a href="../macro/command/sendbroadcast.html">send(ln)broadcast</a>、<a href="../macro/command/sendmulticast.html">send(ln)multicast</a>、<a href="../macro/command/sendkcode.html">sendkcode</a>コマンドが送信データをロストする場合がある不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/774" target="_blank">issue #774</a>)
+        <a href="../menu/control-broadcast.html">Broadcast command</a>ダイアログがUnicodeに対応していなかったので修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/500" target="_blank">issue #500</a>)
       </li>
       <li>
-        [Kermit]-[Get] で Tera Term がクラッシュする不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/785" target="_blank">issue #785</a>)
+        <a href="../macro/command/sendbroadcast.html">send(ln)broadcast</a>、<a href="../macro/command/sendmulticast.html">send(ln)multicast</a>、<a href="../macro/command/sendkcode.html">sendkcode</a> マクロコマンドが送信データをロストする場合がある不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/774" target="_blank">issue #774</a>)
       </li>
     </ul>
   </li>
