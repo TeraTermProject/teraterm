@@ -244,7 +244,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				free(s);
 
 				SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, ts->VTDrawAnsiCodePage_ini, FALSE);
-				EnableCodePage(hWnd, ts->VTDrawAPI == IdVtDrawAPIUnicode ? FALSE : TRUE);
+				EnableCodePage(hWnd, ts->VTDrawAPI == IdVtDrawAPIANSI ? FALSE : TRUE);
 				SendDlgItemMessageA(hWnd, IDC_VTFONT_CODEPAGE_EDIT, EM_LIMITTEXT, IDC_CODEPAGE_MAXLEN, 0);
 			}
 
