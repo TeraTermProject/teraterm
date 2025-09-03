@@ -923,6 +923,24 @@ Name: {app}\cygterm+-x86_64\cyglaunch.exe; Type: files
 Name: {app}\ttpdlg.dll; Type: files
 Name: {app}\ttpset.dll; Type: files
 Name: {app}\ttptek.dll; Type: files
+Name: {app}\lang\Japanese.lng; Type: files
+Name: {app}\lang\German.lng; Type: files
+Name: {app}\lang\French.lng; Type: files
+Name: {app}\lang\Russian.lng; Type: files
+Name: {app}\lang\Korean.lng; Type: files
+Name: {app}\lang\Simplified Chinese.lng; Type: files
+Name: {app}\lang\Spanish.lng; Type: files
+Name: {app}\lang\Traditional Chinese.lng; Type: files
+Name: {app}\lang\Tamil.lng; Type: files
+Name: {app}\lang_utf16le\Japanese.lng; Type: files
+Name: {app}\lang_utf16le\German.lng; Type: files
+Name: {app}\lang_utf16le\French.lng; Type: files
+Name: {app}\lang_utf16le\Russian.lng; Type: files
+Name: {app}\lang_utf16le\Korean.lng; Type: files
+Name: {app}\lang_utf16le\Simplified Chinese.lng; Type: files
+Name: {app}\lang_utf16le\Spanish.lng; Type: files
+Name: {app}\lang_utf16le\Traditional Chinese.lng; Type: files
+Name: {app}\lang_utf16le\Tamil.lng; Type: files
 
 [UninstallDelete]
 ; cygterm.exe は cygterm+-x86_64\cygterm.exe か cygterm+-i686\cygterm.exe を
