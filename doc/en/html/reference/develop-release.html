@@ -72,8 +72,9 @@ To release Tera Term installation package is shown in the following step:
 <h2 id="rc-release">Create RC, and aftet that</h2>
 
 <ol>
-  <li>Create a working branch.
+  <li>Create a working branch. (from main or or stable branch)
 <pre>
+git switch main
 git checkout -b release/5_4_0-RC
 </pre>
   </li>
@@ -141,7 +142,7 @@ git checkout -b release/5_4_0-RC
   <li>Test run installer, run and connect in all supported OS.</li>
   <li>Commit and push.</li>
   <li>Create Pull Request to merge working branch.</li>
-  <li id="RC_commit">Merge the Pull Request.</li>
+  <li id="RC_commit">Merge the Pull Request. (to main or or stable branch)</li>
   <li>A Build workflow of GitHub Actions is run.<br>
     Three builds are triggered on: push to the working branch, Pull Request creation, and merge commit to the main or stable branch.<br>
     The merge commit is considered the release candidate.
@@ -153,16 +154,19 @@ git checkout -b release/5_4_0-RC
       <li>Mention that users must be logged in to GitHub to download GitHub Actions artifacts.</li>
     </ul>
   </li>
-  <li>Get feedbacks.
-    <p>If changed source code, redo "Confirm documents" and "Test run and connect in all supported OS."</p>
+  <li>Delete a working branch.</li>
+  <li>Get feedbacks.<br>
+    If changed source code, redo "Confirm documents" and "Test run and connect in all supported OS."
   </li>
+  <li>If you are going to release RC2, repeat the steps in this section starting from creating a working branch.</li>
 </ol>
 
 <h2 id="release-operation">Release</h2>
 
 <ol>
-  <li>Create a working branch.
+  <li>Create a working branch. (from main or or stable branch)
 <pre>
+git switch main
 git checkout -b release/5_4_0
 </pre>
   </li>
@@ -200,7 +204,7 @@ git checkout -b release/5_4_0
   </li>
   <li>Commit and push.</li>
   <li>Create Pull Request to merge working branch.</li>
-  <li>Merge the Pull Request.</li>
+  <li>Merge the Pull Request. (to main or or stable branch)</li>
   <li>Create a tag and push.
     <p>
       Use annotated tags.
@@ -395,6 +399,7 @@ git checkout -b stable_5_4
     </p>
   </li>
   <li>Update Chocolatey.</li>
+  <li>Delete a working branch.</li>
 </ol>
 
 <h2 id="code-freeze">About code freeze.</h2>

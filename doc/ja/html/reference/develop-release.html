@@ -74,8 +74,9 @@ TeraTerm Project でのリリース手順について以下に示します。
 <h2 id="rc-release">RC 作成とその後</h2>
 
 <ol>
-  <li>作業ブランチを作成する
+  <li>作業ブランチを作成する（main または定期リリース用ブランチから）
 <pre>
+git switch main
 git checkout -b release/5_4_0-RC
 </pre>
   </li>
@@ -143,7 +144,7 @@ git checkout -b release/5_4_0-RC
   <li>サポートされている全 OS でインストーラの実行、起動、接続をチェックする</li>
   <li>コミット、push する</li>
   <li>作業ブランチをマージするための Pull Request を作成する</li>
-  <li id="RC_commit">Pull Request をマージする</li>
+  <li id="RC_commit">Pull Request をマージする（main または定期リリース用ブランチへ）</li>
   <li>GitHub Actions の workflow が実行されてビルドされる<br>
     ビルドは3回実行されます: 作業ブランチへの push・Pull Request の作成・main または安定版ブランチへのマージコミット<br>
     マージコミットを RC とみなします。
@@ -156,16 +157,19 @@ git checkout -b release/5_4_0-RC
       <li>GitHub Actions の Artifacts は、GitHub にログインしていないとダウンロードできないことを注記する。</li>
     </ul>
   </li>
-  <li>フィードバックを受け入れる
-    <p>修正が入ったら再度「ドキュメントを確認する」「サポートされている全 OS で起動・接続チェックする」</p>
+  <li>作業ブランチを削除する</li>
+  <li>フィードバックを受け入れる<br>
+    修正が入ったら再度「ドキュメントを確認する」「サポートされている全 OS で起動・接続チェックする」
   </li>
+  <li>RC2 を出す場合は、この項目の手順を作業ブランチの作成から再度行う</li>
 </ol>
 
 <h2 id="release-operation">リリース作業</h2>
 
 <ol>
-  <li>作業ブランチを作成する
+  <li>作業ブランチを作成する（main または定期リリース用ブランチから）
 <pre>
+git switch main
 git checkout -b release/5_4_0
 </pre>
   </li>
@@ -203,7 +207,7 @@ git checkout -b release/5_4_0
   </li>
   <li>コミット、push する</li>
   <li>作業ブランチをマージするための Pull Request を作成する</li>
-  <li>Pull Request をマージする</li>
+  <li>Pull Request をマージする（main または定期リリース用ブランチへ）</li>
   <li>タグを作成し、push する
     <p>
       タグは annotated tags とする。<br/>
@@ -414,6 +418,7 @@ git checkout -b stable_5_4
     <p>現在 teraterm5 パッケージは reject されている。</p>
     </p>
   </li>
+  <li>作業ブランチを削除する</li>
 </ol>
 
 <h2 id="code-freeze">コードフリーズについて</h2>
