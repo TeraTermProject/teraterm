@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>フォントサイズ変更プラグイン</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>フォントサイズ変更プラグイン</h1>
+
+<p>Tera Term のメニューに <a href="../menu/fontsize.html">[FontSize] メニュー</a>を追加する。</p>
+
+<h2>機能</h2>
+
+<p>
+TTXChangeFontSize プラグインを入れると、Tera Term のメニューに [FontSize] メニューを追加する事が出来ます。<br>
+[FontSize] メニュー内の項目が選択されると、そのサイズに Tera Term の VT ウィンドウのフォントサイズが変更されます。
+</p>
+
+
+<h2>使用方法</h2>
+
+<p>
+プラグインを入れただけでは [FontSize] メニューは表示されません。<br>
+設定ファイルにメニュー項目を登録する必要があります。<br><br>
+
+メニュー内の項目を変更したい場合は、TERATERM.INI に [Change Font Size] セクションを作成し、"FontSizeN= サイズ" の形式で指定して下さい。N  は 1 からの連番です。<br>
+サイズにはフォントの文字セルまたは文字の高さを論理単位で指定します。正の値は文字セルの高さ、負の値は文字の高さとして扱われます。<br>
+メニューの項目数は最大で 20 です。
+</p>
+
+<h2>設定例</h2>
+<pre class="macro-example">
+[Change Font Size]
+FontSize1 = -15
+FontSize2 = -19
+</pre>
+
+<h2>ToDo</h2>
+
+<ul>
+  <li>メニューの項目を、設定ダイアログから変更できるようにする。</li>
+</ul>
+
+</body>
+</html>
