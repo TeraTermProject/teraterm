@@ -90,9 +90,11 @@ else()
     list(APPEND ISCC_OPTION "/DAppVersion=${VERSION}_${DATE}_${TIME}-${GITVERSION}")
   endif()
   if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "arm64")
-    list(APPEND ISCC_OPTION "-DM_ARM64=1")
+    list(APPEND ISCC_OPTION "/DArch=arm64")
   elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    list(APPEND ISCC_OPTION "-DM_X64=1")
+    list(APPEND ISCC_OPTION "/DArch=x64")
+  else()
+    list(APPEND ISCC_OPTION "/DArch=x86")
   endif()
   add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${SETUP_EXE}.exe

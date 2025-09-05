@@ -41,10 +41,10 @@ if "%RELEASE%" == "1" (
 ) else (
     set INNO_SETUP_APPVERSION="/DAppVersion=%VERSION% %DATE%_%TIME%-%VCSVERSION%"
 )
-INNO_SETUP_ARCH=""
-if "%arch%" == "x64" (set INNO_SETUP_ARCH=M_X64)
-if "%arch%" == "arm64" (set INNO_SETUP_ARCH=M_ARM64)
-%INNO_SETUP% %INNO_SETUP_APPVERSION% /OOutput %INNO_SETUP_OUTPUT% /DSrcDir=Output\build\teraterm-%arch% /DSrcDir=Output\build\teraterm-%arch% /D%INNO_SETUP_ARCH% teraterm.iss
+set INNO_SETUP_ARCH="/DArch=x86"
+if "%arch%" == "x64" (set INNO_SETUP_ARCH=/DArch=%arch%)
+if "%arch%" == "arm64" (set INNO_SETUP_ARCH=/DArch=%arch%)
+%INNO_SETUP% %INNO_SETUP_APPVERSION% /OOutput %INNO_SETUP_OUTPUT% /DSrcDir=Output\build\teraterm-%arch% %INNO_SETUP_ARCH% teraterm.iss
 
 rem (署名なし)ポータブル版のzipを作成
 pushd Output

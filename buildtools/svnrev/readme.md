@@ -2,13 +2,15 @@
 
 - ソースツリーのgit(又は svn)の情報をヘッダファイル等に書き出すためのツール
   - ソース用のヘッダフィル
-    - 例 `../teraterm/common/svnversion.h`
+    - 例 `../../teraterm/common/svnversion.h`
   - CI用のbatファイル
     - 例 `sourcetree_info.bat`
   - cmake用ファイル
     - 例 buildフォルダの `build_config.cmake`
   - json用ファイル
     - 例 buildフォルダの `build_config.json`
+  - Inno Setup用ファイル
+    - 例 installフォルダの `../../installer/build_config.isl`
 
 ## 準備
 
@@ -61,6 +63,8 @@
   - svnコマンドのパス
 - --git
   - gitコマンドのパス
+- --jsl
+  - Inno Setup用ファイルのパス
 
 オプションが toolinfo.txt より優先される
 
@@ -68,7 +72,7 @@
 
 このフォルダで
 ```
-$ perl svnrev.pl --cmake test.cmake --json test.json --verbose
+$ perl svnrev.pl --cmake test.cmake --json test.json --isl test.isl --verbose
 root=../..
 tt_version_major=5
 tt_version_minor=5
@@ -88,4 +92,5 @@ update 'svnversion.h'
 update 'sourcetree_info.bat'
 update 'test.cmake'
 update 'test.json'
+update 'test.isl'
 ```
