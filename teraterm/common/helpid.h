@@ -113,6 +113,7 @@
 #define HlpUsageRecurringcommand        31300
 #define HlpUsageResizemenu              31400
 #define HlpUsageTtyrec                  31500
+#define HlpUsageChangefontsize          31600
 
 #define HlpMenuFile                         41000
 #define HlpMenuFileNew                      41100
@@ -176,6 +177,7 @@
 #define HlpMenuWindowWindow                 45001
 #define HlpMenuHelp                         46000
 #define HlpMenuResize                       47000
+#define HlpMenuFontsize                     47001
 
 #define HlpMenutekFile          50000
 #define HlpMenutekFilePrint     50001

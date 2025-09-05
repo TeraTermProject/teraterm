@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Font size change plugin</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Font size change plug-in</h1>
+
+<p><a href="../menu/fontsize.html">[FontSize] menu</a> on Tera Term top menu bar</p>
+
+<h2>Feature</h2>
+
+<p>
+A user can add the [FontSize] menu on the top menu bar by using the TTXChangeFontSize plug-in.<br>
+When the [FontSize] menu entry is selected, Font size of Tera Term window is automatically change by the specified size.
+</p>
+
+
+<h2>Usage</h2>
+
+<p>
+Basically, the [FontSize] menu does not display after the plug-in is installed.<br>
+Next, a user must register the menu entry in the teraterm.ini file.
+<br><br>
+
+Add a [Change Font Size] section in the teraterm.ini file, and describe the "FontSizeMenuN = SIZE" entry. N is an 1-origin number.<br>
+SIZE specifies the height, in logical units, of the font's character cell or character. Positive value is treated as character cell height, negative value as character height.<br>
+The maximum value for N is 20.
+</p>
+
+<h2>Example</h2>
+<pre class="macro-example">
+[Change Font Size]
+FontSize1 = -15
+FontSize2 = -19
+</pre>
+
+<h2>ToDo</h2>
+
+<ul>
+  <li>The FontSize menu value can be changed by the dialog box.</li>
+</ul>
+
+</body>
+</html>
