@@ -29,14 +29,45 @@ TTXChangeFontSize プラグインを入れると、Tera Term のメニューに [FontSize] メニュ
 
 メニュー内の項目を変更したい場合は、TERATERM.INI に [Change Font Size] セクションを作成し、"FontSizeN= サイズ" の形式で指定して下さい。N  は 1 からの連番です。<br>
 サイズにはフォントの文字セルまたは文字の高さを論理単位で指定します。正の値は文字セルの高さ、負の値は文字の高さとして扱われます。<br>
-メニューの項目数は最大で 20 です。
+メニューの項目数は最大で 20 です。<br>
+<br>
+
+以下の<a href="../reference/menu_id.html">メニュー ID</a>が割り当てられています。<br>
+これらの<a href="../reference/menu_id.html">メニュー ID</a>を使用して、マクロの<a href="../macro/command/callmenu.html">callmenu</a>コマンドや<a href="../setup/keyboard.html">KEYBOARD.CNF</a>設定から本機能を呼び出すことが出来ます。<br>
+<table border="1" style="margin-bottom:1ex;">
+  <tr>
+    <th>TTXChangeFontSize メニューコマンド</th>
+    <th>ID</th>
+  </tr>
+  <tr>
+    <td>[FontSize] Menu(1) - Menu(20)</td>
+    <td>58101 - 58120</td>
+  </tr>
+  <tr>
+    <td>[FontSize] Increase</td>
+    <td>58151</td>
+  </tr>
+  <tr>
+    <td>[FontSize] Decrease</td>
+    <td>58152</td>
+  </tr>
+</table>
 </p>
 
 <h2>設定例</h2>
+TERATERM.INI
 <pre class="macro-example">
 [Change Font Size]
 FontSize1 = -15
 FontSize2 = -19
+</pre>
+KEYBOARD.CNF
+<pre class="macro-example">
+[User keys]
+; Control + 1: Increase font size
+User1=1026,3,58151
+; Control + 2: Decrease font size
+User2=1027,3,58152
 </pre>
 
 <h2>ToDo</h2>
