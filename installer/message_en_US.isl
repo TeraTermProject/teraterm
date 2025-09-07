@@ -39,5 +39,6 @@ comp_TTXRecurringCommand=Recurring Command can be used
 comp_TTXResizeMenu=VT-Window size can be changed from preset
 comp_TTXViewMode=View-only mode can be used
 comp_TTXttyrec=ttyrec format record data can be recorded or playback
+comp_TTXChangeFontSize=Allows changing the font size of VT-Window via the menu
 comp_installer=Other installer is started
 msg_AppRunningError=Setup has detected that %s is currently running.%n%nPlease close all instances of it now, then click Next to continue.
