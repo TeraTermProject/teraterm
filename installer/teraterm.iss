@@ -149,6 +149,7 @@ Source: {#SrcDir}\ttxkanjimenu.dll; DestDir: {app}\; Components: Additional_Plug
 Source: {#SrcDir}\TTXResizeMenu.dll; DestDir: {app}\; Components: Additional_Plugins/TTXResizeMenu; Flags: ignoreversion
 Source: {#SrcDir}\TTXttyrec.dll; DestDir: {app}\; Components: Additional_Plugins/TTXttyrec; Flags: ignoreversion
 Source: {#SrcDir}\TTXttyplay.dll; DestDir: {app}\; Components: Additional_Plugins/TTXttyrec; Flags: ignoreversion
+Source: {#SrcDir}\TTXChangeFontSize.dll; DestDir: {app}\; Components: Additional_Plugins/TTXChangeFontSize; Flags: ignoreversion
 Source: {#SrcDir}\TTXKcodeChange.dll; DestDir: {app}\; Components: Additional_Plugins/TTXKcodeChange; Flags: ignoreversion
 Source: {#SrcDir}\TTXViewMode.dll; DestDir: {app}\; Components: Additional_Plugins/TTXViewMode; Flags: ignoreversion
 Source: {#SrcDir}\TTXAlwaysOnTop.dll; DestDir: {app}\; Components: Additional_Plugins/TTXAlwaysOnTop; Flags: ignoreversion
@@ -169,6 +170,7 @@ Name: TTProxy; Description: TTProxy; Types: full standard
 Name: Additional_Plugins; Description: {cm:comp_TTX}
 Name: Additional_Plugins/TTXResizeMenu; Description: TTXResizeMenu ({cm:comp_TTXResizeMenu}); Types: full standard
 Name: Additional_Plugins/TTXttyrec; Description: TTXttyrec ({cm:comp_TTXttyrec}); Types: full standard
+Name: Additional_Plugins/TTXChangeFontSize; Description: TTXChangeFontSize ({cm:comp_TTXChangeFontSize}); Types: full standard
 Name: Additional_Plugins/TTXKanjiMenu; Description: TTXKanjiMenu ({cm:comp_TTXKanjiMenu}); Check: not isJapanese
 Name: Additional_Plugins/TTXKanjiMenu; Description: TTXKanjiMenu ({cm:comp_TTXKanjiMenu}); Types: full; Check: isJapanese
 Name: Additional_Plugins/TTXKcodeChange; Description: TTXKcodeChange ({cm:comp_TTXKcodeChange}); Check: not isJapanese
@@ -929,6 +931,24 @@ Name: {app}\cygterm+-x86_64\cyglaunch.exe; Type: files
 Name: {app}\ttpdlg.dll; Type: files
 Name: {app}\ttpset.dll; Type: files
 Name: {app}\ttptek.dll; Type: files
+Name: {app}\lang\Japanese.lng; Type: files
+Name: {app}\lang\German.lng; Type: files
+Name: {app}\lang\French.lng; Type: files
+Name: {app}\lang\Russian.lng; Type: files
+Name: {app}\lang\Korean.lng; Type: files
+Name: {app}\lang\Simplified Chinese.lng; Type: files
+Name: {app}\lang\Spanish.lng; Type: files
+Name: {app}\lang\Traditional Chinese.lng; Type: files
+Name: {app}\lang\Tamil.lng; Type: files
+Name: {app}\lang_utf16le\Japanese.lng; Type: files
+Name: {app}\lang_utf16le\German.lng; Type: files
+Name: {app}\lang_utf16le\French.lng; Type: files
+Name: {app}\lang_utf16le\Russian.lng; Type: files
+Name: {app}\lang_utf16le\Korean.lng; Type: files
+Name: {app}\lang_utf16le\Simplified Chinese.lng; Type: files
+Name: {app}\lang_utf16le\Spanish.lng; Type: files
+Name: {app}\lang_utf16le\Traditional Chinese.lng; Type: files
+Name: {app}\lang_utf16le\Tamil.lng; Type: files
 
 [UninstallDelete]
 ; cygterm.exe は cygterm+-x86_64\cygterm.exe か cygterm+-i686\cygterm.exe を

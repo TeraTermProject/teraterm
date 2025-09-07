@@ -268,6 +268,11 @@
 				<param name="Local" value="html\usage\recurringcommand.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Change font size plugin">
+				<param name="Local" value="html\usage\change_fontsize.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
 		</UL>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
@@ -614,6 +619,11 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="[KanjiCode] menu">
 				<param name="Local" value="html\ttxplugin/kanjimenu.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="[FontSize] menu">
+				<param name="Local" value="html\menu\fontsize.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 		</UL>

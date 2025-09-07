@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Font size change plugin</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Font size change plug-in</h1>
+
+<p><a href="../menu/fontsize.html">[FontSize] menu</a> on Tera Term top menu bar</p>
+
+<h2>Feature</h2>
+
+<p>
+A user can add the [FontSize] menu on the top menu bar by using the TTXChangeFontSize plug-in.<br>
+When the [FontSize] menu entry is selected, Font size of Tera Term window is automatically change by the specified size.
+</p>
+
+
+<h2>Usage</h2>
+
+<p>
+Basically, the [FontSize] menu does not display after the plug-in is installed.<br>
+Next, a user must register the menu entry in the teraterm.ini file.
+<br><br>
+
+Add a [Change Font Size] section in the teraterm.ini file, and describe the "FontSizeMenuN = SIZE" entry. N is an 1-origin number.<br>
+SIZE specifies the height, in logical units, of the font's character cell or character. Positive value is treated as character cell height, negative value as character height.<br>
+The maximum value for N is 20.<br>
+<br>
+The following <a href="../reference/menu_id.html">menu IDs</a> have been assigned.<br>
+You can use these <a href="../reference/menu_id.html">menu IDs</a> to invoke this function from the macro's <a href="../macro/command/callmenu.html">callmenu</a> command or the <a href="../setup/keyboard.html">KEYBOARD.CNF</a> settings.
+<table border="1" style="margin-bottom:1ex;">
+  <tr>
+    <th>TTXChangeFontSize Menu command</th>
+    <th>ID</th>
+  </tr>
+  <tr>
+    <td>[FontSize] Menu(1) - Menu(20)</td>
+    <td>58101 - 58120</td>
+  </tr>
+  <tr>
+    <td>[FontSize] Increase</td>
+    <td>58151</td>
+  </tr>
+  <tr>
+    <td>[FontSize] Decrease</td>
+    <td>58152</td>
+  </tr>
+</table>
+</p>
+
+<h2>Example</h2>
+TERATERM.INI
+<pre class="macro-example">
+[Change Font Size]
+FontSize1 = -15
+FontSize2 = -19
+</pre>
+KEYBOARD.CNF
+<pre class="macro-example">
+[User keys]
+; Control + 1: Increase font size
+User1=1026,3,58151
+; Control + 2: Decrease font size
+User2=1027,3,58152
+</pre>
+
+<h2>ToDo</h2>
+
+<ul>
+  <li>The FontSize menu value can be changed by the dialog box.</li>
+</ul>
+
+</body>
+</html>

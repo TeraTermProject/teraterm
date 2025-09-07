@@ -39,5 +39,6 @@ comp_TTXRecurringCommand=può essere usato un comando ricorrente
 comp_TTXResizeMenu=le dimensioni VT-Window possono essere modificate nel profilo
 comp_TTXViewMode=può essere usata la modalità 'Sola visualizzazione'
 comp_TTXttyrec=i dati registrati in formato ttyrec possono essere registrati o riprodotti
+comp_TTXChangeFontSize=Allows changing the font size of VT-Window via the menu
 comp_installer=È già stata avviata un'altra installazione
 msg_AppRunningError=Il programma di installazione ha rilevato che '%s' è attualmente in esecuzione.%n%nChiudi tutte le istanze, quindi per continuare seleziona 'Avanti'.

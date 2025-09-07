@@ -39,5 +39,6 @@ comp_TTXRecurringCommand=定期的に文字列を送信する
 comp_TTXResizeMenu=VTウィンドウのサイズをプリセット値の中から変更できるようにする
 comp_TTXViewMode=表示専用モードにすることができる
 comp_TTXttyrec=ttyrec形式の録画データを記録/再生できるようにする
+comp_TTXChangeFontSize=VTウィンドウのフォントサイズをメニューから変更できるようにする
 comp_installer=インストーラが起動します
 msg_AppRunningError=セットアップは実行中の %s を検出しました。%n%n開いているアプリケーションをすべて閉じてから「次へ」をクリックしてください。

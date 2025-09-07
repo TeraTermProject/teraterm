@@ -39,5 +39,6 @@ comp_TTXRecurringCommand=Tekrarlayan Komut kullanılabilir
 comp_TTXResizeMenu=VT-Pencere boyutu ön ayardan değiştirilebilir
 comp_TTXViewMode=Yalnızca Görüntüleme modu kullanılabilir
 comp_TTXttyrec=ttyrec formatındaki kayıt verisi kaydedilebilir veya oynatılabilir
+comp_TTXChangeFontSize=Allows changing the font size of VT-Window via the menu
 comp_installer=Başka bir yükleyici başlatıldı
 msg_AppRunningError=Kurulum, %s'nin şu anda çalıştığını tespit etti.%n%nDevam etmek için tüm örneklerini kapatıp İleri'ye tıklayın.
