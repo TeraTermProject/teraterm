@@ -72,8 +72,9 @@ To release Tera Term installation package is shown in the following step:
 <h2 id="rc-release">Create RC, and aftet that</h2>
 
 <ol>
-  <li>Create a working branch.
+  <li>Create a working branch. (from main or or stable branch)
 <pre>
+git switch main
 git checkout -b release/5_4_0-RC
 </pre>
   </li>
@@ -105,25 +106,6 @@ git checkout -b release/5_4_0-RC
       <li>ttpmenu\ttpmenu.rc // only modifying</li>
       <li>TTProxy\TTProxy.rc // only modifying</li>
       <li>TTXKanjiMenu\ttxkanjimenu.rc // only modifying</li>
-      <li>
-        installer\teraterm.iss<br>
-        Change to "RC" and enable create archive.
-<pre>
-- #define AppVer "5.4.0-dev"
-+ #define AppVer "5.4.0-RC"
-
-  [PreCompile]
-  Name: makechm.bat
-- Name: build.bat
-- ;Name: build.bat; Parameters: rebuild
-+ ;Name: build.bat
-+ Name: build.bat; Parameters: rebuild
-
-  [PostCompile]
-- ;Name: makearchive.bat; Parameters: release
-+ Name: makearchive.bat; Parameters: release
-</pre>
-      </li>
     </ul>
   </li>
   <li>Increment the year of last publication of copyright notice if it is first release in this year.
@@ -152,7 +134,7 @@ git checkout -b release/5_4_0-RC
   <li>Test run installer, run and connect in all supported OS.</li>
   <li>Commit and push.</li>
   <li>Create Pull Request to merge working branch.</li>
-  <li id="RC_commit">Merge the Pull Request.</li>
+  <li id="RC_commit">Merge the Pull Request. (to main or or stable branch)</li>
   <li>A Build workflow of GitHub Actions is run.<br>
     Three builds are triggered on: push to the working branch, Pull Request creation, and merge commit to the main or stable branch.<br>
     The merge commit is considered the release candidate.
@@ -160,18 +142,23 @@ git checkout -b release/5_4_0-RC
   <li>Announce RC release.
     <ul>
       <li>X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)</li>
+      <li>Direct users to report problems via GitHub Issues, as described <a href="../about/contacts.html">here</a>.</li>
+      <li>Mention that users must be logged in to GitHub to download GitHub Actions artifacts.</li>
     </ul>
   </li>
-  <li>Get feedbacks.
-    <p>If changed source code, redo "Confirm documents" and "Test run and connect in all supported OS."</p>
+  <li>Delete a working branch.</li>
+  <li>Get feedbacks.<br>
+    If changed source code, redo "Confirm documents" and "Test run and connect in all supported OS."
   </li>
+  <li>If you are going to release RC2, repeat the steps in this section starting from creating a working branch.</li>
 </ol>
 
 <h2 id="release-operation">Release</h2>
 
 <ol>
-  <li>Create a working branch.
+  <li>Create a working branch. (from main or or stable branch)
 <pre>
+git switch main
 git checkout -b release/5_4_0
 </pre>
   </li>
@@ -188,13 +175,6 @@ git checkout -b release/5_4_0
 + #undef TT_VERSION_SUBSTR
 </pre>
       </li>
-      <li>
-        installer\teraterm.iss<br>
-<pre>
-- #define AppVer "5.4.0-RC"
-+ #define AppVer "5.4.0"
-</pre>
-     </li>
     </ul>
   </li>
   <li>Modify release date.
@@ -209,7 +189,7 @@ git checkout -b release/5_4_0
   </li>
   <li>Commit and push.</li>
   <li>Create Pull Request to merge working branch.</li>
-  <li>Merge the Pull Request.</li>
+  <li>Merge the Pull Request. (to main or or stable branch)</li>
   <li>Create a tag and push.
     <p>
       Use annotated tags.
@@ -284,25 +264,6 @@ git checkout -b stable_5_4
 </pre>
           </li>
           <li>
-            installer\teraterm.iss<br>
-            Set AppVer to [next version]-dev.
-<pre>
-- #define AppVer "5.4.0"
-+ #define AppVer "5.5.0-dev"
-
-  [PreCompile]
-  Name: makechm.bat
-- ;Name: build.bat
-- Name: build.bat; Parameters: rebuild
-+ Name: build.bat
-+ ;Name: build.bat; Parameters: rebuild
-
-  [PostCompile]
-- Name: makearchive.bat; Parameters: release
-+ ;Name: makearchive.bat; Parameters: release
-</pre>
-          </li>
-          <li>
             doc\en/ja\html\about\history.html<br>
             Add template of changelog for next release.
 <pre>
@@ -335,25 +296,6 @@ git checkout -b stable_5_4
   #define TTSSH_VERSION_MINOR             4
 - #define TTSSH_VERSION_PATCH             0
 + #define TTSSH_VERSION_PATCH             1
-</pre>
-          </li>
-          <li>
-            installer\teraterm.iss<br>
-            Set AppVer to [next version]-dev.
-<pre>
-- #define AppVer "5.4.0"
-+ #define AppVer "5.4.1-dev"
-
-  [PreCompile]
-  Name: makechm.bat
-- ;Name: build.bat
-- Name: build.bat; Parameters: rebuild
-+ Name: build.bat
-+ ;Name: build.bat; Parameters: rebuild
-
-  [PostCompile]
-- Name: makearchive.bat; Parameters: release
-+ ;Name: makearchive.bat; Parameters: release
 </pre>
           </li>
           <li>
@@ -395,25 +337,6 @@ git checkout -b stable_5_4
 </pre>
           </li>
           <li>
-            installer\teraterm.iss<br>
-            Set AppVer to [next version]-dev in stable branch.
-<pre>
-- #define AppVer "5.4.1"
-+ #define AppVer "5.4.2-dev"
-
-  [PreCompile]
-  Name: makechm.bat
-- ;Name: build.bat
-- Name: build.bat; Parameters: rebuild
-+ Name: build.bat
-+ ;Name: build.bat; Parameters: rebuild
-
-  [PostCompile]
-- Name: makearchive.bat; Parameters: release
-+ ;Name: makearchive.bat; Parameters: release
-</pre>
-          </li>
-          <li>
             doc\en/ja\html\about\history.html<br>
             Add template of changelog for next release on stable branch.
 <pre>
@@ -437,6 +360,7 @@ git checkout -b stable_5_4
     </p>
   </li>
   <li>Update Chocolatey.</li>
+  <li>Delete a working branch.</li>
 </ol>
 
 <h2 id="code-freeze">About code freeze.</h2>
