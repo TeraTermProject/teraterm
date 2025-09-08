@@ -63,7 +63,7 @@
   - svnコマンドのパス
 - --git
   - gitコマンドのパス
-- --jsl
+- --isl
   - Inno Setup用ファイルのパス
 
 オプションが toolinfo.txt より優先される
