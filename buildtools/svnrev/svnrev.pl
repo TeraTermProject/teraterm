@@ -279,7 +279,6 @@ sub write_info_isl {
 #define Version \"$version\"
 #define Revision \"$revision\"
 #define Release $svninfo{'release'}
-#define BuildYear \"$build_year\"
 #define BuildDate \"$date\"
 #define BuildTime \"$time\"
 #define UserName \"$username\"
