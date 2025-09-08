@@ -106,14 +106,6 @@ git checkout -b release/5_4_0-RC
       <li>ttpmenu\ttpmenu.rc // only modifying</li>
       <li>TTProxy\TTProxy.rc // only modifying</li>
       <li>TTXKanjiMenu\ttxkanjimenu.rc // only modifying</li>
-      <li>
-        installer\teraterm.iss<br>
-        Change to "RC."
-<pre>
-- #define AppVer "5.4.0-dev"
-+ #define AppVer "5.4.0-RC"
-</pre>
-      </li>
     </ul>
   </li>
   <li>Increment the year of last publication of copyright notice if it is first release in this year.
@@ -183,13 +175,6 @@ git checkout -b release/5_4_0
 + #undef TT_VERSION_SUBSTR
 </pre>
       </li>
-      <li>
-        installer\teraterm.iss<br>
-<pre>
-- #define AppVer "5.4.0-RC"
-+ #define AppVer "5.4.0"
-</pre>
-     </li>
     </ul>
   </li>
   <li>Modify release date.
@@ -279,14 +264,6 @@ git checkout -b stable_5_4
 </pre>
           </li>
           <li>
-            installer\teraterm.iss<br>
-            Set AppVer to [next version]-dev.
-<pre>
-- #define AppVer "5.4.0"
-+ #define AppVer "5.5.0-dev"
-</pre>
-          </li>
-          <li>
             doc\en/ja\html\about\history.html<br>
             Add template of changelog for next release.
 <pre>
@@ -319,14 +296,6 @@ git checkout -b stable_5_4
   #define TTSSH_VERSION_MINOR             4
 - #define TTSSH_VERSION_PATCH             0
 + #define TTSSH_VERSION_PATCH             1
-</pre>
-          </li>
-          <li>
-            installer\teraterm.iss<br>
-            Set AppVer to [next version]-dev.
-<pre>
-- #define AppVer "5.4.0"
-+ #define AppVer "5.4.1-dev"
 </pre>
           </li>
           <li>
@@ -365,14 +334,6 @@ git checkout -b stable_5_4
   #define TTSSH_VERSION_MINOR             4
 - #define TTSSH_VERSION_PATCH             1
 + #define TTSSH_VERSION_PATCH             2
-</pre>
-          </li>
-          <li>
-            installer\teraterm.iss<br>
-            Set AppVer to [next version]-dev in stable branch.
-<pre>
-- #define AppVer "5.4.1"
-+ #define AppVer "5.4.2-dev"
 </pre>
           </li>
           <li>
