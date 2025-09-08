@@ -24,10 +24,10 @@
 #else
   ; App Version
   #ifndef AppVersion
-    #define AppVersion "wild_build"
+    #define AppVersion "unofficial_build"
   #endif
   #ifndef OutputBaseFilename
-    #define OutputBaseFilename "teraterm-wild_build" + "-" + Arch
+    #define OutputBaseFilename "teraterm-unofficial_build" + "-" + Arch
   #endif
 #endif
 
