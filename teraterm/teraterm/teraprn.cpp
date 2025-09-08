@@ -97,6 +97,13 @@ static UINT_PTR CALLBACK PrintHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPA
 	return 0;
 }
 
+/**
+ *	印刷ダイアログを表示,印字用DCを取得
+ *
+ *	@param	HWin	親Window
+ *	@param	sel		選択範囲
+ *	@return	HDC		印刷DC
+ */
 HDC PrnBox(HWND HWin, PBOOL Sel)
 {
 	/* initialize PrnDlg record */
@@ -127,7 +134,15 @@ HDC PrnBox(HWND HWin, PBOOL Sel)
 	return PrnDlg.hDC;
 }
 
-BOOL PrnStart(LPSTR DocumentName)
+/**
+ *	印刷開始
+ *
+ *	@param	hDC				印刷DC
+ *	@param	DcumentName		名前
+ *	@relval	TRUE			ok
+ *	@retval	FALSE			開始失敗
+ */
+BOOL PrnStart(HDC hDC, LPSTR DocumentName)
 {
 	DOCINFOA Doc;
 	char DocName[50];
@@ -149,6 +164,7 @@ BOOL PrnStart(LPSTR DocumentName)
 	PrnAbortDlg->Create(hInst,hParent,&PrintAbortFlag,&ts);
 	HPrnAbortDlg = PrnAbortDlg->GetSafeHwnd();
 
+	PrintDC = hDC;
 	SetAbortProc(PrintDC,PrnAbortProc);
 
 	Doc.cbSize = sizeof(Doc);
@@ -170,11 +186,15 @@ BOOL PrnStart(LPSTR DocumentName)
 	return Printing;
 }
 
+/**
+ *	印刷終了
+ */
 void PrnStop()
 {
 	if (Printing) {
 		EndDoc(PrintDC);
 		DeleteDC(PrintDC);
+		PrintDC = NULL;
 		Printing = FALSE;
 	}
 	if (PrnAbortDlg != NULL) {
@@ -212,7 +232,7 @@ int VTPrintInit(int PrnFlag)
 	}
 
 	/* start printing */
-	if (! PrnStart(ts.Title)) {
+	if (! PrnStart(PrintDC, ts.Title)) {
 		return (IdPrnCancel);
 	}
 

@@ -678,7 +678,7 @@ void CTEKWindow::OnFilePrint()
 	if (PrintDC==NULL) {
 		return;
 	}
-	if (! PrnStart(ts.Title)) {
+	if (! PrnStart(PrintDC, ts.Title)) {
 		return;
 	}
 
