@@ -282,9 +282,6 @@ sub write_info_isl {
 #define BuildDate \"$date\"
 #define BuildTime \"$time\"
 #define UserName \"$username\"
-#ifndef Arch
-#define Arch "x86"
-#endif
 #if Release == 0
 #define AppVersion Version + \" \" + BuildDate  + \"_\" + BuildTime  + \"-\" + Revision
 #ifndef OutputBaseFilename
