@@ -282,17 +282,6 @@ sub write_info_isl {
 #define BuildDate \"$date\"
 #define BuildTime \"$time\"
 #define UserName \"$username\"
-#if Release == 0
-#define AppVersion Version + \" \" + BuildDate  + \"_\" + BuildTime  + \"-\" + Revision
-#ifndef OutputBaseFilename
-#define OutputBaseFilename "teraterm-\" + Version + \"-\" + Arch + \"-\" + BuildDate + \"_\" + BuildTime + \"-\" + Revision + "-" + UserName + \"-snapshot\"
-#endif
-#else
-#define AppVersion Version
-#ifndef OutputBaseFilename
-#define OutputBaseFilename "teraterm-\" + Version  + \"-\" + Arch
-#endif
-#endif
 EOS
 
 	open(my $FD, ">:crlf:utf8", $out_isl) or die "error $out_isl";
