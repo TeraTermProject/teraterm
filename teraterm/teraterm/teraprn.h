@@ -37,7 +37,7 @@ extern "C" {
 
 /* prototypes */
 HDC PrnBox(HWND HWin, PBOOL Sel);
-BOOL PrnStart(LPSTR DocumentName);
+BOOL PrnStart(HDC hDC, LPSTR DocumentName);
 void PrnStop();
 
 #define IdPrnCancel 0
