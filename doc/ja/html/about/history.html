@@ -54,12 +54,12 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/844" target="_blank">issue #844</a>)
       </li>
       <li>
-        <a href="../setup/teraterm-trans.html#draganddrop">ドラッグ&ドロップによるファイル送信</a>を行った際、<a href="../menu/file-sendfile.html">ディレイ設定</a>が反映されるようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/594" target="_blank">issue #594</a>)
-      </li>
-      <li>
         <a href="../usage/character_encoding.html">使用可能文字コード</a>を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/510" target="_blank">issue #510</a>)
+      </li>
+      <li>
+        <a href="../setup/teraterm-trans.html#draganddrop">ドラッグ&ドロップによるファイル送信</a>を行った際、<a href="../menu/file-sendfile.html">ディレイ設定</a>が反映されるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/594" target="_blank">issue #594</a>)
       </li>
       <li>
         <a href="../menu/file-log.html#Logging">"Log" ダイアログボックス(ファイルへ書き込み中)</a>に "Hide dialog" ボタンを追加した。
@@ -94,10 +94,6 @@
       <li>
         シリアルポートの送信待ち時間を設定するマクロコマンド <a href="../macro/command/setserialdelaychar.html">setserialdelaychar</a>, <a href="../macro/command/setserialdelayline.html">setserialdelayline</a> を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/437" target="_blank">issue #437</a>)
-      </li>
-      <li>
-        マニュアルに<a href="ctrlseq_device_attributes.html">Device Attribute一覧</a>を追加した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/689" target="_blank">issue #689</a>)
       </li>
     </ul>
   </li>
@@ -168,6 +164,10 @@
       <li>
         <a href="#changefontsize_1.00">TTXChangeFontSize</a>を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/599" target="_blank">issue #599</a>)
+      </li>
+      <li>
+        マニュアルに<a href="ctrlseq_device_attributes.html">Device Attribute一覧</a>を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/689" target="_blank">issue #689</a>)
       </li>
     </ul>
   </li>
@@ -3887,10 +3887,12 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/89" target="_blank">issue #89</a>)
       </li>
       <li>
-        SSH チャネル数の上限をなくした。<br>
-        teraterm.iniに SSH チャネル数の上限を設定する <a href="../setup/teraterm-ini.html#MaxChannel">MaxChannel</a> エントリを追加した。<br>
-        <a href="../setup/teraterm-ini.html#MaxChannel">MaxChannel</a> のデフォルト値は1000、0を指定した場合は無制限となる。
+        SSH チャネル数の上限をなくした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/694" target="_blank">issue #694</a>)
+        <ul>
+          <li>teraterm.iniに SSH チャネル数の上限を設定する <a href="../setup/teraterm-ini.html#MaxChannel">MaxChannel</a> エントリを追加した。</li>
+          <li><a href="../setup/teraterm-ini.html#MaxChannel">MaxChannel</a> のデフォルト値は1000、0を指定した場合は無制限となる。</li>
+        </ul>
       </li>
     </ul>
   </li>
