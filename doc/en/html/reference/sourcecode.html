@@ -47,11 +47,11 @@
 
     Microsoft Visual Studio 2005 Standard Edition or later is required to build the source code. Unfortunately, Express Edition cannot be used as it does not support MFC. Other compilers like C++ Builder, Turbo C++ Explorer and gcc cannot be used either. <br>
 
-    The main source of information about programming for Windows is MSDN Library provided by Microsoft. Tera Term developers often use MSDN Library as a reference. <br>
+    The main source of information about programming for Windows is Microsoft Learn provided by Microsoft. Tera Term developers often use Microsoft Learn as a reference.<br>
 
 <ul>
-  <li><a href="http://msdn2.microsoft.com/en-us/library/default.aspx" target="_blank">MSDN library</a></li>
-  <li><a href="http://msdn2.microsoft.com/ja-jp/library/default.aspx" target="_blank">MSDN library(Japanese)</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/docs/" target="_blank">Microsoft Learn</a></li>
+  <li><a href="https://learn.microsoft.com/ja-jp/docs/" target="_blank">Microsoft Learn(Japanese)</a></li>
 </ul>
 
 <p>
@@ -308,7 +308,7 @@ Traditionally string operations were causing majority of buffer overflow errors 
   <br>
 
 <ul>
-  <li><a href="https://msdn.microsoft.com/en-us/library/8ef0s5kh(v=vs.80).aspx" target="_blank">Security Enhancements in the CRT(MSDN Library)</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/security-features-in-the-crt" target="_blank">Security Enhancements in the CRT (Microsoft Learn)</a></li>
 </ul>
 <br>
 
@@ -588,12 +588,12 @@ Dynamic Data Exchange (DDE) mechanism was introduced in 1987 in Windows 2.0. Whi
 
 Earlier versions of Microsoft Visual Studio contained DDE spy tool (DDESPY.EXE) that could capture DDE traffic, however this tool is not part of VS anymore. <br>
 
-More information about DDE is available from MSDN Library on Microsoft web site:
+More information about DDE is available from Microsoft Learn on Microsoft web site:
 
 <p>
 <ul>
-  <li><a href="http://msdn2.microsoft.com/en-us/library/ms648711(VS.85).aspx" target="_blank">Dynamic Data Exchange(MSDN library)</a></li>
-  <li><a href="http://msdn2.microsoft.com/en-us/library/ms648712(VS.85).aspx" target="_blank">Dynamic Data Exchange Management Library(MSDN library)</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/windows/win32/dataxchg/dynamic-data-exchange" target="_blank">Dynamic Data Exchange (Microsoft Learn)</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/windows/win32/dataxchg/dynamic-data-exchange-management-library" target="_blank">Dynamic Data Exchange Management Library (Microsoft Learn)</a></li>
 </ul>
 </p>
 
@@ -1201,13 +1201,12 @@ Tera Term uses system caret to draw the cursor. For this purpose Tera Term utili
   <li>ShowCaret</li>
 </ul></p>
 
-According to MSDN Library description of <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648399(v=vs.85).aspx" target="_blank">CreateCaret function</a>,
+According to Microsoft Learn description of <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createcaret" target="_blank">CreateCaret function</a>,
 
 <pre>
-The system provides one caret per queue. A window should create
-a caret only when it has the keyboard focus or is active.
-The window should destroy the caret before losing the keyboard
-focus or becoming inactive.
+The system provides one caret per queue.
+A window should create a caret only when it has the keyboard focus or is active.
+The window should destroy the caret before losing the keyboard focus or becoming inactive.
 </pre>
 
 Above requirement means that CreateCaret() can be called only when the window is active and DestroyCaret() should be called before the window becomes inactive. <br>
