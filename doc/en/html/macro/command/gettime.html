@@ -25,7 +25,7 @@ gettime &lt;strvar&gt; [&lt;format&gt; [&lt;timezone&gt;]]
 
 <p>
 Returns the current time in the string variable &lt;strvar&gt;, with the default format "HH:MM:SS".
-The user can specify the format same as <a href="http://msdn2.microsoft.com/en-us/library/fe06s4ak(VS.80).aspx" target="_blank">strftime</a>. And also, the default format equals "%H:%M:%S" at the &lt;format&gt; argument.
+The user can specify the format same as <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/strftime-wcsftime-strftime-l-wcsftime-l" target="_blank">strftime</a>. And also, the default format equals "%H:%M:%S" at the &lt;format&gt; argument.
 </p>
 
 <p>
@@ -76,7 +76,7 @@ This command returns one of the following values in the system variable "result"
 ;Stores the current time to "timestr" variable with HH:MM:SS format.
 gettime timestr
 
-;Stores the current date with the user format to "logfile" variable. 
+;Stores the current date with the user format to "logfile" variable.
 ;The format is log-YYYYMMDD-HHMMSS.txt.
 gettime logfile "log-%Y%m%d-%H%M%S.txt"
 changedir 'C:\Test'
@@ -93,7 +93,7 @@ messagebox s tz
 <h2>See also</h2>
 <ul>
   <li><a href="getdate.html">getdate</a></li>
-  <li><a href="http://msdn2.microsoft.com/en-us/library/fe06s4ak(VS.80).aspx" target="_blank">strftime (MSDN Library)</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/strftime-wcsftime-strftime-l-wcsftime-l" target="_blank">strftime (Microsoft Learn)</a></li>
 </ul>
 
 </body>
