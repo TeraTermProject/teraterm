@@ -25,16 +25,16 @@ set(SRC_DIR "Output/portable_signed/teraterm-${arch}") # teraterm.iss相対
 set(SETUP_DIR "${CMAKE_CURRENT_LIST_DIR}/Output/setup")
 #set(SETUP_EXE "teraterm-unsigned")
 
-set(INNO_SETUP_ARCH "")
+set(INNO_SETUP_ARCH "x86")
 if(arch STREQUAL "x64")
-  set(INNO_SETUP_ARCH "M_X64")
+  set(INNO_SETUP_ARCH "x64")
 elseif(arch STREQUAL "arm64")
-  set(INNO_SETUP_ARCH "M_ARM64")
+  set(INNO_SETUP_ARCH "arm64")
 endif()
 
 file(MAKE_DIRECTORY ${SETUP_DIR})
 execute_process(
-  COMMAND ${ISCC} /DAppVersion=${VERSION} /DOutputBaseFilename=${SETUP_EXE} /DSrcDir=${SRC_DIR} /D${INNO_SETUP_ARCH} /O${SETUP_DIR} ${CMAKE_CURRENT_LIST_DIR}/teraterm.iss
+  COMMAND ${ISCC} /DAppVersion=${VERSION} /DOutputBaseFilename=${SETUP_EXE} /DSrcDir=${SRC_DIR} /DArch=${INNO_SETUP_ARCH} /O${SETUP_DIR} ${CMAKE_CURRENT_LIST_DIR}/teraterm.iss
   WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/Output/portable_signed"
   ENCODING AUTO
   RESULT_VARIABLE rv
