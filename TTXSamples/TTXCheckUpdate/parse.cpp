@@ -62,7 +62,7 @@ version_one_t *ParseJson(const char *json, size_t *info_count)
 	}
 	int version_count = cJSON_GetArraySize(versions);
 	if (version_count == 0) {
-		// ƒtƒ@ƒCƒ‹‚ª‚¨‚©‚µ‚¢?
+		// ãƒ•ã‚¡ã‚¤ãƒ«ãŒãŠã‹ã—ã„?
 		return NULL;
 	}
 	version_one_t *results = (version_one_t *)calloc(version_count, sizeof(version_one_t));

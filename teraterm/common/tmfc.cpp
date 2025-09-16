@@ -37,7 +37,7 @@
 #include "ttlib.h"
 #include "compat_win.h"
 
-// ƒeƒ“ƒvƒŒ[ƒg‚Ì‘‚«Š·‚¦‚ğs‚¤
+// ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®æ›¸ãæ›ãˆã‚’è¡Œã†
 #define REWRITE_TEMPLATE
 
 #if (defined(_MSC_VER) && (_MSC_VER <= 1500)) || \
@@ -275,11 +275,11 @@ TTCDialog::~TTCDialog()
 }
 
 /**
- * ƒ_ƒCƒAƒƒO‰Šú‰»
- * @retval	TRUE	ˆ—‚ªs‚í‚ê‚½(Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚È‚¢)
- * @retval	FALSE	Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚é
+ * ãƒ€ã‚¤ã‚¢ãƒ­ã‚°åˆæœŸåŒ–
+ * @retval	TRUE	å‡¦ç†ãŒè¡Œã‚ã‚ŒãŸ(æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œãªã„)
+ * @retval	FALSE	æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œã‚‹
  *
- * Ÿ‚ÌƒƒbƒZ[ƒWˆ—
+ * æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
  *		TTCDialog::DlgProc(msg=WM_INITDIALOG)
  */
 BOOL TTCDialog::OnInitDialog()
@@ -288,11 +288,11 @@ BOOL TTCDialog::OnInitDialog()
 }
 
 /**
- * OKƒ{ƒ^ƒ“
- * @retval	TRUE	ˆ—‚ªs‚í‚ê‚½(Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚È‚¢)
- * @retval	FALSE	Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚é
+ * OKãƒœã‚¿ãƒ³
+ * @retval	TRUE	å‡¦ç†ãŒè¡Œã‚ã‚ŒãŸ(æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œãªã„)
+ * @retval	FALSE	æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œã‚‹
  *
- * Ÿ‚ÌƒƒbƒZ[ƒWˆ—
+ * æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
  *		TTCDialog::OnCommand()
  */
 BOOL TTCDialog::OnOK()
@@ -302,11 +302,11 @@ BOOL TTCDialog::OnOK()
 }
 
 /**
- * CANCELƒ{ƒ^ƒ“
- * @retval	TRUE	ˆ—‚ªs‚í‚ê‚½(Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚È‚¢)
- * @retval	FALSE	Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚é
+ * CANCELãƒœã‚¿ãƒ³
+ * @retval	TRUE	å‡¦ç†ãŒè¡Œã‚ã‚ŒãŸ(æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œãªã„)
+ * @retval	FALSE	æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œã‚‹
  *
- * Ÿ‚ÌƒƒbƒZ[ƒWˆ—
+ * æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
  *		TTCDialog::OnCommand()
  */
 BOOL TTCDialog::OnCancel()
@@ -321,11 +321,11 @@ BOOL TTCDialog::OnCommand(WPARAM wp, LPARAM lp)
 }
 
 /**
- * WM_CLOSEƒƒbƒZ[ƒWˆ—
- * @retval	TRUE	ˆ—‚ªs‚í‚ê‚½(Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚È‚¢)
- * @retval	FALSE	Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚é
+ * WM_CLOSEãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
+ * @retval	TRUE	å‡¦ç†ãŒè¡Œã‚ã‚ŒãŸ(æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œãªã„)
+ * @retval	FALSE	æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œã‚‹
  *
- * Ÿ‚ÌƒƒbƒZ[ƒWˆ—
+ * æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
  *		TTCDialog::OnCancel()
  */
 BOOL TTCDialog::OnClose()
@@ -334,11 +334,11 @@ BOOL TTCDialog::OnClose()
 }
 
 /**
- * WM_NCDESTROYƒƒbƒZ[ƒWˆ—
- * @retval	TRUE	ˆ—‚ªs‚í‚ê‚½(Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚È‚¢)
- * @retval	FALSE	Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚é
+ * WM_NCDESTROYãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
+ * @retval	TRUE	å‡¦ç†ãŒè¡Œã‚ã‚ŒãŸ(æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œãªã„)
+ * @retval	FALSE	æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œã‚‹
  *
- * Ÿ‚ÌƒƒbƒZ[ƒWˆ—
+ * æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
  *		TTCDialog::DlgProc()
  */
 BOOL TTCDialog::PostNcDestroy()
@@ -347,9 +347,9 @@ BOOL TTCDialog::PostNcDestroy()
 }
 
 /*
- * @retval	TRUE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚½
- * @retval	FALSE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚È‚©‚Á‚½
- * @retval	‚»‚Ì‘¼	ƒƒbƒZ[ƒW‚É‚æ‚Á‚ÄˆÙ‚È‚é‚±‚Æ‚ª‚ ‚é
+ * @retval	TRUE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãŸæ™‚
+ * @retval	FALSE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãªã‹ã£ãŸæ™‚
+ * @retval	ãã®ä»–	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã«ã‚ˆã£ã¦ç•°ãªã‚‹ã“ã¨ãŒã‚ã‚‹
  */
 LRESULT TTCDialog::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -360,8 +360,8 @@ LRESULT TTCDialog::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 }
 
 /*
- * @retval	TRUE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚½
- * @retval	FALSE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚È‚©‚Á‚½
+ * @retval	TRUE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãŸæ™‚
+ * @retval	FALSE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãªã‹ã£ãŸæ™‚
  */
 LRESULT TTCDialog::DlgProcBase(UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -394,11 +394,11 @@ LRESULT TTCDialog::DlgProcBase(UINT msg, WPARAM wp, LPARAM lp)
 		Processed = PostNcDestroy();
 		break;
 	case WM_CLOSE:
-		// CLOSEƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‚½A
+		// CLOSEãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ãŸæ™‚ã€
 		Processed = OnClose();
 		if (Processed == FALSE) {
-			//	ƒI[ƒo[ƒ‰ƒCƒh‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Î
-			//	dialog‚È‚çOnCancel()‚ª”­¶‚·‚é
+			//	ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ã•ã‚Œã¦ã„ãªã‘ã‚Œã°
+			//	dialogãªã‚‰OnCancel()ãŒç™ºç”Ÿã™ã‚‹
 			Processed = OnCancel();
 		}
 		break;
@@ -408,11 +408,11 @@ LRESULT TTCDialog::DlgProcBase(UINT msg, WPARAM wp, LPARAM lp)
 	}
 
 	if (Processed == TRUE) {
-		// ˆ—‚µ‚½
+		// å‡¦ç†ã—ãŸ
 		return TRUE;
 	}
 
-	// ÅŒã‚ÌƒƒbƒZ[ƒWˆ—
+	// æœ€å¾Œã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
 	return DlgProc(msg, wp, lp);
 }
 
@@ -447,11 +447,11 @@ LRESULT TTCDialog::WndProcBase(UINT msg, WPARAM wp, LPARAM lp)
 		Processed = PostNcDestroy();
 		break;
 	case WM_CLOSE:
-		// CLOSEƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‚½A
+		// CLOSEãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ãŸæ™‚ã€
 		Processed = OnClose();
 		if (Processed == FALSE) {
-			//	ƒI[ƒo[ƒ‰ƒCƒh‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Î
-			//	dialog‚È‚çOnCancel()‚ª”­¶‚·‚é
+			//	ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ã•ã‚Œã¦ã„ãªã‘ã‚Œã°
+			//	dialogãªã‚‰OnCancel()ãŒç™ºç”Ÿã™ã‚‹
 			Processed = OnCancel();
 		}
 		break;
@@ -461,12 +461,12 @@ LRESULT TTCDialog::WndProcBase(UINT msg, WPARAM wp, LPARAM lp)
 	}
 
 	if (Processed == TRUE) {
-		// ˆ—‚µ‚½
+		// å‡¦ç†ã—ãŸ
 		return TRUE;
 	}
 
-	// DlgProc‚ğƒI[ƒoƒ‰ƒCƒh‚·‚é‚Ì‚Å‚Í‚È‚­A
-	// DefWindowProc‚ğƒI[ƒo[ƒ‰ƒCƒh‚·‚é‚±‚Æ
+	// DlgProcã‚’ã‚ªãƒ¼ãƒãƒ©ã‚¤ãƒ‰ã™ã‚‹ã®ã§ã¯ãªãã€
+	// DefWindowProcã‚’ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ã™ã‚‹ã“ã¨
 	LRESULT r = DefWindowProc(msg, wp, lp);
 
 	if (msg == WM_NCDESTROY) {
@@ -540,8 +540,8 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 }
 
 /*
- * @retval	TRUE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚½
- * @retval	FALSE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚È‚©‚Á‚½
+ * @retval	TRUE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãŸæ™‚
+ * @retval	FALSE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãªã‹ã£ãŸæ™‚
  */
 INT_PTR CALLBACK TTCDialog::DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -561,8 +561,8 @@ INT_PTR CALLBACK TTCDialog::DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM l
 }
 
 /*
- * @retval	TRUE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚½
- * @retval	FALSE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚È‚©‚Á‚½
+ * @retval	TRUE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãŸæ™‚
+ * @retval	FALSE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãªã‹ã£ãŸæ™‚
  */
 LRESULT CALLBACK TTCDialog::WndProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {

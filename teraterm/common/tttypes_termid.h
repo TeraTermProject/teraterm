@@ -51,33 +51,33 @@ typedef enum {
 
 typedef struct {
 	int TermID;				// Terminal ID
-	const char *TermIDStr;	// Terminal ID ‚Ì•¶š—ñ
+	const char *TermIDStr;	// Terminal ID ã®æ–‡å­—åˆ—
 } TermIDList;
 
 /**
- * @brief TermIDList ‚ğæ“¾
+ * @brief TermIDList ã‚’å–å¾—
  * @param index 0...
- * @return TermIDList ‚Ìƒ|ƒCƒ“ƒ^(NULL‚Ì–³Œø)
+ * @return TermIDList ã®ãƒã‚¤ãƒ³ã‚¿(NULLã®æ™‚ç„¡åŠ¹)
  */
 const TermIDList *TermIDGetList(int index);
 
 /**
- * @brief •¶š‚©‚çID‚Ö•ÏŠ·
+ * @brief æ–‡å­—ã‹ã‚‰IDã¸å¤‰æ›
  * @param term_id_str
- * @return IdTerminalID (•¶š—ñ‚©‚çŒ©‚Â‚¯‚ç‚ê‚È‚©‚Á‚½‚Æ‚«‚Í idVT100)
+ * @return IdTerminalID (æ–‡å­—åˆ—ã‹ã‚‰è¦‹ã¤ã‘ã‚‰ã‚Œãªã‹ã£ãŸã¨ãã¯ idVT100)
  */
 int TermIDGetID(const char *term_id_str);
 
 /**
- * @brief ID‚©‚ç•¶š—ñ‚Ö•ÏŠ·
+ * @brief IDã‹ã‚‰æ–‡å­—åˆ—ã¸å¤‰æ›
  * @param term_id
- * @return •¶š—ñ
+ * @return æ–‡å­—åˆ—
  */
 const char *TermIDGetStr(int term_id);
 
 /**
- * @brief ’[––ID‚ÌƒŒƒxƒ‹‚ğæ“¾
- * @return ’[––ID‚ÌƒŒƒxƒ‹
+ * @brief ç«¯æœ«IDã®ãƒ¬ãƒ™ãƒ«ã‚’å–å¾—
+ * @return ç«¯æœ«IDã®ãƒ¬ãƒ™ãƒ«
  */
 int TermIDGetVTLevel(int term_id);
 

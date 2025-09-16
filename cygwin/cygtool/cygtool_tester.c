@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// cygtool.c ‚©‚ç•ª—£
+// cygtool.c ã‹ã‚‰åˆ†é›¢
 
 #include <windows.h>
 #include <stdio.h>

@@ -70,21 +70,21 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		FARPROC func_ptr = GetProcAddress(module, "SetDefaultDllDirectories");
 		setDefDllDir = (pSetDefDllDir)func_ptr;
 		if (setDefDllDir != NULL) {
-			// SetDefaultDllDirectories() ‚ªg‚¦‚éê‡‚ÍAŒŸõƒpƒX‚ğ %WINDOWS%\system32 ‚Ì‚İ‚Éİ’è‚·‚é
+			// SetDefaultDllDirectories() ãŒä½¿ãˆã‚‹å ´åˆã¯ã€æ¤œç´¢ãƒ‘ã‚¹ã‚’ %WINDOWS%\system32 ã®ã¿ã«è¨­å®šã™ã‚‹
 			(*setDefDllDir)((DWORD)0x00000800); // LOAD_LIBRARY_SEARCH_SYSTEM32
 		}
 		else {
 			func_ptr = GetProcAddress(module, "SetDllDirectoryA");
 			setDllDir = (pSetDllDir)func_ptr;
 			if (setDllDir != NULL) {
-				// SetDefaultDllDirectories() ‚ªg‚¦‚È‚­‚Ä‚àASetDllDirectory() ‚ªg‚¦‚éê‡‚Í
-				// ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚¾‚¯‚Å‚àŒŸõƒpƒX‚©‚ç‚Í‚¸‚µ‚Ä‚¨‚­B
+				// SetDefaultDllDirectories() ãŒä½¿ãˆãªãã¦ã‚‚ã€SetDllDirectory() ãŒä½¿ãˆã‚‹å ´åˆã¯
+				// ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã ã‘ã§ã‚‚æ¤œç´¢ãƒ‘ã‚¹ã‹ã‚‰ã¯ãšã—ã¦ãŠãã€‚
 				(*setDllDir)("");
 			}
 		}
 	}
 
-	// DPI Aware (‚DPI‘Î‰)
+	// DPI Aware (é«˜DPIå¯¾å¿œ)
 	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
 		if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
 			pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
@@ -215,9 +215,9 @@ LRESULT OnDpiChanged(HWND hWnd, WPARAM wp, LPARAM lp)
 
 LRESULT OnDestroy(HWND hWnd)
 {
-	// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“I—¹‚ÉƒAƒCƒRƒ“‚ğ”jŠü‚·‚é‚ÆAƒEƒBƒ“ƒhƒE‚ªÁ‚¦‚é‘O‚É
-	// ƒ^ƒCƒgƒ‹ƒo[‚ÌƒAƒCƒRƒ“‚ª "Windows ‚ÌÀsƒtƒ@ƒCƒ‹‚ÌƒAƒCƒRƒ“" ‚É•Ï‚í‚é
-	// ‚±‚Æ‚ª‚ ‚é‚Ì‚Å”jŠü‚µ‚È‚¢
+	// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³çµ‚äº†æ™‚ã«ã‚¢ã‚¤ã‚³ãƒ³ã‚’ç ´æ£„ã™ã‚‹ã¨ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒæ¶ˆãˆã‚‹å‰ã«
+	// ã‚¿ã‚¤ãƒˆãƒ«ãƒãƒ¼ã®ã‚¢ã‚¤ã‚³ãƒ³ãŒ "Windows ã®å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¢ã‚¤ã‚³ãƒ³" ã«å¤‰ã‚ã‚‹
+	// ã“ã¨ãŒã‚ã‚‹ã®ã§ç ´æ£„ã—ãªã„
 	// TTSetIcon(ghInstance, hWnd, NULL, 0);
 	return TRUE;
 }

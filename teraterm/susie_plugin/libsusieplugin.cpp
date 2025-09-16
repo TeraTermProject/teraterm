@@ -35,23 +35,23 @@
 #endif
 
 /**
- * Susie ƒvƒ‰ƒOƒCƒ“‚ğg‚Á‚Ä‰æ‘œ‚ğ“Ç‚İ‚Ş
+ * Susie ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚’ä½¿ã£ã¦ç”»åƒã‚’èª­ã¿è¾¼ã‚€
  *
- *	@param[in]	nameSPI		ƒvƒ‰ƒOƒCƒ“ƒtƒ@ƒCƒ‹–¼
- *	@param[in]	nameFile	‰æ‘œƒtƒ@ƒCƒ‹–¼(‰æ‘œ‚Ìí—Ş‚ğ”»’è‚·‚éÛ‚Ég‚í‚ê‚é‚©‚à‚µ‚ê‚È‚¢)
- *	@param[in]	bufFile		‰æ‘œƒf[ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *	@param[in]	sizeFile	‰æ‘œƒf[ƒ^ƒTƒCƒY
- *	@param[out]	pHBInfo		BITMAPINFO			LocalFree()‚·‚é‚±‚Æ
- *	@param[out]	pHBm		bitmap data			LocalFree()‚·‚é‚±‚Æ
+ *	@param[in]	nameSPI		ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ãƒ•ã‚¡ã‚¤ãƒ«å
+ *	@param[in]	nameFile	ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«å(ç”»åƒã®ç¨®é¡ã‚’åˆ¤å®šã™ã‚‹éš›ã«ä½¿ã‚ã‚Œã‚‹ã‹ã‚‚ã—ã‚Œãªã„)
+ *	@param[in]	bufFile		ç”»åƒãƒ‡ãƒ¼ã‚¿ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *	@param[in]	sizeFile	ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚µã‚¤ã‚º
+ *	@param[out]	pHBInfo		BITMAPINFO			LocalFree()ã™ã‚‹ã“ã¨
+ *	@param[out]	pHBm		bitmap data			LocalFree()ã™ã‚‹ã“ã¨
  *
- *	ƒvƒ‰ƒOƒCƒ“‚ÍUnicodeƒpƒX–¼‚É‘¶İ‚µ‚Ä‚àƒ[ƒh‚Å‚«‚é
- *	‰æ‘œƒtƒ@ƒCƒ‹–¼‚Íƒvƒ‰ƒOƒCƒ““à‚Å‘½•ªg—p‚³‚ê‚È‚¢
- *	ƒvƒ‰ƒOƒCƒ““à‚Åƒtƒ@ƒCƒ‹‚Íˆµ‚í‚È‚¢‚Ì‚Å Unicode‰»‚Íok‚Æv‚í‚ê‚é
+ *	ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã¯Unicodeãƒ‘ã‚¹åã«å­˜åœ¨ã—ã¦ã‚‚ãƒ­ãƒ¼ãƒ‰ã§ãã‚‹
+ *	ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«åã¯ãƒ—ãƒ©ã‚°ã‚¤ãƒ³å†…ã§å¤šåˆ†ä½¿ç”¨ã•ã‚Œãªã„
+ *	ãƒ—ãƒ©ã‚°ã‚¤ãƒ³å†…ã§ãƒ•ã‚¡ã‚¤ãƒ«ã¯æ‰±ã‚ãªã„ã®ã§ UnicodeåŒ–ã¯okã¨æ€ã‚ã‚Œã‚‹
  */
 BOOL LoadPictureWithSPI(const wchar_t *nameSPI, const wchar_t *nameFile, unsigned char *bufFile, size_t sizeFile, HLOCAL *hbuf,
 						HLOCAL *hbmi)
 {
-	// ‰æ‘œƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹–¼•”•ª‚ğæ‚èo‚·
+	// ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«åéƒ¨åˆ†ã‚’å–ã‚Šå‡ºã™
 	const wchar_t *image_base = wcsrchr(nameFile, L'\\');
 	if (image_base != NULL) {
 		image_base++;
@@ -80,7 +80,7 @@ BOOL LoadPictureWithSPI(const wchar_t *nameSPI, const wchar_t *nameFile, unsigne
 	ret = FALSE;
 	hSPI = NULL;
 
-	// SPI ‚ğƒ[ƒh
+	// SPI ã‚’ãƒ­ãƒ¼ãƒ‰
 	hSPI = LoadLibraryW(nameSPI);
 	if (!hSPI) {
 		return FALSE;
@@ -96,7 +96,7 @@ BOOL LoadPictureWithSPI(const wchar_t *nameSPI, const wchar_t *nameFile, unsigne
 	if (!SPI_GetPluginInfo || !SPI_IsSupported || !SPI_GetPicture)
 		goto error;
 
-	//ƒo[ƒWƒ‡ƒ“ƒ`ƒFƒbƒN
+	//ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãƒã‚§ãƒƒã‚¯
 	SPI_GetPluginInfo(0, spiVersion, 8);
 
 	if (spiVersion[2] != 'I' || spiVersion[3] != 'N')
@@ -127,11 +127,11 @@ static unsigned char *LoadImageFile(const wchar_t *image_file, size_t *file_size
 	}
 	DWORD fileSize = GetFileSize(hPictureFile, 0);
 	if (fileSize < 2 * 1024) {
-		//Å’á 2kb ‚ÍŠm•Û (Susie plugin ‚Ìd—l‚æ‚è)
+		//æœ€ä½ 2kb ã¯ç¢ºä¿ (Susie plugin ã®ä»•æ§˜ã‚ˆã‚Š)
 		fileSize = 2 * 1024;
 	}
 	unsigned char *fileBuf = (unsigned char *)malloc(fileSize);
-	memset(fileBuf, 0, 2*1024);	//“ª‚Ì 2kb ‚Í 0 ‚Å‰Šú‰»
+	memset(fileBuf, 0, 2*1024);	//é ­ã® 2kb ã¯ 0 ã§åˆæœŸåŒ–
 	DWORD readByte;
 	ReadFile(hPictureFile, fileBuf, fileSize, &readByte, 0);
 	CloseHandle(hPictureFile);
@@ -167,17 +167,17 @@ static wchar_t *NormalizePath(const wchar_t *path)
 }
 
 /**
- *	Susieƒvƒ‰ƒOƒCƒ“‚ğg‚Á‚Ä‰æ‘œƒtƒ@ƒCƒ‹‚ğƒ[ƒh‚·‚é
- *	w’èƒtƒHƒ‹ƒ_“à‚Ìƒvƒ‰ƒOƒCƒ“‚ğg‚Á‚Äƒ[ƒh‚ğ‚İ‚é
+ *	Susieãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚’ä½¿ã£ã¦ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
+ *	æŒ‡å®šãƒ•ã‚©ãƒ«ãƒ€å†…ã®ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚’ä½¿ã£ã¦ãƒ­ãƒ¼ãƒ‰ã‚’è©¦ã¿ã‚‹
  *
- *	@param[in]	image_file	‰æ‘œƒtƒ@ƒCƒ‹
+ *	@param[in]	image_file	ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«
  *	@param[in]	spi_path	"c:\\path\\to\\spi"
- *							‚±‚ÌƒtƒHƒ‹ƒ_‚É‚ ‚éƒvƒ‰ƒOƒCƒ“ƒtƒ@ƒCƒ‹‚Å‰æ‘œ‚Ìƒ[ƒh‚ğ‚İ‚é
- *							ƒpƒX‚ÌÅŒã‚É "\\" ‚ª‚ ‚Á‚Ä‚à‚È‚­‚Ä‚à—Ç‚¢
- *	@param[out]	pHBInfo		BITMAPINFO			LocalFree()‚·‚é‚±‚Æ
- *	@param[out]	pHBm		bitmap data			LocalFree()‚·‚é‚±‚Æ
- *	@retval		TRUE		ƒ[ƒhok
- *	@retval		FALSE		ƒ[ƒh‚Å‚«‚È‚©‚Á‚½
+ *							ã“ã®ãƒ•ã‚©ãƒ«ãƒ€ã«ã‚ã‚‹ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ãƒ•ã‚¡ã‚¤ãƒ«ã§ç”»åƒã®ãƒ­ãƒ¼ãƒ‰ã‚’è©¦ã¿ã‚‹
+ *							ãƒ‘ã‚¹ã®æœ€å¾Œã« "\\" ãŒã‚ã£ã¦ã‚‚ãªãã¦ã‚‚è‰¯ã„
+ *	@param[out]	pHBInfo		BITMAPINFO			LocalFree()ã™ã‚‹ã“ã¨
+ *	@param[out]	pHBm		bitmap data			LocalFree()ã™ã‚‹ã“ã¨
+ *	@retval		TRUE		ãƒ­ãƒ¼ãƒ‰ok
+ *	@retval		FALSE		ãƒ­ãƒ¼ãƒ‰ã§ããªã‹ã£ãŸ
  */
 BOOL SusieLoadPicture(const wchar_t *image_file, const wchar_t *spi_path, HANDLE *pHBInfo, HANDLE *pHBm)
 {
@@ -191,7 +191,7 @@ BOOL SusieLoadPicture(const wchar_t *image_file, const wchar_t *spi_path, HANDLE
 		return FALSE;
 	}
 
-	// spi_path ‚ğâ‘ÎƒpƒX‚É•ÏŠ·
+	// spi_path ã‚’çµ¶å¯¾ãƒ‘ã‚¹ã«å¤‰æ›
 	wchar_t *spi_path_full = NormalizePath(spi_path);
 	if (spi_path_full == NULL) {
 		free(file_ptr);
@@ -199,13 +199,13 @@ BOOL SusieLoadPicture(const wchar_t *image_file, const wchar_t *spi_path, HANDLE
 	}
 	const size_t spi_path_full_len = wcslen(spi_path_full);
 
-	// maskì¬
+	// maskä½œæˆ
 	const size_t spi_path_mask_len = spi_path_full_len + 4 + 1;
 	wchar_t *spi_path_mask = (wchar_t *)malloc(spi_path_mask_len * sizeof(wchar_t));
 	wcsncpy_s(spi_path_mask, spi_path_mask_len, spi_path_full, _TRUNCATE);
 	wcsncat_s(spi_path_mask, spi_path_mask_len, L"\\*.*", _TRUNCATE);
 
-	//ƒvƒ‰ƒOƒCƒ“‚ğ“–‚½‚Á‚Ä‚¢‚­
+	//ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚’å½“ãŸã£ã¦ã„ã
 	WIN32_FIND_DATAW fd;
 	HANDLE hFind = FindFirstFileW(spi_path_mask, &fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
@@ -216,11 +216,11 @@ BOOL SusieLoadPicture(const wchar_t *image_file, const wchar_t *spi_path, HANDLE
 				continue;
 			const wchar_t *ext = wcsrchr(fd.cFileName, L'.');
 			if (ext == NULL) {
-				// Šg’£q‚ª‚È‚¢ƒtƒ@ƒCƒ‹?
+				// æ‹¡å¼µå­ãŒãªã„ãƒ•ã‚¡ã‚¤ãƒ«?
 				continue;
 			}
 			if (wcscmp(ext, L".dll") != 0 && wcscmp(ext, PLUGIN_EXT) != 0) {
-				// .dll or .spi(or sph) ˆÈŠO‚Ìƒtƒ@ƒCƒ‹
+				// .dll or .spi(or sph) ä»¥å¤–ã®ãƒ•ã‚¡ã‚¤ãƒ«
 				continue;
 			}
 

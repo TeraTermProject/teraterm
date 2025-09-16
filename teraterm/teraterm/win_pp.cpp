@@ -50,7 +50,7 @@
 
 #include "win_pp.h"
 
-// ƒeƒ“ƒvƒŒ[ƒg‚Ì‘‚«Š·‚¦‚ðs‚¤
+// ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®æ›¸ãæ›ãˆã‚’è¡Œã†
 #define REWRITE_TEMPLATE
 
 typedef struct {
@@ -157,7 +157,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts->UILanguageFileW);
 			{
-				// VTWin‚ÆTEKWin‚Åƒ‰ƒxƒ‹‚ªˆÙ‚È‚Á‚Ä‚¢‚é
+				// VTWinã¨TEKWinã§ãƒ©ãƒ™ãƒ«ãŒç•°ãªã£ã¦ã„ã‚‹
 				wchar_t *UIMsg;
 				if (work->VTFlag>0) {
 					GetI18nStrWW("Tera Term", "DLG_WIN_PCBOLD16",
@@ -251,7 +251,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			SetRB(Dialog,ts->CursorShape,IDC_WINBLOCK,IDC_WINHORZ);
 
 			{
-				// ƒTƒ“ƒvƒ‹—pƒtƒHƒ“ƒgì¬
+				// ã‚µãƒ³ãƒ—ãƒ«ç”¨ãƒ•ã‚©ãƒ³ãƒˆä½œæˆ
 				LOGFONTW logfont;
 				TSGetLogFont(Dialog, ts, (work->VTFlag > 0) ? 0 : 1, 0, &logfont);
 				work->sample_font = CreateFontIndirectW(&logfont);
@@ -510,7 +510,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			return FALSE;
 
 		case WM_DESTROY:
-			// ƒTƒ“ƒvƒ‹—pƒtƒHƒ“ƒg”jŠü
+			// ã‚µãƒ³ãƒ—ãƒ«ç”¨ãƒ•ã‚©ãƒ³ãƒˆç ´æ£„
 			DeleteObject(work->sample_font);
 			work->sample_font = 0;
 			break;

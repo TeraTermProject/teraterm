@@ -45,7 +45,7 @@ extern "C" {
 #endif
 
 #if defined(_MSC_VER) && !defined(_Printf_format_string_)
-// ’è‹`‚³‚ê‚Ä‚¢‚È‚¢‚Æ‚«‚Í‰½‚à‚µ‚È‚¢‚æ‚¤‚É’è‹`‚µ‚Ä‚¨‚­
+// å®šç¾©ã•ã‚Œã¦ã„ãªã„ã¨ãã¯ä½•ã‚‚ã—ãªã„ã‚ˆã†ã«å®šç¾©ã—ã¦ãŠã
 #define _Printf_format_string_
 #endif
 
@@ -170,7 +170,7 @@ int GetMonitorDpiFromWindow(HWND hWnd);
 #define	get_OPENFILENAME_SIZE() get_OPENFILENAME_SIZEA()
 
 /*
- * ƒVƒŠƒAƒ‹ƒ|[ƒgŠÖ˜A‚Ìİ’è’è‹`
+ * ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆé–¢é€£ã®è¨­å®šå®šç¾©
  */
 enum serial_port_conf {
 	COM_DATABIT,
@@ -183,12 +183,12 @@ enum serial_port_conf {
  *	ttlib_static
  */
 typedef struct {
-	const char *section;			// ƒZƒNƒVƒ‡ƒ“–¼
-	const char *title_key;			// ƒ^ƒCƒgƒ‹(NULL‚Ì‚Æ‚«Atitle_default ‚ğí‚Ég—p)
-	const wchar_t *title_default;	//   lng ƒtƒ@ƒCƒ‹‚ÉŒ©‚Â‚©‚ç‚È‚©‚Á‚½‚Æ‚«g—p
-	const char *message_key;		// ƒƒbƒZ[ƒW
-	const wchar_t *message_default;	//   lng ƒtƒ@ƒCƒ‹‚ÉŒ©‚Â‚©‚ç‚È‚©‚Á‚½‚Æ‚«g—p
-	UINT uType;						// ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚Ìƒ^ƒCƒv
+	const char *section;			// ã‚»ã‚¯ã‚·ãƒ§ãƒ³å
+	const char *title_key;			// ã‚¿ã‚¤ãƒˆãƒ«(NULLã®ã¨ãã€title_default ã‚’å¸¸ã«ä½¿ç”¨)
+	const wchar_t *title_default;	//   lng ãƒ•ã‚¡ã‚¤ãƒ«ã«è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã¨ãä½¿ç”¨
+	const char *message_key;		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+	const wchar_t *message_default;	//   lng ãƒ•ã‚¡ã‚¤ãƒ«ã«è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã¨ãä½¿ç”¨
+	UINT uType;						// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒœãƒƒã‚¯ã‚¹ã®ã‚¿ã‚¤ãƒ—
 } TTMessageBoxInfoW;
 
 int TTMessageBoxA(HWND hWnd, const TTMessageBoxInfoW *info, const char *UILanguageFile, ...);

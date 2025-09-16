@@ -74,7 +74,7 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM /*wParam*/,
 
 static BOOL ChooseDlgFont(HWND hWnd, UIPPData *dlg_data)
 {
-	// ダイアログ表示
+	// 繝繧､繧｢繝ｭ繧ｰ陦ｨ遉ｺ
 	CHOOSEFONTW cf = {};
 	cf.lStructSize = sizeof(cf);
 	cf.hwndOwner = hWnd;
@@ -215,7 +215,7 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 
 HPROPSHEETPAGE TEKFontPageCreate(HINSTANCE inst, HWND hWnd, TTTSet *pts)
 {
-	// 注 common/tt_res.h と ui_pp_res.h で値を一致させること
+	// 豕ｨ common/tt_res.h 縺ｨ ui_pp_res.h 縺ｧ蛟､繧剃ｸ閾ｴ縺輔○繧九％縺ｨ
 	int id = IDD_TABSHEET_TEKFONT;
 
 	UIPPData *dlg_data = (UIPPData *)calloc(1, sizeof(UIPPData));

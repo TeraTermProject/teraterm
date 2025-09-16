@@ -28,10 +28,10 @@
 
 #include <windows.h>
 
-// VS2005�Ńr���h���ꂽ�o�C�i���� Windows95 �ŋN���ł���悤�ɂ��邽�߂ɁA
-// IsDebuggerPresent()#kernel.dll�ɑ��݂��Ȃ��V���{�����`����
+// VS2005でビルドされたバイナリが Windows95 で起動できるようにするために、
+// IsDebuggerPresent()#kernel.dllに存在しないシンボルを定義する
 
-// VS2005���V����VS�ł�95�T�|�[�g�ł��Ȃ��̂ł��̊֐�(���̃t�@�C��)�͕s�v
+// VS2005より新しいVSでは95サポートできないのでこの関数(このファイル)は不要
 #if _MSC_VER == 1400
 BOOL WINAPI _imp__IsDebuggerPresent(void)
 {

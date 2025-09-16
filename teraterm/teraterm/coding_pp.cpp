@@ -46,7 +46,7 @@
 
 #include "coding_pp.h"
 
-// ƒeƒ“ƒvƒŒ[ƒg‚Ì‘‚«Š·‚¦‚ðs‚¤
+// ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®æ›¸ãæ›ãˆã‚’è¡Œã†
 #define REWRITE_TEMPLATE
 
 static const char *CellWidthList[] = { "1 Cell", "2 Cell", NULL };
@@ -85,11 +85,11 @@ static void ArrenageItems(HWND hWnd)
 		IDC_EMOJI_WIDTH_COMBO,
 	};
 
-	// ŽóMƒR[ƒh
+	// å—ä¿¡ã‚³ãƒ¼ãƒ‰
 	LRESULT curPos = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
 	IdKanjiCode coding_receive = (IdKanjiCode)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETITEMDATA, curPos, 0);
 
-	// ‘—MƒR[ƒh
+	// é€ä¿¡ã‚³ãƒ¼ãƒ‰
 	curPos = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
 	IdKanjiCode coding_send = (IdKanjiCode)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETITEMDATA, curPos, 0);
 
@@ -107,8 +107,8 @@ static void ArrenageItems(HWND hWnd)
 		 (code_page == 932 || code_page == 949 || code_page == 936 || code_page == 950)) ||
 		coding_send == IdSJIS || coding_send == IdEUC || coding_send == IdJIS ||
 		coding_send == IdKoreanCP949 || coding_send == IdCnGB2312 || coding_send == IdCnBig5) {
-		// UTF-8 ‚Å CJK(CP932, CP949, CP936, CP950) ‚Ì‚Æ‚«
-		//   or DBCS(Unicode‚Å‚Í‚È‚¢‚Ì‚Å‘I‘ð‚Å‚«‚È‚¢)‚Ì‚Æ‚«
+		// UTF-8 ã§ CJK(CP932, CP949, CP936, CP950) ã®ã¨ã
+		//   or DBCS(Unicodeã§ã¯ãªã„ã®ã§é¸æŠžã§ããªã„)ã®ã¨ã
 		SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
 		CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_CHECKED);
 		SendDlgItemMessage(hWnd, IDC_EMOJI_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
@@ -249,7 +249,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			ArrenageItems(hWnd);
 
-			// character width (Œ»Ý‚Ì’l)
+			// character width (ç¾åœ¨ã®å€¤)
 			SetDropDownList(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CellWidthList, ts->UnicodeAmbiguousWidth == 1 ? 1 : 2);
 			SetDropDownList(hWnd, IDC_EMOJI_WIDTH_COMBO, CellWidthList, ts->UnicodeEmojiWidth == 1 ? 1 : 2);
 			if (ts->UnicodeEmojiOverride) {
@@ -272,7 +272,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ts->KanjiIn = 0;
 					ts->KanjiOut = 0;
 
-					// ŽóMƒR[ƒh
+					// å—ä¿¡ã‚³ãƒ¼ãƒ‰
 					int curPos = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
 					IdKanjiCode coding =
 						(IdKanjiCode)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETITEMDATA, curPos, 0);
@@ -341,17 +341,17 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					case IdKOI8_NEW:
 						// SBCS(Single Byte Code Set)
 						break;
-					case IdDebug:	// MinGWŒx‘Îô
+					case IdDebug:	// MinGWè­¦å‘Šå¯¾ç­–
 						break;
 #if !defined(__MINGW32__)
 					default:
-						// gcc/clang‚Å‚Íswitch‚Éenum‚Ìƒƒ“ƒo‚ª‚·‚×‚Ä‚È‚¢‚Æ‚«Œx‚ªo‚é
+						// gcc/clangã§ã¯switchã«enumã®ãƒ¡ãƒ³ãƒãŒã™ã¹ã¦ãªã„ã¨ãè­¦å‘ŠãŒå‡ºã‚‹
 						assert(FALSE);
 						break;
 #endif
 					}
 
-					// ‘—MƒR[ƒh
+					// é€ä¿¡ã‚³ãƒ¼ãƒ‰
 					curPos = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
 					coding = (IdKanjiCode)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETITEMDATA, curPos, 0);
 					ts->KanjiCodeSend = coding;
@@ -387,10 +387,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		case WM_COMMAND: {
 			switch (wp) {
 				case IDC_TERMKANJI | (CBN_SELCHANGE << 16): {
-					// ŽóMƒR[ƒh
+					// å—ä¿¡ã‚³ãƒ¼ãƒ‰
 					LRESULT sel_receive = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
 					if (IsDlgButtonChecked(hWnd, IDC_USE_DIFFERENT_CODE) == BST_UNCHECKED) {
-						// ‘—MƒR[ƒh‚ð“¯‚¶’l‚É‚·‚é
+						// é€ä¿¡ã‚³ãƒ¼ãƒ‰ã‚’åŒã˜å€¤ã«ã™ã‚‹
 						SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETCURSEL, sel_receive, 0);
 					}
 
@@ -398,7 +398,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					break;
 				}
 				case IDC_TERMKANJISEND | (CBN_SELCHANGE << 16): {
-					// ‘—MƒR[ƒh
+					// é€ä¿¡ã‚³ãƒ¼ãƒ‰
 
 					ArrenageItems(hWnd);
 					break;
@@ -407,11 +407,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					const BOOL checked = (IsDlgButtonChecked(hWnd, IDC_USE_DIFFERENT_CODE) == BST_CHECKED) ? TRUE : FALSE;
 					EnableWindow(GetDlgItem(hWnd, IDC_TERMKANJISEND), checked ? TRUE : FALSE);
 					if (!checked) {
-						// USE_DIFFRENT_CODE‚Ìƒ`ƒFƒbƒN‚ª“ü‚Á‚Ä‚¢‚È‚¢‚é‚Æ‚«
+						// USE_DIFFRENT_CODEã®ãƒã‚§ãƒƒã‚¯ãŒå…¥ã£ã¦ã„ãªã„ã‚‹ã¨ã
 						LRESULT recv_index = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
 						LRESULT send_index = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
 						if (recv_index != send_index) {
-							// ‘—ŽóMƒR[ƒh‚ªˆÙ‚È‚Á‚Ä‚¢‚é‚È‚çA‘—MƒR[ƒh‚ðŽóM‚Æ“¯ˆê‚É‚·‚é
+							// é€å—ä¿¡ã‚³ãƒ¼ãƒ‰ãŒç•°ãªã£ã¦ã„ã‚‹ãªã‚‰ã€é€ä¿¡ã‚³ãƒ¼ãƒ‰ã‚’å—ä¿¡ã¨åŒä¸€ã«ã™ã‚‹
 							SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETCURSEL, recv_index, 0);
 						}
 					}
@@ -455,7 +455,7 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 
 HPROPSHEETPAGE CodingPageCreate(HINSTANCE inst, TTTSet *pts)
 {
-	// ’ common/tt_res.h ‚Æ coding_pp_res.h ‚Å’l‚ðˆê’v‚³‚¹‚é‚±‚Æ
+	// æ³¨ common/tt_res.h ã¨ coding_pp_res.h ã§å€¤ã‚’ä¸€è‡´ã•ã›ã‚‹ã“ã¨
 	int id = IDD_TABSHEET_CODING;
 
 	CodingPPData *Param = (CodingPPData *)calloc(1, sizeof(CodingPPData));

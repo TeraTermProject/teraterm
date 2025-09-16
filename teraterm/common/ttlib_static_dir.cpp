@@ -26,9 +26,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* ttlib_static_cpp ‚©‚ç•ª—£ */
-/* ƒtƒHƒ‹ƒ_‚ÉŠÖ‚·‚éŠÖ”A*/
-/* cyglaunch‚Åg‚¤ TTWinExec() */
+/* ttlib_static_cpp ã‹ã‚‰åˆ†é›¢ */
+/* ãƒ•ã‚©ãƒ«ãƒ€ã«é–¢ã™ã‚‹é–¢æ•°ã€*/
+/* cyglaunchã§ä½¿ã† TTWinExec() */
 
 #include <windows.h>
 #include <stdio.h>
@@ -42,8 +42,8 @@
 #include <wchar.h>
 #include <shlobj.h>
 
-// compat_win ‚ğ—˜—p‚·‚é
-//		cyglaunch ‚Ì’P“Æƒrƒ‹ƒh‚Ì‚Æ‚«Acompatwin ‚ğg—p‚¹‚¸ƒrƒ‹ƒh‚·‚é
+// compat_win ã‚’åˆ©ç”¨ã™ã‚‹
+//		cyglaunch ã®å˜ç‹¬ãƒ“ãƒ«ãƒ‰ã®ã¨ãã€compatwin ã‚’ä½¿ç”¨ã›ãšãƒ“ãƒ«ãƒ‰ã™ã‚‹
 #if !defined(ENABLE_COMAPT_WIN)
 #define ENABLE_COMAPT_WIN	1
 #endif
@@ -58,14 +58,14 @@
 
 #include "ttlib_static_dir.h"
 
-// ƒ|[ƒ^ƒuƒ‹”Å‚Æ‚µ‚Ä“®ì‚·‚é‚©‚ğŒˆ‚ß‚éƒtƒ@ƒCƒ‹
+// ãƒãƒ¼ã‚¿ãƒ–ãƒ«ç‰ˆã¨ã—ã¦å‹•ä½œã™ã‚‹ã‹ã‚’æ±ºã‚ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«
 #define PORTABLE_FILENAME L"portable.ini"
 
 /**
- *	AppDataƒtƒHƒ‹ƒ_‚Ìæ“¾
- *	ŠÂ‹«•Ï” APPDATA ‚ÌƒtƒHƒ‹ƒ_
+ *	AppDataãƒ•ã‚©ãƒ«ãƒ€ã®å–å¾—
+ *	ç’°å¢ƒå¤‰æ•° APPDATA ã®ãƒ•ã‚©ãƒ«ãƒ€
  *
- *	@retval	AppDataƒtƒHƒ‹ƒ_
+ *	@retval	AppDataãƒ•ã‚©ãƒ«ãƒ€
  */
 #if ENABLE_COMAPT_WIN
 static wchar_t *GetAppdataDir(void)
@@ -73,8 +73,8 @@ static wchar_t *GetAppdataDir(void)
 	wchar_t *path;
 	HRESULT r = _SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &path);
 	if (r != S_OK) {
-		// AppData ƒtƒHƒ‹ƒ_‚ª‘¶İ‚µ‚È‚¢ŠÂ‹«
-		// = %USERPROFILE%\Documents, C:\My Documents ‚ğg—p‚·‚é
+		// AppData ãƒ•ã‚©ãƒ«ãƒ€ãŒå­˜åœ¨ã—ãªã„ç’°å¢ƒ
+		// = %USERPROFILE%\Documents, C:\My Documents ã‚’ä½¿ç”¨ã™ã‚‹
 		r = _SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_CREATE, NULL, &path);
 		assert(r == S_OK);
 	}
@@ -101,7 +101,7 @@ static wchar_t *GetAppdataDir(void)
 	}
 	char *env = getenv("APPDATA");
 	if (env == NULL) {
-		// ‚à‚Á‚ÆŒÃ‚¢ windows ?
+		// ã‚‚ã£ã¨å¤ã„ windows ?
 		abort();
 	}
 	wchar_t *appdata = ToWcharA(env);
@@ -111,10 +111,10 @@ static wchar_t *GetAppdataDir(void)
 #endif
 
 /**
- *	LocalAppDataƒtƒHƒ‹ƒ_‚Ìæ“¾
- *	ŠÂ‹«•Ï” LOCALAPPDATA ‚ÌƒtƒHƒ‹ƒ_
+ *	LocalAppDataãƒ•ã‚©ãƒ«ãƒ€ã®å–å¾—
+ *	ç’°å¢ƒå¤‰æ•° LOCALAPPDATA ã®ãƒ•ã‚©ãƒ«ãƒ€
  *
- *	@retval	LocalAppDataƒtƒHƒ‹ƒ_
+ *	@retval	LocalAppDataãƒ•ã‚©ãƒ«ãƒ€
  */
 #if ENABLE_COMAPT_WIN
 static wchar_t *GetLocalAppdataDir(void)
@@ -122,8 +122,8 @@ static wchar_t *GetLocalAppdataDir(void)
 	wchar_t *path;
 	HRESULT r = _SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &path);
 	if (r != S_OK) {
-		// AppData ƒtƒHƒ‹ƒ_‚ª‘¶İ‚µ‚È‚¢ŠÂ‹«
-		// = %USERPROFILE%\Documents, C:\My Documents ‚ğg—p‚·‚é
+		// AppData ãƒ•ã‚©ãƒ«ãƒ€ãŒå­˜åœ¨ã—ãªã„ç’°å¢ƒ
+		// = %USERPROFILE%\Documents, C:\My Documents ã‚’ä½¿ç”¨ã™ã‚‹
 		r = _SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_CREATE, NULL, &path);
 		assert(r == S_OK);
 	}
@@ -133,20 +133,20 @@ static wchar_t *GetLocalAppdataDir(void)
 
 /*
  * Get Exe(exe,dll) directory
- *	ttermpro.exe, ƒvƒ‰ƒOƒCƒ“‚ª‚ ‚éƒtƒHƒ‹ƒ_
- *	ttypes.ExeDirW ‚Æ“¯ˆê
- *	‚à‚Æ‚Í GetHomeDirW() ‚¾‚Á‚½
+ *	ttermpro.exe, ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ãŒã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€
+ *	ttypes.ExeDirW ã¨åŒä¸€
+ *	ã‚‚ã¨ã¯ GetHomeDirW() ã ã£ãŸ
  *
- * @param[in]		hInst		WinMain()‚Ì HINSTANCE ‚Ü‚½‚Í NULL
- * @return			ExeDir		•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
- *								•¶š—ñ‚ÌÅŒã‚ÉƒpƒX‹æØ‚è('\')‚Í‚Â‚¢‚Ä‚¢‚È‚¢
+ * @param[in]		hInst		WinMain()ã® HINSTANCE ã¾ãŸã¯ NULL
+ * @return			ExeDir		ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
+ *								æ–‡å­—åˆ—ã®æœ€å¾Œã«ãƒ‘ã‚¹åŒºåˆ‡ã‚Š('\')ã¯ã¤ã„ã¦ã„ãªã„
  */
 wchar_t *GetExeDirW(HINSTANCE hInst)
 {
 	wchar_t *dir;
 	DWORD error = hGetModuleFileNameW(hInst, &dir);
 	if (error != NO_ERROR) {
-		// ƒpƒX‚Ìæ“¾‚É¸”s‚µ‚½B’v–½“IAabort() ‚·‚éB
+		// ãƒ‘ã‚¹ã®å–å¾—ã«å¤±æ•—ã—ãŸã€‚è‡´å‘½çš„ã€abort() ã™ã‚‹ã€‚
 		abort();
 	}
 	wchar_t *sep = wcsrchr(dir, L'\\');
@@ -155,10 +155,10 @@ wchar_t *GetExeDirW(HINSTANCE hInst)
 }
 
 /**
- *	ƒ|[ƒ^ƒuƒ‹”Å‚Æ‚µ‚Ä“®ì‚·‚é‚©
+ *	ãƒãƒ¼ã‚¿ãƒ–ãƒ«ç‰ˆã¨ã—ã¦å‹•ä½œã™ã‚‹ã‹
  *
- *	@retval		TRUE		ƒ|[ƒ^ƒuƒ‹”Å
- *	@retval		FALSE		’ÊíƒCƒ“ƒXƒg[ƒ‹”Å
+ *	@retval		TRUE		ãƒãƒ¼ã‚¿ãƒ–ãƒ«ç‰ˆ
+ *	@retval		FALSE		é€šå¸¸ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ç‰ˆ
  */
 BOOL IsPortableMode(void)
 {
@@ -173,7 +173,7 @@ BOOL IsPortableMode(void)
 		DWORD r = GetFileAttributesW(portable_ini);
 		free(portable_ini);
 		if (r == INVALID_FILE_ATTRIBUTES) {
-			//ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢
+			//ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãªã„
 			ret_val = FALSE;
 		}
 		else {
@@ -185,18 +185,18 @@ BOOL IsPortableMode(void)
 
 /*
  * Get home directory
- *		ŒÂl—pİ’èƒtƒ@ƒCƒ‹ƒtƒHƒ‹ƒ_æ“¾
- *		ttypes.HomeDirW ‚Æ“¯ˆê
- *		TERATERM.INI ‚È‚Ç‚ª‚¨‚¢‚Ä‚ ‚éƒtƒHƒ‹ƒ_
- *		ttermpro.exe ‚ª‚ ‚éƒtƒHƒ‹ƒ_‚Í GetHomeDirW() ‚Å‚Í‚È‚­ GetExeDirW() ‚Åæ“¾‚Å‚«‚é
- *		ExeDirW ‚É portable.ini ‚ª‚ ‚éê‡
+ *		å€‹äººç”¨è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ãƒ•ã‚©ãƒ«ãƒ€å–å¾—
+ *		ttypes.HomeDirW ã¨åŒä¸€
+ *		TERATERM.INI ãªã©ãŒãŠã„ã¦ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€
+ *		ttermpro.exe ãŒã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€ã¯ GetHomeDirW() ã§ã¯ãªã GetExeDirW() ã§å–å¾—ã§ãã‚‹
+ *		ExeDirW ã« portable.ini ãŒã‚ã‚‹å ´åˆ
  *			ExeDirW
- *		ExeDirW ‚É portable.ini ‚ª‚È‚¢ê‡
+ *		ExeDirW ã« portable.ini ãŒãªã„å ´åˆ
  *			%APPDATA%\teraterm5 (%USERPROFILE%\AppData\Roaming\teraterm5)
  *
- * @param[in]		hInst		WinMain()‚Ì HINSTANCE ‚Ü‚½‚Í NULL
- * @return			HomeDir		•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
- *								•¶š—ñ‚ÌÅŒã‚ÉƒpƒX‹æØ‚è('\')‚Í‚Â‚¢‚Ä‚¢‚È‚¢
+ * @param[in]		hInst		WinMain()ã® HINSTANCE ã¾ãŸã¯ NULL
+ * @return			HomeDir		ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
+ *								æ–‡å­—åˆ—ã®æœ€å¾Œã«ãƒ‘ã‚¹åŒºåˆ‡ã‚Š('\')ã¯ã¤ã„ã¦ã„ãªã„
  */
 wchar_t *GetHomeDirW(HINSTANCE hInst)
 {
@@ -215,16 +215,16 @@ wchar_t *GetHomeDirW(HINSTANCE hInst)
 
 /*
  * Get log directory
- *		ƒƒO•Û‘¶ƒtƒHƒ‹ƒ_æ“¾
- *		ttypes.LogDirW ‚Æ“¯ˆê
- *		ExeDirW ‚É portable.ini ‚ª‚ ‚éê‡
+ *		ãƒ­ã‚°ä¿å­˜ãƒ•ã‚©ãƒ«ãƒ€å–å¾—
+ *		ttypes.LogDirW ã¨åŒä¸€
+ *		ExeDirW ã« portable.ini ãŒã‚ã‚‹å ´åˆ
  *			ExeDirW\log
- *		ExeDirW ‚É portable.ini ‚ª‚È‚¢ê‡
+ *		ExeDirW ã« portable.ini ãŒãªã„å ´åˆ
  *			%LOCALAPPDATA%\teraterm5 (%USERPROFILE%\AppData\Local\teraterm5)
  *
- * @param[in]		hInst		WinMain()‚Ì HINSTANCE ‚Ü‚½‚Í NULL
- * @return			LogDir		•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
- *								•¶š—ñ‚ÌÅŒã‚ÉƒpƒX‹æØ‚è('\')‚Í‚Â‚¢‚Ä‚¢‚È‚¢
+ * @param[in]		hInst		WinMain()ã® HINSTANCE ã¾ãŸã¯ NULL
+ * @return			LogDir		ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
+ *								æ–‡å­—åˆ—ã®æœ€å¾Œã«ãƒ‘ã‚¹åŒºåˆ‡ã‚Š('\')ã¯ã¤ã„ã¦ã„ãªã„
  */
 wchar_t* GetLogDirW(HINSTANCE hInst)
 {
@@ -244,16 +244,16 @@ wchar_t* GetLogDirW(HINSTANCE hInst)
 }
 
 /**
- *	ƒvƒƒOƒ‰ƒ€‚ğÀs‚·‚é
+ *	ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’å®Ÿè¡Œã™ã‚‹
  *
- *	@param[in]	command		Às‚·‚éƒRƒ}ƒ“ƒhƒ‰ƒCƒ“
- *							CreateProcess() ‚É‚»‚Ì‚Ü‚Ü“n‚³‚ê‚é
- * 	@retval		NO_ERROR	ƒGƒ‰[‚È‚µ
- *	@retval		ƒGƒ‰[ƒR[ƒh	(NO_ERRORˆÈŠO)
+ *	@param[in]	command		å®Ÿè¡Œã™ã‚‹ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³
+ *							CreateProcess() ã«ãã®ã¾ã¾æ¸¡ã•ã‚Œã‚‹
+ * 	@retval		NO_ERROR	ã‚¨ãƒ©ãƒ¼ãªã—
+ *	@retval		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰	(NO_ERRORä»¥å¤–)
  *
- *	ƒVƒ“ƒvƒ‹‚ÉƒvƒƒOƒ‰ƒ€‚ğ‹N“®‚·‚é‚¾‚¯‚ÌŠÖ”
- *		CreateProcess() ‚Í CloseHandle() ‚ğ–Y‚ê‚Äƒnƒ“ƒhƒ‹ƒŠ[ƒN‚ğ‹N‚±‚µ‚â‚·‚¢
- *		’Pƒ‚ÈƒvƒƒOƒ‰ƒ€Às‚Å‚Í‚±‚ÌŠÖ”‚ğg—p‚·‚é‚ÆˆÀ‘S
+ *	ã‚·ãƒ³ãƒ—ãƒ«ã«ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’èµ·å‹•ã™ã‚‹ã ã‘ã®é–¢æ•°
+ *		CreateProcess() ã¯ CloseHandle() ã‚’å¿˜ã‚Œã¦ãƒãƒ³ãƒ‰ãƒ«ãƒªãƒ¼ã‚¯ã‚’èµ·ã“ã—ã‚„ã™ã„
+ *		å˜ç´”ãªãƒ—ãƒ­ã‚°ãƒ©ãƒ å®Ÿè¡Œã§ã¯ã“ã®é–¢æ•°ã‚’ä½¿ç”¨ã™ã‚‹ã¨å®‰å…¨
  */
 DWORD TTWinExec(const wchar_t *command)
 {

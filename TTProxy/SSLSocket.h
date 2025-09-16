@@ -54,12 +54,12 @@ private:
 
     private:
         SSLContext():ctx(NULL) {
-			// SSL_library_initŠÖ”‚ÍOpenSSL 1.1.0‚Ådeprecated‚Æ‚È‚èA
-			// OPENSSL_init_sslŠÖ”‚É’u‚«Š·‚í‚Á‚½B
+			// SSL_library_inité–¢æ•°ã¯OpenSSL 1.1.0ã§deprecatedã¨ãªã‚Šã€
+			// OPENSSL_init_sslé–¢æ•°ã«ç½®ãæ›ã‚ã£ãŸã€‚
 			OPENSSL_init_ssl(0, NULL);
 
-            // SSL_load_error_stringsŠÖ”‚ÍOpenSSL 1.1.0‚Ådeprecated‚Æ‚È‚èA
-			// ŒÄ‚Ño‚µ•s—v‚Æ‚È‚Á‚½‚½‚ßAíœ‚µ‚½B
+            // SSL_load_error_stringsé–¢æ•°ã¯OpenSSL 1.1.0ã§deprecatedã¨ãªã‚Šã€
+			// å‘¼ã³å‡ºã—ä¸è¦ã¨ãªã£ãŸãŸã‚ã€å‰Šé™¤ã—ãŸã€‚
             ctx = SSL_CTX_new(SSLv23_client_method());
             SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
         }
@@ -202,7 +202,7 @@ public:
                 X509* x509 = SSL_get_peer_certificate(ssl);
                 if (x509 != NULL) {
                     bool match = false;
-                    /* SSL‚Å‚Ì”FØ */
+                    /* SSLã§ã®èªè¨¼ */
                     int result = SSL_get_verify_result(ssl);
                     if (result == X509_V_OK) {
                         verify_result = 0;
@@ -233,16 +233,16 @@ public:
                                 if (i < n)
                                     match = true;
                                 else if (count > 0)
-                                    verify_result = IDS_UNMATCH_COMMON_NAME; /* common name‚ªˆê’v‚µ‚È‚©‚Á‚½ */
+                                    verify_result = IDS_UNMATCH_COMMON_NAME; /* common nameãŒä¸€è‡´ã—ãªã‹ã£ãŸ */
                             }
                         }
                         if (!match && verify_result == 0) {
                             X509_NAME* xn = X509_get_subject_name(x509);
                             char buf[1024];
                             if (X509_NAME_get_text_by_NID(xn, NID_commonName, buf, sizeof buf) == -1)
-                                verify_result = IDS_UNABLE_TO_GET_COMMON_NAME; /* common name‚Ìæ“¾‚É¸”s‚µ‚½ */
+                                verify_result = IDS_UNABLE_TO_GET_COMMON_NAME; /* common nameã®å–å¾—ã«å¤±æ•—ã—ãŸ */
                             else if (!ssl_match_cert_ident(buf, strlen(buf), hostname))
-                                verify_result = IDS_UNMATCH_COMMON_NAME; /* common name‚ªˆê’v‚µ‚È‚©‚Á‚½ */
+                                verify_result = IDS_UNMATCH_COMMON_NAME; /* common nameãŒä¸€è‡´ã—ãªã‹ã£ãŸ */
                             else
                                 match = true;
                         }

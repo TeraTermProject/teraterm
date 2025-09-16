@@ -11,17 +11,17 @@
 
 namespace yebisuya {
 
-// �I�u�W�F�N�g��񋓂��邽�߂̃N���X�B
+// オブジェクトを列挙するためのクラス。
 template<class TYPE>
 class Enumeration : public Object {
 public:
-	// �܂��񋓂���I�u�W�F�N�g�����݂��Ă��邩�ǂ����𔻒肷��B
-	// �Ԓl:
-	//	���̃I�u�W�F�N�g�����݂��Ă���ΐ^�B
+	// まだ列挙するオブジェクトが存在しているかどうかを判定する。
+	// 返値:
+	//	次のオブジェクトが存在していれば真。
 	virtual bool hasMoreElements()const = 0;
-	// ���Ɍ����I�u�W�F�N�g��Ԃ��B
-	// �Ԓl:
-	//	���̃I�u�W�F�N�g�B
+	// 次に現れるオブジェクトを返す。
+	// 返値:
+	//	次のオブジェクト。
 	virtual TYPE nextElement()const = 0;
 };
 

@@ -75,8 +75,8 @@ static void LangFree(LangInfo* infos, size_t count)
 }
 
 /**
- *	ÉtÉ@ÉCÉãñºÇÉäÉXÉgÇ∑ÇÈ(ÉtÉ@ÉCÉãñºÇÃÇ›)
- *	infosÇ…í«â¡ÇµÇƒreturnÇ∑ÇÈ
+ *	„Éï„Ç°„Ç§„É´Âêç„Çí„É™„Çπ„Éà„Åô„Çã(„Éï„Ç°„Ç§„É´Âêç„ÅÆ„Åø)
+ *	infos„Å´ËøΩÂä†„Åó„Å¶return„Åô„Çã
  */
 static LangInfo* LangAppendFileList(const wchar_t* folder, LangInfo* infos, size_t* infos_size)
 {
@@ -110,7 +110,7 @@ static LangInfo* LangAppendFileList(const wchar_t* folder, LangInfo* infos, size
 }
 
 /**
- *	lngÉtÉ@ÉCÉãÇÃ Info ÉZÉNÉVÉáÉìÇì«Ç›çûÇﬁ
+ *	lng„Éï„Ç°„Ç§„É´„ÅÆ Info „Çª„ÇØ„Ç∑„Éß„É≥„ÇíË™≠„ÅøËæº„ÇÄ
  */
 static void LangRead(LangInfo* infos, size_t infos_size)
 {
@@ -170,7 +170,7 @@ struct UIPPData {
 	TComVar *pcv;
 	LangInfo* lng_infos;
 	size_t lng_size;
-	size_t selected_lang;	// ëIÇŒÇÍÇƒÇ¢ÇΩlngÉtÉ@ÉCÉãî‘çÜ
+	size_t selected_lang;	// ÈÅ∏„Å∞„Çå„Å¶„ÅÑ„Åülng„Éï„Ç°„Ç§„É´Áï™Âè∑
 	TipWin2 *tipwin2;
 	LOGFONTW DlgFont;
 	HWND hVTWin;
@@ -196,7 +196,7 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM /*wParam*/,
 
 static BOOL ChooseDlgFont(HWND hWnd, UIPPData *dlg_data)
 {
-	// É_ÉCÉAÉçÉOï\é¶
+	// „ÉÄ„Ç§„Ç¢„É≠„Ç∞Ë°®Á§∫
 	CHOOSEFONTW cf = {};
 	cf.lStructSize = sizeof(cf);
 	cf.hwndOwner = hWnd;
@@ -246,7 +246,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), data->pts->UILanguageFileW);
 
-			// UI Language, ì«Ç›çûÇ›
+			// UI Language, Ë™≠„ÅøËæº„Åø
 			LangInfo* infos = NULL;
 			size_t infos_size = 0;
 			wchar_t* folder;
@@ -262,10 +262,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			data->lng_infos = infos;
 			data->lng_size = infos_size;
 
-			// UI Languageóp tipwin
+			// UI LanguageÁî® tipwin
 			data->tipwin2 = TipWin2Create(data->hInst, hWnd);
 
-			// UI Language, ëIë
+			// UI Language, ÈÅ∏Êäû
 			data->selected_lang = 0;
 			for (size_t i = 0; i < infos_size; i++) {
 				const LangInfo* p = infos + i;
@@ -318,15 +318,15 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						free(pts->UILanguageFileW);
 						pts->UILanguageFileW = _wcsdup(p->fullname);
 
-						// É^ÉCÉgÉãÇÃçXêVÇçsÇ§ÅB(2014.2.23 yutaka)
+						// „Çø„Ç§„Éà„É´„ÅÆÊõ¥Êñ∞„ÇíË°å„ÅÜ„ÄÇ(2014.2.23 yutaka)
 						PostMessage(dlg_data->hVTWin, WM_USER_CHANGETITLE, 0, 0);
 					}
 
 					TSSetLogFont(GetParent(hWnd), &dlg_data->DlgFont, 2, 0, pts);
 
-					// TTXKanjiMenu ÇÕ Language Çå©ÇƒÉÅÉjÉÖÅ[Çï\é¶Ç∑ÇÈÇÃÇ≈ÅAïœçXÇÃâ¬î\ê´Ç™Ç†ÇÈ
-					// OK âüâ∫éûÇ…ÉÅÉjÉÖÅ[çƒï`âÊÇÃÉÅÉbÉZÅ[ÉWÇîÚÇŒÇ∑ÇÊÇ§Ç…ÇµÇΩÅB (2007.7.14 maya)
-					// åæåÍÉtÉ@ÉCÉãÇÃïœçXéûÇ…ÉÅÉjÉÖÅ[ÇÃçƒï`âÊÇ™ïKóv (2012.5.5 maya)
+					// TTXKanjiMenu „ÅØ Language „ÇíË¶ã„Å¶„É°„Éã„É•„Éº„ÇíË°®Á§∫„Åô„Çã„ÅÆ„Åß„ÄÅÂ§âÊõ¥„ÅÆÂèØËÉΩÊÄß„Åå„ÅÇ„Çã
+					// OK Êäº‰∏ãÊôÇ„Å´„É°„Éã„É•„ÉºÂÜçÊèèÁîª„ÅÆ„É°„ÉÉ„Çª„Éº„Ç∏„ÇíÈ£õ„Å∞„Åô„Çà„ÅÜ„Å´„Åó„Åü„ÄÇ (2007.7.14 maya)
+					// Ë®ÄË™û„Éï„Ç°„Ç§„É´„ÅÆÂ§âÊõ¥ÊôÇ„Å´„É°„Éã„É•„Éº„ÅÆÂÜçÊèèÁîª„ÅåÂøÖË¶Å (2012.5.5 maya)
 					PostMessage(dlg_data->hVTWin, WM_USER_CHANGEMENU, 0, 0);
 
 					break;
@@ -409,7 +409,7 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 
 HPROPSHEETPAGE UIPageCreate(HINSTANCE inst, TTTSet *pts)
 {
-	// íç common/tt_res.h Ç∆ ui_pp_res.h Ç≈ílÇàÍívÇ≥ÇπÇÈÇ±Ç∆
+	// Ê≥® common/tt_res.h „Å® ui_pp_res.h „ÅßÂÄ§„Çí‰∏ÄËá¥„Åï„Åõ„Çã„Åì„Å®
 	int id = IDD_TABSHEET_UI;
 
 	UIPPData *dlg_data = (UIPPData *)calloc(1, sizeof(UIPPData));

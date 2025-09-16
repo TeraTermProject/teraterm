@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// ‰pŒê (•Ä‘) resources
+// è‹±èª (ç±³å›½) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -131,7 +131,7 @@ BEGIN
     0
 END
 
-#endif    // ‰pŒê (•Ä‘) resources
+#endif    // è‹±èª (ç±³å›½) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

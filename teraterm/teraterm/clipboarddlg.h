@@ -36,7 +36,7 @@ extern "C" {
 
 typedef struct {
 	const wchar_t *strW_ptr;
-	wchar_t *strW_edited_ptr;		// ok‚ª‰Ÿ‚³‚ê‚½‚Æ‚«•Ô‚Á‚Ä‚­‚é
+	wchar_t *strW_edited_ptr;		// okãŒæŠ¼ã•ã‚ŒãŸã¨ãè¿”ã£ã¦ãã‚‹
 	const wchar_t *UILanguageFileW;
 	TTTSet *pts;
 	SIZE PasteDialogSize;

@@ -114,7 +114,7 @@ BOOL CDebugPropPage::OnCommand(WPARAM wParam, LPARAM)
 		case IDC_BUTTON_DUMP | (BN_CLICKED << 16): {
 			DebugTestCrash();
 			//*((unsigned char *)0) = 0;	// null pointer assignment
-			//_CrtDbgBreak();	// MinGW ‚Å‚Íí‚É–³Œø‰»‚³‚ê‚Ä‚¢‚é
+			//_CrtDbgBreak();	// MinGW ã§ã¯å¸¸ã«ç„¡åŠ¹åŒ–ã•ã‚Œã¦ã„ã‚‹
 			//assert(FALSE);
 			break;
 		}

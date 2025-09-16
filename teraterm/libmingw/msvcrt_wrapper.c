@@ -39,11 +39,11 @@
 #include <sys/stat.h>
 #include "../common/compat_win.h"
 
-// 9xŒn‚È‚Ç‚ÌŒÃ‚¢msvcrt‚ªg‚¦‚é‚æ‚¤‚É‚·‚é
-// - _s() Œn‚ÍƒZƒLƒ…ƒŠƒeƒB[‚Ì’á‚¢ŠÖ”‚ğŒÄ‚Ño‚·
-// - W() ŒnŠÖ”‚Í ANSI•¶š”Å‚ğŒÄ‚Ño‚·
-// - ‚±‚Ìƒtƒ@ƒCƒ‹‚ğƒŠƒ“ƒN‚·‚é‚Æ•K‚¸’u‚«Š·‚¦‚ç‚ê‚é
-// TODO: msvcrt‚É‘¶İ‚·‚é‚©ƒ`ƒFƒbƒN‚µ‚ÄA‚ ‚ê‚Îdll“à‚ÌŠÖ”‚ğg—p‚·‚é
+// 9xç³»ãªã©ã®å¤ã„msvcrtãŒä½¿ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹
+// - _s() ç³»ã¯ã‚»ã‚­ãƒ¥ãƒªãƒ†ã‚£ãƒ¼ã®ä½ã„é–¢æ•°ã‚’å‘¼ã³å‡ºã™
+// - W() ç³»é–¢æ•°ã¯ ANSIæ–‡å­—ç‰ˆã‚’å‘¼ã³å‡ºã™
+// - ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒªãƒ³ã‚¯ã™ã‚‹ã¨å¿…ãšç½®ãæ›ãˆã‚‰ã‚Œã‚‹
+// TODO: msvcrtã«å­˜åœ¨ã™ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã—ã¦ã€ã‚ã‚Œã°dllå†…ã®é–¢æ•°ã‚’ä½¿ç”¨ã™ã‚‹
 
 int vsnprintf_s(char *buffer, size_t sizeOfBuffer, size_t count, const char *format, va_list ap)
 {
@@ -87,7 +87,7 @@ static int inner_snprintf_s(char *buffer, size_t sizeOfBuffer, size_t count, con
 }
 
 /**
- *	TODO: locale–³‹
+ *	TODO: localeç„¡è¦–
  */
 static int inner_snprintf_s_l(char *buffer, size_t sizeOfBuffer, size_t count, const char *format, _locale_t locale, ...)
 {
@@ -377,7 +377,7 @@ static errno_t inner_itoa_s(int value, char * buffer, size_t size, int radix )
 	return 0;
 }
 
-// ƒeƒXƒg—pŠÖ”
+// ãƒ†ã‚¹ãƒˆç”¨é–¢æ•°
 #if 0
 static void not_implemented(void)
 {

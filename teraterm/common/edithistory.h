@@ -35,20 +35,20 @@ extern "C" {
 #endif
 
 typedef struct {
-	const wchar_t *UILanguageFileW;		// lngファイル
+	const wchar_t *UILanguageFileW;		// lng繝輔ぃ繧､繝ｫ
 	const wchar_t *SetupFNameW;			// TERATERM.INI
-	const wchar_t *title;				// タイトル
-	HWND vtwin;							// ヘルプを表示するため
+	const wchar_t *title;				// 繧ｿ繧､繝医Ν
+	HWND vtwin;							// 繝倥Ν繝励ｒ陦ｨ遉ｺ縺吶ｋ縺溘ａ
 } EditHistoryDlgData;
 
 /**
- *	ホストリストを編集する
+ *	繝帙せ繝医Μ繧ｹ繝医ｒ邱ｨ髮�縺吶ｋ
  *
  *	@param		hInstance
  *	@param		WndParent
  *	@param		parent_data
- *	@retval		TRUE		OK(編集した)
- *	@retval		FALSE		Cancelした
+ *	@retval		TRUE		OK(邱ｨ髮�縺励◆)
+ *	@retval		FALSE		Cancel縺励◆
  */
 BOOL EditHistoryDlg(HINSTANCE hInstance, HWND WndParent, EditHistoryDlgData *parent_data);
 

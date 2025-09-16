@@ -96,7 +96,7 @@ inline bool YclAssert(bool condition, const char* message) {
 //}
 #endif
 
-// テンプレート使用時に警告が出るので抑制する
+// 繝�繝ｳ繝励Ξ繝ｼ繝井ｽｿ逕ｨ譎ゅ↓隴ｦ蜻翫′蜃ｺ繧九�ｮ縺ｧ謚大宛縺吶ｋ
 #pragma warning(disable: 4786)
 
 #endif//_YCL_COMMON_H_

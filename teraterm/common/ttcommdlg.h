@@ -43,8 +43,8 @@ typedef struct {
 	HINSTANCE hInstance;
 	LPCWSTR lpstrFilter;
 	DWORD nFilterIndex;
-	LPCWSTR lpstrFile;	// ‰Šúƒtƒ@ƒCƒ‹–¼
-	LPCWSTR lpstrInitialDir;	// ‰ŠúƒtƒHƒ‹ƒ_
+	LPCWSTR lpstrFile;	// åˆæœŸãƒ•ã‚¡ã‚¤ãƒ«å
+	LPCWSTR lpstrInitialDir;	// åˆæœŸãƒ•ã‚©ãƒ«ãƒ€
 	LPCWSTR lpstrTitle;
 	DWORD Flags;
 	LPCWSTR lpstrDefExt;

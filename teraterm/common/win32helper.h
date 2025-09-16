@@ -31,7 +31,7 @@
 #include <windows.h>
 #include <setupapi.h>
 
-// VS2005(SDK7.1ˆÈ‰º)‚Ì‚Æ‚«,LSTATUS‚ª‚È‚¢
+// VS2005(SDK7.1ä»¥ä¸‹)ã®ã¨ã,LSTATUSãŒãªã„
 #if defined(_MSC_VER) && !defined(__MINGW32__) && _MSC_VER == 1400
 typedef LONG LSTATUS;
 #endif

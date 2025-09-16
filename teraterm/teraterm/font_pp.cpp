@@ -52,11 +52,11 @@
 
 #include "font_pp.h"
 
-// ƒeƒ“ƒvƒŒ[ƒg‚Ì‘‚«Š·‚¦‚ğs‚¤
+// ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®æ›¸ãæ›ãˆã‚’è¡Œã†
 #define REWRITE_TEMPLATE
 
-#define IDC_SPACE_MAXLEN 6 	  // IDC_SPACE(FontDX, FontDW, FontDY, FontDH)‚ÌÅ‘åŒ…”
-#define IDC_CODEPAGE_MAXLEN 5 // IDC_CODEPAGE(CodePageForANSIDraw)‚ÌÅ‘åŒ…”
+#define IDC_SPACE_MAXLEN 6 	  // IDC_SPACE(FontDX, FontDW, FontDY, FontDH)ã®æœ€å¤§æ¡æ•°
+#define IDC_CODEPAGE_MAXLEN 5 // IDC_CODEPAGE(CodePageForANSIDraw)ã®æœ€å¤§æ¡æ•°
 
 struct FontPPData {
 	HINSTANCE hInst;
@@ -71,7 +71,7 @@ static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
 {
 	memset(logfont, 0, sizeof(*logfont));
 	if (ts->DialogFontNameW[0] == 0) {
-		// ƒtƒHƒ“ƒg‚ªİ’è‚³‚ê‚Ä‚¢‚È‚©‚Á‚½‚çOS‚ÌƒtƒHƒ“ƒg‚ğg—p‚·‚é
+		// ãƒ•ã‚©ãƒ³ãƒˆãŒè¨­å®šã•ã‚Œã¦ã„ãªã‹ã£ãŸã‚‰OSã®ãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ç”¨ã™ã‚‹
 		GetMessageboxFontW(logfont);
 	}
 	else {
@@ -110,8 +110,8 @@ static void EnableCodePage(HWND hWnd, BOOL enable)
 }
 
 /**
- *	ƒtƒHƒ“ƒg‚ÌCharSet(LOGFONT.charlfCharSet)‚©‚ç
- *	•\¦‚É‘Ã“–‚ÈCodePage‚ğ“¾‚é
+ *	ãƒ•ã‚©ãƒ³ãƒˆã®CharSet(LOGFONT.charlfCharSet)ã‹ã‚‰
+ *	è¡¨ç¤ºã«å¦¥å½“ãªCodePageã‚’å¾—ã‚‹
  */
 static int GetCodePageFromFontCharSet(BYTE char_set)
 {
@@ -310,11 +310,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						}
 					}
 
-					// ƒtƒHƒ“ƒg‚Ìİ’è
+					// ãƒ•ã‚©ãƒ³ãƒˆã®è¨­å®š
 					ChangeFont(0);
 					HWND vtwin = GetParent(GetParent(hWnd));
 					if (::IsZoomed(vtwin)) {
-						// Å‘å‰»‚³‚ê‚Ä‚¢‚éê‡‚ÍAƒTƒCƒY•ÏX‚É‚æ‚è WM_SIZE ‚ğ”­¶‚³‚¹‚éB
+						// æœ€å¤§åŒ–ã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ã€ã‚µã‚¤ã‚ºå¤‰æ›´ã«ã‚ˆã‚Š WM_SIZE ã‚’ç™ºç”Ÿã•ã›ã‚‹ã€‚
 						RECT r;
 						::GetWindowRect(vtwin, &r);
 						SetWindowPos(vtwin, NULL, 0, 0, r.right - r.left, 0, SWP_NOMOVE);
@@ -352,7 +352,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 							SetWindowTextW(hEdit, L"0");
 							break;
 						}
-						// ƒc[ƒ‹ƒ`ƒbƒv‚ğ•\¦
+						// ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚’è¡¨ç¤º
 						wchar_t *uiTitle, *uiText;
 						GetI18nStrWW("Tera Term", "MSG_TOOLTIP_EDITERR_TITLE1", L"Unacceptable Character", ts->UILanguageFileW, &uiTitle);
 						GetI18nStrWW("Tera Term", "MSG_TOOLTIP_EDITERR_TEXT1", L"Only positive and negative integers are acceptable.", ts->UILanguageFileW, &uiText);
@@ -360,7 +360,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						free(uiTitle);
 						free(uiText);
 
-						// –³Œø‚È•¶š‚ğíœ
+						// ç„¡åŠ¹ãªæ–‡å­—ã‚’å‰Šé™¤
 						wchar_t text[IDC_SPACE_MAXLEN + 1];
 						GetWindowTextW(hEdit, &text[0], IDC_SPACE_MAXLEN + 1);
 						wchar_t *orgp = text, *newp = text;
@@ -380,7 +380,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 							text[1] = '\0';
 						}
 
-						// EDITƒRƒ“ƒgƒ[ƒ‹‚ğXV
+						// EDITã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚’æ›´æ–°
 						DWORD startPos, endPos;
 						SendMessage(hEdit, EM_GETSEL, (WPARAM)(&startPos), (LPARAM)(&endPos));
 						SetWindowTextW(hEdit, text);
@@ -459,7 +459,7 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 
 HPROPSHEETPAGE FontPageCreate(HINSTANCE inst, TTTSet *pts)
 {
-	// ’ common/tt_res.h ‚Æ font_pp_res.h ‚Å’l‚ğˆê’v‚³‚¹‚é‚±‚Æ
+	// æ³¨ common/tt_res.h ã¨ font_pp_res.h ã§å€¤ã‚’ä¸€è‡´ã•ã›ã‚‹ã“ã¨
 	const int id = IDD_TABSHEET_FONT;
 
 	FontPPData *Param = (FontPPData *)calloc(1, sizeof(FontPPData));

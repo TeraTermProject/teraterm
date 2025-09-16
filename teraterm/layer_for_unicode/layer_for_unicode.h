@@ -29,7 +29,7 @@
 /*
  * W to A Wrapper
  *
- * API–¼‚ÍW”Å‚Ì“ª‚É '_' ‚ð•t‚¯‚½‚à‚Ì‚ðŽg—p‚·‚é
+ * APIåã¯Wç‰ˆã®é ­ã« '_' ã‚’ä»˜ã‘ãŸã‚‚ã®ã‚’ä½¿ç”¨ã™ã‚‹
  */
 
 #pragma once
