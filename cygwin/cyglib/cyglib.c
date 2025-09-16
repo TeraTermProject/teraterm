@@ -39,17 +39,17 @@
 #include "cyglib.h"
 
 /**
- *	cygwin1.dll / msys-2.0.dll‚ğ’T‚·
+ *	cygwin1.dll / msys-2.0.dllã‚’æ¢ã™
  *
- *	@param[in]	dll_base		"cygwin1", "msys-2.0" ‚È‚ÇA"dll" ‚ğœ‚¢‚½ƒx[ƒX
- *	@param[in]	cygwin_dir		(‘¶İ‚·‚é‚Å‚ ‚ë‚¤)ƒtƒHƒ‹ƒ_(*1)
- *								w’è‚È‚µ‚Ìê‡‚Í NULL ‚ğ“n‚·
- *	@param[in]	search_paths	(*1)‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½‚Æ‚«‚É’T‚·ƒpƒX
- *	@param[out]	find_dir		Œ©‚Â‚©‚Á‚½ƒtƒHƒ‹ƒ_ free() ‚·‚é‚±‚Æ
- *	@param[out]	find_in_path	ŠÂ‹«•Ï” PATH “à‚ÉŒ©‚Â‚©‚Á‚½
+ *	@param[in]	dll_base		"cygwin1", "msys-2.0" ãªã©ã€"dll" ã‚’é™¤ã„ãŸãƒ™ãƒ¼ã‚¹
+ *	@param[in]	cygwin_dir		(å­˜åœ¨ã™ã‚‹ã§ã‚ã‚ã†)ãƒ•ã‚©ãƒ«ãƒ€(*1)
+ *								æŒ‡å®šãªã—ã®å ´åˆã¯ NULL ã‚’æ¸¡ã™
+ *	@param[in]	search_paths	(*1)ãŒè¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã¨ãã«æ¢ã™ãƒ‘ã‚¹
+ *	@param[out]	find_dir		è¦‹ã¤ã‹ã£ãŸãƒ•ã‚©ãƒ«ãƒ€ free() ã™ã‚‹ã“ã¨
+ *	@param[out]	find_in_path	ç’°å¢ƒå¤‰æ•° PATH å†…ã«è¦‹ã¤ã‹ã£ãŸ
  *
- *	@retval		TRUE	Œ©‚Â‚©‚Á‚½
- *	@retval		FALSE	Œ©‚Â‚©‚ç‚È‚¢
+ *	@retval		TRUE	è¦‹ã¤ã‹ã£ãŸ
+ *	@retval		FALSE	è¦‹ã¤ã‹ã‚‰ãªã„
  */
 static BOOL SearchDLL(const wchar_t *dll_base, const wchar_t *cygwin_dir, const wchar_t **search_paths, wchar_t **find_dir, BOOL *find_in_path)
 {
@@ -63,14 +63,14 @@ static BOOL SearchDLL(const wchar_t *dll_base, const wchar_t *cygwin_dir, const 
 	*find_in_path = FALSE;
 	*find_dir = NULL;
 
-	// w’è‚³‚ê‚½ƒtƒHƒ‹ƒ_‚É‘¶İ‚·‚é‚©?
+	// æŒ‡å®šã•ã‚ŒãŸãƒ•ã‚©ãƒ«ãƒ€ã«å­˜åœ¨ã™ã‚‹ã‹?
 	if (cygwin_dir != NULL && cygwin_dir[0] != 0) {
 		static const wchar_t *dll_paths[] = {
-			L"bin\\",		// cygwin‚Í bin/ ‚Ì‰º‚Édll‚ª‚ ‚é
-			L"usr\\bin\\"	// msys2‚Í usr/bin/ ‚Ì‰º‚Édll‚ª‚ ‚é
+			L"bin\\",		// cygwinã¯ bin/ ã®ä¸‹ã«dllãŒã‚ã‚‹
+			L"usr\\bin\\"	// msys2ã¯ usr/bin/ ã®ä¸‹ã«dllãŒã‚ã‚‹
 		};
 		for (i = 0; i < _countof(dll_paths); i++) {
-			// SearchPathW() ‚Å’T‚·
+			// SearchPathW() ã§æ¢ã™
 			dll = NULL;
 			awcscats(&dll, dll_paths[i], dll_base, NULL);
 			r = SearchPathW(cygwin_dir, dll, L".dll", _countof(file), file, &filename);
@@ -79,31 +79,31 @@ static BOOL SearchDLL(const wchar_t *dll_base, const wchar_t *cygwin_dir, const 
 				goto found_dll;
 			}
 
-			// Œ©‚Â‚©‚ç‚È‚©‚Á‚½‚ç GetFileAttributesW() ‚Å‚³‚ç‚É’²‚×‚é
-			// 		SearchPathW() ‚ª"msys-2.0.dll" ‚ªŒ©‚Â‚¯‚é‚±‚Æ‚ª‚Å‚«‚È‚¢
-			//		"." ‚ª“ü‚Á‚Ä‚¢‚é‚©‚ç‚©?
+			// è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã‚‰ GetFileAttributesW() ã§ã•ã‚‰ã«èª¿ã¹ã‚‹
+			// 		SearchPathW() ãŒ"msys-2.0.dll" ãŒè¦‹ã¤ã‘ã‚‹ã“ã¨ãŒã§ããªã„
+			//		"." ãŒå…¥ã£ã¦ã„ã‚‹ã‹ã‚‰ã‹?
 			dll = NULL;
 			awcscats(&dll, cygwin_dir, L"\\", dll_paths[i], dll_base, L".dll", NULL);
 			wcscpy_s(file, _countof(file), dll);
 			free(dll);
 			r = GetFileAttributesW(file);
 			if (r != INVALID_FILE_ATTRIBUTES) {
-				// Œ©‚Â‚©‚Á‚½
+				// è¦‹ã¤ã‹ã£ãŸ
 				goto found_dll;
 			}
 		}
 	}
 
-	// PATH ‚©‚ç’T‚·
+	// PATH ã‹ã‚‰æ¢ã™
 	if (SearchPathW(NULL, dll_base, L".dll", _countof(file), file, &filename) > 0) {
 		*find_in_path = TRUE;
 		goto found_dll;
 	}
 
-	// ‚ ‚è‚»‚¤‚ÈêŠ‚ğ’T‚·
+	// ã‚ã‚Šãã†ãªå ´æ‰€ã‚’æ¢ã™
 	for (c = 'C' ; c <= 'Z' ; c++) {
 		for (i = 0; search_paths[i] != NULL; i++) {
-			// SearchPathW() ‚Å’T‚·
+			// SearchPathW() ã§æ¢ã™
 			const wchar_t *search_path_base = search_paths[i];
 			wchar_t *search_path;
 			aswprintf(&search_path, search_path_base, c);
@@ -113,7 +113,7 @@ static BOOL SearchDLL(const wchar_t *dll_base, const wchar_t *cygwin_dir, const 
 				goto found_dll;
 			}
 
-			// ƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é‚©’²‚×‚é
+			// ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹ã‹èª¿ã¹ã‚‹
 			dll = NULL;
 			awcscats(&dll, search_path, L"\\", dll_base, L".dll", NULL);
 			r = GetFileAttributesW(dll);
@@ -127,12 +127,12 @@ static BOOL SearchDLL(const wchar_t *dll_base, const wchar_t *cygwin_dir, const 
 		}
 	}
 
-	// Œ©‚Â‚©‚ç‚È‚©‚Á‚½
+	// è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸ
 	return FALSE;
 
 found_dll:
 	{
-		// cut "cygwin1.dll", ƒtƒHƒ‹ƒ_‚Ì‚İ‚ğ•Ô‚·
+		// cut "cygwin1.dll", ãƒ•ã‚©ãƒ«ãƒ€ã®ã¿ã‚’è¿”ã™
 		wchar_t *p = wcsrchr(file, L'\\');
 		*p = 0;
 	}
@@ -148,7 +148,7 @@ static errno_t __wdupenv_s(wchar_t** envptr, size_t* buf_size, const wchar_t* na
 #else
     const wchar_t* s = _wgetenv(name);
 	if (s == NULL) {
-		// ‘¶İ‚µ‚È‚¢
+		// å­˜åœ¨ã—ãªã„
 		*envptr = NULL;
 		return EINVAL;
 	}
@@ -161,7 +161,7 @@ static errno_t __wdupenv_s(wchar_t** envptr, size_t* buf_size, const wchar_t* na
 }
 
 /**
- *	ŠÂ‹«•Ï” PATH ‚É add_path ‚ğ’Ç‰Á
+ *	ç’°å¢ƒå¤‰æ•° PATH ã« add_path ã‚’è¿½åŠ 
  */
 static BOOL AddPath(const wchar_t *add_path)
 {
@@ -176,7 +176,7 @@ static BOOL AddPath(const wchar_t *add_path)
 		free(envptr);
 	}
 	else {
-		// ŠÂ‹«•Ï” PATH ‚ª‘¶İ‚µ‚È‚¢
+		// ç’°å¢ƒå¤‰æ•° PATH ãŒå­˜åœ¨ã—ãªã„
 		aswprintf(&new_env, L"PATH=%s", add_path);
 	}
 	r = _wputenv(new_env);
@@ -186,18 +186,18 @@ static BOOL AddPath(const wchar_t *add_path)
 
 /**
  *	Connect to local cygwin
- *	cygterm‚ğÀs
+ *	cygtermã‚’å®Ÿè¡Œ
 
- *	@param[in]	dll_base			"cygwin1", "msys-2.0" ‚È‚ÇA"dll" ‚ğœ‚¢‚½ƒx[ƒX
- *	@param[in]	CygwinDirectory		Cygwin(msys2)‚ªƒCƒ“ƒXƒg[ƒ‹‚µ‚Ä‚ ‚éƒtƒHƒ‹ƒ_
- *									w’è‚È‚µ‚Ìê‡‚Í NULL ‚ğ“n‚·
- *									Œ©‚Â‚©‚ç‚È‚¯‚ê‚ÎƒfƒtƒHƒ‹ƒgƒtƒHƒ‹ƒ_‚È‚Ç‚ğ’T‚·
- *	@param[in]	cmdline				cygterm‚É“n‚·ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ˆø”
- *									NULL‚Ì‚Æ‚«ˆø”‚È‚µ
- *	@retval		NO_ERROR					Às‚Å‚«‚½
- *	@retval		ERROR_FILE_NOT_FOUND		cygwin‚ªŒ©‚Â‚©‚ç‚È‚¢(cygwin1.dll‚ªŒ©‚Â‚©‚ç‚È‚¢)
- *	@retval		ERROR_NOT_ENOUGH_MEMORY		ƒƒ‚ƒŠ•s‘«
- *	@retval		ERROR_OPEN_FAILED			Às‚Å‚«‚È‚¢
+ *	@param[in]	dll_base			"cygwin1", "msys-2.0" ãªã©ã€"dll" ã‚’é™¤ã„ãŸãƒ™ãƒ¼ã‚¹
+ *	@param[in]	CygwinDirectory		Cygwin(msys2)ãŒã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¦ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€
+ *									æŒ‡å®šãªã—ã®å ´åˆã¯ NULL ã‚’æ¸¡ã™
+ *									è¦‹ã¤ã‹ã‚‰ãªã‘ã‚Œã°ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ•ã‚©ãƒ«ãƒ€ãªã©ã‚’æ¢ã™
+ *	@param[in]	cmdline				cygtermã«æ¸¡ã™ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³å¼•æ•°
+ *									NULLã®ã¨ãå¼•æ•°ãªã—
+ *	@retval		NO_ERROR					å®Ÿè¡Œã§ããŸ
+ *	@retval		ERROR_FILE_NOT_FOUND		cygwinãŒè¦‹ã¤ã‹ã‚‰ãªã„(cygwin1.dllãŒè¦‹ã¤ã‹ã‚‰ãªã„)
+ *	@retval		ERROR_NOT_ENOUGH_MEMORY		ãƒ¡ãƒ¢ãƒªä¸è¶³
+ *	@retval		ERROR_OPEN_FAILED			å®Ÿè¡Œã§ããªã„
  */
 static DWORD Connect(const wchar_t *cygterm_exe, const wchar_t *dll_base, const wchar_t *CygwinDirectory, const wchar_t **search_paths, const wchar_t *cmdline)
 {
@@ -214,8 +214,8 @@ static DWORD Connect(const wchar_t *cygterm_exe, const wchar_t *dll_base, const 
 	}
 
 	if (!find_in_path) {
-		// ŠÂ‹«•Ï” PATH ‚É’Ç‰Á
-		// cygterm.exe ‚ğÀs‚·‚é‚Æ‚«‚É cygwin1.dll ‚ğƒ[ƒh‚Å‚«‚é‚æ‚¤‚É‚·‚é
+		// ç’°å¢ƒå¤‰æ•° PATH ã«è¿½åŠ 
+		// cygterm.exe ã‚’å®Ÿè¡Œã™ã‚‹ã¨ãã« cygwin1.dll ã‚’ãƒ­ãƒ¼ãƒ‰ã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹
 		BOOL r = AddPath(find_dir);
 		if (r == FALSE) {
 			free(find_dir);
@@ -242,16 +242,16 @@ static DWORD Connect(const wchar_t *cygterm_exe, const wchar_t *dll_base, const 
 
 /**
  *	Connect to local cygwin
- *	cygterm‚ğÀs
+ *	cygtermã‚’å®Ÿè¡Œ
  *
- *	@param[in]	CygwinDirectory		Cygwin‚ªƒCƒ“ƒXƒg[ƒ‹‚µ‚Ä‚ ‚éƒtƒHƒ‹ƒ_
- *									Œ©‚Â‚©‚ç‚È‚¯‚ê‚ÎƒfƒtƒHƒ‹ƒgƒtƒHƒ‹ƒ_‚È‚Ç‚ğ’T‚·
- *	@param[in]	cmdline				cygterm‚É“n‚·ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ˆø”
- *									NULL‚Ì‚Æ‚«ˆø”‚È‚µ
- *	@retval		NO_ERROR					Às‚Å‚«‚½
- *	@retval		ERROR_FILE_NOT_FOUND		cygwin‚ªŒ©‚Â‚©‚ç‚È‚¢(cygwin1.dll‚ªŒ©‚Â‚©‚ç‚È‚¢)
- *	@retval		ERROR_NOT_ENOUGH_MEMORY		ƒƒ‚ƒŠ•s‘«
- *	@retval		ERROR_OPEN_FAILED			Às‚Å‚«‚È‚¢
+ *	@param[in]	CygwinDirectory		CygwinãŒã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¦ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€
+ *									è¦‹ã¤ã‹ã‚‰ãªã‘ã‚Œã°ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ•ã‚©ãƒ«ãƒ€ãªã©ã‚’æ¢ã™
+ *	@param[in]	cmdline				cygtermã«æ¸¡ã™ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³å¼•æ•°
+ *									NULLã®ã¨ãå¼•æ•°ãªã—
+ *	@retval		NO_ERROR					å®Ÿè¡Œã§ããŸ
+ *	@retval		ERROR_FILE_NOT_FOUND		cygwinãŒè¦‹ã¤ã‹ã‚‰ãªã„(cygwin1.dllãŒè¦‹ã¤ã‹ã‚‰ãªã„)
+ *	@retval		ERROR_NOT_ENOUGH_MEMORY		ãƒ¡ãƒ¢ãƒªä¸è¶³
+ *	@retval		ERROR_OPEN_FAILED			å®Ÿè¡Œã§ããªã„
  */
 DWORD CygwinConnect(const wchar_t *CygwinDirectory, const wchar_t *cmdline)
 {

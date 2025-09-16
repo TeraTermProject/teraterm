@@ -56,7 +56,7 @@ typedef struct {
 	BOOL EnqFlag;
 	BYTE CheckSum;
 	TProtoLog *log;
-	const char *FullName;	// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
+	const char *FullName;	// Windowsä¸Šã®ãƒ•ã‚¡ã‚¤ãƒ«å UTF-8
 	WORD LogState;
 
 	BOOL FileOpen;
@@ -1329,9 +1329,9 @@ static BOOL QVParse(PFileVarProto fv, PComVar cv)
 	PQVVar qv = fv->data;
 	switch (qv->QVMode) {
 	case IdQVReceive:
-		return QVReadPacket(fv,qv,cv);	// ˆ—‚ªI‚í‚Á‚½‚ç FALSE ‚ğ•Ô‚·
+		return QVReadPacket(fv,qv,cv);	// å‡¦ç†ãŒçµ‚ã‚ã£ãŸã‚‰ FALSE ã‚’è¿”ã™
 	case IdQVSend:
-		return QVSendPacket(fv,qv,cv);	// ˆ—‚ªI‚í‚Á‚½‚ç FALSE ‚ğ•Ô‚·
+		return QVSendPacket(fv,qv,cv);	// å‡¦ç†ãŒçµ‚ã‚ã£ãŸã‚‰ FALSE ã‚’è¿”ã™
 	default:
 		return FALSE;
 	}

@@ -16,18 +16,18 @@ typedef unsigned char uint8_t;
 #include "getcontent.h"
 
 /**
- *	url‚©‚çî•ñ‚ğæ“¾‚·‚é
+ *	urlã‹ã‚‰æƒ…å ±ã‚’å–å¾—ã™ã‚‹
  *
  *	@param[in]	url
- *	@param[in]	agent	ƒG[ƒWƒFƒ“ƒg–¼
- *	@param[in]	ptr		æ“¾‚µ‚½î•ñ
- *						•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
- *	@param[in]	size	æ“¾‚µ‚½î•ñƒTƒCƒY
+ *	@param[in]	agent	ã‚¨ãƒ¼ã‚¸ã‚§ãƒ³ãƒˆå
+ *	@param[in]	ptr		å–å¾—ã—ãŸæƒ…å ±
+ *						ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
+ *	@param[in]	size	å–å¾—ã—ãŸæƒ…å ±ã‚µã‚¤ã‚º
  *
  */
 BOOL GetContent(const wchar_t *url, const wchar_t *agent, void **ptr, size_t *size)
 {
-	// URL‰ğÍ
+	// URLè§£æ
 	size_t url_length = wcslen(url);
 	if (url_length == 0) {
 		return false;
@@ -45,7 +45,7 @@ BOOL GetContent(const wchar_t *url, const wchar_t *agent, void **ptr, size_t *si
 	}
 	INTERNET_PORT nPort = urlcomponents.nPort;
 
-	// HTTP‚©HTTPS‚©‚»‚êˆÈŠO‚©
+	// HTTPã‹HTTPSã‹ãã‚Œä»¥å¤–ã‹
 	DWORD dwFlags = INTERNET_FLAG_RELOAD | INTERNET_FLAG_DONT_CACHE | INTERNET_FLAG_NO_AUTO_REDIRECT;
 	if (INTERNET_SCHEME_HTTP == urlcomponents.nScheme) {
 		// HTTP
@@ -73,14 +73,14 @@ BOOL GetContent(const wchar_t *url, const wchar_t *agent, void **ptr, size_t *si
 			goto finish;
 		}
 
-		// HTTPÚ‘±‚ğŠJ‚­
+		// HTTPæ¥ç¶šã‚’é–‹ã
 		hInternetRequest = HttpOpenRequestW(hInternetConnect, L"GET", szUrlPath, NULL, NULL, NULL, dwFlags, 0);
 		if (hInternetRequest == NULL) {
-			// netÚ‘±‚ª‚È‚¢?
+			// netæ¥ç¶šãŒãªã„?
 			goto finish;
 		}
 
-		// HTTP—v‹‘—M
+		// HTTPè¦æ±‚é€ä¿¡
 		if (HttpSendRequestW(hInternetRequest, NULL, 0, NULL, 0) == FALSE) {
 			goto finish;
 		}

@@ -31,15 +31,15 @@ extern "C" {
 #endif
 
 typedef enum {
-	DLL_GET_MODULE_HANDLE,		// GetModuleHandleW() API‚ðŽg—p‚·‚é
-	DLL_LOAD_LIBRARY_SYSTEM,	// system ƒfƒBƒŒƒNƒgƒŠ‚©‚ç LoadLiberaryW() API‚Åƒ[ƒh
-	DLL_LOAD_LIBRARY_CURRENT,	// exe,dll‚Æ“¯ˆêƒfƒBƒŒƒNƒgƒŠ‚©‚ç LoadLiberaryW() API‚Åƒ[ƒh
+	DLL_GET_MODULE_HANDLE,		// GetModuleHandleW() APIã‚’ä½¿ç”¨ã™ã‚‹
+	DLL_LOAD_LIBRARY_SYSTEM,	// system ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‹ã‚‰ LoadLiberaryW() APIã§ãƒ­ãƒ¼ãƒ‰
+	DLL_LOAD_LIBRARY_CURRENT,	// exe,dllã¨åŒä¸€ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‹ã‚‰ LoadLiberaryW() APIã§ãƒ­ãƒ¼ãƒ‰
 	DLL_LOAD_LIBRARY_SxS,		// Side by Side
 } DLLLoadFlag;
 
 typedef enum {
-	DLL_ACCEPT_NOT_EXIST,	//	Œ©‚Â‚©‚ç‚È‚­‚Ä‚àok
-	DLL_ERROR_NOT_EXIST,	//	Œ©‚Â‚©‚ç‚È‚¢ê‡ƒGƒ‰[
+	DLL_ACCEPT_NOT_EXIST,	//	è¦‹ã¤ã‹ã‚‰ãªãã¦ã‚‚ok
+	DLL_ERROR_NOT_EXIST,	//	è¦‹ã¤ã‹ã‚‰ãªã„å ´åˆã‚¨ãƒ©ãƒ¼
 } DLLFuncFlag;
 
 typedef struct {

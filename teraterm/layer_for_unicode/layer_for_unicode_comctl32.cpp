@@ -29,7 +29,7 @@
  /*
   * W to A Wrapper
   *
-  * API–¼‚ÍW”Å‚Ì“ª‚É '_' ‚ğ•t‚¯‚½‚à‚Ì‚ğg—p‚·‚é
+  * APIåã¯Wç‰ˆã®é ­ã« '_' ã‚’ä»˜ã‘ãŸã‚‚ã®ã‚’ä½¿ç”¨ã™ã‚‹
   */
 
 #include <windows.h>
@@ -60,9 +60,9 @@ HPROPSHEETPAGE WINAPI _CreatePropertySheetPageW(LPCPROPSHEETPAGEW_V1 psp)
 	return retval;
 }
 
-// ƒŠƒŠ[ƒX—pSDK‚Ìƒwƒbƒ_‚É
-//	PROPSHEETHEADERW_V1 ‚ª‚È‚¢‚½‚ß
-//	PROPSHEETHEADERW ‚ğg—p
+// ãƒªãƒªãƒ¼ã‚¹ç”¨SDKã®ãƒ˜ãƒƒãƒ€ã«
+//	PROPSHEETHEADERW_V1 ãŒãªã„ãŸã‚
+//	PROPSHEETHEADERW ã‚’ä½¿ç”¨
 //		SDK: Windows Server 2003 R2 Platform SDK
 //			 (Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
 //INT_PTR _PropertySheetW(PROPSHEETHEADERW_V1 *psh)
@@ -103,7 +103,7 @@ static char *ConvertFilter(const wchar_t *filterW)
 		lenW++;
 	}
 	lenW++;
-	size_t lenA = lenW * 2;		// x2‚ÌŒ©‚İ
+	size_t lenA = lenW * 2;		// x2ã®è¦‹è¾¼ã¿
 	char *filterA = (char *)malloc(lenA);
 	::WideCharToMultiByte(CP_ACP, 0, filterW, (int)lenW, filterA, (int)lenA, NULL, NULL);
 	return filterA;

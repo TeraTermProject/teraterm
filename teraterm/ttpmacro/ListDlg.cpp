@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 //
-// ListDlg.cpp : À‘•ƒtƒ@ƒCƒ‹
+// ListDlg.cpp : å®Ÿè£…ãƒ•ã‚¡ã‚¤ãƒ«
 //
 
 #include "tmfc.h"
@@ -42,7 +42,7 @@
 
 #include "ListDlg.h"
 
-// CListDlg ƒ_ƒCƒAƒƒO
+// CListDlg ãƒ€ã‚¤ã‚¢ãƒ­ã‚°
 
 CListDlg::CListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected, int x, int y, int ext, int width, int height)
 {
@@ -120,7 +120,7 @@ BOOL CListDlg::OnInitDialog()
 		ModifyStyle(0, WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
 	}
 
-	// –{•¶‚Æƒ^ƒCƒgƒ‹
+	// æœ¬æ–‡ã¨ã‚¿ã‚¤ãƒˆãƒ«
 	SetDlgItemTextW(IDC_LISTTEXT, m_Text);
 	SetWindowTextW(m_Caption);
 
@@ -140,7 +140,7 @@ BOOL CListDlg::OnInitDialog()
 	if (m_ext & ExtListBoxSize) {
 		SIZE tmp_s;
 		CalcTextExtentW(GetDlgItem(IDC_LISTBOX), NULL, L"A", &tmp_s);
-		LW = tmp_s.cy * m_width / 2; // ‰¡•‚Íc‚Ì”¼•ª‚Æ‚İ‚È‚·
+		LW = tmp_s.cy * m_width / 2; // æ¨ªå¹…ã¯ç¸¦ã®åŠåˆ†ã¨ã¿ãªã™
 		LH = tmp_s.cy * m_height;
 		::GetClientRect(m_hWnd, &R);
 		NonClientAreaWidth  = WW - (R.right - R.left);
@@ -203,20 +203,20 @@ void CListDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 	NonClientAreaWidth  = WW - CW;
 	NonClientAreaHeight = WH - CH;
 
-	// ‰‰ñ‚Ì‚İ
+	// åˆå›ã®ã¿
 	if (is_init) {
-		// ƒeƒLƒXƒgƒRƒ“ƒgƒ[ƒ‹ƒTƒCƒY‚ğ•â³
+		// ãƒ†ã‚­ã‚¹ãƒˆã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚µã‚¤ã‚ºã‚’è£œæ­£
 		if (TW < CW) {
 			TW = CW;
 			use_TW = FALSE;
 		} else {
 			use_TW = TRUE;
 		}
-		// ƒEƒCƒ“ƒhƒEƒTƒCƒY‚ÌŒvZ
+		// ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã®è¨ˆç®—
 		WW = TW + NonClientAreaWidth;
 		CW = WW - NonClientAreaWidth;
-		WH = TH + LH + (int)(BH*1.5) + NonClientAreaHeight;		// (ƒ{ƒ^ƒ“‚Ì‚‚³/2) ‚ªƒEƒBƒ“ƒhƒE’[‚ÆƒRƒ“ƒgƒ[ƒ‹ŠÔ‚Æ‚Ì‚‚³
-		// ƒŠƒXƒgƒ{ƒbƒNƒXƒTƒCƒY‚ÌŒvZ
+		WH = TH + LH + (int)(BH*1.5) + NonClientAreaHeight;		// (ãƒœã‚¿ãƒ³ã®é«˜ã•/2) ãŒã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç«¯ã¨ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«é–“ã¨ã®é«˜ã•
+		// ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã‚µã‚¤ã‚ºã®è¨ˆç®—
 		if (LW < CW - BW - CONTROL_GAP_W * 3) {
 			LW = CW - BW - CONTROL_GAP_W * 3;
 		}
@@ -264,13 +264,13 @@ LRESULT CListDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 					ShowWindow(SW_MINIMIZE);
 					return TRUE;
 				}
-				// ÀÛ‚ÌˆÊ’u‚ÆƒTƒCƒY‚ğ”½‰f
+				// å®Ÿéš›ã®ä½ç½®ã¨ã‚µã‚¤ã‚ºã‚’åæ˜ 
 				GetWindowRect(&R);
 				PosX = R.left;
 				PosY = R.top;
 				WW = R.right-R.left;
 				WH = R.bottom-R.top;
-				// LW‚ÆLH‚ğXV
+				// LWã¨LHã‚’æ›´æ–°
 				GetClientRect(&R);
 				CW = R.right-R.left;
 				CH = R.bottom-R.top;
@@ -322,7 +322,7 @@ LRESULT CListDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 			if (m_ext & ExtListBoxSize) {
 				SIZE tmp_s;
 				CalcTextExtentW(GetDlgItem(IDC_LISTBOX), NULL, L"A", &tmp_s);
-				init_LW = tmp_s.cy * m_width / 2; // ‰¡•‚Íc‚Ì”¼•ª‚Æ‚İ‚È‚·
+				init_LW = tmp_s.cy * m_width / 2; // æ¨ªå¹…ã¯ç¸¦ã®åŠåˆ†ã¨ã¿ãªã™
 				init_LH = tmp_s.cy * m_height;
 				init_WW = init_LW + NonClientAreaWidth  + BW + CONTROL_GAP_W * 4;
 				init_WH = init_LH + NonClientAreaHeight + TH + (int)(BH*1.5);
@@ -330,7 +330,7 @@ LRESULT CListDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 				init_LW = (int)(init_LW * mag);
 				init_LH = (int)(init_LH * mag);
 				if (use_TW) {
-					// dpi‚É‚æ‚éŠg‘å/k¬‚É‚Í•ÏŠ·Œë·‚ª‚ ‚é‚½‚ßACW < IDC_LISTTEXT ‚Ìê‡‚ÍAIDC_LISTTEXT‚ÌƒTƒCƒY‚ÅŒvZ‚·‚é
+					// dpiã«ã‚ˆã‚‹æ‹¡å¤§/ç¸®å°ã«ã¯å¤‰æ›èª¤å·®ãŒã‚ã‚‹ãŸã‚ã€CW < IDC_LISTTEXT ã®å ´åˆã¯ã€IDC_LISTTEXTã®ã‚µã‚¤ã‚ºã§è¨ˆç®—ã™ã‚‹
 					init_WW = TW + NonClientAreaWidth;
 				} else {
 					init_WW = init_LW + NonClientAreaWidth + BW + CONTROL_GAP_W * 3;

@@ -37,7 +37,7 @@ extern "C" {
 
   /* Kermit function id */
 typedef enum {
-	IdKmtQuit    = 0,	// “à•”‚Åg—pAˆ—‚ªŠ®—¹‚µ‚½ó‘Ô
+	IdKmtQuit    = 0,	// å†…éƒ¨ã§ä½¿ç”¨ã€å‡¦ç†ãŒå®Œäº†ã—ãŸçŠ¶æ…‹
 	IdKmtReceive = 1,
 	IdKmtGet     = 2,
 	IdKmtSend    = 3,

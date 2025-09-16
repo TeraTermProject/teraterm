@@ -53,7 +53,7 @@ static HMODULE GetHandle(const wchar_t *fname, DLLLoadFlag LoadFlag)
 	HMODULE module;
 	HandleList_t *p;
 
-	// ˆÈ‘O‚Éƒ[ƒh‚µ‚½?
+	// ä»¥å‰ã«ãƒ­ãƒ¼ãƒ‰ã—ãŸ?
 	if (LoadFlag != DLL_GET_MODULE_HANDLE) {
 		p = HandleList;
 		for (int i = 0; i < HandleListCount; i++) {
@@ -65,27 +65,27 @@ static HMODULE GetHandle(const wchar_t *fname, DLLLoadFlag LoadFlag)
 		}
 	}
 
-	// ƒ‚ƒWƒ…[ƒ‹‚ªƒ[ƒhÏ‚İ‚È‚çƒnƒ“ƒhƒ‹‚ªæ“¾‚Å‚«‚é
-	// exe‚ğƒ[ƒh‚µ‚½‚Æ‚«‚Édll‚ªƒ[ƒh‚³‚ê‚Ä‚¢‚ê‚ÎAƒnƒ“ƒhƒ‹‚ª•Ô‚Á‚Ä‚­‚é
+	// ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ãŒãƒ­ãƒ¼ãƒ‰æ¸ˆã¿ãªã‚‰ãƒãƒ³ãƒ‰ãƒ«ãŒå–å¾—ã§ãã‚‹
+	// exeã‚’ãƒ­ãƒ¼ãƒ‰ã—ãŸã¨ãã«dllãŒãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ã‚Œã°ã€ãƒãƒ³ãƒ‰ãƒ«ãŒè¿”ã£ã¦ãã‚‹
 	module = GetModuleHandleW(fname);
 	if (LoadFlag == DLL_GET_MODULE_HANDLE) {
-		// module == NULL ‚Å‚à return ‚·‚é
+		// module == NULL ã§ã‚‚ return ã™ã‚‹
 		return module;
 	}
 
 	BOOL NeedFreeLibrary = FALSE;
 	if (module == NULL) {
-		// V‚½‚Éƒ[ƒh‚·‚é
+		// æ–°ãŸã«ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
 		int r;
 		wchar_t dllPath[MAX_PATH];
 		dllPath[0] = 0;
 		switch (LoadFlag) {
 		case DLL_LOAD_LIBRARY_SxS:
 			if (IsWindowsXPOrLater()) {
-				// Side by Side ƒ[ƒfƒBƒ“ƒO‚ğ—˜—p‚·‚é‚½‚ßƒtƒ‹ƒpƒX‚É‚µ‚È‚¢
+				// Side by Side ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã‚’åˆ©ç”¨ã™ã‚‹ãŸã‚ãƒ•ãƒ«ãƒ‘ã‚¹ã«ã—ãªã„
 				;
 			} else {
-				// dllƒCƒ“ƒWƒFƒNƒVƒ‡ƒ“‘Îô‚Åƒtƒ‹ƒpƒX‚Åƒ[ƒh
+				// dllã‚¤ãƒ³ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³å¯¾ç­–ã§ãƒ•ãƒ«ãƒ‘ã‚¹ã§ãƒ­ãƒ¼ãƒ‰
 				r = GetSystemDirectoryW(dllPath, _countof(dllPath));
 				assert(r != 0);
 				if (r == 0) return NULL;
@@ -110,13 +110,13 @@ static HMODULE GetHandle(const wchar_t *fname, DLLLoadFlag LoadFlag)
 		wcscat_s(dllPath, _countof(dllPath), fname);
 		module = LoadLibraryW(dllPath);
 		if (module == NULL) {
-			// ‘¶İ‚µ‚È‚¢,dll‚¶‚á‚È‚¢?
+			// å­˜åœ¨ã—ãªã„,dllã˜ã‚ƒãªã„?
 			return NULL;
 		}
 		NeedFreeLibrary = TRUE;
 	}
 
-	// ƒŠƒXƒg‚É’Ç‰Á
+	// ãƒªã‚¹ãƒˆã«è¿½åŠ 
 	HandleList = (HandleList_t *)realloc(HandleList, sizeof(HandleList_t) * (HandleListCount + 1));
 	p = &HandleList[HandleListCount];
 	p->fname = _wcsdup(fname);
@@ -143,7 +143,7 @@ static void DLLFreeFromList(int no)
 		return;
 	}
 
-	// ŠJ•ú‚·‚é
+	// é–‹æ”¾ã™ã‚‹
 	DLLFree(p);
 	memcpy(p, p+1, sizeof(*p) * (HandleListCount - no - 1));
 	HandleListCount--;
@@ -151,59 +151,59 @@ static void DLLFreeFromList(int no)
 }
 
 /**
- *	dll‚ğƒAƒ“ƒ[ƒh‚·‚é
+ *	dllã‚’ã‚¢ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
  *
  *	@param[in]	handle
  */
 void DLLFreeByHandle(HANDLE handle)
 {
-	// ƒŠƒXƒg‚©‚ç’T‚·
+	// ãƒªã‚¹ãƒˆã‹ã‚‰æ¢ã™
 	HandleList_t *p = HandleList;
 	for (int i = 0; i < HandleListCount; i++) {
 		if (p->handle == handle) {
-			// Œ©‚Â‚©‚Á‚½Aíœ
+			// è¦‹ã¤ã‹ã£ãŸã€å‰Šé™¤
 			DLLFreeFromList(i);
 			return;
 		}
 		p++;
 	}
 
-	// ƒŠƒXƒg‚É‚È‚©‚Á‚½
+	// ãƒªã‚¹ãƒˆã«ãªã‹ã£ãŸ
 }
 
 /**
- *	dll‚ğƒAƒ“ƒ[ƒh‚·‚é
+ *	dllã‚’ã‚¢ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
  *
- *	@param[in]	fname	ƒtƒ@ƒCƒ‹–¼
+ *	@param[in]	fname	ãƒ•ã‚¡ã‚¤ãƒ«å
  */
 void DLLFreeByFileName(const wchar_t *fname)
 {
-	// ƒŠƒXƒg‚©‚ç’T‚·
+	// ãƒªã‚¹ãƒˆã‹ã‚‰æ¢ã™
 	HandleList_t *p = HandleList;
 	for (int i = 0; i < HandleListCount; i++) {
 		if (wcscmp(p->fname, fname) == 0) {
-			// Œ©‚Â‚©‚Á‚½Aíœ
+			// è¦‹ã¤ã‹ã£ãŸã€å‰Šé™¤
 			DLLFreeFromList(i);
 			return;
 		}
 		p++;
 	}
 
-	// ƒŠƒXƒg‚É‚È‚©‚Á‚½
+	// ãƒªã‚¹ãƒˆã«ãªã‹ã£ãŸ
 }
 
 /**
- * DLL“à‚ÌŠÖ”‚Ö‚ÌƒAƒhƒŒƒX‚ğæ“¾‚·‚é
- * @param[in]		fname		DLLƒtƒ@ƒCƒ‹–¼
- * @param[in] 		FuncFlag	ŠÖ”‚ªŒ©‚Â‚©‚ç‚È‚¢‚Æ‚«‚Ì“®ì
- *					DLL_ACCEPT_NOT_EXIST	Œ©‚Â‚©‚ç‚È‚­‚Ä‚àok
- *					DLL_ERROR_NOT_EXIST		Œ©‚Â‚©‚ç‚È‚¢ê‡ƒGƒ‰[
- * @param[in]		ApiName		API–¼
- * @param[in,out]	pFunc		ŠÖ”‚Ö‚ÌƒAƒhƒŒƒX
- *								Œ©‚Â‚©‚ç‚È‚¢‚ÍNULL‚ª‘ã“ü‚³‚ê‚é
- * @retval	NO_ERROR				ƒGƒ‰[‚È‚µ
- * @retval	ERROR_FILE_NOT_FOUND	DLL‚ªŒ©‚Â‚©‚ç‚È‚¢(•s³‚Èƒtƒ@ƒCƒ‹)
- * @retval	ERROR_PROC_NOT_FOUND	ŠÖ”ƒGƒ“ƒgƒŠ‚ªŒ©‚Â‚©‚ç‚È‚¢
+ * DLLå†…ã®é–¢æ•°ã¸ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã™ã‚‹
+ * @param[in]		fname		DLLãƒ•ã‚¡ã‚¤ãƒ«å
+ * @param[in] 		FuncFlag	é–¢æ•°ãŒè¦‹ã¤ã‹ã‚‰ãªã„ã¨ãã®å‹•ä½œ
+ *					DLL_ACCEPT_NOT_EXIST	è¦‹ã¤ã‹ã‚‰ãªãã¦ã‚‚ok
+ *					DLL_ERROR_NOT_EXIST		è¦‹ã¤ã‹ã‚‰ãªã„å ´åˆã‚¨ãƒ©ãƒ¼
+ * @param[in]		ApiName		APIå
+ * @param[in,out]	pFunc		é–¢æ•°ã¸ã®ã‚¢ãƒ‰ãƒ¬ã‚¹
+ *								è¦‹ã¤ã‹ã‚‰ãªã„æ™‚ã¯NULLãŒä»£å…¥ã•ã‚Œã‚‹
+ * @retval	NO_ERROR				ã‚¨ãƒ©ãƒ¼ãªã—
+ * @retval	ERROR_FILE_NOT_FOUND	DLLãŒè¦‹ã¤ã‹ã‚‰ãªã„(ä¸æ­£ãªãƒ•ã‚¡ã‚¤ãƒ«)
+ * @retval	ERROR_PROC_NOT_FOUND	é–¢æ•°ã‚¨ãƒ³ãƒˆãƒªãŒè¦‹ã¤ã‹ã‚‰ãªã„
  */
 DWORD DLLGetApiAddress(const wchar_t *fname, DLLLoadFlag LoadFlag,
 					   const char *ApiName, void **pFunc)
@@ -222,18 +222,18 @@ DWORD DLLGetApiAddress(const wchar_t *fname, DLLLoadFlag LoadFlag,
 }
 
 /**
- * DLL“à‚Ì•¡”‚ÌŠÖ”‚Ö‚ÌƒAƒhƒŒƒX‚ğæ“¾‚·‚é
- * @param[in] fname		dll‚Ìƒtƒ@ƒCƒ‹–¼
- * @param[in] LoadFlag	dll‚Ìƒ[ƒhæ
+ * DLLå†…ã®è¤‡æ•°ã®é–¢æ•°ã¸ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã™ã‚‹
+ * @param[in] fname		dllã®ãƒ•ã‚¡ã‚¤ãƒ«å
+ * @param[in] LoadFlag	dllã®ãƒ­ãƒ¼ãƒ‰å…ˆ
  *				DLL_GET_MODULE_HANDLE,
  *				DLL_LOAD_LIBRARY_SYSTEM,
  *				DLL_LOAD_LIBRARY_CURRENT,
- * @param[in] FuncFlag	ŠÖ”‚ªŒ©‚Â‚©‚ç‚È‚¢‚Æ‚«‚Ì“®ì
- * @param[out] handle	DLLƒnƒ“ƒhƒ‹
- *				NULL‚Ì‚Æ‚«‚Í’l‚ğ•Ô‚³‚È‚¢
- * @retval	NO_ERROR				ƒGƒ‰[‚È‚µ
- * @retval	ERROR_FILE_NOT_FOUND	DLL‚ªŒ©‚Â‚©‚ç‚È‚¢(•s³‚Èƒtƒ@ƒCƒ‹)
- * @retval	ERROR_PROC_NOT_FOUND	ŠÖ”ƒGƒ“ƒgƒŠ‚ªŒ©‚Â‚©‚ç‚È‚¢
+ * @param[in] FuncFlag	é–¢æ•°ãŒè¦‹ã¤ã‹ã‚‰ãªã„ã¨ãã®å‹•ä½œ
+ * @param[out] handle	DLLãƒãƒ³ãƒ‰ãƒ«
+ *				NULLã®ã¨ãã¯å€¤ã‚’è¿”ã•ãªã„
+ * @retval	NO_ERROR				ã‚¨ãƒ©ãƒ¼ãªã—
+ * @retval	ERROR_FILE_NOT_FOUND	DLLãŒè¦‹ã¤ã‹ã‚‰ãªã„(ä¸æ­£ãªãƒ•ã‚¡ã‚¤ãƒ«)
+ * @retval	ERROR_PROC_NOT_FOUND	é–¢æ•°ã‚¨ãƒ³ãƒˆãƒªãŒè¦‹ã¤ã‹ã‚‰ãªã„
  */
 DWORD DLLGetApiAddressFromList(const wchar_t *fname, DLLLoadFlag LoadFlag,
 							   DLLFuncFlag FuncFlag, const APIInfo *ApiInfo, HANDLE *handle)
@@ -253,7 +253,7 @@ DWORD DLLGetApiAddressFromList(const wchar_t *fname, DLLLoadFlag LoadFlag,
 		BOOL exist_all = TRUE;
 		const APIInfo *p = ApiInfo;
 
-		// ƒAƒhƒŒƒXæ“¾
+		// ã‚¢ãƒ‰ãƒ¬ã‚¹å–å¾—
 		while(p->ApiName != NULL) {
 			void **func = p->func;
 			*func = (void *)GetProcAddress(hDll, p->ApiName);
@@ -263,7 +263,7 @@ DWORD DLLGetApiAddressFromList(const wchar_t *fname, DLLLoadFlag LoadFlag,
 			p++;
 		}
 
-		// ‚·‚×‚ÄŒ©‚Â‚©‚Á‚½ or Œ©‚Â‚©‚ç‚È‚¢API‚ª‚ ‚Á‚Ä‚àok
+		// ã™ã¹ã¦è¦‹ã¤ã‹ã£ãŸ or è¦‹ã¤ã‹ã‚‰ãªã„APIãŒã‚ã£ã¦ã‚‚ok
 		if (exist_all || FuncFlag == DLL_ACCEPT_NOT_EXIST) {
 			if (handle != NULL) {
 				*handle = hDll;
@@ -271,7 +271,7 @@ DWORD DLLGetApiAddressFromList(const wchar_t *fname, DLLLoadFlag LoadFlag,
 			return NO_ERROR;
 		}
 
-		// Œ©‚Â‚©‚ç‚È‚¢API‚ª‚ ‚Á‚½‚Ì‚ÅƒGƒ‰[
+		// è¦‹ã¤ã‹ã‚‰ãªã„APIãŒã‚ã£ãŸã®ã§ã‚¨ãƒ©ãƒ¼
 		p = ApiInfo;
 		while(p->ApiName != NULL) {
 			void **func = p->func;
@@ -301,8 +301,8 @@ static void SetupLoadLibraryPath(void)
 {
 	const wchar_t *kernel32 = L"kernel32.dll";
 
-	// SetDefaultDllDirectories() ‚ªg‚¦‚éê‡‚ÍA
-	// ŒŸõƒpƒX‚ğ %WINDOWS%\system32 ‚Ì‚İ‚Éİ’è‚·‚é
+	// SetDefaultDllDirectories() ãŒä½¿ãˆã‚‹å ´åˆã¯ã€
+	// æ¤œç´¢ãƒ‘ã‚¹ã‚’ %WINDOWS%\system32 ã®ã¿ã«è¨­å®šã™ã‚‹
 	DLLGetApiAddress(kernel32, DLL_GET_MODULE_HANDLE,
 					 "SetDefaultDllDirectories", (void **)&pSetDefaultDllDirectories);
 	if (pSetDefaultDllDirectories != NULL) {
@@ -310,10 +310,10 @@ static void SetupLoadLibraryPath(void)
 		return;
 	}
 
-	// SetDefaultDllDirectories() ‚ªg‚¦‚È‚­‚Ä‚à
-	// SetDllDirectory() ‚ªg‚¦‚éê‡‚Í
-	// ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚¾‚¯‚Å‚àŒŸõƒpƒX‚©‚ç‚Í‚¸‚µ‚Ä‚¨‚­B
-	// ƒJƒŒƒ“ƒg‚ğŠO‚·(""‚ğƒZƒbƒg‚·‚é)‚¾‚¯‚È‚Ì‚ÅAANSI”Å‚Åok
+	// SetDefaultDllDirectories() ãŒä½¿ãˆãªãã¦ã‚‚
+	// SetDllDirectory() ãŒä½¿ãˆã‚‹å ´åˆã¯
+	// ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã ã‘ã§ã‚‚æ¤œç´¢ãƒ‘ã‚¹ã‹ã‚‰ã¯ãšã—ã¦ãŠãã€‚
+	// ã‚«ãƒ¬ãƒ³ãƒˆã‚’å¤–ã™(""ã‚’ã‚»ãƒƒãƒˆã™ã‚‹)ã ã‘ãªã®ã§ã€ANSIç‰ˆã§ok
 	DLLGetApiAddress(kernel32, DLL_GET_MODULE_HANDLE,
 					 "SetDllDirectoryA", (void **)&pSetDllDirectoryA);
 	if (pSetDllDirectoryA != NULL) {
@@ -324,7 +324,7 @@ static void SetupLoadLibraryPath(void)
 void DLLInit()
 {
 	if (HandleListCount != 0) {
-		return;		// ‰Šú‰»Ï‚İ
+		return;		// åˆæœŸåŒ–æ¸ˆã¿
 	}
 	HandleList = NULL;
 	HandleListCount = 0;
@@ -334,7 +334,7 @@ void DLLInit()
 void DLLExit()
 {
 	if (HandleListCount == 0) {
-		return;		// –¢g—p
+		return;		// æœªä½¿ç”¨
 	}
 	for (int i = 0; i < HandleListCount; i++) {
 		HandleList_t *p = &HandleList[i];

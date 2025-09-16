@@ -90,7 +90,7 @@
 //
 
 //
-// msg ‚ª NULL ‚Å‚Í–³‚¢–‚Ì•ÛØBNULL ‚Ìê‡‚Í "(null)" ‚ğ•Ô‚·B
+// msg ãŒ NULL ã§ã¯ç„¡ã„äº‹ã®ä¿è¨¼ã€‚NULL ã®å ´åˆã¯ "(null)" ã‚’è¿”ã™ã€‚
 //
 #define NonNull(msg) ((msg)?(msg):"(null)")
 
@@ -102,20 +102,20 @@ typedef enum {
 
 static struct global_confirm global_confirms;
 
-static Channel_t *channels = NULL;  // ƒ`ƒƒƒlƒ‹\‘¢‘Ì‚Ì”z—ñ
-static int channel_max_num = 0;     // channels‚Ì—v‘f”
-static int channel_used_num = 0;    // g—pƒ`ƒƒƒlƒ‹”
+static Channel_t *channels = NULL;  // ãƒãƒ£ãƒãƒ«æ§‹é€ ä½“ã®é…åˆ—
+static int channel_max_num = 0;     // channelsã®è¦ç´ æ•°
+static int channel_used_num = 0;    // ä½¿ç”¨ãƒãƒ£ãƒãƒ«æ•°
 
 static char ssh_ttymodes[] = "\x01\x03\x02\x1c\x03\x08\x04\x15\x05\x04";
 
-static CRITICAL_SECTION g_ssh_scp_lock;   /* SCPóM—pƒƒbƒN */
+static CRITICAL_SECTION g_ssh_scp_lock;   /* SCPå—ä¿¡ç”¨ãƒ­ãƒƒã‚¯ */
 
-static int g_scp_sending;  /* SCP‘—M’†‚©? */
+static int g_scp_sending;  /* SCPé€ä¿¡ä¸­ã‹? */
 
 static void try_send_credentials(PTInstVar pvar);
 static void prep_compression(PTInstVar pvar);
 
-// ŠÖ”ƒvƒƒgƒ^ƒCƒvéŒ¾
+// é–¢æ•°ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
 void SSH2_send_kexinit(PTInstVar pvar);
 static BOOL handle_SSH2_kexinit(PTInstVar pvar);
 static void SSH2_dh_kex_init(PTInstVar pvar);
@@ -159,7 +159,7 @@ static void do_SSH2_dispatch_setup_for_transfer(PTInstVar pvar);
 static void ssh2_prep_userauth(PTInstVar pvar);
 static void ssh2_send_newkeys(PTInstVar pvar);
 
-// ƒ}ƒNƒ
+// ãƒã‚¯ãƒ­
 #define remained_payload(pvar) ((pvar)->ssh_state.payload + payload_current_offset(pvar))
 #define remained_payloadlen(pvar) ((pvar)->ssh_state.payloadlen - (pvar)->ssh_state.payload_grabbed)
 #define payload_current_offset(pvar) ((pvar)->ssh_state.payload_grabbed - 1)
@@ -245,7 +245,7 @@ static Channel_t *ssh2_channel_new(PTInstVar pvar, unsigned int window, unsigned
 	c->remote_window = 0;
 	c->remote_maxpacket = 0;
 	c->type = type;
-	c->local_num = local_num;  // alloc_channel()‚Ì•Ô’l‚ğ•Û‘¶‚µ‚Ä‚¨‚­
+	c->local_num = local_num;  // alloc_channel()ã®è¿”å€¤ã‚’ä¿å­˜ã—ã¦ãŠã
 	c->bufchain = NULL;
 	c->bufchain_amount = 0;
 	c->bufchain_recv_suspended = FALSE;
@@ -267,8 +267,8 @@ static Channel_t *ssh2_channel_new(PTInstVar pvar, unsigned int window, unsigned
 	return (c);
 }
 
-// remote_window‚Ì‹ó‚«‚ª‚È‚¢ê‡‚ÉA‘—‚ê‚È‚©‚Á‚½ƒoƒbƒtƒ@‚ğƒŠƒXƒgi“ü—Í‡j‚Ö‚Â‚È‚¢‚Å‚¨‚­B
-// ‚±‚±‚ÅŠm•Û‚µ‚½ƒƒ‚ƒŠ‚Í ssh2_channel_retry_send_bufchain() ‚Å‰ğ•ú‚·‚éB
+// remote_windowã®ç©ºããŒãªã„å ´åˆã«ã€é€ã‚Œãªã‹ã£ãŸãƒãƒƒãƒ•ã‚¡ã‚’ãƒªã‚¹ãƒˆï¼ˆå…¥åŠ›é †ï¼‰ã¸ã¤ãªã„ã§ãŠãã€‚
+// ã“ã“ã§ç¢ºä¿ã—ãŸãƒ¡ãƒ¢ãƒªã¯ ssh2_channel_retry_send_bufchain() ã§è§£æ”¾ã™ã‚‹ã€‚
 static void ssh2_channel_add_bufchain(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen)
 {
 	bufchain_t *p, *old;
@@ -294,16 +294,16 @@ static void ssh2_channel_add_bufchain(PTInstVar pvar, Channel_t *c, unsigned cha
 		old->next = p;
 	}
 
-	// ƒoƒbƒtƒ@ƒTƒCƒY‚Ì‡Œv‚ğXV‚·‚é(‹L˜^—p)
+	// ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã®åˆè¨ˆã‚’æ›´æ–°ã™ã‚‹(è¨˜éŒ²ç”¨)
 	c->bufchain_amount += buflen;
 
-	// remote_window‚Ì‹ó‚«‚ª‚È‚¢‚Ì‚ÅAlocal connection‚©‚ç‚ÌƒpƒPƒbƒgóM‚Ì
-	// ’â~w¦‚ğo‚·B‚·‚®‚É’Ê’m‚ª~‚Ü‚é‚í‚¯‚Å‚Í‚È‚¢B
+	// remote_windowã®ç©ºããŒãªã„ã®ã§ã€local connectionã‹ã‚‰ã®ãƒ‘ã‚±ãƒƒãƒˆå—ä¿¡ã®
+	// åœæ­¢æŒ‡ç¤ºã‚’å‡ºã™ã€‚ã™ãã«é€šçŸ¥ãŒæ­¢ã¾ã‚‹ã‚ã‘ã§ã¯ãªã„ã€‚
 	FWD_suspend_resume_local_connection(pvar, c, FALSE);
 }
 
-// remote_window‚Ì‹ó‚«‚ª‚Å‚«‚½‚çAƒŠƒXƒg‚Éc‚Á‚Ä‚¢‚éƒf[ƒ^‚ğ‡”Ô‚É‘—‚éB
-// ‘—M‚ª‚Å‚«‚½‚çƒƒ‚ƒŠ‚ğ‰ğ•ú‚·‚éB
+// remote_windowã®ç©ºããŒã§ããŸã‚‰ã€ãƒªã‚¹ãƒˆã«æ®‹ã£ã¦ã„ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’é †ç•ªã«é€ã‚‹ã€‚
+// é€ä¿¡ãŒã§ããŸã‚‰ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã™ã‚‹ã€‚
 static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 {
 	bufchain_t *ch;
@@ -311,7 +311,7 @@ static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 	bufchain_t* ch_origin = c->bufchain;
 
 	while (c->bufchain) {
-		// æ“ª‚©‚çæ‚É‘—‚é
+		// å…ˆé ­ã‹ã‚‰å…ˆã«é€ã‚‹
 		ch = c->bufchain;
 		size = buffer_len(ch->msg);
 		if (size >= c->remote_window)
@@ -328,18 +328,18 @@ static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 		buffer_free(ch->msg);
 		free(ch);
 
-		// ƒoƒbƒtƒ@ƒTƒCƒY‚Ì‡Œv‚ğXV‚·‚é(‹L˜^—p)
+		// ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã®åˆè¨ˆã‚’æ›´æ–°ã™ã‚‹(è¨˜éŒ²ç”¨)
 		c->bufchain_amount -= size;
 	}
 
-	// Œ³X‚ ‚Á‚½ƒŠƒXƒg‚ª‹ó‚É‚È‚Á‚½‚çA
-	// local connection‚©‚ç‚ÌƒpƒPƒbƒg’Ê’m‚ğÄŠJ‚·‚éB
+	// å…ƒã€…ã‚ã£ãŸãƒªã‚¹ãƒˆãŒç©ºã«ãªã£ãŸã‚‰ã€
+	// local connectionã‹ã‚‰ã®ãƒ‘ã‚±ãƒƒãƒˆé€šçŸ¥ã‚’å†é–‹ã™ã‚‹ã€‚
 	if (ch_origin && c->bufchain == NULL) {
 		FWD_suspend_resume_local_connection(pvar, c, TRUE);
 	}
 }
 
-// channel close‚Éƒ`ƒƒƒlƒ‹\‘¢‘Ì‚ğƒŠƒXƒg‚Ö•Ô‹p‚·‚é
+// channel closeæ™‚ã«ãƒãƒ£ãƒãƒ«æ§‹é€ ä½“ã‚’ãƒªã‚¹ãƒˆã¸è¿”å´ã™ã‚‹
 // (2007.4.26 yutaka)
 static void ssh2_channel_delete(Channel_t *c)
 {
@@ -356,7 +356,7 @@ static void ssh2_channel_delete(Channel_t *c)
 	}
 
 	if (c->type == TYPE_SCP) {
-		// SCPˆ—‚ÌÅŒã‚Ìó‘Ô‚ğ•Û‘¶‚·‚éB
+		// SCPå‡¦ç†ã®æœ€å¾Œã®çŠ¶æ…‹ã‚’ä¿å­˜ã™ã‚‹ã€‚
 		prev_state = c->scp.state;
 
 		c->scp.state = SCP_CLOSING;
@@ -370,7 +370,7 @@ static void ssh2_channel_delete(Channel_t *c)
 					_utime(c->scp.localfilefull, &filetime);
 				}
 
-				// SCPóM‚ª¬Œ÷‚µ‚Ä‚¢‚È‚¯‚ê‚ÎAƒ[ƒJƒ‹‚Éì‚Á‚½ƒtƒ@ƒCƒ‹‚ÌcŠ[‚ğíœ‚·‚éB
+				// SCPå—ä¿¡ãŒæˆåŠŸã—ã¦ã„ãªã‘ã‚Œã°ã€ãƒ­ãƒ¼ã‚«ãƒ«ã«ä½œã£ãŸãƒ•ã‚¡ã‚¤ãƒ«ã®æ®‹éª¸ã‚’å‰Šé™¤ã™ã‚‹ã€‚
 				// (2017.2.12 yutaka)
 				if (prev_state != SCP_CLOSING)
 					remove(c->scp.localfilefull);
@@ -386,8 +386,8 @@ static void ssh2_channel_delete(Channel_t *c)
 			c->scp.thread = INVALID_HANDLE_VALUE;
 		}
 
-		// SCPóM‚Ìê‡‚Ì‚İASCP—pƒŠƒXƒg‚ÌŠJ•ú‚ğs‚¤B
-		// Windows9x‚Å—‚¿‚é–â‘è‚ğC³‚µ‚½B
+		// SCPå—ä¿¡ã®å ´åˆã®ã¿ã€SCPç”¨ãƒªã‚¹ãƒˆã®é–‹æ”¾ã‚’è¡Œã†ã€‚
+		// Windows9xã§è½ã¡ã‚‹å•é¡Œã‚’ä¿®æ­£ã—ãŸã€‚
 		if (c->scp.dir == FROMREMOTE) {
 			PTInstVar pvar = c->scp.pvar;
 			ssh2_scp_free_packetlist(pvar, c);
@@ -404,7 +404,7 @@ static void ssh2_channel_delete(Channel_t *c)
 	channel_used_num--;
 }
 
-// connection close‚ÉŒÄ‚Î‚ê‚é
+// connection closeæ™‚ã«å‘¼ã°ã‚Œã‚‹
 void ssh2_channel_free(void)
 {
 	int i;
@@ -432,8 +432,8 @@ static Channel_t *ssh2_channel_lookup(int id)
 	return (c);
 }
 
-// SSH1‚ÅŠÇ—‚µ‚Ä‚¢‚échannel\‘¢‘Ì‚©‚çASSH2Œü‚¯‚ÌChannel_t‚Ö•ÏŠ·‚·‚éB
-// TODO: «—ˆ“I‚É‚Íƒ`ƒƒƒlƒ‹\‘¢‘Ì‚Í1‚Â‚É“‡‚·‚éB
+// SSH1ã§ç®¡ç†ã—ã¦ã„ã‚‹channelæ§‹é€ ä½“ã‹ã‚‰ã€SSH2å‘ã‘ã®Channel_tã¸å¤‰æ›ã™ã‚‹ã€‚
+// TODO: å°†æ¥çš„ã«ã¯ãƒãƒ£ãƒãƒ«æ§‹é€ ä½“ã¯1ã¤ã«çµ±åˆã™ã‚‹ã€‚
 // (2005.6.12 yutaka)
 Channel_t *ssh2_local_channel_lookup(int local_num)
 {
@@ -453,11 +453,11 @@ Channel_t *ssh2_local_channel_lookup(int local_num)
 //
 // SSH heartbeat mutex
 //
-// TTSSH‚Í thread-safe ‚Å‚Í‚È‚¢‚½‚ßAƒ}ƒ‹ƒ`ƒXƒŒƒbƒh‚©‚ç‚ÌƒpƒPƒbƒg‘—M‚Í‚Å‚«‚È‚¢B
-// ƒVƒ“ƒOƒ‹ƒXƒŒƒbƒh‚Å‚ÍƒRƒ“ƒeƒLƒXƒgƒXƒCƒbƒ`‚ª”­¶‚·‚é‚±‚Æ‚Í‚È‚¢‚½‚ßA
-// ƒƒbƒN‚ğæ‚é•K—v‚à‚È‚¢‚½‚ßAíœ‚·‚éB(2007.12.26 yutaka)
+// TTSSHã¯ thread-safe ã§ã¯ãªã„ãŸã‚ã€ãƒãƒ«ãƒã‚¹ãƒ¬ãƒƒãƒ‰ã‹ã‚‰ã®ãƒ‘ã‚±ãƒƒãƒˆé€ä¿¡ã¯ã§ããªã„ã€‚
+// ã‚·ãƒ³ã‚°ãƒ«ã‚¹ãƒ¬ãƒƒãƒ‰ã§ã¯ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚¹ã‚¤ãƒƒãƒãŒç™ºç”Ÿã™ã‚‹ã“ã¨ã¯ãªã„ãŸã‚ã€
+// ãƒ­ãƒƒã‚¯ã‚’å–ã‚‹å¿…è¦ã‚‚ãªã„ãŸã‚ã€å‰Šé™¤ã™ã‚‹ã€‚(2007.12.26 yutaka)
 //
-static CRITICAL_SECTION g_ssh_heartbeat_lock;   /* ‘—óM—pƒƒbƒN */
+static CRITICAL_SECTION g_ssh_heartbeat_lock;   /* é€å—ä¿¡ç”¨ãƒ­ãƒƒã‚¯ */
 
 void ssh_heartbeat_lock_initialize(void)
 {
@@ -501,15 +501,15 @@ static memtag_t memtags[MEMTAG_MAX];
 static int memtag_count = 0;
 static int memtag_use = 0;
 
-/* ƒ_ƒ“ƒvƒ‰ƒCƒ“‚ğƒtƒH[ƒ}ƒbƒg•\¦‚·‚é */
+/* ãƒ€ãƒ³ãƒ—ãƒ©ã‚¤ãƒ³ã‚’ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆè¡¨ç¤ºã™ã‚‹ */
 static void displine_memdump(FILE *fp, int addr, int *bytes, int byte_cnt)
 {
 	int i, c;
 
-	/* æ“ª‚ÌƒAƒhƒŒƒX•\¦ */
+	/* å…ˆé ­ã®ã‚¢ãƒ‰ãƒ¬ã‚¹è¡¨ç¤º */
 	fprintf(fp, "%08X : ", addr);
 
-	/* ƒoƒCƒiƒŠ•\¦i4ƒoƒCƒg‚²‚Æ‚É‹ó”’‚ğ‘}“üj*/
+	/* ãƒã‚¤ãƒŠãƒªè¡¨ç¤ºï¼ˆ4ãƒã‚¤ãƒˆã”ã¨ã«ç©ºç™½ã‚’æŒ¿å…¥ï¼‰*/
 	for (i = 0 ; i < byte_cnt ; i++) {
 		if (i > 0 && i % 4 == 0)
 			fprintf(fp, " ");
@@ -517,10 +517,10 @@ static void displine_memdump(FILE *fp, int addr, int *bytes, int byte_cnt)
 		fprintf(fp, "%02X", bytes[i]);
 	}
 
-	/* ASCII•\¦•”•ª‚Ü‚Å‚Ì‹ó”’‚ğ•â‚¤ */
+	/* ASCIIè¡¨ç¤ºéƒ¨åˆ†ã¾ã§ã®ç©ºç™½ã‚’è£œã† */
 	fprintf(fp, "   %*s%*s", (16-byte_cnt)*2+1, " ", (16-byte_cnt+3)/4, " ");
 
-	/* ASCII•\¦ */
+	/* ASCIIè¡¨ç¤º */
 	for (i = 0 ; i < byte_cnt ; i++) {
 		c = bytes[i];
 		if (isprint(c)) {
@@ -534,7 +534,7 @@ static void displine_memdump(FILE *fp, int addr, int *bytes, int byte_cnt)
 }
 
 
-/* ƒ_ƒ“ƒvƒ‹[ƒ`ƒ“ */
+/* ãƒ€ãƒ³ãƒ—ãƒ«ãƒ¼ãƒãƒ³ */
 static void dump_memdump(FILE *fp, char *data, int len)
 {
 	int c, addr;
@@ -584,7 +584,7 @@ void finish_memdump(void)
 {
 	int i;
 
-	// initialize‚³‚ê‚Ä‚È‚¢‚Æ‚«‚Í‰½‚à‚¹‚¸‚É–ß‚éB(2005.4.3 yutaka)
+	// initializeã•ã‚Œã¦ãªã„ã¨ãã¯ä½•ã‚‚ã›ãšã«æˆ»ã‚‹ã€‚(2005.4.3 yutaka)
 	if (memtag_use <= 0)
 		return;
 	memtag_use--;
@@ -1000,18 +1000,18 @@ static int prep_packet_ssh1(PTInstVar pvar, char *data, unsigned int len, unsign
 }
 
 /*
- * ƒpƒPƒbƒgˆ—‚Ìˆ×‚ÌˆÈ‰º‚Ì€”õ‚ğs‚¤B(SSHv2—p)
- * Eƒf[ƒ^•œ†
- * EMAC ‚ÌŒŸØ
- * Epadding ‚ğæ‚èœ‚­
- * EƒƒbƒZ[ƒWƒ^ƒCƒv‚ğ”»•Ê‚µ‚Ä•Ô‚·
+ * ãƒ‘ã‚±ãƒƒãƒˆå‡¦ç†ã®ç‚ºã®ä»¥ä¸‹ã®æº–å‚™ã‚’è¡Œã†ã€‚(SSHv2ç”¨)
+ * ãƒ»ãƒ‡ãƒ¼ã‚¿å¾©å·
+ * ãƒ»MAC ã®æ¤œè¨¼
+ * ãƒ»padding ã‚’å–ã‚Šé™¤ã
+ * ãƒ»ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—ã‚’åˆ¤åˆ¥ã—ã¦è¿”ã™
  *
- * ˆø”:
- *   data - ssh ƒpƒPƒbƒg‚Ìæ“ª‚ğw‚·ƒ|ƒCƒ“ƒ^
- *   len - ƒpƒPƒbƒg’· (æ“ª‚ÌƒpƒPƒbƒg’·—Ìˆæ(4ƒoƒCƒg)‚ğœ‚¢‚½’l)
- *   aadlen - ˆÃ†‰»‚³‚ê‚Ä‚¢‚È‚¢‚ª”FØ‚Ì‘ÎÛ‚Æ‚È‚Á‚Ä‚¢‚éƒf[ƒ^‚Ì’·‚³
- *            chacha20-poly1305 ‚Å‚ÍˆÃ†‰»‚³‚ê‚éƒpƒPƒbƒg’·•”•ª‚Ì’·‚³
- *   authlen - ”FØƒf[ƒ^(AEAD tag)’·
+ * å¼•æ•°:
+ *   data - ssh ãƒ‘ã‚±ãƒƒãƒˆã®å…ˆé ­ã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿
+ *   len - ãƒ‘ã‚±ãƒƒãƒˆé•· (å…ˆé ­ã®ãƒ‘ã‚±ãƒƒãƒˆé•·é ˜åŸŸ(4ãƒã‚¤ãƒˆ)ã‚’é™¤ã„ãŸå€¤)
+ *   aadlen - æš—å·åŒ–ã•ã‚Œã¦ã„ãªã„ãŒèªè¨¼ã®å¯¾è±¡ã¨ãªã£ã¦ã„ã‚‹ãƒ‡ãƒ¼ã‚¿ã®é•·ã•
+ *            chacha20-poly1305 ã§ã¯æš—å·åŒ–ã•ã‚Œã‚‹ãƒ‘ã‚±ãƒƒãƒˆé•·éƒ¨åˆ†ã®é•·ã•
+ *   authlen - èªè¨¼ãƒ‡ãƒ¼ã‚¿(AEAD tag)é•·
  */
 
 static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsigned int aadlen, unsigned int authlen)
@@ -1026,25 +1026,25 @@ static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsign
 		}
 	}
 	else if (aadlen > 0) {
-		// EtM ‚Ìê‡‚Íæ‚É MAC ‚ÌŒŸØ‚ğs‚¤
+		// EtM ã®å ´åˆã¯å…ˆã« MAC ã®æ¤œè¨¼ã‚’è¡Œã†
 		if (!CRYPT_verify_receiver_MAC(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4, data + len + 4)) {
 			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar, "Detected corrupted data; connection terminating.");
 			notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 			return SSH_MSG_NONE;
 		}
 
-		// ƒpƒPƒbƒg’·•”•ª(æ“ª4ƒoƒCƒg)‚ÍˆÃ†‰»‚³‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅA‚»‚±‚ğƒXƒLƒbƒv‚µ‚Ä•œ†‚·‚éB
+		// ãƒ‘ã‚±ãƒƒãƒˆé•·éƒ¨åˆ†(å…ˆé ­4ãƒã‚¤ãƒˆ)ã¯æš—å·åŒ–ã•ã‚Œã¦ã„ãªã„ã®ã§ã€ãã“ã‚’ã‚¹ã‚­ãƒƒãƒ—ã—ã¦å¾©å·ã™ã‚‹ã€‚
 		CRYPT_decrypt(pvar, data + 4, len);
 	}
 	else {
-		// E&M ‚Å‚Íæ“ª•”•ª‚ª–‘O•œ†‚³‚ê‚Ä‚¢‚éB
-		// –‘O•œ†‚³‚ê‚½’·‚³‚ğæ“¾‚·‚éB
+		// E&M ã§ã¯å…ˆé ­éƒ¨åˆ†ãŒäº‹å‰å¾©å·ã•ã‚Œã¦ã„ã‚‹ã€‚
+		// äº‹å‰å¾©å·ã•ã‚ŒãŸé•·ã•ã‚’å–å¾—ã™ã‚‹ã€‚
 		unsigned int already_decrypted = get_predecryption_amount(pvar);
 
-		// –‘O•œ†‚³‚ê‚½•”•ª‚ğƒXƒLƒbƒv‚µ‚ÄAc‚è‚Ì•”•ª‚ğ•œ†‚·‚éB
+		// äº‹å‰å¾©å·ã•ã‚ŒãŸéƒ¨åˆ†ã‚’ã‚¹ã‚­ãƒƒãƒ—ã—ã¦ã€æ®‹ã‚Šã®éƒ¨åˆ†ã‚’å¾©å·ã™ã‚‹ã€‚
 		CRYPT_decrypt(pvar, data + already_decrypted, (4 + len) - already_decrypted);
 
-		// E&M ‚Å‚Í•œ†Œã‚É MAC ‚ÌŒŸØ‚ğs‚¤B
+		// E&M ã§ã¯å¾©å·å¾Œã« MAC ã®æ¤œè¨¼ã‚’è¡Œã†ã€‚
 		if (!CRYPT_verify_receiver_MAC(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4, data + len + 4)) {
 			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar, "Detected corrupted data; connection terminating.");
 			notify_fatal_error(pvar, pvar->UIMsg, TRUE);
@@ -1052,13 +1052,13 @@ static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsign
 		}
 	}
 
-	// ƒpƒfƒBƒ“ƒO’·‚Ìæ“¾
+	// ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°é•·ã®å–å¾—
 	padding = (unsigned int) data[4];
 
-	// ƒpƒPƒbƒg’·(4ƒoƒCƒg) •”•ª‚ÆƒpƒfƒBƒ“ƒO’·(1ƒoƒCƒg)•”•ª‚ğƒXƒLƒbƒv‚µ‚½ SSH ƒyƒCƒ[ƒh‚Ìæ“ª
+	// ãƒ‘ã‚±ãƒƒãƒˆé•·(4ãƒã‚¤ãƒˆ) éƒ¨åˆ†ã¨ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°é•·(1ãƒã‚¤ãƒˆ)éƒ¨åˆ†ã‚’ã‚¹ã‚­ãƒƒãƒ—ã—ãŸ SSH ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®å…ˆé ­
 	pvar->ssh_state.payload = data + 4 + 1;
 
-	// ƒpƒfƒBƒ“ƒO’·•”•ª(1ƒoƒCƒg)‚ÆƒpƒfƒBƒ“ƒO‚ğœ‚¢‚½ÀÛ‚ÌƒyƒCƒ[ƒh’·
+	// ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°é•·éƒ¨åˆ†(1ãƒã‚¤ãƒˆ)ã¨ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚’é™¤ã„ãŸå®Ÿéš›ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰é•·
 	pvar->ssh_state.payloadlen = len - 1 - padding;
 
 	pvar->ssh_state.payload_grabbed = 0;
@@ -1073,16 +1073,16 @@ static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsign
 			if (pvar->decomp_buffer == NULL)
 				return SSH_MSG_NONE;
 		}
-		// ˆê“xŠm•Û‚µ‚½ƒoƒbƒtƒ@‚Íg‚¢‰ñ‚·‚Ì‚Å‰Šú‰»‚ğ–Y‚ê‚¸‚ÉB
+		// ä¸€åº¦ç¢ºä¿ã—ãŸãƒãƒƒãƒ•ã‚¡ã¯ä½¿ã„å›ã™ã®ã§åˆæœŸåŒ–ã‚’å¿˜ã‚Œãšã«ã€‚
 		buffer_clear(pvar->decomp_buffer);
 
-		// packet size‚Æpadding‚ğæ‚èœ‚¢‚½ƒyƒCƒ[ƒh•”•ª‚Ì‚İ‚ğ“WŠJ‚·‚éB
+		// packet sizeã¨paddingã‚’å–ã‚Šé™¤ã„ãŸãƒšã‚¤ãƒ­ãƒ¼ãƒ‰éƒ¨åˆ†ã®ã¿ã‚’å±•é–‹ã™ã‚‹ã€‚
 		buffer_decompress(&pvar->ssh_state.decompress_stream,
 		                  pvar->ssh_state.payload,
 		                  pvar->ssh_state.payloadlen,
 		                  pvar->decomp_buffer);
 
-		// ƒ|ƒCƒ“ƒ^‚ÌXVB
+		// ãƒã‚¤ãƒ³ã‚¿ã®æ›´æ–°ã€‚
 		pvar->ssh_state.payload = buffer_ptr(pvar->decomp_buffer);
 		pvar->ssh_state.payload++;
 		pvar->ssh_state.payloadlen = buffer_len(pvar->decomp_buffer);
@@ -1132,11 +1132,11 @@ unsigned char *begin_send_packet(PTInstVar pvar, int type, int len)
 }
 
 
-// ‘—MƒŠƒgƒ‰ƒCŠÖ”‚Ì’Ç‰Á
+// é€ä¿¡ãƒªãƒˆãƒ©ã‚¤é–¢æ•°ã®è¿½åŠ 
 //
-// WinSock‚Ì send() ‚Íƒoƒbƒtƒ@ƒTƒCƒY(len)‚æ‚è‚à­‚È‚¢’l‚ğ³í‚É•Ô‚µ‚Ä‚­‚é
-// ‚±‚Æ‚ª‚ ‚é‚Ì‚ÅA‚»‚Ìê‡‚ÍƒGƒ‰[‚Æ‚µ‚È‚¢B
-// ‚±‚ê‚É‚æ‚èATCPƒRƒlƒNƒVƒ‡ƒ“Ø’f‚ÌŒëŒŸo‚ğ–h‚®B
+// WinSockã® send() ã¯ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º(len)ã‚ˆã‚Šã‚‚å°‘ãªã„å€¤ã‚’æ­£å¸¸æ™‚ã«è¿”ã—ã¦ãã‚‹
+// ã“ã¨ãŒã‚ã‚‹ã®ã§ã€ãã®å ´åˆã¯ã‚¨ãƒ©ãƒ¼ã¨ã—ãªã„ã€‚
+// ã“ã‚Œã«ã‚ˆã‚Šã€TCPã‚³ãƒã‚¯ã‚·ãƒ§ãƒ³åˆ‡æ–­ã®èª¤æ¤œå‡ºã‚’é˜²ãã€‚
 // (2006.12.9 yutaka)
 static int retry_send_packet(PTInstVar pvar, char *data, int len)
 {
@@ -1149,9 +1149,9 @@ static int retry_send_packet(PTInstVar pvar, char *data, int len)
 		if (n < 0) {
 			err = WSAGetLastError();
 			if (err < WSABASEERR || err == WSAEWOULDBLOCK) {
-				// send()‚Ì•Ô’l‚ª0–¢–‚ÅA‚©‚ÂƒGƒ‰[”Ô†‚ª 10000 –¢–‚Ìê‡‚ÍA
-				// ¬Œ÷‚µ‚½‚à‚Ì‚ÆŒ©‚È‚·B
-				// PuTTY 0.58‚ÌÀ‘•‚ğQlB
+				// send()ã®è¿”å€¤ãŒ0æœªæº€ã§ã€ã‹ã¤ã‚¨ãƒ©ãƒ¼ç•ªå·ãŒ 10000 æœªæº€ã®å ´åˆã¯ã€
+				// æˆåŠŸã—ãŸã‚‚ã®ã¨è¦‹ãªã™ã€‚
+				// PuTTY 0.58ã®å®Ÿè£…ã‚’å‚è€ƒã€‚
 				// (2007.2.4 yutak)
 				return 0; // success
 			}
@@ -1167,9 +1167,9 @@ static int retry_send_packet(PTInstVar pvar, char *data, int len)
 
 static BOOL send_packet_blocking(PTInstVar pvar, char *data, int len)
 {
-	// ƒpƒPƒbƒg‘—MŒã‚Éƒoƒbƒtƒ@‚ğg‚¢‚Ü‚í‚·‚½‚ßAƒuƒƒbƒLƒ“ƒO‚Å‘—M‚µ‚Ä‚µ‚Ü‚¤•K—v‚ª‚ ‚éB
-	// ƒmƒ“ƒuƒƒbƒLƒ“ƒO‚Å‘—M‚µ‚ÄWSAEWOULDBLOCK‚ª•Ô‚Á‚Ä‚«‚½ê‡A‚»‚Ìƒoƒbƒtƒ@‚Í‘—MŠ®—¹‚·‚é
-	// ‚Ü‚Å•Û‚µ‚Ä‚¨‚©‚È‚­‚Ä‚Í‚È‚ç‚È‚¢B(2007.10.30 yutaka)
+	// ãƒ‘ã‚±ãƒƒãƒˆé€ä¿¡å¾Œã«ãƒãƒƒãƒ•ã‚¡ã‚’ä½¿ã„ã¾ã‚ã™ãŸã‚ã€ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ã§é€ä¿¡ã—ã¦ã—ã¾ã†å¿…è¦ãŒã‚ã‚‹ã€‚
+	// ãƒãƒ³ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ã§é€ä¿¡ã—ã¦WSAEWOULDBLOCKãŒè¿”ã£ã¦ããŸå ´åˆã€ãã®ãƒãƒƒãƒ•ã‚¡ã¯é€ä¿¡å®Œäº†ã™ã‚‹
+	// ã¾ã§ä¿æŒã—ã¦ãŠã‹ãªãã¦ã¯ãªã‚‰ãªã„ã€‚(2007.10.30 yutaka)
 	u_long do_block = 0;
 	int code = 0;
 	char *kind = NULL, buf[256];
@@ -1264,7 +1264,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		unsigned int aadlen = 0, maclen = 0, authlen = 0;
 
 		/*
-		 ƒf[ƒ^\‘¢
+		 ãƒ‡ãƒ¼ã‚¿æ§‹é€ 
 		 pvar->ssh_state.outbuf:
 		 offset: 0 1 2 3 4 5 6 7 8 9 10 11 12 ...         EOD
 		         <--ignore---> ^^^^^^^^    <---- payload --->
@@ -1279,12 +1279,12 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		   payload = type(1) + raw-data
 		   len = ssh_state.outgoing_packet_len = payload size
 		 */
-		// ƒpƒPƒbƒgˆ³k‚ª—LŒø‚Ìê‡AƒpƒPƒbƒg‚ğˆ³k‚µ‚Ä‚©‚ç‘—MƒpƒPƒbƒg‚ğ\’z‚·‚éB(2005.7.9 yutaka)
+		// ãƒ‘ã‚±ãƒƒãƒˆåœ§ç¸®ãŒæœ‰åŠ¹ã®å ´åˆã€ãƒ‘ã‚±ãƒƒãƒˆã‚’åœ§ç¸®ã—ã¦ã‹ã‚‰é€ä¿¡ãƒ‘ã‚±ãƒƒãƒˆã‚’æ§‹ç¯‰ã™ã‚‹ã€‚(2005.7.9 yutaka)
 		// support of "Compression delayed" (2006.6.23 maya)
 		if ((pvar->ctos_compression == COMP_ZLIB ||
 		     pvar->ctos_compression == COMP_DELAYED && pvar->userauth_success) &&
 		    pvar->ssh2_keys[MODE_OUT].comp.enabled) {
-			// ‚±‚Ìƒoƒbƒtƒ@‚Í packet-length(4) + padding(1) + payload(any) ‚ğ¦‚·B
+			// ã“ã®ãƒãƒƒãƒ•ã‚¡ã¯ packet-length(4) + padding(1) + payload(any) ã‚’ç¤ºã™ã€‚
 			msg = buffer_init();
 			if (msg == NULL) {
 				// TODO: error check
@@ -1292,7 +1292,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 				return;
 			}
 
-			// ˆ³k‘ÎÛ‚Íƒwƒbƒ_‚ğœ‚­ƒyƒCƒ[ƒh‚Ì‚İB
+			// åœ§ç¸®å¯¾è±¡ã¯ãƒ˜ãƒƒãƒ€ã‚’é™¤ããƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®ã¿ã€‚
 			buffer_append(msg, "\0\0\0\0\0", 5);  // 5 = packet-length(4) + padding(1)
 			if (buffer_compress(&pvar->ssh_state.compress_stream, pvar->ssh_state.outbuf + 12, len, msg) == -1) {
 				UTIL_get_lang_msg("MSG_SSH_COMP_ERROR", pvar,
@@ -1305,11 +1305,11 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 			len = buffer_len(msg) - 5;  // 'len' is overwritten.
 
 		} else {
-			// –³ˆ³k
+			// ç„¡åœ§ç¸®
 			data = pvar->ssh_state.outbuf + 7;
 		}
 
-		// ‘—MƒpƒPƒbƒg\’z(input parameter: data, len)
+		// é€ä¿¡ãƒ‘ã‚±ãƒƒãƒˆæ§‹ç¯‰(input parameter: data, len)
 		if (block_size < 8) {
 			block_size = 8;
 		}
@@ -1319,14 +1319,14 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		}
 
 		if (mac && mac->etm || authlen > 0) {
-			// ˆÃ†‰»‘ÎÛ‚Å‚Í‚È‚¢‚ªAMAC ‚Ì‘ÎÛ‚Æ‚È‚éƒpƒPƒbƒg’·•”•ª‚Ì’·‚³
-			// ‚Ü‚½‚Í chacha20-poly1305 ‚ÅˆÃ†‰»‚³‚ê‚éƒpƒPƒbƒg’·•”•ª‚Ì’·‚³
-			// cf. PKT_recv “à‚ÌƒRƒƒ“ƒg
+			// æš—å·åŒ–å¯¾è±¡ã§ã¯ãªã„ãŒã€MAC ã®å¯¾è±¡ã¨ãªã‚‹ãƒ‘ã‚±ãƒƒãƒˆé•·éƒ¨åˆ†ã®é•·ã•
+			// ã¾ãŸã¯ chacha20-poly1305 ã§æš—å·åŒ–ã•ã‚Œã‚‹ãƒ‘ã‚±ãƒƒãƒˆé•·éƒ¨åˆ†ã®é•·ã•
+			// cf. PKT_recv å†…ã®ã‚³ãƒ¡ãƒ³ãƒˆ
 			aadlen = 4;
 		}
 
-		packet_length = 1 + len; // ƒpƒfƒBƒ“ƒO’·‚ÌƒTƒCƒY + ƒyƒCƒ[ƒh’·
-		encryption_size = 4 + packet_length - aadlen; // ƒpƒPƒbƒg’·‚ÌƒTƒCƒY + packet_length - addlen
+		packet_length = 1 + len; // ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°é•·ã®ã‚µã‚¤ã‚º + ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰é•·
+		encryption_size = 4 + packet_length - aadlen; // ãƒ‘ã‚±ãƒƒãƒˆé•·ã®ã‚µã‚¤ã‚º + packet_length - addlen
 		padding_size = block_size - (encryption_size % block_size);
 		if (padding_size < 4)
 			padding_size += block_size;
@@ -1335,24 +1335,24 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		set_uint32(data, packet_length);
 		data[4] = (unsigned char) padding_size;
 		if (msg) {
-			// ƒpƒPƒbƒgˆ³k‚Ìê‡Aƒoƒbƒtƒ@‚ğŠg’£‚·‚éB(2011.6.10 yutaka)
+			// ãƒ‘ã‚±ãƒƒãƒˆåœ§ç¸®ã®å ´åˆã€ãƒãƒƒãƒ•ã‚¡ã‚’æ‹¡å¼µã™ã‚‹ã€‚(2011.6.10 yutaka)
 			buffer_append_space(msg, padding_size + SSH_DIGEST_MAX_LENGTH);
-			// realloc()‚³‚ê‚é‚ÆAƒ|ƒCƒ“ƒ^‚ª•Ï‚í‚é‰Â”\«‚ª‚ ‚é‚Ì‚ÅAÄ“xæ‚è’¼‚·B
+			// realloc()ã•ã‚Œã‚‹ã¨ã€ãƒã‚¤ãƒ³ã‚¿ãŒå¤‰ã‚ã‚‹å¯èƒ½æ€§ãŒã‚ã‚‹ã®ã§ã€å†åº¦å–ã‚Šç›´ã™ã€‚
 			data = buffer_ptr(msg);
 		}
 
 		CRYPT_set_random_data(pvar, data + 5 + len, padding_size);
 
 		if (authlen > 0) {
-			// ƒpƒPƒbƒgˆÃ†‰»‚Æ MAC ‚ÌŒvZ
+			// ãƒ‘ã‚±ãƒƒãƒˆæš—å·åŒ–ã¨ MAC ã®è¨ˆç®—
 			CRYPT_encrypt_aead(pvar, data, encryption_size, aadlen, authlen);
 			maclen = authlen;
 		}
 		else if (aadlen) {
-			// ƒpƒPƒbƒgˆÃ†‰»iaadlen‚æ‚èŒã‚ë‚¾‚¯j
+			// ãƒ‘ã‚±ãƒƒãƒˆæš—å·åŒ–ï¼ˆaadlenã‚ˆã‚Šå¾Œã‚ã ã‘ï¼‰
 			CRYPT_encrypt(pvar, data + aadlen, encryption_size);
 
-			// EtM ‚Å‚ÍˆÃ†‰»Œã‚É MAC ‚ğŒvZ‚·‚é
+			// EtM ã§ã¯æš—å·åŒ–å¾Œã« MAC ã‚’è¨ˆç®—ã™ã‚‹
 			ret = CRYPT_build_sender_MAC(pvar, pvar->ssh_state.sender_sequence_number,
 			                             data, aadlen + encryption_size, data + aadlen + encryption_size);
 			if (ret) {
@@ -1360,14 +1360,14 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 			}
 		}
 		else {
-			// E&M ‚Å‚ÍˆÃ†‰»‘O‚É MAC ‚ğŒvZ‚·‚é
+			// E&M ã§ã¯æš—å·åŒ–å‰ã« MAC ã‚’è¨ˆç®—ã™ã‚‹
 			ret = CRYPT_build_sender_MAC(pvar, pvar->ssh_state.sender_sequence_number,
 			                             data, encryption_size, data + encryption_size);
 			if (ret) {
 				maclen = CRYPT_get_sender_MAC_size(pvar);
 			}
 
-			// ƒpƒPƒbƒgˆÃ†‰»
+			// ãƒ‘ã‚±ãƒƒãƒˆæš—å·åŒ–
 			CRYPT_encrypt(pvar, data, encryption_size);
 		}
 
@@ -1388,7 +1388,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 
 	pvar->ssh_state.sender_sequence_number++;
 
-	// ‘—M‚ğ‹L˜^
+	// é€ä¿¡æ™‚åˆ»ã‚’è¨˜éŒ²
 	pvar->ssh_heartbeat_tick = time(NULL);
 }
 
@@ -1538,7 +1538,7 @@ static BOOL handle_auth_failure(PTInstVar pvar)
 {
 	logputs(LOG_LEVEL_VERBOSE, "Authentication failed");
 
-	// retry count‚Ì’Ç‰Á (2005.7.15 yutaka)
+	// retry countã®è¿½åŠ  (2005.7.15 yutaka)
 	pvar->userauth_retry_count++;
 
 	AUTH_set_generic_mode(pvar);
@@ -1552,11 +1552,11 @@ static BOOL handle_rsa_auth_refused(PTInstVar pvar)
 {
 	if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
 		if (pvar->pageant_keycount <= pvar->pageant_keycurrent) {
-			// ‘S‚Ä‚ÌŒ®‚ğ‚µI‚í‚Á‚½
+			// å…¨ã¦ã®éµã‚’è©¦ã—çµ‚ã‚ã£ãŸ
 			safefree(pvar->pageant_key);
 		}
 		else {
-			// ‚Ü‚¾Œ®‚ª‚ ‚é
+			// ã¾ã éµãŒã‚ã‚‹
 			pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
 			try_send_credentials(pvar);
 			return TRUE;
@@ -1607,8 +1607,8 @@ static BOOL handle_ignore(PTInstVar pvar)
 	else {
 		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_IGNORE was received.");
 
-		// ƒƒbƒZ[ƒW‚ª SSH2_MSG_IGNORE ‚Ì‚Í‰½‚à‚µ‚È‚¢
-		// Cisco ƒ‹[ƒ^‘Îô (2006.11.28 maya)
+		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒ SSH2_MSG_IGNORE ã®æ™‚ã¯ä½•ã‚‚ã—ãªã„
+		// Cisco ãƒ«ãƒ¼ã‚¿å¯¾ç­– (2006.11.28 maya)
 	}
 	return TRUE;
 }
@@ -1722,11 +1722,11 @@ static BOOL handle_disconnect(PTInstVar pvar)
 	}
 
 	if (SSHv2(pvar)) {
-		// SSH2_MSG_DISCONNECT ‚ğó‚¯æ‚Á‚½‚ ‚Æ‚Í‰½‚à‘—M‚µ‚Ä‚Í‚¢‚¯‚È‚¢
+		// SSH2_MSG_DISCONNECT ã‚’å—ã‘å–ã£ãŸã‚ã¨ã¯ä½•ã‚‚é€ä¿¡ã—ã¦ã¯ã„ã‘ãªã„
 		notify_fatal_error(pvar, buf, FALSE);
 	}
 	else {
-		// SSH1 ‚Ìê‡‚Ìd—l‚ª•ª‚©‚ç‚È‚¢‚Ì‚ÅAˆÈ‘O‚Ì‚Ü‚Ü‚É‚µ‚Ä‚¨‚­
+		// SSH1 ã®å ´åˆã®ä»•æ§˜ãŒåˆ†ã‹ã‚‰ãªã„ã®ã§ã€ä»¥å‰ã®ã¾ã¾ã«ã—ã¦ãŠã
 		notify_fatal_error(pvar, buf, TRUE);
 	}
 
@@ -1758,14 +1758,14 @@ static BOOL handle_auth_success(PTInstVar pvar)
 	logputs(LOG_LEVEL_VERBOSE, "Authentication accepted");
 	prep_compression(pvar);
 
-	// ƒn[ƒgƒr[ƒgEƒXƒŒƒbƒh‚ÌŠJn (2004.12.11 yutaka)
+	// ãƒãƒ¼ãƒˆãƒ“ãƒ¼ãƒˆãƒ»ã‚¹ãƒ¬ãƒƒãƒ‰ã®é–‹å§‹ (2004.12.11 yutaka)
 	start_ssh_heartbeat_thread(pvar);
 
 	return FALSE;
 }
 
 /*
- * SSH1ƒT[ƒo‚©‚ç‘—‚ç‚ê‚Ä‚«‚½Œ®‚ğƒ`ƒFƒbƒN‚µ‚ÄAÅŒã‚Éknown_hostsƒ_ƒCƒAƒƒO‚ğ•\¦‚·‚éB
+ * SSH1ã‚µãƒ¼ãƒã‹ã‚‰é€ã‚‰ã‚Œã¦ããŸéµã‚’ãƒã‚§ãƒƒã‚¯ã—ã¦ã€æœ€å¾Œã«known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤ºã™ã‚‹ã€‚
  */
 static BOOL handle_server_public_key(PTInstVar pvar)
 {
@@ -1836,8 +1836,8 @@ static BOOL handle_server_public_key(PTInstVar pvar)
 	                                 supported_ciphers))
 		return FALSE;
 
-	// SSH1 ƒT[ƒo‚ÍAƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚é”FØ•û®‚ğ‘—‚Á‚Ä‚­‚é
-	// RSA ‚ª—LŒø‚È‚ç PAGEANT ‚ğ—LŒø‚É‚·‚é
+	// SSH1 ã‚µãƒ¼ãƒã¯ã€ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹èªè¨¼æ–¹å¼ã‚’é€ã£ã¦ãã‚‹
+	// RSA ãŒæœ‰åŠ¹ãªã‚‰ PAGEANT ã‚’æœ‰åŠ¹ã«ã™ã‚‹
 	supported_types = get_uint32(inmsg + protocol_flags_pos + 8);
 	if ((supported_types & (1 << SSH_AUTH_RSA)) > 0) {
 		supported_types |= (1 << SSH_AUTH_PAGEANT);
@@ -1855,11 +1855,11 @@ static BOOL handle_server_public_key(PTInstVar pvar)
 
 	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, &hostkey);
 	if (ret == TRUE) {
-		// known_hostsƒ_ƒCƒAƒƒO‚ÌŒÄ‚Ño‚µ‚Í•s—v‚È‚Ì‚ÅA‘±‚«‚Ìˆ—‚ğÀs‚·‚éB
+		// known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®å‘¼ã³å‡ºã—ã¯ä¸è¦ãªã®ã§ã€ç¶šãã®å‡¦ç†ã‚’å®Ÿè¡Œã™ã‚‹ã€‚
 		SSH_notify_host_OK(pvar);
 
 	} else {
-		// known_hostsƒ_ƒCƒAƒƒO‚ÌŒÄ‚Ño‚µ‚½‚Ì‚ÅAˆÈ~A‰½‚à‚µ‚È‚¢B
+		// known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®å‘¼ã³å‡ºã—ãŸã®ã§ã€ä»¥é™ã€ä½•ã‚‚ã—ãªã„ã€‚
 
 	}
 
@@ -1901,15 +1901,15 @@ static int negotiate_protocol(PTInstVar pvar)
 	case 1:
 		if (pvar->protocol_minor == 99 &&
 		    pvar->settings.ssh_protocol_version == 2) {
-			// ƒT[ƒo‚ª 1.99 ‚Åƒ†[ƒU‚ª SSH2 ‚ğ‘I‘ğ‚µ‚Ä‚¢‚é‚Ì‚È‚ç‚Î
-			// 2.0 Ú‘±‚Æ‚·‚é
+			// ã‚µãƒ¼ãƒãŒ 1.99 ã§ãƒ¦ãƒ¼ã‚¶ãŒ SSH2 ã‚’é¸æŠã—ã¦ã„ã‚‹ã®ãªã‚‰ã°
+			// 2.0 æ¥ç¶šã¨ã™ã‚‹
 			pvar->protocol_major = 2;
 			pvar->protocol_minor = 0;
 			return 0;
 		}
 
 		if (pvar->settings.ssh_protocol_version == 2) {
-			// ƒo[ƒWƒ‡ƒ“ˆá‚¢
+			// ãƒãƒ¼ã‚¸ãƒ§ãƒ³é•ã„
 			return -1;
 		}
 
@@ -1922,7 +1922,7 @@ static int negotiate_protocol(PTInstVar pvar)
 	// for SSH2(yutaka)
 	case 2:
 		if (pvar->settings.ssh_protocol_version == 1) {
-			// ƒo[ƒWƒ‡ƒ“ˆá‚¢
+			// ãƒãƒ¼ã‚¸ãƒ§ãƒ³é•ã„
 			return -1;
 		}
 
@@ -1937,7 +1937,7 @@ static void init_protocol(PTInstVar pvar)
 {
 	CRYPT_initialize_random_numbers(pvar);
 
-	// known_hostsƒtƒ@ƒCƒ‹‚©‚çƒzƒXƒgŒöŠJŒ®‚ğæ“Ç‚İ‚µ‚Ä‚¨‚­
+	// known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ›ã‚¹ãƒˆå…¬é–‹éµã‚’å…ˆèª­ã¿ã—ã¦ãŠã
 	HOSTS_prefetch_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport);
 
 	/* while we wait for a response from the server... */
@@ -1966,7 +1966,7 @@ static void init_protocol(PTInstVar pvar)
 
 		enque_handler(pvar, SSH2_MSG_UNIMPLEMENTED, handle_unimplemented);
 
-		// ƒ†[ƒU”FØŒã‚ÌƒfƒBƒXƒpƒbƒ`ƒ‹[ƒ`ƒ“
+		// ãƒ¦ãƒ¼ã‚¶èªè¨¼å¾Œã®ãƒ‡ã‚£ã‚¹ãƒ‘ãƒƒãƒãƒ«ãƒ¼ãƒãƒ³
 		enque_handler(pvar, SSH2_MSG_CHANNEL_CLOSE, handle_SSH2_channel_close);
 		enque_handler(pvar, SSH2_MSG_CHANNEL_DATA, handle_SSH2_channel_data);
 		enque_handler(pvar, SSH2_MSG_CHANNEL_EOF, handle_SSH2_channel_eof);
@@ -2068,11 +2068,11 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len)
 				char TTSSH_ID[1024];
 				int TTSSH_ID_len;
 
-				// SSH ƒo[ƒWƒ‡ƒ“‚ğ teraterm ‘¤‚ÉƒZƒbƒg‚·‚é
-				// SCP ƒRƒ}ƒ“ƒh‚Ì‚½‚ß (2008.2.3)
+				// SSH ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’ teraterm å´ã«ã‚»ãƒƒãƒˆã™ã‚‹
+				// SCP ã‚³ãƒãƒ³ãƒ‰ã®ãŸã‚ (2008.2.3)
 				pvar->cv->isSSH = pvar->protocol_major;
 
-				// ©•ª©g‚Ìƒo[ƒWƒ‡ƒ“‚ğæ“¾‚·‚é (2005.3.3)
+				// è‡ªåˆ†è‡ªèº«ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’å–å¾—ã™ã‚‹ (2005.3.3)
 				_snprintf_s(TTSSH_ID, sizeof(TTSSH_ID), _TRUNCATE,
 				            "SSH-%d.%d-TTSSH/%d.%d.%d Win32\r\n",
 				            pvar->protocol_major, pvar->protocol_minor,
@@ -2080,16 +2080,16 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len)
 				TTSSH_ID_len = strlen(TTSSH_ID);
 
 				// for SSH2
-				// ƒNƒ‰ƒCƒAƒ“ƒgƒo[ƒWƒ‡ƒ“‚Ì•Û‘¶i‰üs‚Íæ‚èœ‚­‚±‚Æj
+				// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®ä¿å­˜ï¼ˆæ”¹è¡Œã¯å–ã‚Šé™¤ãã“ã¨ï¼‰
 				strncpy_s(pvar->client_version_string, sizeof(pvar->client_version_string),
 				          TTSSH_ID, _TRUNCATE);
 
-				// ƒT[ƒoƒo[ƒWƒ‡ƒ“‚Ì•Û‘¶i‰üs‚Íæ‚èœ‚­‚±‚Æj(2005.3.9)
+				// ã‚µãƒ¼ãƒãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®ä¿å­˜ï¼ˆæ”¹è¡Œã¯å–ã‚Šé™¤ãã“ã¨ï¼‰(2005.3.9)
 				_snprintf_s(pvar->server_version_string,
 				            sizeof(pvar->server_version_string), _TRUNCATE,
 				            "%s", pvar->ssh_state.server_ID);
 
-				// ƒT[ƒoƒo[ƒWƒ‡ƒ“‚Ìƒ`ƒFƒbƒN
+				// ã‚µãƒ¼ãƒãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®ãƒã‚§ãƒƒã‚¯
 				server_version_check(pvar);
 
 				if ((pvar->Psend) (pvar->socket, TTSSH_ID, TTSSH_ID_len, 0) != TTSSH_ID_len) {
@@ -2098,14 +2098,14 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len)
 					                  "The connection will close.");
 					notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 				} else {
-					// ‰üs‚Ìœ‹
+					// æ”¹è¡Œã®é™¤å»
 					chop_newlines(pvar->client_version_string);
 					logprintf(LOG_LEVEL_VERBOSE, "Sent client identification string: %s", pvar->client_version_string);
 
 					push_memdump("server ID", NULL, pvar->server_version_string, strlen(pvar->server_version_string));
 					push_memdump("client ID", NULL, pvar->client_version_string, strlen(pvar->client_version_string));
 
-					// SSHƒnƒ“ƒhƒ‰‚Ì“o˜^‚ğs‚¤
+					// SSHãƒãƒ³ãƒ‰ãƒ©ã®ç™»éŒ²ã‚’è¡Œã†
 					init_protocol(pvar);
 
 					SSH2_dispatch_init(pvar, 1);
@@ -2296,7 +2296,7 @@ static BOOL handle_agent_open(PTInstVar pvar)
 	}
 	/*
 	else {
-		// ’Ê’m‚·‚é‘Šèchannel‚ª•ª‚©‚ç‚È‚¢‚Ì‚Å‰½‚à‚Å‚«‚È‚¢
+		// é€šçŸ¥ã™ã‚‹ç›¸æ‰‹channelãŒåˆ†ã‹ã‚‰ãªã„ã®ã§ä½•ã‚‚ã§ããªã„
 	}
 	*/
 
@@ -2305,7 +2305,7 @@ static BOOL handle_agent_open(PTInstVar pvar)
 
 
 
-// ƒnƒ“ƒhƒŠƒ“ƒO‚·‚éƒƒbƒZ[ƒW‚ğŒˆ’è‚·‚é
+// ãƒãƒ³ãƒ‰ãƒªãƒ³ã‚°ã™ã‚‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’æ±ºå®šã™ã‚‹
 
 #define HANDLE_MESSAGE_MAX 30
 static unsigned char handle_messages[HANDLE_MESSAGE_MAX];
@@ -2317,10 +2317,10 @@ void SSH2_dispatch_init(PTInstVar pvar, int stage)
 	handle_message_count = 0;
 	handle_message_stage = stage;
 
-	// DISCONNECT‚Íí‚Éó‚¯“ü‚ê‚é
+	// DISCONNECTã¯å¸¸ã«å—ã‘å…¥ã‚Œã‚‹
 	SSH2_dispatch_add_message(SSH2_MSG_DISCONNECT);
 
-	// Strict KEX ‚ª—LŒøA‚©‚Â‰‰ñ‚Ì KEX ‚Íó‚¯“ü‚ê‚éƒƒbƒZ[ƒW‚ğ§ŒÀ‚·‚é
+	// Strict KEX ãŒæœ‰åŠ¹ã€ã‹ã¤åˆå›ã® KEX æ™‚ã¯å—ã‘å…¥ã‚Œã‚‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’åˆ¶é™ã™ã‚‹
 	if (pvar->server_strict_kex && pvar->kex_status == 0) {
 		return;
 	}
@@ -2352,7 +2352,7 @@ void SSH2_dispatch_add_message(unsigned char message)
 		return;
 	}
 
-	// ‚·‚Å‚É“o˜^‚³‚ê‚Ä‚¢‚éƒƒbƒZ[ƒW‚Í’Ç‰Á‚µ‚È‚¢
+	// ã™ã§ã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯è¿½åŠ ã—ãªã„
 	for (i=0; i<handle_message_count; i++) {
 		if (handle_messages[i] == message) {
 			return;
@@ -2375,9 +2375,9 @@ void SSH1_handle_packet(PTInstVar pvar, char *data, unsigned int len, unsigned i
 {
 	unsigned char message = prep_packet_ssh1(pvar, data, len, padding);
 
-	// SSH‚ÌƒƒbƒZ[ƒWƒ^ƒCƒv‚ğƒ`ƒFƒbƒN
+	// SSHã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—ã‚’ãƒã‚§ãƒƒã‚¯
 	if (message != SSH_MSG_NONE) {
-		// ƒƒbƒZ[ƒWƒ^ƒCƒv‚É‰‚¶‚½ƒnƒ“ƒhƒ‰‚ğ‹N“®
+		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—ã«å¿œã˜ãŸãƒãƒ³ãƒ‰ãƒ©ã‚’èµ·å‹•
 		SSHPacketHandler handler = get_handler(pvar, message);
 
 		if (handler == NULL) {
@@ -2398,12 +2398,12 @@ void SSH2_handle_packet(PTInstVar pvar, char *data, unsigned int len, unsigned i
 {
 	unsigned char message = prep_packet_ssh2(pvar, data, len, aadlen, authlen);
 
-	// SSH‚ÌƒƒbƒZ[ƒWƒ^ƒCƒv‚ğƒ`ƒFƒbƒN
+	// SSHã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—ã‚’ãƒã‚§ãƒƒã‚¯
 	if (message != SSH_MSG_NONE) {
-		// ƒƒbƒZ[ƒWƒ^ƒCƒv‚É‰‚¶‚½ƒnƒ“ƒhƒ‰‚ğ‹N“®
+		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—ã«å¿œã˜ãŸãƒãƒ³ãƒ‰ãƒ©ã‚’èµ·å‹•
 		SSHPacketHandler handler = get_handler(pvar, message);
 
-		// ‘z’èŠO‚ÌƒƒbƒZ[ƒWƒ^ƒCƒv‚ª“’…‚µ‚½‚çƒAƒ{[ƒg‚³‚¹‚éB
+		// æƒ³å®šå¤–ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—ãŒåˆ°ç€ã—ãŸã‚‰ã‚¢ãƒœãƒ¼ãƒˆã•ã›ã‚‹ã€‚
 		if (!SSH2_dispatch_enabled_check(message) || handler == NULL) {
 			char buf[1024];
 
@@ -2537,7 +2537,7 @@ static void enable_send_compression(PTInstVar pvar)
 		notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 		return;
 	} else {
-		// SSH2‚Å‚Íˆ³kE“WŠJˆ—‚ğSSH1‚Æ‚Í•Ê‚És‚¤‚Ì‚ÅA‰º‹Lƒtƒ‰ƒO‚Í—‚Æ‚µ‚Ä‚¨‚­B(2005.7.9 yutaka)
+		// SSH2ã§ã¯åœ§ç¸®ãƒ»å±•é–‹å‡¦ç†ã‚’SSH1ã¨ã¯åˆ¥ã«è¡Œã†ã®ã§ã€ä¸‹è¨˜ãƒ•ãƒ©ã‚°ã¯è½ã¨ã—ã¦ãŠãã€‚(2005.7.9 yutaka)
 		if (SSHv2(pvar)) {
 			pvar->ssh_state.compressing = FALSE;
 		} else {
@@ -2566,7 +2566,7 @@ static void enable_recv_compression(PTInstVar pvar)
 		notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 		return;
 	} else {
-		// SSH2‚Å‚Íˆ³kE“WŠJˆ—‚ğSSH1‚Æ‚Í•Ê‚És‚¤‚Ì‚ÅA‰º‹Lƒtƒ‰ƒO‚Í—‚Æ‚µ‚Ä‚¨‚­B(2005.7.9 yutaka)
+		// SSH2ã§ã¯åœ§ç¸®ãƒ»å±•é–‹å‡¦ç†ã‚’SSH1ã¨ã¯åˆ¥ã«è¡Œã†ã®ã§ã€ä¸‹è¨˜ãƒ•ãƒ©ã‚°ã¯è½ã¨ã—ã¦ãŠãã€‚(2005.7.9 yutaka)
 		if (SSHv2(pvar)) {
 			pvar->ssh_state.decompressing = FALSE;
 		} else {
@@ -2582,7 +2582,7 @@ static void enable_compression(PTInstVar pvar)
 	enable_send_compression(pvar);
 	enable_recv_compression(pvar);
 
-	// SSH2‚Å‚Íˆ³kE“WŠJˆ—‚ğSSH1‚Æ‚Í•Ê‚És‚¤‚Ì‚ÅA‰º‹Lƒtƒ‰ƒO‚Í—‚Æ‚µ‚Ä‚¨‚­B(2005.7.9 yutaka)
+	// SSH2ã§ã¯åœ§ç¸®ãƒ»å±•é–‹å‡¦ç†ã‚’SSH1ã¨ã¯åˆ¥ã«è¡Œã†ã®ã§ã€ä¸‹è¨˜ãƒ•ãƒ©ã‚°ã¯è½ã¨ã—ã¦ãŠãã€‚(2005.7.9 yutaka)
 	if (SSHv2(pvar)) {
 		pvar->ssh_state.compressing = FALSE;
 		pvar->ssh_state.decompressing = FALSE;
@@ -2649,15 +2649,15 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 	if (grab_payload(pvar, challenge_bytes)) {
 		unsigned char *outmsg = begin_send_packet(pvar, SSH_CMSG_AUTH_RSA_RESPONSE, 16);
 
-		// rhosts”FØ(SSH1)‚ª‚Å‚«‚é‚æ‚¤‚É SSH_AUTH_RHOSTS_RSA ‚ğğŒ‚É’Ç‰Á‚·‚éB
+		// rhostsèªè¨¼(SSH1)ãŒã§ãã‚‹ã‚ˆã†ã« SSH_AUTH_RHOSTS_RSA ã‚’æ¡ä»¶ã«è¿½åŠ ã™ã‚‹ã€‚
 		if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA ||
 			pvar->auth_state.cur_cred.method == SSH_AUTH_RHOSTS_RSA
 			) {
 			if (CRYPT_generate_RSA_challenge_response
 				(pvar, pvar->ssh_state.payload + 2, challenge_bytes, outmsg)) {
 
-				// ƒZƒbƒVƒ‡ƒ“•¡»‚ÉƒpƒXƒ[ƒh‚ğg‚¢‰ñ‚µ‚½‚¢‚Ì‚ÅA‚±‚±‚Å‚ÌƒŠƒ\[ƒX‰ğ•ú‚Í‚â‚ß‚éB
-				// socket close‚É‚à‚±‚ÌŠÖ”‚ÍŒÄ‚Î‚ê‚Ä‚¢‚é‚Ì‚ÅA‚½‚Ô‚ñ–â‘è‚È‚¢B(2005.4.8 yutaka)
+				// ã‚»ãƒƒã‚·ãƒ§ãƒ³è¤‡è£½æ™‚ã«ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ä½¿ã„å›ã—ãŸã„ã®ã§ã€ã“ã“ã§ã®ãƒªã‚½ãƒ¼ã‚¹è§£æ”¾ã¯ã‚„ã‚ã‚‹ã€‚
+				// socket closeæ™‚ã«ã‚‚ã“ã®é–¢æ•°ã¯å‘¼ã°ã‚Œã¦ã„ã‚‹ã®ã§ã€ãŸã¶ã‚“å•é¡Œãªã„ã€‚(2005.4.8 yutaka)
 				//AUTH_destroy_cur_cred(pvar);
 
 				finish_send_packet(pvar);
@@ -2692,15 +2692,15 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 			session_buf_len = server_key_bytes + host_key_bytes + 8;
 			session_buf = (char *) malloc(session_buf_len);
 
-			/* Pageant ‚ÉƒnƒbƒVƒ…‚ğŒvZ‚µ‚Ä‚à‚ç‚¤ */
-			// ŒöŠJŒ®‚Ì’·‚³
+			/* Pageant ã«ãƒãƒƒã‚·ãƒ¥ã‚’è¨ˆç®—ã—ã¦ã‚‚ã‚‰ã† */
+			// å…¬é–‹éµã®é•·ã•
 			pubkeylen = putty_get_ssh1_keylen(pvar->pageant_curkey, pvar->pageant_keylistlen);
-			// ƒZƒbƒVƒ‡ƒ“ID‚ğì¬
+			// ã‚»ãƒƒã‚·ãƒ§ãƒ³IDã‚’ä½œæˆ
 			BN_bn2bin(host_n, session_buf);
 			BN_bn2bin(server_n, session_buf + host_key_bytes);
 			memcpy(session_buf + server_key_bytes + host_key_bytes, pvar->crypt_state.server_cookie, 8);
 			MD5(session_buf, session_buf_len, session_id);
-			// ƒnƒbƒVƒ…‚ğó‚¯æ‚é
+			// ãƒãƒƒã‚·ãƒ¥ã‚’å—ã‘å–ã‚‹
 			hash = putty_hash_ssh1_challenge(pvar->pageant_curkey,
 			                                 pubkeylen,
 			                                 pvar->ssh_state.payload,
@@ -2708,7 +2708,7 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 			                                 session_id,
 			                                 &hashlen);
 
-			// ƒnƒbƒVƒ…‚ğ‘—M
+			// ãƒãƒƒã‚·ãƒ¥ã‚’é€ä¿¡
 			memcpy(outmsg, hash, 16);
 			free(hash);
 
@@ -2736,7 +2736,7 @@ static void try_send_credentials(PTInstVar pvar)
 		static const SSHPacketHandler TIS_handlers[]
 		= { handle_TIS_challenge, handle_auth_failure };
 
-		// SSH2‚Ìê‡‚ÍˆÈ‰º‚Ìˆ—‚ğƒXƒLƒbƒv
+		// SSH2ã®å ´åˆã¯ä»¥ä¸‹ã®å‡¦ç†ã‚’ã‚¹ã‚­ãƒƒãƒ—
 		if (SSHv2(pvar))
 			goto skip_ssh2;
 
@@ -2754,8 +2754,8 @@ static void try_send_credentials(PTInstVar pvar)
 				set_uint32(outmsg, len);
 				memcpy(outmsg + 4, cred->password, len);
 
-				// ƒZƒbƒVƒ‡ƒ“•¡»‚ÉƒpƒXƒ[ƒh‚ğg‚¢‰ñ‚µ‚½‚¢‚Ì‚ÅA‚±‚±‚Å‚ÌƒŠƒ\[ƒX‰ğ•ú‚Í‚â‚ß‚éB
-				// socket close‚É‚à‚±‚ÌŠÖ”‚ÍŒÄ‚Î‚ê‚Ä‚¢‚é‚Ì‚ÅA‚½‚Ô‚ñ–â‘è‚È‚¢B(2005.4.8 yutaka)
+				// ã‚»ãƒƒã‚·ãƒ§ãƒ³è¤‡è£½æ™‚ã«ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ä½¿ã„å›ã—ãŸã„ã®ã§ã€ã“ã“ã§ã®ãƒªã‚½ãƒ¼ã‚¹è§£æ”¾ã¯ã‚„ã‚ã‚‹ã€‚
+				// socket closeæ™‚ã«ã‚‚ã“ã®é–¢æ•°ã¯å‘¼ã°ã‚Œã¦ã„ã‚‹ã®ã§ã€ãŸã¶ã‚“å•é¡Œãªã„ã€‚(2005.4.8 yutaka)
 				//AUTH_destroy_cur_cred(pvar);
 
 				enque_simple_auth_handlers(pvar);
@@ -2827,7 +2827,7 @@ static void try_send_credentials(PTInstVar pvar)
 				int len, bn_bytes;
 
 				if (pvar->pageant_keycurrent != 0) {
-					// ’¼‘O‚ÌŒ®‚ğƒXƒLƒbƒv
+					// ç›´å‰ã®éµã‚’ã‚¹ã‚­ãƒƒãƒ—
 					pvar->pageant_curkey += 4;
 					len = get_ushort16_MSBfirst(pvar->pageant_curkey);
 					bn_bytes = (len + 7) / 8;
@@ -2835,10 +2835,10 @@ static void try_send_credentials(PTInstVar pvar)
 					len = get_ushort16_MSBfirst(pvar->pageant_curkey);
 					bn_bytes = (len + 7) / 8;
 					pvar->pageant_curkey += 2 + bn_bytes;
-					// ’¼‘O‚ÌŒ®‚ÌƒRƒƒ“ƒg‚ğƒXƒLƒbƒv
+					// ç›´å‰ã®éµã®ã‚³ãƒ¡ãƒ³ãƒˆã‚’ã‚¹ã‚­ãƒƒãƒ—
 					len = get_uint32_MSBfirst(pvar->pageant_curkey);
 					pvar->pageant_curkey += 4 + len;
-					// Ÿ‚ÌŒ®‚ÌˆÊ’u‚Ö—ˆ‚é
+					// æ¬¡ã®éµã®ä½ç½®ã¸æ¥ã‚‹
 				}
 				pubkey = pvar->pageant_curkey + 4;
 				len = get_ushort16_MSBfirst(pubkey);
@@ -3046,7 +3046,7 @@ void SSH_notify_disconnecting(PTInstVar pvar, char *reason)
 		char *s;
 		int len;
 
-		// SSH2 server‚Édisconnect‚ğ“`‚¦‚é
+		// SSH2 serverã«disconnectã‚’ä¼ãˆã‚‹
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
@@ -3081,15 +3081,15 @@ void SSH_notify_host_OK(PTInstVar pvar)
 
 		if (SSHv1(pvar)) {
 			send_session_key(pvar);
-			// ƒ†[ƒU”FØ‚ğs‚Á‚Ä‚æ‚¢ƒ^ƒCƒ~ƒ“ƒO‚É‚È‚Á‚Ä‚©‚çA”FØƒ_ƒCƒAƒƒO‚ğoŒ»‚³‚¹‚éB
-			// STATUS_HOST_OK‚ª—§‚¿ASTATUS_DONT_SEND_USER_NAME‚ª—‚¿‚Ä‚¢‚È‚¢‚ÆA
-			// ”FØƒ_ƒCƒAƒƒO‚ÍÀ¿g‚¦‚È‚¢‚Ì‚ÅA‚±‚Ìƒ^ƒCƒ~ƒ“ƒO‚Å–â‘è‚È‚¢B
+			// ãƒ¦ãƒ¼ã‚¶èªè¨¼ã‚’è¡Œã£ã¦ã‚ˆã„ã‚¿ã‚¤ãƒŸãƒ³ã‚°ã«ãªã£ã¦ã‹ã‚‰ã€èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºç¾ã•ã›ã‚‹ã€‚
+			// STATUS_HOST_OKãŒç«‹ã¡ã€STATUS_DONT_SEND_USER_NAMEãŒè½ã¡ã¦ã„ãªã„ã¨ã€
+			// èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã¯å®Ÿè³ªä½¿ãˆãªã„ã®ã§ã€ã“ã®ã‚¿ã‚¤ãƒŸãƒ³ã‚°ã§å•é¡Œãªã„ã€‚
 			AUTH_advance_to_next_cred(pvar);
 		}
 	}
 
 	if (SSHv2(pvar)) {
-		// SSH2_MSG_NEWKEYS ‚ª–¢‘—M‚È‚ç‚Î‘—‚é
+		// SSH2_MSG_NEWKEYS ãŒæœªé€ä¿¡ãªã‚‰ã°é€ã‚‹
 		if ((pvar->kex_status & KEX_FLAG_NEWKEYS_SENT) == 0) {
 			ssh2_send_newkeys(pvar);
 		}
@@ -3136,8 +3136,8 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 		}
 
 	} else if (SSHv2(pvar)) {
-		// ƒ^[ƒ~ƒiƒ‹ƒTƒCƒY•ÏX’Ê’m‚Ì’Ç‰Á (2005.1.4 yutaka)
-		// SSH2‚©‚Ç‚¤‚©‚Ìƒ`ƒFƒbƒN‚às‚¤B(2005.1.5 yutaka)
+		// ã‚¿ãƒ¼ãƒŸãƒŠãƒ«ã‚µã‚¤ã‚ºå¤‰æ›´é€šçŸ¥ã®è¿½åŠ  (2005.1.4 yutaka)
+		// SSH2ã‹ã©ã†ã‹ã®ãƒã‚§ãƒƒã‚¯ã‚‚è¡Œã†ã€‚(2005.1.5 yutaka)
 		buffer_t *msg;
 		char *req_type = "window-change";
 		unsigned char *outmsg;
@@ -3150,9 +3150,9 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 			return;
 		}
 		if (c->remote_id == SSH_CHANNEL_INVALID) {
-			// ‚±‚Ìó‹µ‚Í”FØŠ®—¹’¼Œã‚ÉƒEƒBƒ“ƒhƒEƒTƒCƒY‚ğ•ÏX‚·‚é‚Æ”­¶‚·‚éB
-			// ‚Ü‚¾ƒVƒFƒ‹‚Ìƒ`ƒƒƒlƒ‹‚É‘Î‚·‚é SSH_MSG_OPEN_CONFIRMATION ‚ğó‚¯‚Ä‚¢‚È‚¢‚Ì‚ÅA
-			// ‘Šè‘¤‚Ìƒ`ƒƒƒlƒ‹”Ô†‚ª”»‚ç‚È‚¢‚Ì‚Å window-change ƒƒbƒZ[ƒW‚Í‘—‚ç‚È‚¢B
+			// ã“ã®çŠ¶æ³ã¯èªè¨¼å®Œäº†ç›´å¾Œã«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã‚’å¤‰æ›´ã™ã‚‹ã¨ç™ºç”Ÿã™ã‚‹ã€‚
+			// ã¾ã ã‚·ã‚§ãƒ«ã®ãƒãƒ£ãƒãƒ«ã«å¯¾ã™ã‚‹ SSH_MSG_OPEN_CONFIRMATION ã‚’å—ã‘ã¦ã„ãªã„ã®ã§ã€
+			// ç›¸æ‰‹å´ã®ãƒãƒ£ãƒãƒ«ç•ªå·ãŒåˆ¤ã‚‰ãªã„ã®ã§ window-change ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯é€ã‚‰ãªã„ã€‚
 			logprintf(LOG_LEVEL_WARNING, "%s: remote shell channel number is unknown.", __FUNCTION__);
 			return;
 		}
@@ -3180,18 +3180,18 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 		          c->self_id, c->remote_id, req_type, cols, rows, x, y);
 
 	} else {
-		// SSH‚Å‚È‚¢ê‡‚Í‰½‚à‚µ‚È‚¢B
+		// SSHã§ãªã„å ´åˆã¯ä½•ã‚‚ã—ãªã„ã€‚
 	}
 }
 
-// ƒuƒŒ[ƒNM†‚ğ‘—‚é -- RFC 4335
-// OpenSSH ‚Ì"~B"‚É‘Š“–‚·‚éB
+// ãƒ–ãƒ¬ãƒ¼ã‚¯ä¿¡å·ã‚’é€ã‚‹ -- RFC 4335
+// OpenSSH ã®"~B"ã«ç›¸å½“ã™ã‚‹ã€‚
 // (2010.9.27 yutaka)
 int SSH_notify_break_signal(PTInstVar pvar)
 {
 	int ret = 0;
 
-	if (SSHv2(pvar)) { // SSH2 ‚Ì‚İ‘Î‰
+	if (SSHv2(pvar)) { // SSH2 ã®ã¿å¯¾å¿œ
 		buffer_t *msg;
 		char *req_type = "break";
 		unsigned char *outmsg;
@@ -3204,9 +3204,9 @@ int SSH_notify_break_signal(PTInstVar pvar)
 			goto error;
 		}
 		if (c->remote_id == SSH_CHANNEL_INVALID) {
-			// ”FØ’¼Œã‚É send break ‚ğs‚¤‚Æ”­¶‚·‚é
-			// ‚Ü‚¾ƒVƒFƒ‹‚Ìƒ`ƒƒƒlƒ‹‚É‘Î‚·‚é SSH_MSG_OPEN_CONFIRMATION ‚ğó‚¯‚Ä‚¢‚È‚¢‚Ì‚ÅA
-			// ‘Šè‘¤‚Ìƒ`ƒƒƒlƒ‹”Ô†‚ª”»‚ç‚È‚¢‚Ì‚Å break ƒƒbƒZ[ƒW‚Í‘—‚ç‚È‚¢B
+			// èªè¨¼ç›´å¾Œã« send break ã‚’è¡Œã†ã¨ç™ºç”Ÿã™ã‚‹
+			// ã¾ã ã‚·ã‚§ãƒ«ã®ãƒãƒ£ãƒãƒ«ã«å¯¾ã™ã‚‹ SSH_MSG_OPEN_CONFIRMATION ã‚’å—ã‘ã¦ã„ãªã„ã®ã§ã€
+			// ç›¸æ‰‹å´ã®ãƒãƒ£ãƒãƒ«ç•ªå·ãŒåˆ¤ã‚‰ãªã„ã®ã§ break ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯é€ã‚‰ãªã„ã€‚
 			logprintf(LOG_LEVEL_WARNING, "%s: remote shell channel number is unknown.", __FUNCTION__);
 			goto error;
 		}
@@ -3298,7 +3298,7 @@ void SSH_notify_cred(PTInstVar pvar)
 
 void SSH_send(PTInstVar pvar, unsigned char const *buf, unsigned int buflen)
 {
-	// RAWƒpƒPƒbƒgƒ_ƒ“ƒv‚ğ’Ç‰Á (2008.8.15 yutaka)
+	// RAWãƒ‘ã‚±ãƒƒãƒˆãƒ€ãƒ³ãƒ—ã‚’è¿½åŠ  (2008.8.15 yutaka)
 	if (LogLevel(pvar, LOG_LEVEL_SSHDUMP)) {
 		init_memdump();
 		push_memdump("SSH sending packet", "SSH_send", (char *)buf, buflen);
@@ -3537,7 +3537,7 @@ void SSH_end(PTInstVar pvar)
 		pvar->ssh_state.decompressing = FALSE;
 	}
 
-	// SSH2‚Ìƒf[ƒ^‚ğ‰ğ•ú‚·‚é
+	// SSH2ã®ãƒ‡ãƒ¼ã‚¿ã‚’è§£æ”¾ã™ã‚‹
 	if (SSHv2(pvar)) {
 		if (pvar->kexdh) {
 			DH_free(pvar->kexdh);
@@ -3629,7 +3629,7 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 	unsigned char *outmsg;
 	unsigned int len;
 
-	// SSH2Œ®ŒğŠ·’†‚Ìê‡‚ÍAƒpƒPƒbƒg‚ğ‘—‚ê‚È‚¢‚Ì‚Å‚¢‚Á‚½‚ñ•Û‘¶‚µ‚Ä‚¨‚­
+	// SSH2éµäº¤æ›ä¸­ã®å ´åˆã¯ã€ãƒ‘ã‚±ãƒƒãƒˆã‚’é€ã‚Œãªã„ã®ã§ã„ã£ãŸã‚“ä¿å­˜ã—ã¦ãŠã
 	if (pvar->kex_status & KEX_FLAG_REKEYING) {
 		ssh2_channel_add_bufchain(pvar, c, buf, buflen);
 		return;
@@ -3638,9 +3638,9 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 	if (c == NULL)
 		return;
 
-	// ƒŠƒgƒ‰ƒC‚Å‚Í‚È‚¢A’Êí‚ÌƒpƒPƒbƒg‘—M‚ÌÛAˆÈ‘O‘—‚ê‚È‚©‚Á‚½ƒf[ƒ^‚ª
-	// ƒŠƒ“ƒNƒhƒŠƒXƒg‚Éc‚Á‚Ä‚¢‚é‚æ‚¤‚Å‚ ‚ê‚ÎAƒŠƒXƒg‚Ì––”ö‚ÉŒq‚®B
-	// ‚±‚ê‚É‚æ‚èƒpƒPƒbƒg‚ª‰ó‚ê‚½‚æ‚¤‚ÉŒ©‚¦‚éŒ»Û‚ª‰ü‘P‚³‚ê‚éB
+	// ãƒªãƒˆãƒ©ã‚¤ã§ã¯ãªã„ã€é€šå¸¸ã®ãƒ‘ã‚±ãƒƒãƒˆé€ä¿¡ã®éš›ã€ä»¥å‰é€ã‚Œãªã‹ã£ãŸãƒ‡ãƒ¼ã‚¿ãŒ
+	// ãƒªãƒ³ã‚¯ãƒ‰ãƒªã‚¹ãƒˆã«æ®‹ã£ã¦ã„ã‚‹ã‚ˆã†ã§ã‚ã‚Œã°ã€ãƒªã‚¹ãƒˆã®æœ«å°¾ã«ç¹‹ãã€‚
+	// ã“ã‚Œã«ã‚ˆã‚Šãƒ‘ã‚±ãƒƒãƒˆãŒå£Šã‚ŒãŸã‚ˆã†ã«è¦‹ãˆã‚‹ç¾è±¡ãŒæ”¹å–„ã•ã‚Œã‚‹ã€‚
 	// (2012.10.14 yutaka)
 	if (retry == 0 && c->bufchain) {
 		ssh2_channel_add_bufchain(pvar, c, buf, buflen);
@@ -3649,7 +3649,7 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 
 	if ((unsigned int)buflen > c->remote_window) {
 		unsigned int offset = 0;
-		// ‘—‚ê‚È‚¢ƒf[ƒ^‚Í‚¢‚Á‚½‚ñ•Û‘¶‚µ‚Ä‚¨‚­
+		// é€ã‚Œãªã„ãƒ‡ãƒ¼ã‚¿ã¯ã„ã£ãŸã‚“ä¿å­˜ã—ã¦ãŠã
 		ssh2_channel_add_bufchain(pvar, c, buf + offset, buflen - offset);
 		buflen = offset;
 		return;
@@ -3673,7 +3673,7 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 		logprintf(LOG_LEVEL_SSHDUMP, "%s: sending SSH2_MSG_CHANNEL_DATA. "
 				  "local:%d remote:%d len:%d", __FUNCTION__, c->self_id, c->remote_id, buflen);
 
-		// remote window size‚Ì’²®
+		// remote window sizeã®èª¿æ•´
 		if (buflen <= c->remote_window) {
 			c->remote_window -= buflen;
 		}
@@ -3731,7 +3731,7 @@ void SSH_channel_send(PTInstVar pvar, int channel_num,
 		finish_send_packet_special(pvar, 1);
 
 	} else {
-		// ƒ|[ƒgƒtƒHƒ[ƒfƒBƒ“ƒO‚É‚¨‚¢‚ÄƒNƒ‰ƒCƒAƒ“ƒg‚©‚ç‚Ì‘—M—v‹‚ğASSH’ÊM‚Éæ‚¹‚ÄƒT[ƒo‚Ü‚Å‘—‚è“Í‚¯‚éB
+		// ãƒãƒ¼ãƒˆãƒ•ã‚©ãƒ¯ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã«ãŠã„ã¦ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‹ã‚‰ã®é€ä¿¡è¦æ±‚ã‚’ã€SSHé€šä¿¡ã«ä¹—ã›ã¦ã‚µãƒ¼ãƒã¾ã§é€ã‚Šå±Šã‘ã‚‹ã€‚
 		Channel_t *c = ssh2_local_channel_lookup(channel_num);
 		SSH2_send_channel_data(pvar, c, buf, len, retry);
 	}
@@ -3816,7 +3816,7 @@ void SSH_confirm_channel_open(PTInstVar pvar, uint32 remote_channel_num,
 	} else {
 		Channel_t *c;
 
-		// port-forwarding(remote to local)‚Ìƒ[ƒJƒ‹Ú‘±‚Ö‚Ì¬Œ÷‚ğƒT[ƒo‚Ö•Ô‚·B(2005.7.2 yutaka)
+		// port-forwarding(remote to local)ã®ãƒ­ãƒ¼ã‚«ãƒ«æ¥ç¶šã¸ã®æˆåŠŸã‚’ã‚µãƒ¼ãƒã¸è¿”ã™ã€‚(2005.7.2 yutaka)
 		c = ssh2_local_channel_lookup(local_channel_num);
 		if (c == NULL) {
 			// It is sure to be successful as long as it's not a program bug either.
@@ -3836,7 +3836,7 @@ void SSH_channel_output_eof(PTInstVar pvar, uint32 remote_channel_num)
 		finish_send_packet(pvar);
 
 	} else {
-		// SSH2: “Á‚É‚È‚µB
+		// SSH2: ç‰¹ã«ãªã—ã€‚
 
 	}
 }
@@ -3850,10 +3850,10 @@ void SSH2_channel_input_eof(PTInstVar pvar, Channel_t *c)
 	if (c == NULL)
 		return;
 
-	// SSH2Œ®ŒğŠ·’†‚Ìê‡AƒpƒPƒbƒg‚ğÌ‚Ä‚éB(2005.6.21 yutaka)
+	// SSH2éµäº¤æ›ä¸­ã®å ´åˆã€ãƒ‘ã‚±ãƒƒãƒˆã‚’æ¨ã¦ã‚‹ã€‚(2005.6.21 yutaka)
 	if (pvar->kex_status & KEX_FLAG_REKEYING) {
-		// TODO: —‘z‚Æ‚µ‚Ä‚ÍƒpƒPƒbƒg”jŠü‚Å‚Í‚È‚­AƒpƒPƒbƒg“Ç‚İæ‚è’x‰„‚É‚µ‚½‚¢‚Æ‚±‚ë‚¾‚ªA
-		// «—ˆ’¼‚·‚±‚Æ‚É‚·‚éB
+		// TODO: ç†æƒ³ã¨ã—ã¦ã¯ãƒ‘ã‚±ãƒƒãƒˆç ´æ£„ã§ã¯ãªãã€ãƒ‘ã‚±ãƒƒãƒˆèª­ã¿å–ã‚Šé…å»¶ã«ã—ãŸã„ã¨ã“ã‚ã ãŒã€
+		// å°†æ¥ç›´ã™ã“ã¨ã«ã™ã‚‹ã€‚
 		logprintf(LOG_LEVEL_INFO, "%s: now rekeying. data is not sent.", __FUNCTION__);
 
 		c = NULL;
@@ -3887,7 +3887,7 @@ void SSH_channel_input_eof(PTInstVar pvar, uint32 remote_channel_num, uint32 loc
 		finish_send_packet(pvar);
 
 	} else {
-		// SSH2: ƒ`ƒƒƒlƒ‹ƒNƒ[ƒY‚ğƒT[ƒo‚Ö’Ê’m
+		// SSH2: ãƒãƒ£ãƒãƒ«ã‚¯ãƒ­ãƒ¼ã‚ºã‚’ã‚µãƒ¼ãƒã¸é€šçŸ¥
 		Channel_t *c;
 
 		c = ssh2_local_channel_lookup(local_channel_num);
@@ -4124,10 +4124,10 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 			int len;
 			Channel_t *c;
 
-			// SSH2Œ®ŒğŠ·’†‚Ìê‡AƒpƒPƒbƒg‚ğÌ‚Ä‚éB(2005.6.21 yutaka)
+			// SSH2éµäº¤æ›ä¸­ã®å ´åˆã€ãƒ‘ã‚±ãƒƒãƒˆã‚’æ¨ã¦ã‚‹ã€‚(2005.6.21 yutaka)
 			if (pvar->kex_status & KEX_FLAG_REKEYING) {
-				// TODO: —‘z‚Æ‚µ‚Ä‚ÍƒpƒPƒbƒg”jŠü‚Å‚Í‚È‚­AƒpƒPƒbƒg“Ç‚İæ‚è’x‰„‚É‚µ‚½‚¢‚Æ‚±‚ë‚¾‚ªA
-				// «—ˆ’¼‚·‚±‚Æ‚É‚·‚éB
+				// TODO: ç†æƒ³ã¨ã—ã¦ã¯ãƒ‘ã‚±ãƒƒãƒˆç ´æ£„ã§ã¯ãªãã€ãƒ‘ã‚±ãƒƒãƒˆèª­ã¿å–ã‚Šé…å»¶ã«ã—ãŸã„ã¨ã“ã‚ã ãŒã€
+				// å°†æ¥ç›´ã™ã“ã¨ã«ã™ã‚‹ã€‚
 				logprintf(LOG_LEVEL_INFO, "%s: now rekeying. channel open request is not sent.", __FUNCTION__);
 
 				c = NULL;
@@ -4139,7 +4139,7 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 			// changed window size from 32KB to 128KB. (2007.10.29 maya)
 			c = ssh2_channel_new(pvar, CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, local_channel_num);
 			if (c == NULL) {
-				// “]‘—ƒ`ƒƒƒlƒ‹“à‚É‚ ‚éƒ\ƒPƒbƒg‚Ì‰ğ•ú˜R‚ê‚ğC³ (2007.7.26 maya)
+				// è»¢é€ãƒãƒ£ãƒãƒ«å†…ã«ã‚ã‚‹ã‚½ã‚±ãƒƒãƒˆã®è§£æ”¾æ¼ã‚Œã‚’ä¿®æ­£ (2007.7.26 maya)
 				FWD_free_channel(pvar, local_channel_num);
 				UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
 				                  "Could not open new channel. TTSSH is already opening too many channels.");
@@ -4182,7 +4182,7 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 
 	}
 
-	if (SSHv1(pvar)) { // SSH1‚Ì‚İ
+	if (SSHv1(pvar)) { // SSH1ã®ã¿
 		finish_send_packet(pvar);
 		enque_handlers(pvar, 2, msgs, handlers);
 	}
@@ -4215,7 +4215,7 @@ static int statU8(const char *filenameU8, struct __stat64 *st)
 }
 
 /**
- *	ExtractFileName() UTF-8”Å
+ *	ExtractFileName() UTF-8ç‰ˆ
  */
 static void ExtractFileNameU8(const char *PathName, char *FileName, size_t destlen)
 {
@@ -4242,16 +4242,16 @@ static int accessU8(const char *pathU8, int mode)
 /**
  *	SCP support
  *
- *	@param sendfile		ƒtƒ@ƒCƒ‹–¼,UTF-8
- *	@param dstfile		ƒtƒ@ƒCƒ‹–¼,UTF-8
- *						TOREMOTE ‚Ì‚Æ‚«A
- *							NULL ‚Ì‚Æ‚«Aƒz[ƒ€ƒtƒHƒ‹ƒ_
- *							‘Š‘ÎƒpƒXAƒz[ƒ€ƒtƒHƒ‹ƒ_‚©‚ç‚Ì‘Š‘Î?
- *							â‘ÎƒpƒX
- *						TOLOCAL ‚Ì‚Æ‚«
- *							NULL ‚Ì‚Æ‚«Aƒ_ƒEƒ“ƒ[ƒhƒtƒHƒ‹ƒ_
- *							‘Š‘ÎƒpƒXAƒJƒŒƒ“ƒgƒtƒHƒ‹ƒ_‚©‚ç‚Ì‘Š‘Î?
- *							â‘ÎƒpƒX
+ *	@param sendfile		ãƒ•ã‚¡ã‚¤ãƒ«å,UTF-8
+ *	@param dstfile		ãƒ•ã‚¡ã‚¤ãƒ«å,UTF-8
+ *						TOREMOTE ã®ã¨ãã€
+ *							NULL ã®ã¨ãã€ãƒ›ãƒ¼ãƒ ãƒ•ã‚©ãƒ«ãƒ€
+ *							ç›¸å¯¾ãƒ‘ã‚¹ã€ãƒ›ãƒ¼ãƒ ãƒ•ã‚©ãƒ«ãƒ€ã‹ã‚‰ã®ç›¸å¯¾?
+ *							çµ¶å¯¾ãƒ‘ã‚¹
+ *						TOLOCAL ã®ã¨ã
+ *							NULL ã®ã¨ãã€ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ãƒ•ã‚©ãƒ«ãƒ€
+ *							ç›¸å¯¾ãƒ‘ã‚¹ã€ã‚«ãƒ¬ãƒ³ãƒˆãƒ•ã‚©ãƒ«ãƒ€ã‹ã‚‰ã®ç›¸å¯¾?
+ *							çµ¶å¯¾ãƒ‘ã‚¹
  *	@param direction	TOREMOTE	copy local to remote
  *						FROMREMOTE	copy remote to local
  *
@@ -4261,14 +4261,14 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 	Channel_t *c = NULL;
 	FILE *fp = NULL;
 
-	// ƒ\ƒPƒbƒg‚ªƒNƒ[ƒY‚³‚ê‚Ä‚¢‚éê‡‚Í‰½‚à‚µ‚È‚¢B
+	// ã‚½ã‚±ãƒƒãƒˆãŒã‚¯ãƒ­ãƒ¼ã‚ºã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ä½•ã‚‚ã—ãªã„ã€‚
 	if (pvar->socket == INVALID_SOCKET)
 		goto error;
 
-	if (SSHv1(pvar))      // SSH1ƒTƒ|[ƒg‚ÍTBD
+	if (SSHv1(pvar))      // SSH1ã‚µãƒãƒ¼ãƒˆã¯TBD
 		goto error;
 
-	// ƒ`ƒƒƒlƒ‹İ’è
+	// ãƒãƒ£ãƒãƒ«è¨­å®š
 	c = ssh2_channel_new(pvar, CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SCP, -1);
 	if (c == NULL) {
 		UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
@@ -4456,14 +4456,14 @@ int SSH_sftp_transaction(PTInstVar pvar)
 //	FILE *fp = NULL;
 //	struct __stat64 st;
 
-	// ƒ\ƒPƒbƒg‚ªƒNƒ[ƒY‚³‚ê‚Ä‚¢‚éê‡‚Í‰½‚à‚µ‚È‚¢B
+	// ã‚½ã‚±ãƒƒãƒˆãŒã‚¯ãƒ­ãƒ¼ã‚ºã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ä½•ã‚‚ã—ãªã„ã€‚
 	if (pvar->socket == INVALID_SOCKET)
 		goto error;
 
-	if (SSHv1(pvar))      // SSH1ƒTƒ|[ƒg‚ÍTBD
+	if (SSHv1(pvar))      // SSH1ã‚µãƒãƒ¼ãƒˆã¯TBD
 		goto error;
 
-	// ƒ`ƒƒƒlƒ‹İ’è
+	// ãƒãƒ£ãƒãƒ«è¨­å®š
 	c = ssh2_channel_new(pvar, CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SFTP, -1);
 	if (c == NULL) {
 		UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
@@ -4526,8 +4526,8 @@ void debug_print(int no, char *msg, int len)
 
 
 /*
- * Œ®ŒğŠ·‚Å¶¬‚µ‚½Œ®‚Ì’u‚«êBÀÛ‚Ì’ÊM‚Ég‚í‚ê‚é‚Ì‚Ípvar->ssh2_keys[]‚Å‚ ‚èA‚±‚±‚É’u‚¢‚½‚¾‚¯‚Å‚Íg‚í‚ê‚È‚¢B
- * —LŒø‚É‚·‚éƒ^ƒCƒ~ƒ“ƒO‚ÅApvar->ssh2_keys ‚ÉƒRƒs[‚·‚éB
+ * éµäº¤æ›ã§ç”Ÿæˆã—ãŸéµã®ç½®ãå ´ã€‚å®Ÿéš›ã®é€šä¿¡ã«ä½¿ã‚ã‚Œã‚‹ã®ã¯pvar->ssh2_keys[]ã§ã‚ã‚Šã€ã“ã“ã«ç½®ã„ãŸã ã‘ã§ã¯ä½¿ã‚ã‚Œãªã„ã€‚
+ * æœ‰åŠ¹ã«ã™ã‚‹ã‚¿ã‚¤ãƒŸãƒ³ã‚°ã§ã€pvar->ssh2_keys ã«ã‚³ãƒ”ãƒ¼ã™ã‚‹ã€‚
  */
 static SSHKeys current_keys[MODE_MAX];
 
@@ -4562,7 +4562,7 @@ void SSH2_packet_start(buffer_t *msg, unsigned char type)
 	buffer_append(msg, buf, len);
 }
 
-// ƒNƒ‰ƒCƒAƒ“ƒg‚©‚çƒT[ƒo‚Ö‚ÌƒL[ŒğŠ·ŠJn—v‹
+// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‹ã‚‰ã‚µãƒ¼ãƒã¸ã®ã‚­ãƒ¼äº¤æ›é–‹å§‹è¦æ±‚
 void SSH2_send_kexinit(PTInstVar pvar)
 {
 	char cookie[SSH2_COOKIE_LENGTH];
@@ -4580,15 +4580,15 @@ void SSH2_send_kexinit(PTInstVar pvar)
 		buffer_free(pvar->my_kex);
 	pvar->my_kex = msg;
 
-	// ƒƒbƒZ[ƒWƒ^ƒCƒv
+	// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—
 	//SSH2_packet_start(msg, SSH2_MSG_KEXINIT);
 
-	// cookie‚ÌƒZƒbƒg
+	// cookieã®ã‚»ãƒƒãƒˆ
 	CRYPT_set_random_data(pvar, cookie, sizeof(cookie));
 	CRYPT_set_client_cookie(pvar, cookie);
 	buffer_append(msg, cookie, sizeof(cookie));
 
-	// ƒNƒ‰ƒCƒAƒ“ƒg‚ÌƒL[î•ñ
+	// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®ã‚­ãƒ¼æƒ…å ±
 	for (i = 0 ; i < PROPOSAL_MAX ; i++) {
 		buffer_put_string(msg, myproposal[i], strlen(myproposal[i]));
 	}
@@ -4634,7 +4634,7 @@ void SSH2_send_kexinit(PTInstVar pvar)
 	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
 
-	// my_kex‚Éæ‚Á‚Ä‚¨‚­‚½‚ßAƒtƒŠ[‚µ‚Ä‚Í‚¢‚¯‚È‚¢B
+	// my_kexã«å–ã£ã¦ãŠããŸã‚ã€ãƒ•ãƒªãƒ¼ã—ã¦ã¯ã„ã‘ãªã„ã€‚
 	//buffer_free(msg);
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXINIT was sent at SSH2_send_kexinit().");
@@ -4658,19 +4658,19 @@ void normalize_generic_order(char *buf, char default_strings[], int default_stri
 	memset(listed, 0, sizeof(listed));
 	memset(allowed, 0, sizeof(allowed));
 
-	// ‹–‰Â‚³‚ê‚Ä‚¢‚é•¶š‚ÌƒŠƒXƒg‚ğì‚éB
+	// è¨±å¯ã•ã‚Œã¦ã„ã‚‹æ–‡å­—ã®ãƒªã‚¹ãƒˆã‚’ä½œã‚‹ã€‚
 	for (i = 0; i < default_strings_len ; i++) {
 		allowed[default_strings[i]] = 1;
 	}
 
-	// w’è‚³‚ê‚½•¶š—ñ‚ğ‘–¸‚µA‹–‰Â‚³‚ê‚Ä‚¢‚È‚¢•¶šAd•¡‚·‚é•¶š‚Ííœ‚·‚éB
+	// æŒ‡å®šã•ã‚ŒãŸæ–‡å­—åˆ—ã‚’èµ°æŸ»ã—ã€è¨±å¯ã•ã‚Œã¦ã„ãªã„æ–‡å­—ã€é‡è¤‡ã™ã‚‹æ–‡å­—ã¯å‰Šé™¤ã™ã‚‹ã€‚
 	//
-	// ex. (i=5 ‚Ì•¶š‚ğíœ‚·‚é)
+	// ex. (i=5 ã®æ–‡å­—ã‚’å‰Šé™¤ã™ã‚‹)
 	// i=012345
 	//   >:=9<87;A@?B3026(\0)
 	//         i+1
 	//         <------------>
-	//       «
+	//       â†“
 	//   >:=9<7;A@?B3026(\0)
 	//
 	for (i = 0; buf[i] != 0; i++) {
@@ -4685,22 +4685,22 @@ void normalize_generic_order(char *buf, char default_strings[], int default_stri
 			listed[num] = 1;
 		}
 
-		// disabled line‚ª‚ ‚ê‚ÎAˆÊ’u‚ğŠo‚¦‚Ä‚¨‚­B
+		// disabled lineãŒã‚ã‚Œã°ã€ä½ç½®ã‚’è¦šãˆã¦ãŠãã€‚
 		if (num == 0) {
 			k = i;
 		}
 	}
 
-	// w’è‚³‚ê‚Ä‚¢‚È‚¢•¶š‚ª‚ ‚ê‚ÎAdisabled line‚Ì’¼‘O‚É‘}“ü‚·‚éB
+	// æŒ‡å®šã•ã‚Œã¦ã„ãªã„æ–‡å­—ãŒã‚ã‚Œã°ã€disabled lineã®ç›´å‰ã«æŒ¿å…¥ã™ã‚‹ã€‚
 	//
-	// ex. (Z‚ğ‘}“ü‚·‚é)
+	// ex. (Zã‚’æŒ¿å…¥ã™ã‚‹)
 	//                k
 	//   >:=9<87;A@?B3026(\0)
 	//                 k+1
 	//                 <---->
-	//       «       k
+	//       â†“       k
 	//   >:=9<87;A@?B30026(\0)
-	//       «        k
+	//       â†“        k
 	//   >:=9<87;A@?B3Z026(\0)
 	//
 	for (j = 0; j < default_strings_len && default_strings[j] != 0; j++) {
@@ -4710,7 +4710,7 @@ void normalize_generic_order(char *buf, char default_strings[], int default_stri
 			int copylen = strlen(buf + k + 1) + 1;
 
 			memmove(buf + k + 1, buf + k, copylen);
-			buf[k + 1 + copylen] = '\0';   // I’[‚ğ–Y‚ê‚¸‚É•t‚¯‚éB
+			buf[k + 1 + copylen] = '\0';   // çµ‚ç«¯ã‚’å¿˜ã‚Œãšã«ä»˜ã‘ã‚‹ã€‚
 			buf[k] = num + '0';
 			k++;
 			i++;
@@ -4723,7 +4723,7 @@ void normalize_generic_order(char *buf, char default_strings[], int default_stri
 		j++;
 	}
 
-	// disabled line‚ª‘¶İ‚µ‚È‚¢ê‡‚ÍA‚»‚Ì‚Ü‚Ü––”ö‚É’Ç‰Á‚·‚éB
+	// disabled lineãŒå­˜åœ¨ã—ãªã„å ´åˆã¯ã€ãã®ã¾ã¾æœ«å°¾ã«è¿½åŠ ã™ã‚‹ã€‚
 	for (; j < default_strings_len ; j++) {
 		int num = default_strings[j];
 
@@ -4748,7 +4748,7 @@ void choose_SSH2_proposal(char *server_proposal,
 	strncpy_s(tmp_cli, sizeof(tmp_cli), my_proposal, _TRUNCATE);
 	ptr_cli = strtok_s(tmp_cli, ",", &ctc_cli);
 	while (ptr_cli != NULL) {
-		// server_proposal‚É‚ÍƒT[ƒo‚Ìproposal‚ªƒJƒ“ƒ}•¶š—ñ‚ÅŠi”[‚³‚ê‚Ä‚¢‚é
+		// server_proposalã«ã¯ã‚µãƒ¼ãƒã®proposalãŒã‚«ãƒ³ãƒæ–‡å­—åˆ—ã§æ ¼ç´ã•ã‚Œã¦ã„ã‚‹
 		strncpy_s(tmp_svr, sizeof(tmp_svr), server_proposal, _TRUNCATE);
 		ptr_svr = strtok_s(tmp_svr, ",", &ctc_svr);
 		while (ptr_svr != NULL) {
@@ -4770,10 +4770,10 @@ found:
 }
 
 /*
- * Œ®ŒğŠ·ƒAƒ‹ƒSƒŠƒYƒ€EƒzƒXƒgŒ®ƒAƒ‹ƒSƒŠƒYƒ€EˆÃ†ƒAƒ‹ƒSƒŠƒYƒ€EMACƒAƒ‹ƒSƒŠƒYƒ€Eˆ³kƒAƒ‹ƒSƒŠƒYƒ€‚ÌŒˆ’è
+ * éµäº¤æ›ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ãƒ»ãƒ›ã‚¹ãƒˆéµã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ãƒ»æš—å·ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ãƒ»MACã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ãƒ»åœ§ç¸®ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã®æ±ºå®š
  *
- * ƒT[ƒo‚©‚ç‚ÍƒJƒ“ƒ}‹æØ‚è‚Å‚ÌƒŠƒXƒg‚ª‘—‚ç‚ê‚Ä—ˆ‚éB
- * ƒNƒ‰ƒCƒAƒ“ƒg‚ÆƒT[ƒo—¼•û‚ªƒTƒ|[ƒg‚µ‚Ä‚¢‚é•¨‚Ì‚¤‚¿AƒNƒ‰ƒCƒAƒ“ƒg‘¤‚ÅÅ‚à‘O‚Éw’è‚µ‚½•¨‚ªg‚í‚ê‚éB
+ * ã‚µãƒ¼ãƒã‹ã‚‰ã¯ã‚«ãƒ³ãƒåŒºåˆ‡ã‚Šã§ã®ãƒªã‚¹ãƒˆãŒé€ã‚‰ã‚Œã¦æ¥ã‚‹ã€‚
+ * ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã¨ã‚µãƒ¼ãƒä¸¡æ–¹ãŒã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã‚‹ç‰©ã®ã†ã¡ã€ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆå´ã§æœ€ã‚‚å‰ã«æŒ‡å®šã—ãŸç‰©ãŒä½¿ã‚ã‚Œã‚‹ã€‚
  */
 static int
 choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
@@ -4784,7 +4784,7 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	const struct ssh2cipher *cipher;
 	const struct ssh2_mac_t *mac;
 
-	// Œ®ŒğŠ·ƒAƒ‹ƒSƒŠƒYƒ€
+	// éµäº¤æ›ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ 
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
@@ -4809,7 +4809,7 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	}
 
 	if (pvar->kex_status == 0) {
-		// ƒT[ƒo[‘¤‚ªStrict KEX‚É‘Î‰‚µ‚Ä‚¢‚é‚©‚ÌŠm”F
+		// ã‚µãƒ¼ãƒãƒ¼å´ãŒStrict KEXã«å¯¾å¿œã—ã¦ã„ã‚‹ã‹ã®ç¢ºèª
 		choose_SSH2_proposal(buf, "kex-strict-s-v00@openssh.com", tmp, sizeof(tmp));
 		if (tmp[0] != '\0') {
 			pvar->server_strict_kex = TRUE;
@@ -4817,7 +4817,7 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 		}
 	}
 
-	// ƒzƒXƒgŒ®ƒAƒ‹ƒSƒŠƒYƒ€
+	// ãƒ›ã‚¹ãƒˆéµã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ 
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
@@ -4841,7 +4841,7 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 		goto error;
 	}
 
-	// ˆÃ†ƒAƒ‹ƒSƒŠƒYƒ€(ƒNƒ‰ƒCƒAƒ“ƒg -> ƒT[ƒo)
+	// æš—å·ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ (ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ -> ã‚µãƒ¼ãƒ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
@@ -4865,7 +4865,7 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 		goto error;
 	}
 
-	// ˆÃ†ƒAƒ‹ƒSƒŠƒYƒ€(ƒT[ƒo -> ƒNƒ‰ƒCƒAƒ“ƒg)
+	// æš—å·ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ (ã‚µãƒ¼ãƒ -> ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
@@ -4889,7 +4889,7 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 		goto error;
 	}
 
-	// MACƒAƒ‹ƒSƒŠƒYƒ€(ƒNƒ‰ƒCƒAƒ“ƒg -> ƒT[ƒo)
+	// MACã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ (ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ -> ã‚µãƒ¼ãƒ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
@@ -4919,7 +4919,7 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 		}
 	}
 
-	// MACƒAƒ‹ƒSƒŠƒYƒ€(ƒT[ƒo -> ƒNƒ‰ƒCƒAƒ“ƒg)
+	// MACã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ (ã‚µãƒ¼ãƒ -> ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
@@ -4949,7 +4949,7 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 		}
 	}
 
-	// ˆ³kƒAƒ‹ƒSƒŠƒYƒ€(ƒNƒ‰ƒCƒAƒ“ƒg -> ƒT[ƒo)
+	// åœ§ç¸®ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ (ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ -> ã‚µãƒ¼ãƒ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
@@ -4973,7 +4973,7 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 		goto error;
 	}
 
-	// ˆ³kƒAƒ‹ƒSƒŠƒYƒ€(ƒT[ƒo -> ƒNƒ‰ƒCƒAƒ“ƒg)
+	// åœ§ç¸®ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ (ã‚µãƒ¼ãƒ -> ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
@@ -4997,13 +4997,13 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 		goto error;
 	}
 
-	// Œ¾Œê(ƒNƒ‰ƒCƒAƒ“ƒg -> ƒT[ƒo)
-	// Œ»ó‚Å‚Í–¢g—pBƒƒO‚É‹L˜^‚·‚é‚¾‚¯B
+	// è¨€èª(ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ -> ã‚µãƒ¼ãƒ)
+	// ç¾çŠ¶ã§ã¯æœªä½¿ç”¨ã€‚ãƒ­ã‚°ã«è¨˜éŒ²ã™ã‚‹ã ã‘ã€‚
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		// Œ¾Œê‚Ì name-list ‚ªæ‚ê‚È‚¢‚Æ‚¢‚¤–‚Í KEXINIT ƒpƒPƒbƒg‚ÌƒtƒH[ƒ}ƒbƒg©‘Ì‚ª‘z’èŠO‚Å‚ ‚è
-		// ˆÙí‚Èó‘Ô‚Å‚ ‚é‚ªA’ÊM‚É•K—v‚ÈƒAƒ‹ƒSƒŠƒYƒ€‚Í‚·‚Å‚ÉƒlƒSÏ‚İ‚Å’ÊM©‘Ì‚Ís‚¦‚éB
-		// ¡‚Ü‚Å‚Í‚±‚Ì•”•ª‚Ìƒ`ƒFƒbƒN‚ğs‚Á‚Ä‚¢‚È‚©‚Á‚½‚Ì‚ÅAŒx‚ğ‹L˜^‚·‚é‚Ì‚İ‚Åˆ—‚ğ‘±s‚·‚éB
+		// è¨€èªã® name-list ãŒå–ã‚Œãªã„ã¨ã„ã†äº‹ã¯ KEXINIT ãƒ‘ã‚±ãƒƒãƒˆã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆè‡ªä½“ãŒæƒ³å®šå¤–ã§ã‚ã‚Š
+		// ç•°å¸¸ãªçŠ¶æ…‹ã§ã‚ã‚‹ãŒã€é€šä¿¡ã«å¿…è¦ãªã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã¯ã™ã§ã«ãƒã‚´æ¸ˆã¿ã§é€šä¿¡è‡ªä½“ã¯è¡Œãˆã‚‹ã€‚
+		// ä»Šã¾ã§ã¯ã“ã®éƒ¨åˆ†ã®ãƒã‚§ãƒƒã‚¯ã‚’è¡Œã£ã¦ã„ãªã‹ã£ãŸã®ã§ã€è­¦å‘Šã‚’è¨˜éŒ²ã™ã‚‹ã®ã¿ã§å‡¦ç†ã‚’ç¶šè¡Œã™ã‚‹ã€‚
 		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (language client to server)", __FUNCTION__);
 		goto skip;
 	case GetPayloadTruncate:
@@ -5013,11 +5013,11 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: language client to server: %s", buf);
 
-	// Œ¾Œê(ƒT[ƒo -> ƒNƒ‰ƒCƒAƒ“ƒg)
-	// Œ»ó‚Å‚Í–¢g—pBƒƒO‚É‹L˜^‚·‚é‚¾‚¯B
+	// è¨€èª(ã‚µãƒ¼ãƒ -> ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ)
+	// ç¾çŠ¶ã§ã¯æœªä½¿ç”¨ã€‚ãƒ­ã‚°ã«è¨˜éŒ²ã™ã‚‹ã ã‘ã€‚
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		// Œ¾Œê(ƒNƒ‰ƒCƒAƒ“ƒg -> ƒT[ƒo) ‚Æ“¯—l‚ÉA–â‘è‚ª‚ ‚Á‚Ä‚àŒx‚Ì‚İ‚Æ‚·‚éB
+		// è¨€èª(ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ -> ã‚µãƒ¼ãƒ) ã¨åŒæ§˜ã«ã€å•é¡ŒãŒã‚ã£ã¦ã‚‚è­¦å‘Šã®ã¿ã¨ã™ã‚‹ã€‚
 		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (language server to client)", __FUNCTION__);
 		goto skip;
 	case GetPayloadTruncate:
@@ -5028,21 +5028,21 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: language server to client: %s", buf);
 
 	// first_kex_packet_follows:
-	// KEXINIT ƒpƒPƒbƒg‚ÌŒã‚ÉAƒAƒ‹ƒSƒŠƒYƒ€‚ÌƒlƒSŒ‹‰Ê‚ğ„‘ª‚µ‚ÄŒ®ŒğŠ·ƒpƒPƒbƒg‚ğ‘—‚Á‚Ä‚¢‚é‚©B
-	// SSH_MSG_KEXINIT ‚ÌŒã‚ÌŒ®ŒğŠ·‚ÍƒNƒ‰ƒCƒAƒ“ƒg‘¤‚©‚ç‘—‚é‚Ì‚ÅƒT[ƒo‘¤‚ª 1 ‚É‚·‚é–‚Í‚È‚¢‚Í‚¸B
+	// KEXINIT ãƒ‘ã‚±ãƒƒãƒˆã®å¾Œã«ã€ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã®ãƒã‚´çµæœã‚’æ¨æ¸¬ã—ã¦éµäº¤æ›ãƒ‘ã‚±ãƒƒãƒˆã‚’é€ã£ã¦ã„ã‚‹ã‹ã€‚
+	// SSH_MSG_KEXINIT ã®å¾Œã®éµäº¤æ›ã¯ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆå´ã‹ã‚‰é€ã‚‹ã®ã§ã‚µãƒ¼ãƒå´ãŒ 1 ã«ã™ã‚‹äº‹ã¯ãªã„ã¯ãšã€‚
 	if (!get_boolean_from_payload(pvar, buf)) {
-		// Œ¾Œê(ƒNƒ‰ƒCƒAƒ“ƒg -> ƒT[ƒo) ‚Æ“¯—l‚ÉA–â‘è‚ª‚ ‚Á‚Ä‚àŒx‚Ì‚İ‚Æ‚·‚éB
+		// è¨€èª(ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ -> ã‚µãƒ¼ãƒ) ã¨åŒæ§˜ã«ã€å•é¡ŒãŒã‚ã£ã¦ã‚‚è­¦å‘Šã®ã¿ã¨ã™ã‚‹ã€‚
 		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (first_kex_packet_follows)", __FUNCTION__);
 		goto skip;
 	}
 	if (buf[0] != 0) {
-		// ‘Oq‚Ì‚æ‚¤‚ÉƒT[ƒo‘¤‚Í 0 ˆÈŠO‚É‚·‚é–‚Í‚È‚¢‚Í‚¸‚È‚Ì‚ÅAŒx‚ğ‹L˜^‚·‚éB
+		// å‰è¿°ã®ã‚ˆã†ã«ã‚µãƒ¼ãƒå´ã¯ 0 ä»¥å¤–ã«ã™ã‚‹äº‹ã¯ãªã„ã¯ãšãªã®ã§ã€è­¦å‘Šã‚’è¨˜éŒ²ã™ã‚‹ã€‚
 		logprintf(LOG_LEVEL_WARNING, "%s: first_kex_packet_follows is not 0. (%d)", __FUNCTION__, buf[0]);
 	}
 
-	// reserved: Œ»ó‚Íí‚É 0 ‚Æ‚È‚éB
+	// reserved: ç¾çŠ¶ã¯å¸¸ã« 0 ã¨ãªã‚‹ã€‚
 	if (!get_uint32_from_payload(pvar, &payload_len)) {
-		// Œ¾Œê(ƒNƒ‰ƒCƒAƒ“ƒg -> ƒT[ƒo) ‚Æ“¯—l‚ÉA–â‘è‚ª‚ ‚Á‚Ä‚àŒx‚Ì‚İ‚Æ‚·‚éB
+		// è¨€èª(ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ -> ã‚µãƒ¼ãƒ) ã¨åŒæ§˜ã«ã€å•é¡ŒãŒã‚ã£ã¦ã‚‚è­¦å‘Šã®ã¿ã¨ã™ã‚‹ã€‚
 		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (reserved)", __FUNCTION__ );
 		goto skip;
 	}
@@ -5051,7 +5051,7 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	}
 
 skip:
-	// Œˆ’è‚µ‚½•û®‚ğƒƒO‚Éo—Í
+	// æ±ºå®šã—ãŸæ–¹å¼ã‚’ãƒ­ã‚°ã«å‡ºåŠ›
 	logprintf(LOG_LEVEL_VERBOSE, "KEX algorithm: %s",
 		get_kex_algorithm_name(pvar->kex_type));
 	logprintf(LOG_LEVEL_VERBOSE, "server host key algorithm: %s",
@@ -5073,10 +5073,10 @@ skip:
 		cipher = pvar->ciphers[mode];
 		mac = pvar->macs[mode];
 
-		// current_keys[] ‚Éİ’è‚µ‚Ä‚¨‚¢‚ÄA‚ ‚Æ‚Å pvar->ssh2_keys[] ‚ÖƒRƒs[‚·‚éB
+		// current_keys[] ã«è¨­å®šã—ã¦ãŠã„ã¦ã€ã‚ã¨ã§ pvar->ssh2_keys[] ã¸ã‚³ãƒ”ãƒ¼ã™ã‚‹ã€‚
 		mac_setup_by_alg(&current_keys[mode].mac, mac);
 
-		// ƒL[ƒTƒCƒY‚ÆƒuƒƒbƒNƒTƒCƒY‚à‚±‚±‚Åİ’è‚µ‚Ä‚¨‚­
+		// ã‚­ãƒ¼ã‚µã‚¤ã‚ºã¨ãƒ–ãƒ­ãƒƒã‚¯ã‚µã‚¤ã‚ºã‚‚ã“ã“ã§è¨­å®šã—ã¦ãŠã
 		current_keys[mode].enc.key_len = get_cipher_key_len(cipher);
 		current_keys[mode].enc.block_size = get_cipher_block_size(cipher);
 		current_keys[mode].enc.iv_len = get_cipher_iv_len(cipher);
@@ -5086,11 +5086,11 @@ skip:
 		current_keys[mode].comp.enabled = 0;
 
 
-		// ‚±‚Ì“_‚Å‚Í disable
+		// ã“ã®æ™‚ç‚¹ã§ã¯ disable
 		pvar->ssh2_keys[mode].mac.enabled = 0;
 		pvar->ssh2_keys[mode].comp.enabled = 0;
 
-		// ˆÃ†ƒAƒ‹ƒSƒŠƒYƒ€‚ÌƒL[ƒTƒCƒYAƒuƒƒbƒNƒTƒCƒYAMACƒTƒCƒY‚Ì‚¤‚¿Å‘å’l(we_need)‚ğŒˆ’è‚·‚é
+		// æš—å·ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã®ã‚­ãƒ¼ã‚µã‚¤ã‚ºã€ãƒ–ãƒ­ãƒƒã‚¯ã‚µã‚¤ã‚ºã€MACã‚µã‚¤ã‚ºã®ã†ã¡æœ€å¤§å€¤(we_need)ã‚’æ±ºå®šã™ã‚‹
 		need = max(need, current_keys[mode].enc.key_len);
 		need = max(need, current_keys[mode].enc.block_size);
 		need = max(need, current_keys[mode].enc.iv_len);
@@ -5106,8 +5106,8 @@ error:
 
 
 /*
- * ƒL[ŒğŠ·ŠJn‘O‚Ìƒ`ƒFƒbƒN (SSH2_MSG_KEXINIT)
- * ¦“–ŠYŠÖ”‚Íƒf[ƒ^’ÊM’†‚É‚àŒÄ‚Î‚ê‚Ä‚­‚é‰Â”\«‚ ‚è
+ * ã‚­ãƒ¼äº¤æ›é–‹å§‹å‰ã®ãƒã‚§ãƒƒã‚¯ (SSH2_MSG_KEXINIT)
+ * â€»å½“è©²é–¢æ•°ã¯ãƒ‡ãƒ¼ã‚¿é€šä¿¡ä¸­ã«ã‚‚å‘¼ã°ã‚Œã¦ãã‚‹å¯èƒ½æ€§ã‚ã‚Š
  *
  * SSH2_MSG_KEXINIT:
  *   byte         SSH_MSG_KEXINIT
@@ -5135,23 +5135,23 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXINIT was received.");
 
-	// ‚·‚Å‚ÉƒL[ŒğŠ·‚ªI‚í‚Á‚Ä‚¢‚é‚É‚àŠÖ‚í‚ç‚¸AƒT[ƒo‚©‚ç SSH2_MSG_KEXINIT ‚ª
-	// ‘—‚ç‚ê‚Ä‚­‚éê‡‚ÍAƒL[Äì¬‚ğs‚¤B(2004.10.24 yutaka)
+	// ã™ã§ã«ã‚­ãƒ¼äº¤æ›ãŒçµ‚ã‚ã£ã¦ã„ã‚‹ã«ã‚‚é–¢ã‚ã‚‰ãšã€ã‚µãƒ¼ãƒã‹ã‚‰ SSH2_MSG_KEXINIT ãŒ
+	// é€ã‚‰ã‚Œã¦ãã‚‹å ´åˆã¯ã€ã‚­ãƒ¼å†ä½œæˆã‚’è¡Œã†ã€‚(2004.10.24 yutaka)
 	if (pvar->kex_status == KEX_FLAG_KEXDONE) {
 		pvar->kex_status = KEX_FLAG_REKEYING;
 
-		// ƒL[Äì¬‚Í myproposal ‚©‚ç ",ext-info-c,kex-strict-c-v00@openssh.com" ‚ğíœ‚·‚é
-		// XV‚·‚é‚Ì‚Í KEX ‚Ì‚İ‚Å‚æ‚¢
+		// ã‚­ãƒ¼å†ä½œæˆæ™‚ã¯ myproposal ã‹ã‚‰ ",ext-info-c,kex-strict-c-v00@openssh.com" ã‚’å‰Šé™¤ã™ã‚‹
+		// æ›´æ–°ã™ã‚‹ã®ã¯ KEX ã®ã¿ã§ã‚ˆã„
 		SSH2_update_kex_myproposal(pvar);
 
-		// ƒT[ƒo‚ÖSSH2_MSG_KEXINIT ‚ğ‘—‚é
+		// ã‚µãƒ¼ãƒã¸SSH2_MSG_KEXINIT ã‚’é€ã‚‹
 		SSH2_send_kexinit(pvar);
 	}
 
 	data = remained_payload(pvar);
 	len = remained_payloadlen(pvar);
 
-	// KEX ‚ÌÅŒã‚Å exchange-hash (session-id) ‚ğŒvZ‚·‚é‚Ì‚Ég‚¤‚Ì‚Å•Û‘¶‚µ‚Ä‚¨‚­
+	// KEX ã®æœ€å¾Œã§ exchange-hash (session-id) ã‚’è¨ˆç®—ã™ã‚‹ã®ã«ä½¿ã†ã®ã§ä¿å­˜ã—ã¦ãŠã
 	if (pvar->peer_kex != NULL) {
 		// already allocated
 		buffer_clear(pvar->peer_kex);
@@ -5178,7 +5178,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 	CRYPT_set_server_cookie(pvar, buf);
 
-	// g—p‚·‚éƒAƒ‹ƒSƒŠƒYƒ€‚ÌŒˆ’è
+	// ä½¿ç”¨ã™ã‚‹ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã®æ±ºå®š
 	r = choose_SSH2_kex_choose_conf(pvar, buf, sizeof(buf), msg);
 	if (r != 0) {
 		goto error;
@@ -5257,7 +5257,7 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 		goto error;
 	}
 
-	// ”é–§‚É‚·‚×‚«—”(X)‚ğ¶¬
+	// ç§˜å¯†ã«ã™ã¹ãä¹±æ•°(X)ã‚’ç”Ÿæˆ
 	dh_gen_key(pvar, dh, pvar->we_need);
 	DH_get0_key(dh, NULL, &priv_key);
 	log_kex_key(pvar, priv_key);
@@ -5320,9 +5320,9 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 		goto error;
 	}
 
-	// ƒT[ƒo‚É—v‹‚·‚é group size ‚Ì min, n(preferred), max ‚ğŒˆ’è‚·‚éB
+	// ã‚µãƒ¼ãƒã«è¦æ±‚ã™ã‚‹ group size ã® min, n(preferred), max ã‚’æ±ºå®šã™ã‚‹ã€‚
 	if (pvar->settings.GexMinimalGroupSize == 0) {
-		// 0 (–¢İ’è) ‚¾‚Á‚½‚ÍÅV‚Ì„§’l‚ğg‚¤
+		// 0 (æœªè¨­å®š) ã ã£ãŸæ™‚ã¯æœ€æ–°ã®æ¨å¥¨å€¤ã‚’ä½¿ã†
 		min = GEX_GRP_DEFAULT_MIN;
 	}
 	else if (pvar->settings.GexMinimalGroupSize < GEX_GRP_LIMIT_MIN) {
@@ -5341,10 +5341,10 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 		min = pvar->settings.GexMinimalGroupSize;
 	}
 
-	// max ‚Íí‚ÉãŒÀ‚¢‚Á‚Ï‚¢
+	// max ã¯å¸¸ã«ä¸Šé™ã„ã£ã±ã„
 	max = GEX_GRP_LIMIT_MAX;
 
-	// preferred ‚Íg—p‚·‚éŠeˆÃ†—v‘f‚ÌŒ®’·/ƒuƒƒbƒN’·‚Ì‚¤‚¿AÅ‘å‚Ì‚à‚Ì‚ğg‚¤
+	// preferred ã¯ä½¿ç”¨ã™ã‚‹å„æš—å·è¦ç´ ã®éµé•·/ãƒ–ãƒ­ãƒƒã‚¯é•·ã®ã†ã¡ã€æœ€å¤§ã®ã‚‚ã®ã‚’ä½¿ã†
 	bits = dh_estimate(pvar->we_need * 8);
 	if (bits < min) {
 		bits = min;
@@ -5359,7 +5359,7 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 		bits = 4096;
 	}
 
-	// ƒT[ƒo‚Ögroup size‚ğ‘—‚Á‚ÄAp ‚Æ g ‚ğì‚Á‚Ä‚à‚ç‚¤B
+	// ã‚µãƒ¼ãƒã¸group sizeã‚’é€ã£ã¦ã€p ã¨ g ã‚’ä½œã£ã¦ã‚‚ã‚‰ã†ã€‚
 	buffer_put_int(msg, min);
 	buffer_put_int(msg, bits);
 	buffer_put_int(msg, max);
@@ -5368,7 +5368,7 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
 
-	// ‚ ‚Æ‚ÅƒnƒbƒVƒ…ŒvZ‚Ég‚¤‚Ì‚Åæ‚Á‚Ä‚¨‚­B
+	// ã‚ã¨ã§ãƒãƒƒã‚·ãƒ¥è¨ˆç®—ã«ä½¿ã†ã®ã§å–ã£ã¦ãŠãã€‚
 	pvar->kexgex_min = min;
 	pvar->kexgex_bits = bits;
 	pvar->kexgex_max = max;
@@ -5434,7 +5434,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	// (1) < GEX_GRP_LIMIT_MIN <= (2) < kexgex_min <= (3) < kexgex_bits <= (4) <= kexgex_max < (5) <= GEX_GRP_LIMIT_MAX < (6)
 	//
 	if (grp_bits < GEX_GRP_LIMIT_MIN || grp_bits > GEX_GRP_LIMIT_MAX) {
-	// (1), (6) ƒvƒƒgƒRƒ‹‚Å”F‚ß‚ç‚ê‚Ä‚¢‚é”ÍˆÍ(1024 <= grp_bits <= 8192)‚ÌŠOB‹­§Ø’fB
+	// (1), (6) ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã§èªã‚ã‚‰ã‚Œã¦ã„ã‚‹ç¯„å›²(1024 <= grp_bits <= 8192)ã®å¤–ã€‚å¼·åˆ¶åˆ‡æ–­ã€‚
 		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_OUTOFRANGE", pvar,
 		                  "Received group size is out of range: %d");
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, pvar->UIMsg, grp_bits);
@@ -5442,7 +5442,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 		goto error;
 	}
 	else if (grp_bits < pvar->kexgex_min) {
-	// (2) ƒvƒƒgƒRƒ‹‚Å”F‚ß‚ç‚ê‚Ä‚¢‚é”ÍˆÍ“à‚¾‚ªA‚±‚¿‚ç‚Ìİ’è‚µ‚½Å¬’l‚æ‚è¬‚³‚¢BŠm”Fƒ_ƒCƒAƒƒO‚ğo‚·B
+	// (2) ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã§èªã‚ã‚‰ã‚Œã¦ã„ã‚‹ç¯„å›²å†…ã ãŒã€ã“ã¡ã‚‰ã®è¨­å®šã—ãŸæœ€å°å€¤ã‚ˆã‚Šå°ã•ã„ã€‚ç¢ºèªãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºã™ã€‚
 		logprintf(LOG_LEVEL_WARNING,
 		    "DH-GEX: grp_bits(%d) < kexgex_min(%d)", grp_bits, pvar->kexgex_min);
 		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_SMALLER", pvar,
@@ -5451,18 +5451,18 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 			pvar->UIMsg, pvar->kexgex_min, grp_bits);
 	}
 	else if (grp_bits < pvar->kexgex_bits) {
-	// (3) —v‹‚ÌÅ¬’l‚Í–‚½‚·‚ªA—v‹’l‚æ‚è‚Í¬‚³‚¢BŠm”Fƒ_ƒCƒAƒƒO‚Ío‚³‚È‚¢B
+	// (3) è¦æ±‚ã®æœ€å°å€¤ã¯æº€ãŸã™ãŒã€è¦æ±‚å€¤ã‚ˆã‚Šã¯å°ã•ã„ã€‚ç¢ºèªãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã¯å‡ºã•ãªã„ã€‚
 		logprintf(LOG_LEVEL_NOTICE,
 			"DH-GEX: grp_bits(%d) < kexgex_bits(%d)", grp_bits, pvar->kexgex_bits);
 		tmpbuf[0] = 0; // no message
 	}
 	else if (grp_bits <= pvar->kexgex_max) {
-	// (4) —v‹’lˆÈãA‚©‚Â—v‹‚ÌÅ‘å’lˆÈ‰ºB–â‘è‚È‚µB
+	// (4) è¦æ±‚å€¤ä»¥ä¸Šã€ã‹ã¤è¦æ±‚ã®æœ€å¤§å€¤ä»¥ä¸‹ã€‚å•é¡Œãªã—ã€‚
 		tmpbuf[0] = 0; // no message
 	}
 	else {
-	// (5) ‚±‚¿‚ç‚Ìİ’è‚µ‚½Å‘å’l‚æ‚è‘å‚«‚¢BŠm”Fƒ_ƒCƒAƒƒO‚ğo‚·B
-	//     ‚½‚¾‚µŒ»ó‚Å‚Í kexgex_max == GEX_GRP_LIMIT_MAX(8192) ‚Å‚ ‚éˆ×‚±‚Ìó‹µ‚É‚È‚é–‚Í–³‚¢B
+	// (5) ã“ã¡ã‚‰ã®è¨­å®šã—ãŸæœ€å¤§å€¤ã‚ˆã‚Šå¤§ãã„ã€‚ç¢ºèªãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºã™ã€‚
+	//     ãŸã ã—ç¾çŠ¶ã§ã¯ kexgex_max == GEX_GRP_LIMIT_MAX(8192) ã§ã‚ã‚‹ç‚ºã“ã®çŠ¶æ³ã«ãªã‚‹äº‹ã¯ç„¡ã„ã€‚
 		logprintf(LOG_LEVEL_WARNING,
 			"DH-GEX: grp_bits(%d) > kexgex_max(%d)", grp_bits, pvar->kexgex_max);
 		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_LARGER", pvar,
@@ -5487,12 +5487,12 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 		goto error;
 	DH_set0_pqg(dh, p, NULL, g);
 
-	// ”é–§‚É‚·‚×‚«—”(X)‚ğ¶¬
+	// ç§˜å¯†ã«ã™ã¹ãä¹±æ•°(X)ã‚’ç”Ÿæˆ
 	dh_gen_key(pvar, dh, pvar->we_need);
 	DH_get0_key(dh, NULL, &priv_key);
 	log_kex_key(pvar, priv_key);
 
-	// ŒöŠJŒ®‚ğƒT[ƒo‚Ö‘—M
+	// å…¬é–‹éµã‚’ã‚µãƒ¼ãƒã¸é€ä¿¡
 	msg = buffer_init();
 	if (msg == NULL) {
 		goto error;
@@ -5506,7 +5506,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_INIT was sent at handle_SSH2_dh_gex_group().");
 
-	// ‚±‚±‚Åì¬‚µ‚½DHŒ®‚ÍA‚ ‚Æ‚ÅƒnƒbƒVƒ…ŒvZ‚Ég‚¤‚½‚ßæ‚Á‚Ä‚¨‚­B(2004.10.31 yutaka)
+	// ã“ã“ã§ä½œæˆã—ãŸDHéµã¯ã€ã‚ã¨ã§ãƒãƒƒã‚·ãƒ¥è¨ˆç®—ã«ä½¿ã†ãŸã‚å–ã£ã¦ãŠãã€‚(2004.10.31 yutaka)
 	if (pvar->kexdh != NULL) {
 		DH_free(pvar->kexdh);
 	}
@@ -5588,7 +5588,7 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
 
-	// ‚±‚±‚Åì¬‚µ‚½Œ®‚ÍA‚ ‚Æ‚ÅƒnƒbƒVƒ…ŒvZ‚Ég‚¤‚½‚ßæ‚Á‚Ä‚¨‚­B
+	// ã“ã“ã§ä½œæˆã—ãŸéµã¯ã€ã‚ã¨ã§ãƒãƒƒã‚·ãƒ¥è¨ˆç®—ã«ä½¿ã†ãŸã‚å–ã£ã¦ãŠãã€‚
 	if (pvar->ecdh_client_key) {
 		EC_KEY_free(pvar->ecdh_client_key);
 	}
@@ -5692,7 +5692,7 @@ static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, buffer_t *s
 	//debug_print(34, buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
 	//debug_print(35, server_host_key_blob, bloblen);
 
-	// session id‚Ì•Û‘¶i‰‰ñÚ‘±‚Ì‚İj
+	// session idã®ä¿å­˜ï¼ˆåˆå›æ¥ç¶šæ™‚ã®ã¿ï¼‰
 	if (pvar->session_id == NULL) {
 		pvar->session_id_len = hashlen;
 		pvar->session_id = malloc(pvar->session_id_len);
@@ -5747,15 +5747,15 @@ static void ssh2_send_newkeys(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE, "%s: SSH2_MSG_NEWKEYS was sent.", __FUNCTION__);
 
-	// SSH2_MSG_NEWKEYS ‚ğ‘—‚èI‚í‚Á‚½ˆÈ~‚ÌƒpƒPƒbƒg‚ÍˆÃ†‰»‚³‚ê‚é•K—v‚ª—L‚éˆ×A
-	// ‚±‚Ì“_‚Å‘—M•ûŒü‚ÌˆÃ†‰»‚ğŠJn‚·‚éB
+	// SSH2_MSG_NEWKEYS ã‚’é€ã‚Šçµ‚ã‚ã£ãŸä»¥é™ã®ãƒ‘ã‚±ãƒƒãƒˆã¯æš—å·åŒ–ã•ã‚Œã‚‹å¿…è¦ãŒæœ‰ã‚‹ç‚ºã€
+	// ã“ã®æ™‚ç‚¹ã§é€ä¿¡æ–¹å‘ã®æš—å·åŒ–ã‚’é–‹å§‹ã™ã‚‹ã€‚
 	ssh2_set_newkeys(pvar, MODE_OUT);
 	if (!CRYPT_start_encryption(pvar, 1, 0)) {
 		// TODO: error
 	}
 
 
-	// “¯—l‚ÉAMAC‚ÆƒpƒPƒbƒgˆ³k‚à‚±‚Ì“_‚Å—LŒø‚É‚·‚éB
+	// åŒæ§˜ã«ã€MACã¨ãƒ‘ã‚±ãƒƒãƒˆåœ§ç¸®ã‚‚ã“ã®æ™‚ç‚¹ã§æœ‰åŠ¹ã«ã™ã‚‹ã€‚
 	pvar->ssh2_keys[MODE_OUT].mac.enabled = 1;
 	pvar->ssh2_keys[MODE_OUT].comp.enabled = 1;
 	enable_send_compression(pvar);
@@ -5767,16 +5767,16 @@ static void ssh2_send_newkeys(PTInstVar pvar)
 		pvar->ssh_state.sender_sequence_number = 0;
 	}
 
-	// SSH2_MSG_NEWKEYS ‚ğŠù‚Éó‚¯æ‚Á‚Ä‚¢‚½‚çKEX‚ÍŠ®—¹BŸ‚Ìˆ—‚ÉˆÚ‚éB
+	// SSH2_MSG_NEWKEYS ã‚’æ—¢ã«å—ã‘å–ã£ã¦ã„ãŸã‚‰KEXã¯å®Œäº†ã€‚æ¬¡ã®å‡¦ç†ã«ç§»ã‚‹ã€‚
 	if (pvar->kex_status & KEX_FLAG_NEWKEYS_RECEIVED) {
 		if ((pvar->kex_status & KEX_FLAG_REKEYING)) {
 			do_SSH2_dispatch_setup_for_transfer(pvar);
 		}
 		else {
-			// ‰‰ñ‚Ì SSH2_MSG_NEWKEYS ‚Ì‘—óM‚ªŠ®—¹‚µAˆÈ~‚Ì’ÊM‚ÍˆÃ†‰»‚³‚ê‚½ó‘Ô‚É‚È‚é
+			// åˆå›ã® SSH2_MSG_NEWKEYS ã®é€å—ä¿¡ãŒå®Œäº†ã—ã€ä»¥é™ã®é€šä¿¡ã¯æš—å·åŒ–ã•ã‚ŒãŸçŠ¶æ…‹ã«ãªã‚‹
 			ssh2_finish_encryption_setup(pvar);
 
-			// ‰‰ñ‚ÌŒ®ŒğŠ·Œã‚Íƒ†[ƒU”FØ‚ğŠJn‚·‚é
+			// åˆå›ã®éµäº¤æ›å¾Œã¯ãƒ¦ãƒ¼ã‚¶èªè¨¼ã‚’é–‹å§‹ã™ã‚‹
 			ssh2_prep_userauth(pvar);
 		}
 		pvar->kex_status = KEX_FLAG_KEXDONE;
@@ -5788,8 +5788,8 @@ static void ssh2_send_newkeys(PTInstVar pvar)
 /*
  * Diffie-Hellman Key Exchange Reply (SSH2_MSG_KEXDH_REPLY:31)
  *
- * return TRUE: ¬Œ÷
- *        FALSE: ¸”s
+ * return TRUE: æˆåŠŸ
+ *        FALSE: å¤±æ•—
  */
 static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 {
@@ -5815,9 +5815,9 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	memset(&hostkey, 0, sizeof(hostkey));
 
-	// ƒƒbƒZ[ƒWƒ^ƒCƒv‚ÌŒã‚É‘±‚­ƒyƒCƒ[ƒh‚Ìæ“ª
+	// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—ã®å¾Œã«ç¶šããƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®å…ˆé ­
 	data = pvar->ssh_state.payload;
-	// ƒyƒCƒ[ƒh‚Ì’·‚³; ƒƒbƒZ[ƒWƒ^ƒCƒv•ª‚Ì 1 ƒoƒCƒg‚ğŒ¸‚ç‚·
+	// ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®é•·ã•; ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—åˆ†ã® 1 ãƒã‚¤ãƒˆã‚’æ¸›ã‚‰ã™
 	len = pvar->ssh_state.payloadlen - 1;
 
 	push_memdump("KEXDH_REPLY", "key exchange: receiving", data, len);
@@ -5838,8 +5838,8 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	}
 	data += bloblen;
 
-	// known_hosts‘Î‰ (2006.3.20)
-	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->hostkey_type)) {  // ƒzƒXƒgƒL[‚Ìí•Ê”äŠr
+	// known_hostså¯¾å¿œ (2006.3.20)
+	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->hostkey_type)) {  // ãƒ›ã‚¹ãƒˆã‚­ãƒ¼ã®ç¨®åˆ¥æ¯”è¼ƒ
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
 		            /*__FUNCTION__*/"handle_SSH2_dh_kex_reply",
@@ -5877,7 +5877,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	}
 
 	/* calc shared secret K */
-	// ‹¤’ÊŒ®‚Ì¶¬
+	// å…±é€šéµã®ç”Ÿæˆ
 	//   K = B^a mod p = g^(a*b) mod p
 	// Writing using RFC 4253 notation:
 	//   K = f^x mod p
@@ -5901,8 +5901,8 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	//debug_print(40, dh_buf, share_len);
 
 	/* calc and verify H */
-	// ƒnƒbƒVƒ…‚ÌŒvZ
-	// verify ‚Í ssh2_kex_finish() ‚Ås‚¤
+	// ãƒãƒƒã‚·ãƒ¥ã®è¨ˆç®—
+	// verify ã¯ ssh2_kex_finish() ã§è¡Œã†
 	DH_get0_key(pvar->kexdh, &pub_key, NULL);
 	hashlen = sizeof(hash);
 	ret = kex_dh_hash(
@@ -5930,7 +5930,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "hash", hash, hashlen);
 	}
 
-	// TTSSHƒo[ƒWƒ‡ƒ“î•ñ‚É•\¦‚·‚éƒL[ƒrƒbƒg”‚ğ‹‚ß‚Ä‚¨‚­
+	// TTSSHãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±ã«è¡¨ç¤ºã™ã‚‹ã‚­ãƒ¼ãƒ“ãƒƒãƒˆæ•°ã‚’æ±‚ã‚ã¦ãŠã
 	DH_get0_key(pvar->kexdh, &pub_key, NULL);
 	pvar->client_key_bits = BN_num_bits(pub_key);
 	pvar->server_key_bits = BN_num_bits(server_public);
@@ -5941,9 +5941,9 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
 	if (ret == TRUE) {
-		// ƒzƒXƒgŒ®‚ÌŠm”F‚ª¬Œ÷‚µ‚½‚Ì‚ÅAŒã‘±‚Ìˆ—‚ğs‚¤
+		// ãƒ›ã‚¹ãƒˆéµã®ç¢ºèªãŒæˆåŠŸã—ãŸã®ã§ã€å¾Œç¶šã®å‡¦ç†ã‚’è¡Œã†
 		SSH_notify_host_OK(pvar);
-		// known_hostsƒ_ƒCƒAƒƒO‚ÌŒÄ‚Ño‚µ‚½‚Ì‚ÅAˆÈ~A‰½‚à‚µ‚È‚¢B
+		// known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®å‘¼ã³å‡ºã—ãŸã®ã§ã€ä»¥é™ã€ä½•ã‚‚ã—ãªã„ã€‚
 	}
 
 error:
@@ -5963,8 +5963,8 @@ error:
 /*
  * Diffie-Hellman Group and Key Exchange Reply (SSH2_MSG_KEX_DH_GEX_REPLY:33)
  *
- * return TRUE: ¬Œ÷
- *        FALSE: ¸”s
+ * return TRUE: æˆåŠŸ
+ *        FALSE: å¤±æ•—
  */
 static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 {
@@ -5991,9 +5991,9 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	memset(&hostkey, 0, sizeof(hostkey));
 
-	// ƒƒbƒZ[ƒWƒ^ƒCƒv‚ÌŒã‚É‘±‚­ƒyƒCƒ[ƒh‚Ìæ“ª
+	// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—ã®å¾Œã«ç¶šããƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®å…ˆé ­
 	data = pvar->ssh_state.payload;
-	// ƒyƒCƒ[ƒh‚Ì’·‚³; ƒƒbƒZ[ƒWƒ^ƒCƒv•ª‚Ì 1 ƒoƒCƒg‚ğŒ¸‚ç‚·
+	// ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®é•·ã•; ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—åˆ†ã® 1 ãƒã‚¤ãƒˆã‚’æ¸›ã‚‰ã™
 	len = pvar->ssh_state.payloadlen - 1;
 
 	push_memdump("DH_GEX_REPLY", "key exchange: receiving", data, len);
@@ -6014,8 +6014,8 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	}
 	data += bloblen;
 
-	// known_hosts‘Î‰ (2006.3.20)
-	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->hostkey_type)) {  // ƒzƒXƒgƒL[‚Ìí•Ê”äŠr
+	// known_hostså¯¾å¿œ (2006.3.20)
+	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->hostkey_type)) {  // ãƒ›ã‚¹ãƒˆã‚­ãƒ¼ã®ç¨®åˆ¥æ¯”è¼ƒ
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
 		            /*__FUNCTION__*/"handle_SSH2_dh_gex_reply",
@@ -6053,7 +6053,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	}
 
 	/* calc shared secret K */
-	// ‹¤’ÊŒ®‚Ì¶¬
+	// å…±é€šéµã®ç”Ÿæˆ
 	//   K = B^a mod p = g^(a*b) mod p
 	// Writing using RFC 4253 notation:
 	//   K = f^x mod p
@@ -6077,8 +6077,8 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	//debug_print(40, dh_buf, share_len);
 
 	/* calc and verify H */
-	// ƒnƒbƒVƒ…‚ÌŒvZ
-	// verify ‚Í ssh2_kex_finish() ‚Ås‚¤
+	// ãƒãƒƒã‚·ãƒ¥ã®è¨ˆç®—
+	// verify ã¯ ssh2_kex_finish() ã§è¡Œã†
 	DH_get0_pqg(pvar->kexdh, &p, NULL, &g);
 	DH_get0_key(pvar->kexdh, &pub_key, NULL);
 	hashlen = sizeof(hash);
@@ -6112,7 +6112,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		push_memdump("DH_GEX_REPLY kexgex_hash", "hash", hash, hashlen);
 	}
 
-	// TTSSHƒo[ƒWƒ‡ƒ“î•ñ‚É•\¦‚·‚éƒL[ƒrƒbƒg”‚ğ‹‚ß‚Ä‚¨‚­
+	// TTSSHãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±ã«è¡¨ç¤ºã™ã‚‹ã‚­ãƒ¼ãƒ“ãƒƒãƒˆæ•°ã‚’æ±‚ã‚ã¦ãŠã
 	DH_get0_key(pvar->kexdh, &pub_key, NULL);
 	pvar->client_key_bits = BN_num_bits(pub_key);
 	pvar->server_key_bits = BN_num_bits(server_public);
@@ -6123,9 +6123,9 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
 	if (ret == TRUE) {
-		// ƒzƒXƒgŒ®‚ÌŠm”F‚ª¬Œ÷‚µ‚½‚Ì‚ÅAŒã‘±‚Ìˆ—‚ğs‚¤
+		// ãƒ›ã‚¹ãƒˆéµã®ç¢ºèªãŒæˆåŠŸã—ãŸã®ã§ã€å¾Œç¶šã®å‡¦ç†ã‚’è¡Œã†
 		SSH_notify_host_OK(pvar);
-		// known_hostsƒ_ƒCƒAƒƒO‚ÌŒÄ‚Ño‚µ‚½‚Ì‚ÅAˆÈ~A‰½‚à‚µ‚È‚¢B
+		// known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®å‘¼ã³å‡ºã—ãŸã®ã§ã€ä»¥é™ã€ä½•ã‚‚ã—ãªã„ã€‚
 	}
 
 error:
@@ -6146,8 +6146,8 @@ error:
 /*
  * Elliptic Curve Diffie-Hellman Key Exchange Reply (SSH2_MSG_KEX_ECDH_REPLY:31)
  *
- * return TRUE: ¬Œ÷
- *        FALSE: ¸”s
+ * return TRUE: æˆåŠŸ
+ *        FALSE: å¤±æ•—
  */
 static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 {
@@ -6173,9 +6173,9 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	memset(&hostkey, 0, sizeof(hostkey));
 
-	// ƒƒbƒZ[ƒWƒ^ƒCƒv‚ÌŒã‚É‘±‚­ƒyƒCƒ[ƒh‚Ìæ“ª
+	// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—ã®å¾Œã«ç¶šããƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®å…ˆé ­
 	data = pvar->ssh_state.payload;
-	// ƒyƒCƒ[ƒh‚Ì’·‚³; ƒƒbƒZ[ƒWƒ^ƒCƒv•ª‚Ì 1 ƒoƒCƒg‚ğŒ¸‚ç‚·
+	// ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®é•·ã•; ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—åˆ†ã® 1 ãƒã‚¤ãƒˆã‚’æ¸›ã‚‰ã™
 	len = pvar->ssh_state.payloadlen - 1;
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
@@ -6196,8 +6196,8 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	}
 	data += bloblen;
 
-	// known_hosts‘Î‰ (2006.3.20)
-	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->hostkey_type)) {  // ƒzƒXƒgƒL[‚Ìí•Ê”äŠr
+	// known_hostså¯¾å¿œ (2006.3.20)
+	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->hostkey_type)) {  // ãƒ›ã‚¹ãƒˆã‚­ãƒ¼ã®ç¨®åˆ¥æ¯”è¼ƒ
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
 		            /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
@@ -6236,7 +6236,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	}
 
 	/* calc shared secret K */
-	// ‹¤’ÊŒ®‚Ì¶¬
+	// å…±é€šéµã®ç”Ÿæˆ
 	//   (xk, yk) = dA * QB
 	//   xk is a shared secret
 	// Writing using RFC 5656 notation:
@@ -6268,8 +6268,8 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	//debug_print(40, ecdh_buf, ecdh_len);
 
 	/* calc and verify H */
-	// ƒnƒbƒVƒ…‚ÌŒvZ
-	// verify ‚Í ssh2_kex_finish() ‚Ås‚¤
+	// ãƒãƒƒã‚·ãƒ¥ã®è¨ˆç®—
+	// verify ã¯ ssh2_kex_finish() ã§è¡Œã†
 	hashlen = sizeof(hash);
 	ret = kex_ecdh_hash(
 		get_kex_hash_algorithm(pvar->kex_type),
@@ -6296,7 +6296,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "hash", hash, hashlen);
 	}
 
-	// TTSSHƒo[ƒWƒ‡ƒ“î•ñ‚É•\¦‚·‚éƒL[ƒrƒbƒg”‚ğ‹‚ß‚Ä‚¨‚­
+	// TTSSHãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±ã«è¡¨ç¤ºã™ã‚‹ã‚­ãƒ¼ãƒ“ãƒƒãƒˆæ•°ã‚’æ±‚ã‚ã¦ãŠã
 	switch (pvar->kex_type) {
 		case KEX_ECDH_SHA2_256:
 			pvar->client_key_bits = 256;
@@ -6321,9 +6321,9 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
 	if (ret == TRUE) {
-		// ƒzƒXƒgŒ®‚ÌŠm”F‚ª¬Œ÷‚µ‚½‚Ì‚ÅAŒã‘±‚Ìˆ—‚ğs‚¤
+		// ãƒ›ã‚¹ãƒˆéµã®ç¢ºèªãŒæˆåŠŸã—ãŸã®ã§ã€å¾Œç¶šã®å‡¦ç†ã‚’è¡Œã†
 		SSH_notify_host_OK(pvar);
-		// known_hostsƒ_ƒCƒAƒƒO‚ÌŒÄ‚Ño‚µ‚½‚Ì‚ÅAˆÈ~A‰½‚à‚µ‚È‚¢B
+		// known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®å‘¼ã³å‡ºã—ãŸã®ã§ã€ä»¥é™ã€ä½•ã‚‚ã—ãªã„ã€‚
 	}
 
 error:
@@ -6344,8 +6344,8 @@ error:
 /*
  * Elliptic Curve Diffie-Hellman Key Exchange Reply (SSH2_MSG_KEX_ECDH_REPLY:31)
  *
- * return TRUE: ¬Œ÷
- *        FALSE: ¸”s
+ * return TRUE: æˆåŠŸ
+ *        FALSE: å¤±æ•—
  */
 static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 {
@@ -6367,9 +6367,9 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 
 	memset(&hostkey, 0, sizeof(hostkey));
 
-	// ƒƒbƒZ[ƒWƒ^ƒCƒv‚ÌŒã‚É‘±‚­ƒyƒCƒ[ƒh‚Ìæ“ª
+	// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—ã®å¾Œã«ç¶šããƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®å…ˆé ­
 	data = pvar->ssh_state.payload;
-	// ƒyƒCƒ[ƒh‚Ì’·‚³; ƒƒbƒZ[ƒWƒ^ƒCƒv•ª‚Ì 1 ƒoƒCƒg‚ğŒ¸‚ç‚·
+	// ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®é•·ã•; ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—åˆ†ã® 1 ãƒã‚¤ãƒˆã‚’æ¸›ã‚‰ã™
 	len = pvar->ssh_state.payloadlen - 1;
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
@@ -6390,8 +6390,8 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	}
 	data += bloblen;
 
-	// known_hosts‘Î‰
-	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->hostkey_type)) {  // ƒzƒXƒgƒL[‚Ìí•Ê”äŠr
+	// known_hostså¯¾å¿œ
+	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->hostkey_type)) {  // ãƒ›ã‚¹ãƒˆã‚­ãƒ¼ã®ç¨®åˆ¥æ¯”è¼ƒ
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
 		            /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
@@ -6422,7 +6422,7 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	}
 
 	/* calc shared secret K */
-	// ‹¤’ÊŒ®‚Ì¶¬
+	// å…±é€šéµã®ç”Ÿæˆ
 	//   (xk, yk) = dA * QB
 	//   xk is a shared secret
 	// Writing using RFC 5656 notation:
@@ -6443,8 +6443,8 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	}
 
 	/* calc and verify H */
-	// ƒnƒbƒVƒ…‚ÌŒvZ
-	// verify ‚Í ssh2_kex_finish() ‚Ås‚¤
+	// ãƒãƒƒã‚·ãƒ¥ã®è¨ˆç®—
+	// verify ã¯ ssh2_kex_finish() ã§è¡Œã†
 	hashlen = sizeof(hash);
 	ret = kex_c25519_hash(
 		get_kex_hash_algorithm(pvar->kex_type),
@@ -6469,7 +6469,7 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 		push_memdump("KEX_ECDH_REPLY curve25519_kex_reply", "hash", hash, hashlen);
 	}
 
-	// TTSSHƒo[ƒWƒ‡ƒ“î•ñ‚É•\¦‚·‚éƒL[ƒrƒbƒg”‚ğ‹‚ß‚Ä‚¨‚­
+	// TTSSHãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±ã«è¡¨ç¤ºã™ã‚‹ã‚­ãƒ¼ãƒ“ãƒƒãƒˆæ•°ã‚’æ±‚ã‚ã¦ãŠã
 	pvar->client_key_bits = 256;
 	pvar->server_key_bits = 256;
 
@@ -6477,9 +6477,9 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 
 	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
 	if (ret == TRUE) {
-		// ƒzƒXƒgŒ®‚ÌŠm”F‚ª¬Œ÷‚µ‚½‚Ì‚ÅAŒã‘±‚Ìˆ—‚ğs‚¤
+		// ãƒ›ã‚¹ãƒˆéµã®ç¢ºèªãŒæˆåŠŸã—ãŸã®ã§ã€å¾Œç¶šã®å‡¦ç†ã‚’è¡Œã†
 		SSH_notify_host_OK(pvar);
-		// known_hostsƒ_ƒCƒAƒƒO‚ÌŒÄ‚Ño‚µ‚½‚Ì‚ÅAˆÈ~A‰½‚à‚µ‚È‚¢B
+		// known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®å‘¼ã³å‡ºã—ãŸã®ã§ã€ä»¥é™ã€ä½•ã‚‚ã—ãªã„ã€‚
 	}
 
 error:
@@ -6495,7 +6495,7 @@ error:
 }
 
 
-// KEX‚É‚¨‚¢‚ÄƒT[ƒo‚©‚ç•Ô‚Á‚Ä‚­‚é 31 ”ÔƒƒbƒZ[ƒW‚É‘Î‚·‚éƒnƒ“ƒhƒ‰
+// KEXã«ãŠã„ã¦ã‚µãƒ¼ãƒã‹ã‚‰è¿”ã£ã¦ãã‚‹ 31 ç•ªãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã«å¯¾ã™ã‚‹ãƒãƒ³ãƒ‰ãƒ©
 static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar)
 {
 	switch (pvar->kex_type) {
@@ -6542,7 +6542,7 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 {
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_NEWKEYS was received(DH key generation is completed).");
 
-	// ƒƒOÌæ‚ÌI—¹ (2005.3.7 yutaka)
+	// ãƒ­ã‚°æ¡å–ã®çµ‚äº† (2005.3.7 yutaka)
 	if (LogLevel(pvar, LOG_LEVEL_SSHDUMP)) {
 		save_memdump(LOGDUMP);
 	}
@@ -6550,14 +6550,14 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 
 	pvar->kex_status |= KEX_FLAG_NEWKEYS_RECEIVED;
 
-	// SSH2_MSG_NEWKEYS óMŒã‚Í‘Šè‚©‚ç‚ÌƒpƒPƒbƒg‚ÍˆÃ†‰»‚³‚ê‚Ä‚­‚é‚Ì‚ÅA
-	// óM•ûŒü‚ÌˆÃ†‰»(•œ†)‚ğ—LŒø‚É‚·‚éB
+	// SSH2_MSG_NEWKEYS å—ä¿¡å¾Œã¯ç›¸æ‰‹ã‹ã‚‰ã®ãƒ‘ã‚±ãƒƒãƒˆã¯æš—å·åŒ–ã•ã‚Œã¦ãã‚‹ã®ã§ã€
+	// å—ä¿¡æ–¹å‘ã®æš—å·åŒ–(å¾©å·)ã‚’æœ‰åŠ¹ã«ã™ã‚‹ã€‚
 	ssh2_set_newkeys(pvar, MODE_IN);
 	if (!CRYPT_start_encryption(pvar, 0, 1)) {
 		// TODO: error
 	}
 
-	// “¯—l‚ÉAMAC‚¨‚æ‚Ñˆ³k‚ğ—LŒø‚É‚·‚éB
+	// åŒæ§˜ã«ã€MACãŠã‚ˆã³åœ§ç¸®ã‚’æœ‰åŠ¹ã«ã™ã‚‹ã€‚
 	pvar->ssh2_keys[MODE_IN].mac.enabled = 1;
 	pvar->ssh2_keys[MODE_IN].comp.enabled = 1;
 	enable_recv_compression(pvar);
@@ -6569,7 +6569,7 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 
 	SSH2_dispatch_add_message(SSH2_MSG_EXT_INFO);
 
-	// SSH2_MSG_NEWKEYS ‚ğŠù‚É‘—‚Á‚Ä‚¢‚½‚çKEX‚ÍŠ®—¹BŸ‚Ìˆ—‚ÉˆÚ‚éB
+	// SSH2_MSG_NEWKEYS ã‚’æ—¢ã«é€ã£ã¦ã„ãŸã‚‰KEXã¯å®Œäº†ã€‚æ¬¡ã®å‡¦ç†ã«ç§»ã‚‹ã€‚
 	if (pvar->kex_status & KEX_FLAG_NEWKEYS_SENT) {
 		if (pvar->kex_status & KEX_FLAG_REKEYING) {
 			int i;
@@ -6577,7 +6577,7 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 
 			do_SSH2_dispatch_setup_for_transfer(pvar);
 
-			// ‘—‚ç‚¸ƒoƒbƒtƒ@‚É•Û‘¶‚µ‚Ä‚¨‚¢‚½ƒf[ƒ^‚ğ‘—‚é
+			// é€ã‚‰ãšãƒãƒƒãƒ•ã‚¡ã«ä¿å­˜ã—ã¦ãŠã„ãŸãƒ‡ãƒ¼ã‚¿ã‚’é€ã‚‹
 			for (i = 0 ; i < channel_max_num ; i++) {
 				c = &channels[i];
 				if (c->used) {
@@ -6586,10 +6586,10 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 			}
 		}
 		else {
-			// ‰‰ñ‚Ì SSH2_MSG_NEWKEYS ‚Ì‘—óM‚ªŠ®—¹‚µAˆÈ~‚Ì’ÊM‚ÍˆÃ†‰»‚³‚ê‚½ó‘Ô‚É‚È‚é
+			// åˆå›ã® SSH2_MSG_NEWKEYS ã®é€å—ä¿¡ãŒå®Œäº†ã—ã€ä»¥é™ã®é€šä¿¡ã¯æš—å·åŒ–ã•ã‚ŒãŸçŠ¶æ…‹ã«ãªã‚‹
 			ssh2_finish_encryption_setup(pvar);
 
-			// ‰‰ñ‚ÌŒ®ŒğŠ·Œã‚Íƒ†[ƒU”FØ‚ğŠJn‚·‚é
+			// åˆå›ã®éµäº¤æ›å¾Œã¯ãƒ¦ãƒ¼ã‚¶èªè¨¼ã‚’é–‹å§‹ã™ã‚‹
 			ssh2_prep_userauth(pvar);
 		}
 		pvar->kex_status = KEX_FLAG_KEXDONE;
@@ -6603,14 +6603,14 @@ static void ssh2_prep_userauth(PTInstVar pvar)
 	int type = (1 << SSH_AUTH_PASSWORD) | (1 << SSH_AUTH_RSA) |
 	           (1 << SSH_AUTH_TIS) | (1 << SSH_AUTH_PAGEANT);
 
-	// ”FØ•û®‚Ìİ’è
+	// èªè¨¼æ–¹å¼ã®è¨­å®š
 	AUTH_set_supported_auth_types(pvar, type);
 
-	// ”FØƒ_ƒCƒAƒƒO‚ğ•\¦‚·‚é
+	// èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤ºã™ã‚‹
 	AUTH_advance_to_next_cred(pvar);
 }
 
-// ƒ†[ƒU”FØ‚ÌŠJn
+// ãƒ¦ãƒ¼ã‚¶èªè¨¼ã®é–‹å§‹
 BOOL do_SSH2_userauth(PTInstVar pvar)
 {
 	buffer_t *msg;
@@ -6618,14 +6618,14 @@ BOOL do_SSH2_userauth(PTInstVar pvar)
 	unsigned char *outmsg;
 	int len;
 
-	// ƒpƒXƒ[ƒh‚ª“ü—Í‚³‚ê‚½‚ç 1 ‚ğ—§‚Ä‚é (2005.3.12 yutaka)
+	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒå…¥åŠ›ã•ã‚ŒãŸã‚‰ 1 ã‚’ç«‹ã¦ã‚‹ (2005.3.12 yutaka)
 	pvar->keyboard_interactive_password_input = 0;
 
-	// ‚·‚Å‚ÉƒƒOƒCƒ“ˆ—‚ğs‚Á‚Ä‚¢‚éê‡‚ÍASSH2_MSG_SERVICE_REQUEST‚Ì‘—M‚Í
-	// ‚µ‚È‚¢‚±‚Æ‚É‚·‚éBOpenSSH‚Å‚Íxá‚È‚¢‚ªATru64 UNIX‚Å‚ÍƒT[ƒoƒGƒ‰[‚Æ‚È‚Á‚Ä‚µ‚Ü‚¤‚½‚ßB
+	// ã™ã§ã«ãƒ­ã‚°ã‚¤ãƒ³å‡¦ç†ã‚’è¡Œã£ã¦ã„ã‚‹å ´åˆã¯ã€SSH2_MSG_SERVICE_REQUESTã®é€ä¿¡ã¯
+	// ã—ãªã„ã“ã¨ã«ã™ã‚‹ã€‚OpenSSHã§ã¯æ”¯éšœãªã„ãŒã€Tru64 UNIXã§ã¯ã‚µãƒ¼ãƒã‚¨ãƒ©ãƒ¼ã¨ãªã£ã¦ã—ã¾ã†ãŸã‚ã€‚
 	// (2005.3.10 yutaka)
-	// Cisco 12.4.11T ‚Å‚à‚±‚ÌŒ»Û‚ª”­¶‚·‚é–Í—lB
-	// ”FØƒƒ\ƒbƒh none ‚Ì“_‚Å SSH2_MSG_SERVICE_REQUEST ‚ğ‘—M‚µ‚Ä‚¢‚éB
+	// Cisco 12.4.11T ã§ã‚‚ã“ã®ç¾è±¡ãŒç™ºç”Ÿã™ã‚‹æ¨¡æ§˜ã€‚
+	// èªè¨¼ãƒ¡ã‚½ãƒƒãƒ‰ none ã®æ™‚ç‚¹ã§ SSH2_MSG_SERVICE_REQUEST ã‚’é€ä¿¡ã—ã¦ã„ã‚‹ã€‚
 	// (2007.10.26 maya)
 	if (pvar->userauth_retry_count > 0
 	 || pvar->tryed_ssh2_authlist == TRUE) {
@@ -6662,7 +6662,7 @@ static BOOL handle_SSH2_service_accept(PTInstVar pvar)
 {
 	char *data, *svc;
 
-	// 6byteiƒTƒCƒY{ƒpƒfƒBƒ“ƒO{ƒ^ƒCƒvj‚ğæ‚èœ‚¢‚½ˆÈ~‚ÌƒyƒCƒ[ƒh
+	// 6byteï¼ˆã‚µã‚¤ã‚ºï¼‹ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ï¼‹ã‚¿ã‚¤ãƒ—ï¼‰ã‚’å–ã‚Šé™¤ã„ãŸä»¥é™ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰
 	data = pvar->ssh_state.payload;
 
 	if ((svc = buffer_get_string(&data, NULL)) == NULL) {
@@ -6745,7 +6745,7 @@ static BOOL handle_SSH2_ext_info(PTInstVar pvar)
 	return TRUE;
 }
 
-// ƒ†[ƒU”FØƒpƒPƒbƒg‚Ì\’z
+// ãƒ¦ãƒ¼ã‚¶èªè¨¼ãƒ‘ã‚±ãƒƒãƒˆã®æ§‹ç¯‰
 BOOL do_SSH2_authrequest(PTInstVar pvar)
 {
 	buffer_t *msg = NULL;
@@ -6761,28 +6761,28 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		return FALSE;
 	}
 
-	// ƒyƒCƒ[ƒh‚Ì\’z
-	username = pvar->auth_state.user;  // ƒ†[ƒU–¼
+	// ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®æ§‹ç¯‰
+	username = pvar->auth_state.user;  // ãƒ¦ãƒ¼ã‚¶å
 	buffer_put_string(msg, username, strlen(username));
 	buffer_put_string(msg, connect_id, strlen(connect_id));
 
-	if (!pvar->tryed_ssh2_authlist) { // "none"ƒƒ\ƒbƒh‚Ì‘—M
-		// ”FØƒŠƒXƒg‚ğƒT[ƒo‚©‚çæ“¾‚·‚éB
-		// SSH2_MSG_USERAUTH_FAILURE‚ª•Ô‚é‚ªAƒT[ƒo‚É‚ÍƒƒO‚Íc‚ç‚È‚¢B
+	if (!pvar->tryed_ssh2_authlist) { // "none"ãƒ¡ã‚½ãƒƒãƒ‰ã®é€ä¿¡
+		// èªè¨¼ãƒªã‚¹ãƒˆã‚’ã‚µãƒ¼ãƒã‹ã‚‰å–å¾—ã™ã‚‹ã€‚
+		// SSH2_MSG_USERAUTH_FAILUREãŒè¿”ã‚‹ãŒã€ã‚µãƒ¼ãƒã«ã¯ãƒ­ã‚°ã¯æ®‹ã‚‰ãªã„ã€‚
 		// (2007.4.27 yutaka)
 		s = "none";  // method name
 		buffer_put_string(msg, s, strlen(s));
 
-	} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) { // ƒpƒXƒ[ƒh”FØ
+	} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) { // ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰èªè¨¼
 		// password authentication method
 		s = "password";
 		buffer_put_string(msg, s, strlen(s));
 		buffer_put_char(msg, 0); // 0
 
-		if (pvar->ssh2_autologin == 1) { // SSH2©“®ƒƒOƒCƒ“
+		if (pvar->ssh2_autologin == 1) { // SSH2è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³
 			s = pvar->ssh2_password;
 		} else {
-			s = pvar->auth_state.cur_cred.password;  // ƒpƒXƒ[ƒh
+			s = pvar->auth_state.cur_cred.password;  // ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
 		}
 		buffer_put_string(msg, s, strlen(s));
 
@@ -6796,7 +6796,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 
 		SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_INFO_REQUEST);
 
-	} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) { // ŒöŠJŒ®”FØ
+	} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) { // å…¬é–‹éµèªè¨¼
 		buffer_t *signbuf = NULL;
 		buffer_t *blob = NULL;
 		int bloblen;
@@ -6819,10 +6819,10 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 			buffer_free(blob);
 			goto error;
 		}
-		// ƒZƒbƒVƒ‡ƒ“ID
+		// ã‚»ãƒƒã‚·ãƒ§ãƒ³ID
 		buffer_append_length(signbuf, pvar->session_id, pvar->session_id_len);
 		buffer_put_char(signbuf, SSH2_MSG_USERAUTH_REQUEST);
-		s = username;  // ƒ†[ƒU–¼
+		s = username;  // ãƒ¦ãƒ¼ã‚¶å
 		buffer_put_string(signbuf, s, strlen(s));
 		s = connect_id;
 		buffer_put_string(signbuf, s, strlen(s));
@@ -6836,7 +6836,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		s = buffer_ptr(blob);
 		buffer_append_length(signbuf, s, bloblen);
 
-		// –¼‚Ìì¬
+		// ç½²åã®ä½œæˆ
 		if (generate_SSH2_keysign(keypair, &signature, &siglen, buffer_ptr(signbuf), buffer_len(signbuf), keyalgo) == FALSE) {
 			buffer_free(blob);
 			buffer_free(signbuf);
@@ -6870,28 +6870,28 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		buffer_put_char(msg, 0); // false
 
 		if (pvar->pageant_keycurrent != 0) {
-			// ’¼‘O‚ÌŒ®‚ğƒXƒLƒbƒv
+			// ç›´å‰ã®éµã‚’ã‚¹ã‚­ãƒƒãƒ—
 			len = get_uint32_MSBfirst(pvar->pageant_curkey);
 			pvar->pageant_curkey += 4 + len;
-			// ’¼‘O‚ÌŒ®‚ÌƒRƒƒ“ƒg‚ğƒXƒLƒbƒv
+			// ç›´å‰ã®éµã®ã‚³ãƒ¡ãƒ³ãƒˆã‚’ã‚¹ã‚­ãƒƒãƒ—
 			len = get_uint32_MSBfirst(pvar->pageant_curkey);
 			pvar->pageant_curkey += 4 + len;
-			// Ÿ‚ÌŒ®‚ÌˆÊ’u‚Ö—ˆ‚é
+			// æ¬¡ã®éµã®ä½ç½®ã¸æ¥ã‚‹
 		}
 		puttykey = pvar->pageant_curkey;
 
-		// Œ®í•Ê‚©‚ç—˜—p‚·‚é–¼ƒAƒ‹ƒSƒŠƒYƒ€‚ğŒˆ’è‚·‚é
+		// éµç¨®åˆ¥ã‹ã‚‰åˆ©ç”¨ã™ã‚‹ç½²åã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’æ±ºå®šã™ã‚‹
 		len = get_uint32_MSBfirst(puttykey+4);
 		keytype_name = puttykey + 8;
 		keytype = get_hostkey_type_from_name(keytype_name);
 		keyalgo = choose_SSH2_keysign_algorithm(pvar, keytype);
 		keyalgo_name = get_ssh2_hostkey_algorithm_name(keyalgo);
 
-		// ƒAƒ‹ƒSƒŠƒYƒ€‚ğƒRƒs[‚·‚é
+		// ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 		len = strlen(keyalgo_name);
 		buffer_put_string(msg, keyalgo_name, len);
 
-		// Œ®‚ğƒRƒs[‚·‚é
+		// éµã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 		len = get_uint32_MSBfirst(puttykey);
 		puttykey += 4;
 		buffer_put_string(msg, puttykey, len);
@@ -6906,7 +6906,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 
 	}
 
-	// ƒpƒPƒbƒg‘—M
+	// ãƒ‘ã‚±ãƒƒãƒˆé€ä¿¡
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_REQUEST, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
@@ -6938,12 +6938,12 @@ error:
 //
 // SSH2 heartbeat procedure
 //
-// NATŠÂ‹«‚É‚¨‚¢‚ÄASSHƒNƒ‰ƒCƒAƒ“ƒg‚ÆƒT[ƒoŠÔ‚Å’ÊM‚ª”­¶‚µ‚È‚©‚Á‚½ê‡A
-// ƒ‹[ƒ^‚ªŸè‚ÉNATƒe[ƒuƒ‹‚ğƒNƒŠƒA‚·‚é‚±‚Æ‚ª‚ ‚èASSHƒRƒlƒNƒVƒ‡ƒ“‚ª
-// Ø‚ê‚Ä‚µ‚Ü‚¤‚±‚Æ‚ª‚ ‚éB’èŠú“I‚ÉAƒNƒ‰ƒCƒAƒ“ƒg‚©‚çƒ_ƒ~[ƒpƒPƒbƒg‚ğ
-// ‘—M‚·‚é‚±‚Æ‚Å‘Îˆ‚·‚éB(2004.12.10 yutaka)
+// NATç’°å¢ƒã«ãŠã„ã¦ã€SSHã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã¨ã‚µãƒ¼ãƒé–“ã§é€šä¿¡ãŒç™ºç”Ÿã—ãªã‹ã£ãŸå ´åˆã€
+// ãƒ«ãƒ¼ã‚¿ãŒå‹æ‰‹ã«NATãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ã‚¯ãƒªã‚¢ã™ã‚‹ã“ã¨ãŒã‚ã‚Šã€SSHã‚³ãƒã‚¯ã‚·ãƒ§ãƒ³ãŒ
+// åˆ‡ã‚Œã¦ã—ã¾ã†ã“ã¨ãŒã‚ã‚‹ã€‚å®šæœŸçš„ã«ã€ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‹ã‚‰ãƒ€ãƒŸãƒ¼ãƒ‘ã‚±ãƒƒãƒˆã‚’
+// é€ä¿¡ã™ã‚‹ã“ã¨ã§å¯¾å‡¦ã™ã‚‹ã€‚(2004.12.10 yutaka)
 //
-// ƒ‚[ƒhƒŒƒXƒ_ƒCƒAƒƒO‚©‚çƒpƒPƒbƒg‘—M‚·‚é‚æ‚¤‚É•ÏXB(2007.12.26 yutaka)
+// ãƒ¢ãƒ¼ãƒ‰ãƒ¬ã‚¹ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‹ã‚‰ãƒ‘ã‚±ãƒƒãƒˆé€ä¿¡ã™ã‚‹ã‚ˆã†ã«å¤‰æ›´ã€‚(2007.12.26 yutaka)
 //
 #define WM_SEND_HEARTBEAT (WM_USER + 1)
 
@@ -7007,7 +7007,7 @@ static LRESULT CALLBACK ssh_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, L
 			break;
 
 		case WM_CLOSE:
-			// closeƒ{ƒ^ƒ“‚ª‰Ÿ‰º‚³‚ê‚Ä‚à window ‚ª•Â‚¶‚È‚¢‚æ‚¤‚É‚·‚éB
+			// closeãƒœã‚¿ãƒ³ãŒæŠ¼ä¸‹ã•ã‚Œã¦ã‚‚ window ãŒé–‰ã˜ãªã„ã‚ˆã†ã«ã™ã‚‹ã€‚
 			return TRUE;
 
 		case WM_DESTROY:
@@ -7026,18 +7026,18 @@ static unsigned __stdcall ssh_heartbeat_thread(void *p)
 	PTInstVar pvar = (PTInstVar)p;
 	time_t tick;
 
-	// ‚·‚Å‚ÉÀs’†‚È‚ç‰½‚à‚¹‚¸‚É•Ô‚éB
+	// ã™ã§ã«å®Ÿè¡Œä¸­ãªã‚‰ä½•ã‚‚ã›ãšã«è¿”ã‚‹ã€‚
 	if (instance > 0)
 		return 0;
 	instance++;
 
 	for (;;) {
-		// ƒ\ƒPƒbƒg‚ªƒNƒ[ƒY‚³‚ê‚½‚çƒXƒŒƒbƒh‚ğI‚í‚é
+		// ã‚½ã‚±ãƒƒãƒˆãŒã‚¯ãƒ­ãƒ¼ã‚ºã•ã‚ŒãŸã‚‰ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’çµ‚ã‚ã‚‹
 		if (pvar->socket == INVALID_SOCKET)
 			break;
 
-		// ˆê’èŠÔ–³’ÊM‚Å‚ ‚ê‚ÎAƒT[ƒo‚Öƒ_ƒ~[ƒpƒPƒbƒg‚ğ‘—‚é
-		// è‡’l‚ª0‚Å‚ ‚ê‚Î‰½‚à‚µ‚È‚¢B
+		// ä¸€å®šæ™‚é–“ç„¡é€šä¿¡ã§ã‚ã‚Œã°ã€ã‚µãƒ¼ãƒã¸ãƒ€ãƒŸãƒ¼ãƒ‘ã‚±ãƒƒãƒˆã‚’é€ã‚‹
+		// é–¾å€¤ãŒ0ã§ã‚ã‚Œã°ä½•ã‚‚ã—ãªã„ã€‚
 		tick = time(NULL) - pvar->ssh_heartbeat_tick;
 		if (pvar->session_settings.ssh_heartbeat_overtime > 0 &&
 			tick > pvar->session_settings.ssh_heartbeat_overtime) {
@@ -7059,13 +7059,13 @@ static void start_ssh_heartbeat_thread(PTInstVar pvar)
 	unsigned tid;
 	HWND hDlgWnd;
 
-	// ƒ‚[ƒhƒŒƒXƒ_ƒCƒAƒƒO‚ğì¬Bƒn[ƒgƒr[ƒg—p‚È‚Ì‚Åƒ_ƒCƒAƒƒO‚Í”ñ•\¦‚Ì‚Ü‚Ü‚Æ
-	// ‚·‚é‚Ì‚ÅAƒŠƒ\[ƒXID‚Í‚È‚ñ‚Å‚à‚æ‚¢B
+	// ãƒ¢ãƒ¼ãƒ‰ãƒ¬ã‚¹ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’ä½œæˆã€‚ãƒãƒ¼ãƒˆãƒ“ãƒ¼ãƒˆç”¨ãªã®ã§ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã¯éè¡¨ç¤ºã®ã¾ã¾ã¨
+	// ã™ã‚‹ã®ã§ã€ãƒªã‚½ãƒ¼ã‚¹IDã¯ãªã‚“ã§ã‚‚ã‚ˆã„ã€‚
 	hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_SSHSCP_PROGRESS),
                pvar->cv->HWin, (DLGPROC)ssh_heartbeat_dlg_proc);
 	pvar->ssh_hearbeat_dialog = hDlgWnd;
 
-	// TTSSH‚Í thread-safe ‚Å‚Í‚È‚¢‚Ì‚ÅƒXƒŒƒbƒh“à‚©‚ç‚ÌƒpƒPƒbƒg‘—M‚Í•s‰ÂB(2007.12.26 yutaka)
+	// TTSSHã¯ thread-safe ã§ã¯ãªã„ã®ã§ã‚¹ãƒ¬ãƒƒãƒ‰å†…ã‹ã‚‰ã®ãƒ‘ã‚±ãƒƒãƒˆé€ä¿¡ã¯ä¸å¯ã€‚(2007.12.26 yutaka)
 	thread = (HANDLE)_beginthreadex(NULL, 0, ssh_heartbeat_thread, pvar, 0, &tid);
 	if (thread == 0) {
 		// TODO:
@@ -7074,7 +7074,7 @@ static void start_ssh_heartbeat_thread(PTInstVar pvar)
 	pvar->ssh_heartbeat_thread = thread;
 }
 
-// ƒXƒŒƒbƒh‚Ì’â~ (2004.12.27 yutaka)
+// ã‚¹ãƒ¬ãƒƒãƒ‰ã®åœæ­¢ (2004.12.27 yutaka)
 void halt_ssh_heartbeat_thread(PTInstVar pvar)
 {
 	if (pvar->ssh_heartbeat_thread != INVALID_HANDLE_VALUE) {
@@ -7107,16 +7107,16 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 						  __FUNCTION__, len);
 	}
 
-	// ƒpƒXƒ[ƒh‚Ì”jŠü (2006.8.22 yutaka)
+	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã®ç ´æ£„ (2006.8.22 yutaka)
 	if (pvar->settings.remember_password == 0) {
 		destroy_malloced_string(&pvar->auth_state.cur_cred.password);
 	}
 
-	// ”FØOK
+	// èªè¨¼OK
 	pvar->userauth_success = 1;
 	pvar->auth_state.partial_success = 0;
 
-	// ƒfƒBƒXƒpƒbƒ`ƒ‹[ƒ`ƒ“‚ÌÄİ’è
+	// ãƒ‡ã‚£ã‚¹ãƒ‘ãƒƒãƒãƒ«ãƒ¼ãƒãƒ³ã®å†è¨­å®š
 	do_SSH2_dispatch_setup_for_transfer(pvar);
 
 	if (pvar->nosession) {
@@ -7125,8 +7125,8 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 		FWD_enter_interactive_mode(pvar);
 	}
 	else {
-		// ƒ`ƒƒƒlƒ‹İ’è
-		// FWD_prep_forwarding()‚Åshell ID‚ğg‚¤‚Ì‚ÅAæ‚Éİ’è‚ğ‚Á‚Ä‚­‚éB(2005.7.3 yutaka)
+		// ãƒãƒ£ãƒãƒ«è¨­å®š
+		// FWD_prep_forwarding()ã§shell IDã‚’ä½¿ã†ã®ã§ã€å…ˆã«è¨­å®šã‚’æŒã£ã¦ãã‚‹ã€‚(2005.7.3 yutaka)
 		// changed window size from 64KB to 32KB. (2006.3.6 yutaka)
 		// changed window size from 32KB to 128KB. (2007.10.29 maya)
 		if (pvar->use_subsystem) {
@@ -7142,10 +7142,10 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 			notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 			return FALSE;
 		}
-		// ƒVƒFƒ‹‚ÌID‚ğæ‚Á‚Ä‚¨‚­
+		// ã‚·ã‚§ãƒ«ã®IDã‚’å–ã£ã¦ãŠã
 		pvar->shell_id = c->self_id;
 
-		// ƒVƒFƒ‹ƒI[ƒvƒ“
+		// ã‚·ã‚§ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
@@ -7172,7 +7172,7 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 		buffer_free(msg);
 	}
 
-	// ƒn[ƒgƒr[ƒgEƒXƒŒƒbƒh‚ÌŠJn (2004.12.11 yutaka)
+	// ãƒãƒ¼ãƒˆãƒ“ãƒ¼ãƒˆãƒ»ã‚¹ãƒ¬ãƒƒãƒ‰ã®é–‹å§‹ (2004.12.11 yutaka)
 	start_ssh_heartbeat_thread(pvar);
 
 	logputs(LOG_LEVEL_VERBOSE, "User authentication is successful and SSH heartbeat thread is starting.");
@@ -7190,9 +7190,9 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_FAILURE was received.");
 
-	// 6byteiƒTƒCƒY{ƒpƒfƒBƒ“ƒO{ƒ^ƒCƒvj‚ğæ‚èœ‚¢‚½ˆÈ~‚ÌƒyƒCƒ[ƒh
+	// 6byteï¼ˆã‚µã‚¤ã‚ºï¼‹ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ï¼‹ã‚¿ã‚¤ãƒ—ï¼‰ã‚’å–ã‚Šé™¤ã„ãŸä»¥é™ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰
 	data = pvar->ssh_state.payload;
-	// ƒpƒPƒbƒgƒTƒCƒY - (ƒpƒfƒBƒ“ƒOƒTƒCƒY+1)G^‚ÌƒpƒPƒbƒgƒTƒCƒY
+	// ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º - (ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚µã‚¤ã‚º+1)ï¼›çœŸã®ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º
 	len = pvar->ssh_state.payloadlen;
 
 	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
@@ -7201,11 +7201,11 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 					  __FILE__, __LINE__,
 					  __FUNCTION__, len);
 
-	cstring = buffer_get_string(&data, NULL); // ”FØ•û®ƒŠƒXƒg‚Ìæ“¾
+	cstring = buffer_get_string(&data, NULL); // èªè¨¼æ–¹å¼ãƒªã‚¹ãƒˆã®å–å¾—
 	partial = data[0];
 	data += 1;
 
-	// —LŒø‚È”FØ•û®‚ª‚È‚¢ê‡
+	// æœ‰åŠ¹ãªèªè¨¼æ–¹å¼ãŒãªã„å ´åˆ
 	if (cstring == NULL) {
 		UTIL_get_lang_msg("MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR", pvar,
 		                  "The server doesn't have valid authentication method.");
@@ -7213,38 +7213,38 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		return FALSE;
 	}
 
-	// partial ‚ª TRUE ‚Ì‚Æ‚«‚ÍŸ‚Ì”FØ‚Ì€”õ‚ğ‚·‚é
+	// partial ãŒ TRUE ã®ã¨ãã¯æ¬¡ã®èªè¨¼ã®æº–å‚™ã‚’ã™ã‚‹
 	if (partial) {
 		logprintf(LOG_LEVEL_VERBOSE, "Authenticated using \"%s\" with partial success.", cstring);
 
-		// ‚Í‚¶‚ß‚ÄŸ‚Ì”FØ‚ğ—v‚·‚é‚Æ‚«
+		// ã¯ã˜ã‚ã¦æ¬¡ã®èªè¨¼ã‚’è¦ã™ã‚‹ã¨ã
 		if (!pvar->auth_state.partial_success) {
-			// autologin ‚ğ–³Œø‚É‚·‚é
+			// autologin ã‚’ç„¡åŠ¹ã«ã™ã‚‹
 			pvar->ssh2_autologin = 0;
 
-			// ‚±‚ÌÚ‘±‚Í•¡””FØ—v‹‚ğ‚µ‚Ä‚¢‚é
+			// ã“ã®æ¥ç¶šã¯è¤‡æ•°èªè¨¼è¦æ±‚ã‚’ã—ã¦ã„ã‚‹
 			pvar->auth_state.multiple_required_auth = 1;
 		}
 
-		// Šo‚¦‚Ä‚¢‚é password ‚ğƒNƒŠƒA‚µ‚ÄŸ‚Ì”FØ‚É”õ‚¦‚é
+		// è¦šãˆã¦ã„ã‚‹ password ã‚’ã‚¯ãƒªã‚¢ã—ã¦æ¬¡ã®èªè¨¼ã«å‚™ãˆã‚‹
 		SecureZeroMemory(pvar->ssh2_password, sizeof(pvar->ssh2_password));
 
-		// Ÿ‚Ì”FØ‚Ì”FØ•û®‚ªA’¼‘O‚É¬Œ÷‚µ‚½”FØ•û®‚É‚È‚ç‚È‚¢‚æ‚¤‰Šú‰»‚·‚é
+		// æ¬¡ã®èªè¨¼ã®èªè¨¼æ–¹å¼ãŒã€ç›´å‰ã«æˆåŠŸã—ãŸèªè¨¼æ–¹å¼ã«ãªã‚‰ãªã„ã‚ˆã†åˆæœŸåŒ–ã™ã‚‹
 		pvar->ssh2_authmethod = SSH_AUTH_NONE;
 	}
 
-	// ”FØƒ_ƒCƒAƒƒO‚Ì€”õ
-	//   tryed_ssh2_authlist ‚ª FALSE ‚Ì‚Æ‚« = ‚Ü‚¾ÀÛ‚Ì”FØ‚ğs‚ğ‚µ‚Ä‚¢‚È‚¢inone ‚Ì•Ô–‚ª‹A‚Á‚Ä‚«‚½‚Æ‚±‚ëj
-	//     CheckAuthListFirst ‚ª TRUE ‚Ì‚Æ‚«‚ÍA•\¦’†‚Ìƒ_ƒCƒAƒƒO‚ª•ÏX‚³‚ê‚é
-	//   partial ‚ª TRUE ‚Ì‚Æ‚«
-	//     "Ÿ‚Ì”FØ" ‚Ì‚½‚ß‚ÉA‚±‚Ì‚ ‚Æ•\¦‚³‚ê‚éƒ_ƒCƒAƒƒO‚Å—˜—p‚³‚ê‚é
+	// èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®æº–å‚™
+	//   tryed_ssh2_authlist ãŒ FALSE ã®ã¨ã = ã¾ã å®Ÿéš›ã®èªè¨¼ã‚’è©¦è¡Œã‚’ã—ã¦ã„ãªã„ï¼ˆnone ã®è¿”äº‹ãŒå¸°ã£ã¦ããŸã¨ã“ã‚ï¼‰
+	//     CheckAuthListFirst ãŒ TRUE ã®ã¨ãã¯ã€è¡¨ç¤ºä¸­ã®ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãŒå¤‰æ›´ã•ã‚Œã‚‹
+	//   partial ãŒ TRUE ã®ã¨ã
+	//     "æ¬¡ã®èªè¨¼" ã®ãŸã‚ã«ã€ã“ã®ã‚ã¨è¡¨ç¤ºã•ã‚Œã‚‹ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§åˆ©ç”¨ã•ã‚Œã‚‹
 	if (!pvar->tryed_ssh2_authlist || partial) {
 		int type = 0;
 
 		pvar->tryed_ssh2_authlist = TRUE;
 		pvar->auth_state.partial_success = partial;
 
-		// ”FØƒ_ƒCƒAƒƒO‚Ìƒ‰ƒWƒIƒ{ƒ^ƒ“‚ğXV
+		// èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³ã‚’æ›´æ–°
 		if (strstr(cstring, "password")) {
 			type |= (1 << SSH_AUTH_PASSWORD);
 		}
@@ -7258,11 +7258,11 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		if (!AUTH_set_supported_auth_types(pvar, type))
 			return FALSE;
 
-		pvar->ssh2_authlist = cstring; // •s—v‚É‚È‚Á‚½‚çƒtƒŠ[‚·‚é‚±‚Æ
+		pvar->ssh2_authlist = cstring; // ä¸è¦ã«ãªã£ãŸã‚‰ãƒ•ãƒªãƒ¼ã™ã‚‹ã“ã¨
 		logprintf(LOG_LEVEL_VERBOSE, "method list from server: %s", cstring);
 
 		if (pvar->auth_state.partial_success) {
-			// •¡””FØAƒ_ƒCƒAƒƒO‚ğo‚·ˆ—‚Ö
+			// è¤‡æ•°èªè¨¼æ™‚ã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºã™å‡¦ç†ã¸
 			goto auth;
 		}
 
@@ -7270,38 +7270,38 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		    pvar->ask4passwd &&
 		    pvar->session_settings.CheckAuthListFirst &&
 		    pvar->auth_state.auth_dialog != NULL) {
-			// challenge ‚Å ask4passwd ‚Ì‚Æ‚«A”FØƒƒ\ƒbƒhˆê——‚ğ©“®æ“¾‚µ‚½Œã
-			// ©“®“I‚É TIS ƒ_ƒCƒAƒƒO‚ğo‚·‚½‚ß‚É OK ‚ğ‰Ÿ‚·
+			// challenge ã§ ask4passwd ã®ã¨ãã€èªè¨¼ãƒ¡ã‚½ãƒƒãƒ‰ä¸€è¦§ã‚’è‡ªå‹•å–å¾—ã—ãŸå¾Œ
+			// è‡ªå‹•çš„ã« TIS ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºã™ãŸã‚ã« OK ã‚’æŠ¼ã™
 			SendMessage(pvar->auth_state.auth_dialog, WM_COMMAND, IDOK, 0);
 		}
 		else {
-			// ‚Ğ‚Æ‚Ü‚¸ none ‚Ås‚µ‚Ä•Ô‚Á‚Ä‚«‚½‚Æ‚±‚ë‚È‚Ì‚ÅAÀÛ‚ÌƒƒOƒCƒ“ˆ—‚Ö
-			//   CheckAuthListFirst ‚ª TRUE ‚Ìê‡‚Í”FØ•û®‚ªŠm’è‚µ‚Ä‚¢‚È‚¢‚Ì‚ÅAƒƒOƒCƒ“ˆ—‚Ís‚í‚ê‚È‚¢
+			// ã²ã¨ã¾ãš none ã§è©¦è¡Œã—ã¦è¿”ã£ã¦ããŸã¨ã“ã‚ãªã®ã§ã€å®Ÿéš›ã®ãƒ­ã‚°ã‚¤ãƒ³å‡¦ç†ã¸
+			//   CheckAuthListFirst ãŒ TRUE ã®å ´åˆã¯èªè¨¼æ–¹å¼ãŒç¢ºå®šã—ã¦ã„ãªã„ã®ã§ã€ãƒ­ã‚°ã‚¤ãƒ³å‡¦ç†ã¯è¡Œã‚ã‚Œãªã„
 			do_SSH2_authrequest(pvar);
 		}
 
 		return TRUE;
 	}
 
-	// none ‚Å‚Í‚È‚¢ÀÛ‚Ì”FØ‚Ìs‚É¸”s‚µ‚½
+	// none ã§ã¯ãªã„å®Ÿéš›ã®èªè¨¼ã®è©¦è¡Œã«å¤±æ•—ã—ãŸ
 
 	// TCP connection closed
 	//notify_closed_connection(pvar);
 
-	// retry count‚Ì’Ç‰Á
+	// retry countã®è¿½åŠ 
 	if (pvar->auth_state.cur_cred.method != SSH_AUTH_PAGEANT) {
 		pvar->userauth_retry_count++;
 	}
 	else {
 		if (pvar->pageant_keycount <= pvar->pageant_keycurrent ||
 		    pvar->pageant_keyfinal) {
-			// ‘S‚Ä‚ÌŒ®‚ğ‚µI‚í‚Á‚½
-			// ‚Ü‚½‚ÍATRUE ‚Å‚ÌƒƒOƒCƒ“‚É¸”s‚µ‚Ä‚±‚±‚É—ˆ‚½
+			// å…¨ã¦ã®éµã‚’è©¦ã—çµ‚ã‚ã£ãŸ
+			// ã¾ãŸã¯ã€TRUE ã§ã®ãƒ­ã‚°ã‚¤ãƒ³ã«å¤±æ•—ã—ã¦ã“ã“ã«æ¥ãŸ
 			safefree(pvar->pageant_key);
 			pvar->userauth_retry_count++;
 		}
 		else {
-			// ‚Ü‚¾Œ®‚ª‚ ‚é
+			// ã¾ã éµãŒã‚ã‚‹
 			do_SSH2_authrequest(pvar);
 			return TRUE;
 		}
@@ -7309,14 +7309,14 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 
 	if (pvar->ssh2_autologin == 1 && !pvar->auth_state.partial_success) {
 		char uimsg[MAX_UIMSG];
-		// SSH2©“®ƒƒOƒCƒ“‚ª—LŒø‚Ìê‡‚ÍAƒŠƒgƒ‰ƒC‚Ís‚í‚È‚¢B
+		// SSH2è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ãŒæœ‰åŠ¹ã®å ´åˆã¯ã€ãƒªãƒˆãƒ©ã‚¤ã¯è¡Œã‚ãªã„ã€‚
 		UTIL_get_lang_msg("MSG_SSH_AUTH_FAILURE_ERROR", pvar,
 		                  "SSH2 auto-login error: user authentication failed.");
 		strncpy_s(uimsg, sizeof(uimsg), pvar->UIMsg, _TRUNCATE);
 
 		if (pvar->ssh2_authlist != NULL || strlen(pvar->ssh2_authlist) != 0) {
 			if ((pvar->auth_state.supported_types & (1 << pvar->ssh2_authmethod)) == 0) {
-				// g—p‚µ‚½”FØƒƒ\ƒbƒh‚ÍƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚È‚©‚Á‚½
+				// ä½¿ç”¨ã—ãŸèªè¨¼ãƒ¡ã‚½ãƒƒãƒ‰ã¯ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ãªã‹ã£ãŸ
 				UTIL_get_lang_msg("MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR", pvar,
 				                  "\nAuthentication method is not supported by server.");
 				strncat_s(uimsg, sizeof(uimsg), pvar->UIMsg, _TRUNCATE);
@@ -7326,9 +7326,9 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		return TRUE;
 	}
 
-	// ’Ç‰Á”FØ‚Ì‚Æ‚«
-	// ‚Ü‚½‚Íƒ†[ƒU”FØ‚É¸”s‚µ‚½‚Æ‚«
-	//   ƒ†[ƒU–¼‚ÍŒÅ’è‚µ‚ÄAƒpƒXƒ[ƒh‚ÌÄ“ü—Í(SSH1 ‚Æ“¯‚¶)
+	// è¿½åŠ èªè¨¼ã®ã¨ã
+	// ã¾ãŸã¯ãƒ¦ãƒ¼ã‚¶èªè¨¼ã«å¤±æ•—ã—ãŸã¨ã
+	//   ãƒ¦ãƒ¼ã‚¶åã¯å›ºå®šã—ã¦ã€ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã®å†å…¥åŠ›(SSH1 ã¨åŒã˜)
 auth:
 	AUTH_set_generic_mode(pvar);
 	AUTH_advance_to_next_cred(pvar);
@@ -7380,7 +7380,7 @@ void sanitize_str(buffer_t *buff, unsigned char *src, size_t srclen)
 }
 
 /**
- *	UTF-8 •¶š—ñ‚ğóM•¶š—ñ‚É•ÏŠ·‚·‚é
+ *	UTF-8 æ–‡å­—åˆ—ã‚’å—ä¿¡æ–‡å­—åˆ—ã«å¤‰æ›ã™ã‚‹
  */
 static char *ConvertReceiveStr(TComVar *cv, char *strU8, size_t *len)
 {
@@ -7421,11 +7421,11 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 		if (pvar->authbanner_buffer != NULL) {
 			sanitize_str(pvar->authbanner_buffer, buff, MIN(msglen, sizeof(buff)));
 			msg = buffer_ptr(pvar->authbanner_buffer);
-			msglen = buffer_len(pvar->authbanner_buffer) - 1; // NUL Terminate •ª‚Í”‚¦‚È‚¢
+			msglen = buffer_len(pvar->authbanner_buffer) - 1; // NUL Terminate åˆ†ã¯æ•°ãˆãªã„
 		}
 		else {
-			// ƒƒ‚ƒŠŠm•Û¸”s‚Í•ÏŠ·‘O‚Ì•¶š—ñ‚ğ•\¦‚·‚éB
-			// ‚½‚¾AC0 §Œä•¶š‚ğ‚»‚Ì‚Ü‚Ü•\¦‚µ‚æ‚¤‚Æ‚·‚é‚Ì‚Å–]‚Ü‚µ‚­‚È‚¢‚©‚àB
+			// ãƒ¡ãƒ¢ãƒªç¢ºä¿å¤±æ•—æ™‚ã¯å¤‰æ›å‰ã®æ–‡å­—åˆ—ã‚’è¡¨ç¤ºã™ã‚‹ã€‚
+			// ãŸã ã€C0 åˆ¶å¾¡æ–‡å­—ã‚’ãã®ã¾ã¾è¡¨ç¤ºã—ã‚ˆã†ã¨ã™ã‚‹ã®ã§æœ›ã¾ã—ããªã„ã‹ã‚‚ã€‚
 			msg = buff;
 		}
 
@@ -7434,7 +7434,7 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 			break;
 		case 1:
 			if (pvar->authbanner_buffer != NULL) {
-				// óM•¶š—ñ‚É•ÏŠ·‚·‚é
+				// å—ä¿¡æ–‡å­—åˆ—ã«å¤‰æ›ã™ã‚‹
 				size_t msglen_s;
 				msg = ConvertReceiveStr(pvar->cv, msg, &msglen_s);
 				msglen = (int)msglen_s;
@@ -7490,16 +7490,16 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 }
 
 
-// SSH2 ƒƒbƒZ[ƒW 60 ”Ô‚Ìˆ—ŠÖ”
+// SSH2 ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ 60 ç•ªã®å‡¦ç†é–¢æ•°
 //
-// SSH2 ‚Å‚ÍˆÈ‰º‚ÌƒƒbƒZ[ƒW‚ª 60 ”Ô‚Öd•¡‚µ‚ÄŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚éB
+// SSH2 ã§ã¯ä»¥ä¸‹ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒ 60 ç•ªã¸é‡è¤‡ã—ã¦å‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã‚‹ã€‚
 //
 // * SSH2_MSG_USERAUTH_INFO_REQUEST (keyboard-interactive)
-// * SSH2_MSG_USERAUTH_PK_OK (publickey / Tera Term ‚Å‚Í Pageant ”FØ‚Ì‚İ)
+// * SSH2_MSG_USERAUTH_PK_OK (publickey / Tera Term ã§ã¯ Pageant èªè¨¼ã®ã¿)
 // * SSH2_MSG_USERAUTH_PASSWD_CHANGEREQ (password)
 //
-// Œ»ó‚ÌÀ‘•‚Å‚Í“¯‚¶ƒƒbƒZ[ƒW”Ô†‚ª‘¶İ‚Å‚«‚È‚¢‚Ì‚ÅA
-// 60 ”Ô‚Í‚±‚ÌŠÖ”‚Åó‚¯Amethod ‚É‚æ‚Á‚Ä‘Î‰‚·‚éƒnƒ“ƒhƒ‰ŠÖ”‚ÉU‚è•ª‚¯‚éB
+// ç¾çŠ¶ã®å®Ÿè£…ã§ã¯åŒã˜ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ç•ªå·ãŒå­˜åœ¨ã§ããªã„ã®ã§ã€
+// 60 ç•ªã¯ã“ã®é–¢æ•°ã§å—ã‘ã€method ã«ã‚ˆã£ã¦å¯¾å¿œã™ã‚‹ãƒãƒ³ãƒ‰ãƒ©é–¢æ•°ã«æŒ¯ã‚Šåˆ†ã‘ã‚‹ã€‚
 //
 BOOL handle_SSH2_userauth_msg60(PTInstVar pvar)
 {
@@ -7534,9 +7534,9 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_INFO_REQUEST was received.");
 
-	// 6byteiƒTƒCƒY{ƒpƒfƒBƒ“ƒO{ƒ^ƒCƒvj‚ğæ‚èœ‚¢‚½ˆÈ~‚ÌƒyƒCƒ[ƒh
+	// 6byteï¼ˆã‚µã‚¤ã‚ºï¼‹ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ï¼‹ã‚¿ã‚¤ãƒ—ï¼‰ã‚’å–ã‚Šé™¤ã„ãŸä»¥é™ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰
 	data = pvar->ssh_state.payload;
-	// ƒpƒPƒbƒgƒTƒCƒY - (ƒpƒfƒBƒ“ƒOƒTƒCƒY+1)G^‚ÌƒpƒPƒbƒgƒTƒCƒY
+	// ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º - (ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚µã‚¤ã‚º+1)ï¼›çœŸã®ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º
 	len = pvar->ssh_state.payloadlen;
 
 	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
@@ -7580,7 +7580,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	logprintf(LOG_LEVEL_VERBOSE, "%s: prompts=%d", __FUNCTION__, num);
 
 	///////// step2
-	// ƒT[ƒo‚ÖƒpƒXƒtƒŒ[ƒY‚ğ‘—‚é
+	// ã‚µãƒ¼ãƒã¸ãƒ‘ã‚¹ãƒ•ãƒ¬ãƒ¼ã‚ºã‚’é€ã‚‹
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
@@ -7589,13 +7589,13 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	}
 	buffer_put_int(msg, num);
 
-	// ƒpƒXƒ[ƒh•ÏX‚Ìê‡AƒƒbƒZ[ƒW‚ª‚ ‚ê‚ÎA•\¦‚·‚éB(2010.11.11 yutaka)
+	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰å¤‰æ›´ã®å ´åˆã€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒã‚ã‚Œã°ã€è¡¨ç¤ºã™ã‚‹ã€‚(2010.11.11 yutaka)
 	if (num == 0) {
 		if (strlen(lprompt) > 0)
 			MessageBox(pvar->cv->HWin, lprompt, "USERAUTH INFO_REQUEST", MB_OK | MB_ICONINFORMATION);
 	}
 
-	// ƒvƒƒ“ƒvƒg‚Ì”‚¾‚¯ prompt & echo ‚ªŒJ‚è•Ô‚³‚ê‚éB
+	// ãƒ—ãƒ­ãƒ³ãƒ—ãƒˆã®æ•°ã ã‘ prompt & echo ãŒç¹°ã‚Šè¿”ã•ã‚Œã‚‹ã€‚
 	for (i = 0 ; i < num ; i++) {
 		// get string
 		slen = get_uint32_MSBfirst(data);
@@ -7605,12 +7605,12 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 
 		// get boolean
 		echo = data[0];
-		data[0] = '\0'; // ƒƒOo—Í‚Ìˆ×Aˆê“I‚É NUL Terminate ‚·‚é
+		data[0] = '\0'; // ãƒ­ã‚°å‡ºåŠ›ã®ç‚ºã€ä¸€æ™‚çš„ã« NUL Terminate ã™ã‚‹
 
 		logprintf(LOG_LEVEL_VERBOSE, "%s:   prompt[%d]=\"%s\", echo=%d, pass-state=%d", __FUNCTION__,
 			i, prompt, slen, pvar->keyboard_interactive_password_input);
 
-		data[0] = echo; // ƒƒOo—Í‚ğs‚Á‚½‚Ì‚ÅAŒ³‚Ì’l‚É‘‚«–ß‚·
+		data[0] = echo; // ãƒ­ã‚°å‡ºåŠ›ã‚’è¡Œã£ãŸã®ã§ã€å…ƒã®å€¤ã«æ›¸ãæˆ»ã™
 		data += 1;
 
 		// keyboard-interactive method (2005.3.12 yutaka)
@@ -7624,11 +7624,11 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 			return TRUE;
 		}
 
-		// TODO: ‚±‚±‚Åƒvƒƒ“ƒvƒg‚ğ•\¦‚µ‚Äƒ†[ƒU‚©‚ç“ü—Í‚³‚¹‚é‚Ì‚ª³‰ğB
+		// TODO: ã“ã“ã§ãƒ—ãƒ­ãƒ³ãƒ—ãƒˆã‚’è¡¨ç¤ºã—ã¦ãƒ¦ãƒ¼ã‚¶ã‹ã‚‰å…¥åŠ›ã•ã›ã‚‹ã®ãŒæ­£è§£ã€‚
 		s = pvar->auth_state.cur_cred.password;
 		buffer_put_string(msg, s, strlen(s));
 
-		// ƒŠƒgƒ‰ƒC‚É‘Î‰‚Å‚«‚é‚æ‚¤Aƒtƒ‰ƒO‚ğƒNƒŠƒA‚·‚éB(2010.11.11 yutaka)
+		// ãƒªãƒˆãƒ©ã‚¤ã«å¯¾å¿œã§ãã‚‹ã‚ˆã†ã€ãƒ•ãƒ©ã‚°ã‚’ã‚¯ãƒªã‚¢ã™ã‚‹ã€‚(2010.11.11 yutaka)
 		pvar->keyboard_interactive_password_input = 0;
 	}
 
@@ -7680,9 +7680,9 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 							  __FILE__, __LINE__,
 							  __FUNCTION__, len);
 		}
-		username = pvar->auth_state.user;  // ƒ†[ƒU–¼
+		username = pvar->auth_state.user;  // ãƒ¦ãƒ¼ã‚¶å
 
-		// –¼‚·‚éƒf[ƒ^‚ğì¬
+		// ç½²åã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’ä½œæˆ
 		signbuf = buffer_init();
 		if (signbuf == NULL) {
 			safefree(pvar->pageant_key);
@@ -7690,7 +7690,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		}
 		buffer_append_length(signbuf, pvar->session_id, pvar->session_id_len);
 		buffer_put_char(signbuf, SSH2_MSG_USERAUTH_REQUEST);
-		s = username;  // ƒ†[ƒU–¼
+		s = username;  // ãƒ¦ãƒ¼ã‚¶å
 		buffer_put_string(signbuf, s, strlen(s));
 		s = connect_id;
 		buffer_put_string(signbuf, s, strlen(s));
@@ -7700,7 +7700,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 
 		puttykey = pvar->pageant_curkey;
 
-		// Œ®í•Ê‚©‚ç—˜—p‚·‚é–¼ƒAƒ‹ƒSƒŠƒYƒ€‚ğŒˆ’è‚·‚é
+		// éµç¨®åˆ¥ã‹ã‚‰åˆ©ç”¨ã™ã‚‹ç½²åã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’æ±ºå®šã™ã‚‹
 		len = get_uint32_MSBfirst(puttykey+4);
 		keytype_name = puttykey + 8;
 		keytype = get_hostkey_type_from_name(keytype_name);
@@ -7708,17 +7708,17 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		keyalgo_name = get_ssh2_hostkey_algorithm_name(keyalgo);
 		signflag = get_ssh2_agent_flag(keyalgo);
 
-		// ƒAƒ‹ƒSƒŠƒYƒ€‚ğƒRƒs[‚·‚é
+		// ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 		len = strlen(keyalgo_name);
 		buffer_put_string(signbuf, keyalgo_name, len);
 
-		// Œ®‚ğƒRƒs[‚·‚é
+		// éµã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 		len = get_uint32_MSBfirst(puttykey);
 		puttykey += 4;
 		buffer_put_string(signbuf, puttykey, len);
 		puttykey += len;
 
-		// Pageant ‚É–¼‚µ‚Ä‚à‚ç‚¤
+		// Pageant ã«ç½²åã—ã¦ã‚‚ã‚‰ã†
 		signedmsg = putty_sign_ssh2_key(pvar->pageant_curkey,
 		                                buffer_ptr(signbuf), buffer_len(signbuf),
 		                                &signedlen, signflag);
@@ -7729,14 +7729,14 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		}
 
 
-		// ƒyƒCƒ[ƒh‚Ì\’z
+		// ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®æ§‹ç¯‰
 		msg = buffer_init();
 		if (msg == NULL) {
 			safefree(pvar->pageant_key);
 			safefree(signedmsg);
 			return FALSE;
 		}
-		s = username;  // ƒ†[ƒU–¼
+		s = username;  // ãƒ¦ãƒ¼ã‚¶å
 		buffer_put_string(msg, s, strlen(s));
 		s = connect_id;
 		buffer_put_string(msg, s, strlen(s));
@@ -7746,22 +7746,22 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 
 		puttykey = pvar->pageant_curkey;
 
-		// ƒAƒ‹ƒSƒŠƒYƒ€‚ğƒRƒs[‚·‚é
+		// ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 		len = strlen(keyalgo_name);
 		buffer_put_string(msg, keyalgo_name, len);
 
-		// Œ®‚ğƒRƒs[‚·‚é
+		// éµã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 		len = get_uint32_MSBfirst(puttykey);
 		puttykey += 4;
 		buffer_put_string(msg, puttykey, len);
 		puttykey += len;
 
-		// –¼‚³‚ê‚½ƒf[ƒ^
+		// ç½²åã•ã‚ŒãŸãƒ‡ãƒ¼ã‚¿
 		len  = get_uint32_MSBfirst(signedmsg);
 		buffer_put_string(msg, signedmsg + 4, len);
 		free(signedmsg);
 
-		// ƒpƒPƒbƒg‘—M
+		// ãƒ‘ã‚±ãƒƒãƒˆé€ä¿¡
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_REQUEST, len);
 		memcpy(outmsg, buffer_ptr(msg), len);
@@ -7845,8 +7845,8 @@ static INT_PTR CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, 
 			}
 
 			if (new_passwd[0] == 0) {
-				// ƒ_ƒCƒAƒƒO‚ğŠJ‚¢‚Ä‚·‚®‚É Return ‚ğ‰Ÿ‚µ‚Ä‚µ‚Ü‚Á‚½‚Ì‘Îô‚Ìˆ×A
-				// ‚Æ‚è‚ ‚¦‚¸VƒpƒXƒ[ƒh‚ª‹ó‚Ìê‡‚ğ‚Í‚¶‚¢‚Ä‚¨‚­B
+				// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‹ã„ã¦ã™ãã« Return ã‚’æŠ¼ã—ã¦ã—ã¾ã£ãŸæ™‚ã®å¯¾ç­–ã®ç‚ºã€
+				// ã¨ã‚Šã‚ãˆãšæ–°ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒç©ºã®å ´åˆã‚’ã¯ã˜ã„ã¦ãŠãã€‚
 				// c.f. Ticket: #38970
 				return FALSE;
 			}
@@ -7858,7 +7858,7 @@ static INT_PTR CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, 
 			return TRUE;
 
 		case IDCANCEL:
-			// Ú‘±‚ğØ‚é
+			// æ¥ç¶šã‚’åˆ‡ã‚‹
 			notify_closed_connection(pvar, "authentication cancelled");
 			TTEndDialog(dlg, 0); // dialog close
 			return TRUE;
@@ -7895,9 +7895,9 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 		return FALSE;
 	}
 
-	// 6byteiƒTƒCƒY{ƒpƒfƒBƒ“ƒO{ƒ^ƒCƒvj‚ğæ‚èœ‚¢‚½ˆÈ~‚ÌƒyƒCƒ[ƒh
+	// 6byteï¼ˆã‚µã‚¤ã‚ºï¼‹ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ï¼‹ã‚¿ã‚¤ãƒ—ï¼‰ã‚’å–ã‚Šé™¤ã„ãŸä»¥é™ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰
 	data = pvar->ssh_state.payload;
-	// ƒpƒPƒbƒgƒTƒCƒY - (ƒpƒfƒBƒ“ƒOƒTƒCƒY+1)G^‚ÌƒpƒPƒbƒgƒTƒCƒY
+	// ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º - (ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚µã‚¤ã‚º+1)ï¼›çœŸã®ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º
 	len = pvar->ssh_state.payloadlen;
 
 	info = buffer_get_string(&data, NULL);
@@ -7919,8 +7919,8 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 		return FALSE;
 	}
 
-	// ƒyƒCƒ[ƒh‚Ì\’z
-	username = pvar->auth_state.user;  // ƒ†[ƒU–¼
+	// ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®æ§‹ç¯‰
+	username = pvar->auth_state.user;  // ãƒ¦ãƒ¼ã‚¶å
 	buffer_put_string(msg, username, strlen(username));
 
 	// password authentication method
@@ -7937,7 +7937,7 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 	s = cp.new_passwd;
 	buffer_put_string(msg, s, strlen(s));
 
-	// ƒpƒPƒbƒg‘—M
+	// ãƒ‘ã‚±ãƒƒãƒˆé€ä¿¡
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_REQUEST, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
@@ -7958,10 +7958,10 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 }
 
 /*
- * SSH_MSG_CHANNEL_REQUEST ‘—MŠÖ”
- * type-specific data ‚ª string ‚Å 0 ` 2 ‚Ì•¨‚É‘Î‰B
- * g—p‚µ‚È‚¢ƒƒbƒZ[ƒW‚Í NULL ‚É‚·‚éB
- * type-specific data ‚ª‘¼‚ÌŒ`®‚É‚Í‘Î‰‚µ‚Ä‚¢‚È‚¢‚Ì‚ÅA©‘O‚Å‘—‚é–B
+ * SSH_MSG_CHANNEL_REQUEST é€ä¿¡é–¢æ•°
+ * type-specific data ãŒ string ã§ 0 ã€œ 2 ã®ç‰©ã«å¯¾å¿œã€‚
+ * ä½¿ç”¨ã—ãªã„ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯ NULL ã«ã™ã‚‹ã€‚
+ * type-specific data ãŒä»–ã®å½¢å¼ã«ã¯å¯¾å¿œã—ã¦ã„ãªã„ã®ã§ã€è‡ªå‰ã§é€ã‚‹äº‹ã€‚
  */
 static BOOL send_channel_request_gen(PTInstVar pvar, Channel_t *c, unsigned char *req, int want_reply, unsigned char *msg1, unsigned char *msg2)
 {
@@ -8006,7 +8006,7 @@ static BOOL send_channel_request_gen(PTInstVar pvar, Channel_t *c, unsigned char
 BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 {
 	buffer_t *msg, *ttymsg;
-	char *req_type = "pty-req";  // pseudo terminal‚ÌƒŠƒNƒGƒXƒg
+	char *req_type = "pty-req";  // pseudo terminalã®ãƒªã‚¯ã‚¨ã‚¹ãƒˆ
 	unsigned char *outmsg;
 	int len, x, y;
 #ifdef DONT_WANTCONFIRM
@@ -8030,7 +8030,7 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 
 	buffer_put_int(msg, c->remote_id);
 	buffer_put_string(msg, req_type, strlen(req_type));
-	buffer_put_char(msg, want_reply);  // want_reply (disable‚É•ÏX 2005/3/28 yutaka)
+	buffer_put_char(msg, want_reply);  // want_reply (disableã«å¤‰æ›´ 2005/3/28 yutaka)
 
 	buffer_put_string(msg, pvar->ts->TermType, strlen(pvar->ts->TermType));
 	buffer_put_int(msg, pvar->ssh_state.win_cols);  // columns
@@ -8039,7 +8039,7 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 	buffer_put_int(msg, x);  // window width (pixel):
 	buffer_put_int(msg, y);  // window height (pixel):
 
-	// TTY mode‚Í‚±‚±‚Å“n‚· (2005.7.17 yutaka)
+	// TTY modeã¯ã“ã“ã§æ¸¡ã™ (2005.7.17 yutaka)
 	buffer_put_char(ttymsg, SSH2_TTY_OP_OSPEED);
 	buffer_put_int(ttymsg, pvar->ts->TerminalOutputSpeed);  // baud rate
 	buffer_put_char(ttymsg, SSH2_TTY_OP_ISPEED);
@@ -8068,7 +8068,7 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 
 	buffer_put_char(ttymsg, SSH2_TTY_OP_END); // End of terminal modes
 
-	// SSH2‚Å‚Í•¶š—ñ‚Æ‚µ‚Ä‘‚«‚ŞB
+	// SSH2ã§ã¯æ–‡å­—åˆ—ã¨ã—ã¦æ›¸ãè¾¼ã‚€ã€‚
 	buffer_put_string(msg, buffer_ptr(ttymsg), buffer_len(ttymsg));
 
 	len = buffer_len(msg);
@@ -8112,9 +8112,9 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN_CONFIRMATION was received.");
 
-	// 6byteiƒTƒCƒY{ƒpƒfƒBƒ“ƒO{ƒ^ƒCƒvj‚ğæ‚èœ‚¢‚½ˆÈ~‚ÌƒyƒCƒ[ƒh
+	// 6byteï¼ˆã‚µã‚¤ã‚ºï¼‹ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ï¼‹ã‚¿ã‚¤ãƒ—ï¼‰ã‚’å–ã‚Šé™¤ã„ãŸä»¥é™ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰
 	data = pvar->ssh_state.payload;
-	// ƒpƒPƒbƒgƒTƒCƒY - (ƒpƒfƒBƒ“ƒOƒTƒCƒY+1)G^‚ÌƒpƒPƒbƒgƒTƒCƒY
+	// ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º - (ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚µã‚¤ã‚º+1)ï¼›çœŸã®ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º
 	len = pvar->ssh_state.payloadlen;
 
 	logprintf_hexdump(LOG_LEVEL_SSHDUMP, data, len,
@@ -8135,7 +8135,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 
 	c->remote_id = remote_id;
 	if (c->self_id == pvar->shell_id) {
-		// Å‰‚Ìƒ`ƒƒƒlƒ‹ˆÈŠO‚ÅƒŠƒZƒbƒg‚µ‚Ä‚Í‚¢‚¯‚È‚¢ (2008.12.19 maya)
+		// æœ€åˆã®ãƒãƒ£ãƒãƒ«ä»¥å¤–ã§ãƒªã‚»ãƒƒãƒˆã—ã¦ã¯ã„ã‘ãªã„ (2008.12.19 maya)
 		pvar->session_nego_status = 1;
 	}
 
@@ -8147,19 +8147,19 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 
 	switch (c->type) {
 	case TYPE_PORTFWD:
-		// port-forwading‚Ì"direct-tcpip"‚ª¬Œ÷B
+		// port-forwadingã®"direct-tcpip"ãŒæˆåŠŸã€‚
 		FWD_confirmed_open(pvar, c->local_num, -1);
 		break;
 
 	case TYPE_SHELL:
-		// ƒ|[ƒgƒtƒHƒ[ƒfƒBƒ“ƒO‚Ì€”õ (2005.2.26, 2005.6.21 yutaka)
-		// ƒVƒFƒ‹ƒI[ƒvƒ“‚µ‚½‚ ‚Æ‚É X11 ‚Ì—v‹‚ğo‚³‚È‚­‚Ä‚Í‚È‚ç‚È‚¢B(2005.7.3 yutaka)
+		// ãƒãƒ¼ãƒˆãƒ•ã‚©ãƒ¯ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã®æº–å‚™ (2005.2.26, 2005.6.21 yutaka)
+		// ã‚·ã‚§ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³ã—ãŸã‚ã¨ã« X11 ã®è¦æ±‚ã‚’å‡ºã•ãªãã¦ã¯ãªã‚‰ãªã„ã€‚(2005.7.3 yutaka)
 		FWD_prep_forwarding(pvar);
 		FWD_enter_interactive_mode(pvar);
 
-		// ƒG[ƒWƒFƒ“ƒg“]‘— (2008.11.25 maya)
+		// ã‚¨ãƒ¼ã‚¸ã‚§ãƒ³ãƒˆè»¢é€ (2008.11.25 maya)
 		if (pvar->session_settings.ForwardAgent) {
-			// pty-req ‚æ‚è‘O‚ÉƒŠƒNƒGƒXƒg‚µ‚È‚¢‚ÆƒGƒ‰[‚É‚È‚é–Í—l
+			// pty-req ã‚ˆã‚Šå‰ã«ãƒªã‚¯ã‚¨ã‚¹ãƒˆã—ãªã„ã¨ã‚¨ãƒ©ãƒ¼ã«ãªã‚‹æ¨¡æ§˜
 			return send_channel_request_gen(pvar, c, "auth-agent-req@openssh.com", 1, NULL, NULL);
 		}
 		else {
@@ -8172,7 +8172,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 			_snprintf_s(buff, sizeof(buff), _TRUNCATE, "scp -t %s", c->scp.remotefile);
 
 		} else {
-			// ƒtƒ@ƒCƒ‹–¼‚É‹ó”’‚ğŠÜ‚Ü‚ê‚Ä‚¢‚Ä‚à‚æ‚¢‚æ‚¤‚ÉAƒtƒ@ƒCƒ‹–¼‚ğ“ñdˆø—p•„‚ÅˆÍ‚ŞB
+			// ãƒ•ã‚¡ã‚¤ãƒ«åã«ç©ºç™½ã‚’å«ã¾ã‚Œã¦ã„ã¦ã‚‚ã‚ˆã„ã‚ˆã†ã«ã€ãƒ•ã‚¡ã‚¤ãƒ«åã‚’äºŒé‡å¼•ç”¨ç¬¦ã§å›²ã‚€ã€‚
 			// (2014.7.13 yutaka)
 			_snprintf_s(buff, sizeof(buff), _TRUNCATE, "scp -p -f \"%s\"", c->scp.remotefile);
 		}
@@ -8181,8 +8181,8 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 			return FALSE;;
 		}
 
-		// SCP‚Å remote-to-local ‚Ìê‡‚ÍAƒT[ƒo‚©‚ç‚Ìƒtƒ@ƒCƒ‹‘—M—v‹‚ğo‚·B
-		// ‚±‚Ì“_‚Å‚Í remote window size ‚ª"0"‚È‚Ì‚ÅA‚·‚®‚É‚Í‘—‚ç‚ê‚È‚¢‚ªA’x‰„‘—Mˆ—‚Å‘—‚ç‚ê‚éB
+		// SCPã§ remote-to-local ã®å ´åˆã¯ã€ã‚µãƒ¼ãƒã‹ã‚‰ã®ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡è¦æ±‚ã‚’å‡ºã™ã€‚
+		// ã“ã®æ™‚ç‚¹ã§ã¯ remote window size ãŒ"0"ãªã®ã§ã€ã™ãã«ã¯é€ã‚‰ã‚Œãªã„ãŒã€é…å»¶é€ä¿¡å‡¦ç†ã§é€ã‚‰ã‚Œã‚‹ã€‚
 		// (2007.12.27 yutaka)
 		if (c->scp.dir == FROMREMOTE) {
 			char ch = '\0';
@@ -8195,7 +8195,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 			return FALSE;;
 		}
 
-		// SFTPƒZƒbƒVƒ‡ƒ“‚ğŠJn‚·‚é‚½‚ß‚ÌƒlƒSƒVƒG[ƒVƒ‡ƒ“‚ğs‚¤B
+		// SFTPã‚»ãƒƒã‚·ãƒ§ãƒ³ã‚’é–‹å§‹ã™ã‚‹ãŸã‚ã®ãƒã‚´ã‚·ã‚¨ãƒ¼ã‚·ãƒ§ãƒ³ã‚’è¡Œã†ã€‚
 		// (2012.5.3 yutaka)
 		sftp_do_init(pvar, c);
 		break;
@@ -8214,7 +8214,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 	return TRUE;
 }
 
-// SSH2 port-forwarding ‚É‚¨‚¢‚ÄƒZƒbƒVƒ‡ƒ“‚ªƒI[ƒvƒ“‚Å‚«‚È‚¢ê‡‚ÌƒT[ƒo‚©‚ç‚ÌƒŠƒvƒ‰ƒCi¸”sj
+// SSH2 port-forwarding ã«ãŠã„ã¦ã‚»ãƒƒã‚·ãƒ§ãƒ³ãŒã‚ªãƒ¼ãƒ—ãƒ³ã§ããªã„å ´åˆã®ã‚µãƒ¼ãƒã‹ã‚‰ã®ãƒªãƒ—ãƒ©ã‚¤ï¼ˆå¤±æ•—ï¼‰
 static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 {
 	int len;
@@ -8228,9 +8228,9 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN_FAILURE was received.");
 
-	// 6byteiƒTƒCƒY{ƒpƒfƒBƒ“ƒO{ƒ^ƒCƒvj‚ğæ‚èœ‚¢‚½ˆÈ~‚ÌƒyƒCƒ[ƒh
+	// 6byteï¼ˆã‚µã‚¤ã‚ºï¼‹ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ï¼‹ã‚¿ã‚¤ãƒ—ï¼‰ã‚’å–ã‚Šé™¤ã„ãŸä»¥é™ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰
 	data = pvar->ssh_state.payload;
-	// ƒpƒPƒbƒgƒTƒCƒY - (ƒpƒfƒBƒ“ƒOƒTƒCƒY+1)G^‚ÌƒpƒPƒbƒgƒTƒCƒY
+	// ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º - (ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚µã‚¤ã‚º+1)ï¼›çœŸã®ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º
 	len = pvar->ssh_state.payloadlen;
 
 	id = get_uint32_MSBfirst(data);
@@ -8279,7 +8279,7 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 		FWD_failed_open(pvar, c->local_num, reason);
 	}
 
-	// ƒ`ƒƒƒlƒ‹‚Ì‰ğ•ú˜R‚ê‚ğC³ (2007.5.1 maya)
+	// ãƒãƒ£ãƒãƒ«ã®è§£æ”¾æ¼ã‚Œã‚’ä¿®æ­£ (2007.5.1 maya)
 	ssh2_channel_delete(c);
 
 	return TRUE;
@@ -8305,13 +8305,13 @@ static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 	//           <-----------------size---------------------------->
 	//                             <--------len------->
 	//
-	// data: ƒƒbƒZ[ƒWƒ^ƒCƒv‚É‘±‚­ƒyƒCƒ[ƒh‚Ìæ“ª‚ğw‚·ƒ|ƒCƒ“ƒ^
+	// data: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—ã«ç¶šããƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®å…ˆé ­ã‚’æŒ‡ã™ãƒã‚¤ãƒ³ã‚¿
 	data = pvar->ssh_state.payload;
 	// len = size - (padding size + sizeof(padding size)) = sizeof(type) + sizeof(payload):
-	// ƒyƒCƒ[ƒh•”•ª‚Ì’·‚³Btype •ª‚àŠÜ‚Ş
+	// ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰éƒ¨åˆ†ã®é•·ã•ã€‚type åˆ†ã‚‚å«ã‚€
 	len = pvar->ssh_state.payloadlen;
 
-	len--;   // type •ª‚ğœ‚­
+	len--;   // type åˆ†ã‚’é™¤ã
 
 	rtype = buffer_get_string(&data, &n);
 	len -= (n + 4);
@@ -8321,13 +8321,13 @@ static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 	len--;
 
 	if (rtype == NULL) {
-		// rtype ‚ª NULL ‚Å–³‚¢–‚Ì•ÛØ
+		// rtype ãŒ NULL ã§ç„¡ã„äº‹ã®ä¿è¨¼
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_get_string returns NULL.", __FUNCTION__);
 	}
 	else if (strcmp(rtype, "hostkeys-00@openssh.com") == 0) {
-		// OpenSSH 6.8‚Å‚ÍAƒT[ƒo‚ÌƒzƒXƒgŒ®‚ªXV‚³‚ê‚é‚ÆA‚±‚Ì’Ê’m‚ª—ˆ‚éB
-		// OpenSSH 6.8‚ÌÀ‘•‚Å‚ÍAí‚É¬Œ÷‚Å•Ô‚·‚æ‚¤‚É‚È‚Á‚Ä‚¢‚é‚½‚ßA
-		// ‚»‚ê‚É‡‚í‚¹‚Ä Tera Term ‚Å‚à¬Œ÷‚Æ•Ô‚·‚±‚Æ‚É‚·‚éB
+		// OpenSSH 6.8ã§ã¯ã€ã‚µãƒ¼ãƒã®ãƒ›ã‚¹ãƒˆéµãŒæ›´æ–°ã•ã‚Œã‚‹ã¨ã€ã“ã®é€šçŸ¥ãŒæ¥ã‚‹ã€‚
+		// OpenSSH 6.8ã®å®Ÿè£…ã§ã¯ã€å¸¸ã«æˆåŠŸã§è¿”ã™ã‚ˆã†ã«ãªã£ã¦ã„ã‚‹ãŸã‚ã€
+		// ãã‚Œã«åˆã‚ã›ã¦ Tera Term ã§ã‚‚æˆåŠŸã¨è¿”ã™ã“ã¨ã«ã™ã‚‹ã€‚
 		success = update_client_input_hostkeys(pvar, data, len);
 
 	}
@@ -8349,10 +8349,10 @@ static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 }
 
 
-// SSH2 port-forwarding (remote -> local)‚É‘Î‚·‚éƒŠƒvƒ‰ƒCi¬Œ÷j
+// SSH2 port-forwarding (remote -> local)ã«å¯¾ã™ã‚‹ãƒªãƒ—ãƒ©ã‚¤ï¼ˆæˆåŠŸï¼‰
 static BOOL handle_SSH2_request_success(PTInstVar pvar)
 {
-	// •K—v‚Å‚ ‚ê‚ÎƒƒO‚ğæ‚éB“Á‚É‰½‚à‚µ‚È‚­‚Ä‚à‚æ‚¢B
+	// å¿…è¦ã§ã‚ã‚Œã°ãƒ­ã‚°ã‚’å–ã‚‹ã€‚ç‰¹ã«ä½•ã‚‚ã—ãªãã¦ã‚‚ã‚ˆã„ã€‚
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_REQUEST_SUCCESS was received.");
 
 	client_global_request_reply(pvar, SSH2_MSG_REQUEST_SUCCESS, 0, NULL);
@@ -8360,10 +8360,10 @@ static BOOL handle_SSH2_request_success(PTInstVar pvar)
 	return TRUE;
 }
 
-// SSH2 port-forwarding (remote -> local)‚É‘Î‚·‚éƒŠƒvƒ‰ƒCi¸”sj
+// SSH2 port-forwarding (remote -> local)ã«å¯¾ã™ã‚‹ãƒªãƒ—ãƒ©ã‚¤ï¼ˆå¤±æ•—ï¼‰
 static BOOL handle_SSH2_request_failure(PTInstVar pvar)
 {
-	// •K—v‚Å‚ ‚ê‚ÎƒƒO‚ğæ‚éB“Á‚É‰½‚à‚µ‚È‚­‚Ä‚à‚æ‚¢B
+	// å¿…è¦ã§ã‚ã‚Œã°ãƒ­ã‚°ã‚’å–ã‚‹ã€‚ç‰¹ã«ä½•ã‚‚ã—ãªãã¦ã‚‚ã‚ˆã„ã€‚
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_REQUEST_FAILURE was received.");
 
 	client_global_request_reply(pvar, SSH2_MSG_REQUEST_FAILURE, 0, NULL);
@@ -8447,7 +8447,7 @@ static BOOL handle_SSH2_channel_failure(PTInstVar pvar)
 
 	if (pvar->shell_id == channel_id) {
 		if (c->type == TYPE_SUBSYSTEM_GEN) {
-			// ƒTƒuƒVƒXƒeƒ€‚Ì‹N“®‚É¸”s‚µ‚½‚Ì‚ÅØ‚éB
+			// ã‚µãƒ–ã‚·ã‚¹ãƒ†ãƒ ã®èµ·å‹•ã«å¤±æ•—ã—ãŸã®ã§åˆ‡ã‚‹ã€‚
 			char errmsg[MAX_UIMSG];
 			UTIL_get_lang_msg("MSG_SSH_SUBSYSTEM_REQUEST_ERROR", pvar, "subsystem request failed. (%s)");
 			_snprintf_s(errmsg, sizeof(errmsg), _TRUNCATE, pvar->UIMsg, pvar->subsystem_name);
@@ -8456,8 +8456,8 @@ static BOOL handle_SSH2_channel_failure(PTInstVar pvar)
 		}
 		else { // TYPE_SHELL
 			if (pvar->session_nego_status == 1) {
-				// ƒŠƒ‚[ƒg‚Å auth-agent-req@openssh.com ‚ªƒTƒ|[ƒg‚³‚ê‚Ä‚È‚¢‚Ì‚Å
-				// ƒGƒ‰[‚Í‹C‚É‚¹‚¸Ÿ‚Öi‚Ş
+				// ãƒªãƒ¢ãƒ¼ãƒˆã§ auth-agent-req@openssh.com ãŒã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ãªã„ã®ã§
+				// ã‚¨ãƒ©ãƒ¼ã¯æ°—ã«ã›ãšæ¬¡ã¸é€²ã‚€
 				logputs(LOG_LEVEL_VERBOSE, "auth-agent-req@openssh.com is not supported by remote host.");
 
 				return send_pty_request(pvar, c);
@@ -8471,16 +8471,16 @@ static BOOL handle_SSH2_channel_failure(PTInstVar pvar)
 
 
 
-// ƒNƒ‰ƒCƒAƒ“ƒg‚Ìwindow size‚ğƒT[ƒo‚Ö’m‚ç‚¹‚é
+// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®window sizeã‚’ã‚µãƒ¼ãƒã¸çŸ¥ã‚‰ã›ã‚‹
 static void do_SSH2_adjust_window_size(PTInstVar pvar, Channel_t *c)
 {
-	// window size‚ğ32KB‚Ö•ÏX‚µAlocal window‚Ì”»•Ê‚ğC³B
-	// ‚±‚ê‚É‚æ‚èSSH2‚ÌƒXƒ‹[ƒvƒbƒg‚ªŒüã‚·‚éB(2006.3.6 yutaka)
+	// window sizeã‚’32KBã¸å¤‰æ›´ã—ã€local windowã®åˆ¤åˆ¥ã‚’ä¿®æ­£ã€‚
+	// ã“ã‚Œã«ã‚ˆã‚ŠSSH2ã®ã‚¹ãƒ«ãƒ¼ãƒ—ãƒƒãƒˆãŒå‘ä¸Šã™ã‚‹ã€‚(2006.3.6 yutaka)
 	buffer_t *msg;
 	unsigned char *outmsg;
 	int len;
 
-	// ƒ[ƒJƒ‹‚Ìwindow size‚É‚Ü‚¾—]—T‚ª‚ ‚é‚È‚çA‰½‚à‚µ‚È‚¢B
+	// ãƒ­ãƒ¼ã‚«ãƒ«ã®window sizeã«ã¾ã ä½™è£•ãŒã‚ã‚‹ãªã‚‰ã€ä½•ã‚‚ã—ãªã„ã€‚
 	// added /2 (2006.3.6 yutaka)
 	if (c->local_window > c->local_window_max/2)
 		return;
@@ -8502,7 +8502,7 @@ static void do_SSH2_adjust_window_size(PTInstVar pvar, Channel_t *c)
 		buffer_free(msg);
 
 		logputs(LOG_LEVEL_SSHDUMP, "SSH2_MSG_CHANNEL_WINDOW_ADJUST was sent at do_SSH2_adjust_window_size().");
-		// ƒNƒ‰ƒCƒAƒ“ƒg‚Ìwindow size‚ğ‘‚â‚·
+		// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®window sizeã‚’å¢—ã‚„ã™
 		c->local_window = c->local_window_max;
 	}
 
@@ -8516,12 +8516,12 @@ void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c)
 		unsigned char *outmsg;
 		int len;
 
-		// ‚±‚Ìchannel‚É‚Â‚¢‚Äclose‚ğ‘—MÏ‚İ‚È‚ç‘—‚ç‚È‚¢
+		// ã“ã®channelã«ã¤ã„ã¦closeã‚’é€ä¿¡æ¸ˆã¿ãªã‚‰é€ã‚‰ãªã„
 		if (c->state & SSH_CHANNEL_STATE_CLOSE_SENT) {
 			return;
 		}
 
-		// SSH2 server‚Échannel close‚ğ“`‚¦‚é
+		// SSH2 serverã«channel closeã‚’ä¼ãˆã‚‹
 		msg = buffer_init();
 		if (msg == NULL) {
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
@@ -8563,7 +8563,7 @@ static INT_PTR CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 			CenterWindow(hWnd, GetParent(hWnd));
 			return FALSE;
 
-		// SCPƒtƒ@ƒCƒ‹óM(remote-to-local)Ag—p‚·‚éB
+		// SCPãƒ•ã‚¡ã‚¤ãƒ«å—ä¿¡(remote-to-local)æ™‚ã€ä½¿ç”¨ã™ã‚‹ã€‚
 		case WM_CHANNEL_CLOSE:
 			{
 			scp_dlg_parm_t *parm = (scp_dlg_parm_t *)wp;
@@ -8593,8 +8593,8 @@ static INT_PTR CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 					}
 
 				case IDCANCEL:
-					// ƒEƒBƒ“ƒhƒE‚ğ‚¢‚«‚È‚è”jŠü‚·‚é‚Ì‚Å‚Í‚È‚­A”ñ•\¦‚É‚·‚é‚Ì‚İ‚Æ‚µ‚ÄA
-					// ƒXƒŒƒbƒh‚©‚ç‚ÌƒƒbƒZ[ƒW‚ğˆ—‚Å‚«‚é‚æ‚¤‚É‚·‚éB
+					// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ã„ããªã‚Šç ´æ£„ã™ã‚‹ã®ã§ã¯ãªãã€éè¡¨ç¤ºã«ã™ã‚‹ã®ã¿ã¨ã—ã¦ã€
+					// ã‚¹ãƒ¬ãƒƒãƒ‰ã‹ã‚‰ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹ã€‚
 					// (2011.6.8 yutaka)
 					//EndDialog(hWnd, 0);
 					//DestroyWindow(hWnd);
@@ -8607,7 +8607,7 @@ static INT_PTR CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 			break;
 
 		case WM_CLOSE:
-			// closeƒ{ƒ^ƒ“‚ª‰Ÿ‰º‚³‚ê‚Ä‚à window ‚ª•Â‚¶‚È‚¢‚æ‚¤‚É‚·‚éB
+			// closeãƒœã‚¿ãƒ³ãŒæŠ¼ä¸‹ã•ã‚Œã¦ã‚‚ window ãŒé–‰ã˜ãªã„ã‚ˆã†ã«ã™ã‚‹ã€‚
 			return TRUE;
 
 		case WM_DESTROY:
@@ -8668,19 +8668,19 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 	do {
 		int readlen, count=0;
 
-		// Cancelƒ{ƒ^ƒ“‚ª‰Ÿ‰º‚³‚ê‚½‚çƒEƒBƒ“ƒhƒE‚ªÁ‚¦‚éB
+		// Cancelãƒœã‚¿ãƒ³ãŒæŠ¼ä¸‹ã•ã‚ŒãŸã‚‰ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒæ¶ˆãˆã‚‹ã€‚
 		if (is_canceled_window(hWnd))
 			goto cancel_abort;
 
-		// ƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚ñ‚¾ƒf[ƒ^‚Í‚©‚È‚ç‚¸ƒT[ƒo‚Ö‘—M‚·‚éB
+		// ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚“ã ãƒ‡ãƒ¼ã‚¿ã¯ã‹ãªã‚‰ãšã‚µãƒ¼ãƒã¸é€ä¿¡ã™ã‚‹ã€‚
 		readlen = max(4096, min(buflen, c->remote_window)); // min 4KB
 		ret = fread(buf, 1, readlen, c->scp.localfp);
 		if (ret == 0)
 			break;
 
-		// remote_window ‚ª‰ñ•œ‚·‚é‚Ü‚Å‘Ò‚Â
+		// remote_window ãŒå›å¾©ã™ã‚‹ã¾ã§å¾…ã¤
 		do {
-			// socket or channel‚ªƒNƒ[ƒY‚³‚ê‚½‚çƒXƒŒƒbƒh‚ğI‚í‚é
+			// socket or channelãŒã‚¯ãƒ­ãƒ¼ã‚ºã•ã‚ŒãŸã‚‰ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’çµ‚ã‚ã‚‹
 			if (pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0)
 				goto abort;
 
@@ -8688,7 +8688,7 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 				Sleep(100);
 			}
 
-			// 100‰ñ”²‚¯‚ç‚ê‚È‚©‚Á‚½‚ç”²‚¯‚Ä‚µ‚Ü‚¤
+			// 100å›æŠœã‘ã‚‰ã‚Œãªã‹ã£ãŸã‚‰æŠœã‘ã¦ã—ã¾ã†
 			count++;
 			if (count > 100) {
 				break;
@@ -8753,8 +8753,8 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 	return 0;
 
 cancel_abort:
-	// ƒ`ƒƒƒlƒ‹‚ÌƒNƒ[ƒY‚ğs‚¢‚½‚¢‚ªA’¼Ú ssh2_channel_send_close() ‚ğŒÄ‚Ño‚·‚ÆA
-	// “–ŠYŠÖ”‚ªƒXƒŒƒbƒhƒZ[ƒt‚Å‚Í‚È‚¢‚½‚ßASCPˆ—‚ª³í‚ÉI—¹‚µ‚È‚¢ê‡‚ª‚ ‚éB
+	// ãƒãƒ£ãƒãƒ«ã®ã‚¯ãƒ­ãƒ¼ã‚ºã‚’è¡Œã„ãŸã„ãŒã€ç›´æ¥ ssh2_channel_send_close() ã‚’å‘¼ã³å‡ºã™ã¨ã€
+	// å½“è©²é–¢æ•°ãŒã‚¹ãƒ¬ãƒƒãƒ‰ã‚»ãƒ¼ãƒ•ã§ã¯ãªã„ãŸã‚ã€SCPå‡¦ç†ãŒæ­£å¸¸ã«çµ‚äº†ã—ãªã„å ´åˆãŒã‚ã‚‹ã€‚
 	// (2011.6.8 yutaka)
 	parm.c = c;
 	parm.pvar = pvar;
@@ -8817,7 +8817,7 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 
 
 	} else if (c->scp.state == SCP_DATA) {
-		// ‘—MŠ®—¹
+		// é€ä¿¡å®Œäº†
 		ssh2_channel_send_close(pvar, c);
 		//ssh2_channel_delete(c);  // free channel
 
@@ -8850,7 +8850,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 	prev_elapsed = 0;
 
 	for (;;) {
-		// Cancelƒ{ƒ^ƒ“‚ª‰Ÿ‰º‚³‚ê‚½‚çƒEƒBƒ“ƒhƒE‚ªÁ‚¦‚éB
+		// Cancelãƒœã‚¿ãƒ³ãŒæŠ¼ä¸‹ã•ã‚ŒãŸã‚‰ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒæ¶ˆãˆã‚‹ã€‚
 		if (is_canceled_window(hWnd))
 			goto cancel_abort;
 
@@ -8925,8 +8925,8 @@ done:
 	c->scp.state = SCP_CLOSING;
 	ShowWindow(c->scp.progress_window, SW_HIDE);
 
-	// ƒ`ƒƒƒlƒ‹‚ÌƒNƒ[ƒY‚ğs‚¢‚½‚¢‚ªA’¼Ú ssh2_channel_send_close() ‚ğŒÄ‚Ño‚·‚ÆA
-	// “–ŠYŠÖ”‚ªƒXƒŒƒbƒhƒZ[ƒt‚Å‚Í‚È‚¢‚½‚ßASCPˆ—‚ª³í‚ÉI—¹‚µ‚È‚¢ê‡‚ª‚ ‚éB
+	// ãƒãƒ£ãƒãƒ«ã®ã‚¯ãƒ­ãƒ¼ã‚ºã‚’è¡Œã„ãŸã„ãŒã€ç›´æ¥ ssh2_channel_send_close() ã‚’å‘¼ã³å‡ºã™ã¨ã€
+	// å½“è©²é–¢æ•°ãŒã‚¹ãƒ¬ãƒƒãƒ‰ã‚»ãƒ¼ãƒ•ã§ã¯ãªã„ãŸã‚ã€SCPå‡¦ç†ãŒæ­£å¸¸ã«çµ‚äº†ã—ãªã„å ´åˆãŒã‚ã‚‹ã€‚
 	// (2011.6.1 yutaka)
 	parm.c = c;
 	parm.pvar = pvar;
@@ -8938,8 +8938,8 @@ cancel_abort:
 	return 0;
 }
 
-// do_SSH2_adjust_window_size() ‚ğ‚ ‚é’ö“xŠÔ‚ªŒo‰ß‚µ‚Ä‚©‚çƒR[ƒ‹‚·‚é
-// ƒtƒ[§ŒäAóMˆ—‚ğÄŠJ
+// do_SSH2_adjust_window_size() ã‚’ã‚ã‚‹ç¨‹åº¦æ™‚é–“ãŒçµŒéã—ã¦ã‹ã‚‰ã‚³ãƒ¼ãƒ«ã™ã‚‹
+// ãƒ•ãƒ­ãƒ¼åˆ¶å¾¡ã€å—ä¿¡å‡¦ç†ã‚’å†é–‹
 static void CALLBACK do_SSH2_adjust_window_size_timer(
 	HWND hWnd, UINT uMsg, UINT_PTR nIDEvent, DWORD dwTime)
 {
@@ -8951,11 +8951,11 @@ static void CALLBACK do_SSH2_adjust_window_size_timer(
 	(void)dwTime;
 
 	if (pvar->recv.data_finished) {
-		// ‘—MI—¹‚µ‚½‚Ì‚ÉƒƒbƒZ[ƒW‚ªc‚Á‚Ä‚¢‚½‘Îô
+		// é€ä¿¡çµ‚äº†ã—ãŸã®ã«ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒæ®‹ã£ã¦ã„ãŸæ™‚å¯¾ç­–
 		return;
 	}
 	if (pvar->recv.timer_id != 0) {
-		// SetTimer() ‚ÍƒCƒ“ƒ^[ƒoƒ‹‚É”­¶‚·‚é‚Ì‚Åíœ‚·‚é
+		// SetTimer() ã¯ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒ«ã«ç™ºç”Ÿã™ã‚‹ã®ã§å‰Šé™¤ã™ã‚‹
 		KillTimer(pvar->cv->HWin, pvar->recv.timer_id);
 		pvar->recv.timer_id = 0;
 	}
@@ -8965,8 +8965,8 @@ static void CALLBACK do_SSH2_adjust_window_size_timer(
 	do_SSH2_adjust_window_size(pvar, c);
 }
 
-// SSHƒT[ƒo‚©‚ç‘—‚ç‚ê‚Ä‚«‚½ƒtƒ@ƒCƒ‹‚Ìƒf[ƒ^‚ğƒŠƒXƒg‚É‚Â‚È‚®B
-// ƒŠƒXƒg‚Ìæ‚èo‚µ‚Í ssh_scp_receive_thread ƒXƒŒƒbƒh‚Ås‚¤B
+// SSHã‚µãƒ¼ãƒã‹ã‚‰é€ã‚‰ã‚Œã¦ããŸãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‡ãƒ¼ã‚¿ã‚’ãƒªã‚¹ãƒˆã«ã¤ãªãã€‚
+// ãƒªã‚¹ãƒˆã®å–ã‚Šå‡ºã—ã¯ ssh_scp_receive_thread ã‚¹ãƒ¬ãƒƒãƒ‰ã§è¡Œã†ã€‚
 static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen)
 {
 	PacketList_t *p, *old;
@@ -8991,13 +8991,13 @@ static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 		c->scp.pktlist_tail = p;
 	}
 
-	// ƒLƒ…[‚É‹l‚ñ‚¾ƒf[ƒ^‚Ì‘ƒTƒCƒY‚ğ‰ÁZ‚·‚éB
+	// ã‚­ãƒ¥ãƒ¼ã«è©°ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®ç·ã‚µã‚¤ã‚ºã‚’åŠ ç®—ã™ã‚‹ã€‚
 	c->scp.pktlist_cursize += buflen;
 
-	// ƒLƒ…[‚É‹l‚ñ‚¾ƒf[ƒ^‚Ì‘ƒTƒCƒY‚ªãŒÀè‡’l‚ğ’´‚¦‚½ê‡A
-	// SSHƒT[ƒo‚Ìwindows size‚ÌXV‚ğ’â~‚·‚é
-	// ‚±‚ê‚É‚æ‚èƒŠƒXƒgƒGƒ“ƒgƒŠ‚ª‘‚¦‘±‚¯AÁ”ïƒƒ‚ƒŠ‚Ì”ì‘å‰»‚ğ
-	// ‰ñ”ğ‚Å‚«‚éB
+	// ã‚­ãƒ¥ãƒ¼ã«è©°ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®ç·ã‚µã‚¤ã‚ºãŒä¸Šé™é–¾å€¤ã‚’è¶…ãˆãŸå ´åˆã€
+	// SSHã‚µãƒ¼ãƒã®windows sizeã®æ›´æ–°ã‚’åœæ­¢ã™ã‚‹
+	// ã“ã‚Œã«ã‚ˆã‚Šãƒªã‚¹ãƒˆã‚¨ãƒ³ãƒˆãƒªãŒå¢—ãˆç¶šã‘ã€æ¶ˆè²»ãƒ¡ãƒ¢ãƒªã®è‚¥å¤§åŒ–ã‚’
+	// å›é¿ã§ãã‚‹ã€‚
 	if (c->scp.pktlist_cursize >= SCPRCV_HIGH_WATER_MARK) {
 		logprintf(LOG_LEVEL_NOTICE,
 			"%s: enter suspend", __FUNCTION__);
@@ -9037,19 +9037,19 @@ static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 
 	free(p);
 
-	// ƒLƒ…[‚É‹l‚ñ‚¾ƒf[ƒ^‚Ì‘ƒTƒCƒY‚ğŒ¸Z‚·‚éB
+	// ã‚­ãƒ¥ãƒ¼ã«è©°ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®ç·ã‚µã‚¤ã‚ºã‚’æ¸›ç®—ã™ã‚‹ã€‚
 	c->scp.pktlist_cursize -= *buflen;
 
-	// ƒLƒ…[‚É‹l‚ñ‚¾ƒf[ƒ^‚Ì‘ƒTƒCƒY‚ª‰ºŒÀè‡’l‚ğ‰º‰ñ‚Á‚½ê‡A
-	// SSHƒT[ƒo‚Öwindow size‚ÌXV‚ğÄŠJ‚·‚é
+	// ã‚­ãƒ¥ãƒ¼ã«è©°ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®ç·ã‚µã‚¤ã‚ºãŒä¸‹é™é–¾å€¤ã‚’ä¸‹å›ã£ãŸå ´åˆã€
+	// SSHã‚µãƒ¼ãƒã¸window sizeã®æ›´æ–°ã‚’å†é–‹ã™ã‚‹
 	if (c->scp.pktlist_cursize <= SCPRCV_LOW_WATER_MARK) {
 		logprintf(LOG_LEVEL_NOTICE, "%s: SCP receive resumed", __FUNCTION__);
-		// ƒuƒƒbƒN‚µ‚Ä‚¢‚éê‡
+		// ãƒ–ãƒ­ãƒƒã‚¯ã—ã¦ã„ã‚‹å ´åˆ
 		if (pvar->recv.suspended) {
-			// SCPóM‚ÌƒuƒƒbƒN‚ğ‰ğœ‚·‚éB
+			// SCPå—ä¿¡ã®ãƒ–ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã™ã‚‹ã€‚
 			pvar->recv.suspended = FALSE;
 			if (c->scp.filercvsize < c->scp.filetotalsize) {
-				// ‘±‚«‚ğóM
+				// ç¶šãã‚’å—ä¿¡
 				pvar->recv.timer_id =
 					SetTimer(pvar->cv->HWin, (UINT_PTR)c, USER_TIMER_MINIMUM, do_SSH2_adjust_window_size_timer);
 			}
@@ -9110,11 +9110,11 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 
 			sscanf_s(data, "T%ld 0 %ld 0", &mtime, &atime);
 
-			// ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv‚ğ‹L˜^
+			// ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—ã‚’è¨˜éŒ²
 			c->scp.filemtime = mtime;
 			c->scp.fileatime = atime;
 
-			// ƒŠƒvƒ‰ƒC‚ğ•Ô‚·
+			// ãƒªãƒ—ãƒ©ã‚¤ã‚’è¿”ã™
 			goto reply;
 
 		} else if (data[0] == 'C') {  // C0666 size file
@@ -9130,14 +9130,14 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 					  __FUNCTION__,
 					  filename, size, permission);
 
-			// Windows‚È‚Ì‚Åƒp[ƒ~ƒbƒVƒ‡ƒ“‚Í–³‹BƒTƒCƒY‚Ì‚İ‹L˜^B
+			// Windowsãªã®ã§ãƒ‘ãƒ¼ãƒŸãƒƒã‚·ãƒ§ãƒ³ã¯ç„¡è¦–ã€‚ã‚µã‚¤ã‚ºã®ã¿è¨˜éŒ²ã€‚
 			c->scp.filetotalsize = size;
 			c->scp.filercvsize = 0;
 			c->scp.recv.received_size = 0;
 
 			c->scp.state = SCP_DATA;
 
-			// i’»ƒEƒBƒ“ƒhƒE
+			// é€²æ—ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
 			c->scp.pvar = pvar;
 			hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_SSHSCP_PROGRESS),
 									 pvar->cv->HWin, ssh_scp_dlg_proc);
@@ -9167,7 +9167,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			goto reply;
 
 		} else {
-			// ƒT[ƒo‚©‚ç‚Ìƒf[ƒ^‚ª•s’è‚Ìê‡‚ÍAƒGƒ‰[•\¦‚ğs‚¤B
+			// ã‚µãƒ¼ãƒã‹ã‚‰ã®ãƒ‡ãƒ¼ã‚¿ãŒä¸å®šã®å ´åˆã¯ã€ã‚¨ãƒ©ãƒ¼è¡¨ç¤ºã‚’è¡Œã†ã€‚
 			// (2014.7.13 yutaka)
 			char msg[256];
 			int copylen;
@@ -9181,12 +9181,12 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			MessageBox(NULL, msg, pvar->UIMsg, MB_OK | MB_ICONEXCLAMATION);
 		}
 
-	} else if (c->scp.state == SCP_DATA) {  // payload‚ÌóM
+	} else if (c->scp.state == SCP_DATA) {  // payloadã®å—ä¿¡
 		logprintf(LOG_LEVEL_VERBOSE, "%s: SCP_DATA size=%u",
 				  __FUNCTION__,
 				  buflen);
 		if (pvar->recv.close_request) {
-			// ƒLƒƒƒ“ƒZƒ‹ƒ{ƒ^ƒ“‚ğ‰Ÿ‚³‚ê‚½
+			// ã‚­ãƒ£ãƒ³ã‚»ãƒ«ãƒœã‚¿ãƒ³ã‚’æŠ¼ã•ã‚ŒãŸ
 			ssh2_channel_send_close(pvar, c);
 		}
 		else {
@@ -9194,14 +9194,14 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			if (newdata != NULL) {
 				memcpy(newdata, data, buflen);
 
-				// ‚±‚Ì’†‚Å suspended ‚ª TRUE ‚É‚È‚é‚±‚Æ‚ª‚ ‚é
+				// ã“ã®ä¸­ã§ suspended ãŒ TRUE ã«ãªã‚‹ã“ã¨ãŒã‚ã‚‹
 				ssh2_scp_add_packetlist(pvar, c, newdata, buflen);
 			}
 
 			c->scp.recv.received_size += buflen;
 
 			if (c->scp.recv.received_size >= c->scp.filetotalsize) {
-				// óMI—¹
+				// å—ä¿¡çµ‚äº†
 				PTInstVar pvar = c->scp.pvar;
 				pvar->recv.data_finished = TRUE;
 				if (pvar->recv.timer_id != 0) {
@@ -9210,24 +9210,24 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 				}
 			}
 			else if (pvar->recv.suspended) {
-				// ƒtƒ[§Œä’†
+				// ãƒ•ãƒ­ãƒ¼åˆ¶å¾¡ä¸­
 				logprintf(LOG_LEVEL_NOTICE, "%s: scp receive suspended", __FUNCTION__);
 			}
 			else {
-				// ƒ[ƒJƒ‹‚Ìwindow size‚ğƒ`ƒFƒbƒN
-				//	‚±‚Ü‚ß‚É‚â‚ç‚¸‚ÉA‚ ‚é’ö“x‚Ü‚Æ‚ß‚Ä’²®‚ğs‚¤
+				// ãƒ­ãƒ¼ã‚«ãƒ«ã®window sizeã‚’ãƒã‚§ãƒƒã‚¯
+				//	ã“ã¾ã‚ã«ã‚„ã‚‰ãšã«ã€ã‚ã‚‹ç¨‹åº¦ã¾ã¨ã‚ã¦èª¿æ•´ã‚’è¡Œã†
 				if (c->local_window < c->local_window_max/2) {
-					// windowƒTƒCƒY‚ğ’²®‚·‚é
+					// windowã‚µã‚¤ã‚ºã‚’èª¿æ•´ã™ã‚‹
 #if 0
-					// ‚·‚®‚É’²®‚·‚é
-					//		‚·‚®‚ÉƒT[ƒo[‚©‚çƒf[ƒ^‚ªóM‚Å‚«‚éŠÂ‹«‚Ìê‡A
-					// 		FD_READ‚ª—Dæ‚³‚ê‚ÄƒƒbƒZ[ƒWƒLƒ…[‚ÉÏ‚Ü‚ê‚Ä
-					// 		‘¼‚Ìwindows‚ÌƒƒbƒZ[ƒWˆ—(ƒLƒƒƒ“ƒZƒ‹ƒ{ƒ^ƒ“‰Ÿ‰º‚È‚Ç)‚ª
-					//		‚Å‚«‚È‚­‚È‚é‚½‚ßg—p‚µ‚È‚¢
+					// ã™ãã«èª¿æ•´ã™ã‚‹
+					//		ã™ãã«ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ãŒå—ä¿¡ã§ãã‚‹ç’°å¢ƒã®å ´åˆã€
+					// 		FD_READãŒå„ªå…ˆã•ã‚Œã¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚­ãƒ¥ãƒ¼ã«ç©ã¾ã‚Œã¦
+					// 		ä»–ã®windowsã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†(ã‚­ãƒ£ãƒ³ã‚»ãƒ«ãƒœã‚¿ãƒ³æŠ¼ä¸‹ãªã©)ãŒ
+					//		ã§ããªããªã‚‹ãŸã‚ä½¿ç”¨ã—ãªã„
 					do_ssh2_adjust_window_size(pvar, c);
 #else
-					// ­‚µŠÔ‚ğ’u‚¢‚Ä‚©‚ç’²®
-					//		ƒ^ƒCƒ}[‚ğg‚Á‚ÄGUIƒXƒŒƒbƒh‚ÅŠÖ”‚ğƒR[ƒ‹‚·‚é
+					// å°‘ã—æ™‚é–“ã‚’ç½®ã„ã¦ã‹ã‚‰èª¿æ•´
+					//		ã‚¿ã‚¤ãƒãƒ¼ã‚’ä½¿ã£ã¦GUIã‚¹ãƒ¬ãƒƒãƒ‰ã§é–¢æ•°ã‚’ã‚³ãƒ¼ãƒ«ã™ã‚‹
 					if (pvar->recv.timer_id == 0) {
 						pvar->recv.timer_id =
 							SetTimer(pvar->cv->HWin, (UINT_PTR)c, USER_TIMER_MINIMUM, do_SSH2_adjust_window_size_timer);
@@ -9237,7 +9237,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			}
 		}
 
-	} else if (c->scp.state == SCP_CLOSING) {  // EOF‚ÌóM
+	} else if (c->scp.state == SCP_CLOSING) {  // EOFã®å—ä¿¡
 		ssh2_channel_send_close(pvar, c);
 
 	}
@@ -9277,7 +9277,7 @@ error:
 
 		resp = data[0];
 
-		// ƒGƒ‰[ƒR[ƒh‚É‚æ‚è•¶š—ñ‚ÌŠi”[êŠ‚ªáŠ±ˆÙ‚È‚éB
+		// ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰ã«ã‚ˆã‚Šæ–‡å­—åˆ—ã®æ ¼ç´å ´æ‰€ãŒè‹¥å¹²ç•°ãªã‚‹ã€‚
 		if (resp == 1 || /* error, followed by error msg */
 			resp == 2) {  /* fatal error, "" */
 			offset = 1;
@@ -9292,9 +9292,9 @@ error:
 		memcpy(msg, &data[offset], max);
 		msg[max] = '\0';
 
-		// ‚æ‚­•ª‚©‚ç‚È‚¢ƒGƒ‰[‚Ìê‡‚ÍA©g‚Åƒ`ƒƒƒlƒ‹‚ğƒNƒ[ƒY‚·‚éB
-		// .bashrc ‚É"stty stop undef"‚ª’è‹`‚³‚ê‚Ä‚¢‚é‚ÆATTSSH‚ª—‚¿‚é–â‘è‚Ö‚Ìb’èˆ’uB
-		// —‚¿‚éŒ´ˆö‚Í•ª‚©‚Á‚Ä‚¢‚È‚¢B
+		// ã‚ˆãåˆ†ã‹ã‚‰ãªã„ã‚¨ãƒ©ãƒ¼ã®å ´åˆã¯ã€è‡ªèº«ã§ãƒãƒ£ãƒãƒ«ã‚’ã‚¯ãƒ­ãƒ¼ã‚ºã™ã‚‹ã€‚
+		// .bashrc ã«"stty stop undef"ãŒå®šç¾©ã•ã‚Œã¦ã„ã‚‹ã¨ã€TTSSHãŒè½ã¡ã‚‹å•é¡Œã¸ã®æš«å®šå‡¦ç½®ã€‚
+		// è½ã¡ã‚‹åŸå› ã¯åˆ†ã‹ã£ã¦ã„ãªã„ã€‚
 		// (2013.4.5 yutaka)
 		if (resp == 1) {
 			ssh2_channel_send_close(pvar, c);
@@ -9323,9 +9323,9 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 	unsigned int str_len;
 	Channel_t *c;
 
-	// 6byteiƒTƒCƒY{ƒpƒfƒBƒ“ƒO{ƒ^ƒCƒvj‚ğæ‚èœ‚¢‚½ˆÈ~‚ÌƒyƒCƒ[ƒh
+	// 6byteï¼ˆã‚µã‚¤ã‚ºï¼‹ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ï¼‹ã‚¿ã‚¤ãƒ—ï¼‰ã‚’å–ã‚Šé™¤ã„ãŸä»¥é™ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰
 	data = pvar->ssh_state.payload;
-	// ƒpƒPƒbƒgƒTƒCƒY - (ƒpƒfƒBƒ“ƒOƒTƒCƒY+1)G^‚ÌƒpƒPƒbƒgƒTƒCƒY
+	// ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º - (ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚µã‚¤ã‚º+1)ï¼›çœŸã®ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º
 	len = pvar->ssh_state.payloadlen;
 
 	// channel number
@@ -9352,19 +9352,19 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 		push_memdump("SSH receiving packet", "PKT_recv", (char *)data, str_len);
 	}
 
-	// ƒoƒbƒtƒ@ƒTƒCƒY‚Ìƒ`ƒFƒbƒN
+	// ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã®ãƒã‚§ãƒƒã‚¯
 	if (str_len > c->local_maxpacket) {
 		logprintf(LOG_LEVEL_WARNING, "%s: Data length is larger than local_maxpacket. "
 			"len:%d local_maxpacket:%d", __FUNCTION__, str_len, c->local_maxpacket);
 	}
 	if (str_len > c->local_window) {
-		// local window size‚æ‚è‘å‚«‚ÈƒpƒPƒbƒg‚ÍÌ‚Ä‚é
+		// local window sizeã‚ˆã‚Šå¤§ããªãƒ‘ã‚±ãƒƒãƒˆã¯æ¨ã¦ã‚‹
 		logprintf(LOG_LEVEL_WARNING, "%s: Data length is larger than local_window. "
 			"len:%d local_window:%d", __FUNCTION__, str_len, c->local_window);
 		return FALSE;
 	}
 
-	// ƒyƒCƒ[ƒh‚Æ‚µ‚ÄƒNƒ‰ƒCƒAƒ“ƒg(Tera Term)‚Ö“n‚·
+	// ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã¨ã—ã¦ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ(Tera Term)ã¸æ¸¡ã™
 	if (c->type == TYPE_SHELL || c->type == TYPE_SUBSYSTEM_GEN) {
 		pvar->ssh_state.payload_datalen = str_len;
 		pvar->ssh_state.payload_datastart = 8; // id + strlen
@@ -9375,7 +9375,7 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 
 	} else if (c->type == TYPE_SCP) {  // SCP
 		SSH2_scp_response(pvar, c, data, str_len);
-		// ƒEƒBƒ“ƒhƒEƒTƒCƒY‚Ì’²®
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã®èª¿æ•´
 		c->local_window -= str_len;
 		return TRUE;
 
@@ -9388,7 +9388,7 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 		}
 	}
 
-	// ƒEƒBƒ“ƒhƒEƒTƒCƒY‚Ì’²®
+	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã®èª¿æ•´
 	c->local_window -= str_len;
 
 	do_SSH2_adjust_window_size(pvar, c);
@@ -9397,9 +9397,9 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 }
 
 
-// Tectia Server ‚Ì Windows ”Å‚ÍADOSƒRƒ}ƒ“ƒh‚ª¸”s‚µ‚½‚Æ‚«‚Éstderr‚Éo—Í‚³‚ê‚é
-// ƒGƒ‰[ƒƒbƒZ[ƒW‚ğ SSH2_MSG_CHANNEL_EXTENDED_DATA ‚Å‘—M‚µ‚Ä‚­‚éB
-// SSH2_MSG_CHANNEL_EXTENDED_DATA ‚ğˆ—‚·‚é‚æ‚¤‚É‚µ‚½B(2006.10.30 maya)
+// Tectia Server ã® Windows ç‰ˆã¯ã€DOSã‚³ãƒãƒ³ãƒ‰ãŒå¤±æ•—ã—ãŸã¨ãã«stderrã«å‡ºåŠ›ã•ã‚Œã‚‹
+// ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ SSH2_MSG_CHANNEL_EXTENDED_DATA ã§é€ä¿¡ã—ã¦ãã‚‹ã€‚
+// SSH2_MSG_CHANNEL_EXTENDED_DATA ã‚’å‡¦ç†ã™ã‚‹ã‚ˆã†ã«ã—ãŸã€‚(2006.10.30 maya)
 static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 {
 	int len;
@@ -9411,9 +9411,9 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_SSHDUMP, "SSH2_MSG_CHANNEL_EXTENDED_DATA was received.");
 
-	// 6byteiƒTƒCƒY{ƒpƒfƒBƒ“ƒO{ƒ^ƒCƒvj‚ğæ‚èœ‚¢‚½ˆÈ~‚ÌƒyƒCƒ[ƒh
+	// 6byteï¼ˆã‚µã‚¤ã‚ºï¼‹ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ï¼‹ã‚¿ã‚¤ãƒ—ï¼‰ã‚’å–ã‚Šé™¤ã„ãŸä»¥é™ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰
 	data = pvar->ssh_state.payload;
-	// ƒpƒPƒbƒgƒTƒCƒY - (ƒpƒfƒBƒ“ƒOƒTƒCƒY+1)G^‚ÌƒpƒPƒbƒgƒTƒCƒY
+	// ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º - (ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚µã‚¤ã‚º+1)ï¼›çœŸã®ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º
 	len = pvar->ssh_state.payloadlen;
 
 	//debug_print(80, data, len);
@@ -9440,19 +9440,19 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 	strlen = get_uint32_MSBfirst(data);
 	data += 4;
 
-	// ƒoƒbƒtƒ@ƒTƒCƒY‚Ìƒ`ƒFƒbƒN
+	// ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã®ãƒã‚§ãƒƒã‚¯
 	if (strlen > c->local_maxpacket) {
 		logprintf(LOG_LEVEL_WARNING, "%s: Data length is larger than local_maxpacket. "
 			"len:%d local_maxpacket:%d", __FUNCTION__, strlen, c->local_maxpacket);
 	}
 	if (strlen > c->local_window) {
-		// local window size‚æ‚è‘å‚«‚ÈƒpƒPƒbƒg‚ÍÌ‚Ä‚é
+		// local window sizeã‚ˆã‚Šå¤§ããªãƒ‘ã‚±ãƒƒãƒˆã¯æ¨ã¦ã‚‹
 		logprintf(LOG_LEVEL_WARNING, "%s: Data length is larger than local_window. "
 			"len:%d local_window:%d", __FUNCTION__, strlen, c->local_window);
 		return FALSE;
 	}
 
-	// ƒyƒCƒ[ƒh‚Æ‚µ‚ÄƒNƒ‰ƒCƒAƒ“ƒg(Tera Term)‚Ö“n‚·
+	// ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã¨ã—ã¦ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ(Tera Term)ã¸æ¸¡ã™
 	if (c->type == TYPE_SHELL || c->type == TYPE_SUBSYSTEM_GEN) {
 		pvar->ssh_state.payload_datalen = strlen;
 		pvar->ssh_state.payload_datastart = 12; // id + data_type + strlen
@@ -9485,7 +9485,7 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 
 	//debug_print(200, data, strlen);
 
-	// ƒEƒBƒ“ƒhƒEƒTƒCƒY‚Ì’²®
+	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã®èª¿æ•´
 	c->local_window -= strlen;
 
 	if (c->type == TYPE_SCP && pvar->recv.suspended) {
@@ -9506,11 +9506,11 @@ static BOOL handle_SSH2_channel_eof(PTInstVar pvar)
 	int id;
 	Channel_t *c;
 
-	// Ø’f‚ÉƒT[ƒo‚ª SSH2_MSG_CHANNEL_EOF ‚ğ‘—‚Á‚Ä‚­‚é‚Ì‚ÅAƒ`ƒƒƒlƒ‹‚ğ‰ğ•ú‚·‚éB(2005.6.19 yutaka)
+	// åˆ‡æ–­æ™‚ã«ã‚µãƒ¼ãƒãŒ SSH2_MSG_CHANNEL_EOF ã‚’é€ã£ã¦ãã‚‹ã®ã§ã€ãƒãƒ£ãƒãƒ«ã‚’è§£æ”¾ã™ã‚‹ã€‚(2005.6.19 yutaka)
 
-	// 6byteiƒTƒCƒY{ƒpƒfƒBƒ“ƒO{ƒ^ƒCƒvj‚ğæ‚èœ‚¢‚½ˆÈ~‚ÌƒyƒCƒ[ƒh
+	// 6byteï¼ˆã‚µã‚¤ã‚ºï¼‹ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ï¼‹ã‚¿ã‚¤ãƒ—ï¼‰ã‚’å–ã‚Šé™¤ã„ãŸä»¥é™ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰
 	data = pvar->ssh_state.payload;
-	// ƒpƒPƒbƒgƒTƒCƒY - (ƒpƒfƒBƒ“ƒOƒTƒCƒY+1)G^‚ÌƒpƒPƒbƒgƒTƒCƒY
+	// ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º - (ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚µã‚¤ã‚º+1)ï¼›çœŸã®ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º
 	len = pvar->ssh_state.payloadlen;
 
 	// channel number
@@ -9532,7 +9532,7 @@ static BOOL handle_SSH2_channel_eof(PTInstVar pvar)
 		ssh2_channel_send_close(pvar, c);
 	}
 	else {
-		// ‚Ç‚¤‚·‚é‚Ì‚ª³‚µ‚¢H
+		// ã©ã†ã™ã‚‹ã®ãŒæ­£ã—ã„ï¼Ÿ
 	}
 
 	return TRUE;
@@ -9554,9 +9554,9 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE, "%s: SSH2_MSG_CHANNEL_OPEN was received.", __FUNCTION__);
 
-	// 6byteiƒTƒCƒY{ƒpƒfƒBƒ“ƒO{ƒ^ƒCƒvj‚ğæ‚èœ‚¢‚½ˆÈ~‚ÌƒyƒCƒ[ƒh
+	// 6byteï¼ˆã‚µã‚¤ã‚ºï¼‹ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ï¼‹ã‚¿ã‚¤ãƒ—ï¼‰ã‚’å–ã‚Šé™¤ã„ãŸä»¥é™ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰
 	data = pvar->ssh_state.payload;
-	// ƒpƒPƒbƒgƒTƒCƒY - (ƒpƒfƒBƒ“ƒOƒTƒCƒY+1)G^‚ÌƒpƒPƒbƒgƒTƒCƒY
+	// ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º - (ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚µã‚¤ã‚º+1)ï¼›çœŸã®ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º
 	len = pvar->ssh_state.payloadlen;
 
 	// get string
@@ -9576,7 +9576,7 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 
 	// check Channel Type(string)
 	if (ctype == NULL) {
-		// ctype ‚ª NULL ‚Å–³‚¢–‚Ì•ÛØ‚Ìˆ×Aæ‚Éƒ`ƒFƒbƒN‚·‚é
+		// ctype ãŒ NULL ã§ç„¡ã„äº‹ã®ä¿è¨¼ã®ç‚ºã€å…ˆã«ãƒã‚§ãƒƒã‚¯ã™ã‚‹
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_get_string returns NULL. (ctype)", __FUNCTION__);
 	}
 	else if (strcmp(ctype, "forwarded-tcpip") == 0) { // port-forwarding(remote to local)
@@ -9598,12 +9598,12 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 			// searching request entry by listen_port & create_local_channel
 			FWD_open(pvar, remote_id, listen_addr, listen_port, orig_addr, orig_port, &chan_num);
 
-			// channel‚ğƒAƒƒP[ƒg‚µA•K—v‚Èî•ñiremote window sizej‚ğ‚±‚±‚Åæ‚Á‚Ä‚¨‚­B
+			// channelã‚’ã‚¢ãƒ­ã‚±ãƒ¼ãƒˆã—ã€å¿…è¦ãªæƒ…å ±ï¼ˆremote window sizeï¼‰ã‚’ã“ã“ã§å–ã£ã¦ãŠãã€‚
 			// changed window size from 128KB to 32KB. (2006.3.6 yutaka)
 			// changed window size from 32KB to 128KB. (2007.10.29 maya)
 			c = ssh2_channel_new(pvar, CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, chan_num);
 			if (c == NULL) {
-				// “]‘—ƒ`ƒƒƒlƒ‹“à‚É‚ ‚éƒ\ƒPƒbƒg‚Ì‰ğ•ú˜R‚ê‚ğC³ (2007.7.26 maya)
+				// è»¢é€ãƒãƒ£ãƒãƒ«å†…ã«ã‚ã‚‹ã‚½ã‚±ãƒƒãƒˆã®è§£æ”¾æ¼ã‚Œã‚’ä¿®æ­£ (2007.7.26 maya)
 				FWD_free_channel(pvar, chan_num);
 				UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
 				                  "Could not open new channel. TTSSH is already opening too many channels.");
@@ -9623,7 +9623,7 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 		free(orig_addr);
 
 	} else if (strcmp(ctype, "x11") == 0) { // port-forwarding(X11)
-		// X application‚ğƒ^[ƒ~ƒiƒ‹ã‚ÅÀs‚·‚é‚ÆASSH2_MSG_CHANNEL_OPEN ‚ª‘—‚ç‚ê‚Ä‚­‚éB
+		// X applicationã‚’ã‚¿ãƒ¼ãƒŸãƒŠãƒ«ä¸Šã§å®Ÿè¡Œã™ã‚‹ã¨ã€SSH2_MSG_CHANNEL_OPEN ãŒé€ã‚‰ã‚Œã¦ãã‚‹ã€‚
 		char *orig_str;
 		int orig_port;
 
@@ -9636,15 +9636,15 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 
 		free(orig_str);
 
-		// X server ‚ÖÚ‘±‚·‚éB
+		// X server ã¸æ¥ç¶šã™ã‚‹ã€‚
 		FWD_X11_open(pvar, remote_id, NULL, 0, &chan_num);
 
-		// channel‚ğƒAƒƒP[ƒg‚µA•K—v‚Èî•ñiremote window sizej‚ğ‚±‚±‚Åæ‚Á‚Ä‚¨‚­B
+		// channelã‚’ã‚¢ãƒ­ã‚±ãƒ¼ãƒˆã—ã€å¿…è¦ãªæƒ…å ±ï¼ˆremote window sizeï¼‰ã‚’ã“ã“ã§å–ã£ã¦ãŠãã€‚
 		// changed window size from 128KB to 32KB. (2006.3.6 yutaka)
 		// changed window size from 32KB to 128KB. (2007.10.29 maya)
 		c = ssh2_channel_new(pvar, CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, chan_num);
 		if (c == NULL) {
-			// “]‘—ƒ`ƒƒƒlƒ‹“à‚É‚ ‚éƒ\ƒPƒbƒg‚Ì‰ğ•ú˜R‚ê‚ğC³ (2007.7.26 maya)
+			// è»¢é€ãƒãƒ£ãƒãƒ«å†…ã«ã‚ã‚‹ã‚½ã‚±ãƒƒãƒˆã®è§£æ”¾æ¼ã‚Œã‚’ä¿®æ­£ (2007.7.26 maya)
 			FWD_free_channel(pvar, chan_num);
 			UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
 			                  "Could not open new channel. TTSSH is already opening too many channels.");
@@ -9707,15 +9707,15 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 	int id;
 	Channel_t *c;
 
-	// ƒRƒlƒNƒVƒ‡ƒ“Ø’f‚ÉAƒpƒPƒbƒgƒ_ƒ“ƒv‚ğƒtƒ@ƒCƒ‹‚Ö‘|‚«o‚·B
+	// ã‚³ãƒã‚¯ã‚·ãƒ§ãƒ³åˆ‡æ–­æ™‚ã«ã€ãƒ‘ã‚±ãƒƒãƒˆãƒ€ãƒ³ãƒ—ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã¸æƒãå‡ºã™ã€‚
 	if (LOG_LEVEL_SSHDUMP <= pvar->session_settings.LogLevel) {
 		save_memdump(LOG_PACKET_DUMP);
 		finish_memdump();
 	}
 
-	// 6byteiƒTƒCƒY{ƒpƒfƒBƒ“ƒO{ƒ^ƒCƒvj‚ğæ‚èœ‚¢‚½ˆÈ~‚ÌƒyƒCƒ[ƒh
+	// 6byteï¼ˆã‚µã‚¤ã‚ºï¼‹ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ï¼‹ã‚¿ã‚¤ãƒ—ï¼‰ã‚’å–ã‚Šé™¤ã„ãŸä»¥é™ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰
 	data = pvar->ssh_state.payload;
-	// ƒpƒPƒbƒgƒTƒCƒY - (ƒpƒfƒBƒ“ƒOƒTƒCƒY+1)G^‚ÌƒpƒPƒbƒgƒTƒCƒY
+	// ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º - (ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚µã‚¤ã‚º+1)ï¼›çœŸã®ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º
 	len = pvar->ssh_state.payloadlen;
 
 	id = get_uint32_MSBfirst(data);
@@ -9735,18 +9735,18 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 		notify_closed_connection(pvar, "disconnected by server request");
 
 	} else if (c->type == TYPE_PORTFWD) {
-		// CHANNEL_CLOSE ‚ğ‘—‚è•Ô‚³‚È‚¢‚ÆƒŠƒ‚[ƒg‚Ìchannel‚ªŠJ•ú‚³‚ê‚È‚¢
+		// CHANNEL_CLOSE ã‚’é€ã‚Šè¿”ã•ãªã„ã¨ãƒªãƒ¢ãƒ¼ãƒˆã®channelãŒé–‹æ”¾ã•ã‚Œãªã„
 		// c.f. RFC 4254 5.3. Closing a Channel
 		ssh2_channel_send_close(pvar, c);
 
-		// “]‘—ƒ`ƒƒƒlƒ‹“à‚É‚ ‚éƒ\ƒPƒbƒg‚Ì‰ğ•ú˜R‚ê‚ğC³ (2007.7.26 maya)
+		// è»¢é€ãƒãƒ£ãƒãƒ«å†…ã«ã‚ã‚‹ã‚½ã‚±ãƒƒãƒˆã®è§£æ”¾æ¼ã‚Œã‚’ä¿®æ­£ (2007.7.26 maya)
 		FWD_free_channel(pvar, c->local_num);
 
-		// ƒ`ƒƒƒlƒ‹‚Ì‰ğ•ú˜R‚ê‚ğC³ (2007.4.26 yutaka)
+		// ãƒãƒ£ãƒãƒ«ã®è§£æ”¾æ¼ã‚Œã‚’ä¿®æ­£ (2007.4.26 yutaka)
 		ssh2_channel_delete(c);
 
 	} else if (c->type == TYPE_SCP) {
-		// óMI—¹
+		// å—ä¿¡çµ‚äº†
 		PTInstVar pvar = c->scp.pvar;
 		pvar->recv.data_finished = TRUE;
 
@@ -9775,9 +9775,9 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_REQUEST was received.");
 
-	// 6byteiƒTƒCƒY{ƒpƒfƒBƒ“ƒO{ƒ^ƒCƒvj‚ğæ‚èœ‚¢‚½ˆÈ~‚ÌƒyƒCƒ[ƒh
+	// 6byteï¼ˆã‚µã‚¤ã‚ºï¼‹ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ï¼‹ã‚¿ã‚¤ãƒ—ï¼‰ã‚’å–ã‚Šé™¤ã„ãŸä»¥é™ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰
 	data = pvar->ssh_state.payload;
-	// ƒpƒPƒbƒgƒTƒCƒY - (ƒpƒfƒBƒ“ƒOƒTƒCƒY+1)G^‚ÌƒpƒPƒbƒgƒTƒCƒY
+	// ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º - (ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚µã‚¤ã‚º+1)ï¼›çœŸã®ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º
 	len = pvar->ssh_state.payloadlen;
 
 	// ID(4) + string(any) + want_reply(1) + exit status(4)
@@ -9803,18 +9803,18 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 		c->self_id, c->remote_id, NonNull(request), want_reply);
 
 	if (request == NULL) {
-		// request ‚ª NULL ‚Å–³‚¢–‚Ì•ÛØ
+		// request ãŒ NULL ã§ç„¡ã„äº‹ã®ä¿è¨¼
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_get_string returns NULL. (request)", __FUNCTION__);
 	}
 	else if (strcmp(request, "exit-status") == 0) {
-		// I—¹ƒR[ƒh‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚È‚ç‚Î
+		// çµ‚äº†ã‚³ãƒ¼ãƒ‰ãŒå«ã¾ã‚Œã¦ã„ã‚‹ãªã‚‰ã°
 		int estat = get_uint32_MSBfirst(data);
 		success = 1;
 		logprintf(LOG_LEVEL_VERBOSE, "%s: exit-status=%d", __FUNCTION__, estat);
 	}
 	else if (strcmp(request, "keepalive@openssh.com") == 0) {
-		// ŒÃ‚¢ OpenSSH ‚Å‚Í SUCCESS ‚ğ•Ô‚µ‚Ä‚à keepalive ‚É
-		// ‰“š‚µ‚½‚ÆŠÅ˜ô‚³‚ê‚È‚¢‚Ì‚Å FAILURE ‚ğ•Ô‚·B[teraterm:1278]
+		// å¤ã„ OpenSSH ã§ã¯ SUCCESS ã‚’è¿”ã—ã¦ã‚‚ keepalive ã«
+		// å¿œç­”ã—ãŸã¨çœ‹åšã•ã‚Œãªã„ã®ã§ FAILURE ã‚’è¿”ã™ã€‚[teraterm:1278]
 		success = 0;
 	}
 
@@ -9866,9 +9866,9 @@ static BOOL handle_SSH2_window_adjust(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_SSHDUMP, "SSH2_MSG_CHANNEL_WINDOW_ADJUST was received.");
 
-	// 6byteiƒTƒCƒY{ƒpƒfƒBƒ“ƒO{ƒ^ƒCƒvj‚ğæ‚èœ‚¢‚½ˆÈ~‚ÌƒyƒCƒ[ƒh
+	// 6byteï¼ˆã‚µã‚¤ã‚ºï¼‹ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ï¼‹ã‚¿ã‚¤ãƒ—ï¼‰ã‚’å–ã‚Šé™¤ã„ãŸä»¥é™ã®ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰
 	data = pvar->ssh_state.payload;
-	// ƒpƒPƒbƒgƒTƒCƒY - (ƒpƒfƒBƒ“ƒOƒTƒCƒY+1)G^‚ÌƒpƒPƒbƒgƒTƒCƒY
+	// ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º - (ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚µã‚¤ã‚º+1)ï¼›çœŸã®ãƒ‘ã‚±ãƒƒãƒˆã‚µã‚¤ã‚º
 	len = pvar->ssh_state.payloadlen;
 
 	//debug_print(80, data, len);
@@ -9879,8 +9879,8 @@ static BOOL handle_SSH2_window_adjust(PTInstVar pvar)
 
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
-		// channel closeŒã‚Éadjust message‚ª’x‚ê‚Ä‚â‚Á‚Ä‚­‚éƒP[ƒX‚à‚ ‚é‚½‚ßA
-		// FALSE‚Å‚Í•Ô‚³‚È‚¢‚æ‚¤‚É‚·‚éB(2007.12.26 yutaka)
+		// channel closeå¾Œã«adjust messageãŒé…ã‚Œã¦ã‚„ã£ã¦ãã‚‹ã‚±ãƒ¼ã‚¹ã‚‚ã‚ã‚‹ãŸã‚ã€
+		// FALSEã§ã¯è¿”ã•ãªã„ã‚ˆã†ã«ã™ã‚‹ã€‚(2007.12.26 yutaka)
 		logprintf(LOG_LEVEL_WARNING, "%s: channel not found. (%d)", __FUNCTION__, id);
 		return TRUE;
 	}
@@ -9892,17 +9892,17 @@ static BOOL handle_SSH2_window_adjust(PTInstVar pvar)
 	adjust = get_uint32_MSBfirst(data);
 	data += 4;
 
-	// window size‚Ì’²®
+	// window sizeã®èª¿æ•´
 	c->remote_window += adjust;
 
-	// ‘—‚ç‚¸ƒoƒbƒtƒ@‚É•Û‘¶‚µ‚Ä‚¨‚¢‚½ƒf[ƒ^‚ğ‘—‚é
+	// é€ã‚‰ãšãƒãƒƒãƒ•ã‚¡ã«ä¿å­˜ã—ã¦ãŠã„ãŸãƒ‡ãƒ¼ã‚¿ã‚’é€ã‚‹
 	ssh2_channel_retry_send_bufchain(pvar, c);
 
 	return TRUE;
 }
 
-// Channel_t ........... SSH2‚Ìƒ`ƒƒƒlƒ‹\‘¢‘Ì
-// local_channel_num ... SSH1‚Ìƒ[ƒJƒ‹ƒ`ƒƒƒlƒ‹”Ô†
+// Channel_t ........... SSH2ã®ãƒãƒ£ãƒãƒ«æ§‹é€ ä½“
+// local_channel_num ... SSH1ã®ãƒ­ãƒ¼ã‚«ãƒ«ãƒãƒ£ãƒãƒ«ç•ªå·
 static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_num,
                                unsigned char *data, unsigned int buflen)
 {
@@ -9914,7 +9914,7 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 	unsigned int resplen = 0;
 
 
-	// •ªŠ„‚³‚ê‚½ CHANNEL_DATA ‚ÌóM‚É‘Î‰ (2008.11.30 maya)
+	// åˆ†å‰²ã•ã‚ŒãŸ CHANNEL_DATA ã®å—ä¿¡ã«å¯¾å¿œ (2008.11.30 maya)
 	if (SSHv2(pvar)) {
 		agent_msg = c->agent_msg;
 		agent_request_len = &c->agent_request_len;
@@ -9976,12 +9976,12 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 	}
 	safefree(response);
 
-	// g‚¢I‚í‚Á‚½ƒoƒbƒtƒ@‚ğƒNƒŠƒA
+	// ä½¿ã„çµ‚ã‚ã£ãŸãƒãƒƒãƒ•ã‚¡ã‚’ã‚¯ãƒªã‚¢
 	buffer_clear(agent_msg);
 	return TRUE;
 
 error:
-	// ƒGƒ‰[‚Í SSH_AGENT_FAILURE ‚ğ•Ô‚·
+	// ã‚¨ãƒ©ãƒ¼æ™‚ã¯ SSH_AGENT_FAILURE ã‚’è¿”ã™
 	if (SSHv2(pvar)) {
 		SSH2_send_channel_data(pvar, c, SSH_AGENT_FAILURE_MSG, sizeof(SSH_AGENT_FAILURE_MSG), 0);
 	}
@@ -9993,7 +9993,7 @@ error:
 		safefree(response);
 	}
 
-	// g‚¢I‚í‚Á‚½ƒoƒbƒtƒ@‚ğƒNƒŠƒA
+	// ä½¿ã„çµ‚ã‚ã£ãŸãƒãƒƒãƒ•ã‚¡ã‚’ã‚¯ãƒªã‚¢
 	buffer_clear(agent_msg);
 	return TRUE;
 }

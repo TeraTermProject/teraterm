@@ -28,8 +28,8 @@
 
 /* TTCMN.DLL, notify icon */
 
-// SDK7.0�̏ꍇ�AWIN32_IE���K�؂ɒ�`����Ȃ�
-#if _MSC_VER == 1400	// VS2005�̏ꍇ�̂�
+// SDK7.0の場合、WIN32_IEが適切に定義されない
+#if _MSC_VER == 1400	// VS2005の場合のみ
 #if !defined(_WIN32_IE)
 #define	_WIN32_IE 0x0501
 //#define _WIN32_IE 0x0600
@@ -57,7 +57,7 @@
 #include "ttcmn_notify2.h"
 
 typedef struct NotifyIconST {
-	BOOL enable;					// FALSE �ʒmAPI���g���Ȃ�OS or �g���Ȃ����
+	BOOL enable;					// FALSE 通知APIが使えないOS or 使えない状態
 	int NotifyIconShowCount;
 	HWND parent_wnd;
 	BOOL created;
@@ -72,12 +72,12 @@ typedef struct NotifyIconST {
 
 /**
  *	Shell_NotifyIconW() wrapper
- *		- TT_NOTIFYICONDATAW_V2 �� Windows 2000 �ȍ~�Ŏg�p�\
- *		- �^�X�N�g���C�Ƀo���[�����o�����Ƃ��ł���̂� 2000 �ȍ~
- *			- NT4�͎g���Ȃ�
- *			- HasBalloonTipSupport() �� 2000�ȏ�Ƃ��Ă���
- *		- �K�� Unicode �ł����p�\ �� 9x�T�|�[�g�s�v?
- *			- Windows 98,ME �ŗ��p�\?
+ *		- TT_NOTIFYICONDATAW_V2 は Windows 2000 以降で使用可能
+ *		- タスクトレイにバルーンを出すことができるのは 2000 以降
+ *			- NT4は使えない
+ *			- HasBalloonTipSupport() で 2000以上としている
+ *		- 必ず Unicode 版が利用可能 → 9xサポート不要?
+ *			- Windows 98,ME で利用可能?
  *			- TT_NOTIFYICONDATAA_V2
  */
 static BOOL Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData)
@@ -124,17 +124,17 @@ void Notify2Hide(NotifyIcon *ni)
 	BOOL r = Shell_NotifyIconW(NIM_MODIFY, &notify_icon);
 	ni->NotifyIconShowCount = 0;
 	if (r == FALSE) {
-		// �^�X�N�o�[����Ȃ��Ȃ��Ă���
+		// タスクバーからなくなっている
 		ni->created = FALSE;
 	}
 }
 
 /**
- *	�^�X�N�g���C�ɃA�C�R���A�o���[���c�[���`�b�v��\������
+ *	タスクトレイにアイコン、バルーンツールチップを表示する
  *
- *	@param	msg		�\�����郁�b�Z�[�W
- *					NULL�̂Ƃ��o���[���c�[���`�b�v�͕\������Ȃ�
- *	@param	title	NULL�̂Ƃ��^�C�g���Ȃ�
+ *	@param	msg		表示するメッセージ
+ *					NULLのときバルーンツールチップは表示されない
+ *	@param	title	NULLのときタイトルなし
  *	@param	flag	NOTIFYICONDATA.dwInfoFlags
  *					1		information icon (NIIF_INFO)
  *					2		warning icon (NIIF_WARNING)
@@ -147,7 +147,7 @@ void Notify2SetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t *title
 		return;
 	}
 	if (ni->parent_wnd == NULL) {
-		// �܂��E�B���h�E���Z�b�g���Ă��Ȃ�
+		// まだウィンドウをセットしていない
 		return;
 	}
 	if (title == NULL) {
@@ -186,7 +186,7 @@ void Notify2SetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t *title
 	if (ni->created) {
 		BOOL r = Shell_NotifyIconW(NIM_MODIFY, &notify_icon);
 		if (r == FALSE) {
-			// �^�X�N�o�[����Ȃ��Ȃ��Ă���?
+			// タスクバーからなくなっている?
 			ni->created = FALSE;
 		}
 	}
@@ -196,12 +196,12 @@ void Notify2SetMessageW(NotifyIcon *ni, const wchar_t *msg, const wchar_t *title
 			ni->created = TRUE;
 		}
 		else {
-			// �^�X�N�o�[���Ȃ��Ȃ��Ă���Ƃ�ADD�Ɏ��s����
+			// タスクバーがなくなっているときADDに失敗する
 		}
 	}
 
-	// �ʒm�A�C�R���͓n������R�s�[�����̂ŕێ����Ȃ��Ă悢
-	// �����ɔj������ok
+	// 通知アイコンは渡したらコピーされるので保持しなくてよい
+	// すぐに破棄してok
 	// https://docs.microsoft.com/ja-jp/windows/win32/shell/taskbar
 	// https://stackoverflow.com/questions/23897103/how-to-properly-update-tray-notification-icon
 	DestroyIcon(notify_icon.hIcon);
@@ -217,9 +217,9 @@ void Notify2SetIconID(NotifyIcon *ni, HINSTANCE hInstance, WORD IconID)
 }
 
 /**
- *	�ʒm�̈揉����
+ *	通知領域初期化
  *
- *	���� Notify2SetWindow() ���R�[������
+ *	次に Notify2SetWindow() をコールする
  */
 NotifyIcon *Notify2Initialize(void)
 {
@@ -228,15 +228,15 @@ NotifyIcon *Notify2Initialize(void)
 }
 
 /**
- *	�e�E�B���h�E�ƒʒm�̈�̃A�C�R�����Z�b�g����
- *	����API���R�[������ƒʒm�̈悪�g����悤�ɂȂ�
+ *	親ウィンドウと通知領域のアイコンをセットする
+ *	このAPIをコールすると通知領域が使えるようになる
  *
- *	�Z�b�g�����A�C�R�����f�t�H���g�̃A�C�R���ƂȂ�
+ *	セットしたアイコンがデフォルトのアイコンとなる
  *
- *	@param	hWnd		�ʒm�̈�Ɋ֘A�t����E�B���h�E(�����ł͐e�E�B���h�E�ƌĂ�)
- *	@param	msg			�e�E�B���h�E�֑����郁�b�Z�[�WID
- *	@param	hInstance	�A�C�R���������W���[����instance
- *	@param	IconID		�A�C�R���̃��\�[�XID
+ *	@param	hWnd		通知領域に関連付けるウィンドウ(ここでは親ウィンドウと呼ぶ)
+ *	@param	msg			親ウィンドウへ送られるメッセージID
+ *	@param	hInstance	アイコンを持つモジュールのinstance
+ *	@param	IconID		アイコンのリソースID
  */
 void Notify2SetWindow(NotifyIcon *ni, HWND hWnd, UINT msg, HINSTANCE hInstance, WORD IconID)
 {
@@ -254,22 +254,22 @@ void Notify2SetWindow(NotifyIcon *ni, HWND hWnd, UINT msg, HINSTANCE hInstance, 
 }
 
 /**
- *	�e�E�B���h�E��j������O�ɒʒm�̈�̃A�C�R�����폜����
- *	����API���R�[������ƒʒm�̈�͎g���Ȃ��Ȃ�
+ *	親ウィンドウを破棄する前に通知領域のアイコンを削除する
+ *	このAPIをコールすると通知領域は使えなくなる
  */
 void Notify2UnsetWindow(NotifyIcon *ni)
 {
 	if (ni->enable && ni->created) {
 		TT_NOTIFYICONDATAW_V2 notify_icon;
 		InitializeNotifyIconData(ni, &notify_icon);
-		Shell_NotifyIconW(NIM_DELETE, &notify_icon);	// �߂�l�`�F�b�N���Ȃ�
+		Shell_NotifyIconW(NIM_DELETE, &notify_icon);	// 戻り値チェックしない
 		ni->created = FALSE;
 		ni->enable = FALSE;
 	}
 }
 
 /**
- *	�ʒm�̈�I��
+ *	通知領域終了
  */
 void Notify2Uninitialize(NotifyIcon *ni)
 {
@@ -293,12 +293,12 @@ void Notify2SetBallonDontHide(NotifyIcon *ni, BOOL dont_hide)
 }
 
 /**
- *	Notify2SetWindow() �Ŏw�肵���E�B���h�E���b�Z�[�W����
+ *	Notify2SetWindow() で指定したウィンドウメッセージ処理
  */
 void Notify2Event(NotifyIcon *ni, WPARAM wParam, LPARAM lParam)
 {
 	if (wParam != 1) {
-		// NOTIFYICONDATA.uID, 1�����Ȃ�
+		// NOTIFYICONDATA.uID, 1しかない
 		return;
 	}
 
@@ -357,12 +357,12 @@ void WINAPI NotifyMessage(PComVar cv, const char *msg, const char *title, DWORD 
 }
 
 /**
- *	�ʒm�̈�Ŏg�p����A�C�R�����Z�b�g����
+ *	通知領域で使用するアイコンをセットする
  *
- *	@param	hInstance	�A�C�R���������W���[����instance
- *	@param	IconID		�A�C�R���̃��\�[�XID
+ *	@param	hInstance	アイコンを持つモジュールのinstance
+ *	@param	IconID		アイコンのリソースID
  *
- *	�e�X��NULL, 0 �ɂ���� NotifySetWindow() �Őݒ肵���f�t�H���g�̃A�C�R���ɖ߂�
+ *	各々をNULL, 0 にすると NotifySetWindow() で設定したデフォルトのアイコンに戻る
  */
 void WINAPI NotifySetIconID(PComVar cv, HINSTANCE hInstance, WORD IconID)
 {
@@ -371,15 +371,15 @@ void WINAPI NotifySetIconID(PComVar cv, HINSTANCE hInstance, WORD IconID)
 }
 
 /**
- * Tera Term�̒ʒm�̈�̎g����
- * - �ʒm����Ƃ��ɁA�A�C�R���ƃo���[����\��
- *   - ���߂Ă̒ʒm���ɁA�ʒm�A�C�R���쐬
- * - �ʒm�^�C���A�E�g
- *   - �ʒm�A�C�R�����B��
- *   - vtwin.cpp �� CVTWindow::OnNotifyIcon() ���Q��
- * - �ʒm���N���b�N
- *   - �ʒm�A�C�R�����B�� + vtwin��Z�I�[�_�[���őO�ʂ�
- *   - vtwin.cpp �� CVTWindow::OnNotifyIcon() ���Q��
- * - �I����
- *   - �A�C�R�����폜
+ * Tera Termの通知領域の使い方
+ * - 通知するときに、アイコンとバルーンを表示
+ *   - 初めての通知時に、通知アイコン作成
+ * - 通知タイムアウト
+ *   - 通知アイコンを隠す
+ *   - vtwin.cpp の CVTWindow::OnNotifyIcon() を参照
+ * - 通知をクリック
+ *   - 通知アイコンを隠す + vtwinのZオーダーを最前面に
+ *   - vtwin.cpp の CVTWindow::OnNotifyIcon() を参照
+ * - 終了時
+ *   - アイコンを削除
  */

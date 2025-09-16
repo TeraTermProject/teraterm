@@ -96,8 +96,8 @@ enum channel_type {
 	TYPE_SHELL, TYPE_PORTFWD, TYPE_SCP, TYPE_SFTP, TYPE_AGENT, TYPE_SUBSYSTEM_GEN,
 };
 
-#define CHANNEL_ADD_NUM 50       // ѓ`ѓѓѓlѓ‹Ќ\‘ў‘М‚М”z—с(channels)‚М—v‘fђ”‚МЏ‰Љъ’l Њ“ reallocЋћ‚М‘ќ‰Бђ”
-#define CHANNEL_MAX_DEFAULT 100  // ЌЕ‘еѓ`ѓѓѓlѓ‹ђ”‚МѓfѓtѓHѓ‹ѓg’lЃBiniѓtѓ@ѓCѓ‹‚МMaxChannel‚М’l‚М•ы‚Є—Dђж‚і‚к‚йЃB0‚МЏкЌ‡‚Н–іђ§ЊАЃB
+#define CHANNEL_ADD_NUM 50       // гѓЃгѓЈгѓЌгѓ«ж§‹йЂ дЅ“гЃ®й…Ќе€—(channels)гЃ®и¦Ѓзґ ж•°гЃ®е€ќжњџеЂ¤ е…ј reallocж™‚гЃ®еў—еЉ ж•°
+#define CHANNEL_MAX_DEFAULT 100  // жњЂе¤§гѓЃгѓЈгѓЌгѓ«ж•°гЃ®гѓ‡гѓ•г‚©гѓ«гѓ€еЂ¤гЂ‚iniгѓ•г‚Ўг‚¤гѓ«гЃ®MaxChannelгЃ®еЂ¤гЃ®ж–№гЃЊе„Єе…€гЃ•г‚Њг‚‹гЂ‚0гЃ®е ґеђ€гЃЇз„Ўе€¶й™ђгЂ‚
 
 // for SSH1
 #define SSH_MAX_SEND_PACKET_SIZE   250000
@@ -336,7 +336,7 @@ enum kex_modes {
 };
 
 
-// ѓzѓXѓgѓLЃ[(SSH1, SSH2ЉЬ‚Ю)‚МѓfЃ[ѓ^Ќ\‘ў (2006.3.21 yutaka)
+// гѓ›г‚№гѓ€г‚­гѓј(SSH1, SSH2еђ«г‚Ђ)гЃ®гѓ‡гѓјг‚їж§‹йЂ  (2006.3.21 yutaka)
 typedef struct Key {
 	// host key type
 	ssh_keytype type;
@@ -531,8 +531,8 @@ typedef struct PacketList {
 	struct PacketList *next;
 } PacketList_t;
 
-// SCPЋуђMЏ€—ќ‚Й‚Ё‚Ї‚йѓtѓЌЃ[ђ§Њд‚Ми‡’l
-// “K—pђж scp_t.filercvsize
+// SCPеЏ—дїЎе‡¦зђ†гЃ«гЃЉгЃ‘г‚‹гѓ•гѓ­гѓје€¶еѕЎгЃ®й–ѕеЂ¤
+// йЃ©з”Ёе…€ scp_t.filercvsize
 #define SCPRCV_HIGH_WATER_MARK (1 * 1024 * 1024)  // 1MB
 #define SCPRCV_LOW_WATER_MARK (0)  // 0MB
 

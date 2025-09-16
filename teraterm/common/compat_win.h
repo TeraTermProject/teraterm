@@ -29,8 +29,8 @@
 /* compat_win */
 
 /*
- * g—p‚µ‚Δ‚Ά‚ι Windows SDK, Visual Studio ‚Μ·‚π‚Θ‚­‚·‚½‚ί‚Μƒtƒ@ƒCƒ‹
- * windows.h ‚Θ‚Η‚Μƒtƒ@ƒCƒ‹‚π include ‚µ‚½γ‚Ι include ‚·‚ι
+ * δ½Ώη”¨γ—γ¦γ„γ‚‹ Windows SDK, Visual Studio γ®ε·®γ‚’γªγγ™γγ‚γ®γƒ•γ‚΅γ‚¤γƒ«
+ * windows.h γªγ©γ®γƒ•γ‚΅γ‚¤γƒ«γ‚’ include γ—γεΎγ« include γ™γ‚‹
  */
 
 #pragma once
@@ -90,8 +90,8 @@ typedef enum  {
 #endif
 
 /**
- *	NOTIFYICONDATA ‚Ν define ‚ΕƒTƒCƒY‚ª•Ο‰»‚·‚ι
- *	‚Η‚ρ‚ΘΒ‹«‚Ε‚ΰ•Ο‰»‚µ‚Θ‚Ά‚ζ‚¤’θ‹`
+ *	NOTIFYICONDATA γ― define γ§γ‚µγ‚¤γ‚Ίγε¤‰ε–γ™γ‚‹
+ *	γ©γ‚“γªη’°εΆƒγ§γ‚‚ε¤‰ε–γ—γªγ„γ‚γ†ε®ηΎ©
  *
  * Shlwapi.dll 5.0
  * 	Win98(ME?)+,2000+

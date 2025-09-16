@@ -65,7 +65,7 @@ static bool env_add(sh_env_t *envp, const char* name, const char* value)
 	sh_env_data_t* prev_env = NULL;
 	while(1) {
 		if (strcmp(env_data->name, name) == 0) {
-			// “¯‚¶–¼‘O -> “ü‚ê‘Ö‚¦
+			// åŒã˜åå‰ -> å…¥ã‚Œæ›¿ãˆ
 			if (prev_env == NULL) {
 				pr_data->envp = e;
 			} else {
@@ -78,7 +78,7 @@ static bool env_add(sh_env_t *envp, const char* name, const char* value)
 			break;
 		}
 		if (env_data->next == NULL) {
-			// ÅŒã‚Ü‚Å—ˆ‚½
+			// æœ€å¾Œã¾ã§æ¥ãŸ
 			env_data->next = e;
 			break;
 		}

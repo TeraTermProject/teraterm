@@ -88,7 +88,7 @@ static int recv_data(PTInstVar pvar, unsigned long up_to_amount)
 	return amount_read;
 }
 
-// ‰üsƒR[ƒh‚ªo‚Ä‚­‚é‚Ü‚Å“Ç‚Ş
+// æ”¹è¡Œã‚³ãƒ¼ãƒ‰ãŒå‡ºã¦ãã‚‹ã¾ã§èª­ã‚€
 static int recv_line_data(PTInstVar pvar)
 {
 	int amount_read;
@@ -119,7 +119,7 @@ static int recv_line_data(PTInstVar pvar)
 			break;
 		}
 	}
-	amount_read = i + 1; // “Ç‚İ‚İƒTƒCƒYiLF‚àŠÜ‚Şj
+	amount_read = i + 1; // èª­ã¿è¾¼ã¿ã‚µã‚¤ã‚ºï¼ˆLFã‚‚å«ã‚€ï¼‰
 	memcpy(pvar->pkt_state.buf, buf, amount_read);
 
 	pvar->pkt_state.seen_newline = 1;
@@ -158,7 +158,7 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				i++;
 			}
 
-			// SSHƒT[ƒo‚Ìƒo[ƒWƒ‡ƒ“ƒ`ƒFƒbƒN‚ğs‚¤
+			// SSHã‚µãƒ¼ãƒã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãƒã‚§ãƒƒã‚¯ã‚’è¡Œã†
 			if (SSH_handle_server_ID(pvar, pvar->pkt_state.buf, i)) {
 				pvar->pkt_state.seen_server_ID = 1;
 
@@ -187,13 +187,13 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				/*
 				 * pktsize
 				 *   uint32   packet_length
-				 * ‚Í
+				 * ã¯
 				 *   byte     padding_length
 				 *   byte[n1] payload; n1 = packet_length - padding_length - 1
 				 *   byte[n2] random padding; n2 = padding_length
-				 * ‚Ì’·‚³‚Ì‡Œv‚Å
+				 * ã®é•·ã•ã®åˆè¨ˆã§
 				 *   byte[m]  mac (Message Authentication Code - MAC); m = mac_length
-				 * ‚Ì’·‚³‚ğŠÜ‚Ü‚È‚¢B
+				 * ã®é•·ã•ã‚’å«ã¾ãªã„ã€‚
 				 * cf. RFC 4253 6. Binary Packet Protocol
 				 */
 
@@ -215,14 +215,14 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				 */
 				/*
 				 * aadlen: Additional Authenticated Data Length
-				 *   MAC ‚Ì‘ÎÛ‚Æ‚È‚éƒf[ƒ^‚Æˆê‚ÉˆÃ†‰»‚³‚ê‚È‚¢A"MAC ‚Ì‘ÎÛ‚Æ‚È‚éƒf[ƒ^‚Ì’·‚³"‚ÌƒTƒCƒY
-				 *   ‚±‚Ì•”•ª‚Í packet_length ‚ÅAuint32 (4ƒoƒCƒg)
+				 *   MAC ã®å¯¾è±¡ã¨ãªã‚‹ãƒ‡ãƒ¼ã‚¿ã¨ä¸€ç·’ã«æš—å·åŒ–ã•ã‚Œãªã„ã€"MAC ã®å¯¾è±¡ã¨ãªã‚‹ãƒ‡ãƒ¼ã‚¿ã®é•·ã•"ã®ã‚µã‚¤ã‚º
+				 *   ã“ã®éƒ¨åˆ†ã¯ packet_length ã§ã€uint32 (4ãƒã‚¤ãƒˆ)
 				 *
-				 * - ’Êí‚Ì MAC •û® (E&M) ‚Å‚ÍƒpƒPƒbƒg’·•”•ª‚ªˆê‚ÉˆÃ†‰»‚³‚ê‚é‚Ì‚Å aadlen ‚Í 0 ‚Æ‚È‚éB
-				 * - EtM •û®‚Ì MAC ‚â AEAD ‚Ì AES-GCM ‚Å‚ÍAƒpƒPƒbƒg’·•”•ª‚ªˆÃ†‰»‚³‚ê‚È‚¢‚Ì‚Å
-				 * aadlen ‚Í 4 ‚Æ‚È‚éB
-				 * - AEAD ‚Ì chacha20-poly1305 ‚Å‚ÍƒpƒPƒbƒg’·•”•ª‚ªˆÃ†‰»‚³‚ê‚é‚ªAMAC ‚Ì‘ÎÛ‚Æ‚È‚éƒf[ƒ^
-				 * ‚Æ‚Í•Ê‚ÉˆÃ†‰»‚³‚ê‚é‚Ì‚Å aadlen ‚Í 4 ‚Æ‚È‚éB
+				 * - é€šå¸¸ã® MAC æ–¹å¼ (E&M) ã§ã¯ãƒ‘ã‚±ãƒƒãƒˆé•·éƒ¨åˆ†ãŒä¸€ç·’ã«æš—å·åŒ–ã•ã‚Œã‚‹ã®ã§ aadlen ã¯ 0 ã¨ãªã‚‹ã€‚
+				 * - EtM æ–¹å¼ã® MAC ã‚„ AEAD ã® AES-GCM ã§ã¯ã€ãƒ‘ã‚±ãƒƒãƒˆé•·éƒ¨åˆ†ãŒæš—å·åŒ–ã•ã‚Œãªã„ã®ã§
+				 * aadlen ã¯ 4 ã¨ãªã‚‹ã€‚
+				 * - AEAD ã® chacha20-poly1305 ã§ã¯ãƒ‘ã‚±ãƒƒãƒˆé•·éƒ¨åˆ†ãŒæš—å·åŒ–ã•ã‚Œã‚‹ãŒã€MAC ã®å¯¾è±¡ã¨ãªã‚‹ãƒ‡ãƒ¼ã‚¿
+				 * ã¨ã¯åˆ¥ã«æš—å·åŒ–ã•ã‚Œã‚‹ã®ã§ aadlen ã¯ 4 ã¨ãªã‚‹ã€‚
 				 *
 				 */
 				if ((mac && mac->etm) || authlen > 0) {
@@ -232,8 +232,8 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				if (authlen > 0 &&
 				    pvar->cc[MODE_IN]->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
 					/*
-					 * AEAD ‚Ì chacha20-poly1305 ‚Å‚ÍƒpƒPƒbƒg’·•”•ª‚ª•Ê‚ÉˆÃ†‰»‚³‚ê‚Ä‚¢‚éB
-					 * ‚±‚Ìˆ—‚Í’·‚³‚ğæ“¾‚·‚é‚ªAdata ‚ÍˆÃ†‰»‚³‚ê‚½‚Ü‚Ü‚Æ‚È‚éB
+					 * AEAD ã® chacha20-poly1305 ã§ã¯ãƒ‘ã‚±ãƒƒãƒˆé•·éƒ¨åˆ†ãŒåˆ¥ã«æš—å·åŒ–ã•ã‚Œã¦ã„ã‚‹ã€‚
+					 * ã“ã®å‡¦ç†ã¯é•·ã•ã‚’å–å¾—ã™ã‚‹ãŒã€data ã¯æš—å·åŒ–ã•ã‚ŒãŸã¾ã¾ã¨ãªã‚‹ã€‚
 					 */
 					chachapoly_get_length(pvar->cc[MODE_IN]->cp_ctx, &pktsize,
 					                      pvar->ssh_state.receiver_sequence_number,
@@ -243,8 +243,8 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				         aadlen == 0 &&
 				         !pvar->pkt_state.predecrypted_packet && aadlen == 0) {
 					/*
-					 * AEAD ‚Å‚È‚­ E&M (aadlen ‚ª 0) ‚Ì‚ÍAˆÃ†‰»‚³‚ê‚Ä‚¢‚éƒpƒPƒbƒg’·‚ğ
-					 * ’m‚é•K—v‚ª—L‚é‚½‚ßAæ“ª‚Ì 1 ƒuƒƒbƒN‚¾‚¯–‘O‚É•œ†‚·‚éB
+					 * AEAD ã§ãªã E&M (aadlen ãŒ 0) ã®æ™‚ã¯ã€æš—å·åŒ–ã•ã‚Œã¦ã„ã‚‹ãƒ‘ã‚±ãƒƒãƒˆé•·ã‚’
+					 * çŸ¥ã‚‹å¿…è¦ãŒæœ‰ã‚‹ãŸã‚ã€å…ˆé ­ã® 1 ãƒ–ãƒ­ãƒƒã‚¯ã ã‘äº‹å‰ã«å¾©å·ã™ã‚‹ã€‚
 					 */
 					SSH_predecrypt_packet(pvar, data);
 					pvar->pkt_state.predecrypted_packet = TRUE;
@@ -253,7 +253,7 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				}
 				else {
 					/*
-					 * EtM •û®‚Ì MAC ‚âAAEAD ‚Å AES-GCM ‚Ì‚Æ‚«‚È‚Ç‚Í‚»‚Ì‚Ü‚Ü“Ç‚ß‚éB
+					 * EtM æ–¹å¼ã® MAC ã‚„ã€AEAD ã§ AES-GCM ã®ã¨ããªã©ã¯ãã®ã¾ã¾èª­ã‚ã‚‹ã€‚
 					 */
 					pktsize = get_uint32_MSBfirst(data);
 				}
@@ -263,27 +263,27 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 			}
 
 			if (SSHv1(pvar)) {
-				// SSH1 ‚Å‚ÍƒpƒPƒbƒg’·‚Ì’l‚É‚Í padding ‚Ì’·‚³‚ªŠÜ‚Ü‚ê‚Ä‚¢‚È‚¢B
-				// ‚Ü‚½ padding ‚Ì’·‚³‚Ìî•ñ‚àƒpƒPƒbƒgã‚É‚Í–³‚¢‚Ì‚ÅAƒpƒPƒbƒg’·‚Ì’l‚©‚çŒvZ‚·‚éB
+				// SSH1 ã§ã¯ãƒ‘ã‚±ãƒƒãƒˆé•·ã®å€¤ã«ã¯ padding ã®é•·ã•ãŒå«ã¾ã‚Œã¦ã„ãªã„ã€‚
+				// ã¾ãŸ padding ã®é•·ã•ã®æƒ…å ±ã‚‚ãƒ‘ã‚±ãƒƒãƒˆä¸Šã«ã¯ç„¡ã„ã®ã§ã€ãƒ‘ã‚±ãƒƒãƒˆé•·ã®å€¤ã‹ã‚‰è¨ˆç®—ã™ã‚‹ã€‚
 				padding_size = 8 - (pktsize % 8);
 
-				// ˆÈ~‚Ìˆ—‚Í pktsize ‚É padding_size ‚Ì’l‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é–‚ª‘O’ñ‚Æ‚È‚Á‚Ä‚¢‚éB
+				// ä»¥é™ã®å‡¦ç†ã¯ pktsize ã« padding_size ã®å€¤ãŒå«ã¾ã‚Œã¦ã„ã‚‹äº‹ãŒå‰æã¨ãªã£ã¦ã„ã‚‹ã€‚
 				pktsize += padding_size;
 			}
 
-			// ƒpƒPƒbƒg(TCPƒyƒCƒ[ƒh)‚Ì‘S‘Ì‚ÌƒTƒCƒY‚ÍA
-			// 4iƒpƒPƒbƒg’·‚ÌƒTƒCƒYj+ƒpƒPƒbƒg’·i+MAC‚ÌƒTƒCƒYj‚Æ‚È‚éB
+			// ãƒ‘ã‚±ãƒƒãƒˆ(TCPãƒšã‚¤ãƒ­ãƒ¼ãƒ‰)ã®å…¨ä½“ã®ã‚µã‚¤ã‚ºã¯ã€
+			// 4ï¼ˆãƒ‘ã‚±ãƒƒãƒˆé•·ã®ã‚µã‚¤ã‚ºï¼‰+ãƒ‘ã‚±ãƒƒãƒˆé•·ï¼ˆ+MACã®ã‚µã‚¤ã‚ºï¼‰ã¨ãªã‚‹ã€‚
 			total_packet_size = 4 + pktsize + SSH_get_authdata_size(pvar, MODE_IN);
 
 			if (total_packet_size <= pvar->pkt_state.datalen) {
-				// óMÏ‚İƒf[ƒ^‚ª\•ª—L‚éê‡‚ÍƒpƒPƒbƒg‚ÌÀˆ—‚ğs‚¤
+				// å—ä¿¡æ¸ˆã¿ãƒ‡ãƒ¼ã‚¿ãŒååˆ†æœ‰ã‚‹å ´åˆã¯ãƒ‘ã‚±ãƒƒãƒˆã®å®Ÿå‡¦ç†ã‚’è¡Œã†
 				if (SSHv1(pvar)) {
-					// SSH1 ‚Í EtM ”ñ‘Î‰ (‚»‚à‚»‚à MAC ‚Å‚Í‚È‚­ CRC ‚ğg‚¤)
+					// SSH1 ã¯ EtM éå¯¾å¿œ (ãã‚‚ãã‚‚ MAC ã§ã¯ãªã CRC ã‚’ä½¿ã†)
 					SSH1_handle_packet(pvar, data, pktsize, padding_size);
 				}
 				else {
-					// SSH2 ‚Å‚Í‚±‚Ì“_‚Å‚Í padding ’·•”•ª‚ª•œ†‚³‚ê‚Ä‚¢‚È‚¢ê‡‚ª‚ ‚é‚Ì‚ÅA
-					// padding ’·‚Í“n‚³‚¸‚ÉA•K—v‚É‚È‚Á‚½‚É“à•”‚Åæ“¾‚·‚éB
+					// SSH2 ã§ã¯ã“ã®æ™‚ç‚¹ã§ã¯ padding é•·éƒ¨åˆ†ãŒå¾©å·ã•ã‚Œã¦ã„ãªã„å ´åˆãŒã‚ã‚‹ã®ã§ã€
+					// padding é•·ã¯æ¸¡ã•ãšã«ã€å¿…è¦ã«ãªã£ãŸæ™‚ã«å†…éƒ¨ã§å–å¾—ã™ã‚‹ã€‚
 					SSH2_handle_packet(pvar, data, pktsize, aadlen, authlen);
 				}
 
@@ -293,8 +293,8 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 
 			}
 			else if (total_packet_size > PACKET_MAX_SIZE) {
-				// ƒpƒPƒbƒg’·‚ª‘å‚«‚·‚¬‚éê‡‚ÍˆÙíI—¹‚·‚éB
-				// ÀÛ‚É‚Í‰½‚ç‚©‚Ì—vˆö‚Å•œ†¸”sËƒpƒPƒbƒg’·•”•ª‚ª‰ó‚ê‚Ä‚¢‚é–‚ª‘½‚¢B
+				// ãƒ‘ã‚±ãƒƒãƒˆé•·ãŒå¤§ãã™ãã‚‹å ´åˆã¯ç•°å¸¸çµ‚äº†ã™ã‚‹ã€‚
+				// å®Ÿéš›ã«ã¯ä½•ã‚‰ã‹ã®è¦å› ã§å¾©å·å¤±æ•—â‡’ãƒ‘ã‚±ãƒƒãƒˆé•·éƒ¨åˆ†ãŒå£Šã‚Œã¦ã„ã‚‹äº‹ãŒå¤šã„ã€‚
 				UTIL_get_lang_msg("MSG_PKT_OVERSIZED_ERROR", pvar,
 				                  "Oversized packet received from server; connection will close.");
 				notify_fatal_error(pvar, pvar->UIMsg, TRUE);
@@ -315,7 +315,7 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				}
 			}
 		} else {
-			// ƒpƒPƒbƒg‚ÌóM
+			// ãƒ‘ã‚±ãƒƒãƒˆã®å—ä¿¡
 			int amount_read;
 
 			amount_read = recv_data(pvar, READAMOUNT);

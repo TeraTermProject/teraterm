@@ -49,7 +49,7 @@
 #include "theme.h"
 #include "tt_res.h"
 
-// ÉeÉìÉvÉåÅ[ÉgÇÃèëÇ´ä∑Ç¶ÇçsÇ§
+// „ÉÜ„É≥„Éó„É¨„Éº„Éà„ÅÆÊõ∏„ÅçÊèõ„Åà„ÇíË°å„ÅÜ
 #define REWRITE_TEMPLATE
 
 struct ThemePPData {
@@ -129,7 +129,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						ts->EtermLookfeel.BGEnable = 0;
 						break;
 					case 2: {
-						// ÉeÅ[É}ÉtÉ@ÉCÉãéwíË
+						// „ÉÜ„Éº„Éû„Éï„Ç°„Ç§„É´ÊåáÂÆö
 						ts->EtermLookfeel.BGEnable = 1;
 
 						wchar_t* theme_file;
@@ -142,7 +142,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						break;
 					}
 					case 3: {
-						// ÉâÉìÉ_ÉÄÉeÅ[É}
+						// „É©„É≥„ÉÄ„É†„ÉÜ„Éº„Éû
 						ts->EtermLookfeel.BGEnable = 2;
 						if (ts->EtermLookfeel.BGThemeFileW != NULL) {
 							free(ts->EtermLookfeel.BGThemeFileW);
@@ -153,12 +153,12 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					}
 
 					if ((IsDlgButtonChecked(hWnd, IDC_THEME_ENABLE) == BST_CHECKED) && ThemeIsEnabled() == FALSE) {
-						// ÉeÅ[É}ÇenableÇ…Ç∑ÇÈ
+						// „ÉÜ„Éº„Éû„Çíenable„Å´„Åô„Çã
 						ThemeEnable(TRUE);
 					}
 					else if ((IsDlgButtonChecked(hWnd, IDC_THEME_ENABLE) == BST_UNCHECKED) &&
 							 ThemeIsEnabled() == TRUE) {
-						// ÉeÅ[É}ÇdisableÇ…Ç∑ÇÈ
+						// „ÉÜ„Éº„Éû„Çídisable„Å´„Åô„Çã
 						ThemeEnable(FALSE);
 					}
 
@@ -195,14 +195,14 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			}
 			case IDC_THEME_FILE | (CBN_SELCHANGE << 16): {
 				int r = GetCurSel(hWnd, IDC_THEME_FILE);
-				// å≈íËÇÃÇ∆Ç´ÅAÉtÉ@ÉCÉãñºÇì¸óÕÇ≈Ç´ÇÈÇÊÇ§Ç…Ç∑ÇÈ
+				// Âõ∫ÂÆö„ÅÆ„Å®„Åç„ÄÅ„Éï„Ç°„Ç§„É´Âêç„ÇíÂÖ•Âäõ„Åß„Åç„Çã„Çà„ÅÜ„Å´„Åô„Çã
 				BOOL enable = (r == 2) ? TRUE : FALSE;
 				EnableWindow(GetDlgItem(hWnd, IDC_THEME_EDIT), enable);
 				EnableWindow(GetDlgItem(hWnd, IDC_THEME_BUTTON), enable);
 				break;
 			}
 			case IDC_THEME_BUTTON | (BN_CLICKED << 16): {
-				// ÉeÅ[É}ÉtÉ@ÉCÉãÇëIëÇ∑ÇÈ
+				// „ÉÜ„Éº„Éû„Éï„Ç°„Ç§„É´„ÇíÈÅ∏Êäû„Åô„Çã
 				wchar_t *theme_file;
 				hGetDlgItemTextW(hWnd, IDC_THEME_EDIT, &theme_file);
 
@@ -230,7 +230,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				wchar_t *def;
 				hGetDlgItemTextW(hWnd, IDC_SPIPATH_EDIT, &def);
 				if (GetFileAttributesW(def) == INVALID_FILE_ATTRIBUTES) {
-					// ÉtÉHÉãÉ_Ç™ë∂ç›ÇµÇ»Ç¢(ì¸óÕìríÜ?,TT4Ç©ÇÁà⁄çs?)
+					// „Éï„Ç©„É´„ÉÄ„ÅåÂ≠òÂú®„Åó„Å™„ÅÑ(ÂÖ•ÂäõÈÄî‰∏≠?,TT4„Åã„ÇâÁßªË°å?)
 					static const TTMessageBoxInfoW info = {
 						"Tera Term",
 						"MSG_TT_NOTICE", L"Tera Term: Notice",

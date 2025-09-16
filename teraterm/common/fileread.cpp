@@ -45,12 +45,12 @@ typedef unsigned char uint8_t;
 #endif
 
 /**
- *	�t�@�C�����������ɓǂݍ���
- *	@param[out]	*_len		�T�C�Y(terminater�܂�)
- *	@param[in]	terminate	TRUE	�Ō�� L'\0' ("\0\0")��t��
- *							FALSE	�t�@�C�������̂܂ܓǂݍ���
- *	@retval		�t�@�C���̒��g�ւ̃|�C���^(�g�p��free()���邱��)
- *				NULL=�G���[ (fclose()���邱��)
+ *	ファイルをメモリに読み込む
+ *	@param[out]	*_len		サイズ(terminater含む)
+ *	@param[in]	terminate	TRUE	最後に L'\0' ("\0\0")を付加
+ *							FALSE	ファイルをそのまま読み込む
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー (fclose()すること)
  */
 static void *LoadRawFile(FILE *fp, size_t *_len, BOOL terminate)
 {
@@ -71,20 +71,20 @@ static void *LoadRawFile(FILE *fp, size_t *_len, BOOL terminate)
 	}
 	if (terminate) {
 		buf[len] = 0;
-		buf[len+1] = 0;		// UTF-16�΍�
-		buf[len+2] = 0;		// ��ꂽUTF-16�t�@�C���΍�(�� ff fe 30)
+		buf[len+1] = 0;		// UTF-16対策
+		buf[len+2] = 0;		// 壊れたUTF-16ファイル対策(例 ff fe 30)
 	}
 	*_len = alloc_len;
 	return buf;
 }
 
 /**
- *	�t�@�C�����������ɓǂݍ���
- *	@param[in]	fp		"rb" �ŃI�[�v�����邱��
- *	@param[out]	*_len	�T�C�Y(�Ō�ɕt�������"\0\0"���܂�)
- *						�ȗ��s��
- *	@retval		�t�@�C���̒��g�ւ̃|�C���^(�g�p��free()���邱��)
- *				NULL=�G���[
+ *	ファイルをメモリに読み込む
+ *	@param[in]	fp		"rb" でオープンすること
+ *	@param[out]	*_len	サイズ(最後に付加される"\0\0"を含む)
+ *						省略不可
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
  */
 static void *LoadRawFile(FILE *fp, size_t *_len)
 {
@@ -92,11 +92,11 @@ static void *LoadRawFile(FILE *fp, size_t *_len)
 }
 
 /**
- *	�t�@�C�����������ɓǂݍ���
- *	���H�͍s��Ȃ�
- *	@param[out]	*_len	�T�C�Y
- *	@retval		�t�@�C���̒��g�ւ̃|�C���^(�g�p��free()���邱��)
- *				NULL=�G���[
+ *	ファイルをメモリに読み込む
+ *	加工は行わない
+ *	@param[out]	*_len	サイズ
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
  */
 uint8_t *LoadFileBinary(const wchar_t *FileName, size_t *_len)
 {
@@ -111,15 +111,15 @@ uint8_t *LoadFileBinary(const wchar_t *FileName, size_t *_len)
 }
 
 /**
- *	�t�@�C�����������ɓǂݍ���
- *	���g��UTF-8�ɕϊ������
- *	�t�@�C���̍Ō�� '\0'�Ń^�[�~�l�[�g����Ă���
+ *	ファイルをメモリに読み込む
+ *	中身はUTF-8に変換される
+ *	ファイルの最後は '\0'でターミネートされている
  *
- *	@param[out]	*_len	�T�C�Y(�Ō�ɕt�������"\0"���܂�)
- *						NULL�̂Ƃ��͒�����Ԃ��Ȃ�
- *	@param[out] *_code	�t�@�C���̕����R�[�h
- *	@retval		�t�@�C���̒��g�ւ̃|�C���^(�g�p��free()���邱��)
- *				NULL=�G���[
+ *	@param[out]	*_len	サイズ(最後に付加される"\0"を含む)
+ *						NULLのときは長さを返さない
+ *	@param[out] *_code	ファイルの文字コード
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
  */
 char *LoadFileU8C(FILE *fp, size_t *_len, LoadFileCode *_code)
 {
@@ -185,11 +185,11 @@ char *LoadFileU8C(FILE *fp, size_t *_len, LoadFileCode *_code)
 			// UTF-8 -> UTF-16LE
 			wchar_t *w = ToWcharU8((char *)buf);
 			if (w != NULL) {
-				// buf �� UTF-8 �ɈႢ�Ȃ�
+				// buf は UTF-8 に違いない
 				free(w);
 			}
 			else {
-				// buf �̕����R�[�h�͕�����Ȃ�
+				// buf の文字コードは分からない
 				free(buf);
 				if (_code != NULL) {
 					*_code = FILE_CODE_NONE;
@@ -200,7 +200,7 @@ char *LoadFileU8C(FILE *fp, size_t *_len, LoadFileCode *_code)
 	}
 
 	if (_len != NULL) {
-		*_len = strlen((char *)buf)+1;	// ���߂Ē������v��
+		*_len = strlen((char *)buf)+1;	// 改めて長さを計る
 	}
 	if (_code != NULL) {
 		*_code = code;
@@ -209,14 +209,14 @@ char *LoadFileU8C(FILE *fp, size_t *_len, LoadFileCode *_code)
 }
 
 /**
- *	�t�@�C�����������ɓǂݍ���
- *	���g��UTF-8�ɕϊ������
- *	�t�@�C���̍Ō�� '\0'�Ń^�[�~�l�[�g����Ă���
+ *	ファイルをメモリに読み込む
+ *	中身はUTF-8に変換される
+ *	ファイルの最後は '\0'でターミネートされている
  *
- *	@param[out]	*_len	�T�C�Y(�Ō�ɕt�������"\0"���܂�)
- *						NULL�̂Ƃ��͒�����Ԃ��Ȃ�
- *	@retval		�t�@�C���̒��g�ւ̃|�C���^(�g�p��free()���邱��)
- *				NULL=�G���[
+ *	@param[out]	*_len	サイズ(最後に付加される"\0"を含む)
+ *						NULLのときは長さを返さない
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
  */
 char *LoadFileU8(FILE *fp, size_t *_len)
 {
@@ -224,12 +224,12 @@ char *LoadFileU8(FILE *fp, size_t *_len)
 }
 
 /**
- *	�t�@�C�����������ɓǂݍ���
- *	���g��UTF-8�ɕϊ������
+ *	ファイルをメモリに読み込む
+ *	中身はUTF-8に変換される
  *
- *	@param[out]	*_len	�T�C�Y(�Ō�ɕt�������"\0"���܂�)
- *	@retval		�t�@�C���̒��g�ւ̃|�C���^(�g�p��free()���邱��)
- *				NULL=�G���[
+ *	@param[out]	*_len	サイズ(最後に付加される"\0"を含む)
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
  */
 char *LoadFileU8A(const char *FileName, size_t *_len)
 {
@@ -250,12 +250,12 @@ char *LoadFileU8A(const char *FileName, size_t *_len)
 }
 
 /**
- *	�t�@�C�����������ɓǂݍ���
- *	���g��UTF-8�ɕϊ������
+ *	ファイルをメモリに読み込む
+ *	中身はUTF-8に変換される
  *
- *	@param[out]	*_len	�T�C�Y(�Ō�ɕt�������"\0"���܂�)
- *	@retval		�t�@�C���̒��g�ւ̃|�C���^(�g�p��free()���邱��)
- *				NULL=�G���[
+ *	@param[out]	*_len	サイズ(最後に付加される"\0"を含む)
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
  */
 char *LoadFileU8W(const wchar_t *FileName, size_t *_len)
 {
@@ -276,13 +276,13 @@ char *LoadFileU8W(const wchar_t *FileName, size_t *_len)
 }
 
 /**
- *	�t�@�C�����������ɓǂݍ���
- *	���g��wchar_t�ɕϊ������
+ *	ファイルをメモリに読み込む
+ *	中身はwchar_tに変換される
  *
- *	@param[out]	*_len	�T�C�Y(�Ō�ɕt�������"\0"���܂�)
- *						NULL�̂Ƃ��͒�����Ԃ��Ȃ�
- *	@retval		�t�@�C���̒��g�ւ̃|�C���^(�g�p��free()���邱��)
- *				NULL=�G���[
+ *	@param[out]	*_len	サイズ(最後に付加される"\0"を含む)
+ *						NULLのときは長さを返さない
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
  */
 wchar_t *LoadFileWA(const char *FileName, size_t *_len)
 {
@@ -311,13 +311,13 @@ wchar_t *LoadFileWA(const char *FileName, size_t *_len)
 }
 
 /**
- *	�t�@�C�����������ɓǂݍ���
- *	���g��wchar_t�ɕϊ������
+ *	ファイルをメモリに読み込む
+ *	中身はwchar_tに変換される
  *
- *	@param[out]	*_len	�T�C�Y(�Ō�ɕt�������"\0"���܂�)
- *						NULL�̂Ƃ��͒�����Ԃ��Ȃ�
- *	@retval		�t�@�C���̒��g�ւ̃|�C���^(�g�p��free()���邱��)
- *				NULL=�G���[
+ *	@param[out]	*_len	サイズ(最後に付加される"\0"を含む)
+ *						NULLのときは長さを返さない
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
  */
 wchar_t *LoadFileWW(const wchar_t *FileName, size_t *_len)
 {
@@ -346,12 +346,12 @@ wchar_t *LoadFileWW(const wchar_t *FileName, size_t *_len)
 }
 
 /**
- *	�t�@�C�����������ɓǂݍ���
- *	���g��ANSI Codepage�ɕϊ������
+ *	ファイルをメモリに読み込む
+ *	中身はANSI Codepageに変換される
  *
- *	@param[out]	*_len	�T�C�Y(�Ō�ɕt�������"\0"���܂�)
- *	@retval		�t�@�C���̒��g�ւ̃|�C���^(�g�p��free()���邱��)
- *				NULL=�G���[
+ *	@param[out]	*_len	サイズ(最後に付加される"\0"を含む)
+ *	@retval		ファイルの中身へのポインタ(使用後free()すること)
+ *				NULL=エラー
  */
 char *LoadFileAA(const char *FileName, size_t *_len)
 {

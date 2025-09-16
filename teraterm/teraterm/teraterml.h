@@ -30,11 +30,11 @@
 /*	teraterm/ folder only  */
 
 /**
- *	画像読み込みに GDI+ ライブラリを使用する
- *		Windows XP から利用可能
+ *	逕ｻ蜒剰ｪｭ縺ｿ霎ｼ縺ｿ縺ｫ GDI+ 繝ｩ繧､繝悶Λ繝ｪ繧剃ｽｿ逕ｨ縺吶ｋ
+ *		Windows XP 縺九ｉ蛻ｩ逕ｨ蜿ｯ閭ｽ
  */
 #if !defined(ENABLE_GDIPLUS)
-#define ENABLE_GDIPLUS	1	// 0/1=有効/無効
+#define ENABLE_GDIPLUS	1	// 0/1=譛牙柑/辟｡蜉ｹ
 #endif
 
 void AddModelessHandle(HWND hWnd);

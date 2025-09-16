@@ -27,8 +27,8 @@
  */
 
 /*
- *	ttxssh.dll ‚Ö‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX
- *	- ttssh2/ttxssh/ttxssh.def QÆ
+ *	ttxssh.dll ã¸ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
+ *	- ttssh2/ttxssh/ttxssh.def å‚ç…§
  *
  *	TODO
  *	- unicode(wchar_t) filename
@@ -55,9 +55,9 @@ static PSSH_scp_sending_status scp_sending_status = NULL;
 static PSSH_GetKnownHostsFileName GetKnownHostsFileName;
 
 /**
- * @brief SCPŠÖ”‚ÌƒAƒhƒŒƒX‚ğæ“¾
+ * @brief SCPé–¢æ•°ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—
  * @retval TRUE ok
- * @retval FALSE dll‚ª‚È‚¢/dll‚ªscp‘—M‚É‘Î‰‚µ‚Ä‚¢‚È‚¢
+ * @retval FALSE dllãŒãªã„/dllãŒscpé€ä¿¡ã«å¯¾å¿œã—ã¦ã„ãªã„
  */
 static BOOL ScpInit(void)
 {
@@ -98,12 +98,12 @@ static BOOL ScpInit(void)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹‚ğ‘—M‚·‚é
- *	@param	local	ƒ[ƒJƒ‹(PC,Windows)ã‚Ìƒtƒ@ƒCƒ‹
- *					ƒtƒHƒ‹ƒ_‚Íw’è‚Å‚«‚È‚¢
- *	@param	remote	ƒŠƒ‚[ƒg(sshƒT[ƒo[)ã‚ÌƒtƒHƒ‹ƒ_ (or ƒtƒ@ƒCƒ‹–¼?)
- *					L""‚Åƒz[ƒ€ƒfƒBƒŒƒNƒgƒŠ
- *	@return TRUE	ok(ƒŠƒNƒGƒXƒg‚Å‚«‚½)
+ *	ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é€ä¿¡ã™ã‚‹
+ *	@param	local	ãƒ­ãƒ¼ã‚«ãƒ«(PC,Windows)ä¸Šã®ãƒ•ã‚¡ã‚¤ãƒ«
+ *					ãƒ•ã‚©ãƒ«ãƒ€ã¯æŒ‡å®šã§ããªã„
+ *	@param	remote	ãƒªãƒ¢ãƒ¼ãƒˆ(sshã‚µãƒ¼ãƒãƒ¼)ä¸Šã®ãƒ•ã‚©ãƒ«ãƒ€ (or ãƒ•ã‚¡ã‚¤ãƒ«å?)
+ *					L""ã§ãƒ›ãƒ¼ãƒ ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
+ *	@return TRUE	ok(ãƒªã‚¯ã‚¨ã‚¹ãƒˆã§ããŸ)
  *	@return FALSE	ng
  */
 BOOL ScpSend(const wchar_t *local, const wchar_t *remote)
@@ -123,9 +123,9 @@ BOOL ScpSend(const wchar_t *local, const wchar_t *remote)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹‘—Mó‘Ô
- *	@retval	FALSE	‘—M‚µ‚Ä‚¢‚È‚¢
- *	@retval	TRUE	‘—M’†
+ *	ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡çŠ¶æ…‹
+ *	@retval	FALSE	é€ä¿¡ã—ã¦ã„ãªã„
+ *	@retval	TRUE	é€ä¿¡ä¸­
  */
 BOOL ScpGetStatus(void)
 {
@@ -140,7 +140,7 @@ BOOL ScpGetStatus(void)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹‚ğóM‚·‚é
+ *	ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å—ä¿¡ã™ã‚‹
  */
 BOOL ScpReceive(const wchar_t *remotefile, const wchar_t *localfile)
 {
@@ -159,8 +159,8 @@ BOOL ScpReceive(const wchar_t *remotefile, const wchar_t *localfile)
 }
 
 /**
- *	knownhostƒtƒ@ƒCƒ‹–¼‚ğæ“¾
- *	•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
+ *	knownhostãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–å¾—
+ *	ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
  */
 BOOL TTXSSHGetKnownHostsFileName(wchar_t **filename)
 {

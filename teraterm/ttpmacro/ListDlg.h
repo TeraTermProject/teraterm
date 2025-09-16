@@ -31,7 +31,7 @@
 #include "macrodlgbase.h"
 #include "winuser.h"
 
-// CListDlg ダイアログ
+// CListDlg 繝繧､繧｢繝ｭ繧ｰ
 class CListDlg : public CMacroDlgBase
 {
 public:
@@ -40,7 +40,7 @@ public:
 	int m_SelectItem;
 
 private:
-	int CONTROL_GAP_W;				// ウィンドウ端とコントロール間との幅
+	int CONTROL_GAP_W;				// 繧ｦ繧｣繝ｳ繝峨え遶ｯ縺ｨ繧ｳ繝ｳ繝医Ο繝ｼ繝ｫ髢薙→縺ｮ蟷�
 	enum { IDD = IDD_LISTDLG };
 	wchar_t m_Text[MaxStrLen];
 	const wchar_t *m_Caption;
@@ -54,7 +54,7 @@ private:
 	int m_height;
 	BOOL in_init = FALSE;
 	int dpi = 0;
-	BOOL use_TW = FALSE; // TRUE = 初期サイズの計算の際、TWの値を使用する
+	BOOL use_TW = FALSE; // TRUE = 蛻晄悄繧ｵ繧､繧ｺ縺ｮ險育ｮ励�ｮ髫帙ゝW縺ｮ蛟､繧剃ｽｿ逕ｨ縺吶ｋ
 
 	void Relocation(BOOL is_init, int WW, int WH);
 	void InitList(HWND HList);

@@ -45,8 +45,8 @@
   #if defined(__MINGW32__) || (_MSC_VER >= 1600)
     #include <stdint.h>
   #else
-    // VS2008‚æ‚èŒÃ‚¢‚Æ stdint.h ‚ª‚È‚¢‚Ì‚ÅŒİŠ·ƒwƒbƒ_‚ğg‚¤
-	//   TODO libressl ‚ª 2008 ‚Åƒrƒ‹ƒh‚Å‚«‚é‚©‚Í•s–¾
+    // VS2008ã‚ˆã‚Šå¤ã„ã¨ stdint.h ãŒãªã„ã®ã§äº’æ›ãƒ˜ãƒƒãƒ€ã‚’ä½¿ã†
+	//   TODO libressl ãŒ 2008 ã§ãƒ“ãƒ«ãƒ‰ã§ãã‚‹ã‹ã¯ä¸æ˜
     #include "compat/stdint.h"
   #endif
   // include LibreSSL header file

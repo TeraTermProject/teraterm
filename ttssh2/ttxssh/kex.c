@@ -137,20 +137,20 @@ kex_algorithm choose_SSH2_kex_algorithm(char *server_proposal, char *my_proposal
 	return (type);
 }
 
-// KEXƒAƒ‹ƒSƒŠƒYƒ€—Dæ‡ˆÊ‚É‰‚¶‚ÄAmyproposal[]‚ğ‘‚«Š·‚¦‚éB
+// KEXã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ å„ªå…ˆé †ä½ã«å¿œã˜ã¦ã€myproposal[]ã‚’æ›¸ãæ›ãˆã‚‹ã€‚
 // (2011.2.28 yutaka)
 void SSH2_update_kex_myproposal(PTInstVar pvar)
 {
-	static char buf[512]; // TODO: malloc()‚É‚·‚×‚«
+	static char buf[512]; // TODO: malloc()ã«ã™ã¹ã
 	int index;
 	int i;
 
-	// ’ÊM’†‚ÉŒÄ‚Î‚ê‚é‚Æ‚¢‚¤‚±‚Æ‚ÍƒL[Äì¬
+	// é€šä¿¡ä¸­ã«å‘¼ã°ã‚Œã‚‹ã¨ã„ã†ã“ã¨ã¯ã‚­ãƒ¼å†ä½œæˆ
 	if (pvar->socket != INVALID_SOCKET) {
 		if (pvar->kex_status & KEX_FLAG_REKEYING) {
-			// ƒL[Äì¬‚Ìê‡‚É‚ÍAÚ‘±‚É pvar->settings ‚©‚ç‘g‚İ—§‚Ä‚ç‚ê‚½ myproposal ‚ğ‘‚«Š·‚¦‚éB
-			//   pvar->settings ‚ª Ú‘±‚É myproposal ‚ğì¬‚µ‚½‚Æ‚«‚Ì’l‚©‚ç•Ï‚í‚Á‚Ä‚¢‚È‚¢•ÛØ‚ª‚È‚¢B
-			//   Ä“x‘g‚İ—§‚Ä‚é‚Ì‚Å‚Í‚È‚­Šù‘¶‚Ì myproposal ‚ğ‘‚«Š·‚¦‚é‚±‚Æ‚É‚µ‚½B
+			// ã‚­ãƒ¼å†ä½œæˆã®å ´åˆã«ã¯ã€æ¥ç¶šæ™‚ã« pvar->settings ã‹ã‚‰çµ„ã¿ç«‹ã¦ã‚‰ã‚ŒãŸ myproposal ã‚’æ›¸ãæ›ãˆã‚‹ã€‚
+			//   pvar->settings ãŒ æ¥ç¶šæ™‚ã« myproposal ã‚’ä½œæˆã—ãŸã¨ãã®å€¤ã‹ã‚‰å¤‰ã‚ã£ã¦ã„ãªã„ä¿è¨¼ãŒãªã„ã€‚
+			//   å†åº¦çµ„ã¿ç«‹ã¦ã‚‹ã®ã§ã¯ãªãæ—¢å­˜ã® myproposal ã‚’æ›¸ãæ›ãˆã‚‹ã“ã¨ã«ã—ãŸã€‚
 			int pos = strlen(myproposal[PROPOSAL_KEX_ALGS]) - strlen(",ext-info-c,kex-strict-c-v00@openssh.com");
 			if (strcmp(myproposal[PROPOSAL_KEX_ALGS] + pos, ",ext-info-c,kex-strict-c-v00@openssh.com") == 0) {
 				myproposal[PROPOSAL_KEX_ALGS][pos] = '\0';
@@ -185,7 +185,7 @@ static DH *dh_new_group_asc(const char *gen, const char *modulus)
 		goto error;
 	}
 
-	// P‚ÆG‚ÍŒöŠJ‚µ‚Ä‚à‚æ‚¢‘f”‚Ì‘g‚İ‡‚í‚¹
+	// Pã¨Gã¯å…¬é–‹ã—ã¦ã‚‚ã‚ˆã„ç´ æ•°ã®çµ„ã¿åˆã‚ã›
 	if (BN_hex2bn(&p, modulus) == 0) {
 		printf("BN_hex2bn p");
 		goto error;
@@ -196,7 +196,7 @@ static DH *dh_new_group_asc(const char *gen, const char *modulus)
 		goto error;
 	}
 
-	// BN_hex2bn()‚Å•ÏŠ·‚µ‚½ƒ|ƒCƒ“ƒ^‚ğDH\‘¢‘Ì‚ÉƒZƒbƒg‚·‚éB
+	// BN_hex2bn()ã§å¤‰æ›ã—ãŸãƒã‚¤ãƒ³ã‚¿ã‚’DHæ§‹é€ ä½“ã«ã‚»ãƒƒãƒˆã™ã‚‹ã€‚
 	DH_set0_pqg(dh, p, NULL, g);
 
 	return (dh);
@@ -241,7 +241,7 @@ DH *dh_new_group14(void)
 	return (dh_new_group_asc(gen, group14));
 }
 
-// –¢g—p
+// æœªä½¿ç”¨
 DH *dh_new_group15(void)
 {
     static char *gen = "2", *group15 =
@@ -292,7 +292,7 @@ DH *dh_new_group16(void)
 	return (dh_new_group_asc(gen, group16));
 }
 
-// –¢g—p
+// æœªä½¿ç”¨
 DH *dh_new_group17(void)
 {
     static char *gen = "2", *group17 =
@@ -377,7 +377,7 @@ DH *dh_new_group18(void)
 }
 
 
-// DHŒ®‚ğ¶¬‚·‚é
+// DHéµã‚’ç”Ÿæˆã™ã‚‹
 void dh_gen_key(PTInstVar pvar, DH *dh, int we_need /* bytes */ )
 {
 	int i;
@@ -386,7 +386,7 @@ void dh_gen_key(PTInstVar pvar, DH *dh, int we_need /* bytes */ )
 
 	priv_key = NULL;
 
-	// ”é–§‚É‚·‚×‚«—”(X)‚ğ¶¬
+	// ç§˜å¯†ã«ã™ã¹ãä¹±æ•°(X)ã‚’ç”Ÿæˆ
 	for (i = 0 ; i < 10 ; i++) { // retry counter
 		if (priv_key != NULL) {
 			BN_clear_free(priv_key);
@@ -426,7 +426,7 @@ int dh_estimate(int bits)
 }
 
 
-// hash ‚ğŒvZ‚·‚é (DH ŒÅ’èƒOƒ‹[ƒv—p)
+// hash ã‚’è¨ˆç®—ã™ã‚‹ (DH å›ºå®šã‚°ãƒ«ãƒ¼ãƒ—ç”¨)
 // from kexdh.c OpenSSH 7.9p1
 int kex_dh_hash(const digest_algorithm hash_alg,
                 char *client_version_string,
@@ -478,7 +478,7 @@ int kex_dh_hash(const digest_algorithm hash_alg,
 }
 
 
-// hash ‚ğŒvZ‚·‚é (DH GEX—p)
+// hash ã‚’è¨ˆç®—ã™ã‚‹ (DH GEXç”¨)
 // from kexgex.c OpenSSH 7.9p1
 int kexgex_hash(const digest_algorithm hash_alg,
                 char *client_version_string,
@@ -517,12 +517,12 @@ int kexgex_hash(const digest_algorithm hash_alg,
 
 	buffer_put_string(b, serverhostkeyblob, sbloblen);
 
-	// DH group size‚Ìƒrƒbƒg”‚ğ‰ÁZ‚·‚é
+	// DH group sizeã®ãƒ“ãƒƒãƒˆæ•°ã‚’åŠ ç®—ã™ã‚‹
 	buffer_put_int(b, kexgex_min);
 	buffer_put_int(b, kexgex_bits);
 	buffer_put_int(b, kexgex_max);
 
-	// DHŒ®‚Ì‘f”‚Æ¶¬Œ³‚ğ‰ÁZ‚·‚é
+	// DHéµã®ç´ æ•°ã¨ç”Ÿæˆå…ƒã‚’åŠ ç®—ã™ã‚‹
 	buffer_put_bignum2(b, kexgex_p);
 	buffer_put_bignum2(b, kexgex_g);
 
@@ -545,7 +545,7 @@ int kexgex_hash(const digest_algorithm hash_alg,
 }
 
 
-// hash ‚ğŒvZ‚·‚é (ECDH—p)
+// hash ã‚’è¨ˆç®—ã™ã‚‹ (ECDHç”¨)
 // from kexecdh.c OpenSSH 7.9p1
 int kex_ecdh_hash(const digest_algorithm hash_alg,
                              const EC_GROUP *ec_group,
@@ -602,7 +602,7 @@ int kex_ecdh_hash(const digest_algorithm hash_alg,
 // from smult_curve25519_ref.c
 extern int crypto_scalarmult_curve25519(unsigned char *, const unsigned char *, const unsigned char *);
 
-// hash ‚ğŒvZ‚·‚é (Curve25519—p)
+// hash ã‚’è¨ˆç®—ã™ã‚‹ (Curve25519ç”¨)
 // from kexc25519.c OpenSSH 7.9
 int kex_c25519_hash(const digest_algorithm hash_alg,
                     char *client_version_string,
@@ -691,9 +691,9 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 	int bits_set = 0;
 	const BIGNUM *p;
 
-	// OpenSSL 1.1.0‚ÅABIGNUM\‘¢‘Ì‚Ìnegƒƒ“ƒo[‚É’¼ÚƒAƒNƒZƒX‚Å‚«‚È‚­‚È‚Á‚½‚½‚ßA
-	// BN_is_negativeŠÖ”‚É’uŠ·‚·‚éBOpenSSL 1.0.2‚Å‚Íƒ}ƒNƒ’è‹`‚³‚ê‚Ä‚¢‚é‚Ì‚ÅA
-	// OpenSSL 1.0.2‚Å‚àA‚±‚Ì‘‚«•û‚Å‚æ‚¢B
+	// OpenSSL 1.1.0ã§ã€BIGNUMæ§‹é€ ä½“ã®negãƒ¡ãƒ³ãƒãƒ¼ã«ç›´æ¥ã‚¢ã‚¯ã‚»ã‚¹ã§ããªããªã£ãŸãŸã‚ã€
+	// BN_is_negativeé–¢æ•°ã«ç½®æ›ã™ã‚‹ã€‚OpenSSL 1.0.2ã§ã¯ãƒã‚¯ãƒ­å®šç¾©ã•ã‚Œã¦ã„ã‚‹ã®ã§ã€
+	// OpenSSL 1.0.2ã§ã‚‚ã€ã“ã®æ›¸ãæ–¹ã§ã‚ˆã„ã€‚
 	if (BN_is_negative(dh_pub)) {
 		//logit("invalid public DH value: negativ");
 		return 0;
@@ -764,7 +764,7 @@ skip:
 }
 
 /*
- * Œ®ŒğŠ·‚ÌŒ‹‰Ê‚©‚çŠeŒ®‚ğ¶¬‚µ newkeys ‚ÉƒZƒbƒg‚µ‚Ä–ß‚·B
+ * éµäº¤æ›ã®çµæœã‹ã‚‰å„éµã‚’ç”Ÿæˆã— newkeys ã«ã‚»ãƒƒãƒˆã—ã¦æˆ»ã™ã€‚
  */
 // from kex.c OpenSSH 7.9p1
 void kex_derive_keys(PTInstVar pvar, SSHKeys *newkeys, u_char *hash, u_int hashlen,

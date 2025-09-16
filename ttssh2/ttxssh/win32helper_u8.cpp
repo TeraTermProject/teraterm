@@ -27,10 +27,10 @@
  */
 
 /*
- *	win32helper ‚Ì UTF-8 ”Å
- *	win32helper ‚É“‡‚µ‚È‚©‚Á‚½——R
- *		- ttxssh ‚Å‚µ‚©g—p‚µ‚Ä‚¢‚È‚¢
- *		- codeconv ‚ÉˆË‘¶‚µ‚½‚­‚È‚¢
+ *	win32helper ã® UTF-8 ç‰ˆ
+ *	win32helper ã«çµ±åˆã—ãªã‹ã£ãŸç†ç”±
+ *		- ttxssh ã§ã—ã‹ä½¿ç”¨ã—ã¦ã„ãªã„
+ *		- codeconv ã«ä¾å­˜ã—ãŸããªã„
  */
 #include <windows.h>
 #ifndef _CRTDBG_MAP_ALLOC
@@ -53,7 +53,7 @@ BOOL SetDlgItemTextU8(HWND hDlg, int nIDDlgItem, const char *strU8)
 }
 
 /**
- *	hGetWindowTextW ‚Ì UTF-8 ”Å
+ *	hGetWindowTextW ã® UTF-8 ç‰ˆ
  */
 DWORD hGetWindowTextU8(HWND ctl, char **textU8)
 {
@@ -76,7 +76,7 @@ DWORD hGetDlgItemTextU8(HWND hDlg, int id, char **textU8)
 }
 
 /**
- *	hGetWindowTextW ‚Ì ANSI ”Å
+ *	hGetWindowTextW ã® ANSI ç‰ˆ
  */
 DWORD hGetWindowTextA(HWND ctl, char **textA)
 {

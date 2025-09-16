@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ ‚Å¶¬‚³‚ê‚½ƒCƒ“ƒNƒ‹[ƒh ƒtƒ@ƒCƒ‹B
-// font_pp.rc ‚ÅŽg—p
+// Microsoft Visual C++ ã§ç”Ÿæˆã•ã‚ŒãŸã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ ãƒ•ã‚¡ã‚¤ãƒ«ã€‚
+// font_pp.rc ã§ä½¿ç”¨
 //
 #define IDD_TABSHEET_FONT               129
 #define IDC_VTWINFONT                   1000

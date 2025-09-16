@@ -74,6 +74,6 @@ private:
 	HTREEITEM CreatePath(const wchar_t *path, HTREEITEM hParent, int data);
 	HTREEITEM GetTreeItem(int nPage, HTREEITEM hParent);
 
-	// ‰Šú’l
+	// åˆæœŸå€¤
 	static BOOL m_TreeViewInit;
 };

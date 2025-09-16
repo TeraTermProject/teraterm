@@ -128,9 +128,9 @@ static void _Close(TFileIO *fv)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒTƒCƒY‚ðŽæ“¾
- *	@param[in]	filename		ƒtƒ@ƒCƒ‹–¼(UTF-8)
- *	@retval		ƒtƒ@ƒCƒ‹ƒTƒCƒY
+ *	ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºã‚’å–å¾—
+ *	@param[in]	filename		ãƒ•ã‚¡ã‚¤ãƒ«å(UTF-8)
+ *	@retval		ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚º
  */
 static size_t _GetFSize(TFileIO *fv, const char *filename)
 {
@@ -143,7 +143,7 @@ static size_t _GetFSize(TFileIO *fv, const char *filename)
 /**
  *	@retval	0	ok
  *	@retval	-1	error
- * TODO size_t ˆÈã‚Ìƒtƒ@ƒCƒ‹‚Ìˆµ‚¢
+ * TODO size_t ä»¥ä¸Šã®ãƒ•ã‚¡ã‚¤ãƒ«ã®æ‰±ã„
  *
  */
 static int Seek(TFileIO *fv, size_t offset)
@@ -194,16 +194,16 @@ static void FTConvFName(PCHAR FName)
 }
 
 /**
- *	‘—M—pƒtƒ@ƒCƒ‹–¼ì¬
- *	fullname(fullpath)‚©‚çƒtƒ@ƒCƒ‹–¼‚ðŽæ‚èo‚µ‚Ä•K—v‚È•ÏŠ·‚ðs‚¤
- *	Windowsƒtƒ@ƒCƒ‹–¼‚©‚ç‘—M‚É“K‚µ‚½ƒtƒ@ƒCƒ‹–¼‚É•ÏŠ·‚·‚é
+ *	é€ä¿¡ç”¨ãƒ•ã‚¡ã‚¤ãƒ«åä½œæˆ
+ *	fullname(fullpath)ã‹ã‚‰ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–ã‚Šå‡ºã—ã¦å¿…è¦ãªå¤‰æ›ã‚’è¡Œã†
+ *	Windowsãƒ•ã‚¡ã‚¤ãƒ«åã‹ã‚‰é€ä¿¡ã«é©ã—ãŸãƒ•ã‚¡ã‚¤ãƒ«åã«å¤‰æ›ã™ã‚‹
  *
- *	@param[in]	fullname	Tera Term‚ª‘—M‚·‚éƒtƒ@ƒCƒ‹ UTF8(‚Æ‚È‚é—\’è)
- *	@param[in]	utf8		o—Íƒtƒ@ƒCƒ‹–¼‚ÌƒGƒ“ƒR[ƒh
- *							TRUE‚Ì‚Æ‚«AUTF-8
- *							FALSE‚Ì‚Æ‚«AANSI
- *	@retval		ƒtƒ@ƒCƒ‹–¼ (UTF-8 or ANSI)
- *				•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é
+ *	@param[in]	fullname	Tera TermãŒé€ä¿¡ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ« UTF8(ã¨ãªã‚‹äºˆå®š)
+ *	@param[in]	utf8		å‡ºåŠ›ãƒ•ã‚¡ã‚¤ãƒ«åã®ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰
+ *							TRUEã®ã¨ãã€UTF-8
+ *							FALSEã®ã¨ãã€ANSI
+ *	@retval		ãƒ•ã‚¡ã‚¤ãƒ«å (UTF-8 or ANSI)
+ *				ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹
  */
 static char *GetSendFilename(TFileIO *fv, const char *fullname, BOOL utf8, BOOL space, BOOL upper)
 {
@@ -260,7 +260,7 @@ static char *CreateFilenameWithNumber(const char *fullpath, int n)
 	size_t filename_len = strlen(filename);
 	const char *ext = strrchr(filename, '.');
 	if (ext == NULL) {
-		// Šg’£Žq‚È‚µ
+		// æ‹¡å¼µå­ãªã—
 		char *d = new_name;
 		memcpy(d, fullpath, FnPos + filename_len);
 		d += FnPos + filename_len;
@@ -269,7 +269,7 @@ static char *CreateFilenameWithNumber(const char *fullpath, int n)
 		*d = 0;
 	}
 	else {
-		// Šg’£Žq‚ ‚è
+		// æ‹¡å¼µå­ã‚ã‚Š
 		size_t ext_len = strlen(ext);
 		size_t base_len = filename_len - ext_len;
 
@@ -299,22 +299,22 @@ static char *CreateUniqueFilename(const char *fullpath)
 }
 
 /**
- *	ŽóM—pƒtƒ@ƒCƒ‹–¼ì¬
- *	fullname‚©‚ç•K—v‚È•ÏŠ·‚ðs‚¤
- *	‘—‚ç‚ê‚Ä‚«‚½ƒtƒ@ƒCƒ‹–¼‚ªANSI‚©UTF8‚©‚Í
- *	’ÊMæ‚âƒvƒƒgƒRƒ‹‚É‚æ‚é‚ÆŽv‚í‚ê‚é
- *	ŽóM‚µ‚½ƒtƒ@ƒCƒ‹–¼‚©‚çWindows‚É“K‚µ‚½ƒtƒ@ƒCƒ‹–¼‚É•ÏŠ·‚·‚é
+ *	å—ä¿¡ç”¨ãƒ•ã‚¡ã‚¤ãƒ«åä½œæˆ
+ *	fullnameã‹ã‚‰å¿…è¦ãªå¤‰æ›ã‚’è¡Œã†
+ *	é€ã‚‰ã‚Œã¦ããŸãƒ•ã‚¡ã‚¤ãƒ«åãŒANSIã‹UTF8ã‹ã¯
+ *	é€šä¿¡å…ˆã‚„ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã«ã‚ˆã‚‹ã¨æ€ã‚ã‚Œã‚‹
+ *	å—ä¿¡ã—ãŸãƒ•ã‚¡ã‚¤ãƒ«åã‹ã‚‰Windowsã«é©ã—ãŸãƒ•ã‚¡ã‚¤ãƒ«åã«å¤‰æ›ã™ã‚‹
  *
- *	@param[in]	filename	’ÊM‚Å‘—‚ç‚ê‚Ä‚«‚½ƒtƒ@ƒCƒ‹–¼, “ü—Íƒtƒ@ƒCƒ‹–¼
- *	@param[in]	utf8		“ü—Íƒtƒ@ƒCƒ‹–¼‚ÌƒGƒ“ƒR[ƒh
- *							TRUE‚Ì‚Æ‚«AUTF-8
- *							FALSE‚Ì‚Æ‚«AANSI
- *	@param[in]	path		ŽóMƒtƒHƒ‹ƒ_ ƒtƒ@ƒCƒ‹–¼‚Ì‘O‚É•t‰Á‚³‚ê‚é UTF-8
- *							NULL‚Ì‚Æ‚«•t‰Á‚³‚ê‚È‚¢
- *	@param[in]	unique		TRUE‚Ì‚Æ‚«A‚·‚Å‚Éƒtƒ@ƒCƒ‹‚ª‘¶Ý‚µ‚Ä‚¢‚é‚©ƒ`ƒFƒbƒN‚·‚é
- *							ƒtƒ@ƒCƒ‹‚ª‘¶Ý‚µ‚½‚Æ‚«Aƒtƒ@ƒCƒ‹–¼‚ÌŒã‚ë‚É”Žš‚ð’Ç‰Á‚·‚é
- *	@retval		ƒtƒ@ƒCƒ‹–¼ UTF-8
- *				•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é
+ *	@param[in]	filename	é€šä¿¡ã§é€ã‚‰ã‚Œã¦ããŸãƒ•ã‚¡ã‚¤ãƒ«å, å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«å
+ *	@param[in]	utf8		å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«åã®ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰
+ *							TRUEã®ã¨ãã€UTF-8
+ *							FALSEã®ã¨ãã€ANSI
+ *	@param[in]	path		å—ä¿¡ãƒ•ã‚©ãƒ«ãƒ€ ãƒ•ã‚¡ã‚¤ãƒ«åã®å‰ã«ä»˜åŠ ã•ã‚Œã‚‹ UTF-8
+ *							NULLã®ã¨ãä»˜åŠ ã•ã‚Œãªã„
+ *	@param[in]	unique		TRUEã®ã¨ãã€ã™ã§ã«ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ã¦ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
+ *							ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãŸã¨ãã€ãƒ•ã‚¡ã‚¤ãƒ«åã®å¾Œã‚ã«æ•°å­—ã‚’è¿½åŠ ã™ã‚‹
+ *	@retval		ãƒ•ã‚¡ã‚¤ãƒ«å UTF-8
+ *				ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹
  */
 static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL utf8, const char *path, BOOL unique)
 {
@@ -324,7 +324,7 @@ static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL ut
 		int FnPos;
 		GetFileNamePos(filename, NULL, &FnPos);
 		new_name = ToU8A(&filename[FnPos]);
-		// new_name == NULL ‚Ì‚Æ‚« UTF-8‚É•ÏŠ·‚Å‚«‚È‚©‚Á‚½
+		// new_name == NULL ã®ã¨ã UTF-8ã«å¤‰æ›ã§ããªã‹ã£ãŸ
 	}
 	if (new_name == NULL) {
 		// UTF8 -> UTF8

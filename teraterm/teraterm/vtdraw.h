@@ -33,7 +33,7 @@ extern "C" {
 #endif
 
 typedef enum {
-	IdVtDrawAPIAuto,	// ОйУоР▌Тш
+	IdVtDrawAPIAuto,	// шЗкхЛХшинхоЪ
 	IdVtDrawAPIUnicode,
 	IdVtDrawAPIANSI,
 } IdVtDrawAPI;

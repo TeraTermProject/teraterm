@@ -76,8 +76,8 @@ static void AsyncConnect(PComVar cv)
 	/* set asynchronous mode */
 	PWSAAsyncSelect(cv->s,cv->HWin,WM_USER_COMMOPEN, FD_CONNECT);
 
-	// �z�X�g�ւ̐ڑ����Ɉ�莞�ԗ��ƁA�����I�Ƀ\�P�b�g���N���[�Y���āA
-	// �ڑ��������L�����Z��������B�l��0�̏ꍇ�͉������Ȃ��B
+	// ホストへの接続中に一定時間立つと、強制的にソケットをクローズして、
+	// 接続処理をキャンセルさせる。値が0の場合は何もしない。
 	// (2007.1.11 yutaka)
 	if (*cv->ConnetingTimeout > 0) {
 		SetTimer(cv->HWin, IdCancelConnectTimer, *cv->ConnetingTimeout * 1000, NULL);
@@ -247,11 +247,11 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 	SetCommMask(cv->ComID,EV_RXCHAR);
 }
 
-// ���O�t���p�C�v�����������������`�F�b�N����B
+// 名前付きパイプが正しい書式かをチェックする。
 // \\ServerName\pipe\PipeName
 //
-// return  0: ������
-//        -1: �s��
+// return  0: 正しい
+//        -1: 不正
 // (2012.3.10 yutaka)
 int CheckNamedPipeFormat(char *p, int size)
 {
@@ -284,7 +284,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 
 	BOOL InvalidHost;
 
-	// �z�X�g�������O�t���p�C�v���ǂ����𒲂ׂ�B
+	// ホスト名が名前付きパイプかどうかを調べる。
 	if (ts->PortType == IdTCPIP) {
 		if (CheckNamedPipeFormat(ts->HostName, strlen(ts->HostName)) == 0) {
 			ts->PortType = IdNamedPipe;
@@ -517,7 +517,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			memset(P, 0, sizeof(P));
 			strncpy_s(P, sizeof(P), ts->HostName, _TRUNCATE);
 
-			// ���O�t���p�C�v�����������������`�F�b�N����B
+			// 名前付きパイプが正しい書式かをチェックする。
 			if (CheckNamedPipeFormat(P, strlen(P)) < 0) {
 				static const TTMessageBoxInfoW info = {
 					"Tera Term",
@@ -537,7 +537,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			}
 
 			cv->ComID = PCreateFile(P, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
-			                        0,  // �u���b�L���O���[�h�ɂ���(FILE_FLAG_OVERLAPPED �͎w�肵�Ȃ�)
+			                        0,  // ブロッキングモードにする(FILE_FLAG_OVERLAPPED は指定しない)
 			                        NULL);
 			if (cv->ComID == INVALID_HANDLE_VALUE ) {
 				if (cv->NoMsg==0) {
@@ -591,7 +591,7 @@ BreakSC:
 		if ( (ts->PortType==IdTCPIP) && cv->Open ) {
 			if ( cv->s!=INVALID_SOCKET ) {
 				Pclosesocket(cv->s);
-				cv->s = INVALID_SOCKET;  /* �\�P�b�g�����̈��t����B(2010.8.6 yutaka) */
+				cv->s = INVALID_SOCKET;  /* ソケット無効の印を付ける。(2010.8.6 yutaka) */
 			}
 			FreeWinsock();
 		}
@@ -599,7 +599,7 @@ BreakSC:
 	}
 }
 
-// ���O�t���p�C�v�p�X���b�h
+// 名前付きパイプ用スレッド
 void NamedPipeThread(void *arg)
 {
 	PComVar cv = (PComVar)arg;
@@ -613,20 +613,20 @@ void NamedPipeThread(void *arg)
 	REnd = OpenEvent(EVENT_ALL_ACCESS,FALSE, Temp);
 	while (TRUE) {
 		BytesRead = 0;
-		// ���O�t���p�C�v�̓C�x���g��҂��Ƃ��ł��Ȃ��d�l�Ȃ̂ŁA�L���[�̒��g��
-		// �`�������邱�ƂŁAReadFile() ���邩�ǂ������f����B
+		// 名前付きパイプはイベントを待つことができない仕様なので、キューの中身を
+		// 覗き見することで、ReadFile() するかどうか判断する。
 		if (PeekNamedPipe(cv->ComID, Buffer, sizeof(Buffer), &BytesRead, &TotalBytesAvail, &BytesLeftThisMessage)) {
 			if (! cv->Ready) {
 				_endthread();
 			}
-			if (BytesRead == 0) {  // �󂾂�����A�������Ȃ��B
+			if (BytesRead == 0) {  // 空だったら、何もしない。
 				Sleep(1);
 				continue;
 			}
 			if (! cv->RRQ) {
 				PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_READ);
 			}
-			// ReadFile() ���I���܂ő҂B
+			// ReadFile() が終わるまで待つ。
 			WaitForSingleObject(REnd,INFINITE);
 		}
 		else {
@@ -682,7 +682,7 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 		return;
 	}
 
-	// �L�����Z���^�C�}������Ύ������B�������A���̎��_�� WM_TIMER �������Ă���\���͂���B
+	// キャンセルタイマがあれば取り消す。ただし、この時点で WM_TIMER が送られている可能性はある。
 	if (*cv->ConnetingTimeout > 0) {
 		KillTimer(cv->HWin, IdCancelConnectTimer);
 	}
@@ -973,8 +973,8 @@ void CommReceive(PComVar cv)
 				break;
 
 			case IdNamedPipe:
-				// �L���[�̒��ɍŒ�1�o�C�g�ȏ�̃f�[�^�������Ă��邱�Ƃ��m�F�ł��Ă��邽�߁A
-				// ReadFile() �̓u���b�N���邱�Ƃ͂Ȃ����߁A�ꊇ���ēǂށB
+				// キューの中に最低1バイト以上のデータが入っていることを確認できているため、
+				// ReadFile() はブロックすることはないため、一括して読む。
 				if (PReadFile(cv->ComID,&(cv->InBuff[cv->InBuffCount]),
 				              InBuffSize-cv->InBuffCount,&C,NULL)) {
 					if (C == 0) {
@@ -988,7 +988,7 @@ void CommReceive(PComVar cv)
 					DErr = GetLastError();
 				}
 
-				// 1�o�C�g�ȏ�ǂ߂���A�C�x���g���N�����A�X���b�h���ĊJ������B
+				// 1バイト以上読めたら、イベントを起こし、スレッドを再開させる。
 				if (cv->InBuffCount > 0) {
 					cv->RRQ = FALSE;
 					SetEvent(ReadEnd);
@@ -1019,7 +1019,7 @@ void CommReceive(PComVar cv)
 				}
 				return;
 			case IdNamedPipe:
-				// TODO: ���Ԃ�A�����ɗ��邱�Ƃ͂Ȃ��B
+				// TODO: たぶん、ここに来ることはない。
 				if (DErr != ERROR_IO_PENDING) {
 					PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 					cv->RRQ = FALSE;
@@ -1149,8 +1149,8 @@ void CommSend(PComVar cv)
 
 		case IdNamedPipe:
 			if (! PWriteFile(cv->ComID, &(cv->OutBuff[cv->OutPtr]), C, (LPDWORD)&D, NULL)) {
-				// ERROR_IO_PENDING �ȊO�̃G���[��������A�p�C�v���N���[�Y����Ă��邩������Ȃ����A
-				// ���M�ł������Ƃɂ���B
+				// ERROR_IO_PENDING 以外のエラーだったら、パイプがクローズされているかもしれないが、
+				// 送信できたことにする。
 				if (! (GetLastError() == ERROR_IO_PENDING)) {
 					D = C; /* ignore data */
 				}
@@ -1219,7 +1219,7 @@ void CommLock(PTTSet ts, PComVar cv, BOOL Lock)
 	}
 	else if ((cv->PortType==IdSerial) &&
 	         (ts->Flow == IdFlowHard || ts->Flow == IdFlowHardDsrDtr)) {
-		// �n�[�h�E�F�A�t���[�̐ݒ�ɉ����Ċg���@�\�R�[�h��؂�ւ���B
+		// ハードウェアフローの設定に応じて拡張機能コードを切り替える。
 		if (Lock) {
 			Func = CLRRTS;
 			if (ts->Flow == IdFlowHardDsrDtr)
@@ -1251,7 +1251,7 @@ BOOL PrnOpen(PCHAR DevName)
 	          (Temp[0]=='l');
 
 	if (IsWindowsNTKernel()) {
-		// �l�b�g���[�N���L�Ƀ}�b�v���ꂽ�f�o�C�X������̏ꍇ�A�������Ȃ��Ƃ����Ȃ��炵�� (2011.01.25 maya)
+		// ネットワーク共有にマップされたデバイスが相手の場合、こうしないといけないらしい (2011.01.25 maya)
 		// http://logmett.com/forum/viewtopic.php?f=2&t=1383
 		// http://msdn.microsoft.com/en-us/library/aa363858(v=vs.85).aspx#5
 		PrnID = CreateFile(Temp,GENERIC_WRITE | FILE_READ_ATTRIBUTES,
@@ -1259,7 +1259,7 @@ BOOL PrnOpen(PCHAR DevName)
 		                   0,NULL);
 	}
 	else {
-		// 9x �ł͏�L�̃R�[�h�ł��܂������Ȃ��̂ŏ]���ʂ�̏���
+		// 9x では上記のコードでうまくいかないので従来通りの処理
 		PrnID = CreateFile(Temp,GENERIC_WRITE,
 		                   0,NULL,OPEN_EXISTING,
 		                   0,NULL);

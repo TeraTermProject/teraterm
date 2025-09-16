@@ -109,8 +109,8 @@ static void ClearRemoteConnectFlag(FWDDynamicFilterClosure *closure)
 	c->status &= ~FWD_REMOTE_CONNECTED;
 }
 
-// ƒ_ƒ~[‚ÌƒuƒƒbƒLƒ“ƒO‘‚«‚İ—pŠÖ”
-// ’Êí‚Í”ñ“¯Šú‘‚«‚İ‚Åˆ—‚Å‚«‚é‚Í‚¸‚È‚Ì‚ÅAƒuƒƒbƒLƒ“ƒO‘‚«‚İ‚É—‚¿‚½“_‚ÅƒGƒ‰[‚Æ‚·‚é
+// ãƒ€ãƒŸãƒ¼ã®ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°æ›¸ãè¾¼ã¿ç”¨é–¢æ•°
+// é€šå¸¸ã¯éåŒæœŸæ›¸ãè¾¼ã¿ã§å‡¦ç†ã§ãã‚‹ã¯ãšãªã®ã§ã€ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°æ›¸ãè¾¼ã¿ã«è½ã¡ãŸæ™‚ç‚¹ã§ã‚¨ãƒ©ãƒ¼ã¨ã™ã‚‹
 static BOOL dummy_blocking_write(PTInstVar pvar, SOCKET s, const char *data, int length)
 {
         return FALSE;
@@ -150,7 +150,7 @@ static void send_socks5_open_success(FWDDynamicFilterClosure *closure)
 		0, // status -- success
 		0, // reserved
 		1, // addr-type (for dummy) -- IPv4
-		0, 0, 0, 0, // dummy address -- ƒT[ƒo‚ª BIND Address ‚ğ’Ê’m‚µ‚Ä‚­‚ê‚È‚¢‚Ì‚Å orz
+		0, 0, 0, 0, // dummy address -- ã‚µãƒ¼ãƒãŒ BIND Address ã‚’é€šçŸ¥ã—ã¦ãã‚Œãªã„ã®ã§ orz
 		0, 0 // dummy port number
 	};
 
@@ -164,7 +164,7 @@ static void send_socks5_open_failure(FWDDynamicFilterClosure *closure, int reaso
 		1, // status -- general failure
 		0, // reserved
 		1, // addr-type (for dummy) -- IPv4
-		0, 0, 0, 0, // dummy address -- Ú‘±o—ˆ‚Ä‚¢‚È‚¢‚ñ‚¾‚©‚ç BIND Address ‚à‰½‚à–³‚¢‚¾‚ë
+		0, 0, 0, 0, // dummy address -- æ¥ç¶šå‡ºæ¥ã¦ã„ãªã„ã‚“ã ã‹ã‚‰ BIND Address ã‚‚ä½•ã‚‚ç„¡ã„ã ã‚
 		0, 0 // dummy port number
 	};
 
@@ -173,7 +173,7 @@ static void send_socks5_open_failure(FWDDynamicFilterClosure *closure, int reaso
 		buff[1] = 0x02; // connection not allowed
 		break;
 	case 2: // SSH_OPEN_CONNECT_FAILED
-		buff[1] = 0x04; // Host unreachable -- Ú‘±o—ˆ‚È‚¢——R‚ÍFX‚ ‚é‚¯‚ê‚ÇA‚Æ‚è‚ ‚¦‚¸‚±‚ê‚Å
+		buff[1] = 0x04; // Host unreachable -- æ¥ç¶šå‡ºæ¥ãªã„ç†ç”±ã¯è‰²ã€…ã‚ã‚‹ã‘ã‚Œã©ã€ã¨ã‚Šã‚ãˆãšã“ã‚Œã§
 		break;
 	case 3: // SSH_OPEN_UNKNOWN_CHANNEL_TYPE
 		buff[1] = 0x01; // general failure
@@ -213,7 +213,7 @@ static int parse_socks4_request(FWDDynamicFilterClosure *closure, unsigned char 
 
 	memcpy_s(&s4hdr, sizeof(s4hdr), buff, 8);
 
-	// CONNECT ‚Ì‚İ‘Î‰
+	// CONNECT ã®ã¿å¯¾å¿œ
 	if (s4hdr.proto != 4 || s4hdr.command != SOCKS4_COMMAND_CONNECT) {
 		send_socks4_reply(closure, SOCKS4_RESULT_NG);
 		return -1;
@@ -230,7 +230,7 @@ static int parse_socks4_request(FWDDynamicFilterClosure *closure, unsigned char 
 	}
 
 	if (bufflen == 0) {
-		// NUL terminate ‚³‚ê‚Ä‚È‚¢ -> ƒŠƒNƒGƒXƒg‚ª‚Ü‚¾“r’†
+		// NUL terminate ã•ã‚Œã¦ãªã„ -> ãƒªã‚¯ã‚¨ã‚¹ãƒˆãŒã¾ã é€”ä¸­
 		return 0;
 	}
 
@@ -247,7 +247,7 @@ static int parse_socks4_request(FWDDynamicFilterClosure *closure, unsigned char 
 			bufflen--; buff++;
 		}
 		if (bufflen == 0) {
-			// NUL terminate ‚³‚ê‚Ä‚È‚¢ -> ƒŠƒNƒGƒXƒg‚ª‚Ü‚¾“r’†
+			// NUL terminate ã•ã‚Œã¦ãªã„ -> ãƒªã‚¯ã‚¨ã‚¹ãƒˆãŒã¾ã é€”ä¸­
 			return 0;
 		}
 	}
@@ -263,7 +263,7 @@ static int parse_socks4_request(FWDDynamicFilterClosure *closure, unsigned char 
 		addr = addrbuff;
 	}
 
-	// ƒT[ƒo‚É—v‹‚ğ‘—‚é‘O‚ÉAƒtƒ‰ƒO‚ğ–{—ˆ‚Ìó‘Ô‚É–ß‚µ‚Ä‚¨‚­
+	// ã‚µãƒ¼ãƒã«è¦æ±‚ã‚’é€ã‚‹å‰ã«ã€ãƒ•ãƒ©ã‚°ã‚’æœ¬æ¥ã®çŠ¶æ…‹ã«æˆ»ã—ã¦ãŠã
 	ClearRemoteConnectFlag(closure);
 
 	closure->socks_ver = 4;
@@ -299,7 +299,7 @@ static int parse_socks5_init_request(FWDDynamicFilterClosure *closure, unsigned 
 
 	for (i=0; i<authmethod_count; i++) {
 		if (buff[i+2] == SOCKS5_AUTH_NONE) {
-			// Œ»ó‚Å‚Í”FØ‚È‚µ‚Ì‚İƒTƒ|[ƒg
+			// ç¾çŠ¶ã§ã¯èªè¨¼ãªã—ã®ã¿ã‚µãƒãƒ¼ãƒˆ
 			closure->socks_ver = 5;
 			reply_buff[1] = SOCKS5_AUTH_NONE;
 			send_socks_reply(closure, reply_buff, 2);
@@ -360,7 +360,7 @@ static int parse_socks5_connect_request(FWDDynamicFilterClosure *closure, unsign
 	}
 
 	if (s5hdr.command != SOCKS5_COMMAND_CONNECT) {
-		// CONNECT ˆÈŠO‚Í–¢‘Î‰
+		// CONNECT ä»¥å¤–ã¯æœªå¯¾å¿œ
 		send_socks5_open_failure(closure, SOCKS5_ERROR_COMMAND);
 		return -1;
 	}
@@ -399,7 +399,7 @@ static int parse_socks5_connect_request(FWDDynamicFilterClosure *closure, unsign
 
 	port = buff[4 + addrlen] * 256 + buff[4 + addrlen + 1];
 
-	// ƒT[ƒo‚É—v‹‚ğ‘—‚é‘O‚ÉAƒtƒ‰ƒO‚ğ–{—ˆ‚Ìó‘Ô‚É–ß‚µ‚Ä‚¨‚­
+	// ã‚µãƒ¼ãƒã«è¦æ±‚ã‚’é€ã‚‹å‰ã«ã€ãƒ•ãƒ©ã‚°ã‚’æœ¬æ¥ã®çŠ¶æ…‹ã«æˆ»ã—ã¦ãŠã
 	ClearRemoteConnectFlag(closure);
 
 	SSH_open_channel(closure->pvar, closure->channel_num, addr, port, closure->peer_name, closure->peer_port);
@@ -417,7 +417,7 @@ static FwdFilterResult parse_client_request(FWDDynamicFilterClosure *closure, in
 	newlen = closure->buflen + *len;
 
 	if (newlen > SOCKS_REQUEST_MAXLEN || *len < 0) {
-		// ƒŠƒNƒGƒXƒg‚ª‘å‚«‚·‚¬‚éê‡‚ÍØ’f‚·‚é
+		// ãƒªã‚¯ã‚¨ã‚¹ãƒˆãŒå¤§ãã™ãã‚‹å ´åˆã¯åˆ‡æ–­ã™ã‚‹
 		logprintf(LOG_LEVEL_ERROR,
 			"%s: request too large: state=%d, buflen=%d, reqlen=%d",
 			__FUNCTION__, closure->status, closure->buflen, *len);
@@ -431,7 +431,7 @@ static FwdFilterResult parse_client_request(FWDDynamicFilterClosure *closure, in
 	request = closure->request_buf;
 	reqlen = closure->buflen;
 
-	// ƒeƒXƒg‚È‚Ì‚ÅAŒã‘±‚Ìƒf[ƒ^‚ª‚ ‚Á‚Ä‚à–³‹‚µ‚Ä‘S‚ÄÁ‚·
+	// ãƒ†ã‚¹ãƒˆãªã®ã§ã€å¾Œç¶šã®ãƒ‡ãƒ¼ã‚¿ãŒã‚ã£ã¦ã‚‚ç„¡è¦–ã—ã¦å…¨ã¦æ¶ˆã™
 	**buf = 0; *len = 0;
 
 	switch (closure->status) {
@@ -465,8 +465,8 @@ static FwdFilterResult parse_client_request(FWDDynamicFilterClosure *closure, in
 
 
 	if (result < 0) {
-		// ƒtƒ‰ƒO‚ğ–{—ˆ‚Ìó‘Ô(ƒŠƒ‚[ƒg–¢Ú‘±)‚É–ß‚·
-		// ‚±‚ê‚ğ‚â‚Á‚Ä‚¨‚©‚È‚¢‚ÆA–¢Ú‘±‚Ìƒ`ƒƒƒlƒ‹‚ğ•Â‚¶‚æ‚¤‚Æ‚µ‚Ä‚¨‚©‚µ‚­‚È‚é
+		// ãƒ•ãƒ©ã‚°ã‚’æœ¬æ¥ã®çŠ¶æ…‹(ãƒªãƒ¢ãƒ¼ãƒˆæœªæ¥ç¶š)ã«æˆ»ã™
+		// ã“ã‚Œã‚’ã‚„ã£ã¦ãŠã‹ãªã„ã¨ã€æœªæ¥ç¶šã®ãƒãƒ£ãƒãƒ«ã‚’é–‰ã˜ã‚ˆã†ã¨ã—ã¦ãŠã‹ã—ããªã‚‹
 		ClearRemoteConnectFlag(closure);
 
 		return FWD_FILTER_CLOSECHANNEL;
@@ -486,14 +486,14 @@ FwdFilterResult SOCKS_filter(void *void_closure, FwdFilterEvent event, int *len,
 
 	switch (event) {
 	case FWD_FILTER_CLEANUP:
-		// FWD_FILTER_REMOVE ‚ğ•Ô‚·‚ÆAƒŠƒ\[ƒXŠJ•ú‚Ìˆ×‚É‚±‚ê‚ÅÄ“xŒÄ‚Î‚ê‚é
+		// FWD_FILTER_REMOVE ã‚’è¿”ã™ã¨ã€ãƒªã‚½ãƒ¼ã‚¹é–‹æ”¾ã®ç‚ºã«ã“ã‚Œã§å†åº¦å‘¼ã°ã‚Œã‚‹
 		logprintf(LOG_LEVEL_VERBOSE, "%s: closure cleanup. channel=%d", __FUNCTION__, closure->channel_num);
 		free(closure->peer_name);
 		free(closure);
 		return FWD_FILTER_REMOVE;
 
 	case FWD_FILTER_OPENCONFIRM:
-		// SSH_open_channel() ‚ª¬Œ÷
+		// SSH_open_channel() ãŒæˆåŠŸ
 		logprintf(LOG_LEVEL_VERBOSE, "%s: OpenConfirmation received", __FUNCTION__ );
 		if (closure->socks_ver == 4) {
 			send_socks4_reply(closure, SOCKS4_RESULT_OK);
@@ -507,7 +507,7 @@ FwdFilterResult SOCKS_filter(void *void_closure, FwdFilterEvent event, int *len,
 		return FWD_FILTER_REMOVE;
 
 	case FWD_FILTER_OPENFAILURE:
-		// SSH_open_channel() ‚ª¸”s
+		// SSH_open_channel() ãŒå¤±æ•—
 		logprintf(LOG_LEVEL_VERBOSE, "%s: Open Failure. reason=%d", __FUNCTION__, *len);
 		if (closure->socks_ver == 4) {
 			send_socks4_reply(closure, SOCKS4_RESULT_NG);
@@ -521,13 +521,13 @@ FwdFilterResult SOCKS_filter(void *void_closure, FwdFilterEvent event, int *len,
 		return FWD_FILTER_CLOSECHANNEL;
 
 	case FWD_FILTER_FROM_SERVER:
-		// ‚±‚ÌƒtƒBƒ‹ƒ^‚ª—LŒø‚È“_‚Å‚ÍƒT[ƒo‚Ö‚Ìƒ`ƒƒƒlƒ‹‚ÍŠJ‚¢‚Ä‚¢‚È‚¢‚Ì‚Å
-		// ‚±‚±‚É‚Í‚±‚È‚¢‚Í‚¸
+		// ã“ã®ãƒ•ã‚£ãƒ«ã‚¿ãŒæœ‰åŠ¹ãªæ™‚ç‚¹ã§ã¯ã‚µãƒ¼ãƒã¸ã®ãƒãƒ£ãƒãƒ«ã¯é–‹ã„ã¦ã„ãªã„ã®ã§
+		// ã“ã“ã«ã¯ã“ãªã„ã¯ãš
 		logprintf(LOG_LEVEL_VERBOSE, "%s: data received from server. (bug?)", __FUNCTION__);
 		return FWD_FILTER_RETAIN;
 
 	case FWD_FILTER_FROM_CLIENT:
-		// ƒNƒ‰ƒCƒAƒ“ƒg‚©‚ç‚Ì—v‹‚ğˆ—‚·‚é
+		// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‹ã‚‰ã®è¦æ±‚ã‚’å‡¦ç†ã™ã‚‹
 		logprintf(LOG_LEVEL_VERBOSE, "%s: data received from client. size=%d", __FUNCTION__, *len);
 		return parse_client_request(closure, len, buf);
 	}

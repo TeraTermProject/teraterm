@@ -23,7 +23,7 @@ PTInstVar pvar;
 static TInstVar InstVar;
 
 //
-//  TTXInit -- ‹N“®Žžˆ—
+//  TTXInit -- èµ·å‹•æ™‚å‡¦ç†
 //
 static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->ts = ts;
@@ -34,8 +34,8 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 }
 
 //
-//  flush_buffer -- ƒ‰ƒCƒ“ƒoƒbƒtƒ@‚Ìƒtƒ‰ƒbƒVƒ…
-//	ƒtƒ‰ƒbƒVƒ…ŽdØ‚ê‚È‚©‚Á‚½ƒoƒCƒg”‚ð•Ô‚·B
+//  flush_buffer -- ãƒ©ã‚¤ãƒ³ãƒãƒƒãƒ•ã‚¡ã®ãƒ•ãƒ©ãƒƒã‚·ãƒ¥
+//	ãƒ•ãƒ©ãƒƒã‚·ãƒ¥ä»•åˆ‡ã‚Œãªã‹ã£ãŸãƒã‚¤ãƒˆæ•°ã‚’è¿”ã™ã€‚
 //
 int flush_buffer(SOCKET s, int flags) {
 	int i, len;
@@ -59,7 +59,7 @@ int flush_buffer(SOCKET s, int flags) {
 }
 
 //
-//  TTXSend -- ƒL[“ü—Íˆ—
+//  TTXSend -- ã‚­ãƒ¼å…¥åŠ›å‡¦ç†
 //
 static int PASCAL TTXsend(SOCKET s, const char *buf, int len, int flags) {
 	int i, wlen, left_len;
@@ -116,8 +116,8 @@ static int PASCAL TTXsend(SOCKET s, const char *buf, int len, int flags) {
 }
 
 //
-// TTXOpen -- ƒZƒbƒVƒ‡ƒ“ŠJŽnˆ—
-//	Psend ‚ðƒtƒbƒN‚·‚éB
+// TTXOpen -- ã‚»ãƒƒã‚·ãƒ§ãƒ³é–‹å§‹å‡¦ç†
+//	Psend ã‚’ãƒ•ãƒƒã‚¯ã™ã‚‹ã€‚
 //
 static void PASCAL TTXOpenTCP(TTXSockHooks *hooks) {
 	pvar->origPsend = *hooks->Psend;
@@ -126,8 +126,8 @@ static void PASCAL TTXOpenTCP(TTXSockHooks *hooks) {
 }
 
 //
-// TTXCloseTCP -- ƒZƒbƒVƒ‡ƒ“I—¹Žžˆ—
-//	Psend ‚ÌƒtƒbƒN‚ð‰ðœ‚·‚éB
+// TTXCloseTCP -- ã‚»ãƒƒã‚·ãƒ§ãƒ³çµ‚äº†æ™‚å‡¦ç†
+//	Psend ã®ãƒ•ãƒƒã‚¯ã‚’è§£é™¤ã™ã‚‹ã€‚
 //
 static void PASCAL TTXCloseTCP(TTXSockHooks *hooks) {
 	if (pvar->origPsend) {

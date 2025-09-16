@@ -31,7 +31,7 @@
 
 #include "ttxssh.h"
 
-// �N���C�A���g����T�[�o�ւ̒�Ď���
+// クライアントからサーバへの提案事項
 enum kex_init_proposals {
 	PROPOSAL_KEX_ALGS,
 	PROPOSAL_SERVER_HOST_KEY_ALGS,
@@ -81,12 +81,12 @@ kex_algorithm choose_SSH2_kex_algorithm(char *server_proposal, char *my_proposal
 void SSH2_update_kex_myproposal(PTInstVar pvar);
 
 
-// SSH_MSG_KEY_DH_GEX_REQUEST �ł� min, n, max ���Ƃ蓾��͈͂̏��/���� (RFC 4419)
+// SSH_MSG_KEY_DH_GEX_REQUEST での min, n, max がとり得る範囲の上限/下限 (RFC 4419)
 #define GEX_GRP_LIMIT_MIN   1024
 #define GEX_GRP_LIMIT_MAX   8192
-// GexMinimalGroupSize �� 0 (�f�t�H���g(���ݒ�)) ���������� min �Ɏg���l
-// RFC 8270 �� min �̍Œ�l�� 2048 �Ɉ����グ��ꂽ���A�݊����ׂ̈� GEX_GRP_LIMIT_MIN
-// �������グ��̂ł͂Ȃ��āA�f�t�H���g�̒l��ύX����
+// GexMinimalGroupSize が 0 (デフォルト(未設定)) だった時に min に使う値
+// RFC 8270 で min の最低値が 2048 に引き上げられたが、互換性の為に GEX_GRP_LIMIT_MIN
+// を引き上げるのではなくて、デフォルトの値を変更する
 #define GEX_GRP_DEFAULT_MIN 2048
 
 DH *dh_new_group1(void);

@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// プラグインから使用するAPI
+// 繝励Λ繧ｰ繧､繝ｳ縺九ｉ菴ｿ逕ｨ縺吶ｋAPI
 
 #pragma once
 

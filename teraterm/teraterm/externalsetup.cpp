@@ -51,16 +51,16 @@ static struct {
 } ExternalSetupData;
 
 /*
- *	‘Oˆ—AŒãˆ—‚É‚Â‚¢‚Ä
- *		]—ˆ‚Íƒ_ƒCƒAƒƒO–ˆ‚ÉA‘Oˆ—AŒãˆ—‚ª•ª‚©‚ê‚Ä‚¢‚½
- *		Œ»İ‚Íƒ^ƒu‰»‚³‚ê‘S‚Ä‚Ìİ’è‚ªs‚¦‚é‚Ì‚ÅA‘S‚Ä‚Ì‘Oˆ—AŒãˆ—‚ªs‚í‚ê‚é
+ *	å‰å‡¦ç†ã€å¾Œå‡¦ç†ã«ã¤ã„ã¦
+ *		å¾“æ¥ã¯ãƒ€ã‚¤ã‚¢ãƒ­ã‚°æ¯ã«ã€å‰å‡¦ç†ã€å¾Œå‡¦ç†ãŒåˆ†ã‹ã‚Œã¦ã„ãŸ
+ *		ç¾åœ¨ã¯ã‚¿ãƒ–åŒ–ã•ã‚Œå…¨ã¦ã®è¨­å®šãŒè¡Œãˆã‚‹ã®ã§ã€å…¨ã¦ã®å‰å‡¦ç†ã€å¾Œå‡¦ç†ãŒè¡Œã‚ã‚Œã‚‹
  */
 
 /**
- *	İ’èƒ_ƒCƒAƒƒO‚ğo‚·‘O‚Ìˆ—
+ *	è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºã™å‰ã®å‡¦ç†
  *
- *	@param	page	ˆ—‚·‚éƒ^ƒu
- *					íœ—\’è
+ *	@param	page	å‡¦ç†ã™ã‚‹ã‚¿ãƒ–
+ *					å‰Šé™¤äºˆå®š
  */
 static void ExternalSetupPreProcess(HWND hWnd, CAddSettingPropSheetDlgPage page)
 {
@@ -100,7 +100,7 @@ static void ExternalSetupPreProcess(HWND hWnd, CAddSettingPropSheetDlgPage page)
 		((CTEKWindow*)pTEKWin)->OnSetupPreProcess();
 	}
 
-	// “ü—Í‚Ì–³Œø‰»(ƒAƒvƒŠƒP[ƒVƒ‡ƒ“ƒ‚[ƒ_ƒ‹ó‘Ô‚É‚·‚é)
+	// å…¥åŠ›ã®ç„¡åŠ¹åŒ–(ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ãƒ¢ãƒ¼ãƒ€ãƒ«çŠ¶æ…‹ã«ã™ã‚‹)
 	HWND hWnd_disable = hWnd == HVTWin ? HTEKWin : HVTWin;
 	ExternalSetupData.hWnd_disable = hWnd_disable;
 	if (hWnd_disable != NULL) {
@@ -109,15 +109,15 @@ static void ExternalSetupPreProcess(HWND hWnd, CAddSettingPropSheetDlgPage page)
 }
 
 /**
- *	İ’èƒ_ƒCƒAƒƒO‚ğ•Â‚¶‚½Œã‚Ìˆ—
- *		ok = TRUE ‚Ì‚Í
- *			İ’è(ts‚È‚Ç)‚Ì’l‚ğ”½‰f‚·‚é
- *		ok = FALSE ‚Ì‚Í
- *			•K—v‚Å‚ ‚ê‚ÎŒãˆ—‚ğs‚¤
+ *	è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‰ã˜ãŸå¾Œã®å‡¦ç†
+ *		ok = TRUE ã®æ™‚ã¯
+ *			è¨­å®š(tsãªã©)ã®å€¤ã‚’åæ˜ ã™ã‚‹
+ *		ok = FALSE ã®æ™‚ã¯
+ *			å¿…è¦ã§ã‚ã‚Œã°å¾Œå‡¦ç†ã‚’è¡Œã†
  *
- *	@param	page	ˆ—‚·‚éƒ^ƒu
- *					íœ—\’è
- *	@param	ok		TRUE/FALSE = OK‚ª‰Ÿ‚³‚ê‚½/‰Ÿ‚³‚ê‚È‚©‚Á‚½
+ *	@param	page	å‡¦ç†ã™ã‚‹ã‚¿ãƒ–
+ *					å‰Šé™¤äºˆå®š
+ *	@param	ok		TRUE/FALSE = OKãŒæŠ¼ã•ã‚ŒãŸ/æŠ¼ã•ã‚Œãªã‹ã£ãŸ
  */
 static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 {
@@ -133,11 +133,11 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 		;
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::FontPage) {
-		// Fontƒ^ƒu
+		// Fontã‚¿ãƒ–
 		if (ExternalSetupData.old_VTDrawAPI != pts->VTDrawAPI) {
 			BuffSetDispAPI(pts->VTDrawAPI);
 		}
-		// ANSI•\¦—p‚ÌƒR[ƒhƒy[ƒW‚ğİ’è‚·‚é
+		// ANSIè¡¨ç¤ºç”¨ã®ã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸ã‚’è¨­å®šã™ã‚‹
 		BuffSetDispCodePage(pts->VTDrawAnsiCodePage);
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::KeyboardPage) {
@@ -163,7 +163,7 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 		if (ok) {
 			pVTWin->SetColor();
 
-			// ƒ^ƒCƒgƒ‹‚ª•ÏX‚³‚ê‚Ä‚¢‚½‚çAƒŠƒ‚[ƒgƒ^ƒCƒgƒ‹‚ğƒNƒŠƒA‚·‚é
+			// ã‚¿ã‚¤ãƒˆãƒ«ãŒå¤‰æ›´ã•ã‚Œã¦ã„ãŸã‚‰ã€ãƒªãƒ¢ãƒ¼ãƒˆã‚¿ã‚¤ãƒˆãƒ«ã‚’ã‚¯ãƒªã‚¢ã™ã‚‹
 			if ((ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) &&
 				(strcmp(ExternalSetupData.orgTitle, ts.Title) != 0)) {
 				free(cv.TitleRemoteW);
@@ -181,38 +181,38 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 			if (ts.ComPort > 0) {
 
 				if (cv.Ready && (cv.PortType != IdSerial)) {
-					// ƒVƒŠƒAƒ‹ˆÈŠO‚ÉÚ‘±’†‚Ìê‡
-					//  TODO cv.Ready ‚Æ cv.Open‚Ì·‚Í?
+					// ã‚·ãƒªã‚¢ãƒ«ä»¥å¤–ã«æ¥ç¶šä¸­ã®å ´åˆ
+					//  TODO cv.Ready ã¨ cv.Openã®å·®ã¯?
 #if 0
 					OpenNewComport(&ts);
 					return;
 #endif
 				}
 				else if (!cv.Open) {
-					// –¢Ú‘±‚Ìê‡
+					// æœªæ¥ç¶šã®å ´åˆ
 #if 0
 					CommOpen(m_hWnd,&ts,&cv);
 #endif
 				}
 				else {
-					// ƒVƒŠƒAƒ‹‚ÉÚ‘±’†‚Ìê‡
+					// ã‚·ãƒªã‚¢ãƒ«ã«æ¥ç¶šä¸­ã®å ´åˆ
 #if 0
 					if (ts.ComPort != cv.ComPort) {
-						// ƒ|[ƒg‚ğ•ÏX‚·‚é
+						// ãƒãƒ¼ãƒˆã‚’å¤‰æ›´ã™ã‚‹
 						CommClose(&cv);
 						CommOpen(HVTWin,&ts,&cv);
 					}
 					else
 #endif
 					{
-						// ’ÊMƒpƒ‰ƒ[ƒ^‚ğ•ÏX‚·‚é
+						// é€šä¿¡ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’å¤‰æ›´ã™ã‚‹
 						CommResetSerial(&ts, &cv, ts.ClearComBuffOnOpen);
 					}
 				}
 			}
 		}
 
-		// ƒ_ƒCƒAƒƒOƒtƒHƒ“ƒg‚Ì•ÏX
+		// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒ•ã‚©ãƒ³ãƒˆã®å¤‰æ›´
 		if (ok) {
 			SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint,
 						  ts.DialogFontCharSet, ts.UILanguageFileW,
@@ -225,7 +225,7 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 		((CTEKWindow*)pTEKWin)->OnSetupPostProcess(ok);
 	}
 
-	// ’Êíó‘Ô‚É‚·‚é
+	// é€šå¸¸çŠ¶æ…‹ã«ã™ã‚‹
 	HWND hWnd_disable = ExternalSetupData.hWnd_disable;
 	if (hWnd_disable != NULL) {
 		EnableWindow(hWnd_disable, TRUE);
@@ -233,14 +233,14 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 }
 
 /**
- *	Additional Setting ‚ğ•\¦‚·‚é
+ *	Additional Setting ã‚’è¡¨ç¤ºã™ã‚‹
  *
- *	@param	page	DefaultPage		‘S‚Ä‚Ìƒ^ƒu‚ğ•\¦‚µ‚Ä•\¦‚·‚é
- *					‚»‚Ì‘¼			“Á’è‚Ìƒ^ƒu‚ğ•\¦‚·‚é
- *	@retval	TRUE	"OK"‚ª‰Ÿ‚³‚ê‚½
- *	@retval	FALSE	"Cancel"‚ª‰Ÿ‚³‚ê‚½
+ *	@param	page	DefaultPage		å…¨ã¦ã®ã‚¿ãƒ–ã‚’è¡¨ç¤ºã—ã¦è¡¨ç¤ºã™ã‚‹
+ *					ãã®ä»–			ç‰¹å®šã®ã‚¿ãƒ–ã‚’è¡¨ç¤ºã™ã‚‹
+ *	@retval	TRUE	"OK"ãŒæŠ¼ã•ã‚ŒãŸ
+ *	@retval	FALSE	"Cancel"ãŒæŠ¼ã•ã‚ŒãŸ
  *
- *	ŠÖ”‚ğƒR[ƒ‹‚·‚é‡(VTWin‚©‚ç‚Ìê‡)
+ *	é–¢æ•°ã‚’ã‚³ãƒ¼ãƒ«ã™ã‚‹é †(VTWinã‹ã‚‰ã®å ´åˆ)
  *	- ExternalSetupPreProcess()
  *	- OpenExternalSetupTab()
  *	- ExternalSetupPostProcess()
@@ -250,10 +250,10 @@ BOOL OpenExternalSetupTab(HWND hWndParent, CAddSettingPropSheetDlgPage page)
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
 
-	// PreProces‚ªŒÄ‚Î‚ê‚Ä‚¢‚é‚©ƒ`ƒFƒbƒN
+	// PreProcesãŒå‘¼ã°ã‚Œã¦ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
 	assert(ExternalSetupData.PerProcessCalled == TRUE);
 
-	// TEKWin“Á•Êˆ—
+	// TEKWinç‰¹åˆ¥å‡¦ç†
 	if (AddsettingCheckWin(hWndParent) == ADDSETTING_WIN_TEK) {
 		if (page == CAddSettingPropSheetDlgPage::WinPage) {
 			// Window Setup
@@ -279,9 +279,9 @@ BOOL OpenExternalSetupTab(HWND hWndParent, CAddSettingPropSheetDlgPage page)
 }
 
 /*
- *	‚±‚±ˆÈ~‚Í vtwin.cpp ‚©‚ç UI‘€ì/ƒvƒ‰ƒOƒCƒ“‚©‚çƒR[ƒ‹‚³‚ê‚é
- *		OpenExternalSetup() ˆÈŠO‚ÍƒtƒbƒN‚³‚ê‚Ä‚¢‚Äƒ_ƒCƒAƒƒO‚ªŠJ‚©‚È‚¢ê‡‚ª‚ ‚é
- *		ƒ_ƒCƒAƒƒO‚ªŠJ‚­ê‡‚Í OpenExternalSetupTab() ‚ªƒR[ƒ‹‚³‚ê‚é
+ *	ã“ã“ä»¥é™ã¯ vtwin.cpp ã‹ã‚‰ UIæ“ä½œ/ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‹ã‚‰ã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
+ *		OpenExternalSetup() ä»¥å¤–ã¯ãƒ•ãƒƒã‚¯ã•ã‚Œã¦ã„ã¦ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãŒé–‹ã‹ãªã„å ´åˆãŒã‚ã‚‹
+ *		ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãŒé–‹ãå ´åˆã¯ OpenExternalSetupTab() ãŒã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
  */
 void OpenExternalSetup(HWND hWnd)
 {
@@ -292,7 +292,7 @@ void OpenExternalSetup(HWND hWnd)
 
 /**
  *
- *	ƒvƒ‰ƒOƒCƒ“‚©‚ç‚ÌŒÄ‚Ño‚µ
+ *	ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‹ã‚‰ã®å‘¼ã³å‡ºã—
  *		SendMessage(HWin, WM_COMMAND, MAKELONG(ID_SETUP_TERMINAL, 0), 0);
  */
 void OpenSetupTerminal(HWND hWnd)
@@ -307,7 +307,7 @@ void OpenSetupTerminal(HWND hWnd)
 
 /**
  *
- *	ƒvƒ‰ƒOƒCƒ“‚©‚ç‚ÌŒÄ‚Ño‚µ
+ *	ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‹ã‚‰ã®å‘¼ã³å‡ºã—
  *		SendMessage(HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
  */
 void OpenSetupWin(HWND hWnd)

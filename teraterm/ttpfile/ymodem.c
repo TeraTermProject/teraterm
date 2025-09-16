@@ -63,7 +63,7 @@ typedef struct {
 	BYTE LastMessage;
 	BOOL RecvFilesize;
 	TProtoLog *log;
-	const char *FullName;		// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
+	const char *FullName;		// Windowsä¸Šã®ãƒ•ã‚¡ã‚¤ãƒ«å UTF-8
 	WORD LogState;
 
 	BOOL FileOpen;
@@ -89,7 +89,7 @@ typedef TYVar *PYVar;
 #define YnakC 1
 #define YnakG 2
 
-// ƒf[ƒ^“]‘—ƒTƒCƒYBYMODEM‚Å‚Í 128 or 1024 byte ‚ðƒTƒ|[ƒg‚·‚éB
+// ãƒ‡ãƒ¼ã‚¿è»¢é€ã‚µã‚¤ã‚ºã€‚YMODEMã§ã¯ 128 or 1024 byte ã‚’ã‚µãƒãƒ¼ãƒˆã™ã‚‹ã€‚
 #define SOH_DATALEN	128
 #define STX_DATALEN	1024
 
@@ -114,7 +114,7 @@ static int YRead1Byte(PFileVarProto fv, PYVar yv, PComVar cv, LPBYTE b)
 		TProtoLog *log = yv->log;
 		if (yv->LogState==0)
 		{
-			// Žc‚è‚ÌASCII•\Ž¦‚ðs‚¤
+			// æ®‹ã‚Šã®ASCIIè¡¨ç¤ºã‚’è¡Œã†
 			log->DumpFlush(log);
 
 			yv->LogState = 1;
@@ -135,7 +135,7 @@ static int YWrite(PFileVarProto fv, PYVar yv, PComVar cv, PCHAR B, int C)
 		TProtoLog* log = yv->log;
 		if (yv->LogState != 0)
 		{
-			// Žc‚è‚ÌASCII•\Ž¦‚ðs‚¤
+			// æ®‹ã‚Šã®ASCIIè¡¨ç¤ºã‚’è¡Œã†
 			log->DumpFlush(log);
 
 			yv->LogState = 0;
@@ -401,7 +401,7 @@ static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	case IdYSend:
 		yv->TextFlag = 0;
 
-		// ƒtƒ@ƒCƒ‹‘—MŠJŽn‘O‚ÉA"rb ƒtƒ@ƒCƒ‹–¼"‚ðŽ©“®“I‚ÉŒÄ‚Ño‚·B(2007.12.20 yutaka)
+		// ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡é–‹å§‹å‰ã«ã€"rb ãƒ•ã‚¡ã‚¤ãƒ«å"ã‚’è‡ªå‹•çš„ã«å‘¼ã³å‡ºã™ã€‚(2007.12.20 yutaka)
 		//strcpy(ts->YModemRcvCommand, "rb");
 		if (ts->YModemRcvCommand[0] != '\0') {
 			char inistr[MAX_PATH + 10];
@@ -458,7 +458,7 @@ static void YTimeOutProc(PFileVarProto fv, PComVar cv)
 			YSendNAKTimeout(fv,yv,cv);
 		break;
 	case IdYQuit:
-		// ƒLƒƒƒ“ƒZƒ‹‚ª˜A‘±‚µ‚Ä”­¶?
+		// ã‚­ãƒ£ãƒ³ã‚»ãƒ«ãŒé€£ç¶šã—ã¦ç™ºç”Ÿ?
 		break;
 	default:
 		assert(0);
@@ -491,15 +491,15 @@ static BOOL FTCreateFile(PFileVarProto fv)
 	return TRUE;
 }
 
-// YMODEMƒT[ƒo‚©‚çƒtƒ@ƒCƒ‹‚ðŽóM‚·‚éÛAProtoParse()‚©‚çŒÄ‚Ño‚³‚ê‚éŠÖ”B
+// YMODEMã‚µãƒ¼ãƒã‹ã‚‰ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å—ä¿¡ã™ã‚‹éš›ã€ProtoParse()ã‹ã‚‰å‘¼ã³å‡ºã•ã‚Œã‚‹é–¢æ•°ã€‚
 //
 // +-------+-------+--------+---------+-----+
 // |Header |Block# |1-Block#| Payload | CRC |
 // +-------+-------+--------+---------+-----+
 //    1       1        1      128/1024   2      byte
 //
-// return TRUE: ƒtƒ@ƒCƒ‹ŽóM’†
-//        FALSE: ŽóMŠ®—¹
+// return TRUE: ãƒ•ã‚¡ã‚¤ãƒ«å—ä¿¡ä¸­
+//        FALSE: å—ä¿¡å®Œäº†
 static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 {
 	BYTE b, d;
@@ -515,7 +515,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	{
 		switch (yv->PktReadMode) {
 		case XpktSOH:
-			// SOH ‚© STX ‚©‚ÅƒuƒƒbƒN’·‚ªŒˆ‚Ü‚éB
+			// SOH ã‹ STX ã‹ã§ãƒ–ãƒ­ãƒƒã‚¯é•·ãŒæ±ºã¾ã‚‹ã€‚
 			if (b==SOH)
 			{
 				yv->PktIn[0] = b;
@@ -532,7 +532,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			}
 			else if (b==EOT)
 			{
-				// EOT‚ª—ˆ‚½‚çA1‚Â‚Ìƒtƒ@ƒCƒ‹ŽóM‚ªŠ®—¹‚µ‚½‚±‚Æ‚ðŽ¦‚·B
+				// EOTãŒæ¥ãŸã‚‰ã€1ã¤ã®ãƒ•ã‚¡ã‚¤ãƒ«å—ä¿¡ãŒå®Œäº†ã—ãŸã“ã¨ã‚’ç¤ºã™ã€‚
 				if (yv->FileOpen) {
 					file->Close(file);
 					yv->FileOpen = FALSE;
@@ -541,7 +541,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 						file->SetFMtime(file, yv->FullName, yv->FileMtime);
 					}
 
-					// 1‰ñ–Ú‚ÌEOT‚É‘Î‚µ‚ÄNAK‚ð•Ô‚·
+					// 1å›žç›®ã®EOTã«å¯¾ã—ã¦NAKã‚’è¿”ã™
 					b = NAK;
 					YWrite(fv,yv,cv,&b, 1);
 					return TRUE;
@@ -549,11 +549,11 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 
 				initialize_file_info(fv, yv);
 
-				// EOT‚É‘Î‚µ‚ÄACK‚ð•Ô‚·
+				// EOTã«å¯¾ã—ã¦ACKã‚’è¿”ã™
 				b = ACK;
 				YWrite(fv,yv,cv,&b, 1);
 
-				// ŽŸ‚Ìƒtƒ@ƒCƒ‹‘—M‚ð‘£‚·‚½‚ßA'C'‚ð‘—‚éB
+				// æ¬¡ã®ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡ã‚’ä¿ƒã™ãŸã‚ã€'C'ã‚’é€ã‚‹ã€‚
 				YSendNAK(fv,yv,cv);
 
 				return TRUE;
@@ -576,7 +576,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			if ((b ^ yv->PktIn[1]) == 0xff) {
 				nak = 0;
 				if (yv->SendFileInfo) {
-					if (yv->PktIn[1] == (BYTE)(yv->PktNum + 1))  // ŽŸ‚ÌƒuƒƒbƒN”Ô†‚©
+					if (yv->PktIn[1] == (BYTE)(yv->PktNum + 1))  // æ¬¡ã®ãƒ–ãƒ­ãƒƒã‚¯ç•ªå·ã‹
 						nak = 0;
 				}
 			}
@@ -618,7 +618,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		return TRUE;
 	}
 
-	// ƒI[ƒ‹ƒ[ƒ‚È‚ç‚ÎA‘Sƒtƒ@ƒCƒ‹ŽóM‚ÌŠ®—¹‚ðŽ¦‚·B
+	// ã‚ªãƒ¼ãƒ«ã‚¼ãƒ­ãªã‚‰ã°ã€å…¨ãƒ•ã‚¡ã‚¤ãƒ«å—ä¿¡ã®å®Œäº†ã‚’ç¤ºã™ã€‚
 	if (yv->PktIn[1] == 0x00 && yv->PktIn[2] == 0xFF &&
 		yv->SendFileInfo == 0
 		) {
@@ -646,7 +646,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	yv->NAKMode = YnakC;
 	yv->NAKCount = 10;
 
-	// d•¡‚µ‚Ä‚¢‚éê‡‚ÍA‰½‚à‚µ‚È‚¢B
+	// é‡è¤‡ã—ã¦ã„ã‚‹å ´åˆã¯ã€ä½•ã‚‚ã—ãªã„ã€‚
 	if (yv->SendFileInfo &&
 		yv->PktIn[1] == (BYTE)(yv->PktNum)) {
 		return TRUE;
@@ -654,7 +654,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 
 	yv->PktNum = yv->PktIn[1];
 
-	// YMODEM‚Ìê‡Ablock#0‚ªuƒtƒ@ƒCƒ‹î•ñv‚Æ‚È‚éB
+	// YMODEMã®å ´åˆã€block#0ãŒã€Œãƒ•ã‚¡ã‚¤ãƒ«æƒ…å ±ã€ã¨ãªã‚‹ã€‚
 	if (d == 0 &&
 		yv->SendFileInfo == 0) {
 		long modtime;
@@ -694,7 +694,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 
 		yv->SendFileInfo = 1;
 
-		// ŽŸ‚Ìƒtƒ@ƒCƒ‹‘—M‚ð‘£‚·‚½‚ßA'C'‚ð‘—‚éB
+		// æ¬¡ã®ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡ã‚’ä¿ƒã™ãŸã‚ã€'C'ã‚’é€ã‚‹ã€‚
 		YSendNAK(fv,yv,cv);
 
 		free(p);
@@ -709,7 +709,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		while ((c>0) && (yv->PktIn[2+c]==0x1A))
 			c--;
 
-	// ÅIƒuƒƒbƒN‚Ì—]•ª‚Èƒf[ƒ^‚ðœ‹Ž‚·‚é
+	// æœ€çµ‚ãƒ–ãƒ­ãƒƒã‚¯ã®ä½™åˆ†ãªãƒ‡ãƒ¼ã‚¿ã‚’é™¤åŽ»ã™ã‚‹
 	if (yv->RecvFilesize && yv->ByteCount + c > yv->FileSize) {
 		c = yv->FileSize - yv->ByteCount;
 	}
@@ -739,7 +739,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	return TRUE;
 }
 
-// ƒtƒ@ƒCƒ‹‘—M(local-to-remote)Žž‚ÉAYMODEMƒT[ƒo‚©‚çƒf[ƒ^‚ª‘—‚ç‚ê‚Ä‚«‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚éB
+// ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡(local-to-remote)æ™‚ã«ã€YMODEMã‚µãƒ¼ãƒã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ãŒé€ã‚‰ã‚Œã¦ããŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã‚‹ã€‚
 static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 {
 	// If current buffer is empty.
@@ -757,7 +757,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			switch (isym)
 			{
 			case ACK:
-				// 1‰ñ–Ú‚ÌEOT‘—MŒã‚ÌACKŽóM‚ÅAu1ƒtƒ@ƒCƒ‹‘—Mv‚ÌI‚í‚è‚Æ‚·‚éB
+				// 1å›žç›®ã®EOTé€ä¿¡å¾Œã®ACKå—ä¿¡ã§ã€ã€Œ1ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡ã€ã®çµ‚ã‚ã‚Šã¨ã™ã‚‹ã€‚
 				// If we already send EOT, ACK means that client confirms it.
 				if (yv->SendEot)
 				{
@@ -765,7 +765,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 					// Reset the flag.
 					yv->SendEot = 0;
 
-					// ‘—Mƒtƒ@ƒCƒ‹‚ªŽc‚Á‚Ä‚¢‚È‚¢ê‡‚ÍAu‘S‚Ä‚Ìƒtƒ@ƒCƒ‹‚ð“]‘—I—¹v‚ð’Ê’m‚·‚éB
+					// é€ä¿¡ãƒ•ã‚¡ã‚¤ãƒ«ãŒæ®‹ã£ã¦ã„ãªã„å ´åˆã¯ã€ã€Œå…¨ã¦ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’è»¢é€çµ‚äº†ã€ã‚’é€šçŸ¥ã™ã‚‹ã€‚
 					filename = fv->GetNextFname(fv);
 					if (filename == NULL)
 					{
@@ -783,22 +783,22 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				}
 
 				// If client confirms that last (empty) packed was received.
-				// ‚à‚¤‘—M‚·‚éƒtƒ@ƒCƒ‹‚ª‚È‚¢ê‡‚ÍA³íI—¹B
+				// ã‚‚ã†é€ä¿¡ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ãŒãªã„å ´åˆã¯ã€æ­£å¸¸çµ‚äº†ã€‚
 				if (!yv->FileOpen)
 				{
 					fv->Success = TRUE;
 					yv->LastMessage = isym;
 					return FALSE;
 				}
-				// ŽŸ‚ÌƒuƒƒbƒN‚ð‘—‚é
+				// æ¬¡ã®ãƒ–ãƒ­ãƒƒã‚¯ã‚’é€ã‚‹
 				else if (yv->PktNumSent == (BYTE)(yv->PktNum + 1))
 				{
-					// ƒuƒƒbƒN0iƒtƒ@ƒCƒ‹î•ñj‘—MŒã‚ÍAACK ‚Æ 'C' ‚ð˜A‘±‚µ‚ÄŽóM‚·‚é‚±‚Æ‚É
-					// ‚È‚Á‚Ä‚¢‚é‚½‚ßAŽŸ‚Ì'C'‚ð‘Ò‚ÂB(2010.6.20 yutaka)
+					// ãƒ–ãƒ­ãƒƒã‚¯0ï¼ˆãƒ•ã‚¡ã‚¤ãƒ«æƒ…å ±ï¼‰é€ä¿¡å¾Œã¯ã€ACK ã¨ 'C' ã‚’é€£ç¶šã—ã¦å—ä¿¡ã™ã‚‹ã“ã¨ã«
+					// ãªã£ã¦ã„ã‚‹ãŸã‚ã€æ¬¡ã®'C'ã‚’å¾…ã¤ã€‚(2010.6.20 yutaka)
 					if ((yv->PktNum==0) && (yv->PktNumOffset==0))
 					{
 						// It is an ACK for file info, wait for 'C' by some reason (?).
-						// ‘—MÏ‚Ýƒtƒ‰ƒOon
+						// é€ä¿¡æ¸ˆã¿ãƒ•ãƒ©ã‚°on
 						yv->SendFileInfo = 1;
 						continue_read = TRUE;
 						break;
@@ -811,7 +811,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				break;
 
 			case NAK:
-				// 1‰ñ–Ú‚ÌEOT‘—MŒã‚ÌNAKŽóM‚ÅAÅŒã"EOT"‚ð‘—‚éB
+				// 1å›žç›®ã®EOTé€ä¿¡å¾Œã®NAKå—ä¿¡ã§ã€æœ€å¾Œ"EOT"ã‚’é€ã‚‹ã€‚
 				if (yv->SendEot)
 				{
 					yv->PktNum = yv->PktNumSent;
@@ -823,7 +823,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				break;
 
 			case CAN:
-				// ’¼‘O‚à CAN ‚Ìê‡‚ÍƒLƒƒƒ“ƒZƒ‹
+				// ç›´å‰ã‚‚ CAN ã®å ´åˆã¯ã‚­ãƒ£ãƒ³ã‚»ãƒ«
 				if (yv->LastMessage == CAN) {
 					fv->Success = FALSE;       // failure
 					return FALSE;
@@ -832,10 +832,10 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 
 			case 'C':
 			case 'G':
-				// 'C'‚ðŽó‚¯Žæ‚é‚ÆAƒuƒƒbƒN‚Ì‘—M‚ðŠJŽn‚·‚éB
+				// 'C'ã‚’å—ã‘å–ã‚‹ã¨ã€ãƒ–ãƒ­ãƒƒã‚¯ã®é€ä¿¡ã‚’é–‹å§‹ã™ã‚‹ã€‚
 				if ((0 == yv->PktNum) && (0 == yv->PktNumOffset) && !(yv->LastMessage == 'C'))
 				{
-					// ƒtƒ@ƒCƒ‹î•ñ‘—MŒãAACK -> 'C' ‚ÆŽóM‚µ‚½‚Ì‚ÅAŽŸ‚ÌƒuƒƒbƒN‚ð‘—M‚·‚éB
+					// ãƒ•ã‚¡ã‚¤ãƒ«æƒ…å ±é€ä¿¡å¾Œã€ACK -> 'C' ã¨å—ä¿¡ã—ãŸã®ã§ã€æ¬¡ã®ãƒ–ãƒ­ãƒƒã‚¯ã‚’é€ä¿¡ã™ã‚‹ã€‚
 					if (yv->SendFileInfo)
 					{
 						yv->PktNum = yv->PktNumSent;
@@ -865,7 +865,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		// reset timeout timer
 		fv->FTSetTimeOut(fv, yv->TOutVLong);
 #if 0
-		// Œã‘±‚ÌƒT[ƒo‚©‚ç‚Ìƒf[ƒ^‚ð“Ç‚ÝŽÌ‚Ä‚éB
+		// å¾Œç¶šã®ã‚µãƒ¼ãƒã‹ã‚‰ã®ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿æ¨ã¦ã‚‹ã€‚
 		do
 		{
 			lastrx = firstch;
@@ -873,8 +873,8 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			if (i != 0) {
 				firstch = b;
 				if (firstch == CAN && lastrx == CAN) {
-					// CAN(0x18)‚ª˜A‘±‚µ‚Ä‚­‚é‚ÆAƒtƒ@ƒCƒ‹‘—M‚ÌŽ¸”s‚ÆŒ©‚È‚·B
-					// ‚½‚Æ‚¦‚ÎAƒT[ƒo‚É“¯–¼‚Ìƒtƒ@ƒCƒ‹‚ª‘¶Ý‚·‚éê‡‚È‚ÇB
+					// CAN(0x18)ãŒé€£ç¶šã—ã¦ãã‚‹ã¨ã€ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡ã®å¤±æ•—ã¨è¦‹ãªã™ã€‚
+					// ãŸã¨ãˆã°ã€ã‚µãƒ¼ãƒã«åŒåã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹å ´åˆãªã©ã€‚
 					// (2010.3.23 yutaka)
 					fv->Success = FALSE;       // failure
 					return FALSE;
@@ -886,7 +886,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		//================================
 		// Last packet case.
 		//================================
-		// ƒI[ƒ‹ƒ[ƒ‚ÌƒuƒƒbƒN‚ð‘—M‚µ‚ÄA‚à‚¤ƒtƒ@ƒCƒ‹‚ª‚È‚¢‚±‚Æ‚ð’m‚ç‚¹‚éB
+		// ã‚ªãƒ¼ãƒ«ã‚¼ãƒ­ã®ãƒ–ãƒ­ãƒƒã‚¯ã‚’é€ä¿¡ã—ã¦ã€ã‚‚ã†ãƒ•ã‚¡ã‚¤ãƒ«ãŒãªã„ã“ã¨ã‚’çŸ¥ã‚‰ã›ã‚‹ã€‚
 		if (yv->LastSendEot)
 		{
 			WORD Check;
@@ -944,14 +944,14 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			yv->PktOut[1] = yv->PktNumSent;
 			yv->PktOut[2] = ~yv->PktNumSent;
 
-			// ƒuƒƒbƒN”Ô†‚ÌƒJƒEƒ“ƒgƒAƒbƒvBYMODEM‚Å‚Í"0"‚©‚çŠJŽn‚·‚éB
+			// ãƒ–ãƒ­ãƒƒã‚¯ç•ªå·ã®ã‚«ã‚¦ãƒ³ãƒˆã‚¢ãƒƒãƒ—ã€‚YMODEMã§ã¯"0"ã‹ã‚‰é–‹å§‹ã™ã‚‹ã€‚
 			yv->PktNumSent++;
 
 			//================================
 			// First packet case.
 			//================================
-			// ƒuƒƒbƒN0
-			// ƒtƒ@ƒCƒ‹î•ñ‚Ì‘—M
+			// ãƒ–ãƒ­ãƒƒã‚¯0
+			// ãƒ•ã‚¡ã‚¤ãƒ«æƒ…å ±ã®é€ä¿¡
 			if (yv->SendFileInfo == 0)
 			{
 				int ret, total;
@@ -996,7 +996,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 					++idx;
 				}
 
-				// ƒf[ƒ^ƒRƒs[
+				// ãƒ‡ãƒ¼ã‚¿ã‚³ãƒ”ãƒ¼
 				memcpy(dataptr, buf, current_packet_size);
 			}
 
@@ -1046,7 +1046,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				}
 			}
 
-			// ƒf[ƒ^ƒuƒƒbƒN
+			// ãƒ‡ãƒ¼ã‚¿ãƒ–ãƒ­ãƒƒã‚¯
 			if (0 == eot)
 			{
 				// Add CRC if not End-of-Tranfer.
@@ -1068,7 +1068,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				yv->PktOut[0] = EOT;
 				yv->PktBufCount = 1;
 
-				// EOTƒtƒ‰ƒOonBŽŸ‚ÍNAK‚ðŠú‘Ò‚·‚éB
+				// EOTãƒ•ãƒ©ã‚°onã€‚æ¬¡ã¯NAKã‚’æœŸå¾…ã™ã‚‹ã€‚
 				yv->SendEot = 1;
 				yv->LastSendEot = 0;
 			}
@@ -1089,15 +1089,15 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	}
 #if 0
 	/* a NAK or C could have arrived while we were buffering.  Consume it. */
-	// Œã‘±‚ÌƒT[ƒo‚©‚ç‚Ìƒf[ƒ^‚ð“Ç‚ÝŽÌ‚Ä‚éB
+	// å¾Œç¶šã®ã‚µãƒ¼ãƒã‹ã‚‰ã®ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿æ¨ã¦ã‚‹ã€‚
 	do {
 		lastrx = firstch;
 		i = YRead1Byte(fv,yv,cv,&b);
 		if (i != 0) {
 			firstch = b;
 			if (firstch == CAN && lastrx == CAN) {
-				// CAN(0x18)‚ª˜A‘±‚µ‚Ä‚­‚é‚ÆAƒtƒ@ƒCƒ‹‘—M‚ÌŽ¸”s‚ÆŒ©‚È‚·B
-				// ‚½‚Æ‚¦‚ÎAƒT[ƒo‚É“¯–¼‚Ìƒtƒ@ƒCƒ‹‚ª‘¶Ý‚·‚éê‡‚È‚ÇB
+				// CAN(0x18)ãŒé€£ç¶šã—ã¦ãã‚‹ã¨ã€ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡ã®å¤±æ•—ã¨è¦‹ãªã™ã€‚
+				// ãŸã¨ãˆã°ã€ã‚µãƒ¼ãƒã«åŒåã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹å ´åˆãªã©ã€‚
 				// (2010.3.23 yutaka)
 				fv->Success = FALSE;       // failure
 				return FALSE;

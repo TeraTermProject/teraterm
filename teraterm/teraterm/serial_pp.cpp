@@ -49,18 +49,18 @@
 
 #include "serial_pp.h"
 
-// ƒeƒ“ƒvƒŒ[ƒg‚Ì‘‚«Š·‚¦‚ğs‚¤
+// ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®æ›¸ãæ›ãˆã‚’è¡Œã†
 #define REWRITE_TEMPLATE
 
-// ‘¶İ‚·‚éƒVƒŠƒAƒ‹ƒ|[ƒg‚Ì‚İ‚ğ•\¦‚·‚é
+// å­˜åœ¨ã™ã‚‹ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆã®ã¿ã‚’è¡¨ç¤ºã™ã‚‹
 //#define SHOW_ONLY_EXSITING_PORT		TRUE
-#define SHOW_ONLY_EXSITING_PORT		FALSE	// ‚·‚×‚Ä‚Ìƒ|[ƒg‚ğ•\¦‚·‚é
+#define SHOW_ONLY_EXSITING_PORT		FALSE	// ã™ã¹ã¦ã®ãƒãƒ¼ãƒˆã‚’è¡¨ç¤ºã™ã‚‹
 
-// ƒhƒƒbƒvƒ_ƒEƒ“‚©‚çƒ|[ƒg•\¦‚ğØ‚è‘Ö‚¦
+// ãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ã‹ã‚‰ãƒãƒ¼ãƒˆè¡¨ç¤ºã‚’åˆ‡ã‚Šæ›¿ãˆ
 //#define ENABLE_SWITCH_PORT_DISPLAY	1
 #define ENABLE_SWITCH_PORT_DISPLAY	0
 
-// MaxComPort‚æ‚è‘å‚«‚Èƒ|[ƒg‚ª‘¶İ‚·‚é‚Æ‚«AMaxComPort‚ğƒI[ƒo[ƒ‰ƒCƒh‚·‚é
+// MaxComPortã‚ˆã‚Šå¤§ããªãƒãƒ¼ãƒˆãŒå­˜åœ¨ã™ã‚‹ã¨ãã€MaxComPortã‚’ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ã™ã‚‹
 #define ENABLE_MAXCOMPORT_OVERRIDE	0
 
 static const char *BaudList[] = {
@@ -78,16 +78,16 @@ typedef struct {
 	int ComPortInfoCount;
 	HINSTANCE hInst;
 	DLGTEMPLATE *dlg_templ;
-	int g_deltaSumSerialDlg;					// ƒ}ƒEƒXƒzƒC[ƒ‹‚ÌDelta—İÏ—p
-	WNDPROC g_defSerialDlgEditWndProc;			// Edit Control‚ÌƒTƒuƒNƒ‰ƒX‰»—p
+	int g_deltaSumSerialDlg;					// ãƒã‚¦ã‚¹ãƒ›ã‚¤ãƒ¼ãƒ«ã®Deltaç´¯ç©ç”¨
+	WNDPROC g_defSerialDlgEditWndProc;			// Edit Controlã®ã‚µãƒ–ã‚¯ãƒ©ã‚¹åŒ–ç”¨
 	BOOL show_all_port;
 } SerialDlgData;
 
 /*
- * ƒVƒŠƒAƒ‹ƒ|[ƒgİ’èƒ_ƒCƒAƒƒO‚ÌƒeƒLƒXƒgƒ{ƒbƒNƒX‚ÉCOMƒ|[ƒg‚ÌÚ×î•ñ‚ğ•\¦‚·‚éB
- *	@param	port_index		port_info[] ‚ÌƒCƒ“ƒfƒbƒNƒX, -1‚Ì‚Æ‚«g—p‚µ‚È‚¢
- *	@param	port_no			ƒ|[ƒg”Ô† "com%d", -1‚Ì‚Æ‚«g—p‚µ‚È‚¢
- *	@param	port_name		port_name ƒ|[ƒg–¼
+ * ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆè¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ†ã‚­ã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã«COMãƒãƒ¼ãƒˆã®è©³ç´°æƒ…å ±ã‚’è¡¨ç¤ºã™ã‚‹ã€‚
+ *	@param	port_index		port_info[] ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹, -1ã®ã¨ãä½¿ç”¨ã—ãªã„
+ *	@param	port_no			ãƒãƒ¼ãƒˆç•ªå· "com%d", -1ã®ã¨ãä½¿ç”¨ã—ãªã„
+ *	@param	port_name		port_name ãƒãƒ¼ãƒˆå
  */
 static void serial_dlg_set_comport_info(HWND dlg, SerialDlgData *dlg_data, int port_index, int port_no, const wchar_t *port_name)
 {
@@ -120,7 +120,7 @@ static void serial_dlg_set_comport_info(HWND dlg, SerialDlgData *dlg_data, int p
 }
 
 /*
- * ƒVƒŠƒAƒ‹ƒ|[ƒgİ’èƒ_ƒCƒAƒƒO‚ÌƒeƒLƒXƒgƒ{ƒbƒNƒX‚ÌƒvƒƒV[ƒWƒƒ
+ * ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆè¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ†ã‚­ã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã®ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
  */
 static LRESULT CALLBACK SerialDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -128,7 +128,7 @@ static LRESULT CALLBACK SerialDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 	switch (msg) {
 		case WM_KEYDOWN:
-			// Edit controlã‚Å CTRL+A ‚ğ‰Ÿ‰º‚·‚é‚ÆAƒeƒLƒXƒg‚ğ‘S‘I‘ğ‚·‚éB
+			// Edit controlä¸Šã§ CTRL+A ã‚’æŠ¼ä¸‹ã™ã‚‹ã¨ã€ãƒ†ã‚­ã‚¹ãƒˆã‚’å…¨é¸æŠã™ã‚‹ã€‚
 			if (wp == 'A' && GetKeyState(VK_CONTROL) < 0) {
 				PostMessage(hWnd, EM_SETSEL, 0, -1);
 				return 0;
@@ -136,7 +136,7 @@ static LRESULT CALLBACK SerialDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, 
 			break;
 
 		case WM_MOUSEWHEEL: {
-			// CTRLorSHIFT + ƒ}ƒEƒXƒzƒC[ƒ‹‚Ìê‡A‰¡ƒXƒNƒ[ƒ‹‚³‚¹‚éB
+			// CTRLorSHIFT + ãƒã‚¦ã‚¹ãƒ›ã‚¤ãƒ¼ãƒ«ã®å ´åˆã€æ¨ªã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã•ã›ã‚‹ã€‚
 			WORD keys;
 			short delta;
 			BOOL page;
@@ -164,12 +164,12 @@ static LRESULT CALLBACK SerialDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, 
 }
 
 /**
- *	ƒVƒŠƒAƒ‹ƒ|[ƒgƒhƒƒbƒvƒ_ƒEƒ“‚ğİ’è‚·‚é
+ *	ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ã‚’è¨­å®šã™ã‚‹
  *	ITEMDATA
- *		0...	PortInfo‚Ìæ“ª‚©‚ç‚Ì”Ô† 0‚©‚çPortInfoCount-1‚Ü‚Å
- *		-1		Œ»İ‘¶İ‚µ‚È‚¢ƒ|[ƒg
- *		-2		"‘¶İ‚·‚éƒ|[ƒg‚Ì‚İ•\¦"
- *		-3		"‘S‚Ä‚Ìƒ|[ƒg‚ğ•\¦"
+ *		0...	PortInfoã®å…ˆé ­ã‹ã‚‰ã®ç•ªå· 0ã‹ã‚‰PortInfoCount-1ã¾ã§
+ *		-1		ç¾åœ¨å­˜åœ¨ã—ãªã„ãƒãƒ¼ãƒˆ
+ *		-2		"å­˜åœ¨ã™ã‚‹ãƒãƒ¼ãƒˆã®ã¿è¡¨ç¤º"
+ *		-3		"å…¨ã¦ã®ãƒãƒ¼ãƒˆã‚’è¡¨ç¤º"
  */
 static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 {
@@ -188,11 +188,11 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 	}
 #endif
 	if (dlg_data->ComPortInfoCount == 0) {
-		// ƒ|[ƒg‚ª‘¶İ‚µ‚Ä‚¢‚È‚¢‚Æ‚«‚Í‚·‚×‚Ä•\¦‚·‚é
+		// ãƒãƒ¼ãƒˆãŒå­˜åœ¨ã—ã¦ã„ãªã„ã¨ãã¯ã™ã¹ã¦è¡¨ç¤ºã™ã‚‹
 		show_all_port = TRUE;
 	}
 
-	// "COM%d" ‚Å‚Í‚È‚¢ƒ|[ƒg
+	// "COM%d" ã§ã¯ãªã„ãƒãƒ¼ãƒˆ
 	int port_index = 0;
 	int skip_count = 0;
 	const ComPortInfo_t *port_info = dlg_data->ComPortInfoPtr;
@@ -216,7 +216,7 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 		skip_count++;
 	}
 
-	// “`““I‚È "COM%d"
+	// ä¼çµ±çš„ãª "COM%d"
 	int sel_index = 0;
 	int com_count = 0;
 	BOOL all = show_all_port;
@@ -227,7 +227,7 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 		if (port_index < dlg_data->ComPortInfoCount) {
 			p = port_info + port_index;
 			if (p->port_no == i) {
-				// ComPortInfo ‚ÅŒŸo‚Å‚«‚½ƒ|[ƒg
+				// ComPortInfo ã§æ¤œå‡ºã§ããŸãƒãƒ¼ãƒˆ
 				item_data = port_index;
 				port_index++;
 
@@ -241,9 +241,9 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 		}
 
 		if (com_name == NULL) {
-			// ŒŸo‚Å‚«‚È‚©‚Á‚½ƒ|[ƒg(‘¶İ‚µ‚È‚¢ƒ|[ƒg)
+			// æ¤œå‡ºã§ããªã‹ã£ãŸãƒãƒ¼ãƒˆ(å­˜åœ¨ã—ãªã„ãƒãƒ¼ãƒˆ)
 			if (!all && (i != ts->ComPort)) {
-				// ‚·‚×‚Ä•\¦‚µ‚È‚¢
+				// ã™ã¹ã¦è¡¨ç¤ºã—ãªã„
 				continue;
 			}
 			aswprintf(&com_name, L"COM%d", i);
@@ -276,12 +276,12 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 
 	ExpandCBWidth(hWnd, id);
 	if (dlg_data->ComPortInfoCount == 0) {
-		// COMƒ|[ƒg‚È‚µ
+		// COMãƒãƒ¼ãƒˆãªã—
 		serial_dlg_set_comport_info(hWnd, dlg_data, -1, -1, NULL);
 	}
 	else {
 		if (cv.Open && (cv.PortType == IdSerial)) {
-			// Ú‘±’†‚Ì‚Í‘I‘ğ‚Å‚«‚È‚¢‚æ‚¤‚É‚·‚é
+			// æ¥ç¶šä¸­ã®æ™‚ã¯é¸æŠã§ããªã„ã‚ˆã†ã«ã™ã‚‹
 			EnableWindow(GetDlgItem(hWnd, id), FALSE);
 		}
 		serial_dlg_set_comport_info(hWnd, dlg_data, -1, ts->ComPort, NULL);
@@ -290,9 +290,9 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 }
 
 /*
- * ƒVƒŠƒAƒ‹ƒ|[ƒgİ’èƒ_ƒCƒAƒƒO
+ * ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆè¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°
  *
- * ƒVƒŠƒAƒ‹ƒ|[ƒg”‚ª0‚Ì‚ÍŒÄ‚Î‚ê‚È‚¢
+ * ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆæ•°ãŒ0ã®æ™‚ã¯å‘¼ã°ã‚Œãªã„
  */
 static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -364,7 +364,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 			CenterWindow(Dialog, GetParent(Dialog));
 
-			// Edit control‚ğƒTƒuƒNƒ‰ƒX‰»‚·‚éB
+			// Edit controlã‚’ã‚µãƒ–ã‚¯ãƒ©ã‚¹åŒ–ã™ã‚‹ã€‚
 			dlg_data->g_deltaSumSerialDlg = 0;
 			SetWindowLongPtrW(GetDlgItem(Dialog, IDC_SERIALTEXT), GWLP_USERDATA, (LONG_PTR)dlg_data);
 			dlg_data->g_defSerialDlgEditWndProc = (WNDPROC)SetWindowLongPtrW(
@@ -423,13 +423,13 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 				ts->DelayPerLine = GetDlgItemInt(Dialog,IDC_SERIALDELAYLINE,NULL,FALSE);
 
-				// TODO íœ
-				// ‘S”Êƒ^ƒu‚Ìu•W€‚Ìƒ|[ƒgv‚ÅƒfƒtƒHƒ‹ƒg‚ÌÚ‘±ƒ|[ƒg‚ğw’è‚·‚é
-				// ‚±‚±‚Å‚Íw’è‚µ‚È‚¢
+				// TODO å‰Šé™¤
+				// å…¨èˆ¬ã‚¿ãƒ–ã®ã€Œæ¨™æº–ã®ãƒãƒ¼ãƒˆã€ã§ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®æ¥ç¶šãƒãƒ¼ãƒˆã‚’æŒ‡å®šã™ã‚‹
+				// ã“ã“ã§ã¯æŒ‡å®šã—ãªã„
 				// ts->PortType = IdSerial;
 
-				// ƒ{[ƒŒ[ƒg‚ª•ÏX‚³‚ê‚é‚±‚Æ‚ª‚ ‚é‚Ì‚ÅAƒ^ƒCƒgƒ‹Ä•\¦‚Ì
-				// ƒƒbƒZ[ƒW‚ğ”ò‚Î‚·‚æ‚¤‚É‚µ‚½B (2007.7.21 maya)
+				// ãƒœãƒ¼ãƒ¬ãƒ¼ãƒˆãŒå¤‰æ›´ã•ã‚Œã‚‹ã“ã¨ãŒã‚ã‚‹ã®ã§ã€ã‚¿ã‚¤ãƒˆãƒ«å†è¡¨ç¤ºã®
+				// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é£›ã°ã™ã‚ˆã†ã«ã—ãŸã€‚ (2007.7.21 maya)
 				PostMessage(GetParent(Dialog),WM_USER_CHANGETITLE,0,0);
 
 				break;
@@ -446,20 +446,20 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			switch (LOWORD(wParam)) {
 				case IDC_SERIALPORT:
 					if (HIWORD(wParam) == CBN_SELCHANGE) {
-						// ƒŠƒXƒg‚©‚çCOMƒ|[ƒg‚ª‘I‘ğ‚³‚ê‚½
+						// ãƒªã‚¹ãƒˆã‹ã‚‰COMãƒãƒ¼ãƒˆãŒé¸æŠã•ã‚ŒãŸ
 						SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
 						LRESULT sel = SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_GETCURSEL, 0, 0);
 						int item_data = (int)SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_GETITEMDATA, sel, 0);
 						if (item_data >= 0) {
-							// Ú×î•ñ‚ğ•\¦‚·‚é
+							// è©³ç´°æƒ…å ±ã‚’è¡¨ç¤ºã™ã‚‹
 							serial_dlg_set_comport_info(Dialog, dlg_data, item_data, -1, NULL);
 						}
 						else if (item_data == -1) {
-							// î•ñ‚È‚µ‚ğ•\¦‚·‚é
+							// æƒ…å ±ãªã—ã‚’è¡¨ç¤ºã™ã‚‹
 							serial_dlg_set_comport_info(Dialog, dlg_data, -1, -1, NULL);
 						}
 						else {
-							// ‘I‘ğ•û–@•ÏX
+							// é¸æŠæ–¹æ³•å¤‰æ›´
 							dlg_data->show_all_port = (item_data == -2) ? FALSE : TRUE;
 							SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_RESETCONTENT, 0, 0);
 							SetPortDrop(Dialog, IDC_SERIALPORT, dlg_data);

@@ -53,15 +53,15 @@
 
 #define	ENABLE_CELL_INDEX	0
 
-// ƒoƒbƒtƒ@“à‚Ì”¼Šp1•¶š•ª‚Ìî•ñ
+// ãƒãƒƒãƒ•ã‚¡å†…ã®åŠè§’1æ–‡å­—åˆ†ã®æƒ…å ±
 typedef struct {
 	char32_t u32;
 	char32_t u32_last;
-	char WidthProperty;				// 'W' or 'F' or 'H' or 'A' or 'n'(Narrow) or 'N'(Neutual) (•¶š‚Ì‘®«)
-	char cell;			// •¶š‚Ìcell” 1/2/3+=”¼Šp,‘SŠp,3ˆÈã
-						// 2ˆÈã‚Ì‚Æ‚«A‚±‚Ì•¶š‚ÌŒã‚ë‚Épadding‚ªcell-1ŒÂ‘±‚­
-	char Padding;					// TRUE = ‘SŠp‚ÌŸ‚Ì‹l‚ß•¨ or s––‚Ì‹l‚ß•¨
-	char Emoji;						// TRUE = ŠG•¶š
+	char WidthProperty;				// 'W' or 'F' or 'H' or 'A' or 'n'(Narrow) or 'N'(Neutual) (æ–‡å­—ã®å±æ€§)
+	char cell;			// æ–‡å­—ã®cellæ•° 1/2/3+=åŠè§’,å…¨è§’,3ä»¥ä¸Š
+						// 2ä»¥ä¸Šã®ã¨ãã€ã“ã®æ–‡å­—ã®å¾Œã‚ã«paddingãŒcell-1å€‹ç¶šã
+	char Padding;					// TRUE = å…¨è§’ã®æ¬¡ã®è©°ã‚ç‰© or è¡Œæœ«ã®è©°ã‚ç‰©
+	char Emoji;						// TRUE = çµµæ–‡å­—
 	unsigned char CombinationCharCount16;	// character count
 	unsigned char CombinationCharSize16;		// buffer size
 	unsigned char CombinationCharCount32;
@@ -75,18 +75,18 @@ typedef struct {
 	unsigned char attr2;
 	unsigned short ansi_char;
 #if ENABLE_CELL_INDEX
-	int idx;	// ƒZƒ‹’Ê‚µ”Ô†
+	int idx;	// ã‚»ãƒ«é€šã—ç•ªå·
 #endif
 } buff_char_t;
 
 #define BuffXMax TermWidthMax
 //#define BuffYMax 100000
 //#define BuffSizeMax 8000000
-// ƒXƒNƒ[ƒ‹ƒoƒbƒtƒ@‚ÌÅ‘å’·‚ğŠg’£ (2004.11.28 yutaka)
+// ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ãƒãƒƒãƒ•ã‚¡ã®æœ€å¤§é•·ã‚’æ‹¡å¼µ (2004.11.28 yutaka)
 #define BuffYMax 500000
 #define BuffSizeMax (BuffYMax * 80)
 
-// 1•¶š‚ ‚½‚è‚ÌƒRƒ“ƒrƒl[ƒVƒ‡ƒ“ƒoƒbƒtƒ@Å‘åƒTƒCƒY
+// 1æ–‡å­—ã‚ãŸã‚Šã®ã‚³ãƒ³ãƒ“ãƒãƒ¼ã‚·ãƒ§ãƒ³ãƒãƒƒãƒ•ã‚¡æœ€å¤§ã‚µã‚¤ã‚º
 #define MAX_CHAR_SIZE	100
 
 // status line
@@ -106,20 +106,20 @@ static LONG BufferSize;
 static int NumOfLinesInBuff;
 static int BuffStartAbs, BuffEndAbs;
 
-// ‘I‘ğ
-static BOOL Selected;			// TRUE = —Ìˆæ‘I‘ğ‚³‚ê‚Ä‚¢‚é
+// é¸æŠ
+static BOOL Selected;			// TRUE = é ˜åŸŸé¸æŠã•ã‚Œã¦ã„ã‚‹
 static BOOL Selecting;			// ?
 static POINT SelectStart;
 static POINT SelectEnd;
-static POINT ClickCell;			// ƒNƒŠƒbƒN‚µ‚½•¶šcell
+static POINT ClickCell;			// ã‚¯ãƒªãƒƒã‚¯ã—ãŸæ–‡å­—cell
 static POINT SelectEndOld;
 static DWORD SelectStartTime;
 static BOOL BoxSelect;
 static POINT DblClkStart, DblClkEnd;
 
-// •`‰æ
-static int StrChangeStart;	// •`‰æŠJn X (Y=CursorY)
-static int StrChangeCount;	// •`‰æƒLƒƒƒ‰ƒNƒ^”(”¼Šp’PˆÊ),0‚Ì‚Æ‚«•`‰æ‚·‚é‚à‚Ì‚ª‚È‚¢
+// æç”»
+static int StrChangeStart;	// æç”»é–‹å§‹ X (Y=CursorY)
+static int StrChangeCount;	// æç”»ã‚­ãƒ£ãƒ©ã‚¯ã‚¿æ•°(åŠè§’å˜ä½),0ã®ã¨ãæç”»ã™ã‚‹ã‚‚ã®ãŒãªã„
 static BOOL UseUnicodeApi;
 
 static BOOL SeveralPageSelect;  // add (2005.5.15 yutaka)
@@ -130,20 +130,20 @@ static char *SaveBuff = NULL;
 static int SaveBuffX;
 static int SaveBuffY;
 
-// ANSI•\¦—p‚É•ÏŠ·‚·‚é‚Æ‚«‚ÌCodePage
+// ANSIè¡¨ç¤ºç”¨ã«å¤‰æ›ã™ã‚‹ã¨ãã®CodePage
 static int CodePage = 932;
 
 static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd);
 static void BuffDrawLineIPrn(int SY, int IStart, int IEnd);
 
 /**
- *	buff_char_t ‚ğ relƒZƒ‹ˆÚ“®‚·‚é
+ *	buff_char_t ã‚’ relã‚»ãƒ«ç§»å‹•ã™ã‚‹
  *
- *	@param	CodeBuffW_	•¶šƒoƒbƒtƒ@‚Ìæ“ªƒ|ƒCƒ“ƒ^
- *	@param	BufferSize_	•¶šƒoƒbƒtƒ@‚ÌƒTƒCƒY(buff_char_t’PˆÊ)
- *	@param	p			ˆÚ“®‚³‚¹‚éƒ|ƒCƒ“ƒ^
- *	@param	rel			ˆÚ“®—Ê
- *	@retval	ˆÚ“®Œã‚Ìƒ|ƒCƒ“ƒ^
+ *	@param	CodeBuffW_	æ–‡å­—ãƒãƒƒãƒ•ã‚¡ã®å…ˆé ­ãƒã‚¤ãƒ³ã‚¿
+ *	@param	BufferSize_	æ–‡å­—ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚º(buff_char_tå˜ä½)
+ *	@param	p			ç§»å‹•ã•ã›ã‚‹ãƒã‚¤ãƒ³ã‚¿
+ *	@param	rel			ç§»å‹•é‡
+ *	@retval	ç§»å‹•å¾Œã®ãƒã‚¤ãƒ³ã‚¿
  */
 static buff_char_t *GetPtrRel(buff_char_t *CodeBuffW_, size_t BufferSize_, buff_char_t *p, int rel)
 {
@@ -202,7 +202,7 @@ static void CopyCombinationBuf(buff_char_t *dest, const buff_char_t *src)
 {
 	FreeCombinationBuf(dest);
 
-	// \‘¢‘Ì‚ğƒRƒs[‚·‚é
+	// æ§‹é€ ä½“ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 #if ENABLE_CELL_INDEX
 	int idx = dest->idx;
 #endif
@@ -249,8 +249,8 @@ static void BuffSetChar2(buff_char_t *buff, char32_t u32, char property, BOOL ha
 	}
 	else {
 		if (u32 == 0x203e && CodePage == 932) {
-			// U+203e OVERLINE “Á•Êˆ—
-			//	 U+203e‚Í0x7e'~'‚É•ÏŠ·
+			// U+203e OVERLINE ç‰¹åˆ¥å‡¦ç†
+			//	 U+203eã¯0x7e'~'ã«å¤‰æ›
 			//p->ansi_char = 0x7e7e;
 			p->ansi_char = 0x7e;
 		}
@@ -289,13 +289,13 @@ static void BuffSetChar(buff_char_t *buff, char32_t u32, char property)
 }
 
 /**
- *	•¶š‚Ì’Ç‰ÁAƒRƒ“ƒrƒl[ƒVƒ‡ƒ“
+ *	æ–‡å­—ã®è¿½åŠ ã€ã‚³ãƒ³ãƒ“ãƒãƒ¼ã‚·ãƒ§ãƒ³
  */
 static void BuffAddChar(buff_char_t *buff, char32_t u32)
 {
 	buff_char_t *p = buff;
 	assert(p->u32 != 0);
-	// Œã‚É‘±‚­•¶š—Ìˆæ‚ğŠg‘å‚·‚é
+	// å¾Œã«ç¶šãæ–‡å­—é ˜åŸŸã‚’æ‹¡å¤§ã™ã‚‹
 	if (p->CombinationCharSize16 < p->CombinationCharCount16 + 2) {
 		size_t new_size = p->CombinationCharSize16;
 		new_size = new_size == 0 ? 5 : new_size * 2;
@@ -380,11 +380,11 @@ static void memmoveW(buff_char_t *dest, const buff_char_t *src, size_t count)
 
 
 	if (dest < src) {
-		// ‘O‚©‚çƒRƒs[‚·‚é? -> memcpyW() ‚Åok
+		// å‰ã‹ã‚‰ã‚³ãƒ”ãƒ¼ã™ã‚‹? -> memcpyW() ã§ok
 		memcpyW(dest, src, count);
 	}
 	else {
-		// Œã‚ë‚©‚çƒRƒs[‚·‚é
+		// å¾Œã‚ã‹ã‚‰ã‚³ãƒ”ãƒ¼ã™ã‚‹
 		dest += count - 1;
 		src += count - 1;
 		for (i = 0; i < count; i++) {
@@ -441,7 +441,7 @@ static LONG PrevLinePtr(LONG Ptr)
 }
 
 /**
- * ƒ|ƒCƒ“ƒ^‚ÌˆÊ’u‚©‚ç x,y ‚ğ‹‚ß‚é
+ * ãƒã‚¤ãƒ³ã‚¿ã®ä½ç½®ã‹ã‚‰ x,y ã‚’æ±‚ã‚ã‚‹
  */
 static void GetPosFromPtr(const buff_char_t *b, int *bx, int *by)
 {
@@ -800,11 +800,11 @@ static void BuffScroll(int Count, int Bottom)
 /**
  * If cursor is on left/right half of a Kanji, erase it.
  *	@param	LR	left(0)/right(1) flag
- *				0	ƒJ[ƒ\ƒ‹‚ªŠ¿š‚Ì¶‘¤
- *				1	ƒJ[ƒ\ƒ‹‚ªŠ¿š‚Ì‰E‘¤
- *	@return		ˆ—‚µ‚½cell”
- *				0	ˆ—‚µ‚È‚©‚Á‚½
- *				1,2	ˆ—‚µ‚½
+ *				0	ã‚«ãƒ¼ã‚½ãƒ«ãŒæ¼¢å­—ã®å·¦å´
+ *				1	ã‚«ãƒ¼ã‚½ãƒ«ãŒæ¼¢å­—ã®å³å´
+ *	@return		å‡¦ç†ã—ãŸcellæ•°
+ *				0	å‡¦ç†ã—ãªã‹ã£ãŸ
+ *				1,2	å‡¦ç†ã—ãŸ
  */
 static int EraseKanji(int LR)
 {
@@ -814,13 +814,13 @@ static int EraseKanji(int LR)
 	int cell = 0;
 
 	if (CursorX < LR) {
-		// ‘SŠp”»’è‚Å‚«‚È‚¢
+		// å…¨è§’åˆ¤å®šã§ããªã„
 		return 0;
 	}
 	bx = CursorX-LR;
 	p = &CodeLineW[bx];
 	if (IsBuffFullWidth(p)) {
-		// ‘SŠp‚ğ‚Â‚Ô‚·
+		// å…¨è§’ã‚’ã¤ã¶ã™
 		BuffSetChar(p, ' ', 'H');
 		p->attr = CurCharAttr.Attr;
 		p->attr2 = CurCharAttr.Attr2;
@@ -1143,19 +1143,19 @@ void BuffDeleteChars(int Count)
 	b = &CodeLineW[CursorX];
 
 	if (IsBuffPadding(b)) {
-		// ‘SŠp‚Ì‰E‘¤A‘SŠp‚ğƒXƒy[ƒX‚É’u‚«Š·‚¦‚é
+		// å…¨è§’ã®å³å´ã€å…¨è§’ã‚’ã‚¹ãƒšãƒ¼ã‚¹ã«ç½®ãæ›ãˆã‚‹
 		BuffSetChar(b - 1, ' ', 'H');
 		BuffSetChar(b, ' ', 'H');
 	}
 	if (IsBuffFullWidth(b)) {
-		// ‘SŠp‚Ì¶‘¤A‘SŠp‚ğƒXƒy[ƒX‚É’u‚«Š·‚¦‚é
+		// å…¨è§’ã®å·¦å´ã€å…¨è§’ã‚’ã‚¹ãƒšãƒ¼ã‚¹ã«ç½®ãæ›ãˆã‚‹
 		BuffSetChar(b, ' ', 'H');
 		BuffSetChar(b + 1, ' ', 'H');
 	}
 	if (Count > 1) {
-		// I’[‚ğƒ`ƒFƒbƒN
+		// çµ‚ç«¯ã‚’ãƒã‚§ãƒƒã‚¯
 		if (IsBuffPadding(b + Count)) {
-			// ‘SŠp‚Ì‰E‘¤A‘SŠp‚ğƒXƒy[ƒX‚É’u‚«Š·‚¦‚é
+			// å…¨è§’ã®å³å´ã€å…¨è§’ã‚’ã‚¹ãƒšãƒ¼ã‚¹ã«ç½®ãæ›ãˆã‚‹
 			BuffSetChar(b + Count - 1, ' ', 'H');
 			BuffSetChar(b + Count, ' ', 'H');
 		}
@@ -1334,7 +1334,7 @@ void BuffFillBox(char ch, int XStart, int YStart, int XEnd, int YEnd)
 }
 
 //
-// TODO: 1 origin ‚É‚È‚Á‚Ä‚é‚Ì‚ğ 0 origin ‚É’¼‚·
+// TODO: 1 origin ã«ãªã£ã¦ã‚‹ã®ã‚’ 0 origin ã«ç›´ã™
 //
 void BuffCopyBox(
 	int SrcXStart, int SrcYStart, int SrcXEnd, int SrcYEnd, int SrcPage,
@@ -1611,8 +1611,8 @@ void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr 
 }
 
 /**
- *	(Line,CharPtr)ˆÊ’u‚ª‘SŠp‚Ì‰E‘¤(•¶š’·‚³N cell‚Ì1cell–Ú‚Å‚Í‚È‚¢)‚Æ‚«
- *	æ“ª‚Ì•¶š‚ÌˆÊ’u‚ğ•Ô‚·
+ *	(Line,CharPtr)ä½ç½®ãŒå…¨è§’ã®å³å´(æ–‡å­—é•·ã•N cellã®1cellç›®ã§ã¯ãªã„)ã¨ã
+ *	å…ˆé ­ã®æ–‡å­—ã®ä½ç½®ã‚’è¿”ã™
  *
  *	If CharPtr is on the right half of a DBCS character
  *	return pointer to the left half
@@ -1626,10 +1626,10 @@ static int LeftHalfOfDBCS(LONG Line, int CharPtr)
 	int x = CharPtr;
 	while(x > 0) {
 		if ((CodeBuffW[Line+x].Padding) == FALSE) {
-			// padding‚Å‚Í‚È‚¢
+			// paddingã§ã¯ãªã„
 			break;
 		}
-		assert(x > 0);	// s“ª‚Å padding?
+		assert(x > 0);	// è¡Œé ­ã§ padding?
 		x--;
 	}
 	return x;
@@ -1679,19 +1679,19 @@ static int MoveCharPtr(LONG Line, int *x, int dx)
 }
 
 /**
- *	(ƒNƒŠƒbƒvƒ{[ƒh—p‚É)•¶š—ñ‚ğæ“¾
- *	@param[in]	sx,sy,ex,ey	‘I‘ğ—Ìˆæ
- *	@param[in]	box_select	TRUE=” Œ^(‹éŒ`)‘I‘ğ
- *							FALSE=s‘I‘ğ
- *	@param[out] _str_len	•¶š—ñ’·(•¶š’[L'\0'‚ğŠÜ‚Ş)
- *				NULL‚Ì‚Æ‚«‚Í•Ô‚³‚È‚¢
- *	@return		•¶š—ñ
- *				g—pŒã‚Í free() ‚·‚é‚±‚Æ
+ *	(ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ç”¨ã«)æ–‡å­—åˆ—ã‚’å–å¾—
+ *	@param[in]	sx,sy,ex,ey	é¸æŠé ˜åŸŸ
+ *	@param[in]	box_select	TRUE=ç®±å‹(çŸ©å½¢)é¸æŠ
+ *							FALSE=è¡Œé¸æŠ
+ *	@param[out] _str_len	æ–‡å­—åˆ—é•·(æ–‡å­—ç«¯L'\0'ã‚’å«ã‚€)
+ *				NULLã®ã¨ãã¯è¿”ã•ãªã„
+ *	@return		æ–‡å­—åˆ—
+ *				ä½¿ç”¨å¾Œã¯ free() ã™ã‚‹ã“ã¨
  */
 static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_select, size_t *_str_len)
 {
 	wchar_t *str_w;
-	size_t str_size;	// Šm•Û‚µ‚½ƒTƒCƒY
+	size_t str_size;	// ç¢ºä¿ã—ãŸã‚µã‚¤ã‚º
 	size_t k;
 	LONG TmpPtr;
 	int x, y;
@@ -1706,8 +1706,8 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 	TmpPtr = GetLinePtr(sy);
 	k = 0;
 	for (y = sy; y<=ey ; y++) {
-		int IStart;		// ŠJn
-		int IEnd;		// I—¹
+		int IStart;		// é–‹å§‹
+		int IEnd;		// çµ‚äº†
 		BOOL LineContinued;
 
 		if (box_select) {
@@ -1716,55 +1716,55 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 			LineContinued = FALSE;
 		}
 		else {
-			// s‘I‘ğ
+			// è¡Œé¸æŠ
 			IStart = (y == sy) ? sx : 0;
 			LineContinued = FALSE;
 			if (y == ey) {
-				// 1s‘I‘ğA–”‚Í
-				// •¡”s‘I‘ğ‚ÌÅŒã‚Ìs
+				// 1è¡Œé¸æŠæ™‚ã€åˆã¯
+				// è¤‡æ•°è¡Œé¸æŠæ™‚ã®æœ€å¾Œã®è¡Œ
 				IEnd = ex - 1;
 			}
 			else {
-				// •¡”s‘I‘ğ‚Ì“r’†‚Ìs
-				// s––‚Ü‚Å‘I‘ğ‚³‚ê‚Ä‚¢‚é
+				// è¤‡æ•°è¡Œé¸æŠæ™‚ã®é€”ä¸­ã®è¡Œ
+				// è¡Œæœ«ã¾ã§é¸æŠã•ã‚Œã¦ã„ã‚‹
 				IEnd = NumOfColumns - 1;
 
-				// Œp‘±sƒRƒs[İ’è
+				// ç¶™ç¶šè¡Œã‚³ãƒ”ãƒ¼è¨­å®š
 				if (ts.EnableContinuedLineCopy) {
 					LONG NextTmpPtr = NextLinePtr(TmpPtr);
 					if ((CodeBuffW[NextTmpPtr].attr & AttrLineContinued) != 0) {
-						// Ÿ‚Ìs‚ÉŒp‘±‚µ‚Ä‚¢‚é
+						// æ¬¡ã®è¡Œã«ç¶™ç¶šã—ã¦ã„ã‚‹
 						LineContinued = TRUE;
 					}
 				}
 			}
 		}
 
-		// IEnd=ƒRƒs[‚ª•K—v‚ÈÅŒã‚ÌˆÊ’u
+		// IEnd=ã‚³ãƒ”ãƒ¼ãŒå¿…è¦ãªæœ€å¾Œã®ä½ç½®
 		if (LineContinued) {
-			// s‚Ìˆê”ÔÅŒã‚Ü‚ÅƒRƒs[‚·‚é
+			// è¡Œã®ä¸€ç•ªæœ€å¾Œã¾ã§ã‚³ãƒ”ãƒ¼ã™ã‚‹
 			IEnd++;
 		}
 		else {
-			// Ÿ‚Ìs‚ÉŒp‘±‚µ‚Ä‚¢‚È‚¢‚È‚çAƒXƒy[ƒX‚ğíœ‚·‚é
+			// æ¬¡ã®è¡Œã«ç¶™ç¶šã—ã¦ã„ãªã„ãªã‚‰ã€ã‚¹ãƒšãƒ¼ã‚¹ã‚’å‰Šé™¤ã™ã‚‹
 			while (IEnd >= IStart) {
-				// ƒRƒs[•s—v‚È" "(0x20)‚ğíœ
+				// ã‚³ãƒ”ãƒ¼ä¸è¦ãª" "(0x20)ã‚’å‰Šé™¤
 				const buff_char_t *b = &CodeBuffW[TmpPtr + IEnd];
 				if (b->u32 != 0x20) {
-					// ƒXƒy[ƒXˆÈŠO‚¾‚Á‚½
+					// ã‚¹ãƒšãƒ¼ã‚¹ä»¥å¤–ã ã£ãŸ
 					IEnd++;
 					break;
 				}
 				if (IEnd == 0) {
 					break;
 				}
-				// Ø‚è‹l‚ß‚é
+				// åˆ‡ã‚Šè©°ã‚ã‚‹
 				MoveCharPtr(TmpPtr,&IEnd,-1);
 			}
 		}
 
-		// 1ƒ‰ƒCƒ“•¶š—ñ‚ğƒRƒs[‚·‚é
-		//   IEnd=ƒRƒs[‚ª•K—v‚ÈÅŒã‚ÌˆÊ’u+1
+		// 1ãƒ©ã‚¤ãƒ³æ–‡å­—åˆ—ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
+		//   IEnd=ã‚³ãƒ”ãƒ¼ãŒå¿…è¦ãªæœ€å¾Œã®ä½ç½®+1
 		x = IStart;
 		while (x < IEnd) {
 			const buff_char_t *b = &CodeBuffW[TmpPtr + x];
@@ -1779,7 +1779,7 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 				}
 				{
 					int i;
-					// ƒRƒ“ƒrƒl[ƒVƒ‡ƒ“
+					// ã‚³ãƒ³ãƒ“ãƒãƒ¼ã‚·ãƒ§ãƒ³
 					if (k + b->CombinationCharCount16 >= str_size) {
 						str_size += + b->CombinationCharCount16;
 						str_w = realloc(str_w, sizeof(wchar_t) * str_size);
@@ -1793,7 +1793,7 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 		}
 
 		if (y < ey) {
-			// ‰üs‚ğ‰Á‚¦‚é(ÅŒã‚ÌsˆÈŠO‚Ìê‡)
+			// æ”¹è¡Œã‚’åŠ ãˆã‚‹(æœ€å¾Œã®è¡Œä»¥å¤–ã®å ´åˆ)
 			if (!LineContinued) {
 				str_w[k++] = 0x0d;
 				str_w[k++] = 0x0a;
@@ -1813,19 +1813,19 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 }
 
 /**
- *	1ƒZƒ‹•ª‚ğwchar_t•¶š—ñ‚É“WŠJ‚·‚é
- *	@param[in]		b			1ƒZƒ‹•ª‚Ì•¶šî•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *	@param[in,out]	buf			•¶š—ñ“WŠJæ NULL‚Ìê‡‚Í“WŠJ‚³‚ê‚È‚¢
- *	@param[in]		buf_size	buf‚Ì•¶š”(buff == NULL‚Ìê‡‚ÍQÆ‚³‚ê‚È‚¢)
- *	@param[out]		too_small	NULL ‚Ì‚Æ‚«î•ñ‚ğ•Ô‚³‚È‚¢
- *								TRUE	ƒoƒbƒtƒ@ƒTƒCƒY•s‘«
- *										–ß‚è’l‚Í•K—v‚È•¶š”‚ª•Ô‚é
- *								FALSE	•¶š‚ğ“WŠJ‚Å‚«‚½
- *	@retrun			•¶š”		o—Í•¶š”
- *								0‚Ì‚Æ‚«A•¶šo—Í‚È‚µ
+ *	1ã‚»ãƒ«åˆ†ã‚’wchar_tæ–‡å­—åˆ—ã«å±•é–‹ã™ã‚‹
+ *	@param[in]		b			1ã‚»ãƒ«åˆ†ã®æ–‡å­—æƒ…å ±ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *	@param[in,out]	buf			æ–‡å­—åˆ—å±•é–‹å…ˆ NULLã®å ´åˆã¯å±•é–‹ã•ã‚Œãªã„
+ *	@param[in]		buf_size	bufã®æ–‡å­—æ•°(buff == NULLã®å ´åˆã¯å‚ç…§ã•ã‚Œãªã„)
+ *	@param[out]		too_small	NULL ã®ã¨ãæƒ…å ±ã‚’è¿”ã•ãªã„
+ *								TRUE	ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºä¸è¶³
+ *										æˆ»ã‚Šå€¤ã¯å¿…è¦ãªæ–‡å­—æ•°ãŒè¿”ã‚‹
+ *								FALSE	æ–‡å­—ã‚’å±•é–‹ã§ããŸ
+ *	@retrun			æ–‡å­—æ•°		å‡ºåŠ›æ–‡å­—æ•°
+ *								0ã®ã¨ãã€æ–‡å­—å‡ºåŠ›ãªã—
  *
  *	TODO
- *		GetWCS() ‚Æ“¯‚¶?
+ *		GetWCS() ã¨åŒã˜?
  */
 static size_t expand_wchar(const buff_char_t *b, wchar_t *buf, size_t buf_size, BOOL *too_samll)
 {
@@ -1838,26 +1838,26 @@ static size_t expand_wchar(const buff_char_t *b, wchar_t *buf, size_t buf_size, 
 		return 0;
 	}
 
-	// ’·‚³‚ğ‘ª‚é
+	// é•·ã•ã‚’æ¸¬ã‚‹
 	len = 0;
 	if (b->wc2[1] == 0) {
-		// ƒTƒƒQ[ƒgƒyƒA‚Å‚Í‚È‚¢
+		// ã‚µãƒ­ã‚²ãƒ¼ãƒˆãƒšã‚¢ã§ã¯ãªã„
 		len++;
 	} else {
-		// ƒTƒƒQ[ƒgƒyƒA
+		// ã‚µãƒ­ã‚²ãƒ¼ãƒˆãƒšã‚¢
 		len += 2;
 	}
-	// ƒRƒ“ƒrƒl[ƒVƒ‡ƒ“
+	// ã‚³ãƒ³ãƒ“ãƒãƒ¼ã‚·ãƒ§ãƒ³
 	len += b->CombinationCharCount16;
 
 	if (buf == NULL) {
-		// ’·‚³‚¾‚¯‚ğ•Ô‚·
+		// é•·ã•ã ã‘ã‚’è¿”ã™
 		return len;
 	}
 
-	// ƒoƒbƒtƒ@‚Éû‚Ü‚é?
+	// ãƒãƒƒãƒ•ã‚¡ã«åã¾ã‚‹?
 	if (len > buf_size) {
-		// ƒoƒbƒtƒ@‚Éû‚Ü‚ç‚È‚¢
+		// ãƒãƒƒãƒ•ã‚¡ã«åã¾ã‚‰ãªã„
 		if (too_samll != NULL) {
 			*too_samll = TRUE;
 		}
@@ -1867,7 +1867,7 @@ static size_t expand_wchar(const buff_char_t *b, wchar_t *buf, size_t buf_size, 
 		*too_samll = FALSE;
 	}
 
-	// “WŠJ‚µ‚Ä‚¢‚­
+	// å±•é–‹ã—ã¦ã„ã
 	*buf++ = b->wc2[0];
 	if (b->wc2[1] != 0) {
 		*buf++ = b->wc2[1];
@@ -1880,14 +1880,14 @@ static size_t expand_wchar(const buff_char_t *b, wchar_t *buf, size_t buf_size, 
 }
 
 /**
- *	(x,y) ‚Ì1•¶š‚ª str‚Æ“¯ˆê‚©’²‚×‚é
- *		*’ 1•¶š‚ª•¡”‚Ìwchar_t‚©‚ç\¬‚³‚ê‚Ä‚¢‚é
+ *	(x,y) ã®1æ–‡å­—ãŒ strã¨åŒä¸€ã‹èª¿ã¹ã‚‹
+ *		*æ³¨ 1æ–‡å­—ãŒè¤‡æ•°ã®wchar_tã‹ã‚‰æ§‹æˆã•ã‚Œã¦ã„ã‚‹
  *
  *	@param		b
- *	@param		str		”äŠr•¶š—ñ(wchar_t)
- *	@param		len		”äŠr•¶š—ñ’·
- *	@retval		ƒ}ƒbƒ`‚µ‚½•¶š—ñ’·
- *				0=ƒ}ƒbƒ`‚µ‚È‚©‚Á‚½
+ *	@param		str		æ¯”è¼ƒæ–‡å­—åˆ—(wchar_t)
+ *	@param		len		æ¯”è¼ƒæ–‡å­—åˆ—é•·
+ *	@retval		ãƒãƒƒãƒã—ãŸæ–‡å­—åˆ—é•·
+ *				0=ãƒãƒƒãƒã—ãªã‹ã£ãŸ
  */
 static size_t MatchOneStringPtr(const buff_char_t *b, const wchar_t *str, size_t len)
 {
@@ -1896,14 +1896,14 @@ static size_t MatchOneStringPtr(const buff_char_t *b, const wchar_t *str, size_t
 		return 0;
 	}
 	if (b->wc2[1] == 0) {
-		// ƒTƒƒQ[ƒgƒyƒA‚Å‚Í‚È‚¢
+		// ã‚µãƒ­ã‚²ãƒ¼ãƒˆãƒšã‚¢ã§ã¯ãªã„
 		if (str[match_pos] != b->wc2[0]) {
 			return 0;
 		}
 		match_pos++;
 		len--;
 	} else {
-		// ƒTƒƒQ[ƒgƒyƒA
+		// ã‚µãƒ­ã‚²ãƒ¼ãƒˆãƒšã‚¢
 		if (len < 2) {
 			return 0;
 		}
@@ -1915,7 +1915,7 @@ static size_t MatchOneStringPtr(const buff_char_t *b, const wchar_t *str, size_t
 		len-=2;
 	}
 	if (b->CombinationCharCount16 > 0) {
-		// ƒRƒ“ƒrƒl[ƒVƒ‡ƒ“
+		// ã‚³ãƒ³ãƒ“ãƒãƒ¼ã‚·ãƒ§ãƒ³
 		int i;
 		if (len < b->CombinationCharCount16) {
 			return 0;
@@ -1931,14 +1931,14 @@ static size_t MatchOneStringPtr(const buff_char_t *b, const wchar_t *str, size_t
 }
 
 /**
- *	(x,y) ‚Ì1•¶š‚ª str‚Æ“¯ˆê‚©’²‚×‚é
- *		*’ 1•¶š‚ª•¡”‚Ìwchar_t‚©‚ç\¬‚³‚ê‚Ä‚¢‚é
+ *	(x,y) ã®1æ–‡å­—ãŒ strã¨åŒä¸€ã‹èª¿ã¹ã‚‹
+ *		*æ³¨ 1æ–‡å­—ãŒè¤‡æ•°ã®wchar_tã‹ã‚‰æ§‹æˆã•ã‚Œã¦ã„ã‚‹
  *
  *	@param		y		PageStart + CursorY
- *	@param		str		1•¶š(wchar_t—ñ)
- *	@param		len		•¶š—ñ’·
- *	@retval		0=ƒ}ƒbƒ`‚µ‚È‚©‚Á‚½
- *				ƒ}ƒbƒ`‚µ‚½•¶š—ñ’·
+ *	@param		str		1æ–‡å­—(wchar_tåˆ—)
+ *	@param		len		æ–‡å­—åˆ—é•·
+ *	@retval		0=ãƒãƒƒãƒã—ãªã‹ã£ãŸ
+ *				ãƒãƒƒãƒã—ãŸæ–‡å­—åˆ—é•·
  */
 static size_t MatchOneString(int x, int y, const wchar_t *str, size_t len)
 {
@@ -1948,12 +1948,12 @@ static size_t MatchOneString(int x, int y, const wchar_t *str, size_t len)
 }
 
 /**
- *	b ‚©‚ç str‚Æ“¯ˆê‚©’²‚×‚é
+ *	b ã‹ã‚‰ strã¨åŒä¸€ã‹èª¿ã¹ã‚‹
  *
- *	@param		b		ƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^A‚±‚±‚©‚çŒŸõ‚·‚é
- *	@param		LineCntinued	TRUE=s‚ÌŒp‘±‚ğl—¶‚·‚é
- *	@retval		TRUE	ƒ}ƒbƒ`‚µ‚½
- *	@retval		FALSE	ƒ}ƒbƒ`‚µ‚Ä‚¢‚È‚¢
+ *	@param		b		ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€ã“ã“ã‹ã‚‰æ¤œç´¢ã™ã‚‹
+ *	@param		LineCntinued	TRUE=è¡Œã®ç¶™ç¶šã‚’è€ƒæ…®ã™ã‚‹
+ *	@retval		TRUE	ãƒãƒƒãƒã—ãŸ
+ *	@retval		FALSE	ãƒãƒƒãƒã—ã¦ã„ãªã„
  */
 #if 0
 static BOOL MatchStringPtr(const buff_char_t *b, const wchar_t *str, BOOL LineContinued)
@@ -1972,7 +1972,7 @@ static BOOL MatchStringPtr(const buff_char_t *b, const wchar_t *str, BOOL LineCo
 			b++;
 			continue;
 		}
-		// 1•¶š“¯ˆê‚©’²‚×‚é
+		// 1æ–‡å­—åŒä¸€ã‹èª¿ã¹ã‚‹
 		match_len = MatchOneString(x, y, str, len);
 		if (match_len == 0) {
 			result = FALSE;
@@ -1980,26 +1980,26 @@ static BOOL MatchStringPtr(const buff_char_t *b, const wchar_t *str, BOOL LineCo
 		}
 		len -= match_len;
 		if (len == 0) {
-			// ‘S•¶š’²‚×I‚í‚Á‚½
+			// å…¨æ–‡å­—èª¿ã¹çµ‚ã‚ã£ãŸ
 			result = TRUE;
 			break;
 		}
 		str += match_len;
 
-		// Ÿ‚Ì•¶š
+		// æ¬¡ã®æ–‡å­—
 		x++;
 		if (x == NumOfColumns) {
 			if (LineContinued && ((b->attr & AttrLineContinued) != 0)) {
-				// Ÿ‚Ìs‚Ö
+				// æ¬¡ã®è¡Œã¸
 				y++;
 				if (y == NumOfLines) {
-					// ƒoƒbƒtƒ@ÅI’[
+					// ãƒãƒƒãƒ•ã‚¡æœ€çµ‚ç«¯
 					return 0;
 				}
 				x = 0;
 				b = &CodeBuffW[GetLinePtr(y)];
 			} else {
-				// s––
+				// è¡Œæœ«
 				result = FALSE;
 				break;
 			}
@@ -2011,13 +2011,13 @@ static BOOL MatchStringPtr(const buff_char_t *b, const wchar_t *str, BOOL LineCo
 #endif
 
 /**
- *	(x,y)‚©‚ç str‚Æ“¯ˆê‚©’²‚×‚é
+ *	(x,y)ã‹ã‚‰ strã¨åŒä¸€ã‹èª¿ã¹ã‚‹
  *
- *	@param		x		ƒ}ƒCƒiƒX‚ÌAã‚Ìs‚ª‘ÎÛ‚É‚È‚é
+ *	@param		x		ãƒã‚¤ãƒŠã‚¹ã®æ™‚ã€ä¸Šã®è¡ŒãŒå¯¾è±¡ã«ãªã‚‹
  *	@param		y		PageStart + CursorY
- *	@param		LineCntinued	TRUE=s‚ÌŒp‘±‚ğl—¶‚·‚é
- *	@retval		TRUE	ƒ}ƒbƒ`‚µ‚½
- *	@retval		FALSE	ƒ}ƒbƒ`‚µ‚Ä‚¢‚È‚¢
+ *	@param		LineCntinued	TRUE=è¡Œã®ç¶™ç¶šã‚’è€ƒæ…®ã™ã‚‹
+ *	@retval		TRUE	ãƒãƒƒãƒã—ãŸ
+ *	@retval		FALSE	ãƒãƒƒãƒã—ã¦ã„ãªã„
  */
 static BOOL MatchString(int x, int y, const wchar_t *str, BOOL LineContinued)
 {
@@ -2029,8 +2029,8 @@ static BOOL MatchString(int x, int y, const wchar_t *str, BOOL LineContinued)
 	}
 	while(x < 0) {
 		if (LineContinued && (CodeBuffW[TmpPtr+0].attr & AttrLineContinued) == 0) {
-			// s‚ªŒp‘±‚µ‚Ä‚¢‚é‚©l—¶ & Œp‘±‚µ‚Ä‚¢‚È‚¢
-			x = 0;	// s“ª‚©‚ç‚Æ‚·‚é
+			// è¡ŒãŒç¶™ç¶šã—ã¦ã„ã‚‹ã‹è€ƒæ…® & ç¶™ç¶šã—ã¦ã„ãªã„
+			x = 0;	// è¡Œé ­ã‹ã‚‰ã¨ã™ã‚‹
 			break;
 		}
 		TmpPtr = PrevLinePtr(TmpPtr);
@@ -2039,8 +2039,8 @@ static BOOL MatchString(int x, int y, const wchar_t *str, BOOL LineContinued)
 	}
 	while(x > NumOfColumns) {
 		if (LineContinued && (CodeBuffW[TmpPtr+NumOfColumns-1].attr & AttrLineContinued) == 0) {
-			// s‚ªŒp‘±‚µ‚Ä‚¢‚é‚©l—¶ & Œp‘±‚µ‚Ä‚¢‚È‚¢
-			x = 0;	// s“ª‚©‚ç‚Æ‚·‚é
+			// è¡ŒãŒç¶™ç¶šã—ã¦ã„ã‚‹ã‹è€ƒæ…® & ç¶™ç¶šã—ã¦ã„ãªã„
+			x = 0;	// è¡Œé ­ã‹ã‚‰ã¨ã™ã‚‹
 			break;
 		}
 		TmpPtr = NextLinePtr(TmpPtr);
@@ -2048,7 +2048,7 @@ static BOOL MatchString(int x, int y, const wchar_t *str, BOOL LineContinued)
 	}
 
 	for(;;) {
-		// 1•¶š“¯ˆê‚©’²‚×‚é
+		// 1æ–‡å­—åŒä¸€ã‹èª¿ã¹ã‚‹
 		size_t match_len = MatchOneString(x, y, str, len);
 		if (match_len == 0) {
 			result = FALSE;
@@ -2056,22 +2056,22 @@ static BOOL MatchString(int x, int y, const wchar_t *str, BOOL LineContinued)
 		}
 		len -= match_len;
 		if (len == 0) {
-			// ‘S•¶š’²‚×I‚í‚Á‚½
+			// å…¨æ–‡å­—èª¿ã¹çµ‚ã‚ã£ãŸ
 			result = TRUE;
 			break;
 		}
 		str += match_len;
 
-		// Ÿ‚Ì•¶š
+		// æ¬¡ã®æ–‡å­—
 		x++;
 		if (x == NumOfColumns) {
 			if (LineContinued && (CodeBuffW[TmpPtr+NumOfColumns-1].attr & AttrLineContinued) != 0) {
-				// Ÿ‚Ìs‚Ö
+				// æ¬¡ã®è¡Œã¸
 				x = 0;
 				TmpPtr = NextLinePtr(TmpPtr);
 				y++;
 			} else {
-				// s––
+				// è¡Œæœ«
 				result = FALSE;
 				break;
 			}
@@ -2082,13 +2082,13 @@ static BOOL MatchString(int x, int y, const wchar_t *str, BOOL LineContinued)
 }
 
 /**
- *	(sx,sy)‚©‚ç(ex,ey)‚Ü‚Å‚Å str ‚Éƒ}ƒbƒ`‚·‚é•¶š‚ğ’T‚µ‚Ä
- *	ˆÊ’u‚ğ•Ô‚·
+ *	(sx,sy)ã‹ã‚‰(ex,ey)ã¾ã§ã§ str ã«ãƒãƒƒãƒã™ã‚‹æ–‡å­—ã‚’æ¢ã—ã¦
+ *	ä½ç½®ã‚’è¿”ã™
  *
  *	@param		sy,ex	PageStart + CursorY
- *	@param[out]	x		ƒ}ƒbƒ`‚µ‚½ˆÊ’u
- *	@param[out]	y		ƒ}ƒbƒ`‚µ‚½ˆÊ’u
- *	@retval		TRUE	ƒ}ƒbƒ`‚µ‚½
+ *	@param[out]	x		ãƒãƒƒãƒã—ãŸä½ç½®
+ *	@param[out]	y		ãƒãƒƒãƒã—ãŸä½ç½®
+ *	@retval		TRUE	ãƒãƒƒãƒã—ãŸ
  */
 static BOOL BuffGetMatchPosFromString(
 	int sx, int sy, int ex, int ey, const wchar_t *str,
@@ -2110,7 +2110,7 @@ static BOOL BuffGetMatchPosFromString(
 		x = IStart;
 		while (x <= IEnd) {
 			if (MatchString(x, y, str, TRUE)) {
-				// ƒ}ƒbƒ`‚µ‚½
+				// ãƒãƒƒãƒã—ãŸ
 				if (match_x != NULL) {
 					*match_x = x;
 				}
@@ -2127,10 +2127,10 @@ static BOOL BuffGetMatchPosFromString(
 
 
 /**
- *	˜A‘±‚µ‚½ƒXƒy[ƒX‚ğƒ^ƒu1‚Â‚É’uŠ·‚·‚é
- *	@param[out] _str_len	•¶š—ñ’·(L'\0'‚ğŠÜ‚Ş)
- *	@return		•¶š—ñ
- *				g—pŒã‚Í free() ‚·‚é‚±‚Æ
+ *	é€£ç¶šã—ãŸã‚¹ãƒšãƒ¼ã‚¹ã‚’ã‚¿ãƒ–1ã¤ã«ç½®æ›ã™ã‚‹
+ *	@param[out] _str_len	æ–‡å­—åˆ—é•·(L'\0'ã‚’å«ã‚€)
+ *	@return		æ–‡å­—åˆ—
+ *				ä½¿ç”¨å¾Œã¯ free() ã™ã‚‹ã“ã¨
  */
 static wchar_t *ConvertTable(const wchar_t *src, size_t src_len, size_t *str_len)
 {
@@ -2160,9 +2160,9 @@ static wchar_t *ConvertTable(const wchar_t *src, size_t src_len, size_t *str_len
 
 
 /**
- *	ƒNƒŠƒbƒvƒ{[ƒh—p•¶š—ñæ“¾
- *	@return		•¶š—ñ
- *				g—pŒã‚Í free() ‚·‚é‚±‚Æ
+ *	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ç”¨æ–‡å­—åˆ—å–å¾—
+ *	@return		æ–‡å­—åˆ—
+ *				ä½¿ç”¨å¾Œã¯ free() ã™ã‚‹ã“ã¨
  */
 wchar_t *BuffCBCopyUnicode(BOOL Table)
 {
@@ -2173,7 +2173,7 @@ wchar_t *BuffCBCopyUnicode(BOOL Table)
 		SelectEnd.x, SelectEnd.y, BoxSelect,
 		&str_len);
 
-	// ƒe[ƒuƒ‹Œ`®‚Ö•ÏŠ·
+	// ãƒ†ãƒ¼ãƒ–ãƒ«å½¢å¼ã¸å¤‰æ›
 	if (Table) {
 		size_t table_len;
 		wchar_t *table_ptr = ConvertTable(str_ptr, str_len, &table_len);
@@ -2256,7 +2256,7 @@ void BuffPrint(BOOL ScrollRegion)
 	VTPrintEnd();
 }
 
-// TODO ‚Æ‚è‚ ‚¦‚¸ ANSI ‚ÅÀ‘•
+// TODO ã¨ã‚Šã‚ãˆãš ANSI ã§å®Ÿè£…
 // Dumps current line to the file (for path through printing)
 //   HFile: file handle
 //   TERM: terminator character
@@ -2293,7 +2293,7 @@ void BuffDumpCurrentLine(PrintFile *handle, BYTE TERM)
 
 static BOOL isURLchar(unsigned int u32)
 {
-	// RFC3986(Uniform Resource Identifier (URI): Generic Syntax)‚É€‹’‚·‚é
+	// RFC3986(Uniform Resource Identifier (URI): Generic Syntax)ã«æº–æ‹ ã™ã‚‹
 	// by sakura editor 1.5.2.1: etc_uty.cpp
 	static const char	url_char[] = {
 	  /* +0  +1  +2  +3  +4  +5  +6  +7  +8  +9  +A  +B  +C  +D  +E  +F */
@@ -2325,15 +2325,15 @@ static BOOL BuffIsHalfWidthFromPropery(const TTTSet *ts_, char width_property)
 	case 'N':	// Neutral
 	default:
 		return TRUE;
-	case 'A':	// Ambiguous B–†
+	case 'A':	// Ambiguous æ›–æ˜§
 		if (ts_->UnicodeAmbiguousWidth == 2) {
-			// ‘SŠp‚Æ‚µ‚Äˆµ‚¤
+			// å…¨è§’ã¨ã—ã¦æ‰±ã†
 			return FALSE;
 		}
 		return TRUE;
 	case 'W':
 	case 'F':
-		return FALSE;		// ‘SŠp
+		return FALSE;		// å…¨è§’
 	}
 }
 
@@ -2343,19 +2343,19 @@ static BOOL BuffIsHalfWidthFromCode(const TTTSet *ts_, unsigned int u32, char *w
 	*emoji = (char)UnicodeIsEmoji(u32);
 	if (ts_->UnicodeEmojiOverride) {
 		if (*emoji) {
-			// ŠG•¶š‚¾‚Á‚½ê‡
+			// çµµæ–‡å­—ã ã£ãŸå ´åˆ
 			if (u32 < 0x1f000) {
 				if (ts_->UnicodeEmojiWidth == 2) {
-					// ‘SŠp
+					// å…¨è§’
 					return FALSE;
 				}
 				else {
-					// ”¼Šp
+					// åŠè§’
 					return TRUE;
 				}
 			}
 			else {
-				// í‚É‘SŠp
+				// å¸¸ã«å…¨è§’
 				return FALSE;
 			}
 		}
@@ -2364,7 +2364,7 @@ static BOOL BuffIsHalfWidthFromCode(const TTTSet *ts_, unsigned int u32, char *w
 }
 
 /**
- *	ƒJ[ƒ\ƒ‹ˆÊ’u‚Æ‚ÌURLƒAƒgƒŠƒrƒ…[ƒg‚Ìæ“ª‚Æ‚Ì‹——£‚ğŒvZ‚·‚é
+ *	ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã¨ã®URLã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆã®å…ˆé ­ã¨ã®è·é›¢ã‚’è¨ˆç®—ã™ã‚‹
  */
 static int get_url_len(int cur_x, int cur_y)
 {
@@ -2421,25 +2421,25 @@ static BOOL mark_url_w_sub(int sx_s, int sx_e, int sy_s, int sy_e, int *sx_match
 
 	for (i = 0; i < _countof(schemes); i++) {
 		const wchar_t *prefix = schemes[i].str;
-		// ƒ}ƒbƒ`‚·‚é‚©?
+		// ãƒãƒƒãƒã™ã‚‹ã‹?
 		if (BuffGetMatchPosFromString(sx_s, PageStart + sy_s, sx_s, PageStart + sy_s, prefix, &match_x, &match_y)) {
-			// ƒ}ƒbƒ`‚µ‚½
+			// ãƒãƒƒãƒã—ãŸ
 			break;
 		}
 	}
 
 	if (i == _countof(schemes)) {
-		// ƒ}ƒbƒ`‚µ‚È‚©‚Á‚½
+		// ãƒãƒƒãƒã—ãªã‹ã£ãŸ
 		return FALSE;
 	}
 
-	// ƒ}ƒbƒ`‚µ‚½
+	// ãƒãƒƒãƒã—ãŸ
 	*sx_match_s = match_x;
 	*sy_match_s = match_y - PageStart;
 	rx = match_x;
 	for (y = match_y; y <= PageStart + sy_e; y++) {
 		int sx_s_i = 0;
-		int sx_e_i = NumOfColumns - 1;  // ‚Æ‚É‚©‚­s––‚Ü‚Å
+		int sx_e_i = NumOfColumns - 1;  // ã¨ã«ã‹ãè¡Œæœ«ã¾ã§
 		if (y == PageStart + sy_s) {
 			sx_s_i = match_x;
 		}
@@ -2460,11 +2460,11 @@ static BOOL mark_url_w_sub(int sx_s, int sx_e, int sy_s, int sy_e, int *sx_match
 }
 
 /**
- *	ƒJ[ƒ\ƒ‹ˆÊ’u‚Ì•¶š—ñ‚ğURL‹­’²‚·‚é
- *	‚±‚ÌŠÖ”‚ªƒR[ƒ‹‚³‚ê‚½‚Æ‚«AƒJ[ƒ\ƒ‹ˆÊ’u‚Ì1‚Â‘O‚ÍURL‹­’²‚³‚ê‚Ä‚¢‚é
+ *	ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã®æ–‡å­—åˆ—ã‚’URLå¼·èª¿ã™ã‚‹
+ *	ã“ã®é–¢æ•°ãŒã‚³ãƒ¼ãƒ«ã•ã‚ŒãŸã¨ãã€ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã®1ã¤å‰ã¯URLå¼·èª¿ã•ã‚Œã¦ã„ã‚‹
  *
- *	@param cur_x	ƒJ[ƒ\ƒ‹ˆÊ’u
- *	@param cur_y	ƒJ[ƒ\ƒ‹ˆÊ’u(!ƒoƒbƒtƒ@ˆÊ’u)
+ *	@param cur_x	ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®
+ *	@param cur_y	ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®(!ãƒãƒƒãƒ•ã‚¡ä½ç½®)
  */
 static void mark_url_line_w(int cur_x, int cur_y)
 {
@@ -2475,8 +2475,8 @@ static void mark_url_line_w(int cur_x, int cur_y)
 	LONG TmpPtr;
 	const buff_char_t *b;
 
-	// URL‹­’²‚Ìæ“ª‚ğ’T‚·
-	TmpPtr = GetLinePtr(PageStart + cur_y) + cur_x - 1;	// ƒJ[ƒ\ƒ‹ˆÊ’u‚ğƒ|ƒCƒ“ƒ^‚Ö
+	// URLå¼·èª¿ã®å…ˆé ­ã‚’æ¢ã™
+	TmpPtr = GetLinePtr(PageStart + cur_y) + cur_x - 1;	// ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã‚’ãƒã‚¤ãƒ³ã‚¿ã¸
 	while ((CodeBuffW[TmpPtr].attr & AttrURL) != 0) {
 		if (TmpPtr == 0) {
 			break;
@@ -2485,7 +2485,7 @@ static void mark_url_line_w(int cur_x, int cur_y)
 	}
 	TmpPtr++;
 
-	// ƒ|ƒCƒ“ƒ^‚ğƒJ[ƒ\ƒ‹ˆÊ’u‚Ö
+	// ãƒã‚¤ãƒ³ã‚¿ã‚’ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã¸
 	GetPosFromPtr(&CodeBuffW[TmpPtr], &sx, &sy);
 	if (sy >= PageStart) {
 		sy = sy - PageStart;
@@ -2494,7 +2494,7 @@ static void mark_url_line_w(int cur_x, int cur_y)
 		sy = sy + NumOfLinesInBuff;
 	}
 
-	// s––‚ğ’T‚·
+	// è¡Œæœ«ã‚’æ¢ã™
 	ex = NumOfColumns - 1;
 	ey = cur_y;
 	if (cur_y <= NumOfLines - 1) {
@@ -2513,7 +2513,7 @@ static void mark_url_line_w(int cur_x, int cur_y)
 		ex--;
 	}
 
-	// URLƒAƒgƒŠƒrƒ…[ƒg‚ğ—‚Æ‚·
+	// URLã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆã‚’è½ã¨ã™
 	{
 		int x;
 		int y;
@@ -2533,7 +2533,7 @@ static void mark_url_line_w(int cur_x, int cur_y)
 		}
 	}
 
-	// ƒ}[ƒN‚·‚é
+	// ãƒãƒ¼ã‚¯ã™ã‚‹
 	{
 	int sx_i = sx;
 	int sy_i = sy;
@@ -2559,7 +2559,7 @@ static void mark_url_line_w(int cur_x, int cur_y)
 			sy_i = sy_match_e;
 		}
 
-		// Ÿ‚ÌƒZƒ‹‚Ö
+		// æ¬¡ã®ã‚»ãƒ«ã¸
 		if (sx_i == NumOfColumns - 1) {
 			if (sy_i == NumOfLines - 1) {
 				break;
@@ -2573,7 +2573,7 @@ static void mark_url_line_w(int cur_x, int cur_y)
 	}
 	}
 
-	// •`‰æ‚·‚é
+	// æç”»ã™ã‚‹
 	{
 		int y;
 		for (y = sy; y <= ey; y++) {
@@ -2591,7 +2591,7 @@ static void mark_url_line_w(int cur_x, int cur_y)
 }
 
 /**
- *	(cur_x, cur_y)ˆÊ’u‚©‚çURL‹­’²‚ğs‚¤
+ *	(cur_x, cur_y)ä½ç½®ã‹ã‚‰URLå¼·èª¿ã‚’è¡Œã†
  */
 static void mark_url_w(int cur_x, int cur_y)
 {
@@ -2608,9 +2608,9 @@ static void mark_url_w(int cur_x, int cur_y)
 	int ey;
 	int len;
 
-	// 1‚Â‘O‚ÌƒZƒ‹‚ªURL?
+	// 1ã¤å‰ã®ã‚»ãƒ«ãŒURL?
 	if (x == 0) {
-		// ˆê”Ô¶‚Ì‚ÍA‘O‚Ìs‚©‚çŒp‘±‚µ‚Ä‚¢‚ÄA‘O‚Ìs‚ÌÅŒã‚ªURL‚¾‚Á‚½
+		// ä¸€ç•ªå·¦ã®æ™‚ã¯ã€å‰ã®è¡Œã‹ã‚‰ç¶™ç¶šã—ã¦ã„ã¦ã€å‰ã®è¡Œã®æœ€å¾ŒãŒURLã ã£ãŸæ™‚
 		if ((CodeLineW[0].attr & AttrLineContinued) != 0) {
 			const LONG TmpPtr = GetLinePtr(PageStart + cur_y - 1);
 			if ((CodeBuffW[TmpPtr + NumOfColumns - 1].attr & AttrURL) != 0) {
@@ -2624,9 +2624,9 @@ static void mark_url_w(int cur_x, int cur_y)
 		}
 	}
 
-	// 1‚ÂŒã‚ë‚ÌƒZƒ‹‚ªURL?
+	// 1ã¤å¾Œã‚ã®ã‚»ãƒ«ãŒURL?
 	if (x == NumOfColumns - 1) {
-		// Œ»İx‚ªˆê”Ô‰E?
+		// ç¾åœ¨xãŒä¸€ç•ªå³?
 		if ((cur_y + 1) < NumOfLines) {
 			if ((CodeLineW[x].attr & AttrLineContinued) != 0) {
 				const LONG TmpPtr = GetLinePtr(PageStart + cur_y + 1);
@@ -2645,24 +2645,24 @@ static void mark_url_w(int cur_x, int cur_y)
 	if (prev == TRUE) {
 		if (next == TRUE) {
 			if (isURLchar(u32)) {
-				// URL‚É‚Í‚³‚Ü‚ê‚Ä‚¢‚ÄAURL‚É‚È‚è‚¦‚éƒLƒƒƒ‰ƒNƒ^
+				// URLã«ã¯ã•ã¾ã‚Œã¦ã„ã¦ã€URLã«ãªã‚Šãˆã‚‹ã‚­ãƒ£ãƒ©ã‚¯ã‚¿
 				int ptr = GetLinePtr(PageStart + cur_y) + cur_x;
 				CodeBuffW[ptr].attr |= AttrURL;
 				return;
 			}
-			// 1lineŒŸ¸
+			// 1lineæ¤œæŸ»
 			mark_url_line_w(cur_x, cur_y);
 			return;
 		}
 
 		len = get_url_len(cur_x, cur_y);
 		if (len >= 9) {
-			// URLƒAƒgƒŠƒrƒ…[ƒg‚ª‚Â‚¢‚Ä‚¢‚éæ“ª‚©‚çA
-			// 9•¶šˆÈã—£‚ê‚Ä‚¢‚éê‡‚Í
-			// •¶š‚ªã‘‚«‚³‚ê‚Ä‚àURL‚ª‰ó‚ê‚é‚±‚Æ‚Í‚È‚¢
-			// ¨ ƒJ[ƒ\ƒ‹ˆÊ’u‚ÉURLƒAƒgƒŠƒrƒ…[ƒg‚ğ‚Â‚¯‚é
+			// URLã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆãŒã¤ã„ã¦ã„ã‚‹å…ˆé ­ã‹ã‚‰ã€
+			// 9æ–‡å­—ä»¥ä¸Šé›¢ã‚Œã¦ã„ã‚‹å ´åˆã¯
+			// æ–‡å­—ãŒä¸Šæ›¸ãã•ã‚Œã¦ã‚‚URLãŒå£Šã‚Œã‚‹ã“ã¨ã¯ãªã„
+			// â†’ ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã«URLã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆã‚’ã¤ã‘ã‚‹
 			if (isURLchar(u32)) {
-				// URL‚ğL‚Î‚·
+				// URLã‚’ä¼¸ã°ã™
 				CodeLineW[x].attr |= AttrURL;
 			}
 			return;
@@ -2671,16 +2671,16 @@ static void mark_url_w(int cur_x, int cur_y)
 		return;
 	}
 
-	// '/' ‚ª“ü—Í‚³‚ê‚½‚ç’²‚×n‚ß‚é
+	// '/' ãŒå…¥åŠ›ã•ã‚ŒãŸã‚‰èª¿ã¹å§‹ã‚ã‚‹
 	if (u32 != '/') {
 		return;
 	}
 	if (!MatchString(x - 2, PageStart + CursorY, L"://", TRUE)) {
-		// "://" ‚Ìˆê•”‚Å‚Í‚È‚¢
+		// "://" ã®ä¸€éƒ¨ã§ã¯ãªã„
 		return;
 	}
 
-	// –{Ši“I‚É’T‚·
+	// æœ¬æ ¼çš„ã«æ¢ã™
 	for (i = 0; i < _countof(schemes); i++) {
 		const wchar_t *prefix = schemes[i].str;
 		len = schemes[i].len - 1;
@@ -2688,16 +2688,16 @@ static void mark_url_w(int cur_x, int cur_y)
 		sy = PageStart + CursorY;
 		ey = sy;
 		if (x < len) {
-			// ’Z‚¢
+			// çŸ­ã„
 			if ((CodeLineW[0].attr & AttrLineContinued) == 0) {
-				// ‘O‚Ìs‚Æ˜AŒ‹‚µ‚Ä‚¢‚È‚¢
+				// å‰ã®è¡Œã¨é€£çµã—ã¦ã„ãªã„
 				continue;
 			}
-			// ‘O‚Ìs‚©‚çŒŸõ‚©‚¯‚é
+			// å‰ã®è¡Œã‹ã‚‰æ¤œç´¢ã‹ã‘ã‚‹
 			sx = NumOfColumns + sx;
 			sy = PageStart + CursorY - 1;
 		}
-		// ƒ}ƒbƒ`‚·‚é‚©?
+		// ãƒãƒƒãƒã™ã‚‹ã‹?
 		if (BuffGetMatchPosFromString(sx, sy, x, ey, prefix, NULL, NULL)) {
 			match_flag = TRUE;
 			break;
@@ -2707,7 +2707,7 @@ static void mark_url_w(int cur_x, int cur_y)
 		return;
 	}
 
-	// ƒ}ƒbƒ`‚µ‚½‚Ì‚ÅURL‘®«‚ğ•t‚¯‚é
+	// ãƒãƒƒãƒã—ãŸã®ã§URLå±æ€§ã‚’ä»˜ã‘ã‚‹
 	if (sy == ey) {
 		for (i = 0; i <= len; i++) {
 			CodeLineW[sx + i].attr |= AttrURL;
@@ -2741,12 +2741,12 @@ static void mark_url_w(int cur_x, int cur_y)
 }
 
 /**
- *	1ƒZƒ‹•ª‚ğwchar_t•¶š—ñ‚É“WŠJ‚·‚é
- *	@param[in]		b			1ƒZƒ‹•ª‚Ì•¶šî•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *	@retval			“WŠJ‚µ‚½•¶š—ñ
+ *	1ã‚»ãƒ«åˆ†ã‚’wchar_tæ–‡å­—åˆ—ã«å±•é–‹ã™ã‚‹
+ *	@param[in]		b			1ã‚»ãƒ«åˆ†ã®æ–‡å­—æƒ…å ±ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *	@retval			å±•é–‹ã—ãŸæ–‡å­—åˆ—
  *
  *	TODO
- *		expand_wchar() ‚Æ“¯‚¶?
+ *		expand_wchar() ã¨åŒã˜?
  */
 static wchar_t *GetWCS(const buff_char_t *b)
 {
@@ -2770,26 +2770,26 @@ static wchar_t *GetWCS(const buff_char_t *b)
 }
 
 /**
- *	(x,y)‚Éu32‚ğ“ü‚ê‚é‚Æ‚«AŒ‹‡‚·‚é‚©?
- *  @param[in]		wrap		TRUE wrap’†
+ *	(x,y)ã«u32ã‚’å…¥ã‚Œã‚‹ã¨ãã€çµåˆã™ã‚‹ã‹?
+ *  @param[in]		wrap		TRUE wrapä¸­
  *  @param[in]		u32			Unicode
- *	@param[in,out]	combine		u32‚Ì•¶ší‚ğ•Ô‚·(NULL Œ‹‰Ê‚ğ•Ô‚³‚È‚¢)
- *								0	Œ‹‡‚µ‚È‚¢
- *								1	Œ‹‡•¶š,Nonspacing Mark, ƒJ[ƒ\ƒ‹‚ÍˆÚ“®‚µ‚È‚¢
- *								2	Œ‹‡•¶š,Spacing Mark, ƒJ[ƒ\ƒ‹‚ª +1 ˆÚ“®‚·‚é
- *	@return	Œ‹‡‚·‚é•¶š‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *								1(”¼Šp) or 2(‘SŠp) or N ƒZƒ‹‘O
- *								Œ»İ‚ÌƒZƒ‹ (x ‚ªs––‚Å wrap == TRUE )
- *	@return	NULL	Œ‹‡‚µ‚È‚¢
+ *	@param[in,out]	combine		u32ã®æ–‡å­—ç¨®ã‚’è¿”ã™(NULL çµæœã‚’è¿”ã•ãªã„)
+ *								0	çµåˆã—ãªã„
+ *								1	çµåˆæ–‡å­—,Nonspacing Mark, ã‚«ãƒ¼ã‚½ãƒ«ã¯ç§»å‹•ã—ãªã„
+ *								2	çµåˆæ–‡å­—,Spacing Mark, ã‚«ãƒ¼ã‚½ãƒ«ãŒ +1 ç§»å‹•ã™ã‚‹
+ *	@return	çµåˆã™ã‚‹æ–‡å­—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *								1(åŠè§’) or 2(å…¨è§’) or N ã‚»ãƒ«å‰
+ *								ç¾åœ¨ã®ã‚»ãƒ« (x ãŒè¡Œæœ«ã§ wrap == TRUE æ™‚)
+ *	@return	NULL	çµåˆã—ãªã„
  */
 static buff_char_t *IsCombiningChar(int x, int y, BOOL wrap, unsigned int u32, int *combine)
 {
-	buff_char_t *p = NULL;  // NULL‚Ì‚Æ‚«A‘O‚Ì•¶š‚Í‚È‚¢
+	buff_char_t *p = NULL;  // NULLã®ã¨ãã€å‰ã®æ–‡å­—ã¯ãªã„
 	LONG LinePtr_ = GetLinePtr(PageStart+y);
 	buff_char_t *CodeLineW = &CodeBuffW[LinePtr_];
 	int combine_type;	// 0 or 1 or 2
 
-	combine_type = (u32 == 0x200d) ? 1 : 0;		// U+200d = ƒ[ƒ•Ú‡q,ZERO WIDTH JOINER(ZWJ)
+	combine_type = (u32 == 0x200d) ? 1 : 0;		// U+200d = ã‚¼ãƒ­å¹…æ¥åˆå­,ZERO WIDTH JOINER(ZWJ)
 	if (combine_type == 0) {
 		combine_type = UnicodeIsCombiningCharacter(u32);
 	}
@@ -2798,7 +2798,7 @@ static buff_char_t *IsCombiningChar(int x, int y, BOOL wrap, unsigned int u32, i
 	}
 
 	if (x == NumOfColumns - 1 && wrap) {
-		// Œ»İˆÊ’u‚ÉŒ‹‡‚·‚é
+		// ç¾åœ¨ä½ç½®ã«çµåˆã™ã‚‹
 		p = &CodeLineW[x];
 		if (IsBuffPadding(p)){
 			p--;
@@ -2806,37 +2806,37 @@ static buff_char_t *IsCombiningChar(int x, int y, BOOL wrap, unsigned int u32, i
 	}
 	else {
 		if (x == 0) {
-			// ‘O‚Ì‚à‚¶‚Í‚È‚¢
+			// å‰ã®ã‚‚ã˜ã¯ãªã„
 			p = NULL;
 		}
 		else {
-			// padding‚Å‚Í‚È‚¢ƒZƒ‹‚ğ’T‚·
-			x = LeftHalfOfDBCS(LinePtr_, x - 1);		// 1cell‘O‚©‚ç’²‚×‚é
+			// paddingã§ã¯ãªã„ã‚»ãƒ«ã‚’æ¢ã™
+			x = LeftHalfOfDBCS(LinePtr_, x - 1);		// 1cellå‰ã‹ã‚‰èª¿ã¹ã‚‹
 			if (!IsBuffPadding(&CodeLineW[x])) {
 				p = &CodeLineW[x];
 			}
 			else {
-				// ‘O‚Ì‚à‚¶‚Í‚È‚¢
+				// å‰ã®ã‚‚ã˜ã¯ãªã„
 				p = NULL;
 			}
 		}
 	}
 
-	// padding‚Å‚Í‚È‚¢‘O‚ÌƒZƒ‹‚ ‚è?
+	// paddingã§ã¯ãªã„å‰ã®ã‚»ãƒ«ã‚ã‚Š?
 	if (p == NULL) {
-		// ‘O‚ª‚È‚¢‚Ì‚ÅŒ‹‡‚Å‚«‚È‚¢
+		// å‰ãŒãªã„ã®ã§çµåˆã§ããªã„
 		return NULL;
 	}
 
-	// Œ‹‡‚·‚é?
-	// 		1‚Â‘O‚ª ZWJ
+	// çµåˆã™ã‚‹?
+	// 		1ã¤å‰ãŒ ZWJ
 	if (combine_type != 0 || (p->u32_last == 0x200d)) {
 		return p;
 	}
 
-	// ƒ”ƒBƒ‰[ƒ}ˆ—
+	// ãƒ´ã‚£ãƒ©ãƒ¼ãƒå‡¦ç†
 	if (UnicodeIsVirama(p->u32_last) != 0) {
-		// 1‚Â‘O‚Ìƒ”ƒBƒ‰[ƒ}‚Æ“¯‚¶ block ‚Ì•¶š‚Å‚ ‚é
+		// 1ã¤å‰ã®ãƒ´ã‚£ãƒ©ãƒ¼ãƒã¨åŒã˜ block ã®æ–‡å­—ã§ã‚ã‚‹
 		int block_index_last = UnicodeBlockIndex(p->u32_last);
 		int block_index = UnicodeBlockIndex(u32);
 #if 0
@@ -2857,8 +2857,8 @@ BOOL BuffIsCombiningCharacter(int x, int y, unsigned int u32)
 }
 
 /**
- *	Unicode‚©‚ç ANSI ‚É•ÏŠ·‚·‚é
- *		Œ‹‡•¶š(combining character)‚às‚¤
+ *	Unicodeã‹ã‚‰ ANSI ã«å¤‰æ›ã™ã‚‹
+ *		çµåˆæ–‡å­—(combining character)ã‚‚è¡Œã†
  */
 static unsigned short ConvertACPChar(const buff_char_t *b)
 {
@@ -2875,18 +2875,18 @@ static unsigned short ConvertACPChar(const buff_char_t *b)
 	}
 
 	if (lenW >= 2) {
-		// WideCharToMultiByte() ‚Å‚ÍŒ‹‡ˆ—‚Ís‚í‚ê‚È‚¢
-		// ©—Í‚ÅŒ‹‡ˆ—‚ğs‚¤B‚½‚¾‚µAÅ‰‚Ì2•¶š‚¾‚¯
-		//	 —á1:
-		//		U+307B(‚Ù) + U+309A(K) ‚Í
-		//		Shift jis ‚Ì 0x82d9(‚Ù) ‚Æ 0x814b(K) ‚É•ÏŠ·‚³‚ê
-		//		0x82db(‚Û) ‚É‚Í•ÏŠ·‚³‚ê‚È‚¢
-		//		—\‚ß U+307D(‚Û)‚É³‹K‰»‚µ‚Ä‚¨‚­
-		//	 —á2:
+		// WideCharToMultiByte() ã§ã¯çµåˆå‡¦ç†ã¯è¡Œã‚ã‚Œãªã„
+		// è‡ªåŠ›ã§çµåˆå‡¦ç†ã‚’è¡Œã†ã€‚ãŸã ã—ã€æœ€åˆã®2æ–‡å­—ã ã‘
+		//	 ä¾‹1:
+		//		U+307B(ã») + U+309A(ã‚œ) ã¯
+		//		Shift jis ã® 0x82d9(ã») ã¨ 0x814b(ã‚œ) ã«å¤‰æ›ã•ã‚Œ
+		//		0x82db(ã½) ã«ã¯å¤‰æ›ã•ã‚Œãªã„
+		//		äºˆã‚ U+307D(ã½)ã«æ­£è¦åŒ–ã—ã¦ãŠã
+		//	 ä¾‹2:
 		//		U+0061 U+0302 -> U+00E2 (latin small letter a with circumflex) (a+^)
 		unsigned short c = UnicodeCombining(strW[0], strW[1]);
 		if (c != 0) {
-			// Œ‹‡‚Å‚«‚½
+			// çµåˆã§ããŸ
 			strW[0] = c;
 			strW[1] = 0;
 		}
@@ -2894,11 +2894,11 @@ static unsigned short ConvertACPChar(const buff_char_t *b)
 	strA = _WideCharToMultiByte(strW, lenW, CodePage, &lenA);
 	chA = *(unsigned char *)strA;
 	if (!IsDBCSLeadByte((BYTE)chA)) {
-		// 1byte•¶š
+		// 1byteæ–‡å­—
 		chA = strA[0];
 	}
 	else {
-		// 2byte•¶š
+		// 2byteæ–‡å­—
 		chA = (chA << 8) | ((unsigned char)strA[1]);
 	}
 	free(strA);
@@ -2908,11 +2908,11 @@ static unsigned short ConvertACPChar(const buff_char_t *b)
 }
 
 /**
- *	ƒ†ƒjƒR[ƒhƒLƒƒƒ‰ƒNƒ^‚ğ1•¶šƒoƒbƒtƒ@‚Ö“ü—Í‚·‚é
+ *	ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã‚’1æ–‡å­—ãƒãƒƒãƒ•ã‚¡ã¸å…¥åŠ›ã™ã‚‹
  *	@param[in]	u32		unicode character(UTF-32)
  *	@param[in]	Attr	attributes
  *	@param[in]	Insert	Insert flag
- *	@return		ƒJ[ƒ\ƒ‹ˆÚ“®—Ê(0 or 1 or 2)
+ *	@return		ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹•é‡(0 or 1 or 2)
  */
 int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 {
@@ -2930,8 +2930,8 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 #endif
 
 	if (u32 < 0x20 || (0x80 <= u32 && u32 <= 0x9f)) {
-		// C0/C1 Controls ‚Í•¶š‚Æ‚µ‚Äˆ—‚µ‚È‚¢
-		//assert(FALSE);	// “ü‚Á‚Ä‚­‚é‚Ì‚Í‚¨‚©‚µ‚¢
+		// C0/C1 Controls ã¯æ–‡å­—ã¨ã—ã¦å‡¦ç†ã—ãªã„
+		//assert(FALSE);	// å…¥ã£ã¦ãã‚‹ã®ã¯ãŠã‹ã—ã„
 		return 0;
 	}
 
@@ -2939,36 +2939,36 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 		Attr_Attr |= AttrLineContinued;
 	}
 
-	// Œ‹‡•¶š or 1‚Â‘O‚Ì•¶š‚Ì‰e‹¿‚ÅŒ‹‡‚·‚é?
+	// çµåˆæ–‡å­— or 1ã¤å‰ã®æ–‡å­—ã®å½±éŸ¿ã§çµåˆã™ã‚‹?
 	combining_type = 0;
 	p = IsCombiningChar(CursorX, CursorY, Wrap, u32, &combining_type);
 	if (p != NULL || combining_type != 0) {
-		// Œ‹‡‚·‚é
+		// çµåˆã™ã‚‹
 		BOOL add_base_char = FALSE;
-		move_x = 0;  // ƒJ[ƒ\ƒ‹ˆÚ“®—Ê=0
+		move_x = 0;  // ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹•é‡=0
 
 		if (p == NULL) {
-			// ‘O‚Ì‚à‚¶(Šî’ê•¶š)‚ª‚È‚¢‚Ì‚ÉŒ‹‡•¶š‚ªo‚Ä‚«‚½‚Æ‚«
-			// NBSP(non-breaking space) U+00A0 ‚ÉŒ‹‡‚³‚¹‚é
+			// å‰ã®ã‚‚ã˜(åŸºåº•æ–‡å­—)ãŒãªã„ã®ã«çµåˆæ–‡å­—ãŒå‡ºã¦ããŸã¨ã
+			// NBSP(non-breaking space) U+00A0 ã«çµåˆã•ã›ã‚‹
 			add_base_char = TRUE;
 			p = &CodeLineW[CursorX];
 			BuffSetChar(p, 0xa0, 'H');
 
-			move_x = 1;  // ƒJ[ƒ\ƒ‹ˆÚ“®—Ê=1
+			move_x = 1;  // ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹•é‡=1
 		}
 
-		// “ü—Í•¶š‚ÍANonspacing mark ˆÈŠO?
-		//		ƒJ[ƒ\ƒ‹‚ğ+1, •¶š•‚ğ+1‚·‚é
+		// å…¥åŠ›æ–‡å­—ã¯ã€Nonspacing mark ä»¥å¤–?
+		//		ã‚«ãƒ¼ã‚½ãƒ«ã‚’+1, æ–‡å­—å¹…ã‚’+1ã™ã‚‹
 		if (p->u32_last != 0x200d && combining_type != 1) {
-			// ƒJ[ƒ\ƒ‹ˆÚ“®—Ê‚Í1
+			// ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹•é‡ã¯1
 			move_x = 1;
 
 			p->cell++;
 			if(StrChangeCount == 0) {
-				// •`‰æ”ÍˆÍ‚ªƒNƒŠƒA‚³‚ê‚Ä‚¢‚éAÄ“xİ’è‚·‚é
+				// æç”»ç¯„å›²ãŒã‚¯ãƒªã‚¢ã•ã‚Œã¦ã„ã‚‹ã€å†åº¦è¨­å®šã™ã‚‹
 				StrChangeCount = p->cell;
 				if (CursorX == 0) {
-					// ƒJ[ƒ\ƒ‹‚ª¶’[‚Ì
+					// ã‚«ãƒ¼ã‚½ãƒ«ãŒå·¦ç«¯ã®æ™‚
 					StrChangeStart = 0;
 				}
 				else {
@@ -2976,14 +2976,14 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 				}
 			}
 			else {
-				// •`‰æ”ÍˆÍ‚ğ1cell‘‚â‚·
+				// æç”»ç¯„å›²ã‚’1cellå¢—ã‚„ã™
 				StrChangeCount++;
 			}
 
-			// ƒJ[ƒ\ƒ‹ˆÊ’u‚Ì•¶š‚Í Padding‚É‚·‚é
-			//	‚½‚¾‚µŸ‚Ì‚Í Padding ‚ğ“ü‚ê‚È‚¢
-			//	- s––‚Ì‚Æ‚« (TODO ‚±‚ÌğŒ‚Í•s—v?)
-			//	- Šî’ê•¶š‚ª‚ ‚éó‘Ô‚ÅASpacing Mark•¶š(ƒJ[ƒ\ƒ‹‚ª+1ˆÚ“®‚·‚éŒ‹‡•¶š)‚ª“ü—Í‚³‚ê‚½‚Æ‚«
+			// ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã®æ–‡å­—ã¯ Paddingã«ã™ã‚‹
+			//	ãŸã ã—æ¬¡ã®æ™‚ã¯ Padding ã‚’å…¥ã‚Œãªã„
+			//	- è¡Œæœ«ã®ã¨ã (TODO ã“ã®æ¡ä»¶ã¯ä¸è¦?)
+			//	- åŸºåº•æ–‡å­—ãŒã‚ã‚‹çŠ¶æ…‹ã§ã€Spacing Markæ–‡å­—(ã‚«ãƒ¼ã‚½ãƒ«ãŒ+1ç§»å‹•ã™ã‚‹çµåˆæ–‡å­—)ãŒå…¥åŠ›ã•ã‚ŒãŸã¨ã
 			if (CursorX < NumOfColumns - 1) {
 				if (add_base_char == FALSE) {
 					BuffSetChar(&CodeLineW[CursorX], 0, 'H');
@@ -2996,21 +2996,21 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 			}
 		}
 
-		// ‘O‚Ì•¶š‚É‚­‚Á‚Â‚¯‚é
+		// å‰ã®æ–‡å­—ã«ãã£ã¤ã‘ã‚‹
 		BuffAddChar(p, u32);
 
-		// •¶š•`‰æ
+		// æ–‡å­—æç”»
 		if (StrChangeCount == 0) {
-			// •`‰æ—\’è‚ª‚È‚¢(StrChangeCount==0)‚Ì‚ÉA
-			// Œ‹‡•¶š‚ğóM‚µ‚½ê‡A•`‰æ‚·‚é
+			// æç”»äºˆå®šãŒãªã„(StrChangeCount==0)ã®ã«ã€
+			// çµåˆæ–‡å­—ã‚’å—ä¿¡ã—ãŸå ´åˆã€æç”»ã™ã‚‹
 			if (Wrap) {
 				if (!BuffIsHalfWidthFromPropery(&ts, p->WidthProperty)) {
-					// s––‚É2ƒZƒ‹‚Ì•¶š‚ª•`‰æÏ‚İA2ƒZƒ‹‚Ì‰E‘¤‚ÉƒJ[ƒ\ƒ‹‚ª‚ ‚éó‘Ô
+					// è¡Œæœ«ã«2ã‚»ãƒ«ã®æ–‡å­—ãŒæç”»æ¸ˆã¿ã€2ã‚»ãƒ«ã®å³å´ã«ã‚«ãƒ¼ã‚½ãƒ«ãŒã‚ã‚‹çŠ¶æ…‹
 					StrChangeStart = CursorX - 1;
 					StrChangeCount = 2;
 				}
 				else {
-					// s––‚É1ƒZƒ‹‚Ì•¶š‚ª•`‰æ‚³‚ê‚Ä‚¢‚éA‚»‚Ìã‚ÉƒJ[ƒ\ƒ‹‚ª‚ ‚éó‘Ô
+					// è¡Œæœ«ã«1ã‚»ãƒ«ã®æ–‡å­—ãŒæç”»ã•ã‚Œã¦ã„ã‚‹ã€ãã®ä¸Šã«ã‚«ãƒ¼ã‚½ãƒ«ãŒã‚ã‚‹çŠ¶æ…‹
 					StrChangeStart = CursorX;
 					StrChangeCount = 1;
 				}
@@ -3018,7 +3018,7 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 			else {
 				StrChangeCount = p->cell;
 				if (CursorX == 0) {
-					// ƒJ[ƒ\ƒ‹‚ª¶’[‚Ì
+					// ã‚«ãƒ¼ã‚½ãƒ«ãŒå·¦ç«¯ã®æ™‚
 					StrChangeStart = 0;
 				}
 				else {
@@ -3027,7 +3027,7 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 			}
 		}
 
-		// ANSI•¶šƒR[ƒh‚ğXV
+		// ANSIæ–‡å­—ã‚³ãƒ¼ãƒ‰ã‚’æ›´æ–°
 		p->ansi_char = ConvertACPChar(p);
 	}
 	else {
@@ -3036,10 +3036,10 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 		BOOL half_width = BuffIsHalfWidthFromCode(&ts, u32, &width_property, &emoji);
 
 		p = &CodeLineW[CursorX];
-		// Œ»İ‚ÌˆÊ’u‚ª‘SŠp‚Ì‰E‘¤?
+		// ç¾åœ¨ã®ä½ç½®ãŒå…¨è§’ã®å³å´?
 		if (IsBuffPadding(p)) {
-			// ‘SŠp‚Ì‘O”¼‚ğƒXƒy[ƒX‚É’u‚«Š·‚¦‚é
-			assert(CursorX > 0);  // s“ª‚É‘SŠp‚Ì‰E‘¤‚Í‚È‚¢
+			// å…¨è§’ã®å‰åŠã‚’ã‚¹ãƒšãƒ¼ã‚¹ã«ç½®ãæ›ãˆã‚‹
+			assert(CursorX > 0);  // è¡Œé ­ã«å…¨è§’ã®å³å´ã¯ãªã„
 			BuffSetChar(p - 1, ' ', 'H');
 			BuffSetChar(p, ' ', 'H');
 			if (StrChangeCount == 0) {
@@ -3056,9 +3056,9 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 				}
 			}
 		}
-		// Œ»İ‚ÌˆÊ’u‚ª‘SŠp‚Ì¶‘¤ && “ü—Í•¶š‚ª”¼Šp ?
+		// ç¾åœ¨ã®ä½ç½®ãŒå…¨è§’ã®å·¦å´ && å…¥åŠ›æ–‡å­—ãŒåŠè§’ ?
 		if (half_width && IsBuffFullWidth(p)) {
-			// s––‚É‘SŠp(2cell)ˆÈã‚Ì•¶š‚ª‘¶İ‚·‚é‰Â”\«‚ª‚ ‚é
+			// è¡Œæœ«ã«å…¨è§’(2cell)ä»¥ä¸Šã®æ–‡å­—ãŒå­˜åœ¨ã™ã‚‹å¯èƒ½æ€§ãŒã‚ã‚‹
 			BuffSetChar(p, ' ', 'H');
 			if (CursorX < NumOfColumns - 1) {
 				BuffSetChar(p + 1, ' ', 'H');
@@ -3080,9 +3080,9 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 		{
 			buff_char_t *p1 = GetPtrRel(CodeBuffW, BufferSize, p, 1);
 
-			// Ÿ‚Ì•¶š‚ª‘SŠp && “ü—Í•¶š‚ª‘SŠp ?
+			// æ¬¡ã®æ–‡å­—ãŒå…¨è§’ && å…¥åŠ›æ–‡å­—ãŒå…¨è§’ ?
 			if (!Insert && !half_width && IsBuffFullWidth(p1)) {
-				// ‘SŠp‚ğ’×‚·
+				// å…¨è§’ã‚’æ½°ã™
 				buff_char_t *p2 = GetPtrRel(CodeBuffW, BufferSize, p1, 1);
 				BuffSetChar(p1, ' ', 'H');
 				BuffSetChar(p2, ' ', 'H');
@@ -3090,8 +3090,8 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 		}
 
 		if (Insert) {
-			// ‘}“üƒ‚[ƒh
-			// TODO –¢ƒ`ƒFƒbƒN
+			// æŒ¿å…¥ãƒ¢ãƒ¼ãƒ‰
+			// TODO æœªãƒã‚§ãƒƒã‚¯
 			int XStart, LineEnd, MoveLen;
 			int extr = 0;
 			if (CursorX > CursorRightM)
@@ -3100,19 +3100,19 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 				LineEnd = CursorRightM;
 
 			if (half_width) {
-				// ”¼Šp‚Æ‚µ‚Äˆµ‚¤
+				// åŠè§’ã¨ã—ã¦æ‰±ã†
 				move_x = 1;
 			}
 			else {
-				// ‘SŠp‚Æ‚µ‚Äˆµ‚¤
+				// å…¨è§’ã¨ã—ã¦æ‰±ã†
 				move_x = 2;
 				if (CursorX + 1 > LineEnd) {
-					// ‚Í‚İo‚·
+					// ã¯ã¿å‡ºã™
 					return -1;
 				}
 			}
 
-			// ˆê”ÔÅŒã‚Ì•¶š‚ª‘SŠp‚Ìê‡A
+			// ä¸€ç•ªæœ€å¾Œã®æ–‡å­—ãŒå…¨è§’ã®å ´åˆã€
 			if (LineEnd <= NumOfColumns - 1 && (CodeLineW[LineEnd - 1].attr & AttrKanji)) {
 				BuffSetChar(&CodeLineW[LineEnd - 1], 0x20, 'H');
 				CodeLineW[LineEnd].attr &= ~AttrKanji;
@@ -3175,7 +3175,7 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 		}
 		else {
 			if ((Attr->AttrEx & AttrPadding) != 0) {
-				// ‹l‚ß•¨
+				// è©°ã‚ç‰©
 				buff_char_t *b = &CodeLineW[CursorX];
 				BuffSetChar(b, u32, 'H');
 				b->Padding = TRUE;
@@ -3186,17 +3186,17 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 				move_x = 1;
 			}
 			else {
-				// V‚µ‚¢•¶š’Ç‰Á
+				// æ–°ã—ã„æ–‡å­—è¿½åŠ 
 
 				if (half_width) {
-					// ”¼Šp‚Æ‚µ‚Äˆµ‚¤
+					// åŠè§’ã¨ã—ã¦æ‰±ã†
 					move_x = 1;
 				}
 				else {
-					// ‘SŠp‚Æ‚µ‚Äˆµ‚¤
+					// å…¨è§’ã¨ã—ã¦æ‰±ã†
 					move_x = 2;
 					if (CursorX + 2 > NumOfColumns) {
-						// ‚Í‚İo‚·
+						// ã¯ã¿å‡ºã™
 						return -1;
 					}
 				}
@@ -3206,7 +3206,7 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 					CodeLineW[CursorX].attr = Attr_Attr;
 				}
 				else {
-					// ‘SŠp
+					// å…¨è§’
 					CodeLineW[CursorX].attr = Attr_Attr | AttrKanji;
 				}
 				CodeLineW[CursorX].attr2 = Attr->Attr2;
@@ -3214,7 +3214,7 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 				CodeLineW[CursorX].bg = Attr->Back;
 
 				if (!half_width) {
-					// ‘SŠp‚Ì‚ÍŸ‚ÌƒZƒ‹‚Í‹l‚ß•¨
+					// å…¨è§’ã®æ™‚ã¯æ¬¡ã®ã‚»ãƒ«ã¯è©°ã‚ç‰©
 					if (CursorX < NumOfColumns - 1) {
 						buff_char_t *b = &CodeLineW[CursorX + 1];
 						BuffSetChar(b, 0, 'H');
@@ -3236,15 +3236,15 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 				}
 			}
 			else if (move_x == 1) {
-				// ”¼Šp
+				// åŠè§’
 				StrChangeCount = StrChangeCount + 1;
 			}
 			else /*if (move_x == 2)*/ {
-				// ‘SŠp
+				// å…¨è§’
 				StrChangeCount = StrChangeCount + 2;
 			}
 
-			// URL‚ÌŒŸo
+			// URLã®æ¤œå‡º
 			mark_url_w(CursorX, CursorY);
 		}
 	}
@@ -3276,16 +3276,16 @@ static BOOL CheckSelect(int x, int y)
 }
 
 /**
- *	1s•`‰æ
+ *	1è¡Œæç”»
  *
- *	@param	SY				ƒXƒNƒŠ[ƒ“ã‚ÌˆÊ’u(Character)  !ƒoƒbƒtƒ@ã‚ÌˆÊ’u
- *							PageStart + YStart ‚È‚Ç
- *	@param	IStart,IEnd		ƒXƒNƒŠ[ƒ“ã‚ÌˆÊ’u(Character)
- *							w’è‚µ‚½ŠÔ‚ğ•`‰æ‚·‚é
- *  @param	disp_strW()		wchar_t •¶š‚ğ•`‰æ—pŠÖ” (Unicode—p)
- *  @param	disp_strA()		char •¶š‚ğ•`‰æ—pŠÖ” (ANSI—p)
- *  @param	disp_setup_dc()	ƒAƒgƒŠƒrƒ…[ƒgİ’èŠÖ”
- *	@param	data			disp_strW(A)() ‚É“n‚³‚ê‚éƒf[ƒ^
+ *	@param	SY				ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ä¸Šã®ä½ç½®(Character)  !ãƒãƒƒãƒ•ã‚¡ä¸Šã®ä½ç½®
+ *							PageStart + YStart ãªã©
+ *	@param	IStart,IEnd		ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ä¸Šã®ä½ç½®(Character)
+ *							æŒ‡å®šã—ãŸé–“ã‚’æç”»ã™ã‚‹
+ *  @param	disp_strW()		wchar_t æ–‡å­—ã‚’æç”»ç”¨é–¢æ•° (Unicodeç”¨)
+ *  @param	disp_strA()		char æ–‡å­—ã‚’æç”»ç”¨é–¢æ•° (ANSIç”¨)
+ *  @param	disp_setup_dc()	ã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆè¨­å®šé–¢æ•°
+ *	@param	data			disp_strW(A)() ã«æ¸¡ã•ã‚Œã‚‹ãƒ‡ãƒ¼ã‚¿
  */
 static
 void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
@@ -3306,7 +3306,7 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 	BOOL CurAttrEmoji;
 	BOOL CurSelected;
 	BOOL EndFlag = FALSE;
-	int count = 0;		// Œ»İ’–Ú‚µ‚Ä‚¢‚é•¶š,IStart‚©‚ç
+	int count = 0;		// ç¾åœ¨æ³¨ç›®ã—ã¦ã„ã‚‹æ–‡å­—,IStartã‹ã‚‰
 #if 0
 	OutputDebugPrintf("BuffGetDrawInfoW(%d,%d-%d)\n", SY, IStart, IEnd);
 #endif
@@ -3319,12 +3319,12 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 		BOOL DrawFlag = FALSE;
 		BOOL SetString = FALSE;
 
-		// ƒAƒgƒŠƒrƒ…[ƒgæ“¾
+		// ã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆå–å¾—
 		if (count == 0) {
-			// Å‰‚Ì1•¶š–Ú
+			// æœ€åˆã®1æ–‡å­—ç›®
 			int ptr = TmpPtr + istart + count;
 			if (IsBuffPadding(b)) {
-				// Å‰‚É•\¦‚µ‚æ‚¤‚Æ‚µ‚½•¶š‚ª2cell‚Ì‰E‘¤‚¾‚Á‚½ê‡
+				// æœ€åˆã«è¡¨ç¤ºã—ã‚ˆã†ã¨ã—ãŸæ–‡å­—ãŒ2cellã®å³å´ã ã£ãŸå ´åˆ
 				// assert(FALSE);
 				ptr--;
 			}
@@ -3337,10 +3337,10 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 		}
 
 		if (IsBuffPadding(b)) {
-			// 2cell‚ÌŸ‚Ì•¶š,ˆ—•s—v
+			// 2cellã®æ¬¡ã®æ–‡å­—,å‡¦ç†ä¸è¦
 		} else {
 			if (count == 0) {
-				// Å‰‚Ì1•¶š–Ú
+				// æœ€åˆã®1æ–‡å­—ç›®
 				SetString = TRUE;
 			} else {
 				TCharAttr TempAttr;
@@ -3351,7 +3351,7 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 				if (b->u32 != 0 &&
 					((TCharAttrCmp(CurAttr, TempAttr) != 0 || CurAttrEmoji != b->Emoji) ||
 					 (CurSelected != CheckSelect(istart+count,SY)))){
-					// ‚±‚Ì•¶š‚ÅƒAƒgƒŠƒrƒ…[ƒg‚ª•Ï‰»‚µ‚½ ¨ •`‰æ
+					// ã“ã®æ–‡å­—ã§ã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆãŒå¤‰åŒ–ã—ãŸ â†’ æç”»
 					DrawFlag = TRUE;
 					count--;
 				} else {
@@ -3366,7 +3366,7 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 				bufWW[lenW] = b->cell;
 				lenW++;
 			} else {
-				// UTF-16‚ÅƒTƒƒQ[ƒgƒyƒA
+				// UTF-16ã§ã‚µãƒ­ã‚²ãƒ¼ãƒˆãƒšã‚¢
 				bufW[lenW] = b->wc2[0];
 				bufWW[lenW] = 0;
 				lenW++;
@@ -3375,7 +3375,7 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 				lenW++;
 			}
 			if (b->CombinationCharCount16 != 0) {
-				// ƒRƒ“ƒrƒl[ƒVƒ‡ƒ“
+				// ã‚³ãƒ³ãƒ“ãƒãƒ¼ã‚·ãƒ§ãƒ³
 				int i;
 				const char cell_tmp = bufWW[lenW - 1];
 				bufWW[lenW - 1] = 0;
@@ -3385,10 +3385,10 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 				}
 				bufWW[lenW + b->CombinationCharCount16 - 1] = cell_tmp;
 				lenW += b->CombinationCharCount16;
-				DrawFlag = TRUE;  // ƒRƒ“ƒrƒl[ƒVƒ‡ƒ“‚ª‚ ‚éê‡‚Í‚·‚®•`‰æ
+				DrawFlag = TRUE;  // ã‚³ãƒ³ãƒ“ãƒãƒ¼ã‚·ãƒ§ãƒ³ãŒã‚ã‚‹å ´åˆã¯ã™ãæç”»
 			}
 
-			// ANSI”Å
+			// ANSIç‰ˆ
 			{
 				unsigned short ansi_char = b->ansi_char;
 				int i;
@@ -3410,8 +3410,8 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 					lenA++;
 					c++;
 				}
-				// ANSI•¶š—ñ‚Å•\¦‚Å‚«‚é‚Ì‚Í 1or2cell(”¼Špor‘SŠp)
-				// c‚è‚Í '?' ‚ğ•\¦‚·‚é
+				// ANSIæ–‡å­—åˆ—ã§è¡¨ç¤ºã§ãã‚‹ã®ã¯ 1or2cell(åŠè§’orå…¨è§’)
+				// æ®‹ã‚Šã¯ '?' ã‚’è¡¨ç¤ºã™ã‚‹
 				for (i = c; i < cell; i++) {
 					bufA[lenA] = '?';
 					bufAW[lenA] = 0;
@@ -3424,14 +3424,14 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 			}
 		}
 
-		// ÅŒã‚Ü‚ÅƒXƒLƒƒƒ“‚µ‚½?
+		// æœ€å¾Œã¾ã§ã‚¹ã‚­ãƒ£ãƒ³ã—ãŸ?
 		if (istart + count >= IEnd) {
 			DrawFlag = TRUE;
 			EndFlag = TRUE;
 		}
 
 		if (DrawFlag) {
-			// •`‰æ‚·‚é
+			// æç”»ã™ã‚‹
 			bufA[lenA] = 0;
 			bufW[lenW] = 0;
 			bufWW[lenW] = 0;
@@ -3484,24 +3484,24 @@ static void l_disp_strA(const char *buf, const char *width_info, int count, void
 }
 
 /**
- *	1s•`‰æ ‰æ–Ê—p
+ *	1è¡Œæç”» ç”»é¢ç”¨
  *
- *	@param	DrawX,Y			Clint—Ìˆæ•`‰æˆÊ’u(pixel)
- *	@param	SY				ƒXƒNƒŠ[ƒ“ã‚ÌˆÊ’u(Character)  !ƒoƒbƒtƒ@ã‚ÌˆÊ’u
- *							PageStart + YStart ‚È‚Ç
- *	@param	IStart,IEnd		ƒXƒNƒŠ[ƒ“ã‚ÌˆÊ’u(Character)
- *							w’è‚µ‚½ŠÔ‚ğ•`‰æ‚·‚é
+ *	@param	DrawX,Y			Clinté ˜åŸŸæç”»ä½ç½®(pixel)
+ *	@param	SY				ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ä¸Šã®ä½ç½®(Character)  !ãƒãƒƒãƒ•ã‚¡ä¸Šã®ä½ç½®
+ *							PageStart + YStart ãªã©
+ *	@param	IStart,IEnd		ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ä¸Šã®ä½ç½®(Character)
+ *							æŒ‡å®šã—ãŸé–“ã‚’æç”»ã™ã‚‹
  */
 static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 {
 	int X = DrawX;
 	int Y = DrawY;
 	{
-		// ƒJ[ƒ\ƒ‹ˆÊ’uA•\¦ŠJnˆÊ’u‚©‚ç•`‰æˆÊ’u‚ª‚í‚©‚é‚Í‚¸
+		// ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã€è¡¨ç¤ºé–‹å§‹ä½ç½®ã‹ã‚‰æç”»ä½ç½®ãŒã‚ã‹ã‚‹ã¯ãš
 		int X2 = IStart;
 		int Y2 = SY - PageStart;
 		if (! IsLineVisible(&X2, &Y2)) {
-			// •`‰æ•s—vs
+			// æç”»ä¸è¦è¡Œ
 			//assert(FALSE);
 			return;
 		}
@@ -3527,12 +3527,12 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 }
 
 /**
- *	1s•`‰æ ƒvƒŠƒ“ƒ^—p
+ *	1è¡Œæç”» ãƒ—ãƒªãƒ³ã‚¿ç”¨
  *
- *	@param	SY				ƒXƒNƒŠ[ƒ“ã‚ÌˆÊ’u(Character)  !ƒoƒbƒtƒ@ã‚ÌˆÊ’u
- *							PageStart + YStart ‚È‚Ç
- *	@param	IStart,IEnd		ƒXƒNƒŠ[ƒ“ã‚ÌˆÊ’u(Character)
- *							w’è‚µ‚½ŠÔ‚ğ•`‰æ‚·‚é
+ *	@param	SY				ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ä¸Šã®ä½ç½®(Character)  !ãƒãƒƒãƒ•ã‚¡ä¸Šã®ä½ç½®
+ *							PageStart + YStart ãªã©
+ *	@param	IStart,IEnd		ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ä¸Šã®ä½ç½®(Character)
+ *							æŒ‡å®šã—ãŸé–“ã‚’æç”»ã™ã‚‹
  */
 static void BuffDrawLineIPrn(int SY, int IStart, int IEnd)
 {
@@ -3650,7 +3650,7 @@ void MoveCursor(int Xnew, int Ynew)
 	CursorY = Ynew;
 	Wrap = FALSE;
 
-	/* Å‰ºs‚Å‚¾‚¯©“®ƒXƒNƒ[ƒ‹‚·‚é*/
+	/* æœ€ä¸‹è¡Œã§ã ã‘è‡ªå‹•ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã™ã‚‹*/
 	if (ts.AutoScrollOnlyInBottomLine == 0 || WinOrgY == 0) {
 		DispScrollToCursor(CursorX, CursorY);
 	}
@@ -3661,7 +3661,7 @@ void MoveRight(void)
   this procedure must be called from DispChar&DispKanji only */
 {
 	CursorX++;
-	/* Å‰ºs‚Å‚¾‚¯©“®ƒXƒNƒ[ƒ‹‚·‚é */
+	/* æœ€ä¸‹è¡Œã§ã ã‘è‡ªå‹•ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã™ã‚‹ */
 	if (ts.AutoScrollOnlyInBottomLine == 0 || WinOrgY == 0) {
 		DispScrollToCursor(CursorX, CursorY);
 	}
@@ -3723,7 +3723,7 @@ void BuffScrollNLines(int n)
 	if (CursorLeftM == 0 && CursorRightM == NumOfColumns-1 && CursorTop == 0) {
 		if (CursorBottom == NumOfLines-1) {
 			WinOrgY = WinOrgY-n;
-			/* Å‰ºs‚Å‚¾‚¯©“®ƒXƒNƒ[ƒ‹‚·‚é */
+			/* æœ€ä¸‹è¡Œã§ã ã‘è‡ªå‹•ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã™ã‚‹ */
 			if (ts.AutoScrollOnlyInBottomLine != 0 && NewOrgY != 0) {
 				NewOrgY = WinOrgY;
 			}
@@ -3732,9 +3732,9 @@ void BuffScrollNLines(int n)
 			return;
 		}
 		else if (CursorY <= CursorBottom) {
-			/* Å‰ºs‚Å‚¾‚¯©“®ƒXƒNƒ[ƒ‹‚·‚é */
+			/* æœ€ä¸‹è¡Œã§ã ã‘è‡ªå‹•ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã™ã‚‹ */
 			if (ts.AutoScrollOnlyInBottomLine != 0 && NewOrgY != 0) {
-				/* ƒXƒNƒ[ƒ‹‚³‚¹‚È‚¢ê‡‚Ìˆ— */
+				/* ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã•ã›ãªã„å ´åˆã®å‡¦ç† */
 				WinOrgY = WinOrgY-n;
 				NewOrgY = WinOrgY;
 				BuffScroll(n,CursorBottom);
@@ -3908,10 +3908,10 @@ void CursorUpWithScroll(void)
 }
 
 /**
- * ’PŒê‹æØ‚è•¶š”»’è
+ * å˜èªåŒºåˆ‡ã‚Šæ–‡å­—åˆ¤å®š
  *
- *	@retval	TRUE	‹æØ‚è•¶š
- *	@retval	FALSE	‹æØ‚è•¶š‚Å‚Í‚È‚¢
+ *	@retval	TRUE	åŒºåˆ‡ã‚Šæ–‡å­—
+ *	@retval	FALSE	åŒºåˆ‡ã‚Šæ–‡å­—ã§ã¯ãªã„
  */
 static BOOL IsDelimiter(LONG Line, int CharPtr)
 {
@@ -3958,7 +3958,7 @@ static void invokeBrowserWithUrl(const wchar_t *url)
 	}
 
 	if (use_browser && ts.ClickableUrlBrowser[0] != 0) {
-		// ƒuƒ‰ƒEƒU‚ğg—p‚·‚é
+		// ãƒ–ãƒ©ã‚¦ã‚¶ã‚’ä½¿ç”¨ã™ã‚‹
 		wchar_t *browser = ToWcharA(ts.ClickableUrlBrowser);
 		wchar_t *param;
 		aswprintf(&param, L"%hs %s", ts.ClickableUrlBrowserArg, url);
@@ -3967,24 +3967,24 @@ static void invokeBrowserWithUrl(const wchar_t *url)
 		free(param);
 		free(browser);
 		if (r >= (HINSTANCE)32) {
-			// Às‚Å‚«‚½
+			// å®Ÿè¡Œã§ããŸ
 			return;
 		}
-		// ƒRƒ}ƒ“ƒh‚ÌÀs‚É¸”s‚µ‚½ê‡‚Í’Êí‚Æ“¯‚¶ˆ—‚ğ‚·‚é
+		// ã‚³ãƒãƒ³ãƒ‰ã®å®Ÿè¡Œã«å¤±æ•—ã—ãŸå ´åˆã¯é€šå¸¸ã¨åŒã˜å‡¦ç†ã‚’ã™ã‚‹
 	}
 
 	ShellExecuteW(NULL, NULL, url, NULL, NULL, SW_SHOWNORMAL);
 }
 
 /**
- *	•¶š‚ğ’T‚·,‘O•û
+ *	æ–‡å­—ã‚’æ¢ã™,å‰æ–¹
  *
- *	@param[in]	sx				ƒXƒ^[ƒg
+ *	@param[in]	sx				ã‚¹ã‚¿ãƒ¼ãƒˆ
  *	@param[in]	sy
- *	@param[in]	is_finish()		I—¹ğŒ‚ğ–‚½‚·‚Æ‚«‚ÉTRUE‚ğ•Ô‚·ŠÖ”
- *	@param[in]	work			ŠÖ”‚Ö“n‚·ƒ|ƒCƒ“ƒ^
- *	@param[in]	line_continue	FALSE=s“ª‚ÅŒŸõ‚ğ‘Å‚¿Ø‚é
- *	@param[out]	destx			Œ©‚Â‚¯‚½ˆÊ’u
+ *	@param[in]	is_finish()		çµ‚äº†æ¡ä»¶ã‚’æº€ãŸã™ã¨ãã«TRUEã‚’è¿”ã™é–¢æ•°
+ *	@param[in]	work			é–¢æ•°ã¸æ¸¡ã™ãƒã‚¤ãƒ³ã‚¿
+ *	@param[in]	line_continue	FALSE=è¡Œé ­ã§æ¤œç´¢ã‚’æ‰“ã¡åˆ‡ã‚‹
+ *	@param[out]	destx			è¦‹ã¤ã‘ãŸä½ç½®
  *	@param[out]	dexty
  */
 static void SearchCharPrev(
@@ -4001,22 +4001,22 @@ static void SearchCharPrev(
 	assert(b->Padding == FALSE);
 
 	for (;;) {
-		// ˆÚ“®‘O‚ğ‹L‰¯
+		// ç§»å‹•å‰ã‚’è¨˜æ†¶
 		int px = sx;
 		int py = sy;
 
-		// 1‚Â‘O‚ÌƒLƒƒƒ‰ƒNƒ^‚ÖˆÚ“®
+		// 1ã¤å‰ã®ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã¸ç§»å‹•
 		if (sx <= 0) {
-			// s“ª‚È‚çã‚Ìs‚Ö
+			// è¡Œé ­ãªã‚‰ä¸Šã®è¡Œã¸
 			if (!line_continue) {
-				// ã‚Ìs‚ÖŒp‘±‚µ‚È‚¢AŒŸõ‘Å‚¿Ø‚è
+				// ä¸Šã®è¡Œã¸ç¶™ç¶šã—ãªã„ã€æ¤œç´¢æ‰“ã¡åˆ‡ã‚Š
 				sx = 0;
 				break;
 			}
 			else {
-				// ã‚Ìs‚©‚çŒp‘±‚µ‚Ä‚¢‚é?
+				// ä¸Šã®è¡Œã‹ã‚‰ç¶™ç¶šã—ã¦ã„ã‚‹?
 				if (sy > 0 && (b->attr & AttrLineContinued)) {
-					// Œp‘±‚µ‚Ä‚¢‚é,‘O‚Ìs‚ÌÅŒã‚Ö
+					// ç¶™ç¶šã—ã¦ã„ã‚‹,å‰ã®è¡Œã®æœ€å¾Œã¸
 					sy--;
 					ptr = GetLinePtr(sy);
 					sx = NumOfColumns - 1;
@@ -4024,22 +4024,22 @@ static void SearchCharPrev(
 					b = CodeBuffW + ptr + sx;
 				}
 				else {
-					// Œp‘±‚µ‚Ä‚¢‚È‚¢,‘Å‚¿Ø‚è
+					// ç¶™ç¶šã—ã¦ã„ãªã„,æ‰“ã¡åˆ‡ã‚Š
 					sx = 0;
 					break;
 				}
 			}
 		}
 		else {
-			// 1char‘O‚Ö
+			// 1charå‰ã¸
 			sx--;
 			b--;
-			// 2cellˆÈã‚Ì•¶š‚Ì‚Æ‚«“ªo‚µ‚·‚é
+			// 2cellä»¥ä¸Šã®æ–‡å­—ã®ã¨ãé ­å‡ºã—ã™ã‚‹
 			while (b->Padding == TRUE) {
 				sx--;
 				b--;
 				if (sx < 0) {
-					// s“ª‚ª Padding ‚Í‚È‚¢‚Í‚¸
+					// è¡Œé ­ãŒ Padding ã¯ãªã„ã¯ãš
 					assert(0);
 					sx = 0;
 					goto break_all;
@@ -4047,10 +4047,10 @@ static void SearchCharPrev(
 			}
 		}
 
-		// I—¹?
+		// çµ‚äº†?
 		if (is_finish(ptr, sx, work)) {
 		break_all:
-			// 1‚Â‘O‚Éi‚Ş‘O‚ÌˆÊ’u‚ğ•Ô‚·
+			// 1ã¤å‰ã«é€²ã‚€å‰ã®ä½ç½®ã‚’è¿”ã™
 			sx = px;
 			sy = py;
 			break;
@@ -4061,14 +4061,14 @@ static void SearchCharPrev(
 }
 
 /**
- *	•¶š‚ğ’T‚·,Œã•û
+ *	æ–‡å­—ã‚’æ¢ã™,å¾Œæ–¹
  *
- *	@param[in]	sx				ƒXƒ^[ƒg
+ *	@param[in]	sx				ã‚¹ã‚¿ãƒ¼ãƒˆ
  *	@param[in]	sy
- *	@param[in]	is_finish()		I—¹ğŒ‚ğ–‚½‚·‚Æ‚«‚ÉTRUE‚ğ•Ô‚·ŠÖ”
- *	@param[in]	work			ŠÖ”‚Ö“n‚·ƒ|ƒCƒ“ƒ^
- *	@param[in]	line_continue	FALSE=s––‚ÅŒŸõ‚ğ‘Å‚¿Ø‚é
- *	@param[out]	destx			Œ©‚Â‚¯‚½ˆÊ’u
+ *	@param[in]	is_finish()		çµ‚äº†æ¡ä»¶ã‚’æº€ãŸã™ã¨ãã«TRUEã‚’è¿”ã™é–¢æ•°
+ *	@param[in]	work			é–¢æ•°ã¸æ¸¡ã™ãƒã‚¤ãƒ³ã‚¿
+ *	@param[in]	line_continue	FALSE=è¡Œæœ«ã§æ¤œç´¢ã‚’æ‰“ã¡åˆ‡ã‚‹
+ *	@param[out]	destx			è¦‹ã¤ã‘ãŸä½ç½®
  *	@param[out]	dexty
  */
 static void SearchCharNext(
@@ -4084,26 +4084,26 @@ static void SearchCharNext(
 		int px = sx;
 		int py = sy;
 
-		// Ÿ‚ÌƒLƒƒƒ‰ƒNƒ^‚Ö
+		// æ¬¡ã®ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã¸
 		if (sx + b->cell > NumOfColumns - 1) {
-			// Ÿ‚Éi‚Ş‚Æs––?
+			// æ¬¡ã«é€²ã‚€ã¨è¡Œæœ«?
 			if (!line_continue) {
-				// ŒŸõ‘Å‚¿Ø‚è
+				// æ¤œç´¢æ‰“ã¡åˆ‡ã‚Š
 				sx = NumOfColumns - 1;
 				break;
 			}
 			else {
-				// ‰º‚Ìs‚ªŒp‘±‚µ‚Ä‚¢‚é?
+				// ä¸‹ã®è¡ŒãŒç¶™ç¶šã—ã¦ã„ã‚‹?
 				b += b->cell - 1;
 				if (sy < BuffEnd && (b->attr & AttrLineContinued)) {
-					// Œp‘±‚µ‚Ä‚¢‚é
+					// ç¶™ç¶šã—ã¦ã„ã‚‹
 					sx = 0;
 					sy++;
 					ptr = GetLinePtr(sy);
 					b = CodeBuffW + ptr;
 				}
 				else {
-					// ŒŸõ‘Å‚¿Ø‚è
+					// æ¤œç´¢æ‰“ã¡åˆ‡ã‚Š
 					sx = NumOfColumns - 1;
 					break;
 				}
@@ -4113,14 +4113,14 @@ static void SearchCharNext(
 			sx += b->cell;
 			b += b->cell;
 			if (sx > NumOfColumns - 1) {
-				// ‚Í‚İo‚·‚Ì‚Í‚¨‚©‚µ‚¢
+				// ã¯ã¿å‡ºã™ã®ã¯ãŠã‹ã—ã„
 				sx = NumOfColumns - 1;
 			}
 		}
 
-		// I—¹?
+		// çµ‚äº†?
 		if (is_finish(ptr, sx, work)) {
-			// 1‚Â‘O‚Éi‚Ş‘O‚ÌˆÊ’u‚ğ•Ô‚·
+			// 1ã¤å‰ã«é€²ã‚€å‰ã®ä½ç½®ã‚’è¿”ã™
 			sx = px;
 			sy = py;
 			break;
@@ -4289,10 +4289,10 @@ typedef struct delimiter_work_tag {
 } delimiter_work;
 
 /**
- *	‹æØ‚è•¶šƒ`ƒFƒbƒN
+ *	åŒºåˆ‡ã‚Šæ–‡å­—ãƒã‚§ãƒƒã‚¯
  *
- *	@retval	TRUE	‹æØ‚è•¶š‚É‚È‚Á‚½
- *	@retval	FALSE	‹æØ‚è•¶š‚Å‚Í‚È‚¢
+ *	@retval	TRUE	åŒºåˆ‡ã‚Šæ–‡å­—ã«ãªã£ãŸ
+ *	@retval	FALSE	åŒºåˆ‡ã‚Šæ–‡å­—ã§ã¯ãªã„
  */
 static BOOL CheckDelimiterChar(LONG ptr, int x, void *vwork)
 {
@@ -4300,20 +4300,20 @@ static BOOL CheckDelimiterChar(LONG ptr, int x, void *vwork)
 	const buff_char_t *b = CodeBuffW + ptr + x;
 
 	if (work->start_delimiter) {
-		// ‹æØ‚è•¶š‚©‚çƒXƒ^[ƒg‚µ‚½ê‡
+		// åŒºåˆ‡ã‚Šæ–‡å­—ã‹ã‚‰ã‚¹ã‚¿ãƒ¼ãƒˆã—ãŸå ´åˆ
 		wchar_t *wcs = GetWCS(b);
 		int r = wcscmp(wcs, work->start_char);
 		free(wcs);
 		return r != 0;
 	}
 	else {
-		// ”ñ‹æØ‚è•¶š‚©‚çƒXƒ^[ƒg‚µ‚½ê‡
+		// éåŒºåˆ‡ã‚Šæ–‡å­—ã‹ã‚‰ã‚¹ã‚¿ãƒ¼ãƒˆã—ãŸå ´åˆ
 		if (IsDelimiter(ptr, x) ||
 			(ts.DelimDBCS != 0 && ((b->cell == 1) != work->start_cell))) {
-			// Œ»İˆÊ’u
-			//		‹æØ‚è•¶š‚É‚È‚Á‚½
-			//		ƒXƒ^[ƒg•¶š‚ÌƒZƒ‹”‚ÆˆÙ‚È‚éƒZƒ‹”(1or‚»‚Ì‘¼)‚Æ‚È‚Á‚½
-			// I—¹
+			// ç¾åœ¨ä½ç½®
+			//		åŒºåˆ‡ã‚Šæ–‡å­—ã«ãªã£ãŸ
+			//		ã‚¹ã‚¿ãƒ¼ãƒˆæ–‡å­—ã®ã‚»ãƒ«æ•°ã¨ç•°ãªã‚‹ã‚»ãƒ«æ•°(1orãã®ä»–)ã¨ãªã£ãŸ
+			// çµ‚äº†
 			return TRUE;
 		}
 	}
@@ -4321,12 +4321,12 @@ static BOOL CheckDelimiterChar(LONG ptr, int x, void *vwork)
 }
 
 /**
- *	•¶š‚Ì‹æØ‚è(Delimiter)‚ğ’T‚·,‘O•û
+ *	æ–‡å­—ã®åŒºåˆ‡ã‚Š(Delimiter)ã‚’æ¢ã™,å‰æ–¹
  *
- *	@param[in]	sx				ƒXƒ^[ƒg
+ *	@param[in]	sx				ã‚¹ã‚¿ãƒ¼ãƒˆ
  *	@param[in]	sy
- *	@param[in]	line_continue	FALSE=s‚Ì“ª”ö‚Å‹æØ‚é
- *	@param[out]	destx			Œ©‚Â‚¯‚½ˆÊ’u
+ *	@param[in]	line_continue	FALSE=è¡Œã®é ­å°¾ã§åŒºåˆ‡ã‚‹
+ *	@param[out]	destx			è¦‹ã¤ã‘ãŸä½ç½®
  *	@param[out]	dexty
  */
 static void SearchDelimiterPrev(int sx, int sy, BOOL line_continue, int *destx, int *desty)
@@ -4347,12 +4347,12 @@ static void SearchDelimiterPrev(int sx, int sy, BOOL line_continue, int *destx, 
 }
 
 /**
- *	•¶š‚Ì‹æØ‚è(Delimiter)‚ğ’T‚·,Œã•û
+ *	æ–‡å­—ã®åŒºåˆ‡ã‚Š(Delimiter)ã‚’æ¢ã™,å¾Œæ–¹
  *
- *	@param[in]	sx				ƒXƒ^[ƒg
+ *	@param[in]	sx				ã‚¹ã‚¿ãƒ¼ãƒˆ
  *	@param[in]	sy
- *	@param[in]	line_continue	FALSE=s‚Ì“ª”ö‚Å‹æØ‚é
- *	@param[out]	destx			Œ©‚Â‚¯‚½ˆÊ’u
+ *	@param[in]	line_continue	FALSE=è¡Œã®é ­å°¾ã§åŒºåˆ‡ã‚‹
+ *	@param[out]	destx			è¦‹ã¤ã‘ãŸä½ç½®
  *	@param[out]	dexty
  */
 static void SearchDelimiterNext(
@@ -4415,14 +4415,14 @@ void BuffDblClk(int Xw, int Yw)
 			int dest_x;
 			int dest_y;
 
-			// ‘O•û‚Ì‹æØ‚è‚ğ’T‚·
+			// å‰æ–¹ã®åŒºåˆ‡ã‚Šã‚’æ¢ã™
 			SearchDelimiterPrev(IStart, YStart, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
 			IStart = dest_x;
 			YStart = dest_y;
 
-			// Œã•û‚Ì‹æØ‚è‚ğ’T‚·
+			// å¾Œæ–¹ã®åŒºåˆ‡ã‚Šã‚’æ¢ã™
 			SearchDelimiterNext(IEnd, YEnd, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
-			IEnd = dest_x + 1; // I’[‚Ìˆê‚ÂŒã‚ë
+			IEnd = dest_x + 1; // çµ‚ç«¯ã®ä¸€ã¤å¾Œã‚
 			YEnd = dest_y;
 		}
 		SelectStart.x = IStart;
@@ -4498,15 +4498,15 @@ void BuffSeveralPagesSelect(int Xw, int Yw)
 }
 
 /**
- *	•¶š‚Ì‘¶İ‚·‚écellˆÊ’u‚ğ•Ô‚·
+ *	æ–‡å­—ã®å­˜åœ¨ã™ã‚‹cellä½ç½®ã‚’è¿”ã™
  *
- *	VT Windowã‚Ì(x,y)‚ÌcellˆÊ’u‚©‚ç•¶š‚Ì‘¶İ‚·‚écellˆÊ’u‚ğ•Ô‚·
- *	•¶š‚Ìcell”‚ÆAcellã‚Ì‰E‘¤‚©¶‘¤‚©(right)‚ğ”»’f‚µ‚ÄcellˆÊ’u‚ğ•Ô‚·
+ *	VT Windowä¸Šã®(x,y)ã®cellä½ç½®ã‹ã‚‰æ–‡å­—ã®å­˜åœ¨ã™ã‚‹cellä½ç½®ã‚’è¿”ã™
+ *	æ–‡å­—ã®cellæ•°ã¨ã€cellä¸Šã®å³å´ã‹å·¦å´ã‹(right)ã‚’åˆ¤æ–­ã—ã¦cellä½ç½®ã‚’è¿”ã™
  *
- *	@param[in]	x		VT Windowsã‚Ì•¶š(ƒZƒ‹)ˆÊ’u
- *	@param[in]	y		ƒoƒbƒtƒ@ã‚Ìy(PageStart‰ÁZÏ‚İ)
- *	@param[in]	right	FALSE/TRUE = cellã‚Ì¶‘¤/‰E‘¤
- *	@return		•¶š‚ÌcellˆÊ’u
+ *	@param[in]	x		VT Windowsä¸Šã®æ–‡å­—(ã‚»ãƒ«)ä½ç½®
+ *	@param[in]	y		ãƒãƒƒãƒ•ã‚¡ä¸Šã®y(PageStartåŠ ç®—æ¸ˆã¿)
+ *	@param[in]	right	FALSE/TRUE = cellä¸Šã®å·¦å´/å³å´
+ *	@return		æ–‡å­—ã®cellä½ç½®
  */
 static POINT GetCharCell(int x, int y, BOOL right)
 {
@@ -4517,36 +4517,36 @@ static POINT GetCharCell(int x, int y, BOOL right)
 	y = y < 0 ? 0 : y > BuffEnd - 1 ? BuffEnd - 1 : y;
 
 	int ptr = GetLinePtr(y);
-	int x_char = LeftHalfOfDBCS(ptr, x);		// •¶š‚Ìæ“ª
+	int x_char = LeftHalfOfDBCS(ptr, x);		// æ–‡å­—ã®å…ˆé ­
 
 	const buff_char_t *b = CodeBuffW + ptr + x_char;
 	int cell = b->cell;
 	if ((cell & 1) == 0) {
-		// ‹ô”’·cell•¶š(2cell‚È‚Ç)
+		// å¶æ•°é•·cellæ–‡å­—(2cellãªã©)
 		int pos = x - x_char;
 		if (pos >= (cell / 2)) {
-			// •¶š‚Ì’†‰›‚æ‚è‰E‘¤‚È‚Ì‚ÅAˆê‚Â‰E‚Ì•¶š‚ğ‘I‘ğ
+			// æ–‡å­—ã®ä¸­å¤®ã‚ˆã‚Šå³å´ãªã®ã§ã€ä¸€ã¤å³ã®æ–‡å­—ã‚’é¸æŠ
 			if ((x_char + cell) < (NumOfColumns - 1)) {
 				x = x_char + cell;
 			}
 		}
 	} else {
-		// Šï”’·cell•¶š(1cell,3cell‚È‚Ç)
+		// å¥‡æ•°é•·cellæ–‡å­—(1cell,3cellãªã©)
 		int x_th = x_char + (cell + 1) / 2 - 1;
 		if (x == x_th) {
-			// ‚¿‚å‚¤‚Ç^‚ñ’†‚Ìcell‚¾‚Á‚½
+			// ã¡ã‚‡ã†ã©çœŸã‚“ä¸­ã®cellã ã£ãŸæ™‚
 			if (right == FALSE) {
-				// cell‚Ì¶‘¤‚È‚Ì‚ÅA•¶š‚Ìæ“ª
+				// cellã®å·¦å´ãªã®ã§ã€æ–‡å­—ã®å…ˆé ­
 				x = x_char;
 			} else {
-				// cell‚Ì‰E‘¤‚È‚Ì‚ÅAˆê‚Â‰E‚Ì•¶š‚ğ‘I‘ğ
+				// cellã®å³å´ãªã®ã§ã€ä¸€ã¤å³ã®æ–‡å­—ã‚’é¸æŠ
 				x = x_char + cell;
 			}
 		} else if (x < x_th) {
-			// •¶š‚Ì¶‘¤‚È‚Ì‚ÅA•¶š‚Ìæ“ª
+			// æ–‡å­—ã®å·¦å´ãªã®ã§ã€æ–‡å­—ã®å…ˆé ­
 			x = x_char;
 		} else {
-			// •¶š‚Ì‰E‘¤‚È‚Ì‚ÅAˆê‚Â‰E‚Ì•¶š‚ğ‘I‘ğ
+			// æ–‡å­—ã®å³å´ãªã®ã§ã€ä¸€ã¤å³ã®æ–‡å­—ã‚’é¸æŠ
 			x = x_char + cell;
 		}
 	}
@@ -4597,12 +4597,12 @@ void BuffStartSelect(int Xw, int Yw, BOOL Box)
 
 /**
  *  Change selection region by mouse move
- *	ƒ}ƒEƒX‚ªˆÚ“®‚µ‚Ä‘I‘ğ—Ìˆæ‚ª•Ï‰»
+ *	ãƒã‚¦ã‚¹ãŒç§»å‹•ã—ã¦é¸æŠé ˜åŸŸãŒå¤‰åŒ–
  *
  *	@param Xw		horizontal position of the mouse cursor
  *					in window coordinate
  *	@param Yw		vertical
- *	@param NClick	1/2/3	ƒ|ƒCƒ“ƒ^ˆÚ“®’¼‘O‚ÌƒNƒŠƒbƒN”
+ *	@param NClick	1/2/3	ãƒã‚¤ãƒ³ã‚¿ç§»å‹•ç›´å‰ã®ã‚¯ãƒªãƒƒã‚¯æ•°
  */
 void BuffChangeSelect(int Xw, int Yw, int NClick)
 {
@@ -4639,7 +4639,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 	if (NClick==2) { // drag after double click
 		if ((DblClkStart.y > Y) ||
 			(DblClkStart.y == Y && X < DblClkStart.x)) {
-			// ƒ_ƒuƒ‹ƒNƒŠƒbƒN‘I‘ğ—Ìˆæ‚æ‚è‘O‚ğ‘I‘ğ
+			// ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯é¸æŠé ˜åŸŸã‚ˆã‚Šå‰ã‚’é¸æŠ
 			int dest_x;
 			int dest_y;
 			SearchDelimiterPrev(X, Y, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
@@ -4648,7 +4648,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 			SelectStart = DblClkEnd;
 		} else if ((DblClkEnd.y < Y) ||
 				   (DblClkEnd.y == Y && X > DblClkEnd.x)) {
-			// ƒ_ƒuƒ‹ƒNƒŠƒbƒN‘I‘ğ—Ìˆæ‚æ‚èŒã‚ë‚ğ‘I‘ğ
+			// ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯é¸æŠé ˜åŸŸã‚ˆã‚Šå¾Œã‚ã‚’é¸æŠ
 			int dest_x;
 			int dest_y;
 			SearchDelimiterNext(X - 1, Y, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
@@ -4656,7 +4656,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 			SelectEnd.y = dest_y;
 			SelectStart = DblClkStart;
 		} else {
-			// ƒ_ƒuƒ‹ƒNƒŠƒbƒN‘I‘ğ—Ìˆæã‚¾‚Á‚½ê‡
+			// ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯é¸æŠé ˜åŸŸä¸Šã ã£ãŸå ´åˆ
 			SelectStart = DblClkStart;
 			SelectEnd = DblClkEnd;
 		}
@@ -4727,12 +4727,12 @@ wchar_t *BuffEndSelect(void)
 		}
 
 		if (SeveralPageSelect) { // yutaka
-			// ƒy[ƒW‚ğ‚Ü‚½‚®‘I‘ğ‚Ìê‡AMouse button up‚ÉƒŠ[ƒWƒ‡ƒ“‚ğ“h‚è‘Ö‚¦‚éB
+			// ãƒšãƒ¼ã‚¸ã‚’ã¾ãŸãé¸æŠã®å ´åˆã€Mouse button upæ™‚ã«ãƒªãƒ¼ã‚¸ãƒ§ãƒ³ã‚’å¡—ã‚Šæ›¿ãˆã‚‹ã€‚
 			LockBuffer();
 			ChangeSelectRegion();
 			UnlockBuffer();
 			SeveralPageSelect = FALSE;
-			InvalidateRect(HVTWin, NULL, TRUE); // ‚¿‚å‚Á‚Æ‰æ–Ê‚ª‚¿‚ç‚Â‚­
+			InvalidateRect(HVTWin, NULL, TRUE); // ã¡ã‚‡ã£ã¨ç”»é¢ãŒã¡ã‚‰ã¤ã
 		}
 
 		/* copy to the clipboard */
@@ -5207,8 +5207,8 @@ void BuffSaveScreen(void)
 	int i;
 
 	if (SaveBuff == NULL) {
-		ScrSize = NumOfColumns * NumOfLines;	// 1‰æ–Ê•ª‚Ìƒoƒbƒtƒ@‚Ì•Û‘¶”
-		// ‘S‰æ–Ê•ª‚ÌƒoƒCƒg”
+		ScrSize = NumOfColumns * NumOfLines;	// 1ç”»é¢åˆ†ã®ãƒãƒƒãƒ•ã‚¡ã®ä¿å­˜æ•°
+		// å…¨ç”»é¢åˆ†ã®ãƒã‚¤ãƒˆæ•°
 		SaveBuff = calloc(ScrSize, sizeof(buff_char_t));
 		if (SaveBuff != NULL) {
 			CodeDestW = (buff_char_t *)SaveBuff;
@@ -5527,7 +5527,7 @@ void BuffScrollRight(int count)
 	BuffUpdateRect(CursorLeftM-(CursorLeftM>0), CursorTop, CursorRightM+(CursorRightM<NumOfColumns-1), CursorBottom);
 }
 
-// Œ»İs‚ğ‚Ü‚é‚²‚Æƒoƒbƒtƒ@‚ÉŠi”[‚·‚éB•Ô‚è’l‚ÍŒ»İ‚ÌƒJ[ƒ\ƒ‹ˆÊ’u(X)B
+// ç¾åœ¨è¡Œã‚’ã¾ã‚‹ã”ã¨ãƒãƒƒãƒ•ã‚¡ã«æ ¼ç´ã™ã‚‹ã€‚è¿”ã‚Šå€¤ã¯ç¾åœ¨ã®ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®(X)ã€‚
 int BuffGetCurrentLineData(char *buf, int bufsize)
 {
 #if 0
@@ -5543,12 +5543,12 @@ int BuffGetCurrentLineData(char *buf, int bufsize)
 }
 
 /**
- * Sys‚Ìˆês‚ğ•¶š—ñ‚É‚µ‚Ä•Ô‚·
+ * Syè¡Œã®ä¸€è¡Œã‚’æ–‡å­—åˆ—ã«ã—ã¦è¿”ã™
  *
- * @param[in]	Sy			Sys‚Ì1s‚ğ•Ô‚·
- * @param[in]	*Cx			•¶š‚ÌˆÊ’u(ƒJ[ƒ\ƒ‹‚È‚Ç‚ÌˆÊ’u), NULL‚Ì‚Æ‚«–³Œø
- * @param[out]	*Cx			¶’[‚©‚ç‚Ì•¶š”(æ“ª‚©‚çƒJ[ƒ\ƒ‹ˆÊ’u‚Ü‚Å‚Ì•¶š”)
- * @param[out]	*lenght		•¶š”(ƒ^[ƒ~ƒl[ƒ^ŠÜ‚Ş)
+ * @param[in]	Sy			Syè¡Œã®1è¡Œã‚’è¿”ã™
+ * @param[in]	*Cx			æ–‡å­—ã®ä½ç½®(ã‚«ãƒ¼ã‚½ãƒ«ãªã©ã®ä½ç½®), NULLã®ã¨ãç„¡åŠ¹
+ * @param[out]	*Cx			å·¦ç«¯ã‹ã‚‰ã®æ–‡å­—æ•°(å…ˆé ­ã‹ã‚‰ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã¾ã§ã®æ–‡å­—æ•°)
+ * @param[out]	*lenght		æ–‡å­—æ•°(ã‚¿ãƒ¼ãƒŸãƒãƒ¼ã‚¿å«ã‚€)
  */
 wchar_t *BuffGetLineStrW(int Sy, int *cx, size_t *lenght)
 {
@@ -5584,7 +5584,7 @@ wchar_t *BuffGetLineStrW(int Sy, int *cx, size_t *lenght)
 	return result;
 }
 
-// ‘Sƒoƒbƒtƒ@‚©‚çw’è‚µ‚½s‚ğ•Ô‚·B
+// å…¨ãƒãƒƒãƒ•ã‚¡ã‹ã‚‰æŒ‡å®šã—ãŸè¡Œã‚’è¿”ã™ã€‚
 int BuffGetAnyLineData(int offset_y, char *buf, int bufsize)
 {
 	LONG Ptr;
@@ -5619,13 +5619,13 @@ int BuffGetAnyLineData(int offset_y, char *buf, int bufsize)
 }
 
 /**
- * ‘Sƒoƒbƒtƒ@‚©‚çw’è‚µ‚½s‚ğ•Ô‚·B
- * filesys_log.cpp ‚Åg—p‚³‚ê‚é
+ * å…¨ãƒãƒƒãƒ•ã‚¡ã‹ã‚‰æŒ‡å®šã—ãŸè¡Œã‚’è¿”ã™ã€‚
+ * filesys_log.cpp ã§ä½¿ç”¨ã•ã‚Œã‚‹
  *
- * @param[in]	offset_y	æ“¾‚·‚és(0...)
- * @param[in]	bufsize		•¶š”
- * @return		•¶š”
- *				-1	ÅIsˆÈ~‚ğw’è
+ * @param[in]	offset_y	å–å¾—ã™ã‚‹è¡Œ(0...)
+ * @param[in]	bufsize		æ–‡å­—æ•°
+ * @return		æ–‡å­—æ•°
+ *				-1	æœ€çµ‚è¡Œä»¥é™ã‚’æŒ‡å®š
  */
 int BuffGetAnyLineDataW(int offset_y, wchar_t *buf, size_t bufsize)
 {
@@ -5708,11 +5708,11 @@ static wchar_t *UnicodeCodePointStr(char32_t u32)
 }
 
 /**
- *	w’èˆÊ’u‚Ì•¶šî•ñ‚ğ•¶š—ñ‚Å•Ô‚·
- *	ƒfƒoƒO—p“r
+ *	æŒ‡å®šä½ç½®ã®æ–‡å­—æƒ…å ±ã‚’æ–‡å­—åˆ—ã§è¿”ã™
+ *	ãƒ‡ãƒã‚°ç”¨é€”
  *
- *	@param		Xw, Yw	ƒEƒBƒ“ƒhƒEã‚ÌX,Y(pixel),ƒ}ƒEƒXƒ|ƒCƒ“ƒ^‚ÌˆÊ’u
- *	@return		•¶š—ñ(•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ)
+ *	@param		Xw, Yw	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä¸Šã®X,Y(pixel),ãƒã‚¦ã‚¹ãƒã‚¤ãƒ³ã‚¿ã®ä½ç½®
+ *	@return		æ–‡å­—åˆ—(ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨)
  */
 wchar_t *BuffGetCharInfo(int Xw, int Yw)
 {
@@ -5749,7 +5749,7 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 			  X, ScreenY, Y,
 			  Xw, Yw);
 
-	// ƒAƒgƒŠƒrƒ…[ƒg
+	// ã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆ
 	{
 		wchar_t *attr1_attr_str;
 		wchar_t *attr1_str;
@@ -5845,7 +5845,7 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 				  L" 0x%04x\n", mb, c);
 	}
 
-	// Unicode •¶š
+	// Unicode æ–‡å­—
 	{
 		wchar_t *wcs = GetWCS(b);
 		aswprintf(&unicode_char_str,
@@ -5854,7 +5854,7 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 		free(wcs);
 	}
 
-	// Unicode UTF-16 •¶šƒR[ƒh
+	// Unicode UTF-16 æ–‡å­—ã‚³ãƒ¼ãƒ‰
 	{
 		wchar_t *codes_ptr = NULL;
 		wchar_t *code_str;
@@ -5879,7 +5879,7 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
 		unicode_utf16_str = codes_ptr;
 	}
 
-	// Unicode UTF-32 •¶šƒR[ƒh
+	// Unicode UTF-32 æ–‡å­—ã‚³ãƒ¼ãƒ‰
 	{
 		wchar_t *codes_ptr = NULL;
 		wchar_t *code_str;

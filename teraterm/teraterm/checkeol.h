@@ -35,14 +35,14 @@ extern "C" {
 typedef struct CheckEOLData_st CheckEOLData_t;
 
 typedef enum {
-	CheckEOLTypeFile,	// ƒtƒ@ƒCƒ‹‚©‚ç“Ç‚Ş
-	CheckEOLTypeLog,	// ƒƒO‚Ö‘‚«‚Ş
+	CheckEOLTypeFile,	// ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã‚€
+	CheckEOLTypeLog,	// ãƒ­ã‚°ã¸æ›¸ãè¾¼ã‚€
 } CheckEOLType;
 
 typedef enum {
-	CheckEOLNoOutput = 0x00,	// ‰½‚ào—Í‚µ‚È‚¢
-	CheckEOLOutputEOL = 0x01,	// EOL‚ğo—Í‚·‚é
-	CheckEOLOutputChar = 0x02,	// ‚»‚Ì‚Ü‚Üo—Í‚·‚é
+	CheckEOLNoOutput = 0x00,	// ä½•ã‚‚å‡ºåŠ›ã—ãªã„
+	CheckEOLOutputEOL = 0x01,	// EOLã‚’å‡ºåŠ›ã™ã‚‹
+	CheckEOLOutputChar = 0x02,	// ãã®ã¾ã¾å‡ºåŠ›ã™ã‚‹
 } CheckEOLRet;
 
 CheckEOLData_t *CheckEOLCreate(CheckEOLType type);
