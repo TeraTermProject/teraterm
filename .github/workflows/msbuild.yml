@@ -490,29 +490,43 @@ jobs:
       id: vars
       shell: bash
       run: |
+        VERSION=${{ fromJson(steps.read_buildinfo.outputs.json).VERSION }}
+        DATE_TIME=${{ fromJson(steps.read_buildinfo.outputs.json).DATE }}_${{ fromJson(steps.read_buildinfo.outputs.json).TIME }}
+        VCSVERSION=${{ fromJson(steps.read_buildinfo.outputs.json).GITVERSION }}
+        SNAPSHOT_OUTPUT=teraterm-${VERSION}-${DATE_TIME}-${VCSVERSION}-snapshot
+        RELEASE_OUTPUT=teraterm-${VERSION}
         RELEASE=${{ fromJson(steps.read_buildinfo.outputs.json).RELEASE }}
+        if [ "$RELEASE" = "0" ]; then
+          OUTPUT=${SNAPSHOT_OUTPUT}
+        else
+          OUTPUT=${RELEASE_OUTPUT}
+        fi
+        echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+        echo "OUTPUT=${OUTPUT}" >> $GITHUB_OUTPUT
         echo "RELEASE=${RELEASE}" >> $GITHUB_OUTPUT
+        echo "VERSION=${VERSION}"
+        echo "OUTPUT=${OUTPUT}"
         echo "RELEASE=${RELEASE}"
 
-    - name: Download all artifacts
+    - name: Download artifacts (FILES)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       uses: actions/download-artifact@v4
       with:
-        path: installer/Output
-        pattern: BUILD-${{ github.run_number }}-${{ github.run_id }}-*-sha*sum
+        path: installer/Output/release
+        pattern: teraterm-${{ steps.vars.outputs.VERSION }}-*_FILES
         merge-multiple: true
 
-    - name: Collect release files
+    - name: Combine checksum files
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       shell: bash
       run: |
         mkdir installer/Output/checksum
         pushd installer/Output/checksum
-        cat ../*.sha256sum > files.sha256sum
-        cat ../*.sha512sum > files.sha512sum
+        cat ../release/*.sha256sum > ${{ steps.vars.outputs.OUTPUT }}.sha256sum
+        cat ../release/*.sha512sum > ${{ steps.vars.outputs.OUTPUT }}.sha512sum
         ls
 
-    - name: Upload artifacts (release files)
+    - name: Upload artifacts (checksum)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       uses: actions/upload-artifact@v4
       with:
