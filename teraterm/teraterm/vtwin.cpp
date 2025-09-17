@@ -30,8 +30,8 @@
 
 /* TERATERM.EXE, VT window */
 
-// SDK7.0‚Ìê‡AWIN32_IE‚ª“KØ‚É’è‹`‚³‚ê‚È‚¢
-#if _MSC_VER == 1400	// VS2005‚Ìê‡‚Ì‚İ
+// SDK7.0ã®å ´åˆã€WIN32_IEãŒé©åˆ‡ã«å®šç¾©ã•ã‚Œãªã„
+#if _MSC_VER == 1400	// VS2005ã®å ´åˆã®ã¿
 #if !defined(_WIN32_IE)
 #define	_WIN32_IE 0x0501
 #endif
@@ -120,7 +120,7 @@
 
 #include <initguid.h>
 #if _MSC_VER < 1600
-// Visual Studio 2005,2008 ‚Ì‚Æ‚«A2010‚æ‚èŒÃ‚¢ƒo[ƒWƒ‡ƒ“‚Ì‚Æ‚«
+// Visual Studio 2005,2008 ã®ã¨ãã€2010ã‚ˆã‚Šå¤ã„ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®ã¨ã
 DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1F, 0x00, \
              0xC0, 0x4F, 0xB9, 0x51, 0xED);
 #else
@@ -131,7 +131,7 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
 
 #define VTClassName L"VTWin32"
 
-// ƒEƒBƒ“ƒhƒEÅ‘å‰»ƒ{ƒ^ƒ“‚ğ—LŒø‚É‚·‚é (2005.1.15 yutaka)
+// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦æœ€å¤§åŒ–ãƒœã‚¿ãƒ³ã‚’æœ‰åŠ¹ã«ã™ã‚‹ (2005.1.15 yutaka)
 #define WINDOW_MAXMIMUM_ENABLED 1
 
 static BOOL TCPLocalEchoUsed = FALSE;
@@ -142,8 +142,8 @@ static BOOL IgnoreRelease = FALSE;
 UnicodeDebugParam_t UnicodeDebugParam;
 typedef struct {
 	char dbcs_lead_byte;
-	UINT monitor_DPI;			// ƒEƒBƒ“ƒhƒE‚ª•\¦‚³‚ê‚Ä‚¢‚éƒfƒBƒXƒvƒŒƒC‚ÌDPI
-	DWORD help_id;				// WM_HELPƒƒbƒZ[ƒWA•\¦‚·‚éƒwƒ‹ƒvID(0‚Å•\¦‚µ‚È‚¢)
+	UINT monitor_DPI;			// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒè¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®DPI
+	DWORD help_id;				// WM_HELPãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æ™‚ã€è¡¨ç¤ºã™ã‚‹ãƒ˜ãƒ«ãƒ—ID(0ã§è¡¨ç¤ºã—ãªã„)
 } vtwin_work_t;
 static vtwin_work_t vtwin_work;
 
@@ -152,7 +152,7 @@ extern "C" PrintFile *PrintFile_;
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
 
-// Tera Term‹N“®‚ÆURL•¶š—ñmouse over‚ÉŒÄ‚Î‚ê‚é (2005.4.2 yutaka)
+// Tera Termèµ·å‹•æ™‚ã¨URLæ–‡å­—åˆ—mouse overæ™‚ã«å‘¼ã°ã‚Œã‚‹ (2005.4.2 yutaka)
 static void SetMouseCursor(const char *cursor)
 {
 	HCURSOR hc;
@@ -161,7 +161,7 @@ static void SetMouseCursor(const char *cursor)
 
 	for (i = 0 ; MouseCursor[i].name ; i++) {
 		if (_stricmp(cursor, MouseCursor[i].name) == 0) {
-			// ANSI”Å‚ÌƒŠƒ\[ƒXID‚ğUnicode”Å‚É•ÏŠ·
+			// ANSIç‰ˆã®ãƒªã‚½ãƒ¼ã‚¹IDã‚’Unicodeç‰ˆã«å¤‰æ›
 			LPCSTR nameA = MouseCursor[i].id;
 			assert(IS_INTRESOURCE(nameA));
 			name = (LPCWSTR)nameA;
@@ -186,26 +186,26 @@ static void SetMouseCursor(const char *cursor)
 void CVTWindow::SetWindowAlpha(BYTE alpha)
 {
 	if (pSetLayeredWindowAttributes == NULL) {
-		return;	// ƒŒƒCƒ„[ƒhƒEƒCƒ“ƒhƒE‚ÌƒTƒ|[ƒg‚È‚µ
+		return;	// ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒ‰ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ã‚µãƒãƒ¼ãƒˆãªã—
 	}
 	if (Alpha == alpha) {
-		return;	// •Ï‰»‚È‚µ‚È‚ç‰½‚à‚µ‚È‚¢
+		return;	// å¤‰åŒ–ãªã—ãªã‚‰ä½•ã‚‚ã—ãªã„
 	}
 	LONG_PTR lp = GetWindowLongPtr(GWL_EXSTYLE);
 	if (lp == 0) {
 		return;
 	}
 
-	// 2006/03/16 by 337: BGUseAlphaBlendAPI‚ªOn‚È‚ç‚ÎLayered‘®«‚Æ‚·‚é
+	// 2006/03/16 by 337: BGUseAlphaBlendAPIãŒOnãªã‚‰ã°Layeredå±æ€§ã¨ã™ã‚‹
 	//if (ts->EtermLookfeel.BGUseAlphaBlendAPI) {
-	// ƒAƒ‹ƒtƒ@’l‚ª255‚Ìê‡A‰æ–Ê‚Ì‚¿‚ç‚Â‚«‚ğ—}‚¦‚é‚½‚ß‰½‚à‚µ‚È‚¢‚±‚Æ‚Æ‚·‚éB(2006.4.1 yutaka)
-	// ŒÄ‚Ño‚µŒ³‚ÅA’l‚ª•ÏX‚³‚ê‚½‚Æ‚«‚Ì‚İİ’è‚ğ”½‰f‚·‚éB(2007.10.19 maya)
+	// ã‚¢ãƒ«ãƒ•ã‚¡å€¤ãŒ255ã®å ´åˆã€ç”»é¢ã®ã¡ã‚‰ã¤ãã‚’æŠ‘ãˆã‚‹ãŸã‚ä½•ã‚‚ã—ãªã„ã“ã¨ã¨ã™ã‚‹ã€‚(2006.4.1 yutaka)
+	// å‘¼ã³å‡ºã—å…ƒã§ã€å€¤ãŒå¤‰æ›´ã•ã‚ŒãŸã¨ãã®ã¿è¨­å®šã‚’åæ˜ ã™ã‚‹ã€‚(2007.10.19 maya)
 	if (alpha < 255) {
 		::SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp | WS_EX_LAYERED);
 		pSetLayeredWindowAttributes(HVTWin, 0, alpha, LWA_ALPHA);
 	}
 	else {
-		// ƒAƒ‹ƒtƒ@’l‚ª 255 ‚Ìê‡A“§–¾‰»‘®«‚ğíœ‚µ‚ÄÄ•`‰æ‚·‚éB(2007.10.22 maya)
+		// ã‚¢ãƒ«ãƒ•ã‚¡å€¤ãŒ 255 ã®å ´åˆã€é€æ˜åŒ–å±æ€§ã‚’å‰Šé™¤ã—ã¦å†æç”»ã™ã‚‹ã€‚(2007.10.22 maya)
 		::SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp & ~WS_EX_LAYERED);
 		::RedrawWindow(HVTWin, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME);
 	}
@@ -213,7 +213,7 @@ void CVTWindow::SetWindowAlpha(BYTE alpha)
 }
 
 /**
- *	ƒVƒŠƒAƒ‹‚ÌÄÚ‘±/Ø’f‚ğs‚¤
+ *	ã‚·ãƒªã‚¢ãƒ«ã®å†æ¥ç¶š/åˆ‡æ–­ã‚’è¡Œã†
  */
 class SerialReconnect {
 
@@ -235,14 +235,14 @@ public:
 		}
 
 		/*
-		 *	USBƒfƒoƒCƒX•Ï‰»’Ê’m“o˜^
-		 *	WM_DEVICECHANGE ‚Å’Ê’m‚ğó‚¯‚é‚±‚Æ‚ª‚Å‚«‚é
+		 *	USBãƒ‡ãƒã‚¤ã‚¹å¤‰åŒ–é€šçŸ¥ç™»éŒ²
+		 *	WM_DEVICECHANGE ã§é€šçŸ¥ã‚’å—ã‘ã‚‹ã“ã¨ãŒã§ãã‚‹
 		 */
 		DEV_BROADCAST_DEVICEINTERFACE_A filter = {};
 		filter.dbcc_size = sizeof(filter);
 		filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
-		filter.dbcc_classguid = GUID_DEVINTERFACE_USB_DEVICE;	// USBƒ}ƒEƒX‚È‚Ç‚É‚à”½‰
-		//filter.dbcc_classguid = GUID_DEVINTERFACE_COMPORT;	// ƒVƒŠƒAƒ‹ƒ|[ƒg‚¾‚¯‚É”½‰
+		filter.dbcc_classguid = GUID_DEVINTERFACE_USB_DEVICE;	// USBãƒã‚¦ã‚¹ãªã©ã«ã‚‚åå¿œ
+		//filter.dbcc_classguid = GUID_DEVINTERFACE_COMPORT;	// ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆã ã‘ã«åå¿œ
 
 		hDevNotify = pRegisterDeviceNotificationA(vtwin->m_hWnd, &filter, DEVICE_NOTIFY_WINDOW_HANDLE);
 	}
@@ -256,7 +256,7 @@ public:
 	}
 
 	/**
-	 *	WM_DEVICECHANGE ‚ª”­¶‚µ‚½‚Æ‚«ƒR[ƒ‹‚·‚é
+	 *	WM_DEVICECHANGE ãŒç™ºç”Ÿã—ãŸã¨ãã‚³ãƒ¼ãƒ«ã™ã‚‹
 	 */
 	BOOL OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 	{
@@ -266,10 +266,10 @@ public:
 		pDevHdr = (PDEV_BROADCAST_HDR)dwData;
 		if (nEventType == DBT_DEVICEARRIVAL || nEventType == DBT_DEVICEREMOVECOMPLETE) {
 			if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
-				// ƒƒbƒZ[ƒW‚©‚çƒ|[ƒg‚ğæ“¾
+				// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‹ã‚‰ãƒãƒ¼ãƒˆã‚’å–å¾—
 				PDEV_BROADCAST_PORT_A pDevPortA = (PDEV_BROADCAST_PORT_A)pDevHdr;
 				if (pDevPortA->dbcp_name[1] != 0) {
-					// ANSI”Å
+					// ANSIç‰ˆ
 					(void)sscanf(&pDevPortA->dbcp_name[3], "%d", &comport);
 				}
 				else {
@@ -307,17 +307,17 @@ public:
 #endif
 		switch (nEventType) {
 		case DBT_DEVICEARRIVAL:
-			// ƒfƒoƒCƒX‚Ü‚½‚ÍƒƒfƒBƒA‚Ìˆê•”‚ª‘}“ü‚³‚ê‚Äg—p‰Â”\‚É‚È‚Á‚½
+			// ãƒ‡ãƒã‚¤ã‚¹ã¾ãŸã¯ãƒ¡ãƒ‡ã‚£ã‚¢ã®ä¸€éƒ¨ãŒæŒ¿å…¥ã•ã‚Œã¦ä½¿ç”¨å¯èƒ½ã«ãªã£ãŸ
 #if DEBUG_WM_DEVICECHANGE
 			OutputDebugPrintf(" PortType=%d AutoDisconnectedPort=%d state_=%d\n",
 							  ts.PortType, AutoDisconnectedPort, state_);
 #endif
-			// - ³‚µ‚­‚ÍŸ‚Ì‡‚Å2ƒƒbƒZ[ƒW‚ª‘—‚ç‚ê‚Ä‚­‚é‚æ‚¤‚¾
+			// - æ­£ã—ãã¯æ¬¡ã®é †ã§2ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒé€ã‚‰ã‚Œã¦ãã‚‹ã‚ˆã†ã 
 			// 		DBT_DEVTYP_DEVICEINTERFACE
 			// 		DBT_DEVTYP_PORT
-			// - DBT_DEVTYP_PORT ‚ğ“Š‚°‚¸ DBT_DEVTYP_DEVICEINTERFACE ‚µ‚©“Š‚°‚È‚¢ƒhƒ‰ƒCƒo‚ª‚ ‚é‚ç‚µ‚¢
-			// - DBT_DEVTYP_PORT ‚µ‚©“Š‚°‚Ä‚±‚È‚¢ê‡‚Í Windows 2000 ˆÈ‘O or ŒÃ‚¢ƒhƒ‰ƒCƒo?
-			//   - DBT_DEVTYP_DEVICEINTERFACE ‚Í WINVER >= 0x040A(Windows2000?) ‚Ì‚Æ‚«‚¾‚¯”­¶‚·‚é‚ç‚µ‚¢
+			// - DBT_DEVTYP_PORT ã‚’æŠ•ã’ãš DBT_DEVTYP_DEVICEINTERFACE ã—ã‹æŠ•ã’ãªã„ãƒ‰ãƒ©ã‚¤ãƒãŒã‚ã‚‹ã‚‰ã—ã„
+			// - DBT_DEVTYP_PORT ã—ã‹æŠ•ã’ã¦ã“ãªã„å ´åˆã¯ Windows 2000 ä»¥å‰ or å¤ã„ãƒ‰ãƒ©ã‚¤ãƒ?
+			//   - DBT_DEVTYP_DEVICEINTERFACE ã¯ WINVER >= 0x040A(Windows2000?) ã®ã¨ãã ã‘ç™ºç”Ÿã™ã‚‹ã‚‰ã—ã„
 			if ((pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT ||
 				 pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) &&
 				ts.PortType == IdSerial &&
@@ -328,14 +328,14 @@ public:
 				case NONE:
 					break;
 				case WAIT_DEVTYP_DEVICEINTERFACE: {
-					Connecting = TRUE;	// ƒ|[ƒg‚ª•ª‚©‚ç‚È‚¢A‚Æ‚è‚ ‚¦‚¸Ú‘±’†‚É‚·‚é
+					Connecting = TRUE;	// ãƒãƒ¼ãƒˆãŒåˆ†ã‹ã‚‰ãªã„ã€ã¨ã‚Šã‚ãˆãšæ¥ç¶šä¸­ã«ã™ã‚‹
 					UINT delay = ts.AutoComPortReconnectDelayIllegal;
 					SetTimer(delay);
 					if (pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
 						state_ = WAIT_DEVTYP_PORT;
 					}
 					else {
-						// DEVTYP_DEVICEINTERFACE ‚Ì‚Í‚¸‚ª DBT_DEVTYP_PORT “™‚ª”­¶‚µ‚½
+						// DEVTYP_DEVICEINTERFACE ã®ã¯ãšãŒ DBT_DEVTYP_PORT ç­‰ãŒç™ºç”Ÿã—ãŸ
 						state_ = WAIT_TIMER;
 					}
 #if DEBUG_WM_DEVICECHANGE
@@ -346,9 +346,9 @@ public:
 				case WAIT_DEVTYP_PORT: {
 					if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
 						if (comport == AutoDisconnectedPort) {
-							// Ú‘±‚·‚é
+							// æ¥ç¶šã™ã‚‹
 							UINT delay = ts.AutoComPortReconnectDelayNormal;
-							Connecting = TRUE;	// Ú‘±’†
+							Connecting = TRUE;	// æ¥ç¶šä¸­
 							SetTimer(delay);
 							state_ = WAIT_TIMER;
 #if DEBUG_WM_DEVICECHANGE
@@ -361,16 +361,16 @@ public:
 					}
 				}
 				case WAIT_TIMER:
-					// ƒ^ƒCƒ}[‚ÅÚ‘±‚·‚é
+					// ã‚¿ã‚¤ãƒãƒ¼ã§æ¥ç¶šã™ã‚‹
 					break;
 				case RECONNECTING:
-					// ÄÚ‘±’†
+					// å†æ¥ç¶šä¸­
 					break;
 				}
 			}
 			break;
 		case DBT_DEVICEREMOVECOMPLETE:
-			// ƒfƒoƒCƒX‚Ü‚½‚ÍƒƒfƒBƒA‚ªíœ‚³‚ê‚½
+			// ãƒ‡ãƒã‚¤ã‚¹ã¾ãŸã¯ãƒ¡ãƒ‡ã‚£ã‚¢ãŒå‰Šé™¤ã•ã‚ŒãŸ
 #if DEBUG_WM_DEVICECHANGE
 			OutputDebugPrintf(" PortType=%d AutoDisconnectedPort=%d\n", ts.PortType, AutoDisconnectedPort);
 #endif
@@ -379,7 +379,7 @@ public:
 				ts.PortType == IdSerial &&
 				ts.AutoComPortReconnect) {
 				if (state_ == NONE) {
-					// Ø’f‚³‚ê‚½AÄÚ‘±€”õ
+					// åˆ‡æ–­ã•ã‚ŒãŸã€å†æ¥ç¶šæº–å‚™
 					if (cv.Open) {
 						BOOL disconnected = FALSE;
 						if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
@@ -390,15 +390,15 @@ public:
 							}
 						}
 						if (disconnected == FALSE) {
-							// DBT_DEVTYP_PORT ‚ª”­¶‚µ‚È‚¢ê‡‘Î‰
-							//   HHD Software Virtual Serial Port Tool 6.20.00.1466 ‚Å‚Í
-							//		ƒ|[ƒg‚ğƒI[ƒvƒ“‚µ‚Ä‚¢‚é‚Æ DBT_DEVTYP_PORT ‚ğ“Š‚°‚Ä‚±‚È‚¢‚æ‚¤‚¾
+							// DBT_DEVTYP_PORT ãŒç™ºç”Ÿã—ãªã„å ´åˆå¯¾å¿œ
+							//   HHD Software Virtual Serial Port Tool 6.20.00.1466 ã§ã¯
+							//		ãƒãƒ¼ãƒˆã‚’ã‚ªãƒ¼ãƒ—ãƒ³ã—ã¦ã„ã‚‹ã¨ DBT_DEVTYP_PORT ã‚’æŠ•ã’ã¦ã“ãªã„ã‚ˆã†ã 
 							//
-							// Ÿ‚Ì‡‚ÅƒƒbƒZ[ƒW‚ª—ˆ‚é‚½‚ß–Àã DBT_DEVTYP_PORT ‚ÌƒR[ƒh‚Íg—p‚³‚ê‚È‚¢
+							// æ¬¡ã®é †ã§ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒæ¥ã‚‹ãŸã‚äº‹å®Ÿä¸Š DBT_DEVTYP_PORT ã®ã‚³ãƒ¼ãƒ‰ã¯ä½¿ç”¨ã•ã‚Œãªã„
 							//  - DBT_DEVTYP_DEVICEINTERFACE
 							//  - DBT_DEVTYP_PORT
 							if (CheckComPort(cv.ComPort) == 0) {
-								/* ƒI[ƒvƒ“‚µ‚Ä‚¢‚éƒ|[ƒg‚ª–³Œø‚É‚È‚Á‚½,ƒNƒ[ƒY‚·‚é */
+								/* ã‚ªãƒ¼ãƒ—ãƒ³ã—ã¦ã„ã‚‹ãƒãƒ¼ãƒˆãŒç„¡åŠ¹ã«ãªã£ãŸ,ã‚¯ãƒ­ãƒ¼ã‚ºã™ã‚‹ */
 								vtwin_->Disconnect(TRUE);
 								SetAutoConnectPort(ts.ComPort);
 							}
@@ -406,13 +406,13 @@ public:
 					}
 				}
 				else {
-					// ÄÚ‘±’†‚É”²‚©‚ê‚½?
+					// å†æ¥ç¶šä¸­ã«æŠœã‹ã‚ŒãŸ?
 					state_ = NONE;
 					if (timer_id_ != 0) {
 						KillTimer(vtwin_->m_hWnd, timer_id_);
 					}
 					SetAutoConnectPort(ts.ComPort);
-					Connecting = FALSE;		// ’Êíó‘Ô(Ú‘±’†‚Å‚Í‚È‚¢)
+					Connecting = FALSE;		// é€šå¸¸çŠ¶æ…‹(æ¥ç¶šä¸­ã§ã¯ãªã„)
 					ChangeTitle();
 				}
 			}
@@ -458,7 +458,7 @@ private:
 	}
 
 	/**
-	 *	ƒVƒŠƒAƒ‹‚ğƒI[ƒvƒ“‚·‚é
+	 *	ã‚·ãƒªã‚¢ãƒ«ã‚’ã‚ªãƒ¼ãƒ—ãƒ³ã™ã‚‹
 	 */
 	void OpenSerial()
 	{
@@ -472,11 +472,11 @@ private:
 		}
 		BOOL try_open = FALSE;
 		if (CheckComPort(AutoDisconnectedPort) != 0) {
-			// ƒ|[ƒg‚ª‘¶İ‚µ‚Ä‚¢‚éAƒI[ƒvƒ“‚ğ‚İ‚é
+			// ãƒãƒ¼ãƒˆãŒå­˜åœ¨ã—ã¦ã„ã‚‹ã€ã‚ªãƒ¼ãƒ—ãƒ³ã‚’è©¦ã¿ã‚‹
 			int NoMsg_prev = cv.NoMsg;
 			try_open = TRUE;
 			if (retry_left_ != 0) {
-				cv.NoMsg = 1;	// ƒ|ƒbƒvƒAƒbƒv‚ğo‚³‚È‚¢
+				cv.NoMsg = 1;	// ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ã‚’å‡ºã•ãªã„
 			}
 			else {
 				state_ = NONE;
@@ -488,7 +488,7 @@ private:
 #endif
 		}
 		if (cv.Open == TRUE) {
-			// ƒVƒŠƒAƒ‹ƒI[ƒvƒ“¬Œ÷
+			// ã‚·ãƒªã‚¢ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³æˆåŠŸ
 #if DEBUG_WM_DEVICECHANGE
 			OutputDebugPrintf("%s() Open success\n", __FUNCTION__);
 #endif
@@ -496,7 +496,7 @@ private:
 			AutoDisconnectedPort = -1;
 		}
 		else if (retry_left_ ==0) {
-			// ƒVƒŠƒAƒ‹ƒI[ƒvƒ“¸”s
+			// ã‚·ãƒªã‚¢ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³å¤±æ•—
 #if DEBUG_WM_DEVICECHANGE
 			OutputDebugPrintf("%s() Open fail\n", __FUNCTION__);
 #endif
@@ -507,7 +507,7 @@ private:
 			}
 		}
 		else {
-			// ƒVƒŠƒAƒ‹ƒI[ƒvƒ“¸”s,ƒŠƒgƒ‰ƒC‚·‚é
+			// ã‚·ãƒªã‚¢ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³å¤±æ•—,ãƒªãƒˆãƒ©ã‚¤ã™ã‚‹
 			UINT delay = ts.AutoComPortReconnectRetryInterval;
 #if DEBUG_WM_DEVICECHANGE
 			OutputDebugPrintf("%s() Open fail, retry left %d interval %dms\n", __FUNCTION__, retry_left_, delay);
@@ -578,7 +578,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		}
 
 	} else {
-		// 2‚Â‚ßˆÈ~‚ÌƒvƒƒZƒX‚É‚¨‚¢‚Ä‚àAƒfƒBƒXƒN‚©‚ç TERATERM.INI ‚ğ“Ç‚ŞB(2004.11.4 yutaka)
+		// 2ã¤ã‚ä»¥é™ã®ãƒ—ãƒ­ã‚»ã‚¹ã«ãŠã„ã¦ã‚‚ã€ãƒ‡ã‚£ã‚¹ã‚¯ã‹ã‚‰ TERATERM.INI ã‚’èª­ã‚€ã€‚(2004.11.4 yutaka)
 		if (LoadTTSET()) {
 			/* read setup info from "teraterm.ini" */
 			(*ReadIniFile)(ts.SetupFNameW, &ts);
@@ -600,7 +600,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	}
 	FreeTTSET();
 
-	// DPI Aware (‚DPI‘Î‰)
+	// DPI Aware (é«˜DPIå¯¾å¿œ)
 	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
 		wchar_t Temp[4];
 		GetPrivateProfileStringW(L"Tera Term", L"DPIAware", L"on", Temp, _countof(Temp), ts.SetupFNameW);
@@ -611,10 +611,10 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		}
 	}
 
-	// duplicate session‚Ìw’è‚ª‚ ‚é‚È‚çA‹¤—Lƒƒ‚ƒŠ‚©‚çƒRƒs[‚·‚é (2004.12.7 yutaka)
+	// duplicate sessionã®æŒ‡å®šãŒã‚ã‚‹ãªã‚‰ã€å…±æœ‰ãƒ¡ãƒ¢ãƒªã‹ã‚‰ã‚³ãƒ”ãƒ¼ã™ã‚‹ (2004.12.7 yutaka)
 	if (ts.DuplicateSession == 1) {
-		// ‹¤—Lƒƒ‚ƒŠ‚ÌÀ•W‚Í•¡»Œ³‚ÌŒ»İ‚ÌƒEƒBƒ“ƒhƒEÀ•W‚É‚È‚éB
-		// ã‚Å“Ç‚İ‚ñ‚¾ TERATERM.INI ‚Ì’l‚ğg‚¢‚½‚¢‚Ì‚ÅA‘Ò”ğ‚µ‚Ä–ß‚·B
+		// å…±æœ‰ãƒ¡ãƒ¢ãƒªã®åº§æ¨™ã¯è¤‡è£½å…ƒã®ç¾åœ¨ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦åº§æ¨™ã«ãªã‚‹ã€‚
+		// ä¸Šã§èª­ã¿è¾¼ã‚“ã  TERATERM.INI ã®å€¤ã‚’ä½¿ã„ãŸã„ã®ã§ã€å¾…é¿ã—ã¦æˆ»ã™ã€‚
 		POINT VTPos = ts.VTPos;
 		POINT TEKPos = ts.TEKPos;
 
@@ -638,7 +638,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	TplClk = FALSE;
 	Hold = FALSE;
 	FirstPaint = TRUE;
-	ScrollLock = FALSE;  // ‰Šú’l‚Í–³Œø (2006.11.14 yutaka)
+	ScrollLock = FALSE;  // åˆæœŸå€¤ã¯ç„¡åŠ¹ (2006.11.14 yutaka)
 	Alpha = 255;
 #if UNICODE_DEBUG
 	TipWinCodeDebug = NULL;
@@ -691,7 +691,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	wc.hInstance = hInstance;
 	wc.hIcon = NULL;
 	//wc.hCursor = LoadCursor(NULL,IDC_IBEAM);
-	wc.hCursor = NULL; // ƒ}ƒEƒXƒJ[ƒ\ƒ‹‚Í“®“I‚É•ÏX‚·‚é (2005.4.2 yutaka)
+	wc.hCursor = NULL; // ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã¯å‹•çš„ã«å¤‰æ›´ã™ã‚‹ (2005.4.2 yutaka)
 	wc.hbrBackground = NULL;
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = VTClassName;
@@ -715,7 +715,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	if (HVTWin == NULL) return;
 	cv.HWin = HVTWin;
 
-	// Windows 11 ‚ÅƒEƒBƒ“ƒhƒE‚ÌŠp‚ªŠÛ‚­‚È‚ç‚È‚¢‚æ‚¤‚É‚·‚é
+	// Windows 11 ã§ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è§’ãŒä¸¸ããªã‚‰ãªã„ã‚ˆã†ã«ã™ã‚‹
 	if (ts.WindowCornerDontround && pDwmSetWindowAttribute != NULL) {
 		DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_DONOTROUND;
 		pDwmSetWindowAttribute(HVTWin, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
@@ -733,17 +733,17 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		::SetWindowLongPtr(HVTWin,GWL_EXSTYLE,ExStyle);
 	}
 
-	// USBƒfƒoƒCƒX•Ï‰»’Ê’m“o˜^
+	// USBãƒ‡ãƒã‚¤ã‚¹å¤‰åŒ–é€šçŸ¥ç™»éŒ²
 	serail_reconnect = new SerialReconnect();
 	serail_reconnect->Init(this);
 
-	// ’Ê’m—Ìˆæ‰Šú‰»
+	// é€šçŸ¥é ˜åŸŸåˆæœŸåŒ–
 	NotifyIcon *ni = Notify2Initialize();
 	cv.NotifyIcon = ni;
 	Notify2SetWindow(ni, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (ts.VTIcon != IdIconDefault) ? ts.VTIcon: IDI_VT);
 	Notify2SetSound(ni, ts.NotifySound);
 
-	// VT ƒEƒBƒ“ƒhƒE‚ÌƒAƒCƒRƒ“
+	// VT ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¢ã‚¤ã‚³ãƒ³
 	SetVTIconID(&cv, NULL, 0);
 
 	MainMenu = NULL;
@@ -843,11 +843,11 @@ void CVTWindow::ButtonUp(BOOL Paste)
 	TplClk = FALSE;
 	CaretOn();
 
-	// SelectOnlyByLButton ‚ª on ‚Å ’†E‰EƒNƒŠƒbƒN‚µ‚½‚Æ‚«‚É
-	// ƒoƒbƒtƒ@‚ª‘I‘ğó‘Ô‚¾‚Á‚½‚çA‘I‘ğ“à—e‚ªƒNƒŠƒbƒvƒ{[ƒh‚É
-	// ƒRƒs[‚³‚ê‚Ä‚µ‚Ü‚¤–â‘è‚ğC³ (2007.12.6 maya)
+	// SelectOnlyByLButton ãŒ on ã§ ä¸­ãƒ»å³ã‚¯ãƒªãƒƒã‚¯ã—ãŸã¨ãã«
+	// ãƒãƒƒãƒ•ã‚¡ãŒé¸æŠçŠ¶æ…‹ã ã£ãŸã‚‰ã€é¸æŠå†…å®¹ãŒã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«
+	// ã‚³ãƒ”ãƒ¼ã•ã‚Œã¦ã—ã¾ã†å•é¡Œã‚’ä¿®æ­£ (2007.12.6 maya)
 	if (!disableBuffEndSelect) {
-		// ‘I‘ğ—Ìˆæ‚Ì•¶š‚ğæ“¾AƒNƒŠƒbƒvƒ{[ƒh‚ÖƒZƒbƒg‚·‚é
+		// é¸æŠé ˜åŸŸã®æ–‡å­—ã‚’å–å¾—ã€ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã¸ã‚»ãƒƒãƒˆã™ã‚‹
 		wchar_t *strW = BuffEndSelect();
 		if (strW != NULL) {
 			CBSetTextW(HVTWin, strW, 0);
@@ -858,7 +858,7 @@ void CVTWindow::ButtonUp(BOOL Paste)
 	if (Paste) {
 		CBStartPaste(HVTWin, FALSE, BracketedPasteMode());
 
-		// ƒXƒNƒ[ƒ‹ˆÊ’u‚ğƒŠƒZƒbƒg
+		// ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ä½ç½®ã‚’ãƒªã‚»ãƒƒãƒˆ
 		if (WinOrgY != 0) {
 			DispVScroll(SCROLL_BOTTOM, 0);
 		}
@@ -1171,12 +1171,12 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			}
 		}
 
-		// V‹Kƒƒjƒ…[‚ğ’Ç‰Á (2004.12.5 yutaka)
+		// æ–°è¦ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’è¿½åŠ  (2004.12.5 yutaka)
 		EnableMenuItem(FileMenu,ID_FILE_CYGWINCONNECTION,MF_BYCOMMAND | MF_ENABLED);
 		EnableMenuItem(FileMenu,ID_FILE_TERATERMMENU,MF_BYCOMMAND | MF_ENABLED);
 
-		// XXX: ‚±‚ÌˆÊ’u‚É‚µ‚È‚¢‚ÆAlog‚ªƒOƒŒƒC‚É‚È‚ç‚È‚¢B (2005.2.1 yutaka)
-		if (FLogIsOpend()) { // ƒƒOÌæƒ‚[ƒh‚Ìê‡
+		// XXX: ã“ã®ä½ç½®ã«ã—ãªã„ã¨ã€logãŒã‚°ãƒ¬ã‚¤ã«ãªã‚‰ãªã„ã€‚ (2005.2.1 yutaka)
+		if (FLogIsOpend()) { // ãƒ­ã‚°æ¡å–ãƒ¢ãƒ¼ãƒ‰ã®å ´åˆ
 			EnableMenuItem(FileMenu,ID_FILE_LOG,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_COMMENTTOLOG, MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_VIEWLOG, MF_BYCOMMAND | MF_ENABLED);
@@ -1247,9 +1247,9 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 	}
 	else if (SubMenu == SetupMenu)
 		/*
-		 * ƒlƒbƒgƒ[ƒNÚ‘±’†(TCP/IP‚ğ‘I‘ğ‚µ‚ÄÚ‘±‚µ‚½ó‘Ô)‚ÍƒVƒŠƒAƒ‹ƒ|[ƒg
-		 * (ID_SETUP_SERIALPORT)‚Ìƒƒjƒ…[‚ª‘I‘ğ‚Å‚«‚È‚¢‚æ‚¤‚É‚È‚Á‚Ä‚¢‚½‚ªA
-		 * ‚±‚ÌƒK[ƒh‚ğŠO‚µAƒVƒŠƒAƒ‹ƒ|[ƒgİ’èƒ_ƒCƒAƒƒO‚©‚çV‚µ‚¢Ú‘±‚ª‚Å‚«‚é‚æ‚¤‚É‚·‚éB
+		 * ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯æ¥ç¶šä¸­(TCP/IPã‚’é¸æŠã—ã¦æ¥ç¶šã—ãŸçŠ¶æ…‹)ã¯ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆ
+		 * (ID_SETUP_SERIALPORT)ã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãŒé¸æŠã§ããªã„ã‚ˆã†ã«ãªã£ã¦ã„ãŸãŒã€
+		 * ã“ã®ã‚¬ãƒ¼ãƒ‰ã‚’å¤–ã—ã€ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆè¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‹ã‚‰æ–°ã—ã„æ¥ç¶šãŒã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹ã€‚
 		 */
 		if (!IsSendVarNULL() || !IsFileVarNULL() || Connecting) {
 			EnableMenuItem(SetupMenu,ID_SETUP_SERIALPORT,MF_BYCOMMAND | MF_GRAYED);
@@ -1345,15 +1345,15 @@ void CVTWindow::ResetSetup()
 	/* background and ANSI color */
 
 #if 0
-	// ‹N“®‚Ì‚İ‚É“Ç‚İ‚Şƒe[ƒ}‚ª–³Œø‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚Ì‚Åíœ
+	// èµ·å‹•æ™‚ã®ã¿ã«èª­ã¿è¾¼ã‚€ãƒ†ãƒ¼ãƒãŒç„¡åŠ¹ã«ãªã£ã¦ã—ã¾ã†ã®ã§å‰Šé™¤
 	BGInitialize(FALSE);
 	BGSetupPrimary(TRUE);
 #endif
 
-	// 2006/03/17 by 337 : Alpha’l‚à‘¦•ÏX
-	// Layered‘‹‚É‚È‚Á‚Ä‚¢‚È‚¢ê‡‚ÍŒø‰Ê‚ª–³‚¢
+	// 2006/03/17 by 337 : Alphaå€¤ã‚‚å³æ™‚å¤‰æ›´
+	// Layeredçª“ã«ãªã£ã¦ã„ãªã„å ´åˆã¯åŠ¹æœãŒç„¡ã„
 	//
-	// AlphaBlend ‚ğ‘¦”½‰f‚Å‚«‚é‚æ‚¤‚É‚·‚éB
+	// AlphaBlend ã‚’å³æ™‚åæ˜ ã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹ã€‚
 	// (2016.12.24 yutaka)
 	SetWindowAlpha(ts.AlphaBlendActive);
 
@@ -1431,7 +1431,7 @@ void CVTWindow::SetupTerm()
 void CVTWindow::Startup()
 {
 	/* auto log */
-	/* OnCommOpen ‚ÅŠJn‚³‚ê‚é‚Ì‚Å‚±‚±‚Å‚ÍŠJn‚µ‚È‚¢ (2007.5.14 maya) */
+	/* OnCommOpen ã§é–‹å§‹ã•ã‚Œã‚‹ã®ã§ã“ã“ã§ã¯é–‹å§‹ã—ãªã„ (2007.5.14 maya) */
 
 	if ((TopicName[0]==0) && (ts.MacroFNW != NULL)) {
 		// start the macro specified in the command line or setup file
@@ -1559,9 +1559,9 @@ void CVTWindow::OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized)
 }
 
 /**
- *	ƒL[ƒ{[ƒh‚©‚ç1•¶š“ü—Í
- *	@param	nChar	UTF-16 char(wchar_t)	IsWindowUnicode() == TRUE 
- *					ANSI char(char)			IsWindowUnicode() == FALSE 
+ *	ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã‹ã‚‰1æ–‡å­—å…¥åŠ›
+ *	@param	nChar	UTF-16 char(wchar_t)	IsWindowUnicode() == TRUE æ™‚
+ *					ANSI char(char)			IsWindowUnicode() == FALSE æ™‚
  */
 void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
@@ -1578,23 +1578,23 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 
 	wchar_t u16;
 	if (IsWindowUnicode(HVTWin) == TRUE) {
-		// “ü—Í‚Í UTF-16
+		// å…¥åŠ›ã¯ UTF-16
 		u16 = (wchar_t)nChar;
 	} else {
-		// “ü—Í‚Í ANSI
+		// å…¥åŠ›ã¯ ANSI
 		const UINT acp = GetACP();
 		if ((acp == 932) || (acp == 949) || (acp == 936) || (acp == 950)) {
-			// CP932	“ú–{Œê shift jis
+			// CP932	æ—¥æœ¬èª shift jis
 			// CP949	Korean
 			// CP936	GB2312
 			// CP950	Big5
-			// CJK (2byte•¶š)
+			// CJK (2byteæ–‡å­—)
 			if (vtwin_work.dbcs_lead_byte == 0 && IsDBCSLeadByte(nChar)) {
-				// ANSI 2ƒoƒCƒg•¶š‚Ì 1byte–Ú‚¾‚Á‚½
-				//	’Êí‚Í WM_IME_* ƒƒbƒZ[ƒW‚Åˆ—‚³‚ê‚é
-				//	Ÿ‚Ìê‡‚±‚±‚É“ü‚Á‚Ä‚­‚é
-				//		TERATERM.INI ‚Å IME=off ‚Ì‚Æ‚«
-				//		imm32.dll ‚ªƒ[ƒh‚Å‚«‚È‚©‚Á‚½‚Æ‚«
+				// ANSI 2ãƒã‚¤ãƒˆæ–‡å­—ã® 1byteç›®ã ã£ãŸ
+				//	é€šå¸¸ã¯ WM_IME_* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã§å‡¦ç†ã•ã‚Œã‚‹
+				//	æ¬¡ã®å ´åˆã“ã“ã«å…¥ã£ã¦ãã‚‹
+				//		TERATERM.INI ã§ IME=off ã®ã¨ã
+				//		imm32.dll ãŒãƒ­ãƒ¼ãƒ‰ã§ããªã‹ã£ãŸã¨ã
 				vtwin_work.dbcs_lead_byte = nChar;
 				return;
 			}
@@ -1603,12 +1603,12 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 				char mb_str[2];
 				size_t mb_len;
 				if (vtwin_work.dbcs_lead_byte == 0) {
-					// 1ƒoƒCƒg•¶š
+					// 1ãƒã‚¤ãƒˆæ–‡å­—
 					mb_str[0] = (char)nChar;
 					mb_len = 1;
 				}
 				else {
-					// 2ƒoƒCƒg•¶š
+					// 2ãƒã‚¤ãƒˆæ–‡å­—
 					mb_str[0] = (char)vtwin_work.dbcs_lead_byte;
 					mb_str[1] = (char)nChar;
 					mb_len = 2;
@@ -1623,7 +1623,7 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 			}
 		}
 		else if (acp == 1251) {
-			// CP1251	Russian,Cyrillic ƒLƒŠƒ‹
+			// CP1251	Russian,Cyrillic ã‚­ãƒªãƒ«
 			UINT code_page = CP_ACP;
 			if (ts.RussKeyb != /*IdWindows*/0) {
 				code_page = 20866; /*koi8-r*/
@@ -1643,7 +1643,7 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		}
 	}
 
-	// ƒoƒbƒtƒ@‚Öo—ÍA‰æ–Ê‚Öo—Í
+	// ãƒãƒƒãƒ•ã‚¡ã¸å‡ºåŠ›ã€ç”»é¢ã¸å‡ºåŠ›
 	for (i=1 ; i<=nRepCnt ; i++) {
 		CommTextOutW(&cv,&u16,1);
 		if (ts.LocalEcho>0) {
@@ -1651,7 +1651,7 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		}
 	}
 
-	// ƒXƒNƒ[ƒ‹ˆÊ’u‚ğƒŠƒZƒbƒg
+	// ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ä½ç½®ã‚’ãƒªã‚»ãƒƒãƒˆ
 	if (WinOrgY != 0) {
 		DispVScroll(SCROLL_BOTTOM, 0);
 	}
@@ -1660,7 +1660,7 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 LRESULT CVTWindow::OnUniChar(WPARAM wParam, LPARAM lParam)
 {
 	if (wParam == UNICODE_NOCHAR) {
-		// ‚±‚ÌƒƒbƒZ[ƒW‚ğƒTƒ|[ƒg‚µ‚Ä‚¢‚é‚©ƒeƒXƒg‚Å‚«‚é‚æ‚¤‚É‚·‚é‚½‚ß
+		// ã“ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã‚‹ã‹ãƒ†ã‚¹ãƒˆã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹ãŸã‚
 		return TRUE;
 	}
 
@@ -1725,18 +1725,18 @@ void CVTWindow::OnClose()
 	SaveVTPos();
 	Notify2UnsetWindow((NotifyIcon *)cv.NotifyIcon);
 
-	// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“I—¹‚ÉƒAƒCƒRƒ“‚ğ”jŠü‚·‚é‚ÆAƒEƒBƒ“ƒhƒE‚ªÁ‚¦‚é‘O‚É
-	// ƒ^ƒCƒgƒ‹ƒo[‚ÌƒAƒCƒRƒ“‚ª "Windows ‚ÌÀsƒtƒ@ƒCƒ‹‚ÌƒAƒCƒRƒ“" ‚É•Ï‚í‚é
-	// ‚±‚Æ‚ª‚ ‚é‚Ì‚Å”jŠü‚µ‚È‚¢
+	// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³çµ‚äº†æ™‚ã«ã‚¢ã‚¤ã‚³ãƒ³ã‚’ç ´æ£„ã™ã‚‹ã¨ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒæ¶ˆãˆã‚‹å‰ã«
+	// ã‚¿ã‚¤ãƒˆãƒ«ãƒãƒ¼ã®ã‚¢ã‚¤ã‚³ãƒ³ãŒ "Windows ã®å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¢ã‚¤ã‚³ãƒ³" ã«å¤‰ã‚ã‚‹
+	// ã“ã¨ãŒã‚ã‚‹ã®ã§ç ´æ£„ã—ãªã„
 	// TTSetIcon(m_hInst, m_hWnd, NULL, 0);
 
 	DestroyWindow();
 }
 
-// ‘STera Term‚ÌI—¹‚ğw¦‚·‚é
+// å…¨Tera Termã®çµ‚äº†ã‚’æŒ‡ç¤ºã™ã‚‹
 void CVTWindow::OnAllClose()
 {
-	// “Ë‘RI—¹‚³‚¹‚é‚ÆŠëŒ¯‚È‚Ì‚ÅA‚©‚È‚ç‚¸ƒ†[ƒU‚É–â‚¢‡‚í‚¹‚ğo‚·‚æ‚¤‚É‚·‚éB
+	// çªç„¶çµ‚äº†ã•ã›ã‚‹ã¨å±é™ºãªã®ã§ã€ã‹ãªã‚‰ãšãƒ¦ãƒ¼ã‚¶ã«å•ã„åˆã‚ã›ã‚’å‡ºã™ã‚ˆã†ã«ã™ã‚‹ã€‚
 	static const TTMessageBoxInfoW info = {
 		"Tera Term",
 		NULL, L"Tera Term",
@@ -1750,10 +1750,10 @@ void CVTWindow::OnAllClose()
 	BroadcastClosingMessage(HVTWin);
 }
 
-// I—¹–â‚¢‡‚í‚¹‚È‚µ‚ÉTera Term‚ğI—¹‚·‚éBOnAllClose()óM—pB
+// çµ‚äº†å•ã„åˆã‚ã›ãªã—ã«Tera Termã‚’çµ‚äº†ã™ã‚‹ã€‚OnAllClose()å—ä¿¡ç”¨ã€‚
 LRESULT CVTWindow::OnNonConfirmClose(WPARAM wParam, LPARAM lParam)
 {
-	// ‚±‚±‚Å ts ‚Ì“à—e‚ğˆÓ}“I‚É‘‚«Š·‚¦‚Ä‚àAI—¹‚É©“®ƒZ[ƒu‚³‚ê‚é‚í‚¯‚Å‚Í‚È‚¢‚Ì‚ÅA“Á‚É–â‘è‚È‚µB
+	// ã“ã“ã§ ts ã®å†…å®¹ã‚’æ„å›³çš„ã«æ›¸ãæ›ãˆã¦ã‚‚ã€çµ‚äº†æ™‚ã«è‡ªå‹•ã‚»ãƒ¼ãƒ–ã•ã‚Œã‚‹ã‚ã‘ã§ã¯ãªã„ã®ã§ã€ç‰¹ã«å•é¡Œãªã—ã€‚
 	ts.PortFlag &= ~PF_CONFIRMDISCONN;
 	OnClose();
 	return 1;
@@ -1769,7 +1769,7 @@ void CVTWindow::OnDestroy()
 	// remove this window from the window list
 	UnregWin(HVTWin);
 
-	// USBƒfƒoƒCƒX•Ï‰»’Ê’m‰ğœ
+	// USBãƒ‡ãƒã‚¤ã‚¹å¤‰åŒ–é€šçŸ¥è§£é™¤
 	serail_reconnect->Exit();
 	delete serail_reconnect;
 	serail_reconnect = NULL;
@@ -1825,10 +1825,10 @@ static void EscapeFilename(const wchar_t *src, wchar_t *dest)
 	while (*s) {
 		wchar_t c = *s++;
 		if (c == L'\\') {
-			// ƒpƒX‚Ì‹æØ‚è‚ğ \ -> / ‚Ö
+			// ãƒ‘ã‚¹ã®åŒºåˆ‡ã‚Šã‚’ \ -> / ã¸
 			*d = '/';
 		} else if (wcschr(ESCAPE_CHARS, c) != NULL) {
-			// ƒGƒXƒP[ƒv‚ª•K—v‚È•¶š
+			// ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—ãŒå¿…è¦ãªæ–‡å­—
 			*d++ = L'\\';
 			*d = c;
 		} else {
@@ -1867,7 +1867,7 @@ void CVTWindow::DropListFree()
 }
 
 typedef struct DropData_tag {
-	// ini‚É•Û‘¶‚³‚ê‚È‚¢A¡Às‚µ‚Ä‚¢‚éTera Term‚Å‚Ì‚İ—LŒø‚Èİ’è
+	// iniã«ä¿å­˜ã•ã‚Œãªã„ã€ä»Šå®Ÿè¡Œã—ã¦ã„ã‚‹Tera Termã§ã®ã¿æœ‰åŠ¹ãªè¨­å®š
 	enum drop_type DefaultDropType;
 	unsigned char DefaultDropTypePaste;
 	bool DefaultShowDialog;
@@ -1885,7 +1885,7 @@ typedef struct DropData_tag {
 } DropData_t;
 
 /**
- *	‰Šú‰»
+ *	åˆæœŸåŒ–
  */
 void CVTWindow::DropInit()
 {
@@ -1905,25 +1905,25 @@ void CVTWindow::DropUninit()
 }
 
 /**
- *	‘—MŠ®—¹ƒR[ƒ‹ƒoƒbƒN
+ *	é€ä¿¡å®Œäº†ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯
  */
 static void DropSendCallback(void *callback_data)
 {
 	DropData_t *data = (DropData_t *)callback_data;
-	// Ÿ‚Ì‘—M‚ğs‚¤
+	// æ¬¡ã®é€ä¿¡ã‚’è¡Œã†
 	::PostMessage(data->vtwin, WM_USER_DROPNOTIFY, 0, 1);
 }
 
 /**
- *	ƒ^ƒCƒ}[‚ÅSCP‚Ì‘—Mó‹µ‚ğƒ`ƒFƒbƒN
+ *	ã‚¿ã‚¤ãƒãƒ¼ã§SCPã®é€ä¿¡çŠ¶æ³ã‚’ãƒã‚§ãƒƒã‚¯
  */
 static void CALLBACK DropSendTimerProc(HWND, UINT, UINT_PTR nIDEvent, DWORD)
 {
 	DropData_t *data = (DropData_t *)nIDEvent;
 
-	// ‘—M’†?
+	// é€ä¿¡ä¸­?
 	if (ScpGetStatus() == TRUE) {
-		// Ÿ‚Ìƒ^ƒCƒ}[ƒCƒ“ƒ^[ƒoƒ‹‚ÅÄ“xƒ`ƒFƒbƒN
+		// æ¬¡ã®ã‚¿ã‚¤ãƒãƒ¼ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒ«ã§å†åº¦ãƒã‚§ãƒƒã‚¯
 		return;
 	}
 
@@ -1932,17 +1932,17 @@ static void CALLBACK DropSendTimerProc(HWND, UINT, UINT_PTR nIDEvent, DWORD)
 	assert(r == 1); (void)r;
 	data->PollingTimerID = 0;
 
-	// Ÿ‚Ì‘—M‚ğs‚¤
+	// æ¬¡ã®é€ä¿¡ã‚’è¡Œã†
 	::PostMessage(data->vtwin, WM_USER_DROPNOTIFY, 0, 1);
 }
 
 /**
- *  ƒtƒ@ƒCƒ‹‚ªƒhƒƒbƒv’Ê’m
- *	@param	lparam		0	ƒtƒ@ƒCƒ‹‚ªƒhƒƒbƒv‚³‚ê‚½
- *							ShowDialog‚ªQÆ‚³‚ê‚é
- *						1	ƒtƒ@ƒCƒ‹‚Ì“]‘—‚ªŠ®—¹‚µ‚½
- *	@param	ShowDialog	0	•\¦‚µ‚Ä‚à•\¦‚µ‚È‚­‚Ä‚à—Ç‚¢
- *						1	•K‚¸•\¦‚·‚é
+ *  ãƒ•ã‚¡ã‚¤ãƒ«ãŒãƒ‰ãƒ­ãƒƒãƒ—é€šçŸ¥
+ *	@param	lparam		0	ãƒ•ã‚¡ã‚¤ãƒ«ãŒãƒ‰ãƒ­ãƒƒãƒ—ã•ã‚ŒãŸ
+ *							ShowDialogãŒå‚ç…§ã•ã‚Œã‚‹
+ *						1	ãƒ•ã‚¡ã‚¤ãƒ«ã®è»¢é€ãŒå®Œäº†ã—ãŸ
+ *	@param	ShowDialog	0	è¡¨ç¤ºã—ã¦ã‚‚è¡¨ç¤ºã—ãªãã¦ã‚‚è‰¯ã„
+ *						1	å¿…ãšè¡¨ç¤ºã™ã‚‹
  */
 LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 {
@@ -2022,7 +2022,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 			if (data->DirectoryCount > 0 &&
 				(data->DefaultDropType == DROP_TYPE_SEND_FILE ||
 				 data->DefaultDropType == DROP_TYPE_SCP))
-			{	// ƒfƒtƒHƒ‹ƒg‚Ì‚Ü‚Ü‚Å‚Íˆ—‚Å‚«‚È‚¢‘g‚İ‡‚í‚¹
+			{	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã¾ã¾ã§ã¯å‡¦ç†ã§ããªã„çµ„ã¿åˆã‚ã›
 				data->DropType = DROP_TYPE_PASTE_FILENAME;
 				data->DropTypePaste = data->DefaultDropTypePaste;
 				data->DoSameProcess = false;
@@ -2035,12 +2035,12 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 
 		data->SendIndex = 0;
 	}
-		// break; ‚È‚µ
+		// break; ãªã—
 		// FALLTHROUGH
 	case 1:
 	next_file: {
 		if (data->SendIndex == DropListCount) {
-			// ‚·‚×‚Ä‘—MŠ®—¹
+			// ã™ã¹ã¦é€ä¿¡å®Œäº†
 			goto finish;
 		}
 		int i = data->SendIndex;
@@ -2097,7 +2097,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 			free(str);
 			if (DropListCount > 1 && i < DropListCount - 1) {
 				if (data->DropTypePaste & DROP_TYPE_PASTE_NEWLINE) {
-					TermPasteStringNoBracket(L"\x0d", 1);	// ‰üs(CR,0x0d)
+					TermPasteStringNoBracket(L"\x0d", 1);	// æ”¹è¡Œ(CR,0x0d)
 				}
 				else {
 					TermPasteStringNoBracket(L" ", 1);		// space
@@ -2106,7 +2106,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 
 			TermSendEndBracket();
 
-			// Ÿ‚Ìƒtƒ@ƒCƒ‹‚Ìˆ—‚Ö
+			// æ¬¡ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®å‡¦ç†ã¸
 			goto next_file;
 		}
 		case DROP_TYPE_SCP:
@@ -2117,7 +2117,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 			BOOL r = ScpSend(FileName, SendDirW);
 			free(SendDirW);
 			if (!r) {
-				// ‘—MƒGƒ‰[
+				// é€ä¿¡ã‚¨ãƒ©ãƒ¼
 				::MessageBoxA(HVTWin, "scp send error", "Tera Term: error", MB_OK | MB_ICONERROR);
 				goto finish;
 			}
@@ -2132,7 +2132,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 	case 2:
 	default:
 	finish:
-		// I—¹ˆ—
+		// çµ‚äº†å‡¦ç†
 		DropListFree();
 		break;
 	}
@@ -2271,7 +2271,7 @@ void CVTWindow::OnKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 	case KEYDOWN_CONTROL:
 		return;
 	case KEYDOWN_COMMOUT:
-		// ƒXƒNƒ[ƒ‹ˆÊ’u‚ğƒŠƒZƒbƒg
+		// ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ä½ç½®ã‚’ãƒªã‚»ãƒƒãƒˆ
 		if (WinOrgY != 0) {
 			DispVScroll(SCROLL_BOTTOM, 0);
 		}
@@ -2340,7 +2340,7 @@ void CVTWindow::OnLButtonDblClk(WPARAM nFlags, POINTS point)
 		return;
 	}
 
-	if (BuffUrlDblClk(DblClkX, DblClkY)) { // ƒuƒ‰ƒEƒUŒÄ‚Ño‚µ‚Ìê‡‚Í‰½‚à‚µ‚È‚¢B (2005.4.3 yutaka)
+	if (BuffUrlDblClk(DblClkX, DblClkY)) { // ãƒ–ãƒ©ã‚¦ã‚¶å‘¼ã³å‡ºã—ã®å ´åˆã¯ä½•ã‚‚ã—ãªã„ã€‚ (2005.4.3 yutaka)
 		return;
 	}
 
@@ -2476,15 +2476,15 @@ void CVTWindow::OnMouseMove(WPARAM nFlags, POINTS point)
 
 	if (!ts.SelectOnlyByLButton ||
 	    (ts.SelectOnlyByLButton && LButton) ) {
-		// SelectOnlyByLButton == TRUE ‚Ì‚Æ‚«‚ÍA¶ƒ{ƒ^ƒ“ƒ_ƒEƒ“‚Ì‚İ‘I‘ğ‚·‚é (2007.11.21 maya)
+		// SelectOnlyByLButton == TRUE ã®ã¨ãã¯ã€å·¦ãƒœã‚¿ãƒ³ãƒ€ã‚¦ãƒ³æ™‚ã®ã¿é¸æŠã™ã‚‹ (2007.11.21 maya)
 		BuffChangeSelect(point.x, point.y,i);
 	}
 }
 
 void CVTWindow::OnMove(int x, int y)
 {
-	// ƒEƒBƒ“ƒhƒEˆÊ’u‚ğ•Û‘¶
-	// 		’ x,y ‚ÍƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚Ì¶ã‚ÌÀ•W
+	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½ç½®ã‚’ä¿å­˜
+	// 		æ³¨ x,y ã¯ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã®å·¦ä¸Šã®åº§æ¨™
 	RECT R;
 	::GetWindowRect(HVTWin,&R);
 	ts.VTPos.x = R.left;
@@ -2493,17 +2493,17 @@ void CVTWindow::OnMove(int x, int y)
 	DispSetWinPos();
 
 	if (vtwin_work.monitor_DPI == 0) {
-		// ƒEƒBƒ“ƒhƒE‚ª‰‚ß‚Ä•\¦‚³‚ê‚½
-		//	ƒ‚ƒjƒ^‚ÌDPI‚ğ•Û‘¶‚µ‚Ä‚¨‚­
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒåˆã‚ã¦è¡¨ç¤ºã•ã‚ŒãŸ
+		//	ãƒ¢ãƒ‹ã‚¿ã®DPIã‚’ä¿å­˜ã—ã¦ãŠã
 		vtwin_work.monitor_DPI = GetMonitorDpiFromWindow(m_hWnd);
 	}
 }
 
-// ƒ}ƒEƒXƒzƒC[ƒ‹‚Ì‰ñ“]
+// ãƒã‚¦ã‚¹ãƒ›ã‚¤ãƒ¼ãƒ«ã®å›è»¢
 BOOL CVTWindow::OnMouseWheel(
-	UINT nFlags,   // ‰¼‘zƒL[
-	short zDelta,  // ‰ñ“]‹——£
-	POINTS pts     // ƒJ[ƒ\ƒ‹ˆÊ’u
+	UINT nFlags,   // ä»®æƒ³ã‚­ãƒ¼
+	short zDelta,  // å›è»¢è·é›¢
+	POINTS pts     // ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®
 )
 {
 	POINT pt;
@@ -2557,10 +2557,10 @@ BOOL CVTWindow::OnMouseWheel(
 
 	::ScreenToClient(HVTWin, &pt);
 
-	line = abs(zDelta) / WHEEL_DELTA; // ƒ‰ƒCƒ“”
+	line = abs(zDelta) / WHEEL_DELTA; // ãƒ©ã‚¤ãƒ³æ•°
 	if (line < 1) line = 1;
 
-	// ˆêƒXƒNƒ[ƒ‹‚ ‚½‚è‚Ìs”‚É•ÏŠ·‚·‚é (2008.4.6 yutaka)
+	// ä¸€ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã‚ãŸã‚Šã®è¡Œæ•°ã«å¤‰æ›ã™ã‚‹ (2008.4.6 yutaka)
 	if (line == 1 && ts.MouseWheelScrollLine > 0)
 		line *= ts.MouseWheelScrollLine;
 
@@ -2610,7 +2610,7 @@ void CVTWindow::OnPaint()
 	HDC PaintDC;
 	int Xs, Ys, Xe, Ye;
 
-	// •\¦‚³‚ê‚Ä‚¢‚È‚­‚Ä‚àWM_PAINT‚ª”­¶‚·‚éƒP[ƒX‘Îô
+	// è¡¨ç¤ºã•ã‚Œã¦ã„ãªãã¦ã‚‚WM_PAINTãŒç™ºç”Ÿã™ã‚‹ã‚±ãƒ¼ã‚¹å¯¾ç­–
 	if (::IsWindowVisible(m_hWnd) == 0) {
 		return;
 	}
@@ -2659,10 +2659,10 @@ void CVTWindow::OnRButtonUp(UINT nFlags, POINTS point)
 	}
 
 	/*
-	 *  ƒy[ƒXƒgğŒ:
-	 *  Ets.PasteFlag & CPF_DISABLE_RBUTTON -> ‰Eƒ{ƒ^ƒ“‚É‚æ‚éƒy[ƒXƒg–³Œø
-	 *  Ets.PasteFlag & CPF_CONFIRM_RBUTTON -> •\¦‚³‚ê‚½ƒƒjƒ…[‚©‚çƒy[ƒXƒg‚ğs‚¤‚Ì‚ÅA
-	 *                                          ‰Eƒ{ƒ^ƒ“ƒAƒbƒv‚É‚æ‚éƒy[ƒXƒg‚Ís‚í‚È‚¢
+	 *  ãƒšãƒ¼ã‚¹ãƒˆæ¡ä»¶:
+	 *  ãƒ»ts.PasteFlag & CPF_DISABLE_RBUTTON -> å³ãƒœã‚¿ãƒ³ã«ã‚ˆã‚‹ãƒšãƒ¼ã‚¹ãƒˆç„¡åŠ¹
+	 *  ãƒ»ts.PasteFlag & CPF_CONFIRM_RBUTTON -> è¡¨ç¤ºã•ã‚ŒãŸãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‹ã‚‰ãƒšãƒ¼ã‚¹ãƒˆã‚’è¡Œã†ã®ã§ã€
+	 *                                          å³ãƒœã‚¿ãƒ³ã‚¢ãƒƒãƒ—ã«ã‚ˆã‚‹ãƒšãƒ¼ã‚¹ãƒˆã¯è¡Œã‚ãªã„
 	 */
 	if ((ts.PasteFlag & CPF_DISABLE_RBUTTON) || (ts.PasteFlag & CPF_CONFIRM_RBUTTON)) {
 		ButtonUp(FALSE);
@@ -2679,22 +2679,22 @@ void CVTWindow::OnSetFocus(HWND hOldWnd)
 
 void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 {
-	// ƒEƒBƒ“ƒhƒE¶¬‚ÌÅ‰‚ÌWM_SIZE(monitor_DPI==0‚Ì‚Æ‚«)‚Í
-	// DPI‚Ìƒ`ƒFƒbƒN‚ğs‚í‚È‚¢
-	// ƒEƒBƒ“ƒhƒE¶¬AWM_SIZE, WM_MOVE ‚ÆƒƒbƒZ[ƒW‚ª”­¶‚·‚é
+	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç”Ÿæˆæ™‚ã®æœ€åˆã®WM_SIZEæ™‚(monitor_DPI==0ã®ã¨ã)ã¯
+	// DPIã®ãƒã‚§ãƒƒã‚¯ã‚’è¡Œã‚ãªã„
+	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç”Ÿæˆæ™‚ã€WM_SIZE, WM_MOVE ã¨ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒç™ºç”Ÿã™ã‚‹
 	if (vtwin_work.monitor_DPI != 0 &&
 		GetMonitorDpiFromWindow(m_hWnd) != vtwin_work.monitor_DPI &&
 		isSizing == FALSE) {
-		// DPI‚ÌˆÙ‚È‚éƒfƒBƒXƒvƒŒƒC‚ğ‚Ü‚½‚®‚Æ WM_DPICHANGE ‚ª”­¶‚·‚é
+		// DPIã®ç•°ãªã‚‹ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã‚’ã¾ãŸãã¨ WM_DPICHANGE ãŒç™ºç”Ÿã™ã‚‹
 		//
-		// uƒhƒ‰ƒbƒO’†‚ÉƒEƒBƒ“ƒhƒE‚Ì“à—e‚ğ•\¦‚·‚é=OFFvİ’è
-		// ƒ}ƒEƒX‚Ìƒ{ƒ^ƒ“‚ğ—£‚µ‚½‚Æ‚«‚ÉAŸ‚Ì2í—Ş‚Ì”­¶ƒpƒ^[ƒ“‚ª‚ ‚é
-		// 1. ƒEƒBƒ“ƒhƒE‚ªˆÚ“®‚µ‚½‚Æ‚«
-		//    WM_MOVE, WM_SIZE, WM_DPICHANGED ‚Ì‡‚ÅƒƒbƒZ[ƒW‚ª”­¶‚·‚é
-		// 2. ƒEƒBƒ“ƒhƒE‚ªƒŠƒTƒCƒY‚µ‚½‚Æ‚«
-		//    (WM_MOVE,)WM_SIZE, WM_DPICHANGED ‚Ì‡‚ÅƒƒbƒZ[ƒW‚ª”­¶‚·‚é
+		// ã€Œãƒ‰ãƒ©ãƒƒã‚°ä¸­ã«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å†…å®¹ã‚’è¡¨ç¤ºã™ã‚‹=OFFã€è¨­å®šæ™‚
+		// ãƒã‚¦ã‚¹ã®ãƒœã‚¿ãƒ³ã‚’é›¢ã—ãŸã¨ãã«ã€æ¬¡ã®2ç¨®é¡ã®ç™ºç”Ÿãƒ‘ã‚¿ãƒ¼ãƒ³ãŒã‚ã‚‹
+		// 1. ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒç§»å‹•ã—ãŸã¨ã
+		//    WM_MOVE, WM_SIZE, WM_DPICHANGED ã®é †ã§ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒç™ºç”Ÿã™ã‚‹
+		// 2. ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒãƒªã‚µã‚¤ã‚ºã—ãŸã¨ã
+		//    (WM_MOVE,)WM_SIZE, WM_DPICHANGED ã®é †ã§ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒç™ºç”Ÿã™ã‚‹
 		//
-		// WM_SIZE‚Ìˆ—‚Ì‚½‚ßA2 ‚ª‘Ã“–‚Æ‚È‚é‚æ‚¤À‘•‚µ‚½
+		// WM_SIZEã®å‡¦ç†ã®ãŸã‚ã€2 ãŒå¦¥å½“ã¨ãªã‚‹ã‚ˆã†å®Ÿè£…ã—ãŸ
 		return;
 	}
 	RECT R;
@@ -2777,9 +2777,9 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 #endif
 }
 
-// ƒŠƒTƒCƒY’†‚Ìˆ—‚Æ‚µ‚ÄAˆÈ‰º‚Ì“ñ‚Â‚ğs‚¤B
-// Eƒc[ƒ‹ƒ`ƒbƒv‚ÅV‚µ‚¢’[––ƒTƒCƒY‚ğ•\¦‚·‚é
-// EƒtƒHƒ“ƒgƒTƒCƒY‚Æ’[––ƒTƒCƒY‚É‡‚í‚¹‚ÄAƒEƒBƒ“ƒhƒEˆÊ’uEƒTƒCƒY‚ğ’²®‚·‚é
+// ãƒªã‚µã‚¤ã‚ºä¸­ã®å‡¦ç†ã¨ã—ã¦ã€ä»¥ä¸‹ã®äºŒã¤ã‚’è¡Œã†ã€‚
+// ãƒ»ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã§æ–°ã—ã„ç«¯æœ«ã‚µã‚¤ã‚ºã‚’è¡¨ç¤ºã™ã‚‹
+// ãƒ»ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã¨ç«¯æœ«ã‚µã‚¤ã‚ºã«åˆã‚ã›ã¦ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½ç½®ãƒ»ã‚µã‚¤ã‚ºã‚’èª¿æ•´ã™ã‚‹
 void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 {
 	int nWidth;
@@ -2801,15 +2801,15 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 	h = nHeight / FontHeight;
 
 	if (!ts.TermIsWin) {
-		// TermIsWin=off ‚Ì‚ÍƒŠƒTƒCƒY‚Å‚Í’[––ƒTƒCƒY‚ª•Ï‚í‚ç‚È‚¢‚Ì‚Å
-		// Œ»İ‚Ì’[––ƒTƒCƒY‚ğãŒÀ‚Æ‚·‚éB
+		// TermIsWin=off ã®æ™‚ã¯ãƒªã‚µã‚¤ã‚ºã§ã¯ç«¯æœ«ã‚µã‚¤ã‚ºãŒå¤‰ã‚ã‚‰ãªã„ã®ã§
+		// ç¾åœ¨ã®ç«¯æœ«ã‚µã‚¤ã‚ºã‚’ä¸Šé™ã¨ã™ã‚‹ã€‚
 		if (w > ts.TerminalWidth)
 			w = ts.TerminalWidth;
 		if (h > ts.TerminalHeight)
 			h = ts.TerminalHeight;
 	}
 
-	// Å’á‚Å‚à 1x1 ‚Ì’[––ƒTƒCƒY‚ğ•Ûá‚·‚éB
+	// æœ€ä½ã§ã‚‚ 1x1 ã®ç«¯æœ«ã‚µã‚¤ã‚ºã‚’ä¿éšœã™ã‚‹ã€‚
 	if (w <= 0)
 		w = 1;
 	if (h <= 0)
@@ -2820,28 +2820,28 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 	fixed_width = w * FontWidth + margin_width;
 	fixed_height = h * FontHeight + margin_height;
 
-	switch (fwSide) { // •’²®
-	case 1: // ¶
-	case 4: // ¶ã
-	case 7: // ¶‰º
+	switch (fwSide) { // å¹…èª¿æ•´
+	case 1: // å·¦
+	case 4: // å·¦ä¸Š
+	case 7: // å·¦ä¸‹
 		pRect->left = pRect->right - fixed_width;
 		break;
-	case 2: // ‰E
-	case 5: // ‰Eã
-	case 8: // ‰E‰º
+	case 2: // å³
+	case 5: // å³ä¸Š
+	case 8: // å³ä¸‹
 		pRect->right = pRect->left + fixed_width;
 		break;
 	}
 
-	switch (fwSide) { // ‚‚³’²®
-	case 3: // ã
-	case 4: // ¶ã
-	case 5: // ‰Eã
+	switch (fwSide) { // é«˜ã•èª¿æ•´
+	case 3: // ä¸Š
+	case 4: // å·¦ä¸Š
+	case 5: // å³ä¸Š
 		pRect->top = pRect->bottom - fixed_height;
 		break;
-	case 6: // ‰º
-	case 7: // ¶‰º
-	case 8: // ‰E‰º
+	case 6: // ä¸‹
+	case 7: // å·¦ä¸‹
+	case 8: // å³ä¸‹
 		pRect->bottom = pRect->top + fixed_height;
 		break;
 	}
@@ -2851,8 +2851,8 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 void CVTWindow::OnSysChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
 #ifdef WINDOW_MAXMIMUM_ENABLED
-	// ALT + x‚ğ‰Ÿ‰º‚·‚é‚Æ WM_SYSCHAR ‚ª”ò‚ñ‚Å‚­‚éB
-	// ALT + Enter‚ÅƒEƒBƒ“ƒhƒE‚ÌÅ‘å‰» (2005.4.24 yutaka)
+	// ALT + xã‚’æŠ¼ä¸‹ã™ã‚‹ã¨ WM_SYSCHAR ãŒé£›ã‚“ã§ãã‚‹ã€‚
+	// ALT + Enterã§ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®æœ€å¤§åŒ– (2005.4.24 yutaka)
 	if ((nFlags&0x2000) != 0 && nChar == CR) {
 		if (::IsZoomed(m_hWnd)) { // window is maximum
 			ShowWindow(SW_RESTORE);
@@ -2987,11 +2987,11 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 		return;
 	}
 	else if (nIDEvent == IdCancelConnectTimer) {
-		// ‚Ü‚¾Ú‘±‚ªŠ®—¹‚µ‚Ä‚¢‚È‚¯‚ê‚ÎAƒ\ƒPƒbƒg‚ğ‹­§ƒNƒ[ƒYB
-		// CloseSocket()‚ğŒÄ‚Ñ‚½‚¢‚ªA‚±‚±‚©‚ç‚ÍŒÄ‚×‚È‚¢‚Ì‚ÅA’¼ÚWin32API‚ğƒR[ƒ‹‚·‚éB
+		// ã¾ã æ¥ç¶šãŒå®Œäº†ã—ã¦ã„ãªã‘ã‚Œã°ã€ã‚½ã‚±ãƒƒãƒˆã‚’å¼·åˆ¶ã‚¯ãƒ­ãƒ¼ã‚ºã€‚
+		// CloseSocket()ã‚’å‘¼ã³ãŸã„ãŒã€ã“ã“ã‹ã‚‰ã¯å‘¼ã¹ãªã„ã®ã§ã€ç›´æ¥Win32APIã‚’ã‚³ãƒ¼ãƒ«ã™ã‚‹ã€‚
 		if (!cv.Ready) {
 			closesocket(cv.s);
-			cv.s = INVALID_SOCKET;  /* ƒ\ƒPƒbƒg–³Œø‚Ìˆó‚ğ•t‚¯‚éB(2010.8.6 yutaka) */
+			cv.s = INVALID_SOCKET;  /* ã‚½ã‚±ãƒƒãƒˆç„¡åŠ¹ã®å°ã‚’ä»˜ã‘ã‚‹ã€‚(2010.8.6 yutaka) */
 			//::PostMessage(HVTWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 		}
 	}
@@ -3081,7 +3081,7 @@ void CVTWindow::OnVScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 		return;
 	}
 
-	// ƒXƒNƒ[ƒ‹ƒŒƒ“ƒW‚ğ 16bit ‚©‚ç 32bit ‚ÖŠg’£‚µ‚½ (2005.10.4 yutaka)
+	// ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ãƒ¬ãƒ³ã‚¸ã‚’ 16bit ã‹ã‚‰ 32bit ã¸æ‹¡å¼µã—ãŸ (2005.10.4 yutaka)
 	ZeroMemory(&si, sizeof(SCROLLINFO));
 	si.cbSize = sizeof(SCROLLINFO);
 	si.fMask = SIF_TRACKPOS;
@@ -3133,7 +3133,7 @@ LRESULT CVTWindow::OnIMEStartComposition(WPARAM wParam, LPARAM lParam)
 {
 	IMECompositionState = TRUE;
 
-	// ˆÊ’u‚ğ’Ê’m‚·‚é
+	// ä½ç½®ã‚’é€šçŸ¥ã™ã‚‹
 	int CaretX = (CursorX-WinOrgX)*FontWidth;
 	int CaretY = (CursorY-WinOrgY)*FontHeight;
 	SetConversionWindow(HVTWin,CaretX,CaretY);
@@ -3188,67 +3188,67 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
 	case IMN_SETOPENSTATUS:
-		// “ü—ÍƒRƒ“ƒeƒLƒXƒg‚ÌŠJ•Âó‘Ô‚ªXV‚³‚ê‚é(IME On/OFF)
+		// å…¥åŠ›ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®é–‹é–‰çŠ¶æ…‹ãŒæ›´æ–°ã•ã‚Œã‚‹(IME On/OFF)
 
-		// IME‚ÌOn/Off‚ğæ“¾‚·‚é
+		// IMEã®On/Offã‚’å–å¾—ã™ã‚‹
 		IMEstat = GetIMEOpenStatus(HVTWin);
 		if (IMEstat != 0) {
 			// IME On
 
-			// ó‘Ô‚ğ•\¦‚·‚éIME‚Ì‚½‚ß‚ÉˆÊ’u‚ğ’Ê’m‚·‚é
+			// çŠ¶æ…‹ã‚’è¡¨ç¤ºã™ã‚‹IMEã®ãŸã‚ã«ä½ç½®ã‚’é€šçŸ¥ã™ã‚‹
 			int CaretX = (CursorX-WinOrgX)*FontWidth;
 			int CaretY = (CursorY-WinOrgY)*FontHeight;
 			SetConversionWindow(HVTWin,CaretX,CaretY);
 
 			if (ts.IMEInline > 0) {
-				// ƒtƒHƒ“ƒg‚ğİ’è‚·‚é
+				// ãƒ•ã‚©ãƒ³ãƒˆã‚’è¨­å®šã™ã‚‹
 				ResetConversionLogFont(HVTWin);
 			}
 		}
 
-		// •`‰æ
+		// æç”»
 		ChangeCaret();
 
 		break;
 
-	// Œó•âƒEƒBƒ“ƒhƒE‚Ì•\¦ó‹µ’Ê’m
-	// IME_OPENCANDIDATE / IMN_CLOSECANDIDATE ƒTƒ|[ƒgó‹µ
+	// å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è¡¨ç¤ºçŠ¶æ³é€šçŸ¥
+	// IME_OPENCANDIDATE / IMN_CLOSECANDIDATE ã‚µãƒãƒ¼ãƒˆçŠ¶æ³
 	//
 	//  IME								status
 	//  --------------------------------+----------
-	//  MS IME “ú–{Œê(Windows 10 1809)	suport
-	//  Google “ú–{Œê“ü—Í(2.24.3250.0)	not support
+	//  MS IME æ—¥æœ¬èª(Windows 10 1809)	suport
+	//  Google æ—¥æœ¬èªå…¥åŠ›(2.24.3250.0)	not support
 	//
-	// WM_IME_STARTCOMPOSITION / WM_IME_ENDCOMPOSITION ‚Í
-	// Š¿š“ü—Íó‘Ô‚ªƒXƒ^[ƒg‚µ‚½ / I—¹‚µ‚½‚Å”­¶‚·‚éB
-	// IME_OPENCANDIDATE / IMN_CLOSECANDIDATE ‚Í
-	// Œó•âƒEƒBƒ“ƒhƒE‚ª•\¦‚³‚ê‚½ / •Â‚¶‚½‚Å”­¶‚·‚éB
+	// WM_IME_STARTCOMPOSITION / WM_IME_ENDCOMPOSITION ã¯
+	// æ¼¢å­—å…¥åŠ›çŠ¶æ…‹ãŒã‚¹ã‚¿ãƒ¼ãƒˆã—ãŸ / çµ‚äº†ã—ãŸã§ç™ºç”Ÿã™ã‚‹ã€‚
+	// IME_OPENCANDIDATE / IMN_CLOSECANDIDATE ã¯
+	// å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒè¡¨ç¤ºã•ã‚ŒãŸ / é–‰ã˜ãŸã§ç™ºç”Ÿã™ã‚‹ã€‚
 	case IMN_OPENCANDIDATE: {
-		// Œó•âƒEƒBƒ“ƒhƒE‚ğŠJ‚±‚¤‚Æ‚µ‚Ä‚¢‚é
+		// å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é–‹ã“ã†ã¨ã—ã¦ã„ã‚‹
 
-		// ó‘Ô‚ğ•\¦‚·‚éIME‚Ì‚½‚ß‚ÉˆÊ’u‚ğ’Ê’m‚·‚é
-		// Ÿ‚Ìê‡‚ª‚ ‚é‚Ì‚ÅAˆÊ’u‚ğÄİ’è‚·‚é
-		// - Š¿š•ÏŠ·Œó•â‚ğ•\¦
-		// - Ÿ‚Ì•¶š‚ğ“ü—Í‚·‚é‚±‚Æ‚ÅŠm’èˆ—‚ğs‚¤
-		// - •¶š“ü—Í‚Æ–¢•ÏŠ·•¶š“ü—Í‚ª”­¶‚·‚é
+		// çŠ¶æ…‹ã‚’è¡¨ç¤ºã™ã‚‹IMEã®ãŸã‚ã«ä½ç½®ã‚’é€šçŸ¥ã™ã‚‹
+		// æ¬¡ã®å ´åˆãŒã‚ã‚‹ã®ã§ã€ä½ç½®ã‚’å†è¨­å®šã™ã‚‹
+		// - æ¼¢å­—å¤‰æ›å€™è£œã‚’è¡¨ç¤º
+		// - æ¬¡ã®æ–‡å­—ã‚’å…¥åŠ›ã™ã‚‹ã“ã¨ã§ç¢ºå®šå‡¦ç†ã‚’è¡Œã†
+		// - æ–‡å­—å…¥åŠ›ã¨æœªå¤‰æ›æ–‡å­—å…¥åŠ›ãŒç™ºç”Ÿã™ã‚‹
 		int CaretX = (CursorX-WinOrgX)*FontWidth;
 		int CaretY = (CursorY-WinOrgY)*FontHeight;
 		SetConversionWindow(HVTWin,CaretX,CaretY);
 
-		// ƒtƒHƒ“ƒg‚ğİ’è‚·‚é
+		// ãƒ•ã‚©ãƒ³ãƒˆã‚’è¨­å®šã™ã‚‹
 		ResetConversionLogFont(HVTWin);
 
 		break;
 	}
 
 	case IMN_OPENSTATUSWINDOW:
-		// ƒXƒe[ƒ^ƒXƒEƒBƒ“ƒhƒE‚ğƒI[ƒvƒ“(–¢Šm’è•¶š‚ğ•\¦?)‚µ‚æ‚¤‚Æ‚µ‚Ä‚¢‚é
+		// ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ã‚ªãƒ¼ãƒ—ãƒ³(æœªç¢ºå®šæ–‡å­—ã‚’è¡¨ç¤º?)ã—ã‚ˆã†ã¨ã—ã¦ã„ã‚‹
 
-		// IME‚Å–¢•ÏŠ·ó‘Ô‚ÅAƒtƒHƒ“ƒgƒ_ƒCƒAƒƒO‚ğƒI[ƒvƒ“‚µ‚ÄƒNƒ[ƒY‚·‚é‚Æ
-		// IME‚Éİ’è‚µ‚Ä‚¢‚½ƒtƒHƒ“ƒg‚ª•Ê‚Ì‚à‚Ì‚É•Ï‰»‚µ‚Ä‚¢‚é‚ç‚µ‚¢
-		// ‚±‚±‚ÅƒtƒHƒ“ƒg‚ÌÄİ’è‚ğs‚¤
+		// IMEã§æœªå¤‰æ›çŠ¶æ…‹ã§ã€ãƒ•ã‚©ãƒ³ãƒˆãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’ã‚ªãƒ¼ãƒ—ãƒ³ã—ã¦ã‚¯ãƒ­ãƒ¼ã‚ºã™ã‚‹ã¨
+		// IMEã«è¨­å®šã—ã¦ã„ãŸãƒ•ã‚©ãƒ³ãƒˆãŒåˆ¥ã®ã‚‚ã®ã«å¤‰åŒ–ã—ã¦ã„ã‚‹ã‚‰ã—ã„
+		// ã“ã“ã§ãƒ•ã‚©ãƒ³ãƒˆã®å†è¨­å®šã‚’è¡Œã†
 
-		// ƒtƒHƒ“ƒg‚ğİ’è‚·‚é
+		// ãƒ•ã‚©ãƒ³ãƒˆã‚’è¨­å®šã™ã‚‹
 		ResetConversionLogFont(HVTWin);
 		break;
 	default:
@@ -3265,15 +3265,15 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 	LRESULT result;
 
 	if (lParam == 0)
-	{  // 1‰ñ–Ú‚ÌŒÄ‚Ño‚µ ƒTƒCƒY‚¾‚¯‚ğ•Ô‚·
+	{  // 1å›ç›®ã®å‘¼ã³å‡ºã— ã‚µã‚¤ã‚ºã ã‘ã‚’è¿”ã™
 		if(IsWindowUnicode(hWnd) == FALSE) {
-			// ANSI”Å
-			char buf[512];			// QÆ•¶š—ñ‚ğó‚¯æ‚éƒoƒbƒtƒ@
+			// ANSIç‰ˆ
+			char buf[512];			// å‚ç…§æ–‡å­—åˆ—ã‚’å—ã‘å–ã‚‹ãƒãƒƒãƒ•ã‚¡
 			size_t str_len_count;
 			int cx;
 
-			// QÆ•¶š—ñæ“¾A1sæ‚èo‚·
-			{	// ƒJ[ƒ\ƒ‹‚©‚çŒã‚ëAƒXƒy[ƒXˆÈŠO‚ªŒ©‚Â‚©‚Á‚½‚Æ‚±‚ë‚ğs––‚Æ‚·‚é
+			// å‚ç…§æ–‡å­—åˆ—å–å¾—ã€1è¡Œå–ã‚Šå‡ºã™
+			{	// ã‚«ãƒ¼ã‚½ãƒ«ã‹ã‚‰å¾Œã‚ã€ã‚¹ãƒšãƒ¼ã‚¹ä»¥å¤–ãŒè¦‹ã¤ã‹ã£ãŸã¨ã“ã‚ã‚’è¡Œæœ«ã¨ã™ã‚‹
 				int x;
 				int len;
 				cx = BuffGetCurrentLineData(buf, sizeof(buf));
@@ -3287,7 +3287,7 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 				str_len_count = len;
 			}
 
-			// IME‚É•Ô‚·\‘¢‘Ì‚ğì¬‚·‚é
+			// IMEã«è¿”ã™æ§‹é€ ä½“ã‚’ä½œæˆã™ã‚‹
 			if (pReconvPtrSave != NULL) {
 				free(pReconvPtrSave);
 			}
@@ -3295,13 +3295,13 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 				hWnd, buf, str_len_count, cx, &ReconvSizeSave);
 		}
 		else {
-			// UNICODE”Å
+			// UNICODEç‰ˆ
 			size_t str_len_count;
 			int cx;
 			wchar_t *strW;
 
-			// QÆ•¶š—ñæ“¾A1sæ‚èo‚·
-			{	// ƒJ[ƒ\ƒ‹‚©‚çŒã‚ëAƒXƒy[ƒXˆÈŠO‚ªŒ©‚Â‚©‚Á‚½‚Æ‚±‚ë‚ğs––‚Æ‚·‚é
+			// å‚ç…§æ–‡å­—åˆ—å–å¾—ã€1è¡Œå–ã‚Šå‡ºã™
+			{	// ã‚«ãƒ¼ã‚½ãƒ«ã‹ã‚‰å¾Œã‚ã€ã‚¹ãƒšãƒ¼ã‚¹ä»¥å¤–ãŒè¦‹ã¤ã‹ã£ãŸã¨ã“ã‚ã‚’è¡Œæœ«ã¨ã™ã‚‹
 				int x;
 				size_t len = 0;
 				cx = CursorX;
@@ -3317,7 +3317,7 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 				str_len_count = len;
 			}
 
-			// IME‚É•Ô‚·\‘¢‘Ì‚ğì¬‚·‚é
+			// IMEã«è¿”ã™æ§‹é€ ä½“ã‚’ä½œæˆã™ã‚‹
 			if (pReconvPtrSave != NULL) {
 				free(pReconvPtrSave);
 			}
@@ -3326,16 +3326,16 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 			free(strW);
 		}
 
-		// 1‰ñ–Ú‚ÍƒTƒCƒY‚¾‚¯‚ğ•Ô‚·
+		// 1å›ç›®ã¯ã‚µã‚¤ã‚ºã ã‘ã‚’è¿”ã™
 		result = ReconvSizeSave;
 	}
 	else {
-		// 2‰ñ–Ú‚ÌŒÄ‚Ño‚µ \‘¢‘Ì‚ğ“n‚·
+		// 2å›ç›®ã®å‘¼ã³å‡ºã— æ§‹é€ ä½“ã‚’æ¸¡ã™
 		if (pReconvPtrSave != NULL) {
 			RECONVERTSTRING *pReconv = (RECONVERTSTRING*)lParam;
 			result = 0;
 			if (pReconv->dwSize >= ReconvSizeSave) {
-				// 1‰ñ–Ú‚ÌƒTƒCƒY‚ªŠm•Û‚³‚ê‚Ä‚«‚Ä‚¢‚é‚Í‚¸
+				// 1å›ç›®ã®ã‚µã‚¤ã‚ºãŒç¢ºä¿ã•ã‚Œã¦ãã¦ã„ã‚‹ã¯ãš
 				memcpy(pReconv, pReconvPtrSave, ReconvSizeSave);
 				result = ReconvSizeSave;
 			}
@@ -3343,7 +3343,7 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 			pReconvPtrSave = NULL;
 			ReconvSizeSave = 0;
 		} else {
-			// 3‰ñ–Ú?
+			// 3å›ç›®?
 			result = 0;
 		}
 	}
@@ -3353,7 +3353,7 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 
 LRESULT CVTWindow::OnIMERequest(WPARAM wParam, LPARAM lParam)
 {
-	// "IME=off"‚Ìê‡‚ÍA‰½‚à‚µ‚È‚¢B
+	// "IME=off"ã®å ´åˆã¯ã€ä½•ã‚‚ã—ãªã„ã€‚
 	if (ts.UseIME > 0) {
 		switch(wParam) {
 		case IMR_DOCUMENTFEED:
@@ -3465,8 +3465,8 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 
 	Show = (ts.PopupMenu==0) && (ts.HideTitle==0);
 
-// TTXKanjiMenu ‚Ì‚½‚ß‚ÉAƒƒjƒ…[‚ª•\¦‚³‚ê‚Ä‚¢‚Ä‚à
-// Ä•`‰æ‚·‚é‚æ‚¤‚É‚µ‚½B (2007.7.14 maya)
+// TTXKanjiMenu ã®ãŸã‚ã«ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãŒè¡¨ç¤ºã•ã‚Œã¦ã„ã¦ã‚‚
+// å†æç”»ã™ã‚‹ã‚ˆã†ã«ã—ãŸã€‚ (2007.7.14 maya)
 	if (Show != (MainMenu!=NULL)) {
 		AdjustSize = TRUE;
 	}
@@ -3635,15 +3635,15 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 	/* Auto start logging or /L= option */
 	if (ts.LogAutoStart || ts.LogFNW != NULL) {
 		if (ts.LogFNW != NULL) {
-			// "/L"= ‚Åw’è‚³‚ê‚Ä‚¢‚é‚Æ‚«(Auto start logging ‚©‚à‚µ‚ê‚È‚¢)
-			//   w’èƒtƒ@ƒCƒ‹–¼‚ğ“WŠJ‚·‚é
+			// "/L"= ã§æŒ‡å®šã•ã‚Œã¦ã„ã‚‹ã¨ã(Auto start logging ã‹ã‚‚ã—ã‚Œãªã„)
+			//   æŒ‡å®šãƒ•ã‚¡ã‚¤ãƒ«åã‚’å±•é–‹ã™ã‚‹
 			wchar_t *LogFNW = FLogGetLogFilename(ts.LogFNW);
 			free(ts.LogFNW);
 			ts.LogFNW = LogFNW;
 		}
 		else {
-			// Auto start logging ‚Ì‚Æ‚«("/L"‚Åw’è‚³‚ê‚Ä‚¢‚È‚¢‚Æ‚«)
-			//   ƒfƒtƒHƒ‹ƒg‚Ìƒtƒ@ƒCƒ‹–¼
+			// Auto start logging ã®ã¨ã("/L"ã§æŒ‡å®šã•ã‚Œã¦ã„ãªã„ã¨ã)
+			//   ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ•ã‚¡ã‚¤ãƒ«å
 			ts.LogFNW = FLogGetLogFilename(NULL);
 		}
 		WideCharToACP_t(ts.LogFNW, ts.LogFN, sizeof(ts.LogFN));
@@ -3712,7 +3712,7 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnCommStart(WPARAM wParam, LPARAM lParam)
 {
-	// ©“®Ú‘±‚ª–³Œø‚Ì‚Æ‚«‚àÚ‘±ƒ_ƒCƒAƒƒO‚ğo‚·‚æ‚¤‚É‚µ‚½ (2006.9.15 maya)
+	// è‡ªå‹•æ¥ç¶šãŒç„¡åŠ¹ã®ã¨ãã‚‚æ¥ç¶šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºã™ã‚ˆã†ã«ã—ãŸ (2006.9.15 maya)
 	if (((ts.PortType!=IdSerial) && (ts.HostName[0]==0)) ||
 	    ((ts.PortType==IdSerial) && (ts.ComAutoConnect == FALSE))) {
 		if (ts.HostDialogOnStartup) {
@@ -3795,11 +3795,11 @@ LRESULT CVTWindow::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 }
 
 /**
- *	V‚µ‚¢Ú‘±
+ *	æ–°ã—ã„æ¥ç¶š
  *
  *	TODO
- *		Ÿ‚Ì•Ï”‚ªƒRƒ}ƒ“ƒhƒ‰ƒCƒ“’·‚ÌãŒÀ‚Ìˆêˆö‚Æ‚È‚Á‚Ä‚¢‚é
- *		- hostname[HostNameMaxLength] (ƒzƒXƒg–¼AƒRƒ}ƒ“ƒhƒ‰ƒCƒ“)
+ *		æ¬¡ã®å¤‰æ•°ãŒã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³é•·ã®ä¸Šé™ã®ä¸€å› ã¨ãªã£ã¦ã„ã‚‹
+ *		- hostname[HostNameMaxLength] (ãƒ›ã‚¹ãƒˆåã€ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³)
  *		- command[MAXPATHLEN + HostNameMaxLength]
  */
 void CVTWindow::OnFileNewConnection()
@@ -3886,7 +3886,7 @@ void CVTWindow::OnFileNewConnection()
 					wcsncat_s(Command,_countof(Command),tcpport,_TRUNCATE);
 				}
 				/********************************/
-				/* ‚±‚±‚ÉƒvƒƒgƒRƒ‹ˆ—‚ğ“ü‚ê‚é */
+				/* ã“ã“ã«ãƒ—ãƒ­ãƒˆã‚³ãƒ«å‡¦ç†ã‚’å…¥ã‚Œã‚‹ */
 				/********************************/
 				if (GetHNRec.ProtocolFamily == AF_INET) {
 					wcsncat_s(Command,_countof(Command), L" /4",_TRUNCATE);
@@ -3910,7 +3910,7 @@ void CVTWindow::OnFileNewConnection()
 }
 
 
-// ‚·‚Å‚ÉŠJ‚¢‚Ä‚¢‚éƒZƒbƒVƒ‡ƒ“‚Ì•¡»‚ğì‚é
+// ã™ã§ã«é–‹ã„ã¦ã„ã‚‹ã‚»ãƒƒã‚·ãƒ§ãƒ³ã®è¤‡è£½ã‚’ä½œã‚‹
 // (2004.12.6 yutaka)
 void CVTWindow::OnDuplicateSession()
 {
@@ -3923,10 +3923,10 @@ void CVTWindow::OnDuplicateSession()
 	int cygterm_PORT_RANGE = 40;
 	int is_cygwin_port = 0;
 
-	// Œ»İ‚Ìİ’è“à—e‚ğ‹¤—Lƒƒ‚ƒŠ‚ÖƒRƒs[‚µ‚Ä‚¨‚­
+	// ç¾åœ¨ã®è¨­å®šå†…å®¹ã‚’å…±æœ‰ãƒ¡ãƒ¢ãƒªã¸ã‚³ãƒ”ãƒ¼ã—ã¦ãŠã
 	CopyTTSetToShmem(&ts);
 
-	// cygterm.cfg ‚ğ“Ç‚İ‚Ş
+	// cygterm.cfg ã‚’èª­ã¿è¾¼ã‚€
 	strncpy_s(cygterm_cfg, sizeof(cygterm_cfg), ts.HomeDir, _TRUNCATE);
 	AppendSlash(cygterm_cfg, sizeof(cygterm_cfg));
 	strncat_s(cygterm_cfg, sizeof(cygterm_cfg), "cygterm.cfg", _TRUNCATE);
@@ -3950,7 +3950,7 @@ void CVTWindow::OnDuplicateSession()
 		}
 		fclose(fp);
 	}
-	// Cygterm ‚Ìƒ|[ƒg”ÍˆÍ“à‚©‚Ç‚¤‚©
+	// Cygterm ã®ãƒãƒ¼ãƒˆç¯„å›²å†…ã‹ã©ã†ã‹
 	if (ts.TCPPort >= cygterm_PORT_START &&
 	    ts.TCPPort <= cygterm_PORT_START+cygterm_PORT_RANGE) {
 		is_cygwin_port = 1;
@@ -3958,7 +3958,7 @@ void CVTWindow::OnDuplicateSession()
 
 	if (is_cygwin_port && (strcmp(ts.HostName, "127.0.0.1") == 0 ||
 	    strcmp(ts.HostName, "localhost") == 0)) {
-		// localhost‚Ö‚ÌÚ‘±‚Åƒ|[ƒg‚ªcygterm.cfg‚Ì”ÍˆÍ“à‚Ì‚ÍcygwinÚ‘±‚Æ‚İ‚È‚·B
+		// localhostã¸ã®æ¥ç¶šã§ãƒãƒ¼ãƒˆãŒcygterm.cfgã®ç¯„å›²å†…ã®æ™‚ã¯cygwinæ¥ç¶šã¨ã¿ãªã™ã€‚
 		OnCygwinConnection();
 		return;
 	} else if (cv.TelFlag) { // telnet
@@ -3967,8 +3967,8 @@ void CVTWindow::OnDuplicateSession()
 					 exec, ts.HostName, ts.TCPPort);
 
 	} else if (cv.isSSH) { // SSH
-		// ‚±‚±‚Ìˆ—‚Í TTSSH ‘¤‚É‚â‚ç‚¹‚é‚×‚« (2004.12.7 yutaka)
-		// TTSSH‘¤‚Å‚ÌƒIƒvƒVƒ‡ƒ“¶¬‚ğ’Ç‰ÁB(2005.4.8 yutaka)
+		// ã“ã“ã®å‡¦ç†ã¯ TTSSH å´ã«ã‚„ã‚‰ã›ã‚‹ã¹ã (2004.12.7 yutaka)
+		// TTSSHå´ã§ã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³ç”Ÿæˆã‚’è¿½åŠ ã€‚(2005.4.8 yutaka)
 		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
 					 L"%hs %hs:%d /DUPLICATE",
 					 exec, ts.HostName, ts.TCPPort);
@@ -3976,11 +3976,11 @@ void CVTWindow::OnDuplicateSession()
 		TTXSetCommandLine(Command, _countof(Command), NULL); /* TTPLUG */
 
 	} else {
-		// telnet/ssh/cygwinÚ‘±ˆÈŠO‚Å‚Í•¡»‚ğs‚í‚È‚¢B
+		// telnet/ssh/cygwinæ¥ç¶šä»¥å¤–ã§ã¯è¤‡è£½ã‚’è¡Œã‚ãªã„ã€‚
 		return;
 	}
 
-	// ƒZƒbƒVƒ‡ƒ“•¡»‚ğs‚¤ÛA/K= ‚ª‚ ‚ê‚Îˆø‚«Œp‚¬‚ğs‚¤‚æ‚¤‚É‚·‚éB
+	// ã‚»ãƒƒã‚·ãƒ§ãƒ³è¤‡è£½ã‚’è¡Œã†éš›ã€/K= ãŒã‚ã‚Œã°å¼•ãç¶™ãã‚’è¡Œã†ã‚ˆã†ã«ã™ã‚‹ã€‚
 	// cf. http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24682
 	// (2011.3.27 yutaka)
 	if (ts.KeyCnfFNW != NULL) {
@@ -3988,7 +3988,7 @@ void CVTWindow::OnDuplicateSession()
 		wcsncat_s(Command, _countof(Command), ts.KeyCnfFNW, _TRUNCATE);
 	}
 
-	// ƒZƒbƒVƒ‡ƒ“•¡»‚ğs‚¤ÛA/F= ‚ª‚ ‚ê‚Îˆø‚«Œp‚¬‚ğs‚¤‚æ‚¤‚É‚·‚éB
+	// ã‚»ãƒƒã‚·ãƒ§ãƒ³è¤‡è£½ã‚’è¡Œã†éš›ã€/F= ãŒã‚ã‚Œã°å¼•ãç¶™ãã‚’è¡Œã†ã‚ˆã†ã«ã™ã‚‹ã€‚
 	if (ParseFOption(&ts)) {
 		wcsncat_s(Command, _countof(Command), L" /F=", _TRUNCATE);
 		wcsncat_s(Command, _countof(Command), ts.SetupFNameW, _TRUNCATE);
@@ -4052,7 +4052,7 @@ void CVTWindow::OnCygwinConnection()
 }
 
 //
-// TeraTerm Menu‚Ì‹N“®
+// TeraTerm Menuã®èµ·å‹•
 //
 void CVTWindow::OnTTMenuLaunch()
 {
@@ -4082,14 +4082,14 @@ void CVTWindow::OnFileLog()
 	if (r) {
 		const wchar_t *filename = info.filename;
 		if (!info.append) {
-			// ƒtƒ@ƒCƒ‹íœ
+			// ãƒ•ã‚¡ã‚¤ãƒ«å‰Šé™¤
 			DeleteFileW(filename);
 		}
 		r = FLogOpen(filename, info.code, info.bom);
 		if (r != FALSE) {
 			if (FLogIsOpendText()) {
-				// Œ»İƒoƒbƒtƒ@‚É‚ ‚éƒf[ƒ^‚ğ‚·‚×‚Ä‘‚«o‚µ‚Ä‚©‚çA
-				// ƒƒOÌæ‚ğŠJn‚·‚éB
+				// ç¾åœ¨ãƒãƒƒãƒ•ã‚¡ã«ã‚ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’ã™ã¹ã¦æ›¸ãå‡ºã—ã¦ã‹ã‚‰ã€
+				// ãƒ­ã‚°æ¡å–ã‚’é–‹å§‹ã™ã‚‹ã€‚
 				// (2013.9.29 yutaka)
 				if (ts.LogAllBuffIncludedInFirst) {
 					FLogOutputAllBuffer();
@@ -4097,7 +4097,7 @@ void CVTWindow::OnFileLog()
 			}
 		}
 		else {
-			// ƒƒO‚Å‚«‚È‚¢
+			// ãƒ­ã‚°ã§ããªã„
 			static const TTMessageBoxInfoW mbinfo = {
 				"Tera Term",
 				"MSG_TT_FILE_OPEN_ERROR", L"Tera Term: File open error",
@@ -4113,7 +4113,7 @@ void CVTWindow::OnFileLog()
 void CVTWindow::OnCommentToLog()
 {
 	if (!FLogIsOpendText()) {
-		// ‘I‘ğ‚Å‚«‚È‚¢‚Ì‚ÅŒÄ‚Î‚ê‚È‚¢‚Í‚¸
+		// é¸æŠã§ããªã„ã®ã§å‘¼ã°ã‚Œãªã„ã¯ãš
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
@@ -4126,7 +4126,7 @@ void CVTWindow::OnCommentToLog()
 	FLogAddCommentDlg(m_hInst, HVTWin);
 }
 
-// ƒƒO‚Ì‰{——
+// ãƒ­ã‚°ã®é–²è¦§
 void CVTWindow::OnViewLog()
 {
 	if(!FLogIsOpend()) {
@@ -4147,19 +4147,19 @@ void CVTWindow::OnViewLog()
 	}
 }
 
-// ‰B‚µ‚Ä‚¢‚éƒƒOƒ_ƒCƒAƒƒO‚ğ•\¦‚·‚é (2008.2.3 maya)
+// éš ã—ã¦ã„ã‚‹ãƒ­ã‚°ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤ºã™ã‚‹ (2008.2.3 maya)
 void CVTWindow::OnShowLogDialog()
 {
 	FLogShowDlg();
 }
 
-// ƒƒOæ“¾‚ğ’†’f/ÄŠJ‚·‚é
+// ãƒ­ã‚°å–å¾—ã‚’ä¸­æ–­/å†é–‹ã™ã‚‹
 void CVTWindow::OnPauseLog()
 {
 	FLogPause(FLogIsPause() ? FALSE : TRUE);
 }
 
-// ƒƒOæ“¾‚ğI—¹‚·‚é
+// ãƒ­ã‚°å–å¾—ã‚’çµ‚äº†ã™ã‚‹
 void CVTWindow::OnStopLog()
 {
 	FLogClose();
@@ -4172,13 +4172,13 @@ static wchar_t *_get_lang_msg(const char *key, const wchar_t *def, const wchar_t
 	return uimsg;
 }
 
-// ƒƒO‚ÌÄ¶
+// ãƒ­ã‚°ã®å†ç”Ÿ
 void CVTWindow::OnReplayLog()
 {
 	wchar_t *szFile;
 	static const wchar_t *exec = L"ttermpro.exe";
 
-	// ƒoƒCƒiƒŠƒ‚[ƒh‚ÅÌæ‚µ‚½ƒƒOƒtƒ@ƒCƒ‹‚ğ‘I‘ğ‚·‚é
+	// ãƒã‚¤ãƒŠãƒªãƒ¢ãƒ¼ãƒ‰ã§æ¡å–ã—ãŸãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é¸æŠã™ã‚‹
 	wchar_t *filter = _get_lang_msg("FILEDLG_OPEN_LOGFILE_FILTER", L"all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW);
 	wchar_t *title = _get_lang_msg("FILEDLG_OPEN_LOGFILE_TITLE", L"Select replay log file with binary mode", ts.UILanguageFileW);
 	TTOPENFILENAMEW ofn = {};
@@ -4193,7 +4193,7 @@ void CVTWindow::OnReplayLog()
 	if (r == FALSE)
 		return;
 
-	// "/R"ƒIƒvƒVƒ‡ƒ“•t‚«‚ÅTera Term‚ğ‹N“®‚·‚éiƒƒO‚ªÄ¶‚³‚ê‚éj
+	// "/R"ã‚ªãƒ—ã‚·ãƒ§ãƒ³ä»˜ãã§Tera Termã‚’èµ·å‹•ã™ã‚‹ï¼ˆãƒ­ã‚°ãŒå†ç”Ÿã•ã‚Œã‚‹ï¼‰
 	wchar_t *exe_dir = GetExeDirW(NULL);
 	wchar_t *Command;
 	aswprintf(&Command, L"\"%s\\%s\" /R=\"%s\"", exe_dir, exec, szFile);
@@ -4401,7 +4401,7 @@ void CVTWindow::OnEditPaste()
 	// add confirm (2008.2.4 yutaka)
 	CBStartPaste(HVTWin, FALSE, BracketedPasteMode());
 
-	// ƒXƒNƒ[ƒ‹ˆÊ’u‚ğƒŠƒZƒbƒg
+	// ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ä½ç½®ã‚’ãƒªã‚»ãƒƒãƒˆ
 	if (WinOrgY != 0) {
 		DispVScroll(SCROLL_BOTTOM, 0);
 	}
@@ -4412,7 +4412,7 @@ void CVTWindow::OnEditPasteCR()
 	// add confirm (2008.3.11 maya)
 	CBStartPaste(HVTWin, TRUE, BracketedPasteMode());
 
-	// ƒXƒNƒ[ƒ‹ˆÊ’u‚ğƒŠƒZƒbƒg
+	// ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ä½ç½®ã‚’ãƒªã‚»ãƒƒãƒˆ
 	if (WinOrgY != 0) {
 		DispVScroll(SCROLL_BOTTOM, 0);
 	}
@@ -4488,7 +4488,7 @@ void CVTWindow::OnSetupTerminal()
 
 
 /**
- *  F‚ğƒZƒbƒg‚·‚éAƒe[ƒ}‚ªg—p‚³‚ê‚Ä‚¢‚é‚Æ‚«‚ÍƒZƒbƒg‚µ‚Ä‚æ‚¢‚©–â‚¢‡‚í‚¹‚é
+ *  è‰²ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã€ãƒ†ãƒ¼ãƒãŒä½¿ç”¨ã•ã‚Œã¦ã„ã‚‹ã¨ãã¯ã‚»ãƒƒãƒˆã—ã¦ã‚ˆã„ã‹å•ã„åˆã‚ã›ã‚‹
  */
 void CVTWindow::SetColor()
 {
@@ -4505,7 +4505,7 @@ void CVTWindow::SetColor()
 		}
 	}
 
-	// F‚ğİ’è‚·‚é
+	// è‰²ã‚’è¨­å®šã™ã‚‹
 	if (set_color) {
 		DispResetColor(CS_ALL);
 	}
@@ -4527,8 +4527,8 @@ void CVTWindow::OnSetupKeyboard()
 }
 
 /*
- *	ƒVƒŠƒAƒ‹Ú‘±‚ÅV‚µ‚¢ƒvƒƒZƒX‚ğ‹N“®
- *	 New connection‚©‚çƒVƒŠƒAƒ‹Ú‘±‚·‚é“®ì‚ÆŠî–{“I‚É“¯‚¶“®ì
+ *	ã‚·ãƒªã‚¢ãƒ«æ¥ç¶šã§æ–°ã—ã„ãƒ—ãƒ­ã‚»ã‚¹ã‚’èµ·å‹•
+ *	 New connectionã‹ã‚‰ã‚·ãƒªã‚¢ãƒ«æ¥ç¶šã™ã‚‹å‹•ä½œã¨åŸºæœ¬çš„ã«åŒã˜å‹•ä½œ
  */
 #if 0
 static void OpenNewComport(const TTTSet *pts)
@@ -4605,20 +4605,20 @@ void CVTWindow::OnSetupSave()
 	free(title);
 
 	if (! Ok) {
-		// ƒLƒƒƒ“ƒZƒ‹
+		// ã‚­ãƒ£ãƒ³ã‚»ãƒ«
 		return;
 	}
 
-	// ƒtƒ@ƒCƒ‹–¼‚ğ“ü‚ê‘Ö‚¦‚é
-	wchar_t *PrevSetupFNW = _wcsdup(ts.SetupFNameW);	// ‘O‚Ìƒtƒ@ƒCƒ‹‚ğŠo‚¦‚Ä‚¨‚­
+	// ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å…¥ã‚Œæ›¿ãˆã‚‹
+	wchar_t *PrevSetupFNW = _wcsdup(ts.SetupFNameW);	// å‰ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’è¦šãˆã¦ãŠã
 	free(pts->SetupFNameW);
 	pts->SetupFNameW = _wcsdup(NameW);
 	WideCharToACP_t(pts->SetupFNameW, pts->SetupFName, sizeof(pts->SetupFName));
 
-	// ‘‚«‚İ‚Å‚«‚é‚©?
+	// æ›¸ãè¾¼ã¿ã§ãã‚‹ã‹?
 	const DWORD attr = GetFileAttributesW(ts.SetupFNameW);
 	if ((attr & FILE_ATTRIBUTE_DIRECTORY ) == 0 && (attr & FILE_ATTRIBUTE_READONLY) != 0) {
-		// ƒtƒHƒ‹ƒ_‚Å‚Í‚È‚­A“Ç‚İæ‚èê—p‚¾‚Á‚½ê‡
+		// ãƒ•ã‚©ãƒ«ãƒ€ã§ã¯ãªãã€èª­ã¿å–ã‚Šå°‚ç”¨ã ã£ãŸå ´åˆ
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_TT_ERROR", L"Tera Term: ERROR",
@@ -4644,20 +4644,20 @@ void CVTWindow::OnSetupSave()
 #endif
 
 		if (wcscmp(PrevSetupFNW, ts.SetupFNameW) == 0) {
-			// “¯–¼ƒtƒ@ƒCƒ‹‚Ö‘‚«‚İ(ã‘‚«)
+			// åŒåãƒ•ã‚¡ã‚¤ãƒ«ã¸æ›¸ãè¾¼ã¿(ä¸Šæ›¸ã)
 			if (ts.IniAutoBackup) {
-				// ƒoƒbƒNƒAƒbƒv‚ğì¬
+				// ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã‚’ä½œæˆ
 				CreateBakupFile(ts.SetupFNameW, NULL);
 			}
 		}
 		else {
-			// ˆÙ‚È‚éƒtƒ@ƒCƒ‹‚Ö‘‚«‚İ
+			// ç•°ãªã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã¸æ›¸ãè¾¼ã¿
 			CopyFileW(PrevSetupFNW, ts.SetupFNameW, TRUE);
 		}
 
 		if (GetFileAttributesW(ts.SetupFNameW) == INVALID_FILE_ATTRIBUTES) {
-			// ƒtƒ@ƒCƒ‹‚ª‚È‚¢
-			// UTF16LE BOM‚¾‚¯‚Ìiniƒtƒ@ƒCƒ‹‚ğì¬
+			// ãƒ•ã‚¡ã‚¤ãƒ«ãŒãªã„
+			// UTF16LE BOMã ã‘ã®iniãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆ
 			FILE *fp;
 			_wfopen_s(&fp, ts.SetupFNameW, L"wb");
 			if (fp != NULL) {
@@ -4666,8 +4666,8 @@ void CVTWindow::OnSetupSave()
 			}
 		}
 		else {
-			// ƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é
-			// iniƒtƒ@ƒCƒ‹‚Ì•¶šƒR[ƒh‚ğ•ÏX‚·‚é
+			// ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹
+			// iniãƒ•ã‚¡ã‚¤ãƒ«ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰ã‚’å¤‰æ›´ã™ã‚‹
 			ConvertIniFileCharCode(ts.SetupFNameW, NULL);
 		}
 
@@ -4720,8 +4720,8 @@ void CVTWindow::OnSetupRestore()
 }
 
 //
-// Œ»İ“Ç‚İ‚Ü‚ê‚Ä‚¢‚é teraterm.ini ƒtƒ@ƒCƒ‹‚ªŠi”[‚³‚ê‚Ä‚¢‚é
-// ƒtƒHƒ‹ƒ_‚ğƒGƒNƒXƒvƒ[ƒ‰‚ÅŠJ‚­B
+// ç¾åœ¨èª­ã¿è¾¼ã¾ã‚Œã¦ã„ã‚‹ teraterm.ini ãƒ•ã‚¡ã‚¤ãƒ«ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹
+// ãƒ•ã‚©ãƒ«ãƒ€ã‚’ã‚¨ã‚¯ã‚¹ãƒ—ãƒ­ãƒ¼ãƒ©ã§é–‹ãã€‚
 //
 void CVTWindow::OnOpenSetupDirectory()
 {
@@ -4800,7 +4800,7 @@ void CVTWindow::OnControlSendBreak()
 	if (cv.Ready)
 		switch (cv.PortType) {
 			case IdTCPIP:
-				// SSH2Ú‘±‚Ìê‡Aê—p‚ÌƒuƒŒ[ƒNM†‚ğ‘—M‚·‚éB(2010.9.28 yutaka)
+				// SSH2æ¥ç¶šã®å ´åˆã€å°‚ç”¨ã®ãƒ–ãƒ¬ãƒ¼ã‚¯ä¿¡å·ã‚’é€ä¿¡ã™ã‚‹ã€‚(2010.9.28 yutaka)
 				if (cv.isSSH == 2) {
 					if (TTXProcessCommand(HVTWin, ID_CONTROL_SENDBREAK)) {
 						break;
@@ -4825,7 +4825,7 @@ void CVTWindow::OnControlBroadcastCommand(void)
 	BroadCastShowDialog(m_hInst, HVTWin);
 }
 
-// WM_COPYDATA‚ÌóM
+// WM_COPYDATAã®å—ä¿¡
 LRESULT CVTWindow::OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam)
 {
 	if (!cv.Ready) {
@@ -4836,16 +4836,16 @@ LRESULT CVTWindow::OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-	// –¢‘—Mƒf[ƒ^‚ª‚ ‚éê‡‚Íæ‚É‘—M‚·‚é
-	// ƒf[ƒ^—Ê‚ª‘½‚¢ê‡‚Í‘—M‚µ‚«‚ê‚È‚¢‰Â”\«‚ª‚ ‚é
+	// æœªé€ä¿¡ãƒ‡ãƒ¼ã‚¿ãŒã‚ã‚‹å ´åˆã¯å…ˆã«é€ä¿¡ã™ã‚‹
+	// ãƒ‡ãƒ¼ã‚¿é‡ãŒå¤šã„å ´åˆã¯é€ä¿¡ã—ãã‚Œãªã„å¯èƒ½æ€§ãŒã‚ã‚‹
 	if (TalkStatus == IdTalkSendMem) {
-		SendMemContinuously();	// TODO •K—v?
+		SendMemContinuously();	// TODO å¿…è¦?
 	}
 
 	const COPYDATASTRUCT *cds = (COPYDATASTRUCT *)lParam;
 	BroadCastReceive(cds);
 
-	return 1; // ‘—M‚Å‚«‚½ê‡‚Í1‚ğ•Ô‚·
+	return 1; // é€ä¿¡ã§ããŸå ´åˆã¯1ã‚’è¿”ã™
 }
 
 void CVTWindow::OnControlOpenTEK()
@@ -4944,7 +4944,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 	const UINT NewDPI = LOWORD(wp);
 	const RECT SuggestedWindowRect = *(RECT *)lp;
 	SIZE *sz = (SIZE *)lp;
-	RECT NewWindowRect[4]; // V‚µ‚¢ƒEƒBƒ“ƒhƒE—ÌˆæŒó•â
+	RECT NewWindowRect[4]; // æ–°ã—ã„ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦é ˜åŸŸå€™è£œ
 	const RECT *NewRect;
 	int NewWindowWidth;
 	int NewWindowHeight;
@@ -4958,7 +4958,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 		int tmpScreenHeight;
 
 		if (calcOnly) {
-			// VDPI‚ÌƒtƒHƒ“ƒg‚ÌƒTƒCƒY‚©‚çƒXƒNƒŠ[ƒ“ƒTƒCƒY‚ğZo
+			// æ–°DPIã®ãƒ•ã‚©ãƒ³ãƒˆã®ã‚µã‚¤ã‚ºã‹ã‚‰ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚µã‚¤ã‚ºã‚’ç®—å‡º
 			LOGFONTW VTlfDefault;
 			TSGetLogFont(m_hWnd, &ts, 0, NewDPI, &VTlfDefault); // Normal Font
 			HFONT VTFontDefault = CreateFontIndirectW(&VTlfDefault);
@@ -4974,22 +4974,22 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 			tmpScreenWidth = WinWidth * tmpFontWidth;
 			tmpScreenHeight = WinHeight * tmpFontHeight;
 		} else {
-			// V‚µ‚¢DPI‚É‡‚í‚¹‚ÄƒtƒHƒ“ƒg‚ğ¶¬A
-			// ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ÌƒTƒCƒY‚ğŒˆ’è‚·‚é
+			// æ–°ã—ã„DPIã«åˆã‚ã›ã¦ãƒ•ã‚©ãƒ³ãƒˆã‚’ç”Ÿæˆã€
+			// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã®ã‚µã‚¤ã‚ºã‚’æ±ºå®šã™ã‚‹
 			ChangeFont(NewDPI);
 			tmpScreenWidth = WinWidth * FontWidth;
 			tmpScreenHeight = WinHeight * FontHeight;
 			//AdjustScrollBar();
 		}
 
-		// ƒXƒNƒŠ[ƒ“ƒTƒCƒY(=Client Area‚ÌƒTƒCƒY)‚©‚çƒEƒBƒ“ƒhƒEƒTƒCƒY‚ğZo
+		// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚µã‚¤ã‚º(=Client Areaã®ã‚µã‚¤ã‚º)ã‹ã‚‰ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã‚’ç®—å‡º
 		if (pAdjustWindowRectExForDpi != NULL || pAdjustWindowRectEx != NULL) {
 			const DWORD Style = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
 			const DWORD ExStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
 			const BOOL bMenu = (ts.PopupMenu != 0) ? FALSE : TRUE;
 			if (pGetSystemMetricsForDpi != NULL) {
-				// ƒXƒNƒ[ƒ‹ƒo[‚ª•\¦‚³‚ê‚Ä‚¢‚éê‡‚ÍA
-				// ƒXƒNƒŠ[ƒ“ƒTƒCƒY(ƒNƒ‰ƒCƒAƒ“ƒgƒGƒŠƒA‚ÌƒTƒCƒY)‚É’Ç‰Á‚·‚é
+				// ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ãƒãƒ¼ãŒè¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ã€
+				// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚µã‚¤ã‚º(ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‚¨ãƒªã‚¢ã®ã‚µã‚¤ã‚º)ã«è¿½åŠ ã™ã‚‹
 				int min_pos;
 				int max_pos;
 				GetScrollRange(m_hWnd, SB_VERT, &min_pos, &max_pos);
@@ -5014,7 +5014,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 			NewWindowHeight = Rect.bottom - Rect.top;
 		}
 		else {
-			// WM_DPICHANGED‚ª”­¶‚µ‚È‚¢ŠÂ‹«‚Ì‚Í‚¸A”O‚Ìˆ×À‘•
+			// WM_DPICHANGEDãŒç™ºç”Ÿã—ãªã„ç’°å¢ƒã®ã¯ãšã€å¿µã®ç‚ºå®Ÿè£…
 			RECT WindowRect;
 			GetWindowRect(&WindowRect);
 			const int WindowWidth = WindowRect.right - WindowRect.left;
@@ -5036,31 +5036,31 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 			ScreenHeight = tmpScreenHeight;
 		}
 
-		// „§—Ìˆæ‚É¶ãŠñ‚¹
+		// æ¨å¥¨é ˜åŸŸã«å·¦ä¸Šå¯„ã›
 		NewWindowRect[0].top = SuggestedWindowRect.top;
 		NewWindowRect[0].bottom = SuggestedWindowRect.top + NewWindowHeight;
 		NewWindowRect[0].left = SuggestedWindowRect.left;
 		NewWindowRect[0].right = SuggestedWindowRect.left + NewWindowWidth;
 
-		// „§—Ìˆæ‚É‰EãŠñ‚¹
+		// æ¨å¥¨é ˜åŸŸã«å³ä¸Šå¯„ã›
 		NewWindowRect[1].top = SuggestedWindowRect.top;
 		NewWindowRect[1].bottom = SuggestedWindowRect.top + NewWindowHeight;
 		NewWindowRect[1].left = SuggestedWindowRect.right - NewWindowWidth;
 		NewWindowRect[1].right = SuggestedWindowRect.right;
 
-		// „§ˆÊ’u‚É¶‰ºŠñ‚¹
+		// æ¨å¥¨ä½ç½®ã«å·¦ä¸‹å¯„ã›
 		NewWindowRect[2].top = SuggestedWindowRect.bottom - NewWindowHeight;
 		NewWindowRect[2].bottom = SuggestedWindowRect.bottom;
 		NewWindowRect[2].left = SuggestedWindowRect.left;
 		NewWindowRect[2].right = SuggestedWindowRect.left + NewWindowWidth;
 
-		// „§ˆÊ’u‚É‰E‰ºŠñ‚¹
+		// æ¨å¥¨ä½ç½®ã«å³ä¸‹å¯„ã›
 		NewWindowRect[3].top = SuggestedWindowRect.bottom - NewWindowHeight;
 		NewWindowRect[3].bottom = SuggestedWindowRect.bottom;
 		NewWindowRect[3].left = SuggestedWindowRect.right - NewWindowWidth;
 		NewWindowRect[3].right = SuggestedWindowRect.right;
 
-		// Šm”F
+		// ç¢ºèª
 		NewRect = &NewWindowRect[0];
 		for (size_t i = 0; i < _countof(NewWindowRect); i++) {
 			const RECT *r = &NewWindowRect[i];
@@ -5068,19 +5068,19 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 									r->left, r->top, NewWindowWidth, NewWindowHeight,
 									NULL, (HMENU)0x00, m_hInst, (LPVOID)NULL);
 			if (tmphWnd) {
-				assert(pGetDpiForWindow); // GetDpiForWindow()‚ÍAWindows 10 v1607 Red Stone 1 (RS1)ˆÈ~‚Åg—p‰Â”\_
+				assert(pGetDpiForWindow); // GetDpiForWindow()ã¯ã€Windows 10 v1607 Red Stone 1 (RS1)ä»¥é™ã§ä½¿ç”¨å¯èƒ½_
 				int myDPI = pGetDpiForWindow(tmphWnd);
 				/*
-				  ETera Term ‚Ì‚ DPI(Per-Monitor V2) ‘Î‰ŠÂ‹«‚ÍAWindows 10 v1703 ˆÈ~B
-				    Windows 10 v1703 –¢–A‹y‚Ñ Windows 8.1AWindows 7ŠÂ‹«‚Å‚ÍA
-				    WM_DPICHANGED ‚Æ WM_GETDPISCALEDSIZE ‚Í‘—M‚³‚ê‚È‚¢B
-				  ECVTWindow::OnDpiChanged() “à‚Å‚ÍAGetDpiForWindow() ‚Íí‚Ég—p‰Â”\‚¾‚ªA
-				    ‘¼‚Ì‰ÓŠ‚Å‚Í GetDpiForWindow() ‚Ì‘¶İ‚ğŠm”F‚·‚éƒR[ƒh‚Æ‚·‚é‚±‚ÆB
+				  ãƒ»Tera Term ã®é«˜ DPI(Per-Monitor V2) å¯¾å¿œç’°å¢ƒã¯ã€Windows 10 v1703 ä»¥é™ã€‚
+				    Windows 10 v1703 æœªæº€ã€åŠã³ Windows 8.1ã€Windows 7ç’°å¢ƒã§ã¯ã€
+				    WM_DPICHANGED ã¨ WM_GETDPISCALEDSIZE ã¯é€ä¿¡ã•ã‚Œãªã„ã€‚
+				  ãƒ»CVTWindow::OnDpiChanged() å†…ã§ã¯ã€GetDpiForWindow() ã¯å¸¸ã«ä½¿ç”¨å¯èƒ½ã ãŒã€
+				    ä»–ã®ç®‡æ‰€ã§ã¯ GetDpiForWindow() ã®å­˜åœ¨ã‚’ç¢ºèªã™ã‚‹ã‚³ãƒ¼ãƒ‰ã¨ã™ã‚‹ã“ã¨ã€‚
 
-				  ‹@”\                 Å¬—vŒ                             ƒŠƒŠ[ƒX“ú ”õl
+				  æ©Ÿèƒ½                 æœ€å°è¦ä»¶                             ãƒªãƒªãƒ¼ã‚¹æ—¥ å‚™è€ƒ
 				  ------------------------------------------------------------------------------------------
 				  WM_DPICHANGED        Windows 8.1                          2013/10/18
-				  GetDpiForMonitor()   Windows 8.1                          2013/10/18 Per-Monitor V2 ”ñ‘Î‰
+				  GetDpiForMonitor()   Windows 8.1                          2013/10/18 Per-Monitor V2 éå¯¾å¿œ
 				  GetDpiForWindow()    Windows 10 v1607  Red Stone 1 (RS1)  2016/08/XX
 				  ------------------------------------------------------------------------------------------
 				  Per-Monitor V2       Windows 10 v1703  Red Stone 2 (RS2)  2017/04/XX
@@ -5134,14 +5134,14 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 
 	LRESULT retval = 0;
 	if (msg == MsgDlgHelp) {
-		// HELPMSGSTRING message 
+		// HELPMSGSTRING message æ™‚
 		//		wp = dialog handle
 		//		lp = initialization structure
 		OnDlgHelp(HelpId, 0);
 		return 0;
 	}
 	else if (msg == WM_TASKBER_CREATED) {
-		// ƒ^ƒXƒNƒo[‚ªÄ‹N“®‚µ‚½
+		// ã‚¿ã‚¹ã‚¯ãƒãƒ¼ãŒå†èµ·å‹•ã—ãŸ
 		NotifyIcon *ni = (NotifyIcon *)cv.NotifyIcon;
 		Notify2Hide(ni);
 		Notify2SetWindow(ni, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (ts.VTIcon != IdIconDefault) ? ts.VTIcon: IDI_VT);
@@ -5355,7 +5355,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnChangeTitle(wp, lp);
 		break;
 	case WM_COPYDATA:
-		SetTimer(m_hWnd, IdPasteDelayTimer, 0, NULL);  // idleˆ—‚ğ“®ì‚³‚¹‚é‚½‚ß
+		SetTimer(m_hWnd, IdPasteDelayTimer, 0, NULL);  // idleå‡¦ç†ã‚’å‹•ä½œã•ã›ã‚‹ãŸã‚
 		OnReceiveIpcMessage(wp, lp);
 		break;
 	case WM_USER_NONCONFIRM_CLOSE:
@@ -5467,14 +5467,14 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	}
 	case WM_HELP: {
-		// Ÿ‚Ìê‡‚É”­¶‚·‚é
-		//		- F1 ƒL[‰Ÿ‰º
-		//		- MessageBox() ‚Ì MB_HELP ‚Ì HELP ƒ{ƒ^ƒ“‰Ÿ‰º
-		// - F1ƒL[‰Ÿ‰ºAWM_HELP, WM_KEYDOWN, KEYUP ‚ÆƒƒbƒZ[ƒW‚ª”­¶‚·‚é
-		// - WM_HELP ‚Å‰½‚©ˆ—‚ğ‚µ‚Ä‚¢‚é‚Æ WM_KEYDOWN ‚ª‚È‚­‚È‚é‚æ‚¤‚¾
+		// æ¬¡ã®å ´åˆã«ç™ºç”Ÿã™ã‚‹
+		//		- F1 ã‚­ãƒ¼æŠ¼ä¸‹
+		//		- MessageBox() ã® MB_HELP ã® HELP ãƒœã‚¿ãƒ³æŠ¼ä¸‹
+		// - F1ã‚­ãƒ¼æŠ¼ä¸‹æ™‚ã€WM_HELP, WM_KEYDOWN, KEYUP ã¨ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒç™ºç”Ÿã™ã‚‹
+		// - WM_HELP ã§ä½•ã‹å‡¦ç†ã‚’ã—ã¦ã„ã‚‹ã¨ WM_KEYDOWN ãŒãªããªã‚‹ã‚ˆã†ã 
 		vtwin_work_t *w = &vtwin_work;
 		if (w->help_id != 0) {
-			// ƒwƒ‹ƒv‚ªƒZƒbƒg‚³‚ê‚Ä‚¢‚é
+			// ãƒ˜ãƒ«ãƒ—ãŒã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ã‚‹
 			OpenHelpCV(&cv, HH_HELP_CONTEXT, w->help_id);
 			break;
 		}
@@ -5489,15 +5489,15 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 }
 
 /**
- *	WM_HELP ƒƒbƒZ[ƒW‚ğóM‚µ‚½‚Æ‚«•\¦‚·‚éƒwƒ‹ƒv‚Ìƒwƒ‹ƒvID‚ğİ’è/‰ğœ‚·‚é
+ *	WM_HELP ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å—ä¿¡ã—ãŸã¨ãè¡¨ç¤ºã™ã‚‹ãƒ˜ãƒ«ãƒ—ã®ãƒ˜ãƒ«ãƒ—IDã‚’è¨­å®š/è§£é™¤ã™ã‚‹
  *
- *	@param data		0		ƒwƒ‹ƒv‰ğœ
- *					0ˆÈŠO	ƒwƒ‹ƒvID
+ *	@param data		0		ãƒ˜ãƒ«ãƒ—è§£é™¤
+ *					0ä»¥å¤–	ãƒ˜ãƒ«ãƒ—ID
  *
- * - MessageBox() ‚Ì uType ‚É MB_HELP ‚ğİ’èAHELPƒ{ƒ^ƒ“‚ª•\¦‚³‚ê‚é
- * - VTWindows ‚ğe‚É‚µ‚½ MessageBox() ‚Ì HELPƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚Æ‚«A
- *	 ‚±‚ÌAPI‚Åİ’è‚µ‚½ƒwƒ‹ƒvID‚Ìƒwƒ‹ƒv‚ª•\¦‚³‚ê‚é
- * - MessageBox() ‚ğ•Â‚¶‚½‚Æ‚«‚É 0‚ğƒZƒbƒg‚·‚é‚±‚Æ
+ * - MessageBox() ã® uType ã« MB_HELP ã‚’è¨­å®šæ™‚ã€HELPãƒœã‚¿ãƒ³ãŒè¡¨ç¤ºã•ã‚Œã‚‹
+ * - VTWindows ã‚’è¦ªã«ã—ãŸ MessageBox() ã® HELPãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸã¨ãã€
+ *	 ã“ã®APIã§è¨­å®šã—ãŸãƒ˜ãƒ«ãƒ—IDã®ãƒ˜ãƒ«ãƒ—ãŒè¡¨ç¤ºã•ã‚Œã‚‹
+ * - MessageBox() ã‚’é–‰ã˜ãŸã¨ãã« 0ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã“ã¨
  */
 void VtwinSetHelpId(DWORD help_id)
 {

@@ -1,17 +1,17 @@
 /*
- * �e�X�g�̂��߂ɒǉ�
- *	teraterm.h�Ȃǂɓ����ƈˑ��t�@�C�����������߃r���h�Ɏ��Ԃ������邽��
- *	�e�X�g�p�w�b�_�ɕ���
- *	�����͂Ȃ��Ȃ�
+ * テストのために追加
+ *	teraterm.hなどに入れると依存ファイルが多いためビルドに時間がかかるため
+ *	テスト用ヘッダに分離
+ *	将来はなくなる
  *
  */
 #pragma once
 
-// �f�o�O�p�@�\enable
-//		CTRL x2�Ń}�E�X�|�C���^���̕����\�@��\��
+// デバグ用機能enable
+//		CTRL x2でマウスポインタ下の文字表法を表示
 #define	UNICODE_DEBUG			1
 
-// �J�[�\���_�Ōn���~�߂�f�o�O�p
-//		�`�悪�Œ���ƂȂ�
-//		1�ŃJ�[�\���̓_�ŏ������s���Ȃ��Ȃ�
+// カーソル点滅系を止めるデバグ用
+//		描画が最低限となる
+//		1でカーソルの点滅処理が行われなくなる
 #define	UNICODE_DEBUG_CARET_OFF	0

@@ -43,7 +43,7 @@
 #define Section L"Tera Term"
 
 /**
- * TERATERM.INI ‚©‚ç CygwinDirectory ‚ğ“Ç‚İ‚Ş
+ * TERATERM.INI ã‹ã‚‰ CygwinDirectory ã‚’èª­ã¿è¾¼ã‚€
  */
 static wchar_t *GetCygwinDir(void)
 {
@@ -79,7 +79,7 @@ int wmain(int argc, wchar_t *argv[])
 
 	setlocale(LC_ALL, "");
 
-	// ˆø”‚ğŒ‹‡‚µ‚ÄƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚ğì¬
+	// å¼•æ•°ã‚’çµåˆã—ã¦ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã‚’ä½œæˆ
 	Cmdline = NULL;
 	for (i=1; i<argc; i++) {
 		if (i != 1) {
@@ -88,7 +88,7 @@ int wmain(int argc, wchar_t *argv[])
 		if (wcscmp(argv[i], L"-d") == 0 && *(argv+1) != NULL) {
 			i++;
 			if (wcsncmp(L"\"\\\\", argv[i], 3) == 0) {
-				// -d "\\path\..." ‚ğ‘‚«Š·‚¦
+				// -d "\\path\..." ã‚’æ›¸ãæ›ãˆ
 				argv[i][1] = '/';
 				argv[i][2] = '/';
 			}
@@ -110,11 +110,11 @@ int wmain(int argc, wchar_t *argv[])
 	}
 
 
-	// cygterm‚ğÀs‚·‚é
+	// cygtermã‚’å®Ÿè¡Œã™ã‚‹
 	switch(system) {
 	default:
 	case SYSTEM_CYGWIN: {
-		// cygwin‚ªƒCƒ“ƒXƒg[ƒ‹‚³‚ê‚Ä‚¢‚éƒtƒHƒ‹ƒ_
+		// cygwinãŒã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã•ã‚Œã¦ã„ã‚‹ãƒ•ã‚©ãƒ«ãƒ€
 		wchar_t *CygwinDir = GetCygwinDir();
 		e = CygwinConnect(CygwinDir, Cmdline);
 		free(CygwinDir);

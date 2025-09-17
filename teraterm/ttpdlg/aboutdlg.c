@@ -54,11 +54,11 @@
 
 #include "ttdlg.h"
 
-#undef EFFECT_ENABLED	// ƒGƒtƒFƒNƒg‚Ì—LŒø‰Â”Û
-#undef TEXTURE_ENABLED	// ƒeƒNƒXƒ`ƒƒ‚Ì—LŒø‰Â”Û
+#undef EFFECT_ENABLED	// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æœ‰åŠ¹å¯å¦
+#undef TEXTURE_ENABLED	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æœ‰åŠ¹å¯å¦
 
 #if defined(_MSC_VER)
-// ƒrƒ‹ƒh‚µ‚½‚Æ‚«‚Ég‚í‚ê‚½Visual C++‚Ìƒo[ƒWƒ‡ƒ“‚ğæ“¾‚·‚é(2009.3.3 yutaka)
+// ãƒ“ãƒ«ãƒ‰ã—ãŸã¨ãã«ä½¿ã‚ã‚ŒãŸVisual C++ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’å–å¾—ã™ã‚‹(2009.3.3 yutaka)
 static void GetCompilerInfo(char *buf, size_t buf_size)
 {
 	char tmpbuf[128];
@@ -140,18 +140,18 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 #endif
 
 #if defined(WDK_NTDDI_VERSION)
-// ƒrƒ‹ƒh‚µ‚½‚Æ‚«‚Ég‚í‚ê‚½ SDK ‚Ìƒo[ƒWƒ‡ƒ“‚ğæ“¾‚·‚é
+// ãƒ“ãƒ«ãƒ‰ã—ãŸã¨ãã«ä½¿ã‚ã‚ŒãŸ SDK ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’å–å¾—ã™ã‚‹
 // 
 // https://developer.microsoft.com/en-us/windows/downloads/windows-SDK
 // https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
 // https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/index-legacy
 // 
-// ƒo[ƒWƒ‡ƒ“”Ô†‚É‚Í
-// (1) Visual Studio ‚ÅƒvƒƒWƒFƒNƒg‚ÌƒvƒƒpƒeƒB‚Ì "Windows SDK ƒo[ƒWƒ‡ƒ“" ‚É—ñ‹“‚³‚ê‚éƒo[ƒWƒ‡ƒ“
-// (2) ƒCƒ“ƒXƒg[ƒ‹‚³‚ê‚½ SDK ‚ªuƒAƒvƒŠ‚Æ‹@”\v‚Å•\¦‚³‚ê‚éƒo[ƒWƒ‡ƒ“
-// (3) ã‹L URL ‚Å‚Ì•\¦ƒo[ƒWƒ‡ƒ“
-// (4) ƒCƒ“ƒXƒg[ƒ‹æƒtƒHƒ‹ƒ_–¼
-// ‚ª‚ ‚é‚ªAÅŒã‚ÌƒuƒƒbƒN‚Ì”š‚Í“¯‚¶‚É‚È‚ç‚È‚¢‚±‚Æ‚ª‘½‚¢B
+// ãƒãƒ¼ã‚¸ãƒ§ãƒ³ç•ªå·ã«ã¯
+// (1) Visual Studio ã§ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã® "Windows SDK ãƒãƒ¼ã‚¸ãƒ§ãƒ³" ã«åˆ—æŒ™ã•ã‚Œã‚‹ãƒãƒ¼ã‚¸ãƒ§ãƒ³
+// (2) ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã•ã‚ŒãŸ SDK ãŒã€Œã‚¢ãƒ—ãƒªã¨æ©Ÿèƒ½ã€ã§è¡¨ç¤ºã•ã‚Œã‚‹ãƒãƒ¼ã‚¸ãƒ§ãƒ³
+// (3) ä¸Šè¨˜ URL ã§ã®è¡¨ç¤ºãƒãƒ¼ã‚¸ãƒ§ãƒ³
+// (4) ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«å…ˆãƒ•ã‚©ãƒ«ãƒ€å
+// ãŒã‚ã‚‹ãŒã€æœ€å¾Œã®ãƒ–ãƒ­ãƒƒã‚¯ã®æ•°å­—ã¯åŒã˜ã«ãªã‚‰ãªã„ã“ã¨ãŒå¤šã„ã€‚
 // e.g. (1) 10.0.18362.0, (2) 10.0.18362.1, (3) 10.0.18362.1, (4) 10.0.18362.0
 //      (1) 10.0.22000.0, (2) 10.0.22000.832, (3) 10.0.22000.832, (4) 10.0.22000.0
 static void GetSDKInfo(char *buf, size_t buf_size)
@@ -290,7 +290,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 	switch (Message) {
 		case WM_INITDIALOG:
-			// ƒAƒCƒRƒ“‚ğ“®“I‚ÉƒZƒbƒg
+			// ã‚¢ã‚¤ã‚³ãƒ³ã‚’å‹•çš„ã«ã‚»ãƒƒãƒˆ
 			{
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 				int fuLoad = LR_DEFAULTCOLOR;
@@ -300,8 +300,8 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 				}
 				hicon = LoadImage(hInst, MAKEINTRESOURCE(IDI_TTERM),
 				                  IMAGE_ICON, icon_w, icon_h, fuLoad);
-				// Picture Control ‚É•`‰æ‚·‚é‚ÆA‚È‚º‚©“§‰ßF‚ª“§‰ß‚É‚È‚ç‚¸A•‚Æ‚È‚Á‚Ä‚µ‚Ü‚¤‚½‚ßA
-				// WM_PAINT ‚Å•`‰æ‚·‚éB
+				// Picture Control ã«æç”»ã™ã‚‹ã¨ã€ãªãœã‹é€éè‰²ãŒé€éã«ãªã‚‰ãšã€é»’ã¨ãªã£ã¦ã—ã¾ã†ãŸã‚ã€
+				// WM_PAINT ã§æç”»ã™ã‚‹ã€‚
 				dlghicon = hicon;
 #else
 				SetDlgItemIcon(Dialog, IDC_TT_ICON, MAKEINTRESOURCEW(IDI_TTERM), 0, 0);
@@ -310,7 +310,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
-			// Tera Term –{‘Ì‚Ìƒo[ƒWƒ‡ƒ“
+			// Tera Term æœ¬ä½“ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d.%d ",
 			            TT_VERSION_MAJOR, TT_VERSION_MINOR, TT_VERSION_PATCH);
 			{
@@ -320,17 +320,17 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			}
 			SetDlgItemTextA(Dialog, IDC_TT_VERSION, buf);
 
-			// Oniguruma‚Ìƒo[ƒWƒ‡ƒ“
+			// Onigurumaã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Oniguruma %s", onig_version());
 			SetDlgItemTextA(Dialog, IDC_ONIGURUMA_LABEL, buf);
 
-			// SFMT‚Ìƒo[ƒWƒ‡ƒ“‚ğİ’è‚·‚é
+			// SFMTã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’è¨­å®šã™ã‚‹
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "SFMT %s", SFMT_VERSION);
 			SetDlgItemTextA(Dialog, IDC_SFMT_VERSION, buf);
 
 			// build info
 			{
-				// ƒRƒ“ƒpƒCƒ‰ASDKA“úAGitƒuƒ‰ƒ“ƒ`–¼(‚ ‚ê‚Î)
+				// ã‚³ãƒ³ãƒ‘ã‚¤ãƒ©ã€SDKã€æ—¥æ™‚ã€Gitãƒ–ãƒ©ãƒ³ãƒå(ã‚ã‚Œã°)
 				char *info;
 				char tmpbuf[128];
 				char sdk[128];
@@ -362,14 +362,14 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 			/*
-			 * ƒ_ƒCƒAƒƒO‚Ìƒrƒbƒgƒ}ƒbƒv‰»‚ğs‚¢A”wŒi‚ÉƒGƒtƒFƒNƒg‚ğ‚©‚¯‚ç‚ê‚é‚æ‚¤‚É‚·‚éB
+			 * ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—åŒ–ã‚’è¡Œã„ã€èƒŒæ™¯ã«ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’ã‹ã‘ã‚‰ã‚Œã‚‹ã‚ˆã†ã«ã™ã‚‹ã€‚
 			 * (2011.5.7 yutaka)
 			 */
-			// ƒ_ƒCƒAƒƒO‚ÌƒTƒCƒY
+			// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚µã‚¤ã‚º
 			GetWindowRect(Dialog, &dlgrc);
 			dlgw = dlgrc.right - dlgrc.left;
 			dlgh = dlgrc.bottom - dlgrc.top;
-			// ƒrƒbƒgƒ}ƒbƒv‚Ìì¬
+			// ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã®ä½œæˆ
 			dlgdc = CreateCompatibleDC(NULL);
 			ZeroMemory(&bmiHeader, sizeof(BITMAPINFOHEADER));
 			bmiHeader.biSize      = sizeof(BITMAPINFOHEADER);
@@ -380,7 +380,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			bmi.bmiHeader = bmiHeader;
 			dlgbmp = CreateDIBSection(NULL, (LPBITMAPINFO)&bmi, DIB_RGB_COLORS, &dlgpixel, NULL, 0);
 			dlgprevbmp = (HBITMAP)SelectObject(dlgdc, dlgbmp);
-			// ƒrƒbƒgƒ}ƒbƒv‚Ì”wŒiFi’©Ä‚¯‚Á‚Û‚¢j‚ğì‚éB
+			// ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã®èƒŒæ™¯è‰²ï¼ˆæœç„¼ã‘ã£ã½ã„ï¼‰ã‚’ä½œã‚‹ã€‚
 			for (y = 0 ; y < dlgh ; y++) {
 				double dx = (double)(255 - 180) / dlgw;
 				double dy = (double)255/dlgh;
@@ -389,11 +389,11 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					r = min((int)(180+dx*x), 255);
 					g = min((int)(180+dx*x), 255);
 					b = max((int)(255-y*dx), 0);
-					// ‰æ‘f‚Ì•À‚Ñ‚ÍA‰ºˆÊƒoƒCƒg‚©‚çB, G, R, A‚Æ‚È‚éB
+					// ç”»ç´ ã®ä¸¦ã³ã¯ã€ä¸‹ä½ãƒã‚¤ãƒˆã‹ã‚‰B, G, R, Aã¨ãªã‚‹ã€‚
 					dlgpixel[POS(x, y)] = b | g << 8 | r << 16;
 				}
 			}
-			// 2D Water effect —p
+			// 2D Water effect ç”¨
 			wavemap = calloc(sizeof(short), dlgw * dlgh);
 			wavemap_old = calloc(sizeof(short), dlgw * dlgh);
 			dlgorgpixel = calloc(sizeof(DWORD), dlgw * dlgh);
@@ -403,11 +403,11 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 
 #ifdef EFFECT_ENABLED
-			// ƒGƒtƒFƒNƒgƒ^ƒCƒ}[‚ÌŠJn
+			// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚¿ã‚¤ãƒãƒ¼ã®é–‹å§‹
 			SetTimer(Dialog, ID_EFFECT_TIMER, 100, NULL);
 #endif
 
-			// ‰æ–Ê‚ÌF”‚ğ’²‚×‚éB
+			// ç”»é¢ã®è‰²æ•°ã‚’èª¿ã¹ã‚‹ã€‚
 			hwnd = GetDesktopWindow();
 			hdc = GetDC(hwnd);
 			bitspixel = GetDeviceCaps(hdc, BITSPIXEL);
@@ -455,7 +455,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			break;
 
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
-		// static text‚Ì”wŒi‚ğ“§‰ß‚³‚¹‚éB
+		// static textã®èƒŒæ™¯ã‚’é€éã•ã›ã‚‹ã€‚
 		case WM_CTLCOLORSTATIC:
 			SetBkMode((HDC)wParam, TRANSPARENT);
 			return (BOOL)GetStockObject( NULL_BRUSH );
@@ -516,8 +516,8 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 				}
 				waveflag ^= 1;
 
-				// …–Ê‚ÌŒvZ
-				// ƒAƒ‹ƒSƒŠƒYƒ€‚Í‰º‹LƒTƒCƒg(2D Water)‚æ‚èB
+				// æ°´é¢ã®è¨ˆç®—
+				// ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã¯ä¸‹è¨˜ã‚µã‚¤ãƒˆ(2D Water)ã‚ˆã‚Šã€‚
 				// cf. http://freespace.virgin.net/hugo.elias/graphics/x_water.htm
 				for (y = 1; y < dlgh - 1 ; y++) {
 					for (x = 1; x < dlgw - 1 ; x++) {
@@ -530,7 +530,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					}
 				}
 
-				// …–Ê‚Ì•`‰æ
+				// æ°´é¢ã®æç”»
 				for (y = 1; y < dlgh - 1 ; y++) {
 					for (x = 1; x < dlgw - 1 ; x++) {
 						xdiff = p_old[POS(x+1,y)] - p_old[POS(x,y)];

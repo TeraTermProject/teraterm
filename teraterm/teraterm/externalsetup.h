@@ -36,10 +36,10 @@
 extern "C" {
 #endif
 
-// 内部用
+// 蜀�驛ｨ逕ｨ
 BOOL OpenExternalSetupTab(HWND hWndParent, CAddSettingPropSheetDlgPage page);
 
-// vtwinから使用
+// vtwin縺九ｉ菴ｿ逕ｨ
 void OpenExternalSetup(HWND hWndParent);
 void OpenSetupTerminal(HWND hWnd);
 void OpenSetupWin(HWND hWnd);
@@ -49,7 +49,7 @@ void OpenSetupSerialPort(HWND hWnd);
 void OpenSetupTCPIP(HWND hWnd);
 void OpenSetupGeneral(HWND hWnd);
 
-// TEKウィンドウ
+// TEK繧ｦ繧｣繝ｳ繝峨え
 void OpenSetupTekWindow(HWND hWnd);
 void OpenSetupTekFont(HWND hWnd);
 

@@ -33,19 +33,19 @@
 #include "unicode.h"
 
 /**
- *	East_Asian_Width Ql“Á« æ“¾
+ *	East_Asian_Width å‚è€ƒç‰¹æ€§ å–å¾—
  *
- *	@retval	'F'		Fullwidth ‘SŠp
- *	@retval	'H'		Halfwidth ”¼Šp
- *	@retval	'W'		Wide L
- *	@retval	'n'		Na,Narrow ‹·
- *	@retval	'A'		Ambiguous B–†
- *					•¶–¬‚É‚æ‚Á‚Ä•¶š•‚ªˆÙ‚È‚é•¶šB
- *					“ŒƒAƒWƒA‚Ì‘g”Å‚Æ‚»‚êˆÈŠO‚Ì‘g”Å‚Ì—¼•û‚ÉoŒ»‚µA
- *					“ŒƒAƒWƒA‚Ì]—ˆ•¶šƒR[ƒh‚Å‚Í‚¢‚í‚ä‚é‘SŠp‚Æ‚µ‚Äˆµ‚í‚ê‚é‚±‚Æ‚ª‚ ‚éB
- *					ƒMƒŠƒVƒA•¶š‚âƒLƒŠƒ‹•¶š‚È‚ÇB
- *	@retval	'N'		Neutral ’†—§
- *					“ŒƒAƒWƒA‚Ì‘g”Å‚É‚Í’ÊíoŒ»‚¹‚¸A‘SŠp‚Å‚à”¼Šp‚Å‚à‚È‚¢BƒAƒ‰ƒrƒA•¶š‚È‚ÇB
+ *	@retval	'F'		Fullwidth å…¨è§’
+ *	@retval	'H'		Halfwidth åŠè§’
+ *	@retval	'W'		Wide åºƒ
+ *	@retval	'n'		Na,Narrow ç‹­
+ *	@retval	'A'		Ambiguous æ›–æ˜§
+ *					æ–‡è„ˆã«ã‚ˆã£ã¦æ–‡å­—å¹…ãŒç•°ãªã‚‹æ–‡å­—ã€‚
+ *					æ±ã‚¢ã‚¸ã‚¢ã®çµ„ç‰ˆã¨ãã‚Œä»¥å¤–ã®çµ„ç‰ˆã®ä¸¡æ–¹ã«å‡ºç¾ã—ã€
+ *					æ±ã‚¢ã‚¸ã‚¢ã®å¾“æ¥æ–‡å­—ã‚³ãƒ¼ãƒ‰ã§ã¯ã„ã‚ã‚†ã‚‹å…¨è§’ã¨ã—ã¦æ‰±ã‚ã‚Œã‚‹ã“ã¨ãŒã‚ã‚‹ã€‚
+ *					ã‚®ãƒªã‚·ã‚¢æ–‡å­—ã‚„ã‚­ãƒªãƒ«æ–‡å­—ãªã©ã€‚
+ *	@retval	'N'		Neutral ä¸­ç«‹
+ *					æ±ã‚¢ã‚¸ã‚¢ã®çµ„ç‰ˆã«ã¯é€šå¸¸å‡ºç¾ã›ãšã€å…¨è§’ã§ã‚‚åŠè§’ã§ã‚‚ãªã„ã€‚ã‚¢ãƒ©ãƒ“ã‚¢æ–‡å­—ãªã©ã€‚
  */
 char UnicodeGetWidthProperty(unsigned long u32)
 {
@@ -54,7 +54,7 @@ char UnicodeGetWidthProperty(unsigned long u32)
 		unsigned long code_to;
 		char property;
 	} east_asian_width_map_t;
-	// ƒe[ƒuƒ‹‚É“ü‚Á‚Ä‚¢‚È‚¢ê‡‚Í H
+	// ãƒ†ãƒ¼ãƒ–ãƒ«ã«å…¥ã£ã¦ã„ãªã„å ´åˆã¯ H
 	const static east_asian_width_map_t east_asian_width_map[] = {
 #include "unicode_asian_width.tbl"
 	};
@@ -62,7 +62,7 @@ char UnicodeGetWidthProperty(unsigned long u32)
 	const size_t table_size = _countof(east_asian_width_map);
 	char result;
 
-	// ƒe[ƒuƒ‹ŠOƒ`ƒFƒbƒN
+	// ãƒ†ãƒ¼ãƒ–ãƒ«å¤–ãƒã‚§ãƒƒã‚¯
 	if (u32 < east_asian_width_map[0].code_from) {
 		return 'H';
 	}
@@ -70,7 +70,7 @@ char UnicodeGetWidthProperty(unsigned long u32)
 		return 'H';
 	}
 
-	// ƒe[ƒuƒ‹ŒŸõ
+	// ãƒ†ãƒ¼ãƒ–ãƒ«æ¤œç´¢
 	result = 'H';
 	size_t low = 0;
 	size_t high = table_size - 1;
@@ -111,10 +111,10 @@ static const UnicodeTableBlock_t UnicodeBlockList[] = {
 };
 
 /**
- * u32‚ªƒe[ƒuƒ‹‚Ìƒf[ƒ^‚ÉŠÜ‚Ü‚ê‚Ä‚¢‚é‚©’²‚×‚é
+ * u32ãŒãƒ†ãƒ¼ãƒ–ãƒ«ã®ãƒ‡ãƒ¼ã‚¿ã«å«ã¾ã‚Œã¦ã„ã‚‹ã‹èª¿ã¹ã‚‹
  *
- *	@retval		ƒe[ƒuƒ‹‚Ìindex
- *	@retval		-1 ƒe[ƒuƒ‹‚É‘¶İ‚µ‚È‚¢
+ *	@retval		ãƒ†ãƒ¼ãƒ–ãƒ«ã®index
+ *	@retval		-1 ãƒ†ãƒ¼ãƒ–ãƒ«ã«å­˜åœ¨ã—ãªã„
  */
 static int SearchTableSimple(
 	const UnicodeTable_t *table, size_t table_size,
@@ -138,16 +138,16 @@ static int SearchTableSimple(
 			high = mid - 1;
 		}
 	}
-	// ƒe[ƒuƒ‹‚Ì”ÍˆÍŠO
+	// ãƒ†ãƒ¼ãƒ–ãƒ«ã®ç¯„å›²å¤–
 	return -1;
 }
 
 /**
- *	SearchTableSimple() ‚Æ“¯‚¶
- *	ƒe[ƒuƒ‹‚ÌŒ^‚ªˆÙ‚È‚é
+ *	SearchTableSimple() ã¨åŒã˜
+ *	ãƒ†ãƒ¼ãƒ–ãƒ«ã®å‹ãŒç•°ãªã‚‹
  *
- *	@retval		ƒe[ƒuƒ‹‚Ìindex
- *	@retval		-1 ƒe[ƒuƒ‹‚É‘¶İ‚µ‚È‚¢
+ *	@retval		ãƒ†ãƒ¼ãƒ–ãƒ«ã®index
+ *	@retval		-1 ãƒ†ãƒ¼ãƒ–ãƒ«ã«å­˜åœ¨ã—ãªã„
  */
 static int SearchTableCombine(
 	const UnicodeTableCombine_t *table, size_t table_size,
@@ -171,16 +171,16 @@ static int SearchTableCombine(
 			high = mid - 1;
 		}
 	}
-	// ƒe[ƒuƒ‹‚Ì”ÍˆÍŠO
+	// ãƒ†ãƒ¼ãƒ–ãƒ«ã®ç¯„å›²å¤–
 	return -1;
 }
 
 /**
- *	SearchTableSimple() ‚Æ“¯‚¶
- *	ƒe[ƒuƒ‹‚ÌŒ^‚ªˆÙ‚È‚é
+ *	SearchTableSimple() ã¨åŒã˜
+ *	ãƒ†ãƒ¼ãƒ–ãƒ«ã®å‹ãŒç•°ãªã‚‹
  *
- *	@retval		ƒe[ƒuƒ‹‚Ìindex
- *	@retval		-1 ƒe[ƒuƒ‹‚É‘¶İ‚µ‚È‚¢
+ *	@retval		ãƒ†ãƒ¼ãƒ–ãƒ«ã®index
+ *	@retval		-1 ãƒ†ãƒ¼ãƒ–ãƒ«ã«å­˜åœ¨ã—ãªã„
  */
 static int SearchTableBlock(
 	const UnicodeTableBlock_t *table, size_t table_size,
@@ -204,21 +204,21 @@ static int SearchTableBlock(
 			high = mid - 1;
 		}
 	}
-	// ƒe[ƒuƒ‹‚Ì”ÍˆÍŠO
+	// ãƒ†ãƒ¼ãƒ–ãƒ«ã®ç¯„å›²å¤–
 	return -1;
 }
 
 /*
- * Œ‹‡•¶š‚©ŒŸ¸‚·‚é
- *		Ÿ‚Ì•¶š‚àŒ‹‡•¶š‚Æ‚µ‚Äˆµ‚¤
+ * çµåˆæ–‡å­—ã‹æ¤œæŸ»ã™ã‚‹
+ *		æ¬¡ã®æ–‡å­—ã‚‚çµåˆæ–‡å­—ã¨ã—ã¦æ‰±ã†
  *			EMOJI MODIFIER
  *				= Nonspacing Mark
- *			VARIATION SELECTOR (ˆÙ‘ÌšƒZƒŒƒNƒ^)
+ *			VARIATION SELECTOR (ç•°ä½“å­—ã‚»ãƒ¬ã‚¯ã‚¿)
  *				= Nonspacing Mark
  *
- *	@retval	0		Œ‹‡•¶š‚Å‚Í‚È‚¢
- *	@retval	1		Œ‹‡•¶š,Nonspacing Mark, ƒJ[ƒ\ƒ‹‚ÍˆÚ“®‚µ‚È‚¢
- *	@retval	2		Œ‹‡•¶š,Spacing Mark, ƒJ[ƒ\ƒ‹‚ª +1 ˆÚ“®‚·‚é
+ *	@retval	0		çµåˆæ–‡å­—ã§ã¯ãªã„
+ *	@retval	1		çµåˆæ–‡å­—,Nonspacing Mark, ã‚«ãƒ¼ã‚½ãƒ«ã¯ç§»å‹•ã—ãªã„
+ *	@retval	2		çµåˆæ–‡å­—,Spacing Mark, ã‚«ãƒ¼ã‚½ãƒ«ãŒ +1 ç§»å‹•ã™ã‚‹
  */
 int UnicodeIsCombiningCharacter(unsigned long u32)
 {
@@ -237,10 +237,10 @@ int UnicodeIsCombiningCharacter(unsigned long u32)
 }
 
 /**
- *	ŠG•¶š?
+ *	çµµæ–‡å­—?
  *
- *	@retval	0	ŠG•¶š‚Å‚Í‚È‚¢
- *	@retval	1	ŠG•¶š‚Å‚ ‚é
+ *	@retval	0	çµµæ–‡å­—ã§ã¯ãªã„
+ *	@retval	1	çµµæ–‡å­—ã§ã‚ã‚‹
  */
 int UnicodeIsEmoji(unsigned long u32)
 {
@@ -252,19 +252,19 @@ int UnicodeIsEmoji(unsigned long u32)
 }
 
 /**
- *	ˆÙ‘ÌšƒZƒŒƒNƒ^‚©ƒ`ƒFƒbƒN‚·‚é
+ *	ç•°ä½“å­—ã‚»ãƒ¬ã‚¯ã‚¿ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
  *
- *	UnicodeIsCombiningCharacter() ‚Å“¯‚Éƒ`ƒFƒbƒN‚Å‚«‚é‚Ì‚Åg—p‚µ‚È‚­‚È‚Á‚½
+ *	UnicodeIsCombiningCharacter() ã§åŒæ™‚ã«ãƒã‚§ãƒƒã‚¯ã§ãã‚‹ã®ã§ä½¿ç”¨ã—ãªããªã£ãŸ
  *
- *	@retval	0		ˆÙ‘ÌšƒZƒŒƒNƒ^‚Å‚Í‚È‚¢
- *	@retval	1		ˆÙ‘ÌšƒZƒŒƒNƒ^‚Å‚ ‚é
+ *	@retval	0		ç•°ä½“å­—ã‚»ãƒ¬ã‚¯ã‚¿ã§ã¯ãªã„
+ *	@retval	1		ç•°ä½“å­—ã‚»ãƒ¬ã‚¯ã‚¿ã§ã‚ã‚‹
  */
 #if 0
 int UnicodeIsVariationSelector(unsigned long u32)
 {
 	if ((0x00180b <= u32 && u32 <= 0x00180d) ||	// FVS (Mongolian Free Variation Selector)
-		(0x00fe00 <= u32 && u32 <= 0x00fe0f) ||	// SVS VS1`VS16
-		(0x0e0100 <= u32 && u32 <= 0x0e01ef))	// IVS VS17`VS256
+		(0x00fe00 <= u32 && u32 <= 0x00fe0f) ||	// SVS VS1ã€œVS16
+		(0x0e0100 <= u32 && u32 <= 0x0e01ef))	// IVS VS17ã€œVS256
 	{
 		return 1;
 	}
@@ -273,10 +273,10 @@ int UnicodeIsVariationSelector(unsigned long u32)
 #endif
 
 /**
- *	ƒ”ƒBƒ‰[ƒ}?
+ *	ãƒ´ã‚£ãƒ©ãƒ¼ãƒ?
  *
- *	@retval	0	ƒ”ƒBƒ‰[ƒ}‚Å‚Í‚È‚¢
- *	@retval	1	ƒ”ƒBƒ‰[ƒ}‚Å‚ ‚é
+ *	@retval	0	ãƒ´ã‚£ãƒ©ãƒ¼ãƒã§ã¯ãªã„
+ *	@retval	1	ãƒ´ã‚£ãƒ©ãƒ¼ãƒã§ã‚ã‚‹
  */
 int UnicodeIsVirama(unsigned long u32)
 {
@@ -288,10 +288,10 @@ int UnicodeIsVirama(unsigned long u32)
 }
 
 /**
- *	Unicode block ‚Ì index ‚ğ“¾‚é
+ *	Unicode block ã® index ã‚’å¾—ã‚‹
  *
- *	@retval	-1	block ‚ªŒ©‚Â‚©‚ç‚È‚¢
- *	@retval		block ‚Ì index
+ *	@retval	-1	block ãŒè¦‹ã¤ã‹ã‚‰ãªã„
+ *	@retval		block ã® index
  */
 int UnicodeBlockIndex(unsigned long u32)
 {
@@ -341,7 +341,7 @@ static unsigned short UnicodeGetPrecomposedChar(int start_index, unsigned short 
 	int i;
 
 	for (i = start_index ; i < tmax ; i++) {
-		if (table[i].first_code != first_code) { // 1•¶š–Ú‚ªˆÙ‚È‚é‚È‚çAˆÈ~‚Í‚à‚¤’²‚×‚È‚­‚Ä‚æ‚¢B
+		if (table[i].first_code != first_code) { // 1æ–‡å­—ç›®ãŒç•°ãªã‚‹ãªã‚‰ã€ä»¥é™ã¯ã‚‚ã†èª¿ã¹ãªãã¦ã‚ˆã„ã€‚
 			break;
 		}
 
@@ -385,19 +385,19 @@ static int UnicodeGetIndexOfCombiningFirstCode(unsigned short code)
 }
 
 /**
- *	Unicode‚ÌŒ‹‡ˆ—‚ğs‚¤
+ *	Unicodeã®çµåˆå‡¦ç†ã‚’è¡Œã†
  *	@param[in]	first_code
  *	@param[in]	code
- *	@retval		0		Œ‹‡‚Å‚«‚È‚¢
- *	@retval		ˆÈŠO	Œ‹‡‚µ‚½Unicode
+ *	@retval		0		çµåˆã§ããªã„
+ *	@retval		ä»¥å¤–	çµåˆã—ãŸUnicode
  *
- *		—á
+ *		ä¾‹
  *			first_code
- *				U+307B(‚Ù)
+ *				U+307B(ã»)
  *			code
- *				U+309A(K)
+ *				U+309A(ã‚œ)
  *			retval
- *				U+307D(‚Û)
+ *				U+307D(ã½)
  */
 unsigned short UnicodeCombining(unsigned short first_code, unsigned short code)
 {
@@ -612,11 +612,11 @@ static int UnicodeFromSBCSTable(const SBCSTable_t *table_ptr, int table_size, un
 		return 0;
 	}
 	if (table_size == 0x100) {
-		// ŒŸõ•s—v
+		// æ¤œç´¢ä¸è¦
 		*u16 = table_ptr[b].unicode;
 		return 1;
 	}
-	// ƒe[ƒuƒ‹‚ğŒŸõ
+	// ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’æ¤œç´¢
 	for (int i = 0; i < 0xff; i++ ){
 		if (table_ptr[i].code == b) {
 			*u16 = table_ptr[i].unicode;
@@ -631,7 +631,7 @@ static int UnicodeToSBCTable(const SBCSTable_t *table_ptr, int table_size, unsig
 							 unsigned char *b)
 {
 	if (u32 >= 0x10000) {
-		// •ÏŠ·æ‚É‘¶İ‚µ‚È‚¢ƒR[ƒh
+		// å¤‰æ›å…ˆã«å­˜åœ¨ã—ãªã„ã‚³ãƒ¼ãƒ‰
 		*b = 0;
 		return 0;
 	}
@@ -647,18 +647,18 @@ static int UnicodeToSBCTable(const SBCSTable_t *table_ptr, int table_size, unsig
 }
 
 /**
- *	SBCS•¶šƒR[ƒh‚©‚çUnicode‚Ö•ÏŠ·
+ *	SBCSæ–‡å­—ã‚³ãƒ¼ãƒ‰ã‹ã‚‰Unicodeã¸å¤‰æ›
  *
- *	@param[in]	kanji_code	SBCS‚Ì•¶šƒR[ƒhenum
- *	@param[in]	b			SBCS•¶šƒR[ƒh
- *	@param[out]	u16			•ÏŠ·‚µ‚½Unicode
- *	@retval		0			•ÏŠ·‚Å‚«‚È‚¢
- *	@retval		1			•ÏŠ·‚Å‚«‚½
+ *	@param[in]	kanji_code	SBCSã®æ–‡å­—ã‚³ãƒ¼ãƒ‰enum
+ *	@param[in]	b			SBCSæ–‡å­—ã‚³ãƒ¼ãƒ‰
+ *	@param[out]	u16			å¤‰æ›ã—ãŸUnicode
+ *	@retval		0			å¤‰æ›ã§ããªã„
+ *	@retval		1			å¤‰æ›ã§ããŸ
  */
 int UnicodeFromSBCS(IdKanjiCode kanji_code, unsigned char b, unsigned short *u16)
 {
 	if (kanji_code == IdISO8859_1) {
-		// ISO8859-1 ‚Í unicode ‚Æ“¯ˆê
+		// ISO8859-1 ã¯ unicode ã¨åŒä¸€
 		*u16 = b;
 		return 1;
 	}
@@ -668,24 +668,24 @@ int UnicodeFromSBCS(IdKanjiCode kanji_code, unsigned char b, unsigned short *u16
 }
 
 /**
- *	Unicode‚©‚çSBCS•¶šƒR[ƒh‚Ö•ÏŠ·
+ *	Unicodeã‹ã‚‰SBCSæ–‡å­—ã‚³ãƒ¼ãƒ‰ã¸å¤‰æ›
  *
- *	@param[in]	kanji_code	SBCS‚Ì•¶šƒR[ƒhenum
+ *	@param[in]	kanji_code	SBCSã®æ–‡å­—ã‚³ãƒ¼ãƒ‰enum
  *	@param[in]	u32			Unicode
- *	@param[out]	*b			•ÏŠ·‚µ‚½SBCS‚Ì•¶šƒR[ƒh
- *							•ÏŠ·‚Å‚«‚È‚©‚Á‚½‚Í 0
- *	@retval		0			•ÏŠ·‚Å‚«‚È‚¢
- *	@retval		1			•ÏŠ·‚Å‚«‚½
+ *	@param[out]	*b			å¤‰æ›ã—ãŸSBCSã®æ–‡å­—ã‚³ãƒ¼ãƒ‰
+ *							å¤‰æ›ã§ããªã‹ã£ãŸæ™‚ã¯ 0
+ *	@retval		0			å¤‰æ›ã§ããªã„
+ *	@retval		1			å¤‰æ›ã§ããŸ
  */
 int UnicodeToSBCS(IdKanjiCode kanji_code, unsigned long u32, unsigned char *b)
 {
 	if (kanji_code == IdISO8859_1) {
-		// ISO8859-1 ‚Í unicode ‚Æ“¯ˆê
+		// ISO8859-1 ã¯ unicode ã¨åŒä¸€
 		*b = (unsigned char)u32;
 		return 1;
 	}
 	if (u32 >= 0x10000) {
-		// •ÏŠ·æ‚É‘¶İ‚µ‚È‚¢ƒR[ƒh
+		// å¤‰æ›å…ˆã«å­˜åœ¨ã—ãªã„ã‚³ãƒ¼ãƒ‰
 		*b = 0;
 		return 0;
 	}
@@ -695,7 +695,7 @@ int UnicodeToSBCS(IdKanjiCode kanji_code, unsigned long u32, unsigned char *b)
 }
 
 /**
- *	ISO8859‚©‚çUnicode‚Ö•ÏŠ·
+ *	ISO8859ã‹ã‚‰Unicodeã¸å¤‰æ›
  */
 int UnicodeFromISO8859(IdKanjiCode part, unsigned char b, unsigned short *u16)
 {
@@ -703,7 +703,7 @@ int UnicodeFromISO8859(IdKanjiCode part, unsigned char b, unsigned short *u16)
 }
 
 /**
- *	Unicode‚©‚çISO8859‚Ö•ÏŠ·
+ *	Unicodeã‹ã‚‰ISO8859ã¸å¤‰æ›
  */
 int UnicodeToISO8859(IdKanjiCode part, unsigned long u32, unsigned char *b)
 {
@@ -711,7 +711,7 @@ int UnicodeToISO8859(IdKanjiCode part, unsigned long u32, unsigned char *b)
 }
 
 /**
- *	CodePage‚©‚çUnicode‚Ö•ÏŠ·
+ *	CodePageã‹ã‚‰Unicodeã¸å¤‰æ›
  */
 int UnicodeFromCodePage(IdKanjiCode kanji_code, unsigned char b, unsigned short *u16)
 {
@@ -719,7 +719,7 @@ int UnicodeFromCodePage(IdKanjiCode kanji_code, unsigned char b, unsigned short 
 }
 
 /**
- *	Unicode‚©‚çCodePage‚Ö•ÏŠ·
+ *	Unicodeã‹ã‚‰CodePageã¸å¤‰æ›
  *
  */
 int UnicodeToCodePage(IdKanjiCode kanji_code, unsigned long u32, unsigned char *b)

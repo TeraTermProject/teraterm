@@ -105,7 +105,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		// SCP
 		SetDlgItemTextA(hDlgWnd, IDC_SCP_PATH, Param->ScpSendDirPtr);
 		if (!Param->ScpEnable) {
-			// –³Œø‰»
+			// ç„¡åŠ¹åŒ–
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_RADIO), FALSE);
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH_LABEL), FALSE);
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH), FALSE);
@@ -118,7 +118,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			SendMessage(GetDlgItem(hDlgWnd, IDC_BINARY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 		}
 		if (!Param->SendfileEnable) {
-			// –³Œø‰»
+			// ç„¡åŠ¹åŒ–
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_RADIO), FALSE);
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_BINARY_CHECK), FALSE);
 		}
@@ -169,7 +169,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		}
 
 		CenterWindow(hDlgWnd, GetParent(hDlgWnd));
-		// TRUE‚É‚·‚é‚Æƒ{ƒ^ƒ“‚ÉƒtƒH[ƒJƒX‚ª“–‚½‚ç‚È‚¢B
+		// TRUEã«ã™ã‚‹ã¨ãƒœã‚¿ãƒ³ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ãŒå½“ãŸã‚‰ãªã„ã€‚
 		return FALSE;
 	}
 

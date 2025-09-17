@@ -51,7 +51,7 @@ const char *putty_get_version();
 void putty_agent_query_synchronous(const void *req_ptr, int req_len, void **rep_ptr, int *rep_len);
 BOOL putty_agent_exists(void);
 
-// ƒGƒ‰[‰“š—p
+// ã‚¨ãƒ©ãƒ¼å¿œç­”ç”¨
 //		0x00 0x00 0x00 0x01		1 = uint32 length
 //		0x05					5 = AGENT FAILURE
 #define SSH_AGENT_FAILURE_MSG "\x00\x00\x00\x01\x05"

@@ -44,14 +44,14 @@ typedef struct {
   unsigned char *key_exp;
   unsigned char *key_mod;
 #else
-  // ƒzƒXƒgƒL[(SSH1,SSH2)‚Í Key \‘¢‘Ì‚ÉW–ñ‚·‚é
+  // ãƒ›ã‚¹ãƒˆã‚­ãƒ¼(SSH1,SSH2)ã¯ Key æ§‹é€ ä½“ã«é›†ç´„ã™ã‚‹
   Key hostkey;
 #endif
 
   int file_num;
   wchar_t **file_names;
   int file_data_index;
-  char *file_data;  // known_hostsƒtƒ@ƒCƒ‹‚Ì“à—e‚ª‚·‚×‚ÄŠi”[‚³‚ê‚é
+  char *file_data;  // known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã®å†…å®¹ãŒã™ã¹ã¦æ ¼ç´ã•ã‚Œã‚‹
 
   HWND hosts_dialog;
 } HOSTSState;

@@ -99,8 +99,8 @@ static BOOL SelectFile(HWND hDlgWnd, const sendfiledlgdata *data, const wchar_t 
 	ofn.lpstrFilter = filterW;
 	ofn.nFilterIndex = 0;
 	ofn.lpstrTitle = title;
-	ofn.lpstrFile = filename_ini;		// ‰Šúƒtƒ@ƒCƒ‹–¼
-	ofn.lpstrInitialDir = data->initial_dir;	// ‰ŠúƒtƒHƒ‹ƒ_
+	ofn.lpstrFile = filename_ini;		// åˆæœŸãƒ•ã‚¡ã‚¤ãƒ«å
+	ofn.lpstrInitialDir = data->initial_dir;	// åˆæœŸãƒ•ã‚©ãƒ«ãƒ€
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_SHOWHELP | OFN_HIDEREADONLY;
 	BOOL Ok = TTGetOpenFileNameW(&ofn, filename);
 
@@ -156,7 +156,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 
 			HistoryStoreSetControl(hs, hDlgWnd, IDC_SENDFILE_FILENAME_EDIT);
 
-			// ‘—MƒTƒCƒY
+			// é€ä¿¡ã‚µã‚¤ã‚º
 			for (size_t i = 0; i < _countof(send_size_list); i++) {
 				char buf[32];
 				sprintf(buf, "%lu", (unsigned long)send_size_list[i]);
@@ -182,7 +182,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 				free(text);
 			}
 
-			// ƒhƒƒbƒvƒ_ƒEƒ“‚ÌƒGƒfƒBƒbƒgƒRƒ“ƒgƒ[ƒ‹‚Å”š‚Ì‚İ“ü—Í
+			// ãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ã®ã‚¨ãƒ‡ã‚£ãƒƒãƒˆã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã§æ•°å­—ã®ã¿å…¥åŠ›
 			{
 				COMBOBOXINFO cbi;
 				cbi.cbSize = sizeof(COMBOBOXINFO);
@@ -279,7 +279,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			break;
 
 		case WM_DROPFILES: {
-			// •¡”ƒhƒƒbƒv‚³‚ê‚Ä‚àÅ‰‚Ì1‚Â‚¾‚¯‚ğˆµ‚¤
+			// è¤‡æ•°ãƒ‰ãƒ­ãƒƒãƒ—ã•ã‚Œã¦ã‚‚æœ€åˆã®1ã¤ã ã‘ã‚’æ‰±ã†
 			HDROP hDrop = (HDROP)wp;
 			const UINT len = DragQueryFileW(hDrop, 0, NULL, 0);
 			if (len == 0) {
@@ -299,7 +299,7 @@ static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 		}
 		default:
 			if (work != NULL && msg == work->MsgDlgHelp) {
-				// ƒRƒ‚ƒ“ƒ_ƒCƒAƒƒO‚Åƒwƒ‹ƒvƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½
+				// ã‚³ãƒ¢ãƒ³ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§ãƒ˜ãƒ«ãƒ—ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸ
 				PostMessage(GetParent(hDlgWnd), WM_USER_DLGHELP2, HlpMenuFileSendfile, 0);
 				return TRUE;
 			}
@@ -315,7 +315,7 @@ INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data)
 
 	BOOL skip_dialog = data->skip_dialog;
 	if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0) {
-		// CTRL ‚ª‰Ÿ‚³‚ê‚Ä‚¢‚½A‹t‚Ì“®ì‚Æ‚È‚é
+		// CTRL ãŒæŠ¼ã•ã‚Œã¦ã„ãŸæ™‚ã€é€†ã®å‹•ä½œã¨ãªã‚‹
 		skip_dialog = !skip_dialog;
 	}
 

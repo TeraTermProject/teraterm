@@ -28,8 +28,8 @@
 
 #pragma once
 
-// ttpcmn.dll ‚Æ ttermpro.exe ‚ÌŠÔ, ttpcom “à‚Å‚Ì‚İg—p‚·‚éAPI
-// plugin‚Í‚±‚ÌAPI‚ğg—p‚µ‚È‚¢
+// ttpcmn.dll ã¨ ttermpro.exe ã®é–“, ttpcom å†…ã§ã®ã¿ä½¿ç”¨ã™ã‚‹API
+// pluginã¯ã“ã®APIã‚’ä½¿ç”¨ã—ãªã„
 
 #include "ttcmn_shared_memory.h"
 

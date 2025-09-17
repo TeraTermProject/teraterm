@@ -51,15 +51,15 @@ BOOL ContinueFlag;
 
 #define MAXNESTLEVEL 10
 
-#define MAXFILENAME 128   // .ttl�t�@�C�����̍ő�T�C�Y
+#define MAXFILENAME 128   // .ttlファイル名の最大サイズ
 
 static int INest;
-static char BuffHandleFileName[MAXNESTLEVEL][MAXFILENAME];  // �e�K�w��.ttl�t�@�C����(UTF-8)
+static char BuffHandleFileName[MAXNESTLEVEL][MAXFILENAME];  // 各階層の.ttlファイル名(UTF-8)
 static PCHAR Buff[MAXNESTLEVEL];
 static BINT BuffLen[MAXNESTLEVEL];
 static BINT BuffPtr[MAXNESTLEVEL];
 
-// �s���z��
+// 行情報配列
 #define MAX_LINENO 100000
 static BINT *BuffLineNo[MAXNESTLEVEL];
 static BINT BuffLineNoMaxIndex[MAXNESTLEVEL];
@@ -104,12 +104,12 @@ char *GetLineBuffer(void)
 	return (p);
 }
 
-// �}�N���E�B���h�E�ɕ\������R�}���h���ǂ������ʂ��� (2006.2.24 yutaka)
+// マクロウィンドウに表示するコマンドかどうか判別する (2006.2.24 yutaka)
 int IsUpdateMacroCommand(void)
 {
 	char *p = GetLineBuffer();
 
-	// �����Ƃ��ăE�F�C�g�E�X���[�v�n�R�}���h��ΏۂƂ���
+	// 原則としてウェイト・スリープ系コマンドを対象とする
 	if (_strnicmp(p, "wait", 4) == 0)
 		return 1;
 
@@ -133,8 +133,8 @@ static BOOL LoadMacroFile(const wchar_t *FileName, int IBuff)
 		return FALSE;
 	}
 
-	// include�ɐ��������t�@�C������A�t�@�C�������L�^����B
-	// �}�N���̃G���[�_�C�A���O�ŁA�t�@�C������\�����������߁B
+	// includeに成功したファイルから、ファイル名を記録する。
+	// マクロのエラーダイアログで、ファイル名を表示したいため。
 	// (2013.9.8 yutaka)
 	if (GetFileTitleW(FileName, basename, _countof(basename)) != 0)
 		wcsncpy_s(basename, _countof(basename), FileName, _TRUNCATE);
@@ -154,8 +154,8 @@ static BOOL LoadMacroFile(const wchar_t *FileName, int IBuff)
 	}
 	BuffLen[IBuff] = Len;
 
-	// �s�ԍ��z������B����ɂ��A�o�b�t�@�̃C���f�b�N�X����s�ԍ��ւ̕ϊ���
-	// O(N)->O(logN)�Ō����ł���悤�ɂȂ�B
+	// 行番号配列を作る。これにより、バッファのインデックスから行番号への変換が
+	// O(N)->O(logN)で検索できるようになる。
 	// (2014.1.18 yutaka)
 	{
 		unsigned int i, n;
@@ -167,7 +167,7 @@ static BOOL LoadMacroFile(const wchar_t *FileName, int IBuff)
 		for (i = 0 ; i < BuffLen[IBuff] ; i++) {
 			if (Buff[IBuff][i] == 0x0A) {
 				if (i == BuffLen[IBuff] - 1) {
-					// �o�b�t�@�̍Ōオ���s�R�[�h�������ꍇ�A�������̍s�ԍ��͑��݂��Ȃ��B
+					// バッファの最後が改行コードだった場合、もう次の行番号は存在しない。
 
 				} else {
 					if (n < MAX_LINENO - 1) {
@@ -189,8 +189,8 @@ static BOOL LoadMacroFile(const wchar_t *FileName, int IBuff)
 
 
 /**
- *	���ݎ��s���̃}�N���t�@�C���̃t�@�C������Ԃ�
- *	@return	�t�@�C����(UTF-8)
+ *	現在実行中のマクロファイルのファイル名を返す
+ *	@return	ファイル名(UTF-8)
  */
 const char *GetMacroFileName(void)
 {
@@ -198,7 +198,7 @@ const char *GetMacroFileName(void)
 }
 
 
-// ���ݎ��s���̃}�N���t�@�C���̍s�ԍ���Ԃ� (2005.7.18 yutaka)
+// 現在実行中のマクロファイルの行番号を返す (2005.7.18 yutaka)
 static int getCurrentLineNumber(BINT curpos, BINT *lineno, BINT linenomax)
 {
 	BINT i, no;
@@ -210,7 +210,7 @@ static int getCurrentLineNumber(BINT curpos, BINT *lineno, BINT linenomax)
 			break;
 		}
 	}
-	// �Ō�̍s���p�[�X�����ہA�s�ԍ���Ԃ��Ă��Ȃ����������C�������B
+	// 最後の行をパースした際、行番号を返せていなかった問題を修正した。
 	// (2014.7.6 yutaka)
 	if (no == 0 && i == linenomax) {
 		no = linenomax;
@@ -236,12 +236,12 @@ BOOL GetRawLine()
 	while ((BuffPtr[INest]<BuffLen[INest]) &&
 		((b>=0x20) || (b==0x09)))
 	{
-		// LineBuff[]�̃o�b�t�@�T�C�Y�𒴂���ꍇ�̓G���[�Ƃ���B
-		// �������A�}�N���������Ȃ�I������̂Ń_�C�A���O��\������悤�ɂ����ق���
-		// ������������Ȃ��B
+		// LineBuff[]のバッファサイズを超える場合はエラーとする。
+		// ただし、マクロがいきなり終了するのでダイアログを表示するようにしたほうが
+		// いいかもしれない。
 		// (2007.6.6 yutaka)
-		// �o�b�t�@�T�C�Y�Ɏ��܂�͈͂ŃR�s�[����B
-		// break ����Ƃ��ӂꂽ�������̍s�Ƃ��Ĉ�����̂� break ���Ȃ��B
+		// バッファサイズに収まる範囲でコピーする。
+		// break するとあふれた分が次の行として扱われるので break しない。
 		// (2007.6.9 maya)
 		if (i < MaxLineLen-1) {
 			LineBuff[i] = b;
@@ -256,7 +256,7 @@ BOOL GetRawLine()
 	LineParsePtr = 0;
 
 	// current line number (2005.7.18 yutaka)
-	// �o�b�t�@�̃C���f�b�N�X���獂���ɍs�ԍ���������悤�ɂ����B(2014.1.18 yutaka)
+	// バッファのインデックスから高速に行番号を引けるようにした。(2014.1.18 yutaka)
 	LineNo = getCurrentLineNumber(BuffPtr[INest], BuffLineNo[INest], BuffLineNoMaxIndex[INest]);
 
 	while ((BuffPtr[INest]<BuffLen[INest]) &&
@@ -328,7 +328,7 @@ BOOL RegisterLabels(int IBuff)
 		    LinePtr--;
 		}
 
-		/* ���̍s�ֈڂ��O�ɁAC����R�����g��T�����߁A�s���܂ŃX�L��������B*/
+		/* 次の行へ移す前に、C言語コメントを探すため、行末までスキャンする。*/
 		while ((b=GetFirstChar()) != 0) {
 			if (b=='"' || b=='\'' || b=='#') {
 				LinePtr--;
@@ -378,7 +378,7 @@ void CloseBuff(int IBuff)
 	DelLabVar((WORD)IBuff);
 	for (i=IBuff ; i<=MAXNESTLEVEL-1 ; i++) {
 		free(BuffLineNo[i]);
-		/* �|�C���^�̏������R����C�������B4.81�ł̃f�O���[�h�B
+		/* ポインタの初期化漏れを修正した。4.81でのデグレード。
 		 * (2014.3.4 yutaka)
 		 */
 		BuffLineNo[i] = NULL;

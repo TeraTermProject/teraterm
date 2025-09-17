@@ -132,8 +132,8 @@ void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat) {
 
 void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int *p)
 {
-	// 20MB�ȏ�̃t�@�C�����A�b�v���[�h���悤�Ƃ���ƁAbuffer overflow��
-	// ��������ւ̑Ώ��B(2005.3.18 yutaka)
+	// 20MB以上のファイルをアップロードしようとすると、buffer overflowで
+	// 落ちる問題への対処。(2005.3.18 yutaka)
 	// cf. http://sourceforge.jp/tracker/index.php?func=detail&aid=5713&group_id=1412&atid=5333
 	double Num;
 	wchar_t NumStr[10];
@@ -234,13 +234,13 @@ typedef struct {
 } EditSubclassData;
 
 /**
- *	�T�|�[�g����L�[
- *	C-n/C-p		�R���{�{�b�N�X�̂Ƃ�1��/����I��
- *	C-b/C-f		�J�[�\����1�����O/���
- *	C-a/C-e		�J�[�\�����s��/�s��
- *	C-d			�J�[�\���z����1�����폜
- *	C-k			�J�[�\������s���܂ō폜
- *	C-u			�J�[�\�����s���܂ō폜
+ *	サポートするキー
+ *	C-n/C-p		コンボボックスのとき1つ上/下を選択
+ *	C-b/C-f		カーソルを1文字前/後ろ
+ *	C-a/C-e		カーソルを行頭/行末
+ *	C-d			カーソル配下の1文字削除
+ *	C-k			カーソルから行末まで削除
+ *	C-u			カーソルより行頭まで削除
  */
 static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
                                          WPARAM wParam, LPARAM lParam)
@@ -252,7 +252,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 	DWORD len;
 
 	switch (msg) {
-		// �L�[�������ꂽ�̂����m����
+		// キーが押されたのを検知する
 		case WM_KEYDOWN:
 			if (GetKeyState(VK_CONTROL) < 0) {
 				switch (wParam) {
@@ -345,17 +345,17 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 						if (str != NULL) {
 							len = GetWindowTextW(dlg, str, (int)max);
 							if (select < len) {
-								if (wParam == 0x44) { // Ctrl+d �J�[�\���z���̕����݂̂��폜����
+								if (wParam == 0x44) { // Ctrl+d カーソル配下の文字のみを削除する
 									wmemmove(&str[select], &str[select + 1], len - select - 1);
 									str[len - 1] = '\0';
 
-								} else if (wParam == 0x4b) { // Ctrl+k �J�[�\������s���܂ō폜����
+								} else if (wParam == 0x4b) { // Ctrl+k カーソルから行末まで削除する
 									str[select] = '\0';
 
 								}
 							}
 
-							if (wParam == 0x55) { // Ctrl+u�J�[�\����荶�������ׂď���
+							if (wParam == 0x55) { // Ctrl+uカーソルより左側をすべて消す
 								if (select >= len) {
 									str[0] = '\0';
 								} else {
@@ -377,7 +377,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 			}
 			break;
 
-		// ��̃L�[�����������ʑ����镶���ŉ�����̂Ŏ̂Ă�
+		// 上のキーを押した結果送られる文字で音が鳴るので捨てる
 		case WM_CHAR:
 			switch (wParam) {
 				case 0x01:
@@ -414,10 +414,10 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 }
 
 /**
- *	�G�f�B�b�g�{�b�N�X/�R���{�{�b�N�X�̃L�[����� emacs ���ɂ���
- *		C-n/C-p �̂��߂ɃT�u�N���X��
- *	@praram		hDlg		�_�C�A���O
- *	@praram		nID			emacs���ɂ���G�f�B�b�g�{�b�N�X �܂��� �R���{�{�b�N�X
+ *	エディットボックス/コンボボックスのキー操作を emacs 風にする
+ *		C-n/C-p のためにサブクラス化
+ *	@praram		hDlg		ダイアログ
+ *	@praram		nID			emacs風にするエディットボックス または コンボボックス
  */
 void SetEditboxEmacsKeybind(HWND hDlg, int nID)
 {
@@ -462,16 +462,16 @@ static int CALLBACK IsExistFontSubA(
 
 /**
  *	IsExistFont
- *	�t�H���g�����݂��Ă��邩�`�F�b�N����
+ *	フォントが存在しているかチェックする
  *
- *	@param[in]	face		�t�H���g��(�t�@�C�����ł͂Ȃ�)
- *	@param[in]	charset		SHIFTJIS_CHARSET�Ȃ�
- *	@param[in]	strict		TRUE	�t�H���g�����N�͌����Ɋ܂߂Ȃ�
- *							FALSE	�t�H���g�����N�������Ɋ܂߂�
- *	@retval		FALSE		�t�H���g�͂��Ȃ�
- *	@retval		TRUE		�t�H���g�͑��݂���
+ *	@param[in]	face		フォント名(ファイル名ではない)
+ *	@param[in]	charset		SHIFTJIS_CHARSETなど
+ *	@param[in]	strict		TRUE	フォントリンクは検索に含めない
+ *							FALSE	フォントリンクも検索に含める
+ *	@retval		FALSE		フォントはしない
+ *	@retval		TRUE		フォントは存在する
  *
- *	strict = FALSE���A���݂��Ȃ��t�H���g�ł��\���ł���Ȃ�TRUE���Ԃ�
+ *	strict = FALSE時、存在しないフォントでも表示できるならTRUEが返る
  */
 BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict)
 {
@@ -480,7 +480,7 @@ BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict)
 	IsExistFontInfoA info;
 	memset(&lf, 0, sizeof(lf));
 	lf.lfCharSet = !strict ? DEFAULT_CHARSET : charset;
-	// ��DEFAULT_CHARSET�Ƃ���ƃt�H���g�����N���L���ɂȂ�悤��
+	// ↑DEFAULT_CHARSETとするとフォントリンクも有効になるようだ
 	lf.lfPitchAndFamily = 0;
 	info.found = FALSE;
 	info.face = face;
@@ -513,26 +513,26 @@ static int CALLBACK IsExistFontSubW(
 }
 
 /**
- *	�t�H���g�����݂��Ă��邩�`�F�b�N����
+ *	フォントが存在しているかチェックする
  *
- *	@param[in]	face		�t�H���g��(�t�@�C�����ł͂Ȃ�)
- *	@param[in]	charset		SHIFTJIS_CHARSET�Ȃ�
- *	@param[in]	strict		TRUE	�t�H���g�����N�͌����Ɋ܂߂Ȃ�
- *							FALSE	�t�H���g�����N�������Ɋ܂߂�
- *	@retval		FALSE		�t�H���g�͂��Ȃ�
- *	@retval		TRUE		�t�H���g�͑��݂���
+ *	@param[in]	face		フォント名(ファイル名ではない)
+ *	@param[in]	charset		SHIFTJIS_CHARSETなど
+ *	@param[in]	strict		TRUE	フォントリンクは検索に含めない
+ *							FALSE	フォントリンクも検索に含める
+ *	@retval		FALSE		フォントはしない
+ *	@retval		TRUE		フォントは存在する
  *
- *	strict = FALSE���A���݂��Ȃ��t�H���g�ł��\���ł���Ȃ�TRUE���Ԃ�
- *	(charste = DEFAULT_CHARSET �̂Ƃ��Ɠ���)
+ *	strict = FALSE時、存在しないフォントでも表示できるならTRUEが返る
+ *	(charste = DEFAULT_CHARSET のときと同じ)
  *
- *	* ��
- *		- face �� system locale �Ƃ͈قȂ�t�H���g���Ƃ̓}�b�`���Ȃ�
- *		- ���R (EnumFontFamiliesExW() �̃h�L�������g����)
- *		  - Englsh(ANSI) name �� localized name ��2�̃t�H���g���������Ă���
- *		  - localized name �� system local�Ɠ����������擾�ł���
- *		    - EnumFontFamiliesExW() �̎d�l
- *		  - �n���O���Ŏw�肳�ꂽ Gulim,Dotum �͑��݂̊m�F�ł��Ȃ�
- *		- ������
+ *	* 注
+ *		- face は system locale とは異なるフォント名とはマッチしない
+ *		- 理由 (EnumFontFamiliesExW() のドキュメントから)
+ *		  - Englsh(ANSI) name と localized name の2つのフォント名を持っている
+ *		  - localized name は system localと同じ時だけ取得できる
+ *		    - EnumFontFamiliesExW() の仕様
+ *		  - ハングルで指定された Gulim,Dotum は存在の確認できない
+ *		- 解決案
  *		  - http://archives.miloush.net/michkap/archive/2006/02/13/530814.html
  */
 BOOL IsExistFontW(const wchar_t *face, BYTE charset, BOOL strict)
@@ -542,7 +542,7 @@ BOOL IsExistFontW(const wchar_t *face, BYTE charset, BOOL strict)
 	IsExistFontInfoW info;
 	memset(&lf, 0, sizeof(lf));
 	lf.lfCharSet = !strict ? DEFAULT_CHARSET : charset;
-	// ��DEFAULT_CHARSET�Ƃ���ƃt�H���g�����N���L���ɂȂ�悤��
+	// ↑DEFAULT_CHARSETとするとフォントリンクも有効になるようだ
 	lf.lfPitchAndFamily = 0;
 	info.found = FALSE;
 	info.face = face;

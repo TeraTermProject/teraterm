@@ -79,7 +79,7 @@ static void query()
 	int out_len;
 	putty_agent_query_synchronous(&buf[0], (int)buf.size(), (void **)&out_ptr, &out_len);
 
-	// SSH_AGENT_IDENTITIES_ANSWER(12, 0x0c) ‚ª•Ô‚Á‚Ä‚­‚é
+	// SSH_AGENT_IDENTITIES_ANSWER(12, 0x0c) ãŒè¿”ã£ã¦ãã‚‹
 	safefree(out_ptr);
 }
 

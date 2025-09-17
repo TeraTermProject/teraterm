@@ -57,7 +57,7 @@ typedef enum {
 } OpId_t;
 
 typedef struct FileVarProto {
-	// «protosys_proto.cpp“à‚Ì‚ÝŽg—p
+	// â†“protosys_proto.cppå†…ã®ã¿ä½¿ç”¨
 
 	ProtoId_t ProtoId;
 	OpId_t OpId;
@@ -66,21 +66,21 @@ typedef struct FileVarProto {
 	HWND HWin;
 	wchar_t *DlgCaption;
 
-	// ‘—Mƒtƒ@ƒCƒ‹–¼”z—ñ
-	//	ƒtƒ‹ƒpƒX‚Ìƒtƒ@ƒCƒ‹–¼”z—ñ(ˆê”ÔÅŒã‚ÍNULL)
+	// é€ä¿¡ãƒ•ã‚¡ã‚¤ãƒ«åé…åˆ—
+	//	ãƒ•ãƒ«ãƒ‘ã‚¹ã®ãƒ•ã‚¡ã‚¤ãƒ«åé…åˆ—(ä¸€ç•ªæœ€å¾Œã¯NULL)
 	wchar_t **FileNames;
-	int FNCount;		// ‘—M’†ƒtƒ@ƒCƒ‹–¼”z—ñindex(0...)
+	int FNCount;		// é€ä¿¡ä¸­ãƒ•ã‚¡ã‚¤ãƒ«åé…åˆ—index(0...)
 
-	// ŽóM
-	wchar_t *RecievePath;		// ŽóMƒtƒHƒ‹ƒ_(I’[‚ÉƒpƒXƒZƒpƒŒ[ƒ^'\\'‚ª•t‰Á‚³‚ê‚Ä‚¢‚é)
+	// å—ä¿¡
+	wchar_t *RecievePath;		// å—ä¿¡ãƒ•ã‚©ãƒ«ãƒ€(çµ‚ç«¯ã«ãƒ‘ã‚¹ã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿'\\'ãŒä»˜åŠ ã•ã‚Œã¦ã„ã‚‹)
 
-	// ªprotosys_proto.cpp“à‚Ì‚ÝŽg—p
+	// â†‘protosys_proto.cppå†…ã®ã¿ä½¿ç”¨
 
-	// «ŠeƒvƒƒgƒRƒ‹‚ÅŽg—p‚·‚éƒ[ƒN
+	// â†“å„ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã§ä½¿ç”¨ã™ã‚‹ãƒ¯ãƒ¼ã‚¯
 	BOOL OverWrite;
 	BOOL Success;
 	BOOL NoMsg;
-	// ªŠeƒvƒƒgƒRƒ‹‚ÅŽg—p‚·‚éƒ[ƒN
+	// â†‘å„ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã§ä½¿ç”¨ã™ã‚‹ãƒ¯ãƒ¼ã‚¯
 
 	// services
 	char *(*GetNextFname)(struct FileVarProto *fv);
@@ -99,33 +99,33 @@ typedef struct FileVarProto {
 } TFileVarProto;
 typedef TFileVarProto *PFileVarProto;
 
-// ƒvƒƒgƒRƒ‹‚ÌƒIƒyƒŒ[ƒVƒ‡ƒ“
-//   ŠeƒvƒƒgƒRƒ‹‚ÌŽÀ‘•
+// ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã®ã‚ªãƒšãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³
+//   å„ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã®å®Ÿè£…
 typedef struct ProtoOp_ {
-	// ‰Šú‰»ˆ—
-	// ƒƒ‚ƒŠŠm•ÛAó‘Ô‰Šú‰»“™‚ðs‚¤
-	//	@retval	TRUE	³íI—¹
-	//	@retval	FALSE	ˆÙíI—¹A‰Šú‰»Ž¸”s
+	// åˆæœŸåŒ–å‡¦ç†
+	// ãƒ¡ãƒ¢ãƒªç¢ºä¿ã€çŠ¶æ…‹åˆæœŸåŒ–ç­‰ã‚’è¡Œã†
+	//	@retval	TRUE	æ­£å¸¸çµ‚äº†
+	//	@retval	FALSE	ç•°å¸¸çµ‚äº†ã€åˆæœŸåŒ–å¤±æ•—
 	BOOL (*Init)(struct FileVarProto *fv, PComVar cv, PTTSet ts);
-	// ˆ—‚ÌŒp‘±
-	//	@retval	TRUE	³íAˆ—‚ðŒp‘±I—¹
-	//	@retval	FALSE	I—¹Aˆø‚«‘±‚«Parse()‚ðŒÄ‚Ô•K—v‚È‚µ
+	// å‡¦ç†ã®ç¶™ç¶š
+	//	@retval	TRUE	æ­£å¸¸ã€å‡¦ç†ã‚’ç¶™ç¶šçµ‚äº†
+	//	@retval	FALSE	çµ‚äº†ã€å¼•ãç¶šãParse()ã‚’å‘¼ã¶å¿…è¦ãªã—
 	BOOL (*Parse)(struct FileVarProto *fv, PComVar cv);
-	// ƒ^ƒCƒ€ƒAƒEƒg’Ê’m
-	//	ƒ^ƒCƒ€ƒAƒEƒg‚ª”­¶‚µ‚½‚±‚Æ‚ðƒvƒƒgƒRƒ‹ˆ—‚É’Ê’m
+	// ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆé€šçŸ¥
+	//	ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆãŒç™ºç”Ÿã—ãŸã“ã¨ã‚’ãƒ—ãƒ­ãƒˆã‚³ãƒ«å‡¦ç†ã«é€šçŸ¥
 	void (*TimeOutProc)(struct FileVarProto *fv, PComVar cv);
-	// ƒLƒƒƒ“ƒZƒ‹’Ê’m
-	//	ƒ†[ƒU[‚ªƒLƒƒƒ“ƒZƒ‹‚µ‚½‚±‚Æ‚ðƒvƒƒgƒRƒ‹ˆ—‚É’Ê’m
+	// ã‚­ãƒ£ãƒ³ã‚»ãƒ«é€šçŸ¥
+	//	ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒã‚­ãƒ£ãƒ³ã‚»ãƒ«ã—ãŸã“ã¨ã‚’ãƒ—ãƒ­ãƒˆã‚³ãƒ«å‡¦ç†ã«é€šçŸ¥
 	void (*Cancel)(struct FileVarProto *fv, PComVar cv);
-	// ƒpƒ‰ƒ[ƒ^Ý’è
-	//	ƒvƒƒgƒRƒ‹‚²‚Æ‚Ìƒpƒ‰ƒ[ƒ^Ý’è
+	// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¨­å®š
+	//	ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã”ã¨ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¨­å®š
 	int (*SetOptV)(struct FileVarProto *fv, int request, va_list ap);
-	// I—¹ˆ—
-	//	ƒƒ‚ƒŠ‚ÌŠJ•ú‚È‚Ç‚ðs‚¤
+	// çµ‚äº†å‡¦ç†
+	//	ãƒ¡ãƒ¢ãƒªã®é–‹æ”¾ãªã©ã‚’è¡Œã†
 	void (*Destroy)(struct FileVarProto *fv);
 } TProtoOp;
 
-// UI‚È‚Çî•ñ•\Ž¦—pŠÖ”
+// UIãªã©æƒ…å ±è¡¨ç¤ºç”¨é–¢æ•°
 typedef struct InfoOp_ {
 	void (*InitDlgProgress)(struct FileVarProto *fv, int *CurProgStat);
 	void (*SetDlgTime)(struct FileVarProto *fv, DWORD elapsed, int bytes);

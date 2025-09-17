@@ -32,8 +32,8 @@
 extern "C" {
 #endif
 
-// コマンドライン最大長
-// (TGetHNRec.HostNameの確保済み文字長)
+// 繧ｳ繝槭Φ繝峨Λ繧､繝ｳ譛螟ｧ髟ｷ
+// (TGetHNRec.HostName縺ｮ遒ｺ菫晄ｸ医∩譁�蟄鈴聞)
 //
 #define HostNameMaxLength 1024
 //#define HostNameMaxLength 80

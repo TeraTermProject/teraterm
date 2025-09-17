@@ -36,7 +36,7 @@ extern "C" {
 
   /* YMODEM function id */
 typedef enum {
-	IdYQuit = 0,	// “à•”‚Åg—pAˆ—‚ªŠ®—¹‚µ‚½ó‘Ô
+	IdYQuit = 0,	// å†…éƒ¨ã§ä½¿ç”¨ã€å‡¦ç†ãŒå®Œäº†ã—ãŸçŠ¶æ…‹
 	IdYReceive = 1,
 	IdYSend = 2,
 } YMODEM_MODE_T;

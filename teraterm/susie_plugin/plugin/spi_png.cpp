@@ -173,9 +173,9 @@ __declspec(dllexport) int _stdcall GetPluginInfo(int infono, LPSTR buf, int bufl
 __declspec(dllexport) int __stdcall IsSupported(LPCSTR filename, void *dw)
 {
 	if (((UINT_PTR)dw & 0xffff) == 0) {
-		// ƒtƒ@ƒCƒ‹‚©‚ç“Ç‚Ş
+		// ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã‚€
 		(void)filename;
-		return 0;  // ƒTƒ|[ƒg‚µ‚È‚¢
+		return 0;  // ã‚µãƒãƒ¼ãƒˆã—ãªã„
 	}
 
 	const unsigned char *data = (unsigned char *)dw;

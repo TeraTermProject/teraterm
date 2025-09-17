@@ -155,7 +155,7 @@ static void sftp_console_message(PTInstVar pvar, Channel_t *c, char *fmt, ...)
 #define sftp_do_syslog(pvar, level, ...) logprintf(level, __VA_ARGS__)
 #define sftp_syslog(pvar, ...) logprintf(LOG_LEVEL_VERBOSE, __VA_ARGS__)
 
-// SFTPê—pƒoƒbƒtƒ@‚ðŠm•Û‚·‚éBSCP‚Æ‚ÍˆÙ‚È‚èAæ“ª‚ÉŒã‘±‚Ìƒf[ƒ^ƒTƒCƒY‚ð–„‚ßž‚ÞB
+// SFTPå°‚ç”¨ãƒãƒƒãƒ•ã‚¡ã‚’ç¢ºä¿ã™ã‚‹ã€‚SCPã¨ã¯ç•°ãªã‚Šã€å…ˆé ­ã«å¾Œç¶šã®ãƒ‡ãƒ¼ã‚¿ã‚µã‚¤ã‚ºã‚’åŸ‹ã‚è¾¼ã‚€ã€‚
 //
 // buffer_t
 //    +---------+------------------------------------+
@@ -186,7 +186,7 @@ static void sftp_buffer_free(buffer_t *message)
 	buffer_free(message);
 }
 
-// ƒT[ƒo‚ÉSFTPƒpƒPƒbƒg‚ð‘—M‚·‚éB
+// ã‚µãƒ¼ãƒã«SFTPãƒ‘ã‚±ãƒƒãƒˆã‚’é€ä¿¡ã™ã‚‹ã€‚
 static void sftp_send_msg(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 {
 	char *p;
@@ -194,20 +194,20 @@ static void sftp_send_msg(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 
 	len = buffer_len(msg);
 	p = buffer_ptr(msg);
-	// Å‰‚ÉƒƒbƒZ[ƒWƒTƒCƒY‚ðŠi”[‚·‚éB
+	// æœ€åˆã«ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚µã‚¤ã‚ºã‚’æ ¼ç´ã™ã‚‹ã€‚
 	set_uint32(p, len - 4);
-	// ƒyƒCƒ[ƒh‚Ì‘—MB
+	// ãƒšã‚¤ãƒ­ãƒ¼ãƒ‰ã®é€ä¿¡ã€‚
 	SSH2_send_channel_data(pvar, c, p, len, 0);
 }
 
-// ƒT[ƒo‚©‚çŽóM‚µ‚½SFTPƒpƒPƒbƒg‚ðƒoƒbƒtƒ@‚ÉŠi”[‚·‚éB
+// ã‚µãƒ¼ãƒã‹ã‚‰å—ä¿¡ã—ãŸSFTPãƒ‘ã‚±ãƒƒãƒˆã‚’ãƒãƒƒãƒ•ã‚¡ã«æ ¼ç´ã™ã‚‹ã€‚
 static void sftp_get_msg(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen, buffer_t **message)
 {
 	buffer_t *msg = *message;
 	int msg_len;
 
-	// ƒoƒbƒtƒ@‚ðŠm•Û‚µAƒf[ƒ^‚ð‚·‚×‚Ä•ú‚èž‚ÞBˆÈ~‚Í buffer_t Œ^‚ð’Ê‚µ‚Ä‘€ì‚·‚éB
-	// ‚»‚¤‚µ‚½‚Ù‚¤‚ª OpenSSH ‚ÌƒR[ƒh‚Æ‚Ìe˜a«‚ª—Ç‚­‚È‚é‚½‚ßB
+	// ãƒãƒƒãƒ•ã‚¡ã‚’ç¢ºä¿ã—ã€ãƒ‡ãƒ¼ã‚¿ã‚’ã™ã¹ã¦æ”¾ã‚Šè¾¼ã‚€ã€‚ä»¥é™ã¯ buffer_t åž‹ã‚’é€šã—ã¦æ“ä½œã™ã‚‹ã€‚
+	// ãã†ã—ãŸã»ã†ãŒ OpenSSH ã®ã‚³ãƒ¼ãƒ‰ã¨ã®è¦ªå’Œæ€§ãŒè‰¯ããªã‚‹ãŸã‚ã€‚
 	buffer_clear(msg);
 	buffer_append(msg, data, buflen);
 	buffer_rewind(msg);
@@ -243,13 +243,13 @@ static void sftp_send_string_request(PTInstVar pvar, Channel_t *c, unsigned int 
 }
 
 
-// SFTP’ÊMŠJŽn‘O‚ÌƒlƒSƒVƒG[ƒVƒ‡ƒ“
+// SFTPé€šä¿¡é–‹å§‹å‰ã®ãƒã‚´ã‚·ã‚¨ãƒ¼ã‚·ãƒ§ãƒ³
 // based on do_init()#sftp-client.c(OpenSSH 6.0)
 void sftp_do_init(PTInstVar pvar, Channel_t *c)
 {
 	buffer_t *msg;
 
-	// SFTPŠÇ—\‘¢‘Ì‚Ì‰Šú‰»
+	// SFTPç®¡ç†æ§‹é€ ä½“ã®åˆæœŸåŒ–
 	memset(&c->sftp, 0, sizeof(c->sftp));
 	c->sftp.state = SFTP_INIT;
 	c->sftp.transfer_buflen = DEFAULT_COPY_BUFLEN;
@@ -257,7 +257,7 @@ void sftp_do_init(PTInstVar pvar, Channel_t *c)
 	c->sftp.exts = 0;
 	c->sftp.limit_kbps = 0;
 
-	// ƒlƒSƒVƒG[ƒVƒ‡ƒ“‚ÌŠJŽn
+	// ãƒã‚´ã‚·ã‚¨ãƒ¼ã‚·ãƒ§ãƒ³ã®é–‹å§‹
 	sftp_buffer_alloc(&msg);
 	buffer_put_char(msg, SSH2_FXP_INIT); 
 	buffer_put_int(msg, SSH2_FILEXFER_VERSION);
@@ -325,7 +325,7 @@ error:
 	return;
 }
 
-// ƒpƒX‚Ì‘—M
+// ãƒ‘ã‚¹ã®é€ä¿¡
 // based on do_realpath()#sftp-client.c(OpenSSH 6.0)
 static void sftp_do_realpath(PTInstVar pvar, Channel_t *c, char *path)
 {
@@ -787,7 +787,7 @@ static int parse_args(const char **cpp, int *pflag, int *rflag, int *lflag, int 
 
 
 /*
- * SFTP ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ƒRƒ“ƒ\[ƒ‹
+ * SFTP ã‚³ãƒžãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã‚³ãƒ³ã‚½ãƒ¼ãƒ«
  */
 static WNDPROC hEditProc;
 
@@ -824,7 +824,7 @@ static LRESULT CALLBACK EditProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	return 0L;
 
 cmd_parsed:
-	// ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‰ðÍ
+	// ã‚³ãƒžãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³è§£æž
 	path1 = path2 = NULL;
 	cmd = buf;
 	cmdnum = parse_args((const char **)&cmd, &pflag, &rflag, &lflag, &iflag, &hflag,
@@ -1072,7 +1072,7 @@ static LRESULT CALLBACK OnSftpConsoleDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, 
 			hEdit = GetDlgItem(hDlgWnd, IDC_SFTP_EDIT);
 			SetFocus(hEdit);
 
-			// ƒGƒfƒBƒbƒgƒRƒ“ƒgƒ[ƒ‹‚ÌƒTƒuƒNƒ‰ƒX‰»
+			// ã‚¨ãƒ‡ã‚£ãƒƒãƒˆã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®ã‚µãƒ–ã‚¯ãƒ©ã‚¹åŒ–
 			hEditProc = (WNDPROC)GetWindowLongPtr(hEdit, GWLP_WNDPROC);
 			SetWindowLongPtr(hEdit, GWLP_WNDPROC, (LONG_PTR)EditProc);
 
@@ -1107,18 +1107,18 @@ static LRESULT CALLBACK OnSftpConsoleDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, 
 #if 0
 		case WM_SIZE:
 			{
-				// Ä”z’u
+				// å†é…ç½®
 				int dlg_w, dlg_h;
 				RECT rc_dlg;
 				RECT rc;
 				POINT p;
 
-				// V‚µ‚¢ƒ_ƒCƒAƒƒO‚ÌƒTƒCƒY‚ð“¾‚é
+				// æ–°ã—ã„ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚µã‚¤ã‚ºã‚’å¾—ã‚‹
 				GetClientRect(hDlgWnd, &rc_dlg);
 				dlg_w = rc_dlg.right;
 				dlg_h = rc_dlg.bottom;
 
-				// ƒRƒ}ƒ“ƒhƒvƒƒ“ƒvƒg
+				// ã‚³ãƒžãƒ³ãƒ‰ãƒ—ãƒ­ãƒ³ãƒ—ãƒˆ
 				GetWindowRect(GetDlgItem(hDlgWnd, IDC_SFTP_EDIT), &rc);
 				p.x = rc.left;
 				p.y = rc.top;
@@ -1136,7 +1136,7 @@ static LRESULT CALLBACK OnSftpConsoleDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, 
 	return TRUE;
 }
 
-// SFTPŽóMˆ— -ƒXƒe[ƒgƒ}ƒV[ƒ“-
+// SFTPå—ä¿¡å‡¦ç† -ã‚¹ãƒ†ãƒ¼ãƒˆãƒžã‚·ãƒ¼ãƒ³-
 void sftp_response(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen)
 {
 	buffer_t *msg;
@@ -1149,13 +1149,13 @@ void sftp_response(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned i
 	sftp_get_msg(pvar, c, data, buflen, &msg);
 
 	if (c->sftp.state == SFTP_INIT) {
-		// ƒOƒ[ƒoƒ‹•Ï”‚É•Û‘¶‚·‚éB
+		// ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°ã«ä¿å­˜ã™ã‚‹ã€‚
 		g_pvar = pvar;
 		g_channel = c;
 
 		sftp_do_init_recv(pvar, c, msg);
 
-		// ƒRƒ“ƒ\[ƒ‹‚ð‹N“®‚·‚éB
+		// ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ã‚’èµ·å‹•ã™ã‚‹ã€‚
 		hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_SFTP_DIALOG), 
 				pvar->cv->HWin, (DLGPROC)OnSftpConsoleDlgProc);	
 		if (hDlgWnd != NULL) {

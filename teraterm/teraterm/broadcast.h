@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// vtwin‚©‚ç•ª—£
+// vtwinã‹ã‚‰åˆ†é›¢
 #pragma once
 
 #include <windows.h>

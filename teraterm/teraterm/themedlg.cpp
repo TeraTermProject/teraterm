@@ -108,9 +108,9 @@ static LRESULT CALLBACK ColorSampleProc(HWND hWnd, UINT msg, WPARAM wParam, LPAR
 }
 
 /**
- *	ƒ_ƒCƒAƒƒOã‚ÌƒtƒŒ[ƒ€‚ğƒJƒ‰[ƒTƒ“ƒvƒ‹‚É‚·‚é
- *	ColorSampleSetColor()‚ÅF‚ğİ’è‚·‚é
- *	ƒ_ƒCƒAƒƒO‚ª•Â‚¶‚é‚Æ‚«‚É©“®“I‚É”jŠü‚³‚ê‚é
+ *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ä¸Šã®ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ã‚«ãƒ©ãƒ¼ã‚µãƒ³ãƒ—ãƒ«ã«ã™ã‚‹
+ *	ColorSampleSetColor()ã§è‰²ã‚’è¨­å®šã™ã‚‹
+ *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãŒé–‰ã˜ã‚‹ã¨ãã«è‡ªå‹•çš„ã«ç ´æ£„ã•ã‚Œã‚‹
  *
  */
 ColorSampleData_t *ColorSampleInit(HWND hDlg, int ID, COLORREF color)
@@ -126,7 +126,7 @@ ColorSampleData_t *ColorSampleInit(HWND hDlg, int ID, COLORREF color)
 }
 
 /**
- *	F‚ğİ’è‚·‚é
+ *	è‰²ã‚’è¨­å®šã™ã‚‹
  */
 void ColorSampleSetColor(ColorSampleData_t *cs, COLORREF color)
 {
@@ -138,7 +138,7 @@ void ColorSampleSetColor(ColorSampleData_t *cs, COLORREF color)
 //////////////////////////////////////////////////////////////////////////////
 
 typedef struct {
-	// ‹¤’Ê
+	// å…±é€š
 	HINSTANCE hInst;
 	TComVar *pcv;
 	TTTSet *pts;
@@ -361,7 +361,7 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		case WM_COMMAND: {
 			switch (wp) {
 			case IDC_BGIMG_BUTTON | (BN_CLICKED << 16): {
-				// ‰æ‘œƒtƒ@ƒCƒ‹‘I‘ğ
+				// ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«é¸æŠ
 				OPENFILENAMEW ofn = {};
 				wchar_t bg_file[MAX_PATH];
 				wchar_t *bg_file_in;
@@ -601,7 +601,7 @@ static void SetColorListCtrl(HWND hWnd)
 		SetColorListCtrlValue(hWndList, y);
 	}
 
-	// •‚ğ’²®
+	// å¹…ã‚’èª¿æ•´
 	for (int i = 0; i < 4; i++) {
 		ListView_SetColumnWidth(hWndList, i, i == 1 ? LVSCW_AUTOSIZE_USEHEADER : LVSCW_AUTOSIZE);
 	}
@@ -657,7 +657,7 @@ static INT_PTR CALLBACK ColorThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp
 	case WM_COMMAND: {
 		switch (wp) {
 		case IDC_COLOR_DEFAULT_BUTTON | (BN_CLICKED << 16): {
-			// ƒfƒtƒHƒ‹ƒg
+			// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
 			ThemeGetColorDefault(&dlg_data->ColorTab.color_theme);
 			SetColor(&dlg_data->ColorTab.color_theme);
 			SetColorListCtrl(hWnd);
@@ -689,7 +689,7 @@ static INT_PTR CALLBACK ColorThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp
 				}
 				case (CDDS_ITEMPREPAINT | CDDS_SUBITEM):
 				case CDDS_SUBITEM: {
-					// s‚Æ—ñw’è
+					// è¡Œã¨åˆ—æŒ‡å®š
 					// if (lpLvCustomDraw->nmcd.dwItemSpec == 1 && lpLvCustomDraw->iSubItem == 1) {
 					if (lpLvCustomDraw->iSubItem == 1) {
 						lpLvCustomDraw->clrText = RGB(0x80, 0x80, 0x80);
@@ -697,13 +697,13 @@ static INT_PTR CALLBACK ColorThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp
 					}
 					else
 					{
-						// F‚ğ•ÏX‚µ‚È‚¢ƒZƒ‹‚ÌƒfƒtƒHƒ‹ƒgF‚ğw’è
-						// ‚±‚ê‚ğw’è‚µ‚È‚¢ê‡AF‚ğ•ÏX‚µ‚½—ñˆÈ~‚ÍA“¯‚¶F‚É‚È‚Á‚Ä‚µ‚Ü‚¤
+						// è‰²ã‚’å¤‰æ›´ã—ãªã„ã‚»ãƒ«ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆè‰²ã‚’æŒ‡å®š
+						// ã“ã‚Œã‚’æŒ‡å®šã—ãªã„å ´åˆã€è‰²ã‚’å¤‰æ›´ã—ãŸåˆ—ä»¥é™ã¯ã€åŒã˜è‰²ã«ãªã£ã¦ã—ã¾ã†
 
-						// •¶š‚ÌƒfƒtƒHƒ‹ƒgF
+						// æ–‡å­—ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆè‰²
 						lpLvCustomDraw->clrText = GetSysColor(COLOR_WINDOWTEXT);
 
-						// ”wŒi‚ÌƒfƒtƒHƒ‹ƒgF
+						// èƒŒæ™¯ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆè‰²
 						lpLvCustomDraw->clrTextBk = GetSysColor(COLOR_WINDOW);
 					}
 					SetWindowLongW(hWnd, DWLP_MSGRESULT, (LONG)CDRF_NEWFONT);
@@ -718,7 +718,7 @@ static INT_PTR CALLBACK ColorThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp
 //			case NM_CLICK:
 			case NM_DBLCLK:
 			case NM_RCLICK: {
-				static COLORREF CustColors[16];		// TODO ˆê“I‚ÈF•Û‘¶•K—v?
+				static COLORREF CustColors[16];		// TODO ä¸€æ™‚çš„ãªè‰²ä¿å­˜å¿…è¦?
 				int i = nmlist->iItem;
 				CHOOSECOLORA cc = {};
 				cc.lStructSize = sizeof(cc);
@@ -758,7 +758,7 @@ static INT_PTR CALLBACK ColorThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp
 			break;
 		}
 		case TTN_POP:
-			// 1‰ñ‚¾‚¯•\¦‚·‚é‚½‚ßA•Â‚¶‚½‚çíœ‚·‚é
+			// 1å›ã ã‘è¡¨ç¤ºã™ã‚‹ãŸã‚ã€é–‰ã˜ãŸã‚‰å‰Šé™¤ã™ã‚‹
 			TipWin2SetTextW(dlg_data->ColorTab.tipwin, IDC_COLOR_LIST, NULL);
 			break;
 		default:
@@ -868,7 +868,7 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	case WM_COMMAND: {
 		switch (wp) {
 		case IDC_FILE_UNDO_BUTTON | (BN_CLICKED << 16): {
-			// undo,Œ³‚É–ß‚·
+			// undo,å…ƒã«æˆ»ã™
 			dlg_data->BGTab.bg_theme = dlg_data->Backup.bg_theme;
 			dlg_data->ColorTab.color_theme = dlg_data->Backup.color_theme;
 			goto set;
@@ -885,7 +885,7 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		}
 		case IDC_FILE_LOAD_BUTTON | (BN_CLICKED << 16): {
 			// load
-			// ƒe[ƒ}ƒtƒ@ƒCƒ‹“Ç‚İ‚İ
+			// ãƒ†ãƒ¼ãƒãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿
 			OPENFILENAMEW ofn = {};
 			wchar_t theme_file[MAX_PATH];
 
@@ -928,7 +928,7 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		}
 		case IDC_FILE_SAVE_BUTTON | (BN_CLICKED << 16): {
 			// save
-			// ƒe[ƒ}ƒtƒ@ƒCƒ‹‘‚«o‚µ
+			// ãƒ†ãƒ¼ãƒãƒ•ã‚¡ã‚¤ãƒ«æ›¸ãå‡ºã—
 			wchar_t theme_file[MAX_PATH];
 			OPENFILENAMEW ofn = {};
 
@@ -1173,14 +1173,14 @@ void ThemeDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv)
 	CThemeDlg dlg(hInst, hWnd, dlg_data);
 	INT_PTR r = dlg.DoModal();
 	if (r == 0) {
-		// cancelAƒoƒbƒNƒAƒbƒv“à—e‚É–ß‚·
+		// cancelæ™‚ã€ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—å†…å®¹ã«æˆ»ã™
 		ThemeSetBG(&dlg_data->Backup.bg_theme);
 		ThemeSetColor(&dlg_data->Backup.color_theme);
 		BGSetupPrimary(TRUE);
 		InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 	}
 	else if (r >= 1) {
-		// ok‚È‚Ç(Changes were saved by the user)
+		// okãªã©(Changes were saved by the user)
 		ThemeSetBG(&dlg_data->BGTab.bg_theme);
 		ThemeSetColor(&dlg_data->ColorTab.color_theme);
 		BGSetupPrimary(TRUE);

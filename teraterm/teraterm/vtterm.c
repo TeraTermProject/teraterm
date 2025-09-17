@@ -399,12 +399,12 @@ static void MoveToMainScreen(void)
 }
 
 /**
- *	1ƒLƒƒƒ‰ƒNƒ^(unsigned int, char32_t)‚ğmacro‚Öo—Í
+ *	1ã‚­ãƒ£ãƒ©ã‚¯ã‚¿(unsigned int, char32_t)ã‚’macroã¸å‡ºåŠ›
  */
 static void DDEPut1U32(unsigned int u32)
 {
 	if (DDELog) {
-		// UTF-8 ‚Åo—Í‚·‚é
+		// UTF-8 ã§å‡ºåŠ›ã™ã‚‹
 		char u8_buf[4];
 		size_t u8_len = UTF32ToUTF8(u32, u8_buf, _countof(u8_buf));
 		size_t i;
@@ -416,7 +416,7 @@ static void DDEPut1U32(unsigned int u32)
 }
 
 /**
- *	ƒƒO‚Öİ’è‚³‚ê‚½‰üsƒR[ƒh‚ğo—Í
+ *	ãƒ­ã‚°ã¸è¨­å®šã•ã‚ŒãŸæ”¹è¡Œã‚³ãƒ¼ãƒ‰ã‚’å‡ºåŠ›
  */
 static void OutputLogNewLine(vtterm_work_t *vtterm)
 {
@@ -438,11 +438,11 @@ static void OutputLogNewLine(vtterm_work_t *vtterm)
 }
 
 /**
- *	1ƒLƒƒƒ‰ƒNƒ^(unsigned int, char32_t)‚ğƒƒO(or/and macro‘—Mƒoƒbƒtƒ@)‚Öo—Í
- *		o—Íæ
- *			ƒƒOƒtƒ@ƒCƒ‹
- *			macro‘—Mƒoƒbƒtƒ@(DDEPut1())
- *			ƒvƒŠƒ“ƒg—p
+ *	1ã‚­ãƒ£ãƒ©ã‚¯ã‚¿(unsigned int, char32_t)ã‚’ãƒ­ã‚°(or/and macroé€ä¿¡ãƒãƒƒãƒ•ã‚¡)ã¸å‡ºåŠ›
+ *		å‡ºåŠ›å…ˆ
+ *			ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«
+ *			macroé€ä¿¡ãƒãƒƒãƒ•ã‚¡(DDEPut1())
+ *			ãƒ—ãƒªãƒ³ãƒˆç”¨
  */
 static void OutputLogUTF32(unsigned int u32)
 {
@@ -455,42 +455,42 @@ static void OutputLogUTF32(unsigned int u32)
 	vtterm = &vtterm_work;
 	r = CheckEOLCheck(vtterm->check_eol, u32);
 
-	// ƒƒO
+	// ãƒ­ã‚°
 	if (FLogIsOpendText()) {
 		if ((r & CheckEOLOutputEOL) != 0) {
-			// ‰üs‚ğo—Í
+			// æ”¹è¡Œã‚’å‡ºåŠ›
 			OutputLogNewLine(vtterm);
 		}
 
 		if ((r & CheckEOLOutputChar) != 0) {
-			// u32‚ğo—Í
+			// u32ã‚’å‡ºåŠ›
 			FLogPutUTF32(u32);
 		}
 	}
 
-	// ƒ}ƒNƒo—Í
+	// ãƒã‚¯ãƒ­å‡ºåŠ›
 	if (DDELog) {
 		if ((r & CheckEOLOutputEOL) != 0) {
-			// ‰üs‚ğo—Í
+			// æ”¹è¡Œã‚’å‡ºåŠ›
 			DDEPut1(CR);
 			DDEPut1(LF);
 		}
 
-		// u32‚ğo—Í
+		// u32ã‚’å‡ºåŠ›
 		if ((r & CheckEOLOutputChar) != 0) {
 			DDEPut1U32(u32);
 		}
 	}
 
-	// ƒvƒŠƒ“ƒg
+	// ãƒ—ãƒªãƒ³ãƒˆ
 	if (PrinterMode) {
 		if ((r & CheckEOLOutputEOL) != 0) {
-			// ‰üs‚ğo—Í
+			// æ”¹è¡Œã‚’å‡ºåŠ›
 			WriteToPrnFile(PrintFile_, CR,TRUE);
 			WriteToPrnFile(PrintFile_, LF,TRUE);
 		}
 
-		// u32‚ğo—Í
+		// u32ã‚’å‡ºåŠ›
 		if ((r & CheckEOLOutputChar) != 0) {
 			WriteToPrnFileUTF32(PrintFile_, u32, TRUE);
 		}
@@ -498,7 +498,7 @@ static void OutputLogUTF32(unsigned int u32)
 }
 
 /**
- *	1ƒLƒƒƒ‰ƒNƒ^(BYTE)‚ğƒƒO(or/and macro‘—Mƒoƒbƒtƒ@)‚Öo—Í
+ *	1ã‚­ãƒ£ãƒ©ã‚¯ã‚¿(BYTE)ã‚’ãƒ­ã‚°(or/and macroé€ä¿¡ãƒãƒƒãƒ•ã‚¡)ã¸å‡ºåŠ›
  */
 static void OutputLogByte(BYTE b)
 {
@@ -506,7 +506,7 @@ static void OutputLogByte(BYTE b)
 }
 
 /**
- *	ƒƒO(or/and Macro‘—Mƒoƒbƒtƒ@)o—Í‚Ì•K—v‚ª‚ ‚é‚©?
+ *	ãƒ­ã‚°(or/and Macroé€ä¿¡ãƒãƒƒãƒ•ã‚¡)å‡ºåŠ›ã®å¿…è¦ãŒã‚ã‚‹ã‹?
  */
 static BOOL NeedsOutputBufs(void)
 {
@@ -722,8 +722,8 @@ static void Tab(void)
 }
 
 /**
- *	unicode(char32_t)‚ğƒoƒbƒtƒ@‚Ö‘‚«‚Ş
- *		ƒƒO‚É‚à‘‚«‚Şê‡‚Í PutU32() ‚ğg‚¤
+ *	unicode(char32_t)ã‚’ãƒãƒƒãƒ•ã‚¡ã¸æ›¸ãè¾¼ã‚€
+ *		ãƒ­ã‚°ã«ã‚‚æ›¸ãè¾¼ã‚€å ´åˆã¯ PutU32() ã‚’ä½¿ã†
  */
 static void PutU32NoLog(unsigned int code)
 {
@@ -741,7 +741,7 @@ static void PutU32NoLog(unsigned int code)
 
 	switch ((IdDecSpecial)ts.Dec2Unicode) {
 	case IdDecSpecialUniToDec: {
-		// Unicode‚©‚çDEC“Áê•¶š‚Ö‚Ìƒ}ƒbƒsƒ“ƒO
+		// Unicodeã‹ã‚‰DECç‰¹æ®Šæ–‡å­—ã¸ã®ãƒãƒƒãƒ”ãƒ³ã‚°
 		if (dec_special == FALSE && ts.UnicodeDecSpMapping) {
 			unsigned short cset;
 			cset = UTF32ToDecSp(code);
@@ -753,11 +753,11 @@ static void PutU32NoLog(unsigned int code)
 		break;
 	}
 	case IdDecSpecialDecToUni:
-		// DEC“Áê•¶š‚©‚çUnicode‚Ö‚Ìƒ}ƒbƒsƒ“ƒO‚·‚é
+		// DECç‰¹æ®Šæ–‡å­—ã‹ã‚‰Unicodeã¸ã®ãƒãƒƒãƒ”ãƒ³ã‚°ã™ã‚‹
 		if (dec_special) {
-			// 0x5f‚©‚ç0x7e ‚ğ Unicode ‚ÉŠ„‚èU‚é
-			//  Unicode‚Ö‚Ìƒ}ƒbƒsƒ“ƒO‚Í
-			//  DEC Special Graphics(Wikipedia en)‚ÌUnicode‚ğQl‚É‚µ‚½
+			// 0x5fã‹ã‚‰0x7e ã‚’ Unicode ã«å‰²ã‚ŠæŒ¯ã‚‹
+			//  Unicodeã¸ã®ãƒãƒƒãƒ”ãƒ³ã‚°ã¯
+			//  DEC Special Graphics(Wikipedia en)ã®Unicodeã‚’å‚è€ƒã«ã—ãŸ
 			//	 https://en.wikipedia.org/wiki/DEC_Special_Graphics
 			static const char16_t dec2unicode[] = {
 										0x00a0,		// 0x5f
@@ -780,7 +780,7 @@ static void PutU32NoLog(unsigned int code)
 		}
 		break;
 	case IdDecSpecialDoNot:
-		// DEC Special Graphics ‚ÉŠÖ˜A‚½ƒ}ƒbƒsƒ“ƒO‚Ís‚í‚È‚¢
+		// DEC Special Graphics ã«é–¢é€£ãŸãƒãƒƒãƒ”ãƒ³ã‚°ã¯è¡Œã‚ãªã„
 		break;
 	default:
 		assert(FALSE);
@@ -800,40 +800,40 @@ static void PutU32NoLog(unsigned int code)
 	else
 		LineEnd = CursorRightM;
 
-	// Wrapˆ—AƒJ[ƒ\ƒ‹ˆÚ“®
+	// Wrapå‡¦ç†ã€ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹•
 	if (Wrap) {
-		// Œ»İ Wrap ó‘Ô
+		// ç¾åœ¨ Wrap çŠ¶æ…‹
 		if (!BuffIsCombiningCharacter(CursorX, CursorY, code)) {
-			// •¶šƒR[ƒh‚ªŒ‹‡•¶š‚Å‚Í‚È‚¢ = ƒJ[ƒ\ƒ‹‚ªˆÚ“®‚·‚é
+			// æ–‡å­—ã‚³ãƒ¼ãƒ‰ãŒçµåˆæ–‡å­—ã§ã¯ãªã„ = ã‚«ãƒ¼ã‚½ãƒ«ãŒç§»å‹•ã™ã‚‹
 
-			// ƒJ[ƒ\ƒ‹ˆÊ’u‚ÉsŒp‘±ƒAƒgƒŠƒrƒ…[ƒg‚ğ’Ç‰Á
+			// ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã«è¡Œç¶™ç¶šã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆã‚’è¿½åŠ 
 			TCharAttr t = BuffGetCursorCharAttr(CursorX, CursorY);
 			t.Attr |= AttrLineContinued;
 			t.AttrEx = t.Attr;
 			BuffSetCursorCharAttr(CursorX, CursorY, &t);
 
-			// sŒp‘±ƒAƒgƒŠƒrƒ…[ƒg‚ğ‚Â‚¯‚é
+			// è¡Œç¶™ç¶šã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆã‚’ã¤ã‘ã‚‹
 			CharAttrTmp.Attr |= AttrLineContinued;
 			CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 
-			// Ÿ‚Ìs‚Ìs“ª‚Ö
+			// æ¬¡ã®è¡Œã®è¡Œé ­ã¸
 			CarriageReturn(FALSE);
 			LineFeed(LF,FALSE);
 		}
 	}
 
-	// ƒoƒbƒtƒ@‚É•¶š‚ğ“ü‚ê‚é
-	//	BuffPutUnicode()‚µ‚½–ß‚è’l‚Å•¶š‚ÌƒZƒ‹”‚ğ’m‚é‚±‚Æ‚ª‚Å‚«‚é
-	//		ƒGƒ‰[‚ÍƒJ[ƒ\ƒ‹ˆÊ’u‚ğŒŸ“¢‚·‚é
+	// ãƒãƒƒãƒ•ã‚¡ã«æ–‡å­—ã‚’å…¥ã‚Œã‚‹
+	//	BuffPutUnicode()ã—ãŸæˆ»ã‚Šå€¤ã§æ–‡å­—ã®ã‚»ãƒ«æ•°ã‚’çŸ¥ã‚‹ã“ã¨ãŒã§ãã‚‹
+	//		ã‚¨ãƒ©ãƒ¼æ™‚ã¯ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã‚’æ¤œè¨ã™ã‚‹
 	CharAttrTmp.AttrEx = CharAttrTmp.Attr;
 retry:
 	r = BuffPutUnicode(code, &CharAttrTmp, InsertMode);
 	if (r == -1) {
-		// •¶š‘SŠp‚Ås––A“ü—Í‚Å‚«‚È‚¢
+		// æ–‡å­—å…¨è§’ã§è¡Œæœ«ã€å…¥åŠ›ã§ããªã„
 
 		if (AutoWrapMode) {
-			// ©“®‰üs
-			// Awrapˆ—
+			// è‡ªå‹•æ”¹è¡Œ
+			// ã€wrapå‡¦ç†
 			CharAttrTmp = CharAttr;
 			CharAttrTmp.Attr |= AttrLineContinued;
 			CharAttrTmp.AttrEx = CharAttrTmp.Attr | AttrPadding;
@@ -842,16 +842,16 @@ retry:
 			//if (CursorX != LineEnd){
 			//&& BuffIsHalfWidthFromCode(&ts, code)) {
 
-			// full widtho—Í‚ª”¼•ªo—Í‚É‚È‚ç‚È‚¢‚æ‚¤‚É0x20‚ğo—Í
+			// full widthå‡ºåŠ›ãŒåŠåˆ†å‡ºåŠ›ã«ãªã‚‰ãªã„ã‚ˆã†ã«0x20ã‚’å‡ºåŠ›
 			BuffPutUnicode(0x20, &CharAttrTmp, FALSE);
 			CharAttrTmp.AttrEx = CharAttrTmp.AttrEx & ~AttrPadding;
 
-			// Ÿ‚Ìs‚Ìs“ª‚Ö
+			// æ¬¡ã®è¡Œã®è¡Œé ­ã¸
 			CarriageReturn(FALSE);
 			LineFeed(LF,FALSE);
 		}
 		else {
-			// s“ª‚É–ß‚·
+			// è¡Œé ­ã«æˆ»ã™
 			CursorX = 0;
 		}
 
@@ -859,11 +859,11 @@ retry:
 		goto retry;
 	}
 	else if (r == 0) {
-		// ƒJ[ƒ\ƒ‹‚ÌˆÚ“®‚È‚µ,Œ‹‡•¶š,‡š‚È‚Ç
-		// Wrap ‚Í•Ï‰»‚µ‚È‚¢
-		UpdateStr();	// u‚Ùv->u‚Ûv‚È‚ÇA•Ï‰»‚·‚é‚±‚Æ‚ª‚ ‚é‚Ì‚Å•`‰æ‚·‚é
+		// ã‚«ãƒ¼ã‚½ãƒ«ã®ç§»å‹•ãªã—,çµåˆæ–‡å­—,åˆå­—ãªã©
+		// Wrap ã¯å¤‰åŒ–ã—ãªã„
+		UpdateStr();	// ã€Œã»ã€->ã€Œã½ã€ãªã©ã€å¤‰åŒ–ã™ã‚‹ã“ã¨ãŒã‚ã‚‹ã®ã§æç”»ã™ã‚‹
 	} else if (r == 1) {
-		// ”¼Šp(1ƒZƒ‹)
+		// åŠè§’(1ã‚»ãƒ«)
 		if (CursorX + 0 == CursorRightM || CursorX >= NumOfColumns - 1) {
 			UpdateStr();
 			Wrap = AutoWrapMode;
@@ -872,9 +872,9 @@ retry:
 			Wrap = FALSE;
 		}
 	} else if (r == 2) {
-		// ‘SŠp(2ƒZƒ‹)
+		// å…¨è§’(2ã‚»ãƒ«)
 		if (CursorX + 1 == CursorRightM || CursorX + 1 >= NumOfColumns - 1) {
-			MoveRight();	// ‘SŠp‚Ì‰E‘¤‚ÉƒJ[ƒ\ƒ‹ˆÚ“®
+			MoveRight();	// å…¨è§’ã®å³å´ã«ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹•
 			UpdateStr();
 			Wrap = AutoWrapMode;
 		} else {
@@ -889,16 +889,16 @@ retry:
 }
 
 /**
- *	unicode(char32_t)‚ğƒoƒbƒtƒ@‚Ö‘‚«‚Ş
- *	ƒƒO‚É‚à‘‚«‚Ş
+ *	unicode(char32_t)ã‚’ãƒãƒƒãƒ•ã‚¡ã¸æ›¸ãè¾¼ã‚€
+ *	ãƒ­ã‚°ã«ã‚‚æ›¸ãè¾¼ã‚€
  *
- *	PutChar() ‚Ì UTF-32”Å
+ *	PutChar() ã® UTF-32ç‰ˆ
  */
 static void PutU32(unsigned int code)
 {
 	PutU32NoLog(code);
 
-	// ƒƒO‚ğo—Í
+	// ãƒ­ã‚°ã‚’å‡ºåŠ›
 	OutputLogUTF32(code);
 }
 
@@ -1011,8 +1011,8 @@ static void ParseControl(BYTE b)
 		break;
 	case LF:
 		if (ts.CRReceive == IdLF) {
-			// óM‚Ì‰üsƒR[ƒh‚ª LF ‚Ìê‡‚ÍAƒT[ƒo‚©‚ç LF ‚Ì‚İ‚ª‘—‚ç‚ê‚Ä‚­‚é‚Æ‰¼’è‚µA
-			// CR+LF‚Æ‚µ‚Äˆµ‚¤‚æ‚¤‚É‚·‚éB
+			// å—ä¿¡æ™‚ã®æ”¹è¡Œã‚³ãƒ¼ãƒ‰ãŒ LF ã®å ´åˆã¯ã€ã‚µãƒ¼ãƒã‹ã‚‰ LF ã®ã¿ãŒé€ã‚‰ã‚Œã¦ãã‚‹ã¨ä»®å®šã—ã€
+			// CR+LFã¨ã—ã¦æ‰±ã†ã‚ˆã†ã«ã™ã‚‹ã€‚
 			// cf. http://www.neocom.ca/forum/viewtopic.php?t=216
 			// (2007.1.21 yutaka)
 			CarriageReturn(TRUE);
@@ -1279,11 +1279,11 @@ static void ESCDBCSSelect(BYTE b)
 	switch (ICount) {
 		case 1:
 			// - ESC $ @ (01/11 02/04 04/00) (0x1b 0x24 0x40)
-			//		- G0 <- ‹ŒJISŠ¿š
-			//		- ‹ŒJISŠ¿š = JIS X 0208-1978 (JIS C 6226-1978)
+			//		- G0 <- æ—§JISæ¼¢å­—
+			//		- æ—§JISæ¼¢å­— = JIS X 0208-1978 (JIS C 6226-1978)
 			// - ESC $ B (01/11 02/04 04/02) (0x1b 0x24 0x42)
-			//		- G0 <- VJISŠ¿š
-			//		- VJISŠ¿š = JIS X 0208-1990
+			//		- G0 <- æ–°JISæ¼¢å­—
+			//		- æ–°JISæ¼¢å­— = JIS X 0208-1990
 			if ((b=='@') || (b=='B'))
 			{
 				/* Kanji -> G0 */
@@ -1299,12 +1299,12 @@ static void ESCDBCSSelect(BYTE b)
 			// - ESC $ ) @ (01/11 02/04 02/09 04/00) (0x1b 0x24 0x29 0x40)
 			// - ESC $ * @ (01/11 02/04 02/10 04/00) (0x1b 0x24 0x2a 0x40)
 			// - ESC $ + @ (01/11 02/04 02/11 04/00) (0x1b 0x24 0x2b 0x40)
-			//		- G0..G3 <- ‹ŒJISŠ¿š
+			//		- G0..G3 <- æ—§JISæ¼¢å­—
 			// - ESC $ ( B (01/11 02/04 02/08 04/02) (0x1b 0x24 0x28 0x42)
 			// - ESC $ ) B (01/11 02/04 02/09 04/02) (0x1b 0x24 0x29 0x42)
 			// - ESC $ * B (01/11 02/04 02/10 04/02) (0x1b 0x24 0x2a 0x42)
 			// - ESC $ + B (01/11 02/04 02/11 04/02) (0x1b 0x24 0x2b 0x42)
-			//		- G0..G3 <- VJISŠ¿š
+			//		- G0..G3 <- æ–°JISæ¼¢å­—
 			//
 			/* Second intermediate char must be
 				 '(' or ')' or '*' or '+'. */
@@ -1574,7 +1574,7 @@ static void EscapeSequence(BYTE b)
 	if (b<=US)
 		ParseControl(b);
 	else if ((b>=0x20) && (b<=0x2F)) {
-		// TODO: ICount ‚ª IntCharMax ‚É’B‚µ‚½AÅŒã‚Ì IntChar ‚ğ’u‚«Š·‚¦‚é‚Ì‚Í‘Ã“–?
+		// TODO: ICount ãŒ IntCharMax ã«é”ã—ãŸæ™‚ã€æœ€å¾Œã® IntChar ã‚’ç½®ãæ›ãˆã‚‹ã®ã¯å¦¥å½“?
 		if (ICount<IntCharMax)
 			ICount++;
 		IntChar[ICount] = b;
@@ -1676,10 +1676,10 @@ static void CSScreenErase()
 	BuffUpdateScroll();
 	switch (Param[1]) {
 	  case 0:
-		// <ESC>[H(Cursor in left upper corner)‚É‚æ‚èƒJ[ƒ\ƒ‹‚ª¶ã‹÷‚ğw‚µ‚Ä‚¢‚éê‡A
-		// <ESC>[J‚Í<ESC>[2J‚Æ“¯‚¶‚±‚Æ‚È‚Ì‚ÅAˆ—‚ğ•ª‚¯AŒ»sƒoƒbƒtƒ@‚ğƒXƒNƒ[ƒ‹ƒAƒEƒg
-		// ‚³‚¹‚é‚æ‚¤‚É‚·‚éB(2005.5.29 yutaka)
-		// ƒRƒ“ƒtƒBƒOƒŒ[ƒVƒ‡ƒ“‚ÅØ‚è‘Ö‚¦‚ç‚ê‚é‚æ‚¤‚É‚µ‚½B(2008.5.3 yutaka)
+		// <ESC>[H(Cursor in left upper corner)ã«ã‚ˆã‚Šã‚«ãƒ¼ã‚½ãƒ«ãŒå·¦ä¸Šéš…ã‚’æŒ‡ã—ã¦ã„ã‚‹å ´åˆã€
+		// <ESC>[Jã¯<ESC>[2Jã¨åŒã˜ã“ã¨ãªã®ã§ã€å‡¦ç†ã‚’åˆ†ã‘ã€ç¾è¡Œãƒãƒƒãƒ•ã‚¡ã‚’ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã‚¢ã‚¦ãƒˆ
+		// ã•ã›ã‚‹ã‚ˆã†ã«ã™ã‚‹ã€‚(2005.5.29 yutaka)
+		// ã‚³ãƒ³ãƒ•ã‚£ã‚°ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ã§åˆ‡ã‚Šæ›¿ãˆã‚‰ã‚Œã‚‹ã‚ˆã†ã«ã—ãŸã€‚(2008.5.3 yutaka)
 		if (ts.ScrollWindowClearScreen &&
 			(CursorX == 0 && CursorY == 0)) {
 			// Erase screen (scroll out)
@@ -1857,7 +1857,7 @@ static void CSRepeatCharacter()
 
 static void CSScrollUp()
 {
-	// TODO: ƒXƒNƒ[ƒ‹‚ÌÅ‘å’l‚ğ’[––s”‚É§ŒÀ‚·‚×‚«‚©—vŒŸ“¢
+	// TODO: ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã®æœ€å¤§å€¤ã‚’ç«¯æœ«è¡Œæ•°ã«åˆ¶é™ã™ã¹ãã‹è¦æ¤œè¨
 	CheckParamVal(Param[1], INT_MAX);
 
 	BuffUpdateScroll();
@@ -2422,7 +2422,7 @@ static void CSSetScrollRegion()	// DECSTBM
 	CursorBottom = Param[2] - 1;
 
 	if (RelativeOrgMode)
-		// TODO: ¶ƒ}[ƒWƒ“‚ğ–³‹‚µ‚Ä‚éB—vÀ‹@Šm”FB
+		// TODO: å·¦ãƒãƒ¼ã‚¸ãƒ³ã‚’ç„¡è¦–ã—ã¦ã‚‹ã€‚è¦å®Ÿæ©Ÿç¢ºèªã€‚
 		MoveCursor(0, CursorTop);
 	else
 		MoveCursor(0, 0);
@@ -2430,7 +2430,7 @@ static void CSSetScrollRegion()	// DECSTBM
 
 static void CSSetLRScrollRegion()	// DECSLRM
 {
-//	TODO: ƒXƒe[ƒ^ƒXƒ‰ƒCƒ“ã‚Å‚Ì‹““®Šm”FB
+//	TODO: ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ãƒ©ã‚¤ãƒ³ä¸Šã§ã®æŒ™å‹•ç¢ºèªã€‚
 //	if (isCursorOnStatusLine) {
 //		MoveCursor(0,CursorY);
 //		return;
@@ -2521,8 +2521,8 @@ static void CSSunSequence() /* Sun terminal private sequences */
 
 	  case 10: // Full-screen
 		/*
-		 * –{—ˆ‚È‚ç‚Î PuTTY ‚Ì‚æ‚¤‚Èƒtƒ‹ƒXƒNƒŠ[ƒ“ƒ‚[ƒh‚ğÀ‘•‚·‚é‚×‚«‚¾‚ªA
-		 * ‚Æ‚è‚ ‚¦‚¸‚Íè”²‚«‚ÅÅ‘å‰»‚ğ—˜—p‚·‚é
+		 * æœ¬æ¥ãªã‚‰ã° PuTTY ã®ã‚ˆã†ãªãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ãƒ¢ãƒ¼ãƒ‰ã‚’å®Ÿè£…ã™ã‚‹ã¹ãã ãŒã€
+		 * ã¨ã‚Šã‚ãˆãšã¯æ‰‹æŠœãã§æœ€å¤§åŒ–ã‚’åˆ©ç”¨ã™ã‚‹
 		 */
 		if (ts.WindowFlag & WF_WINDOWCHANGE) {
 			RequiredParams(2);
@@ -2870,10 +2870,10 @@ static void CSQChangeColumnMode(int width)		// DECCOLM
 	ChangeTerminalSize(width, NumOfLines-StatusLine);
 	LRMarginMode = FALSE;
 
-	// DECCOLM ‚Å‚Í‰æ–Ê‚ªƒNƒŠƒA‚³‚ê‚é‚Ì‚ªd—l
-	// ClearOnResize ‚ª off ‚Ì‚Í‚±‚±‚ÅƒNƒŠƒA‚·‚éB
-	// ClearOnResize ‚ª on ‚Ì‚Í ChangeTerminalSize() ‚ğŒÄ‚Ô‚ÆƒNƒŠƒA‚³‚ê‚é‚Ì‚ÅA
-	// —]Œv‚ÈƒXƒNƒ[ƒ‹‚ğ”ğ‚¯‚éˆ×‚É‚±‚±‚Å‚ÍƒNƒŠƒA‚µ‚È‚¢B
+	// DECCOLM ã§ã¯ç”»é¢ãŒã‚¯ãƒªã‚¢ã•ã‚Œã‚‹ã®ãŒä»•æ§˜
+	// ClearOnResize ãŒ off ã®æ™‚ã¯ã“ã“ã§ã‚¯ãƒªã‚¢ã™ã‚‹ã€‚
+	// ClearOnResize ãŒ on ã®æ™‚ã¯ ChangeTerminalSize() ã‚’å‘¼ã¶ã¨ã‚¯ãƒªã‚¢ã•ã‚Œã‚‹ã®ã§ã€
+	// ä½™è¨ˆãªã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã‚’é¿ã‘ã‚‹ç‚ºã«ã“ã“ã§ã¯ã‚¯ãƒªã‚¢ã—ãªã„ã€‚
 	if ((ts.TermFlag & TF_CLEARONRESIZE) == 0) {
 		MoveCursor(0, 0);
 		BuffClearScreen();
@@ -3645,7 +3645,7 @@ static void CSDol(BYTE b)
 				Param[3] = CursorBottom + 1;
 			}
 
-			// TODO: ¶‰Eƒ}[ƒWƒ“‚Ìƒ`ƒFƒbƒN‚ğs‚¤B
+			// TODO: å·¦å³ãƒãƒ¼ã‚¸ãƒ³ã®ãƒã‚§ãƒƒã‚¯ã‚’è¡Œã†ã€‚
 		}
 
 		ParseSGRParams(&attr, &mask, 5);
@@ -3705,10 +3705,10 @@ static void CSDol(BYTE b)
 				Param[3] = Param[1] + CursorBottom - Param[6] + 1;
 			}
 
-			// TODO: ¶‰Eƒ}[ƒWƒ“‚Ìƒ`ƒFƒbƒN‚ğs‚¤B
+			// TODO: å·¦å³ãƒãƒ¼ã‚¸ãƒ³ã®ãƒã‚§ãƒƒã‚¯ã‚’è¡Œã†ã€‚
 		}
 
-		// TODO: 1 origin ‚É‚È‚Á‚Ä‚¢‚éB0 origin ‚É’¼‚·B
+		// TODO: 1 origin ã«ãªã£ã¦ã„ã‚‹ã€‚0 origin ã«ç›´ã™ã€‚
 		BuffCopyBox(Param[2], Param[1], Param[4], Param[3], Param[5], Param[7], Param[6], Param[8]);
 		break;
 
@@ -3736,7 +3736,7 @@ static void CSDol(BYTE b)
 				Param[4] = CursorBottom + 1;
 			}
 
-			// TODO: ¶‰Eƒ}[ƒWƒ“‚Ìƒ`ƒFƒbƒN‚ğs‚¤B
+			// TODO: å·¦å³ãƒãƒ¼ã‚¸ãƒ³ã®ãƒã‚§ãƒƒã‚¯ã‚’è¡Œã†ã€‚
 		}
 
 		BuffFillBox(Param[1], Param[3]-1, Param[2]-1, Param[5]-1, Param[4]-1);
@@ -3764,7 +3764,7 @@ static void CSDol(BYTE b)
 				Param[3] = CursorBottom + 1;
 			}
 
-			// TODO: ¶‰Eƒ}[ƒWƒ“‚Ìƒ`ƒFƒbƒN‚ğs‚¤B
+			// TODO: å·¦å³ãƒãƒ¼ã‚¸ãƒ³ã®ãƒã‚§ãƒƒã‚¯ã‚’è¡Œã†ã€‚
 		}
 
 		if (b == 'z') {
@@ -4784,7 +4784,7 @@ static unsigned int XtColor2TTColor(int mode, unsigned int xt_color)
 			colornum = CS_VT_BLINKFG;
 			break;
 		  case 259:
-			colornum = CS_VT_REVERSEBG;		// xterm ‚Æ“¯‚¶“®ì
+			colornum = CS_VT_REVERSEBG;		// xterm ã¨åŒã˜å‹•ä½œ
 			break;
 		  case CS_UNSPEC:
 			if (mode == 104) {
@@ -4870,16 +4870,16 @@ static void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYT
 }
 
 typedef struct {
-	wchar_t *ptr;	// •ÏŠ·Œã•¶š—ñƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
-	size_t index;	// ƒoƒbƒtƒ@“à‚É“ü‚Á‚Ä‚¢‚é•¶š”
-	size_t size;	// ƒoƒbƒtƒ@ƒTƒCƒY
+	wchar_t *ptr;	// å¤‰æ›å¾Œæ–‡å­—åˆ—ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+	size_t index;	// ãƒãƒƒãƒ•ã‚¡å†…ã«å…¥ã£ã¦ã„ã‚‹æ–‡å­—æ•°
+	size_t size;	// ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º
 } CharSetBuf;
 
 static void PutU32Buf(char32_t code, void *client_data)
 {
 	CharSetBuf *bufdata = (CharSetBuf *)client_data;
 	if (bufdata->index + 2 > bufdata->size) {
-		// ƒoƒbƒtƒ@ƒTƒCƒY‚ğŠg’£‚·‚é
+		// ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã‚’æ‹¡å¼µã™ã‚‹
 		const size_t add_size = 4;
 		wchar_t *new_ptr = (wchar_t *)realloc(bufdata->ptr, sizeof(wchar_t) * (bufdata->size + add_size));
 		if (new_ptr == NULL) {
@@ -4889,7 +4889,7 @@ static void PutU32Buf(char32_t code, void *client_data)
 		bufdata->ptr = new_ptr;
 	}
 	if (bufdata->index < bufdata->size) {
-		// UTF-16‚É•ÏŠ·‚µ‚Äƒoƒbƒtƒ@‚É“ü‚ê‚é
+		// UTF-16ã«å¤‰æ›ã—ã¦ãƒãƒƒãƒ•ã‚¡ã«å…¥ã‚Œã‚‹
 		wchar_t *w16_str = &bufdata->ptr[bufdata->index];
 		size_t u16_len = UTF32ToUTF16(code, w16_str, 2);
 		bufdata->index += u16_len;
@@ -4902,11 +4902,11 @@ static void ParseControlBuf(BYTE b, void *client_data)
 }
 
 /**
- *	óM•¶š—ñ‚ğUTF16•¶š—ñ‚É•ÏŠ·‚·‚é
+ *	å—ä¿¡æ–‡å­—åˆ—ã‚’UTF16æ–‡å­—åˆ—ã«å¤‰æ›ã™ã‚‹
  *
- *	@param	ptr		•¶š—ñ
- *	@param	len		•¶š—ñ’·('\0'‚ğŠÜ‚Ü‚È‚¢)
- *	@retval			•ÏŠ·‚³‚ê‚½•¶š—ñ(•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ)
+ *	@param	ptr		æ–‡å­—åˆ—
+ *	@param	len		æ–‡å­—åˆ—é•·('\0'ã‚’å«ã¾ãªã„)
+ *	@retval			å¤‰æ›ã•ã‚ŒãŸæ–‡å­—åˆ—(ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨)
  *
  */
 static wchar_t *ConvertUTF16(const BYTE *ptr, size_t len)
@@ -4980,7 +4980,7 @@ static void XsProcClipboard(PCHAR buff)
 			}
 			cbbuff[len] = 0;
 
-			// cbbuff ‚ğ wchar_t ‚Ö•ÏŠ·
+			// cbbuff ã‚’ wchar_t ã¸å¤‰æ›
 			cbbuffW = ConvertUTF16(cbbuff, len);
 			free(cbbuff);
 			cbbuff = NULL;
@@ -4998,7 +4998,7 @@ static void XsProcClipboard(PCHAR buff)
 				free(notify_buff);
 			}
 
-			// cbbuffW ‚ğƒNƒŠƒbƒvƒ{[ƒh‚ÉƒZƒbƒg‚·‚é
+			// cbbuffW ã‚’ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«ã‚»ãƒƒãƒˆã™ã‚‹
 			CBSetTextW(NULL, cbbuffW, 0);
 			free(cbbuffW);
 		}
@@ -5300,23 +5300,23 @@ static void CANSeen(BYTE b)
 }
 
 /**
- *	1byte‚æ‚İ‚¾‚µ
- *	‚½‚¾‚µŸ‚Ìê‡A“Ç‚İo‚µ‚ğs‚í‚È‚¢
- *		- macro‘—Mƒoƒbƒtƒ@‚É—]—T‚ª‚È‚¢
- *		- ƒƒOƒoƒbƒtƒ@‚É—]—T‚ª‚È‚¢
+ *	1byteã‚ˆã¿ã ã—
+ *	ãŸã ã—æ¬¡ã®å ´åˆã€èª­ã¿å‡ºã—ã‚’è¡Œã‚ãªã„
+ *		- macroé€ä¿¡ãƒãƒƒãƒ•ã‚¡ã«ä½™è£•ãŒãªã„
+ *		- ãƒ­ã‚°ãƒãƒƒãƒ•ã‚¡ã«ä½™è£•ãŒãªã„
  *
  */
 static int CommRead1Byte_(PComVar cv, LPBYTE b)
 {
 	if (DDELog && DDEGetCount() >= InBuffSize - 10) {
-		/* ƒoƒbƒtƒ@‚É—]—T‚ª‚È‚¢ê‡ */
+		/* ãƒãƒƒãƒ•ã‚¡ã«ä½™è£•ãŒãªã„å ´åˆ */
 		Sleep(1);
 		return 0;
 	}
 
 	if (FLogIsOpend() && FLogGetFreeCount() < FILESYS_LOG_FREE_SPACE) {
-		// ©•ª‚Ìƒoƒbƒtƒ@‚É—]—T‚ª‚È‚¢ê‡‚ÍACPUƒXƒPƒWƒ…[ƒŠƒ“ƒO‚ğ‘¼‚É‰ñ‚µA
-		// CPU‚ªƒXƒg[ƒ‹‚·‚é‚Ì–h‚®B
+		// è‡ªåˆ†ã®ãƒãƒƒãƒ•ã‚¡ã«ä½™è£•ãŒãªã„å ´åˆã¯ã€CPUã‚¹ã‚±ã‚¸ãƒ¥ãƒ¼ãƒªãƒ³ã‚°ã‚’ä»–ã«å›ã—ã€
+		// CPUãŒã‚¹ãƒˆãƒ¼ãƒ«ã™ã‚‹ã®é˜²ãã€‚
 		// (2006.10.13 yutaka)
 		Sleep(1);
 		return 0;
@@ -5335,7 +5335,7 @@ int VTParse()
 	if (c==0) return 0;
 
 	CaretOff();
-	UpdateCaretPosition(FALSE);	// ”ñƒAƒNƒeƒBƒu‚Ìê‡‚Ì‚İÄ•`‰æ‚·‚é
+	UpdateCaretPosition(FALSE);	// éã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã®å ´åˆã®ã¿å†æç”»ã™ã‚‹
 
 	ChangeEmu = 0;
 

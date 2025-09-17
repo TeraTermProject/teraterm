@@ -25,8 +25,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-// teraterm/ �� ttset/ �ԂŎg�p����API
-// plugin����͎g�p���Ȃ�
+// teraterm/ と ttset/ 間で使用するAPI
+// pluginからは使用しない
 
 #pragma once
 

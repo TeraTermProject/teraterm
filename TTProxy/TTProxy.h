@@ -148,7 +148,7 @@ private:
 					}
 				}
 				else if (_wcsicmp(option+1, L"noproxy") == 0) {
-					// -noproxy �� -proxy=none:// �̕ʖ�
+					// -noproxy は -proxy=none:// の別名
 					ProxyWSockHook::parseURL("none://", TRUE);
 					action = OPTION_CLEAR;
 				}
@@ -162,8 +162,8 @@ private:
 						action = OPTION_CLEAR;
 					}
 					else {
-						// -proxy= �Ȃ��ŁAproto://proxy:port/ �ȍ~�̎��z�X�g���܂܂�Ă��Ȃ�
-						// ttermpro �ŏ������Ă��炤���߁ATTXParseParam �ŏ����Ȃ�
+						// -proxy= なしで、proto://proxy:port/ 以降の実ホストが含まれていない
+						// ttermpro で処理してもらうため、TTXParseParam で消さない
 						action = OPTION_REPLACE;
 					}
 				}

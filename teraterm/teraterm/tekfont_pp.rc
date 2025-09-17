@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// ì˙ñ{åÍ (ì˙ñ{) resources
+// Êó•Êú¨Ë™û (Êó•Êú¨) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
@@ -52,7 +52,7 @@ END
 
 IDD_TABSHEET_TEKFONT DIALOGEX 0, 0, 302, 126
 STYLE DS_SETFONT | WS_CHILD | WS_DISABLED | WS_CAPTION
-CAPTION "ÉvÉçÉpÉeÉB ÉyÅ[ÉW"
+CAPTION "Property Page"
 FONT 9, "MS UI Gothic", 400, 0, 0x0
 BEGIN
     LTEXT           "TEK Font",IDC_DLGFONT,6,5,101,9
@@ -86,7 +86,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // ì˙ñ{åÍ (ì˙ñ{) resources
+#endif    // Êó•Êú¨Ë™û (Êó•Êú¨) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

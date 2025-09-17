@@ -135,7 +135,7 @@
       <HeaderFileName />
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -178,7 +178,7 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -221,7 +221,7 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -264,7 +264,7 @@
       <HeaderFileName />
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -308,7 +308,7 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -351,7 +351,7 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

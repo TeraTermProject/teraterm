@@ -74,9 +74,9 @@ HANDLE PASCAL WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
 	/* packing arguments struct addrinfo_args */
 	ga->hWnd = hWnd;
 	ga->wMsg = wMsg;
-	ga->hostname = _strdup(hostname); // �|�C���^�����n���ƁA�X���b�h��ŕs��ƂȂ�B(2012.11.7 yutaka)
+	ga->hostname = _strdup(hostname); // ポインタだけ渡すと、スレッド先で不定となる。(2012.11.7 yutaka)
 	ga->portname = _strdup(portname);
-	ga->hints = *hints; // �|�C���^�����n���ƁA�X���b�h��ŕs��ƂȂ�B(2016.3.11 yutaka)
+	ga->hints = *hints; // ポインタだけ渡すと、スレッド先で不定となる。(2016.3.11 yutaka)
 	ga->res = res;
 
 	ga->lpHandle = (HANDLE *)malloc(sizeof(HANDLE));

@@ -35,7 +35,7 @@
 #endif /* _WINSOCKAPI_ */
 #include <windows.h>
 
-/* _MSC_VER ‚Ì’l
+/* _MSC_VER ã®å€¤
 Visual C++ 8.0 (Visual Studio 2005)  1400
 Visual C++ 9.0 (Visual Studio 2008)  1500
 Visual C++ 10.0 (Visual Studio 2010) 1600
@@ -44,9 +44,9 @@ Visual C++ 12.0 (Visual Studio 2013) 1800
 Visual C++ 14.0 (Visual Studio 2015) 1900
 */
 
-/* VS2015(VC14.0)‚¾‚ÆAWSASocketA(), inet_ntoa() ‚È‚Ç‚ÌAPI‚ªdeprecated‚Å‚ ‚é‚Æ
- * Œx‚·‚é‚½‚ß‚ÉAŒx‚ð—}Ž~‚·‚éB‘ã‘ÖŠÖ”‚É’uŠ·‚·‚é‚ÆAVS2005(VC8.0)‚Åƒrƒ‹ƒh
- * ‚Å‚«‚È‚­‚È‚é‚½‚ßAŒx‚ð—}Ž~‚·‚é‚¾‚¯‚Æ‚·‚éB
+/* VS2015(VC14.0)ã ã¨ã€WSASocketA(), inet_ntoa() ãªã©ã®APIãŒdeprecatedã§ã‚ã‚‹ã¨
+ * è­¦å‘Šã™ã‚‹ãŸã‚ã«ã€è­¦å‘Šã‚’æŠ‘æ­¢ã™ã‚‹ã€‚ä»£æ›¿é–¢æ•°ã«ç½®æ›ã™ã‚‹ã¨ã€VS2005(VC8.0)ã§ãƒ“ãƒ«ãƒ‰
+ * ã§ããªããªã‚‹ãŸã‚ã€è­¦å‘Šã‚’æŠ‘æ­¢ã™ã‚‹ã ã‘ã¨ã™ã‚‹ã€‚
  */
 #if _MSC_VER >= 1800  // VSC2013(VC12.0) or later
 	#ifndef _WINSOCK_DEPRECATED_NO_WARNINGS

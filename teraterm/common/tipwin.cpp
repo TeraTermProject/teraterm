@@ -124,7 +124,7 @@ VOID CTipWinImpl::CalcStrRect()
 
 void CTipWinImpl::CalcWindowRect()
 {
-	// ƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒY‚Í•¶š—Ìˆæ+¶‰E(ã‰º)‚ÌƒtƒŒ[ƒ€
+	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºã¯æ–‡å­—é ˜åŸŸ+å·¦å³(ä¸Šä¸‹)ã®ãƒ•ãƒ¬ãƒ¼ãƒ 
 	const int str_width = str_rect.right - str_rect.left;
 	const int str_height = str_rect.bottom - str_rect.top;
 	const int win_width = str_width + TIP_WIN_FRAME_WIDTH * 2;
@@ -268,10 +268,10 @@ VOID CTipWinImpl::Create(HWND pHwnd)
 VOID CTipWinImpl::Destroy()
 {
 	if(IsExists()) {
-		// ƒtƒHƒ“ƒg‚Ì”jŠü
+		// ãƒ•ã‚©ãƒ³ãƒˆã®ç ´æ£„
 		DeleteObject(tip_font);
 		tip_font = NULL;
-		// ƒEƒBƒ“ƒhƒE‚Ì”jŠü
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ç ´æ£„
 		SetWindowLongPtr(tip_wnd, GWLP_USERDATA, NULL);
 		DestroyWindow(tip_wnd);
 		tip_wnd = NULL;
@@ -492,8 +492,8 @@ void TipWinSetPos(TipWin *tWin, int x, int y)
 }
 
 /**
- *	•¶š‚ğƒZƒbƒg‚·‚é
- *		•¶š‚ğƒZƒbƒg‚·‚é‚Æ tipwin‚ÌƒTƒCƒY‚ªæ“¾(TipWinGetWindowSize())‚Å‚«‚é‚æ‚¤‚É‚È‚é
+ *	æ–‡å­—ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
+ *		æ–‡å­—ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã¨ tipwinã®ã‚µã‚¤ã‚ºãŒå–å¾—(TipWinGetWindowSize())ã§ãã‚‹ã‚ˆã†ã«ãªã‚‹
  */
 void TipWinSetTextW(TipWin* tWin, const wchar_t *str)
 {

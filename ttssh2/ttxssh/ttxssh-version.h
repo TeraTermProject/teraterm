@@ -37,7 +37,7 @@
 #define TTSSH_RES_VERSION_STR           TTSSH_VERSION_STR(", ") ", 0"
 
 // TTSSH_RES_PRODUCT_VERSION_STR
-//	リソースファイル(rcファイル) ProductVersion 用
+//	繝ｪ繧ｽ繝ｼ繧ｹ繝輔ぃ繧､繝ｫ(rc繝輔ぃ繧､繝ｫ) ProductVersion 逕ｨ
 #if defined(TT_VERSION_SUBSTR_HASH)
 #define TTSSH_RES_PRODUCT_VERSION_STR \
 	TTSSH_VERSION_STR(".") " " TT_VERSION_SUBSTR_HASH

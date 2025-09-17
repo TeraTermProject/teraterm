@@ -560,7 +560,7 @@ static char *copy_mp_int(char *num)
 }
 
 //
-// RSA\‘¢‘Ì‚Ì•¡»
+// RSAæ§‹é€ ä½“ã®è¤‡è£½
 //
 RSA *duplicate_RSA(RSA *src)
 {
@@ -581,7 +581,7 @@ RSA *duplicate_RSA(RSA *src)
 
 	RSA_get0_key(src, &sn, &se, NULL);
 
-	// [‚¢ƒRƒs[(deep copy)‚ğs‚¤Bó‚¢ƒRƒs[(shallow copy)‚ÍNGB
+	// æ·±ã„ã‚³ãƒ”ãƒ¼(deep copy)ã‚’è¡Œã†ã€‚æµ…ã„ã‚³ãƒ”ãƒ¼(shallow copy)ã¯NGã€‚
 	BN_copy(n, sn);
 	BN_copy(e, se);
 
@@ -591,7 +591,7 @@ error:
 
 
 //
-// DSA\‘¢‘Ì‚Ì•¡»
+// DSAæ§‹é€ ä½“ã®è¤‡è£½
 //
 DSA *duplicate_DSA(DSA *src)
 {
@@ -613,13 +613,13 @@ DSA *duplicate_DSA(DSA *src)
 	    g == NULL ||
 	    pub_key == NULL) {
 		DSA_free(dsa);
-		// ƒƒ‚ƒŠ‚ğ‰ğ•ú‚µ‚Ä‚¢‚é‚Ì‚ÅNULL‚ğ•Ô‚·‚æ‚¤‚É‚·‚éB
-		// ŒÄ‚ÑŒ³‚Å‚Ìƒ`ƒFƒbƒN‚Íticket#39335‚Åˆ’u—\’èB
+		// ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã—ã¦ã„ã‚‹ã®ã§NULLã‚’è¿”ã™ã‚ˆã†ã«ã™ã‚‹ã€‚
+		// å‘¼ã³å…ƒã§ã®ãƒã‚§ãƒƒã‚¯ã¯ticket#39335ã§å‡¦ç½®äºˆå®šã€‚
 		dsa = NULL;
 		goto error;
 	}
 
-	// [‚¢ƒRƒs[(deep copy)‚ğs‚¤Bó‚¢ƒRƒs[(shallow copy)‚ÍNGB
+	// æ·±ã„ã‚³ãƒ”ãƒ¼(deep copy)ã‚’è¡Œã†ã€‚æµ…ã„ã‚³ãƒ”ãƒ¼(shallow copy)ã¯NGã€‚
 	DSA_get0_pqg(src, &sp, &sq, &sg);
 	DSA_get0_key(src, &spub_key, NULL);
 	BN_copy(p, sp);
@@ -769,7 +769,7 @@ key_size(const Key *k)
 
 	switch (k->type) {
 	case KEY_RSA1:
-		// SSH1‚Ìê‡‚Í key->rsa ‚Æ key->dsa ‚Í NULL ‚Å‚ ‚é‚Ì‚ÅAg‚í‚È‚¢B
+		// SSH1ã®å ´åˆã¯ key->rsa ã¨ key->dsa ã¯ NULL ã§ã‚ã‚‹ã®ã§ã€ä½¿ã‚ãªã„ã€‚
 		return k->bits;
 	case KEY_RSA:
 		RSA_get0_key(k->rsa, &n, NULL, NULL);
@@ -955,7 +955,7 @@ key_fingerprint_randomart(const char *alg, u_char *dgst_raw, u_int dgst_raw_len,
 #undef	FLDSIZE_X
 
 //
-// fingerprintiw–äFƒzƒXƒgŒöŠJŒ®‚ÌƒnƒbƒVƒ…j‚ğ¶¬‚·‚é
+// fingerprintï¼ˆæŒ‡ç´‹ï¼šãƒ›ã‚¹ãƒˆå…¬é–‹éµã®ãƒãƒƒã‚·ãƒ¥ï¼‰ã‚’ç”Ÿæˆã™ã‚‹
 //
 char *key_fingerprint(Key *key, fp_rep dgst_rep, digest_algorithm dgst_alg)
 {
@@ -963,7 +963,7 @@ char *key_fingerprint(Key *key, fp_rep dgst_rep, digest_algorithm dgst_alg)
 	unsigned char *dgst_raw;
 	int dgst_raw_len;
 
-	// fingerprint‚ÌƒnƒbƒVƒ…’liƒoƒCƒiƒŠj‚ğ‹‚ß‚é
+	// fingerprintã®ãƒãƒƒã‚·ãƒ¥å€¤ï¼ˆãƒã‚¤ãƒŠãƒªï¼‰ã‚’æ±‚ã‚ã‚‹
 	dgst_raw = key_fingerprint_raw(key, dgst_alg, &dgst_raw_len);
 	if (dgst_raw == NULL)
 		return NULL;
@@ -989,7 +989,7 @@ char *key_fingerprint(Key *key, fp_rep dgst_rep, digest_algorithm dgst_alg)
 }
 
 //
-// ƒL[‚Ìƒƒ‚ƒŠ—ÌˆæŠm•Û
+// ã‚­ãƒ¼ã®ãƒ¡ãƒ¢ãƒªé ˜åŸŸç¢ºä¿
 //
 static void key_add_private(Key *k)
 {
@@ -1047,8 +1047,8 @@ static void key_add_private(Key *k)
 error:
 	if (d) {
 		BN_free(d);
-		// k->rsa->d‚É NULL ‚ğƒZƒbƒg‚·‚é‚±‚Æ‚Í‚Å‚«‚È‚¢B
-		// RSA_set0_key()‚Å‚Í NULL ‚ğ“n‚µ‚Ä‚à‰½‚à‚µ‚È‚¢B
+		// k->rsa->dã« NULL ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã“ã¨ã¯ã§ããªã„ã€‚
+		// RSA_set0_key()ã§ã¯ NULL ã‚’æ¸¡ã—ã¦ã‚‚ä½•ã‚‚ã—ãªã„ã€‚
 	}
 	if (iqmp) {
 		BN_free(iqmp);
@@ -1159,9 +1159,9 @@ error:
 
 
 //
-// Key \‘¢‘Ì‚Ìƒƒ“ƒo‚Ìƒƒ‚ƒŠ—Ìˆæ‚Æ key ©‘Ì‚ğ‰ğ•ú‚·‚é
-//   key_new() ‚È‚Ç‚Å malloc ‚³‚ê‚½Œ‹‰Ê‚Ìƒ|ƒCƒ“ƒ^‚ğ“n‚·
-//   Key \‘¢‘Ì‚ğ“n‚µ‚Ä‚Í‚¢‚¯‚È‚¢
+// Key æ§‹é€ ä½“ã®ãƒ¡ãƒ³ãƒã®ãƒ¡ãƒ¢ãƒªé ˜åŸŸã¨ key è‡ªä½“ã‚’è§£æ”¾ã™ã‚‹
+//   key_new() ãªã©ã§ malloc ã•ã‚ŒãŸçµæœã®ãƒã‚¤ãƒ³ã‚¿ã‚’æ¸¡ã™
+//   Key æ§‹é€ ä½“ã‚’æ¸¡ã—ã¦ã¯ã„ã‘ãªã„
 //
 void key_free(Key *key)
 {
@@ -1175,8 +1175,8 @@ void key_free(Key *key)
 }
 
 //
-// Key \‘¢‘Ì‚Ìƒƒ“ƒo‚Ìƒƒ‚ƒŠ—Ìˆæ‰ğ•ú
-//   ƒƒ“ƒo‚Ì‚İ‚ğ‰ğ•ú‚µAkey ©‘Ì‚Í‰ğ•ú‚µ‚È‚¢
+// Key æ§‹é€ ä½“ã®ãƒ¡ãƒ³ãƒã®ãƒ¡ãƒ¢ãƒªé ˜åŸŸè§£æ”¾
+//   ãƒ¡ãƒ³ãƒã®ã¿ã‚’è§£æ”¾ã—ã€key è‡ªä½“ã¯è§£æ”¾ã—ãªã„
 //
 void key_init(Key *key)
 {
@@ -1247,7 +1247,7 @@ char *curve_keytype_to_name(ssh_keytype type)
 }
 
 //
-// ƒL[î•ñ‚©‚çƒoƒbƒtƒ@‚Ö•ÏŠ·‚·‚é (for SSH2)
+// ã‚­ãƒ¼æƒ…å ±ã‹ã‚‰ãƒãƒƒãƒ•ã‚¡ã¸å¤‰æ›ã™ã‚‹ (for SSH2)
 // NOTE:
 //
 int key_to_blob(Key *key, char **blobp, int *lenp)
@@ -1317,8 +1317,8 @@ error:
 
 
 //
-// ƒoƒbƒtƒ@‚©‚çƒL[î•ñ‚ğæ‚èo‚·(for SSH2)
-// NOTE: •Ô’l‚ÍƒAƒƒP[ƒg—Ìˆæ‚É‚È‚é‚Ì‚ÅAŒÄ‚Ño‚µ‘¤‚Å‰ğ•ú‚·‚é‚±‚ÆB
+// ãƒãƒƒãƒ•ã‚¡ã‹ã‚‰ã‚­ãƒ¼æƒ…å ±ã‚’å–ã‚Šå‡ºã™(for SSH2)
+// NOTE: è¿”å€¤ã¯ã‚¢ãƒ­ã‚±ãƒ¼ãƒˆé ˜åŸŸã«ãªã‚‹ã®ã§ã€å‘¼ã³å‡ºã—å´ã§è§£æ”¾ã™ã‚‹ã“ã¨ã€‚
 //
 Key *key_from_blob(char *data, int blen)
 {
@@ -1521,7 +1521,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		int ok, nid;
 		digest_algorithm hash_alg;
 
-		// ƒ_ƒCƒWƒFƒXƒg’l‚ÌŒvZ
+		// ãƒ€ã‚¤ã‚¸ã‚§ã‚¹ãƒˆå€¤ã®è¨ˆç®—
 		hash_alg = get_ssh2_key_hash_alg(keyalgo);
 		if (ssh_digest_memory(hash_alg, data, datalen, digest, sizeof(digest)) != 0)
 			goto error;
@@ -1532,15 +1532,15 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		if (sig == NULL)
 			goto error;
 
-		// “dq–¼‚ğŒvZ
-		nid = get_ssh2_key_hashtype(keyalgo); // ssh-rsa, rsa-sha2-256, rsa-sha2-512 ‚Ì‰Â”\«‚ª‚ ‚é
+		// é›»å­ç½²åã‚’è¨ˆç®—
+		nid = get_ssh2_key_hashtype(keyalgo); // ssh-rsa, rsa-sha2-256, rsa-sha2-512 ã®å¯èƒ½æ€§ãŒã‚ã‚‹
 		ok = RSA_sign(nid, digest, dlen, sig, &len, keypair->rsa);
 		SecureZeroMemory(digest, sizeof(digest));
 		if (ok != 1) { // error
 			free(sig);
 			goto error;
 		}
-		// –¼‚ÌƒTƒCƒY‚ªƒoƒbƒtƒ@‚æ‚è¬‚³‚¢ê‡AŒã‚ë‚Ö‚¸‚ç‚·Bæ“ª‚Íƒ[ƒ‚Å–„‚ß‚éB
+		// ç½²åã®ã‚µã‚¤ã‚ºãŒãƒãƒƒãƒ•ã‚¡ã‚ˆã‚Šå°ã•ã„å ´åˆã€å¾Œã‚ã¸ãšã‚‰ã™ã€‚å…ˆé ­ã¯ã‚¼ãƒ­ã§åŸ‹ã‚ã‚‹ã€‚
 		if (len < slen) {
 			u_int diff = slen - len;
 			memmove(sig + diff, sig, len);
@@ -1579,19 +1579,19 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		u_int rlen, slen, len, dlen;
 		BIGNUM *bignum_r, *bignum_s;
 
-		// ƒ_ƒCƒWƒFƒXƒg‚ÌŒvZ
+		// ãƒ€ã‚¤ã‚¸ã‚§ã‚¹ãƒˆã®è¨ˆç®—
 		if (ssh_digest_memory(SSH_DIGEST_SHA1, data, datalen, digest, sizeof(digest)) != 0)
 			goto error;
 		dlen = ssh_digest_bytes(SSH_DIGEST_SHA1);
 
-		// DSA“dq–¼‚ğŒvZ
+		// DSAé›»å­ç½²åã‚’è¨ˆç®—
 		sig = DSA_do_sign(digest, dlen, keypair->dsa);
 		SecureZeroMemory(digest, sizeof(digest));
 		if (sig == NULL) {
 			goto error;
 		}
 
-		// BIGNUM‚©‚çƒoƒCƒiƒŠ’l‚Ö‚Ì•ÏŠ·
+		// BIGNUMã‹ã‚‰ãƒã‚¤ãƒŠãƒªå€¤ã¸ã®å¤‰æ›
 		DSA_SIG_get0(sig, &bignum_r, &bignum_s);
 		rlen = BN_num_bytes(bignum_r);
 		slen = BN_num_bytes(bignum_s);
@@ -1631,13 +1631,13 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		BIGNUM *br, *bs;
 		digest_algorithm hash_alg;
 
-		// ƒ_ƒCƒWƒFƒXƒg‚ÌŒvZ
+		// ãƒ€ã‚¤ã‚¸ã‚§ã‚¹ãƒˆã®è¨ˆç®—
 		hash_alg = keytype_to_hash_alg(keypair->type);
 		if (ssh_digest_memory(hash_alg, data, datalen, digest, sizeof(digest)) != 0)
 			goto error;
 		dlen = ssh_digest_bytes(hash_alg);
 
-		// “dq–¼‚ğŒvZ
+		// é›»å­ç½²åã‚’è¨ˆç®—
 		sig = ECDSA_do_sign(digest, dlen, keypair->ecdsa);
 		SecureZeroMemory(digest, sizeof(digest));
 
@@ -1714,18 +1714,18 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 		s = get_ssh2_hostkey_type_name_from_key(keypair);
 		RSA_get0_key(keypair->rsa, &n, &e, NULL);
 		buffer_put_string(msg, s, strlen(s));
-		buffer_put_bignum2(msg, e); // ŒöŠJw”
-		buffer_put_bignum2(msg, n); // p~q
+		buffer_put_bignum2(msg, e); // å…¬é–‹æŒ‡æ•°
+		buffer_put_bignum2(msg, n); // pÃ—q
 		break;
 	case KEY_DSA: // DSA
 		DSA_get0_pqg(keypair->dsa, &p, &q, &g);
 		DSA_get0_key(keypair->dsa, &pub_key, NULL);
 		s = get_ssh2_hostkey_type_name_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
-		buffer_put_bignum2(msg, p); // ‘f”
-		buffer_put_bignum2(msg, q); // (p-1)‚Ì‘fˆö”
-		buffer_put_bignum2(msg, g); // ®”
-		buffer_put_bignum2(msg, pub_key); // ŒöŠJŒ®
+		buffer_put_bignum2(msg, p); // ç´ æ•°
+		buffer_put_bignum2(msg, q); // (p-1)ã®ç´ å› æ•°
+		buffer_put_bignum2(msg, g); // æ•´æ•°
+		buffer_put_bignum2(msg, pub_key); // å…¬é–‹éµ
 		break;
 	case KEY_ECDSA256: // ECDSA
 	case KEY_ECDSA384:
@@ -2145,7 +2145,7 @@ static void hostkeys_update_ctx_free(struct hostkeys_update_ctx *ctx)
 }
 
 
-// ‹–‰Â‚³‚ê‚½ƒzƒXƒgŒ®ƒAƒ‹ƒSƒŠƒYƒ€‚©‚ğƒ`ƒFƒbƒN‚·‚éB
+// è¨±å¯ã•ã‚ŒãŸãƒ›ã‚¹ãƒˆéµã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‹ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹ã€‚
 //
 // return 1: matched
 //        0: not matched
@@ -2169,12 +2169,12 @@ static int check_hostkey_algorithm(PTInstVar pvar, Key *key)
 // Callback function
 //
 // argument:
-//   key: known_hosts‚É“o˜^‚³‚ê‚Ä‚¢‚éŒ®
-//   _ctx: ƒT[ƒo‚©‚ç‘—‚ç‚ê‚Ä‚«‚½Œ®Œó•âŒQ
+//   key: known_hostsã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹éµ
+//   _ctx: ã‚µãƒ¼ãƒã‹ã‚‰é€ã‚‰ã‚Œã¦ããŸéµå€™è£œç¾¤
 //
 // return:
-//   1: deprecated key‚Ì‚½‚ßAŒÄ‚ÑŒ³‚Åkey—Ìˆæ‚Ì‰ğ•ú‹Ö~B
-//   0: ŒÄ‚ÑŒ³‚Å‚Ìkey—Ìˆæ‚Ì‰ğ•ú‚ª•K—vB
+//   1: deprecated keyã®ãŸã‚ã€å‘¼ã³å…ƒã§keyé ˜åŸŸã®è§£æ”¾ç¦æ­¢ã€‚
+//   0: å‘¼ã³å…ƒã§ã®keyé ˜åŸŸã®è§£æ”¾ãŒå¿…è¦ã€‚
 static int hostkeys_find(Key *key, void *_ctx)
 {
 	struct hostkeys_update_ctx *ctx = (struct hostkeys_update_ctx *)_ctx;
@@ -2182,11 +2182,11 @@ static int hostkeys_find(Key *key, void *_ctx)
 	size_t i;
 	Key **tmp;
 
-	// SSH1‚Í‘ÎÛŠOB
+	// SSH1ã¯å¯¾è±¡å¤–ã€‚
 	if (key->type == KEY_RSA1)
 		goto error;
 
-	// ‚·‚Å‚É“o˜^Ï‚İ‚ÌŒ®‚ª‚È‚¢‚©‚ğ’T‚·B
+	// ã™ã§ã«ç™»éŒ²æ¸ˆã¿ã®éµãŒãªã„ã‹ã‚’æ¢ã™ã€‚
 	for (i = 0; i < ctx->nkeys; i++) {
 		if (HOSTS_compare_public_key(key, ctx->keys[i]) == 1) {
 			ctx->keys_seen[i] = 1;
@@ -2194,7 +2194,7 @@ static int hostkeys_find(Key *key, void *_ctx)
 		}
 	}
 
-	// deprecated‚ÈŒ®‚ÍAŒÃ‚¢‚à‚ÌƒŠƒXƒg‚É“ü‚ê‚Ä‚¨‚­B
+	// deprecatedãªéµã¯ã€å¤ã„ã‚‚ã®ãƒªã‚¹ãƒˆã«å…¥ã‚Œã¦ãŠãã€‚
 	tmp = realloc(ctx->old_keys, (ctx->nold + 1)*sizeof(*ctx->old_keys));
 	if (tmp != NULL) {
 		ctx->old_keys = tmp;
@@ -2362,13 +2362,13 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 {
 	size_t i;
 
-	// "/nosecuritywarning"‚ªw’è‚³‚ê‚Ä‚¢‚éê‡AXV‚ÍˆêØs‚í‚È‚¢B
+	// "/nosecuritywarning"ãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã€æ›´æ–°ã¯ä¸€åˆ‡è¡Œã‚ãªã„ã€‚
 	if (pvar->nocheck_known_hosts) {
 		logputs(LOG_LEVEL_VERBOSE, "Hostkey was not updated because `/nosecuritywarning' option was specified.");
 		goto error;
 	}
 
-	// known_hostsƒtƒ@ƒCƒ‹‚ÌXV‚ğs‚¤‚½‚ßAƒ†[ƒU‚É–â‚¢‡‚í‚¹‚ğs‚¤B
+	// known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã®æ›´æ–°ã‚’è¡Œã†ãŸã‚ã€ãƒ¦ãƒ¼ã‚¶ã«å•ã„åˆã‚ã›ã‚’è¡Œã†ã€‚
 	if (pvar->settings.UpdateHostkeys == SSH_UPDATE_HOSTKEYS_ASK) {
 		INT_PTR dlgresult;
 		HWND cur_active = GetActiveWindow();
@@ -2383,10 +2383,10 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 		}
 	}
 
-	// ŒÃ‚¢ƒL[‚ğ‚·‚×‚Äíœ‚·‚éB
+	// å¤ã„ã‚­ãƒ¼ã‚’ã™ã¹ã¦å‰Šé™¤ã™ã‚‹ã€‚
 	HOSTS_delete_all_hostkeys(pvar);
 
-	// V‚µ‚¢ƒL[‚ğ‚·‚×‚Ä“o˜^‚·‚éB
+	// æ–°ã—ã„ã‚­ãƒ¼ã‚’ã™ã¹ã¦ç™»éŒ²ã™ã‚‹ã€‚
 	for (i = 0; i < ctx->nkeys; i++) {
 		HOSTS_add_host_key(pvar, ctx->keys[i]);
 	}
@@ -2417,11 +2417,11 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 	//            <-----------------size------------------------------->
 	//                              <---------len-------->
 	//
-	// data = payload(N) + padding(X): ƒpƒfƒBƒ“ƒO‚àŠÜ‚ß‚½ƒ{ƒfƒB‚·‚×‚Ä‚ğw‚·B
+	// data = payload(N) + padding(X): ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚‚å«ã‚ãŸãƒœãƒ‡ã‚£ã™ã¹ã¦ã‚’æŒ‡ã™ã€‚
 	data = pvar->ssh_state.payload;
-	// len = size - (padding size + 1): ƒpƒfƒBƒ“ƒO‚ğœ‚­ƒ{ƒfƒBBtype‚ªæ“ª‚ÉŠÜ‚Ü‚ê‚éB
+	// len = size - (padding size + 1): ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ã‚’é™¤ããƒœãƒ‡ã‚£ã€‚typeãŒå…ˆé ­ã«å«ã¾ã‚Œã‚‹ã€‚
 	len = pvar->ssh_state.payloadlen;
-	len--;   // type •ª‚ğœ‚­
+	len--;   // type åˆ†ã‚’é™¤ã
 
 	bsig = buffer_init();
 	if (bsig == NULL)
@@ -2465,8 +2465,8 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 
 		sig = buffer_get_string_msg(bsig, &siglen_i);
 		siglen = siglen_i;
-		// è”²‚«Bhostkey algorithm ‚ğg‚¤‚Ì‚Í RSA ‚Ì‚Ì‚İ‚È‚Ì‚ÅA
-		// ‚Æ‚è‚ ‚¦‚¸ KEY_ALGO_RSA ‚ğw’è‚µ‚Ä‚¨‚­B
+		// æ‰‹æŠœãã€‚hostkey algorithm ã‚’ä½¿ã†ã®ã¯ RSA ã®æ™‚ã®ã¿ãªã®ã§ã€
+		// ã¨ã‚Šã‚ãˆãš KEY_ALGO_RSA ã‚’æŒ‡å®šã—ã¦ãŠãã€‚
 		ret = key_verify(ctx->keys[i], sig, siglen, buffer_ptr(b), buffer_len(b), KEY_ALGO_RSA);
 		free(sig);
 		sig = NULL;
@@ -2495,15 +2495,15 @@ error:
 }
 
 //
-// SSHƒT[ƒoƒzƒXƒgŒ®(known_hosts)‚Ì©“®XV(OpenSSH 6.8 or later: host key rotation support)
+// SSHã‚µãƒ¼ãƒãƒ›ã‚¹ãƒˆéµ(known_hosts)ã®è‡ªå‹•æ›´æ–°(OpenSSH 6.8 or later: host key rotation support)
 //
 // return 1: success
 //        0: fail
 //
 int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 {
-	int success = 1;  // OpenSSH 6.8‚ÌÀ‘•‚Å‚ÍAí‚É¬Œ÷‚Å•Ô‚·‚æ‚¤‚É‚È‚Á‚Ä‚¢‚é‚½‚ßA
-	                  // ‚»‚ê‚É‡‚í‚¹‚Ä Tera Term ‚Å‚à¬Œ÷‚Æ•Ô‚·‚±‚Æ‚É‚·‚éB
+	int success = 1;  // OpenSSH 6.8ã®å®Ÿè£…ã§ã¯ã€å¸¸ã«æˆåŠŸã§è¿”ã™ã‚ˆã†ã«ãªã£ã¦ã„ã‚‹ãŸã‚ã€
+	                  // ãã‚Œã«åˆã‚ã›ã¦ Tera Term ã§ã‚‚æˆåŠŸã¨è¿”ã™ã“ã¨ã«ã™ã‚‹ã€‚
 	int len;
 	size_t i;
 	char *cp, *fp;
@@ -2513,7 +2513,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 	Key *key = NULL, **tmp;
 	unsigned char *outmsg;
 
-	// Tera Term‚Ìİ’è‚ÅA“–ŠY‹@”\‚ÌƒIƒ“ƒIƒt‚ğ§Œä‚Å‚«‚é‚æ‚¤‚É‚·‚éB
+	// Tera Termã®è¨­å®šã§ã€å½“è©²æ©Ÿèƒ½ã®ã‚ªãƒ³ã‚ªãƒ•ã‚’åˆ¶å¾¡ã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹ã€‚
 	if (pvar->settings.UpdateHostkeys == SSH_UPDATE_HOSTKEYS_NO) {
 		logputs(LOG_LEVEL_VERBOSE, "Hostkey was not updated because ts.UpdateHostkeys is disabled.");
 		return 1;
@@ -2548,16 +2548,16 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		          get_ssh2_hostkey_type_name_from_key(key), fp);
 		free(fp);
 
-		// ‹–‰Â‚³‚ê‚½ƒzƒXƒgƒL[ƒAƒ‹ƒSƒŠƒYƒ€‚©‚ğƒ`ƒFƒbƒN‚·‚éB
+		// è¨±å¯ã•ã‚ŒãŸãƒ›ã‚¹ãƒˆã‚­ãƒ¼ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‹ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹ã€‚
 		if (check_hostkey_algorithm(pvar, key) == 0) {
 			logprintf(LOG_LEVEL_VERBOSE, "%s host key is not permitted by ts.HostKeyOrder",
 			          get_ssh2_hostkey_type_name_from_key(key));
 			continue;
 		}
 
-		// Skip certs: Tera Term‚Å‚ÍØ–¾‘”FØ‚Í–¢ƒTƒ|[ƒgB
+		// Skip certs: Tera Termã§ã¯è¨¼æ˜æ›¸èªè¨¼ã¯æœªã‚µãƒãƒ¼ãƒˆã€‚
 
-		// d•¡‚µ‚½ƒL[‚ğóM‚µ‚½‚çƒGƒ‰[‚Æ‚·‚éB
+		// é‡è¤‡ã—ãŸã‚­ãƒ¼ã‚’å—ä¿¡ã—ãŸã‚‰ã‚¨ãƒ©ãƒ¼ã¨ã™ã‚‹ã€‚
 		for (i = 0; i < ctx->nkeys; i++) {
 			if (HOSTS_compare_public_key(key, ctx->keys[i]) == 1) {
 				logprintf(LOG_LEVEL_ERROR, "Received duplicated %s host key",
@@ -2566,7 +2566,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 			}
 		}
 
-		// ƒL[‚ğ“o˜^‚·‚éB
+		// ã‚­ãƒ¼ã‚’ç™»éŒ²ã™ã‚‹ã€‚
 		tmp = realloc(ctx->keys, (ctx->nkeys + 1)*sizeof(*ctx->keys));
 		if (tmp == NULL) {
 			logprintf(LOG_LEVEL_FATAL, "Not memory: realloc ctx->keys %d",
@@ -2591,7 +2591,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 
 	HOSTS_hostkey_foreach(pvar, hostkeys_find, ctx);
 
-	// ƒT[ƒo‚ª‘—‚Á‚Ä‚«‚½Œ®Œó•âŒQ‚©‚çA‚¢‚­‚Â‚ÌŒ®‚ğV‹K’Ç‰Á‚·‚é‚Ì‚©‚ğ”‚¦‚éB
+	// ã‚µãƒ¼ãƒãŒé€ã£ã¦ããŸéµå€™è£œç¾¤ã‹ã‚‰ã€ã„ãã¤ã®éµã‚’æ–°è¦è¿½åŠ ã™ã‚‹ã®ã‹ã‚’æ•°ãˆã‚‹ã€‚
 	ctx->nnew = 0;
 	for (i = 0; i < ctx->nkeys; i++) {
 		if (!ctx->keys_seen[i])
@@ -2600,12 +2600,12 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 	logprintf(LOG_LEVEL_VERBOSE, "%u keys from server: %u new, %u retained. %u to remove",
 		ctx->nkeys, ctx->nnew, ctx->nkeys - ctx->nnew, ctx->nold);
 
-	// V‹K’Ç‰Á‚·‚éŒ®‚Íƒ[ƒ‚¾‚ªAdeprecated‚ÈŒ®‚ª‘¶İ‚·‚éB
+	// æ–°è¦è¿½åŠ ã™ã‚‹éµã¯ã‚¼ãƒ­ã ãŒã€deprecatedãªéµãŒå­˜åœ¨ã™ã‚‹ã€‚
 	if (ctx->nnew == 0 && ctx->nold != 0) {
 		update_known_hosts(pvar, ctx);
 
 	}
-	else if (ctx->nnew != 0) { // V‹K’Ç‰Á‚·‚é‚×‚«Œ®‚ª‘¶İ‚·‚éB
+	else if (ctx->nnew != 0) { // æ–°è¦è¿½åŠ ã™ã‚‹ã¹ãéµãŒå­˜åœ¨ã™ã‚‹ã€‚
 		buffer_clear(b);
 
 		buffer_put_cstring(b, "hostkeys-prove-00@openssh.com");
@@ -2625,9 +2625,9 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		memcpy(outmsg, buffer_ptr(b), len);
 		finish_send_packet(pvar);
 
-		// SSH2_MSG_GLOBAL_REQUEST‚ÌƒŒƒXƒ|ƒ“ƒX‚É‘Î‰‚·‚éƒnƒ“ƒhƒ‰‚ğ“o˜^‚·‚éB
+		// SSH2_MSG_GLOBAL_REQUESTã®ãƒ¬ã‚¹ãƒãƒ³ã‚¹ã«å¯¾å¿œã™ã‚‹ãƒãƒ³ãƒ‰ãƒ©ã‚’ç™»éŒ²ã™ã‚‹ã€‚
 		client_register_global_confirm(client_global_hostkeys_private_confirm, ctx);
-		ctx = NULL;   // callback‚Å‰ğ•ú‚·‚é‚Ì‚ÅA‚±‚±‚Å‚ÍNULL‚Å‚Â‚Ô‚µ‚Ä‚¨‚­B
+		ctx = NULL;   // callbackã§è§£æ”¾ã™ã‚‹ã®ã§ã€ã“ã“ã§ã¯NULLã§ã¤ã¶ã—ã¦ãŠãã€‚
 	}
 
 	success = 1;

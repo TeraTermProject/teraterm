@@ -228,16 +228,16 @@ ssh_keyalgo choose_SSH2_host_key_algorithm(char *server_proposal, char *my_propo
 	return get_ssh2_hostkey_algorithm_from_name(str_keytype);
 }
 
-// Host KeyƒAƒ‹ƒSƒŠƒYƒ€—Dæ‡ˆÊ‚É‰‚¶‚ÄAmyproposal[]‚ğ‘‚«Š·‚¦‚éB
+// Host Keyã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ å„ªå…ˆé †ä½ã«å¿œã˜ã¦ã€myproposal[]ã‚’æ›¸ãæ›ãˆã‚‹ã€‚
 // (2011.2.28 yutaka)
 void SSH2_update_host_key_myproposal(PTInstVar pvar)
 {
-	static char buf[256]; // TODO: malloc()‚É‚·‚×‚«
+	static char buf[256]; // TODO: malloc()ã«ã™ã¹ã
 	int index;
 	int len, i;
 
-	// ’ÊM’†‚ÉŒÄ‚Î‚ê‚é‚Æ‚¢‚¤‚±‚Æ‚ÍƒL[Äì¬
-	// ƒL[Äì¬‚Ìê‡‚Í‰½‚à‚µ‚È‚¢
+	// é€šä¿¡ä¸­ã«å‘¼ã°ã‚Œã‚‹ã¨ã„ã†ã“ã¨ã¯ã‚­ãƒ¼å†ä½œæˆ
+	// ã‚­ãƒ¼å†ä½œæˆã®å ´åˆã¯ä½•ã‚‚ã—ãªã„
 	if (pvar->socket != INVALID_SOCKET) {
 		return;
 	}
@@ -262,7 +262,7 @@ static void SSH2_rsa_pubkey_sign_algo_myproposal(PTInstVar pvar, char *buf, int 
 	int len, i;
 	char *c_str;
 
-	// İ’è‚³‚ê‚½—Dæ‡ˆÊ‚É‰‚¶‚Ä buf ‚É•À‚×‚é
+	// è¨­å®šã•ã‚ŒãŸå„ªå…ˆé †ä½ã«å¿œã˜ã¦ buf ã«ä¸¦ã¹ã‚‹
 	buf[0] = '\0';
 	for (i = 0 ; pvar->settings.RSAPubkeySignAlgorithmOrder[i] != 0 ; i++) {
 		algo = pvar->settings.RSAPubkeySignAlgorithmOrder[i] - '0';
@@ -339,9 +339,9 @@ void normalize_rsa_pubkey_sign_algo_order(char *buf)
 }
 
 /*
- * ssh_keyalgo ‚©‚çAŒ®‚É‘Î‚µ‚Ä•W€‚Å‚Í‚È‚¢ƒ_ƒCƒWƒFƒXƒg•û®–¼‚ğ•Ô‚·
- *   ¡‚Ì‚Æ‚±‚ë rsa-sha2-256, rsa-sha2-512 ‚Ì‚Æ‚«‚¾‚¯ "SHA-256", "SHA-512" ‚ğ•Ô‚·
- *   About ƒ_ƒCƒAƒƒO‚ÅA”ñ•W€‚Ìƒ_ƒCƒWƒFƒXƒg•û®‚Ì‚Æ‚«‚¾‚¯•\¦‚·‚é‚½‚ß
+ * ssh_keyalgo ã‹ã‚‰ã€éµã«å¯¾ã—ã¦æ¨™æº–ã§ã¯ãªã„ãƒ€ã‚¤ã‚¸ã‚§ã‚¹ãƒˆæ–¹å¼åã‚’è¿”ã™
+ *   ä»Šã®ã¨ã“ã‚ rsa-sha2-256, rsa-sha2-512 ã®ã¨ãã ã‘ "SHA-256", "SHA-512" ã‚’è¿”ã™
+ *   About ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§ã€éæ¨™æº–ã®ãƒ€ã‚¤ã‚¸ã‚§ã‚¹ãƒˆæ–¹å¼ã®ã¨ãã ã‘è¡¨ç¤ºã™ã‚‹ãŸã‚
  */
 char* get_ssh2_hostkey_algorithm_digest_name(ssh_keyalgo algo)
 {

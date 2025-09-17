@@ -43,8 +43,8 @@ typedef struct ProtoLog {
 	BOOL (*OpenU8)(struct ProtoLog *pv, const char *fileU8);
 	void (*Close)(struct ProtoLog *pv);
 	/**
-	 *	ƒtƒHƒ‹ƒ_‚ğƒZƒbƒg‚·‚é
-	 *	@param[in]	ƒtƒHƒ‹ƒ_(NULL‚Ì‚Æ‚«ƒtƒHƒ‹ƒ_–¢İ’è‚Æ‚È‚é)
+	 *	ãƒ•ã‚©ãƒ«ãƒ€ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
+	 *	@param[in]	ãƒ•ã‚©ãƒ«ãƒ€(NULLã®ã¨ããƒ•ã‚©ãƒ«ãƒ€æœªè¨­å®šã¨ãªã‚‹)
 	 */
 	void (*SetFolderW)(struct ProtoLog *pv, const wchar_t *folder);
 	size_t (*WriteRaw)(struct ProtoLog *pv, const void *data, size_t len);

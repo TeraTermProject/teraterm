@@ -28,16 +28,16 @@
  */
 
 /*
- "ZMODEM.LOG"‚ÌŒ©•ûF
- @"B"‚Ì’¼Œã‚Ì“ñŒ…‚ª Header Type ‚ðŽ¦‚·B
+ "ZMODEM.LOG"ã®è¦‹æ–¹ï¼š
+ ã€€"B"ã®ç›´å¾Œã®äºŒæ¡ãŒ Header Type ã‚’ç¤ºã™ã€‚
 
 2A 2A 18 42 30 31 30 30 30 30 30 30 32 33 62 65     **.B0100000023be
 35 30 0D 8A 11
-   «
+   â†“
 2A 2A 18 42 30 31 30 30 30 30 30 30 32 33 62 65     **.B0100000023be
 ^^^^^^^^ZPAD+ZPAD+ZDLE
          ^^ZHEX
-            ^^^^ZRINITi2Œ…‚Å•\‚·j
+            ^^^^ZRINITï¼ˆ2æ¡ã§è¡¨ã™ï¼‰
 35 30 0D 8A 11
 ^^^^^CRC
  */
@@ -72,7 +72,7 @@ typedef struct {
 	int TOutInit;
 	int TOutFin;
 	TProtoLog *log;
-	const char *FullName;		// Windowsã‚Ìƒtƒ@ƒCƒ‹–¼ UTF-8
+	const char *FullName;		// Windowsä¸Šã®ãƒ•ã‚¡ã‚¤ãƒ«å UTF-8
 	WORD LogState;
 
 	BOOL FileOpen;
@@ -169,7 +169,7 @@ typedef TZVar *PZVar;
 #define ZCBIN	1
 #define ZCNL	2
 
-/* ƒƒOƒtƒ@ƒCƒ‹—pƒoƒbƒtƒ@ */
+/* ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ç”¨ãƒãƒƒãƒ•ã‚¡ */
 #define LOGBUFSIZE 256
 
 static char recvbuf[LOGBUFSIZE];
@@ -261,7 +261,7 @@ static int ZRead1Byte(PFileVarProto fv, PZVar zv, PComVar cv, LPBYTE b)
 	if (zv->log != NULL) {
 		TProtoLog *log = zv->log;
 		if (zv->LogState == 0) {
-			// Žc‚è‚ÌASCII•\Ž¦‚ðs‚¤
+			// æ®‹ã‚Šã®ASCIIè¡¨ç¤ºã‚’è¡Œã†
 			log->DumpFlush(log);
 
 			show_sendbuf(log);
@@ -288,7 +288,7 @@ static int ZWrite(PFileVarProto fv, PZVar zv, PComVar cv, PCHAR B, int C)
 	if (zv->log != NULL && (i > 0)) {
 		TProtoLog* log = zv->log;
 		if (zv->LogState != 0) {
-			// Žc‚è‚ÌASCII•\Ž¦‚ðs‚¤
+			// æ®‹ã‚Šã®ASCIIè¡¨ç¤ºã‚’è¡Œã†
 			log->DumpFlush(log);
 
 			show_recvbuf(log);
@@ -361,15 +361,15 @@ static void ZShHdr(PZVar zv, BYTE HdrType)
 
 static void ZPutBin(PZVar zv, int *i, BYTE b)
 /*
- * lrzsz ‚Å‚Í ZDLE(CAN), DLE, XON, XOFF, @ ‚Ì’¼Œã‚Ì CR, ‚¨‚æ‚Ñ‚±‚ê‚ç‚Ì
- * MSB ‚ª—§‚Á‚½•¶Žš‚ªƒGƒXƒP[ƒv‘ÎÛ‚Æ‚È‚Á‚Ä‚¢‚éB
- * Tera Term ‚Å‚ÍˆÈ‘O‚Í lrzsz ‚Æ“¯‚¶‚¾‚Á‚½‚æ‚¤‚¾‚ªA‰½‚ç‚©‚Ì——R‚Å
- * CR ‚Íí‚ÉƒGƒXƒP[ƒv‘ÎÛ‚É•Ï‚í‚Á‚Ä‚¢‚éB
+ * lrzsz ã§ã¯ ZDLE(CAN), DLE, XON, XOFF, @ ã®ç›´å¾Œã® CR, ãŠã‚ˆã³ã“ã‚Œã‚‰ã®
+ * MSB ãŒç«‹ã£ãŸæ–‡å­—ãŒã‚¨ã‚¹ã‚±ãƒ¼ãƒ—å¯¾è±¡ã¨ãªã£ã¦ã„ã‚‹ã€‚
+ * Tera Term ã§ã¯ä»¥å‰ã¯ lrzsz ã¨åŒã˜ã ã£ãŸã‚ˆã†ã ãŒã€ä½•ã‚‰ã‹ã®ç†ç”±ã§
+ * CR ã¯å¸¸ã«ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—å¯¾è±¡ã«å¤‰ã‚ã£ã¦ã„ã‚‹ã€‚
  *
- * Ú‘±æ‚©‚ç‚³‚ç‚É ssh / telnet Ú‘±‚µ‚½ê‡‚É–â‘è‚ð‹N‚±‚³‚È‚¢‚æ‚¤A
- * LF ‚¨‚æ‚Ñ GS ‚àƒfƒtƒHƒ‹ƒg‚ÌƒGƒXƒP[ƒv‘ÎÛ‚É‰Á‚¦‚éB
- * ssh: LF ‚Ü‚½‚Í CR ‚Ì’¼Œã‚Ì ~ ‚ªƒGƒXƒP[ƒv•¶Žšˆµ‚¢
- * telnet: GS ‚ªƒGƒXƒP[ƒv•¶Žš
+ * æŽ¥ç¶šå…ˆã‹ã‚‰ã•ã‚‰ã« ssh / telnet æŽ¥ç¶šã—ãŸå ´åˆã«å•é¡Œã‚’èµ·ã“ã•ãªã„ã‚ˆã†ã€
+ * LF ãŠã‚ˆã³ GS ã‚‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—å¯¾è±¡ã«åŠ ãˆã‚‹ã€‚
+ * ssh: LF ã¾ãŸã¯ CR ã®ç›´å¾Œã® ~ ãŒã‚¨ã‚¹ã‚±ãƒ¼ãƒ—æ–‡å­—æ‰±ã„
+ * telnet: GS ãŒã‚¨ã‚¹ã‚±ãƒ¼ãƒ—æ–‡å­—
  */
 {
 	switch (b) {
@@ -588,7 +588,7 @@ static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 	/* timestamp */
 	zv->FileMtime = file->GetFMtime(file, zv->FullName);
 
-	// ƒtƒ@ƒCƒ‹‚Ìƒ^ƒCƒ€ƒXƒ^ƒ“ƒv‚Æƒp[ƒ~ƒbƒVƒ‡ƒ“‚à‘—‚é‚æ‚¤‚É‚µ‚½B(2007.12.20 maya, yutaka)
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—ã¨ãƒ‘ãƒ¼ãƒŸãƒƒã‚·ãƒ§ãƒ³ã‚‚é€ã‚‹ã‚ˆã†ã«ã—ãŸã€‚(2007.12.20 maya, yutaka)
 	_snprintf_s(&(zv->PktOut[zv->PktOutCount]),
 				sizeof(zv->PktOut) - zv->PktOutCount, _TRUNCATE,
 				"%lu %lo %o", zv->FileSize, zv->FileMtime,
@@ -782,7 +782,7 @@ static BOOL ZInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	case IdZSend:
 		zv->ZState = Z_SendInit;
 
-		// ƒtƒ@ƒCƒ‹‘—MŠJŽn‘O‚ÉA"rz"‚ðŽ©“®“I‚ÉŒÄ‚Ño‚·B(2007.12.21 yutaka)
+		// ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡é–‹å§‹å‰ã«ã€"rz"ã‚’è‡ªå‹•çš„ã«å‘¼ã³å‡ºã™ã€‚(2007.12.21 yutaka)
 		if (ts->ZModemRcvCommand[0] != '\0') {
 			ZWrite(fv, zv, cv, ts->ZModemRcvCommand,
 				   strlen(ts->ZModemRcvCommand));
@@ -956,8 +956,8 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv, PComVar cv)
 	case ZSKIP:
 		if (zv->FileOpen) {
 			file->Close(file);
-			// ƒT[ƒo‘¤‚É‘¶Ý‚·‚éƒtƒ@ƒCƒ‹‚ð‘—M‚µ‚æ‚¤‚Æ‚·‚é‚ÆAZParseRInit()‚Å“ñdclose‚É‚È‚é‚½‚ßA
-			// ‚±‚±‚Åƒtƒ‰ƒO‚ð—Ž‚Æ‚µ‚Ä‚¨‚­B (2007.12.20 yutaka)
+			// ã‚µãƒ¼ãƒå´ã«å­˜åœ¨ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é€ä¿¡ã—ã‚ˆã†ã¨ã™ã‚‹ã¨ã€ZParseRInit()ã§äºŒé‡closeã«ãªã‚‹ãŸã‚ã€
+			// ã“ã“ã§ãƒ•ãƒ©ã‚°ã‚’è½ã¨ã—ã¦ãŠãã€‚ (2007.12.20 yutaka)
 			zv->FileOpen = FALSE;
 		}
 		ZStoHdr(zv, 0);

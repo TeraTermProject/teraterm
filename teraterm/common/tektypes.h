@@ -87,7 +87,7 @@ typedef struct {
   int ParseMode;
   int SelectCodeFlag;
 
-  LOGFONT reserve_TEKlf;	// LOGFONTW �֐؂�ւ�
+  LOGFONT reserve_TEKlf;	// LOGFONTW へ切り替え
   HFONT TEKFont[4];
   HFONT OldMemFont;
   BOOL AdjustSize, ScaleFont;

@@ -15,24 +15,24 @@
 
 namespace yebisuya {
 
-// ‰Â•Ï’·‚Ì•¶š—ñ‚ğˆµ‚¤‚½‚ß‚ÌƒNƒ‰ƒXB
+// å¯å¤‰é•·ã®æ–‡å­—åˆ—ã‚’æ‰±ã†ãŸã‚ã®ã‚¯ãƒ©ã‚¹ã€‚
 class StringBuffer {
 private:
-	// •¶š—ñ‚ğŠi”[‚·‚éƒoƒbƒtƒ@B
+	// æ–‡å­—åˆ—ã‚’æ ¼ç´ã™ã‚‹ãƒãƒƒãƒ•ã‚¡ã€‚
 	char* buffer;
-	// Œ»İ—LŒø‚È•¶š—ñ‚Ì’·‚³B
+	// ç¾åœ¨æœ‰åŠ¹ãªæ–‡å­—åˆ—ã®é•·ã•ã€‚
 	size_t validLength;
-	// ƒoƒbƒtƒ@‚Ì‘å‚«‚³B
+	// ãƒãƒƒãƒ•ã‚¡ã®å¤§ãã•ã€‚
 	size_t bufferSize;
 	enum {
-		// ƒoƒbƒtƒ@‚ğL‚°‚éÛ‚Ég—p‚·‚éƒTƒCƒYB
+		// ãƒãƒƒãƒ•ã‚¡ã‚’åºƒã’ã‚‹éš›ã«ä½¿ç”¨ã™ã‚‹ã‚µã‚¤ã‚ºã€‚
 		INIT_CAPACITY = 16,
 	};
-	// ƒoƒbƒtƒ@‚ğ‰Šú‰»‚·‚éB
-	// ˆø”:
-	//	source	‰Šú•¶š—ñB
-	//	length	‰Šú•¶š—ñ‚Ì’·‚³B
-	//	capacity	ƒoƒbƒtƒ@‚Ì‰ŠúƒTƒCƒYB
+	// ãƒãƒƒãƒ•ã‚¡ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	source	åˆæœŸæ–‡å­—åˆ—ã€‚
+	//	length	åˆæœŸæ–‡å­—åˆ—ã®é•·ã•ã€‚
+	//	capacity	ãƒãƒƒãƒ•ã‚¡ã®åˆæœŸã‚µã‚¤ã‚ºã€‚
 	void init(const char* source, size_t length, size_t capacity) {
 		if ((capacity != 0 || length != 0) && capacity < length + INIT_CAPACITY)
 			capacity = length + INIT_CAPACITY;
@@ -49,48 +49,48 @@ private:
 		memset(buffer + validLength, '\0', bufferSize - validLength);
 	}
 public:
-	// ƒfƒtƒHƒ‹ƒgƒRƒ“ƒXƒgƒ‰ƒNƒ^B
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 	StringBuffer() {
 		init(NULL, 0, 0);
 	}
-	// ƒoƒbƒtƒ@‚Ì‰ŠúƒTƒCƒY‚ğw’è‚·‚éƒRƒ“ƒXƒgƒ‰ƒNƒ^B
-	// ˆø”:
-	//	capacity ƒoƒbƒtƒ@‚Ì‰ŠúƒTƒCƒYB
+	// ãƒãƒƒãƒ•ã‚¡ã®åˆæœŸã‚µã‚¤ã‚ºã‚’æŒ‡å®šã™ã‚‹ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
+	// å¼•æ•°:
+	//	capacity ãƒãƒƒãƒ•ã‚¡ã®åˆæœŸã‚µã‚¤ã‚ºã€‚
 	StringBuffer(size_t capacity) {
 		init(NULL, 0, capacity);
 	}
-	// ƒoƒbƒtƒ@‚Ì‰Šú•¶š—ñ‚ğw’è‚·‚éƒRƒ“ƒXƒgƒ‰ƒNƒ^B
-	// ˆø”:
-	//	source	‰Šú•¶š—ñB
+	// ãƒãƒƒãƒ•ã‚¡ã®åˆæœŸæ–‡å­—åˆ—ã‚’æŒ‡å®šã™ã‚‹ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
+	// å¼•æ•°:
+	//	source	åˆæœŸæ–‡å­—åˆ—ã€‚
 	StringBuffer(const char* source) {
 		init(source, strlen(source), 0);
 	}
-	// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^B
-	// ˆø”:
-	//	source	‰Šú•¶š—ñB
+	// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
+	// å¼•æ•°:
+	//	source	åˆæœŸæ–‡å­—åˆ—ã€‚
 	StringBuffer(const StringBuffer& source) {
 		init(source.buffer, source.validLength, source.bufferSize);
 	}
-	// ƒfƒXƒgƒ‰ƒNƒ^B
+	// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 	~StringBuffer() {
 		delete[] buffer;
 	}
 
-	// Œ»İ—LŒø‚È•¶š—ñ‚Ì’·‚³‚ğæ“¾‚·‚éB
-	// •Ô’l:
-	//	—LŒø‚È•¶š—ñ‚Ì’·‚³B
+	// ç¾åœ¨æœ‰åŠ¹ãªæ–‡å­—åˆ—ã®é•·ã•ã‚’å–å¾—ã™ã‚‹ã€‚
+	// è¿”å€¤:
+	//	æœ‰åŠ¹ãªæ–‡å­—åˆ—ã®é•·ã•ã€‚
 	size_t length()const {
 		return validLength;
 	}
-	// ƒoƒbƒtƒ@‚ÌƒTƒCƒY‚ğæ“¾‚·‚éB
-	// •Ô’l:
-	//	ƒoƒbƒtƒ@‚ÌƒTƒCƒYB
+	// ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹ã€‚
+	// è¿”å€¤:
+	//	ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã€‚
 	size_t capacity()const {
 		return bufferSize;
 	}
-	// ƒoƒbƒtƒ@‚ÌƒTƒCƒY‚ğw’è‚Ì’·‚³‚ªû‚Ü‚é‚æ‚¤‚É’²ß‚·‚éB
-	// ˆø”:
-	//	newLength	’²ß‚·‚é’·‚³B
+	// ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã‚’æŒ‡å®šã®é•·ã•ãŒåã¾ã‚‹ã‚ˆã†ã«èª¿ç¯€ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	newLength	èª¿ç¯€ã™ã‚‹é•·ã•ã€‚
 	void ensureCapacity(size_t newLength) {
 		if (bufferSize < newLength) {
 			char* oldBuffer = buffer;
@@ -98,27 +98,27 @@ public:
 			delete[] oldBuffer;
 		}
 	}
-	// —LŒø‚È•¶š—ñ’·‚ğ•ÏX‚·‚éB
-	// ˆø”:
-	//	newLength	V‚µ‚¢•¶š—ñ’·B
+	// æœ‰åŠ¹ãªæ–‡å­—åˆ—é•·ã‚’å¤‰æ›´ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	newLength	æ–°ã—ã„æ–‡å­—åˆ—é•·ã€‚
 	void setLength(size_t newLength) {
 		if (validLength < newLength)
 			ensureCapacity(newLength);
 		validLength = newLength;
 	}
-	// w’è‚ÌˆÊ’u‚Ì•¶š‚ğæ“¾‚·‚éB
-	// ˆø”:
-	//	index	•¶š‚ÌˆÊ’uB
-	// •Ô’l:
-	//	w’è‚ÌˆÊ’u‚Ì•¶šB
+	// æŒ‡å®šã®ä½ç½®ã®æ–‡å­—ã‚’å–å¾—ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	index	æ–‡å­—ã®ä½ç½®ã€‚
+	// è¿”å€¤:
+	//	æŒ‡å®šã®ä½ç½®ã®æ–‡å­—ã€‚
 	char charAt(size_t index)const {
 		return index < validLength ? buffer[index] : '\0';
 	}
-	// w’è‚ÌˆÊ’u‚Ì•¶š‚ğæ“¾‚·‚éB
-	// ˆø”:
-	//	index	•¶š‚ÌˆÊ’uB
-	// •Ô’l:
-	//	w’è‚ÌˆÊ’u‚Ì•¶š‚ÌQÆB
+	// æŒ‡å®šã®ä½ç½®ã®æ–‡å­—ã‚’å–å¾—ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	index	æ–‡å­—ã®ä½ç½®ã€‚
+	// è¿”å€¤:
+	//	æŒ‡å®šã®ä½ç½®ã®æ–‡å­—ã®å‚ç…§ã€‚
 	char& charAt(size_t index) {
 		if (index >= validLength) {
 			ensureCapacity(validLength + 1);
@@ -126,36 +126,36 @@ public:
 		}
 		return buffer[index];
 	}
-	// w’è‚ÌˆÊ’u‚Ì•¶š‚ğ•ÏX‚·‚éB
-	// ˆø”:
-	//	index	•ÏX‚·‚é•¶š‚ÌˆÊ’uB
-	//	chr	•ÏX‚·‚é•¶šB
+	// æŒ‡å®šã®ä½ç½®ã®æ–‡å­—ã‚’å¤‰æ›´ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	index	å¤‰æ›´ã™ã‚‹æ–‡å­—ã®ä½ç½®ã€‚
+	//	chr	å¤‰æ›´ã™ã‚‹æ–‡å­—ã€‚
 	void setCharAt(int index, char chr) {
 		charAt(index) = chr;
 	}
-	// •¶š‚ğ’Ç‰Á‚·‚éB
-	// ˆø”:
-	//	chr	’Ç‰Á‚·‚é•¶šB
-	// •Ô’l:
-	//	’Ç‰ÁŒ‹‰ÊB
+	// æ–‡å­—ã‚’è¿½åŠ ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	chr	è¿½åŠ ã™ã‚‹æ–‡å­—ã€‚
+	// è¿”å€¤:
+	//	è¿½åŠ çµæœã€‚
 	StringBuffer& append(char chr) {
 		charAt(validLength) = chr;
 		return *this;
 	}
-	// •¶š—ñ‚ğ’Ç‰Á‚·‚éB
-	// ˆø”:
-	//	source	’Ç‰Á‚·‚é•¶š—ñB
-	// •Ô’l:
-	//	’Ç‰ÁŒ‹‰ÊB
+	// æ–‡å­—åˆ—ã‚’è¿½åŠ ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	source	è¿½åŠ ã™ã‚‹æ–‡å­—åˆ—ã€‚
+	// è¿”å€¤:
+	//	è¿½åŠ çµæœã€‚
 	StringBuffer& append(const char* source) {
 		return append(source, strlen(source));
 	}
-	// •¶š—ñ‚ğ’Ç‰Á‚·‚éB
-	// ˆø”:
-	//	source	’Ç‰Á‚·‚é•¶š—ñB
-	//	length	’Ç‰Á‚·‚é•¶š—ñ‚Ì’·‚³B
-	// •Ô’l:
-	//	’Ç‰ÁŒ‹‰ÊB
+	// æ–‡å­—åˆ—ã‚’è¿½åŠ ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	source	è¿½åŠ ã™ã‚‹æ–‡å­—åˆ—ã€‚
+	//	length	è¿½åŠ ã™ã‚‹æ–‡å­—åˆ—ã®é•·ã•ã€‚
+	// è¿”å€¤:
+	//	è¿½åŠ çµæœã€‚
 	StringBuffer& append(const char* source, size_t length) {
 		size_t oldLength = validLength;
 		ensureCapacity(validLength + length);
@@ -163,20 +163,20 @@ public:
 		validLength += length;
 		return *this;
 	}
-	// w’è‚ÌˆÊ’u‚Ì•¶š‚ğíœ‚·‚éB
-	// ˆø”:
-	//	start	íœ‚·‚éˆÊ’uB
-	// •Ô’l:
-	//	íœŒ‹‰ÊB
+	// æŒ‡å®šã®ä½ç½®ã®æ–‡å­—ã‚’å‰Šé™¤ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	start	å‰Šé™¤ã™ã‚‹ä½ç½®ã€‚
+	// è¿”å€¤:
+	//	å‰Šé™¤çµæœã€‚
 	StringBuffer& remove(size_t index) {
 		return remove(index, index + 1);
 	}
-	// w’è‚ÌˆÊ’u‚Ì•¶š—ñ‚ğíœ‚·‚éB
-	// ˆø”:
-	//	start	íœ‚·‚éæ“ªˆÊ’uB
-	//	end	íœ‚·‚éI‚í‚è‚ÌˆÊ’uB
-	// •Ô’l:
-	//	íœŒ‹‰ÊB
+	// æŒ‡å®šã®ä½ç½®ã®æ–‡å­—åˆ—ã‚’å‰Šé™¤ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	start	å‰Šé™¤ã™ã‚‹å…ˆé ­ä½ç½®ã€‚
+	//	end	å‰Šé™¤ã™ã‚‹çµ‚ã‚ã‚Šã®ä½ç½®ã€‚
+	// è¿”å€¤:
+	//	å‰Šé™¤çµæœã€‚
 	StringBuffer& remove(size_t start, size_t end) {
 		if (start < end) {
 			if (end < validLength){
@@ -188,13 +188,13 @@ public:
 		}
 		return *this;
 	}
-	// w’è‚ÌˆÊ’u‚Ì•¶š—ñ‚ğ’uŠ·‚·‚éB
-	// ˆø”:
-	//	start	’uŠ·‚·‚éæ“ªˆÊ’uB
-	//	end	’uŠ·‚·‚éI‚í‚è‚ÌˆÊ’uB
-	//	source	’uŠ·‚·‚é•¶š—ñB
-	// •Ô’l:
-	//	’uŠ·Œ‹‰ÊB
+	// æŒ‡å®šã®ä½ç½®ã®æ–‡å­—åˆ—ã‚’ç½®æ›ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	start	ç½®æ›ã™ã‚‹å…ˆé ­ä½ç½®ã€‚
+	//	end	ç½®æ›ã™ã‚‹çµ‚ã‚ã‚Šã®ä½ç½®ã€‚
+	//	source	ç½®æ›ã™ã‚‹æ–‡å­—åˆ—ã€‚
+	// è¿”å€¤:
+	//	ç½®æ›çµæœã€‚
 	StringBuffer& replace(size_t start, size_t end, const char* source) {
 		if (end > validLength)
 			end = validLength;
@@ -207,50 +207,50 @@ public:
 		}
 		return *this;
 	}
-	// w’è‚ÌˆÊ’u‚Ì•¶š—ñ‚ğæ“¾‚·‚éB
-	// ˆø”:
-	//	start	æ“¾‚·‚é•¶š—ñ‚Ìæ“ªˆÊ’uB
-	// •Ô’l:
-	//	w’è‚ÌˆÊ’u‚Ì•¶š—ñB
+	// æŒ‡å®šã®ä½ç½®ã®æ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	start	å–å¾—ã™ã‚‹æ–‡å­—åˆ—ã®å…ˆé ­ä½ç½®ã€‚
+	// è¿”å€¤:
+	//	æŒ‡å®šã®ä½ç½®ã®æ–‡å­—åˆ—ã€‚
 	String substring(size_t index)const {
 		return String(buffer + index, validLength - index);
 	}
-	// w’è‚ÌˆÊ’u‚Ì•¶š—ñ‚ğæ“¾‚·‚éB
-	// ˆø”:
-	//	start	æ“¾‚·‚é•¶š—ñ‚Ìæ“ªˆÊ’uB
-	//	end	æ“¾‚·‚é•¶š—ñ‚ÌI‚í‚è‚ÌˆÊ’uB
-	// •Ô’l:
-	//	w’è‚ÌˆÊ’u‚Ì•¶š—ñB
+	// æŒ‡å®šã®ä½ç½®ã®æ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	start	å–å¾—ã™ã‚‹æ–‡å­—åˆ—ã®å…ˆé ­ä½ç½®ã€‚
+	//	end	å–å¾—ã™ã‚‹æ–‡å­—åˆ—ã®çµ‚ã‚ã‚Šã®ä½ç½®ã€‚
+	// è¿”å€¤:
+	//	æŒ‡å®šã®ä½ç½®ã®æ–‡å­—åˆ—ã€‚
 	String substring(size_t start, size_t end)const {
 		if (end > validLength)
 			end = validLength;
 		return String(buffer + start, end - start);
 	}
-	// w’è‚ÌˆÊ’u‚É•¶š‚ğ‘}“ü‚·‚éB
-	// ˆø”:
-	//	index	‘}“ü‚·‚éˆÊ’uB
-	//	source	‘}“ü‚·‚é•¶šB
-	// •Ô’l:
-	//	‘}“üŒ‹‰ÊB
+	// æŒ‡å®šã®ä½ç½®ã«æ–‡å­—ã‚’æŒ¿å…¥ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	index	æŒ¿å…¥ã™ã‚‹ä½ç½®ã€‚
+	//	source	æŒ¿å…¥ã™ã‚‹æ–‡å­—ã€‚
+	// è¿”å€¤:
+	//	æŒ¿å…¥çµæœã€‚
 	StringBuffer& insert(size_t index, char chr) {
 		return insert(index, &chr, 1);
 	}
-	// w’è‚ÌˆÊ’u‚É•¶š—ñ‚ğ‘}“ü‚·‚éB
-	// ˆø”:
-	//	index	‘}“ü‚·‚éˆÊ’uB
-	//	source	‘}“ü‚·‚é•¶š—ñB
-	// •Ô’l:
-	//	‘}“üŒ‹‰ÊB
+	// æŒ‡å®šã®ä½ç½®ã«æ–‡å­—åˆ—ã‚’æŒ¿å…¥ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	index	æŒ¿å…¥ã™ã‚‹ä½ç½®ã€‚
+	//	source	æŒ¿å…¥ã™ã‚‹æ–‡å­—åˆ—ã€‚
+	// è¿”å€¤:
+	//	æŒ¿å…¥çµæœã€‚
 	StringBuffer& insert(size_t index, const char* source) {
 		return insert(index, source, strlen(source));
 	}
-	// w’è‚ÌˆÊ’u‚É•¶š—ñ‚ğ‘}“ü‚·‚éB
-	// ˆø”:
-	//	index	‘}“ü‚·‚éˆÊ’uB
-	//	source	‘}“ü‚·‚é•¶š—ñB
-	//	length	•¶š—ñ‚Ì’·‚³B
-	// •Ô’l:
-	//	‘}“üŒ‹‰ÊB
+	// æŒ‡å®šã®ä½ç½®ã«æ–‡å­—åˆ—ã‚’æŒ¿å…¥ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	index	æŒ¿å…¥ã™ã‚‹ä½ç½®ã€‚
+	//	source	æŒ¿å…¥ã™ã‚‹æ–‡å­—åˆ—ã€‚
+	//	length	æ–‡å­—åˆ—ã®é•·ã•ã€‚
+	// è¿”å€¤:
+	//	æŒ¿å…¥çµæœã€‚
 	StringBuffer& insert(size_t index, const char* source, size_t length) {
 		if (index >= validLength)
 			index = validLength;
@@ -263,9 +263,9 @@ public:
 		validLength += length;
 		return *this;
 	}
-	// •¶š—ñ‚ğ”½“]‚·‚éB
-	// •Ô’l:
-	//	”½“]Œ‹‰ÊB
+	// æ–‡å­—åˆ—ã‚’åè»¢ã™ã‚‹ã€‚
+	// è¿”å€¤:
+	//	åè»¢çµæœã€‚
 	StringBuffer& reverse() {
 		char* temporary = (char*) alloca(sizeof (char) * validLength);
 		char* dst = temporary + validLength;
@@ -282,29 +282,29 @@ public:
 		memcpy(buffer, temporary, validLength);
 		return *this;
 	}
-	// •¶š—ñ‚ğæ“¾‚·‚éB
-	// •Ô’l:
-	//	Œ»İİ’è‚³‚ê‚Ä‚¢‚é•¶š—ñB
+	// æ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹ã€‚
+	// è¿”å€¤:
+	//	ç¾åœ¨è¨­å®šã•ã‚Œã¦ã„ã‚‹æ–‡å­—åˆ—ã€‚
 	String toString()const {
 		return String(buffer, validLength);
 	}
 
-	// ˆê•¶š‚¾‚¯‚Ì•¶š—ñ‚É•ÏX‚·‚éB
-	// ˆø”:
-	//	•ÏX‚·‚éˆê•¶šB
-	// •Ô’l:
-	//	•ÏXŒ‹‰ÊB
+	// ä¸€æ–‡å­—ã ã‘ã®æ–‡å­—åˆ—ã«å¤‰æ›´ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	å¤‰æ›´ã™ã‚‹ä¸€æ–‡å­—ã€‚
+	// è¿”å€¤:
+	//	å¤‰æ›´çµæœã€‚
 	StringBuffer& set(char chr) {
 		ensureCapacity(1);
 		buffer[0] = chr;
 		validLength = 1;
 		return *this;
 	}
-	// w’è‚Ì•¶š—ñ‚É•ÏX‚·‚éB
-	// ˆø”:
-	//	source	•ÏX‚·‚é•¶š—ñB
-	// •Ô’l:
-	//	•ÏXŒ‹‰ÊB
+	// æŒ‡å®šã®æ–‡å­—åˆ—ã«å¤‰æ›´ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	source	å¤‰æ›´ã™ã‚‹æ–‡å­—åˆ—ã€‚
+	// è¿”å€¤:
+	//	å¤‰æ›´çµæœã€‚
 	StringBuffer& set(const char* source) {
 		size_t length = strlen(source);
 		ensureCapacity(validLength = length);
@@ -312,53 +312,53 @@ public:
 		return *this;
 	}
 
-	// char*‚É•ÏŠ·‚·‚éƒLƒƒƒXƒg‰‰ZqB
-	// ƒoƒbƒtƒ@‚ÌƒAƒhƒŒƒX‚ğæ“¾‚·‚éB
-	// •Ô’l:
-	//	ƒoƒbƒtƒ@‚ÌƒAƒhƒŒƒXB
+	// char*ã«å¤‰æ›ã™ã‚‹ã‚­ãƒ£ã‚¹ãƒˆæ¼”ç®—å­ã€‚
+	// ãƒãƒƒãƒ•ã‚¡ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã™ã‚‹ã€‚
+	// è¿”å€¤:
+	//	ãƒãƒƒãƒ•ã‚¡ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã€‚
 	operator char*() {
 		return buffer;
 	}
-	// String‚É•ÏŠ·‚·‚éƒLƒƒƒXƒg‰‰ZqB
-	// •¶š—ñ‚ğæ“¾‚·‚éB
-	// •Ô’l:
-	//	Œ»İİ’è‚³‚ê‚Ä‚¢‚é•¶š—ñB
+	// Stringã«å¤‰æ›ã™ã‚‹ã‚­ãƒ£ã‚¹ãƒˆæ¼”ç®—å­ã€‚
+	// æ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹ã€‚
+	// è¿”å€¤:
+	//	ç¾åœ¨è¨­å®šã•ã‚Œã¦ã„ã‚‹æ–‡å­—åˆ—ã€‚
 	operator String()const {
 		return toString();
 	}
-	// ‘ã“ü‰‰ZqB
-	// ˆê•¶š‚¾‚¯‚Ì•¶š—ñ‚É•ÏX‚·‚éB
-	// ˆø”:
-	//	ch	•ÏX‚·‚éˆê•¶šB
-	// •Ô’l:
-	//	‘ã“üŒ‹‰ÊB
+	// ä»£å…¥æ¼”ç®—å­ã€‚
+	// ä¸€æ–‡å­—ã ã‘ã®æ–‡å­—åˆ—ã«å¤‰æ›´ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	ch	å¤‰æ›´ã™ã‚‹ä¸€æ–‡å­—ã€‚
+	// è¿”å€¤:
+	//	ä»£å…¥çµæœã€‚
 	StringBuffer& operator=(char ch) {
 		return set(ch);
 	}
-	// ‘ã“ü‰‰ZqB
-	// w’è‚Ì•¶š—ñ‚É•ÏX‚·‚éB
-	// ˆø”:
-	//	source	•ÏX‚·‚é•¶š—ñB
-	// •Ô’l:
-	//	‘ã“üŒ‹‰ÊB
+	// ä»£å…¥æ¼”ç®—å­ã€‚
+	// æŒ‡å®šã®æ–‡å­—åˆ—ã«å¤‰æ›´ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	source	å¤‰æ›´ã™ã‚‹æ–‡å­—åˆ—ã€‚
+	// è¿”å€¤:
+	//	ä»£å…¥çµæœã€‚
 	StringBuffer& operator=(const char* source) {
 		return set(source);
 	}
-	// ˜AŒ‹‘ã“ü‰‰ZqB
-	// •¶š‚ğ’Ç‰Á‚·‚éB
-	// ˆø”:
-	//	ch	’Ç‰Á‚·‚é•¶šB
-	// •Ô’l:
-	//	‘ã“üŒ‹‰ÊB
+	// é€£çµä»£å…¥æ¼”ç®—å­ã€‚
+	// æ–‡å­—ã‚’è¿½åŠ ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	ch	è¿½åŠ ã™ã‚‹æ–‡å­—ã€‚
+	// è¿”å€¤:
+	//	ä»£å…¥çµæœã€‚
 	StringBuffer& operator+=(char ch) {
 		return append(ch);
 	}
-	// ˜AŒ‹‘ã“ü‰‰ZqB
-	// •¶š—ñ‚ğ’Ç‰Á‚·‚éB
-	// ˆø”:
-	//	source	’Ç‰Á‚·‚é•¶š—ñB
-	// •Ô’l:
-	//	‘ã“üŒ‹‰ÊB
+	// é€£çµä»£å…¥æ¼”ç®—å­ã€‚
+	// æ–‡å­—åˆ—ã‚’è¿½åŠ ã™ã‚‹ã€‚
+	// å¼•æ•°:
+	//	source	è¿½åŠ ã™ã‚‹æ–‡å­—åˆ—ã€‚
+	// è¿”å€¤:
+	//	ä»£å…¥çµæœã€‚
 	StringBuffer& operator+=(const char* source) {
 		return append(source);
 	}

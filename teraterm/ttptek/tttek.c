@@ -397,7 +397,7 @@ void PASCAL TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H)
   }
 
   tk->ScaleFont = FALSE;
-  tk->TEKlf = logfont;	// GraphText() tekesc.c ‚ÅQÆ
+  tk->TEKlf = logfont;	// GraphText() tekesc.c ã§å‚ç…§
 }
 
 int PASCAL TEKParse(PTEKVar tk, PTTSet ts, PComVar cv)

@@ -66,7 +66,7 @@
 
 #define MaxStrLen (LONG)512
 
-BOOL DDELog = FALSE;		// macro (DDE) ���L�����ǂ���������
+BOOL DDELog = FALSE;		// macro (DDE) が有効かどうかを示す
 char TopicName[21] = "";
 static HCONV ConvH = 0;
 BOOL AdvFlag = FALSE;
@@ -101,8 +101,8 @@ static int cv_DStart;
 static int cv_DCount;
 
 /**
- *	�}�N���ւ̑��M�o�b�t�@��1byte�݂���
- *		�o�b�t�@�t���̎��͌Â����̂���̂Ă���
+ *	マクロへの送信バッファへ1byteつみこむ
+ *		バッファフルの時は古いものから捨てられる
  */
 void DDEPut1(BYTE b)
 {
@@ -164,7 +164,7 @@ static void BringupMacroWindow(BOOL flash_flag)
 		hwnd = GetNextWindow(hwnd, GW_HWNDNEXT);
 	}
 
-	// �}�N���E�B���h�E�{��
+	// マクロウィンドウ本体
 	ShowWindow(HWndDdeCli, SW_NORMAL);
 	SetForegroundWindow(HWndDdeCli);
 	BringWindowToTop(HWndDdeCli);
@@ -280,7 +280,7 @@ static LONG DDEGetDataLen()
 }
 
 /**
- *	���M�o�b�t�@�Ɏc���Ă���f�[�^���擾
+ *	送信バッファに残っているデータ数取得
  */
 int DDEGetCount(void)
 {
@@ -343,11 +343,11 @@ static HDDEDATA AcceptRequest(HSZ ItemHSz)
 }
 
 /**
- *	�o�C�i���f�[�^���ǂ������肷��
+ *	バイナリデータかどうか判定する
  *
- *	@retval		TRUE	�o�C�i���f�[�^�Ɖ���
+ *	@retval		TRUE	バイナリデータと解釈
  *
- *	�f�[�^���� 0x20 �����̒l���������ꍇ�A�o�C�i���f�[�^�Ɖ��߂���
+ *	データ内に 0x20 未満の値があった場合、バイナリデータと解釈する
  */
 static BOOL IsBinaryData(const uint8_t *data, size_t len)
 {
@@ -367,25 +367,25 @@ static BOOL IsBinaryData(const uint8_t *data, size_t len)
 
 static void SendData(const char *DataPtr, DWORD DataSize)
 {
-	// �}�N���R�}���h "send" �ő��M����ƁA0x00����0xff�܂Ŏ��R�ɑ��M�ł���
-	// DataPtr �̃f�[�^�̓e�L�X�g�ł͂Ȃ����Ƃ�����̂ōl�����K�v
+	// マクロコマンド "send" で送信すると、0x00から0xffまで自由に送信できる
+	// DataPtr のデータはテキストではないこともあるので考慮が必要
 	wchar_t *strW = NULL;
 	BOOL binary_data = IsBinaryData(DataPtr, DataSize);
 	if (binary_data == FALSE) {
 		strW = ToWcharU8(DataPtr);
 		if (strW == NULL) {
-			// UTF-16LE�֕ϊ��ł��Ȃ��Ȃ�A(����)�o�C�i���ł͂Ȃ��e�L�X�g
+			// UTF-16LEへ変換できないなら、(多分)バイナリではなくテキスト
 			binary_data = TRUE;
 		}
 		else {
-			// UTF-16 -> UTF-8 �ɕϊ��A�ēx��r
+			// UTF-16 -> UTF-8 に変換、再度比較
 			char *strU8 = ToU8W(strW);
 			if (strU8 == NULL) {
 				binary_data = TRUE;
 			}
 			else {
 				if (strcmp(strU8, DataPtr) != 0) {
-					// �قȂ��Ă�����o�C�i���Ɣ���
+					// 異なっていたらバイナリと判定
 					binary_data = TRUE;
 				}
 				free(strU8);
@@ -443,7 +443,7 @@ static void SendBinary(const void *data_ptr, DWORD data_size)
 		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
 		SendMemStart(sm);
 	}
-	// free(p); ���M������Ɏ����� free() �����
+	// free(p); 送信完了後に自動で free() される
 }
 
 static HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
@@ -453,9 +453,9 @@ static HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
 	DWORD DataSize;
 	HDDEDATA result;
 
-	// �A������XTYP_POKE���N���C�A���g�i�}�N���j���瑗���Ă���ƁA�T�[�o�i�{�́j�����܂�
-	// �R�}���h�̓\��t�����s���Ă��Ȃ��ꍇ�ATalkStatus�� IdTalkCB �ɂȂ̂ŁADDE_FNOTPROCESSED��
-	// �Ԃ����Ƃ�����BDDE_FBUSY�ɕύX�B
+	// 連続してXTYP_POKEがクライアント（マクロ）から送られてくると、サーバ（本体）側がまだ
+	// コマンドの貼り付けを行っていない場合、TalkStatusは IdTalkCB になので、DDE_FNOTPROCESSEDを
+	// 返すことがある。DDE_FBUSYに変更。
 	// (2006.11.6 yutaka)
 	if (TalkStatus != IdTalkKeyb  && TalkStatus != IdTalkSendMem)
 		return (HDDEDATA)DDE_FBUSY;
@@ -494,7 +494,7 @@ static WORD HexStr2Word(PCHAR Str)
 }
 
 /**
- *	���M�����R�[���o�b�N
+ *	送信完了コールバック
  */
 static void SendCallback(void *callback_data)
 {
@@ -502,9 +502,9 @@ static void SendCallback(void *callback_data)
 	EndDdeCmnd(0);
 }
 
-// �L���� DdeAccessData() ���g���Ď�M�f�[�^�ɃA�N�Z�X����
-// ������ DdeGetData() ���g���Ď�M�f�[�^�ɃA�N�Z�X����(�]���Ɠ���)
-//		DdeGetData()�̏ꍇ�A�f�[�^�����(MaxStrLen)�����݂���
+// 有効時 DdeAccessData() を使って受信データにアクセスする
+// 無効時 DdeGetData() を使って受信データにアクセスする(従来と同じ)
+//		DdeGetData()の場合、データ長上限(MaxStrLen)が存在する
 #define	USE_ACCESSDATA	1
 
 static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
@@ -650,7 +650,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	case CmdInit: // initialization signal from TTMACRO
 		if (StartupFlag) // in case of startup macro
 		{ // TTMACRO is waiting for connecting to the host
-			// �V���A���ڑ��Ŏ����ڑ��������̏ꍇ�́A�ڑ��_�C�A���O���o���Ȃ� (2006.9.15 maya)
+			// シリアル接続で自動接続が無効の場合は、接続ダイアログを出さない (2006.9.15 maya)
 			if (!((ts.PortType==IdSerial) && (ts.ComAutoConnect == FALSE)) &&
 				((ts.PortType==IdSerial) || (ts.HostName[0]!=0)))
 			{
@@ -798,10 +798,10 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	case CmdSendFile: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
 #if 0
-		// Tera Term 4 �Ɠ������@�ő��M
+		// Tera Term 4 と同じ方法で送信
 		BOOL r = FileSendStart(ParamFileNameW, ParamBinaryFlag);
 #else
-		// 5 �Œǉ��������@�ő��M
+		// 5 で追加した方法で送信
 		BOOL r = SendMemSendFile2(ParamFileNameW, ParamBinaryFlag, (SendMemDelayType)ts.SendfileDelayType,
 								  ts.SendfileDelayTick, ts.SendfileSize, ts.LocalEcho, SendCallback, NULL);
 #endif
@@ -1057,8 +1057,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 				SendMem *sm = SendMemSetDelay(HWndDdeCli, ts.DelayPerChar, ts.DelayPerLine);
 				assert(sm != NULL);
 				if (sm != NULL) {
-					// SendMemInitEcho(sm, FALSE); �g�p���Ȃ�
-					// SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0); �g�p���Ȃ�
+					// SendMemInitEcho(sm, FALSE); 使用しない
+					// SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0); 使用しない
 					SendMemStart(sm);
 				}
 			}
@@ -1080,8 +1080,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 				SendMem *sm = SendMemSetDelay(HWndDdeCli, ts.DelayPerChar, ts.DelayPerLine);
 				assert(sm != NULL);
 				if (sm != NULL) {
-					// SendMemInitEcho(sm, FALSE); �g�p���Ȃ�
-					// SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0); �g�p���Ȃ�
+					// SendMemInitEcho(sm, FALSE); 使用しない
+					// SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0); 使用しない
 					SendMemStart(sm);
 				}
 			}
@@ -1129,8 +1129,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 
 	case CmdGetTTPos:
 		int showflag;
-		int w_x, w_y, w_width, w_height;	// �E�C���h�E�̈�
-		int c_x, c_y, c_width, c_height;	// �N���C�A���g�̈�
+		int w_x, w_y, w_width, w_height;	// ウインドウ領域
+		int c_x, c_y, c_width, c_height;	// クライアント領域
 		RECT r;
 
 		if (IsIconic(HVTWin) == TRUE) {
@@ -1283,10 +1283,10 @@ static HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
 			Result = AcceptRequest(HSz2);
 			break;
 
-	// �N���C�A���g(ttpmacro.exe)����T�[�o(ttermpro.exe)�փf�[�^�������Ă���ƁA
-	// ���̃��b�Z�[�W�n���h���֔��ł���B
-	// ���������� DDE_FACK�A�r�W�[�̏ꍇ�� DDE_FBUSY �A��������ꍇ�� DDE_FNOTPROCESSED ��
-	// �N���C�A���g�֕Ԃ��K�v������Abreak���������Ă����̂Œǉ������B
+	// クライアント(ttpmacro.exe)からサーバ(ttermpro.exe)へデータが送られてくると、
+	// このメッセージハンドラへ飛んでくる。
+	// 処理したら DDE_FACK、ビジーの場合は DDE_FBUSY 、無視する場合は DDE_FNOTPROCESSED を
+	// クライアントへ返す必要があり、break文が抜けていたので追加した。
 	// (2006.11.6 yutaka)
 		case XTYP_POKE:
 			Result = AcceptPoke(HSz2, Fmt, Data);
@@ -1313,7 +1313,7 @@ static HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
 			}
 			break;
 		case XTYP_DISCONNECT:
-			// �}�N���I�����A���O�̎�������I�ɒ�~����B(2013.6.24 yutaka)
+			// マクロ終了時、ログ採取を自動的に停止する。(2013.6.24 yutaka)
 			if (AutoLogClose) {
 				FLogClose();
 				AutoLogClose = FALSE;
@@ -1444,7 +1444,7 @@ void SetDdeComReady(WORD Ready)
 }
 
 /**
- *	�}�N�����N������
+ *	マクロを起動する
  *
  *	@param  FName: macro filename
  *	@param  startup: TRUE in case of startup macro execution.
@@ -1459,8 +1459,8 @@ void RunMacroW(const wchar_t *FName, BOOL startup)
 	DWORD pri = NORMAL_PRIORITY_CLASS;
 	wchar_t *exe_dir;
 
-	// Control menu����̃}�N���Ăяo���ŁA���łɃ}�N���N�����̏ꍇ�A
-	// �Y������"ttpmacro"���t���b�V������B
+	// Control menuからのマクロ呼び出しで、すでにマクロ起動中の場合、
+	// 該当する"ttpmacro"をフラッシュする。
 	// (2010.4.2 yutaka, maya)
 	if ((FName == NULL && startup == FALSE) && ConvH != 0) {
 		BringupMacroWindow(TRUE);
@@ -1475,7 +1475,7 @@ void RunMacroW(const wchar_t *FName, BOOL startup)
 	free(exe_dir);
 	if (FName != NULL) {
 		if (wcschr(FName, ' ') != NULL) {
-			// �t�@�C�����ɃX�y�[�X���܂܂�Ă��� -> quote('"'�ň͂�)����
+			// ファイル名にスペースが含まれている -> quote('"'で囲む)する
 			awcscats(&Cmnd, L" \"", FName, L"\"", NULL);
 		}
 		else {
@@ -1488,16 +1488,16 @@ void RunMacroW(const wchar_t *FName, BOOL startup)
 
 	StartupFlag = startup;
 
-	// ���O�̎撆�������Ȃ����Ƃɂ���B(2005.8.14 yutaka)
+	// ログ採取中も下げないことにする。(2005.8.14 yutaka)
 #if 0
-	// Tera Term�{�̂Ń��O�̎撆�Ƀ}�N�������s����ƁA�}�N���̓��삪��~���邱�Ƃ�
-	// ���邽�߁A�v���Z�X�̗D��x��1�����Ď��s������B(2004/9/5 yutaka)
-	// ���O�̎撆�݂̂ɉ�����B(2004/11/28 yutaka)
+	// Tera Term本体でログ採取中にマクロを実行すると、マクロの動作が停止することが
+	// あるため、プロセスの優先度を1つ下げて実行させる。(2004/9/5 yutaka)
+	// ログ採取中のみに下げる。(2004/11/28 yutaka)
 	if (FileLog || BinLog) {
 		pri = BELOW_NORMAL_PRIORITY_CLASS;
 	}
-	// �b�菈�u�Ƃ��āA��ɉ����邱�Ƃɂ���B(2005/5/15 yutaka)
-	// �}�N���ɂ��telnet�������O�C�������s���邱�Ƃ�����̂ŁA�����Ȃ����Ƃɂ���B(2005/5/23 yutaka)
+	// 暫定処置として、常に下げることにする。(2005/5/15 yutaka)
+	// マクロによるtelnet自動ログインが失敗することがあるので、下げないことにする。(2005/5/23 yutaka)
 	pri = BELOW_NORMAL_PRIORITY_CLASS;
 #endif
 

@@ -1,4 +1,4 @@
-// ttx.cpp : DLL アプリケーション用のエントリ ポイントを定義します。
+// ttx.cpp : DLL 繧｢繝励Μ繧ｱ繝ｼ繧ｷ繝ｧ繝ｳ逕ｨ縺ｮ繧ｨ繝ｳ繝医Μ 繝昴う繝ｳ繝医ｒ螳夂ｾｩ縺励∪縺吶�
 //
 
 #include "StdAfx.h"
@@ -28,7 +28,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI DllMain(HINSTANCE instance, DWORD r
 	case DLL_THREAD_DETACH:
 		return TTProxy::getInstance().threadDetach();
 	default:
-		TTXBind(0, NULL);	// dummy TODO 未使用で削除されないようにする
+		TTXBind(0, NULL);	// dummy TODO 譛ｪ菴ｿ逕ｨ縺ｧ蜑企勁縺輔ｌ縺ｪ縺�繧医≧縺ｫ縺吶ｋ
 		break;
 	}
 	return FALSE;

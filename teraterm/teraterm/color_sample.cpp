@@ -89,11 +89,11 @@ static LRESULT CALLBACK CSProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 }
 
 /**
- * 	@brief ƒJƒ‰[ƒTƒ“ƒvƒ‹‰Šú‰»
+ * 	@brief ã‚«ãƒ©ãƒ¼ã‚µãƒ³ãƒ—ãƒ«åˆæœŸåŒ–
  *
- *	@param hWnd		ƒ_ƒCƒAƒƒO‚Ìstatic text
- *	@param hFont	ƒtƒHƒ“ƒg
- *					(ƒtƒHƒ“ƒg‚Ì”jŠü‚ÍŒÄ‚Ño‚µ‘¤‚Ås‚¤‚±‚Æ)
+ *	@param hWnd		ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®static text
+ *	@param hFont	ãƒ•ã‚©ãƒ³ãƒˆ
+ *					(ãƒ•ã‚©ãƒ³ãƒˆã®ç ´æ£„ã¯å‘¼ã³å‡ºã—å´ã§è¡Œã†ã“ã¨)
  */
 ColorSample *ColorSampleInit(HWND hWnd, HFONT hFont)
 {
@@ -107,7 +107,7 @@ ColorSample *ColorSampleInit(HWND hWnd, HFONT hFont)
 }
 
 /**
- * 	@brief ƒJƒ‰[ƒTƒ“ƒvƒ‹Fİ’è
+ * 	@brief ã‚«ãƒ©ãƒ¼ã‚µãƒ³ãƒ—ãƒ«è‰²è¨­å®š
  */
 void ColorSampleSetColor(ColorSample *work, COLORREF fore_color, COLORREF back_color)
 {

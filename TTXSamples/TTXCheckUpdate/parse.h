@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 /**
- *	•¶š—ñ‚Í‚·‚×‚ÄUTF-8
+ *	æ–‡å­—åˆ—ã¯ã™ã¹ã¦UTF-8
  */
 typedef struct {
 	int version_major;

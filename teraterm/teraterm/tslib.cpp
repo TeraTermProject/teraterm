@@ -26,8 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* teraterm/ ���ŋ��ʂɎg���֐��Ȃ� */
-/* ts�\���̂Ɋ֘A����֐��Ȃ� */
+/* teraterm/ 内で共通に使う関数など */
+/* ts構造体に関連する関数など */
 
 #include <assert.h>
 
@@ -37,15 +37,15 @@
 #include "codeconv.h"
 
 /**
- *	�ݒ�(TTTSet)���� logfont �̎擾
+ *	設定(TTTSet)から logfont の取得
  *
- *	@param[in]		TTTSet *pts		�ݒ�
- *	@param[in]		type			0	VT�E�B���h�E
- *									1	TEK�E�B���h�E
- *									2	�_�C�A���O�̃t�H���g
- *	@param[in]		dpi				DPI�ɍ��킹���T�C�Y�̃t�H���g���擾
- *									0 �̂Ƃ� hWnd ��DPI���g�p����
- *	@param[out]		logfont			�擾�����t�H���g���
+ *	@param[in]		TTTSet *pts		設定
+ *	@param[in]		type			0	VTウィンドウ
+ *									1	TEKウィンドウ
+ *									2	ダイアログのフォント
+ *	@param[in]		dpi				DPIに合わせたサイズのフォントを取得
+ *									0 のとき hWnd のDPIを使用する
+ *	@param[out]		logfont			取得したフォント情報
  */
 void TSGetLogFont(HWND hWnd, const TTTSet *pts, int type, unsigned int dpi, LOGFONTW *logfont)
 {
@@ -69,7 +69,7 @@ void TSGetLogFont(HWND hWnd, const TTTSet *pts, int type, unsigned int dpi, LOGF
 	default:
 		assert(0);
 	case 0:
-		// VT�E�B���h�E
+		// VTウィンドウ
 		ACPToWideChar_t(pts->VTFont, logfont->lfFaceName, _countof(logfont->lfFaceName));
 		logfont->lfWidth = pts->VTFontSize.x;
 		logfont->lfHeight = pts->VTFontSize.y;
@@ -79,7 +79,7 @@ void TSGetLogFont(HWND hWnd, const TTTSet *pts, int type, unsigned int dpi, LOGF
 		logfont->lfHeight = MulDiv(logfont->lfHeight, dpi, 96);
 		break;
 	case 1:
-		// TEK�E�B���h�E
+		// TEKウィンドウ
 		ACPToWideChar_t(pts->TEKFont, logfont->lfFaceName, _countof(logfont->lfFaceName));
 		logfont->lfWidth = pts->TEKFontSize.x;
 		logfont->lfHeight = pts->TEKFontSize.y;
@@ -89,10 +89,10 @@ void TSGetLogFont(HWND hWnd, const TTTSet *pts, int type, unsigned int dpi, LOGF
 		logfont->lfHeight = MulDiv(logfont->lfHeight, dpi, 96);
 		break;
 	case 2:
-		// �_�C�A���O�t�H���g
-		// DPI�̏�����OS���s���̂ŁA�T�C�Y�̒������Ȃ�
+		// ダイアログフォント
+		// DPIの処理はOSが行うので、サイズの調整しない
 		if (pts->DialogFontNameW[0] == 0) {
-			// �t�H���g���ݒ肳��Ă��Ȃ�������OS�̃t�H���g���g�p����
+			// フォントが設定されていなかったらOSのフォントを使用する
 			GetMessageboxFontW(logfont);
 		} else {
 			wcsncpy_s(logfont->lfFaceName, _countof(logfont->lfFaceName), pts->DialogFontNameW, _TRUNCATE);
@@ -106,15 +106,15 @@ void TSGetLogFont(HWND hWnd, const TTTSet *pts, int type, unsigned int dpi, LOGF
 }
 
 /**
- *	logfont ����ݒ�(TTTSet) �փZ�b�g
+ *	logfont から設定(TTTSet) へセット
  *
- *	@param[in]		logfont			�擾�����t�H���g���
- *	@param[in]		type			0	VT�E�B���h�E
- *									1	TEK�E�B���h�E
- *									2	�_�C�A���O�̃t�H���g
- *	@param[in]		dpi				DPI�ɍ��킹���T�C�Y�̃t�H���g���擾
- *									0 �̂Ƃ� hWnd ��DPI���g�p����
- *	@param[out]		TTTSet *pts		�ݒ�
+ *	@param[in]		logfont			取得したフォント情報
+ *	@param[in]		type			0	VTウィンドウ
+ *									1	TEKウィンドウ
+ *									2	ダイアログのフォント
+ *	@param[in]		dpi				DPIに合わせたサイズのフォントを取得
+ *									0 のとき hWnd のDPIを使用する
+ *	@param[out]		TTTSet *pts		設定
  */
 void TSSetLogFont(HWND hWnd, const LOGFONTW *logfont, int type, unsigned int dpi, TTTSet *pts)
 {
@@ -128,21 +128,21 @@ void TSSetLogFont(HWND hWnd, const LOGFONTW *logfont, int type, unsigned int dpi
 	default:
 		assert(0);
 	case 0:
-		// VT�E�B���h�E
+		// VTウィンドウ
 		WideCharToACP_t(logfont->lfFaceName, pts->VTFont, sizeof(pts->VTFont));
 		pts->VTFontSize.x = logfont->lfWidth  * 96 / (int)dpi;
 		pts->VTFontSize.y = logfont->lfHeight * 96 / (int)dpi;
 		pts->VTFontCharSet = logfont->lfCharSet;
 		break;
 	case 1:
-		// TEK�E�B���h�E
+		// TEKウィンドウ
 		WideCharToACP_t(logfont->lfFaceName, pts->TEKFont, sizeof(pts->TEKFont));
 		pts->TEKFontSize.x = logfont->lfWidth * 96 / (int)dpi;
 		pts->TEKFontSize.y = logfont->lfHeight * 96 / (int)dpi;
 		pts->TEKFontCharSet = logfont->lfCharSet;
 		break;
 	case 2:
-		// �_�C�A���O�t�H���g
+		// ダイアログフォント
 		wcsncpy_s(pts->DialogFontNameW, _countof(pts->DialogFontNameW), logfont->lfFaceName, _TRUNCATE);
 		pts->DialogFontPoint = GetFontPointFromPixel(hWnd, -logfont->lfHeight);
 		pts->DialogFontCharSet = logfont->lfCharSet;

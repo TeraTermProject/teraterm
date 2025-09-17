@@ -280,7 +280,7 @@ private:
             p += 3;
             const char* start = p;
 
-            // user:pass ������Ίi�[����
+            // user:pass があれば格納する
             String tmp = String(start);
             int index = tmp.indexOf('@');
             if (index > -1) {
@@ -296,7 +296,7 @@ private:
                 p += tmp.length() + 1;
             }
 
-            // �z�X�g�����i�[����
+            // ホスト名を格納する
             start = p;
             int in_blacket = false;
             while (*p != '\0' && *p != '/') {
@@ -324,7 +324,7 @@ private:
                     }
                     proxy.host = String(start, p - start);
                 }else{
-                    // �|�[�g�ԍ����i�[����
+                    // ポート番号を格納する
                     proxy.port = parsePort(start, p);
                     if (proxy.port < 0) {
                         proxy.type = TYPE_NONE;
@@ -604,7 +604,7 @@ private:
                 info = newInfo;
             }
         }
-        // �����o�I�����Z�q
+        // メンバ選択演算子
         ConnectionInfo* operator->()const {
             return info;
         }
@@ -625,11 +625,11 @@ private:
         HANDLE getTask(ConnectionInfo* info) {
             if (info == NULL)
                 return NULL;
-			// s_b4�̃}�C�i�X�̒l���n���h���Ƃ��Ďg�p����
+			// s_b4のマイナスの値をハンドルとして使用する
             return (HANDLE)(intptr_t)-info->addr.S_un.S_un_b.s_b4;
         }
         ConnectionInfo* get(HANDLE task) {
-			// �n���h���͐��l�Ƃ��ă}�C�i�X�̒l�̂͂�
+			// ハンドルは数値としてマイナスの値のはず
             if ((intptr_t) task >= 0)
                 return NULL;
             return get((int) -((intptr_t) task) - 1);
@@ -1153,10 +1153,10 @@ private:
     }
 
     /*
-	 * SOCKS�T�[�o����f�[�^����M����
+	 * SOCKSサーバからデータを受信する
 	 *
 	 * return:
-	 *    1�ȏ�   ��M�f�[�^��(byte)�Bsize��菬�����ꍇ������B
+	 *    1以上   受信データ数(byte)。sizeより小さい場合もある。
 	 *    -1      SOCKET_ERROR
 	 */
 	int recieveFromSocketTimeout(SOCKET s, unsigned char* buffer, int size, int timeout) {
@@ -1175,7 +1175,7 @@ private:
             case SOCKET_ERROR:
                 return SOCKET_ERROR;
             case 0:
-				// ��M�^�C���A�E�g�̏ꍇ�ɂ��G���[�����Ƃ���B
+				// 受信タイムアウトの場合にもエラー扱いとする。
                 return SOCKET_ERROR;
             default:
                 ready = FD_ISSET(s, &fd);
@@ -1183,7 +1183,7 @@ private:
             }
         }
 
-		// SOCKS�T�[�o����ؒf���ꂽ�ꍇ�Arecv()��0��Ԃ����߁A�G���[�����Ƃ���B
+		// SOCKSサーバから切断された場合、recv()が0を返すため、エラー扱いとする。
         ret = ORIG_recv(s, (char*) buffer, size, 0);
 		if (ret == 0)
 			ret = SOCKET_ERROR;
@@ -1331,8 +1331,8 @@ private:
             case 405:
             case 406:
             case 403:
-				// �Y�����Ȃ��X�e�[�^�X�R�[�h�������ꍇ�A�s��ȓ��e��uimsg[]��
-				// MessageBox�ɕ\�����������C�������B
+				// 該当しないステータスコードだった場合、不定な内容のuimsg[]が
+				// MessageBoxに表示される問題を修正した。
 			default:
                 UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", tmp, sizeof(tmp),
                                   "Proxy prevent this connection!");
@@ -1490,7 +1490,7 @@ private:
             return SOCKET_ERROR;
         if (recieveFromSocket(s, buf, 4) == SOCKET_ERROR)
             return SOCKET_ERROR;
-		/* SOCKS���N�G�X�g�ɑ΂��郊�v���C
+		/* SOCKSリクエストに対するリプライ
 
 		   buf[0] VER  protocol version: X'05'
 		   buf[1] REP  Reply field:
@@ -1517,7 +1517,7 @@ private:
 
 			UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, sizeof(uimsg),
                               "Proxy prevent this connection!");
-			// ���v���C����ǋL���ă��b�Z�[�W�\������B
+			// リプライ情報を追記してメッセージ表示する。
 			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%s(SOCKS5:VER %u REP %u ATYP %u)",
 				uimsg, buf[0], buf[1], buf[3]);
 			return setError(s, tmp);
@@ -1616,9 +1616,9 @@ private:
         if (recieveFromSocket(s, buf, 8) == SOCKET_ERROR) {
             return SOCKET_ERROR;
         }
-		/* SOCKS4�̕ԓ��p�P�b�g
+		/* SOCKS4の返答パケット
 
-		  buf[0] VN ���0
+		  buf[0] VN 常に0
 		  buf[1] CD
 		           90 request granted
 		           91 request rejected or failed
@@ -1626,8 +1626,8 @@ private:
 	                  identd on the client
 				   93 request rejected because the client program and identd
 	                  report different user-ids
-		  buf[2:3] DSTPORT �|�[�g�ԍ�
-		  buf[4:7] DSTIP   IP�A�h���X
+		  buf[2:3] DSTPORT ポート番号
+		  buf[4:7] DSTIP   IPアドレス
 		 */
         char uimsg[MAX_UIMSG];
         uimsg[0] = NULL;
@@ -1644,7 +1644,7 @@ private:
         if (uimsg[0] != NULL) {
 			char tmp[MAX_UIMSG + 32];
 
-			// SOCKS�̕ԓ��p�P�b�g��VN��CD��ǋL���ă��b�Z�[�W�\������B
+			// SOCKSの返答パケットのVNとCDを追記してメッセージ表示する。
 			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%s(SOCKS4:VN %u CD %u)", uimsg, buf[0], buf[1]);
             return setError(s, tmp);
         }
@@ -1808,12 +1808,12 @@ private:                                                   \
             if (select((int) (s + 1), &ifd, &ofd, &efd, timeout > 0 ? &tv : NULL) == SOCKET_ERROR)
                 return SOCKET_ERROR;
             if (FD_ISSET(s, &efd)) {
-				// Proxy server�ւ�connect�����s�����ꍇ�A�Ӑ}�I�� WSAECONNREFUSED �G���[��
-				// �Z�b�g����̂���߂��B
-				// Proxy server���z�X�g���Ƃ��Đݒ肳��Ă��āA���f���A���X�^�b�N���̏ꍇ�A
-				// Tera Term���ł�IPv6/IPv4�t�H�[���o�b�N�����Ғʂ�ɓ����Ă��Ȃ������B
-				// �܂��AProxy server�ɂ܂������ڑ��ł��Ȃ��ꍇ�AConnection refused�_�C�A���O��
-				// 3��A���\�������Ƃ�������ɂ��Ȃ��Ă����B
+				// Proxy serverへのconnectが失敗した場合、意図的に WSAECONNREFUSED エラーを
+				// セットするのをやめた。
+				// Proxy serverがホスト名として設定されていて、かつデュアルスタック環境の場合、
+				// Tera Term側でのIPv6/IPv4フォールバックが期待通りに動いていなかった。
+				// また、Proxy serverにまったく接続できない場合、Connection refusedダイアログが
+				// 3回連続表示されるという動作にもなっていた。
                 return SOCKET_ERROR;
             }
         }else{

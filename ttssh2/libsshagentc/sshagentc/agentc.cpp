@@ -95,16 +95,16 @@ static uint16_t get_uint16(const uint8_t *p)
 #endif
 
 /**
- *	pageant ‚Ì named pipe–¼‚Ìˆê•”
+ *	pageant ã® named pipeåã®ä¸€éƒ¨
  *	from putty windows/utils/cryptapi.c
  *
- *	@param		realname	Œ³‚É‚È‚é•¶š—ñ
- *	@return		named pipe–¼‚Ìˆê•”
- *				ƒTƒCƒ“ƒCƒ“’†‚Í“¯ˆê•¶š—ñ‚ª•Ô‚é
- *				•s—v‚É‚È‚Á‚½‚ç free()
+ *	@param		realname	å…ƒã«ãªã‚‹æ–‡å­—åˆ—
+ *	@return		named pipeåã®ä¸€éƒ¨
+ *				ã‚µã‚¤ãƒ³ã‚¤ãƒ³ä¸­ã¯åŒä¸€æ–‡å­—åˆ—ãŒè¿”ã‚‹
+ *				ä¸è¦ã«ãªã£ãŸã‚‰ free()
  *
  *	TODO
- *		CryptProtectMemory() API ‚Í”äŠr“IV‚µ‚¢ Windows ‚Ì‚İ‚Æv‚í‚ê‚é
+ *		CryptProtectMemory() API ã¯æ¯”è¼ƒçš„æ–°ã—ã„ Windows ã®ã¿ã¨æ€ã‚ã‚Œã‚‹
  */
 static char *capi_obfuscate_string(const char *realname)
 {
@@ -169,7 +169,7 @@ static char *capi_obfuscate_string(const char *realname)
 }
 
 /**
- *	pagent named pipe–¼
+ *	pagent named pipeå
  *	from PuTTY windows/utils/agent_named_pipe_name.c
  */
 static char *agent_named_pipe_name(void)
@@ -194,7 +194,7 @@ static char *agent_named_pipe_name(void)
 }
 
 /**
- *	ƒoƒbƒtƒ@‘€ì
+ *	ãƒãƒƒãƒ•ã‚¡æ“ä½œ
  */
 class Buffer {
 public:
@@ -236,7 +236,7 @@ public:
 		buf_.push_back((u32 >> (8*0)) & 0xff);
 	}
 	/**
-	 *	malloc‚µ‚½—Ìˆæ‚É“à—e‚ğƒRƒs[‚µ‚Ä•Ô‚·
+	 *	mallocã—ãŸé ˜åŸŸã«å†…å®¹ã‚’ã‚³ãƒ”ãƒ¼ã—ã¦è¿”ã™
 	 */
 	void *get_mallocdbuf(size_t *size)
 	{
@@ -250,7 +250,7 @@ public:
 		return p;
 	}
 	/**
-	 *	ƒoƒbƒtƒ@‚Ìæ“ª‚É’Ç‰Á‚·‚é
+	 *	ãƒãƒƒãƒ•ã‚¡ã®å…ˆé ­ã«è¿½åŠ ã™ã‚‹
 	 */
 	void prepend_uint32(uint32_t u32)
 	{
@@ -264,12 +264,12 @@ private:
 };
 
 /**
- *	Microsoft named pipe –¼‚ğæ“¾
+ *	Microsoft named pipe åã‚’å–å¾—
  *
- *	ŠÂ‹«•Ï” SSH_AUTH_SOCK ‚ªİ’è‚³‚ê‚Ä‚¢‚ê‚ÎA‚»‚Ì’l‚ğ•Ô‚·
- *	İ’è‚³‚ê‚Ä‚¢‚È‚¯‚ê‚ÎƒfƒtƒHƒ‹ƒg‚ğ•Ô‚·
+ *	ç’°å¢ƒå¤‰æ•° SSH_AUTH_SOCK ãŒè¨­å®šã•ã‚Œã¦ã„ã‚Œã°ã€ãã®å€¤ã‚’è¿”ã™
+ *	è¨­å®šã•ã‚Œã¦ã„ãªã‘ã‚Œã°ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚’è¿”ã™
  *
- *	@return	pipe name (•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ)
+ *	@return	pipe name (ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨)
  */
 #if MS_NAMEDPIPE
 static char *get_ms_namedpipe(void)
@@ -291,8 +291,8 @@ static char *get_ms_namedpipe(void)
 #endif
 
 /**
- *	agent‚Æ’ÊM,named pipeŒo—R
- *	RLogin CMainFrame::WageantQuery() MainFrm.cpp ‚ğQl‚É‚µ‚½
+ *	agentã¨é€šä¿¡,named pipeçµŒç”±
+ *	RLogin CMainFrame::WageantQuery() MainFrm.cpp ã‚’å‚è€ƒã«ã—ãŸ
  */
 #if PUTTY_NAMEDPIPE || MS_NAMEDPIPE
 static BOOL query_namedpipe(const char *pipename, const Buffer &request, Buffer &reply)
@@ -306,20 +306,20 @@ static BOOL query_namedpipe(const char *pipename, const Buffer &request, Buffer 
 		return FALSE;
 	}
 
-	// ƒŠƒNƒGƒXƒg‘—M
+	// ãƒªã‚¯ã‚¨ã‚¹ãƒˆé€ä¿¡
 	const BYTE *req_ptr = (BYTE *)request.get_ptr();
 	DWORD req_len = (DWORD)request.size();
 	while (req_len > 0) {
 		DWORD written;
 		if (!WriteFile(hPipe, req_ptr, req_len, &written, NULL)) {
-			// ‘‚«‚İƒGƒ‰[‚ª‹N‚«‚½A’ÊM’†‚É agent ‚ª—‚¿‚½?
+			// æ›¸ãè¾¼ã¿ã‚¨ãƒ©ãƒ¼ãŒèµ·ããŸã€é€šä¿¡ä¸­ã« agent ãŒè½ã¡ãŸ?
 			goto finish;
 		}
 		req_ptr += written;
 		req_len -= written;
 	}
 
-	// ƒŠƒvƒ‰ƒCóM
+	// ãƒªãƒ—ãƒ©ã‚¤å—ä¿¡
 	reply.clear();
 	if (ReadFile(hPipe, &read_buffer[0], 4, &read_len, NULL) && read_len == 4) {
 		const uint32_t len = get_uint32(&read_buffer[0]);
@@ -348,7 +348,7 @@ finish:
 #endif
 
 /**
- *	sid‚Ìæ“¾
+ *	sidã®å–å¾—
  *	from PuTTY windows/utils/security.c get_user_sid()
  */
 #if PUTTY_SHM
@@ -406,14 +406,14 @@ static PSID get_user_sid(void)
 #endif
 
 /**
- *	SECURITY_ATTRIBUTES ‚Ìæ“¾
- *	from PuTTY windows/agent-client.c wm_copydata_agent_query() ‚Ìˆê•”‚ğØ‚èo‚µ
+ *	SECURITY_ATTRIBUTES ã®å–å¾—
+ *	from PuTTY windows/agent-client.c wm_copydata_agent_query() ã®ä¸€éƒ¨ã‚’åˆ‡ã‚Šå‡ºã—
  *
- *	@param	psa		SECURITY_ATTRIBUTES ‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *					‚±‚±‚Éæ“¾‚·‚é
- *	@return	SECURITY_ATTRIBUTES‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *			•s—v‚É‚È‚Á‚½‚ç psa->lpSecurityDescriptor ‚ğ LocalFree() ‚·‚é‚±‚Æ
- *			æ“¾‚Å‚«‚È‚©‚Á‚½‚Æ‚«‚Í NULL
+ *	@param	psa		SECURITY_ATTRIBUTES ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *					ã“ã“ã«å–å¾—ã™ã‚‹
+ *	@return	SECURITY_ATTRIBUTESã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *			ä¸è¦ã«ãªã£ãŸã‚‰ psa->lpSecurityDescriptor ã‚’ LocalFree() ã™ã‚‹ã“ã¨
+ *			å–å¾—ã§ããªã‹ã£ãŸã¨ãã¯ NULL
  */
 #if PUTTY_SHM
 static SECURITY_ATTRIBUTES *get_sa(SECURITY_ATTRIBUTES *psa)
@@ -433,7 +433,7 @@ static SECURITY_ATTRIBUTES *get_sa(SECURITY_ATTRIBUTES *psa)
 		SetSecurityDescriptorOwner(psd, usersid, false)) {
 		psa->nLength = sizeof(*psa);
 		psa->bInheritHandle = true;
-		psa->lpSecurityDescriptor = psd;	// LocalFree() ‚·‚é‚±‚Æ
+		psa->lpSecurityDescriptor = psd;	// LocalFree() ã™ã‚‹ã“ã¨
 	} else {
 		LocalFree(psd);
 		psa = NULL;
@@ -444,10 +444,10 @@ static SECURITY_ATTRIBUTES *get_sa(SECURITY_ATTRIBUTES *psa)
 
 #if PUTTY_SHM
 /**
- *	agent(pageant)‚Æ’ÊM,‹¤—Lƒƒ‚ƒŠŒo—R
- *	PuTTY windows/agent-client.c wm_copydata_agent_query() ‚Æ“¯“™
+ *	agent(pageant)ã¨é€šä¿¡,å…±æœ‰ãƒ¡ãƒ¢ãƒªçµŒç”±
+ *	PuTTY windows/agent-client.c wm_copydata_agent_query() ã¨åŒç­‰
  *
- *	@retval	FALSE	ƒGƒ‰[
+ *	@retval	FALSE	ã‚¨ãƒ©ãƒ¼
  */
 static BOOL query_wm_copydata(const Buffer &request, Buffer &reply)
 {
@@ -492,7 +492,7 @@ static BOOL query_wm_copydata(const Buffer &request, Buffer &reply)
 
 	memcpy(p, in, len + 4);
 	if (SendMessageA(hwnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&cds) > 0) {
-		// ‰“š‚ª‚ ‚Á‚½
+		// å¿œç­”ãŒã‚ã£ãŸ
 		len = get_uint32(p);
 		reply.append_array(p, len+4);
 		ret = TRUE;
@@ -518,7 +518,7 @@ agent_error:
 #endif
 
 /**
- *	PuTTY windows/agent-client.c agent_query() ‚Æ“¯“™
+ *	PuTTY windows/agent-client.c agent_query() ã¨åŒç­‰
  */
 static BOOL query(const Buffer &request, Buffer &reply)
 {
@@ -754,7 +754,7 @@ const char *putty_get_version()
 }
 
 /**
- *	PuTTY aqsync.c agent_query_synchronous() ‚Æ“¯“™
+ *	PuTTY aqsync.c agent_query_synchronous() ã¨åŒç­‰
  */
 void putty_agent_query_synchronous(const void *req_ptr, int req_len, void **rep_ptr, int *rep_len)
 {
@@ -769,7 +769,7 @@ void putty_agent_query_synchronous(const void *req_ptr, int req_len, void **rep_
 
 #if PUTTY_NAMEDPIPE
 /**
- *	PuTTY windows/agent-client.c named_pipe_agent_exists() ‚Æ“¯“™
+ *	PuTTY windows/agent-client.c named_pipe_agent_exists() ã¨åŒç­‰
  */
 static BOOL check_puttyagent_namedpipe()
 {
@@ -806,7 +806,7 @@ static BOOL check_MSagent_namedpipe()
 #endif
 
 /**
- *	PuTTY windows/agent-client.c agent_exists() ‚Æ“¯“™
+ *	PuTTY windows/agent-client.c agent_exists() ã¨åŒç­‰
  */
 BOOL putty_agent_exists()
 {

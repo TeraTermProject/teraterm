@@ -268,9 +268,9 @@ void FWD_free_channel(PTInstVar pvar, uint32 local_channel_num)
 {
 	FWDChannel *channel = &pvar->fwd_state.channels[local_channel_num];
 
-	if (channel->type == TYPE_AGENT) { // TYPE_AGENT ‚Å‚±‚±‚É—ˆ‚é‚Ì‚Í SSH1 ‚Ì‚Ý
+	if (channel->type == TYPE_AGENT) { // TYPE_AGENT ã§ã“ã“ã«æ¥ã‚‹ã®ã¯ SSH1 ã®ã¿
 		buffer_free(channel->agent_msg);
-		// channel_close Žž‚Æ TTSSH I—¹Žž‚É2‰ñŒÄ‚Î‚ê‚é‚Ì‚ÅA“ñd free –hŽ~‚Ì‚½‚ß
+		// channel_close æ™‚ã¨ TTSSH çµ‚äº†æ™‚ã«2å›žå‘¼ã°ã‚Œã‚‹ã®ã§ã€äºŒé‡ free é˜²æ­¢ã®ãŸã‚
 		channel->agent_msg = NULL;
 		channel->status = 0;
 	}
@@ -315,7 +315,7 @@ void FWD_channel_input_eof(PTInstVar pvar, uint32 local_channel_num)
 	logprintf(LOG_LEVEL_VERBOSE, "%s: SSH_MSG_CHANNEL_EOF receive. channel: %d", __FUNCTION__, local_channel_num);
 
 	if (channel->writebuf.datalen == 0) {
-		// ƒNƒ‰ƒCƒAƒ“ƒg‚Ö‘—‚éƒf[ƒ^‚ªŽc‚Á‚Ä‚¢‚È‚¢ê‡‚ÍƒRƒlƒNƒVƒ‡ƒ“‚ð shutdown ‚·‚é
+		// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã¸é€ã‚‹ãƒ‡ãƒ¼ã‚¿ãŒæ®‹ã£ã¦ã„ãªã„å ´åˆã¯ã‚³ãƒã‚¯ã‚·ãƒ§ãƒ³ã‚’ shutdown ã™ã‚‹
 		logprintf(LOG_LEVEL_VERBOSE,
 		          "%s: shutdown local socket. channel: %d", __FUNCTION__, local_channel_num);
 		if (channel->local_socket != INVALID_SOCKET) {
@@ -327,8 +327,8 @@ void FWD_channel_input_eof(PTInstVar pvar, uint32 local_channel_num)
 		}
 	}
 	else {
-		// ƒoƒbƒtƒ@‚Éƒf[ƒ^‚ªŽc‚Á‚Ä‚¢‚éê‡‚Í‚±‚±‚Å‚Í shutdown o—ˆ‚È‚¢
-		// write_local_connection_buffer() ‚Åƒf[ƒ^‚ª‚·‚×‚Ä‘—‚èI‚í‚Á‚½Žž‚É shutdown ‚ªs‚í‚ê‚é
+		// ãƒãƒƒãƒ•ã‚¡ã«ãƒ‡ãƒ¼ã‚¿ãŒæ®‹ã£ã¦ã„ã‚‹å ´åˆã¯ã“ã“ã§ã¯ shutdown å‡ºæ¥ãªã„
+		// write_local_connection_buffer() ã§ãƒ‡ãƒ¼ã‚¿ãŒã™ã¹ã¦é€ã‚Šçµ‚ã‚ã£ãŸæ™‚ã« shutdown ãŒè¡Œã‚ã‚Œã‚‹
 		logprintf(LOG_LEVEL_VERBOSE, "%s: buffer not empty. channel: %d, remained data length: %d",
 		          __FUNCTION__, local_channel_num, channel->writebuf.datalen);
 	}
@@ -631,7 +631,7 @@ static void accept_local_connection(PTInstVar pvar, int request_num, int listeni
 	if (s == INVALID_SOCKET)
 		return;
 
-	// SSH2 port-forwarding‚ÉÚ‘±Œ³‚ÌƒŠƒ‚[ƒgƒ|[ƒg‚ª•K—vB(2005.2.27 yutaka)
+	// SSH2 port-forwardingã«æŽ¥ç¶šå…ƒã®ãƒªãƒ¢ãƒ¼ãƒˆãƒãƒ¼ãƒˆãŒå¿…è¦ã€‚(2005.2.27 yutaka)
 	if (getnameinfo((struct sockaddr *) &addr, addrlen, hname, sizeof(hname),
 	                strport, sizeof(strport), NI_NUMERICHOST | NI_NUMERICSERV)) {
 		/* NOT REACHED */
@@ -658,11 +658,11 @@ static void accept_local_connection(PTInstVar pvar, int request_num, int listeni
 		          "%s: Host %s(%d) connecting to port %d; type=dynamic",
 				  __FUNCTION__, hname, port, request->spec.from_port);
 
-		// SOCKS ‚ÌƒŠƒNƒGƒXƒg‚ðˆ—‚·‚éˆ×‚Ì filter ‚ð“o˜^
+		// SOCKS ã®ãƒªã‚¯ã‚¨ã‚¹ãƒˆã‚’å‡¦ç†ã™ã‚‹ç‚ºã® filter ã‚’ç™»éŒ²
 		channel->filter_closure = SOCKS_init_filter(pvar, channel_num, hname, port);
 		channel->filter = SOCKS_filter;
 
-		// ƒŠƒ‚[ƒg‘¤‚Í‚Ü‚¾Œq‚ª‚Á‚Ä‚¢‚È‚¢‚ªAread_local_connection() “™‚Åˆ—‚ªs‚í‚ê‚é‚æ‚¤‚Éƒtƒ‰ƒO‚ð—§‚Ä‚éB
+		// ãƒªãƒ¢ãƒ¼ãƒˆå´ã¯ã¾ã ç¹‹ãŒã£ã¦ã„ãªã„ãŒã€read_local_connection() ç­‰ã§å‡¦ç†ãŒè¡Œã‚ã‚Œã‚‹ã‚ˆã†ã«ãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã‚‹ã€‚
 		channel->status |= FWD_BOTH_CONNECTED;
 
 	}
@@ -687,8 +687,8 @@ static void write_local_connection_buffer(PTInstVar pvar, int channel_num)
 			channel_error(pvar, "writing", channel_num, WSAGetLastError());
 		}
 		if (channel->writebuf.datalen == 0 && (channel->status & FWD_CLOSED_REMOTE_IN) == FWD_CLOSED_REMOTE_IN) {
-			// ƒNƒ‰ƒCƒAƒ“ƒg‚Ö‚Ìƒf[ƒ^‚ª‚·‚×‚Ä‘—‚èI‚í‚Á‚Ä‚¨‚èAƒŠƒ‚[ƒg‚©‚ç‚Ì EOF ‚ðŽóMÏ‚Ý‚È‚ç‚Î
-			// ƒNƒ‰ƒCƒAƒ“ƒg‚Ö‚ÌƒRƒlƒNƒVƒ‡ƒ“‚ð shutdown ‚·‚é (‘—M•ûŒü‚Ì‚Ý)
+			// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã¸ã®ãƒ‡ãƒ¼ã‚¿ãŒã™ã¹ã¦é€ã‚Šçµ‚ã‚ã£ã¦ãŠã‚Šã€ãƒªãƒ¢ãƒ¼ãƒˆã‹ã‚‰ã® EOF ã‚’å—ä¿¡æ¸ˆã¿ãªã‚‰ã°
+			// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã¸ã®ã‚³ãƒã‚¯ã‚·ãƒ§ãƒ³ã‚’ shutdown ã™ã‚‹ (é€ä¿¡æ–¹å‘ã®ã¿)
 			logprintf(LOG_LEVEL_VERBOSE,
 				  "%s: shutdown local socket. channel: %d", __FUNCTION__, channel_num);
 			shutdown(channel->local_socket, 1);
@@ -715,10 +715,10 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 		int amount;
 		int err = ERROR_SUCCESS;
 
-		// recv‚ÌˆêŽž’âŽ~’†‚È‚ç‚ÎA‰½‚à‚¹‚¸‚É–ß‚éB
+		// recvã®ä¸€æ™‚åœæ­¢ä¸­ãªã‚‰ã°ã€ä½•ã‚‚ã›ãšã«æˆ»ã‚‹ã€‚
 		if (SSHv2(pvar)) {
 			Channel_t* c = ssh2_local_channel_lookup(channel_num);
-			// Ú‘±‚ªŠm—§‚µ‚Ä‚¢‚È‚¢ó‘Ô‚ÌŠÔ‚Í c == NULL ‚ª•Ô‚Á‚Ä‚­‚é
+			// æŽ¥ç¶šãŒç¢ºç«‹ã—ã¦ã„ãªã„çŠ¶æ…‹ã®é–“ã¯ c == NULL ãŒè¿”ã£ã¦ãã‚‹
 			if (c != NULL && c->bufchain_recv_suspended) {
 				logprintf(LOG_LEVEL_NOTICE, "%s: channel=%d recv was skipped for flow control",
 					__FUNCTION__, channel_num);
@@ -726,11 +726,11 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 			}
 		}
 
-		// ŽóM(ƒmƒ“ƒuƒƒbƒLƒ“ƒOƒ‚[ƒh)
+		// å—ä¿¡(ãƒŽãƒ³ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰)
 		amount = recv(channel->local_socket, buf, sizeof(buf), 0);
 
 		if (amount > 0) {
-			// ŽóMƒf[ƒ^‚ ‚è
+			// å—ä¿¡ãƒ‡ãƒ¼ã‚¿ã‚ã‚Š
 			char *new_buf = buf;
 			FwdFilterResult action = FWD_FILTER_RETAIN;
 
@@ -745,7 +745,7 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 			}
 
 			if (amount > 0 && (channel->status & FWD_CLOSED_REMOTE_OUT) == 0) {
-				// ƒ|[ƒgƒtƒHƒ[ƒfƒBƒ“ƒO‚É‚¨‚¢‚ÄƒNƒ‰ƒCƒAƒ“ƒg‚©‚ç‚Ì‘—M—v‹‚ðASSH’ÊM‚Éæ‚¹‚ÄƒT[ƒo‚Ü‚Å‘—‚è“Í‚¯‚éB
+				// ãƒãƒ¼ãƒˆãƒ•ã‚©ãƒ¯ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã«ãŠã„ã¦ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‹ã‚‰ã®é€ä¿¡è¦æ±‚ã‚’ã€SSHé€šä¿¡ã«ä¹—ã›ã¦ã‚µãƒ¼ãƒã¾ã§é€ã‚Šå±Šã‘ã‚‹ã€‚
 				SSH_channel_send(pvar, channel_num, channel->remote_num, new_buf, amount, 0);
 			}
 
@@ -760,7 +760,7 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 				break;
 			}
 		} else if (amount == 0 || (err = WSAGetLastError()) == WSAEWOULDBLOCK) {
-			// ŽóMƒf[ƒ^‚ª‚È‚¢
+			// å—ä¿¡ãƒ‡ãƒ¼ã‚¿ãŒãªã„
 			logprintf(LOG_LEVEL_VERBOSE, "%s: recv()=%d err=%s(%d)", __FUNCTION__, amount,
 					  err == WSAEWOULDBLOCK ? "WSAEWOULDBLOCK" : "-", err);
 			return;
@@ -793,17 +793,17 @@ static void found_to_host_addr(PTInstVar pvar, int request_num)
 	}
 }
 
-// local connection‚ÌŽóM‚Ì’âŽ~‚¨‚æ‚ÑÄŠJ‚Ì”»’f‚ðs‚¤
+// local connectionã®å—ä¿¡ã®åœæ­¢ãŠã‚ˆã³å†é–‹ã®åˆ¤æ–­ã‚’è¡Œã†
 //
-// notify: TRUE    recv‚ðÄŠJ‚·‚é
-//         FALSE   recv‚ð’âŽ~‚·‚é
+// notify: TRUE    recvã‚’å†é–‹ã™ã‚‹
+//         FALSE   recvã‚’åœæ­¢ã™ã‚‹
 //
-// [–Ú“I]
-// remote_window‚É‹ó‚«‚ª‚È‚¢ê‡‚Í’Ê’mƒIƒt‚Æ‚µA‹ó‚«‚ª‚Å‚«‚½ê‡‚Í
-// ’Ê’m‚ðÄŠJ‚·‚éB
-// remote_window‚É—]—T‚ª‚È‚¢ó‘Ô‚ÅAlocal connection‚©‚ç‚ÌƒpƒPƒbƒg‚ð
-// ŽóM‚µ‘±‚¯‚é‚ÆAÁ”ïƒƒ‚ƒŠ‚ª”ì‘å‰»‚·‚é(Œµ–§‚É‚Íƒƒ‚ƒŠƒŠ[ƒN‚Å‚Í‚È‚¢)
-// ‚Æ‚¢‚¤–â‘è‚ð‰ñ”ð‚·‚éB
+// [ç›®çš„]
+// remote_windowã«ç©ºããŒãªã„å ´åˆã¯é€šçŸ¥ã‚ªãƒ•ã¨ã—ã€ç©ºããŒã§ããŸå ´åˆã¯
+// é€šçŸ¥ã‚’å†é–‹ã™ã‚‹ã€‚
+// remote_windowã«ä½™è£•ãŒãªã„çŠ¶æ…‹ã§ã€local connectionã‹ã‚‰ã®ãƒ‘ã‚±ãƒƒãƒˆã‚’
+// å—ä¿¡ã—ç¶šã‘ã‚‹ã¨ã€æ¶ˆè²»ãƒ¡ãƒ¢ãƒªãŒè‚¥å¤§åŒ–ã™ã‚‹(åŽ³å¯†ã«ã¯ãƒ¡ãƒ¢ãƒªãƒªãƒ¼ã‚¯ã§ã¯ãªã„)
+// ã¨ã„ã†å•é¡Œã‚’å›žé¿ã™ã‚‹ã€‚
 //
 // (2019.6.5 yutaka)
 void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notify)
@@ -812,7 +812,7 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 	FWDChannel* channel;
 	int changed = 0;
 
-	// ƒ|[ƒg“]‘—‚Ì–¢Žg—pŽž‚ÍˆÈ‰º‚Ìƒtƒ[§Œä‚ðs‚í‚È‚¢B
+	// ãƒãƒ¼ãƒˆè»¢é€ã®æœªä½¿ç”¨æ™‚ã¯ä»¥ä¸‹ã®ãƒ•ãƒ­ãƒ¼åˆ¶å¾¡ã‚’è¡Œã‚ãªã„ã€‚
 	if (c->type != TYPE_PORTFWD) {
 		return;
 	}
@@ -821,12 +821,12 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 	channel = pvar->fwd_state.channels + channel_num;
 
 	if (notify) {
-		// recv‚ðÄŠJ‚·‚é‚©”»’f‚·‚é
+		// recvã‚’å†é–‹ã™ã‚‹ã‹åˆ¤æ–­ã™ã‚‹
 		if (c->bufchain_amount <= FWD_LOW_WATER_MARK) {
-			// ‰ºŒÀ‚ð‰º‰ñ‚Á‚½‚Ì‚ÅÄŠJ
+			// ä¸‹é™ã‚’ä¸‹å›žã£ãŸã®ã§å†é–‹
 			c->bufchain_recv_suspended = FALSE;
 
-			// ‚±‚±‚ÅÄŠJ‚ÌƒƒbƒZ[ƒW‚ð”ò‚Î‚·
+			// ã“ã“ã§å†é–‹ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é£›ã°ã™
 			PostMessage(pvar->fwd_state.accept_wnd, WM_SOCK_IO,
 				(WPARAM)channel->local_socket,
 				MAKEWPARAM(FD_READ, 0)
@@ -836,9 +836,9 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 		}
 
 	} else {
-		// recv‚ð’âŽ~‚·‚é‚©”»’f‚·‚é
+		// recvã‚’åœæ­¢ã™ã‚‹ã‹åˆ¤æ–­ã™ã‚‹
 		if (c->bufchain_amount >= FWD_HIGH_WATER_MARK) {
-			// ãŒÀ‚ð’´‚¦‚½‚Ì‚Å’âŽ~
+			// ä¸Šé™ã‚’è¶…ãˆãŸã®ã§åœæ­¢
 			c->bufchain_recv_suspended = TRUE;
 			changed = 1;
 		}
@@ -1029,11 +1029,11 @@ static BOOL can_server_listen_using(FWDRequestSpec *listener,
 }
 
 /*
- * ƒ|[ƒg“]‘—‚ð—LŒø‚Éo—ˆ‚é‚©‚Ì”»’èŠÖ”B
- * shell / subsystem ŠJŽn‘O‚Í‚·‚×‚Ä—LŒø‚É‚Å‚«‚é (TRUE‚ð•Ô‚·)B
- * ŠJŽnŒã‚ÍˆÈ‰º‚Ì“]‘—ƒ^ƒCƒv‚Í’Ç‰Á•s‰Â (‚·‚Å‚ÉŠJŽn‚³‚ê‚Ä‚¢‚é“]‘—Ý’è‚Ì‚ÝTRUE‚ð•Ô‚·)
- * - SSH1Ú‘±Žž‚ÌRtoL“]‘— (SSH2‚Í’Ç‰Á‰Â”\)
- * - X11“]‘—
+ * ãƒãƒ¼ãƒˆè»¢é€ã‚’æœ‰åŠ¹ã«å‡ºæ¥ã‚‹ã‹ã®åˆ¤å®šé–¢æ•°ã€‚
+ * shell / subsystem é–‹å§‹å‰ã¯ã™ã¹ã¦æœ‰åŠ¹ã«ã§ãã‚‹ (TRUEã‚’è¿”ã™)ã€‚
+ * é–‹å§‹å¾Œã¯ä»¥ä¸‹ã®è»¢é€ã‚¿ã‚¤ãƒ—ã¯è¿½åŠ ä¸å¯ (ã™ã§ã«é–‹å§‹ã•ã‚Œã¦ã„ã‚‹è»¢é€è¨­å®šã®ã¿TRUEã‚’è¿”ã™)
+ * - SSH1æŽ¥ç¶šæ™‚ã®RtoLè»¢é€ (SSH2ã¯è¿½åŠ å¯èƒ½)
+ * - X11è»¢é€
  */
 BOOL FWD_can_server_listen_for(PTInstVar pvar, FWDRequestSpec *spec)
 {
@@ -1320,9 +1320,9 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 	}
 
 	//
-	// ‘¼‚Ì LOG_LEVEL_VERBOSE ‚Åo—Í‚µ‚Ä‚¢‚éƒƒO‚É”ä‚×‚ÄA
-	// ‚³‚ç‚É‚‚¢ƒƒOƒŒƒxƒ‹‚Åo—Í‚µ‚½‚¢‚Ì‚ÅŽb’è‚Å 150 ‚É‚·‚éB
-	// ‘¼‚Ì‚àŠÜ‚ß‚Ä LOG_LEVEL ‚ð®—‚µ‚½‚¢cc
+	// ä»–ã® LOG_LEVEL_VERBOSE ã§å‡ºåŠ›ã—ã¦ã„ã‚‹ãƒ­ã‚°ã«æ¯”ã¹ã¦ã€
+	// ã•ã‚‰ã«é«˜ã„ãƒ­ã‚°ãƒ¬ãƒ™ãƒ«ã§å‡ºåŠ›ã—ãŸã„ã®ã§æš«å®šã§ 150 ã«ã™ã‚‹ã€‚
+	// ä»–ã®ã‚‚å«ã‚ã¦ LOG_LEVEL ã‚’æ•´ç†ã—ãŸã„â€¦â€¦
 	//
 	if (LogLevel(pvar, 150)) {
 		logprintf(150, "%s: old specs: %d", __FUNCTION__, pvar->fwd_state.num_requests);
@@ -1422,7 +1422,7 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 			free_request++;
 		}
 
-		// XVŒã‚àƒT[ƒo‘¤‚Å listen ‚µ‘±‚¯‚é‚©‚Ìƒ}[ƒN•t‚¯
+		// æ›´æ–°å¾Œã‚‚ã‚µãƒ¼ãƒå´ã§ listen ã—ç¶šã‘ã‚‹ã‹ã®ãƒžãƒ¼ã‚¯ä»˜ã‘
 		if (new_specs[i].type == FWD_REMOTE_TO_LOCAL) {
 			if (num_cur_listening > 0) {
 				FWDRequestSpec *listening_spec =
@@ -1438,8 +1438,8 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 	for (i = 0; i < num_cur_listening; i++) {
 		FWDRequestSpec *lspec = &server_listening_specs[i];
 		if (lspec->type == FWD_REMOTE_X11_TO_LOCAL) {
-			// X11 “]‘—‚ÍƒLƒƒƒ“ƒZƒ‹‚Å‚«‚È‚¢‚Ì‚ÅA‚»‚Ì‚Ü‚Üˆø‚«Œp‚®
-			// ˆø‚«Œp‚®ˆ×‚ÉêŠ‚ðŠo‚¦‚Ä‚¨‚­
+			// X11 è»¢é€ã¯ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã§ããªã„ã®ã§ã€ãã®ã¾ã¾å¼•ãç¶™ã
+			// å¼•ãç¶™ãç‚ºã«å ´æ‰€ã‚’è¦šãˆã¦ãŠã
 			x11_listening = i;
 			num_new_listening++;
 		}
@@ -1449,7 +1449,7 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 	}
 
 	if (x11_listening > 0) {
-		// X11 “]‘—‚ª—L‚Á‚½ê‡‚Íæ“ª‚ÉˆÚ“®‚·‚é (realloc‚ÅÁ‚³‚ê‚È‚¢‚æ‚¤‚É‚·‚éˆ×)
+		// X11 è»¢é€ãŒæœ‰ã£ãŸå ´åˆã¯å…ˆé ­ã«ç§»å‹•ã™ã‚‹ (reallocã§æ¶ˆã•ã‚Œãªã„ã‚ˆã†ã«ã™ã‚‹ç‚º)
 		server_listening_specs[0] = server_listening_specs[x11_listening];
 	}
 
@@ -1737,8 +1737,8 @@ void FWD_X11_open(PTInstVar pvar, uint32 remote_channel_num,
 	notify_nonfatal_error(pvar, pvar->UIMsg);
 }
 
-// agent forwarding ‚Ì—v‹‚É‘Î‚µAFWDChannel ‚ðì¬‚·‚é
-// SSH1 ‚Ì‚Æ‚«‚Ì‚ÝŒÄ‚Î‚ê‚é
+// agent forwarding ã®è¦æ±‚ã«å¯¾ã—ã€FWDChannel ã‚’ä½œæˆã™ã‚‹
+// SSH1 ã®ã¨ãã®ã¿å‘¼ã°ã‚Œã‚‹
 int FWD_agent_open(PTInstVar pvar, uint32 remote_channel_num)
 {
 	if (SSHv1(pvar)) {
@@ -1797,8 +1797,8 @@ void FWD_failed_open(PTInstVar pvar, uint32 local_channel_num, int reason)
 
 	channel = pvar->fwd_state.channels + local_channel_num;
 
-	// SSH2 ‚Å‚ÍŒÄ‚Ño‚µŒ³‚ÅŠù‚Éƒ|ƒbƒvƒAƒbƒv‚ðo‚µ‚Ä‚¢‚é‚Ì‚ÅA
-	// ‚±‚±‚Å‚Í SSH1 ‚ÌŽž‚Ì‚Ýƒ|ƒbƒvƒAƒbƒv‚ðo‚·
+	// SSH2 ã§ã¯å‘¼ã³å‡ºã—å…ƒã§æ—¢ã«ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ã‚’å‡ºã—ã¦ã„ã‚‹ã®ã§ã€
+	// ã“ã“ã§ã¯ SSH1 ã®æ™‚ã®ã¿ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ã‚’å‡ºã™
 	if (SSHv1(pvar)) {
 		UTIL_get_lang_msg("MSG_FWD_DENIED_BY_SERVER_ERROR", pvar,
 		                  "A program on the local machine attempted to connect to a forwarded port.\n"
@@ -1869,10 +1869,10 @@ void FWD_received_data(PTInstVar pvar, uint32 local_channel_num,
 
 	s = channel->local_socket;
 	if (length > 0 && s != INVALID_SOCKET) {
-		// SSHƒT[ƒo‚ÌXƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚©‚ç‘—‚ç‚ê‚Ä‚«‚½X11ƒf[ƒ^‚ðA
-		// Tera Term‚Æ“¯‚¶PC‚É“¯‹‚µ‚Ä‚¢‚éXƒT[ƒo‚ÉAƒuƒƒbƒLƒ“ƒOƒ‚[ƒh‚ðŽg‚Á‚ÄA
-		// ‘—M‚·‚éB
-		// XƒT[ƒo‚É‘—MŽž‚É”­¶‚·‚é FD_WRITE ‚ÍAˆ—‚·‚é•K—v‚ª‚È‚¢‚½‚ß–³Ž‹‚·‚éB
+		// SSHã‚µãƒ¼ãƒã®Xã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‹ã‚‰é€ã‚‰ã‚Œã¦ããŸX11ãƒ‡ãƒ¼ã‚¿ã‚’ã€
+		// Tera Termã¨åŒã˜PCã«åŒå±…ã—ã¦ã„ã‚‹Xã‚µãƒ¼ãƒã«ã€ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰ã‚’ä½¿ã£ã¦ã€
+		// é€ä¿¡ã™ã‚‹ã€‚
+		// Xã‚µãƒ¼ãƒã«é€ä¿¡æ™‚ã«ç™ºç”Ÿã™ã‚‹ FD_WRITE ã¯ã€å‡¦ç†ã™ã‚‹å¿…è¦ãŒãªã„ãŸã‚ç„¡è¦–ã™ã‚‹ã€‚
 		//OutputDebugPrintf("%s: send %d\n", __FUNCTION__, length);
 		if (!UTIL_sock_buffered_write(pvar, &channel->writebuf, blocking_write, s, data, length)) {
 			closed_local_connection(pvar, local_channel_num);
@@ -1880,7 +1880,7 @@ void FWD_received_data(PTInstVar pvar, uint32 local_channel_num,
 			UTIL_get_lang_msg("MSG_FWD_COMM_ERROR", pvar,
 			                  "A communications error occurred while sending forwarded data to a local port.\n"
 			                  "The forwarded connection will be closed.");
-			// ƒ|ƒbƒvƒAƒbƒv—}Ž~Žw’è‚ ‚ê‚ÎAŠÖ”‚ðŒÄ‚Ño‚³‚È‚¢B
+			// ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—æŠ‘æ­¢æŒ‡å®šã‚ã‚Œã°ã€é–¢æ•°ã‚’å‘¼ã³å‡ºã•ãªã„ã€‚
 			if ((pvar->settings.DisablePopupMessage & POPUP_MSG_FWD_received_data) == 0) {
 				notify_nonfatal_error(pvar, pvar->UIMsg);
 			}
