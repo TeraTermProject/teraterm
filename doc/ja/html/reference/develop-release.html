@@ -138,7 +138,12 @@ git checkout -b release/5_4_0-RC
   <li>作業ブランチをマージするための Pull Request を作成する</li>
   <li id="RC_commit">Pull Request をマージする（main または定期リリース用ブランチへ）</li>
   <li>GitHub Actions の workflow が実行されてビルドされる<br>
-    ビルドは3回実行されます: 作業ブランチへの push・Pull Request の作成・main または安定版ブランチへのマージコミット<br>
+    ビルドは3回実行されます:
+    <ul>
+      <li>作業ブランチへの push</li>
+      <li>Pull Request の作成</li>
+      <li>main または安定版ブランチへのマージコミット</li>
+    </ul>
     マージコミットを RC とみなします。
   </li>
   <!-- ローカルでリリースビルドする場合は、この時点で再度インストーラを作成する。コミットハッシュが変わっているため。 -->
@@ -190,10 +195,10 @@ git checkout -b release/5_4_0
       ビルド・インストーラの生成がエラーなくできることを確認する。
     </p>
   </li>
-  <li>コミット、push する</li>
-  <li>作業ブランチをマージするための Pull Request を作成する</li>
-  <li>Pull Request をマージする（main または定期リリース用ブランチへ）</li>
-  <li>タグを作成し、push する
+  <li>コミット、push する <a href="#login_signpath">*</a></li>
+  <li>作業ブランチをマージするための Pull Request を作成する <a href="#login_signpath">*</a></li>
+  <li>Pull Request をマージする（main または定期リリース用ブランチへ） <a href="#login_signpath">*</a></li>
+  <li>タグを作成し、push する <a href="#login_signpath">*</a>
     <p>
       タグは annotated tags とする。<br/>
       タグ名は「v(バージョン)」。（例: 5.4.0ならば "v5.4.0" ）
@@ -206,9 +211,15 @@ git push origin v5.4.0
 </pre>
   </li>
   <li>GitHub Actions の workflow が実行されてビルドされる<br>
-    ビルドは4回実行されます: 作業ブランチへの push・Pull Request の作成・main または安定版ブランチへのマージコミット・タグの作成<br>
+    ビルドは4回実行されます:
+    <ul>
+      <li>作業ブランチへの push</li>
+      <li>Pull Request の作成</li>
+      <li>main または安定版ブランチへのマージコミット</li>
+      <li>タグの作成</li>
+    </ul>
     リリースではタグの作成をリリースとみなします。<br>
-    リリース時には、workflow は途中で SignPath での承認を待ちます。SignPath.io にログインして署名リクエストを Approve します。
+    <span id="login_signpath">リリース時には、workflow は途中で SignPath での承認を待ちます。SignPath.io にログインして署名リクエストを Approve します。</span>
   </li>
   <!-- ローカルでリリースビルドする場合は、この時点で再度インストーラを作成する。コミットハッシュが変わっているため。 -->
   <li>GitHub の Releases に追加する
@@ -231,7 +242,13 @@ git push origin v5.4.0
   </li>
   <li>リリースをアナウンスする
     <ul>
-      <li>X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)</li>
+      <li>
+        X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)
+        <ul>
+          <li>アナウンスをポストする。</li>
+          <li>そのポストを固定する。</li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>定期リリースの場合は、安定版ブランチを作成する
@@ -311,6 +328,16 @@ git checkout -b stable_5_4
           </li>
           <li>コミット、push する。</li>
         </ul>
+      </li>
+      <li>
+        GitHub の <a href="https://github.com/TeraTermProject/teraterm/milestones">Milestones</a> を調整する。
+        <ul>
+          <li>リリースしたバージョンの Milestone を close する。</li>
+          <li>次の定期リリースバージョンの Milestone （例: "5.5.0"）を作成する。</li>
+          <li>「次のリリース or later」の Milestone をリネームする。（例: "5.5.0 or later" to "5.6.0 or later"）<br>
+              ここに含まれている issue を「次のリリース」の Milestone に移動する。</li>
+        </ul>
+        安定版リリースのマイルストーンは作成しません。
       </li>
     </ul>
     <p>安定版リリースの場合</p>
