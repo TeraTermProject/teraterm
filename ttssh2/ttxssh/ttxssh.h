@@ -37,9 +37,9 @@ See LICENSE.TXT for the license.
 
 #pragma warning(3 : 4035)
 
-/* VS2015(VC14.0)‚¾‚ÆAWSASocketA(), inet_ntoa() ‚È‚Ç‚ÌAPI‚ªdeprecated‚Å‚ ‚é‚Æ
-* Œx‚·‚é‚½‚ß‚ÉAŒx‚ğ—}~‚·‚éB‘ã‘ÖŠÖ”‚É’uŠ·‚·‚é‚ÆAVS2005(VC8.0)‚Åƒrƒ‹ƒh
-* ‚Å‚«‚È‚­‚È‚é‚½‚ßAŒx‚ğ—}~‚·‚é‚¾‚¯‚Æ‚·‚éB
+/* VS2015(VC14.0)ã ã¨ã€WSASocketA(), inet_ntoa() ãªã©ã®APIãŒdeprecatedã§ã‚ã‚‹ã¨
+* è­¦å‘Šã™ã‚‹ãŸã‚ã«ã€è­¦å‘Šã‚’æŠ‘æ­¢ã™ã‚‹ã€‚ä»£æ›¿é–¢æ•°ã«ç½®æ›ã™ã‚‹ã¨ã€VS2005(VC8.0)ã§ãƒ“ãƒ«ãƒ‰
+* ã§ããªããªã‚‹ãŸã‚ã€è­¦å‘Šã‚’æŠ‘æ­¢ã™ã‚‹ã ã‘ã¨ã™ã‚‹ã€‚
 */
 #if _MSC_VER >= 1800  // VSC2013(VC12.0) or later
 	#ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -88,8 +88,8 @@ typedef struct _TInstVar *PTInstVar;
 #include <openssl/evp.h>
 #include "buffer.h"
 
-/* tttypes.h ‚Å’è‹`‚³‚ê‚Ä‚¢‚é EM ƒ}ƒNƒ‚ª openssl/rsa.h (OpenSSL 0.9.8)‚ÌŠÖ”ƒvƒƒgƒ^ƒCƒvéŒ¾‚É
- * ‚ ‚éˆø”–¼‚Æd•¡‚µ‚Ä‚µ‚Ü‚¤‚Ì‚ÅAƒrƒ‹ƒhƒGƒ‰[‚Æ‚È‚éB‰º‹L3ƒwƒbƒ_‚ÌincludeˆÊ’u‚ğ‰º‹L‚ÉˆÚ“®‚µ‚½B
+/* tttypes.h ã§å®šç¾©ã•ã‚Œã¦ã„ã‚‹ EM ãƒã‚¯ãƒ­ãŒ openssl/rsa.h (OpenSSL 0.9.8)ã®é–¢æ•°ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€ã«
+ * ã‚ã‚‹å¼•æ•°åã¨é‡è¤‡ã—ã¦ã—ã¾ã†ã®ã§ã€ãƒ“ãƒ«ãƒ‰ã‚¨ãƒ©ãƒ¼ã¨ãªã‚‹ã€‚ä¸‹è¨˜3ãƒ˜ãƒƒãƒ€ã®includeä½ç½®ã‚’ä¸‹è¨˜ã«ç§»å‹•ã—ãŸã€‚
  * (2005.7.9 yutaka)
  */
 #include "teraterm.h"
@@ -97,7 +97,7 @@ typedef struct _TInstVar *PTInstVar;
 #include "ttplugin.h"
 
 #if defined(_MSC_VER) && !defined(_Printf_format_string_)
-// ’è‹`‚³‚ê‚Ä‚¢‚È‚¢‚Æ‚«‚Í‰½‚à‚µ‚È‚¢‚æ‚¤‚É’è‹`‚µ‚Ä‚¨‚­
+// å®šç¾©ã•ã‚Œã¦ã„ãªã„ã¨ãã¯ä½•ã‚‚ã—ãªã„ã‚ˆã†ã«å®šç¾©ã—ã¦ãŠã
 #define _Printf_format_string_
 #endif
 
@@ -121,7 +121,7 @@ extern HANDLE hInst; /* Instance handle of TTXSSH.DLL */
 #define OPTION_REPLACE  2
 
 /*
- * DisablePopupMessage —p‚Ìƒrƒbƒg’è‹`
+ * DisablePopupMessage ç”¨ã®ãƒ“ãƒƒãƒˆå®šç¾©
  */
 #define POPUP_MSG_default			0
 #define POPUP_MSG_FWD_received_data	(1 << 0)
@@ -251,8 +251,8 @@ typedef struct _TInstVar {
 	HWND NotificationWindow;
 	unsigned int notification_msg;
 	long notification_events;
-	HICON OldSmallIcon; // g—p‚µ‚È‚¢
-	HICON OldLargeIcon; // g—p‚µ‚È‚¢
+	HICON OldSmallIcon; // ä½¿ç”¨ã—ãªã„
+	HICON OldLargeIcon; // ä½¿ç”¨ã—ãªã„
 
 	BOOL hostdlg_activated;
 	BOOL hostdlg_Enabled;
@@ -328,13 +328,13 @@ typedef struct _TInstVar {
 	BOOL tryed_ssh2_authlist;
 	HWND ssh_hearbeat_dialog;
 
-	/* Pageant ‚Æ‚Ì’ÊM—p */
+	/* Pageant ã¨ã®é€šä¿¡ç”¨ */
 	unsigned char *pageant_key;
 	unsigned char *pageant_curkey;
 	int pageant_keylistlen;
 	int pageant_keycount;
 	int pageant_keycurrent;
-	BOOL pageant_keyfinal;// SSH2 PK_OK ‚ª—ˆ‚½‚Æ‚«‚É TRUE ‚É‚·‚é
+	BOOL pageant_keyfinal;// SSH2 PK_OK ãŒæ¥ãŸã¨ãã« TRUE ã«ã™ã‚‹
 
 	// agent forward
 	BOOL agentfwd_enable;
@@ -360,13 +360,13 @@ typedef struct _TInstVar {
 	BOOL nosession;
 
 	// dialog resource
-	HFONT hFontFixed;		// hosts.c“à‚Ìƒ_ƒCƒAƒƒO—p
+	HFONT hFontFixed;		// hosts.cå†…ã®ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ç”¨
 
 	struct {
-		BOOL suspended;  // SCPóM‚Ìƒtƒ[§Œä—p,TRUE‚Ì‚Æ‚«‰“š‚ğ•Ô‚³‚È‚¢ó‘Ô
+		BOOL suspended;  // SCPå—ä¿¡ã®ãƒ•ãƒ­ãƒ¼åˆ¶å¾¡ç”¨,TRUEã®ã¨ãå¿œç­”ã‚’è¿”ã•ãªã„çŠ¶æ…‹
 		//BOOL timer_triggerd;
 		UINT_PTR timer_id;
-		BOOL data_finished;	// TRUE‚Ì‚Æ‚«,ƒf[ƒ^‚ÌóM‚ÍŠ®—¹‚µ‚½
+		BOOL data_finished;	// TRUEã®ã¨ã,ãƒ‡ãƒ¼ã‚¿ã®å—ä¿¡ã¯å®Œäº†ã—ãŸ
 		BOOL close_request;
 	} recv;
 
@@ -376,7 +376,7 @@ typedef struct _TInstVar {
 	char UIMsg[MAX_UIMSG];
 } TInstVar;
 
-// ƒo[ƒWƒ‡ƒ“‚É‡‚í‚¹‚Ä©“®•ÏX‚³‚ê‚éB —á: TTSSH_2-81_TS_data
+// ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã«åˆã‚ã›ã¦è‡ªå‹•å¤‰æ›´ã•ã‚Œã‚‹ã€‚ ä¾‹: TTSSH_2-81_TS_data
 #define TTSSH_FILEMAPNAME "TTSSH_" TTSSH_VERSION_STR("-") "_TS_data"
 
 #define LOG_LEVEL_FATAL      5

@@ -34,12 +34,12 @@ extern "C" {
 #endif
 
 /**
- * ���O�o�b�t�@�̍Œ�󂫃T�C�Y
- *	"[YYYY-MM-DD HH:MM:SS.000]" �̕�����������x
+ * ログバッファの最低空きサイズ
+ *	"[YYYY-MM-DD HH:MM:SS.000]" の文字が入る程度
  */
 #define FILESYS_LOG_FREE_SPACE	(30*2)
 
-// log�t�@�C���̕����R�[�h
+// logファイルの文字コード
 typedef enum LogCode {
 	LOG_UTF8,
 	LOG_UTF16LE,

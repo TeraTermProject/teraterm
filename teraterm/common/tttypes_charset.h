@@ -53,10 +53,10 @@ typedef enum {
 	IdJIS,
 	// Russian code sets
 #if 0
-	IdWindows,			// Å®IdCP1251
-	IdKOI8,				// Å®IdKOI8_NEW
-	Id866,				// Å®IdCP866
-	IdISO,				// Å®IdISO8859_5
+	IdWindows,			// ‚ÜíIdCP1251
+	IdKOI8,				// ‚ÜíIdKOI8_NEW
+	Id866,				// ‚ÜíIdCP866
+	IdISO,				// ‚ÜíIdISO8859_5
 #endif
 	// Korean
 	IdKoreanCP949,		// CP949, KS5601

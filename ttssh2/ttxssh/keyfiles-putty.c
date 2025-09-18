@@ -323,8 +323,8 @@ void ssh2_ppk_derive_keys(
 				buffer_append(storage, buf, 20);
 				cipherkey_write_byte += 20;
 			}
-			// TTSSH ‚Ì buffer_t ‚É‚Í shrink ‚·‚éŠÖ”‚ª‚È‚¢‚Ì‚ÅA
-			// shrink ‚¹‚¸‚É 40byte ‚Ì‚¤‚¿ 32byte ‚¾‚¯‚ðŽg‚¤
+			// TTSSH ã® buffer_t ã«ã¯ shrink ã™ã‚‹é–¢æ•°ãŒãªã„ã®ã§ã€
+			// shrink ã›ãšã« 40byte ã®ã†ã¡ 32byte ã ã‘ã‚’ä½¿ã†
 			cipherkey_offset = cipherkey_write_byte - ciphertype->key_len;
 
 			/* In this version of the format, the CBC IV was always all 0. */

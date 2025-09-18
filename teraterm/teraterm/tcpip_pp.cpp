@@ -45,7 +45,7 @@
 #include "dlg_res.h"
 #include "tcpip_pp.h"
 
-// テンプレートの書き換えを行う
+// 繝�繝ｳ繝励Ξ繝ｼ繝医�ｮ譖ｸ縺肴鋤縺医ｒ陦後≧
 #define REWRITE_TEMPLATE
 
 typedef struct {

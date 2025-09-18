@@ -95,7 +95,7 @@ static void FreeUserKey(PKeyMap KeyMap_)
 }
 
 /**
- *	•K—v‚È‚çKeyMap ‚ğŠm•ÛA‰Šú‰»‚·‚é
+ *	å¿…è¦ãªã‚‰KeyMap ã‚’ç¢ºä¿ã€åˆæœŸåŒ–ã™ã‚‹
  */
 static void InitKeyMap()
 {
@@ -846,7 +846,7 @@ static void GetKeyStr(HWND HWin, const PKeyMap KeyMap_, WORD KeyCode, BOOL Appli
 					p++;
 				}
 				if (i == KeyMap_->UserKeyCount){
-					// ƒ†[ƒU[ƒL[‚Éİ’è‚ª‚È‚¢
+					// ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚­ãƒ¼ã«è¨­å®šãŒãªã„
 					return;
 				}
 				*Type = p->type;
@@ -1591,8 +1591,8 @@ void KeyCodeSend(WORD KCode, WORD Count)
 			RunMacroW(Code, FALSE);
 			break;
 		case IdCommand:
-			// sendkcode ‚É‚æ‚éƒƒjƒ…[ƒRƒ}ƒ“ƒh‚ÌÀs‚Í–¢ƒTƒ|[ƒg
-			// (ƒ}ƒNƒƒRƒ}ƒ“ƒh callmenu ‚Å‘ã‘Ö‰Â”\)
+			// sendkcode ã«ã‚ˆã‚‹ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚³ãƒãƒ³ãƒ‰ã®å®Ÿè¡Œã¯æœªã‚µãƒãƒ¼ãƒˆ
+			// (ãƒã‚¯ãƒ­ã‚³ãƒãƒ³ãƒ‰ callmenu ã§ä»£æ›¿å¯èƒ½)
 			break;
 	}
 }

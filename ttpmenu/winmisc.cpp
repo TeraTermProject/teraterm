@@ -38,10 +38,10 @@
 
 /* ==========================================================================
 	Function Name	: (void) SetDlgPos()
-	Outline			: É_ÉCÉAÉçÉOÇÃà íuÇà⁄ìÆÇ∑ÇÈ
-	Arguments		: HWND		hWnd	(in)	É_ÉCÉAÉçÉOÇÃÉEÉCÉìÉhÉEÉnÉìÉhÉã
-					: int		pos		(in)	à⁄ìÆèÍèäÇé¶Ç∑íl
-	Return Value	: Ç»Çµ
+	Outline			: „ÉÄ„Ç§„Ç¢„É≠„Ç∞„ÅÆ‰ΩçÁΩÆ„ÇíÁßªÂãï„Åô„Çã
+	Arguments		: HWND		hWnd	(in)	„ÉÄ„Ç§„Ç¢„É≠„Ç∞„ÅÆ„Ç¶„Ç§„É≥„Éâ„Ç¶„Éè„É≥„Éâ„É´
+					: int		pos		(in)	ÁßªÂãïÂ†¥ÊâÄ„ÇíÁ§∫„ÅôÂÄ§
+	Return Value	: „Å™„Åó
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -93,12 +93,12 @@ void SetDlgPos(HWND hWnd, int pos)
 
 /* ==========================================================================
 	Function Name	: (BOOL) EnableItem()
-	Outline			: É_ÉCÉAÉçÉOÉAÉCÉeÉÄÇóLå¯Å^ñ≥å¯Ç…Ç∑ÇÈ
-	Arguments		: HWND		hWnd		(in)	É_ÉCÉAÉçÉOÇÃÉnÉìÉhÉã
-					: int		idControl	(in)	É_ÉCÉAÉçÉOÉAÉCÉeÉÄÇÃ ID
+	Outline			: „ÉÄ„Ç§„Ç¢„É≠„Ç∞„Ç¢„Ç§„ÉÜ„É†„ÇíÊúâÂäπÔºèÁÑ°Âäπ„Å´„Åô„Çã
+	Arguments		: HWND		hWnd		(in)	„ÉÄ„Ç§„Ç¢„É≠„Ç∞„ÅÆ„Éè„É≥„Éâ„É´
+					: int		idControl	(in)	„ÉÄ„Ç§„Ç¢„É≠„Ç∞„Ç¢„Ç§„ÉÜ„É†„ÅÆ ID
 					: BOOL		flag
-	Return Value	: ê¨å˜ TRUE
-					: é∏îs FALSE
+	Return Value	: ÊàêÂäü TRUE
+					: Â§±Êïó FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -117,12 +117,12 @@ BOOL EnableItem(HWND hWnd, int idControl, BOOL flag)
 
 /* ==========================================================================
 	Function Name	: (void) EncodePassword()
-	Outline			: ÉpÉXÉèÅ[ÉhÇÉGÉìÉRÅ[Éh(?)Ç∑ÇÈÅB
-					  ÉGÉìÉRÅ[ÉhÇ≥ÇÍÇΩï∂éöóÒÇÉfÉRÅ[ÉhÇ∑ÇÈ
-					  ì¸èoóÕÇÕï∂éöóÒÇ‹ÇΩÇÕÉoÉCÉiÉäÇ∆Ç»ÇÈ
-	Arguments		: const char *cPassword			(in)	ïœä∑Ç∑ÇÈï∂éöóÒ
-					: char		 *cEncodePassword	(out)	ïœä∑Ç≥ÇÍÇΩï∂éöóÒ
-	Return Value	: Ç»Çµ
+	Outline			: „Éë„Çπ„ÉØ„Éº„Éâ„Çí„Ç®„É≥„Ç≥„Éº„Éâ(?)„Åô„Çã„ÄÇ
+					  „Ç®„É≥„Ç≥„Éº„Éâ„Åï„Çå„ÅüÊñáÂ≠óÂàó„Çí„Éá„Ç≥„Éº„Éâ„Åô„Çã
+					  ÂÖ•Âá∫Âäõ„ÅØÊñáÂ≠óÂàó„Åæ„Åü„ÅØ„Éê„Ç§„Éä„É™„Å®„Å™„Çã
+	Arguments		: const char *cPassword			(in)	Â§âÊèõ„Åô„ÇãÊñáÂ≠óÂàó
+					: char		 *cEncodePassword	(out)	Â§âÊèõ„Åï„Çå„ÅüÊñáÂ≠óÂàó
+	Return Value	: „Å™„Åó
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -142,16 +142,16 @@ void EncodePassword(const char *cPassword, char *cEncodePassword)
 
 /* ==========================================================================
 	Function Name	: (BOOL) OpenFileDlg()
-	Outline			: ÅuÉtÉ@ÉCÉãÇäJÇ≠ÅvÉ_ÉCÉAÉçÉOÇäJÇ´ÅAéwíËÇ≥ÇÍÇΩÉtÉ@ÉCÉã
-					: ÉpÉXÇéwíËÇ≥ÇÍÇΩÉAÉCÉeÉÄÇ…ëóÇÈ
-	Arguments		: HWND		hWnd		(in)	êeÉEÉCÉìÉhÉEÇÃÉnÉìÉhÉã
-					: UINT		editCtl		(in)	ÉAÉCÉeÉÄÇÃ ID
-					: char		*title		(in)	ÉEÉCÉìÉhÉEÉ^ÉCÉgÉã
-					: char		*filter		(in)	ï\é¶Ç∑ÇÈÉtÉ@ÉCÉãÇÃÉtÉBÉãÉ^
-					: char		*defaultDir	(in,out)ÉfÉtÉHÉãÉgÇÃÉpÉX
+	Outline			: „Äå„Éï„Ç°„Ç§„É´„ÇíÈñã„Åè„Äç„ÉÄ„Ç§„Ç¢„É≠„Ç∞„ÇíÈñã„Åç„ÄÅÊåáÂÆö„Åï„Çå„Åü„Éï„Ç°„Ç§„É´
+					: „Éë„Çπ„ÇíÊåáÂÆö„Åï„Çå„Åü„Ç¢„Ç§„ÉÜ„É†„Å´ÈÄÅ„Çã
+	Arguments		: HWND		hWnd		(in)	Ë¶™„Ç¶„Ç§„É≥„Éâ„Ç¶„ÅÆ„Éè„É≥„Éâ„É´
+					: UINT		editCtl		(in)	„Ç¢„Ç§„ÉÜ„É†„ÅÆ ID
+					: char		*title		(in)	„Ç¶„Ç§„É≥„Éâ„Ç¶„Çø„Ç§„Éà„É´
+					: char		*filter		(in)	Ë°®Á§∫„Åô„Çã„Éï„Ç°„Ç§„É´„ÅÆ„Éï„Ç£„É´„Çø
+					: char		*defaultDir	(in,out)„Éá„Éï„Ç©„É´„Éà„ÅÆ„Éë„Çπ
 					: size_t    max_path
-	Return Value	: ê¨å˜ TRUE
-					: é∏îs FALSE
+	Return Value	: ÊàêÂäü TRUE
+					: Â§±Êïó FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -290,14 +290,14 @@ LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 
 /* ==========================================================================
 	Function Name	: (int) Encrypt2EncDec()
-	Outline			: ÉpÉXÉèÅ[ÉhÇÃà√çÜâª/ïúçÜèàóù(aes_256_ctr)
-	Arguments		:										à√çÜâª  ïúçÜ
-					: char					*szPassword 	(in)	(out)	ÉpÉXÉèÅ[Éh(à√çÜâª/ïúçÜëŒè€ÇÃï∂éöóÒ)
-					: const unsigned char	*szEncryptKey	(in)	(in)	îÈñßåÆ(ÉpÉXÉèÅ[ÉhÇà√çÜâª/ïúçÜÇ∑ÇÈÇΩÇﬂÇÃÉpÉXÉèÅ[Éh)
-					: Encrypt2ProfileP		profile			(out)	(in)	ÉpÉXÉèÅ[ÉhÉvÉçÉtÉ@ÉCÉã
-					: int					encrypt			(in)	(in)	1:à√çÜâªÅA0:ïúçÜ
-	Return Value	: ê¨å˜ 1
-					: é∏îs 0
+	Outline			: „Éë„Çπ„ÉØ„Éº„Éâ„ÅÆÊöóÂè∑Âåñ/Âæ©Âè∑Âá¶ÁêÜ(aes_256_ctr)
+	Arguments		:										ÊöóÂè∑Âåñ  Âæ©Âè∑
+					: char					*szPassword 	(in)	(out)	„Éë„Çπ„ÉØ„Éº„Éâ(ÊöóÂè∑Âåñ/Âæ©Âè∑ÂØæË±°„ÅÆÊñáÂ≠óÂàó)
+					: const unsigned char	*szEncryptKey	(in)	(in)	ÁßòÂØÜÈçµ(„Éë„Çπ„ÉØ„Éº„Éâ„ÇíÊöóÂè∑Âåñ/Âæ©Âè∑„Åô„Çã„Åü„ÇÅ„ÅÆ„Éë„Çπ„ÉØ„Éº„Éâ)
+					: Encrypt2ProfileP		profile			(out)	(in)	„Éë„Çπ„ÉØ„Éº„Éâ„Éó„É≠„Éï„Ç°„Ç§„É´
+					: int					encrypt			(in)	(in)	1:ÊöóÂè∑Âåñ„ÄÅ0:Âæ©Âè∑
+	Return Value	: ÊàêÂäü 1
+					: Â§±Êïó 0
 	Reference		:
 	Renewal			:
 	Notes			:
@@ -328,7 +328,7 @@ int Encrypt2EncDec(char *szPassword, const unsigned char *szEncryptKey, Encrypt2
 		}
 	}
 
-	// åÆì±èo
+	// ÈçµÂ∞éÂá∫
 	if (PKCS5_PBKDF2_HMAC((const char *)szEncryptKey, (int)strlen((const char *)szEncryptKey),
 						  (const unsigned char *)&(profile->PassSalt), ENCRYPT2_SALTLEN,
 						  ENCRYPT2_ITER2, (EVP_MD *)ENCRYPT2_DIGEST,
@@ -338,7 +338,7 @@ int Encrypt2EncDec(char *szPassword, const unsigned char *szEncryptKey, Encrypt2
 	memcpy(Key, TmpKeyIV, ENCRYPT2_IKLEN);
 	memcpy(IV, TmpKeyIV + ENCRYPT2_IKLEN, ENCRYPT2_IVLEN);
 
-	// èÄîı
+	// Ê∫ñÂÇô
 	if ((Bmem = BIO_new(BIO_s_mem())) == NULL ||
 		(Benc = BIO_new(BIO_f_cipher())) == NULL ||
 		BIO_get_cipher_ctx(Benc, &ctx) != 1 ||
@@ -349,10 +349,10 @@ int Encrypt2EncDec(char *szPassword, const unsigned char *szEncryptKey, Encrypt2
 
 	if (encrypt) {
 		int len;
-		// à√çÜâª
+		// ÊöóÂè∑Âåñ
 		len = (int)strlen(szPassword);
 		memcpy(Buf, szPassword, len);
-		memset(Buf + len, 0x00, ENCRYPT2_PWD_MAX_LEN - len);	// nullÉpÉfÉBÉìÉO
+		memset(Buf + len, 0x00, ENCRYPT2_PWD_MAX_LEN - len);	// null„Éë„Éá„Ç£„É≥„Ç∞
 		if (BIO_write(Bio, Buf, ENCRYPT2_PWD_MAX_LEN) != ENCRYPT2_PWD_MAX_LEN ||
 			BIO_write(Bio, profile->EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN ||
 			BIO_flush(Bio) != 1 ||
@@ -360,7 +360,7 @@ int Encrypt2EncDec(char *szPassword, const unsigned char *szEncryptKey, Encrypt2
 			BIO_read(Bmem, profile->EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN) {
 			goto end;
 		}
-		// hmacäiî[
+		// hmacÊ†ºÁ¥ç
 		if ((PKCS5_PBKDF2_HMAC((const char *)szEncryptKey, (int)strlen((const char *)szEncryptKey),
 							   (const unsigned char *)&(profile->EncSalt), ENCRYPT2_SALTLEN,
 							   ENCRYPT2_ITER1, (EVP_MD *)ENCRYPT2_DIGEST,
@@ -375,7 +375,7 @@ int Encrypt2EncDec(char *szPassword, const unsigned char *szEncryptKey, Encrypt2
 		}
 		ret = 1;
 	} else {
-		// ïúçÜ
+		// Âæ©Âè∑
 		if (BIO_write(Bmem, profile->PassStr, ENCRYPT2_PWD_MAX_LEN) != ENCRYPT2_PWD_MAX_LEN ||
 			BIO_write(Bmem, profile->EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN ||
 			BIO_write(Bmem, profile->EncHash, SHA512_DIGEST_LENGTH) != SHA512_DIGEST_LENGTH ||
@@ -385,7 +385,7 @@ int Encrypt2EncDec(char *szPassword, const unsigned char *szEncryptKey, Encrypt2
 			BIO_read(Bio, Lprofile.EncHash, SHA512_DIGEST_LENGTH) != SHA512_DIGEST_LENGTH) {
 			goto end;
 		}
-		// hmacî‰är
+		// hmacÊØîËºÉ
 		if ((PKCS5_PBKDF2_HMAC((const char *)szEncryptKey, (int)strlen((const char *)szEncryptKey),
 							   (const unsigned char *)&(profile->EncSalt), ENCRYPT2_SALTLEN,
 							   ENCRYPT2_ITER1, (EVP_MD *)ENCRYPT2_DIGEST,
@@ -398,10 +398,10 @@ int Encrypt2EncDec(char *szPassword, const unsigned char *szEncryptKey, Encrypt2
 		memcpy(szPassword, Lprofile.PassStr, ENCRYPT2_PWD_MAX_LEN);
 		if (CRYPTO_memcmp(Hash, Lprofile.EncHash, SHA512_DIGEST_LENGTH) == 0) {
 			szPassword[ENCRYPT2_PWD_MAX_LEN] = 0;
-			ret = 1;	// àÍív
+			ret = 1;	// ‰∏ÄËá¥
 		} else {
 			szPassword[0] = 0;
-			ret = 0;	// ïsàÍív
+			ret = 0;	// ‰∏ç‰∏ÄËá¥
 		}
 	}
 

@@ -27,8 +27,8 @@
  */
 
 /**
- *	ƒ_ƒCƒAƒƒOƒŠƒTƒCƒYŽž‚É“o˜^‚µ‚½ƒ_ƒCƒAƒƒOã‚ÌƒRƒ“ƒgƒ[ƒ‹‚ðÄ”z’u‚·‚é
- *	ƒEƒBƒ“ƒhƒE‚Ì‚Ç‚Ì•”•ª‚ðŠî€(ƒAƒ“ƒJ[)‚É‚·‚é‚©‚ðŽw’è‚·‚é
+ *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒªã‚µã‚¤ã‚ºæ™‚ã«ç™»éŒ²ã—ãŸãƒ€ã‚¤ã‚¢ãƒ­ã‚°ä¸Šã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚’å†é…ç½®ã™ã‚‹
+ *	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã©ã®éƒ¨åˆ†ã‚’åŸºæº–(ã‚¢ãƒ³ã‚«ãƒ¼)ã«ã™ã‚‹ã‹ã‚’æŒ‡å®šã™ã‚‹
  */
 #pragma once
 
@@ -39,16 +39,16 @@ extern "C" {
 typedef struct ReiseDlgHelper_st ReiseDlgHelper_t;
 
 /**
- *	ƒAƒ“ƒJ[’è”
+ *	ã‚¢ãƒ³ã‚«ãƒ¼å®šæ•°
  */
 typedef enum {
-	RESIZE_HELPER_ANCHOR_NONE_H = 0x01,	// …•½•ûŒüƒAƒ“ƒJ[‚È‚µ
-	RESIZE_HELPER_ANCHOR_NONE_V = 0x02,	// ‚’¼•ûŒüƒAƒ“ƒJ[‚È‚µ
+	RESIZE_HELPER_ANCHOR_NONE_H = 0x01,	// æ°´å¹³æ–¹å‘ã‚¢ãƒ³ã‚«ãƒ¼ãªã—
+	RESIZE_HELPER_ANCHOR_NONE_V = 0x02,	// åž‚ç›´æ–¹å‘ã‚¢ãƒ³ã‚«ãƒ¼ãªã—
 	RESIZE_HELPER_ANCHOR_NONE = RESIZE_HELPER_ANCHOR_NONE_H | RESIZE_HELPER_ANCHOR_NONE_V,
-	RESIZE_HELPER_ANCHOR_LEFT = 0x04,	// ƒEƒBƒ“ƒhƒE¶’[(–¢Žw’è‚Æ“¯‚¶)
-	RESIZE_HELPER_ANCHOR_RIGHT = 0x08,	// ƒEƒBƒ“ƒhƒE‰E’[
-	RESIZE_HELPER_ANCHOR_TOP = 0x10,	// ƒEƒBƒ“ƒhƒEã’[(–¢Žw’è‚Æ“¯‚¶)
-	RESIZE_HELPER_ANCHOR_BOTTOM = 0x20,	// ƒEƒBƒ“ƒhƒE‰º’[
+	RESIZE_HELPER_ANCHOR_LEFT = 0x04,	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å·¦ç«¯(æœªæŒ‡å®šã¨åŒã˜)
+	RESIZE_HELPER_ANCHOR_RIGHT = 0x08,	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å³ç«¯
+	RESIZE_HELPER_ANCHOR_TOP = 0x10,	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä¸Šç«¯(æœªæŒ‡å®šã¨åŒã˜)
+	RESIZE_HELPER_ANCHOR_BOTTOM = 0x20,	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä¸‹ç«¯
 	RESIZE_HELPER_ANCHOR_L = RESIZE_HELPER_ANCHOR_LEFT,
 	RESIZE_HELPER_ANCHOR_R = RESIZE_HELPER_ANCHOR_RIGHT,
 	RESIZE_HELPER_ANCHOR_T = RESIZE_HELPER_ANCHOR_TOP,
@@ -68,35 +68,35 @@ typedef struct {
 } ResizeHelperInfo;
 
 /**
- *	‰Šú‰»
+ *	åˆæœŸåŒ–
  *
- *	@param[in]	dlg			ƒ_ƒCƒAƒƒOƒnƒ“ƒhƒ‹
- *	@param[in]	size_box	TRUE/FALSE	ƒTƒCƒYƒ{ƒbƒNƒX‚ð•\Ž¦‚·‚é/‚µ‚È‚¢
+ *	@param[in]	dlg			ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
+ *	@param[in]	size_box	TRUE/FALSE	ã‚µã‚¤ã‚ºãƒœãƒƒã‚¯ã‚¹ã‚’è¡¨ç¤ºã™ã‚‹/ã—ãªã„
  */
 ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg, BOOL size_box);
 
 /**
- *	I—¹
+ *	çµ‚äº†
  */
 void ReiseDlgHelperDelete(ReiseDlgHelper_t *h);
 
 /**
- *	ƒRƒ“ƒgƒ[ƒ‹‚ðƒEƒBƒ“ƒhƒE‚Ì‚Ç‚±‚ÉƒAƒ“ƒJ[‚·‚é‚©Žw’è
+ *	ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚’ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã©ã“ã«ã‚¢ãƒ³ã‚«ãƒ¼ã™ã‚‹ã‹æŒ‡å®š
  */
 void ReiseDlgHelperAdd(ReiseDlgHelper_t *h, UINT id, ResizeHelperAnchor anchor);
 
 /**
- *	‰Šú‰» + ˜A‘±“o˜^
+ *	åˆæœŸåŒ– + é€£ç¶šç™»éŒ²
  *
- *	@param[in]	dlg			ƒ_ƒCƒAƒƒOƒnƒ“ƒhƒ‹
- *	@param[in]	size_box	TRUE/FALSE	ƒTƒCƒYƒ{ƒbƒNƒX‚ð•\Ž¦‚·‚é/‚µ‚È‚¢
- *	@param[in]	infos		ƒŠƒTƒCƒYî•ñƒŠƒXƒg
- *	@param[in]	info_count	ƒŠƒTƒCƒYî•ñ”
+ *	@param[in]	dlg			ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒãƒ³ãƒ‰ãƒ«
+ *	@param[in]	size_box	TRUE/FALSE	ã‚µã‚¤ã‚ºãƒœãƒƒã‚¯ã‚¹ã‚’è¡¨ç¤ºã™ã‚‹/ã—ãªã„
+ *	@param[in]	infos		ãƒªã‚µã‚¤ã‚ºæƒ…å ±ãƒªã‚¹ãƒˆ
+ *	@param[in]	info_count	ãƒªã‚µã‚¤ã‚ºæƒ…å ±æ•°
  */
 ReiseDlgHelper_t *ReiseHelperInit(HWND dlg, BOOL size_box, const ResizeHelperInfo *infos, size_t info_count);
 
 /**
- *	ƒEƒBƒ“ƒhƒE‚ÌƒƒbƒZ[ƒW‚ª”­¶‚µ‚½‚çŒÄ‚Ño‚µ
+ *	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒç™ºç”Ÿã—ãŸã‚‰å‘¼ã³å‡ºã—
  */
 void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h);
 INT_PTR ReiseDlgHelper_WM_GETMINMAXINFO(ReiseDlgHelper_t *h, LPARAM lp);

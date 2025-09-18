@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* unicodeŠÖ˜A‚Ì•¶šƒR[ƒh•ÏŠ· */
+/* unicodeé–¢é€£ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰å¤‰æ› */
 
 #include <windows.h>
 #include <string.h>
@@ -43,11 +43,11 @@
 #include "codeconv.h"
 #include "ttcstd.h"
 
-// cp932•ÏŠ·AWindows API ‚æ‚è Tera Term ‚Ì•ÏŠ·ƒe[ƒuƒ‹‚ğ—Dæ‚·‚é
+// cp932å¤‰æ›æ™‚ã€Windows API ã‚ˆã‚Š Tera Term ã®å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’å„ªå…ˆã™ã‚‹
 //#define PRIORITY_CP932_TABLE
 
 /*
- *	Œ©‚Â‚©‚ç‚È‚¢ê‡‚Í 0 ‚ğ•Ô‚·
+ *	è¦‹ã¤ã‹ã‚‰ãªã„å ´åˆã¯ 0 ã‚’è¿”ã™
  */
 static unsigned short _ConvertUnicode(unsigned short code, const codemap_t *table, int tmax)
 {
@@ -86,10 +86,10 @@ int IsLowSurrogate(wchar_t u16)
 }
 
 /**
- * CP932•¶š(Shift_JIS) 1•¶š‚©‚çUTF-32‚Ö•ÏŠ·‚·‚é
- * @param[in]		cp932		CP932•¶š
- * @retval			•ÏŠ·‚µ‚½UTF-32•¶š
- *					0=ƒGƒ‰[(•ÏŠ·‚Å‚«‚È‚©‚Á‚½)
+ * CP932æ–‡å­—(Shift_JIS) 1æ–‡å­—ã‹ã‚‰UTF-32ã¸å¤‰æ›ã™ã‚‹
+ * @param[in]		cp932		CP932æ–‡å­—
+ * @retval			å¤‰æ›ã—ãŸUTF-32æ–‡å­—
+ *					0=ã‚¨ãƒ©ãƒ¼(å¤‰æ›ã§ããªã‹ã£ãŸ)
  */
 unsigned int CP932ToUTF32(unsigned short cp932)
 {
@@ -116,10 +116,10 @@ unsigned int CP932ToUTF32(unsigned short cp932)
 	}
 	ret = ::MultiByteToWideChar(932, MB_ERR_INVALID_CHARS, (char *)buf, len, &wchar, 1);
 	if (ret <= 0) {
-		// MultiByteToWideChar()‚ª•ÏŠ·¸”s
+		// MultiByteToWideChar()ãŒå¤‰æ›å¤±æ•—
 #if !defined(PRIORITY_CP932_TABLE)
 		u32 = _ConvertUnicode(cp932, mapSJISToUnicode, sizeof(mapSJISToUnicode)/sizeof(mapSJISToUnicode[0]));
-		// ƒe[ƒuƒ‹‚É‚à‚È‚©‚Á‚½ê‡ c = 0(•ÏŠ·¸”s)
+		// ãƒ†ãƒ¼ãƒ–ãƒ«ã«ã‚‚ãªã‹ã£ãŸå ´åˆ c = 0(å¤‰æ›å¤±æ•—æ™‚)
 #else
 		u32 = 0;
 #endif
@@ -131,12 +131,12 @@ unsigned int CP932ToUTF32(unsigned short cp932)
 }
 
 /**
- * Unicode‚©‚çDEC“Áê•¶š‚Ö•ÏŠ·
- * @param	u32			UTF-32•¶šƒR[ƒh
- * @return	‰ºˆÊ8bit	DEC“Áê•¶šƒR[ƒh
- *			ãˆÊ8bit	•¶šƒR[ƒhí•Ê (1,2,4)
- *						file://../../doc/ja/html/setup/teraterm-term.html QÆ
- *			0			•ÏŠ·‚Å‚«‚È‚©‚Á‚½
+ * Unicodeã‹ã‚‰DECç‰¹æ®Šæ–‡å­—ã¸å¤‰æ›
+ * @param	u32			UTF-32æ–‡å­—ã‚³ãƒ¼ãƒ‰
+ * @return	ä¸‹ä½8bit	DECç‰¹æ®Šæ–‡å­—ã‚³ãƒ¼ãƒ‰
+ *			ä¸Šä½8bit	æ–‡å­—ã‚³ãƒ¼ãƒ‰ç¨®åˆ¥ (1,2,4)
+ *						file://../../doc/ja/html/setup/teraterm-term.html å‚ç…§
+ *			0			å¤‰æ›ã§ããªã‹ã£ãŸ
  */
 unsigned short UTF32ToDecSp(unsigned int u32)
 {
@@ -152,11 +152,11 @@ unsigned short UTF32ToDecSp(unsigned int u32)
 }
 
 /**
- *	code page ‚Ì mulit byte •¶š‚ğ UTF-32‚Ö•ÏŠ·‚·‚é
- *	@param mb_code		ƒ}ƒ‹ƒ`ƒoƒCƒg‚Ì•¶šƒR[ƒh(0x0000-0xffff)
- *	@param code_page	ƒ}ƒ‹ƒ`ƒoƒCƒg‚ÌƒR[ƒhƒy[ƒW
- *	@retval				unicode(UTF-32•¶šƒR[ƒh)
- *						0=ƒGƒ‰[(•ÏŠ·‚Å‚«‚È‚©‚Á‚½)
+ *	code page ã® mulit byte æ–‡å­—ã‚’ UTF-32ã¸å¤‰æ›ã™ã‚‹
+ *	@param mb_code		ãƒãƒ«ãƒãƒã‚¤ãƒˆã®æ–‡å­—ã‚³ãƒ¼ãƒ‰(0x0000-0xffff)
+ *	@param code_page	ãƒãƒ«ãƒãƒã‚¤ãƒˆã®ã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸
+ *	@retval				unicode(UTF-32æ–‡å­—ã‚³ãƒ¼ãƒ‰)
+ *						0=ã‚¨ãƒ©ãƒ¼(å¤‰æ›ã§ããªã‹ã£ãŸ)
  */
 unsigned int MBCP_UTF32(unsigned short mb_code, int code_page)
 {
@@ -191,9 +191,9 @@ unsigned int MBCP_UTF32(unsigned short mb_code, int code_page)
 }
 
 /**
- * UTF-32•¶š‚ğCP932•¶š(Shift_JIS) 1•¶š‚Ö•ÏŠ·‚·‚é
- * @retval		g—p‚µ‚½CP932•¶š
- *				0=ƒGƒ‰[(•ÏŠ·‚Å‚«‚È‚©‚Á‚½)
+ * UTF-32æ–‡å­—ã‚’CP932æ–‡å­—(Shift_JIS) 1æ–‡å­—ã¸å¤‰æ›ã™ã‚‹
+ * @retval		ä½¿ç”¨ã—ãŸCP932æ–‡å­—
+ *				0=ã‚¨ãƒ©ãƒ¼(å¤‰æ›ã§ããªã‹ã£ãŸ)
  */
 unsigned short UTF32_CP932(unsigned int u32)
 {
@@ -212,10 +212,10 @@ unsigned short UTF32_CP932(unsigned int u32)
 #if defined(PRIORITY_CP932_TABLE)
 	if (u32 < 0x10000) {
 		wchar_t u16 = (wchar_t)u32;
-		// Tera Term‚Ì•ÏŠ·ƒe[ƒuƒ‹‚Å Unicode -> Shift_JIS‚Ö•ÏŠ·
+		// Tera Termã®å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«ã§ Unicode -> Shift_JISã¸å¤‰æ›
 		mb = _ConvertUnicode(u16, mapUnicodeToSJIS, _countof(mapUnicodeToSJIS));
 		if (mb != 0) {
-			// •ÏŠ·‚Å‚«‚½
+			// å¤‰æ›ã§ããŸ
 			return mb;
 		}
 	}
@@ -227,12 +227,12 @@ unsigned short UTF32_CP932(unsigned int u32)
 	use_default_char = FALSE;
 	mblen = ::WideCharToMultiByte(932, 0, u16_str, (int)u16_len, mbstr, 2, NULL, &use_default_char);
 	if (use_default_char) {
-		// •ÏŠ·‚Å‚«‚¸AŠù’è‚Ì•¶š‚ğg‚Á‚½
+		// å¤‰æ›ã§ããšã€æ—¢å®šã®æ–‡å­—ã‚’ä½¿ã£ãŸ
 		goto next_convert;
 	}
 	switch (mblen) {
 	case 0:
-		// •ÏŠ·¸”s
+		// å¤‰æ›å¤±æ•—
 		goto next_convert;
 	case 1:
 		mb = (unsigned char)mbstr[0];
@@ -246,10 +246,10 @@ next_convert:
 #if !defined(PRIORITY_CP932_TABLE)
 	if (u32 < 0x10000) {
 		wchar_t u16 = (wchar_t)u32;
-		// Tera Term‚Ì•ÏŠ·ƒe[ƒuƒ‹‚Å Unicode -> Shift_JIS‚Ö•ÏŠ·
+		// Tera Termã®å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«ã§ Unicode -> Shift_JISã¸å¤‰æ›
 		mb = _ConvertUnicode(u16, mapUnicodeToSJIS, _countof(mapUnicodeToSJIS));
 		if (mb != 0) {
-			// •ÏŠ·‚Å‚«‚½
+			// å¤‰æ›ã§ããŸ
 			return mb;
 		}
 	}
@@ -258,12 +258,12 @@ next_convert:
 }
 
 /**
- * UTF-8•¶š—ñ‚©‚çUTF-32‚ğ1•¶šæ‚èo‚·
- * @param[in]	u8_ptr	UTF-8•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
- * @param[in]	u8_len	UTF-8•¶š—ñ’·‚³
- * @param[out]	u32		•ÏŠ·‚µ‚½UTF-32•¶š
- * @retval		g—p‚µ‚½UTF-8•¶š”(byte”j
- *				0=ƒGƒ‰[(•ÏŠ·‚Å‚«‚È‚©‚Á‚½)
+ * UTF-8æ–‡å­—åˆ—ã‹ã‚‰UTF-32ã‚’1æ–‡å­—å–ã‚Šå‡ºã™
+ * @param[in]	u8_ptr	UTF-8æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ * @param[in]	u8_len	UTF-8æ–‡å­—åˆ—é•·ã•
+ * @param[out]	u32		å¤‰æ›ã—ãŸUTF-32æ–‡å­—
+ * @retval		ä½¿ç”¨ã—ãŸUTF-8æ–‡å­—æ•°(byteæ•°ï¼‰
+ *				0=ã‚¨ãƒ©ãƒ¼(å¤‰æ›ã§ããªã‹ã£ãŸ)
  */
 size_t UTF8ToUTF32(const char *u8_ptr_, size_t u8_len, uint32_t *u32_)
 {
@@ -342,10 +342,10 @@ size_t UTF8ToUTF32(const char *u8_ptr_, size_t u8_len, uint32_t *u32_)
 }
 
 /**
- *	wchar_t•¶š—ñ‚©‚çunicode(UTF-32)‚ğ1•¶šæ‚èo‚·
- *	@retval	0	•¶š‚Æ‚µ‚Äˆµ‚¦‚È‚¢(•¶šƒR[ƒh‚ª‚¨‚©‚µ‚¢)
- *	@retval	1	1ƒLƒƒƒ‰ƒNƒ^‚Å1•¶š‚Æ‚µ‚Äˆµ‚¦‚é
- *	@retval	2	2ƒLƒƒƒ‰ƒNƒ^‚Å1•¶š‚Æ‚µ‚Äˆµ‚¦‚é
+ *	wchar_tæ–‡å­—åˆ—ã‹ã‚‰unicode(UTF-32)ã‚’1æ–‡å­—å–ã‚Šå‡ºã™
+ *	@retval	0	æ–‡å­—ã¨ã—ã¦æ‰±ãˆãªã„(æ–‡å­—ã‚³ãƒ¼ãƒ‰ãŒãŠã‹ã—ã„)
+ *	@retval	1	1ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã§1æ–‡å­—ã¨ã—ã¦æ‰±ãˆã‚‹
+ *	@retval	2	2ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã§1æ–‡å­—ã¨ã—ã¦æ‰±ãˆã‚‹
  */
 size_t UTF16ToUTF32(const wchar_t *wstr_ptr, size_t wstr_len, unsigned int *u32)
 {
@@ -355,12 +355,12 @@ size_t UTF16ToUTF32(const wchar_t *wstr_ptr, size_t wstr_len, unsigned int *u32)
 		return 0;
 	}
 	const wchar_t u16 = *wstr_ptr++;
-	// ƒTƒƒQ[ƒg high?
+	// ã‚µãƒ­ã‚²ãƒ¼ãƒˆ high?
 	if (IsHighSurrogate(u16)) {
 		if (wstr_len >= 2) {
 			const wchar_t u16_lo = *wstr_ptr++;
 			if (IsLowSurrogate(u16_lo)) {
-				// ƒTƒƒQ[ƒgƒyƒA ƒfƒR[ƒh
+				// ã‚µãƒ­ã‚²ãƒ¼ãƒˆãƒšã‚¢ ãƒ‡ã‚³ãƒ¼ãƒ‰
 				*u32 = 0x10000 + (u16 - 0xd800) * 0x400 + (u16_lo - 0xdc00);
 				return 2;
 			} else {
@@ -381,10 +381,10 @@ size_t UTF16ToUTF32(const wchar_t *wstr_ptr, size_t wstr_len, unsigned int *u32)
 }
 
 /**
- *	ƒ}ƒ‹ƒ`ƒoƒCƒg•¶š(code_page) ‚©‚çunicode(UTF-32)‚ğ1•¶šæ‚èo‚·
- *	@retval	0	•¶š‚Æ‚µ‚Äˆµ‚¦‚È‚¢(•¶šƒR[ƒh‚ª‚¨‚©‚µ‚¢)
- *	@retval	1	1ƒLƒƒƒ‰ƒNƒ^‚Å1•¶š‚Æ‚µ‚Äˆµ‚¦‚é
- *	@retval	2	2ƒLƒƒƒ‰ƒNƒ^‚Å1•¶š‚Æ‚µ‚Äˆµ‚¦‚é
+ *	ãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—(code_page) ã‹ã‚‰unicode(UTF-32)ã‚’1æ–‡å­—å–ã‚Šå‡ºã™
+ *	@retval	0	æ–‡å­—ã¨ã—ã¦æ‰±ãˆãªã„(æ–‡å­—ã‚³ãƒ¼ãƒ‰ãŒãŠã‹ã—ã„)
+ *	@retval	1	1ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã§1æ–‡å­—ã¨ã—ã¦æ‰±ãˆã‚‹
+ *	@retval	2	2ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã§1æ–‡å­—ã¨ã—ã¦æ‰±ãˆã‚‹
  */
 size_t MBCPToUTF32(const char *mb_ptr, size_t mb_len, int code_page, unsigned int *u32)
 {
@@ -410,7 +410,7 @@ size_t MBCPToUTF32(const char *mb_ptr, size_t mb_len, int code_page, unsigned in
 			size_t r = UTF16ToUTF32(u16_str, u16_len, u32);
 			assert(r != 0);
 			if (r == 0) {
-				// ‚È‚¢‚Í‚¸
+				// ãªã„ã¯ãš
 				return 0;
 			} else {
 				return input_len;
@@ -426,12 +426,12 @@ size_t MBCPToUTF32(const char *mb_ptr, size_t mb_len, int code_page, unsigned in
 }
 
 /**
- * UTF-32•¶š ‚©‚ç UTF-8 ‚Ö•ÏŠ·‚·‚é
- * @param[in]		u32		•ÏŠ·‚·‚éUTF-32
- * @param[in,out]	u8_ptr	•ÏŠ·ŒãUTF-8•¶š—ño—Íæ(NULL‚Ì‚Æ‚«o—Í‚µ‚È‚¢)
- * @param[in]		u8_len	UTF-8o—Íæ•¶š”(ƒoƒbƒtƒ@’·,byte”)
- * @retval			o—Í‚µ‚½utf8•¶š”(byte”j
- *					0=ƒGƒ‰[
+ * UTF-32æ–‡å­— ã‹ã‚‰ UTF-8 ã¸å¤‰æ›ã™ã‚‹
+ * @param[in]		u32		å¤‰æ›ã™ã‚‹UTF-32
+ * @param[in,out]	u8_ptr	å¤‰æ›å¾ŒUTF-8æ–‡å­—åˆ—å‡ºåŠ›å…ˆ(NULLã®ã¨ãå‡ºåŠ›ã—ãªã„)
+ * @param[in]		u8_len	UTF-8å‡ºåŠ›å…ˆæ–‡å­—æ•°(ãƒãƒƒãƒ•ã‚¡é•·,byteæ•°)
+ * @retval			å‡ºåŠ›ã—ãŸutf8æ–‡å­—æ•°(byteæ•°ï¼‰
+ *					0=ã‚¨ãƒ©ãƒ¼
  */
 size_t UTF32ToUTF8(uint32_t u32, char *u8_ptr_, size_t u8_len)
 {
@@ -486,12 +486,12 @@ size_t UTF32ToUTF8(uint32_t u32, char *u8_ptr_, size_t u8_len)
 }
 
 /**
- * UTF-32 ‚©‚ç UTF-16 ‚Ö•ÏŠ·‚·‚é
- * @param[in]		u32			•ÏŠ·‚·‚éUTF-32
- * @param[in,out]	wstr_ptr	•ÏŠ·ŒãUTF-16•¶š—ño—Íæ(NULL‚Ì‚Æ‚«o—Í‚µ‚È‚¢)
- * @param[in]		wstr_len	UTF-16o—Íæ•¶š”(•¶š”,sizeof(wchar_t)*wstr_len bytes)
- * @retval			o—Í‚µ‚½UTF-16•¶š”(sizeof(wchar_t)”{‚·‚é‚Æbyte”)
- *					0=ƒGƒ‰[(•ÏŠ·‚Å‚«‚È‚©‚Á‚½)
+ * UTF-32 ã‹ã‚‰ UTF-16 ã¸å¤‰æ›ã™ã‚‹
+ * @param[in]		u32			å¤‰æ›ã™ã‚‹UTF-32
+ * @param[in,out]	wstr_ptr	å¤‰æ›å¾ŒUTF-16æ–‡å­—åˆ—å‡ºåŠ›å…ˆ(NULLã®ã¨ãå‡ºåŠ›ã—ãªã„)
+ * @param[in]		wstr_len	UTF-16å‡ºåŠ›å…ˆæ–‡å­—æ•°(æ–‡å­—æ•°,sizeof(wchar_t)*wstr_len bytes)
+ * @retval			å‡ºåŠ›ã—ãŸUTF-16æ–‡å­—æ•°(sizeof(wchar_t)å€ã™ã‚‹ã¨byteæ•°)
+ *					0=ã‚¨ãƒ©ãƒ¼(å¤‰æ›ã§ããªã‹ã£ãŸ)
  */
 size_t UTF32ToUTF16(uint32_t u32, wchar_t *wstr_ptr, size_t wstr_len)
 {
@@ -514,7 +514,7 @@ size_t UTF32ToUTF16(uint32_t u32, wchar_t *wstr_ptr, size_t wstr_len)
 	} else if (u32 <= 0x10ffff) {
 		if (wstr_len >= 2) {
 			if (wstr_ptr != NULL) {
-				// ƒTƒƒQ[ƒg ƒGƒ“ƒR[ƒh
+				// ã‚µãƒ­ã‚²ãƒ¼ãƒˆ ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰
 				*wstr_ptr++ = uint16_t((u32 - 0x10000) / 0x400) + 0xd800;
 				*wstr_ptr++ = uint16_t((u32 - 0x10000) % 0x400) + 0xdc00;
 			}
@@ -529,22 +529,22 @@ size_t UTF32ToUTF16(uint32_t u32, wchar_t *wstr_ptr, size_t wstr_len)
 }
 
 /**
- * UTF-32 ‚©‚ç CP932 ‚Ö•ÏŠ·‚·‚é
- * @param[in]		u32			•ÏŠ·‚·‚éUTF-32
- * @param[in,out]	mb_ptr		•ÏŠ·ŒãCP932•¶š—ño—Íæ(NULL‚Ì‚Æ‚«o—Í‚µ‚È‚¢)
- * @param[in]		mb_len		CP932o—Íæ•¶š”(•¶š”,sizeof(wchar_t)*wstr_len bytes)
- * @retval			o—Í‚µ‚½CP932•¶š”(byte”)
- *					0=ƒGƒ‰[(•ÏŠ·‚Å‚«‚È‚©‚Á‚½)
+ * UTF-32 ã‹ã‚‰ CP932 ã¸å¤‰æ›ã™ã‚‹
+ * @param[in]		u32			å¤‰æ›ã™ã‚‹UTF-32
+ * @param[in,out]	mb_ptr		å¤‰æ›å¾ŒCP932æ–‡å­—åˆ—å‡ºåŠ›å…ˆ(NULLã®ã¨ãå‡ºåŠ›ã—ãªã„)
+ * @param[in]		mb_len		CP932å‡ºåŠ›å…ˆæ–‡å­—æ•°(æ–‡å­—æ•°,sizeof(wchar_t)*wstr_len bytes)
+ * @retval			å‡ºåŠ›ã—ãŸCP932æ–‡å­—æ•°(byteæ•°)
+ *					0=ã‚¨ãƒ©ãƒ¼(å¤‰æ›ã§ããªã‹ã£ãŸ)
  */
 size_t UTF32ToCP932(uint32_t u32, char *mb_ptr, size_t mb_len)
 {
 	uint16_t cp932;
 	size_t cp932_out;
 	if (mb_ptr == NULL) {
-		mb_len = 2;		// 2byte‚ ‚ê‚Î‘«‚è‚é‚Í‚¸
+		mb_len = 2;		// 2byteã‚ã‚Œã°è¶³ã‚Šã‚‹ã¯ãš
 	}
 	if (mb_len == 0) {
-		// o—ÍæƒTƒCƒY‚ª0
+		// å‡ºåŠ›å…ˆã‚µã‚¤ã‚ºãŒ0
 		return 0;
 	}
 	if (u32 == 0) {
@@ -555,7 +555,7 @@ size_t UTF32ToCP932(uint32_t u32, char *mb_ptr, size_t mb_len)
 	}
 	cp932 = UTF32_CP932(u32);
 	if (cp932 == 0) {
-		// •ÏŠ·‚Å‚«‚È‚©‚Á‚½
+		// å¤‰æ›ã§ããªã‹ã£ãŸ
 		return 0;
 	}
 	if (mb_ptr == NULL) {
@@ -585,13 +585,13 @@ size_t UTF32ToCP932(uint32_t u32, char *mb_ptr, size_t mb_len)
 }
 
 /**
- * UTF-32 ‚©‚ç MultiByte•¶š(code_page) ‚Ö•ÏŠ·‚·‚é
- * @param[in]		u32			•ÏŠ·Œ³UTF-32
- * @param[in]		code_page	•ÏŠ·æcodepage
- * @param[in,out]	mb_ptr		•ÏŠ·æ•¶š—ño—Íæ(NULL‚Ì‚Æ‚«o—Í‚µ‚È‚¢)
- * @param[in]		mb_len		•ÏŠ·æo—Íæ•¶š”(•¶š”,mb_len bytes)
- * @retval			o—Í‚µ‚½multibyte•¶š”(byte”)
- *					0=ƒGƒ‰[(•ÏŠ·‚Å‚«‚È‚©‚Á‚½)
+ * UTF-32 ã‹ã‚‰ MultiByteæ–‡å­—(code_page) ã¸å¤‰æ›ã™ã‚‹
+ * @param[in]		u32			å¤‰æ›å…ƒUTF-32
+ * @param[in]		code_page	å¤‰æ›å…ˆcodepage
+ * @param[in,out]	mb_ptr		å¤‰æ›å…ˆæ–‡å­—åˆ—å‡ºåŠ›å…ˆ(NULLã®ã¨ãå‡ºåŠ›ã—ãªã„)
+ * @param[in]		mb_len		å¤‰æ›å…ˆå‡ºåŠ›å…ˆæ–‡å­—æ•°(æ–‡å­—æ•°,mb_len bytes)
+ * @retval			å‡ºåŠ›ã—ãŸmultibyteæ–‡å­—æ•°(byteæ•°)
+ *					0=ã‚¨ãƒ©ãƒ¼(å¤‰æ›ã§ããªã‹ã£ãŸ)
  */
 size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len)
 {
@@ -611,7 +611,7 @@ size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len)
 		use_default_char = FALSE;
 		mb_len = ::WideCharToMultiByte(code_page, 0, u16_str, (int)u16_len, mb_ptr, (int)mb_len, NULL, &use_default_char);
 		if (use_default_char) {
-			// •ÏŠ·‚Å‚«‚¸AŠù’è‚Ì•¶š‚ğg‚Á‚½
+			// å¤‰æ›ã§ããšã€æ—¢å®šã®æ–‡å­—ã‚’ä½¿ã£ãŸ
 			return 0;
 		}
 		return mb_len;
@@ -619,21 +619,21 @@ size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len)
 }
 
 /**
- *	wchar_t(UTF-16)•¶š—ñ‚ğƒ}ƒ‹ƒ`ƒoƒCƒg•¶š—ñ‚É•ÏŠ·‚·‚é
- *	•ÏŠ·‚Å‚«‚È‚¢•¶š‚Í '?' ‚Åo—Í‚·‚é
+ *	wchar_t(UTF-16)æ–‡å­—åˆ—ã‚’ãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—åˆ—ã«å¤‰æ›ã™ã‚‹
+ *	å¤‰æ›ã§ããªã„æ–‡å­—ã¯ '?' ã§å‡ºåŠ›ã™ã‚‹
  *
- *	@param[in]		*wstr_ptr	wchar_t•¶š—ñ
- *	@param[in,out]	*wstr_len	wchar_t•¶š—ñ’·
- *								NULL‚Ü‚½‚Í0‚Ì‚Æ‚«©“®(L'\0'‚Åƒ^[ƒ~ƒl[ƒg‚·‚é‚±‚Æ)
- *								NULLˆÈŠO‚Ì‚Æ‚«“ü—Í‚µ‚½•¶š”‚ğ•Ô‚·
- *	@param[in]		*mb_ptr		•ÏŠ·‚µ‚½•¶š—ñ‚ğû”[‚·‚éƒ|ƒCƒ“ƒ^
- *								(NULL‚Ì‚Æ‚«•ÏŠ·‚¹‚¸‚É•¶š”‚ğƒJƒEƒ“ƒg‚·‚é)
- *	@param[in,out]	*mb_len		•ÏŠ·‚µ‚½•¶š—ñ‚ğû”[‚Å‚«‚éƒTƒCƒY,byte”,
- *								mb_ptr‚ªNULL‚Ì‚Æ‚«o—Í‰Â”\ƒTƒCƒY‚Í•s—v
- *								•ÏŠ·‚µ‚½ƒ}ƒ‹ƒ`ƒoƒCƒg•¶š—ñ‚Ì’·‚³‚ğ•Ô‚·
- *								L'\0'‚ğ•ÏŠ·‚µ‚½‚ç'\0'‚àŠÜ‚Ş
- *								mb_ptr‚ªNULL‚Ì‚Æ‚«‚Å‚à’·‚³‚Í•Ô‚·
- *	@param[in]		UTF32ToMB	UTF32‚ğƒ}ƒ‹ƒ`ƒoƒCƒg‚É•ÏŠ·‚·‚éŠÖ”‚Ö‚Ìƒ|ƒCƒ“ƒ^
+ *	@param[in]		*wstr_ptr	wchar_tæ–‡å­—åˆ—
+ *	@param[in,out]	*wstr_len	wchar_tæ–‡å­—åˆ—é•·
+ *								NULLã¾ãŸã¯0ã®ã¨ãè‡ªå‹•(L'\0'ã§ã‚¿ãƒ¼ãƒŸãƒãƒ¼ãƒˆã™ã‚‹ã“ã¨)
+ *								NULLä»¥å¤–ã®ã¨ãå…¥åŠ›ã—ãŸæ–‡å­—æ•°ã‚’è¿”ã™
+ *	@param[in]		*mb_ptr		å¤‰æ›ã—ãŸæ–‡å­—åˆ—ã‚’åç´ã™ã‚‹ãƒã‚¤ãƒ³ã‚¿
+ *								(NULLã®ã¨ãå¤‰æ›ã›ãšã«æ–‡å­—æ•°ã‚’ã‚«ã‚¦ãƒ³ãƒˆã™ã‚‹)
+ *	@param[in,out]	*mb_len		å¤‰æ›ã—ãŸæ–‡å­—åˆ—ã‚’åç´ã§ãã‚‹ã‚µã‚¤ã‚º,byteæ•°,
+ *								mb_ptrãŒNULLã®ã¨ãå‡ºåŠ›å¯èƒ½ã‚µã‚¤ã‚ºã¯ä¸è¦
+ *								å¤‰æ›ã—ãŸãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—åˆ—ã®é•·ã•ã‚’è¿”ã™
+ *								L'\0'ã‚’å¤‰æ›ã—ãŸã‚‰'\0'ã‚‚å«ã‚€
+ *								mb_ptrãŒNULLã®ã¨ãã§ã‚‚é•·ã•ã¯è¿”ã™
+ *	@param[in]		UTF32ToMB	UTF32ã‚’ãƒãƒ«ãƒãƒã‚¤ãƒˆã«å¤‰æ›ã™ã‚‹é–¢æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿
  */
 static void WideCharToMB(const wchar_t *wstr_ptr, size_t *wstr_len_,
 						 char *mb_ptr, size_t *mb_len_,
@@ -646,8 +646,8 @@ static void WideCharToMB(const wchar_t *wstr_ptr, size_t *wstr_len_,
 
 	assert(wstr_ptr != NULL);
 	if (mb_ptr == NULL) {
-		// •ÏŠ·•¶š—ñ‚ğ‘‚«o‚³‚È‚¢
-		mb_len = 4;		// 1•¶š4byte‚É‚Íû‚Ü‚é‚Í‚¸
+		// å¤‰æ›æ–‡å­—åˆ—ã‚’æ›¸ãå‡ºã•ãªã„
+		mb_len = 4;		// 1æ–‡å­—4byteã«ã¯åã¾ã‚‹ã¯ãš
 	} else {
 		mb_len = *mb_len_;
 	}
@@ -674,7 +674,7 @@ static void WideCharToMB(const wchar_t *wstr_ptr, size_t *wstr_len_,
 		if (mb_out == 0) {
 		unknown_code:
 			if (mb_ptr != NULL) {
-				// •ÏŠ·‚Å‚«‚È‚©‚Á‚½ê‡
+				// å¤‰æ›ã§ããªã‹ã£ãŸå ´åˆ
 				*mb_ptr = '?';
 			}
 			mb_out = 1;
@@ -692,7 +692,7 @@ static void WideCharToMB(const wchar_t *wstr_ptr, size_t *wstr_len_,
 	*mb_len_ = mb_out_sum;
 }
 
-// WideCharToMultiByte‚ÌUTF8“Á‰»”Å
+// WideCharToMultiByteã®UTF8ç‰¹åŒ–ç‰ˆ
 void WideCharToUTF8(const wchar_t *wstr_ptr, size_t *wstr_len, char *u8_ptr, size_t *u8_len)
 {
 	WideCharToMB(wstr_ptr, wstr_len, u8_ptr, u8_len, UTF32ToUTF8);
@@ -728,18 +728,18 @@ void WideCharToMBCP(const wchar_t *wstr_ptr, size_t *wstr_len, char *mb_ptr, siz
 }
 
 /**
- *	wchar_t•¶š—ñ‚ğUTF32•¶š—ñ‚Ö•ÏŠ·
+ *	wchar_tæ–‡å­—åˆ—ã‚’UTF32æ–‡å­—åˆ—ã¸å¤‰æ›
  *
- *	@param[in]		*wstr_ptr	wchar_t•¶š—ñ
- *	@param[in,out]	*wstr_len	wchar_t•¶š—ñ’·
- *								NULL‚Ü‚½‚Í*wstr_len==0‚Ì‚Æ‚«©“®(L'\0'‚Åƒ^[ƒ~ƒl[ƒg‚·‚é‚±‚Æ)
- *								NULLˆÈŠO‚Ì‚Æ‚«“ü—Í‚µ‚½•¶š”‚ğ•Ô‚·
- *	@param[in]		*u32_ptr	•ÏŠ·‚µ‚½•¶š—ñ‚ğû”[‚·‚éƒ|ƒCƒ“ƒ^
- *								(NULL‚Ì‚Æ‚«•ÏŠ·‚¹‚¸‚É•¶š”‚ğƒJƒEƒ“ƒg‚·‚é)
- *	@param[in,out]	*u32_len	•ÏŠ·‚µ‚½•¶š—ñ‚ğû”[‚Å‚«‚éƒTƒCƒY,byte”,
- *								•ÏŠ·‚µ‚½ƒ}ƒ‹ƒ`ƒoƒCƒg•¶š—ñ‚Ì’·‚³‚ğ•Ô‚·
- *								L'\0'‚ğ•ÏŠ·‚µ‚½‚ç'\0'‚àŠÜ‚Ş
- *								u32_ptr‚ªNULL‚Ì‚Æ‚«‚Å‚à’·‚³‚Í•Ô‚·
+ *	@param[in]		*wstr_ptr	wchar_tæ–‡å­—åˆ—
+ *	@param[in,out]	*wstr_len	wchar_tæ–‡å­—åˆ—é•·
+ *								NULLã¾ãŸã¯*wstr_len==0ã®ã¨ãè‡ªå‹•(L'\0'ã§ã‚¿ãƒ¼ãƒŸãƒãƒ¼ãƒˆã™ã‚‹ã“ã¨)
+ *								NULLä»¥å¤–ã®ã¨ãå…¥åŠ›ã—ãŸæ–‡å­—æ•°ã‚’è¿”ã™
+ *	@param[in]		*u32_ptr	å¤‰æ›ã—ãŸæ–‡å­—åˆ—ã‚’åç´ã™ã‚‹ãƒã‚¤ãƒ³ã‚¿
+ *								(NULLã®ã¨ãå¤‰æ›ã›ãšã«æ–‡å­—æ•°ã‚’ã‚«ã‚¦ãƒ³ãƒˆã™ã‚‹)
+ *	@param[in,out]	*u32_len	å¤‰æ›ã—ãŸæ–‡å­—åˆ—ã‚’åç´ã§ãã‚‹ã‚µã‚¤ã‚º,byteæ•°,
+ *								å¤‰æ›ã—ãŸãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—åˆ—ã®é•·ã•ã‚’è¿”ã™
+ *								L'\0'ã‚’å¤‰æ›ã—ãŸã‚‰'\0'ã‚‚å«ã‚€
+ *								u32_ptrãŒNULLã®ã¨ãã§ã‚‚é•·ã•ã¯è¿”ã™
  */
 void WideCharToUTF32(const wchar_t *wstr_ptr, size_t *wstr_len_,
 					 char32_t *u32_ptr, size_t *u32_len_)
@@ -751,8 +751,8 @@ void WideCharToUTF32(const wchar_t *wstr_ptr, size_t *wstr_len_,
 
 	assert(wstr_ptr != NULL);
 	if (u32_ptr == NULL) {
-		// •ÏŠ·•¶š—ñ‚ğ‘‚«o‚³‚È‚¢
-		u32_len = 4;		// 1•¶š4byte‚É‚Íû‚Ü‚é‚Í‚¸
+		// å¤‰æ›æ–‡å­—åˆ—ã‚’æ›¸ãå‡ºã•ãªã„
+		u32_len = 4;		// 1æ–‡å­—4byteã«ã¯åã¾ã‚‹ã¯ãš
 	} else {
 		u32_len = *u32_len_;
 	}
@@ -768,7 +768,7 @@ void WideCharToUTF32(const wchar_t *wstr_ptr, size_t *wstr_len_,
 		size_t wb_in = UTF16ToUTF32(wstr_ptr, wstr_len, &u32_);
 		u32 = u32_;
 		if (wb_in == 0) {
-			// •ÏŠ·‚Å‚«‚È‚¢ê‡A1•¶šÁ”ï‚µ‚Ä'?'o—Í
+			// å¤‰æ›ã§ããªã„å ´åˆã€1æ–‡å­—æ¶ˆè²»ã—ã¦'?'å‡ºåŠ›
 			wstr_len -= 1;
 			wstr_in += 1;
 			wstr_ptr++;
@@ -792,7 +792,7 @@ void WideCharToUTF32(const wchar_t *wstr_ptr, size_t *wstr_len_,
 	*u32_len_ = u32_out;
 }
 
-// MultiByteToWideChar‚ÌUTF8“Á‰»”Å
+// MultiByteToWideCharã®UTF8ç‰¹åŒ–ç‰ˆ
 int UTF8ToWideChar(const char *u8_ptr, int u8_len_, wchar_t *wstr_ptr, int wstr_len_)
 {
 	size_t u8_len;
@@ -832,7 +832,7 @@ int UTF8ToWideChar(const char *u8_ptr, int u8_len_, wchar_t *wstr_ptr, int wstr_
 		} else if (u32 <= 0x10ffff) {
 			if (wstr_len >= 2) {
 				if (wstr_ptr != NULL) {
-					// ƒTƒƒQ[ƒg ƒGƒ“ƒR[ƒh
+					// ã‚µãƒ­ã‚²ãƒ¼ãƒˆ ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰
 					*wstr_ptr++ = uint16_t((u32 - 0x10000) / 0x400) + 0xd800;
 					*wstr_ptr++ = uint16_t((u32 - 0x10000) % 0x400) + 0xdc00;
 				}
@@ -859,16 +859,16 @@ int UTF8ToWideChar(const char *u8_ptr, int u8_len_, wchar_t *wstr_ptr, int wstr_
 }
 
 /**
- *	wchar_t•¶š—ñ‚ğƒ}ƒ‹ƒ`ƒoƒCƒg•¶š—ñ‚Ö•ÏŠ·
- *	•ÏŠ·‚Å‚«‚È‚¢•¶š‚Í '?' ‚Åo—Í‚·‚é
+ *	wchar_tæ–‡å­—åˆ—ã‚’ãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—åˆ—ã¸å¤‰æ›
+ *	å¤‰æ›ã§ããªã„æ–‡å­—ã¯ '?' ã§å‡ºåŠ›ã™ã‚‹
  *
- *	@param[in]	*wstr_ptr	wchar_t•¶š—ñ
- *	@param[in]	wstr_len	wchar_t•¶š—ñ’·(0‚Ì‚Æ‚«©“®A©“®‚Ì‚Æ‚«‚ÍL'\0'‚Åƒ^[ƒ~ƒl[ƒg‚·‚é‚±‚Æ)
- *	@param[in]	code_page	•ÏŠ·æƒR[ƒhƒy[ƒW
- *	@param[out]	*mb_len_	•ÏŠ·‚µ‚½•¶š—ñ’·,byte”,L'\0'‚ğ•ÏŠ·‚µ‚½‚ç'\0'‚àŠÜ‚Ş
- *							(NULL‚Ì‚Æ‚«•¶š—ñ’·‚ğ•Ô‚³‚È‚¢)
- *	@retval		mb•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^(NULL‚Ì•ÏŠ·ƒGƒ‰[)
- *				g—pŒã free() ‚·‚é‚±‚Æ
+ *	@param[in]	*wstr_ptr	wchar_tæ–‡å­—åˆ—
+ *	@param[in]	wstr_len	wchar_tæ–‡å­—åˆ—é•·(0ã®ã¨ãè‡ªå‹•ã€è‡ªå‹•ã®ã¨ãã¯L'\0'ã§ã‚¿ãƒ¼ãƒŸãƒãƒ¼ãƒˆã™ã‚‹ã“ã¨)
+ *	@param[in]	code_page	å¤‰æ›å…ˆã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸
+ *	@param[out]	*mb_len_	å¤‰æ›ã—ãŸæ–‡å­—åˆ—é•·,byteæ•°,L'\0'ã‚’å¤‰æ›ã—ãŸã‚‰'\0'ã‚‚å«ã‚€
+ *							(NULLã®ã¨ãæ–‡å­—åˆ—é•·ã‚’è¿”ã•ãªã„)
+ *	@retval		mbæ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿(NULLã®æ™‚å¤‰æ›ã‚¨ãƒ©ãƒ¼)
+ *				ä½¿ç”¨å¾Œ free() ã™ã‚‹ã“ã¨
  */
 char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_page, size_t *mb_len_)
 {
@@ -918,22 +918,22 @@ char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_pa
 		return NULL;
 	}
 	if (mb_len_ != NULL) {
-		// •ÏŠ·‚µ‚½•¶š—ñ”(byte”)‚ğ•Ô‚·
+		// å¤‰æ›ã—ãŸæ–‡å­—åˆ—æ•°(byteæ•°)ã‚’è¿”ã™
 		*mb_len_ = len;
 	}
     return mb_ptr;
 }
 
 /**
- *	wchar_t•¶š—ñ‚ğUTF-32•¶š—ñ‚Ö•ÏŠ·
- *	•ÏŠ·‚Å‚«‚È‚¢•¶š‚Í '?' ‚Åo—Í‚·‚é
+ *	wchar_tæ–‡å­—åˆ—ã‚’UTF-32æ–‡å­—åˆ—ã¸å¤‰æ›
+ *	å¤‰æ›ã§ããªã„æ–‡å­—ã¯ '?' ã§å‡ºåŠ›ã™ã‚‹
  *
- *	@param[in]	*wstr_ptr	wchar_t•¶š—ñ
- *	@param[in]	wstr_len	wchar_t•¶š—ñ’·(0‚Ì‚Æ‚«©“®A©“®‚Ì‚Æ‚«‚ÍL'\0'‚Åƒ^[ƒ~ƒl[ƒg‚·‚é‚±‚Æ)
- *	@param[out]	*u32_len_	•ÏŠ·‚µ‚½•¶š—ñ’·,byte”,'\0'‚ğ•ÏŠ·‚µ‚½‚ç'\0'‚àŠÜ‚Ş
- *							(NULL‚Ì‚Æ‚«•¶š—ñ’·‚ğ•Ô‚³‚È‚¢)
- *	@retval		UTF-32•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^(NULL‚Ì•ÏŠ·ƒGƒ‰[)
- *				g—pŒã free() ‚·‚é‚±‚Æ
+ *	@param[in]	*wstr_ptr	wchar_tæ–‡å­—åˆ—
+ *	@param[in]	wstr_len	wchar_tæ–‡å­—åˆ—é•·(0ã®ã¨ãè‡ªå‹•ã€è‡ªå‹•ã®ã¨ãã¯L'\0'ã§ã‚¿ãƒ¼ãƒŸãƒãƒ¼ãƒˆã™ã‚‹ã“ã¨)
+ *	@param[out]	*u32_len_	å¤‰æ›ã—ãŸæ–‡å­—åˆ—é•·,byteæ•°,'\0'ã‚’å¤‰æ›ã—ãŸã‚‰'\0'ã‚‚å«ã‚€
+ *							(NULLã®ã¨ãæ–‡å­—åˆ—é•·ã‚’è¿”ã•ãªã„)
+ *	@retval		UTF-32æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿(NULLã®æ™‚å¤‰æ›ã‚¨ãƒ©ãƒ¼)
+ *				ä½¿ç”¨å¾Œ free() ã™ã‚‹ã“ã¨
  */
 char32_t *_WideCharToUTF32(const wchar_t *wstr_ptr, size_t wstr_len, size_t *u32_len_)
 {
@@ -959,22 +959,22 @@ char32_t *_WideCharToUTF32(const wchar_t *wstr_ptr, size_t wstr_len, size_t *u32
 		return NULL;
 	}
 	if (u32_len_ != NULL) {
-		// •ÏŠ·‚µ‚½•¶š—ñ”(byte”)‚ğ•Ô‚·
+		// å¤‰æ›ã—ãŸæ–‡å­—åˆ—æ•°(byteæ•°)ã‚’è¿”ã™
 		*u32_len_ = u32_len;
 	}
     return u32_ptr;
 }
 
 /**
- *	ƒ}ƒ‹ƒ`ƒoƒCƒg•¶š—ñ‚ğwchar_t•¶š—ñ‚Ö•ÏŠ·
- *	@param[in]	*str_ptr	mb(char)•¶š—ñ
- *	@param[in]	str_len		mb(char)•¶š—ñ’·(0‚Ì‚Æ‚«©“®A©“®‚Ì‚Æ‚«‚Í'\0'‚Åƒ^[ƒ~ƒl[ƒg‚·‚é‚±‚Æ)
- *	@param[in]	code_page	•ÏŠ·Œ³ƒR[ƒhƒy[ƒW
- *	@param[out]	*w_len_		wchar_t•¶š—ñ’·,wchar_t”,'\0'‚ğ•ÏŠ·‚µ‚½‚çL'\0'‚àŠÜ‚Ş
- *							(NULL‚Ì‚Æ‚«•¶š—ñ’·‚ğ•Ô‚³‚È‚¢)
- *	@retval		wchar_t•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^(NULL‚Ì•ÏŠ·ƒGƒ‰[)
- *				g—pŒã free() ‚·‚é‚±‚Æ
- *				•ÏŠ·‚Å‚«‚È‚¢•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚Æ NULL ‚ª–ß‚é
+ *	ãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—åˆ—ã‚’wchar_tæ–‡å­—åˆ—ã¸å¤‰æ›
+ *	@param[in]	*str_ptr	mb(char)æ–‡å­—åˆ—
+ *	@param[in]	str_len		mb(char)æ–‡å­—åˆ—é•·(0ã®ã¨ãè‡ªå‹•ã€è‡ªå‹•ã®ã¨ãã¯'\0'ã§ã‚¿ãƒ¼ãƒŸãƒãƒ¼ãƒˆã™ã‚‹ã“ã¨)
+ *	@param[in]	code_page	å¤‰æ›å…ƒã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸
+ *	@param[out]	*w_len_		wchar_tæ–‡å­—åˆ—é•·,wchar_tæ•°,'\0'ã‚’å¤‰æ›ã—ãŸã‚‰L'\0'ã‚‚å«ã‚€
+ *							(NULLã®ã¨ãæ–‡å­—åˆ—é•·ã‚’è¿”ã•ãªã„)
+ *	@retval		wchar_tæ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿(NULLã®æ™‚å¤‰æ›ã‚¨ãƒ©ãƒ¼)
+ *				ä½¿ç”¨å¾Œ free() ã™ã‚‹ã“ã¨
+ *				å¤‰æ›ã§ããªã„æ–‡å­—ãŒå«ã¾ã‚Œã¦ã„ã‚‹ã¨ NULL ãŒæˆ»ã‚‹
  */
 wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page, size_t *w_len_)
 {
@@ -1021,30 +1021,30 @@ wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page
 		return NULL;
 	}
 	if (w_len_ != NULL) {
-		// •ÏŠ·‚µ‚½•¶š—ñ”(wchar_t”)‚ğ•Ô‚·
+		// å¤‰æ›ã—ãŸæ–‡å­—åˆ—æ•°(wchar_tæ•°)ã‚’è¿”ã™
 		*w_len_ = len;
 	}
 	return wstr_ptr;
 }
 
 /**
- *	WideCharToMultiByte() ‚Ì TRUNCATE + CP_ACP ”Å
- *	wchar_t ‚ÌƒpƒX,ƒtƒ@ƒCƒ‹–¼‚ğ char ‚É•ÏŠ·‚·‚é‚Æ‚«‚Ég—p
+ *	WideCharToMultiByte() ã® TRUNCATE + CP_ACP ç‰ˆ
+ *	wchar_t ã®ãƒ‘ã‚¹,ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ char ã«å¤‰æ›ã™ã‚‹ã¨ãã«ä½¿ç”¨
  *
- *	@param[in]		wstr_ptr	wchar_t ‚Ì•¶š—ñ
- *	@param[in,out]	mb_ptr		char •¶š—ño—Íæptr
- *	@param[in]		mb_len		char •¶š—ño—ÍæƒTƒCƒY
+ *	@param[in]		wstr_ptr	wchar_t ã®æ–‡å­—åˆ—
+ *	@param[in,out]	mb_ptr		char æ–‡å­—åˆ—å‡ºåŠ›å…ˆptr
+ *	@param[in]		mb_len		char æ–‡å­—åˆ—å‡ºåŠ›å…ˆã‚µã‚¤ã‚º
  */
 void WideCharToACP_t(const wchar_t *wstr_ptr, char *mb_ptr, size_t mb_len)
 {
 	const DWORD flags = 0;
 	size_t out_len = WideCharToMultiByte(CP_ACP, flags, wstr_ptr, -1, mb_ptr, (int)mb_len, NULL, NULL);
 	if (out_len == 0) {
-		// •ÏŠ·¸”s
+		// å¤‰æ›å¤±æ•—
 		DWORD err = GetLastError();
 		if (err == ERROR_INSUFFICIENT_BUFFER) {
-			// wstr_ptr ‚Ì’·‚³‚ğ -1 ‚Åw’è‚µ‚ÄAmb_len ‚ª•s‘«‚µ‚Ä‚¢‚é‚Æ‚«
-			// ƒoƒbƒtƒ@‚¢‚Á‚Ï‚¢‚É•ÏŠ·‚Ís‚í‚ê‚Ä‚¢‚é
+			// wstr_ptr ã®é•·ã•ã‚’ -1 ã§æŒ‡å®šã—ã¦ã€mb_len ãŒä¸è¶³ã—ã¦ã„ã‚‹ã¨ã
+			// ãƒãƒƒãƒ•ã‚¡ã„ã£ã±ã„ã«å¤‰æ›ã¯è¡Œã‚ã‚Œã¦ã„ã‚‹
 			mb_ptr[mb_len - 1] = 0;
 		}
 		else {
@@ -1058,13 +1058,13 @@ void WideCharToACP_t(const wchar_t *wstr_ptr, char *mb_ptr, size_t mb_len)
 }
 
 /**
- *	MultiByteToWideChar() ‚Ì TRUNCATE + CP_ACP ”Å
- *	wchar_t ‚ÌƒpƒX,ƒtƒ@ƒCƒ‹–¼‚ğ char ‚É•ÏŠ·‚·‚é‚Æ‚«‚Ég—p
+ *	MultiByteToWideChar() ã® TRUNCATE + CP_ACP ç‰ˆ
+ *	wchar_t ã®ãƒ‘ã‚¹,ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ char ã«å¤‰æ›ã™ã‚‹ã¨ãã«ä½¿ç”¨
  *
- *	@param[in]		str_ptr		char ‚Ì•¶š—ñ
- *	@param[in,out]	wstr_ptr	wchar_t •¶š—ño—Íæptr
- *	@param[in]		wstr_len	wchar_t •¶š—ño—Íæ•¶š”
- *	@return			•ÏŠ·‚µ‚½•¶š”(L'^0'ŠÜ‚Ş), wcslen(wstr_ptr) + 1
+ *	@param[in]		str_ptr		char ã®æ–‡å­—åˆ—
+ *	@param[in,out]	wstr_ptr	wchar_t æ–‡å­—åˆ—å‡ºåŠ›å…ˆptr
+ *	@param[in]		wstr_len	wchar_t æ–‡å­—åˆ—å‡ºåŠ›å…ˆæ–‡å­—æ•°
+ *	@return			å¤‰æ›ã—ãŸæ–‡å­—æ•°(L'^0'å«ã‚€), wcslen(wstr_ptr) + 1
  */
 size_t ACPToWideChar_t(const char *str_ptr, wchar_t *wstr_ptr, size_t wstr_len)
 {
@@ -1360,8 +1360,8 @@ wc wc::fromUtf8(const char *strU8)
 	return _wc;
 }
 
-// void‚È‚µ‚ªˆê”Ê“I‚Æv‚í‚ê‚é‚ªA
-// VS2005‚ÅƒŠƒ“ƒNƒGƒ‰[‚ªo‚Ä‚µ‚Ü‚¤‚½‚ß void ’Ç‰Á
+// voidãªã—ãŒä¸€èˆ¬çš„ã¨æ€ã‚ã‚Œã‚‹ãŒã€
+// VS2005ã§ãƒªãƒ³ã‚¯ã‚¨ãƒ©ãƒ¼ãŒå‡ºã¦ã—ã¾ã†ãŸã‚ void è¿½åŠ 
 wc::operator const wchar_t *(void) const
 {
 	return cstr();

@@ -31,14 +31,14 @@
 #include "sub.h"
 
 /**
- *	ƒ}ƒ‹ƒ`ƒoƒCƒg•¶š—ñ‚ğwchar_t•¶š—ñ‚Ö•ÏŠ·
- *	@param[in]	*str_ptr	mb(char)•¶š—ñ
- *	@param[in]	str_len		mb(char)•¶š—ñ’·(0‚Ì‚Æ‚«©“®A©“®‚Ì‚Æ‚«‚Í'\0'‚Åƒ^[ƒ~ƒl[ƒg‚·‚é‚±‚Æ)
- *	@param[in]	code_page	•ÏŠ·Œ³ƒR[ƒhƒy[ƒW
- *	@param[out]	*w_len_		wchar_t•¶š—ñ’·,wchar_t”,'\0'‚ğ•ÏŠ·‚µ‚½‚çL'\0'‚àŠÜ‚Ş
- *							(NULL‚Ì‚Æ‚«•¶š—ñ’·‚ğ•Ô‚³‚È‚¢)
- *	@retval		wchar_t•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^(NULL‚Ì•ÏŠ·ƒGƒ‰[)
- *				g—pŒã free() ‚·‚é‚±‚Æ
+ *	ãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—åˆ—ã‚’wchar_tæ–‡å­—åˆ—ã¸å¤‰æ›
+ *	@param[in]	*str_ptr	mb(char)æ–‡å­—åˆ—
+ *	@param[in]	str_len		mb(char)æ–‡å­—åˆ—é•·(0ã®ã¨ãè‡ªå‹•ã€è‡ªå‹•ã®ã¨ãã¯'\0'ã§ã‚¿ãƒ¼ãƒŸãƒãƒ¼ãƒˆã™ã‚‹ã“ã¨)
+ *	@param[in]	code_page	å¤‰æ›å…ƒã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸
+ *	@param[out]	*w_len_		wchar_tæ–‡å­—åˆ—é•·,wchar_tæ•°,'\0'ã‚’å¤‰æ›ã—ãŸã‚‰L'\0'ã‚‚å«ã‚€
+ *							(NULLã®ã¨ãæ–‡å­—åˆ—é•·ã‚’è¿”ã•ãªã„)
+ *	@retval		wchar_tæ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿(NULLã®æ™‚å¤‰æ›ã‚¨ãƒ©ãƒ¼)
+ *				ä½¿ç”¨å¾Œ free() ã™ã‚‹ã“ã¨
  */
 static wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page, size_t *w_len_)
 {
@@ -74,23 +74,23 @@ static wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int co
 		return NULL;
 	}
 	if (w_len_ != NULL) {
-		// •ÏŠ·‚µ‚½•¶š—ñ”(wchar_t”)‚ğ•Ô‚·
+		// å¤‰æ›ã—ãŸæ–‡å­—åˆ—æ•°(wchar_tæ•°)ã‚’è¿”ã™
 		*w_len_ = len;
 	}
 	return wstr_ptr;
 }
 
 /**
- *	wchar_t•¶š—ñ‚ğƒ}ƒ‹ƒ`ƒoƒCƒg•¶š—ñ‚Ö•ÏŠ·
- *	•ÏŠ·‚Å‚«‚È‚¢•¶š‚Í '?' ‚Åo—Í‚·‚é
+ *	wchar_tæ–‡å­—åˆ—ã‚’ãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—åˆ—ã¸å¤‰æ›
+ *	å¤‰æ›ã§ããªã„æ–‡å­—ã¯ '?' ã§å‡ºåŠ›ã™ã‚‹
  *
- *	@param[in]	*wstr_ptr	wchar_t•¶š—ñ
- *	@param[in]	wstr_len	wchar_t•¶š—ñ’·(0‚Ì‚Æ‚«©“®A©“®‚Ì‚Æ‚«‚ÍL'\0'‚Åƒ^[ƒ~ƒl[ƒg‚·‚é‚±‚Æ)
- *	@param[in]	code_page	•ÏŠ·æƒR[ƒhƒy[ƒW
- *	@param[out]	*mb_len_	•ÏŠ·‚µ‚½•¶š—ñ’·,byte”,L'\0'‚ğ•ÏŠ·‚µ‚½‚ç'\0'‚àŠÜ‚Ş
- *							(NULL‚Ì‚Æ‚«•¶š—ñ’·‚ğ•Ô‚³‚È‚¢)
- *	@retval		mb•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^(NULL‚Ì•ÏŠ·ƒGƒ‰[)
- *				g—pŒã free() ‚·‚é‚±‚Æ
+ *	@param[in]	*wstr_ptr	wchar_tæ–‡å­—åˆ—
+ *	@param[in]	wstr_len	wchar_tæ–‡å­—åˆ—é•·(0ã®ã¨ãè‡ªå‹•ã€è‡ªå‹•ã®ã¨ãã¯L'\0'ã§ã‚¿ãƒ¼ãƒŸãƒãƒ¼ãƒˆã™ã‚‹ã“ã¨)
+ *	@param[in]	code_page	å¤‰æ›å…ˆã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸
+ *	@param[out]	*mb_len_	å¤‰æ›ã—ãŸæ–‡å­—åˆ—é•·,byteæ•°,L'\0'ã‚’å¤‰æ›ã—ãŸã‚‰'\0'ã‚‚å«ã‚€
+ *							(NULLã®ã¨ãæ–‡å­—åˆ—é•·ã‚’è¿”ã•ãªã„)
+ *	@retval		mbæ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿(NULLã®æ™‚å¤‰æ›ã‚¨ãƒ©ãƒ¼)
+ *				ä½¿ç”¨å¾Œ free() ã™ã‚‹ã“ã¨
  */
 static char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_page, size_t *mb_len_)
 {
@@ -125,7 +125,7 @@ static char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int 
 		return NULL;
 	}
 	if (mb_len_ != NULL) {
-		// •ÏŠ·‚µ‚½•¶š—ñ”(byte”)‚ğ•Ô‚·
+		// å¤‰æ›ã—ãŸæ–‡å­—åˆ—æ•°(byteæ•°)ã‚’è¿”ã™
 		*mb_len_ = len;
 	}
 	return mb_ptr;
@@ -160,11 +160,11 @@ char *ToU8W(const wchar_t *strW)
 }
 
 /**
- *	GetModuleFileNameW() ‚Ì“®“Iƒoƒbƒtƒ@”Å
+ *	GetModuleFileNameW() ã®å‹•çš„ãƒãƒƒãƒ•ã‚¡ç‰ˆ
  *
- *	@param buf	•¶š—ñ‚ğŠi”[‚·‚éƒoƒbƒtƒ@
- *				•s—v‚É‚È‚Á‚½‚çfree()‚·‚é
- *	@return	ƒGƒ‰[ƒR[ƒh,0(=NO_ERROR)‚Ì‚Æ‚«ƒGƒ‰[‚È‚µ
+ *	@param buf	æ–‡å­—åˆ—ã‚’æ ¼ç´ã™ã‚‹ãƒãƒƒãƒ•ã‚¡
+ *				ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹
+ *	@return	ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰,0(=NO_ERROR)ã®ã¨ãã‚¨ãƒ©ãƒ¼ãªã—
  */
 DWORD hGetModuleFileNameT(HMODULE hModule, TCHAR **buf)
 {
@@ -179,11 +179,11 @@ DWORD hGetModuleFileNameT(HMODULE hModule, TCHAR **buf)
 	for(;;) {
 		DWORD r = GetModuleFileName(hModule, b, (DWORD)size);
 		if (r == 0) {
-			// ŠÖ”‚ª¸”s
+			// é–¢æ•°ãŒå¤±æ•—
 			error = GetLastError();
 			break;
 		} else if (r < size - 1) {
-			// æ“¾¬Œ÷
+			// å–å¾—æˆåŠŸ
 			size = r + 1;
 			b = (TCHAR *)realloc(b, sizeof(TCHAR) * size);
 			*buf = b;
@@ -208,10 +208,10 @@ error_return:
 }
 
 /**
- *	ƒ|[ƒ^ƒuƒ‹”Å‚Æ‚µ‚Ä“®ì‚·‚é‚©
+ *	ãƒãƒ¼ã‚¿ãƒ–ãƒ«ç‰ˆã¨ã—ã¦å‹•ä½œã™ã‚‹ã‹
  *
- *	@retval		TRUE		ƒ|[ƒ^ƒuƒ‹”Å
- *	@retval		FALSE		’ÊíƒCƒ“ƒXƒg[ƒ‹”Å
+ *	@retval		TRUE		ãƒãƒ¼ã‚¿ãƒ–ãƒ«ç‰ˆ
+ *	@retval		FALSE		é€šå¸¸ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ç‰ˆ
  */
 BOOL IsPortableMode(void)
 {
@@ -242,7 +242,7 @@ BOOL IsPortableMode(void)
 #endif
 		free(portable_iniW);
 		if (r == INVALID_FILE_ATTRIBUTES) {
-			//ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢
+			//ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãªã„
 			ret_val = FALSE;
 		}
 		else {
@@ -273,7 +273,7 @@ static wchar_t *get_appdata_dir(void)
 	}
 	char *env = getenv("APPDATA");
 	if (env == NULL) {
-		// ‚à‚Á‚ÆŒÃ‚¢ windows ?
+		// ã‚‚ã£ã¨å¤ã„ windows ?
 		abort();
 	}
 	wchar_t *appdata = ToWcharA(env);
@@ -293,7 +293,7 @@ static void convert_bsW(wchar_t *path)
 	}
 }
 
-// cygwin Œü‚¯ $APPDATA utf-8 ‚ğ•Ô‚·
+// cygwin å‘ã‘ $APPDATA utf-8 ã‚’è¿”ã™
 char *GetAppDataDirU8()
 {
 	wchar_t *appdataW = get_appdata_dir();
@@ -304,7 +304,7 @@ char *GetAppDataDirU8()
 }
 
 /**
- *	full path exeƒtƒ@ƒCƒ‹–¼‚ğ•Ô‚·
+ *	full path exeãƒ•ã‚¡ã‚¤ãƒ«åã‚’è¿”ã™
  */
 char *GetModuleFileNameU8(void)
 {

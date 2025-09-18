@@ -50,29 +50,29 @@
 #include	"asprintf.h"
 #include	"codeconv.h"
 
-// ƒfƒtƒHƒ‹ƒgƒCƒ“ƒXƒg[ƒ‹æ‚ÍƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ
+// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«å…ˆã¯ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 #define DEFAULT_PATH L"."
 
-// ƒOƒ[ƒoƒ‹•Ï”
-HWND		g_hWnd;				// ƒƒCƒ“‚Ìƒnƒ“ƒhƒ‹
-HWND		g_hWndMenu = NULL;	// İ’èƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
-HWND		g_hWndTip;			// İ’èƒ_ƒCƒAƒƒO“àƒc[ƒ‹ƒ`ƒbƒv‚Ìƒnƒ“ƒhƒ‹
-HICON		g_hIcon;			// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“ƒAƒCƒRƒ“‚Ìƒnƒ“ƒhƒ‹
-HICON		g_hIconSmall;		// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“ƒAƒCƒRƒ“(16x16)‚Ìƒnƒ“ƒhƒ‹
-HMENU		g_hMenu;			// ƒƒjƒ…[i”ñ•\¦j‚Ìƒnƒ“ƒhƒ‹
-HMENU		g_hSubMenu;			// ƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[‚Ìƒnƒ“ƒhƒ‹
-HMENU		g_hListMenu;		// İ’èˆê——ƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[‚Ìƒnƒ“ƒhƒ‹
-HMENU		g_hConfigMenu;		// •\¦İ’èƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[‚Ìƒnƒ“ƒhƒ‹
-HHOOK		g_hHook = NULL;		// ƒc[ƒ‹ƒ`ƒbƒvŠÖ˜AƒtƒbƒN‚Ìƒnƒ“ƒhƒ‹
-HINSTANCE	g_hI;				// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“ƒCƒ“ƒXƒ^ƒ“ƒX
+// ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°
+HWND		g_hWnd;				// ãƒ¡ã‚¤ãƒ³ã®ãƒãƒ³ãƒ‰ãƒ«
+HWND		g_hWndMenu = NULL;	// è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+HWND		g_hWndTip;			// è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°å†…ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã®ãƒãƒ³ãƒ‰ãƒ«
+HICON		g_hIcon;			// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‚¢ã‚¤ã‚³ãƒ³ã®ãƒãƒ³ãƒ‰ãƒ«
+HICON		g_hIconSmall;		// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‚¢ã‚¤ã‚³ãƒ³(16x16)ã®ãƒãƒ³ãƒ‰ãƒ«
+HMENU		g_hMenu;			// ãƒ¡ãƒ‹ãƒ¥ãƒ¼ï¼ˆéè¡¨ç¤ºï¼‰ã®ãƒãƒ³ãƒ‰ãƒ«
+HMENU		g_hSubMenu;			// ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ãƒãƒ³ãƒ‰ãƒ«
+HMENU		g_hListMenu;		// è¨­å®šä¸€è¦§ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ãƒãƒ³ãƒ‰ãƒ«
+HMENU		g_hConfigMenu;		// è¡¨ç¤ºè¨­å®šãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ãƒãƒ³ãƒ‰ãƒ«
+HHOOK		g_hHook = NULL;		// ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—é–¢é€£ãƒ•ãƒƒã‚¯ã®ãƒãƒ³ãƒ‰ãƒ«
+HINSTANCE	g_hI;				// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
 
-JobInfo		g_JobInfo;			// ƒJƒŒƒ“ƒg‚Ìİ’èî•ñ\‘¢‘Ìiİ’èƒ_ƒCƒAƒƒOj
-MenuData	g_MenuData;			// TeraTerm Menu‚Ì•\¦İ’è“™‚Ì\‘¢‘Ì
+JobInfo		g_JobInfo;			// ã‚«ãƒ¬ãƒ³ãƒˆã®è¨­å®šæƒ…å ±æ§‹é€ ä½“ï¼ˆè¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ï¼‰
+MenuData	g_MenuData;			// TeraTerm Menuã®è¡¨ç¤ºè¨­å®šç­‰ã®æ§‹é€ ä½“
 
 wchar_t		*SetupFNameW;		// TERATERM.INI
 wchar_t		*UILanguageFileW;
 
-static char g_szLockBox[MAX_PATH];	// ƒpƒXƒ[ƒhˆÃ†‰»—pƒpƒXƒ[ƒh
+static char g_szLockBox[MAX_PATH];	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰æš—å·åŒ–ç”¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
 
 #if (defined(__MINGW32__) && (__MINGW64_VERSION_MAJOR < 13)) || (defined(_MSC_VER) && (_MSC_VER == 1400))
 // MinGW or VS2005(VC8.0)
@@ -83,12 +83,12 @@ static wchar_t* _wcstok(wchar_t *strToken, const wchar_t *strDelimit)
 #endif
 
 /**
- *	ƒtƒ‹ƒpƒX‰»‚·‚é
- *	‘Š‘ÎƒpƒX‚Ì‚Í ttpmenu.exe ‚Ì‚ ‚éƒtƒHƒ‹ƒ_‚©‚ç‚Ìƒtƒ‹ƒpƒX‚Æ‚È‚é
+ *	ãƒ•ãƒ«ãƒ‘ã‚¹åŒ–ã™ã‚‹
+ *	ç›¸å¯¾ãƒ‘ã‚¹ã®æ™‚ã¯ ttpmenu.exe ã®ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€ã‹ã‚‰ã®ãƒ•ãƒ«ãƒ‘ã‚¹ã¨ãªã‚‹
  *
- *	@param[in]	filename ƒtƒ‹ƒpƒX‰»‚·‚éƒtƒ@ƒCƒ‹–¼
- *	@return		ƒtƒ‹ƒpƒX‰»‚³‚ê‚½ƒtƒ@ƒCƒ‹–¼
- *				•s—v‚É‚È‚Á‚½‚ç free()‚·‚é‚±‚Æ
+ *	@param[in]	filename ãƒ•ãƒ«ãƒ‘ã‚¹åŒ–ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«å
+ *	@return		ãƒ•ãƒ«ãƒ‘ã‚¹åŒ–ã•ã‚ŒãŸãƒ•ã‚¡ã‚¤ãƒ«å
+ *				ä¸è¦ã«ãªã£ãŸã‚‰ free()ã™ã‚‹ã“ã¨
  */
 static wchar_t *GetFullPath(const wchar_t *filename)
 {
@@ -104,20 +104,20 @@ static wchar_t *GetFullPath(const wchar_t *filename)
 }
 
 /**
- *	ttermpro.exe ‚Ì‘¶İ‚·‚éƒtƒHƒ‹ƒ_‚ğ•Ô‚·
+ *	ttermpro.exe ã®å­˜åœ¨ã™ã‚‹ãƒ•ã‚©ãƒ«ãƒ€ã‚’è¿”ã™
  *
- *	@param[in,out]	path	•¶š––‚É‚Í"/"‚ª‚È‚¢
+ *	@param[in,out]	path	æ–‡å­—æœ«ã«ã¯"/"ãŒãªã„
  *	@param[in]		size
  */
 static void GetTeraTermDir(wchar_t *path, size_t size)
 {
 #if 1
-	// ‘Š‘ÎƒpƒX
-	//	Àsƒtƒ@ƒCƒ‹‚ª’u‚¢‚Ä‚ ‚éƒtƒHƒ‹ƒ_(GetExeDirW())‚ğ
-	//	ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚Éİ’è‚µ‚Ä‚ ‚é
+	// ç›¸å¯¾ãƒ‘ã‚¹
+	//	å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ãŒç½®ã„ã¦ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€(GetExeDirW())ã‚’
+	//	ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã«è¨­å®šã—ã¦ã‚ã‚‹
 	wcsncpy_s(path, size, DEFAULT_PATH, _TRUNCATE);
 #else
-	// â‘ÎƒpƒX
+	// çµ¶å¯¾ãƒ‘ã‚¹
 	wchar_t *exe_dir = GetExeDirW(NULL);
 	wcsncpy_s(path, size, exe_dir, _TRUNCATE);
 	free(exe_dir);
@@ -125,7 +125,7 @@ static void GetTeraTermDir(wchar_t *path, size_t size)
 }
 
 /**
- *	ttermpro.exe ‚ÌƒpƒX‚ğ•Ô‚·
+ *	ttermpro.exe ã®ãƒ‘ã‚¹ã‚’è¿”ã™
  *
  *	@param[in,out]	path
  *	@param[in]		size
@@ -140,9 +140,9 @@ static void GetTeraTermPath(wchar_t *path, size_t size)
 
 /* ==========================================================================
 	Function Name	: (BOOL) ExecStartup()
-	Outline			: ƒXƒ^[ƒgƒAƒbƒvİ’è‚ÌƒWƒ‡ƒu‚ğÀs‚·‚éB
-	Arguments		: HWND		hWnd		(In) ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE
+	Outline			: ã‚¹ã‚¿ãƒ¼ãƒˆã‚¢ãƒƒãƒ—è¨­å®šã®ã‚¸ãƒ§ãƒ–ã‚’å®Ÿè¡Œã™ã‚‹ã€‚
+	Arguments		: HWND		hWnd		(In) ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -175,10 +175,10 @@ BOOL ExecStartup(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (BOOL) ErrorMessage()
-	Outline			: w’èƒƒbƒZ[ƒW{ƒVƒXƒeƒ€‚ÌƒGƒ‰[ƒƒbƒZ[ƒW‚ğ•\¦‚·‚éB
-	Arguments		: HWND			hWnd		(In) eƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-					: const wchar_t *msg,...	(In) ”CˆÓƒƒbƒZ[ƒW•¶š—ñ
-	Return Value	: ¬Œ÷ TRUE
+	Outline			: æŒ‡å®šãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ï¼‹ã‚·ã‚¹ãƒ†ãƒ ã®ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã™ã‚‹ã€‚
+	Arguments		: HWND			hWnd		(In) è¦ªã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+					: const wchar_t *msg,...	(In) ä»»æ„ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æ–‡å­—åˆ—
+	Return Value	: æˆåŠŸ TRUE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -209,10 +209,10 @@ static BOOL ErrorMessage(HWND hWnd, DWORD dwErr, const wchar_t *msg,...)
 
 /* ==========================================================================
 	Function Name	: (BOOL) SetMenuFont()
-	Outline			: ƒtƒHƒ“ƒgw’èƒ_ƒCƒAƒƒO‚ğ•\¦‚µAw’è‚³‚ê‚½ƒtƒHƒ“ƒg‚ğ
-					: İ’è‚·‚éB
-	Arguments		: HWND			hWnd		(In) eƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE
+	Outline			: ãƒ•ã‚©ãƒ³ãƒˆæŒ‡å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤ºã—ã€æŒ‡å®šã•ã‚ŒãŸãƒ•ã‚©ãƒ³ãƒˆã‚’
+					: è¨­å®šã™ã‚‹ã€‚
+	Arguments		: HWND			hWnd		(In) è¦ªã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -265,12 +265,12 @@ BOOL SetMenuFont(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (BOOL) ExtractAssociatedIconEx()
-	Outline			: ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÉŠÖ˜A•t‚¯‚ç‚ê‚½ƒAƒCƒRƒ“‚ğæ“¾‚·‚éB
-					: İ’è‚·‚éB
-	Arguments		: const wchar_t	*szPath		(In) ƒAƒvƒŠƒP[ƒVƒ‡ƒ“–¼
-					: HICON			*hLargeIcon	(Out) ‘å‚«‚¢ƒAƒCƒRƒ“‚Ìƒnƒ“ƒhƒ‹
-					: HICON			*hSmallIcon	(Out) ¬‚³‚¢ƒAƒCƒRƒ“‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE
+	Outline			: ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã«é–¢é€£ä»˜ã‘ã‚‰ã‚ŒãŸã‚¢ã‚¤ã‚³ãƒ³ã‚’å–å¾—ã™ã‚‹ã€‚
+					: è¨­å®šã™ã‚‹ã€‚
+	Arguments		: const wchar_t	*szPath		(In) ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³å
+					: HICON			*hLargeIcon	(Out) å¤§ãã„ã‚¢ã‚¤ã‚³ãƒ³ã®ãƒãƒ³ãƒ‰ãƒ«
+					: HICON			*hSmallIcon	(Out) å°ã•ã„ã‚¢ã‚¤ã‚³ãƒ³ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -294,11 +294,11 @@ static BOOL ExtractAssociatedIconEx(const wchar_t *szPath, HICON *hLargeIcon, HI
 
 /* ==========================================================================
 	Function Name	: (BOOL) GetApplicationFilename()
-	Outline			: ƒŒƒWƒXƒgƒŠ‚æ‚èw’è‚³‚ê‚½İ’è‚ÌƒAƒvƒƒP[ƒVƒ‡ƒ“–¼‚ğæ“¾
-					: ‚·‚éB
-	Arguments		: const wchar_t		*szName		(In) İ’è–¼
-					: wchar_t			*szPath		(Out) ƒAƒvƒŠƒP[ƒVƒ‡ƒ“–¼
-	Return Value	: ¬Œ÷ TRUE
+	Outline			: ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚ˆã‚ŠæŒ‡å®šã•ã‚ŒãŸè¨­å®šã®ã‚¢ãƒ—ãƒ­ã‚±ãƒ¼ã‚·ãƒ§ãƒ³åã‚’å–å¾—
+					: ã™ã‚‹ã€‚
+	Arguments		: const wchar_t		*szName		(In) è¨­å®šå
+					: wchar_t			*szPath		(Out) ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³å
+	Return Value	: æˆåŠŸ TRUE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -330,11 +330,11 @@ static BOOL GetApplicationFilename(const wchar_t *szName, wchar_t *szPath)
 
 /* ==========================================================================
 	Function Name	: (BOOL) AddTooltip()
-	Outline			: w’è‚³‚ê‚½ƒRƒ“ƒgƒ[ƒ‹‚Éƒc[ƒ‹ƒ`ƒbƒv‚ğŠÖ˜A•t‚¯‚é
-	Arguments		: HWND		hWnd		(In) ƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-					: int		idControl	(In) ƒEƒBƒ“ƒhƒEã‚ÌƒRƒ“ƒgƒ[ƒ‹ID
-					: wchar_t	*tip		(In) •\¦‚·‚éƒc[ƒ‹ƒ`ƒbƒv
-	Return Value	: ¬Œ÷ TRUE / ¸”s FALSE
+	Outline			: æŒ‡å®šã•ã‚ŒãŸã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã«ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚’é–¢é€£ä»˜ã‘ã‚‹
+	Arguments		: HWND		hWnd		(In) ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+					: int		idControl	(In) ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä¸Šã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ID
+					: wchar_t	*tip		(In) è¡¨ç¤ºã™ã‚‹ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—
+	Return Value	: æˆåŠŸ TRUE / å¤±æ•— FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -357,9 +357,9 @@ BOOL AddTooltip(HWND hWnd, int idControl, const wchar_t *tip)
 
 /* ==========================================================================
 	Function Name	: (BOOL) LoadConfig()
-	Outline			: ƒŒƒWƒXƒgƒŠ‚æ‚èTeraTerm Menu‚Ì•\¦İ’è“™‚ğæ“¾‚·‚é
-	Arguments		: ‚È‚µ
-	Return Value	: ¬Œ÷ TRUE / ¸”s FALSE
+	Outline			: ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚ˆã‚ŠTeraTerm Menuã®è¡¨ç¤ºè¨­å®šç­‰ã‚’å–å¾—ã™ã‚‹
+	Arguments		: ãªã—
+	Return Value	: æˆåŠŸ TRUE / å¤±æ•— FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -435,9 +435,9 @@ BOOL LoadConfig(void)
 
 /* ==========================================================================
 	Function Name	: (BOOL) SaveConfig()
-	Outline			: ƒŒƒWƒXƒgƒŠ‚ÉTeraTerm Menu‚Ì•\¦İ’è“™‚ğ•Û‘¶‚·‚é
-	Arguments		: ‚È‚µ
-	Return Value	: ¬Œ÷ TRUE / ¸”s FALSE
+	Outline			: ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã«TeraTerm Menuã®è¡¨ç¤ºè¨­å®šç­‰ã‚’ä¿å­˜ã™ã‚‹
+	Arguments		: ãªã—
+	Return Value	: æˆåŠŸ TRUE / å¤±æ•— FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -477,7 +477,7 @@ BOOL SaveConfig(void)
 
 /* ==========================================================================
 	Function Name	: (LRESULT CALLBACK) GetMsgProc()
-	Outline			: ƒtƒbƒN ƒvƒƒV[ƒWƒƒiGetMsgProc‚Ìƒwƒ‹ƒvQÆj
+	Outline			: ãƒ•ãƒƒã‚¯ ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ï¼ˆGetMsgProcã®ãƒ˜ãƒ«ãƒ—å‚ç…§ï¼‰
 	Arguments		: 
 	Return Value	: 
 	Reference		: 
@@ -518,9 +518,9 @@ LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 /* ==========================================================================
 	Function Name	: (BOOL) CreateTooltip()
-	Outline			: ƒc[ƒ‹ƒ`ƒbƒv‚ğì¬‚·‚é
-	Arguments		: ‚È‚µ
-	Return Value	: ¬Œ÷ TRUE / ¸”s FALSE
+	Outline			: ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚’ä½œæˆã™ã‚‹
+	Arguments		: ãªã—
+	Return Value	: æˆåŠŸ TRUE / å¤±æ•— FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -576,9 +576,9 @@ BOOL CreateTooltip(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (void) PopupMenu()
-	Outline			: ƒƒCƒ“‚Ìƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[‚ğ•\¦‚·‚éB
-	Arguments		: HWND		hWnd		(In) eƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ‚È‚µ
+	Outline			: ãƒ¡ã‚¤ãƒ³ã®ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’è¡¨ç¤ºã™ã‚‹ã€‚
+	Arguments		: HWND		hWnd		(In) è¦ªã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: ãªã—
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -592,7 +592,7 @@ void PopupMenu(HWND hWnd)
 	GetCursorPos(&Point);
 	::SetForceForegroundWindow(hWnd);
 
-	// ƒ}ƒ‹ƒ`ƒ‚ƒjƒ^ŠÂ‹«‚Å‚Í LOWORD(), HIWORD() ‚ğg‚Á‚Ä‚Í‚¢‚¯‚È‚¢B(2005.10.13 yutaka)
+	// ãƒãƒ«ãƒãƒ¢ãƒ‹ã‚¿ç’°å¢ƒã§ã¯ LOWORD(), HIWORD() ã‚’ä½¿ã£ã¦ã¯ã„ã‘ãªã„ã€‚(2005.10.13 yutaka)
 	::TrackPopupMenu(g_hSubMenu,
 						TPM_LEFTALIGN | TPM_RIGHTBUTTON,
 						Point.x,
@@ -604,9 +604,9 @@ void PopupMenu(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (void) PopupListMenu()
-	Outline			: İ’èˆê——‚Ìƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[‚ğ•\¦‚·‚éB
-	Arguments		: HWND		hWnd		(In) eƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ‚È‚µ
+	Outline			: è¨­å®šä¸€è¦§ã®ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’è¡¨ç¤ºã™ã‚‹ã€‚
+	Arguments		: HWND		hWnd		(In) è¦ªã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: ãªã—
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -620,7 +620,7 @@ void PopupListMenu(HWND hWnd)
 	GetCursorPos(&Point);
 	::SetForceForegroundWindow(hWnd);
 
-	// ƒ}ƒ‹ƒ`ƒ‚ƒjƒ^ŠÂ‹«‚Å‚Í LOWORD(), HIWORD() ‚ğg‚Á‚Ä‚Í‚¢‚¯‚È‚¢B(2005.10.13 yutaka)
+	// ãƒãƒ«ãƒãƒ¢ãƒ‹ã‚¿ç’°å¢ƒã§ã¯ LOWORD(), HIWORD() ã‚’ä½¿ã£ã¦ã¯ã„ã‘ãªã„ã€‚(2005.10.13 yutaka)
 	::TrackPopupMenu(g_hListMenu,
 						TPM_LEFTALIGN | TPM_RIGHTBUTTON,
 						Point.x,
@@ -632,9 +632,9 @@ void PopupListMenu(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (BOOL) InitListBox()
-	Outline			: İ’èƒ_ƒCƒAƒƒO“à‚Ìİ’èˆê——ƒŠƒXƒgƒ{ƒbƒNƒX‚ğ‰Šú‰»‚·‚éB
-	Arguments		: HWND		hWnd		(In) ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE
+	Outline			: è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°å†…ã®è¨­å®šä¸€è¦§ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
+	Arguments		: HWND		hWnd		(In) ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -673,9 +673,9 @@ void init_password_control(HWND dlg, int item)
 
 /* ==========================================================================
 	Function Name	: (BOOL) InitConfigDlg()
-	Outline			: İ’èƒ_ƒCƒAƒƒO‚ğ‰Šú‰»‚·‚éB
-	Arguments		: HWND		hWnd		(In) ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE
+	Outline			: è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
+	Arguments		: HWND		hWnd		(In) ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -736,9 +736,9 @@ BOOL InitConfigDlg(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (BOOL) InitEtcDlg()
-	Outline			: Ú×İ’èƒ_ƒCƒAƒƒO‚ğ‰Šú‰»‚·‚éB
-	Arguments		: HWND		hWnd		(In) ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE
+	Outline			: è©³ç´°è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
+	Arguments		: HWND		hWnd		(In) ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -789,9 +789,9 @@ BOOL InitEtcDlg(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (BOOL) InitVersionDlg()
-	Outline			: uƒo[ƒWƒ‡ƒ“î•ñvƒ_ƒCƒAƒƒO‚ğ‰Šú‰»‚·‚éB
-	Arguments		: HWND		hWnd		(In) ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE
+	Outline			: ã€Œãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±ã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
+	Arguments		: HWND		hWnd		(In) ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -843,9 +843,9 @@ BOOL InitVersionDlg(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (BOOL) SetDefaultEtcDlg()
-	Outline			: Ú×İ’èƒ_ƒCƒAƒƒO‚ÌŠe€–Ú‚ÉƒfƒtƒHƒ‹ƒg’l‚ğİ’è‚·‚éB
-	Arguments		: HWND		hWnd		(In) ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE
+	Outline			: è©³ç´°è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®å„é …ç›®ã«ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’è¨­å®šã™ã‚‹ã€‚
+	Arguments		: HWND		hWnd		(In) ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -860,7 +860,7 @@ BOOL SetDefaultEtcDlg(HWND hWnd)
 
 	::SetDlgItemTextW(hWnd, EDIT_TTMPATH, szTTermPath);
 	::SetDlgItemTextA(hWnd, EDIT_INITFILE, "");
-	// ƒfƒtƒHƒ‹ƒgƒIƒvƒVƒ‡ƒ“‚É /KT , /KR ‚ğ’Ç‰Á (2005.1.25 yutaka)
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚ªãƒ—ã‚·ãƒ§ãƒ³ã« /KT , /KR ã‚’è¿½åŠ  (2005.1.25 yutaka)
 	::SetDlgItemTextA(hWnd, EDIT_OPTION, "/KT=UTF8 /KR=UTF8");
 //	::SetDlgItemText(hWnd, EDIT_OPTION, "");
 	::SetDlgItemTextW(hWnd, EDIT_PROMPT_USER, LOGIN_PROMPT);
@@ -871,10 +871,10 @@ BOOL SetDefaultEtcDlg(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (BOOL) SetTaskTray()
-	Outline			: ƒ^ƒXƒNƒgƒŒƒC‚ÉƒAƒCƒRƒ“‚ğ“o˜^^íœ‚·‚éB
-	Arguments		: HWND		hWnd		(In) ƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-					: DWORD		dwMessage	(In) Shell_NotifyIcon‚Ì‘æˆêˆø”
-	Return Value	: ¬Œ÷ TRUE
+	Outline			: ã‚¿ã‚¹ã‚¯ãƒˆãƒ¬ã‚¤ã«ã‚¢ã‚¤ã‚³ãƒ³ã‚’ç™»éŒ²ï¼å‰Šé™¤ã™ã‚‹ã€‚
+	Arguments		: HWND		hWnd		(In) ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+					: DWORD		dwMessage	(In) Shell_NotifyIconã®ç¬¬ä¸€å¼•æ•°
+	Return Value	: æˆåŠŸ TRUE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -897,11 +897,11 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 	nid.hIcon				= g_hIconSmall;
 	lstrcpyA(nid.szTip, "TeraTerm Menu");
 
-	/* Shell_NotifyIconŠÖ”‚ÍAƒVƒFƒ‹‚Ö‚Ì“o˜^‚ª4•bˆÈ“à‚ÉŠ®—¹‚µ‚È‚¢‚ÆƒGƒ‰[‚ÆŒ©‚È‚·‚½‚ßA
-	 * ƒŠƒgƒ‰ƒCˆ—‚ğ’Ç‰Á‚·‚éB
+	/* Shell_NotifyIconé–¢æ•°ã¯ã€ã‚·ã‚§ãƒ«ã¸ã®ç™»éŒ²ãŒ4ç§’ä»¥å†…ã«å®Œäº†ã—ãªã„ã¨ã‚¨ãƒ©ãƒ¼ã¨è¦‹ãªã™ãŸã‚ã€
+	 * ãƒªãƒˆãƒ©ã‚¤å‡¦ç†ã‚’è¿½åŠ ã™ã‚‹ã€‚
 	 *
-	 * MicrosoftŒö®î•ñ‚É‚æ‚é‚ÆAWindowsXP`7‚Ü‚Å‚ª“–ŠYd—l‚Ì–Í—lBWindows8/8.1‚Å‚ÍA
-	 * ƒŠƒgƒ‰ƒC‚Í•s—v‚Æv‚í‚ê‚é‚ªA‹¤’Êˆ’u‚Æ‚·‚éB
+	 * Microsoftå…¬å¼æƒ…å ±ã«ã‚ˆã‚‹ã¨ã€WindowsXPã€œ7ã¾ã§ãŒå½“è©²ä»•æ§˜ã®æ¨¡æ§˜ã€‚Windows8/8.1ã§ã¯ã€
+	 * ãƒªãƒˆãƒ©ã‚¤ã¯ä¸è¦ã¨æ€ã‚ã‚Œã‚‹ãŒã€å…±é€šå‡¦ç½®ã¨ã™ã‚‹ã€‚
 	 * cf. http://support.microsoft.com/kb/418138/ja
 	 * (2014.6.21 yutaka)
 	 */
@@ -930,12 +930,12 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 
 /* ==========================================================================
 	Function Name	: (BOOL) MakeTTL()
-	Outline			: ©“®ƒƒOƒCƒ“—pƒ}ƒNƒƒtƒ@ƒCƒ‹‚ğ¶¬‚·‚éB
-					  ƒGƒ“ƒR[ƒfƒBƒ“ƒO‚Í UTF-8
-	Arguments		: HWND hWnd	(In) ƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-					: const wchar_t *TTLName	(In) ƒ}ƒNƒƒtƒ@ƒCƒ‹–¼
-					: JobInfo	JobInfo		(In) İ’èî•ñ\‘¢‘Ì
-	Return Value	: ¬Œ÷ TRUE / ¸”s FALSE
+	Outline			: è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ç”¨ãƒã‚¯ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ç”Ÿæˆã™ã‚‹ã€‚
+					  ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã¯ UTF-8
+	Arguments		: HWND hWnd	(In) ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+					: const wchar_t *TTLName	(In) ãƒã‚¯ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«å
+					: JobInfo	JobInfo		(In) è¨­å®šæƒ…å ±æ§‹é€ ä½“
+	Return Value	: æˆåŠŸ TRUE / å¤±æ•— FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -967,7 +967,7 @@ static BOOL MakeTTL(HWND hWnd, const wchar_t *TTLName, JobInfo *jobInfo)
 		::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
 	}
 
-	// telnetƒ|[ƒg”Ô†‚ğ•t‰Á‚·‚é (2004.12.3 yutaka)
+	// telnetãƒãƒ¼ãƒˆç•ªå·ã‚’ä»˜åŠ ã™ã‚‹ (2004.12.3 yutaka)
 	::wsprintfA(buf, "connect '%s:23'\r\n", (const char *)(u8)jobInfo->szHostName);
 	::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
 
@@ -1044,7 +1044,7 @@ static void _dquote_string(const wchar_t *str, wchar_t *dst, size_t dst_len)
 
 static void dquote_string(const wchar_t *str, wchar_t *dst, size_t dst_len)
 {
-	// ",ƒXƒy[ƒX,;,^A-^_ ‚ªŠÜ‚Ü‚ê‚éê‡‚É‚ÍƒNƒI[ƒg‚·‚é
+	// ",ã‚¹ãƒšãƒ¼ã‚¹,;,^A-^_ ãŒå«ã¾ã‚Œã‚‹å ´åˆã«ã¯ã‚¯ã‚ªãƒ¼ãƒˆã™ã‚‹
 	if (wcschr(str, '"') != NULL ||
 	    wcschr(str, ' ') != NULL ||
 	    wcschr(str, ';') != NULL ||
@@ -1082,17 +1082,17 @@ static void dquote_string(const wchar_t *str, wchar_t *dst, size_t dst_len)
 		_dquote_string(str, dst, dst_len);
 		return;
 	}
-	// ‚»‚Ì‚Ü‚ÜƒRƒs[‚µ‚Ä–ß‚é
+	// ãã®ã¾ã¾ã‚³ãƒ”ãƒ¼ã—ã¦æˆ»ã‚‹
 	wcsncpy_s(dst, dst_len, str, _TRUNCATE);
 }
 
 /* ==========================================================================
 	Function Name	: (BOOL) ConnectHost()
-	Outline			: ©“®ƒƒOƒCƒ“‚Ü‚½‚ÍƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÌÀs‚ğ‚·‚éB
-	Arguments		: HWND		hWnd		(In) ƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-					: UINT		idItem		(In) ‘I‘ğ‚³‚ê‚½ƒRƒ“ƒgƒ[ƒ‹ID
-					: char		*szJobName	(In) Às‚·‚éƒWƒ‡ƒu
-	Return Value	: ¬Œ÷ TRUE / ¸”s FALSE
+	Outline			: è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ã¾ãŸã¯ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®å®Ÿè¡Œã‚’ã™ã‚‹ã€‚
+	Arguments		: HWND		hWnd		(In) ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+					: UINT		idItem		(In) é¸æŠã•ã‚ŒãŸã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ID
+					: char		*szJobName	(In) å®Ÿè¡Œã™ã‚‹ã‚¸ãƒ§ãƒ–
+	Return Value	: æˆåŠŸ TRUE / å¤±æ•— FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -1147,7 +1147,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	switch (jobInfo.dwMode) {
 	case MODE_AUTOLOGIN:
 		if (jobInfo.bTtssh != TRUE) {
-			// TTSSH‚ğg—p‚µ‚È‚¢, ©“®ƒƒOƒCƒ“ƒ}ƒNƒ‚ğ¶¬Ag—p‚·‚é
+			// TTSSHã‚’ä½¿ç”¨ã—ãªã„, è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ãƒã‚¯ãƒ­ã‚’ç”Ÿæˆã€ä½¿ç”¨ã™ã‚‹
 			wchar_t	szTempPath[MAX_PATH];
 			::GetTempPathW(MAX_PATH, szTempPath);
 			::GetTempFileNameW(szTempPath, L"ttm", 0, szMacroFile);
@@ -1164,11 +1164,11 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 			awcscat(&szArgment, m_option);
 			free(m_option);
 
-			// SSH‚ğg‚í‚È‚¢ê‡A/nossh ƒIƒvƒVƒ‡ƒ“‚ğ•t‚¯‚Ä‚¨‚­B
+			// SSHã‚’ä½¿ã‚ãªã„å ´åˆã€/nossh ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’ä»˜ã‘ã¦ãŠãã€‚
 			awcscat(&szArgment, L" /nossh");
 		}
 		else {
-			// TTSSH‚ª—LŒø‚Ìê‡‚ÍA©“®ƒƒOƒCƒ“‚Ì‚½‚ß‚ÌƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚ğ•t‰Á‚·‚éB
+			// TTSSHãŒæœ‰åŠ¹ã®å ´åˆã¯ã€è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ã®ãŸã‚ã®ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã‚’ä»˜åŠ ã™ã‚‹ã€‚
 			wchar_t passwd[MAX_PATH], keyfile[MAX_PATH];
 			char szRawPassword[MAX_PATH];
 			wchar_t szPassStrW[MAX_PATH];
@@ -1250,13 +1250,13 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 		free(szTemp);
 	}
 
-	// ƒtƒ‹ƒpƒX‰»‚·‚é
+	// ãƒ•ãƒ«ãƒ‘ã‚¹åŒ–ã™ã‚‹
 	wchar_t *exe_fullpath = GetFullPath(jobInfo.szTeraTerm);
 	wcscpy_s(jobInfo.szTeraTerm, exe_fullpath);
 	free(exe_fullpath);
 
-	// Às‚·‚éƒvƒƒOƒ‰ƒ€‚ÌƒJƒŒƒ“ƒgƒpƒX
-	//   ƒvƒƒOƒ‰ƒ€‚Ì‚ ‚éƒtƒHƒ‹ƒ_
+	// å®Ÿè¡Œã™ã‚‹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ã‚«ãƒ¬ãƒ³ãƒˆãƒ‘ã‚¹
+	//   ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€
 	wcscpy(szDirectory, jobInfo.szTeraTerm);
 	if ((::GetFileAttributesW(jobInfo.szTeraTerm) & FILE_ATTRIBUTE_DIRECTORY) == 0) {
 		wchar_t	*pt = wcsrchr(szDirectory, '\\');
@@ -1301,9 +1301,9 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 
 /* ==========================================================================
 	Function Name	: (BOOL) InitMenu()
-	Outline			: Šeƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[‚ğì¬‚·‚éB
-	Arguments		: ‚È‚µ
-	Return Value	: ¬Œ÷ TRUE / ¸”s FALSE
+	Outline			: å„ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’ä½œæˆã™ã‚‹ã€‚
+	Arguments		: ãªã—
+	Return Value	: æˆåŠŸ TRUE / å¤±æ•— FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -1352,9 +1352,9 @@ BOOL InitMenu(void)
 
 /* ==========================================================================
 	Function Name	: (VOID) DeleteListMenuIcons()
-	Outline			: SHGetFileInfo ‚Åæ‚èo‚µ‚½ƒAƒCƒRƒ“ƒŠƒ\[ƒX‚ğŠJ•ú‚·‚éB
-	                  ƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[‚Æˆê——•\¦‚Åg—p‚·‚é‚½‚ßA
-	                  ŠJ•ú‚Å‚«‚é‚Ì‚Íˆê——XV’¼‘O‚ÆƒvƒƒOƒ‰ƒ€I—¹B
+	Outline			: SHGetFileInfo ã§å–ã‚Šå‡ºã—ãŸã‚¢ã‚¤ã‚³ãƒ³ãƒªã‚½ãƒ¼ã‚¹ã‚’é–‹æ”¾ã™ã‚‹ã€‚
+	                  ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¨ä¸€è¦§è¡¨ç¤ºã§ä½¿ç”¨ã™ã‚‹ãŸã‚ã€
+	                  é–‹æ”¾ã§ãã‚‹ã®ã¯ä¸€è¦§æ›´æ–°ç›´å‰ã¨ãƒ—ãƒ­ã‚°ãƒ©ãƒ çµ‚äº†æ™‚ã€‚
 	Arguments		: 
 	Return Value	: 
 	Reference		: 
@@ -1380,9 +1380,9 @@ VOID DeleteListMenuIcons()
 
 /* ==========================================================================
 	Function Name	: (BOOL) InitListMenu()
-	Outline			: İ’èˆê——ƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[‚ğ‰Šú‰»‚·‚éB
-	Arguments		: HWND		hWnd		(In) ƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE
+	Outline			: è¨­å®šä¸€è¦§ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
+	Arguments		: HWND		hWnd		(In) ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -1420,9 +1420,9 @@ BOOL InitListMenu(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (BOOL) RedrawMenu()
-	Outline			: İ’èˆê——ƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[‚ğ•`‰æ‚·‚éB
-	Arguments		: HWND		hWnd		(In) ƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE
+	Outline			: è¨­å®šä¸€è¦§ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’æç”»ã™ã‚‹ã€‚
+	Arguments		: HWND		hWnd		(In) ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -1485,9 +1485,9 @@ BOOL RedrawMenu(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (BOOL) RegSaveLoginHostInformation()
-	Outline			: ƒŒƒWƒXƒgƒŠ‚Éİ’èî•ñ‚ğ•Û‘¶‚·‚éB
-	Arguments		: JobInfo		*jobInfo	(In) İ’èî•ñ\‘¢‘Ì
-	Return Value	: ¬Œ÷ TRUE / ¸”s FALSE
+	Outline			: ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã«è¨­å®šæƒ…å ±ã‚’ä¿å­˜ã™ã‚‹ã€‚
+	Arguments		: JobInfo		*jobInfo	(In) è¨­å®šæƒ…å ±æ§‹é€ ä½“
+	Return Value	: æˆåŠŸ TRUE / å¤±æ•— FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -1541,10 +1541,10 @@ BOOL RegSaveLoginHostInformation(JobInfo *jobInfo)
 
 /* ==========================================================================
 	Function Name	: (BOOL) RegLoadLoginHostInformation()
-	Outline			: ƒŒƒWƒXƒgƒŠ‚©‚çİ’èî•ñ‚ğæ“¾‚·‚éB
-	Arguments		: const wchar_t *szName		(In) İ’èî•ñ–¼
-					: JobInfo		*jobInfo	(In) İ’èî•ñ\‘¢‘Ì
-	Return Value	: ¬Œ÷ TRUE / ¸”s FALSE
+	Outline			: ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‹ã‚‰è¨­å®šæƒ…å ±ã‚’å–å¾—ã™ã‚‹ã€‚
+	Arguments		: const wchar_t *szName		(In) è¨­å®šæƒ…å ±å
+					: JobInfo		*jobInfo	(In) è¨­å®šæƒ…å ±æ§‹é€ ä½“
+	Return Value	: æˆåŠŸ TRUE / å¤±æ•— FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -1605,9 +1605,9 @@ BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 
 /* ==========================================================================
 	Function Name	: (BOOL) SaveEtcInformation()
-	Outline			: Ú×İ’èî•ñ‚ğƒOƒ[ƒoƒ‹•Ï”‚É•Û‘¶‚·‚éB
-	Arguments		: HWND			hWnd		(In) ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE / ¸”s FALSE
+	Outline			: è©³ç´°è¨­å®šæƒ…å ±ã‚’ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°ã«ä¿å­˜ã™ã‚‹ã€‚
+	Arguments		: HWND			hWnd		(In) ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE / å¤±æ•— FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -1629,9 +1629,9 @@ BOOL SaveEtcInformation(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (BOOL) SaveLoginHostInformation()
-	Outline			: İ’èî•ñ‚ğ•Û‘¶‚·‚éB
-	Arguments		: HWND			hWnd		(In) ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE / ¸”s FALSE
+	Outline			: è¨­å®šæƒ…å ±ã‚’ä¿å­˜ã™ã‚‹ã€‚
+	Arguments		: HWND			hWnd		(In) ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE / å¤±æ•— FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -1754,9 +1754,9 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (BOOL) LoadLoginHostInformation()
-	Outline			: İ’èî•ñ‚ğæ“¾‚·‚éB
-	Arguments		: HWND			hWnd		(In) ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE / ¸”s FALSE
+	Outline			: è¨­å®šæƒ…å ±ã‚’å–å¾—ã™ã‚‹ã€‚
+	Arguments		: HWND			hWnd		(In) ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE / å¤±æ•— FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -1850,7 +1850,7 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 
 	::CheckDlgButton(hWnd, CHECK_TTSSH, g_JobInfo.bTtssh);
 
-	// ”é–§Œ®ƒtƒ@ƒCƒ‹‚Ì’Ç‰Á (2005.1.28 yutaka)
+	// ç§˜å¯†éµãƒ•ã‚¡ã‚¤ãƒ«ã®è¿½åŠ  (2005.1.28 yutaka)
 	::SetDlgItemTextW(hWnd, IDC_KEYFILE_PATH, g_JobInfo.PrivateKeyFile);
 	if (g_JobInfo.bTtssh == TRUE) {
 		EnableWindow(GetDlgItem(hWnd, IDC_CHALLENGE_CHECK), TRUE);
@@ -1891,9 +1891,9 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (BOOL) DeleteLoginHostInformation()
-	Outline			: İ’èî•ñ‚ğíœ‚·‚éB
-	Arguments		: HWND			hWnd		(In) ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUE / ¸”s FALSE
+	Outline			: è¨­å®šæƒ…å ±ã‚’å‰Šé™¤ã™ã‚‹ã€‚
+	Arguments		: HWND			hWnd		(In) ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUE / å¤±æ•— FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -1939,10 +1939,10 @@ BOOL DeleteLoginHostInformation(HWND hWnd)
 
 /* ==========================================================================
 	Function Name	: (BOOL) ManageWMCommand_Config()
-	Outline			: İ’èî•ñƒ_ƒCƒAƒƒO‚ÌWM_COMMAND‚ğˆ—‚·‚éB
-	Arguments		: HWND			hWnd		(In) ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
+	Outline			: è¨­å®šæƒ…å ±ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®WM_COMMANDã‚’å‡¦ç†ã™ã‚‹ã€‚
+	Arguments		: HWND			hWnd		(In) ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
 					: WPARAM		wParam		(In) 
-	Return Value	: ˆ— TRUE / –¢ˆ— FALSE
+	Return Value	: å‡¦ç† TRUE / æœªå‡¦ç† FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -1957,7 +1957,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 	LockBoxDlgPrivateData pData;
 	char szPassword[MAX_PATH];
 
-	// ”é–§Œ®ƒtƒ@ƒCƒ‹‚ÌƒRƒ“ƒgƒ[ƒ‹ (2005.1.28 yutaka)
+	// ç§˜å¯†éµãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ« (2005.1.28 yutaka)
 	switch(wParam) {
 	case CHECK_TTSSH | (BN_CLICKED << 16) :
 		ret = SendMessage(GetDlgItem(hWnd, CHECK_TTSSH), BM_GETCHECK, 0, 0);
@@ -1977,7 +1977,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		return TRUE;
 
 	case IDC_CHALLENGE_CHECK | (BN_CLICKED << 16) :
-		// "use Challenge"‚ğƒ`ƒFƒbƒN‚µ‚½ê‡‚ÍŒ®ƒtƒ@ƒCƒ‹‚ğdisabled‚É‚·‚éB(2007.11.14 yutaka)
+		// "use Challenge"ã‚’ãƒã‚§ãƒƒã‚¯ã—ãŸå ´åˆã¯éµãƒ•ã‚¡ã‚¤ãƒ«ã‚’disabledã«ã™ã‚‹ã€‚(2007.11.14 yutaka)
 		ret = SendMessage(GetDlgItem(hWnd, IDC_CHALLENGE_CHECK), BM_GETCHECK, 0, 0);
 		if (ret & BST_CHECKED) {
 			EnableWindow(GetDlgItem(hWnd, IDC_KEYFILE_PATH), FALSE);
@@ -1993,7 +1993,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		return TRUE;
 
 	case IDC_PAGEANT_CHECK | (BN_CLICKED << 16) :
-		// "use Pageant"‚ÌƒNƒŠƒbƒN‚É‘Î‰B(2008.5.26 maya)
+		// "use Pageant"ã®ã‚¯ãƒªãƒƒã‚¯ã«å¯¾å¿œã€‚(2008.5.26 maya)
 		ret = SendMessage(GetDlgItem(hWnd, IDC_PAGEANT_CHECK), BM_GETCHECK, 0, 0);
 		if (ret & BST_CHECKED) {
 			EnableWindow(GetDlgItem(hWnd, IDC_KEYFILE_PATH), FALSE);
@@ -2158,10 +2158,10 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 
 /* ==========================================================================
 	Function Name	: (BOOL) ManageWMCommand_Etc()
-	Outline			: Ú×İ’èî•ñƒ_ƒCƒAƒƒO‚ÌWM_COMMAND‚ğˆ—‚·‚éB
-	Arguments		: HWND			hWnd		(In) ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
+	Outline			: è©³ç´°è¨­å®šæƒ…å ±ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®WM_COMMANDã‚’å‡¦ç†ã™ã‚‹ã€‚
+	Arguments		: HWND			hWnd		(In) ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
 					: WPARAM		wParam		(In) 
-	Return Value	: ˆ— TRUE / –¢ˆ— FALSE
+	Return Value	: å‡¦ç† TRUE / æœªå‡¦ç† FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -2221,10 +2221,10 @@ BOOL ManageWMCommand_Etc(HWND hWnd, WPARAM wParam)
 
 /* ==========================================================================
 	Function Name	: (BOOL) ManageWMCommand_Version()
-	Outline			: uƒo[ƒWƒ‡ƒ“î•ñvƒ_ƒCƒAƒƒO‚ÌWM_COMMAND‚ğˆ—‚·‚éB
-	Arguments		: HWND			hWnd		(In) ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
+	Outline			: ã€Œãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±ã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®WM_COMMANDã‚’å‡¦ç†ã™ã‚‹ã€‚
+	Arguments		: HWND			hWnd		(In) ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
 					: WPARAM		wParam		(In) 
-	Return Value	: ˆ— TRUE / –¢ˆ— FALSE
+	Return Value	: å‡¦ç† TRUE / æœªå‡¦ç† FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -2247,10 +2247,10 @@ BOOL ManageWMCommand_Version(HWND hWnd, WPARAM wParam)
 
 /* ==========================================================================
 	Function Name	: (BOOL) ManageWMCommand_Menu()
-	Outline			: ƒƒCƒ“ƒEƒCƒ“ƒhƒE‚ÌWM_COMMAND‚ğˆ—‚·‚éB
-	Arguments		: HWND			hWnd		(In) ƒEƒCƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
+	Outline			: ãƒ¡ã‚¤ãƒ³ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®WM_COMMANDã‚’å‡¦ç†ã™ã‚‹ã€‚
+	Arguments		: HWND			hWnd		(In) ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
 					: WPARAM		wParam		(In) 
-	Return Value	: ˆ— TRUE / –¢ˆ— FALSE
+	Return Value	: å‡¦ç† TRUE / æœªå‡¦ç† FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -2322,8 +2322,8 @@ BOOL ManageWMCommand_Menu(HWND hWnd, WPARAM wParam)
 
 /* ==========================================================================
 	Function Name	: (BOOL CALLBACK) DlgCallBack_Config()
-	Outline			: İ’èƒ_ƒCƒAƒƒO‚ÌƒR[ƒ‹ƒoƒbƒNŠÖ”
-					: iDialogProc‚Ìƒwƒ‹ƒvQÆj
+	Outline			: è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+					: ï¼ˆDialogProcã®ãƒ˜ãƒ«ãƒ—å‚ç…§ï¼‰
 	Arguments		: 
 					: 
 	Return Value	: 
@@ -2407,8 +2407,8 @@ INT_PTR CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 /* ==========================================================================
 	Function Name	: (BOOL CALLBACK) DlgCallBack_Etc()
-	Outline			: Ú×İ’èƒ_ƒCƒAƒƒO‚ÌƒR[ƒ‹ƒoƒbƒNŠÖ”
-					: iDialogProc‚Ìƒwƒ‹ƒvQÆj
+	Outline			: è©³ç´°è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+					: ï¼ˆDialogProcã®ãƒ˜ãƒ«ãƒ—å‚ç…§ï¼‰
 	Arguments		: 
 					: 
 	Return Value	: 
@@ -2434,8 +2434,8 @@ INT_PTR CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 /* ==========================================================================
 	Function Name	: (BOOL CALLBACK) DlgCallBack_Version()
-	Outline			: uƒo[ƒWƒ‡ƒ“î•ñvƒ_ƒCƒAƒƒO‚ÌƒR[ƒ‹ƒoƒbƒNŠÖ”
-					: iDialogProc‚Ìƒwƒ‹ƒvQÆj
+	Outline			: ã€Œãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±ã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+					: ï¼ˆDialogProcã®ãƒ˜ãƒ«ãƒ—å‚ç…§ï¼‰
 	Arguments		: 
 					: 
 	Return Value	: 
@@ -2464,14 +2464,14 @@ INT_PTR CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 
 /* ==========================================================================
 	Function Name	: (BOOL) DecryptPassword()
-	Outline			: ˆÃ†‰»‚³‚ê‚½ƒpƒXƒ[ƒh‚Ì•œ†ˆ—
-	Arguments		: char *szEncryptPassword	(in)	ˆÃ†‰»‚³‚ê‚½ƒpƒXƒ[ƒh
-					: char *szDecryptPassword	(out)	•œ†‚³‚ê‚½ƒpƒXƒ[ƒh
-					: HWND hWnd					(in)	ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷ TRUEA¸”s FALSE
+	Outline			: æš—å·åŒ–ã•ã‚ŒãŸãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã®å¾©å·å‡¦ç†
+	Arguments		: char *szEncryptPassword	(in)	æš—å·åŒ–ã•ã‚ŒãŸãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
+					: char *szDecryptPassword	(out)	å¾©å·ã•ã‚ŒãŸãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
+					: HWND hWnd					(in)	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ TRUEã€å¤±æ•— FALSE
 	Reference		:
 	Renewal			:
-	Notes			: ƒOƒ[ƒoƒ‹•Ï” g_szLockBox (in)Ag_hI (in) ‚ğQÆ‚µ‚Ä‚¢‚é
+	Notes			: ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•° g_szLockBox (in)ã€g_hI (in) ã‚’å‚ç…§ã—ã¦ã„ã‚‹
 	Attention		:
 	Up Date			:
    ======1=========2=========3=========4=========5=========6=========7======= */
@@ -2506,18 +2506,18 @@ BOOL DecryptPassword(char *szEncryptPassword, char *szDecryptPassword, HWND hWnd
 
 /* ==========================================================================
 	Function Name	: (BOOL CALLBACK) DlgCallBack_LockBox()
-	Outline			: uLockBoxvƒ_ƒCƒAƒƒO‚ÌƒR[ƒ‹ƒoƒbƒNŠÖ”
-	Arguments		: HWND		hWnd	(In)	ƒ_ƒCƒAƒƒOƒ{ƒbƒNƒX‚ğ¯•Ê‚·‚éƒnƒ“ƒhƒ‹
-					: UINT		uMsg	(In)	ƒƒbƒZ[ƒW
-					: WPARAM	wParam	(In)	’Ç‰Á‚ÌƒƒbƒZ[ƒWŒÅ—Lî•ñ
-					: LPARAM	lParam	(In)	•œ†‚µ‚½ƒpƒXƒ[ƒh‚Ì•Û‘¶æA
-					:							lParam[0]‚ª0‚Å‚Í‚È‚¢ê‡‚ÍƒGƒ‰[ƒƒbƒZ[ƒW‚ğ•\¦‚·‚é
-					: 					(Out)	•œ†‚µ‚½ƒpƒXƒ[ƒh(¬Œ÷)
-	Return Value	: ¬Œ÷ TRUE
-					: ¸”s FALSE
-	Reference		: DialogProc‚Ìƒwƒ‹ƒvQÆ
+	Outline			: ã€ŒLockBoxã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+	Arguments		: HWND		hWnd	(In)	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒœãƒƒã‚¯ã‚¹ã‚’è­˜åˆ¥ã™ã‚‹ãƒãƒ³ãƒ‰ãƒ«
+					: UINT		uMsg	(In)	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+					: WPARAM	wParam	(In)	è¿½åŠ ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å›ºæœ‰æƒ…å ±
+					: LPARAM	lParam	(In)	å¾©å·ã—ãŸãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã®ä¿å­˜å…ˆã€
+					:							lParam[0]ãŒ0ã§ã¯ãªã„å ´åˆã¯ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã™ã‚‹
+					: 					(Out)	å¾©å·ã—ãŸãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰(æˆåŠŸæ™‚)
+	Return Value	: æˆåŠŸ TRUE
+					: å¤±æ•— FALSE
+	Reference		: DialogProcã®ãƒ˜ãƒ«ãƒ—å‚ç…§
 	Renewal			:
-	Notes			: ¬Œ÷‚µ‚½ê‡Ag_szLockBox‚É“ü—Í‚³‚ê‚½•¶š—ñ‚ªİ’è‚³‚ê‚é
+	Notes			: æˆåŠŸã—ãŸå ´åˆã€g_szLockBoxã«å…¥åŠ›ã•ã‚ŒãŸæ–‡å­—åˆ—ãŒè¨­å®šã•ã‚Œã‚‹
 	Attention		:
 	Up Date			:
    ======1=========2=========3=========4=========5=========6=========7======= */
@@ -2638,8 +2638,8 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 
 /* ==========================================================================
 	Function Name	: (LRESULT CALLBACK) WinProc()
-	Outline			: ƒƒCƒ“ƒEƒCƒ“ƒhƒE‚ÌƒR[ƒ‹ƒoƒbƒNŠÖ”
-					: iWindowProc‚Ìƒwƒ‹ƒvQÆj
+	Outline			: ãƒ¡ã‚¤ãƒ³ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+					: ï¼ˆWindowProcã®ãƒ˜ãƒ«ãƒ—å‚ç…§ï¼‰
 	Arguments		: 
 					: 
 	Return Value	: 
@@ -2776,7 +2776,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 /* ==========================================================================
 	Function Name	: (int WINAPI) WinMain()
-	Outline			: ƒƒCƒ“ŠÖ”
+	Outline			: ãƒ¡ã‚¤ãƒ³é–¢æ•°
 	Arguments		: 
 					: 
 	Return Value	: 
@@ -2806,17 +2806,17 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 
 	if ((module = GetModuleHandleA("kernel32.dll")) != NULL) {
 		if ((setDefDllDir = (pSetDefDllDir)GetProcAddress(module, "SetDefaultDllDirectories")) != NULL) {
-			// SetDefaultDllDirectories() ‚ªg‚¦‚éê‡‚ÍAŒŸõƒpƒX‚ğ %WINDOWS%\system32 ‚Ì‚İ‚Éİ’è‚·‚é
+			// SetDefaultDllDirectories() ãŒä½¿ãˆã‚‹å ´åˆã¯ã€æ¤œç´¢ãƒ‘ã‚¹ã‚’ %WINDOWS%\system32 ã®ã¿ã«è¨­å®šã™ã‚‹
 			(*setDefDllDir)((DWORD)0x00000800); // LOAD_LIBRARY_SEARCH_SYSTEM32
 		}
 		else if ((setDllDir = (pSetDllDir)GetProcAddress(module, "SetDllDirectoryA")) != NULL) {
-			// SetDefaultDllDirectories() ‚ªg‚¦‚È‚­‚Ä‚àASetDllDirectory() ‚ªg‚¦‚éê‡‚Í
-			// ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚¾‚¯‚Å‚àŒŸõƒpƒX‚©‚ç‚Í‚¸‚µ‚Ä‚¨‚­B
+			// SetDefaultDllDirectories() ãŒä½¿ãˆãªãã¦ã‚‚ã€SetDllDirectory() ãŒä½¿ãˆã‚‹å ´åˆã¯
+			// ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã ã‘ã§ã‚‚æ¤œç´¢ãƒ‘ã‚¹ã‹ã‚‰ã¯ãšã—ã¦ãŠãã€‚
 			(*setDllDir)("");
 		}
 	}
 
-	// ttpmenu.exe ‚Ì‚ ‚éƒtƒHƒ‹ƒ_‚ğƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒg‚É•ÏX‚·‚é
+	// ttpmenu.exe ã®ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€ã‚’ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆã«å¤‰æ›´ã™ã‚‹
 	wchar_t *exe_dir = GetExeDirW(NULL);
 	SetCurrentDirectoryW(exe_dir);
 	free(exe_dir);
@@ -2829,7 +2829,7 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 				  NULL, 0, 0,
 				  UILanguageFileW, "TTMenu", "DLG_TAHOMA_FONT");
 
-	// İ’èƒtƒ@ƒCƒ‹‰Šú‰» (INIƒtƒ@ƒCƒ‹/ƒŒƒWƒXƒgƒŠØ‘Ö)
+	// è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«åˆæœŸåŒ– (INIãƒ•ã‚¡ã‚¤ãƒ«/ãƒ¬ã‚¸ã‚¹ãƒˆãƒªåˆ‡æ›¿)
 	RegInit();
 
 	g_hI			= hI;

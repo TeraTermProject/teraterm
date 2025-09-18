@@ -47,8 +47,8 @@ typedef struct {
 } DlgTextInfo;
 
 typedef struct {
-	const char *key;				// NULL‚Ìê‡‚Íí‚Édefault_text ‚ªg—p‚³‚ê‚é
-	const wchar_t *default_text;	// key == NULL && default_text == NULL‚Ìê‡I’[
+	const char *key;				// NULLã®å ´åˆã¯å¸¸ã«default_text ãŒä½¿ç”¨ã•ã‚Œã‚‹
+	const wchar_t *default_text;	// key == NULL && default_text == NULLã®å ´åˆçµ‚ç«¯
 	uintptr_t data;
 } I18nTextInfo;
 

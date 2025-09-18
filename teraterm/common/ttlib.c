@@ -49,8 +49,8 @@
 
 #include "ttlib.h"
 
-// ‚±‚Ìƒtƒ@ƒCƒ‹‚Í‚¢‚­‚Â‚©‚ÌƒvƒƒWƒFƒNƒg‚É’Ç‰Á‚³‚ê‚Ä’¼ÚƒRƒ“ƒpƒCƒ‹,ƒŠƒ“ƒN‚³‚ê‚Ä‚¢‚é
-// common_static ‚Í lib ‚Æ‚µ‚Äì¬‚³‚ê‚Ä‘¼‚ÌƒvƒƒWƒFƒNƒg‚É‚ÅƒŠƒ“ƒN‚³‚ê‚Ä‚¢‚é
+// ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ã„ãã¤ã‹ã®ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã«è¿½åŠ ã•ã‚Œã¦ç›´æ¥ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«,ãƒªãƒ³ã‚¯ã•ã‚Œã¦ã„ã‚‹
+// common_static ã¯ lib ã¨ã—ã¦ä½œæˆã•ã‚Œã¦ä»–ã®ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã«ã§ãƒªãƒ³ã‚¯ã•ã‚Œã¦ã„ã‚‹
 
 // for b64encode/b64decode
 static char *b64enc_table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -183,16 +183,16 @@ int b64decode(PCHAR dst, int dsize, PCHAR src)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹–¼(ƒpƒX–¼)‚ğ‰ğÍ‚·‚é
- *	_splitpath‚ÌƒpƒX‚Æƒtƒ@ƒCƒ‹–¼‚¾‚¯”Å
+ *	ãƒ•ã‚¡ã‚¤ãƒ«å(ãƒ‘ã‚¹å)ã‚’è§£æã™ã‚‹
+ *	_splitpathã®ãƒ‘ã‚¹ã¨ãƒ•ã‚¡ã‚¤ãƒ«åã ã‘ç‰ˆ
  *
- *	@param[in]	PathName	ƒtƒ@ƒCƒ‹–¼Aƒtƒ‹ƒpƒX
- *	@param[out]	DirLen		––”ö‚ÌƒXƒ‰ƒbƒVƒ…‚ğŠÜ‚ŞƒfƒBƒŒƒNƒgƒŠƒpƒX’·
- *							NULL‚Ì‚Æ‚«’l‚ğ•Ô‚³‚È‚¢
- *	@param[out]	FNPos		ƒtƒ@ƒCƒ‹–¼‚Ö‚Ìindex
- *							&PathName[FNPos] ‚ªƒtƒ@ƒCƒ‹–¼
- *							NULL‚Ì‚Æ‚«’l‚ğ•Ô‚³‚È‚¢
- *	@retval		FALSE		PathName‚ª•s³
+ *	@param[in]	PathName	ãƒ•ã‚¡ã‚¤ãƒ«åã€ãƒ•ãƒ«ãƒ‘ã‚¹
+ *	@param[out]	DirLen		æœ«å°¾ã®ã‚¹ãƒ©ãƒƒã‚·ãƒ¥ã‚’å«ã‚€ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªãƒ‘ã‚¹é•·
+ *							NULLã®ã¨ãå€¤ã‚’è¿”ã•ãªã„
+ *	@param[out]	FNPos		ãƒ•ã‚¡ã‚¤ãƒ«åã¸ã®index
+ *							&PathName[FNPos] ãŒãƒ•ã‚¡ã‚¤ãƒ«å
+ *							NULLã®ã¨ãå€¤ã‚’è¿”ã•ãªã„
+ *	@retval		FALSE		PathNameãŒä¸æ­£
  */
 BOOL GetFileNamePos(const char *PathName, int *DirLen, int *FNPos)
 {
@@ -313,8 +313,8 @@ void AppendSlash(PCHAR Path, int destlen)
 /**
  * Delete slashes at the end of a path name
  *
- *	@return	s––‚Ì '\' ‚ªíœ‚³‚ê‚½•¶š—ñ
- *			•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
+ *	@return	è¡Œæœ«ã® '\' ãŒå‰Šé™¤ã•ã‚ŒãŸæ–‡å­—åˆ—
+ *			ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  */
 wchar_t *DeleteSlashW(const wchar_t *Path)
 {
@@ -446,7 +446,7 @@ int Hex2Str(PCHAR Hex, PCHAR Str, int MaxLen)
 BOOL DoesFileExist(const char *FName)
 {
 	// check if a file exists or not
-	// ƒtƒHƒ‹ƒ_‚Ü‚½‚Íƒtƒ@ƒCƒ‹‚ª‚ ‚ê‚Î TRUE ‚ğ•Ô‚·
+	// ãƒ•ã‚©ãƒ«ãƒ€ã¾ãŸã¯ãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚Œã° TRUE ã‚’è¿”ã™
 	struct _stat st;
 
 	return (_stat(FName,&st)==0);
@@ -454,9 +454,9 @@ BOOL DoesFileExist(const char *FName)
 
 /**
  *	check if a folder exists or not
- *	ƒ}ƒNƒŒİŠ·«‚Ì‚½‚ß
- *	DoesFileExist() ‚Í]—ˆ’Ê‚èƒtƒHƒ‹ƒ_‚Ü‚½‚Íƒtƒ@ƒCƒ‹‚ª‚ ‚ê‚Î TRUE ‚ğ•Ô‚µ
- *  DoesFolderExist() ‚ÍƒtƒHƒ‹ƒ_‚ª‚ ‚éê‡‚Ì‚İ TRUE ‚ğ•Ô‚·B
+ *	ãƒã‚¯ãƒ­äº’æ›æ€§ã®ãŸã‚
+ *	DoesFileExist() ã¯å¾“æ¥é€šã‚Šãƒ•ã‚©ãƒ«ãƒ€ã¾ãŸã¯ãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚Œã° TRUE ã‚’è¿”ã—
+ *  DoesFolderExist() ã¯ãƒ•ã‚©ãƒ«ãƒ€ãŒã‚ã‚‹å ´åˆã®ã¿ TRUE ã‚’è¿”ã™ã€‚
  */
 BOOL DoesFolderExistW(const wchar_t *FName)
 {
@@ -513,7 +513,7 @@ void uint2str(UINT i, PCHAR Str, int destlen, int len)
 	strncpy_s(Str,destlen,Temp,_TRUNCATE);
 }
 
-// ƒtƒ@ƒCƒ‹–¼‚Ég—p‚Å‚«‚È‚¢•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚©Šm‚©‚ß‚é (2006.8.28 maya)
+// ãƒ•ã‚¡ã‚¤ãƒ«åã«ä½¿ç”¨ã§ããªã„æ–‡å­—ãŒå«ã¾ã‚Œã¦ã„ã‚‹ã‹ç¢ºã‹ã‚ã‚‹ (2006.8.28 maya)
 int isInvalidFileNameChar(const char *FName)
 {
 	wchar_t *FNameW = ToWcharA(FName);
@@ -522,8 +522,8 @@ int isInvalidFileNameChar(const char *FName)
 	return (int)r;
 }
 
-// ƒtƒ@ƒCƒ‹–¼‚Ég—p‚Å‚«‚È‚¢•¶š‚ğ c ‚É’u‚«Š·‚¦‚é
-// c ‚É 0 ‚ğw’è‚µ‚½ê‡‚Í•¶š‚ğíœ‚·‚é
+// ãƒ•ã‚¡ã‚¤ãƒ«åã«ä½¿ç”¨ã§ããªã„æ–‡å­—ã‚’ c ã«ç½®ãæ›ãˆã‚‹
+// c ã« 0 ã‚’æŒ‡å®šã—ãŸå ´åˆã¯æ–‡å­—ã‚’å‰Šé™¤ã™ã‚‹
 void replaceInvalidFileNameChar(PCHAR FName, unsigned char c)
 {
 	wchar_t *FNameW = ToWcharA(FName);
@@ -536,7 +536,7 @@ void replaceInvalidFileNameChar(PCHAR FName, unsigned char c)
 }
 
 
-// strftime ‚É“n‚¹‚È‚¢•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚©Šm‚©‚ß‚é (2006.8.28 maya)
+// strftime ã«æ¸¡ã›ãªã„æ–‡å­—ãŒå«ã¾ã‚Œã¦ã„ã‚‹ã‹ç¢ºã‹ã‚ã‚‹ (2006.8.28 maya)
 int isInvalidStrftimeChar(PCHAR format)
 {
 	wchar_t *formatW = ToWcharA(format);
@@ -545,7 +545,7 @@ int isInvalidStrftimeChar(PCHAR format)
 	return (int)r;
 }
 
-// strftime ‚É“n‚¹‚È‚¢•¶š‚ğíœ‚·‚é
+// strftime ã«æ¸¡ã›ãªã„æ–‡å­—ã‚’å‰Šé™¤ã™ã‚‹
 void deleteInvalidStrftimeChar(PCHAR FName)
 {
 	const size_t len = strlen(FName);
@@ -555,7 +555,7 @@ void deleteInvalidStrftimeChar(PCHAR FName)
 	free(FNameW);
 }
 
-// ƒtƒ‹ƒpƒX‚©‚çAƒtƒ@ƒCƒ‹–¼•”•ª‚Ì‚İ‚ğ strftime ‚Å•ÏŠ·‚·‚é (2006.8.28 maya)
+// ãƒ•ãƒ«ãƒ‘ã‚¹ã‹ã‚‰ã€ãƒ•ã‚¡ã‚¤ãƒ«åéƒ¨åˆ†ã®ã¿ã‚’ strftime ã§å¤‰æ›ã™ã‚‹ (2006.8.28 maya)
 void ParseStrftimeFileName(PCHAR FName, int destlen)
 {
 	char filename[MAX_PATH];
@@ -565,22 +565,22 @@ void ParseStrftimeFileName(PCHAR FName, int destlen)
 	time_t time_local;
 	struct tm tm_local;
 
-	// ƒtƒ@ƒCƒ‹–¼•”•ª‚Ì‚İ‚ğ flename ‚ÉŠi”[
+	// ãƒ•ã‚¡ã‚¤ãƒ«åéƒ¨åˆ†ã®ã¿ã‚’ flename ã«æ ¼ç´
 	ExtractFileName(FName, filename ,sizeof(filename));
 
-	// strftime ‚Ég—p‚Å‚«‚È‚¢•¶š‚ğíœ
+	// strftime ã«ä½¿ç”¨ã§ããªã„æ–‡å­—ã‚’å‰Šé™¤
 	deleteInvalidStrftimeChar(filename);
 
-	// Œ»İ‚ğæ“¾
+	// ç¾åœ¨æ™‚åˆ»ã‚’å–å¾—
 	time(&time_local);
 	localtime_s(&tm_local, &time_local);
 
-	// •¶š—ñ‚É•ÏŠ·
+	// æ™‚åˆ»æ–‡å­—åˆ—ã«å¤‰æ›
 	if (strftime(buf, sizeof(buf), filename, &tm_local) == 0) {
 		strncpy_s(buf, sizeof(buf), filename, _TRUNCATE);
 	}
 
-	// ƒtƒ@ƒCƒ‹–¼‚Ég—p‚Å‚«‚È‚¢•¶š‚ğíœ
+	// ãƒ•ã‚¡ã‚¤ãƒ«åã«ä½¿ç”¨ã§ããªã„æ–‡å­—ã‚’å‰Šé™¤
 	deleteInvalidFileNameChar(buf);
 
 	c = strrchr(FName, '\\');
@@ -590,7 +590,7 @@ void ParseStrftimeFileName(PCHAR FName, int destlen)
 		AppendSlash(FName,destlen);
 		strncat_s(FName, destlen, buf, _TRUNCATE);
 	}
-	else { // "\"‚ğŠÜ‚Ü‚È‚¢(ƒtƒ‹ƒpƒX‚Å‚È‚¢)ê‡‚É‘Î‰ (2006.11.30 maya)
+	else { // "\"ã‚’å«ã¾ãªã„(ãƒ•ãƒ«ãƒ‘ã‚¹ã§ãªã„)å ´åˆã«å¯¾å¿œ (2006.11.30 maya)
 		strncpy_s(FName, destlen, buf, _TRUNCATE);
 	}
 }
@@ -614,8 +614,8 @@ void ConvFName(const char *HomeDir, PCHAR Temp, int templen, const char *DefExt,
 }
 #endif
 
-// "\n" ‚ğ‰üs‚É•ÏŠ·‚·‚é (2006.7.29 maya)
-// "\t" ‚ğƒ^ƒu‚É•ÏŠ·‚·‚é (2006.11.6 maya)
+// "\n" ã‚’æ”¹è¡Œã«å¤‰æ›ã™ã‚‹ (2006.7.29 maya)
+// "\t" ã‚’ã‚¿ãƒ–ã«å¤‰æ›ã™ã‚‹ (2006.11.6 maya)
 void RestoreNewLine(PCHAR Text)
 {
 	int i, j=0, size=strlen(Text);
@@ -655,7 +655,7 @@ void RestoreNewLine(PCHAR Text)
 	memcpy(Text, buf, size);
 }
 
-// w’è‚µ‚½ƒGƒ“ƒgƒŠ‚ğ teraterm.ini ‚©‚ç“Ç‚İæ‚é (2009.3.23 yutaka)
+// æŒ‡å®šã—ãŸã‚¨ãƒ³ãƒˆãƒªã‚’ teraterm.ini ã‹ã‚‰èª­ã¿å–ã‚‹ (2009.3.23 yutaka)
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 {
 	wchar_t *HomeDirW;
@@ -717,12 +717,12 @@ void OutputDebugPrintf(const char *fmt, ...)
 	OutputDebugStringA(tmp);
 }
 
-// Šeƒo[ƒWƒ‡ƒ“ƒ`ƒFƒbƒN‚Í’¼’l‚É‚Å‚«‚é‚©‚à‚µ‚ê‚È‚¢
-//  —á
-//		VS2013‚Åƒrƒ‹ƒh‚µ‚½ƒvƒƒOƒ‰ƒ€‚ÍA‚»‚à‚»‚à NT4.0 ‚Å‚Í“®ì‚µ‚È‚¢‚½‚ßA
-//		IsWindowsNT4() ‚Íí‚É FALSE ‚ğ•Ô‚·
+// å„ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãƒã‚§ãƒƒã‚¯ã¯ç›´å€¤ã«ã§ãã‚‹ã‹ã‚‚ã—ã‚Œãªã„
+//  ä¾‹
+//		VS2013ã§ãƒ“ãƒ«ãƒ‰ã—ãŸãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ã€ãã‚‚ãã‚‚ NT4.0 ã§ã¯å‹•ä½œã—ãªã„ãŸã‚ã€
+//		IsWindowsNT4() ã¯å¸¸ã« FALSE ã‚’è¿”ã™
 
-// OS‚ª WindowsNT ƒJ[ƒlƒ‹‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
+// OSãŒ WindowsNT ã‚«ãƒ¼ãƒãƒ«ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
 //
 // return TRUE:  NT kernel
 //        FALSE: Not NT kernel
@@ -741,31 +741,31 @@ BOOL IsWindowsNTKernel()
 	return (ret);
 }
 
-// OS‚ª Windows95 ‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
+// OSãŒ Windows95 ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
 BOOL IsWindows95()
 {
 	return IsWindowsVer(VER_PLATFORM_WIN32_WINDOWS, 4, 0);
 }
 
-// OS‚ª WindowsMe ‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
+// OSãŒ WindowsMe ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
 BOOL IsWindowsMe()
 {
 	return IsWindowsVer(VER_PLATFORM_WIN32_WINDOWS, 4, 90);
 }
 
-// OS‚ª WindowsNT4.0 ‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
+// OSãŒ WindowsNT4.0 ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
 BOOL IsWindowsNT4()
 {
 	return IsWindowsVer(VER_PLATFORM_WIN32_NT, 4, 0);
 }
 
-// OS‚ª Windows2000 ‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
+// OSãŒ Windows2000 ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
 BOOL IsWindows2000()
 {
 	return IsWindowsVer(VER_PLATFORM_WIN32_NT, 5, 0);
 }
 
-// OS‚ª Windows2000 ˆÈ~ ‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
+// OSãŒ Windows2000 ä»¥é™ ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
 //
 // return TRUE:  2000 or later
 //        FALSE: NT4 or earlier
@@ -774,7 +774,7 @@ BOOL IsWindows2000OrLater(void)
 	return IsWindowsVerOrLater(5, 0);
 }
 
-// OS‚ª WindowsVista ˆÈ~ ‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
+// OSãŒ WindowsVista ä»¥é™ ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
 //
 // return TRUE:  Vista or later
 //        FALSE: XP or earlier
@@ -783,7 +783,7 @@ BOOL IsWindowsVistaOrLater(void)
 	return IsWindowsVerOrLater(6, 0);
 }
 
-// OS‚ª Windows7 ˆÈ~ ‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
+// OSãŒ Windows7 ä»¥é™ ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
 //
 // return TRUE:  7 or later
 //        FALSE: Vista or earlier
@@ -792,8 +792,8 @@ BOOL IsWindows7OrLater(void)
 	return IsWindowsVerOrLater(6, 1);
 }
 
-// OS ‚ªƒ}ƒ‹ƒ`ƒ‚ƒjƒ^ API ‚ğƒTƒ|[ƒg‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
-//   98 ˆÈ~/2000 ˆÈ~‚Í TRUE ‚ğ•Ô‚·
+// OS ãŒãƒãƒ«ãƒãƒ¢ãƒ‹ã‚¿ API ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã‚‹ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
+//   98 ä»¥é™/2000 ä»¥é™ã¯ TRUE ã‚’è¿”ã™
 BOOL HasMultiMonitorSupport()
 {
 	HMODULE mod;
@@ -805,8 +805,8 @@ BOOL HasMultiMonitorSupport()
 	return FALSE;
 }
 
-// OS ‚ª DnsQuery ‚ğƒTƒ|[ƒg‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
-//   2000 ˆÈ~‚Í TRUE ‚ğ•Ô‚·
+// OS ãŒ DnsQuery ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã‚‹ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
+//   2000 ä»¥é™ã¯ TRUE ã‚’è¿”ã™
 BOOL HasDnsQuery()
 {
 	HMODULE mod;
@@ -818,14 +818,14 @@ BOOL HasDnsQuery()
 	return FALSE;
 }
 
-// ’Ê’mƒAƒCƒRƒ“‚Å‚Ìƒoƒ‹[ƒ“ƒ`ƒbƒv‚É‘Î‰‚µ‚Ä‚¢‚é‚©”»•Ê‚·‚éB
-// Me/2000 ˆÈ~‚Å TRUE ‚ğ•Ô‚·
+// é€šçŸ¥ã‚¢ã‚¤ã‚³ãƒ³ã§ã®ãƒãƒ«ãƒ¼ãƒ³ãƒãƒƒãƒ—ã«å¯¾å¿œã—ã¦ã„ã‚‹ã‹åˆ¤åˆ¥ã™ã‚‹ã€‚
+// Me/2000 ä»¥é™ã§ TRUE ã‚’è¿”ã™
 BOOL HasBalloonTipSupport()
 {
 	return IsWindows2000OrLater() || IsWindowsMe();
 }
 
-// OPENFILENAMEA.lStructSize ‚É‘ã“ü‚·‚é’l
+// OPENFILENAMEA.lStructSize ã«ä»£å…¥ã™ã‚‹å€¤
 DWORD get_OPENFILENAME_SIZE()
 {
 	if (IsWindows2000OrLater()) {
@@ -834,7 +834,7 @@ DWORD get_OPENFILENAME_SIZE()
 	return OPENFILENAME_SIZE_VERSION_400A;
 }
 
-// OPENFILENAMEW.lStructSize ‚É‘ã“ü‚·‚é’l
+// OPENFILENAMEW.lStructSize ã«ä»£å…¥ã™ã‚‹å€¤
 DWORD get_OPENFILENAME_SIZEW()
 {
 	if (IsWindows2000OrLater()) {
@@ -845,10 +845,10 @@ DWORD get_OPENFILENAME_SIZEW()
 }
 
 /*
- *	Œ»İ‚ÌŠÔ‚ğ•¶š—ñ‚É‚µ‚Ä•Ô‚·
+ *	ç¾åœ¨ã®æ™‚é–“ã‚’æ–‡å­—åˆ—ã«ã—ã¦è¿”ã™
  *
- *	@return	Œo‰ß•¶š—ñ
- *			•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
+ *	@return	çµŒéæ™‚åˆ»æ–‡å­—åˆ—
+ *			ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
  */
 char *mctimelocal(const char *format, BOOL utc_flag)
 {
@@ -951,10 +951,10 @@ char *mctimelocal(const char *format, BOOL utc_flag)
 }
 
 /*
- *	Œ»İ‚Ü‚Å‚ÌŒo‰ßŠÔ‚ğ•¶š—ñ‚É‚µ‚Ä•Ô‚·
+ *	ç¾åœ¨ã¾ã§ã®çµŒéæ™‚é–“ã‚’æ–‡å­—åˆ—ã«ã—ã¦è¿”ã™
  *
- *	@return	Œo‰ßŠÔ‚Ì•¶š—ñ
- *			•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
+ *	@return	çµŒéæ™‚é–“ã®æ–‡å­—åˆ—
+ *			ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
  */
 char *strelapsed(DWORD start_time)
 {
@@ -1094,8 +1094,8 @@ void split_buffer(char *buffer, int delimiter, char **head, char **body)
 }
 
 /**
- *	ƒ_ƒCƒAƒƒOƒtƒHƒ“ƒg‚ğæ“¾‚·‚é
- *	ƒGƒ‰[‚Í”­¶‚µ‚È‚¢
+ *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒ•ã‚©ãƒ³ãƒˆã‚’å–å¾—ã™ã‚‹
+ *	ã‚¨ãƒ©ãƒ¼ã¯ç™ºç”Ÿã—ãªã„
  */
 DllExport void GetMessageboxFont(LOGFONTA *logfont)
 {

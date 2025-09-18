@@ -71,8 +71,8 @@ private:
   // for debug
 #if UNICODE_DEBUG
   TipWin *TipWinCodeDebug;
-  int CtrlKeyState;			// 0:ŠJn/1:‰Ÿ‚·/2:—£‚·/3:‰Ÿ‚·(•\¦ó‘Ô)
-  DWORD CtrlKeyDownTick;	// Å‰‚É‰Ÿ‚µ‚½tick
+  int CtrlKeyState;			// 0:é–‹å§‹/1:æŠ¼ã™/2:é›¢ã™/3:æŠ¼ã™(è¡¨ç¤ºçŠ¶æ…‹)
+  DWORD CtrlKeyDownTick;	// æœ€åˆã«æŠ¼ã—ãŸtick
 #endif
 
   // TipWin
@@ -81,7 +81,7 @@ private:
   // for html help
   LONG HelpId;
 
-  // ƒTƒCƒY•ÏX’†(WM_SIZING ` WM_EXITSIZEMOVE)‚ÍTRUE
+  // ã‚µã‚¤ã‚ºå¤‰æ›´ä¸­(WM_SIZING ã€œ WM_EXITSIZEMOVE)ã¯TRUE
   BOOL isSizing;
 
 public:

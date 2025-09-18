@@ -44,22 +44,22 @@
 #include "comportinfo.h"
 
 /*
- *	devpkey.h ‚ª‚ ‚éŠÂ‹«?
- *		HAS_DEVPKEY_H ‚ª define ‚³‚ê‚é
+ *	devpkey.h ãŒã‚ã‚‹ç’°å¢ƒ?
+ *		HAS_DEVPKEY_H ãŒ define ã•ã‚Œã‚‹
  */
 #if	defined(_MSC_VER)
 #if	(_MSC_VER > 1400)
 
-// VS2019‚Ì‚Æ‚«(VS2005‚æ‚è‘å‚«‚¢‚Æ‚µ‚Ä‚¢‚é)
+// VS2019ã®ã¨ã(VS2005ã‚ˆã‚Šå¤§ãã„ã¨ã—ã¦ã„ã‚‹)
 #define HAS_DEVPKEY_H	1
 
 #else // _MSC_VER > 1400
 
-// VS2008‚Ì‚Æ‚«
+// VS2008ã®ã¨ã
 #if defined(_INC_SDKDDKVER)
 
-// VS2008 + SDK 7.0‚Å‚Í‚È‚¢‚Æ‚«(SDK 7.1‚Ì‚Æ‚«)
-//   SDK 7.0 ‚Ìê‡‚Í sdkddkver.h ‚ª include ‚³‚ê‚Ä‚¢‚È‚¢
+// VS2008 + SDK 7.0ã§ã¯ãªã„ã¨ã(SDK 7.1ã®ã¨ã)
+//   SDK 7.0 ã®å ´åˆã¯ sdkddkver.h ãŒ include ã•ã‚Œã¦ã„ãªã„
 #define HAS_DEVPKEY_H	1
 
 #endif  //  defined(_INC_SDKDDKVER)
@@ -67,14 +67,14 @@
 #elif defined(__MINGW32__)
 
 #if	__MINGW64_VERSION_MAJOR >= 8
-// mingw64 8+ ‚Ì‚Æ‚«
+// mingw64 8+ ã®ã¨ã
 #define HAS_DEVPKEY_H	1
 #endif
 
 #endif  // defined(_MSC_VER)
 
 /*
- *	devpkey.h ‚Ì include
+ *	devpkey.h ã® include
  */
 #if defined(HAS_DEVPKEY_H)
 
@@ -90,11 +90,11 @@
 #define INITGUID
 #include <guiddef.h>
 
-// 1‚Ì‚Æ‚«A"COM%d" ‚Ì‚İŒŸo‚·‚é
+// 1ã®ã¨ãã€"COM%d" ã®ã¿æ¤œå‡ºã™ã‚‹
 #define DETECT_COM_ONLY		1
 
 /**
- *	ƒ|[ƒg–¼‚ğæ“¾
+ *	ãƒãƒ¼ãƒˆåã‚’å–å¾—
  */
 static BOOL GetComPortName(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, wchar_t **str)
 {
@@ -103,7 +103,7 @@ static BOOL GetComPortName(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, w
 									 DICS_FLAG_GLOBAL,
 									 0, DIREG_DEV, KEY_READ);
 	if (hKey == NULL){
-		// ƒ|[ƒg–¼‚ªæ“¾‚Å‚«‚È‚¢?
+		// ãƒãƒ¼ãƒˆåãŒå–å¾—ã§ããªã„?
 		*str = NULL;
 		return FALSE;
 	}
@@ -124,7 +124,7 @@ static BOOL GetComPortName(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData, w
 }
 
 /**
- *	ƒvƒƒpƒeƒB•¶š—ñì¬
+ *	ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£æ–‡å­—åˆ—ä½œæˆ
  */
 static void CreatePropertyStr(ComPortInfo_t *info)
 {
@@ -160,7 +160,7 @@ static void CreatePropertyStr(ComPortInfo_t *info)
 
 
 /**
- *	î•ñ‚ğæ“¾
+ *	æƒ…å ±ã‚’å–å¾—
  */
 static void GetComProperty(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData,
 						   ComPortInfo_t *info)
@@ -186,7 +186,7 @@ static void GetComProperty(HDEVINFO hDevInfo, SP_DEVINFO_DATA *DeviceInfoData,
 		&DEVPKEY_Device_DriverVersion, (void **)&p->driverversion, NULL);
 }
 
-/* COMƒ|[ƒgî•ñƒ\[ƒg */
+/* COMãƒãƒ¼ãƒˆæƒ…å ±ã‚½ãƒ¼ãƒˆ */
 static int sort_sub(const void *a_, const void *b_)
 {
 	const ComPortInfo_t *a = (ComPortInfo_t *)a_;
@@ -194,23 +194,23 @@ static int sort_sub(const void *a_, const void *b_)
 	BOOL a_com = (wcsncmp(a->port_name, L"COM", 3) == 0);
 	BOOL b_com = (wcsncmp(b->port_name, L"COM", 3) == 0);
 	if (a_com && !b_com) {
-		// "COM%d"‚ªŒã‚ë
+		// "COM%d"ãŒå¾Œã‚
 		return 1;
 	}
 	if (!a_com && b_com) {
-		// "COM%d"‚ªŒã‚ë
+		// "COM%d"ãŒå¾Œã‚
 		return -1;
 	}
 	if (a_com && b_com) {
-		// —¼•û"COM%d"‚Ì‚Æ‚«‚ÍA”š‚ª‘å‚«‚¢‚Ù‚¤‚ªŒã‚ë
+		// ä¸¡æ–¹"COM%d"ã®ã¨ãã¯ã€æ•°å­—ãŒå¤§ãã„ã»ã†ãŒå¾Œã‚
 		return (a->port_no == b->port_no) ? 0 : (a->port_no > b->port_no) ? 1 : -1;
 	}
-	// ƒAƒ‹ƒtƒ@ƒxƒbƒg‡•À‚Ñ
+	// ã‚¢ãƒ«ãƒ•ã‚¡ãƒ™ãƒƒãƒˆé †ä¸¦ã³
 	return wcscmp(a->port_name, b->port_name);
 }
 
 /**
- *	ÀÛ‚ÉƒfƒoƒCƒX‚ğƒI[ƒvƒ“‚·‚é‚±‚Æ‚Åcomƒ|[ƒgŒŸo
+ *	å®Ÿéš›ã«ãƒ‡ãƒã‚¤ã‚¹ã‚’ã‚ªãƒ¼ãƒ—ãƒ³ã™ã‚‹ã“ã¨ã§comãƒãƒ¼ãƒˆæ¤œå‡º
  */
 static ComPortInfo_t *ComPortInfoGetByCreatefile(int *count)
 {
@@ -227,8 +227,8 @@ static ComPortInfo_t *ComPortInfoGetByCreatefile(int *count)
 			ComPortInfo_t info = {};
 			wchar_t com_name[12];
 			_snwprintf_s(com_name, _countof(com_name), _TRUNCATE, L"COM%d", i);
-			info.port_name = _wcsdup(com_name);  // COMƒ|[ƒg–¼
-			info.port_no = i;  // COMƒ|[ƒg”Ô†
+			info.port_name = _wcsdup(com_name);  // COMãƒãƒ¼ãƒˆå
+			info.port_no = i;  // COMãƒãƒ¼ãƒˆç•ªå·
 			CreatePropertyStr(&info);
 
 			comport_count++;
@@ -243,7 +243,7 @@ static ComPortInfo_t *ComPortInfoGetByCreatefile(int *count)
 }
 
 /**
- * COM0COM ‚Ì class GUID
+ * COM0COM ã® class GUID
  */
 DEFINE_GUID( GUID_DEVCLASS_COM0COM, 0xdf799e12L, 0x3c56, 0x421b, 0xb2, 0x98, 0xb6, 0xd3, 0x64, 0x2b, 0xc8, 0x78 );
 
@@ -266,36 +266,36 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 			do {
 				GUID class_guid;
 
-				// class guid ‚©‚ç‘I‘ğ‚·‚é Windows 7 ˆÈ‘O‚Í¸”s‚·‚é
+				// class guid ã‹ã‚‰é¸æŠã™ã‚‹ Windows 7 ä»¥å‰ã¯å¤±æ•—ã™ã‚‹
 				r = hSetupDiGetDevicePropertyW(hDevInfo, &DeviceInfoData, &DEVPKEY_Device_ClassGuid, (void **)&class_guid, NULL);
 				if (r == TRUE) {
 					if (memcmp(&class_guid, &GUID_DEVCLASS_PORTS, sizeof(GUID)) == 0) {
-						// ƒVƒŠƒAƒ‹ƒ|[ƒg(class_str = "Ports"‚Ì‚Í‚¸)
+						// ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆ(class_str = "Ports"ã®ã¯ãš)
 						hSetupDiGetDevicePropertyW(hDevInfo, &DeviceInfoData, &DEVPKEY_Device_Class, (void **)&class_str, NULL);
 						break;
 					}
 					if (memcmp(&class_guid, &GUID_DEVCLASS_MODEM, sizeof(GUID)) == 0) {
-						// ƒ‚ƒfƒ€(class_str = "Modem"‚Ì‚Í‚¸)
+						// ãƒ¢ãƒ‡ãƒ (class_str = "Modem"ã®ã¯ãš)
 						hSetupDiGetDevicePropertyW(hDevInfo, &DeviceInfoData, &DEVPKEY_Device_Class, (void **)&class_str, NULL);
 						break;
 					}
 					if (memcmp(&class_guid, &GUID_DEVCLASS_COM0COM, sizeof(GUID)) == 0) {
-						// com0com(class_str = "CNCPorts"‚Ì‚Í‚¸)
+						// com0com(class_str = "CNCPorts"ã®ã¯ãš)
 						hSetupDiGetDevicePropertyW(hDevInfo, &DeviceInfoData, &DEVPKEY_Device_Class, (void **)&class_str, NULL);
 						break;
 					}
 				}
 
-				// class‚©‚çŒˆ‚ß‚é
+				// classã‹ã‚‰æ±ºã‚ã‚‹
 				wchar_t *str;
 				r = hSetupDiGetDevicePropertyW(hDevInfo, &DeviceInfoData, &DEVPKEY_Device_Class, (void **)&str, NULL);
 				if (r == TRUE) {
 					if (wcsstr(str, L"Ports") != 0) {
-						// "Ports" ‚ªŠÜ‚Ü‚ê‚Ä‚¢‚½‚ç ƒVƒŠƒAƒ‹ƒ|[ƒg‚Æ”»’è‚·‚é
+						// "Ports" ãŒå«ã¾ã‚Œã¦ã„ãŸã‚‰ ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆã¨åˆ¤å®šã™ã‚‹
 						class_str = str;
 						break;
 					} else if (wcsstr(str, L"Modem") != 0) {
-						// "Modem" ‚ªŠÜ‚Ü‚ê‚Ä‚¢‚½‚ç ƒVƒŠƒAƒ‹ƒ|[ƒg‚Æ”»’è‚·‚é
+						// "Modem" ãŒå«ã¾ã‚Œã¦ã„ãŸã‚‰ ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆã¨åˆ¤å®šã™ã‚‹
 						class_str = str;
 						break;
 					}
@@ -303,7 +303,7 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 				}
 			} while(0);
 			if (class_str == NULL) {
-				// ƒVƒŠƒAƒ‹‚¶‚á‚È‚¢AŸ‚ÌƒfƒoƒCƒX‚Ö
+				// ã‚·ãƒªã‚¢ãƒ«ã˜ã‚ƒãªã„ã€æ¬¡ã®ãƒ‡ãƒã‚¤ã‚¹ã¸
 				continue;
 			}
 
@@ -317,7 +317,7 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 					continue;
 				}
 				if (problem != 0) {
-					// ‰½‚ç‚©‚Ì–â‘è‚ª‚ ‚Á‚½?
+					// ä½•ã‚‰ã‹ã®å•é¡ŒãŒã‚ã£ãŸ?
 					free(class_str);
 					continue;
 				}
@@ -330,7 +330,7 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 			}
 
 #if DETECT_COM_ONLY
-			// "COM%d" ‚Å‚Í‚È‚¢ê‡AŒŸo‚µ‚È‚¢
+			// "COM%d" ã§ã¯ãªã„å ´åˆã€æ¤œå‡ºã—ãªã„
 			if (wcsncmp(port_name, L"COM", 3) != 0) {
 				free(port_name);
 				free(class_str);
@@ -338,7 +338,7 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 			}
 #endif
 
-			// î•ñæ“¾
+			// æƒ…å ±å–å¾—
 			ComPortInfo_t info = {};
 			info.port_name = port_name;
 			info.class_name = class_str;
@@ -361,7 +361,7 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 		}
 	}
 
-	/* ƒ|[ƒg–¼‡‚É•À‚×‚é */
+	/* ãƒãƒ¼ãƒˆåé †ã«ä¸¦ã¹ã‚‹ */
 	qsort(comport_infos, comport_count, sizeof(comport_infos[0]), sort_sub);
 
 	*count = comport_count;
@@ -369,18 +369,18 @@ static ComPortInfo_t *ComPortInfoGetByGetSetupAPI(int *count)
 }
 
 /**
- *	comƒ|[ƒg‚Ìî•ñ‚ğæ“¾‚·‚é
+ *	comãƒãƒ¼ãƒˆã®æƒ…å ±ã‚’å–å¾—ã™ã‚‹
  *
- *	@param[out]	count		î•ñ”(0‚Ì‚Æ‚«comƒ|[ƒg‚È‚µ)
- *	@return		î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^(”z—ñ)Aƒ|[ƒg”Ô†‚Ì¬‚³‚¢‡
- *				NULL‚Ì‚Æ‚«comƒ|[ƒg‚È‚µ
- *				g—pŒãComPortInfoFree()‚ğŒÄ‚Ô‚±‚Æ
+ *	@param[out]	count		æƒ…å ±æ•°(0ã®ã¨ãcomãƒãƒ¼ãƒˆãªã—)
+ *	@return		æƒ…å ±ã¸ã®ãƒã‚¤ãƒ³ã‚¿(é…åˆ—)ã€ãƒãƒ¼ãƒˆç•ªå·ã®å°ã•ã„é †
+ *				NULLã®ã¨ãcomãƒãƒ¼ãƒˆãªã—
+ *				ä½¿ç”¨å¾ŒComPortInfoFree()ã‚’å‘¼ã¶ã“ã¨
  */
 ComPortInfo_t *ComPortInfoGet(int *count)
 {
 #if defined(_MSC_VER) && _MSC_VER > 1400
-	// Visual Studio 2005‚æ‚è‚ ‚½‚ç‚µ‚¢VS‚Åƒrƒ‹ƒh‚·‚é‚Æ
-	// setupapi ‚Íg—p‚Å‚«‚é‚ª 9x ‚Å‹N“®‚µ‚È‚¢ƒoƒCƒiƒŠ‚Æ‚È‚é
+	// Visual Studio 2005ã‚ˆã‚Šã‚ãŸã‚‰ã—ã„VSã§ãƒ“ãƒ«ãƒ‰ã™ã‚‹ã¨
+	// setupapi ã¯ä½¿ç”¨ã§ãã‚‹ãŒ 9x ã§èµ·å‹•ã—ãªã„ãƒã‚¤ãƒŠãƒªã¨ãªã‚‹
 	const bool is_setupapi_supported = true;
 #else
 	// VS2005 or MinGW
@@ -402,13 +402,13 @@ ComPortInfo_t *ComPortInfoGet(int *count)
 		return ComPortInfoGetByGetSetupAPI(count);
 	}
 	else {
-		// setupapi ‚Ì“®ì‚ª¡ˆê‚Â‚ÌOS‚Ì‚Æ‚«
+		// setupapi ã®å‹•ä½œãŒä»Šä¸€ã¤ã®OSã®ã¨ã
 		return ComPortInfoGetByCreatefile(count);
 	}
 }
 
 /**
- *	comƒ|[ƒg‚Ìî•ñ‚ğƒƒ‚ƒŠ‚ğ”jŠü‚·‚é
+ *	comãƒãƒ¼ãƒˆã®æƒ…å ±ã‚’ãƒ¡ãƒ¢ãƒªã‚’ç ´æ£„ã™ã‚‹
  */
 void ComPortInfoFree(ComPortInfo_t *info, int count)
 {

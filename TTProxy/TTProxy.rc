@@ -28,12 +28,12 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// “ú–{Œê resources
+// æ—¥æœ¬èª resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
 #ifdef _WIN32
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
-#pragma code_page(932)
+#pragma code_page(65001)
 #endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
@@ -98,14 +98,14 @@ BEGIN
     BEGIN
         BLOCK "041104b0"
         BEGIN
-            VALUE "Comments", "ƒvƒƒLƒVŒo—R‚Å‚Ì’ÊM‚ğƒTƒ|[ƒg‚·‚éƒvƒ‰ƒOƒCƒ“B"
-            VALUE "CompanyName", "•gq‰®–{•Ü, TeraTerm Project"
-            VALUE "FileDescription", "ƒvƒƒLƒVƒvƒ‰ƒOƒCƒ“"
+            VALUE "Comments", "ãƒ—ãƒ­ã‚­ã‚·çµŒç”±ã§ã®é€šä¿¡ã‚’ã‚µãƒãƒ¼ãƒˆã™ã‚‹ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã€‚"
+            VALUE "CompanyName", "è›­å­å±‹æœ¬èˆ—, TeraTerm Project"
+            VALUE "FileDescription", "ãƒ—ãƒ­ã‚­ã‚·ãƒ—ãƒ©ã‚°ã‚¤ãƒ³"
             VALUE "FileVersion", "1, 0, 0, 27"
             VALUE "InternalName", "TTProxy"
-            VALUE "LegalCopyright", "Copyright (C) 2003-2006 •gq‰®–{•Ü, (C) 2004-2025 TeraTerm Project"
+            VALUE "LegalCopyright", "Copyright (C) 2003-2006 è›­å­å±‹æœ¬èˆ—, (C) 2004-2025 TeraTerm Project"
             VALUE "OriginalFilename", "TTXProxy.dll"
-            VALUE "ProductName", "•gq‰®–{•ÜƒvƒƒLƒVƒvƒ‰ƒOƒCƒ“W"
+            VALUE "ProductName", "è›­å­å±‹æœ¬èˆ—ãƒ—ãƒ­ã‚­ã‚·ãƒ—ãƒ©ã‚°ã‚¤ãƒ³é›†"
             VALUE "ProductVersion", "1, 0, 0, 27"
         END
     END
@@ -115,12 +115,12 @@ BEGIN
     END
 END
 
-#endif    // “ú–{Œê resources
+#endif    // æ—¥æœ¬èª resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// ‰pŒê (•Ä‘) resources
+// è‹±èª (ç±³å›½) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -270,7 +270,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // ‰pŒê (•Ä‘) resources
+#endif    // è‹±èª (ç±³å›½) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

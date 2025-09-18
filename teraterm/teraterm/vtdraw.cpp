@@ -33,14 +33,14 @@
 #include "vtdraw.h"
 
 /**
- * ini�t�@�C����ID������ۂ̕`��Ŏg��ID��Ԃ�
- * @param	ini_id ini�t�@�C����ID
- *			IdVtDrawAPIAuto�̏ꍇ����
- * @return	NT�̏ꍇ
- *				IdVtDrawAPIUnicode/ANSI�̂Ƃ����̂܂ܕԂ�
- *				IdVtDrawAPIAuto�̂Ƃ�Unicode��Ԃ�
- *			NT�ł͂Ȃ��ꍇ
- *				dVtDrawAPIANSI��Ԃ�
+ * iniファイルのIDから実際の描画で使うIDを返す
+ * @param	ini_id iniファイルのID
+ *			IdVtDrawAPIAutoの場合あり
+ * @return	NTの場合
+ *				IdVtDrawAPIUnicode/ANSIのときそのまま返す
+ *				IdVtDrawAPIAutoのときUnicodeを返す
+ *			NTではない場合
+ *				dVtDrawAPIANSIを返す
  */
 IdVtDrawAPI VTDrawFromID(IdVtDrawAPI ini_id)
 {
@@ -56,8 +56,8 @@ IdVtDrawAPI VTDrawFromID(IdVtDrawAPI ini_id)
 }
 
 /**
- *	ini�t�@�C������͂���enum�ɕϊ�����
- *	@param	str		ini�t�@�C���̃L�[���[�h
+ *	iniファイルを解析してenumに変換する
+ *	@param	str		iniファイルのキーワード
  *	@retval			enum, IdVtDrawAPI*
  */
 IdVtDrawAPI VTDrawFromIni(const wchar_t *str)
@@ -74,7 +74,7 @@ IdVtDrawAPI VTDrawFromIni(const wchar_t *str)
 }
 
 /**
- *	enum��ini�t�@�C�����̕�����֕ϊ�����
+ *	enumをiniファイル内の文字列へ変換する
  */
 const wchar_t *VTDrawToIni(IdVtDrawAPI api)
 {

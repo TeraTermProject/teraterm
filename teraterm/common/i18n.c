@@ -35,9 +35,9 @@
 #include <assert.h>
 
 /**
- *	GetI18nStr() ‚Ì unicode”Å
- *	@param[in]	buf_len		•¶š”(\0ŠÜ‚Ş)
- *	@reterm		ƒoƒbƒtƒ@‚Ì•¶š”(L'\0'‚ğŠÜ‚Ş)
+ *	GetI18nStr() ã® unicodeç‰ˆ
+ *	@param[in]	buf_len		æ–‡å­—æ•°(\0å«ã‚€)
+ *	@reterm		ãƒãƒƒãƒ•ã‚¡ã®æ–‡å­—æ•°(L'\0'ã‚’å«ã‚€)
  */
 DllExport size_t WINAPI GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def,
 									const char *iniFile)
@@ -45,7 +45,7 @@ DllExport size_t WINAPI GetI18nStrW(const char *section, const char *key, wchar_
 	wchar_t *str;
 	size_t size = GetI18nStrWA(section, key, def, iniFile, &str);
 	if (size <= (size_t)buf_len) {
-		// size‚Í L'\0' ‚ğŠÜ‚Ş
+		// sizeã¯ L'\0' ã‚’å«ã‚€
 		wmemcpy(buf, str, size);
 	}
 	else {
@@ -58,11 +58,11 @@ DllExport size_t WINAPI GetI18nStrW(const char *section, const char *key, wchar_
 }
 
 /**
- *	section/key‚Ì•¶š—ñ‚ğbuf‚ÉƒZƒbƒg‚·‚é
- *	section/key‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½ê‡A
- *		def‚Ì•¶š—ñ‚ğbuf‚ÉƒZƒbƒg‚·‚é
- *		def‚ªNULL‚Ìê‡buf[0] = 0‚Æ‚È‚é
- *	@param	buf_len		•¶š”(\0ŠÜ‚Ş)
+ *	section/keyã®æ–‡å­—åˆ—ã‚’bufã«ã‚»ãƒƒãƒˆã™ã‚‹
+ *	section/keyãŒè¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸå ´åˆã€
+ *		defã®æ–‡å­—åˆ—ã‚’bufã«ã‚»ãƒƒãƒˆã™ã‚‹
+ *		defãŒNULLã®å ´åˆbuf[0] = 0ã¨ãªã‚‹
+ *	@param	buf_len		æ–‡å­—æ•°(\0å«ã‚€)
  */
 DllExport void WINAPI GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
@@ -90,10 +90,10 @@ int WINAPI GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfon
 }
 
 /*
- * Œ¾Œêƒtƒ@ƒCƒ‹‚©‚çDialog‚ÌƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì•¶š—ñ‚ğ•ÏŠ·‚·‚é
+ * è¨€èªãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰Dialogã®ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®æ–‡å­—åˆ—ã‚’å¤‰æ›ã™ã‚‹
  *
  * [return]
- *    Œ¾Œêƒtƒ@ƒCƒ‹‚Å•ÏŠ·‚Å‚«‚½‰ñ”(infoCountˆÈ‰º‚Ì”‚É‚È‚é)
+ *    è¨€èªãƒ•ã‚¡ã‚¤ãƒ«ã§å¤‰æ›ã§ããŸå›æ•°(infoCountä»¥ä¸‹ã®æ•°ã«ãªã‚‹)
  *
  */
 int WINAPI SetI18nDlgStrs(const char *section, HWND hDlgWnd,

@@ -98,11 +98,11 @@ static UINT_PTR CALLBACK PrintHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPA
 }
 
 /**
- *	ˆóüƒ_ƒCƒAƒƒO‚ğ•\¦,ˆóš—pDC‚ğæ“¾
+ *	å°åˆ·ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤º,å°å­—ç”¨DCã‚’å–å¾—
  *
- *	@param	HWin	eWindow
- *	@param	sel		‘I‘ğ”ÍˆÍ
- *	@return	HDC		ˆóüDC
+ *	@param	HWin	è¦ªWindow
+ *	@param	sel		é¸æŠç¯„å›²
+ *	@return	HDC		å°åˆ·DC
  */
 HDC PrnBox(HWND HWin, PBOOL Sel)
 {
@@ -118,8 +118,8 @@ HDC PrnBox(HWND HWin, PBOOL Sel)
 	}
 	PrnDlg.nCopies = 1;
 	/*
-	 * Windows NTŒn‚É‚¨‚¢‚ÄAˆóüƒ_ƒCƒAƒƒO‚Éƒwƒ‹ƒvƒ{ƒ^ƒ“‚ğ•\¦‚·‚é‚½‚ßA
-	 * ƒvƒƒV[ƒWƒƒ‚ğƒtƒbƒN‚·‚éB
+	 * Windows NTç³»ã«ãŠã„ã¦ã€å°åˆ·ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«ãƒ˜ãƒ«ãƒ—ãƒœã‚¿ãƒ³ã‚’è¡¨ç¤ºã™ã‚‹ãŸã‚ã€
+	 * ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã‚’ãƒ•ãƒƒã‚¯ã™ã‚‹ã€‚
 	 */
 	PrnDlg.lpfnPrintHook = PrintHookProc;
 
@@ -135,12 +135,12 @@ HDC PrnBox(HWND HWin, PBOOL Sel)
 }
 
 /**
- *	ˆóüŠJn
+ *	å°åˆ·é–‹å§‹
  *
- *	@param	hDC				ˆóüDC
- *	@param	DcumentName		–¼‘O
+ *	@param	hDC				å°åˆ·DC
+ *	@param	DcumentName		åå‰
  *	@relval	TRUE			ok
- *	@retval	FALSE			ŠJn¸”s
+ *	@retval	FALSE			é–‹å§‹å¤±æ•—
  */
 BOOL PrnStart(HDC hDC, LPSTR DocumentName)
 {
@@ -187,7 +187,7 @@ BOOL PrnStart(HDC hDC, LPSTR DocumentName)
 }
 
 /**
- *	ˆóüI—¹
+ *	å°åˆ·çµ‚äº†
  */
 void PrnStop()
 {
@@ -507,22 +507,22 @@ void PrnFinish(PrintFile *handle)
 
 static void PrnOutText(const char *StrA, int Count, void *data)
 {
-	// •¶š•î•ñ‚ğì‚é
-	//	MBCS‚Ì‚Æ‚«A1byte=1cell, 2byte=2cell
+	// æ–‡å­—å¹…æƒ…å ±ã‚’ä½œã‚‹
+	//	MBCSã®ã¨ãã€1byte=1cell, 2byte=2cell
 	char *WidthInfo = (char *)malloc(Count);
 	char *w = WidthInfo;
 	BYTE *s = (BYTE*)StrA;
 	for (int i = 0; i < Count; i++) {
 		BYTE b = *s++;
 		if (__ismbblead(b, CP_ACP)) {
-			// 2byte•¶š
+			// 2byteæ–‡å­—
 			*w++ = 2;
 			*w++ = 0;
 			s++;
 			i++;
 		}
 		else {
-			// 1byte•¶š
+			// 1byteæ–‡å­—
 			*w++ = 1;
 		}
 	}
@@ -533,7 +533,7 @@ static void PrnOutText(const char *StrA, int Count, void *data)
 }
 
 /**
- *	ˆóš—p‚É•Û‘¶‚µ‚Ä‚¢‚½ƒtƒ@ƒCƒ‹‚©‚çˆóš‚·‚é
+ *	å°å­—ç”¨ã«ä¿å­˜ã—ã¦ã„ãŸãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰å°å­—ã™ã‚‹
  */
 static void PrintFile_(PrintFile *handle)
 {
@@ -557,7 +557,7 @@ static void PrintFile_(PrintFile *handle)
 					DWORD NumberOfBytesRead;
 					BOOL r = ReadFile(HPrnFile, &u32, sizeof(u32), &NumberOfBytesRead, NULL);
 					if (r == TRUE && NumberOfBytesRead != 0) {
-						// ˆóšŒp‘±
+						// å°å­—ç¶™ç¶š
 						c = 1;
 					}
 					else {
@@ -581,7 +581,7 @@ static void PrintFile_(PrintFile *handle)
 #endif
 							default:
 								if (u32 >= 0x20) {
-									int codepage = CP_ACP;	// ˆóü—pƒR[ƒhƒy[ƒW
+									int codepage = CP_ACP;	// å°åˆ·ç”¨ã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸
 									size_t out_len = UTF32ToUTF16(u32, &BuffW[len_w], _countof(BuffW) - len_w);
 									len_w += out_len;
 									out_len = UTF32ToMBCP(u32, codepage, &BuffA[len_a], _countof(BuffA) - len_a);
@@ -670,7 +670,7 @@ void PrnFileDirectProc(PrintFile *handle)
 			if (handle->PrnBuffCount != 0) {
 				// UTF-32
 				unsigned int u32 = handle->PrnBuff[0];
-				int codepage = CP_ACP;	// ˆóü—pƒR[ƒhƒy[ƒW
+				int codepage = CP_ACP;	// å°åˆ·ç”¨ã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸
 				char str[5];
 				size_t out_len = UTF32ToMBCP(u32, codepage, str, _countof(str));
 				c = PrnWrite(str, out_len);
@@ -697,8 +697,8 @@ void PrnFileDirectProc(PrintFile *handle)
 }
 
 /**
- * ƒ^ƒCƒ}[ŠÔ‚ªŒo‰ßAˆóš‚ğŠJn‚·‚é
- *		ClosePrnFile() ‚Ì SetTimer(IdPrnStartTimer) ‚ªƒgƒŠƒK
+ * ã‚¿ã‚¤ãƒãƒ¼æ™‚é–“ãŒçµŒéã€å°å­—ã‚’é–‹å§‹ã™ã‚‹
+ *		ClosePrnFile() ã® SetTimer(IdPrnStartTimer) ãŒãƒˆãƒªã‚¬
  */
 void PrnFileStart(PrintFile *handle)
 {
@@ -717,8 +717,8 @@ void PrnFileStart(PrintFile *handle)
 }
 
 /**
- * ƒvƒŠƒ“ƒg—pƒtƒ@ƒCƒ‹‚Ì‘‚«‚İ‚ğI—¹
- * ƒvƒŠƒ“ƒg‚ğŠJnƒ^ƒCƒ}[‚ğƒZƒbƒg‚·‚é
+ * ãƒ—ãƒªãƒ³ãƒˆç”¨ãƒ•ã‚¡ã‚¤ãƒ«ã®æ›¸ãè¾¼ã¿ã‚’çµ‚äº†
+ * ãƒ—ãƒªãƒ³ãƒˆã‚’é–‹å§‹ã‚¿ã‚¤ãƒãƒ¼ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
  */
 void ClosePrnFile(PrintFile *handle, void (*finish_callback)(PrintFile *handle))
 {

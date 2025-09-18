@@ -67,12 +67,12 @@
 #define _OutputDebugPrintf(...)  (void)0
 #endif
 
-int WinWidth, WinHeight;		// ‰æ–Ê‚É•\¦‚³‚ê‚Ä‚¢‚é•¶š”
+int WinWidth, WinHeight;		// ç”»é¢ã«è¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹æ–‡å­—æ•°
 static BOOL Active = FALSE;
 static BOOL CompletelyVisible;
 HFONT VTFont[AttrFontMask+1];
 int FontHeight, FontWidth;
-int ScreenWidth, ScreenHeight;	// ƒXƒNƒŠ[ƒ“ƒTƒCƒY = (ƒZƒ‹”)*(Font•or‚‚³) à Client Area
+int ScreenWidth, ScreenHeight;	// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚µã‚¤ã‚º = (ã‚»ãƒ«æ•°)*(Fontå¹…oré«˜ã•) â‰’ Client Area
 BOOL AdjustSize;
 BOOL DontChangeSize=FALSE;
 static int CRTWidth, CRTHeight;
@@ -81,33 +81,33 @@ int CursorX, CursorY;
 static RECT VirtualScreen;
 
 // --- scrolling status flags
-int WinOrgX, WinOrgY;			// Œ»İ‚Ì•\¦ˆÊ’u
-int NewOrgX, NewOrgY;			// XVŒã‚Ì•\¦ˆÊ’u
+int WinOrgX, WinOrgY;			// ç¾åœ¨ã®è¡¨ç¤ºä½ç½®
+int NewOrgX, NewOrgY;			// æ›´æ–°å¾Œã®è¡¨ç¤ºä½ç½®
 
-int NumOfLines, NumOfColumns;	// ƒoƒbƒtƒ@ƒŠƒ“ƒO‚µ‚Ä‚¢‚é•¶š”
-int PageStart, BuffEnd;			// •\¦‚µ‚Ä‚¢‚éƒoƒbƒtƒ@“à‚ÌˆÊ’u
+int NumOfLines, NumOfColumns;	// ãƒãƒƒãƒ•ã‚¡ãƒªãƒ³ã‚°ã—ã¦ã„ã‚‹æ–‡å­—æ•°
+int PageStart, BuffEnd;			// è¡¨ç¤ºã—ã¦ã„ã‚‹ãƒãƒƒãƒ•ã‚¡å†…ã®ä½ç½®
 
 static BOOL CursorOnDBCS = FALSE;
 static BOOL SaveWinSize = FALSE;
 static int WinWidthOld, WinHeightOld;
 static HBRUSH Background;
-static BOOL FontReSizeEnableInit = TRUE;	// font_resize_enable ‚Ì‰Šú’l
+static BOOL FontReSizeEnableInit = TRUE;	// font_resize_enable ã®åˆæœŸå€¤
 /*  TODO
- *	iniƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ‚ÌŒã(DispEnableResizedFont()‚ªŒÄ‚Î‚ê‚½Œã)
- *	‰Šú‰»(InitDisp())‚ªs‚í‚ê‚é‚½‚ß‰Šú’l‚ğ•Ï”‚Å‚ÂB
- *	1‰ñ‚µ‚©s‚í‚È‚¢‰Šú‚Í‚à‚Á‚Æ‘‚­A
- *	iniƒtƒ@ƒCƒ‹“Ç‚İ‚İ‚æ‚è‚à‘O‚És‚¢A
- *	•Ï”FontReSizeEnableInit‚ğ•s—v‚É‚·‚éB
+ *	iniãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿è¾¼ã¿ã®å¾Œ(DispEnableResizedFont()ãŒå‘¼ã°ã‚ŒãŸå¾Œ)
+ *	åˆæœŸåŒ–(InitDisp())ãŒè¡Œã‚ã‚Œã‚‹ãŸã‚åˆæœŸå€¤ã‚’å¤‰æ•°ã§æŒã¤ã€‚
+ *	1å›ã—ã‹è¡Œã‚ãªã„åˆæœŸã¯ã‚‚ã£ã¨æ—©ãã€
+ *	iniãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿ã‚ˆã‚Šã‚‚å‰ã«è¡Œã„ã€
+ *	å¤‰æ•°FontReSizeEnableInitã‚’ä¸è¦ã«ã™ã‚‹ã€‚
  */
 
 /*
  *	ANSI color table
- *		0		•,Black
- *		1-6		­‚µˆÃ‚¢F(Red, Green, Yellow, Blue, Magenta, Cyan)
- *		7		Gray (15‚æ‚èˆÃ‚¢,8‚æ‚è–¾‚é‚¢)
- *		8		Gray (7‚æ‚èˆÃ‚¢,0‚æ‚è–¾‚é‚¢)
- *		9-14	–¾‚é‚¢F,Œ´F (Bright Red, Green, Yellow, Blue, Magenta, Cyan)
- *		15		”’,White 255 (Bright White)
+ *		0		é»’,Black
+ *		1-6		å°‘ã—æš—ã„è‰²(Red, Green, Yellow, Blue, Magenta, Cyan)
+ *		7		Gray (15ã‚ˆã‚Šæš—ã„,8ã‚ˆã‚Šæ˜ã‚‹ã„)
+ *		8		Gray (7ã‚ˆã‚Šæš—ã„,0ã‚ˆã‚Šæ˜ã‚‹ã„)
+ *		9-14	æ˜ã‚‹ã„è‰²,åŸè‰² (Bright Red, Green, Yellow, Blue, Magenta, Cyan)
+ *		15		ç™½,White 255 (Bright White)
  *		16-255	DefaultColorTable[16-255]
  */
 static COLORREF ANSIColor[256];
@@ -116,7 +116,7 @@ static COLORREF ANSIColor[256];
 static int CaretStatus;
 static BOOL CaretEnabled = TRUE;
 BOOL IMEstat;				/* IME Status  TRUE=IME ON */
-BOOL IMECompositionState;	/* •ÏŠ·ó‘Ô TRUE=•ÏŠ·’† */
+BOOL IMECompositionState;	/* å¤‰æ›çŠ¶æ…‹ TRUE=å¤‰æ›ä¸­ */
 
 // ---- device context and status flags
 static HDC VTDC = NULL; /* Device context for VT window */
@@ -152,9 +152,9 @@ typedef struct _BGSrc
 	wchar_t    *fileW;
 } BGSrc;
 
-static BGSrc BGDest;	// ”wŒi‰æ‘œ—p
-static BGSrc BGSrc1;	// •Ç†(Windows‚ÌƒfƒXƒNƒgƒbƒv”wŒi)—p
-static BGSrc BGSrc2;	// fill color—p
+static BGSrc BGDest;	// èƒŒæ™¯ç”»åƒç”¨
+static BGSrc BGSrc1;	// å£ç´™(Windowsã®ãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—èƒŒæ™¯)ç”¨
+static BGSrc BGSrc2;	// fill colorç”¨
 
 static int  BGEnable;
 static BYTE BGReverseTextAlpha;
@@ -164,7 +164,7 @@ static COLORREF BGVTBoldColor[2];
 static COLORREF BGVTUnderlineColor[2];	// SGR 4
 static COLORREF BGVTBlinkColor[2];
 static COLORREF BGVTReverseColor[2];
-static COLORREF BGURLColor[2];			// URL‘®«F
+static COLORREF BGURLColor[2];			// URLå±æ€§è‰²
 
 static RECT BGPrevRect;
 
@@ -187,7 +187,7 @@ typedef struct {
 	BOOL bg_enable;
 	BYTE alpha_vtback;
 	BYTE alpha_back;
-	BOOL debug_drawbox_text;	// •¶š•`‰æ–ˆ‚Ébox‚ğ•`‰æ‚·‚é
+	BOOL debug_drawbox_text;	// æ–‡å­—æç”»æ¯ã«boxã‚’æç”»ã™ã‚‹
 	//
 	BYTE DCBackAlpha;
 	COLORREF DCBackColor;
@@ -201,12 +201,12 @@ static void InitColorTable(const COLORREF *ANSIColor16);
 static void UpdateBGBrush(void);
 static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_color, COLORREF *back_color, BYTE *_alpha);
 
-// LoadImage() ‚µ‚©g‚¦‚È‚¢ŠÂ‹«‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
-// LoadImage()‚Å‚Í .bmp ˆÈŠO‚Ì‰æ‘œƒtƒ@ƒCƒ‹‚ªˆµ‚¦‚È‚¢‚Ì‚Å—v’ˆÓB
+// LoadImage() ã—ã‹ä½¿ãˆãªã„ç’°å¢ƒã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
+// LoadImage()ã§ã¯ .bmp ä»¥å¤–ã®ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ãŒæ‰±ãˆãªã„ã®ã§è¦æ³¨æ„ã€‚
 // (2014.4.20 yutaka)
 static BOOL IsLoadImageOnlyEnabled(void)
 {
-	// Vista –¢–‚Ìê‡‚É‚ÍA¡‚Ü‚Å’Ê‚è‚Ì“Ç‚İ‚İ‚ğ‚·‚é‚æ‚¤‚É‚µ‚½
+	// Vista æœªæº€ã®å ´åˆã«ã¯ã€ä»Šã¾ã§é€šã‚Šã®èª­ã¿è¾¼ã¿ã‚’ã™ã‚‹ã‚ˆã†ã«ã—ãŸ
 	// cf. SVN#4571(2011.8.4)
 	return !IsWindowsVistaOrLater();
 }
@@ -343,7 +343,7 @@ static void DebugSaveFile(const wchar_t* fname, HDC hdc, int width, int height)
 }
 
 /**
- *	BMP•Û‘¶AƒfƒoƒO‚Ég‚¤‚©‚à‚µ‚ê‚È‚¢‚Ì‚Åc‚µ‚Ä‚¨‚­
+ *	BMPä¿å­˜ã€ãƒ‡ãƒã‚°ã«ä½¿ã†ã‹ã‚‚ã—ã‚Œãªã„ã®ã§æ®‹ã—ã¦ãŠã
  */
 #if 0
 static BOOL SaveBitmapFile(const char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
@@ -440,14 +440,14 @@ static BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int 
   return TRUE;
 }
 
-// ‰æ‘œ“Ç‚İ‚İŠÖŒW
+// ç”»åƒèª­ã¿è¾¼ã¿é–¢ä¿‚
 static void BGPreloadPicture(BGSrc *src)
 {
 	HBITMAP hbm = NULL;
 	const wchar_t *load_file = src->fileW;
 	const wchar_t *spi_path = ts.EtermLookfeel.BGSPIPathW;
 
-	// Susie plugin ‚Å“Ç‚İ‚İ
+	// Susie plugin ã§èª­ã¿è¾¼ã¿
 	if (hbm == NULL) {
 		HANDLE hbmi;
 		HANDLE hbuf;
@@ -459,24 +459,24 @@ static void BGPreloadPicture(BGSrc *src)
 		}
 	}
 
-	// GDI+ ƒ‰ƒCƒuƒ‰ƒŠ‚ğg‚Á‚Ä“Ç‚İ‚Ş
+	// GDI+ ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã‚’ä½¿ã£ã¦èª­ã¿è¾¼ã‚€
 #if ENABLE_GDIPLUS
 	if (hbm == NULL) {
 		hbm = GDIPLoad(load_file);
 	}
 #endif
 
-	// OLE ‚ğ—˜—p‚µ‚Ä‰æ‘œ(jpeg)‚ğ“Ç‚Ş
-	//		LoadImage()‚Ì‚İ‹–‰Â‚³‚ê‚Ä‚¢‚éŠÂ‹«‚Å‚Í‚È‚¢‚Æ‚«
+	// OLE ã‚’åˆ©ç”¨ã—ã¦ç”»åƒ(jpeg)ã‚’èª­ã‚€
+	//		LoadImage()ã®ã¿è¨±å¯ã•ã‚Œã¦ã„ã‚‹ç’°å¢ƒã§ã¯ãªã„ã¨ã
 	if (hbm == NULL && !IsLoadImageOnlyEnabled()) {
 		hbm = GetBitmapHandleW(load_file);
 	}
 
-	// LoadImageW() API ‚Å“Ç‚İ‚Ş
+	// LoadImageW() API ã§èª­ã¿è¾¼ã‚€
 	if (hbm == NULL) {
-		// LoadImageW() API‚ÍA
-		// Windows 10 ‚Ì‚Æ‚«‚‚³‚ªƒ}ƒCƒiƒX‚Ìbmpƒtƒ@ƒCƒ‹‚Íƒ[ƒh‚É¸”s‚·‚é
-		// Windows 7 ‚Ì‚Æ‚«‚Í¬Œ÷‚·‚é
+		// LoadImageW() APIã¯ã€
+		// Windows 10 ã®ã¨ãé«˜ã•ãŒãƒã‚¤ãƒŠã‚¹ã®bmpãƒ•ã‚¡ã‚¤ãƒ«ã¯ãƒ­ãƒ¼ãƒ‰ã«å¤±æ•—ã™ã‚‹
+		// Windows 7 ã®ã¨ãã¯æˆåŠŸã™ã‚‹
 		hbm = LoadImageW(0,load_file,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
 	}
 
@@ -504,43 +504,43 @@ static void BGGetWallpaperInfo(WallpaperInfo *wi)
 	wi->pattern = BG_CENTER;
 	wi->filename = NULL;
 
-	//ƒŒƒWƒXƒgƒŠƒL[‚ÌƒI[ƒvƒ“
+	//ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã®ã‚ªãƒ¼ãƒ—ãƒ³
 	if(RegOpenKeyExA(HKEY_CURRENT_USER, "Control Panel\\Desktop", 0, KEY_READ, &hKey) != ERROR_SUCCESS)
 		return;
 
-	//•Ç†ƒtƒ@ƒCƒ‹–¼ƒQƒbƒg
+	//å£ç´™ãƒ•ã‚¡ã‚¤ãƒ«åã‚²ãƒƒãƒˆ
 	hRegQueryValueExW(hKey, L"Wallpaper", NULL, NULL, (void **)&wi->filename, NULL);
 
-	//•Ç†ƒXƒ^ƒCƒ‹ƒQƒbƒg
+	//å£ç´™ã‚¹ã‚¿ã‚¤ãƒ«ã‚²ãƒƒãƒˆ
 	length = sizeof(str);
 	RegQueryValueExA(hKey,"WallpaperStyle",NULL,NULL,(BYTE*)str,&length);
 	style = atoi(str);
 
-	//•Ç†ƒXƒ^ƒCƒ‹ƒQƒbƒg
+	//å£ç´™ã‚¹ã‚¿ã‚¤ãƒ«ã‚²ãƒƒãƒˆ
 	length = sizeof(str);
 	RegQueryValueExA(hKey,"TileWallpaper" ,NULL,NULL,(BYTE*)str,&length);
 	tile = atoi(str);
 
-	//ƒŒƒWƒXƒgƒŠƒL[‚ÌƒNƒ[ƒY
+	//ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã®ã‚¯ãƒ­ãƒ¼ã‚º
 	RegCloseKey(hKey);
 
-	//‚±‚ê‚Å‚¢‚¢‚ÌH
+	//ã“ã‚Œã§ã„ã„ã®ï¼Ÿ
 	if(tile)
 		wi->pattern = BG_TILE;
 	else {
 		switch (style) {
-		case 0: // Center(’†‰›‚É•\¦)
+		case 0: // Center(ä¸­å¤®ã«è¡¨ç¤º)
 			wi->pattern = BG_CENTER;
 			break;
-		case 2: // Stretch(‰æ–Ê‚É‡‚í‚¹‚ÄLk) ƒAƒXƒyƒNƒg”ä‚Í–³‹‚³‚ê‚é
+		case 2: // Stretch(ç”»é¢ã«åˆã‚ã›ã¦ä¼¸ç¸®) ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã¯ç„¡è¦–ã•ã‚Œã‚‹
 			wi->pattern = BG_STRETCH;
 			break;
-		case 10: // Fill(ƒy[ƒW‰¡•‚É‡‚í‚¹‚é) ‚Æ‚ ‚é‚ªA˜a–ó‚ª‚¨‚©‚µ‚¢
-			// ƒAƒXƒyƒNƒg”ä‚ğˆÛ‚µ‚ÄA‚Í‚İo‚µ‚Ä‚Å‚àÅ‘å•\¦‚·‚é
+		case 10: // Fill(ãƒšãƒ¼ã‚¸æ¨ªå¹…ã«åˆã‚ã›ã‚‹) ã¨ã‚ã‚‹ãŒã€å’Œè¨³ãŒãŠã‹ã—ã„
+			// ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã‚’ç¶­æŒã—ã¦ã€ã¯ã¿å‡ºã—ã¦ã§ã‚‚æœ€å¤§è¡¨ç¤ºã™ã‚‹
 			wi->pattern = BG_AUTOFILL;
 			break;
-		case 6: // Fit(ƒy[ƒWc•‚É‡‚í‚¹‚é) ‚Æ‚ ‚é‚ªA˜a–ó‚ª‚¨‚©‚µ‚¢
-			// ƒAƒXƒyƒNƒg”ä‚ğˆÛ‚µ‚ÄA‚Í‚İo‚³‚È‚¢‚æ‚¤‚ÉÅ‘å•\¦‚·‚é
+		case 6: // Fit(ãƒšãƒ¼ã‚¸ç¸¦å¹…ã«åˆã‚ã›ã‚‹) ã¨ã‚ã‚‹ãŒã€å’Œè¨³ãŒãŠã‹ã—ã„
+			// ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã‚’ç¶­æŒã—ã¦ã€ã¯ã¿å‡ºã•ãªã„ã‚ˆã†ã«æœ€å¤§è¡¨ç¤ºã™ã‚‹
 			wi->pattern = BG_AUTOFIT;
 			break;
 		}
@@ -548,16 +548,16 @@ static void BGGetWallpaperInfo(WallpaperInfo *wi)
 }
 
 /**
- *	OleLoadPicture() ‚ğg‚Á‚½‰æ‘œ“Ç‚İ‚İ
- * 	jpeg, bmp ‚ğ“Ç‚İ‚Ş‚±‚Æ‚ª‚Å‚«‚é
- *	(Windows‚É‚æ‚Á‚Ä‚Í‘¼‚ÌŒ`®‚à“Ç‚ß‚é‚©‚à‚µ‚ê‚È‚¢)
+ *	OleLoadPicture() ã‚’ä½¿ã£ãŸç”»åƒèª­ã¿è¾¼ã¿
+ * 	jpeg, bmp ã‚’èª­ã¿è¾¼ã‚€ã“ã¨ãŒã§ãã‚‹
+ *	(Windowsã«ã‚ˆã£ã¦ã¯ä»–ã®å½¢å¼ã‚‚èª­ã‚ã‚‹ã‹ã‚‚ã—ã‚Œãªã„)
  *
  */
-// .bmpˆÈŠO‚Ì‰æ‘œƒtƒ@ƒCƒ‹‚ğ“Ç‚ŞB
-// •Ç†‚ª .bmp ˆÈŠO‚Ìƒtƒ@ƒCƒ‹‚É‚È‚Á‚Ä‚¢‚½ê‡‚Ö‚Ì‘ÎˆB
-// ‚±‚ÌŠÖ”‚Í Windows 2000 –¢–‚Ìê‡‚É‚ÍŒÄ‚ñ‚Å‚Í‚¢‚¯‚È‚¢
+// .bmpä»¥å¤–ã®ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã‚€ã€‚
+// å£ç´™ãŒ .bmp ä»¥å¤–ã®ãƒ•ã‚¡ã‚¤ãƒ«ã«ãªã£ã¦ã„ãŸå ´åˆã¸ã®å¯¾å‡¦ã€‚
+// ã“ã®é–¢æ•°ã¯ Windows 2000 æœªæº€ã®å ´åˆã«ã¯å‘¼ã‚“ã§ã¯ã„ã‘ãªã„
 // TODO:
-//		IsLoadImageOnlyEnabled() ‚Í Vista –¢–‚Æ‚È‚Á‚Ä‚¢‚é
+//		IsLoadImageOnlyEnabled() ã¯ Vista æœªæº€ã¨ãªã£ã¦ã„ã‚‹
 //
 static HBITMAP GetBitmapHandleW(const wchar_t *File)
 {
@@ -589,7 +589,7 @@ static HBITMAP GetBitmapHandleW(const wchar_t *File)
 
 	result = OleLoadPicture(iStream, nFileSize, FALSE, &IID_IPicture, (LPVOID *)&iPicture);
 	if (result != S_OK || iPicture == NULL) {
-		// ‰æ‘œƒtƒ@ƒCƒ‹‚Å‚Í‚È‚¢,‘Î‰‚µ‚½‰æ‘œƒtƒ@ƒCƒ‹ê‡
+		// ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã§ã¯ãªã„,å¯¾å¿œã—ãŸç”»åƒãƒ•ã‚¡ã‚¤ãƒ«å ´åˆ
 		return NULL;
 	}
 
@@ -605,8 +605,8 @@ static HBITMAP GetBitmapHandleW(const wchar_t *File)
 	return hBitmap;
 }
 
-// üŒ`•âŠ®–@‚É‚æ‚è”äŠr“I‘N–¾‚Éƒrƒbƒgƒ}ƒbƒv‚ğŠg‘åEk¬‚·‚éB
-// Windows 9x/NT‘Î‰
+// ç·šå½¢è£œå®Œæ³•ã«ã‚ˆã‚Šæ¯”è¼ƒçš„é®®æ˜ã«ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã‚’æ‹¡å¤§ãƒ»ç¸®å°ã™ã‚‹ã€‚
+// Windows 9x/NTå¯¾å¿œ
 // cf.http://katahiromz.web.fc2.com/win32/bilinear.html
 static HBITMAP CreateStretched32BppBitmapBilinear(HBITMAP hbm, INT cxNew, INT cyNew)
 {
@@ -721,8 +721,8 @@ static void BGPreloadWallpaper(BGSrc *src)
 	BGGetWallpaperInfo(&wi);
 
 	if (IsLoadImageOnlyEnabled()) {
-		//•Ç†‚ğ“Ç‚İ‚İ
-		//LR_CREATEDIBSECTION ‚ğw’è‚·‚é‚Ì‚ªƒRƒc
+		//å£ç´™ã‚’èª­ã¿è¾¼ã¿
+		//LR_CREATEDIBSECTION ã‚’æŒ‡å®šã™ã‚‹ã®ãŒã‚³ãƒ„
 		if (wi.pattern == BG_STRETCH) {
 			hbm = LoadImageW(0, wi.filename, IMAGE_BITMAP, CRTWidth, CRTHeight, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 		}
@@ -740,7 +740,7 @@ static void BGPreloadWallpaper(BGSrc *src)
 		}
 
 		GetObject(hbm,sizeof(bm),&bm);
-		// •Ç†‚Ìİ’è‚É‡‚í‚¹‚ÄA‰æ‘œ‚ÌƒXƒgƒŒƒbƒ`ƒTƒCƒY‚ğŒˆ‚ß‚éB
+		// å£ç´™ã®è¨­å®šã«åˆã‚ã›ã¦ã€ç”»åƒã®ã‚¹ãƒˆãƒ¬ãƒƒãƒã‚µã‚¤ã‚ºã‚’æ±ºã‚ã‚‹ã€‚
 		if (wi.pattern == BG_STRETCH) {
 			s_width = CRTWidth;
 			s_height = CRTHeight;
@@ -788,7 +788,7 @@ static void BGPreloadWallpaper(BGSrc *src)
 load_finish:
 	free(wi.filename);
 
-	//•Ç†DC‚ğì‚é
+	//å£ç´™DCã‚’ä½œã‚‹
 	if(hbm)
 	{
 		BITMAP bm;
@@ -953,14 +953,14 @@ static BOOL CALLBACK BGLoadWallpaperEnumFunc(HMONITOR hMonitor,HDC hdcMonitor,LP
   if(!IntersectRect(&rectDest,lprcMonitor,lws->rectClient))
     return TRUE;
 
-  //ƒ‚ƒjƒ^[‚É‚©‚©‚Á‚Ä‚é•”•ª‚ğƒ}ƒXƒN
+  //ãƒ¢ãƒ‹ã‚¿ãƒ¼ã«ã‹ã‹ã£ã¦ã‚‹éƒ¨åˆ†ã‚’ãƒã‚¹ã‚¯
   SaveDC(lws->hdcDest);
   CopyRect(&rectRgn,&rectDest);
   OffsetRect(&rectRgn,- lws->rectClient->left,- lws->rectClient->top);
   hRgn = CreateRectRgnIndirect(&rectRgn);
   SelectObject(lws->hdcDest,hRgn);
 
-  //ƒ‚ƒjƒ^[‚Ì‘å‚«‚³
+  //ãƒ¢ãƒ‹ã‚¿ãƒ¼ã®å¤§ãã•
   monitorWidth  = lprcMonitor->right  - lprcMonitor->left;
   monitorHeight = lprcMonitor->bottom - lprcMonitor->top;
 
@@ -993,7 +993,7 @@ static BOOL CALLBACK BGLoadWallpaperEnumFunc(HMONITOR hMonitor,HDC hdcMonitor,LP
       break;
   }
 
-  //ƒŠ[ƒWƒ‡ƒ“‚ğ”jŠü
+  //ãƒªãƒ¼ã‚¸ãƒ§ãƒ³ã‚’ç ´æ£„
   RestoreDC(lws->hdcDest,-1);
   DeleteObject(hRgn);
 
@@ -1006,25 +1006,25 @@ static void BGLoadWallpaper(HDC hdcDest,BGSrc *src)
   POINT point;
   LoadWallpaperStruct lws;
 
-  //æ‚è‚ ‚¦‚¸ƒfƒXƒNƒgƒbƒvF‚Å“h‚è‚Â‚Ô‚·
+  //å–ã‚Šã‚ãˆãšãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—è‰²ã§å¡—ã‚Šã¤ã¶ã™
   FillBitmapDC(hdcDest,src->color);
 
-  //•Ç†‚ªİ’è‚³‚ê‚Ä‚¢‚È‚¢
+  //å£ç´™ãŒè¨­å®šã•ã‚Œã¦ã„ãªã„
   if(!src->hdc)
     return;
 
-  //hdcDest‚ÌÀ•WŒn‚ğ‰¼‘zƒXƒNƒŠ[ƒ“‚É‡‚í‚¹‚é
+  //hdcDestã®åº§æ¨™ç³»ã‚’ä»®æƒ³ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã«åˆã‚ã›ã‚‹
   point.x = 0;
   point.y = 0;
   ClientToScreen(HVTWin,&point);
 
   SetWindowOrgEx(hdcDest,point.x,point.y,NULL);
 
-  //‰¼‘zƒXƒNƒŠ[ƒ“‚Å‚ÌƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ
+  //ä»®æƒ³ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã§ã®ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸ
   GetClientRect(HVTWin,&rectClient);
   OffsetRect(&rectClient,point.x,point.y);
 
-  //ƒ‚ƒjƒ^[‚ğ—ñ‹“
+  //ãƒ¢ãƒ‹ã‚¿ãƒ¼ã‚’åˆ—æŒ™
   lws.rectClient = &rectClient;
   lws.src        = src;
   lws.hdcDest    = hdcDest;
@@ -1039,7 +1039,7 @@ static void BGLoadWallpaper(HDC hdcDest,BGSrc *src)
     BGLoadWallpaperEnumFunc(NULL,NULL,&rectMonitor,(LPARAM)&lws);
   }
 
-  //À•WŒn‚ğ–ß‚·
+  //åº§æ¨™ç³»ã‚’æˆ»ã™
   SetWindowOrgEx(hdcDest,0,0,NULL);
 }
 
@@ -1064,8 +1064,8 @@ static void BGLoadSrc(HDC hdcDest, BGSrc *src)
 }
 
 /**
- *	32bit bitmap ‚Å‚à alpha‚ªg—p‚³‚ê‚Ä‚¢‚È‚¢‚Æ‚«‚Í
- *	•s“§–¾‚Èbitmap‚Æ“¯—l‚Éˆµ‚¤
+ *	32bit bitmap ã§ã‚‚ alphaãŒä½¿ç”¨ã•ã‚Œã¦ã„ãªã„ã¨ãã¯
+ *	ä¸é€æ˜ãªbitmapã¨åŒæ§˜ã«æ‰±ã†
  */
 static BOOL IsAlphaValidBitmap(HBITMAP hBmp)
 {
@@ -1074,18 +1074,18 @@ static BOOL IsAlphaValidBitmap(HBITMAP hBmp)
 
 	assert(hBmp != NULL);
 
-	// 1pixel‚ ‚½‚è‚Ìbit”‚ğƒ`ƒFƒbƒN‚·‚é
+	// 1pixelã‚ãŸã‚Šã®bitæ•°ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹
 	GetObject(hBmp, sizeof(bm), &bm);
 	if (bm.bmBitsPixel != 32) {
-		// 32bit/pixel ˆÈŠO‚Ì‚Í alpha î•ñ‚Í‚È‚¢
+		// 32bit/pixel ä»¥å¤–ã®æ™‚ã¯ alpha æƒ…å ±ã¯ãªã„
 		return FALSE;
 	}
 
-	// alphaî•ñ‚ªg—p‚³‚ê‚Ä‚¢‚é‚©ƒ`ƒFƒbƒN‚·‚é
-	//		‚·‚×‚Ä‚ÌƒsƒNƒZƒ‹‚Å•s“§–¾‚Æ‚È‚Á‚Ä‚¢‚é‚©’²‚×‚é
+	// alphaæƒ…å ±ãŒä½¿ç”¨ã•ã‚Œã¦ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
+	//		ã™ã¹ã¦ã®ãƒ”ã‚¯ã‚»ãƒ«ã§ä¸é€æ˜ã¨ãªã£ã¦ã„ã‚‹ã‹èª¿ã¹ã‚‹
 	{
-		// DIB‚ğì¬‚·‚é hBmp ‚ÌƒRƒs[æ
-		//  hBmp ‚ª DDB ‚Ì‚Æ‚« pixelî•ñ‚ğƒ`ƒFƒbƒN‚Å‚«‚È‚¢‚Ì‚Å DIB ‚ÖƒRƒs[(BitBlt)‚·‚é
+		// DIBã‚’ä½œæˆã™ã‚‹ hBmp ã®ã‚³ãƒ”ãƒ¼å…ˆ
+		//  hBmp ãŒ DDB ã®ã¨ã pixelæƒ…å ±ã‚’ãƒã‚§ãƒƒã‚¯ã§ããªã„ã®ã§ DIB ã¸ã‚³ãƒ”ãƒ¼(BitBlt)ã™ã‚‹
 		LONG width;
 		LONG height;
 		BITMAPINFO bmi;
@@ -1111,18 +1111,18 @@ static BOOL IsAlphaValidBitmap(HBITMAP hBmp)
 		bmi.bmiHeader.biSizeImage = width * height * 4;
 		hBmpDIB = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
 
-		// hBmp ‚ª SelectObject() ‚³‚ê‚Ä‚¢‚½‚Æ‚«
-		// •ÊHDC‚ÉSelectObject()‚Å‚«‚È‚¢‚Ì‚ÅƒRƒs[‚µ‚Ä‚¨‚­
+		// hBmp ãŒ SelectObject() ã•ã‚Œã¦ã„ãŸã¨ã
+		// åˆ¥HDCã«SelectObject()ã§ããªã„ã®ã§ã‚³ãƒ”ãƒ¼ã—ã¦ãŠã
 		hBmpCopy = (HBITMAP)CopyImage(hBmp, IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
 
-		// hBmp(hBmpCopy)‚ğDIB‚ÉƒRƒs[(BitBlt)‚·‚é
+		// hBmp(hBmpCopy)ã‚’DIBã«ã‚³ãƒ”ãƒ¼(BitBlt)ã™ã‚‹
 		HDCDest = CreateCompatibleDC(NULL);
 		HDCSrc = CreateCompatibleDC(NULL);
 		prev1 = SelectObject(HDCDest, hBmpDIB);
 		prev2 = SelectObject(HDCSrc, hBmpCopy);
 		BitBlt(HDCDest, 0, 0, width, height, HDCSrc, 0, 0, SRCCOPY);
 
-		// alpha’l‚ğƒ`ƒFƒbƒN‚·‚é
+		// alphaå€¤ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹
 		p = pvBits;
 		for (i = 0; i < width * height; i++) {
 			DWORD pix = *p++;
@@ -1132,7 +1132,7 @@ static BOOL IsAlphaValidBitmap(HBITMAP hBmp)
 			}
 		}
 
-		// ”jŠü
+		// ç ´æ£„
 		SelectObject(HDCDest, prev1);
 		SelectObject(HDCSrc, prev2);
 		DeleteObject(hBmpDIB);
@@ -1153,7 +1153,7 @@ static BOOL IsAlphaValidBitmapHDC(HDC hDC)
 }
 
 /**
- *	”wŒi‰æ‘œ¶¬
+ *	èƒŒæ™¯ç”»åƒç”Ÿæˆ
  */
 static HDC CreateBGImage(int width, int height)
 {
@@ -1164,50 +1164,50 @@ static HDC CreateBGImage(int width, int height)
 	hdc_bg = CreateBitmapDC(CreateScreenCompatibleBitmap(width, height));
 	hdc_work = CreateBitmapDC(CreateScreenCompatibleBitmap(width, height));
 
-	// •Ç†(Windows‚ÌƒfƒXƒNƒgƒbƒv”wŒi)
+	// å£ç´™(Windowsã®ãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—èƒŒæ™¯)
 	if (BGSrc1.enable) {
 		BGLoadSrc(hdc_bg, &BGSrc1);
 	}
 	DebugSaveFile(L"bg_1.bmp", hdc_bg, width, height);
 
-	// w’è‰æ‘œ
+	// æŒ‡å®šç”»åƒ
 	if (BGDest.enable && BGDest.hdc != NULL) {
 		BOOL alpha_valid;
 
-		// ‰æ‘œ‚ğƒ[ƒh(•`‰æ)‚·‚é
+		// ç”»åƒã‚’ãƒ­ãƒ¼ãƒ‰(æç”»)ã™ã‚‹
 		BGLoadSrc(hdc_work, &BGDest);
 		alpha_valid = IsAlphaValidBitmapHDC(BGDest.hdc);
 
-		// €”õ‚µ‚½‰æ‘œ‚ğ“\‚è•t‚¯‚é
+		// æº–å‚™ã—ãŸç”»åƒã‚’è²¼ã‚Šä»˜ã‘ã‚‹
 		memset(&bf, 0, sizeof(bf));
 		bf.BlendOp = AC_SRC_OVER;
 		bf.SourceConstantAlpha = BGDest.alpha;
 		bf.AlphaFormat = 0;
 		if (alpha_valid) {
-			// 32bitƒrƒbƒgƒ}ƒbƒv(alpha’l‚ª‘¶İ‚µ‚Ä‚¢‚é)ê‡‚Íalpha’l‚ğQÆ‚·‚é
+			// 32bitãƒ“ãƒƒãƒˆãƒãƒƒãƒ—(alphaå€¤ãŒå­˜åœ¨ã—ã¦ã„ã‚‹)å ´åˆã¯alphaå€¤ã‚’å‚ç…§ã™ã‚‹
 			bf.AlphaFormat = AC_SRC_ALPHA;
 		}
 		if (!BGSrc1.enable) {
-			// •Ç†‚ª‚È‚¢ê‡‚Í‚ ‚ç‚©‚¶‚ß“h‚è‚Â‚Ô‚µ‚Ä‚¨‚­
+			// å£ç´™ãŒãªã„å ´åˆã¯ã‚ã‚‰ã‹ã˜ã‚å¡—ã‚Šã¤ã¶ã—ã¦ãŠã
 			FillBitmapDC(hdc_bg, BGDest.color);
 		}
 		BGAlphaBlend(hdc_bg, 0, 0, width, height, hdc_work, 0, 0, width, height, bf);
 	}
 	DebugSaveFile(L"bg_2.bmp", hdc_bg, width, height);
 
-	// ’PFƒvƒŒ[ƒ“
+	// å˜è‰²ãƒ—ãƒ¬ãƒ¼ãƒ³
 	if (BGSrc2.enable) {
-		// ‰æ‘œ‚ğ€”õ
+		// ç”»åƒã‚’æº–å‚™
 		BGLoadSrc(hdc_work, &BGSrc2);
 
-		// “\‚è•t‚¯‚é
+		// è²¼ã‚Šä»˜ã‘ã‚‹
 		memset(&bf, 0, sizeof(bf));
 		bf.BlendOp = AC_SRC_OVER;
 		if (BGDest.enable || BGSrc1.enable) {
 			bf.SourceConstantAlpha = BGSrc2.alpha;
 		}
 		else {
-			// ƒuƒŒƒ“ƒh‚·‚é‚à‚Ì‚ª‚È‚¯‚ê‚Îalpha‚Íg‚í‚È‚¢(’Pƒ‚È“h‚è‚Â‚Ô‚µ)
+			// ãƒ–ãƒ¬ãƒ³ãƒ‰ã™ã‚‹ã‚‚ã®ãŒãªã‘ã‚Œã°alphaã¯ä½¿ã‚ãªã„(å˜ç´”ãªå¡—ã‚Šã¤ã¶ã—)
 			bf.SourceConstantAlpha = 255;
 		}
 		bf.AlphaFormat = 0;
@@ -1222,10 +1222,10 @@ static HDC CreateBGImage(int width, int height)
 
 /**
  *
- *	ThemeSetBG(), ThemeSetColor() ‚Ì‚ ‚Æ‚ÉƒR[ƒ‹‚·‚é
+ *	ThemeSetBG(), ThemeSetColor() ã®ã‚ã¨ã«ã‚³ãƒ¼ãƒ«ã™ã‚‹
  *
- *	@param	forceSetup		FALSE	WM_PAINT
- *							TRUE	ˆÈŠO
+ *	@param	forceSetup		FALSE	WM_PAINTæ™‚
+ *							TRUE	ä»¥å¤–
  *
  */
 void BGSetupPrimary(BOOL forceSetup)
@@ -1236,7 +1236,7 @@ void BGSetupPrimary(BOOL forceSetup)
   if(!BGEnable)
     return;
 
-  //‘‹‚ÌˆÊ’uA‘å‚«‚³‚ª•Ï‚í‚Á‚½‚©ƒ`ƒFƒbƒN
+  //çª“ã®ä½ç½®ã€å¤§ãã•ãŒå¤‰ã‚ã£ãŸã‹ãƒã‚§ãƒƒã‚¯
   point.x = 0;
   point.y = 0;
   ClientToScreen(HVTWin,&point);
@@ -1249,26 +1249,26 @@ void BGSetupPrimary(BOOL forceSetup)
 
   CopyRect(&BGPrevRect,&rect);
 
-  //•Ç† or ”wŒi‚ğƒvƒŠƒ[ƒh
+  //å£ç´™ or èƒŒæ™¯ã‚’ãƒ—ãƒªãƒ­ãƒ¼ãƒ‰
   BGPreloadSrc(&BGDest);
   BGPreloadSrc(&BGSrc1);
   BGPreloadSrc(&BGSrc2);
 
   _OutputDebugPrintf("BGSetupPrimary : BGInSizeMove = %d\n",BGInSizeMove);
 
-  //ì‹Æ—p DC ì¬
+  //ä½œæ¥­ç”¨ DC ä½œæˆ
   if(hdcBGWork)   DeleteBitmapDC(&hdcBGWork);
   if(hdcBGBuffer) DeleteBitmapDC(&hdcBGBuffer);
 
   hdcBGWork   = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,FontHeight));
   hdcBGBuffer = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,FontHeight));
 
-  //hdcBGBuffer ‚Ì‘®«İ’è
+  //hdcBGBuffer ã®å±æ€§è¨­å®š
   SetBkMode(hdcBGBuffer,TRANSPARENT);
 
   if(!BGInSizeMove)
   {
-	  //”wŒi HDC
+	  //èƒŒæ™¯ HDC
 	  if(hdcBG) {
 		  DeleteBitmapDC(&hdcBG);
 	  }
@@ -1278,9 +1278,9 @@ void BGSetupPrimary(BOOL forceSetup)
 }
 
 /**
- *	ƒe[ƒ}ƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚ñ‚Åİ’è‚·‚é
+ *	ãƒ†ãƒ¼ãƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚“ã§è¨­å®šã™ã‚‹
  *
- *	@param file		NULL‚Ìƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ü‚È‚¢(ƒfƒtƒHƒ‹ƒg’l‚Åİ’è)
+ *	@param file		NULLã®æ™‚ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã¾ãªã„(ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã§è¨­å®š)
  */
 static void BGReadIniFile(const wchar_t *file)
 {
@@ -1314,11 +1314,11 @@ static void BGSetDefaultColor(TTTSet *pts)
 }
 
 /*
- * Eterm lookfeel‹@”\‚É‚æ‚é‰Šú‰»ˆ—
+ * Eterm lookfeelæ©Ÿèƒ½ã«ã‚ˆã‚‹åˆæœŸåŒ–å‡¦ç†
  *
  * initialize_once:
- *    TRUE: Tera Term‚Ì‹N“®
- *    FALSE: Tera Term‚Ì‹N“®ˆÈŠO
+ *    TRUE: Tera Termã®èµ·å‹•æ™‚
+ *    FALSE: Tera Termã®èµ·å‹•æ™‚ä»¥å¤–
  */
 void BGInitialize(BOOL initialize_once)
 {
@@ -1328,10 +1328,10 @@ void BGInitialize(BOOL initialize_once)
 
 	BGSetDefaultColor(&ts);
 
-	//ƒŠƒ\[ƒX‰ğ•ú
+	//ãƒªã‚½ãƒ¼ã‚¹è§£æ”¾
 	BGDestruct();
 
-	// AlphaBlend ‚ÌƒAƒhƒŒƒX‚ğ“Ç‚İ‚İ
+	// AlphaBlend ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’èª­ã¿è¾¼ã¿
 	if (ts.EtermLookfeel.BGUseAlphaBlendAPI) {
 		if (pAlphaBlend != NULL)
 			BGAlphaBlend = pAlphaBlend;
@@ -1344,20 +1344,20 @@ void BGInitialize(BOOL initialize_once)
 }
 
 /**
- *	ƒe[ƒ}‚Ìİ’è‚ğƒ`ƒFƒbƒN‚µ‚Ä BGˆ—‚ğs‚¤‚©(BGEnable=TRUE/FALSE)‚ğŒˆ‚ß‚é
+ *	ãƒ†ãƒ¼ãƒã®è¨­å®šã‚’ãƒã‚§ãƒƒã‚¯ã—ã¦ BGå‡¦ç†ã‚’è¡Œã†ã‹(BGEnable=TRUE/FALSE)ã‚’æ±ºã‚ã‚‹
  */
 static void DecideBGEnable(void)
 {
 	vtdisp_work_t *w = &vtdisp_work;
 
-	// ”wŒi‰æ‘œƒ`ƒFƒbƒN
+	// èƒŒæ™¯ç”»åƒãƒã‚§ãƒƒã‚¯
 	if (BGDest.fileW == NULL || BGDest.fileW[0] == 0) {
-		// ”wŒi‰æ‘œ‚Íg—p‚µ‚È‚¢
+		// èƒŒæ™¯ç”»åƒã¯ä½¿ç”¨ã—ãªã„
 		BGDest.enable = FALSE;
 	}
 
 	if (BGDest.enable == FALSE && BGSrc1.enable == FALSE && BGSrc2.enable == FALSE) {
-		// BG‚Íg—p‚µ‚È‚¢
+		// BGã¯ä½¿ç”¨ã—ãªã„
 		BGEnable = FALSE;
 		w->bg_enable = FALSE;
 	}
@@ -1368,23 +1368,23 @@ static void DecideBGEnable(void)
 }
 
 /**
- *	ƒe[ƒ}‚Ìİ’è‚ğs‚¤
- *		ƒe[ƒ}–³‚µ‚È‚çƒfƒtƒHƒ‹ƒgİ’è‚·‚é
- *		ƒe[ƒ}‚ ‚è‚È‚çƒe[ƒ}ƒtƒ@ƒCƒ‹‚ğ“Ç‚İo‚µ‚Äİ’è‚·‚é
+ *	ãƒ†ãƒ¼ãƒã®è¨­å®šã‚’è¡Œã†
+ *		ãƒ†ãƒ¼ãƒç„¡ã—ãªã‚‰ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆè¨­å®šã™ã‚‹
+ *		ãƒ†ãƒ¼ãƒã‚ã‚Šãªã‚‰ãƒ†ãƒ¼ãƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿å‡ºã—ã¦è¨­å®šã™ã‚‹
  */
 void BGLoadThemeFile(const TTTSet *pts)
 {
-	// ƒRƒ“ƒtƒBƒOƒtƒ@ƒCƒ‹(ƒe[ƒ}ƒtƒ@ƒCƒ‹)‚ÌŒˆ’è
+	// ã‚³ãƒ³ãƒ•ã‚£ã‚°ãƒ•ã‚¡ã‚¤ãƒ«(ãƒ†ãƒ¼ãƒãƒ•ã‚¡ã‚¤ãƒ«)ã®æ±ºå®š
 	switch(pts->EtermLookfeel.BGEnable) {
 	case 0:
 	default:
-		// ƒe[ƒ}–³‚µ
+		// ãƒ†ãƒ¼ãƒç„¡ã—
 		BGReadIniFile(NULL);
 		BGEnable = FALSE;
 		break;
 	case 1:
 		if (pts->EtermLookfeel.BGThemeFileW != NULL) {
-			// ƒe[ƒ}ƒtƒ@ƒCƒ‹‚Ìw’è‚ª‚ ‚é
+			// ãƒ†ãƒ¼ãƒãƒ•ã‚¡ã‚¤ãƒ«ã®æŒ‡å®šãŒã‚ã‚‹
 			BGReadIniFile(pts->EtermLookfeel.BGThemeFileW);
 			BGEnable = TRUE;
 		}
@@ -1393,7 +1393,7 @@ void BGLoadThemeFile(const TTTSet *pts)
 		}
 		break;
 	case 2: {
-		// ƒ‰ƒ“ƒ_ƒ€ƒe[ƒ} (or ƒe[ƒ}ƒtƒ@ƒCƒ‹‚ğw’è‚ª‚È‚¢)
+		// ãƒ©ãƒ³ãƒ€ãƒ ãƒ†ãƒ¼ãƒ (or ãƒ†ãƒ¼ãƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’æŒ‡å®šãŒãªã„)
 		wchar_t *theme_mask;
 		wchar_t *theme_file;
 		aswprintf(&theme_mask, L"%s\\theme\\*.ini", pts->HomeDirW);
@@ -1410,7 +1410,7 @@ void BGLoadThemeFile(const TTTSet *pts)
 }
 
 /**
- *	ƒfƒoƒO—pAbox‚ğ•`‰æ‚·‚é
+ *	ãƒ‡ãƒã‚°ç”¨ã€boxã‚’æç”»ã™ã‚‹
  */
 static void DrawBox(HDC hdc, int sx, int sy, int width, int height, COLORREF rgb)
 {
@@ -1432,29 +1432,29 @@ static void DrawBox(HDC hdc, int sx, int sy, int width, int height, COLORREF rgb
 }
 
 /**
- * @brief •¶š‚Ì”wŒi‚ğì¬‚·‚é
- *		hdc ‚É (0,0)-(width,height) ‚Ì•¶š”wŒi‚ğì¬‚·‚é
- *		alpha‚Ì’l‚É‚æ‚Á‚Ä”wŒi‰æ‘œ(hdcBG)‚ğƒuƒŒƒ“ƒh‚·‚é
+ * @brief æ–‡å­—ã®èƒŒæ™¯ã‚’ä½œæˆã™ã‚‹
+ *		hdc ã« (0,0)-(width,height) ã®æ–‡å­—èƒŒæ™¯ã‚’ä½œæˆã™ã‚‹
+ *		alphaã®å€¤ã«ã‚ˆã£ã¦èƒŒæ™¯ç”»åƒ(hdcBG)ã‚’ãƒ–ãƒ¬ãƒ³ãƒ‰ã™ã‚‹
  *
- * @param hdc		•`‰æ‚·‚éhdc
- * @param X			•¶šˆÊ’u(”wŒi‰æ‘œ‚ÌˆÊ’u)
+ * @param hdc		æç”»ã™ã‚‹hdc
+ * @param X			æ–‡å­—ä½ç½®(èƒŒæ™¯ç”»åƒã®ä½ç½®)
  * @param Y
- * @param width		•¶šƒTƒCƒY
+ * @param width		æ–‡å­—ã‚µã‚¤ã‚º
  * @param height
- * @param alpha		”wŒi‰æ‘œ‚Ì•s“§–¾“x 0..255
- *						0=”wŒi‰æ‘œ‚ª‚»‚Ì‚Ü‚Ü“]‘—‚³‚ê‚é
- *						255=”wŒi‚Í“§–¾(‰e‹¿‚È‚µ)
+ * @param alpha		èƒŒæ™¯ç”»åƒã®ä¸é€æ˜åº¦ 0..255
+ *						0=èƒŒæ™¯ç”»åƒãŒãã®ã¾ã¾è»¢é€ã•ã‚Œã‚‹
+ *						255=èƒŒæ™¯ã¯é€æ˜(å½±éŸ¿ãªã—)
  */
 static void DrawTextBGImage(HDC hdc, int X, int Y, int width, int height, COLORREF color, unsigned char alpha)
 {
 	HBRUSH hbr = CreateSolidBrush(color);
 
-	// hdc‚É”wŒi‰æ‘œ‚ğ•`‰æ
+	// hdcã«èƒŒæ™¯ç”»åƒã‚’æç”»
 	if (BGInSizeMove) {
-		// BGInSizeMove!=0(‘‹‚ÌˆÚ“®AƒŠƒTƒCƒY’†)
+		// BGInSizeMove!=0æ™‚(çª“ã®ç§»å‹•ã€ãƒªã‚µã‚¤ã‚ºä¸­)
 		RECT rect;
 		SetRect(&rect, 0, 0, width, height);
-		//FillRect(hdc, &rect, BGBrushInSizeMove);	//   ”wŒi‚ğ BGBrushInSizeMove ‚Å“h‚è‚Â‚Ô‚·
+		//FillRect(hdc, &rect, BGBrushInSizeMove);	//   èƒŒæ™¯ã‚’ BGBrushInSizeMove ã§å¡—ã‚Šã¤ã¶ã™
 		FillRect(hdc, &rect, hbr);
 	}
 	else {
@@ -1462,15 +1462,15 @@ static void DrawTextBGImage(HDC hdc, int X, int Y, int width, int height, COLORR
 		BLENDFUNCTION bf;
 		BOOL r;
 
-		// ƒ[ƒNDC‚É•¶š‚Ì”wŒi‚ğ•`‰æ
+		// ãƒ¯ãƒ¼ã‚¯DCã«æ–‡å­—ã®èƒŒæ™¯ã‚’æç”»
 		SetRect(&rect, 0, 0, width, height);
 		FillRect(hdcBGWork, &rect, hbr);
 
-		// •s“§–¾
-		//   ”wŒi‰æ‘œ‚ğ‚»‚Ì‚Ü‚Ü•¶š”wŒi‚É“]‘—
+		// ä¸é€æ˜æ™‚
+		//   èƒŒæ™¯ç”»åƒã‚’ãã®ã¾ã¾æ–‡å­—èƒŒæ™¯ã«è»¢é€
 		BitBlt(hdc, 0, 0, width, height, hdcBG, X, Y, SRCCOPY);
 
-		// hdc‚Éƒ[ƒNDC‚É—pˆÓ‚µ‚½•¶š‚Ì”wŒi‚ğalphablend
+		// hdcã«ãƒ¯ãƒ¼ã‚¯DCã«ç”¨æ„ã—ãŸæ–‡å­—ã®èƒŒæ™¯ã‚’alphablend
 		ZeroMemory(&bf, sizeof(bf));
 		bf.BlendOp = AC_SRC_OVER;
 		bf.SourceConstantAlpha = alpha;
@@ -1490,12 +1490,12 @@ static void BGScrollWindow(HWND hwnd, int xa, int ya, RECT *Rect, RECT *ClipRect
 		InvalidateRect(HVTWin, ClipRect, FALSE);
 	}
 	else if (IsZoomed(hwnd)) {
-		// ƒEƒBƒ“ƒhƒEÅ‘å‰»‚Ì•¶šŒ‡‚¯‘Îô
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦æœ€å¤§åŒ–æ™‚ã®æ–‡å­—æ¬ ã‘å¯¾ç­–
 		switch (ts.MaximizedBugTweak) {
-		case 1: // type 1: ScrollWindow ‚ğg‚í‚¸‚É‚·‚×‚Ä‘‚«’¼‚·
+		case 1: // type 1: ScrollWindow ã‚’ä½¿ã‚ãšã«ã™ã¹ã¦æ›¸ãç›´ã™
 			InvalidateRect(HVTWin, ClipRect, FALSE);
 			break;
-		case 2: // type 2: ƒXƒNƒ[ƒ‹—Ìˆæ‚ª‘S‘Ì(NULL)‚Ì‚ÍŒ„ŠÔ•”•ª‚ğœ‚¢‚½—Ìˆæ‚É·‚µ‘Ö‚¦‚é
+		case 2: // type 2: ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«é ˜åŸŸãŒå…¨ä½“(NULL)ã®æ™‚ã¯éš™é–“éƒ¨åˆ†ã‚’é™¤ã„ãŸé ˜åŸŸã«å·®ã—æ›¿ãˆã‚‹
 			if (Rect == NULL) {
 				GetClientRect(hwnd, &r);
 				r.bottom -= r.bottom % ts.TerminalHeight;
@@ -1531,7 +1531,7 @@ void BGOnExitSizeMove(void)
   InvalidateRect(HVTWin,NULL,FALSE);
 
 #if 0
-  //ƒuƒ‰ƒV‚ğíœ
+  //ãƒ–ãƒ©ã‚·ã‚’å‰Šé™¤
   if(BGBrushInSizeMove)
   {
     DeleteObject(BGBrushInSizeMove);
@@ -1541,14 +1541,14 @@ void BGOnExitSizeMove(void)
 }
 
 /**
- *	WM_SETTINGCHANGE ‚ÉŒÄ‚Ño‚·
+ *	WM_SETTINGCHANGE æ™‚ã«å‘¼ã³å‡ºã™
  */
 void BGOnSettingChange(void)
 {
 	if(!BGEnable)
 		return;
 
-	// TODO ƒ‚ƒjƒ^(ƒfƒBƒXƒvƒŒƒC)‚ğ‚Ü‚½‚®‚ÆƒTƒCƒY‚ª•Ï‰»‚·‚é‚Ì‚Å‚Í?
+	// TODO ãƒ¢ãƒ‹ã‚¿(ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤)ã‚’ã¾ãŸãã¨ã‚µã‚¤ã‚ºãŒå¤‰åŒ–ã™ã‚‹ã®ã§ã¯?
 	CRTWidth  = GetSystemMetrics(SM_CXSCREEN);
 	CRTHeight = GetSystemMetrics(SM_CYSCREEN);
 
@@ -1557,14 +1557,14 @@ void BGOnSettingChange(void)
 }
 
 /**
- *	‹Œ16FƒJƒ‰[ƒe[ƒuƒ‹(ts.ANSIColor[16])‚ÌF”Ô†‚©‚ç
- *	256FƒJƒ‰[ƒe[ƒuƒ‹(ANSIColor[256])‚ÌF”Ô†‚ğæ“¾
+ *	æ—§16è‰²ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«(ts.ANSIColor[16])ã®è‰²ç•ªå·ã‹ã‚‰
+ *	256è‰²ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«(ANSIColor[256])ã®è‰²ç•ªå·ã‚’å–å¾—
  *
- * @param index16 	16F‚ÌF”Ô†
+ * @param index16 	16è‰²ã®è‰²ç•ªå·
  */
 static int GetIndex256From16(int index16)
 {
-	// ANSIColor16‚ÍA–¾‚é‚¢/ˆÃ‚¢ƒOƒ‹[ƒv‚ª“ü‚ê‘Ö‚í‚Á‚Ä‚¢‚é
+	// ANSIColor16ã¯ã€æ˜ã‚‹ã„/æš—ã„ã‚°ãƒ«ãƒ¼ãƒ—ãŒå…¥ã‚Œæ›¿ã‚ã£ã¦ã„ã‚‹
 	static const int index256[] = {
 		0,
 		9, 10, 11, 12, 13, 14, 15,
@@ -1575,10 +1575,10 @@ static int GetIndex256From16(int index16)
 }
 
 /**
- *	256FƒJƒ‰[ƒe[ƒuƒ‹(ANSIColor[256])‚ÌF”Ô†‚©‚ç
- *	‹Œ16FƒJƒ‰[ƒe[ƒuƒ‹(ts.ANSIColor[16])‚ÌF”Ô†‚ğæ“¾
+ *	256è‰²ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«(ANSIColor[256])ã®è‰²ç•ªå·ã‹ã‚‰
+ *	æ—§16è‰²ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«(ts.ANSIColor[16])ã®è‰²ç•ªå·ã‚’å–å¾—
  *
- * @param index256 	256F‚ÌF”Ô†
+ * @param index256 	256è‰²ã®è‰²ç•ªå·
  */
 static int GetIndex16From256(int index256)
 {
@@ -1586,23 +1586,23 @@ static int GetIndex16From256(int index256)
 }
 
 /**
- *	ANSIƒJƒ‰[ƒe[ƒuƒ‹(ANSIColor[256])‚ğ‰Šú‰»‚·‚é
+ *	ANSIã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«(ANSIColor[256])ã‚’åˆæœŸåŒ–ã™ã‚‹
  *
  *	@param ANSIColor16	ts.ANSIColor[16]
- *						‹Œ16FƒJƒ‰[ƒe[ƒuƒ‹
+ *						æ—§16è‰²ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«
  */
 static void InitColorTable(const COLORREF *ANSIColor16)
 {
 	int i;
 
-	// ANSIColor[] ‚Ìæ“ª16F‚ğ‰Šú‰»
-	//		ANSIColor16‚Í16FƒJƒ‰[ƒe[ƒuƒ‹
+	// ANSIColor[] ã®å…ˆé ­16è‰²ã‚’åˆæœŸåŒ–
+	//		ANSIColor16ã¯16è‰²ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒ–ãƒ«
 	for (i = 0 ; i < 16 ; i++) {
 		int i256 = GetIndex256From16(i);
 		ANSIColor[i256] = ANSIColor16[i];
 	}
 
-	// ANSIColor[] ‚Ì16”ÔˆÈ~‚ğ‰Šú‰»
+	// ANSIColor[] ã®16ç•ªä»¥é™ã‚’åˆæœŸåŒ–
 	for (i=16; i<=255; i++) {
 		ANSIColor[i] = RGB(DefaultColorTable[i][0], DefaultColorTable[i][1], DefaultColorTable[i][2]);
 	}
@@ -1611,7 +1611,7 @@ static void InitColorTable(const COLORREF *ANSIColor16)
 static void DispSetNearestColors(int start, int end, HDC DispCtx)
 {
 #if 1
-	// –³Œø‰»
+	// ç„¡åŠ¹åŒ–
 	(void)start;
 	(void)end;
 	(void)DispCtx;
@@ -1781,11 +1781,11 @@ void DispConvScreenToWin
 }
 
 /**
- *	VTFont ‚Ìæ“¾
+ *	VTFont ã®å–å¾—
  *
- *	@param[out]		VTlf	æ“¾‚µ‚½ƒtƒHƒ“ƒgî•ñ
- *	@param[in]		dpi		DPI‚É‡‚í‚¹‚½ƒTƒCƒY‚ÌƒtƒHƒ“ƒg‚ğæ“¾
- *							0 ‚ÌDPI‚É‡‚í‚¹‚½Šg‘å‚ğ‚µ‚È‚¢
+ *	@param[out]		VTlf	å–å¾—ã—ãŸãƒ•ã‚©ãƒ³ãƒˆæƒ…å ±
+ *	@param[in]		dpi		DPIã«åˆã‚ã›ãŸã‚µã‚¤ã‚ºã®ãƒ•ã‚©ãƒ³ãƒˆã‚’å–å¾—
+ *							0 ã®æ™‚DPIã«åˆã‚ã›ãŸæ‹¡å¤§ã‚’ã—ãªã„
  */
 static void DispSetLogFont(LOGFONTW *VTlf, unsigned int dpi)
 {
@@ -1809,10 +1809,10 @@ static void DispSetLogFont(LOGFONTW *VTlf, unsigned int dpi)
 }
 
 /**
- *	ƒtƒHƒ“ƒg‚ğ•ÏX
+ *	ãƒ•ã‚©ãƒ³ãƒˆã‚’å¤‰æ›´
  *
- *	@param	dpi		DPI‚ğw’è‚·‚é
- *					0‚Ì‚Æ‚«Œ»İ‚ÌƒfƒBƒXƒvƒŒƒC‚ÌDPI
+ *	@param	dpi		DPIã‚’æŒ‡å®šã™ã‚‹
+ *					0ã®ã¨ãç¾åœ¨ã®ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®DPI
  */
 void ChangeFont(unsigned int dpi)
 {
@@ -1933,7 +1933,7 @@ void ResetIME(void)
 	/* reset IME */
 	if ((IMEEnabled() == TRUE) && (ts.UseIME > 0)) {
 
-		// IME‰Šú‰»
+		// IMEåˆæœŸåŒ–
 		if (! LoadIME()) {
 			static const TTMessageBoxInfoW info = {
 				"Tera Term",
@@ -1989,7 +1989,7 @@ void ChangeCaret(void)
   UpdateCaretPosition(TRUE);
 }
 
-// WM_KILLFOCUS‚³‚ê‚½‚Æ‚«‚ÌƒJ[ƒ\ƒ‹‚ğ©•ª‚Å•`‚­
+// WM_KILLFOCUSã•ã‚ŒãŸã¨ãã®ã‚«ãƒ¼ã‚½ãƒ«ã‚’è‡ªåˆ†ã§æã
 void CaretKillFocus(BOOL show)
 {
   int CaretX, CaretY;
@@ -2000,7 +2000,7 @@ void CaretKillFocus(BOOL show)
   if (ts.KillFocusCursor == 0)
 	  return;
 
-  // Eterm lookfeel‚Ìê‡‚Í‰½‚à‚µ‚È‚¢
+  // Eterm lookfeelã®å ´åˆã¯ä½•ã‚‚ã—ãªã„
   if (BGEnable)
 	  return;
 
@@ -2028,7 +2028,7 @@ void CaretKillFocus(BOOL show)
   p[4].x = CaretX;
   p[4].y = CaretY;
 
-  if (show) {  // ƒ|ƒŠƒSƒ“ƒJ[ƒ\ƒ‹‚ğ•\¦i”ñƒtƒH[ƒJƒXj
+  if (show) {  // ãƒãƒªã‚´ãƒ³ã‚«ãƒ¼ã‚½ãƒ«ã‚’è¡¨ç¤ºï¼ˆéãƒ•ã‚©ãƒ¼ã‚«ã‚¹æ™‚ï¼‰
 	  oldpen = SelectObject(hdc, CreatePen(PS_SOLID, 0, ts.VTColor[0]));
   } else {
 	  oldpen = SelectObject(hdc, CreatePen(PS_SOLID, 0, ts.VTColor[1]));
@@ -2041,12 +2041,12 @@ void CaretKillFocus(BOOL show)
   DispReleaseDC();
 }
 
-// ƒ|ƒŠƒSƒ“ƒJ[ƒ\ƒ‹‚ğÁ‚µ‚½‚ ‚Æ‚ÉA‚»‚Ì•”•ª‚Ì•¶š‚ğÄ•`‰æ‚·‚éB
+// ãƒãƒªã‚´ãƒ³ã‚«ãƒ¼ã‚½ãƒ«ã‚’æ¶ˆã—ãŸã‚ã¨ã«ã€ãã®éƒ¨åˆ†ã®æ–‡å­—ã‚’å†æç”»ã™ã‚‹ã€‚
 //
-// CaretOff()‚Ì’¼Œã‚ÉŒÄ‚Ô‚±‚ÆBCaretOff()“à‚©‚çŒÄ‚Ô‚ÆA–³ŒÀÄ‹AŒÄ‚Ño‚µ‚Æ‚È‚èA
-// stack overflow‚É‚È‚éB
+// CaretOff()ã®ç›´å¾Œã«å‘¼ã¶ã“ã¨ã€‚CaretOff()å†…ã‹ã‚‰å‘¼ã¶ã¨ã€ç„¡é™å†å¸°å‘¼ã³å‡ºã—ã¨ãªã‚Šã€
+// stack overflowã«ãªã‚‹ã€‚
 //
-// ƒJ[ƒ\ƒ‹Œ`ó•ÏX(ChangeCaret)‚É‚àŒÄ‚Ô‚±‚Æ‚É‚µ‚½‚½‚ßAŠÖ”–¼•ÏX -- 2009/04/17 doda.
+// ã‚«ãƒ¼ã‚½ãƒ«å½¢çŠ¶å¤‰æ›´æ™‚(ChangeCaret)ã«ã‚‚å‘¼ã¶ã“ã¨ã«ã—ãŸãŸã‚ã€é–¢æ•°åå¤‰æ›´ -- 2009/04/17 doda.
 //
 void UpdateCaretPosition(BOOL enforce)
 {
@@ -2059,7 +2059,7 @@ void UpdateCaretPosition(BOOL enforce)
   if (!enforce && !ts.KillFocusCursor)
 	  return;
 
-  // Eterm lookfeel‚Ìê‡‚Í‰½‚à‚µ‚È‚¢
+  // Eterm lookfeelã®å ´åˆã¯ä½•ã‚‚ã—ãªã„
   if (BGEnable)
 	  return;
 
@@ -2071,8 +2071,8 @@ void UpdateCaretPosition(BOOL enforce)
 	  else
 		rc.right = CaretX + FontWidth;
 	  rc.bottom = CaretY + FontHeight;
-	  // w’è‚æ‚è‚à1ƒsƒNƒZƒ‹¬‚³‚¢”ÍˆÍ‚ªÄ•`‰æ‚³‚ê‚é‚½‚ß
-	  // rc ‚Ì right, bottom ‚Í1ƒsƒNƒZƒ‹‘å‚«‚­‚µ‚Ä‚¢‚éB
+	  // æŒ‡å®šã‚ˆã‚Šã‚‚1ãƒ”ã‚¯ã‚»ãƒ«å°ã•ã„ç¯„å›²ãŒå†æç”»ã•ã‚Œã‚‹ãŸã‚
+	  // rc ã® right, bottom ã¯1ãƒ”ã‚¯ã‚»ãƒ«å¤§ããã—ã¦ã„ã‚‹ã€‚
 	  InvalidateRect(HVTWin, &rc, FALSE);
   }
 }
@@ -2092,8 +2092,8 @@ void CaretOn(void)
 		int CaretX, CaretY, H;
 		HBITMAP color;
 
-		/* IME‚Ìon/offó‘Ô‚ğŒ©‚ÄAƒJ[ƒ\ƒ‹‚ÌF‚ğ•ÏX‚·‚éB
-		 * WM_INPUTLANGCHANGE, WM_IME_NOTIFY ‚Å‚ÍƒJ[ƒ\ƒ‹‚ÌÄ•`‰æ‚Ì‚İs‚¤B
+		/* IMEã®on/offçŠ¶æ…‹ã‚’è¦‹ã¦ã€ã‚«ãƒ¼ã‚½ãƒ«ã®è‰²ã‚’å¤‰æ›´ã™ã‚‹ã€‚
+		 * WM_INPUTLANGCHANGE, WM_IME_NOTIFY ã§ã¯ã‚«ãƒ¼ã‚½ãƒ«ã®å†æç”»ã®ã¿è¡Œã†ã€‚
 		 * (2010.5.20 yutaka)
 		 */
 		if ((ts.WindowFlag & WF_IMECURSORCHANGE) == 0) {
@@ -2110,10 +2110,10 @@ void CaretOn(void)
 		CaretY = (CursorY-WinOrgY)*FontHeight;
 
 		if (IMEstat && IMECompositionState) {
-			// IME ON && •ÏŠ·’†‚Ìê‡‚Ì‚İ‚Ìˆ—‚·‚éB
-			// •ÏŠ·’†(Š¿š‚âŒó•âƒEƒBƒ“ƒhƒE‚ª•\¦‚³‚ê‚Ä‚¢‚éó‘Ô)‚Å
-			// ƒzƒXƒg‚©‚ç‚ÌƒGƒR[‚ğóM‚µ‚ÄcaretˆÊ’u‚ª•Ï‰»‚µ‚½ê‡A
-			// •ÏŠ·‚µ‚Ä‚¢‚éˆÊ’u‚ğXV‚·‚é•K—v‚ª‚ ‚éB
+			// IME ON && å¤‰æ›ä¸­ã®å ´åˆã®ã¿ã®å‡¦ç†ã™ã‚‹ã€‚
+			// å¤‰æ›ä¸­(æ¼¢å­—ã‚„å€™è£œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒè¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹çŠ¶æ…‹)ã§
+			// ãƒ›ã‚¹ãƒˆã‹ã‚‰ã®ã‚¨ã‚³ãƒ¼ã‚’å—ä¿¡ã—ã¦caretä½ç½®ãŒå¤‰åŒ–ã—ãŸå ´åˆã€
+			// å¤‰æ›ã—ã¦ã„ã‚‹ä½ç½®ã‚’æ›´æ–°ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
 			SetConversionWindow(HVTWin,CaretX,CaretY);
 		}
 
@@ -2199,8 +2199,8 @@ void DispSetCaretWidth(BOOL DW)
 }
 
 /**
- *	ƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒY‚ª•Ï‰»
- *	BuffChangeWinSize() ‚©‚çƒR[ƒ‹‚³‚ê‚é
+ *	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºãŒå¤‰åŒ–
+ *	BuffChangeWinSize() ã‹ã‚‰ã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
  *
  */
 void DispChangeWinSize(int Nx, int Ny)
@@ -2238,14 +2238,14 @@ void DispChangeWinSize(int Nx, int Ny)
   {
 	AdjustSize = TRUE;
 
-	// SWP_NOMOVE ‚ğw’è‚µ‚Ä‚¢‚é‚Ì‚É‚È‚º‚© 0,0 ‚ª”½‰f‚³‚êA
-	// ƒ}ƒ‹ƒ`ƒfƒBƒXƒvƒŒƒCŠÂ‹«‚Å‚Íƒvƒ‰ƒCƒ}ƒŠƒ‚ƒjƒ^‚É
-	// ˆÚ“®‚µ‚Ä‚µ‚Ü‚¤‚Ì‚ğC³ (2008.5.29 maya)
+	// SWP_NOMOVE ã‚’æŒ‡å®šã—ã¦ã„ã‚‹ã®ã«ãªãœã‹ 0,0 ãŒåæ˜ ã•ã‚Œã€
+	// ãƒãƒ«ãƒãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ç’°å¢ƒã§ã¯ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¢ãƒ‹ã‚¿ã«
+	// ç§»å‹•ã—ã¦ã—ã¾ã†ã®ã‚’ä¿®æ­£ (2008.5.29 maya)
 	//SetWindowPos(HVTWin,HWND_TOP,0,0,W+dW,H+dH,SWP_NOMOVE);
 
-	// ƒ}ƒ‹ƒ`ƒfƒBƒXƒvƒŒƒCŠÂ‹«‚ÅÅ‘å‰»‚µ‚½‚Æ‚«‚ÉA
-	// —×‚ÌƒfƒBƒXƒvƒŒƒC‚ÉƒEƒBƒ“ƒhƒE‚Ì’[‚ª‚Í‚İo‚·–â‘è‚ğC³ (2008.5.30 maya)
-	// ‚Ü‚½Aã‹L‚Ìó‘Ô‚Å‚ÍÅ‘å‰»ó‘Ô‚Å‚àƒEƒBƒ“ƒhƒE‚ğˆÚ“®‚³‚¹‚é‚±‚Æ‚ªo—ˆ‚éB
+	// ãƒãƒ«ãƒãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ç’°å¢ƒã§æœ€å¤§åŒ–ã—ãŸã¨ãã«ã€
+	// éš£ã®ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ç«¯ãŒã¯ã¿å‡ºã™å•é¡Œã‚’ä¿®æ­£ (2008.5.30 maya)
+	// ã¾ãŸã€ä¸Šè¨˜ã®çŠ¶æ…‹ã§ã¯æœ€å¤§åŒ–çŠ¶æ…‹ã§ã‚‚ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç§»å‹•ã•ã›ã‚‹ã“ã¨ãŒå‡ºæ¥ã‚‹ã€‚
 	if (!IsZoomed(HVTWin)) {
 		SetWindowPos(HVTWin,HWND_TOP,R.left,R.top,W+dW,H+dH,SWP_NOMOVE);
 	}
@@ -2255,15 +2255,15 @@ void DispChangeWinSize(int Nx, int Ny)
 }
 
 /**
- *	ƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒY‚ª•Ï‰»‚·‚é(WM_SIZE‚ª”­¶‚µ‚½)‚ÉA
- *	AdjustSize == TRUE‚Ì‚ÉƒR[ƒ‹‚³‚ê‚é
+ *	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºãŒå¤‰åŒ–ã™ã‚‹æ™‚(WM_SIZEãŒç™ºç”Ÿã—ãŸæ™‚)ã«ã€
+ *	AdjustSize == TRUEã®æ™‚ã«ã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
  *
- *	@param	x	ƒEƒBƒ“ƒhƒE‚Ìleft
- *	@param	y	ƒEƒBƒ“ƒhƒE‚Ìtop
- *	@param	w	ƒŠƒTƒCƒY‘O‚ÌƒEƒBƒ“ƒhƒEw
- *	@param	h	ƒŠƒTƒCƒY‘O‚ÌƒEƒBƒ“ƒhƒEh
- *	@param	cw	V‚µ‚¢ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚Ìw
- *	@param	ch	V‚µ‚¢ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚Ìh
+ *	@param	x	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®left
+ *	@param	y	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®top
+ *	@param	w	ãƒªã‚µã‚¤ã‚ºå‰ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦w
+ *	@param	h	ãƒªã‚µã‚¤ã‚ºå‰ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦h
+ *	@param	cw	æ–°ã—ã„ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã®w
+ *	@param	ch	æ–°ã—ã„ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã®h
  */
 void ResizeWindow(int x, int y, int w, int h, int cw, int ch)
 {
@@ -2410,30 +2410,30 @@ void DispReleaseDC(void)
 }
 
 /**
- * ƒV[ƒPƒ“ƒX‚Ìcolor_index‚ğANSIColor[]‚Ìindex‚Ö•ÏŠ·‚·‚é
+ * ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ã®color_indexã‚’ANSIColor[]ã®indexã¸å¤‰æ›ã™ã‚‹
  *
- * 8Fƒ‚[ƒh
- *	 Œ´F(–¾‚é‚¢F)‚ªg‚í‚ê‚é
- * 16FˆÈã‚ÅPC-style 16 colorsˆÈŠO
- *   ˆø” color_index ‚Í ANSIColor[] ‚Ìindex‚Æ“™‚µ‚¢
- * PC-style 16 colors (pcbold16‚ª0ˆÈŠO‚Ì)
- *	 pcbold16_bright ‚ª 0 ‚Ì‚Æ‚«
- *		­‚µˆÃ‚¢F
- *	 pcbold16_bright ‚ª 0 ˆÈŠO(Bold‘®« or Blonk‘®«)‚Ì‚Æ‚«
- *		•¶šF‘®«(0-7)‚Ì‘g‚İ‡‚í‚¹‚Å–¾‚é‚¢•¶šF‚ğ•\‚·
+ * 8è‰²ãƒ¢ãƒ¼ãƒ‰
+ *	 åŸè‰²(æ˜ã‚‹ã„è‰²)ãŒä½¿ã‚ã‚Œã‚‹
+ * 16è‰²ä»¥ä¸Šã§PC-style 16 colorsä»¥å¤–
+ *   å¼•æ•° color_index ã¯ ANSIColor[] ã®indexã¨ç­‰ã—ã„
+ * PC-style 16 colors (pcbold16ãŒ0ä»¥å¤–ã®æ™‚)
+ *	 pcbold16_bright ãŒ 0 ã®ã¨ã
+ *		å°‘ã—æš—ã„è‰²
+ *	 pcbold16_bright ãŒ 0 ä»¥å¤–(Boldå±æ€§ or Blonkå±æ€§)ã®ã¨ã
+ *		æ–‡å­—è‰²å±æ€§(0-7)ã®çµ„ã¿åˆã‚ã›ã§æ˜ã‚‹ã„æ–‡å­—è‰²ã‚’è¡¨ã™
  *
- * @param color_index			F”Ô†
- * @param pcbold16				0/0ˆÈŠO = 16 color mode PC Style‚Å‚Í‚È‚¢/‚Å‚ ‚é
- * @param pcbold16_bright		0/0ˆÈŠO = F‚ğ–¾‚é‚­‚µ‚È‚¢/‚·‚é
- * @return ANSIColor[]‚Ìindex (ANSI color 256F‚Ìindex)
+ * @param color_index			è‰²ç•ªå·
+ * @param pcbold16				0/0ä»¥å¤– = 16 color mode PC Styleã§ã¯ãªã„/ã§ã‚ã‚‹
+ * @param pcbold16_bright		0/0ä»¥å¤– = è‰²ã‚’æ˜ã‚‹ãã—ãªã„/ã™ã‚‹
+ * @return ANSIColor[]ã®index (ANSI color 256è‰²ã®index)
  */
 static int Get16ColorIndex(int color_index_256, int pcbold16, int pcbold16_bright)
 {
 	if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
-		// 8Fƒ‚[ƒh
+		// 8è‰²ãƒ¢ãƒ¼ãƒ‰
 		//		input	output
-		//		0    	0			•,Black
-		//		1-7  	9-14		–¾‚é‚¢F,Œ´F (Bright color)
+		//		0    	0			é»’,Black
+		//		1-7  	9-14		æ˜ã‚‹ã„è‰²,åŸè‰² (Bright color)
 		if (color_index_256 == 0) {
 			return 0;
 		} else if (color_index_256 < 8) {
@@ -2457,19 +2457,19 @@ static int Get16ColorIndex(int color_index_256, int pcbold16, int pcbold16_brigh
 		}
 	}
 	else {
-		// 16/256F
+		// 16/256è‰²
 		return color_index_256;
 	}
 }
 
 /**
- *	•¶š‚ÌƒAƒgƒŠƒrƒ…[ƒg‚Æ”½“](—Ìˆæ‘I‘ğ)ó‘Ô‚©‚ç•`‰æF‚È‚Ç‚ğ“¾‚é
+ *	æ–‡å­—ã®ã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆã¨åè»¢(é ˜åŸŸé¸æŠ)çŠ¶æ…‹ã‹ã‚‰æç”»è‰²ãªã©ã‚’å¾—ã‚‹
  *
- *	@param[in]	Attr		•¶š‘®«î•ñ
- *	@param[in]	reverse		”½“](—Ìˆæ‘I‘ğ)ó‘Ô
- *	@param[out]	fore_color	•¶š‘OŒiF
- *	@param[out]	back_color	•¶š”wŒiF
- *	@param[ot]	alpha		¬‡Š„‡
+ *	@param[in]	Attr		æ–‡å­—å±æ€§æƒ…å ±
+ *	@param[in]	reverse		åè»¢(é ˜åŸŸé¸æŠ)çŠ¶æ…‹
+ *	@param[out]	fore_color	æ–‡å­—å‰æ™¯è‰²
+ *	@param[out]	back_color	æ–‡å­—èƒŒæ™¯è‰²
+ *	@param[ot]	alpha		æ··åˆå‰²åˆ
  */
 static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_color, COLORREF *back_color, BYTE *_alpha)
 {
@@ -2481,7 +2481,7 @@ static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_col
 	vtdisp_work_t *w = &vtdisp_work;
 	BYTE alpha;
 
-	// ts.ColorFlag ‚Æ Attr ‚ğ‡¬‚µ‚½ Attr ‚ğì‚é
+	// ts.ColorFlag ã¨ Attr ã‚’åˆæˆã—ãŸ Attr ã‚’ä½œã‚‹
 	AttrFlag = 0;
 	AttrFlag |= ((ts.ColorFlag & CF_URLCOLOR) && (Attr->Attr & AttrURL)) ? AttrURL : 0;
 	AttrFlag |= ((ts.ColorFlag & CF_UNDERLINE) && (Attr->Attr & AttrUnder)) ? AttrUnder : 0;
@@ -2492,7 +2492,7 @@ static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_col
 	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr->Attr2 & Attr2Fore)) ? Attr2Fore : 0;
 	Attr2Flag |= ((ts.ColorFlag & CF_ANSICOLOR) && (Attr->Attr2 & Attr2Back)) ? Attr2Back : 0;
 
-	// ”½“]
+	// åè»¢
 	reverse = FALSE;
 	if (_reverse) {
 		reverse = TRUE;
@@ -2504,7 +2504,7 @@ static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_col
 		reverse = reverse ? FALSE : TRUE;
 	}
 
-	// F‚ğŒˆ’è‚·‚é
+	// è‰²ã‚’æ±ºå®šã™ã‚‹
 	TextColor = BGVTColor[0];
 	BackColor = BGVTColor[1];
 	if ((AttrFlag & (AttrURL | AttrUnder | AttrBold | AttrBlink)) == 0) {
@@ -2518,7 +2518,7 @@ static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_col
 				BackColor = BGVTColor[0];
 			}
 			else {
-				// ”½“]‘®«F‚ª—LŒø
+				// åè»¢å±æ€§è‰²ãŒæœ‰åŠ¹
 				TextColor = BGVTReverseColor[0];
 				BackColor = BGVTReverseColor[1];
 			}
@@ -2611,9 +2611,9 @@ static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_col
 		}
 	}
 
-	// UseTextColor=on ‚Ì‚Æ‚«‚Ìˆ—
-	//	”wŒiF(Back)‚ğl—¶‚¹‚¸‚É•¶šF(Fore)‚¾‚¯‚ğ•ÏX‚·‚éƒAƒvƒŠ‚ğg‚Á‚Ä‚¢‚Ä
-	//	•¶š‚ªŒ©‚¦‚È‚¢ó‘Ô‚É‚È‚Á‚½‚ç’Êí•¶šF‚©”½“]‘®«•¶šF‚ğg—p‚·‚é
+	// UseTextColor=on ã®ã¨ãã®å‡¦ç†
+	//	èƒŒæ™¯è‰²(Back)ã‚’è€ƒæ…®ã›ãšã«æ–‡å­—è‰²(Fore)ã ã‘ã‚’å¤‰æ›´ã™ã‚‹ã‚¢ãƒ—ãƒªã‚’ä½¿ã£ã¦ã„ã¦
+	//	æ–‡å­—ãŒè¦‹ãˆãªã„çŠ¶æ…‹ã«ãªã£ãŸã‚‰é€šå¸¸æ–‡å­—è‰²ã‹åè»¢å±æ€§æ–‡å­—è‰²ã‚’ä½¿ç”¨ã™ã‚‹
 	if ((ts.ColorFlag & CF_USETEXTCOLOR) !=0) {
 		if ((Attr2Flag & Attr2Fore) && (Attr2Flag & Attr2Back)) {
 			const int is_target_color = (Attr->Fore == IdFore || Attr->Fore == IdBack || Attr->Fore == 15);
@@ -2632,15 +2632,15 @@ static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_col
 	}
 
 	if (BackColor == BGVTColor[1]) {
-		// ’Êí(ƒAƒgƒŠƒrƒ…[ƒg‚È‚µ)‚Ìback
+		// é€šå¸¸(ã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆãªã—)ã®back
 		alpha = w->alpha_vtback;
 	}
 	else if (!reverse) {
-		// ˆê”Ê(”½“]‘®«(SGR 4)ˆÈŠO)‚Ìback
+		// ä¸€èˆ¬(åè»¢å±æ€§(SGR 4)ä»¥å¤–)ã®back
 		alpha = w->alpha_back;
 	}
 	else {
-		// ”½“]‘®«(SGR 4)‚Ìback
+		// åè»¢å±æ€§(SGR 4)ã®back
 		alpha = BGReverseTextAlpha;
 	}
 
@@ -2665,7 +2665,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	if (VTDC == NULL)
 		DispInitDC();
 
-	// ƒtƒHƒ“ƒgİ’è
+	// ãƒ•ã‚©ãƒ³ãƒˆè¨­å®š
 	if (((ts.FontFlag & FF_URLUNDERLINE) && (Attr.Attr & AttrURL)) ||
 		((ts.FontFlag & FF_UNDERLINE) && (Attr.Attr & AttrUnder))) {
 		SelectObject(VTDC, VTFont[(Attr.Attr & AttrFontMask) | AttrUnder]);
@@ -2674,7 +2674,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 		SelectObject(VTDC, VTFont[Attr.Attr & (AttrBold|AttrSpecial)]);
 	}
 
-	// Fİ’è
+	// è‰²è¨­å®š
 	SetTextColor(VTDC, TextColor);
 	SetBkColor(VTDC, BackColor);
 
@@ -2683,7 +2683,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 }
 
 /**
- *	1s•`‰æ ANSI
+ *	1è¡Œæç”» ANSI
  */
 void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Count, int font_width, int font_height, int Y, int *X)
 {
@@ -2714,7 +2714,7 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Cou
 
 	direct_draw = FALSE;
 	if (BGDC == NULL) {
-		// ƒ[ƒN‚Ìw’è‚ª‚È‚¢‚Æ’¼Ú•`‰æ
+		// ãƒ¯ãƒ¼ã‚¯ã®æŒ‡å®šãŒãªã„ã¨ç›´æ¥æç”»
 		direct_draw = TRUE;
 	}
 	else {
@@ -2724,7 +2724,7 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Cou
 		}
 	}
 
-	// ƒeƒLƒXƒg•`‰æ—Ìˆæ
+	// ãƒ†ã‚­ã‚¹ãƒˆæç”»é ˜åŸŸ
 	width = HalfCharCount * font_width;
 	height = font_height;
 	if (direct_draw) {
@@ -2737,11 +2737,11 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Cou
 		HFONT hPrevFont;
 		RECT rect;
 
-		// BGDC‚É”wŒi‰æ‘œ‚ğ•`‰æ
+		// BGDCã«èƒŒæ™¯ç”»åƒã‚’æç”»
 		const COLORREF BackColor = GetBkColor(DC);
 		DrawTextBGImage(BGDC, *X, Y, width, height, BackColor, alpha);
 
-		// BGDC‚É•¶š‚ğ•`‰æ
+		// BGDCã«æ–‡å­—ã‚’æç”»
 		hPrevFont = SelectObject(BGDC, GetCurrentObject(DC, OBJ_FONT));
 		SetTextColor(BGDC, GetTextColor(DC));
 		SetBkColor(BGDC, GetBkColor(DC));
@@ -2749,7 +2749,7 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Cou
 		ExtTextOutA(BGDC, ts.FontDX, ts.FontDY, ETO_CLIPPED, &rect, StrA, Count, &Dx[0]);
 		SelectObject(BGDC, hPrevFont);
 
-		// BGDC‚É•`‰æ‚µ‚½•¶š‚ğWindow‚É“\‚è•t‚¯
+		// BGDCã«æç”»ã—ãŸæ–‡å­—ã‚’Windowã«è²¼ã‚Šä»˜ã‘
 		BitBlt(DC, *X, Y, width, height, BGDC, 0, 0, SRCCOPY);
 
 		SelectObject(BGDC, hPrevFont);
@@ -2788,24 +2788,24 @@ static void DrawChar(HDC hDC, HDC BGDC, int x, int y, const wchar_t *str, size_t
 	rc.bottom = char_size.cy;
 	ExtTextOutW(char_dc, 0, 0, ETO_OPAQUE, &rc, str, (UINT)len, 0);
 
-	// ‰¡‚ğcell•(cell*FontWidth pixel)‚ÉŠg‘å/k¬‚µ‚Ä•`‰æ
+	// æ¨ªã‚’cellå¹…(cell*FontWidth pixel)ã«æ‹¡å¤§/ç¸®å°ã—ã¦æç”»
 	width = cell * FontWidth;
 	height = char_size.cy;
 	if (pTransparentBlt == NULL || BGDC == NULL || w->DCBackAlpha == 255) {
-		// ’¼Ú•`‰æ
+		// ç›´æ¥æç”»
 		SetStretchBltMode(hDC, COLORONCOLOR);
 		StretchBlt(hDC, x, y, width, height, char_dc, 0, 0, char_size.cx, char_size.cy, SRCCOPY);
 	}
 	else {
-		// BGDC‚É”wŒi‰æ‘œ‚ğ•`‰æ
+		// BGDCã«èƒŒæ™¯ç”»åƒã‚’æç”»
 		const COLORREF BackColor = GetBkColor(hDC);
 		DrawTextBGImage(BGDC, x, y, width, height, BackColor, w->DCBackAlpha);
 
-		// BGDC‚É•¶š‚ğ•`‰æ
+		// BGDCã«æ–‡å­—ã‚’æç”»
 		SetStretchBltMode(hDC, COLORONCOLOR);
 		pTransparentBlt(BGDC, 0, 0, width, height, char_dc, 0, 0, char_size.cx, char_size.cy, GetBkColor(hDC));
 
-		// BGDC‚É•`‰æ‚µ‚½•¶š‚ğWindow‚É“\‚è•t‚¯
+		// BGDCã«æç”»ã—ãŸæ–‡å­—ã‚’Windowã«è²¼ã‚Šä»˜ã‘
 		BitBlt(hDC, x, y, width, height, BGDC, 0, 0, SRCCOPY);
 	}
 
@@ -2818,7 +2818,7 @@ static void DrawStrWSub(HDC DC, HDC BGDC, const wchar_t *StrW, const int *Dx,
 						int Count, int cells, int font_width, int font_height,
 						int Y, int *X)
 {
-	int HalfCharCount = cells;	// ƒZƒ‹”
+	int HalfCharCount = cells;	// ã‚»ãƒ«æ•°
 	int width;
 	int height;
 	BOOL direct_draw;
@@ -2827,7 +2827,7 @@ static void DrawStrWSub(HDC DC, HDC BGDC, const wchar_t *StrW, const int *Dx,
 
 	direct_draw = FALSE;
 	if (BGDC == NULL) {
-		// ƒ[ƒN‚Ìw’è‚ª‚È‚¢‚Æ’¼Ú•`‰æ
+		// ãƒ¯ãƒ¼ã‚¯ã®æŒ‡å®šãŒãªã„ã¨ç›´æ¥æç”»
 		direct_draw = TRUE;
 	}
 	else {
@@ -2836,7 +2836,7 @@ static void DrawStrWSub(HDC DC, HDC BGDC, const wchar_t *StrW, const int *Dx,
 			direct_draw = TRUE;
 		}
 	}
-	// ƒeƒLƒXƒg•`‰æ—Ìˆæ
+	// ãƒ†ã‚­ã‚¹ãƒˆæç”»é ˜åŸŸ
 	width = HalfCharCount * font_width;
 	height = font_height;
 	if (direct_draw) {
@@ -2848,11 +2848,11 @@ static void DrawStrWSub(HDC DC, HDC BGDC, const wchar_t *StrW, const int *Dx,
 		HFONT hPrevFont;
 		RECT rect;
 
-		// BGDC‚É”wŒi‰æ‘œ‚ğ•`‰æ
+		// BGDCã«èƒŒæ™¯ç”»åƒã‚’æç”»
 		const COLORREF BackColor = GetBkColor(DC);
 		DrawTextBGImage(BGDC, *X, Y, width, height, BackColor, alpha);
 
-		// BGDC‚É•¶š‚ğ•`‰æ
+		// BGDCã«æ–‡å­—ã‚’æç”»
 		hPrevFont = SelectObject(BGDC, GetCurrentObject(DC, OBJ_FONT));
 		SetTextColor(BGDC, GetTextColor(DC));
 		SetBkColor(BGDC, GetBkColor(DC));
@@ -2860,7 +2860,7 @@ static void DrawStrWSub(HDC DC, HDC BGDC, const wchar_t *StrW, const int *Dx,
 		ExtTextOutW(BGDC, ts.FontDX, ts.FontDY, ETO_CLIPPED, &rect, StrW, Count, &Dx[0]);
 		SelectObject(BGDC, hPrevFont);
 
-		// BGDC‚É•`‰æ‚µ‚½•¶š‚ğWindow‚É“\‚è•t‚¯
+		// BGDCã«æç”»ã—ãŸæ–‡å­—ã‚’Windowã«è²¼ã‚Šä»˜ã‘
 		BitBlt(DC, *X, Y, width, height, BGDC, 0, 0, SRCCOPY);
 	}
 
@@ -2869,35 +2869,35 @@ static void DrawStrWSub(HDC DC, HDC BGDC, const wchar_t *StrW, const int *Dx,
 
 
 /**
- *	1s•`‰æ Unicode
- *		Windows 95 ‚É‚à ExtTextOutW() ‚Í‘¶İ‚·‚é‚ª
- *		“®ì‚ªˆÙ‚È‚é‚æ‚¤‚¾
- *		TODO •¶šŠÔ‚É‘Î‰‚µ‚Ä‚¢‚È‚¢?
+ *	1è¡Œæç”» Unicode
+ *		Windows 95 ã«ã‚‚ ExtTextOutW() ã¯å­˜åœ¨ã™ã‚‹ãŒ
+ *		å‹•ä½œãŒç•°ãªã‚‹ã‚ˆã†ã 
+ *		TODO æ–‡å­—é–“ã«å¯¾å¿œã—ã¦ã„ãªã„?
  *
- *	@param  DC				•`‰ææDC
- *	@param  BGDC			•`‰ææƒ[ƒNDC
- *							NULL‚Ìƒ[ƒN‚È‚µ(=”wŒi•`‰æ‚È‚µ)
- *							ƒvƒŠƒ“ƒ^‚Ö‚Ìo—Í‚Ì‚Íí‚ÉNULL
- *	@param	StrW			o—Í•¶š (wchar_t)
- *	@param	cells[]			o—Í•¶š‚Ìcell”
- *							1		”¼Šp•¶š
- *							0		Œ‹‡•¶š, Nonspacing Mark
- *							2+		‘SŠp•¶š, ”¼Šp + Spacing Mark
- *	@param	len				•¶š”
+ *	@param  DC				æç”»å…ˆDC
+ *	@param  BGDC			æç”»å…ˆãƒ¯ãƒ¼ã‚¯DC
+ *							NULLã®æ™‚ãƒ¯ãƒ¼ã‚¯ãªã—(=èƒŒæ™¯æç”»ãªã—)
+ *							ãƒ—ãƒªãƒ³ã‚¿ã¸ã®å‡ºåŠ›ã®æ™‚ã¯å¸¸ã«NULL
+ *	@param	StrW			å‡ºåŠ›æ–‡å­— (wchar_t)
+ *	@param	cells[]			å‡ºåŠ›æ–‡å­—ã®cellæ•°
+ *							1		åŠè§’æ–‡å­—
+ *							0		çµåˆæ–‡å­—, Nonspacing Mark
+ *							2+		å…¨è§’æ–‡å­—, åŠè§’ + Spacing Mark
+ *	@param	len				æ–‡å­—æ•°
  *
- *	—á
+ *	ä¾‹
  *		len=2, L"AB"
  *					0		1		2
  *			StrW	'A'		'B'
  *			cells	1		1
  *
- *		len=2, U+307B U+309A (L'‚Ù' + L'K')
+ *		len=2, U+307B U+309A (L'ã»' + L'ã‚œ')
  *					0		1		2
  *			StrW	U+307B	U+309A
  *			cells	0		2
  *
  *		 len=4
- *					‹g(‚Â‚¿‚æ‚µ)  –ì	 ‰Æ
+ *					å‰(ã¤ã¡ã‚ˆã—)  é‡	 å®¶
  *					0			  1		 2
  *			StrW	0xd842 0xdfb7 0x91ce 0x5bb6
  *			cells	0	   2	  2		 2
@@ -2990,7 +2990,7 @@ void DispStrA(const char *Buff, const char *WidthInfo, int Count, int Y, int* X)
 }
 
 /**
- *	DispStr() ‚Ì wchar_t”Å
+ *	DispStr() ã® wchar_tç‰ˆ
  */
 void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int* X)
 {
@@ -3198,8 +3198,8 @@ void DispUpdateScroll(void)
   if (NewOrgY>BuffEnd-WinHeight-PageStart)
     NewOrgY = BuffEnd-WinHeight-PageStart;
 
-  /* Å‰ºs‚Å‚¾‚¯©“®ƒXƒNƒ[ƒ‹‚·‚éİ’è‚Ìê‡
-     NewOrgY‚ª•Ï‰»‚µ‚Ä‚¢‚È‚­‚Ä‚àƒoƒbƒtƒ@s”‚ª•Ï‰»‚·‚é‚Ì‚ÅXV‚·‚é */
+  /* æœ€ä¸‹è¡Œã§ã ã‘è‡ªå‹•ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã™ã‚‹è¨­å®šã®å ´åˆ
+     NewOrgYãŒå¤‰åŒ–ã—ã¦ã„ãªãã¦ã‚‚ãƒãƒƒãƒ•ã‚¡è¡Œæ•°ãŒå¤‰åŒ–ã™ã‚‹ã®ã§æ›´æ–°ã™ã‚‹ */
   if (ts.AutoScrollOnlyInBottomLine != 0)
   {
     if ((BuffEnd==WinHeight) &&
@@ -3316,8 +3316,8 @@ void DispVScroll(int Func, int Pos)
 //-------------- end of scrolling functions --------
 
 /**
- *	ƒtƒHƒ“ƒg‚ÌCharSet(LOGFONT.charlfCharSet)‚©‚ç
- *	•\¦‚É‘Ã“–‚ÈCodePage‚ğ“¾‚é
+ *	ãƒ•ã‚©ãƒ³ãƒˆã®CharSet(LOGFONT.charlfCharSet)ã‹ã‚‰
+ *	è¡¨ç¤ºã«å¦¥å½“ãªCodePageã‚’å¾—ã‚‹
  */
 static int GetCodePageFromFontCharSet(BYTE char_set)
 {
@@ -3363,7 +3363,7 @@ void DispRestoreWinSize(void)
 }
 
 /**
- *	WM_MOVE ‚ÉƒR[ƒ‹‚³‚ê‚é
+ *	WM_MOVE æ™‚ã«ã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
  */
 void DispSetWinPos(void)
 {
@@ -3385,22 +3385,22 @@ void DispSetWinPos(void)
 
 	if(BGEnable) {
 		if (BGSrc1.enable) {
-			// •Ç†(Windows‚ÌƒfƒXƒNƒgƒbƒv”wŒi)‚ª—LŒø‚È‚Í
-			// ‘S–Ê‘‚«’¼‚µ
+			// å£ç´™(Windowsã®ãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—èƒŒæ™¯)ãŒæœ‰åŠ¹ãªæ™‚ã¯
+			// å…¨é¢æ›¸ãç›´ã—
 			InvalidateRect(HVTWin, NULL, FALSE);
 		}
 	}
 }
 
 /**
- *	ƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚ğˆÚ“®‚·‚é
- *	CSSunSequence()@vtterm.c ‚©‚çŒÄ‚Î‚ê‚é
+ *	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ã‚’ç§»å‹•ã™ã‚‹
+ *	CSSunSequence()@vtterm.c ã‹ã‚‰å‘¼ã°ã‚Œã‚‹
  */
 void DispMoveWindow(int x, int y)
 {
 	SetWindowPos(HVTWin, 0, x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
-	// WM_WINDOWPOSCHANGED ‚ğˆ—‚µ‚È‚¢‚Ì‚Å
-	// WM_MOVE ‚ª”­¶‚µ‚Ä DispSetWinPos() ‚ªƒR[ƒ‹‚³‚ê‚é
+	// WM_WINDOWPOSCHANGED ã‚’å‡¦ç†ã—ãªã„ã®ã§
+	// WM_MOVE ãŒç™ºç”Ÿã—ã¦ DispSetWinPos() ãŒã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
 	// DispSetWinPos();
 	return;
 }
@@ -3411,7 +3411,7 @@ void DispSetActive(BOOL ActiveFlag)
 	if (Active) {
 		if (IsCaretOn()) {
 			CaretKillFocus(FALSE);
-			// ƒAƒNƒeƒBƒu‚Í–³ğŒ‚ÉÄ•`‰æ‚·‚é
+			// ã‚¢ã‚¯ãƒ†ã‚£ãƒ–æ™‚ã¯ç„¡æ¡ä»¶ã«å†æç”»ã™ã‚‹
 			UpdateCaretPosition(TRUE);
 		}
 
@@ -3472,12 +3472,12 @@ void DispSetColor(unsigned int num, COLORREF color)
 	default:
 		if (num <= 255) {
 			if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
-				// 8Fƒ‚[ƒh
+				// 8è‰²ãƒ¢ãƒ¼ãƒ‰
 				int i256 = GetIndex256From16(num);
 				ANSIColor[i256] = color;
 			}
 			else {
-				// 16/256Fƒ‚[ƒh
+				// 16/256è‰²ãƒ¢ãƒ¼ãƒ‰
 				ANSIColor[num] = color;
 			}
 		}
@@ -3558,7 +3558,7 @@ void DispResetColor(unsigned int num)
 	default:
 		if (num <= 15) {
 			if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
-				// 8Fƒ‚[ƒh
+				// 8è‰²ãƒ¢ãƒ¼ãƒ‰
 				int i256 = GetIndex256From16(num);
 				ANSIColor[i256] = ts.ANSIColor[num];
 			}
@@ -3607,12 +3607,12 @@ COLORREF DispGetColor(unsigned int num)
 	default:
 		if (num <= 255) {
 			if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
-				// 8Fƒ‚[ƒh
+				// 8è‰²ãƒ¢ãƒ¼ãƒ‰
 				int i256 = GetIndex256From16(num);
 				color = ANSIColor[i256];
 			}
 			else {
-				// 16/256Fƒ‚[ƒh
+				// 16/256è‰²ãƒ¢ãƒ¼ãƒ‰
 				color = ANSIColor[num];
 			}
 		}
@@ -3676,14 +3676,14 @@ void DispShowWindow(int mode)
 		ShowWindow(HVTWin, SW_RESTORE);
 		break;
 	case WINDOW_RAISE: {
-		//‰½‚à‹N‚«‚È‚¢‚±‚Æ‚ ‚è
+		//ä½•ã‚‚èµ·ããªã„ã“ã¨ã‚ã‚Š
 		//  SetWindowPos(HVTWin, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 //#define RAISE_AND_GET_FORCUS
 #if defined(RAISE_AND_GET_FORCUS)
-		//ƒtƒH[ƒJƒX‚ğ’D‚¤
+		//ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å¥ªã†
 		SetForegroundWindow(HVTWin);
 #else
-		//ƒtƒH[ƒJƒX‚Í’D‚í‚¸Åã–Ê‚É—ˆ‚é
+		//ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã¯å¥ªã‚ãšæœ€ä¸Šé¢ã«æ¥ã‚‹
 		BringWindowToTop(HVTWin);
 		if (GetForegroundWindow() != HVTWin) {
 			FlashWindow(HVTWin, TRUE);
@@ -3877,7 +3877,7 @@ void ThemeSetColor(const TColorTheme *data)
 }
 
 /**
- * ƒfƒtƒHƒ‹ƒg’l‚Å‰Šú‰»‚·‚é
+ * ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã§åˆæœŸåŒ–ã™ã‚‹
  */
 void ThemeGetBGDefault(BGTheme *bg_theme)
 {
@@ -3923,7 +3923,7 @@ static void GetDefaultColor(TColorSetting *tc, const COLORREF *color, int field)
 #endif
 
 /**
- *	ƒfƒtƒHƒ‹ƒgF‚ğƒZƒbƒg‚·‚é
+ *	ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆè‰²ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
  */
 void ThemeGetColorDefaultTS(const TTTSet *pts, TColorTheme *color_theme)
 {
@@ -3955,7 +3955,7 @@ void ThemeGetColorDefaultTS(const TTTSet *pts, TColorTheme *color_theme)
 	}
 
 #if 0
-	// ƒfƒtƒHƒ‹ƒg
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
 	const int ColorFlag = ts.ColorFlag;
 	GetDefaultColor(&(color_theme->vt), ts.VTColor, !FALSE);
 	GetDefaultColor(&(color_theme->bold), ts.VTBoldColor, ColorFlag & CF_BOLDCOLOR);
@@ -3969,7 +3969,7 @@ void ThemeGetColorDefaultTS(const TTTSet *pts, TColorTheme *color_theme)
 }
 
 /**
- *	BGƒe[ƒ}‚ğƒZƒbƒg‚·‚é
+ *	BGãƒ†ãƒ¼ãƒã‚’ã‚»ãƒƒãƒˆã™ã‚‹
  */
 void ThemeSetBG(const BGTheme *bg_theme)
 {
@@ -4034,7 +4034,7 @@ void ThemeGetBG(BGTheme *bg_theme)
 }
 
 /**
- *	ƒfƒtƒHƒ‹ƒg‚ÌF‚ğæ“¾
+ *	ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®è‰²ã‚’å–å¾—
  */
 void ThemeGetColorDefault(TColorTheme *color_theme)
 {

@@ -131,8 +131,8 @@ static void loadExtension(wchar_t const *fileName, const wchar_t *UILanguageFile
 			sub_message = L"unknown";
 			break;
 	}
-	// ����t�@�C���ɂ�郁�b�Z�[�W�̍��ۉ����s���Ă��邪�A���̎��_�ł͐ݒ肪
-	// �܂��ǂݍ��܂�Ă��Ȃ��ׁA���b�Z�[�W���p��̂܂܂ƂȂ�B�v�����B
+	// 言語ファイルによるメッセージの国際化を行っているが、この時点では設定が
+	// まだ読み込まれていない為、メッセージが英語のままとなる。要検討。
 	{
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",

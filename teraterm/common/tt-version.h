@@ -33,8 +33,8 @@
 #define TT_VERSION_PATCH             1
 #define TT_VERSION_SUBSTR            "dev"
 //#undef TT_VERSION_SUBSTR
-// SUBSTR ‚ª•s—v‚ÈŽž‚Í undef ‚·‚é
-//  Žg—p—á "dev", "RC", "RC2"
+// SUBSTR ãŒä¸è¦ãªæ™‚ã¯ undef ã™ã‚‹
+//  ä½¿ç”¨ä¾‹ "dev", "RC", "RC2"
 
 #define TT_TOSTR(x)					TT_TOSTR_HELPER(x)
 #define TT_TOSTR_HELPER(x)			#x
@@ -71,7 +71,7 @@
 #endif
 
 // TT_RES_PRODUCT_VERSION_STR
-//	ƒŠƒ\[ƒXƒtƒ@ƒCƒ‹(rcƒtƒ@ƒCƒ‹) ProductVersion —p
+//	ãƒªã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«(rcãƒ•ã‚¡ã‚¤ãƒ«) ProductVersion ç”¨
 #if defined(TT_VERSION_SUBSTR_HASH)
 #define TT_RES_PRODUCT_VERSION_STR \
 	TT_VERSION_STR(".") " " TT_VERSION_SUBSTR_HASH
@@ -81,7 +81,7 @@
 #endif
 
 // TT_RES_VERSION_STR
-// 	ƒŠƒ\[ƒXƒtƒ@ƒCƒ‹(rcƒtƒ@ƒCƒ‹) FileVersion —p
+// 	ãƒªã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«(rcãƒ•ã‚¡ã‚¤ãƒ«) FileVersion ç”¨
 // 	ex "5, 1, 0, 0"
 #undef TT_RES_VERSION_STR
 #define TT_RES_VERSION_STR	TT_VERSION_STR(", ") ", 0"

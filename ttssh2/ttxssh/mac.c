@@ -165,16 +165,16 @@ const struct ssh2_mac_t *choose_SSH2_mac_algorithm(char *server_proposal, char *
 	return (NULL);
 }
 
-// HMACƒAƒ‹ƒSƒŠƒYƒ€—Dæ‡ˆÊ‚É‰‚¶‚ÄAmyproposal[]‚ğ‘‚«Š·‚¦‚éB
+// HMACã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ å„ªå…ˆé †ä½ã«å¿œã˜ã¦ã€myproposal[]ã‚’æ›¸ãæ›ãˆã‚‹ã€‚
 // (2011.2.28 yutaka)
 void SSH2_update_hmac_myproposal(PTInstVar pvar)
 {
-	static char buf[256]; // TODO: malloc()‚É‚·‚×‚«
+	static char buf[256]; // TODO: malloc()ã«ã™ã¹ã
 	int index;
 	int len, i;
 
-	// ’ÊM’†‚ÉŒÄ‚Î‚ê‚é‚Æ‚¢‚¤‚±‚Æ‚ÍƒL[Äì¬
-	// ƒL[Äì¬‚Ìê‡‚Í‰½‚à‚µ‚È‚¢
+	// é€šä¿¡ä¸­ã«å‘¼ã°ã‚Œã‚‹ã¨ã„ã†ã“ã¨ã¯ã‚­ãƒ¼å†ä½œæˆ
+	// ã‚­ãƒ¼å†ä½œæˆã®å ´åˆã¯ä½•ã‚‚ã—ãªã„
 	if (pvar->socket != INVALID_SOCKET) {
 		return;
 	}
@@ -199,8 +199,8 @@ void SSH2_update_hmac_myproposal(PTInstVar pvar)
  * $OpenBSD: mac.c,v 1.34 2017/05/08 22:57:38 djm Exp $
  */
 
-// ¡‚Ì‚Æ‚±‚ë umac Œn‚ğƒTƒ|[ƒg‚µ‚Ä‚¢‚È‚¢
-// ‚»‚Ì‚½‚ß TTSSH ‚Ì struct Mac ‚ÍAOpenSSH ‚Ì struct sshmac ‚Æˆá‚¢ type ‚ğ‚Á‚Ä‚¢‚È‚¢
+// ä»Šã®ã¨ã“ã‚ umac ç³»ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ãªã„
+// ãã®ãŸã‚ TTSSH ã® struct Mac ã¯ã€OpenSSH ã® struct sshmac ã¨é•ã„ type ã‚’æŒã£ã¦ã„ãªã„
 
 int
 mac_setup_by_alg(struct Mac *mac, const struct ssh2_mac_t *macalg)

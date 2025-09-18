@@ -71,7 +71,7 @@ typedef struct {
 	int TOutVLong;
 	int CANCount;
 	TProtoLog *log;
-	const char *FullName;		// Windows��̃t�@�C���� UTF-8
+	const char *FullName;		// Windows上のファイル名 UTF-8
 	WORD LogState;
 
 	BOOL FileOpen;
@@ -85,9 +85,9 @@ typedef struct {
 	DWORD FileMtime;
 
 	enum {
-		STATE_FLUSH,		// �����J�n���Ɏ�M�f�[�^���̂Ă�
+		STATE_FLUSH,		// 処理開始時に受信データを捨てる
 		STATE_NORMAL,
-		STATE_CANCELED,		// �L�����Z���ʒm���󂯂�
+		STATE_CANCELED,		// キャンセル通知を受けた
 	} state;
 
 } TXVar;
@@ -104,7 +104,7 @@ static int XRead1Byte(PFileVarProto fv, PXVar xv, PComVar cv, LPBYTE b)
 		TProtoLog *log = xv->log;
 
 		if (xv->LogState == 0) {
-			// �c���ASCII�\�����s��
+			// 残りのASCII表示を行う
 			log->DumpFlush(log);
 
 			xv->LogState = 1;
@@ -124,7 +124,7 @@ static int XWrite(PFileVarProto fv, PXVar xv, PComVar cv, const void *_B, size_t
 	if (xv->log != NULL && (i > 0)) {
 		TProtoLog* log = xv->log;
 		if (xv->LogState != 0) {
-			// �c���ASCII�\�����s��
+			// 残りのASCII表示を行う
 			log->DumpFlush(log);
 
 			xv->LogState = 0;
@@ -268,7 +268,7 @@ static BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		size = file->GetFSize(file, xv->FullName);
 		if (size > 0x7FFFFFFF) { // LONG_MAX
 			// TODO
-			//  FileSize �͊e�v���g�R�����ƂɎ��ق����悳����
+			//  FileSize は各プロトコルごとに持つほうがよさそう
 			return FALSE;
 		}
 		xv->FileSize = (LONG)size;
@@ -318,7 +318,7 @@ static BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 
 	switch (xv->XMode) {
 	case IdXSend:
-		// �t�@�C�����M�J�n�O�ɁA"rx �t�@�C����"�������I�ɌĂяo���B(2007.12.20 yutaka)
+		// ファイル送信開始前に、"rx ファイル名"を自動的に呼び出す。(2007.12.20 yutaka)
 		if (ts->XModemRcvCommand[0] != '\0') {
 			TFileIO *file = fv->file;
 			char inistr[MAX_PATH + 10];
@@ -484,32 +484,32 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 
 	c = xv->DataLen;
 	if (xv->TextFlagTrim1A) {
-		// �p�P�b�g���� 0x1A ���폜
+		// パケット末の 0x1A を削除
 		while ((c > 0) && (xv->PktIn[2 + c] == 0x1A))
 			c--;
 	}
 
 	if (xv->TextFlagConvertCRLF) {
-		// �p�P�b�g����CR�̂�LF�݂̂�CR+LF�ɕϊ����Ȃ���t�@�C���֏o��
+		// パケット内のCRのみLFのみをCR+LFに変換しながらファイルへ出力
 		for (i = 0; i <= c - 1; i++) {
 			b = xv->PktIn[3 + i];
 			if ((b == LF) && (!xv->CRRecv)) {
-				// LF(0x0A)��M && �O�̃f�[�^��CR(0x0D)�ł͂Ȃ�
-				// CR(0x0D)�o��
-				//  �� (CR�ȊO)+(LF) �́A(CR�ȊO)+(CR)+(LF)�ŏo�͂����
+				// LF(0x0A)受信 && 前のデータがCR(0x0D)ではない
+				// CR(0x0D)出力
+				//  → (CR以外)+(LF) は、(CR以外)+(CR)+(LF)で出力される
 				file->WriteFile(file, "\015", 1);
 			}
 			if (xv->CRRecv && (b != LF)) {
-				// LF(0x0A)�ȊO��M && �O�̃f�[�^��CR(0xOD)
-				// LF(0x0A)�o��
-				//  �� (CR)+(LF�ȊO)�́A(CR)+(LF)+(LF�ȊO)�ŏo�͂����
+				// LF(0x0A)以外受信 && 前のデータがCR(0xOD)
+				// LF(0x0A)出力
+				//  → (CR)+(LF以外)は、(CR)+(LF)+(LF以外)で出力される
 				file->WriteFile(file, "\012", 1);
 			}
 			xv->CRRecv = b == CR;
 			file->WriteFile(file, &b, 1);
 		}
 	} else {
-		// ���̂܂܃t�@�C���֏o��
+		// そのままファイルへ出力
 		file->WriteFile(file, &(xv->PktIn[3]), c);
 	}
 
@@ -531,14 +531,14 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 	int i;
 	BOOL SendFlag;
 	WORD Check;
-	BOOL is0x43Received = FALSE;//��M������'C'(0x43)���܂܂�Ă��邩�̃t���O
+	BOOL is0x43Received = FALSE;//受信文字に'C'(0x43)が含まれているかのフラグ
 
 	SendFlag = FALSE;
 	if (xv->PktBufCount == 0) {
 		for(;;){
 			i = XRead1Byte(fv, xv, cv, &b);
 			if (i == 0)
-				break; //��s���Ď�M�����������S�Ė����Ȃ�܂ŌJ��Ԃ�(CAN CAN�̂ݑ����L�����Z��)
+				break; //先行して受信した文字が全て無くなるまで繰り返す(CAN CANのみ即時キャンセル)
 
 			switch (b) {
 			case ACK:
@@ -554,7 +554,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 				break;
 			case NAK:
 				if ((xv->PktNum == 0) && (xv->PktNumOffset == 0) && (xv->PktNumSent == 0)) {
-					if (!is0x43Received) { //���CRC�v��'C'(0x43)���󂯕t���Ă����ꍇ��CRC���[�h���ێ��B(CRC�ő����Ď󂯕t���Ȃ������ꍇ��NAK�𑗂��Ă���͂��Ȃ̂�CheckSum�ł̍đ��ɐ؂�ւ��)
+					if (!is0x43Received) { //先にCRC要求'C'(0x43)を受け付けていた場合はCRCモードを維持。(CRCで送って受け付けなかった場合はNAKを送ってくるはずなのでCheckSumでの再送に切り替わる)
 						if (xv->XOpt == XoptCRC) {
 							// receiver wants to use checksum.
 							XSetOpt(fv, xv, XoptCheck);
@@ -577,7 +577,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 				}
 				break;
 			case 0x43:
-				// 0x43 = 'C' crc���[�h��v�����Ă���
+				// 0x43 = 'C' crcモードを要求している
 				if ((xv->PktNum == 0) && (xv->PktNumOffset == 0) && (xv->PktNumSent == 0)) {
 					if (xv->XOpt == XoptCheck) {
 						XSetOpt(fv, xv, XoptCRC);
@@ -586,7 +586,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 						XSetOpt(fv, xv, Xopt1kCRC);
 					}
 					SendFlag = TRUE;
-					is0x43Received = TRUE;//CRC�ŗv����������
+					is0x43Received = TRUE;//CRCで要求があった
 				}
 				break;
 			}
@@ -594,7 +594,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 		}
 
 		if (!SendFlag){
-			return TRUE; //���M������̂��Ȃ��Ȃ珈���𔲂���
+			return TRUE; //送信するものがないなら処理を抜ける
 		}
 
 
@@ -686,9 +686,9 @@ static BOOL XParse(PFileVarProto fv, PComVar cv)
 	PXVar xv = fv->data;
 	switch (xv->state) {
 	case STATE_FLUSH:
-		// ��M�f�[�^���̂Ă�
+		// 受信データを捨てる
 		XFlushReceiveBuf(fv, xv, cv);
-		xv->state = STATE_NORMAL;	// ����M�������s��
+		xv->state = STATE_NORMAL;	// 送受信処理を行う
 		return TRUE;
 	case STATE_NORMAL:
 		switch (xv->XMode) {

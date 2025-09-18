@@ -43,7 +43,7 @@
 
 #include "keyboard_pp.h"
 
-// ƒeƒ“ƒvƒŒ[ƒg‚Ì‘‚«Š·‚¦‚ğs‚¤
+// ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®æ›¸ãæ›ãˆã‚’è¡Œã†
 #define REWRITE_TEMPLATE
 
 static const char *RussList2[] = {"Windows","KOI8-R",NULL};
@@ -100,8 +100,8 @@ static INT_PTR CALLBACK proc(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 
 			SetDropDownList(Dialog, IDC_KEYBKEYB, RussList2, ts->RussKeyb);
 			if (IsWindowUnicode(Dialog) != TRUE || GetACP() != 1251) {
-				// ”ñUnicode(ANSI)“®ì && CP1251(Russian)‚Ì‚Æ‚«A
-				// ‚±‚ÌƒIƒvƒVƒ‡ƒ“‚Íg—p‰Â”\‚Æ‚È‚é
+				// éUnicode(ANSI)å‹•ä½œ && CP1251(Russian)ã®ã¨ãã€
+				// ã“ã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã¯ä½¿ç”¨å¯èƒ½ã¨ãªã‚‹
 				EnableWindow(GetDlgItem(Dialog, IDC_KEYBKEYBTEXT), FALSE);
 				EnableWindow(GetDlgItem(Dialog, IDC_KEYBKEYB), FALSE);
 			}

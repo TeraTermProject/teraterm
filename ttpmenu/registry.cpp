@@ -27,7 +27,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-//•Û‘¶æ‚Éiniƒtƒ@ƒCƒ‹‚ğg—p‚µ‚½‚¢ê‡‚ÍA0ƒoƒCƒg‚Ìƒtƒ@ƒCƒ‹‚Å‚æ‚¢‚Ì‚Åttpmenu.exe‚Æ“¯‚¶ƒtƒHƒ‹ƒ_‚Éttpmenu.ini‚ğ—pˆÓ‚·‚é
+//ä¿å­˜å…ˆã«iniãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½¿ç”¨ã—ãŸã„å ´åˆã¯ã€0ãƒã‚¤ãƒˆã®ãƒ•ã‚¡ã‚¤ãƒ«ã§ã‚ˆã„ã®ã§ttpmenu.exeã¨åŒã˜ãƒ•ã‚©ãƒ«ãƒ€ã«ttpmenu.iniã‚’ç”¨æ„ã™ã‚‹
 #define		STRICT
 #include	"registry.h"
 #include	<stdio.h>
@@ -43,10 +43,10 @@
 
 #define ENABLE_CONVERT_EXE_INI 1
 
-static BOOL bUseINI = FALSE;					// •Û‘¶æ(TRUE=INI, FALSE=ƒŒƒWƒXƒgƒŠ)
-static wchar_t szSectionName[MAX_PATH];			// INI‚ÌƒZƒNƒVƒ‡ƒ“–¼
-static wchar_t szSectionNames[1024*10]={0};		// INI‚ÌƒZƒNƒVƒ‡ƒ“–¼ˆê——
-static wchar_t *szApplicationName;				// INIƒtƒ@ƒCƒ‹‚Ìƒtƒ‹ƒpƒX
+static BOOL bUseINI = FALSE;					// ä¿å­˜å…ˆ(TRUE=INI, FALSE=ãƒ¬ã‚¸ã‚¹ãƒˆãƒª)
+static wchar_t szSectionName[MAX_PATH];			// INIã®ã‚»ã‚¯ã‚·ãƒ§ãƒ³å
+static wchar_t szSectionNames[1024*10]={0};		// INIã®ã‚»ã‚¯ã‚·ãƒ§ãƒ³åä¸€è¦§
+static wchar_t *szApplicationName;				// INIãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ãƒ«ãƒ‘ã‚¹
 
 static BOOL getSection(const wchar_t *str)
 {
@@ -62,7 +62,7 @@ static BOOL getSection(const wchar_t *str)
 }
 
 /**
- *	INIƒtƒ@ƒCƒ‹‚Ìƒtƒ‹ƒpƒXæ“¾
+ *	INIãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ãƒ«ãƒ‘ã‚¹å–å¾—
  */
 static const wchar_t *getModuleName()
 {
@@ -71,24 +71,24 @@ static const wchar_t *getModuleName()
 }
 
 /**
- *	exe‚Æ“¯‚¶ƒpƒX‚É‚ ‚éiniƒtƒ@ƒCƒ‹‚ğ
- *	%APPDATA%\teraterm5\ttpmenu.ini ‚ÉƒRƒs[‚·‚é
+ *	exeã¨åŒã˜ãƒ‘ã‚¹ã«ã‚ã‚‹iniãƒ•ã‚¡ã‚¤ãƒ«ã‚’
+ *	%APPDATA%\teraterm5\ttpmenu.ini ã«ã‚³ãƒ”ãƒ¼ã™ã‚‹
  */
 #if ENABLE_CONVERT_EXE_INI
 static void CopyIniFile(const wchar_t *ini)
 {
-	// exeƒtƒHƒ‹ƒ_‚Ìiniƒtƒ@ƒCƒ‹
+	// exeãƒ•ã‚©ãƒ«ãƒ€ã®iniãƒ•ã‚¡ã‚¤ãƒ«
 	wchar_t *exe_ini;
 	wchar_t *exe_dir = GetExeDirW(NULL);
 	aswprintf(&exe_ini, L"%s\\ttpmenu.ini", exe_dir);
 	free(exe_dir);
 	if (::GetFileAttributesW(exe_ini) == INVALID_FILE_ATTRIBUTES) {
-		// ‘¶İ‚µ‚È‚¢‚Ì‚Å‰½‚à‚µ‚È‚¢
+		// å­˜åœ¨ã—ãªã„ã®ã§ä½•ã‚‚ã—ãªã„
 		free(exe_ini);
 		return;
 	}
 
-	// UTF-16 ‚Å‘‚«o‚·
+	// UTF-16 ã§æ›¸ãå‡ºã™
 	size_t content_len = 0;
 	wchar_t *exe_ini_content = LoadFileWW(exe_ini, &content_len);
 	if (exe_ini_content != NULL) {
@@ -108,28 +108,28 @@ static void CopyIniFile(const wchar_t *ini)
 
 void RegInit()
 {
-	// ’Êí			%APPDATA%\teraterm5\ttpmenu.ini
-	// ƒ|[ƒ^ƒuƒ‹	exeƒtƒHƒ‹ƒ_‚Ì\ttpmenu.ini
+	// é€šå¸¸			%APPDATA%\teraterm5\ttpmenu.ini
+	// ãƒãƒ¼ã‚¿ãƒ–ãƒ«	exeãƒ•ã‚©ãƒ«ãƒ€ã®\ttpmenu.ini
 	wchar_t *ini;
 	wchar_t *home_dir = GetHomeDirW(NULL);
 	aswprintf(&ini, L"%s\\ttpmenu.ini", home_dir);
 	free(home_dir);
 
 #if ENABLE_CONVERT_EXE_INI
-	// ƒ|[ƒ^ƒuƒ‹”Å?
+	// ãƒãƒ¼ã‚¿ãƒ–ãƒ«ç‰ˆ?
 	if (!IsPortableMode()) {
-		// %APPDATA%\teraterm5\ttpmenu.ini ‚ª‘¶İ‚·‚é?
+		// %APPDATA%\teraterm5\ttpmenu.ini ãŒå­˜åœ¨ã™ã‚‹?
 		if (::GetFileAttributesW(ini) == INVALID_FILE_ATTRIBUTES) {
-			// iniƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢‚È‚ç
-			// exe‚Æ“¯‚¶ƒtƒHƒ‹ƒ_‚Ìiniƒtƒ@ƒCƒ‹‚ğƒRƒs[‚·‚é
+			// iniãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãªã„ãªã‚‰
+			// exeã¨åŒã˜ãƒ•ã‚©ãƒ«ãƒ€ã®iniãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 			CopyIniFile(ini);
 		}
 	}
 #endif
 
-	// iniƒtƒ@ƒCƒ‹‘¶İ‚·‚é?
+	// iniãƒ•ã‚¡ã‚¤ãƒ«å­˜åœ¨ã™ã‚‹?
 	if (::GetFileAttributesW(ini) != INVALID_FILE_ATTRIBUTES) {
-		// ƒtƒ@ƒCƒ‹ƒTƒCƒY‚ª0‚Ì‚Æ‚« UTF16 LE BOM ‚ğ‘‚«‚Ş
+		// ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºãŒ0ã®ã¨ã UTF16 LE BOM ã‚’æ›¸ãè¾¼ã‚€
 		if (GetFSize64W(ini) == 0) {
 			FILE *fp;
 			_wfopen_s(&fp, ini, L"wb");
@@ -139,13 +139,13 @@ void RegInit()
 			}
 		}
 
-		// ttpmenu.ini‚ğg—p‚·‚é
+		// ttpmenu.iniã‚’ä½¿ç”¨ã™ã‚‹
 		szApplicationName = ini;
 		bUseINI = TRUE;
 		return;
 	}
 
-	// ƒŒƒWƒXƒgƒŠ‚ğg—p‚·‚é
+	// ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚’ä½¿ç”¨ã™ã‚‹
 	free(ini);
 	szApplicationName = NULL;
 	bUseINI = FALSE;
@@ -158,11 +158,11 @@ void RegExit()
 }
 
 /**
- *	İ’è‚Ìó‹µ
+ *	è¨­å®šã®çŠ¶æ³
  *
- *	@param[out]	use_ini		TRUE/FALSE = iniƒtƒ@ƒCƒ‹/ registry ‚ğg—p‚µ‚Ä‚¢‚é
- *	@param[out]	inifile		iniƒtƒ@ƒCƒ‹–¼, registry‚Ìê‡‚Í NULL
- *							•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
+ *	@param[out]	use_ini		TRUE/FALSE = iniãƒ•ã‚¡ã‚¤ãƒ«/ registry ã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹
+ *	@param[out]	inifile		iniãƒ•ã‚¡ã‚¤ãƒ«å, registryã®å ´åˆã¯ NULL
+ *							ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
  *
  */
 void RegGetStatus(BOOL *use_ini, wchar_t **inifile)
@@ -178,12 +178,12 @@ void RegGetStatus(BOOL *use_ini, wchar_t **inifile)
 
 /* ==========================================================================
 	Function Name	: (HKEY) RegCreate()
-	Outline			: w’è‚µ‚½ƒŒƒWƒXƒgƒŠƒL[‚ğì¬i‚Ü‚½‚ÍƒI[ƒvƒ“j‚·‚é
-	Arguments		: HKEY		hCurrentKey		(in)	Œ»İ‚ÌƒI[ƒvƒ“ƒL[
-					: const wchar_t *lpszKeyName		(in)	ƒI[ƒvƒ“‚·‚éƒTƒuƒL[‚Ì
-					: 									–¼‘O
-	Return Value	: ¬Œ÷	ƒI[ƒvƒ“‚Ü‚½‚Íì¬‚³‚ê‚½ƒL[‚Ìƒnƒ“ƒhƒ‹
-					: ¸”s	NULL
+	Outline			: æŒ‡å®šã—ãŸãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã‚’ä½œæˆï¼ˆã¾ãŸã¯ã‚ªãƒ¼ãƒ—ãƒ³ï¼‰ã™ã‚‹
+	Arguments		: HKEY		hCurrentKey		(in)	ç¾åœ¨ã®ã‚ªãƒ¼ãƒ—ãƒ³ã‚­ãƒ¼
+					: const wchar_t *lpszKeyName		(in)	ã‚ªãƒ¼ãƒ—ãƒ³ã™ã‚‹ã‚µãƒ–ã‚­ãƒ¼ã®
+					: 									åå‰
+	Return Value	: æˆåŠŸ	ã‚ªãƒ¼ãƒ—ãƒ³ã¾ãŸã¯ä½œæˆã•ã‚ŒãŸã‚­ãƒ¼ã®ãƒãƒ³ãƒ‰ãƒ«
+					: å¤±æ•—	NULL
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -220,12 +220,12 @@ HKEY RegCreate(HKEY hCurrentKey, const wchar_t *lpszKeyName)
 
 /* ==========================================================================
 	Function Name	: (HKEY) RegOpen()
-	Outline			: w’è‚µ‚½ƒŒƒWƒXƒgƒŠƒL[‚ğƒI[ƒvƒ“‚·‚é
-	Arguments		: HKEY		hCurrentKey		(in)	Œ»İ‚ÌƒI[ƒvƒ“ƒL[
-					: const wchar_t *lpszKeyName		(in)	ƒI[ƒvƒ“‚·‚éƒTƒuƒL[‚Ì
-					: 									–¼‘O
-	Return Value	: ¬Œ÷	ƒI[ƒvƒ“‚Ü‚½‚Íì¬‚³‚ê‚½ƒL[‚Ìƒnƒ“ƒhƒ‹
-					: ¸”s	NULL
+	Outline			: æŒ‡å®šã—ãŸãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã‚’ã‚ªãƒ¼ãƒ—ãƒ³ã™ã‚‹
+	Arguments		: HKEY		hCurrentKey		(in)	ç¾åœ¨ã®ã‚ªãƒ¼ãƒ—ãƒ³ã‚­ãƒ¼
+					: const wchar_t *lpszKeyName		(in)	ã‚ªãƒ¼ãƒ—ãƒ³ã™ã‚‹ã‚µãƒ–ã‚­ãƒ¼ã®
+					: 									åå‰
+	Return Value	: æˆåŠŸ	ã‚ªãƒ¼ãƒ—ãƒ³ã¾ãŸã¯ä½œæˆã•ã‚ŒãŸã‚­ãƒ¼ã®ãƒãƒ³ãƒ‰ãƒ«
+					: å¤±æ•—	NULL
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -257,10 +257,10 @@ HKEY RegOpen(HKEY hCurrentKey, const wchar_t *lpszKeyName)
 
 /* ==========================================================================
 	Function Name	: (BOOL) RegClose()
-	Outline			: w’è‚µ‚½ƒŒƒWƒXƒgƒŠƒL[‚ğƒNƒ[ƒY‚·‚é
-	Arguments		: HKEY		hKey			(in)	ƒNƒ[ƒY‚·‚éƒL[‚Ìƒnƒ“ƒhƒ‹
-	Return Value	: ¬Œ÷	TRUE
-					: ¸”s	FALSE
+	Outline			: æŒ‡å®šã—ãŸãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã‚’ã‚¯ãƒ­ãƒ¼ã‚ºã™ã‚‹
+	Arguments		: HKEY		hKey			(in)	ã‚¯ãƒ­ãƒ¼ã‚ºã™ã‚‹ã‚­ãƒ¼ã®ãƒãƒ³ãƒ‰ãƒ«
+	Return Value	: æˆåŠŸ	TRUE
+					: å¤±æ•—	FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -286,12 +286,12 @@ BOOL RegClose(HKEY hKey)
 
 /* ==========================================================================
 	Function Name	: (BOOL) RegSetStr()
-	Outline			: ƒŒƒWƒXƒgƒŠƒL[‚Ì’l‚É•¶š—ñ‚ğ‘‚«‚Ş
-	Arguments		: HKEY		hKey			(in)	’l‚ğİ’è‚·‚éƒL[‚Ìƒnƒ“ƒhƒ‹
-					: const wchar_t *lpszValueName	(in)	İ’è‚·‚é’l
-					: const wchar_t *buf			(in)	’lƒf[ƒ^
-	Return Value	: ¬Œ÷	TRUE
-					: ¸”s	FALSE
+	Outline			: ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã®å€¤ã«æ–‡å­—åˆ—ã‚’æ›¸ãè¾¼ã‚€
+	Arguments		: HKEY		hKey			(in)	å€¤ã‚’è¨­å®šã™ã‚‹ã‚­ãƒ¼ã®ãƒãƒ³ãƒ‰ãƒ«
+					: const wchar_t *lpszValueName	(in)	è¨­å®šã™ã‚‹å€¤
+					: const wchar_t *buf			(in)	å€¤ãƒ‡ãƒ¼ã‚¿
+	Return Value	: æˆåŠŸ	TRUE
+					: å¤±æ•—	FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -322,15 +322,15 @@ BOOL RegSetStr(HKEY hKey, const wchar_t *lpszValueName, const wchar_t *buf)
 
 /* ==========================================================================
 	Function Name	: (BOOL) RegGetStr()
-	Outline			: ƒŒƒWƒXƒgƒŠƒL[‚Ì’l‚©‚ç•¶š—ñ‚ğ“Ç‚İ‚Ş
-	Arguments		: HKEY		hKey			(in)		’l‚ğİ’è‚·‚éƒL[‚Ì
-					: 										ƒnƒ“ƒhƒ‹
-					: const wchar_t *	lpszValueName	(in)		İ’è‚·‚é’l
-					: wchar_t	*buf			(out)		’lƒf[ƒ^‚ğŠi”[‚·‚é
-					: 										ƒoƒbƒtƒ@
-					: DWORD		dwSize			(in/out)	•¶š”
-	Return Value	: ¬Œ÷	TRUE
-					: ¸”s	FALSE
+	Outline			: ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã®å€¤ã‹ã‚‰æ–‡å­—åˆ—ã‚’èª­ã¿è¾¼ã‚€
+	Arguments		: HKEY		hKey			(in)		å€¤ã‚’è¨­å®šã™ã‚‹ã‚­ãƒ¼ã®
+					: 										ãƒãƒ³ãƒ‰ãƒ«
+					: const wchar_t *	lpszValueName	(in)		è¨­å®šã™ã‚‹å€¤
+					: wchar_t	*buf			(out)		å€¤ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹
+					: 										ãƒãƒƒãƒ•ã‚¡
+					: DWORD		dwSize			(in/out)	æ–‡å­—æ•°
+	Return Value	: æˆåŠŸ	TRUE
+					: å¤±æ•—	FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -362,12 +362,12 @@ BOOL RegGetStr(HKEY hKey, const wchar_t *lpszValueName, wchar_t *buf, DWORD dwSi
 
 /* ==========================================================================
 	Function Name	: (BOOL) RegSetDword()
-	Outline			: ƒŒƒWƒXƒgƒŠƒL[‚Ì’l‚É DWORD‚ğ‘‚«‚Ş
-	Arguments		: HKEY		hKey			(in)	’l‚ğİ’è‚·‚éƒL[‚Ìƒnƒ“ƒhƒ‹
-					: const wchar_t *lpszValueName	(in)	İ’è‚·‚é’l
-					: DWORD		dwValue			(in)	’lƒf[ƒ^
-	Return Value	: ¬Œ÷	TRUE
-					: ¸”s	FALSE
+	Outline			: ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã®å€¤ã« DWORDã‚’æ›¸ãè¾¼ã‚€
+	Arguments		: HKEY		hKey			(in)	å€¤ã‚’è¨­å®šã™ã‚‹ã‚­ãƒ¼ã®ãƒãƒ³ãƒ‰ãƒ«
+					: const wchar_t *lpszValueName	(in)	è¨­å®šã™ã‚‹å€¤
+					: DWORD		dwValue			(in)	å€¤ãƒ‡ãƒ¼ã‚¿
+	Return Value	: æˆåŠŸ	TRUE
+					: å¤±æ•—	FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -400,12 +400,12 @@ BOOL RegSetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD dwValue)
 
 /* ==========================================================================
 	Function Name	: (BOOL) RegGetDword()
-	Outline			: ƒŒƒWƒXƒgƒŠƒL[‚Ì’l‚©‚ç DWORD‚ğ“Ç‚İ‚Ş
-	Arguments		: HKEY		hKey			(in)	’l‚ğİ’è‚·‚éƒL[‚Ìƒnƒ“ƒhƒ‹
-					: const wchar_t *lpszValueName	(in)	İ’è‚·‚é’l
-					: DWORD		*dwValue		(out)	’lƒf[ƒ^
-	Return Value	: ¬Œ÷	TRUE
-					: ¸”s	FALSE
+	Outline			: ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã®å€¤ã‹ã‚‰ DWORDã‚’èª­ã¿è¾¼ã‚€
+	Arguments		: HKEY		hKey			(in)	å€¤ã‚’è¨­å®šã™ã‚‹ã‚­ãƒ¼ã®ãƒãƒ³ãƒ‰ãƒ«
+					: const wchar_t *lpszValueName	(in)	è¨­å®šã™ã‚‹å€¤
+					: DWORD		*dwValue		(out)	å€¤ãƒ‡ãƒ¼ã‚¿
+	Return Value	: æˆåŠŸ	TRUE
+					: å¤±æ•—	FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -417,7 +417,7 @@ BOOL RegGetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD *dwValue)
 	int defmark = 0xdeadbeef;
 
 	if(bUseINI){
-		// “Ç‚İ‚İ‚É¸”s‚µ‚½ê‡‚Í false ‚ğ•Ô‚· (2007.11.14 yutaka)
+		// èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ãŸå ´åˆã¯ false ã‚’è¿”ã™ (2007.11.14 yutaka)
 		*dwValue = GetPrivateProfileIntW(szSectionName, lpszValueName, defmark, getModuleName());
 		if (*dwValue == defmark) {
 			*dwValue = 0;
@@ -447,12 +447,12 @@ BOOL RegGetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD *dwValue)
 
 /* ==========================================================================
 	Function Name	: (BOOL) RegSetBinary()
-	Outline			: ƒŒƒWƒXƒgƒŠƒL[‚Ì’l‚©‚ç BINARY‚ğ‘‚«‚Ş
-	Arguments		: HKEY		hKey			(in)	’l‚ğİ’è‚·‚éƒL[‚Ìƒnƒ“ƒhƒ‹
-					: const wchar_t *lpszValueName	(in)	İ’è‚·‚é’l
-					: void		*buf			(out)	’lƒf[ƒ^
-	Return Value	: ¬Œ÷	TRUE
-					: ¸”s	FALSE
+	Outline			: ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã®å€¤ã‹ã‚‰ BINARYã‚’æ›¸ãè¾¼ã‚€
+	Arguments		: HKEY		hKey			(in)	å€¤ã‚’è¨­å®šã™ã‚‹ã‚­ãƒ¼ã®ãƒãƒ³ãƒ‰ãƒ«
+					: const wchar_t *lpszValueName	(in)	è¨­å®šã™ã‚‹å€¤
+					: void		*buf			(out)	å€¤ãƒ‡ãƒ¼ã‚¿
+	Return Value	: æˆåŠŸ	TRUE
+					: å¤±æ•—	FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 
@@ -497,13 +497,13 @@ BOOL RegSetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, DWORD dwSi
 
 /* ==========================================================================
 	Function Name	: (BOOL) RegGetBinary()
-	Outline			: ƒŒƒWƒXƒgƒŠƒL[‚Ì’l‚©‚ç BINARY‚ğ“Ç‚İ‚Ş
-	Arguments		: HKEY		hKey			(in)	’l‚ğİ’è‚·‚éƒL[‚Ìƒnƒ“ƒhƒ‹
-					: const wchar_t *lpszValueName	(in)	İ’è‚·‚é’l
-					: int		*buf			(out)	’lƒf[ƒ^
-					: LPDWORD lpdwSize			(in,out)	ƒoƒbƒtƒ@ƒTƒCƒY,“Ç‚İ‚İƒTƒCƒY
-	Return Value	: ¬Œ÷	TRUE
-					: ¸”s	FALSE
+	Outline			: ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã®å€¤ã‹ã‚‰ BINARYã‚’èª­ã¿è¾¼ã‚€
+	Arguments		: HKEY		hKey			(in)	å€¤ã‚’è¨­å®šã™ã‚‹ã‚­ãƒ¼ã®ãƒãƒ³ãƒ‰ãƒ«
+					: const wchar_t *lpszValueName	(in)	è¨­å®šã™ã‚‹å€¤
+					: int		*buf			(out)	å€¤ãƒ‡ãƒ¼ã‚¿
+					: LPDWORD lpdwSize			(in,out)	ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º,èª­ã¿è¾¼ã¿ã‚µã‚¤ã‚º
+	Return Value	: æˆåŠŸ	TRUE
+					: å¤±æ•—	FALSE
 	Reference		: 
 	Renewal			: 
 	Notes			: 

@@ -72,7 +72,7 @@ typedef struct {
 	BOOL CtlEsc;
 	BYTE Q[8];
 	TProtoLog *log;
-	const char *FullName;		// Windows��̃t�@�C���� UTF-8
+	const char *FullName;		// Windows上のファイル名 UTF-8
 	WORD LogState;
 
 	BOOL FileOpen;
@@ -127,7 +127,7 @@ static BOOL BPOpenFileToBeSent(PFileVarProto fv)
   return bv->FileOpen;
 }
 
-// �ʐM���Ɏ�M/���M���؂�ւ��?
+// 通信中に受信/送信が切り替わる?
 static void BPDispMode(PFileVarProto fv, PBPVar bv)
 {
 	switch (bv->BPMode) {
@@ -712,9 +712,9 @@ static void BPParseTPacket(PFileVarProto fv, PBPVar bv)
 	  free((void *)bv->FullName);
 	  bv->FullName = NULL;
 
-	  // �_�C�A���O���J���ăt�@�C���������[�U�[�Ɏw�肵�Ă��炤
-	  // ���̈ʒu�ōs���͓̂K�؂łȂ��Ǝv���邽��
-	  // [cancel]���������Ƃ��Ɠ��l�̓���Ƃ���
+	  // ダイアログを開いてファイル名をユーザーに指定してもらう
+	  // この位置で行うのは適切でないと思われるため
+	  // [cancel]を押したときと同様の動作とした
 	  //if (! GetTransFname(fv, NULL, GTF_BP, (PLONG)&i))
 	  if (FALSE)
 	  {

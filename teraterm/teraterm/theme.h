@@ -51,18 +51,18 @@ typedef struct {
 	BG_PATTERN pattern;
 	BOOL enable;
 	BOOL antiAlias;
-	COLORREF color;		// type=BG_PICTURE, BG_WALLPAPERA‰æ‘œ‚Ì‚È‚¢•”•ª“h‚è‚Â‚Ô‚µF
+	COLORREF color;		// type=BG_PICTURE, BG_WALLPAPERæ™‚ã€ç”»åƒã®ãªã„éƒ¨åˆ†å¡—ã‚Šã¤ã¶ã—è‰²
 	int alpha;
 	wchar_t file[MAX_PATH];
 } TBGSrc;
 
 typedef struct _BGTheme {
-	TBGSrc BGDest;				// ”wŒi‰æ‘œ
-	TBGSrc BGSrc1;				// •Ç†(Windows‚ÌƒfƒXƒNƒgƒbƒv”wŒi)
+	TBGSrc BGDest;				// èƒŒæ™¯ç”»åƒ
+	TBGSrc BGSrc1;				// å£ç´™(Windowsã®ãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—èƒŒæ™¯)
 	TBGSrc BGSrc2;				// fill color
-	BYTE TextBackAlpha;			// ’Êí‘®«(SGR0),back•”•ª‚ÌAlpha
-	BYTE BGReverseTextAlpha;	// ”½“]‘®«(SGR7),back•”•ª‚ÌAlpha
-	BYTE BackAlpha;				// ‚»‚Ì‘¼‚Ìback•”•ª‚ÌAlpha
+	BYTE TextBackAlpha;			// é€šå¸¸å±æ€§(SGR0),backéƒ¨åˆ†ã®Alpha
+	BYTE BGReverseTextAlpha;	// åè»¢å±æ€§(SGR7),backéƒ¨åˆ†ã®Alpha
+	BYTE BackAlpha;				// ãã®ä»–ã®backéƒ¨åˆ†ã®Alpha
 } BGTheme;
 
 ////////////////////
@@ -72,17 +72,17 @@ typedef struct _BGTheme {
 // Character Attributes
 //	Normal(SGR 0), BOLD(SGR 1),...
 typedef struct {
-	BOOL change;		// TRUE/FALSE = defaultF‚©‚ç•ÏX‚·‚é/•ÏX‚µ‚È‚¢
-	BOOL enable;		// TRUE/FALSE = ‚±‚Ì•¶š‘®«(Bold attribute“™)‚Ì“Æ©F‚ğ—LŒø/–³Œø‚É‚·‚é
-	COLORREF fg;		// Fore color (•¶š‘®«‚Ì“Æ©F‚ª—LŒø‚Èê‡)
-	COLORREF bg;		// Back color (•¶š‘®«‚Ì“Æ©F‚ª—LŒø‚Èê‡)
+	BOOL change;		// TRUE/FALSE = defaultè‰²ã‹ã‚‰å¤‰æ›´ã™ã‚‹/å¤‰æ›´ã—ãªã„
+	BOOL enable;		// TRUE/FALSE = ã“ã®æ–‡å­—å±æ€§(Bold attributeç­‰)ã®ç‹¬è‡ªè‰²ã‚’æœ‰åŠ¹/ç„¡åŠ¹ã«ã™ã‚‹
+	COLORREF fg;		// Fore color (æ–‡å­—å±æ€§ã®ç‹¬è‡ªè‰²ãŒæœ‰åŠ¹ãªå ´åˆ)
+	COLORREF bg;		// Back color (æ–‡å­—å±æ€§ã®ç‹¬è‡ªè‰²ãŒæœ‰åŠ¹ãªå ´åˆ)
 } TColorSetting;
 
 // ANSI Color
 typedef struct {
-	BOOL change;			// TRUE/FALSE =  defaultF‚©‚ç•ÏX‚·‚é/•ÏX‚µ‚È‚¢
-	//BOOL enable;			// •s—v‚©?
-	COLORREF color[16];		// ANSI color 256F ‚ÌÅ‰‚Ì16F, (‘O”¼‚ªˆÃ‚¢F,Œã”¼‚ªŒ´F‚Ì–¾‚é‚¢F)
+	BOOL change;			// TRUE/FALSE =  defaultè‰²ã‹ã‚‰å¤‰æ›´ã™ã‚‹/å¤‰æ›´ã—ãªã„
+	//BOOL enable;			// ä¸è¦ã‹?
+	COLORREF color[16];		// ANSI color 256è‰² ã®æœ€åˆã®16è‰², (å‰åŠãŒæš—ã„è‰²,å¾ŒåŠãŒåŸè‰²ã®æ˜ã‚‹ã„è‰²)
 } TAnsiColorSetting;
 
 // color theme

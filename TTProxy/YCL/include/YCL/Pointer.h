@@ -11,77 +11,77 @@
 
 namespace yebisuya {
     
-// ƒ|ƒCƒ“ƒ^‚ğƒ‰ƒbƒv‚·‚é‚½‚ß‚ÌƒNƒ‰ƒXB
+// ãƒã‚¤ãƒ³ã‚¿ã‚’ãƒ©ãƒƒãƒ—ã™ã‚‹ãŸã‚ã®ã‚¯ãƒ©ã‚¹ã€‚
 template<class TYPE, class REFCTRL = Object >
 class Pointer {
 private:
-    // Ši”[‚·‚éƒ|ƒCƒ“ƒ^
+    // æ ¼ç´ã™ã‚‹ãƒã‚¤ãƒ³ã‚¿
     TYPE* value;
 protected:
-    // ƒ|ƒCƒ“ƒ^‚ğ’u‚«Š·‚¦‚é
+    // ãƒã‚¤ãƒ³ã‚¿ã‚’ç½®ãæ›ãˆã‚‹
     void set(TYPE* ptr) {
 	value = (TYPE*) REFCTRL::set(value, ptr);
     }
 public:
-    // ƒfƒtƒHƒ‹ƒgƒRƒ“ƒXƒgƒ‰ƒNƒ^
+    // ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
     Pointer():value(NULL) {
     }
-    // ‰Šú’l•t‚«ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+    // åˆæœŸå€¤ä»˜ãã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
     Pointer(TYPE* ptr):value(NULL) {
 	set(ptr);
     }
-    // ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+    // ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
     Pointer(const Pointer& ptr):value(NULL) {
 	set(ptr.value);
     }
-    // ƒfƒXƒgƒ‰ƒNƒ^
+    // ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
     ~Pointer() {
 	set(NULL);
     }
-    // ‘ã“ü‰‰Zq
+    // ä»£å…¥æ¼”ç®—å­
     Pointer& operator=(TYPE* ptr) {
 	set(ptr);
 	return *this;
     }
-    // ƒRƒs[‘ã“ü‰‰Zq
+    // ã‚³ãƒ”ãƒ¼ä»£å…¥æ¼”ç®—å­
     Pointer& operator=(const Pointer& ptr) {
 	set(ptr.value);
 	return *this;
     }
-    // ŠÔÚ‰‰Zq
+    // é–“æ¥æ¼”ç®—å­
     TYPE& operator*()const {
 	return *value;
     }
-    // ƒƒ“ƒo‘I‘ğ‰‰Zq
+    // ãƒ¡ãƒ³ãƒé¸æŠæ¼”ç®—å­
     TYPE* operator->()const {
 	return value;
     }
-    // ƒLƒƒƒXƒg‰‰Zq
+    // ã‚­ãƒ£ã‚¹ãƒˆæ¼”ç®—å­
     operator TYPE*()const {
 	return value;
     }
 };
     
-// Pointer‚ÌArray<TYPE>Œ^‚Ö‚Ì“Áê‰»
-// ”z—ñ—v‘f‰‰Zq[]‚ğ’ñ‹Ÿ‚·‚é
+// Pointerã®Array<TYPE>å‹ã¸ã®ç‰¹æ®ŠåŒ–
+// é…åˆ—è¦ç´ æ¼”ç®—å­[]ã‚’æä¾›ã™ã‚‹
 template<class TYPE>
 class PointerArray : public Pointer< Array<TYPE> > {
 public:
-    // ƒfƒtƒHƒ‹ƒgƒRƒ“ƒXƒgƒ‰ƒNƒ^
+    // ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
     PointerArray() {
     }
-    // ‰Šú’l•t‚«ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+    // åˆæœŸå€¤ä»˜ãã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
     PointerArray(Array<TYPE>* ptr):Pointer< Array<TYPE> >(ptr) {
     }
-    // ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+    // ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
     PointerArray(const PointerArray& ptr):Pointer< Array<TYPE> >(ptr) {
     }
-    // ‘ã“ü‰‰Zq
+    // ä»£å…¥æ¼”ç®—å­
     PointerArray& operator=(Array<TYPE>* ptr) {
 	set(ptr);
 	return *this;
     }
-    // ”z—ñ—v‘f‰‰Zq
+    // é…åˆ—è¦ç´ æ¼”ç®—å­
     TYPE& operator[](int index) {
 	Array<TYPE>* ptr = *this;
 	return (**this)[index];

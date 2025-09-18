@@ -49,7 +49,7 @@
 #include "edithistory.h"
 
 /**
- *	ƒŠƒXƒgƒ{ƒbƒNƒX‚Ì‰¡ƒXƒNƒ[ƒ‹•‚ğİ’è‚·‚é
+ *	ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã®æ¨ªã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«å¹…ã‚’è¨­å®šã™ã‚‹
  */
 static void ModifyListboxHScrollWidth(HWND dlg, int dlg_item)
 {
@@ -62,7 +62,7 @@ static void ModifyListboxHScrollWidth(HWND dlg, int dlg_item)
 	HFONT listbox_font = (HFONT)SendMessageW(listbox, WM_GETFONT, 0, 0);
 	HFONT listbox_font_old = (HFONT)SelectObject(listbox_dc, listbox_font);
 
-	// ƒŠƒXƒgƒ{ƒbƒNƒX“à‚ÌÅ‘å•¶š—ñ•æ“¾
+	// ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹å†…ã®æœ€å¤§æ–‡å­—åˆ—å¹…å–å¾—
 	max_width = 0;
 	item_count = SendMessageW(listbox, LB_GETCOUNT, 0, 0);
 	for (i = 0; i < item_count; i++) {
@@ -76,15 +76,15 @@ static void ModifyListboxHScrollWidth(HWND dlg, int dlg_item)
 		}
 	}
 
-	// ‰¡•‚ğİ’è‚·‚é
-	SendMessageW(listbox, LB_SETHORIZONTALEXTENT, max_width + 5, 0);	// +5 •‚É­‚µ—]—T‚ğ‚½‚¹‚é
+	// æ¨ªå¹…ã‚’è¨­å®šã™ã‚‹
+	SendMessageW(listbox, LB_SETHORIZONTALEXTENT, max_width + 5, 0);	// +5 å¹…ã«å°‘ã—ä½™è£•ã‚’æŒãŸã›ã‚‹
 
 	SelectObject(listbox_dc, listbox_font_old);
 	ReleaseDC(listbox, listbox_dc);
 }
 
 /**
- *	Up/Remove/Downƒ{ƒ^ƒ“‚ğenable/disable‚·‚é
+ *	Up/Remove/Downãƒœã‚¿ãƒ³ã‚’enable/disableã™ã‚‹
  */
 static void TCPIPDlgButtons(HWND Dialog)
 {
@@ -257,10 +257,10 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 					SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_DELETESTRING, cur_pos, 0);
 					ModifyListboxHScrollWidth(Dialog, IDC_TCPIPLIST);
 					if (item_count - 1 == 0) {
-						// 0ŒÂ‚É‚È‚Á‚½
+						// 0å€‹ã«ãªã£ãŸ
 					}
 					else if (cur_pos == item_count - 1) {
-						// ˆê”ÔÅŒã‚ğíœ
+						// ä¸€ç•ªæœ€å¾Œã‚’å‰Šé™¤
 						SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_SETCURSEL, cur_pos - 1, 0);
 					}
 					else {
@@ -315,7 +315,7 @@ BOOL EditHistoryDlg(HINSTANCE hInstance, HWND WndParent, EditHistoryDlgData *par
 	}
 	data->parent_data = parent_data;
 
-	// TERATERM.INI ‚Ì Hosts ƒZƒNƒVƒ‡ƒ““Ç‚İ‚İ
+	// TERATERM.INI ã® Hosts ã‚»ã‚¯ã‚·ãƒ§ãƒ³èª­ã¿è¾¼ã¿
 	data->hs = HistoryStoreCreate(MAXHOSTLIST);
 	HistoryStoreReadIni(data->hs, parent_data->SetupFNameW, L"Hosts", L"host");
 
@@ -323,7 +323,7 @@ BOOL EditHistoryDlg(HINSTANCE hInstance, HWND WndParent, EditHistoryDlgData *par
 							  MAKEINTRESOURCEW(IDD_EDITHISTORYDLG),
 							  WndParent, TCPIPDlg, (LPARAM)data);
 	if (r == TRUE) {
-		// TERATERM.INI ‚Ö‘‚«o‚µ
+		// TERATERM.INI ã¸æ›¸ãå‡ºã—
 		HistoryStoreSaveIni(data->hs, parent_data->SetupFNameW, L"Hosts", L"host");
 	}
 	HistoryStoreDestroy(data->hs);
