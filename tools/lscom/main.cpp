@@ -73,8 +73,8 @@ void DetectComPortByQueryDosDevice()
 
 void lscom_DetectComPorts()
 {
-	static WORD ComPortTable[MAXCOMPORT];  // �g�p�\��COM�|�[�g�ԍ�
-	static char *ComPortDesc[MAXCOMPORT];  // COM�|�[�g�̏ڍ׏��
+	static WORD ComPortTable[MAXCOMPORT];  // 使用可能なCOMポート番号
+	static char *ComPortDesc[MAXCOMPORT];  // COMポートの詳細情報
 	int com_count = DetectComPorts(ComPortTable, MAXCOMPORT, ComPortDesc);
 
 	for(int i = 0; i < com_count; i++) {
