@@ -43,10 +43,8 @@
 #include "buffer.h"
 #include "vtterm.h"
 #include "vtwin.h"
-#include "clipboar.h"
 #include "filesys.h"
 #include "telnet.h"
-#include "tektypes.h"
 #include "tekwin.h"
 #include "ttdde.h"
 #include "keyboard.h"
@@ -140,6 +138,7 @@ static BOOL OnIdle(LONG lCount)
 {
 	int nx, ny;
 	BOOL Size;
+	(void)lCount;
 
 	if (cv.Ready)
 	{
