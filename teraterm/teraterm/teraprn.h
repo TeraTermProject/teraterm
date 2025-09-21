@@ -32,7 +32,7 @@
 #pragma once
 
 #include "buffer.h"		// for TCharAttr
-#include "vtdisp.h"		// for ttdc_t
+#include "vtdisp.h"		// for vtdraw_t, ttdc_t
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,12 +49,12 @@ void PrnStop(HDC hDC);
 #define IdPrnScrollRegion 4
 #define IdPrnFile 8
 
-int VTPrintInit(int PrnFlag);
-void PrnSetupDC(ttdc_t *vt, TCharAttr Attr, BOOL reverse);
-void PrnOutTextA(const char *Buff, const char *WidthInfo, int Count, void *data);
-void PrnOutTextW(const wchar_t *StrW, const char *WidthInfo, int Count, void *data);
-void PrnNewLine();
-void VTPrintEnd();
+vtdraw_t *VTPrintInit(int PrnFlag, int *mode);
+void VTPrintEnd(vtdraw_t *vt);
+void PrnSetupDC(vtdraw_t *vt, TCharAttr Attr, BOOL reverse);
+void PrnOutTextA(vtdraw_t *vt, const char *Buff, const char *WidthInfo, int Count, void *data);
+void PrnOutTextW(vtdraw_t *vt, const wchar_t *StrW, const char *WidthInfo, int Count, void *data);
+void PrnNewLine(vtdraw_t *vt);
 
 #ifdef __cplusplus
 }

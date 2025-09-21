@@ -272,7 +272,7 @@ static void RestoreCursor()
 
 void ResetTerminal() /*reset variables but don't update screen */
 {
-	DispReset();
+	DispReset(vt_src);
 	BuffReset();
 
 	/* Attribute */
@@ -394,7 +394,7 @@ static void MoveToMainScreen(void)
 	CursorTop = MainTop;
 	CursorBottom = MainBottom;
 	Wrap = MainWrap;
-	DispEnableCaret(MainCursor);
+	DispEnableCaret(vt_src, MainCursor);
 	MoveCursor(MainX, MainY); // move to main screen
 }
 
@@ -522,7 +522,7 @@ void MoveToStatusLine()
 	MainWrap = Wrap;
 	MainCursor = IsCaretEnabled();
 
-	DispEnableCaret(StatusCursor);
+	DispEnableCaret(vt_src, StatusCursor);
 	MoveCursor(StatusX, NumOfLines-1); // move to status line
 	CursorTop = NumOfLines-1;
 	CursorBottom = CursorTop;
@@ -2017,13 +2017,13 @@ static void CS_h_Mode()		// SM
 	  case 33:	// WYSTCURM
 		if (ts.WindowFlag & WF_CURSORCHANGE) {
 			ts.NonblinkingCursor = TRUE;
-			ChangeCaret();
+			ChangeCaret(vt_src);
 		}
 		break;
 	  case 34:	// WYULCURM
 		if (ts.WindowFlag & WF_CURSORCHANGE) {
 			ts.CursorShape = IdHCur;
-			ChangeCaret();
+			ChangeCaret(vt_src);
 		}
 		break;
 	}
@@ -2074,13 +2074,13 @@ static void CS_l_Mode()		// RM
 	  case 33:	// WYSTCURM
 		if (ts.WindowFlag & WF_CURSORCHANGE) {
 			ts.NonblinkingCursor = FALSE;
-			ChangeCaret();
+			ChangeCaret(vt_src);
 		}
 		break;
 	  case 34:	// WYULCURM
 		if (ts.WindowFlag & WF_CURSORCHANGE) {
 			ts.CursorShape = IdBlkCur;
-			ChangeCaret();
+			ChangeCaret(vt_src);
 		}
 		break;
 	}
@@ -2588,7 +2588,7 @@ static void CSSunSequence() /* Sun terminal private sequences */
 
 	  case 15: // Report display size (pixel)
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
-			DispGetRootWinSize(&x, &y, TRUE);
+			DispGetRootWinSize(vt_src, &x, &y, TRUE);
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "5;%d;%dt", CLocale, y, x);
 			SendCSIstr(Report, len);
 		}
@@ -2596,7 +2596,7 @@ static void CSSunSequence() /* Sun terminal private sequences */
 
 	  case 16: // Report character cell size (pixel)
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
-			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "6;%d;%dt", CLocale, FontHeight, FontWidth);
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "6;%d;%dt", CLocale, vt_src->FontHeight, vt_src->FontWidth);
 			SendCSIstr(Report, len);
 		}
 		break;
@@ -2611,7 +2611,7 @@ static void CSSunSequence() /* Sun terminal private sequences */
 
 	  case 19: // Report display size (character)
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
-			DispGetRootWinSize(&x, &y, FALSE);
+			DispGetRootWinSize(vt_src, &x, &y, FALSE);
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "9;%d;%dt", CLocale, y, x);
 			SendCSIstr(Report, len);
 		}
@@ -2910,11 +2910,11 @@ static void CSQ_h_Mode() // DECSET
 		  case 12: /* att610 cursor blinking */
 			if (ts.WindowFlag & WF_CURSORCHANGE) {
 				ts.NonblinkingCursor = FALSE;
-				ChangeCaret();
+				ChangeCaret(vt_src);
 			}
 			break;
 		  case 19: PrintEX = TRUE; break;		// DECPEX
-		  case 25: DispEnableCaret(TRUE); break;	// cursor on (DECTCEM)
+		  case 25: DispEnableCaret(vt_src, TRUE); break;	// cursor on (DECTCEM)
 		  case 38: // DECTEK
 			if (ts.AutoWinSwitch>0)
 				ChangeEmu = IdTEK; /* Enter TEK Mode */
@@ -3088,11 +3088,11 @@ static void CSQ_l_Mode()		// DECRST
 		  case 12: /* att610 cursor blinking */
 			if (ts.WindowFlag & WF_CURSORCHANGE) {
 				ts.NonblinkingCursor = TRUE;
-				ChangeCaret();
+				ChangeCaret(vt_src);
 			}
 			break;
 		  case 19: PrintEX = FALSE; break;		// DECPEX
-		  case 25: DispEnableCaret(FALSE); break;	// cursor off (DECTCEM)
+		  case 25: DispEnableCaret(vt_src, FALSE); break;	// cursor off (DECTCEM)
 		  case 47: // Alternate Screen Buffer
 			if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
 				BuffRestoreScreen();
@@ -3208,7 +3208,7 @@ static void SoftReset()
 {
 	UpdateStr();
 	AutoRepeatMode = TRUE;
-	DispEnableCaret(TRUE); // cursor on
+	DispEnableCaret(vt_src, TRUE);  // cursor on
 	InsertMode = FALSE;
 	RelativeOrgMode = FALSE;
 	AppliKeyMode = FALSE;
@@ -3836,7 +3836,7 @@ static void CSQuote(BYTE b)
 				y = LastY + 1;
 			}
 			else {
-				DispConvWinToScreen(LastX, LastY, &x, &y, NULL);
+				DispConvWinToScreen(vt_src, LastX, LastY, &x, &y, NULL);
 				x++;
 				y++;
 			}
@@ -3945,7 +3945,7 @@ static void CSSpace(BYTE b)
 			  default:
 				return;
 			}
-			ChangeCaret();
+			ChangeCaret(vt_src);
 		}
 		break;
 	}
@@ -5334,13 +5334,13 @@ int VTParse()
 
 	if (c==0) return 0;
 
-	CaretOff();
-	UpdateCaretPosition(FALSE);	// 非アクティブの場合のみ再描画する
+	CaretOff(vt_src);
+	UpdateCaretPosition(vt_src, FALSE);	// 非アクティブの場合のみ再描画する
 
 	ChangeEmu = 0;
 
 	/* Get Device Context */
-	ttdc_t *vt = DispInitDC(HVTWin);
+	ttdc_t *vt = DispInitDC(vt_src, HVTWin);
 
 	LockBuffer();
 
@@ -5409,9 +5409,9 @@ int VTParse()
 	UnlockBuffer();
 
 	/* release device context */
-	DispReleaseDC(vt);
+	DispReleaseDC(vt_src, vt);
 
-	CaretOn();
+	CaretOn(vt_src);
 
 	if (ChangeEmu > 0)
 		ParseMode = ModeFirst;
@@ -5437,13 +5437,13 @@ static BOOL DecLocatorReport(int Event, int Button)
 	if (DecLocatorFlag & DecLocatorPixel) {
 		x = LastX + 1;
 		y = LastY + 1;
-		DispConvScreenToWin(NumOfColumns+1, NumOfLines+1, &MaxX, &MaxY);
+		DispConvScreenToWin(vt_src, NumOfColumns+1, NumOfLines+1, &MaxX, &MaxY);
 		if (x < 1 || x > MaxX || y < 1 || y > MaxY) {
 			x = -1;
 		}
 	}
 	else {
-		DispConvWinToScreen(LastX, LastY, &x, &y, NULL);
+		DispConvWinToScreen(vt_src, LastX, LastY, &x, &y, NULL);
 		x++; y++;
 		if (x < 1 || x > NumOfColumns || y < 1 || y > NumOfLines) {
 			x = -1;
@@ -5578,7 +5578,7 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	  	y = (Ypos<1) ? 1 : Ypos;
 	}
 	else {
-		DispConvWinToScreen(Xpos, Ypos, &x, &y, NULL);
+		DispConvWinToScreen(vt_src, Xpos, Ypos, &x, &y, NULL);
 		x++; y++;
 
 		if (x < 1)

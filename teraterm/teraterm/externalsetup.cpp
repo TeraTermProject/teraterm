@@ -151,7 +151,7 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 	if (all || page == CAddSettingPropSheetDlgPage::GeneralPage) {
 		if (ok) {
 			ResetCharSet();
-			ResetIME();
+			ResetIME(vt_src);
 		}
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::TermPage) {
@@ -170,7 +170,7 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 				cv.TitleRemoteW = NULL;
 			}
 			ChangeWin();
-			ChangeFont(0);
+			ChangeFont(vt_src, 0);
 
 		}
 		free(ExternalSetupData.orgTitle);

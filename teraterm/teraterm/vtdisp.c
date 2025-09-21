@@ -70,8 +70,8 @@
 int WinWidth, WinHeight;		// 画面に表示されている文字数
 static BOOL Active = FALSE;
 static BOOL CompletelyVisible;
-static HFONT VTFont[AttrFontMask+1];
-int FontHeight, FontWidth;		// フォントサイズ pixel
+//static HFONT VTFont[AttrFontMask+1];
+//int FontHeight, FontWidth;		// フォントサイズ pixel
 int ScreenWidth, ScreenHeight;	// スクリーンサイズ = (セル数)*(Font幅or高さ) ≒ Client Area
 BOOL AdjustSize;
 BOOL DontChangeSize=FALSE;
@@ -200,7 +200,7 @@ static HBITMAP GetBitmapHandleW(const wchar_t *File);
 static void InitColorTable(const COLORREF *ANSIColor16);
 static void UpdateBGBrush(void);
 static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_color, COLORREF *back_color, BYTE *_alpha);
-static void DispInitDC2(ttdc_t *vt);
+static void DispInitDC2(vtdraw_t *vt, ttdc_t *dc);
 
 // LoadImage() しか使えない環境かどうかを判別する。
 // LoadImage()では .bmp 以外の画像ファイルが扱えないので要注意。
@@ -1229,7 +1229,7 @@ static HDC CreateBGImage(int width, int height)
  *							TRUE	以外
  *
  */
-void BGSetupPrimary(BOOL forceSetup)
+void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
 {
   POINT point;
   RECT rect;
@@ -1261,8 +1261,8 @@ void BGSetupPrimary(BOOL forceSetup)
   if(hdcBGWork)   DeleteBitmapDC(&hdcBGWork);
   if(hdcBGBuffer) DeleteBitmapDC(&hdcBGBuffer);
 
-  hdcBGWork   = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,FontHeight));
-  hdcBGBuffer = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,FontHeight));
+  hdcBGWork   = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,vt->FontHeight));
+  hdcBGBuffer = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,vt->FontHeight));
 
   //hdcBGBuffer の属性設定
   SetBkMode(hdcBGBuffer,TRANSPARENT);
@@ -1521,14 +1521,14 @@ void BGOnEnterSizeMove(void)
   BGInSizeMove = TRUE;
 }
 
-void BGOnExitSizeMove(void)
+void BGOnExitSizeMove(vtdraw_t *vt)
 {
   if(!BGEnable || !ts.EtermLookfeel.BGFastSizeMove)
     return;
 
   BGInSizeMove = FALSE;
 
-  BGSetupPrimary(TRUE);
+  BGSetupPrimary(vt, TRUE);
   InvalidateRect(HVTWin,NULL,FALSE);
 
 #if 0
@@ -1544,7 +1544,7 @@ void BGOnExitSizeMove(void)
 /**
  *	WM_SETTINGCHANGE 時に呼び出す
  */
-void BGOnSettingChange(void)
+void BGOnSettingChange(vtdraw_t *vt)
 {
 	if(!BGEnable)
 		return;
@@ -1553,7 +1553,7 @@ void BGOnSettingChange(void)
 	CRTWidth  = GetSystemMetrics(SM_CXSCREEN);
 	CRTHeight = GetSystemMetrics(SM_CYSCREEN);
 
-	BGSetupPrimary(TRUE);
+	BGSetupPrimary(vt, TRUE);
 	InvalidateRect(HVTWin, NULL, FALSE);
 }
 
@@ -1636,112 +1636,124 @@ static void DispSetNearestColors(int start, int end, HDC DispCtx)
 #endif
 }
 
-void InitDisp(void)
+vtdraw_t *InitDisp(void)
 {
-  HDC TmpDC;
-  BOOL bMultiDisplaySupport = FALSE;
-  vtdisp_work_t *w = &vtdisp_work;
+	vtdraw_t *p = (vtdraw_t *)calloc(1, sizeof(*p));
+	HDC TmpDC;
+	BOOL bMultiDisplaySupport = FALSE;
+	vtdisp_work_t *w = &vtdisp_work;
 
-  TmpDC = GetDC(NULL);
+	TmpDC = GetDC(NULL);
 
-  CRTWidth  = GetSystemMetrics(SM_CXSCREEN);
-  CRTHeight = GetSystemMetrics(SM_CYSCREEN);
+	CRTWidth  = GetSystemMetrics(SM_CXSCREEN);
+	CRTHeight = GetSystemMetrics(SM_CYSCREEN);
 
-  BGInitialize(TRUE);
+	BGInitialize(TRUE);
 
-  DispSetNearestColors(IdBack, 255, TmpDC);
+	DispSetNearestColors(IdBack, 255, TmpDC);
 
-  /* background paintbrush */
-  Background = CreateSolidBrush(ts.VTColor[1]);
-  /* CRT width & height */
-  if (HasMultiMonitorSupport()) {
-    bMultiDisplaySupport = TRUE;
-  }
-  if( bMultiDisplaySupport ) {
-	  VirtualScreen.left = GetSystemMetrics(SM_XVIRTUALSCREEN);
-	  VirtualScreen.top = GetSystemMetrics(SM_YVIRTUALSCREEN);
-	  VirtualScreen.right = VirtualScreen.left +  GetSystemMetrics(SM_CXVIRTUALSCREEN);
-	  VirtualScreen.bottom = VirtualScreen.top + GetSystemMetrics(SM_CYVIRTUALSCREEN);
-  } else {
-	  VirtualScreen.left = 0;
-	  VirtualScreen.top = 0;
-	  VirtualScreen.right = GetDeviceCaps(TmpDC,HORZRES);
-	  VirtualScreen.bottom = GetDeviceCaps(TmpDC,VERTRES);
-  }
+	/* background paintbrush */
+	Background = CreateSolidBrush(ts.VTColor[1]);
+	/* CRT width & height */
+	if (HasMultiMonitorSupport()) {
+		bMultiDisplaySupport = TRUE;
+	}
+	if( bMultiDisplaySupport ) {
+		VirtualScreen.left = GetSystemMetrics(SM_XVIRTUALSCREEN);
+		VirtualScreen.top = GetSystemMetrics(SM_YVIRTUALSCREEN);
+		VirtualScreen.right = VirtualScreen.left +  GetSystemMetrics(SM_CXVIRTUALSCREEN);
+		VirtualScreen.bottom = VirtualScreen.top + GetSystemMetrics(SM_CYVIRTUALSCREEN);
+	} else {
+		VirtualScreen.left = 0;
+		VirtualScreen.top = 0;
+		VirtualScreen.right = GetDeviceCaps(TmpDC,HORZRES);
+		VirtualScreen.bottom = GetDeviceCaps(TmpDC,VERTRES);
+	}
 
-  ReleaseDC(NULL, TmpDC);
+	ReleaseDC(NULL, TmpDC);
 
-  if ( (ts.VTPos.x > VirtualScreen.right) || (ts.VTPos.y > VirtualScreen.bottom) )
-  {
-    ts.VTPos.x = CW_USEDEFAULT;
-    ts.VTPos.y = CW_USEDEFAULT;
-  }
-  else if ( (ts.VTPos.x < VirtualScreen.left-20) || (ts.VTPos.y < VirtualScreen.top-20) )
-  {
-    ts.VTPos.x = CW_USEDEFAULT;
-    ts.VTPos.y = CW_USEDEFAULT;
-  }
-  else {
-    if ( ts.VTPos.x < VirtualScreen.left ) ts.VTPos.x = VirtualScreen.left;
-    if ( ts.VTPos.y < VirtualScreen.top ) ts.VTPos.y = VirtualScreen.top;
-  }
+	if ( (ts.VTPos.x > VirtualScreen.right) || (ts.VTPos.y > VirtualScreen.bottom) )
+	{
+		ts.VTPos.x = CW_USEDEFAULT;
+		ts.VTPos.y = CW_USEDEFAULT;
+	}
+	else if ( (ts.VTPos.x < VirtualScreen.left-20) || (ts.VTPos.y < VirtualScreen.top-20) )
+	{
+		ts.VTPos.x = CW_USEDEFAULT;
+		ts.VTPos.y = CW_USEDEFAULT;
+	}
+	else {
+		if ( ts.VTPos.x < VirtualScreen.left ) ts.VTPos.x = VirtualScreen.left;
+		if ( ts.VTPos.y < VirtualScreen.top ) ts.VTPos.y = VirtualScreen.top;
+	}
 
-  if ( (ts.TEKPos.x >  VirtualScreen.right) || (ts.TEKPos.y > VirtualScreen.bottom) )
-  {
-    ts.TEKPos.x = CW_USEDEFAULT;
-    ts.TEKPos.y = CW_USEDEFAULT;
-  }
-  else if ( (ts.TEKPos.x < VirtualScreen.left-20) || (ts.TEKPos.y < VirtualScreen.top-20) )
-  {
-    ts.TEKPos.x = CW_USEDEFAULT;
-    ts.TEKPos.y = CW_USEDEFAULT;
-  }
-  else {
-    if ( ts.TEKPos.x < VirtualScreen.left ) ts.TEKPos.x = VirtualScreen.left;
-    if ( ts.TEKPos.y < VirtualScreen.top ) ts.TEKPos.y = VirtualScreen.top;
-  }
+	if ( (ts.TEKPos.x >  VirtualScreen.right) || (ts.TEKPos.y > VirtualScreen.bottom) )
+	{
+		ts.TEKPos.x = CW_USEDEFAULT;
+		ts.TEKPos.y = CW_USEDEFAULT;
+	}
+	else if ( (ts.TEKPos.x < VirtualScreen.left-20) || (ts.TEKPos.y < VirtualScreen.top-20) )
+	{
+		ts.TEKPos.x = CW_USEDEFAULT;
+		ts.TEKPos.y = CW_USEDEFAULT;
+	}
+	else {
+		if ( ts.TEKPos.x < VirtualScreen.left ) ts.TEKPos.x = VirtualScreen.left;
+		if ( ts.TEKPos.y < VirtualScreen.top ) ts.TEKPos.y = VirtualScreen.top;
+	}
 
-  w->bg_enable = FALSE;
-  w->alpha_back = 255;
-  w->alpha_vtback = 255;
-  w->debug_drawbox_text = FALSE;
-  w->font_resize_enable = FontReSizeEnableInit;
-  BGReverseTextAlpha = 255;
+	w->bg_enable = FALSE;
+	w->alpha_back = 255;
+	w->alpha_vtback = 255;
+	w->debug_drawbox_text = FALSE;
+	w->font_resize_enable = FontReSizeEnableInit;
+	BGReverseTextAlpha = 255;
+
+	return p;
 }
 
-void EndDisp(void)
+static void DeleteFonts(vtdraw_t *vt)
 {
-  int i, j;
+	int i, j;
+	for (i = 0; i <= AttrFontMask; i++) {
+		for (j = i+1 ; j <= AttrFontMask ; j++) {
+			if (vt->VTFont[j]==vt->VTFont[i])
+				vt->VTFont[j] = 0;
+		}
+		if (vt->VTFont[i]!=0) {
+			DeleteObject(vt->VTFont[i]);
+			vt->VTFont[i] = 0;
+		}
+	}
+}
+
+void EndDisp(vtdraw_t *vt)
+{
 #if 0
-  if (VTDC!=NULL) {
-	  //DispReleaseDC();
-	  SelectObject(VTDC, DCPrevFont);
-	  ReleaseDC(HVTWin,VTDC);
-	  VTDC = NULL;
-  }
+	if (VTDC!=NULL) {
+		//DispReleaseDC();
+		SelectObject(VTDC, DCPrevFont);
+		ReleaseDC(HVTWin,VTDC);
+		VTDC = NULL;
+	}
 #endif
-  /* Delete fonts */
-  for (i = 0 ; i <= AttrFontMask; i++)
-  {
-    for (j = i+1 ; j <= AttrFontMask ; j++)
-      if (VTFont[j]==VTFont[i])
-        VTFont[j] = 0;
-    if (VTFont[i]!=0) DeleteObject(VTFont[i]);
-  }
+	DeleteFonts(vt);
 
-  if (Background!=0)
-  {
-	DeleteObject(Background);
-	Background = 0;
-  }
+	if (Background!=0)
+	{
+		DeleteObject(Background);
+		Background = 0;
+	}
 
-  BGDestruct();
+	BGDestruct();
 
-  free(BGDest.fileW);
-  BGDest.fileW = NULL;
+	free(BGDest.fileW);
+	BGDest.fileW = NULL;
+
+	free(vt);
 }
 
-void DispReset(void)
+void DispReset(vtdraw_t *vt)
 {
   /* Cursor */
   CursorX = 0;
@@ -1751,12 +1763,11 @@ void DispReset(void)
   ScrollCount = 0;
   dScroll = 0;
 
-  if (IsCaretOn()) CaretOn();
-  DispEnableCaret(TRUE); // enable caret
+  if (IsCaretOn()) CaretOn(vt);
+  DispEnableCaret(vt, TRUE); // enable caret
 }
 
-void DispConvWinToScreen
-  (int Xw, int Yw, int *Xs, int *Ys, PBOOL Right)
+void DispConvWinToScreen(vtdraw_t *vt, int Xw, int Yw, int *Xs, int *Ys, PBOOL Right)
 // Converts window coordinate to screen cordinate
 //   Xs: horizontal position in window coordinate (pixels)
 //   Ys: vertical
@@ -1766,14 +1777,13 @@ void DispConvWinToScreen
 //			 a character cell.
 {
   if (Xs!=NULL)
-	*Xs = Xw / FontWidth + WinOrgX;
-  *Ys = Yw / FontHeight + WinOrgY;
+	*Xs = Xw / vt->FontWidth + WinOrgX;
+  *Ys = Yw / vt->FontHeight + WinOrgY;
   if ((Xs!=NULL) && (Right!=NULL))
-    *Right = (Xw - (*Xs-WinOrgX)*FontWidth) >= FontWidth/2;
+    *Right = (Xw - (*Xs-WinOrgX)*vt->FontWidth) >= vt->FontWidth/2;
 }
 
-void DispConvScreenToWin
-  (int Xs, int Ys, int *Xw, int *Yw)
+void DispConvScreenToWin(vtdraw_t *vt, int Xs, int Ys, int *Xw, int *Yw)
 // Converts screen coordinate to window cordinate
 //   Xs: horizontal position in screen coordinate (characters)
 //   Ys: vertical
@@ -1781,9 +1791,9 @@ void DispConvScreenToWin
 //      Xw, Yw: window coordinate
 {
   if (Xw!=NULL)
-       *Xw = (Xs - WinOrgX) * FontWidth;
+       *Xw = (Xs - WinOrgX) * vt->FontWidth;
   if (Yw!=NULL)
-       *Yw = (Ys - WinOrgY) * FontHeight;
+       *Yw = (Ys - WinOrgY) * vt->FontHeight;
 }
 
 /**
@@ -1820,20 +1830,11 @@ static void DispSetLogFont(LOGFONTW *VTlf, unsigned int dpi)
  *	@param	dpi		DPIを指定する
  *					0のとき現在のディスプレイのDPI
  */
-void ChangeFont(unsigned int dpi)
+void ChangeFont(vtdraw_t *vt, unsigned int dpi)
 {
-	int i, j;
 	LOGFONTW VTlf;
 
-	/* Delete Old Fonts */
-	for (i = 0 ; i <= AttrFontMask ; i++)
-	{
-		for (j = i+1 ; j <= AttrFontMask ; j++)
-			if (VTFont[j]==VTFont[i])
-				VTFont[j] = 0;
-		if (VTFont[i]!=0)
-			DeleteObject(VTFont[i]);
-	}
+	DeleteFonts(vt);
 
 	if (dpi == 0) {
 		dpi = GetMonitorDpiFromWindow(HVTWin);
@@ -1841,7 +1842,7 @@ void ChangeFont(unsigned int dpi)
 
 	/* Normal Font */
 	DispSetLogFont(&VTlf, dpi);
-	VTFont[AttrDefault] = CreateFontIndirectW(&VTlf);
+	vt->VTFont[AttrDefault] = CreateFontIndirectW(&VTlf);
 
 	if (ts.UseIME > 0) {
 		if (ts.IMEInline > 0) {
@@ -1854,10 +1855,10 @@ void ChangeFont(unsigned int dpi)
 		HDC TmpDC = GetDC(HVTWin);
 		TEXTMETRIC Metrics;
 
-		SelectObject(TmpDC, VTFont[AttrDefault]);
+		SelectObject(TmpDC, vt->VTFont[AttrDefault]);
 		GetTextMetrics(TmpDC, &Metrics);
-		FontWidth = Metrics.tmAveCharWidth + ts.FontDW;
-		FontHeight = Metrics.tmHeight + ts.FontDH;
+		vt->FontWidth = Metrics.tmAveCharWidth + ts.FontDW;
+		vt->FontHeight = Metrics.tmHeight + ts.FontDH;
 
 		ReleaseDC(HVTWin,TmpDC);
 	}
@@ -1865,76 +1866,76 @@ void ChangeFont(unsigned int dpi)
 	/* Underline */
 	if ((ts.FontFlag & FF_UNDERLINE) || (ts.FontFlag & FF_URLUNDERLINE)) {
 		VTlf.lfUnderline = 1;
-		VTFont[AttrUnder] = CreateFontIndirectW(&VTlf);
+		vt->VTFont[AttrUnder] = CreateFontIndirectW(&VTlf);
 	}
 	else {
-		VTFont[AttrUnder] = VTFont[AttrDefault];
+		vt->VTFont[AttrUnder] = vt->VTFont[AttrDefault];
 	}
 
 	if (ts.FontFlag & FF_BOLD) {
 		/* Bold */
 		VTlf.lfUnderline = 0;
 		VTlf.lfWeight = FW_BOLD;
-		VTFont[AttrBold] = CreateFontIndirectW(&VTlf);
+		vt->VTFont[AttrBold] = CreateFontIndirectW(&VTlf);
 
 		/* Bold + Underline */
 		if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
 			VTlf.lfUnderline = 1;
-			VTFont[AttrBold | AttrUnder] = CreateFontIndirectW(&VTlf);
+			vt->VTFont[AttrBold | AttrUnder] = CreateFontIndirectW(&VTlf);
 		}
 		else {
-			VTFont[AttrBold | AttrUnder] = VTFont[AttrBold];
+			vt->VTFont[AttrBold | AttrUnder] = vt->VTFont[AttrBold];
 		}
 	}
 	else {
-		VTFont[AttrBold] = VTFont[AttrDefault];
-		VTFont[AttrBold | AttrUnder] = VTFont[AttrUnder];
+		vt->VTFont[AttrBold] = vt->VTFont[AttrDefault];
+		vt->VTFont[AttrBold | AttrUnder] = vt->VTFont[AttrUnder];
 	}
 
 	/* Special font */
 	VTlf.lfWeight = FW_NORMAL;
 	VTlf.lfUnderline = 0;
-	VTlf.lfWidth = FontWidth + 1; /* adjust width */
-	VTlf.lfHeight = FontHeight;
+	VTlf.lfWidth = vt->FontWidth + 1; /* adjust width */
+	VTlf.lfHeight = vt->FontHeight;
 	VTlf.lfCharSet = SYMBOL_CHARSET;
 
 	wcsncpy_s(VTlf.lfFaceName, _countof(VTlf.lfFaceName), L"Tera Special", _TRUNCATE);
-	VTFont[AttrSpecial] = CreateFontIndirectW(&VTlf);
+	vt->VTFont[AttrSpecial] = CreateFontIndirectW(&VTlf);
 
 	/* Special font (Underline) */
 	if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
 		VTlf.lfUnderline = 1;
-		VTlf.lfHeight = FontHeight - 1; // adjust for underline
-		VTFont[AttrSpecial | AttrUnder] = CreateFontIndirectW(&VTlf);
+		VTlf.lfHeight = vt->FontHeight - 1; // adjust for underline
+		vt->VTFont[AttrSpecial | AttrUnder] = CreateFontIndirectW(&VTlf);
 	}
 	else {
-		VTFont[AttrSpecial | AttrUnder] = VTFont[AttrSpecial];
+		vt->VTFont[AttrSpecial | AttrUnder] = vt->VTFont[AttrSpecial];
 	}
 
 	if (ts.FontFlag & FF_BOLD) {
 		/* Special font (Bold) */
 		VTlf.lfUnderline = 0;
-		VTlf.lfHeight = FontHeight;
+		VTlf.lfHeight = vt->FontHeight;
 		VTlf.lfWeight = FW_BOLD;
-		VTFont[AttrSpecial | AttrBold] = CreateFontIndirectW(&VTlf);
+		vt->VTFont[AttrSpecial | AttrBold] = CreateFontIndirectW(&VTlf);
 
 		/* Special font (Bold + Underline) */
 		if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
 			VTlf.lfUnderline = 1;
-			VTlf.lfHeight = FontHeight - 1; // adjust for underline
-			VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirectW(&VTlf);
+			VTlf.lfHeight = vt->FontHeight - 1; // adjust for underline
+			vt->VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirectW(&VTlf);
 		}
 		else {
-			VTFont[AttrSpecial | AttrBold | AttrUnder] = VTFont[AttrSpecial | AttrBold];
+			vt->VTFont[AttrSpecial | AttrBold | AttrUnder] = vt->VTFont[AttrSpecial | AttrBold];
 		}
 	}
 	else {
-		VTFont[AttrSpecial | AttrBold] = VTFont[AttrSpecial];
-		VTFont[AttrSpecial | AttrBold | AttrUnder] = VTFont[AttrSpecial | AttrUnder];
+		vt->VTFont[AttrSpecial | AttrBold] = vt->VTFont[AttrSpecial];
+		vt->VTFont[AttrSpecial | AttrBold | AttrUnder] = vt->VTFont[AttrSpecial | AttrUnder];
 	}
 }
 
-void ResetIME(void)
+void ResetIME(vtdraw_t *vt)
 {
 	/* reset IME */
 	if ((IMEEnabled() == TRUE) && (ts.UseIME > 0)) {
@@ -1967,10 +1968,10 @@ void ResetIME(void)
 		FreeIME(HVTWin);
 	}
 
-	if (IsCaretOn()) CaretOn();
+	if (IsCaretOn()) CaretOn(vt);
 }
 
-void ChangeCaret(void)
+void ChangeCaret(vtdraw_t *vt)
 {
   UINT T;
 
@@ -1978,25 +1979,25 @@ void ChangeCaret(void)
   DestroyCaret();
   switch (ts.CursorShape) {
     case IdVCur:
-	CreateCaret(HVTWin, 0, CurWidth, FontHeight);
+		CreateCaret(HVTWin, 0, CurWidth, vt->FontHeight);
 	break;
     case IdHCur:
-	CreateCaret(HVTWin, 0, FontWidth, CurWidth);
+		CreateCaret(HVTWin, 0, vt->FontWidth, CurWidth);
 	break;
   }
   if (CaretEnabled) {
 	CaretStatus = 1;
   }
-  CaretOn();
+  CaretOn(vt);
   if (CaretEnabled && (ts.NonblinkingCursor!=0)) {
     T = GetCaretBlinkTime() * 2 / 3;
     SetTimer(HVTWin,IdCaretTimer,T,NULL);
   }
-  UpdateCaretPosition(TRUE);
+  UpdateCaretPosition(vt, TRUE);
 }
 
 // WM_KILLFOCUSされたときのカーソルを自分で描く
-void CaretKillFocus(BOOL show)
+void CaretKillFocus(vtdraw_t *vt, BOOL show)
 {
   int CaretX, CaretY;
   POINT p[5];
@@ -2011,26 +2012,26 @@ void CaretKillFocus(BOOL show)
 	  return;
 
   /* Get Device Context */
-  ttdc_t *vt = DispInitDC(HVTWin);
+  ttdc_t *dc = DispInitDC(vt, HVTWin);
 //  VTDC = NULL;
-  hdc = vt->VTDC;
+  hdc = dc->VTDC;
 
-  CaretX = (CursorX-WinOrgX)*FontWidth;
-  CaretY = (CursorY-WinOrgY)*FontHeight;
+  CaretX = (CursorX - WinOrgX) * vt->FontWidth;
+  CaretY = (CursorY - WinOrgY) * vt->FontHeight;
 
   p[0].x = CaretX;
   p[0].y = CaretY;
   p[1].x = CaretX;
-  p[1].y = CaretY + FontHeight - 1;
+  p[1].y = CaretY + vt->FontHeight - 1;
   if (CursorOnDBCS)
-	p[2].x = CaretX + FontWidth*2 - 1;
+	  p[2].x = CaretX + vt->FontWidth * 2 - 1;
   else
-	p[2].x = CaretX + FontWidth - 1;
-  p[2].y = CaretY + FontHeight - 1;
+	  p[2].x = CaretX + vt->FontWidth - 1;
+  p[2].y = CaretY + vt->FontHeight - 1;
   if (CursorOnDBCS)
-	p[3].x = CaretX + FontWidth*2 - 1;
+	  p[3].x = CaretX + vt->FontWidth * 2 - 1;
   else
-	p[3].x = CaretX + FontWidth - 1;
+	  p[3].x = CaretX + vt->FontWidth - 1;
   p[3].y = CaretY;
   p[4].x = CaretX;
   p[4].y = CaretY;
@@ -2045,7 +2046,7 @@ void CaretKillFocus(BOOL show)
   DeleteObject(oldpen);
 
   /* release device context */
-  DispReleaseDC(vt);
+  DispReleaseDC(vt, dc);
 }
 
 // ポリゴンカーソルを消したあとに、その部分の文字を再描画する。
@@ -2055,13 +2056,13 @@ void CaretKillFocus(BOOL show)
 //
 // カーソル形状変更時(ChangeCaret)にも呼ぶことにしたため、関数名変更 -- 2009/04/17 doda.
 //
-void UpdateCaretPosition(BOOL enforce)
+void UpdateCaretPosition(vtdraw_t *vt, BOOL enforce)
 {
   int CaretX, CaretY;
   RECT rc;
 
-  CaretX = (CursorX-WinOrgX)*FontWidth;
-  CaretY = (CursorY-WinOrgY)*FontHeight;
+  CaretX = (CursorX - WinOrgX) * vt->FontWidth;
+  CaretY = (CursorY - WinOrgY) * vt->FontHeight;
 
   if (!enforce && !ts.KillFocusCursor)
 	  return;
@@ -2074,17 +2075,17 @@ void UpdateCaretPosition(BOOL enforce)
 	  rc.left = CaretX;
 	  rc.top = CaretY;
 	  if (CursorOnDBCS)
-		rc.right = CaretX + FontWidth*2;
+		rc.right = CaretX + vt->FontWidth * 2;
 	  else
-		rc.right = CaretX + FontWidth;
-	  rc.bottom = CaretY + FontHeight;
+		rc.right = CaretX + vt->FontWidth;
+	  rc.bottom = CaretY + vt->FontHeight;
 	  // 指定よりも1ピクセル小さい範囲が再描画されるため
 	  // rc の right, bottom は1ピクセル大きくしている。
 	  InvalidateRect(HVTWin, &rc, FALSE);
   }
 }
 
-void CaretOn(void)
+void CaretOn(vtdraw_t *vt)
 // Turn on the cursor
 {
 #if UNICODE_DEBUG_CARET_OFF
@@ -2113,8 +2114,8 @@ void CaretOn(void)
 			}
 		}
 
-		CaretX = (CursorX-WinOrgX)*FontWidth;
-		CaretY = (CursorY-WinOrgY)*FontHeight;
+		CaretX = (CursorX - WinOrgX) * vt->FontWidth;
+		CaretY = (CursorY - WinOrgY) * vt->FontHeight;
 
 		if (IMEstat && IMECompositionState) {
 			// IME ON && 変換中の場合のみの処理する。
@@ -2126,21 +2127,21 @@ void CaretOn(void)
 
 		if (ts.CursorShape!=IdVCur) {
 			if (ts.CursorShape==IdHCur) {
-				CaretY = CaretY+FontHeight-CurWidth;
+				CaretY = CaretY + vt->FontHeight - CurWidth;
 				H = CurWidth;
 			}
 			else {
-				H = FontHeight;
+				H = vt->FontHeight;
 			}
 
 			DestroyCaret();
 			if (CursorOnDBCS) {
 				/* double width caret */
-				CreateCaret(HVTWin, color, FontWidth*2, H);
+				CreateCaret(HVTWin, color, vt->FontWidth * 2, H);
 			}
 			else {
 				/* single width caret */
-				CreateCaret(HVTWin, color, FontWidth, H);
+				CreateCaret(HVTWin, color, vt->FontWidth, H);
 			}
 			CaretStatus = 1;
 		}
@@ -2149,7 +2150,7 @@ void CaretOn(void)
 
 	while (CaretStatus > 0) {
 		if (! Active) {
-			CaretKillFocus(TRUE);
+			CaretKillFocus(vt, TRUE);
 		} else {
 			ShowCaret(HVTWin);
 		}
@@ -2157,14 +2158,14 @@ void CaretOn(void)
 	}
 }
 
-void CaretOff(void)
+void CaretOff(vtdraw_t *vt)
 {
 	if (ts.KillFocusCursor == 0 && !Active)
 		return;
 
 	if (CaretStatus == 0) {
 		if (! Active) {
-			CaretKillFocus(FALSE);
+			CaretKillFocus(vt, FALSE);
 		} else {
 			HideCaret(HVTWin);
 		}
@@ -2185,12 +2186,12 @@ BOOL IsCaretOn(void)
 	return ((ts.KillFocusCursor || Active) && (CaretStatus==0));
 }
 
-void DispEnableCaret(BOOL On)
+void DispEnableCaret(vtdraw_t *vt, BOOL On)
 {
 #if UNICODE_DEBUG_CARET_OFF
   On = FALSE;
 #endif
-  if (! On) CaretOff();
+  if (! On) CaretOff(vt);
   CaretEnabled = On;
 }
 
@@ -2210,7 +2211,7 @@ void DispSetCaretWidth(BOOL DW)
  *	BuffChangeWinSize() からコールされる
  *
  */
-void DispChangeWinSize(int Nx, int Ny)
+void DispChangeWinSize(vtdraw_t *vt, int Nx, int Ny)
 {
   LONG W,H,dW,dH;
   RECT R;
@@ -2229,8 +2230,8 @@ void DispChangeWinSize(int Nx, int Ny)
   WinWidth = Nx;
   WinHeight = Ny;
 
-  ScreenWidth = WinWidth*FontWidth;
-  ScreenHeight = WinHeight*FontHeight;
+  ScreenWidth = WinWidth * vt->FontWidth;
+  ScreenHeight = WinHeight * vt->FontHeight;
 
   AdjustScrollBar();
 
@@ -2272,7 +2273,7 @@ void DispChangeWinSize(int Nx, int Ny)
  *	@param	cw	新しいクライアント領域のw
  *	@param	ch	新しいクライアント領域のh
  */
-void ResizeWindow(int x, int y, int w, int h, int cw, int ch)
+void ResizeWindow(vtdraw_t *vt, int x, int y, int w, int h, int cw, int ch)
 {
   int dw,dh, NewX, NewY;
   POINT Point;
@@ -2306,7 +2307,7 @@ void ResizeWindow(int x, int y, int w, int h, int cw, int ch)
     Point.y = ScreenHeight;
     ClientToScreen(HVTWin,&Point);
     CompletelyVisible = (Point.y <= VirtualScreen.bottom);
-    if (IsCaretOn()) CaretOn();
+    if (IsCaretOn()) CaretOn(vt);
   }
 }
 
@@ -2318,56 +2319,56 @@ void ResizeWindow(int x, int y, int w, int h, int cw, int ch)
 //	*Xs, *Ys: upper left corner of the region
 //		    in screen coord.
 //	*Xe, *Ye: lower right
-ttdc_t *PaintWindow(HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
+ttdc_t *PaintWindow(vtdraw_t *vt, HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
 					  int* Xs, int* Ys, int* Xe, int* Ye)
 {
 	OutputDebugPrintf("%s()\n", __FUNCTION__);
-  ttdc_t *vt = (ttdc_t *)calloc(sizeof(*vt), 1);
+	ttdc_t *dc = (ttdc_t *)calloc(1, sizeof(*dc));
 #if 0
-  assert(VTDC == NULL);
-  if (VTDC!=NULL) {
-	  //DispReleaseDC();
-	  SelectObject(VTDC, DCPrevFont);
-	  ReleaseDC(HVTWin,VTDC);
-	  VTDC = NULL;
-  }
+	assert(VTDC == NULL);
+	if (VTDC!=NULL) {
+		//DispReleaseDC();
+		SelectObject(VTDC, DCPrevFont);
+		ReleaseDC(HVTWin,VTDC);
+		VTDC = NULL;
+	}
 #endif
-  HDC hDC = PaintDC;
-  vt->HVTWin = HVTWin;
-  vt->VTDC = hDC;
-  DispInitDC2(vt);
+	HDC hDC = PaintDC;
+	dc->HVTWin = HVTWin;
+	dc->VTDC = hDC;
+	DispInitDC2(vt, dc);
 //  VTDC = hDC;
 
-  if(!BGEnable && fBkGnd)
-    FillRect(hDC, &PaintRect,Background);
+	if(!BGEnable && fBkGnd)
+		FillRect(hDC, &PaintRect,Background);
 
-  *Xs = PaintRect.left / FontWidth + WinOrgX;
-  *Ys = PaintRect.top / FontHeight + WinOrgY;
-  *Xe = (PaintRect.right-1) / FontWidth + WinOrgX;
-  *Ye = (PaintRect.bottom-1) / FontHeight + WinOrgY;
+	*Xs = PaintRect.left / vt->FontWidth + WinOrgX;
+	*Ys = PaintRect.top / vt->FontHeight + WinOrgY;
+	*Xe = (PaintRect.right - 1) / vt->FontWidth + WinOrgX;
+	*Ye = (PaintRect.bottom - 1) / vt->FontHeight + WinOrgY;
 
-  return vt;
+	return dc;
 }
 
-void DispEndPaint(ttdc_t *vt)
+void DispEndPaint(ttdc_t *dc)
 {
 	OutputDebugPrintf("%s()\n", __FUNCTION__);
-  HDC hDC = vt->VTDC;
+  HDC hDC = dc->VTDC;
   assert(hDC != NULL);
   //if (VTDC==NULL) return;
-  SelectObject(hDC,vt->DCPrevFont);
+  SelectObject(hDC,dc->DCPrevFont);
   //VTDC = NULL;
-  free(vt);
+  free(dc);
 }
 
-void DispClearWin(void)
+void DispClearWin(vtdraw_t *vt)
 {
   InvalidateRect(HVTWin,NULL,FALSE);
 
   ScrollCount = 0;
   dScroll = 0;
   if (WinHeight > NumOfLines)
-    DispChangeWinSize(NumOfColumns,NumOfLines);
+    DispChangeWinSize(vt, NumOfColumns,NumOfLines);
   else {
     if ((NumOfLines==WinHeight) && (ts.EnableScrollBuff>0))
     {
@@ -2379,7 +2380,7 @@ void DispClearWin(void)
     SetScrollPos(HVTWin,SB_HORZ,0,TRUE);
     SetScrollPos(HVTWin,SB_VERT,0,TRUE);
   }
-  if (IsCaretOn()) CaretOn();
+  if (IsCaretOn()) CaretOn(vt);
 }
 
 void DispChangeBackground(void)
@@ -2391,7 +2392,7 @@ void DispChangeBackground(void)
 	InvalidateRect(HVTWin,NULL,TRUE);
 }
 
-void DispChangeWin(void)
+void DispChangeWin(vtdraw_t *vt)
 {
   /* Change window caption */
   ChangeTitle();
@@ -2402,32 +2403,34 @@ void DispChangeWin(void)
   SwitchTitleBar();
 
   /* Change caret shape */
-  ChangeCaret();
+  ChangeCaret(vt);
 
   /* change background color */
   DispChangeBackground();
 }
 
-static void DispInitDC2(ttdc_t *vt)
+static void DispInitDC2(vtdraw_t *vt, ttdc_t *dc)
 {
-	vt->DCPrevFont = SelectObject(vt->VTDC, VTFont[0]);
+	dc->DCPrevFont = SelectObject(dc->VTDC, vt->VTFont[0]);
 //	DCPrevFont = vt->DCPrevFont;
-	SelectObject(vt->VTDC, VTFont[0]);
-	SetTextColor(vt->VTDC, BGVTColor[0]);
-	SetBkColor(vt->VTDC, BGVTColor[1]);
+	SelectObject(dc->VTDC, vt->VTFont[0]);
+	SetTextColor(dc->VTDC, BGVTColor[0]);
+	SetBkColor(dc->VTDC, BGVTColor[1]);
 
-	SetBkMode(vt->VTDC,OPAQUE);
+	SetBkMode(dc->VTDC,OPAQUE);
 }
 
 //void DispInitDC(void)
 #if !_DEBUG
-ttdc_t *DispInitDC(HWND hVTWin)
+ttdc_t *DispInitDC(vtdraw_t *vt, HWND hVTWin)
 #else
-ttdc_t *DispInitDCDebug(HWND hVTWin, const char *file, int line)
+ttdc_t *DispInitDCDebug(vtdraw_t *vt, HWND hVTWin, const char *file, int line)
 #endif
 {
+#if _DEBUG
 	OutputDebugPrintf("%s(%d): %s()\n", file, line, __FUNCTION__);
-	ttdc_t *vt = (ttdc_t *)calloc(sizeof(*vt), 1);
+#endif
+	ttdc_t *dc = (ttdc_t *)calloc(1, sizeof(*dc));
 #if 0
 	assert(VTDC == NULL);
 	if (VTDC==NULL)
@@ -2445,23 +2448,25 @@ ttdc_t *DispInitDCDebug(HWND hVTWin, const char *file, int line)
 	SetBkMode(VTDC,OPAQUE);
 	DCAttr = DefCharAttr;
 #endif
-	vt->HVTWin = hVTWin;
-	vt->VTDC = GetDC(hVTWin);
-	vt->DCAttr = DefCharAttr;
+	dc->HVTWin = hVTWin;
+	dc->VTDC = GetDC(hVTWin);
+	dc->DCAttr = DefCharAttr;
 //	DCAttr = DefCharAttr;
 //	VTDC = vt->VTDC;
-	DispInitDC2(vt);
+	DispInitDC2(vt, dc);
 
-	return vt;
+	return dc;
 }
 
 #if !_DEBUG
-void DispReleaseDC(ttdc_t *vt)
+void DispReleaseDC(vtdraw_t *vt, ttdc_t *dc)
 #else
-void DispReleaseDCDebug(ttdc_t *vt, const char *file, int line)
+void DispReleaseDCDebug(vtdraw_t *vt, ttdc_t *dc, const char *file, int line)
 #endif
 {
+#if _DEBUG
 	OutputDebugPrintf("%s(%d): %s()\n", file, line, __FUNCTION__);
+#endif
 #if 0
 	assert(VTDC != NULL);
 	if (VTDC==NULL) {
@@ -2469,10 +2474,15 @@ void DispReleaseDCDebug(ttdc_t *vt, const char *file, int line)
 		return;
 	}
 #endif
-	SelectObject(vt->VTDC, vt->DCPrevFont);
-	ReleaseDC(vt->HVTWin, vt->VTDC);
-//	VTDC = NULL;
-	free(vt);
+	SelectObject(dc->VTDC, dc->DCPrevFont);
+	if (dc->HVTWin != NULL) {
+		ReleaseDC(dc->HVTWin, dc->VTDC);
+	}
+	else {
+		// printer
+		DeleteDC(dc->VTDC);
+	}
+	free(dc);
 }
 
 /**
@@ -2720,18 +2730,18 @@ static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_col
  *   Attr: character attributes
  *   Reverse: true if text is selected (reversed) by mouse
  */
-void DispSetupDC(ttdc_t *vt, TCharAttr Attr, BOOL Reverse)
+void DispSetupDC(vtdraw_t *vt, ttdc_t *dc, TCharAttr Attr, BOOL Reverse)
 {
 	vtdisp_work_t *w = &vtdisp_work;
 	COLORREF TextColor, BackColor;
 	BYTE alpha;
-	HDC hDC = vt->VTDC;
+	HDC hDC = dc->VTDC;
 
 	GetDrawAttr(&Attr, Reverse, &TextColor, &BackColor, &alpha);
 
 #if 0
 	if (VTDC == NULL)
-		DispInitDC(vt);
+		DispInitDC(dc);
 #else
 	//assert(VTDC != NULL);
 #endif
@@ -2739,10 +2749,10 @@ void DispSetupDC(ttdc_t *vt, TCharAttr Attr, BOOL Reverse)
 	// フォント設定
 	if (((ts.FontFlag & FF_URLUNDERLINE) && (Attr.Attr & AttrURL)) ||
 		((ts.FontFlag & FF_UNDERLINE) && (Attr.Attr & AttrUnder))) {
-		SelectObject(hDC, VTFont[(Attr.Attr & AttrFontMask) | AttrUnder]);
+		SelectObject(hDC, vt->VTFont[(Attr.Attr & AttrFontMask) | AttrUnder]);
 	}
 	else {
-		SelectObject(hDC, VTFont[Attr.Attr & (AttrBold|AttrSpecial)]);
+		SelectObject(hDC, vt->VTFont[Attr.Attr & (AttrBold|AttrSpecial)]);
 	}
 
 	// 色設定
@@ -2756,7 +2766,8 @@ void DispSetupDC(ttdc_t *vt, TCharAttr Attr, BOOL Reverse)
 /**
  *	1行描画 ANSI
  */
-void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Count, int font_width, int font_height, int Y, int *X)
+void DrawStrA(vtdraw_t *vt, HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Count, int font_width,
+			  int font_height, int Y, int *X)
 {
 	int Dx[TermWidthMax];
 	int HalfCharCount = 0;
@@ -2833,7 +2844,7 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Cou
 	}
 }
 
-static void DrawChar(HDC hDC, HDC BGDC, int x, int y, const wchar_t *str, size_t len, int cell)
+static void DrawChar(vtdraw_t *vt, HDC hDC, HDC BGDC, int x, int y, const wchar_t *str, size_t len, int cell)
 {
 	SIZE char_size;
 	HDC char_dc;
@@ -2860,7 +2871,7 @@ static void DrawChar(HDC hDC, HDC BGDC, int x, int y, const wchar_t *str, size_t
 	ExtTextOutW(char_dc, 0, 0, ETO_OPAQUE, &rc, str, (UINT)len, 0);
 
 	// 横をcell幅(cell*FontWidth pixel)に拡大/縮小して描画
-	width = cell * FontWidth;
+	width = cell * vt->FontWidth;
 	height = char_size.cy;
 	if (pTransparentBlt == NULL || BGDC == NULL || w->DCBackAlpha == 255) {
 		// 直接描画
@@ -2974,7 +2985,8 @@ static void DrawStrWSub(HDC DC, HDC BGDC, const wchar_t *StrW, const int *Dx,
  *			cells	0	   2	  2		 2
  *
  */
-void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *cells, int len, int font_width, int font_height,
+void DrawStrW(vtdraw_t *vt, HDC DC, HDC BGDC, const wchar_t *StrW, const char *cells, int len, int font_width,
+			  int font_height,
 			  int Y, int *X)
 {
 	int Dx[TermWidthMax];
@@ -3022,8 +3034,8 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *cells, int len,
 									font_width, font_height, Y, X);
 						start_idx += wchar_count;
 					}
-					DrawChar(DC, BGDC, *X, Y, &StrW[i - zero_count], 1 + zero_count, cells[i]);
-					*X += cells[i] * FontWidth;
+					DrawChar(vt, DC, BGDC, *X, Y, &StrW[i - zero_count], 1 + zero_count, cells[i]);
+					*X += cells[i] * vt->FontWidth;
 					start_idx += 1 + zero_count;
 					zero_count = 0;
 					cell_count = 0;
@@ -3054,22 +3066,22 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *cells, int len,
  *  @param[in]	*X		horizontal position
  *  @param[out]	*X		horizontal position shifted by the width of the string
  */
-void DispStrA(ttdc_t *vt, const char *Buff, const char *WidthInfo, int Count, int Y, int* X)
+void DispStrA(vtdraw_t *vt, ttdc_t *dc, const char *Buff, const char *WidthInfo, int Count, int Y, int *X)
 {
 	HDC BGDC = BGEnable ? hdcBGBuffer : NULL;
-	DrawStrA(vt->VTDC, BGDC, Buff, WidthInfo, Count, FontWidth, FontHeight, Y, X);
+	DrawStrA(vt, dc->VTDC, BGDC, Buff, WidthInfo, Count, vt->FontWidth, vt->FontHeight, Y, X);
 }
 
 /**
  *	DispStr() の wchar_t版
  */
-void DispStrW(ttdc_t *vt, const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int* X)
+void DispStrW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int *X)
 {
 	HDC BGDC = BGEnable ? hdcBGBuffer : NULL;
-	DrawStrW(vt->VTDC, BGDC, StrW, WidthInfo, Count, FontWidth, FontHeight, Y, X);
+	DrawStrW(vt, dc->VTDC, BGDC, StrW, WidthInfo, Count, vt->FontWidth, vt->FontHeight, Y, X);
 }
 
-BOOL DispDeleteLines(int Count, int YEnd)
+BOOL DispDeleteLines(vtdraw_t *vt, int Count, int YEnd)
 // return value:
 //	 TRUE  - screen is successfully updated
 //   FALSE - screen is not updated
@@ -3077,14 +3089,14 @@ BOOL DispDeleteLines(int Count, int YEnd)
   RECT R;
 
   if (Active && CompletelyVisible &&
-      (YEnd+1-WinOrgY <= WinHeight))
+      (YEnd + 1 - WinOrgY <= WinHeight))
   {
 	R.left = 0;
 	R.right = ScreenWidth;
-	R.top = (CursorY-WinOrgY)*FontHeight;
-	R.bottom = (YEnd+1-WinOrgY)*FontHeight;
-//  ScrollWindow(HVTWin,0,-FontHeight*Count,&R,&R);
-	BGScrollWindow(HVTWin,0,-FontHeight*Count,&R,&R);
+	R.top = (CursorY - WinOrgY) * vt->FontHeight;
+	R.bottom = (YEnd + 1 - WinOrgY) * vt->FontHeight;
+	//  ScrollWindow(HVTWin,0,-FontHeight*Count,&R,&R);
+	BGScrollWindow(HVTWin,0,-vt->FontHeight*Count,&R,&R);
 	UpdateWindow(HVTWin);
 	return TRUE;
   }
@@ -3092,7 +3104,7 @@ BOOL DispDeleteLines(int Count, int YEnd)
 	return FALSE;
 }
 
-BOOL DispInsertLines(int Count, int YEnd)
+BOOL DispInsertLines(vtdraw_t *vt, int Count, int YEnd)
 // return value:
 //	 TRUE  - screen is successfully updated
 //   FALSE - screen is not updated
@@ -3104,10 +3116,10 @@ BOOL DispInsertLines(int Count, int YEnd)
   {
     R.left = 0;
     R.right = ScreenWidth;
-    R.top = (CursorY-WinOrgY)*FontHeight;
-    R.bottom = (YEnd+1-WinOrgY)*FontHeight;
-//  ScrollWindow(HVTWin,0,FontHeight*Count,&R,&R);
-    BGScrollWindow(HVTWin,0,FontHeight*Count,&R,&R);
+	R.top = (CursorY - WinOrgY) * vt->FontHeight;
+	R.bottom = (YEnd + 1 - WinOrgY) * vt->FontHeight;
+	//  ScrollWindow(HVTWin,0,FontHeight*Count,&R,&R);
+	BGScrollWindow(HVTWin, 0, vt->FontHeight * Count, &R, &R);
 	UpdateWindow(HVTWin);
     return TRUE;
   }
@@ -3115,7 +3127,7 @@ BOOL DispInsertLines(int Count, int YEnd)
 	return FALSE;
 }
 
-BOOL IsLineVisible(int* X, int* Y)
+BOOL IsLineVisible(vtdraw_t *vt, int *X, int *Y)
 //  Check the visibility of a line
 //	called from UpdateStr()
 //    *X, *Y: position of a character in the line. screen coord.
@@ -3140,8 +3152,8 @@ BOOL IsLineVisible(int* X, int* Y)
     return FALSE;
 
   /* screen coordinate -> window coordinate */
-  *X = (*X-WinOrgX)*FontWidth;
-  *Y = (*Y-WinOrgY)*FontHeight;
+  *X = (*X - WinOrgX) * vt->FontWidth;
+  *Y = (*Y - WinOrgY) * vt->FontHeight;
   return TRUE;
 }
 
@@ -3205,7 +3217,7 @@ void DispScrollToCursor(int CurX, int CurY)
     NewOrgY = CurY + 1 - WinHeight;
 }
 
-void DispScrollNLines(int Top, int Bottom, int Direction)
+void DispScrollNLines(vtdraw_t *vt, int Top, int Bottom, int Direction)
 //  Scroll a region of the window by Direction lines
 //    updates window if necessary
 //  Top: top line of scroll region
@@ -3214,24 +3226,24 @@ void DispScrollNLines(int Top, int Bottom, int Direction)
 {
 	if (((dScroll * Direction < 0) || (dScroll * Direction > 0)) &&
 		(((SRegionTop != Top) || (SRegionBottom != Bottom)))) {
-		DispUpdateScroll();
+		DispUpdateScroll(vt);
 	}
 	SRegionTop = Top;
 	SRegionBottom = Bottom;
 	dScroll = dScroll + Direction;
 	if (Direction > 0)
-		DispCountScroll(Direction);
+		DispCountScroll(vt, Direction);
 	else
-		DispCountScroll(-Direction);
+		DispCountScroll(vt, -Direction);
 }
 
-void DispCountScroll(int n)
+void DispCountScroll(vtdraw_t *vt, int n)
 {
   ScrollCount = ScrollCount + n;
-  if (ScrollCount>=ts.ScrollThreshold) DispUpdateScroll();
+  if (ScrollCount>=ts.ScrollThreshold) DispUpdateScroll(vt);
 }
 
-void DispUpdateScroll(void)
+void DispUpdateScroll(vtdraw_t *vt)
 {
   int d;
   RECT R;
@@ -3241,11 +3253,11 @@ void DispUpdateScroll(void)
   /* Update partial scroll */
   if (dScroll != 0)
   {
-    d = dScroll * FontHeight;
+    d = dScroll * vt->FontHeight;
     R.left = 0;
     R.right = ScreenWidth;
-    R.top = (SRegionTop-WinOrgY)*FontHeight;
-    R.bottom = (SRegionBottom+1-WinOrgY)*FontHeight;
+    R.top = (SRegionTop-WinOrgY)*vt->FontHeight;
+    R.bottom = (SRegionBottom+1-WinOrgY)*vt->FontHeight;
 //  ScrollWindow(HVTWin,0,-d,&R,&R);
     BGScrollWindow(HVTWin,0,-d,&R,&R);
 
@@ -3286,13 +3298,13 @@ void DispUpdateScroll(void)
 
   if (NewOrgX==WinOrgX)
   {
-    d = (NewOrgY-WinOrgY) * FontHeight;
-//  ScrollWindow(HVTWin,0,-d,NULL,NULL);
+	  d = (NewOrgY - WinOrgY) * vt->FontHeight;
+	  //  ScrollWindow(HVTWin,0,-d,NULL,NULL);
     BGScrollWindow(HVTWin,0,-d,NULL,NULL);
   }
   else if (NewOrgY==WinOrgY)
   {
-    d = (NewOrgX-WinOrgX) * FontWidth;
+    d = (NewOrgX-WinOrgX) * vt->FontWidth;
 //  ScrollWindow(HVTWin,-d,0,NULL,NULL);
     BGScrollWindow(HVTWin,-d,0,NULL,NULL);
   }
@@ -3316,22 +3328,22 @@ void DispUpdateScroll(void)
   WinOrgX = NewOrgX;
   WinOrgY = NewOrgY;
 
-  if (IsCaretOn()) CaretOn();
+  if (IsCaretOn()) CaretOn(vt);
 }
 
-void DispScrollHomePos(void)
+void DispScrollHomePos(vtdraw_t *vt)
 {
   NewOrgX = 0;
   NewOrgY = 0;
-  DispUpdateScroll();
+  DispUpdateScroll(vt);
 }
 
-void DispAutoScroll(POINT p)
+void DispAutoScroll(vtdraw_t *vt, POINT p)
 {
   int X, Y;
 
-  X = (p.x + FontWidth / 2) / FontWidth;
-  Y = p.y / FontHeight;
+  X = (p.x + vt->FontWidth / 2) / vt->FontWidth;
+  Y = p.y / vt->FontHeight;
   if (X<0)
     NewOrgX = WinOrgX + X;
   else if (X>=WinWidth)
@@ -3341,10 +3353,10 @@ void DispAutoScroll(POINT p)
   else if (Y>=WinHeight)
     NewOrgY = NewOrgY + Y - WinHeight + 1;
 
-  DispUpdateScroll();
+  DispUpdateScroll(vt);
 }
 
-void DispHScroll(int Func, int Pos)
+void DispHScroll(vtdraw_t *vt, int Func, int Pos)
 {
   switch (Func) {
 	case SCROLL_BOTTOM:
@@ -3361,10 +3373,10 @@ void DispHScroll(int Func, int Pos)
 	case SCROLL_POS: NewOrgX = Pos; break;
 	case SCROLL_TOP: NewOrgX = 0; break;
   }
-  DispUpdateScroll();
+  DispUpdateScroll(vt);
 }
 
-void DispVScroll(int Func, int Pos)
+void DispVScroll(vtdraw_t *vt, int Func, int Pos)
 {
   switch (Func) {
 	case SCROLL_BOTTOM:
@@ -3381,7 +3393,7 @@ void DispVScroll(int Func, int Pos)
 	case SCROLL_POS: NewOrgY = Pos-PageStart; break;
 	case SCROLL_TOP: NewOrgY = -PageStart; break;
   }
-  DispUpdateScroll();
+  DispUpdateScroll(vt);
 }
 
 //-------------- end of scrolling functions --------
@@ -3415,7 +3427,7 @@ static int GetCodePageFromFontCharSet(BYTE char_set)
  *	Restore window size by double clik on caption bar
  *
  */
-void DispRestoreWinSize(void)
+void DispRestoreWinSize(vtdraw_t *vt)
 {
   if (ts.TermIsWin>0) return;
 
@@ -3425,26 +3437,26 @@ void DispRestoreWinSize(void)
       WinWidthOld = NumOfColumns;
     if (WinHeightOld > BuffEnd)
       WinHeightOld = BuffEnd;
-    DispChangeWinSize(WinWidthOld,WinHeightOld);
+	DispChangeWinSize(vt, WinWidthOld, WinHeightOld);
   }
   else {
     SaveWinSize = TRUE;
-    DispChangeWinSize(NumOfColumns,NumOfLines);
+    DispChangeWinSize(vt, NumOfColumns,NumOfLines);
   }
 }
 
 /**
  *	WM_MOVE 時にコールされる
  */
-void DispSetWinPos(void)
+void DispSetWinPos(vtdraw_t *vt)
 {
 	int CaretX, CaretY;
 	POINT Point;
 
 	if (CanUseIME() && (ts.IMEInline > 0))
 	{
-		CaretX = (CursorX-WinOrgX)*FontWidth;
-		CaretY = (CursorY-WinOrgY)*FontHeight;
+		CaretX = (CursorX-WinOrgX)*vt->FontWidth;
+		CaretY = (CursorY-WinOrgY)*vt->FontHeight;
 		/* set IME conversion window pos. */
 		SetConversionWindow(HVTWin,CaretX,CaretY);
 	}
@@ -3476,14 +3488,14 @@ void DispMoveWindow(int x, int y)
 	return;
 }
 
-void DispSetActive(BOOL ActiveFlag)
+void DispSetActive(vtdraw_t *vt, BOOL ActiveFlag)
 {
 	Active = ActiveFlag;
 	if (Active) {
 		if (IsCaretOn()) {
-			CaretKillFocus(FALSE);
+			CaretKillFocus(vt, FALSE);
 			// アクティブ時は無条件に再描画する
-			UpdateCaretPosition(TRUE);
+			UpdateCaretPosition(vt, TRUE);
 		}
 
 		SetFocus(HVTWin);
@@ -3842,7 +3854,7 @@ void DispGetWindowSize(int *width, int *height, BOOL client) {
 	return;
 }
 
-void DispGetRootWinSize(int *x, int *y, BOOL inPixels)
+void DispGetRootWinSize(vtdraw_t *vt, int *x, int *y, BOOL inPixels)
 {
 	RECT desktop, win, client;
 
@@ -3856,8 +3868,8 @@ void DispGetRootWinSize(int *x, int *y, BOOL inPixels)
 		*y = desktop.bottom - desktop.top;
 	}
 	else {
-		*x = (desktop.right - desktop.left - (win.right - win.left - client.right)) / FontWidth;
-		*y = (desktop.bottom - desktop.top - (win.bottom - win.top - client.bottom)) / FontHeight;
+		*x = (desktop.right - desktop.left - (win.right - win.left - client.right)) / vt->FontWidth;
+		*y = (desktop.bottom - desktop.top - (win.bottom - win.top - client.bottom)) / vt->FontHeight;
 	}
 }
 

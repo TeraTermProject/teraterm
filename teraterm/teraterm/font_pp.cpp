@@ -302,8 +302,8 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 										ts->FontDW = dlgw;
 										ts->FontDY = dlgy;
 										ts->FontDH = dlgh;
-										ChangeFont(0);
-										DispChangeWinSize(ts->TerminalWidth, ts->TerminalHeight);
+										ChangeFont(vt_src, 0);
+										DispChangeWinSize(vt_src, ts->TerminalWidth, ts->TerminalHeight);
 									}
 								}
 							}
@@ -311,7 +311,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					}
 
 					// フォントの設定
-					ChangeFont(0);
+					ChangeFont(vt_src, 0);
 					HWND vtwin = GetParent(GetParent(hWnd));
 					if (::IsZoomed(vtwin)) {
 						// 最大化されている場合は、サイズ変更により WM_SIZE を発生させる。
@@ -320,9 +320,9 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						SetWindowPos(vtwin, NULL, 0, 0, r.right - r.left, 0, SWP_NOMOVE);
 						SetWindowPos(vtwin, NULL, 0, 0, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
 					} else {
-						DispChangeWinSize(WinWidth,WinHeight);
+						DispChangeWinSize(vt_src, WinWidth, WinHeight);
 					}
-					ChangeCaret();
+					ChangeCaret(vt_src);
 
 					break;
 				}
