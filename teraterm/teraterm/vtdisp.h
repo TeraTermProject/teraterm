@@ -169,6 +169,9 @@ BOOL DispIsPrinter(vtdraw_t *vt);
 BOOL DispDCIsPrinter(ttdc_t *dc);
 void DispSetDrawPos(vtdraw_t *vt, ttdc_t *dc, int x, int y);
 
+void DispFontCreate(vtdraw_t *vt, ttdc_t *dc, LOGFONTW VTlf);
+void DispFontDelete(vtdraw_t *vt);
+
 extern int WinWidth, WinHeight;
 extern int ScreenWidth, ScreenHeight;
 extern BOOL AdjustSize, DontChangeSize;

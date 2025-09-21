@@ -198,7 +198,7 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **pdc, int *mode)
 	POINT PPI, PPI2;
 	HDC DC;
 	TCharAttr TempAttr = DefCharAttr;
-	LOGFONTA Prnlf;
+	LOGFONTW Prnlf;
 	vtdraw_t *p = (vtdraw_t *)calloc(1, sizeof(*p));
 	p->IsPrinter = TRUE;
 	p->IsColorPrinter = FALSE;		// TRUEのときプリンタにカラーで印刷する
@@ -253,13 +253,13 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **pdc, int *mode)
 		Prnlf.lfHeight = ts.VTFontSize.y;
 		Prnlf.lfWidth = ts.VTFontSize.x;
 		Prnlf.lfCharSet = ts.VTFontCharSet;
-		strncpy_s(Prnlf.lfFaceName, sizeof(Prnlf.lfFaceName), ts.VTFont, _TRUNCATE);
+		ACPToWideChar_t(ts.VTFont, Prnlf.lfFaceName, _countof(Prnlf.lfFaceName));
 	}
 	else {
 		Prnlf.lfHeight = ts.PrnFontSize.y;
 		Prnlf.lfWidth = ts.PrnFontSize.x;
 		Prnlf.lfCharSet = ts.PrnFontCharSet;
-		strncpy_s(Prnlf.lfFaceName, sizeof(Prnlf.lfFaceName), ts.PrnFont, _TRUNCATE);
+		ACPToWideChar_t(ts.PrnFont, Prnlf.lfFaceName, _countof(Prnlf.lfFaceName));
 	}
 	Prnlf.lfWeight = FW_NORMAL;
 	Prnlf.lfItalic = 0;
@@ -270,7 +270,7 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **pdc, int *mode)
 	Prnlf.lfQuality = DEFAULT_QUALITY;
 	Prnlf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
 
-	p->VTFont[0] = CreateFontIndirectA(&Prnlf);
+	p->VTFont[0] = CreateFontIndirectW(&Prnlf);
 
 	DC = GetDC(HVTWin);
 	SelectObject(DC, p->VTFont[0]);
@@ -285,44 +285,7 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **pdc, int *mode)
 	Prnlf.lfWidth = (int)((float)Metrics.tmAveCharWidth * (float)PPI.x / (float)PPI2.x);
 
 	/* Create New Fonts */
-
-	/* Normal Font */
-	Prnlf.lfWeight = FW_NORMAL;
-	Prnlf.lfUnderline = 0;
-	p->VTFont[0] = CreateFontIndirectA(&Prnlf);
-	SelectObject(PrintDC,p->VTFont[0]);
-	GetTextMetrics(PrintDC, &Metrics);
-	p->FontWidth = Metrics.tmAveCharWidth;
-	p->FontHeight = Metrics.tmHeight;
-	/* Under line */
-	Prnlf.lfUnderline = 1;
-	p->VTFont[AttrUnder] = CreateFontIndirectA(&Prnlf);
-
-	if (ts.FontFlag & FF_BOLD) {
-		/* Bold */
-		Prnlf.lfUnderline = 0;
-		Prnlf.lfWeight = FW_BOLD;
-		p->VTFont[AttrBold] = CreateFontIndirectA(&Prnlf);
-		/* Bold + Underline */
-		Prnlf.lfUnderline = 1;
-		p->VTFont[AttrBold | AttrUnder] = CreateFontIndirectA(&Prnlf);
-	}
-	else {
-		p->VTFont[AttrBold] = p->VTFont[AttrDefault];
-		p->VTFont[AttrBold | AttrUnder] = p->VTFont[AttrUnder];
-	}
-	/* Special font */
-	Prnlf.lfWeight = FW_NORMAL;
-	Prnlf.lfUnderline = 0;
-	Prnlf.lfWidth = p->FontWidth; /* adjust width */
-	Prnlf.lfHeight = p->FontHeight;
-	Prnlf.lfCharSet = SYMBOL_CHARSET;
-
-	strncpy_s(Prnlf.lfFaceName, sizeof(Prnlf.lfFaceName),"Tera Special", _TRUNCATE);
-	p->VTFont[AttrSpecial] = CreateFontIndirectA(&Prnlf);
-	p->VTFont[AttrSpecial | AttrBold] = p->VTFont[AttrSpecial];
-	p->VTFont[AttrSpecial | AttrUnder] = p->VTFont[AttrSpecial];
-	p->VTFont[AttrSpecial | AttrBold | AttrUnder] = p->VTFont[AttrSpecial];
+	DispFontCreate(p, dc, Prnlf);
 
 	p->Black = RGB(0,0,0);
 	p->White = RGB(255,255,255);
@@ -355,27 +318,15 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **pdc, int *mode)
  */
 void VTPrintEnd(vtdraw_t *vt, ttdc_t *dc)
 {
-	int i, j;
-
 	if (PrnAbortDlg->IsAborted()) {
 		AbortDoc(dc->VTDC);
 	}
 	else {
 		EndPage(dc->VTDC);
 	}
-
-	for (i = 0 ; i <= AttrFontMask ; i++) {
-		for (j = i+1 ; j <= AttrFontMask ; j++) {
-			if (vt->VTFont[j] == vt->VTFont[i]) {
-				vt->VTFont[j] = NULL;
-			}
-		}
-		if (vt->VTFont[i] != NULL) {
-			DeleteObject(vt->VTFont[i]);
-		}
-	}
-
 	PrnStop(dc->VTDC);
+
+	DispFontDelete(vt);
 	DispReleaseDC(vt, dc);
 	free(vt);
 }
