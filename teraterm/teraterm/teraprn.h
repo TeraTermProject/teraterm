@@ -51,10 +51,6 @@ void PrnStop(HDC hDC);
 
 vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **dc, int *mode);
 void VTPrintEnd(vtdraw_t *vt, ttdc_t *dc);
-void PrnSetupDC(vtdraw_t *vt, TCharAttr Attr, BOOL reverse);
-void PrnOutTextA(vtdraw_t *vt, const char *Buff, const char *WidthInfo, int Count, void *data);
-void PrnOutTextW(vtdraw_t *vt, const wchar_t *StrW, const char *WidthInfo, int Count, void *data);
-void PrnNewLine(vtdraw_t *vt);
 
 #ifdef __cplusplus
 }

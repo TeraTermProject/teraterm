@@ -40,7 +40,7 @@
 
 HWND CPrnAbortDlg::m_hWnd_static;
 
-LRESULT CALLBACK CPrnAbortDlg::OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
+INT_PTR CALLBACK CPrnAbortDlg::OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ IDC_PRNABORT_PRINTING, "DLG_PRNABORT_PRINTING" },
@@ -90,14 +90,16 @@ CPrnAbortDlg::CPrnAbortDlg()
  *	@param	hInstance
  *	@param	hParent
  *	@param	AbortFlag	中断ボタンが押されると TRUE となる(NULLのとき使用しない)
+ *						IsAborted()でもチェック可
  *	@param	pts
  *	@retval	TRUE		ok
- *	@retval	FALSE		ダイアログ生成失敗(ないはず)
+ *	@retval	FALSE		ダイアログ生成失敗(発生しないはず)
  */
 BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PTTSet pts)
 {
 	assert(m_hWnd_static == NULL);
 	if (m_hWnd_static != NULL) {
+		// 印刷は1つしかできない
 		return FALSE;
 	}
 
@@ -149,13 +151,20 @@ int CPrnAbortDlg::SetPrintDC(HDC hPrintDC)
 }
 
 /**
+ *	印刷中に呼び出されるコールバック
+ *	戻り値で印字の中断/継続をシステムに伝える
+ *	この中でダイアログのメッセージポンプを動かす
  *
+ *	@param	hDC		印刷中のDC ?
+ *	@param	Error	0=エラーなし/SP_OUTOFDISK ?
  *	@retval	TRUE	印刷ジョブを続行
  *	@retval	FALSE	印刷ジョブを取り消す
  */
 BOOL CPrnAbortDlg::AbortProc(HDC hDC, int Error)
 {
 	MSG m;
+	(void)hDC;
+	(void)Error;
 
 	// すでに abort が押されている
 	if (m_PrintAbortFlag) {

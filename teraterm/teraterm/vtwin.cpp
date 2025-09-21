@@ -664,7 +664,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	InitBuffer((IdVtDrawAPI)ts.VTDrawAPI);
 	BuffSetDispCodePage(ts.VTDrawAnsiCodePage);
 
-	vt_src = InitDisp();
 	BGLoadThemeFile(&ts);
 
 	if (ts.HideTitle>0) {
@@ -715,6 +714,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	HVTWin = GetSafeHwnd();
 	if (HVTWin == NULL) return;
 	cv.HWin = HVTWin;
+	vt_src = InitDisp(HVTWin);
 
 	// Windows 11 でウィンドウの角が丸くならないようにする
 	if (ts.WindowCornerDontround && pDwmSetWindowAttribute != NULL) {
@@ -4515,7 +4515,7 @@ void CVTWindow::SetColor()
 
 	// 色を設定する
 	if (set_color) {
-		DispResetColor(CS_ALL);
+		DispResetColor(vt_src, CS_ALL);
 	}
 }
 
@@ -4776,7 +4776,7 @@ void CVTWindow::OnControlResetTerminal()
 	HideStatusLine();
 	DispScrollHomePos(vt_src);
 	ResetTerminal();
-	DispResetColor(CS_ALL);
+	DispResetColor(vt_src, CS_ALL);
 	UnlockBuffer();
 
 	LButton = FALSE;

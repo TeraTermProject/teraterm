@@ -51,6 +51,6 @@ private:
 	static HWND m_hWnd_static;
 
 	BOOL AbortProc(HDC PDC, int Code);
-	static LRESULT CALLBACK OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
+	static INT_PTR CALLBACK OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
 	static BOOL CALLBACK AbortProcStatic(HDC hDC, int Error);
 };
