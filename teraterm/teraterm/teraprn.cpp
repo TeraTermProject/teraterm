@@ -197,7 +197,6 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **pdc, int *mode)
 	TEXTMETRIC Metrics;
 	POINT PPI, PPI2;
 	HDC DC;
-	TCharAttr TempAttr = DefCharAttr;
 	LOGFONTW Prnlf;
 	vtdraw_t *p = (vtdraw_t *)calloc(1, sizeof(*p));
 	p->IsPrinter = TRUE;
@@ -289,7 +288,6 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **pdc, int *mode)
 
 	p->Black = RGB(0,0,0);
 	p->White = RGB(255,255,255);
-	DispSetupDC(p, dc, &TempAttr, FALSE);
 	DispSetDrawPos(p, dc, 0, 0);
 
 	*pdc = dc;

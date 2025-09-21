@@ -116,12 +116,6 @@ static BOOL CaretEnabled = TRUE;
 BOOL IMEstat;				/* IME Status  TRUE=IME ON */
 BOOL IMECompositionState;	/* 変換状態 TRUE=変換中 */
 
-// ---- device context and status flags
-//static HDC VTDC = NULL; /* Device context for VT window */
-//static TCharAttr DCAttr;
-//static TCharAttr CurCharAttr;
-//static HFONT DCPrevFont;
-
 TCharAttr DefCharAttr = {
   AttrDefault,
   AttrDefault,
@@ -2419,7 +2413,6 @@ ttdc_t *DispInitDC(vtdraw_t *vt)
 	ttdc_t *dc = (ttdc_t *)calloc(1, sizeof(*dc));
 	dc->HVTWin = vt->hVTWin;
 	dc->VTDC = GetDC(vt->hVTWin);
-//	dc->DCAttr = DefCharAttr;
 	DispInitDC2(vt, dc);
 
 	return dc;
