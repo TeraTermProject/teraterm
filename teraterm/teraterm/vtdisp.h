@@ -70,7 +70,6 @@ typedef struct {
 
 // VT Winの描画情報、ワーク
 typedef struct {
-	ttdc_t *dc;
 	HFONT VTFont[AttrFontMask+1];
 	int FontWidth, FontHeight;
 	RECT Margin;
