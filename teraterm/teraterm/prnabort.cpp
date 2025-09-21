@@ -85,7 +85,7 @@ CPrnAbortDlg::CPrnAbortDlg()
 }
 
 /**
- *	ダイアログを表示する
+ *	ダイアログを生成して表示する
  *
  *	@param	hInstance
  *	@param	hParent
@@ -99,7 +99,7 @@ BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PT
 {
 	assert(m_hWnd_static == NULL);
 	if (m_hWnd_static != NULL) {
-		// 印刷は1つしかできない
+		// 印刷中止ダイアログは1つしか作れない
 		return FALSE;
 	}
 
@@ -115,10 +115,10 @@ BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PT
 	HWND hWnd = TTCreateDialogParam(
 		hInstance, MAKEINTRESOURCEW(IDD_PRNABORTDLG), hParent,
 		OnDlgProc, (LPARAM)this);
-	if (hWnd == NULL)
-	{
+	if (hWnd == NULL) {
 		return FALSE;
 	}
+	CenterWindow(hWnd, ::GetParent(hWnd));
 
 	m_hWnd = hWnd;
 	m_hWnd_static = hWnd;

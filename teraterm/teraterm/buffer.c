@@ -2234,6 +2234,11 @@ void BuffPrint(BOOL ScrollRegion)
 		PrintEnd.x = NumOfColumns;
 		PrintEnd.y = PageStart + NumOfLines - 1;
 	}
+
+	// スクロールしている分(スクロールバーで古いバッファを見ている等)ずらす
+	PrintStart.y += WinOrgY;
+	PrintEnd.y += WinOrgY;
+
 	if (PrintEnd.y > BuffEnd-1) {
 		PrintEnd.y = BuffEnd-1;
 	}
@@ -3521,7 +3526,6 @@ void BuffUpdateRect
 {
 	int j;
 	int IStart, IEnd;
-//	int X, Y;
 	LONG TmpPtr;
 	BOOL TempSel, Caret;
 
@@ -3567,9 +3571,6 @@ void BuffUpdateRect
 		CaretOff(vt_src);
 	}
 
-	DispSetupDC(vt_src, dc, &DefCharAttr, TempSel);
-
-	//Y = (YStart-WinOrgY)*FontHeight;
 	TmpPtr = GetLinePtr(PageStart+YStart);
 	for (j = YStart+PageStart ; j <= YEnd+PageStart ; j++) {
 		IStart = XStart;
@@ -3577,10 +3578,7 @@ void BuffUpdateRect
 
 		IStart = LeftHalfOfDBCS(TmpPtr,IStart);
 
-		//X = (IStart-WinOrgX)*FontWidth;
-
 		BuffDrawLineI(vt_src, dc, j, IStart, IEnd);
-		//Y = Y + FontHeight;
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
 	if (Caret) {
