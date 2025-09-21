@@ -2200,15 +2200,16 @@ void BuffPrint(BOOL ScrollRegion)
 	int IStart, IEnd;
 	LONG TmpPtr;
 	vtdraw_t *vt;
+	ttdc_t *dc;
 
 	if (ScrollRegion) {
-		vt = VTPrintInit(IdPrnScrollRegion, &Id);
+		vt = VTPrintInit(IdPrnScrollRegion, &dc, &Id);
 	}
 	else if (Selected) {
-		vt = VTPrintInit(IdPrnScreen | IdPrnSelectedText, &Id);
+		vt = VTPrintInit(IdPrnScreen | IdPrnSelectedText, &dc, &Id);
 	}
 	else {
-		vt = VTPrintInit(IdPrnScreen, &Id);
+		vt = VTPrintInit(IdPrnScreen, &dc, &Id);
 	}
 	if (Id==IdPrnCancel) {
 		return;
@@ -2256,12 +2257,12 @@ void BuffPrint(BOOL ScrollRegion)
 		}
 
 		//BuffDrawLineIPrn(vt, j, IStart, IEnd);
-		BuffDrawLineI(vt, vt->dc, -1, -1, j, IStart, IEnd);
+		BuffDrawLineI(vt, dc, -1, -1, j, IStart, IEnd);
 		PrnNewLine(vt);
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
 	UnlockBuffer();
-	VTPrintEnd(vt);
+	VTPrintEnd(vt, dc);
 }
 
 // TODO とりあえず ANSI で実装
