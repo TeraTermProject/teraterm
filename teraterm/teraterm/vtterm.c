@@ -2861,7 +2861,7 @@ static void CSQExchangeColor(void)
 
 	ts.ColorFlag ^= CF_REVERSEVIDEO;
 
-	DispChangeBackground();
+	DispChangeBackground(vt_src);
 	UpdateWindow(HVTWin);
 }
 
@@ -4864,7 +4864,7 @@ static void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYT
 			SendOSCstr(StrBuff, len, TermChar);
 		}
 		else if (XsParseColor(ColorSpec, &color)) {
-			DispSetColor(colornum, color);
+			DispSetColor(vt_src, colornum, color);
 		}
 	}
 }
@@ -5144,7 +5144,7 @@ static void XSequence(BYTE b)
 							color_num = color_num * 10 + *p - '0';
 						}
 						else if (*p == ';') {
-							DispResetColor(XtColor2TTColor(Param[1], color_num));
+							DispResetColor(vt_src, XtColor2TTColor(Param[1], color_num));
 							color_num = 0;
 						}
 						else {
@@ -5152,12 +5152,12 @@ static void XSequence(BYTE b)
 						}
 					}
 					if (color_num != CS_UNSPEC) {
-						DispResetColor(XtColor2TTColor(Param[1], color_num));
+						DispResetColor(vt_src, XtColor2TTColor(Param[1], color_num));
 					}
 				}
 			}
 			else {
-				DispResetColor(XtColor2TTColor(Param[1], CS_UNSPEC));
+				DispResetColor(vt_src, XtColor2TTColor(Param[1], CS_UNSPEC));
 			}
 			break;
 		  case 110: /* Reset VT-Window foreground color */
@@ -5170,7 +5170,7 @@ static void XSequence(BYTE b)
 		  case 117: /* Reset highlight background color */
 		  case 118: /* Reset Tek-Window cursor color */
 		  case 119: /* Reset highlight foreground color */
-			DispResetColor(XtColor2TTColor(Param[1], CS_UNSPEC));
+			DispResetColor(vt_src, XtColor2TTColor(Param[1], CS_UNSPEC));
 			if (HasParamStr && StrBuff) {
 				color_num = 0;
 				for (p = StrBuff; *p; p++) {
@@ -5178,7 +5178,7 @@ static void XSequence(BYTE b)
 						color_num = color_num * 10 + *p - '0';
 					}
 					else if (*p == ';') {
-						DispResetColor(XtColor2TTColor(color_num, CS_UNSPEC));
+						DispResetColor(vt_src, XtColor2TTColor(color_num, CS_UNSPEC));
 						color_num = 0;
 					}
 					else {
@@ -5187,7 +5187,7 @@ static void XSequence(BYTE b)
 					}
 				}
 				if (color_num != CS_UNSPEC) {
-					DispResetColor(XtColor2TTColor(color_num, CS_UNSPEC));
+					DispResetColor(vt_src, XtColor2TTColor(color_num, CS_UNSPEC));
 				}
 			}
 			break;
@@ -5340,7 +5340,7 @@ int VTParse()
 	ChangeEmu = 0;
 
 	/* Get Device Context */
-	ttdc_t *vt = DispInitDC(vt_src, HVTWin);
+	ttdc_t *vt = DispInitDC(vt_src);
 
 	LockBuffer();
 

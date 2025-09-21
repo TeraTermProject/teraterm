@@ -55,10 +55,12 @@
 static CPrnAbortDlg *PrnAbortDlg;
 static BOOL PrintAbortFlag = FALSE;
 
-static void PrnSetAttr(vtdraw_t *vt, ttdc_t *dc, const TCharAttr *Attr);
-
 static UINT_PTR CALLBACK PrintHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
+	(void)hdlg;
+	(void)uiMsg;
+	(void)wParam;
+	(void)lParam;
 	return 0;
 }
 
@@ -103,6 +105,7 @@ static ttdc_t *CreateTTDC(HDC hDC)
 {
 	ttdc_t *dc = (ttdc_t *)calloc(1, sizeof(*dc));
 	dc->VTDC = hDC;
+	dc->IsPrinter = TRUE;
 	return dc;
 }
 
@@ -188,7 +191,7 @@ void PrnStop(HDC hDC)
  *	= IdPrnFile		(always when PrnFlag=IdPrnFile)
  *	@return		vt
  */
-vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **dc, int *mode)
+vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **pdc, int *mode)
 {
 	BOOL Sel;
 	TEXTMETRIC Metrics;
@@ -197,11 +200,14 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **dc, int *mode)
 	TCharAttr TempAttr = DefCharAttr;
 	LOGFONTA Prnlf;
 	vtdraw_t *p = (vtdraw_t *)calloc(1, sizeof(*p));
+	p->IsPrinter = TRUE;
+	p->IsColorPrinter = FALSE;		// TRUEのときプリンタにカラーで印刷する
 
 	Sel = (PrnFlag & IdPrnSelectedText)!=0;
 	HDC PrintDC = PrnBox(HVTWin,&Sel);
 	if (PrintDC == NULL) {
 		*mode = IdPrnCancel;
+		*pdc = NULL;
 		return NULL;
 	}
 
@@ -210,6 +216,7 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **dc, int *mode)
 	if (!PrnStart(PrintDC, TitleW)) {
 		free(TitleW);
 		*mode = IdPrnCancel;
+		*pdc = NULL;
 		return NULL;
 	}
 	free(TitleW);
@@ -217,7 +224,7 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **dc, int *mode)
 	/* initialization */
 	StartPage(PrintDC);
 
-	*dc = CreateTTDC(PrintDC);
+	ttdc_t *dc = CreateTTDC(PrintDC);
 
 	/* pixels per inch */
 	if ((ts.VTPPI.x>0) && (ts.VTPPI.y>0)) {
@@ -319,10 +326,10 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **dc, int *mode)
 
 	p->Black = RGB(0,0,0);
 	p->White = RGB(255,255,255);
-	PrnSetAttr(p, *dc, &TempAttr);
+	DispSetupDC(p, dc, &TempAttr, FALSE);
+	DispSetDrawPos(p, dc, 0, 0);
 
-	p->PrnY = p->Margin.top;
-	p->PrnX = p->Margin.left;
+	*pdc = dc;
 
 	if (PrnFlag == IdPrnScrollRegion) {
 		*mode = IdPrnScrollRegion;
@@ -340,77 +347,6 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **dc, int *mode)
 		*mode = IdPrnScreen;
 		return p;
 	}
-}
-
-static void PrnSetAttr(vtdraw_t *vt, ttdc_t *dc, const TCharAttr *Attr)
-//  Set text attribute of printing
-//
-{
-	vt->PrnAttr = *Attr;
-	SelectObject(dc->VTDC, vt->VTFont[Attr->Attr & AttrFontMask]);
-
-	if ((Attr->Attr & AttrReverse) != 0) {
-		SetTextColor(dc->VTDC, vt->White);
-		SetBkColor(  dc->VTDC, vt->Black);
-	}
-	else {
-		SetTextColor(dc->VTDC, vt->Black);
-		SetBkColor(  dc->VTDC, vt->White);
-	}
-}
-
-void PrnSetupDC(vtdraw_t *vt, ttdc_t *dc, TCharAttr Attr, BOOL reverse)
-{
-	(void)reverse;
-	PrnSetAttr(vt, dc, &Attr);
-}
-
-/**
- *  Print out text
- *    Buff: points text buffer
- *    Count: number of characters to be printed
- */
-void PrnOutTextA(vtdraw_t *vt, ttdc_t *dc, const char *StrA, const char *WidthInfo, int Count, void *data)
-{
-	if (vt->PrnX+vt->FontWidth > vt->Margin.right) {
-		/* new line */
-		vt->PrnX = vt->Margin.left;
-		vt->PrnY = vt->PrnY + vt->FontHeight;
-	}
-	if (vt->PrnY+vt->FontHeight > vt->Margin.bottom) {
-		/* next page */
-		EndPage(dc->VTDC);
-		StartPage(dc->VTDC);
-		PrnSetAttr(vt, dc, &vt->PrnAttr);
-		vt->PrnY = vt->Margin.top;
-	}
-
-	DrawStrA(vt, dc->VTDC, NULL, StrA, WidthInfo, Count, vt->FontWidth, vt->FontHeight, vt->PrnY, &vt->PrnX);
-}
-
-void PrnOutTextW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *cells, int len, void *data)
-{
-	if (vt->PrnX+vt->FontWidth > vt->Margin.right) {
-		/* new line */
-		vt->PrnX = vt->Margin.left;
-		vt->PrnY = vt->PrnY + vt->FontHeight;
-	}
-	if (vt->PrnY+vt->FontHeight > vt->Margin.bottom) {
-		/* next page */
-		EndPage(dc->VTDC);
-		StartPage(dc->VTDC);
-		PrnSetAttr(vt, dc, &vt->PrnAttr);
-		vt->PrnY = vt->Margin.top;
-	}
-
-	DrawStrW(vt, dc->VTDC, NULL, StrW, cells, len, vt->FontWidth, vt->FontHeight, vt->PrnY, &vt->PrnX);
-}
-
-void PrnNewLine(vtdraw_t *vt)
-//  Moves to the next line in printing
-{
-	vt->PrnX = vt->Margin.left;
-	vt->PrnY = vt->PrnY + vt->FontHeight;
 }
 
 /**
@@ -440,7 +376,7 @@ void VTPrintEnd(vtdraw_t *vt, ttdc_t *dc)
 	}
 
 	PrnStop(dc->VTDC);
-	DispReleaseDC(vt_src, dc);
+	DispReleaseDC(vt, dc);
 	free(vt);
 }
 
@@ -499,7 +435,7 @@ void PrnFinish(PrintFile *handle)
 	free(handle);
 }
 
-static void PrnOutText(vtdraw_t *vt, ttdc_t *dc, const char *StrA, int Count, void *data)
+static void PrnOutText(vtdraw_t *vt, ttdc_t *dc, const char *StrA, int Count)
 {
 	// 文字幅情報を作る
 	//	MBCSのとき、1byte=1cell, 2byte=2cell
@@ -521,7 +457,7 @@ static void PrnOutText(vtdraw_t *vt, ttdc_t *dc, const char *StrA, int Count, vo
 		}
 	}
 
-	DrawStrA(vt, dc->VTDC, NULL, StrA, WidthInfo, Count, vt->FontWidth, vt->FontHeight, vt->PrnY, &vt->PrnX);
+	DispStrA(vt, dc, StrA, WidthInfo, Count);
 
 	free(WidthInfo);
 }
@@ -594,16 +530,16 @@ static void PrintFile_(PrintFile *handle)
 					}
 				} while ((c>0) && (! CRFlag));
 				if (len_a >0) {
-					PrnOutText(vt, dc, BuffA, len_a, NULL);
-					//PrnOutTextW(BuffW, NULL, len_w, NULL);
+					PrnOutText(vt, dc, BuffA, len_a);
+					//PrnOutTextW(BuffW, NULL, len_w);
 				}
 				if (CRFlag) {
-					vt->PrnX = vt->Margin.left;
+					dc->PrnX = vt->Margin.left;
 					if ((u32==FF) && (ts.PrnConvFF==0)) { // new page
-						vt->PrnY = vt->Margin.bottom;
+						dc->PrnY = vt->Margin.bottom;
 					}
 					else { // new line
-						vt->PrnY = vt->PrnY + vt->FontHeight;
+						dc->PrnY = dc->PrnY + vt->FontHeight;
 					}
 				}
 				CRFlag = (u32==CR);
