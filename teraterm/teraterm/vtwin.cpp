@@ -2619,11 +2619,11 @@ void CVTWindow::OnPaint()
 
 	PaintDC = BeginPaint(&ps);
 
-	PaintWindow(PaintDC,ps.rcPaint,ps.fErase, &Xs,&Ys,&Xe,&Ye);
+	ttdc_t *vt = PaintWindow(PaintDC, ps.rcPaint, ps.fErase, &Xs, &Ys, &Xe, &Ye);
 	LockBuffer();
 	BuffUpdateRect(Xs,Ys,Xe,Ye);
 	UnlockBuffer();
-	DispEndPaint();
+	DispEndPaint(vt);
 
 	EndPaint(&ps);
 

@@ -59,6 +59,15 @@ extern "C" {
 #define CS_UNSPEC          0xffffffff
 #define CS_ALL             0xfffffffe	// DispResetColor() だけで使用
 
+// HDC の wapper
+typedef struct {
+	HDC VTDC;			// 描画に使用するDC
+	HWND HVTWin;		// DCの元になったHWND
+	HFONT DCPrevFont;	// DCに最初にセレクトされていたfont
+	TCharAttr DCAttr;
+	void *data;
+} ttdc_t;
+
 /* prototypes */
 void BGInitialize(BOOL initialize_once);
 void BGLoadThemeFile(const TTTSet *pts);
@@ -89,17 +98,13 @@ BOOL IsCaretEnabled(void);
 void DispSetCaretWidth(BOOL DW);
 void DispChangeWinSize(int Nx, int Ny);
 void ResizeWindow(int x, int y, int w, int h, int cw, int ch);
-void PaintWindow(HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
+ttdc_t *PaintWindow(HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
 		 int* Xs, int* Ys, int* Xe, int* Ye);
-void DispEndPaint(void);
+void DispEndPaint(ttdc_t *vt);
 void DispClearWin(void);
 void DispChangeBackground(void);
 void DispChangeWin(void);
-void DispInitDC(void);
-void DispReleaseDC(void);
-void DispSetupDC(TCharAttr Attr, BOOL Reverse);
-void DispStrA(const char *Buff, const char *WidthInfo, int Count, int Y, int* X);
-void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int* X);
+void DispSetupDC(ttdc_t *vt, TCharAttr Attr, BOOL Reverse);
 BOOL DispDeleteLines(int Count, int YEnd);
 BOOL DispInsertLines(int Count, int YEnd);
 BOOL IsLineVisible(int* X, int* Y);
@@ -135,9 +140,22 @@ void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Cou
 void DispEnableResizedFont(BOOL enable);
 BOOL DispIsResizedFont();
 
+#if !_DEBUG
+ttdc_t *DispInitDC(HWND hVTWin);
+void DispReleaseDC(ttdc_t *vt);
+#else
+ttdc_t *DispInitDCDebug(HWND hVTWin, const char *file, int line);
+#define DispInitDC(p1)	DispInitDCDebug(p1, __FILE__, __LINE__)
+void DispReleaseDCDebug(ttdc_t *vt, const char *file, int line);
+#define DispReleaseDC(p1) DispReleaseDCDebug(p1, __FILE__, __LINE__)
+#endif
+void DispStrA(ttdc_t *vt, const char *Buff, const char *WidthInfo, int Count, int Y, int* X);
+void DispStrW(ttdc_t *vt, const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int* X);
+
 extern int WinWidth, WinHeight;
-extern HFONT VTFont[AttrFontMask+1];
-extern int FontHeight, FontWidth, ScreenWidth, ScreenHeight;
+//extern HFONT VTFont[AttrFontMask+1];
+extern int FontHeight, FontWidth;
+extern int ScreenWidth, ScreenHeight;
 extern BOOL AdjustSize, DontChangeSize;
 extern int CursorX, CursorY;
 extern int WinOrgX, WinOrgY, NewOrgX, NewOrgY;

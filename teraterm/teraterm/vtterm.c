@@ -5340,7 +5340,7 @@ int VTParse()
 	ChangeEmu = 0;
 
 	/* Get Device Context */
-	DispInitDC();
+	ttdc_t *vt = DispInitDC(HVTWin);
 
 	LockBuffer();
 
@@ -5409,7 +5409,7 @@ int VTParse()
 	UnlockBuffer();
 
 	/* release device context */
-	DispReleaseDC();
+	DispReleaseDC(vt);
 
 	CaretOn();
 
