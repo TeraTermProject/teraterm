@@ -29,6 +29,8 @@
 
 /* TERATERM.EXE, Printing routines */
 
+#pragma once
+
 #include "buffer.h"		// for TCharAttr
 
 #ifdef __cplusplus
@@ -37,8 +39,8 @@ extern "C" {
 
 /* prototypes */
 HDC PrnBox(HWND HWin, PBOOL Sel);
-BOOL PrnStart(HDC hDC, LPSTR DocumentName);
-void PrnStop();
+BOOL PrnStart(HDC hDC, const wchar_t *DocumentName);
+void PrnStop(HDC hDC);
 
 #define IdPrnCancel 0
 #define IdPrnScreen 1

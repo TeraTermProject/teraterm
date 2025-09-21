@@ -42,9 +42,6 @@
 #include "ttlib.h"
 #include "codeconv.h"
 #include "vtdisp.h"
-
-#include "tt_res.h"
-#include "tmfc.h"
 #include "prnabort.h"
 
 #include "teraprn.h"
@@ -67,30 +64,8 @@ static BOOL Printing = FALSE;
 static BOOL PrintAbortFlag = FALSE;
 
 static CPrnAbortDlg *PrnAbortDlg;
-static HWND HPrnAbortDlg;
 
 static void PrnSetAttr(TCharAttr Attr);
-
-/* Print Abortion Call Back Function */
-static BOOL CALLBACK PrnAbortProc(HDC PDC, int Code)
-{
-	MSG m;
-
-	while ((! PrintAbortFlag) && PeekMessage(&m, 0,0,0, PM_REMOVE))
-		if ((HPrnAbortDlg==NULL) || (! IsDialogMessage(HPrnAbortDlg, &m))) {
-			TranslateMessage(&m);
-			DispatchMessage(&m);
-		}
-
-	if (PrintAbortFlag) {
-		HPrnAbortDlg = NULL;
-		PrnAbortDlg = NULL;
-		return FALSE;
-	}
-	else {
-		return TRUE;
-	}
-}
 
 static UINT_PTR CALLBACK PrintHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -142,10 +117,9 @@ HDC PrnBox(HWND HWin, PBOOL Sel)
  *	@relval	TRUE			ok
  *	@retval	FALSE			開始失敗
  */
-BOOL PrnStart(HDC hDC, LPSTR DocumentName)
+BOOL PrnStart(HDC hDC, const wchar_t *DocumentName)
 {
-	DOCINFOA Doc;
-	char DocName[50];
+	DOCINFOW Doc = {};
 	HWND hParent;
 
 	Printing = FALSE;
@@ -161,27 +135,22 @@ BOOL PrnStart(HDC hDC, LPSTR DocumentName)
 	else {
 		hParent = HTEKWin;
 	}
-	PrnAbortDlg->Create(hInst,hParent,&PrintAbortFlag,&ts);
-	HPrnAbortDlg = PrnAbortDlg->GetSafeHwnd();
-
 	PrintDC = hDC;
-	SetAbortProc(PrintDC,PrnAbortProc);
+	PrnAbortDlg->Create(hInst,hParent,&PrintAbortFlag,&ts);
+	PrnAbortDlg->SetPrintDC(PrintDC);
 
 	Doc.cbSize = sizeof(Doc);
-	strncpy_s(DocName,sizeof(DocName),DocumentName,_TRUNCATE);
-	Doc.lpszDocName = DocName;
+	Doc.lpszDocName = DocumentName;
 	Doc.lpszOutput = NULL;
 	Doc.lpszDatatype = NULL;
 	Doc.fwType = 0;
-	if (StartDocA(PrintDC, &Doc) > 0) {
+	if (StartDocW(PrintDC, &Doc) > 0) {
 		Printing = TRUE;
 	}
 	else {
-		if (PrnAbortDlg != NULL) {
-			PrnAbortDlg->DestroyWindow();
-			PrnAbortDlg = NULL;
-			HPrnAbortDlg = NULL;
-		}
+		PrnAbortDlg->DestroyWindow();
+		delete PrnAbortDlg;
+		PrnAbortDlg = NULL;
 	}
 	return Printing;
 }
@@ -189,19 +158,17 @@ BOOL PrnStart(HDC hDC, LPSTR DocumentName)
 /**
  *	印刷終了
  */
-void PrnStop()
+void PrnStop(HDC hDC)
 {
 	if (Printing) {
-		EndDoc(PrintDC);
-		DeleteDC(PrintDC);
+		EndDoc(hDC);
+		DeleteDC(hDC);
 		PrintDC = NULL;
 		Printing = FALSE;
 	}
-	if (PrnAbortDlg != NULL) {
-		PrnAbortDlg->DestroyWindow();
-		PrnAbortDlg = NULL;
-		HPrnAbortDlg = NULL;
-	}
+	PrnAbortDlg->DestroyWindow();
+	delete PrnAbortDlg;
+	PrnAbortDlg = NULL;
 }
 
 int VTPrintInit(int PrnFlag)
@@ -232,9 +199,12 @@ int VTPrintInit(int PrnFlag)
 	}
 
 	/* start printing */
-	if (! PrnStart(PrintDC, ts.Title)) {
+	wchar_t *TitleW = ToWcharA(ts.Title);
+	if (!PrnStart(PrintDC, TitleW)) {
+		free(TitleW);
 		return (IdPrnCancel);
 	}
+	free(TitleW);
 
 	/* initialization */
 	StartPage(PrintDC);
@@ -433,7 +403,12 @@ void VTPrintEnd()
 {
 	int i, j;
 
-	EndPage(PrintDC);
+	if (PrnAbortDlg->IsAborted()) {
+		AbortDoc(PrintDC);
+	}
+	else {
+		EndPage(PrintDC);
+	}
 
 	for (i = 0 ; i <= AttrFontMask ; i++) {
 		for (j = i+1 ; j <= AttrFontMask ; j++) {
@@ -446,8 +421,7 @@ void VTPrintEnd()
 		}
 	}
 
-	PrnStop();
-	return;
+	PrnStop(PrintDC);
 }
 
 /* pass-thru printing */
@@ -634,7 +608,6 @@ static void PrintFileDirect(PrintFile *handle)
 		hParent = HTEKWin;
 	}
 	PrnAbortDlg->Create(hInst,hParent,&PrintAbortFlag,&ts);
-	HPrnAbortDlg = PrnAbortDlg->GetSafeHwnd();
 
 	handle->HPrnFile = CreateFileW(handle->PrnFName,
 									GENERIC_READ, FILE_SHARE_READ, NULL,
@@ -650,8 +623,9 @@ void PrnFileDirectProc(PrintFile *handle)
 	if (HPrnFile==INVALID_HANDLE_VALUE) {
 		return;
 	}
-	if (PrintAbortFlag) {
-		HPrnAbortDlg = NULL;
+	if (PrnAbortDlg->IsAborted()) {
+		PrnAbortDlg->DestroyWindow();
+		delete PrnAbortDlg;
 		PrnAbortDlg = NULL;
 		PrnCancel();
 	}
@@ -689,8 +663,8 @@ void PrnFileDirectProc(PrintFile *handle)
 
 	if (PrnAbortDlg!=NULL) {
 		PrnAbortDlg->DestroyWindow();
+		delete PrnAbortDlg;
 		PrnAbortDlg = NULL;
-		HPrnAbortDlg = NULL;
 	}
 
 	handle->FinishCallback(handle);
