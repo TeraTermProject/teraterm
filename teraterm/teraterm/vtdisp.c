@@ -1707,7 +1707,109 @@ vtdraw_t *InitDisp(HWND hVTWin)
 	return p;
 }
 
-static void DispFontDelete(vtdraw_t *vt)
+/**
+ *	フォント生成
+ *	VTWinで使用するフォントを生成する
+ *
+ *	@param[in/out]	vt
+ *	@param[in]		dc		生成するフォントの対象DC
+ *	@param[in]		VTlf	フォント情報
+ */
+void DispFontCreate(vtdraw_t *vt, ttdc_t *dc, LOGFONTW VTlf)
+{
+	// Normal font
+	VTlf.lfWeight = FW_NORMAL;
+	VTlf.lfUnderline = 0;
+	vt->VTFont[AttrDefault] = CreateFontIndirectW(&VTlf);
+
+	{
+		// VTFont[AttrDefault] のフォントサイズを取得
+		// FontWidth, FontHeight にセットする
+		HDC hDC = dc->VTDC;
+		TEXTMETRICA Metrics;
+		HFONT prev_font = SelectObject(hDC, vt->VTFont[AttrDefault]);
+		GetTextMetricsA(hDC, &Metrics);
+		vt->FontWidth = Metrics.tmAveCharWidth + ts.FontDW;
+		vt->FontHeight = Metrics.tmHeight + ts.FontDH;
+		SelectObject(hDC, prev_font);
+	}
+
+	/* Underline */
+	if ((ts.FontFlag & FF_UNDERLINE) || (ts.FontFlag & FF_URLUNDERLINE)) {
+		VTlf.lfUnderline = 1;
+		vt->VTFont[AttrUnder] = CreateFontIndirectW(&VTlf);
+	}
+	else {
+		vt->VTFont[AttrUnder] = vt->VTFont[AttrDefault];
+	}
+
+	if (ts.FontFlag & FF_BOLD) {
+		/* Bold */
+		VTlf.lfUnderline = 0;
+		VTlf.lfWeight = FW_BOLD;
+		vt->VTFont[AttrBold] = CreateFontIndirectW(&VTlf);
+
+		/* Bold + Underline */
+		if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
+			VTlf.lfUnderline = 1;
+			vt->VTFont[AttrBold | AttrUnder] = CreateFontIndirectW(&VTlf);
+		}
+		else {
+			vt->VTFont[AttrBold | AttrUnder] = vt->VTFont[AttrBold];
+		}
+	}
+	else {
+		vt->VTFont[AttrBold] = vt->VTFont[AttrDefault];
+		vt->VTFont[AttrBold | AttrUnder] = vt->VTFont[AttrUnder];
+	}
+
+	/* Special font */
+	VTlf.lfWeight = FW_NORMAL;
+	VTlf.lfUnderline = 0;
+	VTlf.lfWidth = vt->FontWidth + 1; /* adjust width */
+	VTlf.lfHeight = vt->FontHeight;
+	VTlf.lfCharSet = SYMBOL_CHARSET;
+
+	wcsncpy_s(VTlf.lfFaceName, _countof(VTlf.lfFaceName), L"Tera Special", _TRUNCATE);
+	vt->VTFont[AttrSpecial] = CreateFontIndirectW(&VTlf);
+
+	/* Special font (Underline) */
+	if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
+		VTlf.lfUnderline = 1;
+		VTlf.lfHeight = vt->FontHeight - 1; // adjust for underline
+		vt->VTFont[AttrSpecial | AttrUnder] = CreateFontIndirectW(&VTlf);
+	}
+	else {
+		vt->VTFont[AttrSpecial | AttrUnder] = vt->VTFont[AttrSpecial];
+	}
+
+	if (ts.FontFlag & FF_BOLD) {
+		/* Special font (Bold) */
+		VTlf.lfUnderline = 0;
+		VTlf.lfHeight = vt->FontHeight;
+		VTlf.lfWeight = FW_BOLD;
+		vt->VTFont[AttrSpecial | AttrBold] = CreateFontIndirectW(&VTlf);
+
+		/* Special font (Bold + Underline) */
+		if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
+			VTlf.lfUnderline = 1;
+			VTlf.lfHeight = vt->FontHeight - 1; // adjust for underline
+			vt->VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirectW(&VTlf);
+		}
+		else {
+			vt->VTFont[AttrSpecial | AttrBold | AttrUnder] = vt->VTFont[AttrSpecial | AttrBold];
+		}
+	}
+	else {
+		vt->VTFont[AttrSpecial | AttrBold] = vt->VTFont[AttrSpecial];
+		vt->VTFont[AttrSpecial | AttrBold | AttrUnder] = vt->VTFont[AttrSpecial | AttrUnder];
+	}
+}
+
+/**
+ *	フォントを削除
+ */
+void DispFontDelete(vtdraw_t *vt)
 {
 	int i, j;
 	for (i = 0; i <= AttrFontMask; i++) {
@@ -1827,98 +1929,18 @@ void ChangeFont(vtdraw_t *vt, unsigned int dpi)
 		dpi = GetMonitorDpiFromWindow(HVTWin);
 	}
 
-	/* Normal Font */
 	DispSetLogFont(&VTlf, dpi);
-	vt->VTFont[AttrDefault] = CreateFontIndirectW(&VTlf);
-
+	ttdc_t *dc = DispInitDC(vt);
+	DispFontCreate(vt, dc, VTlf);
+	DispReleaseDC(vt, dc);
 	if (ts.UseIME > 0) {
 		if (ts.IMEInline > 0) {
 			/* set IME font */
-			SetConversionLogFont(HVTWin, &VTlf);
+			LOGFONTW lf = {};
+			HFONT hFont = vt->VTFont[AttrDefault];
+			GetObjectW(hFont, sizeof(lf), &lf);
+			SetConversionLogFont(HVTWin, &lf);
 		}
-	}
-
-	{
-		HDC TmpDC = GetDC(HVTWin);
-		TEXTMETRIC Metrics;
-
-		SelectObject(TmpDC, vt->VTFont[AttrDefault]);
-		GetTextMetrics(TmpDC, &Metrics);
-		vt->FontWidth = Metrics.tmAveCharWidth + ts.FontDW;
-		vt->FontHeight = Metrics.tmHeight + ts.FontDH;
-
-		ReleaseDC(HVTWin,TmpDC);
-	}
-
-	/* Underline */
-	if ((ts.FontFlag & FF_UNDERLINE) || (ts.FontFlag & FF_URLUNDERLINE)) {
-		VTlf.lfUnderline = 1;
-		vt->VTFont[AttrUnder] = CreateFontIndirectW(&VTlf);
-	}
-	else {
-		vt->VTFont[AttrUnder] = vt->VTFont[AttrDefault];
-	}
-
-	if (ts.FontFlag & FF_BOLD) {
-		/* Bold */
-		VTlf.lfUnderline = 0;
-		VTlf.lfWeight = FW_BOLD;
-		vt->VTFont[AttrBold] = CreateFontIndirectW(&VTlf);
-
-		/* Bold + Underline */
-		if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
-			VTlf.lfUnderline = 1;
-			vt->VTFont[AttrBold | AttrUnder] = CreateFontIndirectW(&VTlf);
-		}
-		else {
-			vt->VTFont[AttrBold | AttrUnder] = vt->VTFont[AttrBold];
-		}
-	}
-	else {
-		vt->VTFont[AttrBold] = vt->VTFont[AttrDefault];
-		vt->VTFont[AttrBold | AttrUnder] = vt->VTFont[AttrUnder];
-	}
-
-	/* Special font */
-	VTlf.lfWeight = FW_NORMAL;
-	VTlf.lfUnderline = 0;
-	VTlf.lfWidth = vt->FontWidth + 1; /* adjust width */
-	VTlf.lfHeight = vt->FontHeight;
-	VTlf.lfCharSet = SYMBOL_CHARSET;
-
-	wcsncpy_s(VTlf.lfFaceName, _countof(VTlf.lfFaceName), L"Tera Special", _TRUNCATE);
-	vt->VTFont[AttrSpecial] = CreateFontIndirectW(&VTlf);
-
-	/* Special font (Underline) */
-	if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
-		VTlf.lfUnderline = 1;
-		VTlf.lfHeight = vt->FontHeight - 1; // adjust for underline
-		vt->VTFont[AttrSpecial | AttrUnder] = CreateFontIndirectW(&VTlf);
-	}
-	else {
-		vt->VTFont[AttrSpecial | AttrUnder] = vt->VTFont[AttrSpecial];
-	}
-
-	if (ts.FontFlag & FF_BOLD) {
-		/* Special font (Bold) */
-		VTlf.lfUnderline = 0;
-		VTlf.lfHeight = vt->FontHeight;
-		VTlf.lfWeight = FW_BOLD;
-		vt->VTFont[AttrSpecial | AttrBold] = CreateFontIndirectW(&VTlf);
-
-		/* Special font (Bold + Underline) */
-		if (ts.FontFlag & FF_UNDERLINE || ts.FontFlag & FF_URLUNDERLINE) {
-			VTlf.lfUnderline = 1;
-			VTlf.lfHeight = vt->FontHeight - 1; // adjust for underline
-			vt->VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirectW(&VTlf);
-		}
-		else {
-			vt->VTFont[AttrSpecial | AttrBold | AttrUnder] = vt->VTFont[AttrSpecial | AttrBold];
-		}
-	}
-	else {
-		vt->VTFont[AttrSpecial | AttrBold] = vt->VTFont[AttrSpecial];
-		vt->VTFont[AttrSpecial | AttrBold | AttrUnder] = vt->VTFont[AttrSpecial | AttrUnder];
 	}
 }
 
