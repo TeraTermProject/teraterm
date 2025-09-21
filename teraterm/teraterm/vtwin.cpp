@@ -664,7 +664,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	InitBuffer((IdVtDrawAPI)ts.VTDrawAPI);
 	BuffSetDispCodePage(ts.VTDrawAnsiCodePage);
 
-	InitDisp();
+	vt_src = InitDisp();
 	BGLoadThemeFile(&ts);
 
 	if (ts.HideTitle>0) {
@@ -763,9 +763,9 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		::PostMessage(HVTWin,WM_USER_CHANGEMENU,0,0);
 	}
 
-	ChangeFont(0);
+	ChangeFont(vt_src, 0);
 
-	ResetIME();
+	ResetIME(vt_src);
 
 	BuffChangeWinSize(NumOfColumns,NumOfLines);
 
@@ -798,7 +798,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		return;
 	}
 	SetWindowAlpha(ts.AlphaBlendActive);
-	ChangeCaret();
+	ChangeCaret(vt_src);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -841,7 +841,7 @@ void CVTWindow::ButtonUp(BOOL Paste)
 	RButton = FALSE;
 	DblClk = FALSE;
 	TplClk = FALSE;
-	CaretOn();
+	CaretOn(vt_src);
 
 	// SelectOnlyByLButton が on で 中・右クリックしたときに
 	// バッファが選択状態だったら、選択内容がクリップボードに
@@ -860,7 +860,7 @@ void CVTWindow::ButtonUp(BOOL Paste)
 
 		// スクロール位置をリセット
 		if (WinOrgY != 0) {
-			DispVScroll(SCROLL_BOTTOM, 0);
+			DispVScroll(vt_src, SCROLL_BOTTOM, 0);
 		}
 	}
 }
@@ -1326,9 +1326,9 @@ void CVTWindow::InitPasteMenu(HMENU *Menu)
 
 void CVTWindow::ResetSetup()
 {
-	ChangeFont(0);
+	ChangeFont(vt_src,0);
 	BuffChangeWinSize(WinWidth,WinHeight);
-	ChangeCaret();
+	ChangeCaret(vt_src);
 
 	if (cv.Ready) {
 		ts.PortType = cv.PortType;
@@ -1361,7 +1361,7 @@ void CVTWindow::ResetSetup()
 	ChangeWin();
 
 	/* Language & IME */
-	ResetIME();
+	ResetIME(vt_src);
 
 	/* change TEK window */
 	if (pTEKWin != NULL)
@@ -1550,7 +1550,7 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CVTWindow::OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized)
 {
-	DispSetActive(nState!=WA_INACTIVE);
+	DispSetActive(vt_src, nState != WA_INACTIVE);
 	if (nState == WA_INACTIVE) {
 		SetWindowAlpha(ts.AlphaBlendInactive);
 	} else {
@@ -1653,7 +1653,7 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 
 	// スクロール位置をリセット
 	if (WinOrgY != 0) {
-		DispVScroll(SCROLL_BOTTOM, 0);
+		DispVScroll(vt_src, SCROLL_BOTTOM, 0);
 	}
 }
 
@@ -1801,7 +1801,8 @@ void CVTWindow::OnDestroy()
 	}
 
 	EndTerm();
-	EndDisp();
+	EndDisp(vt_src);
+	vt_src = NULL;
 	sendfiledlgUnInit();
 	FLogOpenDialogUnInit();
 
@@ -2208,7 +2209,7 @@ void CVTWindow::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 		default:
 			return;
 	}
-	DispHScroll(Func,nPos);
+	DispHScroll(vt_src, Func, nPos);
 }
 
 void CVTWindow::OnInitMenuPopup(HMENU hPopupMenu, UINT nIndex, BOOL bSysMenu)
@@ -2273,7 +2274,7 @@ void CVTWindow::OnKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 	case KEYDOWN_COMMOUT:
 		// スクロール位置をリセット
 		if (WinOrgY != 0) {
-			DispVScroll(SCROLL_BOTTOM, 0);
+			DispVScroll(vt_src, SCROLL_BOTTOM, 0);
 		}
 		return;
 	}
@@ -2323,7 +2324,7 @@ void CVTWindow::OnKillFocus(HWND hNewWnd)
 //	TTCFrameWnd::OnKillFocus(hNewWnd);		// TODO
 
 	if (IsCaretOn()) {
-		CaretKillFocus(TRUE);
+		CaretKillFocus(vt_src, TRUE);
 	}
 }
 
@@ -2490,7 +2491,7 @@ void CVTWindow::OnMove(int x, int y)
 	ts.VTPos.x = R.left;
 	ts.VTPos.y = R.top;
 
-	DispSetWinPos();
+	DispSetWinPos(vt_src);
 
 	if (vtwin_work.monitor_DPI == 0) {
 		// ウィンドウが初めて表示された
@@ -2591,7 +2592,7 @@ BOOL CVTWindow::OnMouseWheel(
 void CVTWindow::OnNcLButtonDblClk(UINT nHitTest, POINTS point)
 {
 	if (! Minimized && !ts.TermIsWin && (nHitTest == HTCAPTION)) {
-		DispRestoreWinSize();
+		DispRestoreWinSize(vt_src);
 	}
 }
 
@@ -2615,11 +2616,11 @@ void CVTWindow::OnPaint()
 		return;
 	}
 
-	BGSetupPrimary(FALSE);
+	BGSetupPrimary(vt_src, FALSE);
 
 	PaintDC = BeginPaint(&ps);
 
-	ttdc_t *vt = PaintWindow(PaintDC, ps.rcPaint, ps.fErase, &Xs, &Ys, &Xe, &Ye);
+	ttdc_t *vt = PaintWindow(vt_src, PaintDC, ps.rcPaint, ps.fErase, &Xs, &Ys, &Xe, &Ye);
 	LockBuffer();
 	BuffUpdateRect(Xs,Ys,Xe,Ye);
 	UnlockBuffer();
@@ -2673,7 +2674,7 @@ void CVTWindow::OnRButtonUp(UINT nFlags, POINTS point)
 
 void CVTWindow::OnSetFocus(HWND hOldWnd)
 {
-	ChangeCaret();
+	ChangeCaret(vt_src);
 	FocusReport(TRUE);
 }
 
@@ -2726,7 +2727,7 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 	w = R.right - R.left;
 	h = R.bottom - R.top;
 	if (AdjustSize) {
-		ResizeWindow(R.left,R.top,w,h,cx,cy);
+		ResizeWindow(vt_src, R.left, R.top, w, h, cx, cy);
 	}
 	else {
 		if (ts.FontScaling) {
@@ -2739,18 +2740,18 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 			if (NewFontWidth - ts.FontDW < 3) {
 				NewFontWidth = ts.FontDW + 3;
 			}
-			if (NewFontWidth != FontWidth) {
+			if (NewFontWidth != vt_src->FontWidth) {
 				ts.VTFontSize.x = ts.FontDW - NewFontWidth;
-				FontWidth = NewFontWidth;
+				vt_src->FontWidth = NewFontWidth;
 				FontChanged = TRUE;
 			}
 
 			if (NewFontHeight - ts.FontDH < 3) {
 				NewFontHeight = ts.FontDH + 3;
 			}
-			if (NewFontHeight != FontHeight) {
+			if (NewFontHeight != vt_src->FontHeight) {
 				ts.VTFontSize.y = ts.FontDH - NewFontHeight;
-				FontHeight = NewFontHeight;
+				vt_src->FontHeight = NewFontHeight;
 				FontChanged = TRUE;
 			}
 
@@ -2758,12 +2759,12 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 			h = ts.TerminalHeight;
 
 			if (FontChanged) {
-				ChangeFont(0);
+				ChangeFont(vt_src, 0);
 			}
 		}
 		else {
-			w = cx / FontWidth;
-			h = cy / FontHeight;
+			w = cx / vt_src->FontWidth;
+			h = cy / vt_src->FontHeight;
 		}
 
 		HideStatusLine();
@@ -2797,8 +2798,8 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 	nWidth = (pRect->right) - (pRect->left) - margin_width;
 	nHeight = (pRect->bottom) - (pRect->top) - margin_height;
 
-	w = nWidth / FontWidth;
-	h = nHeight / FontHeight;
+	w = nWidth / vt_src->FontWidth;
+	h = nHeight / vt_src->FontHeight;
 
 	if (!ts.TermIsWin) {
 		// TermIsWin=off の時はリサイズでは端末サイズが変わらないので
@@ -2817,8 +2818,8 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 
 	UpdateSizeTip(HVTWin, w, h, fwSide, pRect->left, pRect->top);
 
-	fixed_width = w * FontWidth + margin_width;
-	fixed_height = h * FontHeight + margin_height;
+	fixed_width = w * vt_src->FontWidth + margin_width;
+	fixed_height = h * vt_src->FontHeight + margin_height;
 
 	switch (fwSide) { // 幅調整
 	case 1: // 左
@@ -2979,7 +2980,7 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 	else if (nIDEvent==IdScrollTimer) {
 		GetCursorPos(&Point);
 		::ScreenToClient(HVTWin,&Point);
-		DispAutoScroll(Point);
+		DispAutoScroll(vt_src, Point);
 		if ((Point.x < 0) || (Point.x >= ScreenWidth) ||
 			(Point.y < 0) || (Point.y >= ScreenHeight)) {
 			::PostMessage(HVTWin,WM_MOUSEMOVE,MK_LBUTTON,MAKELONG(Point.x,Point.y));
@@ -3089,7 +3090,7 @@ void CVTWindow::OnVScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 		nPos = si.nTrackPos;
 	}
 
-	DispVScroll(Func,nPos);
+	DispVScroll(vt_src, Func, nPos);
 }
 
 BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
@@ -3108,7 +3109,7 @@ LRESULT CVTWindow::OnWindowPosChanging(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnSettingChange(WPARAM wParam, LPARAM lParam)
 {
-	BGOnSettingChange();
+	BGOnSettingChange(vt_src);
 	return TTCFrameWnd::DefWindowProc(WM_SETTINGCHANGE,wParam,lParam);
 }
 
@@ -3122,7 +3123,7 @@ LRESULT CVTWindow::OnEnterSizeMove(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 {
-	BGOnExitSizeMove();
+	BGOnExitSizeMove(vt_src);
 
 	EnableSizeTip(0);
 	isSizing = FALSE;
@@ -3134,8 +3135,8 @@ LRESULT CVTWindow::OnIMEStartComposition(WPARAM wParam, LPARAM lParam)
 	IMECompositionState = TRUE;
 
 	// 位置を通知する
-	int CaretX = (CursorX-WinOrgX)*FontWidth;
-	int CaretY = (CursorY-WinOrgY)*FontHeight;
+	int CaretX = (CursorX-WinOrgX)*vt_src->FontWidth;
+	int CaretY = (CursorY-WinOrgY)*vt_src->FontHeight;
 	SetConversionWindow(HVTWin,CaretX,CaretY);
 
 	return TTCFrameWnd::DefWindowProc(WM_IME_STARTCOMPOSITION,wParam,lParam);
@@ -3179,7 +3180,7 @@ LRESULT CVTWindow::OnIMEComposition(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnIMEInputChange(WPARAM wParam, LPARAM lParam)
 {
-	ChangeCaret();
+	ChangeCaret(vt_src);
 
 	return TTCFrameWnd::DefWindowProc(WM_INPUTLANGCHANGE,wParam,lParam);
 }
@@ -3196,8 +3197,8 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 			// IME On
 
 			// 状態を表示するIMEのために位置を通知する
-			int CaretX = (CursorX-WinOrgX)*FontWidth;
-			int CaretY = (CursorY-WinOrgY)*FontHeight;
+			int CaretX = (CursorX-WinOrgX)*vt_src->FontWidth;
+			int CaretY = (CursorY-WinOrgY)*vt_src->FontHeight;
 			SetConversionWindow(HVTWin,CaretX,CaretY);
 
 			if (ts.IMEInline > 0) {
@@ -3207,7 +3208,7 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 		}
 
 		// 描画
-		ChangeCaret();
+		ChangeCaret(vt_src);
 
 		break;
 
@@ -3231,8 +3232,8 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 		// - 漢字変換候補を表示
 		// - 次の文字を入力することで確定処理を行う
 		// - 文字入力と未変換文字入力が発生する
-		int CaretX = (CursorX-WinOrgX)*FontWidth;
-		int CaretY = (CursorY-WinOrgY)*FontHeight;
+		int CaretX = (CursorX-WinOrgX)*vt_src->FontWidth;
+		int CaretY = (CursorY-WinOrgY)*vt_src->FontHeight;
 		SetConversionWindow(HVTWin,CaretX,CaretY);
 
 		// フォントを設定する
@@ -4410,7 +4411,7 @@ void CVTWindow::OnEditPaste()
 
 	// スクロール位置をリセット
 	if (WinOrgY != 0) {
-		DispVScroll(SCROLL_BOTTOM, 0);
+		DispVScroll(vt_src, SCROLL_BOTTOM, 0);
 	}
 }
 
@@ -4421,7 +4422,7 @@ void CVTWindow::OnEditPasteCR()
 
 	// スクロール位置をリセット
 	if (WinOrgY != 0) {
-		DispVScroll(SCROLL_BOTTOM, 0);
+		DispVScroll(vt_src, SCROLL_BOTTOM, 0);
 	}
 }
 
@@ -4773,7 +4774,7 @@ void CVTWindow::OnControlResetTerminal()
 {
 	LockBuffer();
 	HideStatusLine();
-	DispScrollHomePos();
+	DispScrollHomePos(vt_src);
 	ResetTerminal();
 	DispResetColor(CS_ALL);
 	UnlockBuffer();
@@ -4983,9 +4984,9 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 		} else {
 			// 新しいDPIに合わせてフォントを生成、
 			// クライアント領域のサイズを決定する
-			ChangeFont(NewDPI);
-			tmpScreenWidth = WinWidth * FontWidth;
-			tmpScreenHeight = WinHeight * FontHeight;
+			ChangeFont(vt_src, NewDPI);
+			tmpScreenWidth = WinWidth * vt_src->FontWidth;
+			tmpScreenHeight = WinHeight * vt_src->FontHeight;
 			//AdjustScrollBar();
 		}
 
@@ -5120,7 +5121,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 				   SWP_NOZORDER);
 	vtwin_work.monitor_DPI = NewDPI;
 
-	ChangeCaret();
+	ChangeCaret(vt_src);
 
 	{
 		HINSTANCE inst;

@@ -52,22 +52,10 @@
 #endif
 #endif
 
-//static HDC PrintDC;
-extern "C" HDC PrintDC;
-HDC PrintDC;
-static HFONT PrnFont[AttrFontMask+1];
-static int PrnFW, PrnFH;
-static RECT Margin;
-static COLORREF White, Black;
-static int PrnX, PrnY;
-static TCharAttr PrnAttr;
-
-static BOOL Printing = FALSE;
+static CPrnAbortDlg *PrnAbortDlg;
 static BOOL PrintAbortFlag = FALSE;
 
-static CPrnAbortDlg *PrnAbortDlg;
-
-static void PrnSetAttr(TCharAttr Attr);
+static void PrnSetAttr(vtdraw_t *vt, const TCharAttr *Attr);
 
 static UINT_PTR CALLBACK PrintHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -79,7 +67,7 @@ static UINT_PTR CALLBACK PrintHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPA
  *
  *	@param	HWin	親Window
  *	@param	sel		選択範囲
- *	@return	HDC		印刷DC
+ *	@return	HDC		印刷DC, PrnStop() か DeleteDC() すること
  */
 HDC PrnBox(HWND HWin, PBOOL Sel)
 {
@@ -111,81 +99,94 @@ HDC PrnBox(HWND HWin, PBOOL Sel)
 	return PrnDlg.hDC;
 }
 
+static ttdc_t *CreateTTDC(HDC hDC)
+{
+	ttdc_t *dc = (ttdc_t *)calloc(1, sizeof(*dc));
+	dc->VTDC = hDC;
+	return dc;
+}
+
 /**
  *	印刷開始
+ *	hDCを印刷できる状態にする
+ *	ダイアログを表示する
  *
  *	@param	hDC				印刷DC
  *	@param	DcumentName		名前
  *	@relval	TRUE			ok
- *	@retval	FALSE			開始失敗
+ *	@retval	FALSE			開始失敗, 失敗時はダイアログは作成されない
  */
 BOOL PrnStart(HDC hDC, const wchar_t *DocumentName)
 {
-	DOCINFOW Doc = {};
-	HWND hParent;
-
-	Printing = FALSE;
 	PrintAbortFlag = FALSE;
 
 	PrnAbortDlg = new CPrnAbortDlg();
 	if (PrnAbortDlg==NULL) {
 		return FALSE;
 	}
+	HWND hParent;
 	if (ActiveWin==IdVT) {
 		hParent = HVTWin;
 	}
 	else {
 		hParent = HTEKWin;
 	}
-	PrintDC = hDC;
 	PrnAbortDlg->Create(hInst,hParent,&PrintAbortFlag,&ts);
-	PrnAbortDlg->SetPrintDC(PrintDC);
+	PrnAbortDlg->SetPrintDC(hDC);
 
+	DOCINFOW Doc = {};
 	Doc.cbSize = sizeof(Doc);
 	Doc.lpszDocName = DocumentName;
 	Doc.lpszOutput = NULL;
 	Doc.lpszDatatype = NULL;
 	Doc.fwType = 0;
-	if (StartDocW(PrintDC, &Doc) > 0) {
-		Printing = TRUE;
-	}
-	else {
+	if (StartDocW(hDC, &Doc) <= 0) {
+		// error
 		PrnAbortDlg->DestroyWindow();
 		delete PrnAbortDlg;
 		PrnAbortDlg = NULL;
+		return FALSE;
 	}
-	return Printing;
+	else {
+		// ok
+		return TRUE;
+	}
 }
 
 /**
  *	印刷終了
+ *	hDCの印刷を完了、削除する
+ *	ダイアログが存在していたら閉じる
  */
 void PrnStop(HDC hDC)
 {
-	if (Printing) {
-		EndDoc(hDC);
-		DeleteDC(hDC);
-		PrintDC = NULL;
-		Printing = FALSE;
+	EndDoc(hDC);
+	DeleteDC(hDC);
+	if (PrnAbortDlg != NULL) {
+		PrnAbortDlg->DestroyWindow();
+		delete PrnAbortDlg;
+		PrnAbortDlg = NULL;
 	}
-	PrnAbortDlg->DestroyWindow();
-	delete PrnAbortDlg;
-	PrnAbortDlg = NULL;
 }
 
-int VTPrintInit(int PrnFlag)
-// Initialize printing of VT window
-//   PrnFlag: specifies object to be printed
-//	= IdPrnScreen		Current screen
-//	= IdPrnSelectedText	Selected text
-//	= IdPrnScrollRegion	Scroll region
-//	= IdPrnFile		Spooled file (printer sequence)
-//   Return: print object ID specified by user
-//	= IdPrnCancel		(user clicks "Cancel" button)
-//	= IdPrnScreen		(user don't select "print selection" option)
-//	= IdPrnSelectedText	(user selects "print selection")
-//	= IdPrnScrollRegion	(always when PrnFlag=IdPrnScrollRegion)
-//	= IdPrnFile		(always when PrnFlag=IdPrnFile)
+/**
+ *	VT印刷
+ *	Initialize printing of VT window
+ *
+ *	@param PrnFlag		specifies object to be printed
+ *	= IdPrnScreen		Current screen
+ *	= IdPrnSelectedText	Selected text
+ *	= IdPrnScrollRegion	Scroll region
+ *	= IdPrnFile		Spooled file (printer sequence)
+ *	@param[out] mode	print object ID specified by user
+ *	= IdPrnCancel		(user clicks "Cancel" button)
+ *	= IdPrnScreen		(user don't select "print selection" option)
+ *	= IdPrnSelectedText	(user selects "print selection")
+ *	= IdPrnScrollRegion	(always when PrnFlag=IdPrnScrollRegion)
+ *	= IdPrnFile		(always when PrnFlag=IdPrnFile)
+ *	@return		vt
+ */
+vtdraw_t *VTPrintInit(int PrnFlag, int *mode)
 {
 	BOOL Sel;
 	TEXTMETRIC Metrics;
@@ -193,23 +194,28 @@ int VTPrintInit(int PrnFlag)
 	HDC DC;
 	TCharAttr TempAttr = DefCharAttr;
 	LOGFONTA Prnlf;
+	vtdraw_t *p = (vtdraw_t *)calloc(1, sizeof(*p));
 
 	Sel = (PrnFlag & IdPrnSelectedText)!=0;
-	PrintDC = PrnBox(HVTWin,&Sel);
+	HDC PrintDC = PrnBox(HVTWin,&Sel);
 	if (PrintDC == NULL) {
-		return (IdPrnCancel);
+		*mode = IdPrnCancel;
+		return NULL;
 	}
 
 	/* start printing */
 	wchar_t *TitleW = ToWcharA(ts.Title);
 	if (!PrnStart(PrintDC, TitleW)) {
 		free(TitleW);
-		return (IdPrnCancel);
+		*mode = IdPrnCancel;
+		return NULL;
 	}
 	free(TitleW);
 
 	/* initialization */
 	StartPage(PrintDC);
+
+	p->dc = CreateTTDC(PrintDC);
 
 	/* pixels per inch */
 	if ((ts.VTPPI.x>0) && (ts.VTPPI.y>0)) {
@@ -221,14 +227,14 @@ int VTPrintInit(int PrnFlag)
 	}
 
 	/* left margin */
-	Margin.left = (int)((float)ts.PrnMargin[0] / 100.0 * (float)PPI.x);
+	p->Margin.left = (int)((float)ts.PrnMargin[0] / 100.0 * (float)PPI.x);
 	/* right margin */
-	Margin.right = GetDeviceCaps(PrintDC,HORZRES) -
+	p->Margin.right = GetDeviceCaps(PrintDC, HORZRES) -
 	               (int)((float)ts.PrnMargin[1] / 100.0 * (float)PPI.x);
 	/* top margin */
-	Margin.top = (int)((float)ts.PrnMargin[2] / 100.0 * (float)PPI.y);
+	p->Margin.top = (int)((float)ts.PrnMargin[2] / 100.0 * (float)PPI.y);
 	/* bottom margin */
-	Margin.bottom =  GetDeviceCaps(PrintDC,VERTRES) -
+	p->Margin.bottom = GetDeviceCaps(PrintDC, VERTRES) -
 	                 (int)((float)ts.PrnMargin[3] / 100.0 * (float)PPI.y);
 
 	/* create test font */
@@ -255,15 +261,15 @@ int VTPrintInit(int PrnFlag)
 	Prnlf.lfQuality = DEFAULT_QUALITY;
 	Prnlf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
 
-	PrnFont[0] = CreateFontIndirectA(&Prnlf);
+	p->VTFont[0] = CreateFontIndirectA(&Prnlf);
 
 	DC = GetDC(HVTWin);
-	SelectObject(DC, PrnFont[0]);
+	SelectObject(DC, p->VTFont[0]);
 	GetTextMetrics(DC, &Metrics);
 	PPI2.x = GetDeviceCaps(DC,LOGPIXELSX);
 	PPI2.y = GetDeviceCaps(DC,LOGPIXELSY);
 	ReleaseDC(HVTWin,DC);
-	DeleteObject(PrnFont[0]); /* Delete test font */
+	DeleteObject(p->VTFont[0]); /* Delete test font */
 
 	/* Adjust font size */
 	Prnlf.lfHeight = (int)((float)Metrics.tmHeight * (float)PPI.y / (float)PPI2.y);
@@ -274,83 +280,88 @@ int VTPrintInit(int PrnFlag)
 	/* Normal Font */
 	Prnlf.lfWeight = FW_NORMAL;
 	Prnlf.lfUnderline = 0;
-	PrnFont[0] = CreateFontIndirectA(&Prnlf);
-	SelectObject(PrintDC,PrnFont[0]);
+	p->VTFont[0] = CreateFontIndirectA(&Prnlf);
+	SelectObject(PrintDC,p->VTFont[0]);
 	GetTextMetrics(PrintDC, &Metrics);
-	PrnFW = Metrics.tmAveCharWidth;
-	PrnFH = Metrics.tmHeight;
+	p->FontWidth = Metrics.tmAveCharWidth;
+	p->FontHeight = Metrics.tmHeight;
 	/* Under line */
 	Prnlf.lfUnderline = 1;
-	PrnFont[AttrUnder] = CreateFontIndirectA(&Prnlf);
+	p->VTFont[AttrUnder] = CreateFontIndirectA(&Prnlf);
 
 	if (ts.FontFlag & FF_BOLD) {
 		/* Bold */
 		Prnlf.lfUnderline = 0;
 		Prnlf.lfWeight = FW_BOLD;
-		PrnFont[AttrBold] = CreateFontIndirectA(&Prnlf);
+		p->VTFont[AttrBold] = CreateFontIndirectA(&Prnlf);
 		/* Bold + Underline */
 		Prnlf.lfUnderline = 1;
-		PrnFont[AttrBold | AttrUnder] = CreateFontIndirectA(&Prnlf);
+		p->VTFont[AttrBold | AttrUnder] = CreateFontIndirectA(&Prnlf);
 	}
 	else {
-		PrnFont[AttrBold] = PrnFont[AttrDefault];
-		PrnFont[AttrBold | AttrUnder] = PrnFont[AttrUnder];
+		p->VTFont[AttrBold] = p->VTFont[AttrDefault];
+		p->VTFont[AttrBold | AttrUnder] = p->VTFont[AttrUnder];
 	}
 	/* Special font */
 	Prnlf.lfWeight = FW_NORMAL;
 	Prnlf.lfUnderline = 0;
-	Prnlf.lfWidth = PrnFW; /* adjust width */
-	Prnlf.lfHeight = PrnFH;
+	Prnlf.lfWidth = p->FontWidth; /* adjust width */
+	Prnlf.lfHeight = p->FontHeight;
 	Prnlf.lfCharSet = SYMBOL_CHARSET;
 
 	strncpy_s(Prnlf.lfFaceName, sizeof(Prnlf.lfFaceName),"Tera Special", _TRUNCATE);
-	PrnFont[AttrSpecial] = CreateFontIndirectA(&Prnlf);
-	PrnFont[AttrSpecial | AttrBold] = PrnFont[AttrSpecial];
-	PrnFont[AttrSpecial | AttrUnder] = PrnFont[AttrSpecial];
-	PrnFont[AttrSpecial | AttrBold | AttrUnder] = PrnFont[AttrSpecial];
+	p->VTFont[AttrSpecial] = CreateFontIndirectA(&Prnlf);
+	p->VTFont[AttrSpecial | AttrBold] = p->VTFont[AttrSpecial];
+	p->VTFont[AttrSpecial | AttrUnder] = p->VTFont[AttrSpecial];
+	p->VTFont[AttrSpecial | AttrBold | AttrUnder] = p->VTFont[AttrSpecial];
 
-	Black = RGB(0,0,0);
-	White = RGB(255,255,255);
-	PrnSetAttr(TempAttr);
+	p->Black = RGB(0,0,0);
+	p->White = RGB(255,255,255);
+	PrnSetAttr(p, &TempAttr);
 
-	PrnY = Margin.top;
-	PrnX = Margin.left;
+	p->PrnY = p->Margin.top;
+	p->PrnX = p->Margin.left;
 
 	if (PrnFlag == IdPrnScrollRegion) {
-		return (IdPrnScrollRegion);
+		*mode = IdPrnScrollRegion;
+		return p;
 	}
 	if (PrnFlag == IdPrnFile) {
-		return (IdPrnFile);
+		*mode = IdPrnFile;
+		return p;
 	}
 	if (Sel) {
-		return (IdPrnSelectedText);
+		*mode = IdPrnSelectedText;
+		return p;
 	}
 	else {
-		return (IdPrnScreen);
+		*mode = IdPrnScreen;
+		return p;
 	}
 }
 
-static void PrnSetAttr(TCharAttr Attr)
+static void PrnSetAttr(vtdraw_t *vt, const TCharAttr *Attr)
 //  Set text attribute of printing
 //
 {
-	PrnAttr = Attr;
-	SelectObject(PrintDC, PrnFont[Attr.Attr & AttrFontMask]);
+	ttdc_t *dc = vt->dc;
+	vt->PrnAttr = *Attr;
+	SelectObject(dc->VTDC, vt->VTFont[Attr->Attr & AttrFontMask]);
 
-	if ((Attr.Attr & AttrReverse) != 0) {
-		SetTextColor(PrintDC,White);
-		SetBkColor(  PrintDC,Black);
+	if ((Attr->Attr & AttrReverse) != 0) {
+		SetTextColor(dc->VTDC, vt->White);
+		SetBkColor(  dc->VTDC, vt->Black);
 	}
 	else {
-		SetTextColor(PrintDC,Black);
-		SetBkColor(  PrintDC,White);
+		SetTextColor(dc->VTDC, vt->Black);
+		SetBkColor(  dc->VTDC, vt->White);
 	}
 }
 
-void PrnSetupDC(ttdc_t *vt, TCharAttr Attr, BOOL reverse)
+void PrnSetupDC(vtdraw_t *vt, TCharAttr Attr, BOOL reverse)
 {
 	(void)reverse;
-	PrnSetAttr(Attr);
+	PrnSetAttr(vt, &Attr);
 }
 
 /**
@@ -358,72 +369,74 @@ void PrnSetupDC(ttdc_t *vt, TCharAttr Attr, BOOL reverse)
  *    Buff: points text buffer
  *    Count: number of characters to be printed
  */
-void PrnOutTextA(const char *StrA, const char *WidthInfo, int Count, void *data)
+void PrnOutTextA(vtdraw_t *vt, const char *StrA, const char *WidthInfo, int Count, void *data)
 {
-	if (PrnX+PrnFW > Margin.right) {
+	if (vt->PrnX+vt->FontWidth > vt->Margin.right) {
 		/* new line */
-		PrnX = Margin.left;
-		PrnY = PrnY + PrnFH;
+		vt->PrnX = vt->Margin.left;
+		vt->PrnY = vt->PrnY + vt->FontHeight;
 	}
-	if (PrnY+PrnFH > Margin.bottom) {
+	if (vt->PrnY+vt->FontHeight > vt->Margin.bottom) {
 		/* next page */
-		EndPage(PrintDC);
-		StartPage(PrintDC);
-		PrnSetAttr(PrnAttr);
-		PrnY = Margin.top;
+		EndPage(vt->dc->VTDC);
+		StartPage(vt->dc->VTDC);
+		PrnSetAttr(vt, &vt->PrnAttr);
+		vt->PrnY = vt->Margin.top;
 	}
 
-	DrawStrA(PrintDC, NULL, StrA, WidthInfo, Count, PrnFW, PrnFH, PrnY, &PrnX);
+	DrawStrA(vt, vt->dc->VTDC, NULL, StrA, WidthInfo, Count, vt->FontWidth, vt->FontHeight, vt->PrnY, &vt->PrnX);
 }
 
-void PrnOutTextW(const wchar_t *StrW, const char *cells, int len, void *data)
+void PrnOutTextW(vtdraw_t *vt, const wchar_t *StrW, const char *cells, int len, void *data)
 {
-	if (PrnX+PrnFW > Margin.right) {
+	if (vt->PrnX+vt->FontWidth > vt->Margin.right) {
 		/* new line */
-		PrnX = Margin.left;
-		PrnY = PrnY + PrnFH;
+		vt->PrnX = vt->Margin.left;
+		vt->PrnY = vt->PrnY + vt->FontHeight;
 	}
-	if (PrnY+PrnFH > Margin.bottom) {
+	if (vt->PrnY+vt->FontHeight > vt->Margin.bottom) {
 		/* next page */
-		EndPage(PrintDC);
-		StartPage(PrintDC);
-		PrnSetAttr(PrnAttr);
-		PrnY = Margin.top;
+		EndPage(vt->dc->VTDC);
+		StartPage(vt->dc->VTDC);
+		PrnSetAttr(vt, &vt->PrnAttr);
+		vt->PrnY = vt->Margin.top;
 	}
 
-	DrawStrW(PrintDC, NULL, StrW, cells, len, PrnFW, PrnFH, PrnY, &PrnX);
+	DrawStrW(vt, vt->dc->VTDC, NULL, StrW, cells, len, vt->FontWidth, vt->FontHeight, vt->PrnY, &vt->PrnX);
 }
 
-void PrnNewLine()
+void PrnNewLine(vtdraw_t *vt)
 //  Moves to the next line in printing
 {
-	PrnX = Margin.left;
-	PrnY = PrnY + PrnFH;
+	vt->PrnX = vt->Margin.left;
+	vt->PrnY = vt->PrnY + vt->FontHeight;
 }
 
-void VTPrintEnd()
+void VTPrintEnd(vtdraw_t *vt)
 {
 	int i, j;
 
 	if (PrnAbortDlg->IsAborted()) {
-		AbortDoc(PrintDC);
+		AbortDoc(vt->dc->VTDC);
 	}
 	else {
-		EndPage(PrintDC);
+		EndPage(vt->dc->VTDC);
 	}
 
 	for (i = 0 ; i <= AttrFontMask ; i++) {
 		for (j = i+1 ; j <= AttrFontMask ; j++) {
-			if (PrnFont[j]==PrnFont[i]) {
-				PrnFont[j] = NULL;
+			if (vt->VTFont[j] == vt->VTFont[i]) {
+				vt->VTFont[j] = NULL;
 			}
 		}
-		if (PrnFont[i] != NULL) {
-			DeleteObject(PrnFont[i]);
+		if (vt->VTFont[i] != NULL) {
+			DeleteObject(vt->VTFont[i]);
 		}
 	}
 
-	PrnStop(PrintDC);
+	PrnStop(vt->dc->VTDC);
+	DispReleaseDC(vt_src, vt->dc);
+	free(vt);
 }
 
 /* pass-thru printing */
@@ -481,7 +494,7 @@ void PrnFinish(PrintFile *handle)
 	free(handle);
 }
 
-static void PrnOutText(const char *StrA, int Count, void *data)
+static void PrnOutText(vtdraw_t *vt, const char *StrA, int Count, void *data)
 {
 	// 文字幅情報を作る
 	//	MBCSのとき、1byte=1cell, 2byte=2cell
@@ -503,7 +516,7 @@ static void PrnOutText(const char *StrA, int Count, void *data)
 		}
 	}
 
-	DrawStrA(PrintDC, NULL, StrA, WidthInfo, Count, PrnFW, PrnFH, PrnY, &PrnX);
+	DrawStrA(vt, vt->dc->VTDC, NULL, StrA, WidthInfo, Count, vt->FontWidth, vt->FontHeight, vt->PrnY, &vt->PrnX);
 
 	free(WidthInfo);
 }
@@ -513,7 +526,10 @@ static void PrnOutText(const char *StrA, int Count, void *data)
  */
 static void PrintFile_(PrintFile *handle)
 {
-	if (VTPrintInit(IdPrnFile)==IdPrnFile) {
+	vtdraw_t *vt = NULL;
+	int id;
+	vt = VTPrintInit(IdPrnFile, &id);
+	if (vt != NULL) {
 		HANDLE HPrnFile = CreateFileW(handle->PrnFName,
 									   GENERIC_READ, FILE_SHARE_READ, NULL,
 									   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -572,16 +588,16 @@ static void PrintFile_(PrintFile *handle)
 					}
 				} while ((c>0) && (! CRFlag));
 				if (len_a >0) {
-					PrnOutText(BuffA, len_a, NULL);
+					PrnOutText(vt, BuffA, len_a, NULL);
 					//PrnOutTextW(BuffW, NULL, len_w, NULL);
 				}
 				if (CRFlag) {
-					PrnX = Margin.left;
+					vt->PrnX = vt->Margin.left;
 					if ((u32==FF) && (ts.PrnConvFF==0)) { // new page
-						PrnY = Margin.bottom;
+						vt->PrnY = vt->Margin.bottom;
 					}
 					else { // new line
-						PrnY = PrnY + PrnFH;
+						vt->PrnY = vt->PrnY + vt->FontHeight;
 					}
 				}
 				CRFlag = (u32==CR);
@@ -589,7 +605,7 @@ static void PrintFile_(PrintFile *handle)
 			CloseHandle(HPrnFile);
 		}
 		HPrnFile = INVALID_HANDLE_VALUE;
-		VTPrintEnd();
+		VTPrintEnd(vt);
 	}
 	handle->FinishCallback(handle);
 }
