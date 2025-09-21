@@ -32,6 +32,7 @@
 #pragma once
 
 #include "buffer.h"		// for TCharAttr
+#include "vtdisp.h"		// for ttdc_t
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,7 +50,7 @@ void PrnStop(HDC hDC);
 #define IdPrnFile 8
 
 int VTPrintInit(int PrnFlag);
-void PrnSetupDC(TCharAttr Attr, BOOL reverse);
+void PrnSetupDC(ttdc_t *vt, TCharAttr Attr, BOOL reverse);
 void PrnOutTextA(const char *Buff, const char *WidthInfo, int Count, void *data);
 void PrnOutTextW(const wchar_t *StrW, const char *WidthInfo, int Count, void *data);
 void PrnNewLine();

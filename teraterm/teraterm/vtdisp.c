@@ -70,8 +70,8 @@
 int WinWidth, WinHeight;		// 画面に表示されている文字数
 static BOOL Active = FALSE;
 static BOOL CompletelyVisible;
-HFONT VTFont[AttrFontMask+1];
-int FontHeight, FontWidth;
+static HFONT VTFont[AttrFontMask+1];
+int FontHeight, FontWidth;		// フォントサイズ pixel
 int ScreenWidth, ScreenHeight;	// スクリーンサイズ = (セル数)*(Font幅or高さ) ≒ Client Area
 BOOL AdjustSize;
 BOOL DontChangeSize=FALSE;
@@ -119,10 +119,10 @@ BOOL IMEstat;				/* IME Status  TRUE=IME ON */
 BOOL IMECompositionState;	/* 変換状態 TRUE=変換中 */
 
 // ---- device context and status flags
-static HDC VTDC = NULL; /* Device context for VT window */
-static TCharAttr DCAttr;
+//static HDC VTDC = NULL; /* Device context for VT window */
+//static TCharAttr DCAttr;
 static TCharAttr CurCharAttr;
-static HFONT DCPrevFont;
+//static HFONT DCPrevFont;
 
 TCharAttr DefCharAttr = {
   AttrDefault,
@@ -200,6 +200,7 @@ static HBITMAP GetBitmapHandleW(const wchar_t *File);
 static void InitColorTable(const COLORREF *ANSIColor16);
 static void UpdateBGBrush(void);
 static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_color, COLORREF *back_color, BYTE *_alpha);
+static void DispInitDC2(ttdc_t *vt);
 
 // LoadImage() しか使えない環境かどうかを判別する。
 // LoadImage()では .bmp 以外の画像ファイルが扱えないので要注意。
@@ -1711,9 +1712,14 @@ void InitDisp(void)
 void EndDisp(void)
 {
   int i, j;
-
-  if (VTDC!=NULL) DispReleaseDC();
-
+#if 0
+  if (VTDC!=NULL) {
+	  //DispReleaseDC();
+	  SelectObject(VTDC, DCPrevFont);
+	  ReleaseDC(HVTWin,VTDC);
+	  VTDC = NULL;
+  }
+#endif
   /* Delete fonts */
   for (i = 0 ; i <= AttrFontMask; i++)
   {
@@ -2005,8 +2011,9 @@ void CaretKillFocus(BOOL show)
 	  return;
 
   /* Get Device Context */
-  DispInitDC();
-  hdc = VTDC;
+  ttdc_t *vt = DispInitDC(HVTWin);
+//  VTDC = NULL;
+  hdc = vt->VTDC;
 
   CaretX = (CursorX-WinOrgX)*FontWidth;
   CaretY = (CursorY-WinOrgY)*FontHeight;
@@ -2033,12 +2040,12 @@ void CaretKillFocus(BOOL show)
   } else {
 	  oldpen = SelectObject(hdc, CreatePen(PS_SOLID, 0, ts.VTColor[1]));
   }
-  Polyline(VTDC, p, 5);
+  Polyline(hdc, p, 5);
   oldpen = SelectObject(hdc, oldpen);
   DeleteObject(oldpen);
 
   /* release device context */
-  DispReleaseDC();
+  DispReleaseDC(vt);
 }
 
 // ポリゴンカーソルを消したあとに、その部分の文字を再描画する。
@@ -2303,8 +2310,6 @@ void ResizeWindow(int x, int y, int w, int h, int cw, int ch)
   }
 }
 
-void PaintWindow(HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
-		 int* Xs, int* Ys, int* Xe, int* Ye)
 //  Paint window with background color &
 //  convert paint region from window coord. to screen coord.
 //  Called from WM_PAINT handler
@@ -2313,27 +2318,46 @@ void PaintWindow(HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
 //	*Xs, *Ys: upper left corner of the region
 //		    in screen coord.
 //	*Xe, *Ye: lower right
+ttdc_t *PaintWindow(HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
+					  int* Xs, int* Ys, int* Xe, int* Ye)
 {
-  if (VTDC!=NULL)
-	DispReleaseDC();
-  VTDC = PaintDC;
-  DCPrevFont = SelectObject(VTDC, VTFont[0]);
-  DispInitDC();
+	OutputDebugPrintf("%s()\n", __FUNCTION__);
+  ttdc_t *vt = (ttdc_t *)calloc(sizeof(*vt), 1);
+#if 0
+  assert(VTDC == NULL);
+  if (VTDC!=NULL) {
+	  //DispReleaseDC();
+	  SelectObject(VTDC, DCPrevFont);
+	  ReleaseDC(HVTWin,VTDC);
+	  VTDC = NULL;
+  }
+#endif
+  HDC hDC = PaintDC;
+  vt->HVTWin = HVTWin;
+  vt->VTDC = hDC;
+  DispInitDC2(vt);
+//  VTDC = hDC;
 
   if(!BGEnable && fBkGnd)
-    FillRect(VTDC, &PaintRect,Background);
+    FillRect(hDC, &PaintRect,Background);
 
   *Xs = PaintRect.left / FontWidth + WinOrgX;
   *Ys = PaintRect.top / FontHeight + WinOrgY;
   *Xe = (PaintRect.right-1) / FontWidth + WinOrgX;
   *Ye = (PaintRect.bottom-1) / FontHeight + WinOrgY;
+
+  return vt;
 }
 
-void DispEndPaint(void)
+void DispEndPaint(ttdc_t *vt)
 {
-  if (VTDC==NULL) return;
-  SelectObject(VTDC,DCPrevFont);
-  VTDC = NULL;
+	OutputDebugPrintf("%s()\n", __FUNCTION__);
+  HDC hDC = vt->VTDC;
+  assert(hDC != NULL);
+  //if (VTDC==NULL) return;
+  SelectObject(hDC,vt->DCPrevFont);
+  //VTDC = NULL;
+  free(vt);
 }
 
 void DispClearWin(void)
@@ -2360,7 +2384,7 @@ void DispClearWin(void)
 
 void DispChangeBackground(void)
 {
-	DispReleaseDC();
+//	DispReleaseDC();
 
 	UpdateBGBrush();
 
@@ -2384,29 +2408,71 @@ void DispChangeWin(void)
   DispChangeBackground();
 }
 
-void DispInitDC(void)
+static void DispInitDC2(ttdc_t *vt)
 {
-  if (VTDC==NULL)
-  {
-    VTDC = GetDC(HVTWin);
-    DCPrevFont = SelectObject(VTDC, VTFont[0]);
-  }
-  else
-    SelectObject(VTDC, VTFont[0]);
+	vt->DCPrevFont = SelectObject(vt->VTDC, VTFont[0]);
+//	DCPrevFont = vt->DCPrevFont;
+	SelectObject(vt->VTDC, VTFont[0]);
+	SetTextColor(vt->VTDC, BGVTColor[0]);
+	SetBkColor(vt->VTDC, BGVTColor[1]);
 
-  SetTextColor(VTDC, BGVTColor[0]);
-  SetBkColor(VTDC, BGVTColor[1]);
-
-  SetBkMode(VTDC,OPAQUE);
-  DCAttr = DefCharAttr;
+	SetBkMode(vt->VTDC,OPAQUE);
 }
 
-void DispReleaseDC(void)
+//void DispInitDC(void)
+#if !_DEBUG
+ttdc_t *DispInitDC(HWND hVTWin)
+#else
+ttdc_t *DispInitDCDebug(HWND hVTWin, const char *file, int line)
+#endif
 {
-  if (VTDC==NULL) return;
-  SelectObject(VTDC, DCPrevFont);
-  ReleaseDC(HVTWin,VTDC);
-  VTDC = NULL;
+	OutputDebugPrintf("%s(%d): %s()\n", file, line, __FUNCTION__);
+	ttdc_t *vt = (ttdc_t *)calloc(sizeof(*vt), 1);
+#if 0
+	assert(VTDC == NULL);
+	if (VTDC==NULL)
+	{
+		VTDC = GetDC(hVTWin);
+		DCPrevFont = SelectObject(VTDC, VTFont[0]);
+	}
+	else
+		SelectObject(VTDC, VTFont[0]);
+#endif
+#if 0
+	SetTextColor(VTDC, BGVTColor[0]);
+	SetBkColor(VTDC, BGVTColor[1]);
+
+	SetBkMode(VTDC,OPAQUE);
+	DCAttr = DefCharAttr;
+#endif
+	vt->HVTWin = hVTWin;
+	vt->VTDC = GetDC(hVTWin);
+	vt->DCAttr = DefCharAttr;
+//	DCAttr = DefCharAttr;
+//	VTDC = vt->VTDC;
+	DispInitDC2(vt);
+
+	return vt;
+}
+
+#if !_DEBUG
+void DispReleaseDC(ttdc_t *vt)
+#else
+void DispReleaseDCDebug(ttdc_t *vt, const char *file, int line)
+#endif
+{
+	OutputDebugPrintf("%s(%d): %s()\n", file, line, __FUNCTION__);
+#if 0
+	assert(VTDC != NULL);
+	if (VTDC==NULL) {
+		free(vt);
+		return;
+	}
+#endif
+	SelectObject(vt->VTDC, vt->DCPrevFont);
+	ReleaseDC(vt->HVTWin, vt->VTDC);
+//	VTDC = NULL;
+	free(vt);
 }
 
 /**
@@ -2654,29 +2720,34 @@ static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_col
  *   Attr: character attributes
  *   Reverse: true if text is selected (reversed) by mouse
  */
-void DispSetupDC(TCharAttr Attr, BOOL Reverse)
+void DispSetupDC(ttdc_t *vt, TCharAttr Attr, BOOL Reverse)
 {
 	vtdisp_work_t *w = &vtdisp_work;
 	COLORREF TextColor, BackColor;
 	BYTE alpha;
+	HDC hDC = vt->VTDC;
 
 	GetDrawAttr(&Attr, Reverse, &TextColor, &BackColor, &alpha);
 
+#if 0
 	if (VTDC == NULL)
-		DispInitDC();
+		DispInitDC(vt);
+#else
+	//assert(VTDC != NULL);
+#endif
 
 	// フォント設定
 	if (((ts.FontFlag & FF_URLUNDERLINE) && (Attr.Attr & AttrURL)) ||
 		((ts.FontFlag & FF_UNDERLINE) && (Attr.Attr & AttrUnder))) {
-		SelectObject(VTDC, VTFont[(Attr.Attr & AttrFontMask) | AttrUnder]);
+		SelectObject(hDC, VTFont[(Attr.Attr & AttrFontMask) | AttrUnder]);
 	}
 	else {
-		SelectObject(VTDC, VTFont[Attr.Attr & (AttrBold|AttrSpecial)]);
+		SelectObject(hDC, VTFont[Attr.Attr & (AttrBold|AttrSpecial)]);
 	}
 
 	// 色設定
-	SetTextColor(VTDC, TextColor);
-	SetBkColor(VTDC, BackColor);
+	SetTextColor(hDC, TextColor);
+	SetBkColor(hDC, BackColor);
 
 	w->DCBackColor = BackColor;
 	w->DCBackAlpha = alpha;
@@ -2983,19 +3054,19 @@ void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *cells, int len,
  *  @param[in]	*X		horizontal position
  *  @param[out]	*X		horizontal position shifted by the width of the string
  */
-void DispStrA(const char *Buff, const char *WidthInfo, int Count, int Y, int* X)
+void DispStrA(ttdc_t *vt, const char *Buff, const char *WidthInfo, int Count, int Y, int* X)
 {
 	HDC BGDC = BGEnable ? hdcBGBuffer : NULL;
-	DrawStrA(VTDC, BGDC, Buff, WidthInfo, Count, FontWidth, FontHeight, Y, X);
+	DrawStrA(vt->VTDC, BGDC, Buff, WidthInfo, Count, FontWidth, FontHeight, Y, X);
 }
 
 /**
  *	DispStr() の wchar_t版
  */
-void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int* X)
+void DispStrW(ttdc_t *vt, const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int* X)
 {
 	HDC BGDC = BGEnable ? hdcBGBuffer : NULL;
-	DrawStrW(VTDC, BGDC, StrW, WidthInfo, Count, FontWidth, FontHeight, Y, X);
+	DrawStrW(vt->VTDC, BGDC, StrW, WidthInfo, Count, FontWidth, FontHeight, Y, X);
 }
 
 BOOL DispDeleteLines(int Count, int YEnd)

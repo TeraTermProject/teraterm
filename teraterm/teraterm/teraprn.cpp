@@ -52,7 +52,9 @@
 #endif
 #endif
 
-static HDC PrintDC;
+//static HDC PrintDC;
+extern "C" HDC PrintDC;
+HDC PrintDC;
 static HFONT PrnFont[AttrFontMask+1];
 static int PrnFW, PrnFH;
 static RECT Margin;
@@ -345,7 +347,7 @@ static void PrnSetAttr(TCharAttr Attr)
 	}
 }
 
-void PrnSetupDC(TCharAttr Attr, BOOL reverse)
+void PrnSetupDC(ttdc_t *vt, TCharAttr Attr, BOOL reverse)
 {
 	(void)reverse;
 	PrnSetAttr(Attr);

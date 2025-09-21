@@ -133,8 +133,8 @@ static int SaveBuffY;
 // ANSI表示用に変換するときのCodePage
 static int CodePage = 932;
 
-static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd);
-static void BuffDrawLineIPrn(int SY, int IStart, int IEnd);
+static void BuffDrawLineI(ttdc_t *dc, int DrawX, int DrawY, int SY, int IStart, int IEnd);
+static void BuffDrawLineIPrn(ttdc_t *dc, int SY, int IStart, int IEnd);
 
 /**
  *	buff_char_t を relセル移動する
@@ -952,10 +952,12 @@ void BuffEraseCurToEnd(void)
 	if (head == 1) {
 		XStart--;
 	}
-	BuffDrawLineI(-1, -1, CursorY + PageStart, XStart, NumOfColumns);
+	ttdc_t *dc = DispInitDC(HVTWin);
+	BuffDrawLineI(dc, -1, -1, CursorY + PageStart, XStart, NumOfColumns);
 	for (i = CursorY + 1; i <= YEnd; i++) {
-		BuffDrawLineI(-1, -1, i + PageStart, 0, NumOfColumns);
+		BuffDrawLineI(dc, -1, -1, i + PageStart, 0, NumOfColumns);
 	}
+	DispReleaseDC(dc);
 }
 
 /**
@@ -991,11 +993,13 @@ void BuffEraseHomeToCur(void)
 	}
 
 	/* update window */
+	ttdc_t *dc = DispInitDC(HVTWin);
 	draw_len = tail == 0 ? CursorX : CursorX + 1;
 	for (i = YHome; i < CursorY; i++) {
-		BuffDrawLineI(-1, -1, i + PageStart, 0, NumOfColumns);
+		BuffDrawLineI(dc, -1, -1, i + PageStart, 0, NumOfColumns);
 	}
-	BuffDrawLineI(-1, -1, CursorY + PageStart, 0, draw_len);
+	BuffDrawLineI(dc, -1, -1, CursorY + PageStart, 0, draw_len);
+	DispReleaseDC(dc);
 }
 
 void BuffInsertLines(int Count, int YEnd)
@@ -1084,7 +1088,9 @@ void BuffEraseCharsInLine(int XStart, int Count)
 	if (tail != 0) {
 		Count += 1;
 	}
-	BuffDrawLineI(-1, -1, CursorY + PageStart, XStart, XStart + Count);
+	ttdc_t *dc = DispInitDC(HVTWin);
+	BuffDrawLineI(dc, -1, -1, CursorY + PageStart, XStart, XStart + Count);
+	DispReleaseDC(dc);
 }
 
 void BuffDeleteLines(int Count, int YEnd)
@@ -2184,6 +2190,8 @@ wchar_t *BuffCBCopyUnicode(BOOL Table)
 	return str_ptr;
 }
 
+extern HDC PrintDC;
+
 void BuffPrint(BOOL ScrollRegion)
 // Print screen or selected text
 {
@@ -2231,6 +2239,8 @@ void BuffPrint(BOOL ScrollRegion)
 	}
 
 	LockBuffer();
+	ttdc_t *vt = DispInitDC(HVTWin);
+	vt->VTDC = PrintDC;
 
 	TmpPtr = GetLinePtr(PrintStart.y);
 	for (j = PrintStart.y ; j <= PrintEnd.y ; j++) {
@@ -2247,11 +2257,12 @@ void BuffPrint(BOOL ScrollRegion)
 			IEnd = NumOfColumns - 1;
 		}
 
-		BuffDrawLineIPrn(j, IStart, IEnd);
+		//BuffDrawLineIPrn(vt, j, IStart, IEnd);
+		BuffDrawLineI(vt, -1, -1, j, IStart, IEnd);
 		PrnNewLine();
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
-
+	DispReleaseDC(vt);
 	UnlockBuffer();
 	VTPrintEnd();
 }
@@ -2534,6 +2545,7 @@ static void mark_url_line_w(int cur_x, int cur_y)
 	}
 
 	// マークする
+	ttdc_t *dc = DispInitDC(HVTWin);
 	{
 	int sx_i = sx;
 	int sy_i = sy;
@@ -2550,10 +2562,10 @@ static void mark_url_line_w(int cur_x, int cur_y)
 		match = mark_url_w_sub(sx_i, ex, sy_i, ey, &sx_match_s, &sx_match_e, &sy_match_s, &sy_match_e);
 		if (match) {
 			if (sy_match_s == sy_match_e) {
-				BuffDrawLineI(-1, -1, sy_match_s, sx_match_s, sx_match_e);
+				BuffDrawLineI(dc, -1, -1, sy_match_s, sx_match_s, sx_match_e);
 			}
 			else {
-				BuffDrawLineI(-1, -1, sy_match_s, sx_match_s, sx_match_e);
+				BuffDrawLineI(dc, -1, -1, sy_match_s, sx_match_s, sx_match_e);
 			}
 			sx_i = sx_match_e;
 			sy_i = sy_match_e;
@@ -2585,9 +2597,10 @@ static void mark_url_line_w(int cur_x, int cur_y)
 			else if (y == ey) {
 				ex_i = ex;
 			}
-			BuffDrawLineI(-1, -1, y + PageStart, sx_i, ex_i);
+			BuffDrawLineI(dc, -1, -1, y + PageStart, sx_i, ex_i);
 		}
 	}
+	DispReleaseDC(dc);
 }
 
 /**
@@ -2728,7 +2741,9 @@ static void mark_url_w(int cur_x, int cur_y)
 				int draw_x = sx;
 				int draw_y = CursorY - 1;
 				if (IsLineVisible(&draw_x, &draw_y)) {
-					BuffDrawLineI(draw_x, draw_y, PageStart + CursorY - 1, sx, NumOfColumns - 1);
+					ttdc_t *dc = DispInitDC(HVTWin);
+					BuffDrawLineI(dc, -1, -1, PageStart + CursorY - 1, sx, NumOfColumns - 1);
+					DispReleaseDC(dc);
 				}
 				TmpPtr = NextLinePtr(TmpPtr);
 				xx = 0;
@@ -3288,10 +3303,10 @@ static BOOL CheckSelect(int x, int y)
  *	@param	data			disp_strW(A)() に渡されるデータ
  */
 static
-void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
-					  void (*disp_strW)(const wchar_t *bufW, const char *width_info, int count, void *data),
-					  void (*disp_strA)(const char *buf, const char *width_info, int count, void *data),
-					  void (*disp_setup_dc)(TCharAttr Attr, BOOL Reverse),
+void BuffGetDrawInfoW(ttdc_t *dc, int SY, int IStart, int IEnd,
+					  void (*disp_strW)(ttdc_t *dc, const wchar_t *bufW, const char *width_info, int count, void *data),
+					  void (*disp_strA)(ttdc_t *dc, const char *buf, const char *width_info, int count, void *data),
+					  void (*disp_setup_dc)(ttdc_t *dc, TCharAttr Attr, BOOL Reverse),
 					  void *data)
 {
 	const LONG TmpPtr = GetLinePtr(SY);
@@ -3441,12 +3456,12 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 			OutputDebugPrintfW(L"W[%d] '%s'\n", lenW, bufW);
 #endif
 
-			disp_setup_dc(CurAttr, CurSelected);
+			disp_setup_dc(dc, CurAttr, CurSelected);
 			if (UseUnicodeApi) {
-				disp_strW(bufW, bufWW, lenW, data);
+				disp_strW(dc, bufW, bufWW, lenW, data);
 			}
 			else {
-				disp_strA(bufA, bufAW, lenA, data);
+				disp_strA(dc, bufA, bufAW, lenA, data);
 			}
 
 			lenA = 0;
@@ -3465,21 +3480,21 @@ typedef struct {
 	int draw_y;
 } disp_data_t;
 
-static void l_disp_strW(const wchar_t *bufW, const char *cells, int len, void *data_)
+static void l_disp_strW(ttdc_t *dc, const wchar_t *bufW, const char *cells, int len, void *data_)
 {
 	disp_data_t *data = (disp_data_t *)data_;
 	int x = data->draw_x;
 	int y = data->draw_y;
-	DispStrW(bufW, cells, len, y, &x);
+	DispStrW(dc, bufW, cells, len, y, &x);
 	data->draw_x = x;
 }
 
-static void l_disp_strA(const char *buf, const char *width_info, int count, void *data_)
+static void l_disp_strA(ttdc_t *dc, const char *buf, const char *width_info, int count, void *data_)
 {
 	disp_data_t *data = (disp_data_t *)data_;
 	int x = data->draw_x;
 	int y = data->draw_y;
-	DispStrA(buf, width_info, count, y, &x);
+	DispStrA(dc, buf, width_info, count, y, &x);
 	data->draw_x = x;
 }
 
@@ -3487,12 +3502,13 @@ static void l_disp_strA(const char *buf, const char *width_info, int count, void
  *	1行描画 画面用
  *
  *	@param	DrawX,Y			Clint領域描画位置(pixel)
+ *							描画位置指定は廃止、(-1,-1)を入れる
  *	@param	SY				スクリーン上の位置(Character)  !バッファ上の位置
  *							PageStart + YStart など
  *	@param	IStart,IEnd		スクリーン上の位置(Character)
  *							指定した間を描画する
  */
-static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
+static void BuffDrawLineI(ttdc_t *dc, int DrawX, int DrawY, int SY, int IStart, int IEnd)
 {
 	int X = DrawX;
 	int Y = DrawY;
@@ -3522,7 +3538,7 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
 		data.draw_x = X;
 		data.draw_y = Y;
 
-		BuffGetDrawInfoW(SY, IStart, IEnd, l_disp_strW, l_disp_strA, DispSetupDC, &data);
+		BuffGetDrawInfoW(dc, SY, IStart, IEnd, l_disp_strW, l_disp_strA, DispSetupDC, &data);
 	}
 }
 
@@ -3534,14 +3550,16 @@ static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
  *	@param	IStart,IEnd		スクリーン上の位置(Character)
  *							指定した間を描画する
  */
-static void BuffDrawLineIPrn(int SY, int IStart, int IEnd)
+#if 0
+static void BuffDrawLineIPrn(ttdc_t *dc, int SY, int IStart, int IEnd)
 {
 	if (IEnd >= NumOfColumns) {
 		IEnd = NumOfColumns - 1;
 	}
 
-	BuffGetDrawInfoW(SY, IStart, IEnd, PrnOutTextW, PrnOutTextA, PrnSetupDC, NULL);
+	BuffGetDrawInfoW(dc, SY, IStart, IEnd, PrnOutTextW, PrnOutTextA, PrnSetupDC, NULL);
 }
+#endif
 
 void BuffUpdateRect
   (int XStart, int YStart, int XEnd, int YEnd)
@@ -3553,7 +3571,7 @@ void BuffUpdateRect
 {
 	int j;
 	int IStart, IEnd;
-	int X, Y;
+//	int X, Y;
 	LONG TmpPtr;
 	BOOL TempSel, Caret;
 
@@ -3569,6 +3587,8 @@ void BuffUpdateRect
 	if (YEnd < WinOrgY) {
 		return;
 	}
+
+	ttdc_t *dc = DispInitDC(HVTWin);
 
 	if (XStart < WinOrgX) {
 		XStart = WinOrgX;
@@ -3597,9 +3617,9 @@ void BuffUpdateRect
 		CaretOff();
 	}
 
-	DispSetupDC(DefCharAttr, TempSel);
+	DispSetupDC(dc, DefCharAttr, TempSel);
 
-	Y = (YStart-WinOrgY)*FontHeight;
+	//Y = (YStart-WinOrgY)*FontHeight;
 	TmpPtr = GetLinePtr(PageStart+YStart);
 	for (j = YStart+PageStart ; j <= YEnd+PageStart ; j++) {
 		IStart = XStart;
@@ -3607,15 +3627,17 @@ void BuffUpdateRect
 
 		IStart = LeftHalfOfDBCS(TmpPtr,IStart);
 
-		X = (IStart-WinOrgX)*FontWidth;
+		//X = (IStart-WinOrgX)*FontWidth;
 
-		BuffDrawLineI(X, Y, j, IStart, IEnd);
-		Y = Y + FontHeight;
+		BuffDrawLineI(dc, -1, -1, j, IStart, IEnd);
+		//Y = Y + FontHeight;
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
 	if (Caret) {
 		CaretOn();
 	}
+
+	DispReleaseDC(dc);
 }
 
 void UpdateStr(void)
@@ -3634,7 +3656,9 @@ void UpdateStr(void)
 		return;
 	}
 
-	BuffDrawLineI(X, Y, PageStart + CursorY, StrChangeStart, StrChangeStart + StrChangeCount - 1);
+	ttdc_t *dc = DispInitDC(HVTWin);
+	BuffDrawLineI(dc, -1, -1, PageStart + CursorY, StrChangeStart, StrChangeStart + StrChangeCount - 1);
+	DispReleaseDC(dc);
 	StrChangeCount = 0;
 }
 
@@ -4181,10 +4205,8 @@ void ChangeSelectRegion(void)
 		if (Caret) {
 			CaretOff();
 		}
-		DispInitDC();
 		BuffUpdateRect(TempStart.x,TempStart.y-PageStart,
 		               TempEnd.x,TempEnd.y-PageStart);
-		DispReleaseDC();
 		if (Caret) {
 			CaretOn();
 		}
@@ -4223,9 +4245,7 @@ void ChangeSelectRegion(void)
 
 		if ((IEnd>=IStart) && (j >= PageStart+WinOrgY) &&
 		    (j < PageStart+WinOrgY+WinHeight)) {
-			DispInitDC();
 			BuffUpdateRect(IStart,j-PageStart,IEnd,j-PageStart);
-			DispReleaseDC();
 		}
 	}
 	if (Caret) {
