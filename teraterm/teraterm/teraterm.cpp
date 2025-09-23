@@ -43,10 +43,8 @@
 #include "buffer.h"
 #include "vtterm.h"
 #include "vtwin.h"
-#include "clipboar.h"
 #include "filesys.h"
 #include "telnet.h"
-#include "tektypes.h"
 #include "tekwin.h"
 #include "ttdde.h"
 #include "keyboard.h"
@@ -130,14 +128,17 @@ static void init(void)
 #endif
 }
 
-// Tera Term main engine
+/**
+ * Tera Term main engine
+ *
+ *	@retval	FALSE	すぐに処理する必要なし
+ *	@retval	TRUE	引き続き処理する必要あり
+ */
 static BOOL OnIdle(LONG lCount)
 {
-	static int Busy = 2;
 	int nx, ny;
 	BOOL Size;
-
-	if (lCount==0) Busy = 2;
+	(void)lCount;
 
 	if (cv.Ready)
 	{
@@ -228,15 +229,13 @@ static BOOL OnIdle(LONG lCount)
 
 	}
 
+	BOOL Busy = FALSE;
 	if (cv.Ready &&
 	    (cv.RRQ || (cv.OutBuffCount>0) || (cv.InBuffCount>0) || (cv.FlushLen>0) || FLogGetCount() > 0 || (DDEGetCount()>0)) ) {
-		Busy = 2;
-	}
-	else {
-		Busy--;
+		Busy = TRUE;
 	}
 
-	return (Busy>0);
+	return Busy;
 }
 
 static HWND main_window;
@@ -388,17 +387,38 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	MSG msg;
 	for (;;) {
 		// idle状態でメッセージがない場合
+		DWORD idle_enter_tick = GetTickCount();
+		BOOL sleep_enable = FALSE;
 		for (;;) {
 			if (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) != FALSE) {
 				// メッセージが存在する
 				break;
 			}
 
+			// idle処理を行う
+			//		- GetMessage()でブロックすると、
+			//		  ウィンドウ非表示時にidle処理ができない
+			//		- メッセージ処理を素早く行わなければ
+			//		  SCPのダイアログの処理が遅くなり転送が滞る
+			//		- 高速で処理を行うとCPU時間を消費してしまう
+			//	20msは高速に処理して、その後Sleep()することでバランスを取る
 			const BOOL continue_idle = OnIdle(lCount++);
 			if (!continue_idle) {
 				// FALSEが戻ってきたらidle処理は不要
-				Sleep(2);
+				if (!sleep_enable) {
+					if (GetTickCount() - idle_enter_tick > 20) {
+						// 20ms以上idle処理不要だったらSleep()を入れる
+						sleep_enable = TRUE;
+					}
+				}
+				if (sleep_enable) {
+					Sleep(2);
+				}
 				lCount = 0;
+			}
+			else {
+				idle_enter_tick = GetTickCount();
+				sleep_enable = FALSE;
 			}
 		}
 
