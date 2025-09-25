@@ -426,7 +426,7 @@ Visual Studio 2005になってから、Windows 95のサポートが打ち切られました。よって、
 <h2 id="debug">デバッグ手法</h2>
 <h3>debug printf</h3>
 　Windowsアプリケーションでは printf() が使えません。標準出力がどこにも割り当てられていないからです。AllocConsole()とfreopen()を使えば、Windowsアプリケーションにおいても printf() を利用することができます。<br>
-　OutputDebugString()というAPIがあります。これは Visual Studio のデバッグコンソールにメッセージ出力することができる関数です。当該APIは、"Debug build"および"Release build"に関係なく、デバroガが存在すれば、メッセージを送信します。ゆえに、 Visual Studioがなくとも、<a href="https://www.vector.co.jp/soft/win95/prog/se046776.html" target="_blank">DBCon</a>のようなツールを使えば、アプリケーションの単体起動においても、OutputDebugString()によるメッセージを拾うことができます。<br>
+　OutputDebugString()というAPIがあります。これは Visual Studio のデバッグコンソールにメッセージ出力することができる関数です。当該APIは、"Debug build"および"Release build"に関係なく、デバッガが存在すれば、メッセージを送信します。ゆえに、 Visual Studioがなくとも、<a href="https://www.vector.co.jp/soft/win95/prog/se046776.html" target="_blank">DBCon</a>のようなツールを使えば、アプリケーションの単体起動においても、OutputDebugString()によるメッセージを拾うことができます。<br>
 　Tera Termでは、可変長引数を扱えるようにラッパー関数を用意しています。
 　
 <pre class=code>
