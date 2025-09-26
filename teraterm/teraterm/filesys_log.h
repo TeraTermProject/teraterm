@@ -69,6 +69,10 @@ int FLogGetCount(void);
 int FLogGetFreeCount(void);
 void FLogWriteFile(void);
 void FLogPutUTF32(unsigned int u32);
+void FLogPutANSI(BYTE b);
+void FLogPutBinary(BYTE b);
+void FLogBinSkip(int add);
+
 void FLogOutputAllBuffer(void);
 
 #ifdef __cplusplus
