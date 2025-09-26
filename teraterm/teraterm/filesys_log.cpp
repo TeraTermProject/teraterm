@@ -45,6 +45,7 @@
 #include "vtterm.h"
 #include "codeconv.h"
 #include "asprintf.h"
+#include "makeoutputstring.h"
 
 #include "filesys_log.h"
 #include "filesys.h"  // for ProtoGetProtoFlag()
@@ -1173,6 +1174,14 @@ static void OutputStr(PFileVar fv, const wchar_t *strW)
 				break;
 			}
 			}
+		}
+	} else if (fv->LogMode == TFileVar::LogModeTag::BIN_MODE) {
+		char *str = MakeOutputStringConvW(strW, ts.KanjiCodeSend, 0, 0, 0, NULL);
+		if (str != NULL) {
+			for (size_t i = 0; str[i] != 0; i++) {
+				Put1(fv, (BYTE)str[i]);
+			}
+			free(str);
 		}
 	}
 }
