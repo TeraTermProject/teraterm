@@ -96,16 +96,17 @@ typedef struct {
 
 	BOOL FileLog;
 	BOOL BinLog;
+
+	PCHAR cv_LogBuf;
+	int cv_LogPtr, cv_LStart, cv_LCount;
+	PCHAR cv_BinBuf;
+	int cv_BinPtr, cv_BStart, cv_BCount;
+	int cv_BinSkip;
+
 } TFileVar;
 typedef TFileVar *PFileVar;
 
 static PFileVar LogVar = NULL;
-
-static PCHAR cv_LogBuf;
-static int cv_LogPtr, cv_LStart, cv_LCount;
-static PCHAR cv_BinBuf;
-static int cv_BinPtr, cv_BStart, cv_BCount;
-static int cv_BinSkip;
 
 // 遅延書き込み用スレッドのメッセージ
 #define WM_DPC_LOGTHREAD_SEND (WM_APP + 1)
@@ -368,8 +369,8 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 			return FALSE;
 		}
 	}
-	cv_LStart = cv_LogPtr;
-	cv_LCount = 0;
+	fv->cv_LStart = fv->cv_LogPtr;
+	fv->cv_LCount = 0;
 
 	OpenLogFile(fv);
 	if (fv->FileHandle == INVALID_HANDLE_VALUE) {
@@ -469,23 +470,23 @@ void LogPut1(BYTE b)
 {
 	PFileVar fv = LogVar;
 
-	cv_LogBuf[cv_LogPtr] = b;
-	cv_LogPtr++;
-	if (cv_LogPtr>=InBuffSize)
-		cv_LogPtr = cv_LogPtr-InBuffSize;
+	fv->cv_LogBuf[fv->cv_LogPtr] = b;
+	fv->cv_LogPtr++;
+	if (fv->cv_LogPtr >= InBuffSize)
+		fv->cv_LogPtr = fv->cv_LogPtr-InBuffSize;
 
 	if (fv->FileLog)
 	{
-		if (cv_LCount>=InBuffSize)
+		if (fv->cv_LCount>=InBuffSize)
 		{
-			cv_LCount = InBuffSize;
-			cv_LStart = cv_LogPtr;
+			fv->cv_LCount = InBuffSize;
+			fv->cv_LStart = fv->cv_LogPtr;
 		}
 		else
-			cv_LCount++;
+			fv->cv_LCount++;
 	}
 	else
-		cv_LCount = 0;
+		fv->cv_LCount = 0;
 }
 
 static BOOL Get1(PCHAR Buf, int *Start, int *Count, PBYTE b)
@@ -629,15 +630,15 @@ static void LogToFile(PFileVar fv)
 
 	if (fv->FileLog)
 	{
-		Buf = cv_LogBuf;
-		Start = cv_LStart;
-		Count = cv_LCount;
+		Buf = fv->cv_LogBuf;
+		Start = fv->cv_LStart;
+		Count = fv->cv_LCount;
 	}
 	else if (fv->BinLog)
 	{
-		Buf = cv_BinBuf;
-		Start = cv_BStart;
-		Count = cv_BCount;
+		Buf = fv->cv_BinBuf;
+		Start = fv->cv_BStart;
+		Count = fv->cv_BCount;
 	}
 	else
 		return;
@@ -683,12 +684,12 @@ static void LogToFile(PFileVar fv)
 
 	if (fv->FileLog)
 	{
-		cv_LStart = Start;
-		cv_LCount = Count;
+		fv->cv_LStart = Start;
+		fv->cv_LCount = Count;
 	}
 	else {
-		cv_BStart = Start;
-		cv_BCount = Count;
+		fv->cv_BStart = Start;
+		fv->cv_BCount = Count;
 	}
 	if (FLogIsPause() || ProtoGetProtoFlag()) return;
 	fv->FLogDlg->RefreshNum(fv->StartTime, fv->FileSize, fv->ByteCount);
@@ -700,44 +701,48 @@ static void LogToFile(PFileVar fv)
 
 static BOOL CreateLogBuf(void)
 {
-	if (cv_LogBuf==NULL)
+	PFileVar fv = LogVar;
+	if (fv->cv_LogBuf==NULL)
 	{
-		cv_LogBuf = (char *)malloc(InBuffSize);
-		cv_LogPtr = 0;
-		cv_LStart = 0;
-		cv_LCount = 0;
+		fv->cv_LogBuf = (char *)malloc(InBuffSize);
+		fv->cv_LogPtr = 0;
+		fv->cv_LStart = 0;
+		fv->cv_LCount = 0;
 	}
-	return (cv_LogBuf!=NULL);
+	return (fv->cv_LogBuf!=NULL);
 }
 
 static void FreeLogBuf(void)
 {
-	free(cv_LogBuf);
-	cv_LogBuf = NULL;
-	cv_LogPtr = 0;
-	cv_LStart = 0;
-	cv_LCount = 0;
+	PFileVar fv = LogVar;
+	free(fv->cv_LogBuf);
+	fv->cv_LogBuf = NULL;
+	fv->cv_LogPtr = 0;
+	fv->cv_LStart = 0;
+	fv->cv_LCount = 0;
 }
 
 static BOOL CreateBinBuf(void)
 {
-	if (cv_BinBuf==NULL)
+	PFileVar fv = LogVar;
+	if (fv->cv_BinBuf == NULL)
 	{
-		cv_BinBuf = (PCHAR)malloc(InBuffSize);
-		cv_BinPtr = 0;
-		cv_BStart = 0;
-		cv_BCount = 0;
+		fv->cv_BinBuf = (PCHAR)malloc(InBuffSize);
+		fv->cv_BinPtr = 0;
+		fv->cv_BStart = 0;
+		fv->cv_BCount = 0;
 	}
-	return (cv_BinBuf!=NULL);
+	return (fv->cv_BinBuf != NULL);
 }
 
 static void FreeBinBuf(void)
 {
-	free(cv_BinBuf);
-	cv_BinBuf = NULL;
-	cv_BinPtr = 0;
-	cv_BStart = 0;
-	cv_BCount = 0;
+	PFileVar fv = LogVar;
+	free(fv->cv_BinBuf);
+	fv->cv_BinBuf = NULL;
+	fv->cv_BinPtr = 0;
+	fv->cv_BStart = 0;
+	fv->cv_BCount = 0;
 }
 
 static void FileTransEnd_(PFileVar fv)
@@ -759,8 +764,6 @@ static void FileTransEnd_(PFileVar fv)
 	free(fv->FullName);
 	fv->FullName = NULL;
 	free(fv);
-
-	LogVar = NULL;
 }
 
 /**
@@ -881,6 +884,7 @@ void FLogClose(void)
 	}
 
 	FileTransEnd_(fv);
+	LogVar = NULL;
 }
 
 /**
@@ -902,7 +906,6 @@ BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom)
 	if (fv == NULL) {
 		return FALSE;
 	}
-	LogVar = fv;
 	memset(fv, 0, sizeof(TFileVar));
 	fv->FileHandle = INVALID_HANDLE_VALUE;
 	fv->LogThread = INVALID_HANDLE_VALUE;
@@ -910,9 +913,12 @@ BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom)
 
 	fv->log_code = code;
 	fv->bom = bom;
+
+	LogVar = fv;
 	BOOL ret = LogStart(fv, fname);
 	if (ret == FALSE) {
 		FileTransEnd_(fv);
+		LogVar = NULL;
 	}
 
 	return ret;
@@ -1128,31 +1134,33 @@ void FLogShowDlg(void)
 //void Log1Bin(PComVar cv, BYTE b)
 static void Log1Bin(BYTE b)
 {
-	if (LogVar->IsPause || ProtoGetProtoFlag()) {
+	PFileVar fv = LogVar;
+	if (fv->IsPause || ProtoGetProtoFlag()) {
 		return;
 	}
-	if (cv_BinSkip > 0) {
-		cv_BinSkip--;
+	if (fv->cv_BinSkip > 0) {
+		fv->cv_BinSkip--;
 		return;
 	}
-	cv_BinBuf[cv_BinPtr] = b;
-	cv_BinPtr++;
-	if (cv_BinPtr>=InBuffSize) {
-		cv_BinPtr = cv_BinPtr-InBuffSize;
+	fv->cv_BinBuf[fv->cv_BinPtr] = b;
+	fv->cv_BinPtr++;
+	if (fv->cv_BinPtr>=InBuffSize) {
+		fv->cv_BinPtr = fv->cv_BinPtr-InBuffSize;
 	}
-	if (cv_BCount>=InBuffSize) {
-		cv_BCount = InBuffSize;
-		cv_BStart = cv_BinPtr;
+	if (fv->cv_BCount>=InBuffSize) {
+		fv->cv_BCount = InBuffSize;
+		fv->cv_BStart = fv->cv_BinPtr;
 	}
 	else {
-		cv_BCount++;
+		fv->cv_BCount++;
 	}
 }
 
 static void LogBinSkip(int add)
 {
-	if (cv_BinBuf != NULL) {
-		cv_BinSkip += add;
+	PFileVar fv = LogVar;
+	if (fv->cv_BinBuf != NULL) {
+		fv->cv_BinSkip += add;
 	}
 }
 
@@ -1166,10 +1174,10 @@ int FLogGetCount(void)
 		return 0;
 	}
 	if (fv->FileLog) {
-		return cv_LCount;
+		return fv->cv_LCount;
 	}
 	if (fv->BinLog) {
-		return cv_BCount;
+		return fv->cv_BCount;
 	}
 	return 0;
 }
@@ -1184,10 +1192,10 @@ int FLogGetFreeCount(void)
 		return 0;
 	}
 	if (fv->FileLog) {
-		return InBuffSize - cv_LCount;
+		return InBuffSize - fv->cv_LCount;
 	}
 	if (fv->BinLog) {
-		return InBuffSize - cv_BCount;
+		return InBuffSize - fv->cv_BCount;
 	}
 	return 0;
 }
@@ -1201,14 +1209,14 @@ void FLogWriteFile(void)
 	if (fv == NULL) {
 		return;
 	}
-	if (cv_LogBuf!=NULL)
+	if (fv->cv_LogBuf != NULL)
 	{
 		if (fv->FileLog) {
 			LogToFile(fv);
 		}
 	}
 
-	if (cv_BinBuf!=NULL)
+	if (fv->cv_BinBuf != NULL)
 	{
 		if (fv->BinLog) {
 			LogToFile(fv);
@@ -1219,7 +1227,7 @@ void FLogWriteFile(void)
 void FLogPutUTF32(unsigned int u32)
 {
 	PFileVar fv = LogVar;
-	BOOL log_available = (cv_LogBuf != 0);
+	BOOL log_available = (fv->cv_LogBuf != 0);
 
 	if (!log_available) {
 		// ログには出力しない
