@@ -4112,7 +4112,7 @@ void CVTWindow::OnFileLog()
 
 void CVTWindow::OnCommentToLog()
 {
-	if (!FLogIsOpendText()) {
+	if (!FLogIsOpend()) {
 		// 選択できないので呼ばれないはず
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
