@@ -312,6 +312,9 @@
     <ClCompile Include="vtdraw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="commentdlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -683,6 +686,9 @@
     </ClInclude>
     <ClInclude Include="vtdraw.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="commentdlg.h">
+      <Filter>dialog</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

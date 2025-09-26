@@ -103,6 +103,7 @@ typedef struct {
 	int cv_BinPtr, cv_BStart, cv_BCount;
 	int cv_BinSkip;
 
+	CRITICAL_SECTION filelog_lock;   /* ロック用変数 */
 } TFileVar;
 typedef TFileVar *PFileVar;
 
@@ -120,7 +121,7 @@ static void OutputStr(const wchar_t *str);
 static void LogToFile(PFileVar fv);
 static void FLogOutputBOM(PFileVar fv);
 
-static BOOL OpenFTDlg_(PFileVar fv)
+static BOOL OpenFTDlg(PFileVar fv)
 {
 	PFileTransDlg FTDlg = new CFileTransDlg();
 	if (FTDlg == NULL) {
@@ -414,7 +415,7 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 		fv->ByteCount = 0;
 	}
 
-	if (! OpenFTDlg_(fv)) {
+	if (! OpenFTDlg(fv)) {
 		return FALSE;
 	}
 
@@ -501,22 +502,14 @@ static BOOL Get1(PCHAR Buf, int *Start, int *Count, PBYTE b)
 }
 
 
-
-static CRITICAL_SECTION g_filelog_lock;   /* ロック用変数 */
-
-void logfile_lock_initialize(void)
+static void logfile_lock(PFileVar fv)
 {
-	InitializeCriticalSection(&g_filelog_lock);
+	EnterCriticalSection(&fv->filelog_lock);
 }
 
-static inline void logfile_lock(void)
+static void logfile_unlock(PFileVar fv)
 {
-	EnterCriticalSection(&g_filelog_lock);
-}
-
-static inline void logfile_unlock(void)
-{
-	LeaveCriticalSection(&g_filelog_lock);
+	LeaveCriticalSection(&fv->filelog_lock);
 }
 
 // ログをローテートする。
@@ -537,7 +530,7 @@ static void LogRotate(PFileVar fv)
 		return;
 	}
 
-	logfile_lock();
+	logfile_lock(fv);
 	// ログサイズを再初期化する。
 	fv->ByteCount = 0;
 
@@ -587,7 +580,7 @@ static void LogRotate(PFileVar fv)
 		StartThread(fv);
 	}
 
-	logfile_unlock();
+	logfile_unlock(fv);
 }
 
 static wchar_t *TimeStampStr(PFileVar fv)
@@ -647,7 +640,7 @@ static void LogToFile(PFileVar fv)
 	if (Count==0) return;
 
 	// ロックを取る(2004.8.6 yutaka)
-	logfile_lock();
+	logfile_lock(fv);
 
 	// 書き込みデータを作成する
 	DWORD WriteBufMax = 8192;
@@ -680,7 +673,7 @@ static void LogToFile(PFileVar fv)
 		}
 	}
 
-	logfile_unlock();
+	logfile_unlock(fv);
 
 	if (fv->FileLog)
 	{
@@ -763,6 +756,7 @@ static void FileTransEnd_(PFileVar fv)
 	FreeBinBuf();
 	free(fv->FullName);
 	fv->FullName = NULL;
+	DeleteCriticalSection(&fv->filelog_lock);
 	free(fv);
 }
 
@@ -821,61 +815,6 @@ void FLogRotateHalt(void)
 	fv->RotateStep = 0;
 }
 
-static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM)
-{
-	static const DlgTextInfo TextInfos[] = {
-		{ 0, "DLG_COMMENT_TITLE" },
-		{ IDOK, "BTN_OK" }
-	};
-
-	switch (msg) {
-		case WM_INITDIALOG:
-			// エディットコントロールにフォーカスをあてる
-			SetFocus(GetDlgItem(hDlgWnd, IDC_EDIT_COMMENT));
-			SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
-			return FALSE;
-
-		case WM_COMMAND:
-			switch (LOWORD(wp)) {
-				case IDOK: {
-					size_t len = SendDlgItemMessageW(hDlgWnd, IDC_EDIT_COMMENT, WM_GETTEXTLENGTH, 0, 0);
-					len += 1;
-					wchar_t *buf = (wchar_t *)malloc(len * sizeof(wchar_t));
-					GetDlgItemTextW(hDlgWnd, IDC_EDIT_COMMENT, buf, (int)len);
-					FLogWriteStr(buf);
-					FLogWriteStr(L"\n");		// TODO 改行コード
-					free(buf);
-					TTEndDialog(hDlgWnd, IDOK);
-					break;
-				}
-				default:
-					return FALSE;
-			}
-			break;
-
-		case WM_CLOSE:
-			TTEndDialog(hDlgWnd, 0);
-			return TRUE;
-
-		default:
-			return FALSE;
-	}
-	return TRUE;
-}
-
-/**
- * ログファイルへコメントを追加する (2004.8.6 yutaka)
- */
-void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd)
-{
-	PFileVar fv = LogVar;
-	if (fv == NULL) {
-		return;
-	}
-	TTDialogBox(hInst, MAKEINTRESOURCEW(IDD_COMMENT_DIALOG),
-				hWnd, OnCommentDlgProc);
-}
-
 void FLogClose(void)
 {
 	PFileVar fv = LogVar;
@@ -920,6 +859,8 @@ BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom)
 		FileTransEnd_(fv);
 		LogVar = NULL;
 	}
+
+	InitializeCriticalSection(&fv->filelog_lock);
 
 	return ret;
 }
