@@ -95,11 +95,12 @@ typedef struct {
 		TEXT_MODE,
 	} LogMode;
 
-	PCHAR cv_LogBuf;	// バッファの先頭 (サイズ=InBuffSize)
+	PCHAR cv_LogBuf;	// バッファの先頭
 	int cv_LogPtr;		// 書き込み位置
 	int cv_LStart;		// 読出し位置
 	int cv_LCount;		// データ数
 	int cv_BinSkip;
+	int BuffSize;		// バッファサイズ (=InBuffSize)
 
 	CRITICAL_SECTION filelog_lock;   /* ロック用変数 */
 } TFileVar;
@@ -346,7 +347,8 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 	fv->FullName = _wcsdup(fname);
 	FixLogOption();
 
-	fv->cv_LogBuf = (char *)malloc(InBuffSize);
+	fv->BuffSize = InBuffSize;
+	fv->cv_LogBuf = (char *)malloc(fv->BuffSize);
 	if (fv->cv_LogBuf == NULL) {
 		return FALSE;
 	}
@@ -456,12 +458,12 @@ static void Put1(PFileVar fv, BYTE b)
 {
 	fv->cv_LogBuf[fv->cv_LogPtr] = b;
 	fv->cv_LogPtr++;
-	if (fv->cv_LogPtr >= InBuffSize) {
-		fv->cv_LogPtr = fv->cv_LogPtr - InBuffSize;
+	if (fv->cv_LogPtr >= fv->BuffSize) {
+		fv->cv_LogPtr = fv->cv_LogPtr - fv->BuffSize;
 	}
-	if (fv->cv_LCount>=InBuffSize) {
+	if (fv->cv_LCount>=fv->BuffSize) {
 		// バッファがいっぱいの時、古い1byteを捨てる
-		fv->cv_LCount = InBuffSize;
+		fv->cv_LCount = fv->BuffSize;
 		fv->cv_LStart = fv->cv_LogPtr;
 	}
 	else {
@@ -482,8 +484,8 @@ static BOOL Get1(PFileVar fv, PBYTE b)
 	}
 	*b = fv->cv_LogBuf[fv->cv_LStart];
 	fv->cv_LStart++;
-	if (fv->cv_LStart >= InBuffSize) {
-		fv->cv_LStart = fv->cv_LStart - InBuffSize;
+	if (fv->cv_LStart >= fv->BuffSize) {
+		fv->cv_LStart = fv->cv_LStart - fv->BuffSize;
 	}
 	fv->cv_LCount--;
 	return TRUE;
@@ -619,7 +621,7 @@ static void LogToFile(PFileVar fv)
 	logfile_lock(fv);
 
 	// 書き込みデータを作成する
-	DWORD WriteBufMax = 8192;
+	DWORD WriteBufMax = fv->BuffSize;
 	DWORD WriteBufLen = 0;
 	PCHAR WriteBuf = (PCHAR)malloc(WriteBufMax);
 	while (Get1(fv, &b)) {
@@ -627,6 +629,7 @@ static void LogToFile(PFileVar fv)
 			continue;
 		}
 
+		// fv->BuffSizeより大きくならないはず
 		if (WriteBufLen >= (WriteBufMax*4/5)) {
 			WriteBufMax *= 2;
 			WriteBuf = (PCHAR)realloc(WriteBuf, WriteBufMax);
@@ -805,6 +808,9 @@ BOOL FLogIsOpendBin(void)
 	return fv != NULL && (fv->LogMode == TFileVar::LogModeTag::BIN_MODE);
 }
 
+/**
+ *	ログに文字列を書き込む
+ */
 void FLogWriteStr(const wchar_t *str)
 {
 	PFileVar fv = LogVar;
@@ -815,6 +821,9 @@ void FLogWriteStr(const wchar_t *str)
 		return;
 	}
 	OutputStr(fv, str);
+
+	// すぐに書き込む
+	LogToFile(fv);
 }
 
 /**
@@ -1047,7 +1056,7 @@ int FLogGetFreeCount(void)
 	if (fv == NULL) {
 		return 0;
 	}
-	return InBuffSize - fv->cv_LCount;
+	return fv->BuffSize - fv->cv_LCount;
 }
 
 /**
@@ -1176,7 +1185,7 @@ static void OutputStr(PFileVar fv, const wchar_t *strW)
 			}
 		}
 	} else if (fv->LogMode == TFileVar::LogModeTag::BIN_MODE) {
-		char *str = MakeOutputStringConvW(strW, ts.KanjiCodeSend, 0, 0, 0, NULL);
+		char *str = MakeOutputStringConvW(strW, ts.KanjiCode, 0, 0, 0, NULL);
 		if (str != NULL) {
 			for (size_t i = 0; str[i] != 0; i++) {
 				Put1(fv, (BYTE)str[i]);
