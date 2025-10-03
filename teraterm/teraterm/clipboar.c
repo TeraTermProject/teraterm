@@ -346,7 +346,7 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 		str_mb = ToU8W(str_w);
 	}
 	else {
-		str_mb = MakeOutputStringConvW(str_w, ts.KanjiCodeSend, 0, 0, 0, NULL);
+		str_mb = MakeOutputStringConvW(str_w, ts.KanjiCodeSend, ts.KanjiIn, ts.KanjiOut, ts.JIS7KatakanaSend, NULL);
 	}
 
 	if (str_mb == NULL) {
