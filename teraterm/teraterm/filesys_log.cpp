@@ -1185,7 +1185,7 @@ static void OutputStr(PFileVar fv, const wchar_t *strW)
 			}
 		}
 	} else if (fv->LogMode == TFileVar::LogModeTag::BIN_MODE) {
-		char *str = MakeOutputStringConvW(strW, ts.KanjiCode, 0, 0, 0, NULL);
+		char *str = MakeOutputStringConvW(strW, ts.KanjiCode, ts.KanjiIn, ts.KanjiOut, ts.JIS7KatakanaSend, NULL);
 		if (str != NULL) {
 			for (size_t i = 0; str[i] != 0; i++) {
 				Put1(fv, (BYTE)str[i]);
