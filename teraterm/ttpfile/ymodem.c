@@ -558,6 +558,11 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 
 				return TRUE;
 			}
+			else if (b == CAN) {
+				// quit
+				yv->YMode = IdYQuit;
+				return FALSE;
+			}
 			else {
 				/* flush comm buffer */
 				cv->InBuffCount = 0;
