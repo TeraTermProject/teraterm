@@ -275,6 +275,7 @@ mac_check(struct Mac *mac, u_int32_t seqno,
 void
 mac_clear(struct Mac *mac)
 {
-	ssh_hmac_free(mac->hmac_ctx);
+	if (mac->hmac_ctx != NULL)
+		ssh_hmac_free(mac->hmac_ctx);
 	mac->hmac_ctx = NULL;
 }
