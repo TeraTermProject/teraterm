@@ -336,7 +336,7 @@ static void ZShHdr(PZVar zv, BYTE HdrType)
 	}
 	ZPutHex(zv, &(zv->PktOutCount), HIBYTE(zv->CRC));
 	ZPutHex(zv, &(zv->PktOutCount), LOBYTE(zv->CRC));
-	zv->PktOut[zv->PktOutCount] = 0x8D;
+	zv->PktOut[zv->PktOutCount] = 0x0D;
 	zv->PktOutCount++;
 	zv->PktOut[zv->PktOutCount] = 0x8A;
 	zv->PktOutCount++;
@@ -361,11 +361,6 @@ static void ZShHdr(PZVar zv, BYTE HdrType)
 
 static void ZPutBin(PZVar zv, int *i, BYTE b)
 /*
- * lrzsz では ZDLE(CAN), DLE, XON, XOFF, @ の直後の CR, およびこれらの
- * MSB が立った文字がエスケープ対象となっている。
- * Tera Term では以前は lrzsz と同じだったようだが、何らかの理由で
- * CR は常にエスケープ対象に変わっている。
- *
  * 接続先からさらに ssh / telnet 接続した場合に問題を起こさないよう、
  * LF および GS もデフォルトのエスケープ対象に加える。
  * ssh: LF または CR の直後の ~ がエスケープ文字扱い
