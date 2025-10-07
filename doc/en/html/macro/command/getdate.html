@@ -25,7 +25,7 @@ getdate &lt;strvar&gt; [&lt;format&gt; [&lt;timezone&gt;]]
 
 <p>
 Returns the current date in the string variable &lt;strvar&gt;, with the default format "YYYY-MM-DD".
-The user can specify the format same as <a href="http://msdn2.microsoft.com/en-us/library/fe06s4ak(VS.80).aspx" target="_blank">strftime</a>. And also, the default format equals "%Y-%m-%d" at the &lt;format&gt; argument.
+The user can specify the format same as <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/strftime-wcsftime-strftime-l-wcsftime-l" target="_blank">strftime</a>. And also, the default format equals "%Y-%m-%d" at the &lt;format&gt; argument.
 </p>
 
 <p>
@@ -76,7 +76,7 @@ This command returns one of the following values in the system variable "result"
 ;Stores the current date to "datestr" variable with YYYY-MM-DD format.
 getdate datestr
 
-;Stores the current date with the user format to "logfile" variable. 
+;Stores the current date with the user format to "logfile" variable.
 ;The format is log-YYYYMMDD-HHMMSS.txt.
 getdate logfile "log-%Y%m%d-%H%M%S.txt"
 
@@ -93,7 +93,7 @@ gettime s "|%d|%#d|"    ; |25|25| (Today is 25th).
 <h2>See also</h2>
 <ul>
   <li><a href="gettime.html">gettime</a></li>
-  <li><a href="http://msdn2.microsoft.com/en-us/library/fe06s4ak(VS.80).aspx" target="_blank">strftime (MSDN Library)</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/strftime-wcsftime-strftime-l-wcsftime-l" target="_blank">strftime (Microsoft Learn)</a></li>
 </ul>
 
 </body>
