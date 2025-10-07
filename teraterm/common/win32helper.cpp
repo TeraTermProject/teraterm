@@ -267,6 +267,7 @@ DWORD hGetWindowTextW(HWND hWnd, wchar_t **text)
 DWORD hGetDlgItemTextW(HWND hDlg, int id, wchar_t **text)
 {
 	HWND hWnd = GetDlgItem(hDlg, id);
+	assert(hWnd != NULL);
 	return hGetWindowTextW(hWnd, text);
 }
 
@@ -436,4 +437,31 @@ BOOL hSetupDiGetDevicePropertyW(
 		}
 	}
 	return FALSE;
+}
+
+/**
+ *	リストボックス(コンボボックス)の文字列を取得する
+ *	不要になったら free() すること
+ *
+ *	@param		hDlg	ダイアログのハンドル
+ *	@param		id		コントロール(コンボボックス)のID
+ *	@param		index	リストの通し番号(0-)
+ *	@param[out]	text	設定されている文字列
+ *						不要になったらfree()する
+ *	@return	エラーコード,0(=NO_ERROR)のときエラーなし
+ */
+DWORD hGetDlgItemCBTextW(HWND hDlg, int id, int index, wchar_t **text)
+{
+	HWND hWnd = GetDlgItem(hDlg, id);
+	assert(hWnd != NULL);
+	LRESULT len = SendMessageW(hWnd, CB_GETLBTEXTLEN, index, 0);
+	wchar_t *strW = (wchar_t *)malloc((size_t(len) + 1) * sizeof(wchar_t));
+	if (strW == NULL) {
+		*text = NULL;
+		return ERROR_NOT_ENOUGH_MEMORY;
+	}
+	SendMessageW(hWnd, CB_GETLBTEXT, index, (LPARAM)strW);
+	strW[len] = 0;
+	*text = strW;
+	return NO_ERROR;
 }

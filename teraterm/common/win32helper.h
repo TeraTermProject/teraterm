@@ -56,6 +56,7 @@ BOOL hSetupDiGetDevicePropertyW(
 	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
 	const DEVPROPKEY *PropertyKey,
 	void **buf, size_t *buf_size);
+DWORD hGetDlgItemCBTextW(HWND hDlg, int id, int index, wchar_t **text);
 
 #ifdef __cplusplus
 }
