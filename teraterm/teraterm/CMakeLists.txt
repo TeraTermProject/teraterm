@@ -101,6 +101,8 @@ set(SRC_DIALOG
   coding_pp_res.h
   color_sample.cpp
   color_sample.h
+  commentdlg.cpp
+  commentdlg.h
   debug_pp.cpp
   debug_pp.h
   debug_pp.rc

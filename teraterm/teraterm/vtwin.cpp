@@ -117,6 +117,7 @@
 #include "externalsetup.h"
 #include "tslib.h"
 #include "../ttpset/ttset.h"
+#include "commentdlg.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -724,7 +725,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	// register this window to the window list
 	SerialNo = RegWin(HVTWin,NULL);
 
-	logfile_lock_initialize();
 	SetMouseCursor(ts.MouseCursorName);
 
 	if(ts.EtermLookfeel.BGNoFrame && ts.HideTitle > 0) {
@@ -4112,7 +4112,7 @@ void CVTWindow::OnFileLog()
 
 void CVTWindow::OnCommentToLog()
 {
-	if (!FLogIsOpendText()) {
+	if (!FLogIsOpend()) {
 		// 選択できないので呼ばれないはず
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
@@ -4123,7 +4123,14 @@ void CVTWindow::OnCommentToLog()
 		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
 		return;
 	}
-	FLogAddCommentDlg(m_hInst, HVTWin);
+
+	wchar_t *comment;
+	INT_PTR r = CommentDlg(m_hInst, HVTWin, &ts, &comment);
+	if (r == IDOK && comment != NULL && comment[0] != 0) {
+		FLogWriteStr(comment);
+		FLogWriteStr(L"\n");		// TODO 改行コード
+		free(comment);
+	}
 }
 
 // ログの閲覧

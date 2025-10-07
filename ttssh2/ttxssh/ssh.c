@@ -7385,7 +7385,7 @@ void sanitize_str(buffer_t *buff, unsigned char *src, size_t srclen)
 static char *ConvertReceiveStr(TComVar *cv, char *strU8, size_t *len)
 {
 	TTTSet *pts = cv->ts;
-	return MakeOutputStringConvU8(strU8, pts->KanjiCode, 0, 0, 0, len);
+	return MakeOutputStringConvU8(strU8, pts->KanjiCode, pts->KanjiIn, pts->KanjiOut, pts->JIS7KatakanaSend, len);
 }
 
 /*

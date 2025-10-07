@@ -37,22 +37,16 @@
 #include <windows.h>
 #include <assert.h>
 
-#include "teraterm.h"
 #include "tttypes.h"
 #include "ftdlg.h"
 #include "ttwinman.h"
-#include "commlib.h"
-#include "ttcommon.h"
 #include "ttlib.h"
 #include "ttlib_types.h"
-#include "dlglib.h"
 #include "vtterm.h"
-#include "ftlib.h"
 #include "codeconv.h"
 #include "asprintf.h"
-#include "win32helper.h"
+#include "makeoutputstring.h"
 
-#include "filesys_log_res.h"
 #include "filesys_log.h"
 #include "filesys.h"  // for ProtoGetProtoFlag()
 
@@ -72,14 +66,15 @@ typedef struct {
 	wchar_t *FullName;
 
 	HANDLE FileHandle;
-	LONG FileSize, ByteCount;
+	LONG FileSize;		// ? 使っていない
+	LONG ByteCount;		// ファイルサイズ
 
 	DWORD StartTime;
 
 	enum enumLineEnd eLineEnd;
 
 	// log rotate
-	int RotateMode;  //  enum rotate_mode RotateMode;
+	enum rotate_mode RotateMode;
 	LONG RotateSize;
 	int RotateStep;
 
@@ -94,32 +89,33 @@ typedef struct {
 	LogCode_t log_code;
 	BOOL bom;
 
-	BOOL FileLog;
-	BOOL BinLog;
+	enum LogModeTag {
+		NONE,
+		BIN_MODE,
+		TEXT_MODE,
+	} LogMode;
+
+	PCHAR cv_LogBuf;	// バッファの先頭
+	int cv_LogPtr;		// 書き込み位置
+	int cv_LStart;		// 読出し位置
+	int cv_LCount;		// データ数
+	int cv_BinSkip;
+	int BuffSize;		// バッファサイズ (=InBuffSize)
+
+	CRITICAL_SECTION filelog_lock;   /* ロック用変数 */
 } TFileVar;
 typedef TFileVar *PFileVar;
 
 static PFileVar LogVar = NULL;
 
-static PCHAR cv_LogBuf;
-static int cv_LogPtr, cv_LStart, cv_LCount;
-static PCHAR cv_BinBuf;
-static int cv_BinPtr, cv_BStart, cv_BCount;
-static int cv_BinSkip;
-
 // 遅延書き込み用スレッドのメッセージ
 #define WM_DPC_LOGTHREAD_SEND (WM_APP + 1)
 
-static void Log1Bin(BYTE b);
-static void LogBinSkip(int add);
-static BOOL CreateLogBuf(void);
-static BOOL CreateBinBuf(void);
-void LogPut1(BYTE b);
-static void OutputStr(const wchar_t *str);
+static void OutputStr(PFileVar fv, const wchar_t *str);
 static void LogToFile(PFileVar fv);
 static void FLogOutputBOM(PFileVar fv);
 
-static BOOL OpenFTDlg_(PFileVar fv)
+static BOOL OpenFTDlg(PFileVar fv)
 {
 	PFileTransDlg FTDlg = new CFileTransDlg();
 	if (FTDlg == NULL) {
@@ -351,25 +347,19 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 	fv->FullName = _wcsdup(fname);
 	FixLogOption();
 
-	if (ts.LogBinary > 0)
-	{
-		fv->BinLog = TRUE;
-		fv->FileLog = FALSE;
-		if (! CreateBinBuf())
-		{
-			return FALSE;
-		}
+	fv->BuffSize = InBuffSize;
+	fv->cv_LogBuf = (char *)malloc(fv->BuffSize);
+	if (fv->cv_LogBuf == NULL) {
+		return FALSE;
 	}
-	else {
-		fv->BinLog = FALSE;
-		fv->FileLog = TRUE;
-		if (! CreateLogBuf())
-		{
-			return FALSE;
-		}
+	fv->cv_LogPtr = 0;
+	fv->cv_LStart = 0;
+	fv->cv_LCount = 0;
+	if (ts.LogBinary > 0) {
+		fv->LogMode = TFileVar::LogModeTag::BIN_MODE;
+	} else {
+		fv->LogMode = TFileVar::LogModeTag::TEXT_MODE;
 	}
-	cv_LStart = cv_LogPtr;
-	cv_LCount = 0;
 
 	OpenLogFile(fv);
 	if (fv->FileHandle == INVALID_HANDLE_VALUE) {
@@ -395,14 +385,12 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 	}
 
 	// Log rotate configuration
-	fv->RotateMode = ts.LogRotate;
+	fv->RotateMode = (enum rotate_mode)ts.LogRotate;
 	fv->RotateSize = ts.LogRotateSize;
 	fv->RotateStep = ts.LogRotateStep;
 
-	// Log rotateが有効の場合、初期ファイルサイズを設定する。
-	// 最初のファイルが設定したサイズでローテートしない問題の修正。
-	// (2016.4.9 yutaka)
 	if (fv->RotateMode != ROTATE_NONE) {
+		// Log rotateが有効の場合、初期ファイルサイズを設定する。
 		DWORD size = GetFileSize(fv->FileHandle, NULL);
 		if (size == -1) {
 			return FALSE;
@@ -413,7 +401,7 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 		fv->ByteCount = 0;
 	}
 
-	if (! OpenFTDlg_(fv)) {
+	if (! OpenFTDlg(fv)) {
 		return FALSE;
 	}
 
@@ -424,12 +412,12 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 		StartThread(fv);
 	}
 
-	if (fv->FileLog) {
-		cv.Log1Byte = LogPut1;
+	if (fv->LogMode == TFileVar::LogModeTag::TEXT_MODE) {
+		cv.Log1Byte = FLogPutANSI;
 	}
-	if (fv->BinLog) {
-		cv.Log1Bin = Log1Bin;
-		cv.LogBinSkip = LogBinSkip;
+	else {
+		cv.Log1Bin = FLogPutBinary;
+		cv.LogBinSkip = FLogBinSkip;
 	}
 
 	return TRUE;
@@ -437,13 +425,15 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 
 /**
  * 現在バッファにあるデータをすべてログに書き出す
- * (2013.9.29 yutaka)
  *
  *	TODO
  *		1行の長さ
  */
 void FLogOutputAllBuffer(void)
 {
+	if (LogVar == NULL) {
+		return;
+	}
 	PFileVar fv = LogVar;
 	DWORD ofs;
 	int size;
@@ -454,68 +444,61 @@ void FLogOutputAllBuffer(void)
 		if (size == -1)
 			break;
 
-		OutputStr(buf);
-		OutputStr(L"\r\n");
+		OutputStr(fv, buf);
+		OutputStr(fv, L"\r\n");
 		LogToFile(fv);
 	}
 }
 
 /**
- * ログへ1byte書き込み
- *		バッファへ書き込まれる
+ * バッファへ1byte書き込み
  *		実際の書き込みは LogToFile() で行われる
  */
-void LogPut1(BYTE b)
+static void Put1(PFileVar fv, BYTE b)
 {
-	PFileVar fv = LogVar;
-
-	cv_LogBuf[cv_LogPtr] = b;
-	cv_LogPtr++;
-	if (cv_LogPtr>=InBuffSize)
-		cv_LogPtr = cv_LogPtr-InBuffSize;
-
-	if (fv->FileLog)
-	{
-		if (cv_LCount>=InBuffSize)
-		{
-			cv_LCount = InBuffSize;
-			cv_LStart = cv_LogPtr;
-		}
-		else
-			cv_LCount++;
+	fv->cv_LogBuf[fv->cv_LogPtr] = b;
+	fv->cv_LogPtr++;
+	if (fv->cv_LogPtr >= fv->BuffSize) {
+		fv->cv_LogPtr = fv->cv_LogPtr - fv->BuffSize;
 	}
-	else
-		cv_LCount = 0;
+	if (fv->cv_LCount>=fv->BuffSize) {
+		// バッファがいっぱいの時、古い1byteを捨てる
+		fv->cv_LCount = fv->BuffSize;
+		fv->cv_LStart = fv->cv_LogPtr;
+	}
+	else {
+		fv->cv_LCount++;
+	}
 }
 
-static BOOL Get1(PCHAR Buf, int *Start, int *Count, PBYTE b)
+/**
+ * バッファから1byte取り出し
+ *
+ *	@return	TRUE/FALSE	取り出せた/バッファが空
+ */
+static BOOL Get1(PFileVar fv, PBYTE b)
 {
-	if (*Count<=0) return FALSE;
-	*b = Buf[*Start];
-	(*Start)++;
-	if (*Start>=InBuffSize)
-		*Start = *Start-InBuffSize;
-	(*Count)--;
+	if (fv->cv_LCount <= 0) {
+		// 空
+		return FALSE;
+	}
+	*b = fv->cv_LogBuf[fv->cv_LStart];
+	fv->cv_LStart++;
+	if (fv->cv_LStart >= fv->BuffSize) {
+		fv->cv_LStart = fv->cv_LStart - fv->BuffSize;
+	}
+	fv->cv_LCount--;
 	return TRUE;
 }
 
-
-
-static CRITICAL_SECTION g_filelog_lock;   /* ロック用変数 */
-
-void logfile_lock_initialize(void)
+static void logfile_lock(PFileVar fv)
 {
-	InitializeCriticalSection(&g_filelog_lock);
+	EnterCriticalSection(&fv->filelog_lock);
 }
 
-static inline void logfile_lock(void)
+static void logfile_unlock(PFileVar fv)
 {
-	EnterCriticalSection(&g_filelog_lock);
-}
-
-static inline void logfile_unlock(void)
-{
-	LeaveCriticalSection(&g_filelog_lock);
+	LeaveCriticalSection(&fv->filelog_lock);
 }
 
 // ログをローテートする。
@@ -536,7 +519,7 @@ static void LogRotate(PFileVar fv)
 		return;
 	}
 
-	logfile_lock();
+	logfile_lock(fv);
 	// ログサイズを再初期化する。
 	fv->ByteCount = 0;
 
@@ -586,7 +569,7 @@ static void LogRotate(PFileVar fv)
 		StartThread(fv);
 	}
 
-	logfile_unlock();
+	logfile_unlock(fv);
 }
 
 static wchar_t *TimeStampStr(PFileVar fv)
@@ -623,40 +606,30 @@ static wchar_t *TimeStampStr(PFileVar fv)
  */
 static void LogToFile(PFileVar fv)
 {
-	PCHAR Buf;
-	int Start, Count;
 	BYTE b;
 
-	if (fv->FileLog)
-	{
-		Buf = cv_LogBuf;
-		Start = cv_LStart;
-		Count = cv_LCount;
-	}
-	else if (fv->BinLog)
-	{
-		Buf = cv_BinBuf;
-		Start = cv_BStart;
-		Count = cv_BCount;
-	}
-	else
+	if (fv->LogMode != TFileVar::LogModeTag::TEXT_MODE &&
+		fv->LogMode != TFileVar::LogModeTag::BIN_MODE) {
 		return;
+	}
 
-	if (Buf==NULL) return;
-	if (Count==0) return;
+	if (fv->cv_LCount==0) {
+		return;
+	}
 
 	// ロックを取る(2004.8.6 yutaka)
-	logfile_lock();
+	logfile_lock(fv);
 
 	// 書き込みデータを作成する
-	DWORD WriteBufMax = 8192;
+	DWORD WriteBufMax = fv->BuffSize;
 	DWORD WriteBufLen = 0;
 	PCHAR WriteBuf = (PCHAR)malloc(WriteBufMax);
-	while (Get1(Buf,&Start,&Count,&b)) {
+	while (Get1(fv, &b)) {
 		if (FLogIsPause() || ProtoGetProtoFlag()) {
 			continue;
 		}
 
+		// fv->BuffSizeより大きくならないはず
 		if (WriteBufLen >= (WriteBufMax*4/5)) {
 			WriteBufMax *= 2;
 			WriteBuf = (PCHAR)realloc(WriteBuf, WriteBufMax);
@@ -664,7 +637,7 @@ static void LogToFile(PFileVar fv)
 
 		WriteBuf[WriteBufLen++] = b;
 
-		(fv->ByteCount)++;
+		fv->ByteCount++;
 	}
 
 	// 書き込み
@@ -679,17 +652,8 @@ static void LogToFile(PFileVar fv)
 		}
 	}
 
-	logfile_unlock();
+	logfile_unlock(fv);
 
-	if (fv->FileLog)
-	{
-		cv_LStart = Start;
-		cv_LCount = Count;
-	}
-	else {
-		cv_BStart = Start;
-		cv_BCount = Count;
-	}
 	if (FLogIsPause() || ProtoGetProtoFlag()) return;
 	fv->FLogDlg->RefreshNum(fv->StartTime, fv->FileSize, fv->ByteCount);
 
@@ -698,52 +662,9 @@ static void LogToFile(PFileVar fv)
 	LogRotate(fv);
 }
 
-static BOOL CreateLogBuf(void)
-{
-	if (cv_LogBuf==NULL)
-	{
-		cv_LogBuf = (char *)malloc(InBuffSize);
-		cv_LogPtr = 0;
-		cv_LStart = 0;
-		cv_LCount = 0;
-	}
-	return (cv_LogBuf!=NULL);
-}
-
-static void FreeLogBuf(void)
-{
-	free(cv_LogBuf);
-	cv_LogBuf = NULL;
-	cv_LogPtr = 0;
-	cv_LStart = 0;
-	cv_LCount = 0;
-}
-
-static BOOL CreateBinBuf(void)
-{
-	if (cv_BinBuf==NULL)
-	{
-		cv_BinBuf = (PCHAR)malloc(InBuffSize);
-		cv_BinPtr = 0;
-		cv_BStart = 0;
-		cv_BCount = 0;
-	}
-	return (cv_BinBuf!=NULL);
-}
-
-static void FreeBinBuf(void)
-{
-	free(cv_BinBuf);
-	cv_BinBuf = NULL;
-	cv_BinPtr = 0;
-	cv_BStart = 0;
-	cv_BCount = 0;
-}
-
 static void FileTransEnd_(PFileVar fv)
 {
-	fv->FileLog = FALSE;
-	fv->BinLog = FALSE;
+	fv->LogMode = TFileVar::LogModeTag::NONE;
 	cv.Log1Byte = NULL;
 	cv.Log1Bin = NULL;
 	cv.LogBinSkip = NULL;
@@ -754,13 +675,15 @@ static void FileTransEnd_(PFileVar fv)
 		fv->FLogDlg = NULL;
 	}
 	CloseFileSync(fv);
-	FreeLogBuf();
-	FreeBinBuf();
+	free(fv->cv_LogBuf);
+	fv->cv_LogBuf = NULL;
+	fv->cv_LogPtr = 0;
+	fv->cv_LStart = 0;
+	fv->cv_LCount = 0;
 	free(fv->FullName);
 	fv->FullName = NULL;
+	DeleteCriticalSection(&fv->filelog_lock);
 	free(fv);
-
-	LogVar = NULL;
 }
 
 /**
@@ -818,61 +741,6 @@ void FLogRotateHalt(void)
 	fv->RotateStep = 0;
 }
 
-static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM)
-{
-	static const DlgTextInfo TextInfos[] = {
-		{ 0, "DLG_COMMENT_TITLE" },
-		{ IDOK, "BTN_OK" }
-	};
-
-	switch (msg) {
-		case WM_INITDIALOG:
-			// エディットコントロールにフォーカスをあてる
-			SetFocus(GetDlgItem(hDlgWnd, IDC_EDIT_COMMENT));
-			SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
-			return FALSE;
-
-		case WM_COMMAND:
-			switch (LOWORD(wp)) {
-				case IDOK: {
-					size_t len = SendDlgItemMessageW(hDlgWnd, IDC_EDIT_COMMENT, WM_GETTEXTLENGTH, 0, 0);
-					len += 1;
-					wchar_t *buf = (wchar_t *)malloc(len * sizeof(wchar_t));
-					GetDlgItemTextW(hDlgWnd, IDC_EDIT_COMMENT, buf, (int)len);
-					FLogWriteStr(buf);
-					FLogWriteStr(L"\n");		// TODO 改行コード
-					free(buf);
-					TTEndDialog(hDlgWnd, IDOK);
-					break;
-				}
-				default:
-					return FALSE;
-			}
-			break;
-
-		case WM_CLOSE:
-			TTEndDialog(hDlgWnd, 0);
-			return TRUE;
-
-		default:
-			return FALSE;
-	}
-	return TRUE;
-}
-
-/**
- * ログファイルへコメントを追加する (2004.8.6 yutaka)
- */
-void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd)
-{
-	PFileVar fv = LogVar;
-	if (fv == NULL) {
-		return;
-	}
-	TTDialogBox(hInst, MAKEINTRESOURCEW(IDD_COMMENT_DIALOG),
-				hWnd, OnCommentDlgProc);
-}
-
 void FLogClose(void)
 {
 	PFileVar fv = LogVar;
@@ -881,6 +749,7 @@ void FLogClose(void)
 	}
 
 	FileTransEnd_(fv);
+	LogVar = NULL;
 }
 
 /**
@@ -902,7 +771,6 @@ BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom)
 	if (fv == NULL) {
 		return FALSE;
 	}
-	LogVar = fv;
 	memset(fv, 0, sizeof(TFileVar));
 	fv->FileHandle = INVALID_HANDLE_VALUE;
 	fv->LogThread = INVALID_HANDLE_VALUE;
@@ -910,12 +778,17 @@ BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom)
 
 	fv->log_code = code;
 	fv->bom = bom;
+
+	InitializeCriticalSection(&fv->filelog_lock);
+
 	BOOL ret = LogStart(fv, fname);
 	if (ret == FALSE) {
 		FileTransEnd_(fv);
+		LogVar = NULL;
+		return FALSE;
 	}
-
-	return ret;
+	LogVar = fv;
+	return TRUE;
 }
 
 BOOL FLogIsOpend(void)
@@ -925,19 +798,32 @@ BOOL FLogIsOpend(void)
 
 BOOL FLogIsOpendText(void)
 {
-	return LogVar != NULL && LogVar->FileLog;
+	PFileVar fv = LogVar;
+	return fv != NULL && (fv->LogMode == TFileVar::LogModeTag::TEXT_MODE);
 }
 
 BOOL FLogIsOpendBin(void)
 {
-	return LogVar != NULL && LogVar->BinLog;
+	PFileVar fv = LogVar;
+	return fv != NULL && (fv->LogMode == TFileVar::LogModeTag::BIN_MODE);
 }
 
+/**
+ *	ログに文字列を書き込む
+ */
 void FLogWriteStr(const wchar_t *str)
 {
-	if (LogVar != NULL) {
-		OutputStr(str);
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
+		return;
 	}
+	if (str == NULL) {
+		return;
+	}
+	OutputStr(fv, str);
+
+	// すぐに書き込む
+	LogToFile(fv);
 }
 
 /**
@@ -969,10 +855,11 @@ void FLogInfo(char *param_ptr, size_t param_len)
  */
 const wchar_t *FLogGetFilename(void)
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return NULL;
 	}
-	return LogVar->FullName;
+	return fv->FullName;
 }
 
 /**
@@ -1091,19 +978,21 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 
 BOOL FLogIsPause()
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return FALSE;
 	}
-	return LogVar->IsPause;
+	return fv->IsPause;
 }
 
 void FLogWindow(int nCmdShow)
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return;
 	}
 
-	HWND HWndLog = LogVar->FLogDlg->m_hWnd;
+	HWND HWndLog = fv->FLogDlg->m_hWnd;
 	ShowWindow(HWndLog, nCmdShow);
 	if (nCmdShow == SW_RESTORE) {
 		// 拡張スタイル WS_EX_NOACTIVATE 状態を解除する
@@ -1113,46 +1002,36 @@ void FLogWindow(int nCmdShow)
 
 void FLogShowDlg(void)
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return;
 	}
-	HWND HWndLog = LogVar->FLogDlg->m_hWnd;
+	HWND HWndLog = fv->FLogDlg->m_hWnd;
 	ShowWindow(HWndLog, SW_SHOWNORMAL);
 	SetForegroundWindow(HWndLog);
 }
 
 /**
  * ログへ1byte書き込み
- *		LogPut1() と違う?
  */
-//void Log1Bin(PComVar cv, BYTE b)
-static void Log1Bin(BYTE b)
+static void Log1Bin(PFileVar fv, BYTE b)
 {
-	if (LogVar->IsPause || ProtoGetProtoFlag()) {
+	if (fv->IsPause || ProtoGetProtoFlag()) {
 		return;
 	}
-	if (cv_BinSkip > 0) {
-		cv_BinSkip--;
-		return;
+	if (fv->LogMode == TFileVar::LogModeTag::BIN_MODE) {
+		if (fv->cv_BinSkip > 0) {
+			fv->cv_BinSkip--;
+			return;
+		}
 	}
-	cv_BinBuf[cv_BinPtr] = b;
-	cv_BinPtr++;
-	if (cv_BinPtr>=InBuffSize) {
-		cv_BinPtr = cv_BinPtr-InBuffSize;
-	}
-	if (cv_BCount>=InBuffSize) {
-		cv_BCount = InBuffSize;
-		cv_BStart = cv_BinPtr;
-	}
-	else {
-		cv_BCount++;
-	}
+	Put1(fv, b);
 }
 
-static void LogBinSkip(int add)
+static void LogBinSkip(PFileVar fv, int add)
 {
-	if (cv_BinBuf != NULL) {
-		cv_BinSkip += add;
+	if (fv->LogMode == TFileVar::LogModeTag::BIN_MODE) {
+		fv->cv_BinSkip += add;
 	}
 }
 
@@ -1165,13 +1044,7 @@ int FLogGetCount(void)
 	if (fv == NULL) {
 		return 0;
 	}
-	if (fv->FileLog) {
-		return cv_LCount;
-	}
-	if (fv->BinLog) {
-		return cv_BCount;
-	}
-	return 0;
+	return fv->cv_LCount;
 }
 
 /**
@@ -1183,13 +1056,7 @@ int FLogGetFreeCount(void)
 	if (fv == NULL) {
 		return 0;
 	}
-	if (fv->FileLog) {
-		return InBuffSize - cv_LCount;
-	}
-	if (fv->BinLog) {
-		return InBuffSize - cv_BCount;
-	}
-	return 0;
+	return fv->BuffSize - fv->cv_LCount;
 }
 
 /**
@@ -1201,27 +1068,15 @@ void FLogWriteFile(void)
 	if (fv == NULL) {
 		return;
 	}
-	if (cv_LogBuf!=NULL)
-	{
-		if (fv->FileLog) {
-			LogToFile(fv);
-		}
-	}
-
-	if (cv_BinBuf!=NULL)
-	{
-		if (fv->BinLog) {
-			LogToFile(fv);
-		}
-	}
+	LogToFile(fv);
 }
 
-void FLogPutUTF32(unsigned int u32)
+/**
+ *	ログに1文字書きこむ(text, unicode)
+ */
+static void FLogPutUTF32_(PFileVar fv, unsigned int u32)
 {
-	PFileVar fv = LogVar;
-	BOOL log_available = (cv_LogBuf != 0);
-
-	if (!log_available) {
+	if (fv->LogMode != TFileVar::LogModeTag::TEXT_MODE) {
 		// ログには出力しない
 		return;
 	}
@@ -1242,7 +1097,7 @@ void FLogPutUTF32(unsigned int u32)
 		size_t u8_len = UTF32ToUTF8(u32, u8_buf, _countof(u8_buf));
 		for (size_t i = 0; i < u8_len; i++) {
 			BYTE b = u8_buf[i];
-			LogPut1(b);
+			Put1(fv, b);
 		}
 		break;
 	}
@@ -1254,13 +1109,13 @@ void FLogPutUTF32(unsigned int u32)
 		for (size_t i = 0; i < u16_len; i++) {
 			if (fv->log_code == LOG_UTF16LE) {
 				// UTF-16LE
-				LogPut1(u16[i] & 0xff);
-				LogPut1((u16[i] >> 8) & 0xff);
+				Put1(fv, u16[i] & 0xff);
+				Put1(fv, (u16[i] >> 8) & 0xff);
 			}
 			else {
 				// UTF-16BE
-				LogPut1((u16[i] >> 8) & 0xff);
-				LogPut1(u16[i] & 0xff);
+				Put1(fv, (u16[i] >> 8) & 0xff);
+				Put1(fv, u16[i] & 0xff);
 			}
 		}
 	}
@@ -1302,30 +1157,82 @@ static void FLogOutputBOM(PFileVar fv)
 	}
 }
 
-static void OutputStr(const wchar_t *str)
+static void OutputStr(PFileVar fv, const wchar_t *strW)
 {
 	size_t len;
 
-	assert(str != NULL);
+	assert(strW != NULL);
 
-	len = wcslen(str);
-	while(*str != 0) {
-		unsigned int u32;
-		size_t u16_len = UTF16ToUTF32(str, len, &u32);
-		switch (u16_len) {
-		case 0:
-		default:
-			// 変換できない
-			str++;
-			len--;
-			break;
-		case 1:
-		case 2: {
-			FLogPutUTF32(u32);
-			str += u16_len;
-			len -= u16_len;
-			break;
+	if (fv->LogMode == TFileVar::LogModeTag::TEXT_MODE) {
+		len = wcslen(strW);
+		while(*strW != 0) {
+			unsigned int u32;
+			size_t u16_len = UTF16ToUTF32(strW, len, &u32);
+			switch (u16_len) {
+			case 0:
+			default:
+				// 変換できない
+				strW++;
+				len--;
+				break;
+			case 1:
+			case 2: {
+				FLogPutUTF32_(fv, u32);
+				strW += u16_len;
+				len -= u16_len;
+				break;
+			}
+			}
 		}
+	} else if (fv->LogMode == TFileVar::LogModeTag::BIN_MODE) {
+		char *str = MakeOutputStringConvW(strW, ts.KanjiCode, ts.KanjiIn, ts.KanjiOut, ts.JIS7KatakanaSend, NULL);
+		if (str != NULL) {
+			for (size_t i = 0; str[i] != 0; i++) {
+				Put1(fv, (BYTE)str[i]);
+			}
+			free(str);
 		}
 	}
+}
+
+/**
+ *	ログに1文字書きこむ(text, unicode)
+ */
+void FLogPutUTF32(unsigned int u32)
+{
+	PFileVar fv = LogVar;
+	FLogPutUTF32_(fv, u32);
+}
+
+/**
+ *	1文字(ANSI)出力
+ *
+ */
+void FLogPutANSI(BYTE b)
+{
+	PFileVar fv = LogVar;
+	if (fv->LogMode != TFileVar::LogModeTag::TEXT_MODE) {
+		return;
+	}
+	Put1(fv, b);
+}
+
+/**
+ *	1文字(Binary)出力
+ *
+ */
+void FLogPutBinary(BYTE b)
+{
+	PFileVar fv = LogVar;
+	Log1Bin(fv, b);
+}
+
+/**
+ *	指定文字スキップ
+ *		Binary出力時
+ */
+void FLogBinSkip(int add)
+{
+	PFileVar fv = LogVar;
+	LogBinSkip(fv, add);
 }

@@ -523,6 +523,12 @@ static void LogBinSkip(PComVar cv, int add)
 	}
 }
 
+/**
+ *	入力バッファの先頭にデータを入れる
+ *	入れたデータはバイナリログに記録されない
+ *
+ *	@param	b	入れるデータ
+ */
 void WINAPI CommInsert1Byte(PComVar cv, BYTE b)
 {
 	if ( ! cv->Ready ) {
