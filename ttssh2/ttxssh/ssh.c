@@ -5085,11 +5085,6 @@ skip:
 		current_keys[mode].mac.enabled = 0;
 		current_keys[mode].comp.enabled = 0;
 
-
-		// この時点では disable
-		pvar->ssh2_keys[mode].mac.enabled = 0;
-		pvar->ssh2_keys[mode].comp.enabled = 0;
-
 		// 暗号アルゴリズムのキーサイズ、ブロックサイズ、MACサイズのうち最大値(we_need)を決定する
 		need = max(need, current_keys[mode].enc.key_len);
 		need = max(need, current_keys[mode].enc.block_size);
