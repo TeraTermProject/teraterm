@@ -361,6 +361,9 @@ static void ZShHdr(PZVar zv, BYTE HdrType)
 
 static void ZPutBin(PZVar zv, int *i, BYTE b)
 /*
+ * lrzsz では ZDLE(CAN), DLE, XON, XOFF, @ の直後の CR, およびこれらの
+ * MSB が立った文字がエスケープ対象となっている。
+ *
  * 接続先からさらに ssh / telnet 接続した場合に問題を起こさないよう、
  * LF および GS もデフォルトのエスケープ対象に加える。
  * ssh: LF または CR の直後の ~ がエスケープ文字扱い
