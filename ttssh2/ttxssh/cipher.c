@@ -250,7 +250,7 @@ char *get_cipher_name(int cipher_id)
 	case SSH2_CIPHER_AES256_GCM:
 		return "aes256-gcm@openssh.com";
 	case SSH2_CIPHER_CHACHAPOLY:
-		return "chacha20-poly1305@openssh.com(SSH2)";
+		return "chacha20-poly1305@openssh.com";
 
 	default:
 		return "Unknown";
