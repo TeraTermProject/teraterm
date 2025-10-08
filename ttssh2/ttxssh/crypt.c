@@ -691,8 +691,9 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 	ret = mac_check(mac, sequence_number, data, len, MAC, mac->mac_len);
 	if (ret == SSH_ERR_MAC_INVALID) {
 		logprintf(LOG_LEVEL_VERBOSE, "HMAC key is not matched(seq %lu len %d)", sequence_number, len);
-		// logprintf_hexdump(LOG_LEVEL_VERBOSE, m, mac->mac_len, "m:"); // ourmac in mac_check() should be logged
-		logprintf_hexdump(LOG_LEVEL_VERBOSE, MAC, mac->mac_len, "MAC:"); // theirmac in mac_check()
+		// for debug
+		// ourmac in mac_check() should be logged
+		// logprintf_hexdump(LOG_LEVEL_VERBOSE, MAC, mac->mac_len, "theirmac:");
 		goto error;
 	}
 	else if (ret != 0) {
