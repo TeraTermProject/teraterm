@@ -132,9 +132,9 @@ static int SaveBuffY;
 
 // ANSI表示用に変換するときのCodePage
 static int CodePage = 932;
+vtdraw_t *vt_src;
 
-static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd);
-static void BuffDrawLineIPrn(int SY, int IStart, int IEnd);
+static void BuffDrawLineI(vtdraw_t *vt, ttdc_t *dc, int SY, int IStart, int IEnd);
 
 /**
  *	buff_char_t を relセル移動する
@@ -677,7 +677,7 @@ void BuffAllSelect(void)
 void BuffScreenSelect(void)
 {
 	int X, Y;
-	DispConvWinToScreen(0, 0, &X, &Y, NULL);
+	DispConvWinToScreen(vt_src, 0, 0, &X, &Y, NULL);
 	SelectStart.x = X;
 	SelectStart.y = Y + PageStart;
 	SelectEnd.x = 0;
@@ -952,10 +952,12 @@ void BuffEraseCurToEnd(void)
 	if (head == 1) {
 		XStart--;
 	}
-	BuffDrawLineI(-1, -1, CursorY + PageStart, XStart, NumOfColumns);
+	ttdc_t *dc = DispInitDC(vt_src);
+	BuffDrawLineI(vt_src, dc, CursorY + PageStart, XStart, NumOfColumns);
 	for (i = CursorY + 1; i <= YEnd; i++) {
-		BuffDrawLineI(-1, -1, i + PageStart, 0, NumOfColumns);
+		BuffDrawLineI(vt_src, dc, i + PageStart, 0, NumOfColumns);
 	}
+	DispReleaseDC(vt_src, dc);
 }
 
 /**
@@ -991,11 +993,13 @@ void BuffEraseHomeToCur(void)
 	}
 
 	/* update window */
+	ttdc_t *dc = DispInitDC(vt_src);
 	draw_len = tail == 0 ? CursorX : CursorX + 1;
 	for (i = YHome; i < CursorY; i++) {
-		BuffDrawLineI(-1, -1, i + PageStart, 0, NumOfColumns);
+		BuffDrawLineI(vt_src, dc, i + PageStart, 0, NumOfColumns);
 	}
-	BuffDrawLineI(-1, -1, CursorY + PageStart, 0, draw_len);
+	BuffDrawLineI(vt_src, dc, CursorY + PageStart, 0, draw_len);
+	DispReleaseDC(vt_src, dc);
 }
 
 void BuffInsertLines(int Count, int YEnd)
@@ -1029,7 +1033,7 @@ void BuffInsertLines(int Count, int YEnd)
 		DestPtr = PrevLinePtr(DestPtr);
 	}
 
-	if (CursorLeftM > 0 || CursorRightM < NumOfColumns-1 || !DispInsertLines(Count, YEnd)) {
+	if (CursorLeftM > 0 || CursorRightM < NumOfColumns-1 || !DispInsertLines(vt_src, Count, YEnd)) {
 		BuffUpdateRect(CursorLeftM-extl, CursorY, CursorRightM+extr, YEnd);
 	}
 }
@@ -1084,7 +1088,9 @@ void BuffEraseCharsInLine(int XStart, int Count)
 	if (tail != 0) {
 		Count += 1;
 	}
-	BuffDrawLineI(-1, -1, CursorY + PageStart, XStart, XStart + Count);
+	ttdc_t *dc = DispInitDC(vt_src);
+	BuffDrawLineI(vt_src, dc, CursorY + PageStart, XStart, XStart + Count);
+	DispReleaseDC(vt_src, dc);
 }
 
 void BuffDeleteLines(int Count, int YEnd)
@@ -1118,7 +1124,7 @@ void BuffDeleteLines(int Count, int YEnd)
 		DestPtr = NextLinePtr(DestPtr);
 	}
 
-	if (CursorLeftM > 0 || CursorRightM < NumOfColumns-1 || ! DispDeleteLines(Count,YEnd)) {
+	if (CursorLeftM > 0 || CursorRightM < NumOfColumns-1 || !DispDeleteLines(vt_src, Count,YEnd)) {
 		BuffUpdateRect(CursorLeftM-extl, CursorY, CursorRightM+extr, YEnd);
 	}
 }
@@ -2192,15 +2198,17 @@ void BuffPrint(BOOL ScrollRegion)
 	int j;
 	int IStart, IEnd;
 	LONG TmpPtr;
+	vtdraw_t *vt;
+	ttdc_t *dc;
 
 	if (ScrollRegion) {
-		Id = VTPrintInit(IdPrnScrollRegion);
+		vt = VTPrintInit(IdPrnScrollRegion, &dc, &Id);
 	}
 	else if (Selected) {
-		Id = VTPrintInit(IdPrnScreen | IdPrnSelectedText);
+		vt = VTPrintInit(IdPrnScreen | IdPrnSelectedText, &dc, &Id);
 	}
 	else {
-		Id = VTPrintInit(IdPrnScreen);
+		vt = VTPrintInit(IdPrnScreen, &dc, &Id);
 	}
 	if (Id==IdPrnCancel) {
 		return;
@@ -2226,12 +2234,18 @@ void BuffPrint(BOOL ScrollRegion)
 		PrintEnd.x = NumOfColumns;
 		PrintEnd.y = PageStart + NumOfLines - 1;
 	}
+
+	// スクロールしている分(スクロールバーで古いバッファを見ている等)ずらす
+	PrintStart.y += WinOrgY;
+	PrintEnd.y += WinOrgY;
+
 	if (PrintEnd.y > BuffEnd-1) {
 		PrintEnd.y = BuffEnd-1;
 	}
 
 	LockBuffer();
 
+	int line_in_page = 0;
 	TmpPtr = GetLinePtr(PrintStart.y);
 	for (j = PrintStart.y ; j <= PrintEnd.y ; j++) {
 		if (j==PrintStart.y) {
@@ -2247,13 +2261,20 @@ void BuffPrint(BOOL ScrollRegion)
 			IEnd = NumOfColumns - 1;
 		}
 
-		BuffDrawLineIPrn(j, IStart, IEnd);
-		PrnNewLine();
-		TmpPtr = NextLinePtr(TmpPtr);
-	}
+		DispSetDrawPos(vt, dc, 0, line_in_page * vt->FontHeight);
 
+		BuffDrawLineI(vt, dc, j, IStart, IEnd);
+		TmpPtr = NextLinePtr(TmpPtr);
+		line_in_page++;
+		if (dc->PrnY > vt->Margin.bottom) {
+			// 次のページへ
+			line_in_page = 0;
+			EndPage(dc->VTDC);
+			StartPage(dc->VTDC);
+		}
+	}
 	UnlockBuffer();
-	VTPrintEnd();
+	VTPrintEnd(vt, dc);
 }
 
 // TODO とりあえず ANSI で実装
@@ -2534,6 +2555,7 @@ static void mark_url_line_w(int cur_x, int cur_y)
 	}
 
 	// マークする
+	ttdc_t *dc = DispInitDC(vt_src);
 	{
 	int sx_i = sx;
 	int sy_i = sy;
@@ -2550,10 +2572,10 @@ static void mark_url_line_w(int cur_x, int cur_y)
 		match = mark_url_w_sub(sx_i, ex, sy_i, ey, &sx_match_s, &sx_match_e, &sy_match_s, &sy_match_e);
 		if (match) {
 			if (sy_match_s == sy_match_e) {
-				BuffDrawLineI(-1, -1, sy_match_s, sx_match_s, sx_match_e);
+				BuffDrawLineI(vt_src, dc, sy_match_s, sx_match_s, sx_match_e);
 			}
 			else {
-				BuffDrawLineI(-1, -1, sy_match_s, sx_match_s, sx_match_e);
+				BuffDrawLineI(vt_src, dc, sy_match_s, sx_match_s, sx_match_e);
 			}
 			sx_i = sx_match_e;
 			sy_i = sy_match_e;
@@ -2585,9 +2607,10 @@ static void mark_url_line_w(int cur_x, int cur_y)
 			else if (y == ey) {
 				ex_i = ex;
 			}
-			BuffDrawLineI(-1, -1, y + PageStart, sx_i, ex_i);
+			BuffDrawLineI(vt_src, dc, y + PageStart, sx_i, ex_i);
 		}
 	}
+	DispReleaseDC(vt_src, dc);
 }
 
 /**
@@ -2727,8 +2750,10 @@ static void mark_url_w(int cur_x, int cur_y)
 			if (xx == NumOfColumns) {
 				int draw_x = sx;
 				int draw_y = CursorY - 1;
-				if (IsLineVisible(&draw_x, &draw_y)) {
-					BuffDrawLineI(draw_x, draw_y, PageStart + CursorY - 1, sx, NumOfColumns - 1);
+				if (IsLineVisible(vt_src, &draw_x, &draw_y)) {
+					ttdc_t *dc = DispInitDC(vt_src);
+					BuffDrawLineI(vt_src, dc, PageStart + CursorY - 1, sx, NumOfColumns - 1);
+					DispReleaseDC(vt_src, dc);
 				}
 				TmpPtr = NextLinePtr(TmpPtr);
 				xx = 0;
@@ -3285,14 +3310,11 @@ static BOOL CheckSelect(int x, int y)
  *  @param	disp_strW()		wchar_t 文字を描画用関数 (Unicode用)
  *  @param	disp_strA()		char 文字を描画用関数 (ANSI用)
  *  @param	disp_setup_dc()	アトリビュート設定関数
- *	@param	data			disp_strW(A)() に渡されるデータ
  */
 static
-void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
-					  void (*disp_strW)(const wchar_t *bufW, const char *width_info, int count, void *data),
-					  void (*disp_strA)(const char *buf, const char *width_info, int count, void *data),
-					  void (*disp_setup_dc)(TCharAttr Attr, BOOL Reverse),
-					  void *data)
+void BuffGetDrawInfoW(vtdraw_t *vt, ttdc_t *dc, int SY, int IStart, int IEnd,
+					  void (*disp_strW)(vtdraw_t *vt, ttdc_t *dc, const wchar_t *bufW, const char *width_info, int count),
+					  void (*disp_strA)(vtdraw_t *vt, ttdc_t *dc, const char *buf, const char *width_info, int count))
 {
 	const LONG TmpPtr = GetLinePtr(SY);
 	int istart = IStart;
@@ -3441,12 +3463,12 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 			OutputDebugPrintfW(L"W[%d] '%s'\n", lenW, bufW);
 #endif
 
-			disp_setup_dc(CurAttr, CurSelected);
+			DispSetupDC(vt, dc, &CurAttr, CurSelected);
 			if (UseUnicodeApi) {
-				disp_strW(bufW, bufWW, lenW, data);
+				disp_strW(vt, dc, bufW, bufWW, lenW);
 			}
 			else {
-				disp_strA(bufA, bufAW, lenA, data);
+				disp_strA(vt, dc, bufA, bufAW, lenA);
 			}
 
 			lenA = 0;
@@ -3460,87 +3482,38 @@ void BuffGetDrawInfoW(int SY, int IStart, int IEnd,
 	}
 }
 
-typedef struct {
-	int draw_x;
-	int draw_y;
-} disp_data_t;
-
-static void l_disp_strW(const wchar_t *bufW, const char *cells, int len, void *data_)
-{
-	disp_data_t *data = (disp_data_t *)data_;
-	int x = data->draw_x;
-	int y = data->draw_y;
-	DispStrW(bufW, cells, len, y, &x);
-	data->draw_x = x;
-}
-
-static void l_disp_strA(const char *buf, const char *width_info, int count, void *data_)
-{
-	disp_data_t *data = (disp_data_t *)data_;
-	int x = data->draw_x;
-	int y = data->draw_y;
-	DispStrA(buf, width_info, count, y, &x);
-	data->draw_x = x;
-}
-
 /**
  *	1行描画 画面用
  *
- *	@param	DrawX,Y			Clint領域描画位置(pixel)
  *	@param	SY				スクリーン上の位置(Character)  !バッファ上の位置
  *							PageStart + YStart など
  *	@param	IStart,IEnd		スクリーン上の位置(Character)
  *							指定した間を描画する
  */
-static void BuffDrawLineI(int DrawX, int DrawY, int SY, int IStart, int IEnd)
+static void BuffDrawLineI(vtdraw_t *vt, ttdc_t *dc, int SY, int IStart, int IEnd)
 {
-	int X = DrawX;
-	int Y = DrawY;
-	{
-		// カーソル位置、表示開始位置から描画位置がわかるはず
-		int X2 = IStart;
-		int Y2 = SY - PageStart;
-		if (! IsLineVisible(&X2, &Y2)) {
+	if (!DispDCIsPrinter(dc)) {
+		// 画面描画
+		//	カーソル位置、表示開始位置
+		int X = IStart;
+		int Y = SY - PageStart;
+		//	画面上の描画位置(pixel)
+		if (! IsLineVisible(vt, &X, &Y)) {
 			// 描画不要行
 			//assert(FALSE);
 			return;
 		}
-		if (X != -1 && Y != -1) {
-			assert(X == X2 && Y == Y2);
-		}
-		else {
-			X = X2;
-			Y = Y2;
-		}
+		//	文字描画位置設定
+		DispSetDrawPos(vt, dc, X, Y);
+	} else {
+		// プリンタの時
+		//	何もしない(文字の位置は設定済み)
 	}
 	if (IEnd >= NumOfColumns) {
 		IEnd = NumOfColumns - 1;
 	}
 
-	{
-		disp_data_t data;
-		data.draw_x = X;
-		data.draw_y = Y;
-
-		BuffGetDrawInfoW(SY, IStart, IEnd, l_disp_strW, l_disp_strA, DispSetupDC, &data);
-	}
-}
-
-/**
- *	1行描画 プリンタ用
- *
- *	@param	SY				スクリーン上の位置(Character)  !バッファ上の位置
- *							PageStart + YStart など
- *	@param	IStart,IEnd		スクリーン上の位置(Character)
- *							指定した間を描画する
- */
-static void BuffDrawLineIPrn(int SY, int IStart, int IEnd)
-{
-	if (IEnd >= NumOfColumns) {
-		IEnd = NumOfColumns - 1;
-	}
-
-	BuffGetDrawInfoW(SY, IStart, IEnd, PrnOutTextW, PrnOutTextA, PrnSetupDC, NULL);
+	BuffGetDrawInfoW(vt, dc, SY, IStart, IEnd, DispStrW, DispStrA);
 }
 
 void BuffUpdateRect
@@ -3553,7 +3526,6 @@ void BuffUpdateRect
 {
 	int j;
 	int IStart, IEnd;
-	int X, Y;
 	LONG TmpPtr;
 	BOOL TempSel, Caret;
 
@@ -3569,6 +3541,8 @@ void BuffUpdateRect
 	if (YEnd < WinOrgY) {
 		return;
 	}
+
+	ttdc_t *dc = DispInitDC(vt_src);
 
 	if (XStart < WinOrgX) {
 		XStart = WinOrgX;
@@ -3594,12 +3568,9 @@ void BuffUpdateRect
 
 	Caret = IsCaretOn();
 	if (Caret) {
-		CaretOff();
+		CaretOff(vt_src);
 	}
 
-	DispSetupDC(DefCharAttr, TempSel);
-
-	Y = (YStart-WinOrgY)*FontHeight;
 	TmpPtr = GetLinePtr(PageStart+YStart);
 	for (j = YStart+PageStart ; j <= YEnd+PageStart ; j++) {
 		IStart = XStart;
@@ -3607,15 +3578,14 @@ void BuffUpdateRect
 
 		IStart = LeftHalfOfDBCS(TmpPtr,IStart);
 
-		X = (IStart-WinOrgX)*FontWidth;
-
-		BuffDrawLineI(X, Y, j, IStart, IEnd);
-		Y = Y + FontHeight;
+		BuffDrawLineI(vt_src, dc, j, IStart, IEnd);
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
 	if (Caret) {
-		CaretOn();
+		CaretOn(vt_src);
 	}
+
+	DispReleaseDC(vt_src, dc);
 }
 
 void UpdateStr(void)
@@ -3629,12 +3599,14 @@ void UpdateStr(void)
 	}
 	X = StrChangeStart;
 	Y = CursorY;
-	if (! IsLineVisible(&X, &Y)) {
+	if (! IsLineVisible(vt_src, &X, &Y)) {
 		StrChangeCount = 0;
 		return;
 	}
 
-	BuffDrawLineI(X, Y, PageStart + CursorY, StrChangeStart, StrChangeStart + StrChangeCount - 1);
+	ttdc_t *dc = DispInitDC(vt_src);
+	BuffDrawLineI(vt_src, dc, PageStart + CursorY, StrChangeStart, StrChangeStart + StrChangeCount - 1);
+	DispReleaseDC(vt_src, dc);
 	StrChangeCount = 0;
 }
 
@@ -3705,7 +3677,7 @@ void ScrollUp1Line(void)
 		if (CursorLeftM > 0 || CursorRightM < NumOfColumns-1)
 			BuffUpdateRect(CursorLeftM-extl, CursorTop, CursorRightM+extr, CursorBottom);
 		else
-			DispScrollNLines(CursorTop, CursorBottom, -1);
+			DispScrollNLines(vt_src, CursorTop, CursorBottom, -1);
 	}
 }
 
@@ -3728,7 +3700,7 @@ void BuffScrollNLines(int n)
 				NewOrgY = WinOrgY;
 			}
 			BuffScroll(n,CursorBottom);
-			DispCountScroll(n);
+			DispCountScroll(vt_src, n);
 			return;
 		}
 		else if (CursorY <= CursorBottom) {
@@ -3738,10 +3710,10 @@ void BuffScrollNLines(int n)
 				WinOrgY = WinOrgY-n;
 				NewOrgY = WinOrgY;
 				BuffScroll(n,CursorBottom);
-				DispCountScroll(n);
+				DispCountScroll(vt_src, n);
 			} else {
 				BuffScroll(n,CursorBottom);
-				DispScrollNLines(WinOrgY,CursorBottom,n);
+				DispScrollNLines(vt_src, WinOrgY, CursorBottom, n);
 			}
 			return;
 		}
@@ -3775,7 +3747,7 @@ void BuffScrollNLines(int n)
 		if (CursorLeftM > 0 || CursorRightM < NumOfColumns-1)
 			BuffUpdateRect(CursorLeftM-extl, CursorTop, CursorRightM+extr, CursorBottom);
 		else
-			DispScrollNLines(CursorTop, CursorBottom, n);
+			DispScrollNLines(vt_src, CursorTop, CursorBottom, n);
 	}
 }
 
@@ -3793,11 +3765,11 @@ void BuffRegionScrollUpNLines(int n) {
 		if (CursorBottom == NumOfLines-1) {
 			WinOrgY = WinOrgY-n;
 			BuffScroll(n,CursorBottom);
-			DispCountScroll(n);
+			DispCountScroll(vt_src, n);
 		}
 		else {
 			BuffScroll(n,CursorBottom);
-			DispScrollNLines(WinOrgY,CursorBottom,n);
+			DispScrollNLines(vt_src, WinOrgY, CursorBottom, n);
 		}
 	}
 	else {
@@ -3830,7 +3802,7 @@ void BuffRegionScrollUpNLines(int n) {
 			BuffUpdateRect(CursorLeftM-extl, CursorTop, CursorRightM+extr, CursorBottom);
 		}
 		else {
-			DispScrollNLines(CursorTop, CursorBottom, n);
+			DispScrollNLines(vt_src, CursorTop, CursorBottom, n);
 		}
 	}
 }
@@ -3874,7 +3846,7 @@ void BuffRegionScrollDownNLines(int n) {
 		BuffUpdateRect(CursorLeftM-extl, CursorTop, CursorRightM+extr, CursorBottom);
 	}
 	else {
-		DispScrollNLines(CursorTop, CursorBottom, -n);
+		DispScrollNLines(vt_src, CursorTop, CursorBottom, -n);
 	}
 }
 
@@ -3886,7 +3858,7 @@ void BuffClearScreen(void)
 	else { /* clear main screen */
 		UpdateStr();
 		BuffScroll(NumOfLines-StatusLine,NumOfLines-1-StatusLine);
-		DispScrollNLines(WinOrgY,NumOfLines-1-StatusLine,NumOfLines-StatusLine);
+		DispScrollNLines(vt_src, WinOrgY, NumOfLines - 1 - StatusLine, NumOfLines - StatusLine);
 	}
 }
 
@@ -3894,7 +3866,7 @@ void BuffUpdateScroll(void)
 // Updates scrolling
 {
 	UpdateStr();
-	DispUpdateScroll();
+	DispUpdateScroll(vt_src);
 }
 
 void CursorUpWithScroll(void)
@@ -3943,14 +3915,14 @@ static void GetMinMax(int i1, int i2, int i3, int *min, int *max)
 
 static void invokeBrowserWithUrl(const wchar_t *url)
 {
-	static const wchar_t *schemes[] = {
+	static const wchar_t *webbrowser_schemes[] = {
 		L"http://",
 		L"https://",
 		L"ftp://",
 	};
 	BOOL use_browser = FALSE;
-	for (int i = 0; i < _countof(schemes); i++) {
-		const wchar_t *scheme = schemes[i];
+	for (int i = 0; i < _countof(webbrowser_schemes); i++) {
+		const wchar_t *scheme = webbrowser_schemes[i];
 		if (wcsncmp(url, scheme, wcslen(scheme)) == 0) {
 			use_browser = TRUE;
 			break;
@@ -4179,14 +4151,12 @@ void ChangeSelectRegion(void)
 		TempEnd.x--;
 		Caret = IsCaretOn();
 		if (Caret) {
-			CaretOff();
+			CaretOff(vt_src);
 		}
-		DispInitDC();
 		BuffUpdateRect(TempStart.x,TempStart.y-PageStart,
 		               TempEnd.x,TempEnd.y-PageStart);
-		DispReleaseDC();
 		if (Caret) {
-			CaretOn();
+			CaretOn(vt_src);
 		}
 		SelectEndOld = SelectEnd;
 		return;
@@ -4209,7 +4179,7 @@ void ChangeSelectRegion(void)
 
 	Caret = IsCaretOn();
 	if (Caret) {
-		CaretOff();
+		CaretOff(vt_src);
 	}
 	for (j = TempStart.y ; j <= TempEnd.y ; j++) {
 		IStart = 0;
@@ -4223,13 +4193,13 @@ void ChangeSelectRegion(void)
 
 		if ((IEnd>=IStart) && (j >= PageStart+WinOrgY) &&
 		    (j < PageStart+WinOrgY+WinHeight)) {
-			DispInitDC();
+			ttdc_t *dc = DispInitDC(vt_src);
 			BuffUpdateRect(IStart,j-PageStart,IEnd,j-PageStart);
-			DispReleaseDC();
+			DispReleaseDC(vt_src, dc);
 		}
 	}
 	if (Caret) {
-		CaretOn();
+		CaretOn(vt_src);
 	}
 
 	SelectEndOld = SelectEnd;
@@ -4245,9 +4215,9 @@ BOOL BuffUrlDblClk(int Xw, int Yw)
 		return FALSE;
 	}
 
-	CaretOff();
+	CaretOff(vt_src);
 
-	DispConvWinToScreen(Xw,Yw,&X,&Y,NULL);
+	DispConvWinToScreen(vt_src, Xw, Yw, &X, &Y, NULL);
 	Y = Y + PageStart;
 	if ((Y<0) || (Y>=BuffEnd)) {
 		return 0;
@@ -4383,14 +4353,14 @@ void BuffDblClk(int Xw, int Yw)
 	int IStart, IEnd;
 	LONG TmpPtr;
 
-	CaretOff();
+	CaretOff(vt_src);
 
 	if (!Selecting) {
 		SelectStart = ClickCell;
 		Selecting = TRUE;
 	}
 
-	DispConvWinToScreen(Xw,Yw,&X,&Y,NULL);
+	DispConvWinToScreen(vt_src, Xw,Yw,&X,&Y,NULL);
 	Y = Y + PageStart;
 	if ((Y<0) || (Y>=BuffEnd)) {
 		return;
@@ -4446,9 +4416,9 @@ void BuffTplClk(int Yw)
 {
 	int Y;
 
-	CaretOff();
+	CaretOff(vt_src);
 
-	DispConvWinToScreen(0,Yw,NULL,&Y,NULL);
+	DispConvWinToScreen(vt_src, 0, Yw, NULL, &Y, NULL);
 	Y = Y + PageStart;
 	if ((Y<0) || (Y>=BuffEnd)) {
 		return;
@@ -4481,7 +4451,7 @@ void BuffSeveralPagesSelect(int Xw, int Yw)
 	int X, Y;
 	BOOL Right;
 
-	DispConvWinToScreen(Xw,Yw, &X,&Y,&Right);
+	DispConvWinToScreen(vt_src, Xw, Yw, &X, &Y, &Right);
 	Y = Y + PageStart;
 	if ((Y<0) || (Y>=BuffEnd)) {
 		return;
@@ -4566,7 +4536,7 @@ void BuffStartSelect(int Xw, int Yw, BOOL Box)
 	int X, Y;
 	BOOL Right;
 
-	DispConvWinToScreen(Xw,Yw, &X,&Y,&Right);
+	DispConvWinToScreen(vt_src, Xw, Yw, &X, &Y, &Right);
 	Y = Y + PageStart;
 	if ((Y<0) || (Y>=BuffEnd)) {
 		return;
@@ -4590,7 +4560,7 @@ void BuffStartSelect(int Xw, int Yw, BOOL Box)
 
 	SelectEnd = ClickCell;
 	SelectEndOld = SelectEnd;
-	CaretOff();
+	CaretOff(vt_src);
 	Selected = TRUE;
 	BoxSelect = Box;
 }
@@ -4609,7 +4579,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 	int X, Y;
 	BOOL Right;
 
-	DispConvWinToScreen(Xw,Yw,&X,&Y,&Right);
+	DispConvWinToScreen(vt_src, Xw, Yw, &X, &Y, &Right);
 
 	if (!Selecting) {
 		if (GetTickCount() - SelectStartTime < ts.SelectStartDelay) {
@@ -4771,7 +4741,7 @@ void BuffChangeWinSize(int Nx, int Ny)
 	if (Ny>BuffEnd) {
 		Ny = BuffEnd;
 	}
-	DispChangeWinSize(Nx,Ny);
+	DispChangeWinSize(vt_src, Nx, Ny);
 }
 
 void BuffChangeTerminalSize(int Nx, int Ny)
@@ -4918,7 +4888,7 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 	BuffChangeWinSize(W,H);
 	WinOrgY = -NumOfLines;
 
-	DispScrollHomePos();
+	DispScrollHomePos(vt_src);
 
 	if (cv.Ready && cv.TelFlag) {
 		TelInformWinSize(NumOfColumns,NumOfLines-StatusLine);
@@ -4956,7 +4926,7 @@ void ChangeWin(void)
 		}
 	}
 
-	DispChangeWin();
+	DispChangeWin(vt_src);
 }
 
 void ClearBuffer(void)
@@ -4997,7 +4967,7 @@ void ClearBuffer(void)
 
 	StrChangeCount = 0;
 
-	DispClearWin();
+	DispClearWin(vt_src);
 }
 
 void SetTabStop(void)
@@ -5176,7 +5146,7 @@ void ShowStatusLine(int Show)
 	/* Change Window Size */
 	BuffChangeWinSize(W,H);
 	WinOrgY = -NumOfLines;
-	DispScrollHomePos();
+	DispScrollHomePos(vt_src);
 
 	MoveCursor(CursorX,CursorY);
 }
@@ -5196,7 +5166,7 @@ void BuffLineContinued(BOOL mode)
 void BuffSetCurCharAttr(const TCharAttr *Attr)
 {
 	CurCharAttr = *Attr;
-	DispSetCurCharAttr(Attr);
+	DispSetCurCharAttr(vt_src, Attr);
 }
 
 void BuffSaveScreen(void)
@@ -5672,7 +5642,7 @@ BOOL BuffCheckMouseOnURL(int Xw, int Yw)
 	LONG TmpPtr;
 	BOOL Result, Right;
 
-	DispConvWinToScreen(Xw, Yw, &X, &Y, &Right);
+	DispConvWinToScreen(vt_src, Xw, Yw, &X, &Y, &Right);
 	Y += PageStart;
 
 	if (X < 0)
@@ -5729,7 +5699,7 @@ wchar_t *BuffGetCharInfo(int Xw, int Yw)
     wchar_t *unicode_utf16_str;
     wchar_t *unicode_utf32_str;
 
-	DispConvWinToScreen(Xw, Yw, &X, &ScreenY, &Right);
+	DispConvWinToScreen(vt_src, Xw, Yw, &X, &ScreenY, &Right);
 	Y = PageStart + ScreenY;
 
 	if (X < 0)

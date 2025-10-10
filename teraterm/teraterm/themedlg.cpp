@@ -879,7 +879,7 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			// preview
 			ThemeSetBG(&dlg_data->BGTab.bg_theme);
 			ThemeSetColor(&dlg_data->ColorTab.color_theme);
-			BGSetupPrimary(TRUE);
+			BGSetupPrimary(vt_src, TRUE);
 			InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 			break;
 		}
@@ -919,7 +919,7 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ThemeSetColor(&dlg_data->ColorTab.color_theme);
 					ThemeSetBG(&dlg_data->BGTab.bg_theme);
 
-					BGSetupPrimary(TRUE);
+					BGSetupPrimary(vt_src, TRUE);
 					InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 				}
 			}
@@ -1176,14 +1176,14 @@ void ThemeDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv)
 		// cancel時、バックアップ内容に戻す
 		ThemeSetBG(&dlg_data->Backup.bg_theme);
 		ThemeSetColor(&dlg_data->Backup.color_theme);
-		BGSetupPrimary(TRUE);
+		BGSetupPrimary(vt_src, TRUE);
 		InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 	}
 	else if (r >= 1) {
 		// okなど(Changes were saved by the user)
 		ThemeSetBG(&dlg_data->BGTab.bg_theme);
 		ThemeSetColor(&dlg_data->ColorTab.color_theme);
-		BGSetupPrimary(TRUE);
+		BGSetupPrimary(vt_src, TRUE);
 		InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 	}
 

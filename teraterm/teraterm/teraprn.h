@@ -29,7 +29,10 @@
 
 /* TERATERM.EXE, Printing routines */
 
+#pragma once
+
 #include "buffer.h"		// for TCharAttr
+#include "vtdisp.h"		// for vtdraw_t, ttdc_t
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,8 +40,8 @@ extern "C" {
 
 /* prototypes */
 HDC PrnBox(HWND HWin, PBOOL Sel);
-BOOL PrnStart(HDC hDC, LPSTR DocumentName);
-void PrnStop();
+BOOL PrnStart(HDC hDC, const wchar_t *DocumentName);
+void PrnStop(HDC hDC);
 
 #define IdPrnCancel 0
 #define IdPrnScreen 1
@@ -46,12 +49,8 @@ void PrnStop();
 #define IdPrnScrollRegion 4
 #define IdPrnFile 8
 
-int VTPrintInit(int PrnFlag);
-void PrnSetupDC(TCharAttr Attr, BOOL reverse);
-void PrnOutTextA(const char *Buff, const char *WidthInfo, int Count, void *data);
-void PrnOutTextW(const wchar_t *StrW, const char *WidthInfo, int Count, void *data);
-void PrnNewLine();
-void VTPrintEnd();
+vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **dc, int *mode);
+void VTPrintEnd(vtdraw_t *vt, ttdc_t *dc);
 
 #ifdef __cplusplus
 }
