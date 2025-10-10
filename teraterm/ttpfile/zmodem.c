@@ -336,9 +336,9 @@ static void ZShHdr(PZVar zv, BYTE HdrType)
 	}
 	ZPutHex(zv, &(zv->PktOutCount), HIBYTE(zv->CRC));
 	ZPutHex(zv, &(zv->PktOutCount), LOBYTE(zv->CRC));
-	zv->PktOut[zv->PktOutCount] = 0x0D;
+	zv->PktOut[zv->PktOutCount] = 0x0D; // CR
 	zv->PktOutCount++;
-	zv->PktOut[zv->PktOutCount] = 0x8A;
+	zv->PktOut[zv->PktOutCount] = 0x8A; // LF | 0x80
 	zv->PktOutCount++;
 
 	if ((HdrType != ZFIN) && (HdrType != ZACK)) {
