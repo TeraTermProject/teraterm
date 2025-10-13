@@ -336,9 +336,9 @@ static void ZShHdr(PZVar zv, BYTE HdrType)
 	}
 	ZPutHex(zv, &(zv->PktOutCount), HIBYTE(zv->CRC));
 	ZPutHex(zv, &(zv->PktOutCount), LOBYTE(zv->CRC));
-	zv->PktOut[zv->PktOutCount] = 0x0D;
+	zv->PktOut[zv->PktOutCount] = 0x0D; // CR
 	zv->PktOutCount++;
-	zv->PktOut[zv->PktOutCount] = 0x8A;
+	zv->PktOut[zv->PktOutCount] = 0x8A; // LF | 0x80
 	zv->PktOutCount++;
 
 	if ((HdrType != ZFIN) && (HdrType != ZACK)) {
@@ -363,6 +363,8 @@ static void ZPutBin(PZVar zv, int *i, BYTE b)
 /*
  * lrzsz では ZDLE(CAN), DLE, XON, XOFF, @ の直後の CR, およびこれらの
  * MSB が立った文字がエスケープ対象となっている。
+ * Tera Term では、以前は lrzsz と同様 @ の直後の CR をエスケープしていた
+ * ようだが、何らかの理由で 2.3 時点で常に CR をエスケープしている。
  *
  * 接続先からさらに ssh / telnet 接続した場合に問題を起こさないよう、
  * LF および GS もデフォルトのエスケープ対象に加える。
