@@ -517,6 +517,12 @@ static void ZSendFIN(PZVar zv)
 	ZShHdr(zv, ZFIN);
 }
 
+static void ZSendSKIP(PZVar zv)
+{
+	ZStoHdr(zv, 0);
+	ZShHdr(zv, ZSKIP);
+}
+
 static void ZSendCancel(PZVar zv)
 {
 	int i;
@@ -1232,6 +1238,10 @@ static void ZCheckData(PZVar zv)
 		break;
 	case ZFILE:
 		Ok = ZParseFile(zv);
+		if (!Ok) {
+			// ファイル書き込みオープン失敗
+			ZSendSKIP(zv);
+		}
 		break;
 	case ZDATA:
 		Ok = ZWriteData(zv);
