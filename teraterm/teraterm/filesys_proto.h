@@ -68,6 +68,40 @@ typedef struct Comm_ {
 	void *private_data;
 } TComm;
 
+// プロトコルのオペレーション
+//   各プロトコルの実装
+struct FileVarProto;
+struct Proto_;
+typedef struct ProtoOp_ {
+	// 初期化処理
+	// メモリ確保、状態初期化等を行う
+	//	@retval	TRUE	正常終了
+	//	@retval	FALSE	異常終了、初期化失敗
+	BOOL (*Init)(struct Proto_ *pv, PComVar cv, PTTSet ts);
+	// 処理の継続
+	//	@retval	TRUE	正常、処理を継続終了
+	//	@retval	FALSE	終了、引き続きParse()を呼ぶ必要なし
+	BOOL (*Parse)(struct Proto_ *pv);
+	// タイムアウト通知
+	//	タイムアウトが発生したことをプロトコル処理に通知
+	void (*TimeOutProc)(struct Proto_ *pv);
+	// キャンセル通知
+	//	ユーザーがキャンセルしたことをプロトコル処理に通知
+	void (*Cancel)(struct Proto_ *pv);
+	// パラメータ設定
+	//	プロトコルごとのパラメータ設定
+	int (*SetOpt)(struct Proto_ *pv, int request, ...);
+	int (*SetOptV)(struct Proto_ *pv, int request, va_list ap);
+	// 終了処理
+	//	メモリの開放などを行う
+	void (*Destroy)(struct Proto_ *pv);
+} TProtoOp;
+
+typedef struct Proto_ {
+	const TProtoOp *Op;
+	void *PrivateData;
+} TProto;
+
 typedef struct FileVarProto {
 	// ↓protosys_proto.cpp内のみ使用
 
@@ -100,8 +134,7 @@ typedef struct FileVarProto {
 	void (*SetDialogCation)(struct FileVarProto *fv, const char *key, const wchar_t *default_caption);
 
 	// protocol entrys, data
-	const struct ProtoOp_ *ProtoOp;
-	void *data;
+	TProto *Proto;
 
 	// UI
 	const struct InfoOp_ *InfoOp;
@@ -109,35 +142,9 @@ typedef struct FileVarProto {
 	// comm
 	TComm *Comm;
 
-	TFileIO *file;
+	TFileIO *file_fv;
 } TFileVarProto;
 typedef TFileVarProto *PFileVarProto;
-
-// プロトコルのオペレーション
-//   各プロトコルの実装
-typedef struct ProtoOp_ {
-	// 初期化処理
-	// メモリ確保、状態初期化等を行う
-	//	@retval	TRUE	正常終了
-	//	@retval	FALSE	異常終了、初期化失敗
-	BOOL (*Init)(struct FileVarProto *fv, PComVar cv, PTTSet ts);
-	// 処理の継続
-	//	@retval	TRUE	正常、処理を継続終了
-	//	@retval	FALSE	終了、引き続きParse()を呼ぶ必要なし
-	BOOL (*Parse)(struct FileVarProto *fv);
-	// タイムアウト通知
-	//	タイムアウトが発生したことをプロトコル処理に通知
-	void (*TimeOutProc)(struct FileVarProto *fv);
-	// キャンセル通知
-	//	ユーザーがキャンセルしたことをプロトコル処理に通知
-	void (*Cancel)(struct FileVarProto *fv);
-	// パラメータ設定
-	//	プロトコルごとのパラメータ設定
-	int (*SetOptV)(struct FileVarProto *fv, int request, va_list ap);
-	// 終了処理
-	//	メモリの開放などを行う
-	void (*Destroy)(struct FileVarProto *fv);
-} TProtoOp;
 
 // UIなど情報表示用関数
 typedef struct InfoOp_ {
