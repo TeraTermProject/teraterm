@@ -31,7 +31,6 @@
 #include <stdio.h>
 
 #include "tttypes.h"
-#include "ttcommon.h"
 #include "ftlib.h"
 #include "protolog.h"
 #include "filesys_proto.h"
@@ -90,14 +89,15 @@ typedef struct {
 		STATE_CANCELED,		// キャンセル通知を受けた
 	} state;
 
+	TComm *Comm;
 } TXVar;
 typedef TXVar *PXVar;
 
-static void XCancel(PFileVarProto fv, PComVar cv);
+static void XCancel(PFileVarProto fv);
 
-static int XRead1Byte(PFileVarProto fv, PXVar xv, PComVar cv, LPBYTE b)
+static int XRead1Byte(PFileVarProto fv, PXVar xv, LPBYTE b)
 {
-	if (CommRead1Byte(cv, b) == 0)
+	if (xv->Comm->op->Read1Byte(xv->Comm, b) == 0)
 		return 0;
 
 	if (xv->log != NULL) {
@@ -115,12 +115,12 @@ static int XRead1Byte(PFileVarProto fv, PXVar xv, PComVar cv, LPBYTE b)
 	return 1;
 }
 
-static int XWrite(PFileVarProto fv, PXVar xv, PComVar cv, const void *_B, size_t C)
+static int XWrite(PFileVarProto fv, PXVar xv, const void *_B, size_t C)
 {
 	int i, j;
 	char *B = (char *)_B;
 
-	i = CommBinaryOut(cv, B, (int)C);
+	i = xv->Comm->op->BinaryOut(xv->Comm, B, (int)C);
 	if (xv->log != NULL && (i > 0)) {
 		TProtoLog* log = xv->log;
 		if (xv->LogState != 0) {
@@ -136,13 +136,13 @@ static int XWrite(PFileVarProto fv, PXVar xv, PComVar cv, const void *_B, size_t
 	return i;
 }
 
-static void XFlushReceiveBuf(PFileVarProto fv, PXVar xv, PComVar cv)
+static void XFlushReceiveBuf(PFileVarProto fv, PXVar xv)
 {
 	BYTE b;
 	int r;
 
 	do {
-		r = XRead1Byte(fv, xv, cv, &b);
+		r = XRead1Byte(fv, xv, &b);
 	} while (r != 0);
 }
 
@@ -178,14 +178,13 @@ static void XSetOpt(PFileVarProto fv, PXVar xv, WORD Opt)
 	fv->InfoOp->SetDlgProtoText(fv, Tmp);
 }
 
-static void XSendNAK(PFileVarProto fv, PXVar xv, PComVar cv)
+static void XSendNAK(PFileVarProto fv, PXVar xv)
 {
 	BYTE b;
 	int t;
 
 	/* flush comm buffer */
-	cv->InBuffCount = 0;
-	cv->InPtr = 0;
+	xv->Comm->op->FlashReceiveBuf(xv->Comm);
 
 	xv->NAKCount--;
 	if (xv->NAKCount < 0) {
@@ -194,7 +193,7 @@ static void XSendNAK(PFileVarProto fv, PXVar xv, PComVar cv)
 			xv->NAKMode = XnakNAK;
 			xv->NAKCount = 9;
 		} else {
-			XCancel(fv, cv);
+			XCancel(fv);
 			return;
 		}
 	}
@@ -209,7 +208,7 @@ static void XSendNAK(PFileVarProto fv, PXVar xv, PComVar cv)
 		b = 'C';
 		t = xv->TOutInitCRC;
 	}
-	XWrite(fv, xv, cv, &b, 1);
+	XWrite(fv, xv, &b, 1);
 	xv->PktReadMode = XpktSOH;
 	fv->FTSetTimeOut(fv, t);
 }
@@ -273,7 +272,7 @@ static BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 		}
 		xv->FileSize = (LONG)size;
 		fv->InfoOp->InitDlgProgress(fv, &xv->ProgStat);
-		XFlushReceiveBuf(fv, xv, cv);
+		XFlushReceiveBuf(fv, xv);
 	} else {
 		xv->FileOpen = file->OpenWrite(file, xv->FullName);
 		if (xv->FileOpen == FALSE) {
@@ -325,31 +324,31 @@ static BOOL XInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 			char *filename = file->GetSendFilename(file, xv->FullName, FALSE, TRUE, FALSE);
 			_snprintf_s(inistr, sizeof(inistr), _TRUNCATE, "%s %s\015",
 						ts->XModemRcvCommand, filename);
-			XWrite(fv, xv, cv, inistr, strlen(inistr));
+			XWrite(fv, xv, inistr, strlen(inistr));
 			free(filename);
 		}
 
 		fv->FTSetTimeOut(fv, xv->TOutVLong);
 		break;
 	case IdXReceive:
-		XSendNAK(fv, xv, cv);
+		XSendNAK(fv, xv);
 		break;
 	}
 	xv->state = STATE_FLUSH;
 	return TRUE;
 }
 
-static void XCancel(PFileVarProto fv, PComVar cv)
+static void XCancel(PFileVarProto fv)
 {
 	PXVar xv = fv->data;
 	// five cancels & five backspaces per spec
 	static const BYTE cancel[] = { CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS };
 
-	XWrite(fv,xv,cv, (PCHAR)&cancel, sizeof(cancel));
+	XWrite(fv, xv, (PCHAR)&cancel, sizeof(cancel));
 	xv->state = STATE_CANCELED;		// quit
 }
 
-static void XTimeOutProc(PFileVarProto fv, PComVar cv)
+static void XTimeOutProc(PFileVarProto fv)
 {
 	PXVar xv = fv->data;
 	switch (xv->XMode) {
@@ -357,12 +356,12 @@ static void XTimeOutProc(PFileVarProto fv, PComVar cv)
 		xv->state = STATE_CANCELED;	// quit
 		break;
 	case IdXReceive:
-		XSendNAK(fv, xv, cv);
+		XSendNAK(fv, xv);
 		break;
 	}
 }
 
-static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
+static BOOL XReadPacket(PFileVarProto fv)
 {
 	PXVar xv = fv->data;
 	BYTE b, d;
@@ -370,7 +369,7 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 	BOOL GetPkt = FALSE;
 	TFileIO *file = fv->file;
 
-	for (c=XRead1Byte(fv, xv, cv, &b); (c > 0) && !GetPkt; c=XRead1Byte(fv, xv, cv, &b)) {
+	for (c=XRead1Byte(fv, xv, &b); (c > 0) && !GetPkt; c=XRead1Byte(fv, xv, &b)) {
 		switch (xv->PktReadMode) {
 		case XpktSOH:
 			switch (b) {
@@ -395,7 +394,7 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 			case EOT:
 				b = ACK;
 				fv->Success = TRUE;
-				XWrite(fv, xv, cv, &b, 1);
+				XWrite(fv, xv, &b, 1);
 				return FALSE;
 				break;
 			case CAN:
@@ -409,8 +408,7 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 				break;
 			default:
 				/* flush comm buffer */
-				cv->InBuffCount = 0;
-				cv->InPtr = 0;
+				xv->Comm->op->FlashReceiveBuf(xv->Comm);
 				return TRUE;
 				break;
 			}
@@ -429,7 +427,7 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 				xv->PktReadMode = XpktDATA;
 				fv->FTSetTimeOut(fv, xv->TOutShort);
 			} else
-				XSendNAK(fv, xv, cv);
+				XSendNAK(fv, xv);
 			break;
 		case XpktDATA:
 			xv->PktIn[xv->PktBufPtr] = b;
@@ -454,25 +452,25 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 			xv->NAKCount = 10;
 		else
 			xv->NAKCount = 3;
-		XSendNAK(fv, xv, cv);
+		XSendNAK(fv, xv);
 		return TRUE;
 	}
 
 	GetPkt = XCheckPacket(xv);
 	if (!GetPkt) {
-		XSendNAK(fv, xv, cv);
+		XSendNAK(fv, xv);
 		return TRUE;
 	}
 
 	d = xv->PktIn[1] - xv->PktNum;
 	if (d > 1) {
-		XCancel(fv, cv);
+		XCancel(fv);
 		return FALSE;
 	}
 
 	/* send ACK */
 	b = ACK;
-	XWrite(fv, xv, cv, &b, 1);
+	XWrite(fv, xv, &b, 1);
 	xv->NAKMode = XnakNAK;
 	xv->NAKCount = 10;
 
@@ -524,7 +522,7 @@ static BOOL XReadPacket(PFileVarProto fv, PComVar cv)
 	return TRUE;
 }
 
-static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
+static BOOL XSendPacket(PFileVarProto fv)
 {
 	PXVar xv = fv->data;
 	BYTE b;
@@ -536,7 +534,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 	SendFlag = FALSE;
 	if (xv->PktBufCount == 0) {
 		for(;;){
-			i = XRead1Byte(fv, xv, cv, &b);
+			i = XRead1Byte(fv, xv, &b);
 			if (i == 0)
 				break; //先行して受信した文字が全て無くなるまで繰り返す(CAN CANのみ即時キャンセル)
 
@@ -601,7 +599,7 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 		// reset timeout timer
 		fv->FTSetTimeOut(fv, xv->TOutVLong);
 
-		XFlushReceiveBuf(fv, xv, cv);
+		XFlushReceiveBuf(fv, xv);
 
 		if (xv->PktNumSent == xv->PktNum) {	/* make a new packet */
 			TFileIO *file = fv->file;
@@ -654,12 +652,12 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 		xv->PktBufPtr = 0;
 	}
 	/* a NAK or C could have arrived while we were buffering.  Consume it. */
-	XFlushReceiveBuf(fv, xv, cv);
+	XFlushReceiveBuf(fv, xv);
 
 	i = 1;
 	while ((xv->PktBufCount > 0) && (i > 0)) {
 		b = xv->PktOut[xv->PktBufPtr];
-		i = XWrite(fv, xv, cv, &b, 1);
+		i = XWrite(fv, xv, &b, 1);
 		if (i > 0) {
 			xv->PktBufCount--;
 			xv->PktBufPtr++;
@@ -681,26 +679,26 @@ static BOOL XSendPacket(PFileVarProto fv, PComVar cv)
 	return TRUE;
 }
 
-static BOOL XParse(PFileVarProto fv, PComVar cv)
+static BOOL XParse(PFileVarProto fv)
 {
 	PXVar xv = fv->data;
 	switch (xv->state) {
 	case STATE_FLUSH:
 		// 受信データを捨てる
-		XFlushReceiveBuf(fv, xv, cv);
+		XFlushReceiveBuf(fv, xv);
 		xv->state = STATE_NORMAL;	// 送受信処理を行う
 		return TRUE;
 	case STATE_NORMAL:
 		switch (xv->XMode) {
 		case IdXReceive:
-			return XReadPacket(fv,cv);
+			return XReadPacket(fv);
 		case IdXSend:
-			return XSendPacket(fv,cv);
+			return XSendPacket(fv);
 		default:
 			return FALSE;
 		}
 	case STATE_CANCELED:
-		XFlushReceiveBuf(fv, xv, cv);
+		XFlushReceiveBuf(fv, xv);
 		return FALSE;
 	}
 	return FALSE;
@@ -765,6 +763,7 @@ BOOL XCreate(PFileVarProto fv)
 	xv->FileOpen = FALSE;
 	xv->XOpt = XoptCRC;
 	xv->state = STATE_FLUSH;
+	xv->Comm = fv->Comm;
 	fv->data = xv;
 	fv->ProtoOp = &Op;
 
