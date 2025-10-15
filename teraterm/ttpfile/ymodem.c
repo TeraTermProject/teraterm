@@ -31,7 +31,6 @@
 #include <assert.h>
 
 #include "tttypes.h"
-//#include "ttcommon.h"
 #include "ftlib.h"
 #include "protolog.h"
 #include "filesys_proto.h"
@@ -77,6 +76,8 @@ typedef struct {
 	DWORD FileMtime;
 
 	TComm *Comm;
+	PFileVarProto fv;
+	TFileIO *file;
 } TYVar;
 typedef TYVar *PYVar;
 
@@ -104,9 +105,7 @@ typedef TYVar *PYVar;
 #define XnakNAK 1
 #define XnakC 2
 
-static void YCancel(PFileVarProto fv);
-
-static int YRead1Byte(PFileVarProto fv, PYVar yv, LPBYTE b)
+static int YRead1Byte(PYVar yv, LPBYTE b)
 {
 	if (yv->Comm->op->Read1Byte(yv->Comm, b) == 0)
 		return 0;
@@ -127,7 +126,7 @@ static int YRead1Byte(PFileVarProto fv, PYVar yv, LPBYTE b)
 	return 1;
 }
 
-static int YWrite(PFileVarProto fv, PYVar yv, PCHAR B, int C)
+static int YWrite(PYVar yv, PCHAR B, int C)
 {
 	int i, j;
 
@@ -147,6 +146,17 @@ static int YWrite(PFileVarProto fv, PYVar yv, PCHAR B, int C)
 			log->DumpByte(log, B[j]);
 	}
 	return i;
+}
+
+static void YCancel_(PYVar yv)
+{
+	// five cancels & five backspaces per spec
+	static const BYTE cancel[] = {
+		CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS
+	};
+
+	YWrite(yv, (PCHAR)&cancel, sizeof(cancel));
+	yv->YMode = IdYQuit;	// quit
 }
 
 static void YSetOpt(PFileVarProto fv, PYVar yv, WORD Opt)
@@ -197,7 +207,7 @@ static void YSendNAK(PFileVarProto fv, PYVar yv)
 			yv->NAKCount = 9;
 		}
 		else {
-			YCancel(fv);
+			YCancel_(yv);
 			return;
 		}
 	}
@@ -214,7 +224,7 @@ static void YSendNAK(PFileVarProto fv, PYVar yv)
 		b = 'C';
 		t = yv->TOutInitCRC;
 	}
-	YWrite(fv,yv,&b,1);
+	YWrite(yv,&b,1);
 	yv->PktReadMode = XpktSOH;
 	fv->FTSetTimeOut(fv,t);
 }
@@ -237,7 +247,7 @@ static void YSendNAKTimeout(PFileVarProto fv, PYVar yv)
 			yv->NAKCount = 9;
 		}
 		else {
-			YCancel(fv);
+			YCancel_(yv);
 			return;
 		}
 	}
@@ -255,7 +265,7 @@ static void YSendNAKTimeout(PFileVarProto fv, PYVar yv)
 		b = 'C';
 		t = yv->TOutInitCRC;
 	}
-	YWrite(fv,yv,&b,1);
+	YWrite(yv,&b,1);
 	yv->PktReadMode = XpktSOH;
 	fv->FTSetTimeOut(fv,t);
 }
@@ -299,7 +309,7 @@ static BOOL YCheckPacket(PYVar yv, const WORD len)
 
 static void initialize_file_info(PFileVarProto fv, PYVar yv)
 {
-	TFileIO *file = fv->file;
+	TFileIO *file = yv->file;
 	if (yv->YMode == IdYSend) {
 		if (yv->FileOpen) {
 			file->Close(file);
@@ -337,9 +347,10 @@ static void initialize_file_info(PFileVarProto fv, PYVar yv)
 	yv->LastMessage = 0;
 }
 
-static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
+static BOOL YInit(TProto *pv, PComVar cv, PTTSet ts)
 {
-	PYVar yv = fv->data;
+	PYVar yv = pv->PrivateData;
+	PFileVarProto fv = yv->fv;
 
 	if (yv->YMode == IdYSend) {
 		char *filename = fv->GetNextFname(fv);
@@ -407,7 +418,7 @@ static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 			char inistr[MAX_PATH + 10];
 			_snprintf_s(inistr, sizeof(inistr), _TRUNCATE, "%s\015",
 			            ts->YModemRcvCommand);
-			YWrite(fv, yv, inistr , strlen(inistr));
+			YWrite(yv, inistr , strlen(inistr));
 		}
 
 		fv->FTSetTimeOut(fv, yv->TOutVLong);
@@ -432,21 +443,16 @@ static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	return TRUE;
 }
 
-static void YCancel(PFileVarProto fv)
+static void YCancel(TProto *pv)
 {
-	// five cancels & five backspaces per spec
-	static const BYTE cancel[] = {
-		CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS
-	};
-	PYVar yv = fv->data;
-
-	YWrite(fv, yv, (PCHAR)&cancel, sizeof(cancel));
-	yv->YMode = IdYQuit;	// quit
+	PYVar yv = pv->PrivateData;
+	YCancel_(yv);
 }
 
-static void YTimeOutProc(PFileVarProto fv)
+static void YTimeOutProc(TProto *pv)
 {
-	PYVar yv = fv->data;
+	PYVar yv = pv->PrivateData;
+	PFileVarProto fv = yv->fv;
 	switch (yv->YMode) {
 	case IdYSend:
 		yv->YMode = IdYQuit;	// quit
@@ -466,10 +472,10 @@ static void YTimeOutProc(PFileVarProto fv)
 	}
 }
 
-static BOOL FTCreateFile(PFileVarProto fv)
+static BOOL FTCreateFile(PYVar yv)
 {
-	TFileIO *file = fv->file;
-	PYVar yv = fv->data;
+	PFileVarProto fv = yv->fv;
+	TFileIO *file = yv->file;
 
 	fv->InfoOp->SetDlgProtoFileName(fv, yv->FullName);
 	yv->FileOpen = file->OpenWrite(file, yv->FullName);
@@ -505,9 +511,9 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv)
 	BYTE b, d;
 	int i, c, nak;
 	BOOL GetPkt;
-	TFileIO *file = fv->file;
+	TFileIO *file = yv->file;
 
-	c = YRead1Byte(fv,yv,&b);
+	c = YRead1Byte(yv,&b);
 
 	GetPkt = FALSE;
 
@@ -543,7 +549,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv)
 
 					// 1回目のEOTに対してNAKを返す
 					b = NAK;
-					YWrite(fv, yv, &b, 1);
+					YWrite(yv, &b, 1);
 					return TRUE;
 				}
 
@@ -551,7 +557,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv)
 
 				// EOTに対してACKを返す
 				b = ACK;
-				YWrite(fv, yv, &b, 1);
+				YWrite(yv, &b, 1);
 
 				// 次のファイル送信を促すため、'C'を送る。
 				YSendNAK(fv,yv);
@@ -610,7 +616,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv)
 			break;
 		}
 
-		if (! GetPkt) c = YRead1Byte(fv,yv,&b);
+		if (! GetPkt) c = YRead1Byte(yv,&b);
 	}
 
 	if (! GetPkt) return TRUE;
@@ -631,7 +637,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv)
 			c--;
 		if (c == 0) {
 		  b = ACK;
-		  YWrite(fv, yv, &b, 1);
+		  YWrite(yv, &b, 1);
 		  fv->Success = TRUE;
 		  return FALSE;
 		}
@@ -640,13 +646,13 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv)
 	d = yv->PktIn[1] - yv->PktNum;
 	if (d>1)
 	{
-		YCancel(fv);
+		YCancel_(yv);
 		return FALSE;
 	}
 
 	/* send ACK */
 	b = ACK;
-	YWrite(fv, yv, &b, 1);
+	YWrite(yv, &b, 1);
 	yv->NAKMode = YnakC;
 	yv->NAKCount = 10;
 
@@ -678,7 +684,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv)
 		free((void *)yv->FullName);
 		yv->FullName = file->GetRecieveFilename(file, name, FALSE, RecievePath, !fv->OverWrite);
 		free(RecievePath);
-		if (!FTCreateFile(fv)) {
+		if (!FTCreateFile(yv)) {
 			free(p);
 			return FALSE;
 		}
@@ -754,7 +760,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv)
 		while (continue_read)
 		{
 			BYTE isym = 0;
-			int is_success = YRead1Byte(fv, yv, &isym);
+			int is_success = YRead1Byte(yv, &isym);
 			if (0 == is_success) return TRUE;
 
 			// Analyze responce.
@@ -962,7 +968,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv)
 				size_t idx;
 				// TODO: remove magic number.
 				BYTE buf[1024 + 10];
-				TFileIO *file = fv->file;
+				TFileIO *file = yv->file;
 				char *filename;
 
 				// 128 bytes for the first packet.
@@ -1010,7 +1016,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv)
 
 			else
 			{
-				TFileIO *file = fv->file;
+				TFileIO *file = yv->file;
 				BYTE fsym = 0;
 				size_t idx = 1;
 
@@ -1114,7 +1120,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv)
 	while (yv->PktBufCount > 0)
 	{
 		BYTE osym = yv->PktOut[yv->PktBufPtr];
-		int is_success = YWrite(fv, yv, &osym, 1);
+		int is_success = YWrite(yv, &osym, 1);
 		if (is_success > 0)
 		{
 			--yv->PktBufCount;
@@ -1144,15 +1150,16 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv)
 	return TRUE;
 }
 
-static BOOL YParse(PFileVarProto fv)
+static BOOL YParse(TProto *pv)
 {
-	PYVar pv = fv->data;
-	switch (pv->YMode) {
+	PYVar yv = pv->PrivateData;
+	PFileVarProto fv = yv->fv;
+	switch (yv->YMode) {
 	case IdYReceive:
-		return YReadPacket(fv,pv);
+		return YReadPacket(fv,yv);
 		break;
 	case IdYSend:
-		return YSendPacket(fv,pv);
+		return YSendPacket(fv,yv);
 		break;
 	case IdYQuit:
 		return FALSE;
@@ -1162,27 +1169,36 @@ static BOOL YParse(PFileVarProto fv)
 	}
 }
 
-static int SetOptV(PFileVarProto fv, int request, va_list ap)
+static int SetOptV(TProto *pv, int request, va_list ap)
 {
-	PYVar pv = fv->data;
+	PYVar yv = pv->PrivateData;
 	switch(request) {
 	case YMODEM_MODE: {
 		YMODEM_MODE_T Mode = va_arg(ap, YMODEM_MODE_T);
-		pv->YMode = Mode;
+		yv->YMode = Mode;
 		return 0;
 	}
 	case YMODEM_OPT: {
 		WORD Opt1 = va_arg(ap, int);
-		pv->YOpt = Opt1;
+		yv->YOpt = Opt1;
 		return 0;
 	}
 	}
 	return -1;
 }
 
-static void Destroy(PFileVarProto fv)
+static int SetOpt(TProto *pv, int request, ...)
 {
-	PYVar yv = fv->data;
+	va_list ap;
+	va_start(ap, request);
+	int r = SetOptV(pv, request, ap);
+	va_end(ap);
+	return r;
+}
+
+static void Destroy(TProto *pv)
+{
+	PYVar yv = pv->PrivateData;
 	if (yv->log != NULL) {
 		TProtoLog* log = yv->log;
 		log->Destory(log);
@@ -1191,7 +1207,8 @@ static void Destroy(PFileVarProto fv)
 	free((void *)yv->FullName);
 	yv->FullName = NULL;
 	free(yv);
-	fv->data = NULL;
+	pv->PrivateData = NULL;
+	free(pv);
 }
 
 static const TProtoOp Op = {
@@ -1199,22 +1216,29 @@ static const TProtoOp Op = {
 	YParse,
 	YTimeOutProc,
 	YCancel,
+	SetOpt,
 	SetOptV,
 	Destroy,
 };
 
-BOOL YCreate(PFileVarProto fv)
+TProto *YCreate(PFileVarProto fv)
 {
-	PYVar pv;
-	pv = malloc(sizeof(TYVar));
+	TProto *pv = malloc(sizeof(*pv));
 	if (pv == NULL) {
-		return FALSE;
+		return NULL;
 	}
-	memset(pv, 0, sizeof(*pv));
-	pv->FileOpen = FALSE;
-	pv->Comm = fv->Comm;
-	fv->data = pv;
-	fv->ProtoOp = &Op;
+	pv->Op = &Op;
+	PYVar yv = malloc(sizeof(TYVar));
+	pv->PrivateData = yv;
+	if (yv == NULL) {
+		free(pv);
+		return NULL;
+	}
+	memset(yv, 0, sizeof(*yv));
+	yv->FileOpen = FALSE;
+	yv->Comm = fv->Comm;
+	yv->file = fv->file_fv;
+	yv->fv = fv;
 
-	return TRUE;
+	return pv;
 }

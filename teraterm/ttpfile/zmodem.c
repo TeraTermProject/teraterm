@@ -124,6 +124,8 @@ typedef struct {
 	char sendbuf[LOGBUFSIZE];
 
 	TComm *Comm;
+	PFileVarProto fv;
+	TFileIO *file;
 } TZVar;
 typedef TZVar *PZVar;
 
@@ -261,7 +263,7 @@ static const char *hdrtype_name(int type)
 		return NULL;
 }
 
-static int ZRead1Byte(PFileVarProto fv, PZVar zv, LPBYTE b)
+static int ZRead1Byte(PZVar zv, LPBYTE b)
 {
 	char *s;
 
@@ -288,7 +290,7 @@ static int ZRead1Byte(PFileVarProto fv, PZVar zv, LPBYTE b)
 	return 1;
 }
 
-static int ZWrite(PFileVarProto fv, PZVar zv, PCHAR B, int C)
+static int ZWrite(PZVar zv, PCHAR B, int C)
 {
 	int i, j;
 	char *s;
@@ -473,7 +475,7 @@ static void ZSendRInit(PFileVarProto fv, PZVar zv)
 	fv->FTSetTimeOut(fv, zv->TOutInit);
 }
 
-static void ZSendRQInit(PFileVarProto fv, PZVar zv, PComVar cv)
+static void ZSendRQInit(PZVar zv)
 {
 	ZStoHdr(zv, 0);
 	ZShHdr(zv, ZRQINIT);
@@ -574,7 +576,7 @@ static void ZSendFileHdr(PZVar zv)
 static void ZSendFileDat(PFileVarProto fv, PZVar zv)
 {
 	int i, j;
-	TFileIO *file = fv->file;
+	TFileIO *file = zv->file;
 	char *filename;
 
 	if (!zv->FileOpen) {
@@ -649,7 +651,7 @@ static void ZSendDataDat(PFileVarProto fv, PZVar zv)
 {
 	int c;
 	BYTE b;
-	TFileIO *file = fv->file;
+	TFileIO *file = zv->file;
 
 	if (zv->Pos >= zv->FileSize) {
 		zv->Pos = zv->FileSize;
@@ -703,10 +705,11 @@ static void ZSendDataDat(PFileVarProto fv, PZVar zv)
 	add_sendbuf(zv, "%s: ", __FUNCTION__);
 }
 
-static BOOL ZInit(PFileVarProto fv, PComVar cv, PTTSet ts)
+static BOOL ZInit(TProto *pv, PComVar cv, PTTSet ts)
 {
+	PZVar zv = pv->PrivateData;
+	PFileVarProto fv = zv->fv;
 	int Max;
-	PZVar zv = fv->data;
 
 	zv->CtlEsc = ((ts->FTFlag & FT_ZESCCTL) != 0);
 	zv->MaxDataLen = ts->ZmodemDataLen;
@@ -794,21 +797,21 @@ static BOOL ZInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 
 		// ファイル送信開始前に、"rz"を自動的に呼び出す。(2007.12.21 yutaka)
 		if (ts->ZModemRcvCommand[0] != '\0') {
-			ZWrite(fv, zv, ts->ZModemRcvCommand,
-				   strlen(ts->ZModemRcvCommand));
-			ZWrite(fv, zv, "\015", 1);
+			ZWrite(zv, ts->ZModemRcvCommand, strlen(ts->ZModemRcvCommand));
+			ZWrite(zv, "\015", 1);
 		}
 
-		ZSendRQInit(fv, zv, cv);
+		ZSendRQInit(zv);
 		break;
 	}
 
 	return TRUE;
 }
 
-static void ZTimeOutProc(PFileVarProto fv)
+static void ZTimeOutProc(TProto *pv)
 {
-	PZVar zv = fv->data;
+	PZVar zv = pv->PrivateData;
+	PFileVarProto fv = zv->fv;
 	switch (zv->ZState) {
 	case Z_RecvInit:
 		ZSendRInit(fv, zv);
@@ -821,6 +824,8 @@ static void ZTimeOutProc(PFileVarProto fv)
 		break;
 	case Z_RecvFIN:
 		zv->ZState = Z_End;
+		break;
+	default:
 		break;
 	}
 }
@@ -850,6 +855,8 @@ static BOOL ZCheckHdr(PFileVarProto fv, PZVar zv)
 		case Z_RecvData:
 			ZSendRPOS(fv, zv);
 			break;
+		default:
+			break;
 		}
 	}
 	zv->RxType = zv->PktIn[0];
@@ -862,7 +869,7 @@ static BOOL ZCheckHdr(PFileVarProto fv, PZVar zv)
 static void ZParseRInit(PFileVarProto fv, PZVar zv)
 {
 	int Max;
-	TFileIO *file = fv->file;
+	TFileIO *file = zv->file;
 	char *filename;
 
 	if ((zv->ZState != Z_SendInit) && (zv->ZState != Z_SendEOF))
@@ -924,7 +931,7 @@ static BOOL ZParseSInit(PZVar zv)
 
 static void ZParseHdr(PFileVarProto fv, PZVar zv)
 {
-	TFileIO *file = fv->file;
+	TFileIO *file = zv->file;
 	add_recvbuf(zv, "%s: RxType %s ", __FUNCTION__, hdrtype_name(zv->RxType));
 
 	switch (zv->RxType) {
@@ -953,6 +960,8 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv)
 				zv->Pos = zv->LastPos;
 				ZSendDataHdr(zv);
 			}
+			break;
+		default:
 			break;
 		}
 		break;
@@ -986,6 +995,8 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv)
 		case Z_SendFileDat:
 			ZSendFileHdr(zv);
 			break;
+		default:
+			break;
 		}
 		break;
 	case ZABORT:
@@ -1004,7 +1015,7 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv)
 			fv->FTSetTimeOut(fv, zv->TOutFin);
 		} else {
 			zv->ZState = Z_End;
-			ZWrite(fv, zv, "OO", 2);
+			ZWrite(zv, "OO", 2);
 		}
 		break;
 	case ZRPOS:
@@ -1018,6 +1029,8 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv)
 			zv->LastPos = zv->Pos;
 			add_recvbuf(zv, " pos=%ld", zv->Pos);
 			ZSendDataHdr(zv);
+			break;
+		default:
 			break;
 		}
 		break;
@@ -1059,10 +1072,10 @@ static void ZParseHdr(PFileVarProto fv, PZVar zv)
 	zv->PktInCount = 0;
 }
 
-static BOOL FTCreateFile(PFileVarProto fv)
+static BOOL FTCreateFile(PZVar zv)
 {
-	TFileIO *file = fv->file;
-	PZVar zv = fv->data;
+	PFileVarProto fv = zv->fv;
+	TFileIO *file = zv->file;
 
 	fv->InfoOp->SetDlgProtoFileName(fv, zv->FullName);
 	zv->FileOpen = file->OpenWrite(file, zv->FullName);
@@ -1092,7 +1105,7 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 	long modtime;
 	int mode;
 	int ret;
-	TFileIO* file = fv->file;
+	TFileIO* file = zv->file;
 	char *RecievePath;
 
 	if ((zv->ZState != Z_RecvInit) && (zv->ZState != Z_RecvInit2))
@@ -1110,7 +1123,7 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 	free(RecievePath);
 
 	/* file open */
-	if (!FTCreateFile(fv))
+	if (!FTCreateFile(zv))
 		return FALSE;
 
 	/* file size */
@@ -1149,7 +1162,7 @@ static BOOL ZParseFile(PFileVarProto fv, PZVar zv)
 
 static BOOL ZWriteData(PFileVarProto fv, PZVar zv)
 {
-	TFileIO *file = fv->file;
+	TFileIO *file = zv->file;
 	int i;
 	BYTE b;
 
@@ -1197,6 +1210,8 @@ static void ZCheckData(PFileVarProto fv, PZVar zv)
 			break;
 		case Z_RecvData:
 			ZSendRPOS(fv, zv);
+			break;
+		default:
 			break;
 		}
 		zv->ZPktState = Z_PktGetPAD;
@@ -1256,9 +1271,10 @@ static void ZCheckData(PFileVarProto fv, PZVar zv)
 	}
 }
 
-static BOOL ZParse(PFileVarProto fv)
+static BOOL ZParse(TProto *pv)
 {
-	PZVar zv = fv->data;
+	PZVar zv = pv->PrivateData;
+	PFileVarProto fv = zv->fv;
 	BYTE b;
 	int c;
 
@@ -1267,8 +1283,7 @@ static BOOL ZParse(PFileVarProto fv)
 		if (zv->Sending) {
 			c = 1;
 			while ((c > 0) && (zv->PktOutCount > 0)) {
-				c = ZWrite(fv, zv, &(zv->PktOut[zv->PktOutPtr]),
-						   zv->PktOutCount);
+				c = ZWrite(zv, &(zv->PktOut[zv->PktOutPtr]), zv->PktOutCount);
 				zv->PktOutPtr = zv->PktOutPtr + c;
 				zv->PktOutCount = zv->PktOutCount - c;
 			}
@@ -1278,7 +1293,7 @@ static BOOL ZParse(PFileVarProto fv)
 				return TRUE;
 		}
 
-		c = ZRead1Byte(fv, zv, &b);
+		c = ZRead1Byte(zv, &b);
 		while (c > 0) {
 			if (zv->ZState == Z_RecvFIN) {
 				if (b == 'O')
@@ -1476,7 +1491,7 @@ static BOOL ZParse(PFileVarProto fv)
 				}
 				break;
 			}
-			c = ZRead1Byte(fv, zv, &b);
+			c = ZRead1Byte(zv, &b);
 		}
 
 		if (!zv->Sending)
@@ -1494,6 +1509,8 @@ static BOOL ZParse(PFileVarProto fv)
 			case Z_Cancel:
 				zv->ZState = Z_End;
 				break;
+			default:
+				break;
 			}
 
 		if (zv->Sending && (zv->PktOutCount > 0))
@@ -1505,15 +1522,15 @@ static BOOL ZParse(PFileVarProto fv)
 	return TRUE;
 }
 
-static void ZCancel(PFileVarProto fv)
+static void ZCancel(TProto *pv)
 {
-	PZVar zv = fv->data;
+	PZVar zv = pv->PrivateData;
 	ZSendCancel(zv);
 }
 
-static int SetOptV(PFileVarProto fv, int request, va_list ap)
+static int SetOptV(TProto *pv, int request, va_list ap)
 {
-	PZVar zv = fv->data;
+	PZVar zv = pv->PrivateData;
 	switch(request) {
 	case ZMODEM_MODE: {
 		int Mode = va_arg(ap, int);
@@ -1529,9 +1546,18 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 	return -1;
 }
 
-static void Destroy(PFileVarProto fv)
+static int SetOpt(TProto *pv, int request, ...)
 {
-	PZVar zv = fv->data;
+	va_list ap;
+	va_start(ap, request);
+	int r = SetOptV(pv, request, ap);
+	va_end(ap);
+	return r;
+}
+
+static void Destroy(TProto *pv)
+{
+	PZVar zv = pv->PrivateData;
 	if (zv->log != NULL) {
 		TProtoLog* log = zv->log;
 		log->Destory(log);
@@ -1540,7 +1566,8 @@ static void Destroy(PFileVarProto fv)
 	free((void *)zv->FullName);
 	zv->FullName = NULL;
 	free(zv);
-	fv->data = NULL;
+	pv->PrivateData = NULL;
+	free(pv);
 }
 
 static const TProtoOp Op = {
@@ -1548,22 +1575,29 @@ static const TProtoOp Op = {
 	ZParse,
 	ZTimeOutProc,
 	ZCancel,
+	SetOpt,
 	SetOptV,
 	Destroy,
 };
 
-BOOL ZCreate(PFileVarProto fv)
+TProto *ZCreate(PFileVarProto fv)
 {
-	PZVar zv;
-	zv = malloc(sizeof(TZVar));
+	TProto *pv = malloc(sizeof(*pv));
+	if (pv == NULL) {
+		return NULL;
+	}
+	pv->Op = &Op;
+	PZVar zv = malloc(sizeof(TZVar));
+	pv->PrivateData = zv;
 	if (zv == NULL) {
-		return FALSE;
+		free(pv);
+		return NULL;
 	}
 	memset(zv, 0, sizeof(*zv));
 	zv->FileOpen = FALSE;
 	zv->Comm = fv->Comm;
-	fv->data = zv;
-	fv->ProtoOp = &Op;
+	zv->file = fv->file_fv;
+	zv->fv = fv;
 
-	return TRUE;
+	return pv;
 }

@@ -253,7 +253,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	fv->Success = FALSE;
 	fv->NoMsg = FALSE;
 
-	fv->file = FilesysCreateWin32();
+	fv->file_fv = FilesysCreateWin32();
 
 	fv->GetNextFname = GetNextFname;
 	fv->GetRecievePath = GetRecievePath;
@@ -278,14 +278,14 @@ static void FreeFileVar_(PFileVarProto *pfv)
 		return;
 	}
 
-	if (fv->ProtoOp != NULL) {
-		fv->ProtoOp->Destroy(fv);
+	if (fv->Proto != NULL) {
+		fv->Proto->Op->Destroy(fv->Proto);
 	}
 
 	if (fv->FileNames != NULL) {
 		free(fv->FileNames);
 	}
-	fv->file->FileSysDestroy(fv->file);
+	fv->file_fv->FileSysDestroy(fv->file_fv);
 	free(fv->DlgCaption);
 	fv->DlgCaption = NULL;
 	free(fv->RecievePath);
@@ -298,53 +298,64 @@ static void FreeFileVar_(PFileVarProto *pfv)
 	*pfv = NULL;
 }
 
-static int _ProtoSetOpt(PFileVarProto fv, int request, ...)
-{
-	va_list ap;
-	va_start(ap, request);
-	int r = fv->ProtoOp->SetOptV(fv, request, ap);
-	va_end(ap);
-	return r;
-}
-
 static BOOL OpenProtoDlg(PFileVarProto fv, ProtoId_t IdProto, int Mode, WORD Opt1, WORD Opt2)
 {
 	PProtoDlg pd;
+	TProto *proto;
 
 	switch (IdProto) {
 		case PROTO_KMT:
-			KmtCreate(fv);
-			_ProtoSetOpt(fv, KMT_MODE, Mode);
+			proto = KmtCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, KMT_MODE, Mode);
 			break;
 		case PROTO_XM:
-			XCreate(fv);
-			_ProtoSetOpt(fv, XMODEM_MODE, Mode);
-			_ProtoSetOpt(fv, XMODEM_OPT, Opt1);
-			_ProtoSetOpt(fv, XMODEM_TEXT_FLAG, 1 - (Opt2 & 1));
+			proto = XCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, XMODEM_MODE, Mode);
+			proto->Op->SetOpt(proto, XMODEM_OPT, Opt1);
+			proto->Op->SetOpt(proto, XMODEM_TEXT_FLAG, 1 - (Opt2 & 1));
 			break;
 		case PROTO_YM:
-			YCreate(fv);
-			_ProtoSetOpt(fv, YMODEM_MODE, Mode);
-			_ProtoSetOpt(fv, YMODEM_OPT, Opt1);
+			proto = YCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, YMODEM_MODE, Mode);
+			proto->Op->SetOpt(proto, YMODEM_OPT, Opt1);
 			break;
 		case PROTO_ZM:
-			ZCreate(fv);
-			_ProtoSetOpt(fv, ZMODEM_MODE, Mode);
-			_ProtoSetOpt(fv, ZMODEM_BINFLAG, (Opt1 & 1) != 0);
+			proto = ZCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, ZMODEM_MODE, Mode);
+			proto->Op->SetOpt(proto, ZMODEM_BINFLAG, (Opt1 & 1) != 0);
 			break;
 		case PROTO_BP:
-			BPCreate(fv);
-			_ProtoSetOpt(fv, BPLUS_MODE, Mode);
+			proto = BPCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, BPLUS_MODE, Mode);
 			break;
 		case PROTO_QV:
-			QVCreate(fv);
-			_ProtoSetOpt(fv, QUICKVAN_MODE, Mode);
+			proto = QVCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, QUICKVAN_MODE, Mode);
 			break;
 		default:
 			assert(FALSE);
 			return FALSE;
 			break;
 	}
+	fv->Proto = proto;
 
 	pd = new CProtoDlg();
 	if (pd==NULL)
@@ -358,7 +369,7 @@ static BOOL OpenProtoDlg(PFileVarProto fv, ProtoId_t IdProto, int Mode, WORD Opt
 	fv->HWin = pd->m_hWnd;
 	PtDlg = pd;
 
-	BOOL r = fv->ProtoOp->Init(fv, &cv, &ts);
+	BOOL r = fv->Proto->Op->Init(fv->Proto, &cv, &ts);
 	if (r == FALSE) {
 		//fv->Destroy(fv);
 		return FALSE;
@@ -788,7 +799,7 @@ int ProtoDlgParse(void)
 	CommReceive(&cv); //ダイアログ表示中に受信したデータを処理できるように読み取りを行わせる
 
 	PFileVarProto fv = FileVar;
-	if (fv->ProtoOp->Parse(fv))
+	if (fv->Proto->Op->Parse(fv->Proto))
 		// 処理を継続する
 		P = 0;
 	else {
@@ -808,7 +819,7 @@ void ProtoDlgTimeOut(void)
 		PFileVarProto fv = FileVar;
 
 		// タイムアウトが発生したことを通知する
-		fv->ProtoOp->TimeOutProc(fv);
+		fv->Proto->Op->TimeOutProc(fv->Proto);
 	}
 }
 
@@ -821,7 +832,7 @@ void ProtoDlgCancel(void)
 		PFileVarProto fv = FileVar;
 
 		// キャンセルが押されたことを通知する
-		fv->ProtoOp->Cancel(fv);
+		fv->Proto->Op->Cancel(fv->Proto);
 	}
 }
 
