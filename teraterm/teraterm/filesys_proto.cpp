@@ -60,6 +60,15 @@
 #include "bplus.h"
 #include "quickvan.h"
 
+typedef enum {
+	PROTO_KMT = 1,
+	PROTO_XM = 2,
+	PROTO_ZM = 3,
+	PROTO_BP = 4,
+	PROTO_QV = 5,
+	PROTO_YM = 6,
+} ProtoId_t;
+
 #define TitKmtRcv   L"Kermit Receive"
 #define TitKmtGet   L"Kermit Get"
 #define TitKmtSend  L"Kermit Send"
@@ -188,6 +197,38 @@ static const TInfoOp InfoOp = {
 	_SetDlgProtoFileName,
 };
 
+static void Insert1Byte(struct Comm_ *comm, BYTE b)
+{
+	PComVar pcv = (PComVar)comm->private_data;
+	CommInsert1Byte(pcv, b);
+}
+
+static int Read1Byte(struct Comm_ *comm, BYTE *b)
+{
+	PComVar pcv = (PComVar)comm->private_data;
+	return CommRead1Byte(pcv, b);
+}
+
+static int BinaryOut(struct Comm_ *comm, const CHAR *buf, size_t len)
+{
+	PComVar pcv = (PComVar)comm->private_data;
+	return CommBinaryOut(pcv, (PCHAR)buf, (int)len);
+}
+
+static void FlashReceiveBuf(struct Comm_ *comm)
+{
+	PComVar pcv = (PComVar)comm->private_data;
+	pcv->InBuffCount = 0;
+	pcv->InPtr = 0;
+}
+
+static const CommOp CommOpList =  {
+	BinaryOut,
+	Read1Byte,
+	Insert1Byte,
+	FlashReceiveBuf,
+};
+
 static BOOL NewFileVar_(PFileVarProto *pfv)
 {
 	if (*pfv != NULL) {
@@ -221,6 +262,11 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 
 	fv->InfoOp = &InfoOp;
 
+	fv->Comm = (TComm *)malloc(sizeof(TComm));
+	fv->Comm->private_data = (void *)&cv;
+	CommOp const **comm_op_ptr = (CommOp const **)&fv->Comm->op;
+	*comm_op_ptr = &CommOpList;
+
 	*pfv = fv;
 	return TRUE;
 }
@@ -244,6 +290,9 @@ static void FreeFileVar_(PFileVarProto *pfv)
 	fv->DlgCaption = NULL;
 	free(fv->RecievePath);
 	fv->RecievePath = NULL;
+	free((void *)fv->Comm);
+	fv->Comm = NULL;
+
 	free(fv);
 
 	*pfv = NULL;
@@ -265,51 +314,35 @@ static BOOL OpenProtoDlg(PFileVarProto fv, ProtoId_t IdProto, int Mode, WORD Opt
 	switch (IdProto) {
 		case PROTO_KMT:
 			KmtCreate(fv);
-			break;
-		case PROTO_XM:
-			XCreate(fv);
-			break;
-		case PROTO_YM:
-			YCreate(fv);
-			break;
-		case PROTO_ZM:
-			ZCreate(fv);
-			break;
-		case PROTO_BP:
-			BPCreate(fv);
-			break;
-		case PROTO_QV:
-			QVCreate(fv);
-			break;
-		default:
-			assert(FALSE);
-			return FALSE;
-			break;
-	}
-	fv->ProtoId = IdProto;
-
-	switch (fv->ProtoId) {
-		case PROTO_KMT:
 			_ProtoSetOpt(fv, KMT_MODE, Mode);
 			break;
 		case PROTO_XM:
+			XCreate(fv);
 			_ProtoSetOpt(fv, XMODEM_MODE, Mode);
 			_ProtoSetOpt(fv, XMODEM_OPT, Opt1);
 			_ProtoSetOpt(fv, XMODEM_TEXT_FLAG, 1 - (Opt2 & 1));
 			break;
 		case PROTO_YM:
+			YCreate(fv);
 			_ProtoSetOpt(fv, YMODEM_MODE, Mode);
 			_ProtoSetOpt(fv, YMODEM_OPT, Opt1);
 			break;
 		case PROTO_ZM:
+			ZCreate(fv);
 			_ProtoSetOpt(fv, ZMODEM_MODE, Mode);
 			_ProtoSetOpt(fv, ZMODEM_BINFLAG, (Opt1 & 1) != 0);
 			break;
 		case PROTO_BP:
+			BPCreate(fv);
 			_ProtoSetOpt(fv, BPLUS_MODE, Mode);
 			break;
 		case PROTO_QV:
+			QVCreate(fv);
 			_ProtoSetOpt(fv, QUICKVAN_MODE, Mode);
+			break;
+		default:
+			assert(FALSE);
+			return FALSE;
 			break;
 	}
 

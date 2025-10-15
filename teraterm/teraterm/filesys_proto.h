@@ -31,15 +31,6 @@
 #include "filesys_io.h"
 
 typedef enum {
-	PROTO_KMT = 1,
-	PROTO_XM = 2,
-	PROTO_ZM = 3,
-	PROTO_BP = 4,
-	PROTO_QV = 5,
-	PROTO_YM = 6,
-} ProtoId_t;
-
-typedef enum {
 	OpKmtRcv  = 3,
 	OpKmtGet  = 4,
 	OpKmtSend = 5,
@@ -56,10 +47,30 @@ typedef enum {
 	OpYSend   = 16,
 } OpId_t;
 
+struct Comm_;
+
+typedef struct CommOp_ {
+	// 1byte送信
+	int (*BinaryOut)(struct Comm_ *comm, const CHAR *buf, size_t len);
+
+	// 1byte受信
+	int (*Read1Byte)(struct Comm_ *comm, BYTE *b);
+
+	// 1byte送信,送信バッファの先頭に入れる
+	void (*Insert1Byte)(struct Comm_ *comm, BYTE b);
+
+	// 受信バッファをクリアする
+	void (*FlashReceiveBuf)(struct Comm_ *comm);
+} CommOp;
+
+typedef struct Comm_ {
+	const CommOp *op;
+	void *private_data;
+} TComm;
+
 typedef struct FileVarProto {
 	// ↓protosys_proto.cpp内のみ使用
 
-	ProtoId_t ProtoId;
 	OpId_t OpId;
 
 	HWND HMainWin;
@@ -94,6 +105,9 @@ typedef struct FileVarProto {
 
 	// UI
 	const struct InfoOp_ *InfoOp;
+
+	// comm
+	TComm *Comm;
 
 	TFileIO *file;
 } TFileVarProto;
