@@ -788,7 +788,7 @@ int ProtoDlgParse(void)
 	CommReceive(&cv); //ダイアログ表示中に受信したデータを処理できるように読み取りを行わせる
 
 	PFileVarProto fv = FileVar;
-	if (fv->ProtoOp->Parse(fv, &cv))
+	if (fv->ProtoOp->Parse(fv))
 		// 処理を継続する
 		P = 0;
 	else {
@@ -808,7 +808,7 @@ void ProtoDlgTimeOut(void)
 		PFileVarProto fv = FileVar;
 
 		// タイムアウトが発生したことを通知する
-		fv->ProtoOp->TimeOutProc(fv, &cv);
+		fv->ProtoOp->TimeOutProc(fv);
 	}
 }
 
@@ -821,7 +821,7 @@ void ProtoDlgCancel(void)
 		PFileVarProto fv = FileVar;
 
 		// キャンセルが押されたことを通知する
-		fv->ProtoOp->Cancel(fv, &cv);
+		fv->ProtoOp->Cancel(fv);
 	}
 }
 

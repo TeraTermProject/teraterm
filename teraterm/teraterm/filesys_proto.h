@@ -124,13 +124,13 @@ typedef struct ProtoOp_ {
 	// 処理の継続
 	//	@retval	TRUE	正常、処理を継続終了
 	//	@retval	FALSE	終了、引き続きParse()を呼ぶ必要なし
-	BOOL (*Parse)(struct FileVarProto *fv, PComVar cv);
+	BOOL (*Parse)(struct FileVarProto *fv);
 	// タイムアウト通知
 	//	タイムアウトが発生したことをプロトコル処理に通知
-	void (*TimeOutProc)(struct FileVarProto *fv, PComVar cv);
+	void (*TimeOutProc)(struct FileVarProto *fv);
 	// キャンセル通知
 	//	ユーザーがキャンセルしたことをプロトコル処理に通知
-	void (*Cancel)(struct FileVarProto *fv, PComVar cv);
+	void (*Cancel)(struct FileVarProto *fv);
 	// パラメータ設定
 	//	プロトコルごとのパラメータ設定
 	int (*SetOptV)(struct FileVarProto *fv, int request, va_list ap);

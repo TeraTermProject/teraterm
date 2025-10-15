@@ -31,7 +31,7 @@
 #include <assert.h>
 
 #include "tttypes.h"
-#include "ttcommon.h"
+//#include "ttcommon.h"
 #include "ftlib.h"
 #include "protolog.h"
 #include "filesys_proto.h"
@@ -75,6 +75,8 @@ typedef struct {
 	DWORD StartTime;
 
 	DWORD FileMtime;
+
+	TComm *Comm;
 } TYVar;
 typedef TYVar *PYVar;
 
@@ -102,11 +104,11 @@ typedef TYVar *PYVar;
 #define XnakNAK 1
 #define XnakC 2
 
-static void YCancel(PFileVarProto fv, PComVar cv);
+static void YCancel(PFileVarProto fv);
 
-static int YRead1Byte(PFileVarProto fv, PYVar yv, PComVar cv, LPBYTE b)
+static int YRead1Byte(PFileVarProto fv, PYVar yv, LPBYTE b)
 {
-	if (CommRead1Byte(cv,b) == 0)
+	if (yv->Comm->op->Read1Byte(yv->Comm, b) == 0)
 		return 0;
 
 	if (yv->log != NULL)
@@ -125,11 +127,11 @@ static int YRead1Byte(PFileVarProto fv, PYVar yv, PComVar cv, LPBYTE b)
 	return 1;
 }
 
-static int YWrite(PFileVarProto fv, PYVar yv, PComVar cv, PCHAR B, int C)
+static int YWrite(PFileVarProto fv, PYVar yv, PCHAR B, int C)
 {
 	int i, j;
 
-	i = CommBinaryOut(cv,B,C);
+	i = yv->Comm->op->BinaryOut(yv->Comm, B, C);
 	if (yv->log != NULL && (i>0))
 	{
 		TProtoLog* log = yv->log;
@@ -177,14 +179,13 @@ static void YSetOpt(PFileVarProto fv, PYVar yv, WORD Opt)
 	fv->InfoOp->SetDlgProtoText(fv, Tmp);
 }
 
-static void YSendNAK(PFileVarProto fv, PYVar yv, PComVar cv)
+static void YSendNAK(PFileVarProto fv, PYVar yv)
 {
 	BYTE b;
 	int t;
 
 	/* flush comm buffer */
-	cv->InBuffCount = 0;
-	cv->InPtr = 0;
+	yv->Comm->op->FlashReceiveBuf(yv->Comm);
 
 	yv->NAKCount--;
 	if (yv->NAKCount<0)
@@ -196,7 +197,7 @@ static void YSendNAK(PFileVarProto fv, PYVar yv, PComVar cv)
 			yv->NAKCount = 9;
 		}
 		else {
-			YCancel(fv,cv);
+			YCancel(fv);
 			return;
 		}
 	}
@@ -213,19 +214,18 @@ static void YSendNAK(PFileVarProto fv, PYVar yv, PComVar cv)
 		b = 'C';
 		t = yv->TOutInitCRC;
 	}
-	YWrite(fv,yv,cv,&b,1);
+	YWrite(fv,yv,&b,1);
 	yv->PktReadMode = XpktSOH;
 	fv->FTSetTimeOut(fv,t);
 }
 
-static void YSendNAKTimeout(PFileVarProto fv, PYVar yv, PComVar cv)
+static void YSendNAKTimeout(PFileVarProto fv, PYVar yv)
 {
 	BYTE b;
 	int t;
 
 	/* flush comm buffer */
-	cv->InBuffCount = 0;
-	cv->InPtr = 0;
+	yv->Comm->op->FlashReceiveBuf(yv->Comm);
 
 	yv->NAKCount--;
 	if (yv->NAKCount<0)
@@ -237,7 +237,7 @@ static void YSendNAKTimeout(PFileVarProto fv, PYVar yv, PComVar cv)
 			yv->NAKCount = 9;
 		}
 		else {
-			YCancel(fv,cv);
+			YCancel(fv);
 			return;
 		}
 	}
@@ -255,7 +255,7 @@ static void YSendNAKTimeout(PFileVarProto fv, PYVar yv, PComVar cv)
 		b = 'C';
 		t = yv->TOutInitCRC;
 	}
-	YWrite(fv,yv,cv,&b,1);
+	YWrite(fv,yv,&b,1);
 	yv->PktReadMode = XpktSOH;
 	fv->FTSetTimeOut(fv,t);
 }
@@ -407,7 +407,7 @@ static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 			char inistr[MAX_PATH + 10];
 			_snprintf_s(inistr, sizeof(inistr), _TRUNCATE, "%s\015",
 			            ts->YModemRcvCommand);
-			YWrite(fv,yv,cv, inistr , strlen(inistr));
+			YWrite(fv, yv, inistr , strlen(inistr));
 		}
 
 		fv->FTSetTimeOut(fv, yv->TOutVLong);
@@ -417,11 +417,11 @@ static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 #if 0   // for debug
 		strcpy(inistr, "sb -b svnrev.exe lrzsz-0.12.20.tar.gz\r\n");
 //		strcpy(inistr, "sb url3.txt url4.txt url5.txt\r\n");
-		YWrite(fv,yv,cv, inistr , strlen(inistr));
+		YWrite(fv, yv, inistr , strlen(inistr));
 #endif
 		yv->TextFlag = 0;
 
-		YSendNAK(fv,yv,cv);
+		YSendNAK(fv,yv);
 
 		break;
 	default:
@@ -432,7 +432,7 @@ static BOOL YInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	return TRUE;
 }
 
-static void YCancel(PFileVarProto fv, PComVar cv)
+static void YCancel(PFileVarProto fv)
 {
 	// five cancels & five backspaces per spec
 	static const BYTE cancel[] = {
@@ -440,11 +440,11 @@ static void YCancel(PFileVarProto fv, PComVar cv)
 	};
 	PYVar yv = fv->data;
 
-	YWrite(fv,yv,cv, (PCHAR)&cancel, sizeof(cancel));
+	YWrite(fv, yv, (PCHAR)&cancel, sizeof(cancel));
 	yv->YMode = IdYQuit;	// quit
 }
 
-static void YTimeOutProc(PFileVarProto fv, PComVar cv)
+static void YTimeOutProc(PFileVarProto fv)
 {
 	PYVar yv = fv->data;
 	switch (yv->YMode) {
@@ -453,9 +453,9 @@ static void YTimeOutProc(PFileVarProto fv, PComVar cv)
 		break;
 	case IdYReceive:
 		if ((yv->PktNum == 0) && yv->PktNumOffset == 0)
-			YSendNAK(fv,yv,cv);
+			YSendNAK(fv,yv);
 		else
-			YSendNAKTimeout(fv,yv,cv);
+			YSendNAKTimeout(fv,yv);
 		break;
 	case IdYQuit:
 		// キャンセルが連続して発生?
@@ -500,14 +500,14 @@ static BOOL FTCreateFile(PFileVarProto fv)
 //
 // return TRUE: ファイル受信中
 //        FALSE: 受信完了
-static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
+static BOOL YReadPacket(PFileVarProto fv, PYVar yv)
 {
 	BYTE b, d;
 	int i, c, nak;
 	BOOL GetPkt;
 	TFileIO *file = fv->file;
 
-	c = YRead1Byte(fv,yv,cv,&b);
+	c = YRead1Byte(fv,yv,&b);
 
 	GetPkt = FALSE;
 
@@ -543,7 +543,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 
 					// 1回目のEOTに対してNAKを返す
 					b = NAK;
-					YWrite(fv,yv,cv,&b, 1);
+					YWrite(fv, yv, &b, 1);
 					return TRUE;
 				}
 
@@ -551,10 +551,10 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 
 				// EOTに対してACKを返す
 				b = ACK;
-				YWrite(fv,yv,cv,&b, 1);
+				YWrite(fv, yv, &b, 1);
 
 				// 次のファイル送信を促すため、'C'を送る。
-				YSendNAK(fv,yv,cv);
+				YSendNAK(fv,yv);
 
 				return TRUE;
 			}
@@ -565,8 +565,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			}
 			else {
 				/* flush comm buffer */
-				cv->InBuffCount = 0;
-				cv->InPtr = 0;
+				yv->Comm->op->FlashReceiveBuf(yv->Comm);
 				return TRUE;
 			}
 			break;
@@ -594,7 +593,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 				fv->FTSetTimeOut(fv,yv->TOutShort);
 			}
 			else
-				YSendNAK(fv,yv,cv);
+				YSendNAK(fv,yv);
 			break;
 		case XpktDATA:
 			yv->PktIn[yv->PktBufPtr] = b;
@@ -611,7 +610,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			break;
 		}
 
-		if (! GetPkt) c = YRead1Byte(fv,yv,cv,&b);
+		if (! GetPkt) c = YRead1Byte(fv,yv,&b);
 	}
 
 	if (! GetPkt) return TRUE;
@@ -619,7 +618,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	GetPkt = YCheckPacket(yv, yv->__DataLen);
 	if (! GetPkt)
 	{
-		YSendNAK(fv,yv,cv);
+		YSendNAK(fv,yv);
 		return TRUE;
 	}
 
@@ -632,7 +631,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 			c--;
 		if (c == 0) {
 		  b = ACK;
-		  YWrite(fv,yv,cv,&b, 1);
+		  YWrite(fv, yv, &b, 1);
 		  fv->Success = TRUE;
 		  return FALSE;
 		}
@@ -641,13 +640,13 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	d = yv->PktIn[1] - yv->PktNum;
 	if (d>1)
 	{
-		YCancel(fv,cv);
+		YCancel(fv);
 		return FALSE;
 	}
 
 	/* send ACK */
 	b = ACK;
-	YWrite(fv,yv,cv,&b, 1);
+	YWrite(fv, yv, &b, 1);
 	yv->NAKMode = YnakC;
 	yv->NAKCount = 10;
 
@@ -700,7 +699,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		yv->SendFileInfo = 1;
 
 		// 次のファイル送信を促すため、'C'を送る。
-		YSendNAK(fv,yv,cv);
+		YSendNAK(fv,yv);
 
 		free(p);
 		return TRUE;
@@ -745,7 +744,7 @@ static BOOL YReadPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 }
 
 // ファイル送信(local-to-remote)時に、YMODEMサーバからデータが送られてきたときに呼び出される。
-static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
+static BOOL YSendPacket(PFileVarProto fv, PYVar yv)
 {
 	// If current buffer is empty.
 	if (0 == yv->PktBufCount)
@@ -755,7 +754,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		while (continue_read)
 		{
 			BYTE isym = 0;
-			int is_success = YRead1Byte(fv, yv, cv, &isym);
+			int is_success = YRead1Byte(fv, yv, &isym);
 			if (0 == is_success) return TRUE;
 
 			// Analyze responce.
@@ -874,7 +873,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 		do
 		{
 			lastrx = firstch;
-			i = YRead1Byte(fv,yv,cv,&b);
+			i = YRead1Byte(fv,yv,&b);
 			if (i != 0) {
 				firstch = b;
 				if (firstch == CAN && lastrx == CAN) {
@@ -1097,7 +1096,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	// 後続のサーバからのデータを読み捨てる。
 	do {
 		lastrx = firstch;
-		i = YRead1Byte(fv,yv,cv,&b);
+		i = YRead1Byte(fv,yv,&b);
 		if (i != 0) {
 			firstch = b;
 			if (firstch == CAN && lastrx == CAN) {
@@ -1115,7 +1114,7 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	while (yv->PktBufCount > 0)
 	{
 		BYTE osym = yv->PktOut[yv->PktBufPtr];
-		int is_success = YWrite(fv, yv, cv, &osym, 1);
+		int is_success = YWrite(fv, yv, &osym, 1);
 		if (is_success > 0)
 		{
 			--yv->PktBufCount;
@@ -1145,15 +1144,15 @@ static BOOL YSendPacket(PFileVarProto fv, PYVar yv, PComVar cv)
 	return TRUE;
 }
 
-static BOOL YParse(PFileVarProto fv, PComVar cv)
+static BOOL YParse(PFileVarProto fv)
 {
 	PYVar pv = fv->data;
 	switch (pv->YMode) {
 	case IdYReceive:
-		return YReadPacket(fv,pv,cv);
+		return YReadPacket(fv,pv);
 		break;
 	case IdYSend:
-		return YSendPacket(fv,pv,cv);
+		return YSendPacket(fv,pv);
 		break;
 	case IdYQuit:
 		return FALSE;
@@ -1213,6 +1212,7 @@ BOOL YCreate(PFileVarProto fv)
 	}
 	memset(pv, 0, sizeof(*pv));
 	pv->FileOpen = FALSE;
+	pv->Comm = fv->Comm;
 	fv->data = pv;
 	fv->ProtoOp = &Op;
 
