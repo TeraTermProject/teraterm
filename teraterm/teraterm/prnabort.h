@@ -36,16 +36,21 @@
 class CPrnAbortDlg
 {
 public:
-	HWND GetSafeHwnd() const {return m_hWnd;}
+	CPrnAbortDlg();
 	BOOL Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PTTSet pts);
 	BOOL DestroyWindow();
+	int SetPrintDC(HDC hPrintDC);
+	BOOL IsAborted();
 
 private:
-	void OnCancel();
-	void PostNcDestroy();
 	HWND m_hWnd;
 	HWND m_hParentWnd;
 	BOOL *m_pAbort;
 	TTTSet *m_ts;
-	static LRESULT CALLBACK OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
+	BOOL m_PrintAbortFlag;
+	static HWND m_hWnd_static;
+
+	BOOL AbortProc(HDC PDC, int Code);
+	static INT_PTR CALLBACK OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
+	static BOOL CALLBACK AbortProcStatic(HDC hDC, int Error);
 };

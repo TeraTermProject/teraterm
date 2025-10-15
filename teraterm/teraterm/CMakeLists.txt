@@ -37,8 +37,6 @@ add_executable(
   filesys_proto.h
   keyboard.c
   keyboard.h
-  prnabort.cpp
-  prnabort.h
   scp.cpp
   scp.h
   sendmem.cpp
@@ -128,6 +126,8 @@ set(SRC_DIALOG
   mouse_pp.cpp
   mouse_pp.h
   mouse_pp.rc
+  prnabort.cpp
+  prnabort.h
   protodlg.cpp
   protodlg.h
   resource.h

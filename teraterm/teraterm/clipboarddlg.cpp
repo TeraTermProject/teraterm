@@ -65,7 +65,7 @@ static void TTGetCaretPos(HWND hDlgWnd, POINT *p)
 		 * vtdisp.c 内部で管理している値から計算する
 		 */
 		int x, y;
-		DispConvScreenToWin(CursorX, CursorY, &x, &y);
+		DispConvScreenToWin(vt_src, CursorX, CursorY, &x, &y);
 		p->x = x;
 		p->y = y;
 	}
