@@ -5085,11 +5085,6 @@ skip:
 		current_keys[mode].mac.enabled = 0;
 		current_keys[mode].comp.enabled = 0;
 
-
-		// この時点では disable
-		pvar->ssh2_keys[mode].mac.enabled = 0;
-		pvar->ssh2_keys[mode].comp.enabled = 0;
-
 		// 暗号アルゴリズムのキーサイズ、ブロックサイズ、MACサイズのうち最大値(we_need)を決定する
 		need = max(need, current_keys[mode].enc.key_len);
 		need = max(need, current_keys[mode].enc.block_size);
@@ -5670,11 +5665,13 @@ static void ssh2_set_newkeys(PTInstVar pvar, int mode)
 	if (pvar->ssh2_keys[mode].enc.key != NULL) {
 		free(pvar->ssh2_keys[mode].enc.key);
 	}
+	mac_clear(&pvar->ssh2_keys[mode].mac);
 	if (pvar->ssh2_keys[mode].mac.key != NULL) {
 		free(pvar->ssh2_keys[mode].mac.key);
 	}
 
 	pvar->ssh2_keys[mode] = current_keys[mode];
+
 	if (pvar->ssh2_keys[mode].enc.auth_len == 0) {
 		mac_init(&pvar->ssh2_keys[mode].mac);
 	}
@@ -5748,14 +5745,13 @@ static void ssh2_send_newkeys(PTInstVar pvar)
 	logprintf(LOG_LEVEL_VERBOSE, "%s: SSH2_MSG_NEWKEYS was sent.", __FUNCTION__);
 
 	// SSH2_MSG_NEWKEYS を送り終わった以降のパケットは暗号化される必要が有る為、
-	// この時点で送信方向の暗号化を開始する。
+	// 送信方向の暗号化を開始する。
 	ssh2_set_newkeys(pvar, MODE_OUT);
 	if (!CRYPT_start_encryption(pvar, 1, 0)) {
 		// TODO: error
 	}
 
-
-	// 同様に、MACとパケット圧縮もこの時点で有効にする。
+	// 同様に、MACおよび圧縮を有効にする。
 	pvar->ssh2_keys[MODE_OUT].mac.enabled = 1;
 	pvar->ssh2_keys[MODE_OUT].comp.enabled = 1;
 	enable_send_compression(pvar);
