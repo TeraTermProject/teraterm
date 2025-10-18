@@ -267,14 +267,18 @@ mac_check(struct Mac *mac, u_int32_t seqno,
 	if ((r = mac_compute(mac, seqno, data, dlen,
 	    ourmac, sizeof(ourmac))) != 0)
 		return r;
-	if (timingsafe_bcmp(ourmac, theirmac, mac->mac_len) != 0)
+	if (timingsafe_bcmp(ourmac, theirmac, mac->mac_len) != 0) {
+		// for debug
+		// logprintf_hexdump(LOG_LEVEL_VERBOSE, ourmac, mac->mac_len, "ourmac in mac_check():");
 		return SSH_ERR_MAC_INVALID;
+	}
 	return 0;
 }
 
 void
 mac_clear(struct Mac *mac)
 {
-	ssh_hmac_free(mac->hmac_ctx);
+	if (mac->hmac_ctx != NULL)
+		ssh_hmac_free(mac->hmac_ctx);
 	mac->hmac_ctx = NULL;
 }
