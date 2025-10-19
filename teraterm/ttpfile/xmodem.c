@@ -155,9 +155,10 @@ static void XCancel_(PXVar xv)
 	xv->state = STATE_CANCELED;		// quit
 }
 
-static void XSetOpt(PFileVarProto fv, PXVar xv, WORD Opt)
+static void XSetOpt(PXVar xv, WORD Opt)
 {
 	char Tmp[21];
+	PFileVarProto fv = xv->fv;
 
 	xv->XOpt = Opt;
 
@@ -187,10 +188,11 @@ static void XSetOpt(PFileVarProto fv, PXVar xv, WORD Opt)
 	fv->InfoOp->SetDlgProtoText(fv, Tmp);
 }
 
-static void XSendNAK(PFileVarProto fv, PXVar xv)
+static void XSendNAK(PXVar xv)
 {
 	BYTE b;
 	int t;
+	PFileVarProto fv = xv->fv;
 
 	/* flush comm buffer */
 	xv->Comm->op->FlashReceiveBuf(xv->Comm);
@@ -198,7 +200,7 @@ static void XSendNAK(PFileVarProto fv, PXVar xv)
 	xv->NAKCount--;
 	if (xv->NAKCount < 0) {
 		if (xv->NAKMode == XnakC) {
-			XSetOpt(fv, xv, XoptCheck);
+			XSetOpt(xv, XoptCheck);
 			xv->NAKMode = XnakNAK;
 			xv->NAKCount = 9;
 		} else {
@@ -315,7 +317,7 @@ static BOOL XInit(TProto *pv, PComVar cv, PTTSet ts)
 		xv->TOutLong = ts->XmodemTimeOutLong;
 	}
 
-	XSetOpt(fv, xv, xv->XOpt);
+	XSetOpt(xv, xv->XOpt);
 
 	if (xv->XOpt == XoptCheck || xv->XOpt == Xopt1kCksum) {
 		xv->NAKMode = XnakNAK;
@@ -341,7 +343,7 @@ static BOOL XInit(TProto *pv, PComVar cv, PTTSet ts)
 		fv->FTSetTimeOut(fv, xv->TOutVLong);
 		break;
 	case IdXReceive:
-		XSendNAK(fv, xv);
+		XSendNAK(xv);
 		break;
 	}
 	xv->state = STATE_FLUSH;
@@ -357,13 +359,12 @@ static void XCancel(TProto *pv)
 static void XTimeOutProc(TProto *pv)
 {
 	PXVar xv = pv->PrivateData;
-	PFileVarProto fv = xv->fv;
 	switch (xv->XMode) {
 	case IdXSend:
 		xv->state = STATE_CANCELED;	// quit
 		break;
 	case IdXReceive:
-		XSendNAK(fv, xv);
+		XSendNAK(xv);
 		break;
 	}
 }
@@ -384,18 +385,18 @@ static BOOL XReadPacket(PXVar xv)
 				xv->PktIn[0] = b;
 				xv->PktReadMode = XpktBLK;
 				if (xv->XOpt == Xopt1kCRC)
-					XSetOpt(fv, xv, XoptCRC);
+					XSetOpt(xv, XoptCRC);
 				else if (xv->XOpt == Xopt1kCksum)
-					XSetOpt(fv, xv, XoptCheck);
+					XSetOpt(xv, XoptCheck);
 				fv->FTSetTimeOut(fv, xv->TOutShort);
 				break;
 			case STX:
 				xv->PktIn[0] = b;
 				xv->PktReadMode = XpktBLK;
 				if (xv->XOpt == XoptCRC)
-					XSetOpt(fv, xv, Xopt1kCRC);
+					XSetOpt(xv, Xopt1kCRC);
 				else if (xv->XOpt == XoptCheck)
-					XSetOpt(fv, xv, Xopt1kCksum);
+					XSetOpt(xv, Xopt1kCksum);
 				fv->FTSetTimeOut(fv, xv->TOutShort);
 				break;
 			case EOT:
@@ -434,7 +435,7 @@ static BOOL XReadPacket(PXVar xv)
 				xv->PktReadMode = XpktDATA;
 				fv->FTSetTimeOut(fv, xv->TOutShort);
 			} else
-				XSendNAK(fv, xv);
+				XSendNAK(xv);
 			break;
 		case XpktDATA:
 			xv->PktIn[xv->PktBufPtr] = b;
@@ -459,13 +460,13 @@ static BOOL XReadPacket(PXVar xv)
 			xv->NAKCount = 10;
 		else
 			xv->NAKCount = 3;
-		XSendNAK(fv, xv);
+		XSendNAK(xv);
 		return TRUE;
 	}
 
 	GetPkt = XCheckPacket(xv);
 	if (!GetPkt) {
-		XSendNAK(fv, xv);
+		XSendNAK(xv);
 		return TRUE;
 	}
 
@@ -562,11 +563,11 @@ static BOOL XSendPacket(PXVar xv)
 					if (!is0x43Received) { //先にCRC要求'C'(0x43)を受け付けていた場合はCRCモードを維持。(CRCで送って受け付けなかった場合はNAKを送ってくるはずなのでCheckSumでの再送に切り替わる)
 						if (xv->XOpt == XoptCRC) {
 							// receiver wants to use checksum.
-							XSetOpt(fv, xv, XoptCheck);
+							XSetOpt(xv, XoptCheck);
 						} else if (xv->XOpt == Xopt1kCRC) {
 							/* we wanted 1k with CRC, but the other end specified checksum */
 							/* keep the 1k block, but move back to checksum mode.          */
-							XSetOpt(fv, xv, Xopt1kCksum);
+							XSetOpt(xv, Xopt1kCksum);
 						}
 					}
 				}
@@ -585,10 +586,10 @@ static BOOL XSendPacket(PXVar xv)
 				// 0x43 = 'C' crcモードを要求している
 				if ((xv->PktNum == 0) && (xv->PktNumOffset == 0) && (xv->PktNumSent == 0)) {
 					if (xv->XOpt == XoptCheck) {
-						XSetOpt(fv, xv, XoptCRC);
+						XSetOpt(xv, XoptCRC);
 					}
 					else if (xv->XOpt == Xopt1kCksum) {
-						XSetOpt(fv, xv, Xopt1kCRC);
+						XSetOpt(xv, Xopt1kCRC);
 					}
 					SendFlag = TRUE;
 					is0x43Received = TRUE;//CRCで要求があった
