@@ -48,7 +48,7 @@ enum {
 
 /* prototypes */
 struct FileVarProto;
-BOOL QVCreate(struct FileVarProto *fv);
+TProto *QVCreate(struct FileVarProto *fv);
 
 #ifdef __cplusplus
 }

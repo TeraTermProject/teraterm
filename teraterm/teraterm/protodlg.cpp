@@ -62,6 +62,7 @@ BOOL CProtoDlg::OnInitDialog()
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
 	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
+	CenterWindow(m_hWnd, m_hParentWnd);
 	return TRUE;
 }
 
