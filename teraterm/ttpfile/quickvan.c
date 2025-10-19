@@ -146,8 +146,9 @@ static int QVWrite(PQVVar qv, PCHAR B, int C)
   return i;
 }
 
-static void QVSendNAK(PFileVarProto fv, PQVVar qv)
+static void QVSendNAK(PQVVar qv)
 {
+  PFileVarProto fv = qv->fv;
   BYTE b;
 
   b = NAK;
@@ -155,8 +156,9 @@ static void QVSendNAK(PFileVarProto fv, PQVVar qv)
   fv->FTSetTimeOut(fv,TimeOutRecv);
 }
 
-static void QVSendACK(PFileVarProto fv, PQVVar qv)
+static void QVSendACK(PQVVar qv)
 {
+  PFileVarProto fv = qv->fv;
   BYTE b;
 
   fv->FTSetTimeOut(fv,0);
@@ -207,7 +209,7 @@ static BOOL QVInit(TProto *pv, PComVar cv, PTTSet ts)
       qv->QVState = QV_RecvInit1;
       qv->PktState = QVpktSOH;
       qv->RetryCount = 10;
-      QVSendNAK(fv,qv);
+      QVSendNAK(qv);
       break;
     default:
       return FALSE;
@@ -262,8 +264,9 @@ static BOOL QVCountRetry(PQVVar qv)
     return FALSE;
 }
 
-static void QVResendPacket(PFileVarProto fv, PQVVar qv)
+static void QVResendPacket(PQVVar qv)
 {
+  PFileVarProto fv = qv->fv;
 
   qv->PktOutCount = qv->PktOutLen;
   qv->PktOutPtr = 0;
@@ -291,8 +294,9 @@ static void QVSetResPacket(PQVVar qv, BYTE Typ, BYTE Num, int DataLen)
   qv->PktOutPtr = 0;
 }
 
-static void QVSendVACK(PFileVarProto fv, PQVVar qv, BYTE Seq)
+static void QVSendVACK(PQVVar qv, BYTE Seq)
 {
+  PFileVarProto fv = qv->fv;
   fv->FTSetTimeOut(fv,TimeOutRecv);
   qv->RetryCount = 10;
   qv->QVState = QV_RecvData;
@@ -300,8 +304,9 @@ static void QVSendVACK(PFileVarProto fv, PQVVar qv, BYTE Seq)
     QVSetResPacket(qv,'A',Seq,0);
 }
 
-static void QVSendVNAK(PFileVarProto fv, PQVVar qv)
+static void QVSendVNAK(PQVVar qv)
 {
+  PFileVarProto fv = qv->fv;
   fv->FTSetTimeOut(fv,TimeOutRecv);
   QVSetResPacket(qv,'N',LOBYTE(qv->SeqNum+1),0);
   if (qv->QVState==QV_RecvData)
@@ -311,8 +316,9 @@ static void QVSendVNAK(PFileVarProto fv, PQVVar qv)
   }
 }
 
-static void QVSendVSTAT(PFileVarProto fv, PQVVar qv)
+static void QVSendVSTAT(PQVVar qv)
 {
+  PFileVarProto fv = qv->fv;
   fv->FTSetTimeOut(fv,TimeOutRecv);
   qv->PktOut[3] = 0x30;
   QVSetResPacket(qv,'T',LOBYTE(qv->SeqNum),1);
@@ -323,7 +329,6 @@ static void QVSendVSTAT(PFileVarProto fv, PQVVar qv)
 static void QVTimeOutProc(TProto *pv)
 {
   PQVVar qv = pv->PrivateData;
-  PFileVarProto fv = qv->fv;
   if ((qv->QVState==QV_Cancel) ||
       (qv->QVState==QV_RecvEOT))
   {
@@ -350,26 +355,27 @@ static void QVTimeOutProc(TProto *pv)
   qv->PktState = QVpktSOH;
   switch (qv->QVState) {
     case QV_RecvInit1:
-      QVSendNAK(fv,qv);
+      QVSendNAK(qv);
       break;
     case QV_RecvInit2:
-      QVResendPacket(fv,qv); /* resend RINIT */
+      QVResendPacket(qv); /* resend RINIT */
       break;
     case QV_RecvData:
     case QV_RecvDataRetry:
       if (qv->SeqNum==0)
-	QVResendPacket(fv,qv); /* resend RPOS */
+	QVResendPacket(qv); /* resend RPOS */
       else
-	QVSendVNAK(fv,qv);
+	QVSendVNAK(qv);
       break;
     case QV_RecvNext:
-      QVResendPacket(fv,qv); /* resend VSTAT */
+      QVResendPacket(qv); /* resend VSTAT */
       break;
   }
 }
 
-static BOOL QVParseSINIT(PFileVarProto fv, PQVVar qv)
+static BOOL QVParseSINIT(PQVVar qv)
 {
+  PFileVarProto fv = qv->fv;
   int i;
   BYTE b, n;
   WORD WS;
@@ -529,7 +535,6 @@ static BOOL QVParseVFILE(PQVVar qv)
 
 static BOOL QVParseVENQ(PQVVar qv)
 {
-  PFileVarProto fv = qv->fv;
   TFileIO *file = qv->file;
   struct tm time;
   struct utimbuf timebuf;
@@ -563,7 +568,7 @@ static BOOL QVParseVENQ(PQVVar qv)
 	  utime(qv->FullName,&timebuf);
 	}
       }
-      QVSendVSTAT(fv,qv);
+      QVSendVSTAT(qv);
     }
     else
       return FALSE; /* exit and cancel */
@@ -575,7 +580,7 @@ static BOOL QVParseVENQ(PQVVar qv)
       if (qv->RetryCount<0)
 	return FALSE; /* exit and cancel */
     }
-    QVSendVNAK(fv,qv);
+    QVSendVNAK(qv);
   }
 
   return TRUE;
@@ -614,12 +619,13 @@ static BOOL QVCheckWindow8(WORD w0, WORD w1, BYTE b, LPWORD  w)
   return FALSE;
 }
 
-static BOOL QVReadPacket(PFileVarProto fv, PQVVar qv)
+static BOOL QVReadPacket(PQVVar qv)
 {
   BYTE b;
   WORD w0, w1, w;
   int c;
   BOOL GetPkt, EOTFlag, Ok;
+  PFileVarProto fv = qv->fv;
 
   if (qv->QVState == QV_Close)
     return FALSE;
@@ -687,7 +693,7 @@ static BOOL QVReadPacket(PFileVarProto fv, PQVVar qv)
 	  }
 	  else {
 	    qv->PktState =QVpktSOH;
-	    QVSendVNAK(fv,qv);
+	    QVSendVNAK(qv);
 	  }
 	}
 	else if ((qv->QVState==QV_RecvDataRetry) &&
@@ -734,7 +740,7 @@ static BOOL QVReadPacket(PFileVarProto fv, PQVVar qv)
       switch (qv->QVState) {
 	case QV_RecvInit2:
 	case QV_RecvNext:
-	  QVSendACK(fv,qv);
+	  QVSendACK(qv);
 	  fv->Success = TRUE;
 	  return TRUE;
 	case QV_RecvEOT:
@@ -753,22 +759,22 @@ static BOOL QVReadPacket(PFileVarProto fv, PQVVar qv)
 	case QV_RecvInit1:
 	  if ((qv->PktIn[2]==0x30) && /* SINIT */
 	      ! QVCountRetry(qv))
-	    QVSendNAK(fv,qv);
+	    QVSendNAK(qv);
 	  break;
 	case QV_RecvInit2:
 	case QV_RecvNext:
 	  if ((qv->PktIn[2]==0x31) && /* VFILE */
 	      ! QVCountRetry(qv))
-	    QVResendPacket(fv,qv);
+	    QVResendPacket(qv);
 	  break;
 	case QV_RecvData:
 	  if (qv->PktIn[2]==0x32) /* VENQ */
-	    QVSendVNAK(fv,qv);
+	    QVSendVNAK(qv);
 	  break;
 	case QV_RecvDataRetry:
 	  if ((qv->PktIn[2]==0x32) && /* VENQ */
 	      ! QVCountRetry(qv))
-	    QVSendVNAK(fv,qv);
+	    QVSendVNAK(qv);
 	  break;
       }
       return TRUE;
@@ -776,7 +782,7 @@ static BOOL QVReadPacket(PFileVarProto fv, PQVVar qv)
     Ok = FALSE;
     switch (qv->PktIn[2]) { /* function type */
       case 0x30:
-	Ok = QVParseSINIT(fv,qv);
+	Ok = QVParseSINIT(qv);
 	break;
       case 0x31:
 	Ok = QVParseVFILE(qv);
@@ -793,15 +799,15 @@ static BOOL QVReadPacket(PFileVarProto fv, PQVVar qv)
 	(qv->QVState != QV_RecvDataRetry))
       return TRUE;
     if (qv->PktIn[1] != LOBYTE(qv->SeqNum+1))
-      QVSendVACK(fv,qv,qv->PktIn[1]);
+      QVSendVACK(qv,qv->PktIn[1]);
     else if (qv->CheckSum==qv->PktIn[qv->PktInPtr-1])
     {
-      QVSendVACK(fv,qv,qv->PktIn[1]);
+      QVSendVACK(qv,qv->PktIn[1]);
       qv->SeqNum++;
       QVWriteToFile(qv);
     }
     else /* bad checksum */
-      QVSendVNAK(fv,qv);
+      QVSendVNAK(qv);
   }
 
   return TRUE;
@@ -826,8 +832,9 @@ static void QVSetPacket(PQVVar qv, BYTE Num, BYTE Typ)
   qv->PktOutPtr = 0;
 }
 
-static void QVSendSINIT(PFileVarProto fv, PQVVar qv)
+static void QVSendSINIT(PQVVar qv)
 {
+  PFileVarProto fv = qv->fv;
   int i;
 
   qv->PktOut[3] = qv->Ver + 0x30;
@@ -845,9 +852,10 @@ static void QVSendSINIT(PFileVarProto fv, PQVVar qv)
   fv->FTSetTimeOut(fv,TimeOutSend);
 }
 
-static void QVSendEOT(PFileVarProto fv, PQVVar qv)
+static void QVSendEOT(PQVVar qv)
 {
   BYTE b;
+  PFileVarProto fv = qv->fv;
 
   if (qv->QVState==QV_SendEnd)
   {
@@ -885,7 +893,7 @@ static void QVSendVFILE(PQVVar qv)
   filename = fv->GetNextFname(fv);
   if (filename == NULL)
   {
-    QVSendEOT(fv,qv);
+    QVSendEOT(qv);
     return;
   }
   free((void *)qv->FullName);
@@ -1048,10 +1056,11 @@ static void QVParseRINIT(PQVVar qv)
   QVSendVFILE(qv);
 }
 
-static void QVParseVRPOS(PFileVarProto fv, PQVVar qv)
+static void QVParseVRPOS(PQVVar qv)
 {
   int i;
   BYTE b;
+  PFileVarProto fv = qv->fv;
 
   qv->SeqNum = 0;
   if (qv->PktInPtr-3 >= 3)
@@ -1094,9 +1103,10 @@ static BOOL QVCheckWindow7(WORD w0, WORD w1, BYTE b, LPWORD w)
   return FALSE;
 }
 
-static void QVParseVACK(PFileVarProto fv, PQVVar qv)
+static void QVParseVACK(PQVVar qv)
 {
   WORD w;
+  PFileVarProto fv = qv->fv;
 
   if (QVCheckWindow7((WORD)(qv->SeqNum+1),qv->SeqSent,qv->PktIn[2],&w))
   {
@@ -1113,9 +1123,10 @@ static void QVParseVACK(PFileVarProto fv, PQVVar qv)
   }
 }
 
-static void QVParseVNAK(PFileVarProto fv, PQVVar qv)
+static void QVParseVNAK(PQVVar qv)
 {
   WORD w;
+  PFileVarProto fv = qv->fv;
 
   if ((qv->QVState==QV_SendDataRetry) &&
       (qv->PktIn[1]==LOBYTE(qv->SeqNum+1)))
@@ -1160,11 +1171,12 @@ static void QVParseVSTAT(PQVVar qv)
     QVCancel_(qv);
 }
 
-static BOOL QVSendPacket(PFileVarProto fv, PQVVar qv)
+static BOOL QVSendPacket(PQVVar qv)
 {
   BYTE b;
   int c, i;
   BOOL GetPkt;
+  PFileVarProto fv = qv->fv;
 
   if (qv->QVState == QV_Close)
     return FALSE;
@@ -1192,12 +1204,12 @@ static BOOL QVSendPacket(PFileVarProto fv, PQVVar qv)
       switch (qv->QVState) {
 	case QV_SendInit1:
 	  qv->RetryCount = 10;
-	  QVSendSINIT(fv,qv);
+	  QVSendSINIT(qv);
 	  break;
 	case QV_SendInit2:
 	  if (QVCountRetry(qv))
 	    return TRUE;
-	  QVSendSINIT(fv,qv);
+	  QVSendSINIT(qv);
 	  break;
       }
 
@@ -1208,7 +1220,7 @@ static BOOL QVSendPacket(PFileVarProto fv, PQVVar qv)
 	fv->Success = TRUE;
 	return FALSE;
       }
-      QVSendEOT(fv,qv);
+      QVSendEOT(qv);
     }
 
     switch (qv->PktState) {
@@ -1249,22 +1261,22 @@ static BOOL QVSendPacket(PFileVarProto fv, PQVVar qv)
       case QV_SendInit3:
 	switch (qv->PktIn[1]) {
 	  case 'P':
-	    QVParseVRPOS(fv,qv);
+	    QVParseVRPOS(qv);
 	    break;
 	  case 'R': /* RINIT */
 	    if (QVCountRetry(qv))
 	      return TRUE;
-	    QVResendPacket(fv,qv); /* resend VFILE */
+	    QVResendPacket(qv); /* resend VFILE */
 	    break;
 	}
 	break;
       case QV_SendData:
 	switch (qv->PktIn[1]) {
 	  case 'A':
-	    QVParseVACK(fv,qv);
+	    QVParseVACK(qv);
 	    break;
 	  case 'N':
-	    QVParseVNAK(fv,qv);
+	    QVParseVNAK(qv);
 	    break;
 	  case 'T':
 	    QVParseVSTAT(qv);
@@ -1287,10 +1299,10 @@ static BOOL QVSendPacket(PFileVarProto fv, PQVVar qv)
       case QV_SendDataRetry:
 	switch (qv->PktIn[1]) {
 	  case 'A':
-	    QVParseVACK(fv,qv);
+	    QVParseVACK(qv);
 	    break;
 	  case 'N':
-	    QVParseVNAK(fv,qv);
+	    QVParseVNAK(qv);
 	    break;
 	  case 'T':
 	    QVParseVSTAT(qv);
@@ -1313,12 +1325,12 @@ static BOOL QVSendPacket(PFileVarProto fv, PQVVar qv)
       case QV_SendNext:
 	switch (qv->PktIn[1]) {
 	  case 'P':
-	    QVParseVRPOS(fv,qv);
+	    QVParseVRPOS(qv);
 	    break;
 	  case 'T':
 	    if (QVCountRetry(qv))
 	      return TRUE;
-	    QVResendPacket(fv,qv); /* resend VFILE */
+	    QVResendPacket(qv); /* resend VFILE */
 	    break;
 	}
 	break;
@@ -1343,12 +1355,11 @@ static BOOL QVSendPacket(PFileVarProto fv, PQVVar qv)
 static BOOL QVParse(TProto *pv)
 {
 	PQVVar qv = pv->PrivateData;
-	PFileVarProto fv = qv->fv;
 	switch (qv->QVMode) {
 	case IdQVReceive:
-		return QVReadPacket(fv,qv);	// 処理が終わったら FALSE を返す
+		return QVReadPacket(qv);	// 処理が終わったら FALSE を返す
 	case IdQVSend:
-		return QVSendPacket(fv,qv);	// 処理が終わったら FALSE を返す
+		return QVSendPacket(qv);	// 処理が終わったら FALSE を返す
 	default:
 		return FALSE;
 	}

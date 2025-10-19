@@ -131,8 +131,9 @@ static BOOL BPOpenFileToBeSent(PBPVar bv)
 }
 
 // 通信中に受信/送信が切り替わる?
-static void BPDispMode(PFileVarProto fv, PBPVar bv)
+static void BPDispMode(PBPVar bv)
 {
+  PFileVarProto fv = bv->fv;
 	switch (bv->BPMode) {
     case IdBPSend:
 		fv->SetDialogCation(fv, "FILEDLG_TRANS_TITLE_BPSEND", TitBPSend);
@@ -156,7 +157,7 @@ static BOOL BPInit(TProto *pv, PComVar cv, PTTSet ts)
 	bv->Comm->op->Insert1Byte(bv->Comm, DLE);
   }
 
-  BPDispMode(fv,bv);
+  BPDispMode(bv);
   fv->InfoOp->SetDlgProtoText(fv, "B-Plus");
 
   fv->InfoOp->InitDlgProgress(fv, &bv->ProgStat);
@@ -547,8 +548,9 @@ static void BPSendNPacket(PBPVar bv)
   fv->InfoOp->SetDlgTime(fv, bv->StartTime, bv->ByteCount);
 }
 
-static void BPCheckPacket(PFileVarProto fv, PBPVar bv)
+static void BPCheckPacket(PBPVar bv)
 {
+  PFileVarProto fv = bv->fv;
   if (bv->Check != bv->CheckCalc)
   {
     BPSendNAK(bv);
@@ -641,7 +643,7 @@ static void BPParseTPacket(PBPVar bv)
       }
       bv->BPMode = IdBPReceive;
       bv->BPState = BP_RecvFile;
-      BPDispMode(fv,bv);
+      BPDispMode(bv);
 
       /* Get file name */
       j = 0;
@@ -689,7 +691,7 @@ static void BPParseTPacket(PBPVar bv)
 	return;
       }
       bv->BPMode = IdBPSend;
-      BPDispMode(fv,bv);
+      BPDispMode(bv);
 
       if (!bv->FileOpen)
       {
@@ -787,8 +789,9 @@ static void BPParsePacket(PBPVar bv)
 	}
 }
 
-static void BPParseAck(PFileVarProto fv, PBPVar bv, BYTE b)
+static void BPParseAck(PBPVar bv, BYTE b)
 {
+  PFileVarProto fv = bv->fv;
   b = (b - 0x30) % 10;
   if (bv->EnqSent)
   {
@@ -943,7 +946,7 @@ static BOOL BPParse(TProto *pv)
 	      if ((b>=0x30) && (b<=0x39))
 	      {  /* ACK */
 		bv->BPPktState = BP_PktGetDLE;
-		BPParseAck(fv,bv,b);
+		BPParseAck(bv,b);
 	      }
 	      break;
 	  }
@@ -987,7 +990,7 @@ static BOOL BPParse(TProto *pv)
 	      if (bv->CheckCount<=0)
 	      {
 		bv->BPPktState = BP_PktGetDLE;
-		BPCheckPacket(fv,bv);
+		BPCheckPacket(bv);
 	      }
 	  }
 	  break;
