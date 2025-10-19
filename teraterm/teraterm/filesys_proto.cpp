@@ -60,6 +60,15 @@
 #include "bplus.h"
 #include "quickvan.h"
 
+typedef enum {
+	PROTO_KMT = 1,
+	PROTO_XM = 2,
+	PROTO_ZM = 3,
+	PROTO_BP = 4,
+	PROTO_QV = 5,
+	PROTO_YM = 6,
+} ProtoId_t;
+
 #define TitKmtRcv   L"Kermit Receive"
 #define TitKmtGet   L"Kermit Get"
 #define TitKmtSend  L"Kermit Send"
@@ -188,6 +197,38 @@ static const TInfoOp InfoOp = {
 	_SetDlgProtoFileName,
 };
 
+static void Insert1Byte(struct Comm_ *comm, BYTE b)
+{
+	PComVar pcv = (PComVar)comm->private_data;
+	CommInsert1Byte(pcv, b);
+}
+
+static int Read1Byte(struct Comm_ *comm, BYTE *b)
+{
+	PComVar pcv = (PComVar)comm->private_data;
+	return CommRead1Byte(pcv, b);
+}
+
+static int BinaryOut(struct Comm_ *comm, const CHAR *buf, size_t len)
+{
+	PComVar pcv = (PComVar)comm->private_data;
+	return CommBinaryOut(pcv, (PCHAR)buf, (int)len);
+}
+
+static void FlashReceiveBuf(struct Comm_ *comm)
+{
+	PComVar pcv = (PComVar)comm->private_data;
+	pcv->InBuffCount = 0;
+	pcv->InPtr = 0;
+}
+
+static const CommOp CommOpList =  {
+	BinaryOut,
+	Read1Byte,
+	Insert1Byte,
+	FlashReceiveBuf,
+};
+
 static BOOL NewFileVar_(PFileVarProto *pfv)
 {
 	if (*pfv != NULL) {
@@ -212,7 +253,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	fv->Success = FALSE;
 	fv->NoMsg = FALSE;
 
-	fv->file = FilesysCreateWin32();
+	fv->file_fv = FilesysCreateWin32();
 
 	fv->GetNextFname = GetNextFname;
 	fv->GetRecievePath = GetRecievePath;
@@ -220,6 +261,11 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	fv->SetDialogCation = SetDialogCation;
 
 	fv->InfoOp = &InfoOp;
+
+	fv->Comm = (TComm *)malloc(sizeof(TComm));
+	fv->Comm->private_data = (void *)&cv;
+	CommOp const **comm_op_ptr = (CommOp const **)&fv->Comm->op;
+	*comm_op_ptr = &CommOpList;
 
 	*pfv = fv;
 	return TRUE;
@@ -232,86 +278,84 @@ static void FreeFileVar_(PFileVarProto *pfv)
 		return;
 	}
 
-	if (fv->ProtoOp != NULL) {
-		fv->ProtoOp->Destroy(fv);
+	if (fv->Proto != NULL) {
+		fv->Proto->Op->Destroy(fv->Proto);
 	}
 
 	if (fv->FileNames != NULL) {
 		free(fv->FileNames);
 	}
-	fv->file->FileSysDestroy(fv->file);
+	fv->file_fv->FileSysDestroy(fv->file_fv);
 	free(fv->DlgCaption);
 	fv->DlgCaption = NULL;
 	free(fv->RecievePath);
 	fv->RecievePath = NULL;
+	free((void *)fv->Comm);
+	fv->Comm = NULL;
+
 	free(fv);
 
 	*pfv = NULL;
 }
 
-static int _ProtoSetOpt(PFileVarProto fv, int request, ...)
-{
-	va_list ap;
-	va_start(ap, request);
-	int r = fv->ProtoOp->SetOptV(fv, request, ap);
-	va_end(ap);
-	return r;
-}
-
 static BOOL OpenProtoDlg(PFileVarProto fv, ProtoId_t IdProto, int Mode, WORD Opt1, WORD Opt2)
 {
 	PProtoDlg pd;
+	TProto *proto;
 
 	switch (IdProto) {
 		case PROTO_KMT:
-			KmtCreate(fv);
+			proto = KmtCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, KMT_MODE, Mode);
 			break;
 		case PROTO_XM:
-			XCreate(fv);
+			proto = XCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, XMODEM_MODE, Mode);
+			proto->Op->SetOpt(proto, XMODEM_OPT, Opt1);
+			proto->Op->SetOpt(proto, XMODEM_TEXT_FLAG, 1 - (Opt2 & 1));
 			break;
 		case PROTO_YM:
-			YCreate(fv);
+			proto = YCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, YMODEM_MODE, Mode);
+			proto->Op->SetOpt(proto, YMODEM_OPT, Opt1);
 			break;
 		case PROTO_ZM:
-			ZCreate(fv);
+			proto = ZCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, ZMODEM_MODE, Mode);
+			proto->Op->SetOpt(proto, ZMODEM_BINFLAG, (Opt1 & 1) != 0);
 			break;
 		case PROTO_BP:
-			BPCreate(fv);
+			proto = BPCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, BPLUS_MODE, Mode);
 			break;
 		case PROTO_QV:
-			QVCreate(fv);
+			proto = QVCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, QUICKVAN_MODE, Mode);
 			break;
 		default:
 			assert(FALSE);
 			return FALSE;
 			break;
 	}
-	fv->ProtoId = IdProto;
-
-	switch (fv->ProtoId) {
-		case PROTO_KMT:
-			_ProtoSetOpt(fv, KMT_MODE, Mode);
-			break;
-		case PROTO_XM:
-			_ProtoSetOpt(fv, XMODEM_MODE, Mode);
-			_ProtoSetOpt(fv, XMODEM_OPT, Opt1);
-			_ProtoSetOpt(fv, XMODEM_TEXT_FLAG, 1 - (Opt2 & 1));
-			break;
-		case PROTO_YM:
-			_ProtoSetOpt(fv, YMODEM_MODE, Mode);
-			_ProtoSetOpt(fv, YMODEM_OPT, Opt1);
-			break;
-		case PROTO_ZM:
-			_ProtoSetOpt(fv, ZMODEM_MODE, Mode);
-			_ProtoSetOpt(fv, ZMODEM_BINFLAG, (Opt1 & 1) != 0);
-			break;
-		case PROTO_BP:
-			_ProtoSetOpt(fv, BPLUS_MODE, Mode);
-			break;
-		case PROTO_QV:
-			_ProtoSetOpt(fv, QUICKVAN_MODE, Mode);
-			break;
-	}
+	fv->Proto = proto;
 
 	pd = new CProtoDlg();
 	if (pd==NULL)
@@ -325,7 +369,7 @@ static BOOL OpenProtoDlg(PFileVarProto fv, ProtoId_t IdProto, int Mode, WORD Opt
 	fv->HWin = pd->m_hWnd;
 	PtDlg = pd;
 
-	BOOL r = fv->ProtoOp->Init(fv, &cv, &ts);
+	BOOL r = fv->Proto->Op->Init(fv->Proto, &cv, &ts);
 	if (r == FALSE) {
 		//fv->Destroy(fv);
 		return FALSE;
@@ -755,7 +799,7 @@ int ProtoDlgParse(void)
 	CommReceive(&cv); //ダイアログ表示中に受信したデータを処理できるように読み取りを行わせる
 
 	PFileVarProto fv = FileVar;
-	if (fv->ProtoOp->Parse(fv, &cv))
+	if (fv->Proto->Op->Parse(fv->Proto))
 		// 処理を継続する
 		P = 0;
 	else {
@@ -775,7 +819,7 @@ void ProtoDlgTimeOut(void)
 		PFileVarProto fv = FileVar;
 
 		// タイムアウトが発生したことを通知する
-		fv->ProtoOp->TimeOutProc(fv, &cv);
+		fv->Proto->Op->TimeOutProc(fv->Proto);
 	}
 }
 
@@ -788,7 +832,7 @@ void ProtoDlgCancel(void)
 		PFileVarProto fv = FileVar;
 
 		// キャンセルが押されたことを通知する
-		fv->ProtoOp->Cancel(fv, &cv);
+		fv->Proto->Op->Cancel(fv->Proto);
 	}
 }
 
@@ -841,10 +885,10 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	return FALSE;
 }
 
-static BOOL _GetGetFname(HWND HWin, PFileVarProto fv, PTTSet ts)
+static BOOL _GetGetFname(HWND HWin, PFileVarProto fv, PTTSet pts)
 {
-	SetDialogFont(ts->DialogFontNameW, ts->DialogFontPoint, ts->DialogFontCharSet,
-				  ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(pts->DialogFontNameW, pts->DialogFontPoint, pts->DialogFontCharSet,
+				  pts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	return (BOOL)TTDialogBoxParam(hInst,
 								  MAKEINTRESOURCEW(IDD_GETFNDLG),
 								  HWin, GetFnDlg, (LPARAM)fv);

@@ -50,7 +50,7 @@ enum {
 
 /* prototypes */
 struct FileVarProto;
-BOOL BPCreate(struct FileVarProto *fv);
+TProto *BPCreate(struct FileVarProto *fv);
 
 #ifdef __cplusplus
 }

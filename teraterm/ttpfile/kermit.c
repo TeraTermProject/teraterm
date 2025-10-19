@@ -33,7 +33,6 @@
 #include <assert.h>
 
 #include "tttypes.h"
-#include "ttcommon.h"
 #include "protolog.h"
 #include "filesys_proto.h"
 
@@ -82,6 +81,10 @@ typedef struct {
 	DWORD StartTime;
 
 	DWORD FileMtime;
+
+	TComm *Comm;
+	PFileVarProto fv;
+	TFileIO *file;
 } TKmtVar;
 typedef TKmtVar *PKmtVar;
 
@@ -150,7 +153,7 @@ typedef TKmtVar *PKmtVar;
 static BYTE KmtNum(BYTE b);
 
 
-static void KmtOutputCommonLog(PFileVarProto fv, PKmtVar kv, BYTE *buf, int len)
+static void KmtOutputCommonLog(PKmtVar kv, BYTE *buf, int len)
 {
 	TProtoLog* log = kv->log;
 	int i, datalen, n;
@@ -254,27 +257,27 @@ static void KmtOutputCommonLog(PFileVarProto fv, PKmtVar kv, BYTE *buf, int len)
 	}
 }
 
-static void KmtReadLog(PFileVarProto fv, PKmtVar kv, BYTE *buf, int len)
+static void KmtReadLog(PKmtVar kv, BYTE *buf, int len)
 {
 	if (kv->log != NULL && (len>0))
 	{
 		TProtoLog* log = kv->log;
 		log->WriteRaw(log, "\015\012<<<\015\012",7);
-		KmtOutputCommonLog(fv, kv, buf, len);
+		KmtOutputCommonLog(kv, buf, len);
 	}
 }
 
-static void KmtWriteLog(PFileVarProto fv, PKmtVar kv, BYTE *buf, int len)
+static void KmtWriteLog(PKmtVar kv, BYTE *buf, int len)
 {
 	if (kv->log != NULL && (len>0))
 	{
 		TProtoLog* log = kv->log;
 		log->WriteRaw(log, "\015\012>>>\015\012",7);
-		KmtOutputCommonLog(fv, kv, buf, len);
+		KmtOutputCommonLog(kv, buf, len);
 	}
 }
 
-static void KmtStringLog(PFileVarProto fv, PKmtVar kv, char *fmt, ...)
+static void KmtStringLog(PKmtVar kv, char *fmt, ...)
 {
 	char tmp[1024];
 	int len;
@@ -329,30 +332,31 @@ static int KmtCheckSumType1(BYTE *buf, int len)
 	return (check);
 }
 
-static void KmtSendPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendPacket(PKmtVar kv)
 {
+	PFileVarProto fv = kv->fv;
 	int C;
 
 	/* padding characters */
-	for (C = 1 ; C <= kv->KmtYour.NPAD ; C++)
-		CommBinaryOut(cv,&(kv->KmtYour.PADC), 1);
+	for (C = 1; C <= kv->KmtYour.NPAD; C++)
+		kv->Comm->op->BinaryOut(kv->Comm, &(kv->KmtYour.PADC), 1);
 
 	/* packet */
 	C = kv->PktOutCount;
-	CommBinaryOut(cv,&kv->PktOut[0], C);
+	kv->Comm->op->BinaryOut(kv->Comm, &kv->PktOut[0], C);
 
 	if (kv->log != NULL) {
-		KmtWriteLog(fv, kv, &(kv->PktOut[0]), C);
+		KmtWriteLog(kv, &(kv->PktOut[0]), C);
 	}
 
 	/* end-of-line character */
 	if (kv->KmtYour.EOL > 0)
-		CommBinaryOut(cv,&(kv->KmtYour.EOL), 1);
+		kv->Comm->op->BinaryOut(kv->Comm, &(kv->KmtYour.EOL), 1);
 
 	fv->FTSetTimeOut(fv,kv->KmtYour.TIME);
 }
 
-static void KmtMakePacket(PFileVarProto fv, PKmtVar kv, BYTE SeqNum, BYTE PktType, int DataLen)
+static void KmtMakePacket(PKmtVar kv, BYTE SeqNum, BYTE PktType, int DataLen)
 {
 	int i, nlen, headnum;
 	WORD Sum;
@@ -395,7 +399,7 @@ static void KmtMakePacket(PFileVarProto fv, PKmtVar kv, BYTE SeqNum, BYTE PktTyp
 }
 
 
-static void KmtSendInitPkt(PFileVarProto fv, PKmtVar kv, PComVar cv, BYTE PktType)
+static void KmtSendInitPkt(PKmtVar kv, BYTE PktType)
 {
 	int NParam;
 
@@ -427,8 +431,8 @@ static void KmtSendInitPkt(PFileVarProto fv, PKmtVar kv, PComVar cv, BYTE PktTyp
 		}
 	}
 
-	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum - kv->PktNumOffset),PktType,NParam);
-	KmtSendPacket(fv,kv,cv);
+	KmtMakePacket(kv, (BYTE)(kv->PktNum - kv->PktNumOffset), PktType, NParam);
+	KmtSendPacket(kv);
 
 	switch (PktType) {
 	case 'S': kv->KmtState = SendInit; break;
@@ -436,10 +440,10 @@ static void KmtSendInitPkt(PFileVarProto fv, PKmtVar kv, PComVar cv, BYTE PktTyp
 	}
 }
 
-static void KmtSendNack(PFileVarProto fv, PKmtVar kv, PComVar cv, BYTE SeqChar)
+static void KmtSendNack(PKmtVar kv, BYTE SeqChar)
 {
-	KmtMakePacket(fv,kv,KmtNum(SeqChar),'N',0);
-	KmtSendPacket(fv,kv,cv);
+	KmtMakePacket(kv, KmtNum(SeqChar), 'N', 0);
+	KmtSendPacket(kv);
 }
 
 static int KmtCalcPktNum(PKmtVar kv, BYTE b)
@@ -630,24 +634,25 @@ static void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 	}
 }
 
-static void KmtSendAck(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendAck(PKmtVar kv)
 {
 	if (kv->PktIn[3]=='S') /* Send-Init packet */
 	{
 		KmtParseInit(kv,FALSE);
-		KmtSendInitPkt(fv,kv,cv,'Y');
+		KmtSendInitPkt(kv,'Y');
 	}
 	else {
-		KmtMakePacket(fv,kv,KmtNum(kv->PktIn[2]),(BYTE)'Y',0);
-		KmtSendPacket(fv,kv,cv);
+		KmtMakePacket(kv,KmtNum(kv->PktIn[2]),(BYTE)'Y',0);
+		KmtSendPacket(kv);
 	}
 }
 
-static void KmtDecode(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
+static void KmtDecode(PKmtVar kv, PCHAR Buff, int *BuffLen)
 {
 	int i, j, DataLen, BuffPtr, off;
 	BYTE b, b2;
 	BOOL CTLflag,BINflag,REPTflag,OutFlag;
+	PFileVarProto fv = kv->fv;
 
 	BuffPtr = 0;
 
@@ -695,7 +700,7 @@ static void KmtDecode(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 			for (j = 1 ; j <= kv->RepeatCount ; j++)
 			{
 				if (Buff==NULL) { /* write to file */
-					TFileIO *fileio = fv->file;
+					TFileIO *fileio = kv->file;
 					fileio->WriteFile(fileio,&b,1);
 				} else /* write to buffer */
 					if (BuffPtr < *BuffLen)
@@ -719,7 +724,7 @@ static void KmtDecode(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 	fv->InfoOp->SetDlgTime(fv, kv->StartTime, kv->ByteCount);
 }
 
-static void KmtRecvFileAttr(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
+static void KmtRecvFileAttr(PKmtVar kv, PCHAR Buff, int *BuffLen)
 {
 	int DataLen, off, c, n, j;
 	BYTE *p, *q;
@@ -859,12 +864,12 @@ static void KmtRecvFileAttr(PFileVarProto fv, PKmtVar kv, PCHAR Buff, int *BuffL
 
 }
 
-static BOOL KmtEncode(PFileVarProto fv, PKmtVar kv)
+static BOOL KmtEncode(PKmtVar kv)
 {
 	BYTE b, b2, b7;
 	int Len;
 	char TempStr[4];
-	TFileIO *file = fv->file;
+	TFileIO *file = kv->file;
 
 	if ((kv->RepeatCount>0) && (strlen(kv->ByteStr)>0))
 	{
@@ -953,27 +958,28 @@ static void KmtIncPacketNum(PKmtVar kv)
 		kv->PktNumOffset = kv->PktNumOffset + 64;
 }
 
-static void KmtSendEOFPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendEOFPacket(PKmtVar kv)
 {
 	/* close file */
 	if (kv->FileOpen) {
-		TFileIO *file = fv->file;
+		TFileIO *file = kv->file;
 		file->Close(file);
 	}
 	kv->FileOpen = FALSE;
 
 	KmtIncPacketNum(kv);
 
-	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'Z',0);
-	KmtSendPacket(fv,kv,cv);
+	KmtMakePacket(kv, (BYTE)(kv->PktNum - kv->PktNumOffset), (BYTE)'Z', 0);
+	KmtSendPacket(kv);
 
 	kv->KmtState = SendEOF;
 }
 
-static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendNextData(PKmtVar kv)
 {
 	int DataLen, DataLenNew, maxlen;
 	BOOL NextFlag;
+	PFileVarProto fv = kv->fv;
 
 	fv->InfoOp->SetDlgByteCount(fv, kv->ByteCount);
 	fv->InfoOp->SetDlgPercent(fv, kv->ByteCount, kv->FileSize, &kv->ProgStat);
@@ -992,14 +998,14 @@ static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 		maxlen = kv->KmtYour.MAXL - kv->KmtMy.CHKT - 2;
 	}
 
-	NextFlag = KmtEncode(fv,kv);
+	NextFlag = KmtEncode(kv);
 	if (NextFlag) DataLenNew = DataLen + strlen(kv->ByteStr);
 	while (NextFlag &&
 		(DataLenNew < maxlen))
 	{
 		strncpy_s(&(kv->PktOut[4+DataLen]),sizeof(kv->PktOut) - (4+DataLen),kv->ByteStr,_TRUNCATE);
 		DataLen = DataLenNew;
-		NextFlag = KmtEncode(fv,kv);
+		NextFlag = KmtEncode(kv);
 		if (NextFlag) DataLenNew = DataLen + strlen(kv->ByteStr);
 	}
 	if (NextFlag) kv->RepeatCount++;
@@ -1009,38 +1015,39 @@ static void KmtSendNextData(PFileVarProto fv, PKmtVar kv, PComVar cv)
 		fv->InfoOp->SetDlgByteCount(fv, kv->ByteCount);
 		fv->InfoOp->SetDlgPercent(fv, kv->ByteCount, kv->FileSize, &kv->ProgStat);
 		fv->InfoOp->SetDlgTime(fv, kv->StartTime, kv->ByteCount);
-		KmtSendEOFPacket(fv,kv,cv);
+		KmtSendEOFPacket(kv);
 	}
 	else {
 		KmtIncPacketNum(kv);
 
-		KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'D',DataLen);
-		KmtSendPacket(fv,kv,cv);
+		KmtMakePacket(kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'D',DataLen);
+		KmtSendPacket(kv);
 
 		kv->KmtState = SendData;
 	}
 }
 
-static void KmtSendEOTPacket(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendEOTPacket(PKmtVar kv)
 {
 	KmtIncPacketNum(kv);
-	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'B',0);
-	KmtSendPacket(fv,kv,cv);
+	KmtMakePacket(kv, (BYTE)(kv->PktNum - kv->PktNumOffset), (BYTE)'B', 0);
+	KmtSendPacket(kv);
 
 	kv->KmtState = SendEOT;
 }
 
-static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static BOOL KmtSendNextFile(PKmtVar kv)
 {
-	TFileIO *file = fv->file;
+	TFileIO *file = kv->file;
 	struct _stati64 st;
 	BOOL r;
 	char *filename;
+	PFileVarProto fv = kv->fv;
 
 	filename = fv->GetNextFname(fv);
 	if (filename == NULL)
 	{
-		KmtSendEOTPacket(fv,kv,cv);
+		KmtSendEOTPacket(kv);
 		return TRUE;
 	}
 	free((void *)kv->FullName);
@@ -1087,9 +1094,8 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	KmtIncPacketNum(kv);
 	filename = file->GetSendFilename(file, kv->FullName, FALSE, TRUE, FALSE);
 	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4, filename,_TRUNCATE); // put FName
-	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'F',
-				  strlen(filename));
-	KmtSendPacket(fv,kv,cv);
+	KmtMakePacket(kv, (BYTE)(kv->PktNum - kv->PktNumOffset), (BYTE)'F', strlen(filename));
+	KmtSendPacket(kv);
 	free(filename);
 
 	kv->RepeatCount = 0;
@@ -1098,7 +1104,7 @@ static BOOL KmtSendNextFile(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	return TRUE;
 }
 
-static BOOL KmtSendNextFileAttr(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static BOOL KmtSendNextFileAttr(PKmtVar kv)
 {
 	char buf[512], s[128];
 	char t[64];
@@ -1129,9 +1135,8 @@ static BOOL KmtSendNextFileAttr(PFileVarProto fv, PKmtVar kv, PComVar cv)
 
 	KmtIncPacketNum(kv);
 	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4, buf, _TRUNCATE);
-	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'A',
-		strlen(buf));
-	KmtSendPacket(fv,kv,cv);
+	KmtMakePacket(kv, (BYTE)(kv->PktNum - kv->PktNumOffset), (BYTE)'A', strlen(buf));
+	KmtSendPacket(kv);
 
 	kv->RepeatCount = 0;
 	kv->NextByteFlag = FALSE;
@@ -1139,9 +1144,10 @@ static BOOL KmtSendNextFileAttr(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	return TRUE;
 }
 
-static void KmtSendReceiveInit(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendReceiveInit(PKmtVar kv)
 {
-	TFileIO *file = fv->file;
+	PFileVarProto fv = kv->fv;
+	TFileIO *file = kv->file;
 	char *filename;
 	const size_t filename_len_max = kv->KmtYour.MAXL - kv->KmtMy.CHKT - 4;
 
@@ -1155,29 +1161,29 @@ static void KmtSendReceiveInit(PFileVarProto fv, PKmtVar kv, PComVar cv)
 	}
 
 	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4,filename,_TRUNCATE);
-	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'R',
-		strlen(filename));
-	KmtSendPacket(fv,kv,cv);
+	KmtMakePacket(kv, (BYTE)(kv->PktNum - kv->PktNumOffset), (BYTE)'R', strlen(filename));
+	KmtSendPacket(kv);
 	free(filename);
 
 	kv->KmtState = GetInit;
 }
 
-static void KmtSendFinish(PFileVarProto fv, PKmtVar kv, PComVar cv)
+static void KmtSendFinish(PKmtVar kv)
 {
 	kv->PktNum = 0;
 	kv->PktNumOffset = 0;
 
 	kv->PktOut[4] = 'F'; /* Finish */
-	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'G',1);
-	KmtSendPacket(fv,kv,cv);
+	KmtMakePacket(kv, (BYTE)(kv->PktNum - kv->PktNumOffset), (BYTE)'G', 1);
+	KmtSendPacket(kv);
 
 	kv->KmtState = Finish;
 }
 
-static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
+static BOOL KmtInit(TProto *pv, PComVar cv, PTTSet ts)
 {
-	PKmtVar kv = fv->data;
+	PKmtVar kv = pv->PrivateData;
+	PFileVarProto fv = kv->fv;
 
 	fv->InfoOp->SetDlgProtoText(fv, "Kermit");
 
@@ -1258,17 +1264,17 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 
 	switch (kv->KmtMode) {
 	case IdKmtSend:
-		KmtSendInitPkt(fv,kv,cv,'S');
+		KmtSendInitPkt(kv,'S');
 		break;
 	case IdKmtReceive:
 		kv->KmtState = ReceiveInit;
 		fv->FTSetTimeOut(fv,kv->KmtYour.TIME);
 		break;
 	case IdKmtGet:
-		KmtSendInitPkt(fv,kv,cv,'I');
+		KmtSendInitPkt(kv,'I');
 		break;
 	case IdKmtFinish:
-		KmtSendInitPkt(fv,kv,cv,'I');
+		KmtSendInitPkt(kv,'I');
 		break;
 	default:
 		assert(0);
@@ -1278,50 +1284,50 @@ static BOOL KmtInit(PFileVarProto fv, PComVar cv, PTTSet ts)
 	return TRUE;
 }
 
-static void KmtTimeOutProc(PFileVarProto fv, PComVar cv)
+static void KmtTimeOutProc(TProto *pv)
 {
-	PKmtVar kv = fv->data;
+	PKmtVar kv = pv->PrivateData;
 	switch (kv->KmtState) {
 	case SendInit:
-		KmtSendPacket(fv,kv,cv);
+		KmtSendPacket(kv);
 		break;
 	case SendFile:
-		KmtSendPacket(fv,kv,cv);
+		KmtSendPacket(kv);
 		break;
 	case SendData:
-		KmtSendPacket(fv,kv,cv);
+		KmtSendPacket(kv);
 		break;
 	case SendEOF:
-		KmtSendPacket(fv,kv,cv);
+		KmtSendPacket(kv);
 		break;
 	case SendEOT:
-		KmtSendPacket(fv,kv,cv);
+		KmtSendPacket(kv);
 		break;
 	case ReceiveInit:
-		KmtSendNack(fv,kv,cv,KmtChar(0));
+		KmtSendNack(kv,KmtChar(0));
 		break;
 	case ReceiveFile:
-		KmtSendNack(fv,kv,cv,kv->NextSeq);
+		KmtSendNack(kv,kv->NextSeq);
 		break;
 	case ReceiveData:
-		KmtSendNack(fv,kv,cv,kv->NextSeq);
+		KmtSendNack(kv,kv->NextSeq);
 		break;
 	case ServerInit:
-		KmtSendPacket(fv,kv,cv);
+		KmtSendPacket(kv);
 		break;
 	case GetInit:
-		KmtSendPacket(fv,kv,cv);
+		KmtSendPacket(kv);
 		break;
 	case Finish:
-		KmtSendPacket(fv,kv,cv);
+		KmtSendPacket(kv);
 		break;
 	}
 }
 
-static BOOL FTCreateFile(PFileVarProto fv)
+static BOOL FTCreateFile(PKmtVar kv)
 {
-	PKmtVar kv = fv->data;
-	TFileIO *file = fv->file;
+	PFileVarProto fv = kv->fv;
+	TFileIO *file = kv->file;
 
 	fv->InfoOp->SetDlgProtoFileName(fv, kv->FullName);
 	kv->FileOpen = file->OpenWrite(file, kv->FullName);
@@ -1343,21 +1349,22 @@ static BOOL FTCreateFile(PFileVarProto fv)
 	return TRUE;
 }
 
-static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
+static BOOL KmtReadPacket(TProto *pv)
 {
 	BYTE b;
 	int c, PktNumNew;
 	BOOL GetPkt;
 	char FNBuff[50];
 	int Len;
-	PKmtVar kv = fv->data;
+	PKmtVar kv = pv->PrivateData;
+	PFileVarProto fv = kv->fv;
 
 	if (kv->KmtMode == IdKmtQuit) {
 		// 終了状態
 		return FALSE;
 	}
 
-	c = CommRead1Byte(cv,&b);
+	c = kv->Comm->op->Read1Byte(kv->Comm, &b);
 
 	GetPkt = FALSE;
 
@@ -1383,7 +1390,7 @@ static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 					// "Initialize でリモートが送ってきた MAXL" + 2 (MARK, LEN)
 					// を超えるサイズのパケットをリモートが送ろうとしてきた
 					if (kv->PktInCount > kv->KmtMy.MAXL + 2) {
-						KmtStringLog(fv, kv, "Remote is attempting to send %d bytes, but MAXL from remote is %d. Must be less than or equal to %d bytes.",
+						KmtStringLog(kv, "Remote is attempting to send %d bytes, but MAXL from remote is %d. Must be less than or equal to %d bytes.",
 						             kv->PktInCount, kv->KmtMy.MAXL, kv->KmtMy.MAXL + 2);
 						GetPkt = FALSE;
 						kv->PktReadMode = WaitMark;
@@ -1391,7 +1398,7 @@ static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 					}
 				} else {
 					/* If unchar(LEN) = 1 or 2, the packet is invalid and should cause an Error. */
-					KmtStringLog(fv, kv, "If unchar(LEN) = %d is 1 or 2, the packet is invalid.", kv->PktInLen);
+					KmtStringLog(kv, "If unchar(LEN) = %d is 1 or 2, the packet is invalid.", kv->PktInLen);
 					GetPkt = FALSE;
 					kv->PktReadMode = WaitMark;
 					goto read_end;
@@ -1414,7 +1421,7 @@ static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 					// を超えるサイズのパケットをリモートが送ろうとしてきた
 					//   +1 は C-Kermit 9.0.305 Alpha.05 から C-Kermit 10.0 Beta.04 までが 1 バイト多く送ってくるため
 					if (kv->PktInCount > kv->KmtMy.MAXLX + 7 + 1) {
-						KmtStringLog(fv, kv, "Remote is attempting to send %d bytes, but MAXLX from remote is %d. Must be less than or equal to %d bytes.",
+						KmtStringLog(kv, "Remote is attempting to send %d bytes, but MAXLX from remote is %d. Must be less than or equal to %d bytes.",
 						             kv->PktInCount, kv->KmtMy.MAXLX, kv->KmtMy.MAXLX + 7 + 1);
 						GetPkt = FALSE;
 						kv->PktReadMode = WaitMark;
@@ -1431,7 +1438,8 @@ static BOOL KmtReadPacket(PFileVarProto fv,  PComVar cv)
 				break;
 			}
 
-		if (! GetPkt) c = CommRead1Byte(cv,&b);
+		if (!GetPkt)
+			c = kv->Comm->op->Read1Byte(kv->Comm, &b);
 	}
 
 read_end:
@@ -1439,7 +1447,7 @@ read_end:
 
 	if (kv->log != NULL)
 	{
-		KmtReadLog(fv, kv, &(kv->PktIn[0]), kv->PktInCount);
+		KmtReadLog(kv, &(kv->PktIn[0]), kv->PktInCount);
 	}
 
 	PktNumNew = KmtCalcPktNum(kv,kv->PktIn[2]);
@@ -1450,8 +1458,8 @@ read_end:
 	if ((kv->PktIn[3]!='Y') &&
 		(kv->PktIn[3]!='N'))
 	{
-		if (GetPkt) KmtSendAck(fv,kv,cv);
-		else KmtSendNack(fv,kv,cv,kv->PktIn[2]);
+		if (GetPkt) KmtSendAck(kv);
+		else KmtSendNack(kv,kv->PktIn[2]);
 	}
 
 	if (! GetPkt) return TRUE;
@@ -1467,14 +1475,14 @@ read_end:
 	case 'D':
 		if ((kv->KmtState == ReceiveData) &&
 			(PktNumNew > kv->PktNum))
-			KmtDecode(fv,kv,NULL,&Len);
+			KmtDecode(kv,NULL,&Len);
 		break;
 	case 'E': return FALSE;
 	case 'F':
 		if ((kv->KmtState==ReceiveFile) ||
 			(kv->KmtState==GetInit))
 		{
-			TFileIO *file = fv->file;
+			TFileIO *file = kv->file;
 			char *RecievePath;
 			kv->KmtMode = IdKmtReceive;
 
@@ -1482,13 +1490,13 @@ read_end:
 			kv->FullName = NULL;
 
 			Len = sizeof(FNBuff);
-			KmtDecode(fv,kv,FNBuff,&Len);
+			KmtDecode(kv,FNBuff,&Len);
 			FNBuff[Len] = 0;
 			RecievePath = fv->GetRecievePath(fv);
 			kv->FullName = file->GetRecieveFilename(file, FNBuff, FALSE, RecievePath, !fv->OverWrite);
 			free(RecievePath);
 			/* file open */
-			if (! FTCreateFile(fv)) return FALSE;
+			if (! FTCreateFile(kv)) return FALSE;
 			kv->KmtState = ReceiveData;
 		}
 		break;
@@ -1496,7 +1504,7 @@ read_end:
 	case 'A':   /* File Attribute(Optional) */
 		if ((kv->KmtState == ReceiveData) &&
 			(PktNumNew > kv->PktNum)) {
-			KmtRecvFileAttr(fv,kv,NULL,&Len);
+			KmtRecvFileAttr(kv, NULL, &Len);
 		}
 		break;
 
@@ -1513,48 +1521,48 @@ read_end:
 		switch (kv->KmtState) {
 		case SendInit:
 			if (PktNumNew==kv->PktNum)
-				KmtSendPacket(fv,kv,cv);
+				KmtSendPacket(kv);
 			break;
 		case SendFile:
 			if (PktNumNew==kv->PktNum)
-				KmtSendPacket(fv,kv,cv);
+				KmtSendPacket(kv);
 			else if (PktNumNew==kv->PktNum+1) {
 				if (kv->KmtYour.CAPAS & KMT_CAP_FILATTR)
-					KmtSendNextData(fv,kv,cv);
+					KmtSendNextData(kv);
 				else
-					KmtSendNextData(fv,kv,cv);
+					KmtSendNextData(kv);
 			}
 			break;
 		case SendData:
 			if (PktNumNew==kv->PktNum)
-				KmtSendPacket(fv,kv,cv);
+				KmtSendPacket(kv);
 			else if (PktNumNew==kv->PktNum+1)
-				KmtSendNextData(fv,kv,cv);
+				KmtSendNextData(kv);
 			break;
 		case SendEOF:
 			if (PktNumNew==kv->PktNum)
-				KmtSendPacket(fv,kv,cv);
+				KmtSendPacket(kv);
 			else if (PktNumNew==kv->PktNum+1)
 			{
-				if (! KmtSendNextFile(fv,kv,cv))
+				if (! KmtSendNextFile(kv))
 					return FALSE;
 			}
 			break;
 		case SendEOT:
 			if (PktNumNew==kv->PktNum)
-				KmtSendPacket(fv,kv,cv);
+				KmtSendPacket(kv);
 			break;
 		case ServerInit:
 			if (PktNumNew==kv->PktNum)
-				KmtSendPacket(fv,kv,cv);
+				KmtSendPacket(kv);
 			break;
 		case GetInit:
 			if (PktNumNew==kv->PktNum)
-				KmtSendPacket(fv,kv,cv);
+				KmtSendPacket(kv);
 			break;
 		case Finish:
 			if (PktNumNew==kv->PktNum)
-				KmtSendPacket(fv,kv,cv);
+				KmtSendPacket(kv);
 			break;
 		}
 		break;
@@ -1565,33 +1573,33 @@ read_end:
 			if (PktNumNew==kv->PktNum)
 			{
 				KmtParseInit(kv,TRUE);
-				if (! KmtSendNextFile(fv,kv,cv))
+				if (! KmtSendNextFile(kv))
 					return FALSE;
 			}
 			break;
 		case SendFile:
 			if (PktNumNew==kv->PktNum) {
 				if (kv->KmtYour.CAPAS & KMT_CAP_FILATTR)
-					KmtSendNextFileAttr(fv,kv,cv);
+					KmtSendNextFileAttr(kv);
 				else
-					KmtSendNextData(fv,kv,cv);
+					KmtSendNextData(kv);
 			}
 			break;
 		case SendFileAttr:
 			if (PktNumNew==kv->PktNum) {
-				KmtSendNextData(fv,kv,cv);
+				KmtSendNextData(kv);
 			}
 			break;
 		case SendData:
 			if (PktNumNew==kv->PktNum)
-				KmtSendNextData(fv,kv,cv);
+				KmtSendNextData(kv);
 			else if (PktNumNew+1==kv->PktNum)
-				KmtSendPacket(fv,kv,cv);
+				KmtSendPacket(kv);
 			break;
 		case SendEOF:
 			if (PktNumNew==kv->PktNum)
 			{
-				if (! KmtSendNextFile(fv,kv,cv))
+				if (! KmtSendNextFile(kv))
 					return FALSE;
 			}
 			break;
@@ -1608,10 +1616,10 @@ read_end:
 				KmtParseInit(kv,TRUE);
 				switch (kv->KmtMode) {
 				case IdKmtGet:
-					KmtSendReceiveInit(fv,kv,cv);
+					KmtSendReceiveInit(kv);
 					break;
 				case IdKmtFinish:
-					KmtSendFinish(fv,kv,cv);
+					KmtSendFinish(kv);
 					break;
 				default:
 					assert(0);
@@ -1632,7 +1640,7 @@ read_end:
 	case 'Z':
 		if (kv->KmtState == ReceiveData)
 		{
-			TFileIO *file = fv->file;
+			TFileIO *file = kv->file;
 			if (kv->FileOpen)
 				file->Close(file);
 			kv->FileOpen = FALSE;
@@ -1662,20 +1670,20 @@ read_end:
 	return TRUE;
 }
 
-static void KmtCancel(PFileVarProto fv, PComVar cv)
+static void KmtCancel(TProto *pv)
 {
-	PKmtVar kv = fv->data;
+	PKmtVar kv = pv->PrivateData;
 	KmtIncPacketNum(kv);
 	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4,"Cancel",_TRUNCATE);
-	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'E',
+	KmtMakePacket(kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'E',
 		strlen(&(kv->PktOut[4])));
-	KmtSendPacket(fv,kv,cv);
+	KmtSendPacket(kv);
 	kv->KmtMode = IdKmtQuit;
 }
 
-static int SetOptV(PFileVarProto fv, int request, va_list ap)
+static int SetOptV(TProto *pv, int request, va_list ap)
 {
-	PKmtVar kv = fv->data;
+	PKmtVar kv = pv->PrivateData;
 	switch(request) {
 	case KMT_MODE: {
 		KMT_MODE_T Mode = va_arg(ap, KMT_MODE_T);
@@ -1686,9 +1694,18 @@ static int SetOptV(PFileVarProto fv, int request, va_list ap)
 	return -1;
 }
 
-static void Destroy(PFileVarProto fv)
+static int SetOpt(TProto *pv, int request, ...)
 {
-	PKmtVar kv = fv->data;
+	va_list ap;
+	va_start(ap, request);
+	int r = SetOptV(pv, request, ap);
+	va_end(ap);
+	return r;
+}
+
+static void Destroy(TProto *pv)
+{
+	PKmtVar kv = pv->PrivateData;
 	if (kv->log != NULL) {
 		TProtoLog* log = kv->log;
 		log->Destory(log);
@@ -1697,7 +1714,8 @@ static void Destroy(PFileVarProto fv)
 	free((void *)kv->FullName);
 	kv->FullName = NULL;
 	free(kv);
-	fv->data = NULL;
+	pv->PrivateData = NULL;
+	free(pv);
 }
 
 static const TProtoOp Op = {
@@ -1705,21 +1723,29 @@ static const TProtoOp Op = {
 	KmtReadPacket,
 	KmtTimeOutProc,
 	KmtCancel,
+	SetOpt,
 	SetOptV,
 	Destroy,
 };
 
-BOOL KmtCreate(PFileVarProto fv)
+TProto *KmtCreate(PFileVarProto fv)
 {
-	PKmtVar kv;
-	kv = malloc(sizeof(TKmtVar));
+	TProto *pv = malloc(sizeof(*pv));
+	if (pv == NULL) {
+		return NULL;
+	}
+	PKmtVar kv = malloc(sizeof(TKmtVar));
+	pv->Op = &Op;
+	pv->PrivateData = kv;
 	if (kv == NULL) {
-		return FALSE;
+		free(pv);
+		return NULL;
 	}
 	memset(kv, 0, sizeof(*kv));
 	kv->FileOpen = FALSE;
-	fv->data = kv;
-	fv->ProtoOp = &Op;
+	kv->Comm = fv->Comm;
+	kv->file = fv->file_fv;
+	kv->fv = fv;
 
-	return TRUE;
+	return pv;
 }
