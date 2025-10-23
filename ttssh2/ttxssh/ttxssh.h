@@ -344,6 +344,7 @@ typedef struct _TInstVar {
 	BOOL nocheck_known_hosts;
 
 	EC_KEY *ecdh_client_key;
+	const EC_GROUP *ec_group;
 
 	u_char c25519_client_key[CURVE25519_SIZE];
 	u_char c25519_client_pubkey[CURVE25519_SIZE];

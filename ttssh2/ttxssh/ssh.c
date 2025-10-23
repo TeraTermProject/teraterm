@@ -5588,6 +5588,7 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 		EC_KEY_free(pvar->ecdh_client_key);
 	}
 	pvar->ecdh_client_key = client_key;
+	pvar->ec_group = group;
 
 	SSH2_dispatch_init(pvar, 2);
 	SSH2_dispatch_add_message(SSH2_MSG_KEX_ECDH_REPLY);
@@ -6152,6 +6153,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	char *server_host_key_blob;
 	int bloblen, siglen;
 	EC_POINT *server_public = NULL;
+	EC_KEY *client_key = NULL;
 	const EC_GROUP *group;
 	char *signature;
 	int ecdh_len;
@@ -6168,6 +6170,9 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
 
 	memset(&hostkey, 0, sizeof(hostkey));
+
+	group = pvar->ec_group;
+	client_key = pvar->ecdh_client_key;
 
 	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
@@ -6205,7 +6210,6 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	}
 
 	/* Q_S, server public key */
-	group = EC_KEY_get0_group(pvar->ecdh_client_key);
 	server_public = EC_POINT_new(group);
 	if (server_public == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
@@ -6247,7 +6251,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 		goto error;
 	}
 	if (ECDH_compute_key(ecdh_buf, ecdh_len, server_public,
-	                     pvar->ecdh_client_key, NULL) != (int)ecdh_len) {
+	                     client_key, NULL) != (int)ecdh_len) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 					"%s: Out of memory (3)", __FUNCTION__);
 		emsg = emsg_tmp;
@@ -6275,7 +6279,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 		buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
 		buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex),
 		server_host_key_blob, bloblen,
-		EC_KEY_get0_public_key(pvar->ecdh_client_key),
+		EC_KEY_get0_public_key(client_key),
 		server_public,
 		share_key,
 		hash, &hashlen);
