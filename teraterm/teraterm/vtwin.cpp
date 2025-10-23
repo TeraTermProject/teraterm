@@ -1675,27 +1675,6 @@ LRESULT CVTWindow::OnUniChar(WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-/* copy from ttset.c*/
-static void WriteInt2(const char *Sect, const char *Key, const char *FName, int i1, int i2)
-{
-	char Temp[32];
-	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d,%d", i1, i2);
-	WritePrivateProfileString(Sect, Key, Temp, FName);
-}
-
-static void SaveVTPos()
-{
-#define Section "Tera Term"
-	if (ts.SaveVTWinPos) {
-		/* VT win position */
-		WriteInt2(Section, "VTPos", ts.SetupFName, ts.VTPos.x, ts.VTPos.y);
-
-		/* VT terminal size  */
-		WriteInt2(Section, "TerminalSize", ts.SetupFName,
-		          ts.TerminalWidth, ts.TerminalHeight);
-	}
-}
-
 void CVTWindow::OnClose()
 {
 	if ((HTEKWin!=NULL) && ! ::IsWindowEnabled(HTEKWin)) {
@@ -1722,7 +1701,7 @@ void CVTWindow::OnClose()
 	FileSendEnd();
 	ProtoEnd();
 
-	SaveVTPos();
+	SaveVTPos(&ts);
 	Notify2UnsetWindow((NotifyIcon *)cv.NotifyIcon);
 
 	// アプリケーション終了時にアイコンを破棄すると、ウィンドウが消える前に
