@@ -467,9 +467,17 @@ static wchar_t *_GetTermLogPath(const SetupList *list, const TTTSet *pts)
 	}
 }
 
-static wchar_t *_GetFileDir(const SetupList *list, const TTTSet *pts)
+static wchar_t *_GetFileDir(const SetupList *, const TTTSet *pts)
 {
 	return GetFileDir(pts);
+}
+
+static wchar_t *GetHistoryFileName(const SetupList *, const TTTSet *pts)
+{
+#define BROADCAST_LOGFILE L"broadcast.log"
+	wchar_t *fname = NULL;
+	awcscats(&fname, pts->HomeDirW, L"\\", BROADCAST_LOGFILE, NULL);
+	return fname;
 }
 
 typedef struct {
@@ -547,6 +555,8 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			  LIST_PARAM_STR, pts->EtermLookfeel.BGSPIPathW, NULL },
 			{ NULL, L"UI language file",
 			  LIST_PARAM_STR, pts->UILanguageFileW, NULL },
+			{ NULL, L"Broadcast history file",
+			  LIST_PARAM_FUNC, GetHistoryFileName, NULL },
 		};
 
 		int y = 0;
