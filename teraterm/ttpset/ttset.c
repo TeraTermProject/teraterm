@@ -3318,6 +3318,18 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 }
 
+void SaveVTPos(const PTTSet ts)
+{
+	if (ts->SaveVTWinPos) {
+		/* VT win position */
+		WriteInt2(Section, "VTPos", ts->SetupFNameW, ts->VTPos.x, ts->VTPos.y);
+
+		/* VT terminal size  */
+		WriteInt2(Section, "TerminalSize", ts->SetupFNameW,
+		          ts->TerminalWidth, ts->TerminalHeight);
+	}
+}
+
 void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,
 							const wchar_t *key, int MaxList)
 {
