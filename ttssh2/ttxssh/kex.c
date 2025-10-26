@@ -67,6 +67,33 @@ static const struct ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
 };
 
 
+// from kex.c OpenSSH 8.0p1
+kex* kex_new(void)
+{
+	kex *kex;
+
+	if ((kex = calloc(1, sizeof(*kex))) == NULL ||
+	    (kex->peer = buffer_init()) == NULL ||
+	    (kex->my = buffer_init()) == NULL) {
+		kex_free(kex);
+		return NULL;
+	}
+	return kex;
+}
+
+// from kex.c OpenSSH 8.0p1
+void kex_free(kex *kex)
+{
+	if (kex == NULL)
+		return;
+
+	DH_free(kex->dh);
+	EC_KEY_free(kex->ec_client_key);
+	buffer_free(kex->peer);
+	buffer_free(kex->my);
+	free(kex);
+}
+
 const char* get_kex_algorithm_name(kex_algorithm kextype)
 {
 	const struct ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
@@ -147,7 +174,7 @@ void SSH2_update_kex_myproposal(PTInstVar pvar)
 
 	// 通信中に呼ばれるということはキー再作成
 	if (pvar->socket != INVALID_SOCKET) {
-		if (pvar->kex_status & KEX_FLAG_REKEYING) {
+		if (pvar->kex->kex_status & KEX_FLAG_REKEYING) {
 			// キー再作成の場合には、接続時に pvar->settings から組み立てられた myproposal を書き換える。
 			//   pvar->settings が 接続時に myproposal を作成したときの値から変わっていない保証がない。
 			//   再度組み立てるのではなく既存の myproposal を書き換えることにした。
@@ -716,7 +743,7 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 static u_char *derive_key(PTInstVar pvar, int id, int need, u_char *hash, u_int hashlen,
 	buffer_t *shared_secret)
 {
-	digest_algorithm hash_alg = get_kex_hash_algorithm(pvar->kex_type);
+	digest_algorithm hash_alg = get_kex_hash_algorithm(pvar->kex->kex_type);
 	struct ssh_digest_ctx *hashctx = NULL;
 	char c = id;
 	int have;
@@ -734,8 +761,8 @@ static u_char *derive_key(PTInstVar pvar, int id, int need, u_char *hash, u_int 
 	    ssh_digest_update_buffer(hashctx, shared_secret) != 0 ||
 	    ssh_digest_update(hashctx, hash, hashlen) != 0 ||
 	    ssh_digest_update(hashctx, &c, 1) != 0 ||
-	    ssh_digest_update(hashctx, pvar->session_id,
-	    pvar->session_id_len) != 0 ||
+	    ssh_digest_update(hashctx, pvar->kex->session_id,
+	                      pvar->kex->session_id_len) != 0 ||
 	    ssh_digest_final(hashctx, digest, mdsz) != 0) {
 		goto skip;
 	}
@@ -775,8 +802,8 @@ void kex_derive_keys(PTInstVar pvar, SSHKeys *newkeys, u_char *hash, u_int hashl
 	int i, mode, ctos;
 
 	for (i = 0; i < NKEYS; i++) {
-		keys[i] = derive_key(pvar, 'A'+i, pvar->we_need, hash, hashlen, shared_secret);
-		//debug_print(i, keys[i], pvar->we_need);
+		keys[i] = derive_key(pvar, 'A'+i, pvar->kex->we_need, hash, hashlen, shared_secret);
+		//debug_print(i, keys[i], pvar->kex->we_need);
 	}
 
 	for (mode = 0; mode < MODE_MAX; mode++) {

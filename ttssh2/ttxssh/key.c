@@ -2439,10 +2439,10 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 			"Server failed to confirm ownership of private host keys(type %d)", type);
 		goto error;
 	}
-	if (pvar->session_id_len == 0) {
+	if (pvar->kex->session_id_len == 0) {
 		logprintf(LOG_LEVEL_FATAL,
 			"Hostkey can not be updated because pvar->session_id_len %d(program bug).",
-			pvar->session_id_len);
+			pvar->kex->session_id_len);
 		goto error;
 	}
 
@@ -2457,7 +2457,7 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 
 		buffer_clear(b);
 		buffer_put_cstring(b, "hostkeys-prove-00@openssh.com");
-		buffer_put_string(b, pvar->session_id, pvar->session_id_len);
+		buffer_put_string(b, pvar->kex->session_id, pvar->kex->session_id_len);
 		key_to_blob(ctx->keys[i], (char **)&blob, &bloblen);
 		buffer_put_string(b, blob, bloblen);
 		free(blob);

@@ -279,21 +279,6 @@ typedef struct _TInstVar {
 	TS_SSH settings;
 
 	// SSH2
-	DH *kexdh;
-	char server_version_string[128];
-	char client_version_string[128];
-	buffer_t *my_kex;
-	buffer_t *peer_kex;
-	kex_algorithm kex_type; // KEX algorithm
-	ssh_keyalgo hostkey_type;
-	const struct ssh2cipher *ciphers[MODE_MAX];
-	const struct ssh2_mac_t *macs[MODE_MAX];
-	compression_type ctos_compression;
-	compression_type stoc_compression;
-	int we_need;
-	int kex_status;
-	char *session_id;
-	int session_id_len;
 	SSHKeys ssh2_keys[MODE_MAX];
 	struct sshcipher_ctx *cc[MODE_MAX];
 	int userauth_success;
@@ -307,11 +292,10 @@ typedef struct _TInstVar {
 	unsigned int remote_window;
 	unsigned int remote_maxpacket;
 	*/
-	int client_key_bits;
-	int server_key_bits;
-	int kexgex_min;
-	int kexgex_bits;
-	int kexgex_max;
+
+	/* Key exchange */
+	struct kex *kex;
+
 	int ssh2_autologin;
 	int ask4passwd;
 	SSHAuthMethod ssh2_authmethod;
@@ -343,12 +327,6 @@ typedef struct _TInstVar {
 
 	BOOL nocheck_known_hosts;
 
-	EC_KEY *ecdh_client_key;
-	const EC_GROUP *ec_group;
-
-	u_char c25519_client_key[CURVE25519_SIZE];
-	u_char c25519_client_pubkey[CURVE25519_SIZE];
-
 	int dns_key_check;
 
 	unsigned int server_compat_flag;
@@ -370,9 +348,6 @@ typedef struct _TInstVar {
 		BOOL data_finished;	// TRUEのとき,データの受信は完了した
 		BOOL close_request;
 	} recv;
-
-	char *server_sig_algs;
-	BOOL server_strict_kex;
 
 	char UIMsg[MAX_UIMSG];
 } TInstVar;

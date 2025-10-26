@@ -31,6 +31,8 @@
 
 #include "ttxssh.h"
 
+#define CURVE25519_SIZE 32
+
 // クライアントからサーバへの提案事項
 enum kex_init_proposals {
 	PROPOSAL_KEX_ALGS,
@@ -72,6 +74,48 @@ typedef enum {
 	KEX_DH_UNKNOWN,
 	KEX_DH_MAX = KEX_DH_UNKNOWN,
 } kex_algorithm;
+
+struct ssh2_mac_t;
+
+typedef struct kex {
+	int kex_status;
+	char server_version_string[128];
+	char client_version_string[128];
+	buffer_t *my;
+	buffer_t *peer;
+
+	kex_algorithm kex_type; // KEX algorighm
+	ssh_keyalgo hostkey_type;
+	const ssh2cipher *ciphers[MODE_MAX];
+	const ssh2_mac_t *macs[MODE_MAX];
+	compression_type ctos_compression;
+	compression_type stoc_compression;
+
+	// 鍵交換で生成した鍵の置き場
+	// 実際の通信に使われるのはpvar->ssh2_keys[]であり、ここに置いただけでは使われない。
+	// 有効にするタイミングで、pvar->ssh2_keys にコピーする。
+	SSHKeys current_keys[MODE_MAX];
+	int we_need;
+
+	int client_key_bits;
+	int server_key_bits;
+	char *session_id;
+	int session_id_len;
+
+	BOOL kex_strict;
+	char *server_sig_algs;
+
+	/* kex specific state */
+	DH *dh; /* DH */
+	u_int min, max, nbits; /* GEX */
+	EC_KEY *ec_client_key; /* ECDH */
+	const EC_GROUP *ec_group; /* ECDH */
+	u_char c25519_client_key[CURVE25519_SIZE]; /* 25519 */
+	u_char c25519_client_pubkey[CURVE25519_SIZE]; /* 25519 */
+} kex;
+
+kex* kex_new(void);
+void kex_free(kex *kex);
 
 const char* get_kex_algorithm_name(kex_algorithm kextype);
 const digest_algorithm get_kex_hash_algorithm(kex_algorithm kextype);
@@ -134,7 +178,7 @@ int kex_ecdh_hash(const digest_algorithm hash_alg,
                   const EC_POINT *server_dh_pub,
                   BIGNUM *shared_secret,
                   char *hash, unsigned int *hashlen);
-#define CURVE25519_SIZE 32
+
 int kex_c25519_hash(const digest_algorithm hash_alg,
                     char *client_version_string,
                     char *server_version_string,

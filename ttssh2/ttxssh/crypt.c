@@ -1041,9 +1041,9 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 		}
 		else {
 			// SSH2
-			cipher = pvar->ciphers[MODE_OUT];
+			cipher = pvar->kex->ciphers[MODE_OUT];
 			if (cipher) {
-				pvar->crypt_state.sender_cipher = get_cipher_id(pvar->ciphers[MODE_OUT]);
+				pvar->crypt_state.sender_cipher = get_cipher_id(pvar->kex->ciphers[MODE_OUT]);
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
 				cipher_init_SSH2(&pvar->cc[MODE_OUT], cipher,
 				                 enc->key, enc->key_len,
@@ -1087,9 +1087,9 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 		}
 		else {
 			// SSH2
-			cipher = pvar->ciphers[MODE_IN];
+			cipher = pvar->kex->ciphers[MODE_IN];
 			if (cipher) {
-				pvar->crypt_state.receiver_cipher = get_cipher_id(pvar->ciphers[MODE_IN]);
+				pvar->crypt_state.receiver_cipher = get_cipher_id(pvar->kex->ciphers[MODE_IN]);
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
 				cipher_init_SSH2(&pvar->cc[MODE_IN], cipher,
 				                 enc->key, enc->key_len,
@@ -1157,17 +1157,17 @@ void CRYPT_get_server_key_info(PTInstVar pvar, char *dest, int len)
 			RSA_get0_key(pvar->crypt_state.host_key.RSA_key, &host_n, NULL, NULL);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_KEY_INFO", pvar,
-								"%d-bit server key, %d-bit host key");
+			                    "%d-bit server key, %d-bit host key");
 			_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg,
 			            BN_num_bits(server_n),
 			            BN_num_bits(host_n));
 		}
 	} else { // SSH2
 			UTIL_get_lang_msgU8("DLG_ABOUT_KEY_INFO2", pvar,
-								"%d-bit client key, %d-bit server key");
+			                    "%d-bit client key, %d-bit server key");
 			_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg,
-			            pvar->client_key_bits,
-			            pvar->server_key_bits);
+			            pvar->kex->client_key_bits,
+			            pvar->kex->server_key_bits);
 	}
 }
 
