@@ -67,12 +67,14 @@ static const struct ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
 };
 
 
-// from kex.c OpenSSH 8.0p1
+// from OpenSSH 8.0p1 kex.c
 kex* kex_new(void)
 {
 	kex *kex;
 
 	if ((kex = calloc(1, sizeof(*kex))) == NULL ||
+	    (kex->client_version = buffer_init()) == NULL ||
+	    (kex->server_version = buffer_init()) == NULL ||
 	    (kex->peer = buffer_init()) == NULL ||
 	    (kex->my = buffer_init()) == NULL) {
 		kex_free(kex);
@@ -81,7 +83,7 @@ kex* kex_new(void)
 	return kex;
 }
 
-// from kex.c OpenSSH 8.0p1
+// from OpenSSH 8.0p1 kex.c
 void kex_free(kex *kex)
 {
 	if (kex == NULL)
@@ -89,8 +91,11 @@ void kex_free(kex *kex)
 
 	DH_free(kex->dh);
 	EC_KEY_free(kex->ec_client_key);
+	buffer_free(kex->client_version);
+	buffer_free(kex->server_version);
 	buffer_free(kex->peer);
 	buffer_free(kex->my);
+	buffer_free(kex->client_pub); /* buffer_init() in each kex reply method */
 	free(kex);
 }
 
@@ -454,16 +459,16 @@ int dh_estimate(int bits)
 
 
 // hash を計算する (DH 固定グループ用)
-// from kexdh.c OpenSSH 7.9p1
+// from OpenSSH 8.0p1 kexgen.c
 int kex_dh_hash(const digest_algorithm hash_alg,
-                char *client_version_string,
-                char *server_version_string,
-                char *ckexinit, int ckexinitlen,
-                char *skexinit, int skexinitlen,
-                u_char *serverhostkeyblob, int sbloblen,
-                BIGNUM *client_dh_pub,
-                BIGNUM *server_dh_pub,
-                BIGNUM *shared_secret,
+                buffer_t *client_version,
+                buffer_t *server_version,
+                buffer_t *client_kexinit,
+                buffer_t *server_kexinit,
+                buffer_t *serverhostkeyblob,
+                buffer_t *client_pub,
+                buffer_t *server_pub,
+                buffer_t *shared_secret,
                 char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
@@ -474,21 +479,21 @@ int kex_dh_hash(const digest_algorithm hash_alg,
 	if (b == NULL)
 		return SSH_ERR_ALLOC_FAIL;
 
-	buffer_put_string(b, client_version_string, strlen(client_version_string));
-	buffer_put_string(b, server_version_string, strlen(server_version_string));
+	buffer_put_stringb(b, client_version);
+	buffer_put_stringb(b, server_version);
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	buffer_put_int(b, ckexinitlen+1);
+	buffer_put_int(b, buffer_len(client_kexinit) + 1);
 	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_append(b, ckexinit, ckexinitlen);
-	buffer_put_int(b, skexinitlen+1);
+	buffer_append(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit));
+	buffer_put_int(b, buffer_len(server_kexinit) + 1);
 	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_append(b, skexinit, skexinitlen);
+	buffer_append(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit));
 
-	buffer_put_string(b, serverhostkeyblob, sbloblen);
-	buffer_put_bignum2(b, client_dh_pub);
-	buffer_put_bignum2(b, server_dh_pub);
-	buffer_put_bignum2(b, shared_secret);
+	buffer_put_stringb(b, serverhostkeyblob);
+	buffer_append(b, buffer_ptr(client_pub), buffer_len(client_pub));
+	buffer_append(b, buffer_ptr(server_pub), buffer_len(server_pub));
+	buffer_append(b, buffer_ptr(shared_secret), buffer_len(shared_secret));
 
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
@@ -506,13 +511,13 @@ int kex_dh_hash(const digest_algorithm hash_alg,
 
 
 // hash を計算する (DH GEX用)
-// from kexgex.c OpenSSH 7.9p1
+// from OpenSSH 8.0p1 kexgex.c
 int kexgex_hash(const digest_algorithm hash_alg,
-                char *client_version_string,
-                char *server_version_string,
-                char *ckexinit, int ckexinitlen,
-                char *skexinit, int skexinitlen,
-                u_char *serverhostkeyblob, int sbloblen,
+                buffer_t *client_version,
+                buffer_t *server_version,
+                buffer_t *client_kexinit,
+                buffer_t *server_kexinit,
+                buffer_t *serverhostkeyblob,
                 int kexgex_min,
                 int kexgex_bits,
                 int kexgex_max,
@@ -531,18 +536,18 @@ int kexgex_hash(const digest_algorithm hash_alg,
 	if (b == NULL)
 		return SSH_ERR_ALLOC_FAIL;
 
-	buffer_put_string(b, client_version_string, strlen(client_version_string));
-	buffer_put_string(b, server_version_string, strlen(server_version_string));
+	buffer_put_stringb(b, client_version);
+	buffer_put_stringb(b, server_version);
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	buffer_put_int(b, ckexinitlen+1);
+	buffer_put_int(b, buffer_len(client_kexinit) + 1);
 	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_append(b, ckexinit, ckexinitlen);
-	buffer_put_int(b, skexinitlen+1);
+	buffer_append(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit));
+	buffer_put_int(b, buffer_len(server_kexinit) + 1);
 	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_append(b, skexinit, skexinitlen);
+	buffer_append(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit));
 
-	buffer_put_string(b, serverhostkeyblob, sbloblen);
+	buffer_put_stringb(b, serverhostkeyblob);
 
 	// DH group sizeのビット数を加算する
 	buffer_put_int(b, kexgex_min);
@@ -553,6 +558,9 @@ int kexgex_hash(const digest_algorithm hash_alg,
 	buffer_put_bignum2(b, kexgex_p);
 	buffer_put_bignum2(b, kexgex_g);
 
+	/*
+	 * GEX は引数の型が異なる（OpenSSH 7.9以前のまま）
+	 */
 	buffer_put_bignum2(b, client_dh_pub);
 	buffer_put_bignum2(b, server_dh_pub);
 	buffer_put_bignum2(b, shared_secret);
@@ -573,18 +581,17 @@ int kexgex_hash(const digest_algorithm hash_alg,
 
 
 // hash を計算する (ECDH用)
-// from kexecdh.c OpenSSH 7.9p1
+// from OpenSSH 8.0p1 kexgen.c
 int kex_ecdh_hash(const digest_algorithm hash_alg,
-                             const EC_GROUP *ec_group,
-                             char *client_version_string,
-                             char *server_version_string,
-                             char *ckexinit, int ckexinitlen,
-                             char *skexinit, int skexinitlen,
-                             u_char *serverhostkeyblob, int sbloblen,
-                             const EC_POINT *client_dh_pub,
-                             const EC_POINT *server_dh_pub,
-                             BIGNUM *shared_secret,
-                             char *hash, unsigned int *hashlen)
+                  buffer_t *client_version,
+                  buffer_t *server_version,
+                  buffer_t *client_kexinit,
+                  buffer_t *server_kexinit,
+                  buffer_t *serverhostkeyblob,
+                  buffer_t *client_pub,
+                  buffer_t *server_pub,
+                  buffer_t *shared_secret,
+                  char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
 
@@ -594,22 +601,21 @@ int kex_ecdh_hash(const digest_algorithm hash_alg,
 	if (b == NULL)
 		return SSH_ERR_ALLOC_FAIL;
 
-	buffer_put_string(b, client_version_string, strlen(client_version_string));
-	buffer_put_string(b, server_version_string, strlen(server_version_string));
+	buffer_put_stringb(b, client_version);
+	buffer_put_stringb(b, server_version);
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	buffer_put_int(b, ckexinitlen+1);
+	buffer_put_int(b, buffer_len(client_kexinit) + 1);
 	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_append(b, ckexinit, ckexinitlen);
-	buffer_put_int(b, skexinitlen+1);
+	buffer_append(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit));
+	buffer_put_int(b, buffer_len(server_kexinit) + 1);
 	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_append(b, skexinit, skexinitlen);
+	buffer_append(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit));
 
-	buffer_put_string(b, serverhostkeyblob, sbloblen);
-
-	buffer_put_ecpoint(b, ec_group, client_dh_pub);
-	buffer_put_ecpoint(b, ec_group, server_dh_pub);
-	buffer_put_bignum2(b, shared_secret);
+	buffer_put_stringb(b, serverhostkeyblob);
+	buffer_append(b, buffer_ptr(client_pub), buffer_len(client_pub));
+	buffer_append(b, buffer_ptr(server_pub), buffer_len(server_pub));
+	buffer_append(b, buffer_ptr(shared_secret), buffer_len(shared_secret));
 
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
@@ -630,16 +636,16 @@ int kex_ecdh_hash(const digest_algorithm hash_alg,
 extern int crypto_scalarmult_curve25519(unsigned char *, const unsigned char *, const unsigned char *);
 
 // hash を計算する (Curve25519用)
-// from kexc25519.c OpenSSH 7.9
+// from OpenSSH 8.0p1 kexgen.c
 int kex_c25519_hash(const digest_algorithm hash_alg,
-                    char *client_version_string,
-                    char *server_version_string,
-                    char *ckexinit, int ckexinitlen,
-                    char *skexinit, int skexinitlen,
-                    u_char *serverhostkeyblob, int sbloblen,
-                    u_char client_dh_pub[CURVE25519_SIZE],
-                    u_char server_dh_pub[CURVE25519_SIZE],
-                    u_char *shared_secret, int secretlen,
+                    buffer_t *client_version,
+                    buffer_t *server_version,
+                    buffer_t *client_kexinit,
+                    buffer_t *server_kexinit,
+                    buffer_t *serverhostkeyblob,
+                    buffer_t *client_pub,
+                    buffer_t *server_pub,
+                    buffer_t *shared_secret,
                     char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
@@ -650,22 +656,21 @@ int kex_c25519_hash(const digest_algorithm hash_alg,
 	if (b == NULL)
 		return SSH_ERR_ALLOC_FAIL;
 
-	buffer_put_string(b, client_version_string, strlen(client_version_string));
-	buffer_put_string(b, server_version_string, strlen(server_version_string));
+	buffer_put_stringb(b, client_version);
+	buffer_put_stringb(b, server_version);
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	buffer_put_int(b, ckexinitlen+1);
+	buffer_put_int(b, buffer_len(client_kexinit) + 1);
 	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_append(b, ckexinit, ckexinitlen);
-	buffer_put_int(b, skexinitlen+1);
+	buffer_append(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit));
+	buffer_put_int(b, buffer_len(server_kexinit) + 1);
 	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_append(b, skexinit, skexinitlen);
+	buffer_append(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit));
 
-	buffer_put_string(b, serverhostkeyblob, sbloblen);
-
-	buffer_put_string(b, client_dh_pub, CURVE25519_SIZE);
-	buffer_put_string(b, server_dh_pub, CURVE25519_SIZE);
-	buffer_put_raw(b, shared_secret, secretlen);
+	buffer_put_stringb(b, serverhostkeyblob);
+	buffer_append(b, buffer_ptr(client_pub), buffer_len(client_pub));
+	buffer_append(b, buffer_ptr(server_pub), buffer_len(server_pub));
+	buffer_append(b, buffer_ptr(shared_secret), buffer_len(shared_secret));
 
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
@@ -681,7 +686,7 @@ int kex_c25519_hash(const digest_algorithm hash_alg,
 	return 0;
 }
 
-// from kexc25519.c OpenSSH 7.9
+// from OpenSSH 7.9p1 kexc25519.c
 void kexc25519_keygen(u_char key[CURVE25519_SIZE], u_char pub[CURVE25519_SIZE])
 {
 	static const u_char basepoint[CURVE25519_SIZE] = {9};
@@ -690,7 +695,7 @@ void kexc25519_keygen(u_char key[CURVE25519_SIZE], u_char pub[CURVE25519_SIZE])
 	crypto_scalarmult_curve25519(pub, key, basepoint);
 }
 
-// from kexc25519.c OpenSSH 7.9
+// from OpenSSH 7.9p1 kexc25519.c
 int kexc25519_shared_key(const u_char key[CURVE25519_SIZE],
                          const u_char pub[CURVE25519_SIZE], buffer_t *out)
 {
@@ -739,7 +744,7 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 }
 
 
-// from kex.c OpenSSH 7.9p1
+// from OpenSSH 7.9p1 kex.c
 static u_char *derive_key(PTInstVar pvar, int id, int need, u_char *hash, u_int hashlen,
 	buffer_t *shared_secret)
 {

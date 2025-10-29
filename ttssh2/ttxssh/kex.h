@@ -79,8 +79,8 @@ struct ssh2_mac_t;
 
 typedef struct kex {
 	int kex_status;
-	char server_version_string[128];
-	char client_version_string[128];
+	buffer_t *client_version;
+	buffer_t *server_version;
 	buffer_t *my;
 	buffer_t *peer;
 
@@ -112,6 +112,7 @@ typedef struct kex {
 	const EC_GROUP *ec_group; /* ECDH */
 	u_char c25519_client_key[CURVE25519_SIZE]; /* 25519 */
 	u_char c25519_client_pubkey[CURVE25519_SIZE]; /* 25519 */
+	buffer_t *client_pub;
 } kex;
 
 kex* kex_new(void);
@@ -143,21 +144,21 @@ void dh_gen_key(PTInstVar pvar, DH *dh, int we_need /* bytes */ );
 int dh_estimate(int bits);
 
 int kex_dh_hash(const digest_algorithm hash_alg,
-                char *client_version_string,
-                char *server_version_string,
-                char *ckexinit, int ckexinitlen,
-                char *skexinit, int skexinitlen,
-                u_char *serverhostkeyblob, int sbloblen,
-                BIGNUM *client_dh_pub,
-                BIGNUM *server_dh_pub,
-                BIGNUM *shared_secret,
+                buffer_t *client_version,
+                buffer_t *server_version,
+                buffer_t *client_kexinit,
+                buffer_t *server_kexinit,
+                buffer_t *serverhostkeyblob,
+                buffer_t *client_pub,
+                buffer_t *server_pub,
+                buffer_t *shared_secret,
                 char *hash, unsigned int *hashlen);
 int kexgex_hash(const digest_algorithm hash_alg,
-                char *client_version_string,
-                char *server_version_string,
-                char *ckexinit, int ckexinitlen,
-                char *skexinit, int skexinitlen,
-                u_char *serverhostkeyblob, int sbloblen,
+                buffer_t *client_version,
+                buffer_t *server_version,
+                buffer_t *client_kexinit,
+                buffer_t *server_kexinit,
+                buffer_t *serverhostkeyblob,
                 int kexgex_min,
                 int kexgex_bits,
                 int kexgex_max,
@@ -168,26 +169,25 @@ int kexgex_hash(const digest_algorithm hash_alg,
                 BIGNUM *shared_secret,
                 char *hash, unsigned int *hashlen);
 int kex_ecdh_hash(const digest_algorithm hash_alg,
-                  const EC_GROUP *ec_group,
-                  char *client_version_string,
-                  char *server_version_string,
-                  char *ckexinit, int ckexinitlen,
-                  char *skexinit, int skexinitlen,
-                  u_char *serverhostkeyblob, int sbloblen,
-                  const EC_POINT *client_dh_pub,
-                  const EC_POINT *server_dh_pub,
-                  BIGNUM *shared_secret,
+                  buffer_t *client_version,
+                  buffer_t *server_version,
+                  buffer_t *client_kexinit,
+                  buffer_t *server_kexinit,
+                  buffer_t *serverhostkeyblob,
+                  buffer_t *client_pub,
+                  buffer_t *server_pub,
+                  buffer_t *shared_secret,
                   char *hash, unsigned int *hashlen);
 
 int kex_c25519_hash(const digest_algorithm hash_alg,
-                    char *client_version_string,
-                    char *server_version_string,
-                    char *ckexinit, int ckexinitlen,
-                    char *skexinit, int skexinitlen,
-                    u_char *serverhostkeyblob, int sbloblen,
-                    u_char client_dh_pub[CURVE25519_SIZE],
-                    u_char server_dh_pub[CURVE25519_SIZE],
-                    u_char *shared_secret, int secretlen,
+                    buffer_t *client_version,
+                    buffer_t *server_version,
+                    buffer_t *client_kexinit,
+                    buffer_t *server_kexinit,
+                    buffer_t *serverhostkeyblob,
+                    buffer_t *client_pub,
+                    buffer_t *server_pub,
+                    buffer_t *shared_secret,
                     char *hash, unsigned int *hashlen);
 void kexc25519_keygen(u_char key[CURVE25519_SIZE], u_char pub[CURVE25519_SIZE]);
 int kexc25519_shared_key(const u_char key[CURVE25519_SIZE],

@@ -1993,7 +1993,7 @@ void server_version_check(PTInstVar pvar)
 
 	pvar->server_compat_flag = 0;
 
-	if ((server_swver = strchr(pvar->kex->server_version_string+4, '-')) == NULL) {
+	if ((server_swver = strchr(pvar->ssh_state.server_ID + 4, '-')) == NULL) {
 		logputs(LOG_LEVEL_WARNING, "Can't get server software version string.");
 		return;
 	}
@@ -2039,8 +2039,8 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len)
 		} else if (strncmp(ID, "SSH-", 4) != 0) {
 			return FALSE;
 		} else {
+			// 改行の除去
 			ID[ID_len - 1] = 0;
-
 			if (ID_len > 1 && ID[ID_len - 2] == '\r') {
 				ID[ID_len - 2] = 0;
 			}
@@ -2065,8 +2065,8 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len)
 				notify_fatal_error(pvar, uimsg, TRUE);
 			}
 			else {
-				char TTSSH_ID[1024];
-				int TTSSH_ID_len;
+				char TTSSH_ID[1024], TTSSH_ID_send[1024];
+				int TTSSH_ID_send_len;
 
 				// SSH バージョンを teraterm 側にセットする
 				// SCP コマンドのため (2008.2.3)
@@ -2074,39 +2074,38 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len)
 
 				// 自分自身のバージョンを取得する (2005.3.3)
 				_snprintf_s(TTSSH_ID, sizeof(TTSSH_ID), _TRUNCATE,
-				            "SSH-%d.%d-TTSSH/%d.%d.%d Win32\r\n",
+				            "SSH-%d.%d-TTSSH/%d.%d.%d Win32",
 				            pvar->protocol_major, pvar->protocol_minor,
 				            TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR, TTSSH_VERSION_PATCH);
-				TTSSH_ID_len = strlen(TTSSH_ID);
+				pvar->ssh_state.client_ID = _strdup(TTSSH_ID);
 
-				// for SSH2
-				// クライアントバージョンの保存（改行は取り除くこと）
-				strncpy_s(pvar->kex->client_version_string, sizeof(pvar->kex->client_version_string),
-				          TTSSH_ID, _TRUNCATE);
+				// 送信用（改行あり）
+				_snprintf_s(TTSSH_ID_send, sizeof(TTSSH_ID_send), _TRUNCATE,
+				            "%s\r\n", TTSSH_ID);
+				TTSSH_ID_send_len = strlen(TTSSH_ID_send);
 
-				// サーババージョンの保存（改行は取り除くこと）(2005.3.9)
-				_snprintf_s(pvar->kex->server_version_string,
-				            sizeof(pvar->kex->server_version_string), _TRUNCATE,
-				            "%s", pvar->ssh_state.server_ID);
+				// for SSH2 KEX
+				//   クライアントバージョンの保存
+				buffer_clear(pvar->kex->client_version);
+				buffer_append(pvar->kex->client_version, TTSSH_ID, strlen(TTSSH_ID));
+
+				//   サーババージョンの保存 (2005.3.9)
+				buffer_clear(pvar->kex->server_version);
+				buffer_append(pvar->kex->server_version, ID, strlen(ID));
 
 				// サーババージョンのチェック
 				server_version_check(pvar);
 
-				if ((pvar->Psend) (pvar->socket, TTSSH_ID, TTSSH_ID_len, 0) != TTSSH_ID_len) {
+				if ((pvar->Psend)(pvar->socket, TTSSH_ID_send, TTSSH_ID_send_len, 0) != TTSSH_ID_send_len) {
 					UTIL_get_lang_msg("MSG_SSH_SEND_ID_ERROR", pvar,
 					                  "An error occurred while sending the SSH ID string.\n"
 					                  "The connection will close.");
 					notify_fatal_error(pvar, pvar->UIMsg, TRUE);
 				} else {
-					// 改行の除去
-					chop_newlines(pvar->kex->client_version_string);
-					logprintf(LOG_LEVEL_VERBOSE, "Sent client identification string: %s",
-					          pvar->kex->client_version_string);
+					logprintf(LOG_LEVEL_VERBOSE, "Sent client identification string: %s", pvar->ssh_state.client_ID);
 
-					push_memdump("server ID", NULL, pvar->kex->server_version_string,
-					             strlen(pvar->kex->server_version_string));
-					push_memdump("client ID", NULL, pvar->kex->client_version_string,
-					             strlen(pvar->kex->client_version_string));
+					push_memdump("server ID", NULL, pvar->ssh_state.server_ID, strlen(pvar->ssh_state.server_ID));
+					push_memdump("client ID", NULL, pvar->ssh_state.client_ID, strlen(pvar->ssh_state.client_ID));
 
 					// SSHハンドラの登録を行う
 					init_protocol(pvar);
@@ -2994,6 +2993,7 @@ void SSH_init(PTInstVar pvar)
 	pvar->ssh_state.payload_datalen = 0;
 	pvar->ssh_state.hostname = NULL;
 	pvar->ssh_state.server_ID = NULL;
+	pvar->ssh_state.client_ID = NULL;
 	pvar->ssh_state.receiver_sequence_number = 0;
 	pvar->ssh_state.sender_sequence_number = 0;
 	for (i = 0; i < NUM_ELEM(pvar->ssh_state.packet_handlers); i++) {
@@ -3469,6 +3469,14 @@ void SSH_get_server_ID_info(PTInstVar pvar, char *dest, int len)
 	          _TRUNCATE);
 }
 
+void SSH_get_client_ID_info(PTInstVar pvar, char *dest, int len)
+{
+	strncpy_s(dest, len,
+	          pvar->ssh_state.client_ID == NULL ? "Unknown"
+	                                            : pvar->ssh_state.client_ID,
+	          _TRUNCATE);
+}
+
 void SSH_get_protocol_version_info(PTInstVar pvar, char *dest,
                                    int len)
 {
@@ -3515,6 +3523,8 @@ void SSH_end(PTInstVar pvar)
 	pvar->ssh_state.hostname = NULL;
 	free(pvar->ssh_state.server_ID);
 	pvar->ssh_state.server_ID = NULL;
+	free(pvar->ssh_state.client_ID);
+	pvar->ssh_state.client_ID = NULL;
 	buf_destroy(&pvar->ssh_state.outbuf, &pvar->ssh_state.outbuflen);
 	buf_destroy(&pvar->ssh_state.precompress_outbuf,
 	            &pvar->ssh_state.precompress_outbuflen);
@@ -3543,9 +3553,6 @@ void SSH_end(PTInstVar pvar)
 		pvar->shell_id = SSH_CHANNEL_INVALID;
 		pvar->session_nego_status = 0;
 
-
-		memset(pvar->kex->server_version_string, 0, sizeof(pvar->kex->server_version_string));
-		memset(pvar->kex->client_version_string, 0, sizeof(pvar->kex->client_version_string));
 
 		pvar->kex->we_need = 0;
 		pvar->kex->kex_status = 0;
@@ -5667,8 +5674,8 @@ static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, buffer_t *s
 	char emsg[1024];  // error message
 
 	//debug_print(30, hash, hashlen);
-	//debug_print(31, pvar->kex->client_version_string, strlen(pvar->kex->client_version_string));
-	//debug_print(32, pvar->kex->server_version_string, strlen(pvar->kex->server_version_string));
+	//debug_print(31, buffer_ptr(pvar->kex->client_version), buffer_len(pvar->kex->client_version));
+	//debug_print(32, buffer_ptr(pvar->kex->server_version), buffer_len(pvar->kex->server_version));
 	//debug_print(33, buffer_ptr(pvar->kex->my), buffer_len(pvar->kex->my));
 	//debug_print(34, buffer_ptr(pvar->kex->peer), buffer_len(pvar->kex->peer));
 	//debug_print(35, server_host_key_blob, bloblen);
@@ -5775,9 +5782,10 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 {
 	char *data;
 	int len;
-	char *server_host_key_blob;
+	buffer_t *server_host_key_blob = NULL;
 	int bloblen, siglen;
 	BIGNUM *server_public = NULL;
+	buffer_t *server_blob = NULL;
 	char *signature;
 	int dh_len, share_len;
 	char *dh_buf = NULL;
@@ -5786,14 +5794,14 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	char hash[SSH_DIGEST_MAX_LENGTH];
 	char *emsg = NULL, emsg_tmp[1024];  // error message
 	int hashlen;
-	Key *hostkey = NULL;  // hostkey
+	Key *server_host_key = NULL;
 	BOOL result = FALSE;
 	BIGNUM *pub_key;
 	int ret;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXDH_REPLY was received.");
 
-	memset(&hostkey, 0, sizeof(hostkey));
+	memset(&server_host_key, 0, sizeof(server_host_key));
 
 	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
@@ -5805,12 +5813,14 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	/* hostkey */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
-	server_host_key_blob = data; // for hash
+	server_host_key_blob = buffer_init();
+	buffer_append(server_host_key_blob, data, bloblen);
 
-	push_memdump("KEXDH_REPLY", "server_host_key_blob", server_host_key_blob, bloblen);
+	push_memdump("KEXDH_REPLY", "server_host_key_blob", data, bloblen);
 
-	hostkey = key_from_blob(data, bloblen);
-	if (hostkey == NULL) {
+	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob),
+	                                buffer_len(server_host_key_blob));
+	if (server_host_key == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: key_from_blob error", __FUNCTION__);
 		emsg = emsg_tmp;
@@ -5819,13 +5829,13 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	data += bloblen;
 
 	// known_hosts対応 (2006.3.20)
-	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->kex->hostkey_type)) {  // ホストキーの種別比較
+	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(pvar->kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
 		            /*__FUNCTION__*/"handle_SSH2_dh_kex_reply",
 		            get_ssh2_hostkey_type_name_from_algorithm(pvar->kex->hostkey_type),
 		            get_ssh2_hostkey_algorithm_name(pvar->kex->hostkey_type),
-		            get_ssh2_hostkey_type_name(hostkey->type));
+		            get_ssh2_hostkey_type_name(server_host_key->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -5839,6 +5849,8 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		goto error;
 	}
 	buffer_get_bignum2(&data, server_public);
+	server_blob = buffer_init();
+	buffer_put_bignum2(server_blob, server_public);
 
 	/* signed H */
 	siglen = get_uint32_MSBfirst(data);
@@ -5879,22 +5891,29 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	}
 	BN_bin2bn(dh_buf, share_len, share_key);
 	//debug_print(40, dh_buf, share_len);
+	shared_secret = buffer_init();
+	buffer_put_bignum2(shared_secret, share_key);
 
 	/* calc and verify H */
 	// ハッシュの計算
 	// verify は ssh2_kex_finish() で行う
 	DH_get0_key(pvar->kex->dh, &pub_key, NULL);
+	if (pvar->kex->client_pub == NULL) {
+		pvar->kex->client_pub = buffer_init();
+	}
+	buffer_clear(pvar->kex->client_pub);
+	buffer_put_bignum2(pvar->kex->client_pub, pub_key);
 	hashlen = sizeof(hash);
 	ret = kex_dh_hash(
 		get_kex_hash_algorithm(pvar->kex->kex_type),
-		pvar->kex->client_version_string,
-		pvar->kex->server_version_string,
-		buffer_ptr(pvar->kex->my), buffer_len(pvar->kex->my),
-		buffer_ptr(pvar->kex->peer), buffer_len(pvar->kex->peer),
-		server_host_key_blob, bloblen,
-		pub_key,
-		server_public,
-		share_key,
+		pvar->kex->client_version,
+		pvar->kex->server_version,
+		pvar->kex->my,
+		pvar->kex->peer,
+		server_host_key_blob,
+		pvar->kex->client_pub,
+		server_blob,
+		shared_secret,
 		hash, &hashlen);
 	if (ret < 0) {
 		goto error;
@@ -5915,11 +5934,9 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	pvar->kex->client_key_bits = BN_num_bits(pub_key);
 	pvar->kex->server_key_bits = BN_num_bits(server_public);
 
-	shared_secret = buffer_init();
-	buffer_put_bignum2(shared_secret, share_key);
-	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, hostkey, signature, siglen);
+	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 
-	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
+	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
 	if (ret == TRUE) {
 		// ホスト鍵の確認が成功したので、後続の処理を行う
 		SSH_notify_host_OK(pvar);
@@ -5927,13 +5944,18 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	}
 
 error:
+	SecureZeroMemory(hash, sizeof(hash));
+	buffer_free(server_host_key_blob);
 	BN_free(server_public);
 	DH_free(pvar->kex->dh);
 	pvar->kex->dh = NULL;
-	key_free(hostkey);
+	key_free(server_host_key);
 	free(dh_buf);
 	BN_free(share_key);
+	buffer_free(server_blob);
 	buffer_free(shared_secret);
+	buffer_free(pvar->kex->client_pub);
+	pvar->kex->client_pub = NULL;
 
 	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
@@ -5951,7 +5973,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 {
 	char *data;
 	int len;
-	char *server_host_key_blob;
+	buffer_t *server_host_key_blob = NULL;
 	int bloblen, siglen;
 	BIGNUM *server_public = NULL;
 	char *signature;
@@ -5962,7 +5984,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	char hash[SSH_DIGEST_MAX_LENGTH];
 	char *emsg = NULL, emsg_tmp[1024];  // error message
 	int hashlen;
-	Key *hostkey = NULL;  // hostkey
+	Key *server_host_key = NULL;
 	BOOL result = FALSE;
 	int ret;
 	BIGNUM *p, *g;
@@ -5970,7 +5992,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_REPLY was received.");
 
-	memset(&hostkey, 0, sizeof(hostkey));
+	memset(&server_host_key, 0, sizeof(server_host_key));
 
 	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
@@ -5982,12 +6004,14 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	/* hostkey */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
-	server_host_key_blob = data; // for hash
+	server_host_key_blob = buffer_init();
+	buffer_append(server_host_key_blob, data, bloblen);
 
-	push_memdump("DH_GEX_REPLY", "server_host_key_blob", server_host_key_blob, bloblen);
+	push_memdump("DH_GEX_REPLY", "server_host_key_blob", data, bloblen);
 
-	hostkey = key_from_blob(data, bloblen);
-	if (hostkey == NULL) {
+	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob),
+	                                buffer_len(server_host_key_blob));
+	if (server_host_key == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: key_from_blob error", __FUNCTION__);
 		emsg = emsg_tmp;
@@ -5996,13 +6020,13 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	data += bloblen;
 
 	// known_hosts対応 (2006.3.20)
-	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->kex->hostkey_type)) {  // ホストキーの種別比較
+	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(pvar->kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
 		            /*__FUNCTION__*/"handle_SSH2_dh_gex_reply",
 		            get_ssh2_hostkey_type_name_from_algorithm(pvar->kex->hostkey_type),
 		            get_ssh2_hostkey_algorithm_name(pvar->kex->hostkey_type),
-		            get_ssh2_hostkey_type_name(hostkey->type));
+		            get_ssh2_hostkey_type_name(server_host_key->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -6056,6 +6080,8 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	}
 	BN_bin2bn(dh_buf, share_len, share_key);
 	//debug_print(40, dh_buf, share_len);
+	shared_secret = buffer_init();
+	buffer_put_bignum2(shared_secret, share_key);
 
 	/* calc and verify H */
 	// ハッシュの計算
@@ -6065,11 +6091,11 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	hashlen = sizeof(hash);
 	ret = kexgex_hash(
 		get_kex_hash_algorithm(pvar->kex->kex_type),
-		pvar->kex->client_version_string,
-		pvar->kex->server_version_string,
-		buffer_ptr(pvar->kex->my), buffer_len(pvar->kex->my),
-		buffer_ptr(pvar->kex->peer), buffer_len(pvar->kex->peer),
-		server_host_key_blob, bloblen,
+		pvar->kex->client_version,
+		pvar->kex->server_version,
+		pvar->kex->my,
+		pvar->kex->peer,
+		server_host_key_blob,
 		pvar->kex->min,
 		pvar->kex->nbits,
 		pvar->kex->max,
@@ -6098,11 +6124,9 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	pvar->kex->client_key_bits = BN_num_bits(pub_key);
 	pvar->kex->server_key_bits = BN_num_bits(server_public);
 
-	shared_secret = buffer_init();
-	buffer_put_bignum2(shared_secret, share_key);
-	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, hostkey, signature, siglen);
+	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 
-	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
+	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
 	if (ret == TRUE) {
 		// ホスト鍵の確認が成功したので、後続の処理を行う
 		SSH_notify_host_OK(pvar);
@@ -6110,10 +6134,12 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	}
 
 error:
+	SecureZeroMemory(hash, sizeof(hash));
+	buffer_free(server_host_key_blob);
 	BN_free(server_public);
 	DH_free(pvar->kex->dh);
 	pvar->kex->dh = NULL;
-	key_free(hostkey);
+	key_free(server_host_key);
 	free(dh_buf);
 	BN_free(share_key);
 	buffer_free(shared_secret);
@@ -6135,9 +6161,10 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 {
 	char *data;
 	int len;
-	char *server_host_key_blob;
+	buffer_t *server_host_key_blob = NULL;
 	int bloblen, siglen;
 	EC_POINT *server_public = NULL;
+	buffer_t *server_blob = NULL;
 	EC_KEY *client_key = NULL;
 	const EC_GROUP *group;
 	char *signature;
@@ -6148,13 +6175,14 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	char hash[SSH_DIGEST_MAX_LENGTH];
 	char *emsg = NULL, emsg_tmp[1024];  // error message
 	int hashlen;
-	Key *hostkey = NULL;  // hostkey
+	Key *server_host_key = NULL;
 	BOOL result = FALSE;
+	const EC_POINT *pub_key;
 	int ret;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
 
-	memset(&hostkey, 0, sizeof(hostkey));
+	memset(&server_host_key, 0, sizeof(server_host_key));
 
 	group = pvar->kex->ec_group;
 	client_key = pvar->kex->ec_client_key;
@@ -6169,12 +6197,14 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	/* hostkey */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
-	server_host_key_blob = data; // for hash
+	server_host_key_blob = buffer_init();
+	buffer_append(server_host_key_blob, data, bloblen);
 
-	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob", server_host_key_blob, bloblen);
+	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob", data, bloblen);
 
-	hostkey = key_from_blob(data, bloblen);
-	if (hostkey == NULL) {
+	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob),
+	                                buffer_len(server_host_key_blob));
+	if (server_host_key == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: key_from_blob error", __FUNCTION__);
 		emsg = emsg_tmp;
@@ -6183,13 +6213,13 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	data += bloblen;
 
 	// known_hosts対応 (2006.3.20)
-	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->kex->hostkey_type)) {  // ホストキーの種別比較
+	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(pvar->kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
 		            /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
 		            get_ssh2_hostkey_type_name_from_algorithm(pvar->kex->hostkey_type),
 		            get_ssh2_hostkey_algorithm_name(pvar->kex->hostkey_type),
-		            get_ssh2_hostkey_type_name(hostkey->type));
+		            get_ssh2_hostkey_type_name(server_host_key->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
@@ -6203,6 +6233,8 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 		goto error;
 	}
 	buffer_get_ecpoint(&data, group, server_public);
+	server_blob = buffer_init();
+	buffer_put_ecpoint(server_blob, group, server_public);
 
 	/* signed H */
 	siglen = get_uint32_MSBfirst(data);
@@ -6251,22 +6283,29 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	}
 	BN_bin2bn(ecdh_buf, ecdh_len, share_key);
 	//debug_print(40, ecdh_buf, ecdh_len);
+	shared_secret = buffer_init();
+	buffer_put_bignum2(shared_secret, share_key);
 
 	/* calc and verify H */
 	// ハッシュの計算
 	// verify は ssh2_kex_finish() で行う
+	pub_key = EC_KEY_get0_public_key(client_key);
+	if (pvar->kex->client_pub == NULL) {
+		pvar->kex->client_pub = buffer_init();
+	}
+	buffer_clear(pvar->kex->client_pub);
+	buffer_put_ecpoint(pvar->kex->client_pub, group, pub_key);
 	hashlen = sizeof(hash);
 	ret = kex_ecdh_hash(
 		get_kex_hash_algorithm(pvar->kex->kex_type),
-		group,
-		pvar->kex->client_version_string,
-		pvar->kex->server_version_string,
-		buffer_ptr(pvar->kex->my), buffer_len(pvar->kex->my),
-		buffer_ptr(pvar->kex->peer), buffer_len(pvar->kex->peer),
-		server_host_key_blob, bloblen,
-		EC_KEY_get0_public_key(client_key),
-		server_public,
-		share_key,
+		pvar->kex->client_version,
+		pvar->kex->server_version,
+		pvar->kex->my,
+		pvar->kex->peer,
+		server_host_key_blob,
+		pvar->kex->client_pub,
+		server_blob,
+		shared_secret,
 		hash, &hashlen);
 	if (ret < 0) {
 		goto error;
@@ -6300,11 +6339,9 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 			break;
 	}
 
-	shared_secret = buffer_init();
-	buffer_put_bignum2(shared_secret, share_key);
-	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, hostkey, signature, siglen);
+	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 
-	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
+	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
 	if (ret == TRUE) {
 		// ホスト鍵の確認が成功したので、後続の処理を行う
 		SSH_notify_host_OK(pvar);
@@ -6312,13 +6349,18 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	}
 
 error:
+	SecureZeroMemory(hash, sizeof(hash));
+	buffer_free(server_host_key_blob);
 	EC_POINT_clear_free(server_public);
 	EC_KEY_free(pvar->kex->ec_client_key);
 	pvar->kex->ec_client_key = NULL;
-	key_free(hostkey);
+	key_free(server_host_key);
 	free(ecdh_buf);
 	BN_free(share_key);
+	buffer_free(server_blob);
 	buffer_free(shared_secret);
+	buffer_free(pvar->kex->client_pub);
+	pvar->kex->client_pub = NULL;
 
 	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
@@ -6337,21 +6379,22 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 {
 	char *data;
 	int len;
-	char *server_host_key_blob;
+	buffer_t *server_host_key_blob = NULL;
 	int bloblen, siglen, pklen;
-	u_char *server_pubkey = NULL;
+	u_char *server_public = NULL;
+	buffer_t *server_blob = NULL;
 	char *signature;
 	buffer_t *shared_secret = NULL;
 	char hash[SSH_DIGEST_MAX_LENGTH];
 	char *emsg = NULL, emsg_tmp[1024];  // error message
 	int hashlen;
-	Key *hostkey = NULL;  // hostkey
+	Key *server_host_key = NULL;
 	BOOL result = FALSE;
 	int ret;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
 
-	memset(&hostkey, 0, sizeof(hostkey));
+	memset(&server_host_key, 0, sizeof(server_host_key));
 
 	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
@@ -6363,12 +6406,14 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	/* hostkey */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
-	server_host_key_blob = data; // for hash
+	server_host_key_blob = buffer_init();
+	buffer_append(server_host_key_blob, data, bloblen);
 
-	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob", server_host_key_blob, bloblen);
+	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob",data, bloblen);
 
-	hostkey = key_from_blob(data, bloblen);
-	if (hostkey == NULL) {
+	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob),
+	                                buffer_len(server_host_key_blob));
+	if (server_host_key == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: key_from_blob error", __FUNCTION__);
 		emsg = emsg_tmp;
@@ -6377,19 +6422,21 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	data += bloblen;
 
 	// known_hosts対応
-	if (hostkey->type != get_ssh2_hostkey_type_from_algorithm(pvar->kex->hostkey_type)) {  // ホストキーの種別比較
+	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(pvar->kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
 		            /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
 		            get_ssh2_hostkey_type_name_from_algorithm(pvar->kex->hostkey_type),
 		            get_ssh2_hostkey_algorithm_name(pvar->kex->hostkey_type),
-		            get_ssh2_hostkey_type_name(hostkey->type));
+		            get_ssh2_hostkey_type_name(server_host_key->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
 
 	/* Q_S, server public key */
-	server_pubkey = buffer_get_string(&data, &pklen);
+	server_public = buffer_get_string(&data, &pklen);
+	server_blob = buffer_init();
+	buffer_put_string(server_blob, server_public, CURVE25519_SIZE);
 
 	/* signed H */
 	siglen = get_uint32_MSBfirst(data);
@@ -6420,7 +6467,7 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		goto error;
 	}
-	if ((ret = kexc25519_shared_key(pvar->kex->c25519_client_key, server_pubkey,
+	if ((ret = kexc25519_shared_key(pvar->kex->c25519_client_key, server_public,
 	                                shared_secret)) < 0) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: kexc25519_shared_key() was failed(ret %d)", __FUNCTION__, ret);
@@ -6431,16 +6478,22 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	/* calc and verify H */
 	// ハッシュの計算
 	// verify は ssh2_kex_finish() で行う
+	if (pvar->kex->client_pub == NULL) {
+		pvar->kex->client_pub = buffer_init();
+	}
+	buffer_clear(pvar->kex->client_pub);
+	buffer_put_string(pvar->kex->client_pub, pvar->kex->c25519_client_pubkey, CURVE25519_SIZE);
 	hashlen = sizeof(hash);
 	ret = kex_c25519_hash(
 		get_kex_hash_algorithm(pvar->kex->kex_type),
-		pvar->kex->client_version_string,
-		pvar->kex->server_version_string,
-		buffer_ptr(pvar->kex->my), buffer_len(pvar->kex->my),
-		buffer_ptr(pvar->kex->peer), buffer_len(pvar->kex->peer),
-		server_host_key_blob, bloblen,
-		pvar->kex->c25519_client_pubkey, server_pubkey,
-		buffer_ptr(shared_secret), buffer_len(shared_secret),
+		pvar->kex->client_version,
+		pvar->kex->server_version,
+		pvar->kex->my,
+		pvar->kex->peer,
+		server_host_key_blob,
+		pvar->kex->client_pub,
+		server_blob,
+		shared_secret,
 		hash, &hashlen);
 	if (ret < 0) {
 		goto error;
@@ -6459,9 +6512,9 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	pvar->kex->client_key_bits = 256;
 	pvar->kex->server_key_bits = 256;
 
-	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, hostkey, signature, siglen);
+	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 
-	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
+	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
 	if (ret == TRUE) {
 		// ホスト鍵の確認が成功したので、後続の処理を行う
 		SSH_notify_host_OK(pvar);
@@ -6469,10 +6522,15 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	}
 
 error:
-	free(server_pubkey);
+	SecureZeroMemory(hash, sizeof(hash));
+	buffer_free(server_host_key_blob);
+	free(server_public);
 	SecureZeroMemory(pvar->kex->c25519_client_key, sizeof(pvar->kex->c25519_client_key));
-	key_free(hostkey);
+	key_free(server_host_key);
+	buffer_free(server_blob);
 	buffer_free(shared_secret);
+	buffer_free(pvar->kex->client_pub);
+	pvar->kex->client_pub = NULL;
 
 	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);

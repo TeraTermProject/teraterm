@@ -2041,7 +2041,8 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			UTIL_get_lang_msgU8("DLG_ABOUT_CLIENTID", pvar, "Client ID:");
 			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), pvar->kex->client_version_string, _TRUNCATE);
+			SSH_get_client_ID_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_PROTOCOL", pvar, "Using protocol:");
