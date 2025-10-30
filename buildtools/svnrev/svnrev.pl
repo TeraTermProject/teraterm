@@ -34,6 +34,7 @@ my %svninfo = (
 	vcs => '',
 	);
 my $out_isl = "";
+my $architecture = "Win32";		# VS(Win32 / x64 / ARM64) / MinGW(i686 / x86_64)
 
 sub read_toolinfo {
 	my $info = "toolinfo.txt";
@@ -166,6 +167,8 @@ sub write_info_header {
 		print $FD "#undef TERATERM_RELEASE\n";
 	}
 	print $FD "#define BRANCH_NAME \"$svninfo{'name'}\"\n";
+	print $FD "// use predefine macro _M_IX86 or _M_X64 or _M_ARM64\n";
+	print $FD "// #define ARCH \"$architecture\"\n";
 	close($FD);
 }
 
@@ -200,6 +203,7 @@ sub write_info_bat {
 	print $FD "set RELEASE=$svninfo{'release'}\n";
 	print $FD "set DATE=$date\n";
 	print $FD "set TIME=$time\n";
+	print $FD "set ARCHITECTURE=$architecture\n";
 	close($FD);
 }
 
@@ -231,9 +235,14 @@ sub write_info_cmake {
 		print $FD "#set(GITVERSION \"0000\")\n";
 		print $FD "#set(SVNVERSION \"0000\")\n";
 	}
-	print $FD "set(RELEASE $svninfo{'release'})\n";
-	print $FD "set(DATE \"$date\")\n";
-	print $FD "set(TIME \"$time\")\n";
+	print $FD <<"EOS";
+set(RELEASE $svninfo{'release'})
+set(DATE \"$date\")
+set(TIME \"$time\")
+#if(\${CMAKE_GENERATOR} MATCHES "Visual Studio")
+  set(ARCHITECTURE \"$architecture\")
+#endif()
+EOS
 	close($FD);
 }
 
@@ -261,7 +270,8 @@ sub write_info_json {
 	}
 	print $FD "  \"RELEASE\": \"$svninfo{'release'}\",\n";
 	print $FD "  \"DATE\": \"$date\",\n";
-	print $FD "  \"TIME\": \"$time\"\n";
+	print $FD "  \"TIME\": \"$time\",\n";
+	print $FD "	 \"ARCHITECTURE\":  \"$architecture\"\n";
 	print $FD "}\n";
 	close($FD);
 }
@@ -282,6 +292,7 @@ sub write_info_isl {
 #define BuildDate \"$date\"
 #define BuildTime \"$time\"
 #define UserName \"$username\"
+;#define Arch \"$architecture\"
 EOS
 
 	open(my $FD, ">:crlf:utf8", $out_isl) or die "error $out_isl";
@@ -334,7 +345,8 @@ GetOptions(
 	'json=s' => \$out_json,
 	'verbose' => \$verbose,
 	'overwrite' => \$overwrite,
-	'isl=s' => \$out_isl
+	'isl=s' => \$out_isl,
+	'architecture=s' => \$architecture
 );
 
 $git =~ s/"//g;
@@ -349,18 +361,21 @@ if ($tt_version_substr eq "") {
 }
 
 if ($verbose != 0) {
-	print "root=$source_root\n";
-	print "tt_version_major=$tt_version_major\n";
-	print "tt_version_minor=$tt_version_minor\n";
-	print "tt_version_patch=$tt_version_patch\n";
-	print "tt_version_substr=$tt_version_substr\n";
-	print "svn=\"$svn\"\n";
-	print "git=\"$git\"\n";
-	print "header=\"$out_header\"\n";
-	print "bat=\"$out_bat\"\n";
-	print "cmake=\"$out_cmake\"\n";
-	print "json=\"$out_json\"\n";
-	print "overwrite $overwrite\n";
+	print <<"EOS"
+root=$source_root
+tt_version_major=$tt_version_major
+tt_version_minor=$tt_version_minor
+tt_version_patch=$tt_version_patch
+tt_version_substr=$tt_version_substr
+svn=\"$svn\"
+git=\"$git\"
+header=\"$out_header\"
+bat=\"$out_bat\"
+cmake=\"$out_cmake\"
+json=\"$out_json\"
+overwrite $overwrite
+architecture=\"$architecture\"
+EOS
 }
 
 if (-d "$source_root/.svn" && $svn ne "") {

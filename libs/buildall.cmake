@@ -4,8 +4,8 @@
 # cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=win32 -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=x64   -P buildall.cmake
 # .\cmake-3.11.4-win32-x86\bin\cmake.exe -DCMAKE_GENERATOR="Visual Studio 8 2005" -P buildall.cmake
-# cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=32 -P buildall.cmake
-# cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=64 -P buildall.cmake
+# cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=i686 -P buildall.cmake
+# cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=x86_64 -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="NMake Makefiles" -DBUILD_SSL_LIBRARY=OFF -P buildall.cmake
 
 set(BUILD_OPENSSL1 OFF)

@@ -4,6 +4,8 @@
 # cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm64 -P buildoniguruma.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm   -P buildoniguruma.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 8 2005" -P buildoniguruma.cmake
+# cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=x86_64 -P buildoniguruma.cmake
+# cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=i686 -P buildoniguruma.cmake
 
 include(script_support.cmake)
 
@@ -93,11 +95,6 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
 else()
   # single-configuration
   unset(GENERATE_OPTIONS)
-  if(${ARCHITECTURE} EQUAL 64)
-    list(APPEND GENERATE_OPTIONS "-DUSE_GCC_64=ON")
-  else()
-    list(APPEND GENERATE_OPTIONS "-DUSE_GCC_32=ON")
-  endif()
   if(CMAKE_HOST_UNIX)
     list(APPEND GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/../mingw.toolchain.cmake")
   endif(CMAKE_HOST_UNIX)

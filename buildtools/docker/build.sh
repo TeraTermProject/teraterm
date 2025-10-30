@@ -16,7 +16,7 @@ rm -rf build
 cd ..
 mkdir build
 cd build
-cmake .. -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake -DUSE_GCC_32=on -DSUPPORT_OLD_WINDOWS=on -DENABLE_GDIPLUS=off
+cmake .. -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake -DARCHITECURE=i686 -DSUPPORT_OLD_WINDOWS=on -DENABLE_GDIPLUS=off
 make -j
 make -j install
 make zip
