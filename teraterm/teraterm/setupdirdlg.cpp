@@ -556,7 +556,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			{ NULL, L"UI language file",
 			  LIST_PARAM_STR, pts->UILanguageFileW, NULL },
 			{ NULL, L"Broadcast history file",
-			  LIST_PARAM_FUNC, GetHistoryFileName, NULL },
+			  LIST_PARAM_FUNC, (void*)GetHistoryFileName, NULL },
 		};
 
 		int y = 0;
