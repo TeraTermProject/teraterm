@@ -65,7 +65,7 @@ Case of Visual Studio 2022 arm64
 
 Using cmake in each environment.
 
-    cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=32 -P buildall.cmake
+    cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=i686 -P buildall.cmake
 
 # Regarding each directory
 

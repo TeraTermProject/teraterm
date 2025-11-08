@@ -1,6 +1,8 @@
 ﻿# TOOLSET ツールセット名
 if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
-  if(${CMAKE_GENERATOR} MATCHES "Visual Studio 17 2022")
+  if(${CMAKE_GENERATOR} MATCHES "Visual Studio 18 2026")
+    set(MSVC_TOOLSET_VERSION 145)
+  elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio 17 2022")
     set(MSVC_TOOLSET_VERSION 143)
   elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio 16 2019")
     set(MSVC_TOOLSET_VERSION 142)
@@ -31,9 +33,9 @@ elseif((${CMAKE_GENERATOR} MATCHES "Unix Makefiles") OR
     (${CMAKE_GENERATOR} MATCHES "Ninja"))
   if(DEFINED ARCHITECTURE)
     # for script
-    if((${ARCHITECTURE} EQUAL 64) OR (${ARCHITECTURE} STREQUAL "x86_64"))
+    if(${ARCHITECTURE} STREQUAL "x86_64")
       set(TOOLSET "mingw_x86_64")
-    elseif((${ARCHITECTURE} EQUAL 32) OR (${ARCHITECTURE} STREQUAL "i686"))
+    elseif(${ARCHITECTURE} STREQUAL "i686")
       set(TOOLSET "mingw_i686")
     else()
       message(FATAL_ERROR "check ARCHITECTURE ${ARCHITECTURE}")

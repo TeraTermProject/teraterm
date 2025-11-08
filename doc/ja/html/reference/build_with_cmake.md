@@ -7,7 +7,7 @@
 ## cmakeのバージョン
 
 - 3.11以上
-- Visual Studio 2017,2019,2022 インストーラーで、オプションを選べば cmake をインストールできます
+- Visual Studio 2017,2019,2022,2026 インストーラーで、オプションを選べば cmake をインストールできます
 - Visual Studio 2005(Expressも含む)のIDEをサポートしている最後のバージョンは 3.11.4 です
 
 ## ライブラリ
@@ -32,8 +32,7 @@ Visual Studio の IDE を使用する場合の例
 インストーラを作成する
 
     cmake --build . --config Release --target Install
-    cmake --build . --config Release --target inno_setup
-    cmake --build . --config Release --target zip
+    make_installer_cmake.bat
 
 ### NMake (Visual Studio, very experimental)
 

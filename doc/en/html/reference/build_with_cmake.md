@@ -31,8 +31,7 @@ Use Visual Studio IDE
 To build installer
 
     cmake --build . --config Release --target Install
-    cmake --build . --config Release --target inno_setup
-    cmake --build . --config Release --target zip
+    make_installer_cmake.bat
 
 ### NMake (Visual Studio, very experimental)
 

@@ -11,13 +11,13 @@ else
   tar xf /current.tar
 fi
 cd libs
-cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=32 -P buildall.cmake
+cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=i686 -P buildall.cmake
 rm -rf build
 cd ..
 mkdir build
 cd build
-cmake .. -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake -DUSE_GCC_32=on -DSUPPORT_OLD_WINDOWS=on -DENABLE_GDIPLUS=off
-make -j
+cmake .. -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake -DARCHITECURE=i686 -DSUPPORT_OLD_WINDOWS=on -DENABLE_GDIPLUS=off
+make -j $(nproc)
 make -j install
-make zip
+bash make_installer_cmake.sh
 cp *.zip /mnt/buildtools/docker/

@@ -50,6 +50,9 @@
 
 ## svnrev.pl のオプション
 
+- --architecture
+  - Win32 or x86 or arm64
+  - default Win32
 - --root
   - プロジェクトファイルのパス
   - '.svn/' 又は '.git/' の存在するパス
@@ -72,10 +75,10 @@
 
 このフォルダで
 ```
-$ perl svnrev.pl --cmake test.cmake --json test.json --isl test.isl --verbose
+$ perl svnrev.pl --architecture x64 --cmake test.cmake --json test.json --isl test.isl --verbose
 root=../..
 tt_version_major=5
-tt_version_minor=5
+tt_version_minor=6
 tt_version_patch=0
 tt_version_substr=dev
 svn="C:/Program Files/TortoiseSVN/bin/svn.exe"
@@ -85,6 +88,7 @@ bat="sourcetree_info.bat"
 cmake="test.cmake"
 json="test.json"
 overwrite 0
+architecture="x64"
 SVNREVISION 1234567
 RELEASE 0
 BRANCH_NAME main
