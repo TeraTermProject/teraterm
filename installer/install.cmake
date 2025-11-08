@@ -1,6 +1,5 @@
 ﻿
 message(CMAKE_HOST_SYSTEM_NAME=${CMAKE_HOST_SYSTEM_NAME})
-#message(FATAL_ERROR "end")
 
 # Inno Setup
 #  Create setup.exe
@@ -9,11 +8,8 @@ if(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
     ISCC ISCC.exe
     HINTS "${CMAKE_SOURCE_DIR}/../buildtools/innosetup6"
     HINTS "C:/Program Files (x86)/Inno Setup 6/"
-    HINTS "C:/Program Files (x86)/Inno Setup 5/"
     HINTS "C:/Program Files/Inno Setup 6/"
-    HINTS "C:/Program Files/Inno Setup 5/"
     HINTS "$ENV{LOCALAPPDATA}/Programs/Inno Setup 6"
-    HINTS "$ENV{LOCALAPPDATA}/Programs/Inno Setup 5"
   )
   message("ISCC=${ISCC}")
 endif()
@@ -21,13 +17,6 @@ endif()
 message("CMAKE_CURRENT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}")
 
 include("${CMAKE_CURRENT_BINARY_DIR}/build_config.cmake")
-
-#set(VERSION "99")
-#set(GITVERSION "9999")
-#set(CMAKE_VS_PLATFORM_NAME "x64")
-#set(ARCHITECTURE ${ARCHITECTURE})
-#set(DATE "999999")
-#set(TIME "999999")
 
 if(NOT $ENV{USER})
   set(USER $ENV{USER})
@@ -85,8 +74,8 @@ if(ISCC)
   else()
     message(FATAL_ERROR "ARCHITECTURE=${ARCHITECTURE}")
   endif()
+  file(TOUCH ${CMAKE_INSTALL_PREFIX}/cygterm+.tar.gz)
   execute_process(
-    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_INSTALL_PREFIX}/cygterm+.tar.gz
     COMMAND ${ISCC} ${ISCC_OPTION} /O${CMAKE_BINARY_DIR} /DOutputBaseFilename=${SETUP_EXE} /DSrcDir=${CMAKE_INSTALL_PREFIX} ${CMAKE_CURRENT_LIST_DIR}/teraterm.iss
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
@@ -98,26 +87,21 @@ if(ISCC)
 endif(ISCC)
 
 # zip
-execute_process(
-  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXFixedWinSize.dll ${CMAKE_INSTALL_PREFIX}/_TTXFixedWinSize.dll
-  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXOutputBuffering.dll ${CMAKE_INSTALL_PREFIX}/_TTXOutputBuffering.dll
-  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXResizeWin.dll ${CMAKE_INSTALL_PREFIX}/_TTXResizeWin.dll
-  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXShowCommandLine.dll ${CMAKE_INSTALL_PREFIX}/_TTXShowCommandLine.dll
-  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/TTXtest.dll ${CMAKE_INSTALL_PREFIX}/_TTXtest.dll
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-)
+file(RENAME ${CMAKE_INSTALL_PREFIX}/TTXFixedWinSize.dll ${CMAKE_INSTALL_PREFIX}/_TTXFixedWinSize.dll)
+file(RENAME ${CMAKE_INSTALL_PREFIX}/TTXOutputBuffering.dll ${CMAKE_INSTALL_PREFIX}/_TTXOutputBuffering.dll)
+file(RENAME ${CMAKE_INSTALL_PREFIX}/TTXResizeWin.dll ${CMAKE_INSTALL_PREFIX}/_TTXResizeWin.dll)
+file(RENAME ${CMAKE_INSTALL_PREFIX}/TTXShowCommandLine.dll ${CMAKE_INSTALL_PREFIX}/_TTXShowCommandLine.dll)
+file(RENAME ${CMAKE_INSTALL_PREFIX}/TTXtest.dll ${CMAKE_INSTALL_PREFIX}/_TTXtest.dll)
 execute_process(
   COMMAND "${CMAKE_COMMAND}" -E tar cvf ${SETUP_ZIP} --format=zip ${CMAKE_INSTALL_PREFIX}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
-execute_process(
-  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXFixedWinSize.dll ${CMAKE_INSTALL_PREFIX}/TTXFixedWinSize.dll
-  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXOutputBuffering.dll ${CMAKE_INSTALL_PREFIX}/TTXOutputBuffering.dll
-  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXResizeWin.dll ${CMAKE_INSTALL_PREFIX}/TTXResizeWin.dll
-  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXShowCommandLine.dll ${CMAKE_INSTALL_PREFIX}/TTXShowCommandLine.dll
-  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_INSTALL_PREFIX}/_TTXtest.dll ${CMAKE_INSTALL_PREFIX}/TTXtest.dll
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-)
+file(RENAME ${CMAKE_INSTALL_PREFIX}/_TTXFixedWinSize.dll ${CMAKE_INSTALL_PREFIX}/TTXFixedWinSize.dll)
+file(RENAME ${CMAKE_INSTALL_PREFIX}/_TTXOutputBuffering.dll ${CMAKE_INSTALL_PREFIX}/TTXOutputBuffering.dll)
+file(RENAME ${CMAKE_INSTALL_PREFIX}/_TTXResizeWin.dll ${CMAKE_INSTALL_PREFIX}/TTXResizeWin.dll)
+file(RENAME ${CMAKE_INSTALL_PREFIX}/_TTXShowCommandLine.dll ${CMAKE_INSTALL_PREFIX}/TTXShowCommandLine.dll)
+file(RENAME ${CMAKE_INSTALL_PREFIX}/_TTXtest.dll ${CMAKE_INSTALL_PREFIX}/TTXtest.dll)
+
 file(SHA256 ${SETUP_EXE}.zip SHA_OUT)
 file(WRITE "${CMAKE_BINARY_DIR}/${SETUP_EXE}.zip.sha256sum" "${SHA_OUT} ${SETUP_EXE}.zip")
 file(SHA512 ${SETUP_EXE}.zip SHA_OUT)
