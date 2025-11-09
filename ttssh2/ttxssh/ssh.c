@@ -148,7 +148,6 @@ void SSH2_dispatch_init(PTInstVar pvar, int stage);
 int SSH2_dispatch_enabled_check(unsigned char message);
 void SSH2_dispatch_add_message(unsigned char message);
 void SSH2_dispatch_add_range_message(unsigned char begin, unsigned char end);
-int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub);
 static void start_ssh_heartbeat_thread(PTInstVar pvar);
 void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c);
 static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_num, unsigned char *data, unsigned int buflen);
@@ -4770,6 +4769,7 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	char tmp[1024+512];
 	int mode, r, payload_len;
 	unsigned int need = 0;
+	const ssh2_kex_algorithm_t *kexalg;
 	const struct ssh2cipher *cipher;
 	const struct ssh2_mac_t *mac;
 
@@ -4796,6 +4796,16 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 		r = -2;
 		goto error;
 	}
+	kexalg = get_kex_algorithm_by_type(pvar->kex->kex_type);
+	if (kexalg == NULL) {
+		strncpy_s(tmp, sizeof(tmp), "unknown KEX algorithm: ", _TRUNCATE);
+		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
+		msg = tmp;
+		r = -2;
+		goto error;
+	}
+	pvar->kex->hash_alg = kexalg->hash_alg;
+	pvar->kex->ec_nid = kexalg->ec_nid;
 
 	if (pvar->kex->kex_status == 0) {
 		// サーバー側がStrict KEXに対応しているかの確認
@@ -5216,55 +5226,33 @@ error:;
  */
 static void SSH2_dh_kex_init(PTInstVar pvar)
 {
-	DH *dh = NULL;
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
 	int len;
-	BIGNUM *pub_key, *priv_key;
+	kex *kex = pvar->kex;
 
-	// Diffie-Hellman key agreement
-	switch (pvar->kex->kex_type) {
-	case KEX_DH_GRP1_SHA1:
-		dh = dh_new_group1();
-		break;
-	case KEX_DH_GRP14_SHA1:
-	case KEX_DH_GRP14_SHA256:
-		dh = dh_new_group14();
-		break;
-	case KEX_DH_GRP16_SHA512:
-		dh = dh_new_group16();
-		break;
-	case KEX_DH_GRP18_SHA512:
-		dh = dh_new_group18();
-		break;
-	default:
+	if (kex_dh_keypair(kex) != 0)
 		goto error;
-	}
 
-	// 秘密にすべき乱数(X)を生成
-	dh_gen_key(pvar, dh, pvar->kex->we_need);
-	DH_get0_key(dh, NULL, &priv_key);
-	log_kex_key(pvar, priv_key);
+	{
+		BIGNUM *priv_key;
+		DH_get0_key(kex->dh, NULL, &priv_key);
+		log_kex_key(pvar, priv_key);
+	}
 
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
-		return;
+		goto error;
 	}
 
-	DH_get0_key(dh, &pub_key, NULL);
-	buffer_put_bignum2(msg, pub_key);
+	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEXDH_INIT, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
-
-	if (pvar->kex->dh != NULL) {
-		DH_free(pvar->kex->dh);
-	}
-	pvar->kex->dh = dh;
 
 	SSH2_dispatch_init(pvar, 2);
 	SSH2_dispatch_add_message(SSH2_MSG_KEXDH_REPLY);
@@ -5276,7 +5264,7 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 	return;
 
 error:;
-	DH_free(dh);
+	DH_free(kex->dh);
 	buffer_free(msg);
 
 	notify_fatal_error(pvar, "error occurred @ SSH2_dh_kex_init()", TRUE);
@@ -5297,71 +5285,71 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
 	int len;
-	int bits, min, max;
-
-	msg = buffer_init();
-	if (msg == NULL) {
-		goto error;
-	}
+	kex *kex = pvar->kex;
+	u_int nbits;
 
 	// サーバに要求する group size の min, n(preferred), max を決定する。
 	if (pvar->settings.GexMinimalGroupSize == 0) {
 		// 0 (未設定) だった時は最新の推奨値を使う
-		min = GEX_GRP_DEFAULT_MIN;
+		kex->min = GEX_GRP_DEFAULT_MIN;
 	}
 	else if (pvar->settings.GexMinimalGroupSize < GEX_GRP_LIMIT_MIN) {
-		min = GEX_GRP_LIMIT_MIN;
+		kex->min = GEX_GRP_LIMIT_MIN;
 		logprintf(LOG_LEVEL_NOTICE,
 			"%s: small GexMinimalGroupSize is too small (%d), use minimum limit (%d)", __FUNCTION__,
 			pvar->settings.GexMinimalGroupSize, GEX_GRP_LIMIT_MIN);
 	}
 	else if (pvar->settings.GexMinimalGroupSize > GEX_GRP_LIMIT_MAX) {
-		min = GEX_GRP_LIMIT_MAX;
+		kex->min = GEX_GRP_LIMIT_MAX;
 		logprintf(LOG_LEVEL_NOTICE,
 			"%s: small GexMinimalGroupSize is too large (%d), use maximum limit (%d)", __FUNCTION__,
 			pvar->settings.GexMinimalGroupSize, GEX_GRP_LIMIT_MAX);
 	}
 	else {
-		min = pvar->settings.GexMinimalGroupSize;
+		kex->min = pvar->settings.GexMinimalGroupSize;
 	}
 
 	// max は常に上限いっぱい
-	max = GEX_GRP_LIMIT_MAX;
+	kex->max = GEX_GRP_LIMIT_MAX;
 
 	// preferred は使用する各暗号要素の鍵長/ブロック長のうち、最大のものを使う
-	bits = dh_estimate(pvar->kex->we_need * 8);
-	if (bits < min) {
-		bits = min;
+	nbits = dh_estimate(kex->we_need * 8);
+	if (nbits < kex->min) {
+		nbits = kex->min;
 	}
-	else if (bits > max) {
-		bits = max;
+	else if (nbits > kex->max) {
+		nbits = kex->max;
 	}
-	if (pvar->server_compat_flag & SSH_BUG_DHGEX_LARGE && bits > 4096) {
+	if (pvar->server_compat_flag & SSH_BUG_DHGEX_LARGE && nbits > 4096) {
 		logprintf(LOG_LEVEL_NOTICE,
 			"SSH_BUG_DHGEX_LARGE is enabled. DH-GEX group size is limited to 4096. "
-			"(Original size is %d)", bits);
-		bits = 4096;
+			"(Original size is %d)", nbits);
+		nbits = 4096;
+	}
+	kex->nbits = nbits;
+
+	msg = buffer_init();
+	if (msg == NULL) {
+		// TODO: error check
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
+		goto error;
 	}
 
 	// サーバへgroup sizeを送って、p と g を作ってもらう。
-	buffer_put_int(msg, min);
-	buffer_put_int(msg, bits);
-	buffer_put_int(msg, max);
+	buffer_put_int(msg, kex->min);
+	buffer_put_int(msg, kex->nbits);
+	buffer_put_int(msg, kex->max);
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_DH_GEX_REQUEST, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
 
-	// あとでハッシュ計算に使うので取っておく。
-	pvar->kex->min = min;
-	pvar->kex->nbits = bits;
-	pvar->kex->max = max;
-
 	{
 		char tmp[128];
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-		            "we_need %d min %d bits %d max %d",
-		            pvar->kex->we_need, min, bits, max);
+		            "we_need %d min %d nbits %d max %d",
+		            kex->we_need,
+		            kex->min, kex->nbits, kex->max);
 		push_memdump("DH_GEX_REQUEST", "requested key bits", tmp, strlen(tmp));
 	}
 
@@ -5388,14 +5376,14 @@ error:;
  */
 static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 {
-	int len;
-	u_int grp_bits;
-	BIGNUM *p = NULL, *g = NULL;
-	DH *dh = NULL;
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
+	int len;
+	kex *kex = pvar->kex;
+	BIGNUM *p = NULL, *g = NULL;
+	BIGNUM *pub_key;
+	u_int bits;
 	char tmpbuf[256];
-	BIGNUM *pub_key, *priv_key;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_GROUP was received.");
 
@@ -5411,37 +5399,37 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 		return FALSE;
 	}
 
-	grp_bits = BN_num_bits(p);
+	bits = BN_num_bits(p);
 	logprintf(LOG_LEVEL_VERBOSE, "DH-GEX: Request: %d / %d / %d, Received: %d",
-	            pvar->kex->min, pvar->kex->nbits, pvar->kex->max, BN_num_bits(p));
+	          kex->min, kex->nbits, kex->max, BN_num_bits(p));
 
 	//
 	// (1) < GEX_GRP_LIMIT_MIN <= (2) < kexgex_min <= (3) < kexgex_bits <= (4) <= kexgex_max < (5) <= GEX_GRP_LIMIT_MAX < (6)
 	//
-	if (grp_bits < GEX_GRP_LIMIT_MIN || grp_bits > GEX_GRP_LIMIT_MAX) {
-	// (1), (6) プロトコルで認められている範囲(1024 <= grp_bits <= 8192)の外。強制切断。
+	if (bits < GEX_GRP_LIMIT_MIN || bits > GEX_GRP_LIMIT_MAX) {
+	// (1), (6) プロトコルで認められている範囲(1024 <= bits <= 8192)の外。強制切断。
 		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_OUTOFRANGE", pvar,
 		                  "Received group size is out of range: %d");
-		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, pvar->UIMsg, grp_bits);
+		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, pvar->UIMsg, bits);
 		notify_fatal_error(pvar, tmpbuf, FALSE);
 		goto error;
 	}
-	else if (grp_bits < pvar->kex->min) {
+	else if (bits < kex->min) {
 	// (2) プロトコルで認められている範囲内だが、こちらの設定した最小値より小さい。確認ダイアログを出す。
 		logprintf(LOG_LEVEL_WARNING,
-		    "DH-GEX: grp_bits(%d) < kexgex_min(%d)", grp_bits, pvar->kex->min);
+		    "DH-GEX: bits(%d) < kexgex_min(%d)", bits, kex->min);
 		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_SMALLER", pvar,
 		                  "Received group size is smaller than the requested minimal size.\nrequested: %d, received: %d\nAre you sure that you want to accecpt received group?");
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
-		            pvar->UIMsg, pvar->kex->min, grp_bits);
+		            pvar->UIMsg, kex->min, bits);
 	}
-	else if (grp_bits < pvar->kex->nbits) {
+	else if (bits < kex->nbits) {
 	// (3) 要求の最小値は満たすが、要求値よりは小さい。確認ダイアログは出さない。
 		logprintf(LOG_LEVEL_NOTICE,
-		          "DH-GEX: grp_bits(%d) < kexgex_bits(%d)", grp_bits, pvar->kex->nbits);
+		          "DH-GEX: bits(%d) < kexgex_bits(%d)", bits, kex->nbits);
 		tmpbuf[0] = 0; // no message
 	}
-	else if (grp_bits <= pvar->kex->max) {
+	else if (bits <= kex->max) {
 	// (4) 要求値以上、かつ要求の最大値以下。問題なし。
 		tmpbuf[0] = 0; // no message
 	}
@@ -5449,11 +5437,11 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	// (5) こちらの設定した最大値より大きい。確認ダイアログを出す。
 	//     ただし現状では kexgex_max == GEX_GRP_LIMIT_MAX(8192) である為この状況になる事は無い。
 		logprintf(LOG_LEVEL_WARNING,
-		          "DH-GEX: grp_bits(%d) > kexgex_max(%d)", grp_bits, pvar->kex->max);
+		          "DH-GEX: bits(%d) > kexgex_max(%d)", bits, kex->max);
 		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_LARGER", pvar,
 		                  "Received group size is larger than the requested maximal size.\nrequested: %d, received: %d\nAre you sure that you want to accecpt received group?");
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
-		            pvar->UIMsg, pvar->kex->max, grp_bits);
+		            pvar->UIMsg, kex->max, bits);
 	}
 
 	if (tmpbuf[0] != 0) {
@@ -5467,41 +5455,41 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 		}
 	}
 
-	dh = DH_new();
-	if (dh == NULL)
+	if ((kex->dh = dh_new_group(g, p)) == NULL) {
 		goto error;
-	DH_set0_pqg(dh, p, NULL, g);
+	}
+	p = g = NULL; /* belong to kex->dh now */
 
 	// 秘密にすべき乱数(X)を生成
-	dh_gen_key(pvar, dh, pvar->kex->we_need);
-	DH_get0_key(dh, NULL, &priv_key);
-	log_kex_key(pvar, priv_key);
+	if (dh_gen_key(kex->dh, kex->we_need * 8) != 0)
+		goto error;
+	{
+		BIGNUM *priv_key;
+		DH_get0_key(kex->dh, NULL, &priv_key);
+		log_kex_key(pvar, priv_key);
+	}
+	DH_get0_key(kex->dh, &pub_key, NULL);
 
 	// 公開鍵をサーバへ送信
 	msg = buffer_init();
 	if (msg == NULL) {
+		// TODO: error check
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		goto error;
 	}
-	DH_get0_key(dh, &pub_key, NULL);
+
 	buffer_put_bignum2(msg, pub_key);
+
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_DH_GEX_INIT, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
 
-	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_INIT was sent at handle_SSH2_dh_gex_group().");
-
-	// ここで作成したDH鍵は、あとでハッシュ計算に使うため取っておく。(2004.10.31 yutaka)
-	if (pvar->kex->dh != NULL) {
-		DH_free(pvar->kex->dh);
-	}
-	pvar->kex->dh = dh;
-
 	{
-		BIGNUM *p, *q, *pub_key;
+		BIGNUM *p, *g, *pub_key;
 
-		DH_get0_pqg(dh, &p, &q, NULL);
-		DH_get0_key(dh, &pub_key, NULL);
+		DH_get0_pqg(kex->dh, &p, NULL, &g);
+		DH_get0_key(kex->dh, &pub_key, NULL);
 
 		push_bignum_memdump("DH_GEX_GROUP", "p", p);
 		push_bignum_memdump("DH_GEX_GROUP", "g", g);
@@ -5513,13 +5501,13 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 
 	buffer_free(msg);
 
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_INIT was sent at handle_SSH2_dh_gex_group().");
+
 	return TRUE;
 
 error:;
-	BN_free(p);
-	BN_free(g);
-	DH_free(dh);
-
+	BN_clear_free(p);
+	BN_clear_free(g);
 	return FALSE;
 }
 
@@ -5534,51 +5522,32 @@ error:;
  */
 static void SSH2_ecdh_kex_init(PTInstVar pvar)
 {
-	EC_KEY *client_key = NULL;
-	const EC_GROUP *group;
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
-	int len, ret;
-	char buf[128];
+	int len;
+	kex *kex = pvar->kex;
 
-	client_key = EC_KEY_new();
-	if (client_key == NULL) {
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: EC_KEY_new was failed", __FUNCTION__);
+	if (kex_ecdh_keypair(kex) != 0)
 		goto error;
+
+	{
+		const BIGNUM *priv_key = EC_KEY_get0_private_key(kex->ec_client_key);
+		log_kex_key(pvar, priv_key);
 	}
-	client_key = EC_KEY_new_by_curve_name(kextype_to_cipher_nid(pvar->kex->kex_type));
-	if (client_key == NULL) {
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: EC_KEY_new_by_curve_name was failed", __FUNCTION__);
-		goto error;
-	}
-	ret = EC_KEY_generate_key(client_key);
-	if (ret != 1) {
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: EC_KEY_generate_key was failed(ret %d)", __FUNCTION__, ret);
-		goto error;
-	}
-	group = EC_KEY_get0_group(client_key);
-	log_kex_key(pvar, EC_KEY_get0_private_key(client_key));
 
 	msg = buffer_init();
 	if (msg == NULL) {
+		// TODO: error check
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: buffer_init was failed", __FUNCTION__);
 		goto error;
 	}
 
-	buffer_put_ecpoint(msg, group, EC_KEY_get0_public_key(client_key));
+	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
 	finish_send_packet(pvar);
-
-	// ここで作成した鍵は、あとでハッシュ計算に使うため取っておく。
-	if (pvar->kex->ec_client_key) {
-		EC_KEY_free(pvar->kex->ec_client_key);
-	}
-	pvar->kex->ec_client_key = client_key;
-	pvar->kex->ec_group = group;
 
 	SSH2_dispatch_init(pvar, 2);
 	SSH2_dispatch_add_message(SSH2_MSG_KEX_ECDH_REPLY);
@@ -5590,10 +5559,10 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 	return;
 
 error:;
-	EC_KEY_free(client_key);
+	EC_KEY_free(kex->ec_client_key);
 	buffer_free(msg);
 
-	notify_fatal_error(pvar, buf, TRUE);
+	notify_fatal_error(pvar, "error occurred @ SSH2_ecdh_kex_init()", TRUE);
 }
 
 
@@ -5609,22 +5578,21 @@ static void SSH2_curve25519_kex_init(PTInstVar pvar)
 {
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
-
-	EC_KEY *client_key = NULL;
 	int len;
-	char buf[128];
+	kex *kex = pvar->kex;
 
 
-	kexc25519_keygen(pvar->kex->c25519_client_key, pvar->kex->c25519_client_pubkey);
+	if (kex_c25519_keypair(kex) != 0)
+		goto error;
 
 	msg = buffer_init();
 	if (msg == NULL) {
+		// TODO: error check
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: buffer_init was failed", __FUNCTION__);
 		goto error;
 	}
 
-	buffer_put_string(msg, pvar->kex->c25519_client_pubkey, sizeof(pvar->kex->c25519_client_pubkey));
+	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
@@ -5636,14 +5604,14 @@ static void SSH2_curve25519_kex_init(PTInstVar pvar)
 
 	buffer_free(msg);
 
-	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_INIT was sent at SSH2_ecdh_kex_init().");
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_INIT was sent at SSH2_curve25519_kex_init().");
 
 	return;
 
 error:;
 	buffer_free(msg);
 
-	notify_fatal_error(pvar, buf, TRUE);
+	notify_fatal_error(pvar, "error occurred @ SSH2_curve25519_kex_init()", TRUE);
 }
 
 
@@ -5782,22 +5750,22 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 {
 	char *data;
 	int len;
-	buffer_t *server_host_key_blob = NULL;
-	int bloblen, siglen;
-	BIGNUM *server_public = NULL;
-	buffer_t *server_blob = NULL;
-	char *signature;
-	int dh_len, share_len;
-	char *dh_buf = NULL;
-	BIGNUM *share_key = NULL;
-	buffer_t *shared_secret = NULL;
-	char hash[SSH_DIGEST_MAX_LENGTH];
-	char *emsg = NULL, emsg_tmp[1024];  // error message
-	int hashlen;
+	int bloblen, pklen, siglen;
+	kex *kex = pvar->kex;
 	Key *server_host_key = NULL;
+	buffer_t *shared_secret = NULL;
+	buffer_t *server_blob = NULL;
+	buffer_t *server_host_key_blob = NULL;
+	char *signature;
+	char hash[SSH_DIGEST_MAX_LENGTH];
+	int hashlen;
+	int r;
+
+	u_char *server_public = NULL;
+	BIGNUM *dh_server_pub = NULL;
+	BIGNUM *pub_key = NULL;
 	BOOL result = FALSE;
-	BIGNUM *pub_key;
-	int ret;
+	char *emsg = NULL, emsg_tmp[1024]; // error message
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXDH_REPLY was received.");
 
@@ -5824,33 +5792,26 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: key_from_blob error", __FUNCTION__);
 		emsg = emsg_tmp;
-		goto error;
+		goto out;
 	}
 	data += bloblen;
 
 	// known_hosts対応 (2006.3.20)
-	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(pvar->kex->hostkey_type)) {  // ホストキーの種別比較
+	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
 		            /*__FUNCTION__*/"handle_SSH2_dh_kex_reply",
-		            get_ssh2_hostkey_type_name_from_algorithm(pvar->kex->hostkey_type),
-		            get_ssh2_hostkey_algorithm_name(pvar->kex->hostkey_type),
+		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
+		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
 		            get_ssh2_hostkey_type_name(server_host_key->type));
 		emsg = emsg_tmp;
-		goto error;
+		goto out;
 	}
 
 	/* DH parameter f, server public DH key */
-	server_public = BN_new();
-	if (server_public == NULL) {
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: Out of memory (1)", __FUNCTION__);
-		emsg = emsg_tmp;
-		goto error;
-	}
-	buffer_get_bignum2(&data, server_public);
+	server_public = buffer_get_string(&data, &pklen); // data part of mpint
 	server_blob = buffer_init();
-	buffer_put_bignum2(server_blob, server_public);
+	buffer_append(server_blob, server_public, pklen);
 
 	/* signed H */
 	siglen = get_uint32_MSBfirst(data);
@@ -5860,102 +5821,78 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEXDH_REPLY", "signature", signature, siglen);
 
-	// check public key
-	if (!dh_pub_is_valid(pvar->kex->dh, server_public)) {
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: invalid server public key", __FUNCTION__);
-		emsg = emsg_tmp;
-		goto error;
-	}
-
 	/* calc shared secret K */
 	// 共通鍵の生成
 	//   K = B^a mod p = g^(a*b) mod p
 	// Writing using RFC 4253 notation:
 	//   K = f^x mod p
-	dh_len = DH_size(pvar->kex->dh);
-	dh_buf = malloc(dh_len);
-	if (dh_buf == NULL) {
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: Out of memory (2)", __FUNCTION__);
-		emsg = emsg_tmp;
-		goto error;
-	}
-	share_len = DH_compute_key(dh_buf, server_public, pvar->kex->dh);
-	share_key = BN_new();
-	if (share_key == NULL) {
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: Out of memory (3)", __FUNCTION__);
-		emsg = emsg_tmp;
-		goto error;
-	}
-	BN_bin2bn(dh_buf, share_len, share_key);
-	//debug_print(40, dh_buf, share_len);
-	shared_secret = buffer_init();
-	buffer_put_bignum2(shared_secret, share_key);
+	r = kex_dh_dec(kex, server_blob, &shared_secret);
+	if (r != 0)
+		goto out;
 
 	/* calc and verify H */
 	// ハッシュの計算
 	// verify は ssh2_kex_finish() で行う
-	DH_get0_key(pvar->kex->dh, &pub_key, NULL);
-	if (pvar->kex->client_pub == NULL) {
-		pvar->kex->client_pub = buffer_init();
-	}
-	buffer_clear(pvar->kex->client_pub);
-	buffer_put_bignum2(pvar->kex->client_pub, pub_key);
 	hashlen = sizeof(hash);
-	ret = kex_dh_hash(
-		get_kex_hash_algorithm(pvar->kex->kex_type),
-		pvar->kex->client_version,
-		pvar->kex->server_version,
-		pvar->kex->my,
-		pvar->kex->peer,
+	r = kex_dh_hash(
+		kex->hash_alg,
+		kex->client_version,
+		kex->server_version,
+		kex->my,
+		kex->peer,
 		server_host_key_blob,
-		pvar->kex->client_pub,
+		kex->client_pub,
 		server_blob,
 		shared_secret,
 		hash, &hashlen);
-	if (ret < 0) {
-		goto error;
-	}
+	if (r != 0)
+		goto out;
 
 	{
-		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "my_kex", buffer_ptr(pvar->kex->my), buffer_len(pvar->kex->my));
-		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "peer_kex", buffer_ptr(pvar->kex->peer), buffer_len(pvar->kex->peer));
+		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "my_kex", buffer_ptr(kex->my), buffer_len(kex->my));
+		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "peer_kex", buffer_ptr(kex->peer), buffer_len(kex->peer));
 
-		push_bignum_memdump("KEXDH_REPLY kex_dh_kex_hash", "server_public", server_public);
-		push_bignum_memdump("KEXDH_REPLY kex_dh_kex_hash", "share_key", share_key);
+		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "server_public", server_public, pklen);
+		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "shared_secret", buffer_ptr(shared_secret), buffer_len(shared_secret));
 
 		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "hash", hash, hashlen);
 	}
 
 	// TTSSHバージョン情報に表示するキービット数を求めておく
-	DH_get0_key(pvar->kex->dh, &pub_key, NULL);
-	pvar->kex->client_key_bits = BN_num_bits(pub_key);
-	pvar->kex->server_key_bits = BN_num_bits(server_public);
+	DH_get0_key(kex->dh, &pub_key, NULL);
+	kex->client_key_bits = BN_num_bits(pub_key);
+	dh_server_pub = BN_new();
+	if (dh_server_pub == NULL) {
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE, "%s: Out of memory (1)", __FUNCTION__);
+		emsg = emsg_tmp;
+		goto out;
+	}
+	buffer_clear(server_blob);
+	buffer_put_string(server_blob, server_public, pklen);
+	buffer_get_bignum2_msg(server_blob, dh_server_pub);
+	kex->server_key_bits = BN_num_bits(dh_server_pub);
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 
-	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
-	if (ret == TRUE) {
+	r = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
+	if (r == TRUE) {
 		// ホスト鍵の確認が成功したので、後続の処理を行う
 		SSH_notify_host_OK(pvar);
 		// known_hostsダイアログの呼び出したので、以降、何もしない。
 	}
 
-error:
+ out:
 	SecureZeroMemory(hash, sizeof(hash));
 	buffer_free(server_host_key_blob);
-	BN_free(server_public);
-	DH_free(pvar->kex->dh);
-	pvar->kex->dh = NULL;
+	free(server_public);
+	BN_clear_free(dh_server_pub);
 	key_free(server_host_key);
-	free(dh_buf);
-	BN_free(share_key);
 	buffer_free(server_blob);
 	buffer_free(shared_secret);
-	buffer_free(pvar->kex->client_pub);
-	pvar->kex->client_pub = NULL;
+	buffer_free(kex->client_pub);
+	kex->client_pub = NULL;
+	DH_free(kex->dh);
+	kex->dh = NULL;
 
 	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
@@ -5973,22 +5910,20 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 {
 	char *data;
 	int len;
-	buffer_t *server_host_key_blob = NULL;
-	int bloblen, siglen;
-	BIGNUM *server_public = NULL;
-	char *signature;
-	int dh_len, share_len;
-	char *dh_buf = NULL;
-	BIGNUM *share_key = NULL;
+	int bloblen;
+	kex *kex = pvar->kex;
+	BIGNUM *dh_server_pub = NULL;
+	BIGNUM *pub_key, *dh_p, *dh_g;
 	buffer_t *shared_secret = NULL;
-	char hash[SSH_DIGEST_MAX_LENGTH];
-	char *emsg = NULL, emsg_tmp[1024];  // error message
-	int hashlen;
+	buffer_t *server_host_key_blob = NULL;
 	Key *server_host_key = NULL;
+	char *signature = NULL;
+	char hash[SSH_DIGEST_MAX_LENGTH];
+	int slen, hashlen;
+	int r;
+
 	BOOL result = FALSE;
-	int ret;
-	BIGNUM *p, *g;
-	BIGNUM *pub_key;
+	char *emsg = NULL, emsg_tmp[1024]; // error message
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_REPLY was received.");
 
@@ -6020,114 +5955,98 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	data += bloblen;
 
 	// known_hosts対応 (2006.3.20)
-	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(pvar->kex->hostkey_type)) {  // ホストキーの種別比較
+	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
 		            /*__FUNCTION__*/"handle_SSH2_dh_gex_reply",
-		            get_ssh2_hostkey_type_name_from_algorithm(pvar->kex->hostkey_type),
-		            get_ssh2_hostkey_algorithm_name(pvar->kex->hostkey_type),
+		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
+		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
 		            get_ssh2_hostkey_type_name(server_host_key->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
 
 	/* DH parameter f, server public DH key */
-	server_public = BN_new();
-	if (server_public == NULL) {
+	dh_server_pub = BN_new();
+	if (dh_server_pub == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: Out of memory (1)", __FUNCTION__);
 		emsg = emsg_tmp;
 		goto error;
 	}
-	buffer_get_bignum2(&data, server_public);
+	buffer_get_bignum2(&data, dh_server_pub);
 
 	/* signed H */
-	siglen = get_uint32_MSBfirst(data);
+	slen = get_uint32_MSBfirst(data);
 	data += 4;
 	signature = data;
-	data += siglen;
+	data += slen;
 
-	push_memdump("DH_GEX_REPLY", "signature", signature, siglen);
-
-	// check public key
-	if (!dh_pub_is_valid(pvar->kex->dh, server_public)) {
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: invalid server public key", __FUNCTION__);
-		emsg = emsg_tmp;
-		goto error;
-	}
+	push_memdump("DH_GEX_REPLY", "signature", signature, slen);
 
 	/* calc shared secret K */
 	// 共通鍵の生成
 	//   K = B^a mod p = g^(a*b) mod p
 	// Writing using RFC 4253 notation:
 	//   K = f^x mod p
-	dh_len = DH_size(pvar->kex->dh);
-	dh_buf = malloc(dh_len);
-	if (dh_buf == NULL) {
+	shared_secret = buffer_init();
+	if (shared_secret == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: Out of memory (2)", __FUNCTION__);
 		emsg = emsg_tmp;
 		goto error;
 	}
-	share_len = DH_compute_key(dh_buf, server_public, pvar->kex->dh);
-	share_key = BN_new();
-	if (share_key == NULL) {
+	if ((r = kex_dh_compute_key(kex, dh_server_pub, shared_secret)) != 0) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: Out of memory (3)", __FUNCTION__);
+		            "%s: kex_dh_compute_key (%d)", __FUNCTION__, r);
 		emsg = emsg_tmp;
 		goto error;
 	}
-	BN_bin2bn(dh_buf, share_len, share_key);
-	//debug_print(40, dh_buf, share_len);
-	shared_secret = buffer_init();
-	buffer_put_bignum2(shared_secret, share_key);
 
 	/* calc and verify H */
 	// ハッシュの計算
 	// verify は ssh2_kex_finish() で行う
-	DH_get0_pqg(pvar->kex->dh, &p, NULL, &g);
-	DH_get0_key(pvar->kex->dh, &pub_key, NULL);
+	DH_get0_pqg(kex->dh, &dh_p, NULL, &dh_g);
+	DH_get0_key(kex->dh, &pub_key, NULL);
 	hashlen = sizeof(hash);
-	ret = kexgex_hash(
-		get_kex_hash_algorithm(pvar->kex->kex_type),
-		pvar->kex->client_version,
-		pvar->kex->server_version,
-		pvar->kex->my,
-		pvar->kex->peer,
+	r = kexgex_hash(
+		kex->hash_alg,
+		kex->client_version,
+		kex->server_version,
+		kex->my,
+		kex->peer,
 		server_host_key_blob,
-		pvar->kex->min,
-		pvar->kex->nbits,
-		pvar->kex->max,
-		p,
-		g,
+		kex->min,
+		kex->nbits,
+		kex->max,
+		dh_p, dh_g,
 		pub_key,
-		server_public,
-		share_key,
+		dh_server_pub,
+		buffer_ptr(shared_secret), buffer_len(shared_secret),
 		hash, &hashlen);
-	if (ret < 0) {
+	if (r < 0) {
 		goto error;
 	}
 
 	{
-		push_memdump("DH_GEX_REPLY kexgex_hash", "my_kex", buffer_ptr(pvar->kex->my), buffer_len(pvar->kex->my));
-		push_memdump("DH_GEX_REPLY kexgex_hash", "peer_kex", buffer_ptr(pvar->kex->peer), buffer_len(pvar->kex->peer));
+		push_memdump("DH_GEX_REPLY kexgex_hash", "my_kex", buffer_ptr(kex->my), buffer_len(kex->my));
+		push_memdump("DH_GEX_REPLY kexgex_hash", "peer_kex", buffer_ptr(kex->peer), buffer_len(kex->peer));
 
-		push_bignum_memdump("DH_GEX_REPLY kexgex_hash", "server_public", server_public);
-		push_bignum_memdump("DH_GEX_REPLY kexgex_hash", "share_key", share_key);
+		push_bignum_memdump("DH_GEX_REPLY kexgex_hash", "dh_server_pub", dh_server_pub);
+		push_memdump("DH_GEX_REPLY kexgex_hash", "shared_secret", buffer_ptr(shared_secret), buffer_len(shared_secret));
 
 		push_memdump("DH_GEX_REPLY kexgex_hash", "hash", hash, hashlen);
 	}
 
 	// TTSSHバージョン情報に表示するキービット数を求めておく
-	DH_get0_key(pvar->kex->dh, &pub_key, NULL);
-	pvar->kex->client_key_bits = BN_num_bits(pub_key);
-	pvar->kex->server_key_bits = BN_num_bits(server_public);
+	DH_get0_key(kex->dh, &pub_key, NULL);
+	kex->client_key_bits = BN_num_bits(pub_key);
+	kex->server_key_bits = BN_num_bits(dh_server_pub);
 
-	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
+	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, slen);
 
-	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
-	if (ret == TRUE) {
+	r = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
+	if (r == TRUE) {
 		// ホスト鍵の確認が成功したので、後続の処理を行う
 		SSH_notify_host_OK(pvar);
 		// known_hostsダイアログの呼び出したので、以降、何もしない。
@@ -6135,14 +6054,12 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 error:
 	SecureZeroMemory(hash, sizeof(hash));
-	buffer_free(server_host_key_blob);
-	BN_free(server_public);
-	DH_free(pvar->kex->dh);
-	pvar->kex->dh = NULL;
-	key_free(server_host_key);
-	free(dh_buf);
-	BN_free(share_key);
+	DH_free(kex->dh);
+	kex->dh = NULL;
+	BN_clear_free(dh_server_pub);
 	buffer_free(shared_secret);
+	key_free(server_host_key);
+	buffer_free(server_host_key_blob);
 
 	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
@@ -6161,31 +6078,24 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 {
 	char *data;
 	int len;
-	buffer_t *server_host_key_blob = NULL;
-	int bloblen, siglen;
-	EC_POINT *server_public = NULL;
-	buffer_t *server_blob = NULL;
-	EC_KEY *client_key = NULL;
-	const EC_GROUP *group;
-	char *signature;
-	int ecdh_len;
-	char *ecdh_buf = NULL;
-	BIGNUM *share_key = NULL;
-	buffer_t *shared_secret = NULL;
-	char hash[SSH_DIGEST_MAX_LENGTH];
-	char *emsg = NULL, emsg_tmp[1024];  // error message
-	int hashlen;
+	int bloblen, pklen, siglen;
+	kex *kex = pvar->kex;
 	Key *server_host_key = NULL;
+	buffer_t *shared_secret = NULL;
+	buffer_t *server_blob = NULL;
+	buffer_t *server_host_key_blob = NULL;
+	char *signature;
+	char hash[SSH_DIGEST_MAX_LENGTH];
+	int hashlen;
+	int r;
+
+	u_char *server_public = NULL;
 	BOOL result = FALSE;
-	const EC_POINT *pub_key;
-	int ret;
+	char *emsg = NULL, emsg_tmp[1024]; // error message
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
 
 	memset(&server_host_key, 0, sizeof(server_host_key));
-
-	group = pvar->kex->ec_group;
-	client_key = pvar->kex->ec_client_key;
 
 	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
@@ -6208,33 +6118,26 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: key_from_blob error", __FUNCTION__);
 		emsg = emsg_tmp;
-		goto error;
+		goto out;
 	}
 	data += bloblen;
 
 	// known_hosts対応 (2006.3.20)
-	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(pvar->kex->hostkey_type)) {  // ホストキーの種別比較
+	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
 		            /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
-		            get_ssh2_hostkey_type_name_from_algorithm(pvar->kex->hostkey_type),
-		            get_ssh2_hostkey_algorithm_name(pvar->kex->hostkey_type),
+		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
+		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
 		            get_ssh2_hostkey_type_name(server_host_key->type));
 		emsg = emsg_tmp;
-		goto error;
+		goto out;
 	}
 
 	/* Q_S, server public key */
-	server_public = EC_POINT_new(group);
-	if (server_public == NULL) {
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: Out of memory (1)", __FUNCTION__);
-		emsg = emsg_tmp;
-		goto error;
-	}
-	buffer_get_ecpoint(&data, group, server_public);
+	server_public = buffer_get_string(&data, &pklen); // octet string (form, X, Y)
 	server_blob = buffer_init();
-	buffer_put_ecpoint(server_blob, group, server_public);
+	buffer_append(server_blob, server_public, pklen);
 
 	/* signed H */
 	siglen = get_uint32_MSBfirst(data);
@@ -6244,14 +6147,6 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEX_ECDH_REPLY", "signature", signature, siglen);
 
-	// check public key
-	if (key_ec_validate_public(group, server_public) != 0) {
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: invalid server public key", __FUNCTION__);
-		emsg = emsg_tmp;
-		goto error;
-	}
-
 	/* calc shared secret K */
 	// 共通鍵の生成
 	//   (xk, yk) = dA * QB
@@ -6259,80 +6154,52 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	// Writing using RFC 5656 notation:
 	//   (x', y') = d_C * Q_S
 	//   x' is a shared secret K
-	ecdh_len = (EC_GROUP_get_degree(group) + 7) / 8;
-	ecdh_buf = malloc(ecdh_len);
-	if (ecdh_buf == NULL) {
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: Out of memory (2)", __FUNCTION__);
-		emsg = emsg_tmp;
-		goto error;
-	}
-	if (ECDH_compute_key(ecdh_buf, ecdh_len, server_public,
-	                     client_key, NULL) != (int)ecdh_len) {
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: Out of memory (3)", __FUNCTION__);
-		emsg = emsg_tmp;
-		goto error;
-	}
-	share_key = BN_new();
-	if (share_key == NULL) {
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: Out of memory (4)", __FUNCTION__);
-		emsg = emsg_tmp;
-		goto error;
-	}
-	BN_bin2bn(ecdh_buf, ecdh_len, share_key);
-	//debug_print(40, ecdh_buf, ecdh_len);
-	shared_secret = buffer_init();
-	buffer_put_bignum2(shared_secret, share_key);
+	r = kex_ecdh_dec(kex, server_blob, &shared_secret);
+	if (r != 0)
+		goto out;
 
 	/* calc and verify H */
 	// ハッシュの計算
 	// verify は ssh2_kex_finish() で行う
-	pub_key = EC_KEY_get0_public_key(client_key);
-	if (pvar->kex->client_pub == NULL) {
-		pvar->kex->client_pub = buffer_init();
-	}
-	buffer_clear(pvar->kex->client_pub);
-	buffer_put_ecpoint(pvar->kex->client_pub, group, pub_key);
 	hashlen = sizeof(hash);
-	ret = kex_ecdh_hash(
-		get_kex_hash_algorithm(pvar->kex->kex_type),
-		pvar->kex->client_version,
-		pvar->kex->server_version,
-		pvar->kex->my,
-		pvar->kex->peer,
+	r = kex_ecdh_hash(
+		kex->hash_alg,
+		kex->client_version,
+		kex->server_version,
+		kex->my,
+		kex->peer,
 		server_host_key_blob,
-		pvar->kex->client_pub,
+		kex->client_pub,
 		server_blob,
 		shared_secret,
 		hash, &hashlen);
-	if (ret < 0) {
-		goto error;
+	if (r < 0) {
+		goto out;
 	}
 
 	{
-		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "my_kex", buffer_ptr(pvar->kex->my), buffer_len(pvar->kex->my));
-		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "peer_kex", buffer_ptr(pvar->kex->peer), buffer_len(pvar->kex->peer));
+		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "my_kex", buffer_ptr(kex->my), buffer_len(kex->my));
+		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "peer_kex", buffer_ptr(kex->peer), buffer_len(kex->peer));
 
-		push_bignum_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "share_key", share_key);
+		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "server_public", server_public, pklen);
+		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "shared_secret", buffer_ptr(shared_secret), buffer_len(shared_secret));
 
 		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "hash", hash, hashlen);
 	}
 
 	// TTSSHバージョン情報に表示するキービット数を求めておく
-	switch (pvar->kex->kex_type) {
+	switch (kex->kex_type) {
 		case KEX_ECDH_SHA2_256:
-			pvar->kex->client_key_bits = 256;
-			pvar->kex->server_key_bits = 256;
+			kex->client_key_bits = 256;
+			kex->server_key_bits = 256;
 			break;
 		case KEX_ECDH_SHA2_384:
-			pvar->kex->client_key_bits = 384;
-			pvar->kex->server_key_bits = 384;
+			kex->client_key_bits = 384;
+			kex->server_key_bits = 384;
 			break;
 		case KEX_ECDH_SHA2_521:
-			pvar->kex->client_key_bits = 521;
-			pvar->kex->server_key_bits = 521;
+			kex->client_key_bits = 521;
+			kex->server_key_bits = 521;
 			break;
 		default:
 			// TODO
@@ -6341,26 +6208,24 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 
-	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
-	if (ret == TRUE) {
+	r = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
+	if (r == TRUE) {
 		// ホスト鍵の確認が成功したので、後続の処理を行う
 		SSH_notify_host_OK(pvar);
 		// known_hostsダイアログの呼び出したので、以降、何もしない。
 	}
 
-error:
+ out:
 	SecureZeroMemory(hash, sizeof(hash));
 	buffer_free(server_host_key_blob);
-	EC_POINT_clear_free(server_public);
-	EC_KEY_free(pvar->kex->ec_client_key);
-	pvar->kex->ec_client_key = NULL;
+	free(server_public);
+	EC_KEY_free(kex->ec_client_key);
+	kex->ec_client_key = NULL;
 	key_free(server_host_key);
-	free(ecdh_buf);
-	BN_free(share_key);
 	buffer_free(server_blob);
 	buffer_free(shared_secret);
-	buffer_free(pvar->kex->client_pub);
-	pvar->kex->client_pub = NULL;
+	buffer_free(kex->client_pub);
+	kex->client_pub = NULL;
 
 	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
@@ -6379,18 +6244,20 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 {
 	char *data;
 	int len;
-	buffer_t *server_host_key_blob = NULL;
-	int bloblen, siglen, pklen;
-	u_char *server_public = NULL;
-	buffer_t *server_blob = NULL;
-	char *signature;
-	buffer_t *shared_secret = NULL;
-	char hash[SSH_DIGEST_MAX_LENGTH];
-	char *emsg = NULL, emsg_tmp[1024];  // error message
-	int hashlen;
+	int bloblen, pklen, siglen;
+	kex *kex = pvar->kex;
 	Key *server_host_key = NULL;
+	buffer_t *shared_secret = NULL;
+	buffer_t *server_blob = NULL;
+	buffer_t *server_host_key_blob = NULL;
+	char *signature;
+	char hash[SSH_DIGEST_MAX_LENGTH];
+	int hashlen;
+	int r;
+
+	u_char *server_public = NULL;
 	BOOL result = FALSE;
-	int ret;
+	char *emsg = NULL, emsg_tmp[1024]; // error message
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
 
@@ -6417,26 +6284,26 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: key_from_blob error", __FUNCTION__);
 		emsg = emsg_tmp;
-		goto error;
+		goto out;
 	}
 	data += bloblen;
 
 	// known_hosts対応
-	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(pvar->kex->hostkey_type)) {  // ホストキーの種別比較
+	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
 		            /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
-		            get_ssh2_hostkey_type_name_from_algorithm(pvar->kex->hostkey_type),
-		            get_ssh2_hostkey_algorithm_name(pvar->kex->hostkey_type),
+		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
+		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
 		            get_ssh2_hostkey_type_name(server_host_key->type));
 		emsg = emsg_tmp;
-		goto error;
+		goto out;
 	}
 
 	/* Q_S, server public key */
-	server_public = buffer_get_string(&data, &pklen);
+	server_public = buffer_get_string(&data, &pklen); // 32 bytes public key
 	server_blob = buffer_init();
-	buffer_put_string(server_blob, server_public, CURVE25519_SIZE);
+	buffer_append(server_blob, server_public, CURVE25519_SIZE);
 
 	/* signed H */
 	siglen = get_uint32_MSBfirst(data);
@@ -6446,14 +6313,6 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEX_ECDH_REPLY", "signature", signature, siglen);
 
-	// check public key
-	if (pklen != CURVE25519_SIZE) {
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: invalid server public key", __FUNCTION__);
-		emsg = emsg_tmp;
-		goto error;
-	}
-
 	/* calc shared secret K */
 	// 共通鍵の生成
 	//   (xk, yk) = dA * QB
@@ -6461,76 +6320,62 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	// Writing using RFC 5656 notation:
 	//   (x', y') = d_C * Q_S
 	//   x' is a shared secret K
-	shared_secret = buffer_init();
-	if (shared_secret == NULL) {
-		// TODO: error check
-		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
-		goto error;
-	}
-	if ((ret = kexc25519_shared_key(pvar->kex->c25519_client_key, server_public,
-	                                shared_secret)) < 0) {
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "%s: kexc25519_shared_key() was failed(ret %d)", __FUNCTION__, ret);
-		emsg = emsg_tmp;
-		goto error;
-	}
+	r = kex_c25519_dec(kex, server_blob, &shared_secret);
+	if (r != 0)
+		goto out;
 
 	/* calc and verify H */
 	// ハッシュの計算
 	// verify は ssh2_kex_finish() で行う
-	if (pvar->kex->client_pub == NULL) {
-		pvar->kex->client_pub = buffer_init();
-	}
-	buffer_clear(pvar->kex->client_pub);
-	buffer_put_string(pvar->kex->client_pub, pvar->kex->c25519_client_pubkey, CURVE25519_SIZE);
 	hashlen = sizeof(hash);
-	ret = kex_c25519_hash(
-		get_kex_hash_algorithm(pvar->kex->kex_type),
-		pvar->kex->client_version,
-		pvar->kex->server_version,
-		pvar->kex->my,
-		pvar->kex->peer,
+	r = kex_c25519_hash(
+		kex->hash_alg,
+		kex->client_version,
+		kex->server_version,
+		kex->my,
+		kex->peer,
 		server_host_key_blob,
-		pvar->kex->client_pub,
+		kex->client_pub,
 		server_blob,
 		shared_secret,
 		hash, &hashlen);
-	if (ret < 0) {
-		goto error;
+	if (r < 0) {
+		goto out;
 	}
 
 	{
-		push_memdump("KEX_ECDH_REPLY curve25519_kex_reply", "my_kex", buffer_ptr(pvar->kex->my), buffer_len(pvar->kex->my));
-		push_memdump("KEX_ECDH_REPLY ecdh_kecurve25519_kex_replyx_reply", "peer_kex", buffer_ptr(pvar->kex->peer), buffer_len(pvar->kex->peer));
+		push_memdump("KEX_ECDH_REPLY curve25519_kex_reply", "my_kex", buffer_ptr(kex->my), buffer_len(kex->my));
+		push_memdump("KEX_ECDH_REPLY curve25519_kex_reply", "peer_kex", buffer_ptr(kex->peer), buffer_len(kex->peer));
 
+		push_memdump("KEX_ECDH_REPLY curve25519_kex_reply", "server_public", server_public, pklen);
 		push_memdump("KEX_ECDH_REPLY curve25519_kex_reply", "shared_secret", buffer_ptr(shared_secret), buffer_len(shared_secret));
 
 		push_memdump("KEX_ECDH_REPLY curve25519_kex_reply", "hash", hash, hashlen);
 	}
 
 	// TTSSHバージョン情報に表示するキービット数を求めておく
-	pvar->kex->client_key_bits = 256;
-	pvar->kex->server_key_bits = 256;
+	kex->client_key_bits = 256;
+	kex->server_key_bits = 256;
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 
-	ret = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
-	if (ret == TRUE) {
+	r = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
+	if (r == TRUE) {
 		// ホスト鍵の確認が成功したので、後続の処理を行う
 		SSH_notify_host_OK(pvar);
 		// known_hostsダイアログの呼び出したので、以降、何もしない。
 	}
 
-error:
+ out:
 	SecureZeroMemory(hash, sizeof(hash));
 	buffer_free(server_host_key_blob);
 	free(server_public);
-	SecureZeroMemory(pvar->kex->c25519_client_key, sizeof(pvar->kex->c25519_client_key));
 	key_free(server_host_key);
+	SecureZeroMemory(kex->c25519_client_key, sizeof(kex->c25519_client_key));
 	buffer_free(server_blob);
 	buffer_free(shared_secret);
-	buffer_free(pvar->kex->client_pub);
-	pvar->kex->client_pub = NULL;
+	buffer_free(kex->client_pub);
+	kex->client_pub = NULL;
 
 	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);

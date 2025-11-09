@@ -1752,19 +1752,6 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 	return TRUE;
 }
 
-int kextype_to_cipher_nid(kex_algorithm type)
-{
-	switch (type) {
-		case KEX_ECDH_SHA2_256:
-			return NID_X9_62_prime256v1;
-		case KEX_ECDH_SHA2_384:
-			return NID_secp384r1;
-		case KEX_ECDH_SHA2_521:
-			return NID_secp521r1;
-	}
-	return NID_undef;
-}
-
 digest_algorithm keytype_to_hash_alg(ssh_keytype type)
 {
 	switch (type) {
