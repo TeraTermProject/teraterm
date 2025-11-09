@@ -125,9 +125,6 @@ typedef struct kex {
 	buffer_t *client_pub;
 } kex;
 
-kex* kex_new(void);
-void kex_free(kex *kex);
-
 const ssh2_kex_algorithm_t *get_kex_algorithm_by_type(kex_algorithm kextype);
 const char *get_kex_algorithm_name(kex_algorithm kextype);
 const digest_algorithm get_kex_hash_algorithm(kex_algorithm kextype);
@@ -145,6 +142,8 @@ void SSH2_update_kex_myproposal(PTInstVar pvar);
 // を引き上げるのではなくて、デフォルトの値を変更する
 #define GEX_GRP_DEFAULT_MIN 2048
 
+int dh_pub_is_valid(const DH *dh, const BIGNUM *dh_pub);
+int dh_gen_key(DH *dh, int need);
 DH *dh_new_group(BIGNUM *gen, BIGNUM *modulus);
 DH *dh_new_group1(void);
 DH *dh_new_group14(void);
@@ -152,81 +151,81 @@ DH *dh_new_group15(void);
 DH *dh_new_group16(void);
 DH *dh_new_group17(void);
 DH *dh_new_group18(void);
-
-int dh_gen_key(DH *dh, int need);
 int dh_estimate(int bits);
 
-int kex_dh_hash(const digest_algorithm hash_alg,
-                buffer_t *client_version,
-                buffer_t *server_version,
-                buffer_t *client_kexinit,
-                buffer_t *server_kexinit,
-                buffer_t *serverhostkeyblob,
-                buffer_t *client_pub,
-                buffer_t *server_pub,
-                buffer_t *shared_secret,
-                char *hash, unsigned int *hashlen);
-int kex_dh_compute_key(kex *kex, BIGNUM *dh_pub, buffer_t *out);
+kex *kex_new(void);
+void kex_free(kex *kex);
+
 int kex_dh_keygen(kex *kex);
+int kex_dh_compute_key(kex *kex, BIGNUM *dh_pub, buffer_t *out);
 int kex_dh_keypair(struct kex *kex);
 int kex_dh_dec(kex *kex, buffer_t *dh_blob,
-               buffer_t **shared_secretp);
+    buffer_t **shared_secretp);
+int kex_dh_hash(
+    const digest_algorithm hash_alg,
+    buffer_t *client_version,
+    buffer_t *server_version,
+    buffer_t *client_kexinit,
+    buffer_t *server_kexinit,
+    buffer_t *serverhostkeyblob,
+    buffer_t *client_pub,
+    buffer_t *server_pub,
+    buffer_t *shared_secret,
+    char *hash, unsigned int *hashlen);
 
-int kexgex_hash(const digest_algorithm hash_alg,
-                buffer_t *client_version,
-                buffer_t *server_version,
-                buffer_t *client_kexinit,
-                buffer_t *server_kexinit,
-                buffer_t *serverhostkeyblob,
-                int kexgex_min,
-                int kexgex_bits,
-                int kexgex_max,
-                BIGNUM *kexgex_p,
-                BIGNUM *kexgex_g,
-                BIGNUM *client_dh_pub,
-                BIGNUM *server_dh_pub,
-                char *shared_secret, unsigned int secretlen,
-                char *hash, unsigned int *hashlen);
+int kexgex_hash(
+    const digest_algorithm hash_alg,
+    buffer_t *client_version,
+    buffer_t *server_version,
+    buffer_t *client_kexinit,
+    buffer_t *server_kexinit,
+    buffer_t *serverhostkeyblob,
+    int kexgex_min,
+    int kexgex_bits,
+    int kexgex_max,
+    BIGNUM *kexgex_p,
+    BIGNUM *kexgex_g,
+    BIGNUM *client_dh_pub,
+    BIGNUM *server_dh_pub,
+    char *shared_secret, unsigned int secretlen,
+    char *hash, unsigned int *hashlen);
 
-int kex_ecdh_hash(const digest_algorithm hash_alg,
-                  buffer_t *client_version,
-                  buffer_t *server_version,
-                  buffer_t *client_kexinit,
-                  buffer_t *server_kexinit,
-                  buffer_t *serverhostkeyblob,
-                  buffer_t *client_pub,
-                  buffer_t *server_pub,
-                  buffer_t *shared_secret,
-                  char *hash, unsigned int *hashlen);
 int kex_ecdh_keypair(kex *kex);
 int kex_ecdh_dec_key_group(kex *kex, buffer_t *ec_blob,
-                           EC_KEY *key, const EC_GROUP *group,
-                           buffer_t **shared_secretp);
+    EC_KEY *key, const EC_GROUP *group, buffer_t **shared_secretp);
 int kex_ecdh_dec(kex *kex, buffer_t *server_blob,
-                 buffer_t **shared_secretp);
+    buffer_t **shared_secretp);
+int kex_ecdh_hash(const digest_algorithm hash_alg,
+    buffer_t *client_version,
+    buffer_t *server_version,
+    buffer_t *client_kexinit,
+    buffer_t *server_kexinit,
+    buffer_t *serverhostkeyblob,
+    buffer_t *client_pub,
+    buffer_t *server_pub,
+    buffer_t *shared_secret,
+    char *hash, unsigned int *hashlen);
 
-int kex_c25519_hash(const digest_algorithm hash_alg,
-                    buffer_t *client_version,
-                    buffer_t *server_version,
-                    buffer_t *client_kexinit,
-                    buffer_t *server_kexinit,
-                    buffer_t *serverhostkeyblob,
-                    buffer_t *client_pub,
-                    buffer_t *server_pub,
-                    buffer_t *shared_secret,
-                    char *hash, unsigned int *hashlen);
 void kexc25519_keygen(u_char key[CURVE25519_SIZE], u_char pub[CURVE25519_SIZE]);
 int kexc25519_shared_key_ext(const u_char key[CURVE25519_SIZE],
-                             const u_char pub[CURVE25519_SIZE],
-                             buffer_t *out, int raw);
+    const u_char pub[CURVE25519_SIZE], buffer_t *out, int raw);
 int kexc25519_shared_key(const u_char key[CURVE25519_SIZE],
-                         const u_char pub[CURVE25519_SIZE], buffer_t *out);
+    const u_char pub[CURVE25519_SIZE], buffer_t *out);
 int kex_c25519_keypair(kex *kex);
 int kex_c25519_dec(kex *kex, buffer_t *server_blob,
-                   buffer_t **shared_secretp);
+    buffer_t **shared_secretp);
+int kex_c25519_hash(const digest_algorithm hash_alg,
+    buffer_t *client_version,
+    buffer_t *server_version,
+    buffer_t *client_kexinit,
+    buffer_t *server_kexinit,
+    buffer_t *serverhostkeyblob,
+    buffer_t *client_pub,
+    buffer_t *server_pub,
+    buffer_t *shared_secret,
+    char *hash, unsigned int *hashlen);
 
-int dh_pub_is_valid(const DH *dh, const BIGNUM *dh_pub);
 void kex_derive_keys(PTInstVar pvar, SSHKeys *newkeys, u_char *hash, u_int hash_len,
-	buffer_t *shared_secret);
+    buffer_t *shared_secret);
 
 #endif				/* KEX_H */
