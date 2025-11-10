@@ -648,8 +648,7 @@ static wchar_t **MakeStrArrayFromArray(wchar_t **strs)
 	wchar_t *strpool = (wchar_t *)(pool + ptrs_len);
 	for (int i = 0 ; i < strs_count; i++) {
 		size_t len = wcslen(strs[i]) + 1;
-		len = len * sizeof(wchar_t);
-		memcpy(strpool, strs[i], len);
+		memcpy(strpool, strs[i], len * sizeof(wchar_t));
 		ptrs[i] = strpool;
 		strpool += len;
 	}
