@@ -47,9 +47,13 @@ typedef struct FileIO {
 	int (*utime)(struct FileIO *fv, const char *filename, struct _utimbuf* const _Time);
 	BOOL (*SetFMtime)(struct FileIO *fv, const char *FName, DWORD mtime);
 	int (*stat)(struct FileIO *fv, const char *filename, struct _stati64* _Stat);
-	char *(*GetSendFilename)(struct FileIO *fv, const char *fullname, BOOL utf8, BOOL space, BOOL upper);
-	char *(*GetRecieveFilename)(struct FileIO *fv, const char* filename, BOOL utf8, const char *path, BOOL unique);
 	long (*GetFMtime)(struct FileIO *fv, const char *fullname);
+	//
+	// 送信にふさわしいファイル名取得
+	char *(*GetSendFilename)(struct FileIO *fv, const char *fullname, BOOL utf8, BOOL space, BOOL upper);
+
+	// 受信にふさわしいファイル名取得
+	char *(*GetReceiveFilename)(struct FileIO *fv, const char* filename, BOOL utf8, const char *path, BOOL unique);
 	//
 	BOOL (*SetFilenameEncodeUTF8)(struct FileIO *fv, BOOL utf8);
 	//

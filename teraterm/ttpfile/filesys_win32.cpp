@@ -316,7 +316,7 @@ static char *CreateUniqueFilename(const char *fullpath)
  *	@retval		ファイル名 UTF-8
  *				不要になったら free() する
  */
-static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL utf8, const char *path, BOOL unique)
+static char* GetReceiveFilename(struct FileIO* fv, const char* filename, BOOL utf8, const char *path, BOOL unique)
 {
 	char* new_name = NULL;
 	if (!utf8) {
@@ -418,7 +418,7 @@ TFileIO *FilesysCreateWin32(void)
 	fv->stat = __stat;
 	fv->FileSysDestroy = FileSysDestroy;
 	fv->GetSendFilename = GetSendFilename;
-	fv->GetRecieveFilename = GetRecieveFilename;
+	fv->GetReceiveFilename = GetReceiveFilename;
 	fv->GetFMtime = GetFMtime;
 	fv->SetFMtime = _SetFMtime;
 	return fv;

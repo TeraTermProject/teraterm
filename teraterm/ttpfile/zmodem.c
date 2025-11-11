@@ -1132,7 +1132,7 @@ static BOOL ZParseFile(PZVar zv)
 
 	RecievePath = fv->GetRecievePath(fv);
 	free((void *)zv->FullName);
-	zv->FullName = file->GetRecieveFilename(file, zv->PktIn, FALSE, RecievePath, !fv->OverWrite);
+	zv->FullName = file->GetReceiveFilename(file, zv->PktIn, FALSE, RecievePath, !fv->OverWrite);
 	free(RecievePath);
 
 	/* file open */

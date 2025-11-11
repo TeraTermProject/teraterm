@@ -1155,7 +1155,7 @@ static void KmtSendReceiveInit(PKmtVar kv)
 	kv->PktNumOffset = 0;
 
 	kv->FullName = fv->GetNextFname(fv);
-	filename = file->GetRecieveFilename(file, kv->FullName, FALSE, NULL, FALSE);
+	filename = file->GetReceiveFilename(file, kv->FullName, FALSE, NULL, FALSE);
 	if (strlen(filename) >= filename_len_max) {
 		filename[filename_len_max] = 0;
 	}
@@ -1493,7 +1493,7 @@ read_end:
 			KmtDecode(kv,FNBuff,&Len);
 			FNBuff[Len] = 0;
 			RecievePath = fv->GetRecievePath(fv);
-			kv->FullName = file->GetRecieveFilename(file, FNBuff, FALSE, RecievePath, !fv->OverWrite);
+			kv->FullName = file->GetReceiveFilename(file, FNBuff, FALSE, RecievePath, !fv->OverWrite);
 			free(RecievePath);
 			/* file open */
 			if (! FTCreateFile(kv)) return FALSE;
