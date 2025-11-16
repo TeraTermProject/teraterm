@@ -36,7 +36,8 @@ To release Tera Term installation package is shown in the following step:
       </li>
       <li>Merge branches
         <ul>
-          <li>working branches, cherry-pick to stable branch</li>
+          <li>Merge working branches into main branch.</li>
+          <li>Cherry-pick the commits from working branches into merge-to-stable branch, and then merge into stable branch.</li>
         </ul>
       </li>
       <li>Close issues.
@@ -63,8 +64,9 @@ To release Tera Term installation package is shown in the following step:
       <li>cJSON (<a href="https://github.com/DaveGamble/cJSON/" target="_blank">https://github.com/DaveGamble/cJSON/</a>)</li>
       <li>Unicode (<a href="https://www.unicode.org/versions/latest/" target="_blank">https://www.unicode.org/versions/latest/</a>)</li>
     </ul>
+    <p>We use CI tool for release build. For this reason, the detailed version of Visual Studio is uncontrollable. The detailed version will depend on what version is currently adopted by the CI tool at build time.</p>
     <p>Library versions are mostly determined at this timing.</p>
-    <p>We use CI tool for release build. For this reason, the detailed version of Visual Studio is uncontrollable. The detailed version will depend on what version is adopted by the CI tool.</p>
+    <p>In a stable release, library versions are not updated from periodic release. (However, if a library has a security fix, we will handle it on a case-by-case basis.)</p>
   </li>
   <li>What change is included in this release of not included is mostly determined.</li>
 </ol>
@@ -72,7 +74,7 @@ To release Tera Term installation package is shown in the following step:
 <h2 id="rc-release">Create RC, and aftet that</h2>
 
 <ol>
-  <li>Create a working branch. (from main or or stable branch)
+  <li>Create a branch for RC work. (from main branch or stable branch)
 <pre>
 git switch main
 git checkout -b release/5_4_0-RC
@@ -134,13 +136,13 @@ git checkout -b release/5_4_0-RC
   <li>Test run installer, run and connect in all supported OS.</li>
   <li>Commit and push.</li>
   <li>Create the <a href="https://github.com/TeraTermProject/teraterm/pulls" target="_blank">Pull Request</a> to merge working branch.</li>
-  <li id="RC_commit">Merge the Pull Request. (to main or or stable branch)</li>
+  <li id="RC_commit">Merge the Pull Request. (into main branch or stable branch)</li>
   <li>A build workflow runs on <a href="https://github.com/TeraTermProject/teraterm/actions" target="_blank">GitHub Actions</a>.<br>
     Three builds are triggered on:
     <ul>
       <li>Push to the working branch</li>
       <li>Pull Request creation</li>
-      <li>Merge commit to the main or stable branch.</li>
+      <li>Merge commit into the main branch or stable branch.</li>
     </ul>
     The merge commit is considered the release candidate.
   </li>
@@ -161,7 +163,7 @@ git checkout -b release/5_4_0-RC
 <h2 id="release-operation">Release</h2>
 
 <ol>
-  <li>Create a working branch. (from main or or stable branch)
+  <li>Create a branch for release work. (from main branch or stable branch)
 <pre>
 git switch main
 git checkout -b release/5_4_0
@@ -194,7 +196,7 @@ git checkout -b release/5_4_0
   </li>
   <li>Commit and push. <a href="#login_signpath">*</a></li>
   <li>Create the <a href="https://github.com/TeraTermProject/teraterm/pulls" target="_blank">Pull Request</a> to merge working branch. <a href="#login_signpath">*</a></li>
-  <li>Merge the Pull Request. (to main or or stable branch) <a href="#login_signpath">*</a></li>
+  <li>Merge the Pull Request. (into main branch or stable branch) <a href="#login_signpath">*</a></li>
   <li>Create a tag and push. <a href="#login_signpath">*</a>
     <p>
       Use annotated tags.
@@ -212,7 +214,7 @@ git push origin v5.4.0
     <ul>
       <li>Push to the working branch</li>
       <li>Pull Request creation</li>
-      <li>Merge commit to the main or stable branch</li>
+      <li>Merge commit ito the main branch or stable branch</li>
       <li>Tag creation.</li>
     </ul>
     The tag creation is considered the release.<br>
