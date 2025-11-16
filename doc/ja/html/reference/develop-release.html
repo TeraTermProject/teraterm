@@ -36,7 +36,8 @@ TeraTerm Project でのリリース手順について以下に示します。
       </li>
       <li>ブランチをマージする
         <ul>
-          <li>作業中のブランチ・安定版ブランチへの cherry-pick</li>
+          <li>作業ブランチを main へマージする</li>
+          <li>作業ブランチのコミットを "安定版ブランチへマージするためのブランチ" へ cherry-pick し、安定版ブランチへマージする</li>
         </ul>
       </li>
       <li>issue をクローズする
@@ -65,8 +66,9 @@ TeraTerm Project でのリリース手順について以下に示します。
       <li>cJSON (<a href="https://github.com/DaveGamble/cJSON/" target="_blank">https://github.com/DaveGamble/cJSON/</a>)</li>
       <li>Unicode (<a href="https://www.unicode.org/versions/latest/" target="_blank">https://www.unicode.org/versions/latest/</a>)</li>
     </ul>
+    <p>リリースビルドには CI ツールを使っているため、Visual Studio の詳細バージョンはコントロールできない。どのバージョンになるかは、ビルド時点で CI ツールがどのバージョンを採用しているかに左右される。</p>
     <p>リリースに使うライブラリのバージョンはこの時点でおおむね決定する。</p>
-    <p>リリースビルドには CI ツールを使っているため、Visual Studio の詳細バージョンはコントロールできない。どのバージョンになるかは CI ツールがどのバージョンを採用するかに左右される。</p>
+    <p>安定版リリースでは、ライブラリは元になった定期リリースから更新しない。（ライブラリにセキュリティ修正がある場合は個別に検討する。）</p>
   </li>
   <li>今回のリリースに入れたいものが落ち着く</li>
 </ol>
@@ -74,7 +76,7 @@ TeraTerm Project でのリリース手順について以下に示します。
 <h2 id="rc-release">RC 作成とその後</h2>
 
 <ol>
-  <li>作業ブランチを作成する（main または定期リリース用ブランチから）
+  <li>RC 作業ブランチを作成する（main または安定版リリース用ブランチから）
 <pre>
 git switch main
 git checkout -b release/5_4_0-RC
@@ -164,7 +166,7 @@ git checkout -b release/5_4_0-RC
 <h2 id="release-operation">リリース作業</h2>
 
 <ol>
-  <li>作業ブランチを作成する（main または定期リリース用ブランチから）
+  <li>作業ブランチを作成する（main または安定版リリース用ブランチから）
 <pre>
 git switch main
 git checkout -b release/5_4_0

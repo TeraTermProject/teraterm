@@ -36,7 +36,8 @@ To release Tera Term installation package is shown in the following step:
       </li>
       <li>Merge branches
         <ul>
-          <li>working branches, cherry-pick to stable branch</li>
+          <li>Merge working branches into main.</li>
+          <li>Cherry-pick the commits from working branches into merge-to-stable branch, and then merge into stable branch.</li>
         </ul>
       </li>
       <li>Close issues.
@@ -63,8 +64,9 @@ To release Tera Term installation package is shown in the following step:
       <li>cJSON (<a href="https://github.com/DaveGamble/cJSON/" target="_blank">https://github.com/DaveGamble/cJSON/</a>)</li>
       <li>Unicode (<a href="https://www.unicode.org/versions/latest/" target="_blank">https://www.unicode.org/versions/latest/</a>)</li>
     </ul>
+    <p>We use CI tool for release build. For this reason, the detailed version of Visual Studio is uncontrollable. The detailed version will depend on what version is currently adopted by the CI tool at build time.</p>
     <p>Library versions are mostly determined at this timing.</p>
-    <p>We use CI tool for release build. For this reason, the detailed version of Visual Studio is uncontrollable. The detailed version will depend on what version is adopted by the CI tool.</p>
+    <p>In a stable release, library versions are not updated from periodic release. (However, if a library has a security fix, we will handle it on a case-by-case basis.)</p>
   </li>
   <li>What change is included in this release of not included is mostly determined.</li>
 </ol>
@@ -72,7 +74,7 @@ To release Tera Term installation package is shown in the following step:
 <h2 id="rc-release">Create RC, and aftet that</h2>
 
 <ol>
-  <li>Create a working branch. (from main or or stable branch)
+  <li>Create a branch for RC work. (from main or or stable branch)
 <pre>
 git switch main
 git checkout -b release/5_4_0-RC
@@ -161,7 +163,7 @@ git checkout -b release/5_4_0-RC
 <h2 id="release-operation">Release</h2>
 
 <ol>
-  <li>Create a working branch. (from main or or stable branch)
+  <li>Create a branch for release work. (from main or or stable branch)
 <pre>
 git switch main
 git checkout -b release/5_4_0
