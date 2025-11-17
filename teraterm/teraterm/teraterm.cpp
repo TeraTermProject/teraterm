@@ -69,6 +69,7 @@ static BOOL AddFontFlag;
 static wchar_t *TSpecialFont;
 CVTWindow* pVTWin;
 static DWORD HtmlHelpCookie;
+HANDLE hIdleTimer;
 
 static void LoadSpecialFont(void)
 {
@@ -134,7 +135,7 @@ static void init(void)
  *	@retval	FALSE	すぐに処理する必要なし
  *	@retval	TRUE	引き続き処理する必要あり
  */
-static BOOL OnIdle(LONG lCount)
+BOOL OnIdle(LONG lCount)
 {
 	int nx, ny;
 	BOOL Size;
@@ -352,6 +353,11 @@ static BOOL IsIdleMessage(const MSG* pMsg)
 	return TRUE;
 }
 
+VOID CALLBACK IdleTimerProc(PVOID lpParam, BOOLEAN TimerOrWaitFired)
+{
+	SendMessage(main_window, WM_USER_IDLETIMER, 0, 0);
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
@@ -387,6 +393,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	// [Tera Term]セクションのDLG_SYSTEM_FONTをとりあえずセットする
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+
+	CreateTimerQueueTimer(&hIdleTimer, NULL, IdleTimerProc, 0, IdleTimerPeriod, 0, WT_EXECUTEDEFAULT);
 
 	LONG lCount = 0;
 	MSG msg;
@@ -466,6 +474,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 		}
 	}
 exit_message_loop:
+
+	DeleteTimerQueueTimer(NULL, hIdleTimer, NULL);
 
 	delete m_pMainWnd;
 	m_pMainWnd = NULL;

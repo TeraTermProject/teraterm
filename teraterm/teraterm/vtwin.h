@@ -165,6 +165,7 @@ protected:
 	LRESULT OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam);
 	LRESULT OnNonConfirmClose(WPARAM wParam, LPARAM lParam);
 	LRESULT OnNotifyIcon(WPARAM wParam, LPARAM lParam);
+	LRESULT OnIdleTimer(WPARAM wParam, LPARAM lParam);
 	void OnFileNewConnection();
 	void OnDuplicateSession();
 	void OnCygwinConnection();

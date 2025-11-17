@@ -3774,6 +3774,24 @@ LRESULT CVTWindow::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+LRESULT CVTWindow::OnIdleTimer(WPARAM wParam, LPARAM lParam)
+{
+	// TalkStatus が IdTalkSendMem の状態で連続して OnIdle() を呼びだすと
+	// ファイル転送ダイアログと VTwindow の操作がままならなくなるため、
+	// TalkStatus が IdTalkKeyb か IdTalkQuiet の場合のみ OnIdle() を呼びだす。
+	if (cv.PortType == IdSerial && (TalkStatus == IdTalkKeyb || TalkStatus == IdTalkQuiet)) {
+		int i = IdleLoopCount;
+		while (OnIdle(0)) {
+			if (--i <= 0) {
+				break;
+			}
+		}
+	}
+	DeleteTimerQueueTimer(NULL, hIdleTimer, NULL);
+	CreateTimerQueueTimer(&hIdleTimer, NULL, IdleTimerProc, 0, IdleTimerPeriod, 0, WT_EXECUTEDEFAULT);
+	return 0;
+}
+
 /**
  *	新しい接続
  *
@@ -5353,6 +5371,9 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_USER_DROPNOTIFY:
 		OnDropNotify(wp, lp);
+		break;
+	case WM_USER_IDLETIMER:
+		OnIdleTimer(wp, lp);
 		break;
 	case WM_GETDPISCALEDSIZE:
 		retval = OnDpiChanged(wp, lp, TRUE);
