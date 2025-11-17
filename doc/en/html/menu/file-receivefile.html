@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Receive file ([File] menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Receive file ([File] menu)</h1>
+    <p>
+      Receive a file from the host.
+    </p>
+
+    <p>
+      Selecting this menu brings up the "Receive file" dialog.<br>
+      If you select this menu while holding down the CTRL key, it skips the "Receive File" dialog, allowing you to receive a file by simply selecting it.<br>
+      At this time, the same receiving options as before will be used.
+    <p>
+
+    <p>
+      This behavior can be changed with <a href="#SpecialOption">Special Option</a>.
+    </p>
+
+    <h2 id="dialog">"Receive file" dialog box (to input the file name)</h2>
+    <dl>
+      <dt>Filename (drop file in this dialog)</dt>
+      <dd>
+        Enter or select a filename to receive.<br>
+        By dropping a file into dialog, You can also enter file name.
+      </dd>
+
+      <dt id="binary">Binary</dt>
+      <dd>
+        It will receive the contents of the file as is.<br>
+        Text mode (character encoding, newline character conversion, suppression of control character output) is not implemented, so it is fixed to binary mode.
+      </dd>
+
+      <dt id="ReceivefileAutoStopWaitTime">Auto-stop wait time(sec)</dt>
+      <dd>
+        If there is no received data for the specified duration, the file reception will be terminated.<br>
+        The default value for the wait time is 5 seconds.<br>
+        If 0 seconds is specified, the file reception will not be terminated and will continue to wait for data.
+      </dd>
+    </dl>
+
+    <h3 id="SpecialOption">Special options in the Tera Term setup file</h3>
+    <ul>
+      <li><a href="../setup/teraterm-trans.html#ReceivefileSkipOptionDialog">Skip Receive file dialog</a>
+    </ul>
+
+    <h3 id="drop">Drop of received data</h3>
+    When receiving data at a high bit rate from the serial port, there may be instances where received data is dropped.<br>
+    This is likely to occur when the PC is under high load and Tera Term's processing (such as reading data from the UART chip, logging/file output, screen rendering, etc.) cannot keep up.
+    Please also refer to <a href="file-sendfile.html">"Send file" ([File] menu) Send size</a>
+
+    <h2>"Receive file" dialog box (displayed while sending)</h2>
+    <dl>
+      <dt>Cancel</dt>
+      <dd>
+        Pressing the Cancel button will stop the file reception.
+      </dd>
+    </dl>
+  </body>
+</html>
