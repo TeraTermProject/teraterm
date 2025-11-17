@@ -764,7 +764,7 @@ typedef struct tttset TTTSet, *PTTSet;
 #define PM   0x9E
 #define APC  0x9F
 
-#define InBuffSize  1024
+#define InBuffSize  (1024*4)
 #define OutBuffSize (1024*16)
 
 typedef struct {

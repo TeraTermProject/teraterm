@@ -43,7 +43,7 @@
 　Tera Termのパッケージに含まれるほとんどのプログラムは、C言語で記述されています。一部のコードはC++言語で、MFC(Microsoft Foundation Class)が利用されています。Windows特有の処理を行うために、Win32 APIが多用されているため、APIの知識が必要となってきます。<br>
 　ソースコードをビルドするためには、Microsoft Visual Studio 2005 Standard Edition以上が必要です。Express EditionではMFCが利用できないため、ビルドができません。また、C++BuilderやTurbo C++ Explorer、gccなどのコンパイラにおいても、ビルドすることはできません。<br>
 　Windowsプログラミングに関する情報の源は、Microsoftが提供する「Microsoft Learn」にあります。開発を行う際は、Microsoft Learnを頻繁に参照することになります。<br>
-　
+
 <ul>
   <li><a href="https://learn.microsoft.com/en-us/docs/" target="_blank">Microsoft Learn</a></li>
   <li><a href="https://learn.microsoft.com/ja-jp/docs/" target="_blank">Microsoft Learn (日本語版)</a></li>
@@ -60,23 +60,23 @@
 
 <h2 id="module">モジュール構成</h2>
 　Tera Termパッケージに含まれる実行モジュール（.exeと.dll）の関連図を以下に示します。実行ファイルの拡張子は".exe"になっており、必要に応じてDLLが動的リンクされます。いずれも32ビットプログラム(x86)であるために、x86-64やIA-64といった64ビット環境ではそのまま動作するかどうかは評価されていません。
-　
+
 <div align="center">
 <img src="image/module_relation.png" width=720 height=540>
 </div>
 
 　通常、ユーザがデスクトップやスタートメニューからアプリケーションを起動するときに、呼び出される実行ファイルは"ttermpro.exe"になります。実行ファイルはさらに5つのDLLとダイナミックリンクしています。静的リンクを行い、単一のEXEファイルにしていないのは、1つのプロセスのメモリ占有率を抑えるためです。Tera Termでは多数の起動が行われることが想定されるため、初期設計段階からDLLに分割されています。一度読み込まれたDLLは、複数のプロセス間で共有することができます。<br>
 　<br>
-　
+
 　マクロスクリプトを実行する際は、"ttpmacro.exe"というまったく別のプロセスが呼び出されます。"ttermpro.exe"とプロセス単位で分けられているのは、マクロを単体で実行できるようにするためです。両プロセス間で、データのやりとりを行うためには、プロセス間通信が必要です。Tera Termでは、DDE(Dynamic Data Exchange)と呼ばれる現在ではレガシーとなってしまったしくみが採用されています。将来のWindowsではDDEがサポートされなくなる可能性があり、その場合Tera Term上でマクロを実行することは一切できなくなります。<br>
 　<br>
-　
+
 　TTSSHやTTProxy、TTXKanjiMenuといったプラグイン形式のDLLは、Tera Termの起動時に明示的に LoadLibrary() を使ってダイナミックロードされます。ロード対象となるDLLのファイル名は、TTXInit()#ttplug.c において、"TTX*.DLL"というパターンにマッチしたものとなります。<br>
 　<br>
-　
+
 　"keycode.exe"と"ttpmenu.exe"は単体アプリケーションです。<br>
 　<br>
-　
+
 　Cygwin接続のしくみについては、別の節で説明します。
 
 <hr>
@@ -119,7 +119,7 @@
 　プラグインを作成するためのサンプルコードとして、TTXSamples\ttxtest\ttxtest.c というソースファイルが用意されています。プラグインを開発するときは、このソースファイルをひな形とするとよいでしょう。実践的なプラグインとして、"TTX KanjiMenu"のソースコード（TTXKanjiMenu\配下）がシンプルで分かりやすいです。<br><br>
 
 　プラグインは、Tera Term("ttermpro.exe")の起動時に読み込まれます。TTXInit()#ttplug.c が読み込みを行う関数で、カレントディレクトリから"TTX*.DLL"というワイルドカードに合致するDLLファイルが読み込み対象となります。<br>
-　複数のDLLが存在する場合は、Tera Term本体からチェインするような形で、各DLLのエクスポート関数が連結されます。連結される順番は、それぞれのDLLが定義するオーダー値（TTXExports構造体のloadOrderメンバ）で決定され、現状下記の通りとなっています。　
+　複数のDLLが存在する場合は、Tera Term本体からチェインするような形で、各DLLのエクスポート関数が連結されます。連結される順番は、それぞれのDLLが定義するオーダー値（TTXExports構造体のloadOrderメンバ）で決定され、現状下記の通りとなっています。
 <p>
 <table border=1 align=center>
 <tr>
@@ -145,11 +145,11 @@
  </p>
 
 オーダー値が小さいほど、Tera Term本体側に近くなります。たとえば、Tera Term本体からTTXModifyMenu()が呼び出された場合、
-　
+
 　<ul>
 　 <li>TTXModifyMenu()#ttplug.c → TTProxyのTTXModifyMenu()  → TTSSHのTTXModifyMenu()  → TTX Kanji MenuのTTXModifyMenu()</li>
 　</ul><br>
-　
+
 という順番で、各DLLの関数が呼び出されていくことになります。
 　<br>
 
@@ -180,7 +180,7 @@ static TTXExports Exports = {
 
 　原則、プラグインのエクスポート関数は、他のプラグインと干渉しないように設計をするべきです。また、Tera Term本体側からの呼び出しが、自分宛てであるかどうかを判断する必要がある場合もあります。<br>
 　プラグインがエクスポートする関数について、以下に示します。
-　
+
 <p>
 <table border=1 align=center>
 <tr>
@@ -201,37 +201,37 @@ static TTXExports Exports = {
 <tr>
   <td>TTXGetUIHooks</td>
   <td>ダイアログのハンドルをフックするための関数。Tera Term本体のダイアログインターフェイスを変更したい場合に使う。フック対象の関数は以下のとおり。<br>
-      &SetupTerminal, &SetupWin, &SetupKeyboard, &SetupSerialPort, 
-      &SetupTCPIP, &GetHostName, &ChangeDirectory, &AboutDialog,   
-      &ChooseFontDlg, &SetupGeneral, &WindowWindow                 
+      &SetupTerminal, &SetupWin, &SetupKeyboard, &SetupSerialPort,
+      &SetupTCPIP, &GetHostName, &ChangeDirectory, &AboutDialog,
+      &ChooseFontDlg, &SetupGeneral, &WindowWindow
   </td>
 </tr>
 
 <tr>
   <td>TTXGetSetupHooks</td>
   <td>セットアップルーチンをフックするための関数。フックした側は、元の関数も責任を持って呼び出す必要がある。複数のプラグインが存在する場合、関数がチェインされていく。フック対象の関数は以下のとおり。<br>
-      &ReadIniFile, &WriteIniFile, &ReadKeyboardCnf, &CopyHostList,   
-      &AddHostToList, &ParseParam                                     
+      &ReadIniFile, &WriteIniFile, &ReadKeyboardCnf, &CopyHostList,
+      &AddHostToList, &ParseParam
   </td>
 </tr>
 
 <tr>
   <td>TTXOpenTCP</td>
   <td>TCP接続を行うときに呼び出される関数。シリアル接続のときは呼び出されない。また、以下のソケットインターフェイスをフックすることもできる。<br>
-      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,   
-      &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,     
-      &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,       
-      &PWSACancelAsyncRequest, &PWSAGetLastError                 
+      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,
+      &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,
+      &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,
+      &PWSACancelAsyncRequest, &PWSAGetLastError
   </td>
 </tr>
 
 <tr>
   <td>TTXCloseTCP</td>
   <td>TCPコネクションが切断されるときに呼び出される関数。シリアル接続のときは呼び出されない。下記のうちフックしたインターフェイスがあるならば、元に戻す必要がある。<br>
-      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,   
-      &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,     
-      &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,       
-      &PWSACancelAsyncRequest, &PWSAGetLastError                 
+      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,
+      &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,
+      &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,
+      &PWSACancelAsyncRequest, &PWSAGetLastError
   </td>
 </tr>
 
@@ -270,7 +270,7 @@ static TTXExports Exports = {
 
 </table>
  </p>
-　
+
 
 <hr>
 
@@ -281,7 +281,7 @@ static TTXExports Exports = {
 　パッケージに同梱されるCygTermに関してもローカルディレクトリへデータが保存されます。<br>
 　例外として、TeraTerm Menuはデフォルトでレジストリへ保存をします。カレントディレクトリに"ttpmenu.ini"（0バイトで可）を設置することで、レジストリの代わりに.iniファイルを使うようにすることもできます。ただし、レジストリから.iniファイルへの移行は自動で行いませんので、手動で再登録してください。<br>
 　<br>
-　
+
 　teraterm.iniファイルにエントリを追加した場合は、ReadIniFile()#ttset.cに設定を読み込みするようにします。
 
 <pre class=code>
@@ -339,7 +339,7 @@ static TTXExports Exports = {
 </tr>
 </table>
 　<br>
-　
+
 　デフォルトのロケールが適用されると、期待する動作とならないケースにおいては、_snprintf_s_l()を使用しています。<br>
 　いずれの関数においても、_s("secure")という接尾辞が付くため、見た目に区別が付きやすくなっています。当然のことながら、これらの関数はANSI C非互換です。<br>
 　<br>
@@ -354,7 +354,7 @@ strncpy_s(buf, sizeof(buf), "hello", _TRUNCATE);
 </pre>
 
 　次に、strncat_s()の使用例を示します。当該関数は、すでに存在する文字列に、さらに文字列を連結するものであるため、第1引数(strDest)は<b>かならずnull-terminateしている</b>必要性があります。strncpy_s()の第2引数(numberOfElements)には、ナル文字(\0)も含めたバッファサイズを指定します。以下の例では、最初の関数を実行すると、5バイト（4文字＋ナル文字）が格納されます。2つめの関数を実行する際、残り2バイトしかないので、2文字だけがコピーされ、最終的に"TeraTe"（4文字＋2文字＋ナル文字）となります。
-　
+
 <pre class=code>
 char str[7];
 str[0] = '\0';
@@ -400,7 +400,7 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 	if (g_pSetLayeredWindowAttributes == NULL)
 		return FALSE;
 
-	return g_pSetLayeredWindowAttributes(hwnd, crKey, 
+	return g_pSetLayeredWindowAttributes(hwnd, crKey,
 	                                     bAlpha, dwFlags);
 }
 </pre>
@@ -428,7 +428,7 @@ Visual Studio 2005になってから、Windows 95のサポートが打ち切られました。よって、
 　Windowsアプリケーションでは printf() が使えません。標準出力がどこにも割り当てられていないからです。AllocConsole()とfreopen()を使えば、Windowsアプリケーションにおいても printf() を利用することができます。<br>
 　OutputDebugString()というAPIがあります。これは Visual Studio のデバッグコンソールにメッセージ出力することができる関数です。当該APIは、"Debug build"および"Release build"に関係なく、デバッガが存在すれば、メッセージを送信します。ゆえに、 Visual Studioがなくとも、<a href="https://www.vector.co.jp/soft/win95/prog/se046776.html" target="_blank">DBCon</a>のようなツールを使えば、アプリケーションの単体起動においても、OutputDebugString()によるメッセージを拾うことができます。<br>
 　Tera Termでは、可変長引数を扱えるようにラッパー関数を用意しています。
-　
+
 <pre class=code>
 void OutputDebugPrintf(char *fmt, ...) {
 	char tmp[1024];
@@ -644,8 +644,8 @@ void TelStartKeepAliveThread() {
 
   <h3>ライブラリ</h3>
 　Tera Termで使われているDDEMLについて、以下に示します。
-　
-　
+
+
 <p>
 <table border=1 align=center>
 <tr>
@@ -712,7 +712,7 @@ void TelStartKeepAliveThread() {
 　DDEサーバ側の実装について見ていきます。Tera Term本体("ttermpro.exe")がDDEサーバとなり、かならずDDEサーバから起動されます。マクロプログラム("ttpmacro.exe")から直接マクロスクリプトが実行されるケースにおいても、"connect"マクロによりDDE接続をしないと、通信が開始できません。<br>
 　Tera TermのControlメニューからMacroを呼び出した場合、RunMacro()#ttdde.c がコールされます。<br>
 　HVTWinウィンドウハンドルからトピック名（8バイト）を作成し、DDEの初期化とサーバの登録を行います。また、このタイミングでDDEバッファ（1KB）を作成しています。その後、"ttpmacro.exe"を /D= オプションでトピック名を渡しつつ、起動をします。<br>
-　
+
 <pre class=code>
 	SetTopic();
 	if (! InitDDE()) return;
@@ -721,7 +721,7 @@ void TelStartKeepAliveThread() {
 </pre>
 
 　DDEサーバに、DDEクライアントからトランザクションが送られてきたときは、DdeCallbackProcコールバック関数が呼び出されます。コールバック関数は、DdeInitialize()でDDEの初期化を行うときに登録されます。<br><br>
-　
+
 　次に、DDEクライアントについて見てみましょう。マクロプログラムの起動時、InitDDE()#ttmdde.c が呼び出され、DDEクライアントとして初期化が行われます。DDEの初期化は、DdeInitialize()で行われ、同時にDdeCallbackProcコールバック関数が登録されます。DDEサーバから届いたトランザクションは、コールバック関数で処理されます。<br>
 　DDE通信を始めるためには、DdeConnect()を呼び出し、サーバと接続する必要があります。次に、"ttpmacro.exe"のウィンドウハンドル(HWin)をサーバへ通知するために、XTYP_EXECUTEトランザクションで送ります。最後に、XTYP_ADVSTARTトランザクションをサーバへ送り、アドバイズループを開始します。<br>
 
@@ -751,7 +751,8 @@ void TelStartKeepAliveThread() {
 <img src="image/dde_flowcontrol.png" width=720 height=540>
 </div>
 
-　まず、Tera Term本体におけるリモートホストからのTCPパケット受信は、アイドルループ OnIdle()#teraterm.cpp にて行われます。OnIdle()から呼び出される CommReceive()#commlib.c において、TCPパケットデータをバッファ(cv->InBuff[])に格納します。このバッファは 1KB の大きさを持ちます。また、リングバッファではないため、バッファフルになった場合は、TCPパケットの受信をしません。ただし、バッファフル状態が長く続くと、Windowsカーネル内にTCPパケットが溜まっていき、いずれはリモートホストからのパケットを受信できなくなる可能性があります。<br>
+　まず、Tera Term本体におけるリモートホストからのTCPパケット受信は、アイドルループ OnIdle()#teraterm.cpp にて行われます。OnIdle()から呼び出される CommReceive()#commlib.c において、TCPパケットデータをバッファ(cv->InBuff[])に格納します。このバッファは 4KB の大きさを持ちます。また、リングバッファではないため、バッファフルになった場合は、TCPパケットの受信をしません。ただし、バッファフル状態が長く続くと、Windowsカーネル内にTCPパケットが溜まっていき、いずれはリモートホストからのパケットを受信できなくなる可能性があります。<br>
+　シリアルポートからの受信データは、UARTチップからの読み出しが間に合わないとドロップします。VTウインドウのタイトルバーを左クリックしたままマウスを動かさなかったりツールバーのメニューを表示すると、制御をOS自身に渡すモーダルループに入り、通常のメッセージループがブロックされるため、OnIdle()#teraterm.cpp が実行されません。左記の状態でもデータを受信出来るよう、OnIdle()#teraterm.cpp はアイドルループに加え、タイマーからも一定間隔で呼び出されます。<br>
 　エスケープシーケンスの解析処理を行う過程で、「ログ採取」か「マクロ実行」を行っている場合は、LogPut1()が呼び出され、DDEバッファ(cv.LogBuf[])へ受信データが格納されます。すなわち、ログ採取とマクロ実行におけるバッファは共通です。このバッファは1KBの大きさを持つリングバッファであり、バッファフルになった場合は、最古のデータから上書きされてゆきます。<br>
 　なお、バイナリモードでログ採取においては、cv.BinBuf[] という別のバッファへデータが格納されますので、DDEバッファとは別物です。言い換えると、バイナリモードにおけるデータをDDE通信させることはできないということです。単純な"wait"コマンドでは、バイナリデータ（制御コードなど）を待つことはできません。<br>
 　Tera Term本体のDDEバッファのデータは、エスケープシーケンスの解析処理が完了後、DDEAdv()#ttdde.c がすぐに呼び出され、自分自身（DDEサーバ）へ XTYP_ADVREQ トランザクションを送ります。XTYP_ADVREQを受け取ったら、DDEコールバック関数 DdeCallbackProc() が呼び出され、マクロプログラムへのデータ送信を行います。ここでアドバイズループが使われています。<br>
@@ -761,7 +762,7 @@ void TelStartKeepAliveThread() {
 </div>
 
 　アドバイズループによりDDEサーバよりデータが送られてくると、DDEクライアントであるマクロプログラムにおいては、XTYP_ADVDATAトランザクションがDDEコールバック関数 DdeCallbackProc()#ttmdde.c により処理されます。<br>
-　
+
 　なお、Tera Term本体において、DDE通信用のバッファと、ログ採取用のバッファは cv.LogBuf[] で共有されています。バッファの先頭とデータサイズを表すインデックスは、DDE通信の場合は"DStart"と"Dcount"、ログ採取の場合は"LStart"と"Lcount"と区別されています。実際には、1つのバッファを共有しているわけなので、それぞれのインデックスが食い違うと、誤動作する原因となるため、常に同期を取っておくことになります。<br>
 <hr>
 
@@ -776,7 +777,7 @@ void TelStartKeepAliveThread() {
   <h3>SSHプロトコル</h3>
 　SSH(Secure Shell)は、バージョン1（厳密には1.5）とバージョン2が存在し、略して"SSH1"および"SSH2"と呼ばれます。それらのバージョン間にはプロトコル仕様としての互換性はありません。SSH1にはセキュリティ上の問題があるために、現在はほとんど利用されません。<br>
 　SSH2プロトコルの仕様に関しては、RFC化されています。
-　
+
 <p>
 <ul>
   <li><a href="https://www.ietf.org/rfc/rfc4250.txt" target="_blank">RFC4250: The Secure Shell (SSH) Protocol Assigned Numbers</a></li>
@@ -808,13 +809,13 @@ void TelStartKeepAliveThread() {
 
   <h3>送信パケット処理</h3>
   SSH2プロトコルに載せて、パケットをサーバへ送るときのコードは以下のような書き方となります。begin_send_packet()の呼び出しで、「pvar->ssh_state.outbuf + 12」が返り値となり、それがペイロードを表します。ペイロードは純粋にサーバへ送りたいデータのことで、サイズやパディング等を含みません。<br>
-  
+
 <pre class=code>
 	buffer_t *msg;
 	int len;
 	char *s;
 	unsigned char *outmsg;
-	
+
 	msg = buffer_init();
 	if (msg != NULL) {
 		buffer_put_int(msg, SSH2_DISCONNECT_PROTOCOL_ERROR);
@@ -834,7 +835,7 @@ void TelStartKeepAliveThread() {
 　SSH通信に載せられて、実際にパケットが送出されるのは、finish_send_packet()から呼び出される finish_send_packet_special() です。パケットを送信するときのフォーマットについて、以下に示します。共通鍵暗号でパケットデータを暗号化する前に、ヘッダとフッタを付ける必要があります。<br>
 　パケットサイズはHMACを除く長さです。パケットサイズそのものはビッグエンディアン形式で、4バイト分格納しますが、その"4"バイトは含まれません。ペイロードの直後にパディングを埋めるのは、共通鍵暗号で暗号化するときに「ブロックサイズ単位」になっていなければ、アルゴリズム的に暗号化できないからです。ブロックサイズは暗号アルゴリズムにより異なり、たとえば3DES-CBCならば24バイト、AES128ならば16バイトです。<br>
 　HMAC(Keyed-Hashing for Message Authentication)は、暗号化本文に対するハッシュです。ハッシュのアルゴリズムは選択可能であり、"MD5"や"SHA-1"がよく使われています。HMACを付加することにより、「第三者によるデータの改ざん」を検出することができます。HMACは、暗号化対象となる本文を秘密鍵とシーケンス番号を加え、ハッシュ値を計算します。秘密鍵とシーケンス番号を加えることにより、第三者がデータをまるごと差し替えたとしても、送信者が生成したハッシュ値を復元することは理論上できません。<br>
-　
+
 
 <div align="center">
 <img src="image/ssh_packet_format1.png" width=720 height=540>
@@ -858,9 +859,9 @@ void TelStartKeepAliveThread() {
 </div>
 
 　TeraTerm本体側は OnIdle()#teraterm.cpp というアイドルループにおいて、常時パケットの受信がないかをポーリングしています。それが CommReceive() で、recv()を呼び出します。recv()はTTSSHによりフックされているので、ソケット関数ではなく、TTXrecv()#ttxssh.c が呼び出されます。<br>
-　CommReceive()は recv() を呼び出す際に、バッファ(cv->InBuff[])の空きポインタとサイズを引数に渡します。バッファサイズは 1KB です。つまり、TTXrecv()のサイズには、1～1024 までの数値が渡される可能性があるということです。<br>
+　CommReceive()は recv() を呼び出す際に、バッファ(cv->InBuff[])の空きポインタとサイズを引数に渡します。バッファサイズは 4KB です。つまり、TTXrecv()のサイズには、1～4096 までの数値が渡される可能性があるということです。<br>
 　TTXrecv()から呼び出される PKT_recv() は、少々複雑なループ処理となっています。SSH接続を初めて行うときのシーケンスを以下に示します。
-　
+
 <ol>
  <li>recv_data() で本当の recv() を呼び出し、サーバからの受信パケットをカーネルから受け取る。pvar->pkt_state.datalenが更新される。 </li>
  <li>SSH_handle_server_ID() でSSHサーバのバージョンチェックが行われる。pvar->pkt_state.datastart と pvar->pkt_state.datalen を更新する。</li>
@@ -942,7 +943,7 @@ void TelStartKeepAliveThread() {
   <h3>SCP(Secure Copy)</h3>
 　SCPは OpenSSH パッケージに含まれるプログラムの1つであり、SSHセッションを使ってファイルの送受信を行うことができます。SCPを利用するためには、リモートサーバに"sshd"だけではなく、"scp"コマンドも導入されている必要があります。OpenSSHのSCPは、sshd デーモンから"scp"コマンドが子プロセスとして起動されることで実現されています。なお、SCPとSFTP(Secure File Transfer Program)はまったく別のプロトコルで、互換性はなく、SCPは純粋にファイルの「送信」と「受信」しかできません。<br>
 　SSHセッション上でファイル転送を行うには、クライアントからサーバへ接続が成功したあとに、シェルオープン(pty-req)の代わりに、「外部コマンドの実行」(exec)という形式で、SCPが利用できるようになります。
-　
+
 　<p><font size=3>・SSH2の場合</font></p>
 　SSH2_MSG_CHANNEL_REQUEST をサーバへ送るときに、"pty-req"の代わりに"exec"をサービス名として指定すると、外部コマンドを実行することができます。
 <pre>
@@ -957,7 +958,7 @@ void TelStartKeepAliveThread() {
 
 　<p><font size=3>・SSH1の場合</font></p>
 　　セッションを開くときに、SSH_CMSG_EXEC_CMD をサーバへ送ると、外部コマンドを実行することができます。
-　
+
 　<p><font size=3>・外部コマンドの書式</font></p>
 <pre>
 　* "scp [-v] [-r] [-p] [-d] -t ファイル名"　ローカルからリモートへのコピー
@@ -1043,16 +1044,16 @@ DISPLAY=localhost:10.0
 <h2 id="macro">マクロ言語の設計と実装</h2>
   <h3>概要</h3>
 　Tera Termのマクロスクリプトは、BASIC風の言語仕様となっています。BisonやFlexといったしくみは利用しておらず、力業的な独自の構文解析（再帰的下降法）により実装されています。そのため、本格的なスクリプト言語としての記述はできない側面があります。<br>
-　
+
   <h3>ファイルの読み込み</h3>
 　ttpmacro.exeの起動時に、マクロファイル(.ttl)が一括してバッファへ読み込まれます。
-　
+
 <p><ul>
   <li>OnInitDialog()#ttmmain.cpp -> InitTTL() -> InitBuff() -> LoadMacroFile()</li>
 </ul></p>
 
 　初めて読み込まれるマクロファイルの全内容は Buff[0] # ttmbuff.c に格納されます。この時点で、ファイルの内容は一括して読み込まれるため、マクロ実行中はファイルを削除してしまっても問題はありません。ただし、"include"で別のファイルを読み込む場合は、includeを実行する時点で、include対象となるファイルの読み込みが発生します。
-　
+
 <pre class=code>
 #define MAXNESTLEVEL 10     /* 扱えるファイル数（includeは9つまで）*/
 
@@ -1137,7 +1138,7 @@ WORD LineLen;       /* バッファサイズ */
 　マクロコマンドかどうかは、GetReservedWord()で判別しています。_stricmp()で比較しているので、アルファベットの大文字・小文字は区別されません(case-insensitive)。マクロコマンドの場合は、TTLxxx() の関数を呼び出します。<br>
 　識別子の判定は、GetIdentifier() で行います。アルファベット(a-z, A-Z)および数値(0-9)、アンダースコア(_)から構成されるトークンを切り出します。トークンは32文字までです。トークンは「変数」として扱われます。左辺値に変数が来る場合は、「変数への代入」しかありえないので、その直後に「イコール(=)」があるかどうかを調べます。<br>
 　イコール以降の判定処理は、以下の順番となります。
-　
+
 <p><ol>
   <li>文字列の判定</li>
   <li>計算式の判定</li>
@@ -1146,7 +1147,7 @@ WORD LineLen;       /* バッファサイズ */
 　文字列かどうかは GetString() で判定します。文字列は’か”でクォートされているため、取り出すのは容易です。<br>
 　計算式の判定は、GetExpression() で行います。ここでは再帰的下降法により、構文解析されます。<br>
 　左辺値が定義済みの変数かどうかは CheckVar() でチェックし、数値もしくは文字列をセットします。そうではない場合は NewStrVar() で、新しい変数として登録します。
-　
+
 
 <hr>
 
@@ -1260,7 +1261,7 @@ void CaretKillFocus(BOOL show)
   <h3>概要</h3>
 　Tera TermはUART(16550A)互換のシリアルポートに対応しているため、シリアルコンソールが使用できます。シリアルポートのことを、COM(Communication Port)ポートと呼ぶこともあります。OSが検出したCOMポートは、順に"COM1"、"COM2"といった名前が付けられ、アプリケーションから利用することができます。Microsoft Windows XPでは、最大256個のCOMポート（COM1～COM256）までが利用可能です。<br>
 　パソコンに搭載されるCOMポートは、せいぜい1つ、多くても2つであり、最近ではまったくCOMポートがないパソコンも存在します。そのため、USB接続によるシリアルポートを実現する「USBシリアル変換ケーブル」が発売されています。こういった製品の特徴として、OSに認識させるCOMポートの番号を、ユーザが自由に設定できるようになっています。すなわち、Tera Term見えには、2つのCOMポートがあった場合、それぞれ"COM1"、"COM2"として認識できるとは限らず、"COM1"、"COM7"といったふうに認識できるようになる必要があります。<br>
-　
+
   <h3>COMポートのリストアップ</h3>
 　かつてのTera Termでは、"COM1"から"COM256"までのすべてのCOMポートを、接続ダイアログにリストアップしていましたが、使い勝手がよくありませんでした。そこで、接続ダイアログを呼び出したタイミングにおいて（Tera Term起動時のみでは不十分）、OSが認識しているCOMポートを検出するようにして、必要なCOMポートのみを表示させるようにしました。その検出ロジックが、DetectComPorts()#ttcmn.c です。QueryDosDevice() APIを使用し、MS-DOSデバイス名から"COM"を探します。<br>
 
@@ -1282,7 +1283,7 @@ void CaretKillFocus(BOOL show)
   <h3>COMポートのフルネーム取得</h3>
 
 　上記の処理だけでもユーザビリティは向上するのですが、さらなる欲求として、各COMポートに付けられる「フルネーム」を同時に表示したくなります。COMポートの番号とともに、フルネームも付加表示できると、さらに使い勝手がよくなることが期待されます。この課題を解決するのが、ListupSerialPort()#ttcmn.c です。<br>
-　
+
 <pre class=code>
 static void ListupSerialPort(LPWORD ComPortTable, int comports, char **ComPortDesc, int ComPortMax)
 {
@@ -1476,7 +1477,7 @@ ZMODEMのエントリポイントについて、以下に示します。
 
   <h3>テスト手法</h3>
 　バイナリ転送プロトコルはシリアル回線で利用されることが多いのですが、最近のPCは、シリアルポートが搭載されていないため、シリアル接続でのテストを行うことが難しくなっています。そこで、<a href="https://com0com.sourceforge.net/" target="_blank">com0comというNull-modem emulator</a>を利用すると、1つのPC内で仮想的に2つのCOMポートを生成し、Tera Term同士、Tera Termと別ターミナルソフト同士で、シリアル通信を行うことができます。
-　
+
 
 <div align="center">
 <img src="image/devman_com0com.png" width=468 height=171>
@@ -1485,7 +1486,7 @@ ZMODEMのエントリポイントについて、以下に示します。
 
   <h3>記号</h3>
 　バイナリ転送プロトコルでは、ACKやCANといったキャラクタ表記が使われますが、これらはASCIIコード表から来ています。man 7 ascii でASCIIコード一覧が参照できます。以下に代表的な記号と値を引用します。
-　
+
 
 <pre class=code>
 Oct   Dec   Hex   Char                        Oct   Dec   Hex   Char
@@ -1518,7 +1519,7 @@ XmodemLog=on
 </pre>
 
 　簡単な例として、Tera Term(COM10)から<a href="http://nanno.bf1.jp/softlib/man/rlogin/" target="_blank">RLogin</a>(COM11)に対して、67バイトのファイルを送信した場合の通信ログを示します。「&lt;&lt;&lt;」行はTera Termがホストから受信したデータで、「&gt;&gt;&gt;」行はTera Termが送信したデータです。
-　
+
 <pre class=code>
 &lt;&lt;&lt;
 15                                                  .
@@ -1541,11 +1542,11 @@ XmodemLog=on
 04                                                  .
 
 &lt;&lt;&lt;
-06 
+06
 </pre>
 
 　上記ログの意味は以下のとおりです。
-　
+
 <ol>
  <li>NAK受信(15)</li>
  <li>ブロックデータの送信</li>
@@ -1569,7 +1570,7 @@ XmodemLog=on
 01 01 FE 3B 20 73 61 6D 70 6C 65 20 6D 61 63 72     ...; sample macr
 6F 20 6F 66 20 54 65 72 61 20 54 65 72 6D 0D 0A     o of Tera Term..
 3B 0D 0A 3B 20 46 69 6C 65 3A 20 73 63 72 65 65     ;..; File: scree
-6E 63 61 70 74 75 72 65 2E 74 74 6C 0D 0A 3B 20     ncapture.ttl..; 
+6E 63 61 70 74 75 72 65 2E 74 74 6C 0D 0A 3B 20     ncapture.ttl..;
 44 65 73 63 72 69 70 74 69 6F 6E 3A 20 63 61 70     Description: cap
 74 75 72 65 20 73 63 72 65 65 6E 20 63 6F 6E 74     ture screen cont
 65 6E 74 73 20 61 6E 64 20 77 72 69 74 65 20 74     ents and write t
@@ -1629,7 +1630,7 @@ XmodemLog=on
 04                                                  .
 
 &lt;&lt;&lt;
-06 
+06
 </pre>
 
 
@@ -1651,7 +1652,7 @@ YmodemLog=on
 </pre>
 
 　簡単な例として、Tera Term(COM10)から<a href="http://nanno.bf1.jp/softlib/man/rlogin/" target="_blank">RLogin</a>(COM11)に対して、67バイトのファイルを送信した場合の通信ログを示します。「&lt;&lt;&lt;」行はTera Termがホストから受信したデータで、「&gt;&gt;&gt;」行はTera Termが送信したデータです。
-　
+
 <pre class=code>
 &lt;&lt;&lt;
 43                                                  C
@@ -1870,11 +1871,11 @@ YmodemLog=on
 00 00 00 00 00                                      .....
 
 &lt;&lt;&lt;
-06 
+06
 </pre>
 
 　上記ログの意味は以下のとおりです。
-　
+
 <ol>
  <li>'C'（送信要求）受信(43)</li>
  <li>ブロック0（ファイル情報）の送信</li>
@@ -1899,7 +1900,7 @@ TBD
 
   <h3>KERMIT</h3>
 　KERMIT（カーミット：セサミストリートに登場するカエルのマペット）は、1981年にコロンビア大学で開発されたファイル転送プロトコルであり、現在はカーミットプロジェクトによりメンテナンスされています。下記のサイトから仕様書が入手できます。<br>
-　
+
 <ul>
   <li><a href="https://www.kermitproject.org/" target="_blank">The Kermit Project</a></li>
 </ul>
@@ -1907,7 +1908,7 @@ TBD
 
 　上記サイトでは、ソースコードも配布されており、様々なプラットフォームに実装されています。実装の名称としては、C-KermitやE-Kermit、Kermit95などがあります。<br>
 　teraterm.ini で KmtLog エントリを有効にすると、通信ログを採取することができます。通信ログファイルは、ttermpro.exe と同じディレクトリに"KERMIT.LOG"という名前で生成されます。
-　
+
 <pre class=code>
 ; Kermit log
 KmtLog=on
@@ -1955,9 +1956,9 @@ HCHECK is a single-character type 1 checksum
 
 　拡張形式では94バイト以上のデータを一度に送れるようにするため、データサイズを表現する領域が2バイトに増えています。基本形式の"LEN"は常にゼロです（32を加算するので、ASCIIコードの空白になる）。また、ヘッダサイズが3バイト増えており、ヘッダ用のチェックサムが追加されています。<br>
 　<br>
-　
+
 　下記は初期文字列です。
-　
+
 <pre class=code>
 Initialization String
 1         2      3       4       5       6       7       8       9       10
