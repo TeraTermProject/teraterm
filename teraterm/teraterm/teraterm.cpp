@@ -321,6 +321,7 @@ void RemoveModelessHandle(HWND hWnd)
 	modeless_dlg.Remove(hWnd);
 }
 
+#if 0 // not used
 static UINT nMsgLast;
 static POINT ptCursorLast;
 
@@ -352,6 +353,7 @@ static BOOL IsIdleMessage(const MSG* pMsg)
 
 	return TRUE;
 }
+#endif
 
 VOID CALLBACK IdleTimerProc(PVOID lpParam, BOOLEAN TimerOrWaitFired)
 {
@@ -403,11 +405,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 		DWORD idle_enter_tick = GetTickCount();
 		BOOL sleep_enable = FALSE;
 		for (;;) {
-			if (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) != FALSE) {
-				// メッセージが存在する
-				break;
-			}
-
 			// idle処理を行う
 			//		- GetMessage()でブロックすると、
 			//		  ウィンドウ非表示時にidle処理ができない
@@ -432,6 +429,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 			else {
 				idle_enter_tick = GetTickCount();
 				sleep_enable = FALSE;
+			}
+
+			if (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) != FALSE) {
+				// メッセージが存在する
+				break;
 			}
 		}
 
@@ -462,10 +464,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				}
 			}
 
-			// idle状態に入るか?
-			if (IsIdleMessage(&msg)) {
-				lCount = 0;
-			}
+//			// idle状態に入るか?
+//			if (IsIdleMessage(&msg)) {
+//				lCount = 0;
+//			}
 
 			if (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) == FALSE) {
 				// メッセージがなくなった
