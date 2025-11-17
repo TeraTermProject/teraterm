@@ -101,6 +101,7 @@
 #include "codeconv.h"
 #include "sendmem.h"
 #include "sendfiledlg.h"
+#include "recvfiledlg.h"
 #include "setting.h"
 #include "broadcast.h"
 #include "asprintf.h"
@@ -1034,13 +1035,14 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		{ ID_FILE_PAUSELOG, "MENU_FILE_PAUSELOG" },
 		{ ID_FILE_STOPLOG, "MENU_FILE_STOPLOG" },
 		{ ID_FILE_SENDFILE, "MENU_FILE_SENDFILE" },
+		{ ID_FILE_RECVFILE, "MENU_FILE_RECVFILE" },
 		{ ID_FILE_REPLAYLOG, "MENU_FILE_REPLAYLOG" },
 		{ ID_FILE_CHANGEDIR, "MENU_FILE_CHANGEDIR" },
 		{ ID_FILE_PRINT2, "MENU_FILE_PRINT" },
 		{ ID_FILE_DISCONNECT, "MENU_FILE_DISCONNECT" },
 		{ ID_FILE_EXIT, "MENU_FILE_EXIT" },
 		{ ID_FILE_EXITALL, "MENU_FILE_EXITALL" },
-		{ 11, "MENU_TRANS" },
+		{ 12, "MENU_TRANS" },
 		{ ID_FILE_KERMITRCV, "MENU_TRANS_KERMIT_RCV" },
 		{ ID_FILE_KERMITGET, "MENU_TRANS_KERMIT_GET" },
 		{ ID_FILE_KERMITSEND, "MENU_TRANS_KERMIT_SEND" },
@@ -1153,6 +1155,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		if ( (! cv.Ready) || (!IsSendVarNULL()) ||
 		     (!IsFileVarNULL()) || (cv.PortType==IdFile) ) {
 			EnableMenuItem(FileMenu,ID_FILE_SENDFILE,MF_BYCOMMAND | MF_GRAYED);
+			EnableMenuItem(FileMenu,ID_FILE_RECVFILE,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_TRANSFER,MF_BYPOSITION | MF_GRAYED); /* Transfer */
 			EnableMenuItem(FileMenu,ID_FILE_CHANGEDIR,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_DISCONNECT,MF_BYCOMMAND | MF_GRAYED);
@@ -1160,6 +1163,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		}
 		else {
 			EnableMenuItem(FileMenu,ID_FILE_SENDFILE,MF_BYCOMMAND | MF_ENABLED);
+			EnableMenuItem(FileMenu,ID_FILE_RECVFILE,MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_TRANSFER,MF_BYPOSITION | MF_ENABLED); /* Transfer */
 			EnableMenuItem(FileMenu,ID_FILE_CHANGEDIR,MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_DISCONNECT,MF_BYCOMMAND | MF_ENABLED);
@@ -1783,6 +1787,7 @@ void CVTWindow::OnDestroy()
 	EndDisp(vt_src);
 	vt_src = NULL;
 	sendfiledlgUnInit();
+	recvfiledlgUnInit();
 	FLogOpenDialogUnInit();
 
 	FreeBuffer();
@@ -4261,6 +4266,35 @@ void CVTWindow::OnFileSend()
 	free(filename);
 }
 
+void CVTWindow::OnFileRecv()
+{
+	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
+				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
+	recvfiledlgdata data = {};
+	data.UILanguageFileW = ts.UILanguageFileW;
+	wchar_t *filterW = ToWcharA(ts.FileReceiveFilter);
+	data.filerecv_filter = filterW;
+	wchar_t *initial_dir = GetFileDir(&ts);
+	data.initial_dir = initial_dir;
+	data.skip_dialog = (BOOL)ts.ReceivefileSkipOptionDialog;
+	data.binary = TRUE;											// バイナリモード固定
+	data.autostop_sec = ts.ReceivefileAutoStopWaitTime;
+
+	INT_PTR ok = recvfiledlg(m_hInst, m_hWnd, &data);
+	free(initial_dir);
+	free(filterW);
+	if (ok != IDOK) {
+		return;
+	}
+	ts.ReceivefileSkipOptionDialog = data.skip_dialog;
+	ts.TransBin = data.binary;
+	ts.ReceivefileAutoStopWaitTime = data.autostop_sec;
+
+	wchar_t *filename = data.filename;
+	RawStartReceive(filename, ts.ReceivefileAutoStopWaitTime, FALSE);
+	free(filename);
+}
+
 void CVTWindow::OnFileKermitRcv()
 {
 	KermitStartRecive(FALSE);
@@ -5397,6 +5431,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_FILE_STOPLOG: OnStopLog(); break;
 		case ID_FILE_REPLAYLOG: OnReplayLog(); break;
 		case ID_FILE_SENDFILE: OnFileSend(); break;
+		case ID_FILE_RECVFILE: OnFileRecv(); break;
 		case ID_FILE_KERMITRCV: OnFileKermitRcv(); break;
 		case ID_FILE_KERMITGET: OnFileKermitGet(); break;
 		case ID_FILE_KERMITSEND: OnFileKermitSend(); break;

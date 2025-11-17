@@ -179,6 +179,7 @@ protected:
 	void OnReplayLog();
 	void OnExternalSetup();
 	void OnFileSend();
+	void OnFileRecv();
 	void OnFileKermitRcv();
 	void OnFileKermitGet();
 	void OnFileKermitSend();

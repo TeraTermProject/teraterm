@@ -130,6 +130,8 @@ set(SRC_DIALOG
   prnabort.h
   protodlg.cpp
   protodlg.h
+  recvfiledlg.cpp
+  recvfiledlg.h
   resource.h
   sendfiledlg.cpp
   sendfiledlg.h
@@ -271,6 +273,8 @@ target_sources(
   ../ttpfile/protolog.h
   ../ttpfile/quickvan.c
   ../ttpfile/quickvan.h
+  ../ttpfile/raw.c
+  ../ttpfile/raw.h
   ../ttpfile/xmodem.c
   ../ttpfile/xmodem.h
   ../ttpfile/ymodem.c

@@ -1,0 +1,220 @@
+/*
+ * (C) 2025- TeraTerm Project
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/* Raw protocol */
+#include <stdio.h>
+#include <process.h>
+
+#include "tttypes.h"
+#include "ftlib.h"
+#include "protolog.h"
+#include "filesys_proto.h"
+
+#include "raw.h"
+
+typedef struct {
+	const char *FullName;	// Windows上のファイル名 UTF-8
+	BOOL FileOpen;
+	LONG ByteCount;
+	DWORD StartTime;
+	PComVar cv;
+	enum {
+		STATE_FLUSH,		// 処理開始時に受信データを捨てる
+		STATE_NORMAL,
+		STATE_CANCELED,		// キャンセル通知を受けた
+	} state;
+	TComm *Comm;
+	PFileVarProto fv;
+	TFileIO *file;
+	int AutostopSec;		// 自動停止待ち時間(秒)
+} TRawVar;
+typedef TRawVar *PRawVar;
+
+static int RawRead1Byte(PRawVar rv, LPBYTE b)
+{
+	if (rv->Comm->op->Read1Byte(rv->Comm, b) == 0) {
+		return 0;
+	}
+	return 1;
+}
+
+static void RawFlushReceiveBuf(PRawVar rv)
+{
+	BYTE b;
+	int r;
+
+	do {
+		r = RawRead1Byte(rv, &b);
+	} while (r != 0);
+}
+
+static BOOL RawInit(TProto *pv, PComVar cv, PTTSet ts)
+{
+	PRawVar rv = pv->PrivateData;
+	PFileVarProto fv = rv->fv;
+	TFileIO *file = rv->file;
+
+	rv->FullName = fv->GetNextFname(fv);
+	rv->FileOpen = file->OpenWrite(file, rv->FullName);
+	if (rv->FileOpen == FALSE) {
+		return FALSE;
+	}
+	fv->InfoOp->SetDlgProtoFileName(fv, rv->FullName);
+	fv->InfoOp->SetDlgProtoText(fv, "Raw(binary)");
+	rv->StartTime = 0;
+	rv->ByteCount = 0;
+	rv->state = STATE_FLUSH;
+	rv->cv = cv;
+
+	return TRUE;
+}
+
+static void RawCancel(TProto *pv)
+{
+	PRawVar rv = pv->PrivateData;
+	rv->state = STATE_CANCELED;		// quit
+}
+
+static void RawTimeOutProc(TProto *pv)
+{
+	PRawVar rv = pv->PrivateData;
+	rv->state = STATE_CANCELED;		// quit
+}
+
+static BOOL RawReadPacket(void *arg)
+{
+	PRawVar rv = (PRawVar)arg;
+	TFileIO *file = rv->file;
+	PFileVarProto fv = rv->fv;
+	BYTE b, Buff[InBuffSize];
+	int r, BuffCount;
+
+	BuffCount = 0;
+	for (r=RawRead1Byte(rv, &b); r > 0 && BuffCount < InBuffSize; r=RawRead1Byte(rv, &b)) {
+		Buff[BuffCount++] = b;
+	}
+
+	if (BuffCount != 0) {
+		if (rv->StartTime == 0) {
+			rv->StartTime = GetTickCount();
+			fv->InfoOp->SetDlgPacketNum(fv, 1);
+		}
+		file->WriteFile(file, Buff, BuffCount);
+		rv->ByteCount += BuffCount;
+		fv->InfoOp->SetDlgByteCount(fv, rv->ByteCount);
+		fv->InfoOp->SetDlgTime(fv, rv->StartTime, rv->ByteCount);
+		fv->FTSetTimeOut(fv, rv->AutostopSec);
+	}
+	if (rv->state == STATE_CANCELED) {
+		return FALSE;
+	}
+	return TRUE;
+}
+
+static BOOL RawParse(TProto *pv)
+{
+	PRawVar rv = pv->PrivateData;
+
+	switch (rv->state) {
+	case STATE_FLUSH:
+		RawFlushReceiveBuf(rv);		// 受信データを捨てる
+		rv->state = STATE_NORMAL;	// 送受信処理を行う
+		return TRUE;
+	case STATE_NORMAL:
+		return RawReadPacket(rv);
+	case STATE_CANCELED:
+		RawFlushReceiveBuf(rv);
+		return FALSE;
+	}
+	return FALSE;
+}
+
+static int SetOptV(TProto *pv, int request, va_list ap)
+{
+	PRawVar rv = pv->PrivateData;
+	switch(request) {
+	case RAW_AUTOSTOP_SEC: {
+		const int autostop_sec = va_arg(ap, int);
+		rv->AutostopSec = autostop_sec;
+		return 0;
+	}
+	}
+	return -1;
+}
+
+static int SetOpt(TProto *pv, int request, ...)
+{
+	va_list ap;
+	va_start(ap, request);
+	int r = SetOptV(pv, request, ap);
+	va_end(ap);
+	return r;
+}
+
+static void Destroy(TProto *pv)
+{
+	PRawVar rv = pv->PrivateData;
+	free((void*)rv->FullName);
+	rv->FullName = NULL;
+	free(rv);
+	pv->PrivateData = NULL;
+	free(pv);
+}
+
+static const TProtoOp Op = {
+	RawInit,
+	RawParse,
+	RawTimeOutProc,
+	RawCancel,
+	SetOpt,
+	SetOptV,
+	Destroy,
+};
+
+TProto *RawCreate(PFileVarProto fv)
+{
+	TProto *pv = malloc(sizeof(*pv));
+	if (pv == NULL) {
+		return NULL;
+	}
+	pv->Op = &Op;
+	PRawVar rv = malloc(sizeof(TRawVar));
+	pv->PrivateData = rv;
+	if (rv == NULL) {
+		free(pv);
+		return NULL;
+	}
+	memset(rv, 0, sizeof(*rv));
+	rv->FileOpen = FALSE;
+	rv->state = STATE_FLUSH;
+	rv->Comm = fv->Comm;
+	rv->file = fv->file_fv;
+	rv->fv = fv;
+
+	return pv;
+}

@@ -608,6 +608,9 @@ struct tttset {
 	WORD VTDrawAPI;
 	WORD VTDrawAnsiCodePage_ini;		// ini保存時、TRUEの時ACP=0で保存する
 	WORD VTDrawAnsiCodePage;
+	char FileReceiveFilter[128];
+	WORD ReceivefileSkipOptionDialog;
+	int ReceivefileAutoStopWaitTime;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;
@@ -882,7 +885,7 @@ typedef TComVar *PComVar;
 #define ID_WINDOW_UNDO         50816
 #define ID_TEKWINDOW_WINDOW    51810
 
-#define ID_TRANSFER      9 // the position on [File] menu
+#define ID_TRANSFER      12 // the position on [File] menu
 #define ID_SHOWMENUBAR   995
 
 #define MAXNWIN 256

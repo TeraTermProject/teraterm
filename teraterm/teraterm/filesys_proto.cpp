@@ -59,6 +59,7 @@
 #include "zmodem.h"
 #include "bplus.h"
 #include "quickvan.h"
+#include "raw.h"
 
 typedef enum {
 	PROTO_KMT = 1,
@@ -67,6 +68,7 @@ typedef enum {
 	PROTO_BP = 4,
 	PROTO_QV = 5,
 	PROTO_YM = 6,
+	PROTO_RAW = 7,
 } ProtoId_t;
 
 #define TitKmtRcv   L"Kermit Receive"
@@ -81,6 +83,7 @@ typedef enum {
 #define TitZSend    L"ZMODEM Send"
 #define TitQVRcv    L"Quick-VAN Receive"
 #define TitQVSend   L"Quick-VAN Send"
+#define TitRawRcv   L"Raw Receive"
 
 #define IsXoptCRC(x)	((x) & 2)
 #define IsXopt1k(x)	(((x)-1) & 2)
@@ -351,6 +354,13 @@ static BOOL OpenProtoDlg(PFileVarProto fv, ProtoId_t IdProto, int Mode, WORD Opt
 				return FALSE;
 			}
 			proto->Op->SetOpt(proto, QUICKVAN_MODE, Mode);
+			break;
+		case PROTO_RAW:
+			proto = RawCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, RAW_AUTOSTOP_SEC, Opt1);
 			break;
 		default:
 			assert(FALSE);
@@ -1792,6 +1802,50 @@ BOOL QVStartSend(const wchar_t *filename)
 	cv.DelayFlag = FALSE;
 
 	if (! OpenProtoDlg(FileVar,PROTO_QV,IdQVSend,0,0)) {
+		ProtoEnd();
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+BOOL RawStartReceive(const wchar_t *filename, int autostop_sec, BOOL macro)
+{
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar_(&FileVar)) {
+		return FALSE;
+	}
+
+	if (macro) {
+		FileVar->NoMsg = TRUE;
+	}
+
+	TFileVarProto *fv = FileVar;
+	FileVar->OpId = OpRawRcv;
+
+	SetDialogCation(fv, "FILEDLG_TRANS_TITLE_RAWRCV", TitRawRcv);
+
+	assert(filename);
+	if (IsRelativePathW(filename)) {
+		wchar_t *fullpath = GetFileDir(&ts);
+		awcscats(&fullpath, L"\\", filename, NULL);
+		fv->FileNames = MakeStrArrayFromStr(fullpath);
+		free(fullpath);
+	} else {
+		fv->FileNames = MakeStrArrayFromStr(filename);
+	}
+
+	if (! ProtoStart())
+		return FALSE;
+
+	TalkStatus = IdTalkQuiet;
+
+	/* disable transmit delay (serial port) */
+	cv.DelayFlag = FALSE;
+
+	if (! OpenProtoDlg(FileVar,PROTO_RAW,0,autostop_sec,0)) {
 		ProtoEnd();
 		return FALSE;
 	}
