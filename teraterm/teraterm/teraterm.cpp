@@ -224,7 +224,12 @@ static BOOL OnIdle(LONG lCount)
 			// 上書きしてしまう可能性がある。(2007.6.14 yutaka)
 
 		} else {
-			CommReceive(&cv);
+			if (cv.PortType == IdSerial) {
+				// シリアル接続では、別スレッド CommThread() でCOMポートから読み出しを行っているため、
+				// CommReceive() の呼び出しは不要。
+			} else {
+				CommReceive(&cv);
+			}
 		}
 
 	}

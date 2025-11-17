@@ -218,8 +218,10 @@ static int BinaryOut(struct Comm_ *comm, const CHAR *buf, size_t len)
 static void FlashReceiveBuf(struct Comm_ *comm)
 {
 	PComVar pcv = (PComVar)comm->private_data;
+	EnterCriticalSection(&pcv->InBuff_lock);
 	pcv->InBuffCount = 0;
 	pcv->InPtr = 0;
+	LeaveCriticalSection(&pcv->InBuff_lock);
 }
 
 static const CommOp CommOpList =  {

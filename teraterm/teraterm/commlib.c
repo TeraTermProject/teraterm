@@ -142,6 +142,8 @@ void CommInit(PComVar cv)
 	cv->NotifyIcon = NULL;
 
 	cv->ConnectedTime = 0;
+
+	InitializeCriticalSection(&cv->InBuff_lock); // CommInit()は一度しか呼ばれないので、DeleteCriticalSection() していない。
 }
 
 /* reset a serial port which is already open */
@@ -155,6 +157,8 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 		(cv->PortType != IdSerial)) {
 			return;
 	}
+
+	EnterCriticalSection(&cv->InBuff_lock);
 
 	ClearCommError(cv->ComID,&DErr,NULL);
 	SetupComm(cv->ComID,CommInQueSize,CommOutQueSize);
@@ -245,6 +249,8 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 	/* enable receive request */
 	SetCommMask(cv->ComID,0);
 	SetCommMask(cv->ComID,EV_RXCHAR);
+
+	LeaveCriticalSection(&cv->InBuff_lock);
 }
 
 // 名前付きパイプが正しい書式かをチェックする。
@@ -656,10 +662,9 @@ void CommThread(void *arg)
 			if (! cv->Ready) {
 				_endthread();
 			}
-			if (! cv->RRQ) {
-				PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_READ);
-			}
-			WaitForSingleObject(REnd,INFINITE);
+			cv->RRQ = TRUE;
+			CommReceive(cv);
+			cv->RRQ = FALSE;
 		}
 		else {
 			DErr = GetLastError();  // this returns 995 (operation aborted) if a USB com port is removed
@@ -751,8 +756,6 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 			break;
 
 		case IdSerial:
-			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READENDNAME, cv->ComPort);
-			ReadEnd = CreateEvent(NULL,FALSE,FALSE,Temp);
 			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", WRITENAME, cv->ComPort);
 			memset(&wol,0,sizeof(OVERLAPPED));
 			wol.hEvent = CreateEvent(NULL,TRUE,TRUE,Temp);
@@ -855,7 +858,6 @@ void CommClose(PComVar cv)
 			break;
 		case IdSerial:
 			if ( cv->ComID != INVALID_HANDLE_VALUE ) {
-				CloseHandle(ReadEnd);
 				CloseHandle(wol.hEvent);
 				CloseHandle(rol.hEvent);
 				PurgeComm(cv->ComID, PURGE_TXABORT | PURGE_RXABORT |
@@ -918,6 +920,8 @@ void CommReceive(PComVar cv)
 	    (cv->InBuffCount>=InBuffSize)) {
 		return;
 	}
+
+	EnterCriticalSection(&cv->InBuff_lock);
 
 	/* Compact buffer */
 	if ((cv->InBuffCount>0) && (cv->InPtr>0)) {
@@ -997,6 +1001,8 @@ void CommReceive(PComVar cv)
 		}
 	}
 
+	LeaveCriticalSection(&cv->InBuff_lock);
+
 	if (cv->InBuffCount==0) {
 		switch (cv->PortType) {
 			case IdTCPIP:
@@ -1006,8 +1012,6 @@ void CommReceive(PComVar cv)
 				}
 				break;
 			case IdSerial:
-				cv->RRQ = FALSE;
-				SetEvent(ReadEnd);
 				return;
 			case IdFile:
 				if (DErr != ERROR_IO_PENDING) {
