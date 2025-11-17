@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2025-08-30 by TeraTerm Project
+date=2025-11-18 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -18,6 +18,7 @@ MENU_FILE_VIEWLOG=Log ansehen
 MENU_FILE_SHOWLOGDIALOG=Sho&w Log dialog...
 MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=Datei &senden
+MENU_FILE_RECVFILE=RDatei empfangen (&Z)...
 MENU_FILE_CHANGEDIR=&Verzeichnis wechseln
 MENU_FILE_REPLAYLOG=&Log abspielen
 MENU_FILE_PRINT=&Drucken...\tAlt+P
@@ -546,6 +547,7 @@ DLG_GETFN_FILENAME=&Datei:
 ; ttftypes.h
 FILEDLG_TRANS_TITLE_LOG=Log
 FILEDLG_TRANS_TITLE_SENDFILE=Datei senden
+FILEDLG_TRANS_TITLE_RECVFILE=Datei empfangen
 FILEDLG_TRANS_TITLE_KMTRCV=Kermit Receive
 FILEDLG_TRANS_TITLE_KMTGET=Kermit Get
 FILEDLG_TRANS_TITLE_KMTSEND=Kermit Send
@@ -560,6 +562,7 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus Receive
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus Send
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN Receive
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN Send
+FILEDLG_TRANS_TITLE_RAWRCV=Rohe Empfang
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: Clipboard confirmation
@@ -609,6 +612,11 @@ DLG_SENDFILE_READING_METHOD_BULK=B&ulk read
 DLG_SENDFILE_READING_METHOD_SEQUENTIAL=Se&quential read
 DLG_SENDFILE_READING_METOHD_TOOLTIP=Bulk read:\n- Send while reading from a file.\n- Textfile is read as ACP encoding and is not automatically determined.\nSequencal read:\n- File is read into memory and then sent.\n- Encoding of text files is automatically determined.\n
 DLG_SENDFILE_BINARY=&Binary
+
+; receivefile
+DLG_RECVFILE_FILENAME_TITLE=&Dateiname (Datei in dieses Dialogfeld ziehen)
+DLG_RECVFILE_BINARY=&Binär
+DLG_RECVFILE_AUTOSTOP_LABEL=&Automatische Stoppwartezeit (Sek.)
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=Preview/File

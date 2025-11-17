@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2025-08-30 by TeraTerm Project
+date=2025-11-18 by TeraTerm Project
 contributor=LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -18,6 +18,7 @@ MENU_FILE_VIEWLOG=查看日志(&V)
 MENU_FILE_SHOWLOGDIALOG=显示日志对话框(&W)...
 MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=发送文件(&S)...
+MENU_FILE_RECVFILE=接收文件(&Z)...
 MENU_FILE_CHANGEDIR=更改目录(&C)...
 MENU_FILE_REPLAYLOG=重播日志(&R)...
 MENU_FILE_PRINT=打印(&P)...\tAlt+P
@@ -547,6 +548,7 @@ DLG_GETFN_FILENAME=文件名(&F)：
 ; ttftypes.h
 FILEDLG_TRANS_TITLE_LOG=日志
 FILEDLG_TRANS_TITLE_SENDFILE=文件传输
+FILEDLG_TRANS_TITLE_RECVFILE=接收文件
 FILEDLG_TRANS_TITLE_KMTRCV=Kermit接收
 FILEDLG_TRANS_TITLE_KMTGET=Kermit获取
 FILEDLG_TRANS_TITLE_KMTSEND=Kermit发送
@@ -561,6 +563,7 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus接收
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus发送
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN接收
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN发送
+FILEDLG_TRANS_TITLE_RAWRCV=Raw接收
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term：剪贴板确认
@@ -610,6 +613,11 @@ DLG_SENDFILE_READING_METHOD_BULK=B&ulk read
 DLG_SENDFILE_READING_METHOD_SEQUENTIAL=Se&quential read
 DLG_SENDFILE_READING_METOHD_TOOLTIP=Bulk read:\n- Send while reading from a file.\n- Textfile is read as ACP encoding and is not automatically determined.\nSequencal read:\n- File is read into memory and then sent.\n- Encoding of text files is automatically determined.\n
 DLG_SENDFILE_BINARY=&Binary
+
+; receivefile
+DLG_RECVFILE_FILENAME_TITLE=文件名（将文件拖放到此对话框中）(&R)
+DLG_RECVFILE_BINARY=二进制(&B)
+DLG_RECVFILE_AUTOSTOP_LABEL=自动停止等待时间（秒）(&A)
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=Preview/File

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2025-08-30 by TeraTerm Project
+date=2025-11-18 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -18,6 +18,7 @@ MENU_FILE_VIEWLOG=ログを表示(&V)
 MENU_FILE_SHOWLOGDIALOG=ログダイアログを表示(&W)...
 MENU_FILE_STOPLOG=ログを終了(&Q)
 MENU_FILE_SENDFILE=ファイル送信(&S)...
+MENU_FILE_RECVFILE=ファイル受信(&Z)...
 MENU_FILE_CHANGEDIR=ディレクトリを変更(&C)...
 MENU_FILE_REPLAYLOG=ログを再生(&R)...
 MENU_FILE_PRINT=印刷(&P)...\tAlt+P
@@ -547,6 +548,7 @@ DLG_GETFN_FILENAME=ファイル名(&F):
 ; ttftypes.h
 FILEDLG_TRANS_TITLE_LOG=ログ
 FILEDLG_TRANS_TITLE_SENDFILE=ファイル送信
+FILEDLG_TRANS_TITLE_RECVFILE=ファイル受信
 FILEDLG_TRANS_TITLE_KMTRCV=Kermit受信
 FILEDLG_TRANS_TITLE_KMTGET=Kermit取得
 FILEDLG_TRANS_TITLE_KMTSEND=Kermit送信
@@ -561,6 +563,7 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus受信
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus送信
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN受信
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN送信
+FILEDLG_TRANS_TITLE_RAWRCV=Raw受信
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: クリップボードの確認
@@ -610,6 +613,11 @@ DLG_SENDFILE_READING_METHOD_BULK=バルク(一括)読み込み(&U)
 DLG_SENDFILE_READING_METHOD_SEQUENTIAL=シーケンシャル(逐次)読み込み(&Q)
 DLG_SENDFILE_READING_METOHD_TOOLTIP=Bulk read:\n・ファイルをメモリに読み込んでから送信する\n・テキストファイルのエンコードは自動判定される\nSequential read:\n・ファイルから読み込みながら送信する\n・テキストファイルはACPとして読み込み,エンコードは自動判定されない
 DLG_SENDFILE_BINARY=バイナリ(&B)
+
+; receivefile
+DLG_RECVFILE_FILENAME_TITLE=受信ファイル名(dialogにファイルをドロップ)(&R)
+DLG_RECVFILE_BINARY=バイナリ(&B)
+DLG_RECVFILE_AUTOSTOP_LABEL=ファイル受信自動停止待ち時間(秒)(&A)
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=プレビュー/ファイル

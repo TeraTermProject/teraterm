@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Italian
-date=2025-08-30 by TeraTerm Project
+date=2025-11-18 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -18,6 +18,7 @@ MENU_FILE_VIEWLOG=&Visualizza registro attività
 MENU_FILE_SHOWLOGDIALOG=Vi&sualizza finestra registrazione attività...
 MENU_FILE_STOPLOG=Stop registrazione attività (&Q)
 MENU_FILE_SENDFILE=&Invia file...
+MENU_FILE_RECVFILE=Ricevi file(&Z)...
 MENU_FILE_CHANGEDIR=&Cartella trasferimento file...
 MENU_FILE_REPLAYLOG=&Riproduci registro attività...
 MENU_FILE_PRINT=&Stampa...\tAlt+P
@@ -244,7 +245,7 @@ DLG_TAB_COPYPASTE_DELIMITER=Carattere del&imitatore
 DLG_TAB_COPYPASTE_PASTEDELAY=Rit&ardo incolla per linea
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Quando la finestra è attivata dal mouse a&bilita selezione del testo
-DLG_TAB_COPYPASTE_AUTO_TEXT_COPY=Quando viene selezionato il testo copialo negli appunti di Windows 
+DLG_TAB_COPYPASTE_AUTO_TEXT_COPY=Quando viene selezionato il testo copialo negli appunti di Windows
 
 DLG_TAB_VISUAL_ALPHA=Opacità finestra
 DLG_TAB_VISUAL_ALPHA_ACTIVE=&Attiva
@@ -269,7 +270,7 @@ DLG_TAB_VISUAL_UNDERLINE_FONT=Font attributo sottolineato
 DLG_TAB_VISUAL_URL_COLOR=Colore attributo &URL
 DLG_TAB_VISUAL_URL_FONT=Font attributo &URL
 DLG_TAB_VISUAL_ANSI=Colore A&NSI
-DLG_TAB_VISUAL_FAST_SIZE_MOVE=Quando sposti o muovi finestra disabilita tema 
+DLG_TAB_VISUAL_FAST_SIZE_MOVE=Quando sposti o muovi finestra disabilita tema
 DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=Nessun uso
 DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=File tema fisso
 DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=File tema causale
@@ -547,6 +548,7 @@ DLG_GETFN_FILENAME=Nome &file:
 ; ttftypes.h
 FILEDLG_TRANS_TITLE_LOG=Registro eventi
 FILEDLG_TRANS_TITLE_SENDFILE=Invia file
+FILEDLG_TRANS_TITLE_RECVFILE=Ricevi file
 FILEDLG_TRANS_TITLE_KMTRCV=Ricezione Kermit
 FILEDLG_TRANS_TITLE_KMTGET=Ottieni Kermit
 FILEDLG_TRANS_TITLE_KMTSEND=Invia Kermit
@@ -561,6 +563,7 @@ FILEDLG_TRANS_TITLE_BPRCV=Ricezione B-Plus
 FILEDLG_TRANS_TITLE_BPSEND=Invio B-Plus
 FILEDLG_TRANS_TITLE_QVRCV=Ricezione Quick-VAN
 FILEDLG_TRANS_TITLE_QVSEND=Invio Quick-VAN
+FILEDLG_TRANS_TITLE_RAWRCV=Ricezione Raw
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: conferma appunti
@@ -610,6 +613,11 @@ DLG_SENDFILE_READING_METHOD_BULK=Lett&ura contemporanea
 DLG_SENDFILE_READING_METHOD_SEQUENTIAL=Lettura se&quenziale
 DLG_SENDFILE_READING_METOHD_TOOLTIP=Lettura contemporanea:\n- Invia durante la lettura da un file.\n- Il file testo viene letto come codifica ACP e non è determinata automaticamente.\nLettura sequenziale:\n- Il file è letto in memoria e quindi inviato.\n- La codifica del file testo è determinata automaticamente.\n
 DLG_SENDFILE_BINARY=&Binario
+
+; receivefile
+DLG_RECVFILE_FILENAME_TITLE=&Nome file (trascina il file in questa finestra di dialogo)
+DLG_RECVFILE_BINARY=&Binario
+DLG_RECVFILE_AUTOSTOP_LABEL=&Tempo di attesa per arresto automatico (sec)
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=Anteprima/file
@@ -696,7 +704,7 @@ DLG_AUTH_PRIVATEKEY=File c&hiave privata:
 DLG_AUTH_LOCALUSER=Nome &utente locale:
 DLG_AUTH_HOST_PRIVATEKEY=&File chiave privata host:
 DLG_AUTH_TIP_CONTROL_CODE=è stato inserito carattere di controllo
-DLG_AUTH_TIP_PASTE_KEY=Per incollare dagli appunti usa Maiusc+Ins 
+DLG_AUTH_TIP_PASTE_KEY=Per incollare dagli appunti usa Maiusc+Ins
 MSG_PAGEANT_NOTFOUND=Impossibile trovare Pageant.
 MSG_PAGEANT_NOKEY=Pageant non ha una chiave valida.
 
