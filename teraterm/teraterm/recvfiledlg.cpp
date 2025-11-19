@@ -107,6 +107,7 @@ static INT_PTR CALLBACK RecvFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 			SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), data->UILanguageFileW);
 			SendMessage(GetDlgItem(hDlgWnd, IDC_RECVFILE_CHECK_BINARY), BM_SETCHECK, BST_CHECKED, 0);	// binaryのチェックボックスをチェック
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_RECVFILE_CHECK_BINARY),FALSE);						  	// binaryのチェックボックスは無効 (TODO:textモードは未実装)
+			SendDlgItemMessage(hDlgWnd, IDC_RECVFILE_AUTOSTOP_EDIT, EM_LIMITTEXT, 8, 0);
 			SetDlgNum(hDlgWnd, IDC_RECVFILE_AUTOSTOP_EDIT, data->autostop_sec);
 			CenterWindow(hDlgWnd, GetParent(hDlgWnd));
 
