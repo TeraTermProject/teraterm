@@ -40,34 +40,32 @@
 #include "filesys_io.h"
 #include "filesys_win32.h"
 
-#include "tttypes.h"
+#include "ttlib.h"
 #include "codeconv.h"
-#include "ftlib.h"
 
 typedef struct FileIOWin32 {
 	HANDLE FileHandle;
-	BOOL utf8;
 } TFileIOWin32;
 
-static wc GetFilenameW(TFileIOWin32 *data, const char *filename)
+static wchar_t *GetFilenameW(TFileIOWin32 *data, const char *filenameU8)
 {
-	wc filenameW;
-	if (data->utf8) {
-		filenameW = wc::fromUtf8(filename);
-	}
-	else {
-		filenameW = wc(filename);
+	(void)data;
+	wchar_t *filenameW = ToWcharU8(filenameU8);
+	if (filenameW == NULL) {
+		// UTF-8ではない?
+		filenameW = ToWcharA(filenameU8);
 	}
 	return filenameW;
 }
 
-static BOOL _OpenRead(TFileIO *fv, const char *filename)
+static BOOL _OpenRead(TFileIO *fv, const char *filenameU8)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
-	wc filenameW = GetFilenameW(data, filename);
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
 	HANDLE hFile = CreateFileW(filenameW,
 							   GENERIC_READ, FILE_SHARE_READ, NULL,
 							   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	free(filenameW);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		data->FileHandle = INVALID_HANDLE_VALUE;
 		return FALSE;
@@ -76,13 +74,14 @@ static BOOL _OpenRead(TFileIO *fv, const char *filename)
 	return TRUE;
 }
 
-static BOOL _OpenWrite(TFileIO *fv, const char *filename)
+static BOOL _OpenWrite(TFileIO *fv, const char *filenameU8)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
-	wc filenameW = GetFilenameW(data, filename);
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
 	HANDLE hFile = CreateFileW(filenameW,
 							   GENERIC_WRITE, 0, NULL,
 							   CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	free(filenameW);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		data->FileHandle = INVALID_HANDLE_VALUE;
 		return FALSE;
@@ -130,14 +129,15 @@ static void _Close(TFileIO *fv)
 /**
  *	ファイルのファイルサイズを取得
  *	@param[in]	filename		ファイル名(UTF-8)
- *	@retval		ファイルサイズ
+ *	@retval		ファイルサイズ (TODO int64_tへ)
  */
-static size_t _GetFSize(TFileIO *fv, const char *filename)
+static size_t _GetFSize(TFileIO *fv, const char *filenameU8)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
-	wc filenameW = GetFilenameW(data, filename);
-	size_t file_size = GetFSize64W(filenameW);
-	return file_size;
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
+	unsigned long long file_size = GetFSize64W(filenameW);
+	free(filenameW);
+	return (size_t)file_size;
 }
 
 /**
@@ -165,18 +165,22 @@ static int Seek(TFileIO *fv, size_t offset)
 	return 0;
 }
 
-static int __stat(TFileIO *fv, const char *filename, struct _stati64* _Stat)
+static int __stat(TFileIO *fv, const char *filenameU8, struct _stati64 *_Stat)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
-	wc filenameW = GetFilenameW(data, filename);
-	return _wstati64(filenameW, _Stat);
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
+	int r = _wstati64(filenameW, _Stat);
+	free(filenameW);
+	return r;
 }
 
-static int __utime(TFileIO *fv, const char *filename, struct _utimbuf* const _Time)
+static int __utime(TFileIO *fv, const char *filenameU8, struct _utimbuf* const _Time)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
-	wc filenameW = GetFilenameW(data, filename);
-	return _wutime(filenameW, _Time);
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
+	int r = _wutime(filenameW, _Time);
+	free(filenameW);
+	return r;
 }
 
 // replace ' ' by '_' in FName
@@ -196,41 +200,31 @@ static void FTConvFName(PCHAR FName)
 /**
  *	送信用ファイル名作成
  *	fullname(fullpath)からファイル名を取り出して必要な変換を行う
- *	Windowsファイル名から送信に適したファイル名に変換する
+ *	Windowsファイル名から、送信に適したファイル名に変換する
  *
- *	@param[in]	fullname	Tera Termが送信するファイル UTF8(となる予定)
- *	@param[in]	utf8		出力ファイル名のエンコード
+ *	@param[in]	fullname	Tera Termが送信するWindows Full Pathファイル UTF8
+ *	@param[in]	utf8		fullnameのエンコード
  *							TRUEのとき、UTF-8
  *							FALSEのとき、ANSI
- *	@retval		ファイル名 (UTF-8 or ANSI)
- *				不要になったら free() する
+ *	@param[in]	space		TRUEのとき、' ' を '_' へ置換
+ *	@param[in]	upper		TRUEのとき、小文字を大文字へ置換
+ *	@retval		パスを取り除いた送信に使用するファイル名 (UTF-8 or ANSI)
+ *				不要になったら free() すること
  */
-static char *GetSendFilename(TFileIO *fv, const char *fullname, BOOL utf8, BOOL space, BOOL upper)
+static char *GetSendFilename(TFileIO *fv, const char *fullnameU8, BOOL utf8, BOOL space, BOOL upper)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	(void)data;
 	int FnPos;
 	char *filename;
-	if (data->utf8) {
-		GetFileNamePosU8(fullname, NULL, &FnPos);
-		if (utf8) {
-			// UTF8 -> UTF8
-			filename = _strdup(fullname + FnPos);
-		}
-		else {
-			// UTF8 -> ANSI
-			filename = ToCharU8(fullname + FnPos);
-		}
+	GetFileNamePosU8(fullnameU8, NULL, &FnPos);
+	if (utf8) {
+		// UTF8 -> UTF8
+		filename = _strdup(fullnameU8 + FnPos);
 	}
 	else {
-		GetFileNamePos(fullname, NULL, &FnPos);
-		if (utf8) {
-			// ANSI -> UTF8
-			filename = ToU8A(fullname + FnPos);
-		}
-		else {
-			// ANSI -> ANSI
-			filename = _strdup(fullname + FnPos);
-		}
+		// UTF8 -> ANSI
+		filename = ToCharU8(fullnameU8 + FnPos);
 	}
 	if (space) {
 		// replace ' ' by '_' in filename
@@ -242,27 +236,26 @@ static char *GetSendFilename(TFileIO *fv, const char *fullname, BOOL utf8, BOOL 
 	return filename;
 }
 
-static char *CreateFilenameWithNumber(const char *fullpath, int n)
+static char *CreateFilenameWithNumber(const char *fullpathU8, int n)
 {
 	int FnPos;
 	char Num[11];
 
-	size_t len = strlen(fullpath) + sizeof(Num);
+	size_t len = strlen(fullpathU8) + sizeof(Num);
 	char *new_name = (char *)malloc(len);
 
-//	GetFileNamePos(fullpath, NULL, &FnPos);
-	GetFileNamePosU8(fullpath, NULL, &FnPos);
+	GetFileNamePosU8(fullpathU8, NULL, &FnPos);
 
 	_snprintf_s(Num,sizeof(Num),_TRUNCATE,"%u",n);
 	size_t num_len = strlen(Num);
 
-	const char *filename = &fullpath[FnPos];
+	const char *filename = &fullpathU8[FnPos];
 	size_t filename_len = strlen(filename);
 	const char *ext = strrchr(filename, '.');
 	if (ext == NULL) {
 		// 拡張子なし
 		char *d = new_name;
-		memcpy(d, fullpath, FnPos + filename_len);
+		memcpy(d, fullpathU8, FnPos + filename_len);
 		d += FnPos + filename_len;
 		memcpy(d, Num, num_len);
 		d += num_len;
@@ -274,7 +267,7 @@ static char *CreateFilenameWithNumber(const char *fullpath, int n)
 		size_t base_len = filename_len - ext_len;
 
 		char *d = new_name;
-		memcpy(d, fullpath, FnPos + base_len);
+		memcpy(d, fullpathU8, FnPos + base_len);
 		d += FnPos + base_len;
 		memcpy(d, Num, num_len);
 		d += num_len;
@@ -285,15 +278,18 @@ static char *CreateFilenameWithNumber(const char *fullpath, int n)
 	return new_name;
 }
 
-static char *CreateUniqueFilename(const char *fullpath)
+static char *CreateUniqueFilename(const char *fullpathU8)
 {
 	int i = 1;
 	while(1) {
-		char *filename = CreateFilenameWithNumber(fullpath, i);
-		if (!DoesFileExist(filename)) {
-			return filename;
+		char *filenameU8 = CreateFilenameWithNumber(fullpathU8, i);
+		wchar_t *filenameW = ToWcharU8(filenameU8);
+		const DWORD r = GetFileAttributesW(filenameW);
+		free(filenameW);
+		if (r == INVALID_FILE_ATTRIBUTES) {
+			return filenameU8;
 		}
-		free(filename);
+		free(filenameU8);
 		i++;
 	}
 }
@@ -306,18 +302,20 @@ static char *CreateUniqueFilename(const char *fullpath)
  *	受信したファイル名からWindowsに適したファイル名に変換する
  *
  *	@param[in]	filename	通信で送られてきたファイル名, 入力ファイル名
- *	@param[in]	utf8		入力ファイル名のエンコード
+ *	@param[in]	utf8		filenameのエンコード
  *							TRUEのとき、UTF-8
  *							FALSEのとき、ANSI
  *	@param[in]	path		受信フォルダ ファイル名の前に付加される UTF-8
+ *							(終端にパスセパレータ'\\'を付加していること)
  *							NULLのとき付加されない
  *	@param[in]	unique		TRUEのとき、すでにファイルが存在しているかチェックする
  *							ファイルが存在したとき、ファイル名の後ろに数字を追加する
  *	@retval		ファイル名 UTF-8
- *				不要になったら free() する
+ *				不要になったら free() すること
  */
-static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL utf8, const char *path, BOOL unique)
+static char* GetReceiveFilename(struct FileIO* fv, const char* filename, BOOL utf8, const char *path, BOOL unique)
 {
+	(void)fv;
 	char* new_name = NULL;
 	if (!utf8) {
 		// ANSI -> UTF8
@@ -336,7 +334,7 @@ static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL ut
 		return NULL;
 	}
 	size_t len = strlen(new_name) + 1;
-	FitFileName(new_name, len, NULL);
+	FitFileName(new_name, (int)len, NULL);
 	char *new_name_safe = replaceInvalidFileNameCharU8(new_name, '_');
 	free(new_name);
 	new_name = NULL;
@@ -357,31 +355,37 @@ static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL ut
 
 	// to unique
 	if (unique && DoesFileExist(full)) {
-		char *filename = CreateUniqueFilename(full);
+		char *f = CreateUniqueFilename(full);
 		free(full);
-		full = filename;
+		full = f;
 	}
 
 	return full;
 }
 
-static long GetFMtime(TFileIO *fv, const char *FName)
+static long GetFMtime(TFileIO *fv, const char *filenameU8)
 {
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
 	struct _stat st;
-
-	if (_stat(FName,&st)==-1) {
+	int r = _wstat(filenameW, &st);
+	free(filenameW);
+	if (r == -1) {
 		return 0;
 	}
 	return (long)st.st_mtime;
 }
 
-static BOOL _SetFMtime(TFileIO *fv, const char *FName, DWORD mtime)
+static BOOL _SetFMtime(TFileIO *fv, const char *filenameU8, DWORD mtime)
 {
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
 	struct _utimbuf filetime;
-
 	filetime.actime = mtime;
 	filetime.modtime = mtime;
-	return _utime(FName, &filetime);
+	int r = _wutime(filenameW, &filetime);
+	free(filenameW);
+	return r;
 }
 
 static void FileSysDestroy(TFileIO *fv)
@@ -400,7 +404,6 @@ TFileIO *FilesysCreateWin32(void)
 		return NULL;
 	}
 	data->FileHandle = INVALID_HANDLE_VALUE;
-	data->utf8 = TRUE;
 	TFileIO *fv = (TFileIO *)calloc(1, sizeof(TFileIO));
 	if (fv == NULL) {
 		free(data);
@@ -418,7 +421,7 @@ TFileIO *FilesysCreateWin32(void)
 	fv->stat = __stat;
 	fv->FileSysDestroy = FileSysDestroy;
 	fv->GetSendFilename = GetSendFilename;
-	fv->GetRecieveFilename = GetRecieveFilename;
+	fv->GetReceiveFilename = GetReceiveFilename;
 	fv->GetFMtime = GetFMtime;
 	fv->SetFMtime = _SetFMtime;
 	return fv;

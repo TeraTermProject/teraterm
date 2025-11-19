@@ -686,7 +686,7 @@ static BOOL YReadPacket(PYVar yv)
 
 		RecievePath = fv->GetRecievePath(fv);
 		free((void *)yv->FullName);
-		yv->FullName = file->GetRecieveFilename(file, name, FALSE, RecievePath, !fv->OverWrite);
+		yv->FullName = file->GetReceiveFilename(file, name, FALSE, RecievePath, !fv->OverWrite);
 		free(RecievePath);
 		if (!FTCreateFile(yv)) {
 			free(p);
