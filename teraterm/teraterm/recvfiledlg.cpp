@@ -126,6 +126,21 @@ static INT_PTR CALLBACK RecvFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARA
 				case IDOK | (BN_CLICKED << 16): {
 					wchar_t *filename;
 					hGetWindowTextW(GetDlgItem(hDlgWnd, IDC_RECVFILE_FILENAME_EDIT), &filename);
+					HANDLE hFile = CreateFileW(filename,
+											   GENERIC_WRITE, FILE_SHARE_READ, NULL,
+											   CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+					if (hFile == INVALID_HANDLE_VALUE) {
+						static const TTMessageBoxInfoW mbinfo = {
+							"Tera Term",
+							"MSG_TT_ERROR", L"Tera Term: Error",
+							"MSG_CANTOPEN_FILE_ERROR", L"Cannot open file",
+							MB_TASKMODAL | MB_ICONEXCLAMATION };
+						TTMessageBoxW(hDlgWnd, &mbinfo, data->UILanguageFileW);
+						free(filename);
+						PostMessage(hDlgWnd, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(hDlgWnd, IDC_RECVFILE_FILENAME_EDIT), TRUE);
+						return TRUE;
+					}
+					CloseHandle(hFile);
 					HistoryStoreAddTop(hs, filename, FALSE);
 					data->filename = filename;
 					data->binary = IsDlgButtonChecked(hDlgWnd, IDC_RECVFILE_CHECK_BINARY) == BST_CHECKED ? TRUE : FALSE;

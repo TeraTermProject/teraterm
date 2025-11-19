@@ -82,6 +82,14 @@ static BOOL RawInit(TProto *pv, PComVar cv, PTTSet ts)
 	rv->FullName = fv->GetNextFname(fv);
 	rv->FileOpen = file->OpenWrite(file, rv->FullName);
 	if (rv->FileOpen == FALSE) {
+		if (fv->NoMsg == FALSE) {
+			static const TTMessageBoxInfoW mbinfo = {
+				"Tera Term",
+				"MSG_TT_ERROR", L"Tera Term: Error",
+				"MSG_CANTOPEN_FILE_ERROR", L"Cannot open file",
+				MB_TASKMODAL | MB_ICONEXCLAMATION };
+			TTMessageBoxW(fv->HMainWin, &mbinfo, ts->UILanguageFileW);
+		}
 		return FALSE;
 	}
 	fv->InfoOp->SetDlgProtoFileName(fv, rv->FullName);
