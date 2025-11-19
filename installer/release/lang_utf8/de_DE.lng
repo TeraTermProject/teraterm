@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2025-11-18 by TeraTerm Project
+date=2025-11-19 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -562,7 +562,7 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus Receive
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus Send
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN Receive
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN Send
-FILEDLG_TRANS_TITLE_RAWRCV=Rohe Empfang
+FILEDLG_TRANS_TITLE_RAWRCV=Datei wird empfangen
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: Clipboard confirmation

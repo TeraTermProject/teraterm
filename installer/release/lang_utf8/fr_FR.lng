@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2025-11-18 by TeraTerm Project
+date=2025-11-19 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -563,7 +563,7 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus Recevoir
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus Envoyer
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN Recevoir
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN Envoyer
-FILEDLG_TRANS_TITLE_RAWRCV=Brute Recevoir
+FILEDLG_TRANS_TITLE_RAWRCV=Réception du fichier
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: Confirmation Presse-papiers

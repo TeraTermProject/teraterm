@@ -83,7 +83,7 @@ typedef enum {
 #define TitZSend    L"ZMODEM Send"
 #define TitQVRcv    L"Quick-VAN Receive"
 #define TitQVSend   L"Quick-VAN Send"
-#define TitRawRcv   L"Raw Receive"
+#define TitRawRcv   L"Receiving file"
 
 #define IsXoptCRC(x)	((x) & 2)
 #define IsXopt1k(x)	(((x)-1) & 2)

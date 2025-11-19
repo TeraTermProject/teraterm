@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2025-11-18 by TeraTerm Project
+date=2025-11-19 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -563,7 +563,7 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus прием
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus передача
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN прием
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN передача
-FILEDLG_TRANS_TITLE_RAWRCV=Raw прием
+FILEDLG_TRANS_TITLE_RAWRCV=Получение файла
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: Буфер обмена

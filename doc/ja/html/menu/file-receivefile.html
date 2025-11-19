@@ -11,33 +11,33 @@
   <body>
     <h1>Receive file ([File] メニュー)</h1>
     <p>
-      ファイルを受信します。
+      ホストから受信したデータをファイルに書き込みます。
     </p>
 
     <p>
       メニューを選択すると "Receive file" ダイアログが表示されます。<br>
       CTRLキーを押しながらをメニューを選択すると、
-      "Receive file" ダイアログをスキップして、受信ファイルの選択のみとなります。<br>
-      この時、受信オプションは前回と同じものが使用されます。<br>
+      "Receive file" ダイアログをスキップして、ファイルの選択となります。<br>
+      この場合、受信オプションは前回と同じものが使用されます。<br>
     <p>
 
     <p>
-      この動作は <a href="#SpecialOption">特別オプション</a> で
-      変更することができます。
+      この動作は設定ファイルで変更することができます。
+      <a href="../setup/teraterm-trans.html#ReceivefileSkipOptionDialog">ファイル受信ダイアログをスキップする</a> を参照下さい。
     </p>
 
-    <h2 id="dialog">"Receive file" ダイアログボックス(受信前のファイル名指定)</h2>
+    <h2 id="dialog">"Receive file" ダイアログボックス</h2>
     <dl>
       <dt>Filename (drop file in this dialog)</dt>
       <dd>
-        受信するファイルのファイル名を入力または選択してください。<br>
+        書き込むファイルのファイル名を入力または選択してください。<br>
         ダイアログにファイルをドロップすることでファイル名を入力することもできます。
       </dd>
 
       <dt id="binary">Binary</dt>
       <dd>
-        ファイルの内容をそのまま受信します。<br>
-        テキストモード(漢字コード、改行文字の変換、制御文字の出力抑止)は未実装のため、バイナリモード固定です。
+        受信したデータをそのままファイルに書き込みます。<br>
+        漢字コード、改行文字の変換、制御文字の出力抑止等は行われません。(バイナリモード固定)
       </dd>
 
       <dt id="ReceivefileAutoStopWaitTime">Auto-stop wait time(sec)</dt>
@@ -48,22 +48,18 @@
       </dd>
     </dl>
 
-    <h3 id="SpecialOption">設定ファイルの特別オプション</h3>
-    <ul>
-      <li><a href="../setup/teraterm-trans.html#ReceivefileSkipOptionDialog">ファイル受信ダイアログをスキップする</a>
-    </ul>
-
-    <h3 id="drop">受信データのドロップ</h3>
-    シリアルポートから高ビットレートでデータを受信する場合、受信データをドロップする場合があります。<br>
-    PCが高負荷で Tera Term の処理(UART チップからのデータ読み出し、ログ/ファイル出力、画面描画等)が追い付かない場合に発生しがちです。<br>
-    <a href="file-sendfile.html">Send file ([File] メニュー) 送信サイズ</a>も参照下さい。
-
-    <h2>"Receive file" ダイアログボックス(受信中)</h2>
+    <h2>"Receiving file" ダイアログボックス</h2>
     <dl>
       <dt>Cancel</dt>
       <dd>
         キャンセル ボタンを押すとファイル受信を中止します。
       </dd>
     </dl>
+
+    <h3 id="drop">受信データのドロップ</h3>
+    シリアルポートから高ビットレートでデータを受信する場合、受信データをドロップする場合があります。<br>
+    PCが高負荷で Tera Term の処理(UART チップからのデータ読み出し、ログ/ファイル出力、画面描画等)が追い付かない場合に発生しがちです。<br>
+    <a href="file-sendfile.html#drop">Send file ([File] メニュー)の"送信サイズ"</a>も参照下さい。
+
   </body>
 </html>

@@ -11,31 +11,32 @@
   <body>
     <h1>Receive file ([File] menu)</h1>
     <p>
-      Receive a file from the host.
+      Writes data received from the host to a file.
     </p>
 
     <p>
       Selecting this menu brings up the "Receive file" dialog.<br>
-      If you select this menu while holding down the CTRL key, it skips the "Receive File" dialog, allowing you to receive a file by simply selecting it.<br>
-      At this time, the same receiving options as before will be used.
+      If you select this menu while holding down the CTRL key, it skips the "Receive File" dialogand proceed to file selection.<br>
+      In that case, the same receiving options as before will be used.
     <p>
 
     <p>
-      This behavior can be changed with <a href="#SpecialOption">Special Option</a>.
+      This behavior can be changed in the configuration file.
+      See "<a href="../setup/teraterm-trans.html#ReceivefileSkipOptionDialog">Skip Receive file dialog</a>" for details.
     </p>
 
-    <h2 id="dialog">"Receive file" dialog box (to input the file name)</h2>
+    <h2 id="dialog">"Receive file" dialog box</h2>
     <dl>
       <dt>Filename (drop file in this dialog)</dt>
       <dd>
-        Enter or select a filename to receive.<br>
+        Enter or select the name of the file to write.<br>
         By dropping a file into dialog, You can also enter file name.
       </dd>
 
       <dt id="binary">Binary</dt>
       <dd>
-        It will receive the contents of the file as is.<br>
-        Text mode (character encoding, newline character conversion, suppression of control character output) is not implemented, so it is fixed to binary mode.
+        Write the received data to the file exactly as received.<br>
+        No conversions are performed (kanji/codepage conversion, line-ending conversion, suppression of control-character output, etc.). Binary mode is fixed.
       </dd>
 
       <dt id="ReceivefileAutoStopWaitTime">Auto-stop wait time(sec)</dt>
@@ -46,22 +47,18 @@
       </dd>
     </dl>
 
-    <h3 id="SpecialOption">Special options in the Tera Term setup file</h3>
-    <ul>
-      <li><a href="../setup/teraterm-trans.html#ReceivefileSkipOptionDialog">Skip Receive file dialog</a>
-    </ul>
-
-    <h3 id="drop">Drop of received data</h3>
-    When receiving data at a high bit rate from the serial port, there may be instances where received data is dropped.<br>
-    This is likely to occur when the PC is under high load and Tera Term's processing (such as reading data from the UART chip, logging/file output, screen rendering, etc.) cannot keep up.
-    Please also refer to <a href="file-sendfile.html">"Send file" ([File] menu) Send size</a>
-
-    <h2>"Receive file" dialog box (displayed while sending)</h2>
+    <h2>"Receiving file" dialog box</h2>
     <dl>
       <dt>Cancel</dt>
       <dd>
         Pressing the Cancel button will stop the file reception.
       </dd>
     </dl>
+
+    <h3 id="drop">Drop of received data</h3>
+    When receiving data at a high bit rate from the serial port, there may be instances where received data is dropped.<br>
+    This is likely to occur when the PC is under high load and Tera Term's processing (such as reading data from the UART chip, logging/file output, screen rendering, etc.) cannot keep up.<br>
+    See <a href="file-sendfile.html#drop">"Send file" ([File] menu) Send size</a> for related information.
+
   </body>
 </html>

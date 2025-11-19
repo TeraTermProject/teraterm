@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2025-11-18 by TeraTerm Project
+date=2025-11-19 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -563,7 +563,7 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus接收
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus發送
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN接收
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN發送
-FILEDLG_TRANS_TITLE_RAWRCV=Raw接收
+FILEDLG_TRANS_TITLE_RAWRCV=接收文件
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term：剪貼板確認

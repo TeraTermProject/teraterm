@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2025-11-18 by TeraTerm Project
+date=2025-11-19 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -563,7 +563,7 @@ FILEDLG_TRANS_TITLE_BPRCV=பி-கூட்டல் பெறுதல்
 FILEDLG_TRANS_TITLE_BPSEND=பி-கூட்டல் அனுப்பு
 FILEDLG_TRANS_TITLE_QVRCV=விரைவு-வேன் பெறுதல்
 FILEDLG_TRANS_TITLE_QVSEND=விரைவு-வேன் அனுப்பு
-FILEDLG_TRANS_TITLE_RAWRCV=மூல பெறுதல்
+FILEDLG_TRANS_TITLE_RAWRCV=கோப்பைப் பெறுகிறது
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=தேரா முனை: இடைநிலைப் பலகை உறுதிப்படுத்தல்

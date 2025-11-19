@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean(한국어)
-date=2025-11-18 by TeraTerm Project
+date=2025-11-19 by TeraTerm Project
 contributor=Daeehong Kim (2013-07-25)
 
 [Tera Term]
@@ -563,7 +563,7 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus 받기
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus 보내기
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN 받기
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN 보내기
-FILEDLG_TRANS_TITLE_RAWRCV=원시 수신
+FILEDLG_TRANS_TITLE_RAWRCV=파일 수신 중
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: 클립보드 확인

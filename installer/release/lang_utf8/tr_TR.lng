@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Turkish
-date=2025-11-18 by TeraTerm Project
+date=2025-11-19 by TeraTerm Project
 contributor= Mehmet Cagri Aksoy (2025-08-04)
 
 [Tera Term]
@@ -563,7 +563,7 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus Al
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus Gönder
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN Al
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN Gönder
-FILEDLG_TRANS_TITLE_RAWRCV=Raw Al
+FILEDLG_TRANS_TITLE_RAWRCV=Dosya alınıyor
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: Pano onayı
