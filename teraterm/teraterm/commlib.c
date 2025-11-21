@@ -665,7 +665,7 @@ void CommThread(void *arg)
 			cv->RRQ = TRUE;
 			CommReceive(cv);
 			cv->RRQ = FALSE;
-			SendMessage(cv->HWin, WM_USER_IDLETIMER, 0, 0);
+			PostMessage(cv->HWin, WM_USER_IDLETIMER, 0, 0);
 		}
 		else {
 			DErr = GetLastError();  // this returns 995 (operation aborted) if a USB com port is removed

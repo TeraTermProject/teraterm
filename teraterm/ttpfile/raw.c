@@ -119,19 +119,22 @@ static BOOL RawReadPacket(void *arg)
 	PRawVar rv = (PRawVar)arg;
 	TFileIO *file = rv->file;
 	PFileVarProto fv = rv->fv;
-	BYTE b, Buff[InBuffSize];
-	int r, BuffCount;
+	PComVar cv = rv->cv;
+	BYTE Buff[InBuffSize];
+	int BuffCount;
 
-	BuffCount = 0;
-	for (r=RawRead1Byte(rv, &b); r > 0 && BuffCount < InBuffSize; r=RawRead1Byte(rv, &b)) {
-		Buff[BuffCount++] = b;
-	}
-
-	if (BuffCount != 0) {
+	if (cv->InBuffCount > 0) {
 		if (rv->StartTime == 0) {
 			rv->StartTime = GetTickCount();
 			fv->InfoOp->SetDlgPacketNum(fv, 1);
 		}
+		// クリティカルセクションの時間を短くするため memcpy() してから WriteFile()する
+		EnterCriticalSection(&cv->InBuff_lock);
+		memcpy(Buff, &(cv->InBuff[cv->InPtr]), cv->InBuffCount);
+		BuffCount = cv->InBuffCount;
+		cv->InBuffCount = 0;
+		cv->InPtr = 0;
+		LeaveCriticalSection(&cv->InBuff_lock);
 		file->WriteFile(file, Buff, BuffCount);
 		rv->ByteCount += BuffCount;
 		fv->InfoOp->SetDlgByteCount(fv, rv->ByteCount);
