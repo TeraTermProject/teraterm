@@ -1154,14 +1154,12 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		     (!IsFileVarNULL()) || (cv.PortType==IdFile) ) {
 			EnableMenuItem(FileMenu,ID_FILE_SENDFILE,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_TRANSFER,MF_BYPOSITION | MF_GRAYED); /* Transfer */
-			EnableMenuItem(FileMenu,ID_FILE_CHANGEDIR,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_DISCONNECT,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_DUPLICATESESSION,MF_BYCOMMAND | MF_GRAYED);
 		}
 		else {
 			EnableMenuItem(FileMenu,ID_FILE_SENDFILE,MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_TRANSFER,MF_BYPOSITION | MF_ENABLED); /* Transfer */
-			EnableMenuItem(FileMenu,ID_FILE_CHANGEDIR,MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_DISCONNECT,MF_BYCOMMAND | MF_ENABLED);
 			if (ts.DisableMenuDuplicateSession) {
 				EnableMenuItem(FileMenu,ID_FILE_DUPLICATESESSION,MF_BYCOMMAND | MF_GRAYED);
@@ -1206,20 +1204,22 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		if ((cv.PortType==IdSerial) &&
 		    ((ts.DataBit==IdDataBit7) || (ts.Flow==IdFlowX))) {
 			EnableMenuItem(TransMenu,1,MF_BYPOSITION | MF_GRAYED);  /* XMODEM */
-			EnableMenuItem(TransMenu,4,MF_BYPOSITION | MF_GRAYED);  /* Quick-VAN */
+			EnableMenuItem(TransMenu,2,MF_BYPOSITION | MF_GRAYED);  /* YMODEM */
+			EnableMenuItem(TransMenu,5,MF_BYPOSITION | MF_GRAYED);  /* Quick-VAN */
 		}
 		else {
 			EnableMenuItem(TransMenu,1,MF_BYPOSITION | MF_ENABLED); /* XMODEM */
-			EnableMenuItem(TransMenu,4,MF_BYPOSITION | MF_ENABLED); /* Quick-VAN */
+			EnableMenuItem(TransMenu,2,MF_BYPOSITION | MF_ENABLED); /* YMODEM */
+			EnableMenuItem(TransMenu,5,MF_BYPOSITION | MF_ENABLED); /* Quick-VAN */
 		}
 		if ((cv.PortType==IdSerial) &&
 		    (ts.DataBit==IdDataBit7)) {
-			EnableMenuItem(TransMenu,2,MF_BYPOSITION | MF_GRAYED); /* ZMODEM */
-			EnableMenuItem(TransMenu,3,MF_BYPOSITION | MF_GRAYED); /* B-Plus */
+			EnableMenuItem(TransMenu,3,MF_BYPOSITION | MF_GRAYED); /* ZMODEM */
+			EnableMenuItem(TransMenu,4,MF_BYPOSITION | MF_GRAYED); /* B-Plus */
 		}
 		else {
-			EnableMenuItem(TransMenu,2,MF_BYPOSITION | MF_ENABLED); /* ZMODEM */
-			EnableMenuItem(TransMenu,3,MF_BYPOSITION | MF_ENABLED); /* B-Plus */
+			EnableMenuItem(TransMenu,3,MF_BYPOSITION | MF_ENABLED); /* ZMODEM */
+			EnableMenuItem(TransMenu,4,MF_BYPOSITION | MF_ENABLED); /* B-Plus */
 		}
 	}
 	else if (SubMenu == EditMenu)
