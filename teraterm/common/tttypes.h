@@ -879,7 +879,7 @@ typedef TComVar *PComVar;
 #define ID_WINDOW_UNDO         50816
 #define ID_TEKWINDOW_WINDOW    51810
 
-#define ID_TRANSFER      9 // the position on [File] menu
+#define ID_TRANSFER      11 // the position on [File] menu
 #define ID_SHOWMENUBAR   995
 
 #define MAXNWIN 256
