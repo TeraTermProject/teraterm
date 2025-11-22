@@ -453,6 +453,26 @@ FileSendFilter=
 </pre>
 
 
+<h1 id="FileReceiveFilter">受信ダイアログのファイル名フィルタ</h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの FileReceiveFilter 行を、
+</p>
+
+<pre>
+FileReceiveFilter=*.txt;a.log
+</pre>
+
+<p>
+のように変更すると、ダイアログの「ファイルの種類」にユーザ定義のフィルタが反映されます。
+</p>
+
+<pre>
+省略時:
+FileReceiveFilter=
+</pre>
+
+
 <h1 id="draganddrop">ドラッグ&amp;ドロップによるファイル送信の確認</h1>
 
 <p>
@@ -540,6 +560,26 @@ SendfileSkipOptionDialog=off
 </pre>
 
 CTRLキーを押しながら[File]-[Send file...]を選択することで、
+この設定のon/offを入れ替えた動作を行うことができます。
+
+
+<h1 id="ReceivefileSkipOptionDialog">ファイル受信ダイアログをスキップする</h1>
+
+<p>
+<a href="../menu/file-receivefile.html">[File]-[Receive file...]</a> 選択時、ファイル受信ダイアログが表示されます。<br>
+いつも同じ設定を使用する場合は、次のように設定することでファイル選択のみでファイルを受信できます。
+</p>
+
+<pre>
+ReceivefileSkipOptionDialog=on
+</pre>
+
+<pre>
+省略時:
+ReceivefileSkipOptionDialog=off
+</pre>
+
+CTRLキーを押しながら[File]-[Receive file...]を選択することで、
 この設定のon/offを入れ替えた動作を行うことができます。
 
 

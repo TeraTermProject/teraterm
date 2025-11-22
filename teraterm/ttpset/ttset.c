@@ -2041,6 +2041,11 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		ts->VTDrawAnsiCodePage = ts->VTDrawAnsiCodePage_ini;
 	}
 
+	// Receivefile
+	GetPrivateProfileString(Section, "FileReceiveFilter", "", ts->FileReceiveFilter, sizeof(ts->FileReceiveFilter), FName);
+	ts->ReceivefileSkipOptionDialog = GetOnOff(Section, "ReceivefileSkipOptionDialog", FName, FALSE);
+	ts->ReceivefileAutoStopWaitTime = GetPrivateProfileInt(Section, "ReceivefileAutoStopWaitTime", 5, FName);
+
 	// Experimental
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreePropertySheet", FName, ts->ExperimentalTreePropertySheetEnable);
@@ -3316,6 +3321,10 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WritePrivateProfileIntW(
 		SectionW, L"VTDrawACP", ts->VTDrawAnsiCodePage_ini, FName);
 
+	// Receivefile
+	WritePrivateProfileString(Section, "FileReceiveFilter", ts->FileReceiveFilter, FName);
+	WriteOnOff(Section, "ReceivefileSkipOptionDialog", FName, ts->ReceivefileSkipOptionDialog);
+	WriteInt(Section, "ReceivefileAutoStopWaitTime", FName, ts->ReceivefileAutoStopWaitTime);
 }
 
 void SaveVTPos(const PTTSet ts)

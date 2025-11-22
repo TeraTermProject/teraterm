@@ -315,11 +315,14 @@
     <ClCompile Include="commentdlg.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="recvfiledlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\raw.c">
+      <Filter>ttpfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\cygterm\cygterm.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="..\common\tek.ico">
       <Filter>Resource Files</Filter>
     </Image>
@@ -342,6 +345,12 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\common\vt_3d.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\cygwin\cygterm\cygterm.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\vt_flat.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -689,6 +698,12 @@
     </ClInclude>
     <ClInclude Include="commentdlg.h">
       <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="recvfiledlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\raw.h">
+      <Filter>ttpfile</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

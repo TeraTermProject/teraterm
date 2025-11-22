@@ -119,6 +119,7 @@
 #define HlpMenuFileNew                      41100
 #define HlpMenuFileLog                      41200
 #define HlpMenuFileSendfile                 41300
+#define HlpMenuFileRecvfile                 41310
 #define HlpMenuFileTransfer                 41400
 #define HlpMenuFileTransferKermit           41410
 #define HlpMenuFileTransferKermitGet        41411

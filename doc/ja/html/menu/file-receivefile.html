@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Receive file ([File] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Receive file ([File] メニュー)</h1>
+    <p>
+      ホストから受信したデータをファイルに書き込みます。
+    </p>
+
+    <p>
+      メニューを選択すると "Receive file" ダイアログが表示されます。<br>
+      CTRLキーを押しながらをメニューを選択すると、
+      "Receive file" ダイアログをスキップして、ファイルの選択となります。<br>
+      この場合、受信オプションは前回と同じものが使用されます。<br>
+    <p>
+
+    <p>
+      この動作は設定ファイルで変更することができます。
+      <a href="../setup/teraterm-trans.html#ReceivefileSkipOptionDialog">ファイル受信ダイアログをスキップする</a> を参照下さい。
+    </p>
+
+    <h2 id="dialog">"Receive file" ダイアログボックス</h2>
+    <dl>
+      <dt>Filename (drop file in this dialog)</dt>
+      <dd>
+        書き込むファイルのファイル名を入力または選択してください。<br>
+        ダイアログにファイルをドロップすることでファイル名を入力することもできます。
+      </dd>
+
+      <dt id="binary">Binary</dt>
+      <dd>
+        受信したデータをそのままファイルに書き込みます。<br>
+        漢字コード、改行文字の変換、制御文字の出力抑止等は行われません。(バイナリモード固定)
+      </dd>
+
+      <dt id="ReceivefileAutoStopWaitTime">Auto-stop wait time(sec)</dt>
+      <dd>
+        受信データが無い状態が指定秒数続いた場合に、ファイル受信を終了します。<br>
+        待ち時間のデフォルト値は5秒です。<br>
+        0秒を指定した場合は、ファイル受信を終了せずデータを待ち続けます。
+      </dd>
+    </dl>
+
+    <h2>"Receiving file" ダイアログボックス</h2>
+    <dl>
+      <dt>Cancel</dt>
+      <dd>
+        キャンセル ボタンを押すとファイル受信を中止します。
+      </dd>
+    </dl>
+
+    <h3 id="drop">受信データのドロップ</h3>
+    シリアルポートから高ビットレートでデータを受信する場合、受信データをドロップする場合があります。<br>
+    PCが高負荷で Tera Term の処理(UART チップからのデータ読み出し、ログ/ファイル出力、画面描画等)が追い付かない場合に発生しがちです。<br>
+    <a href="file-sendfile.html#drop">Send file ([File] メニュー)の"送信サイズ"</a>も参照下さい。
+
+  </body>
+</html>
