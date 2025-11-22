@@ -807,7 +807,11 @@ int ProtoDlgParse(void)
 	if (PtDlg==NULL)
 		return P;
 
-	CommReceive(&cv); //ダイアログ表示中に受信したデータを処理できるように読み取りを行わせる
+	if (cv.PortType == IdSerial) {
+		// シリアル接続では、別スレッド CommThread() で読み出しを行っているため、CommReceive()の呼び出しは不要
+	} else {
+		CommReceive(&cv); //ダイアログ表示中に受信したデータを処理できるように読み取りを行わせる
+	}
 
 	PFileVarProto fv = FileVar;
 	if (fv->Proto->Op->Parse(fv->Proto))
