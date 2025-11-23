@@ -45,6 +45,7 @@ typedef enum {
 	OpQVSend  = 14,
 	OpYRcv    = 15,
 	OpYSend   = 16,
+	OpRawRcv  = 17,
 } OpId_t;
 
 struct Comm_;

@@ -89,6 +89,7 @@ HlpMenuFile=html\menu\file.html
 HlpMenuFileNew=html\menu\file-new.html
 HlpMenuFileLog=html\menu\file-log.html
 HlpMenuFileSendfile=html\menu\file-sendfile.html
+HlpMenuFileRecvfile=html\menu\file-receivefile.html
 HlpMenuFileTransfer=html\menu\file-transfer.html
 HlpMenuFileTransferKermit=html\menu\file-transfer-kermit.html
 HlpMenuFileTransferKermitGet=html\menu\file-transfer.html

@@ -244,6 +244,7 @@ typedef enum {
 #define RsvContinue     155
 #define RsvRegexOption  156
 #define RsvSendlnMulticast 157
+#define RsvRecvFile     158
 
 #define RsvSetDebug     175
 #define RsvYmodemRecv   176

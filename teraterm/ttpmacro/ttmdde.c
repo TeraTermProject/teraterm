@@ -1078,3 +1078,16 @@ WORD GetTTParam(char OpId, PCHAR Param, int destlen)
 
 	return 0;
 }
+
+void SetRecvFileOption(int AutoStopWaitTime)
+{
+	char Cmd[6];
+
+	if (AutoStopWaitTime < 0) {
+		AutoStopWaitTime = 0;
+	}
+	Cmd[0] = CmdSetRecvFileOpt;
+	Word2HexStr(AutoStopWaitTime, &(Cmd[1]));
+	Cmd[5] = 0;
+	DdeClientTransaction(Cmd, strlen(Cmd)+1, ConvH, 0, CF_OEMTEXT, XTYP_EXECUTE, 1000, NULL);
+}

@@ -410,6 +410,7 @@
     <ClCompile Include="..\ttpfile\xmodem.c" />
     <ClCompile Include="..\ttpfile\ymodem.c" />
     <ClCompile Include="..\ttpfile\zmodem.c" />
+    <ClCompile Include="..\ttpfile\raw.c" />
     <ClCompile Include="..\ttpset\ttset.c" />
     <ClCompile Include="..\ttpset\ttset_keyboard.c" />
     <ClCompile Include="..\ttptek\tekesc.c" />
@@ -439,6 +440,7 @@
     <ClCompile Include="mouse_pp.cpp" />
     <ClCompile Include="scp.cpp" />
     <ClCompile Include="sendfiledlg.cpp" />
+    <ClCompile Include="recvfiledlg.cpp" />
     <ClCompile Include="serial_pp.cpp" />
     <ClCompile Include="setupdirdlg.cpp" />
     <ClCompile Include="sizetip.c" />
@@ -492,6 +494,7 @@
     <ClInclude Include="..\ttpfile\xmodem.h" />
     <ClInclude Include="..\ttpfile\ymodem.h" />
     <ClInclude Include="..\ttpfile\zmodem.h" />
+    <ClInclude Include="..\ttpfile\raw.h" />
     <ClInclude Include="..\ttpset\ttset.h" />
     <ClInclude Include="..\ttpset\ttset_i.h" />
     <ClInclude Include="..\ttptek\tekesc.h" />
@@ -515,6 +518,7 @@
     <ClInclude Include="mouse_pp.h" />
     <ClInclude Include="scp.h" />
     <ClInclude Include="sendfiledlg.h" />
+    <ClInclude Include="recvfiledlg.h" />
     <ClInclude Include="sendmem.h" />
     <ClCompile Include="sendmem.cpp" />
     <ClInclude Include="ftdlg_lite.h" />
@@ -534,7 +538,7 @@
     <ClInclude Include="win_pp.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\cygterm\cygterm.ico" />
+    <Image Include="..\..\cygwin\cygterm\cygterm.ico" />
     <Image Include="..\common\tek.ico" />
     <Image Include="..\common\teraterm.ico" />
     <Image Include="..\common\teraterm_3d.ico" />
@@ -543,6 +547,7 @@
     <Image Include="..\common\vt.ico" />
     <Image Include="..\common\vt_3d.ico" />
     <Image Include="..\common\vt_classic.ico" />
+    <Image Include="..\common\vt_flat.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="../ttpdlg/ttpdlg.rc" />

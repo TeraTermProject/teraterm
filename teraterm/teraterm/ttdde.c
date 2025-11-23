@@ -1240,6 +1240,23 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	}
 
+	case CmdSetRecvFileOpt: {
+		ts.ReceivefileAutoStopWaitTime = (int)HexStr2Word(&Command[1]);
+		break;
+	}
+
+	case CmdRecvFile: {
+		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
+		BOOL r = RawStartReceive(ParamFileNameW, ts.ReceivefileAutoStopWaitTime, TRUE);
+		free(ParamFileNameW);
+		if (r) {
+			DdeCmnd = TRUE;
+		} else{
+			result = DDE_FNOTPROCESSED;
+		}
+		break;
+	}
+
 	default:
 		result = DDE_FNOTPROCESSED;
 		break;
