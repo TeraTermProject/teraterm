@@ -34,6 +34,7 @@
 #include "ftlib.h"
 #include "protolog.h"
 #include "filesys_proto.h"
+#include "filesys.h"
 
 #include "raw.h"
 
@@ -104,14 +105,16 @@ static BOOL RawInit(TProto *pv, PComVar cv, PTTSet ts)
 
 static void RawCancel(TProto *pv)
 {
-	PRawVar rv = pv->PrivateData;
-	rv->state = STATE_CANCELED;		// quit
+	// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
+	ProtoEnd();						// quit(cancel)
 }
 
 static void RawTimeOutProc(TProto *pv)
 {
 	PRawVar rv = pv->PrivateData;
-	rv->state = STATE_CANCELED;		// quit
+	PFileVarProto fv = rv->fv;
+	fv->Success = TRUE;
+	rv->state = STATE_CANCELED;		// quit(autostop)
 }
 
 static BOOL RawReadPacket(void *arg)
