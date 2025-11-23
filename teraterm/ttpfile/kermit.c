@@ -35,6 +35,7 @@
 #include "tttypes.h"
 #include "protolog.h"
 #include "filesys_proto.h"
+#include "filesys.h"
 
 #include "kermit.h"
 
@@ -1332,7 +1333,7 @@ static BOOL FTCreateFile(PKmtVar kv)
 	fv->InfoOp->SetDlgProtoFileName(fv, kv->FullName);
 	kv->FileOpen = file->OpenWrite(file, kv->FullName);
 	if (!kv->FileOpen) {
-		if (fv->NoMsg) {
+		if (!fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
 		}
@@ -1679,6 +1680,7 @@ static void KmtCancel(TProto *pv)
 		strlen(&(kv->PktOut[4])));
 	KmtSendPacket(kv);
 	kv->KmtMode = IdKmtQuit;
+	ProtoEnd();	// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
 }
 
 static int SetOptV(TProto *pv, int request, va_list ap)

@@ -34,6 +34,7 @@
 #include "ftlib.h"
 #include "protolog.h"
 #include "filesys_proto.h"
+#include "filesys.h"
 
 #include "xmodem.h"
 
@@ -153,6 +154,7 @@ static void XCancel_(PXVar xv)
 
 	XWrite(xv, (PCHAR)&cancel, sizeof(cancel));
 	xv->state = STATE_CANCELED;		// quit
+	ProtoEnd();	// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
 }
 
 static void XSetOpt(PXVar xv, WORD Opt)

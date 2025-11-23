@@ -34,6 +34,7 @@
 #include "ftlib.h"
 #include "protolog.h"
 #include "filesys_proto.h"
+#include "filesys.h"
 
 #include "ymodem.h"
 
@@ -157,6 +158,7 @@ static void YCancel_(PYVar yv)
 
 	YWrite(yv, (PCHAR)&cancel, sizeof(cancel));
 	yv->YMode = IdYQuit;	// quit
+	ProtoEnd();	// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
 }
 
 static void YSetOpt(PYVar yv, WORD Opt)
@@ -483,7 +485,7 @@ static BOOL FTCreateFile(PYVar yv)
 	fv->InfoOp->SetDlgProtoFileName(fv, yv->FullName);
 	yv->FileOpen = file->OpenWrite(file, yv->FullName);
 	if (!yv->FileOpen) {
-		if (fv->NoMsg) {
+		if (!fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
 		}

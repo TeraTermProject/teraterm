@@ -34,6 +34,7 @@
 #include "tttypes.h"
 #include "ftlib.h"
 #include "protolog.h"
+#include "filesys.h"
 
 #include "quickvan.h"
 
@@ -240,10 +241,12 @@ static void QVCancel_(PQVVar qv)
   {
     fv->FTSetTimeOut(fv,TimeOutEOT);
     qv->QVState = QV_RecvEOT;
-    return;
   }
-  fv->FTSetTimeOut(fv,TimeOutCANSend);
-  qv->QVState = QV_Cancel;
+  else {
+    fv->FTSetTimeOut(fv,TimeOutCANSend);
+    qv->QVState = QV_Cancel;
+  }
+  ProtoEnd();	// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
 }
 
 static void QVCancel(TProto *pv)
@@ -451,7 +454,7 @@ static BOOL FTCreateFile(PQVVar qv)
 	fv->InfoOp->SetDlgProtoFileName(fv, qv->FullName);
 	qv->FileOpen = file->OpenWrite(file, qv->FullName);
 	if (!qv->FileOpen) {
-		if (fv->NoMsg) {
+		if (!fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
 		}

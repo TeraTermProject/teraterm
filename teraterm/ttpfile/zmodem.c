@@ -49,6 +49,7 @@
 #include "tttypes.h"
 #include "ftlib.h"
 #include "protolog.h"
+#include "filesys.h"
 
 #include "zmodem.h"
 
@@ -1092,7 +1093,7 @@ static BOOL FTCreateFile(PZVar zv)
 	fv->InfoOp->SetDlgProtoFileName(fv, zv->FullName);
 	zv->FileOpen = file->OpenWrite(file, zv->FullName);
 	if (!zv->FileOpen) {
-		if (fv->NoMsg) {
+		if (!fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
 		}
@@ -1543,6 +1544,7 @@ static void ZCancel(TProto *pv)
 {
 	PZVar zv = pv->PrivateData;
 	ZSendCancel(zv);
+	ProtoEnd();	// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
 }
 
 static int SetOptV(TProto *pv, int request, va_list ap)
