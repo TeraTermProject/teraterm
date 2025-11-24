@@ -27,14 +27,10 @@
  */
 
 /* Raw protocol */
-#include <stdio.h>
-#include <process.h>
 
 #include "tttypes.h"
-#include "ftlib.h"
-#include "protolog.h"
 #include "filesys_proto.h"
-#include "filesys.h"
+#include "filesys.h"		// for ProtoEnd()
 
 #include "raw.h"
 
@@ -105,16 +101,35 @@ static BOOL RawInit(TProto *pv, PComVar cv, PTTSet ts)
 
 static void RawCancel(TProto *pv)
 {
-	// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
-	ProtoEnd();						// quit(cancel)
+	PRawVar rv = pv->PrivateData;
+	PComVar cv = rv->cv;
+	TFileIO *file = rv->file;
+
+	rv->state = STATE_CANCELED;	// quit(cancel)
+	file->Close(file);
+	if (! cv->Ready) {
+		// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
+		RawFlushReceiveBuf(rv);
+		ProtoEnd();
+	}
 }
 
 static void RawTimeOutProc(TProto *pv)
 {
 	PRawVar rv = pv->PrivateData;
+	PComVar cv = rv->cv;
+	TFileIO *file = rv->file;
 	PFileVarProto fv = rv->fv;
-	fv->Success = TRUE;
-	rv->state = STATE_CANCELED;		// quit(autostop)
+
+	rv->state = STATE_CANCELED;	// quit(autostop)
+	file->Close(file);
+	if (! cv->Ready) {
+		// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
+		RawFlushReceiveBuf(rv);
+		ProtoEnd();
+	} else {
+		fv->Success = TRUE;
+	}
 }
 
 static BOOL RawReadPacket(void *arg)

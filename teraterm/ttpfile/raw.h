@@ -34,8 +34,9 @@
 extern "C" {
 #endif
 
+/* option */
 enum {
-//	RAW_MODE,			// ttpfileで使用するのは受信のみ
+//	RAW_MODE,			// 受信のみに対応
 	RAW_AUTOSTOP_SEC,
 //	RAW_BINFLAG,		// binaryモードのみ対応(textモードは未実装)
 };
