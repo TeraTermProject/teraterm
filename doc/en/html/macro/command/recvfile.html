@@ -54,9 +54,12 @@ connect '192.168.0.10:22 /ssh /user=root /passwd=XXXXXX /auth=password'
 waitregex '.*[$#] '
 
 ; Wait 3 seconds to allow recvfile to start
+; Save stty settings to "save_stty"
+; Run "stty raw" so that the remote host sends the output data exactly as-is, without any modification
 ; Print /var/log/messages to stdout
+; Restore stty settings
 ; Wait 5 seconds to signal the end of transmission
-sendln 'sleep 3; cat /var/log/messages; sleep 5'
+sendln 'sleep 3; save_stty=$(stty -g); stty raw; cat /var/log/messages; stty "${save_stty}"; sleep 5'
 
 ; Wait 1 second for sendln to complete
 pause 1

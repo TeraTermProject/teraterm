@@ -14,7 +14,7 @@
 <h1>recvfile</h1>
 
 <p>
-受信データをファイルに書き込む。 <em>(バージョン 5.6.0以降)</em>
+受信データをファイルに出力する。 <em>(バージョン 5.6.0以降)</em>
 </p>
 
 <pre class="macro-syntax">
@@ -24,8 +24,8 @@ recvfile &lt;filename&gt; &lt;binary flag&gt; &lt;Auto-stop wait time&gt;
 <h2>解説</h2>
 
 <p>
-ホストから受信したデータを &lt;filename&gt; で指定されたファイルに書き込む。<br>
-書き込みが終わるまで次のコマンドは実行されない。<br>
+ホストから受信したデータを &lt;filename&gt; で指定されたファイルに出力する。<br>
+データ受信が終わるまで次のコマンドは実行されない。<br>
 </p>
 
 <p>
@@ -33,7 +33,7 @@ recvfile &lt;filename&gt; &lt;binary flag&gt; &lt;Auto-stop wait time&gt;
 </p>
 
 <p>
-&lt;binary flag&gt; の値(数値)が何であれ、受信したデータをそのままファイルに書き込む。<br>
+&lt;binary flag&gt; の値(数値)が何であれ、受信したデータをそのままファイルに出力する。<br>
 漢字コード、改行文字の変換、制御文字の出力抑止等は行わない。(バイナリモード固定)
 </p>
 
@@ -53,9 +53,12 @@ connect '192.168.0.10:22 /ssh /user=root /passwd=XXXXXX /auth=password'
 waitregex '.*[$#] '
 
 ; Wait 3 seconds to allow recvfile to start
+; Save stty settings to "save_stty"
+; Run "stty raw" so that the remote host sends the output data exactly as-is, without any modification
 ; Print /var/log/messages to stdout
+; Restore stty settings
 ; Wait 5 seconds to signal the end of transmission
-sendln 'sleep 3; cat /var/log/messages; sleep 5'
+sendln 'sleep 3; save_stty=$(stty -g); stty raw; cat /var/log/messages; stty "${save_stty}"; sleep 5'
 
 ; Wait 1 second for sendln to complete
 pause 1
