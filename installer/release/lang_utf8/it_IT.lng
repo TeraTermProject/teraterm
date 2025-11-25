@@ -300,7 +300,7 @@ DLG_TAB_FONT_CHARACTER_SPACE=Carattere spazio
 DLG_TAB_FONT_RESIZED_FONT=Di&segna font ridimensionata per adattarla a larghezza cella
 MSG_TOOLTIP_EDITERR_TITLE1=Carattere non accettabile
 MSG_TOOLTIP_EDITERR_TEXT1=Sono accettati solo interi positivi e negativi.
-DLG_TAB_FONT_FOLDER_LABEL=Usa il seguente collegamento seguente per aprire la cartella Font e visualizzare la visibilità del carattere
+DLG_TAB_FONT_FOLDER=Open Font Settings/Font Folder (%s)
 
 DLG_COMMENT_TITLE=Commento al registro
 

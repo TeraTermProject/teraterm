@@ -73,3 +73,7 @@ end_of_line = crlf
 [*.sh]
 end_of_line = lf
 charset = utf-8
+
+[*.rc]
+end_of_line = crlf
+charset = utf-8

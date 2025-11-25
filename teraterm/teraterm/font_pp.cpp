@@ -49,6 +49,7 @@
 #include "tttext.h"
 #include "tslib.h"
 #include "vtdraw.h"
+#include "ttcommdlg.h"
 
 #include "font_pp.h"
 
@@ -165,7 +166,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		{ IDC_LIST_PRO_FONTS_VT, "DLG_TAB_FONT_LIST_PRO_FONTS_VT" },
 		{ IDC_CHARACTER_SPACE_TITLE, "DLG_TAB_FONT_CHARACTER_SPACE" },
 		{ IDC_RESIZED_FONT, "DLG_TAB_FONT_RESIZED_FONT" },
-		{ IDC_FONT_FOLDER_LABEL, "DLG_TAB_FONT_FOLDER_LABEL" },
+		{ IDC_FONT_FOLDER, "DLG_TAB_FONT_FOLDER" },
 	};
 	FontPPData *dlg_data = (FontPPData *)GetWindowLongPtr(hWnd, DWLP_USER);
 	TTTSet *ts = dlg_data == NULL ? NULL : dlg_data->pts;
@@ -229,8 +230,13 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			wchar_t *font_folder;
 			HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
 			if (r == S_OK) {
-				TTTextMenu(hWnd, IDC_FONT_FOLDER, font_folder, NULL, 0);
-				free(font_folder);
+				wchar_t *text;
+				hGetDlgItemTextW(hWnd, IDC_FONT_FOLDER, &text);
+				wchar_t *new_text;
+				aswprintf(&new_text, text, font_folder);
+				TTTextMenu(hWnd, IDC_FONT_FOLDER, new_text, NULL, 0);
+				free(text);
+				free(new_text);
 			}
 
 			break;
@@ -374,15 +380,9 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				break;
 			}
 
-			case IDC_FONT_FOLDER: {
-				wchar_t *font_folder;
-				HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
-				if (r ==S_OK) {
-					ShellExecuteW(NULL, L"explore", font_folder, NULL, NULL, SW_NORMAL);
-					free(font_folder);
-				}
+			case IDC_FONT_FOLDER:
+				OpenFontFolder();
 				break;
-			}
 
 			default:
 				break;

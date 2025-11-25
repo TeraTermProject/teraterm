@@ -456,3 +456,16 @@ BOOL TTGetSaveFileNameW(const TTOPENFILENAMEW *ofn, wchar_t **filename)
 {
 	return GetOpenSaveFileNameW(ofn, true, filename);
 }
+
+void OpenFontFolder(void)
+{
+	HINSTANCE result = ShellExecuteA(NULL, "open", "ms-settings:fonts", NULL, NULL, SW_SHOWNORMAL);
+	if (result <= (HINSTANCE)32) {
+		wchar_t *font_folder;
+		HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
+		if (r == S_OK) {
+			ShellExecuteW(NULL, L"explore", font_folder, NULL, NULL, SW_NORMAL);
+			free(font_folder);
+		}
+	}
+}

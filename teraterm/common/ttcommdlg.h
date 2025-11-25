@@ -63,6 +63,7 @@ BOOL TTSHBrowseForFolderW(const TTBROWSEINFOW *bi, const wchar_t *def, wchar_t *
 
 DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
 BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder);
+void OpenFontFolder(void);
 
 #ifdef __cplusplus
 }
