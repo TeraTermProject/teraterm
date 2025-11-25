@@ -67,42 +67,6 @@ struct FontPPData {
 	TipWin2 *Tipwin;
 };
 
-static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
-{
-	memset(logfont, 0, sizeof(*logfont));
-	if (ts->DialogFontNameW[0] == 0) {
-		// フォントが設定されていなかったらOSのフォントを使用する
-		GetMessageboxFontW(logfont);
-	}
-	else {
-		wcsncpy_s(logfont->lfFaceName, _countof(logfont->lfFaceName), ts->DialogFontNameW,  _TRUNCATE);
-		logfont->lfHeight = -GetFontPixelFromPoint(hWnd, ts->DialogFontPoint);
-		logfont->lfCharSet = ts->DialogFontCharSet;
-		logfont->lfWeight = FW_NORMAL;
-		logfont->lfOutPrecision = OUT_DEFAULT_PRECIS;
-		logfont->lfClipPrecision = CLIP_DEFAULT_PRECIS;
-		logfont->lfQuality = DEFAULT_QUALITY;
-		logfont->lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
-	}
-}
-
-static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
-{
-	if (Message == WM_INITDIALOG) {
-		FontPPData *dlg_data = (FontPPData *)(((CHOOSEFONTW *)lParam)->lCustData);
-		wchar_t *uimsg;
-		static const wchar_t def[] = L"\"Font style\" selection here won't affect actual font appearance.";
-		GetI18nStrWW("Tera Term", "DLG_CHOOSEFONT_STC6", def, dlg_data->UILanguageFileW, &uimsg);
-		SetDlgItemTextW(Dialog, stc6, uimsg);
-		free(uimsg);
-
-		SetFocus(GetDlgItem(Dialog,cmb1));
-
-		CenterWindow(Dialog, GetParent(Dialog));
-	}
-	return FALSE;
-}
-
 static void EnableCodePage(HWND hWnd, BOOL enable)
 {
 	EnableWindow(GetDlgItem(hWnd, IDC_VTFONT_CODEPAGE_LABEL), enable);
@@ -345,7 +309,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					id == IDC_SPACE_TOP ||
 					id == IDC_SPACE_BOTTOM) {
 					BOOL parsed;
-					int dlg = GetDlgItemInt(hWnd, id, &parsed, TRUE);
+					GetDlgItemInt(hWnd, id, &parsed, TRUE); // parseできたかチェックする。戻り値は使用しない。
 					if (! parsed) {
 						HWND hEdit = (HWND)lp;
 						if (GetWindowTextLengthW(hEdit) == 0) {
