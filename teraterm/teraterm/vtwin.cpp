@@ -1161,7 +1161,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(FileMenu,ID_FILE_SENDFILE,MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_TRANSFER,MF_BYPOSITION | MF_ENABLED); /* Transfer */
 			EnableMenuItem(FileMenu,ID_FILE_DISCONNECT,MF_BYCOMMAND | MF_ENABLED);
-			if (ts.DisableMenuDuplicateSession) {
+			if (ts.DisableMenuDuplicateSession || cv.PortType==IdSerial) {
 				EnableMenuItem(FileMenu,ID_FILE_DUPLICATESESSION,MF_BYCOMMAND | MF_GRAYED);
 			}
 			else {
@@ -3889,28 +3889,17 @@ void CVTWindow::OnFileNewConnection()
 	}
 }
 
-
-// すでに開いているセッションの複製を作る
-// (2004.12.6 yutaka)
-void CVTWindow::OnDuplicateSession()
+static void CygtermPortRange(int *start, int *range)
 {
-	wchar_t Command[1024];
-	const char *exec = "ttermpro";
-	char cygterm_cfg[MAX_PATH];
+	wchar_t *cygterm_cfg;
 	FILE *fp;
 	char buf[256], *head, *body;
 	int cygterm_PORT_START = 20000;
 	int cygterm_PORT_RANGE = 40;
-	int is_cygwin_port = 0;
 
-	// 現在の設定内容を共有メモリへコピーしておく
-	CopyTTSetToShmem(&ts);
-
-	// cygterm.cfg を読み込む
-	strncpy_s(cygterm_cfg, sizeof(cygterm_cfg), ts.HomeDir, _TRUNCATE);
-	AppendSlash(cygterm_cfg, sizeof(cygterm_cfg));
-	strncat_s(cygterm_cfg, sizeof(cygterm_cfg), "cygterm.cfg", _TRUNCATE);
-	fopen_s(&fp, cygterm_cfg, "r");
+	aswprintf(&cygterm_cfg, L"%s\\cygterm.cfg", ts.HomeDirW);
+	_wfopen_s(&fp, cygterm_cfg, L"r");
+	free(cygterm_cfg);
 	if (fp != NULL) {
 		while (fgets(buf, sizeof(buf), fp) != NULL) {
 			size_t len = strlen(buf);
@@ -3930,18 +3919,52 @@ void CVTWindow::OnDuplicateSession()
 		}
 		fclose(fp);
 	}
+
+	*start = cygterm_PORT_START;
+	*range = cygterm_PORT_RANGE;
+}
+
+static BOOL IsCygterm()
+{
+	int cygterm_PORT_START = 20000;
+	int cygterm_PORT_RANGE = 40;
+	int is_cygwin_port = 0;
+
+	CygtermPortRange(&cygterm_PORT_START, &cygterm_PORT_RANGE);
+
 	// Cygterm のポート範囲内かどうか
-	if (ts.TCPPort >= cygterm_PORT_START &&
-	    ts.TCPPort <= cygterm_PORT_START+cygterm_PORT_RANGE) {
-		is_cygwin_port = 1;
+	if (ts.TCPPort < cygterm_PORT_START ||
+	    ts.TCPPort > cygterm_PORT_START+cygterm_PORT_RANGE) {
+		return 0;
 	}
 
-	if (is_cygwin_port && (strcmp(ts.HostName, "127.0.0.1") == 0 ||
-	    strcmp(ts.HostName, "localhost") == 0)) {
+	if ((strcmp(ts.HostName, "127.0.0.1") == 0 ||
+		 strcmp(ts.HostName, "localhost") == 0)) {
 		// localhostへの接続でポートがcygterm.cfgの範囲内の時はcygwin接続とみなす。
+		return 1;
+	}
+
+	return 0;
+}
+
+// すでに開いているセッションの複製を作る
+void CVTWindow::OnDuplicateSession()
+{
+	wchar_t Command[1024];
+	const char *exec = "ttermpro";	// 仮実行ファイル名
+	Command[0] = 0;
+
+	// 現在の設定内容を共有メモリへコピーしておく
+	CopyTTSetToShmem(&ts);
+
+	if (IsCygterm()) {
+		// cygwin接続
 		OnCygwinConnection();
 		return;
-	} else if (cv.TelFlag) { // telnet
+	}
+
+	if (cv.TelFlag) {
+		// telnet
 		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
 					 L"%hs %hs:%d /DUPLICATE /nossh",
 					 exec, ts.HostName, ts.TCPPort);
