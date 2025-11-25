@@ -118,6 +118,7 @@
 #include "tslib.h"
 #include "../ttpset/ttset.h"
 #include "commentdlg.h"
+#include "ttdup.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -3950,10 +3951,6 @@ static BOOL IsCygterm()
 // すでに開いているセッションの複製を作る
 void CVTWindow::OnDuplicateSession()
 {
-	wchar_t Command[1024];
-	const char *exec = "ttermpro";	// 仮実行ファイル名
-	Command[0] = 0;
-
 	// 現在の設定内容を共有メモリへコピーしておく
 	CopyTTSetToShmem(&ts);
 
@@ -3963,41 +3960,52 @@ void CVTWindow::OnDuplicateSession()
 		return;
 	}
 
-	if (cv.TelFlag) {
-		// telnet
-		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
-					 L"%hs %hs:%d /DUPLICATE /nossh",
-					 exec, ts.HostName, ts.TCPPort);
-
-	} else if (cv.isSSH) { // SSH
-		// ここの処理は TTSSH 側にやらせるべき (2004.12.7 yutaka)
-		// TTSSH側でのオプション生成を追加。(2005.4.8 yutaka)
-		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
-					 L"%hs %hs:%d /DUPLICATE",
-					 exec, ts.HostName, ts.TCPPort);
-
-		TTXSetCommandLine(Command, _countof(Command), NULL); /* TTPLUG */
-
-	} else {
+	if (!cv.TelFlag && !cv.isSSH) {
 		// telnet/ssh/cygwin接続以外では複製を行わない。
 		return;
 	}
 
-	// セッション複製を行う際、/K= があれば引き継ぎを行うようにする。
-	// cf. http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24682
-	// (2011.3.27 yutaka)
+	const char *exec = "ttermpro";	// 仮実行ファイル名
+	wchar_t Command[1024];
+	Command[0] = 0;
+
+	if (cv.TelFlag) {
+		// telnet
+		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
+					 L"%hs /DUPLICATE /nossh", exec);
+
+	} else if (cv.isSSH) {
+		// SSH
+		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
+					 L"%hs /DUPLICATE", exec);
+
+		// telnt以外の時は、プラグインにオプション生成してもらう
+		// プラグインからコマンドラインを返す
+		TTXSetCommandLine(Command, _countof(Command), NULL); /* TTPLUG */
+	} else {
+		// 来ないはず
+		assert(FALSE);
+	}
+
 	if (ts.KeyCnfFNW != NULL) {
 		wcsncat_s(Command, _countof(Command), L" /K=", _TRUNCATE);
 		wcsncat_s(Command, _countof(Command), ts.KeyCnfFNW, _TRUNCATE);
 	}
 
-	// セッション複製を行う際、/F= があれば引き継ぎを行うようにする。
 	if (ParseFOption(&ts)) {
 		wcsncat_s(Command, _countof(Command), L" /F=", _TRUNCATE);
 		wcsncat_s(Command, _countof(Command), ts.SetupFNameW, _TRUNCATE);
 	}
 
-	DWORD e = TTWinExec(Command);
+	wchar_t *hostnameW = ToWcharA(ts.HostName);
+	const wchar_t *commandline = wcschr(Command, L' ') + 1;	// 実行ファイル名以降
+	TTDupInfo info = {};
+	info.szHostName = hostnameW;
+	info.port = ts.TCPPort;
+	info.szOption = commandline;
+	info.mode = TTDUP_COMMANDLINE;
+	DWORD e = ConnectHost(m_hInst, m_hWnd, &info);
+	free(hostnameW);
 	if (e != NO_ERROR) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
