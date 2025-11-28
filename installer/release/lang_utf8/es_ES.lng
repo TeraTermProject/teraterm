@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Spanish
-date=2025-08-30 by TeraTerm Project
+date=2025-11-28 by TeraTerm Project
 contributor=Filiberto Olguin Ascona (2022-05-26)
 
 [Tera Term]
@@ -15,7 +15,7 @@ MENU_FILE_LOG=&Log...
 MENU_FILE_PAUSELOG=Pause Logg&ing
 MENU_FILE_COMMENTLOG=C&omentar en Log...
 MENU_FILE_VIEWLOG=&Ver Log
-MENU_FILE_SHOWLOGDIALOG=Mostrar diálogo de log...
+MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
 MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=&Enviar archivo...
 MENU_FILE_CHANGEDIR=&Cambiar carpeta...
@@ -510,6 +510,7 @@ MSG_FIND_DIR_ERROR=Cannot find directory
 
 ; ttpfile
 ; ttfile.c
+DLG_FOPT_TITLE=Log
 DLG_FOPT_FILENAME_TITLE=&Filename (drop file in this dialog)
 DLG_FOPT_APPEND_LABEL=Write mode
 DLG_FOPT_NEW_OVERWRITE=&New / Overwrite
@@ -545,7 +546,7 @@ DLG_GETFN_TITLE=Tera Term: Kermit Get
 DLG_GETFN_FILENAME=&Filename:
 
 ; ttftypes.h
-FILEDLG_TRANS_TITLE_LOG=Log
+FILEDLG_TRANS_TITLE_LOG=Logging
 FILEDLG_TRANS_TITLE_SENDFILE=Send file
 FILEDLG_TRANS_TITLE_KMTRCV=Kermit Receive
 FILEDLG_TRANS_TITLE_KMTGET=Kermit Get

@@ -267,7 +267,7 @@ static LRESULT CALLBACK FNameEditProc(HWND dlg, UINT msg,
 static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
-		{ 0, "DLG_TABSHEET_TITLE_LOG" },
+		{ 0, "DLG_FOPT_TITLE" },
 		{ IDC_SENDFILE_FILENAME_TITLE, "DLG_FOPT_FILENAME_TITLE" },
 		{ IDC_FOPTTEXT, "DLG_FOPT_TEXT" },
 		{ IDC_FOPTBIN, "DLG_FOPT_BINARY" },
@@ -403,8 +403,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			wchar_t *FNFilter = GetCommonDialogFilterWW(simple_log_filter, UILanguageFile);
 
 			wchar_t *uimsg;
-			GetI18nStrWW("Tera Term", "FILEDLG_TRANS_TITLE_LOG",
-						 L"Log", UILanguageFile, &uimsg);
+			GetI18nStrWW("Tera Term", "DLG_FOPT_TITLE", L"Log", UILanguageFile, &uimsg);
 			wchar_t *caption;
 			aswprintf(&caption, L"Tera Term: %s", uimsg);
 			free(uimsg);

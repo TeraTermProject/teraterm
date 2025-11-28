@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2025-08-30 by TeraTerm Project
+date=2025-11-28 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -15,7 +15,7 @@ MENU_FILE_LOG=ログ(&L)...
 MENU_FILE_PAUSELOG=ログを中断(&I)
 MENU_FILE_COMMENTLOG=ログにコメントを付加(&O)...
 MENU_FILE_VIEWLOG=ログを表示(&V)
-MENU_FILE_SHOWLOGDIALOG=ログダイアログを表示(&W)...
+MENU_FILE_SHOWLOGDIALOG=ログ保存中ダイアログを表示(&W)...
 MENU_FILE_STOPLOG=ログを終了(&Q)
 MENU_FILE_SENDFILE=ファイル送信(&S)...
 MENU_FILE_CHANGEDIR=ディレクトリを変更(&C)...
@@ -510,6 +510,7 @@ MSG_FIND_DIR_ERROR=ディレクトリが見つかりません
 
 ; ttpfile
 ; ttfile.c
+DLG_FOPT_TITLE=ログ
 DLG_FOPT_FILENAME_TITLE=ログファイル名(dialogにファイルをドロップ)(&F)
 DLG_FOPT_APPEND_LABEL=書き込みモード
 DLG_FOPT_NEW_OVERWRITE=新規/上書き(&N)
@@ -545,7 +546,7 @@ DLG_GETFN_TITLE=Tera Term: Kermit 取得
 DLG_GETFN_FILENAME=ファイル名(&F):
 
 ; ttftypes.h
-FILEDLG_TRANS_TITLE_LOG=ログ
+FILEDLG_TRANS_TITLE_LOG=ログ記録中
 FILEDLG_TRANS_TITLE_SENDFILE=ファイル送信
 FILEDLG_TRANS_TITLE_KMTRCV=Kermit受信
 FILEDLG_TRANS_TITLE_KMTGET=Kermit取得

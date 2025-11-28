@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2025-08-30 by TeraTerm Project
+date=2025-11-28 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -15,7 +15,7 @@ MENU_FILE_LOG=日誌(&L)...
 MENU_FILE_PAUSELOG=Pause Logg&ing
 MENU_FILE_COMMENTLOG=註釋日誌(&O)...
 MENU_FILE_VIEWLOG=查看日誌(&V)
-MENU_FILE_SHOWLOGDIALOG=顯示日誌對話框(&W)...
+MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
 MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=發送文件(&S)...
 MENU_FILE_CHANGEDIR=更改目錄(&C)...
@@ -510,6 +510,7 @@ MSG_FIND_DIR_ERROR=未找到目錄
 
 ; ttpfile
 ; ttfile.c
+DLG_FOPT_TITLE=日誌
 DLG_FOPT_FILENAME_TITLE=&Filename (drop file in this dialog)
 DLG_FOPT_APPEND_LABEL=Write mode
 DLG_FOPT_NEW_OVERWRITE=&New / Overwrite
@@ -545,7 +546,7 @@ DLG_GETFN_TITLE=Tera Term：Kermit
 DLG_GETFN_FILENAME=文件名(&F)：
 
 ; ttftypes.h
-FILEDLG_TRANS_TITLE_LOG=日誌
+FILEDLG_TRANS_TITLE_LOG=Logging
 FILEDLG_TRANS_TITLE_SENDFILE=文件傳輸
 FILEDLG_TRANS_TITLE_KMTRCV=Kermit接收
 FILEDLG_TRANS_TITLE_KMTGET=Kermit獲取
