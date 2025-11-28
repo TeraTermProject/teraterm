@@ -48,6 +48,8 @@
 
 #include "ttdde.h"
 
+#define TitSend L"Sending file"
+
 typedef enum {
 	SendMemTypeText,
 	SendMemTypeBinary,
@@ -789,7 +791,7 @@ SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayTy
 		goto finish;
 	}
 	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFileW);
-	SendMemInitDialogCaption(sm, L"send file");			// title
+	SendMemInitDialogCaption(sm, TitSend);	// title
 	SendMemInitDialogFilename(sm, fullpath);
 	SendMemInitDelay(sm, delay_type, delay_tick, send_max);
 	SendMemInitEcho(sm, local_echo);

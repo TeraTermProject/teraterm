@@ -67,6 +67,7 @@ public:
 	}
 	void SetUILanguageFile(const wchar_t *UILanguageFile) {
 		static const DlgTextInfo TextInfos[] = {
+			{ 0, "FILEDLG_TRANS_TITLE_SENDFILE" },
 			{ IDC_TRANS_FILENAME, "DLG_FILETRANS_FILENAME" },
 			{ IDC_FULLPATH_LABEL, "DLG_FILETRANS_FULLPATH" },
 			{ IDC_TRANS_TRANS, "DLG_FILETRANS_TRNAS" },

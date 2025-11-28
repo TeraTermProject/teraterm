@@ -327,6 +327,7 @@ DLG_PROT_PACKET=சிறுகட்டு#:
 DLG_PROT_TRANS=பைட்டுகள் மாற்றப்பட்டன:
 DLG_PROT_ELAPSED=கடந்த நேரம்:
 
+DLG_FILETRANS_TITLE=கோப்பை அனுப்பு
 DLG_FILETRANS_FILENAME=கோப்பின் பெயர்:
 DLG_FILETRANS_FULLPATH=முழுப்பாதை:
 DLG_FILETRANS_TRNAS=பைட்டுகள் மாற்றப்பட்டன:
@@ -547,7 +548,7 @@ DLG_GETFN_FILENAME=&கோப்பு பெயர்:
 
 ; ttftypes.h
 FILEDLG_TRANS_TITLE_LOG=Logging
-FILEDLG_TRANS_TITLE_SENDFILE=கோப்பை அனுப்பு
+FILEDLG_TRANS_TITLE_SENDFILE=Sending file
 FILEDLG_TRANS_TITLE_KMTRCV=கெர்மிட் பெறுதல்
 FILEDLG_TRANS_TITLE_KMTGET=கெர்மிட் கெட்
 FILEDLG_TRANS_TITLE_KMTSEND=கெர்மிட் அனுப்பு
