@@ -399,7 +399,7 @@ static void SendData(const char *DataPtr, DWORD DataSize)
 		SendMem *sm = SendMemBinary(p, DataSize - 1);
 		assert(sm != NULL);
 		if (sm != NULL) {
-			SendMemInitEcho(sm, FALSE);
+			SendMemInitEcho(sm, ts.LocalEcho);
 			SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
 			SendMemStart(sm);
 		}
@@ -407,7 +407,7 @@ static void SendData(const char *DataPtr, DWORD DataSize)
 		SendMem *sm = SendMemTextW(strW, 0);
 		assert(sm != NULL);
 		if (sm != NULL) {
-			SendMemInitEcho(sm, FALSE);
+			SendMemInitEcho(sm, ts.LocalEcho);
 			SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
 			SendMemStart(sm);
 		}
@@ -423,7 +423,7 @@ static void SendStringU8(const char *strU8)
 	SendMem *sm = SendMemTextW(strW, 0);
 	assert(sm != NULL);
 	if (sm != NULL) {
-		SendMemInitEcho(sm, FALSE);
+		SendMemInitEcho(sm, ts.LocalEcho);
 		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
 		SendMemStart(sm);
 	}
@@ -439,7 +439,7 @@ static void SendBinary(const void *data_ptr, DWORD data_size)
 	SendMem *sm = SendMemBinary(p, data_size - 1);
 	assert(sm != NULL);
 	if (sm != NULL) {
-		SendMemInitEcho(sm, FALSE);
+		SendMemInitEcho(sm, ts.LocalEcho);
 		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
 		SendMemStart(sm);
 	}
