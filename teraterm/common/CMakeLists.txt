@@ -57,6 +57,8 @@ add_library(
   ttcommdlg.h
   ttdebug.cpp
   ttdebug.h
+  ttdup.cpp
+  ttdup.h
   ttgdiplus.cpp
   ttgdiplus.h
   ttknownfolders.c
