@@ -300,7 +300,7 @@ DLG_TAB_FONT_CHARACTER_SPACE=character space
 DLG_TAB_FONT_RESIZED_FONT=Dra&wing resized font to fit cell width
 MSG_TOOLTIP_EDITERR_TITLE1=不可接受的字符
 MSG_TOOLTIP_EDITERR_TEXT1=僅接受正整數和負整數。
-DLG_TAB_FONT_FOLDER_LABEL=Use the link below to open the Fonts folder and view font visibility
+DLG_TAB_FONT_FOLDER=Open Font Settings/Font Folder (%s)
 
 DLG_COMMENT_TITLE=添加註釋到日誌
 

@@ -297,7 +297,7 @@ DLG_TAB_FONT_CHARACTER_SPACE=espaçamento de caracteres
 DLG_TAB_FONT_RESIZED_FONT=&Redimensionar fonte para ajustar à largura da célula
 MSG_TOOLTIP_EDITERR_TITLE1=Caractere Inválido
 MSG_TOOLTIP_EDITERR_TEXT1=Apenas números inteiros positivos e negativos são aceitáveis.
-DLG_TAB_FONT_FOLDER_LABEL=Use o link abaixo para abrir a pasta Fontes e verificar a visibilidade das fontes
+DLG_TAB_FONT_FOLDER=Open Font Settings/Font Folder (%s)
 
 DLG_COMMENT_TITLE=Comentário para o Log
 
