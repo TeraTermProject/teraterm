@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023- TeraTerm Project
+ * (C) 2025- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,21 +26,43 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include <windows.h>
 
-#include "tt-version.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define TTPMENU_VERSION_MAJOR             1
-#define TTPMENU_VERSION_MINOR             21
-#define TTPMENU_VERSION_STR(sep)          TT_TOSTR(TTPMENU_VERSION_MAJOR) sep TT_TOSTR(TTPMENU_VERSION_MINOR)
-#define TTPMENU_RES_VERSION_STR           TTPMENU_VERSION_STR(", ") ", 0, 0"
+typedef enum {
+	TTDUP_TELNET,
+	TTDUP_SSH_CHALLENGE,
+	TTDUP_SSH_PAGEANT,
+	TTDUP_SSH_PASSWORD,
+	TTDUP_SSH_PUBLICKEY,
+	TTDUP_COMMANDLINE,
+} TTDupMode;
 
-// TTPMENU_RES_PRODUCT_VERSION_STR
-//	リソースファイル(rcファイル) ProductVersion 用
-#if defined(TT_VERSION_SUBSTR_HASH)
-#define TTPMENU_RES_PRODUCT_VERSION_STR \
-	TTPMENU_VERSION_STR(".") " " TT_VERSION_SUBSTR_HASH
-#else
-#define TTPMENU_RES_PRODUCT_VERSION_STR \
-	TTPMENU_VERSION_STR(".")
+typedef struct {
+	TTDupMode mode;
+
+	const wchar_t *szHostName;		// ホスト名
+	int port;						// ポート番号
+	const wchar_t *szUsername;		// ユーザ名
+	const wchar_t *szPasswordW;		// パスワード(NULL時はユーザーがパスワードを入力)
+
+	const wchar_t *szOption;		// 追加オプション/引数
+
+	const wchar_t *szLog;			// ログファイル名
+
+	// for telnet
+	const wchar_t *szLoginPrompt;	// ログインプロンプト
+	const wchar_t *szPasswdPrompt;	// パスワードプロンプト
+
+	// for ssh MODE_SSH_PUBLICKEY
+	const wchar_t *PrivateKeyFile;   // 秘密鍵ファイル
+}  TTDupInfo;
+
+DWORD ConnectHost(HINSTANCE hInstance, HWND hWnd, const TTDupInfo *jobInfo);
+
+#ifdef __cplusplus
+}
 #endif
