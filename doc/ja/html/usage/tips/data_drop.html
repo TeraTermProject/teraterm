@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>送受信データのドロップ</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>送受信データのドロップ</h1>
+
+いくつかの理由により送受信データがドロップすることがあります。<br>
+ドロップの発生箇所と対処方法は以下のとおりです。
+
+<h2 id="send">1. データ送信</h2>
+
+<pre>
+                    s1               s2                 s3                   s4                    program
+Tera Term ---> Tera Term内  ---> OS,driver  ---> (sshd,telnet,pipe) ---> UARTチップ ---> 擬似端末(pty) + シェル,コマンド
+               送信バッファ      UARTチップ      (serial          )      driver,OS       組込プログラム等
+</pre>
+
+<dl>
+  <dt>s1. Tera Term内の送信バッファ</dt>
+  <dd>
+    可能性は低いでしょう。<br>
+    送信バッファ OutBuff[](16KB) の空きサイズを見ながらデータを詰めていきます。<br>
+  </dd>
+  <dt>s2. OS(送信側),UARTチップ</dt>
+  <dd>
+    可能性は低いでしょう。<br>
+    使用するハードウェア、ドライバのバージョンによっては BSoD を含めて様々な不具合が発生することがあります。<br>
+    Tera Term のシリアルポート設定でドライバの詳細を見ることができます。<br>
+    Tera Termは <a href="https://learn.microsoft.com/ja-jp/windows/win32/api/winbase/nf-winbase-setupcomm">SetupComm()</a>で通信デバイスに送信バッファーの推奨サイズとして4KBを提案します。
+  </dd>
+  <dt>s3. 送信路</dt>
+  <dd>
+    ケーブルの品質、ケーブル長、クロストークや信号干渉等によりエラーが発生し、ドロップすることがあります。<br>
+    シリアルの場合エラー時の再送処理はありません。<br>
+    TCP/IP、pipe の場合は可能性は低いと思われます。
+  </dd>
+  <dt>s4. UARTチップ,OS(受信側)</dt>
+  <dd>
+    対向機器の処理能力を超えたデータの受信(program が OS やチップから受信データを引き取らない場合)等で、
+    OS(ドライバ)、UART チップの受信バッファがオーバーフローしてドロップします。<br>
+    フロー制御等は OS(ドライバ)が行うか program が行うかは実装によります。<br>
+    TCP/IP ではフロー制御、エラー時の再送が行われ、多くの場合 OS 内のプロトコルスタックがこれらの処理を行います。<br>
+    シリアルではフロー制御の有無はユーザーが決めることができ、オーバーフロー等エラー時の再送は自動で行われません。
+  </dd>
+  <dt>program</dt>
+  <dd>
+    プログラム内の受信バッファのオーバーフロー等でドロップします。<br>
+    仮想端末(pty)ではバッファが溢れそうになると 0x07(BEL) が送られ、Tera Term でベルがなります。
+  </dd>
+</dl>
+
+<h2 id="recv">2. データ受信</h2>
+
+<pre>
+                    r1               r2                 r3                   r4                    program
+Tera Term <--- Tera Term内  <--- UARTチップ <--- (sshd,telnet,pipe) <--- OS,driver  <--- 擬似端末(pty) + シェル,コマンド
+               受信バッファ      driver,OS       (serial          )      UARTチップ      組込プログラム等
+</pre>
+
+<dl>
+  <dt>program</dt>
+  <dd>
+    可能性は低いでしょう。<br>
+    プログラム内の送信バッファのオーバーフロー等でドロップします。<br>
+  </dd>
+  <dt>r4. OS(送信側),UARTチップ</dt>
+  <dd>
+    可能性は低いでしょう。<br>
+    使用するハードウェア、ドライバのバージョンによっては様々な不具合が発生することがあります。
+  </dd>
+  <dt>r3. 受信路</dt>
+  <dd>
+    ケーブルの品質、ケーブル長、クロストークや信号干渉等によりエラーが発生し、ドロップすることがあります。<br>
+    シリアルの場合エラー時の再送処理はありません。<br>
+    TCP/IP、pipe の場合は可能性は低いと思われます。
+  </dd>
+  <dt>r2. UARTチップ,OS(受信側)</dt>
+  <dd>
+    Tera Termは <a href="https://learn.microsoft.com/ja-jp/windows/win32/api/winbase/nf-winbase-setupcomm">SetupComm()</a>で通信デバイスに受信バッファーの推奨サイズとして16KBを提案します。<br>
+    高負荷等により、UARTチップやOSからの読み出しが遅延すると、通信デバイスの受信バッファがオーバーフローしてドロップします。<br>
+    フロー制御等は OS(ドライバ)が行うか program が行うかは実装によります。<br>
+    TCP/IP ではフロー制御、エラー時の再送が行われ、多くの場合 OS 内のプロトコルスタックがこれらの処理を行います。<br>
+    シリアルではフロー制御の有無はユーザーが決めることができ、オーバーフロー等エラー時の再送は自動で行われません。<br>
+    <p>
+    主なUARTチップ、ドライバの受信バッファサイズは以下のとおり。
+    <pre>
+8250 UART                 受信バッファなし
+16550 UART                16 Byte FIFO
+FT232R                    256 Byte receive buffer
+TTY drive(Linux 2.6.26)   4KB  (<a href="../../reference/sourcecode.html#ttssh">TTSSHによるSSHの設計と実装/擬似端末のしくみ</a>)
+    </pre>
+  </dd>
+  <dt>r1. Tera Term内の受信バッファ</dt>
+  <dd>
+    OSから読み出した受信データは、Tera Term の受信バッファ InBuff[](16KB) に格納され、画面描画、ログ出力、マクロの処理等が行われます。<br>
+    Tera Termの処理(画面描画、ログ出力、マクロの処理等)が遅延すると受信バッファがオーバーフローしてドロップします。
+  </dd>
+</dl>
+
+<h2 id="solution">3. 対処方法</h2>
+
+<ol>
+  <li>接続方法の確認</li>
+  シリアル接続の場合は、送信側と受信側で<a href="../../menu/setup-additional-serialport.html#Speed">通信設定(ボーレート、ビット長等)</a>が一致していることを確認して下さい。<br>
+  フロー制御の導入により、受信バッファのオーバーフローを抑制出来ます。<br>
+  ハードウェアフロー制御(RTS/CTS、DSR/DTR)の使用が推奨です。<br>
+  <br>
+  <li>送信データがドロップする場合</li>
+  対向機器「s4. UARTチップ,OS(受信側)」、「program」の処理性能の不足が原因と思われます。<br>
+  対処方法は、通信速度を遅くすること、単位時間あたりの送信量を減らすことになります。<br>
+  シリアル接続の場合は、ボーレートを低くして下さい。<br>
+  組み込み機器等でボーレートの変更が出来ない場合は送信ディレイを設定し、受信バッファのオーバーフローを抑制します。<br>
+  LCDコントローラ等で改行や画面クリアに時間がかかり、処理完了前に次のコマンドを送信すると不具合が発生するような場合も送信ディレイは有効です。<br>
+  <br>
+  <li>受信データがドロップする場合</li>
+  「r2. UARTチップ,OS(受信側)」、「r1. Tera Term内の受信バッファ」の処理性能の不足が原因と思われます。<br>
+  Visual Studio、動画・画像編集ソフト等多くのリソースを必要とするアプリを起動する際、一時的にリソースが不足しドロップすることがあります。<br>
+  対処方法は、通信速度を遅くすること、単位時間あたりの送信量を減らすことになります。<br>
+  シリアル接続の場合は、ボーレートを低くして下さい。<br>
+  <br>
+  <li>その他</li>
+  データエラーが発生する場合は、高品質なケーブルを使用したり、ノイズ発生源(電源アダプタ、電源ケーブル等)からケーブルを離すことで改善される場合があります。
+</ol>
+
+</BODY>
+</HTML>
