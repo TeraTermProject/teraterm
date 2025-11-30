@@ -102,10 +102,10 @@ static int CloseSocket(SOCKET s)
 	return Pclosesocket(s);
 }
 
-#define CommInQueSize 8192
-#define CommOutQueSize 2048
-#define CommXonLim 2048
-#define CommXoffLim 2048
+#define CommInQueSize 16384
+#define CommOutQueSize 4096
+#define CommXonLim 768
+#define CommXoffLim 3328
 
 #define READENDNAME "ReadEnd"
 #define WRITENAME "Write"
@@ -665,7 +665,10 @@ void CommThread(void *arg)
 			cv->RRQ = TRUE;
 			CommReceive(cv);
 			cv->RRQ = FALSE;
-			PostMessage(cv->HWin, WM_USER_IDLETIMER, 0, 0);
+			if (cv->InBuffCount > InBuffSize / 3) {
+				PostMessage(cv->HWin, WM_USER_IDLETIMER, 0, 0);
+				Sleep(1);
+			}
 		}
 		else {
 			DErr = GetLastError();  // this returns 995 (operation aborted) if a USB com port is removed
