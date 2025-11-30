@@ -125,6 +125,7 @@ typedef struct {
 	char sendbuf[LOGBUFSIZE];
 
 	TComm *Comm;
+	PComVar cv;
 	PFileVarProto fv;
 	TFileIO *file;
 } TZVar;
@@ -767,6 +768,7 @@ static BOOL ZInit(TProto *pv, PComVar cv, PTTSet ts)
 	zv->TOutFin = ts->ZmodemTimeOutFin;
 
 	/* Time out & Max block size */
+	zv->cv = cv;
 	if (cv->PortType == IdTCPIP) {
 		zv->TimeOut = ts->ZmodemTimeOutTCPIP;
 		Max = 1024;
@@ -1544,7 +1546,9 @@ static void ZCancel(TProto *pv)
 {
 	PZVar zv = pv->PrivateData;
 	ZSendCancel(zv);
-	ProtoEnd();	// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
+	if (! zv->cv->Ready){
+		ProtoEnd();	// セッション断の場合は直接 ProtoEnd() を呼んでウィンドウを閉じる
+	}
 }
 
 static int SetOptV(TProto *pv, int request, va_list ap)

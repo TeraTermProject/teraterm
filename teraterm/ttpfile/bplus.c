@@ -1021,7 +1021,9 @@ static void BPCancel(TProto *pv)
 	if ((bv->BPState != BP_Failure) &&
 		(bv->BPState != BP_Close))
 		BPSendFailure(bv,'A');
-	ProtoEnd();	// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
+	if (! bv->cv->Ready){
+		ProtoEnd();	// セッション断の場合は直接 ProtoEnd() を呼んでウィンドウを閉じる
+	}
 }
 
 static int SetOptV(TProto *pv, int request, va_list ap)

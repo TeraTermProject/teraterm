@@ -71,6 +71,7 @@ typedef struct {
 
 	TComm *Comm;
 	TFileIO *file;
+	PComVar cv;
 	PFileVarProto fv;
 } TQVVar;
 typedef TQVVar *PQVVar;
@@ -172,6 +173,7 @@ static BOOL QVInit(TProto *pv, PComVar cv, PTTSet ts)
 {
   PQVVar qv = pv->PrivateData;
   PFileVarProto fv = qv->fv;
+  qv->cv = cv;
   (void)cv;
 
   qv->WinSize = ts->QVWinSize;
@@ -246,7 +248,9 @@ static void QVCancel_(PQVVar qv)
     fv->FTSetTimeOut(fv,TimeOutCANSend);
     qv->QVState = QV_Cancel;
   }
-  ProtoEnd();	// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
+  if (! qv->cv->Ready){
+	  ProtoEnd();	// セッション断の場合は直接 ProtoEnd() を呼んでウィンドウを閉じる
+  }
 }
 
 static void QVCancel(TProto *pv)

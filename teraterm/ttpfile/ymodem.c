@@ -77,6 +77,7 @@ typedef struct {
 	DWORD FileMtime;
 
 	TComm *Comm;
+	PComVar cv;
 	PFileVarProto fv;
 	TFileIO *file;
 } TYVar;
@@ -158,7 +159,9 @@ static void YCancel_(PYVar yv)
 
 	YWrite(yv, (PCHAR)&cancel, sizeof(cancel));
 	yv->YMode = IdYQuit;	// quit
-	ProtoEnd();	// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
+	if (! yv->cv->Ready){
+		ProtoEnd();	// セッション断の場合は直接 ProtoEnd() を呼んでウィンドウを閉じる
+	}
 }
 
 static void YSetOpt(PYVar yv, WORD Opt)
@@ -380,6 +383,7 @@ static BOOL YInit(TProto *pv, PComVar cv, PTTSet ts)
 	yv->TOutInitCRC = ts->YmodemTimeOutInitCRC;
 	yv->TOutVLong = ts->YmodemTimeOutVLong;
 
+	yv->cv = cv;
 	if (cv->PortType==IdTCPIP)
 	{
 		yv->TOutShort = ts->YmodemTimeOutVLong;

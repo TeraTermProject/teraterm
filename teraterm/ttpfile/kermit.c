@@ -84,6 +84,7 @@ typedef struct {
 	DWORD FileMtime;
 
 	TComm *Comm;
+	PComVar cv;
 	PFileVarProto fv;
 	TFileIO *file;
 } TKmtVar;
@@ -1234,6 +1235,7 @@ static BOOL KmtInit(TProto *pv, PComVar cv, PTTSet ts)
 		kv->KmtMy.CAPAS |= KMT_CAP_FILATTR;
 
 	/* default your parameters */
+	kv->cv = cv;
 	kv->KmtYour = kv->KmtMy;
 	kv->KmtYour.CAPAS = 0x00;
 	kv->KmtYour.MAXLX = 0;
@@ -1680,7 +1682,9 @@ static void KmtCancel(TProto *pv)
 		strlen(&(kv->PktOut[4])));
 	KmtSendPacket(kv);
 	kv->KmtMode = IdKmtQuit;
-	ProtoEnd();	// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
+	if (! kv->cv->Ready){
+		ProtoEnd();	// セッション断の場合は直接 ProtoEnd() を呼んでウィンドウを閉じる
+	}
 }
 
 static int SetOptV(TProto *pv, int request, va_list ap)
