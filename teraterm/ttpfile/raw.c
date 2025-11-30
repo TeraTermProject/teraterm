@@ -140,10 +140,13 @@ static BOOL RawReadPacket(void *arg)
 	PComVar cv = rv->cv;
 	BYTE Buff[InBuffSize];
 	int BuffCount;
+	static DWORD prev_elapsed;
+	DWORD elapsed;
 
 	if (cv->InBuffCount > 0) {
 		if (rv->StartTime == 0) {
 			rv->StartTime = GetTickCount();
+			prev_elapsed = rv->StartTime;
 			fv->InfoOp->SetDlgPacketNum(fv, 1);
 		}
 		// クリティカルセクションの時間を短くするため memcpy() してから WriteFile()する
@@ -155,9 +158,13 @@ static BOOL RawReadPacket(void *arg)
 		LeaveCriticalSection(&cv->InBuff_lock);
 		file->WriteFile(file, Buff, BuffCount);
 		rv->ByteCount += BuffCount;
-		fv->InfoOp->SetDlgByteCount(fv, rv->ByteCount);
-		fv->InfoOp->SetDlgTime(fv, rv->StartTime, rv->ByteCount);
-		fv->FTSetTimeOut(fv, rv->AutostopSec);
+		elapsed = (GetTickCount() - prev_elapsed) / 250;
+		if (elapsed != prev_elapsed) {
+			prev_elapsed = elapsed;
+			fv->InfoOp->SetDlgByteCount(fv, rv->ByteCount);
+			fv->InfoOp->SetDlgTime(fv, rv->StartTime, rv->ByteCount);
+			fv->FTSetTimeOut(fv, rv->AutostopSec);
+		}
 	}
 	if (rv->state == STATE_CANCELED) {
 		return FALSE;
