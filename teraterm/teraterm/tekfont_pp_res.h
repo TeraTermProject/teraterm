@@ -8,7 +8,6 @@
 #define IDC_DLGFONT_CHOOSE              1017
 #define IDC_LIST_HIDDEN_FONTS_DLG       1019
 #define IDC_LIST_PRO_FONTS_DLG          1022
-#define IDC_FONT_FOLDER_LABEL           2615
 #define IDC_FONT_FOLDER                 2616
 
 // Next default values for new objects

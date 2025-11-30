@@ -374,11 +374,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	pVTWin = m_pMainWnd;
 	main_window = m_pMainWnd->m_hWnd;
 
-	if (ts.Minimize>0) {
-		nCmdShow = SW_SHOWMINIMIZED;
-	}
-	ShowWindow(main_window, nCmdShow);
-
 	// [Tera Term]セクションのDLG_SYSTEM_FONTをとりあえずセットする
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");

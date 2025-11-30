@@ -38,8 +38,16 @@
   <li>Changes
     <ul>
       <li>
+        Hide command line when duplicating sessions.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
+      </li>
+      <li>
         added broadcast.log to <a href="../menu/setup-directory.html">Setup directory</a>.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/928" target="_blank">issue #928</a>)
+      </li>
+      <li>
+        Open "Settings &gt; Personalization &gt; Fonts" instead of opening the "%WINDIR%\Fonts" folder if possible when opening Windows font settings.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/979" target="_blank">issue #979</a>)
       </li>
     </ul>
   </li>
@@ -55,12 +63,20 @@
         Fixed a bug that prevented the transfer dialogs for Kermit, XModem, YModem, ZModem, B-Plus, and Quick-VAN from being closed when a session was disconnected.<br>
         Do not show the error dialog if the PC fails to create the file during reception (Kermit, XModem, YModem, ZModem, B-Plus, Quick-VAN).
         (<a href="https://github.com/TeraTermProject/teraterm/issues/973" target="_blank">issue #973</a>)
+        Fixed an issue where the window was not hidden when ttermpro.exe was launched with the /V option. (degradation at 5.4.1)<br>
+        Fixed an issue where the macro command "connect" failed to connect to the host when ttermpro.exe was launched with the /I option. (degradation at 5.4.1)
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/975" target="_blank">issue #975</a>)
+      </li>
+      <li>
+        Fixed a bug that caused <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> in TERATERM.INI to stop working.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/967" target="_blank">issue #967</a>)
       </li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
+      <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.21">1.21</a>.</li>
       <li>Upgraded TTSSH to <a href="#ttssh_3.6.0">3.6.0</a>.</li>
       <li>
         Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.5.4" target="_blank">6.5.4</a>.
@@ -3973,8 +3989,8 @@ SYNOPSIS:
   <li>Misc
     <ul>
       <li>
-        Upgraded LibreSSL to 4.2.0.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/926" target="_blank">issue #926</a>)
+        Upgraded LibreSSL to 4.2.1.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/962" target="_blank">issue #962</a>)
       </li>
     </ul>
   </li>
@@ -6053,6 +6069,14 @@ SYNOPSIS:
 
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
+
+<h3 id="ttmenu_1.21">YYYY.MM.DD(Ver 1.21)</h3>
+<ul class="history">
+      <li>
+        Fixed to hide command line when launching Tera Term.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
+      </li>
+</ul>
 
 <h3 id="ttmenu_1.20">2024.7.7 (Ver 1.20)</h3>
 <ul class="history">

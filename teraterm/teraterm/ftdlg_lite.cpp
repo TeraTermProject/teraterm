@@ -41,6 +41,7 @@
 #include "tt_res.h"
 #include "teraterml.h"
 #include "compat_win.h"
+#include "ttwinman.h"		// for ts
 
 #include "ftdlg_lite.h"
 
@@ -199,7 +200,7 @@ BOOL CFileTransLiteDlg::Create(HINSTANCE hInstance, HWND hParent, const wchar_t 
 	pData->check_2sec = FALSE;
 	pData->show = FALSE;
 	pData->Pause = FALSE;
-	pData->HideDialog = FALSE;
+	pData->HideDialog = ts.FTHideDialog ? TRUE : FALSE;
 
 	BOOL Ok = pData->Create(hInstance, hParent);
 	pData->SetUILanguageFile(UILanguageFile);
@@ -208,7 +209,9 @@ BOOL CFileTransLiteDlg::Create(HINSTANCE hInstance, HWND hParent, const wchar_t 
 	::SendMessage(hWnd, PBM_SETRANGE, (WPARAM)0, MAKELPARAM(0, 100));
 	::SendMessage(hWnd, PBM_SETSTEP, (WPARAM)1, 0);
 	::SendMessage(hWnd, PBM_SETPOS, (WPARAM)0, 0);
-	::ShowWindow(hWnd, SW_SHOW);
+	if (! pData->HideDialog) {
+		::ShowWindow(hWnd, SW_SHOW);
+	}
 
 	pData->SetDlgItemTextA(IDC_TRANS_ETIME, "0:00");
 	pData->StartTime = GetTickCount();
@@ -224,6 +227,10 @@ void CFileTransLiteDlg::ChangeButton(BOOL PauseFlag)
 
 void CFileTransLiteDlg::RefreshNum(size_t ByteCount, size_t FileSize)
 {
+	if (pData->HideDialog) {
+		return;
+	}
+
 	const DWORD now = GetTickCount();
 
 	if (!pData->check_2sec) {

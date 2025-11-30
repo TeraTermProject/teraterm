@@ -138,7 +138,7 @@ struct MenuData {
 typedef struct {
 	int		nMessageFlag;				// in : 0:通常メッセージ、1:LockBox誤りメッセージ
 	BOOL	bLockBox;					// in : パスワードの暗号化/復号するかどうかのフラグ
-	char	*pEncryptPassword;			// in : パスワード(暗号文)
+	const char	*pEncryptPassword;			// in : パスワード(暗号文)
 	char	*pDecryptPassword;			// out: パスワード(平文)
 } LockBoxDlgPrivateData;
 
@@ -148,7 +148,7 @@ void	PopupListMenu(HWND hWnd);
 BOOL	AddTooltip(int idControl);
 BOOL	ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName = NULL);
 BOOL	CreateTooltip(HWND hWnd);
-BOOL	DecryptPassword(char *szEncryptPassword, char *szDecryptPassword, HWND hWnd);
+BOOL	DecryptPassword(const char *szEncryptPassword, char *szDecryptPassword, HWND hWnd);
 BOOL	DeleteLoginHostInformation(HWND hWnd);
 BOOL	ErrorMessage(HWND hWnd, LPTSTR msg,...);
 BOOL	ExtractAssociatedIconEx(char *szPath, HICON *hLargeIcon, HICON *hSmallIcon);

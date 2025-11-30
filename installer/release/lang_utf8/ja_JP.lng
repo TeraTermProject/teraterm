@@ -300,7 +300,7 @@ DLG_TAB_FONT_CHARACTER_SPACE=文字間スペース
 DLG_TAB_FONT_RESIZED_FONT=描画幅に合わせてリサイズしたフォントを描画(&W)
 MSG_TOOLTIP_EDITERR_TITLE1=許可されていない文字
 MSG_TOOLTIP_EDITERR_TEXT1=正と負の整数のみ使用できます。
-DLG_TAB_FONT_FOLDER_LABEL=フォントフォルダを開いてフォントの表示状態を確認できます
+DLG_TAB_FONT_FOLDER=フォント設定/フォントフォルダ(%s)を開く
 
 DLG_COMMENT_TITLE=ログにコメントを付加
 
