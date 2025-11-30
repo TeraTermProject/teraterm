@@ -484,7 +484,7 @@ static BOOL QVParseVFILE(PQVVar qv)
   /* file name */
   RecievePath = fv->GetRecievePath(fv);
   free((void *)qv->FullName);
-  qv->FullName = file->GetRecieveFilename(file, &(qv->PktIn[5]), FALSE, RecievePath, !fv->OverWrite);
+  qv->FullName = file->GetReceiveFilename(file, &(qv->PktIn[5]), FALSE, RecievePath, !fv->OverWrite);
   free(RecievePath);
   /* file open */
   if (! FTCreateFile(qv)) return FALSE;

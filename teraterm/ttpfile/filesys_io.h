@@ -35,23 +35,27 @@
 
 typedef struct FileIO {
 	// file I/O, Filename related functions
-	BOOL (*OpenRead)(struct FileIO *fv, const char *filename);
-	BOOL (*OpenWrite)(struct FileIO *fv, const char *filename);
+	BOOL (*OpenRead)(struct FileIO *fv, const char *filenameU8);
+	BOOL (*OpenWrite)(struct FileIO *fv, const char *filenameU8);
 	size_t (*ReadFile)(struct FileIO *fv, void *buf, size_t bytes);
 	size_t (*WriteFile)(struct FileIO *fv, const void *buf, size_t bytes);
 	void (*Close)(struct FileIO *fv);
 	int (*Seek)(struct FileIO *fv, size_t offset);
+
+	// destroy
 	void (*FileSysDestroy)(struct FileIO *fv);
-	//
-	size_t (*GetFSize)(struct FileIO *fv, const char *filename);
-	int (*utime)(struct FileIO *fv, const char *filename, struct _utimbuf* const _Time);
-	BOOL (*SetFMtime)(struct FileIO *fv, const char *FName, DWORD mtime);
-	int (*stat)(struct FileIO *fv, const char *filename, struct _stati64* _Stat);
-	char *(*GetSendFilename)(struct FileIO *fv, const char *fullname, BOOL utf8, BOOL space, BOOL upper);
-	char *(*GetRecieveFilename)(struct FileIO *fv, const char* filename, BOOL utf8, const char *path, BOOL unique);
-	long (*GetFMtime)(struct FileIO *fv, const char *fullname);
-	//
-	BOOL (*SetFilenameEncodeUTF8)(struct FileIO *fv, BOOL utf8);
+
+	// file info
+	size_t (*GetFSize)(struct FileIO *fv, const char *filenameU8);
+	int (*utime)(struct FileIO *fv, const char *filenameU8, struct _utimbuf* const _Time);
+	BOOL (*SetFMtime)(struct FileIO *fv, const char *filenameU8, DWORD mtime);
+	int (*stat)(struct FileIO *fv, const char *filenameU8, struct _stati64* _Stat);
+	long (*GetFMtime)(struct FileIO *fv, const char *filenameU8);
+
+	// filename
+	char *(*GetSendFilename)(struct FileIO *fv, const char *filenameU8, BOOL utf8, BOOL space, BOOL upper);
+	char *(*GetReceiveFilename)(struct FileIO *fv, const char* filename, BOOL utf8, const char *path, BOOL unique);
+
 	//
 	void *data;
 } TFileIO;

@@ -38,6 +38,10 @@
   <li>Changes
     <ul>
       <li>
+        Hide command line when duplicating sessions.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
+      </li>
+      <li>
         added broadcast.log to <a href="../menu/setup-directory.html">Setup directory</a>.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/928" target="_blank">issue #928</a>)
       </li>
@@ -47,17 +51,30 @@
         Added macro command "<a href="../macro/command/recvfile.html">recvfile</a>".
         (<a href="https://github.com/TeraTermProject/teraterm/issues/894" target="_blank">issue #894</a>)
       </li>
+      <li>
+        Open "Settings &gt; Personalization &gt; Fonts" instead of opening the "%WINDIR%\Fonts" folder if possible when opening Windows font settings.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/979" target="_blank">issue #979</a>)
+      </li>
     </ul>
   </li>
 
-  <!--li>Bug fixes
+  <li>Bug fixes
     <ul>
-      <li></li>
+      <li>
+        Fixed an issue where the serial port data length and flow control settings were not reflected in the enabled/disabled state of the [File] - [Transfer] - [YMODEM, ZMODEM, B-Plus, Quick-VAN] menu items.<br>
+        Fixed an issue so that [File] - [Change directory...] can be selected even when the session is disconnected.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/969" target="_blank">issue #969</a>)
+      </li>
+      <li>
+        Fixed a bug that caused <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> in TERATERM.INI to stop working.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/967" target="_blank">issue #967</a>)
+      </li>
     </ul>
-  </li-->
+  </li>
 
   <li>Misc
     <ul>
+      <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.21">1.21</a>.</li>
       <li>Upgraded TTSSH to <a href="#ttssh_3.6.0">3.6.0</a>.</li>
       <li>
         Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.5.4" target="_blank">6.5.4</a>.
@@ -3970,8 +3987,8 @@ SYNOPSIS:
   <li>Misc
     <ul>
       <li>
-        Upgraded LibreSSL to 4.2.0.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/926" target="_blank">issue #926</a>)
+        Upgraded LibreSSL to 4.2.1.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/962" target="_blank">issue #962</a>)
       </li>
     </ul>
   </li>
@@ -6050,6 +6067,14 @@ SYNOPSIS:
 
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
+
+<h3 id="ttmenu_1.21">YYYY.MM.DD(Ver 1.21)</h3>
+<ul class="history">
+      <li>
+        Fixed to hide command line when launching Tera Term.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
+      </li>
+</ul>
 
 <h3 id="ttmenu_1.20">2024.7.7 (Ver 1.20)</h3>
 <ul class="history">

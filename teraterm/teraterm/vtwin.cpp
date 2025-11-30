@@ -119,6 +119,7 @@
 #include "tslib.h"
 #include "../ttpset/ttset.h"
 #include "commentdlg.h"
+#include "ttdup.h"
 
 #include <initguid.h>
 #if _MSC_VER < 1600
@@ -1042,7 +1043,7 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		{ ID_FILE_DISCONNECT, "MENU_FILE_DISCONNECT" },
 		{ ID_FILE_EXIT, "MENU_FILE_EXIT" },
 		{ ID_FILE_EXITALL, "MENU_FILE_EXITALL" },
-		{ 12, "MENU_TRANS" },
+		{ ID_TRANSFER, "MENU_TRANS" },
 		{ ID_FILE_KERMITRCV, "MENU_TRANS_KERMIT_RCV" },
 		{ ID_FILE_KERMITGET, "MENU_TRANS_KERMIT_GET" },
 		{ ID_FILE_KERMITSEND, "MENU_TRANS_KERMIT_SEND" },
@@ -1157,7 +1158,6 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(FileMenu,ID_FILE_SENDFILE,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_RECVFILE,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_TRANSFER,MF_BYPOSITION | MF_GRAYED); /* Transfer */
-			EnableMenuItem(FileMenu,ID_FILE_CHANGEDIR,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_DISCONNECT,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_DUPLICATESESSION,MF_BYCOMMAND | MF_GRAYED);
 		}
@@ -1165,9 +1165,8 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(FileMenu,ID_FILE_SENDFILE,MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_RECVFILE,MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_TRANSFER,MF_BYPOSITION | MF_ENABLED); /* Transfer */
-			EnableMenuItem(FileMenu,ID_FILE_CHANGEDIR,MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_FILE_DISCONNECT,MF_BYCOMMAND | MF_ENABLED);
-			if (ts.DisableMenuDuplicateSession) {
+			if (ts.DisableMenuDuplicateSession || cv.PortType==IdSerial) {
 				EnableMenuItem(FileMenu,ID_FILE_DUPLICATESESSION,MF_BYCOMMAND | MF_GRAYED);
 			}
 			else {
@@ -1210,20 +1209,22 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		if ((cv.PortType==IdSerial) &&
 		    ((ts.DataBit==IdDataBit7) || (ts.Flow==IdFlowX))) {
 			EnableMenuItem(TransMenu,1,MF_BYPOSITION | MF_GRAYED);  /* XMODEM */
-			EnableMenuItem(TransMenu,4,MF_BYPOSITION | MF_GRAYED);  /* Quick-VAN */
+			EnableMenuItem(TransMenu,2,MF_BYPOSITION | MF_GRAYED);  /* YMODEM */
+			EnableMenuItem(TransMenu,5,MF_BYPOSITION | MF_GRAYED);  /* Quick-VAN */
 		}
 		else {
 			EnableMenuItem(TransMenu,1,MF_BYPOSITION | MF_ENABLED); /* XMODEM */
-			EnableMenuItem(TransMenu,4,MF_BYPOSITION | MF_ENABLED); /* Quick-VAN */
+			EnableMenuItem(TransMenu,2,MF_BYPOSITION | MF_ENABLED); /* YMODEM */
+			EnableMenuItem(TransMenu,5,MF_BYPOSITION | MF_ENABLED); /* Quick-VAN */
 		}
 		if ((cv.PortType==IdSerial) &&
 		    (ts.DataBit==IdDataBit7)) {
-			EnableMenuItem(TransMenu,2,MF_BYPOSITION | MF_GRAYED); /* ZMODEM */
-			EnableMenuItem(TransMenu,3,MF_BYPOSITION | MF_GRAYED); /* B-Plus */
+			EnableMenuItem(TransMenu,3,MF_BYPOSITION | MF_GRAYED); /* ZMODEM */
+			EnableMenuItem(TransMenu,4,MF_BYPOSITION | MF_GRAYED); /* B-Plus */
 		}
 		else {
-			EnableMenuItem(TransMenu,2,MF_BYPOSITION | MF_ENABLED); /* ZMODEM */
-			EnableMenuItem(TransMenu,3,MF_BYPOSITION | MF_ENABLED); /* B-Plus */
+			EnableMenuItem(TransMenu,3,MF_BYPOSITION | MF_ENABLED); /* ZMODEM */
+			EnableMenuItem(TransMenu,4,MF_BYPOSITION | MF_ENABLED); /* B-Plus */
 		}
 	}
 	else if (SubMenu == EditMenu)
@@ -3912,28 +3913,17 @@ void CVTWindow::OnFileNewConnection()
 	}
 }
 
-
-// すでに開いているセッションの複製を作る
-// (2004.12.6 yutaka)
-void CVTWindow::OnDuplicateSession()
+static void CygtermPortRange(int *start, int *range)
 {
-	wchar_t Command[1024];
-	const char *exec = "ttermpro";
-	char cygterm_cfg[MAX_PATH];
+	wchar_t *cygterm_cfg;
 	FILE *fp;
 	char buf[256], *head, *body;
 	int cygterm_PORT_START = 20000;
 	int cygterm_PORT_RANGE = 40;
-	int is_cygwin_port = 0;
 
-	// 現在の設定内容を共有メモリへコピーしておく
-	CopyTTSetToShmem(&ts);
-
-	// cygterm.cfg を読み込む
-	strncpy_s(cygterm_cfg, sizeof(cygterm_cfg), ts.HomeDir, _TRUNCATE);
-	AppendSlash(cygterm_cfg, sizeof(cygterm_cfg));
-	strncat_s(cygterm_cfg, sizeof(cygterm_cfg), "cygterm.cfg", _TRUNCATE);
-	fopen_s(&fp, cygterm_cfg, "r");
+	aswprintf(&cygterm_cfg, L"%s\\cygterm.cfg", ts.HomeDirW);
+	_wfopen_s(&fp, cygterm_cfg, L"r");
+	free(cygterm_cfg);
 	if (fp != NULL) {
 		while (fgets(buf, sizeof(buf), fp) != NULL) {
 			size_t len = strlen(buf);
@@ -3953,51 +3943,92 @@ void CVTWindow::OnDuplicateSession()
 		}
 		fclose(fp);
 	}
+
+	*start = cygterm_PORT_START;
+	*range = cygterm_PORT_RANGE;
+}
+
+static BOOL IsCygterm()
+{
+	int cygterm_PORT_START = 20000;
+	int cygterm_PORT_RANGE = 40;
+	int is_cygwin_port = 0;
+
+	CygtermPortRange(&cygterm_PORT_START, &cygterm_PORT_RANGE);
+
 	// Cygterm のポート範囲内かどうか
-	if (ts.TCPPort >= cygterm_PORT_START &&
-	    ts.TCPPort <= cygterm_PORT_START+cygterm_PORT_RANGE) {
-		is_cygwin_port = 1;
+	if (ts.TCPPort < cygterm_PORT_START ||
+	    ts.TCPPort > cygterm_PORT_START+cygterm_PORT_RANGE) {
+		return 0;
 	}
 
-	if (is_cygwin_port && (strcmp(ts.HostName, "127.0.0.1") == 0 ||
-	    strcmp(ts.HostName, "localhost") == 0)) {
+	if ((strcmp(ts.HostName, "127.0.0.1") == 0 ||
+		 strcmp(ts.HostName, "localhost") == 0)) {
 		// localhostへの接続でポートがcygterm.cfgの範囲内の時はcygwin接続とみなす。
+		return 1;
+	}
+
+	return 0;
+}
+
+// すでに開いているセッションの複製を作る
+void CVTWindow::OnDuplicateSession()
+{
+	// 現在の設定内容を共有メモリへコピーしておく
+	CopyTTSetToShmem(&ts);
+
+	if (IsCygterm()) {
+		// cygwin接続
 		OnCygwinConnection();
 		return;
-	} else if (cv.TelFlag) { // telnet
-		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
-					 L"%hs %hs:%d /DUPLICATE /nossh",
-					 exec, ts.HostName, ts.TCPPort);
+	}
 
-	} else if (cv.isSSH) { // SSH
-		// ここの処理は TTSSH 側にやらせるべき (2004.12.7 yutaka)
-		// TTSSH側でのオプション生成を追加。(2005.4.8 yutaka)
-		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
-					 L"%hs %hs:%d /DUPLICATE",
-					 exec, ts.HostName, ts.TCPPort);
-
-		TTXSetCommandLine(Command, _countof(Command), NULL); /* TTPLUG */
-
-	} else {
+	if (!cv.TelFlag && !cv.isSSH) {
 		// telnet/ssh/cygwin接続以外では複製を行わない。
 		return;
 	}
 
-	// セッション複製を行う際、/K= があれば引き継ぎを行うようにする。
-	// cf. http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24682
-	// (2011.3.27 yutaka)
+	const char *exec = "ttermpro";	// 仮実行ファイル名
+	wchar_t Command[1024];
+	Command[0] = 0;
+
+	if (cv.TelFlag) {
+		// telnet
+		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
+					 L"%hs /DUPLICATE /nossh", exec);
+
+	} else if (cv.isSSH) {
+		// SSH
+		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
+					 L"%hs /DUPLICATE", exec);
+
+		// telnt以外の時は、プラグインにオプション生成してもらう
+		// プラグインからコマンドラインを返す
+		TTXSetCommandLine(Command, _countof(Command), NULL); /* TTPLUG */
+	} else {
+		// 来ないはず
+		assert(FALSE);
+	}
+
 	if (ts.KeyCnfFNW != NULL) {
 		wcsncat_s(Command, _countof(Command), L" /K=", _TRUNCATE);
 		wcsncat_s(Command, _countof(Command), ts.KeyCnfFNW, _TRUNCATE);
 	}
 
-	// セッション複製を行う際、/F= があれば引き継ぎを行うようにする。
 	if (ParseFOption(&ts)) {
 		wcsncat_s(Command, _countof(Command), L" /F=", _TRUNCATE);
 		wcsncat_s(Command, _countof(Command), ts.SetupFNameW, _TRUNCATE);
 	}
 
-	DWORD e = TTWinExec(Command);
+	wchar_t *hostnameW = ToWcharA(ts.HostName);
+	const wchar_t *commandline = wcschr(Command, L' ') + 1;	// 実行ファイル名以降
+	TTDupInfo info = {};
+	info.szHostName = hostnameW;
+	info.port = ts.TCPPort;
+	info.szOption = commandline;
+	info.mode = TTDUP_COMMANDLINE;
+	DWORD e = ConnectHost(m_hInst, m_hWnd, &info);
+	free(hostnameW);
 	if (e != NO_ERROR) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",

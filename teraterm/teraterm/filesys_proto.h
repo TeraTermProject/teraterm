@@ -129,7 +129,10 @@ typedef struct FileVarProto {
 	// ↑各プロトコルで使用するワーク
 
 	// services
+
+	// 送信するファイル名 UTF-8
 	char *(*GetNextFname)(struct FileVarProto *fv);
+	// 受信パス UTF-8
 	char *(*GetRecievePath)(struct FileVarProto *fv);
 	void (*FTSetTimeOut)(struct FileVarProto *fv, int T);
 	void (*SetDialogCation)(struct FileVarProto *fv, const char *key, const wchar_t *default_caption);

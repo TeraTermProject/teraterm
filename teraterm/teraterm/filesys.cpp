@@ -107,7 +107,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 	info.DlgCaption = DlgCaption;
 	info.FileName = NULL;
 	info.FullName = fv->FullName;
-	info.HideDialog = FALSE;
+	info.HideDialog = ts.FTHideDialog ? TRUE : FALSE;
 	info.HMainWin = HVTWin;
 
 	FTDlg->Create(hInst, &info);

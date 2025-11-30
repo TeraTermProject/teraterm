@@ -301,7 +301,7 @@ DLG_TAB_FONT_CHARACTER_SPACE=எழுத்து இடம்
 DLG_TAB_FONT_RESIZED_FONT=&செல் அகலத்திற்கு ஏற்றவாறு அளவு மாற்றப்பட்ட எழுத்துருவை வரைதல்
 MSG_TOOLTIP_EDITERR_TITLE1=ஏற்றுக்கொள்ள முடியாத எழுத்து
 MSG_TOOLTIP_EDITERR_TEXT1=நன்மை மற்றும் தீமை முழு எண்கள் மட்டுமே ஏற்றுக்கொள்ளப்படும்.
-DLG_TAB_FONT_FOLDER_LABEL=Use the link below to open the Fonts folder and view font visibility
+DLG_TAB_FONT_FOLDER=Open Font Settings/Font Folder (%s)
 
 DLG_COMMENT_TITLE=பதிவிற்கான கருத்து
 

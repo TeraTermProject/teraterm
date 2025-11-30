@@ -301,7 +301,7 @@ DLG_TAB_FONT_CHARACTER_SPACE=character space
 DLG_TAB_FONT_RESIZED_FONT=Dra&wing resized font to fit cell width
 MSG_TOOLTIP_EDITERR_TITLE1=Carácter inaceptable
 MSG_TOOLTIP_EDITERR_TEXT1=Solo se aceptan enteros positivos y negativos.
-DLG_TAB_FONT_FOLDER_LABEL=Use the link below to open the Fonts folder and view font visibility
+DLG_TAB_FONT_FOLDER=Open Font Settings/Font Folder (%s)
 
 DLG_COMMENT_TITLE=Comment to Log
 

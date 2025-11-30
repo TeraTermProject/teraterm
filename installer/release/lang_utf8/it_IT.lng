@@ -294,14 +294,14 @@ DLG_TAB_FONT_VTFONT_TITLE=API disegno
 DLG_TAB_FONT_DLGFONT=Font finestra &dialogo
 DLG_TAB_FONT_TEKFONT=Font TEK
 DLG_TAB_FONT_BTN_DEFAULT=Pred&efinita
-DLG_TAB_FONT_CODEPAGE_LABEL=Pagina &codice visualizzazione conversione carattere(Auto when 0, %d)
+DLG_TAB_FONT_CODEPAGE_LABEL=Pagina &codice visualizzazione conversione carattere(Auto quando 0, %d)
 DLG_TAB_FONT_LIST_PRO_FONTS_VT=Visualizza font &proporzionali nella finestra font
 DLG_TAB_FONT_LIST_PRO_FONTS_DLG=Visualizza font p&roporzionali nella finestra font
 DLG_TAB_FONT_CHARACTER_SPACE=Carattere spazio
 DLG_TAB_FONT_RESIZED_FONT=Di&segna font ridimensionata per adattarla a larghezza cella
 MSG_TOOLTIP_EDITERR_TITLE1=Carattere non accettabile
 MSG_TOOLTIP_EDITERR_TEXT1=Sono accettati solo interi positivi e negativi.
-DLG_TAB_FONT_FOLDER_LABEL=Usa il seguente collegamento seguente per aprire la cartella Font e visualizzare la visibilità del carattere
+DLG_TAB_FONT_FOLDER=Apri impostazioni font/cartella font (%s)
 
 DLG_COMMENT_TITLE=Commento al registro
 

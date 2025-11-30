@@ -301,7 +301,7 @@ DLG_TAB_FONT_CHARACTER_SPACE=karakter aralığı
 DLG_TAB_FONT_RESIZED_FONT=Hücre genişliğine sığacak şekilde yeniden boyutlandırılmış yazı tipini &çiz
 MSG_TOOLTIP_EDITERR_TITLE1=Kabul Edilemez Karakter
 MSG_TOOLTIP_EDITERR_TEXT1=Yalnızca pozitif ve negatif tamsayılar kabul edilir.
-DLG_TAB_FONT_FOLDER_LABEL=Yazı Tiplerinin görünürlüğünü görmek için aşağıdaki bağlantıyı kullanın
+DLG_TAB_FONT_FOLDER=Open Font Settings/Font Folder (%s)
 
 DLG_COMMENT_TITLE=Kayda Yorum
 

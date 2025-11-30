@@ -65,8 +65,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,82,210,11
     CONTROL         "List &hidden fonts in font dialog",IDC_LIST_HIDDEN_FONTS_DLG,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,99,205,11
-    LTEXT           "Use the link below to open the Fonts folder and view font visibility",IDC_FONT_FOLDER_LABEL,17,118,280,8
-    LTEXT           "font folder",IDC_FONT_FOLDER,29,134,124,8,WS_TABSTOP
+    LTEXT           "Open Font Settings/Font Folder (%s)",IDC_FONT_FOLDER,17,118,280,8
 END
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020- TeraTerm Project
+ * (C) 2025- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,44 +26,42 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-
 #include <windows.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if !defined(DllExport)
-#define DllExport __declspec(dllexport)
-#endif
+typedef enum {
+	TTDUP_TELNET,
+	TTDUP_SSH_CHALLENGE,
+	TTDUP_SSH_PAGEANT,
+	TTDUP_SSH_PASSWORD,
+	TTDUP_SSH_PUBLICKEY,
+	TTDUP_COMMANDLINE,
+} TTDupMode;
 
 typedef struct {
-	HWND hwndOwner;
-	HINSTANCE hInstance;
-	LPCWSTR lpstrFilter;
-	DWORD nFilterIndex;
-	LPCWSTR lpstrFile;	// 初期ファイル名
-	LPCWSTR lpstrInitialDir;	// 初期フォルダ
-	LPCWSTR lpstrTitle;
-	DWORD Flags;
-	LPCWSTR lpstrDefExt;
-} TTOPENFILENAMEW;
+	TTDupMode mode;
 
-BOOL TTGetOpenFileNameW(const TTOPENFILENAMEW *ofn, wchar_t **filename);
-BOOL TTGetSaveFileNameW(const TTOPENFILENAMEW *ofn, wchar_t **filename);
+	const wchar_t *szHostName;		// ホスト名
+	int port;						// ポート番号
+	const wchar_t *szUsername;		// ユーザ名
+	const wchar_t *szPasswordW;		// パスワード(NULL時はユーザーがパスワードを入力)
 
-typedef struct _TTbrowseinfoW {
-	HWND	hwndOwner;
-	LPCWSTR lpszTitle;
-	UINT	ulFlags;
-} TTBROWSEINFOW;
+	const wchar_t *szOption;		// 追加オプション/引数
 
-BOOL TTSHBrowseForFolderW(const TTBROWSEINFOW *bi, const wchar_t *def, wchar_t **folder);
+	const wchar_t *szLog;			// ログファイル名
 
-DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
-BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder);
-void OpenFontFolder(void);
+	// for telnet
+	const wchar_t *szLoginPrompt;	// ログインプロンプト
+	const wchar_t *szPasswdPrompt;	// パスワードプロンプト
+
+	// for ssh MODE_SSH_PUBLICKEY
+	const wchar_t *PrivateKeyFile;   // 秘密鍵ファイル
+}  TTDupInfo;
+
+DWORD ConnectHost(HINSTANCE hInstance, HWND hWnd, const TTDupInfo *jobInfo);
 
 #ifdef __cplusplus
 }
