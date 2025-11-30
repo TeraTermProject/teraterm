@@ -111,6 +111,7 @@ function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DI
       # ${EXPECTED_HASH}
       SHOW_PROGRESS
       STATUS st
+      LOG log
       )
 
     # ダウンロードのステータスを判定
@@ -118,7 +119,7 @@ function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DI
     if(status_code EQUAL 0)
       set(DOWNLOAD_SUCCESS TRUE)
     else()
-      message("Download failed. ${st}")
+      message("Download failed. ${st} ${log}")
       if(RETRY_COUNT EQUAL MAX_RETRIES)
         message(FATAL_ERROR "Maximum number of retries reached.")
       endif()
