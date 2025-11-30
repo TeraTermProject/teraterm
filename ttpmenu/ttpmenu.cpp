@@ -50,6 +50,11 @@
 #include	"asprintf.h"
 #include	"codeconv.h"
 
+#include	"ttdup.h"
+
+// TTLファイルを保存する場合定義する(デバグ用)
+//#define KEEP_TTL_FILE L"C:\\tmp\\start.ttl"
+
 // デフォルトインストール先はカレントディレクトリ
 #define DEFAULT_PATH L"."
 
@@ -165,9 +170,10 @@ BOOL ExecStartup(HWND hWnd)
 		}
 		wcscpy(szJobName[dwIndex], L"");
 		RegClose(hKey);
-
+#if 0
 		for (dwCnt = 0; dwCnt < dwIndex; dwCnt++)
 			ConnectHost(hWnd, 0, szJobName[dwCnt]);
+#endif
 	}
 
 	return TRUE;
@@ -592,7 +598,6 @@ void PopupMenu(HWND hWnd)
 	GetCursorPos(&Point);
 	::SetForceForegroundWindow(hWnd);
 
-	// マルチモニタ環境では LOWORD(), HIWORD() を使ってはいけない。(2005.10.13 yutaka)
 	::TrackPopupMenu(g_hSubMenu,
 						TPM_LEFTALIGN | TPM_RIGHTBUTTON,
 						Point.x,
@@ -620,7 +625,6 @@ void PopupListMenu(HWND hWnd)
 	GetCursorPos(&Point);
 	::SetForceForegroundWindow(hWnd);
 
-	// マルチモニタ環境では LOWORD(), HIWORD() を使ってはいけない。(2005.10.13 yutaka)
 	::TrackPopupMenu(g_hListMenu,
 						TPM_LEFTALIGN | TPM_RIGHTBUTTON,
 						Point.x,
@@ -928,162 +932,31 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 	return TRUE;
 }
 
-/* ==========================================================================
-	Function Name	: (BOOL) MakeTTL()
-	Outline			: 自動ログイン用マクロファイルを生成する。
-					  エンコーディングは UTF-8
-	Arguments		: HWND hWnd	(In) ウインドウのハンドル
-					: const wchar_t *TTLName	(In) マクロファイル名
-					: JobInfo	JobInfo		(In) 設定情報構造体
-	Return Value	: 成功 TRUE / 失敗 FALSE
-	Reference		: 
-	Renewal			: 
-	Notes			: 
-	Attention		: 
-	Up Date			: 
-   ======1=========2=========3=========4=========5=========6=========7======= */
-static BOOL MakeTTL(HWND hWnd, const wchar_t *TTLName, JobInfo *jobInfo)
+/**
+ *	パスワード取得
+ *	@retval	パスワード(wchar_t文字列) 不要になったらfree()すること
+ */
+static wchar_t *GetPassword(const JobInfo *jobInfo, HWND hWnd)
 {
-	char	buf[1024];
-	DWORD	dwWrite;
-	HANDLE	hFile;
-	BOOL	usePassword;
-
-	hFile = ::CreateFileW(TTLName,
-						GENERIC_WRITE, 
-						FILE_SHARE_WRITE | FILE_SHARE_READ, 
-						NULL,
-						CREATE_ALWAYS, 
-						FILE_ATTRIBUTE_NORMAL, 
-						NULL);
-	if (hFile == INVALID_HANDLE_VALUE)
-		return FALSE;
-
-	sprintf_s(buf, "filedelete '%s'\r\n", (const char *)(u8)TTLName);
-	::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
-
-	if (wcslen(jobInfo->szLog) != 0) {
-		::wsprintfA(buf, "logopen '%s' 0 1\r\n", (const char *)(u8)jobInfo->szLog);
-		::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
+	wchar_t *szPasswordW;
+	char szRawPassword[MAX_PATH];
+	if (jobInfo->bPassword == FALSE) {
+		return NULL;
 	}
 
-	// telnetポート番号を付加する (2004.12.3 yutaka)
-	::wsprintfA(buf, "connect '%s:23'\r\n", (const char *)(u8)jobInfo->szHostName);
-	::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
-
-	if (jobInfo->bUsername == TRUE) {
-		if (wcslen(jobInfo->szLoginPrompt) == 0)
-			wcscpy(jobInfo->szLoginPrompt, LOGIN_PROMPT);
-		::wsprintfA(buf, "UsernamePrompt = '%s'\r\nUsername = '%s'\r\n", (const char *)(u8)jobInfo->szLoginPrompt,
-				   (const char *)(u8)jobInfo->szUsername);
-		::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
-	}
-
-	if (jobInfo->bPassword == TRUE) {
-		char szRawPassword[MAX_PATH];
-		if (jobInfo->bLockBox == TRUE) {
-			usePassword = DecryptPassword(jobInfo->szPassword, szRawPassword, hWnd);
+	if (jobInfo->bLockBox == TRUE) {
+		BOOL usePassword = DecryptPassword(jobInfo->szPassword, szRawPassword, hWnd);
+		if (usePassword == FALSE) {
+			szPasswordW = NULL;
 		} else {
-			usePassword = TRUE;
-			EncodePassword((const char *)jobInfo->szPassword, szRawPassword);
-		}
-		if (usePassword == TRUE) {
-			if (wcslen(jobInfo->szPasswdPrompt) == 0)
-				wcscpy(jobInfo->szPasswdPrompt, PASSWORD_PROMPT);
-			::wsprintfA(buf, "PasswordPrompt = '%s'\r\nPassword = '%s'\r\n", (const char *)(u8)jobInfo->szPasswdPrompt,
-						(const char *)(u8)szRawPassword);
-			::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
+			szPasswordW = ToWcharA(szRawPassword);
 		}
 	} else {
-		usePassword = FALSE;
+		EncodePassword((const char *)jobInfo->szPassword, szRawPassword);
+		szPasswordW = ToWcharA(szRawPassword);
 	}
-
-	if (jobInfo->bUsername == TRUE) {
-		::wsprintfA(buf, "wait   UsernamePrompt\r\nsendln Username\r\n");
-		::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
-	}
-
-	if (usePassword == TRUE) {
-		::wsprintfA(buf, "wait   PasswordPrompt\r\nsendln Password\r\n");
-		::WriteFile(hFile, buf, ::lstrlenA(buf), &dwWrite, NULL);
-	}
-
-	::CloseHandle(hFile);
-
-	return TRUE;
-}
-
-
-static void _dquote_string(const wchar_t *str, wchar_t *dst, size_t dst_len)
-{
-	size_t i, len, n;
-	
-	len = wcslen(str);
-	n = 0;
-	for (i = 0 ; i < len ; i++) {
-		if (str[i] == '"')
-			n++;
-	}
-	if (dst_len < (len + 2*n + 2 + 1))
-		return;
-
-	*dst++ = '"';
-	for (i = 0 ; i < len ; i++) {
-		if (str[i] == '"') {
-			*dst++ = '"';
-			*dst++ = '"';
-
-		} else {
-			*dst++ = str[i];
-
-		}
-	}
-	*dst++ = '"';
-	*dst = '\0';
-}
-
-static void dquote_string(const wchar_t *str, wchar_t *dst, size_t dst_len)
-{
-	// ",スペース,;,^A-^_ が含まれる場合にはクオートする
-	if (wcschr(str, '"') != NULL ||
-	    wcschr(str, ' ') != NULL ||
-	    wcschr(str, ';') != NULL ||
-	    wcschr(str, 0x01) != NULL ||
-	    wcschr(str, 0x02) != NULL ||
-	    wcschr(str, 0x03) != NULL ||
-	    wcschr(str, 0x04) != NULL ||
-	    wcschr(str, 0x05) != NULL ||
-	    wcschr(str, 0x06) != NULL ||
-	    wcschr(str, 0x07) != NULL ||
-	    wcschr(str, 0x08) != NULL ||
-	    wcschr(str, 0x09) != NULL ||
-	    wcschr(str, 0x0a) != NULL ||
-	    wcschr(str, 0x0b) != NULL ||
-	    wcschr(str, 0x0c) != NULL ||
-	    wcschr(str, 0x0d) != NULL ||
-	    wcschr(str, 0x0e) != NULL ||
-	    wcschr(str, 0x0f) != NULL ||
-	    wcschr(str, 0x10) != NULL ||
-	    wcschr(str, 0x11) != NULL ||
-	    wcschr(str, 0x12) != NULL ||
-	    wcschr(str, 0x13) != NULL ||
-	    wcschr(str, 0x14) != NULL ||
-	    wcschr(str, 0x15) != NULL ||
-	    wcschr(str, 0x16) != NULL ||
-	    wcschr(str, 0x17) != NULL ||
-	    wcschr(str, 0x18) != NULL ||
-	    wcschr(str, 0x19) != NULL ||
-	    wcschr(str, 0x1a) != NULL ||
-	    wcschr(str, 0x1b) != NULL ||
-	    wcschr(str, 0x1c) != NULL ||
-	    wcschr(str, 0x1d) != NULL ||
-	    wcschr(str, 0x1e) != NULL ||
-	    wcschr(str, 0x1f) != NULL) {
-		_dquote_string(str, dst, dst_len);
-		return;
-	}
-	// そのままコピーして戻る
-	wcsncpy_s(dst, dst_len, str, _TRUNCATE);
+	SecureZeroMemory(szRawPassword, sizeof(szRawPassword));
+	return szPasswordW;
 }
 
 /* ==========================================================================
@@ -1104,14 +977,12 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	wchar_t	szName[MAX_PATH];
 	wchar_t	szDirectory[MAX_PATH];
 	wchar_t	szHostName[MAX_PATH];
-	wchar_t	szMacroFile[MAX_PATH];
-	bool MacroFileCreated = false;
 	wchar_t	*szArgment = NULL;
 	wchar_t	*szTemp;
 	wchar_t	*pHostName;
 	JobInfo	jobInfo;
 
-	DWORD	dwErr;
+	DWORD	dwErr = NO_ERROR;
 	wchar_t uimsg[MAX_UIMSG];
 
 	wcscpy(szName, (szJobName == NULL) ? g_MenuData.szName[idItem - ID_MENU_MIN] : szJobName);
@@ -1144,157 +1015,101 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 			free(szTemp);
 		}
 
-	switch (jobInfo.dwMode) {
-	case MODE_AUTOLOGIN:
-		if (jobInfo.bTtssh != TRUE) {
-			// TTSSHを使用しない, 自動ログインマクロを生成、使用する
-			wchar_t	szTempPath[MAX_PATH];
-			::GetTempPathW(MAX_PATH, szTempPath);
-			::GetTempFileNameW(szTempPath, L"ttm", 0, szMacroFile);
-			if (MakeTTL(hWnd, szMacroFile, &jobInfo) == FALSE) {
-				dwErr = ::GetLastError();
-				UTIL_get_lang_msgW("MSG_ERROR_MAKETTL", uimsg, _countof(uimsg),
-								   L"Could not make 'ttpmenu.TTL'\n", UILanguageFileW);
-				ErrorMessage(hWnd, dwErr, uimsg);
-				return FALSE;
-			}
-			MacroFileCreated = true;
-			wchar_t *m_option;
-			aswprintf(&m_option, L" /M=\"%s\"", szMacroFile);
-			awcscat(&szArgment, m_option);
-			free(m_option);
-
-			// SSHを使わない場合、/nossh オプションを付けておく。
-			awcscat(&szArgment, L" /nossh");
-		}
-		else {
-			// TTSSHが有効の場合は、自動ログインのためのコマンドラインを付加する。
-			wchar_t passwd[MAX_PATH], keyfile[MAX_PATH];
-			char szRawPassword[MAX_PATH];
-			wchar_t szPassStrW[MAX_PATH];
-			BOOL usePassword;
-
-			if (jobInfo.bLockBox == TRUE) {
-				usePassword = DecryptPassword(jobInfo.szPassword, szRawPassword, hWnd);
-			} else {
-				usePassword = TRUE;
-				EncodePassword((const char *)jobInfo.szPassword, szRawPassword);
-			}
-			if (usePassword == TRUE) {
-				wchar_t *szPasswordW = ToWcharA(szRawPassword);
-				wsprintfW(szPassStrW, L"/passwd=%s", szPasswordW);
-				free(szPasswordW);
-			} else {
-				wsprintfW(szPassStrW, L"/ask4passwd");
-			}
-			dquote_string(szPassStrW, passwd, _countof(passwd));
-			dquote_string(jobInfo.PrivateKeyFile, keyfile, _countof(keyfile));
-
-			wchar_t *options;
-			if (jobInfo.bChallenge) { // keyboard-interactive
-				aswprintf(&options,
-					L"%s:22 /ssh /auth=challenge /user=%s %s %s",
-					jobInfo.szHostName,
-					jobInfo.szUsername,
-					passwd,
-					szArgment
-					);
-
-			} else if (jobInfo.bPageant) { // Pageant
-				aswprintf(&options,
-					L"%s:22 /ssh /auth=pageant /user=%s %s",
-					jobInfo.szHostName,
-					jobInfo.szUsername,
-					szArgment
-					);
-
-			}
-			else if (jobInfo.PrivateKeyFile[0] == L'\0') {  // password authentication
-				aswprintf(&options,
-					L"%s:22 /ssh /auth=password /user=%s %s %s",
-					jobInfo.szHostName,
-					jobInfo.szUsername,
-					passwd,
-					szArgment
-					);
-
-			} else { // publickey
-				aswprintf(&options,
-					L"%s:22 /ssh /auth=publickey /user=%s %s /keyfile=%s %s",
-					jobInfo.szHostName,
-					jobInfo.szUsername,
-					passwd,
-					keyfile,
-					szArgment
-					);
-			}
-			free(szArgment);
-			szArgment = options;
-		}
-		break;
-	case MODE_MACRO:
-		aswprintf(&szTemp, L" /M=\"%s\"", jobInfo.szMacroFile);
-		awcscat(&szArgment, szTemp);
-		free(szTemp);
-		break;
-	case MODE_DIRECT:
-		break;
-	default:
-		assert(FALSE);
-		break;
-	}
-
 	if (wcslen(jobInfo.szOption) != 0) {
 		aswprintf(&szTemp, L" %s", jobInfo.szOption);
 		awcscat(&szArgment, szTemp);
 		free(szTemp);
 	}
 
-	// フルパス化する
-	wchar_t *exe_fullpath = GetFullPath(jobInfo.szTeraTerm);
-	wcscpy_s(jobInfo.szTeraTerm, exe_fullpath);
-	free(exe_fullpath);
+	if (jobInfo.dwMode == MODE_AUTOLOGIN ) {
+		wchar_t *passwordW = GetPassword(&jobInfo, hWnd);
 
-	// 実行するプログラムのカレントパス
-	//   プログラムのあるフォルダ
-	wcscpy(szDirectory, jobInfo.szTeraTerm);
-	if ((::GetFileAttributesW(jobInfo.szTeraTerm) & FILE_ATTRIBUTE_DIRECTORY) == 0) {
-		wchar_t	*pt = wcsrchr(szDirectory, '\\');
-		if (pt != NULL)
-			*pt	= '\0';
+		TTDupInfo info = {};
+		info.szHostName = jobInfo.szHostName;
+		info.szUsername = jobInfo.szUsername;
+		info.szOption = szArgment;
+
+		if (jobInfo.bTtssh != TRUE) {
+			// TELNET
+			info.mode = TTDUP_TELNET;
+			info.szPasswordW = passwordW;
+			info.szLoginPrompt = jobInfo.szLoginPrompt;
+			info.szPasswdPrompt = jobInfo.szPasswdPrompt;
+		} else if (jobInfo.bChallenge) {
+			// SSH keyboard-interactive
+			info.mode = TTDUP_SSH_CHALLENGE;
+			info.szPasswordW = passwordW;
+		} else if (jobInfo.bPageant) {
+			// SSH Pageant
+			info.mode = TTDUP_SSH_PAGEANT;
+		} else if (jobInfo.PrivateKeyFile[0] == L'\0') {
+			// SSH password authentication
+			info.mode = TTDUP_SSH_PASSWORD;
+			info.szPasswordW = passwordW;
+		} else {
+			// SSH publickey
+			info.mode = TTDUP_SSH_PUBLICKEY;
+			info.szPasswordW = passwordW;
+			info.PrivateKeyFile = jobInfo.PrivateKeyFile;
+		}
+		dwErr = ConnectHost(g_hI, hWnd, &info);
+		if (passwordW != NULL) {
+			SecureZeroMemory(passwordW, sizeof(wchar_t) * wcslen(passwordW));
+			free(passwordW);
+		}
+	}
+	else {
+		switch (jobInfo.dwMode) {
+		case MODE_MACRO:
+			aswprintf(&szTemp, L" /M=\"%s\"", jobInfo.szMacroFile);
+			awcscat(&szArgment, szTemp);
+			free(szTemp);
+			break;
+		case MODE_DIRECT:
+			break;
+		default:
+			assert(FALSE);
+			break;
+		}
+
+		// フルパス化する
+		wchar_t *exe_fullpath = GetFullPath(jobInfo.szTeraTerm);
+		wcscpy_s(jobInfo.szTeraTerm, exe_fullpath);
+		free(exe_fullpath);
+
+		// 実行するプログラムのカレントパス
+		//   プログラムのあるフォルダ
+		wcscpy(szDirectory, jobInfo.szTeraTerm);
+		if ((::GetFileAttributesW(jobInfo.szTeraTerm) & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+			wchar_t	*pt = wcsrchr(szDirectory, '\\');
+			if (pt != NULL)
+				*pt	= '\0';
+		}
+
+		SHELLEXECUTEINFOW ExecInfo = {};
+		ExecInfo.cbSize			= sizeof(ExecInfo);
+		ExecInfo.fMask			= SEE_MASK_FLAG_NO_UI | SEE_MASK_NOCLOSEPROCESS;
+		ExecInfo.hwnd			= hWnd;
+		ExecInfo.lpVerb			= NULL;
+		ExecInfo.lpFile			= jobInfo.szTeraTerm;
+		ExecInfo.lpParameters	= szArgment;
+		ExecInfo.lpDirectory	= szDirectory;
+		ExecInfo.nShow			= SW_SHOWNORMAL;
+		ExecInfo.hInstApp		= g_hI;
+
+		if (::ShellExecuteExW(&ExecInfo) == FALSE) {
+			dwErr = ::GetLastError();
+		}
 	}
 
-	SHELLEXECUTEINFOW	ExecInfo;
-	memset((void *) &ExecInfo, 0, sizeof(ExecInfo));
-	ExecInfo.cbSize			= sizeof(ExecInfo);
-	ExecInfo.fMask			= SEE_MASK_FLAG_NO_UI | SEE_MASK_NOCLOSEPROCESS;
-	ExecInfo.hwnd			= hWnd;
-	ExecInfo.lpVerb			= NULL;
-	ExecInfo.lpFile			= jobInfo.szTeraTerm;
-	ExecInfo.lpParameters	= szArgment;
-	ExecInfo.lpDirectory	= szDirectory;
-	ExecInfo.nShow			= SW_SHOWNORMAL;
-	ExecInfo.hInstApp		= g_hI;
-
-	if (::ShellExecuteExW(&ExecInfo) == FALSE) {
-		dwErr = ::GetLastError();
+	if (dwErr != NO_ERROR) {
 		UTIL_get_lang_msgW("MSG_ERROR_LAUNCH", uimsg, _countof(uimsg),
 						   L"Launching the application was failure.\n", UILanguageFileW);
 		ErrorMessage(hWnd, dwErr, uimsg);
-		if (MacroFileCreated) {
-			::DeleteFileW(szMacroFile);
-		}
 	}
 
 	free(szArgment);
 	szArgment = NULL;
-
-	if (wcslen(jobInfo.szLog) != 0) {
-		Sleep(500);
-		HWND hLog = ::FindWindowW(NULL, L"Tera Term: Log");
-		if (hLog != NULL)
-			ShowWindow(hLog, SW_HIDE);
-	}
 
 	return TRUE;
 }
@@ -2475,7 +2290,7 @@ INT_PTR CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	Attention		:
 	Up Date			:
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL DecryptPassword(char *szEncryptPassword, char *szDecryptPassword, HWND hWnd)
+BOOL DecryptPassword(const char *szEncryptPassword, char *szDecryptPassword, HWND hWnd)
 {
 	LockBoxDlgPrivateData pData;
 	char szEncryptKey[MAX_PATH];

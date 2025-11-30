@@ -41,6 +41,14 @@
         <a href="../menu/setup-directory.html">設定フォルダ(Setup directory)</a> に broadcast.log を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/928" target="_blank">issue #928</a>)
       </li>
+      <li>
+        セッションの複製時、コマンドラインを隠すよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
+      </li>
+      <li>
+        Windowsのフォント設定を開くとき、可能であれば "%WINDIR%\Fonts" フォルダを開くかわりに "設定 &gt; 個人用設定 &gt; フォント" を開くようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/979" target="_blank">issue #979</a>)
+      </li>
     </ul>
   </li>
 
@@ -55,12 +63,15 @@
         ttermpro.exe の /I オプション指定時にマクロコマンド connect でホストに接続出来ない不具合を修正した。（5.4.1でのデグレード）<br>
         ttermpro.exe の /V オプション指定時にウインドウが非表示にならない不具合を修正した。（5.4.1でのデグレード）
         (<a href="https://github.com/TeraTermProject/teraterm/issues/975" target="_blank">issue #975</a>)
+        TERATERM.INI の <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> が機能しなくなっていた不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/967" target="_blank">issue #967</a>)
       </li>
     </ul>
   </li>
 
   <li>その他
     <ul>
+      <li><a href="#ttmenu_1.21">TeraTerm Menu(1.21)</a>へ差し替えた。</li>
       <li><a href="#ttssh_3.6.0">TTSSH(3.6.0)</a>へ差し替えた。</li>
       <li>
         インストーラに使用している Inno Setup のバージョンを<a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.5.4" target="_blank">6.5.4</a>へ差し替えた。
@@ -3981,8 +3992,8 @@
   <li>その他
     <ul>
       <li>
-        LibreSSL 4.2.0 へ差し替えた。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/926" target="_blank">issue #926</a>)
+        LibreSSL 4.2.1 へ差し替えた。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/962" target="_blank">issue #962</a>)
       </li>
     </ul>
   </li>
@@ -6062,6 +6073,14 @@
 
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
+
+<h3 id="ttmenu_1.21">YYYY.MM.DD(Ver 1.21)</h3>
+<ul class="history">
+      <li>
+        Tera Termを起動する際のコマンドラインを隠すよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
+      </li>
+</ul>
 
 <h3 id="ttmenu_1.20">2024.7.7(Ver 1.20)</h3>
 <ul class="history">

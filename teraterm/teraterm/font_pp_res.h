@@ -18,7 +18,6 @@
 #define IDC_LIST_HIDDEN_FONTS           1019
 #define IDC_LIST_PRO_FONTS_VT           1020
 #define IDC_RESIZED_FONT                1021
-#define IDC_FONT_FOLDER_LABEL           1022
 #define IDC_FONT_FOLDER                 1023
 
 // Next default values for new objects

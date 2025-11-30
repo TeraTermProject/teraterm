@@ -43,6 +43,7 @@
 #include "tipwin2.h"
 #include "tttext.h"
 #include "tslib.h"
+#include "ttcommdlg.h"
 
 #include "ui_pp.h"
 #include "ui_pp_res.h"
@@ -234,7 +235,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		{ IDC_DLGFONT_DEFAULT, "DLG_TAB_FONT_BTN_DEFAULT" },
 		{ IDC_LIST_PRO_FONTS_DLG, "DLG_TAB_FONT_LIST_PRO_FONTS_DLG" },
 		{ IDC_LIST_HIDDEN_FONTS_DLG, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
-		{ IDC_FONT_FOLDER_LABEL, "DLG_TAB_FONT_FOLDER_LABEL" },
+		{ IDC_FONT_FOLDER, "DLG_TAB_FONT_FOLDER" },
 	};
 
 	switch (msg) {
@@ -288,8 +289,13 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			wchar_t *font_folder;
 			HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
 			if (r == S_OK) {
-				TTTextMenu(hWnd, IDC_FONT_FOLDER, font_folder, NULL, 0);
-				free(font_folder);
+				wchar_t *text;
+				hGetDlgItemTextW(hWnd, IDC_FONT_FOLDER, &text);
+				wchar_t *new_text;
+				aswprintf(&new_text, text, font_folder);
+				TTTextMenu(hWnd, IDC_FONT_FOLDER, new_text, NULL, 0);
+				free(text);
+				free(new_text);
 			}
 
 			return TRUE;
@@ -366,15 +372,9 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ArrangeControls(hWnd, data, ACFCF_CONTINUE);
 					break;
 
-				case IDC_FONT_FOLDER: {
-					wchar_t *font_folder;
-					HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
-					if (r ==S_OK) {
-						ShellExecuteW(NULL, L"explore", font_folder, NULL, NULL, SW_NORMAL);
-						free(font_folder);
-					}
+				case IDC_FONT_FOLDER:
+					OpenFontFolder();
 					break;
-				}
 
 				default:
 					break;
