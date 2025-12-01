@@ -2041,7 +2041,8 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			UTIL_get_lang_msgU8("DLG_ABOUT_CLIENTID", pvar, "Client ID:");
 			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), pvar->client_version_string, _TRUNCATE);
+			SSH_get_client_ID_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_PROTOCOL", pvar, "Using protocol:");
@@ -2054,13 +2055,13 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			UTIL_get_lang_msgU8("DLG_ABOUT_KEX", pvar, "Key exchange algorithm:");
 			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), get_kex_algorithm_name(pvar->kex_type), _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), get_kex_algorithm_name(pvar->kex->kex_type), _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_HOSTKEY", pvar, "Host Key:");
 			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), get_ssh2_hostkey_algorithm_name(pvar->hostkey_type), _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), get_ssh2_hostkey_algorithm_name(pvar->kex->hostkey_type), _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_ENCRYPTION", pvar, "Encryption:");
@@ -2077,7 +2078,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
-			if (pvar->ctos_compression == COMP_DELAYED) { // 遅延パケット圧縮の場合 (2006.6.23 yutaka)
+			if (pvar->kex->ctos_compression == COMP_DELAYED) { // 遅延パケット圧縮の場合 (2006.6.23 yutaka)
 				UTIL_get_lang_msgU8("DLG_ABOUT_COMPDELAY", pvar, "Delayed Compression:");
 			}
 			else {
