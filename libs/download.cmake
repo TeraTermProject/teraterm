@@ -109,7 +109,7 @@ function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DI
       ${SRC_URL}
       ${DOWN_DIR}/${SRC_ARC}
       # ${EXPECTED_HASH}
-      HTTPHEADER "UserAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+      HTTPHEADER "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
       SHOW_PROGRESS
       STATUS st
       LOG log
