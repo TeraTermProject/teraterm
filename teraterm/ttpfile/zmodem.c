@@ -49,6 +49,7 @@
 #include "tttypes.h"
 #include "ftlib.h"
 #include "protolog.h"
+#include "filesys.h"
 
 #include "zmodem.h"
 
@@ -124,6 +125,7 @@ typedef struct {
 	char sendbuf[LOGBUFSIZE];
 
 	TComm *Comm;
+	PComVar cv;
 	PFileVarProto fv;
 	TFileIO *file;
 } TZVar;
@@ -766,6 +768,7 @@ static BOOL ZInit(TProto *pv, PComVar cv, PTTSet ts)
 	zv->TOutFin = ts->ZmodemTimeOutFin;
 
 	/* Time out & Max block size */
+	zv->cv = cv;
 	if (cv->PortType == IdTCPIP) {
 		zv->TimeOut = ts->ZmodemTimeOutTCPIP;
 		Max = 1024;
@@ -1092,7 +1095,7 @@ static BOOL FTCreateFile(PZVar zv)
 	fv->InfoOp->SetDlgProtoFileName(fv, zv->FullName);
 	zv->FileOpen = file->OpenWrite(file, zv->FullName);
 	if (!zv->FileOpen) {
-		if (fv->NoMsg) {
+		if (!fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
 		}
@@ -1543,6 +1546,9 @@ static void ZCancel(TProto *pv)
 {
 	PZVar zv = pv->PrivateData;
 	ZSendCancel(zv);
+	if (! zv->cv->Ready){
+		ProtoEnd();	// セッション断の場合は直接 ProtoEnd() を呼んでウィンドウを閉じる
+	}
 }
 
 static int SetOptV(TProto *pv, int request, va_list ap)

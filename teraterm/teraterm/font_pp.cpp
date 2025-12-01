@@ -49,6 +49,7 @@
 #include "tttext.h"
 #include "tslib.h"
 #include "vtdraw.h"
+#include "ttcommdlg.h"
 
 #include "font_pp.h"
 
@@ -66,42 +67,6 @@ struct FontPPData {
 	LOGFONTW VTFont;
 	TipWin2 *Tipwin;
 };
-
-static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
-{
-	memset(logfont, 0, sizeof(*logfont));
-	if (ts->DialogFontNameW[0] == 0) {
-		// フォントが設定されていなかったらOSのフォントを使用する
-		GetMessageboxFontW(logfont);
-	}
-	else {
-		wcsncpy_s(logfont->lfFaceName, _countof(logfont->lfFaceName), ts->DialogFontNameW,  _TRUNCATE);
-		logfont->lfHeight = -GetFontPixelFromPoint(hWnd, ts->DialogFontPoint);
-		logfont->lfCharSet = ts->DialogFontCharSet;
-		logfont->lfWeight = FW_NORMAL;
-		logfont->lfOutPrecision = OUT_DEFAULT_PRECIS;
-		logfont->lfClipPrecision = CLIP_DEFAULT_PRECIS;
-		logfont->lfQuality = DEFAULT_QUALITY;
-		logfont->lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
-	}
-}
-
-static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
-{
-	if (Message == WM_INITDIALOG) {
-		FontPPData *dlg_data = (FontPPData *)(((CHOOSEFONTW *)lParam)->lCustData);
-		wchar_t *uimsg;
-		static const wchar_t def[] = L"\"Font style\" selection here won't affect actual font appearance.";
-		GetI18nStrWW("Tera Term", "DLG_CHOOSEFONT_STC6", def, dlg_data->UILanguageFileW, &uimsg);
-		SetDlgItemTextW(Dialog, stc6, uimsg);
-		free(uimsg);
-
-		SetFocus(GetDlgItem(Dialog,cmb1));
-
-		CenterWindow(Dialog, GetParent(Dialog));
-	}
-	return FALSE;
-}
 
 static void EnableCodePage(HWND hWnd, BOOL enable)
 {
@@ -201,7 +166,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		{ IDC_LIST_PRO_FONTS_VT, "DLG_TAB_FONT_LIST_PRO_FONTS_VT" },
 		{ IDC_CHARACTER_SPACE_TITLE, "DLG_TAB_FONT_CHARACTER_SPACE" },
 		{ IDC_RESIZED_FONT, "DLG_TAB_FONT_RESIZED_FONT" },
-		{ IDC_FONT_FOLDER_LABEL, "DLG_TAB_FONT_FOLDER_LABEL" },
+		{ IDC_FONT_FOLDER, "DLG_TAB_FONT_FOLDER" },
 	};
 	FontPPData *dlg_data = (FontPPData *)GetWindowLongPtr(hWnd, DWLP_USER);
 	TTTSet *ts = dlg_data == NULL ? NULL : dlg_data->pts;
@@ -265,8 +230,13 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			wchar_t *font_folder;
 			HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
 			if (r == S_OK) {
-				TTTextMenu(hWnd, IDC_FONT_FOLDER, font_folder, NULL, 0);
-				free(font_folder);
+				wchar_t *text;
+				hGetDlgItemTextW(hWnd, IDC_FONT_FOLDER, &text);
+				wchar_t *new_text;
+				aswprintf(&new_text, text, font_folder);
+				TTTextMenu(hWnd, IDC_FONT_FOLDER, new_text, NULL, 0);
+				free(text);
+				free(new_text);
 			}
 
 			break;
@@ -345,7 +315,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					id == IDC_SPACE_TOP ||
 					id == IDC_SPACE_BOTTOM) {
 					BOOL parsed;
-					int dlg = GetDlgItemInt(hWnd, id, &parsed, TRUE);
+					GetDlgItemInt(hWnd, id, &parsed, TRUE); // parseできたかチェックする。戻り値は使用しない。
 					if (! parsed) {
 						HWND hEdit = (HWND)lp;
 						if (GetWindowTextLengthW(hEdit) == 0) {
@@ -410,15 +380,9 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				break;
 			}
 
-			case IDC_FONT_FOLDER: {
-				wchar_t *font_folder;
-				HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
-				if (r ==S_OK) {
-					ShellExecuteW(NULL, L"explore", font_folder, NULL, NULL, SW_NORMAL);
-					free(font_folder);
-				}
+			case IDC_FONT_FOLDER:
+				OpenFontFolder();
 				break;
-			}
 
 			default:
 				break;

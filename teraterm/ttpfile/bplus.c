@@ -33,6 +33,7 @@
 #include "tttypes.h"
 #include "ftlib.h"
 #include "protolog.h"
+#include "filesys.h"
 
 #include "bplus.h"
 
@@ -597,7 +598,7 @@ static BOOL FTCreateFile(PBPVar bv)
 	fv->InfoOp->SetDlgProtoFileName(fv, bv->FullName);
 	bv->FileOpen = file->OpenWrite(file, bv->FullName);
 	if (!bv->FileOpen) {
-		if (fv->NoMsg) {
+		if (!fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
 		}
@@ -1020,6 +1021,9 @@ static void BPCancel(TProto *pv)
 	if ((bv->BPState != BP_Failure) &&
 		(bv->BPState != BP_Close))
 		BPSendFailure(bv,'A');
+	if (! bv->cv->Ready){
+		ProtoEnd();	// セッション断の場合は直接 ProtoEnd() を呼んでウィンドウを閉じる
+	}
 }
 
 static int SetOptV(TProto *pv, int request, va_list ap)
