@@ -34,6 +34,7 @@
 #include "tttypes.h"
 #include "ftlib.h"
 #include "protolog.h"
+#include "filesys.h"
 
 #include "quickvan.h"
 
@@ -70,6 +71,7 @@ typedef struct {
 
 	TComm *Comm;
 	TFileIO *file;
+	PComVar cv;
 	PFileVarProto fv;
 } TQVVar;
 typedef TQVVar *PQVVar;
@@ -171,6 +173,7 @@ static BOOL QVInit(TProto *pv, PComVar cv, PTTSet ts)
 {
   PQVVar qv = pv->PrivateData;
   PFileVarProto fv = qv->fv;
+  qv->cv = cv;
   (void)cv;
 
   qv->WinSize = ts->QVWinSize;
@@ -240,10 +243,14 @@ static void QVCancel_(PQVVar qv)
   {
     fv->FTSetTimeOut(fv,TimeOutEOT);
     qv->QVState = QV_RecvEOT;
-    return;
   }
-  fv->FTSetTimeOut(fv,TimeOutCANSend);
-  qv->QVState = QV_Cancel;
+  else {
+    fv->FTSetTimeOut(fv,TimeOutCANSend);
+    qv->QVState = QV_Cancel;
+  }
+  if (! qv->cv->Ready){
+	  ProtoEnd();	// セッション断の場合は直接 ProtoEnd() を呼んでウィンドウを閉じる
+  }
 }
 
 static void QVCancel(TProto *pv)
@@ -451,7 +458,7 @@ static BOOL FTCreateFile(PQVVar qv)
 	fv->InfoOp->SetDlgProtoFileName(fv, qv->FullName);
 	qv->FileOpen = file->OpenWrite(file, qv->FullName);
 	if (!qv->FileOpen) {
-		if (fv->NoMsg) {
+		if (!fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
 		}
