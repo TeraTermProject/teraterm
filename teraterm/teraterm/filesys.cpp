@@ -44,6 +44,8 @@
 
 #include "filesys.h"
 
+#define TitSend L"Sending file"
+
 typedef enum {
 	FS_BRACKET_NONE,
 	FS_BRACKET_START,
@@ -97,7 +99,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 	}
 
 	wchar_t *DlgCaption;
-	wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", L"Send file", ts.UILanguageFileW);
+	wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", TitSend, ts.UILanguageFileW);
 	aswprintf(&DlgCaption, L"Tera Term: %s", uimsg);
 	free(uimsg);
 
