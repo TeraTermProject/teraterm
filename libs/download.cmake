@@ -109,6 +109,7 @@ function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DI
       ${SRC_URL}
       ${DOWN_DIR}/${SRC_ARC}
       # ${EXPECTED_HASH}
+      HTTPHEADER "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
       SHOW_PROGRESS
       STATUS st
       LOG log
@@ -251,7 +252,8 @@ function(download_sfmt)
   set(RENAME_DIR "SFMT")
   set(CHECK_FILE "SFMT/CHANGE-LOG.txt")
   set(CHECK_FILE_HASH "ac65302c740579c7dccc99b2fcd735af3027957680f2ce227042755646abb1db")
-  set(SRC_URL "https://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/SFMT-src-1.5.1.zip")
+  # SSL ネゴシエーションに失敗するようなので HTTP でダウンロードする
+  set(SRC_URL "http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/SFMT-src-1.5.1.zip")
   set(ARC_HASH "630d1dfa6b690c30472f75fa97ca90ba62f9c13c5add6c264fdac2c1d3a878f4")
   #   ARC_HASH by TeraTerm Project
   set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/SFMT")
