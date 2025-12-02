@@ -48,7 +48,8 @@ typedef struct {
 	TComm *Comm;
 	PFileVarProto fv;
 	TFileIO *file;
-	int AutostopSec;		// 自動停止待ち時間(秒)
+	int AutoStopSec;		// 自動停止待ち時間(秒)
+	int SecLeft;
 } TRawVar;
 typedef TRawVar *PRawVar;
 
@@ -121,14 +122,21 @@ static void RawTimeOutProc(TProto *pv)
 	TFileIO *file = rv->file;
 	PFileVarProto fv = rv->fv;
 
-	rv->state = STATE_CANCELED;	// quit(autostop)
-	file->Close(file);
-	if (! cv->Ready) {
-		// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
-		RawFlushReceiveBuf(rv);
-		ProtoEnd();
-	} else {
-		fv->Success = TRUE;
+	rv->SecLeft -= 1;
+	if (rv->AutoStopSec > 0 && rv->SecLeft == 0) {
+		rv->state = STATE_CANCELED;	// quit(autostop)
+		file->Close(file);
+		if (! cv->Ready) {
+			// セッション断の場合は RawParse() が呼ばれないため、直接 ProtoEnd() を呼ぶ
+			RawFlushReceiveBuf(rv);
+			ProtoEnd();
+		} else {
+			fv->Success = TRUE;
+		}
+	}
+	else {
+		fv->InfoOp->SetDlgByteCount(fv, rv->ByteCount);
+		fv->FTSetTimeOut(fv, 1);
 	}
 }
 
@@ -163,8 +171,9 @@ static BOOL RawReadPacket(void *arg)
 			prev_elapsed = elapsed;
 			fv->InfoOp->SetDlgByteCount(fv, rv->ByteCount);
 			fv->InfoOp->SetDlgTime(fv, rv->StartTime, rv->ByteCount);
-			fv->FTSetTimeOut(fv, rv->AutostopSec);
 		}
+		rv->SecLeft = rv->AutoStopSec;
+		fv->FTSetTimeOut(fv, 1);
 	}
 	if (rv->state == STATE_CANCELED) {
 		return FALSE;
@@ -196,7 +205,7 @@ static int SetOptV(TProto *pv, int request, va_list ap)
 	switch(request) {
 	case RAW_AUTOSTOP_SEC: {
 		const int autostop_sec = va_arg(ap, int);
-		rv->AutostopSec = autostop_sec;
+		rv->AutoStopSec = autostop_sec;
 		return 0;
 	}
 	}
