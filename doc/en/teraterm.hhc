@@ -247,6 +247,11 @@
 				<param name="Local" value="html/usage/tips/vt100_wrap.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Dropping sent and received data">
+				<param name="Local" value="html/usage/tips/data_drop.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Additional plugins">
@@ -300,6 +305,11 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Send file">
 				<param name="Local" value="html\menu\file-sendfile.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Receive file">
+				<param name="Local" value="html\menu\file-receivefile.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
