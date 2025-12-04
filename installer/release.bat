@@ -20,10 +20,11 @@ echo 6. build libs / build Tera Term, installer, zip
 echo 7. exec cmd.exe
 echo 8. check tools
 echo 9. exit
-echo 10. for multi-stage build stage 1: download lib / rebuild common
-echo 11. for multi-stage build stage 2: download and build lib / rebuild arch, installer, zip
-echo 12. for multi-stage build stage 1: download lib / build common
-echo 13. for multi-stage build stage 2: download and build lib / build arch, installer, zip
+echo 10. for multi-stage build stage 0: download libs
+echo 11. for multi-stage build stage 1: rebuild common
+echo 12. for multi-stage build stage 2: build libs / rebuild arch, installer, zip
+echo 13. for multi-stage build stage 1: build common
+echo 14. for multi-stage build stage 2: build libs / build arch, installer, zip
 
 if "%1" == "" (
     set /p no="select no "
@@ -75,21 +76,25 @@ if "%no%" == "8" (
 
 if "%no%" == "10" (
     call :download_libs
-    call :build_teraterm_1 rebuild
 )
 
 if "%no%" == "11" (
+    call :download_libs
+    call :build_teraterm_1 rebuild
+)
+
+if "%no%" == "12" (
     call :download_libs
     call :build_libs
     call :build_teraterm_2 rebuild
 )
 
-if "%no%" == "12" (
+if "%no%" == "13" (
     call :download_libs
     call :build_teraterm_1
 )
 
-if "%no%" == "13" (
+if "%no%" == "14" (
     call :download_libs
     call :build_libs
     call :build_teraterm_2

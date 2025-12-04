@@ -34,16 +34,20 @@ function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DI
     if(EXISTS ${EXT_DIR}/${CHECK_FILE})
       file(SHA256 ${EXT_DIR}/${CHECK_FILE} CHECK_FILE_HASH_ACTUAL)
 
+      message("CHECK_FILE: ${EXT_DIR}/${CHECK_FILE}")
+      message("ACTUAL_HASH: ${CHECK_FILE_HASH_ACTUAL}")
+      message("EXPECT_HASH: ${CHECK_FILE_HASH}")
+
       # ファイルが展開されていて、チェックファイルのhashが一致したら終了
       if(${CHECK_FILE_HASH_ACTUAL} STREQUAL ${CHECK_FILE_HASH})
+        message("Hash match.")
         return()
       endif()
 
-      message("${EXT_DIR}/${CHECK_FILE}")
-      message("ACTUAL_HASH: ${CHECK_FILE_HASH_ACTUAL}")
-      message("EXPECT_HASH: ${CHECK_FILE_HASH}")
+      message("Hash mismatch.")
     else()
-      message("not exist ${EXT_DIR}/${CHECK_FILE}")
+      message("CHECK_FILE: ${EXT_DIR}/${CHECK_FILE}")
+      message("File not found.")
     endif()
   endif()
 
@@ -78,62 +82,73 @@ function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DI
     message(FATAL_ERROR "unknwon hash HASH=${ARC_FILE_HASH} HASH_LEN=${HASH_LEN}")
   endif()
 
-  message("ARCHIVE=${DOWN_DIR}/${SRC_ARC}")
-  message("ARCHIVE HASH ${ARC_HASH_TYPE}=${ARC_FILE_HASH}")
-  if(FORCE_DOWNLOAD)
-    # 常にダウンロードする
-    unset(EXPECTED_HASH)
-  else()
-    # 必要ならダウンロードする
-    set(EXPECTED_HASH EXPECTED_HASH "${ARC_HASH_TYPE}=${ARC_FILE_HASH}")
+  set(DO_DOWNLOAD 1)
+  if(NOT FORCE_DOWNLOAD)
+    if(EXISTS ${DOWN_DIR}/${SRC_ARC})
+      file(${ARC_HASH_TYPE} ${DOWN_DIR}/${SRC_ARC} ARC_FILE_HASH_ACTUAL)
+
+      message("ARCHIVE: ${DOWN_DIR}/${SRC_ARC}")
+      message("ACTUAL_HASH: ${ARC_HASH_TYPE}=${ARC_FILE_HASH_ACTUAL}")
+      message("EXPECT_HASH: ${ARC_HASH_TYPE}=${ARC_FILE_HASH}")
+
+      # ファイルがダウンロードされていて、アーカイブファイルのhashが一致したらダウンロードしない
+      if(${ARC_FILE_HASH} STREQUAL ${ARC_FILE_HASH_ACTUAL})
+        message("Hash match.")
+        set(DO_DOWNLOAD 0)
+      else()
+        message("Hash mismatch.")
+      endif()
+    endif()
   endif()
 
-  # アーカイブをダウンロード
-  message("download ${SRC_URL}")
-  set(MAX_RETRIES 3)
-  set(RETRY_WAIT 30)
-  set(RETRY_COUNT 0)
-  set(DOWNLOAD_SUCCESS FALSE)
-  while(NOT DOWNLOAD_SUCCESS AND
-        (RETRY_COUNT LESS MAX_RETRIES OR RETRY_COUNT EQUAL MAX_RETRIES))
-    # リトライの前に待つ
-    if(RETRY_COUNT GREATER 0 AND
-       (RETRY_COUNT LESS MAX_RETRIES OR RETRY_COUNT EQUAL MAX_RETRIES))
-      message("Wait ${RETRY_WAIT} sec...")
-      execute_process(COMMAND ${CMAKE_COMMAND} -E sleep ${RETRY_WAIT})
-      message("Retrying...")
-    endif()
-
-    # ダウンロード
-    file(DOWNLOAD
-      ${SRC_URL}
-      ${DOWN_DIR}/${SRC_ARC}
-      # ${EXPECTED_HASH}
-      HTTPHEADER "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
-      SHOW_PROGRESS
-      STATUS st
-      LOG log
-      )
-
-    # ダウンロードのステータスを判定
-    list(GET st 0 status_code)
-    if(status_code EQUAL 0)
-      set(DOWNLOAD_SUCCESS TRUE)
-    else()
-      message("Download failed. ${st} ${log}")
-      if(RETRY_COUNT EQUAL MAX_RETRIES)
-        message(FATAL_ERROR "Maximum number of retries reached.")
+  if(DO_DOWNLOAD)
+    # アーカイブをダウンロード
+    message("download ${SRC_URL}")
+    set(MAX_RETRIES 3)
+    set(RETRY_WAIT 30)
+    set(RETRY_COUNT 0)
+    set(DOWNLOAD_SUCCESS FALSE)
+    while(NOT DOWNLOAD_SUCCESS AND
+          (RETRY_COUNT LESS MAX_RETRIES OR RETRY_COUNT EQUAL MAX_RETRIES))
+      # リトライの前に待つ
+      if(RETRY_COUNT GREATER 0 AND
+         (RETRY_COUNT LESS MAX_RETRIES OR RETRY_COUNT EQUAL MAX_RETRIES))
+        message("Wait ${RETRY_WAIT} sec...")
+        execute_process(COMMAND ${CMAKE_COMMAND} -E sleep ${RETRY_WAIT})
+        message("Retrying...")
       endif()
-      math(EXPR RETRY_COUNT "${RETRY_COUNT} + 1")
-    endif()
-  endwhile()
 
-  # アーカイブファイルのhashをチェックする
-  file(${ARC_HASH_TYPE} ${DOWN_DIR}/${SRC_ARC} ARC_FILE_HASH_ACTUAL)
-  if(NOT ${ARC_FILE_HASH} STREQUAL ${ARC_FILE_HASH_ACTUAL})
+      # ダウンロード
+      file(DOWNLOAD
+        ${SRC_URL}
+        ${DOWN_DIR}/${SRC_ARC}
+        SHOW_PROGRESS
+        STATUS st
+        LOG log
+        )
+
+      # ダウンロードのステータスを判
+      list(GET st 0 status_code)
+      if(status_code EQUAL 0)
+        set(DOWNLOAD_SUCCESS TRUE)
+      else()
+        message("Download failed. ${st} ${log}")
+        if(RETRY_COUNT EQUAL MAX_RETRIES)
+          message(FATAL_ERROR "Maximum number of retries reached.")
+        endif()
+        math(EXPR RETRY_COUNT "${RETRY_COUNT} + 1")
+      endif()
+    endwhile()
+
+    # アーカイブファイルのhashをチェクする
+    file(${ARC_HASH_TYPE} ${DOWN_DIR}/${SRC_ARC} ARC_FILE_HASH_ACTUAL)
+    message("ARCHIVE: ${DOWN_DIR}/${SRC_ARC}")
     message("ACTUAL_HASH: ${ARC_HASH_TYPE}=${ARC_FILE_HASH_ACTUAL}")
     message("EXPECT_HASH: ${ARC_HASH_TYPE}=${ARC_FILE_HASH}")
-    message(FATAL_ERROR "Hash mismatch.")
+    if(NOT ${ARC_FILE_HASH} STREQUAL ${ARC_FILE_HASH_ACTUAL})
+      message(FATAL_ERROR "Hash mismatch.")
+    endif()
+    message("Hash match.")
   endif()
 
   # アーカイブファイルを展開する
