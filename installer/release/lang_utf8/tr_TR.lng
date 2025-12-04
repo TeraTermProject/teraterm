@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Turkish
-date=2025-11-19 by TeraTerm Project
+date=2025-11-28 by TeraTerm Project
 contributor= Mehmet Cagri Aksoy (2025-08-04)
 
 [Tera Term]
@@ -15,7 +15,7 @@ MENU_FILE_LOG=&Kayıt...
 MENU_FILE_PAUSELOG=Kaydı &Durdur
 MENU_FILE_COMMENTLOG=Kayıt &Yorumla...
 MENU_FILE_VIEWLOG=&Kaydı Görüntüle
-MENU_FILE_SHOWLOGDIALOG=Kayıt &Penceresini Göster...
+MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
 MENU_FILE_STOPLOG=Kaydı Durdur (&Q)
 MENU_FILE_SENDFILE=&Dosya Gönder...
 MENU_FILE_RECVFILE=Resim dosyası al (&Z)...
@@ -328,6 +328,7 @@ DLG_PROT_PACKET=Paketi#:
 DLG_PROT_TRANS=Aktarılan bayt:
 DLG_PROT_ELAPSED=Geçen süre:
 
+DLG_FILETRANS_TITLE=Dosya Gönder
 DLG_FILETRANS_FILENAME=Dosya adı:
 DLG_FILETRANS_FULLPATH=Tam yol:
 DLG_FILETRANS_TRNAS=Aktarılan bayt:
@@ -511,6 +512,7 @@ MSG_FIND_DIR_ERROR=Dizin bulunamıyor
 
 ; ttpfile
 ; ttfile.c
+DLG_FOPT_TITLE=Kayıt
 DLG_FOPT_FILENAME_TITLE=&Dosya adı (dosyayı bu iletişim kutusuna sürükleyin)
 DLG_FOPT_APPEND_LABEL=Yazma modu
 DLG_FOPT_NEW_OVERWRITE=&Yeni / Üzerine yaz
@@ -546,9 +548,8 @@ DLG_GETFN_TITLE=Tera Term: Kermit Al
 DLG_GETFN_FILENAME=&Dosya adı:
 
 ; ttftypes.h
-FILEDLG_TRANS_TITLE_LOG=Kayıt
-FILEDLG_TRANS_TITLE_SENDFILE=Dosya Gönder
-FILEDLG_TRANS_TITLE_RECVFILE=Dosya al
+FILEDLG_TRANS_TITLE_LOG=Logging
+FILEDLG_TRANS_TITLE_SENDFILE=Sending file
 FILEDLG_TRANS_TITLE_KMTRCV=Kermit Al
 FILEDLG_TRANS_TITLE_KMTGET=Kermit Al
 FILEDLG_TRANS_TITLE_KMTSEND=Kermit Gönder
@@ -563,6 +564,7 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus Al
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus Gönder
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN Al
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN Gönder
+FILEDLG_TRANS_TITLE_RECVFILE=Dosya al
 FILEDLG_TRANS_TITLE_RAWRCV=Dosya alınıyor
 
 ; dlg clipboard

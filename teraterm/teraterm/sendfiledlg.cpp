@@ -86,7 +86,7 @@ static void ArrangeControls(HWND hDlgWnd)
 static BOOL SelectFile(HWND hDlgWnd, const sendfiledlgdata *data, const wchar_t *filename_ini, wchar_t **filename)
 {
 	wchar_t *uimsg;
-	GetI18nStrWW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", L"Send file", data->UILanguageFileW, &uimsg);
+	GetI18nStrWW("Tera Term", "DLG_FILETRANS_TITLE", L"Send file", data->UILanguageFileW, &uimsg);
 	wchar_t *title;
 	aswprintf(&title, L"Tera Term: %s", uimsg);
 	free(uimsg);
@@ -113,7 +113,7 @@ static BOOL SelectFile(HWND hDlgWnd, const sendfiledlgdata *data, const wchar_t 
 static INT_PTR CALLBACK SendFileDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
-		{ 0, "FILEDLG_TRANS_TITLE_SENDFILE" },
+		{ 0, "DLG_FILETRANS_TITLE" },
 		{ IDC_SENDFILE_FILENAME_TITLE, "DLG_SENDFILE_FILENAME_TITLE" },
 		{ IDC_SENDFILE_READING_METHOD_LABEL, "DLG_SENDFILE_READING_METHOD_TITLE" },
 		{ IDC_SENDFILE_RADIO_BULK, "DLG_SENDFILE_READING_METHOD_BULK" },

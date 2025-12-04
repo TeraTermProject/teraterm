@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2025-11-19 by TeraTerm Project
+date=2025-11-28 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -15,7 +15,7 @@ MENU_FILE_LOG=&பதிவு...
 MENU_FILE_PAUSELOG=பதிவை இடைநிறுத்தவும்
 MENU_FILE_COMMENTLOG=பதிவு செய்ய கருத்து...
 MENU_FILE_VIEWLOG=&பதிவைக் காண்க
-MENU_FILE_SHOWLOGDIALOG=பதிவு உரையாடலைக் காட்டு...
+MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
 MENU_FILE_STOPLOG=பதிவு செய்வதை நிறுத்து (&ஆ)
 MENU_FILE_SENDFILE=&கோப்பை அனுப்பு...
 MENU_FILE_RECVFILE=Rஏற்கனவே கோப்பு பெற (&Z)...
@@ -328,6 +328,7 @@ DLG_PROT_PACKET=சிறுகட்டு#:
 DLG_PROT_TRANS=பைட்டுகள் மாற்றப்பட்டன:
 DLG_PROT_ELAPSED=கடந்த நேரம்:
 
+DLG_FILETRANS_TITLE=கோப்பை அனுப்பு
 DLG_FILETRANS_FILENAME=கோப்பின் பெயர்:
 DLG_FILETRANS_FULLPATH=முழுப்பாதை:
 DLG_FILETRANS_TRNAS=பைட்டுகள் மாற்றப்பட்டன:
@@ -511,6 +512,7 @@ MSG_FIND_DIR_ERROR=கோப்பகத்தைக் கண்டுபிட
 
 ; ttpfile
 ; ttfile.c
+DLG_FOPT_TITLE=பதிவு
 DLG_FOPT_FILENAME_TITLE=&கோப்புப்பெயர் (இந்த உரையாடலில் கோப்பை விடுங்கள்)
 DLG_FOPT_APPEND_LABEL=எழுது பயன்முறை
 DLG_FOPT_NEW_OVERWRITE=&புதிய / மேலெழுத
@@ -546,9 +548,8 @@ DLG_GETFN_TITLE=தேரா முனை: கெர்மிட் கெட்
 DLG_GETFN_FILENAME=&கோப்பு பெயர்:
 
 ; ttftypes.h
-FILEDLG_TRANS_TITLE_LOG=பதிவு
-FILEDLG_TRANS_TITLE_SENDFILE=கோப்பை அனுப்பு
-FILEDLG_TRANS_TITLE_RECVFILE=கோப்பு பெற
+FILEDLG_TRANS_TITLE_LOG=Logging
+FILEDLG_TRANS_TITLE_SENDFILE=Sending file
 FILEDLG_TRANS_TITLE_KMTRCV=கெர்மிட் பெறுதல்
 FILEDLG_TRANS_TITLE_KMTGET=கெர்மிட் கெட்
 FILEDLG_TRANS_TITLE_KMTSEND=கெர்மிட் அனுப்பு
@@ -563,6 +564,7 @@ FILEDLG_TRANS_TITLE_BPRCV=பி-கூட்டல் பெறுதல்
 FILEDLG_TRANS_TITLE_BPSEND=பி-கூட்டல் அனுப்பு
 FILEDLG_TRANS_TITLE_QVRCV=விரைவு-வேன் பெறுதல்
 FILEDLG_TRANS_TITLE_QVSEND=விரைவு-வேன் அனுப்பு
+FILEDLG_TRANS_TITLE_RECVFILE=கோப்பு பெற
 FILEDLG_TRANS_TITLE_RAWRCV=கோப்பைப் பெறுகிறது
 
 ; dlg clipboard

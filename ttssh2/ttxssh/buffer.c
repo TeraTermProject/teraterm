@@ -334,6 +334,11 @@ void buffer_put_cstring(buffer_t *msg, const char *ptr)
 	buffer_put_string(msg, ptr, strlen(ptr));
 }
 
+void buffer_put_stringb(buffer_t *msg, buffer_t *v)
+{
+	buffer_put_string(msg, buffer_ptr(v), buffer_len(v));
+}
+
 void buffer_put_char(buffer_t *msg, int value)
 {
 	char ch = (char)value;

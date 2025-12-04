@@ -32,8 +32,6 @@
 #include "ttxssh.h"
 #include "digest.h"
 
-struct ssh2_mac_t;
-
 typedef enum {
 	HMAC_NONE,      /* disabled line */
 	HMAC_SHA1,
@@ -56,6 +54,14 @@ typedef enum {
 	HMAC_UNKNOWN,
 	HMAC_MAX = HMAC_UNKNOWN,
 } mac_algorithm;
+
+typedef struct ssh2_mac_t {
+	mac_algorithm id;
+	char *name;
+	digest_algorithm alg;
+	int truncatebits; /* truncate digest if != 0 */
+	int etm;		  /* Encrypt-then-MAC */
+} ssh2_mac_t;
 
 struct Mac;
 

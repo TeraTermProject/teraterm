@@ -53,6 +53,7 @@ void buffer_put_raw(buffer_t *msg, const void *ptr, size_t size);
 char *buffer_get_string(char **data_ptr, int *buflen_ptr);
 void buffer_put_string(buffer_t *msg, const char *ptr, size_t size);
 void buffer_put_cstring(buffer_t *msg, const char *ptr);
+void buffer_put_stringb(buffer_t *msg, buffer_t *v);
 void buffer_put_char(buffer_t *msg, int value);
 void buffer_put_padding(buffer_t *msg, size_t size);
 void buffer_put_int(buffer_t *msg, int value);

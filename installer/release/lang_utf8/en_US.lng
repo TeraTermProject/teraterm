@@ -1,6 +1,6 @@
 ﻿[Info]
 language=English
-date=2025-11-19 by TeraTerm Project
+date=2025-11-28 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -15,7 +15,7 @@ MENU_FILE_LOG=&Log...
 MENU_FILE_PAUSELOG=Pause Logg&ing
 MENU_FILE_COMMENTLOG=C&omment to Log...
 MENU_FILE_VIEWLOG=&View Log
-MENU_FILE_SHOWLOGDIALOG=Sho&w Log dialog...
+MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
 MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=&Send file...
 MENU_FILE_RECVFILE=Receive file (&Z)...
@@ -328,6 +328,7 @@ DLG_PROT_PACKET=Packet#:
 DLG_PROT_TRANS=Bytes transferred:
 DLG_PROT_ELAPSED=Elapsed time:
 
+DLG_FILETRANS_TITLE=Send file
 DLG_FILETRANS_FILENAME=Filename:
 DLG_FILETRANS_FULLPATH=Fullpath:
 DLG_FILETRANS_TRNAS=Bytes transferred:
@@ -511,6 +512,7 @@ MSG_FIND_DIR_ERROR=Cannot find directory
 
 ; ttpfile
 ; ttfile.c
+DLG_FOPT_TITLE=Log
 DLG_FOPT_FILENAME_TITLE=&Filename (drop file in this dialog)
 DLG_FOPT_APPEND_LABEL=Write mode
 DLG_FOPT_NEW_OVERWRITE=&New / Overwrite
@@ -546,9 +548,8 @@ DLG_GETFN_TITLE=Tera Term: Kermit Get
 DLG_GETFN_FILENAME=&Filename:
 
 ; ttftypes.h
-FILEDLG_TRANS_TITLE_LOG=Log
-FILEDLG_TRANS_TITLE_SENDFILE=Send file
-FILEDLG_TRANS_TITLE_RECVFILE=Receive file
+FILEDLG_TRANS_TITLE_LOG=Logging
+FILEDLG_TRANS_TITLE_SENDFILE=Sending file
 FILEDLG_TRANS_TITLE_KMTRCV=Kermit Receive
 FILEDLG_TRANS_TITLE_KMTGET=Kermit Get
 FILEDLG_TRANS_TITLE_KMTSEND=Kermit Send
@@ -563,6 +564,7 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus Receive
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus Send
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN Receive
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN Send
+FILEDLG_TRANS_TITLE_RECVFILE=Receive file
 FILEDLG_TRANS_TITLE_RAWRCV=Receiving file
 
 ; dlg clipboard

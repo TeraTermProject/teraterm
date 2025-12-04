@@ -381,6 +381,7 @@ typedef struct {
 
 	int server_protocol_flags;
 	char *server_ID;
+	char *client_ID;
 
 	/* This buffer is used to hold the outgoing data, and encrypted in-place
 	   here if necessary. */
@@ -460,6 +461,7 @@ int SSH_extract_payload(PTInstVar pvar, unsigned char *dest, int len);
 void SSH_end(PTInstVar pvar);
 
 void SSH_get_server_ID_info(PTInstVar pvar, char *dest, int len);
+void SSH_get_client_ID_info(PTInstVar pvar, char *dest, int len);
 void SSH_get_protocol_version_info(PTInstVar pvar, char *dest, int len);
 void SSH_get_compression_info(PTInstVar pvar, char *dest, int len);
 void SSH_get_mac_info(PTInstVar pvar, char *dest, int len);

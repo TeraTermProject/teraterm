@@ -292,7 +292,7 @@ ssh_keyalgo choose_SSH2_keysign_algorithm(PTInstVar pvar, ssh_keytype keytype)
 {
 	char buff[128];
 	const struct ssh2_host_key_t *ptr = ssh2_host_key;
-	char *server_proposal = pvar->server_sig_algs;
+	char *server_proposal = pvar->kex->server_sig_algs;
 
 	if (keytype == KEY_RSA) {
 		if (server_proposal == NULL) {

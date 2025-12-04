@@ -50,7 +50,7 @@
 #include "filesys_log.h"
 #include "filesys.h"  // for ProtoGetProtoFlag()
 
-#define TitLog      L"Log"
+#define TitLog      L"Logging"
 
 /*
    Line Head flag for timestamping

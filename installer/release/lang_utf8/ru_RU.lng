@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2025-11-19 by TeraTerm Project
+date=2025-11-28 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -15,7 +15,7 @@ MENU_FILE_LOG=&Лог...
 MENU_FILE_PAUSELOG=Pause Logg&ing
 MENU_FILE_COMMENTLOG=&Комментарии к логу...
 MENU_FILE_VIEWLOG=&Просмотреть лог
-MENU_FILE_SHOWLOGDIALOG=&Показать диалог...
+MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
 MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=&Передать файл...
 MENU_FILE_RECVFILE=Получить файл (&Z)...
@@ -328,6 +328,7 @@ DLG_PROT_PACKET=Пакет#:
 DLG_PROT_TRANS=Переданные байты:
 DLG_PROT_ELAPSED=Время:
 
+DLG_FILETRANS_TITLE=Послать файл
 DLG_FILETRANS_FILENAME=Имя файла:
 DLG_FILETRANS_FULLPATH=Полный путь:
 DLG_FILETRANS_TRNAS=Переданные байты:
@@ -511,6 +512,7 @@ MSG_FIND_DIR_ERROR=Не удается найти папку
 
 ; ttpfile
 ; ttfile.c
+DLG_FOPT_TITLE=Лог
 DLG_FOPT_FILENAME_TITLE=&Filename (drop file in this dialog)
 DLG_FOPT_APPEND_LABEL=Write mode
 DLG_FOPT_NEW_OVERWRITE=&New / Overwrite
@@ -546,9 +548,8 @@ DLG_GETFN_TITLE=Tera Term: Kermit
 DLG_GETFN_FILENAME=&Имя файла:
 
 ; ttftypes.h
-FILEDLG_TRANS_TITLE_LOG=Лог
-FILEDLG_TRANS_TITLE_SENDFILE=Послать файл
-FILEDLG_TRANS_TITLE_RECVFILE=Получить файл
+FILEDLG_TRANS_TITLE_LOG=Logging
+FILEDLG_TRANS_TITLE_SENDFILE=Sending file
 FILEDLG_TRANS_TITLE_KMTRCV=Kermit принять
 FILEDLG_TRANS_TITLE_KMTGET=Kermit получить
 FILEDLG_TRANS_TITLE_KMTSEND=Kermit отправить
@@ -563,6 +564,7 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus прием
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus передача
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN прием
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN передача
+FILEDLG_TRANS_TITLE_RECVFILE=Получить файл
 FILEDLG_TRANS_TITLE_RAWRCV=Получение файла
 
 ; dlg clipboard

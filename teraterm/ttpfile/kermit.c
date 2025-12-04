@@ -35,6 +35,7 @@
 #include "tttypes.h"
 #include "protolog.h"
 #include "filesys_proto.h"
+#include "filesys.h"
 
 #include "kermit.h"
 
@@ -83,6 +84,7 @@ typedef struct {
 	DWORD FileMtime;
 
 	TComm *Comm;
+	PComVar cv;
 	PFileVarProto fv;
 	TFileIO *file;
 } TKmtVar;
@@ -1233,6 +1235,7 @@ static BOOL KmtInit(TProto *pv, PComVar cv, PTTSet ts)
 		kv->KmtMy.CAPAS |= KMT_CAP_FILATTR;
 
 	/* default your parameters */
+	kv->cv = cv;
 	kv->KmtYour = kv->KmtMy;
 	kv->KmtYour.CAPAS = 0x00;
 	kv->KmtYour.MAXLX = 0;
@@ -1332,7 +1335,7 @@ static BOOL FTCreateFile(PKmtVar kv)
 	fv->InfoOp->SetDlgProtoFileName(fv, kv->FullName);
 	kv->FileOpen = file->OpenWrite(file, kv->FullName);
 	if (!kv->FileOpen) {
-		if (fv->NoMsg) {
+		if (!fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
 		}
@@ -1679,6 +1682,9 @@ static void KmtCancel(TProto *pv)
 		strlen(&(kv->PktOut[4])));
 	KmtSendPacket(kv);
 	kv->KmtMode = IdKmtQuit;
+	if (! kv->cv->Ready){
+		ProtoEnd();	// セッション断の場合は直接 ProtoEnd() を呼んでウィンドウを閉じる
+	}
 }
 
 static int SetOptV(TProto *pv, int request, va_list ap)

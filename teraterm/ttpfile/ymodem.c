@@ -34,6 +34,7 @@
 #include "ftlib.h"
 #include "protolog.h"
 #include "filesys_proto.h"
+#include "filesys.h"
 
 #include "ymodem.h"
 
@@ -76,6 +77,7 @@ typedef struct {
 	DWORD FileMtime;
 
 	TComm *Comm;
+	PComVar cv;
 	PFileVarProto fv;
 	TFileIO *file;
 } TYVar;
@@ -157,6 +159,9 @@ static void YCancel_(PYVar yv)
 
 	YWrite(yv, (PCHAR)&cancel, sizeof(cancel));
 	yv->YMode = IdYQuit;	// quit
+	if (! yv->cv->Ready){
+		ProtoEnd();	// セッション断の場合は直接 ProtoEnd() を呼んでウィンドウを閉じる
+	}
 }
 
 static void YSetOpt(PYVar yv, WORD Opt)
@@ -378,6 +383,7 @@ static BOOL YInit(TProto *pv, PComVar cv, PTTSet ts)
 	yv->TOutInitCRC = ts->YmodemTimeOutInitCRC;
 	yv->TOutVLong = ts->YmodemTimeOutVLong;
 
+	yv->cv = cv;
 	if (cv->PortType==IdTCPIP)
 	{
 		yv->TOutShort = ts->YmodemTimeOutVLong;
@@ -483,7 +489,7 @@ static BOOL FTCreateFile(PYVar yv)
 	fv->InfoOp->SetDlgProtoFileName(fv, yv->FullName);
 	yv->FileOpen = file->OpenWrite(file, yv->FullName);
 	if (!yv->FileOpen) {
-		if (fv->NoMsg) {
+		if (!fv->NoMsg) {
 			MessageBox(fv->HMainWin,"Cannot create file",
 					   "Tera Term: Error",MB_ICONEXCLAMATION);
 		}

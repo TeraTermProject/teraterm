@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Italian
-date=2025-11-19 by TeraTerm Project
+date=2025-11-28 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -15,7 +15,7 @@ MENU_FILE_LOG=&Registro eventi...
 MENU_FILE_PAUSELOG=Pausa reg&istrazione attività
 MENU_FILE_COMMENTLOG=C&ommento alla registrazione attività...
 MENU_FILE_VIEWLOG=&Visualizza registro attività
-MENU_FILE_SHOWLOGDIALOG=Vi&sualizza finestra registrazione attività...
+MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
 MENU_FILE_STOPLOG=Stop registrazione attività (&Q)
 MENU_FILE_SENDFILE=&Invia file...
 MENU_FILE_RECVFILE=Ricevi file(&Z)...
@@ -328,6 +328,7 @@ DLG_PROT_PACKET=Pacchetto#:
 DLG_PROT_TRANS=Byte trasferiti:
 DLG_PROT_ELAPSED=Tempo trascorso:
 
+DLG_FILETRANS_TITLE=Invia file
 DLG_FILETRANS_FILENAME=Nome file:
 DLG_FILETRANS_FULLPATH=Percorso completo:
 DLG_FILETRANS_TRNAS=Byte trasferiti:
@@ -511,6 +512,7 @@ MSG_FIND_DIR_ERROR=Impossibile trovare la cartella
 
 ; ttpfile
 ; ttfile.c
+DLG_FOPT_TITLE=Registro eventi
 DLG_FOPT_FILENAME_TITLE=Nome &file (trascina il file in questa finestra)
 DLG_FOPT_APPEND_LABEL=Modo scrittura
 DLG_FOPT_NEW_OVERWRITE=&Nuovo/sovrascrivi
@@ -546,9 +548,8 @@ DLG_GETFN_TITLE=Tera Term: ottieni con Kermit
 DLG_GETFN_FILENAME=Nome &file:
 
 ; ttftypes.h
-FILEDLG_TRANS_TITLE_LOG=Registro eventi
-FILEDLG_TRANS_TITLE_SENDFILE=Invia file
-FILEDLG_TRANS_TITLE_RECVFILE=Ricevi file
+FILEDLG_TRANS_TITLE_LOG=Logging
+FILEDLG_TRANS_TITLE_SENDFILE=Sending file
 FILEDLG_TRANS_TITLE_KMTRCV=Ricezione Kermit
 FILEDLG_TRANS_TITLE_KMTGET=Ottieni Kermit
 FILEDLG_TRANS_TITLE_KMTSEND=Invia Kermit
@@ -563,6 +564,7 @@ FILEDLG_TRANS_TITLE_BPRCV=Ricezione B-Plus
 FILEDLG_TRANS_TITLE_BPSEND=Invio B-Plus
 FILEDLG_TRANS_TITLE_QVRCV=Ricezione Quick-VAN
 FILEDLG_TRANS_TITLE_QVSEND=Invio Quick-VAN
+FILEDLG_TRANS_TITLE_RECVFILE=Ricevi file
 FILEDLG_TRANS_TITLE_RAWRCV=Ricezione del file
 
 ; dlg clipboard

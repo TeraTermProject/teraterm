@@ -34,14 +34,6 @@
 #include "openbsd-compat.h"
 
 
-struct ssh2_mac_t {
-	mac_algorithm id;
-	char *name;
-	digest_algorithm alg;
-	int truncatebits;	/* truncate digest if != 0 */
-	int etm;			/* Encrypt-then-MAC */
-};
-
 static const struct ssh2_mac_t ssh2_macs[] = {
 	{HMAC_SHA1,         "hmac-sha1",                     SSH_DIGEST_SHA1,      0,  0}, // RFC4253
 	{HMAC_MD5,          "hmac-md5",                      SSH_DIGEST_MD5,       0,  0}, // RFC4253

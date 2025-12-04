@@ -34,6 +34,7 @@
 #include "ftlib.h"
 #include "protolog.h"
 #include "filesys_proto.h"
+#include "filesys.h"
 
 #include "xmodem.h"
 
@@ -90,6 +91,7 @@ typedef struct {
 	} state;
 
 	TComm *Comm;
+	PComVar cv;
 	PFileVarProto fv;
 	TFileIO *file;
 } TXVar;
@@ -153,6 +155,9 @@ static void XCancel_(PXVar xv)
 
 	XWrite(xv, (PCHAR)&cancel, sizeof(cancel));
 	xv->state = STATE_CANCELED;		// quit
+	if (! xv->cv->Ready){
+		ProtoEnd();	// セッション断の場合は直接 ProtoEnd() を呼んでウィンドウを閉じる
+	}
 }
 
 static void XSetOpt(PXVar xv, WORD Opt)
@@ -309,6 +314,7 @@ static BOOL XInit(TProto *pv, PComVar cv, PTTSet ts)
 	xv->TOutInitCRC = ts->XmodemTimeOutInitCRC;
 	xv->TOutVLong = ts->XmodemTimeOutVLong;
 
+	xv->cv = cv;
 	if (cv->PortType == IdTCPIP) {
 		xv->TOutShort = ts->XmodemTimeOutVLong;
 		xv->TOutLong = ts->XmodemTimeOutVLong;

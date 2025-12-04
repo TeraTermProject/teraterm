@@ -83,7 +83,7 @@ typedef enum {
 	SSH_CIPHER_MAX = SSH2_CIPHER_CHACHAPOLY,
 } SSHCipherId;
 
-struct ssh2cipher {
+typedef struct ssh2cipher {
 	SSHCipherId id;
 	char *name;
 	u_int block_size;
@@ -92,7 +92,7 @@ struct ssh2cipher {
 	u_int iv_len;
 	u_int auth_len;
 	const EVP_CIPHER *(*func)(void);
-};
+} ssh2cipher;
 
 struct sshcipher_ctx {
 	// TTSSH では SSH_CIPHER_NONE が無効なので、plaintext は使用されない
