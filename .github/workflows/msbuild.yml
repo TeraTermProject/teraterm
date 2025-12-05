@@ -18,6 +18,73 @@ env:
   SIGNPATH_FORCE: ${{ vars.SIGNPATH_FORCE }}
 
 jobs:
+  download_libs:
+    runs-on: windows-2022
+
+    steps:
+    - name: Set timezone to JST
+      run: |
+        tzutil /s "Tokyo Standard Time"
+
+    - uses: actions/checkout@v4
+
+    - name: Calculate cache hash
+      id: cache_hash
+      shell: bash
+      run: |
+        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
+
+    - name: Restore cached files (buildtools)
+      id: cache-buildtools-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          buildtools
+        key: cache-buildtools-${{ steps.cache_hash.outputs.hash_value }}
+
+    - name: Restore cached files (libs/download)
+      id: cache-libs_download-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          libs/download
+        key: cache-libs_download-${{ steps.cache_hash.outputs.hash_value }}
+
+    - name: Install Cygwin to buildtools
+      run: |
+        chcp 932
+        buildtools/install_cygwin.bat
+
+    - name: Install Inno Setup to buildtools
+      run: |
+        chcp 932
+        buildtools/install_innosetup.bat
+
+    - name: Download
+      shell: cmd
+      env:
+        RELEASE: ${{ steps.vars.outputs.RELEASE }}
+      run: |
+        chcp 932
+        installer\release.bat 10
+
+    - name: Save cache files (buildtools)
+      id: cache-buildtools-save
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          buildtools
+        key: cache-buildtools-${{ steps.cache_hash.outputs.hash_value }}
+
+    - name: Save cache files (libs/download)
+      id: cache-libs_download-save
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          libs/download
+        key: cache-libs_download-${{ steps.cache_hash.outputs.hash_value }}
+
   build_common:
     strategy:
       matrix:
@@ -27,6 +94,8 @@ jobs:
             VS_VERSION: 2022
 
     runs-on: ${{ matrix.windows }}
+
+    needs: [download_libs]
 
     env:
       VS_VERSION: ${{ matrix.VS_VERSION }}
@@ -38,14 +107,41 @@ jobs:
 
     - uses: actions/checkout@v4
 
-    - name: Restore cached files
-      id: cache-libs-restore
+    - name: Calculate cache hash
+      id: cache_hash
+      shell: bash
+      run: |
+        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
+
+    - name: Restore cached files (buildtools)
+      id: cache-buildtools-restore
       uses: actions/cache/restore@v4
       with:
         path: |
-          libs
           buildtools
-        key: cache-common-${{ matrix.VS_VERSION }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        key: cache-buildtools-${{ steps.cache_hash.outputs.hash_value }}
+        # download_libs ジョブで保存した buildtools のキャッシュがないと止まる
+        #   このジョブでは Cygwin のインストールをしないため
+        fail-on-cache-miss: true
+
+    - name: Restore cached files (libs)
+      id: cache-libs-restore
+      uses: actions/cache/restore@v4
+      with:
+        # キャッシュに libs/download は含まれていないが、path が全く同じでないとリストアできないので !libs/download を追加
+        path: |
+          libs
+          !libs/download
+        key: cache-${{ matrix.VS_VERSION }}-common-${{ steps.cache_hash.outputs.hash_value }}
+
+    - name: Restore cached files (libs/download)
+      id: cache-libs_download-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          libs/download
+        key: cache-libs_download-${{ steps.cache_hash.outputs.hash_value }}
 
     # キャッシュから古いソースが復元されるかもしれないので、変更を取り消して最新に戻す
     - name: Revert source to state before cache restore
@@ -53,11 +149,6 @@ jobs:
         git checkout .
 
     - uses: msys2/setup-msys2@v2
-
-    - name:  Install Cygwin to buildtools
-      run: |
-        chcp 932
-        buildtools/install_cygwin.bat
 
     - name: Create buildinfo.json
       shell: bash
@@ -87,10 +178,10 @@ jobs:
       run: |
         chcp 932
         if "%RELEASE%"=="0" (
-          installer\release.bat 12
+          installer\release.bat 13
         ) else (
           rem for release build
-          installer\release.bat 10
+          installer\release.bat 11
         )
 
     - name: Upload to artifacts (teraterm_common)
@@ -113,27 +204,20 @@ jobs:
         name: buildinfo
         path: installer/buildinfo
 
-    - name: Calculate cache hash
-      id: cache_hash
-      shell: bash
-      run: |
-        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
-        echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
-
     - name: Clean up files before caching
       run: |
         chcp 932
         ci_scripts/build_appveyor_release_bat_pre_cache.bat
 
-    - name: Save cache
-      if: steps.cache-libs-restore.outputs.cache-hit != 'true'   # restore時keyが完全に一致したときtrue
+    - name: Save cache files (libs)
+      if: ${{ steps.cache-libs-restore.outputs.cache-hit != 'true' && github.event_name == 'push' }}
       id: cache-libs-save
       uses: actions/cache/save@v4
       with:
         path: |
           libs
-          buildtools
-        key: cache-common-${{ matrix.VS_VERSION }}-${{ steps.cache_hash.outputs.hash_value }}
+          !libs/download
+        key: cache-${{ matrix.VS_VERSION }}-common-${{ steps.cache_hash.outputs.hash_value }}
 
   build_arch:
     strategy:
@@ -166,14 +250,41 @@ jobs:
 
     - uses: actions/checkout@v4
 
-    - name: Restore cached files
-      id: cache-libs-restore
+    - name: Calculate cache hash
+      id: cache_hash
+      shell: bash
+      run: |
+        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
+
+    - name: Restore cached files (buildtools)
+      id: cache-buildtools-restore
       uses: actions/cache/restore@v4
       with:
         path: |
-          libs
           buildtools
-        key: cache-arch-${{ matrix.VS_VERSION }}-${{ matrix.arch }}-${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        key: cache-buildtools-${{ steps.cache_hash.outputs.hash_value }}
+        # download_libs ジョブで保存した buildtools のキャッシュがないと止まる
+        #   このジョブでは Cygwin, Inno Setup のインストールをしないため
+        fail-on-cache-miss: true
+
+    - name: Restore cached files (libs)
+      id: cache-libs-restore
+      uses: actions/cache/restore@v4
+      with:
+        # キャッシュに libs/download は含まれていないが、path が全く同じでないとリストアできないので !libs/download を追加
+        path: |
+          libs
+          !libs/download
+        key: cache-${{ matrix.VS_VERSION }}-${{ matrix.arch }}-${{ steps.cache_hash.outputs.hash_value }}
+
+    - name: Restore cached files (libs/download)
+      id: cache-libs_download-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          libs/download
+        key: cache-libs_download-${{ steps.cache_hash.outputs.hash_value }}
 
     # キャッシュから古いソースが復元されるかもしれないので、変更を取り消して最新に戻す
     - name: Revert source to state before cache restore
@@ -185,16 +296,6 @@ jobs:
       with:
         name: teraterm_common
         path: installer/Output/build/teraterm_common
-
-    - name: Install Cygwin to buildtools
-      run: |
-        chcp 932
-        buildtools/install_cygwin.bat
-
-    - name: Install Inno Setup to buildtools
-      run: |
-        chcp 932
-        buildtools/install_innosetup.bat
 
     - name: Download from artifacts (buildinfo)
       uses: actions/download-artifact@v4
@@ -247,34 +348,26 @@ jobs:
       run: |
         chcp 932
         if "%RELEASE%"=="0" (
-          installer\release.bat 13
+          installer\release.bat 14
         ) else (
           rem for release build
-          installer\release.bat 11
+          installer\release.bat 12
         )
-
-    - name: Calculate cache hash
-      id: cache_hash
-      shell: bash
-      run: |
-        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
-        echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
 
     - name: Clean up files before caching
       run: |
         chcp 932
         ci_scripts/build_appveyor_release_bat_pre_cache.bat
 
-    - name: Save cache
-      if: steps.cache-libs-restore.outputs.cache-hit != 'true'   # restore時keyが完全に一致したときtrue
+    - name: Save cache files (libs)
+      if: ${{ steps.cache-libs-restore.outputs.cache-hit != 'true' && github.event_name == 'push' }}
       id: cache-libs-save
       uses: actions/cache/save@v4
       with:
         path: |
           libs
-          buildtools
-          !buildtools/svnrev
-        key: cache-arch-${{ matrix.VS_VERSION }}-${{ matrix.arch }}-${{ steps.cache_hash.outputs.hash_value }}
+          !libs/download
+        key: cache-${{ matrix.VS_VERSION }}-${{ matrix.arch }}-${{ steps.cache_hash.outputs.hash_value }}
 
     - name: Upload to artifacts (zip)
       uses: actions/upload-artifact@v4
