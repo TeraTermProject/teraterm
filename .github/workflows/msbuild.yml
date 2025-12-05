@@ -70,7 +70,6 @@ jobs:
         installer\release.bat 10
 
     - name: Save cache files (buildtools)
-      if: ${{ steps.cache-buildtools-restore.outputs.cache-hit != 'true' && github.event_name == 'push' }}
       id: cache-buildtools-save
       uses: actions/cache/save@v4
       with:
@@ -79,7 +78,6 @@ jobs:
         key: cache-buildtools-${{ steps.cache_hash.outputs.hash_value }}
 
     - name: Save cache files (libs/download)
-      if: ${{ steps.cache-libs_download-restore.outputs.cache-hit != 'true' && github.event_name == 'push' }}
       id: cache-libs_download-save
       uses: actions/cache/save@v4
       with:
