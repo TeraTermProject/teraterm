@@ -52,13 +52,13 @@ jobs:
         key: cache-libs_download-${{ steps.cache_hash.outputs.hash_value }}
 
     - name: Install Cygwin to buildtools
-      if: ${{ steps.cache-libs-restore.outputs.cache-hit != 'true' }}
+      if: ${{ steps.cache-buildtools-restore.outputs.cache-hit != 'true' }}
       run: |
         chcp 932
         buildtools/install_cygwin.bat
 
     - name: Install Inno Setup to buildtools
-      if: ${{ steps.cache-libs-restore.outputs.cache-hit != 'true' }}
+      if: ${{ steps.cache-buildtools-restore.outputs.cache-hit != 'true' }}
       run: |
         chcp 932
         buildtools/install_innosetup.bat
