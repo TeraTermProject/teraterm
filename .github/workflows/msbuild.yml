@@ -32,7 +32,7 @@ jobs:
       id: cache_hash
       shell: bash
       run: |
-        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'libs/download.cmake') }}
         echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
 
     - name: Restore cached files (buildtools)
@@ -113,7 +113,7 @@ jobs:
       id: cache_hash
       shell: bash
       run: |
-        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'libs/download.cmake') }}
         echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
 
     - name: Restore cached files (buildtools)
@@ -256,7 +256,7 @@ jobs:
       id: cache_hash
       shell: bash
       run: |
-        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'libs/download.cmake') }}
         echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
 
     - name: Restore cached files (buildtools)
