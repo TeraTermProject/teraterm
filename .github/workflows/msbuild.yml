@@ -32,7 +32,7 @@ jobs:
       id: cache_hash
       shell: bash
       run: |
-        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'libs/download.cmake') }}
         echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
 
     - name: Restore cached files (buildtools)
@@ -52,11 +52,13 @@ jobs:
         key: cache-libs_download-${{ steps.cache_hash.outputs.hash_value }}
 
     - name: Install Cygwin to buildtools
+      if: ${{ steps.cache-buildtools-restore.outputs.cache-hit != 'true' }}
       run: |
         chcp 932
         buildtools/install_cygwin.bat
 
     - name: Install Inno Setup to buildtools
+      if: ${{ steps.cache-buildtools-restore.outputs.cache-hit != 'true' }}
       run: |
         chcp 932
         buildtools/install_innosetup.bat
@@ -111,7 +113,7 @@ jobs:
       id: cache_hash
       shell: bash
       run: |
-        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'libs/download.cmake') }}
         echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
 
     - name: Restore cached files (buildtools)
@@ -254,7 +256,7 @@ jobs:
       id: cache_hash
       shell: bash
       run: |
-        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'ci_scripts/*.cmake') }}
+        HASH_OUTPUT=${{ hashFiles('.github/workflows/msbuild.yml', 'buildtools/*.cmake', 'libs/download.cmake') }}
         echo "hash_value=$HASH_OUTPUT" >> $GITHUB_OUTPUT
 
     - name: Restore cached files (buildtools)
