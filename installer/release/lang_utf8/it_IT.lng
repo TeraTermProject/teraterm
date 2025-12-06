@@ -15,7 +15,7 @@ MENU_FILE_LOG=&Registro eventi...
 MENU_FILE_PAUSELOG=Pausa reg&istrazione attività
 MENU_FILE_COMMENTLOG=C&ommento alla registrazione attività...
 MENU_FILE_VIEWLOG=&Visualizza registro attività
-MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
+MENU_FILE_SHOWLOGDIALOG=&Visualizza finestra registro eventi...
 MENU_FILE_STOPLOG=Stop registrazione attività (&Q)
 MENU_FILE_SENDFILE=&Invia file...
 MENU_FILE_CHANGEDIR=&Cartella trasferimento file...
@@ -547,8 +547,8 @@ DLG_GETFN_TITLE=Tera Term: ottieni con Kermit
 DLG_GETFN_FILENAME=Nome &file:
 
 ; ttftypes.h
-FILEDLG_TRANS_TITLE_LOG=Logging
-FILEDLG_TRANS_TITLE_SENDFILE=Sending file
+FILEDLG_TRANS_TITLE_LOG=Registro eventi
+FILEDLG_TRANS_TITLE_SENDFILE=Invio file
 FILEDLG_TRANS_TITLE_KMTRCV=Ricezione Kermit
 FILEDLG_TRANS_TITLE_KMTGET=Ottieni Kermit
 FILEDLG_TRANS_TITLE_KMTSEND=Invia Kermit
