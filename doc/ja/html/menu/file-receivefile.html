@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Receive file ([File] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Receive file ([File] メニュー)</h1>
+    <p>
+      ホストから受信したデータをファイルに出力します。
+    </p>
+
+    <p style="padding-left: 1em;">
+      特徴
+      <ol>
+        <li>
+          scp、ftp、Kermit等によるファイル転送が出来ない環境でもバイナリデータの受信/ファイル出力が可能です。<br>
+          UNIXサーバからバイナリデータを受信する場合は、UNIXサーバ側で stty raw を実行します。<br>
+          詳細は <a href="../macro/command/recvfile.html">マクロコマンド recvfile 例</a> を参照下さい。
+        </li>
+        <li>
+          シリアル接続時、ログ出力より受信データのドロップが少なくなります。
+        </li>
+        <li>
+          ログ出力より高速です。
+        </li>
+      </ol>
+    </p>
+
+    <p>
+      メニューを選択すると "Receive file" ダイアログが表示されます。<br>
+      CTRLキーを押しながらをメニューを選択すると、
+      "Receive file" ダイアログをスキップして、ファイル選択になります。<br>
+      この場合の受信オプションは前回と同じものが使用されます。<br>
+    <p>
+
+    <p>
+      この動作は設定ファイルで変更することができます。
+      <a href="../setup/teraterm-trans.html#ReceivefileSkipOptionDialog">ファイル受信ダイアログをスキップする</a> を参照下さい。
+    </p>
+
+    <h2 id="dialog">"Receive file" ダイアログボックス</h2>
+    <dl>
+      <dt>Filename (drop file in this dialog)</dt>
+      <dd>
+        出力ファイルのファイル名を入力または選択してください。<br>
+        ダイアログにファイルをドロップすることでファイル名を入力することができます。
+      </dd>
+
+      <dt id="binary">Binary</dt>
+      <dd>
+        受信したデータをそのままファイルに出力します。<br>
+        漢字コード、改行文字の変換、制御文字の出力抑止等は行われません。(バイナリモード固定)
+      </dd>
+
+      <dt id="ReceivefileAutoStopWaitTime">Auto-stop wait time(sec)</dt>
+      <dd>
+        受信データが無い状態が指定秒数続いた場合に、ファイル出力を終了します。<br>
+        待ち時間のデフォルト値は5秒です。<br>
+        0秒を指定した場合は、ファイル出力を終了せずデータを待ち続けます。
+      </dd>
+    </dl>
+
+    <h2>"Receiving file" ダイアログボックス</h2>
+    <dl>
+      <dt>Cancel</dt>
+      <dd>
+        キャンセル ボタンを押すとファイル出力を中止します。
+      </dd>
+    </dl>
+
+    <h2 id="drop">受信データのドロップ</h2>
+    <p style="padding-left: 1em;">
+      シリアルポートから高ビットレートでデータを受信する場合、受信データをドロップする場合があります。<br>
+      PCが高負荷で Tera Term の処理が追い付かない場合に発生しがちです。<br>
+      <a href="../usage/tips/data_drop.html#solution">対処方法</a>を参照下さい。
+    </p>
+
+  </body>
+</html>

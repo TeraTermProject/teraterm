@@ -101,6 +101,7 @@
 #include "codeconv.h"
 #include "sendmem.h"
 #include "sendfiledlg.h"
+#include "recvfiledlg.h"
 #include "setting.h"
 #include "broadcast.h"
 #include "asprintf.h"
@@ -1039,6 +1040,7 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		{ ID_FILE_PAUSELOG, "MENU_FILE_PAUSELOG" },
 		{ ID_FILE_STOPLOG, "MENU_FILE_STOPLOG" },
 		{ ID_FILE_SENDFILE, "MENU_FILE_SENDFILE" },
+		{ ID_FILE_RECVFILE, "MENU_FILE_RECVFILE" },
 		{ ID_FILE_REPLAYLOG, "MENU_FILE_REPLAYLOG" },
 		{ ID_FILE_CHANGEDIR, "MENU_FILE_CHANGEDIR" },
 		{ ID_FILE_PRINT2, "MENU_FILE_PRINT" },
@@ -1158,12 +1160,14 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		if ( (! cv.Ready) || (!IsSendVarNULL()) ||
 		     (!IsFileVarNULL()) || (cv.PortType==IdFile) ) {
 			EnableMenuItem(FileMenu,ID_FILE_SENDFILE,MF_BYCOMMAND | MF_GRAYED);
+			EnableMenuItem(FileMenu,ID_FILE_RECVFILE,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_TRANSFER,MF_BYPOSITION | MF_GRAYED); /* Transfer */
 			EnableMenuItem(FileMenu,ID_FILE_DISCONNECT,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_DUPLICATESESSION,MF_BYCOMMAND | MF_GRAYED);
 		}
 		else {
 			EnableMenuItem(FileMenu,ID_FILE_SENDFILE,MF_BYCOMMAND | MF_ENABLED);
+			EnableMenuItem(FileMenu,ID_FILE_RECVFILE,MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_TRANSFER,MF_BYPOSITION | MF_ENABLED); /* Transfer */
 			EnableMenuItem(FileMenu,ID_FILE_DISCONNECT,MF_BYCOMMAND | MF_ENABLED);
 			if (ts.DisableMenuDuplicateSession || cv.PortType==IdSerial) {
@@ -1788,6 +1792,7 @@ void CVTWindow::OnDestroy()
 	EndDisp(vt_src);
 	vt_src = NULL;
 	sendfiledlgUnInit();
+	recvfiledlgUnInit();
 	FLogOpenDialogUnInit();
 
 	FreeBuffer();
@@ -3779,6 +3784,24 @@ LRESULT CVTWindow::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+LRESULT CVTWindow::OnIdleTimer(WPARAM wParam, LPARAM lParam)
+{
+	// TalkStatus が IdTalkSendMem の状態で連続して OnIdle() を呼びだすと
+	// ファイル転送ダイアログと VTwindow の操作がままならなくなるため、
+	// TalkStatus が IdTalkKeyb か IdTalkQuiet の場合のみ OnIdle() を呼びだす。
+	if (cv.PortType == IdSerial && (TalkStatus == IdTalkKeyb || TalkStatus == IdTalkQuiet)) {
+		int i = IdleLoopCount;
+		while (OnIdle(0)) {
+			if (--i <= 0) {
+				break;
+			}
+		}
+	}
+	DeleteTimerQueueTimer(NULL, hIdleTimer, NULL);
+	CreateTimerQueueTimer(&hIdleTimer, NULL, IdleTimerProc, 0, IdleTimerPeriod, 0, WT_EXECUTEDEFAULT);
+	return 0;
+}
+
 /**
  *	新しい接続
  *
@@ -4275,6 +4298,35 @@ void CVTWindow::OnFileSend()
 		HelpId = HlpFileSend;
 		FileSendStart(filename, data.binary);
 	}
+	free(filename);
+}
+
+void CVTWindow::OnFileRecv()
+{
+	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
+				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
+	recvfiledlgdata data = {};
+	data.UILanguageFileW = ts.UILanguageFileW;
+	wchar_t *filterW = ToWcharA(ts.FileReceiveFilter);
+	data.filerecv_filter = filterW;
+	wchar_t *initial_dir = GetFileDir(&ts);
+	data.initial_dir = initial_dir;
+	data.skip_dialog = (BOOL)ts.ReceivefileSkipOptionDialog;
+	data.binary = TRUE;											// バイナリモード固定
+	data.autostop_sec = ts.ReceivefileAutoStopWaitTime;
+
+	INT_PTR ok = recvfiledlg(m_hInst, m_hWnd, &data);
+	free(initial_dir);
+	free(filterW);
+	if (ok != IDOK) {
+		return;
+	}
+	ts.ReceivefileSkipOptionDialog = data.skip_dialog;
+	ts.TransBin = data.binary;
+	ts.ReceivefileAutoStopWaitTime = data.autostop_sec;
+
+	wchar_t *filename = data.filename;
+	RawStartReceive(filename, ts.ReceivefileAutoStopWaitTime, FALSE);
 	free(filename);
 }
 
@@ -5389,6 +5441,9 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_USER_DROPNOTIFY:
 		OnDropNotify(wp, lp);
 		break;
+	case WM_USER_IDLETIMER:
+		OnIdleTimer(wp, lp);
+		break;
 	case WM_GETDPISCALEDSIZE:
 		retval = OnDpiChanged(wp, lp, TRUE);
 		break;
@@ -5411,6 +5466,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_FILE_STOPLOG: OnStopLog(); break;
 		case ID_FILE_REPLAYLOG: OnReplayLog(); break;
 		case ID_FILE_SENDFILE: OnFileSend(); break;
+		case ID_FILE_RECVFILE: OnFileRecv(); break;
 		case ID_FILE_KERMITRCV: OnFileKermitRcv(); break;
 		case ID_FILE_KERMITGET: OnFileKermitGet(); break;
 		case ID_FILE_KERMITSEND: OnFileKermitSend(); break;

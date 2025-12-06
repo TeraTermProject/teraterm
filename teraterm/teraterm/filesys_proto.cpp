@@ -59,6 +59,7 @@
 #include "zmodem.h"
 #include "bplus.h"
 #include "quickvan.h"
+#include "raw.h"
 
 typedef enum {
 	PROTO_KMT = 1,
@@ -67,6 +68,7 @@ typedef enum {
 	PROTO_BP = 4,
 	PROTO_QV = 5,
 	PROTO_YM = 6,
+	PROTO_RAW = 7,
 } ProtoId_t;
 
 #define TitKmtRcv   L"Kermit Receive"
@@ -81,6 +83,7 @@ typedef enum {
 #define TitZSend    L"ZMODEM Send"
 #define TitQVRcv    L"Quick-VAN Receive"
 #define TitQVSend   L"Quick-VAN Send"
+#define TitRawRcv   L"Receiving file"
 
 #define IsXoptCRC(x)	((x) & 2)
 #define IsXopt1k(x)	(((x)-1) & 2)
@@ -218,8 +221,10 @@ static int BinaryOut(struct Comm_ *comm, const CHAR *buf, size_t len)
 static void FlashReceiveBuf(struct Comm_ *comm)
 {
 	PComVar pcv = (PComVar)comm->private_data;
+	EnterCriticalSection(&pcv->InBuff_lock);
 	pcv->InBuffCount = 0;
 	pcv->InPtr = 0;
+	LeaveCriticalSection(&pcv->InBuff_lock);
 }
 
 static const CommOp CommOpList =  {
@@ -349,6 +354,13 @@ static BOOL OpenProtoDlg(PFileVarProto fv, ProtoId_t IdProto, int Mode, WORD Opt
 				return FALSE;
 			}
 			proto->Op->SetOpt(proto, QUICKVAN_MODE, Mode);
+			break;
+		case PROTO_RAW:
+			proto = RawCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, RAW_AUTOSTOP_SEC, Opt1);
 			break;
 		default:
 			assert(FALSE);
@@ -795,7 +807,11 @@ int ProtoDlgParse(void)
 	if (PtDlg==NULL)
 		return P;
 
-	CommReceive(&cv); //ダイアログ表示中に受信したデータを処理できるように読み取りを行わせる
+	if (cv.PortType == IdSerial) {
+		// シリアル接続では、別スレッド CommThread() で読み出しを行っているため、CommReceive()の呼び出しは不要
+	} else {
+		CommReceive(&cv); //ダイアログ表示中に受信したデータを処理できるように読み取りを行わせる
+	}
 
 	PFileVarProto fv = FileVar;
 	if (fv->Proto->Op->Parse(fv->Proto))
@@ -1790,6 +1806,50 @@ BOOL QVStartSend(const wchar_t *filename)
 	cv.DelayFlag = FALSE;
 
 	if (! OpenProtoDlg(FileVar,PROTO_QV,IdQVSend,0,0)) {
+		ProtoEnd();
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+BOOL RawStartReceive(const wchar_t *filename, int autostop_sec, BOOL macro)
+{
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar_(&FileVar)) {
+		return FALSE;
+	}
+
+	if (macro) {
+		FileVar->NoMsg = TRUE;
+	}
+
+	TFileVarProto *fv = FileVar;
+	FileVar->OpId = OpRawRcv;
+
+	SetDialogCation(fv, "FILEDLG_TRANS_TITLE_RAWRCV", TitRawRcv);
+
+	assert(filename);
+	if (IsRelativePathW(filename)) {
+		wchar_t *fullpath = GetFileDir(&ts);
+		awcscats(&fullpath, L"\\", filename, NULL);
+		fv->FileNames = MakeStrArrayFromStr(fullpath);
+		free(fullpath);
+	} else {
+		fv->FileNames = MakeStrArrayFromStr(filename);
+	}
+
+	if (! ProtoStart())
+		return FALSE;
+
+	TalkStatus = IdTalkQuiet;
+
+	/* disable transmit delay (serial port) */
+	cv.DelayFlag = FALSE;
+
+	if (! OpenProtoDlg(FileVar,PROTO_RAW,0,autostop_sec,0)) {
 		ProtoEnd();
 		return FALSE;
 	}

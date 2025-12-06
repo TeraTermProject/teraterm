@@ -3555,6 +3555,33 @@ static WORD TTLRecvLn(void)
 	return 0;
 }
 
+static WORD TTLRecvFile(void)
+{
+	TStrVal Str;
+	WORD Err;
+	int BinFlag, AutoStopWaitTime;
+
+	Err = 0;
+	GetStrVal(Str, &Err);
+	GetIntVal(&BinFlag, &Err);
+	GetIntVal(&AutoStopWaitTime, &Err);
+	if ((Err==0) &&
+	    ((strlen(Str)==0) || (GetFirstChar()!=0)))
+		Err = ErrSyntax;
+
+	if (Err!=0) return Err;
+
+	BinFlag = 1; // binaryモード固定
+	if (AutoStopWaitTime < 0) {
+		AutoStopWaitTime = 0;
+	}
+
+	SetFile(Str);
+	SetBinary(BinFlag);
+	SetRecvFileOption(AutoStopWaitTime);
+	return SendCmnd(CmdRecvFile, IdTTLWaitCmndResult);
+}
+
 static WORD TTLRegexOption(void)
 {
 	TStrVal Str;
@@ -6211,6 +6238,8 @@ static int ExecCmnd(void)
 			Err = TTLRandom(); break;
 		case RsvRecvLn:
 			Err = TTLRecvLn(); break;
+		case RsvRecvFile:
+			Err = TTLRecvFile(); break;
 		case RsvRegexOption:
 			Err = TTLRegexOption(); break;
 		case RsvRestoreSetup:

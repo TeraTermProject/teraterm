@@ -94,6 +94,8 @@
 #define CmdGetTTPos         'd'
 #define CmdSetSerialDelayChar 'e'
 #define CmdSetSerialDelayLine 'f'
+#define CmdSetRecvFileOpt   'g'
+#define CmdRecvFile         'h'
 
 #define LogOptBinary        1
 #define LogOptAppend        2

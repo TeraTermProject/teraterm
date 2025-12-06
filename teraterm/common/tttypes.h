@@ -84,6 +84,7 @@ typedef enum {
 #define WM_USER_CHANGETITLE  WM_USER+14
 #define WM_USER_NOTIFYICON   WM_USER+15
 #define WM_USER_DROPNOTIFY   WM_USER+16
+#define WM_USER_IDLETIMER    WM_USER+17
 
 #define WM_USER_DDEREADY     WM_USER+21
 #define WM_USER_DDECMNDEND   WM_USER+22
@@ -607,6 +608,9 @@ struct tttset {
 	WORD VTDrawAPI;
 	WORD VTDrawAnsiCodePage_ini;		// ini保存時、TRUEの時ACP=0で保存する
 	WORD VTDrawAnsiCodePage;
+	char FileReceiveFilter[128];
+	WORD ReceivefileSkipOptionDialog;
+	int ReceivefileAutoStopWaitTime;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;
@@ -763,7 +767,7 @@ typedef struct tttset TTTSet, *PTTSet;
 #define PM   0x9E
 #define APC  0x9F
 
-#define InBuffSize  1024
+#define InBuffSize  (1024*16)
 #define OutBuffSize (1024*16)
 
 typedef struct {
@@ -860,6 +864,8 @@ typedef struct {
 
 	void *StateSend;
 	void *StateEcho;
+
+	CRITICAL_SECTION InBuff_lock;
 } TComVar;
 typedef TComVar *PComVar;
 
@@ -879,7 +885,7 @@ typedef TComVar *PComVar;
 #define ID_WINDOW_UNDO         50816
 #define ID_TEKWINDOW_WINDOW    51810
 
-#define ID_TRANSFER      11 // the position on [File] menu
+#define ID_TRANSFER      12 // the position on [File] menu
 #define ID_SHOWMENUBAR   995
 
 #define MAXNWIN 256

@@ -18,6 +18,7 @@ MENU_FILE_VIEWLOG=&Visualizza registro attività
 MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
 MENU_FILE_STOPLOG=Stop registrazione attività (&Q)
 MENU_FILE_SENDFILE=&Invia file...
+MENU_FILE_RECVFILE=Ricevi file(&Z)...
 MENU_FILE_CHANGEDIR=&Cartella trasferimento file...
 MENU_FILE_REPLAYLOG=&Riproduci registro attività...
 MENU_FILE_PRINT=&Stampa...\tAlt+P
@@ -563,6 +564,8 @@ FILEDLG_TRANS_TITLE_BPRCV=Ricezione B-Plus
 FILEDLG_TRANS_TITLE_BPSEND=Invio B-Plus
 FILEDLG_TRANS_TITLE_QVRCV=Ricezione Quick-VAN
 FILEDLG_TRANS_TITLE_QVSEND=Invio Quick-VAN
+FILEDLG_TRANS_TITLE_RECVFILE=Ricevi file
+FILEDLG_TRANS_TITLE_RAWRCV=Ricezione del file
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: conferma appunti
@@ -612,6 +615,11 @@ DLG_SENDFILE_READING_METHOD_BULK=Lett&ura contemporanea
 DLG_SENDFILE_READING_METHOD_SEQUENTIAL=Lettura se&quenziale
 DLG_SENDFILE_READING_METOHD_TOOLTIP=Lettura contemporanea:\n- Invia durante la lettura da un file.\n- Il file testo viene letto come codifica ACP e non è determinata automaticamente.\nLettura sequenziale:\n- Il file è letto in memoria e quindi inviato.\n- La codifica del file testo è determinata automaticamente.\n
 DLG_SENDFILE_BINARY=&Binario
+
+; receivefile
+DLG_RECVFILE_FILENAME_TITLE=&Nome file (trascina il file in questa finestra di dialogo)
+DLG_RECVFILE_BINARY=&Binario
+DLG_RECVFILE_AUTOSTOP_LABEL=&Tempo di attesa per arresto automatico (sec)
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=Anteprima/file

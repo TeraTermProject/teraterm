@@ -18,6 +18,7 @@ MENU_FILE_VIEWLOG=&Kaydı Görüntüle
 MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
 MENU_FILE_STOPLOG=Kaydı Durdur (&Q)
 MENU_FILE_SENDFILE=&Dosya Gönder...
+MENU_FILE_RECVFILE=Resim dosyası al (&Z)...
 MENU_FILE_CHANGEDIR=&Dizini Değiştir...
 MENU_FILE_REPLAYLOG=&Kaydı Tekrarla...
 MENU_FILE_PRINT=&Yazdır...\tAlt+P
@@ -563,6 +564,8 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus Al
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus Gönder
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN Al
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN Gönder
+FILEDLG_TRANS_TITLE_RECVFILE=Dosya al
+FILEDLG_TRANS_TITLE_RAWRCV=Dosya alınıyor
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: Pano onayı
@@ -612,6 +615,11 @@ DLG_SENDFILE_READING_METHOD_BULK=&Toplu okuma
 DLG_SENDFILE_READING_METHOD_SEQUENTIAL=&Sıralı okuma
 DLG_SENDFILE_READING_METOHD_TOOLTIP=Toplu okuma:\n- Dosyadan okurken gönder.\n- Metin dosyası ACP kodlaması olarak okunur ve otomatik olarak belirlenmez.\nSıralı okuma:\n- Dosya belleğe okunur ve sonra gönderilir.\n- Metin dosyalarının kodlaması otomatik olarak belirlenir.\n
 DLG_SENDFILE_BINARY=&İkili
+
+; receivefile
+DLG_RECVFILE_FILENAME_TITLE=&Dosya adı (bu iletişim kutusuna dosyayı sürükleyin)
+DLG_RECVFILE_BINARY=&İkili
+DLG_RECVFILE_AUTOSTOP_LABEL=&Otomatik durdurma bekleme süresi (sn)
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=Önizleme/Dosya

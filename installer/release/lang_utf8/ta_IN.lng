@@ -18,6 +18,7 @@ MENU_FILE_VIEWLOG=&பதிவைக் காண்க
 MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
 MENU_FILE_STOPLOG=பதிவு செய்வதை நிறுத்து (&ஆ)
 MENU_FILE_SENDFILE=&கோப்பை அனுப்பு...
+MENU_FILE_RECVFILE=Rஏற்கனவே கோப்பு பெற (&Z)...
 MENU_FILE_CHANGEDIR=&கோப்பகத்தை மாற்று...
 MENU_FILE_REPLAYLOG=&மறுஇயக்கு பதிவு...
 MENU_FILE_PRINT=&அச்சிடு...\tமாற்று+ண
@@ -563,6 +564,8 @@ FILEDLG_TRANS_TITLE_BPRCV=பி-கூட்டல் பெறுதல்
 FILEDLG_TRANS_TITLE_BPSEND=பி-கூட்டல் அனுப்பு
 FILEDLG_TRANS_TITLE_QVRCV=விரைவு-வேன் பெறுதல்
 FILEDLG_TRANS_TITLE_QVSEND=விரைவு-வேன் அனுப்பு
+FILEDLG_TRANS_TITLE_RECVFILE=கோப்பு பெற
+FILEDLG_TRANS_TITLE_RAWRCV=கோப்பைப் பெறுகிறது
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=தேரா முனை: இடைநிலைப் பலகை உறுதிப்படுத்தல்
@@ -612,6 +615,11 @@ DLG_SENDFILE_READING_METHOD_BULK=B&ulk read
 DLG_SENDFILE_READING_METHOD_SEQUENTIAL=Se&quential read
 DLG_SENDFILE_READING_METOHD_TOOLTIP=Bulk read:\n- Send while reading from a file.\n- Textfile is read as ACP encoding and is not automatically determined.\nSequencal read:\n- File is read into memory and then sent.\n- Encoding of text files is automatically determined.\n
 DLG_SENDFILE_BINARY=&Binary
+
+; receivefile
+DLG_RECVFILE_FILENAME_TITLE=&கோப்பு பெயர் (இந்த உரையாடல் பெட்டியில் கோப்பை இழுக்கவும்)
+DLG_RECVFILE_BINARY=&இருமை
+DLG_RECVFILE_AUTOSTOP_LABEL=&தானாக நிறுத்தும் காத்திருப்பு நேரம் (வினாடிகள்)
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=முன்னோட்டம்/கோப்பு

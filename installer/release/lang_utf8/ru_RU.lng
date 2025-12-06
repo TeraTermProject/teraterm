@@ -18,6 +18,7 @@ MENU_FILE_VIEWLOG=&Просмотреть лог
 MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
 MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=&Передать файл...
+MENU_FILE_RECVFILE=Получить файл (&Z)...
 MENU_FILE_CHANGEDIR=&Изменить путь...
 MENU_FILE_REPLAYLOG=&Воспроизвести лог...
 MENU_FILE_PRINT=&Печать...\tAlt+P
@@ -563,6 +564,8 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus прием
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus передача
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN прием
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN передача
+FILEDLG_TRANS_TITLE_RECVFILE=Получить файл
+FILEDLG_TRANS_TITLE_RAWRCV=Получение файла
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: Буфер обмена
@@ -612,6 +615,11 @@ DLG_SENDFILE_READING_METHOD_BULK=B&ulk read
 DLG_SENDFILE_READING_METHOD_SEQUENTIAL=Se&quential read
 DLG_SENDFILE_READING_METOHD_TOOLTIP=Bulk read:\n- Send while reading from a file.\n- Textfile is read as ACP encoding and is not automatically determined.\nSequencal read:\n- File is read into memory and then sent.\n- Encoding of text files is automatically determined.\n
 DLG_SENDFILE_BINARY=&Binary
+
+; receivefile
+DLG_RECVFILE_FILENAME_TITLE=&Имя файла (перетащите файл в это окно)
+DLG_RECVFILE_BINARY=&Двоичный
+DLG_RECVFILE_AUTOSTOP_LABEL=&Автоостановка время ожидания (сек)
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=Preview/File

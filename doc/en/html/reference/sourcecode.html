@@ -759,7 +759,9 @@ Certain macro commands (like "wait" and few others) need to analyze the data rec
 <img src="image/dde_flowcontrol.png" width=720 height=540>
 </div>
 
-Tera Term core sends the data from the remote host to macro program via DDE communication (DDE transaction). Initially TCP packet received from a remote host will be detected by OnIdle()#teraterm.cpp loop. OnIdle() then calls CommReceive()#commlib.c which places TCP packet into the buffer (cv->InBuff[]). The size of this buffer is 1KB. It is not a ring buffer and once it fills up, it won't be able to store more packets. If this happens Windows kernel will start accumulating received TCP packets, but if the buffer remains full for a long time, eventually we will start loosing packets from the remote host. <br>
+Tera Term core sends the data from the remote host to macro program via DDE communication (DDE transaction). Initially TCP packet received from a remote host will be detected by OnIdle()#teraterm.cpp loop. OnIdle() then calls CommReceive()#commlib.c which places TCP packet into the buffer (cv->InBuff[]). The size of this buffer is 16KB. It is not a ring buffer and once it fills up, it won't be able to store more packets. If this happens Windows kernel will start accumulating received TCP packets, but if the buffer remains full for a long time, eventually we will start loosing packets from the remote host. <br>
+
+Received data from the serial port will be dropped if reading from the UART chip cannot keep up. If you hold down the left mouse button on the title bar of the VT window and do not move the mouse, or if you display the menu of the toolbar, it enters a modal loop that hands control to the OS itself, blocking the normal message loop, which prevents OnIdle() in teraterm.cpp from being executed. To ensure that data can still be received even in this state, OnIdle() in teraterm.cpp is called at regular intervals from the timer in addition to being part of the idle loop.<br>
 
 Log collection, escape sequence analysis and macro execution related operations require data buffering. In all these cases Tera Term uses LogPut1() function to place data into DDE buffer cv.LogBuf[]. In other words, the logging and macro executing functions share the same buffer. The size of this buffer is 1KB and this is ring buffer, i.e the oldest data will be overwritten if the buffer is full. <br>
 
@@ -877,7 +879,7 @@ The function recv() responsible for receiving packets is part of Tera Term core 
 
 Tera Term core contains idle loop OnIdle()#teraterm.cpp that constantly checks if new packets have arrived and need to be processed. CommReceive() function calls recv(). TTSSH adds the hook and replaces socket function recv() with its own function TTXrecv()#ttxssh.c. <br>
 
-When CommReceive() calls recv() and passes free pointer and the size of the buffer (cv->InBuff[]) as the arguments. Buffer size is 1KB, which means buffer size value received by TTXrecv() will be in the range 1-1024 bytes. <br>
+When CommReceive() calls recv() and passes free pointer and the size of the buffer (cv->InBuff[]) as the arguments. Buffer size is 16KB, which means buffer size value received by TTXrecv() will be in the range 1-16384 bytes. <br>
 
 Then, when PKT_recv() is called by TTXrecv (), the processing becomes a bit more complicated. Below sequence shows handling of the packets when SSH connection is being established.
 

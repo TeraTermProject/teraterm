@@ -69,6 +69,7 @@ static BOOL AddFontFlag;
 static wchar_t *TSpecialFont;
 CVTWindow* pVTWin;
 static DWORD HtmlHelpCookie;
+HANDLE hIdleTimer;
 
 static void LoadSpecialFont(void)
 {
@@ -134,7 +135,7 @@ static void init(void)
  *	@retval	FALSE	すぐに処理する必要なし
  *	@retval	TRUE	引き続き処理する必要あり
  */
-static BOOL OnIdle(LONG lCount)
+BOOL OnIdle(LONG lCount)
 {
 	int nx, ny;
 	BOOL Size;
@@ -224,7 +225,12 @@ static BOOL OnIdle(LONG lCount)
 			// 上書きしてしまう可能性がある。(2007.6.14 yutaka)
 
 		} else {
-			CommReceive(&cv);
+			if (cv.PortType == IdSerial) {
+				// シリアル接続では、別スレッド CommThread() でCOMポートから読み出しを行っているため、
+				// CommReceive() の呼び出しは不要。
+			} else {
+				CommReceive(&cv);
+			}
 		}
 
 	}
@@ -315,6 +321,7 @@ void RemoveModelessHandle(HWND hWnd)
 	modeless_dlg.Remove(hWnd);
 }
 
+#if 0 // not used
 static UINT nMsgLast;
 static POINT ptCursorLast;
 
@@ -345,6 +352,12 @@ static BOOL IsIdleMessage(const MSG* pMsg)
 	}
 
 	return TRUE;
+}
+#endif
+
+VOID CALLBACK IdleTimerProc(PVOID lpParam, BOOLEAN TimerOrWaitFired)
+{
+	SendMessage(main_window, WM_USER_IDLETIMER, 0, 0);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
@@ -378,6 +391,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 
+	CreateTimerQueueTimer(&hIdleTimer, NULL, IdleTimerProc, 0, IdleTimerPeriod, 0, WT_EXECUTEDEFAULT);
+
 	LONG lCount = 0;
 	MSG msg;
 	for (;;) {
@@ -385,11 +400,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 		DWORD idle_enter_tick = GetTickCount();
 		BOOL sleep_enable = FALSE;
 		for (;;) {
-			if (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) != FALSE) {
-				// メッセージが存在する
-				break;
-			}
-
 			// idle処理を行う
 			//		- GetMessage()でブロックすると、
 			//		  ウィンドウ非表示時にidle処理ができない
@@ -414,6 +424,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 			else {
 				idle_enter_tick = GetTickCount();
 				sleep_enable = FALSE;
+			}
+
+			if (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) != FALSE) {
+				// メッセージが存在する
+				break;
 			}
 		}
 
@@ -444,10 +459,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				}
 			}
 
-			// idle状態に入るか?
-			if (IsIdleMessage(&msg)) {
-				lCount = 0;
-			}
+//			// idle状態に入るか?
+//			if (IsIdleMessage(&msg)) {
+//				lCount = 0;
+//			}
 
 			if (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) == FALSE) {
 				// メッセージがなくなった
@@ -456,6 +471,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 		}
 	}
 exit_message_loop:
+
+	DeleteTimerQueueTimer(NULL, hIdleTimer, NULL);
 
 	delete m_pMainWnd;
 	m_pMainWnd = NULL;

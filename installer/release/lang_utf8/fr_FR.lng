@@ -18,6 +18,7 @@ MENU_FILE_VIEWLOG=&Voir le Journal
 MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
 MENU_FILE_STOPLOG=Stop Logging (&Q)
 MENU_FILE_SENDFILE=&Envoyer un fichier...
+MENU_FILE_RECVFILE=Recevoir le fichier (&Z)...
 MENU_FILE_CHANGEDIR=&Changer de dossier...
 MENU_FILE_REPLAYLOG=&Réafficher le journal...
 MENU_FILE_PRINT=&Imprimer...\tAlt+P
@@ -563,6 +564,8 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus Recevoir
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus Envoyer
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN Recevoir
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN Envoyer
+FILEDLG_TRANS_TITLE_RECVFILE=Recevoir fichier
+FILEDLG_TRANS_TITLE_RAWRCV=Réception du fichier
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: Confirmation Presse-papiers
@@ -612,6 +615,11 @@ DLG_SENDFILE_READING_METHOD_BULK=B&ulk read
 DLG_SENDFILE_READING_METHOD_SEQUENTIAL=Se&quential read
 DLG_SENDFILE_READING_METOHD_TOOLTIP=Bulk read:\n- Send while reading from a file.\n- Textfile is read as ACP encoding and is not automatically determined.\nSequencal read:\n- File is read into memory and then sent.\n- Encoding of text files is automatically determined.\n
 DLG_SENDFILE_BINARY=&Binary
+
+; receivefile
+DLG_RECVFILE_FILENAME_TITLE=&Nom de fichier (déposez le fichier dans cette boîte de dialogue)
+DLG_RECVFILE_BINARY=&Binaire
+DLG_RECVFILE_AUTOSTOP_LABEL=&Temps d'attente d'arrêt automatique (sec)
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=Preview/File

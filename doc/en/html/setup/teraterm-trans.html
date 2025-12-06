@@ -223,7 +223,7 @@ XMODEM timeout value can be specified in seconds.
 2nd  ... CRC mode: Timeout value for first packet <br>
 3rd  ... Timeout short time <br>
 4th  ... Timeout long time <br>
-5th  ... Timeout very long time 
+5th  ... Timeout very long time
 </p>
 
 <pre>
@@ -259,7 +259,7 @@ YMODEM timeout value can be specified in seconds.
 2nd  ... CRC mode: Timeout value for first packet <br>
 3rd  ... Timeout short time <br>
 4th  ... Timeout long time <br>
-5th  ... Timeout very long time 
+5th  ... Timeout very long time
 </p>
 
 <pre>
@@ -390,7 +390,7 @@ ZMODEM timeout value can be specified in seconds.
 1st  ... Timeout value for serial port <br>
 2nd  ... Timeout value for TCP/IP port <br>
 3rd  ... Timeout value for initial packet <br>
-4th  ... Timeout value for final packet 
+4th  ... Timeout value for final packet
 </p>
 
 <pre>
@@ -400,7 +400,7 @@ ZmodemTimeouts=10,0,10,3
 <h1 id="filter">File name filter for send file dialog</h1>
 
 <p>
-To apply user define filter for "types of file" on send file dialog, edit the following line in the [Tera Term] section of the setup file like the following: 
+To apply user define filter for "types of file" on send file dialog, edit the following line in the [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
@@ -410,6 +410,22 @@ FileSendFilter=*.txt;a.log
 <pre>
 default:
 FileSendFilter=
+</pre>
+
+
+<h1 id="FileReceiveFilter">File name filter for receive file dialog</h1>
+
+<p>
+To apply user define filter for "types of file" on receive file dialog, edit the following line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+FileReceiveFilter=*.txt;a.log
+</pre>
+
+<pre>
+default:
+FileReceiveFilter=
 </pre>
 
 
@@ -458,7 +474,7 @@ The file content is sent as 8KB at at time on the special condition to resolve t
 Condition:
 Serial connection
 Binary flag on
-Not Bracketed Paste Mode 
+Not Bracketed Paste Mode
 Telnet flag off
 LocalEcho off
 Speed 115200 over
@@ -500,6 +516,26 @@ SendfileSkipOptionDialog=off
 </pre>
 
 When [File]-[Send file...] is selected with holding down CTRL key,
+You can temporarily switch on/off behavior.
+
+
+<h1 id="ReceivefileSkipOptionDialog">Skip Receive file dialog</h1>
+
+<p>
+When <a href="../menu/file-receivefile.html">[File]-[Receive file...]</a> is selected, Receive file dialog box appears.<br>
+If same options are always used, you can receive files only by file selection.
+</p>
+
+<pre>
+ReceivefileSkipOptionDialog=on
+</pre>
+
+<pre>
+default:
+ReceivefileSkipOptionDialog=off
+</pre>
+
+When [File]-[Receive file...] is selected with holding down CTRL key,
 You can temporarily switch on/off behavior.
 
 </BODY>
