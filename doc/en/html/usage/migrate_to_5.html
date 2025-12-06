@@ -78,7 +78,8 @@
             <li>cygterm.cfg is not using Win32API.</li>
           </ul>
         </li>
-        <li>Tera Term 5 automatically converts character encoding of TERATERM.INI files to UTF-16 (with LE BOM) when Tera Term 5 starts if TERATERM.INI is not UTF-16 (with LE BOM).<br>
+        <li>If the TERATERM.INI file in the default configuration folder is not UTF-16 (with LE BOM), Tera Term 5 automatically converts to UTF-16 (with LE BOM).<br>
+            The setup file specified by the <a href="../commandline/teraterm.html#f">/F=</a> command line option is not converted.</li>
             Before conversion, original ini file is backed up.</li>
         <li>Tera Term 5 uses UTF-16 (with LE BOM) character encoding saving setup file (TERATERM.INI).</li>
       </ul>
