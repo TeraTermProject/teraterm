@@ -106,6 +106,7 @@ static int CloseSocket(SOCKET s)
 #define CommOutQueSize 4096
 #define CommXonLim 768
 #define CommXoffLim 3328
+#define CommWriteLimit 0	// WriteFile制限 0=制限しない/1～=送信バイト数制限
 
 #define READENDNAME "ReadEnd"
 #define WRITENAME "Write"
@@ -161,7 +162,23 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 	EnterCriticalSection(&cv->InBuff_lock);
 
 	ClearCommError(cv->ComID,&DErr,NULL);
+	{
+		COMMPROP CommProp;
+		GetCommProperties(cv->ComID, &CommProp);
+		OutputDebugPrintf("dwMaxTxQueue=%d\n",CommProp.dwMaxTxQueue);
+		OutputDebugPrintf("dwCurrentTxQueue=%d\n",CommProp.dwCurrentTxQueue);
+		OutputDebugPrintf("dwMaxRxQueue=%d\n",CommProp.dwMaxRxQueue);
+		OutputDebugPrintf("dwCurrentRxQueue=%d\n",CommProp.dwCurrentRxQueue);
+	}
 	SetupComm(cv->ComID,CommInQueSize,CommOutQueSize);
+	{
+		COMMPROP CommProp;
+		GetCommProperties(cv->ComID, &CommProp);
+		OutputDebugPrintf("dwMaxTxQueue=%d\n",CommProp.dwMaxTxQueue);
+		OutputDebugPrintf("dwCurrentTxQueue=%d\n",CommProp.dwCurrentTxQueue);
+		OutputDebugPrintf("dwMaxRxQueue=%d\n",CommProp.dwMaxRxQueue);
+		OutputDebugPrintf("dwCurrentRxQueue=%d\n",CommProp.dwCurrentRxQueue);
+	}
 	/* flush input and output buffers */
 	if (ClearBuff) {
 		PurgeComm(cv->ComID, PURGE_TXABORT | PURGE_RXABORT |
@@ -1069,7 +1086,13 @@ void CommSend(PComVar cv)
 			break;
 		case IdSerial:
 			ClearCommError(cv->ComID,&DErr,&Stat);
+			//OutputDebugPrintf("cbOutQue:%d\n", Stat.cbOutQue);
 			Max = OutBuffSize - Stat.cbOutQue;
+			if (CommWriteLimit != 0) {
+				if (Max > CommWriteLimit) {
+					Max = CommWriteLimit;
+				}
+			}
 			break;
 		case IdFile:
 			Max = cv->OutBuffCount;
