@@ -740,7 +740,7 @@ static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPL
 	}
 
 	OPENFILENAMEW ofn = {};
-	ofn.lStructSize = get_OPENFILENAME_SIZE();
+	ofn.lStructSize = get_OPENFILENAME_SIZEW();
 	ofn.hwndOwner   = HWin;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
@@ -1014,7 +1014,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 	}
 
 	OPENFILENAMEW ofn = {};
-	ofn.lStructSize = get_OPENFILENAME_SIZE();
+	ofn.lStructSize = get_OPENFILENAME_SIZEW();
 	ofn.hwndOwner   = hWnd;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
@@ -1614,7 +1614,7 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 
 	FileName[0] = 0;
 	OPENFILENAMEW ofn = {};
-	ofn.lStructSize = get_OPENFILENAME_SIZE();
+	ofn.lStructSize = get_OPENFILENAME_SIZEW();
 	ofn.hwndOwner   = hWnd;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
