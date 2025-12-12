@@ -2330,8 +2330,12 @@ ttdc_t *PaintWindow(vtdraw_t *vt, HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
 	dc->VTDC = hDC;
 	DispInitDC2(vt, dc);
 
+	// 領域の塗りつぶし
+	//  文字間が全て0の時、文字の描画だけで全領域が描画できるので、塗りつぶし不要
 	if(!BGEnable && fBkGnd) {
-		FillRect(hDC, &PaintRect, vt->Background);
+		if (ts.FontDW != 0 || ts.FontDH != 0 || ts.FontDX != 0 || ts.FontDY != 0){
+			FillRect(hDC, &PaintRect, vt->Background);
+		}
 	}
 
 	*Xs = PaintRect.left / vt->FontWidth + WinOrgX;

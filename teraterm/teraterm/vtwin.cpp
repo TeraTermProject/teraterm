@@ -5214,6 +5214,14 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_PAINT:
 		OnPaint();
 		break;
+	case WM_ERASEBKGND:
+		// 背景消去を DefWindowProc() に行わせない(DefWindowProc()を呼ばない)
+		//		DefWindowProc() は背景を塗りつぶすが、
+		//		WNDCLASSW.hbrBackground = NULL なので何も行わない
+		// 0を返すと背景が塗りつぶしが行われていない、と判定される
+		//		WM_PAINTで PAINTSTRUCT.fErase = TRUE となる
+		retval = 0;
+		break;
 	case WM_RBUTTONDOWN:
 		OnRButtonDown((UINT)wp, MAKEPOINTS(lp));
 		break;
