@@ -362,27 +362,25 @@ static INT_PTR CALLBACK BGThemeProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			switch (wp) {
 			case IDC_BGIMG_BUTTON | (BN_CLICKED << 16): {
 				// 画像ファイル選択
-				OPENFILENAMEW ofn = {};
-				wchar_t bg_file[MAX_PATH];
-				wchar_t *bg_file_in;
+				wchar_t *bg_file;
+				hGetDlgItemTextW(hWnd, IDC_BGIMG_EDIT, &bg_file);
 
-				hGetDlgItemTextW(hWnd, IDC_BGIMG_EDIT, &bg_file_in);
-				wcscpy_s(bg_file, _countof(bg_file), bg_file_in);
-				free(bg_file_in);
-
-				ofn.lStructSize = get_OPENFILENAME_SIZEW();
+				TTOPENFILENAMEW ofn = {};
 				ofn.hwndOwner   = hWnd;
 				ofn.lpstrFile   = bg_file;
-				ofn.nMaxFile    = _countof(bg_file);
 				//ofn.lpstrFilter = "";
-				ofn.nFilterIndex = 1;
+				//ofn.nFilterIndex = 1;
 				ofn.hInstance = dlg_data->hInst;
 				ofn.lpstrDefExt = L"jpg";
 				ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
 				ofn.lpstrTitle = L"select bg image file";
 
-				if (GetOpenFileNameW(&ofn)) {
-					SetDlgItemTextW(hWnd, IDC_BGIMG_EDIT, bg_file);
+				wchar_t *filename;
+				BOOL r = TTGetOpenFileNameW(&ofn, &filename);
+				free(bg_file);
+				if (r) {
+					SetDlgItemTextW(hWnd, IDC_BGIMG_EDIT, filename);
+					free(filename);
 				}
 				break;
 			}
