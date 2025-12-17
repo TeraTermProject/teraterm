@@ -74,6 +74,8 @@ end_of_line = crlf
 end_of_line = lf
 charset = utf-8
 
-[*.rc]
-end_of_line = crlf
-charset = utf-8
+; Visual StudioのリソースエディタがANSIで出力するようです
+; なるべく文字コードはASCIIの範囲で使用してください
+;[*.rc]
+;end_of_line = crlf
+;charset = utf-8
