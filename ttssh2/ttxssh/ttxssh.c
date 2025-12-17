@@ -43,6 +43,7 @@
 #include "keyfiles.h"
 #include "auth.h"
 #include "helpid.h"
+#include "ttcommdlg.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -52,6 +53,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <locale.h>		// for setlocale()
+#include <assert.h>
 
 #include "resource.h"
 #include <commctrl.h>
@@ -2913,33 +2915,37 @@ static void move_cur_sel_delta(HWND listbox, int delta)
 static int get_keys_file_name(HWND parent, char *buf, int bufsize,
                               int readonly)
 {
-	OPENFILENAME params;
-	char fullname_buf[2048] = "ssh_known_hosts";
-
-	params.lStructSize = get_OPENFILENAME_SIZE();
-	params.hwndOwner = parent;
-	params.lpstrFilter = NULL;
-	params.lpstrCustomFilter = NULL;
-	params.nFilterIndex = 0;
-	buf[0] = 0;
-	params.lpstrFile = fullname_buf;
-	params.nMaxFile = sizeof(fullname_buf);
-	params.lpstrFileTitle = NULL;
-	params.lpstrInitialDir = NULL;
+	wchar_t *title;
 	if (readonly) {
-		UTIL_get_lang_msg("MSG_OPEN_KNOWNHOSTS_RO_TITLE", pvar,
-		                  "Choose a read-only known-hosts file to add");
+		GetI18nStrWW("TTSSH", "MSG_OPEN_KNOWNHOSTS_RO_TITLE",
+					 L"Choose a read-only known-hosts file to add",
+					 pvar->ts->UILanguageFileW, &title);
 	}
 	else {
-		UTIL_get_lang_msg("MSG_OPEN_KNOWNHOSTS_RW_TITLE", pvar,
-		                  "Choose a read/write known-hosts file");
+		GetI18nStrWW("TTSSH", "MSG_OPEN_KNOWNHOSTS_RW_TITLE",
+					 L"Choose a read/write known-hosts file",
+					 pvar->ts->UILanguageFileW, &title);
 	}
-	params.lpstrTitle = pvar->UIMsg;
+
+	TTOPENFILENAMEW params = {0};
+	params.hwndOwner = parent;
+	params.lpstrFilter = NULL;
+	params.nFilterIndex = 0;
+	params.lpstrFile = L"ssh_known_hosts";
+	params.lpstrInitialDir = NULL;
+	params.lpstrTitle = title;
 	params.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	params.lpstrDefExt = NULL;
+//	params.lpstrInitialDir = pvar->ts->HomeDirW;
 
-	if (GetOpenFileName(&params) != 0) {
-		copy_teraterm_dir_relative_path(buf, bufsize, fullname_buf);
+	wchar_t *filenameW;
+	BOOL r = TTGetOpenFileNameW(&params, &filenameW);
+	free(title);
+	if (r != FALSE) {
+		// ANSIで保存
+		char *filenameA = ToCharW(filenameW);
+		copy_teraterm_dir_relative_path(buf, bufsize, filenameA);
+		free(filenameA);
 		return 1;
 	} else {
 		int err = CommDlgExtendedError();
@@ -3722,7 +3728,7 @@ static void keygen_progress(int phase, int count, void *cbarg_) {
 
 // bcrypt KDF形式で秘密鍵を保存する
 // based on OpenSSH 6.5:key_save_private(), key_private_to_blob2()
-static void save_bcrypt_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar, int rounds)
+static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, char *comment, HWND dlg, PTInstVar pvar, int rounds)
 {
 	const struct ssh2cipher *cipher = NULL;
 	char *ciphername = DEFAULT_CIPHERNAME;
@@ -3844,7 +3850,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	len = buffer_len(blob);
 
 	// 秘密鍵をファイルに保存する。
-	fp = fopen(filename, "wb");
+	fp = _wfopen(filename, L"wb");
 	if (fp == NULL) {
 		static const TTMessageBoxInfoW info = {
 			"TTSSH",
@@ -3875,12 +3881,145 @@ ed25519_error:
 	buffer_free(blob);
 }
 
+static BOOL GetPublicKeyFilename(HWND dlg, ssh_keytype type, wchar_t **filename_)
+{
+	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
+
+	wchar_t *titleW = NULL;
+	GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PUBLICKEY_TITLE", L"Save public key as:", UILanguageFileW, &titleW);
+
+	wchar_t *filterW = NULL;
+	const wchar_t *default_filenameW = NULL;
+	switch (type) {
+	case KEY_RSA1:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER",
+					 L"SSH1 RSA key(identity.pub)\\0identity.pub\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"identity.pub";
+		break;
+	case KEY_RSA:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PUBLICKEY_RSA_FILTER",
+					 L"SSH2 RSA key(id_rsa.pub)\\0id_rsa.pub\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_rsa.pub";
+		break;
+	case KEY_DSA:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PUBLICKEY_DSA_FILTER",
+					 L"SSH2 DSA key(id_dsa.pub)\\0id_dsa.pub\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_dsa.pub";
+		break;
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER",
+					 L"SSH2 ECDSA key(id_ecdsa.pub)\\0id_ecdsa.pub\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_ecdsa.pub";
+		break;
+	case KEY_ED25519:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER",
+					 L"SSH2 ED25519 key(id_ed25519.pub)\\0id_ed25519.pub\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_ed25519.pub";
+		break;
+	default:
+		assert(FALSE);
+		break;
+	}
+
+	TTOPENFILENAMEW ofn = {0};
+	ofn.hwndOwner = dlg;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+	ofn.lpstrFile = default_filenameW;
+	ofn.lpstrFilter = filterW;
+	ofn.lpstrTitle = titleW;
+	wchar_t *filename;
+	BOOL r = TTGetSaveFileNameW(&ofn, &filename);
+	free(titleW);
+	free(filterW);
+	if (r == FALSE) {
+		// cancel/failure
+		// int ret = CommDlgExtendedError();
+		*filename_ = NULL;
+		return FALSE;
+	}
+	*filename_ = filename;
+	return TRUE;
+}
+
+static BOOL GetPrivateKeyFilename(HWND dlg, ssh_keytype type, wchar_t **filename_)
+{
+	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
+
+	wchar_t *titleW = NULL;
+	GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PRIVATEKEY_TITLE", L"Save private key as:", pvar->ts->UILanguageFileW, &titleW);
+
+	wchar_t *filterW = NULL;
+	const wchar_t *default_filenameW = NULL;
+	switch (private_key.type) {
+	case KEY_RSA1:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER",
+					 L"SSH1 RSA key(identity)\\0identity\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"identity";
+		break;
+	case KEY_RSA:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER",
+					 L"SSH2 RSA key(id_rsa)\\0id_rsa\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_rsa";
+		break;
+	case KEY_DSA:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER",
+					 L"SSH2 DSA key(id_dsa)\\0id_dsa\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_dsa";
+		break;
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PRIVATEKEY_ECDSA_FILTER",
+					 L"SSH2 ECDSA key(id_ecdsa)\\0id_ecdsa\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_ecdsa";
+		break;
+	case KEY_ED25519:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER",
+					 L"SSH2 ED25519 key(id_ed25519)\\0id_ed25519\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_ed25519";
+		break;
+	default:
+		assert(FALSE);
+		break;
+	}
+
+	TTOPENFILENAMEW ofn = {0};
+	ofn.hwndOwner = dlg;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+	ofn.lpstrFile = default_filenameW;
+	ofn.lpstrFilter = filterW;
+	ofn.lpstrTitle = titleW;
+	wchar_t *filename;
+	BOOL r = TTGetSaveFileNameW(&ofn, &filename);
+	free(titleW);
+	free(filterW);
+	if (r == FALSE) {
+		// cancel/failure
+		// int ret = CommDlgExtendedError();
+		*filename_ = NULL;
+		return FALSE;
+	}
+	*filename_ = filename;
+	return TRUE;
+}
+
 static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
                                         LPARAM lParam)
 {
 	static ssh_keytype key_type;
 	static int saved_key_bits;
-	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -4196,72 +4335,19 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		// saving public key file
 		case IDC_SAVE_PUBLIC_KEY:
 			{
-			int ret;
-			OPENFILENAME ofn;
-			char filename[MAX_PATH];
-			FILE *fp;
-			char comment[1024]; // comment string in private key
-
 			// saving file dialog
-			ZeroMemory(&ofn, sizeof(ofn));
-			ofn.lStructSize = get_OPENFILENAME_SIZE();
-			ofn.hwndOwner = dlg;
-			switch (public_key.type) {
-			case KEY_RSA1:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER", pvar,
-				                  "SSH1 RSA key(identity.pub)\\0identity.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "identity.pub", _TRUNCATE);
-				break;
-			case KEY_RSA:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_RSA_FILTER", pvar,
-				                  "SSH2 RSA key(id_rsa.pub)\\0id_rsa.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_rsa.pub", _TRUNCATE);
-				break;
-			case KEY_DSA:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_DSA_FILTER", pvar,
-				                  "SSH2 DSA key(id_dsa.pub)\\0id_dsa.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_dsa.pub", _TRUNCATE);
-				break;
-			case KEY_ECDSA256:
-			case KEY_ECDSA384:
-			case KEY_ECDSA521:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER", pvar,
-				                  "SSH2 ECDSA key(id_ecdsa.pub)\\0id_ecdsa.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_ecdsa.pub", _TRUNCATE);
-				break;
-			case KEY_ED25519:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER", pvar,
-				                  "SSH2 ED25519 key(id_ed25519.pub)\\0id_ed25519.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_ed25519.pub", _TRUNCATE);
-				break;
-			default:
-				break;
-			}
-			ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
-			ofn.lpstrFile = filename;
-			ofn.nMaxFile = sizeof(filename);
-			UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_TITLE", pvar,
-			                  "Save public key as:");
-			ofn.lpstrTitle = pvar->UIMsg;
-			if (GetSaveFileName(&ofn) == 0) { // failure
-				ret = CommDlgExtendedError();
+			wchar_t *filename;
+			if (GetPublicKeyFilename(dlg, public_key.type, &filename) == FALSE) {
+				// cancel or failure
 				break;
 			}
 
+			char comment[1024];	 // comment string in private key
 			GetDlgItemText(dlg, IDC_COMMENT_EDIT, comment, sizeof(comment));
 
 			// saving public key file
-			fp = fopen(filename, "wb");
+			FILE *fp = _wfopen(filename, L"wb");
+			free(filename);
 			if (fp == NULL) {
 				static const TTMessageBoxInfoW info = {
 					"TTSSH",
@@ -4380,9 +4466,6 @@ public_error:
 			{
 			char buf[1024], buf_conf[1024];  // passphrase
 			int ret, rounds;
-			OPENFILENAME ofn;
-			char filename[MAX_PATH];
-			char comment[1024]; // comment string in private key
 
 			// パスフレーズのチェックを行う。パスフレーズは秘密鍵ファイルに付ける。
 			SendMessage(GetDlgItem(dlg, IDC_KEY_EDIT), WM_GETTEXT, sizeof(buf), (LPARAM)buf);
@@ -4438,61 +4521,13 @@ public_error:
 				}
 			}
 
+			char comment[1024];	 // comment string in private key
 			ssh_make_comment(comment, sizeof(comment));
 
 			// saving file dialog
-			ZeroMemory(&ofn, sizeof(ofn));
-			ofn.lStructSize = get_OPENFILENAME_SIZE();
-			ofn.hwndOwner = dlg;
-			switch (private_key.type) {
-			case KEY_RSA1:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER", pvar,
-				                  "SSH1 RSA key(identity)\\0identity\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "identity", _TRUNCATE);
-				break;
-			case KEY_RSA:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER", pvar,
-				                  "SSH2 RSA key(id_rsa)\\0id_rsa\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_rsa", _TRUNCATE);
-				break;
-			case KEY_DSA:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER", pvar,
-				                  "SSH2 DSA key(id_dsa)\\0id_dsa\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_dsa", _TRUNCATE);
-				break;
-			case KEY_ECDSA256:
-			case KEY_ECDSA384:
-			case KEY_ECDSA521:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_ECDSA_FILTER", pvar,
-				                  "SSH2 ECDSA key(id_ecdsa)\\0id_ecdsa\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_ecdsa", _TRUNCATE);
-				break;
-			case KEY_ED25519:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER", pvar,
-				                  "SSH2 ED25519 key(id_ed25519)\\0id_ed25519\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_ed25519", _TRUNCATE);
-				break;
-			default:
-				break;
-			}
-			ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
-			ofn.lpstrFile = filename;
-			ofn.nMaxFile = sizeof(filename);
-			UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_TITLE", pvar,
-			                  "Save private key as:");
-			ofn.lpstrTitle = pvar->UIMsg;
-			if (GetSaveFileName(&ofn) == 0) { // failure
-				ret = CommDlgExtendedError();
+			wchar_t *filename;
+			if (GetPrivateKeyFilename(dlg, private_key.type, &filename) == FALSE) {
+				// cancel
 				break;
 			}
 
@@ -4601,7 +4636,7 @@ public_error:
 				buffer_append(enc, wrapped, len);
 
 				// saving private key file (binary mode)
-				fp = fopen(filename, "wb");
+				fp = _wfopen(filename, L"wb");
 				if (fp == NULL) {
 					static const TTMessageBoxInfoW info = {
 						"TTSSH",
@@ -4642,7 +4677,7 @@ error:;
 					cipher = EVP_aes_128_cbc();
 				}
 
-				fp = fopen(filename, "w");
+				fp = _wfopen(filename, L"w");
 				if (fp == NULL) {
 					static const TTMessageBoxInfoW info = {
 						"TTSSH",
@@ -4678,7 +4713,7 @@ error:;
 				}
 				fclose(fp);
 			}
-
+			free(filename);
 
 			}
 			break;
