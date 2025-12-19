@@ -206,8 +206,8 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 			break;
 	}
 
-	dcb.fDtrControl = DTR_CONTROL_ENABLE;
-	dcb.fRtsControl = RTS_CONTROL_ENABLE;
+	dcb.fDtrControl = ts->FlowControlDTR;
+	dcb.fRtsControl = ts->FlowControlRTS;
 	switch (ts->Flow) {
 		case IdFlowX:
 			dcb.fOutX = TRUE;
@@ -219,11 +219,9 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 			break;
 		case IdFlowHard:  // RTS/CTS
 			dcb.fOutxCtsFlow = TRUE;
-			dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
 			break;
 		case IdFlowHardDsrDtr:  // DSR/DTR
 			dcb.fOutxDsrFlow = TRUE;
-			dcb.fDtrControl = DTR_CONTROL_HANDSHAKE;
 			break;
 	}
 

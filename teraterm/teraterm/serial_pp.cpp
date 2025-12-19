@@ -71,6 +71,9 @@ static const char *DataList[] = {"7 bit","8 bit",NULL};
 static const char *ParityList[] = {"none", "odd", "even", "mark", "space", NULL};
 static const char *StopList[] = {"1 bit", "2 bit", NULL};
 static const char *FlowList[] = {"XON/XOFF", "RTS/CTS", "DSR/DTR", "NONE", NULL};
+static const char *RtsList[] = {"Disable", "Enable", "Handshake", "Toggle", NULL};
+static const char *DtrList[] = {"Disable", "Enable", "Handshake", NULL};
+static UINT_PTR timer_id = NULL;
 
 typedef struct {
 	PTTSet pts;
@@ -290,6 +293,58 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 }
 
 /*
+ * シリアルポートの状態をダイアログに反映する
+ */
+static void SetComStatus(HWND Dialog, int FlowControlRTS, int FlowControlDTR)
+{
+	DWORD status;
+	if (GetCommModemStatus(cv.ComID, &status)) {
+		CheckRadioButton(Dialog, IDC_RADIO_RING, IDC_RADIO_RING, status & MS_RING_ON ? IDC_RADIO_RING : NULL);
+		CheckRadioButton(Dialog, IDC_RADIO_RLSD, IDC_RADIO_RLSD, status & MS_RLSD_ON ? IDC_RADIO_RLSD : NULL);
+		CheckRadioButton(Dialog, IDC_RADIO_CTS, IDC_RADIO_CTS, status & MS_CTS_ON ? IDC_RADIO_CTS : NULL);
+		CheckRadioButton(Dialog, IDC_RADIO_DSR, IDC_RADIO_DSR, status & MS_DSR_ON ? IDC_RADIO_DSR : NULL);
+	}
+
+	DCB dcb;
+	if (GetCommState(cv.ComID, &dcb)) {
+		dcb.fDtrControl = SendDlgItemMessageA(Dialog, IDC_SERIALDTR, CB_GETCURSEL, 0, 0);
+		dcb.fRtsControl = SendDlgItemMessageA(Dialog, IDC_SERIALRTS, CB_GETCURSEL, 0, 0);
+
+		WORD Flow = (WORD)SendDlgItemMessageA(Dialog, IDC_SERIALFLOW, CB_GETCURSEL, 0, 0);
+		if (Flow == 1 /* RTS/CTS */) {
+			dcb.fOutxCtsFlow = TRUE;
+		} else {
+			dcb.fOutxCtsFlow = FALSE;
+		}
+		if (Flow == 2 /* DSR/DTR */) {
+			dcb.fOutxDsrFlow = TRUE;
+		} else {
+			dcb.fOutxDsrFlow = FALSE;
+		}
+
+		SetCommState(cv.ComID, &dcb);
+	}
+
+	EscapeCommFunction(cv.ComID, FlowControlRTS == IdDisable ? CLRRTS : SETRTS);
+	CheckRadioButton(Dialog, IDC_RADIO_RTS, IDC_RADIO_RTS, FlowControlRTS == IdDisable ? NULL : IDC_RADIO_RTS);
+	EscapeCommFunction(cv.ComID, FlowControlDTR == IdDisable ? CLRDTR : SETDTR);
+	CheckRadioButton(Dialog, IDC_RADIO_DTR, IDC_RADIO_DTR, FlowControlDTR == IdDisable ? NULL : IDC_RADIO_DTR);
+
+	EnableWindow(GetDlgItem(Dialog, IDC_RADIO_RTS), FlowControlRTS == IdDisable || FlowControlRTS == IdEnable ? TRUE : FALSE);
+	EnableWindow(GetDlgItem(Dialog, IDC_RADIO_DTR), FlowControlDTR == IdDisable || FlowControlDTR == IdEnable ? TRUE : FALSE);
+}
+
+static void CALLBACK ComPortStatusUpdateProc(HWND Dialog, UINT, UINT_PTR, DWORD) {
+	DWORD status;
+	if (GetCommModemStatus(cv.ComID, &status)) {
+		CheckRadioButton(Dialog, IDC_RADIO_RING, IDC_RADIO_RING, status & MS_RING_ON ? IDC_RADIO_RING : NULL);
+		CheckRadioButton(Dialog, IDC_RADIO_RLSD, IDC_RADIO_RLSD, status & MS_RLSD_ON ? IDC_RADIO_RLSD : NULL);
+		CheckRadioButton(Dialog, IDC_RADIO_CTS, IDC_RADIO_CTS, status & MS_CTS_ON ? IDC_RADIO_CTS : NULL);
+		CheckRadioButton(Dialog, IDC_RADIO_DSR, IDC_RADIO_DSR, status & MS_DSR_ON ? IDC_RADIO_DSR : NULL);
+	}
+}
+
+/*
  * シリアルポート設定ダイアログ
  *
  * シリアルポート数が0の時は呼ばれない
@@ -372,6 +427,12 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				GWLP_WNDPROC,
 				(LONG_PTR)SerialDlgEditWindowProc);
 
+			SetDropDownList(Dialog, IDC_SERIALRTS, RtsList, ts->FlowControlRTS + 1);
+			SetDropDownList(Dialog, IDC_SERIALDTR, DtrList, ts->FlowControlDTR + 1);
+			SetComStatus(Dialog, ts->FlowControlRTS, ts->FlowControlDTR);
+
+			timer_id = SetTimer(Dialog, NULL, 100, ComPortStatusUpdateProc);
+
 			return TRUE;
 		}
 		case WM_NOTIFY: {
@@ -419,6 +480,32 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 					ts->Flow = Flow;
 				}
 
+				int rts = (int)SendDlgItemMessageA(Dialog, IDC_RADIO_RTS, BM_GETCHECK, 0, 0);
+				EscapeCommFunction(cv.ComID, rts ? SETRTS : CLRRTS);
+				int dtr = (int)SendDlgItemMessageA(Dialog, IDC_RADIO_DTR, BM_GETCHECK, 0, 0);
+				EscapeCommFunction(cv.ComID, dtr ? SETDTR : CLRDTR);
+				ts->FlowControlRTS = SendDlgItemMessageA(Dialog, IDC_SERIALRTS, CB_GETCURSEL, 0, 0);
+				ts->FlowControlDTR = SendDlgItemMessageA(Dialog, IDC_SERIALDTR, CB_GETCURSEL, 0, 0);
+				DCB dcb;
+				if (GetCommState(cv.ComID, &dcb)) {
+					dcb.fRtsControl = ts->FlowControlRTS;
+					dcb.fDtrControl = ts->FlowControlDTR;
+
+					WORD Flow = (WORD)SendDlgItemMessageA(Dialog, IDC_SERIALFLOW, CB_GETCURSEL, 0, 0);
+					if (Flow == 1 /* RTS/CTS */) {
+						dcb.fOutxCtsFlow = TRUE;
+					} else {
+						dcb.fOutxCtsFlow = FALSE;
+					}
+					if (Flow == 2 /* DSR/DTR */) {
+						dcb.fOutxDsrFlow = TRUE;
+					} else {
+						dcb.fOutxDsrFlow = FALSE;
+					}
+
+					SetCommState(cv.ComID, &dcb);
+				}
+
 				ts->DelayPerChar = GetDlgItemInt(Dialog,IDC_SERIALDELAYCHAR,NULL,FALSE);
 
 				ts->DelayPerLine = GetDlgItemInt(Dialog,IDC_SERIALDELAYLINE,NULL,FALSE);
@@ -432,6 +519,30 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				// メッセージを飛ばすようにした。 (2007.7.21 maya)
 				PostMessage(GetParent(Dialog),WM_USER_CHANGETITLE,0,0);
 
+				break;
+			}
+			case PSN_RESET: {
+				if (timer_id) {
+					KillTimer(Dialog, timer_id);
+				}
+				DCB dcb;
+				if (GetCommState(cv.ComID, &dcb)) {
+					dcb.fRtsControl = ts->FlowControlRTS;
+					dcb.fDtrControl = ts->FlowControlDTR;
+
+					if (ts->Flow == 1 /* RTS/CTS */) {
+						dcb.fOutxCtsFlow = TRUE;
+					} else {
+						dcb.fOutxCtsFlow = FALSE;
+						}
+					if (ts->Flow == 2 /* DSR/DTR */) {
+						dcb.fOutxDsrFlow = TRUE;
+					} else {
+						dcb.fOutxDsrFlow = FALSE;
+					}
+
+					SetCommState(cv.ComID, &dcb);
+				}
 				break;
 			}
 			case PSN_HELP: {
@@ -466,7 +577,73 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 						}
 						break;
 					}
+					return TRUE;
 
+				case IDC_SERIALFLOW:
+					if (HIWORD(wParam) == CBN_SELCHANGE) {
+						SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
+						WORD Flow = (WORD)SendDlgItemMessageA(Dialog, IDC_SERIALFLOW, CB_GETCURSEL, 0, 0) + 1;
+						if (Flow == 4) {
+							Flow = 3;
+						} else if (Flow == 3) {
+							Flow = 4;
+						}
+						int rts, dtr;
+						switch (Flow) {
+							case IdFlowX:				// XON/XOFF
+							case IdFlowNone:			// NONE
+								rts = 1; // Enable
+								dtr = 1; // Enable
+								break;
+							case IdFlowHard:			// RTS/CTS
+								rts = 2; // Handshake
+								dtr = 1; // Enable
+								break;
+							case IdFlowHardDsrDtr:		// DSR/DTR
+								rts = 1; // Enable
+								dtr = 2; // Handshake
+								break;
+						}
+						SendDlgItemMessage(Dialog, IDC_SERIALRTS, CB_SETCURSEL, rts, 0);
+						SendDlgItemMessage(Dialog, IDC_SERIALDTR, CB_SETCURSEL, dtr, 0);
+						SetComStatus(Dialog, rts, dtr);
+					}
+					return TRUE;
+
+				case IDC_RADIO_RTS:
+					if (HIWORD(wParam) == BN_CLICKED) {
+						SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
+						int rts = (int)SendDlgItemMessageA(Dialog, IDC_RADIO_RTS, BM_GETCHECK, 0, 0);
+						EscapeCommFunction(cv.ComID, rts ? CLRRTS : SETRTS); // 即時反映する
+						CheckRadioButton(Dialog, IDC_RADIO_RTS, IDC_RADIO_RTS, rts ? NULL : IDC_RADIO_RTS);
+						SetFocus(GetDlgItem(Dialog, IDC_SERIALRTS)); // VTウインドウにフォーカスが移った際、BN_CLICKEDが発生しないよう、コントロールのフォーカスを移動しておく
+					}
+					return TRUE;
+
+				case IDC_RADIO_DTR:
+					if (HIWORD(wParam) == BN_CLICKED) {
+						SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
+						int dtr = (int)SendDlgItemMessageA(Dialog, IDC_RADIO_DTR, BM_GETCHECK, 0, 0);
+						EscapeCommFunction(cv.ComID, dtr ? CLRDTR : SETDTR);// 即時反映する
+						CheckRadioButton(Dialog, IDC_RADIO_DTR, IDC_RADIO_DTR, dtr ? NULL : IDC_RADIO_DTR);
+						SetFocus(GetDlgItem(Dialog, IDC_SERIALDTR)); // VTウインドウにフォーカスが移った際、BN_CLICKEDが発生しないよう、コントロールのフォーカスを移動しておく
+					}
+					return TRUE;
+
+				case IDC_SERIALRTS:
+				case IDC_SERIALDTR:
+					if (HIWORD(wParam) == CBN_SELCHANGE) {
+						SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
+						WORD Flow = (WORD)SendDlgItemMessageA(Dialog, IDC_SERIALFLOW, CB_GETCURSEL, 0, 0) + 1;
+						if (Flow == 4) {
+							Flow = 3;
+						} else if (Flow == 3) {
+							Flow = 4;
+						}
+						int FlowControlRTS = SendDlgItemMessageA(Dialog, IDC_SERIALRTS, CB_GETCURSEL, 0, 0);
+						int FlowControlDTR = SendDlgItemMessageA(Dialog, IDC_SERIALDTR, CB_GETCURSEL, 0, 0);
+						SetComStatus(Dialog, FlowControlRTS, FlowControlDTR);
+					}
 					return TRUE;
 			}
 	}
