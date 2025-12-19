@@ -295,16 +295,8 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 /*
  * シリアルポートの状態をダイアログに反映する
  */
-static void SetComStatus(HWND Dialog, int FlowControlRTS, int FlowControlDTR)
+static void SetComStatus(HWND Dialog, int FlowCtrlRTS, int FlowCtrlDTR)
 {
-	DWORD status;
-	if (GetCommModemStatus(cv.ComID, &status)) {
-		CheckRadioButton(Dialog, IDC_RADIO_RING, IDC_RADIO_RING, status & MS_RING_ON ? IDC_RADIO_RING : NULL);
-		CheckRadioButton(Dialog, IDC_RADIO_RLSD, IDC_RADIO_RLSD, status & MS_RLSD_ON ? IDC_RADIO_RLSD : NULL);
-		CheckRadioButton(Dialog, IDC_RADIO_CTS, IDC_RADIO_CTS, status & MS_CTS_ON ? IDC_RADIO_CTS : NULL);
-		CheckRadioButton(Dialog, IDC_RADIO_DSR, IDC_RADIO_DSR, status & MS_DSR_ON ? IDC_RADIO_DSR : NULL);
-	}
-
 	DCB dcb;
 	if (GetCommState(cv.ComID, &dcb)) {
 		dcb.fDtrControl = SendDlgItemMessageA(Dialog, IDC_SERIALDTR, CB_GETCURSEL, 0, 0);
@@ -325,13 +317,13 @@ static void SetComStatus(HWND Dialog, int FlowControlRTS, int FlowControlDTR)
 		SetCommState(cv.ComID, &dcb);
 	}
 
-	EscapeCommFunction(cv.ComID, FlowControlRTS == IdDisable ? CLRRTS : SETRTS);
-	CheckRadioButton(Dialog, IDC_RADIO_RTS, IDC_RADIO_RTS, FlowControlRTS == IdDisable ? NULL : IDC_RADIO_RTS);
-	EscapeCommFunction(cv.ComID, FlowControlDTR == IdDisable ? CLRDTR : SETDTR);
-	CheckRadioButton(Dialog, IDC_RADIO_DTR, IDC_RADIO_DTR, FlowControlDTR == IdDisable ? NULL : IDC_RADIO_DTR);
+	EscapeCommFunction(cv.ComID, FlowCtrlRTS == IdDisable ? CLRRTS : SETRTS);
+	CheckRadioButton(Dialog, IDC_RADIO_RTS, IDC_RADIO_RTS, FlowCtrlRTS == IdDisable ? NULL : IDC_RADIO_RTS);
+	EscapeCommFunction(cv.ComID, FlowCtrlDTR == IdDisable ? CLRDTR : SETDTR);
+	CheckRadioButton(Dialog, IDC_RADIO_DTR, IDC_RADIO_DTR, FlowCtrlDTR == IdDisable ? NULL : IDC_RADIO_DTR);
 
-	EnableWindow(GetDlgItem(Dialog, IDC_RADIO_RTS), FlowControlRTS == IdDisable || FlowControlRTS == IdEnable ? TRUE : FALSE);
-	EnableWindow(GetDlgItem(Dialog, IDC_RADIO_DTR), FlowControlDTR == IdDisable || FlowControlDTR == IdEnable ? TRUE : FALSE);
+	EnableWindow(GetDlgItem(Dialog, IDC_RADIO_RTS), FlowCtrlRTS == IdDisable || FlowCtrlRTS == IdEnable ? TRUE : FALSE);
+	EnableWindow(GetDlgItem(Dialog, IDC_RADIO_DTR), FlowCtrlDTR == IdDisable || FlowCtrlDTR == IdEnable ? TRUE : FALSE);
 }
 
 static void CALLBACK ComPortStatusUpdateProc(HWND Dialog, UINT, UINT_PTR, DWORD) {
@@ -427,9 +419,9 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				GWLP_WNDPROC,
 				(LONG_PTR)SerialDlgEditWindowProc);
 
-			SetDropDownList(Dialog, IDC_SERIALRTS, RtsList, ts->FlowControlRTS + 1);
-			SetDropDownList(Dialog, IDC_SERIALDTR, DtrList, ts->FlowControlDTR + 1);
-			SetComStatus(Dialog, ts->FlowControlRTS, ts->FlowControlDTR);
+			SetDropDownList(Dialog, IDC_SERIALRTS, RtsList, ts->FlowCtrlRTS + 1);
+			SetDropDownList(Dialog, IDC_SERIALDTR, DtrList, ts->FlowCtrlDTR + 1);
+			SetComStatus(Dialog, ts->FlowCtrlRTS, ts->FlowCtrlDTR);
 
 			timer_id = SetTimer(Dialog, NULL, 100, ComPortStatusUpdateProc);
 
@@ -484,12 +476,12 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				EscapeCommFunction(cv.ComID, rts ? SETRTS : CLRRTS);
 				int dtr = (int)SendDlgItemMessageA(Dialog, IDC_RADIO_DTR, BM_GETCHECK, 0, 0);
 				EscapeCommFunction(cv.ComID, dtr ? SETDTR : CLRDTR);
-				ts->FlowControlRTS = SendDlgItemMessageA(Dialog, IDC_SERIALRTS, CB_GETCURSEL, 0, 0);
-				ts->FlowControlDTR = SendDlgItemMessageA(Dialog, IDC_SERIALDTR, CB_GETCURSEL, 0, 0);
+				ts->FlowCtrlRTS = SendDlgItemMessageA(Dialog, IDC_SERIALRTS, CB_GETCURSEL, 0, 0);
+				ts->FlowCtrlDTR = SendDlgItemMessageA(Dialog, IDC_SERIALDTR, CB_GETCURSEL, 0, 0);
 				DCB dcb;
 				if (GetCommState(cv.ComID, &dcb)) {
-					dcb.fRtsControl = ts->FlowControlRTS;
-					dcb.fDtrControl = ts->FlowControlDTR;
+					dcb.fRtsControl = ts->FlowCtrlRTS;
+					dcb.fDtrControl = ts->FlowCtrlDTR;
 
 					WORD Flow = (WORD)SendDlgItemMessageA(Dialog, IDC_SERIALFLOW, CB_GETCURSEL, 0, 0);
 					if (Flow == 1 /* RTS/CTS */) {
@@ -527,8 +519,8 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				}
 				DCB dcb;
 				if (GetCommState(cv.ComID, &dcb)) {
-					dcb.fRtsControl = ts->FlowControlRTS;
-					dcb.fDtrControl = ts->FlowControlDTR;
+					dcb.fRtsControl = ts->FlowCtrlRTS;
+					dcb.fDtrControl = ts->FlowCtrlDTR;
 
 					if (ts->Flow == 1 /* RTS/CTS */) {
 						dcb.fOutxCtsFlow = TRUE;
@@ -640,9 +632,9 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 						} else if (Flow == 3) {
 							Flow = 4;
 						}
-						int FlowControlRTS = SendDlgItemMessageA(Dialog, IDC_SERIALRTS, CB_GETCURSEL, 0, 0);
-						int FlowControlDTR = SendDlgItemMessageA(Dialog, IDC_SERIALDTR, CB_GETCURSEL, 0, 0);
-						SetComStatus(Dialog, FlowControlRTS, FlowControlDTR);
+						int FlowCtrlRTS = SendDlgItemMessageA(Dialog, IDC_SERIALRTS, CB_GETCURSEL, 0, 0);
+						int FlowCtrlDTR = SendDlgItemMessageA(Dialog, IDC_SERIALDTR, CB_GETCURSEL, 0, 0);
+						SetComStatus(Dialog, FlowCtrlRTS, FlowCtrlDTR);
 					}
 					return TRUE;
 			}

@@ -2047,20 +2047,20 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->ReceivefileAutoStopWaitTime = GetPrivateProfileInt(Section, "ReceivefileAutoStopWaitTime", 5, FName);
 
 	// シリアルポートRTSとDTRのフローコントロール設定
-	ts->FlowControlRTS = GetPrivateProfileInt(Section, "FlowControlRTS", -1, FName);
-	if (ts->FlowControlRTS == -1) {
+	ts->FlowCtrlRTS = GetPrivateProfileInt(Section, "FlowCtrlRTS", -1, FName);
+	if (ts->FlowCtrlRTS == -1) {
 		if (ts->Flow == IdFlowHard) {
-			ts->FlowControlRTS = IdHandshake; // RTS/CTS
+			ts->FlowCtrlRTS = IdHandshake; // RTS/CTS
 		} else {
-			ts->FlowControlRTS = IdEnable;
+			ts->FlowCtrlRTS = IdEnable;
 		}
 	}
-	ts->FlowControlDTR = GetPrivateProfileInt(Section, "FlowControlDTR", -1, FName);
-	if (ts->FlowControlDTR == -1) {
+	ts->FlowCtrlDTR = GetPrivateProfileInt(Section, "FlowCtrlDTR", -1, FName);
+	if (ts->FlowCtrlDTR == -1) {
 		if (ts->Flow == IdFlowHardDsrDtr) {
-			ts->FlowControlDTR = IdHandshake; // DSR/DTR
+			ts->FlowCtrlDTR = IdHandshake; // DSR/DTR
 		} else {
-			ts->FlowControlDTR = IdEnable;
+			ts->FlowCtrlDTR = IdEnable;
 		}
 	}
 
@@ -3345,8 +3345,8 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteInt(Section, "ReceivefileAutoStopWaitTime", FName, ts->ReceivefileAutoStopWaitTime);
 
 	// シリアルポートRTSとDTRのフローコントロール設定
-	WriteInt(Section, "FlowControlRTS", FName, ts->FlowControlRTS);
-	WriteInt(Section, "FlowControlDTR", FName, ts->FlowControlDTR);
+	WriteInt(Section, "FlowCtrlRTS", FName, ts->FlowCtrlRTS);
+	WriteInt(Section, "FlowCtrlDTR", FName, ts->FlowCtrlDTR);
 }
 
 void SaveVTPos(const PTTSet ts)

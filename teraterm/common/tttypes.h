@@ -611,8 +611,8 @@ struct tttset {
 	char FileReceiveFilter[128];
 	WORD ReceivefileSkipOptionDialog;
 	int ReceivefileAutoStopWaitTime;
-	int FlowControlRTS;
-	int FlowControlDTR;
+	int FlowCtrlRTS;
+	int FlowCtrlDTR;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;

@@ -206,8 +206,8 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 			break;
 	}
 
-	dcb.fDtrControl = ts->FlowControlDTR;
-	dcb.fRtsControl = ts->FlowControlRTS;
+	dcb.fDtrControl = ts->FlowCtrlDTR;
+	dcb.fRtsControl = ts->FlowCtrlRTS;
 	switch (ts->Flow) {
 		case IdFlowX:
 			dcb.fOutX = TRUE;
