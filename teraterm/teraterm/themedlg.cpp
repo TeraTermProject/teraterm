@@ -876,7 +876,7 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			set:
 			// preview
 			ThemeSetBG(&dlg_data->BGTab.bg_theme);
-			ThemeSetColor(&dlg_data->ColorTab.color_theme);
+			ThemeSetColor(vt_src, &dlg_data->ColorTab.color_theme);
 			BGSetupPrimary(vt_src, TRUE);
 			InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 			break;
@@ -914,7 +914,7 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					MB_YESNO | MB_ICONWARNING
 				};
 				if (TTMessageBoxW(hWnd, &info, ts->UILanguageFileW) == IDYES) {
-					ThemeSetColor(&dlg_data->ColorTab.color_theme);
+					ThemeSetColor(vt_src, &dlg_data->ColorTab.color_theme);
 					ThemeSetBG(&dlg_data->BGTab.bg_theme);
 
 					BGSetupPrimary(vt_src, TRUE);
@@ -1165,7 +1165,7 @@ void ThemeDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv)
 	dlg_data->hVTWin = pcv->HWin;
 	ThemeGetBG(&dlg_data->BGTab.bg_theme);
 	dlg_data->Backup.bg_theme = dlg_data->BGTab.bg_theme;
-	ThemeGetColor(&dlg_data->ColorTab.color_theme);
+	ThemeGetColor(vt_src, &dlg_data->ColorTab.color_theme);
 	dlg_data->Backup.color_theme = dlg_data->ColorTab.color_theme;
 
 	CThemeDlg dlg(hInst, hWnd, dlg_data);
@@ -1173,14 +1173,14 @@ void ThemeDialog(HINSTANCE hInst, HWND hWnd, TComVar *pcv)
 	if (r == 0) {
 		// cancel時、バックアップ内容に戻す
 		ThemeSetBG(&dlg_data->Backup.bg_theme);
-		ThemeSetColor(&dlg_data->Backup.color_theme);
+		ThemeSetColor(vt_src, &dlg_data->Backup.color_theme);
 		BGSetupPrimary(vt_src, TRUE);
 		InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 	}
 	else if (r >= 1) {
 		// okなど(Changes were saved by the user)
 		ThemeSetBG(&dlg_data->BGTab.bg_theme);
-		ThemeSetColor(&dlg_data->ColorTab.color_theme);
+		ThemeSetColor(vt_src, &dlg_data->ColorTab.color_theme);
 		BGSetupPrimary(vt_src, TRUE);
 		InvalidateRect(dlg_data->hVTWin, NULL, FALSE);
 	}

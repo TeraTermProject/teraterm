@@ -28,17 +28,15 @@
  */
 
 /* TERATERM.EXE, print-abort dialog box */
+// シンプルな中断ダイアログ
+
 #include <windows.h>
 #include <windowsx.h>
 #include <assert.h>
-#include "teraterm.h"
-#include "tttypes.h"
 #include "ttlib.h"
 #include "dlglib.h"
 #include "tt_res.h"
 #include "prnabort.h"
-
-HWND CPrnAbortDlg::m_hWnd_static;
 
 INT_PTR CALLBACK CPrnAbortDlg::OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -52,7 +50,7 @@ INT_PTR CALLBACK CPrnAbortDlg::OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 	{
 		CPrnAbortDlg *self = (CPrnAbortDlg *)lp;
 		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)self);
-		SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), self->m_ts->UILanguageFileW);
+		SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), self->m_UILanguageFileW);
 		return TRUE;
 	}
 
@@ -60,15 +58,12 @@ INT_PTR CALLBACK CPrnAbortDlg::OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 	{
 		CPrnAbortDlg *self = (CPrnAbortDlg *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
 		const WORD wID = GET_WM_COMMAND_ID(wp, lp);
-		if (wID == IDOK) {
-			self->DestroyWindow();
-		}
-		if (wID == IDCANCEL) {
-			if (self->m_pAbort != NULL) {
-				*self->m_pAbort = TRUE;
-			}
-			self->m_PrintAbortFlag = TRUE;
-			self->DestroyWindow();
+		switch (wID) {
+		case IDOK:
+			return TRUE;
+		case IDCANCEL:
+			self->m_AbortFlag = TRUE;
+			return TRUE;
 		}
 		return FALSE;
 	}
@@ -76,12 +71,11 @@ INT_PTR CALLBACK CPrnAbortDlg::OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 	default:
 		return FALSE;
 	}
-	return TRUE;
 }
 
 CPrnAbortDlg::CPrnAbortDlg()
 {
-	m_PrintAbortFlag = FALSE;
+	m_AbortFlag = FALSE;
 }
 
 /**
@@ -95,33 +89,21 @@ CPrnAbortDlg::CPrnAbortDlg()
  *	@retval	TRUE		ok
  *	@retval	FALSE		ダイアログ生成失敗(発生しないはず)
  */
-BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PTTSet pts)
+BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, wchar_t *UILanguageFileW)
 {
-	assert(m_hWnd_static == NULL);
-	if (m_hWnd_static != NULL) {
-		// 印刷中止ダイアログは1つしか作れない
-		return FALSE;
-	}
-
-	m_pAbort = AbortFlag;
 	m_hParentWnd = hParent;
-	m_ts = pts;
-	if (m_pAbort != NULL) {
-		*m_pAbort = FALSE;
-	}
+	m_UILanguageFileW = _wcsdup(UILanguageFileW);
 
-	SetDialogFont(m_ts->DialogFontNameW, m_ts->DialogFontPoint, m_ts->DialogFontCharSet,
-				  m_ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	HWND hWnd = TTCreateDialogParam(
 		hInstance, MAKEINTRESOURCEW(IDD_PRNABORTDLG), hParent,
 		OnDlgProc, (LPARAM)this);
 	if (hWnd == NULL) {
+		free(m_UILanguageFileW);
 		return FALSE;
 	}
 	CenterWindow(hWnd, ::GetParent(hWnd));
 
 	m_hWnd = hWnd;
-	m_hWnd_static = hWnd;
 	::EnableWindow(hParent,FALSE);
 	::ShowWindow(hWnd, SW_SHOW);
 	::EnableWindow(m_hWnd,TRUE);
@@ -133,66 +115,38 @@ BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PT
  */
 BOOL CPrnAbortDlg::DestroyWindow()
 {
+	assert(m_hWnd != NULL);
 	::EnableWindow(m_hParentWnd,TRUE);
 	::SetFocus(m_hParentWnd);
 	::DestroyWindow(m_hWnd);
-	m_hWnd_static = NULL;
+	m_hWnd = NULL;
+	free(m_UILanguageFileW);
 	return TRUE;
 }
 
 /**
- *	印刷用DCをセット
- *	@retval	0以上		成功
- *	@retval	SP_ERROR	失敗
- */
-int CPrnAbortDlg::SetPrintDC(HDC hPrintDC)
-{
-	return ::SetAbortProc(hPrintDC, AbortProcStatic);
-}
-
-/**
- *	印刷中に呼び出されるコールバック
- *	戻り値で印字の中断/継続をシステムに伝える
- *	この中でダイアログのメッセージポンプを動かす
+ *	Windowsメッセージの処理を行う
  *
- *	@param	hDC		印刷中のDC ?
- *	@param	Error	0=エラーなし/SP_OUTOFDISK ?
- *	@retval	TRUE	印刷ジョブを続行
- *	@retval	FALSE	印刷ジョブを取り消す
+ *	"Cancel(中断)" ボタンが押されたら後の処理は不要
  */
-BOOL CPrnAbortDlg::AbortProc(HDC hDC, int Error)
+void CPrnAbortDlg::MessagePump()
 {
-	MSG m;
-	(void)hDC;
-	(void)Error;
-
 	// すでに abort が押されている
-	if (m_PrintAbortFlag) {
-		return FALSE;
+	if (m_AbortFlag) {
+		// メッセージの処理不要
+		return;
 	}
 
+	MSG m;
 	while (PeekMessage(&m, 0,0,0, PM_REMOVE)) {
 		if (!IsDialogMessage(m_hWnd, &m)) {
 			TranslateMessage(&m);
 			DispatchMessage(&m);
 		}
-		if (m_PrintAbortFlag) {
+		if (m_AbortFlag) {
 			break;
 		}
 	}
-
-	if (m_PrintAbortFlag) {
-		return FALSE;
-	}
-	else {
-		return TRUE;
-	}
-}
-
-BOOL CALLBACK CPrnAbortDlg::AbortProcStatic(HDC hDC, int Error)
-{
-	CPrnAbortDlg *self = (CPrnAbortDlg *)GetWindowLongPtr(m_hWnd_static, DWLP_USER);
-	return self->AbortProc(hDC, Error);
 }
 
 /**
@@ -202,5 +156,5 @@ BOOL CALLBACK CPrnAbortDlg::AbortProcStatic(HDC hDC, int Error)
  */
 BOOL CPrnAbortDlg::IsAborted()
 {
-	return m_PrintAbortFlag;
+	return m_AbortFlag;
 }

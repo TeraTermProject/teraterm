@@ -688,6 +688,7 @@ void CTEKWindow::OnFilePrint()
 	(*TEKPrint)(&tk,&ts,PrintDC,Sel);
 
 	PrnStop(PrintDC);
+	DeleteDC(PrintDC);
 }
 
 void CTEKWindow::OnFileExit()

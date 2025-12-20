@@ -666,8 +666,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	InitBuffer((IdVtDrawAPI)ts.VTDrawAPI);
 	BuffSetDispCodePage(ts.VTDrawAnsiCodePage);
 
-	BGLoadThemeFile(&ts);
-
 	if (ts.HideTitle>0) {
 		Style = WS_VSCROLL | WS_HSCROLL |
 		        WS_BORDER | WS_THICKFRAME | WS_POPUP;
@@ -717,6 +715,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	if (HVTWin == NULL) return;
 	cv.HWin = HVTWin;
 	vt_src = InitDisp(HVTWin);
+	BGLoadThemeFile(vt_src, &ts);
 
 	// Windows 11 でウィンドウの角が丸くならないようにする
 	if (ts.WindowCornerDontround && pDwmSetWindowAttribute != NULL) {
@@ -2719,6 +2718,8 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 		ResizeWindow(vt_src, R.left, R.top, w, h, cx, cy);
 	}
 	else {
+		int FontWidth, FontHeight;
+		DispGetFontSize(vt_src, &FontWidth, &FontHeight);
 		if (ts.FontScaling) {
 			int NewFontWidth, NewFontHeight;
 			BOOL FontChanged = FALSE;
@@ -2729,18 +2730,18 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 			if (NewFontWidth - ts.FontDW < 3) {
 				NewFontWidth = ts.FontDW + 3;
 			}
-			if (NewFontWidth != vt_src->FontWidth) {
+			if (NewFontWidth != FontWidth) {
 				ts.VTFontSize.x = ts.FontDW - NewFontWidth;
-				vt_src->FontWidth = NewFontWidth;
+				FontWidth = NewFontWidth;
 				FontChanged = TRUE;
 			}
 
 			if (NewFontHeight - ts.FontDH < 3) {
 				NewFontHeight = ts.FontDH + 3;
 			}
-			if (NewFontHeight != vt_src->FontHeight) {
+			if (NewFontHeight != FontHeight) {
 				ts.VTFontSize.y = ts.FontDH - NewFontHeight;
-				vt_src->FontHeight = NewFontHeight;
+				FontHeight = NewFontHeight;
 				FontChanged = TRUE;
 			}
 
@@ -2748,12 +2749,13 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 			h = ts.TerminalHeight;
 
 			if (FontChanged) {
+				DispSetFontSize(vt_src, FontWidth, FontHeight);
 				ChangeFont(vt_src, 0);
 			}
 		}
 		else {
-			w = cx / vt_src->FontWidth;
-			h = cy / vt_src->FontHeight;
+			w = cx / FontWidth;
+			h = cy / FontHeight;
 		}
 
 		HideStatusLine();
@@ -2787,8 +2789,10 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 	nWidth = (pRect->right) - (pRect->left) - margin_width;
 	nHeight = (pRect->bottom) - (pRect->top) - margin_height;
 
-	w = nWidth / vt_src->FontWidth;
-	h = nHeight / vt_src->FontHeight;
+	int FontWidth, FontHeight;
+	DispGetFontSize(vt_src, &FontWidth, &FontHeight);
+	w = nWidth / FontWidth;
+	h = nHeight / FontHeight;
 
 	if (!ts.TermIsWin) {
 		// TermIsWin=off の時はリサイズでは端末サイズが変わらないので
@@ -2807,8 +2811,8 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 
 	UpdateSizeTip(HVTWin, w, h, fwSide, pRect->left, pRect->top);
 
-	fixed_width = w * vt_src->FontWidth + margin_width;
-	fixed_height = h * vt_src->FontHeight + margin_height;
+	fixed_width = w * FontWidth + margin_width;
+	fixed_height = h * FontHeight + margin_height;
 
 	switch (fwSide) { // 幅調整
 	case 1: // 左
@@ -3124,8 +3128,10 @@ LRESULT CVTWindow::OnIMEStartComposition(WPARAM wParam, LPARAM lParam)
 	IMECompositionState = TRUE;
 
 	// 位置を通知する
-	int CaretX = (CursorX-WinOrgX)*vt_src->FontWidth;
-	int CaretY = (CursorY-WinOrgY)*vt_src->FontHeight;
+	int FontWidth, FontHeight;
+	DispGetFontSize(vt_src, &FontWidth, &FontHeight);
+	int CaretX = (CursorX - WinOrgX) * FontWidth;
+	int CaretY = (CursorY - WinOrgY) * FontHeight;
 	SetConversionWindow(HVTWin,CaretX,CaretY);
 
 	return TTCFrameWnd::DefWindowProc(WM_IME_STARTCOMPOSITION,wParam,lParam);
@@ -3186,8 +3192,11 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 			// IME On
 
 			// 状態を表示するIMEのために位置を通知する
-			int CaretX = (CursorX-WinOrgX)*vt_src->FontWidth;
-			int CaretY = (CursorY-WinOrgY)*vt_src->FontHeight;
+			int font_width;
+			int font_height;
+			DispGetFontSize(vt_src, &font_width, &font_height);
+			int CaretX = (CursorX-WinOrgX) * font_width;
+			int CaretY = (CursorY-WinOrgY) * font_height;
 			SetConversionWindow(HVTWin,CaretX,CaretY);
 
 			if (ts.IMEInline > 0) {
@@ -3221,8 +3230,10 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 		// - 漢字変換候補を表示
 		// - 次の文字を入力することで確定処理を行う
 		// - 文字入力と未変換文字入力が発生する
-		int CaretX = (CursorX-WinOrgX)*vt_src->FontWidth;
-		int CaretY = (CursorY-WinOrgY)*vt_src->FontHeight;
+		int FontWidth, FontHeight;
+		DispGetFontSize(vt_src, &FontWidth, &FontHeight);
+		int CaretX = (CursorX - WinOrgX) * FontWidth;
+		int CaretY = (CursorY - WinOrgY) * FontHeight;
 		SetConversionWindow(HVTWin,CaretX,CaretY);
 
 		// フォントを設定する
@@ -3862,7 +3873,7 @@ void CVTWindow::OnFileNewConnection()
 				FreeTTSET();
 			}
 			SetKeyMap();
-			BGLoadThemeFile(&ts);
+			BGLoadThemeFile(vt_src, &ts);
 			if (ts.MacroFNW != NULL) {
 				RunMacroW(ts.MacroFNW,TRUE);
 				free(ts.MacroFNW);
@@ -5051,8 +5062,10 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 			// 新しいDPIに合わせてフォントを生成、
 			// クライアント領域のサイズを決定する
 			ChangeFont(vt_src, NewDPI);
-			tmpScreenWidth = WinWidth * vt_src->FontWidth;
-			tmpScreenHeight = WinHeight * vt_src->FontHeight;
+			int FontWidth, FontHeight;
+			DispGetFontSize(vt_src, &FontWidth, &FontHeight);
+			tmpScreenWidth = WinWidth * FontWidth;
+			tmpScreenHeight = WinHeight * FontHeight;
 			//AdjustScrollBar();
 		}
 

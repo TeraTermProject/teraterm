@@ -2261,16 +2261,23 @@ void BuffPrint(BOOL ScrollRegion)
 			IEnd = NumOfColumns - 1;
 		}
 
-		DispSetDrawPos(vt, dc, 0, line_in_page * vt->FontHeight);
+		int height;
+		DispGetCellSize(vt, NULL, &height);
+		DispSetDrawPos(vt, dc, 0, line_in_page * height);
 
 		BuffDrawLineI(vt, dc, j, IStart, IEnd);
 		TmpPtr = NextLinePtr(TmpPtr);
 		line_in_page++;
-		if (dc->PrnY > vt->Margin.bottom) {
+		if (DispPrnIsNextPage(vt, dc)) {
 			// 次のページへ
 			line_in_page = 0;
-			EndPage(dc->VTDC);
-			StartPage(dc->VTDC);
+			HDC hdc = DispDCGetRawDC(dc);
+			EndPage(hdc);
+			StartPage(hdc);
+		}
+
+		if (PrnCheckAbort()) {
+			break;
 		}
 	}
 	UnlockBuffer();

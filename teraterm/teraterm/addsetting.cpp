@@ -917,7 +917,7 @@ BOOL CVisualPropPageDlg::CheckThemeColor()
 	TColorTheme def;	// default color (=ts.ANSIColor[])
 	ThemeGetColorDefault(&def);
 	TColorTheme disp;	// 今表示されている色
-	ThemeGetColor(&disp);
+	ThemeGetColor(vt_src, &disp);
 	for (int i = 0; i < 16; i++) {
 		if (disp.ansicolor.color[i] != def.ansicolor.color[i]) {
 			return TRUE;
@@ -1043,7 +1043,7 @@ void CVisualPropPageDlg::OnOK()
 			TColorTheme color;
 			// デフォルト色を設定する
 			ThemeGetColorDefault(&color);
-			ThemeSetColor(&color);
+			ThemeSetColor(vt_src, &color);
 		}
 	}
 }
