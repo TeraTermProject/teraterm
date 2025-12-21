@@ -149,6 +149,7 @@ protected:
 	LRESULT OnIMEInputChange(WPARAM wParam, LPARAM lParam);
 	LRESULT OnIMENotify(WPARAM wParam, LPARAM lParam);
 	LRESULT OnIMERequest(WPARAM wParam, LPARAM lParam);
+	void SetConversionWindowPos();
 	LRESULT OnAccelCommand(WPARAM wParam, LPARAM lParam);
 	LRESULT OnChangeMenu(WPARAM wParam, LPARAM lParam);
 	LRESULT OnChangeTBar(WPARAM wParam, LPARAM lParam);

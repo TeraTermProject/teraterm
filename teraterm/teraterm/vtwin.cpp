@@ -2718,30 +2718,31 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 		ResizeWindow(vt_src, R.left, R.top, w, h, cx, cy);
 	}
 	else {
-		int FontWidth, FontHeight;
-		DispGetFontSize(vt_src, &FontWidth, &FontHeight);
+		int CellWidth, CellHeight;
+		DispGetCellSize(vt_src, &CellWidth, &CellHeight);
+#if 0
 		if (ts.FontScaling) {
-			int NewFontWidth, NewFontHeight;
+			int NewCellWidth, NewCellHeight;
 			BOOL FontChanged = FALSE;
 
-			NewFontWidth = cx / ts.TerminalWidth;
-			NewFontHeight = cy / ts.TerminalHeight;
+			NewCellWidth = cx / ts.TerminalWidth;
+			NewCellHeight = cy / ts.TerminalHeight;
 
-			if (NewFontWidth - ts.FontDW < 3) {
-				NewFontWidth = ts.FontDW + 3;
+			if (NewCellWidth - ts.FontDW < 3) {
+				NewCellWidth = ts.FontDW + 3;
 			}
-			if (NewFontWidth != FontWidth) {
-				ts.VTFontSize.x = ts.FontDW - NewFontWidth;
-				FontWidth = NewFontWidth;
+			if (NewCellWidth != CellWidth) {
+				ts.VTFontSize.x = ts.FontDW - NewCellWidth;
+				CellWidth = NewCellWidth;
 				FontChanged = TRUE;
 			}
 
-			if (NewFontHeight - ts.FontDH < 3) {
-				NewFontHeight = ts.FontDH + 3;
+			if (NewCellHeight - ts.FontDH < 3) {
+				NewCellHeight = ts.FontDH + 3;
 			}
-			if (NewFontHeight != FontHeight) {
-				ts.VTFontSize.y = ts.FontDH - NewFontHeight;
-				FontHeight = NewFontHeight;
+			if (NewCellHeight != CellHeight) {
+				ts.VTFontSize.y = ts.FontDH - NewCellHeight;
+				CellHeight = NewCellHeight;
 				FontChanged = TRUE;
 			}
 
@@ -2749,13 +2750,15 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 			h = ts.TerminalHeight;
 
 			if (FontChanged) {
-				DispSetFontSize(vt_src, FontWidth, FontHeight);
+				DispSetFontSize(vt_src, CellWidth, CellHeight);
 				ChangeFont(vt_src, 0);
 			}
 		}
-		else {
-			w = cx / FontWidth;
-			h = cy / FontHeight;
+		else
+#endif
+		{
+			w = cx / CellWidth;
+			h = cy / CellHeight;
 		}
 
 		HideStatusLine();
@@ -2789,10 +2792,10 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 	nWidth = (pRect->right) - (pRect->left) - margin_width;
 	nHeight = (pRect->bottom) - (pRect->top) - margin_height;
 
-	int FontWidth, FontHeight;
-	DispGetFontSize(vt_src, &FontWidth, &FontHeight);
-	w = nWidth / FontWidth;
-	h = nHeight / FontHeight;
+	int CellWidth, CellHeight;
+	DispGetCellSize(vt_src, &CellWidth, &CellHeight);
+	w = nWidth / CellWidth;
+	h = nHeight / CellHeight;
 
 	if (!ts.TermIsWin) {
 		// TermIsWin=off の時はリサイズでは端末サイズが変わらないので
@@ -2811,33 +2814,33 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 
 	UpdateSizeTip(HVTWin, w, h, fwSide, pRect->left, pRect->top);
 
-	fixed_width = w * FontWidth + margin_width;
-	fixed_height = h * FontHeight + margin_height;
+	fixed_width = w * CellWidth + margin_width;
+	fixed_height = h * CellHeight + margin_height;
 
-	switch (fwSide) { // 幅調整
-	case 1: // 左
-	case 4: // 左上
-	case 7: // 左下
-		pRect->left = pRect->right - fixed_width;
-		break;
-	case 2: // 右
-	case 5: // 右上
-	case 8: // 右下
-		pRect->right = pRect->left + fixed_width;
-		break;
+	switch (fwSide) {		   // 幅調整
+		case WMSZ_LEFT:		   // 左
+		case WMSZ_TOPLEFT:	   // 左上
+		case WMSZ_BOTTOMLEFT:  // 左下
+			pRect->left = pRect->right - fixed_width;
+			break;
+		case WMSZ_RIGHT:		// 右
+		case WMSZ_TOPRIGHT:		// 右上
+		case WMSZ_BOTTOMRIGHT:	// 右下
+			pRect->right = pRect->left + fixed_width;
+			break;
 	}
 
-	switch (fwSide) { // 高さ調整
-	case 3: // 上
-	case 4: // 左上
-	case 5: // 右上
-		pRect->top = pRect->bottom - fixed_height;
-		break;
-	case 6: // 下
-	case 7: // 左下
-	case 8: // 右下
-		pRect->bottom = pRect->top + fixed_height;
-		break;
+	switch (fwSide) {		 // 高さ調整
+		case WMSZ_TOP:		 // 上
+		case WMSZ_TOPLEFT:	 // 左上
+		case WMSZ_TOPRIGHT:	 // 右上
+			pRect->top = pRect->bottom - fixed_height;
+			break;
+		case WMSZ_BOTTOM:		// 下
+		case WMSZ_BOTTOMLEFT:	// 左下
+		case WMSZ_BOTTOMRIGHT:	// 右下
+			pRect->bottom = pRect->top + fixed_height;
+			break;
 	}
 	isSizing = TRUE;
 }
@@ -2971,6 +2974,9 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 		return;
 	}
 	else if (nIDEvent==IdScrollTimer) {
+		int ScreenWidth;
+		int ScreenHeight;
+		DispGetScreenSize(vt_src, &ScreenWidth, &ScreenHeight);
 		GetCursorPos(&Point);
 		::ScreenToClient(HVTWin,&Point);
 		DispAutoScroll(vt_src, Point);
@@ -3123,17 +3129,20 @@ LRESULT CVTWindow::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 	return TTCFrameWnd::DefWindowProc(WM_EXITSIZEMOVE,wParam,lParam);
 }
 
+// 変換位置を通知する
+void CVTWindow::SetConversionWindowPos()
+{
+	int CellWidth, CellHeight;
+	DispGetCellSize(vt_src, &CellWidth, &CellHeight);
+	int CaretX = (CursorX - WinOrgX) * CellWidth + ts.FontDX;
+	int CaretY = (CursorY - WinOrgY) * CellHeight + ts.FontDY;
+	SetConversionWindow(m_hWnd, CaretX, CaretY);
+}
+
 LRESULT CVTWindow::OnIMEStartComposition(WPARAM wParam, LPARAM lParam)
 {
 	IMECompositionState = TRUE;
-
-	// 位置を通知する
-	int FontWidth, FontHeight;
-	DispGetFontSize(vt_src, &FontWidth, &FontHeight);
-	int CaretX = (CursorX - WinOrgX) * FontWidth;
-	int CaretY = (CursorY - WinOrgY) * FontHeight;
-	SetConversionWindow(HVTWin,CaretX,CaretY);
-
+	SetConversionWindowPos();
 	return TTCFrameWnd::DefWindowProc(WM_IME_STARTCOMPOSITION,wParam,lParam);
 }
 
@@ -3192,12 +3201,7 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 			// IME On
 
 			// 状態を表示するIMEのために位置を通知する
-			int font_width;
-			int font_height;
-			DispGetFontSize(vt_src, &font_width, &font_height);
-			int CaretX = (CursorX-WinOrgX) * font_width;
-			int CaretY = (CursorY-WinOrgY) * font_height;
-			SetConversionWindow(HVTWin,CaretX,CaretY);
+			SetConversionWindowPos();
 
 			if (ts.IMEInline > 0) {
 				// フォントを設定する
@@ -3230,11 +3234,7 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 		// - 漢字変換候補を表示
 		// - 次の文字を入力することで確定処理を行う
 		// - 文字入力と未変換文字入力が発生する
-		int FontWidth, FontHeight;
-		DispGetFontSize(vt_src, &FontWidth, &FontHeight);
-		int CaretX = (CursorX - WinOrgX) * FontWidth;
-		int CaretY = (CursorY - WinOrgY) * FontHeight;
-		SetConversionWindow(HVTWin,CaretX,CaretY);
+		SetConversionWindowPos();
 
 		// フォントを設定する
 		ResetConversionLogFont(HVTWin);
@@ -5062,10 +5062,10 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 			// 新しいDPIに合わせてフォントを生成、
 			// クライアント領域のサイズを決定する
 			ChangeFont(vt_src, NewDPI);
-			int FontWidth, FontHeight;
-			DispGetFontSize(vt_src, &FontWidth, &FontHeight);
-			tmpScreenWidth = WinWidth * FontWidth;
-			tmpScreenHeight = WinHeight * FontHeight;
+			int CellWidth, CellHeight;
+			DispGetCellSize(vt_src, &CellWidth, &CellHeight);
+			tmpScreenWidth = WinWidth * CellWidth;
+			tmpScreenHeight = WinHeight * CellHeight;
 			//AdjustScrollBar();
 		}
 
@@ -5118,9 +5118,6 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 			sz->cx = NewWindowWidth;
 			sz->cy = NewWindowHeight;
 			return TRUE;
-		} else {
-			ScreenWidth = tmpScreenWidth;
-			ScreenHeight = tmpScreenHeight;
 		}
 
 		// 推奨領域に左上寄せ

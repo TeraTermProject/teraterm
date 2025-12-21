@@ -81,17 +81,17 @@ typedef struct ttdc {
 	BYTE DCBackAlpha;
 } ttdc_t;
 
+// 描画先情報
 typedef struct vtdraw {
 	HWND hVTWin;					// VT Win Window handle(ウィドウの時)
 	HFONT VTFont[AttrFontMask+1];	// 各フォント
-	int FontWidth, FontHeight;		// フォントサイズ(pixel/1cell)
+	int CellWidth, CellHeight;		// セルサイズ(pixel)
+	int FontWidth, FontHeight;		// フォントサイズ(pixel)
 	BOOL IsPrinter;					// TRUEのとき、プリンタ
 	BOOL IsColorPrinter;			// TRUEのとき、プリンタでカラー印刷(実験的実装)
 	RECT Margin;					// 文字描画時の余白(pixel)、プリンタ用
 	COLORREF White, Black;			// プリンタ用
 	BOOL debug_drawbox_text;		// 文字描画毎にboxを描画する
-	HBRUSH Background;				// background paintbrush 【不要のはず】
-	TCharAttr CurCharAttr;			// ディスプレイ用
 	COLORREF BGVTColor[2];
 	COLORREF BGVTBoldColor[2];
 	COLORREF BGVTUnderlineColor[2];	// SGR 4
@@ -100,10 +100,10 @@ typedef struct vtdraw {
 	COLORREF BGURLColor[2];			// URL属性色
 } vtdraw_t;
 
-int WinWidth, WinHeight;		// 画面に表示されている文字数
+int WinWidth, WinHeight;		// 画面に表示されている文字数(セル数)
 static BOOL Active = FALSE;
 static BOOL CompletelyVisible;
-int ScreenWidth, ScreenHeight;	// スクリーンサイズ = (セル数)*(Font幅or高さ) ≒ Client Area
+static int ScreenWidth, ScreenHeight;	// スクリーンサイズ = (セル数)*(Cell幅or高さ) ≒ Client Area
 BOOL AdjustSize;
 BOOL DontChangeSize=FALSE;
 static int CRTWidth, CRTHeight;
@@ -211,7 +211,6 @@ static vtdisp_work_t vtdisp_work;
 
 static HBITMAP GetBitmapHandleW(const wchar_t *File);
 static void InitColorTable(const COLORREF *ANSIColor16);
-static void UpdateBGBrush(vtdraw_t *vt);
 static void DispInitDC2(vtdraw_t *vt, ttdc_t *dc);
 
 // LoadImage() しか使えない環境かどうかを判別する。
@@ -1273,8 +1272,8 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
   if(hdcBGWork)   DeleteBitmapDC(&hdcBGWork);
   if(hdcBGBuffer) DeleteBitmapDC(&hdcBGBuffer);
 
-  hdcBGWork   = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,vt->FontHeight));
-  hdcBGBuffer = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,vt->FontHeight));
+  hdcBGWork   = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,vt->CellHeight));
+  hdcBGBuffer = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,vt->CellHeight));
 
   //hdcBGBuffer の属性設定
   SetBkMode(hdcBGBuffer,TRANSPARENT);
@@ -1673,8 +1672,6 @@ vtdraw_t *InitDisp(HWND hVTWin)
 
 	DispSetNearestColors(IdBack, 255, TmpDC);
 
-	/* background paintbrush */
-	vt->Background = CreateSolidBrush(ts.VTColor[1]);
 	/* CRT width & height */
 	if (HasMultiMonitorSupport()) {
 		bMultiDisplaySupport = TRUE;
@@ -1738,6 +1735,11 @@ vtdraw_t *InitDisp(HWND hVTWin)
  *	フォント生成
  *	VTWinで使用するフォントを生成する
  *
+ *	次の値も更新される
+ *		FontWidth,Height
+ *		CellWidth,Height
+ *		ScreenWidth,Height
+ *
  *	@param[in/out]	vt
  *	@param[in]		dc		生成するフォントの対象DC
  *	@param[in]		VTlf	フォント情報
@@ -1756,10 +1758,14 @@ static void DispFontCreate(vtdraw_t *vt, ttdc_t *dc, LOGFONTW VTlf)
 		TEXTMETRICA Metrics;
 		HFONT prev_font = SelectObject(hDC, vt->VTFont[AttrDefault]);
 		GetTextMetricsA(hDC, &Metrics);
-		vt->FontWidth = Metrics.tmAveCharWidth + ts.FontDW;
-		vt->FontHeight = Metrics.tmHeight + ts.FontDH;
+		vt->FontWidth = Metrics.tmAveCharWidth;		// 文字の平均幅
+		vt->FontHeight = Metrics.tmHeight;
 		SelectObject(hDC, prev_font);
 	}
+	vt->CellWidth = vt->FontWidth + ts.FontDW;
+	vt->CellHeight = vt->FontHeight + ts.FontDH;
+	ScreenWidth = WinWidth * vt->CellWidth;
+	ScreenHeight = WinHeight * vt->CellHeight;
 
 	/* Underline */
 	if ((ts.FontFlag & FF_UNDERLINE) || (ts.FontFlag & FF_URLUNDERLINE)) {
@@ -1861,11 +1867,6 @@ void EndDisp(vtdraw_t *vt)
 {
 	DispFontDelete(vt);
 
-	if (vt->Background != 0) {
-		DeleteObject(vt->Background);
-		vt->Background = 0;
-	}
-
 	if (!vt->IsPrinter) {
 		BGDestruct();
 
@@ -1901,10 +1902,10 @@ void DispConvWinToScreen(vtdraw_t *vt, int Xw, int Yw, int *Xs, int *Ys, PBOOL R
 //			 a character cell.
 {
   if (Xs!=NULL)
-	*Xs = Xw / vt->FontWidth + WinOrgX;
-  *Ys = Yw / vt->FontHeight + WinOrgY;
+	*Xs = Xw / vt->CellWidth + WinOrgX;
+  *Ys = Yw / vt->CellHeight + WinOrgY;
   if ((Xs!=NULL) && (Right!=NULL))
-    *Right = (Xw - (*Xs-WinOrgX)*vt->FontWidth) >= vt->FontWidth/2;
+    *Right = (Xw - (*Xs-WinOrgX)*vt->CellWidth) >= vt->CellWidth/2;
 }
 
 void DispConvScreenToWin(vtdraw_t *vt, int Xs, int Ys, int *Xw, int *Yw)
@@ -1915,9 +1916,9 @@ void DispConvScreenToWin(vtdraw_t *vt, int Xs, int Ys, int *Xw, int *Yw)
 //      Xw, Yw: window coordinate
 {
   if (Xw!=NULL)
-       *Xw = (Xs - WinOrgX) * vt->FontWidth;
+       *Xw = (Xs - WinOrgX) * vt->CellWidth;
   if (Yw!=NULL)
-       *Yw = (Ys - WinOrgY) * vt->FontHeight;
+       *Yw = (Ys - WinOrgY) * vt->CellHeight;
 }
 
 /**
@@ -1971,7 +1972,7 @@ void ChangeFont(vtdraw_t *vt, unsigned int dpi)
 	if (ts.UseIME > 0) {
 		if (ts.IMEInline > 0) {
 			/* set IME font */
-			LOGFONTW lf = {};
+			LOGFONTW lf = {0};
 			HFONT hFont = vt->VTFont[AttrDefault];
 			GetObjectW(hFont, sizeof(lf), &lf);
 			SetConversionLogFont(HVTWin, &lf);
@@ -2023,10 +2024,10 @@ void ChangeCaret(vtdraw_t *vt)
   DestroyCaret();
   switch (ts.CursorShape) {
     case IdVCur:
-		CreateCaret(HVTWin, 0, CurWidth, vt->FontHeight);
+		CreateCaret(HVTWin, 0, CurWidth, vt->CellHeight);
 	break;
     case IdHCur:
-		CreateCaret(HVTWin, 0, vt->FontWidth, CurWidth);
+		CreateCaret(HVTWin, 0, vt->CellWidth, CurWidth);
 	break;
   }
   if (CaretEnabled) {
@@ -2059,22 +2060,22 @@ void CaretKillFocus(vtdraw_t *vt, BOOL show)
   ttdc_t *dc = DispInitDC(vt);
   hdc = dc->VTDC;
 
-  CaretX = (CursorX - WinOrgX) * vt->FontWidth;
-  CaretY = (CursorY - WinOrgY) * vt->FontHeight;
+  CaretX = (CursorX - WinOrgX) * vt->CellWidth;
+  CaretY = (CursorY - WinOrgY) * vt->CellHeight;
 
   p[0].x = CaretX;
   p[0].y = CaretY;
   p[1].x = CaretX;
-  p[1].y = CaretY + vt->FontHeight - 1;
+  p[1].y = CaretY + vt->CellHeight - 1;
   if (CursorOnDBCS)
-	  p[2].x = CaretX + vt->FontWidth * 2 - 1;
+	  p[2].x = CaretX + vt->CellWidth * 2 - 1;
   else
-	  p[2].x = CaretX + vt->FontWidth - 1;
-  p[2].y = CaretY + vt->FontHeight - 1;
+	  p[2].x = CaretX + vt->CellWidth - 1;
+  p[2].y = CaretY + vt->CellHeight - 1;
   if (CursorOnDBCS)
-	  p[3].x = CaretX + vt->FontWidth * 2 - 1;
+	  p[3].x = CaretX + vt->CellWidth * 2 - 1;
   else
-	  p[3].x = CaretX + vt->FontWidth - 1;
+	  p[3].x = CaretX + vt->CellWidth - 1;
   p[3].y = CaretY;
   p[4].x = CaretX;
   p[4].y = CaretY;
@@ -2104,8 +2105,8 @@ void UpdateCaretPosition(vtdraw_t *vt, BOOL enforce)
   int CaretX, CaretY;
   RECT rc;
 
-  CaretX = (CursorX - WinOrgX) * vt->FontWidth;
-  CaretY = (CursorY - WinOrgY) * vt->FontHeight;
+  CaretX = (CursorX - WinOrgX) * vt->CellWidth;
+  CaretY = (CursorY - WinOrgY) * vt->CellHeight;
 
   if (!enforce && !ts.KillFocusCursor)
 	  return;
@@ -2118,10 +2119,10 @@ void UpdateCaretPosition(vtdraw_t *vt, BOOL enforce)
 	  rc.left = CaretX;
 	  rc.top = CaretY;
 	  if (CursorOnDBCS)
-		rc.right = CaretX + vt->FontWidth * 2;
+		rc.right = CaretX + vt->CellWidth * 2;
 	  else
-		rc.right = CaretX + vt->FontWidth;
-	  rc.bottom = CaretY + vt->FontHeight;
+		rc.right = CaretX + vt->CellWidth;
+	  rc.bottom = CaretY + vt->CellHeight;
 	  // 指定よりも1ピクセル小さい範囲が再描画されるため
 	  // rc の right, bottom は1ピクセル大きくしている。
 	  InvalidateRect(HVTWin, &rc, FALSE);
@@ -2157,8 +2158,8 @@ void CaretOn(vtdraw_t *vt)
 			}
 		}
 
-		CaretX = (CursorX - WinOrgX) * vt->FontWidth;
-		CaretY = (CursorY - WinOrgY) * vt->FontHeight;
+		CaretX = (CursorX - WinOrgX) * vt->CellWidth;
+		CaretY = (CursorY - WinOrgY) * vt->CellHeight;
 
 		if (IMEstat && IMECompositionState) {
 			// IME ON && 変換中の場合のみの処理する。
@@ -2170,21 +2171,21 @@ void CaretOn(vtdraw_t *vt)
 
 		if (ts.CursorShape!=IdVCur) {
 			if (ts.CursorShape==IdHCur) {
-				CaretY = CaretY + vt->FontHeight - CurWidth;
+				CaretY = CaretY + vt->CellHeight - CurWidth;
 				H = CurWidth;
 			}
 			else {
-				H = vt->FontHeight;
+				H = vt->CellHeight;
 			}
 
 			DestroyCaret();
 			if (CursorOnDBCS) {
 				/* double width caret */
-				CreateCaret(HVTWin, color, vt->FontWidth * 2, H);
+				CreateCaret(HVTWin, color, vt->CellWidth * 2, H);
 			}
 			else {
 				/* single width caret */
-				CreateCaret(HVTWin, color, vt->FontWidth, H);
+				CreateCaret(HVTWin, color, vt->CellWidth, H);
 			}
 			CaretStatus = 1;
 		}
@@ -2273,8 +2274,8 @@ void DispChangeWinSize(vtdraw_t *vt, int Nx, int Ny)
   WinWidth = Nx;
   WinHeight = Ny;
 
-  ScreenWidth = WinWidth * vt->FontWidth;
-  ScreenHeight = WinHeight * vt->FontHeight;
+  ScreenWidth = WinWidth * vt->CellWidth;
+  ScreenHeight = WinHeight * vt->CellHeight;
 
   AdjustScrollBar();
 
@@ -2365,24 +2366,18 @@ void ResizeWindow(vtdraw_t *vt, int x, int y, int w, int h, int cw, int ch)
 ttdc_t *PaintWindow(vtdraw_t *vt, HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
 					  int* Xs, int* Ys, int* Xe, int* Ye)
 {
+	(void)fBkGnd;
+
 	ttdc_t *dc = (ttdc_t *)calloc(1, sizeof(*dc));
 	HDC hDC = PaintDC;
 	dc->HVTWin = HVTWin;
 	dc->VTDC = hDC;
 	DispInitDC2(vt, dc);
 
-	// 領域の塗りつぶし
-	//  文字間が全て0の時、文字の描画だけで全領域が描画できるので、塗りつぶし不要
-	if(!BGEnable && fBkGnd) {
-		if (ts.FontDW != 0 || ts.FontDH != 0 || ts.FontDX != 0 || ts.FontDY != 0){
-			FillRect(hDC, &PaintRect, vt->Background);
-		}
-	}
-
-	*Xs = PaintRect.left / vt->FontWidth + WinOrgX;
-	*Ys = PaintRect.top / vt->FontHeight + WinOrgY;
-	*Xe = (PaintRect.right - 1) / vt->FontWidth + WinOrgX;
-	*Ye = (PaintRect.bottom - 1) / vt->FontHeight + WinOrgY;
+	*Xs = PaintRect.left / vt->CellWidth + WinOrgX;
+	*Ys = PaintRect.top / vt->CellHeight + WinOrgY;
+	*Xe = (PaintRect.right - 1) / vt->CellWidth + WinOrgX;
+	*Ye = (PaintRect.bottom - 1) / vt->CellHeight + WinOrgY;
 
 	return dc;
 }
@@ -2417,12 +2412,10 @@ void DispClearWin(vtdraw_t *vt)
   if (IsCaretOn()) CaretOn(vt);
 }
 
+// TODO: DECSCNM / Visual Bell から使われている。必要?
 void DispChangeBackground(vtdraw_t *vt)
 {
-//	DispReleaseDC();
-
-	UpdateBGBrush(vt);
-
+	(void)vt;
 	InvalidateRect(HVTWin,NULL,TRUE);
 }
 
@@ -2793,8 +2786,8 @@ void DrawStrA(vtdraw_t *vt, ttdc_t *dc, const char *StrA, const char *WidthInfo,
 	int height;
 	BOOL direct_draw;
 	BYTE alpha = 0;
-	int font_width = vt->FontWidth;
-	int font_height = vt->FontHeight;
+	int font_width = vt->CellWidth;
+	int font_height = vt->CellHeight;
 	int Y = dc->PrnY;
 	int *X = &dc->PrnX;
 	HDC DC = dc->VTDC;
@@ -2866,6 +2859,9 @@ void DrawStrA(vtdraw_t *vt, ttdc_t *dc, const char *StrA, const char *WidthInfo,
 	}
 }
 
+/**
+ *	拡大縮小して文字を描画する
+ */
 static void DrawChar(vtdraw_t *vt, ttdc_t *dc, HDC BGDC, int x, int y, const wchar_t *str, size_t len, int cell)
 {
 	SIZE char_size;
@@ -2873,12 +2869,11 @@ static void DrawChar(vtdraw_t *vt, ttdc_t *dc, HDC BGDC, int x, int y, const wch
 	HBITMAP bitmap;
 	HBITMAP prev_bitmap;
 	RECT rc;
-	int width;
-	int height;
 	HDC hDC = dc->VTDC;
 
 	GetTextExtentPoint32W(hDC, str, (int)len, &char_size);
 
+	// 拡縮前フォントサイズのchar_dc/bitmapを作る
 	char_dc = CreateCompatibleDC(hDC);
 	SetTextColor(char_dc, GetTextColor(hDC));
 	SetBkColor(char_dc, GetBkColor(hDC));
@@ -2886,41 +2881,66 @@ static void DrawChar(vtdraw_t *vt, ttdc_t *dc, HDC BGDC, int x, int y, const wch
 	bitmap = CreateCompatibleBitmap(hDC, char_size.cx, char_size.cy);
 	prev_bitmap = SelectObject(char_dc, bitmap);
 
+	// char_dcに拡縮前フォントを描画
 	rc.top = 0;
 	rc.left = 0;
 	rc.right = char_size.cx;
 	rc.bottom = char_size.cy;
 	ExtTextOutW(char_dc, 0, 0, ETO_OPAQUE, &rc, str, (UINT)len, 0);
 
-	// 横をcell幅(cell*FontWidth pixel)に拡大/縮小して描画
-	width = cell * vt->FontWidth;
-	height = char_size.cy;
+	// 横をcell幅(cell*CellWidth pixel)に拡大/縮小して描画
+	int cell_width = cell * vt->CellWidth;
+	int cell_height = vt->CellHeight;
 	if (pTransparentBlt == NULL || BGDC == NULL || dc->DCBackAlpha == 255) {
-		// 直接描画
+		// 1cell分のビットマップを作成
+		HDC cell_dc = CreateCompatibleDC(hDC);
+		SetTextColor(cell_dc, GetTextColor(hDC));
+		SetBkColor(cell_dc, GetBkColor(hDC));
+		HBITMAP cell_bitmap = CreateCompatibleBitmap(hDC, vt->CellWidth * cell, vt->CellHeight);
+		HBITMAP cell_bitmap_prev = SelectObject(cell_dc, cell_bitmap);
+
+		// cell_dcを塗りつぶす
+		RECT rect;
+		SetRect(&rect, 0, 0, vt->CellWidth * cell, vt->CellHeight);
+		ExtTextOutW(cell_dc, 0, 0, ETO_OPAQUE, &rect, L"", 0, 0);	// 背景色で塗りつぶし
+
+		// cell_dcに文字を描画
 		SetStretchBltMode(hDC, COLORONCOLOR);
-		StretchBlt(hDC, x, y, width, height, char_dc, 0, 0, char_size.cx, char_size.cy, SRCCOPY);
+		pTransparentBlt(cell_dc, ts.FontDX * cell, ts.FontDY, vt->FontWidth * cell, vt->FontHeight, char_dc, 0, 0, char_size.cx,
+						char_size.cy, GetBkColor(hDC));
+
+		// cell_dcに描画した文字をWindowに貼り付け
+		BitBlt(hDC, x, y, cell * vt->CellWidth, vt->CellHeight, cell_dc, 0, 0, SRCCOPY);
+
+		SelectObject(cell_dc, cell_bitmap_prev);
+		DeleteObject(cell_bitmap);
+		DeleteDC(cell_dc);
 	}
 	else {
 		// BGDCに背景画像を描画
 		const COLORREF BackColor = GetBkColor(hDC);
-		DrawTextBGImage(BGDC, x, y, width, height, BackColor, dc->DCBackAlpha);
+		DrawTextBGImage(BGDC, x, y, cell_width, cell_height, BackColor, dc->DCBackAlpha);
 
 		// BGDCに文字を描画
 		SetStretchBltMode(hDC, COLORONCOLOR);
-		pTransparentBlt(BGDC, 0, 0, width, height, char_dc, 0, 0, char_size.cx, char_size.cy, GetBkColor(hDC));
+		pTransparentBlt(BGDC, ts.FontDX * cell, ts.FontDY, vt->FontWidth * cell, vt->FontHeight, char_dc, 0, 0,
+						char_size.cx, char_size.cy, GetBkColor(hDC));
 
 		// BGDCに描画した文字をWindowに貼り付け
-		BitBlt(hDC, x, y, width, height, BGDC, 0, 0, SRCCOPY);
+		BitBlt(hDC, x, y, cell * vt->CellWidth, vt->CellHeight, BGDC, 0, 0, SRCCOPY);
 	}
 
 	SelectObject(char_dc, prev_bitmap);
 	DeleteObject(bitmap);
 	DeleteDC(char_dc);
+
+	if (vt->debug_drawbox_text) {
+		DrawBox(hDC, x, y, cell_width, cell_height, RGB(0, 0, 255));
+	}
 }
 
-static void DrawStrWSub(ttdc_t *dc, HDC BGDC, const wchar_t *StrW, const int *Dx,
-						int Count, int cells, int font_width, int font_height,
-						int Y, int *X)
+static void DrawStrWSub(vtdraw_t *vt, ttdc_t *dc, HDC BGDC, const wchar_t *StrW, const int *Dx, int Count, int cells,
+						int font_width, int font_height, int Y, int *X)
 {
 	int HalfCharCount = cells;	// セル数
 	int width;
@@ -2968,9 +2988,12 @@ static void DrawStrWSub(ttdc_t *dc, HDC BGDC, const wchar_t *StrW, const int *Dx
 		BitBlt(DC, *X, Y, width, height, BGDC, 0, 0, SRCCOPY);
 	}
 
+	if (vt->debug_drawbox_text) {
+		DrawBox(DC, *X, Y, width, height, RGB(0, 255, 0));
+	}
+
 	*X += width;
 }
-
 
 /**
  *	1行描画 Unicode
@@ -2997,7 +3020,7 @@ static void DrawStrWSub(ttdc_t *dc, HDC BGDC, const wchar_t *StrW, const int *Dx
  *			StrW	U+307B	U+309A
  *			cells	0		2
  *
- *		 len=4
+ *		len=4
  *					吉(つちよし)  野	 家
  *					0			  1		 2
  *			StrW	0xd842 0xdfb7 0x91ce 0x5bb6
@@ -3010,8 +3033,8 @@ static void DrawStrW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *
 	int cell = 0;
 	int i;
 	vtdisp_work_t *w = &vtdisp_work;
-	int font_width = vt->FontWidth;
-	int font_height = vt->FontHeight;
+	int cell_width = vt->CellWidth;
+	int cell_height = vt->CellHeight;
 	int Y = dc->PrnY;
 	int *X = &dc->PrnX;
 	const int sx = *X;
@@ -3024,7 +3047,7 @@ static void DrawStrW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *
 
 	for (i = 0; i < len; i++) {
 		cell += cells[i];
-		Dx[i] = cells[i] * font_width;
+		Dx[i] = cells[i] * cell_width;
 	}
 
 	if (w->font_resize_enable) {
@@ -3035,7 +3058,7 @@ static void DrawStrW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *
 		for (i = 0; i < len; i++) {
 			if (cells[i] == 0) {
 				if (cell_count != 0) {
-					DrawStrWSub(dc, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count, font_width, font_height, Y, X);
+					DrawStrWSub(vt, dc, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count, cell_width, cell_height, Y, X);
 					start_idx = i;
 					cell_count = 0;
 					wchar_count = 0;
@@ -3046,19 +3069,20 @@ static void DrawStrW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *
 			}
 			else {
 				SIZE size;
+				int font_width_c = vt->FontWidth * cells[i];
 				GetTextExtentPoint32W(DC, &StrW[i - zero_count], 1 + zero_count, &size);
-				if (zero_count == 0 && ((size.cx == Dx[i]) || (size.cx == Dx[i] + 1))) {
+				if (zero_count == 0 && ((size.cx == font_width_c) || (size.cx == font_width_c + 1))) {
 					wchar_count++;
 					cell_count += cells[i];
 				}
 				else {
 					if (cell_count > 0) {
-						DrawStrWSub(dc, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count,
-									font_width, font_height, Y, X);
+						DrawStrWSub(vt, dc, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count,
+									cell_width, cell_height, Y, X);
 						start_idx += wchar_count;
 					}
 					DrawChar(vt, dc, BGDC, *X, Y, &StrW[i - zero_count], 1 + zero_count, cells[i]);
-					*X += cells[i] * vt->FontWidth;
+					*X += cells[i] * vt->CellWidth;
 					start_idx += 1 + zero_count;
 					zero_count = 0;
 					cell_count = 0;
@@ -3067,18 +3091,12 @@ static void DrawStrW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *
 			}
 		}
 		if (cell_count != 0) {
-			DrawStrWSub(dc, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count, font_width, font_height, Y,
+			DrawStrWSub(vt, dc, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count, cell_width, cell_height, Y,
 						X);
 		}
 	}
 	else {
-		DrawStrWSub(dc, BGDC, StrW, Dx, len, cell, font_width, font_height, Y, X);
-	}
-
-	if (vt->debug_drawbox_text) {
-		int width = cell * font_width;
-		int height = font_height;
-		DrawBox(DC, sx, Y, width, height, RGB(0, 255, 0));
+		DrawStrWSub(vt, dc, BGDC, StrW, Dx, len, cell, cell_width, cell_height, Y, X);
 	}
 }
 
@@ -3114,10 +3132,10 @@ BOOL DispDeleteLines(vtdraw_t *vt, int Count, int YEnd)
   {
 	R.left = 0;
 	R.right = ScreenWidth;
-	R.top = (CursorY - WinOrgY) * vt->FontHeight;
-	R.bottom = (YEnd + 1 - WinOrgY) * vt->FontHeight;
-	//  ScrollWindow(HVTWin,0,-FontHeight*Count,&R,&R);
-	BGScrollWindow(HVTWin,0,-vt->FontHeight*Count,&R,&R);
+	R.top = (CursorY - WinOrgY) * vt->CellHeight;
+	R.bottom = (YEnd + 1 - WinOrgY) * vt->CellHeight;
+	//  ScrollWindow(HVTWin,0,-CellHeight*Count,&R,&R);
+	BGScrollWindow(HVTWin,0,-vt->CellHeight*Count,&R,&R);
 	UpdateWindow(HVTWin);
 	return TRUE;
   }
@@ -3137,10 +3155,10 @@ BOOL DispInsertLines(vtdraw_t *vt, int Count, int YEnd)
   {
     R.left = 0;
     R.right = ScreenWidth;
-	R.top = (CursorY - WinOrgY) * vt->FontHeight;
-	R.bottom = (YEnd + 1 - WinOrgY) * vt->FontHeight;
-	//  ScrollWindow(HVTWin,0,FontHeight*Count,&R,&R);
-	BGScrollWindow(HVTWin, 0, vt->FontHeight * Count, &R, &R);
+	R.top = (CursorY - WinOrgY) * vt->CellHeight;
+	R.bottom = (YEnd + 1 - WinOrgY) * vt->CellHeight;
+	//  ScrollWindow(HVTWin,0,CellHeight*Count,&R,&R);
+	BGScrollWindow(HVTWin, 0, vt->CellHeight * Count, &R, &R);
 	UpdateWindow(HVTWin);
     return TRUE;
   }
@@ -3173,8 +3191,8 @@ BOOL IsLineVisible(vtdraw_t *vt, int *X, int *Y)
     return FALSE;
 
   /* screen coordinate -> window coordinate */
-  *X = (*X - WinOrgX) * vt->FontWidth;
-  *Y = (*Y - WinOrgY) * vt->FontHeight;
+  *X = (*X - WinOrgX) * vt->CellWidth;
+  *Y = (*Y - WinOrgY) * vt->CellHeight;
   return TRUE;
 }
 
@@ -3274,11 +3292,11 @@ void DispUpdateScroll(vtdraw_t *vt)
   /* Update partial scroll */
   if (dScroll != 0)
   {
-    d = dScroll * vt->FontHeight;
+    d = dScroll * vt->CellHeight;
     R.left = 0;
     R.right = ScreenWidth;
-    R.top = (SRegionTop-WinOrgY)*vt->FontHeight;
-    R.bottom = (SRegionBottom+1-WinOrgY)*vt->FontHeight;
+    R.top = (SRegionTop-WinOrgY)*vt->CellHeight;
+    R.bottom = (SRegionBottom+1-WinOrgY)*vt->CellHeight;
 //  ScrollWindow(HVTWin,0,-d,&R,&R);
     BGScrollWindow(HVTWin,0,-d,&R,&R);
 
@@ -3319,13 +3337,13 @@ void DispUpdateScroll(vtdraw_t *vt)
 
   if (NewOrgX==WinOrgX)
   {
-	  d = (NewOrgY - WinOrgY) * vt->FontHeight;
+	  d = (NewOrgY - WinOrgY) * vt->CellHeight;
 	  //  ScrollWindow(HVTWin,0,-d,NULL,NULL);
     BGScrollWindow(HVTWin,0,-d,NULL,NULL);
   }
   else if (NewOrgY==WinOrgY)
   {
-    d = (NewOrgX-WinOrgX) * vt->FontWidth;
+    d = (NewOrgX-WinOrgX) * vt->CellWidth;
 //  ScrollWindow(HVTWin,-d,0,NULL,NULL);
     BGScrollWindow(HVTWin,-d,0,NULL,NULL);
   }
@@ -3363,8 +3381,8 @@ void DispAutoScroll(vtdraw_t *vt, POINT p)
 {
   int X, Y;
 
-  X = (p.x + vt->FontWidth / 2) / vt->FontWidth;
-  Y = p.y / vt->FontHeight;
+  X = (p.x + vt->CellWidth / 2) / vt->CellWidth;
+  Y = p.y / vt->CellHeight;
   if (X<0)
     NewOrgX = WinOrgX + X;
   else if (X>=WinWidth)
@@ -3476,8 +3494,8 @@ void DispSetWinPos(vtdraw_t *vt)
 
 	if (CanUseIME() && (ts.IMEInline > 0))
 	{
-		CaretX = (CursorX-WinOrgX)*vt->FontWidth;
-		CaretY = (CursorY-WinOrgY)*vt->FontHeight;
+		CaretX = (CursorX-WinOrgX)*vt->CellWidth;
+		CaretY = (CursorY-WinOrgY)*vt->CellHeight;
 		/* set IME conversion window pos. */
 		SetConversionWindow(HVTWin,CaretX,CaretY);
 	}
@@ -3528,20 +3546,6 @@ void DispSetActive(vtdraw_t *vt, BOOL ActiveFlag)
 			SetConversionWindow(HVTWin,-1,0);
 		}
 	}
-}
-
-int TCharAttrCmp(TCharAttr a, TCharAttr b)
-{
-  if (a.Attr == b.Attr &&
-      a.Attr2 == b.Attr2 &&
-      a.Fore == b.Fore &&
-      a.Back == b.Back)
-  {
-    return 0;
-  }
-  else {
-    return 1;
-  }
 }
 
 void DispSetColor(vtdraw_t *vt, unsigned int num, COLORREF color)
@@ -3610,8 +3614,6 @@ void DispSetColor(vtdraw_t *vt, unsigned int num, COLORREF color)
 		}
 		break;
 	}
-
-	UpdateBGBrush(vt);
 
 	if (num == CS_TEK_FG || num == CS_TEK_BG) {
 		if (HTEKWin)
@@ -3718,8 +3720,6 @@ void DispResetColor(vtdraw_t *vt, unsigned int num)
 		}
 	}
 
-	UpdateBGBrush(vt);
-
 	if (num == CS_TEK_FG || num == CS_TEK_BG) {
 		if (HTEKWin)
 			InvalidateRect(HTEKWin, NULL, FALSE);
@@ -3767,43 +3767,6 @@ COLORREF DispGetColor(unsigned int num)
 	}
 
 	return color;
-}
-
-void DispSetCurCharAttr(vtdraw_t *vt, const TCharAttr *Attr)
-{
-	vt->CurCharAttr = *Attr;
-	UpdateBGBrush(vt);
-}
-
-static void UpdateBGBrush(vtdraw_t *vt)
-{
-	COLORREF bg_rgb;
-
-	if (vt->Background != NULL)
-		DeleteObject(vt->Background);
-
-	if ((ts.ColorFlag & CF_REVERSEVIDEO) == 0) {
-		if ((vt->CurCharAttr.Attr2 & Attr2Back) != 0) {
-			const WORD AttrFlag = ((ts.ColorFlag & CF_BLINKCOLOR) && (vt->CurCharAttr.Attr & AttrBlink)) ? AttrBlink : 0;
-			const int index = Get16ColorIndex(vt->CurCharAttr.Back, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBlink);
-			bg_rgb = ANSIColor[index];
-		}
-		else {
-			bg_rgb = vt->BGVTColor[1];
-		}
-	}
-	else {
-		if ((vt->CurCharAttr.Attr2 & Attr2Fore) != 0) {
-			const WORD AttrFlag = ((ts.ColorFlag & CF_BOLDCOLOR) && (vt->CurCharAttr.Attr & AttrBold)) ? AttrBold : 0;
-			const int index = Get16ColorIndex(vt->CurCharAttr.Fore, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBold);
-			bg_rgb = ANSIColor[index];
-		}
-		else {
-			bg_rgb = vt->BGVTColor[0];
-		}
-	}
-
-	vt->Background = CreateSolidBrush(bg_rgb);
 }
 
 void DispShowWindow(int mode)
@@ -3928,8 +3891,8 @@ void DispGetRootWinSize(vtdraw_t *vt, int *x, int *y, BOOL inPixels)
 		*y = desktop.bottom - desktop.top;
 	}
 	else {
-		*x = (desktop.right - desktop.left - (win.right - win.left - client.right)) / vt->FontWidth;
-		*y = (desktop.bottom - desktop.top - (win.bottom - win.top - client.bottom)) / vt->FontHeight;
+		*x = (desktop.right - desktop.left - (win.right - win.left - client.right)) / vt->CellWidth;
+		*y = (desktop.bottom - desktop.top - (win.bottom - win.top - client.bottom)) / vt->CellHeight;
 	}
 }
 
@@ -4254,7 +4217,7 @@ void DispPrnPosCR(vtdraw_t *vt, ttdc_t *dc)
  */
 void DispPrnPosLF(vtdraw_t *vt, ttdc_t *dc)
 {
-	dc->PrnY = dc->PrnY + vt->FontHeight;
+	dc->PrnY = dc->PrnY + vt->CellHeight;
 }
 
 /**
@@ -4284,10 +4247,10 @@ HDC DispDCGetRawDC(ttdc_t *dc)
 void DispGetCellSize(vtdraw_t *vt, int *width, int *height)
 {
 	if (width != NULL) {
-		*width = vt->FontWidth;
+		*width = vt->CellWidth;
 	}
 	if (height != NULL) {
-		*height = vt->FontHeight;
+		*height = vt->CellHeight;
 	}
 }
 
@@ -4305,6 +4268,19 @@ void DispSetFontSize(vtdraw_t *vt, int width, int height)
 {
 	vt->FontWidth = width;
 	vt->FontHeight = height;
+	vt->CellWidth = width;
+	vt->CellHeight = height;
+}
+
+void DispGetScreenSize(vtdraw_t *vt, int *width, int *height)
+{
+	(void)vt;
+	if (width != NULL) {
+		*width = ScreenWidth;
+	}
+	if (height != NULL) {
+		*height = ScreenHeight;
+	}
 }
 
 /**
