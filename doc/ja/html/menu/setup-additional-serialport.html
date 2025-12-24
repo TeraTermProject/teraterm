@@ -97,8 +97,33 @@
               <dt>DSR/DTR</dt><dd>ハードウェアフロー(DSR/DTR)</dd>
               <dt>none</dt><dd>フロー制御なし<br>
             </dl>
-
           </dd>
+
+          <dt>CTS、DSR、RING、RLSD</dt>
+          <dd>
+            制御信号の状態を表示します。
+            <ul>
+              <li>CTS (Clear To Send) : 送信可能</li>
+              <li>DSR (Data Set Ready) : データセット準備完了</li>
+              <li>RING (Ring Indicator) : 着信(呼び出し中)</li>
+              <li>RLSD (Receive Line Signal Detect) : キャリア検出</li>
+            </ul>
+          </dd>
+
+          <dt id="FlowCtrlRTS">RTS</dt>
+          <dd>
+            制御信号 RTS (Request To Send) の状態を表示します。<br>
+            RTS のフロー制御方法 Disable / Enable / Handshake / Toggle を設定します。<br>
+            RTS のフロー制御が Disable 又は Enable の場合は、RTSをクリックするとアサート、デアサートが切り替わります。
+          </dd>
+
+          <dt id="FlowCtrlDTR">DTR</dt>
+          <dd>
+            制御信号 DTR (Data Terminal Ready) の状態を表示します。<br>
+            DTR のフロー制御方法 Disable / Enable / Handshake を設定します。<br>
+            DTR のフロー制御が Disable 又は Enable の場合は、DTRをクリックするとアサート、デアサートが切り替わります。
+          </dd>
+
         </dl>
       </dd>
 

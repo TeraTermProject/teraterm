@@ -2046,6 +2046,24 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->ReceivefileSkipOptionDialog = GetOnOff(Section, "ReceivefileSkipOptionDialog", FName, FALSE);
 	ts->ReceivefileAutoStopWaitTime = GetPrivateProfileInt(Section, "ReceivefileAutoStopWaitTime", 5, FName);
 
+	// シリアルポートRTSとDTRのフローコントロール設定
+	ts->FlowCtrlRTS = GetPrivateProfileInt(Section, "FlowCtrlRTS", -1, FName);
+	if (ts->FlowCtrlRTS == -1) {
+		if (ts->Flow == IdFlowHard) {
+			ts->FlowCtrlRTS = IdHandshake; // RTS/CTS
+		} else {
+			ts->FlowCtrlRTS = IdEnable;
+		}
+	}
+	ts->FlowCtrlDTR = GetPrivateProfileInt(Section, "FlowCtrlDTR", -1, FName);
+	if (ts->FlowCtrlDTR == -1) {
+		if (ts->Flow == IdFlowHardDsrDtr) {
+			ts->FlowCtrlDTR = IdHandshake; // DSR/DTR
+		} else {
+			ts->FlowCtrlDTR = IdEnable;
+		}
+	}
+
 	// Experimental
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreePropertySheet", FName, ts->ExperimentalTreePropertySheetEnable);
@@ -3325,6 +3343,10 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WritePrivateProfileString(Section, "FileReceiveFilter", ts->FileReceiveFilter, FName);
 	WriteOnOff(Section, "ReceivefileSkipOptionDialog", FName, ts->ReceivefileSkipOptionDialog);
 	WriteInt(Section, "ReceivefileAutoStopWaitTime", FName, ts->ReceivefileAutoStopWaitTime);
+
+	// シリアルポートRTSとDTRのフローコントロール設定
+	WriteInt(Section, "FlowCtrlRTS", FName, ts->FlowCtrlRTS);
+	WriteInt(Section, "FlowCtrlDTR", FName, ts->FlowCtrlDTR);
 }
 
 void SaveVTPos(const PTTSet ts)

@@ -97,8 +97,33 @@
               <dt>DSR/DTR</dt><dd>Hardware flow(DSR/DTR)</dd>
               <dt>none</dt><dd>No flow control<br>
             </dl>
-
           </dd>
+
+          <dt>CTS, DSR, RING, RLSD</dt>
+          <dd>
+            Displays the status of the control signals.
+            <ul>
+              <li>CTS (Clear To Send) : Ready to send</li>
+              <li>DSR (Data Set Ready) : Data set ready</li>
+              <li>RING (Ring Indicator) : Incoming (ringing)</li>
+              <li>RLSD (Receive Line Signal Detect) : Carrier detected</li>
+            </ul>
+          </dd>
+
+          <dt id="FlowCtrlRTS">RTS</dt>
+          <dd>
+            Displays the status of the RTS (Request To Send) control signal.<br>
+            Set the RTS flow control method to Disable / Enable / Handshake / Toggle.<br>
+            When RTS flow control is set to Disable or Enable, clicking RTS toggles it between asserted and deasserted.
+          </dd>
+
+          <dt id="FlowCtrlDTR">DTR</dt>
+          <dd>
+            Displays the status of the DTR (Data Terminal Ready) control signal.<br>
+            Set the DTR flow control method to Disable / Enable / Handshake.<br>
+            When DTR flow control is set to Disable or Enable, clicking DTR toggles it between asserted and deasserted.
+          </dd>
+
         </dl>
       </dd>
 
