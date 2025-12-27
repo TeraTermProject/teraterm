@@ -102,6 +102,12 @@ VT 端末のエミュレーションをします。</dd>
 文字コードに関連する用語
 
 <dl>
+  <dt id="Cell">セル</dt>
+
+  <dd>
+    文字を描画する単位。
+  </dd>
+
   <dt id="CJK">CJK, CJKV, 東アジア(East Asian)の文字コード</dt>
 
   <dd>
@@ -141,7 +147,8 @@ VT 端末のエミュレーションをします。</dd>
   <dt id="SBCS">SBCS</dt>
   <dd>
     Single-byte character set, 1バイト文字セット。<br>
-    最大で256種の文字を表現できる。
+    最大で256種の文字を表現できる。<br>
+    1文字は1<a href="#Cell">セル</a>で表現します。
   </dd>
 
   <dt id="DBCS">DBCS</dt>
@@ -149,7 +156,8 @@ VT 端末のエミュレーションをします。</dd>
     Double-byte character set, 2 バイト文字セット。<br>
     SBCSを拡張して漢字なども含めた文字を表現できる。<br>
     1バイトの文字と2バイトの文字が混在。<br>
-    Shift_jisはDBCSの1例。
+    Shift_jisはDBCSの1例。<br>
+    1バイト文字は1<a href="#Cell">セル</a>、2バイト文字2セル使用して1文字を表現します。
   </dd>
 
   <dt id="MBCS">MBCS</dt>
