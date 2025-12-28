@@ -6188,23 +6188,9 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	}
 
 	// TTSSHバージョン情報に表示するキービット数を求めておく
-	switch (kex->kex_type) {
-		case KEX_ECDH_SHA2_256:
-			kex->client_key_bits = 256;
-			kex->server_key_bits = 256;
-			break;
-		case KEX_ECDH_SHA2_384:
-			kex->client_key_bits = 384;
-			kex->server_key_bits = 384;
-			break;
-		case KEX_ECDH_SHA2_521:
-			kex->client_key_bits = 521;
-			kex->server_key_bits = 521;
-			break;
-		default:
-			// TODO
-			break;
-	}
+	//   アルゴリズムから曲線サイズ・暗号学的強度が確定するので、ビット数は表示しない
+	kex->client_key_bits = 0;
+	kex->server_key_bits = 0;
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 
@@ -6354,8 +6340,9 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	}
 
 	// TTSSHバージョン情報に表示するキービット数を求めておく
-	kex->client_key_bits = 256;
-	kex->server_key_bits = 256;
+	//   アルゴリズムから曲線サイズ・暗号学的強度が確定するので、ビット数は表示しない
+	kex->client_key_bits = 0;
+	kex->server_key_bits = 0;
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 

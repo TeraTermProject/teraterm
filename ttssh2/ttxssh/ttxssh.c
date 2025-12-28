@@ -2092,12 +2092,18 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
-			UTIL_get_lang_msgU8("DLG_ABOUT_KEXKEY", pvar, "Key exchange keys:");
-			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			CRYPT_get_server_key_info(pvar, buf, sizeof(buf));
-			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
+			// DH fixed group, DH GEX
+			//   キービット数を表示する
+			// ECDH (nistp, curve25519)
+			//   アルゴリズムから曲線サイズ・暗号学的強度が確定するので、キービット数は表示しない
+			if (pvar->kex->client_key_bits > 0 && pvar->kex->server_key_bits > 0) {
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXKEY", pvar, "Key exchange keys:");
+				strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
+				strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+				CRYPT_get_server_key_info(pvar, buf, sizeof(buf));
+				strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+				strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
+			}
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_AUTH", pvar, "Authentication:");
 			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
