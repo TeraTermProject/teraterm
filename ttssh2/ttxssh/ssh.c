@@ -5869,6 +5869,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	}
 	buffer_clear(server_blob);
 	buffer_put_string(server_blob, server_public, pklen);
+	buffer_rewind(server_blob);
 	buffer_get_bignum2_msg(server_blob, dh_server_pub);
 	kex->server_key_bits = BN_num_bits(dh_server_pub);
 
