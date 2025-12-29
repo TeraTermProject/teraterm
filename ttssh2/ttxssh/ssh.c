@@ -5764,6 +5764,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	u_char *server_public = NULL;
 	BIGNUM *dh_server_pub = NULL;
 	BIGNUM *pub_key = NULL;
+	BIGNUM *dh_p = NULL;
 	BOOL result = FALSE;
 	char *emsg = NULL, emsg_tmp[1024]; // error message
 
@@ -5858,7 +5859,8 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "hash", hash, hashlen);
 	}
 
-	// TTSSHバージョン情報に表示するキービット数を求めておく
+	// TTSSHバージョン情報に表示するビット数を求めておく
+	/*
 	DH_get0_key(kex->dh, &pub_key, NULL);
 	kex->client_key_bits = BN_num_bits(pub_key);
 	dh_server_pub = BN_new();
@@ -5871,6 +5873,9 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	buffer_put_string(server_blob, server_public, pklen);
 	buffer_get_bignum2_msg(server_blob, dh_server_pub);
 	kex->server_key_bits = BN_num_bits(dh_server_pub);
+	*/
+	DH_get0_pqg(kex->dh, &dh_p, NULL, NULL);
+	kex->dh_group_bits = BN_num_bits(dh_p);
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 
@@ -6038,10 +6043,13 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		push_memdump("DH_GEX_REPLY kexgex_hash", "hash", hash, hashlen);
 	}
 
-	// TTSSHバージョン情報に表示するキービット数を求めておく
+	// TTSSHバージョン情報に表示するビット数を求めておく
+	/*
 	DH_get0_key(kex->dh, &pub_key, NULL);
 	kex->client_key_bits = BN_num_bits(pub_key);
 	kex->server_key_bits = BN_num_bits(dh_server_pub);
+	*/
+	kex->dh_group_bits = BN_num_bits(dh_p);
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, slen);
 
@@ -6186,11 +6194,6 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "hash", hash, hashlen);
 	}
-
-	// TTSSHバージョン情報に表示するキービット数を求めておく
-	//   アルゴリズムから曲線サイズ・暗号学的強度が確定するので、ビット数は表示しない
-	kex->client_key_bits = 0;
-	kex->server_key_bits = 0;
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 
@@ -6338,11 +6341,6 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 
 		push_memdump("KEX_ECDH_REPLY curve25519_kex_reply", "hash", hash, hashlen);
 	}
-
-	// TTSSHバージョン情報に表示するキービット数を求めておく
-	//   アルゴリズムから曲線サイズ・暗号学的強度が確定するので、ビット数は表示しない
-	kex->client_key_bits = 0;
-	kex->server_key_bits = 0;
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 

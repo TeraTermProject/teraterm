@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Turkish
-date=2025-11-28 by TeraTerm Project
+date=2025-12-30 by TeraTerm Project
 contributor= Mehmet Cagri Aksoy (2025-08-04)
 
 [Tera Term]
@@ -673,6 +673,10 @@ DLG_ABOUT_COMP_INFO=seviye %d; oran %.1f (%ld:%ld)
 DLG_ABOUT_COMP_INFO2=seviye %d
 DLG_ABOUT_COMP_NONE=yok
 DLG_ABOUT_COMP_UPDOWN=Yukarı %s; Aşağı %s
+DLG_ABOUT_KEXPARAM=Key exchange param:
+DLG_ABOUT_KEXPARAM_DH=%d-bit DH group
+DLG_ABOUT_KEXPARAM_NISTP=NIST P-%d (%d-bit) elliptic curve
+DLG_ABOUT_KEXPARAM_X25519=Curve25519 (255-bit) elliptic curve
 DLG_ABOUT_AUTH_INFO=Kullanıcı '%s', %s kimlik doğrulama
 DLG_ABOUT_AUTH_INFO2=, %s anahtarı
 DLG_ABOUT_AUTH_INFO3=, %s anahtarı ile %s

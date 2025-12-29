@@ -1162,12 +1162,57 @@ void CRYPT_get_server_key_info(PTInstVar pvar, char *dest, int len)
 			            BN_num_bits(server_n),
 			            BN_num_bits(host_n));
 		}
-	} else { // SSH2
-			UTIL_get_lang_msgU8("DLG_ABOUT_KEY_INFO2", pvar,
-			                    "%d-bit client key, %d-bit server key");
-			_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg,
-			            pvar->kex->client_key_bits,
-			            pvar->kex->server_key_bits);
+	}
+}
+
+void CRYPT_get_kex_params_info(PTInstVar pvar, char *dest, int len)
+{
+	char buf[1024];
+	buf[0] = '\0';
+
+	if (SSHv2(pvar)) {
+		switch (pvar->kex->kex_type) {
+			// DH fixed group, DH group exchange
+			case KEX_DH_GRP1_SHA1:
+			case KEX_DH_GRP14_SHA1:
+			case KEX_DH_GEX_SHA1:
+			case KEX_DH_GEX_SHA256:
+			case KEX_DH_GRP14_SHA256:
+			case KEX_DH_GRP16_SHA512:
+			case KEX_DH_GRP18_SHA512:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_DH", pvar, "%d-bit DH group");
+				strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
+				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg, pvar->kex->dh_group_bits);
+				break;
+			// NIST P-based ECDH
+			case KEX_ECDH_SHA2_256:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_NISTP", pvar, "NIST P-%d (%d-bit) elliptic curve");
+				strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
+				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg, 256, 256);
+				break;
+			case KEX_ECDH_SHA2_384:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_NISTP", pvar, "NIST P-%d (%d-bit) elliptic curve");
+				strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
+				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg, 384, 384);
+				break;
+			case KEX_ECDH_SHA2_521:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_NISTP", pvar, "NIST P-%d (%d-bit) elliptic curve");
+				strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
+				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg, 521, 521);
+				break;
+			// curve25519 ECDH
+			case KEX_CURVE25519_SHA256_OLD:
+			case KEX_CURVE25519_SHA256:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_X25519", pvar, "Curve25519 (255-bit) elliptic curve");
+				strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
+				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg);
+				break;
+		}
 	}
 }
 

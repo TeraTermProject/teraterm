@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2025-11-28 by TeraTerm Project
+date=2025-12-30 by TeraTerm Project
 contributor=LiShaohui (2017-04-11); tuwulin365@126.com(2025-12-18)
 
 [Tera Term]
@@ -673,6 +673,10 @@ DLG_ABOUT_COMP_INFO=等级 %d; 压缩比 %.1f (%ld：%ld)
 DLG_ABOUT_COMP_INFO2=等级 %d
 DLG_ABOUT_COMP_NONE=无
 DLG_ABOUT_COMP_UPDOWN=上传 %s; 下载 %s
+DLG_ABOUT_KEXPARAM=Key exchange param:
+DLG_ABOUT_KEXPARAM_DH=%d-bit DH group
+DLG_ABOUT_KEXPARAM_NISTP=NIST P-%d (%d-bit) elliptic curve
+DLG_ABOUT_KEXPARAM_X25519=Curve25519 (255-bit) elliptic curve
 DLG_ABOUT_AUTH_INFO=用户 '%s'，%s认证
 DLG_ABOUT_AUTH_INFO2=, %s key
 DLG_ABOUT_AUTH_INFO3=, %s key with %s

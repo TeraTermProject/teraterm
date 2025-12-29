@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2025-11-28 by TeraTerm Project
+date=2025-12-30 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -672,6 +672,10 @@ DLG_ABOUT_COMP_INFO=level %d; ratio %.1f (%ld:%ld)
 DLG_ABOUT_COMP_INFO2=level %d
 DLG_ABOUT_COMP_NONE=Keiner
 DLG_ABOUT_COMP_UPDOWN=Upstream %s; Downstream %s
+DLG_ABOUT_KEXPARAM=Key exchange param:
+DLG_ABOUT_KEXPARAM_DH=%d-bit DH group
+DLG_ABOUT_KEXPARAM_NISTP=NIST P-%d (%d-bit) elliptic curve
+DLG_ABOUT_KEXPARAM_X25519=Curve25519 (255-bit) elliptic curve
 DLG_ABOUT_AUTH_INFO=Benutzer '%s', %s authentication
 DLG_ABOUT_AUTH_INFO2=, %s key
 DLG_ABOUT_AUTH_INFO3=, %s key with %s
