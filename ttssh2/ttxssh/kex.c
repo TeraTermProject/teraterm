@@ -1052,7 +1052,7 @@ kex_c25519_keypair(kex *kex)
 
 	// TTSSH のバッファには読み込み位置が存在しない
 	//   どの種類でも一律に 4 bytes ずらして読み込めるようにするため、
-	//   ed25519 のとき、OpenSSH と TTSSH はデータ構造が異なる
+	//   x25519 のとき、OpenSSH と TTSSH はデータ構造が異なる
 	// data format of kex->client_pub
 	//   len:  4 bytes  ... length of data
 	//   data: 32 bytes ... x25519 public key

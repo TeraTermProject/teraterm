@@ -5778,7 +5778,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEXDH_REPLY", "key exchange: receiving", data, len);
 
-	/* hostkey */
+	/* K_S, server's public host key */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = buffer_init();
@@ -5936,7 +5936,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	push_memdump("DH_GEX_REPLY", "key exchange: receiving", data, len);
 
-	/* hostkey */
+	/* K_S, server's public host key */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = buffer_init();
@@ -6104,7 +6104,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
-	/* hostkey */
+	/* K_S, server's public host key */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = buffer_init();
@@ -6270,7 +6270,7 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
-	/* hostkey */
+	/* K_S, server's public host key */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = buffer_init();
@@ -6319,7 +6319,7 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	//   xk is a shared secret
 	// Writing using RFC 5656 notation:
 	//   (x', y') = d_C * Q_S
-	//   x' is a shared secret K
+	//   K = stringify(x') ... x25519 shared secret
 	r = kex_c25519_dec(kex, server_blob, &shared_secret);
 	if (r != 0)
 		goto out;
