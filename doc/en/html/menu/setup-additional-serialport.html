@@ -113,15 +113,28 @@
           <dt id="FlowCtrlRTS">RTS</dt>
           <dd>
             Displays the status of the RTS (Request To Send) control signal.<br>
-            Set the RTS flow control method to Disable / Enable / Handshake / Toggle.<br>
-            When RTS flow control is set to Disable or Enable, clicking RTS toggles it between asserted and deasserted.
+            Set the RTS flow control method to Disable / Enable / Handshake / Toggle.
+            For details, see the description of the fRtsControl member of the <a href="https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-dcb">DCB structure</a>.<br>
+            <ul>
+              <li>Disable : always low</li>
+              <li>Enable : always high</li>
+              <li>Handshake : high when ready to receive</li>
+              <li>Toggle : high while transmitting</li>
+            </ul>
+            When RTS flow control is set to Disable or Enable, clicking RTS toggles it between low and high.
           </dd>
 
           <dt id="FlowCtrlDTR">DTR</dt>
           <dd>
             Displays the status of the DTR (Data Terminal Ready) control signal.<br>
-            Set the DTR flow control method to Disable / Enable / Handshake.<br>
-            When DTR flow control is set to Disable or Enable, clicking DTR toggles it between asserted and deasserted.
+            Set the DTR flow control method to Disable / Enable / Handshake.
+            For details, see the description of the fDtrControl member of the <a href="https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-dcb">DCB structure</a>.<br>
+            <ul>
+              <li>Disable : always low</li>
+              <li>Enable : always high</li>
+              <li>Handshake : high when ready to receive</li>
+            </ul>
+            When DTR flow control is set to Disable or Enable, clicking DTR toggles it between low and high.
           </dd>
 
         </dl>

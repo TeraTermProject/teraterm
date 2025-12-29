@@ -149,14 +149,14 @@
 #define IDC_WINLISTCLOSE                1202
 #define IDC_WINLISTHELP                 1299
 #define IDC_GENLANGUI_LABEL             1300
-#define IDC_RADIO_RING                  1301
-#define IDC_RADIO_RLSD                  1302
-#define IDC_RADIO_CTS                   1303
-#define IDC_RADIO_RTS                   1304
-#define IDC_SERIALRTS                   1305
-#define IDC_RADIO_DSR                   1306
-#define IDC_RADIO_DTR                   1307
-#define IDC_SERIALDTR                   1308
+#define IDC_CHECK_CTS                   1301
+#define IDC_CHECK_RTS                   1302
+#define IDC_SERIALRTS                   1303
+#define IDC_CHECK_DSR                   1304
+#define IDC_CHECK_DTR                   1305
+#define IDC_SERIALDTR                   1306
+#define IDC_CHECK_RING                  1307
+#define IDC_CHECK_RLSD                  1308
 
 // Next default values for new objects
 //
