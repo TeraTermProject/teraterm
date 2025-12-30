@@ -127,6 +127,12 @@ On the other hand, when pasted characters is overwritten again to remove the hig
 Glossary related to character codes.
 
 <dl>
+  <dt id="Cell">Cell</dt>
+
+  <dd>
+    The Unit for drawing characters.
+  </dd>
+
   <dt id="CJK">CJK, CJKV, East Asian characters</dt>
 
   <dd>
@@ -165,7 +171,8 @@ Glossary related to character codes.
   <dt id="SBCS">SBCS</dt>
   <dd>
     Single-byte character set.<br>
-    Up to 256 types of characters can be represented.
+    Up to 256 types of characters can be represented.<br>
+    1character uses 1<a href="#Cell">cell</a>.
   </dd>
 
   <dt id="DBCS">DBCS</dt>
@@ -173,7 +180,8 @@ Glossary related to character codes.
     Double-byte character set.<br>
     DBCS is a character set that extends SBCS and can represent characters including Kanji characters.<br>
     Mixed 1-byte and 2-byte characters.<br>
-    Shift_jis is one example of DBCS.
+    Shift_jis is one example of DBCS.<br>
+    1-byte character uses 1<a href="#Cell">cell</a>, 2-byte character uses 2 cell.
   </dd>
 
   <dt id="MBCS">MBCS</dt>

@@ -101,14 +101,6 @@ HDC PrnBox(HWND HWin, PBOOL Sel)
 	return PrnDlg.hDC;
 }
 
-static ttdc_t *CreateTTDC(HDC hDC)
-{
-	ttdc_t *dc = (ttdc_t *)calloc(1, sizeof(*dc));
-	dc->VTDC = hDC;
-	dc->IsPrinter = TRUE;
-	return dc;
-}
-
 /**
  *	印刷開始
  *	hDCを印刷できる状態にする
@@ -170,163 +162,6 @@ void PrnStop(HDC hDC)
 		delete PrnAbortDlg;
 		PrnAbortDlg = NULL;
 	}
-}
-
-/**
- *	VT印刷
- *	Initialize printing of VT window
- *	dcと戻り値vtはVTPrintEnd()で破棄する
- *
- *	@param PrnFlag		specifies object to be printed
- *	= IdPrnScreen		Current screen
- *	= IdPrnSelectedText	Selected text
- *	= IdPrnScrollRegion	Scroll region
- *	= IdPrnFile		Spooled file (printer sequence)
- *	@param[out]	dc
- *	@param[out] mode	print object ID specified by user
- *	= IdPrnCancel		(user clicks "Cancel" button)
- *	= IdPrnScreen		(user don't select "print selection" option)
- *	= IdPrnSelectedText	(user selects "print selection")
- *	= IdPrnScrollRegion	(always when PrnFlag=IdPrnScrollRegion)
- *	= IdPrnFile		(always when PrnFlag=IdPrnFile)
- *	@return		vt
- */
-vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **pdc, int *mode)
-{
-	BOOL Sel;
-	TEXTMETRIC Metrics;
-	POINT PPI, PPI2;
-	HDC DC;
-	LOGFONTW Prnlf;
-	vtdraw_t *p = (vtdraw_t *)calloc(1, sizeof(*p));
-	p->IsPrinter = TRUE;
-	p->IsColorPrinter = FALSE;		// TRUEのときプリンタにカラーで印刷する
-
-	Sel = (PrnFlag & IdPrnSelectedText)!=0;
-	HDC PrintDC = PrnBox(HVTWin,&Sel);
-	if (PrintDC == NULL) {
-		*mode = IdPrnCancel;
-		*pdc = NULL;
-		return NULL;
-	}
-
-	/* start printing */
-	wchar_t *TitleW = ToWcharA(ts.Title);
-	if (!PrnStart(PrintDC, TitleW)) {
-		free(TitleW);
-		*mode = IdPrnCancel;
-		*pdc = NULL;
-		return NULL;
-	}
-	free(TitleW);
-
-	/* initialization */
-	StartPage(PrintDC);
-
-	ttdc_t *dc = CreateTTDC(PrintDC);
-
-	/* pixels per inch */
-	if ((ts.VTPPI.x>0) && (ts.VTPPI.y>0)) {
-		PPI = ts.VTPPI;
-	}
-	else {
-		PPI.x = GetDeviceCaps(PrintDC,LOGPIXELSX);
-		PPI.y = GetDeviceCaps(PrintDC,LOGPIXELSY);
-	}
-
-	/* left margin */
-	p->Margin.left = (int)((float)ts.PrnMargin[0] / 100.0 * (float)PPI.x);
-	/* right margin */
-	p->Margin.right = GetDeviceCaps(PrintDC, HORZRES) -
-	               (int)((float)ts.PrnMargin[1] / 100.0 * (float)PPI.x);
-	/* top margin */
-	p->Margin.top = (int)((float)ts.PrnMargin[2] / 100.0 * (float)PPI.y);
-	/* bottom margin */
-	p->Margin.bottom = GetDeviceCaps(PrintDC, VERTRES) -
-	                 (int)((float)ts.PrnMargin[3] / 100.0 * (float)PPI.y);
-
-	/* create test font */
-	memset(&Prnlf, 0, sizeof(Prnlf));
-
-	if (ts.PrnFont[0]==0) {
-		Prnlf.lfHeight = ts.VTFontSize.y;
-		Prnlf.lfWidth = ts.VTFontSize.x;
-		Prnlf.lfCharSet = ts.VTFontCharSet;
-		ACPToWideChar_t(ts.VTFont, Prnlf.lfFaceName, _countof(Prnlf.lfFaceName));
-	}
-	else {
-		Prnlf.lfHeight = ts.PrnFontSize.y;
-		Prnlf.lfWidth = ts.PrnFontSize.x;
-		Prnlf.lfCharSet = ts.PrnFontCharSet;
-		ACPToWideChar_t(ts.PrnFont, Prnlf.lfFaceName, _countof(Prnlf.lfFaceName));
-	}
-	Prnlf.lfWeight = FW_NORMAL;
-	Prnlf.lfItalic = 0;
-	Prnlf.lfUnderline = 0;
-	Prnlf.lfStrikeOut = 0;
-	Prnlf.lfOutPrecision = OUT_CHARACTER_PRECIS;
-	Prnlf.lfClipPrecision = CLIP_CHARACTER_PRECIS;
-	Prnlf.lfQuality = DEFAULT_QUALITY;
-	Prnlf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
-
-	p->VTFont[0] = CreateFontIndirectW(&Prnlf);
-
-	DC = GetDC(HVTWin);
-	SelectObject(DC, p->VTFont[0]);
-	GetTextMetrics(DC, &Metrics);
-	PPI2.x = GetDeviceCaps(DC,LOGPIXELSX);
-	PPI2.y = GetDeviceCaps(DC,LOGPIXELSY);
-	ReleaseDC(HVTWin,DC);
-	DeleteObject(p->VTFont[0]); /* Delete test font */
-
-	/* Adjust font size */
-	Prnlf.lfHeight = (int)((float)Metrics.tmHeight * (float)PPI.y / (float)PPI2.y);
-	Prnlf.lfWidth = (int)((float)Metrics.tmAveCharWidth * (float)PPI.x / (float)PPI2.x);
-
-	/* Create New Fonts */
-	DispFontCreate(p, dc, Prnlf);
-
-	p->Black = RGB(0,0,0);
-	p->White = RGB(255,255,255);
-	DispSetDrawPos(p, dc, 0, 0);
-
-	*pdc = dc;
-
-	if (PrnFlag == IdPrnScrollRegion) {
-		*mode = IdPrnScrollRegion;
-		return p;
-	}
-	if (PrnFlag == IdPrnFile) {
-		*mode = IdPrnFile;
-		return p;
-	}
-	if (Sel) {
-		*mode = IdPrnSelectedText;
-		return p;
-	}
-	else {
-		*mode = IdPrnScreen;
-		return p;
-	}
-}
-
-/**
- *	VT印刷完了
- *	VTPrintInit()で取得したvtとdcを開放する
- */
-void VTPrintEnd(vtdraw_t *vt, ttdc_t *dc)
-{
-	if (PrnAbortDlg->IsAborted()) {
-		AbortDoc(dc->VTDC);
-	}
-	else {
-		EndPage(dc->VTDC);
-	}
-	PrnStop(dc->VTDC);
-
-	DispFontDelete(vt);
-	DispReleaseDC(vt, dc);
-	free(vt);
 }
 
 /* pass-thru printing */
@@ -483,12 +318,12 @@ static void PrintFile_(PrintFile *handle)
 					//PrnOutTextW(BuffW, NULL, len_w);
 				}
 				if (CRFlag) {
-					dc->PrnX = vt->Margin.left;
+					DispPrnPosCR(vt, dc);
 					if ((u32==FF) && (ts.PrnConvFF==0)) { // new page
-						dc->PrnY = vt->Margin.bottom;
+						DispPrnPosFF(vt, dc);
 					}
 					else { // new line
-						dc->PrnY = dc->PrnY + vt->FontHeight;
+						DispPrnPosLF(vt, dc);
 					}
 				}
 				CRFlag = (u32==CR);

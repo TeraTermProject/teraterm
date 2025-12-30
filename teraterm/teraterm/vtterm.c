@@ -2596,7 +2596,10 @@ static void CSSunSequence() /* Sun terminal private sequences */
 
 	  case 16: // Report character cell size (pixel)
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
-			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "6;%d;%dt", CLocale, vt_src->FontHeight, vt_src->FontWidth);
+			int width;
+			int height;
+			DispGetCellSize(vt_src, &width, &height);
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "6;%d;%dt", CLocale, height, width);
 			SendCSIstr(Report, len);
 		}
 		break;
