@@ -609,11 +609,19 @@ kex_dh_keypair(struct kex* kex)
 	DH_get0_key(kex->dh, &pub_key, NULL);
 	if ((buf = buffer_init()) == NULL)
 		return SSH_ERR_ALLOC_FAIL;
+
+	// OpenSSH
+	// if ((r = sshbuf_put_bignum2(buf, pub_key)) != 0 ||
+	//     (r = sshbuf_get_u32(buf, NULL)) != 0)
+	// sshbuf_get_u32() により off がずれる
+	// 読み込み位置が data の位置になる
+
+	// data format of kex->client_pub
+	//   len:  4 bytes ... length of mpint data (m)
+	//   data: m bytes ... data part of mpint
+
 	buffer_put_bignum2(buf, pub_key);
-	// TTSSH の buffer_ptr() は offset 位置ではなくバッファの先頭を返すので意味がないが、
-	// OpenSSH と同じになるように offset を 4 バイトずらしておく。
-	buffer_rewind(buf);
-	buffer_consume(buf, 4);
+
 	kex->client_pub = buf;
 	buf = NULL;
  out:
@@ -693,11 +701,11 @@ kex_dh_hash(const digest_algorithm hash_alg,
 
 	buffer_put_stringb(b, serverhostkeyblob);
 	// OpenSSH:
-	//   「データの最初（off が4バイト進んだところ）」を sshbuf_put_stringb() する
-	//   「size-off（長さ）」と「データ」がコピーされる
+	//  off が 4 の sshbuf を sshbuf_put_stringb() する
+	//   「size-off（データの長さ）」と「off 以降のデータ」が格納される
 	// TTSSH:
 	//   「client_pub の最初から最後まで」を buffer_append() する
-	//   先頭にある4バイトの長さからデータの最後までがそのままコピーされる
+	//   先頭にある4バイトの長さからデータの最後までがそのまま格納される
 	buffer_append(b, buffer_ptr(client_pub), buffer_len(client_pub));
 	buffer_put_stringb(b, server_pub);
 	buffer_append(b, buffer_ptr(shared_secret), buffer_len(shared_secret));
@@ -818,11 +826,21 @@ kex_ecdh_keypair(kex *kex)
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		goto out;
 	}
+
+	// OpenSSH
+	// if ((r = sshbuf_put_ec(buf, public_key, group)) != 0 ||
+	//     (r = sshbuf_get_u32(buf, NULL)) != 0)
+	// sshbuf_get_u32() により off がずれる
+	// 読み込み位置が data の位置になる
+
+		// data format of kex->client_pub
+	//   len:  4 bytes ... 1 + m + m
+	//   form: 1 byte  ... 0x04 (uncompressed)
+	//   X:    m bytes
+	//   Y:    m bytes
+
 	buffer_put_ecpoint(buf, group, public_key);
-	// TTSSH の buffer_ptr() は offset 位置ではなくバッファの先頭を返すので意味がないが、
-	// OpenSSH と同じになるように offset を 4 バイトずらしておく。
-	buffer_rewind(buf);
-	buffer_consume(buf, 4);
+
 	kex->ec_client_key = client_key;
 	kex->ec_group = group;
 	client_key = NULL;	/* owned by the kex */
@@ -938,11 +956,11 @@ kex_ecdh_hash(const digest_algorithm hash_alg,
 
 	buffer_put_stringb(b, serverhostkeyblob);
 	// OpenSSH:
-	//   「データの最初（off が4バイト進んだところ）」を sshbuf_put_stringb() する
-	//   「size-off（長さ）」と「データ」がコピーされる
+	//  off が 4 の sshbuf を sshbuf_put_stringb() する
+	//   「size-off（データの長さ）」と「off 以降のデータ」が格納される
 	// TTSSH:
 	//   「client_pub の最初から最後まで」を buffer_append() する
-	//   先頭にある4バイトの長さからデータの最後までがそのままコピーされる
+	//   先頭にある4バイトの長さからデータの最後までがそのまま格納される
 	buffer_append(b, buffer_ptr(client_pub), buffer_len(client_pub));
 	buffer_put_stringb(b, server_pub);
 	buffer_append(b, buffer_ptr(shared_secret), buffer_len(shared_secret));
@@ -1021,15 +1039,31 @@ kex_c25519_keypair(kex *kex)
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		goto out;
 	}
+
+	// OpenSSH
+	// if ((r = sshbuf_reserve(buf, CURVE25519_SIZE, &cp)) != 0)
+	//     goto out;
+	// kexc25519_keygen(kex->c25519_client_key, cp);
+	// 長さ含まない 32 bytes を格納する
+	// off をずらす操作がない
+
+	// data format of kex->client_pub
+	//   data: 32 bytes ... x25519 public key
+
+	// TTSSH のバッファには読み込み位置が存在しない
+	//   どの種類でも一律に 4 bytes ずらして読み込めるようにするため、
+	//   x25519 のとき、OpenSSH と TTSSH はデータ構造が異なる
+	// data format of kex->client_pub
+	//   len:  4 bytes  ... length of data
+	//   data: 32 bytes ... x25519 public key
 	buffer_put_int(buf, CURVE25519_SIZE);
 	if (buffer_append_space(buf, CURVE25519_SIZE) == NULL) {
 		r = SSH_ERR_ALLOC_FAIL;
 		goto out;
 	}
 	cp = buffer_ptr(buf) + 4;
-	// TTSSH の buffer_ptr() は offset 位置ではなくバッファの先頭を返すので意味がないが、
-	// データの書き込みは直接行っているので、offset は OpenSSH と同じ 4 バイト進んだ位置になる。
 	kexc25519_keygen(kex->c25519_client_key, cp);
+
 	kex->client_pub = buf;
 	buf = NULL;
  out:
@@ -1105,11 +1139,12 @@ kex_c25519_hash(const digest_algorithm hash_alg,
 
 	buffer_put_stringb(b, serverhostkeyblob);
 	// OpenSSH:
-	//   「4バイト進んだところから最後まで」を sshbuf_put_stringb() する
-	//   「長さ」と「指定された範囲のデータ」がコピーされる
+	//  off が 0 の sshbuf を sshbuf_put_stringb() する
+	//   「size-off = size（データの長さ）」と「off 以降 = すべてのデータ」が格納される
 	// TTSSH:
-	//   「先頭から最後まで」を buffer_append() する
-	//   バッファ先頭にある長さから最後までがそのままコピーされる
+	//   「client_pub の最初から最後まで」を buffer_append() する
+	//   先頭にある4バイトの長さからデータの最後までがそのまま格納される
+	// cf. kex_c25519_keypair()
 	buffer_append(b, buffer_ptr(client_pub), buffer_len(client_pub));
 	buffer_put_stringb(b, server_pub);
 	buffer_append(b, buffer_ptr(shared_secret), buffer_len(shared_secret));

@@ -5778,7 +5778,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEXDH_REPLY", "key exchange: receiving", data, len);
 
-	/* hostkey */
+	/* K_S, server's public host key */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = buffer_init();
@@ -5800,7 +5800,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
-		            /*__FUNCTION__*/"handle_SSH2_dh_kex_reply",
+		            "handle_SSH2_dh_kex_reply",
 		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
 		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
 		            get_ssh2_hostkey_type_name(server_host_key->type));
@@ -5937,7 +5937,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	push_memdump("DH_GEX_REPLY", "key exchange: receiving", data, len);
 
-	/* hostkey */
+	/* K_S, server's public host key */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = buffer_init();
@@ -5959,7 +5959,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
-		            /*__FUNCTION__*/"handle_SSH2_dh_gex_reply",
+		            "handle_SSH2_dh_gex_reply",
 		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
 		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
 		            get_ssh2_hostkey_type_name(server_host_key->type));
@@ -6105,7 +6105,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
-	/* hostkey */
+	/* K_S, server's public host key */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = buffer_init();
@@ -6127,7 +6127,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
-		            /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
+		            "handle_SSH2_ecdh_kex_reply",
 		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
 		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
 		            get_ssh2_hostkey_type_name(server_host_key->type));
@@ -6271,13 +6271,13 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
-	/* hostkey */
+	/* K_S, server's public host key */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = buffer_init();
 	buffer_append(server_host_key_blob, data, bloblen);
 
-	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob",data, bloblen);
+	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob", data, bloblen);
 
 	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob),
 	                                buffer_len(server_host_key_blob));
@@ -6293,7 +6293,7 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
-		            /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
+		            "handle_SSH2_curve25519_kex_reply",
 		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
 		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
 		            get_ssh2_hostkey_type_name(server_host_key->type));
@@ -6320,7 +6320,7 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	//   xk is a shared secret
 	// Writing using RFC 5656 notation:
 	//   (x', y') = d_C * Q_S
-	//   x' is a shared secret K
+	//   K = stringify(x') ... x25519 shared secret
 	r = kex_c25519_dec(kex, server_blob, &shared_secret);
 	if (r != 0)
 		goto out;
