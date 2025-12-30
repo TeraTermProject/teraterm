@@ -2275,6 +2275,10 @@ void BuffPrint(BOOL ScrollRegion)
 			EndPage(hdc);
 			StartPage(hdc);
 		}
+
+		if (PrnCheckAbort()) {
+			break;
+		}
 	}
 	UnlockBuffer();
 	VTPrintEnd(vt, dc);

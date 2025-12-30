@@ -43,6 +43,7 @@
 #include "codeconv.h"
 #include "vtdisp.h"
 #include "prnabort.h"
+#include "dlglib.h"
 
 #include "teraprn.h"
 
@@ -69,7 +70,7 @@ static UINT_PTR CALLBACK PrintHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPA
  *
  *	@param	HWin	親Window
  *	@param	sel		選択範囲
- *	@return	HDC		印刷DC, PrnStop() か DeleteDC() すること
+ *	@return	HDC		印刷DC, DeleteDC() すること
  */
 HDC PrnBox(HWND HWin, PBOOL Sel)
 {
@@ -101,6 +102,65 @@ HDC PrnBox(HWND HWin, PBOOL Sel)
 	return PrnDlg.hDC;
 }
 
+static BOOL PrnCreateDialog()
+{
+	if (PrnAbortDlg != NULL) {
+		// ダイアログは1つしか出せない
+		//  (印刷は1つしかできない)
+		return FALSE;
+	}
+
+	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
+				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+	PrnAbortDlg = new CPrnAbortDlg();
+	if (PrnAbortDlg == NULL) {
+		return FALSE;
+	}
+	HWND hParent;
+	if (ActiveWin == IdVT) {
+		hParent = HVTWin;
+	}
+	else {
+		hParent = HTEKWin;
+	}
+	PrnAbortDlg->Create(hInst, hParent, ts.UILanguageFileW);
+	return TRUE;
+}
+
+static void PrnDestroyDialog()
+{
+	PrnAbortDlg->DestroyWindow();
+	delete PrnAbortDlg;
+	PrnAbortDlg = NULL;
+}
+
+/**
+ *	印刷中に呼び出されるコールバック
+ *	戻り値で印字の中断/継続をシステムに伝える
+ *	Windowsのバージョン、プリンタドライバによって呼び出されるタイミングが変化するらしい
+ *
+ *	@param	hDC		印刷中のDC ?
+ *	@param	Error	0=エラーなし/SP_OUTOFDISK ?
+ *	@retval	TRUE	印刷ジョブを続行
+ *	@retval	FALSE	印刷ジョブを取り消す
+ */
+static BOOL PrnAbortProc(HDC hDC, int Error)
+{
+	(void)hDC;
+	(void)Error;
+
+	// ダイアログのメッセージポンプを動かす
+	PrnAbortDlg->MessagePump();
+
+	if (PrnAbortDlg->IsAborted()) {
+		// 中断が押された
+		PrintAbortFlag = TRUE;
+	}
+
+	// TRUE/FALSE = 続行/中断
+	return PrintAbortFlag == FALSE ? TRUE : FALSE;
+}
+
 /**
  *	印刷開始
  *	hDCを印刷できる状態にする
@@ -115,19 +175,12 @@ BOOL PrnStart(HDC hDC, const wchar_t *DocumentName)
 {
 	PrintAbortFlag = FALSE;
 
-	PrnAbortDlg = new CPrnAbortDlg();
-	if (PrnAbortDlg==NULL) {
+	if (PrnCreateDialog() == FALSE) {
 		return FALSE;
 	}
-	HWND hParent;
-	if (ActiveWin==IdVT) {
-		hParent = HVTWin;
-	}
-	else {
-		hParent = HTEKWin;
-	}
-	PrnAbortDlg->Create(hInst,hParent,&PrintAbortFlag,&ts);
-	PrnAbortDlg->SetPrintDC(hDC);
+
+	// 印字中断コールバック登録
+	::SetAbortProc(hDC, PrnAbortProc);
 
 	DOCINFOW Doc = {};
 	Doc.cbSize = sizeof(Doc);
@@ -135,11 +188,9 @@ BOOL PrnStart(HDC hDC, const wchar_t *DocumentName)
 	Doc.lpszOutput = NULL;
 	Doc.lpszDatatype = NULL;
 	Doc.fwType = 0;
-	if (StartDocW(hDC, &Doc) <= 0) {
+	if (::StartDocW(hDC, &Doc) <= 0) {
 		// error
-		PrnAbortDlg->DestroyWindow();
-		delete PrnAbortDlg;
-		PrnAbortDlg = NULL;
+		PrnDestroyDialog();
 		return FALSE;
 	}
 	else {
@@ -150,18 +201,29 @@ BOOL PrnStart(HDC hDC, const wchar_t *DocumentName)
 
 /**
  *	印刷終了
- *	hDCの印刷を完了、削除する
+ *	hDCの印刷を完了
  *	ダイアログが存在していたら閉じる
+ *	hDCの削除はしない(DeleteDC()すること)
  */
 void PrnStop(HDC hDC)
 {
-	EndDoc(hDC);
-	DeleteDC(hDC);
-	if (PrnAbortDlg != NULL) {
-		PrnAbortDlg->DestroyWindow();
-		delete PrnAbortDlg;
-		PrnAbortDlg = NULL;
+	if (PrnAbortDlg->IsAborted()) {
+		AbortDoc(hDC);
 	}
+	else {
+		EndPage(hDC);
+	}
+	EndDoc(hDC);
+	PrnDestroyDialog();
+}
+
+/**
+ *	@retval	TRUE	中断する
+ *	@retval	FALSE	中断しない
+ */
+BOOL PrnCheckAbort()
+{
+	return PrintAbortFlag;
 }
 
 /* pass-thru printing */
@@ -338,20 +400,10 @@ static void PrintFile_(PrintFile *handle)
 
 static void PrintFileDirect(PrintFile *handle)
 {
-	HWND hParent;
-
-	PrnAbortDlg = new CPrnAbortDlg();
-	if (PrnAbortDlg==NULL) {
+	if (PrnCreateDialog() == FALSE) {
 		DeletePrintFile(handle);
 		return;
 	}
-	if (ActiveWin==IdVT) {
-		hParent = HVTWin;
-	}
-	else {
-		hParent = HTEKWin;
-	}
-	PrnAbortDlg->Create(hInst,hParent,&PrintAbortFlag,&ts);
 
 	handle->HPrnFile = CreateFileW(handle->PrnFName,
 									GENERIC_READ, FILE_SHARE_READ, NULL,
@@ -368,9 +420,7 @@ void PrnFileDirectProc(PrintFile *handle)
 		return;
 	}
 	if (PrnAbortDlg->IsAborted()) {
-		PrnAbortDlg->DestroyWindow();
-		delete PrnAbortDlg;
-		PrnAbortDlg = NULL;
+		PrnDestroyDialog();
 		PrnCancel();
 	}
 	if (!PrintAbortFlag && (HPrnFile != INVALID_HANDLE_VALUE)) {
@@ -404,12 +454,7 @@ void PrnFileDirectProc(PrintFile *handle)
 		} while (c>0);
 	}
 	PrnClose();
-
-	if (PrnAbortDlg!=NULL) {
-		PrnAbortDlg->DestroyWindow();
-		delete PrnAbortDlg;
-		PrnAbortDlg = NULL;
-	}
+	PrnDestroyDialog();
 
 	handle->FinishCallback(handle);
 }
