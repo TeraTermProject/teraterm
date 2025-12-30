@@ -1214,7 +1214,7 @@ kex_kem_sntrup761x25519_dec(kex *kex, buffer_t *server_blob,
 	*shared_secretp = NULL;
 
 	need = crypto_kem_sntrup761_CIPHERTEXTBYTES + CURVE25519_SIZE;
-	if (buffer_len(server_blob) != crypto_kem_sntrup761_CIPHERTEXTBYTES + CURVE25519_SIZE) {
+	if (buffer_len(server_blob) != need) {
 		r = SSH_ERR_SIGNATURE_INVALID;
 		goto out;
 	}
@@ -1311,11 +1311,12 @@ kex_kem_sntrup761x25519_hash(const digest_algorithm hash_alg,
 
 	buffer_put_stringb(b, serverhostkeyblob);
 	// OpenSSH:
-	//   「4バイト進んだところから最後まで」を sshbuf_put_stringb() する
-	//   「長さ」と「指定された範囲のデータ」がコピーされる
+	//  off が 0 の sshbuf を sshbuf_put_stringb() する
+	//   「size-off = size（データの長さ）」と「off 以降 = すべてのデータ」が格納される
 	// TTSSH:
-	//   「先頭から最後まで」を buffer_append() する
-	//   バッファ先頭にある長さから最後までがそのままコピーされる
+	//   「client_pub の最初から最後まで」を buffer_append() する
+	//   先頭にある4バイトの長さからデータの最後までがそのまま格納される
+	// cf. kex_kem_sntrup761x25519_keypair()
 	buffer_append(b, buffer_ptr(client_pub), buffer_len(client_pub));
 	buffer_put_stringb(b, server_pub);
 	buffer_append(b, buffer_ptr(shared_secret), buffer_len(shared_secret));

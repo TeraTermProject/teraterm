@@ -5658,14 +5658,14 @@ static void SSH2_kem_sntrup761x25519_kex_init(PTInstVar pvar)
 
 	buffer_free(msg);
 
-	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_INIT was sent at SSH2_kem_mlkem768x25519_kex_init().");
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_INIT was sent at SSH2_kem_sntrup761x25519_kex_init().");
 
 	return;
 
 error:;
 	buffer_free(msg);
 
-	notify_fatal_error(pvar, "error occurred @ SSH2_kem_mlkem768x25519_kex_init()", TRUE);
+	notify_fatal_error(pvar, "error occurred @ SSH2_kem_sntrup761x25519_kex_init()", TRUE);
 }
 
 
@@ -6462,7 +6462,7 @@ static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
 
 	u_char *server_public = NULL;
 	BOOL result = FALSE;
-	char *emsg = NULL, emsg_tmp[1024];	// error message
+	char *emsg = NULL, emsg_tmp[1024]; // error message
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
 
@@ -6475,7 +6475,7 @@ static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
-	/* hostkey */
+	/* K_S, server's public host key */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = buffer_init();
@@ -6492,12 +6492,13 @@ static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
 	data += bloblen;
 
 	// known_hosts対応
-	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {	 // ホストキーの種別比較
-		_snprintf_s(
-			emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-			"%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
-			"handle_SSH2_kem_sntrup761x25519_kex_reply", get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
-			get_ssh2_hostkey_algorithm_name(kex->hostkey_type), get_ssh2_hostkey_type_name(server_host_key->type));
+	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
+		            "handle_SSH2_kem_sntrup761x25519_kex_reply",
+		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
+		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
+		            get_ssh2_hostkey_type_name(server_host_key->type));
 		emsg = emsg_tmp;
 		goto out;
 	}
@@ -6517,15 +6518,15 @@ static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
 
 	/* calc shared secret K */
 	// 共通鍵の生成
-	// Writing using RFC 5656 notation:
+	// Writing using draft-ietf-sshm-ntruprime-ssh notation:
 	//   Q_S --+-- c   ... sntrup761 ciphertext
 	//         +-- K_B ... x25519 public key
 	//   d_C           ... x25519 private key
 	//   sk_C          ... sntrup761 private key
 	//   (x', y') = d_C * K_B
-	//   x'                         ... x25519 shared secret
-	//   k_sntrup = Decaps(c, sk_C) ... sntrup761 shared secret
-	//   K = k_sntrup || x'         ... hybrid shared secret
+	//   k_x25519 = stringify(x')       ... x25519 shared secret
+	//   k_sntrup = Decaps(c, sk_C)     ... sntrup761 shared secret
+	//   K = HASH(k_sntrup || k_x25519) ... hybrid shared secret
 	r = kex_kem_sntrup761x25519_dec(kex, server_blob, &shared_secret);
 	if (r != 0)
 		goto out;
