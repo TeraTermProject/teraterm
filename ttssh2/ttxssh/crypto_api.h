@@ -87,6 +87,12 @@ int	crypto_sign_ed25519_open(unsigned char *, unsigned long long *,
     const unsigned char *, unsigned long long, const unsigned char *);
 int	crypto_sign_ed25519_keypair(unsigned char *, unsigned char *);
 
+#define crypto_kem_mlkem768_PUBLICKEYBYTES 1184
+#define crypto_kem_mlkem768_SECRETKEYBYTES 2400
+#define crypto_kem_mlkem768_CIPHERTEXTBYTES 1088
+#define crypto_kem_mlkem768_BYTES 32
+
+
 int	bcrypt_pbkdf(const char *, size_t, const u_int8_t *, size_t,
     u_int8_t *, size_t, unsigned int);
 
