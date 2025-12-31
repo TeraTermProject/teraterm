@@ -2095,7 +2095,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM", pvar, "Key exchange param:");
 			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			CRYPT_get_kex_params_info(pvar, buf, sizeof(buf));
+			CRYPT_get_kex_param_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 

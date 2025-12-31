@@ -1165,7 +1165,7 @@ void CRYPT_get_server_key_info(PTInstVar pvar, char *dest, int len)
 	}
 }
 
-void CRYPT_get_kex_params_info(PTInstVar pvar, char *dest, int len)
+void CRYPT_get_kex_param_info(PTInstVar pvar, char *dest, int len)
 {
 	char buf[1024];
 	buf[0] = '\0';
