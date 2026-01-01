@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="100" viewBox="0 0 80 100">
+  <g transform="scale(0.5)">
+    <text
+      x="10"
+      y="70"
+      font-size="85"
+      font-family="monospace"
+      fill="black">
+      E
+    </text>
+    <text
+      x="55"
+      y="132"
+      font-size="85"
+      font-family="monospace"
+      fill="black">
+      S
+    </text>
+    <text
+      x="100"
+      y="195"
+      font-size="85"
+      font-family="monospace"
+      fill="black">
+      C
+    </text>
+  </g>
+</svg>
