@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="100" viewBox="0 0 80 100">
+  <g transform="scale(0.5)">
+    <text
+      x="40"
+      y="80"
+      font-size="100"
+      font-family="monospace"
+      fill="black">
+      B
+    </text>
+    <text
+      x="80"
+      y="195"
+      font-size="100"
+      font-family="monospace"
+      fill="black">
+      S
+    </text>
+  </g>
+</svg>
