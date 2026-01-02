@@ -31,10 +31,13 @@
 #include "teraterm.h"
 #include "teraterml.h"
 #include "tttypes.h"
+#include "teraprn.h"
 #include <string.h>
 #include <olectl.h>
 #include <assert.h>
 #include <stdio.h>
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
 
 #define VTDISP_DEBUG_DISABLE 1
 #include "ttwinman.h"
@@ -68,10 +71,42 @@
 #define _OutputDebugPrintf(...)  (void)0
 #endif
 
-int WinWidth, WinHeight;		// 画面に表示されている文字数
+// HDC の wapper
+typedef struct ttdc {
+	HDC VTDC;			// 描画に使用するDC
+	HWND HVTWin;		// DCの元になったHWND(プリンタの場合はNULL)
+	HFONT DCPrevFont;	// DCに最初にセレクトされていたfont
+	int PrnX, PrnY;		// 文字の描画位置(pixel), 描画するとPrnXが+方向に増加する
+	BOOL IsPrinter;		// TRUEのとき、プリンタ
+	BYTE DCBackAlpha;
+} ttdc_t;
+
+// 描画先情報
+typedef struct vtdraw {
+	HWND hVTWin;					// VT Win Window handle(ウィドウの時)
+	HFONT VTFont[AttrFontMask+1];	// 各フォント
+	int ScreenWidth, ScreenHeight;	// スクリーンサイズ = (セル数)*(Cell幅or高さ) ≒ Client Area
+	int CellWidth, CellHeight;		// セルサイズ(pixel)
+	int FontWidth, FontHeight;		// フォントサイズ(pixel)
+	BOOL IsPrinter;					// TRUEのとき、プリンタ
+	BOOL IsColorPrinter;			// TRUEのとき、プリンタでカラー印刷(実験的実装)
+	RECT Margin;					// 文字描画時の余白(pixel)、プリンタ用
+	COLORREF White, Black;			// プリンタ用
+	BOOL debug_drawbox_text;		// 文字描画毎にboxを描画する
+	COLORREF BGVTColor[2];			// SGR 0
+	COLORREF BGVTBoldColor[2];		// SGR 1
+	COLORREF BGVTUnderlineColor[2];	// SGR 4
+	COLORREF BGVTBlinkColor[2];		// SGR 5 点滅属性
+	COLORREF BGVTReverseColor[2];	// SGR 7 反転属性
+	COLORREF BGURLColor[2];			// URL属性色
+	BYTE alpha_vtback;				// 通常(アトリビュートなし)のbackのalpha
+	BYTE alpha_back;				// 一般(反転属性(SGR 4)以外)のbackのalpha
+	BYTE BGReverseTextAlpha;		// 反転属性(SGR 4)のbackのalpha
+} vtdraw_t;
+
+int WinWidth, WinHeight;		// 画面に表示されている文字数(セル数)
 static BOOL Active = FALSE;
 static BOOL CompletelyVisible;
-int ScreenWidth, ScreenHeight;	// スクリーンサイズ = (セル数)*(Font幅or高さ) ≒ Client Area
 BOOL AdjustSize;
 BOOL DontChangeSize=FALSE;
 static int CRTWidth, CRTHeight;
@@ -149,14 +184,6 @@ static BGSrc BGSrc1;	// 壁紙(Windowsのデスクトップ背景)用
 static BGSrc BGSrc2;	// fill color用
 
 static int  BGEnable;
-static BYTE BGReverseTextAlpha;
-
-static COLORREF BGVTColor[2];
-static COLORREF BGVTBoldColor[2];
-static COLORREF BGVTUnderlineColor[2];	// SGR 4
-static COLORREF BGVTBlinkColor[2];
-static COLORREF BGVTReverseColor[2];
-static COLORREF BGURLColor[2];			// URL属性色
 
 static RECT BGPrevRect;
 
@@ -177,8 +204,6 @@ static BOOL (WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLEND
 
 typedef struct {
 	BOOL bg_enable;
-	BYTE alpha_vtback;
-	BYTE alpha_back;
 	//
 	BOOL font_resize_enable;
 } vtdisp_work_t;
@@ -186,8 +211,6 @@ static vtdisp_work_t vtdisp_work;
 
 static HBITMAP GetBitmapHandleW(const wchar_t *File);
 static void InitColorTable(const COLORREF *ANSIColor16);
-static void UpdateBGBrush(vtdraw_t *vt);
-static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_color, COLORREF *back_color, BYTE *_alpha);
 static void DispInitDC2(vtdraw_t *vt, ttdc_t *dc);
 
 // LoadImage() しか使えない環境かどうかを判別する。
@@ -859,7 +882,7 @@ static void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int he
 	}
 }
 
-static void BGLoadPicture(HDC hdcDest,BGSrc *src)
+static void BGLoadPicture(vtdraw_t *vt, HDC hdcDest,BGSrc *src)
 {
   int x,y,width,height,pattern;
 
@@ -869,7 +892,7 @@ static void BGLoadPicture(HDC hdcDest,BGSrc *src)
     return;
 
   if(src->pattern == BG_AUTOFIT){
-    if((src->height * ScreenWidth) > (ScreenHeight * src->width))
+    if((src->height * vt->ScreenWidth) > (vt->ScreenHeight * src->width))
       pattern = BG_FIT_WIDTH;
     else
       pattern = BG_FIT_HEIGHT;
@@ -880,34 +903,34 @@ static void BGLoadPicture(HDC hdcDest,BGSrc *src)
   switch(pattern)
   {
     case BG_STRETCH :
-      BGStretchPicture(hdcDest,src,0,0,ScreenWidth,ScreenHeight,src->antiAlias);
+      BGStretchPicture(hdcDest,src,0,0,vt->ScreenWidth,vt->ScreenHeight,src->antiAlias);
       break;
 
     case BG_FIT_WIDTH :
 
-      height = (src->height * ScreenWidth) / src->width;
-      y      = (ScreenHeight - height) / 2;
+      height = (src->height * vt->ScreenWidth) / src->width;
+      y      = (vt->ScreenHeight - height) / 2;
 
-      BGStretchPicture(hdcDest,src,0,y,ScreenWidth,height,src->antiAlias);
+      BGStretchPicture(hdcDest,src,0,y,vt->ScreenWidth,height,src->antiAlias);
       break;
 
     case BG_FIT_HEIGHT :
 
-      width = (src->width * ScreenHeight) / src->height;
-      x     = (ScreenWidth - width) / 2;
+      width = (src->width * vt->ScreenHeight) / src->height;
+      x     = (vt->ScreenWidth - width) / 2;
 
-      BGStretchPicture(hdcDest,src,x,0,width,ScreenHeight,src->antiAlias);
+      BGStretchPicture(hdcDest,src,x,0,width,vt->ScreenHeight,src->antiAlias);
       break;
 
     case BG_TILE :
-      for(x = 0;x < ScreenWidth ;x += src->width )
-      for(y = 0;y < ScreenHeight;y += src->height)
+      for(x = 0;x < vt->ScreenWidth ;x += src->width )
+      for(y = 0;y < vt->ScreenHeight;y += src->height)
         BitBlt(hdcDest,x,y,src->width,src->height,src->hdc,0,0,SRCCOPY);
       break;
 
     case BG_CENTER :
-      x = (ScreenWidth  -  src->width) / 2;
-      y = (ScreenHeight - src->height) / 2;
+      x = (vt->ScreenWidth  -  src->width) / 2;
+      y = (vt->ScreenHeight - src->height) / 2;
 
       BitBlt(hdcDest,x,y,src->width,src->height,src->hdc,0,0,SRCCOPY);
       break;
@@ -1032,7 +1055,7 @@ static void BGLoadWallpaper(HDC hdcDest,BGSrc *src)
   SetWindowOrgEx(hdcDest,0,0,NULL);
 }
 
-static void BGLoadSrc(HDC hdcDest, BGSrc *src)
+static void BGLoadSrc(vtdraw_t *vt, HDC hdcDest, BGSrc *src)
 {
 	switch (src->type) {
 		case BG_COLOR:
@@ -1044,7 +1067,7 @@ static void BGLoadSrc(HDC hdcDest, BGSrc *src)
 			break;
 
 		case BG_PICTURE:
-			BGLoadPicture(hdcDest, src);
+			BGLoadPicture(vt, hdcDest, src);
 			break;
 
 		default:
@@ -1144,7 +1167,7 @@ static BOOL IsAlphaValidBitmapHDC(HDC hDC)
 /**
  *	背景画像生成
  */
-static HDC CreateBGImage(int width, int height)
+static HDC CreateBGImage(vtdraw_t *vt, int width, int height)
 {
 	BLENDFUNCTION bf;
 	HDC hdc_work;
@@ -1155,7 +1178,7 @@ static HDC CreateBGImage(int width, int height)
 
 	// 壁紙(Windowsのデスクトップ背景)
 	if (BGSrc1.enable) {
-		BGLoadSrc(hdc_bg, &BGSrc1);
+		BGLoadSrc(vt, hdc_bg, &BGSrc1);
 	}
 	DebugSaveFile(L"bg_1.bmp", hdc_bg, width, height);
 
@@ -1164,7 +1187,7 @@ static HDC CreateBGImage(int width, int height)
 		BOOL alpha_valid;
 
 		// 画像をロード(描画)する
-		BGLoadSrc(hdc_work, &BGDest);
+		BGLoadSrc(vt, hdc_work, &BGDest);
 		alpha_valid = IsAlphaValidBitmapHDC(BGDest.hdc);
 
 		// 準備した画像を貼り付ける
@@ -1187,7 +1210,7 @@ static HDC CreateBGImage(int width, int height)
 	// 単色プレーン
 	if (BGSrc2.enable) {
 		// 画像を準備
-		BGLoadSrc(hdc_work, &BGSrc2);
+		BGLoadSrc(vt, hdc_work, &BGSrc2);
 
 		// 貼り付ける
 		memset(&bf, 0, sizeof(bf));
@@ -1249,8 +1272,8 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
   if(hdcBGWork)   DeleteBitmapDC(&hdcBGWork);
   if(hdcBGBuffer) DeleteBitmapDC(&hdcBGBuffer);
 
-  hdcBGWork   = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,vt->FontHeight));
-  hdcBGBuffer = CreateBitmapDC(CreateScreenCompatibleBitmap(ScreenWidth,vt->FontHeight));
+  hdcBGWork   = CreateBitmapDC(CreateScreenCompatibleBitmap(vt->ScreenWidth,vt->CellHeight));
+  hdcBGBuffer = CreateBitmapDC(CreateScreenCompatibleBitmap(vt->ScreenWidth,vt->CellHeight));
 
   //hdcBGBuffer の属性設定
   SetBkMode(hdcBGBuffer,TRANSPARENT);
@@ -1262,7 +1285,7 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
 		  DeleteBitmapDC(&hdcBG);
 	  }
 
-	  hdcBG = CreateBGImage(ScreenWidth, ScreenHeight);
+	  hdcBG = CreateBGImage(vt, vt->ScreenWidth, vt->ScreenHeight);
   }
 }
 
@@ -1271,13 +1294,13 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
  *
  *	@param file		NULLの時ファイルを読み込まない(デフォルト値で設定)
  */
-static void BGReadIniFile(const wchar_t *file)
+static void BGReadIniFile(vtdraw_t *vt, const wchar_t *file)
 {
 	BGTheme bg_theme;
 	TColorTheme color_theme;
 	ThemeLoad(file, &bg_theme, &color_theme);
-	ThemeSetBG(&bg_theme);
-	ThemeSetColor(&color_theme);
+	ThemeSetBG(vt, &bg_theme);
+	ThemeSetColor(vt, &color_theme);
 }
 
 static void BGDestruct(void)
@@ -1295,11 +1318,11 @@ static void BGDestruct(void)
   BGEnable = FALSE;
 }
 
-static void BGSetDefaultColor(TTTSet *pts)
+static void BGSetDefaultColor(vtdraw_t *vt, TTTSet *pts)
 {
 	TColorTheme color_theme;
 	ThemeGetColorDefaultTS(pts, &color_theme);
-	ThemeSetColor(&color_theme);
+	ThemeSetColor(vt, &color_theme);
 }
 
 /*
@@ -1309,13 +1332,13 @@ static void BGSetDefaultColor(TTTSet *pts)
  *    TRUE: Tera Termの起動時
  *    FALSE: Tera Termの起動時以外
  */
-void BGInitialize(BOOL initialize_once)
+void BGInitialize(vtdraw_t *vt, BOOL initialize_once)
 {
 	(void)initialize_once;
 
 	InitColorTable(ts.ANSIColor);
 
-	BGSetDefaultColor(&ts);
+	BGSetDefaultColor(vt, &ts);
 
 	//リソース解放
 	BGDestruct();
@@ -1361,20 +1384,20 @@ static void DecideBGEnable(void)
  *		テーマ無しならデフォルト設定する
  *		テーマありならテーマファイルを読み出して設定する
  */
-void BGLoadThemeFile(const TTTSet *pts)
+void BGLoadThemeFile(vtdraw_t *vt, const TTTSet *pts)
 {
 	// コンフィグファイル(テーマファイル)の決定
 	switch(pts->EtermLookfeel.BGEnable) {
 	case 0:
 	default:
 		// テーマ無し
-		BGReadIniFile(NULL);
+		BGReadIniFile(vt, NULL);
 		BGEnable = FALSE;
 		break;
 	case 1:
 		if (pts->EtermLookfeel.BGThemeFileW != NULL) {
 			// テーマファイルの指定がある
-			BGReadIniFile(pts->EtermLookfeel.BGThemeFileW);
+			BGReadIniFile(vt, pts->EtermLookfeel.BGThemeFileW);
 			BGEnable = TRUE;
 		}
 		else {
@@ -1388,7 +1411,7 @@ void BGLoadThemeFile(const TTTSet *pts)
 		aswprintf(&theme_mask, L"%s\\theme\\*.ini", pts->HomeDirW);
 		theme_file = RandomFileW(theme_mask);
 		free(theme_mask);
-		BGReadIniFile(theme_file);
+		BGReadIniFile(vt, theme_file);
 		free(theme_file);
 		BGEnable = TRUE;
 		break;
@@ -1624,9 +1647,18 @@ static void DispSetNearestColors(int start, int end, HDC DispCtx)
 #endif
 }
 
+/**
+ *	描画領域情報を作る ディスプレイ用
+ *
+ *	印字用は VTPrintInit() を使う
+ *
+ *	@param	hVtWin		描画先 HWND
+ *	@retval	vtdraw_t	描画先情報(ハンドル)
+ *						EndiDisp() で開放する
+ */
 vtdraw_t *InitDisp(HWND hVTWin)
 {
-	vtdraw_t *p = (vtdraw_t *)calloc(1, sizeof(*p));
+	vtdraw_t *vt = (vtdraw_t *)calloc(1, sizeof(*vt));
 	HDC TmpDC;
 	BOOL bMultiDisplaySupport = FALSE;
 	vtdisp_work_t *w = &vtdisp_work;
@@ -1636,12 +1668,10 @@ vtdraw_t *InitDisp(HWND hVTWin)
 	CRTWidth  = GetSystemMetrics(SM_CXSCREEN);
 	CRTHeight = GetSystemMetrics(SM_CYSCREEN);
 
-	BGInitialize(TRUE);
+	BGInitialize(vt, TRUE);
 
 	DispSetNearestColors(IdBack, 255, TmpDC);
 
-	/* background paintbrush */
-	p->Background = CreateSolidBrush(ts.VTColor[1]);
 	/* CRT width & height */
 	if (HasMultiMonitorSupport()) {
 		bMultiDisplaySupport = TRUE;
@@ -1691,25 +1721,30 @@ vtdraw_t *InitDisp(HWND hVTWin)
 	}
 
 	w->bg_enable = FALSE;
-	w->alpha_back = 255;
-	w->alpha_vtback = 255;
+	vt->alpha_back = 255;
+	vt->alpha_vtback = 255;
 	w->font_resize_enable = FontReSizeEnableInit;
-	BGReverseTextAlpha = 255;
+	vt->BGReverseTextAlpha = 255;
 
-	p->hVTWin = hVTWin;
-	p->debug_drawbox_text = FALSE;
-	return p;
+	vt->hVTWin = hVTWin;
+	vt->debug_drawbox_text = FALSE;
+	return vt;
 }
 
 /**
  *	フォント生成
  *	VTWinで使用するフォントを生成する
  *
+ *	次の値も更新される
+ *		FontWidth,Height
+ *		CellWidth,Height
+ *		ScreenWidth,Height
+ *
  *	@param[in/out]	vt
  *	@param[in]		dc		生成するフォントの対象DC
  *	@param[in]		VTlf	フォント情報
  */
-void DispFontCreate(vtdraw_t *vt, ttdc_t *dc, LOGFONTW VTlf)
+static void DispFontCreate(vtdraw_t *vt, ttdc_t *dc, LOGFONTW VTlf)
 {
 	// Normal font
 	VTlf.lfWeight = FW_NORMAL;
@@ -1723,10 +1758,14 @@ void DispFontCreate(vtdraw_t *vt, ttdc_t *dc, LOGFONTW VTlf)
 		TEXTMETRICA Metrics;
 		HFONT prev_font = SelectObject(hDC, vt->VTFont[AttrDefault]);
 		GetTextMetricsA(hDC, &Metrics);
-		vt->FontWidth = Metrics.tmAveCharWidth + ts.FontDW;
-		vt->FontHeight = Metrics.tmHeight + ts.FontDH;
+		vt->FontWidth = Metrics.tmAveCharWidth;		// 文字の平均幅
+		vt->FontHeight = Metrics.tmHeight;
 		SelectObject(hDC, prev_font);
 	}
+	vt->CellWidth = vt->FontWidth + ts.FontDW;
+	vt->CellHeight = vt->FontHeight + ts.FontDH;
+	vt->ScreenWidth = WinWidth * vt->CellWidth;
+	vt->ScreenHeight = WinHeight * vt->CellHeight;
 
 	/* Underline */
 	if ((ts.FontFlag & FF_UNDERLINE) || (ts.FontFlag & FF_URLUNDERLINE)) {
@@ -1803,7 +1842,7 @@ void DispFontCreate(vtdraw_t *vt, ttdc_t *dc, LOGFONTW VTlf)
 /**
  *	フォントを削除
  */
-void DispFontDelete(vtdraw_t *vt)
+static void DispFontDelete(vtdraw_t *vt)
 {
 	int i, j;
 	for (i = 0; i <= AttrFontMask; i++) {
@@ -1818,21 +1857,24 @@ void DispFontDelete(vtdraw_t *vt)
 	}
 }
 
+/**
+ *	描画領域情報を開放する
+ *
+ *	@param	vt	描画ハンドル(InitDisp()の戻り値)
+ *
+ */
 void EndDisp(vtdraw_t *vt)
 {
 	DispFontDelete(vt);
 
-	if (vt->Background != 0)
-	{
-		DeleteObject(vt->Background);
-		vt->Background = 0;
+	if (!vt->IsPrinter) {
+		BGDestruct();
+
+		free(BGDest.fileW);
+		BGDest.fileW = NULL;
 	}
 
-	BGDestruct();
-
-	free(BGDest.fileW);
-	BGDest.fileW = NULL;
-
+	memset(vt, 0, sizeof(*vt));
 	free(vt);
 }
 
@@ -1860,10 +1902,10 @@ void DispConvWinToScreen(vtdraw_t *vt, int Xw, int Yw, int *Xs, int *Ys, PBOOL R
 //			 a character cell.
 {
   if (Xs!=NULL)
-	*Xs = Xw / vt->FontWidth + WinOrgX;
-  *Ys = Yw / vt->FontHeight + WinOrgY;
+	*Xs = Xw / vt->CellWidth + WinOrgX;
+  *Ys = Yw / vt->CellHeight + WinOrgY;
   if ((Xs!=NULL) && (Right!=NULL))
-    *Right = (Xw - (*Xs-WinOrgX)*vt->FontWidth) >= vt->FontWidth/2;
+    *Right = (Xw - (*Xs-WinOrgX)*vt->CellWidth) >= vt->CellWidth/2;
 }
 
 void DispConvScreenToWin(vtdraw_t *vt, int Xs, int Ys, int *Xw, int *Yw)
@@ -1874,9 +1916,9 @@ void DispConvScreenToWin(vtdraw_t *vt, int Xs, int Ys, int *Xw, int *Yw)
 //      Xw, Yw: window coordinate
 {
   if (Xw!=NULL)
-       *Xw = (Xs - WinOrgX) * vt->FontWidth;
+       *Xw = (Xs - WinOrgX) * vt->CellWidth;
   if (Yw!=NULL)
-       *Yw = (Ys - WinOrgY) * vt->FontHeight;
+       *Yw = (Ys - WinOrgY) * vt->CellHeight;
 }
 
 /**
@@ -1930,7 +1972,7 @@ void ChangeFont(vtdraw_t *vt, unsigned int dpi)
 	if (ts.UseIME > 0) {
 		if (ts.IMEInline > 0) {
 			/* set IME font */
-			LOGFONTW lf = {};
+			LOGFONTW lf = {0};
 			HFONT hFont = vt->VTFont[AttrDefault];
 			GetObjectW(hFont, sizeof(lf), &lf);
 			SetConversionLogFont(HVTWin, &lf);
@@ -1982,10 +2024,10 @@ void ChangeCaret(vtdraw_t *vt)
   DestroyCaret();
   switch (ts.CursorShape) {
     case IdVCur:
-		CreateCaret(HVTWin, 0, CurWidth, vt->FontHeight);
+		CreateCaret(HVTWin, 0, CurWidth, vt->CellHeight);
 	break;
     case IdHCur:
-		CreateCaret(HVTWin, 0, vt->FontWidth, CurWidth);
+		CreateCaret(HVTWin, 0, vt->CellWidth, CurWidth);
 	break;
   }
   if (CaretEnabled) {
@@ -2018,22 +2060,22 @@ void CaretKillFocus(vtdraw_t *vt, BOOL show)
   ttdc_t *dc = DispInitDC(vt);
   hdc = dc->VTDC;
 
-  CaretX = (CursorX - WinOrgX) * vt->FontWidth;
-  CaretY = (CursorY - WinOrgY) * vt->FontHeight;
+  CaretX = (CursorX - WinOrgX) * vt->CellWidth;
+  CaretY = (CursorY - WinOrgY) * vt->CellHeight;
 
   p[0].x = CaretX;
   p[0].y = CaretY;
   p[1].x = CaretX;
-  p[1].y = CaretY + vt->FontHeight - 1;
+  p[1].y = CaretY + vt->CellHeight - 1;
   if (CursorOnDBCS)
-	  p[2].x = CaretX + vt->FontWidth * 2 - 1;
+	  p[2].x = CaretX + vt->CellWidth * 2 - 1;
   else
-	  p[2].x = CaretX + vt->FontWidth - 1;
-  p[2].y = CaretY + vt->FontHeight - 1;
+	  p[2].x = CaretX + vt->CellWidth - 1;
+  p[2].y = CaretY + vt->CellHeight - 1;
   if (CursorOnDBCS)
-	  p[3].x = CaretX + vt->FontWidth * 2 - 1;
+	  p[3].x = CaretX + vt->CellWidth * 2 - 1;
   else
-	  p[3].x = CaretX + vt->FontWidth - 1;
+	  p[3].x = CaretX + vt->CellWidth - 1;
   p[3].y = CaretY;
   p[4].x = CaretX;
   p[4].y = CaretY;
@@ -2063,8 +2105,8 @@ void UpdateCaretPosition(vtdraw_t *vt, BOOL enforce)
   int CaretX, CaretY;
   RECT rc;
 
-  CaretX = (CursorX - WinOrgX) * vt->FontWidth;
-  CaretY = (CursorY - WinOrgY) * vt->FontHeight;
+  CaretX = (CursorX - WinOrgX) * vt->CellWidth;
+  CaretY = (CursorY - WinOrgY) * vt->CellHeight;
 
   if (!enforce && !ts.KillFocusCursor)
 	  return;
@@ -2077,10 +2119,10 @@ void UpdateCaretPosition(vtdraw_t *vt, BOOL enforce)
 	  rc.left = CaretX;
 	  rc.top = CaretY;
 	  if (CursorOnDBCS)
-		rc.right = CaretX + vt->FontWidth * 2;
+		rc.right = CaretX + vt->CellWidth * 2;
 	  else
-		rc.right = CaretX + vt->FontWidth;
-	  rc.bottom = CaretY + vt->FontHeight;
+		rc.right = CaretX + vt->CellWidth;
+	  rc.bottom = CaretY + vt->CellHeight;
 	  // 指定よりも1ピクセル小さい範囲が再描画されるため
 	  // rc の right, bottom は1ピクセル大きくしている。
 	  InvalidateRect(HVTWin, &rc, FALSE);
@@ -2116,8 +2158,8 @@ void CaretOn(vtdraw_t *vt)
 			}
 		}
 
-		CaretX = (CursorX - WinOrgX) * vt->FontWidth;
-		CaretY = (CursorY - WinOrgY) * vt->FontHeight;
+		CaretX = (CursorX - WinOrgX) * vt->CellWidth;
+		CaretY = (CursorY - WinOrgY) * vt->CellHeight;
 
 		if (IMEstat && IMECompositionState) {
 			// IME ON && 変換中の場合のみの処理する。
@@ -2129,21 +2171,21 @@ void CaretOn(vtdraw_t *vt)
 
 		if (ts.CursorShape!=IdVCur) {
 			if (ts.CursorShape==IdHCur) {
-				CaretY = CaretY + vt->FontHeight - CurWidth;
+				CaretY = CaretY + vt->CellHeight - CurWidth;
 				H = CurWidth;
 			}
 			else {
-				H = vt->FontHeight;
+				H = vt->CellHeight;
 			}
 
 			DestroyCaret();
 			if (CursorOnDBCS) {
 				/* double width caret */
-				CreateCaret(HVTWin, color, vt->FontWidth * 2, H);
+				CreateCaret(HVTWin, color, vt->CellWidth * 2, H);
 			}
 			else {
 				/* single width caret */
-				CreateCaret(HVTWin, color, vt->FontWidth, H);
+				CreateCaret(HVTWin, color, vt->CellWidth, H);
 			}
 			CaretStatus = 1;
 		}
@@ -2232,8 +2274,8 @@ void DispChangeWinSize(vtdraw_t *vt, int Nx, int Ny)
   WinWidth = Nx;
   WinHeight = Ny;
 
-  ScreenWidth = WinWidth * vt->FontWidth;
-  ScreenHeight = WinHeight * vt->FontHeight;
+  vt->ScreenWidth = WinWidth * vt->CellWidth;
+  vt->ScreenHeight = WinHeight * vt->CellHeight;
 
   AdjustScrollBar();
 
@@ -2241,8 +2283,8 @@ void DispChangeWinSize(vtdraw_t *vt, int Nx, int Ny)
   W = R.right-R.left;
   H = R.bottom-R.top;
   GetClientRect(HVTWin,&R);
-  dW = ScreenWidth - R.right + R.left;
-  dH = ScreenHeight - R.bottom + R.top;
+  dW = vt->ScreenWidth - R.right + R.left;
+  dH = vt->ScreenHeight - R.bottom + R.top;
 
   if ((dW!=0) || (dH!=0))
   {
@@ -2281,8 +2323,8 @@ void ResizeWindow(vtdraw_t *vt, int x, int y, int w, int h, int cw, int ch)
   POINT Point;
 
   if (! AdjustSize) return;
-  dw = ScreenWidth - cw;
-  dh = ScreenHeight - ch;
+  dw = vt->ScreenWidth - cw;
+  dh = vt->ScreenHeight - ch;
   if ((dw!=0) || (dh!=0)) {
     SetWindowPos(HVTWin,HWND_TOP,x,y,w+dw,h+dh,SWP_NOMOVE);
     AdjustSize = FALSE;
@@ -2306,7 +2348,7 @@ void ResizeWindow(vtdraw_t *vt, int x, int y, int w, int h, int cw, int ch)
       SetWindowPos(HVTWin,HWND_TOP,NewX,NewY,w,h,SWP_NOSIZE);
 
     Point.x = 0;
-    Point.y = ScreenHeight;
+    Point.y = vt->ScreenHeight;
     ClientToScreen(HVTWin,&Point);
     CompletelyVisible = (Point.y <= VirtualScreen.bottom);
     if (IsCaretOn()) CaretOn(vt);
@@ -2324,24 +2366,18 @@ void ResizeWindow(vtdraw_t *vt, int x, int y, int w, int h, int cw, int ch)
 ttdc_t *PaintWindow(vtdraw_t *vt, HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
 					  int* Xs, int* Ys, int* Xe, int* Ye)
 {
+	(void)fBkGnd;
+
 	ttdc_t *dc = (ttdc_t *)calloc(1, sizeof(*dc));
 	HDC hDC = PaintDC;
 	dc->HVTWin = HVTWin;
 	dc->VTDC = hDC;
 	DispInitDC2(vt, dc);
 
-	// 領域の塗りつぶし
-	//  文字間が全て0の時、文字の描画だけで全領域が描画できるので、塗りつぶし不要
-	if(!BGEnable && fBkGnd) {
-		if (ts.FontDW != 0 || ts.FontDH != 0 || ts.FontDX != 0 || ts.FontDY != 0){
-			FillRect(hDC, &PaintRect, vt->Background);
-		}
-	}
-
-	*Xs = PaintRect.left / vt->FontWidth + WinOrgX;
-	*Ys = PaintRect.top / vt->FontHeight + WinOrgY;
-	*Xe = (PaintRect.right - 1) / vt->FontWidth + WinOrgX;
-	*Ye = (PaintRect.bottom - 1) / vt->FontHeight + WinOrgY;
+	*Xs = PaintRect.left / vt->CellWidth + WinOrgX;
+	*Ys = PaintRect.top / vt->CellHeight + WinOrgY;
+	*Xe = (PaintRect.right - 1) / vt->CellWidth + WinOrgX;
+	*Ye = (PaintRect.bottom - 1) / vt->CellHeight + WinOrgY;
 
 	return dc;
 }
@@ -2376,12 +2412,10 @@ void DispClearWin(vtdraw_t *vt)
   if (IsCaretOn()) CaretOn(vt);
 }
 
+// TODO: DECSCNM / Visual Bell から使われている。必要?
 void DispChangeBackground(vtdraw_t *vt)
 {
-//	DispReleaseDC();
-
-	UpdateBGBrush(vt);
-
+	(void)vt;
 	InvalidateRect(HVTWin,NULL,TRUE);
 }
 
@@ -2405,8 +2439,8 @@ void DispChangeWin(vtdraw_t *vt)
 static void DispInitDC2(vtdraw_t *vt, ttdc_t *dc)
 {
 	dc->DCPrevFont = SelectObject(dc->VTDC, vt->VTFont[0]);
-	SetTextColor(dc->VTDC, BGVTColor[0]);
-	SetBkColor(dc->VTDC, BGVTColor[1]);
+	SetTextColor(dc->VTDC, vt->BGVTColor[0]);
+	SetBkColor(dc->VTDC, vt->BGVTColor[1]);
 
 	SetBkMode(dc->VTDC,OPAQUE);
 }
@@ -2440,6 +2474,7 @@ void DispReleaseDC(vtdraw_t *vt, ttdc_t *dc)
 		assert(vt->hVTWin == dc->HVTWin);
 		ReleaseDC(dc->HVTWin, dc->VTDC);
 	}
+	memset(dc, 0, sizeof(*dc));
 	free(dc);
 }
 
@@ -2511,14 +2546,13 @@ static int Get16ColorIndex(int color_index_256, int pcbold16, int pcbold16_brigh
  *	@param[out]	back_color	文字背景色
  *	@param[ot]	alpha		混合割合
  */
-static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_color, COLORREF *back_color, BYTE *_alpha)
+static void GetDrawAttr(vtdraw_t *vt, const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_color, COLORREF *back_color, BYTE *_alpha)
 {
 	COLORREF TextColor, BackColor;
 	WORD AttrFlag;	// Attr + Flag
 	WORD Attr2Flag;	// Attr2 + Flag
 	BOOL reverse;
 	const BOOL use_normal_bg_color = ts.UseNormalBGColor;
-	vtdisp_work_t *w = &vtdisp_work;
 	BYTE alpha;
 
 	// ts.ColorFlag と Attr を合成した Attr を作る
@@ -2545,87 +2579,87 @@ static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_col
 	}
 
 	// 色を決定する
-	TextColor = BGVTColor[0];
-	BackColor = BGVTColor[1];
+	TextColor = vt->BGVTColor[0];
+	BackColor = vt->BGVTColor[1];
 	if ((AttrFlag & (AttrURL | AttrUnder | AttrBold | AttrBlink)) == 0) {
 		if (!reverse) {
-			TextColor = BGVTColor[0];
-			BackColor = BGVTColor[1];
+			TextColor = vt->BGVTColor[0];
+			BackColor = vt->BGVTColor[1];
 		}
 		else {
 			if ((ts.ColorFlag & CF_REVERSECOLOR) == 0) {
-				TextColor = BGVTColor[1];
-				BackColor = BGVTColor[0];
+				TextColor = vt->BGVTColor[1];
+				BackColor = vt->BGVTColor[0];
 			}
 			else {
 				// 反転属性色が有効
-				TextColor = BGVTReverseColor[0];
-				BackColor = BGVTReverseColor[1];
+				TextColor = vt->BGVTReverseColor[0];
+				BackColor = vt->BGVTReverseColor[1];
 			}
 		}
 	} else if (AttrFlag & AttrBlink) {
 		if (!reverse) {
-			TextColor = BGVTBlinkColor[0];
+			TextColor = vt->BGVTBlinkColor[0];
 			if (!use_normal_bg_color) {
-				BackColor = BGVTBlinkColor[1];
+				BackColor = vt->BGVTBlinkColor[1];
 			} else {
-				BackColor = BGVTColor[1];
+				BackColor = vt->BGVTColor[1];
 			}
 		} else {
 			if (!use_normal_bg_color) {
-				TextColor = BGVTBlinkColor[1];
+				TextColor = vt->BGVTBlinkColor[1];
 			} else {
-				TextColor = BGVTColor[1];
+				TextColor = vt->BGVTColor[1];
 			}
-			BackColor = BGVTBlinkColor[0];
+			BackColor = vt->BGVTBlinkColor[0];
 		}
 	} else if (AttrFlag & AttrBold) {
 		if (!reverse) {
-			TextColor = BGVTBoldColor[0];
+			TextColor = vt->BGVTBoldColor[0];
 			if (!use_normal_bg_color) {
-				BackColor = BGVTBoldColor[1];
+				BackColor = vt->BGVTBoldColor[1];
 			} else {
-				BackColor = BGVTColor[1];
+				BackColor = vt->BGVTColor[1];
 			}
 		} else {
 			if (!use_normal_bg_color) {
-				TextColor = BGVTBoldColor[1];
+				TextColor = vt->BGVTBoldColor[1];
 			} else {
-				TextColor = BGVTColor[1];
+				TextColor = vt->BGVTColor[1];
 			}
-			BackColor = BGVTBoldColor[0];
+			BackColor = vt->BGVTBoldColor[0];
 		}
 	} else if (AttrFlag & AttrUnder) {
 		if (!reverse) {
-			TextColor = BGVTUnderlineColor[0];
+			TextColor = vt->BGVTUnderlineColor[0];
 			if (!use_normal_bg_color) {
-				BackColor = BGVTUnderlineColor[1];
+				BackColor = vt->BGVTUnderlineColor[1];
 			} else {
-				BackColor = BGVTColor[1];
+				BackColor = vt->BGVTColor[1];
 			}
 		} else {
 			if (!use_normal_bg_color) {
-				TextColor = BGVTUnderlineColor[1];
+				TextColor = vt->BGVTUnderlineColor[1];
 			} else {
-				TextColor = BGVTColor[1];
+				TextColor = vt->BGVTColor[1];
 			}
-			BackColor = BGVTUnderlineColor[0];
+			BackColor = vt->BGVTUnderlineColor[0];
 		}
 	} else if (AttrFlag & AttrURL) {
 		if (!reverse) {
-			TextColor = BGURLColor[0];
+			TextColor = vt->BGURLColor[0];
 			if (!use_normal_bg_color) {
-				BackColor = BGURLColor[1];
+				BackColor = vt->BGURLColor[1];
 			} else {
-				BackColor = BGVTColor[1];
+				BackColor = vt->BGVTColor[1];
 			}
 		} else {
 			if (!use_normal_bg_color) {
-				TextColor = BGURLColor[1];
+				TextColor = vt->BGURLColor[1];
 			} else {
-				TextColor = BGVTColor[1];
+				TextColor = vt->BGVTColor[1];
 			}
-			BackColor = BGURLColor[0];
+			BackColor = vt->BGURLColor[0];
 		}
 	}
 
@@ -2660,28 +2694,28 @@ static void GetDrawAttr(const TCharAttr *Attr, BOOL _reverse, COLORREF *fore_col
 //			const int is_target_color = 1;
 			if (Attr->Fore == Attr->Back && is_target_color) {
 				if (!reverse) {
-					TextColor = BGVTColor[0];
-					BackColor = BGVTColor[1];
+					TextColor = vt->BGVTColor[0];
+					BackColor = vt->BGVTColor[1];
 				}
 				else {
-					TextColor = BGVTReverseColor[0];
-					BackColor = BGVTReverseColor[1];
+					TextColor = vt->BGVTReverseColor[0];
+					BackColor = vt->BGVTReverseColor[1];
 				}
 			}
 		}
 	}
 
-	if (BackColor == BGVTColor[1]) {
+	if (BackColor == vt->BGVTColor[1]) {
 		// 通常(アトリビュートなし)のback
-		alpha = w->alpha_vtback;
+		alpha = vt->alpha_vtback;
 	}
 	else if (!reverse) {
 		// 一般(反転属性(SGR 4)以外)のback
-		alpha = w->alpha_back;
+		alpha = vt->alpha_back;
 	}
 	else {
 		// 反転属性(SGR 4)のback
-		alpha = BGReverseTextAlpha;
+		alpha = vt->BGReverseTextAlpha;
 	}
 
 	*fore_color = TextColor;
@@ -2721,7 +2755,7 @@ void DispSetupDC(vtdraw_t *vt, ttdc_t *dc, const TCharAttr *Attr, BOOL Reverse)
 	BYTE alpha;
 	HDC hDC = dc->VTDC;
 
-	GetDrawAttr(Attr, Reverse, &TextColor, &BackColor, &alpha);
+	GetDrawAttr(vt, Attr, Reverse, &TextColor, &BackColor, &alpha);
 
 	// フォント設定
 	if (((ts.FontFlag & FF_URLUNDERLINE) && (Attr->Attr & AttrURL)) ||
@@ -2751,8 +2785,8 @@ void DrawStrA(vtdraw_t *vt, ttdc_t *dc, const char *StrA, const char *WidthInfo,
 	int height;
 	BOOL direct_draw;
 	BYTE alpha = 0;
-	int font_width = vt->FontWidth;
-	int font_height = vt->FontHeight;
+	int font_width = vt->CellWidth;
+	int font_height = vt->CellHeight;
 	int Y = dc->PrnY;
 	int *X = &dc->PrnX;
 	HDC DC = dc->VTDC;
@@ -2824,6 +2858,9 @@ void DrawStrA(vtdraw_t *vt, ttdc_t *dc, const char *StrA, const char *WidthInfo,
 	}
 }
 
+/**
+ *	拡大縮小して文字を描画する
+ */
 static void DrawChar(vtdraw_t *vt, ttdc_t *dc, HDC BGDC, int x, int y, const wchar_t *str, size_t len, int cell)
 {
 	SIZE char_size;
@@ -2831,12 +2868,11 @@ static void DrawChar(vtdraw_t *vt, ttdc_t *dc, HDC BGDC, int x, int y, const wch
 	HBITMAP bitmap;
 	HBITMAP prev_bitmap;
 	RECT rc;
-	int width;
-	int height;
 	HDC hDC = dc->VTDC;
 
 	GetTextExtentPoint32W(hDC, str, (int)len, &char_size);
 
+	// 拡縮前フォントサイズのchar_dc/bitmapを作る
 	char_dc = CreateCompatibleDC(hDC);
 	SetTextColor(char_dc, GetTextColor(hDC));
 	SetBkColor(char_dc, GetBkColor(hDC));
@@ -2844,41 +2880,66 @@ static void DrawChar(vtdraw_t *vt, ttdc_t *dc, HDC BGDC, int x, int y, const wch
 	bitmap = CreateCompatibleBitmap(hDC, char_size.cx, char_size.cy);
 	prev_bitmap = SelectObject(char_dc, bitmap);
 
+	// char_dcに拡縮前フォントを描画
 	rc.top = 0;
 	rc.left = 0;
 	rc.right = char_size.cx;
 	rc.bottom = char_size.cy;
 	ExtTextOutW(char_dc, 0, 0, ETO_OPAQUE, &rc, str, (UINT)len, 0);
 
-	// 横をcell幅(cell*FontWidth pixel)に拡大/縮小して描画
-	width = cell * vt->FontWidth;
-	height = char_size.cy;
+	// 横をcell幅(cell*CellWidth pixel)に拡大/縮小して描画
+	int cell_width = cell * vt->CellWidth;
+	int cell_height = vt->CellHeight;
 	if (pTransparentBlt == NULL || BGDC == NULL || dc->DCBackAlpha == 255) {
-		// 直接描画
+		// 1cell分のビットマップを作成
+		HDC cell_dc = CreateCompatibleDC(hDC);
+		SetTextColor(cell_dc, GetTextColor(hDC));
+		SetBkColor(cell_dc, GetBkColor(hDC));
+		HBITMAP cell_bitmap = CreateCompatibleBitmap(hDC, vt->CellWidth * cell, vt->CellHeight);
+		HBITMAP cell_bitmap_prev = SelectObject(cell_dc, cell_bitmap);
+
+		// cell_dcを塗りつぶす
+		RECT rect;
+		SetRect(&rect, 0, 0, vt->CellWidth * cell, vt->CellHeight);
+		ExtTextOutW(cell_dc, 0, 0, ETO_OPAQUE, &rect, L"", 0, 0);	// 背景色で塗りつぶし
+
+		// cell_dcに文字を描画
 		SetStretchBltMode(hDC, COLORONCOLOR);
-		StretchBlt(hDC, x, y, width, height, char_dc, 0, 0, char_size.cx, char_size.cy, SRCCOPY);
+		pTransparentBlt(cell_dc, ts.FontDX * cell, ts.FontDY, vt->FontWidth * cell, vt->FontHeight, char_dc, 0, 0, char_size.cx,
+						char_size.cy, GetBkColor(hDC));
+
+		// cell_dcに描画した文字をWindowに貼り付け
+		BitBlt(hDC, x, y, cell * vt->CellWidth, vt->CellHeight, cell_dc, 0, 0, SRCCOPY);
+
+		SelectObject(cell_dc, cell_bitmap_prev);
+		DeleteObject(cell_bitmap);
+		DeleteDC(cell_dc);
 	}
 	else {
 		// BGDCに背景画像を描画
 		const COLORREF BackColor = GetBkColor(hDC);
-		DrawTextBGImage(BGDC, x, y, width, height, BackColor, dc->DCBackAlpha);
+		DrawTextBGImage(BGDC, x, y, cell_width, cell_height, BackColor, dc->DCBackAlpha);
 
 		// BGDCに文字を描画
 		SetStretchBltMode(hDC, COLORONCOLOR);
-		pTransparentBlt(BGDC, 0, 0, width, height, char_dc, 0, 0, char_size.cx, char_size.cy, GetBkColor(hDC));
+		pTransparentBlt(BGDC, ts.FontDX * cell, ts.FontDY, vt->FontWidth * cell, vt->FontHeight, char_dc, 0, 0,
+						char_size.cx, char_size.cy, GetBkColor(hDC));
 
 		// BGDCに描画した文字をWindowに貼り付け
-		BitBlt(hDC, x, y, width, height, BGDC, 0, 0, SRCCOPY);
+		BitBlt(hDC, x, y, cell * vt->CellWidth, vt->CellHeight, BGDC, 0, 0, SRCCOPY);
 	}
 
 	SelectObject(char_dc, prev_bitmap);
 	DeleteObject(bitmap);
 	DeleteDC(char_dc);
+
+	if (vt->debug_drawbox_text) {
+		DrawBox(hDC, x, y, cell_width, cell_height, RGB(0, 0, 255));
+	}
 }
 
-static void DrawStrWSub(ttdc_t *dc, HDC BGDC, const wchar_t *StrW, const int *Dx,
-						int Count, int cells, int font_width, int font_height,
-						int Y, int *X)
+static void DrawStrWSub(vtdraw_t *vt, ttdc_t *dc, HDC BGDC, const wchar_t *StrW, const int *Dx, int Count, int cells,
+						int font_width, int font_height, int Y, int *X)
 {
 	int HalfCharCount = cells;	// セル数
 	int width;
@@ -2926,9 +2987,12 @@ static void DrawStrWSub(ttdc_t *dc, HDC BGDC, const wchar_t *StrW, const int *Dx
 		BitBlt(DC, *X, Y, width, height, BGDC, 0, 0, SRCCOPY);
 	}
 
+	if (vt->debug_drawbox_text) {
+		DrawBox(DC, *X, Y, width, height, RGB(0, 255, 0));
+	}
+
 	*X += width;
 }
-
 
 /**
  *	1行描画 Unicode
@@ -2955,7 +3019,7 @@ static void DrawStrWSub(ttdc_t *dc, HDC BGDC, const wchar_t *StrW, const int *Dx
  *			StrW	U+307B	U+309A
  *			cells	0		2
  *
- *		 len=4
+ *		len=4
  *					吉(つちよし)  野	 家
  *					0			  1		 2
  *			StrW	0xd842 0xdfb7 0x91ce 0x5bb6
@@ -2968,11 +3032,10 @@ static void DrawStrW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *
 	int cell = 0;
 	int i;
 	vtdisp_work_t *w = &vtdisp_work;
-	int font_width = vt->FontWidth;
-	int font_height = vt->FontHeight;
+	int cell_width = vt->CellWidth;
+	int cell_height = vt->CellHeight;
 	int Y = dc->PrnY;
 	int *X = &dc->PrnX;
-	const int sx = *X;
 	HDC DC = dc->VTDC;
 	HDC BGDC = (!vt->IsPrinter && BGEnable) ? hdcBGBuffer : NULL;
 
@@ -2982,7 +3045,7 @@ static void DrawStrW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *
 
 	for (i = 0; i < len; i++) {
 		cell += cells[i];
-		Dx[i] = cells[i] * font_width;
+		Dx[i] = cells[i] * cell_width;
 	}
 
 	if (w->font_resize_enable) {
@@ -2993,7 +3056,7 @@ static void DrawStrW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *
 		for (i = 0; i < len; i++) {
 			if (cells[i] == 0) {
 				if (cell_count != 0) {
-					DrawStrWSub(dc, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count, font_width, font_height, Y, X);
+					DrawStrWSub(vt, dc, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count, cell_width, cell_height, Y, X);
 					start_idx = i;
 					cell_count = 0;
 					wchar_count = 0;
@@ -3004,19 +3067,20 @@ static void DrawStrW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *
 			}
 			else {
 				SIZE size;
+				int font_width_c = vt->FontWidth * cells[i];
 				GetTextExtentPoint32W(DC, &StrW[i - zero_count], 1 + zero_count, &size);
-				if (zero_count == 0 && ((size.cx == Dx[i]) || (size.cx == Dx[i] + 1))) {
+				if (zero_count == 0 && ((size.cx == font_width_c) || (size.cx == font_width_c + 1))) {
 					wchar_count++;
 					cell_count += cells[i];
 				}
 				else {
 					if (cell_count > 0) {
-						DrawStrWSub(dc, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count,
-									font_width, font_height, Y, X);
+						DrawStrWSub(vt, dc, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count,
+									cell_width, cell_height, Y, X);
 						start_idx += wchar_count;
 					}
 					DrawChar(vt, dc, BGDC, *X, Y, &StrW[i - zero_count], 1 + zero_count, cells[i]);
-					*X += cells[i] * vt->FontWidth;
+					*X += cells[i] * vt->CellWidth;
 					start_idx += 1 + zero_count;
 					zero_count = 0;
 					cell_count = 0;
@@ -3025,18 +3089,12 @@ static void DrawStrW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *
 			}
 		}
 		if (cell_count != 0) {
-			DrawStrWSub(dc, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count, font_width, font_height, Y,
+			DrawStrWSub(vt, dc, BGDC, &StrW[start_idx], &Dx[start_idx], wchar_count, cell_count, cell_width, cell_height, Y,
 						X);
 		}
 	}
 	else {
-		DrawStrWSub(dc, BGDC, StrW, Dx, len, cell, font_width, font_height, Y, X);
-	}
-
-	if (vt->debug_drawbox_text) {
-		int width = cell * font_width;
-		int height = font_height;
-		DrawBox(DC, sx, Y, width, height, RGB(0, 255, 0));
+		DrawStrWSub(vt, dc, BGDC, StrW, Dx, len, cell, cell_width, cell_height, Y, X);
 	}
 }
 
@@ -3071,11 +3129,11 @@ BOOL DispDeleteLines(vtdraw_t *vt, int Count, int YEnd)
       (YEnd + 1 - WinOrgY <= WinHeight))
   {
 	R.left = 0;
-	R.right = ScreenWidth;
-	R.top = (CursorY - WinOrgY) * vt->FontHeight;
-	R.bottom = (YEnd + 1 - WinOrgY) * vt->FontHeight;
-	//  ScrollWindow(HVTWin,0,-FontHeight*Count,&R,&R);
-	BGScrollWindow(HVTWin,0,-vt->FontHeight*Count,&R,&R);
+	R.right = vt->ScreenWidth;
+	R.top = (CursorY - WinOrgY) * vt->CellHeight;
+	R.bottom = (YEnd + 1 - WinOrgY) * vt->CellHeight;
+	//  ScrollWindow(HVTWin,0,-CellHeight*Count,&R,&R);
+	BGScrollWindow(HVTWin,0,-vt->CellHeight*Count,&R,&R);
 	UpdateWindow(HVTWin);
 	return TRUE;
   }
@@ -3094,11 +3152,11 @@ BOOL DispInsertLines(vtdraw_t *vt, int Count, int YEnd)
       (CursorY >= WinOrgY))
   {
     R.left = 0;
-    R.right = ScreenWidth;
-	R.top = (CursorY - WinOrgY) * vt->FontHeight;
-	R.bottom = (YEnd + 1 - WinOrgY) * vt->FontHeight;
-	//  ScrollWindow(HVTWin,0,FontHeight*Count,&R,&R);
-	BGScrollWindow(HVTWin, 0, vt->FontHeight * Count, &R, &R);
+    R.right = vt->ScreenWidth;
+	R.top = (CursorY - WinOrgY) * vt->CellHeight;
+	R.bottom = (YEnd + 1 - WinOrgY) * vt->CellHeight;
+	//  ScrollWindow(HVTWin,0,CellHeight*Count,&R,&R);
+	BGScrollWindow(HVTWin, 0, vt->CellHeight * Count, &R, &R);
 	UpdateWindow(HVTWin);
     return TRUE;
   }
@@ -3131,8 +3189,8 @@ BOOL IsLineVisible(vtdraw_t *vt, int *X, int *Y)
     return FALSE;
 
   /* screen coordinate -> window coordinate */
-  *X = (*X - WinOrgX) * vt->FontWidth;
-  *Y = (*Y - WinOrgY) * vt->FontHeight;
+  *X = (*X - WinOrgX) * vt->CellWidth;
+  *Y = (*Y - WinOrgY) * vt->CellHeight;
   return TRUE;
 }
 
@@ -3232,11 +3290,11 @@ void DispUpdateScroll(vtdraw_t *vt)
   /* Update partial scroll */
   if (dScroll != 0)
   {
-    d = dScroll * vt->FontHeight;
+    d = dScroll * vt->CellHeight;
     R.left = 0;
-    R.right = ScreenWidth;
-    R.top = (SRegionTop-WinOrgY)*vt->FontHeight;
-    R.bottom = (SRegionBottom+1-WinOrgY)*vt->FontHeight;
+    R.right = vt->ScreenWidth;
+    R.top = (SRegionTop-WinOrgY)*vt->CellHeight;
+    R.bottom = (SRegionBottom+1-WinOrgY)*vt->CellHeight;
 //  ScrollWindow(HVTWin,0,-d,&R,&R);
     BGScrollWindow(HVTWin,0,-d,&R,&R);
 
@@ -3277,13 +3335,13 @@ void DispUpdateScroll(vtdraw_t *vt)
 
   if (NewOrgX==WinOrgX)
   {
-	  d = (NewOrgY - WinOrgY) * vt->FontHeight;
+	  d = (NewOrgY - WinOrgY) * vt->CellHeight;
 	  //  ScrollWindow(HVTWin,0,-d,NULL,NULL);
     BGScrollWindow(HVTWin,0,-d,NULL,NULL);
   }
   else if (NewOrgY==WinOrgY)
   {
-    d = (NewOrgX-WinOrgX) * vt->FontWidth;
+    d = (NewOrgX-WinOrgX) * vt->CellWidth;
 //  ScrollWindow(HVTWin,-d,0,NULL,NULL);
     BGScrollWindow(HVTWin,-d,0,NULL,NULL);
   }
@@ -3321,8 +3379,8 @@ void DispAutoScroll(vtdraw_t *vt, POINT p)
 {
   int X, Y;
 
-  X = (p.x + vt->FontWidth / 2) / vt->FontWidth;
-  Y = p.y / vt->FontHeight;
+  X = (p.x + vt->CellWidth / 2) / vt->CellWidth;
+  Y = p.y / vt->CellHeight;
   if (X<0)
     NewOrgX = WinOrgX + X;
   else if (X>=WinWidth)
@@ -3434,14 +3492,14 @@ void DispSetWinPos(vtdraw_t *vt)
 
 	if (CanUseIME() && (ts.IMEInline > 0))
 	{
-		CaretX = (CursorX-WinOrgX)*vt->FontWidth;
-		CaretY = (CursorY-WinOrgY)*vt->FontHeight;
+		CaretX = (CursorX-WinOrgX)*vt->CellWidth;
+		CaretY = (CursorY-WinOrgY)*vt->CellHeight;
 		/* set IME conversion window pos. */
 		SetConversionWindow(HVTWin,CaretX,CaretY);
 	}
 
 	Point.x = 0;
-	Point.y = ScreenHeight;
+	Point.y = vt->ScreenHeight;
 	ClientToScreen(HVTWin,&Point);
 	CompletelyVisible = (Point.y <= VirtualScreen.bottom);
 
@@ -3488,20 +3546,6 @@ void DispSetActive(vtdraw_t *vt, BOOL ActiveFlag)
 	}
 }
 
-int TCharAttrCmp(TCharAttr a, TCharAttr b)
-{
-  if (a.Attr == b.Attr &&
-      a.Attr2 == b.Attr2 &&
-      a.Fore == b.Fore &&
-      a.Back == b.Back)
-  {
-    return 0;
-  }
-  else {
-    return 1;
-  }
-}
-
 void DispSetColor(vtdraw_t *vt, unsigned int num, COLORREF color)
 {
 #if 0
@@ -3514,21 +3558,41 @@ void DispSetColor(vtdraw_t *vt, unsigned int num, COLORREF color)
 
 	switch (num) {
 	case CS_VT_NORMALFG:
-		BGVTColor[0] = color;
+			vt->BGVTColor[0] = color;
 		break;
 	case CS_VT_NORMALBG:
-		BGVTColor[1] = color;
+		vt->BGVTColor[1] = color;
 		break;
-	case CS_VT_BOLDFG:    BGVTBoldColor[0] = color; break;
-	case CS_VT_BOLDBG:    BGVTBoldColor[1] = color; break;
-	case CS_VT_BLINKFG:   BGVTBlinkColor[0] = color; break;
-	case CS_VT_BLINKBG:   BGVTBlinkColor[1] = color; break;
-	case CS_VT_REVERSEFG: BGVTReverseColor[0] = color; break;
-	case CS_VT_REVERSEBG: BGVTReverseColor[1] = color; break;
-	case CS_VT_URLFG:     BGURLColor[0] = color; break;
-	case CS_VT_URLBG:     BGURLColor[1] = color; break;
-	case CS_VT_UNDERFG:   BGVTUnderlineColor[0] = color; break;
-	case CS_VT_UNDERBG:   BGVTUnderlineColor[1] = color; break;
+	case CS_VT_BOLDFG:
+		vt->BGVTBoldColor[0] = color;
+		break;
+	case CS_VT_BOLDBG:
+		vt->BGVTBoldColor[1] = color;
+		break;
+	case CS_VT_BLINKFG:
+		vt->BGVTBlinkColor[0] = color;
+		break;
+	case CS_VT_BLINKBG:
+		vt->BGVTBlinkColor[1] = color;
+		break;
+	case CS_VT_REVERSEFG:
+		vt->BGVTReverseColor[0] = color;
+		break;
+	case CS_VT_REVERSEBG:
+		vt->BGVTReverseColor[1] = color;
+		break;
+	case CS_VT_URLFG:
+		vt->BGURLColor[0] = color;
+		break;
+	case CS_VT_URLBG:
+		vt->BGURLColor[1] = color;
+		break;
+	case CS_VT_UNDERFG:
+		vt->BGVTUnderlineColor[0] = color;
+		break;
+	case CS_VT_UNDERBG:
+		vt->BGVTUnderlineColor[1] = color;
+		break;
 	case CS_TEK_FG:       ts.TEKColor[0] = color; break;
 	case CS_TEK_BG:       ts.TEKColor[1] = color; break;
 	default:
@@ -3549,8 +3613,6 @@ void DispSetColor(vtdraw_t *vt, unsigned int num, COLORREF color)
 		break;
 	}
 
-	UpdateBGBrush(vt);
-
 	if (num == CS_TEK_FG || num == CS_TEK_BG) {
 		if (HTEKWin)
 			InvalidateRect(HTEKWin, NULL, FALSE);
@@ -3566,23 +3628,43 @@ void DispResetColor(vtdraw_t *vt, unsigned int num)
 		return;
 	}
 
-	switch(num) {
+	switch (num) {
 	case CS_VT_NORMALFG:
-		BGVTColor[0] = ts.VTColor[0];
+		vt->BGVTColor[0] = ts.VTColor[0];
 		break;
 	case CS_VT_NORMALBG:
-		BGVTColor[1] = ts.VTColor[1];
+		vt->BGVTColor[1] = ts.VTColor[1];
 		break;
-	case CS_VT_BOLDFG:    BGVTBoldColor[0] = ts.VTBoldColor[0]; break;
-	case CS_VT_BOLDBG:    BGVTBoldColor[1] = ts.VTBoldColor[1]; break;
-	case CS_VT_BLINKFG:   BGVTBlinkColor[0] = ts.VTBlinkColor[0]; break;
-	case CS_VT_BLINKBG:   BGVTBlinkColor[1] = ts.VTBlinkColor[1]; break;
-	case CS_VT_REVERSEFG: BGVTReverseColor[0] = ts.VTReverseColor[0]; break;
-	case CS_VT_REVERSEBG: BGVTReverseColor[1] = ts.VTReverseColor[1]; break;
-	case CS_VT_URLFG:     BGURLColor[0] = ts.URLColor[0]; break;
-	case CS_VT_URLBG:     BGURLColor[1] = ts.URLColor[1]; break;
-	case CS_VT_UNDERFG:   BGVTUnderlineColor[0] = ts.VTUnderlineColor[0]; break;
-	case CS_VT_UNDERBG:   BGVTUnderlineColor[1] = ts.VTUnderlineColor[1]; break;
+	case CS_VT_BOLDFG:
+		vt->BGVTBoldColor[0] = ts.VTBoldColor[0];
+		break;
+	case CS_VT_BOLDBG:
+		vt->BGVTBoldColor[1] = ts.VTBoldColor[1];
+		break;
+	case CS_VT_BLINKFG:
+		vt->BGVTBlinkColor[0] = ts.VTBlinkColor[0];
+		break;
+	case CS_VT_BLINKBG:
+		vt->BGVTBlinkColor[1] = ts.VTBlinkColor[1];
+		break;
+	case CS_VT_REVERSEFG:
+		vt->BGVTReverseColor[0] = ts.VTReverseColor[0];
+		break;
+	case CS_VT_REVERSEBG:
+		vt->BGVTReverseColor[1] = ts.VTReverseColor[1];
+		break;
+	case CS_VT_URLFG:
+		vt->BGURLColor[0] = ts.URLColor[0];
+		break;
+	case CS_VT_URLBG:
+		vt->BGURLColor[1] = ts.URLColor[1];
+		break;
+	case CS_VT_UNDERFG:
+		vt->BGVTUnderlineColor[0] = ts.VTUnderlineColor[0];
+		break;
+	case CS_VT_UNDERBG:
+		vt->BGVTUnderlineColor[1] = ts.VTUnderlineColor[1];
+		break;
 	case CS_TEK_FG:
 		break;
 	case CS_TEK_BG:
@@ -3592,26 +3674,26 @@ void DispResetColor(vtdraw_t *vt, unsigned int num)
 		DispSetNearestColors(0, 255, NULL);
 		break;
 	case CS_SP_ALL:
-		BGVTBoldColor[0] = ts.VTBoldColor[0];
-		BGVTBlinkColor[0] = ts.VTBlinkColor[0];
-		BGVTReverseColor[1] = ts.VTReverseColor[1];
+		vt->BGVTBoldColor[0] = ts.VTBoldColor[0];
+		vt->BGVTBlinkColor[0] = ts.VTBlinkColor[0];
+		vt->BGVTReverseColor[1] = ts.VTReverseColor[1];
 		break;
 	case CS_ALL:
 		// VT color Foreground
-		BGVTColor[0] = ts.VTColor[0];
-		BGVTBoldColor[0] = ts.VTBoldColor[0];
-		BGVTBlinkColor[0] = ts.VTBlinkColor[0];
-		BGVTReverseColor[0] = ts.VTReverseColor[0];
-		BGURLColor[0] = ts.URLColor[0];
-		BGVTUnderlineColor[0] = ts.VTUnderlineColor[0];
+		vt->BGVTColor[0] = ts.VTColor[0];
+		vt->BGVTBoldColor[0] = ts.VTBoldColor[0];
+		vt->BGVTBlinkColor[0] = ts.VTBlinkColor[0];
+		vt->BGVTReverseColor[0] = ts.VTReverseColor[0];
+		vt->BGURLColor[0] = ts.URLColor[0];
+		vt->BGVTUnderlineColor[0] = ts.VTUnderlineColor[0];
 
 		// VT color Background
-		BGVTColor[1] = ts.VTColor[1];
-		BGVTReverseColor[1] = ts.VTReverseColor[1];
-		BGVTBoldColor[1] = ts.VTBoldColor[1];
-		BGVTBlinkColor[1] = ts.VTBlinkColor[1];
-		BGURLColor[1] = ts.URLColor[1];
-		BGVTUnderlineColor[1] = ts.VTUnderlineColor[1];
+		vt->BGVTColor[1] = ts.VTColor[1];
+		vt->BGVTReverseColor[1] = ts.VTReverseColor[1];
+		vt->BGVTBoldColor[1] = ts.VTBoldColor[1];
+		vt->BGVTBlinkColor[1] = ts.VTBlinkColor[1];
+		vt->BGURLColor[1] = ts.URLColor[1];
+		vt->BGVTUnderlineColor[1] = ts.VTUnderlineColor[1];
 
 		// ANSI Color / xterm 256 color
 		InitColorTable(ts.ANSIColor);
@@ -3636,14 +3718,12 @@ void DispResetColor(vtdraw_t *vt, unsigned int num)
 		}
 	}
 
-	UpdateBGBrush(vt);
-
 	if (num == CS_TEK_FG || num == CS_TEK_BG) {
 		if (HTEKWin)
 			InvalidateRect(HTEKWin, NULL, FALSE);
 	}
 	else {
-		InvalidateRect(HVTWin,NULL,FALSE);
+		InvalidateRect(HVTWin, NULL, FALSE);
 	}
 }
 
@@ -3685,43 +3765,6 @@ COLORREF DispGetColor(unsigned int num)
 	}
 
 	return color;
-}
-
-void DispSetCurCharAttr(vtdraw_t *vt, const TCharAttr *Attr)
-{
-	vt->CurCharAttr = *Attr;
-	UpdateBGBrush(vt);
-}
-
-static void UpdateBGBrush(vtdraw_t *vt)
-{
-	COLORREF bg_rgb;
-
-	if (vt->Background != NULL)
-		DeleteObject(vt->Background);
-
-	if ((ts.ColorFlag & CF_REVERSEVIDEO) == 0) {
-		if ((vt->CurCharAttr.Attr2 & Attr2Back) != 0) {
-			const WORD AttrFlag = ((ts.ColorFlag & CF_BLINKCOLOR) && (vt->CurCharAttr.Attr & AttrBlink)) ? AttrBlink : 0;
-			const int index = Get16ColorIndex(vt->CurCharAttr.Back, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBlink);
-			bg_rgb = ANSIColor[index];
-		}
-		else {
-			bg_rgb = BGVTColor[1];
-		}
-	}
-	else {
-		if ((vt->CurCharAttr.Attr2 & Attr2Fore) != 0) {
-			const WORD AttrFlag = ((ts.ColorFlag & CF_BOLDCOLOR) && (vt->CurCharAttr.Attr & AttrBold)) ? AttrBold : 0;
-			const int index = Get16ColorIndex(vt->CurCharAttr.Fore, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBold);
-			bg_rgb = ANSIColor[index];
-		}
-		else {
-			bg_rgb = BGVTColor[0];
-		}
-	}
-
-	vt->Background = CreateSolidBrush(bg_rgb);
 }
 
 void DispShowWindow(int mode)
@@ -3846,8 +3889,8 @@ void DispGetRootWinSize(vtdraw_t *vt, int *x, int *y, BOOL inPixels)
 		*y = desktop.bottom - desktop.top;
 	}
 	else {
-		*x = (desktop.right - desktop.left - (win.right - win.left - client.right)) / vt->FontWidth;
-		*y = (desktop.bottom - desktop.top - (win.bottom - win.top - client.bottom)) / vt->FontHeight;
+		*x = (desktop.right - desktop.left - (win.right - win.left - client.right)) / vt->CellWidth;
+		*y = (desktop.bottom - desktop.top - (win.bottom - win.top - client.bottom)) / vt->CellHeight;
 	}
 }
 
@@ -3879,35 +3922,35 @@ int DispFindClosestColor(int red, int green, int blue)
 	return color;
 }
 
-void ThemeGetColor(TColorTheme *data)
+void ThemeGetColor(vtdraw_t *vt, TColorTheme *data)
 {
 	int i;
 
 	wcscpy_s(data->name, _countof(data->name), L"Tera Term color theme");
 	data->vt.change = TRUE;
 	data->vt.enable = TRUE;
-	data->vt.fg = BGVTColor[0];
-	data->vt.bg = BGVTColor[1];
+	data->vt.fg = vt->BGVTColor[0];
+	data->vt.bg = vt->BGVTColor[1];
 	data->bold.change = TRUE;
 	data->bold.enable = TRUE;
-	data->bold.fg = BGVTBoldColor[0];
-	data->bold.bg = BGVTBoldColor[1];
+	data->bold.fg = vt->BGVTBoldColor[0];
+	data->bold.bg = vt->BGVTBoldColor[1];
 	data->underline.change = TRUE;
 	data->underline.enable = TRUE;
-	data->underline.fg = BGVTUnderlineColor[0];
-	data->underline.bg = BGVTUnderlineColor[1];
+	data->underline.fg = vt->BGVTUnderlineColor[0];
+	data->underline.bg = vt->BGVTUnderlineColor[1];
 	data->blink.change = TRUE;
 	data->blink.enable = TRUE;
-	data->blink.fg = BGVTBlinkColor[0];
-	data->blink.bg = BGVTBlinkColor[1];
+	data->blink.fg = vt->BGVTBlinkColor[0];
+	data->blink.bg = vt->BGVTBlinkColor[1];
 	data->reverse.change = TRUE;
 	data->reverse.enable = TRUE;
-	data->reverse.fg = BGVTReverseColor[0];
-	data->reverse.bg = BGVTReverseColor[1];
+	data->reverse.fg = vt->BGVTReverseColor[0];
+	data->reverse.bg = vt->BGVTReverseColor[1];
 	data->url.change = TRUE;
 	data->url.enable = TRUE;
-	data->url.fg = BGURLColor[0];
-	data->url.bg = BGURLColor[1];
+	data->url.fg = vt->BGURLColor[0];
+	data->url.bg = vt->BGURLColor[1];
 
 	// ANSI color
 	data->ansicolor.change = TRUE;
@@ -3916,22 +3959,22 @@ void ThemeGetColor(TColorTheme *data)
 	}
 }
 
-void ThemeSetColor(const TColorTheme *data)
+void ThemeSetColor(vtdraw_t *vt, const TColorTheme *data)
 {
 	int i;
 
-	BGVTColor[0] = data->vt.fg;
-	BGVTColor[1] = data->vt.bg;
-	BGVTBoldColor[0] = data->bold.fg;
-	BGVTBoldColor[1] = data->bold.bg;
-	BGVTUnderlineColor[0] = data->underline.fg;
-	BGVTUnderlineColor[1] = data->underline.bg;
-	BGVTBlinkColor[0] = data->blink.fg;
-	BGVTBlinkColor[1] = data->blink.bg;
-	BGVTReverseColor[0] = data->reverse.fg;
-	BGVTReverseColor[1] = data->reverse.bg;
-	BGURLColor[0] = data->url.fg;
-	BGURLColor[1] = data->url.bg;
+	vt->BGVTColor[0] = data->vt.fg;
+	vt->BGVTColor[1] = data->vt.bg;
+	vt->BGVTBoldColor[0] = data->bold.fg;
+	vt->BGVTBoldColor[1] = data->bold.bg;
+	vt->BGVTUnderlineColor[0] = data->underline.fg;
+	vt->BGVTUnderlineColor[1] = data->underline.bg;
+	vt->BGVTBlinkColor[0] = data->blink.fg;
+	vt->BGVTBlinkColor[1] = data->blink.bg;
+	vt->BGVTReverseColor[0] = data->reverse.fg;
+	vt->BGVTReverseColor[1] = data->reverse.bg;
+	vt->BGURLColor[0] = data->url.fg;
+	vt->BGURLColor[1] = data->url.bg;
 	for (i = 0; i < 16; i++) {
 		ANSIColor[i] = data->ansicolor.color[i];
 	}
@@ -4032,7 +4075,7 @@ void ThemeGetColorDefaultTS(const TTTSet *pts, TColorTheme *color_theme)
 /**
  *	BGテーマをセットする
  */
-void ThemeSetBG(const BGTheme *bg_theme)
+void ThemeSetBG(vtdraw_t *vt, const BGTheme *bg_theme)
 {
 	if (BGDest.fileW != NULL) {
 		free(BGDest.fileW);
@@ -4053,17 +4096,14 @@ void ThemeSetBG(const BGTheme *bg_theme)
 	BGSrc2.color = bg_theme->BGSrc2.color;
 	BGSrc2.enable = bg_theme->BGSrc2.enable;
 
-	BGReverseTextAlpha = bg_theme->BGReverseTextAlpha;
-	{
-		vtdisp_work_t *w = &vtdisp_work;
-		w->alpha_vtback = bg_theme->TextBackAlpha;
-		w->alpha_back = bg_theme->BackAlpha;
-	}
+	vt->BGReverseTextAlpha = bg_theme->BGReverseTextAlpha;
+	vt->alpha_vtback = bg_theme->TextBackAlpha;
+	vt->alpha_back = bg_theme->BackAlpha;
 
 	DecideBGEnable();
 }
 
-void ThemeGetBG(BGTheme *bg_theme)
+void ThemeGetBG(vtdraw_t *vt, BGTheme *bg_theme)
 {
 	if (BGDest.fileW == NULL) {
 		bg_theme->BGDest.file[0] = 0;
@@ -4086,12 +4126,9 @@ void ThemeGetBG(BGTheme *bg_theme)
 	bg_theme->BGSrc2.color = BGSrc2.color;
 	bg_theme->BGSrc2.enable = BGSrc2.enable;
 
-	bg_theme->BGReverseTextAlpha = BGReverseTextAlpha;
-	{
-		vtdisp_work_t *w = &vtdisp_work;
-		bg_theme->TextBackAlpha = w->alpha_vtback;
-		bg_theme->BackAlpha = w->alpha_back;
-	}
+	bg_theme->BGReverseTextAlpha = vt->BGReverseTextAlpha;
+	bg_theme->TextBackAlpha = vt->alpha_vtback;
+	bg_theme->BackAlpha = vt->alpha_back;
 }
 
 /**
@@ -4157,4 +4194,242 @@ void DispSetDrawPos(vtdraw_t *vt, ttdc_t *dc, int x, int y)
 		dc->PrnX += vt->Margin.left;
 		dc->PrnY += vt->Margin.top;
 	}
+}
+
+/**
+ *	行頭
+ */
+void DispPrnPosCR(vtdraw_t *vt, ttdc_t *dc)
+{
+	dc->PrnX = vt->Margin.left;
+}
+
+/**
+ *	改行
+ */
+void DispPrnPosLF(vtdraw_t *vt, ttdc_t *dc)
+{
+	dc->PrnY = dc->PrnY + vt->CellHeight;
+}
+
+/**
+ *	改ページ
+ */
+void DispPrnPosFF(vtdraw_t *vt, ttdc_t *dc)
+{
+	dc->PrnY = vt->Margin.bottom;
+}
+
+/**
+ *	次のページ(プリンタ時)
+ */
+BOOL DispPrnIsNextPage(vtdraw_t *vt, ttdc_t *dc)
+{
+	return (dc->PrnY > vt->Margin.bottom) ? TRUE : FALSE;
+}
+
+/**
+ *	OSのHDC取得
+ */
+HDC DispDCGetRawDC(ttdc_t *dc)
+{
+	return dc->VTDC;
+}
+
+void DispGetCellSize(vtdraw_t *vt, int *width, int *height)
+{
+	if (width != NULL) {
+		*width = vt->CellWidth;
+	}
+	if (height != NULL) {
+		*height = vt->CellHeight;
+	}
+}
+
+void DispGetFontSize(vtdraw_t *vt, int *width, int *height)
+{
+	if (width != NULL) {
+		*width = vt->FontWidth;
+	}
+	if (height != NULL) {
+		*height = vt->FontHeight;
+	}
+}
+
+void DispSetFontSize(vtdraw_t *vt, int width, int height)
+{
+	vt->FontWidth = width;
+	vt->FontHeight = height;
+	vt->CellWidth = width;
+	vt->CellHeight = height;
+}
+
+void DispGetScreenSize(vtdraw_t *vt, int *width, int *height)
+{
+	(void)vt;
+	if (width != NULL) {
+		*width = vt->ScreenWidth;
+	}
+	if (height != NULL) {
+		*height = vt->ScreenHeight;
+	}
+}
+
+/**
+ *	VT印刷
+ *	Initialize printing of VT window
+ *	dcと戻り値vtはVTPrintEnd()で破棄する
+ *
+ *	@param PrnFlag		specifies object to be printed
+ *	= IdPrnScreen		Current screen
+ *	= IdPrnSelectedText	Selected text
+ *	= IdPrnScrollRegion	Scroll region
+ *	= IdPrnFile		Spooled file (printer sequence)
+ *	@param[out]	dc
+ *	@param[out] mode	print object ID specified by user
+ *	= IdPrnCancel		(user clicks "Cancel" button)
+ *	= IdPrnScreen		(user don't select "print selection" option)
+ *	= IdPrnSelectedText	(user selects "print selection")
+ *	= IdPrnScrollRegion	(always when PrnFlag=IdPrnScrollRegion)
+ *	= IdPrnFile		(always when PrnFlag=IdPrnFile)
+ *	@return		vt
+ */
+vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **pdc, int *mode)
+{
+	BOOL Sel;
+	TEXTMETRIC Metrics;
+	POINT PPI, PPI2;
+	HDC DC;
+	LOGFONTW Prnlf;
+	vtdraw_t *vt = (vtdraw_t *)calloc(1, sizeof(*vt));
+	vt->IsPrinter = TRUE;
+	vt->IsColorPrinter = FALSE;		// TRUEのときプリンタにカラーで印刷する
+
+	ttdc_t *dc = (ttdc_t *)calloc(1, sizeof(*dc));
+	if (dc == NULL) {
+	error:
+		*mode = IdPrnCancel;
+		*pdc = NULL;
+		return NULL;
+	}
+
+	Sel = (PrnFlag & IdPrnSelectedText)!=0;
+	HDC PrintDC = PrnBox(HVTWin,&Sel);
+	if (PrintDC == NULL) {
+		goto error;
+	}
+
+	/* start printing */
+	wchar_t *TitleW = ToWcharA(ts.Title);
+	BOOL r = PrnStart(PrintDC, TitleW);
+	free(TitleW);
+	if (!r) {
+		goto error;
+	}
+
+	/* initialization */
+	StartPage(PrintDC);
+
+	dc->VTDC = PrintDC;
+	dc->IsPrinter = TRUE;
+
+	/* pixels per inch */
+	if ((ts.VTPPI.x>0) && (ts.VTPPI.y>0)) {
+		PPI = ts.VTPPI;
+	}
+	else {
+		PPI.x = GetDeviceCaps(PrintDC,LOGPIXELSX);
+		PPI.y = GetDeviceCaps(PrintDC,LOGPIXELSY);
+	}
+
+	/* left margin */
+	vt->Margin.left = (int)((float)ts.PrnMargin[0] / 100.0 * (float)PPI.x);
+	/* right margin */
+	vt->Margin.right = GetDeviceCaps(PrintDC, HORZRES) -
+	               (int)((float)ts.PrnMargin[1] / 100.0 * (float)PPI.x);
+	/* top margin */
+	vt->Margin.top = (int)((float)ts.PrnMargin[2] / 100.0 * (float)PPI.y);
+	/* bottom margin */
+	vt->Margin.bottom = GetDeviceCaps(PrintDC, VERTRES) -
+	                 (int)((float)ts.PrnMargin[3] / 100.0 * (float)PPI.y);
+
+	/* create test font */
+	memset(&Prnlf, 0, sizeof(Prnlf));
+
+	if (ts.PrnFont[0]==0) {
+		Prnlf.lfHeight = ts.VTFontSize.y;
+		Prnlf.lfWidth = ts.VTFontSize.x;
+		Prnlf.lfCharSet = ts.VTFontCharSet;
+		ACPToWideChar_t(ts.VTFont, Prnlf.lfFaceName, _countof(Prnlf.lfFaceName));
+	}
+	else {
+		Prnlf.lfHeight = ts.PrnFontSize.y;
+		Prnlf.lfWidth = ts.PrnFontSize.x;
+		Prnlf.lfCharSet = ts.PrnFontCharSet;
+		ACPToWideChar_t(ts.PrnFont, Prnlf.lfFaceName, _countof(Prnlf.lfFaceName));
+	}
+	Prnlf.lfWeight = FW_NORMAL;
+	Prnlf.lfItalic = 0;
+	Prnlf.lfUnderline = 0;
+	Prnlf.lfStrikeOut = 0;
+	Prnlf.lfOutPrecision = OUT_CHARACTER_PRECIS;
+	Prnlf.lfClipPrecision = CLIP_CHARACTER_PRECIS;
+	Prnlf.lfQuality = DEFAULT_QUALITY;
+	Prnlf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
+
+	vt->VTFont[0] = CreateFontIndirectW(&Prnlf);
+
+	DC = GetDC(HVTWin);
+	SelectObject(DC, vt->VTFont[0]);
+	GetTextMetrics(DC, &Metrics);
+	PPI2.x = GetDeviceCaps(DC,LOGPIXELSX);
+	PPI2.y = GetDeviceCaps(DC,LOGPIXELSY);
+	ReleaseDC(HVTWin,DC);
+	DeleteObject(vt->VTFont[0]); /* Delete test font */
+
+	/* Adjust font size */
+	Prnlf.lfHeight = (int)((float)Metrics.tmHeight * (float)PPI.y / (float)PPI2.y);
+	Prnlf.lfWidth = (int)((float)Metrics.tmAveCharWidth * (float)PPI.x / (float)PPI2.x);
+
+	/* Create New Fonts */
+	DispFontCreate(vt, dc, Prnlf);
+
+	vt->Black = RGB(0,0,0);
+	vt->White = RGB(255,255,255);
+	DispSetDrawPos(vt, dc, 0, 0);
+
+	*pdc = dc;
+	_CrtCheckMemory();
+
+	if (PrnFlag == IdPrnScrollRegion) {
+		*mode = IdPrnScrollRegion;
+		return vt;
+	}
+	if (PrnFlag == IdPrnFile) {
+		*mode = IdPrnFile;
+		return vt;
+	}
+	if (Sel) {
+		*mode = IdPrnSelectedText;
+		return vt;
+	}
+	else {
+		*mode = IdPrnScreen;
+		return vt;
+	}
+}
+
+/**
+ *	VT印刷完了
+ *	VTPrintInit()で取得したvtとdcを開放する
+ */
+void VTPrintEnd(vtdraw_t *vt, ttdc_t *dc)
+{
+	_CrtCheckMemory();
+	HDC hDC = DispDCGetRawDC(dc);
+	PrnStop(hDC);
+
+	DispReleaseDC(vt, dc);
+	EndDisp(vt);
+	_CrtCheckMemory();
 }
