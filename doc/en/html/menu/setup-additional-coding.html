@@ -253,9 +253,8 @@ cells(2=full/1=half)
     </p>
 
     <p>
-      The following information is used to determine Emoji.<br>
-      <a href="https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt</a><br>
-      However, code points less than U+0080 are not treated as Emoji
+      The following data's Extended_Pictographic property is used to determine if a character is an emoji.<br>
+      <a href="https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt</a>
     </p>
 
     <p>
@@ -270,6 +269,10 @@ cells(2=full/1=half)
       <dt>"&#x2764;", U+2764</dt>
       <dd>HEAVY BLACK HEART</dd>
     </dl>
+
+    <h2 id="width_decision">Character width decision flow</h2>
+
+    <img src="cell_width.png">
 
   </body>
 </html>
