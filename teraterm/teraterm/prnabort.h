@@ -30,27 +30,21 @@
 /* TERATERM.EXE, print-abort dialog box */
 #pragma once
 
-#include "tttypes.h"	// for TTSet
-
 // CPrnAbortDlg dialog
 class CPrnAbortDlg
 {
 public:
 	CPrnAbortDlg();
-	BOOL Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PTTSet pts);
+	BOOL Create(HINSTANCE hInstance, HWND hParent, wchar_t *UILanguageFileW);
 	BOOL DestroyWindow();
-	int SetPrintDC(HDC hPrintDC);
 	BOOL IsAborted();
+	void MessagePump();
 
 private:
 	HWND m_hWnd;
 	HWND m_hParentWnd;
-	BOOL *m_pAbort;
-	TTTSet *m_ts;
-	BOOL m_PrintAbortFlag;
-	static HWND m_hWnd_static;
+	BOOL m_AbortFlag;
+	wchar_t *m_UILanguageFileW;
 
-	BOOL AbortProc(HDC PDC, int Code);
 	static INT_PTR CALLBACK OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
-	static BOOL CALLBACK AbortProcStatic(HDC hDC, int Error);
 };

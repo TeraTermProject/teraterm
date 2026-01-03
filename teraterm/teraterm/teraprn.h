@@ -42,6 +42,7 @@ extern "C" {
 HDC PrnBox(HWND HWin, PBOOL Sel);
 BOOL PrnStart(HDC hDC, const wchar_t *DocumentName);
 void PrnStop(HDC hDC);
+BOOL PrnCheckAbort();
 
 #define IdPrnCancel 0
 #define IdPrnScreen 1
