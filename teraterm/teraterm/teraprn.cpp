@@ -144,7 +144,7 @@ static void PrnDestroyDialog()
  *	@retval	TRUE	印刷ジョブを続行
  *	@retval	FALSE	印刷ジョブを取り消す
  */
-static BOOL PrnAbortProc(HDC hDC, int Error)
+static BOOL CALLBACK PrnAbortProc(HDC hDC, int Error)
 {
 	(void)hDC;
 	(void)Error;
