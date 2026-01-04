@@ -31,6 +31,8 @@
 
 #include <windows.h>
 
+#include "vtdisp.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -115,10 +117,10 @@ void ThemeSaveBG(const BGTheme *bg_theme, const wchar_t *fname);
 void ThemeSaveColor(TColorTheme *color_theme, const wchar_t *fname);
 
 // setting / vtdisp.c
-void ThemeGetBG(BGTheme *bg_theme);
-void ThemeSetBG(const BGTheme *bg_theme);
-void ThemeGetColor(TColorTheme *data);
-void ThemeSetColor(const TColorTheme *data);
+void ThemeGetBG(vtdraw_t *vt, BGTheme *bg_theme);
+void ThemeSetBG(vtdraw_t *vt, const BGTheme *bg_theme);
+void ThemeGetColor(vtdraw_t *vt, TColorTheme *data);
+void ThemeSetColor(vtdraw_t *vt, const TColorTheme *data);
 void ThemeGetColorDefault(TColorTheme *data);
 void ThemeGetColorDefaultTS(const TTTSet *pts, TColorTheme *color_theme);
 void ThemeGetBGDefault(BGTheme *bg_theme);

@@ -62,36 +62,18 @@ extern "C" {
 #define CS_ALL             0xfffffffe	// DispResetColor() だけで使用
 
 // HDC の wapper
-typedef struct {
-	HDC VTDC;			// 描画に使用するDC
-	HWND HVTWin;		// DCの元になったHWND(プリンタの場合はNULL)
-	HFONT DCPrevFont;	// DCに最初にセレクトされていたfont
-	int PrnX, PrnY;		// 文字の描画位置(pixel), 描画するとPrnXが+方向に増加する
-	BOOL IsPrinter;		// TRUEのとき、プリンタ
-	BYTE DCBackAlpha;
-} ttdc_t;
+typedef struct ttdc ttdc_t;
 
-// VT Winの描画情報、ワーク
-typedef struct vtdraw_tag {
-	HWND hVTWin;					// VT Win Window handle(ウィドウの時)
-	HFONT VTFont[AttrFontMask+1];	// 各フォント
-	int FontWidth, FontHeight;		// フォントサイズ(pixel/1cell)
-	BOOL IsPrinter;					// TRUEのとき、プリンタ
-	BOOL IsColorPrinter;			// TRUEのとき、プリンタでカラー印刷(実験的実装)
-	RECT Margin;					// 文字描画時の余白(pixel)、プリンタ用
-	COLORREF White, Black;			// プリンタ用
-	BOOL debug_drawbox_text;		// 文字描画毎にboxを描画する
-	HBRUSH Background;				// background paintbrush
-	TCharAttr CurCharAttr;			// ディスプレイ用
-} vtdraw_t;
+// VT Winの描画情報
+typedef struct vtdraw vtdraw_t;
 
 // VTWinの描画情報
 //   TODO 移動する vtwinあたりか?
 extern vtdraw_t *vt_src;
 
 /* prototypes */
-void BGInitialize(BOOL initialize_once);
-void BGLoadThemeFile(const TTTSet *pts);
+void BGInitialize(vtdraw_t *vt, BOOL initialize_once);
+void BGLoadThemeFile(vtdraw_t *vt, const TTTSet *pts);
 void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup);
 
 void BGOnSettingChange(vtdraw_t *vt);
@@ -139,11 +121,9 @@ void DispVScroll(vtdraw_t *vt, int Func, int Pos);
 void DispRestoreWinSize(vtdraw_t *vt);
 void DispSetWinPos(vtdraw_t *vt);
 void DispSetActive(vtdraw_t *vt, BOOL ActiveFlag);
-int TCharAttrCmp(TCharAttr a, TCharAttr b);
 void DispSetColor(vtdraw_t *vt, unsigned int num, COLORREF color);
 void DispResetColor(vtdraw_t *vt, unsigned int num);
 COLORREF DispGetColor(unsigned int num);
-void DispSetCurCharAttr(vtdraw_t *vt, const TCharAttr *Attr);
 void DispMoveWindow(int x, int y);
 void DispShowWindow(int mode);
 void DispResizeWin(int w, int h);
@@ -168,12 +148,18 @@ void DispStrW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *WidthIn
 BOOL DispIsPrinter(vtdraw_t *vt);
 BOOL DispDCIsPrinter(ttdc_t *dc);
 void DispSetDrawPos(vtdraw_t *vt, ttdc_t *dc, int x, int y);
+HDC DispDCGetRawDC(ttdc_t *dc);
+BOOL DispPrnIsNextPage(vtdraw_t *vt, ttdc_t *dc);
+void DispPrnPosCR(vtdraw_t *vt, ttdc_t *dc);
+void DispPrnPosLF(vtdraw_t *vt, ttdc_t *dc);
+void DispPrnPosFF(vtdraw_t *vt, ttdc_t *dc);
 
-void DispFontCreate(vtdraw_t *vt, ttdc_t *dc, LOGFONTW VTlf);
-void DispFontDelete(vtdraw_t *vt);
+void DispGetCellSize(vtdraw_t *vt, int *width, int *height);
+void DispGetFontSize(vtdraw_t *vt, int *width, int *height);
+void DispSetFontSize(vtdraw_t *vt, int width, int height);
+void DispGetScreenSize(vtdraw_t *vt, int *width, int *height);
 
 extern int WinWidth, WinHeight;
-extern int ScreenWidth, ScreenHeight;
 extern BOOL AdjustSize, DontChangeSize;
 extern int CursorX, CursorY;
 extern int WinOrgX, WinOrgY, NewOrgX, NewOrgY;
@@ -201,6 +187,15 @@ extern BOOL IMECompositionState;
 #define WINDOW_LOWER    5
 #define WINDOW_REFRESH  6
 #define WINDOW_TOGGLE_MAXIMIZE 7
+
+#define IdPrnCancel 0
+#define IdPrnScreen 1
+#define IdPrnSelectedText 2
+#define IdPrnScrollRegion 4
+#define IdPrnFile 8
+
+vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **dc, int *mode);
+void VTPrintEnd(vtdraw_t *vt, ttdc_t *dc);
 
 #ifdef __cplusplus
 }

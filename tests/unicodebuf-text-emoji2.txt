@@ -1,0 +1,34 @@
+-- Unicode 17.0
+-- Ambiguous
+←:U+2190 LEFTWARDS ARROW
+☆:U+2606 WHITE STAR
+-- Ambiguous + Emoji(<U+1F000)
+®:U+00AE REGISTERED SIGN
+♭:U+266D MUSIC FLAT SIGN
+-- Ambiguous + Emoji(>=U+1F000)
+🅰️:U+1F170 NEGATIVE SQUARED LATIN CAPITAL LETTER A
+-- Full
+！:U+FF01 FULLWIDTH EXCLAMATION MARK
+-- Full + Emoji
+nonexistent?
+-- Half
+｢:U+00AE HALFWIDTH LEFT CORNER BRACKET
+-- Half + Emoji
+nonexistent?
+-- Neutral
+☻:U+263B BLACK SMILING FACE
+-- Neutral + Emoji(<U+1F000)
+©:U+00A9 COPYRIGHT SIGN
+☺:U+263A WHITE SMILING FACE
+-- Neutral + Emoji(>=U+1F000)
+🌡:U+1F321 THERMOMETER
+-- Narrow
+⟦:U+27E6 MATHEMATICAL LEFT WHITE SQUARE BRACKET
+-- Narrow + Emoji
+nonexistent?
+-- Wide
+〈:U+2329 LEFT-POINTING ANGLE BRACKET
+-- Wide + Emoji(<U+1F000)
+⏰:U+23F0 ALARM CLOCK
+-- Wide + Emoji(>=U+1F000)
+🆎:1F18E NEGATIVE SQUARED AB
