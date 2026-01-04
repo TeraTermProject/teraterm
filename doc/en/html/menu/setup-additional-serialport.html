@@ -97,8 +97,46 @@
               <dt>DSR/DTR</dt><dd>Hardware flow(DSR/DTR)</dd>
               <dt>none</dt><dd>No flow control<br>
             </dl>
-
           </dd>
+
+          <dt>CTS, DSR, RING, RLSD</dt>
+          <dd>
+            Displays the status of the control signals.
+            <ul>
+              <li>CTS (Clear To Send) : Ready to send</li>
+              <li>DSR (Data Set Ready) : Data set ready</li>
+              <li>RING (Ring Indicator) : Incoming (ringing)</li>
+              <li>RLSD (Receive Line Signal Detect) : Carrier detected</li>
+            </ul>
+          </dd>
+
+          <dt id="FlowCtrlRTS">RTS</dt>
+          <dd>
+            Displays the status of the RTS (Request To Send) control signal.<br>
+            Set the RTS flow control method to Disable / Enable / Handshake / Toggle.
+            For details, see the description of the fRtsControl member of the <a href="https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-dcb" target="_blank">DCB structure</a>.<br>
+            <ul>
+              <li>Disable : always low</li>
+              <li>Enable : always high</li>
+              <li>Handshake : high when ready to receive</li>
+              <li>Toggle : high while transmitting</li>
+            </ul>
+            When RTS flow control is set to Disable or Enable, clicking RTS temporarily toggles the signal between low and high.
+          </dd>
+
+          <dt id="FlowCtrlDTR">DTR</dt>
+          <dd>
+            Displays the status of the DTR (Data Terminal Ready) control signal.<br>
+            Set the DTR flow control method to Disable / Enable / Handshake.
+            For details, see the description of the fDtrControl member of the <a href="https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-dcb" target="_blank">DCB structure</a>.<br>
+            <ul>
+              <li>Disable : always low</li>
+              <li>Enable : always high</li>
+              <li>Handshake : high when ready to receive</li>
+            </ul>
+            When DTR flow control is set to Disable or Enable, clicking DTR temporarily toggles the signal between low and high.
+          </dd>
+
         </dl>
       </dd>
 

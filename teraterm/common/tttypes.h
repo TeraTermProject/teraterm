@@ -611,6 +611,8 @@ struct tttset {
 	char FileReceiveFilter[128];
 	WORD ReceivefileSkipOptionDialog;
 	int ReceivefileAutoStopWaitTime;
+	int FlowCtrlRTS;
+	int FlowCtrlDTR;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;
@@ -696,6 +698,11 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdFlowHard 2    // RTS/CTS(hardware flow)
 #define IdFlowNone 3
 #define IdFlowHardDsrDtr 4  // DSR/DTR(hardware flow)
+  /* RTS,DTR Flow control ID */
+#define IdDisable   0
+#define IdEnable    1
+#define IdHandshake 2
+#define IdToggle    3
 
 /* Control Characters */
 
