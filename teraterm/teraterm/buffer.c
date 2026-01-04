@@ -2261,16 +2261,23 @@ void BuffPrint(BOOL ScrollRegion)
 			IEnd = NumOfColumns - 1;
 		}
 
-		DispSetDrawPos(vt, dc, 0, line_in_page * vt->FontHeight);
+		int height;
+		DispGetCellSize(vt, NULL, &height);
+		DispSetDrawPos(vt, dc, 0, line_in_page * height);
 
 		BuffDrawLineI(vt, dc, j, IStart, IEnd);
 		TmpPtr = NextLinePtr(TmpPtr);
 		line_in_page++;
-		if (dc->PrnY > vt->Margin.bottom) {
+		if (DispPrnIsNextPage(vt, dc)) {
 			// 次のページへ
 			line_in_page = 0;
-			EndPage(dc->VTDC);
-			StartPage(dc->VTDC);
+			HDC hdc = DispDCGetRawDC(dc);
+			EndPage(hdc);
+			StartPage(hdc);
+		}
+
+		if (PrnCheckAbort()) {
+			break;
 		}
 	}
 	UnlockBuffer();
@@ -3300,6 +3307,20 @@ static BOOL CheckSelect(int x, int y)
 	}
 }
 
+static int TCharAttrCmp(const TCharAttr *a, const TCharAttr *b)
+{
+	if (a->Attr == b->Attr &&
+		a->Attr2 == b->Attr2 &&
+		a->Fore == b->Fore &&
+		a->Back == b->Back)
+	{
+		return 0;
+	}
+	else {
+		return 1;
+	}
+}
+
 /**
  *	1行描画
  *
@@ -3371,7 +3392,7 @@ void BuffGetDrawInfoW(vtdraw_t *vt, ttdc_t *dc, int SY, int IStart, int IEnd,
 				TempAttr.Fore = CodeBuffW[TmpPtr + istart + count].fg;
 				TempAttr.Back = CodeBuffW[TmpPtr + istart + count].bg;
 				if (b->u32 != 0 &&
-					((TCharAttrCmp(CurAttr, TempAttr) != 0 || CurAttrEmoji != b->Emoji) ||
+					((TCharAttrCmp(&CurAttr, &TempAttr) != 0 || CurAttrEmoji != b->Emoji) ||
 					 (CurSelected != CheckSelect(istart+count,SY)))){
 					// この文字でアトリビュートが変化した → 描画
 					DrawFlag = TRUE;
@@ -5166,7 +5187,6 @@ void BuffLineContinued(BOOL mode)
 void BuffSetCurCharAttr(const TCharAttr *Attr)
 {
 	CurCharAttr = *Attr;
-	DispSetCurCharAttr(vt_src, Attr);
 }
 
 void BuffSaveScreen(void)

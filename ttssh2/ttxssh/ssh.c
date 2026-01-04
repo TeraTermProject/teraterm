@@ -5764,6 +5764,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	u_char *server_public = NULL;
 	BIGNUM *dh_server_pub = NULL;
 	BIGNUM *pub_key = NULL;
+	BIGNUM *dh_p = NULL;
 	BOOL result = FALSE;
 	char *emsg = NULL, emsg_tmp[1024]; // error message
 
@@ -5778,7 +5779,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEXDH_REPLY", "key exchange: receiving", data, len);
 
-	/* hostkey */
+	/* K_S, server's public host key */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = buffer_init();
@@ -5800,7 +5801,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
-		            /*__FUNCTION__*/"handle_SSH2_dh_kex_reply",
+		            "handle_SSH2_dh_kex_reply",
 		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
 		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
 		            get_ssh2_hostkey_type_name(server_host_key->type));
@@ -5858,7 +5859,8 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "hash", hash, hashlen);
 	}
 
-	// TTSSHバージョン情報に表示するキービット数を求めておく
+	// TTSSHバージョン情報に表示するビット数を求めておく
+	/*
 	DH_get0_key(kex->dh, &pub_key, NULL);
 	kex->client_key_bits = BN_num_bits(pub_key);
 	dh_server_pub = BN_new();
@@ -5869,8 +5871,12 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	}
 	buffer_clear(server_blob);
 	buffer_put_string(server_blob, server_public, pklen);
+	buffer_rewind(server_blob);
 	buffer_get_bignum2_msg(server_blob, dh_server_pub);
 	kex->server_key_bits = BN_num_bits(dh_server_pub);
+	*/
+	DH_get0_pqg(kex->dh, &dh_p, NULL, NULL);
+	kex->dh_group_bits = BN_num_bits(dh_p);
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 
@@ -5936,7 +5942,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	push_memdump("DH_GEX_REPLY", "key exchange: receiving", data, len);
 
-	/* hostkey */
+	/* K_S, server's public host key */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = buffer_init();
@@ -5958,7 +5964,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
-		            /*__FUNCTION__*/"handle_SSH2_dh_gex_reply",
+		            "handle_SSH2_dh_gex_reply",
 		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
 		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
 		            get_ssh2_hostkey_type_name(server_host_key->type));
@@ -6038,10 +6044,13 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		push_memdump("DH_GEX_REPLY kexgex_hash", "hash", hash, hashlen);
 	}
 
-	// TTSSHバージョン情報に表示するキービット数を求めておく
+	// TTSSHバージョン情報に表示するビット数を求めておく
+	/*
 	DH_get0_key(kex->dh, &pub_key, NULL);
 	kex->client_key_bits = BN_num_bits(pub_key);
 	kex->server_key_bits = BN_num_bits(dh_server_pub);
+	*/
+	kex->dh_group_bits = BN_num_bits(dh_p);
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, slen);
 
@@ -6104,7 +6113,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
-	/* hostkey */
+	/* K_S, server's public host key */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = buffer_init();
@@ -6126,7 +6135,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
-		            /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
+		            "handle_SSH2_ecdh_kex_reply",
 		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
 		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
 		            get_ssh2_hostkey_type_name(server_host_key->type));
@@ -6185,25 +6194,6 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "shared_secret", buffer_ptr(shared_secret), buffer_len(shared_secret));
 
 		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "hash", hash, hashlen);
-	}
-
-	// TTSSHバージョン情報に表示するキービット数を求めておく
-	switch (kex->kex_type) {
-		case KEX_ECDH_SHA2_256:
-			kex->client_key_bits = 256;
-			kex->server_key_bits = 256;
-			break;
-		case KEX_ECDH_SHA2_384:
-			kex->client_key_bits = 384;
-			kex->server_key_bits = 384;
-			break;
-		case KEX_ECDH_SHA2_521:
-			kex->client_key_bits = 521;
-			kex->server_key_bits = 521;
-			break;
-		default:
-			// TODO
-			break;
 	}
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
@@ -6270,13 +6260,13 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
-	/* hostkey */
+	/* K_S, server's public host key */
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = buffer_init();
 	buffer_append(server_host_key_blob, data, bloblen);
 
-	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob",data, bloblen);
+	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob", data, bloblen);
 
 	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob),
 	                                buffer_len(server_host_key_blob));
@@ -6292,7 +6282,7 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
-		            /*__FUNCTION__*/"handle_SSH2_ecdh_kex_reply",
+		            "handle_SSH2_curve25519_kex_reply",
 		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
 		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
 		            get_ssh2_hostkey_type_name(server_host_key->type));
@@ -6319,7 +6309,7 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	//   xk is a shared secret
 	// Writing using RFC 5656 notation:
 	//   (x', y') = d_C * Q_S
-	//   x' is a shared secret K
+	//   K = stringify(x') ... x25519 shared secret
 	r = kex_c25519_dec(kex, server_blob, &shared_secret);
 	if (r != 0)
 		goto out;
@@ -6352,10 +6342,6 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 
 		push_memdump("KEX_ECDH_REPLY curve25519_kex_reply", "hash", hash, hashlen);
 	}
-
-	// TTSSHバージョン情報に表示するキービット数を求めておく
-	kex->client_key_bits = 256;
-	kex->server_key_bits = 256;
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
 

@@ -38,31 +38,36 @@
   <li>変更
     <ul>
       <li>
-        <a href="../menu/setup-directory.html">設定フォルダ(Setup directory)</a> に broadcast.log を追加した。
+        設定フォルダダイアログ ("Setup &gt; <a href="../menu/setup-directory.html">Setup directory...</a>") に broadcast.log を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/928" target="_blank">issue #928</a>)
       </li>
       <li>
-        セッションの複製時、コマンドラインを隠すよう修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
-      </li>
-      <li>
-        高ビットレートでシリアル接続した際の受信データの欠落を起きづらくした。<br>
-        <a href="../menu/file-receivefile.html">ファイル受信ダイアログ (File - Receive file)</a> を追加した。<br>
-        マクロコマンド <a href="../macro/command/recvfile.html">recvfile</a> を追加した。
+        高ビットレートでシリアル接続した際の受信データの欠落を起きづらくした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/894" target="_blank">issue #894</a>)
       </li>
       <li>
-        Windowsのフォント設定を開くとき、可能であれば "%WINDIR%\Fonts" フォルダを開くかわりに "設定 &gt; 個人用設定 &gt; フォント" を開くようにした。
+        バイナリデータを受信してファイルとして保存する機能を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/894" target="_blank">issue #894</a>)
+        <ul>
+          <li>ファイル受信ダイアログ ("File &gt; <a href="../menu/file-receivefile.html">Receive file...</a>") を追加した。</li>
+          <li>マクロコマンド <a href="../macro/command/recvfile.html">recvfile</a> を追加した。</li>
+        </ul>
+      </li>
+      <li>
+        <a href="../menu/setup-additional-font.html#Windows_Fonts">Windowsのフォント設定を開く</a>とき、可能であれば "%WINDIR%\Fonts" フォルダを開くかわりに "設定 &gt; 個人用設定 &gt; フォント" を開くようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/979" target="_blank">issue #979</a>)
       </li>
       <li>
-        セッションの複製時、コマンドラインを隠すよう修正した。
+        "セッションの複製" で起動した Tera Term のコマンドラインオプションを確認できないようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
       </li>
       <li>
-        <a href="../menu/setup-additional-serialport.html#FlowCtrlRTS">Serial port タブ</a>：RTS、DTR のフロー制御を設定できるようにした。
-        RTS、DTR のアサート/デアサートを切り替えられるようにした。
+        Serial port タブ ("Setup &gt; <a href="../menu/setup-additional-serialport.html">Serial port...</a>") で RTS と DTR の制御信号の low と high を切り替えられるようにし、RTS と DTR のフロー制御を設定できるようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/934" target="_blank">issue #934</a>)
+      </li>
+      <li>
+        セッション断の状態でも "File &gt; <a href="../menu/file-chdir.html">Change directory...</a>" を選択できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/969" target="_blank">issue #969</a>)
       </li>
     </ul>
   </li>
@@ -70,26 +75,36 @@
   <li>バグ修正
     <ul>
       <li>
-        シリアルポートのデータ長とフロー制御の設定が [File] - [Transfer] - [YMODEM, ZMODEM, B-Plus, Quick-VAN] のメニューの有効/無効状態に反映されるよう修正した。<br>
-        セッション断の状態でも [File] - [Change directory...] を選択出来るよう修正した。
+        シリアルポートのデータ長とフロー制御の設定が "File &gt; Transfer &gt; <a href="../menu/file-transfer-ymodem.html">YMODEM</a>, <a href="../menu/file-transfer-zmodem.html">ZMODEM</a>, <a href="../menu/file-transfer-bplus.html">B-Plus</a>, <a href="../menu/file-transfer-qv.html">Quick-VAN</a>" のメニューの有効/無効状態に反映されるよう修正した。
+        4.66からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/969" target="_blank">issue #969</a>)
       </li>
       <li>
-        セッション断発生時に Kermit, XModem, YModem, ZModem, B-Plus, Quick-VAN の転送ダイアログを閉じられない不具合を修正した。<br>
-        マクロコマンド kmtrecv, ymodemrecv bplusrecv, quickvanrecv でファイル受信時にPC側でファイル作成に失敗してもエラーダイアログを表示しないようした。
+        セッション断発生時に Kermit, XModem, YModem, ZModem, B-Plus, Quick-VAN の転送ダイアログを閉じられない不具合を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/973" target="_blank">issue #973</a>)
       </li>
       <li>
-        文字間スペースを Additional settings &gt; Font タブから正しく設定できない問題を修正した。5.0からの不具合。
+        マクロコマンド <a href="../macro/command/kmtrecv.html">kmtrecv</a>, <a href="../macro/command/ymodemrecv.html">ymodemrecv</a>, <a href="../macro/command/bplusrecv.html">bplusrecv</a>, <a href="../macro/command/quickvanrecv.html">quickvanrecv</a> でファイル受信時にPC側でファイル作成に失敗してもエラーダイアログを表示しないようした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/973" target="_blank">issue #973</a>)
+      </li>
+      <li>
+        文字間スペースを "Additional settings &gt; <a href="../menu/setup-additional-font.html">Font</a>" タブから正しく設定できない問題を修正した。
+        5.0からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1008" target="_blank">issue #1008</a>)
       </li>
       <li>
-        ttermpro.exe の /I オプション指定時にマクロコマンド connect でホストに接続出来ない不具合を修正した。（5.4.1でのデグレード）<br>
-        ttermpro.exe の /V オプション指定時にウインドウが非表示にならない不具合を修正した。（5.4.1でのデグレード）
+        ttermpro.exe の /I オプション指定時にマクロコマンド connect でホストに接続出来ない不具合を修正した。
+        5.4.1からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/975" target="_blank">issue #975</a>)
+      </li>
+      <li>
+        ttermpro.exe の /V オプション指定時にウインドウが非表示にならない不具合を修正した。
+        5.4.1からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/975" target="_blank">issue #975</a>)
       </li>
       <li>
         TERATERM.INI の <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> が機能しなくなっていた不具合を修正した。
+        5.0からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/967" target="_blank">issue #967</a>)
       </li>
       <li>
@@ -101,15 +116,24 @@
         5.0からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/147" target="_blank">issue #147</a>)
       </li>
+      <li>
+        印刷 ("File &gt; <a href="../menu/file-print.html">Print...</a>") 時、印刷中ダイアログのCancelボタンで中断できるよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1017" target="_blank">issue #1017</a>)
+      </li>
+      <li>
+        <a href="../menu/setup-additional-font.html#CharSpace">文字間スペース</a>を設定して、<a href="../menu/setup-additional-font.html#ResizedFont">描画幅に合わせてリサイズしたフォントを描画</a>をONにした時、正しく描画するよう修正した。
+        5.0からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1017" target="_blank">issue #1006</a>)
+      </li>
     </ul>
   </li>
 
   <li>その他
     <ul>
-      <li><a href="#ttmenu_1.21">TeraTerm Menu(1.21)</a>へ差し替えた。</li>
-      <li><a href="#ttssh_3.6.0">TTSSH(3.6.0)</a>へ差し替えた。</li>
+      <li><a href="#ttmenu_1.21">TeraTerm Menu 1.21</a> へ差し替えた。</li>
+      <li><a href="#ttssh_3.6.0">TTSSH 3.6.0 </a> へ差し替えた。</li>
       <li>
-        インストーラに使用している Inno Setup のバージョンを<a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.5.4" target="_blank">6.5.4</a>へ差し替えた。
+        インストーラに使用している Inno Setup のバージョンを <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.5.4" target="_blank">6.5.4</a> へ差し替えた。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/874" target="_blank">issue #874</a>)
       </li>
     </ul>
@@ -4012,11 +4036,14 @@
 
 <h3 id="ttssh_3.6.0">YYYY.MM.DD (Ver 3.6.0 not released yet)</h3>
 <ul class="history">
-  <!--li>変更
+  <li>変更
     <ul>
-      <li></li>
+      <li>
+        About TTSSH ダイアログに表示する鍵交換方式の情報を、DH グループや楕円曲線の情報に変更した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1018" target="_blank">issue #1018</a>)
+      </li>
     </ul>
-  </li-->
+  </li>
 
   <!--li>バグ修正
     <ul>
@@ -6112,7 +6139,7 @@
 <h3 id="ttmenu_1.21">YYYY.MM.DD(Ver 1.21)</h3>
 <ul class="history">
       <li>
-        Tera Termを起動する際のコマンドラインを隠すよう修正した。
+        TeraTerm Menu から起動した Tera Term のコマンドラインオプションを確認できないようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
       </li>
 </ul>
