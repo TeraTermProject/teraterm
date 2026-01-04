@@ -111,6 +111,7 @@ typedef struct kex {
 
 	int client_key_bits;
 	int server_key_bits;
+	int dh_group_bits;
 	char *session_id;
 	int session_id_len;
 

@@ -114,6 +114,7 @@ void CRYPT_end(PTInstVar pvar);
 
 void CRYPT_get_cipher_info(PTInstVar pvar, char *dest, int len);
 void CRYPT_get_server_key_info(PTInstVar pvar, char *dest, int len);
+void CRYPT_get_kex_param_info(PTInstVar pvar, char *dest, int len);
 
 void CRYPT_set_server_cookie(PTInstVar pvar, unsigned char *cookie);
 void CRYPT_set_client_cookie(PTInstVar pvar, unsigned char *cookie);

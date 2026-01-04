@@ -53,9 +53,9 @@ int vasprintf(char **strp, const char *fmt, va_list ap)
 	size_t tmp_size = 128;
 	for(;;) {
 		char *p = (char *)realloc(tmp_ptr, tmp_size);
-		assert(p != NULL);
 		if (p == NULL) {
 			// メモリ不足
+			assert(0);
 			free(tmp_ptr);
 			*strp = NULL;
 			return -1;
@@ -69,8 +69,15 @@ int vasprintf(char **strp, const char *fmt, va_list ap)
 		}
 
 		len++;	// +1 for '\0' (terminator)
-		tmp_ptr = (char *)realloc(tmp_ptr, len);
-		*strp = tmp_ptr;
+		char *p2 = (char *)realloc(tmp_ptr, len);
+		if (p2 == NULL) {
+			// メモリ不足
+			assert(0);
+			free(tmp_ptr);
+			*strp = NULL;
+			return -1;
+		}
+		*strp = p2;
 		return len;
 	}
 }
@@ -87,9 +94,9 @@ int vaswprintf(wchar_t **strp, const wchar_t *fmt, va_list ap)
 	size_t tmp_size = 128;
 	for(;;) {
 		wchar_t *p = (wchar_t *)realloc(tmp_ptr, sizeof(wchar_t) * tmp_size);
-		assert(p != NULL);
 		if (p == NULL) {
 			// メモリ不足
+			assert(0);
 			free(tmp_ptr);
 			*strp = NULL;
 			return -1;
@@ -102,9 +109,17 @@ int vaswprintf(wchar_t **strp, const wchar_t *fmt, va_list ap)
 			continue;
 		}
 
+		// reduce memory size
 		len++;	// +1 for '\0' (terminator)
-		tmp_ptr = (wchar_t *)realloc(tmp_ptr, sizeof(wchar_t) * len);
-		*strp = tmp_ptr;
+		wchar_t *p2 = (wchar_t *)realloc(tmp_ptr, sizeof(wchar_t) * len);
+		if (p2 == NULL) {
+			// メモリ不足
+			assert(0);
+			free(tmp_ptr);
+			*strp = NULL;
+			return -1;
+		}
+		*strp = p2;
 		return len;
 	}
 }
