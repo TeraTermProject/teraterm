@@ -251,9 +251,9 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			ArrangeControlsForChooseFont(hWnd, &dlg_data->VTFont, IDC_LIST_HIDDEN_FONTS, IDC_LIST_PRO_FONTS_VT, ACFCF_INIT_VTWIN);
 
 			SetDlgItemInt(hWnd, IDC_SPACE_LEFT, ts->FontDX, TRUE);
-			SetDlgItemInt(hWnd, IDC_SPACE_RIGHT, ts->FontDW, TRUE);
+			SetDlgItemInt(hWnd, IDC_SPACE_RIGHT, ts->FontDW - ts->FontDX, TRUE);
 			SetDlgItemInt(hWnd, IDC_SPACE_TOP, ts->FontDY, TRUE);
-			SetDlgItemInt(hWnd, IDC_SPACE_BOTTOM, ts->FontDH, TRUE);
+			SetDlgItemInt(hWnd, IDC_SPACE_BOTTOM, ts->FontDH - ts->FontDY, TRUE);
 			SendDlgItemMessage(hWnd, IDC_SPACE_LEFT,   EM_LIMITTEXT, IDC_SPACE_MAXLEN, 0);
 			SendDlgItemMessage(hWnd, IDC_SPACE_RIGHT,  EM_LIMITTEXT, IDC_SPACE_MAXLEN, 0);
 			SendDlgItemMessage(hWnd, IDC_SPACE_TOP,    EM_LIMITTEXT, IDC_SPACE_MAXLEN, 0);
@@ -297,11 +297,14 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 							if (parsed) {
 								dlgh = GetDlgItemInt(hWnd, IDC_SPACE_BOTTOM, &parsed, TRUE);
 								if (parsed) {
-									if (ts->FontDX != dlgx || ts->FontDW != dlgw || ts->FontDY != dlgy || ts->FontDH != dlgh) {
+									if (ts->FontDX != dlgx ||
+									    ts->FontDW != (dlgw + dlgx) ||
+									    ts->FontDY != dlgy ||
+									    ts->FontDH != (dlgh + dlgy)) {
 										ts->FontDX = dlgx;
-										ts->FontDW = dlgw;
+										ts->FontDW = dlgw + dlgx;
 										ts->FontDY = dlgy;
-										ts->FontDH = dlgh;
+										ts->FontDH = dlgh + dlgy;
 										ChangeFont(vt_src, 0);
 										DispChangeWinSize(vt_src, ts->TerminalWidth, ts->TerminalHeight);
 									}
