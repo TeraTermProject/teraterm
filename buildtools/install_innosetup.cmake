@@ -5,12 +5,12 @@ else()
   option(REMOVE_TMP "" OFF)
 endif()
 
-# innosetup 6.5.4
-set(INNOSETUP_EXE "innosetup-6.5.4.exe")
+# innosetup 6.6.1
+set(INNOSETUP_EXE "innosetup-6.6.1.exe")
 set(INNOSETUP_URL "https://files.jrsoftware.org/is/6/${INNOSETUP_EXE}")
-set(INNOSETUP_HASH "fa73bf47a4da250d185d07561c2bfda387e5e20db77e4570004cf6a133cc10b1")
+set(INNOSETUP_HASH "d243ce440c02705530699554fb9612b9b2bd7a2a90629cdb7f41e66f5faeb91f")
 set(CHECK_FILE innosetup6/ISCC.exe)
-set(CHECK_HASH "876b87e1f4261448bb682e597f5e62201594dd4b43e6779bc91fc1687f74d840")
+set(CHECK_HASH "f8deb3e9e54303c178fd3513357ebc4d580a63bd072e24c221442b06f884b8fc")
 
 # check innosetup
 if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${CHECK_FILE})
