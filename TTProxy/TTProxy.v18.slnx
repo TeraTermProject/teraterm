@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="Win32" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="TTProxy.v18.vcxproj" Id="c4de5fdf-db00-4c73-9d4f-359bfca3f2fb" />
+</Solution>

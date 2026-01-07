@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="Win32" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="argon2/argon2.v18.vcxproj" Id="d33c59b8-e227-47d2-8f80-eda3e28bf995" />
+  <Project Path="libsshagentc/sshagentc/sshagentc.v18.vcxproj" Id="b5323378-e523-4cb3-8484-85445b35d39b" />
+  <Project Path="matcher/matcher.v18.vcxproj" Id="c4b19bfb-8068-4ef2-a3a1-4ec4c40be7f1" />
+  <Project Path="ttxssh/ttxssh.v18.vcxproj" Id="5638bb89-44e3-4d55-ba98-a01142b4223e" />
+</Solution>

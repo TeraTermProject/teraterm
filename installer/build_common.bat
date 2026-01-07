@@ -59,6 +59,7 @@ rem Check Visual Studio version
 set VSCMNDIR="%VSINSTALLDIR%\Common7\Tools\"
 set VSCMNDIR=%VSCMNDIR:\\=\%
 
+if /I %VSCMNDIR% EQU "%VS180COMNTOOLS%" goto vs2026
 if /I %VSCMNDIR% EQU "%VS170COMNTOOLS%" goto vs2022
 if /I %VSCMNDIR% EQU "%VS160COMNTOOLS%" goto vs2019
 
@@ -73,6 +74,11 @@ goto vsend
 :vs2022
 set TERATERMSLN=..\teraterm\ttermpro.v17.sln
 set CYGWINSLN=..\CYGWIN\cygwin.v17.sln
+goto vsend
+
+:vs2026
+set TERATERMSLN=..\teraterm\ttermpro.v18.slnx
+set CYGWINSLN=..\CYGWIN\cygwin.v18.slnx
 goto vsend
 
 :vsend

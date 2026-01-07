@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="Win32" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="ttpmenu.v18.vcxproj" Id="594f6499-8eda-44dc-ac41-830a754ff1c8" />
+</Solution>

@@ -41,6 +41,7 @@ set VSCMNDIR=%VSCMNDIR:\\=\%
 
 if /I %VSCMNDIR% EQU "%VS160COMNTOOLS%" goto generate
 if /I %VSCMNDIR% EQU "%VS170COMNTOOLS%" goto generate
+if /I %VSCMNDIR% EQU "%VS180COMNTOOLS%" goto generate
 
 echo Unknown Visual Studio version
 goto fail

@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="Win32" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="ttxkanjimenu.v18.vcxproj" Id="dcce3462-94bd-49e8-8dc9-4eeac23c04b7" />
+</Solution>
