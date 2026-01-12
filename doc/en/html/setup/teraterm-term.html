@@ -149,7 +149,7 @@ Debug=on
 </pre>
 
 <p>
-If you press Shift+Esc, Tera Term enters the debug mode, in which all received characters are displayed on the screen. 
+If you press Shift+Esc, Tera Term enters the debug mode, in which all received characters are displayed on the screen.
 The debug mode have four pattern, a user can switch from output as usual to disable output completely.
 </p>
 
@@ -168,9 +168,9 @@ In the debug mode, received characters are displayed by the following way:
 <pre>
 ASCII code of the character    Displaying form
 $00 - $1F                      ^@ - ^_
-                               ($00=^@ $01=^A $02=^B $03=^C $04=^D $05=^E $06=^F $07=^G 
-                                $08=^H $09=^I $0A=^J $0B=^K $0C=^L $0D=^M $0E=^N $0F=^O 
-                                $10=^P $11=^Q $12=^R $13=^S $14=^T $15=^U $16=^V $17=^W 
+                               ($00=^@ $01=^A $02=^B $03=^C $04=^D $05=^E $06=^F $07=^G
+                                $08=^H $09=^I $0A=^J $0B=^K $0C=^L $0D=^M $0E=^N $0F=^O
+                                $10=^P $11=^Q $12=^R $13=^S $14=^T $15=^U $16=^V $17=^W
                                 $18=^X $19=^Y $1A=^Z $1B=^[ $1C=^\ $1D=^] $1E=^^ $1F=^_)
 $20 - $7E                      normal character
 $7F                            &lt;DEL&gt;
@@ -297,7 +297,7 @@ Value: 1
 </pre>
 
 <pre>
-Type B: The character that is displayed "??" up to version 4.58 
+Type B: The character that is displayed "??" up to version 4.58
 (it includes undisplayed characters in English environment).
 
 Value: 2
@@ -312,7 +312,7 @@ Value: 2
 </pre>
 
 <pre>
-Type C: The character that is displayed as bullet(wide character) 
+Type C: The character that is displayed as bullet(wide character)
 in Japanese environment, and is displayed as Middle dot in English environment.<br>
 NOTICE: A user is recommended to not specifying this option unless in Japanese environment.
 
@@ -522,8 +522,8 @@ BeepVBellWait=10
 
 <h1 id="MaxOSCBufferSize">OSC string buffer size</h1>
 <p>
-Tera Term will expand the buffer size of the OSC string when the buffer size is lack. 
-However, when the remote host sends invalid OSC string by using the host bug, 
+Tera Term will expand the buffer size of the OSC string when the buffer size is lack.
+However, when the remote host sends invalid OSC string by using the host bug,
 Tera Term will restrict the buffer size to prevent enlarged memory allocation.
 </p>
                                                                                                                                                         <p>
@@ -658,6 +658,34 @@ it can be displayed correctly.
 Default:
 FallbackToCP932=off
 </pre>
+
+<h1 id="OverrideCellWdith">Override Character width Per Character</h1>
+
+You can set the character width for each character.<br>
+Refer to <a href="../menu/setup-additional-coding.html#OverrideCellWdith">Override character width per character</a>.
+
+<pre>
+[CellWidth1]
+Range1=U+XXXXXX,U+XXXXXY,2
+Range2=U+XXXXYA,U+XXXXYZ,1
+Range3=U+XXXXYY,1
+  :
+</pre>
+
+<ul>
+  <li>RangeN is read sequentially from 1 until it no longer exists.</li>
+  <li>When 3 item
+    <ul>
+      <li>Item 1 is Start and 2 is End Code Point</li>
+      <li>Item 3 1 = 1 cell / 2 = 2 cell / 0 = invalid row</li>
+    </ul></li>
+  <li>When 2 item
+    <ul>
+      <li>Item 1 is Code Point</li>
+      <li>Item 2 1 = 1 cell / 2 = 2 cell / 0 = invalid row</li>
+  </ul></li>
+
+</ul>
 
 </BODY>
 </HTML>

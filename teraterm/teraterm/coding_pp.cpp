@@ -43,6 +43,7 @@
 #include "helpid.h"
 #include "ttlib_charset.h"
 #include "makeoutputstring.h"
+#include "unicode.h"
 
 #include "coding_pp.h"
 
@@ -137,6 +138,9 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_GEN_TITLE" },
+		// Unicode
+		{ IDC_OVERRIDE_CHAR_WIDTH, "DLG_ENCODING_CHAR_WIDTH_PER_CHAR" },
+		// Japanese JIS
 		// { IDC_TERMKANJILABEL, "DLG_TERM_KANJI" },
 		{ IDC_TERMKANJILABEL, "DLG_TERMK_KANJI" },
 		//{ IDC_TERMKANA, "DLG_TERM_KANA" },
@@ -144,6 +148,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		//{ IDC_TERMKANASEND, "DLG_TERM_KANASEND" },
 		{ IDC_TERMKINTEXT, "DLG_TERM_KIN" },
 		{ IDC_TERMKOUTTEXT, "DLG_TERM_KOUT" },
+		// DEC Special Graphics
 		{ IDC_DECSP_UNI2DEC, "DLG_CODING_DECSP_UNICODE_TO_DEC" },
 		{ IDC_DECSP_DEC2UNI, "DLG_CODING_DECSP_DEC_TO_UNICODE" },
 		{ IDC_DECSP_DO_NOT, "DLG_CODING_DECSP_DO_NOT_MAP" },
@@ -173,13 +178,13 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				LRESULT index = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_ADDSTRING, 0, (LPARAM)p->CodeStrGUI);
 				SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_SETITEMDATA, index, (LPARAM)p->coding);
 				if (ts->KanjiCode == p->coding) {
-					recv_index = index;
+					recv_index = (int)index;
 				}
 
 				index = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_ADDSTRING, 0, (LPARAM)p->CodeStrGUI);
 				SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETITEMDATA, index, (LPARAM)p->coding);
 				if (ts->KanjiCodeSend == p->coding) {
-					send_index = index;
+					send_index = (int)index;
 				}
 			}
 			ExpandCBWidth(hWnd, IDC_TERMKANJI);
@@ -257,6 +262,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			} else {
 				CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_UNCHECKED);
 			}
+
+			// 文字ごとの文字幅オーバーライド設定を使う
+			EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH),
+						 UnicodeOverrideWidthAvailable() == 0 ? FALSE : TRUE);
 
 			return TRUE;
 		}

@@ -62,6 +62,7 @@
 #include "ymodem.h"
 #include "kermit.h"
 #include "vtdraw.h"
+#include "unicode.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
@@ -2063,6 +2064,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 			ts->FlowCtrlDTR = IdEnable;
 		}
 	}
+
+	// Unicode Override Info
+	UnicodeOverrideWidthInit(FName, L"CellWidth1");
 
 	// Experimental
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);

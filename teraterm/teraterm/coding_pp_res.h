@@ -24,6 +24,7 @@
 #define IDC_DEC2UNICODE_PUNCTUATION     2614
 #define IDC_DEC2UNICODE_MIDDLEDOT       2615
 #define IDC_AMBIGUOUS_WIDTH_TITLE       2616
+#define IDC_OVERRIDE_CHAR_WIDTH         2617
 
 // Next default values for new objects
 //

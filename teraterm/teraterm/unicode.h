@@ -53,6 +53,11 @@ int UnicodeToCodePage(IdKanjiCode kanji_code, unsigned long u32, unsigned char *
 int UnicodeFromSBCS(IdKanjiCode kanji_code, unsigned char b, unsigned short *u16);
 int UnicodeToSBCS(IdKanjiCode kanji_code, unsigned long u32, unsigned char *b);
 
+int UnicodeOverrideWidthInit(const wchar_t *ini, const wchar_t *section);
+void UnicodeOverrideWidthUninit(void);
+int UnicodeOverrideWidthCheck(unsigned int u32, int *width);
+int UnicodeOverrideWidthAvailable(void);
+
 #ifdef __cplusplus
 }
 #endif

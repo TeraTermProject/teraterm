@@ -32,6 +32,9 @@
 
 #include "unicode.h"
 
+#include "win32helper.h"
+#include "asprintf.h"
+
 /**
  *	East_Asian_Width 参考特性 取得
  *
@@ -725,4 +728,102 @@ int UnicodeFromCodePage(IdKanjiCode kanji_code, unsigned char b, unsigned short 
 int UnicodeToCodePage(IdKanjiCode kanji_code, unsigned long u32, unsigned char *b)
 {
 	return UnicodeToSBCS(kanji_code, u32, b);
+}
+
+typedef struct {
+	unsigned int start;
+	unsigned int end;
+	int width;
+} UnicodeWidthList_t;
+
+static UnicodeWidthList_t *unicode_width_list_ptr;
+static size_t unicode_width_list_count = 0;
+
+int UnicodeOverrideWidthInit(const wchar_t *ini, const wchar_t *section)
+{
+	UnicodeOverrideWidthUninit();
+
+	UnicodeWidthList_t *p = NULL;
+	size_t c = 0;
+
+	for (size_t i = 1;; i++) {
+		wchar_t *key;
+		aswprintf(&key, L"Range%d", (int)i);
+		wchar_t *value;
+		hGetPrivateProfileStringW(section, key, L"", ini, &value);
+		free(key);
+		if (value[0] == 0) {
+			free(value);
+			break;
+		}
+		unsigned int start;
+		unsigned int end;
+		int width;
+		int r = 0;
+		r = swscanf(value, L"U+%x , U+%x , %d", &start, &end, &width);
+		if (r == 3) {
+			UnicodeWidthList_t item;
+			item.start = start;
+			item.end = end;
+			item.width = width;
+
+			if (width == 1 || width == 2) {
+				p = (UnicodeWidthList_t *)realloc(p, sizeof(UnicodeWidthList_t) * (c + 1));
+				p[c] = item;
+				c++;
+			}
+			free(value);
+			continue;
+		}
+		r = swscanf(value, L"U+%x , %d", &start, &width);
+		if (r == 2) {
+			UnicodeWidthList_t item;
+			item.start = start;
+			item.end = start;
+			item.width = width;
+
+			if (width == 1 || width == 2) {
+				p = (UnicodeWidthList_t *)realloc(p, sizeof(UnicodeWidthList_t) * (c + 1));
+				p[c] = item;
+				c++;
+			}
+			free(value);
+			continue;
+		}
+	}
+
+	unicode_width_list_ptr = p;
+	unicode_width_list_count = c;
+
+	return 1;
+}
+
+void UnicodeOverrideWidthUninit(void)
+{
+	if (unicode_width_list_ptr != NULL) {
+		free(unicode_width_list_ptr);
+		unicode_width_list_ptr = NULL;
+		unicode_width_list_count = 0;
+	}
+}
+
+int UnicodeOverrideWidthCheck(unsigned int u32, int *width)
+{
+	if (unicode_width_list_count == 0) {
+		UnicodeOverrideWidthInit(NULL, NULL);
+		return 0;
+	}
+	const UnicodeWidthList_t *p = unicode_width_list_ptr;
+	for (size_t i = 0; i < unicode_width_list_count; p++,i++) {
+		if (p->start <= u32 && u32 <= p->end) {
+			*width = p->width;
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int UnicodeOverrideWidthAvailable(void)
+{
+	return unicode_width_list_count == 0 ? 0 : 1;
 }
