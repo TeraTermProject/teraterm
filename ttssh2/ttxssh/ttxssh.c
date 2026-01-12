@@ -3583,20 +3583,13 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 				wchar_t *recvdir_expanded;
 				hExpandEnvironmentStringsW(recvdirW, &recvdir_expanded);
 
-				wchar_t *recvpathW;
-				if (recvdir_expanded[0] != 0) {
-					aswprintf(&recvpathW, L"%s\\%s", recvdir_expanded, recvfn);
-				} else {
-					recvpathW = _wcsdup(recvfn);
-				}
-				char *recvpathU8 = ToU8W(recvpathW);
+				char *recvpathU8 = ToU8W(recvdir_expanded);
 				char *FileNameU8 = ToU8W(FileNameW);
 				SSH_scp_transaction(pvar, FileNameU8, recvpathU8, FROMREMOTE);
 				free(FileNameW);
 				free(recvfn);
 				free(recvdirW);
 				free(recvdir_expanded);
-				free(recvpathW);
 				free(recvpathU8);
 				free(FileNameU8);
 

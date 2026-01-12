@@ -4246,12 +4246,12 @@ static int accessU8(const char *pathU8, int mode)
  *	@param dest			フォルダ名またはファイル名,UTF-8
  *						TOREMOTE のとき、
  *							NULL のとき、ホームフォルダ
- *							相対パス、ホームフォルダからの相対?（ファイル名可）
- *							絶対パス（ファイル名可）
+ *							相対パス、ホームフォルダからの相対?
+ *							絶対パス
  *						TOLOCAL のとき
  *							NULL のとき、ダウンロードフォルダ
- *							相対パス、カレントフォルダからの相対?（ファイル名は不可）
- *							絶対パス（ファイル名は不可）
+ *							相対パス、カレントフォルダからの相対?
+ *							絶対パス
  *	@param direction	TOREMOTE	copy local to remote
  *						FROMREMOTE	copy remote to local
  *
