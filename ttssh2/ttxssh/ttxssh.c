@@ -3544,7 +3544,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 
 				char *sendfiledirU8 = ToU8W(sendfiledirW);
 				char *filenameU8 = ToU8W(filenameW);
-				SSH_start_scp(pvar, filenameU8, sendfiledirU8);
+				SSH_start_scp_send(pvar, filenameU8, sendfiledirU8);
 				//SSH_scp_transaction(pvar, "bigfile30.bin", "", FROMREMOTE);
 				free(filenameU8);
 				free(sendfiledirU8);
@@ -3626,9 +3626,9 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 
 // マクロコマンド"scpsend"から呼び出すために、DLL外へエクスポートする。"ttxssh.def"ファイルに記載。
 // (2008.1.1 yutaka)
-__declspec(dllexport) int CALLBACK TTXScpSendfile(char *filename, char *dstfile)
+__declspec(dllexport) int CALLBACK TTXScpSendfile(char *sendfile, char *dest)
 {
-	return SSH_start_scp(pvar, filename, dstfile);
+	return SSH_start_scp_send(pvar, sendfile, dest);
 }
 
 __declspec(dllexport) int CALLBACK TTXScpSendingStatus(void)
