@@ -4242,21 +4242,21 @@ static int accessU8(const char *pathU8, int mode)
 /**
  *	SCP support
  *
- *	@param sendfile		ファイル名,UTF-8
- *	@param dstfile		ファイル名,UTF-8
+ *	@param filename		ファイル名,UTF-8
+ *	@param dest			フォルダ名またはファイル名,UTF-8
  *						TOREMOTE のとき、
  *							NULL のとき、ホームフォルダ
- *							相対パス、ホームフォルダからの相対?
- *							絶対パス
+ *							相対パス、ホームフォルダからの相対?（ファイル名可）
+ *							絶対パス（ファイル名可）
  *						TOLOCAL のとき
  *							NULL のとき、ダウンロードフォルダ
- *							相対パス、カレントフォルダからの相対?
- *							絶対パス
+ *							相対パス、カレントフォルダからの相対?（ファイル名は不可）
+ *							絶対パス（ファイル名は不可）
  *	@param direction	TOREMOTE	copy local to remote
  *						FROMREMOTE	copy remote to local
  *
  */
-int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfile, enum scp_dir direction)
+int SSH_scp_transaction(PTInstVar pvar, const char *filename, const char *dest, enum scp_dir direction)
 {
 	Channel_t *c = NULL;
 	FILE *fp = NULL;
@@ -4284,7 +4284,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 
 	if (direction == TOREMOTE) {  // copy local to remote
 		struct __stat64 st;
-		fp = fopenU8(sendfile, "rb");
+		fp = fopenU8(filename, "rb");
 		if (fp == NULL) {
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
@@ -4295,21 +4295,21 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			DWORD error = GetLastError();
 			wchar_t *err_str;
 			hFormatMessageW(error, &err_str);
-			wchar_t *fname = ToWcharU8(sendfile);
+			wchar_t *fname = ToWcharU8(filename);
 			TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, err_str, fname);
 			free(fname);
 			free(err_str);
 			goto error;
 		}
 
-		strncpy_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), sendfile, _TRUNCATE);  // full path
-		ExtractFileNameU8(sendfile, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
-		if (dstfile == NULL || dstfile[0] == '\0') { // remote file path
-			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), ".", _TRUNCATE);  // full path
+		strncpy_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), filename, _TRUNCATE);  // full path
+		ExtractFileNameU8(filename, c->scp.localfile, sizeof(c->scp.localfile));             // file name only
+		if (dest == NULL || dest[0] == '\0') { // remote file path
+			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), ".", _TRUNCATE);   // full path
 		} else {
-			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), dstfile, _TRUNCATE);  // full path
+			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), dest, _TRUNCATE);  // full path
 		}
-		c->scp.localfp = fp;     // file pointer
+		c->scp.localfp = fp; // file pointer
 
 		if (statU8(c->scp.localfilefull, &st) == 0) {
 			c->scp.filestat = st;
@@ -4317,26 +4317,27 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			goto error;
 		}
 	} else { // copy remote to local
-		strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), sendfile, _TRUNCATE);
+		strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), filename, _TRUNCATE);
 
-		if (dstfile == NULL || dstfile[0] == '\0') { // local file path is empty.
+		if (dest == NULL || dest[0] == '\0') { // local file path is empty.
 			char *fn;
 			wchar_t *FileDirExpanded;
 			char *FileDirExpandedU8;
 
-			fn = strrchr(sendfile, '/');
+			fn = strrchr(filename, '/');
 			if (fn && fn[1] == '\0')
 				goto error;
 
 			FileDirExpanded = GetFileDir(pvar->ts);
 			FileDirExpandedU8 = ToU8W(FileDirExpanded);
-			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s\\%s", FileDirExpandedU8, fn ? fn : sendfile);
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE,
+			            "%s\\%s", FileDirExpandedU8, fn ? fn : filename);
 			free(FileDirExpanded);
 			free(FileDirExpandedU8);
-			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
+			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
 		} else {
-			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s", dstfile);
-			ExtractFileName(dstfile, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s", dest);
+			ExtractFileName(dest, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
 		}
 
 		if (accessU8(c->scp.localfilefull, 0x00) == 0) {
@@ -4385,7 +4386,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			goto error;
 		}
 
-		c->scp.localfp = fp;     // file pointer
+		c->scp.localfp = fp;    // file pointer
 	}
 
 	// setup SCP data
@@ -4404,9 +4405,9 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			goto error;
 		}
 		s = "session";
-		buffer_put_string(msg, s, strlen(s));  // ctype
-		buffer_put_int(msg, c->self_id);  // self(channel number)
-		buffer_put_int(msg, c->local_window);  // local_window
+		buffer_put_string(msg, s, strlen(s));     // ctype
+		buffer_put_int(msg, c->self_id);          // self (channel number)
+		buffer_put_int(msg, c->local_window);     // local_window
 		buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
@@ -4430,9 +4431,9 @@ error:
 	return FALSE;
 }
 
-int SSH_start_scp(PTInstVar pvar, char *sendfile, char *dstfile)
+int SSH_start_scp_send(PTInstVar pvar, char *sendfile, char *dest)
 {
-	return SSH_scp_transaction(pvar, sendfile, dstfile, TOREMOTE);
+	return SSH_scp_transaction(pvar, sendfile, dest, TOREMOTE);
 }
 
 int SSH_scp_sending_status(void)
