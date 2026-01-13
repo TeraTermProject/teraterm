@@ -9228,6 +9228,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 					{ IDC_SCP_PROGRESS_BYTE_LABEL, "DLG_SCP_PROGRESS_BYTES_LABEL" },
 					{ IDC_SCP_PROGRESS_TIME_LABEL, "DLG_SCP_PROGRESS_TIME_LABEL" },
 				};
+				SetWindowText(hDlgWnd, "TTSSH: SCP receiving file");
 				SetI18nDlgStrsW(hDlgWnd, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 				c->scp.progress_window = hDlgWnd;
