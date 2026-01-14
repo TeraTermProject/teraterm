@@ -4316,7 +4316,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *filename, const char *dest, 
 
 		if (dest == NULL || dest[0] == '\0') { // local file path is empty.
 			char *fn;
-			wchar_t *FileDirExpanded;
+			wchar_t *FileDirExpanded, *FileDirExpandedDS;
 			char *FileDirExpandedU8;
 
 			fn = strrchr(filename, '/');
@@ -4324,13 +4324,34 @@ int SSH_scp_transaction(PTInstVar pvar, const char *filename, const char *dest, 
 				goto error;
 
 			FileDirExpanded = GetFileDir(pvar->ts);
-			FileDirExpandedU8 = ToU8W(FileDirExpanded);
+			FileDirExpandedDS = DeleteSlashW(FileDirExpanded);
+			FileDirExpandedU8 = ToU8W(FileDirExpandedDS);
 			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE,
 			            "%s\\%s", FileDirExpandedU8, fn ? fn : filename);
 			free(FileDirExpanded);
+			free(FileDirExpandedDS);
 			free(FileDirExpandedU8);
 			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
-		} else {
+		} else if (DoesFolderExist(dest)) { // local file path is a directory.
+			char *fn;
+			wchar_t *FileDirExpanded, *FileDirExpandedDS;
+			char *FileDirExpandedU8;
+
+			fn = strrchr(filename, '/');
+			if (fn && fn[1] == '\0')
+				goto error;
+
+			FileDirExpanded = ToWcharA(dest);
+			FileDirExpandedDS = DeleteSlashW(FileDirExpanded);
+			FileDirExpandedU8 = ToU8W(FileDirExpandedDS);
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE,
+			            "%s\\%s", FileDirExpandedU8, fn ? fn : filename);
+			free(FileDirExpanded);
+			free(FileDirExpandedDS);
+			free(FileDirExpandedU8);
+			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
+		}
+		else {
 			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s", dest);
 			ExtractFileName(dest, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
 		}
