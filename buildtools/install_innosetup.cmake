@@ -5,22 +5,22 @@ else()
   option(REMOVE_TMP "" OFF)
 endif()
 
-# innosetup 6.5.1
-set(INNOSETUP_EXE "innosetup-6.5.1.exe")
+# innosetup 6.7.0
+set(INNOSETUP_EXE "innosetup-6.7.0.exe")
 set(INNOSETUP_URL "https://files.jrsoftware.org/is/6/${INNOSETUP_EXE}")
-set(INNOSETUP_HASH "3622ffdad7b2534239370099149c33adb85b90054799d901cb8ec844df7a0e41")
-set(CHECK_FILE innosetup6/ISCC.exe)
-set(CHECK_HASH "d5b86b130b6878eb73044946ea36cb8e8095b9a8c27643853dc5b5dd7902ed47")
+set(INNOSETUP_HASH "f45c7d68d1e660cf13877ec36738a5179ce72a33414f9959d35e99b68c52a697")
+set(INNOSETUP_CHECK_FILE innosetup6/ISCC.exe)
+set(INNOSETUP_CHECK_HASH "a7472a35be9cd63da59e54c2622a0d8b048ab2ec85382e2b2d47a5a79dbf9bef")
 
 # check innosetup
-if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${CHECK_FILE})
-  file(SHA256 ${CMAKE_CURRENT_LIST_DIR}/${CHECK_FILE} HASH)
-  if(${HASH} STREQUAL ${CHECK_HASH})
+if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${INNOSETUP_CHECK_FILE})
+  file(SHA256 ${CMAKE_CURRENT_LIST_DIR}/${INNOSETUP_CHECK_FILE} HASH)
+  if(${HASH} STREQUAL ${INNOSETUP_CHECK_HASH})
     return()
   endif()
-  message("file ${CMAKE_CURRENT_LIST_DIR}/${CHECK_FILE}")
+  message("file ${CMAKE_CURRENT_LIST_DIR}/${INNOSETUP_CHECK_FILE}")
   message("actual HASH=${HASH}")
-  message("expect HASH=${CHECK_HASH}")
+  message("expect HASH=${INNOSETUP_CHECK_HASH}")
 endif()
 
 # download
