@@ -221,9 +221,10 @@ Below are some cases in which a password may be specified, along with whether a 
     <pre>ttermpro.exe server3:22 /ssh /2 /auth=password /user=guest /passwd=guest</pre>
     When started in this way, the command line arguments of that process will be visible.
   </dd>
-  <dt>File &gt; Duplicate session</dt>
+  <dt>"File &gt; Duplicate session" (prior to TTSSH 3.6.0, included in Tera Term 5.6.0)</dt>
   <dd>
-    Tera Term internally generates command line arguments to launch ttermpro.exe. As a result, the command-line arguments of that process can be viewed.
+    Tera Term internally generates command line arguments to launch ttermpro.exe. As a result, the command-line arguments of that process can be viewed.<br>
+    In TTSSH 3.6.0 and later, the password is no longer passed via command-line arguments.
   </dd>
   <dt>Specify command line arguments in the "Host" field of the New Connection dialog and connect</dt>
   <dd>
@@ -244,10 +245,11 @@ connect '/DS'
 connect 'server3:22 /ssh /2 /auth=password /user=guest /passwd=guest'
     </pre>
   </dd>
-  <dt>Start from TeraTerm Menu</dt>
+  <dt>Start from TeraTerm Menu (prior to TeraTerm Menu 1.21, included in Tera Term 5.6.0)</dt>
   <dd>
     TeraTerm Menu constructs command line arguments from the input values and starts ttermpro.exe. As a result, the command-line arguments of that process can be viewed.<br>
-    A possible workaround is to write a macro as shown above and use the macro file instead of an SSH configuration.
+    A possible workaround is to write a macro as shown above and use the macro file instead of an SSH configuration.<br>
+    In TeraTerm Menu 1.21 and later, the password is no longer passed via command-line arguments.
   </dd>
 </dl>
 
