@@ -4764,7 +4764,7 @@ found:
  * クライアントとサーバ両方がサポートしている物のうち、クライアント側で最も前に指定した物が使われる。
  */
 static int
-choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
+choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, int msg_size)
 {
 	char tmp[1024+512];
 	int mode, r, payload_len;
@@ -4776,9 +4776,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 鍵交換アルゴリズム
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (kex algorithms)", __FUNCTION__);
-		msg = tmp;
 		r = -1;
 		goto error;
 	case GetPayloadTruncate:
@@ -4790,17 +4789,15 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->kex_type = choose_SSH2_kex_algorithm(buf, myproposal[PROPOSAL_KEX_ALGS]);
 	if (pvar->kex->kex_type == KEX_DH_UNKNOWN) {  // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown KEX algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown KEX algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -2;
 		goto error;
 	}
 	kexalg = get_kex_algorithm_by_type(pvar->kex->kex_type);
 	if (kexalg == NULL) {
-		strncpy_s(tmp, sizeof(tmp), "unknown KEX algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown KEX algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -2;
 		goto error;
 	}
@@ -4819,9 +4816,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// ホスト鍵アルゴリズム
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (hostkey algorithms)", __FUNCTION__);
-		msg = tmp;
 		r = -3;
 		goto error;
 	case GetPayloadTruncate:
@@ -4833,9 +4829,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->hostkey_type = choose_SSH2_host_key_algorithm(buf, myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS]);
 	if (pvar->kex->hostkey_type == KEY_ALGO_UNSPEC) {
-		strncpy_s(tmp, sizeof(tmp), "unknown host KEY algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown host KEY algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -4;
 		goto error;
 	}
@@ -4843,9 +4838,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 暗号アルゴリズム(クライアント -> サーバ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (encryption algorithms client to server)", __FUNCTION__);
-		msg = tmp;
 		r = -5;
 		goto error;
 	case GetPayloadTruncate:
@@ -4857,9 +4851,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->ciphers[MODE_OUT] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_CTOS]);
 	if (pvar->kex->ciphers[MODE_OUT] == NULL) {
-		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(client to server): ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown Encrypt algorithm(client to server): ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -6;
 		goto error;
 	}
@@ -4867,9 +4860,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 暗号アルゴリズム(サーバ -> クライアント)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (encryption algorithms server to client)", __FUNCTION__);
-		msg = tmp;
 		r = -7;
 		goto error;
 	case GetPayloadTruncate:
@@ -4881,9 +4873,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->ciphers[MODE_IN] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_STOC]);
 	if (pvar->kex->ciphers[MODE_IN] == NULL) {
-		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(server to client): ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown Encrypt algorithm(server to client): ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -8;
 		goto error;
 	}
@@ -4891,9 +4882,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// MACアルゴリズム(クライアント -> サーバ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (MAC algorithms client to server)", __FUNCTION__);
-		msg = tmp;
 		r = -9;
 		goto error;
 	case GetPayloadTruncate:
@@ -4910,9 +4900,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	else {
 		pvar->kex->macs[MODE_OUT] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_CTOS]);
 		if (pvar->kex->macs[MODE_OUT] == NULL) {  // not match
-			strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
-			strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-			msg = tmp;
+			strncpy_s(msg, msg_size, "unknown MAC algorithm: ", _TRUNCATE);
+			strncat_s(msg, msg_size, buf, _TRUNCATE);
 			r = -10;
 			goto error;
 		}
@@ -4921,9 +4910,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// MACアルゴリズム(サーバ -> クライアント)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (MAC algorithms server to client)", __FUNCTION__);
-		msg = tmp;
 		r = -11;
 		goto error;
 	case GetPayloadTruncate:
@@ -4940,9 +4928,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	else {
 		pvar->kex->macs[MODE_IN] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_STOC]);
 		if (pvar->kex->macs[MODE_IN] == NULL) {	 // not match
-			strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
-			strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-			msg = tmp;
+			strncpy_s(msg, msg_size, "unknown MAC algorithm: ", _TRUNCATE);
+			strncat_s(msg, msg_size, buf, _TRUNCATE);
 			r = -12;
 			goto error;
 		}
@@ -4951,9 +4938,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 圧縮アルゴリズム(クライアント -> サーバ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (compression algorithms client to server)", __FUNCTION__);
-		msg = tmp;
 		r = -13;
 		goto error;
 	case GetPayloadTruncate:
@@ -4965,9 +4951,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->ctos_compression = choose_SSH2_compression_algorithm(buf, myproposal[PROPOSAL_COMP_ALGS_CTOS]);
 	if (pvar->kex->ctos_compression == COMP_UNKNOWN) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown Packet Compression algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown Packet Compression algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -14;
 		goto error;
 	}
@@ -4975,9 +4960,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 圧縮アルゴリズム(サーバ -> クライアント)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (compression algorithms server to client)", __FUNCTION__);
-		msg = tmp;
 		r = -15;
 		goto error;
 	case GetPayloadTruncate:
@@ -4989,9 +4973,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->stoc_compression = choose_SSH2_compression_algorithm(buf, myproposal[PROPOSAL_COMP_ALGS_STOC]);
 	if (pvar->kex->stoc_compression == COMP_UNKNOWN) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown Packet Compression algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown Packet Compression algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -16;
 		goto error;
 	}
@@ -5124,8 +5107,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	char buf[1024];
 	char *data;
 	int len, r;
-	char *msg = NULL;
-	char tmp[1024+512];
+	char msg[1024+512];
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXINIT was received.");
 
@@ -5153,9 +5135,8 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	else {
 		pvar->kex->peer = buffer_init();
 		if (pvar->kex->peer == NULL) {
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+			_snprintf_s(msg, sizeof(msg), _TRUNCATE,
 			            "%s: Out of memory", __FUNCTION__);
-			msg = tmp;
 			goto error;
 		}
 	}
@@ -5165,15 +5146,14 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	// cookie
 	if (! get_bytearray_from_payload(pvar, buf, SSH2_COOKIE_LENGTH)) {
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE,
 		            "%s: truncated packet (cookie)", __FUNCTION__);
-		msg = tmp;
 		goto error;
 	}
 	CRYPT_set_server_cookie(pvar, buf);
 
 	// 使用するアルゴリズムの決定
-	r = choose_SSH2_kex_choose_conf(pvar, buf, sizeof(buf), msg);
+	r = choose_SSH2_kex_choose_conf(pvar, buf, sizeof(buf), msg, sizeof(msg));
 	if (r != 0) {
 		goto error;
 	}
