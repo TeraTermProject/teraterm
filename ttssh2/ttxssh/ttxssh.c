@@ -3447,6 +3447,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			{ IDC_RECEIVEFILE_FROM_LABEL, "DLG_SCP_RECEIVEFILE_FROM" },
 			{ IDC_RECVFILE_TO_LABEL, "DLG_SCP_RECEIVEFILE_TO" },
 			{ IDC_RECV, "DLG_SCP_RECEIVEFILE_RECEIVE" },
+			{ IDHELP, "BTN_HELP" },
 		};
 		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
@@ -3605,6 +3606,10 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 
 		case IDC_SFTP_TEST:
 			SSH_sftp_transaction(pvar);
+			return TRUE;
+
+		case IDHELP:
+			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpMenuFileSshScp, 0);
 			return TRUE;
 		}
 	}

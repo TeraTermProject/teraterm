@@ -109,6 +109,7 @@ HlpMenuFileTransferBplus=html\menu\file-transfer-bplus.html
 HlpMenuFileTransferBplusSend=html\menu\file-transfer.html
 HlpMenuFileTransferQuickvan=html\menu\file-transfer-qv.html
 HlpMenuFileTransferQuickvanSend=html\menu\file-transfer.html
+HlpMenuFileSshScp=html\menu\file-ssh-scp.html
 HlpMenuFileChdir=html\menu\file-chdir.html
 HlpMenuFilePrint=html\menu\file-print.html
 HlpMenuEdit=html\menu\edit.html
