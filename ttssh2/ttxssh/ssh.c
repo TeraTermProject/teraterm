@@ -100,6 +100,11 @@ typedef enum {
 	GetPayloadTruncate = 2
 } PayloadStat;
 
+enum scp_dir {
+	TOREMOTE,
+	FROMREMOTE,
+};
+
 static struct global_confirm global_confirms;
 
 static Channel_t *channels = NULL;  // チャネル構造体の配列
@@ -4242,13 +4247,15 @@ static int accessU8(const char *pathU8, int mode)
 /**
  *	SCP support
  *
- *	@param filename		ファイル名,UTF-8
+ *	@param filename		ローカル(Windows上の)ファイル名,UTF-8
+ *						TOREMOTEのとき、読み込みファイル名
+ *						FROMREMOTE のとき、書き込みファイル名
  *	@param dest			フォルダ名またはファイル名,UTF-8
  *						TOREMOTE のとき、
  *							NULL のとき、ホームフォルダ
  *							相対パス、ホームフォルダからの相対?
  *							絶対パス
- *						TOLOCAL のとき
+ *						FROMREMOTE のとき
  *							NULL のとき、ダウンロードフォルダ
  *							相対パス、カレントフォルダからの相対?
  *							絶対パス
@@ -4256,7 +4263,7 @@ static int accessU8(const char *pathU8, int mode)
  *						FROMREMOTE	copy remote to local
  *
  */
-int SSH_scp_transaction(PTInstVar pvar, const char *filename, const char *dest, enum scp_dir direction)
+static int SSH_scp_transaction(PTInstVar pvar, const char *filename, const char *dest, enum scp_dir direction)
 {
 	Channel_t *c = NULL;
 	FILE *fp = NULL;
@@ -4452,7 +4459,7 @@ error:
 	return FALSE;
 }
 
-int SSH_start_scp_send(PTInstVar pvar, char *sendfile, char *dest)
+int SSH_start_scp_send(PTInstVar pvar, const char *sendfile, const char *dest)
 {
 	return SSH_scp_transaction(pvar, sendfile, dest, TOREMOTE);
 }
@@ -4462,9 +4469,24 @@ int SSH_scp_sending_status(void)
 	return g_scp_sending;
 }
 
-int SSH_start_scp_receive(PTInstVar pvar, char *filename)
+/**
+ *	@param	pvar
+ *	@param	recfile		受信ファイル名(リモートのファイル名),UTF-8
+ *	@param	dest		受信フォルダ/ファイル名,UTF-8
+ *				NULL
+ *					FileDir 又は ダウンロードフォルダ に元ファイル名でダウンロードされる
+ *				フルパス（フォルダ名）
+ *					指定したフォルダに元ファイル名でダウンロードされる
+ *				相対パス（フォルダ名）
+ *					指定したフォルダ（roaming\teraterm5 からの相対）に元ファイル名でダウンロードされる
+ *				フルパス（ファイル名）
+ *					指定したフォルダに指定したファイル名でダウンロードされる
+ *				相対パス（ファイル名）
+ *					指定したフォルダ（roaming\teraterm5 からの相対）に指定したファイル名でダウンロードされる
+ */
+int SSH_start_scp_receive(PTInstVar pvar, const char *recfile, const char *dest)
 {
-	return SSH_scp_transaction(pvar, filename, NULL, FROMREMOTE);
+	return SSH_scp_transaction(pvar, recfile, dest, FROMREMOTE);
 }
 
 
