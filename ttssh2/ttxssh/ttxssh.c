@@ -5073,6 +5073,7 @@ static void PASCAL TTXCloseTCP(TTXSockHooks *hooks)
 	}
 
 	TTXEnd();
+	pvar->fatal_error = FALSE;
 	init_TTSSH(pvar);
 }
 
