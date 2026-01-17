@@ -44,6 +44,7 @@
 #include "auth.h"
 #include "helpid.h"
 #include "ttcommdlg.h"
+#include "ttlib_types.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -3462,7 +3463,9 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 		SetDlgItemTextA(dlg, IDC_SENDFILE_TO, pvar->ts->ScpSendDir);
 
 		// SCPファイル受信先を表示する
-		SetDlgItemTextW(dlg, IDC_RECVFILE_TO, pvar->ts->FileDirW);
+		wchar_t *dir = GetFileDir(pvar->ts);
+		SetDlgItemTextW(dlg, IDC_RECVFILE_TO, dir);
+		free(dir);
 
 #ifdef SFTP_DEBUG
 		ShowWindow(GetDlgItem(dlg, IDC_SFTP_TEST), SW_SHOW);
@@ -3545,7 +3548,6 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 				char *sendfiledirU8 = ToU8W(sendfiledirW);
 				char *filenameU8 = ToU8W(filenameW);
 				SSH_start_scp_send(pvar, filenameU8, sendfiledirU8);
-				//SSH_scp_transaction(pvar, "bigfile30.bin", "", FROMREMOTE);
 				free(filenameU8);
 				free(sendfiledirU8);
 				free(sendfiledirW);
@@ -3592,7 +3594,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 
 				char *recvpathU8 = ToU8W(recvdir_expanded);
 				char *FileNameU8 = ToU8W(FileNameW);
-				SSH_scp_transaction(pvar, FileNameU8, recvpathU8, FROMREMOTE);
+				SSH_start_scp_receive(pvar, FileNameU8, recvpathU8);
 				free(FileNameW);
 				free(recvfn);
 				free(recvdirW);
@@ -3631,7 +3633,7 @@ __declspec(dllexport) int CALLBACK TTXScpSendingStatus(void)
 
 __declspec(dllexport) int CALLBACK TTXScpReceivefile(char *remotefile, char *localfile)
 {
-	return SSH_scp_transaction(pvar, remotefile, localfile, FROMREMOTE);
+	return SSH_start_scp_receive(pvar, remotefile, localfile);
 }
 
 
