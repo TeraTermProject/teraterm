@@ -1006,29 +1006,6 @@ static void PASCAL TTXOpenTCP(TTXSockHooks *hooks)
 	}
 }
 
-static void PASCAL TTXCloseTCP(TTXSockHooks *hooks)
-{
-	if (pvar->session_settings.Enabled) {
-		pvar->socket = INVALID_SOCKET;
-
-		logputs(LOG_LEVEL_VERBOSE, "Terminating SSH session...");
-
-		// 認証ダイアログが残っていれば閉じる。
-		HOSTS_notify_closing_on_exit(pvar);
-		AUTH_notify_closing_on_exit(pvar);
-
-		*hooks->Precv = pvar->Precv;
-		*hooks->Psend = pvar->Psend;
-		*hooks->PWSAAsyncSelect = pvar->PWSAAsyncSelect;
-		*hooks->Pconnect = pvar->Pconnect;
-
-		pvar->ts->DisableTCPEchoCR = pvar->origDisableTCPEchoCR;
-	}
-
-	uninit_TTSSH(pvar);
-	init_TTSSH(pvar);
-}
-
 static void enable_dlg_items(HWND dlg, int from, int to, BOOL enabled)
 {
 	for (; from <= to; from++) {
@@ -5038,6 +5015,30 @@ static void PASCAL TTXEnd(void)
 		free(pvar->err_msg);
 		pvar->err_msg = NULL;
 	}
+}
+
+static void PASCAL TTXCloseTCP(TTXSockHooks *hooks)
+{
+	if (pvar->session_settings.Enabled) {
+		pvar->socket = INVALID_SOCKET;
+
+		logputs(LOG_LEVEL_VERBOSE, "Terminating SSH session...");
+
+		// 認証ダイアログが残っていれば閉じる。
+		HOSTS_notify_closing_on_exit(pvar);
+		AUTH_notify_closing_on_exit(pvar);
+
+		*hooks->Precv = pvar->Precv;
+		*hooks->Psend = pvar->Psend;
+		*hooks->PWSAAsyncSelect = pvar->PWSAAsyncSelect;
+		*hooks->Pconnect = pvar->Pconnect;
+
+		pvar->ts->DisableTCPEchoCR = pvar->origDisableTCPEchoCR;
+	}
+
+	TTXEnd();
+	pvar->fatal_error = FALSE;
+	init_TTSSH(pvar);
 }
 
 /* This record contains all the information that the extension forwards to the
