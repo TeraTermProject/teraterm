@@ -453,8 +453,8 @@
       <li>"<a href="../menu/setup-additional-general.html#Port">Default port</a>" for new connection dialog, which is configured on [Additional settings]-[General] tab became "TCP/IP" or "Serial" selection.<br>
         Select default Serial port number on <a href="../menu/setup-additional-serialport.html">Serial port tab</a>.
       </li>
-      <li>Renamed "Reverse" button on [Additional settings]-[<a href="../menu/setup-additional-window.html#">Window</a>] tab to "Swap colors."</li>
-      <li>Made "List proportional fonts in font dialog" available on [Additional settings]-[<a href="../menu/setup-font.html#">Font</a>] tab.</li>
+      <li>Renamed "Reverse" button on [Additional settings]-[<a href="../menu/setup-additional-window.html">Window</a>] tab to "Swap colors."</li>
+      <li>Made "List proportional fonts in font dialog" available on [Additional settings]-[<a href="../menu/setup-font.html">Font</a>] tab.</li>
       <li>Changed initial directory for file select dialog of Send file to <a href="../setup/folder.html#FileDir">File transfer folder</a>.</li>
       <li>Send file dialog options are saved in TERATERM.INI.
         <ul>
@@ -4040,6 +4040,11 @@ SYNOPSIS:
 
   <li>Bug fixes
     <ul>
+      <li>
+        Fixed an issue where SCP receiving did not save to the Downloads folder if the receiving folder was not specified.
+        This bug was introduced in 3.1 (Tera Term 5.1).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1057" target="_blank">issue #1057</a>)
+      </li>
       <li>
         Fixed an issue where the SCP receiving dialog title was "SCP sending file."
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1055" target="_blank">issue #1055</a>)

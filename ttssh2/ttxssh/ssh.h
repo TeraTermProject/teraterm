@@ -357,10 +357,6 @@ typedef struct Key {
 } Key;
 
 
-enum scp_dir {
-	TOREMOTE, FROMREMOTE,
-};
-
 /* The packet handler returns TRUE to keep the handler in place,
    FALSE to remove the handler. */
 typedef BOOL (* SSHPacketHandler)(PTInstVar pvar);
@@ -483,10 +479,9 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
                       char *to_remote_host, int to_remote_port,
                       char *originator, unsigned short originator_port);
 
-int SSH_start_scp(PTInstVar pvar, char *sendfile, char *dstfile);
+int SSH_start_scp_send(PTInstVar pvar, const char *sendfile, const char *dest);
 int SSH_scp_sending_status(void);
-int SSH_start_scp_receive(PTInstVar pvar, char *filename);
-int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfile, enum scp_dir direction);
+int SSH_start_scp_receive(PTInstVar pvar, const char *filename, const char *dest);
 int SSH_sftp_transaction(PTInstVar pvar);
 
 /* auxiliary SSH2 interfaces for pkt.c */
