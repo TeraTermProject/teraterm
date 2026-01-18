@@ -15,63 +15,49 @@
 Folders and full paths of files can be found in <a href="../menu/setup-directory.html">[Setup]-Setup directory</a>.
 </p>
 
-<ul>
-  <li>installer edition
-    <ul>
-      <li>setup files
-        <ul>
-          <li><code>%APPDATA%\teraterm5</code></li>
-        </ul>
-      </li>
-      <li id="LogDir">log files, dump files
-        <ul>
-          <li><code>%LOCALAPPDATA%\teraterm5</code></li>
-        </ul>
-      </li>
-      <li id="FileDir">File transfer (Priority order, below is used when not set)
-        <ol>
-          <li><a href="../menu/setup-additional-general.html#FileFolder">File transfer folder</a></li>
-          <li><code>%USERPROFILE%\Downloads</code></li>
-        </ol>
-      </li>
-      <li id="TermLogDir">Terminal log folder(Priority order, below is used when not set)
-        <ol>
-          <li><a href="../menu/setup-additional-log.html#LogDefaultPath">Default log save folder</a></li>
-          <li><a href="../menu/setup-additional-general.html#FileFolder">File transfer folder</a></li>
-          <li><code>%LOCALAPPDATA%\teraterm5</code></li>
-        </ol>
-      </li>
-    </ul>
-  </li>
+<table border="1">
+  <tr>
+    <th></th>
+    <th>installer edition</th>
+    <th>portable edition</th>
+  </tr>    
+  <tr>
+    <th id="HomeDir">setup files</th>
+    <td><code>%APPDATA%\teraterm5</code></td>
+    <td>a folder which is exist exe file</td>
+  </tr>    
+  <tr>
+    <th id="LogDir">log files, dump files</th>
+    <td><code>%LOCALAPPDATA%\teraterm5</code></td>
+    <td>a folder which is exist exe file + <code>\log</code></td>
+  </tr>    
+  <tr>
+    <th id="FileDir">File transfer*</th>
+    <td>
+      <a href="../menu/setup-additional-general.html#FileFolder">File transfer folder</a><br>
+      <code>%USERPROFILE%\Downloads</code>
+    </td>
+    <td>
+      <a href="../menu/setup-additional-general.html#FileFolder">File transfer folder</a><br>
+      <code>%USERPROFILE%\Downloads</code>
+    </td>
+  </tr>    
+  <tr>
+    <th id="TermLogDir">Terminal log folder*</th>
+    <td>
+      <a href="../menu/setup-additional-log.html#LogDefaultPath">Default log save folder</a><br>
+      <a href="../menu/setup-additional-general.html#FileFolder">File transfer folder</a><br>
+      <code>%LOCALAPPDATA%\teraterm5</code>
+    </td>
+    <td>
+      <a href="../menu/setup-additional-log.html#LogDefaultPath">Default log save folder</a><br>
+      <a href="../menu/setup-additional-general.html#FileFolder">File transfer folder</a><br>
+      a folder which is exist exe file + <code>\log</code>
+    </td>
+  </tr>    
+</table>
 
-  <li>portable edition
-    <ul>
-      <li>setup files
-        <ul>
-          <li>a folder which is exist exe file</li>
-        </ul>
-      </li>
-      <li>log files, dump files
-        <ul>
-          <li>a folder which is exist exe file + <code>\log</code></li>
-        </ul>
-      </li>
-      <li>File transfer (Priority order, below is used when not set)
-        <ol>
-          <li><a href="../menu/setup-additional-general.html#FileFolder">File transfer folder</a></li>
-          <li><code>%USERPROFILE%\Downloads</code></li>
-        </ol>
-      </li>
-      <li>Terminal log folder(Priority order, below is used when not set)
-        <ol>
-          <li><a href="../menu/setup-additional-log.html#LogDefaultPath">Default log save folder</a></li>
-          <li><a href="../menu/setup-additional-general.html#FileFolder">File transfer folder</a></li>
-          <li>a folder which is exist exe file + <code>\log</code></li>
-        </ol>
-      </li>
-    </ul>
-  </li>
-</ul>
+* Priority order, below is used when not set.
 
 <h1>about portable edition</h1>
 
