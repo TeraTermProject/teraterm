@@ -398,8 +398,8 @@
       <li>[Additional settings]-[General] タブで設定する、新規接続ダイアログの "<a href="../menu/setup-additional-general.html#Port">Default port</a>" は "TCP/IP" または "Serial" の選択になった。<br>
         デフォルトのシリアルポート番号は <a href="../menu/setup-additional-serialport.html">Serial port タブ</a>で選択するようになった。
       </li>
-      <li>[Additional settings]-[<a href="../menu/setup-additional-window.html#">Window</a>] タブの "Reverse" ボタンを "Swap colors" に改名した。
-      <li>[Additional settings]-[<a href="../menu/setup-font.html#">Font</a>] タブの "List proportional fonts in font dialog" を使用可能にした。</li>
+      <li>[Additional settings]-[<a href="../menu/setup-additional-window.html">Window</a>] タブの "Reverse" ボタンを "Swap colors" に改名した。
+      <li>[Additional settings]-[<a href="../menu/setup-font.html">Font</a>] タブの "List proportional fonts in font dialog" を使用可能にした。</li>
       <li><a href="../menu/file-sendfile.html#dialog">Send file ダイアログ</a>の送信ファイル選択の初期ディレクトリが<a href="../setup/folder.html#FileDir">ファイル転送用のフォルダ</a>になるようにした。</li>
       <li><a href="../menu/file-sendfile.html#dialog">Send file ダイアログ</a>のオプションを TERATERM.INI に保存するようにした。
         <ul>
@@ -3990,6 +3990,11 @@
 
   <li>バグ修正
     <ul>
+      <li>
+        SCP 受信のときに受信フォルダが指定されていない場合、ダウンロードフォルダに保存されない問題を修正した。
+        3.1 (Tera Term 5.1) からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1057" target="_blank">issue #1057</a>)
+      </li>
       <li>
         SCP 受信中ダイアログのタイトルが "SCP sending file" になっているのを修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1055" target="_blank">issue #1055</a>)

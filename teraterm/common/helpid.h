@@ -133,6 +133,7 @@
 #define HlpMenuFileTransferBplusSend        41441
 #define HlpMenuFileTransferQuickvan         41450
 #define HlpMenuFileTransferQuickvanSend     41451
+#define HlpMenuFileSshScp                   41470
 #define HlpMenuFileChdir                    41500
 #define HlpMenuFilePrint                    41600
 #define HlpMenuEdit                         42000

@@ -100,6 +100,11 @@ typedef enum {
 	GetPayloadTruncate = 2
 } PayloadStat;
 
+enum scp_dir {
+	TOREMOTE,
+	FROMREMOTE,
+};
+
 static struct global_confirm global_confirms;
 
 static Channel_t *channels = NULL;  // チャネル構造体の配列
@@ -4242,13 +4247,15 @@ static int accessU8(const char *pathU8, int mode)
 /**
  *	SCP support
  *
- *	@param sendfile		ファイル名,UTF-8
- *	@param dstfile		ファイル名,UTF-8
+ *	@param filename		ローカル(Windows上の)ファイル名,UTF-8
+ *						TOREMOTEのとき、読み込みファイル名
+ *						FROMREMOTE のとき、書き込みファイル名
+ *	@param dest			フォルダ名またはファイル名,UTF-8
  *						TOREMOTE のとき、
  *							NULL のとき、ホームフォルダ
  *							相対パス、ホームフォルダからの相対?
  *							絶対パス
- *						TOLOCAL のとき
+ *						FROMREMOTE のとき
  *							NULL のとき、ダウンロードフォルダ
  *							相対パス、カレントフォルダからの相対?
  *							絶対パス
@@ -4256,7 +4263,7 @@ static int accessU8(const char *pathU8, int mode)
  *						FROMREMOTE	copy remote to local
  *
  */
-int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfile, enum scp_dir direction)
+static int SSH_scp_transaction(PTInstVar pvar, const char *filename, const char *dest, enum scp_dir direction)
 {
 	Channel_t *c = NULL;
 	FILE *fp = NULL;
@@ -4284,7 +4291,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 
 	if (direction == TOREMOTE) {  // copy local to remote
 		struct __stat64 st;
-		fp = fopenU8(sendfile, "rb");
+		fp = fopenU8(filename, "rb");
 		if (fp == NULL) {
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
@@ -4295,21 +4302,21 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			DWORD error = GetLastError();
 			wchar_t *err_str;
 			hFormatMessageW(error, &err_str);
-			wchar_t *fname = ToWcharU8(sendfile);
+			wchar_t *fname = ToWcharU8(filename);
 			TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, err_str, fname);
 			free(fname);
 			free(err_str);
 			goto error;
 		}
 
-		strncpy_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), sendfile, _TRUNCATE);  // full path
-		ExtractFileNameU8(sendfile, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
-		if (dstfile == NULL || dstfile[0] == '\0') { // remote file path
-			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), ".", _TRUNCATE);  // full path
+		strncpy_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), filename, _TRUNCATE);  // full path
+		ExtractFileNameU8(filename, c->scp.localfile, sizeof(c->scp.localfile));             // file name only
+		if (dest == NULL || dest[0] == '\0') { // remote file path
+			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), ".", _TRUNCATE);   // full path
 		} else {
-			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), dstfile, _TRUNCATE);  // full path
+			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), dest, _TRUNCATE);  // full path
 		}
-		c->scp.localfp = fp;     // file pointer
+		c->scp.localfp = fp; // file pointer
 
 		if (statU8(c->scp.localfilefull, &st) == 0) {
 			c->scp.filestat = st;
@@ -4317,26 +4324,48 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			goto error;
 		}
 	} else { // copy remote to local
-		strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), sendfile, _TRUNCATE);
+		strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), filename, _TRUNCATE);
 
-		if (dstfile == NULL || dstfile[0] == '\0') { // local file path is empty.
+		if (dest == NULL || dest[0] == '\0') { // local file path is empty.
 			char *fn;
-			wchar_t *FileDirExpanded;
+			wchar_t *FileDirExpanded, *FileDirExpandedDS;
 			char *FileDirExpandedU8;
 
-			fn = strrchr(sendfile, '/');
+			fn = strrchr(filename, '/');
 			if (fn && fn[1] == '\0')
 				goto error;
 
 			FileDirExpanded = GetFileDir(pvar->ts);
-			FileDirExpandedU8 = ToU8W(FileDirExpanded);
-			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s\\%s", FileDirExpandedU8, fn ? fn : sendfile);
+			FileDirExpandedDS = DeleteSlashW(FileDirExpanded);
+			FileDirExpandedU8 = ToU8W(FileDirExpandedDS);
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE,
+			            "%s\\%s", FileDirExpandedU8, fn ? fn : filename);
 			free(FileDirExpanded);
+			free(FileDirExpandedDS);
 			free(FileDirExpandedU8);
-			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
-		} else {
-			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s", dstfile);
-			ExtractFileName(dstfile, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
+			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
+		} else if (DoesFolderExist(dest)) { // local file path is a directory.
+			char *fn;
+			wchar_t *FileDirExpanded, *FileDirExpandedDS;
+			char *FileDirExpandedU8;
+
+			fn = strrchr(filename, '/');
+			if (fn && fn[1] == '\0')
+				goto error;
+
+			FileDirExpanded = ToWcharA(dest);
+			FileDirExpandedDS = DeleteSlashW(FileDirExpanded);
+			FileDirExpandedU8 = ToU8W(FileDirExpandedDS);
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE,
+			            "%s\\%s", FileDirExpandedU8, fn ? fn : filename);
+			free(FileDirExpanded);
+			free(FileDirExpandedDS);
+			free(FileDirExpandedU8);
+			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
+		}
+		else {
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s", dest);
+			ExtractFileName(dest, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
 		}
 
 		if (accessU8(c->scp.localfilefull, 0x00) == 0) {
@@ -4385,7 +4414,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			goto error;
 		}
 
-		c->scp.localfp = fp;     // file pointer
+		c->scp.localfp = fp;    // file pointer
 	}
 
 	// setup SCP data
@@ -4404,9 +4433,9 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			goto error;
 		}
 		s = "session";
-		buffer_put_string(msg, s, strlen(s));  // ctype
-		buffer_put_int(msg, c->self_id);  // self(channel number)
-		buffer_put_int(msg, c->local_window);  // local_window
+		buffer_put_string(msg, s, strlen(s));     // ctype
+		buffer_put_int(msg, c->self_id);          // self (channel number)
+		buffer_put_int(msg, c->local_window);     // local_window
 		buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
@@ -4430,9 +4459,9 @@ error:
 	return FALSE;
 }
 
-int SSH_start_scp(PTInstVar pvar, char *sendfile, char *dstfile)
+int SSH_start_scp_send(PTInstVar pvar, const char *sendfile, const char *dest)
 {
-	return SSH_scp_transaction(pvar, sendfile, dstfile, TOREMOTE);
+	return SSH_scp_transaction(pvar, sendfile, dest, TOREMOTE);
 }
 
 int SSH_scp_sending_status(void)
@@ -4440,9 +4469,24 @@ int SSH_scp_sending_status(void)
 	return g_scp_sending;
 }
 
-int SSH_start_scp_receive(PTInstVar pvar, char *filename)
+/**
+ *	@param	pvar
+ *	@param	recfile		受信ファイル名(リモートのファイル名),UTF-8
+ *	@param	dest		受信フォルダ/ファイル名,UTF-8
+ *				NULL
+ *					FileDir 又は ダウンロードフォルダ に元ファイル名でダウンロードされる
+ *				フルパス（フォルダ名）
+ *					指定したフォルダに元ファイル名でダウンロードされる
+ *				相対パス（フォルダ名）
+ *					指定したフォルダ（roaming\teraterm5 からの相対）に元ファイル名でダウンロードされる
+ *				フルパス（ファイル名）
+ *					指定したフォルダに指定したファイル名でダウンロードされる
+ *				相対パス（ファイル名）
+ *					指定したフォルダ（roaming\teraterm5 からの相対）に指定したファイル名でダウンロードされる
+ */
+int SSH_start_scp_receive(PTInstVar pvar, const char *recfile, const char *dest)
 {
-	return SSH_scp_transaction(pvar, filename, NULL, FROMREMOTE);
+	return SSH_scp_transaction(pvar, recfile, dest, FROMREMOTE);
 }
 
 

@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Ëã±Ë™û (Á±≥ÂõΩ) resources
+// âpåÍ (ïƒçë) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -368,6 +368,7 @@ BEGIN
     EDITTEXT        IDC_RECVFILE_TO,45,97,150,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_RECVDIR_SELECT,200,97,14,14
     PUSHBUTTON      "&Receive",IDC_RECV,223,77,50,14
+    PUSHBUTTON      "&Help",IDHELP,222,97,50,14
 END
 
 IDD_SSHSCP_PROGRESS DIALOGEX 0, 0, 200, 100
@@ -693,7 +694,7 @@ BEGIN
     0
 END
 
-#endif    // Ëã±Ë™û (Á±≥ÂõΩ) resources
+#endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
