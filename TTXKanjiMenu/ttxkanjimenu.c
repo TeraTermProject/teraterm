@@ -595,8 +595,8 @@ static INT_PTR CALLBACK SettingDlgProc(HWND dlg, UINT msg, WPARAM wp, LPARAM lp)
 		wchar_t *s;
 		char *ver_substr = GetVersionSubstr();
 		aswprintf(&s,
-				  L"KanjiMenu version %d.%d\r\n%hs",
-				  TTXKANJIMENU_VERSION_MAJOR, TTXKANJIMENU_VERSION_MINOR,
+				  L"KanjiMenu version %d.%d.%d\r\n%hs",
+				  TTXKANJIMENU_VERSION_MAJOR, TTXKANJIMENU_VERSION_MINOR, TTXKANJIMENU_VERSION_PATCH,
 				  ver_substr);
 		free(ver_substr);
 		SetDlgItemTextW(dlg, IDC_VERSION, s);
