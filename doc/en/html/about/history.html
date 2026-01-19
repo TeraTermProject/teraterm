@@ -44,23 +44,13 @@
   <li>Bug fixes
     <ul>
       <li>
-        Fixed an issue where the "Space between characters (lines)" from "Additional settings &gt; <a href="../menu/setup-additional-font.html">Font</a>" tab.
-        This bug was introduced in 5.0.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1008" target="_blank">issue #1008</a>)
-      </li>
-      <li>
         Fixed text was not rendered correctly when setting <a href="../menu/setup-additional-font.html#CharSpace">character space</a> and <a href="../menu/setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a> is on.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1006" target="_blank">issue #1006</a>)
       </li>
       <li>
-        Fixed sending data using
-        <a href="../macro/command/send.html">send</a>,
-        <a href="../macro/command/sendln.html">sendln</a>,
-        <a href="../macro/command/sendbinary.html">sendbinary</a>,
-        <a href="../macro/command/sendtext.html">sendtext</a> macro commands
-        follows <a href="../menu/setup-additional-terminal.html#LocalEcho">local echo</a> settings.
+        Fixed an issue where the "Space between characters (lines)" from "Additional settings &gt; <a href="../menu/setup-additional-font.html">Font</a>" tab.
         This bug was introduced in 5.0.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/147" target="_blank">issue #147</a>)
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1008" target="_blank">issue #1008</a>)
       </li>
       <li>
         Fixed an issue where the window was not hidden when ttermpro.exe was launched with the /V option.
@@ -72,11 +62,22 @@
         This bug was introduced in 5.4.1.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/975" target="_blank">issue #975</a>)
       </li>
+      <li>
+        Fixed sending data using
+        <a href="../macro/command/send.html">send</a>,
+        <a href="../macro/command/sendln.html">sendln</a>,
+        <a href="../macro/command/sendbinary.html">sendbinary</a>,
+        <a href="../macro/command/sendtext.html">sendtext</a> macro commands
+        follows <a href="../menu/setup-additional-terminal.html#LocalEcho">local echo</a> settings.
+        This bug was introduced in 5.0.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/147" target="_blank">issue #147</a>)
+      </li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
+      <li>Upgraded TTSSH to <a href="#ttssh_3.5.2">3.5.2</a>.</li>
       <li>
         Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.0" target="_blank">6.7.0</a>.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/963" target="_blank">issue #963</a>)
@@ -3987,13 +3988,13 @@ SYNOPSIS:
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1057" target="_blank">issue #1057</a>)
       </li>
       <li>
-        Fixed an issue where the SCP receiving dialog title was "SCP sending file."
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1055" target="_blank">issue #1055</a>)
-      </li>
-      <li>
         Fixed an issue that caused a crash when key exchange negotiation failed.
         This bug was introduced in 3.5.0 (Tera Term 5.5.0).
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1070" target="_blank">issue #1070</a>)
+      </li>
+      <li>
+        Fixed an issue where the SCP receiving dialog title was "SCP sending file."
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1055" target="_blank">issue #1055</a>)
       </li>
     </ul>
   </li>

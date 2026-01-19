@@ -44,22 +44,13 @@
   <li>バグ修正
     <ul>
       <li>
+        <a href="../menu/setup-additional-font.html#CharSpace">文字間スペース</a>を設定して、<a href="../menu/setup-additional-font.html#ResizedFont">描画幅に合わせてリサイズしたフォントを描画</a>をONにした時、正しく描画するよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1006" target="_blank">issue #1006</a>)
+      </li>
+      <li>
         文字間スペースを "Additional settings &gt; <a href="../menu/setup-additional-font.html">Font</a>" タブから正しく設定できない問題を修正した。
         5.0からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1008" target="_blank">issue #1008</a>) 
-      </li>
-      <li>
-        <a href="../menu/setup-additional-font.html#CharSpace">文字間スペース</a>を設定して、<a href="../menu/setup-additional-font.html#ResizedFont">描画幅に合わせてリサイズしたフォントを描画</a>をONにした時、正しく描画するよう修正した
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1017" target="_blank">issue #1006</a>)
-      </li>
-      <li>
-        <a href="../macro/command/send.html">send</a>,
-        <a href="../macro/command/sendln.html">sendln</a>,
-        <a href="../macro/command/sendbinary.html">sendbinary</a>,
-        <a href="../macro/command/sendtext.html">sendtext</a> マクロコマンドで送信したデータが
-        <a href="../menu/setup-additional-terminal.html#LocalEcho">ローカルエコー設定</a>に従うよう修正した。
-        5.0からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/147" target="_blank">issue #147</a>)
       </li>
       <li>
         ttermpro.exe の /I オプション指定時にマクロコマンド connect でホストに接続出来ない不具合を修正した。
@@ -71,11 +62,21 @@
         5.4.1からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/975" target="_blank">issue #975</a>)
       </li>
+      <li>
+        <a href="../macro/command/send.html">send</a>,
+        <a href="../macro/command/sendln.html">sendln</a>,
+        <a href="../macro/command/sendbinary.html">sendbinary</a>,
+        <a href="../macro/command/sendtext.html">sendtext</a> マクロコマンドで送信したデータが
+        <a href="../menu/setup-additional-terminal.html#LocalEcho">ローカルエコー設定</a>に従うよう修正した。
+        5.0からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/147" target="_blank">issue #147</a>)
+      </li>
     </ul>
   </li>
 
   <li>その他
     <ul>
+      <li><a href="#ttssh_3.5.2">TTSSH (3.5.2)</a> へ差し替えた。</li>
       <li>
         インストーラに使用している Inno Setup のバージョンを <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.0" target="_blank">6.7.0</a> へ差し替えた。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/963" target="_blank">issue #963</a>)
@@ -3994,13 +3995,13 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1057" target="_blank">issue #1057</a>)
       </li>
       <li>
-        SCP 受信中ダイアログのタイトルが "SCP sending file" になっているのを修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1055" target="_blank">issue #1055</a>)
-      </li>
-      <li>
         鍵交換ネゴシエーションに失敗した場合にクラッシュする問題を修正した。
         3.5.0 (Tera Term 5.5.0)からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1070" target="_blank">issue #1070</a>)
+      </li>
+      <li>
+        SCP 受信中ダイアログのタイトルが "SCP sending file" になっているのを修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1055" target="_blank">issue #1055</a>)
       </li>
     </ul>
   </li>

@@ -50,7 +50,7 @@ AppVerName={#AppName} {#AppVersion} {#Arch}
 
 ; properties of installer executable
 VersionInfoDescription={#AppName} installer
-AppCopyright=(C) 2004-2025 TeraTerm Project
+AppCopyright=(C) 2004-2026 TeraTerm Project
 ; Apps in Settings
 AppPublisher=TeraTerm Project
 AppPublisherURL=https://teratermproject.github.io/
