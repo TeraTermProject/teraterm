@@ -357,6 +357,10 @@ typedef struct Key {
 } Key;
 
 
+enum scp_dir {
+	TOREMOTE, FROMREMOTE,
+};
+
 /* The packet handler returns TRUE to keep the handler in place,
    FALSE to remove the handler. */
 typedef BOOL (* SSHPacketHandler)(PTInstVar pvar);

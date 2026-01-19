@@ -100,11 +100,6 @@ typedef enum {
 	GetPayloadTruncate = 2
 } PayloadStat;
 
-enum scp_dir {
-	TOREMOTE,
-	FROMREMOTE,
-};
-
 static struct global_confirm global_confirms;
 
 static Channel_t *channels = NULL;  // チャネル構造体の配列
