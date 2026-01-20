@@ -77,6 +77,7 @@ To release Tera Term installation package is shown in the following step:
   <li>Create a branch for RC work. (from main branch or stable branch)
 <pre>
 git switch main
+git pull --rebase
 git checkout -b release/5_4_0-RC
 </pre>
   </li>
@@ -86,28 +87,6 @@ git checkout -b release/5_4_0-RC
       <li>Check for changelog. Add it if found missing.</li>
       <li>Change order of changelog. Important changes will be located at upper position. Order is terminal emulation, application and macro.</li>
       <li>Check for translations of changed documents. Translate them if they are not translated.</li>
-    </ul>
-  </li>
-  <li>Increment the version while RC release process.
-    <ul>
-      <li>
-        teraterm\common\tt-version.h<br>
-        set TT_VERSION_SUBSTR to "RC".
-<pre>
-  #define TT_VERSION_MAJOR             5
-  #define TT_VERSION_MINOR             4
-  #define TT_VERSION_PATCH             0
-- #define TT_VERSION_SUBSTR            "dev"
-+ #define TT_VERSION_SUBSTR            "RC"
-</pre>
-        TT_VERSION_MINOR or TT_VERSION_PATCH is already incremented yet. It is incremented immediately after previous release.
-      </li>
-      <li>ttssh2\ttxssh\ttxssh-version.h<br>
-        TTSSH_VERSION_MINOR or TTSSH_VERSION_PATCH is already incremented yet. It is incremented immediately after previous release.
-      </li>
-      <li>ttpmenu\ttpmenu.rc // only modifying</li>
-      <li>TTProxy\TTProxy.rc // only modifying</li>
-      <li>TTXKanjiMenu\ttxkanjimenu.rc // only modifying</li>
     </ul>
   </li>
   <li>Increment the year of last publication of copyright notice if it is first release in this year.
@@ -132,6 +111,29 @@ git checkout -b release/5_4_0-RC
       <li>doc\ja\html\macro\index.html</li>
     </ul>
   </li>
+  <li>Increment the version while RC release process.
+    <ul>
+      <li>
+        teraterm\common\tt-version.h<br>
+        set TT_VERSION_SUBSTR to "RC".
+<pre>
+  #define TT_VERSION_MAJOR             5
+  #define TT_VERSION_MINOR             4
+  #define TT_VERSION_PATCH             0
+- #define TT_VERSION_SUBSTR            "dev"
++ #define TT_VERSION_SUBSTR            "RC"
+  //#undef TT_VERSION_SUBSTR
+</pre>
+        TT_VERSION_MINOR or TT_VERSION_PATCH is already incremented yet. It is incremented immediately after previous release.
+      </li>
+      <li>ttssh2\ttxssh\ttxssh-version.h<br>
+        TTSSH_VERSION_MINOR or TTSSH_VERSION_PATCH is already incremented yet. It is incremented immediately after previous release.
+      </li>
+      <li>ttpmenu\ttpmenu.rc // only modifying</li>
+      <li>TTProxy\TTProxy.rc // only modifying</li>
+      <li>TTXKanjiMenu\ttxkanjimenu.rc // only modifying</li>
+    </ul>
+  </li>
   <li>Create installer. (for check)</li>
   <li>Test run installer, run and connect in all supported OS.</li>
   <li>Commit and push.</li>
@@ -144,13 +146,14 @@ git checkout -b release/5_4_0-RC
       <li>Pull Request creation</li>
       <li>Merge commit into the main branch or stable branch.</li>
     </ul>
-    The merge commit is considered the release candidate.
+    The build binary generated from the merge commit is considered the release candidate artifact.
   </li>
   <li>Announce RC release.
     <ul>
       <li>X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)</li>
       <li>Direct users to report problems via <a href="https://github.com/TeraTermProject/teraterm/issues" target="_blank">Issues</a> on GitHub, as described <a href="../about/contacts.html">here</a>.</li>
       <li>Mention that users must be logged in to GitHub to download GitHub Actions artifacts.</li>
+      <li>e.g. <a href="https://x.com/Tera_Term/status/1989711573842366794">5.5.1 RC</a></li>
     </ul>
   </li>
   <li>Delete a working branch.</li>
@@ -163,13 +166,34 @@ git checkout -b release/5_4_0-RC
 <h2 id="release-operation">Release</h2>
 
 <ol>
+  <li>Prepare an announcement texts.
+    <ul>
+      <li>
+        For <a href="#github_release">GitHub Releases</a><br>
+        Write summary of release note (in Japanese and English) from changelog of document.<br>
+        Select a few items that have a major impact on users.<br>
+        e.g. <a href="https://github.com/TeraTermProject/teraterm/releases/tag/v5.5.1">5.5.1</a>
+      </li>
+      <li>
+        For an <a href="#X_announce">annoucement on X</a><br>
+        Summarize it in 140 characters. (only in Japanese)<br>
+        e.g. <a href="https://x.com/Tera_Term/status/1990412662459490542">5.5.1</a>
+      </li>
+    </ul>
+  </li>
   <li>Create a branch for release work. (from main branch or stable branch)
 <pre>
 git switch main
+git pull --rebase
 git checkout -b release/5_4_0
 </pre>
   </li>
   <li>Confirm documents. (same as above)</li>
+  <li>Modify release date.
+    <ul>
+      <li>html/about/history.html</li>
+    </ul>
+  </li>
   <li>Remove "RC" string.
     <ul>
       <li>
@@ -179,14 +203,11 @@ git checkout -b release/5_4_0
   #define TT_VERSION_MINOR             4
   #define TT_VERSION_PATCH             0
 - #define TT_VERSION_SUBSTR            "RC"
+- //#undef TT_VERSION_SUBSTR
++ //#define TT_VERSION_SUBSTR            "dev"
 + #undef TT_VERSION_SUBSTR
 </pre>
       </li>
-    </ul>
-  </li>
-  <li>Modify release date.
-    <ul>
-      <li>html/about/history.html</li>
     </ul>
   </li>
   <li>Create installer. (for check)
@@ -217,14 +238,15 @@ git push origin v5.4.0
       <li>Merge commit ito the main branch or stable branch</li>
       <li>Tag creation.</li>
     </ul>
-    The tag creation is considered the release.<br>
+    The build binary generated from the release tag is considered the release artifact.<br>
     <span id="login_signpath">During the release process, the workflow sends code signing requests to SignPath. SignPath's release-signing policy requires manual approval. Therefore, the workflow will wait until the code signing is approved. To approve the requests, log in to <a href="https://about.signpath.io/" target="_blank">SignPath.io</a> and approve signing requests.</span>
   </li>
-  <li>Add to GitHub "<a href="https://github.com/TeraTermProject/teraterm/releases" target="_blank">Releases</a>."
+  <li>Delete a working branch.</li>
+  <li id="github_release">Add to GitHub "<a href="https://github.com/TeraTermProject/teraterm/releases" target="_blank">Releases</a>."
     <ul>
       <li>select a new tag.</li>
       <li>put installer and portable zip file and hash file.</li>
-      <li>write summary of release note (in Japanese and English) from changelog of document.</li>
+      <li>write summary of release note.</li>
     </ul>
   </li>
   <li>Check anti-virus software
@@ -238,7 +260,7 @@ git push origin v5.4.0
   <li>Update project web page (<a href="https://teratermproject.github.io" target="_blank">https://teratermproject.github.io</a>).
     <p><a href="https://github.com/TeraTermProject/teraterm/wiki/Update-Project-page" target="_blank">How to update project home page (in Japanese).</a></p>
   </li>
-  <li>Announce release.
+  <li id="X_announce">Announce release.
     <ul>
       <li>
         X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)
@@ -249,8 +271,10 @@ git push origin v5.4.0
       </li>
     </ul>
   </li>
-  <li>When periodic release, create stable branch.
+  <li>Create stable branch (only for periodic releases).
 <pre>
+git switch main
+git pull --rebase
 git checkout -b stable_5_4
 </pre>
   </li>
@@ -259,6 +283,11 @@ git checkout -b stable_5_4
     <ul>
       <li>
         Fix the main branch.
+<pre>
+git switch main
+git pull --rebase
+git checkout -b release/unfroze
+</pre>
         <ul>
           <li>
             teraterm/common/tt-version.h<br>
@@ -268,8 +297,10 @@ git checkout -b stable_5_4
 - #define TT_VERSION_MINOR             4
 + #define TT_VERSION_MINOR             5
   #define TT_VERSION_PATCH             0
+- //#define TT_VERSION_SUBSTR            "dev"
 - #undef TT_VERSION_SUBSTR
 + #define TT_VERSION_SUBSTR            "dev"
++ //#undef TT_VERSION_SUBSTR
 </pre>
           </li>
           <li>
@@ -290,19 +321,22 @@ git checkout -b stable_5_4
 &lt;ul class="history"&gt;
   &lt;!--li&gt;Changes
     &lt;ul&gt;
-      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li--&gt;
 
   &lt;!--li&gt;Bug fixes
     &lt;ul&gt;
-      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li--&gt;
 
   &lt;!--li&gt;Misc
     &lt;ul&gt;
-      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li--&gt;
 &lt;/ul&gt;
@@ -311,29 +345,38 @@ git checkout -b stable_5_4
 &lt;ul class="history"&gt;
   &lt;!--li&gt;Changes
     &lt;ul&gt;
-      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li--&gt;
 
   &lt;!--li&gt;Bug fixes
     &lt;ul&gt;
-      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li--&gt;
 
   &lt;!--li&gt;Misc
     &lt;ul&gt;
-      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li--&gt;
 &lt;/ul&gt;
 </pre>
           </li>
-          <li>Commit and push.</li>
+          <li>Commit and push and merge.</li>
+          <li>Delete a working branch.</li>
         </ul>
       </li>
       <li>
         Fix the stable branch.
+<pre>
+git switch stable_5_4
+git pull --rebase
+git checkout -b release/unfroze
+</pre>
         <ul>
           <li>
             teraterm/common/tt-version.h<br>
@@ -344,7 +387,10 @@ git checkout -b stable_5_4
 - #define TT_VERSION_PATCH             0
 - #undef TT_VERSION_SUBSTR
 + #define TT_VERSION_PATCH             1
+- //#define TT_VERSION_SUBSTR            "dev"
+- #undef TT_VERSION_SUBSTR
 + #define TT_VERSION_SUBSTR            "dev"
++ //#undef TT_VERSION_SUBSTR
 </pre>
           </li>
           <li>
@@ -404,24 +450,20 @@ git checkout -b stable_5_4
 &lt;/ul&gt;
 </pre>
           </li>
-          <li>Commit and push.</li>
+          <li>Commit and push and merge.</li>
+          <li>Delete a working branch.</li>
         </ul>
-      </li>
-      <li>
-        Configure GitHub <a href="https://github.com/TeraTermProject/teraterm/milestones">Milestones</a>.
-        <ul>
-          <li>Close the milestone of released version.</li>
-          <li>Create the new milestone for next periodic release version. (e.g. "5.5.0")</li>
-          <li>Rename the milestone to reflect a version after the upcoming release. (e.g. change "5.5.0 or later" to "5.6.0 or later")<br>
-              Move all issues in this milestone to the "next release" milestone.</li>
-        </ul>
-        The Milestone of stable release is not to be created.
       </li>
     </ul>
     <p>When stable release,</p>
     <ul>
       <li>
         Fix the stable branch.
+<pre>
+git switch stable_5_4
+git pull --rebase
+git checkout -b release/unfroze
+</pre>
         <ul>
           <li>
             teraterm/common/tt-version.h<br>
@@ -432,7 +474,10 @@ git checkout -b stable_5_4
 - #define TT_VERSION_PATCH             1
 - #undef TT_VERSION_SUBSTR
 + #define TT_VERSION_PATCH             2
+- //#define TT_VERSION_SUBSTR            "dev"
+- #undef TT_VERSION_SUBSTR
 + #define TT_VERSION_SUBSTR            "dev"
++ //#undef TT_VERSION_SUBSTR
 </pre>
           </li>
           <li>
@@ -453,19 +498,22 @@ git checkout -b stable_5_4
 &lt;ul class="history"&gt;
   &lt;!--li&gt;Changes
     &lt;ul&gt;
-      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li--&gt;
 
   &lt;!--li&gt;Bug fixes
     &lt;ul&gt;
-      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li--&gt;
 
   &lt;!--li&gt;Misc
     &lt;ul&gt;
-      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li--&gt;
 &lt;/ul&gt;
@@ -474,28 +522,61 @@ git checkout -b stable_5_4
 &lt;ul class="history"&gt;
   &lt;!--li&gt;Changes
     &lt;ul&gt;
-      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li--&gt;
 
   &lt;!--li&gt;Bug fixes
     &lt;ul&gt;
-      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li--&gt;
 
   &lt;!--li&gt;Misc
     &lt;ul&gt;
-      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li--&gt;
 &lt;/ul&gt;
 </pre>
           </li>
-          <li>Commit and push.</li>
+          <li>Commit and push and merge.</li>
+          <li>Delete a working branch.</li>
         </ul>
       </li>
     </ul>
+  </li>
+  <li>Modify changelog (only for stable releases).
+    <ul>
+      <li>
+        Fix the main branch.
+<pre>
+git switch main
+git pull --rebase
+git checkout -b port/changelog
+</pre>
+        <ul>
+          <li>
+            doc\en/ja\html\about\history.html<br>
+            Copy changelogs from stable release, and delete them from periodic release.
+          </li>
+          <li>?????push???????</li>
+          <li>???????????</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Configure GitHub <a href="https://github.com/TeraTermProject/teraterm/milestones">Milestones</a> (only for periodic releases).
+    <ul>
+      <li>Close the milestone of released version.</li>
+      <li>Create the new milestone for next periodic release version. (e.g. "5.5.0")</li>
+      <li>Rename the milestone to reflect a version after the upcoming release. (e.g. change "5.5.0 or later" to "5.6.0 or later")<br>
+          Move all issues in this milestone to the "next release" milestone.</li>
+    </ul>
+    The Milestone of stable release is not to be created.
   </li>
   <li>Check for download a installer binary.
     <p>
@@ -509,7 +590,6 @@ git checkout -b stable_5_4
     </p>
   </li>
   <li>Update Chocolatey.</li>
-  <li>Delete a working branch.</li>
 </ol>
 
 <h2 id="code-freeze">About code freeze.</h2>
