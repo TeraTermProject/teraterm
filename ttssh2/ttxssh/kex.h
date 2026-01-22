@@ -30,6 +30,7 @@
 #define KEX_H
 
 #include "ttxssh.h"
+#include "crypto_api.h"
 
 #define CURVE25519_SIZE 32
 
@@ -71,6 +72,8 @@ typedef enum {
 	KEX_DH_GRP18_SHA512,
 	KEX_CURVE25519_SHA256_OLD,
 	KEX_CURVE25519_SHA256,
+	KEX_SNTRUP761X25519_SHA512_OLD,
+	KEX_SNTRUP761X25519_SHA512,
 	KEX_DH_UNKNOWN,
 	KEX_DH_MAX = KEX_DH_UNKNOWN,
 } kex_algorithm;
@@ -123,6 +126,7 @@ typedef struct kex {
 	const EC_GROUP *ec_group; /* ECDH */
 	u_char c25519_client_key[CURVE25519_SIZE]; /* 25519 */
 	u_char c25519_client_pubkey[CURVE25519_SIZE]; /* 25519 */
+	u_char sntrup761_client_key[crypto_kem_sntrup761_SECRETKEYBYTES]; /* KEM */
 	buffer_t *client_pub;
 } kex;
 
@@ -216,6 +220,20 @@ int kex_c25519_keypair(kex *kex);
 int kex_c25519_dec(kex *kex, buffer_t *server_blob,
     buffer_t **shared_secretp);
 int kex_c25519_hash(const digest_algorithm hash_alg,
+    buffer_t *client_version,
+    buffer_t *server_version,
+    buffer_t *client_kexinit,
+    buffer_t *server_kexinit,
+    buffer_t *serverhostkeyblob,
+    buffer_t *client_pub,
+    buffer_t *server_pub,
+    buffer_t *shared_secret,
+    char *hash, unsigned int *hashlen);
+
+int kex_kem_sntrup761x25519_keypair(kex *kex);
+int kex_kem_sntrup761x25519_dec(kex *kex, buffer_t *server_blob,
+    buffer_t **shared_secretp);
+int kex_kem_sntrup761x25519_hash(const digest_algorithm hash_alg,
     buffer_t *client_version,
     buffer_t *server_version,
     buffer_t *client_kexinit,

@@ -97,6 +97,9 @@
     <ClCompile Include="smult_curve25519_ref.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sntrup761.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ssh.c">
       <Filter>Source Files</Filter>
     </ClCompile>

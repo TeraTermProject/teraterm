@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Portuguese (Português) - Brazil
-date=2025-12-30 by TeraTerm Project
+date=2026-01-04 by TeraTerm Project
 contributor=Waldemar Vaz Passarinho Neto (2025-05-07)
 
 [Tera Term]
@@ -673,6 +673,7 @@ DLG_ABOUT_KEXPARAM=Key exchange param:
 DLG_ABOUT_KEXPARAM_DH=%d-bit DH group
 DLG_ABOUT_KEXPARAM_NISTP=NIST P-%d (%d-bit) elliptic curve
 DLG_ABOUT_KEXPARAM_X25519=Curve25519 (255-bit) elliptic curve
+DLG_ABOUT_KEXPARAM_SNTRUP761X25519=Curve25519 (255-bit) elliptic curve, SNTRUP761 (761-degree polynomial)
 DLG_ABOUT_AUTH_INFO=Usuário '%s', autenticação %s
 DLG_ABOUT_AUTH_INFO2=, chave %s
 DLG_ABOUT_AUTH_INFO3=, chave %s com %s

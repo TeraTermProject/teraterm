@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2025-12-30 by TeraTerm Project
+date=2026-01-04 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -678,6 +678,7 @@ DLG_ABOUT_KEXPARAM=鍵交換パラメータ:
 DLG_ABOUT_KEXPARAM_DH=%d-bit DH グループ
 DLG_ABOUT_KEXPARAM_NISTP=NIST P-%d (%d-bit) 楕円曲線
 DLG_ABOUT_KEXPARAM_X25519=Curve25519 (255-bit) 楕円曲線
+DLG_ABOUT_KEXPARAM_SNTRUP761X25519=Curve25519 (255-bit) 楕円曲線, SNTRUP761 (次数761の多項式)
 DLG_ABOUT_AUTH_INFO2=, %s key
 DLG_ABOUT_AUTH_INFO3=, %s key with %s
 DLG_ABOUT_FINGERPRINT=ホスト鍵の指紋:

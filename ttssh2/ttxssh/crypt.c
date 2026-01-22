@@ -1212,6 +1212,15 @@ void CRYPT_get_kex_param_info(PTInstVar pvar, char *dest, int len)
 				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
 				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg);
 				break;
+			// sntrup761x25519
+			case KEX_SNTRUP761X25519_SHA512_OLD:
+			case KEX_SNTRUP761X25519_SHA512:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_SNTRUP761X25519", pvar,
+				                    "Curve25519 (255-bit) elliptic curve, SNTRUP761 (761-degree polynomial)");
+				strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
+				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg);
+				break;
 		}
 	}
 }
