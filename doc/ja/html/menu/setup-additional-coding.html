@@ -28,12 +28,19 @@
 
     <h2>Unicode</h2>
 
+    <p>
+      Unicode(UTF-8)使用時の文字幅(セル数)の設定を行います。
+    </p>
+
+    <p>
+      Tera Term が描画する文字の幅については<a href="setup-additional-font.html#ResizedFont">描画幅に合わせてリサイズしたフォントを描画</a>を参照ください。<br>
+    </p>
+
     <h3 id="AmbiguousCharactersWidth">Ambiguous Characters width</h3>
 
-    1 Cell または 2 Cell を選択します。<br>
+    Ambiguous(曖昧)特性の文字の文字幅を、1 Cell または 2 Cell から選択します。<br>
     Tera Term の接続先が想定している文字幅を指定します。<br>
     <a href="#EastAsianWidth">East_Asian_Width特性とセル数について</a>を参照ください。<br>
-    Tera Term が描画する文字の幅については<a href="setup-additional-font.html#ResizedFont">描画幅に合わせてリサイズしたフォントを描画</a>を参照ください。<br>
     Encoding-receive プルダウンを変更すると、その漢字コードで一般的な文字幅で上書きされます。しかし、その文字幅でなければならないというわけではありません。フォントなどの理由により、使いたい幅を選択してください。
 
     <h3 id="UnicodeEmojiOverride">Override Emoji Characters width</h3>
@@ -51,10 +58,19 @@
         </dl>
     </ul>
 
-    <h3 id="OverrideCellWdith">Override Character width Per Character</h3>
+    <h3 id="OverrideCharWidth">文字ごとの文字幅オーバーライド設定を使う</h3>
 
-    チェックすると、TERATERM.INIファイルに指定した文字幅設定が使用されます。TERATERM.INIファイルに設定が存在する場合、有効になります。<br>
-    <a href="../setup/teraterm-term.html#OverrideCellWdith">文字ごとの文字幅オーバーライド設定を使う</a>を参照してください。
+    <p>
+      TERATERM.INIに<a href="../setup/teraterm-term.html#OverrideCharWidth">文字幅設定</a>が存在すると、有効になります。
+      チェックすると、ユーザーの文字幅設定が使用されます。
+    </p>
+
+    <p>
+      Tera Term は、Unicodeの仕様に準拠して文字幅を決定します。
+      仕様と異なる文字幅を使用する場合、この設定が役立ちます。
+      通信先のUnicodeバージョンがTera Termと異なっていたり、
+      独自の文字幅を使用したい場合を想定しています。
+    </p>
 
     <h2 id="DecSpecial">DEC Special Graphics</h2>
 

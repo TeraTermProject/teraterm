@@ -659,32 +659,71 @@ Default:
 FallbackToCP932=off
 </pre>
 
-<h1 id="OverrideCellWdith">Override Character width Per Character</h1>
+<h1 id="OverrideCharWidth">Override Character width Per Character</h1>
 
-You can set the character width for each character.<br>
-Refer to <a href="../menu/setup-additional-coding.html#OverrideCellWdith">Override character width per character</a>.
+<p>
+When using Unicode (UTF-8), Override Character width Per Character settings are available.<br>
+Add code point and character width (number of cells) in following section to TERATERM.INI, 
+</p>
+<p>
+You can enable or disable this setting with
+<a href="../menu/setup-additional-coding.html#OverrideCharWidth">Override character width per character</a>.
+</p>
 
+Example Settings<br>
+TERATERM.INI
 <pre>
 [CellWidth1]
-Range1=U+XXXXXX,U+XXXXXY,2
-Range2=U+XXXXYA,U+XXXXYZ,1
-Range3=U+XXXXYY,1
-  :
+Range1=U+2605,U+2606,2
+Range2=U+00a9,2
+Range3=U+1F363,0
+Range4=U+2665,1
+Range5=U+1F90D,2
 </pre>
 
+Display Example<br>
+<img src="OverrideCharWidth.png"><br>
+
+Detail
 <ul>
   <li>RangeN is read sequentially from 1 until it no longer exists.</li>
   <li>When 3 item
-    <ul>
-      <li>Item 1 is Start and 2 is End Code Point</li>
-      <li>Item 3 1 = 1 cell / 2 = 2 cell / 0 = invalid row</li>
-    </ul></li>
+    <dl>
+      <dt>Item 1</dt>
+      <dd>Start Code Point</dd>
+      <dt>Item 2</dt>
+      <dd>End Code Point</dd>
+      <dt>Item 3</dt>
+      <dd>
+          <dl>
+            <dt>1</dt>
+            <dd>1cell</dd>
+            <dt>2</dt>
+            <dd>2cell</dd>
+            <dt>0 (Other than 1 and 2)</dt>
+            <dd>ignore line</dd>
+          </dl>
+      </dd>
+    </dl>
+  </li>
   <li>When 2 item
-    <ul>
-      <li>Item 1 is Code Point</li>
-      <li>Item 2 1 = 1 cell / 2 = 2 cell / 0 = invalid row</li>
-  </ul></li>
+    <dl>
+      <dt>Item 1</dt>
+      <dd>Code Point</dd>
 
+      <dt>Item 2</dt>
+      <dd>
+          <dl>
+            <dt>1</dt>
+            <dd>1cell</dd>
+            <dt>2</dt>
+            <dd>2cell</dd>
+            <dt>0 (Other than 1 and 2)</dt>
+            <dd>ignore line</dd>
+          </dl>
+      </dd>
+    </dl>
+  </li>
 </ul>
 
 </BODY>

@@ -28,12 +28,19 @@
 
     <h2>Unicode</h2>
 
+    <p>
+      Select character width (number of cells) when using Unicode (UTF-8).
+    </p>
+
+    <p>
+      Refer to <a href="setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a> for Tera Term drawing character width.
+    </p>
+
     <h3 id="AmbiguousCharactersWidth">Ambiguous Characters width</h3>
 
     Select 1 Cell or 2 Cell.<br>
     Specify character width assumed by Tera Term connecting destination.<br>
     Refer to <a href="#EastAsianWidth">East_Asian_Width and width (cells)</a>.<br>
-    Refer to <a href="setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a> for Tera Term drawing character width.
     If you change Encoding-receive by pull-down, width is changed to typical character width of that code automatically. Nevertheless, that width is not absolutely recommend, you can choose the width what you want for font or other reasons.
 
     <h3 id="UnicodeEmojiOverride">Override Emoji Characters width</h3>
@@ -51,10 +58,19 @@
         </dl>
     </ul>
 
-    <h3 id="OverrideCellWdith">Override Character width Per Character</h3>
+    <h3 id="OverrideCharWidth">Override Character width Per Character</h3>
 
-    When checked, Character width specified in TERATERM.INI file is used.  Check box is enabled if setting exists in TERATERM.INI file.<br>
-    Refer to <a href="../setup/teraterm-term.html#OverrideCellWdith">Override character width per character</a>.
+    <p>
+      This check box is enabled if <a href="../setup/teraterm-term.html#OverrideCharWidth">Character width</a> setting is exists in TERATERM.INI file.
+      When checked, User's character width setting is used.
+    </p>
+
+    <p>
+      Tera Term determines character widths according to Unicode specification.
+      This setting is useful when using character widths that differ from the specification.
+      This can be used in following cases.
+      Host's Unicode version differs from Tera Term,User want to uses own character width.
+    </p>
 
     <h2 id="DecSpecial">DEC Special Graphics</h2>
 

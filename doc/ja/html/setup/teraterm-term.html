@@ -690,32 +690,73 @@ Cygwin接続時にWindows付属コマンドの出力がCP932で行われる事に対応するためのもので
 FallbackToCP932=off
 </pre>
 
-<h1 id="OverrideCellWdith">文字ごとの文字幅オーバーライド設定を使う</h1>
+<h1 id="OverrideCharWidth">文字ごとの文字幅オーバーライド設定を使う</h1>
 
-文字ごとに文字幅を設定することができます。<br>
-<a href="../menu/setup-additional-coding.html#OverrideCellWdith">Override character width per character</a>を参照ください。
+<p>
+Unicode(UTF-8)を使用時、文字ごとに文字幅を設定することができます。<br>
+TERATERM.INI に次のセクションを追加することで、コードポイントと文字幅(セル数)を指定します。
+</p>
+<p>
+<a href="../menu/setup-additional-coding.html#OverrideCharWidth">文字ごとの文字幅オーバーライド設定を使う</a>で、
+この設定を使用する/しないを変更できます。
+</p>
 
+設定例<br>
+TERATERM.INI
 <pre>
 [CellWidth1]
-Range1=U+XXXXXX,U+XXXXXY,2
-Range2=U+XXXXYA,U+XXXXYZ,1
-Range3=U+XXXXYY,1
-  :
+Range1=U+2605,U+2606,2
+Range2=U+00a9,2
+Range3=U+1F363,0
+Range4=U+2665,1
+Range5=U+1F90D,2
 </pre>
 
+表示例<br>
+<img src="OverrideCharWidth.png"><br>
+
+詳細
 <ul>
   <li>RangeN は、1から順に読み込まれ、存在しなくなるまで読み込まれます</li>
   <li>3項目の場合
-    <ul>
-      <li>1,2項目目 開始,終了コードポイント</li>
-      <li>3項目目 1=1cell/2=2cell/0=無効行</li>
-    </ul></li>
-  <li>2項目の場合
-    <ul>
-      <li>1項目目 コードポイント</li>
-      <li>2項目目 1=1cell/2=2cell/0=無効行</li>
-  </ul></li>
+    <dl>
+      <dt>1項目目</dt>
+      <dd>開始コードポイント</dd>
 
+      <dt>2項目目</dt>
+      <dd>終了コードポイント</dd>
+
+      <dt>3項目目</dt>
+      <dd>
+          <dl>
+            <dt>1</dt>
+            <dd>1cell</dd>
+            <dt>2</dt>
+            <dd>2cell</dd>
+            <dt>0 (1,2以外)</dt>
+            <dd>無効行</dd>
+          </dl>
+      </dd>
+    </dl>
+  </li>
+  <li>2項目の場合
+    <dl>
+      <dt>1項目目</dt>
+      <dd>コードポイント</dd>
+
+      <dt>2項目目</dt>
+      <dd>
+          <dl>
+            <dt>1</dt>
+            <dd>1cell</dd>
+            <dt>2</dt>
+            <dd>2cell</dd>
+            <dt>0 (1,2以外)</dt>
+            <dd>無効行</dd>
+          </dl>
+      </dd>
+    </dl>
+  </li>
 </ul>
 
 </BODY>
