@@ -384,6 +384,11 @@
 				</UL>
 			</UL>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="SSH SCP">
+				<param name="Local" value="html\menu\file-ssh-scp.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Change directory">
 				<param name="Local" value="html\menu\file-chdir.html">
 				<param name="ImageNumber" value="11">

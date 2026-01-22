@@ -44,6 +44,7 @@
 #include "auth.h"
 #include "helpid.h"
 #include "ttcommdlg.h"
+#include "ttlib_types.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1006,29 +1007,6 @@ static void PASCAL TTXOpenTCP(TTXSockHooks *hooks)
 		SSH2_update_hmac_myproposal(pvar);
 		SSH2_update_compression_myproposal(pvar);
 	}
-}
-
-static void PASCAL TTXCloseTCP(TTXSockHooks *hooks)
-{
-	if (pvar->session_settings.Enabled) {
-		pvar->socket = INVALID_SOCKET;
-
-		logputs(LOG_LEVEL_VERBOSE, "Terminating SSH session...");
-
-		// 認証ダイアログが残っていれば閉じる。
-		HOSTS_notify_closing_on_exit(pvar);
-		AUTH_notify_closing_on_exit(pvar);
-
-		*hooks->Precv = pvar->Precv;
-		*hooks->Psend = pvar->Psend;
-		*hooks->PWSAAsyncSelect = pvar->PWSAAsyncSelect;
-		*hooks->Pconnect = pvar->Pconnect;
-
-		pvar->ts->DisableTCPEchoCR = pvar->origDisableTCPEchoCR;
-	}
-
-	uninit_TTSSH(pvar);
-	init_TTSSH(pvar);
 }
 
 static void enable_dlg_items(HWND dlg, int from, int to, BOOL enabled)
@@ -3453,6 +3431,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			{ IDC_RECEIVEFILE_FROM_LABEL, "DLG_SCP_RECEIVEFILE_FROM" },
 			{ IDC_RECVFILE_TO_LABEL, "DLG_SCP_RECEIVEFILE_TO" },
 			{ IDC_RECV, "DLG_SCP_RECEIVEFILE_RECEIVE" },
+			{ IDHELP, "BTN_HELP" },
 		};
 		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
@@ -3462,7 +3441,9 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 		SetDlgItemTextA(dlg, IDC_SENDFILE_TO, pvar->ts->ScpSendDir);
 
 		// SCPファイル受信先を表示する
-		SetDlgItemTextW(dlg, IDC_RECVFILE_TO, pvar->ts->FileDirW);
+		wchar_t *dir = GetFileDir(pvar->ts);
+		SetDlgItemTextW(dlg, IDC_RECVFILE_TO, dir);
+		free(dir);
 
 #ifdef SFTP_DEBUG
 		ShowWindow(GetDlgItem(dlg, IDC_SFTP_TEST), SW_SHOW);
@@ -3544,8 +3525,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 
 				char *sendfiledirU8 = ToU8W(sendfiledirW);
 				char *filenameU8 = ToU8W(filenameW);
-				SSH_start_scp(pvar, filenameU8, sendfiledirU8);
-				//SSH_scp_transaction(pvar, "bigfile30.bin", "", FROMREMOTE);
+				SSH_start_scp_send(pvar, filenameU8, sendfiledirU8);
 				free(filenameU8);
 				free(sendfiledirU8);
 				free(sendfiledirW);
@@ -3590,20 +3570,13 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 				wchar_t *recvdir_expanded;
 				hExpandEnvironmentStringsW(recvdirW, &recvdir_expanded);
 
-				wchar_t *recvpathW;
-				if (recvdir_expanded[0] != 0) {
-					aswprintf(&recvpathW, L"%s\\%s", recvdir_expanded, recvfn);
-				} else {
-					recvpathW = _wcsdup(recvfn);
-				}
-				char *recvpathU8 = ToU8W(recvpathW);
+				char *recvpathU8 = ToU8W(recvdir_expanded);
 				char *FileNameU8 = ToU8W(FileNameW);
-				SSH_scp_transaction(pvar, FileNameU8, recvpathU8, FROMREMOTE);
+				SSH_start_scp_receive(pvar, FileNameU8, recvpathU8);
 				free(FileNameW);
 				free(recvfn);
 				free(recvdirW);
 				free(recvdir_expanded);
-				free(recvpathW);
 				free(recvpathU8);
 				free(FileNameU8);
 
@@ -3618,6 +3591,10 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 		case IDC_SFTP_TEST:
 			SSH_sftp_transaction(pvar);
 			return TRUE;
+
+		case IDHELP:
+			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpMenuFileSshScp, 0);
+			return TRUE;
 		}
 	}
 
@@ -3626,9 +3603,9 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 
 // マクロコマンド"scpsend"から呼び出すために、DLL外へエクスポートする。"ttxssh.def"ファイルに記載。
 // (2008.1.1 yutaka)
-__declspec(dllexport) int CALLBACK TTXScpSendfile(char *filename, char *dstfile)
+__declspec(dllexport) int CALLBACK TTXScpSendfile(char *sendfile, char *dest)
 {
-	return SSH_start_scp(pvar, filename, dstfile);
+	return SSH_start_scp_send(pvar, sendfile, dest);
 }
 
 __declspec(dllexport) int CALLBACK TTXScpSendingStatus(void)
@@ -3638,7 +3615,7 @@ __declspec(dllexport) int CALLBACK TTXScpSendingStatus(void)
 
 __declspec(dllexport) int CALLBACK TTXScpReceivefile(char *remotefile, char *localfile)
 {
-	return SSH_scp_transaction(pvar, remotefile, localfile, FROMREMOTE);
+	return SSH_start_scp_receive(pvar, remotefile, localfile);
 }
 
 
@@ -5074,6 +5051,30 @@ static void PASCAL TTXEnd(void)
 		free(pvar->err_msg);
 		pvar->err_msg = NULL;
 	}
+}
+
+static void PASCAL TTXCloseTCP(TTXSockHooks *hooks)
+{
+	if (pvar->session_settings.Enabled) {
+		pvar->socket = INVALID_SOCKET;
+
+		logputs(LOG_LEVEL_VERBOSE, "Terminating SSH session...");
+
+		// 認証ダイアログが残っていれば閉じる。
+		HOSTS_notify_closing_on_exit(pvar);
+		AUTH_notify_closing_on_exit(pvar);
+
+		*hooks->Precv = pvar->Precv;
+		*hooks->Psend = pvar->Psend;
+		*hooks->PWSAAsyncSelect = pvar->PWSAAsyncSelect;
+		*hooks->Pconnect = pvar->Pconnect;
+
+		pvar->ts->DisableTCPEchoCR = pvar->origDisableTCPEchoCR;
+	}
+
+	TTXEnd();
+	pvar->fatal_error = FALSE;
+	init_TTSSH(pvar);
 }
 
 /* This record contains all the information that the extension forwards to the

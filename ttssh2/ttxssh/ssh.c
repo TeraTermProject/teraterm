@@ -122,6 +122,7 @@ static void SSH2_dh_kex_init(PTInstVar pvar);
 static void SSH2_dh_gex_kex_init(PTInstVar pvar);
 static void SSH2_ecdh_kex_init(PTInstVar pvar);
 static void SSH2_curve25519_kex_init(PTInstVar pvar);
+static void SSH2_kem_sntrup761x25519_kex_init(PTInstVar pvar);
 static void SSH2_kem_mlkem768x25519_kex_init(PTInstVar pvar);
 static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar);
 static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar);
@@ -4238,13 +4239,15 @@ static int accessU8(const char *pathU8, int mode)
 /**
  *	SCP support
  *
- *	@param sendfile		ファイル名,UTF-8
- *	@param dstfile		ファイル名,UTF-8
+ *	@param filename		ローカル(Windows上の)ファイル名,UTF-8
+ *						TOREMOTEのとき、読み込みファイル名
+ *						FROMREMOTE のとき、書き込みファイル名
+ *	@param dest			フォルダ名またはファイル名,UTF-8
  *						TOREMOTE のとき、
  *							NULL のとき、ホームフォルダ
  *							相対パス、ホームフォルダからの相対?
  *							絶対パス
- *						TOLOCAL のとき
+ *						FROMREMOTE のとき
  *							NULL のとき、ダウンロードフォルダ
  *							相対パス、カレントフォルダからの相対?
  *							絶対パス
@@ -4252,7 +4255,7 @@ static int accessU8(const char *pathU8, int mode)
  *						FROMREMOTE	copy remote to local
  *
  */
-int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfile, enum scp_dir direction)
+static int SSH_scp_transaction(PTInstVar pvar, const char *filename, const char *dest, enum scp_dir direction)
 {
 	Channel_t *c = NULL;
 	FILE *fp = NULL;
@@ -4280,7 +4283,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 
 	if (direction == TOREMOTE) {  // copy local to remote
 		struct __stat64 st;
-		fp = fopenU8(sendfile, "rb");
+		fp = fopenU8(filename, "rb");
 		if (fp == NULL) {
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
@@ -4291,21 +4294,21 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			DWORD error = GetLastError();
 			wchar_t *err_str;
 			hFormatMessageW(error, &err_str);
-			wchar_t *fname = ToWcharU8(sendfile);
+			wchar_t *fname = ToWcharU8(filename);
 			TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, err_str, fname);
 			free(fname);
 			free(err_str);
 			goto error;
 		}
 
-		strncpy_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), sendfile, _TRUNCATE);  // full path
-		ExtractFileNameU8(sendfile, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
-		if (dstfile == NULL || dstfile[0] == '\0') { // remote file path
-			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), ".", _TRUNCATE);  // full path
+		strncpy_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), filename, _TRUNCATE);  // full path
+		ExtractFileNameU8(filename, c->scp.localfile, sizeof(c->scp.localfile));             // file name only
+		if (dest == NULL || dest[0] == '\0') { // remote file path
+			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), ".", _TRUNCATE);   // full path
 		} else {
-			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), dstfile, _TRUNCATE);  // full path
+			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), dest, _TRUNCATE);  // full path
 		}
-		c->scp.localfp = fp;     // file pointer
+		c->scp.localfp = fp; // file pointer
 
 		if (statU8(c->scp.localfilefull, &st) == 0) {
 			c->scp.filestat = st;
@@ -4313,26 +4316,48 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			goto error;
 		}
 	} else { // copy remote to local
-		strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), sendfile, _TRUNCATE);
+		strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), filename, _TRUNCATE);
 
-		if (dstfile == NULL || dstfile[0] == '\0') { // local file path is empty.
+		if (dest == NULL || dest[0] == '\0') { // local file path is empty.
 			char *fn;
-			wchar_t *FileDirExpanded;
+			wchar_t *FileDirExpanded, *FileDirExpandedDS;
 			char *FileDirExpandedU8;
 
-			fn = strrchr(sendfile, '/');
+			fn = strrchr(filename, '/');
 			if (fn && fn[1] == '\0')
 				goto error;
 
 			FileDirExpanded = GetFileDir(pvar->ts);
-			FileDirExpandedU8 = ToU8W(FileDirExpanded);
-			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s\\%s", FileDirExpandedU8, fn ? fn : sendfile);
+			FileDirExpandedDS = DeleteSlashW(FileDirExpanded);
+			FileDirExpandedU8 = ToU8W(FileDirExpandedDS);
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE,
+			            "%s\\%s", FileDirExpandedU8, fn ? fn : filename);
 			free(FileDirExpanded);
+			free(FileDirExpandedDS);
 			free(FileDirExpandedU8);
-			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
-		} else {
-			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s", dstfile);
-			ExtractFileName(dstfile, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
+			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
+		} else if (DoesFolderExist(dest)) { // local file path is a directory.
+			char *fn;
+			wchar_t *FileDirExpanded, *FileDirExpandedDS;
+			char *FileDirExpandedU8;
+
+			fn = strrchr(filename, '/');
+			if (fn && fn[1] == '\0')
+				goto error;
+
+			FileDirExpanded = ToWcharA(dest);
+			FileDirExpandedDS = DeleteSlashW(FileDirExpanded);
+			FileDirExpandedU8 = ToU8W(FileDirExpandedDS);
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE,
+			            "%s\\%s", FileDirExpandedU8, fn ? fn : filename);
+			free(FileDirExpanded);
+			free(FileDirExpandedDS);
+			free(FileDirExpandedU8);
+			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
+		}
+		else {
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s", dest);
+			ExtractFileName(dest, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
 		}
 
 		if (accessU8(c->scp.localfilefull, 0x00) == 0) {
@@ -4381,7 +4406,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			goto error;
 		}
 
-		c->scp.localfp = fp;     // file pointer
+		c->scp.localfp = fp;    // file pointer
 	}
 
 	// setup SCP data
@@ -4400,9 +4425,9 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			goto error;
 		}
 		s = "session";
-		buffer_put_string(msg, s, strlen(s));  // ctype
-		buffer_put_int(msg, c->self_id);  // self(channel number)
-		buffer_put_int(msg, c->local_window);  // local_window
+		buffer_put_string(msg, s, strlen(s));     // ctype
+		buffer_put_int(msg, c->self_id);          // self (channel number)
+		buffer_put_int(msg, c->local_window);     // local_window
 		buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
@@ -4426,9 +4451,9 @@ error:
 	return FALSE;
 }
 
-int SSH_start_scp(PTInstVar pvar, char *sendfile, char *dstfile)
+int SSH_start_scp_send(PTInstVar pvar, const char *sendfile, const char *dest)
 {
-	return SSH_scp_transaction(pvar, sendfile, dstfile, TOREMOTE);
+	return SSH_scp_transaction(pvar, sendfile, dest, TOREMOTE);
 }
 
 int SSH_scp_sending_status(void)
@@ -4436,9 +4461,24 @@ int SSH_scp_sending_status(void)
 	return g_scp_sending;
 }
 
-int SSH_start_scp_receive(PTInstVar pvar, char *filename)
+/**
+ *	@param	pvar
+ *	@param	recfile		受信ファイル名(リモートのファイル名),UTF-8
+ *	@param	dest		受信フォルダ/ファイル名,UTF-8
+ *				NULL
+ *					FileDir 又は ダウンロードフォルダ に元ファイル名でダウンロードされる
+ *				フルパス（フォルダ名）
+ *					指定したフォルダに元ファイル名でダウンロードされる
+ *				相対パス（フォルダ名）
+ *					指定したフォルダ（roaming\teraterm5 からの相対）に元ファイル名でダウンロードされる
+ *				フルパス（ファイル名）
+ *					指定したフォルダに指定したファイル名でダウンロードされる
+ *				相対パス（ファイル名）
+ *					指定したフォルダ（roaming\teraterm5 からの相対）に指定したファイル名でダウンロードされる
+ */
+int SSH_start_scp_receive(PTInstVar pvar, const char *recfile, const char *dest)
 {
-	return SSH_scp_transaction(pvar, filename, NULL, FROMREMOTE);
+	return SSH_scp_transaction(pvar, recfile, dest, FROMREMOTE);
 }
 
 
@@ -4765,7 +4805,7 @@ found:
  * クライアントとサーバ両方がサポートしている物のうち、クライアント側で最も前に指定した物が使われる。
  */
 static int
-choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
+choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, int msg_size)
 {
 	char tmp[1024+512];
 	int mode, r, payload_len;
@@ -4777,9 +4817,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 鍵交換アルゴリズム
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (kex algorithms)", __FUNCTION__);
-		msg = tmp;
 		r = -1;
 		goto error;
 	case GetPayloadTruncate:
@@ -4791,17 +4830,15 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->kex_type = choose_SSH2_kex_algorithm(buf, myproposal[PROPOSAL_KEX_ALGS]);
 	if (pvar->kex->kex_type == KEX_DH_UNKNOWN) {  // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown KEX algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown KEX algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -2;
 		goto error;
 	}
 	kexalg = get_kex_algorithm_by_type(pvar->kex->kex_type);
 	if (kexalg == NULL) {
-		strncpy_s(tmp, sizeof(tmp), "unknown KEX algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown KEX algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -2;
 		goto error;
 	}
@@ -4820,9 +4857,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// ホスト鍵アルゴリズム
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (hostkey algorithms)", __FUNCTION__);
-		msg = tmp;
 		r = -3;
 		goto error;
 	case GetPayloadTruncate:
@@ -4834,9 +4870,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->hostkey_type = choose_SSH2_host_key_algorithm(buf, myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS]);
 	if (pvar->kex->hostkey_type == KEY_ALGO_UNSPEC) {
-		strncpy_s(tmp, sizeof(tmp), "unknown host KEY algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown host KEY algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -4;
 		goto error;
 	}
@@ -4844,9 +4879,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 暗号アルゴリズム(クライアント -> サーバ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (encryption algorithms client to server)", __FUNCTION__);
-		msg = tmp;
 		r = -5;
 		goto error;
 	case GetPayloadTruncate:
@@ -4858,9 +4892,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->ciphers[MODE_OUT] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_CTOS]);
 	if (pvar->kex->ciphers[MODE_OUT] == NULL) {
-		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(client to server): ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown Encrypt algorithm(client to server): ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -6;
 		goto error;
 	}
@@ -4868,9 +4901,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 暗号アルゴリズム(サーバ -> クライアント)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (encryption algorithms server to client)", __FUNCTION__);
-		msg = tmp;
 		r = -7;
 		goto error;
 	case GetPayloadTruncate:
@@ -4882,9 +4914,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->ciphers[MODE_IN] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_STOC]);
 	if (pvar->kex->ciphers[MODE_IN] == NULL) {
-		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(server to client): ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown Encrypt algorithm(server to client): ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -8;
 		goto error;
 	}
@@ -4892,9 +4923,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// MACアルゴリズム(クライアント -> サーバ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (MAC algorithms client to server)", __FUNCTION__);
-		msg = tmp;
 		r = -9;
 		goto error;
 	case GetPayloadTruncate:
@@ -4911,9 +4941,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	else {
 		pvar->kex->macs[MODE_OUT] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_CTOS]);
 		if (pvar->kex->macs[MODE_OUT] == NULL) {  // not match
-			strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
-			strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-			msg = tmp;
+			strncpy_s(msg, msg_size, "unknown MAC algorithm: ", _TRUNCATE);
+			strncat_s(msg, msg_size, buf, _TRUNCATE);
 			r = -10;
 			goto error;
 		}
@@ -4922,9 +4951,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// MACアルゴリズム(サーバ -> クライアント)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (MAC algorithms server to client)", __FUNCTION__);
-		msg = tmp;
 		r = -11;
 		goto error;
 	case GetPayloadTruncate:
@@ -4941,9 +4969,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	else {
 		pvar->kex->macs[MODE_IN] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_STOC]);
 		if (pvar->kex->macs[MODE_IN] == NULL) {	 // not match
-			strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
-			strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-			msg = tmp;
+			strncpy_s(msg, msg_size, "unknown MAC algorithm: ", _TRUNCATE);
+			strncat_s(msg, msg_size, buf, _TRUNCATE);
 			r = -12;
 			goto error;
 		}
@@ -4952,9 +4979,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 圧縮アルゴリズム(クライアント -> サーバ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (compression algorithms client to server)", __FUNCTION__);
-		msg = tmp;
 		r = -13;
 		goto error;
 	case GetPayloadTruncate:
@@ -4966,9 +4992,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->ctos_compression = choose_SSH2_compression_algorithm(buf, myproposal[PROPOSAL_COMP_ALGS_CTOS]);
 	if (pvar->kex->ctos_compression == COMP_UNKNOWN) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown Packet Compression algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown Packet Compression algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -14;
 		goto error;
 	}
@@ -4976,9 +5001,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 圧縮アルゴリズム(サーバ -> クライアント)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (compression algorithms server to client)", __FUNCTION__);
-		msg = tmp;
 		r = -15;
 		goto error;
 	case GetPayloadTruncate:
@@ -4990,9 +5014,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->stoc_compression = choose_SSH2_compression_algorithm(buf, myproposal[PROPOSAL_COMP_ALGS_STOC]);
 	if (pvar->kex->stoc_compression == COMP_UNKNOWN) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown Packet Compression algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown Packet Compression algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -16;
 		goto error;
 	}
@@ -5125,8 +5148,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	char buf[1024];
 	char *data;
 	int len, r;
-	char *msg = NULL;
-	char tmp[1024+512];
+	char msg[1024+512];
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXINIT was received.");
 
@@ -5154,9 +5176,8 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	else {
 		pvar->kex->peer = buffer_init();
 		if (pvar->kex->peer == NULL) {
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+			_snprintf_s(msg, sizeof(msg), _TRUNCATE,
 			            "%s: Out of memory", __FUNCTION__);
-			msg = tmp;
 			goto error;
 		}
 	}
@@ -5166,15 +5187,14 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	// cookie
 	if (! get_bytearray_from_payload(pvar, buf, SSH2_COOKIE_LENGTH)) {
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE,
 		            "%s: truncated packet (cookie)", __FUNCTION__);
-		msg = tmp;
 		goto error;
 	}
 	CRYPT_set_server_cookie(pvar, buf);
 
 	// 使用するアルゴリズムの決定
-	r = choose_SSH2_kex_choose_conf(pvar, buf, sizeof(buf), msg);
+	r = choose_SSH2_kex_choose_conf(pvar, buf, sizeof(buf), msg, sizeof(msg));
 	if (r != 0) {
 		goto error;
 	}
@@ -5200,6 +5220,10 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		case KEX_CURVE25519_SHA256_OLD:
 		case KEX_CURVE25519_SHA256:
 			SSH2_curve25519_kex_init(pvar);
+			break;
+		case KEX_SNTRUP761X25519_SHA512_OLD:
+		case KEX_SNTRUP761X25519_SHA512:
+			SSH2_kem_sntrup761x25519_kex_init(pvar);
 			break;
 		case KEX_MLKEM768X25519_SHA256:
 			SSH2_kem_mlkem768x25519_kex_init(pvar);
@@ -5616,6 +5640,55 @@ error:;
 	buffer_free(msg);
 
 	notify_fatal_error(pvar, "error occurred @ SSH2_curve25519_kex_init()", TRUE);
+}
+
+
+/*
+ * sntrup761x25519 (draft-ietf-sshm-ntruprime-ssh)
+ *   KEX_SNTRUP761X25519_SHA512_OLD or KEX_SNTRUP761X25519_SHA512
+ *
+ * SSH2_MSG_KEX_ECDH_INIT:
+ *   byte    SSH_MSG_KEX_ECDH_INIT (31)
+ *   string  Q_C, client's ephemeral public key octet string
+ */
+
+static void SSH2_kem_sntrup761x25519_kex_init(PTInstVar pvar)
+{
+	buffer_t *msg = NULL;
+	unsigned char *outmsg;
+	int len;
+	kex *kex = pvar->kex;
+
+	if (kex_kem_sntrup761x25519_keypair(kex) != 0)
+		goto error;
+
+	msg = buffer_init();
+	if (msg == NULL) {
+		// TODO: error check
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
+		goto error;
+	}
+
+	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+
+	len = buffer_len(msg);
+	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
+	memcpy(outmsg, buffer_ptr(msg), len);
+	finish_send_packet(pvar);
+
+	SSH2_dispatch_init(pvar, 2);
+	SSH2_dispatch_add_message(SSH2_MSG_KEX_ECDH_REPLY);
+
+	buffer_free(msg);
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_INIT was sent at SSH2_kem_sntrup761x25519_kex_init().");
+
+	return;
+
+error:;
+	buffer_free(msg);
+
+	notify_fatal_error(pvar, "error occurred @ SSH2_kem_sntrup761x25519_kex_init()", TRUE);
 }
 
 
@@ -6422,6 +6495,161 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 }
 
 /*
+ * Key Exchange Method Using Hybrid Streamlined NTRU Prime sntrup761 and X25519 with SHA-512
+ *   Reply (SSH2_MSG_KEX_ECDH_REPLY:31)
+ *
+ * return TRUE: 成功
+ *        FALSE: 失敗
+ */
+static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
+{
+	char *data;
+	int len;
+	int bloblen, pklen, siglen;
+	kex *kex = pvar->kex;
+	Key *server_host_key = NULL;
+	buffer_t *shared_secret = NULL;
+	buffer_t *server_blob = NULL;
+	buffer_t *server_host_key_blob = NULL;
+	char *signature;
+	char hash[SSH_DIGEST_MAX_LENGTH];
+	int hashlen;
+	int r;
+
+	u_char *server_public = NULL;
+	BOOL result = FALSE;
+	char *emsg = NULL, emsg_tmp[1024]; // error message
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
+
+	memset(&server_host_key, 0, sizeof(server_host_key));
+
+	// メッセージタイプの後に続くペイロードの先頭
+	data = pvar->ssh_state.payload;
+	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
+	len = pvar->ssh_state.payloadlen - 1;
+
+	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
+
+	/* K_S, server's public host key */
+	bloblen = get_uint32_MSBfirst(data);
+	data += 4;
+	server_host_key_blob = buffer_init();
+	buffer_append(server_host_key_blob, data, bloblen);
+
+	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob", data, bloblen);
+
+	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob), buffer_len(server_host_key_blob));
+	if (server_host_key == NULL) {
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE, "%s: key_from_blob error", __FUNCTION__);
+		emsg = emsg_tmp;
+		goto out;
+	}
+	data += bloblen;
+
+	// known_hosts対応
+	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
+		            "handle_SSH2_kem_sntrup761x25519_kex_reply",
+		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
+		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
+		            get_ssh2_hostkey_type_name(server_host_key->type));
+		emsg = emsg_tmp;
+		goto out;
+	}
+
+	/* Q_S, server public key */
+	server_public = buffer_get_string(&data, &pklen); // 1039 byte sntrup761 public key + 32 bytes X25519 public key
+	server_blob = buffer_init();
+	buffer_append(server_blob, server_public, pklen);
+
+	/* signed H */
+	siglen = get_uint32_MSBfirst(data);
+	data += 4;
+	signature = data;
+	data += siglen;
+
+	push_memdump("KEX_ECDH_REPLY", "signature", signature, siglen);
+
+	/* calc shared secret K */
+	// 共通鍵の生成
+	// Writing using draft-ietf-sshm-ntruprime-ssh notation:
+	//   Q_S --+-- c   ... sntrup761 ciphertext
+	//         +-- K_B ... x25519 public key
+	//   d_C           ... x25519 private key
+	//   sk_C          ... sntrup761 private key
+	//   (x', y') = d_C * K_B
+	//   k_x25519 = stringify(x')       ... x25519 shared secret
+	//   k_sntrup = Decaps(c, sk_C)     ... sntrup761 shared secret
+	//   K = HASH(k_sntrup || k_x25519) ... hybrid shared secret
+	r = kex_kem_sntrup761x25519_dec(kex, server_blob, &shared_secret);
+	if (r != 0)
+		goto out;
+
+	/* calc and verify H */
+	// ハッシュの計算
+	// verify は ssh2_kex_finish() で行う
+	hashlen = sizeof(hash);
+	r = kex_kem_sntrup761x25519_hash(
+		kex->hash_alg,
+		kex->client_version,
+		kex->server_version,
+		kex->my,
+		kex->peer,
+		server_host_key_blob,
+		kex->client_pub,
+		server_blob,
+		shared_secret,
+		hash, &hashlen);
+	if (r < 0) {
+		goto out;
+	}
+
+	{
+		push_memdump("KEX_ECDH_REPLY kem_sntrup761x25519_kex_reply", "my_kex", buffer_ptr(kex->my), buffer_len(kex->my));
+		push_memdump("KEX_ECDH_REPLY kem_sntrup761x25519_kex_reply", "peer_kex", buffer_ptr(kex->peer), buffer_len(kex->peer));
+
+		push_memdump("KEX_ECDH_REPLY kem_sntrup761x25519_kex_reply", "server_public", server_public, pklen);
+		push_memdump("KEX_ECDH_REPLY kem_sntrup761x25519_kex_reply", "shared_secret", buffer_ptr(shared_secret),
+		             buffer_len(shared_secret));
+
+		push_memdump("KEX_ECDH_REPLY kem_sntrup761x25519_kex_reply", "hash", hash, hashlen);
+	}
+
+	// TTSSHバージョン情報に表示するキービット数を求めておく
+	//   アルゴリズムから曲線サイズ・暗号学的強度が確定するので、ビット数は表示しない
+	kex->client_key_bits = 0;
+	kex->server_key_bits = 0;
+
+	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
+
+	r = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
+	if (r == TRUE) {
+		// ホスト鍵の確認が成功したので、後続の処理を行う
+		SSH_notify_host_OK(pvar);
+		// known_hostsダイアログの呼び出したので、以降、何もしない。
+	}
+
+ out:
+	SecureZeroMemory(hash, sizeof(hash));
+	buffer_free(server_host_key_blob);
+	free(server_public);
+	key_free(server_host_key);
+	SecureZeroMemory(kex->c25519_client_key, sizeof(kex->c25519_client_key));
+	SecureZeroMemory(kex->sntrup761_client_key, sizeof(kex->sntrup761_client_key));
+	buffer_free(server_blob);
+	buffer_free(shared_secret);
+	buffer_free(kex->client_pub);
+	kex->client_pub = NULL;
+
+	if (emsg)
+		notify_fatal_error(pvar, emsg, TRUE);
+
+	return result;
+}
+
+/*
  * PQ/T Hybrid Key Exchange with ML-KEM
  *   Reply (SSH_MSG_KEX_HYBRID_REPLY:31)
  *
@@ -6595,6 +6823,10 @@ static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar)
 		case KEX_CURVE25519_SHA256_OLD:
 		case KEX_CURVE25519_SHA256:
 			handle_SSH2_curve25519_kex_reply(pvar);
+			break;
+		case KEX_SNTRUP761X25519_SHA512_OLD:
+		case KEX_SNTRUP761X25519_SHA512:
+			handle_SSH2_kem_sntrup761x25519_kex_reply(pvar);
 			break;
 		case KEX_MLKEM768X25519_SHA256:
 			handle_SSH2_kem_mlkem768x25519_kex_reply(pvar);

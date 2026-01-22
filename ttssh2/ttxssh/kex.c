@@ -58,6 +58,8 @@ static const ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
 	{KEX_DH_GRP18_SHA512, "diffie-hellman-group18-sha512",      0,                    SSH_DIGEST_SHA512}, // RFC8268
 	{KEX_CURVE25519_SHA256_OLD, "curve25519-sha256@libssh.org", 0,                    SSH_DIGEST_SHA256}, // not RFC8731, PROTOCOL of OpenSSH
 	{KEX_CURVE25519_SHA256,     "curve25519-sha256",            0,                    SSH_DIGEST_SHA256}, // RFC8731
+	{KEX_SNTRUP761X25519_SHA512_OLD, "sntrup761x25519-sha512@openssh.com", 0,         SSH_DIGEST_SHA512}, // draft-ietf-sshm-ntruprime-ssh
+	{KEX_SNTRUP761X25519_SHA512,     "sntrup761x25519-sha512",  0,                    SSH_DIGEST_SHA512}, // draft-ietf-sshm-ntruprime-ssh
 	{KEX_MLKEM768X25519_SHA256, "mlkem768x25519-sha256",        0,                    SSH_DIGEST_SHA256}, // draft-ietf-sshm-mlkem-hybrid-kex
 	{KEX_DH_NONE      , NULL,                                   0,                    SSH_DIGEST_MAX},
 };
@@ -106,6 +108,8 @@ void normalize_kex_order(char *buf)
 {
 	static char default_strings[] = {
 		KEX_MLKEM768X25519_SHA256,
+		KEX_SNTRUP761X25519_SHA512,
+		KEX_SNTRUP761X25519_SHA512_OLD,
 		KEX_CURVE25519_SHA256,
 		KEX_CURVE25519_SHA256_OLD,
 		KEX_ECDH_SHA2_256,
@@ -1148,6 +1152,209 @@ kex_c25519_hash(const digest_algorithm hash_alg,
 	//   「client_pub の最初から最後まで」を buffer_append() する
 	//   先頭にある4バイトの長さからデータの最後までがそのまま格納される
 	// cf. kex_c25519_keypair()
+	buffer_append(b, buffer_ptr(client_pub), buffer_len(client_pub));
+	buffer_put_stringb(b, server_pub);
+	buffer_append(b, buffer_ptr(shared_secret), buffer_len(shared_secret));
+
+	//debug_print(38, buffer_ptr(b), buffer_len(b));
+
+	if (ssh_digest_buffer(hash_alg, b, hash, *hashlen) != 0) {
+		buffer_free(b);
+		return SSH_ERR_LIBCRYPTO_ERROR;
+	}
+	buffer_free(b);
+
+	*hashlen = ssh_digest_bytes(hash_alg);
+	//write_buffer_file(digest, *hashlen);
+
+	return 0;
+}
+
+
+// from OpenSSH 10.2p1 kexsntrup761x25519.c
+volatile crypto_int16 crypto_int16_optblocker = 0;
+volatile crypto_int32 crypto_int32_optblocker = 0;
+volatile crypto_int64 crypto_int64_optblocker = 0;
+
+// from OpenSSH 10.2p1 kexsntrup761x25519.c
+int kex_kem_sntrup761x25519_keypair(kex *kex)
+{
+	buffer_t *buf = NULL;
+	char *cp = NULL;
+	size_t need;
+	int r = 0;
+
+	buf = buffer_init();
+	if (buf == NULL) {
+		r = SSH_ERR_ALLOC_FAIL;
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
+		goto out;
+	}
+
+	// OpenSSH
+	// need = crypto_kem_sntrup761_PUBLICKEYBYTES + CURVE25519_SIZE;
+	// if ((r = sshbuf_reserve(buf, need, &cp)) != 0)
+	//     goto out;
+	// crypto_kem_sntrup761_keypair(cp, kex->sntrup761_client_key);
+	// cp += crypto_kem_sntrup761_PUBLICKEYBYTES;
+	// kexc25519_keygen(kex->c25519_client_key, cp);
+	// 長さ含まない 1158 bytes + 32 bytes を格納する
+	// off をずらす操作がない
+
+	// data format of kex->client_pub
+	//   sntrup761 public key: 1158 bytes
+	//   x25519 public key:    32 bytes
+
+	// TTSSH のバッファには読み込み位置が存在しない
+	//   どの種類でも一律に 4 bytes ずらして読み込めるようにするため、
+	//   sntrup761x25519 のとき、OpenSSH と TTSSH はデータ構造が異なる
+	// data format of kex->client_pub
+	//   len:                  4 bytes    ... length of total data
+	//   sntrup761 public key: 1158 bytes
+	//   x25519 public key:    32 bytes
+
+	need = crypto_kem_sntrup761_PUBLICKEYBYTES + CURVE25519_SIZE;
+	buffer_put_int(buf, need);
+
+	// OpenSSH
+	// if ((r = sshbuf_reserve(buf, need, &cp)) != 0)
+	//   len を確保し、dpp は追加確保された最初の位置になる
+	if (buffer_append_space(buf, need) == NULL) {
+		r = SSH_ERR_ALLOC_FAIL;
+		goto out;
+	}
+	// TTSSH では長さのぶん書き込み位置をずらす
+	cp = buffer_ptr(buf) + 4;
+
+	crypto_kem_sntrup761_keypair(cp, kex->sntrup761_client_key);
+	cp += crypto_kem_sntrup761_PUBLICKEYBYTES;
+	kexc25519_keygen(kex->c25519_client_key, cp);
+	kex->client_pub = buf;
+	buf = NULL;
+out:
+	buffer_free(buf);
+	return r;
+}
+
+// from OpenSSH 10.2p1 kexsntrup761x25519.c
+int
+kex_kem_sntrup761x25519_dec(kex *kex, buffer_t *server_blob,
+    buffer_t **shared_secretp)
+{
+	buffer_t *buf = NULL;
+	u_char *kem_key = NULL;
+	buffer_t *buf2 = NULL;
+	const u_char *ciphertext, *server_pub;
+	u_char hash[SSH_DIGEST_MAX_LENGTH];
+	size_t need;
+	int r, decoded;
+
+	*shared_secretp = NULL;
+
+	need = crypto_kem_sntrup761_CIPHERTEXTBYTES + CURVE25519_SIZE;
+	if (buffer_len(server_blob) != need) {
+		r = SSH_ERR_SIGNATURE_INVALID;
+		goto out;
+	}
+	ciphertext = buffer_ptr(server_blob);
+	server_pub = ciphertext + crypto_kem_sntrup761_CIPHERTEXTBYTES;
+
+	/* hash concatenation of KEM key and ECDH shared key */
+	if ((buf = buffer_init()) == NULL) {
+		r = SSH_ERR_ALLOC_FAIL;
+		goto out;
+	}
+	if ((buf2 = buffer_init()) == NULL) {
+		r = SSH_ERR_ALLOC_FAIL;
+		goto out;
+	}
+
+	// OpenSSH
+	// if ((r = sshbuf_reserve(buf, crypto_kem_sntrup761_BYTES,
+	//     &kem_key)) != 0)
+	//   len を確保し、dpp は追加確保された最初の位置になる
+	if (buffer_append_space(buf, crypto_kem_sntrup761_BYTES) == NULL) {
+		r = SSH_ERR_ALLOC_FAIL;
+		goto out;
+	}
+	kem_key = buffer_ptr(buf);
+	decoded = crypto_kem_sntrup761_dec(kem_key, ciphertext,
+	    kex->sntrup761_client_key);
+
+	// OpenSSH
+	// if ((r = kexc25519_shared_key_ext(kex->c25519_client_key, server_pub,
+	//     buf, 1)) < 0)
+	//   CURVE25519_SIZE を確保し、末尾に追記する
+	if ((r = kexc25519_shared_key_ext(kex->c25519_client_key, server_pub,
+	    buf2, 1)) < 0)
+		goto out;
+	if (buffer_append_space(buf, CURVE25519_SIZE) == NULL) {
+		r = SSH_ERR_ALLOC_FAIL;
+		goto out;
+	}
+	buffer_consume(buf, crypto_kem_sntrup761_BYTES);
+	buffer_append(buf, buffer_ptr(buf2), buffer_len(buf2));
+
+	if ((r = ssh_digest_buffer(kex->hash_alg, buf, hash, sizeof(hash))) != 0)
+		goto out;
+	buffer_clear(buf);
+	buffer_put_string(buf, hash, ssh_digest_bytes(kex->hash_alg));
+	if (decoded != 0) {
+		r = SSH_ERR_SIGNATURE_INVALID;
+		goto out;
+	}
+
+	*shared_secretp = buf;
+	buf = NULL;
+	buf2 = NULL;
+out:
+	SecureZeroMemory(hash, sizeof(hash));
+	buffer_free(buf);
+	buffer_free(buf2);
+	return r;
+}
+
+// hash を計算する (sntrup761x25519用)
+// from OpenSSH 8.0p1 kexgen.c
+int
+kex_kem_sntrup761x25519_hash(const digest_algorithm hash_alg,
+    buffer_t *client_version,
+    buffer_t *server_version,
+    buffer_t *client_kexinit,
+    buffer_t *server_kexinit,
+    buffer_t *serverhostkeyblob,
+    buffer_t *client_pub,
+    buffer_t *server_pub,
+    buffer_t *shared_secret,
+    char *hash, unsigned int *hashlen)
+{
+	buffer_t *b;
+
+	if (*hashlen < ssh_digest_bytes(hash_alg))
+		return SSH_ERR_INVALID_ARGUMENT;
+	b = buffer_init();
+	if (b == NULL)
+		return SSH_ERR_ALLOC_FAIL;
+
+	buffer_put_stringb(b, client_version);
+	buffer_put_stringb(b, server_version);
+
+	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
+	buffer_put_int(b, buffer_len(client_kexinit) + 1);
+	buffer_put_char(b, SSH2_MSG_KEXINIT);
+	buffer_append(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit));
+	buffer_put_int(b, buffer_len(server_kexinit) + 1);
+	buffer_put_char(b, SSH2_MSG_KEXINIT);
+	buffer_append(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit));
+
+	buffer_put_stringb(b, serverhostkeyblob);
+	// OpenSSH:
+	//  off が 0 の sshbuf を sshbuf_put_stringb() する
+	//   「size-off = size（データの長さ）」と「off 以降 = すべてのデータ」が格納される
+	// TTSSH:
+	//   「client_pub の最初から最後まで」を buffer_append() する
+	//   先頭にある4バイトの長さからデータの最後までがそのまま格納される
+	// cf. kex_kem_sntrup761x25519_keypair()
 	buffer_append(b, buffer_ptr(client_pub), buffer_len(client_pub));
 	buffer_put_stringb(b, server_pub);
 	buffer_append(b, buffer_ptr(shared_secret), buffer_len(shared_secret));
