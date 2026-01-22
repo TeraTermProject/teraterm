@@ -28,6 +28,7 @@
 
 #include "ttxssh.h"
 #include "kex.h"
+#include "libcrux_mlkem768_sha3.h"
 #include "ssherr.h"
 #include "openbsd-compat.h"
 
@@ -59,6 +60,7 @@ static const ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
 	{KEX_CURVE25519_SHA256,     "curve25519-sha256",            0,                    SSH_DIGEST_SHA256}, // RFC8731
 	{KEX_SNTRUP761X25519_SHA512_OLD, "sntrup761x25519-sha512@openssh.com", 0,         SSH_DIGEST_SHA512}, // draft-ietf-sshm-ntruprime-ssh
 	{KEX_SNTRUP761X25519_SHA512,     "sntrup761x25519-sha512",  0,                    SSH_DIGEST_SHA512}, // draft-ietf-sshm-ntruprime-ssh
+	{KEX_MLKEM768X25519_SHA256, "mlkem768x25519-sha256",        0,                    SSH_DIGEST_SHA256}, // draft-ietf-sshm-mlkem-hybrid-kex
 	{KEX_DH_NONE      , NULL,                                   0,                    SSH_DIGEST_MAX},
 };
 
@@ -105,6 +107,7 @@ const digest_algorithm get_kex_hash_algorithm(kex_algorithm kextype)
 void normalize_kex_order(char *buf)
 {
 	static char default_strings[] = {
+		KEX_MLKEM768X25519_SHA256,
 		KEX_SNTRUP761X25519_SHA512,
 		KEX_SNTRUP761X25519_SHA512_OLD,
 		KEX_CURVE25519_SHA256,
@@ -1352,6 +1355,219 @@ kex_kem_sntrup761x25519_hash(const digest_algorithm hash_alg,
 	//   「client_pub の最初から最後まで」を buffer_append() する
 	//   先頭にある4バイトの長さからデータの最後までがそのまま格納される
 	// cf. kex_kem_sntrup761x25519_keypair()
+	buffer_append(b, buffer_ptr(client_pub), buffer_len(client_pub));
+	buffer_put_stringb(b, server_pub);
+	buffer_append(b, buffer_ptr(shared_secret), buffer_len(shared_secret));
+
+	//debug_print(38, buffer_ptr(b), buffer_len(b));
+
+	if (ssh_digest_buffer(hash_alg, b, hash, *hashlen) != 0) {
+		buffer_free(b);
+		return SSH_ERR_LIBCRYPTO_ERROR;
+	}
+	buffer_free(b);
+
+	*hashlen = ssh_digest_bytes(hash_alg);
+	//write_buffer_file(digest, *hashlen);
+
+	return 0;
+}
+
+
+// from OpenSSH 10.2p1 kexmlkem768x25519.c
+int kex_kem_mlkem768x25519_keypair(kex *kex)
+{
+	buffer_t *buf = NULL;
+	u_char rnd[LIBCRUX_ML_KEM_KEY_PAIR_PRNG_LEN], *cp = NULL;
+	size_t need;
+	int r = SSH_ERR_INTERNAL_ERROR;
+	struct libcrux_mlkem768_keypair keypair;
+
+	buf = buffer_init();
+	if (buf == NULL) {
+		r = SSH_ERR_ALLOC_FAIL;
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
+		goto out;
+	}
+
+	// OpenSSH
+	// need = crypto_kem_mlkem768_PUBLICKEYBYTES + CURVE25519_SIZE;
+	// if ((r = sshbuf_reserve(buf, need, &cp)) != 0)
+	//     goto out;
+	// (snip)
+	// memcpy(cp, keypair.pk.value, crypto_kem_mlkem768_PUBLICKEYBYTES);
+	// (snip)
+	// cp += crypto_kem_mlkem768_PUBLICKEYBYTES;
+	// kexc25519_keygen(kex->c25519_client_key, cp);
+	// 長さ含まない 1184 bytes + 32 bytes を格納する
+	// off をずらす操作がない
+
+	// data format of kex->client_pub
+	//   mlkem768 public key: 1184 bytes
+	//   x25519 public key:    32 bytes
+
+	// TTSSH のバッファには読み込み位置が存在しない
+	//   どの種類でも一律に 4 bytes ずらして読み込めるようにするため、
+	//   mlkem768x25519 のとき、OpenSSH と TTSSH はデータ構造が異なる
+	// data format of kex->client_pub
+	//   len:                  4 bytes    ... length of total data
+	//   mlkem768 public key: 1184 bytes
+	//   x25519 public key:    32 bytes
+
+	need = crypto_kem_mlkem768_PUBLICKEYBYTES + CURVE25519_SIZE;
+	buffer_put_int(buf, need);
+
+	// OpenSSH
+	// if ((r = sshbuf_reserve(buf, need, &cp)) != 0)
+	//   len を確保し、dpp は追加確保された最初の位置になる
+	if (buffer_append_space(buf, need) == NULL) {
+		r = SSH_ERR_ALLOC_FAIL;
+		goto out;
+	}
+	// TTSSH では長さのぶん書き込み位置をずらす
+	cp = buffer_ptr(buf) + 4;
+
+	arc4random_buf(rnd, sizeof(rnd));
+	keypair = libcrux_ml_kem_mlkem768_portable_generate_key_pair(rnd);
+	memcpy(cp, keypair.pk.value, crypto_kem_mlkem768_PUBLICKEYBYTES);
+	memcpy(kex->mlkem768_client_key, keypair.sk.value,
+	    sizeof(kex->mlkem768_client_key));
+	cp += crypto_kem_mlkem768_PUBLICKEYBYTES;
+	kexc25519_keygen(kex->c25519_client_key, cp);
+
+	/* success */
+	r = 0;
+	kex->client_pub = buf;
+	buf = NULL;
+out:
+	SecureZeroMemory(&keypair, sizeof(keypair));
+	SecureZeroMemory(rnd, sizeof(rnd));
+	buffer_free(buf);
+	return r;
+}
+
+// from OpenSSH 10.2p1 kexmlkem768x25519.c
+int
+kex_kem_mlkem768x25519_dec(kex *kex, buffer_t *server_blob,
+    buffer_t **shared_secretp)
+{
+	buffer_t *buf = NULL;
+	u_char mlkem_key[crypto_kem_mlkem768_BYTES];
+	buffer_t *buf2 = NULL;
+	const u_char *ciphertext, *server_pub;
+	u_char hash[SSH_DIGEST_MAX_LENGTH];
+	size_t need;
+	int r;
+	struct libcrux_mlkem768_sk mlkem_priv;
+	struct libcrux_mlkem768_ciphertext mlkem_ciphertext;
+
+	*shared_secretp = NULL;
+	memset(&mlkem_priv, 0, sizeof(mlkem_priv));
+	memset(&mlkem_ciphertext, 0, sizeof(mlkem_ciphertext));
+
+	need = crypto_kem_mlkem768_CIPHERTEXTBYTES + CURVE25519_SIZE;
+	if (buffer_len(server_blob) != need) {
+		r = SSH_ERR_SIGNATURE_INVALID;
+		goto out;
+	}
+	ciphertext = buffer_ptr(server_blob);
+	server_pub = ciphertext + crypto_kem_mlkem768_CIPHERTEXTBYTES;
+
+	/* hash concatenation of KEM key and ECDH shared key */
+	if ((buf = buffer_init()) == NULL) {
+		r = SSH_ERR_ALLOC_FAIL;
+		goto out;
+	}
+	if ((buf2 = buffer_init()) == NULL) {
+		r = SSH_ERR_ALLOC_FAIL;
+		goto out;
+	}
+	memcpy(mlkem_priv.value, kex->mlkem768_client_key,
+	    sizeof(kex->mlkem768_client_key));
+	memcpy(mlkem_ciphertext.value, ciphertext,
+	    sizeof(mlkem_ciphertext.value));
+	libcrux_ml_kem_mlkem768_portable_decapsulate(&mlkem_priv,
+	    &mlkem_ciphertext, mlkem_key);
+
+	// OpenSSH
+	// if ((r = sshbuf_put(buf, mlkem_key, sizeof(mlkem_key))) != 0)
+	//     goto out;
+	buffer_append(buf, mlkem_key, sizeof(mlkem_key));
+
+	// OpenSSH
+	// if ((r = kexc25519_shared_key_ext(kex->c25519_client_key, server_pub,
+	//     buf, 1)) < 0)
+	//   CURVE25519_SIZE を確保し、末尾に追記する
+	if ((r = kexc25519_shared_key_ext(kex->c25519_client_key, server_pub,
+	    buf2, 1)) < 0)
+		goto out;
+	if (buffer_append_space(buf, CURVE25519_SIZE) == NULL) {
+		r = SSH_ERR_ALLOC_FAIL;
+		goto out;
+	}
+	buffer_append(buf, buffer_ptr(buf2), buffer_len(buf2));
+
+	if ((r = ssh_digest_buffer(kex->hash_alg, buf, hash, sizeof(hash))) != 0)
+		goto out;
+	buffer_clear(buf);
+	buffer_put_string(buf, hash, ssh_digest_bytes(kex->hash_alg));
+
+	/* success */
+	r = 0;
+	*shared_secretp = buf;
+	buf = NULL;
+	buf2 = NULL;
+out:
+	SecureZeroMemory(hash, sizeof(hash));
+	SecureZeroMemory(&mlkem_priv, sizeof(mlkem_priv));
+	SecureZeroMemory(&mlkem_ciphertext, sizeof(mlkem_ciphertext));
+	SecureZeroMemory(mlkem_key, sizeof(mlkem_key));
+	buffer_free(buf);
+	buffer_free(buf2);
+	return r;
+}
+
+// hash を計算する (mlkem768x25519用)
+// from OpenSSH 8.0p1 kexgen.c
+int
+kex_kem_mlkem768x25519_hash(const digest_algorithm hash_alg,
+    buffer_t *client_version,
+    buffer_t *server_version,
+    buffer_t *client_kexinit,
+    buffer_t *server_kexinit,
+    buffer_t *serverhostkeyblob,
+    buffer_t *client_pub,
+    buffer_t *server_pub,
+    buffer_t *shared_secret,
+    char *hash, unsigned int *hashlen)
+{
+	buffer_t *b;
+
+	if (*hashlen < ssh_digest_bytes(hash_alg))
+		return SSH_ERR_INVALID_ARGUMENT;
+	b = buffer_init();
+	if (b == NULL)
+		return SSH_ERR_ALLOC_FAIL;
+
+	buffer_put_stringb(b, client_version);
+	buffer_put_stringb(b, server_version);
+
+	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
+	buffer_put_int(b, buffer_len(client_kexinit) + 1);
+	buffer_put_char(b, SSH2_MSG_KEXINIT);
+	buffer_append(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit));
+	buffer_put_int(b, buffer_len(server_kexinit) + 1);
+	buffer_put_char(b, SSH2_MSG_KEXINIT);
+	buffer_append(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit));
+
+	buffer_put_stringb(b, serverhostkeyblob);
+	// OpenSSH:
+	//  off が 0 の sshbuf を sshbuf_put_stringb() する
+	//   「size-off = size（データの長さ）」と「off 以降 = すべてのデータ」が格納される
+	// TTSSH:
+	//   「client_pub の最初から最後まで」を buffer_append() する
+	//   先頭にある4バイトの長さからデータの最後までがそのまま格納される
+	// cf. kex_kem_mlkem768x25519_keypair()
 	buffer_append(b, buffer_ptr(client_pub), buffer_len(client_pub));
 	buffer_put_stringb(b, server_pub);
 	buffer_append(b, buffer_ptr(shared_secret), buffer_len(shared_secret));

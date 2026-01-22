@@ -1221,6 +1221,10 @@ void CRYPT_get_kex_param_info(PTInstVar pvar, char *dest, int len)
 				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
 				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg);
 				break;
+			// mlkem768x25519
+			case KEX_MLKEM768X25519_SHA256:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_MLKEM768X25519", pvar,
+				                    "Curve25519 (255-bit) elliptic curve, ML-KEM-768 (768-dimensional lattice)");
 		}
 	}
 }

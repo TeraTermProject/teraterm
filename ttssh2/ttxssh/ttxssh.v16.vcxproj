@@ -447,6 +447,7 @@
     <ClInclude Include="key.h" />
     <ClInclude Include="keyfiles.h" />
     <ClInclude Include="keyfiles-putty.h" />
+    <ClInclude Include="libcrux_mlkem768_sha3.h" />
     <ClInclude Include="mac.h" />
     <ClInclude Include="openbsd-compat.h" />
     <ClInclude Include="pkt.h" />

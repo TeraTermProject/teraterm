@@ -123,6 +123,7 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar);
 static void SSH2_ecdh_kex_init(PTInstVar pvar);
 static void SSH2_curve25519_kex_init(PTInstVar pvar);
 static void SSH2_kem_sntrup761x25519_kex_init(PTInstVar pvar);
+static void SSH2_kem_mlkem768x25519_kex_init(PTInstVar pvar);
 static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar);
 static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar);
 static BOOL handle_SSH2_newkeys(PTInstVar pvar);
@@ -5224,6 +5225,9 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		case KEX_SNTRUP761X25519_SHA512:
 			SSH2_kem_sntrup761x25519_kex_init(pvar);
 			break;
+		case KEX_MLKEM768X25519_SHA256:
+			SSH2_kem_mlkem768x25519_kex_init(pvar);
+			break;
 		default:
 			// TODO
 			break;
@@ -5685,6 +5689,54 @@ error:;
 	buffer_free(msg);
 
 	notify_fatal_error(pvar, "error occurred @ SSH2_kem_sntrup761x25519_kex_init()", TRUE);
+}
+
+
+/*
+ * mlkem761x25519 (draft-ietf-sshm-mlkem-hybrid-kex)
+ *   KEX_MLKEM768X25519_SHA256
+ *
+ * SSH_MSG_KEX_HYBRID_INIT:
+ *   byte    SSH_MSG_KEX_HYBRID_INIT (31)
+ *   string  Q_C, client's ephemeral public key octet string
+ */
+static void SSH2_kem_mlkem768x25519_kex_init(PTInstVar pvar)
+{
+	buffer_t *msg = NULL;
+	unsigned char *outmsg;
+	int len;
+	kex *kex = pvar->kex;
+
+	if (kex_kem_mlkem768x25519_keypair(kex) != 0)
+		goto error;
+
+	msg = buffer_init();
+	if (msg == NULL) {
+		// TODO: error check
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
+		goto error;
+	}
+
+	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+
+	len = buffer_len(msg);
+	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
+	memcpy(outmsg, buffer_ptr(msg), len);
+	finish_send_packet(pvar);
+
+	SSH2_dispatch_init(pvar, 2);
+	SSH2_dispatch_add_message(SSH2_MSG_KEX_ECDH_REPLY);
+
+	buffer_free(msg);
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_HYBRID_INIT was sent at SSH2_kem_mlkem768x25519_kex_init().");
+
+	return;
+
+error:;
+	buffer_free(msg);
+
+	notify_fatal_error(pvar, "error occurred @ SSH2_kem_mlkem761x25519_kex_init()", TRUE);
 }
 
 
@@ -6442,7 +6494,6 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	return result;
 }
 
-
 /*
  * Key Exchange Method Using Hybrid Streamlined NTRU Prime sntrup761 and X25519 with SHA-512
  *   Reply (SSH2_MSG_KEX_ECDH_REPLY:31)
@@ -6598,6 +6649,156 @@ static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
 	return result;
 }
 
+/*
+ * PQ/T Hybrid Key Exchange with ML-KEM
+ *   Reply (SSH_MSG_KEX_HYBRID_REPLY:31)
+ *
+ * return TRUE: 成功
+ *        FALSE: 失敗
+ */
+static BOOL handle_SSH2_kem_mlkem768x25519_kex_reply(PTInstVar pvar)
+{
+	char *data;
+	int len;
+	int bloblen, pklen, siglen;
+	kex *kex = pvar->kex;
+	Key *server_host_key = NULL;
+	buffer_t *shared_secret = NULL;
+	buffer_t *server_blob = NULL;
+	buffer_t *server_host_key_blob = NULL;
+	char *signature;
+	char hash[SSH_DIGEST_MAX_LENGTH];
+	int hashlen;
+	int r;
+
+	u_char *server_public = NULL;
+	BOOL result = FALSE;
+	char *emsg = NULL, emsg_tmp[1024]; // error message
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_HYBRID_REPLY was received.");
+
+	memset(&server_host_key, 0, sizeof(server_host_key));
+
+	// メッセージタイプの後に続くペイロードの先頭
+	data = pvar->ssh_state.payload;
+	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
+	len = pvar->ssh_state.payloadlen - 1;
+
+	push_memdump("KEX_HYBRID_REPLY", "key exchange: receiving", data, len);
+
+	/* K_S, server's public host key */
+	bloblen = get_uint32_MSBfirst(data);
+	data += 4;
+	server_host_key_blob = buffer_init();
+	buffer_append(server_host_key_blob, data, bloblen);
+
+	push_memdump("KEX_HYBRID_REPLY", "server_host_key_blob", data, bloblen);
+
+	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob), buffer_len(server_host_key_blob));
+	if (server_host_key == NULL) {
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE, "%s: key_from_blob error", __FUNCTION__);
+		emsg = emsg_tmp;
+		goto out;
+	}
+	data += bloblen;
+
+	// known_hosts対応
+	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
+		            "handle_SSH2_kem_mlkem768x25519_kex_reply",
+		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
+		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
+		            get_ssh2_hostkey_type_name(server_host_key->type));
+		emsg = emsg_tmp;
+		goto out;
+	}
+
+	/* S_REPLY, server public key */
+	server_public = buffer_get_string(&data, &pklen); // 1088 byte mlkem768 public key + 32 bytes X25519 public key
+	server_blob = buffer_init();
+	buffer_append(server_blob, server_public, pklen);
+
+	/* signed H */
+	siglen = get_uint32_MSBfirst(data);
+	data += 4;
+	signature = data;
+	data += siglen;
+
+	push_memdump("KEX_HYBRID_REPLY", "signature", signature, siglen);
+
+	/* calc shared secret K */
+	// 共通鍵の生成
+	// Writing using draft-ietf-sshm-mlkem-hybrid-kex notation:
+	//   S_REPLY --+-- S_CT2 ... mlkem768 ciphertext
+	//             +-- S_PK1 ... x25519 public key
+	//   d_C                 ... x25519 private key
+	//   sk_C                ... mlkem768 private key
+	//   (x', y') = d_C * S_PK1
+	//   K_CL = stringify(x')       ... x25519 shared secret
+	//   K_PQ = Decaps(S_CT2, sk_C) ... mlkem768 shared secret
+	//   K = HASH(K_PQ || K_CL)     ... hybrid shared secret
+	r = kex_kem_mlkem768x25519_dec(kex, server_blob, &shared_secret);
+	if (r != 0)
+		goto out;
+
+	/* calc and verify H */
+	// ハッシュの計算
+	// verify は ssh2_kex_finish() で行う
+	hashlen = sizeof(hash);
+	r = kex_kem_mlkem768x25519_hash(
+		kex->hash_alg,
+		kex->client_version,
+		kex->server_version,
+		kex->my,
+		kex->peer,
+		server_host_key_blob,
+		kex->client_pub,
+		server_blob,
+		shared_secret,
+		hash, &hashlen);
+	if (r < 0) {
+		goto out;
+	}
+
+	{
+		push_memdump("KEX_HYBRID_REPLY kem_mlkem768x25519_kex_reply", "my_kex", buffer_ptr(kex->my), buffer_len(kex->my));
+		push_memdump("KEX_HYBRID_REPLY kem_mlkem768x25519_kex_reply", "peer_kex", buffer_ptr(kex->peer), buffer_len(kex->peer));
+
+		push_memdump("KEX_HYBRID_REPLY kem_mlkem768x25519_kex_reply", "server_public", server_public, pklen);
+		push_memdump("KEX_HYBRID_REPLY kem_mlkem768x25519_kex_reply", "shared_secret", buffer_ptr(shared_secret),
+		             buffer_len(shared_secret));
+
+		push_memdump("KEX_HYBRID_REPLY kem_mlkem768x25519_kex_reply", "hash", hash, hashlen);
+	}
+
+	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
+
+	r = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
+	if (r == TRUE) {
+		// ホスト鍵の確認が成功したので、後続の処理を行う
+		SSH_notify_host_OK(pvar);
+		// known_hostsダイアログの呼び出したので、以降、何もしない。
+	}
+
+ out:
+	SecureZeroMemory(hash, sizeof(hash));
+	buffer_free(server_host_key_blob);
+	free(server_public);
+	key_free(server_host_key);
+	SecureZeroMemory(kex->c25519_client_key, sizeof(kex->c25519_client_key));
+	SecureZeroMemory(kex->mlkem768_client_key, sizeof(kex->mlkem768_client_key));
+	buffer_free(server_blob);
+	buffer_free(shared_secret);
+	buffer_free(kex->client_pub);
+	kex->client_pub = NULL;
+
+	if (emsg)
+		notify_fatal_error(pvar, emsg, TRUE);
+
+	return result;
+}
+
 
 // KEXにおいてサーバから返ってくる 31 番メッセージに対するハンドラ
 static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar)
@@ -6626,6 +6827,9 @@ static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar)
 		case KEX_SNTRUP761X25519_SHA512_OLD:
 		case KEX_SNTRUP761X25519_SHA512:
 			handle_SSH2_kem_sntrup761x25519_kex_reply(pvar);
+			break;
+		case KEX_MLKEM768X25519_SHA256:
+			handle_SSH2_kem_mlkem768x25519_kex_reply(pvar);
 			break;
 		default:
 			// TODO

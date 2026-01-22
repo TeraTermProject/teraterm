@@ -99,6 +99,11 @@ int	crypto_kem_sntrup761_dec(unsigned char *k,
     const unsigned char *cstr, const unsigned char *sk);
 int	crypto_kem_sntrup761_keypair(unsigned char *pk, unsigned char *sk);
 
+#define crypto_kem_mlkem768_PUBLICKEYBYTES 1184
+#define crypto_kem_mlkem768_SECRETKEYBYTES 2400
+#define crypto_kem_mlkem768_CIPHERTEXTBYTES 1088
+#define crypto_kem_mlkem768_BYTES 32
+
 
 int	bcrypt_pbkdf(const char *, size_t, const u_int8_t *, size_t,
     u_int8_t *, size_t, unsigned int);

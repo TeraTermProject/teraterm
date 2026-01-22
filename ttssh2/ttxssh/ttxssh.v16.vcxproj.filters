@@ -210,6 +210,9 @@
     <ClInclude Include="keyfiles-putty.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="libcrux_mlkem768_sha3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="mac.h">
       <Filter>Header Files</Filter>
     </ClInclude>
