@@ -2002,6 +2002,8 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (ts->UnicodeEmojiWidth < 1 || 2 < ts->UnicodeEmojiWidth) {
 		ts->UnicodeEmojiWidth = GetDefaultUnicodeWidth();
 	}
+	ts->UnicodeOverrideCharWidth = (BYTE)GetOnOff(Section, "UnicodeOverrideCharWidth", FName, FALSE);
+
 	DispEnableResizedFont(GetOnOff(Section, "DrawingResizedFont", FName, TRUE));
 
 	DispReadIni(FName, ts);
@@ -3310,6 +3312,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteInt(Section, "UnicodeAmbiguousWidth", FName, ts->UnicodeAmbiguousWidth);
 	WriteOnOff(Section, "UnicodeEmojiOverride", FName, ts->UnicodeEmojiOverride);
 	WriteInt(Section, "UnicodeEmojiWidth", FName, ts->UnicodeEmojiWidth);
+	WriteOnOff(Section, "UnicodeOverrideCharWidth", FName, ts->UnicodeOverrideCharWidth);
 
 	WriteOnOff(Section, "DrawingResizedFont", FName, DispIsResizedFont());
 

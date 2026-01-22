@@ -75,8 +75,10 @@ static void ArrenageItems(HWND hWnd)
 		IDC_TERMKOUTTEXT,
 		IDC_TERMKOUT,
 		IDC_TERMKANA,
+		IDC_JIS_RECEIVE_TITLE,
 	};
 	static const int JJISSendItems[] = {
+		IDC_JIS_TRANSMIT_TITLE,
 		IDC_TERMKANASEND,
 	};
 	static const int UnicodeItems[] = {
@@ -84,6 +86,7 @@ static void ArrenageItems(HWND hWnd)
 		IDC_AMBIGUOUS_WIDTH_COMBO,
 		IDC_EMOJI_WIDTH_CHECK,
 		IDC_EMOJI_WIDTH_COMBO,
+		IDC_OVERRIDE_CHAR_WIDTH,
 	};
 
 	// 受信コード
@@ -113,10 +116,12 @@ static void ArrenageItems(HWND hWnd)
 		SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
 		CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_CHECKED);
 		SendDlgItemMessage(hWnd, IDC_EMOJI_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
+		//CheckDlgButton(hWnd, IDC_OVERRIDE_CHAR_WIDTH, BST_UNCHECKED);
 	}
 	else {
 		CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_UNCHECKED);
 		SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 0, 0);
+		//CheckDlgButton(hWnd, IDC_OVERRIDE_CHAR_WIDTH, BST_UNCHECKED);
 	}
 
 	if (coding_receive == IdJIS) {
@@ -264,6 +269,8 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			}
 
 			// 文字ごとの文字幅オーバーライド設定を使う
+			CheckDlgButton(hWnd, IDC_OVERRIDE_CHAR_WIDTH,
+						   ts->UnicodeOverrideCharWidth != 0 ? BST_CHECKED : BST_UNCHECKED);
 			EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH),
 						 UnicodeOverrideWidthAvailable() == 0 ? FALSE : TRUE);
 
@@ -369,6 +376,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ts->UnicodeAmbiguousWidth = (BYTE)GetCurSel(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO);
 					ts->UnicodeEmojiOverride = (BYTE)IsDlgButtonChecked(hWnd, IDC_EMOJI_WIDTH_CHECK);
 					ts->UnicodeEmojiWidth = (BYTE)GetCurSel(hWnd, IDC_EMOJI_WIDTH_COMBO);
+					ts->UnicodeOverrideCharWidth = (BYTE)IsDlgButtonChecked(hWnd, IDC_OVERRIDE_CHAR_WIDTH);
 
 					// DEC Special Graphics
 					ts->Dec2Unicode =

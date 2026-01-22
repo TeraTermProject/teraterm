@@ -26,8 +26,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
 #include <assert.h>
 
 #include "unicode.h"
@@ -762,30 +764,36 @@ int UnicodeOverrideWidthInit(const wchar_t *ini, const wchar_t *section)
 		int r = 0;
 		r = swscanf(value, L"U+%x , U+%x , %d", &start, &end, &width);
 		if (r == 3) {
-			UnicodeWidthList_t item;
-			item.start = start;
-			item.end = end;
-			item.width = width;
-
 			if (width == 1 || width == 2) {
-				p = (UnicodeWidthList_t *)realloc(p, sizeof(UnicodeWidthList_t) * (c + 1));
-				p[c] = item;
-				c++;
+				UnicodeWidthList_t *p2 = (UnicodeWidthList_t *)realloc(p, sizeof(UnicodeWidthList_t) * (c + 1));
+				if (p2 != NULL) {
+					UnicodeWidthList_t item;
+					item.start = start;
+					item.end = end;
+					item.width = width;
+
+					p = p2;
+					p[c] = item;
+					c++;
+				}
 			}
 			free(value);
 			continue;
 		}
 		r = swscanf(value, L"U+%x , %d", &start, &width);
 		if (r == 2) {
-			UnicodeWidthList_t item;
-			item.start = start;
-			item.end = start;
-			item.width = width;
-
 			if (width == 1 || width == 2) {
-				p = (UnicodeWidthList_t *)realloc(p, sizeof(UnicodeWidthList_t) * (c + 1));
-				p[c] = item;
-				c++;
+				UnicodeWidthList_t *p2 = (UnicodeWidthList_t *)realloc(p, sizeof(UnicodeWidthList_t) * (c + 1));
+				if (p2 != NULL) {
+					UnicodeWidthList_t item;
+					item.start = start;
+					item.end = start;
+					item.width = width;
+
+					p = p2;
+					p[c] = item;
+					c++;
+				}
 			}
 			free(value);
 			continue;
@@ -807,10 +815,18 @@ void UnicodeOverrideWidthUninit(void)
 	}
 }
 
+/**
+ *	文字幅Overrideする?
+ *
+ *	@param		u32		コードポイント
+ *	@param[out]	width	文字幅(セル数) 1 or 2
+ *	@retval		TRUE	u32はOverrideする
+ *	@retval		FALSE	u32はOverrideしない
+ */
 int UnicodeOverrideWidthCheck(unsigned int u32, int *width)
 {
 	if (unicode_width_list_count == 0) {
-		UnicodeOverrideWidthInit(NULL, NULL);
+		*width = 0;
 		return 0;
 	}
 	const UnicodeWidthList_t *p = unicode_width_list_ptr;

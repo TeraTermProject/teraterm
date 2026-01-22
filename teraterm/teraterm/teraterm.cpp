@@ -60,6 +60,7 @@
 #include "ttgdiplus.h"
 #endif
 #include "directx.h"
+#include "unicode.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -489,6 +490,7 @@ exit_message_loop:
 	TSpecialFont = NULL;
 	UnloadSpecialFont();
 	DLLExit();
+	UnicodeOverrideWidthUninit();
 
     return (int)msg.wParam;
 }

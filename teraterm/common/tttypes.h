@@ -613,6 +613,7 @@ struct tttset {
 	int ReceivefileAutoStopWaitTime;
 	int FlowCtrlRTS;
 	int FlowCtrlDTR;
+	BYTE UnicodeOverrideCharWidth;	// 0/1=overrideしない/する(文字幅Override設定存在時)
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;

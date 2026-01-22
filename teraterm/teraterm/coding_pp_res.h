@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ „ÅßÁîüÊàê„Åï„Çå„Åü„Ç§„É≥„ÇØ„É´„Éº„Éâ „Éï„Ç°„Ç§„É´„ÄÇ
-// coding_pp.rc „Åß‰ΩøÁî®
+// Microsoft Visual C++ Ç≈ê∂ê¨Ç≥ÇÍÇΩÉCÉìÉNÉãÅ[Éh ÉtÉ@ÉCÉãÅB
+// coding_pp.rc Ç≈égóp
 //
 #define IDC_TERMKANJI                   100
 #define IDC_TERMKANA                    101
@@ -25,15 +25,17 @@
 #define IDC_DEC2UNICODE_MIDDLEDOT       2615
 #define IDC_AMBIGUOUS_WIDTH_TITLE       2616
 #define IDC_OVERRIDE_CHAR_WIDTH         2617
+#define IDC_JIS_RECEIVE_TITLE           2618
+#define IDC_JIS_TRANSMIT_TITLE          2619
 
 // Next default values for new objects
-//
+// 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        115
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2618
+#define _APS_NEXT_CONTROL_VALUE         2620
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
