@@ -4875,7 +4875,7 @@ void CVTWindow::OnControlResetRemoteTitle()
 
 void CVTWindow::OnControlAreYouThere()
 {
-	if (cv.Ready && (cv.PortType==IdTCPIP)) {
+	if (cv.Ready && (cv.PortType==IdTCPIP) && cv.TelFlag) {
 		TelSendAYT();
 	}
 }
