@@ -1,6 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include "ttxkanjimenu.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -117,8 +118,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,10,0,0
- PRODUCTVERSION 1,10,0,0
+ FILEVERSION TTXKANJIMENU_VERSION_MAJOR,TTXKANJIMENU_VERSION_MINOR,TTXKANJIMENU_VERSION_PATCH,0
+ PRODUCTVERSION TTXKANJIMENU_VERSION_MAJOR,TTXKANJIMENU_VERSION_MINOR,TTXKANJIMENU_VERSION_PATCH,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -134,12 +135,12 @@ BEGIN
         BLOCK "041104b0"
         BEGIN
             VALUE "FileDescription", "TTX KanjiMenu Plug-in"
-            VALUE "FileVersion", "1, 10, 0, 0"
+            VALUE "FileVersion", TTXKANJIMENU_RES_VERSION_STR
             VALUE "InternalName", "ttxkanjimenu"
-            VALUE "LegalCopyright", "Copyright (C) 2007 Sunao HARA, (C) 2007-2025 TeraTerm Project"
+            VALUE "LegalCopyright", "Copyright (C) 2007 Sunao HARA, (C) 2007-2026 TeraTerm Project"
             VALUE "OriginalFilename", "ttxkanjimenu.dll"
             VALUE "ProductName", "TTX KanjiMenu Plug-in"
-            VALUE "ProductVersion", "1.10 dev 1f4001ca1"
+            VALUE "ProductVersion", TTXKANJIMENU_RES_PRODUCT_VERSION_STR
         END
     END
     BLOCK "VarFileInfo"
