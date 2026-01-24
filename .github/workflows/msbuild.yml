@@ -357,6 +357,7 @@ jobs:
           rem for release build
           call installer\release.bat 12
         )
+        echo msbuild.yml step "Build" errorlevel=%errorlevel%
         if errorlevel 1 exit /b 1
 
     - name: Clean up files before caching
