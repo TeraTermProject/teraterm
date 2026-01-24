@@ -27,7 +27,7 @@
  */
 
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__MINGW32__)
 
 // endian.h
 #define htole64(x) ((uint64_t)(x))
