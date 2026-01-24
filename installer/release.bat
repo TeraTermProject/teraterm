@@ -149,8 +149,7 @@ if "%RELEASE%" == "1" (
 )
 if ERRORLEVEL 1 (
     echo ERROR call build_common.bat
-    endlocal
-    exit /b 1
+    goto :fail
 )
 if "%RELEASE%" == "1" (
     call build_arch.bat rebuild
@@ -161,20 +160,17 @@ if "%RELEASE%" == "1" (
 )
 if ERRORLEVEL 1 (
     echo ERROR call build_arch.bat
-    endlocal
-    exit /b 1
+    goto :fail
 )
 call collect_files.bat
 if ERRORLEVEL 1 (
     echo ERROR call collect_files.bat
-    endlocal
-    exit /b 1
+    goto :fail
 )
 call create_package.bat
 if ERRORLEVEL 1 (
     echo ERROR call create_package.bat
-    endlocal
-    exit /b 1
+    goto :fail
 )
 
 endlocal
@@ -198,8 +194,7 @@ if "%RELEASE%" == "1" (
 )
 if ERRORLEVEL 1 (
     echo ERROR call build_common.bat
-    endlocal
-    exit /b 1
+    goto :fail
 )
 
 endlocal
@@ -216,8 +211,7 @@ call ..\buildtools\svnrev\sourcetree_info.bat
 
 if ERRORLEVEL 1 (
     echo ERROR call build_common.ba
-    endlocal
-    exit /b 1
+    goto :fail
 )
 if "%RELEASE%" == "1" (
     call build_arch.bat rebuild
@@ -228,20 +222,17 @@ if "%RELEASE%" == "1" (
 )
 if ERRORLEVEL 1 (
     echo ERROR call build_arch.bat
-    endlocal
-    exit /b 1
+    goto :fail
 )
 call collect_files.bat
 if ERRORLEVEL 1 (
     echo ERROR call collect_files.bat
-    endlocal
-    exit /b 1
+    goto :fail
 )
 call create_package.bat
 if ERRORLEVEL 1 (
     echo ERROR call create_package.bat
-    endlocal
-    exit /b 1
+    goto :fail
 )
 
 endlocal
@@ -453,5 +444,9 @@ echo INNO_SETUP=%INNO_SETUP%
 
 echo PATH
 echo %PATH%
-
 exit /b 0
+
+rem ####################
+:fail
+endlocal
+exit /b 1
