@@ -65,8 +65,6 @@ jobs:
 
     - name: Download
       shell: cmd
-      env:
-        RELEASE: ${{ steps.vars.outputs.RELEASE }}
       run: |
         chcp 932
         call installer\release.bat 10
@@ -174,13 +172,18 @@ jobs:
         echo "RELEASE=${RELEASE}"
 
     - name: Build
+      if: ${{ steps.vars.outputs.RELEASE == '0' }}
       shell: cmd
-      env:
-        RELEASE: ${{ steps.vars.outputs.RELEASE }}
       run: |
         chcp 932
-        if "%RELEASE%"=="0" call installer\release.bat 13 || exit /b 1
-        if not "%RELEASE%"=="0" call installer\release.bat 11 || exit /b 1
+        call installer\release.bat 13
+
+    - name: Build (rebuild)
+      if: ${{ steps.vars.outputs.RELEASE != '0' }}
+      shell: cmd
+      run: |
+        chcp 932
+        call installer\release.bat 11
 
     - name: Upload to artifacts (teraterm_common)
       uses: actions/upload-artifact@v4
@@ -340,13 +343,18 @@ jobs:
         echo "OUTPUT=${OUTPUT}"
 
     - name: Build
+      if: ${{ steps.vars.outputs.RELEASE == '0' }}
       shell: cmd
-      env:
-        RELEASE: ${{ steps.vars.outputs.RELEASE }}
       run: |
         chcp 932
-        if "%RELEASE%"=="0" call installer\release.bat 14 || exit /b 1
-        if not "%RELEASE%"=="0" call installer\release.bat 12 || exit /b 1
+        call installer\release.bat 14
+
+    - name: Build (rebuild)
+      if: ${{ steps.vars.outputs.RELEASE != '0' }}
+      shell: cmd
+      run: |
+        chcp 932
+        call installer\release.bat 12
 
     - name: Clean up files before caching
       run: |

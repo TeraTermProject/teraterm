@@ -1,7 +1,3 @@
-echo ERROR for debug
-exit /b 1
-
-
 @echo off
 setlocal
 set CUR=%~dp0
