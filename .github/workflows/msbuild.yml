@@ -180,11 +180,14 @@ jobs:
       run: |
         chcp 932
         if "%RELEASE%"=="0" (
-          call installer\release.bat 13 || exit /b 1
+          call installer\release.bat 13
+          set ret=%errorlevel%
         ) else (
           rem for release build
-          call installer\release.bat 11 || exit /b 1
+          call installer\release.bat 11
+          set ret=%errorlevel%
         )
+        if %ret% neq 0 exit /b 1
 
     - name: Upload to artifacts (teraterm_common)
       uses: actions/upload-artifact@v4
