@@ -179,15 +179,14 @@ jobs:
         RELEASE: ${{ steps.vars.outputs.RELEASE }}
       run: |
         chcp 932
+        setlocal enabledelayedexpansion
         if "%RELEASE%"=="0" (
           call installer\release.bat 13
-          set ret=%errorlevel%
         ) else (
           rem for release build
           call installer\release.bat 11
-          set ret=%errorlevel%
         )
-        if %ret% neq 0 exit /b 1
+        if !errorlevel! neq 0 exit /b 1
 
     - name: Upload to artifacts (teraterm_common)
       uses: actions/upload-artifact@v4
