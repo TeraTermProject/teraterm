@@ -69,7 +69,7 @@ jobs:
         RELEASE: ${{ steps.vars.outputs.RELEASE }}
       run: |
         chcp 932
-        call installer\release.bat 10 || exit /b 1
+        call installer\release.bat 10
 
     - name: Save cache files (buildtools)
       id: cache-buildtools-save
