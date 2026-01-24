@@ -95,6 +95,9 @@ if "%no%" == "13" (
 )
 
 if "%no%" == "14" (
+    echo ERROR for debug
+    endlocal
+    exit /b 1
     call :download_libs
     call :build_libs
     call :build_teraterm_2
