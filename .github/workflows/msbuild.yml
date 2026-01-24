@@ -69,8 +69,7 @@ jobs:
         RELEASE: ${{ steps.vars.outputs.RELEASE }}
       run: |
         chcp 932
-        call installer\release.bat 10
-        if errorlevel 1 exit /b 1
+        call installer\release.bat 10 || exit /b 1
 
     - name: Save cache files (buildtools)
       id: cache-buildtools-save
@@ -181,12 +180,11 @@ jobs:
       run: |
         chcp 932
         if "%RELEASE%"=="0" (
-          call installer\release.bat 13
+          call installer\release.bat 13 || exit /b 1
         ) else (
-          call rem for release build
-          installer\release.bat 11
+          rem for release build
+          call installer\release.bat 11 || exit /b 1
         )
-        if errorlevel 1 exit /b 1
 
     - name: Upload to artifacts (teraterm_common)
       uses: actions/upload-artifact@v4
@@ -352,13 +350,11 @@ jobs:
       run: |
         chcp 932
         if "%RELEASE%"=="0" (
-          call installer\release.bat 14
+          call installer\release.bat 14 || exit /b 1
         ) else (
           rem for release build
-          call installer\release.bat 12
+          call installer\release.bat 12 || exit /b 1
         )
-        echo msbuild.yml step "Build" errorlevel=%errorlevel%
-        if errorlevel 1 exit /b 1
 
     - name: Clean up files before caching
       run: |
