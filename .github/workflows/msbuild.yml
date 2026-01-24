@@ -67,7 +67,7 @@ jobs:
       shell: cmd
       run: |
         chcp 932
-        call installer\release.bat 10
+        call installer\release.bat 10 || exit /b 1
 
     - name: Save cache files (buildtools)
       id: cache-buildtools-save
@@ -176,14 +176,14 @@ jobs:
       shell: cmd
       run: |
         chcp 932
-        call installer\release.bat 13
+        call installer\release.bat 13 || exit /b 1
 
     - name: Build (rebuild)
       if: ${{ steps.vars.outputs.RELEASE != '0' }}
       shell: cmd
       run: |
         chcp 932
-        call installer\release.bat 11
+        call installer\release.bat 11 || exit /b 1
 
     - name: Upload to artifacts (teraterm_common)
       uses: actions/upload-artifact@v4
@@ -347,14 +347,14 @@ jobs:
       shell: cmd
       run: |
         chcp 932
-        call installer\release.bat 14
+        call installer\release.bat 14 || exit /b 1
 
     - name: Build (rebuild)
       if: ${{ steps.vars.outputs.RELEASE != '0' }}
       shell: cmd
       run: |
         chcp 932
-        call installer\release.bat 12
+        call installer\release.bat 12 || exit /b 1
 
     - name: Clean up files before caching
       run: |
