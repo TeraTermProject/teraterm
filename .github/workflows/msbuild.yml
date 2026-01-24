@@ -69,7 +69,9 @@ jobs:
         RELEASE: ${{ steps.vars.outputs.RELEASE }}
       run: |
         chcp 932
-        call installer\release.bat 10 || exit /b 1
+        setlocal enabledelayedexpansion
+        call installer\release.bat 10
+        if !errorlevel! neq 0 exit /b 1
 
     - name: Save cache files (buildtools)
       id: cache-buildtools-save
@@ -351,12 +353,14 @@ jobs:
         RELEASE: ${{ steps.vars.outputs.RELEASE }}
       run: |
         chcp 932
+        setlocal enabledelayedexpansion
         if "%RELEASE%"=="0" (
-          call installer\release.bat 14 || exit /b 1
+          call installer\release.bat 14
         ) else (
           rem for release build
-          call installer\release.bat 12 || exit /b 1
+          call installer\release.bat 12
         )
+        if !errorlevel! neq 0 exit /b 1
 
     - name: Clean up files before caching
       run: |
