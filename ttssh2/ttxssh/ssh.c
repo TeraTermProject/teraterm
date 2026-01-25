@@ -9198,6 +9198,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 					prev_elapsed2 = elapsed;
 					// Cancelボタンが押下されたらウィンドウが消える。
 					if (is_canceled_window(hWnd)) {
+						pvar->recv.close_request = TRUE;
 						goto cancel_abort;
 					}
 
@@ -9257,16 +9258,13 @@ done:
 	c->scp.state = SCP_CLOSING;
 	ShowWindow(c->scp.progress_window, SW_HIDE);
 
+cancel_abort:
 	// チャネルのクローズを行いたいが、直接 ssh2_channel_send_close() を呼び出すと、
 	// 当該関数がスレッドセーフではないため、SCP処理が正常に終了しない場合がある。
 	// (2011.6.1 yutaka)
 	parm.c = c;
 	parm.pvar = pvar;
 	SendMessage(hWnd, WM_CHANNEL_CLOSE, (WPARAM)&parm, 0);
-	return 0;
-
-cancel_abort:
-	pvar->recv.close_request = TRUE;
 	return 0;
 }
 
