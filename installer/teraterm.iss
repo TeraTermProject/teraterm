@@ -1,5 +1,6 @@
 ﻿
 #define AppName "Tera Term"
+#define CurrentYear GetDateTimeString('yyyy','','')
 
 ; Arch "x86" or "x64" or "arm64"
 #ifndef Arch
@@ -50,7 +51,8 @@ AppVerName={#AppName} {#AppVersion} {#Arch}
 
 ; properties of installer executable
 VersionInfoDescription={#AppName} installer
-AppCopyright=(C) 2004-2025 TeraTerm Project
+VersionInfoVersion={#AppVersion}
+AppCopyright=(C) 2004-{#CurrentYear} TeraTerm Project
 ; Apps in Settings
 AppPublisher=TeraTerm Project
 AppPublisherURL=https://teratermproject.github.io/
@@ -80,6 +82,8 @@ Compression=lzma2/ultra64
   ArchitecturesAllowed=x86compatible
   ArchitecturesInstallIn64BitMode=
 #endif
+
+WizardStyle=modern dynamic
 
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl,message_en_US.isl
@@ -969,3 +973,4 @@ Name: {app}\lang_utf16le\Tamil.lng; Type: files
 ; cygterm.exe は cygterm+-x86_64\cygterm.exe か cygterm+-i686\cygterm.exe を
 ; スクリプトでコピーしたもので、自動でアンインストールされないため。
 Name: {app}\cygterm.exe; Type: files
+
