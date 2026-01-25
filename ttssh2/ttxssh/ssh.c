@@ -9276,15 +9276,15 @@ static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 {
 	PacketList_t *p, *old;
 
-	EnterCriticalSection(&g_ssh_scp_lock);
-
 	// allocate new buffer
 	p = malloc(sizeof(PacketList_t));
 	if (p == NULL)
-		goto error;
+		return;
 	p->buf = buf;
 	p->buflen = buflen;
 	p->next = NULL;
+
+	EnterCriticalSection(&g_ssh_scp_lock);
 
 	if (c->scp.pktlist_head == NULL) {
 		c->scp.pktlist_head = p;
@@ -9299,6 +9299,12 @@ static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 	// キューに詰んだデータの総サイズを加算する。
 	c->scp.pktlist_cursize += buflen;
 
+	int self_id = c->self_id;
+	unsigned long pktlist_cursize = c->scp.pktlist_cursize;
+	BOOL suspended = pvar->recv.suspended;
+
+	LeaveCriticalSection(&g_ssh_scp_lock);
+
 	// キューに詰んだデータの総サイズが上限閾値を超えた場合、
 	// SSHサーバのwindows sizeの更新を停止する
 	// これによりリストエントリが増え続け、消費メモリの肥大化を
@@ -9311,12 +9317,9 @@ static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 
 	logprintf(LOG_LEVEL_NOTICE,
 		"%s: channel=#%d SCP recv %u(bytes) and enqueued.%s",
-		__FUNCTION__, c->self_id, c->scp.pktlist_cursize,
-		pvar->recv.suspended ? "(suspended)" : ""
+		__FUNCTION__, self_id, pktlist_cursize,
+		suspended ? "(suspended)" : ""
 	);
-
-error:;
-	LeaveCriticalSection(&g_ssh_scp_lock);
 }
 
 static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char **buf, unsigned int *buflen)
@@ -9328,7 +9331,8 @@ static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 	if (c->scp.pktlist_head == NULL) {
 		*buf = NULL;
 		*buflen = 0;
-		goto end;
+		LeaveCriticalSection(&g_ssh_scp_lock);
+		return;
 	}
 
 	p = c->scp.pktlist_head;
@@ -9339,8 +9343,6 @@ static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 
 	if (c->scp.pktlist_head == NULL)
 		c->scp.pktlist_tail = NULL;
-
-	free(p);
 
 	// キューに詰んだデータの総サイズを減算する。
 	c->scp.pktlist_cursize -= *buflen;
@@ -9360,14 +9362,19 @@ static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 		}
 	}
 
+	int self_id = c->self_id;
+	unsigned long pktlist_cursize = c->scp.pktlist_cursize;
+	BOOL suspended = pvar->recv.suspended;
+
+	LeaveCriticalSection(&g_ssh_scp_lock);
+
+	free(p);
+
 	logprintf(LOG_LEVEL_NOTICE,
 		"%s: channel=#%d SCP recv %u(bytes) and dequeued.%s",
-		__FUNCTION__, c->self_id, c->scp.pktlist_cursize,
-		pvar->recv.suspended ? "(suspended)" : ""
+		__FUNCTION__, self_id, pktlist_cursize,
+		suspended ? "(suspended)" : ""
 	);
-
-end:;
-	LeaveCriticalSection(&g_ssh_scp_lock);
 }
 
 static void ssh2_scp_alloc_packetlist(PTInstVar pvar, Channel_t *c)
@@ -9515,7 +9522,6 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			}
 			else {
 				// ローカルのwindow sizeをチェック
-				//	こまめにやらずに、ある程度まとめて調整を行う
 				if (c->local_window < c->local_window_max/4) {
 					// windowサイズを調整する
 					do_SSH2_adjust_window_size(pvar, c);
