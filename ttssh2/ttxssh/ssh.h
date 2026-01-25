@@ -105,14 +105,18 @@ enum channel_type {
 // for SSH2
 /* default window/packet sizes for tcp/x11-fwd-channel */
 #define CHAN_SES_PACKET_DEFAULT (32*1024)
-#define CHAN_SES_WINDOW_DEFAULT (64*CHAN_SES_PACKET_DEFAULT) // 2.0 MB
+#define CHAN_SES_WINDOW_DEFAULT (64*CHAN_SES_PACKET_DEFAULT)		// 2.0 MB
 #define CHAN_TCP_PACKET_DEFAULT (32*1024)
-#define CHAN_TCP_WINDOW_DEFAULT (64*CHAN_TCP_PACKET_DEFAULT) // 2.0 MB
+#define CHAN_TCP_WINDOW_DEFAULT (64*CHAN_TCP_PACKET_DEFAULT)		// 2.0 MB
 #if 0 // unused
 #define CHAN_X11_PACKET_DEFAULT (16*1024)
 #define CHAN_X11_WINDOW_DEFAULT (4*CHAN_X11_PACKET_DEFAULT)
 #endif
 
+// SCP受信処理におけるフロー制御の閾値
+// 適用先 scp_t.filercvsize
+#define SCPRCV_HIGH_WATER_MARK  (CHAN_SES_WINDOW_DEFAULT * 0.75)	// 1.5 MB
+#define SCPRCV_LOW_WATER_MARK   (CHAN_SES_WINDOW_DEFAULT * 0.25)	// 0.5 MB
 
 /* SSH2 constants */
 #define SSH_CHANNEL_INVALID -1
@@ -530,11 +534,6 @@ typedef struct PacketList {
 	unsigned int buflen;
 	struct PacketList *next;
 } PacketList_t;
-
-// SCP受信処理におけるフロー制御の閾値
-// 適用先 scp_t.filercvsize
-#define SCPRCV_HIGH_WATER_MARK (1 * 1024 * 1024)  // 1MB
-#define SCPRCV_LOW_WATER_MARK (0)  // 0MB
 
 typedef struct scp {
 	enum scp_dir dir;              // transfer direction

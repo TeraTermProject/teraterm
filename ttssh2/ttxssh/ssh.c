@@ -8790,7 +8790,7 @@ static void do_SSH2_adjust_window_size(PTInstVar pvar, Channel_t *c)
 
 	// ローカルのwindow sizeにまだ余裕があるなら、何もしない。
 	// added /2 (2006.3.6 yutaka)
-	if (c->local_window > c->local_window_max/2)
+	if (c->local_window > c->local_window_max/4)
 		return;
 
 	{
@@ -9525,7 +9525,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			else {
 				// ローカルのwindow sizeをチェック
 				//	こまめにやらずに、ある程度まとめて調整を行う
-				if (c->local_window < c->local_window_max/2) {
+				if (c->local_window < c->local_window_max/4) {
 					// windowサイズを調整する
 #if 0
 					// すぐに調整する
