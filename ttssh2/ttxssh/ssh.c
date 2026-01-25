@@ -4132,8 +4132,6 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 				return;
 			}
 
-			// changed window size from 128KB to 32KB. (2006.3.6 yutaka)
-			// changed window size from 32KB to 128KB. (2007.10.29 maya)
 			c = ssh2_channel_new(pvar, CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, local_channel_num);
 			if (c == NULL) {
 				// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
@@ -7439,8 +7437,6 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 	else {
 		// チャネル設定
 		// FWD_prep_forwarding()でshell IDを使うので、先に設定を持ってくる。(2005.7.3 yutaka)
-		// changed window size from 64KB to 32KB. (2006.3.6 yutaka)
-		// changed window size from 32KB to 128KB. (2007.10.29 maya)
 		if (pvar->use_subsystem) {
 			c = ssh2_channel_new(pvar, CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SUBSYSTEM_GEN, -1);
 		}
@@ -9912,8 +9908,6 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 			FWD_open(pvar, remote_id, listen_addr, listen_port, orig_addr, orig_port, &chan_num);
 
 			// channelをアロケートし、必要な情報（remote window size）をここで取っておく。
-			// changed window size from 128KB to 32KB. (2006.3.6 yutaka)
-			// changed window size from 32KB to 128KB. (2007.10.29 maya)
 			c = ssh2_channel_new(pvar, CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, chan_num);
 			if (c == NULL) {
 				// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
@@ -9953,8 +9947,6 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 		FWD_X11_open(pvar, remote_id, NULL, 0, &chan_num);
 
 		// channelをアロケートし、必要な情報（remote window size）をここで取っておく。
-		// changed window size from 128KB to 32KB. (2006.3.6 yutaka)
-		// changed window size from 32KB to 128KB. (2007.10.29 maya)
 		c = ssh2_channel_new(pvar, CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, chan_num);
 		if (c == NULL) {
 			// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
