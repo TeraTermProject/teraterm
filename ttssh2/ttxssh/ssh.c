@@ -8486,7 +8486,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 		}
 
 		if (!send_channel_request_gen(pvar, c, "exec", want_reply, buff, NULL)) {
-			return FALSE;;
+			return FALSE;
 		}
 
 		// SCPで remote-to-local の場合は、サーバからのファイル送信要求を出す。
@@ -8500,7 +8500,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 
 	case TYPE_SFTP:
 		if (!send_channel_request_gen(pvar, c, "subsystem", want_reply, "sftp", NULL)) {
-			return FALSE;;
+			return FALSE;
 		}
 
 		// SFTPセッションを開始するためのネゴシエーションを行う。
@@ -8510,7 +8510,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 
 	case TYPE_SUBSYSTEM_GEN:
 		if (!send_channel_request_gen(pvar, c, "subsystem", want_reply, pvar->subsystem_name, NULL)) {
-			return FALSE;;
+			return FALSE;
 		}
 		pvar->session_nego_status = 0;
 		break;
@@ -8719,7 +8719,7 @@ static BOOL handle_SSH2_channel_success(PTInstVar pvar)
 		}
 
 		if (!send_channel_request_gen(pvar, c, "shell", want_reply, NULL, NULL)) {
-			return FALSE;;
+			return FALSE;
 		}
 
 		if (want_reply == 0) {
@@ -8960,8 +8960,8 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 	HWND hWnd = c->scp.progress_window;
 	scp_dlg_parm_t parm;
 	int rate, ProgStat;
-	DWORD stime;
-	int elapsed, prev_elapsed;
+	DWORD stime, tick;
+	int elapsed, prev_elapsed, prev_elapsed2;
 
 	buflen = min(c->remote_window, 8192*4); // max 32KB
 	buf = malloc(buflen);
@@ -8972,13 +8972,10 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 
 	stime = GetTickCount();
 	prev_elapsed = 0;
+	prev_elapsed2 = 0;
 
 	do {
 		int readlen, count=0;
-
-		// Cancelボタンが押下されたらウィンドウが消える。
-		if (is_canceled_window(hWnd))
-			goto cancel_abort;
 
 		// ファイルから読み込んだデータはかならずサーバへ送信する。
 		readlen = max(4096, min(buflen, c->remote_window)); // min 4KB
@@ -8993,12 +8990,12 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 				goto abort;
 
 			if (ret > c->remote_window) {
-				Sleep(100);
+				Sleep(10);
 			}
 
-			// 100回抜けられなかったら抜けてしまう
+			// 10秒抜けられなかったら抜けてしまう
 			count++;
-			if (count > 100) {
+			if (count > 1000) {
 				break;
 			}
 
@@ -9013,35 +9010,44 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 
 		total_size += ret;
 
-		rate = (int)(100 * total_size / c->scp.filestat.st_size);
-		_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", total_size, c->scp.filestat.st_size, rate);
-		SendMessage(GetDlgItem(hWnd, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
-		if (ProgStat != rate) {
-			ProgStat = rate;
-			SendDlgItemMessage(hWnd, IDC_PROGBAR, PBM_SETPOS, (WPARAM)ProgStat, 0);
-		}
+		tick = GetTickCount();
+		elapsed = (tick - stime) / 250;
+		if (elapsed > prev_elapsed2) {
+			prev_elapsed2 = elapsed;
+			// Cancelボタンが押下されたらウィンドウが消える。
+			if (is_canceled_window(hWnd)) {
+				goto cancel_abort;
+			}
 
-		elapsed = (GetTickCount() - stime) / 1000;
-		if (elapsed > prev_elapsed) {
-			if (elapsed > 2) {
-				rate = (int)(total_size / elapsed);
-				if (rate < 1200) {
-					_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d %s)", elapsed / 60, elapsed % 60, rate, "Bytes/s");
-				}
-				else if (rate < 1200000) {
-					_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100, "KBytes/s");
+			rate = (int)(100 * total_size / c->scp.filestat.st_size);
+			_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", total_size, c->scp.filestat.st_size, rate);
+			SendMessage(GetDlgItem(hWnd, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
+			if (ProgStat != rate) {
+				ProgStat = rate;
+				SendDlgItemMessage(hWnd, IDC_PROGBAR, PBM_SETPOS, (WPARAM)ProgStat, 0);
+			}
+
+			elapsed = (tick - stime) / 1000;
+			if (elapsed > prev_elapsed) {
+				if (elapsed > 2) {
+					rate = (int)(total_size / elapsed);
+					if (rate < 1200) {
+						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d %s)", elapsed / 60, elapsed % 60, rate, "Bytes/s");
+					}
+					else if (rate < 1200000) {
+						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100, "KBytes/s");
+					}
+					else {
+						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100, "MBytes/s");
+					}
 				}
 				else {
-					_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100, "MBytes/s");
+					_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d", elapsed / 60, elapsed % 60);
 				}
+				SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
+				prev_elapsed = elapsed;
 			}
-			else {
-				_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d", elapsed / 60, elapsed % 60);
-			}
-			SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
-			prev_elapsed = elapsed;
 		}
-
 	} while (ret <= buflen);
 
 	// eof
@@ -9140,28 +9146,24 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 {
 	Channel_t *c = (Channel_t *)p;
 	PTInstVar pvar = c->scp.pvar;
-	long long total_size = 0;
 	char s[80];
 	HWND hWnd = c->scp.progress_window;
 	MSG msg;
 	unsigned char *data;
 	unsigned int buflen;
-	int eof;
+	int eof = 0;
 	int rate, ProgStat;
-	DWORD stime;
-	int elapsed, prev_elapsed;
+	DWORD stime, tick;
+	int elapsed, prev_elapsed, prev_elapsed2;
 	scp_dlg_parm_t parm;
 
 	InitDlgProgress(hWnd, IDC_PROGBAR, &ProgStat);
 
 	stime = GetTickCount();
 	prev_elapsed = 0;
+	prev_elapsed2 = 0;
 
 	for (;;) {
-		// Cancelボタンが押下されたらウィンドウが消える。
-		if (is_canceled_window(hWnd))
-			goto cancel_abort;
-
 		ssh2_scp_get_packetlist(pvar, c, &data, &buflen);
 		if (data && buflen) {
 			msg.message = WM_RECEIVING_FILE;
@@ -9170,7 +9172,6 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 			case WM_RECEIVING_FILE:
 				//data = (unsigned char *)msg.wParam;
 				//buflen = (unsigned int)msg.lParam;
-				eof = 0;
 
 				if (c->scp.filercvsize >= c->scp.filetotalsize) { // EOF
 					free(data);  // free!
@@ -9190,34 +9191,44 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 
 				free(data);  // free!
 
-				rate =(int)(100 * c->scp.filercvsize / c->scp.filetotalsize);
-				_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", c->scp.filercvsize, c->scp.filetotalsize, rate);
-				SendMessage(GetDlgItem(c->scp.progress_window, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
+				tick = GetTickCount();
+				elapsed = (tick - stime) / 250;
+				if (elapsed > prev_elapsed2) {
+					prev_elapsed2 = elapsed;
+					// Cancelボタンが押下されたらウィンドウが消える。
+					if (is_canceled_window(hWnd)) {
+						goto cancel_abort;
+					}
 
-				if (ProgStat != rate) {
-					ProgStat = rate;
-					SendDlgItemMessage(c->scp.progress_window, IDC_PROGBAR, PBM_SETPOS, (WPARAM)ProgStat, 0);
-				}
+					rate = (int)(100 * c->scp.filercvsize / c->scp.filetotalsize);
+					_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", c->scp.filercvsize, c->scp.filetotalsize, rate);
+					SendMessage(GetDlgItem(hWnd, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
 
-				elapsed = (GetTickCount() - stime) / 1000;
-				if (elapsed > prev_elapsed) {
-					if (elapsed > 2) {
-						rate = (int)(c->scp.filercvsize / elapsed);
-						if (rate < 1200) {
-							_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d %s)", elapsed / 60, elapsed % 60, rate, "Bytes/s");
-						}
-						else if (rate < 1200000) {
-							_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100, "KBytes/s");
+					if (ProgStat != rate) {
+						ProgStat = rate;
+						SendDlgItemMessage(hWnd, IDC_PROGBAR, PBM_SETPOS, (WPARAM)ProgStat, 0);
+					}
+
+					elapsed = (tick - stime) / 1000;
+					if (elapsed > prev_elapsed) {
+						if (elapsed > 2) {
+							rate = (int)(c->scp.filercvsize / elapsed);
+							if (rate < 1200) {
+								_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d %s)", elapsed / 60, elapsed % 60, rate, "Bytes/s");
+							}
+							else if (rate < 1200000) {
+								_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100, "KBytes/s");
+							}
+							else {
+								_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100, "MBytes/s");
+							}
 						}
 						else {
-							_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100, "MBytes/s");
+							_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d", elapsed / 60, elapsed % 60);
 						}
+						SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
+						prev_elapsed = elapsed;
 					}
-					else {
-						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d", elapsed / 60, elapsed % 60);
-					}
-					SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
-					prev_elapsed = elapsed;
 				}
 
 				if (eof)
