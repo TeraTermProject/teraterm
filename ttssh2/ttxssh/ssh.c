@@ -9156,6 +9156,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 	DWORD stime, tick;
 	int elapsed, prev_elapsed, prev_elapsed2;
 	scp_dlg_parm_t parm;
+	BOOL isRepaint = FALSE;
 
 	InitDlgProgress(hWnd, IDC_PROGBAR, &ProgStat);
 
@@ -9229,6 +9230,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 						SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
 						prev_elapsed = elapsed;
 					}
+					isRepaint = TRUE;
 				}
 
 				if (eof)
@@ -9236,8 +9238,19 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 
 				break;
 			}
+		} else {
+			if (isRepaint == TRUE) {
+				isRepaint = FALSE;
+				// 強制描画
+				MSG msg;
+				while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				}
+			} else {
+				Sleep(1);
+			}
 		}
-		Sleep(0);
 	}
 
 done:
@@ -9255,33 +9268,6 @@ done:
 cancel_abort:
 	pvar->recv.close_request = TRUE;
 	return 0;
-}
-
-// do_SSH2_adjust_window_size() をある程度時間が経過してからコールする
-// フロー制御、受信処理を再開
-static void CALLBACK do_SSH2_adjust_window_size_timer(
-	HWND hWnd, UINT uMsg, UINT_PTR nIDEvent, DWORD dwTime)
-{
-	Channel_t *c = (Channel_t *)nIDEvent;
-	PTInstVar pvar = c->scp.pvar;
-
-	(void)hWnd;
-	(void)uMsg;
-	(void)dwTime;
-
-	if (pvar->recv.data_finished) {
-		// 送信終了したのにメッセージが残っていた時対策
-		return;
-	}
-	if (pvar->recv.timer_id != 0) {
-		// SetTimer() はインターバルに発生するので削除する
-		KillTimer(pvar->cv->HWin, pvar->recv.timer_id);
-		pvar->recv.timer_id = 0;
-	}
-
-	logprintf(LOG_LEVEL_NOTICE, "%s: SCP receive, send SSH_MSG_CHANNEL_WINDOW_ADJUST", __FUNCTION__);
-	pvar->recv.suspended = FALSE;
-	do_SSH2_adjust_window_size(pvar, c);
 }
 
 // SSHサーバから送られてきたファイルのデータをリストにつなぐ。
@@ -9368,9 +9354,8 @@ static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 			// SCP受信のブロックを解除する。
 			pvar->recv.suspended = FALSE;
 			if (c->scp.filercvsize < c->scp.filetotalsize) {
-				// 続きを受信
-				pvar->recv.timer_id =
-					SetTimer(pvar->cv->HWin, (UINT_PTR)c, USER_TIMER_MINIMUM, do_SSH2_adjust_window_size_timer);
+				// windowサイズを調整する
+				do_SSH2_adjust_window_size(pvar, c);
 			}
 		}
 	}
@@ -9392,7 +9377,6 @@ static void ssh2_scp_alloc_packetlist(PTInstVar pvar, Channel_t *c)
 	InitializeCriticalSection(&g_ssh_scp_lock);
 	c->scp.pktlist_cursize = 0;
 	pvar->recv.suspended = FALSE;
-	pvar->recv.timer_id = 0;
 	pvar->recv.close_request = FALSE;
 }
 
@@ -9524,10 +9508,6 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 				// 受信終了
 				PTInstVar pvar = c->scp.pvar;
 				pvar->recv.data_finished = TRUE;
-				if (pvar->recv.timer_id != 0) {
-					pvar->recv.timer_id = 0;
-					KillTimer(pvar->cv->HWin, pvar->recv.timer_id);
-				}
 			}
 			else if (pvar->recv.suspended) {
 				// フロー制御中
@@ -9538,21 +9518,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 				//	こまめにやらずに、ある程度まとめて調整を行う
 				if (c->local_window < c->local_window_max/4) {
 					// windowサイズを調整する
-#if 0
-					// すぐに調整する
-					//		すぐにサーバーからデータが受信できる環境の場合、
-					// 		FD_READが優先されてメッセージキューに積まれて
-					// 		他のwindowsのメッセージ処理(キャンセルボタン押下など)が
-					//		できなくなるため使用しない
-					do_ssh2_adjust_window_size(pvar, c);
-#else
-					// 少し時間を置いてから調整
-					//		タイマーを使ってGUIスレッドで関数をコールする
-					if (pvar->recv.timer_id == 0) {
-						pvar->recv.timer_id =
-							SetTimer(pvar->cv->HWin, (UINT_PTR)c, USER_TIMER_MINIMUM, do_SSH2_adjust_window_size_timer);
-					}
-#endif
+					do_SSH2_adjust_window_size(pvar, c);
 				}
 			}
 		}
