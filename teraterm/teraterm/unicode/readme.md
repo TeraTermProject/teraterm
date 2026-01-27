@@ -67,3 +67,10 @@
 ## jis0208.md
 
 - [jis0208.md](jis0208.md)
+
+## UnicodeXX.0-emoji.txt
+
+- Unicode 絵文字の文字幅を一覧にしたテキストファイル
+- プログラムからは利用しない
+- [get_emoji_list.md](get_emoji_list.md)
+
