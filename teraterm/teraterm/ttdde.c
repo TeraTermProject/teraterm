@@ -1149,8 +1149,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		w_width	 = r.right  - r.left;
 		w_height = r.bottom - r.top;
 
-		DispGetWindowPos(&c_x, &c_y, TRUE);
-		DispGetWindowSize(&c_width, &c_height, TRUE);
+		DispGetWindowPos(vt_src, &c_x, &c_y, TRUE);
+		DispGetWindowSize(vt_src, &c_width, &c_height, TRUE);
 
 		_snprintf_s(ParamFileName, sizeof(ParamFileName), _TRUNCATE,
 			    "%d %d %d %d %d %d %d %d %d", showflag,
