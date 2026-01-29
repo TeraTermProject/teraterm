@@ -68,13 +68,25 @@
 
       <dt id="TerminalID">Terminal ID:</dt>
       <dd>
-	ホストに報告する <a href="../about/ctrlseq.html#TerminalID">Terminal ID</a> を設定します。
+        VT windowでエミュレートするターミナルを指定します。
+        <dl>
+          <dt>VT100...VT525</dt>
+          <dd>
+            <a href="../about/glossary.html#VT100">DEC 社のVT端末</a>をエミュレートします。<br>
+            ホストに報告する <a href="../about/ctrlseq.html#TerminalID">Terminal ID</a> を設定します。
+          </dd>
+          <dt>dumb</dt>
+          <dd>
+            ダム端末をエミュレートします。<br>
+            改行(0x0d(\r,^J),0x0a(\n,^M))とベル(0x07(^G))しか使えない端末です。
+          </dd>
+        </dl>
 
-	<p>
-	Terminal ID は telnet の terminal type とは違います。<br>
-	Telnet の terminal type を変更するには
-	<a href="setup-additional-tcpip.html#TermType">[Setup] Addtional Setting の TCP/IP タブの Terminal type</a>
-	を変更してください。
+        <p>
+          Telnet/ssh サーバーに通知する terminal type は
+          <a href="setup-additional-tcpip.html#TermType">[Setup] Addtional Setting の TCP/IP タブの Terminal type</a>
+          を変更してください。
+        </p>
       </dd>
 
       <dt id="LocalEcho">Local echo</dt>
