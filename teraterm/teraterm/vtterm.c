@@ -721,6 +721,55 @@ static void Tab(void)
 	if (NeedsOutputBufs()) OutputLogByte(HT);
 }
 
+static void ProcessCR(void)
+{
+	if (ts.CRReceive == IdAUTO) {
+		// 9th Apr 2012: AUTO CR/LF mode (tentner)
+		// a CR or LF will generated a CR+LF, if the next character is the opposite, it will be ignored
+		if(PrevCharacter != LF || !PrevCRorLFGeneratedCRLF) {
+			CarriageReturn(TRUE);
+			LineFeed(CR, TRUE);
+			PrevCRorLFGeneratedCRLF = TRUE;
+		}
+		else {
+			PrevCRorLFGeneratedCRLF = FALSE;
+		}
+	}
+	else {
+		CarriageReturn(TRUE);
+		if (ts.CRReceive==IdCRLF) {
+			CommInsert1Byte(&cv, LF);
+		}
+	}
+}
+
+static void ProcessLF(void)
+{
+	if (ts.CRReceive == IdLF) {
+		// 受信時の改行コードが LF の場合は、サーバから LF のみが送られてくると仮定し、
+		// CR+LFとして扱うようにする。
+		// cf. http://www.neocom.ca/forum/viewtopic.php?t=216
+		// (2007.1.21 yutaka)
+		CarriageReturn(TRUE);
+		LineFeed(LF, TRUE);
+	}
+	else if (ts.CRReceive == IdAUTO) {
+		// 9th Apr 2012: AUTO CR/LF mode (tentner)
+		// a CR or LF will generated a CR+LF, if the next character is the opposite, it will be ignored
+		if(PrevCharacter != CR || !PrevCRorLFGeneratedCRLF) {
+			CarriageReturn(TRUE);
+			LineFeed(LF, TRUE);
+			PrevCRorLFGeneratedCRLF = TRUE;
+		}
+		else {
+			PrevCRorLFGeneratedCRLF = FALSE;
+		}
+	}
+	else {
+		LineFeed(LF, TRUE);
+	}
+}
+
 /**
  *	unicode(char32_t)をバッファへ書き込む
  *		ログにも書き込む場合は PutU32() を使う
@@ -969,7 +1018,36 @@ static void PrnParseControl(BYTE b) // printer mode
 	WriteToPrnFile(PrintFile_, b, TRUE);
 }
 
-static void ParseControl(BYTE b)
+/**
+ *	Dumb Terminal Control
+ */
+static void ParseControlDumb(BYTE b)
+{
+	switch (b)
+	{
+	case LF:
+		ProcessLF();
+		break;
+	case CR:
+		ProcessCR();
+		break;
+	case BEL:
+		if (ts.Beep != IdBeepOff)
+			RingBell(ts.Beep);
+		break;
+	default:
+		if (TRUE) {
+			// U+2400～のControl Picturesをつかって表示
+			PutU32(0x2400 + b);
+		}
+		else {
+			PutU32(b);
+		}
+		break;
+	}
+}
+
+static void ParseControlVT(BYTE b)
 {
 	if (PrinterMode) { // printer mode
 		PrnParseControl(b);
@@ -1010,33 +1088,11 @@ static void ParseControl(BYTE b)
 		Tab();
 		break;
 	case LF:
-		if (ts.CRReceive == IdLF) {
-			// 受信時の改行コードが LF の場合は、サーバから LF のみが送られてくると仮定し、
-			// CR+LFとして扱うようにする。
-			// cf. http://www.neocom.ca/forum/viewtopic.php?t=216
-			// (2007.1.21 yutaka)
-			CarriageReturn(TRUE);
-			LineFeed(b, TRUE);
-			break;
-		}
-		else if (ts.CRReceive == IdAUTO) {
-			// 9th Apr 2012: AUTO CR/LF mode (tentner)
-			// a CR or LF will generated a CR+LF, if the next character is the opposite, it will be ignored
-			if(PrevCharacter != CR || !PrevCRorLFGeneratedCRLF) {
-				CarriageReturn(TRUE);
-				LineFeed(b, TRUE);
-				PrevCRorLFGeneratedCRLF = TRUE;
-			}
-			else {
-				PrevCRorLFGeneratedCRLF = FALSE;
-			}
-			break;
-		}
-
+		ProcessLF();
+		break;
 	case VT:
 		LineFeed(b, TRUE);
 		break;
-
 	case FF:
 		if ((ts.AutoWinSwitch>0) && JustAfterESC) {
 			CommInsert1Byte(&cv, b);
@@ -1047,24 +1103,7 @@ static void ParseControl(BYTE b)
 			LineFeed(b, TRUE);
 		break;
 	case CR:
-		if (ts.CRReceive == IdAUTO) {
-			// 9th Apr 2012: AUTO CR/LF mode (tentner)
-			// a CR or LF will generated a CR+LF, if the next character is the opposite, it will be ignored
-			if(PrevCharacter != LF || !PrevCRorLFGeneratedCRLF) {
-				CarriageReturn(TRUE);
-				LineFeed(b, TRUE);
-				PrevCRorLFGeneratedCRLF = TRUE;
-			}
-			else {
-				PrevCRorLFGeneratedCRLF = FALSE;
-			}
-		}
-		else {
-			CarriageReturn(TRUE);
-			if (ts.CRReceive==IdCRLF) {
-				CommInsert1Byte(&cv, LF);
-			}
-		}
+		ProcessCR();
 		break;
 	case SO: /* LS1 */
 		if (ts.ISO2022Flag & ISO2022_SO) {
@@ -1161,6 +1200,16 @@ static void ParseControl(BYTE b)
 		ESCFlag = FALSE;
 		ParseMode = ModeIgnore;
 		break;
+	}
+}
+
+static void ParseControl(BYTE b)
+{
+	if (ts.TerminalID == IdDUMB) {
+		ParseControlDumb(b);
+	}
+	else {
+		ParseControlVT(b);
 	}
 }
 
@@ -5328,6 +5377,12 @@ static int CommRead1Byte_(PComVar cv, LPBYTE b)
 	return CommRead1Byte(cv, b);
 }
 
+/**
+ *	受信バッファから受信データを取得
+ *
+ *	@retval		0		なにもなし
+ *	@retval		IdTEK	Enter TEK Mode
+ */
 int VTParse()
 {
 	BYTE b;
@@ -5784,12 +5839,18 @@ BOOL WheelToCursorMode() {
 
 void ChangeTerminalID()
 {
-	VTlevel = TermIDGetVTLevel(ts.TerminalID);
-	if (VTlevel == 1) {
-		Send8BitMode = FALSE;
+	if (ts.TerminalID == IdDUMB) {
+		// dumb端末
 	}
 	else {
-		Send8BitMode = ts.Send8BitCtrl;
+		// VT端末
+		VTlevel = TermIDGetVTLevel(ts.TerminalID);
+		if (VTlevel == 1) {
+			Send8BitMode = FALSE;
+		}
+		else {
+			Send8BitMode = ts.Send8BitCtrl;
+		}
 	}
 }
 
