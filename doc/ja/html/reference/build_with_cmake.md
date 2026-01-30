@@ -51,14 +51,14 @@ nmakeが利用できる環境から次のように実行します。
 
 msys2等をつかってMinGWが使える環境から次のように実行します。
 
-    mkdir build_mingw
-    cd build_mingw
-    cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+    mkdir build_mingw_msys2_i686
+    cd build_mingw_msys2_i686
+    cmake .. -G "Unix Makefiles" -DARCHITECTURE=i686 -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
     cmake --build . -j
 
 cygwin,linux等では次のように実行します。
 
-    mkdir build_mingw_cygwin
-    cd build_mingw_cygwin
-    cmake .. -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+    mkdir build_mingw_cygwin_i686
+    cd build_mingw_cygwin_i686
+    cmake .. -G "Unix Makefiles" -DARCHITECTURE=i686 -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
     cmake --build . -j
