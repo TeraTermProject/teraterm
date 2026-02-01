@@ -270,7 +270,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 		// 幅を調整
 		for (int i = 0; i < 5; i++) {
-			ListView_SetColumnWidth(hWndList, i, LVSCW_AUTOSIZE);
+			ListView_SetColumnWidth(hWndList, i, LVSCW_AUTOSIZE_USEHEADER);
 		}
 
 		return TRUE;
