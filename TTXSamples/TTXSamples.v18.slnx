@@ -1,0 +1,25 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="Win32" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="TTXAdditionalTitle/TTXAdditionalTitle.v18.vcxproj" Id="0ecaf69b-08b4-414a-b822-be8459e463d8" />
+  <Project Path="TTXAlwaysOnTop/TTXAlwaysOnTop.v18.vcxproj" Id="e86ddb2c-cc00-43d1-8a1a-4b042ec983d6" />
+  <Project Path="TTXCallSysMenu/TTXCallSysMenu.v18.vcxproj" Id="25709a86-e6b8-4cda-906c-02d935e05978" />
+  <Project Path="TTXChangeFontSize/TTXChangeFontSize/TTXChangeFontSize.v18.vcxproj" Id="56807ec2-1793-438f-942e-de7f09283971" />
+  <Project Path="TTXCheckUpdate/TTXCheckUpdate.v18.vcxproj" Id="937dfa65-5709-4643-b778-482c15dec581" />
+  <Project Path="TTXCommandLineOpt/TTXCommandLineOpt.v18.vcxproj" Id="ee8bfc38-7000-42f1-bbc3-17f19855918a" />
+  <Project Path="TTXCopyIniFile/TTXCopyIniFile.v18.vcxproj" Id="2b2b8d6e-4a84-49dd-8291-46172fce422a" />
+  <Project Path="TTXFixedWinSize/TTXFixedWinSize.v18.vcxproj" Id="3c12ba78-2f6a-4655-b6ff-e1bff2a191d8" />
+  <Project Path="TTXKcodeChange/TTXKcodeChange.v18.vcxproj" Id="2e487f50-84e4-404d-a7e1-f9fa4a72bc25" />
+  <Project Path="TTXOutputBuffering/TTXOutputBuffering.v18.vcxproj" Id="80be71d1-bea3-4a5d-8f13-362d6364892d" />
+  <Project Path="TTXRecurringCommand/TTXRecurringCommand.v18.vcxproj" Id="3c656364-faea-41d2-b227-52187d3c2529" />
+  <Project Path="TTXResizeMenu/TTXResizeMenu.v18.vcxproj" Id="4ea6aeb6-9ccd-4e6d-9531-3f92184ebe67" />
+  <Project Path="TTXResizeWin/TTXResizeWin.v18.vcxproj" Id="11ef5960-4922-49dc-9e64-b0845fc7c88c" />
+  <Project Path="TTXShowCommandLine/TTXShowCommandLine.v18.vcxproj" Id="80ed9927-27f9-473a-802c-fb10deb5ecc6" />
+  <Project Path="ttxtest/TTXtest.v18.vcxproj" Id="9e20e276-1905-44ae-bc67-c1a1f3c42135" />
+  <Project Path="TTXttyrec/TTXttyplay.v18.vcxproj" Id="3181e887-2183-4fb8-84cc-ca5b4d48bc71" />
+  <Project Path="TTXttyrec/TTXttyrec.v18.vcxproj" Id="5798e37e-0428-457e-a652-ee0a75130327" />
+  <Project Path="TTXViewMode/TTXViewMode.v18.vcxproj" Id="2296fb66-3fa4-4136-8252-abeceeac2d70" />
+</Solution>
