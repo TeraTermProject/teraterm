@@ -37,9 +37,9 @@ extern "C" {
 #endif
 
 typedef struct {
-	IdKanjiCode coding;		// “à•”‚ÌƒR[ƒh
-	const char *CodeStrGUI;	// GUI‚Å•\¦‚·‚é•¶š—ñ
-	const char *CodeStrINI;	// iniƒtƒ@ƒCƒ‹AƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚Ì•¶š—ñ
+	IdKanjiCode coding;		// å†…éƒ¨ã®ã‚³ãƒ¼ãƒ‰
+	const char *CodeStrGUI;	// GUIã§è¡¨ç¤ºã™ã‚‹æ–‡å­—åˆ—
+	const char *CodeStrINI;	// iniãƒ•ã‚¡ã‚¤ãƒ«ã€ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã®æ–‡å­—åˆ—
 } TKanjiList;
 
 const char *GetLanguageStr(int language);

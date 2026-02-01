@@ -95,8 +95,8 @@ WORD GetOnOff(PCHAR Sect, PCHAR Key, const wchar_t *FName, BOOL Default)
 }
 
 //
-// \n, \t“™‚ğ“WŠJ‚·‚éB
-// common/ttlib.c:RestoreNewLine()‚ªƒx[ƒXB
+// \n, \tç­‰ã‚’å±•é–‹ã™ã‚‹ã€‚
+// common/ttlib.c:RestoreNewLine()ãŒãƒ™ãƒ¼ã‚¹ã€‚
 //
 int UnEscapeStr(BYTE *Text)
 {
@@ -180,8 +180,8 @@ int UnEscapeStr(BYTE *Text)
 }
 
 //
-//  o—Íƒoƒbƒtƒ@‚É•¶š—ñ‚ğ‘‚«‚Ş
-//  ttpcmn/ttcmn.c:CommTextOut()‚ªƒx[ƒX
+//  å‡ºåŠ›ãƒãƒƒãƒ•ã‚¡ã«æ–‡å­—åˆ—ã‚’æ›¸ãè¾¼ã‚€
+//  ttpcmn/ttcmn.c:CommTextOut()ãŒãƒ™ãƒ¼ã‚¹
 //
 void CommOut(char *str, int len) {
 	int outlen, c;
@@ -245,8 +245,8 @@ void CommOut(char *str, int len) {
 }
 
 //
-// ƒ^ƒCƒ}‚ªƒ^ƒCƒ€ƒAƒEƒg‚µ‚½‚ÌƒR[ƒ‹ƒoƒbƒNŠÖ”
-//	—LŒø‚É‚³‚ê‚Ä‚¢‚é‚È‚ç‚ÎAo—Íƒoƒbƒtƒ@‚ÉƒRƒ}ƒ“ƒh‚ğ‘‚«‚Ş
+// ã‚¿ã‚¤ãƒãŒã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã—ãŸæ™‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+//	æœ‰åŠ¹ã«ã•ã‚Œã¦ã„ã‚‹ãªã‚‰ã°ã€å‡ºåŠ›ãƒãƒƒãƒ•ã‚¡ã«ã‚³ãƒãƒ³ãƒ‰ã‚’æ›¸ãè¾¼ã‚€
 //
 void CALLBACK RecurringTimerProc(HWND hwnd, UINT msg, UINT_PTR ev, DWORD now) {
 	if (pvar->enable && pvar->cmdLen > 0 && pvar->cv->Ready && pvar->cv->OutBuffCount == 0) {
@@ -257,7 +257,7 @@ void CALLBACK RecurringTimerProc(HWND hwnd, UINT msg, UINT_PTR ev, DWORD now) {
 }
 
 //
-//  TTXInit -- ‹N“®ˆ—
+//  TTXInit -- èµ·å‹•æ™‚å‡¦ç†
 //
 static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->ts = ts;
@@ -270,8 +270,8 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 }
 
 //
-//  TTXSend, TTXWriteFile -- ƒL[“ü—Íˆ—
-//	ƒL[“ü—Í‚ª‚ ‚Á‚½‚çAƒ^ƒCƒ}‚ğ‰„’·‚·‚é
+//  TTXSend, TTXWriteFile -- ã‚­ãƒ¼å…¥åŠ›å‡¦ç†
+//	ã‚­ãƒ¼å…¥åŠ›ãŒã‚ã£ãŸã‚‰ã€ã‚¿ã‚¤ãƒã‚’å»¶é•·ã™ã‚‹
 //
 static int PASCAL TTXsend(SOCKET s, const char *buf, int len, int flags) {
 	if (pvar->enable && len > 0) {
@@ -288,8 +288,8 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 }
 
 //
-// TTXOpenTCP, TTXOpenFile -- ƒZƒbƒVƒ‡ƒ“ŠJnˆ—
-//	Psend, WriteFile‚ğƒtƒbƒN‚µA—LŒø‚È‚ç‚Îƒ^ƒCƒ}‚ğƒZƒbƒg‚·‚éB
+// TTXOpenTCP, TTXOpenFile -- ã‚»ãƒƒã‚·ãƒ§ãƒ³é–‹å§‹å‡¦ç†
+//	Psend, WriteFileã‚’ãƒ•ãƒƒã‚¯ã—ã€æœ‰åŠ¹ãªã‚‰ã°ã‚¿ã‚¤ãƒã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã€‚
 //
 static void PASCAL TTXOpenTCP(TTXSockHooks *hooks) {
 	pvar->origPsend = *hooks->Psend;
@@ -310,8 +310,8 @@ static void PASCAL TTXOpenFile(TTXFileHooks *hooks) {
 }
 
 //
-// TTXCloseTCP, TTXCloseFile -- ƒZƒbƒVƒ‡ƒ“I—¹ˆ—
-//	Psend, WriteFile‚ÌƒtƒbƒN‚ğ‰ğœ‚µAƒ^ƒCƒ}‚ğ~‚ß‚éB
+// TTXCloseTCP, TTXCloseFile -- ã‚»ãƒƒã‚·ãƒ§ãƒ³çµ‚äº†æ™‚å‡¦ç†
+//	Psend, WriteFileã®ãƒ•ãƒƒã‚¯ã‚’è§£é™¤ã—ã€ã‚¿ã‚¤ãƒã‚’æ­¢ã‚ã‚‹ã€‚
 //
 static void PASCAL TTXCloseTCP(TTXSockHooks *hooks) {
 	if (pvar->origPsend) {
@@ -328,42 +328,26 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 }
 
 //
-// TTXReadIniFile, TTXWriteIniFile -- İ’èƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‘‚«
+// TTXReadIniFile, TTXWriteIniFile -- è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿æ›¸ã
 //
 void ReadINI(const wchar_t *fn, PTTSet ts) {
-	wchar_t sect[OutBuffSize];
-	wchar_t *p;
-
-	// DLL ƒtƒ@ƒCƒ‹–¼‚©‚çAINI ‚ÌƒZƒNƒVƒ‡ƒ“–¼‚ğŒˆ‚ß‚é
-	if (fn[0] == '\\' || fn[0] == '/' || (fn[0] != 0 && fn[1] == ':')) {
-		wcsncpy_s(sect, _countof(sect), fn, _TRUNCATE);
-	}
-	else {
-		GetModuleFileNameW(NULL, sect, _countof(sect));
-		p = wcsrchr(sect, '\\');
-		if (!p) {
-			return;
-		}
-		wcsncpy_s(p+1, _countof(sect) - ((p+1)-sect), fn, _TRUNCATE);
-	}
-
-	GetPrivateProfileStringAFileW(SECTION, "Command", "", pvar->orgCommand, sizeof(pvar->orgCommand), sect);
+	GetPrivateProfileStringAFileW(SECTION, "Command", "", pvar->orgCommand, sizeof(pvar->orgCommand), fn);
 	strncpy_s(pvar->command, sizeof(pvar->command), pvar->orgCommand, _TRUNCATE);
 	UnEscapeStr(pvar->command);
 	pvar->cmdLen = (int)strlen(pvar->command);
 
-	pvar->add_nl = GetOnOff(SECTION, "AddNewLine", sect, FALSE);
+	pvar->add_nl = GetOnOff(SECTION, "AddNewLine", fn, FALSE);
 	if (pvar->add_nl && pvar->cmdLen < sizeof(pvar->command) - 1) {
 		pvar->command[pvar->cmdLen++] = '\n';
 		pvar->command[pvar->cmdLen] = '\0';
 	}
 
-	pvar->interval = GetPrivateProfileIntAFileW(SECTION, "Interval", DEFAULT_INTERVAL, sect);
+	pvar->interval = GetPrivateProfileIntAFileW(SECTION, "Interval", DEFAULT_INTERVAL, fn);
 	if (pvar->interval < MINIMUM_INTERVAL) {
 		pvar->interval = MINIMUM_INTERVAL;
 	}
 
-	pvar->enable = GetOnOff(SECTION, "Enable", sect, FALSE);
+	pvar->enable = GetOnOff(SECTION, "Enable", fn, FALSE);
 }
 
 static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
@@ -391,23 +375,12 @@ static void PASCAL TTXWriteIniFile(const wchar_t *fn, PTTSet ts) {
 }
 
 //
-// TTXParseParam -- ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ƒIƒvƒVƒ‡ƒ“‚Ì‰ğß
-//	¡‚Ì‚Æ‚±‚ëŒÅ—L‚ÌƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ƒIƒvƒVƒ‡ƒ“‚Í–³‚¢B(•K—v?)
-//	/F= ‚É‚æ‚éİ’èƒtƒ@ƒCƒ‹‚ÌØ‚è‘Ö‚¦‚Ì‚İ‘Î‰B
+// TTXParseParam -- ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã®è§£é‡ˆ
+//	ä»Šã®ã¨ã“ã‚å›ºæœ‰ã®ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã¯ç„¡ã„ã€‚(å¿…è¦?)
 //
 
 static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
-	wchar_t buff[1024];
-	wchar_t *next;
 	pvar->origParseParam(Param, ts, DDETopic);
-
-	next = Param;
-	while (next = GetParam(buff, sizeof(buff), next)) {
-		DequoteParam(buff, sizeof(buff), buff);
-		if (_wcsnicmp(buff, L"/F=", 3) == 0) {
-			ReadINI(buff+3, ts);
-		}
-	}
 
 	return;
 }
@@ -426,8 +399,8 @@ static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
 }
 
 //
-// ƒƒjƒ…[ˆ—
-//	ƒRƒ“ƒgƒ[ƒ‹ƒƒjƒ…[‚ÉRecurringCommand‚ğ’Ç‰ÁB
+// ãƒ¡ãƒ‹ãƒ¥ãƒ¼å‡¦ç†
+//	ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã«RecurringCommandã‚’è¿½åŠ ã€‚
 //
 static void PASCAL TTXModifyMenu(HMENU menu) {
 	static const DlgTextInfo MenuTextInfo[] = {
@@ -463,7 +436,7 @@ static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 }
 
 //
-// RecurringCommandİ’èƒ_ƒCƒAƒƒO‚ÌƒR[ƒ‹ƒoƒbƒNŠÖ”B
+// RecurringCommandè¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã€‚
 //
 static INT_PTR CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam) {
 	static const DlgTextInfo text_info[] = {
@@ -472,6 +445,8 @@ static INT_PTR CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 		{ IDC_INTERVAL_LABEL, "DLG_INTERVAL" },
 		{ IDC_COMMAND_LABEL, "DLG_COMMAND" },
 		{ IDC_ADD_NL, "DLG_ADD_NEWLINE" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" },
 	};
 
 	switch (msg) {
@@ -532,7 +507,7 @@ static INT_PTR CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 }
 
 //
-// ƒƒjƒ…[ƒRƒ}ƒ“ƒhˆ—
+// ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚³ãƒãƒ³ãƒ‰å‡¦ç†
 //
 static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	switch (cmd) {

@@ -51,7 +51,7 @@ typedef struct {
   AUTHCred cur_cred;
   SSHAuthMethod failed_method;
   int partial_success;
-  int multiple_required_auth; // OpenSSH 6.2 or later, •¡””FØ—v‹
+  int multiple_required_auth; // OpenSSH 6.2 or later, è¤‡æ•°èªè¨¼è¦æ±‚
   int flags;
   int supported_types;
   HWND auth_dialog;

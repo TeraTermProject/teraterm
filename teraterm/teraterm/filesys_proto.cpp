@@ -59,6 +59,17 @@
 #include "zmodem.h"
 #include "bplus.h"
 #include "quickvan.h"
+#include "raw.h"
+
+typedef enum {
+	PROTO_KMT = 1,
+	PROTO_XM = 2,
+	PROTO_ZM = 3,
+	PROTO_BP = 4,
+	PROTO_QV = 5,
+	PROTO_YM = 6,
+	PROTO_RAW = 7,
+} ProtoId_t;
 
 #define TitKmtRcv   L"Kermit Receive"
 #define TitKmtGet   L"Kermit Get"
@@ -72,6 +83,7 @@
 #define TitZSend    L"ZMODEM Send"
 #define TitQVRcv    L"Quick-VAN Receive"
 #define TitQVSend   L"Quick-VAN Send"
+#define TitRawRcv   L"Receiving file"
 
 #define IsXoptCRC(x)	((x) & 2)
 #define IsXopt1k(x)	(((x)-1) & 2)
@@ -111,7 +123,7 @@ static void _SetDlgProtoFileName(struct FileVarProto *fv, const char *filename)
 		SetDlgItemTextA(fv->HWin, IDC_PROTOFNAME, "");
 		return;
 	}
-	// ƒtƒ@ƒCƒ‹–¼(ÅŒã‚ÌƒpƒXƒZƒpƒŒ[ƒ^‚©‚çŒã‚ë‚ğ•\¦)
+	// ãƒ•ã‚¡ã‚¤ãƒ«å(æœ€å¾Œã®ãƒ‘ã‚¹ã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿ã‹ã‚‰å¾Œã‚ã‚’è¡¨ç¤º)
 	const char *s = filename;
 	const char *p = strrchr(filename, '\\');
 	if (p == NULL) {
@@ -130,11 +142,11 @@ static void _InitDlgProgress(struct FileVarProto *fv, int *CurProgStat)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹–¼‚ğæ“¾
+ *	ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–å¾—
  *
- *	@return		ƒtƒ@ƒCƒ‹–¼ UTF-8
- *				NULL‚Ì‚Æ‚«Ÿ‚Ìƒtƒ@ƒCƒ‹‚Í‚È‚¢
- *				•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
+ *	@return		ãƒ•ã‚¡ã‚¤ãƒ«å UTF-8
+ *				NULLã®ã¨ãæ¬¡ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ãªã„
+ *				ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  */
 static char *GetNextFname(PFileVarProto fv)
 {
@@ -149,10 +161,10 @@ static char *GetNextFname(PFileVarProto fv)
 }
 
 /**
- *	ƒ_ƒEƒ“ƒ[ƒhƒpƒX‚ğæ“¾
+ *	ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ãƒ‘ã‚¹ã‚’å–å¾—
  *
- *	@return		óMƒtƒHƒ‹ƒ_(I’[‚ÉƒpƒXƒZƒpƒŒ[ƒ^'\\'‚ª•t‰Á‚³‚ê‚Ä‚¢‚é)
- *				•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
+ *	@return		å—ä¿¡ãƒ•ã‚©ãƒ«ãƒ€(çµ‚ç«¯ã«ãƒ‘ã‚¹ã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿'\\'ãŒä»˜åŠ ã•ã‚Œã¦ã„ã‚‹)
+ *				ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  */
 static char *GetRecievePath(struct FileVarProto *fv)
 {
@@ -188,6 +200,40 @@ static const TInfoOp InfoOp = {
 	_SetDlgProtoFileName,
 };
 
+static void Insert1Byte(struct Comm_ *comm, BYTE b)
+{
+	PComVar pcv = (PComVar)comm->private_data;
+	CommInsert1Byte(pcv, b);
+}
+
+static int Read1Byte(struct Comm_ *comm, BYTE *b)
+{
+	PComVar pcv = (PComVar)comm->private_data;
+	return CommRead1Byte(pcv, b);
+}
+
+static int BinaryOut(struct Comm_ *comm, const CHAR *buf, size_t len)
+{
+	PComVar pcv = (PComVar)comm->private_data;
+	return CommBinaryOut(pcv, (PCHAR)buf, (int)len);
+}
+
+static void FlashReceiveBuf(struct Comm_ *comm)
+{
+	PComVar pcv = (PComVar)comm->private_data;
+	EnterCriticalSection(&pcv->InBuff_lock);
+	pcv->InBuffCount = 0;
+	pcv->InPtr = 0;
+	LeaveCriticalSection(&pcv->InBuff_lock);
+}
+
+static const CommOp CommOpList =  {
+	BinaryOut,
+	Read1Byte,
+	Insert1Byte,
+	FlashReceiveBuf,
+};
+
 static BOOL NewFileVar_(PFileVarProto *pfv)
 {
 	if (*pfv != NULL) {
@@ -198,7 +244,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 		return FALSE;
 	memset(fv, 0, sizeof(*fv));
 
-	// óMƒtƒHƒ‹ƒ_
+	// å—ä¿¡ãƒ•ã‚©ãƒ«ãƒ€
 	{
 		wchar_t *dir = GetFileDir(&ts);
 		size_t len = wcslen(dir) + 2;
@@ -212,7 +258,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	fv->Success = FALSE;
 	fv->NoMsg = FALSE;
 
-	fv->file = FilesysCreateWin32();
+	fv->file_fv = FilesysCreateWin32();
 
 	fv->GetNextFname = GetNextFname;
 	fv->GetRecievePath = GetRecievePath;
@@ -220,6 +266,11 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	fv->SetDialogCation = SetDialogCation;
 
 	fv->InfoOp = &InfoOp;
+
+	fv->Comm = (TComm *)malloc(sizeof(TComm));
+	fv->Comm->private_data = (void *)&cv;
+	CommOp const **comm_op_ptr = (CommOp const **)&fv->Comm->op;
+	*comm_op_ptr = &CommOpList;
 
 	*pfv = fv;
 	return TRUE;
@@ -232,86 +283,91 @@ static void FreeFileVar_(PFileVarProto *pfv)
 		return;
 	}
 
-	if (fv->ProtoOp != NULL) {
-		fv->ProtoOp->Destroy(fv);
+	if (fv->Proto != NULL) {
+		fv->Proto->Op->Destroy(fv->Proto);
 	}
 
 	if (fv->FileNames != NULL) {
 		free(fv->FileNames);
 	}
-	fv->file->FileSysDestroy(fv->file);
+	fv->file_fv->FileSysDestroy(fv->file_fv);
 	free(fv->DlgCaption);
 	fv->DlgCaption = NULL;
 	free(fv->RecievePath);
 	fv->RecievePath = NULL;
+	free((void *)fv->Comm);
+	fv->Comm = NULL;
+
 	free(fv);
 
 	*pfv = NULL;
 }
 
-static int _ProtoSetOpt(PFileVarProto fv, int request, ...)
-{
-	va_list ap;
-	va_start(ap, request);
-	int r = fv->ProtoOp->SetOptV(fv, request, ap);
-	va_end(ap);
-	return r;
-}
-
 static BOOL OpenProtoDlg(PFileVarProto fv, ProtoId_t IdProto, int Mode, WORD Opt1, WORD Opt2)
 {
 	PProtoDlg pd;
+	TProto *proto;
 
 	switch (IdProto) {
 		case PROTO_KMT:
-			KmtCreate(fv);
+			proto = KmtCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, KMT_MODE, Mode);
 			break;
 		case PROTO_XM:
-			XCreate(fv);
+			proto = XCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, XMODEM_MODE, Mode);
+			proto->Op->SetOpt(proto, XMODEM_OPT, Opt1);
+			proto->Op->SetOpt(proto, XMODEM_TEXT_FLAG, 1 - (Opt2 & 1));
 			break;
 		case PROTO_YM:
-			YCreate(fv);
+			proto = YCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, YMODEM_MODE, Mode);
+			proto->Op->SetOpt(proto, YMODEM_OPT, Opt1);
 			break;
 		case PROTO_ZM:
-			ZCreate(fv);
+			proto = ZCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, ZMODEM_MODE, Mode);
+			proto->Op->SetOpt(proto, ZMODEM_BINFLAG, (Opt1 & 1) != 0);
 			break;
 		case PROTO_BP:
-			BPCreate(fv);
+			proto = BPCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, BPLUS_MODE, Mode);
 			break;
 		case PROTO_QV:
-			QVCreate(fv);
+			proto = QVCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, QUICKVAN_MODE, Mode);
+			break;
+		case PROTO_RAW:
+			proto = RawCreate(fv);
+			if (proto == NULL) {
+				return FALSE;
+			}
+			proto->Op->SetOpt(proto, RAW_AUTOSTOP_SEC, Opt1);
 			break;
 		default:
 			assert(FALSE);
 			return FALSE;
 			break;
 	}
-	fv->ProtoId = IdProto;
-
-	switch (fv->ProtoId) {
-		case PROTO_KMT:
-			_ProtoSetOpt(fv, KMT_MODE, Mode);
-			break;
-		case PROTO_XM:
-			_ProtoSetOpt(fv, XMODEM_MODE, Mode);
-			_ProtoSetOpt(fv, XMODEM_OPT, Opt1);
-			_ProtoSetOpt(fv, XMODEM_TEXT_FLAG, 1 - (Opt2 & 1));
-			break;
-		case PROTO_YM:
-			_ProtoSetOpt(fv, YMODEM_MODE, Mode);
-			_ProtoSetOpt(fv, YMODEM_OPT, Opt1);
-			break;
-		case PROTO_ZM:
-			_ProtoSetOpt(fv, ZMODEM_MODE, Mode);
-			_ProtoSetOpt(fv, ZMODEM_BINFLAG, (Opt1 & 1) != 0);
-			break;
-		case PROTO_BP:
-			_ProtoSetOpt(fv, BPLUS_MODE, Mode);
-			break;
-		case PROTO_QV:
-			_ProtoSetOpt(fv, QUICKVAN_MODE, Mode);
-			break;
-	}
+	fv->Proto = proto;
 
 	pd = new CProtoDlg();
 	if (pd==NULL)
@@ -325,7 +381,7 @@ static BOOL OpenProtoDlg(PFileVarProto fv, ProtoId_t IdProto, int Mode, WORD Opt
 	fv->HWin = pd->m_hWnd;
 	PtDlg = pd;
 
-	BOOL r = fv->ProtoOp->Init(fv, &cv, &ts);
+	BOOL r = fv->Proto->Op->Init(fv->Proto, &cv, &ts);
 	if (r == FALSE) {
 		//fv->Destroy(fv);
 		return FALSE;
@@ -357,7 +413,7 @@ static BOOL ProtoStart(void)
 	if (cv_ProtoFlag)
 		return FALSE;
 	if (FileSnedIsSending())
-	{	// ƒtƒ@ƒCƒ‹‘—M’†
+	{	// ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡ä¸­
 		FreeFileVar_(&FileVar);
 		return FALSE;
 	}
@@ -392,10 +448,10 @@ void ProtoEnd(void)
 	FreeFileVar_(&FileVar);
 }
 
-/* ƒ_ƒCƒAƒƒO‚ğ’†‰›‚ÉˆÚ“®‚·‚é */
+/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’ä¸­å¤®ã«ç§»å‹•ã™ã‚‹ */
 static void CenterCommonDialog(HWND hDlg)
 {
-	/* hDlg‚Ìe‚ªƒ_ƒCƒAƒƒO‚ÌƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹ */
+	/* hDlgã®è¦ªãŒãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ« */
 	HWND hWndDlgRoot = GetParent(hDlg);
 	CenterWindow(hWndDlgRoot, GetParent(hWndDlgRoot));
 }
@@ -545,15 +601,15 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 }
 
 /**
- *	ƒ_ƒCƒAƒƒO‚ÌƒfƒtƒHƒ‹ƒgƒtƒ@ƒCƒ‹–¼‚ğ•Ô‚·
- *		ƒtƒBƒ‹ƒ^(ts.FileSendFilter)‚ªƒƒCƒ‹ƒhƒJ[ƒh‚Å‚Í‚È‚­A
- *		‚»‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚éê‡
- *		ƒfƒtƒHƒ‹ƒg‚Ìƒtƒ@ƒCƒ‹–¼‚Æ‚µ‚Ä•Ô‚·
+ *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ•ã‚¡ã‚¤ãƒ«åã‚’è¿”ã™
+ *		ãƒ•ã‚£ãƒ«ã‚¿(ts.FileSendFilter)ãŒãƒ¯ã‚¤ãƒ«ãƒ‰ã‚«ãƒ¼ãƒ‰ã§ã¯ãªãã€
+ *		ãã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹å ´åˆ
+ *		ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ•ã‚¡ã‚¤ãƒ«åã¨ã—ã¦è¿”ã™
  *
- * @param[in]	path		ƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é‚©’²‚×‚éƒpƒX
- *							(lpstrInitialDir ‚Éİ’è‚³‚ê‚éƒpƒX)
- * @retval		NULL		ƒfƒtƒHƒ‹ƒgƒtƒ@ƒCƒ‹–¼‚È‚µ
- * @retval		NULLˆÈŠO	ƒfƒtƒHƒ‹ƒgƒtƒ@ƒCƒ‹(•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ)
+ * @param[in]	path		ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹ã‹èª¿ã¹ã‚‹ãƒ‘ã‚¹
+ *							(lpstrInitialDir ã«è¨­å®šã•ã‚Œã‚‹ãƒ‘ã‚¹)
+ * @retval		NULL		ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ•ã‚¡ã‚¤ãƒ«åãªã—
+ * @retval		NULLä»¥å¤–	ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ•ã‚¡ã‚¤ãƒ«(ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨)
  */
 static wchar_t *GetCommonDialogDefaultFilenameW(const wchar_t *path)
 {
@@ -562,8 +618,8 @@ static wchar_t *GetCommonDialogDefaultFilenameW(const wchar_t *path)
 		return NULL;
 	}
 
-	// ƒtƒBƒ‹ƒ^‚ªƒƒCƒ‹ƒhƒJ[ƒh‚Å‚Í‚È‚­A‚»‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚éê‡
-	// ‚ ‚ç‚©‚¶‚ßƒfƒtƒHƒ‹ƒg‚Ìƒtƒ@ƒCƒ‹–¼‚ğ“ü‚ê‚Ä‚¨‚­ (2008.5.18 maya)
+	// ãƒ•ã‚£ãƒ«ã‚¿ãŒãƒ¯ã‚¤ãƒ«ãƒ‰ã‚«ãƒ¼ãƒ‰ã§ã¯ãªãã€ãã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹å ´åˆ
+	// ã‚ã‚‰ã‹ã˜ã‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å…¥ã‚Œã¦ãŠã (2008.5.18 maya)
 	wchar_t *filename = NULL;
 	if (!isInvalidFileNameChar(FileSendFilterA)) {
 		wchar_t file[MAX_PATH];
@@ -573,7 +629,7 @@ static wchar_t *GetCommonDialogDefaultFilenameW(const wchar_t *path)
 		wcsncat_s(file, _countof(file), FileSendFilterW, _TRUNCATE);
 		DWORD attr = GetFileAttributesW(file);
 		if (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) == 0) {
-			// ƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é
+			// ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹
 			filename = _wcsdup(file);
 		}
 		free(FileSendFilterW);
@@ -584,7 +640,7 @@ static wchar_t *GetCommonDialogDefaultFilenameW(const wchar_t *path)
 
 static wchar_t **MakeStrArrayFromArray(wchar_t **strs)
 {
-	// ”‚ğ”‚¦‚é
+	// æ•°ã‚’æ•°ãˆã‚‹
 	size_t strs_count = 0;
 	size_t strs_len = 0;
 	while(1) {
@@ -597,15 +653,14 @@ static wchar_t **MakeStrArrayFromArray(wchar_t **strs)
 		strs_len += len;
 	}
 
-	// 1—Ìˆæ‚É•Û‘¶
+	// 1é ˜åŸŸã«ä¿å­˜
 	size_t ptrs_len = sizeof(char *) * (strs_count + 1);
 	char *pool = (char *)malloc(ptrs_len + strs_len * sizeof(wchar_t));
 	wchar_t **ptrs = (wchar_t **)pool;
 	wchar_t *strpool = (wchar_t *)(pool + ptrs_len);
 	for (int i = 0 ; i < strs_count; i++) {
 		size_t len = wcslen(strs[i]) + 1;
-		len = len * sizeof(wchar_t);
-		memcpy(strpool, strs[i], len);
+		memcpy(strpool, strs[i], len * sizeof(wchar_t));
 		ptrs[i] = strpool;
 		strpool += len;
 	}
@@ -624,7 +679,7 @@ static wchar_t **MakeStrArrayFromStr(const wchar_t *str)
 
 static wchar_t **MakeFileArrayMultiSelect(const wchar_t *lpstrFile)
 {
-	// ”‚ğ”‚¦‚é
+	// æ•°ã‚’æ•°ãˆã‚‹
 	size_t file_count = 0;
 	const wchar_t *p = lpstrFile;
 	const wchar_t *path = p;
@@ -640,11 +695,11 @@ static wchar_t **MakeFileArrayMultiSelect(const wchar_t *lpstrFile)
 	}
 
 	if (file_count == 0) {
-		// 1‚Â‚¾‚¯‘I‘ğ‚³‚ê‚Ä‚¢‚½
+		// 1ã¤ã ã‘é¸æŠã•ã‚Œã¦ã„ãŸ
 		return MakeStrArrayFromStr(lpstrFile);
 	}
 
-	// ƒpƒX + ƒtƒ@ƒCƒ‹–¼ ˆê——ì¬
+	// ãƒ‘ã‚¹ + ãƒ•ã‚¡ã‚¤ãƒ«å ä¸€è¦§ä½œæˆ
 	size_t ptr_len = sizeof(wchar_t *) * (file_count + 1);
 	wchar_t **filenames = (wchar_t **)malloc(ptr_len);
 	len = wcslen(path);
@@ -685,7 +740,7 @@ static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPL
 	}
 
 	OPENFILENAMEW ofn = {};
-	ofn.lStructSize = get_OPENFILENAME_SIZE();
+	ofn.lStructSize = get_OPENFILENAME_SIZEW();
 	ofn.hwndOwner   = HWin;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
@@ -738,11 +793,11 @@ static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPL
 }
 
 /**
- *	OnIdle()#teraterm.cpp‚©‚çƒR[ƒ‹‚³‚ê‚é
- *		cv_ProtoFlag ‚ª 0 ˆÈŠO‚Ì‚Æ‚«
+ *	OnIdle()#teraterm.cppã‹ã‚‰ã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
+ *		cv_ProtoFlag ãŒ 0 ä»¥å¤–ã®ã¨ã
  *	@retval		0		continue
- *				1/2		ActiveWin(ƒOƒ[ƒoƒ‹•Ï”)‚Ì’l(IdVT=1/IdTek=2)
- *						’ ¡‚Ì‚Æ‚±‚ëÌ‚Ä‚ç‚ê‚Ä‚¢‚é
+ *				1/2		ActiveWin(ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°)ã®å€¤(IdVT=1/IdTek=2)
+ *						æ³¨ ä»Šã®ã¨ã“ã‚æ¨ã¦ã‚‰ã‚Œã¦ã„ã‚‹
  */
 int ProtoDlgParse(void)
 {
@@ -752,14 +807,18 @@ int ProtoDlgParse(void)
 	if (PtDlg==NULL)
 		return P;
 
-	CommReceive(&cv); //ƒ_ƒCƒAƒƒO•\¦’†‚ÉóM‚µ‚½ƒf[ƒ^‚ğˆ—‚Å‚«‚é‚æ‚¤‚É“Ç‚İæ‚è‚ğs‚í‚¹‚é
+	if (cv.PortType == IdSerial) {
+		// ã‚·ãƒªã‚¢ãƒ«æ¥ç¶šã§ã¯ã€åˆ¥ã‚¹ãƒ¬ãƒƒãƒ‰ CommThread() ã§èª­ã¿å‡ºã—ã‚’è¡Œã£ã¦ã„ã‚‹ãŸã‚ã€CommReceive()ã®å‘¼ã³å‡ºã—ã¯ä¸è¦
+	} else {
+		CommReceive(&cv); //ãƒ€ã‚¤ã‚¢ãƒ­ã‚°è¡¨ç¤ºä¸­ã«å—ä¿¡ã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’å‡¦ç†ã§ãã‚‹ã‚ˆã†ã«èª­ã¿å–ã‚Šã‚’è¡Œã‚ã›ã‚‹
+	}
 
 	PFileVarProto fv = FileVar;
-	if (fv->ProtoOp->Parse(fv, &cv))
-		// ˆ—‚ğŒp‘±‚·‚é
+	if (fv->Proto->Op->Parse(fv->Proto))
+		// å‡¦ç†ã‚’ç¶™ç¶šã™ã‚‹
 		P = 0;
 	else {
-		// ˆ—I—¹
+		// å‡¦ç†çµ‚äº†
 		CommSend(&cv);
 		ProtoEnd();
 	}
@@ -767,46 +826,28 @@ int ProtoDlgParse(void)
 }
 
 /**
- *	ƒ^ƒCƒ€ƒAƒEƒg”­¶
+ *	ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆç™ºç”Ÿ
  */
 void ProtoDlgTimeOut(void)
 {
 	if (PtDlg!=NULL) {
 		PFileVarProto fv = FileVar;
 
-		// ƒ^ƒCƒ€ƒAƒEƒg‚ª”­¶‚µ‚½‚±‚Æ‚ğ’Ê’m‚·‚é
-		fv->ProtoOp->TimeOutProc(fv, &cv);
+		// ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆãŒç™ºç”Ÿã—ãŸã“ã¨ã‚’é€šçŸ¥ã™ã‚‹
+		fv->Proto->Op->TimeOutProc(fv->Proto);
 	}
 }
 
 /**
- *	ƒ_ƒCƒAƒƒO‚Ì "Cancel" ‚ª‰Ÿ‚³‚ê‚½
+ *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã® "Cancel" ãŒæŠ¼ã•ã‚ŒãŸ
  */
 void ProtoDlgCancel(void)
 {
 	if (PtDlg!=NULL) {
 		PFileVarProto fv = FileVar;
 
-		// ƒLƒƒƒ“ƒZƒ‹‚ª‰Ÿ‚³‚ê‚½‚±‚Æ‚ğ’Ê’m‚·‚é
-		fv->ProtoOp->Cancel(fv, &cv);
-
-		// “Á•Êˆ—
-		// 		’Êí‰½‚à‚µ‚È‚¢
-		switch (fv->ProtoId) {
-		case PROTO_ZM:
-		case PROTO_XM:
-			break;
-		case PROTO_KMT:
-		case PROTO_BP:
-		case PROTO_QV:
-		case PROTO_YM:
-			// ƒ_ƒCƒAƒƒO‚ğ•Â‚¶‚é
-			ProtoEnd();
-			break;
-		default:
-			assert(FALSE);
-			break;
-		}
+		// ã‚­ãƒ£ãƒ³ã‚»ãƒ«ãŒæŠ¼ã•ã‚ŒãŸã“ã¨ã‚’é€šçŸ¥ã™ã‚‹
+		fv->Proto->Op->Cancel(fv->Proto);
 	}
 }
 
@@ -850,7 +891,7 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			return TRUE;
 		case IDC_GETFNHELP:
 			if (fv!=NULL) {
-				// ŒÄ‚Ño‚µŒ³‚ªƒwƒ‹ƒvID‚ğ€”õ‚·‚é
+				// å‘¼ã³å‡ºã—å…ƒãŒãƒ˜ãƒ«ãƒ—IDã‚’æº–å‚™ã™ã‚‹
 				PostMessage(fv->HMainWin,WM_USER_DLGHELP2,0,0);
 			}
 			break;
@@ -859,10 +900,10 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	return FALSE;
 }
 
-static BOOL _GetGetFname(HWND HWin, PFileVarProto fv, PTTSet ts)
+static BOOL _GetGetFname(HWND HWin, PFileVarProto fv, PTTSet pts)
 {
-	SetDialogFont(ts->DialogFontNameW, ts->DialogFontPoint, ts->DialogFontCharSet,
-				  ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(pts->DialogFontNameW, pts->DialogFontPoint, pts->DialogFontCharSet,
+				  pts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	return (BOOL)TTDialogBoxParam(hInst,
 								  MAKEINTRESOURCEW(IDD_GETFNDLG),
 								  HWin, GetFnDlg, (LPARAM)fv);
@@ -973,7 +1014,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 	}
 
 	OPENFILENAMEW ofn = {};
-	ofn.lStructSize = get_OPENFILENAME_SIZE();
+	ofn.lStructSize = get_OPENFILENAME_SIZEW();
 	ofn.hwndOwner   = hWnd;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
@@ -1029,9 +1070,9 @@ static void KermitStart(int mode)
 }
 
 /**
- *	Kermit ‘—M
+ *	Kermit é€ä¿¡
  *
- *	@param[in]	filename			óMƒtƒ@ƒCƒ‹–¼(NULL‚Ì‚Æ‚«Aƒ_ƒCƒAƒƒO‚Å‘I‘ğ‚·‚é)
+ *	@param[in]	filename			å—ä¿¡ãƒ•ã‚¡ã‚¤ãƒ«å(NULLã®ã¨ãã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§é¸æŠã™ã‚‹)
  */
 BOOL KermitStartSend(const wchar_t *filename)
 {
@@ -1072,7 +1113,7 @@ BOOL KermitStartSend(const wchar_t *filename)
 }
 
 /**
- *	Kermit óM
+ *	Kermit å—ä¿¡
  */
 BOOL KermitGet(const wchar_t *filename)
 {
@@ -1110,7 +1151,7 @@ BOOL KermitGet(const wchar_t *filename)
 }
 
 /**
- *	Kermit óM
+ *	Kermit å—ä¿¡
  */
 BOOL KermitStartRecive(BOOL macro)
 {
@@ -1125,7 +1166,7 @@ BOOL KermitStartRecive(BOOL macro)
 	SetDialogCation(fv, "FILEDLG_TRANS_TITLE_KMTRCV", TitKmtRcv);
 
 	if (macro) {
-		// ƒ}ƒNƒ‚©‚ç
+		// ãƒã‚¯ãƒ­ã‹ã‚‰
 		FileVar->NoMsg = TRUE;
 	}
 	KermitStart(IdKmtReceive);
@@ -1158,9 +1199,9 @@ BOOL KermitFinish(BOOL macro)
 }
 
 /**
- *	XMODEMóM
+ *	XMODEMå—ä¿¡
  *
- *	@param[in]	filename			óMƒtƒ@ƒCƒ‹–¼(NULL‚Ì‚Æ‚«Aƒ_ƒCƒAƒƒO‚Å‘I‘ğ‚·‚é)
+ *	@param[in]	filename			å—ä¿¡ãƒ•ã‚¡ã‚¤ãƒ«å(NULLã®ã¨ãã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§é¸æŠã™ã‚‹)
  *	@param[in]	ParamBinaryFlag
  *	@param[in]	ParamXmodemOpt
  */
@@ -1253,9 +1294,9 @@ BOOL XMODEMStartReceive(const wchar_t *filename, WORD ParamBinaryFlag, WORD Para
 }
 
 /**
- *	XMODEM‘—M
+ *	XMODEMé€ä¿¡
  *
- *	@param[in]	filename			‘—Mƒtƒ@ƒCƒ‹–¼(NULL‚Ì‚Æ‚«Aƒ_ƒCƒAƒƒO‚Å‘I‘ğ‚·‚é)
+ *	@param[in]	filename			é€ä¿¡ãƒ•ã‚¡ã‚¤ãƒ«å(NULLã®ã¨ãã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§é¸æŠã™ã‚‹)
  *	@param[in]	ParamXmodemOpt
  */
 BOOL XMODEMStartSend(const wchar_t *filename, WORD ParamXmodemOpt)
@@ -1344,9 +1385,9 @@ BOOL XMODEMStartSend(const wchar_t *filename, WORD ParamXmodemOpt)
 }
 
 /**
- *	YMODEMóM
+ *	YMODEMå—ä¿¡
  *
- *	@param[in]	macro	TURE‚Ì‚Æ‚«ƒ}ƒNƒ‚©‚çŒÄ‚Î‚ê‚½
+ *	@param[in]	macro	TUREã®ã¨ããƒã‚¯ãƒ­ã‹ã‚‰å‘¼ã°ã‚ŒãŸ
  */
 BOOL YMODEMStartReceive(BOOL macro)
 {
@@ -1370,7 +1411,7 @@ BOOL YMODEMStartReceive(BOOL macro)
 
 	SetDialogCation(fv, "FILEDLG_TRANS_TITLE_YRCV", TitYRcv);
 
-	// ƒtƒ@ƒCƒ‹“]‘—‚ÌƒIƒvƒVƒ‡ƒ“‚Í"Yopt1K"‚ÉŒˆ‚ß‘Å‚¿B
+	// ãƒ•ã‚¡ã‚¤ãƒ«è»¢é€æ™‚ã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã¯"Yopt1K"ã«æ±ºã‚æ‰“ã¡ã€‚
 	WORD Opt = Yopt1K;
 //	_SetFileVar(FileVar);
 
@@ -1388,9 +1429,9 @@ BOOL YMODEMStartReceive(BOOL macro)
 }
 
 /**
- *	YMODEM‘—M
+ *	YMODEMé€ä¿¡
  *
- *	@param[in]	filename			‘—Mƒtƒ@ƒCƒ‹–¼(NULL‚Ì‚Æ‚«Aƒ_ƒCƒAƒƒO‚Å‘I‘ğ‚·‚é)
+ *	@param[in]	filename			é€ä¿¡ãƒ•ã‚¡ã‚¤ãƒ«å(NULLã®ã¨ãã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§é¸æŠã™ã‚‹)
  */
 BOOL YMODEMStartSend(const wchar_t *filename)
 {
@@ -1408,8 +1449,8 @@ BOOL YMODEMStartSend(const wchar_t *filename)
 
 	SetDialogCation(fv, "FILEDLG_TRANS_TITLE_YSEND", TitYSend);
 
-	// ƒtƒ@ƒCƒ‹“]‘—‚ÌƒIƒvƒVƒ‡ƒ“‚Í"Yopt1K"‚ÉŒˆ‚ß‘Å‚¿B
-	// TODO: "Yopt1K", "YoptG", "YoptSingle"‚ğ‹æ•Ê‚µ‚½‚¢‚È‚ç‚ÎAIDD_FOPT‚ğŠg’£‚·‚é•K—v‚ ‚èB
+	// ãƒ•ã‚¡ã‚¤ãƒ«è»¢é€æ™‚ã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã¯"Yopt1K"ã«æ±ºã‚æ‰“ã¡ã€‚
+	// TODO: "Yopt1K", "YoptG", "YoptSingle"ã‚’åŒºåˆ¥ã—ãŸã„ãªã‚‰ã°ã€IDD_FOPTã‚’æ‹¡å¼µã™ã‚‹å¿…è¦ã‚ã‚Šã€‚
 	WORD Opt = Yopt1K;
 	FileVar->OpId = OpYSend;
 	if (filename == NULL) {
@@ -1448,10 +1489,10 @@ BOOL YMODEMStartSend(const wchar_t *filename)
 }
 
 /**
- *	ZMODEMóM
+ *	ZMODEMå—ä¿¡
  *
- *	@param[in]	macro		TURE‚Ì‚Æ‚«ƒ}ƒNƒ‚©‚çŒÄ‚Î‚ê‚½
- *	@param[in]	autostart	TURE‚Ì‚Æ‚«©“®ƒXƒ^[ƒg
+ *	@param[in]	macro		TUREã®ã¨ããƒã‚¯ãƒ­ã‹ã‚‰å‘¼ã°ã‚ŒãŸ
+ *	@param[in]	autostart	TUREã®ã¨ãè‡ªå‹•ã‚¹ã‚¿ãƒ¼ãƒˆ
  */
 BOOL ZMODEMStartReceive(BOOL macro, BOOL autostart)
 {
@@ -1492,11 +1533,11 @@ BOOL ZMODEMStartReceive(BOOL macro, BOOL autostart)
 }
 
 /**
- *	ZMODEM‘—M
+ *	ZMODEMé€ä¿¡
  *
- *	@param[in]	filename			‘—Mƒtƒ@ƒCƒ‹–¼(NULL‚Ì‚Æ‚«Aƒ_ƒCƒAƒƒO‚Å‘I‘ğ‚·‚é)
+ *	@param[in]	filename			é€ä¿¡ãƒ•ã‚¡ã‚¤ãƒ«å(NULLã®ã¨ãã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§é¸æŠã™ã‚‹)
  *	@param[in]	ParamBinaryFlag		binary mode
- *	@param[in]	autostart			TURE‚Ì‚Æ‚«©“®ƒXƒ^[ƒg
+ *	@param[in]	autostart			TUREã®ã¨ãè‡ªå‹•ã‚¹ã‚¿ãƒ¼ãƒˆ
  */
 BOOL ZMODEMStartSend(const wchar_t *filename, WORD ParamBinaryFlag, BOOL autostart)
 {
@@ -1573,7 +1614,7 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 
 	FileName[0] = 0;
 	OPENFILENAMEW ofn = {};
-	ofn.lStructSize = get_OPENFILENAME_SIZE();
+	ofn.lStructSize = get_OPENFILENAME_SIZEW();
 	ofn.hwndOwner   = hWnd;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
@@ -1772,15 +1813,59 @@ BOOL QVStartSend(const wchar_t *filename)
 	return TRUE;
 }
 
+BOOL RawStartReceive(const wchar_t *filename, int autostop_sec, BOOL macro)
+{
+	if (FileVar != NULL) {
+		return FALSE;
+	}
+	if (!NewFileVar_(&FileVar)) {
+		return FALSE;
+	}
+
+	if (macro) {
+		FileVar->NoMsg = TRUE;
+	}
+
+	TFileVarProto *fv = FileVar;
+	FileVar->OpId = OpRawRcv;
+
+	SetDialogCation(fv, "FILEDLG_TRANS_TITLE_RAWRCV", TitRawRcv);
+
+	assert(filename);
+	if (IsRelativePathW(filename)) {
+		wchar_t *fullpath = GetFileDir(&ts);
+		awcscats(&fullpath, L"\\", filename, NULL);
+		fv->FileNames = MakeStrArrayFromStr(fullpath);
+		free(fullpath);
+	} else {
+		fv->FileNames = MakeStrArrayFromStr(filename);
+	}
+
+	if (! ProtoStart())
+		return FALSE;
+
+	TalkStatus = IdTalkQuiet;
+
+	/* disable transmit delay (serial port) */
+	cv.DelayFlag = FALSE;
+
+	if (! OpenProtoDlg(FileVar,PROTO_RAW,0,autostop_sec,0)) {
+		ProtoEnd();
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
 /**
- *	ƒtƒ@ƒCƒ‹“]‘—‚ğs‚Á‚Ä‚¢‚é‚©?
+ *	ãƒ•ã‚¡ã‚¤ãƒ«è»¢é€ã‚’è¡Œã£ã¦ã„ã‚‹ã‹?
  *
- *	vtwin.cpp ‚Å‘½‚­g‚í‚ê‚Ä‚¢‚é
- *	ƒƒjƒ…‚Ì•\¦“™‚Å—˜—p
- *	ProtoGetProtoFlag() ‚Æ“¯‚¶‚Å‚Í?
+ *	vtwin.cpp ã§å¤šãä½¿ã‚ã‚Œã¦ã„ã‚‹
+ *	ãƒ¡ãƒ‹ãƒ¥ã®è¡¨ç¤ºæ™‚ç­‰ã§åˆ©ç”¨
+ *	ProtoGetProtoFlag() ã¨åŒã˜ã§ã¯?
  *
- *	@retval	TRUE	“]‘—‚µ‚Ä‚¢‚È‚¢
- *	@retval	FALSE	“]‘—’†
+ *	@retval	TRUE	è»¢é€ã—ã¦ã„ãªã„
+ *	@retval	FALSE	è»¢é€ä¸­
  */
 BOOL IsFileVarNULL()
 {
@@ -1788,14 +1873,14 @@ BOOL IsFileVarNULL()
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹“]‘—‚ğs‚Á‚Ä‚¢‚é‚©?
+ *	ãƒ•ã‚¡ã‚¤ãƒ«è»¢é€ã‚’è¡Œã£ã¦ã„ã‚‹ã‹?
  *
- *	filesys_log.c ‚Å‘½‚­g‚í‚ê‚Ä‚¢‚é
- *	“]‘—‚ğs‚Á‚Ä‚¢‚é‚Æ‚«‚ÍƒƒO‚ğæ‚ç‚È‚¢
- *	IsFileVarNULL() ‚Æ“¯‚¶‚Å‚Í?
+ *	filesys_log.c ã§å¤šãä½¿ã‚ã‚Œã¦ã„ã‚‹
+ *	è»¢é€ã‚’è¡Œã£ã¦ã„ã‚‹ã¨ãã¯ãƒ­ã‚°ã‚’å–ã‚‰ãªã„
+ *	IsFileVarNULL() ã¨åŒã˜ã§ã¯?
  *
- *	@retval	TRUE	“]‘—’†
- *	@retval	FALSE	“]‘—‚µ‚Ä‚¢‚È‚¢
+ *	@retval	TRUE	è»¢é€ä¸­
+ *	@retval	FALSE	è»¢é€ã—ã¦ã„ãªã„
  */
 BOOL ProtoGetProtoFlag(void)
 {

@@ -281,6 +281,12 @@
     TCP/IP Port# に 23 を指定して設定保存し直せば元に戻ります。
 
 // 変 更 履 歴 //
+v1.07_31 2025/08/03
+        * Tera Term マクロで cygconnect を実行すると
+          「/D=XXXXXXXX\n指定されたファイルがみつかりません。」と表示され、
+          cygterm が起動しない不具合を修正した。
+          issue: https://github.com/TeraTermProject/teraterm/issues/645
+
 v1.07_30 2022/02/06
         * 読み込む設定ファイルを追加
           $APPDATA/teraterm5/cygterm.cfg

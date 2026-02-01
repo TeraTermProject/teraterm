@@ -4,6 +4,8 @@ build*/
 *.obj
 **/Debug/
 **/Release/
+**/Debug.*/
+**/Release.*/
 **/.vs/
 *.aps
 /GTAGS
@@ -14,3 +16,4 @@ build*/
 *.user
 *.map
 /gtags.files
+*.bak

@@ -76,7 +76,7 @@ static int ssh1_3des_init(EVP_CIPHER_CTX *ctx, const u_char *key, const u_char *
 	c->k1 = EVP_CIPHER_CTX_new();
 	c->k2 = EVP_CIPHER_CTX_new();
 	c->k3 = EVP_CIPHER_CTX_new();
-	/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335Ç≈èàíuó\íË) ***/
+	/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335„ÅßÂá¶ÁΩÆ‰∫àÂÆö) ***/
 	if (EVP_CipherInit(c->k1, EVP_des_cbc(), k1, NULL, enc) == 0 ||
 	    EVP_CipherInit(c->k2, EVP_des_cbc(), k2, NULL, !enc) == 0 ||
 	    EVP_CipherInit(c->k3, EVP_des_cbc(), k3, NULL, enc) == 0) {
@@ -129,7 +129,7 @@ const EVP_CIPHER *evp_ssh1_3des(void)
 
 	if (p == NULL) {
 		p = EVP_CIPHER_meth_new(NID_undef, /*block_size*/8, /*key_len*/16);
-		/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335Ç≈èàíuó\íË) ***/
+		/*** TODO: OPENSSL1.1.1 ERROR CHECK(ticket#39335„ÅßÂá¶ÁΩÆ‰∫àÂÆö) ***/
 	}
 	if (p) {
 		EVP_CIPHER_meth_set_iv_length(p, 0);

@@ -21,7 +21,8 @@
 
 ## TTXChangeFontSize
 
-- [README.md](TTXChangeFontSize/README.md)
+- [ReadMe.txt](TTXChangeFontSize/TTXChangeFontSize/ReadMe.txt)
+- [ReadMe-ja.txt](TTXChangeFontSize/TTXChangeFontSize/ReadMe-ja.txt)
 
 ## TTXCheckUpdate
 
@@ -88,17 +89,3 @@
 プラグインのスケルトン
 
 ----------
-
-cmake時自動ビルド可能なプラグイン
-
-## TTXChangeFontSize
-
-[OSDN](https://osdn.net/users/doda/pf/TTXChangeFontSize/wiki/FrontPage)
-
-cmakeを使用したビルド時はソースを置くと自動でビルドされる
-
-次のコマンドでソースを取得
-```
-cd TTXChangeFontSize
-git clone git://git.pf.osdn.net/gitroot/d/do/doda/TTXChangeFontSize.git
-```

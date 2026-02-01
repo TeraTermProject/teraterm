@@ -34,9 +34,9 @@
 #error check compiler
 #endif
 
-// MessageBox‚Ìƒ^ƒCƒgƒ‹‚Åg—p TODO exeƒtƒ@ƒCƒ‹–¼‚É•ÏX
+// MessageBoxã®ã‚¿ã‚¤ãƒˆãƒ«ã§ä½¿ç”¨ TODO exeãƒ•ã‚¡ã‚¤ãƒ«åã«å¤‰æ›´
 static char Program[] = "CygTerm+";
-//static char Version[] = "version 1.07_30_beta (2021/11/14)";
+//static char Version[] = "version 1.07_31 (2025/08/03)";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -116,7 +116,7 @@ static char *usr_conf;          // ~/cygtermrc  $HOME/cygtermrc
 //================//
 // message output //
 //----------------//
-// msg ‚Í ANSI•¶šƒR[ƒh (UTF8‚Í‰»‚¯‚é)
+// msg ã¯ ANSIæ–‡å­—ã‚³ãƒ¼ãƒ‰ (UTF8ã¯åŒ–ã‘ã‚‹)
 void msg_print(const char* msg)
 {
     OutputDebugStringA(msg);
@@ -253,11 +253,11 @@ static void get_username_and_shell(cfg_data_t *cfg)
 //--------------------//
 static void load_cfg(cfg_data_t *cfg)
 {
-	// İ’èƒtƒ@ƒCƒ‹“Ç‚İ‚İ‡
-	//		ƒŠƒXƒg‚Ìã‚Ì‚Ù‚¤‚©‚çæ‚É“Ç‚İ‚Ü‚ê‚é
-	//		ƒŠƒXƒg‚Ì‰º‚Ì‚Ù‚¤‚©‚çŒã‚É“Ç‚İ‚Ü‚ê‚é(‚ ‚ÆŸ‚¿)
-	//		‰º‚Ì•û‚ª—Dæ‡ˆÊ‚ª‚‚¢
-	// ’Êí
+	// è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿é †
+	//		ãƒªã‚¹ãƒˆã®ä¸Šã®ã»ã†ã‹ã‚‰å…ˆã«èª­ã¿è¾¼ã¾ã‚Œã‚‹
+	//		ãƒªã‚¹ãƒˆã®ä¸‹ã®ã»ã†ã‹ã‚‰å¾Œã«èª­ã¿è¾¼ã¾ã‚Œã‚‹(ã‚ã¨å‹ã¡)
+	//		ä¸‹ã®æ–¹ãŒå„ªå…ˆé †ä½ãŒé«˜ã„
+	// é€šå¸¸æ™‚
 	char *conf_order_normal_list[] = {
 		cfg_exe,			// [exe directory]/cygterm.cfg
 		sys_conf,			// /etc/cygterm.conf
@@ -266,7 +266,7 @@ static void load_cfg(cfg_data_t *cfg)
 	};
 	const int conf_order_normal_count = (int)_countof(conf_order_normal_list);
 
-	// ƒ|[ƒ^ƒuƒ‹
+	// ãƒãƒ¼ã‚¿ãƒ–ãƒ«æ™‚
 	char *conf_order_portable_list[] = {
 		cfg_exe,			// [exe directory]/cygterm.cfg
 	};
@@ -275,17 +275,17 @@ static void load_cfg(cfg_data_t *cfg)
 	char **conf_order_list;
 	int conf_order_count;
 	if (IsPortableMode()) {
-		// ƒ|[ƒ^ƒuƒ‹
+		// ãƒãƒ¼ã‚¿ãƒ–ãƒ«æ™‚
 		conf_order_list = conf_order_portable_list;
 		conf_order_count = conf_order_portable_count;
 	}
 	else {
-		// ’Êí
+		// é€šå¸¸æ™‚
 		conf_order_list = conf_order_normal_list;
 		conf_order_count = conf_order_normal_count;
 	}
 
-	// ÀÛ‚É“Ç‚İ‚Ş
+	// å®Ÿéš›ã«èª­ã¿è¾¼ã‚€
 	for (int i = 0; i < conf_order_count; i++) {
 		const char *fname = conf_order_list[i];
 		debug_msg_print("load %s", fname);
@@ -722,7 +722,7 @@ DWORD WINAPI term_thread(LPVOID param)
 	asprintf(&term, cfg->term, inet_ntoa(addr), (int)ntohs(listen_port));
 	if (cfg->termopt != NULL) {
 		char *tmp;
-		asprintf(&tmp, "%s %s", tmp, cfg->termopt);
+		asprintf(&tmp, "%s %s", term, cfg->termopt);
 		free(term);
 		term = tmp;
 	}
@@ -749,8 +749,10 @@ DWORD WINAPI term_thread(LPVOID param)
 	free(termT);
 	if (!r) {
 		api_error(term);
+		free(term);
 		return 0;
 	}
+	free(term);
 	WaitForSingleObject(pi.hProcess, INFINITE);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
@@ -1418,12 +1420,12 @@ int main(int argc, char** argv)
 }
 
 #ifdef NO_WIN_MAIN
-// ƒŠƒ“ƒN‚É -mwindows ‚ğw’è‚µ‚Ä‚¢‚é‚Ì‚Å
-// Àsƒtƒ@ƒCƒ‹‚Í subsystem=windows ‚Å¶¬‚³‚ê‚Ä‚¢‚é
-// ƒvƒƒOƒ‰ƒ€‚ÌƒGƒ“ƒgƒŠ‚Í WinMainCRTStartup() ‚Æ‚È‚é
-// cygwin‚ÅƒCƒ“ƒXƒg[ƒ‹‚³‚ê‚égcc 11.2 ‚Å‚Í‚Æ‚­‚Éw’è‚µ‚È‚­‚Ä‚à main() ‚ªƒR[ƒ‹‚³‚ê‚é
+// ãƒªãƒ³ã‚¯æ™‚ã« -mwindows ã‚’æŒ‡å®šã—ã¦ã„ã‚‹ã®ã§
+// å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ã¯ subsystem=windows ã§ç”Ÿæˆã•ã‚Œã¦ã„ã‚‹
+// ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ã‚¨ãƒ³ãƒˆãƒªã¯ WinMainCRTStartup() ã¨ãªã‚‹
+// cygwinã§ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã•ã‚Œã‚‹gcc 11.2 ã§ã¯ã¨ãã«æŒ‡å®šã—ãªãã¦ã‚‚ main() ãŒã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
 //
-// ˆÈ‘O‚Ìcygwin‚Ìgcc‚Å‚ÍŸ‚ÌƒR[ƒh‚ª•K—v‚¾‚Á‚½‚Ì‚©‚à‚µ‚ê‚È‚¢
+// ä»¥å‰ã®cygwinã®gccã§ã¯æ¬¡ã®ã‚³ãƒ¼ãƒ‰ãŒå¿…è¦ã ã£ãŸã®ã‹ã‚‚ã—ã‚Œãªã„
 // This program is an Win32 application but, start as Cygwin main().
 //------------------------------------------------------------------
 extern "C" {

@@ -28,40 +28,35 @@
 
 #include "ttxssh.h"
 #include "mac.h"
+#include "digest.h"
 #include "kex.h"
+#include "ssherr.h"
+#include "openbsd-compat.h"
 
 
-struct SSH2Mac {
-	SSH2MacId id;
-	char *name;
-	const EVP_MD *(*evp_md)(void);
-	int truncatebits;
-	int etm;
-};
-
-static const struct SSH2Mac ssh2_macs[] = {
-	{HMAC_SHA1,         "hmac-sha1",                     EVP_sha1,      0,  0}, // RFC4253
-	{HMAC_MD5,          "hmac-md5",                      EVP_md5,       0,  0}, // RFC4253
-	{HMAC_SHA1_96,      "hmac-sha1-96",                  EVP_sha1,      96, 0}, // RFC4253
-	{HMAC_MD5_96,       "hmac-md5-96",                   EVP_md5,       96, 0}, // RFC4253
-	{HMAC_RIPEMD160,    "hmac-ripemd160@openssh.com",    EVP_ripemd160, 0,  0},
-	{HMAC_SHA2_256,     "hmac-sha2-256",                 EVP_sha256,    0,  0}, // RFC6668
-//	{HMAC_SHA2_256_96,  "hmac-sha2-256-96",              EVP_sha256,    96, 0}, // draft-dbider-sha2-mac-for-ssh-05, deleted at 06
-	{HMAC_SHA2_512,     "hmac-sha2-512",                 EVP_sha512,    0,  0}, // RFC6668
-//	{HMAC_SHA2_512_96,  "hmac-sha2-512-96",              EVP_sha512,    96, 0}, // draft-dbider-sha2-mac-for-ssh-05, deleted at 06
-	{HMAC_SHA1_EtM,     "hmac-sha1-etm@openssh.com",     EVP_sha1,      0,  1},
-	{HMAC_MD5_EtM,      "hmac-md5-etm@openssh.com",      EVP_md5,       0,  1},
-	{HMAC_SHA1_96_EtM,  "hmac-sha1-96-etm@openssh.com",  EVP_sha1,      96, 1},
-	{HMAC_MD5_96_EtM,   "hmac-md5-96-etm@openssh.com",   EVP_md5,       96, 1},
-	{HMAC_RIPEMD160_EtM,"hmac-ripemd160-etm@openssh.com",EVP_ripemd160, 0,  1},
-	{HMAC_SHA2_256_EtM, "hmac-sha2-256-etm@openssh.com", EVP_sha256,    0,  1},
-	{HMAC_SHA2_512_EtM, "hmac-sha2-512-etm@openssh.com", EVP_sha512,    0,  1},
-	{HMAC_IMPLICIT,     "<implicit>",                    EVP_md_null,   0,  0}, // for AEAD cipher
-	{HMAC_NONE,         NULL,                            NULL,          0,  0},
+static const struct ssh2_mac_t ssh2_macs[] = {
+	{HMAC_SHA1,         "hmac-sha1",                     SSH_DIGEST_SHA1,      0,  0}, // RFC4253
+	{HMAC_MD5,          "hmac-md5",                      SSH_DIGEST_MD5,       0,  0}, // RFC4253
+	{HMAC_SHA1_96,      "hmac-sha1-96",                  SSH_DIGEST_SHA1,      96, 0}, // RFC4253
+	{HMAC_MD5_96,       "hmac-md5-96",                   SSH_DIGEST_MD5,       96, 0}, // RFC4253
+	{HMAC_RIPEMD160,    "hmac-ripemd160@openssh.com",    SSH_DIGEST_RIPEMD160, 0,  0},
+	{HMAC_SHA2_256,     "hmac-sha2-256",                 SSH_DIGEST_SHA256,    0,  0}, // RFC6668
+//	{HMAC_SHA2_256_96,  "hmac-sha2-256-96",              SSH_DIGEST_SHA256,    96, 0}, // draft-dbider-sha2-mac-for-ssh-05, deleted at 06
+	{HMAC_SHA2_512,     "hmac-sha2-512",                 SSH_DIGEST_SHA512,    0,  0}, // RFC6668
+//	{HMAC_SHA2_512_96,  "hmac-sha2-512-96",              SSH_DIGEST_SHA512,    96, 0}, // draft-dbider-sha2-mac-for-ssh-05, deleted at 06
+	{HMAC_SHA1_EtM,     "hmac-sha1-etm@openssh.com",     SSH_DIGEST_SHA1,      0,  1},
+	{HMAC_MD5_EtM,      "hmac-md5-etm@openssh.com",      SSH_DIGEST_MD5,       0,  1},
+	{HMAC_SHA1_96_EtM,  "hmac-sha1-96-etm@openssh.com",  SSH_DIGEST_SHA1,      96, 1},
+	{HMAC_MD5_96_EtM,   "hmac-md5-96-etm@openssh.com",   SSH_DIGEST_MD5,       96, 1},
+	{HMAC_RIPEMD160_EtM,"hmac-ripemd160-etm@openssh.com",SSH_DIGEST_RIPEMD160, 0,  1},
+	{HMAC_SHA2_256_EtM, "hmac-sha2-256-etm@openssh.com", SSH_DIGEST_SHA256,    0,  1},
+	{HMAC_SHA2_512_EtM, "hmac-sha2-512-etm@openssh.com", SSH_DIGEST_SHA512,    0,  1},
+	{HMAC_IMPLICIT,     "<implicit>",                    SSH_DIGEST_MAX,       0,  0}, // for AEAD cipher
+	{HMAC_NONE,         NULL,                            SSH_DIGEST_MAX,       0,  0},
 };
 
 
-char* get_ssh2_mac_name(const struct SSH2Mac *mac)
+char* get_ssh2_mac_name(const struct ssh2_mac_t *mac)
 {
 	if (mac) {
 		return mac->name;
@@ -71,24 +66,24 @@ char* get_ssh2_mac_name(const struct SSH2Mac *mac)
 	}
 }
 
-char* get_ssh2_mac_name_by_id(const SSH2MacId id)
+char* get_ssh2_mac_name_by_id(const mac_algorithm id)
 {
 	return get_ssh2_mac_name(get_ssh2_mac(id));
 }
 
-const EVP_MD* get_ssh2_mac_EVP_MD(const struct SSH2Mac *mac)
+const digest_algorithm get_ssh2_mac_hash_algorithm(const struct ssh2_mac_t *mac)
 {
 	if (mac) {
-		return mac->evp_md();
+		return mac->alg;
 	}
 	else {
-		return EVP_md_null();
+		return SSH_DIGEST_MAX;
 	}
 }
 
-const struct SSH2Mac *get_ssh2_mac(SSH2MacId id)
+const struct ssh2_mac_t *get_ssh2_mac(mac_algorithm id)
 {
-	const struct SSH2Mac *ptr = ssh2_macs;
+	const struct ssh2_mac_t *ptr = ssh2_macs;
 
 	while (ptr->name != NULL) {
 		if (ptr->id == id) {
@@ -100,7 +95,7 @@ const struct SSH2Mac *get_ssh2_mac(SSH2MacId id)
 	return NULL;
 }
 
-int get_ssh2_mac_truncatebits(const struct SSH2Mac *mac)
+int get_ssh2_mac_truncatebits(const struct ssh2_mac_t *mac)
 {
 	if (mac) {
 		return mac->truncatebits;
@@ -110,7 +105,7 @@ int get_ssh2_mac_truncatebits(const struct SSH2Mac *mac)
 	}
 }
 
-int get_ssh2_mac_etm(const struct SSH2Mac *mac)
+int get_ssh2_mac_etm(const struct ssh2_mac_t *mac)
 {
 	if (mac) {
 		return mac->etm;
@@ -145,10 +140,10 @@ void normalize_mac_order(char *buf)
 	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
 }
 
-const struct SSH2Mac *choose_SSH2_mac_algorithm(char *server_proposal, char *my_proposal)
+const struct ssh2_mac_t *choose_SSH2_mac_algorithm(char *server_proposal, char *my_proposal)
 {
 	char str_hmac[64];
-	const struct SSH2Mac *ptr = ssh2_macs;
+	const struct ssh2_mac_t *ptr = ssh2_macs;
 
 	choose_SSH2_proposal(server_proposal, my_proposal, str_hmac, sizeof(str_hmac));
 
@@ -162,16 +157,16 @@ const struct SSH2Mac *choose_SSH2_mac_algorithm(char *server_proposal, char *my_
 	return (NULL);
 }
 
-// HMACƒAƒ‹ƒSƒŠƒYƒ€—Dæ‡ˆÊ‚É‰ž‚¶‚ÄAmyproposal[]‚ð‘‚«Š·‚¦‚éB
+// HMACã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ å„ªå…ˆé †ä½ã«å¿œã˜ã¦ã€myproposal[]ã‚’æ›¸ãæ›ãˆã‚‹ã€‚
 // (2011.2.28 yutaka)
 void SSH2_update_hmac_myproposal(PTInstVar pvar)
 {
-	static char buf[256]; // TODO: malloc()‚É‚·‚×‚«
+	static char buf[256]; // TODO: malloc()ã«ã™ã¹ã
 	int index;
 	int len, i;
 
-	// ’ÊM’†‚ÉŒÄ‚Î‚ê‚é‚Æ‚¢‚¤‚±‚Æ‚ÍƒL[Äì¬
-	// ƒL[Äì¬‚Ìê‡‚Í‰½‚à‚µ‚È‚¢
+	// é€šä¿¡ä¸­ã«å‘¼ã°ã‚Œã‚‹ã¨ã„ã†ã“ã¨ã¯ã‚­ãƒ¼å†ä½œæˆ
+	// ã‚­ãƒ¼å†ä½œæˆã®å ´åˆã¯ä½•ã‚‚ã—ãªã„
 	if (pvar->socket != INVALID_SOCKET) {
 		return;
 	}
@@ -187,6 +182,95 @@ void SSH2_update_hmac_myproposal(PTInstVar pvar)
 	len = strlen(buf);
 	if (len > 0)
 		buf[len - 1] = '\0';  // get rid of comma
-	myproposal[PROPOSAL_MAC_ALGS_CTOS] = buf; 
-	myproposal[PROPOSAL_MAC_ALGS_STOC] = buf; 
+	myproposal[PROPOSAL_MAC_ALGS_CTOS] = buf;
+	myproposal[PROPOSAL_MAC_ALGS_STOC] = buf;
+}
+
+/*
+ * Import from OpenSSH 7.9p1
+ * $OpenBSD: mac.c,v 1.34 2017/05/08 22:57:38 djm Exp $
+ */
+
+// ä»Šã®ã¨ã“ã‚ umac ç³»ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ãªã„
+// ãã®ãŸã‚ TTSSH ã® struct Mac ã¯ã€OpenSSH ã® struct sshmac ã¨é•ã„ type ã‚’æŒã£ã¦ã„ãªã„
+
+int
+mac_setup_by_alg(struct Mac *mac, const struct ssh2_mac_t *macalg)
+{
+	if ((mac->hmac_ctx = ssh_hmac_start(macalg->alg)) == NULL)
+		return SSH_ERR_ALLOC_FAIL;
+	mac->key_len = mac->mac_len = ssh_hmac_bytes(macalg->alg);
+	if (macalg->truncatebits != 0)
+		mac->mac_len = macalg->truncatebits / 8;
+	mac->etm = macalg->etm;
+	return 0;
+}
+
+int
+mac_init(struct Mac *mac)
+{
+	if (mac->key == NULL)
+		return SSH_ERR_INVALID_ARGUMENT;
+	if (mac->hmac_ctx == NULL ||
+	    ssh_hmac_init(mac->hmac_ctx, mac->key, mac->key_len) < 0)
+		return SSH_ERR_INVALID_ARGUMENT;
+	return 0;
+}
+
+int
+mac_compute(struct Mac *mac, u_int32_t seqno,
+    const u_char *data, int datalen,
+    u_char *digest, size_t dlen)
+{
+	static union {
+		u_char m[SSH_DIGEST_MAX_LENGTH];
+		u_int64_t for_align;
+	} u;
+	u_char b[4];
+
+	if (mac->mac_len > sizeof(u))
+		return SSH_ERR_INTERNAL_ERROR;
+	
+	put_u32(b, seqno);
+	/* reset HMAC context */
+	if (ssh_hmac_init(mac->hmac_ctx, NULL, 0) < 0 ||
+	    ssh_hmac_update(mac->hmac_ctx, b, sizeof(b)) < 0 ||
+	    ssh_hmac_update(mac->hmac_ctx, data, datalen) < 0 ||
+	    ssh_hmac_final(mac->hmac_ctx, u.m, sizeof(u.m)) < 0)
+		return SSH_ERR_LIBCRYPTO_ERROR;
+	if (digest != NULL) {
+		if (dlen > mac->mac_len)
+			dlen = mac->mac_len;
+		memcpy(digest, u.m, dlen);
+	}
+	return 0;
+}
+
+int
+mac_check(struct Mac *mac, u_int32_t seqno,
+    const u_char *data, size_t dlen,
+    const u_char *theirmac, size_t mlen)
+{
+	u_char ourmac[SSH_DIGEST_MAX_LENGTH];
+	int r;
+
+	if (mac->mac_len > mlen)
+		return SSH_ERR_INVALID_ARGUMENT;
+	if ((r = mac_compute(mac, seqno, data, dlen,
+	    ourmac, sizeof(ourmac))) != 0)
+		return r;
+	if (timingsafe_bcmp(ourmac, theirmac, mac->mac_len) != 0) {
+		// for debug
+		// logprintf_hexdump(LOG_LEVEL_VERBOSE, ourmac, mac->mac_len, "ourmac in mac_check():");
+		return SSH_ERR_MAC_INVALID;
+	}
+	return 0;
+}
+
+void
+mac_clear(struct Mac *mac)
+{
+	if (mac->hmac_ctx != NULL)
+		ssh_hmac_free(mac->hmac_ctx);
+	mac->hmac_ctx = NULL;
 }

@@ -49,21 +49,11 @@
 
 #include "term_pp.h"
 
-// ƒeƒ“ƒvƒŒ[ƒg‚Ì‘‚«Š·‚¦‚ðs‚¤
+// ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®æ›¸ãæ›ãˆã‚’è¡Œã†
 #define REWRITE_TEMPLATE
 
 static const char *NLListRcv[] = {"CR", "CR+LF", "LF", "AUTO", NULL};
 static const char *NLList[] = {"CR","CR+LF", "LF", NULL};
-static const char *TermList[] =
-	{"VT100", "VT101", "VT102", "VT282", "VT320", "VT382",
-	 "VT420", "VT520", "VT525", NULL};
-static WORD Term_TermJ[] =
-	{IdVT100, IdVT101, IdVT102, IdVT282, IdVT320, IdVT382,
-	 IdVT420, IdVT520, IdVT525};
-static WORD TermJ_Term[] = {1, 1, 2, 3, 3, 4, 4, 5, 6, 7, 8, 9};
-static const char *TermListJ[] =
-	{"VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
-	 "VT320", "VT382", "VT420", "VT520", "VT525", NULL};
 
 typedef struct {
 	TTTSet *pts;
@@ -108,32 +98,20 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			SetDropDownList(Dialog, IDC_TERMCRRCV, NLListRcv, ts->CRReceive); // add 'LF' (2007.1.21 yutaka), added "AUTO" (9th Apr 2012, tentner)
 			SetDropDownList(Dialog, IDC_TERMCRSEND, NLList, ts->CRSend);
 
-#if 0
-			if ( ts->Language!=IdJapanese ) { /* non-Japanese mode */
-				if ((ts->TerminalID>=1) &&
-					(ts->TerminalID <= sizeof(TermJ_Term)/sizeof(WORD))) {
-					w = TermJ_Term[ts->TerminalID-1];
+			int cur_sel = -1;
+			for (int i = 0;; i++) {
+				const TermIDList *term_id = TermIDGetList(i);
+				if (term_id == NULL) {
+					break;
 				}
-				else {
-					w = 1;
+				int index = (int)SendDlgItemMessageA(Dialog, IDC_TERMID,
+													 CB_ADDSTRING, 0, (LPARAM)term_id->TermIDStr);
+				SendDlgItemMessageA(Dialog, IDC_TERMID, CB_SETITEMDATA, index, (LPARAM)term_id->TermID);
+				if (term_id->TermID == ts->TerminalID) {
+					cur_sel = index;
 				}
-				SetDropDownList(Dialog, IDC_TERMID, TermList, w);
 			}
-			else {
-				SetDropDownList(Dialog, IDC_TERMID, TermListJ, ts->TerminalID);
-			}
-#else
-			{
-				if ((ts->TerminalID>=1) &&
-					(ts->TerminalID <= sizeof(TermJ_Term)/sizeof(WORD))) {
-					w = TermJ_Term[ts->TerminalID-1];
-				}
-				else {
-					w = 1;
-				}
-				SetDropDownList(Dialog, IDC_TERMID, TermList, w);
-			}
-#endif
+			SendDlgItemMessage(Dialog, IDC_TERMID, CB_SETCURSEL, cur_sel, 0);
 
 			SetRB(Dialog,ts->LocalEcho,IDC_TERMLOCALECHO,IDC_TERMLOCALECHO);
 
@@ -170,7 +148,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				else if (width > 0) {
 					ts->TerminalWidth = width;
 				}
-				else { // 0 ˆÈ‰º‚Ìê‡‚Í•ÏX‚µ‚È‚¢
+				else { // 0 ä»¥ä¸‹ã®å ´åˆã¯å¤‰æ›´ã—ãªã„
 					;
 				}
 
@@ -181,7 +159,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				else if (height > 0) {
 					ts->TerminalHeight = height;
 				}
-				else { // 0 ˆÈ‰º‚Ìê‡‚Í•ÏX‚µ‚È‚¢
+				else { // 0 ä»¥ä¸‹ã®å ´åˆã¯å¤‰æ›´ã—ãªã„
 					;
 				}
 
@@ -195,15 +173,8 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 					ts->CRSend = w;
 				}
 
-				if ((w = (WORD)GetCurSel(Dialog, IDC_TERMID)) > 0) {
-#if 0
-					if ( ts->Language!=IdJapanese ) { /* non-Japanese mode */
-						if (w > sizeof(Term_TermJ)/sizeof(WORD)) w = 1;
-						w = Term_TermJ[w-1];
-					}
-#endif
-					ts->TerminalID = w;
-				}
+				LRESULT sel = SendDlgItemMessageA(Dialog, IDC_TERMID, CB_GETCURSEL, 0, 0);
+				ts->TerminalID = (int)SendDlgItemMessageA(Dialog, IDC_TERMID, CB_GETITEMDATA, sel, 0);
 
 				GetRB(Dialog,&ts->LocalEcho,IDC_TERMLOCALECHO,IDC_TERMLOCALECHO);
 

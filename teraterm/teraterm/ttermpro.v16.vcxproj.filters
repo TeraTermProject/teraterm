@@ -300,6 +300,24 @@
     <ClCompile Include="ui_pp.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="tslib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tekfont_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="vtdraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="commentdlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="recvfiledlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\raw.c">
+      <Filter>ttpfile</Filter>
+    </ClCompile>
     <ClCompile Include="ttplug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -308,9 +326,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\cygterm\cygterm.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="..\common\tek.ico">
       <Filter>Resource Files</Filter>
     </Image>
@@ -333,6 +348,12 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\common\vt_3d.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\cygwin\cygterm\cygterm.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\vt_flat.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -371,6 +392,9 @@
       <Filter>dialog</Filter>
     </ResourceCompile>
     <ResourceCompile Include="ui_pp.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="tekfont_pp.rc">
       <Filter>dialog</Filter>
     </ResourceCompile>
     <ResourceCompile Include="plugin_pp.rc">
@@ -665,6 +689,27 @@
     </ClInclude>
     <ClInclude Include="ui_pp_res.h">
       <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="tslib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tekfont_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="tekfont_pp_res.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="vtdraw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="commentdlg.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="recvfiledlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\raw.h">
+      <Filter>ttpfile</Filter>
     </ClInclude>
     <ClInclude Include="plugin_pp.h">
       <Filter>dialog</Filter>

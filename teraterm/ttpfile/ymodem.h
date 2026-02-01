@@ -30,15 +30,16 @@
 
 #pragma once
 
-#include "xmodem.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
   /* YMODEM function id */
-#define IdYReceive 1
-#define IdYSend    2
+typedef enum {
+	IdYQuit = 0,	// 内部で使用、処理が完了した状態
+	IdYReceive = 1,
+	IdYSend = 2,
+} YMODEM_MODE_T;
 
   /* YMODEM option */
 #define Yopt1K 1
@@ -52,7 +53,8 @@ enum {
 
 /* prototypes */
 struct FileVarProto;
-BOOL YCreate(struct FileVarProto *fv);
+struct Proto_;
+struct Proto_ *YCreate(struct FileVarProto *fv);
 
 #ifdef __cplusplus
 }

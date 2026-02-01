@@ -41,9 +41,9 @@
 #define KEYSTREAM_ONLY
 
 /*
- * ‚±‚Ìƒ\[ƒX‚Í OpenSSL ‚Ì‚Æ‚«‚¾‚¯g‚í‚ê‚é
- * LibreSSL ‚Ì‚Æ‚«‚Í libressl/crypto/compat/arc4random.c,
- * crypto/compat/getentropy_win.c ‚ªg‚í‚ê‚é
+ * ã“ã®ã‚½ãƒ¼ã‚¹ã¯ OpenSSL ã®ã¨ãã ã‘ä½¿ã‚ã‚Œã‚‹
+ * LibreSSL ã®ã¨ãã¯ libressl/crypto/compat/arc4random.c,
+ * crypto/compat/getentropy_win.c ãŒä½¿ã‚ã‚Œã‚‹
  */
 #include "openssl/opensslv.h"  // for LIBRESSL_VERSION_NUMBER
 #ifndef LIBRESSL_VERSION_NUMBER

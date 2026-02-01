@@ -47,6 +47,8 @@ target_sources(
   crypt.c
   crypt.h
   crypto_api.h
+  digest.c
+  digest.h
   dns.c
   dns.h
   ed25519.c
@@ -57,6 +59,8 @@ target_sources(
   fwdui.c
   fwdui.h
   hash.c
+  hmac.c
+  hmac.h
   hostkey.c
   hostkey.h
   hosts.c
@@ -81,6 +85,7 @@ target_sources(
   sftp.c
   sftp.h
   smult_curve25519_ref.c
+  sntrup761.c
   ssh.c
   ssh.h
   ssherr.c
@@ -93,11 +98,11 @@ target_sources(
   ttxssh.rc
   util.c
   util.h
+  win32helper_u8.cpp
+  win32helper_u8.h
   x11util.c
   x11util.h
-  win32helper_u8.h
-  win32helper_u8.cpp
-  )
+)
 
 target_sources(
   ${PACKAGE_NAME}

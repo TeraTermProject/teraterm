@@ -359,7 +359,7 @@ Key *KEYFILES_read_private_key(PTInstVar pvar,
 	} else {
 		Key *result = (Key *) malloc(sizeof(Key));
 
-		// ƒtƒŠ[‚·‚é‚Æ‚«‚É 0 ‚©‚Ç‚¤‚©‚Å”»•Ê‚·‚é‚½‚ß’Ç‰ÁB(2004.12.20 yutaka)
+		// ãƒ•ãƒªãƒ¼ã™ã‚‹ã¨ãã« 0 ã‹ã©ã†ã‹ã§åˆ¤åˆ¥ã™ã‚‹ãŸã‚è¿½åŠ ã€‚(2004.12.20 yutaka)
 		ZeroMemory(result, sizeof(Key));
 
 		result->rsa = RSA_key;
@@ -372,7 +372,7 @@ Key *KEYFILES_read_private_key(PTInstVar pvar,
 // SSH2
 //
 
-// bcrypt KDF Œ`®‚Å“Ç‚Ş
+// bcrypt KDF å½¢å¼ã§èª­ã‚€
 // based on key_parse_private2() @ OpenSSH 6.5
 static Key *read_SSH2_private2_key(PTInstVar pvar,
                                    FILE * fp,
@@ -383,10 +383,10 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
                                    int errmsg_len)
 {
 	/* (A)
-	 * buffer_consumeŒnŠÖ”‚ğg‚¤ê‡‚ÍAbuffer_len‚Æbuffer_ptr‚ªg‚¦‚È‚¢‚Ì‚ÅA
+	 * buffer_consumeç³»é–¢æ•°ã‚’ä½¿ã†å ´åˆã¯ã€buffer_lenã¨buffer_ptrãŒä½¿ãˆãªã„ã®ã§ã€
 	 *   buffer_len -> buffer_remain_len
 	 *   buffer_ptr -> buffer_tail_ptr
-	 * ‚ğ‘ã‘Ög—p‚·‚é‚±‚ÆB
+	 * ã‚’ä»£æ›¿ä½¿ç”¨ã™ã‚‹ã“ã¨ã€‚
 	 */
 	buffer_t *blob = NULL;
 	buffer_t *b = NULL;
@@ -414,7 +414,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	if (blob == NULL || b == NULL || kdf == NULL || encoded == NULL || copy_consumed == NULL)
 		goto error;
 
-	// ƒtƒ@ƒCƒ‹‚ğ‚·‚×‚Ä“Ç‚İ‚Ş
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã™ã¹ã¦èª­ã¿è¾¼ã‚€
 	for (;;) {
 		len = fread(buf, 1, sizeof(buf), fp);
 		buffer_append(blob, buf, len);
@@ -455,7 +455,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		goto error;
 	}
 
-	// ƒtƒ@ƒCƒ‹‚ÌƒXƒLƒƒƒ“‚ªI‚í‚Á‚½‚Ì‚ÅAbase64 decode‚·‚éB
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¹ã‚­ãƒ£ãƒ³ãŒçµ‚ã‚ã£ãŸã®ã§ã€base64 decodeã™ã‚‹ã€‚
 	len = buffer_len(encoded);
 	if ((cp = buffer_append_space(copy_consumed, len)) == NULL) {
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_append_space", __FUNCTION__);
@@ -479,16 +479,16 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	buffer_consume(copy_consumed, sizeof(AUTH_MAGIC));
 
 	/*
-	 * ƒfƒR[ƒh‚µ‚½ƒf[ƒ^‚ğ‰ğÍ‚·‚éB
+	 * ãƒ‡ã‚³ãƒ¼ãƒ‰ã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’è§£æã™ã‚‹ã€‚
 	 */
-	// ˆÃ†‰»ƒAƒ‹ƒSƒŠƒYƒ€‚Ì–¼‘O
+	// æš—å·åŒ–ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã®åå‰
 	ciphername = buffer_get_string_msg(copy_consumed, NULL);
 	cipher = get_cipher_by_name(ciphername);
 	if (cipher == NULL && strcmp(ciphername, "none") != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: unknown cipher name", __FUNCTION__);
 		goto error;
 	}
-	// ƒpƒXƒtƒŒ[ƒY‚Ìƒ`ƒFƒbƒNBˆÃ†‰»‚ª none ‚Å‚È‚¢ê‡‚Í‹ó‚ÌƒpƒXƒ[ƒh‚ğ”F‚ß‚È‚¢B
+	// ãƒ‘ã‚¹ãƒ•ãƒ¬ãƒ¼ã‚ºã®ãƒã‚§ãƒƒã‚¯ã€‚æš—å·åŒ–ãŒ none ã§ãªã„å ´åˆã¯ç©ºã®ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’èªã‚ãªã„ã€‚
 	if ((passphrase == NULL || strlen(passphrase) == 0) &&
 	    strcmp(ciphername, "none") != 0) {
 		/* passphrase required */
@@ -541,7 +541,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	/* size of encrypted key blob */
 	len = buffer_get_int(copy_consumed);
 	blocksize = get_cipher_block_size(cipher);
-	authlen = 0;  // TODO: ‚Æ‚è‚ ‚¦‚¸ŒÅ’è‰»
+	authlen = 0;  // TODO: ã¨ã‚Šã‚ãˆãšå›ºå®šåŒ–
 	if (len < blocksize) {
 		logprintf(LOG_LEVEL_ERROR, "%s: encrypted data too small", __FUNCTION__);
 		goto error;
@@ -570,7 +570,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		}
 	}
 
-	// •œ†‰»
+	// å¾©å·åŒ–
 	cp = buffer_append_space(b, len);
 	cipher_init_SSH2(&cc, cipher, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, pvar);
 	ret = EVP_Cipher(cc->evp, cp, buffer_tail_ptr(copy_consumed), len);
@@ -633,7 +633,7 @@ error:
 	free(salt);
 	free(comment);
 
-	// KDF ‚Å‚Í‚È‚©‚Á‚½
+	// KDF ã§ã¯ãªã‹ã£ãŸ
 	if (keyfmt == NULL) {
 		fseek(fp, 0, SEEK_SET);
 
@@ -671,7 +671,7 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 	result = (Key *)malloc(sizeof(Key));
 	ZeroMemory(result, sizeof(Key));
 
-	// ƒtƒ@ƒCƒ‹‚©‚çƒpƒXƒtƒŒ[ƒY‚ğŒ³‚É”é–§Œ®‚ğ“Ç‚İ‚ŞB
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ‘ã‚¹ãƒ•ãƒ¬ãƒ¼ã‚ºã‚’å…ƒã«ç§˜å¯†éµã‚’èª­ã¿è¾¼ã‚€ã€‚
 	pk = PEM_read_PrivateKey(fp, NULL, NULL, passphrase);
 	if (pk == NULL) {
 		err = ERR_get_error();
@@ -688,7 +688,7 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 		result->dsa = NULL;
 		result->ecdsa = NULL;
 
-		// RSA–Ú‚­‚ç‚Ü‚µ‚ğ—LŒø‚É‚·‚éiƒ^ƒCƒ~ƒ“ƒOUŒ‚‚©‚ç‚Ì–hŒäj
+		// RSAç›®ãã‚‰ã¾ã—ã‚’æœ‰åŠ¹ã«ã™ã‚‹ï¼ˆã‚¿ã‚¤ãƒŸãƒ³ã‚°æ”»æ’ƒã‹ã‚‰ã®é˜²å¾¡ï¼‰
 		if (RSA_blinding_on(result->rsa, NULL) != 1) {
 			err = ERR_get_error();
 			ERR_error_string_n(err, errmsg, errmsg_len);
@@ -1735,7 +1735,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		if (key_ec_validate_private(result->ecdsa) != 0)
 			goto ecdsa_error;
 
-		// ƒtƒ@ƒCƒ‹‚É‚Í”é–§Œ®‚µ‚©Ši”[‚³‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅŒöŠJŒ®‚ğŒvZ‚Å‹‚ß‚é
+		// ãƒ•ã‚¡ã‚¤ãƒ«ã«ã¯ç§˜å¯†éµã—ã‹æ ¼ç´ã•ã‚Œã¦ã„ãªã„ã®ã§å…¬é–‹éµã‚’è¨ˆç®—ã§æ±‚ã‚ã‚‹
 		if ((ctx = BN_CTX_new()) == NULL)
 			goto ecdsa_error;
 		if (!EC_POINT_mul(EC_KEY_get0_group(result->ecdsa), q, exponent, NULL, NULL, ctx)) {

@@ -66,14 +66,14 @@ BOOL CMsgDlg::OnInitDialog()
 	RECT R;
 	HWND HOk;
 
-	// IDOK �̃f�t�H���g "OK", �\��
-	// IDCANCEL �̃f�t�H���g "No", ��\��
+	// IDOK のデフォルト "OK", 表示
+	// IDCANCEL のデフォルト "No", 非表示
 	if (YesNoFlag) {
 		static const DlgTextInfo TextInfosYesNo[] = {
 			{ IDOK, "BTN_YES" },
 			{ IDCANCEL, "BTN_NO" },
 		};
-		SetDlgItemTextA(IDOK, "Yes");	// lng �t�@�C���Ȃ��΍�
+		SetDlgItemTextA(IDOK, "Yes");	// lng ファイルなし対策
 		SetDlgTextsW(m_hWnd, TextInfosYesNo, _countof(TextInfosYesNo), UILanguageFileW);
 	} else {
 		static const DlgTextInfo TextInfosOk[] = {
@@ -118,14 +118,14 @@ LRESULT CMsgDlg::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 	current_WH = R.bottom - R.top;
 
 	if (current_WW == WW && current_WH == WH) {
-		// �T�C�Y���ς���Ă��Ȃ���Ή������Ȃ�
+		// サイズが変わっていなければ何もしない
 		PosX = R.left;
 		PosY = R.top;
 	}
 	else {
 		int new_WW;
 
-		// �������ύX���ꂽ���A�ŏ���蕝�������Ȃ����ꍇ�͌��ɖ߂�
+		// 高さが変更されたか、最初より幅が狭くなった場合は元に戻す
 		if (current_WW < init_WW) {
 			new_WW = init_WW;
 			if (PosX != R.left) {
@@ -168,22 +168,22 @@ void CMsgDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 	CW = R.right-R.left;
 	CH = R.bottom-R.top;
 
-	// ����̂�
+	// 初回のみ
 	if (is_init) {
-		// �e�L�X�g�R���g���[���T�C�Y��␳
+		// テキストコントロールサイズを補正
 		if (TW < BW) {
 			TW = BW * 2;
 		}
 		if (YesNoFlag && (TW < 7*BW/2)) {
 			TW = 7*BW/2;
 		}
-		// �E�C���h�E�T�C�Y�̌v�Z
+		// ウインドウサイズの計算
 		GetWindowRect(&R);
 		WW = TW + (R.right - R.left - CW);
 		WH = TH + (R.bottom - R.top - CH) + BH + BH*3/2;
 		init_WW = WW;
 		init_WH = WH;
-		// ���ۂ̃T�C�Y���擾
+		// 実際のサイズを取得
 		::SetWindowPos(m_hWnd, HWND_TOP, 0, 0, WW, WH, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 		GetClientRect(&R);
 		TW = R.right - R.left;
@@ -223,15 +223,15 @@ void CMsgDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 BOOL CMsgDlg::OnCancel()
 {
 	if (!YesNoFlag) {
-		// ok(yes)�����̂Ƃ��́Acancel�����͉������Ȃ�
+		// ok(yes)だけのときは、cancel処理は何もしない
 		return TRUE;
 	} else {
-		// yes/no�̂Ƃ��́A�f�t�H���g����(�I��)
+		// yes/noのときは、デフォルト処理(終了)
 		return TTCDialog::OnCancel();
 	}
 }
 
-// ���b�Z�[�W�{�b�N�X���L�����Z������(close�{�^��������)�ƁA�}�N���̏I���Ƃ���B
+// メッセージボックスをキャンセルする(closeボタンを押す)と、マクロの終了とする。
 // (2008.8.5 yutaka)
 BOOL CMsgDlg::OnClose()
 {

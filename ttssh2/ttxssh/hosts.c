@@ -59,7 +59,7 @@ See LICENSE.TXT for the license.
 #include "codeconv.h"
 #include "asprintf.h"
 
-// BASE64\¬•¶š—ñi‚±‚±‚Å‚Í'='‚ÍŠÜ‚Ü‚ê‚Ä‚¢‚È‚¢j
+// BASE64æ§‹æˆæ–‡å­—åˆ—ï¼ˆã“ã“ã§ã¯'='ã¯å«ã¾ã‚Œã¦ã„ãªã„ï¼‰
 static char base64[] ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 
@@ -107,7 +107,7 @@ void HOSTS_init(PTInstVar pvar)
 	pvar->hosts_state.file_names = NULL;
 
 	/*
-	 * ‘O‰ñ‚ÌƒIƒvƒVƒ‡ƒ“w’è(/nosecuritywarning)‚ªc‚ç‚È‚¢‚æ‚¤‚É‰Šú‰»‚µ‚Ä‚¨‚­B
+	 * å‰å›ã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³æŒ‡å®š(/nosecuritywarning)ãŒæ®‹ã‚‰ãªã„ã‚ˆã†ã«åˆæœŸåŒ–ã—ã¦ãŠãã€‚
 	 */
 	pvar->nocheck_known_hosts = FALSE;
 }
@@ -121,7 +121,7 @@ void HOSTS_open(PTInstVar pvar)
 }
 
 //
-// known_hostsƒtƒ@ƒCƒ‹‚Ì“à—e‚ğ‚·‚×‚Ä pvar->hosts_state.file_data ‚Ö“Ç‚İ‚Ş
+// known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã®å†…å®¹ã‚’ã™ã¹ã¦ pvar->hosts_state.file_data ã¸èª­ã¿è¾¼ã‚€
 //
 static int begin_read_file(PTInstVar pvar, wchar_t *name,
                            int suppress_errors)
@@ -207,7 +207,7 @@ static int begin_read_host_files(PTInstVar pvar, int suppress_errors)
 	return 1;
 }
 
-// MIME64‚Ì•¶š—ñ‚ğƒXƒLƒbƒv‚·‚é
+// MIME64ã®æ–‡å­—åˆ—ã‚’ã‚¹ã‚­ãƒƒãƒ—ã™ã‚‹
 static int eat_base64(char *data)
 {
 	int index = 0;
@@ -216,7 +216,7 @@ static int eat_base64(char *data)
 	for (;;) {
 		ch = data[index];
 		if (ch == '=' || strchr(base64, ch)) {
-			// BASE64‚Ì\¬•¶š‚ªŒ©‚Â‚©‚Á‚½‚ç index ‚ği‚ß‚é
+			// BASE64ã®æ§‹æˆæ–‡å­—ãŒè¦‹ã¤ã‹ã£ãŸã‚‰ index ã‚’é€²ã‚ã‚‹
 			index++;
 		} else {
 			break;
@@ -276,7 +276,7 @@ static int eat_to_end_of_pattern(char *data)
 	return index;
 }
 
-// SSH2Œ®‚Í BASE64 Œ`®‚ÅŠi”[‚³‚ê‚Ä‚¢‚é
+// SSH2éµã¯ BASE64 å½¢å¼ã§æ ¼ç´ã•ã‚Œã¦ã„ã‚‹
 static Key *parse_base64data(char *data)
 {
 	int count;
@@ -285,16 +285,16 @@ static Key *parse_base64data(char *data)
 	Key *key = NULL;
 	char ch;
 
-	// BASE64•¶š—ñ‚ÌƒTƒCƒY‚ğ“¾‚é
+	// BASE64æ–‡å­—åˆ—ã®ã‚µã‚¤ã‚ºã‚’å¾—ã‚‹
 	count = eat_base64(data);
 	len = 2 * count;
 	blob = malloc(len);
 	if (blob == NULL)
 		goto error;
 
-	// BASE64ƒfƒR[ƒh
+	// BASE64ãƒ‡ã‚³ãƒ¼ãƒ‰
 	ch = data[count];
-	data[count] = '\0';  // ‚±‚±‚Í‰üsƒR[ƒh‚Ì‚Í‚¸‚È‚Ì‚Å‘‚«’×‚µ‚Ä‚à–â‘è‚È‚¢‚Í‚¸
+	data[count] = '\0';  // ã“ã“ã¯æ”¹è¡Œã‚³ãƒ¼ãƒ‰ã®ã¯ãšãªã®ã§æ›¸ãæ½°ã—ã¦ã‚‚å•é¡Œãªã„ã¯ãš
 	n = b64decode(blob, len, data);
 	data[count] = ch;
 	if (n < 0) {
@@ -324,8 +324,8 @@ static char *parse_bignum(char *data)
 	int ch;
 	int leftover_digits = 1;
 
-	// BN_CTX_initŠÖ”‚Í OpenSSL 1.1.0 ‚Åíœ‚³‚ê‚½B
-	// OpenSSL 1.0.2‚Ì“_‚Å‚·‚Å‚É deprecated ˆµ‚¢‚¾‚Á‚½B
+	// BN_CTX_inité–¢æ•°ã¯ OpenSSL 1.1.0 ã§å‰Šé™¤ã•ã‚ŒãŸã€‚
+	// OpenSSL 1.0.2ã®æ™‚ç‚¹ã§ã™ã§ã« deprecated æ‰±ã„ã ã£ãŸã€‚
 	BN_set_word(num, 0);
 	BN_set_word(billion, 1000000000L);
 
@@ -361,7 +361,7 @@ static char *parse_bignum(char *data)
 }
 
 //
-// known_hostsƒtƒ@ƒCƒ‹‚Ì“à—e‚ğ‰ğÍ‚µAw’è‚µ‚½ƒzƒXƒg‚ÌŒöŠJŒ®‚ğ’T‚·B
+// known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã®å†…å®¹ã‚’è§£æã—ã€æŒ‡å®šã—ãŸãƒ›ã‚¹ãƒˆã®å…¬é–‹éµã‚’æ¢ã™ã€‚
 //
 static int check_host_key(PTInstVar pvar, char *hostname,
                           unsigned short tcpport, char *data,
@@ -431,8 +431,8 @@ static int check_host_key(PTInstVar pvar, char *hostname,
 	if (!matched) {
 		return index + eat_to_end_of_line(data + index);
 	} else {
-		// Œ®‚Ìí—Ş‚É‚æ‚èƒtƒH[ƒ}ƒbƒg‚ªˆÙ‚È‚é
-		// ‚Ü‚½AÅ‰‚Éˆê’v‚µ‚½ƒGƒ“ƒgƒŠ‚ğæ“¾‚·‚é‚±‚Æ‚É‚È‚éB
+		// éµã®ç¨®é¡ã«ã‚ˆã‚Šãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆãŒç•°ãªã‚‹
+		// ã¾ãŸã€æœ€åˆã«ä¸€è‡´ã—ãŸã‚¨ãƒ³ãƒˆãƒªã‚’å–å¾—ã™ã‚‹ã“ã¨ã«ãªã‚‹ã€‚
 		/*
 		[SSH1]
 		192.168.1.2 1024 35 13032....
@@ -449,8 +449,8 @@ static int check_host_key(PTInstVar pvar, char *hostname,
 		index += eat_spaces(data + index);
 
 		rsa1_key_bits = atoi(data + index);
-		if (rsa1_key_bits > 0) { // RSA1‚Å‚ ‚é
-			if (!SSHv1(pvar)) { // SSH2Ú‘±‚Å‚ ‚ê‚Î–³‹‚·‚é
+		if (rsa1_key_bits > 0) { // RSA1ã§ã‚ã‚‹
+			if (!SSHv1(pvar)) { // SSH2æ¥ç¶šã§ã‚ã‚Œã°ç„¡è¦–ã™ã‚‹
 				return index + eat_to_end_of_line(data + index);
 			}
 
@@ -470,7 +470,7 @@ static int check_host_key(PTInstVar pvar, char *hostname,
 			Key *key2;
 			ssh_keytype key_type;
 
-			if (!SSHv2(pvar)) { // SSH1Ú‘±‚Å‚ ‚ê‚Î–³‹‚·‚é
+			if (!SSHv2(pvar)) { // SSH1æ¥ç¶šã§ã‚ã‚Œã°ç„¡è¦–ã™ã‚‹
 				return index + eat_to_end_of_line(data + index);
 			}
 
@@ -502,7 +502,7 @@ static int check_host_key(PTInstVar pvar, char *hostname,
 			index += eat_base64(data + index);
 			index += eat_spaces(data + index);
 
-			// Key\‘¢‘Ì©g‚ğ‰ğ•ú‚·‚é (2008.3.2 yutaka)
+			// Keyæ§‹é€ ä½“è‡ªèº«ã‚’è§£æ”¾ã™ã‚‹ (2008.3.2 yutaka)
 			free(key2);
 		}
 
@@ -511,10 +511,10 @@ static int check_host_key(PTInstVar pvar, char *hostname,
 }
 
 //
-// known_hostsƒtƒ@ƒCƒ‹‚©‚çƒzƒXƒg–¼‚É‡’v‚·‚és‚ğ“Ç‚Ş
+// known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ›ã‚¹ãƒˆåã«åˆè‡´ã™ã‚‹è¡Œã‚’èª­ã‚€
 //   return_always
-//     0: Œ©‚Â‚©‚é‚Ü‚Å’T‚·
-//     1: 1s‚¾‚¯’T‚µ‚Ä–ß‚é
+//     0: è¦‹ã¤ã‹ã‚‹ã¾ã§æ¢ã™
+//     1: 1è¡Œã ã‘æ¢ã—ã¦æˆ»ã‚‹
 //
 static int read_host_key(PTInstVar pvar,
                          char *hostname, unsigned short tcpport,
@@ -587,7 +587,7 @@ static int read_host_key(PTInstVar pvar,
 			               key);
 
 		if (!return_always) {
-			// —LŒø‚ÈƒL[‚ªŒ©‚Â‚©‚é‚Ü‚Å
+			// æœ‰åŠ¹ãªã‚­ãƒ¼ãŒè¦‹ã¤ã‹ã‚‹ã¾ã§
 			while_flg = (key->type == KEY_UNSPEC);
 		}
 		else {
@@ -605,10 +605,10 @@ static void finish_read_host_files(PTInstVar pvar, int suppress_errors)
 	}
 }
 
-// ƒT[ƒo‚ÖÚ‘±‚·‚é‘O‚ÉAknown_hostsƒtƒ@ƒCƒ‹‚©‚çƒzƒXƒgŒöŠJŒ®‚ğæ“Ç‚İ‚µ‚Ä‚¨‚­B
+// ã‚µãƒ¼ãƒã¸æ¥ç¶šã™ã‚‹å‰ã«ã€known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ›ã‚¹ãƒˆå…¬é–‹éµã‚’å…ˆèª­ã¿ã—ã¦ãŠãã€‚
 void HOSTS_prefetch_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport)
 {
-	Key key; // known_hosts‚É“o˜^‚³‚ê‚Ä‚¢‚éŒ®
+	Key key; // known_hostsã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹éµ
 
 	if (!begin_read_host_files(pvar, 1)) {
 		return;
@@ -629,10 +629,10 @@ void HOSTS_prefetch_host_key(PTInstVar pvar, char *hostname, unsigned short tcpp
 }
 
 
-// known_hostsƒtƒ@ƒCƒ‹‚©‚çŠY“–‚·‚éƒL[î•ñ‚ğæ“¾‚·‚éB
+// known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰è©²å½“ã™ã‚‹ã‚­ãƒ¼æƒ…å ±ã‚’å–å¾—ã™ã‚‹ã€‚
 //
 // return:
-//   *keyptr != NULL  æ“¾¬Œ÷
+//   *keyptr != NULL  å–å¾—æˆåŠŸ
 //
 static int parse_hostkey_file(PTInstVar pvar, char *hostname,
 	unsigned short tcpport, char *data, Key **keyptr)
@@ -707,8 +707,8 @@ static int parse_hostkey_file(PTInstVar pvar, char *hostname,
 		return index + eat_to_end_of_line(data + index);
 	}
 	else {
-		// Œ®‚Ìí—Ş‚É‚æ‚èƒtƒH[ƒ}ƒbƒg‚ªˆÙ‚È‚é
-		// ‚Ü‚½AÅ‰‚Éˆê’v‚µ‚½ƒGƒ“ƒgƒŠ‚ğæ“¾‚·‚é‚±‚Æ‚É‚È‚éB
+		// éµã®ç¨®é¡ã«ã‚ˆã‚Šãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆãŒç•°ãªã‚‹
+		// ã¾ãŸã€æœ€åˆã«ä¸€è‡´ã—ãŸã‚¨ãƒ³ãƒˆãƒªã‚’å–å¾—ã™ã‚‹ã“ã¨ã«ãªã‚‹ã€‚
 		/*
 		[SSH1]
 		192.168.1.2 1024 35 13032....
@@ -725,8 +725,8 @@ static int parse_hostkey_file(PTInstVar pvar, char *hostname,
 		index += eat_spaces(data + index);
 
 		rsa1_key_bits = atoi(data + index);
-		if (rsa1_key_bits > 0) { // RSA1‚Å‚ ‚é
-			if (!SSHv1(pvar)) { // SSH2Ú‘±‚Å‚ ‚ê‚Î–³‹‚·‚é
+		if (rsa1_key_bits > 0) { // RSA1ã§ã‚ã‚‹
+			if (!SSHv1(pvar)) { // SSH2æ¥ç¶šã§ã‚ã‚Œã°ç„¡è¦–ã™ã‚‹
 				return index + eat_to_end_of_line(data + index);
 			}
 
@@ -748,7 +748,7 @@ static int parse_hostkey_file(PTInstVar pvar, char *hostname,
 		else {
 			char *cp, *p;
 
-			if (!SSHv2(pvar)) { // SSH1Ú‘±‚Å‚ ‚ê‚Î–³‹‚·‚é
+			if (!SSHv2(pvar)) { // SSH1æ¥ç¶šã§ã‚ã‚Œã°ç„¡è¦–ã™ã‚‹
 				return index + eat_to_end_of_line(data + index);
 			}
 
@@ -781,8 +781,8 @@ static int parse_hostkey_file(PTInstVar pvar, char *hostname,
 	}
 }
 
-// known_hostsƒtƒ@ƒCƒ‹‚©‚çƒzƒXƒgŒöŠJŒ®‚ğæ“¾‚·‚éB
-// Šù‘¶‚Ìˆ—‚ğ‰ü•Ï‚µ‚½‚­‚È‚¢‚Ì‚ÅAHost key rotation—p‚ÉV‹K‚É—pˆÓ‚·‚éB
+// known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ›ã‚¹ãƒˆå…¬é–‹éµã‚’å–å¾—ã™ã‚‹ã€‚
+// æ—¢å­˜ã®å‡¦ç†ã‚’æ”¹å¤‰ã—ãŸããªã„ã®ã§ã€Host key rotationç”¨ã«æ–°è¦ã«ç”¨æ„ã™ã‚‹ã€‚
 //
 // return 1: success
 //        0: fail
@@ -799,8 +799,8 @@ int HOSTS_hostkey_foreach(PTInstVar pvar, hostkeys_foreach_fn *callback, void *c
 		goto error;
 	}
 
-	// Host key rotation‚Å‚ÍAknown_hosts ƒtƒ@ƒCƒ‹‚ğ‘‚«Š·‚¦‚é‚Ì‚ÅA
-	// ŒŸõ‚·‚é‚Ì‚Í1‚Â‚ß‚Ìƒtƒ@ƒCƒ‹‚Ì‚İ‚Å‚æ‚¢i2‚Â‚ß‚Ìƒtƒ@ƒCƒ‹‚ÍReadOnly‚Ì‚½‚ßjB
+	// Host key rotationã§ã¯ã€known_hosts ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ›¸ãæ›ãˆã‚‹ã®ã§ã€
+	// æ¤œç´¢ã™ã‚‹ã®ã¯1ã¤ã‚ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®ã¿ã§ã‚ˆã„ï¼ˆ2ã¤ã‚ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ReadOnlyã®ãŸã‚ï¼‰ã€‚
 	filename = pvar->hosts_state.file_names[pvar->hosts_state.file_num];
 	pvar->hosts_state.file_num++;
 
@@ -813,12 +813,12 @@ int HOSTS_hostkey_foreach(PTInstVar pvar, hostkeys_foreach_fn *callback, void *c
 	if (pvar->hosts_state.file_data_index == -1)
 		goto error;
 
-	// ŒŸõ‘ÎÛ‚Æ‚È‚éƒzƒXƒg–¼‚Æƒ|[ƒg”Ô†B
+	// æ¤œç´¢å¯¾è±¡ã¨ãªã‚‹ãƒ›ã‚¹ãƒˆåã¨ãƒãƒ¼ãƒˆç•ªå·ã€‚
 	hostname = pvar->ssh_state.hostname;
 	tcpport = pvar->ssh_state.tcpport;
 
-	// known_hostsƒtƒ@ƒCƒ‹‚Ì“à—e‚ª‚·‚×‚Ä pvar->hosts_state.file_data ‚É“Ç‚İ‚Ü‚ê‚Ä‚¢‚éB
-	// ––”ö‚Í \0 B
+	// known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã®å†…å®¹ãŒã™ã¹ã¦ pvar->hosts_state.file_data ã«èª­ã¿è¾¼ã¾ã‚Œã¦ã„ã‚‹ã€‚
+	// æœ«å°¾ã¯ \0 ã€‚
 	while (pvar->hosts_state.file_data[pvar->hosts_state.file_data_index] != 0) {
 		key = NULL;
 
@@ -828,7 +828,7 @@ int HOSTS_hostkey_foreach(PTInstVar pvar, hostkeys_foreach_fn *callback, void *c
 				pvar->hosts_state.file_data_index,
 				&key);
 
-		// ŠY“–‚·‚éŒ®‚ªŒ©‚Â‚©‚Á‚½‚çAƒR[ƒ‹ƒoƒbƒNŠÖ”‚ğŒÄ‚Ño‚·B
+		// è©²å½“ã™ã‚‹éµãŒè¦‹ã¤ã‹ã£ãŸã‚‰ã€ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã‚’å‘¼ã³å‡ºã™ã€‚
 		if (key != NULL) {
 			if (callback(key, ctx) == 0)
 				key_free(key);
@@ -861,12 +861,12 @@ static BOOL equal_mp_ints(unsigned char *num1,
 }
 
 
-// ŒöŠJŒ®‚Ì”äŠr‚ğs‚¤B
+// å…¬é–‹éµã®æ¯”è¼ƒã‚’è¡Œã†ã€‚
 //
 // return
-//   -1 ... Œ®‚ÌŒ^‚ªˆá‚¤
-//    0 ... “™‚µ‚­‚È‚¢
-//    1 ... “™‚µ‚¢
+//   -1 ... éµã®å‹ãŒé•ã†
+//    0 ... ç­‰ã—ããªã„
+//    1 ... ç­‰ã—ã„
 int HOSTS_compare_public_key(Key *src, Key *key)
 {
 	int bits;
@@ -941,10 +941,10 @@ int HOSTS_compare_public_key(Key *src, Key *key)
 }
 
 #if 0
-// pvar->hosts_state.hostkey ‚Æ“n‚³‚ê‚½ŒöŠJŒ®‚ª“™‚µ‚¢‚©‚ğŒŸØ‚·‚é
-//   -1 ... Œ®‚ÌŒ^‚ªˆá‚¤
-//    0 ... “™‚µ‚­‚È‚¢
-//    1 ... “™‚µ‚¢
+// pvar->hosts_state.hostkey ã¨æ¸¡ã•ã‚ŒãŸå…¬é–‹éµãŒç­‰ã—ã„ã‹ã‚’æ¤œè¨¼ã™ã‚‹
+//   -1 ... éµã®å‹ãŒé•ã†
+//    0 ... ç­‰ã—ããªã„
+//    1 ... ç­‰ã—ã„
 static int match_key(PTInstVar pvar, Key *key)
 {
 	return HOSTS_compare_public_key(&pvar->hosts_state.hostkey, key);
@@ -955,7 +955,7 @@ static void hosts_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest_algorithm
 {
 	char *fp = NULL;
 
-	// fingerprint‚ğİ’è‚·‚é
+	// fingerprintã‚’è¨­å®šã™ã‚‹
 	switch (dgst_alg) {
 	case SSH_DIGEST_MD5:
 		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX, dgst_alg);
@@ -974,7 +974,7 @@ static void hosts_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest_algorithm
 		break;
 	}
 
-	// ƒrƒWƒ…ƒAƒ‹‰»fingerprint‚ğ•\¦‚·‚é
+	// ãƒ“ã‚¸ãƒ¥ã‚¢ãƒ«åŒ–fingerprintã‚’è¡¨ç¤ºã™ã‚‹
 	fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART, dgst_alg);
 	if (fp != NULL) {
 		SendMessage(GetDlgItem(dlg, IDC_FP_RANDOMART), WM_SETTEXT, 0, (LPARAM)fp);
@@ -988,7 +988,7 @@ static void init_hosts_dlg(PTInstVar pvar, HWND dlg)
 	wchar_t *buf2;
 	wchar_t *hostW;
 
-	// ƒzƒXƒg–¼‚É’uŠ·‚·‚é
+	// ãƒ›ã‚¹ãƒˆåã«ç½®æ›ã™ã‚‹
 	GetDlgItemTextW(dlg, IDC_HOSTWARNING, buf, _countof(buf));
 	hostW = ToWcharA(pvar->hosts_state.prefetched_hostname);
 	aswprintf(&buf2, buf, hostW);
@@ -1031,7 +1031,7 @@ static int print_mp_int(char *buf, unsigned char *mp)
 }
 
 //
-// known_hosts ƒtƒ@ƒCƒ‹‚Ö•Û‘¶‚·‚éƒGƒ“ƒgƒŠ‚ğì¬‚·‚éB
+// known_hosts ãƒ•ã‚¡ã‚¤ãƒ«ã¸ä¿å­˜ã™ã‚‹ã‚¨ãƒ³ãƒˆãƒªã‚’ä½œæˆã™ã‚‹ã€‚
 //
 static char *format_host_key(PTInstVar pvar)
 {
@@ -1059,12 +1059,12 @@ static char *format_host_key(PTInstVar pvar)
 			index = strlen(result);
 		}
 
-		// ‘æ2ˆø”(sizeOfBuffer)‚Ìw’èŒë‚è‚É‚æ‚èAÀÛ‚Ìƒoƒbƒtƒ@ƒTƒCƒY‚æ‚è
-		// ‘å‚«‚­‚È‚Á‚Ä‚¢‚½–â‘è‚ğC³‚µ‚½B
-		// ƒ|[ƒg”Ô†‚ª22ˆÈŠO‚Ìê‡AVS2005‚Ìdebug build‚Å‚ÍAadd_host_key()‚Ì
-		// free(keydata)‚ÅA‚©‚È‚ç‚¸uƒuƒŒ[ƒNƒ|ƒCƒ“ƒg‚ª”­¶‚µ‚Ü‚µ‚½Bƒq[ƒv‚ª‰ó‚ê‚Ä‚¢‚é‚±‚Æ‚ª
-		// Œ´ˆö‚Æ‚µ‚Äl‚¦‚ç‚ê‚Ü‚·Bv‚Æ‚¢‚¤—áŠO‚ª”­¶‚·‚éB
-		// release build‚Å‚ÍÄŒ»«‚ª’á‚¢B
+		// ç¬¬2å¼•æ•°(sizeOfBuffer)ã®æŒ‡å®šèª¤ã‚Šã«ã‚ˆã‚Šã€å®Ÿéš›ã®ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã‚ˆã‚Š
+		// å¤§ãããªã£ã¦ã„ãŸå•é¡Œã‚’ä¿®æ­£ã—ãŸã€‚
+		// ãƒãƒ¼ãƒˆç•ªå·ãŒ22ä»¥å¤–ã®å ´åˆã€VS2005ã®debug buildã§ã¯ã€add_host_key()ã®
+		// free(keydata)ã§ã€ã‹ãªã‚‰ãšã€Œãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚ãƒ’ãƒ¼ãƒ—ãŒå£Šã‚Œã¦ã„ã‚‹ã“ã¨ãŒ
+		// åŸå› ã¨ã—ã¦è€ƒãˆã‚‰ã‚Œã¾ã™ã€‚ã€ã¨ã„ã†ä¾‹å¤–ãŒç™ºç”Ÿã™ã‚‹ã€‚
+		// release buildã§ã¯å†ç¾æ€§ãŒä½ã„ã€‚
 		_snprintf_s(result + index, result_len - index, _TRUNCATE,
 		            " %d ", pvar->hosts_state.hostkey.bits);
 		index += strlen(result + index);
@@ -1285,7 +1285,7 @@ static void add_host_key(PTInstVar pvar)
 	}
 }
 
-// w’è‚µ‚½ƒL[‚ğ known_hosts ‚É’Ç‰Á‚·‚éB
+// æŒ‡å®šã—ãŸã‚­ãƒ¼ã‚’ known_hosts ã«è¿½åŠ ã™ã‚‹ã€‚
 void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 {
 	wchar_t *name = NULL;
@@ -1347,8 +1347,8 @@ void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 }
 
 //
-// “¯‚¶ƒzƒXƒg‚Å“à—e‚ÌˆÙ‚È‚éƒL[‚ğíœ‚·‚é
-// add_host_key ‚Ì‚ ‚Æ‚ÉŒÄ‚Ô‚±‚Æ
+// åŒã˜ãƒ›ã‚¹ãƒˆã§å†…å®¹ã®ç•°ãªã‚‹ã‚­ãƒ¼ã‚’å‰Šé™¤ã™ã‚‹
+// add_host_key ã®ã‚ã¨ã«å‘¼ã¶ã“ã¨
 //
 static void delete_different_key(PTInstVar pvar)
 {
@@ -1361,7 +1361,7 @@ static void delete_different_key(PTInstVar pvar)
 		notify_nonfatal_error(pvar, pvar->UIMsg);
 	}
 	else {
-		Key key; // known_hosts‚É“o˜^‚³‚ê‚Ä‚¢‚éŒ®
+		Key key; // known_hostsã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹éµ
 		int length;
 		wchar_t *filename = NULL;
 		int fd;
@@ -1373,14 +1373,14 @@ static void delete_different_key(PTInstVar pvar)
 		struct _stat fileStat;
 		long newFilePos = 0, totalSize;
 
-		// known_hostsƒtƒ@ƒCƒ‹ƒTƒCƒY‚ğæ“¾‚·‚éB
+		// known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹ã€‚
 		filename = get_home_dir_relative_nameW(name);
 		ret = _wstat(filename, &fileStat);
 		if (ret != 0) {
 			// error
 			goto error;
 		}
-		// ƒtƒ@ƒCƒ‹ƒf[ƒ^‚Ìƒƒ‚ƒŠ‚ğŠm•Û‚·‚éB
+		// ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‡ãƒ¼ã‚¿ã®ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ã™ã‚‹ã€‚
 		totalSize = fileStat.st_size;
 		newfiledata = malloc(totalSize);
 		if (newfiledata == NULL) {
@@ -1389,7 +1389,7 @@ static void delete_different_key(PTInstVar pvar)
 		}
 
 
-		// ƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚Ş
+		// ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚€
 		memset(&key, 0, sizeof(key));
 		begin_read_host_files(pvar, 0);
 		do {
@@ -1405,7 +1405,7 @@ static void delete_different_key(PTInstVar pvar)
 			}
 
 			if (data_index == pvar->hosts_state.file_data_index) {
-				// index ‚ªi‚Ü‚È‚¢ == ÅŒã‚Ü‚Å“Ç‚ñ‚¾
+				// index ãŒé€²ã¾ãªã„ == æœ€å¾Œã¾ã§èª­ã‚“ã 
 				break;
 			}
 
@@ -1416,7 +1416,7 @@ static void delete_different_key(PTInstVar pvar)
 				do_write = 1;
 			}
 			else {
-				// ƒzƒXƒg‚ÌÆ‡
+				// ãƒ›ã‚¹ãƒˆã®ç…§åˆ
 				host_index--;
 				do {
 					int negated;
@@ -1445,7 +1445,7 @@ static void delete_different_key(PTInstVar pvar)
 						}
 						if (host_matched && keyfile_port == pvar->ssh_state.tcpport) {
 							matched = 0;
-							// Ú‘±ƒo[ƒWƒ‡ƒ“ƒ`ƒFƒbƒN‚Ì‚½‚ß‚É host_index ‚ği‚ß‚Ä‚©‚ç”²‚¯‚é
+							// æ¥ç¶šãƒãƒ¼ã‚¸ãƒ§ãƒ³ãƒã‚§ãƒƒã‚¯ã®ãŸã‚ã« host_index ã‚’é€²ã‚ã¦ã‹ã‚‰æŠœã‘ã‚‹
 							host_index--;
 							do {
 								host_index++;
@@ -1475,21 +1475,21 @@ static void delete_different_key(PTInstVar pvar)
 					host_index += eat_to_end_of_pattern(data + host_index);
 				} while (data[host_index] == ',');
 
-				// ƒzƒXƒg‚ª“™‚µ‚­‚È‚¢
+				// ãƒ›ã‚¹ãƒˆãŒç­‰ã—ããªã„
 				if (!matched) {
 					do_write = 1;
 				}
-				// ƒzƒXƒg‚ª“™‚µ‚¢
+				// ãƒ›ã‚¹ãƒˆãŒç­‰ã—ã„
 				else {
-					// Œ®‚ÌŒ`®‚ªˆá‚¤ or ‡’v‚·‚éƒL[
+					// éµã®å½¢å¼ãŒé•ã† or åˆè‡´ã™ã‚‹ã‚­ãƒ¼
 					if (HOSTS_compare_public_key(&pvar->hosts_state.hostkey, &key) != 0) {
 						do_write = 1;
 					}
-					// Œ®‚ÌŒ`®‚ª“¯‚¶‚Å‡’v‚µ‚È‚¢ƒL[‚ÍƒXƒLƒbƒv‚³‚ê‚é
+					// éµã®å½¢å¼ãŒåŒã˜ã§åˆè‡´ã—ãªã„ã‚­ãƒ¼ã¯ã‚¹ã‚­ãƒƒãƒ—ã•ã‚Œã‚‹
 				}
 			}
 
-			// ‘‚«‚İˆ—
+			// æ›¸ãè¾¼ã¿å‡¦ç†
 			if (do_write) {
 				length = pvar->hosts_state.file_data_index - data_index;
 
@@ -1508,14 +1508,14 @@ static void delete_different_key(PTInstVar pvar)
 
 			}
 			data_index = pvar->hosts_state.file_data_index;
-		} while (1); // ÅŒã‚Ü‚Å“Ç‚Ş
+		} while (1); // æœ€å¾Œã¾ã§èª­ã‚€
 
 		finish_read_host_files(pvar, 0);
 
-		// ÅŒã‚Éƒƒ‚ƒŠ‚ğ‰ğ•ú‚µ‚Ä‚¨‚­B
+		// æœ€å¾Œã«ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã—ã¦ãŠãã€‚
 		key_init(&key);
 
-		// known_hostsƒtƒ@ƒCƒ‹‚ÉV‚µ‚¢ƒtƒ@ƒCƒ‹ƒf[ƒ^‚Åã‘‚«‚·‚éB
+		// known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã«æ–°ã—ã„ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‡ãƒ¼ã‚¿ã§ä¸Šæ›¸ãã™ã‚‹ã€‚
 		fd = _wopen(filename,
 			_O_CREAT | _O_WRONLY | _O_SEQUENTIAL | _O_BINARY | _O_TRUNC,
 			_S_IREAD | _S_IWRITE);
@@ -1573,7 +1573,7 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 		notify_nonfatal_error(pvar, pvar->UIMsg);
 	}
 	else {
-		Key key; // known_hosts‚É“o˜^‚³‚ê‚Ä‚¢‚éŒ®
+		Key key; // known_hostsã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹éµ
 		int length;
 		wchar_t *filename = NULL;
 		int fd;
@@ -1585,14 +1585,14 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 		struct _stat fileStat;
 		long newFilePos = 0, totalSize;
 
-		// known_hostsƒtƒ@ƒCƒ‹ƒTƒCƒY‚ğæ“¾‚·‚éB
+		// known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹ã€‚
 		filename = get_home_dir_relative_nameW(name);
 		ret = _wstat(filename, &fileStat);
 		if (ret != 0) {
 			// error
 			goto error;
 		}
-		// ƒtƒ@ƒCƒ‹ƒf[ƒ^‚Ìƒƒ‚ƒŠ‚ğŠm•Û‚·‚éB
+		// ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‡ãƒ¼ã‚¿ã®ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ã™ã‚‹ã€‚
 		totalSize = fileStat.st_size;
 		newfiledata = malloc(totalSize);
 		if (newfiledata == NULL) {
@@ -1600,7 +1600,7 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 			goto error;
 		}
 
-		// ƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚Ş
+		// ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚€
 		memset(&key, 0, sizeof(key));
 		begin_read_host_files(pvar, 0);
 		do {
@@ -1616,7 +1616,7 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 			}
 
 			if (data_index == pvar->hosts_state.file_data_index) {
-				// index ‚ªi‚Ü‚È‚¢ == ÅŒã‚Ü‚Å“Ç‚ñ‚¾
+				// index ãŒé€²ã¾ãªã„ == æœ€å¾Œã¾ã§èª­ã‚“ã 
 				break;
 			}
 
@@ -1627,7 +1627,7 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 				do_write = 1;
 			}
 			else {
-				// ƒzƒXƒg‚ÌÆ‡
+				// ãƒ›ã‚¹ãƒˆã®ç…§åˆ
 				host_index--;
 				do {
 					int negated;
@@ -1656,7 +1656,7 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 						}
 						if (host_matched && keyfile_port == pvar->ssh_state.tcpport) {
 							matched = 0;
-							// Ú‘±ƒo[ƒWƒ‡ƒ“ƒ`ƒFƒbƒN‚Ì‚½‚ß‚É host_index ‚ği‚ß‚Ä‚©‚ç”²‚¯‚é
+							// æ¥ç¶šãƒãƒ¼ã‚¸ãƒ§ãƒ³ãƒã‚§ãƒƒã‚¯ã®ãŸã‚ã« host_index ã‚’é€²ã‚ã¦ã‹ã‚‰æŠœã‘ã‚‹
 							host_index--;
 							do {
 								host_index++;
@@ -1686,18 +1686,18 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 					host_index += eat_to_end_of_pattern(data + host_index);
 				} while (data[host_index] == ',');
 
-				// ƒzƒXƒg‚ª“™‚µ‚­‚È‚¢
+				// ãƒ›ã‚¹ãƒˆãŒç­‰ã—ããªã„
 				if (!matched) {
 					do_write = 1;
 				}
-				// ƒzƒXƒg‚ª“™‚µ‚¢
+				// ãƒ›ã‚¹ãƒˆãŒç­‰ã—ã„
 				else {
-					// ˆêØ‘‚«‚İ‚ğ‚µ‚È‚¢B
+					// ä¸€åˆ‡æ›¸ãè¾¼ã¿ã‚’ã—ãªã„ã€‚
 
 				}
 			}
 
-			// ‘‚«‚İˆ—
+			// æ›¸ãè¾¼ã¿å‡¦ç†
 			if (do_write) {
 				length = pvar->hosts_state.file_data_index - data_index;
 
@@ -1716,14 +1716,14 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 
 			}
 			data_index = pvar->hosts_state.file_data_index;
-		} while (1); // ÅŒã‚Ü‚Å“Ç‚Ş
+		} while (1); // æœ€å¾Œã¾ã§èª­ã‚€
 
 		finish_read_host_files(pvar, 0);
 
-		// ÅŒã‚Éƒƒ‚ƒŠ‚ğ‰ğ•ú‚µ‚Ä‚¨‚­B
+		// æœ€å¾Œã«ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã—ã¦ãŠãã€‚
 		key_init(&key);
 
-		// known_hostsƒtƒ@ƒCƒ‹‚ÉV‚µ‚¢ƒtƒ@ƒCƒ‹ƒf[ƒ^‚Åã‘‚«‚·‚éB
+		// known_hostsãƒ•ã‚¡ã‚¤ãƒ«ã«æ–°ã—ã„ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‡ãƒ¼ã‚¿ã§ä¸Šæ›¸ãã™ã‚‹ã€‚
 		fd = _wopen(filename,
 			_O_CREAT | _O_WRONLY | _O_SEQUENTIAL | _O_BINARY | _O_TRUNC,
 			_S_IREAD | _S_IWRITE);
@@ -1766,9 +1766,9 @@ error:
 
 
 //
-// Unknown host‚ÌƒzƒXƒgŒöŠJŒ®‚ğ known_hosts ƒtƒ@ƒCƒ‹‚Ö•Û‘¶‚·‚é‚©‚Ç‚¤‚©‚ğ
-// ƒ†[ƒU‚ÉŠm”F‚³‚¹‚éB
-// TODO: finger print‚Ì•\¦‚às‚¤B
+// Unknown hostã®ãƒ›ã‚¹ãƒˆå…¬é–‹éµã‚’ known_hosts ãƒ•ã‚¡ã‚¤ãƒ«ã¸ä¿å­˜ã™ã‚‹ã‹ã©ã†ã‹ã‚’
+// ãƒ¦ãƒ¼ã‚¶ã«ç¢ºèªã•ã›ã‚‹ã€‚
+// TODO: finger printã®è¡¨ç¤ºã‚‚è¡Œã†ã€‚
 // (2006.3.25 yutaka)
 //
 static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
@@ -1792,7 +1792,7 @@ static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		pvar->hosts_state.hosts_dialog = dlg;
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
-		// ’Ç‰ÁE’u‚«Š·‚¦‚Æ‚à init_hosts_dlg ‚ğŒÄ‚ñ‚Å‚¢‚é‚Ì‚ÅA‚»‚Ì‘O‚ÉƒZƒbƒg‚·‚é•K—v‚ª‚ ‚é
+		// è¿½åŠ ãƒ»ç½®ãæ›ãˆã¨ã‚‚ init_hosts_dlg ã‚’å‘¼ã‚“ã§ã„ã‚‹ã®ã§ã€ãã®å‰ã«ã‚»ãƒƒãƒˆã™ã‚‹å¿…è¦ãŒã‚ã‚‹
 		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 		switch (pvar->dns_key_check) {
@@ -1833,7 +1833,7 @@ static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		}
 
 		init_hosts_dlg(pvar, dlg);
-		// add host check box‚Éƒ`ƒFƒbƒN‚ğƒfƒtƒHƒ‹ƒg‚Å“ü‚ê‚Ä‚¨‚­
+		// add host check boxã«ãƒã‚§ãƒƒã‚¯ã‚’ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§å…¥ã‚Œã¦ãŠã
 		SendMessage(GetDlgItem(dlg, IDC_ADDTOKNOWNHOSTS), BM_SETCHECK, BST_CHECKED, 0);
 
 		CenterWindow(dlg, GetParent(dlg));
@@ -1845,7 +1845,7 @@ static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		switch (LOWORD(wParam)) {
 		case IDC_CONTINUE:
-			// ”FØ’†‚ÉƒT[ƒo‚©‚çØ’f‚³‚ê‚½ê‡‚ÍAƒLƒƒƒ“ƒZƒ‹ˆµ‚¢‚Æ‚·‚éB(2014.3.31 yutaka)
+			// èªè¨¼ä¸­ã«ã‚µãƒ¼ãƒã‹ã‚‰åˆ‡æ–­ã•ã‚ŒãŸå ´åˆã¯ã€ã‚­ãƒ£ãƒ³ã‚»ãƒ«æ‰±ã„ã¨ã™ã‚‹ã€‚(2014.3.31 yutaka)
 			if (!pvar->cv->Ready) {
 				goto canceled;
 			}
@@ -1855,8 +1855,8 @@ static INT_PTR CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			}
 
 			/*
-			 * known_hostsƒ_ƒCƒAƒƒO‚Ì‚½‚ß‚Éˆê’â~‚µ‚Ä‚¢‚½
-			 * SSHƒT[ƒo‚Æ‚ÌƒlƒSƒVƒG[ƒVƒ‡ƒ“‚ğÄŠJ‚³‚¹‚éB
+			 * known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãŸã‚ã«ä¸€æ™‚åœæ­¢ã—ã¦ã„ãŸ
+			 * SSHã‚µãƒ¼ãƒã¨ã®ãƒã‚´ã‚·ã‚¨ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å†é–‹ã•ã›ã‚‹ã€‚
 			 */
 			SSH_notify_host_OK(pvar);
 
@@ -1874,8 +1874,8 @@ canceled:
 
 		case IDCLOSE:
 			/*
-			 * known_hosts’†‚ÉƒT[ƒo‘¤‚©‚çƒlƒbƒgƒ[ƒNØ’f‚³‚ê‚½ê‡A
-			 * ƒ_ƒCƒAƒƒO‚Ì‚İ‚ğ•Â‚¶‚éB
+			 * known_hostsä¸­ã«ã‚µãƒ¼ãƒå´ã‹ã‚‰ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯åˆ‡æ–­ã•ã‚ŒãŸå ´åˆã€
+			 * ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã¿ã‚’é–‰ã˜ã‚‹ã€‚
 			 */
 			pvar->hosts_state.hosts_dialog = NULL;
 			TTEndDialog(dlg, 0);
@@ -1919,7 +1919,7 @@ canceled:
 }
 
 //
-// ’u‚«Š·‚¦‚ÌŠm”Fƒ_ƒCƒAƒƒO‚ğ•ª—£
+// ç½®ãæ›ãˆæ™‚ã®ç¢ºèªãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’åˆ†é›¢
 //
 static INT_PTR CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 											   LPARAM lParam)
@@ -1942,7 +1942,7 @@ static INT_PTR CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam
 		pvar->hosts_state.hosts_dialog = dlg;
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
-		// ’Ç‰ÁE’u‚«Š·‚¦‚Æ‚à init_hosts_dlg ‚ğŒÄ‚ñ‚Å‚¢‚é‚Ì‚ÅA‚»‚Ì‘O‚ÉƒZƒbƒg‚·‚é•K—v‚ª‚ ‚é
+		// è¿½åŠ ãƒ»ç½®ãæ›ãˆã¨ã‚‚ init_hosts_dlg ã‚’å‘¼ã‚“ã§ã„ã‚‹ã®ã§ã€ãã®å‰ã«ã‚»ãƒƒãƒˆã™ã‚‹å¿…è¦ãŒã‚ã‚‹
 		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 		switch (pvar->dns_key_check) {
@@ -1984,7 +1984,7 @@ static INT_PTR CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam
 
 		init_hosts_dlg(pvar, dlg);
 		CenterWindow(dlg, GetParent(dlg));
-		// ƒfƒtƒHƒ‹ƒg‚Åƒ`ƒFƒbƒN‚Í“ü‚ê‚È‚¢
+		// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§ãƒã‚§ãƒƒã‚¯ã¯å…¥ã‚Œãªã„
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
@@ -1992,7 +1992,7 @@ static INT_PTR CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam
 
 		switch (LOWORD(wParam)) {
 		case IDC_CONTINUE:
-			// ”FØ’†‚ÉƒT[ƒo‚©‚çØ’f‚³‚ê‚½ê‡‚ÍAƒLƒƒƒ“ƒZƒ‹ˆµ‚¢‚Æ‚·‚éB(2014.3.31 yutaka)
+			// èªè¨¼ä¸­ã«ã‚µãƒ¼ãƒã‹ã‚‰åˆ‡æ–­ã•ã‚ŒãŸå ´åˆã¯ã€ã‚­ãƒ£ãƒ³ã‚»ãƒ«æ‰±ã„ã¨ã™ã‚‹ã€‚(2014.3.31 yutaka)
 			if (!pvar->cv->Ready) {
 				goto canceled;
 			}
@@ -2003,8 +2003,8 @@ static INT_PTR CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam
 			}
 
 			/*
-			 * known_hostsƒ_ƒCƒAƒƒO‚Ì‚½‚ß‚Éˆê’â~‚µ‚Ä‚¢‚½
-			 * SSHƒT[ƒo‚Æ‚ÌƒlƒSƒVƒG[ƒVƒ‡ƒ“‚ğÄŠJ‚³‚¹‚éB
+			 * known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãŸã‚ã«ä¸€æ™‚åœæ­¢ã—ã¦ã„ãŸ
+			 * SSHã‚µãƒ¼ãƒã¨ã®ãƒã‚´ã‚·ã‚¨ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å†é–‹ã•ã›ã‚‹ã€‚
 			 */
 			SSH_notify_host_OK(pvar);
 
@@ -2022,8 +2022,8 @@ canceled:
 
 		case IDCLOSE:
 			/*
-			 * known_hosts’†‚ÉƒT[ƒo‘¤‚©‚çƒlƒbƒgƒ[ƒNØ’f‚³‚ê‚½ê‡A
-			 * ƒ_ƒCƒAƒƒO‚Ì‚İ‚ğ•Â‚¶‚éB
+			 * known_hostsä¸­ã«ã‚µãƒ¼ãƒå´ã‹ã‚‰ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯åˆ‡æ–­ã•ã‚ŒãŸå ´åˆã€
+			 * ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã¿ã‚’é–‰ã˜ã‚‹ã€‚
 			 */
 			pvar->hosts_state.hosts_dialog = NULL;
 			TTEndDialog(dlg, 0);
@@ -2067,7 +2067,7 @@ canceled:
 }
 
 //
-// “¯‚¶ƒzƒXƒg‚ÅŒ®Œ`®‚ªˆá‚¤‚Ì’Ç‰ÁŠm”Fƒ_ƒCƒAƒƒO‚ğ•ª—£
+// åŒã˜ãƒ›ã‚¹ãƒˆã§éµå½¢å¼ãŒé•ã†æ™‚ã®è¿½åŠ ç¢ºèªãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’åˆ†é›¢
 //
 static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 											LPARAM lParam)
@@ -2090,7 +2090,7 @@ static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		pvar->hosts_state.hosts_dialog = dlg;
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
-		// ’Ç‰ÁE’u‚«Š·‚¦‚Æ‚à init_hosts_dlg ‚ğŒÄ‚ñ‚Å‚¢‚é‚Ì‚ÅA‚»‚Ì‘O‚ÉƒZƒbƒg‚·‚é•K—v‚ª‚ ‚é
+		// è¿½åŠ ãƒ»ç½®ãæ›ãˆã¨ã‚‚ init_hosts_dlg ã‚’å‘¼ã‚“ã§ã„ã‚‹ã®ã§ã€ãã®å‰ã«ã‚»ãƒƒãƒˆã™ã‚‹å¿…è¦ãŒã‚ã‚‹
 		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 		switch (pvar->dns_key_check) {
@@ -2132,7 +2132,7 @@ static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		init_hosts_dlg(pvar, dlg);
 		CenterWindow(dlg, GetParent(dlg));
-		// add host check box ‚ÌƒfƒtƒHƒ‹ƒg‚Í off ‚É‚·‚é
+		// add host check box ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ off ã«ã™ã‚‹
 		// SendMessage(GetDlgItem(dlg, IDC_ADDTOKNOWNHOSTS), BM_SETCHECK, BST_CHECKED, 0);
 
 		return TRUE;			/* because we do not set the focus */
@@ -2142,7 +2142,7 @@ static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		switch (LOWORD(wParam)) {
 		case IDC_CONTINUE:
-			// ”FØ’†‚ÉƒT[ƒo‚©‚çØ’f‚³‚ê‚½ê‡‚ÍAƒLƒƒƒ“ƒZƒ‹ˆµ‚¢‚Æ‚·‚éB(2014.3.31 yutaka)
+			// èªè¨¼ä¸­ã«ã‚µãƒ¼ãƒã‹ã‚‰åˆ‡æ–­ã•ã‚ŒãŸå ´åˆã¯ã€ã‚­ãƒ£ãƒ³ã‚»ãƒ«æ‰±ã„ã¨ã™ã‚‹ã€‚(2014.3.31 yutaka)
 			if (!pvar->cv->Ready) {
 				goto canceled;
 			}
@@ -2152,8 +2152,8 @@ static INT_PTR CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			}
 
 			/*
-			 * known_hostsƒ_ƒCƒAƒƒO‚Ì‚½‚ß‚Éˆê’â~‚µ‚Ä‚¢‚½
-			 * SSHƒT[ƒo‚Æ‚ÌƒlƒSƒVƒG[ƒVƒ‡ƒ“‚ğÄŠJ‚³‚¹‚éB
+			 * known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãŸã‚ã«ä¸€æ™‚åœæ­¢ã—ã¦ã„ãŸ
+			 * SSHã‚µãƒ¼ãƒã¨ã®ãƒã‚´ã‚·ã‚¨ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å†é–‹ã•ã›ã‚‹ã€‚
 			 */
 			SSH_notify_host_OK(pvar);
 
@@ -2171,8 +2171,8 @@ canceled:
 
 		case IDCLOSE:
 			/*
-			 * known_hosts’†‚ÉƒT[ƒo‘¤‚©‚çƒlƒbƒgƒ[ƒNØ’f‚³‚ê‚½ê‡A
-			 * ƒ_ƒCƒAƒƒO‚Ì‚İ‚ğ•Â‚¶‚éB
+			 * known_hostsä¸­ã«ã‚µãƒ¼ãƒå´ã‹ã‚‰ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯åˆ‡æ–­ã•ã‚ŒãŸå ´åˆã€
+			 * ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã¿ã‚’é–‰ã˜ã‚‹ã€‚
 			 */
 			pvar->hosts_state.hosts_dialog = NULL;
 			TTEndDialog(dlg, 0);
@@ -2218,13 +2218,13 @@ canceled:
 void HOSTS_do_unknown_host_dialog(HWND wnd, PTInstVar pvar)
 {
 	if (pvar->hosts_state.hosts_dialog == NULL) {
-		/* known_hosts‚Ì“Ç‚İ‚İAID_SSHASYNCMESSAGEBOX ‚ğg‚Á‚½
-		 * MessageBox ‚ª•\¦‚³‚ê‚éê‡AƒI[ƒi[‚È‚µ(no owner)‚É‚È‚é‚½‚ßA
-		 * MessageBox ‚ªTera Term‚Ì— ‚É‰B‚ê‚é‚±‚Æ‚ª‚ ‚éB
-		 * ‚»‚Ìó‘Ô‚Å GetActiveWindow() ‚ğŒÄ‚Ño‚·‚ÆAknown_hostsƒ_ƒCƒAƒƒO‚Ì
-		 * ƒI[ƒi[‚ª MessageBox ‚Æ‚È‚Á‚ÄATera Term‚Ì— ‚É‰B‚ê‚Ä‚µ‚Ü‚¤B
-		 * ‚»‚±‚ÅAknown_hostsƒ_ƒCƒAƒƒO‚ÌƒI[ƒi[‚Íí‚É Tera Term ‚ğw‚µ¦‚·
-		 * ‚æ‚¤‚É‚·‚éB
+		/* known_hostsã®èª­ã¿è¾¼ã¿æ™‚ã€ID_SSHASYNCMESSAGEBOX ã‚’ä½¿ã£ãŸ
+		 * MessageBox ãŒè¡¨ç¤ºã•ã‚Œã‚‹å ´åˆã€ã‚ªãƒ¼ãƒŠãƒ¼ãªã—(no owner)ã«ãªã‚‹ãŸã‚ã€
+		 * MessageBox ãŒTera Termã®è£ã«éš ã‚Œã‚‹ã“ã¨ãŒã‚ã‚‹ã€‚
+		 * ãã®çŠ¶æ…‹ã§ GetActiveWindow() ã‚’å‘¼ã³å‡ºã™ã¨ã€known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®
+		 * ã‚ªãƒ¼ãƒŠãƒ¼ãŒ MessageBox ã¨ãªã£ã¦ã€Tera Termã®è£ã«éš ã‚Œã¦ã—ã¾ã†ã€‚
+		 * ãã“ã§ã€known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚ªãƒ¼ãƒŠãƒ¼ã¯å¸¸ã« Tera Term ã‚’æŒ‡ã—ç¤ºã™
+		 * ã‚ˆã†ã«ã™ã‚‹ã€‚
 		 */
 		HWND cur_active = NULL;
 
@@ -2237,13 +2237,13 @@ void HOSTS_do_unknown_host_dialog(HWND wnd, PTInstVar pvar)
 void HOSTS_do_different_key_dialog(HWND wnd, PTInstVar pvar)
 {
 	if (pvar->hosts_state.hosts_dialog == NULL) {
-		/* known_hosts‚Ì“Ç‚İ‚İAID_SSHASYNCMESSAGEBOX ‚ğg‚Á‚½
-		 * MessageBox ‚ª•\¦‚³‚ê‚éê‡AƒI[ƒi[‚È‚µ(no owner)‚É‚È‚é‚½‚ßA
-		 * MessageBox ‚ªTera Term‚Ì— ‚É‰B‚ê‚é‚±‚Æ‚ª‚ ‚éB
-		 * ‚»‚Ìó‘Ô‚Å GetActiveWindow() ‚ğŒÄ‚Ño‚·‚ÆAknown_hostsƒ_ƒCƒAƒƒO‚Ì
-		 * ƒI[ƒi[‚ª MessageBox ‚Æ‚È‚Á‚ÄATera Term‚Ì— ‚É‰B‚ê‚Ä‚µ‚Ü‚¤B
-		 * ‚»‚±‚ÅAknown_hostsƒ_ƒCƒAƒƒO‚ÌƒI[ƒi[‚Íí‚É Tera Term ‚ğw‚µ¦‚·
-		 * ‚æ‚¤‚É‚·‚éB
+		/* known_hostsã®èª­ã¿è¾¼ã¿æ™‚ã€ID_SSHASYNCMESSAGEBOX ã‚’ä½¿ã£ãŸ
+		 * MessageBox ãŒè¡¨ç¤ºã•ã‚Œã‚‹å ´åˆã€ã‚ªãƒ¼ãƒŠãƒ¼ãªã—(no owner)ã«ãªã‚‹ãŸã‚ã€
+		 * MessageBox ãŒTera Termã®è£ã«éš ã‚Œã‚‹ã“ã¨ãŒã‚ã‚‹ã€‚
+		 * ãã®çŠ¶æ…‹ã§ GetActiveWindow() ã‚’å‘¼ã³å‡ºã™ã¨ã€known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®
+		 * ã‚ªãƒ¼ãƒŠãƒ¼ãŒ MessageBox ã¨ãªã£ã¦ã€Tera Termã®è£ã«éš ã‚Œã¦ã—ã¾ã†ã€‚
+		 * ãã“ã§ã€known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚ªãƒ¼ãƒŠãƒ¼ã¯å¸¸ã« Tera Term ã‚’æŒ‡ã—ç¤ºã™
+		 * ã‚ˆã†ã«ã™ã‚‹ã€‚
 		 */
 		HWND cur_active = NULL;
 
@@ -2256,13 +2256,13 @@ void HOSTS_do_different_key_dialog(HWND wnd, PTInstVar pvar)
 void HOSTS_do_different_type_key_dialog(HWND wnd, PTInstVar pvar)
 {
 	if (pvar->hosts_state.hosts_dialog == NULL) {
-		/* known_hosts‚Ì“Ç‚İ‚İAID_SSHASYNCMESSAGEBOX ‚ğg‚Á‚½
-		 * MessageBox ‚ª•\¦‚³‚ê‚éê‡AƒI[ƒi[‚È‚µ(no owner)‚É‚È‚é‚½‚ßA
-		 * MessageBox ‚ªTera Term‚Ì— ‚É‰B‚ê‚é‚±‚Æ‚ª‚ ‚éB
-		 * ‚»‚Ìó‘Ô‚Å GetActiveWindow() ‚ğŒÄ‚Ño‚·‚ÆAknown_hostsƒ_ƒCƒAƒƒO‚Ì
-		 * ƒI[ƒi[‚ª MessageBox ‚Æ‚È‚Á‚ÄATera Term‚Ì— ‚É‰B‚ê‚Ä‚µ‚Ü‚¤B
-		 * ‚»‚±‚ÅAknown_hostsƒ_ƒCƒAƒƒO‚ÌƒI[ƒi[‚Íí‚É Tera Term ‚ğw‚µ¦‚·
-		 * ‚æ‚¤‚É‚·‚éB
+		/* known_hostsã®èª­ã¿è¾¼ã¿æ™‚ã€ID_SSHASYNCMESSAGEBOX ã‚’ä½¿ã£ãŸ
+		 * MessageBox ãŒè¡¨ç¤ºã•ã‚Œã‚‹å ´åˆã€ã‚ªãƒ¼ãƒŠãƒ¼ãªã—(no owner)ã«ãªã‚‹ãŸã‚ã€
+		 * MessageBox ãŒTera Termã®è£ã«éš ã‚Œã‚‹ã“ã¨ãŒã‚ã‚‹ã€‚
+		 * ãã®çŠ¶æ…‹ã§ GetActiveWindow() ã‚’å‘¼ã³å‡ºã™ã¨ã€known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®
+		 * ã‚ªãƒ¼ãƒŠãƒ¼ãŒ MessageBox ã¨ãªã£ã¦ã€Tera Termã®è£ã«éš ã‚Œã¦ã—ã¾ã†ã€‚
+		 * ãã“ã§ã€known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚ªãƒ¼ãƒŠãƒ¼ã¯å¸¸ã« Tera Term ã‚’æŒ‡ã—ç¤ºã™
+		 * ã‚ˆã†ã«ã™ã‚‹ã€‚
 		 */
 		HWND cur_active = NULL;
 
@@ -2273,36 +2273,36 @@ void HOSTS_do_different_type_key_dialog(HWND wnd, PTInstVar pvar)
 }
 
 /*
- * ƒT[ƒo‚©‚ç‘—‚ç‚ê‚Ä‚«‚½ƒzƒXƒgŒöŠJŒ®‚Ì‘Ã“–«‚ğƒ`ƒFƒbƒN‚µA
- * •K—v‚É‰‚¶‚Ä known_hosts ƒ_ƒCƒAƒƒO‚ğŒÄ‚Ño‚·B
+ * ã‚µãƒ¼ãƒã‹ã‚‰é€ã‚‰ã‚Œã¦ããŸãƒ›ã‚¹ãƒˆå…¬é–‹éµã®å¦¥å½“æ€§ã‚’ãƒã‚§ãƒƒã‚¯ã—ã€
+ * å¿…è¦ã«å¿œã˜ã¦ known_hosts ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‘¼ã³å‡ºã™ã€‚
  *
- *   hostname: Ú‘±æ‚ÌƒzƒXƒg–¼
- *   tcpport: Ú‘±æƒ|[ƒg”Ô†
- *   key: ƒT[ƒo‚©‚ç‚ÌŒöŠJŒ®
+ *   hostname: æ¥ç¶šå…ˆã®ãƒ›ã‚¹ãƒˆå
+ *   tcpport: æ¥ç¶šå…ˆãƒãƒ¼ãƒˆç•ªå·
+ *   key: ã‚µãƒ¼ãƒã‹ã‚‰ã®å…¬é–‹éµ
  *
  * return:
- *    TRUE:  known_hostsƒ_ƒCƒAƒƒO‚ÌŒÄ‚Ño‚µ‚Í•s—v
- *    FALSE: known_hostsƒ_ƒCƒAƒƒO‚ğŒÄ‚Ño‚µ‚½
+ *    TRUE:  known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®å‘¼ã³å‡ºã—ã¯ä¸è¦
+ *    FALSE: known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‘¼ã³å‡ºã—ãŸ
  *
  */
 BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport, Key *key)
 {
 	int found_different_key = 0, found_different_type_key = 0;
-	Key key2; // known_hosts‚É“o˜^‚³‚ê‚Ä‚¢‚éŒ®
+	Key key2; // known_hostsã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹éµ
 	DWORD id;
 
 	pvar->dns_key_check = DNS_VERIFY_NONE;
 
-	// ‚·‚Å‚É known_hosts ƒtƒ@ƒCƒ‹‚©‚çƒzƒXƒgŒöŠJŒ®‚ğ“Ç‚İ‚ñ‚Å‚¢‚é‚È‚çA‚»‚ê‚Æ”äŠr‚·‚éB
+	// ã™ã§ã« known_hosts ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ›ã‚¹ãƒˆå…¬é–‹éµã‚’èª­ã¿è¾¼ã‚“ã§ã„ã‚‹ãªã‚‰ã€ãã‚Œã¨æ¯”è¼ƒã™ã‚‹ã€‚
 	if (pvar->hosts_state.prefetched_hostname != NULL
 	 && _stricmp(pvar->hosts_state.prefetched_hostname, hostname) == 0
 	 && HOSTS_compare_public_key(&pvar->hosts_state.hostkey, key) == 1) {
 
-		 // ‰½‚à‚¹‚¸‚É–ß‚éB
+		 // ä½•ã‚‚ã›ãšã«æˆ»ã‚‹ã€‚
 		 return TRUE;
 	}
 
-	// æ“Ç‚İ‚³‚ê‚Ä‚¢‚È‚¢ê‡‚ÍA‚±‚Ì“_‚Åƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚Ş
+	// å…ˆèª­ã¿ã•ã‚Œã¦ã„ãªã„å ´åˆã¯ã€ã“ã®æ™‚ç‚¹ã§ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚€
 	memset(&key2, 0, sizeof(key2));
 	if (begin_read_host_files(pvar, 0)) {
 		do {
@@ -2314,36 +2314,36 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport
 				int match = HOSTS_compare_public_key(&key2, key);
 				if (match == 1) {
 					finish_read_host_files(pvar, 0);
-					// ‚·‚×‚Ä‚ÌƒGƒ“ƒgƒŠ‚ğQÆ‚µ‚ÄA‡’v‚·‚éƒL[‚ªŒ©‚Â‚©‚Á‚½‚ç–ß‚éB
-					// About TTSSH ƒ_ƒCƒAƒƒO‚Å‚Ì•\¦‚Ì‚½‚ß‚ÉA‚±‚±‚Å•Û‘¶‚µ‚Ä‚¨‚­B
+					// ã™ã¹ã¦ã®ã‚¨ãƒ³ãƒˆãƒªã‚’å‚ç…§ã—ã¦ã€åˆè‡´ã™ã‚‹ã‚­ãƒ¼ãŒè¦‹ã¤ã‹ã£ãŸã‚‰æˆ»ã‚‹ã€‚
+					// About TTSSH ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§ã®è¡¨ç¤ºã®ãŸã‚ã«ã€ã“ã“ã§ä¿å­˜ã—ã¦ãŠãã€‚
 					key_copy(&pvar->hosts_state.hostkey, key);
 
 					return TRUE;
 				}
 				else if (match == 0) {
-					// ƒL[‚Í known_hosts ‚ÉŒ©‚Â‚©‚Á‚½‚ªAƒL[‚Ì“à—e‚ªˆÙ‚È‚éB
+					// ã‚­ãƒ¼ã¯ known_hosts ã«è¦‹ã¤ã‹ã£ãŸãŒã€ã‚­ãƒ¼ã®å†…å®¹ãŒç•°ãªã‚‹ã€‚
 					found_different_key = 1;
 				}
 				else {
-					// ƒL[‚ÌŒ`®‚ªˆá‚¤ê‡
+					// ã‚­ãƒ¼ã®å½¢å¼ãŒé•ã†å ´åˆ
 					found_different_type_key = 1;
 				}
 			}
-		} while (key2.type != KEY_UNSPEC);  // ƒL[‚ªŒ©‚Â‚©‚Á‚Ä‚¢‚éŠÔ‚Íƒ‹[ƒv‚·‚é
+		} while (key2.type != KEY_UNSPEC);  // ã‚­ãƒ¼ãŒè¦‹ã¤ã‹ã£ã¦ã„ã‚‹é–“ã¯ãƒ«ãƒ¼ãƒ—ã™ã‚‹
 
 		key_init(&key2);
 		finish_read_host_files(pvar, 0);
 	}
 
-	// known_hosts ‚É‘¶İ‚µ‚È‚¢ƒL[‚Í‚ ‚Æ‚Åƒtƒ@ƒCƒ‹‚Ö‘‚«‚Ş‚½‚ß‚ÉA‚±‚±‚Å•Û‘¶‚µ‚Ä‚¨‚­B
+	// known_hosts ã«å­˜åœ¨ã—ãªã„ã‚­ãƒ¼ã¯ã‚ã¨ã§ãƒ•ã‚¡ã‚¤ãƒ«ã¸æ›¸ãè¾¼ã‚€ãŸã‚ã«ã€ã“ã“ã§ä¿å­˜ã—ã¦ãŠãã€‚
 	key_copy(&pvar->hosts_state.hostkey, key);
 
 	free(pvar->hosts_state.prefetched_hostname);
 	pvar->hosts_state.prefetched_hostname = _strdup(hostname);
 
-	// "/nosecuritywarning"‚ªw’è‚³‚ê‚Ä‚¢‚éê‡Aƒ_ƒCƒAƒƒO‚ğ•\¦‚³‚¹‚¸‚É return success ‚·‚éB
+	// "/nosecuritywarning"ãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤ºã•ã›ãšã« return success ã™ã‚‹ã€‚
 	if (pvar->nocheck_known_hosts == TRUE) {
-		 // ‰½‚à‚¹‚¸‚É–ß‚éB
+		 // ä½•ã‚‚ã›ãšã«æˆ»ã‚‹ã€‚
 		return TRUE;
 	}
 
@@ -2351,28 +2351,28 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport
 		pvar->dns_key_check = verify_hostkey_dns(pvar, hostname, key);
 	}
 
-	// known_hostsƒ_ƒCƒAƒƒO‚Í“¯Šú“I‚É•\¦‚³‚¹A‚±‚Ì“_‚É‚¨‚¢‚Äƒ†[ƒU‚ÉŠm”F
-	// ‚³‚¹‚é•K—v‚ª‚ ‚é‚½‚ßA’¼ÚƒR[ƒ‹‚É•ÏX‚·‚éB
-	// ‚±‚ê‚É‚æ‚èknown_hosts‚ÌŠm”F‚ğ‘Ò‚½‚¸‚ÉAƒT[ƒo‚Öƒ†[ƒUî•ñ‚ğ‘—‚Á‚Ä‚µ‚Ü‚¤–â‘è‚ğ‰ñ”ğ‚·‚éB
+	// known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã¯åŒæœŸçš„ã«è¡¨ç¤ºã•ã›ã€ã“ã®æ™‚ç‚¹ã«ãŠã„ã¦ãƒ¦ãƒ¼ã‚¶ã«ç¢ºèª
+	// ã•ã›ã‚‹å¿…è¦ãŒã‚ã‚‹ãŸã‚ã€ç›´æ¥ã‚³ãƒ¼ãƒ«ã«å¤‰æ›´ã™ã‚‹ã€‚
+	// ã“ã‚Œã«ã‚ˆã‚Šknown_hostsã®ç¢ºèªã‚’å¾…ãŸãšã«ã€ã‚µãƒ¼ãƒã¸ãƒ¦ãƒ¼ã‚¶æƒ…å ±ã‚’é€ã£ã¦ã—ã¾ã†å•é¡Œã‚’å›é¿ã™ã‚‹ã€‚
 	// (2007.10.1 yutaka)
 	/*
-	 * known_hostsƒ_ƒCƒAƒƒO‚Í”ñ“¯Šú‚Å•\¦‚³‚¹‚é‚Ì‚ª³‚µ‚©‚Á‚½B
-	 * known_hostsƒ_ƒCƒAƒƒO‚ª•\¦‚³‚ê‚Ä‚¢‚éó‘Ô‚ÅAƒT[ƒo‚©‚çØ’f‚ğs‚¤‚ÆA
-	 * TTXCloseTCP‚ªŒÄ‚Ño‚³‚êATTSSH‚ÌƒŠƒ\[ƒX‚ª‰ğ•ú‚³‚ê‚Ä‚µ‚Ü‚¤B
-	 * SSHƒnƒ“ƒhƒ‰‚Ì‰„’·‚Åknown_hostsƒ_ƒCƒAƒƒO‚ğo‚µ‚Ä~‚Ü‚Á‚Ä‚¢‚é‚½‚ßA
-	 * ˆ—ÄŠJŒã‚É•s³ƒAƒNƒZƒX‚Å—‚¿‚éB
+	 * known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã¯éåŒæœŸã§è¡¨ç¤ºã•ã›ã‚‹ã®ãŒæ­£ã—ã‹ã£ãŸã€‚
+	 * known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãŒè¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹çŠ¶æ…‹ã§ã€ã‚µãƒ¼ãƒã‹ã‚‰åˆ‡æ–­ã‚’è¡Œã†ã¨ã€
+	 * TTXCloseTCPãŒå‘¼ã³å‡ºã•ã‚Œã€TTSSHã®ãƒªã‚½ãƒ¼ã‚¹ãŒè§£æ”¾ã•ã‚Œã¦ã—ã¾ã†ã€‚
+	 * SSHãƒãƒ³ãƒ‰ãƒ©ã®å»¶é•·ã§known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºã—ã¦æ­¢ã¾ã£ã¦ã„ã‚‹ãŸã‚ã€
+	 * å‡¦ç†å†é–‹å¾Œã«ä¸æ­£ã‚¢ã‚¯ã‚»ã‚¹ã§è½ã¡ã‚‹ã€‚
 	 * (2019.9.3 yutaka)
 	 */
 	if (found_different_key) {
-		// TTXProcessCommand ‚©‚ç HOSTS_do_different_key_dialog() ‚ğŒÄ‚Ño‚·B
+		// TTXProcessCommand ã‹ã‚‰ HOSTS_do_different_key_dialog() ã‚’å‘¼ã³å‡ºã™ã€‚
 		id = ID_SSHDIFFERENTKEY;
 	}
 	else if (found_different_type_key) {
-		// TTXProcessCommand ‚©‚ç HOSTS_do_different_type_key_dialog() ‚ğŒÄ‚Ño‚·B
+		// TTXProcessCommand ã‹ã‚‰ HOSTS_do_different_type_key_dialog() ã‚’å‘¼ã³å‡ºã™ã€‚
 		id = ID_SSHDIFFERENT_TYPE_KEY;
 	}
 	else {
-		// TTXProcessCommand ‚©‚ç HOSTS_do_unknown_host_dialog() ‚ğŒÄ‚Ño‚·B
+		// TTXProcessCommand ã‹ã‚‰ HOSTS_do_unknown_host_dialog() ã‚’å‘¼ã³å‡ºã™ã€‚
 		id = ID_SSHUNKNOWNHOST;
 	}
 
@@ -2395,9 +2395,9 @@ void HOSTS_notify_disconnecting(PTInstVar pvar)
 	}
 }
 
-// TCPƒZƒbƒVƒ‡ƒ“‚ªƒNƒ[ƒY‚³‚ê‚½ê‡Aknown_hostsƒ_ƒCƒAƒƒO‚ğ•Â‚¶‚é‚æ‚¤‚Éw¦‚ğo‚·B
-// HOSTS_notify_disconnecting()‚Æ‚ÍˆÙ‚È‚èAƒ_ƒCƒAƒƒO‚ğ•Â‚¶‚é‚Ì‚İ‚ÅA
-// SSHƒT[ƒo‚É’Ê’m‚Ío‚³‚È‚¢B
+// TCPã‚»ãƒƒã‚·ãƒ§ãƒ³ãŒã‚¯ãƒ­ãƒ¼ã‚ºã•ã‚ŒãŸå ´åˆã€known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‰ã˜ã‚‹ã‚ˆã†ã«æŒ‡ç¤ºã‚’å‡ºã™ã€‚
+// HOSTS_notify_disconnecting()ã¨ã¯ç•°ãªã‚Šã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‰ã˜ã‚‹ã®ã¿ã§ã€
+// SSHã‚µãƒ¼ãƒã«é€šçŸ¥ã¯å‡ºã•ãªã„ã€‚
 void HOSTS_notify_closing_on_exit(PTInstVar pvar)
 {
 	if (pvar->hosts_state.hosts_dialog != NULL) {

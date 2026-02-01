@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>recvfile</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>recvfile</h1>
+
+<p>
+受信データをファイルに出力する。 <em>(バージョン 5.6.0以降)</em>
+</p>
+
+<pre class="macro-syntax">
+recvfile &lt;filename&gt; &lt;binary flag&gt; &lt;Auto-stop wait time&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+ホストから受信したデータを &lt;filename&gt; で指定されたファイルに出力する。<br>
+データ受信が終わるまで次のコマンドは実行されない。<br>
+</p>
+
+<p>
+&lt;filename&gt; が相対パスの場合は、<a href="../../setup/folder.html#FileDir">ファイル転送用ディレクトリ</a>相対として扱う。
+</p>
+
+<p>
+&lt;binary flag&gt; の値(数値)が何であれ、受信したデータをそのままファイルに出力する。<br>
+漢字コード、改行文字の変換、制御文字の出力抑止等は行わない。(バイナリモード固定)
+</p>
+
+<p>
+&lt;Auto-stop wait time&gt; で指定した秒数の間、受信データが無い状態が続いた場合にデータ受信を終了する。<br>
+この場合、システム変数 result に1が格納される。それ以外の場合、 result に0が格納される。<br>
+&lt;Auto-stop wait time&gt; の単位は秒、0以下の値を指定した場合はデータ受信を終了せず、データを待ち続ける。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; Connect to the remote host
+connect '192.168.0.10:22 /ssh /user=root /passwd=XXXXXX /auth=password'
+
+; Wait for the shell prompt
+waitregex '.*[$#] '
+
+; Wait 3 seconds to allow recvfile to start
+; Save stty settings to "save_stty"
+; Run "stty raw" so that the remote host sends the output data exactly as-is, without any modification
+; Print /var/log/messages to stdout
+; Restore stty settings
+; Wait 5 seconds to signal the end of transmission
+sendln 'sleep 3; save_stty=$(stty -g); stty raw; cat /var/log/messages; stty "${save_stty}"; sleep 5'
+
+; Wait 1 second for sendln to complete
+pause 1
+
+; Save received data to C:\tmp\messages
+; Exit recvfile if no data is received for 3 seconds
+recvfile 'C:\tmp\messages' 1 3
+
+; Wait for the shell prompt
+waitregex '.*[$#] '
+
+; Log out from the remote host
+sendln 'exit'
+
+; Close Tera Term
+closett
+
+; End macro execution
+end
+</pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="changedir.html">changedir</a></li>
+</ul>
+
+</body>
+</html>

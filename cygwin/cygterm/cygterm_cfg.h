@@ -40,7 +40,7 @@ typedef struct cfg_data_tag {
 	char *termopt;				// ex. "/KR-UTF8"
 	char *shell;				// ex. "/usr/bin/bash"
 	char *term_type;			// terminal type ex. "vt100"
-	char *change_dir;			// cd ‚µ‚½ŒãAƒVƒFƒ‹‹N“®
+	char *change_dir;			// cd ã—ãŸå¾Œã€ã‚·ã‚§ãƒ«èµ·å‹•
 	int port_start;				// default lowest port number
 	int port_range;				// default number of ports
 	int cl_port;

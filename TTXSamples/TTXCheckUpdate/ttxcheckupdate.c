@@ -61,11 +61,11 @@ static TInstVar InstVar;
 static TInstVar *pvar;
 
 /**
- *	ƒhƒƒbƒvƒ_ƒEƒ“‚Éƒo[ƒWƒ‡ƒ“î•ñˆê——‚Ìˆê——‚ğƒZƒbƒg‚·‚é
+ *	ãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ã«ãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±ä¸€è¦§ã®ä¸€è¦§ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
  *
- *	Å‰‚ÉŒ©‚Â‚©‚Á‚½
- *	running_version ‚ÌƒƒWƒƒ[ƒo[ƒWƒ‡ƒ“‚Æ“¯‚¶
- *	ƒo[ƒWƒ‡ƒ“î•ñ‚ğ‘I‘ğ‚·‚é
+ *	æœ€åˆã«è¦‹ã¤ã‹ã£ãŸ
+ *	running_version ã®ãƒ¡ã‚¸ãƒ£ãƒ¼ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã¨åŒã˜
+ *	ãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±ã‚’é¸æŠã™ã‚‹
  */
 static int SetDropdown(HWND hDlg, int running_version)
 {
@@ -104,7 +104,7 @@ static int SetDropdown(HWND hDlg, int running_version)
 }
 
 /**
- *	version_one_t ‚Ìî•ñ‚ğƒ_ƒCƒAƒƒO‚É•\¦‚·‚é
+ *	version_one_t ã®æƒ…å ±ã‚’ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«è¡¨ç¤ºã™ã‚‹
  */
 static void SetTexts(HWND hDlg, const version_one_t *version)
 {
@@ -191,14 +191,14 @@ static void ShowDialog(HWND hWnd)
 		MB_YESNO | MB_ICONEXCLAMATION
 	};
 
-	/* XVî•ñ‚ğæ“¾‚µ‚Ä‚àok? */
+	/* æ›´æ–°æƒ…å ±ã‚’å–å¾—ã—ã¦ã‚‚ok? */
 	GetI18nStrWW("TTXCheckUpdate", "JSON_URL", update_info_url_default, UILanguageFileW, &update_info_url);
 	result_mb = TTMessageBoxW(hWnd, &info, UILanguageFileW, update_info_url);
 	if (result_mb == IDNO) {
 		return;
 	}
 
-	/* XVî•ñæ“¾A'\0'‚ğ’Ç‰Á‚·‚é¨ json•¶š—ñ‚ğì¬ */
+	/* æ›´æ–°æƒ…å ±å–å¾—ã€'\0'ã‚’è¿½åŠ ã™ã‚‹â†’ jsonæ–‡å­—åˆ—ã‚’ä½œæˆ */
 	swprintf(agent, _countof(agent), L"%s_%d", agent_base, pvar->ts->RunningVersion);
 	result_bool = GetContent(update_info_url, agent, (void**)&json_raw_ptr, &json_raw_size);
 	free(update_info_url);
@@ -221,7 +221,7 @@ static void ShowDialog(HWND hWnd)
 	json_raw_ptr = NULL;
 	json_ptr[json_size - 1] = '\0';
 
-	/* json‚ğƒp[ƒX‚·‚é, versions‚Éî•ñ‚ª“ü‚é */
+	/* jsonã‚’ãƒ‘ãƒ¼ã‚¹ã™ã‚‹, versionsã«æƒ…å ±ãŒå…¥ã‚‹ */
 	pvar->versions = ParseJson(json_ptr, &pvar->versions_count);
 	if (pvar->versions == NULL) {
 		static const TTMessageBoxInfoW info = {
@@ -234,12 +234,12 @@ static void ShowDialog(HWND hWnd)
 		return;
 	}
 
-	/* ƒ_ƒCƒAƒƒO‚ğo‚· */
+	/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºã™ */
 	SetDialogFont(pvar->ts->DialogFontNameW, pvar->ts->DialogFontPoint, pvar->ts->DialogFontCharSet,
 				  pvar->ts->UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
 	TTDialogBoxParam(pvar->hInst, MAKEINTRESOURCEW(IDD_CHECK_UPDATE_DIALOG), hWnd, DlgProc, (LPARAM)pvar);
 
-	/* I—¹ */
+	/* çµ‚äº† */
 	free(json_ptr);
 	ParseFree(pvar->versions, pvar->versions_count);
 	pvar->versions = NULL;
@@ -304,7 +304,7 @@ BOOL __declspec(dllexport) WINAPI TTXBind(WORD Version, TTXExports *exports)
 
 #if 0
 	if (!IsWindowsNTKernel()) {
-		// TODO Windows10ˆÈŠOA–¢ŒŸØ
+		// TODO Windows10ä»¥å¤–ã€æœªæ¤œè¨¼
 		return FALSE;
 	}
 #endif

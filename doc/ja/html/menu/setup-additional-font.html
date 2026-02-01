@@ -45,7 +45,7 @@
             </p>
           </dd>
 
-          <dt>フォントフォルダを開いてフォントの表示状態を確認できます</dt>
+          <dt id="Windows_Fonts">フォントフォルダを開いてフォントの表示状態を確認できます</dt>
           <dd>
             フォントフォルダのリンクをクリックすると
             フォントをプレビュー、表示/非表示設定ができるフォントフォルダを開きます。
@@ -82,9 +82,15 @@
         </dl>
       </dd>
 
-      <dt>文字描画で使用するAPI</dt>
+      <dt id="DrawAPI">文字描画で使用するAPI</dt>
       <dd>
         <dl>
+          <dt>Auto</dt>
+          <dd>
+            動作しているWindowsによってUnicode/ANSIを自動で決定します。<br>
+            Windows 9xでは選択できず、ANSIのみとなります。
+          </dd>
+
           <dt>Unicode API</dt>
           <dd>
             Unicodeを直接使用できる描画APIを使用します。<br>
@@ -100,9 +106,17 @@
         </dl>
       </dd>
 
-      <dt>文字間スペース</dt>
+      <dt id="CharSpace">文字間スペース</dt>
       <dd>
-        <a href="../setup/teraterm-win.html#space">文字(行)間のすきまを調整する</a>を参照ください。
+        <p>
+          文字間スペースが0の時、フォントの外枠と<a href="../about/glossary.html#Cell">セル</a>(文字)の外枠は同一です。<br>
+          文字間スペースを設定すると、フォントの外枠にスペースを追加(削除)できます。<br>
+          <a href="char_space.png"><img width=30% src="char_space.png"></a>
+        </p>
+
+        <p>
+          設定については、<a href="../setup/teraterm-win.html#space">文字(行)間のすきまを調整する</a>を参照ください。
+        </p>
       </dd>
 
     </dl>

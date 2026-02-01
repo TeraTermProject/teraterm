@@ -119,7 +119,7 @@ static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
 				strncpy_s(request->bind_address, sizeof(request->bind_address), "0.0.0.0", _TRUNCATE);
 			}
 			else {
-				// IPv6 ƒAƒhƒŒƒX‚Ì "[", "]" ‚ª‚ ‚ê‚Îíœ
+				// IPv6 ã‚¢ãƒ‰ãƒ¬ã‚¹ã® "[", "]" ãŒã‚ã‚Œã°å‰Šé™¤
 				start = 0;
 				strncpy_s(hostname, sizeof(hostname), argv[i], _TRUNCATE);
 				if (strlen(hostname) > 0 &&
@@ -143,7 +143,7 @@ static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
 			}
 			i++;
 
-			// IPv6 ƒAƒhƒŒƒX‚Ì "[", "]" ‚ª‚ ‚ê‚Îíœ
+			// IPv6 ã‚¢ãƒ‰ãƒ¬ã‚¹ã® "[", "]" ãŒã‚ã‚Œã°å‰Šé™¤
 			start = 0;
 			strncpy_s(hostname, sizeof(hostname), argv[i], _TRUNCATE);
 			if (strlen(hostname) > 0 &&
@@ -174,7 +174,7 @@ static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
 				          "0.0.0.0", _TRUNCATE);
 			}
 			else {
-				// IPv6 ƒAƒhƒŒƒX‚Ì "[", "]" ‚ª‚ ‚ê‚Îíœ
+				// IPv6 ã‚¢ãƒ‰ãƒ¬ã‚¹ã® "[", "]" ãŒã‚ã‚Œã°å‰Šé™¤
 				start = 0;
 				strncpy_s(hostname, sizeof(hostname), argv[i], _TRUNCATE);
 				if (strlen(hostname) > 0 &&
@@ -239,7 +239,7 @@ static void FWDUI_save_settings(PTInstVar pvar)
 			FWDRequestSpec *spec = requests + i;
 			int chars;
 
-			// IPv6 ƒAƒhƒŒƒX‚È‚ç "[", "]" ‚ğ•t‰Á‚µ‚Ä•¶š—ñ‰»
+			// IPv6 ã‚¢ãƒ‰ãƒ¬ã‚¹ãªã‚‰ "[", "]" ã‚’ä»˜åŠ ã—ã¦æ–‡å­—åˆ—åŒ–
 			switch (spec->type) {
 			case FWD_LOCAL_TO_REMOTE:
 				if (strcmp(spec->bind_address,"localhost") == 0) {
@@ -733,7 +733,7 @@ static void set_dir_options_status(HWND dlg)
 	enable_LTR = IsWindowEnabled(GetDlgItem(dlg, IDC_SSHLTRFROMPORT));
 	enable_RTL = IsWindowEnabled(GetDlgItem(dlg, IDC_SSHRTLFROMPORT));
 	enable_DYN = IsWindowEnabled(GetDlgItem(dlg, IDC_SSHDYNFROMPORT));
-	type_from = FWD_NONE; // ƒ_ƒCƒAƒƒO•\¦‚É‚Í‚·‚×‚ÄEnableó‘Ô
+	type_from = FWD_NONE; // ãƒ€ã‚¤ã‚¢ãƒ­ã‚°è¡¨ç¤ºæ™‚ã«ã¯ã™ã¹ã¦EnableçŠ¶æ…‹
 	if (enable_LTR && !enable_RTL && !enable_DYN) {
 		type_from = FWD_LOCAL_TO_REMOTE;
 	}
@@ -865,7 +865,7 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 		strncpy_s(new_spec.bind_address, sizeof(new_spec.bind_address), "0.0.0.0", _TRUNCATE);
 	}
 	else {
-		// IPv6 ƒAƒhƒŒƒX‚Ì "[", "]" ‚ª‚ ‚ê‚Îíœ
+		// IPv6 ã‚¢ãƒ‰ãƒ¬ã‚¹ã® "[", "]" ãŒã‚ã‚Œã°å‰Šé™¤
 		if (new_spec.bind_address[strlen(new_spec.bind_address)-1] == ']') {
 			new_spec.bind_address[strlen(new_spec.bind_address)-1] = '\0';
 		}
@@ -882,7 +882,7 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 			strncpy_s(new_spec.to_host, sizeof(new_spec.to_host), "localhost", _TRUNCATE);
 		}
 		else {
-			// IPv6 ƒAƒhƒŒƒX‚Ì "[", "]" ‚ª‚ ‚ê‚Îíœ
+			// IPv6 ã‚¢ãƒ‰ãƒ¬ã‚¹ã® "[", "]" ãŒã‚ã‚Œã°å‰Šé™¤
 			if (new_spec.to_host[strlen(new_spec.to_host)-1] == ']') {
 				new_spec.to_host[strlen(new_spec.to_host)-1] = '\0';
 			}

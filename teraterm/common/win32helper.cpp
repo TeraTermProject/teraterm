@@ -40,11 +40,11 @@
 #include "win32helper.h"
 
 /**
- *	GetModuleFileNameW() ‚Ì“®“Iƒoƒbƒtƒ@”Å
+ *	GetModuleFileNameW() ã®å‹•çš„ãƒãƒƒãƒ•ã‚¡ç‰ˆ
  *
- *	@param buf	•¶š—ñ‚ğŠi”[‚·‚éƒoƒbƒtƒ@
- *				•s—v‚É‚È‚Á‚½‚çfree()‚·‚é
- *	@return	ƒGƒ‰[ƒR[ƒh,0(=NO_ERROR)‚Ì‚Æ‚«ƒGƒ‰[‚È‚µ
+ *	@param buf	æ–‡å­—åˆ—ã‚’æ ¼ç´ã™ã‚‹ãƒãƒƒãƒ•ã‚¡
+ *				ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹
+ *	@return	ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰,0(=NO_ERROR)ã®ã¨ãã‚¨ãƒ©ãƒ¼ãªã—
  */
 DWORD hGetModuleFileNameW(HMODULE hModule, wchar_t **buf)
 {
@@ -59,11 +59,11 @@ DWORD hGetModuleFileNameW(HMODULE hModule, wchar_t **buf)
 	for(;;) {
 		DWORD r = GetModuleFileNameW(hModule, b, (DWORD)size);
 		if (r == 0) {
-			// ŠÖ”‚ª¸”s
+			// é–¢æ•°ãŒå¤±æ•—
 			error = GetLastError();
 			break;
 		} else if (r < size - 1) {
-			// æ“¾¬Œ÷
+			// å–å¾—æˆåŠŸ
 			size = r + 1;
 			b = (wchar_t*)realloc(b, sizeof(wchar_t) * size);
 			*buf = b;
@@ -88,29 +88,29 @@ error_return:
 }
 
 /**
- *	GetPrivateProfileStringW() ‚Ì“®“Iƒoƒbƒtƒ@”Å
+ *	GetPrivateProfileStringW() ã®å‹•çš„ãƒãƒƒãƒ•ã‚¡ç‰ˆ
  *
  *	@param section
  *	@param key
- *	@param def		ƒfƒtƒHƒ‹ƒg’l
- *					NULL‚Ì‚Æ‚«‚Í L"" ‚ğ•Ô‚·
- *	@param ini		iniƒtƒ@ƒCƒ‹‚ÌƒpƒX
- *					NULL‚Ì‚Æ‚«‚Íƒtƒ@ƒCƒ‹w’è‚È‚µ
- *	@param str		•¶š—ñ‚ğŠi”[‚·‚éƒoƒbƒtƒ@
- *					•s—v‚É‚È‚Á‚½‚çfree()‚·‚é
- *	@return	ƒGƒ‰[ƒR[ƒh,0(=NO_ERROR)‚Ì‚Æ‚«ƒGƒ‰[‚È‚µ
+ *	@param def		ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤
+ *					NULLã®ã¨ãã¯ L"" ã‚’è¿”ã™
+ *	@param ini		iniãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹
+ *					NULLã®ã¨ãã¯ãƒ•ã‚¡ã‚¤ãƒ«æŒ‡å®šãªã—
+ *	@param str		æ–‡å­—åˆ—ã‚’æ ¼ç´ã™ã‚‹ãƒãƒƒãƒ•ã‚¡
+ *					ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹
+ *	@return	ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰,0(=NO_ERROR)ã®ã¨ãã‚¨ãƒ©ãƒ¼ãªã—
  *
- *		Ÿ‚Ìê‡ str = L"" ‚ª•Ô‚é (free()‚·‚é‚±‚Æ)
- *			ini=NULL‚Ìê‡
- *				–ß‚è’l NO_ERROR
- *			key‚É‹ó‚ªİ’è‚³‚ê‚Ä‚¢‚é 'key='‚Æ‹Lq ("="‚ÌŒã‚É‰½‚à‘‚¢‚Ä‚¢‚È‚¢)
- *				–ß‚è’l NO_ERROR
- *			key‚ª‘¶İ‚¹‚¸def=NULL ê‡
- *				–ß‚è’l ERROR_FILE_NOT_FOUND
- *			GetPrivateProfileStringW() ‚ÅƒGƒ‰[‚ª”­¶‚µ‚½ê‡
- *				–ß‚è’l ƒGƒ‰[’l
- *			ƒƒ‚ƒŠ‚ªŠm•Û‚Å‚«‚È‚©‚Á‚½ê‡
- *				–ß‚è’l ERROR_NOT_ENOUGH_MEMORY
+ *		æ¬¡ã®å ´åˆ str = L"" ãŒè¿”ã‚‹ (free()ã™ã‚‹ã“ã¨)
+ *			ini=NULLã®å ´åˆ
+ *				æˆ»ã‚Šå€¤ NO_ERROR
+ *			keyã«ç©ºãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹ 'key='ã¨è¨˜è¿° ("="ã®å¾Œã«ä½•ã‚‚æ›¸ã„ã¦ã„ãªã„)
+ *				æˆ»ã‚Šå€¤ NO_ERROR
+ *			keyãŒå­˜åœ¨ã›ãšdef=NULL å ´åˆ
+ *				æˆ»ã‚Šå€¤ ERROR_FILE_NOT_FOUND
+ *			GetPrivateProfileStringW() ã§ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ãŸå ´åˆ
+ *				æˆ»ã‚Šå€¤ ã‚¨ãƒ©ãƒ¼å€¤
+ *			ãƒ¡ãƒ¢ãƒªãŒç¢ºä¿ã§ããªã‹ã£ãŸå ´åˆ
+ *				æˆ»ã‚Šå€¤ ERROR_NOT_ENOUGH_MEMORY
  */
 DWORD hGetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, const wchar_t *def, const wchar_t *ini, wchar_t **str)
 {
@@ -119,14 +119,14 @@ DWORD hGetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, cons
 	DWORD error;
 
 	if (ini == NULL) {
-		// iniƒtƒ@ƒCƒ‹w’è‚È‚µ‚Ì‚Æ‚«ƒfƒtƒHƒ‹ƒg’l‚ğ•Ô‚·
-		//		GetPrivateProfileStringW(A)() ‚Ìd—l‚É‚Í
-		//		ƒtƒ@ƒCƒ‹–¼‚ÉNULL‚ğ“n‚µ‚Ä—Ç‚¢‚Æ‚Ì‹Lq‚Í‚È‚¢
-		//			NULL‚ğ“n‚µ‚½‚Æ‚«A
-		//			Windows10,11 ‚Å‚Íƒtƒ@ƒCƒ‹‚ª‚È‚¢‚Æ‚«‚Æ“¯‚¶“®ì
-		//			Windows95 ‚Íd—lŠO‚Ì“®ì
-		//				–ß‚è’l=ƒoƒbƒtƒ@ƒTƒCƒY+2‚ª•Ô‚Á‚Ä‚­‚é
-		*str = _wcsdup(def != NULL ? def : L"");  // ˆø”‚ªNULL‚Ì‚Æ‚«‚Ì“®ì‚Í–¢’è‹`
+		// iniãƒ•ã‚¡ã‚¤ãƒ«æŒ‡å®šãªã—ã®ã¨ããƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’è¿”ã™
+		//		GetPrivateProfileStringW(A)() ã®ä»•æ§˜ã«ã¯
+		//		ãƒ•ã‚¡ã‚¤ãƒ«åã«NULLã‚’æ¸¡ã—ã¦è‰¯ã„ã¨ã®è¨˜è¿°ã¯ãªã„
+		//			NULLã‚’æ¸¡ã—ãŸã¨ãã€
+		//			Windows10,11 ã§ã¯ãƒ•ã‚¡ã‚¤ãƒ«ãŒãªã„ã¨ãã¨åŒã˜å‹•ä½œ
+		//			Windows95 ã¯ä»•æ§˜å¤–ã®å‹•ä½œ
+		//				æˆ»ã‚Šå€¤=ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º+2ãŒè¿”ã£ã¦ãã‚‹
+		*str = _wcsdup(def != NULL ? def : L"");  // å¼•æ•°ãŒNULLã®ã¨ãã®å‹•ä½œã¯æœªå®šç¾©
 		if (*str == NULL) {
 			return ERROR_NOT_ENOUGH_MEMORY;
 		}
@@ -171,11 +171,11 @@ error_return:
 }
 
 /**
- *	GetFullPathNameW() ‚Ì“®“Iƒoƒbƒtƒ@”Å
+ *	GetFullPathNameW() ã®å‹•çš„ãƒãƒƒãƒ•ã‚¡ç‰ˆ
  *
- *	@param fullpath		fullpath‚ğŠi”[‚·‚éƒoƒbƒtƒ@
- *						•s—v‚É‚È‚Á‚½‚çfree()‚·‚é
- *	@return	ƒGƒ‰[ƒR[ƒh,0(=NO_ERROR)‚Ì‚Æ‚«ƒGƒ‰[‚È‚µ
+ *	@param fullpath		fullpathã‚’æ ¼ç´ã™ã‚‹ãƒãƒƒãƒ•ã‚¡
+ *						ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹
+ *	@return	ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰,0(=NO_ERROR)ã®ã¨ãã‚¨ãƒ©ãƒ¼ãªã—
  */
 DWORD hGetFullPathNameW(const wchar_t *lpFileName, wchar_t **fullpath, wchar_t **filepart)
 {
@@ -202,11 +202,11 @@ DWORD hGetFullPathNameW(const wchar_t *lpFileName, wchar_t **fullpath, wchar_t *
 }
 
 /**
- *	GetCurrentDirectoryW() ‚Ì“®“Iƒoƒbƒtƒ@”Å
+ *	GetCurrentDirectoryW() ã®å‹•çš„ãƒãƒƒãƒ•ã‚¡ç‰ˆ
  *
- *	@param[out]	dir		ƒtƒHƒ‹ƒ_
- *						•s—v‚É‚È‚Á‚½‚çfree()‚·‚é
- *	@return	ƒGƒ‰[ƒR[ƒh,0(=NO_ERROR)‚Ì‚Æ‚«ƒGƒ‰[‚È‚µ
+ *	@param[out]	dir		ãƒ•ã‚©ãƒ«ãƒ€
+ *						ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹
+ *	@return	ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰,0(=NO_ERROR)ã®ã¨ãã‚¨ãƒ©ãƒ¼ãªã—
  */
 DWORD hGetCurrentDirectoryW(wchar_t **dir)
 {
@@ -227,19 +227,19 @@ DWORD hGetCurrentDirectoryW(wchar_t **dir)
 }
 
 /**
- *	hWnd‚Ì•¶š—ñ‚ğæ“¾‚·‚é
- *	•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
+ *	hWndã®æ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹
+ *	ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  *
- *	@param[out]	text	İ’è‚³‚ê‚Ä‚¢‚é•¶š—ñ
- *						•s—v‚É‚È‚Á‚½‚çfree()‚·‚é
- *	@return	ƒGƒ‰[ƒR[ƒh,0(=NO_ERROR)‚Ì‚Æ‚«ƒGƒ‰[‚È‚µ
+ *	@param[out]	text	è¨­å®šã•ã‚Œã¦ã„ã‚‹æ–‡å­—åˆ—
+ *						ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹
+ *	@return	ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰,0(=NO_ERROR)ã®ã¨ãã‚¨ãƒ©ãƒ¼ãªã—
  */
 DWORD hGetWindowTextW(HWND hWnd, wchar_t **text)
 {
-	// GetWindowTextLengthW() ‚ª 0 ‚ğ•Ô‚µ‚½‚Æ‚«A
-	// ƒGƒ‰[‚È‚çƒGƒ‰[‚ªƒZƒbƒg‚³‚ê‚é‚ªA
-	// ƒGƒ‰[‚Å‚Í‚È‚¢‚Æ‚«(³íI—¹)AƒGƒ‰[‚ğƒNƒŠƒA‚µ‚È‚¢(ƒGƒ‰[‚È‚µ‚ğƒZƒbƒg‚µ‚È‚¢)
-	// ‚±‚±‚ÅƒGƒ‰[‚ğƒNƒŠƒA‚µ‚Ä‚¨‚­
+	// GetWindowTextLengthW() ãŒ 0 ã‚’è¿”ã—ãŸã¨ãã€
+	// ã‚¨ãƒ©ãƒ¼ãªã‚‰ã‚¨ãƒ©ãƒ¼ãŒã‚»ãƒƒãƒˆã•ã‚Œã‚‹ãŒã€
+	// ã‚¨ãƒ©ãƒ¼ã§ã¯ãªã„ã¨ã(æ­£å¸¸çµ‚äº†æ™‚)ã€ã‚¨ãƒ©ãƒ¼ã‚’ã‚¯ãƒªã‚¢ã—ãªã„(ã‚¨ãƒ©ãƒ¼ãªã—ã‚’ã‚»ãƒƒãƒˆã—ãªã„)
+	// ã“ã“ã§ã‚¨ãƒ©ãƒ¼ã‚’ã‚¯ãƒªã‚¢ã—ã¦ãŠã
 	SetLastError(NO_ERROR);
 	int len = GetWindowTextLengthW(hWnd);
 	if (len == 0) {
@@ -267,6 +267,7 @@ DWORD hGetWindowTextW(HWND hWnd, wchar_t **text)
 DWORD hGetDlgItemTextW(HWND hDlg, int id, wchar_t **text)
 {
 	HWND hWnd = GetDlgItem(hDlg, id);
+	assert(hWnd != NULL);
 	return hGetWindowTextW(hWnd, text);
 }
 
@@ -284,10 +285,10 @@ DWORD hExpandEnvironmentStringsW(const wchar_t *src, wchar_t **expanded)
 }
 
 /**
- *	RegQueryValueExW ‚Ì“®“Iƒoƒbƒtƒ@”Å
+ *	RegQueryValueExW ã®å‹•çš„ãƒãƒƒãƒ•ã‚¡ç‰ˆ
  *
- *	lpData ‚ª malloc() ‚ğg‚Á‚ÄŠm•Û‚³‚ê‚é
- *	•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
+ *	lpData ãŒ malloc() ã‚’ä½¿ã£ã¦ç¢ºä¿ã•ã‚Œã‚‹
+ *	ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  */
 LSTATUS hRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, void **lpData,
 						  LPDWORD lpcbData)
@@ -397,14 +398,14 @@ BOOL hSetupDiGetDevicePropertyW(
 	}
 	_CrtCheckMemory();
 	if (ulPropertyType == DEVPROP_TYPE_STRING) {
-		// ƒ|ƒCƒ“ƒ^‚ğ‚»‚Ì‚Ü‚Ü•Ô‚¹‚Îok (•¶š—ñ)
+		// ãƒã‚¤ãƒ³ã‚¿ã‚’ãã®ã¾ã¾è¿”ã›ã°ok (æ–‡å­—åˆ—)
 		*buf = b;
 		if (buf_size != NULL) {
 			*buf_size = size;
 		}
 		return TRUE;
 	} else if (ulPropertyType ==  DEVPROP_TYPE_FILETIME) {
-		// buf = FILETIME \‘¢‘Ì‚Ì8ƒoƒCƒg
+		// buf = FILETIME æ§‹é€ ä½“ã®8ãƒã‚¤ãƒˆ
 		SYSTEMTIME stFileTime = {};
 		FileTimeToSystemTime((FILETIME *)b, &stFileTime);
 		free(b);
@@ -436,4 +437,31 @@ BOOL hSetupDiGetDevicePropertyW(
 		}
 	}
 	return FALSE;
+}
+
+/**
+ *	ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹(ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹)ã®æ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹
+ *	ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
+ *
+ *	@param		hDlg	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+ *	@param		id		ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«(ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹)ã®ID
+ *	@param		index	ãƒªã‚¹ãƒˆã®é€šã—ç•ªå·(0-)
+ *	@param[out]	text	è¨­å®šã•ã‚Œã¦ã„ã‚‹æ–‡å­—åˆ—
+ *						ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹
+ *	@return	ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰,0(=NO_ERROR)ã®ã¨ãã‚¨ãƒ©ãƒ¼ãªã—
+ */
+DWORD hGetDlgItemCBTextW(HWND hDlg, int id, int index, wchar_t **text)
+{
+	HWND hWnd = GetDlgItem(hDlg, id);
+	assert(hWnd != NULL);
+	LRESULT len = SendMessageW(hWnd, CB_GETLBTEXTLEN, index, 0);
+	wchar_t *strW = (wchar_t *)malloc((size_t(len) + 1) * sizeof(wchar_t));
+	if (strW == NULL) {
+		*text = NULL;
+		return ERROR_NOT_ENOUGH_MEMORY;
+	}
+	SendMessageW(hWnd, CB_GETLBTEXT, index, (LPARAM)strW);
+	strW[len] = 0;
+	*text = strW;
+	return NO_ERROR;
 }

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Portuguese (Português) - Brazil
-date=2025-05-10 by TeraTerm Project
+date=2026-01-04 by TeraTerm Project
 contributor=Waldemar Vaz Passarinho Neto (2025-05-07)
 
 [Tera Term]
@@ -15,9 +15,10 @@ MENU_FILE_LOG=&Log...
 MENU_FILE_PAUSELOG=&Pausar log
 MENU_FILE_COMMENTLOG=&Comentar no Log...
 MENU_FILE_VIEWLOG=&Visualizar Log
-MENU_FILE_SHOWLOGDIALOG=Mostrar diálogo de &Log...
+MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
 MENU_FILE_STOPLOG=Parar registro (&Q)
 MENU_FILE_SENDFILE=&Enviar arquivo...
+MENU_FILE_RECVFILE=Receber arquivo (&Z)...
 MENU_FILE_CHANGEDIR=&Alterar diretório...
 MENU_FILE_REPLAYLOG=&Repetir Log...
 MENU_FILE_PRINT=&Imprimir...\tAlt+P
@@ -290,14 +291,14 @@ DLG_TAB_FONT_BTN_SELECT=&Selecionar...
 DLG_TAB_FONT_VTFONT_TITLE=API para desenho
 DLG_TAB_FONT_DLGFONT=Fonte do &diálogo
 DLG_TAB_FONT_BTN_DEFAULT=&Padrão
-DLG_TAB_FONT_CODEPAGE_LABEL=&Página de código para conversão de caracteres
+DLG_TAB_FONT_CODEPAGE_LABEL=&Página de código para conversão de caracteres(Auto when 0, %d)
 DLG_TAB_FONT_LIST_PRO_FONTS_VT=Listar fontes &proporcionais no diálogo de fontes
 DLG_TAB_FONT_LIST_PRO_FONTS_DLG=Listar fontes p&roporcionais no diálogo de fontes
 DLG_TAB_FONT_CHARACTER_SPACE=espaçamento de caracteres
 DLG_TAB_FONT_RESIZED_FONT=&Redimensionar fonte para ajustar à largura da célula
 MSG_TOOLTIP_EDITERR_TITLE1=Caractere Inválido
 MSG_TOOLTIP_EDITERR_TEXT1=Apenas números inteiros positivos e negativos são aceitáveis.
-DLG_TAB_FONT_FOLDER_LABEL=Use o link abaixo para abrir a pasta Fontes e verificar a visibilidade das fontes
+DLG_TAB_FONT_FOLDER=Open Font Settings/Font Folder (%s)
 
 DLG_COMMENT_TITLE=Comentário para o Log
 
@@ -324,6 +325,7 @@ DLG_PROT_PACKET=Pacote#:
 DLG_PROT_TRANS=Bytes transferidos:
 DLG_PROT_ELAPSED=Tempo decorrido:
 
+DLG_FILETRANS_TITLE=Enviar arquivo
 DLG_FILETRANS_FILENAME=Arquivo:
 DLG_FILETRANS_FULLPATH=Caminho completo:
 DLG_FILETRANS_TRNAS=Bytes transferidos:
@@ -380,6 +382,8 @@ DLG_SELECT_DIR_TITLE=Selecionar novo diretório
 
 DLG_GEN_TITLE=Tera Term: Configurações gerais
 DLG_GEN_PORT=Padrão para nova &conexão
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Serial
 DLG_GEN_LANG_UI=Idioma:
 
 DLG_HOST_TITLE=Tera Term: Nova conexão
@@ -395,6 +399,10 @@ DLG_KEYB_BS=Tecla &Backspace
 DLG_KEYB_DEL=Tecla &Delete
 DLG_KEYB_KEYB=&Teclado:
 DLG_KEYB_META=Tecla &Meta:
+DLG_KEYB_META_OFF=desligado
+DLG_KEYB_META_ON=ligado
+DLG_KEYB_META_LEFT=esquerda
+DLG_KEYB_META_RIGHT=direita
 DLG_KEYB_DISABLE=Modo desabilitado:
 DLG_KEYB_APPKEY=Teclado &Numérico Aplicativo
 DLG_KEYB_APPCUR=&Cursor Aplicativo
@@ -465,6 +473,7 @@ DLG_WIN_VERT=Linha &vertical
 DLG_WIN_HORZ=Linha &horizontal
 DLG_WIN_BOLDFONT=Ativar fonte &negrito
 DLG_WIN_HIDETITLE=Ocultar barra de &título
+DLG_WIN_NO_FRAME=Sem &Quadro
 DLG_WIN_HIDEMENU=Ocultar barra de &menu
 DLG_WIN_COLOREMU=Emulação de &cor
 DLG_WIN_PCBOLD16=16 cores (&estilo PC)
@@ -485,6 +494,8 @@ DLG_WIN_NORMAL=Normal
 DLG_WIN_BOLD=Negrito
 DLG_WIN_BLINK=Piscante
 DLG_WIN_REVERSEATTR=Invertido
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=Sublinhado
 
 DLG_CHOOSEFONT_STC6=A seleção de "Estilo da fonte" aqui não afetará a aparência real da fonte.
 
@@ -497,6 +508,7 @@ MSG_FIND_DIR_ERROR=Não foi possível encontrar o diretório
 
 ; ttpfile
 ; ttfile.c
+DLG_FOPT_TITLE=Log
 DLG_FOPT_FILENAME_TITLE=&Nome do arquivo (arraste arquivos aqui)
 DLG_FOPT_APPEND_LABEL=Modo de escrita
 DLG_FOPT_NEW_OVERWRITE=&Novo / Sobrescrever
@@ -532,8 +544,8 @@ DLG_GETFN_TITLE=Tera Term: Kermit Get
 DLG_GETFN_FILENAME=&Nome do arquivo:
 
 ; ttftypes.h
-FILEDLG_TRANS_TITLE_LOG=Log
-FILEDLG_TRANS_TITLE_SENDFILE=Enviar arquivo
+FILEDLG_TRANS_TITLE_LOG=Logging
+FILEDLG_TRANS_TITLE_SENDFILE=Sending file
 FILEDLG_TRANS_TITLE_KMTRCV=Kermit Receive
 FILEDLG_TRANS_TITLE_KMTGET=Kermit Get
 FILEDLG_TRANS_TITLE_KMTSEND=Kermit Send
@@ -548,6 +560,8 @@ FILEDLG_TRANS_TITLE_BPRCV=B-Plus Receive
 FILEDLG_TRANS_TITLE_BPSEND=B-Plus Send
 FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN Receive
 FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN Send
+FILEDLG_TRANS_TITLE_RECVFILE=Receber arquivo
+FILEDLG_TRANS_TITLE_RAWRCV=Recebendo arquivo
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: Confirmação de área de transferência
@@ -597,6 +611,11 @@ DLG_SENDFILE_READING_METHOD_BULK=Leitura em &bloco
 DLG_SENDFILE_READING_METHOD_SEQUENTIAL=Leitura &sequencial
 DLG_SENDFILE_READING_METOHD_TOOLTIP=Leitura em bloco:\n- Envia enquanto lê o arquivo.\n- Arquivos de texto são lidos como codificação ACP e não são determinados automaticamente.\nLeitura sequencial:\n- Arquivo é lido na memória antes de ser enviado.\n- Codificação de arquivos de texto é determinada automaticamente.\n
 DLG_SENDFILE_BINARY=&Binário
+
+; receivefile
+DLG_RECVFILE_FILENAME_TITLE=&Nome do arquivo (arraste o arquivo para este diálogo)
+DLG_RECVFILE_BINARY=&Binário
+DLG_RECVFILE_AUTOSTOP_LABEL=&Tempo de espera para parada automática (seg)
 
 ; theme
 DLG_THEME_PREVIEW_FILE_TITLE=Pré-visualização/Arquivo
@@ -650,6 +669,12 @@ DLG_ABOUT_COMP_INFO=nível %d; taxa %.1f (%ld:%ld)
 DLG_ABOUT_COMP_INFO2=nível %d
 DLG_ABOUT_COMP_NONE=nenhuma
 DLG_ABOUT_COMP_UPDOWN=Upload %s; Download %s
+DLG_ABOUT_KEXPARAM=Key exchange param:
+DLG_ABOUT_KEXPARAM_DH=%d-bit DH group
+DLG_ABOUT_KEXPARAM_NISTP=NIST P-%d (%d-bit) elliptic curve
+DLG_ABOUT_KEXPARAM_X25519=Curve25519 (255-bit) elliptic curve
+DLG_ABOUT_KEXPARAM_SNTRUP761X25519=Curve25519 (255-bit) elliptic curve, SNTRUP761 (761-degree polynomial)
+DLG_ABOUT_KEXPARAM_MLKEM768X25519=Curve25519 (255-bit) elliptic curve, ML-KEM-768 (768-dimensional lattice)
 DLG_ABOUT_AUTH_INFO=Usuário '%s', autenticação %s
 DLG_ABOUT_AUTH_INFO2=, chave %s
 DLG_ABOUT_AUTH_INFO3=, chave %s com %s
@@ -1248,8 +1273,14 @@ MENU_SETTING=Config&uração
 MENU_SETTING_TITLE=Configuração do KanjiMenu
 MENU_CHARCODE=Exibir menu de &código de caractere
 MENU_CONTENTS=&Conteúdo do menu
+MENU_CONTENTS_AUTO=Automatico
+MENU_CONTENTS_JAPANESE=Japones
+MENU_CONTENTS_KOREAN=Coreano
 MENU_AMB_MENU=Exibir menu de largura de &caracteres ambíguos
 MENU_USE_ONE_SETTING_MENU=Usar menu de &única configuração
+BTN_OK=OK
+BTN_CANCEL=Cancelar
+BTN_HELP=Ajuda
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=&Sempre visível
@@ -1267,6 +1298,42 @@ DLG_INTERVAL=&Intervalo (seg)
 DLG_COMMAND=&Comando
 DLG_ADD_NEWLINE=&Adicionar nova linha
 
+BTN_OK=OK
+BTN_CANCEL=Cancelar
+
 [TTXCheckUpdate]
 MSG_CHECKUPDATE=Verificar atualizações automaticamente?\n  %s
 MENU_CHECKUPDATE=Verificar &atualizações...
+
+
+[TTXttyrec]
+MENU_RECORD=Gravar TT&Y
+MENU_REPLAY=R&eproduzir TTY
+MENU_REPLAYAGAIN=Reproduzir novamente
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0Todos os arquivos(*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=Velocidade: %d, Pausa: %s
+TITLE_STATUS_ON=LIGADO
+TITLE_STATUS_OFF=DESLIGADO
+TITLE_TRIM=%d.%06d segundos ocioso. cortar para %d segundos.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), Desativado.
+
+
+[TTXViewMode]
+MENU_SETPASS=Senha do Modo de &Visualizacao
+MENU_VIEWMODE=Modo de &Visualizacao
+DLG_SETPASSWORD_TITLE=Definir senha
+DLG_SETPASSWORD_CURPASS=Senha antiga
+DLG_SETPASSWORD_NEWPASS=Nova senha
+DLG_SETPASSWORD_RETPASS=Redigitar senha
+DLG_INPUTPASSWORD_TITLE=Inserir senha
+DLG_INPUTPASSWORD_PASSWORD=Senha
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=Senha alterada
+MSG_INVALID=Senha invalida
+MSG_NOTMATCHED=Nova senha nao corresponde.
+MSG_TITLE_ERROR=Erro no TTXViewMode
+MSG_CANNOTDISPLAY=Nao e possivel exibir a caixa de dialogo.
+BTN_OK=OK
+BTN_CANCEL=&Cancelar

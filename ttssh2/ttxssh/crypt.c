@@ -41,6 +41,7 @@
 #include <openssl/dsa.h>
 #include "cipher.h"
 #include "ssh.h"
+#include "ssherr.h"
 
 #define do_crc(buf, len) (~(uint32)crc32(0xFFFFFFFF, (buf), (len)))
 #define get_uint32(buf) get_uint32_MSBfirst((buf))
@@ -220,9 +221,9 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	}
 
 	if (cc->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
-		// chacha20-poly1305 ‚Å‚Í aadlen ‚àˆÃ†‰»‚Ì‘ÎÛ
-		//   aadlen ‚Æ bytes ‚Í•ÊX‚ÉˆÃ†‰»‚³‚ê‚é
-		// chachapoly_crypt ‚Ì’†‚Å”FØƒf[ƒ^(AEAD tag)‚à¶¬‚³‚ê‚é
+		// chacha20-poly1305 ã§ã¯ aadlen ã‚‚æš—å·åŒ–ã®å¯¾è±¡
+		//   aadlen ã¨ bytes ã¯åˆ¥ã€…ã«æš—å·åŒ–ã•ã‚Œã‚‹
+		// chachapoly_crypt ã®ä¸­ã§èªè¨¼ãƒ‡ãƒ¼ã‚¿(AEAD tag)ã‚‚ç”Ÿæˆã•ã‚Œã‚‹
 		newbuff_len += aadlen + authlen;
 	}
 	if (newbuff_len > encbufflen) {
@@ -247,7 +248,7 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	if (aadlen && !EVP_Cipher(cc->evp, NULL, data, aadlen) < 0)
 		goto err;
 
-	// AES-GCM ‚Å‚Í aadlen ‚ðˆÃ†‰»‚µ‚È‚¢‚Ì‚ÅA‚»‚Ìæ‚¾‚¯ˆÃ†‰»‚·‚é
+	// AES-GCM ã§ã¯ aadlen ã‚’æš—å·åŒ–ã—ãªã„ã®ã§ã€ãã®å…ˆã ã‘æš—å·åŒ–ã™ã‚‹
 	if (EVP_Cipher(cc->evp, encbuff, data+aadlen, bytes) < 0)
 		goto err;
 
@@ -291,7 +292,7 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	}
 
 	if (cc->cipher->id == SSH2_CIPHER_CHACHAPOLY) {
-		// chacha20-poly1305 ‚Å‚Í aadlen ‚àˆÃ†‰»‚³‚ê‚Ä‚¢‚é
+		// chacha20-poly1305 ã§ã¯ aadlen ã‚‚æš—å·åŒ–ã•ã‚Œã¦ã„ã‚‹
 		newbuff_len += aadlen;
 	}
 	if (newbuff_len > encbufflen) {
@@ -319,7 +320,7 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	if (aadlen && !EVP_Cipher(cc->evp, NULL, data, aadlen) < 0)
 		goto err;
 
-	// AES-GCM ‚Å‚Í aadlen ‚ðˆÃ†‰»‚µ‚È‚¢‚Ì‚ÅA‚»‚Ìæ‚¾‚¯•œ†‚·‚é
+	// AES-GCM ã§ã¯ aadlen ã‚’æš—å·åŒ–ã—ãªã„ã®ã§ã€ãã®å…ˆã ã‘å¾©å·ã™ã‚‹
 	if (EVP_Cipher(cc->evp, encbuff, data+aadlen, bytes) < 0)
 		goto err;
 
@@ -495,7 +496,7 @@ void CRYPT_set_random_data(PTInstVar pvar, unsigned char *buf, unsigned int byte
 {
 	int ret;
 
-	// OpenSSL 1.1.1‚ðŽg‚Á‚½ê‡AWindowsMe‚Å‚Í RAND_bytes() ‚ÌŒÄ‚Ño‚µ‚Å—Ž‚¿‚éB
+	// OpenSSL 1.1.1ã‚’ä½¿ã£ãŸå ´åˆã€WindowsMeã§ã¯ RAND_bytes() ã®å‘¼ã³å‡ºã—ã§è½ã¡ã‚‹ã€‚
 	logprintf(LOG_LEVEL_VERBOSE, "%s: RAND_bytes call", __FUNCTION__);
 	ret = RAND_bytes(buf, bytes);
 	if (ret < 0) {
@@ -505,7 +506,7 @@ void CRYPT_set_random_data(PTInstVar pvar, unsigned char *buf, unsigned int byte
 
 void CRYPT_initialize_random_numbers(PTInstVar pvar)
 {
-	// ŒÄ‚Î‚È‚­‚Ä‚à‚æ‚¢‚ç‚µ‚¢
+	// å‘¼ã°ãªãã¦ã‚‚ã‚ˆã„ã‚‰ã—ã„
 	// http://www.mail-archive.com/openssl-users@openssl.org/msg60484.html
 	//RAND_screen();
 }
@@ -517,7 +518,7 @@ static BIGNUM *get_bignum(unsigned char *bytes)
 	return BN_bin2bn(bytes + 2, (bits + 7) / 8, NULL);
 }
 
-// make_key()‚ð fingerprint ¶¬‚Å‚à—˜—p‚·‚é‚Ì‚ÅAstatic‚ðíœB(2006.3.27 yutaka)
+// make_key()ã‚’ fingerprint ç”Ÿæˆã§ã‚‚åˆ©ç”¨ã™ã‚‹ã®ã§ã€staticã‚’å‰Šé™¤ã€‚(2006.3.27 yutaka)
 RSA *make_key(PTInstVar pvar,
               int bits, unsigned char *exp,
               unsigned char *mod)
@@ -526,8 +527,8 @@ RSA *make_key(PTInstVar pvar,
 	BIGNUM *e = NULL, *n = NULL;
 
 	if (key != NULL) {
-		// OpenSSL 1.1.0‚Å‚ÍRSA\‘¢‘Ì‚Ìƒƒ“ƒo[‚É’¼ÚƒAƒNƒZƒX‚Å‚«‚È‚¢‚½‚ßA
-		// RSA_set0_keyŠÖ”‚ÅÝ’è‚·‚é•K—v‚ª‚ ‚éB
+		// OpenSSL 1.1.0ã§ã¯RSAæ§‹é€ ä½“ã®ãƒ¡ãƒ³ãƒãƒ¼ã«ç›´æŽ¥ã‚¢ã‚¯ã‚»ã‚¹ã§ããªã„ãŸã‚ã€
+		// RSA_set0_keyé–¢æ•°ã§è¨­å®šã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
 		e = get_bignum(exp);
 		n = get_bignum(mod);
 		RSA_set0_key(key, n, e, NULL);
@@ -632,7 +633,7 @@ unsigned int CRYPT_get_decryption_block_size(PTInstVar pvar)
 	if (SSHv1(pvar)) {
 		return 8;
 	} else {
-		// ƒpƒPƒbƒgŽóMŽž‚É‚¨‚¯‚é•œ†ƒAƒ‹ƒSƒŠƒYƒ€‚ÌƒuƒƒbƒNƒTƒCƒY (2004.11.7 yutaka)
+		// ãƒ‘ã‚±ãƒƒãƒˆå—ä¿¡æ™‚ã«ãŠã‘ã‚‹å¾©å·ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã®ãƒ–ãƒ­ãƒƒã‚¯ã‚µã‚¤ã‚º (2004.11.7 yutaka)
 		// cf. 3DES=8, AES128=16
 		return (pvar->ssh2_keys[MODE_IN].enc.block_size);
 	}
@@ -643,7 +644,7 @@ unsigned int CRYPT_get_encryption_block_size(PTInstVar pvar)
 	if (SSHv1(pvar)) {
 		return 8;
 	} else {
-		// ƒpƒPƒbƒg‘—MŽž‚É‚¨‚¯‚éˆÃ†ƒAƒ‹ƒSƒŠƒYƒ€‚ÌƒuƒƒbƒNƒTƒCƒY (2004.11.7 yutaka)
+		// ãƒ‘ã‚±ãƒƒãƒˆé€ä¿¡æ™‚ã«ãŠã‘ã‚‹æš—å·ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã®ãƒ–ãƒ­ãƒƒã‚¯ã‚µã‚¤ã‚º (2004.11.7 yutaka)
 		// cf. 3DES=8, AES128=16
 		return (pvar->ssh2_keys[MODE_OUT].enc.block_size);
 	}
@@ -666,20 +667,17 @@ unsigned int CRYPT_get_receiver_MAC_size(PTInstVar pvar)
 
 }
 
-// HMAC‚ÌŒŸØ
-// ¦–{ŠÖ”‚Í SSH2 ‚Å‚Ì‚ÝŽg—p‚³‚ê‚éB
-// (2004.12.17 yutaka)
+// HMACã®æ¤œè¨¼
+// â€»æœ¬é–¢æ•°ã¯ SSH2 ã§ã®ã¿ä½¿ç”¨ã•ã‚Œã‚‹ã€‚
 BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
                                char *data, int len, char *MAC)
 {
-	HMAC_CTX *c = NULL;
-	unsigned char m[EVP_MAX_MD_SIZE];
-	unsigned char b[4];
 	struct Mac *mac;
+	int ret;
 
 	mac = &pvar->ssh2_keys[MODE_IN].mac;
 
-	// HMAC‚ª‚Ü‚¾—LŒø‚Å‚È‚¢ê‡‚ÍAŒŸØOK‚Æ‚µ‚Ä•Ô‚·B
+	// HMACãŒã¾ã æœ‰åŠ¹ã§ãªã„å ´åˆã¯ã€æ¤œè¨¼OKã¨ã—ã¦è¿”ã™ã€‚
 	if (mac == NULL || mac->enabled == 0)
 		return TRUE;
 
@@ -688,38 +686,23 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 		goto error;
 	}
 
-	if ((u_int)mac->mac_len > sizeof(m)) {
-		logprintf(LOG_LEVEL_VERBOSE, "HMAC len(%d) is larger than %d bytes(seq %lu len %d)",
-		          mac->mac_len, (int)sizeof(m), sequence_number, len);
-		goto error;
-	}
-
-	c = HMAC_CTX_new();
-	if (c == NULL)
-		goto error;
-
-	HMAC_Init_ex(c, mac->key, mac->key_len, mac->md, NULL);
-	set_uint32_MSBfirst(b, sequence_number);
-	HMAC_Update(c, b, sizeof(b));
-	HMAC_Update(c, data, len);
-	HMAC_Final(c, m, NULL);
-	// HMAC_cleanup()‚ÍOpenSSL 1.1.0‚Åíœ‚³‚êAHMAC_CTX_free()‚ÉW–ñ‚³‚ê‚½B
-
-	if (memcmp(m, MAC, mac->mac_len)) {
+	// mac_check() ã® mlen ã¯ sizeof(theirmac) ã‚’æƒ³å®šã—ã¦ã„ã‚‹ãŒã€
+	// MAC ã¯ buf ã®ãƒã‚¤ãƒ³ã‚¿ãªã®ã§æœ¬å½“ã¯ã‚ˆããªã„ï¼Ÿ
+	ret = mac_check(mac, sequence_number, data, len, MAC, mac->mac_len);
+	if (ret == SSH_ERR_MAC_INVALID) {
 		logprintf(LOG_LEVEL_VERBOSE, "HMAC key is not matched(seq %lu len %d)", sequence_number, len);
-		logprintf_hexdump(LOG_LEVEL_VERBOSE, m, mac->mac_len, "m:");
-		logprintf_hexdump(LOG_LEVEL_VERBOSE, MAC, mac->mac_len, "MAC:");
+		// for debug
+		// ourmac in mac_check() should be logged
+		// logprintf_hexdump(LOG_LEVEL_VERBOSE, MAC, mac->mac_len, "theirmac:");
 		goto error;
 	}
-
-	HMAC_CTX_free(c);
+	else if (ret != 0) {
+		goto error;
+	}
 
 	return TRUE;
 
 error:
-	if (c)
-		HMAC_CTX_free(c);
-
 	return FALSE;
 }
 
@@ -742,32 +725,20 @@ unsigned int CRYPT_get_sender_MAC_size(PTInstVar pvar)
 BOOL CRYPT_build_sender_MAC(PTInstVar pvar, uint32 sequence_number,
                             char *data, int len, char *MAC)
 {
-	HMAC_CTX *c = NULL;
-	static u_char m[EVP_MAX_MD_SIZE];
-	u_char b[4];
 	struct Mac *mac;
+	int ret;
 
-	if (SSHv2(pvar)) { // for SSH2(yutaka)
+	if (SSHv2(pvar)) {
 		mac = &pvar->ssh2_keys[MODE_OUT].mac;
 		if (mac == NULL || mac->enabled == 0)
 			return FALSE;
 
-		c = HMAC_CTX_new();
-		if (c == NULL)
+		// mac_compute() ã® dlen ã¯ sizeof(digest) ã‚’æƒ³å®šã—ã¦ã„ã‚‹ãŒã€
+		// MAC ã¯ buf ã®ãƒã‚¤ãƒ³ã‚¿ãªã®ã§æœ¬å½“ã¯ã‚ˆããªã„ï¼Ÿ
+		ret = mac_compute(mac, sequence_number, data, len, MAC, mac->mac_len);
+		if (ret != 0) {
 			return FALSE;
-
-		HMAC_Init_ex(c, mac->key, mac->key_len, mac->md, NULL);
-		set_uint32_MSBfirst(b, sequence_number);
-		HMAC_Update(c, b, sizeof(b));
-		HMAC_Update(c, data, len);
-		HMAC_Final(c, m, NULL);
-		// HMAC_cleanup()‚ÍOpenSSL 1.1.0‚Åíœ‚³‚êAHMAC_CTX_free()‚ÉW–ñ‚³‚ê‚½B
-
-		// 20ƒoƒCƒg•ª‚¾‚¯ƒRƒs[
-		memcpy(MAC, m, pvar->ssh2_keys[MODE_OUT].mac.mac_len);
-	//	memcpy(MAC, m, sizeof(m));
-
-		HMAC_CTX_free(c);
+		}
 
 		return TRUE;
 	}
@@ -822,8 +793,8 @@ unsigned int CRYPT_get_encrypted_session_key_len(PTInstVar pvar)
 	int host_key_bytes;
 	BIGNUM *n;
 
-	// OpenSSL 1.1.0‚Å‚ÍRSA\‘¢‘Ì‚Ìƒƒ“ƒo[‚É’¼ÚƒAƒNƒZƒX‚Å‚«‚È‚¢‚½‚ßA
-	// RSA_get0_keyŠÖ”‚ÅŽæ“¾‚·‚é•K—v‚ª‚ ‚éB
+	// OpenSSL 1.1.0ã§ã¯RSAæ§‹é€ ä½“ã®ãƒ¡ãƒ³ãƒãƒ¼ã«ç›´æŽ¥ã‚¢ã‚¯ã‚»ã‚¹ã§ããªã„ãŸã‚ã€
+	// RSA_get0_keyé–¢æ•°ã§å–å¾—ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
 	RSA_get0_key(pvar->crypt_state.server_key.RSA_key, &n, NULL, NULL);
 	server_key_bits = BN_num_bits(n);
 
@@ -851,8 +822,8 @@ int CRYPT_choose_session_key(PTInstVar pvar,
 	int bit_delta;
 	BIGNUM *server_n, *host_n;
 
-	// OpenSSL 1.1.0‚Å‚ÍRSA\‘¢‘Ì‚Ìƒƒ“ƒo[‚É’¼ÚƒAƒNƒZƒX‚Å‚«‚È‚¢‚½‚ßA
-	// RSA_get0_keyŠÖ”‚ÅŽæ“¾‚·‚é•K—v‚ª‚ ‚éB
+	// OpenSSL 1.1.0ã§ã¯RSAæ§‹é€ ä½“ã®ãƒ¡ãƒ³ãƒãƒ¼ã«ç›´æŽ¥ã‚¢ã‚¯ã‚»ã‚¹ã§ããªã„ãŸã‚ã€
+	// RSA_get0_keyé–¢æ•°ã§å–å¾—ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
 	RSA_get0_key(pvar->crypt_state.server_key.RSA_key, &server_n, NULL, NULL);
 	server_key_bits = BN_num_bits(server_n);
 
@@ -964,8 +935,8 @@ int CRYPT_generate_RSA_challenge_response(PTInstVar pvar,
 	int decrypted_challenge_len;
 	BIGNUM *server_n, *host_n;
 
-	// OpenSSL 1.1.0‚Å‚ÍRSA\‘¢‘Ì‚Ìƒƒ“ƒo[‚É’¼ÚƒAƒNƒZƒX‚Å‚«‚È‚¢‚½‚ßA
-	// RSA_get0_keyŠÖ”‚ÅŽæ“¾‚·‚é•K—v‚ª‚ ‚éB
+	// OpenSSL 1.1.0ã§ã¯RSAæ§‹é€ ä½“ã®ãƒ¡ãƒ³ãƒãƒ¼ã«ç›´æŽ¥ã‚¢ã‚¯ã‚»ã‚¹ã§ããªã„ãŸã‚ã€
+	// RSA_get0_keyé–¢æ•°ã§å–å¾—ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
 	RSA_get0_key(pvar->crypt_state.server_key.RSA_key, &server_n, NULL, NULL);
 	server_key_bits = BN_num_bits(server_n);
 
@@ -1070,9 +1041,9 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 		}
 		else {
 			// SSH2
-			cipher = pvar->ciphers[MODE_OUT];
+			cipher = pvar->kex->ciphers[MODE_OUT];
 			if (cipher) {
-				pvar->crypt_state.sender_cipher = get_cipher_id(pvar->ciphers[MODE_OUT]);
+				pvar->crypt_state.sender_cipher = get_cipher_id(pvar->kex->ciphers[MODE_OUT]);
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
 				cipher_init_SSH2(&pvar->cc[MODE_OUT], cipher,
 				                 enc->key, enc->key_len,
@@ -1116,9 +1087,9 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 		}
 		else {
 			// SSH2
-			cipher = pvar->ciphers[MODE_IN];
+			cipher = pvar->kex->ciphers[MODE_IN];
 			if (cipher) {
-				pvar->crypt_state.receiver_cipher = get_cipher_id(pvar->ciphers[MODE_IN]);
+				pvar->crypt_state.receiver_cipher = get_cipher_id(pvar->kex->ciphers[MODE_IN]);
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
 				cipher_init_SSH2(&pvar->cc[MODE_IN], cipher,
 				                 enc->key, enc->key_len,
@@ -1173,8 +1144,8 @@ void CRYPT_get_server_key_info(PTInstVar pvar, char *dest, int len)
 {
 	BIGNUM *server_n, *host_n;
 
-	// OpenSSL 1.1.0‚Å‚ÍRSA\‘¢‘Ì‚Ìƒƒ“ƒo[‚É’¼ÚƒAƒNƒZƒX‚Å‚«‚È‚¢‚½‚ßA
-	// RSA_get0_keyŠÖ”‚ÅŽæ“¾‚·‚é•K—v‚ª‚ ‚éB
+	// OpenSSL 1.1.0ã§ã¯RSAæ§‹é€ ä½“ã®ãƒ¡ãƒ³ãƒãƒ¼ã«ç›´æŽ¥ã‚¢ã‚¯ã‚»ã‚¹ã§ããªã„ãŸã‚ã€
+	// RSA_get0_keyé–¢æ•°ã§å–å¾—ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
 
 	if (SSHv1(pvar)) {
 		if (pvar->crypt_state.server_key.RSA_key == NULL
@@ -1186,17 +1157,75 @@ void CRYPT_get_server_key_info(PTInstVar pvar, char *dest, int len)
 			RSA_get0_key(pvar->crypt_state.host_key.RSA_key, &host_n, NULL, NULL);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_KEY_INFO", pvar,
-								"%d-bit server key, %d-bit host key");
+			                    "%d-bit server key, %d-bit host key");
 			_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg,
 			            BN_num_bits(server_n),
 			            BN_num_bits(host_n));
 		}
-	} else { // SSH2
-			UTIL_get_lang_msgU8("DLG_ABOUT_KEY_INFO2", pvar,
-								"%d-bit client key, %d-bit server key");
-			_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg,
-			            pvar->client_key_bits,
-			            pvar->server_key_bits);
+	}
+}
+
+void CRYPT_get_kex_param_info(PTInstVar pvar, char *dest, int len)
+{
+	char buf[1024];
+	buf[0] = '\0';
+
+	if (SSHv2(pvar)) {
+		switch (pvar->kex->kex_type) {
+			// DH fixed group, DH group exchange
+			case KEX_DH_GRP1_SHA1:
+			case KEX_DH_GRP14_SHA1:
+			case KEX_DH_GEX_SHA1:
+			case KEX_DH_GEX_SHA256:
+			case KEX_DH_GRP14_SHA256:
+			case KEX_DH_GRP16_SHA512:
+			case KEX_DH_GRP18_SHA512:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_DH", pvar, "%d-bit DH group");
+				strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
+				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg, pvar->kex->dh_group_bits);
+				break;
+			// NIST P-based ECDH
+			case KEX_ECDH_SHA2_256:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_NISTP", pvar, "NIST P-%d (%d-bit) elliptic curve");
+				strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
+				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg, 256, 256);
+				break;
+			case KEX_ECDH_SHA2_384:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_NISTP", pvar, "NIST P-%d (%d-bit) elliptic curve");
+				strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
+				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg, 384, 384);
+				break;
+			case KEX_ECDH_SHA2_521:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_NISTP", pvar, "NIST P-%d (%d-bit) elliptic curve");
+				strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
+				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg, 521, 521);
+				break;
+			// curve25519 ECDH
+			case KEX_CURVE25519_SHA256_OLD:
+			case KEX_CURVE25519_SHA256:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_X25519", pvar, "Curve25519 (255-bit) elliptic curve");
+				strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
+				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg);
+				break;
+			// sntrup761x25519
+			case KEX_SNTRUP761X25519_SHA512_OLD:
+			case KEX_SNTRUP761X25519_SHA512:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_SNTRUP761X25519", pvar,
+				                    "Curve25519 (255-bit) elliptic curve, SNTRUP761 (761-degree polynomial)");
+				strncat_s(buf, sizeof(buf), pvar->UIMsg, _TRUNCATE);
+				strncat_s(buf, sizeof(buf), " ", _TRUNCATE);
+				_snprintf_s(dest, len, _TRUNCATE, pvar->UIMsg);
+				break;
+			// mlkem768x25519
+			case KEX_MLKEM768X25519_SHA256:
+				UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM_MLKEM768X25519", pvar,
+				                    "Curve25519 (255-bit) elliptic curve, ML-KEM-768 (768-dimensional lattice)");
+		}
 	}
 }
 

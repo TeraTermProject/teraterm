@@ -31,9 +31,9 @@
 #include "filesys_log.h"	// for LogCode_t
 
 typedef struct {
-	wchar_t *filename;		// [in] ファイル名初期値(NULL=default) [out] 入力ファイル名、free()すること
+	wchar_t *filename;		// [in] 繝輔ぃ繧､繝ｫ蜷榊�晄悄蛟､(NULL=default) [out] 蜈･蜉帙ヵ繧｡繧､繝ｫ蜷阪’ree()縺吶ｋ縺薙→
 	BOOL append;			// TRUE/FALSE = append/new(overwrite)
-	BOOL bom;				// TRUE = BOMあり
+	BOOL bom;				// TRUE = BOM縺ゅｊ
 	LogCode_t code;
 	TTTSet *pts;
 	TComVar *pcv;

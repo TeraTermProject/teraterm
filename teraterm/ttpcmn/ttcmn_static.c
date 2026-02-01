@@ -49,9 +49,9 @@
 
 #include "ttcmn_static.h"
 
-// TMap ‚ğŠi”[‚·‚éƒtƒ@ƒCƒ‹ƒ}ƒbƒsƒ“ƒOƒIƒuƒWƒFƒNƒg(‹¤—Lƒƒ‚ƒŠ)‚Ì–¼‘O
-// TMap(‚Æ‚»‚Ìƒƒ“ƒo)‚ÌXV‚Í‹Œƒo[ƒWƒ‡ƒ“‚Æ‚Ì“¯‹N“®‚Ìˆ×‚É•Ï‚¦‚é•K—v‚ª‚ ‚é‚ª
-// ˜A”Ô‚©‚çƒo[ƒWƒ‡ƒ“”Ô†‚ğg‚¤‚æ‚¤‚É•ÏX‚µ‚½ˆ×A’Êí‚Íè“®‚Å•ÏX‚·‚é•K—v‚Í–³‚¢
+// TMap ã‚’æ ¼ç´ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒƒãƒ”ãƒ³ã‚°ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(å…±æœ‰ãƒ¡ãƒ¢ãƒª)ã®åå‰
+// TMap(ã¨ãã®ãƒ¡ãƒ³ãƒ)ã®æ›´æ–°æ™‚ã¯æ—§ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã¨ã®åŒæ™‚èµ·å‹•ã®ç‚ºã«å¤‰ãˆã‚‹å¿…è¦ãŒã‚ã‚‹ãŒ
+// é€£ç•ªã‹ã‚‰ãƒãƒ¼ã‚¸ãƒ§ãƒ³ç•ªå·ã‚’ä½¿ã†ã‚ˆã†ã«å¤‰æ›´ã—ãŸç‚ºã€é€šå¸¸ã¯æ‰‹å‹•ã§å¤‰æ›´ã™ã‚‹å¿…è¦ã¯ç„¡ã„
 #define TT_FILEMAPNAME "ttset_memfilemap_" TT_VERSION_STR("_")
 
 static PMap pm;
@@ -78,10 +78,10 @@ void CopyTTSetToShmem(PTTSet ts)
 		void *dest = (void *)MapViewOfFile(handle, FILE_MAP_ALL_ACCESS,0,0,0);
 		memcpy(dest, ptr, size);
 		UnmapViewOfFile(dest);
-		//CloseHandle(handle);	do not close, g—p‚µ‚È‚¢ó‘Ô‚É‚È‚é‚Æ‚È‚­‚È‚Á‚Ä‚µ‚Ü‚¤
+		//CloseHandle(handle);	do not close, ä½¿ç”¨ã—ãªã„çŠ¶æ…‹ã«ãªã‚‹ã¨ãªããªã£ã¦ã—ã¾ã†
 
 		if (pm->DuplicateDataHandle != NULL) {
-			// 1‰ñ‘O‚Ìî•ñ‚ğíœ‚·‚é
+			// 1å›å‰ã®æƒ…å ±ã‚’å‰Šé™¤ã™ã‚‹
 			CloseHandle(pm->DuplicateDataHandle);
 		}
 		pm->DuplicateDataHandle = handle;
@@ -106,7 +106,7 @@ static void CopyFiles(const wchar_t *file_list[], const wchar_t *src_dir, const 
 
 		len = wcslen(dest);
 		if (dest[len - 1] == '\\') {
-			// ƒtƒHƒ‹ƒ_ì¬
+			// ãƒ•ã‚©ãƒ«ãƒ€ä½œæˆ
 			CreateDirectoryW(dest, NULL);
 		}
 		else {
@@ -136,7 +136,7 @@ static void ConvertIniFiles(const wchar_t *filelist[],  const wchar_t *dir, cons
 }
 
 /*
- *	@return		ƒGƒ‰[‚ª—L‚éê‡ FALSE
+ *	@return		ã‚¨ãƒ©ãƒ¼ãŒæœ‰ã‚‹å ´åˆ FALSE
  *	@param[in]	BOOL first_instance
  */
 BOOL OpenSharedMemory(BOOL *first_instance_, PMap *pm_, HANDLE *HMap_)
@@ -200,9 +200,9 @@ BOOL StartTeraTerm(HINSTANCE hInst, PTTSet ts)
 		pm->NWin = 0;
 	}
 
-	// if (FirstInstance) { ‚Ì•”•ª‚©‚çˆÚ“® (2008.3.13 maya)
-	// ‹N“®‚É‚ÍA‹¤—Lƒƒ‚ƒŠ‚Ì HomeDir ‚Æ SetupFName ‚Í‹ó‚É‚È‚é
-	/* Get home directory (ttermpro.exe‚ÌƒtƒHƒ‹ƒ_) */
+	// if (FirstInstance) { ã®éƒ¨åˆ†ã‹ã‚‰ç§»å‹• (2008.3.13 maya)
+	// èµ·å‹•æ™‚ã«ã¯ã€å…±æœ‰ãƒ¡ãƒ¢ãƒªã® HomeDir ã¨ SetupFName ã¯ç©ºã«ãªã‚‹
+	/* Get home directory (ttermpro.exeã®ãƒ•ã‚©ãƒ«ãƒ€) */
 	ts->ExeDirW = GetExeDirW(hInst);
 
 	// LogDir
@@ -211,22 +211,22 @@ BOOL StartTeraTerm(HINSTANCE hInst, PTTSet ts)
 	// HomeDir
 	ts->HomeDirW = GetHomeDirW(hInst);
 	WideCharToACP_t(ts->HomeDirW, ts->HomeDir, _countof(ts->HomeDir));
-	SetCurrentDirectoryW(ts->HomeDirW);		// TODO •K—v??
+	SetCurrentDirectoryW(ts->HomeDirW);		// TODO å¿…è¦??
 
-	// TERATERM.INI ‚Ìƒtƒ‹ƒpƒX
+	// TERATERM.INI ã®ãƒ•ãƒ«ãƒ‘ã‚¹
 	ts->SetupFNameW = NULL;
 	awcscats(&ts->SetupFNameW, ts->HomeDirW, L"\\TERATERM.INI", NULL);
 	WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
 
-	// KEYBOARD.CNF ‚Ìƒtƒ‹ƒpƒX
+	// KEYBOARD.CNF ã®ãƒ•ãƒ«ãƒ‘ã‚¹
 	ts->KeyCnfFNW = NULL;
 	awcscats(&ts->KeyCnfFNW, ts->HomeDirW, L"\\KEYBOARD.CNF", NULL);
 
-	// ƒ|[ƒ^ƒuƒ‹ƒ‚[ƒh‚Å‚Í‚È‚­A
-	// ŒÂlİ’èƒtƒ@ƒCƒ‹‚Ì‚ ‚éƒtƒHƒ‹ƒ_ HomeDirW ‚É TERATERM.INI ‚ª‘¶İ‚µ‚È‚¢‚Æ‚«
+	// ãƒãƒ¼ã‚¿ãƒ–ãƒ«ãƒ¢ãƒ¼ãƒ‰ã§ã¯ãªãã€
+	// å€‹äººè¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€ HomeDirW ã« TERATERM.INI ãŒå­˜åœ¨ã—ãªã„ã¨ã
 	if (!IsPortableMode() &&
 		(GetFileAttributesW(ts->SetupFNameW) == INVALID_FILE_ATTRIBUTES)) {
-		// İ’èƒtƒ@ƒCƒ‹‚ğŒÂlƒtƒHƒ‹ƒ_‚ÖƒRƒs[‚·‚é
+		// è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã‚’å€‹äººãƒ•ã‚©ãƒ«ãƒ€ã¸ã‚³ãƒ”ãƒ¼ã™ã‚‹
 		static const wchar_t *filelist[] = {
 			L"TERATERM.INI",
 			L"KEYBOARD.CNF",
@@ -248,7 +248,7 @@ BOOL StartTeraTerm(HINSTANCE hInst, PTTSet ts)
 		CopyFiles(filelist, ts->ExeDirW, ts->HomeDirW);
 	}
 
-	// iniƒtƒ@ƒCƒ‹‚Ì•¶šƒR[ƒh‚ğ•ÏŠ·‚·‚é
+	// iniãƒ•ã‚¡ã‚¤ãƒ«ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰ã‚’å¤‰æ›ã™ã‚‹
 	{
 		static const wchar_t *filelist[] = {
 			L"TERATERM.INI",
@@ -257,11 +257,11 @@ BOOL StartTeraTerm(HINSTANCE hInst, PTTSet ts)
 			NULL,
 		};
 
-		// backup ƒtƒ@ƒCƒ‹‚É‚Â‚¯‚é“ú•t•¶š—ñ
+		// backup ãƒ•ã‚¡ã‚¤ãƒ«ã«ã¤ã‘ã‚‹æ—¥ä»˜æ–‡å­—åˆ—
 		wchar_t *date_str = MakeISO8601Str(0);
 		awcscat(&date_str, L"_");
 
-		// iniƒtƒ@ƒCƒ‹‚ğ•ÏŠ·‚·‚é
+		// iniãƒ•ã‚¡ã‚¤ãƒ«ã‚’å¤‰æ›ã™ã‚‹
 		ConvertIniFiles(filelist, ts->HomeDirW, date_str);
 
 		free(date_str);
@@ -279,9 +279,9 @@ BOOL StartTeraTerm(HINSTANCE hInst, PTTSet ts)
 	}
 }
 
-// İ’èƒtƒ@ƒCƒ‹‚ğƒfƒBƒXƒN‚É•Û‘¶‚µATera Term–{‘Ì‚ğÄ‹N“®‚·‚éB
+// è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ‡ã‚£ã‚¹ã‚¯ã«ä¿å­˜ã—ã€Tera Termæœ¬ä½“ã‚’å†èµ·å‹•ã™ã‚‹ã€‚
 // (2012.4.30 yutaka)
-// g‚Á‚Ä‚¢‚È‚¢?
+// ä½¿ã£ã¦ã„ãªã„?
 #if 0
 void WINAPI RestartTeraTerm(HWND hwnd, PTTSet ts)
 {
@@ -301,11 +301,11 @@ void WINAPI RestartTeraTerm(HWND hwnd, PTTSet ts)
 		return;
 
 	SendMessage(hwnd, WM_COMMAND, ID_SETUP_SAVE, 0);
-	// ID_FILE_EXIT ƒƒbƒZ[ƒW‚Å‚ÍƒAƒvƒŠ‚ª—‚¿‚é‚±‚Æ‚ª‚ ‚é‚½‚ßAWM_QUIT ‚ğƒ|ƒXƒg‚·‚éB
+	// ID_FILE_EXIT ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã§ã¯ã‚¢ãƒ—ãƒªãŒè½ã¡ã‚‹ã“ã¨ãŒã‚ã‚‹ãŸã‚ã€WM_QUIT ã‚’ãƒã‚¹ãƒˆã™ã‚‹ã€‚
 	//PostMessage(hwnd, WM_COMMAND, ID_FILE_EXIT, 0);
 	PostQuitMessage(0);
 
-	// ©ƒvƒƒZƒX‚ÌÄ‹N“®B
+	// è‡ªãƒ—ãƒ­ã‚»ã‚¹ã®å†èµ·å‹•ã€‚
 	if (hGetModuleFileNameW(NULL, &path) == 0) {
 		TTWinExec(path);
 		free(path);

@@ -1,0 +1,1344 @@
+﻿[Info]
+language=Tamil(தமிழ்)
+date=2026-01-04 by TeraTerm Project
+contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
+
+[Tera Term]
+DLG_SYSTEM_FONT=System,14,0
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_FILE=&கோப்பு
+MENU_FILE_NEW=&புதிய இணைப்பு...\tமாற்று+ல
+MENU_FILE_DUPLICATE=அமர்வு நகல்\tமாற்று+உ
+MENU_FILE_GYGWIN=சிக்சாளர இணைப்பு\tமாற்று+எ
+MENU_FILE_LOG=&பதிவு...
+MENU_FILE_PAUSELOG=பதிவை இடைநிறுத்தவும்
+MENU_FILE_COMMENTLOG=பதிவு செய்ய கருத்து...
+MENU_FILE_VIEWLOG=&பதிவைக் காண்க
+MENU_FILE_SHOWLOGDIALOG=Sho&w Logging dialog...
+MENU_FILE_STOPLOG=பதிவு செய்வதை நிறுத்து (&ஆ)
+MENU_FILE_SENDFILE=&கோப்பை அனுப்பு...
+MENU_FILE_RECVFILE=Rஏற்கனவே கோப்பு பெற (&Z)...
+MENU_FILE_CHANGEDIR=&கோப்பகத்தை மாற்று...
+MENU_FILE_REPLAYLOG=&மறுஇயக்கு பதிவு...
+MENU_FILE_PRINT=&அச்சிடு...\tமாற்று+ண
+MENU_FILE_DISCONNECT=&துண்டி\tமாற்று+ன
+MENU_FILE_EXIT=வெளியேறு\tமாற்று+ஆ
+MENU_FILE_EXITALL=அனைத்தும் வெளியேறு
+
+MENU_TRANS=&பரிமாற்றம்
+MENU_TRANS_KERMIT_RCV=&பெறு
+MENU_TRANS_KERMIT_GET=&பெறுக...
+MENU_TRANS_KERMIT_SEND=&அனுப்பு...
+MENU_TRANS_KERMIT_FINISH=&முடி
+MENU_TRANS_X_RCV=&பெறு...
+MENU_TRANS_X_SEND=&அனுப்பு...
+MENU_TRANS_Y_RCV=&பெறு...
+MENU_TRANS_Y_SEND=&அனுப்பு...
+MENU_TRANS_Z_RCV=&பெறு
+MENU_TRANS_Z_SEND=&அனுப்பு...
+MENU_TRANS_BP_RCV=&பெறு
+MENU_TRANS_BP_SEND=&அனுப்பு...
+MENU_TRANS_QV_RCV=&பெறு
+MENU_TRANS_QV_SEND=&அனுப்பு...
+
+MENU_EDIT=&திருத்து
+MENU_EDIT_COPY=&நகலெடு\tமாற்று+ஒ
+MENU_EDIT_COPYTABLE=&அட்டவணையை நகலெடு
+MENU_EDIT_PASTE=&ஒட்டு\tமாற்று+வ
+MENU_EDIT_PASTECR=ஒட்டு<வ&தி>\tமாற்று+ஐ
+MENU_EDIT_CLSCREEN=அழி &திரை
+MENU_EDIT_CLBUFFER= தாங்கலை அழி
+MENU_EDIT_CANCELSELECT=தேர்வை ரத்துசெய்
+MENU_EDIT_SELECTSCREEN=திரை தேர்ந்தெடு
+MENU_EDIT_SELECTALL=&அனைத்தையும் தேர்ந்தெடு
+
+MENU_SETUP=&அமைவு
+MENU_SETUP_TERMINAL=&முனையம்...
+MENU_SETUP_WINDOW=&சாளரம்...
+MENU_SETUP_FONT=&எழுத்துரு...
+MENU_SETUP_KEYBOARD=&விசைப்பலகை...
+MENU_SETUP_SERIALPORT=தொடர் துறைமுகம்...
+MENU_SETUP_TCPIP=பகநெ/இநெ...
+MENU_SETUP_GENERAL=&பொது...
+MENU_SETUP_ADDITION=கூடுதல் அமைப்புகள்...
+MENU_SETUP_SAVE=&அமைப்பைச் சேமி...
+MENU_SETUP_RESTORE=&அமைவை மீட்டமை...
+MENU_SETUP_OPENSETUP=அமைவு கோப்புறை...
+MENU_SETUP_LOADKEYMAP=&விசை வரைபடத்தை ஏற்று...
+
+MENU_CONTROL=கட்டுப்பாடு
+MENU_CONTROL_RESET=&முனையத்தை மீட்டமை
+MENU_CONTROL_RESETTITLE=தொலை தலைப்பை மீட்டமை
+MENU_CONTROL_AREYOUTHERE=நீங்கள் &அங்கே இருக்கிறீர்களா\tமாற்று+ஏ
+MENU_CONTROL_SENDBREAK=&தடை அனுப்பு\tமாற்று+ங
+MENU_CONTROL_RESETPORT=&துறைமுகம் மீட்டமை
+MENU_CONTROL_BROADCAST=&ஒலிபரப்பு கட்டளை
+MENU_CONTROL_OPENTEK=&டெக்ஐ திற
+MENU_CONTROL_CLOSETEK=&டெக்ஐ மூடு
+MENU_CONTROL_MACRO=&பெரிய
+MENU_CONTROL_SHOW_MACRO=பெரிய &சாளரத்தைக் காட்டு
+
+MENU_WINDOW=&சாளரம்
+MENU_WINDOW_WINDOW=&சாளரம்
+MENU_WINDOW_MINIMIZEALL=&அனைத்தையும் குறைக்கவும்
+MENU_WINDOW_CASCADE=&பல்நிலை
+MENU_WINDOW_STACKED=&அடுக்கப்பட்டது
+MENU_WINDOW_SIDEBYSIDE=அருகருகே
+MENU_WINDOW_RESTOREALL=&அனைத்தையும் மீட்டமை
+MENU_WINDOW_CASCADE_UNDO=&செயல்தவிர் - பல்நிலை
+MENU_WINDOW_STACKED_UNDO=&செயல்தவிர் - அடுக்கப்பட்டது
+MENU_WINDOW_SIDEBYSIDE_UNDO=&செயல்தவிர் - அருகருகே
+
+MENU_HELP=&உதவி
+MENU_HELP_INDEX=&சுட்டுவரிசையாக்கம்
+MENU_HELP_ABOUT=&தேரா முனையத்தைப் பற்றி...
+
+MENU_SHOW_MENUBAR=பட்டியல் &பட்டியைக் காட்டு
+
+
+TEKMENU_FILE=&கோப்பு
+TEKMENU_FILE_PRINT=&அச்சிடு...\tமாற்று+ண
+TEKMENU_FILE_EXIT=வெளியேறு\tமாற்று+ஆ
+
+TEKMENU_EDIT=&திருத்து
+TEKMENU_EDIT_COPY=&நகலெடு\tமாற்று+ஒ
+TEKMENU_EDIT_COPYSCREEN=நகல் & திரை
+TEKMENU_EDIT_PASTE=&ஒட்டு\tமாற்று+வ
+TEKMENU_EDIT_PASTECR=ஒட்டு<வ&தி>\tமாற்று+ஐ
+TEKMENU_EDIT_CLSCREEN=அழி திரை
+
+TEKMENU_SETUP=&அமைவு
+TEKMENU_SETUP_WINDOW=&சாளரம்
+TEKMENU_SETUP_FONT=&எழுத்துரு
+
+TEKMENU_VTWIN=விடி-சாளரம்
+
+TEKMENU_WINDOW=&சாளரம்
+
+TEKMENU_HELP=&உதவி
+TEKMENU_HELP_INDEX=&சுட்டுவரிசையாக்கம்
+TEKMENU_HELP_USING=&உதவியைப் பயன்படுத்துதல்
+TEKMENU_HELP_ABOUT=&தேரா முனைத்தைப் பற்றி...
+
+TEKMENU_SHOW_MENUBAR=பட்டியல் &பட்டியைக் காட்டு
+
+; டெர்ம்ப்ரோ
+; filesys.cpp
+MSG_COMMENT_LOG_OPEN_ERROR=இது இன்னும் பதிவு கோப்பால் திறக்கப்படவில்லை.
+
+; ttime.c
+MSG_USE_IME_ERROR=ஐஎம்இஐப் பயன்படுத்த முடியாது
+
+; ttplug.c
+MSG_LOAD_EXT_ERROR=%s (%d) நீட்டிப்பை ஏற்ற முடியவில்லை
+
+; ttwinman.c
+DLG_MAIN_TITLE_CONNECTING=[இணைக்கிறது...]
+DLG_MAIN_TITLE_DISCONNECTED=[துண்டிக்கப்பட்டது]
+
+; vtterm.c
+MSG_CBACCESS_TITLE=இடைநிலைப் பலகை அணுகல்
+MSG_CBACCESS_REJECT_TITLE=இடைநிலைப் பலகை அணுகல் நிராகரிக்கப்பட்டது
+MSG_CBACCESS_READ=தொலை புரவலன் இடைநிலைப் பலகை உள்ளடக்கங்களைப் படிக்கிறது.
+MSG_CBACCESS_WRITE=தொலை புரவலன் இடைநிலைப் பலகையை எழுதுகிறது.
+MSG_CBACCESS_READ_REJECT=தொலைவில் இருந்து இடைநிலைப் பலகை வாசிப்பு அணுகலை நிராகரிக்கவும்.
+MSG_CBACCESS_WRITE_REJECT=தொலைவில் இருந்து இடைநிலைப் பலகை எழுதும் அணுகலை நிராகரிக்கவும்.
+
+; vtwin.cpp
+MSG_ALL_TERMINATE_CONF=அனைத்து தேரா முனைத்தையும்(களை) நிறுத்தவா?
+MSG_DISCONNECT_CONF=துண்டிக்கவா?
+MSG_EXEC_TT_ERROR=தேரா முனைத்தை இயக்க முடியாது. (%d)
+MSG_FIND_CYGTERM_DIR_ERROR=சிக்வின் கோப்பகத்தைக் கண்டுபிடிக்க முடியவில்லை.
+MSG_CYGTERM_ENV_ALLOC_ERROR=சூழல் மாறிக்கு நினைவகத்தை ஒதுக்க முடியாது.
+MSG_EXEC_CYGTERM_ERROR=சிக்முனையை இயக்க முடியாது.
+MSG_EXEC_TTMENU_ERROR=தேராமுனை பட்டியலை இயக்க முடியாது. (%d)
+MSG_VIEW_LOGFILE_ERROR=பதிவு செய்யும் கோப்பை பார்க்க முடியவில்லை. (%d)
+FILEDLG_OPEN_LOGFILE_TITLE=இரும பயன்முறையுடன் மறுபதிவு கோப்பைத் தேர்ந்தெடுக்கவும்
+FILEDLG_OPEN_LOGFILE_FILTER=அனைத்து(*.*)\0*.*\0\0
+DIRDLG_CYGTERM_DIR_TITLE=சிக்வின் கோப்பகத்தைத் தேர்ந்தெடுக்கவும்
+MSG_CYGTERM_CONF_WRITEFILE_ERROR=சிக்தேரா உள்ளமைவு கோப்பை (%d) எழுத முடியவில்லை .
+MSG_CYGTERM_CONF_REMOVEFILE_ERROR=பழைய சிக்தேரா உள்ளமைவு கோப்பை (%d) அகற்ற முடியவில்லை .
+MSG_CYGTERM_CONF_RENAMEFILE_ERROR=சிக்தேரா உள்ளமைவு கோப்பை மறுபெயரிட முடியாது (%d).
+MSG_CYGTERM_CONF_SAVED_NOTICE=சிக்வின் தாவல் கட்டமைப்பு %s இல் சேமிக்கப்பட்டது.
+FILEDLG_SELECT_LOGVIEW_APP_TITLE=பதிவு செய்யும் கோப்பைத் தொடங்கும் ஒரு செயல்படுத்தும் கோப்பைத் தேர்ந்தெடுக்கவும்
+FILEDLG_SELECT_LOGVIEW_APP_FILTER=இயக்கி(*.exe)\0*.exe\0all(*.*)\0*.*\0\0
+FILEDLG_SELECT_LOGDIR_TITLE=பதிவு கோப்புறையைத் தேர்ந்தெடுக்கவும்
+FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE=உறுதிபடுத்திமாற்றம்ஒட்டு சரங்களை உள்ளடக்கிய கோப்பைத் தேர்ந்தெடுக்கவும்
+FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=உரை(*.txt)\0*.txt\0அனைத்தும்(*.*)\0*.*\0\0
+MSG_LOGFILE_INVALID_CHAR_ERROR=தவறான எழுத்து பதிவு கோப்பு பெயரில் சேர்க்கப்பட்டுள்ளது.
+MSG_LOGFILE_TOOLONG_ERROR=பதிவு கோப்பு பெயர் மிக நீளமாக உள்ளது.
+MSG_TT_FILE_OPEN_ERROR=Tera Term: File open error
+MSG_LOGFILE_WRITE_ERROR=Cannot write log file.\n%s
+MSG_SAVESETUP_PERMISSION_ERROR=TERATERM.INI கோப்பில் எழுதக்கூடிய அனுமதி இல்லை.
+
+DLG_TABSHEET_TITLE=தேரா முனை: கூடுதல் அமைப்புகள்
+DLG_TABSHEET_TITLE_GENERAL=பொது
+DLG_TABSHEET_TITLE_SEQUENCE=கட்டுப்பாட்டு வரிசை
+DLG_TABSHEET_TITLE_COPYPASTE=நகலெடுத்து ஒட்டவும்
+DLG_TABSHEET_TITLE_VISUAL=காட்சி
+DLG_TABSHEET_TITLE_LOG=பதிவு
+DLG_TABSHEET_TITLE_CYGWIN=சிக்வின்
+DLG_TABSHEET_TITLE_FONT=எழுத்துரு
+DLG_TABSHEET_TITLE_ENCODING=Encoding
+DLG_TABSHEET_TITLE_THEME=Theme
+DLG_TABSHEET_TITLE_MOUSE=Mouse
+DLG_TABSHEET_TITLE_FONT_TEK=Font(TEK)
+
+DLG_TAB_GENERAL_CLICKURL=&சொடுக்கம் செய்யக்கூடிய முகவரியை இயக்கு
+DLG_TAB_GENERAL_DISABLESENDBREAK=முடுக்கியை முடக்கு & இடைவெளியை அனுப்பு
+DLG_TAB_GENERAL_ACCEPTBROADCAST=ஏற்றுக்கொள் & ஒளிபரப்பு
+DLG_TAB_GENERAL_MOUSEWHEEL_SCROLL_LINE=சுட்டி &சக்கரம் உருட்டும் வரி
+DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE=தானி உருட்டும் கீழ் வரியில் மட்டும்
+DLG_TAB_GENERAL_CLEAR_ON_RESIZE=&சாளரத்தின் அளவை மாற்றும்போது காட்சியை அழி
+DLG_TAB_GENERAL_CURSOR_CHANGE_IME=சிமிட்டும் கோடு வடிவத்தை &ஐஎம்இ நிலையுடன் மாற்றவும்
+DLG_TAB_GENERAL_LIST_HIDDEN_FONTS=எழுத்துரு உரையாடலில் &மறைக்கப்பட்ட எழுத்துருக்களை பட்டியலிடு
+DLG_TAB_GENERAL_TITLEFMT_GROUP=தலைப்பு வடிவம்
+DLG_TAB_GENERAL_TITLEFMT_DISPHOSTNAME=&காட்சி புரவலன்/துறைமுகம் பெயர்
+DLG_TAB_GENERAL_TITLEFMT_DISPSESSION=காட்சி அமர்வு &எண்
+DLG_TAB_GENERAL_TITLEFMT_DISPVTTEK=Display &விடி/டெக்
+DLG_TAB_GENERAL_TITLEFMT_SWAPHOSTTITLE=புரவலன் பெயர் மற்றும் &தலைப்பு நிலையை மாற்றவும்
+DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT=பகநெ &துறைமுகம் எண்ணைக் காட்டு
+DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED=தொடர் துறைமுகம் வேகத்தைக் காட்டு
+DLG_TAB_GENERAL_NOTIFICATION_TITLE=அறிவிப்பு
+DLG_TAB_GENERAL_NOTIFIY_SOUND=&ஒலியை அறிவிக்கவும்
+DLG_TAB_GENERAL_NOTIFICATION_TEST_NOTIFY=&Notify Test
+DLG_TAB_GENERAL_NOTIFICATION_TEST_MESSAGE=Now icon is displayed in the notification area (task tray),\n and can be turned on or off in Windows notification setting.
+DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY=&தட்டு சோதனை
+
+DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=சுட்டி நிகழ்வு கண்காணிப்பு கோரிக்கையை ஏற்கவும்
+DLG_TAB_SEQUENCE_DISABLE_MOUSE_TRACKING_CTRL=&கண்ட்ரோல் அழுத்தும் போது சுட்டி நிகழ்வு கண்காணிப்பை முடக்கு
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING=சாளரம் & தலைப்பு மாற்ற கோரிக்கையை ஏற்கவும்
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF=முடக்கு
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OVERWRITE=மேலெழுது
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_AHEAD=முன்னே
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_LAST=கடைசி
+DLG_TAB_SEQUENCE_CURSOR_CTRL=&சிமிட்டும் கோடு கட்டுப்பாட்டு வரிசை
+DLG_TAB_SEQUENCE_WINDOW_CTRL=&விண்டோ கட்டுப்பாட்டு வரிசை
+DLG_TAB_SEQUENCE_WINDOW_REPORT=சாளரம் &அறிக்கை வரிசை
+DLG_TAB_SEQUENCE_TITLE_REPORT=சாளரம் தலைப்பு அறிக்கை
+DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE=புறக்கணி
+DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT=ஏற்றுக்கொள்
+DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY=காலி
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS=தொலைவில் இருந்து இடைநிலைப் பலகை அணுகல்
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF=முடக்கு
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON=படிக்க/எழுத
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ=படிக்க மட்டும்
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE=எழுதுவதற்கு மட்டும்
+DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY=&தொலைவில் இருந்து இடைநிலைப் பலகை அணுகலை அறிவிக்கவும்
+DLG_TAB_SEQUENCE_ACCEPT_CLEAR_SBUFF=தொலைவில் இருந்து இடையகத்தை & உருட்டுவதை ஏற்றுக்கொள்
+DLG_TAB_SEQUENCE_PRINT_START=அச்சு தொடக்க வரிசையை முடக்கு
+DLG_TAB_SEQUENCE_BEEP_LABEL=&பீப்
+DLG_TAB_SEQUENCE_BEEP_DISABLE=முடக்கு
+DLG_TAB_SEQUENCE_BEEP_SOUND=ஒலி
+DLG_TAB_SEQUENCE_BEEP_VISUALBELL=காட்சிமணி
+
+DLG_TAB_COPYPASTE_CONTINUE=தொடர்ந்து &வரி நகலை இயக்கவும்
+DLG_TAB_COPYPASTE_MOUSEPASTE=&சுட்டி வலது பொத்தான் ஒட்டை முடக்கு
+DLG_TAB_COPYPASTE_CONFIRMPASTE=&சுட்டி வலது பொத்தான் ஒட்டை உறுதிப்படுத்தவும்
+DLG_TAB_COPYPASTE_MOUSEPASTEM=சுட்டி &நடு பொத்தான் ஒட்டை முடக்கு
+DLG_TAB_COPYPASTE_SELECTLBUTTON=இடது பொத்தானால் &மட்டும் தேர்ந்தெடு
+DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=&ஒட்டும்போது புதிய வரி எழுத்தை நீக்கவும்
+DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE=மாற்று ஒட்டை உறுதிப்படுத்தவும்
+DLG_TAB_COPYPASTE_STRINGFILE=&சரம் கோப்பு
+DLG_TAB_COPYPASTE_DELIMITER=பிரிப்பான் எழுத்துகள்
+DLG_TAB_COPYPASTE_PASTEDELAY=ஒவ்வொரு வரிக்கும் தாமதத்தை ஒட்டு
+DLG_TAB_COPYPASTE_PASTEDELAY2=மி.நொ
+DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=சாளரம் சுட்டி மூலம் செயல்படுத்தப்படும் போது உரை தேர்வை இயக்கு
+DLG_TAB_COPYPASTE_AUTO_TEXT_COPY=உரை தேர்ந்தெடுக்கும்போது விண்டோஸ் இடைநிலைப் பலகைக்கு நகலெடுக்கவும்
+
+DLG_TAB_VISUAL_ALPHA=சாளர ஒளிபுகாநிலை
+DLG_TAB_VISUAL_ALPHA_ACTIVE=&செயலில்
+DLG_TAB_VISUAL_ALPHA_INACTIVE=செயல்படவில்லை
+DLG_TAB_VISUAL_MOUSE=&சுட்டி சிமிட்டும் கோடு
+DLG_TAB_VISUAL_FONT_QUALITY=&எழுத்துரு தரம்
+DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT=இயல்புநிலை
+DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED=அல்லாதது
+DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED=பொருத்தமானவை
+DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE=தெளிவான வகை
+DLG_TAB_VISUAL_ANSICOLOR=அநாதநி நிறம்
+DLG_TAB_VISUAL_RED=&சிவப்பு
+DLG_TAB_VISUAL_GREEN=&பச்சை
+DLG_TAB_VISUAL_BLUE=&நீலம்
+DLG_TAB_VISUAL_CORNER_DONT_ROUND=சாளரத்தின் மூலை வட்டமாக இல்லை
+DLG_TAB_VISUAL_BOLD_COLOR=Bold பண்புக்கூறு வண்ணத்தை இயக்கு
+DLG_TAB_VISUAL_BOLD_FONT=Bold பண்புக்கூறு எழுத்துருவை இயக்கு
+DLG_TAB_VISUAL_BLINK=Blink பண்புக்கூறு வண்ணத்தை இயக்கு
+DLG_TAB_VISUAL_REVERSE=ரிவர்ஸ் பண்புக்கூறு வண்ணத்தை இயக்கு
+DLG_TAB_VISUAL_UNDERLINE_COLOR=அடிகோடு பண்புக்கூறு வண்ணத்தை இயக்கு
+DLG_TAB_VISUAL_UNDERLINE_FONT=அடிகோடு பண்பு எழுத்துருவை இயக்கு
+DLG_TAB_VISUAL_URL_COLOR=&முகவரி பண்புக்கூறு வண்ணத்தை இயக்கு
+DLG_TAB_VISUAL_URL_FONT=&முகவரி பண்புக்கூறு எழுத்துருவை இயக்கு
+DLG_TAB_VISUAL_ANSI=அநாதநி வண்ணத்தை இயக்கு
+DLG_TAB_VISUAL_FAST_SIZE_MOVE=சாளரத்தை நகர்த்தும்போது அல்லது அளவை மாற்றும்போது கருபொருளை முடக்கவும்
+DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=பயன் இல்லை
+DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=நிலையான கருபொருள் கோப்பு
+DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=சீரற்ற கருபொருள்  கோப்பு
+
+DLG_TAB_LOG_EDITOR=பதிவு &திருத்தியைக் காண்க
+DLG_TAB_LOG_EDITOR_EXE=&exe file
+DLG_TAB_LOG_EDITOR_ARG=a&rgs
+DLG_TAB_LOG_FILENAME=இயல்புநிலை பதிவு &கோப்பு பெயர்(உரைவநேரம் வடிவம்)
+DLG_TAB_LOG_FILEPATH=இயல்புநிலை பதிவு சேமி கோப்புறை
+DLG_TAB_LOG_AUTOSTART=தானி உள்நுழைவைத் தொடங்கவும்
+DLG_TAB_LOG_ROTATE=&பதிவு சுழற்று
+DLG_TAB_LOG_ROTATE_SIZE_TEXT=அளவு
+DLG_TAB_LOG_ROTATESTEP=&சுழற்று
+
+
+DLG_TAB_CYGWIN_PATH=சிக்வின் நிறுவல் &பாதை
+
+DLG_TAB_FONT_VTWINFONT=&விடிசாளரம் எழுத்துரு
+DLG_TAB_FONT_BTN_SELECT=&தேர்ந்தெடு...
+DLG_TAB_FONT_VTFONT_TITLE=வரைவதற்கான பநிஇ
+DLG_TAB_FONT_DLGFONT=&உரையாடல் எழுத்துரு
+DLG_TAB_FONT_TEKFONT=TEK Font
+DLG_TAB_FONT_BTN_DEFAULT=இயல்புநிலை
+DLG_TAB_FONT_CODEPAGE_LABEL=&காட்சி எழுத்து மாற்றத்திற்கான குறியீடு பக்கம்(Auto when 0, %d)
+DLG_TAB_FONT_LIST_PRO_FONTS_VT=&எழுத்துரு உரையாடலில் &விகிதாசார எழுத்துருக்களை பட்டியலிடு
+DLG_TAB_FONT_LIST_PRO_FONTS_DLG=எ&ழுத்துரு உரையாடலில் &விகிதாசார எழுத்துருக்களை பட்டியலிடு
+DLG_TAB_FONT_CHARACTER_SPACE=எழுத்து இடம்
+DLG_TAB_FONT_RESIZED_FONT=&செல் அகலத்திற்கு ஏற்றவாறு அளவு மாற்றப்பட்ட எழுத்துருவை வரைதல்
+MSG_TOOLTIP_EDITERR_TITLE1=ஏற்றுக்கொள்ள முடியாத எழுத்து
+MSG_TOOLTIP_EDITERR_TEXT1=நன்மை மற்றும் தீமை முழு எண்கள் மட்டுமே ஏற்றுக்கொள்ளப்படும்.
+DLG_TAB_FONT_FOLDER=Open Font Settings/Font Folder (%s)
+
+DLG_COMMENT_TITLE=பதிவிற்கான கருத்து
+
+DLG_BROADCAST_TITLE=தேரா முனை: ஒளிபரப்பு கட்டளை
+DLG_BROADCAST_HISTORY=வரலாறு
+DLG_BROADCAST_PARENTONLY=இந்த செயல்முறைக்கு மட்டும் அனுப்பவும்
+DLG_BROADCAST_ENTER=உள்ளிடு விசை
+DLG_BROADCAST_SUBMIT=சமர்ப்பி
+DLG_BROADCAST_CLOSE=Close
+DLG_BROADCAST_REALTIME=நிகழ்நேர பயன்முறை
+DLG_BROADCAST_HELP=Help
+CMENU_BROADCAST_FOREGROUND=Bring selected window to foreground
+CMENU_BROADCAST_MINIMIZE=Minimize selected window
+CMENU_BROADCAST_REFRESH=Refresh window list
+CMENU_BROADCAST_SELECT_ALL=Select all
+CMENU_BROADCAST_UNSELECT_ALL=Unselect all
+CMENU_BROADCAST_INVERSE=Inverse selection
+
+DLG_PRNABORT_PRINTING=அச்சிடுதல்
+
+DLG_PROT_FILENAME=கோப்பின் பெயர்:
+DLG_PROT_PROTO=நெறிமுறை:
+DLG_PROT_PACKET=சிறுகட்டு#:
+DLG_PROT_TRANS=பைட்டுகள் மாற்றப்பட்டன:
+DLG_PROT_ELAPSED=கடந்த நேரம்:
+
+DLG_FILETRANS_TITLE=கோப்பை அனுப்பு
+DLG_FILETRANS_FILENAME=கோப்பின் பெயர்:
+DLG_FILETRANS_FULLPATH=முழுப்பாதை:
+DLG_FILETRANS_TRNAS=பைட்டுகள் மாற்றப்பட்டன:
+DLG_FILETRANS_ELAPSED=கடந்த நேரம்:
+DLG_FILETRANS_START=&தொடங்கு
+DLG_FILETRANS_PAUSE=இடைநிறுத்து
+DLG_FILETRANS_CLOSE=மூடு
+
+DLG_SETUPDIR_TITLE=தேரா முனை: அமைவு அடைவு
+DLG_SETUPDIR_INIFILE=தேரா முனை கட்டமைப்பு கோப்பு
+DLG_SETUPDIR_KEYBOARDFILE=விசைப்பலகை கட்டமைப்பு கோப்பு
+DLG_SETUPDIR_CYGTERMFILE=சிக்தேரா கட்டமைப்பு கோப்பு
+DLG_SETUPDIR_KNOWNHOSTSFILE=பாஓடு அறியப்பட்ட_புரவலன்கள் கோப்பு
+DLG_SETUPDIR_NOFILE_ERROR=கோப்பு இல்லை.(%d)
+DLG_SETUPDIR_OPENFILE_ERROR=கோப்பை திறக்க முடியாது.(%d)
+
+DLG_DANDD_TITLE=தேரா முனை: கோப்பு இழுத்து விடவும்
+DLG_DANDD_TEXT=கோப்பின் உள்ளடக்கத்தை நிச்சயமாக அனுப்ப விரும்புகிறீர்களா?
+DLG_DANDD_SCP_RADIO=&பாநகல்
+DLG_DANDD_SENDFILE_RADIO=கோப்பு அனுப்பு (கோப்பின் உள்ளடக்கத்தை ஒட்டவும்)
+DLG_DANDD_PASTE_RADIO=கோப்பின் பெயரை ஒட்டவும்
+DLG_DANDD_SCP_DEST_LABEL=அடைவு:
+DLG_DANDD_SCP_DEST_NOTE=அடைவு வீடு கோப்பகம் காலியாக இருந்தால்
+DLG_DANDD_SEND_BINARY_CHECK=இருமம்
+DLG_DANDD_PASTE_ESCAPE_CHECK=எஸ்கேப்
+DLG_DANDD_PASTE_SPACE_RADIO=பிரிப்பான் இடம்
+DLG_DANDD_PASTE_NEWLINE_RADIO=பிரிப்பான் &புதிய வரி
+DLG_DANDD_NEXTFILES=&அடுத்த %d கோப்புகளுக்கு இதைச் செய்யுங்கள்
+DLG_DANDD_SAME_NEEXTDROP=அடுத்த துளி செயலைச் செய்
+DLG_DANDD_DONTSHOW_NEEXTDROP=அடுத்த துளி, இந்த உரையாடலைக் காட்ட வேண்டாம்
+DLG_DANDD_NOTE=CTRL உடன் கைவிடவும், இந்த உரையாடல் காட்டப்படும்
+
+TOOLTIP_TITLEBAR_OPACITY=ஒளிபுகாநிலை %.1f %%
+
+; commonlib.c
+MSG_WINSOCK_ERROR=சாளரகுதைகுழியைப் பயன்படுத்த முடியாது
+MSG_INVALID_HOST_ERROR=தவறான புரவலன்
+MSG_CANTOPEN_ERROR=%s ஐ திறக்க முடியாது. (0x%08x)
+MSG_CANTOPEN_ERROR_NOTFOUND=%s ஐ திறக்க முடியாது. கிடைக்கவில்லை.
+MSG_CANTOPEN_ERROR_DENIED=%s ஐ திறக்க முடியாது. அணுகல் மறுக்கப்பட்டது.
+MSG_CANTOPEN_ERROR_PIPEBUSY=%s ஐ திறக்க முடியாது. குழாய் பிஸியாக உள்ளது.
+MSG_CANTOPEN_FILE_ERROR=கோப்பைத் திறக்க முடியாது
+MSG_COMM_REFUSE_ERROR=இணைப்பு மறுக்கப்பட்டது
+MSG_COMM_REACH_ERROR=நெட்வொர்க்கை அடைய முடியவில்லை
+MSG_COMM_TIMEOUT_ERROR=இணைப்பு நேரம் முடிந்தது
+MSG_COMM_CONNECT_ERROR=புரவலனை இணைக்க முடியவில்லை
+MSG_CREATE_THREAD_ERROR=நூலை உருவாக்க முடியாது
+
+; ttpdlg
+; ttdlg.c
+DLG_ABOUT_TITLE=தேரா முனைத்தைப் பற்றி
+
+DLG_SELECT_DIR_TITLE=புதிய கோப்பகத்தைத் தேர்ந்தெடுக்கவும்
+
+DLG_GEN_TITLE=தேரா முனை: பொது அமைப்பு
+DLG_GEN_PORT=New &connection default
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Serial
+DLG_GEN_LANG_UI=மொழி இடைமுகம்:
+
+DLG_HOST_TITLE=தேரா முனை: புதிய இணைப்பு
+DLG_HOST_TCPIPHOST=புரவலன்:
+DLG_HOST_TCPIPPORT=பகநெ &துறைமுகம்#:
+DLG_HOST_TCPIPPROTOCOL=இநெ பதிப்பு:
+DLG_HOST_SERIAL=&தொடர்
+DLG_HOST_SERIALPORT=துறைமுகம்:
+
+DLG_KEYB_TITLE=விசைப்பலகை அமைவு
+DLG_KEYB_TRANSMIT=நீக்கை அனுப்பு:
+DLG_KEYB_BS=&பின்வெளி விசை
+DLG_KEYB_DEL=&நீக்கு விசை
+DLG_KEYB_KEYB=&விசைப்பலகை:
+DLG_KEYB_META=&மெட்டா விசை:
+DLG_KEYB_META_OFF=ஆஃப்
+DLG_KEYB_META_ON=உள்ள
+DLG_KEYB_META_LEFT=இடது
+DLG_KEYB_META_RIGHT=வலது
+DLG_KEYB_DISABLE=முடக்கப்பட்ட பயன்முறை:
+DLG_KEYB_APPKEY=&பயன்பாட்டு விசைப்பலகை
+DLG_KEYB_APPCUR=பயன்பாடு &சிமிட்டும் கோடு
+
+DLG_SERIAL_TITLE=தொடர் துறைமுகம்
+DLG_SERIAL_PORT=&துறைமுகம்:
+DLG_SERIAL_BAUD=வேகம்:
+DLG_SERIAL_DATA=&தரவு:
+DLG_SERIAL_PARITY=சமநிலை:
+DLG_SERIAL_STOP=&நிறுத்த இருமங்கள்:
+DLG_SERIAL_FLOW=&ஓட்டம் கட்டுப்பாடு:
+DLG_SERIAL_DELAY=அனுப்பும் தாமதம்
+DLG_SERIAL_DELAYCHAR=மிநொடி/&எழுத்து
+DLG_SERIAL_DELAYLINE=மிநொடி/&வரி
+DLG_SERIAL_OK_CONNECTION=&புதிய சாளரத்துடன் இணைக்கவும்
+DLG_SERIAL_OK_OPEN=&புதிய திறந்தது
+DLG_SERIAL_OK_CLOSEOPEN=மூடு மற்றும் &புதிய திற
+DLG_SERIAL_OK_RESET=&புதிய அமைப்பு
+
+; edit history
+DLG_TCPIP_ADD=&சேர்
+DLG_TCPIP_UP=&மேல்
+DLG_TCPIP_REMOVE=&நீக்கு
+DLG_TCPIP_DOWN=&கீழ்
+
+; TCP/IP tab
+DLG_TCPIP_TITLE=TCP/IP
+DLG_TCPIP_HOSTLIST=புரவலன் &பட்டியல்
+DLG_TCPIP_HISTORYTITLE=வரலாறு
+DLG_TCPIP_HISTORY=Add host l&ist when new connection
+DLG_TCPIP_EDITHISTORY=Edit host list
+DLG_TCPIP_TELNET=T&elnet
+DLG_TCPIP_PORT=&துறைமுகம்#:
+DLG_TCPIP_KEEPALIVE=&தொலைவலையில் உயிருடன் இருங்கள்
+DLG_TCPIP_KEEPALIVE_SEC=நொடி
+DLG_TCPIP_AUTOCLOSE=தானாக &சாளரம் மூடப்படும்
+DLG_TCPIP_TERMTYPE=&முனை வகை:
+
+DLG_TERM_TITLE=முனையம்
+DLG_TERM_WIDTHLABEL=&முனையம் அளவு
+DLG_TERM_ISWIN=முனை &அளவு = சாளர அளவு
+DLG_TERM_RESIZE=தானியங்கு &சாளர மறுஅளவு
+DLG_TERM_NEWLINE=புதிய வரி
+DLG_TERM_CRRCV=&பெறுக:
+DLG_TERM_CRSEND=அனுப்பு:
+DLG_TERM_ID=முனைய &அடையாளம்:
+DLG_TERM_LOCALECHO=&உள்ளக எதிரொலி
+DLG_TERM_ANSBACK=&பதில்:
+DLG_TERM_AUTOSWITCH=தானி மாற்றி (விடி<->டெக்)
+DLG_TERM_KANJI=குறியீடு (பெறுதல்)
+DLG_TERM_KANA=அரை அகல கனா
+DLG_TERM_KANJISEND=குறியீடு (அனுப்பு)
+DLG_TERM_KANASEND=அரை அகல கனா
+DLG_TERM_KIN=காஞ்சி-உள்:
+DLG_TERM_KOUT=காஞ்சி-&வெளி:
+DLG_CODING_DECSP_UNICODE_TO_DEC=ஒருங்குறி முதல் பதின்மம் சிறப்பு வரைகலை வரைதல்
+DLG_CODING_UNICODE_TO_DEC_BOXDRAWING=பெட்டி வரைதல் எழுத்து (U+2500-U+257F)
+DLG_CODING_UNICODE_TO_DEC_PUNCTUATION=நிறுத்தம், தொகுதி கூறுகள், நிழல்
+DLG_CODING_UNICODE_TO_DEC_MIDDLEDOT=மத்திய புள்ளிகள் (U+00B7,U+2024,U+2219)
+DLG_CODING_DECSP_DEC_TO_UNICODE=பதின்மம் சிறப்பு வரைகலை ஒருங்குறிக்கு வரைபடம்
+DLG_CODING_DECSP_DO_NOT_MAP=Do not mapping
+
+DLG_WIN_TITLE=சாளர
+DLG_WIN_TEK_TITLE=Window(TEK)
+DLG_WIN_TITLELABEL=&தலைப்பு:
+DLG_WIN_CURSOR=சிமிட்டும் கோடு வடிவம்
+DLG_WIN_BLOCK=தடு
+DLG_WIN_VERT=&செங்குத்து கோடு
+DLG_WIN_HORZ=கிடைமட்ட கோடு
+DLG_WIN_BOLDFONT=தடித்த எழுத்துருவை இயக்கு
+DLG_WIN_HIDETITLE=தலைப்புப் பட்டி மறை
+DLG_WIN_NO_FRAME=&கட்டமைப்பு இல்லை
+DLG_WIN_HIDEMENU=&பட்டியல் பட்டியை மறை
+DLG_WIN_COLOREMU=&வண்ண எமுலேஷன்
+DLG_WIN_PCBOLD16=&16 நிறங்கள் (பிசி பாணி)
+DLG_WIN_AIXTERM16=1&6 நிறங்கள் (எஃசுமுனை பாணி)
+DLG_WIN_XTERM256=&256 நிறங்கள் (எஃசுமுனை பாணி)
+DLG_WIN_SCROLL1=&உருட்டு பட்டி:
+DLG_WIN_SCROLL3=வரிகள்
+DLG_WIN_COLOR=வண்ணம்
+DLG_WIN_TEXT=உரை
+DLG_WIN_BG=பின்னணிபடம்
+DLG_WIN_ATTRIB=&பண்பு
+DLG_WIN_SWAP_COLORS=S&wap colors
+DLG_WIN_R=&சி:
+DLG_WIN_G=&ப:
+DLG_WIN_B=&நீ:
+DLG_WIN_ALWAYSBG=எப்போதும் &இயல்பான உரையின் பிண்ணனியைப் பயன்படுத்து
+DLG_WIN_NORMAL=இயல்பானது
+DLG_WIN_BOLD=தடித்த
+DLG_WIN_BLINK=இமைக்க
+DLG_WIN_REVERSEATTR=தலைகீழ்
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=அடிக்கோடு
+
+DLG_CHOOSEFONT_STC6=இங்கே "எழுத்துரு நடை" தேர்வு உண்மையான எழுத்துரு தோற்றத்தை பாதிக்காது.
+
+DLG_WINLIST_TITLE=தேரா முனை: சாளர பட்டியல்
+DLG_WINLIST_LABEL=&சாளரம்:
+DLG_WINLIST_OPEN=&திற
+DLG_WINLIST_CLOSEWIN=&சாளரத்தை மூடு
+
+MSG_FIND_DIR_ERROR=கோப்பகத்தைக் கண்டுபிடிக்க முடியவில்லை
+
+; ttpfile
+; ttfile.c
+DLG_FOPT_TITLE=பதிவு
+DLG_FOPT_FILENAME_TITLE=&கோப்புப்பெயர் (இந்த உரையாடலில் கோப்பை விடுங்கள்)
+DLG_FOPT_APPEND_LABEL=எழுது பயன்முறை
+DLG_FOPT_NEW_OVERWRITE=&புதிய / மேலெழுத
+DLG_FOPT_APPEND=&பின்சேர்
+DLG_FOPT_BINARY_LABEL=உரை அல்லது இரும முறை
+DLG_FOPT_TEXT=உரை
+DLG_FOPT_BINARY=இருமம்
+DLG_FOPT_BOM=&பைவகு
+DLG_FOPT_PLAIN=&எளிமையான உரை
+DLG_FOPT_TIMESTAMP=&நேர முத்திரை
+DLG_FOPT_HIDEDIALOG=மறை &உரையாடல்
+DLG_FOPT_ALLBUFFINFIRST=திரை பட்டி உள்ளடக்கு
+DLG_FOPT_TIMESTAMP_LOCAL=உள்ளக நேரம்
+DLG_FOPT_TIMESTAMP_UTC=UTC
+DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=கடந்த நேரம் (பதிவு செய்தல்)
+DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=கடந்த நேரம் (இணைப்பு)
+
+DLG_XOPT=விருப்பம்
+DLG_XOPT_CHECKSUM=சரிபார்தொகை
+DLG_XOPT_CRC=&சிஆர்சி
+DLG_XOPT_1K=1&கே
+DLG_XOPT_BINARY=இருமம்
+
+FILEDLG_KEYBOARD_FILTER=விசைப்பலகை அமைவு கோப்புகள் (*.cnf)\0*.cnf\0\0
+FILEDLG_SETUP_FILTER=கோப்புகளை அமைக்கவும் (*.ini)\0*.ini\0\0
+FILEDLG_SAVE_SETUP_TITLE=தேரா முனை: அமைப்பை சேமி
+FILEDLG_RESTORE_SETUP_TITLE=தேரா முனை: அமைப்பை மீட்டமை
+FILEDLG_LOAD_KEYMAP_TITLE=தேரா முனை: ஏற்ற விசை வரைபடம்
+FILEDLG_ALL_FILTER=அனைத்து(*.*)\0*.*\0\0
+FILEDLG_USER_FILTER_NAME=பயனர் வரையறுக்கவும்
+
+DLG_GETFN_TITLE=தேரா முனை: கெர்மிட் கெட்
+DLG_GETFN_FILENAME=&கோப்பு பெயர்:
+
+; ttftypes.h
+FILEDLG_TRANS_TITLE_LOG=Logging
+FILEDLG_TRANS_TITLE_SENDFILE=Sending file
+FILEDLG_TRANS_TITLE_KMTRCV=கெர்மிட் பெறுதல்
+FILEDLG_TRANS_TITLE_KMTGET=கெர்மிட் கெட்
+FILEDLG_TRANS_TITLE_KMTSEND=கெர்மிட் அனுப்பு
+FILEDLG_TRANS_TITLE_KMTFIN=கெர்மிட் பினிஷ்
+FILEDLG_TRANS_TITLE_XRCV=எஃசுபண்பேற்றிறக்கி பெறு
+FILEDLG_TRANS_TITLE_XSEND=எஃசுபண்பேற்றிறக்கி அனுப்பு
+FILEDLG_TRANS_TITLE_YRCV=ஒய்பண்பேற்றிறக்கி பெறு
+FILEDLG_TRANS_TITLE_YSEND=ஒய்பண்பேற்றிறக்கி அனுப்பு
+FILEDLG_TRANS_TITLE_ZRCV=இசட்பண்பேற்றிறக்கி பெறு
+FILEDLG_TRANS_TITLE_ZSEND=இசட்பண்பேற்றிறக்கி அனுப்பு
+FILEDLG_TRANS_TITLE_BPRCV=பி-கூட்டல் பெறுதல்
+FILEDLG_TRANS_TITLE_BPSEND=பி-கூட்டல் அனுப்பு
+FILEDLG_TRANS_TITLE_QVRCV=விரைவு-வேன் பெறுதல்
+FILEDLG_TRANS_TITLE_QVSEND=விரைவு-வேன் அனுப்பு
+FILEDLG_TRANS_TITLE_RECVFILE=கோப்பு பெற
+FILEDLG_TRANS_TITLE_RAWRCV=கோப்பைப் பெறுகிறது
+
+; dlg clipboard
+DLG_CLIPBOARD_TITLE=தேரா முனை: இடைநிலைப் பலகை உறுதிப்படுத்தல்
+
+; ttptek
+; tttek.c
+MSG_TEK_PRINT_ERROR=அச்சுப்பொறி கிராபிக்ஸை ஆதரிக்காது
+
+; ttpmacro
+FILEDLG_OPEN_MACRO_TITLE=பெரிய: பெரியவைத் திறக்கவும்
+FILEDLG_OPEN_MACRO_FILTER=பெரிய கோப்புகள் (*.ttl)\0*.ttl\0\0
+
+BTN_PAUSE=இடைநிறுத்து
+BTN_START=&தொடங்கு
+BTN_END=&முடிவு
+BTN_YES=&ஆம்
+BTN_NO=&இல்லை
+BTN_STOP=&நிறுத்து பெரிய
+BTN_CONTINUE=&தொடரவும்
+
+MSG_MACRO_CONF=பெரிய: உறுதிப்படுத்தல்
+MSG_MACRO_HALT_SCRIPT=இந்த பெரிய கைஉரை நிறுத்த விரும்புகிறீர்களா?
+
+; common
+MSG_ERROR=பிழை
+MSG_TT_ERROR=தேரா முனை: பிழை
+MSG_TT_NOTICE=தேரா முனை: அறிவிப்பு
+MSG_TT_TAKE_EFFECT=அடுத்த முறை அமர்வு தொடங்கும் போது இந்த விருப்பம் நடைமுறைக்கு வரும்.
+
+BTN_OK=சரி
+BTN_CANCEL=ரத்துசெய்
+BTN_CLOSE=மூடு
+BTN_HELP=&உதவி
+BTN_DEFAULT=இயல்புநிலை
+
+; help
+HELPFILE=தேராமுனை.chm
+MSG_OPENHELP_ERROR=உஉகுமொ உதவி கோப்பை(%s) திறக்க முடியவில்லை.
+
+; ttset
+MSG_INI_ERROR=தேரா முனை: பிழை
+MSG_INI_WRITE_ERROR=இனி கோப்பை எழுத முடியாது.
+
+; sendfile
+DLG_SENDFILE_READING_METHOD_TITLE=File reading method
+DLG_SENDFILE_READING_METHOD_BULK=B&ulk read
+DLG_SENDFILE_READING_METHOD_SEQUENTIAL=Se&quential read
+DLG_SENDFILE_READING_METOHD_TOOLTIP=Bulk read:\n- Send while reading from a file.\n- Textfile is read as ACP encoding and is not automatically determined.\nSequencal read:\n- File is read into memory and then sent.\n- Encoding of text files is automatically determined.\n
+DLG_SENDFILE_BINARY=&Binary
+
+; receivefile
+DLG_RECVFILE_FILENAME_TITLE=&கோப்பு பெயர் (இந்த உரையாடல் பெட்டியில் கோப்பை இழுக்கவும்)
+DLG_RECVFILE_BINARY=&இருமை
+DLG_RECVFILE_AUTOSTOP_LABEL=&தானாக நிறுத்தும் காத்திருப்பு நேரம் (வினாடிகள்)
+
+; theme
+DLG_THEME_PREVIEW_FILE_TITLE=முன்னோட்டம்/கோப்பு
+DLG_THEME_PREVIEW_FILE_LOAD=ஏற்றவும்
+DLG_THEME_PREVIEW_FILE_SAVE=சேமி
+
+DLG_THEME_BG_TITLE=பின்னணி
+DLG_THEME_BG_IMAGE=பின்னணி படம்
+
+DLG_THEME_BG_ALPHA_TITLE=பின்னணி பட அனா
+DLG_THEME_BG_ALPHA_TEXT_BACK_ALPHA_TITLE=இயல்பான பின் அனா(ஒளிபுகா வலது திசை):
+DLG_THEME_BG_ALPHA_REVERSE_TEXT_BACK_ALPHA_TITLE=பின்திசை பின் அனா:
+DLG_THEME_BG_ALPHA_OTHER_BACK_TITLE=மற்ற பின் அனா:
+
+DLG_THEME_COLOR_TITLE=உரை நிறம்
+
+[TTSSH]
+; font
+DLG_SYSTEM_FONT=System,14,0
+DLG_TAHOMA_FONT=Tahoma,8,0
+DLG_ABOUT_FONT=Courier New,8,0
+
+; menu
+MENU_ABOUT=&தேமுபாஓடு பற்றி...
+MENU_SSH=பாஓடு...
+MENU_SSH_AUTH=பாஓடு &அங்கீகாரம்...
+MENU_SSH_FORWARD=பாஓடு முன்னோக்கி...
+MENU_SSH_KEYGEN=பாஓடு திறவுகோல்உருவாக்கி...
+
+; dlg about
+DLG_ABOUT_TITLE=தேமுபாஓடு பற்றி
+DLG_ABOUT_FP_HASH_ALGORITHM=கைரேகை கொத்து வழிமுறை:
+DLG_ABOUT_SERVERID=சேவையக அடையாளம்:
+DLG_ABOUT_PROTOCOL=நெறிமுறையைப் பயன்படுத்துதல்:
+DLG_ABOUT_ENCRYPTION=குறியாக்கம்:
+DLG_ABOUT_SERVERKEY=சேவையக விசைகள்:
+DLG_ABOUT_KEXKEY=திறவுகோல் பரிமாற்ற விசைகள்:
+DLG_ABOUT_AUTH=அங்கீகாரம்:
+DLG_ABOUT_COMP=அமுக்கம்:
+DLG_ABOUT_CLIENTID=வாடிக்கையாளர் அடையாளம்:
+DLG_ABOUT_KEX=திறவுகோல் பரிமாற்ற வழிமுறை:
+DLG_ABOUT_HOSTKEY=புரவலன் திறவுகோல்:
+DLG_ABOUT_MAC=ஊஅக வழிமுறை:
+DLG_ABOUT_MAC_INFO=%s சேவையகத்திற்கு, %s சேவையகத்திலிருந்து
+DLG_ABOUT_COMPDELAY=தாமதமான சுருக்கம்:
+DLG_ABOUT_CIPHER_INFO=%s சேவையகத்திற்கு, %s சேவையகத்திலிருந்து
+DLG_ABOUT_KEY_INFO=%d-இரும சேவையக திறவுகோல், %d-இரும புரவலன் திறவுகோல்
+DLG_ABOUT_KEY_INFO2=%d-இரும வாடிக்கையாளர் திறவுகோல், %d-இரும சேவையக திறவுகோல்
+DLG_ABOUT_KEY_NONE=இல்லை
+DLG_ABOUT_COMP_INFO=நிலை %d; விகிதம் %.1f (%ld:%ld)
+DLG_ABOUT_COMP_INFO2=நிலை %d
+DLG_ABOUT_COMP_NONE=இல்லை
+DLG_ABOUT_COMP_UPDOWN=மேலோடை %s; கீழோடை %s
+DLG_ABOUT_KEXPARAM=Key exchange param:
+DLG_ABOUT_KEXPARAM_DH=%d-bit DH group
+DLG_ABOUT_KEXPARAM_NISTP=NIST P-%d (%d-bit) elliptic curve
+DLG_ABOUT_KEXPARAM_X25519=Curve25519 (255-bit) elliptic curve
+DLG_ABOUT_KEXPARAM_SNTRUP761X25519=Curve25519 (255-bit) elliptic curve, SNTRUP761 (761-degree polynomial)
+DLG_ABOUT_KEXPARAM_MLKEM768X25519=Curve25519 (255-bit) elliptic curve, ML-KEM-768 (768-dimensional lattice)
+DLG_ABOUT_AUTH_INFO=பயனர் '%s', %s அங்கீகாரம்
+DLG_ABOUT_AUTH_INFO2=, %s திறவுகோல்
+DLG_ABOUT_AUTH_INFO3=, %s உடன் %s திறவுகோல்
+DLG_ABOUT_FINGERPRINT=புரவலன் திறவுகோலின் கைரேகை:
+
+; dlg auth
+DLG_AUTH_TITLE=பாஓடு அங்கீகாரம்
+DLG_AUTH_TITLE_FAILED=பாஓடு அங்கீகாரத்தை மீண்டும் முயற்சிக்கிறது
+DLG_AUTH_BANNER=%s இல் உள்நுழைகிறது
+DLG_AUTH_BANNER2=அங்கீகாரம் தேவை.
+DLG_AUTH_BANNER2_FAILED=அங்கீகாரம் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.
+DLG_AUTH_BANNER2_FURTHER=Further authentication required.
+DLG_AUTH_USERNAME=பயனர் &பெயர்:
+DLG_AUTH_USE_DEFAULT_USERNAME=இயல்புநிலை பயனர் பெயரைப் பயன்படுத்தவும்
+DLG_AUTH_USE_LOGON_USERNAME=&உள்நுழைவு பயனர் பெயரைப் பயன்படுத்தவும்
+DLG_AUTH_PASSWORD=&கடவுச்சொற்றொடர்:
+DLG_AUTH_PASTE_CLIPBOARD=&இடைநிலைப் பலகையில் இருந்து ஒட்டவும்
+DLG_AUTH_CLEAR_CLIPBOARD=இடைநிலைப் பலகையில் இருந்து ஒட்டவும் மற்றும் இடைநிலைப் பலகையை துடை
+DLG_AUTH_USE_CONTORL_CHARACTERS=கட்டுப்பாட்டு எழுத்துகளைப் பயன்படுத்தவும்
+DLG_AUTH_SHOW_PASSPHRASE=&கடவுச்சொற்றொடரைக் காட்டு
+DLG_AUTH_REMEMBER_PASSWORD=&நினைவகத்தில் கடவுச்சொல்லை நினைவில் கொள்க
+DLG_AUTH_FWDAGENT=முன்னோக்கி முகவர்
+DLG_AUTH_METHOD=அங்கீகார முறைகள்
+DLG_AUTH_METHOD_PASSWORD=உள்நுழைய எளிய கடவுச்சொல்லைப் பயன்படுத்தவும்
+DLG_AUTH_METHOD_RSA=உள்நுழைய &ஆர்ச்ஏ/டிஎச்ஏ/இசிடிஎச்எ/இடி25519 திறவுகோலைப் பயன்படுத்தவும்
+DLG_AUTH_METHOD_RHOST=உள்நுழைய ஆர்&புரவலன்கள் ஐப் பயன்படுத்தவும் (பாஓடு1)
+DLG_AUTH_METHOD_CHALLENGE1=உள்நுழைய சவால்/பதில்(&டிச்) ஐப் பயன்படுத்தவும்
+DLG_AUTH_METHOD_CHALLENGE2=உள்நுழைவதற்கு விசைப்பலகை-&ஊடாடுதலைப் பயன்படுத்தவும்
+DLG_AUTH_METHOD_PAGEANT=உள்நுழைய அணிவகுப்பைப் பயன்படுத்தவும்
+DLG_AUTH_PRIVATEKEY=தனிப்பட்ட &திறவுகோல் கோப்பு:
+DLG_AUTH_LOCALUSER=உள்ளக & பயனர் பெயர்:
+DLG_AUTH_HOST_PRIVATEKEY=புரவலன் தனிப்பட்ட திறவுகோல் &கோப்பு:
+DLG_AUTH_TIP_CONTROL_CODE=கட்டுப்பாட்டு எழுத்து உள்ளிடப்பட்டது
+DLG_AUTH_TIP_PASTE_KEY=இடைநிலைப் பலகையில் இருந்து ஒட்ட உயர்த்து + சொருகு ஐப் பயன்படுத்தவும்
+MSG_PAGEANT_NOTFOUND=அணிவகுப்பைக் கண்டுபிடிக்க முடியவில்லை.
+MSG_PAGEANT_NOKEY=அணிவகுப்புக்கு சரியான திறவுகோல் இல்லை.
+
+; dlg auth setup
+DLG_AUTHSETUP_TITLE=தேமுபாஓடு: அங்கீகார அமைப்பு
+DLG_AUTHSETUP_BANNER=அங்கீகரிப்புக்கு இயல்புநிலையைத் தேர்ந்தெடுக்கவும்:
+DLG_AUTHSETUP_USERNAME=பயனர் பெயர்
+DLG_AUTHSETUP_NO_USERNAME=&பயனர்பெயரை உள்ளிட வேண்டாம்
+DLG_AUTHSETUP_DEFAULT_USERNAME=இயல்பு பயனர்பெயரை பயன்படுத்து
+DLG_AUTHSETUP_LOGON_USERNAME=உள்நுழைவு பயனர்பெயரை பயன்படுத்து
+DLG_AUTHSETUP_LOGON_USERNAME_TEXT=தற்போதைய பயனர் பெயர் "%s"
+DLG_AUTHSETUP_METHOD=அங்கீகார முறைகள்
+DLG_AUTHSETUP_METHOD_PASSWORD=உள்நுழைய எளிய கடவுச்சொல்லைப் பயன்படுத்தவும்
+DLG_AUTHSETUP_METHOD_RSA=உள்நுழைய &ஆர்ச்ஏ/டிஎச்எ/இசிடிஎச்எ/இடி25519 திறவுகோலைப் பயன்படுத்தவும்
+DLG_AUTHSETUP_METHOD_RHOST=உள்நுழைய ஆர்புரவலன்கள் ஐப் பயன்படுத்தவும் (பாஓடு1)
+DLG_AUTHSETUP_METHOD_CHALLENGE=உள்நுழைய பாஓடு1: சவால்/பதில்(&டிச்) / பாஓடு2:விசைப்பலகை-&ஊடாடுதலைப் பயன்படுத்தவும்
+DLG_AUTHSETUP_METHOD_PAGEANT=அணிவகுப்பைப் பயன்படுத்தவும்
+DLG_AUTHSETUP_PRIVATEKEY=தனிப்பட்ட &திறவுகோல் கோப்பு:
+DLG_AUTHSETUP_LOCALUSER=உள்ளக & பயனர் பெயர்:
+DLG_AUTHSETUP_HOST_PRIVATEKEY=புரவலன் தனிப்பட்ட திறவுகோல் &கோப்பு:
+DLG_AUTHSETUP_CHECKAUTH=&உள்நுழைவதற்கு முன் செயல்படுத்தப்பட்ட அங்கீகார முறைகளைச் சரிபார்க்கவும் (பாஓடு2)
+
+FILEDLG_OPEN_PRIVATEKEY_TITLE=ஆர்ச்ஏ/டிஎச்எ/இசிடிஎச்எ/இடி25519 தனிப்பட்ட விசையுடன் ஒரு கோப்பைத் தேர்ந்தெடுக்கவும்
+FILEDLG_OPEN_PRIVATEKEY_FILTER=அடையாளக் கோப்புகள்\0அடையாளம்;id_rsa;id_டிஎச்எ;id_இசிடிஎச்எ;id_ed25519;*.ppk;*.pem\0identity(ஆர்ச்ஏ1)\0identity\0id_rsa(பாஓடு2)\0id\0d_rsa\0id_rsa(பாஓடு2) 0id_இசிடிஎச்எ \0id_ed25519(பாஓடு2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0PEM கோப்புகள்(*.pem)\0*.pem\0all(*.*)\0*.*\0\0
+MSG_KEYSPECIFY_ERROR=ஆர்ச்ஏ/டிஎச்எ/இசிடிஎச்எ/இடி25519 தனிப்பட்ட திறவுகோலைக் கொண்ட கோப்பை நீங்கள் குறிப்பிட வேண்டும்.
+MSG_READKEY_ERROR=வாசிப்பு பிழை பாஓடு2 தனிப்பட்ட திறவுகோல் கோப்பு\n%s
+MSG_RHOSTS_NOTDEFAULT_ERROR=ஆர்புரவலன்கள் அங்கீகாரம் தோல்வியடையும் ஏனெனில் இது இயல்புநிலை அங்கீகார முறை இல்லை.\nதேமுபாஓடுஇல் ஆர்புரவலன்கள் அங்கீகாரத்தைப் பயன்படுத்த, \nதேமுபாஓடுஐ மறுதொடக்கம் செய்து, "பாஓடு பட்டியல்வை அங்கீகரித்தல்..." என்பதைத் தேர்ந்தெடுத்து இயல்புநிலையாக அமைக்க வேண்டும். இணைக்கும் முன்.
+MSG_NOAUTHMETHOD_ERROR=தேமுபாஓடு வழங்கிய அங்கீகார விருப்பங்கள் எதையும் சேவையகம் ஆதரிக்கவில்லை. இந்த இணைப்பு இப்போது மூடப்படும்.
+
+; dlg diff key
+DLG_DIFFERENTKEY_TITLE=பாதுகாப்பு எச்சரிக்கை
+DLG_DIFFERENTKEY_WARNING=உங்கள் அறியப்பட்ட புரவலன்கள் பட்டியலில் "%s" சேவையகத்திற்கான உள்ளீடு உள்ளது, ஆனால் நீங்கள் தொடர்பு கொண்ட இயந்திரம் உங்களுக்குத் தெரிந்த புரவலன்கள் பட்டியலில் உள்ள ஒரு வித்தியாசமான திறவுகோலை வழங்கியுள்ளது. ஒரு விரோத இயந்திரம் சேவையக போல் நடிக்கலாம்.
+DLG_DIFFERENTKEY_WARNING2=இந்தப் புதிய திறவுகோலை அறியப்பட்ட புரவலன்கள் பட்டியலில் மாற்றவும், தொடரவும் நீங்கள் தேர்வுசெய்தால், இந்த எச்சரிக்கையை நீங்கள் மீண்டும் பெறமாட்டீர்கள்.
+DLG_DIFFERENTKEY_FINGERPRINT=சேவையகத்தின் புரவலன் திறவுகோல் கைரேகை:
+DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=கைரேகை கொத்து வழிமுறை:
+DLG_DIFFERENTKEY_REPLACE=&இந்த புதிய விசையுடன் இருக்கும் திறவுகோலை மாற்றவும்
+
+; dlg diff type key
+DLG_DIFFERENTTYPEKEY_TITLE=பாதுகாப்பு எச்சரிக்கை
+DLG_DIFFERENTTYPEKEY_WARNING=உங்கள் அறியப்பட்ட புரவலன்கள் பட்டியலில் "%s" சேவையகத்திற்கான உள்ளீடு உள்ளது, ஆனால் நீங்கள் தொடர்பு கொண்ட இயந்திரம் உங்களுக்குத் தெரிந்த புரவலன்கள் பட்டியலில் உள்ள ஒரு வித்தியாசமான வகை திறவுகோலை வழங்கியது. ஒரு விரோத இயந்திரம் சேவையகம் போல் நடிக்கலாம்.
+DLG_DIFFERENTTYPEKEY_WARNING2=இந்தப் புதிய திறவுகோலை அறியப்பட்ட புரவலன்கள் பட்டியலில் சேர்த்து, தொடர நீங்கள் தேர்வுசெய்தால், இந்த எச்சரிக்கையை நீங்கள் மீண்டும் பெறமாட்டீர்கள்.
+DLG_DIFFERENTTYPEKEY_FINGERPRINT=சேவையகத்தின் புரவலன் திறவுகோல் கைரேகை:
+DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=கைரேகை கொத்து வழிமுறை:
+DLG_DIFFERENTTYPEKEY_ADD=&இந்த இயந்திரத்தையும் அதன் திறவுகோலையும் அறியப்பட்ட புரவலன்கள் பட்டியலில் சேர்க்கவும்
+
+; dlg fwd edit
+DLG_FWD_TITLE=பாஓடு துறைமுகம் முன்னோக்கி
+DLG_FWD_BANNER=முன்னனுப்பப்பட்ட துறைமுகத்திற்கான திசையைத் தேர்ந்தெடுக்கவும்:
+DLG_FWD_LOCAL_PORT=முன்னோக்கி &உள்ளக துறைமுகம்
+DLG_FWD_LOCAL_LISTEN=கேள்
+DLG_FWD_LOCAL_REMOTE=தொலை இயந்திரத்திற்கு
+DLG_FWD_LOCAL_REMOTE_PORT=&துறைமுகம்
+DLG_FWD_LOCAL_CHECKIDENTITY=மற்ற புரவலன்களிடமிருந்து இணைப்புகளை ஏற்றுக்கொள்
+DLG_FWD_REMOTE_PORT=முன்னோக்கி & தொலை சேவையக துறைமுகம்
+DLG_FWD_REMOTE_LISTEN=கேள்
+DLG_FWD_REMOTE_LOCAL=உள்ளக இயந்திரத்திற்கு
+DLG_FWD_REMOTE_LOCAL_PORT=துறைமுகம்
+DLG_FWD_DYNAMIC_PORT=முன்னோக்கி &டைனமிக் துறைமுகம்
+DLG_FWD_DYNAMIC_LISTEN=கேள்
+
+MSG_SAME_SERVERPORT_ERROR=ஒரே சேவையக துறைமுகத்திலிருந்து (%d) இரண்டு முன்னோக்கிகளை நீங்கள் கொண்டிருக்க முடியாது.
+MSG_SAME_LOCALPORT_ERROR=ஒரே உள்ளக துறைமுகத்திலிருந்து (%d) இரண்டு முன்னோக்கிகளை நீங்கள் கொண்டிருக்க முடியாது.
+MSG_UNSPECIFIED_FWD_ERROR1=இந்த பாஓடு அமர்வு தொடங்கிய போது பின்வரும் முன்னோக்கி குறிப்பிடப்படவில்லை:\n\n
+MSG_UNSPECIFIED_FWD_ERROR2=\nபாஓடு நெறிமுறையின் வரம்பு காரணமாக, தற்போதைய பாஓடு அமர்வில் இந்த முன்னோக்கி வேலை செய்யாது.\nஇந்த அமைப்புகளைச் சேமித்து, புதிய பாஓடு அமர்வைத் தொடங்கினால், முன்னோக்கி செயல்படும்.
+MSG_INVALID_PORT_ERROR=துறைமுகம் "%s" என்பது சரியான துறைமுகம் எண் அல்ல.\nபட்டியலிலிருந்து துறைமுக பெயரை தேர்வு செய்யவும் அல்லது 1 மற்றும் 65535 க்கு இடைப்பட்ட எண்ணை உள்ளிடவும்.
+
+; dlg fwd setup
+DLG_FWDSETUP_TITLE=தேமுபாஓடு: முன்னோக்கி அமைப்பு
+DLG_FWDSETUP_LIST=&துறைமுக முன்னோக்கி
+DLG_FWDSETUP_ADD=&சேர்...
+DLG_FWDSETUP_EDIT=&திருத்து...
+DLG_FWDSETUP_REMOVE=&நீக்கு
+DLG_FWDSETUP_CHECKIDENTITY=உள்ளக துறைமுகங்கள் பிற புரவலன்களிடமிருந்து இணைப்புகளை ஏற்றுக்கொள்கின்றன
+DLG_FWDSETUP_X=எஃசு முன்னோக்கி
+DLG_FWDSETUP_XAPP=உள்ளக எஃசு சேவையகத்தில் தொலை &எஃசு பயன்பாடுகளைக் காண்பி
+
+MSG_FWD_REMOTE_XSERVER=தொலை எஃசு சேவையகம்
+MSG_FWD_REMOTE_XSCREEN=எஃசு சேவையகம் (காட்சி %d:%d)
+MSG_FWD_REMOTE=தொலை "%s" துறைமுகம் %s இலிருந்து உள்ளக "%s" துறைமுகம் %s
+MSG_FWD_LOCAL=உள்ளக "%s" துறைமுகம் %s க்கு தொலை "%s" துறைமுகம் %s
+MSG_FWD_X=உள்ளக எஃசு சேவையகத்திற்கு தொலை எஃசு பயன்பாடுகள்
+MSG_FWD_DYNAMIC=உள்ளகம் "%s" துறைமுகம் %s இருந்து மாறும்தொலை
+
+; dlg host
+DLG_HOST_TITLE=தேரா முனை: புதிய இணைப்பு
+DLG_HOST_TCPIPHOST=புரவலன்:
+DLG_HOST_TCPIPHISTORY=Add h&ost list
+DLG_HOST_TCPIPSERVICE=சேவை
+DLG_HOST_TCPIPOTHER=மற்றவை
+DLG_HOST_TCPIPPORT=பகநெ &துறைமுகம்#:
+DLG_HOST_TCPIPSSHVERSION=பாஓடு பதிப்பு:
+DLG_HOST_TCPIPPROTOCOL=இநெ பதிப்பு:
+DLG_HOST_SERIAL=தொடர்
+DLG_HOST_SERIALPORT=துறைமுகம்:
+DLG_HOST_HELP=&உதவி
+
+MSG_TCPPORT_NAN_ERROR=பகநெ துறைமுகம் ஒரு எண்ணாக இருக்க வேண்டும்.
+
+; dlg keygen
+DLG_KEYGEN_TITLE=தேமுபாஓடு: திறவுகோல் உருவாக்கி
+DLG_KEYGEN_KEYTYPE=திறவுகோல் வகை
+DLG_KEYGEN_PASSPHRASE=திறவுகோல் கடவுச்சொற்றொடர்:
+DLG_KEYGEN_PASSPHRASE2=கடவுச்சொல்லை உறுதிப்படுத்தவும்:
+DLG_KEYGEN_COMMENT=கருத்து:
+DLG_KEYGEN_SAVEPUBLIC=பொது திறவுகோலைச் சேமிக்கவும்
+DLG_KEYGEN_SAVEPRIVATE= &தனியார் திறவுகோலைச் சேமிக்கவும்
+DLG_KEYGEN_GENERATE=&உருவாக்கு
+DLG_KEYGEN_BITS=திறவுகோல் &இருமங்கள்:
+DLG_KEYGEN_BCRYPT_KDF=பிகிரிப்ட் &கேடிஎப் வடிவம்
+DLG_KEYGEN_BCRYPT_ROUNDS=&சுற்றுகளின் எண்ணிக்கை:
+
+MSG_KEYBITS_MIN_ERROR=திறவுகோல் இருமங்கள் மிகவும் சிறியதாக உள்ளது.
+MSG_BCRYPT_ROUNDS_MIN_ERROR=சுற்றுகளின் எண்ணிக்கை மிகவும் சிறியது.
+MSG_BCRYPT_ROUNDS_MAX_ERROR=சுற்றுகளின் எண்ணிக்கை மிகப் பெரியது.
+MSG_KEYGEN_GENERATING="உருவாக்குகிறது திறவுகோலை"
+MSG_KEYGEN_GENERATED="திறவுகோல் உருவாக்கப்பட்டது"
+
+FILEDLG_SAVE_PUBLICKEY_TITLE=பொது திறவுகோலை இவ்வாறு சேமி:
+FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER=பாஓடு1 ஆர்ச்ஏ திறவுகோல்(identity.pub)\0identity.pub\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_RSA_FILTER=பாஓடு2 ஆர்ச்ஏ திறவுகோல்(id_rsa.pub)\0id_rsa.pub\0அனைத்து கோப்புகளும்(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_DSA_FILTER=பாஓடு2 டிஎச்எ திறவுகோல்(id_dsa.pub)\0id_dsa.pub\0அனைத்து கோப்புகளும்(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER=பாஓடு2 இசிடிஎச்எ திறவுகோல்(id_ecdsa.pub)\0id_ecdsa.pub\0அனைத்து கோப்புகளும்(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER=பாஓடு2 இடி25519 திறவுகோல்(id_ed25519.pub)\0id_ed25519.pub\0அனைத்து கோப்புகளும்(*.*)\0*.*\0\0
+MSG_SAVE_KEY_OPENFILE_ERROR=திறவுகோல் கோப்பை திறக்க முடியவில்லை
+MSG_SAVE_KEY_WRITEFILE_ERROR=திறவுகோல் கோப்பை எழுத முடியவில்லை
+MSG_SAVE_PRIVATE_KEY_MISMATCH_ERROR=இரண்டு கடவுச்சொற்கள் பொருந்தவில்லை.
+MSG_SAVE_PRIVATEKEY_EMPTY_WARN=வெற்று கடவுச்சொற்றொடரைப் பயன்படுத்த விரும்புகிறீர்களா?
+FILEDLG_SAVE_PRIVATEKEY_TITLE=தனிப்பட்ட திறவுகோலை இவ்வாறு சேமி:
+FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER=பாஓடு1 ஆர்ச்ஏ திறவுகோல்(அடையாளம்)\0அடையாளம்\0அனைத்து கோப்புகளும்(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER=பாஓடு2 ஆர்ச்ஏ திறவுகோல்(id_rsa)\0id_rsa\0அனைத்து கோப்புகளும்(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER=பாஓடு2 டிஎச்எ திறவுகோல்(id_dsa)\0id_dsa\0அனைத்து கோப்புகளும்(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_ECDSA_FILTER=பாஓடு2 இசிடிஎச்எ திறவுகோல்(id_ecdsa)\0id_ecdsa\0அனைத்து கோப்புகளும்(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER=பாஓடு2 இடி25519 திறவுகோல்(id_ed25519)\0id_ed25519\0அனைத்து கோப்புகளும்(*.*)\0*.*\0\0
+
+; dlg setup
+DLG_SSHSETUP_TITLE=தேமுபாஓடு: அமைவு
+DLG_SSHSETUP_COMPRESS=&சுருக்க நிலை:
+DLG_SSHSETUP_COMPRESS_NONE=ஒன்றும் இல்லை
+DLG_SSHSETUP_COMPRESS_HIGHEST=அதிகமானது
+DLG_SSHSETUP_COMPRESS_NOTE=பாஓடு1: 'அமுக்கி நிலை' சுருக்கத்தை இயக்கு/அணை தீர்மானிக்கிறது.\nபாஓடு2: 'அமுக்கி முறை' மற்றும் 'அமுக்கி நிலை' சுருக்கத்தை இயக்கு/அணை தீர்மானிக்கிறது.
+DLG_SSHSETUP_CIPHER=&விருப்பமான சைபர் முறை
+DLG_SSHSETUP_CIPHER_UP=மேலே நகர்த்து(&1)
+DLG_SSHSETUP_CIPHER_DOWN=கீழே நகர்த்து(&2)
+DLG_SSHSETUP_CIPHER_BORDER=<இந்த வரிக்கு கீழே உள்ள மறைக்குறியீடுகள் முடக்கப்பட்டுள்ளன>
+DLG_SSHSETUP_KEX=கேஇஃசு முறை (பாஓடு2 மட்டும்)
+DLG_SSHSETUP_KEX_UP=மேலே நகர்த்து(&3)
+DLG_SSHSETUP_KEX_DOWN=கீழே நகர்த்து(&4)
+DLG_SSHSETUP_KEX_BORDER=<இந்த வரிக்கு கீழே உள்ள கேஇஃசுகள் முடக்கப்பட்டுள்ளன>
+DLG_SSHSETUP_HOST_KEY=புரவலன் திறவுகோல் முறை (பாஓடு2 மட்டும்)
+DLG_SSHSETUP_HOST_KEY_UP=மேலே நகர்த்து(&5)
+DLG_SSHSETUP_HOST_KEY_DOWN=கீழே நகர்த்து(&6)
+DLG_SSHSETUP_HOST_KEY_BORDER=<இந்த வரிக்கு கீழே உள்ள புரவலன் விசைகள் முடக்கப்பட்டுள்ளன>
+DLG_SSHSETUP_MAC=ஊஅக முறை (பாஓடு2 மட்டும்)
+DLG_SSHSETUP_MAC_UP=மேலே நகர்த்து(&7)
+DLG_SSHSETUP_MAC_DOWN=கீழே நகர்த்து(&8)
+DLG_SSHSETUP_MAC_BORDER=<இந்த வரிக்கு கீழே உள்ள ஊஅககள் முடக்கப்பட்டுள்ளன>
+DLG_SSHSETUP_COMP=அமுக்கி வரிசை (பாஓடு2 மட்டும்)
+DLG_SSHSETUP_COMP_UP=மேலே நகர்த்து(&9)
+DLG_SSHSETUP_COMP_DOWN=கீழே நகர்த்து(&0)
+DLG_SSHSETUP_COMP_BORDER=<இந்த வரிக்கு கீழே உள்ள சுருக்க முறைகள் முடக்கப்பட்டுள்ளன>
+DLG_SSHSETUP_KNOWNHOST=பாஓடு அறியப்பட்ட புரவலன்கள்
+DLG_SSHSETUP_KNOWNHOST_RW=கோப்பைப் படிக்க/&எழுத:
+DLG_SSHSETUP_KNOWNHOST_RO=படிக்க மட்டும் கோப்புகள்:
+DLG_SSHSETUP_HEARTBEAT=இதயத் துடிப்பு(&உயிருடன் வைக்க)
+DLG_SSHSETUP_HEARTBEAT_UNIT=நொடி.(அனைக்க 0)
+DLG_SSHSETUP_PASSWORD=நினைவகத்தில் கடவுச்சொல்லை நினைவில் கொள்க
+DLG_SSHSETUP_FORWARDAGENT=முகவர் முன்னோக்குதலை இயக்கு
+DLG_SSHSETUP_FORWARDAGENTCONFIRM=உறுதிப்படுத்து முகவர் முன்னோக்கி
+DLG_SSHSETUP_FORWARDAGENTNOTIFY=முன்னனுப்பப்பட்ட முகவருகான அணுகலை அறிவிக்க வேண்டாம்
+DLG_SSHSETUP_VERIFYHOSTKEYDNS=&தபெசே மூலம் புரவலன் கைரேகையை சரிபார்க்கவும்
+DLG_SSHSETUP_NOTICE=அனைத்து விருப்பங்களும் அடுத்த முறை அமர்வு தொடங்கும் போது நடைமுறைக்கு வரும்.
+DLG_SSHSETUP_HOSTKEY_ROTATION=புரவலன்திறவுகோல் சுழற்சி
+DLG_SSHSETUP_HOSTKEY_ROTATION_NO=இல்லை
+DLG_SSHSETUP_HOSTKEY_ROTATION_YES=ஆம்
+DLG_SSHSETUP_HOSTKEY_ROTATION_ASK=கேள்
+DLG_SSHSETUP_LOGLEVEL=&பதிவுநிலை
+DLG_SSHSETUP_LOGLEVEL_UNIT=(0 அணைக்க)
+
+FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=ஒரு படிக்க/எழுத அறியப்பட்ட புரவலன்கள் கோப்பைத் தேர்ந்தெடுக்கவும்
+FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=சேர்க்க, படிக்க மட்டுமே தெரிந்த புரவலன்கள் கோப்பைத் தேர்ந்தெடுக்கவும்
+
+; dlg tis
+DLG_TIS_TITLE=பாஓடு அங்கீகரிப்பு சவால்
+DLG_TIS_BANNER=%s இல் உள்நுழைகிறது
+
+; dlg passwd change
+DLG_PASSCHG_TITLE=தேமுபாஓடு: கடவுச்சொல்லை மாற்றவும்
+DLG_PASSCHG_MESSAGE=கடவுச்சொல்லை மாற்ற சேவையகம் கோருகிறது
+DLG_PASSCHG_OLDPASSWD=&பழைய கடவுச்சொல்
+DLG_PASSCHG_NEWPASSWD=&புதிய கடவுச்சொல்
+DLG_PASSCHG_CONFIRMPASSWD=&கடவுச்சொல்லை உறுதிப்படுத்தவும்
+MSG_PASSCHG_MISMATCH=பொருத்தம் இல்லை; மீண்டும் முயற்சி செய்.
+
+; dlg unknown host
+DLG_UNKNOWNHOST_TITLE=பாதுகாப்பு எச்சரிக்கை
+DLG_UNKNOWNHOST_WARNING=உங்கள் அறியப்பட்ட புரவலன்களின் பட்டியலில் "%s" சேவையகத்திற்கான நுழைவு எதுவும் இல்லை. நீங்கள் தொடர்பு கொண்ட இயந்திரம், சேவையகம் போல் நடிக்கும் விரோத இயந்திரமாக இருக்கலாம்.
+DLG_UNKNOWNHOST_WARNING2=இந்த இயந்திரத்தை அறியப்பட்ட புரவலன்கள் பட்டியலில் சேர்த்து, தொடர விரும்பினால், இந்த எச்சரிக்கையை நீங்கள் மீண்டும் பெறமாட்டீர்கள்.
+DLG_UNKNOWNHOST_FINGERPRINT=சேவையகத்தின் புரவலன் திறவுகோல் கைரேகை:
+DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=கைரேகை கொத்து வழிமுறை:
+DLG_UNKNOWNHOST_ADD=&இந்த இயந்திரத்தையும் அதன் திறவுகோலையும் அறியப்பட்ட புரவலன்கள் பட்டியலில் சேர்
+
+DLG_HOSTKEY_SSHFP_NOTFOUND=தபெசே இல் புரவலன் திறவுகோல் கைரேகை இல்லை.
+DLG_HOSTKEY_SSHFP_MATCH=பொருத்தமான புரவலன் திறவுகோல் கைரேகை தபெசே இல் காணப்படுகிறது.
+DLG_HOSTKEY_SSHFP_MISMATCH=பொருத்தமில்லாத புரவலன் திறவுகோல் கைரேகை தபெசே இல் காணப்படுகிறது.
+DLG_HOSTKEY_SSHFP_DIFFTYPE=தபெசே இல் காணப்படும் புரவலன் திறவுகோல் வகை பொருந்தாதது.
+DLG_HOSTKEY_DNSSEC_NG=தபெசே இல் பாதுகாப்பற்ற கைரேகை கண்டறியப்பட்டது.
+DLG_HOSTKEY_DNSSEC_OK=தபெசே இல் பாதுகாப்பான கைரேகை கண்டறியப்பட்டது.
+
+DLG_HOSTKEY_ROTATION_TITLE=புரவலன்திறவுகோல் சுழற்சி
+DLG_HOSTKEY_ROTATION_WARNING=தொலை சேவையகமான `%s' இலிருந்து புரவலன் விசைகளின் பட்டியலைப் பெற்றுள்ளீர்கள்.\nநீங்கள் %u புதிய திறவுகோல்(களை) சேர்க்க தேர்வு செய்யலாம் மற்றும் %u வழக்கற்றுப் போன திறவுகோலை இந்த கணினியில் இருந்து அறியப்பட்ட புரவலன்கள் பட்டியலில் நீக்கலாம்.\nதெரிந்த புரவலன்கள் கோப்பைப் புதுப்பிக்க விரும்புகிறீர்களா?
+DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=கைரேகை கொத்து வழிமுறை:
+DLG_HOSTKEY_ROTATION_ADD=%u புதிய திறவுகோல்(கள்):
+DLG_HOSTKEY_ROTATION_REMOVE=%u வழக்கற்றுப் போன திறவுகோல்(கள்):
+
+; dlg SCP
+DLG_SCP_TITLE=தேமுபாஓடு: பாதுகாப்பான நகல் நெறிமுறை (பாநகல்)
+DLG_SCP_SENDFILE_FROM=அனுப்புநர்:
+DLG_SCP_SENDFILE_TO=பெறுநர்:
+DLG_SCP_SENDFILE_DRAG=நீங்கள் கோப்பை இந்த சாளரத்திற்கு இழுக்கலாம்.
+DLG_SCP_SENDFILE_SEND=&அனுப்பு
+DLG_SCP_SENDFILE_CANCEL=&ரத்துசெய்
+DLG_SCP_RECEIVEFILE_FROM=அனுப்புநர்:
+DLG_SCP_RECEIVEFILE_TO=பெறுநர்:
+DLG_SCP_RECEIVEFILE_RECEIVE=&பெறு
+DLG_SCP_SELECT_FILE_TITLE=பாநகல் உடன் அனுப்பும் கோப்பைத் தேர்ந்தெடுக்கவும்
+DLG_SCP_SELECT_DEST_TITLE=இலக்கு கோப்பகத்தை தேர்வு செய்யவும்
+
+; dlg SCP progress
+DLG_SCP_PROGRESS_TITLE_SENDFILE=தேமுபாஓடு: பாநகல் கோப்பை அனுப்புகிறது
+DLG_SCP_PROGRESS_TITLE_RECEIVEFILE=தேமுபாஓடு:பாநகல் பெறுதல் கோப்பு
+DLG_SCP_PROGRESS_FILENAME_LABEL=கோப்பின் பெயர்:
+DLG_SCP_PROGRESS_BYTES_LABEL=மாற்றப்பட்ட பைட்டுகள்:
+DLG_SCP_PROGRESS_TIME_LABEL=கழிந்த நேரம்:
+
+; crypt.c
+MSG_ENCRYPT_ERROR1=%s குறியாக்க பிழை(1): பைட்டுகள் %d (%d)
+MSG_ENCRYPT_ERROR2=%s குறியாக்க பிழை(2)
+MSG_DECRYPT_ERROR1=%s மறைகுறியாக்க பிழை(1): பைட்டுகள் %d (%d)
+MSG_DECRYPT_ERROR2=%s மறைகுறியாக்க பிழை(2)
+MSG_CIPHER_INIT_ERROR=சைஃபர் துவக்க பிழை(%d)
+MSG_RSAKEY_SETUP_ERROR=ஆர்ச்ஏ விசைகளை அமைப்பதில் பிழை
+MSG_UNAVAILABLE_CIPHERS_ERROR=தேமுபாஓடு குறியாக்க வழிமுறைகள் எதையும் சேவையகம் ஆதரிக்கவில்லை.\nதேமுபாஓடு-சேவையகதிற்கு திசையில் பாதுகாப்பான இணைப்பை உருவாக்க முடியாது.\nஇந்த இணைப்பு இப்போது மூடப்படும்.
+MSG_CIPHER_NONE_ERROR=இந்த நிரல் மற்றும் சேவையகம் இரண்டும் புரிந்து கொள்ளும் அனைத்து குறியாக்க வழிமுறைகளும் முடக்கப்பட்டுள்ளன.\nஇந்த சேவையகத்துடன் தொடர்பு கொள்ள, நீங்கள் தேரா முனையை மீண்டும் இயக்கும் போது\nதேமுபாஓடு அமைவு உரையாடல் பெட்டியில் மேலும் சில மறைக்குறியீடுகளை இயக்க வேண்டும்.\nஇந்த இணைப்பு இப்போது மூடப்படும்.
+MSG_RSAKEY_TOOWEAK_ERROR=சேவையக ஆர்ச்ஏ விசைகள் மிகவும் பலவீனமாக உள்ளன. பாதுகாப்பான இணைப்பை நிறுவ முடியாது.
+MSG_CIPHER_NOTSELECTED_ERROR=சைஃபர் எதுவும் தேர்ந்தெடுக்கப்படவில்லை!
+
+; fwd.c
+MSG_FWD_LOCAL_CHANNEL_ERROR=சேவையகம் இல்லாத ஒரு முன்னோக்கி சேனலை கையாள முயற்சித்தது.\nசேவையகத்தில் பிழை உள்ளது அல்லது விரோதமானது. இந்த இணைப்பை நீங்கள் மூட வேண்டும்.
+MSG_FWD_REQUEST_ERROR=முன்னோக்கி இணைப்புக்காக கேட்கும் போது தகவல் தொடர்பு பிழை.\nகேட்கும் துறை நிறுத்தப்படும்.
+MSG_FWD_REFUSED_ERROR=இணைப்பு நிராகரிக்கப்பட்டது (ஒருவேளை தற்போது சேவை இயங்காமல் இருக்கலாம்)
+MSG_FWD_NETDOWN_ERROR=இயந்திரத்தை தொடர்பு கொள்ள முடியவில்லை (ஒருவேளை பிணைய பிரச்சனையாக இருக்கலாம்)
+MSG_FWD_MACHINEDOWN_ERROR=இயந்திரத்தை தொடர்பு கொள்ள முடியவில்லை (இயந்திரம் செயலிழந்திருக்கலாம்)
+MSG_FWD_ADDRNOTFOUND_ERROR=இயந்திரத்திற்கான முகவரி எதுவும் கிடைக்கவில்லை
+MSG_FWD_CONNECT_ERROR=முன்னனுப்புதல் இணைப்பை நிறுவ முடியவில்லை
+MSG_FWD_CHANNEL_ERROR=தகவல்தொடர்பு பிழை %s உள்ளக முன்னனுப்புதல் %s.\n%s (குறியீடு %d).\nமுன்னனுப்பப்பட்ட இணைப்பு மூடப்படும்.
+MSG_FWD_CHANNEL_OPEN_X_ERROR=சேவையகம் இந்த இயந்திரத்தின் மூலம் இணைப்பை அனுப்ப முயற்சித்தது.\nஇது %s இல் உள்ள எஃசு சேவையகத்துடன் ஒரு இணைப்பைக் கோரியது (%d:%d காட்சிப்படுத்தவும்).\n%s(குறியீடு %d).\nமுன்னனுப்பப்பட்ட இணைப்பு மூடப்பட்டது.
+MSG_FWD_CHANNEL_OPEN_ERROR=சேவையகம் இந்த இயந்திரத்தின் மூலம் இணைப்பை அனுப்ப முயற்சித்தது.\nஇது %s (துறைமுகம் %s) க்கு ஒரு இணைப்பைக் கோரியது.\n%s(குறியீடு %d).\nமுன்னனுப்பப்பட்ட இணைப்பு மூடப்படும்.
+DLG_FWDMON_TITLE=தேமுபாஓடு துறைமுகம் முன்னனுப்புதல் கண்காணிப்பாளர்
+MSG_FWD_HOSTILE_ATTACK_ERROR=ஐபி எண் %s கொண்ட புரவலன், முன்னனுப்பப்பட்ட உள் துறைமுகத்துடன் %d இணைக்க முயற்சித்தது.\nஇது ஒருவித விரோத தாக்குதலாக இருக்கலாம்.
+MSG_FWD_SOCKET_ERROR=துறைமுகம் பகிர்தலுக்குத் தேவையான சில சாக்கெட்(களை) துவக்க முடியவில்லை.\nசில துறைமுகம் முன்னனுப்பப்பட்ட சேவைகள் கிடைக்காமல் போகலாம்.\n(பிழைஎண் %d)
+MSG_FWD_DUPLICATE_ERROR=தேமுபாஓடு உள் பிழை: நகல் வகை/துறைமுகம் கோரிக்கைகள் கண்டறியப்பட்டதால் துறைமுக முன்னோக்கிகளை அமைக்க முடியவில்லை
+MSG_FWD_DENIED_HANDLE_ERROR=சேவையகம் இந்த இயந்திரத்தின் மூலம் ஒரு இணைப்பை அனுப்ப முயற்சித்தது.\nஇது %s இயந்திரம் %s துறைமுகத்தில்   இணைப்பைக் கோரியது.\nகோரிக்கையைச் செயலாக்கும்போது பிழை ஏற்பட்டது, அது மறுக்கப்பட்டது.
+MSG_FWD_DENIED_ERROR=சேவையகம் இந்த இயந்திரத்தின் மூலம் ஒரு இணைப்பை அனுப்ப முயற்சித்தது.\nஇது %s இயந்திரத்துடன் %d துறைமுகத்தில் உள்ள இணைப்பைக் கோரியது.\nஇந்த முன்னனுப்புதலை நீங்கள் தேமுபாஓடுக்கு முன்கூட்டியே குறிப்பிடவில்லை, எனவே கோரிக்கை நிராகரிக்கப்பட்டது.
+MSG_FWD_DENIED_X_ERROR=சேவையகம் இந்த இயந்திரத்தின் மூலம் ஒரு இணைப்பை அனுப்ப முயற்சித்தது.\nஇது உள்ளக எஃசு சேவையகத்துடன் இணைப்பைக் கோரியது.\nஇந்த முன்னனுப்புதலை நீங்கள் தேமுபாஓடு க்கு முன்கூட்டியே குறிப்பிடவில்லை, எனவே கோரிக்கை நிராகரிக்கப்பட்டது.
+MSG_FWD_DENIED_BY_SERVER_ERROR=உள்ளக கணினியில் உள்ள ஒரு நிரல், முன்னனுப்பப்பட்ட துறைமுகத்துடன் இணைக்க முயற்சித்தது.\nமுன்னனுப்பப்பட்ட கோரிக்கை சேவையகத்தால் நிராகரிக்கப்பட்டது. இணைப்பு மூடப்பட்டுள்ளது.
+MSG_FWD_COMM_ERROR=உள்ளக துறைமுகத்துக்கு அனுப்பப்பட்ட தரவை அனுப்பும் போது தகவல் தொடர்பு பிழை ஏற்பட்டது.\nமுன்னனுப்பப்பட்ட இணைப்பு மூடப்படும்.
+MSG_FWD_AGENT_FORWARDING_CONFIRM=நிச்சயமாக முகவர்-முன்னோக்கி கோரிக்கையை ஏற்க விரும்புகிறீர்களா?
+MSG_FWD_AGENT_NOTIFY=முகவருக்கான தொலை புரவலன் அணுகல்.
+MSG_FWD_AGENT_NOTIFY_TITLE=முகவர் முன்னோக்கி
+
+; hosts.c
+MSG_HOSTS_READ_ENOENT_ERROR=தெரிந்த_புரவலன்கள் கோப்பைப் படிக்க முயலும்போது பிழை ஏற்பட்டது.\nகுறிப்பிடப்பட்ட கோப்புப்பெயர் இல்லை.
+MSG_HOSTS_READ_ERROR=தெரிந்த_புரவலன்கள் கோப்பை படிக்க முயற்சிக்கும் போது பிழை ஏற்பட்டது.
+MSG_HOSTS_ALLOC_ERROR=தெரிந்த_புரவலன்கள் கோப்பைப் படிக்க இடத்தை ஒதுக்க முயற்சிக்கும் போது நினைவகம் தீர்ந்துவிட்டது.
+MSG_HOSTS_HOSTNAME_INVALID_ERROR=புரவலன் பெயரில் தவறான எழுத்து உள்ளது.\nஇந்த அமர்வு நிறுத்தப்படும்.
+MSG_HOSTS_HOSTNAME_EMPTY_ERROR=புரவலன் பெயர் காலியாக இருக்கக்கூடாது.\nஇந்த அமர்வு நிறுத்தப்படும்.
+MSG_HOSTS_FILE_UNSPECIFY_ERROR=புரவலன் மற்றும் அதன் திறவுகோலைச் சேர்க்க முடியாது, ஏனெனில் அறியப்பட்ட புரவலன்கள் கோப்பு எதுவும் குறிப்பிடப்படவில்லை.\nதேரா முனைத்தை மறுதொடக்கம் செய்து தேமுபாஓடு அமைவு உரையாடல் பெட்டியில் படிக்க/எழுத அறியப்பட்ட புரவலன் கோப்பைக் குறிப்பிடவும்.
+MSG_HOSTS_WRITE_EACCES_ERROR=புரவலன் திறவுகோலை எழுத முயற்சிக்கும் போது பிழை ஏற்பட்டது.\nதெரிந்த புரவலன் கோப்பில் எழுத உங்களுக்கு அனுமதி இல்லை.
+MSG_HOSTS_WRITE_ERROR=புரவலன் திறவுகோலை எழுத முயலும்போது பிழை ஏற்பட்டது.\nபுரவலன் திறவுகோலை எழுத முடியவில்லை.
+
+; keyfiles.c
+MSG_KEYFILES_READ_ENOENT_ERROR=திறவுகோல் கோப்பை படிக்க முயற்சிக்கும் போது பிழை ஏற்பட்டது.\nகுறிப்பிடப்பட்ட கோப்பு பெயர் இல்லை.
+MSG_KEYFILES_READ_ERROR=திறவுகோல் கோப்பை படிக்க முயற்சிக்கும் போது பிழை ஏற்பட்டது.
+MSG_KEYFILES_READ_ALLOC_ERROR=திறவுகோல் கோப்பை படிக்க இடத்தை ஒதுக்க முயற்சிக்கும் போது நினைவகம் தீர்ந்துவிட்டது.
+MSG_KEYFILES_PRIVATEKEY_NOTCONTAIN_ERROR=குறிப்பிடப்பட்ட திறவுகோல் கோப்பில் பாஓடு தனிப்பட்ட திறவுகோல் இல்லை.
+MSG_KEYFILES_PRIVATEKEY_TRUNCATE_ERROR=குறிப்பிடப்பட்ட விசைக் கோப்பு துண்டிக்கப்பட்டது மற்றும் சரியான தனிப்பட்ட திறவுகோல் இல்லை.
+MSG_KEYFILES_PRIVATEKEY_LENGTH_ERROR=குறிப்பிட்ட திறவுகோல் கோப்பை கடவுச்சொற்றொடரைப் பயன்படுத்தி மறைகுறியாக்க முடியாது.\nகோப்பில் சரியான நீளம் இல்லை.
+MSG_KEYFILES_PRIVATEKEY_NOCIPHER_ERROR=குறிப்பிடப்பட்ட திறவுகோல் கோப்பை கடவுச்சொற்றொடரைப் பயன்படுத்தி மறைகுறியாக்க முடியாது.\nகோப்பை குறியாக்கப் பயன்படுத்தப்படும் சைஃபர் வகை தேமுபாஓடு ஆல் இந்த நோக்கத்திற்காக ஆதரிக்கப்படவில்லை.
+MSG_KEYFILES_PASSPHRASE_EMPTY_ERROR=குறிப்பிட்ட திறவுகோல் கோப்பை வெற்று கடவுச்சொற்றொடரைப் பயன்படுத்தி மறைகுறியாக்க முடியாது.\nதானாக உள்நுழைவதற்கு, கடவுச்சொற்றொடர் இல்லாத ஒரு திறவுகோல் கோப்பை நீங்கள் உருவாக்க வேண்டும்.\nகவனியுங்கள்: இதன் பொருள் திறவுகோல் எளிதில் திருடப்படலாம்.
+MSG_KEYFILES_PASSPHRASE_ERROR=குறிப்பிடப்பட்ட திறவுகோல் கோப்பை கடவுச்சொற்றொடரை பயன்படுத்தி மறைகுறியாக்க முடியாது.\nகடவுச்சொற்றொடர் தவறானது.
+MSG_KEYFILES_CRYPTOLIB_ERROR=கிரிப்டோகிராஃபி நூலகத்தில் பிழை.\nஒருவேளை சேமிக்கப்பட்ட திறவுகோல் தவறானதாக இருக்கலாம்.
+
+; pkt.c
+MSG_PKT_OVERSIZED_ERROR=அதிகப்படுத்தப்பட்ட சிறுகட்டு சேவையகத்தில் இருந்து பெறப்பட்டது; இணைப்பு மூடப்படும்.
+
+; ssh.c
+MSG_SSH_INVALID_COMPDATA_ERROR=பெறப்பட்ட சிறுகட்டுடில் தவறான சுருக்கப்பட்ட தரவு
+MSG_SSH_TRUNCATED_PKT_ERROR=துண்டிக்கப்பட்ட சிறுகட்டு பெறப்பட்டது (%ld > %d) @ grab_payload()
+MSG_SSH_TRUNCATED_PKT_LIM_ERROR=துண்டிக்கப்பட்ட சிறுகட்டு பெறப்பட்டது (%ld > %d) @ grab_payload_limited()
+MSG_SSH_COREINS_ERROR='கரு சொருகி தாக்குதல்' கண்டறியப்பட்டது. இணைப்பை நிறுத்துகிறது.
+MSG_SSH_CORRUPTDATA_ERROR=கெட்ட தரவு கண்டறியப்பட்டது; இணைப்பு நிறுத்தப்படுகிறது.
+MSG_SSH_DECOMPRESS_ERROR=உள் பிழை: ஒரு சிறுகட்டு முழுவதுமாக விரிவாகப்படவில்லை.\nஇது ஒரு பிழை, தயவுசெய்து புகாரளிக்கவும்.
+MSG_SSH_SEND_PKT_ERROR=பாஓடு சிறுகட்டுடை அனுப்பும் போது தகவல் தொடர்பு பிழை ஏற்பட்டது.\nஇணைப்பு மூடப்படும். (%s:%d)
+MSG_SSH_COMP_ERROR=சிறுகட்டு தரவை சுருக்கும்போது பிழை ஏற்பட்டது.\nஇணைப்பு மூடப்படும்.
+MSG_SSH_UNABLE_FWD_ERROR=\nசேவையகத்தில் இருந்து முன்னனுப்பப்படுமாறு நீங்கள் கோரிய துறைமுகத்தை முன்னனுப்ப முடியாமல் போனதால் அது துண்டிக்கப்பட்டிருக்கலாம்.\nஏற்கனவே யாராவது அந்த துறைமுகத்தை சேவையகத்தில் இருந்து முன்னனுப்பும்போது இது அடிக்கடி நிகழும்.
+MSG_SSH_SERVER_DISCON_ERROR='%s' செய்தியுடன் சேவையகம் துண்டிக்கப்பட்டது.%s
+MSG_SSH_SERVER_DISCON_NORES_ERROR=சேவையகம் துண்டிக்கப்பட்டது (காரணம் எதுவும் குறிப்பிடப்படவில்லை).%s
+MSG_SSH_VERSION_ERROR=இந்த நிரல் நெறிமுறையின் சேவையகத்தின் பதிப்பை புரிந்து கொள்ளவில்லை.
+MSG_SSH_VERSION_MISMATCH=நெறிமுறை பதிப்பு பொருந்தவில்லை. சேவையகம்:%d.%d வாடிக்கையாளர்:%d
+MSG_SSH_SEND_ID_ERROR=பாஓடு அடையாள சரத்தை அனுப்பும்போது பிழை ஏற்பட்டது.\nஇணைப்பு மூடப்படும்.
+MSG_SSH_UNEXP_MSG2_ERROR=தற்போதைய நிலையில் (%d) எதிர்பாராத பாஓடு2 செய்தி(%d)
+MSG_SSH_UNEXP_MSG_ERROR=எதிர்பாராத சிறுகட்டு வகை பெறப்பட்டது: %d
+MSG_SSH_ALLOC_TERMINAL_ERROR=சேவையகம் ஒரு போலி முனையத்தை ஒதுக்க முடியாது. முனையத்தில் சில சிக்கல்களை நீங்கள் சந்திக்கலாம்.
+MSG_SSH_SETUP_COMP_ERROR=சுருக்கத்தை அமைக்கும் போது பிழை ஏற்பட்டது.\nஇணைப்பு மூடப்படும்.
+MSG_SSH_DECRYPT_RSA_ERROR=ஆர்ச்ஏ சவாலை மறைகுறியாக்கும்போது பிழை ஏற்பட்டது.\nஒருவேளை திறவுகோல் கோப்பு சிதைந்திருக்கலாம்.
+MSG_SSH_UNSUPPORT_AUTH_METHOD_ERROR=உள் பிழை: ஆதரிக்கப்படாத அங்கீகார முறை
+MSG_SSH_AUTH_FAILURE_ERROR=பாஓடு2 தானியங்கு உள்நுழைவு பிழை: பயனர் அங்கீகாரம் தோல்வியடைந்தது.
+MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=சேவையகத்தில் சரியான அங்கீகார முறை இல்லை.
+MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\nஅங்கீகார முறை சேவையகத்தால் ஆதரிக்கப்படவில்லை.
+MSG_SSH_CHANNEL_OPEN_ERROR=பாஓடு2_செய்தி_சேனல்_திற_தோல்வி பெறப்பட்டது.\nசேனல் [%d]: காரணம்: %s(%d) செய்தி: %s
+MSG_SSH_NO_FREE_CHANNEL=புதிய சேனலை திறக்க முடியவில்லை. தேமுபாஓடு ஏற்கனவே பல சேனல்களைத் திறக்கிறது.
+MSG_SSH_GEX_SIZE_TITLE=தேமுபாஓடு: சீஃசு குழு அளவை உறுதிப்படுத்தவும்
+MSG_SSH_GEX_SIZE_CANCEL=புதிய இணைப்பு ரத்து செய்யப்பட்டது.
+MSG_SSH_GEX_SIZE_OUTOFRANGE=பெறப்பட்ட குழு அளவு வரம்பிற்கு வெளியே உள்ளது: %d
+MSG_SSH_GEX_SIZE_SMALLER=பெறப்பட்ட குழுவின் அளவு கோரப்பட்ட குறைந்தபட்ச அளவை விட சிறியது.\nகோரிக்கப்பட்டது: %d, பெற்றது: %d\nபெறப்பட்ட குழுவை ஏற்க விரும்புகிறீர்களா?
+MSG_SSH_GEX_SIZE_LARGER=பெறப்பட்ட குழுவின் அளவு கோரப்பட்ட அதிகபட்ச அளவை விட பெரியது.\nகோரிக்கப்பட்டது: %d, பெற்றது: %d\nபெறப்பட்ட குழுவை ஏற்க விரும்புகிறீர்களா?
+MSG_SSH_SUBSYSTEM_REQUEST_ERROR=துணை அமைப்பு கோரிக்கை தோல்வியடைந்தது. (%s)
+MSG_SSH_AGENTERROR_TITLE=மோசமான முகவர் கோரிக்கை
+MSG_SSH_AGENTERROR_TOOLARGE=முகவர் கோரிக்கை அளவு மிக அதிகமாக உள்ளது, அதை புறக்கணி.
+MSG_SSH_SCP_FILEOPEN_ERROR_TITLE=தேமுபாஓடு: கோப்பு திற பிழை
+MSG_SSH_SCP_FILEOPEN_READ_ERROR=படிக்க கோப்பை திறக்க முடியவில்லை: %s %s
+MSG_SSH_SCP_FILEOPEN_READONLY_ERROR=`%s' கோப்பு படிக்க மட்டுமே.
+MSG_SSH_SCP_FILEOPEN_OVERWRITE_CONFIRM=`%s' கோப்பு உள்ளது.\nஅதன் மேல்எழுதவா?
+MSG_SSH_SCP_FILEOPEN_WRITE_ERROR=எழுதுவதற்கான கோப்பை திறக்க முடியவில்லை: %s %s
+MSG_SSH_SCP_CONFIRM_TITLE=தேமுபாஓடு: உறுதிப்படுத்தவும்
+MSG_SSH_SCP_ERROR_TITLE=தேமுபாஓடு: பாநகல் பிழை
+MSG_SSH_SCP_ERROR_INIT_TITLE=தேமுபாஓடு: பாநகல் பிழை (பாநகல்_துவக்கம்)
+
+; ttxssh.c
+MSG_UNKNOWN_OPTION_ERROR=அங்கீகரிக்கப்படாத கட்டளை வரி விருப்பம்: %s
+
+MSG_CREATEWINDOW_SCP_ERROR=Unable to display SCP dialog box.
+MSG_CREATEWINDOW_KEYGEN_ERROR=திறவுகோல் உருவாக்கி உரையாடல் பெட்டியைக் காட்ட முடியவில்லை.
+MSG_CREATEWINDOW_ABOUT_ERROR=பற்றி உரையாடல் பெட்டியைக் காட்ட முடியவில்லை.
+MSG_CREATEWINDOW_SETUP_ERROR=தேமுபாஓடு அமைவு உரையாடல் பெட்டியைக் காட்ட முடியவில்லை.
+MSG_CREATEWINDOW_FWDSETUP_ERROR=முன்னோக்கி அமைவு உரையாடல் பெட்டியைக் காட்ட முடியவில்லை.
+MSG_CREATEWINDOW_FWDEDIT_ERROR=முன்னோக்கி திருத்தி உரையாடல் பெட்டியைக் காட்ட முடியவில்லை.
+MSG_CREATEWINDOW_AUTH_ERROR=அங்கீகார உரையாடல் பெட்டியைக் காட்ட முடியவில்லை.\nஇணைப்பு நிறுத்தப்பட்டது.
+MSG_CREATEWINDOW_AUTHSETUP_ERROR=அங்கீகார அமைவு உரையாடல் பெட்டியைக் காட்ட முடியவில்லை.
+MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=கோப்பு உரையாடல் பெட்டியைக் காட்ட முடியவில்லை: பிழை %d
+
+MSG_WARNING=எச்சரிக்கை
+MSG_ERROR=பிழை
+MSG_TTSSH_ERROR=தேமுபாஓடு பிழை
+MSG_NONFATAL_ERROR=தேரா முனை: அபாயகரமான பிழை அல்ல
+
+BTN_OK=சரி
+BTN_CANCEL=ரத்துசெய்
+BTN_CLOSE=மூடு
+BTN_DISCONNECT=&துண்டிக்கவும்
+BTN_CONTINUE=&தொடரவும்
+BTN_YES=&ஆம்
+BTN_NO=&இல்லை
+BTN_HELP=&உதவி
+
+; x11util.c
+MSG_X_AUTH_ERROR=தொலை எஃசு பயன்பாடு தவறான அங்கீகாரத் தரவை அனுப்பியது.\nஅதன் எஃசு அமர்வு ரத்து செய்யப்படுகிறது.
+
+
+[TTProxy]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_SETUP=&பதிலாள்...
+MENU_ABOUT=தேமுபதிலாள் பற்றி...
+
+DLG_SETUP_TITLE=பதிலாள் அமைவு
+DLG_SETUP_URL=முகவரி
+DLG_SETUP_TYPE=&வகை
+DLG_SETUP_HOST=&புரவலன்பெயர்
+DLG_SETUP_PORT=துறைமுக &எண்
+DLG_SETUP_USER=&பயனர்பெயர்
+DLG_SETUP_PASS=&கடவுச்சொல்
+DLG_SETUP_OTHER=&மற்ற அமைப்பு...
+
+DLG_OTHER_TITLE=மற்ற அமைப்பு
+DLG_OTHER_COMMON=பொது அமைவு
+DLG_OTHER_TIMEOUT=இணைப்பு &நேரம் முடிந்தது
+DLG_OTHER_SECOND=நொடிகள்
+DLG_OTHER_LOG=பதிலாள் இணைப்பு &பதிவு
+DLG_OTHER_REFER=பார்...
+DLG_OTHER_SOCKS=குதைகுழி பதிலாள் அமைவு
+DLG_OTHER_RESOLV=பெயர் &தீர்த்தல்
+DLG_OTHER_RESOLV_AUTO=தானாகத் தீர்க்க
+DLG_OTHER_RESOLV_REMOTE=தொலையைத் தீர்க்கவும்
+DLG_OTHER_RESOLV_LOCAL=உள்ளூரில் தீர்க்கவும்
+DLG_OTHER_TELNET=தொலைவலை பதிலாள் அமைவு
+DLG_OTHER_HOST=&புரவலன்பெயர் அறிவுறுத்தல்
+DLG_OTHER_USER=&பயனர்பெயர் அறிவுறுத்தல்
+DLG_OTHER_PASS=&கடவுச்சொல் அறிவுறுத்தல்
+DLG_OTHER_CONNECT=&இணைக்கப்பட்ட செய்தி
+DLG_OTHER_ERROR=&பிழை செய்தி
+
+DLG_ABOUT_TITLE=தேமுபதிலாள் பற்றி
+DLG_ABOUT_EXTENSION=தேரா முனை பதிலாள் நீட்டிப்பு
+DLG_ABOUT_YEBISUYA=யபிசுயொபோ
+DLG_ABOUT_HOMEPAGE=தேமுபதிலாள் முகப்புப் பக்கம்
+
+MSG_EMPTY_HOSTNAME=புரவலன்பெயர் காலியாக உள்ளது!
+MSG_ILLEGAL_PORT=சட்டவிரோத துறைமுகம் எண்!
+MSG_EMPTY_PARAMETER=சில அளவுருக்கள் காலியாக உள்ளன!
+MSG_PROXY_UNAUTHORIZED=பதிலாள் அங்கீகாரம் தோல்வியடைந்தது!
+MSG_PROXY_BAD_REQUEST=பதிலாள் இந்த இணைப்பைத் தடுக்கிறது!
+MSG_TYPE_NONE=பதிலாள் இல்லாமல்
+MSG_LOGFILE_SELECT=பதிவுக்கோப்பைத் தேர்ந்தெடுக்கவும்
+MSG_UNABLE_TO_GET_ISSUER_CERT=வழங்குபவர் சான்றிதழைப் பெற முடியவில்லை
+MSG_UNABLE_TO_GET_CRL=சான்றிதழ் சிஆர்எல் ஐப் பெற முடியவில்லை
+MSG_UNABLE_TO_DECRYPT_CERT_SIGNATURE=சான்றிதழின் கையொப்பத்தை மறைகுறியாக்க முடியவில்லை
+MSG_UNABLE_TO_DECRYPT_CRL_SIGNATURE=சிஆர்எல் இன் கையொப்பத்தை மறைகுறியாக்க முடியவில்லை
+MSG_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY=வழங்குபவர் பொது திறவுகோலை மறைகுறியாக்க செய்ய முடியவில்லை
+MSG_CERT_SIGNATURE_FAILURE=சான்றிதழ் கையொப்பம் தோல்வி
+MSG_CRL_SIGNATURE_FAILURE=சிஆர்எல் கையொப்பம் தோல்வி
+MSG_CERT_NOT_YET_VALID=சான்றிதழ் இன்னும் செல்லுபடியாகவில்லை
+MSG_CERT_HAS_EXPIRED=சான்றிதழ் காலாவதியானது
+MSG_CRL_NOT_YET_VALID=சிஆர்எல் இன்னும் செல்லுபடியாகவில்லை
+MSG_CRL_HAS_EXPIRED=சிஆர்எல் காலாவதியானது
+MSG_ERROR_IN_CERT_NOT_BEFORE_FIELD=சான்றிதழின் முன்அல்ல புலத்தில் வடிவமைப்பு பிழை
+MSG_ERROR_IN_CERT_NOT_AFTER_FIELD=சான்றிதழின் பின்அல்ல புலத்தில் வடிவமைப்பு பிழை
+MSG_ERROR_IN_CRL_LAST_UPDATE_FIELD=சிஆர்எல் இன் கடைசி புதுப்பிப்பு புலத்தில் வடிவமைப்பு பிழை
+MSG_ERROR_IN_CRL_NEXT_UPDATE_FIELD=சிஆர்எல் இன் அடுத்த புதுப்பிப்பு புலத்தில் வடிவமைப்பு பிழை
+MSG_OUT_OF_MEM=நினைவகம் இல்லை
+MSG_DEPTH_ZERO_SELF_SIGNED_CERT=சுய கையொப்பமிட்ட சான்றிதழ்
+MSG_SELF_SIGNED_CERT_IN_CHAIN=சுய கையொப்பமிடப்பட்ட சான்றிதழ் சான்றிதழ் சங்கிலியில் காணப்படுகிறது
+MSG_UNABLE_TO_GET_ISSUER_CERT_LOCALLY=உள்ளக வழங்குநர் சான்றிதழைப் பெற முடியவில்லை
+MSG_UNABLE_TO_VERIFY_LEAF_SIGNATURE=முதல் சான்றிதழை சரிபார்க்க முடியவில்லை
+MSG_CERT_CHAIN_TOO_LONG=சான்றிதழ் சங்கிலி மிக நீளமாக உள்ளது
+MSG_CERT_REVOKED=சான்றிதழ் திரும்பப் பெறப்பட்டது
+MSG_INVALID_CA=தவறான சிஎ சான்றிதழ்
+MSG_PATH_LENGTH_EXCEEDED=பாதை நீளக் கட்டுப்பாடு மீறப்பட்டது
+MSG_INVALID_PURPOSE=ஆதரவற்ற சான்றிதழ் நோக்கம்
+MSG_CERT_UNTRUSTED=சான்றிதழ் நம்பகமானதாக இல்லை
+MSG_CERT_REJECTED=சான்றிதழ் நிராகரிக்கப்பட்டது
+MSG_SUBJECT_ISSUER_MISMATCH=பொருள் வழங்குபவர் பொருந்தவில்லை
+MSG_AKID_SKID_MISMATCH=அதிகாரம் மற்றும் பொருள் திறவுகோல் அடையாளங்காட்டி பொருந்தவில்லை
+MSG_AKID_ISSUER_SERIAL_MISMATCH=அதிகாரம் மற்றும் வழங்குபவர் வரிசை எண் பொருந்தவில்லை
+MSG_KEYUSAGE_NO_CERTSIGN=சான்றிதழ் கையொப்பமிடுதல் திறவுகோல் பயன்பாட்டில் இல்லை
+MSG_APPLICATION_VERIFICATION=பயன்பாட்டு சரிபார்ப்பு தோல்வி
+MSG_UNMATCH_COMMON_NAME=பொதுப்பெயர் ஒப்பீடு இல்லை
+MSG_UNABLE_TO_GET_COMMON_NAME=பொதுப் பெயரைப் பெற முடியவில்லை
+
+BTN_OK=சரி
+BTN_CANCEL=ரத்துசெய்
+
+
+[TTMenu]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_LISTCONFIG=பட்டியல் கட்டமைப்பு
+MENU_SETTING=அமைப்பு
+MENU_ICON=பெரிய சின்னத்தைக் காட்டுகிறது
+MENU_FONT=எழுத்துருவைக் குறிப்பிடுகிறது
+MENU_LEFTPOPUP=இடது சொடுக்கு மூலம் பட்டியலைக் காட்டுகிறது
+MENU_HOTKEY=பட்டியல் சூடானவிசையைக் காட்டுகிறது(கட்டுபாடு+மாற்று+M)
+MENU_VERSION=பதிப்பு
+MENU_EXEC=இயக்கு
+MENU_CLOSE=வெளியேறு
+MENU_NOTRAY=(இல்லை)
+
+DLG_ABOUT_TITLE=பதிப்பு தகவல்
+DLG_ABOUT_APPNAME=தேரா முனை துவக்க கருவி\nதேராமுனை பட்டியல்
+
+DLG_CONFIG_TITLE=பட்டியல் கட்டமைப்பு
+DLG_CONFIG_ITEM=பட்டியல் உருப்படி
+DLG_CONFIG_CONFIG=உள்ளமைவு
+DLG_CONFIG_NAME=பெயர்
+DLG_CONFIG_PATTERN=வெளியீட்டு முறை
+DLG_CONFIG_AUTO=தானிஉள்நுழை
+DLG_CONFIG_HOST=புரவலன் பெயர்
+DLG_CONFIG_USER=பயனர் பெயர்
+DLG_CONFIG_PASS=கடவுச்சொல்
+DLG_CONFIG_MACRO=குறிப்பிடப்பட்ட பெரிய கோப்பு
+DLG_CONFIG_LAUNCH=துவங்கம் மட்டும்
+DLG_CONFIG_STARTUP=தொடக்கத்தில் உதை
+DLG_CONFIG_LOCKBOX_CHECK=use LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
+DLG_CONFIG_SSH=பாஓடு பயன்படுத்தவும்
+DLG_CONFIG_KEYFILE=திறவுகோல்கோப்பு
+DLG_CONFIG_CHALLENGE=சவால் பயன்படுத்தவும்
+DLG_CONFIG_PAGEANT=அணிவகுப்பைப் பயன்படுத்தவும்
+DLG_CONFIG_DETAIL=விவரங்கள்
+
+DLG_ETC_TITLE=உள்ளமைவு விவரங்கள்
+DLG_ETC_APP=பயன்பாடு
+DLG_ETC_OPTION=விருப்பம்
+DLG_ETC_CONFIG=தேரா முனை கட்டமைப்பு கோப்பு (தொடங்குவதை தவிர)
+DLG_ETC_AUTO=தானாக உள்நுழைவதற்கான கட்டமைப்பு
+DLG_ETC_LOGFILE=பதிவு கோப்பு
+DLG_ETC_PROMPT=அறிவிப்பு
+DLG_ETC_USER=பயனர் பெயர்
+DLG_ETC_PASS=கடவுச்சொல்
+
+DLG_LOCKBOX_TITLE=TeraTerm Menu
+DLG_LOCKBOX_LABEL=Enter your LockBox password:
+DLG_LOCKBOX_SHOW=This password is used to lock and unlock the LockBox.
+DLG_LOCKBOX_WRONG=Incorrect password.
+DLG_LOCKBOX_STRTOOLONG=The password is too long.
+DLG_LOCKBOX_NOSTR=The password is not entered.
+DLG_LOCKBOX_VALID=Correct password.
+MSG_ERROR_NOLOCKBOX=error: LockBox is not setup.
+MSG_TOOLTIP_CHECK_LOCKBOX=If LockBox is enabled, login passwords are stored in LockBox encrypted.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Set a password for locking and unlocking LockBox.
+
+MSG_ERROR_READREG=பதிவேட்டில் தரவைப் படிக்க முடியவில்லை.\n
+MSG_ERROR_MAKETTL='ttpmenu.TTL' ஐ உருவாக்க முடியவில்லை\n
+MSG_ERROR_LAUNCH=பயன்பாட்டை துவக்குவது தோல்வியடைந்தது.\n
+MSG_ERROR_NOREGNAME=பிழை: பதிவேட்டில் பெயர் இல்லை
+MSG_ERROR_INVALIDREGNAME=பதிவேட்டில் "\\" ஐப் பயன்படுத்த முடியாது
+MSG_ERROR_NOHOST=பிழை: புரவலன் பெயர் இல்லை
+MSG_ERROR_NOMACRO=பிழை: பெரிய கோப்பு பெயர் இல்லை
+MSG_ERROR_CHECKFILE=[%s] கோப்பைச் சரிபார்ப்பது தோல்வி.\n
+MSG_ERROR_SAVEREG=பிழை: பதிவேட்டில் சேமிக்க முடியவில்லை.\n
+MSG_ERROR_OPENREG=பிழை: பதிவேட்டை திறக்க முடியவில்லை.\n
+MSG_ERROR_SELECTREG=நீக்கப்பட்ட பதிவேட்டில் பெயரைத் தேர்ந்தெடுக்கவும்
+MSG_ERROR_GETDELETEREG=நீக்குதல் உள்ளீட்டைப் பெற முடியவில்லை
+MSG_ERROR_DELETEREG=பதிவேட்டை நீக்க முடியவில்லை.\n
+MSG_ERROR_WINCLASS=சாளர வகுப்பை பதிவு செய்ய முடியவில்லை.\n
+
+FILEDLG_MACRO_TITLE=பெரிய கோப்பைக் குறிப்பிடுகிறது
+FILEDLG_MACRO_FILTER=பெரிய கோப்பு(*.ttl)\0*.ttl\0அனைத்து கோப்புகள்(*.*)\0*.*\0\0
+FILEDLG_KEY_TITLE=தனிப்பட்டதிறவுகோல் கோப்பைக் குறிப்பிடுகிறது
+FILEDLG_KEY_FILTER=அடையாளக் கோப்புகள்\0அடையாளம்;அடையாள_ஆர்எச்ஏ;அடையாள_டிஎச்ஏ\0அடையாளம்(ஆர்எச்ஏ1)\0அடையாளம்\0அடையாள_ஆர்எச்ஏ(பாஓடு2)\0அடையாள_ஆர்எச்ஏ\0அடையாள_டிஎச்ஏ(பாஓடு2)\0அடையாள_டிஎச்ஏ\0அனைத்தும்(*.*)\0*.*\0\0
+FILEDLG_TERATERM_TITLE=தேரா முடியைக் குறிப்பிடுகிறது
+FILEDLG_TERATERM_FILTER=இயக்கு கோப்பு(*.exe)\0*.exe\0அனைத்து கோப்புகள்(*.*)\0*.*\0\0
+FILEDLG_INI_TITLE=கட்டமைப்பு கோப்பைக் குறிப்பிடுகிறது
+FILEDLG_INI_FILTER=கட்டமைப்பு கோப்பு(*.ini)\0*.ini\0அனைத்து கோப்புகள்(*.*)\0*.*\0\0
+FILEDLG_LOG_TITLE=பதிவுக் கோப்பைக் குறிப்பிடுகிறது
+FILEDLG_LOG_FILTER=பதிவுக் கோப்பு(*.log)\0*.log\0அனைத்து கோப்புகள்(*.*)\0*.*\0\0
+
+BTN_OK=சரி
+BTN_CANCEL=ரத்துசெய்
+BTN_DEFAULT=இயல்புநிலை
+
+
+[TTXKanjiMenu]
+MENU_KANJI=&காஞ்சிகுறியீடு
+MENU_KANJI_K=குறியீடு(&கே)
+MENU_RECV_SJIS=பெறு: &உயர்த்து_சேஐச்
+MENU_RECV_EUCJP=பெறு: &இயுசி-சேபி
+MENU_RECV_JIS=பெறு: &சேஐச்
+MENU_RECV_UTF8=பெறு: &ஒபசெ-8
+MENU_RECV_KS5601=பெறு: &கேச்5601
+MENU_SEND_SJIS=அனுப்பு: உயர்த்து_சேஐச்
+MENU_SEND_EUCJP=அனுப்பு: இயுசி-சேபி
+MENU_SEND_JIS=அனுப்பு: சேஐச்
+MENU_SEND_UTF8=அனுப்பு: ஒபசெ-8
+MENU_SEND_KS5601=அனுப்பு: கேச்5601
+MENU_USE_ONE_SETTING=ஒரு அமைப்பைப் பயன்படுத்து
+MENU_SJIS=பெறு/அனுப்பு: &உயர்த்து_சேஐச்
+MENU_EUCJP=பெறு/அனுப்பு: &இயுசி-சேபி
+MENU_JIS=பெறு/அனுப்பு: &சேஐச்
+MENU_UTF8=பெறு/அனுப்பு: &ஒபசெ-8
+MENU_KS5601=பெறு/அனுப்பு: &கேச்5601
+MENU_SETTING=Sett&ing
+MENU_SETTING_TITLE=KanjiMenu Setting
+MENU_CHARCODE=Sho&w charcode menu
+MENU_CONTENTS=Menu &contents
+MENU_CONTENTS_AUTO=தானாக
+MENU_CONTENTS_JAPANESE=ஜப்பானிய
+MENU_CONTENTS_KOREAN=கொரியன்
+MENU_AMB_MENU=Show &Ambiguous Characters width menu
+MENU_USE_ONE_SETTING_MENU=Use o&ne setting menu
+BTN_OK=சரி
+BTN_CANCEL=ரத்து செய்யவும்
+BTN_HELP=உதவி
+
+[TTXAlwaysOnTop]
+MENU_ALWAYSONTOP=&எப்போதும் மேலே
+
+
+[TTXRecurringCommand]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_SETUP_RECURRING=தொடர் கட்டளை
+MENU_CONTROL_RECURRING=தொடர் கட்டளை
+
+DLG_TITLE=தொடர் கட்டளை
+DLG_ENABLE=&இயக்கு
+DLG_INTERVAL=&இடைவெளி(நொடி)
+DLG_COMMAND=&கட்டளை
+DLG_ADD_NEWLINE=&புதிய வரியைச் சேர்
+
+BTN_OK=சரி
+BTN_CANCEL=ரத்து செய்யவும்
+
+[TTXCheckUpdate]
+MSG_CHECKUPDATE=Check for updates automatically?\n  %s
+MENU_CHECKUPDATE=Check for &Updates...
+
+
+[TTXttyrec]
+MENU_RECORD=TTY &பதிவு
+MENU_REPLAY=TTY &மீள்பார்வை
+MENU_REPLAYAGAIN=மீண்டும் மீள்பார்வை
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0எல்லா கோப்புகள்(*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=வேகம்: %d, இடைவேளை: %s
+TITLE_STATUS_ON=உள்ள
+TITLE_STATUS_OFF=ஆஃப்
+TITLE_TRIM=%d.%06d நொடிகள் சுமந்து கொண்டிருக்கிறது. %d நொடிகளுக்கு வெட்டி.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), முடக்கப்பட்டது.
+
+
+[TTXViewMode]
+MENU_SETPASS=&காணும் முறை கடவுச்சொல்
+MENU_VIEWMODE=&காணும் முறை
+DLG_SETPASSWORD_TITLE=கடவுச்சொல்லை அமைக்கவும்
+DLG_SETPASSWORD_CURPASS=பழைய கடவுச்சொல்
+DLG_SETPASSWORD_NEWPASS=புதிய கடவுச்சொல்
+DLG_SETPASSWORD_RETPASS=மீண்டும் கடவுச்சொல்
+DLG_INPUTPASSWORD_TITLE=கடவுச்சொல்லை உள்ளிடவும்
+DLG_INPUTPASSWORD_PASSWORD=கடவுச்சொல்
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=கடவுச்சொல் மாற்றப்பட்டது
+MSG_INVALID=தவறான கடவுச்சொல்
+MSG_NOTMATCHED=புதிய கடவுச்சொல் பொருந்தவில்லை.
+MSG_TITLE_ERROR=TTXViewMode பிழை
+MSG_CANNOTDISPLAY=உள்ளீடு பெட்டி காட்சியிட முடியாது.
+BTN_OK=சரி
+BTN_CANCEL=&ரத்து செய்யவும்

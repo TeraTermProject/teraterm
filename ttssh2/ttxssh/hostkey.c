@@ -53,23 +53,6 @@ static const struct ssh2_host_key_t ssh2_host_key[] = {
 	{KEY_ALGO_NONE,     KEY_NONE,     NID_undef,  SSH_AGENT_SIGN_DEFAULT, NULL},
 };
 
-struct ssh_digest_t {
-	digest_algorithm id;
-	char *name;
-};
-
-/* NB. Indexed directly by algorithm number */
-static const struct ssh_digest_t ssh_digests[] = {
-	{ SSH_DIGEST_MD5,       "MD5" },
-	{ SSH_DIGEST_RIPEMD160, "RIPEMD160" },
-	{ SSH_DIGEST_SHA1,      "SHA1" },
-	{ SSH_DIGEST_SHA256,    "SHA256" },
-	{ SSH_DIGEST_SHA384,    "SHA384" },
-	{ SSH_DIGEST_SHA512,    "SHA512" },
-	{ SSH_DIGEST_MAX,       NULL },
-};
-
-
 ssh_keytype get_hostkey_type_from_name(char *name)
 {
 	if (strcmp(name, "rsa1") == 0) {
@@ -159,6 +142,29 @@ int get_ssh2_key_hashtype(ssh_keyalgo algo)
 	return NID_sha1;
 }
 
+digest_algorithm get_ssh2_key_hash_alg(ssh_keyalgo algo)
+{
+	int nid = get_ssh2_key_hashtype(algo);
+	digest_algorithm hash_alg = SSH_DIGEST_MAX;
+
+	switch (nid) {
+		case NID_sha1:
+			hash_alg = SSH_DIGEST_SHA1;
+			break;
+		case NID_sha256:
+			hash_alg = SSH_DIGEST_SHA256;
+			break;
+		case NID_sha384:
+			hash_alg = SSH_DIGEST_SHA384;
+			break;
+		case NID_sha512:
+			hash_alg = SSH_DIGEST_SHA512;
+			break;
+	}
+
+	return hash_alg;
+}
+
 int get_ssh2_agent_flag(ssh_keyalgo algo)
 {
 	const struct ssh2_host_key_t *ptr = ssh2_host_key;
@@ -194,21 +200,6 @@ const char* get_ssh2_hostkey_type_name_from_algorithm(ssh_keyalgo algo)
 	return get_ssh2_hostkey_type_name(get_ssh2_hostkey_type_from_algorithm(algo));
 }
 
-char* get_digest_algorithm_name(digest_algorithm id)
-{
-	const struct ssh_digest_t *ptr = ssh_digests;
-
-	while (ptr->name != NULL) {
-		if (id == ptr->id) {
-			return ptr->name;
-		}
-		ptr++;
-	}
-
-	// not found.
-	return "unknown";
-}
-
 void normalize_host_key_order(char *buf)
 {
 	static char default_strings[] = {
@@ -237,16 +228,16 @@ ssh_keyalgo choose_SSH2_host_key_algorithm(char *server_proposal, char *my_propo
 	return get_ssh2_hostkey_algorithm_from_name(str_keytype);
 }
 
-// Host KeyƒAƒ‹ƒSƒŠƒYƒ€—Dæ‡ˆÊ‚É‰‚¶‚ÄAmyproposal[]‚ğ‘‚«Š·‚¦‚éB
+// Host Keyã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ å„ªå…ˆé †ä½ã«å¿œã˜ã¦ã€myproposal[]ã‚’æ›¸ãæ›ãˆã‚‹ã€‚
 // (2011.2.28 yutaka)
 void SSH2_update_host_key_myproposal(PTInstVar pvar)
 {
-	static char buf[256]; // TODO: malloc()‚É‚·‚×‚«
+	static char buf[256]; // TODO: malloc()ã«ã™ã¹ã
 	int index;
 	int len, i;
 
-	// ’ÊM’†‚ÉŒÄ‚Î‚ê‚é‚Æ‚¢‚¤‚±‚Æ‚ÍƒL[Äì¬
-	// ƒL[Äì¬‚Ìê‡‚Í‰½‚à‚µ‚È‚¢
+	// é€šä¿¡ä¸­ã«å‘¼ã°ã‚Œã‚‹ã¨ã„ã†ã“ã¨ã¯ã‚­ãƒ¼å†ä½œæˆ
+	// ã‚­ãƒ¼å†ä½œæˆã®å ´åˆã¯ä½•ã‚‚ã—ãªã„
 	if (pvar->socket != INVALID_SOCKET) {
 		return;
 	}
@@ -271,7 +262,7 @@ static void SSH2_rsa_pubkey_sign_algo_myproposal(PTInstVar pvar, char *buf, int 
 	int len, i;
 	char *c_str;
 
-	// İ’è‚³‚ê‚½—Dæ‡ˆÊ‚É‰‚¶‚Ä buf ‚É•À‚×‚é
+	// è¨­å®šã•ã‚ŒãŸå„ªå…ˆé †ä½ã«å¿œã˜ã¦ buf ã«ä¸¦ã¹ã‚‹
 	buf[0] = '\0';
 	for (i = 0 ; pvar->settings.RSAPubkeySignAlgorithmOrder[i] != 0 ; i++) {
 		algo = pvar->settings.RSAPubkeySignAlgorithmOrder[i] - '0';
@@ -301,7 +292,7 @@ ssh_keyalgo choose_SSH2_keysign_algorithm(PTInstVar pvar, ssh_keytype keytype)
 {
 	char buff[128];
 	const struct ssh2_host_key_t *ptr = ssh2_host_key;
-	char *server_proposal = pvar->server_sig_algs;
+	char *server_proposal = pvar->kex->server_sig_algs;
 
 	if (keytype == KEY_RSA) {
 		if (server_proposal == NULL) {
@@ -348,9 +339,9 @@ void normalize_rsa_pubkey_sign_algo_order(char *buf)
 }
 
 /*
- * ssh_keyalgo ‚©‚çAŒ®‚É‘Î‚µ‚Ä•W€‚Å‚Í‚È‚¢ƒ_ƒCƒWƒFƒXƒg•û®–¼‚ğ•Ô‚·
- *   ¡‚Ì‚Æ‚±‚ë rsa-sha2-256, rsa-sha2-512 ‚Ì‚Æ‚«‚¾‚¯ "SHA-256", "SHA-512" ‚ğ•Ô‚·
- *   About ƒ_ƒCƒAƒƒO‚ÅA”ñ•W€‚Ìƒ_ƒCƒWƒFƒXƒg•û®‚Ì‚Æ‚«‚¾‚¯•\¦‚·‚é‚½‚ß
+ * ssh_keyalgo ã‹ã‚‰ã€éµã«å¯¾ã—ã¦æ¨™æº–ã§ã¯ãªã„ãƒ€ã‚¤ã‚¸ã‚§ã‚¹ãƒˆæ–¹å¼åã‚’è¿”ã™
+ *   ä»Šã®ã¨ã“ã‚ rsa-sha2-256, rsa-sha2-512 ã®ã¨ãã ã‘ "SHA-256", "SHA-512" ã‚’è¿”ã™
+ *   About ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§ã€éæ¨™æº–ã®ãƒ€ã‚¤ã‚¸ã‚§ã‚¹ãƒˆæ–¹å¼ã®ã¨ãã ã‘è¡¨ç¤ºã™ã‚‹ãŸã‚
  */
 char* get_ssh2_hostkey_algorithm_digest_name(ssh_keyalgo algo)
 {

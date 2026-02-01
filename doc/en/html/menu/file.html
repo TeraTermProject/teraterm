@@ -19,7 +19,8 @@
       <dt>Duplicate session</dt>
       <dd>
         Duplicates current session.
-        Only TELNET, SSH and Cygwin connection is duplicated.
+        Only TELNET, SSH and Cygwin connection is duplicated.<br>
+        Please refer to <a href="../commandline/ttssh.html#passwd_specify">Notes on Specifying a Password</a> of TTSSH command line.
       </dd>
 
       <dt><a href="file-log.html">Log...</a></dt>
@@ -32,10 +33,11 @@
         Pause logging.
       </dd>
 
-      <dt>Comment to Log...</dt>
+      <dt id="Comment">Comment to Log...</dt>
       <dd>
         Adds comment to the log file.
-        Maximum allowed length of comment is 255 characters.
+        Maximum allowed length of comment is 1024Byte.<br>
+        (the number of characters that can be used in a comment varies depending on the character encoding.)
       </dd>
 
       <dt>View Log</dt>
@@ -70,13 +72,30 @@
         behavior can be swapped by <a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">setting</a>.
       </dd>
 
+      <dt id="Receivefile"><a href="file-receivefile.html">Receive file...</a></dt>
+      <dd>
+        Outputs the received data to a file.
+        <dl>
+          <dt>When this menu is selected</dt>
+          <dd>
+            Open "Receive file" dialog.
+          </dd>
+          <dt>When this menu is selected with holding down CTRL key</dt>
+          <dd>
+            Open file select dialog, "Receive file" dialog is skipped.<br>
+            Previously used send options are used.
+          </dd>
+        </dl>
+        behavior can be swapped by <a href="../setup/teraterm-trans.html#ReceivefileSkipOptionDialog">setting</a>.
+      </dd>
+
       <dt><a href="file-transfer.html">Transfer</a></dt>
       <dd>
         Transfers files between the PC and the host with the
         Kermit/XMODEM/YMODEM/ZMODEM/B-Plus/Quick-VAN protocols.
       </dd>
 
-      <dt>SSH SCP</dt>
+      <dt><a href="file-ssh-scp.html">SSH SCP</a></dt>
       <dd>
         Transfers files between the PC and the host with the Secure Protocol.
       </dd>
@@ -107,7 +126,7 @@
       <dd>
         Closes Tera Term. If the connection is open, it is also closed.
       </dd>
-      
+
       <dt>Exit All</dt>
       <dd>
         Closes All Tera Term instances without confirmation. If the connection is open, it is also closed.

@@ -40,34 +40,32 @@
 #include "filesys_io.h"
 #include "filesys_win32.h"
 
-#include "tttypes.h"
+#include "ttlib.h"
 #include "codeconv.h"
-#include "ftlib.h"
 
 typedef struct FileIOWin32 {
 	HANDLE FileHandle;
-	BOOL utf8;
 } TFileIOWin32;
 
-static wc GetFilenameW(TFileIOWin32 *data, const char *filename)
+static wchar_t *GetFilenameW(TFileIOWin32 *data, const char *filenameU8)
 {
-	wc filenameW;
-	if (data->utf8) {
-		filenameW = wc::fromUtf8(filename);
-	}
-	else {
-		filenameW = wc(filename);
+	(void)data;
+	wchar_t *filenameW = ToWcharU8(filenameU8);
+	if (filenameW == NULL) {
+		// UTF-8ã§ã¯ãªã„?
+		filenameW = ToWcharA(filenameU8);
 	}
 	return filenameW;
 }
 
-static BOOL _OpenRead(TFileIO *fv, const char *filename)
+static BOOL _OpenRead(TFileIO *fv, const char *filenameU8)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
-	wc filenameW = GetFilenameW(data, filename);
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
 	HANDLE hFile = CreateFileW(filenameW,
 							   GENERIC_READ, FILE_SHARE_READ, NULL,
 							   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	free(filenameW);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		data->FileHandle = INVALID_HANDLE_VALUE;
 		return FALSE;
@@ -76,13 +74,14 @@ static BOOL _OpenRead(TFileIO *fv, const char *filename)
 	return TRUE;
 }
 
-static BOOL _OpenWrite(TFileIO *fv, const char *filename)
+static BOOL _OpenWrite(TFileIO *fv, const char *filenameU8)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
-	wc filenameW = GetFilenameW(data, filename);
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
 	HANDLE hFile = CreateFileW(filenameW,
-							   GENERIC_WRITE, 0, NULL,
+							   GENERIC_WRITE, FILE_SHARE_READ, NULL,
 							   CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	free(filenameW);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		data->FileHandle = INVALID_HANDLE_VALUE;
 		return FALSE;
@@ -128,22 +127,23 @@ static void _Close(TFileIO *fv)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒTƒCƒY‚ðŽæ“¾
- *	@param[in]	filename		ƒtƒ@ƒCƒ‹–¼(UTF-8)
- *	@retval		ƒtƒ@ƒCƒ‹ƒTƒCƒY
+ *	ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºã‚’å–å¾—
+ *	@param[in]	filename		ãƒ•ã‚¡ã‚¤ãƒ«å(UTF-8)
+ *	@retval		ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚º (TODO int64_tã¸)
  */
-static size_t _GetFSize(TFileIO *fv, const char *filename)
+static size_t _GetFSize(TFileIO *fv, const char *filenameU8)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
-	wc filenameW = GetFilenameW(data, filename);
-	size_t file_size = GetFSize64W(filenameW);
-	return file_size;
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
+	unsigned long long file_size = GetFSize64W(filenameW);
+	free(filenameW);
+	return (size_t)file_size;
 }
 
 /**
  *	@retval	0	ok
  *	@retval	-1	error
- * TODO size_t ˆÈã‚Ìƒtƒ@ƒCƒ‹‚Ìˆµ‚¢
+ * TODO size_t ä»¥ä¸Šã®ãƒ•ã‚¡ã‚¤ãƒ«ã®æ‰±ã„
  *
  */
 static int Seek(TFileIO *fv, size_t offset)
@@ -165,18 +165,22 @@ static int Seek(TFileIO *fv, size_t offset)
 	return 0;
 }
 
-static int __stat(TFileIO *fv, const char *filename, struct _stati64* _Stat)
+static int __stat(TFileIO *fv, const char *filenameU8, struct _stati64 *_Stat)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
-	wc filenameW = GetFilenameW(data, filename);
-	return _wstati64(filenameW, _Stat);
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
+	int r = _wstati64(filenameW, _Stat);
+	free(filenameW);
+	return r;
 }
 
-static int __utime(TFileIO *fv, const char *filename, struct _utimbuf* const _Time)
+static int __utime(TFileIO *fv, const char *filenameU8, struct _utimbuf* const _Time)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
-	wc filenameW = GetFilenameW(data, filename);
-	return _wutime(filenameW, _Time);
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
+	int r = _wutime(filenameW, _Time);
+	free(filenameW);
+	return r;
 }
 
 // replace ' ' by '_' in FName
@@ -194,43 +198,33 @@ static void FTConvFName(PCHAR FName)
 }
 
 /**
- *	‘—M—pƒtƒ@ƒCƒ‹–¼ì¬
- *	fullname(fullpath)‚©‚çƒtƒ@ƒCƒ‹–¼‚ðŽæ‚èo‚µ‚Ä•K—v‚È•ÏŠ·‚ðs‚¤
- *	Windowsƒtƒ@ƒCƒ‹–¼‚©‚ç‘—M‚É“K‚µ‚½ƒtƒ@ƒCƒ‹–¼‚É•ÏŠ·‚·‚é
+ *	é€ä¿¡ç”¨ãƒ•ã‚¡ã‚¤ãƒ«åä½œæˆ
+ *	fullname(fullpath)ã‹ã‚‰ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–ã‚Šå‡ºã—ã¦å¿…è¦ãªå¤‰æ›ã‚’è¡Œã†
+ *	Windowsãƒ•ã‚¡ã‚¤ãƒ«åã‹ã‚‰ã€é€ä¿¡ã«é©ã—ãŸãƒ•ã‚¡ã‚¤ãƒ«åã«å¤‰æ›ã™ã‚‹
  *
- *	@param[in]	fullname	Tera Term‚ª‘—M‚·‚éƒtƒ@ƒCƒ‹ UTF8(‚Æ‚È‚é—\’è)
- *	@param[in]	utf8		o—Íƒtƒ@ƒCƒ‹–¼‚ÌƒGƒ“ƒR[ƒh
- *							TRUE‚Ì‚Æ‚«AUTF-8
- *							FALSE‚Ì‚Æ‚«AANSI
- *	@retval		ƒtƒ@ƒCƒ‹–¼ (UTF-8 or ANSI)
- *				•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é
+ *	@param[in]	fullname	Tera TermãŒé€ä¿¡ã™ã‚‹Windows Full Pathãƒ•ã‚¡ã‚¤ãƒ« UTF8
+ *	@param[in]	utf8		fullnameã®ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰
+ *							TRUEã®ã¨ãã€UTF-8
+ *							FALSEã®ã¨ãã€ANSI
+ *	@param[in]	space		TRUEã®ã¨ãã€' ' ã‚’ '_' ã¸ç½®æ›
+ *	@param[in]	upper		TRUEã®ã¨ãã€å°æ–‡å­—ã‚’å¤§æ–‡å­—ã¸ç½®æ›
+ *	@retval		ãƒ‘ã‚¹ã‚’å–ã‚Šé™¤ã„ãŸé€ä¿¡ã«ä½¿ç”¨ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«å (UTF-8 or ANSI)
+ *				ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  */
-static char *GetSendFilename(TFileIO *fv, const char *fullname, BOOL utf8, BOOL space, BOOL upper)
+static char *GetSendFilename(TFileIO *fv, const char *fullnameU8, BOOL utf8, BOOL space, BOOL upper)
 {
 	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	(void)data;
 	int FnPos;
 	char *filename;
-	if (data->utf8) {
-		GetFileNamePosU8(fullname, NULL, &FnPos);
-		if (utf8) {
-			// UTF8 -> UTF8
-			filename = _strdup(fullname + FnPos);
-		}
-		else {
-			// UTF8 -> ANSI
-			filename = ToCharU8(fullname + FnPos);
-		}
+	GetFileNamePosU8(fullnameU8, NULL, &FnPos);
+	if (utf8) {
+		// UTF8 -> UTF8
+		filename = _strdup(fullnameU8 + FnPos);
 	}
 	else {
-		GetFileNamePos(fullname, NULL, &FnPos);
-		if (utf8) {
-			// ANSI -> UTF8
-			filename = ToU8A(fullname + FnPos);
-		}
-		else {
-			// ANSI -> ANSI
-			filename = _strdup(fullname + FnPos);
-		}
+		// UTF8 -> ANSI
+		filename = ToCharU8(fullnameU8 + FnPos);
 	}
 	if (space) {
 		// replace ' ' by '_' in filename
@@ -242,39 +236,38 @@ static char *GetSendFilename(TFileIO *fv, const char *fullname, BOOL utf8, BOOL 
 	return filename;
 }
 
-static char *CreateFilenameWithNumber(const char *fullpath, int n)
+static char *CreateFilenameWithNumber(const char *fullpathU8, int n)
 {
 	int FnPos;
 	char Num[11];
 
-	size_t len = strlen(fullpath) + sizeof(Num);
+	size_t len = strlen(fullpathU8) + sizeof(Num);
 	char *new_name = (char *)malloc(len);
 
-//	GetFileNamePos(fullpath, NULL, &FnPos);
-	GetFileNamePosU8(fullpath, NULL, &FnPos);
+	GetFileNamePosU8(fullpathU8, NULL, &FnPos);
 
 	_snprintf_s(Num,sizeof(Num),_TRUNCATE,"%u",n);
 	size_t num_len = strlen(Num);
 
-	const char *filename = &fullpath[FnPos];
+	const char *filename = &fullpathU8[FnPos];
 	size_t filename_len = strlen(filename);
 	const char *ext = strrchr(filename, '.');
 	if (ext == NULL) {
-		// Šg’£Žq‚È‚µ
+		// æ‹¡å¼µå­ãªã—
 		char *d = new_name;
-		memcpy(d, fullpath, FnPos + filename_len);
+		memcpy(d, fullpathU8, FnPos + filename_len);
 		d += FnPos + filename_len;
 		memcpy(d, Num, num_len);
 		d += num_len;
 		*d = 0;
 	}
 	else {
-		// Šg’£Žq‚ ‚è
+		// æ‹¡å¼µå­ã‚ã‚Š
 		size_t ext_len = strlen(ext);
 		size_t base_len = filename_len - ext_len;
 
 		char *d = new_name;
-		memcpy(d, fullpath, FnPos + base_len);
+		memcpy(d, fullpathU8, FnPos + base_len);
 		d += FnPos + base_len;
 		memcpy(d, Num, num_len);
 		d += num_len;
@@ -285,46 +278,51 @@ static char *CreateFilenameWithNumber(const char *fullpath, int n)
 	return new_name;
 }
 
-static char *CreateUniqueFilename(const char *fullpath)
+static char *CreateUniqueFilename(const char *fullpathU8)
 {
 	int i = 1;
 	while(1) {
-		char *filename = CreateFilenameWithNumber(fullpath, i);
-		if (!DoesFileExist(filename)) {
-			return filename;
+		char *filenameU8 = CreateFilenameWithNumber(fullpathU8, i);
+		wchar_t *filenameW = ToWcharU8(filenameU8);
+		const DWORD r = GetFileAttributesW(filenameW);
+		free(filenameW);
+		if (r == INVALID_FILE_ATTRIBUTES) {
+			return filenameU8;
 		}
-		free(filename);
+		free(filenameU8);
 		i++;
 	}
 }
 
 /**
- *	ŽóM—pƒtƒ@ƒCƒ‹–¼ì¬
- *	fullname‚©‚ç•K—v‚È•ÏŠ·‚ðs‚¤
- *	‘—‚ç‚ê‚Ä‚«‚½ƒtƒ@ƒCƒ‹–¼‚ªANSI‚©UTF8‚©‚Í
- *	’ÊMæ‚âƒvƒƒgƒRƒ‹‚É‚æ‚é‚ÆŽv‚í‚ê‚é
- *	ŽóM‚µ‚½ƒtƒ@ƒCƒ‹–¼‚©‚çWindows‚É“K‚µ‚½ƒtƒ@ƒCƒ‹–¼‚É•ÏŠ·‚·‚é
+ *	å—ä¿¡ç”¨ãƒ•ã‚¡ã‚¤ãƒ«åä½œæˆ
+ *	fullnameã‹ã‚‰å¿…è¦ãªå¤‰æ›ã‚’è¡Œã†
+ *	é€ã‚‰ã‚Œã¦ããŸãƒ•ã‚¡ã‚¤ãƒ«åãŒANSIã‹UTF8ã‹ã¯
+ *	é€šä¿¡å…ˆã‚„ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã«ã‚ˆã‚‹ã¨æ€ã‚ã‚Œã‚‹
+ *	å—ä¿¡ã—ãŸãƒ•ã‚¡ã‚¤ãƒ«åã‹ã‚‰Windowsã«é©ã—ãŸãƒ•ã‚¡ã‚¤ãƒ«åã«å¤‰æ›ã™ã‚‹
  *
- *	@param[in]	filename	’ÊM‚Å‘—‚ç‚ê‚Ä‚«‚½ƒtƒ@ƒCƒ‹–¼, “ü—Íƒtƒ@ƒCƒ‹–¼
- *	@param[in]	utf8		“ü—Íƒtƒ@ƒCƒ‹–¼‚ÌƒGƒ“ƒR[ƒh
- *							TRUE‚Ì‚Æ‚«AUTF-8
- *							FALSE‚Ì‚Æ‚«AANSI
- *	@param[in]	path		ŽóMƒtƒHƒ‹ƒ_ ƒtƒ@ƒCƒ‹–¼‚Ì‘O‚É•t‰Á‚³‚ê‚é UTF-8
- *							NULL‚Ì‚Æ‚«•t‰Á‚³‚ê‚È‚¢
- *	@param[in]	unique		TRUE‚Ì‚Æ‚«A‚·‚Å‚Éƒtƒ@ƒCƒ‹‚ª‘¶Ý‚µ‚Ä‚¢‚é‚©ƒ`ƒFƒbƒN‚·‚é
- *							ƒtƒ@ƒCƒ‹‚ª‘¶Ý‚µ‚½‚Æ‚«Aƒtƒ@ƒCƒ‹–¼‚ÌŒã‚ë‚É”Žš‚ð’Ç‰Á‚·‚é
- *	@retval		ƒtƒ@ƒCƒ‹–¼ UTF-8
- *				•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é
+ *	@param[in]	filename	é€šä¿¡ã§é€ã‚‰ã‚Œã¦ããŸãƒ•ã‚¡ã‚¤ãƒ«å, å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«å
+ *	@param[in]	utf8		filenameã®ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰
+ *							TRUEã®ã¨ãã€UTF-8
+ *							FALSEã®ã¨ãã€ANSI
+ *	@param[in]	path		å—ä¿¡ãƒ•ã‚©ãƒ«ãƒ€ ãƒ•ã‚¡ã‚¤ãƒ«åã®å‰ã«ä»˜åŠ ã•ã‚Œã‚‹ UTF-8
+ *							(çµ‚ç«¯ã«ãƒ‘ã‚¹ã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿'\\'ã‚’ä»˜åŠ ã—ã¦ã„ã‚‹ã“ã¨)
+ *							NULLã®ã¨ãä»˜åŠ ã•ã‚Œãªã„
+ *	@param[in]	unique		TRUEã®ã¨ãã€ã™ã§ã«ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ã¦ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
+ *							ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãŸã¨ãã€ãƒ•ã‚¡ã‚¤ãƒ«åã®å¾Œã‚ã«æ•°å­—ã‚’è¿½åŠ ã™ã‚‹
+ *	@retval		ãƒ•ã‚¡ã‚¤ãƒ«å UTF-8
+ *				ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  */
-static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL utf8, const char *path, BOOL unique)
+static char* GetReceiveFilename(struct FileIO* fv, const char* filename, BOOL utf8, const char *path, BOOL unique)
 {
+	(void)fv;
 	char* new_name = NULL;
 	if (!utf8) {
 		// ANSI -> UTF8
 		int FnPos;
 		GetFileNamePos(filename, NULL, &FnPos);
 		new_name = ToU8A(&filename[FnPos]);
-		// new_name == NULL ‚Ì‚Æ‚« UTF-8‚É•ÏŠ·‚Å‚«‚È‚©‚Á‚½
+		// new_name == NULL ã®ã¨ã UTF-8ã«å¤‰æ›ã§ããªã‹ã£ãŸ
 	}
 	if (new_name == NULL) {
 		// UTF8 -> UTF8
@@ -336,7 +334,7 @@ static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL ut
 		return NULL;
 	}
 	size_t len = strlen(new_name) + 1;
-	FitFileName(new_name, len, NULL);
+	FitFileName(new_name, (int)len, NULL);
 	char *new_name_safe = replaceInvalidFileNameCharU8(new_name, '_');
 	free(new_name);
 	new_name = NULL;
@@ -344,7 +342,7 @@ static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL ut
 	// to fullpath
 	char *full;
 	if (path == NULL) {
-		full = new_name_safe;
+		full = _strdup(new_name_safe);
 	}
 	else {
 		size_t full_len = strlen(new_name_safe) + strlen(path) + 1;
@@ -357,31 +355,37 @@ static char* GetRecieveFilename(struct FileIO* fv, const char* filename, BOOL ut
 
 	// to unique
 	if (unique && DoesFileExist(full)) {
-		char *filename = CreateUniqueFilename(full);
+		char *f = CreateUniqueFilename(full);
 		free(full);
-		full = filename;
+		full = f;
 	}
 
 	return full;
 }
 
-static long GetFMtime(TFileIO *fv, const char *FName)
+static long GetFMtime(TFileIO *fv, const char *filenameU8)
 {
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
 	struct _stat st;
-
-	if (_stat(FName,&st)==-1) {
+	int r = _wstat(filenameW, &st);
+	free(filenameW);
+	if (r == -1) {
 		return 0;
 	}
 	return (long)st.st_mtime;
 }
 
-static BOOL _SetFMtime(TFileIO *fv, const char *FName, DWORD mtime)
+static BOOL _SetFMtime(TFileIO *fv, const char *filenameU8, DWORD mtime)
 {
+	TFileIOWin32 *data = (TFileIOWin32 *)fv->data;
+	wchar_t *filenameW = GetFilenameW(data, filenameU8);
 	struct _utimbuf filetime;
-
 	filetime.actime = mtime;
 	filetime.modtime = mtime;
-	return _utime(FName, &filetime);
+	int r = _wutime(filenameW, &filetime);
+	free(filenameW);
+	return r;
 }
 
 static void FileSysDestroy(TFileIO *fv)
@@ -400,7 +404,6 @@ TFileIO *FilesysCreateWin32(void)
 		return NULL;
 	}
 	data->FileHandle = INVALID_HANDLE_VALUE;
-	data->utf8 = TRUE;
 	TFileIO *fv = (TFileIO *)calloc(1, sizeof(TFileIO));
 	if (fv == NULL) {
 		free(data);
@@ -418,7 +421,7 @@ TFileIO *FilesysCreateWin32(void)
 	fv->stat = __stat;
 	fv->FileSysDestroy = FileSysDestroy;
 	fv->GetSendFilename = GetSendFilename;
-	fv->GetRecieveFilename = GetRecieveFilename;
+	fv->GetReceiveFilename = GetReceiveFilename;
 	fv->GetFMtime = GetFMtime;
 	fv->SetFMtime = _SetFMtime;
 	return fv;

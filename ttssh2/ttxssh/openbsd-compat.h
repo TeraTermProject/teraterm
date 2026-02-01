@@ -85,4 +85,28 @@ int timingsafe_bcmp(const void *, const void *, size_t);
 		((u_char *)(p))[1] = __v & 0xff; \
 	} while (0)
 
+
+// from defines.h
+typedef unsigned char u_char;
+typedef unsigned char u_int8_t;
+typedef unsigned short int u_int16_t;
+typedef unsigned int u_int32_t;
+typedef long long int int64_t;
+typedef unsigned long long int u_int64_t;
+
+// import from misc.h
+/* $OpenBSD: misc.h,v 1.75 2018/10/03 06:38:35 djm Exp $ */
+
+/* Functions to extract or store big-endian words of various sizes */
+u_int64_t	get_u64(const void *);
+u_int32_t	get_u32(const void *);
+u_int16_t	get_u16(const void *);
+void		put_u64(void *, u_int64_t);
+void		put_u32(void *, u_int32_t);
+void		put_u16(void *, u_int16_t);
+
+/* Little-endian store/load, used by umac.c */
+u_int32_t	get_u32_le(const void *);
+void		put_u32_le(void *, u_int32_t);
+
 #endif /* OPENBSD_COMPAT_H */

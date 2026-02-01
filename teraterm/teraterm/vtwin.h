@@ -71,8 +71,8 @@ private:
   // for debug
 #if UNICODE_DEBUG
   TipWin *TipWinCodeDebug;
-  int CtrlKeyState;			// 0:äJén/1:âüÇ∑/2:ó£Ç∑/3:âüÇ∑(ï\é¶èÛë‘)
-  DWORD CtrlKeyDownTick;	// ç≈èâÇ…âüÇµÇΩtick
+  int CtrlKeyState;			// 0:ÈñãÂßã/1:Êäº„Åô/2:Èõ¢„Åô/3:Êäº„Åô(Ë°®Á§∫Áä∂ÊÖã)
+  DWORD CtrlKeyDownTick;	// ÊúÄÂàù„Å´Êäº„Åó„Åütick
 #endif
 
   // TipWin
@@ -81,7 +81,7 @@ private:
   // for html help
   LONG HelpId;
 
-  // ÉTÉCÉYïœçXíÜ(WM_SIZING Å` WM_EXITSIZEMOVE)ÇÕTRUE
+  // „Çµ„Ç§„Ç∫Â§âÊõ¥‰∏≠(WM_SIZING „Äú WM_EXITSIZEMOVE)„ÅØTRUE
   BOOL isSizing;
 
 public:
@@ -149,6 +149,7 @@ protected:
 	LRESULT OnIMEInputChange(WPARAM wParam, LPARAM lParam);
 	LRESULT OnIMENotify(WPARAM wParam, LPARAM lParam);
 	LRESULT OnIMERequest(WPARAM wParam, LPARAM lParam);
+	void SetConversionWindowPos();
 	LRESULT OnAccelCommand(WPARAM wParam, LPARAM lParam);
 	LRESULT OnChangeMenu(WPARAM wParam, LPARAM lParam);
 	LRESULT OnChangeTBar(WPARAM wParam, LPARAM lParam);
@@ -165,6 +166,7 @@ protected:
 	LRESULT OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam);
 	LRESULT OnNonConfirmClose(WPARAM wParam, LPARAM lParam);
 	LRESULT OnNotifyIcon(WPARAM wParam, LPARAM lParam);
+	LRESULT OnIdleTimer(WPARAM wParam, LPARAM lParam);
 	void OnFileNewConnection();
 	void OnDuplicateSession();
 	void OnCygwinConnection();
@@ -178,6 +180,7 @@ protected:
 	void OnReplayLog();
 	void OnExternalSetup();
 	void OnFileSend();
+	void OnFileRecv();
 	void OnFileKermitRcv();
 	void OnFileKermitGet();
 	void OnFileKermitSend();

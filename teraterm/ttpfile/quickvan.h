@@ -37,8 +37,10 @@ extern "C" {
 #endif
 
   /* Quick-VAN function id */
-#define IdQVReceive 1
-#define IdQVSend    2
+typedef enum {
+	IdQVReceive = 1,
+	IdQVSend    = 2,
+} QV_MODE_T;
 
 enum {
 	QUICKVAN_MODE,
@@ -46,7 +48,7 @@ enum {
 
 /* prototypes */
 struct FileVarProto;
-BOOL QVCreate(struct FileVarProto *fv);
+TProto *QVCreate(struct FileVarProto *fv);
 
 #ifdef __cplusplus
 }

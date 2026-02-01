@@ -4,7 +4,7 @@
 #  cmake -DFORCE_DOWNLOAD=on -P download.cmake
 # memo:
 #  スクリプト中のコメントのないhash値は、
-#  Tera Term Project が独自に算出しました
+#  TeraTerm Project が独自に算出したものです
 
 option(FORCE_DOWNLOAD "force download" OFF)
 option(FORCE_EXTRACT "force extract" OFF)
@@ -13,35 +13,41 @@ option(FORCE_EXTRACT "force extract" OFF)
 #   ファイルをダウンロードして、展開する
 #
 #   ファイルが展開されているかチェック
-#    EXT_DIR       展開されているフォルダ
-#    CHECK_FILE    チェックファイル,このファイルの有無とhashをチェックする
-#                  ${EXT_DIR}相対  ${EXT_DIR}/${CHECK_FILE}
-#    CHECK_HASH    チェックファイルhash値(sha256)
+#     EXT_DIR          展開されているフォルダ
+#     CHECK_FILE       アーカイブの中にあり、hashをチェックするファイル（チェックファイル）
+#                      このファイルの有無とhashをチェックする
+#                      ${EXT_DIR}相対  ${EXT_DIR}/${CHECK_FILE}
+#     CHECK_FILE_HASH  チェックファイルhash値(sha256)
 #   ダウンロード
-#    SRC_URL       アーカイブファイルのURL
-#    ARC_HASH      アーカイブファイルのhash値
-#                  または、hashの入っているファイルのURL
-#    DOWN_DIR      ダウンロードしたファイルの収納ディレクトリ
+#      SRC_URL         アーカイブファイルのURL
+#      ARC_HASH        アーカイブファイルのhash値
+#                      または、hashの入っているファイルのURL
+#      DOWN_DIR        ダウンロードしたファイルの収納ディレクトリ
 #   展開
-#    DIR_IN_ARC    アーカイブ内のフォルダ名
-#    RENAME_DIR    展開後 ${DIR_IN_ARC} をリネーム
-#                  ${EXT_DIR}/${RENAME_DIR} ができる
-function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DIR CHECK_FILE CHECK_HASH)
+#      DIR_IN_ARC      アーカイブ内のフォルダ名
+#      RENAME_DIR      展開後 ${DIR_IN_ARC} をリネーム
+#                      ${EXT_DIR}/${RENAME_DIR} ができる
+function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DIR CHECK_FILE CHECK_FILE_HASH)
 
   # ファイルが展開されているかチェック
   if((NOT FORCE_EXTRACT) AND (NOT FORCE_DOWNLOAD))
     if(EXISTS ${EXT_DIR}/${CHECK_FILE})
-      file(SHA256 ${EXT_DIR}/${CHECK_FILE} HASH)
+      file(SHA256 ${EXT_DIR}/${CHECK_FILE} CHECK_FILE_HASH_ACTUAL)
 
-      if(${HASH} STREQUAL ${CHECK_HASH})
+      message("CHECK_FILE: ${EXT_DIR}/${CHECK_FILE}")
+      message("ACTUAL_HASH: ${CHECK_FILE_HASH_ACTUAL}")
+      message("EXPECT_HASH: ${CHECK_FILE_HASH}")
+
+      # ファイルが展開されていて、チェックファイルのhashが一致したら終了
+      if(${CHECK_FILE_HASH_ACTUAL} STREQUAL ${CHECK_FILE_HASH})
+        message("Hash match.")
         return()
       endif()
 
-      message("${EXT_DIR}/${CHECK_FILE}")
-      message("ACTUAL_HASH=${HASH}")
-      message("EXPECT_HASH=${CHECK_HASH}")
+      message("Hash mismatch.")
     else()
-      message("not exist ${EXT_DIR}/${CHECK_FILE}")
+      message("CHECK_FILE: ${EXT_DIR}/${CHECK_FILE}")
+      message("File not found.")
     endif()
   endif()
 
@@ -49,9 +55,9 @@ function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DI
   # アーカイブファイル名(フォルダ含まない)
   string(REGEX REPLACE "(.*)/([^/]*)$" "\\2" SRC_ARC ${SRC_URL})
 
-  # ダウンロードファイルのHASH値
+  # アーカイブファイルのhash値
   if("${ARC_HASH}" MATCHES "http")
-    # download hash
+    # download the `hash file`
     string(REGEX REPLACE "(.*)/([^/]*)$" "\\2" HASH_FNAME ${ARC_HASH})
     if((NOT EXISTS ${DOWN_DIR}/${HASH_FNAME}) OR FORCE_DOWNLOAD)
       message("download ${ARC_HASH}")
@@ -61,40 +67,89 @@ function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DI
         SHOW_PROGRESS
         )
     endif()
-    file(STRINGS ${DOWN_DIR}/${HASH_FNAME} HASH)
-    string(REGEX REPLACE "^(.+) (.+)$" "\\1" HASH ${HASH})
+    file(STRINGS ${DOWN_DIR}/${HASH_FNAME} ARC_FILE_HASH)
+    string(REGEX REPLACE "^(.+) (.+)$" "\\1" ARC_FILE_HASH ${ARC_FILE_HASH})
   else()
-    # HASH値そのまま
-    set(HASH ${ARC_HASH})
+    # 渡された値そのまま
+    set(ARC_FILE_HASH ${ARC_HASH})
   endif()
 
-  # HASHの文字長からHASHの種別を決める
-  string(LENGTH ${HASH} HASH_LEN)
+  # ARC_FILE_HASHの文字長からhashの種別を決める
+  string(LENGTH ${ARC_FILE_HASH} HASH_LEN)
   if(${HASH_LEN} EQUAL 64)
     set(ARC_HASH_TYPE "SHA256")
   else()
-    message(FATAL_ERROR "unknwon hash HASH=${HASH} HASH_LEN=${HASH_LEN}")
+    message(FATAL_ERROR "unknwon hash HASH=${ARC_FILE_HASH} HASH_LEN=${HASH_LEN}")
   endif()
 
-  message("ARCHIVE=${DOWN_DIR}/${SRC_ARC}")
-  message("ARCHIVE HASH ${ARC_HASH_TYPE}=${HASH}")
-  if(FORCE_DOWNLOAD)
-    # 常にダウンロードする
-    unset(EXPECTED_HASH)
-  else()
-    # 必要ならダウンロードする
-    set(EXPECTED_HASH EXPECTED_HASH "${ARC_HASH_TYPE}=${HASH}")
+  set(DO_DOWNLOAD 1)
+  if(NOT FORCE_DOWNLOAD)
+    if(EXISTS ${DOWN_DIR}/${SRC_ARC})
+      file(${ARC_HASH_TYPE} ${DOWN_DIR}/${SRC_ARC} ARC_FILE_HASH_ACTUAL)
+
+      message("ARCHIVE: ${DOWN_DIR}/${SRC_ARC}")
+      message("ACTUAL_HASH: ${ARC_HASH_TYPE}=${ARC_FILE_HASH_ACTUAL}")
+      message("EXPECT_HASH: ${ARC_HASH_TYPE}=${ARC_FILE_HASH}")
+
+      # ファイルがダウンロードされていて、アーカイブファイルのhashが一致したらダウンロードしない
+      if(${ARC_FILE_HASH} STREQUAL ${ARC_FILE_HASH_ACTUAL})
+        message("Hash match.")
+        set(DO_DOWNLOAD 0)
+      else()
+        message("Hash mismatch.")
+      endif()
+    endif()
   endif()
 
-  # アーカイブをダウンロード
-  message("download ${SRC_URL}")
-  file(DOWNLOAD
-    ${SRC_URL}
-    ${DOWN_DIR}/${SRC_ARC}
-    ${EXPECTED_HASH}
-    SHOW_PROGRESS
-    STATUS st
-    )
+  if(DO_DOWNLOAD)
+    # アーカイブをダウンロード
+    message("download ${SRC_URL}")
+    set(MAX_RETRIES 3)
+    set(RETRY_WAIT 30)
+    set(RETRY_COUNT 0)
+    set(DOWNLOAD_SUCCESS FALSE)
+    while(NOT DOWNLOAD_SUCCESS AND
+          (RETRY_COUNT LESS MAX_RETRIES OR RETRY_COUNT EQUAL MAX_RETRIES))
+      # リトライの前に待つ
+      if(RETRY_COUNT GREATER 0 AND
+         (RETRY_COUNT LESS MAX_RETRIES OR RETRY_COUNT EQUAL MAX_RETRIES))
+        message("Wait ${RETRY_WAIT} sec...")
+        execute_process(COMMAND ${CMAKE_COMMAND} -E sleep ${RETRY_WAIT})
+        message("Retrying...")
+      endif()
+
+      # ダウンロード
+      file(DOWNLOAD
+        ${SRC_URL}
+        ${DOWN_DIR}/${SRC_ARC}
+        SHOW_PROGRESS
+        STATUS st
+        LOG log
+        )
+
+      # ダウンロードのステータスを判
+      list(GET st 0 status_code)
+      if(status_code EQUAL 0)
+        set(DOWNLOAD_SUCCESS TRUE)
+      else()
+        message("Download failed. ${st} ${log}")
+        if(RETRY_COUNT EQUAL MAX_RETRIES)
+          message(FATAL_ERROR "Maximum number of retries reached.")
+        endif()
+        math(EXPR RETRY_COUNT "${RETRY_COUNT} + 1")
+      endif()
+    endwhile()
+
+    # アーカイブファイルのhashをチェクする
+    file(${ARC_HASH_TYPE} ${DOWN_DIR}/${SRC_ARC} ARC_FILE_HASH_ACTUAL)
+    message("ARCHIVE: ${DOWN_DIR}/${SRC_ARC}")
+    message("ACTUAL_HASH: ${ARC_HASH_TYPE}=${ARC_FILE_HASH_ACTUAL}")
+    message("EXPECT_HASH: ${ARC_HASH_TYPE}=${ARC_FILE_HASH}")
+    if(NOT ${ARC_FILE_HASH} STREQUAL ${ARC_FILE_HASH_ACTUAL})
+      message(FATAL_ERROR "Hash mismatch.")
+    endif()
+    message("Hash match.")
+  endif()
 
   # アーカイブファイルを展開する
   message("expand ${EXT_DIR}/${DIR_IN_ARC}")
@@ -119,7 +174,7 @@ function(download_argon2)
   set(DIR_IN_ARC "phc-winner-argon2-20190702")
   set(RENAME_DIR "argon2")
   set(CHECK_FILE "argon2/CHANGELOG.md")
-  set(CHECK_HASH "1b513eb6524f0a3ac5e182bf2713618ddd8f2616ebe6e090d647c49b3e7eb2ec")
+  set(CHECK_FILE_HASH "1b513eb6524f0a3ac5e182bf2713618ddd8f2616ebe6e090d647c49b3e7eb2ec")
   set(SRC_URL "https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/20190702.tar.gz")
   set(ARC_HASH "daf972a89577f8772602bf2eb38b6a3dd3d922bf5724d45e7f9589b5e830442c")
   #   ARC_HASH by TeraTerm Project
@@ -132,7 +187,7 @@ function(download_argon2)
     ${DIR_IN_ARC}
     ${RENAME_DIR}
     ${CHECK_FILE}
-    ${CHECK_HASH}
+    ${CHECK_FILE_HASH}
   )
 endfunction()
 
@@ -143,7 +198,7 @@ function(download_cjson)
   set(DIR_IN_ARC "cJSON-1.7.14")
   set(RENAME_DIR "cJSON")
   set(CHECK_FILE "cJSON/CHANGELOG.md")
-  set(CHECK_HASH "4ff95e0060ea2dbc13720079399e77d404d89e514b569fcc8d741f3272c98e53")
+  set(CHECK_FILE_HASH "4ff95e0060ea2dbc13720079399e77d404d89e514b569fcc8d741f3272c98e53")
   set(SRC_URL "https://github.com/DaveGamble/cJSON/archive/v1.7.14.zip")
   set(ARC_HASH "d797b4440c91a19fa9c721d1f8bab21078624aa9555fc64c5c82e24aa2a08221")
   #   ARC_HASH by TeraTerm Project
@@ -156,19 +211,19 @@ function(download_cjson)
     ${DIR_IN_ARC}
     ${RENAME_DIR}
     ${CHECK_FILE}
-    ${CHECK_HASH}
+    ${CHECK_FILE_HASH}
   )
 endfunction()
 
 # libressl
 function(download_libressl)
   message("libressl")
-  set(DIR_IN_ARC "libressl-4.0.0")
+  set(DIR_IN_ARC "libressl-4.2.1")
   set(RENAME_DIR "libressl")
   set(CHECK_FILE "libressl/ChangeLog")
-  set(CHECK_HASH "63f360e51ff6d39a4162d8be1b3cfb40967833092e5f23751973c66be69281d2")
-  set(SRC_URL "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-4.0.0.tar.gz")
-  set(ARC_HASH "4d841955f0acc3dfc71d0e3dd35f283af461222350e26843fea9731c0246a1e4")
+  set(CHECK_FILE_HASH "f99c885d5318dc6357b4bb3563c0fb7ea536ff1734c67a436aa2532ebb4b5bd7")
+  set(SRC_URL "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-4.2.1.tar.gz")
+  set(ARC_HASH "6d5c2f58583588ea791f4c8645004071d00dfa554a5bf788a006ca1eb5abd70b")
   #   ARC_HASH was picked from https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/SHA256
   set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/libressl")
   download_extract(
@@ -179,7 +234,7 @@ function(download_libressl)
     ${DIR_IN_ARC}
     ${RENAME_DIR}
     ${CHECK_FILE}
-    ${CHECK_HASH}
+    ${CHECK_FILE_HASH}
   )
 endfunction()
 
@@ -189,7 +244,7 @@ function(download_oniguruma)
   set(DIR_IN_ARC "onig-6.9.10")
   set(RENAME_DIR "oniguruma")
   set(CHECK_FILE "oniguruma/HISTORY")
-  set(CHECK_HASH "bdf00b251fa9dfb2aea3e1c007a0994bd40203a56706402c7cebb976c41d0cae")
+  set(CHECK_FILE_HASH "bdf00b251fa9dfb2aea3e1c007a0994bd40203a56706402c7cebb976c41d0cae")
   set(SRC_URL "https://github.com/kkos/oniguruma/releases/download/v6.9.10/onig-6.9.10.tar.gz")
   set(ARC_HASH "https://github.com/kkos/oniguruma/releases/download/v6.9.10/onig-6.9.10.tar.gz.sha256")
   set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/oniguruma")
@@ -201,7 +256,7 @@ function(download_oniguruma)
     ${DIR_IN_ARC}
     ${RENAME_DIR}
     ${CHECK_FILE}
-    ${CHECK_HASH}
+    ${CHECK_FILE_HASH}
   )
 endfunction()
 
@@ -211,8 +266,8 @@ function(download_sfmt)
   set(DIR_IN_ARC "SFMT-src-1.5.1")
   set(RENAME_DIR "SFMT")
   set(CHECK_FILE "SFMT/CHANGE-LOG.txt")
-  set(CHECK_HASH "ac65302c740579c7dccc99b2fcd735af3027957680f2ce227042755646abb1db")
-  set(SRC_URL "http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/SFMT-src-1.5.1.zip")
+  set(CHECK_FILE_HASH "ac65302c740579c7dccc99b2fcd735af3027957680f2ce227042755646abb1db")
+  set(SRC_URL "https://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/SFMT-src-1.5.1.zip")
   set(ARC_HASH "630d1dfa6b690c30472f75fa97ca90ba62f9c13c5add6c264fdac2c1d3a878f4")
   #   ARC_HASH by TeraTerm Project
   set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/SFMT")
@@ -224,7 +279,7 @@ function(download_sfmt)
     ${DIR_IN_ARC}
     ${RENAME_DIR}
     ${CHECK_FILE}
-    ${CHECK_HASH}
+    ${CHECK_FILE_HASH}
   )
   set(SFMT_VERSION_H "${EXT_DIR}/${RENAME_DIR}/SFMT_version_for_teraterm.h")
   if(NOT EXISTS ${SFMT_VERSION_H})
@@ -245,7 +300,7 @@ function(download_zlib)
   set(DIR_IN_ARC "zlib-1.3.1")
   set(RENAME_DIR "zlib")
   set(CHECK_FILE "zlib/ChangeLog")
-  set(CHECK_HASH "f3bc368fd1722570d25411fece6b0e026ab95a9e20ccf39c4395aa41a956a4f0")
+  set(CHECK_FILE_HASH "f3bc368fd1722570d25411fece6b0e026ab95a9e20ccf39c4395aa41a956a4f0")
   set(SRC_URL "https://zlib.net/zlib-1.3.1.tar.xz")
   set(ARC_HASH "38ef96b8dfe510d42707d9c781877914792541133e1870841463bfa73f883e32")
   #   ARC_HASH was picked from https://www.zlib.net
@@ -258,7 +313,7 @@ function(download_zlib)
     ${DIR_IN_ARC}
     ${RENAME_DIR}
     ${CHECK_FILE}
-    ${CHECK_HASH}
+    ${CHECK_FILE_HASH}
   )
 endfunction()
 

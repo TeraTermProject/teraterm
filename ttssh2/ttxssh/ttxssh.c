@@ -43,6 +43,8 @@
 #include "keyfiles.h"
 #include "auth.h"
 #include "helpid.h"
+#include "ttcommdlg.h"
+#include "ttlib_types.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -52,6 +54,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <locale.h>		// for setlocale()
+#include <assert.h>
 
 #include "resource.h"
 #include <commctrl.h>
@@ -159,11 +162,11 @@ static void init_TTSSH(PTInstVar pvar)
 	pvar->protocol_minor = 0;
 
 	/*
-	 * pvar->contents_after_known_hosts ‚ÍˆÓ}“I‚É
-	 * init_TTSSH()‚âuninit_TTSSH()‚Å‚Í‰Šú‰»‚â‰ğ•ú‚ğ‚µ‚È‚¢B
-	 * ‚È‚º‚È‚ç‚ÎAknown_hostsƒ_ƒCƒAƒƒO‚Åg—p‚·‚é‚½‚ß‚Å‚ ‚èA
-	 * ƒ_ƒCƒAƒƒO‚Ì•\¦’†‚É TTXCloseTCP() ‚ªŒÄ‚Ño‚³‚ê‚é‚±‚Æ‚É‚æ‚èA
-	 * pvar->contents_after_known_hosts ‚ª‰Šú‰»‚â‰ğ•ú‚³‚ê‚Ä‚Í¢‚é‚©‚ç‚Å‚ ‚éB
+	 * pvar->contents_after_known_hosts ã¯æ„å›³çš„ã«
+	 * init_TTSSH()ã‚„uninit_TTSSH()ã§ã¯åˆæœŸåŒ–ã‚„è§£æ”¾ã‚’ã—ãªã„ã€‚
+	 * ãªãœãªã‚‰ã°ã€known_hostsãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§ä½¿ç”¨ã™ã‚‹ãŸã‚ã§ã‚ã‚Šã€
+	 * ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®è¡¨ç¤ºä¸­ã« TTXCloseTCP() ãŒå‘¼ã³å‡ºã•ã‚Œã‚‹ã“ã¨ã«ã‚ˆã‚Šã€
+	 * pvar->contents_after_known_hosts ãŒåˆæœŸåŒ–ã‚„è§£æ”¾ã•ã‚Œã¦ã¯å›°ã‚‹ã‹ã‚‰ã§ã‚ã‚‹ã€‚
 	 */
 
 	PKT_init(pvar);
@@ -178,7 +181,7 @@ static void init_TTSSH(PTInstVar pvar)
 
 	pvar->cc[MODE_IN] = NULL;
 	pvar->cc[MODE_OUT] = NULL;
-	// ƒƒ‚ƒŠŠm•Û‚Í CRYPT_start_encryption ‚Ìæ‚Ì cipher_init_SSH2 ‚ÉˆÚ“®
+	// ãƒ¡ãƒ¢ãƒªç¢ºä¿ã¯ CRYPT_start_encryption ã®å…ˆã® cipher_init_SSH2 ã«ç§»å‹•
 }
 
 static void uninit_TTSSH(PTInstVar pvar)
@@ -195,7 +198,7 @@ static void uninit_TTSSH(PTInstVar pvar)
 	FWD_end(pvar);
 	FWDUI_end(pvar);
 
-	// VT ƒEƒBƒ“ƒhƒE‚ÌƒAƒCƒRƒ“
+	// VT ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¢ã‚¤ã‚³ãƒ³
 	SetVTIconID(pvar->cv, NULL, 0);
 
 	ssh_heartbeat_lock_finalize();
@@ -203,7 +206,7 @@ static void uninit_TTSSH(PTInstVar pvar)
 	cipher_free_SSH2(pvar->cc[MODE_IN]);
 	cipher_free_SSH2(pvar->cc[MODE_OUT]);
 
-	// CloseTCP ‚Æ TTXEnd ‚©‚ç 2 ‰ñŒÄ‚Î‚ê‚éê‡‚ª‚ ‚é‚½‚ßA2d free ‚µ‚È‚¢‚æ‚¤‚É NULL ‚ğƒZƒbƒg‚µ‚Ä‚¨‚­
+	// CloseTCP ã¨ TTXEnd ã‹ã‚‰ 2 å›å‘¼ã°ã‚Œã‚‹å ´åˆãŒã‚ã‚‹ãŸã‚ã€2é‡ free ã—ãªã„ã‚ˆã†ã« NULL ã‚’ã‚»ãƒƒãƒˆã—ã¦ãŠã
 	pvar->cc[MODE_IN] = NULL;
 	pvar->cc[MODE_OUT] = NULL;
 }
@@ -218,7 +221,7 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv)
 	pvar->err_msg = NULL;
 
 #ifdef OPENSSL_LEGACY_PROVIDER
-	// OpenSSL 3 ˆÈ~‚ÅˆÈ‰º‚ÌƒAƒ‹ƒSƒŠƒYƒ€‚ğg‚¦‚é‚æ‚¤‚É‚·‚é‚½‚ß
+	// OpenSSL 3 ä»¥é™ã§ä»¥ä¸‹ã®ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’ä½¿ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹ãŸã‚
 	// - blowfish-cbc
 	// - cast128-cbc
 	// - arcfour
@@ -365,27 +368,27 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 	// SSH heartbeat time(second) (2004.12.11 yutaka)
 	settings->ssh_heartbeat_overtime = GetPrivateProfileInt("TTSSH", "HeartBeat", 300, fileName);
 
-	// ƒpƒXƒ[ƒh”FØ‚¨‚æ‚ÑŒöŠJŒ®”FØ‚Ég‚¤ƒpƒXƒ[ƒh‚ğƒƒ‚ƒŠã‚É•Û‚µ‚Ä‚¨‚­‚©‚Ç‚¤‚©‚ğ
-	// •\‚·B(2006.8.5 yutaka)
+	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰èªè¨¼ãŠã‚ˆã³å…¬é–‹éµèªè¨¼ã«ä½¿ã†ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ãƒ¡ãƒ¢ãƒªä¸Šã«ä¿æŒã—ã¦ãŠãã‹ã©ã†ã‹ã‚’
+	// è¡¨ã™ã€‚(2006.8.5 yutaka)
 	settings->remember_password = GetPrivateProfileInt("TTSSH", "RememberPassword", 1, fileName);
 
-	// ‰‰ñ‚Ì”FØƒ_ƒCƒAƒƒO‚ÅƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚éƒƒ\ƒbƒh‚ğƒ`ƒFƒbƒN‚µA
-	// –³Œø‚Èƒƒ\ƒbƒh‚ğƒOƒŒƒCƒAƒEƒg‚·‚é (2007.9.24 maya)
+	// åˆå›ã®èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰ã‚’ãƒã‚§ãƒƒã‚¯ã—ã€
+	// ç„¡åŠ¹ãªãƒ¡ã‚½ãƒƒãƒ‰ã‚’ã‚°ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã™ã‚‹ (2007.9.24 maya)
 	settings->CheckAuthListFirst = read_BOOL_option(fileName, "CheckAuthListFirst", FALSE);
 
-	// 768bit –¢–‚Ì RSA Œ®‚ğ‚ÂƒT[ƒo‚Ö‚ÌÚ‘±‚ğ—LŒø‚É‚·‚é (2008.9.11 maya)
+	// 768bit æœªæº€ã® RSA éµã‚’æŒã¤ã‚µãƒ¼ãƒã¸ã®æ¥ç¶šã‚’æœ‰åŠ¹ã«ã™ã‚‹ (2008.9.11 maya)
 	settings->EnableRsaShortKeyServer = read_BOOL_option(fileName, "EnableRsaShortKeyServer", FALSE);
 
-	// agent forward ‚ğ—LŒø‚É‚·‚é (2008.11.25 maya)
+	// agent forward ã‚’æœ‰åŠ¹ã«ã™ã‚‹ (2008.11.25 maya)
 	settings->ForwardAgent = read_BOOL_option(fileName, "ForwardAgent", FALSE);
 
-	// agent forward Šm”F‚ğ—LŒø‚É‚·‚é
+	// agent forward ç¢ºèªã‚’æœ‰åŠ¹ã«ã™ã‚‹
 	settings->ForwardAgentConfirm = read_BOOL_option(fileName, "ForwardAgentConfirm", TRUE);
 
-	// agent forward Šm”F‚ğ—LŒø‚É‚·‚é
+	// agent forward ç¢ºèªã‚’æœ‰åŠ¹ã«ã™ã‚‹
 	settings->ForwardAgentNotify = read_BOOL_option(fileName, "ForwardAgentNotify", TRUE);
 
-	// ƒzƒXƒgŒ®‚Ì DNS ‚Å‚Ìƒ`ƒFƒbƒN (RFC 4255)
+	// ãƒ›ã‚¹ãƒˆéµã® DNS ã§ã®ãƒã‚§ãƒƒã‚¯ (RFC 4255)
 	settings->VerifyHostKeyDNS = read_BOOL_option(fileName, "VerifyHostKeyDNS", TRUE);
 
 	// icon
@@ -407,7 +410,7 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 		settings->IconID = IDI_SECURETT;
 	}
 
-	// ƒGƒ‰[‚¨‚æ‚ÑŒx‚Ìƒ|ƒbƒvƒAƒbƒvƒƒbƒZ[ƒW‚ğ—}~‚·‚é (2014.6.26 yutaka)
+	// ã‚¨ãƒ©ãƒ¼ãŠã‚ˆã³è­¦å‘Šæ™‚ã®ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’æŠ‘æ­¢ã™ã‚‹ (2014.6.26 yutaka)
 	settings->DisablePopupMessage = GetPrivateProfileInt("TTSSH", "DisablePopupMessage", 0, fileName);
 
 	READ_STD_STRING_OPTION(X11Display);
@@ -417,6 +420,8 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 	settings->GexMinimalGroupSize = GetPrivateProfileInt("TTSSH", "GexMinimalGroupSize", 0, fileName);
 
 	settings->AuthBanner = GetPrivateProfileInt("TTSSH", "AuthBanner", 3, fileName);
+
+	settings->MaxChannel = GetPrivateProfileInt("TTSSH", "MaxChannel", CHANNEL_MAX_DEFAULT, fileName);
 
 #ifdef _DEBUG
 	GetPrivateProfileStringW(L"TTSSH", L"KexKeyLogFile", L"", settings->KexKeyLogFile, _countof(settings->KexKeyLogFile), fileName);
@@ -512,32 +517,32 @@ static void write_ssh_options(PTInstVar pvar, const wchar_t *fileName,
 	                          settings->remember_password ? "1" : "0",
 	                          fileName);
 
-	// ‰‰ñ‚Ì”FØƒ_ƒCƒAƒƒO‚ÅƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚éƒƒ\ƒbƒh‚ğƒ`ƒFƒbƒN‚µA
-	// –³Œø‚Èƒƒ\ƒbƒh‚ğƒOƒŒƒCƒAƒEƒg‚·‚é (2007.9.24 maya)
+	// åˆå›ã®èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰ã‚’ãƒã‚§ãƒƒã‚¯ã—ã€
+	// ç„¡åŠ¹ãªãƒ¡ã‚½ãƒƒãƒ‰ã‚’ã‚°ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã™ã‚‹ (2007.9.24 maya)
 	WritePrivateProfileString("TTSSH", "CheckAuthListFirst",
 	                          settings->CheckAuthListFirst ? "1" : "0", fileName);
 
-	// 768bit –¢–‚Ì RSA Œ®‚ğ‚ÂƒT[ƒo‚Ö‚ÌÚ‘±‚ğ—LŒø‚É‚·‚é (2008.9.11 maya)
+	// 768bit æœªæº€ã® RSA éµã‚’æŒã¤ã‚µãƒ¼ãƒã¸ã®æ¥ç¶šã‚’æœ‰åŠ¹ã«ã™ã‚‹ (2008.9.11 maya)
 	WritePrivateProfileString("TTSSH", "EnableRsaShortKeyServer",
 	                          settings->EnableRsaShortKeyServer ? "1" : "0", fileName);
 
-	// agent forward ‚ğ—LŒø‚É‚·‚é (2008.11.25 maya)
+	// agent forward ã‚’æœ‰åŠ¹ã«ã™ã‚‹ (2008.11.25 maya)
 	WritePrivateProfileString("TTSSH", "ForwardAgent",
 	                          settings->ForwardAgent ? "1" : "0", fileName);
 
-	// agent forward Šm”F‚ğ—LŒø‚É‚·‚é
+	// agent forward ç¢ºèªã‚’æœ‰åŠ¹ã«ã™ã‚‹
 	WritePrivateProfileString("TTSSH", "ForwardAgentConfirm",
 	                          settings->ForwardAgentConfirm ? "1" : "0", fileName);
 
-	// agent forward ’Ê’m‚ğ—LŒø‚É‚·‚é
+	// agent forward é€šçŸ¥ã‚’æœ‰åŠ¹ã«ã™ã‚‹
 	WritePrivateProfileString("TTSSH", "ForwardAgentNotify",
 	                          settings->ForwardAgentNotify ? "1" : "0", fileName);
 
-	// ƒzƒXƒgŒ®‚Ì DNS ‚Å‚Ìƒ`ƒFƒbƒN (RFC 4255)
+	// ãƒ›ã‚¹ãƒˆéµã® DNS ã§ã®ãƒã‚§ãƒƒã‚¯ (RFC 4255)
 	WritePrivateProfileString("TTSSH", "VerifyHostKeyDNS",
 	                          settings->VerifyHostKeyDNS ? "1" : "0", fileName);
 
-	// SSH ƒAƒCƒRƒ“
+	// SSH ã‚¢ã‚¤ã‚³ãƒ³
 	if (settings->IconID==IDI_SECURETT_YELLOW) {
 		WritePrivateProfileString("TTSSH", "SSHIcon", "yellow", fileName);
 	}
@@ -565,6 +570,9 @@ static void write_ssh_options(PTInstVar pvar, const wchar_t *fileName,
 
 	_itoa_s(settings->AuthBanner, buf, sizeof(buf), 10);
 	WritePrivateProfileString("TTSSH", "AuthBanner", buf, fileName);
+
+	_itoa_s(settings->MaxChannel, buf, sizeof(buf), 10);
+	WritePrivateProfileString("TTSSH", "MaxChannel", buf, fileName);
 
 #ifdef _DEBUG
 	WritePrivateProfileStringW(L"TTSSH", L"KexKeyLogFile", settings->KexKeyLogFile, fileName);
@@ -686,11 +694,11 @@ static int PASCAL TTXWSAAsyncSelect(SOCKET s, HWND hWnd, u_int wMsg,
 
 		if (pvar->NotificationWindow == NULL) {
 			pvar->NotificationWindow = hWnd;
-			// AUTH_advance_to_next_cred()‚ÌŒÄ‚Ño‚µ‚ğíœ‚·‚éB
-			// NotificationWindow‚Éƒnƒ“ƒhƒ‹‚Íİ’è‚µ‚Ä‚¨‚­‚ªA‚±‚Ìƒ^ƒCƒ~ƒ“ƒO‚Å‚Í
-			// ”FØƒ_ƒCƒAƒƒO‚ğo‚·‚Ì‚Í‘‚·‚¬‚½BProxy‚âNATŒo—R‚ÅƒT[ƒo‚ÉÚ‘±
-			// ‚Å‚«‚È‚¢ê‡A‚·‚Å‚ÉØ’fó‘Ô‚É‚àŠÖ‚í‚ç‚¸A”FØƒ_ƒCƒAƒƒO‚ª
-			// •\¦‚³‚ê‚½‚Ü‚Ü‚Æ‚È‚Á‚Ä‚¢‚½B
+			// AUTH_advance_to_next_cred()ã®å‘¼ã³å‡ºã—ã‚’å‰Šé™¤ã™ã‚‹ã€‚
+			// NotificationWindowã«ãƒãƒ³ãƒ‰ãƒ«ã¯è¨­å®šã—ã¦ãŠããŒã€ã“ã®ã‚¿ã‚¤ãƒŸãƒ³ã‚°ã§ã¯
+			// èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºã™ã®ã¯æ—©ã™ããŸã€‚Proxyã‚„NATçµŒç”±ã§ã‚µãƒ¼ãƒã«æ¥ç¶š
+			// ã§ããªã„å ´åˆã€ã™ã§ã«åˆ‡æ–­çŠ¶æ…‹ã«ã‚‚é–¢ã‚ã‚‰ãšã€èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãŒ
+			// è¡¨ç¤ºã•ã‚ŒãŸã¾ã¾ã¨ãªã£ã¦ã„ãŸã€‚
 		}
 	}
 
@@ -727,7 +735,7 @@ static int PASCAL TTXsend(SOCKET s, char const *buf, int len,
 
 void notify_established_secure_connection(PTInstVar pvar)
 {
-	// VT ƒEƒBƒ“ƒhƒE‚ÌƒAƒCƒRƒ“
+	// VT ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¢ã‚¤ã‚³ãƒ³
 	SetVTIconID(pvar->cv, hInst, pvar->settings.IconID);
 
 	logputs(LOG_LEVEL_VERBOSE, "Entering secure mode");
@@ -743,21 +751,21 @@ void notify_closed_connection(PTInstVar pvar, char *send_msg)
 	            pvar->socket, MAKELPARAM(FD_CLOSE, 0));
 }
 
-// non-fatal‚¨‚æ‚Ñfatal‚ÌƒGƒ‰[ƒƒbƒZ[ƒW‚ğŠo‚¦‚Ä‚¨‚­B
-// ˆê“xAŠo‚¦‚½ƒƒbƒZ[ƒW‚ª‚ ‚ê‚ÎA‰üs‚ğ‹²‚ñ‚Å’Ç‰Á‚µ‚Ä‚¢‚­B
+// non-fatalãŠã‚ˆã³fatalæ™‚ã®ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¦šãˆã¦ãŠãã€‚
+// ä¸€åº¦ã€è¦šãˆãŸãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒã‚ã‚Œã°ã€æ”¹è¡Œã‚’æŒŸã‚“ã§è¿½åŠ ã—ã¦ã„ãã€‚
 static void add_err_msg(PTInstVar pvar, char *msg)
 {
 	if (pvar->err_msg != NULL) {
 		int buf_len;
 		char *buf;
 
-		// ‚·‚Å‚É“¯‚¶ƒƒbƒZ[ƒW‚ª“o˜^Ï‚İ‚Ìê‡‚Í’Ç‰Á‚µ‚È‚¢B
+		// ã™ã§ã«åŒã˜ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒç™»éŒ²æ¸ˆã¿ã®å ´åˆã¯è¿½åŠ ã—ãªã„ã€‚
 		if (strstr(pvar->err_msg, msg))
 			return;
 
 		buf_len = strlen(pvar->err_msg) + 3 + strlen(msg);
 		buf = malloc(buf_len);
-		// ƒƒ‚ƒŠ‚ªŠm•Û‚Å‚«‚È‚¢ê‡‚Í‰½‚à‚µ‚È‚¢B
+		// ãƒ¡ãƒ¢ãƒªãŒç¢ºä¿ã§ããªã„å ´åˆã¯ä½•ã‚‚ã—ãªã„ã€‚
 		if (buf == NULL)
 			return;
 
@@ -767,7 +775,7 @@ static void add_err_msg(PTInstVar pvar, char *msg)
 		free(pvar->err_msg);
 		pvar->err_msg = buf;
 	} else {
-		// ƒƒ‚ƒŠ‚ªŠm•Û‚Å‚«‚È‚¢ê‡‚ÍA_strdup()‚ÍNULL‚ğ•Ô‚·B
+		// ãƒ¡ãƒ¢ãƒªãŒç¢ºä¿ã§ããªã„å ´åˆã¯ã€_strdup()ã¯NULLã‚’è¿”ã™ã€‚
 		pvar->err_msg = _strdup(msg);
 	}
 }
@@ -775,8 +783,8 @@ static void add_err_msg(PTInstVar pvar, char *msg)
 void notify_nonfatal_error(PTInstVar pvar, char *msg)
 {
 	if (!pvar->showing_err) {
-		// –¢Ú‘±‚Ìó‘Ô‚Å‚Í’Ê’mæƒEƒBƒ“ƒhƒE‚ª‚È‚¢‚Ì‚ÅAƒfƒXƒNƒgƒbƒv‚ğƒI[ƒi[‚Æ‚µ‚Ä
-		// ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚ğoŒ»‚³‚¹‚éB(2006.6.11 yutaka)
+		// æœªæ¥ç¶šã®çŠ¶æ…‹ã§ã¯é€šçŸ¥å…ˆã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒãªã„ã®ã§ã€ãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—ã‚’ã‚ªãƒ¼ãƒŠãƒ¼ã¨ã—ã¦
+		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒœãƒƒã‚¯ã‚¹ã‚’å‡ºç¾ã•ã›ã‚‹ã€‚(2006.6.11 yutaka)
 		if (pvar->NotificationWindow == NULL) {
 			UTIL_get_lang_msg("MSG_NONFATAL_ERROR", pvar,
 			                  "Tera Term: not fatal error");
@@ -876,11 +884,11 @@ static void format_line_hexdump(char *buf, int buflen, int addr, int *bytes, int
 
 	buf[0] = 0;
 
-	/* æ“ª‚ÌƒAƒhƒŒƒX•\¦ */
+	/* å…ˆé ­ã®ã‚¢ãƒ‰ãƒ¬ã‚¹è¡¨ç¤º */
 	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%08X : ", addr);
 	strncat_s(buf, buflen, tmp, _TRUNCATE);
 
-	/* ƒoƒCƒiƒŠ•\¦i4ƒoƒCƒg‚²‚Æ‚É‹ó”’‚ğ‘}“üj*/
+	/* ãƒã‚¤ãƒŠãƒªè¡¨ç¤ºï¼ˆ4ãƒã‚¤ãƒˆã”ã¨ã«ç©ºç™½ã‚’æŒ¿å…¥ï¼‰*/
 	for (i = 0; i < byte_cnt; i++) {
 		if (i > 0 && i % 4 == 0) {
 			strncat_s(buf, buflen, " ", _TRUNCATE);
@@ -890,11 +898,11 @@ static void format_line_hexdump(char *buf, int buflen, int addr, int *bytes, int
 		strncat_s(buf, buflen, tmp, _TRUNCATE);
 	}
 
-	/* ASCII•\¦•”•ª‚Ü‚Å‚Ì‹ó”’‚ğ•â‚¤ */
+	/* ASCIIè¡¨ç¤ºéƒ¨åˆ†ã¾ã§ã®ç©ºç™½ã‚’è£œã† */
 	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "   %*s%*s", (16 - byte_cnt) * 2 + 1, " ", (16 - byte_cnt + 3) / 4, " ");
 	strncat_s(buf, buflen, tmp, _TRUNCATE);
 
-	/* ASCII•\¦ */
+	/* ASCIIè¡¨ç¤º */
 	for (i = 0; i < byte_cnt; i++) {
 		c = bytes[i];
 		if (isprint(c)) {
@@ -957,7 +965,7 @@ void logprintf_hexdump(int level, const char *data, int len, const char *fmt, ..
 static void PASCAL TTXOpenTCP(TTXSockHooks *hooks)
 {
 	if (pvar->settings.Enabled) {
-		// TCPLocalEcho/TCPCRSend ‚ğ–³Œø‚É‚·‚é (maya 2007.4.25)
+		// TCPLocalEcho/TCPCRSend ã‚’ç„¡åŠ¹ã«ã™ã‚‹ (maya 2007.4.25)
 		pvar->origDisableTCPEchoCR = pvar->ts->DisableTCPEchoCR;
 		pvar->ts->DisableTCPEchoCR = TRUE;
 
@@ -990,38 +998,15 @@ static void PASCAL TTXOpenTCP(TTXSockHooks *hooks)
 		HOSTS_open(pvar);
 		FWDUI_open(pvar);
 
-		// Ú‘±’¼‘O‚Ì‚±‚±‚ÅAİ’è‚ğ myproposal ‚É”½‰f‚µ‚Ä‚¢‚é
-		//   ƒL[Äì¬‚Ì‚Æ‚«‚ÍA“¯‚¶ SSH2_update_kex_myproposal() ‚ğŒÄ‚Ño‚µ‚Ä
-		//   myproposal ‚©‚ç ",ext-info-c" ‚ğíœ‚µ‚Ä‚¢‚é
+		// æ¥ç¶šç›´å‰ã®ã“ã“ã§ã€è¨­å®šã‚’ myproposal ã«åæ˜ ã—ã¦ã„ã‚‹
+		//   ã‚­ãƒ¼å†ä½œæˆã®ã¨ãã¯ã€åŒã˜ SSH2_update_kex_myproposal() ã‚’å‘¼ã³å‡ºã—ã¦
+		//   myproposal ã‹ã‚‰ ",ext-info-c" ã‚’å‰Šé™¤ã—ã¦ã„ã‚‹
 		SSH2_update_kex_myproposal(pvar);
 		SSH2_update_host_key_myproposal(pvar);
 		SSH2_update_cipher_myproposal(pvar);
 		SSH2_update_hmac_myproposal(pvar);
 		SSH2_update_compression_myproposal(pvar);
 	}
-}
-
-static void PASCAL TTXCloseTCP(TTXSockHooks *hooks)
-{
-	if (pvar->session_settings.Enabled) {
-		pvar->socket = INVALID_SOCKET;
-
-		logputs(LOG_LEVEL_VERBOSE, "Terminating SSH session...");
-
-		// ”FØƒ_ƒCƒAƒƒO‚ªc‚Á‚Ä‚¢‚ê‚Î•Â‚¶‚éB
-		HOSTS_notify_closing_on_exit(pvar);
-		AUTH_notify_closing_on_exit(pvar);
-
-		*hooks->Precv = pvar->Precv;
-		*hooks->Psend = pvar->Psend;
-		*hooks->PWSAAsyncSelect = pvar->PWSAAsyncSelect;
-		*hooks->Pconnect = pvar->Pconnect;
-
-		pvar->ts->DisableTCPEchoCR = pvar->origDisableTCPEchoCR;
-	}
-
-	uninit_TTSSH(pvar);
-	init_TTSSH(pvar);
 }
 
 static void enable_dlg_items(HWND dlg, int from, int to, BOOL enabled)
@@ -1052,14 +1037,14 @@ static void SetHostDropdown(HWND dlg, const TTTSet *ts)
 	ExpandCBWidth(dlg, IDC_HOSTNAME);
 	SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
 	if (SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) != 0) {
-		// ˆê”ÔÅ‰‚ğ‘I‘ğ‚·‚é
+		// ä¸€ç•ªæœ€åˆã‚’é¸æŠã™ã‚‹
 		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
 	} else {
-		// ‘I‘ğ‚µ‚È‚¢AƒGƒfƒBƒbƒgƒ{ƒbƒNƒX‚Í‹ó‚É‚È‚é
+		// é¸æŠã—ãªã„ã€ã‚¨ãƒ‡ã‚£ãƒƒãƒˆãƒœãƒƒã‚¯ã‚¹ã¯ç©ºã«ãªã‚‹
 		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
 	}
 
-	// Edit history‚ğ’Ç‰Á(ITEMDATA=999)
+	// Edit historyã‚’è¿½åŠ (ITEMDATA=999)
 	index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING, 0, (LPARAM)L"<Edit host list...>");
 	SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
 }
@@ -1072,17 +1057,17 @@ static void OpenEditHistory(HWND dlg, TTTSet *ts)
 	data.vtwin = pvar->cv->HWin;
 	data.title = L"Edit Host list";
 	if (EditHistoryDlg(NULL, dlg, &data)) {
-		// •ÒW‚³‚ê‚½‚Ì‚ÅAƒhƒƒbƒvƒ_ƒEƒ“‚ğÄİ’è‚·‚é
+		// ç·¨é›†ã•ã‚ŒãŸã®ã§ã€ãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ã‚’å†è¨­å®šã™ã‚‹
 		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_RESETCONTENT, 0, 0);
 
 		SetHostDropdown(dlg, ts);
 	}
 
 	if (SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) > 1) {
-		// ˆê”ÔÅ‰‚ğ‘I‘ğ‚·‚é
+		// ä¸€ç•ªæœ€åˆã‚’é¸æŠã™ã‚‹
 		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
 	} else {
-		// "<Edit History...>‚Ì‚İA‘I‘ğ‚µ‚È‚¢AƒGƒfƒBƒbƒgƒ{ƒbƒNƒX‚Í‹ó‚É‚È‚é
+		// "<Edit History...>ã®ã¿ã€é¸æŠã—ãªã„ã€ã‚¨ãƒ‡ã‚£ãƒƒãƒˆãƒœãƒƒã‚¯ã‚¹ã¯ç©ºã«ãªã‚‹
 		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
 	}
 }
@@ -1125,20 +1110,20 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 
 		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
-		// ƒzƒXƒgƒqƒXƒgƒŠ‚Ìƒ`ƒFƒbƒNƒ{ƒbƒNƒX‚ğ’Ç‰Á (2005.10.21 yutaka)
+		// ãƒ›ã‚¹ãƒˆãƒ’ã‚¹ãƒˆãƒªã®ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã‚’è¿½åŠ  (2005.10.21 yutaka)
 		if (pvar->ts->HistoryList > 0) {
 			SendMessage(GetDlgItem(dlg, IDC_HISTORY), BM_SETCHECK, BST_CHECKED, 0);
 		} else {
 			SendMessage(GetDlgItem(dlg, IDC_HISTORY), BM_SETCHECK, BST_UNCHECKED, 0);
 		}
 
-		// ƒtƒ@ƒCƒ‹‚¨‚æ‚Ñ–¼‘O•t‚«ƒpƒCƒv‚Ìê‡ATCP/IPˆµ‚¢‚Æ‚·‚éB
+		// ãƒ•ã‚¡ã‚¤ãƒ«ãŠã‚ˆã³åå‰ä»˜ããƒ‘ã‚¤ãƒ—ã®å ´åˆã€TCP/IPæ‰±ã„ã¨ã™ã‚‹ã€‚
 		if (GetHNRec->PortType == IdFile ||
 			GetHNRec->PortType == IdNamedPipe
 			)
 			GetHNRec->PortType = IdTCPIP;
 
-		// ƒzƒXƒg (ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“)
+		// ãƒ›ã‚¹ãƒˆ (ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³)
 		SetHostDropdown(dlg, pvar->ts);
 		SetEditboxEmacsKeybind(dlg, IDC_HOSTNAME);
 
@@ -1182,12 +1167,12 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			wchar_t *EntNameW;
 			int index;
 
-			// MaxComPort ‚ğ‰z‚¦‚éƒ|[ƒg‚Í•\¦‚µ‚È‚¢
+			// MaxComPort ã‚’è¶Šãˆã‚‹ãƒãƒ¼ãƒˆã¯è¡¨ç¤ºã—ãªã„
 			if (GetHNRec->MaxComPort >= 0 && i > GetHNRec->MaxComPort) {
 				continue;
 			}
 
-			// g—p’†‚Ìƒ|[ƒg‚Í•\¦‚µ‚È‚¢
+			// ä½¿ç”¨ä¸­ã®ãƒãƒ¼ãƒˆã¯è¡¨ç¤ºã—ãªã„
 			if (CheckCOMFlag(p->port_no) == 1) {
 				continue;
 			}
@@ -1208,7 +1193,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 			free(EntNameW);
 		}
 		if (j > 0) {
-			// GetHNRec->ComPort ‚ğ‘I‘ğ‚·‚é
+			// GetHNRec->ComPort ã‚’é¸æŠã™ã‚‹
 			SendDlgItemMessageA(dlg, IDC_HOSTCOM, CB_SETCURSEL, com_index - 1, 0);
 		} else {					/* All com ports are already used */
 			GetHNRec->PortType = IdTCPIP;
@@ -1241,7 +1226,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 		}
 		CenterWindow(dlg, GetParent(dlg));
 
-		// TRUE‚ğ•Ô‚·‚ÆAƒtƒH[ƒJƒX‚ªˆÚ“®‚µ‚Ä‚µ‚Ü‚¤
+		// TRUEã‚’è¿”ã™ã¨ã€ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ãŒç§»å‹•ã—ã¦ã—ã¾ã†
 		return FALSE;
 		//return TRUE;
 	}
@@ -1257,7 +1242,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 				BOOL Ok;
 				i = GetDlgItemInt(dlg, IDC_HOSTTCPPORT, &Ok, FALSE);
 				if (!Ok) {
-					// TODO IDC_HOSTTCPPORT‚Í”’l‚µ‚©“ü—Í‚Å‚«‚È‚¢A•s—v?
+					// TODO IDC_HOSTTCPPORTã¯æ•°å€¤ã—ã‹å…¥åŠ›ã§ããªã„ã€ä¸è¦?
 					static const TTMessageBoxInfoW info = {
 						"TTSSH",
 						NULL, L"Tera Term",
@@ -1375,8 +1360,8 @@ hostssh_enabled:
 				break;
 			case CBN_SELENDOK:
 				if (dlg_data->HostDropOpen) {
-					//	ƒhƒƒbƒvƒ_ƒEƒ“‚µ‚Ä‚¢‚È‚¢‚Æ‚«‚ÍAƒL[‚©ƒzƒC[ƒ‹‚Å‘I‘ğ‚µ‚Ä‚¢‚é
-					//	Œˆ’è(Enter or OK‰Ÿ‰º)‚·‚é‚Æ•ÒWŠJn
+					//	ãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ã—ã¦ã„ãªã„ã¨ãã¯ã€ã‚­ãƒ¼ã‹ãƒ›ã‚¤ãƒ¼ãƒ«ã§é¸æŠã—ã¦ã„ã‚‹
+					//	æ±ºå®š(Enter or OKæŠ¼ä¸‹)ã™ã‚‹ã¨ç·¨é›†é–‹å§‹
 					if(IsEditHistorySelected(dlg)) {
 						OpenEditHistory(dlg, pvar->ts);
 					}
@@ -1446,8 +1431,8 @@ static void read_ssh_options_from_user_file(PTInstVar pvar,
 	FWDUI_load_settings(pvar);
 }
 
-// Percent-encode‚³‚ê‚½•¶š—ñsrc‚ğƒfƒR[ƒh‚µ‚Ädst‚ÉƒRƒs[‚·‚éB
-// dstlen‚Ídst‚ÌƒTƒCƒYB‚±‚ê‚æ‚èŒ‹‰Ê‚ª’·‚¢ê‡A‚»‚Ì•ª‚ÍØ‚èÌ‚Ä‚ç‚ê‚éB
+// Percent-encodeã•ã‚ŒãŸæ–‡å­—åˆ—srcã‚’ãƒ‡ã‚³ãƒ¼ãƒ‰ã—ã¦dstã«ã‚³ãƒ”ãƒ¼ã™ã‚‹ã€‚
+// dstlenã¯dstã®ã‚µã‚¤ã‚ºã€‚ã“ã‚Œã‚ˆã‚ŠçµæœãŒé•·ã„å ´åˆã€ãã®åˆ†ã¯åˆ‡ã‚Šæ¨ã¦ã‚‰ã‚Œã‚‹ã€‚
 static void percent_decode(char *dst, int dstlen, const wchar_t *src) {
 	if (src == NULL || dst == NULL || dstlen < 1) {
 		return;
@@ -1521,11 +1506,11 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 					action = OPTION_CLEAR;
 				}
 
-			// ttermpro.exe ‚Ì /F= w’è‚Å‚à TTSSH ‚Ìİ’è‚ğ“Ç‚Ş (2006.10.11 maya)
+			// ttermpro.exe ã® /F= æŒ‡å®šã§ã‚‚ TTSSH ã®è¨­å®šã‚’èª­ã‚€ (2006.10.11 maya)
 			} else if (_wcsnicmp(option + 1, L"f=", 2) == 0) {
 				const wchar_t *file = option + 3;
 				read_ssh_options_from_user_file(pvar, file);
-				// Tera Term‘¤‚Å‚à‰ğß‚·‚é•K—v‚ª‚ ‚é‚Ì‚ÅÁ‚³‚È‚¢
+				// Tera Termå´ã§ã‚‚è§£é‡ˆã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã®ã§æ¶ˆã•ãªã„
 			}
 		}
 
@@ -1641,7 +1626,7 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 				} else if (wcscmp(option + 4, L"-N") == 0) {
 					pvar->nosession = TRUE;
 
-				// /ssh1 ‚Æ /ssh2 ƒIƒvƒVƒ‡ƒ“‚ÌV‹K’Ç‰Á (2006.9.16 maya)
+				// /ssh1 ã¨ /ssh2 ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã®æ–°è¦è¿½åŠ  (2006.9.16 maya)
 				} else if (wcscmp(option + 4, L"1") == 0) {
 					pvar->settings.Enabled = 1;
 					pvar->settings.ssh_protocol_version = 1;
@@ -1659,17 +1644,17 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 					TTMessageBoxW(NULL, &info, pvar->ts->UILanguageFileW, option);
 				}
 
-			// ttermpro.exe ‚Ì /T= w’è‚Ì—¬—p‚È‚Ì‚ÅA‘å•¶š‚à‹–‚· (2006.10.19 maya)
+			// ttermpro.exe ã® /T= æŒ‡å®šã®æµç”¨ãªã®ã§ã€å¤§æ–‡å­—ã‚‚è¨±ã™ (2006.10.19 maya)
 			} else if (_wcsnicmp(option + 1, L"t=", 2) == 0) {
 				if (wcscmp(option + 3, L"2") == 0) {
 					pvar->settings.Enabled = 1;
-					// /t=2‚Íttssh‘¤‚Å‚ÌŠg’£‚È‚Ì‚ÅÁ‚·
+					// /t=2ã¯ttsshå´ã§ã®æ‹¡å¼µãªã®ã§æ¶ˆã™
 				} else {
 					pvar->settings.Enabled = 0;
-					action = OPTION_NONE;	// Tera Term‘¤‚Å‰ğß‚·‚é‚Ì‚ÅÁ‚³‚È‚¢
+					action = OPTION_NONE;	// Tera Termå´ã§è§£é‡ˆã™ã‚‹ã®ã§æ¶ˆã•ãªã„
 				}
 
-			// /1 ‚¨‚æ‚Ñ /2 ƒIƒvƒVƒ‡ƒ“‚ÌV‹K’Ç‰Á (2004.10.3 yutaka)
+			// /1 ãŠã‚ˆã³ /2 ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã®æ–°è¦è¿½åŠ  (2004.10.3 yutaka)
 			} else if (wcscmp(option + 1, L"1") == 0) {
 				// command line: /ssh /1 is SSH1 only
 				pvar->settings.ssh_protocol_version = 1;
@@ -1679,47 +1664,47 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 				pvar->settings.ssh_protocol_version = 2;
 
 			} else if (wcscmp(option + 1, L"nossh") == 0) {
-				// '/nossh' ƒIƒvƒVƒ‡ƒ“‚Ì’Ç‰ÁB
-				// TERATERM.INI ‚ÅSSH‚ª—LŒø‚É‚È‚Á‚Ä‚¢‚éê‡A‚¤‚Ü‚­Cygterm‚ª‹N“®‚µ‚È‚¢‚±‚Æ‚ª
-				// ‚ ‚é‚±‚Æ‚Ö‚Ì‘ÎˆB(2004.10.11 yutaka)
+				// '/nossh' ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã®è¿½åŠ ã€‚
+				// TERATERM.INI ã§SSHãŒæœ‰åŠ¹ã«ãªã£ã¦ã„ã‚‹å ´åˆã€ã†ã¾ãCygtermãŒèµ·å‹•ã—ãªã„ã“ã¨ãŒ
+				// ã‚ã‚‹ã“ã¨ã¸ã®å¯¾å‡¦ã€‚(2004.10.11 yutaka)
 				pvar->settings.Enabled = 0;
 
 			} else if (wcscmp(option + 1, L"telnet") == 0) {
-				// '/telnet' ‚ªw’è‚³‚ê‚Ä‚¢‚é‚Æ‚«‚É‚Í '/nossh' ‚Æ“¯‚¶‚­
-				// SSH‚ğ–³Œø‚É‚·‚é (2006.9.16 maya)
+				// '/telnet' ãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹ã¨ãã«ã¯ '/nossh' ã¨åŒã˜ã
+				// SSHã‚’ç„¡åŠ¹ã«ã™ã‚‹ (2006.9.16 maya)
 				pvar->settings.Enabled = 0;
-				// Tera Term ‚Ì Telnet ƒtƒ‰ƒO‚à•t‚¯‚é
+				// Tera Term ã® Telnet ãƒ•ãƒ©ã‚°ã‚‚ä»˜ã‘ã‚‹
 				pvar->ts->Telnet = 1;
 
 			} else if (wcsncmp(option + 1, L"auth=", 5) == 0) {
-				// SSH2©“®ƒƒOƒCƒ“ƒIƒvƒVƒ‡ƒ“‚Ì’Ç‰Á
+				// SSH2è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã®è¿½åŠ 
 				//
-				// SYNOPSIS: /ssh /auth=passowrd /user=ƒ†[ƒU–¼ /passwd=ƒpƒXƒ[ƒh
-				//           /ssh /auth=publickey /user=ƒ†[ƒU–¼ /passwd=ƒpƒXƒ[ƒh /keyfile=ƒpƒX
-				// EXAMPLE: /ssh /auth=password /user=nike /passwd="a b""c"  ; ƒpƒXƒ[ƒh: ua b"cv
+				// SYNOPSIS: /ssh /auth=passowrd /user=ãƒ¦ãƒ¼ã‚¶å /passwd=ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
+				//           /ssh /auth=publickey /user=ãƒ¦ãƒ¼ã‚¶å /passwd=ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ /keyfile=ãƒ‘ã‚¹
+				// EXAMPLE: /ssh /auth=password /user=nike /passwd="a b""c"  ; ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰: ã€Œa b"cã€
 				//          /ssh /auth=publickey /user=foo /passwd=bar /keyfile=d:\tmp\id_rsa
-				// NOTICE: ƒpƒXƒ[ƒh‚âƒpƒX‚É‹ó”’‚âƒZƒ~ƒRƒƒ“‚ªŠÜ‚Ü‚ê‚éê‡‚Íƒ_ƒuƒ‹ƒNƒH[ƒg " ‚ÅˆÍ‚Ş
-				//         ƒpƒXƒ[ƒh‚Éƒ_ƒuƒ‹ƒNƒH[ƒg‚ªŠÜ‚Ü‚ê‚éê‡‚Í˜A‘±‚µ‚½ƒ_ƒuƒ‹ƒNƒH[ƒg "" ‚É’u‚«Š·‚¦‚é
+				// NOTICE: ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚„ãƒ‘ã‚¹ã«ç©ºç™½ã‚„ã‚»ãƒŸã‚³ãƒ­ãƒ³ãŒå«ã¾ã‚Œã‚‹å ´åˆã¯ãƒ€ãƒ–ãƒ«ã‚¯ã‚©ãƒ¼ãƒˆ " ã§å›²ã‚€
+				//         ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã«ãƒ€ãƒ–ãƒ«ã‚¯ã‚©ãƒ¼ãƒˆãŒå«ã¾ã‚Œã‚‹å ´åˆã¯é€£ç¶šã—ãŸãƒ€ãƒ–ãƒ«ã‚¯ã‚©ãƒ¼ãƒˆ "" ã«ç½®ãæ›ãˆã‚‹
 				//
 				pvar->ssh2_autologin = 1; // for SSH2 (2004.11.30 yutaka)
 
-				if (_wcsicmp(option + 6, L"password") == 0) { // ƒpƒXƒ[ƒh
+				if (_wcsicmp(option + 6, L"password") == 0) { // ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_PASSWORD;
 					pvar->ssh2_authmethod = SSH_AUTH_PASSWORD;
 
-				} else if (_wcsicmp(option + 6, L"keyboard-interactive") == 0) { // keyboard-interactive”FØ
+				} else if (_wcsicmp(option + 6, L"keyboard-interactive") == 0) { // keyboard-interactiveèªè¨¼
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_TIS;
 					pvar->ssh2_authmethod = SSH_AUTH_TIS;
 
-				} else if (_wcsicmp(option + 6, L"challenge") == 0) { // keyboard-interactive”FØ
+				} else if (_wcsicmp(option + 6, L"challenge") == 0) { // keyboard-interactiveèªè¨¼
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_TIS;
 					pvar->ssh2_authmethod = SSH_AUTH_TIS;
 
-				} else if (_wcsicmp(option + 6, L"publickey") == 0) { // ŒöŠJŒ®”FØ
+				} else if (_wcsicmp(option + 6, L"publickey") == 0) { // å…¬é–‹éµèªè¨¼
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_RSA;
 					pvar->ssh2_authmethod = SSH_AUTH_RSA;
 
-				} else if (_wcsicmp(option + 6, L"pageant") == 0) { // ŒöŠJŒ®”FØ by Pageant
+				} else if (_wcsicmp(option + 6, L"pageant") == 0) { // å…¬é–‹éµèªè¨¼ by Pageant
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_RSA;
 					pvar->ssh2_authmethod = SSH_AUTH_PAGEANT;
 
@@ -1738,22 +1723,22 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 				wcsncpy(pvar->ssh2_keyfile, keyfileW, _countof(pvar->ssh2_keyfile));
 
 			} else if (wcscmp(option + 1, L"ask4passwd") == 0) {
-				// ƒpƒXƒ[ƒh‚ğ•·‚­ (2006.9.18 maya)
+				// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’èã (2006.9.18 maya)
 				pvar->ask4passwd = 1;
 
 			} else if (wcscmp(option + 1, L"nosecuritywarning") == 0) {
-				// known_hostsƒ`ƒFƒbƒN‚ğ‚µ‚È‚¢B“–ŠYƒIƒvƒVƒ‡ƒ“‚ğg‚¤‚ÆAƒZƒLƒ…ƒŠƒeƒB«‚ª’á‰º‚·‚é
-				// ‚½‚ßA‰B‚µƒIƒvƒVƒ‡ƒ“ˆµ‚¢‚Æ‚·‚éB
+				// known_hostsãƒã‚§ãƒƒã‚¯ã‚’ã—ãªã„ã€‚å½“è©²ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’ä½¿ã†ã¨ã€ã‚»ã‚­ãƒ¥ãƒªãƒ†ã‚£æ€§ãŒä½ä¸‹ã™ã‚‹
+				// ãŸã‚ã€éš ã—ã‚ªãƒ—ã‚·ãƒ§ãƒ³æ‰±ã„ã¨ã™ã‚‹ã€‚
 				// (2009.10.4 yutaka)
 				pvar->nocheck_known_hosts = TRUE;
 
 			}
 			else {	// Other (not ttssh) option
-				action = OPTION_NONE;	// ttssh‚ÌƒIƒvƒVƒ‡ƒ“‚Å‚Í‚È‚¢‚Ì‚ÅÁ‚³‚È‚¢
+				action = OPTION_NONE;	// ttsshã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã§ã¯ãªã„ã®ã§æ¶ˆã•ãªã„
 			}
 
-			// ƒpƒXƒ[ƒh‚ğ•·‚­ê‡‚Í©“®ƒƒOƒCƒ“‚ª–³Œø‚É‚È‚é
-			// /auth ‚Í”FØƒƒ\ƒbƒh‚Ìw’è‚Æ‚µ‚Ä‚Í—˜—p‚³‚ê‚é (2006.9.18 maya)
+			// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’èãå ´åˆã¯è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ãŒç„¡åŠ¹ã«ãªã‚‹
+			// /auth ã¯èªè¨¼ãƒ¡ã‚½ãƒƒãƒ‰ã®æŒ‡å®šã¨ã—ã¦ã¯åˆ©ç”¨ã•ã‚Œã‚‹ (2006.9.18 maya)
 			if (pvar->ask4passwd == 1) {
 				pvar->ssh2_autologin = 0;
 			}
@@ -1766,10 +1751,10 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 		         (_wcsnicmp(option, L"slogin1://", 10) == 0) ||
 		         (_wcsnicmp(option, L"slogin2://", 10) == 0)) {
 			//
-			// ssh://user@host/ “™‚ÌURLŒ`®‚ÌƒTƒ|[ƒg
-			// Šî–{“I‚È‘®‚Í telnet:// URL‚É‡‚¸‚é
+			// ssh://user@host/ ç­‰ã®URLå½¢å¼ã®ã‚µãƒãƒ¼ãƒˆ
+			// åŸºæœ¬çš„ãªæ›¸å¼ã¯ telnet:// URLã«é †ãšã‚‹
 			//
-			// Ql:
+			// å‚è€ƒ:
 			//   RFC3986: Uniform Resource Identifier (URI): Generic Syntax
 			//   RFC4248: The telnet URI Scheme
 			//
@@ -1778,7 +1763,7 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 
 			optlen = wcslen(option);
 
-			// Å‰‚Ì':'‚Ì‘O‚Ì•¶š‚ª”š‚¾‚Á‚½ê‡A‚»‚ê‚ğsshƒvƒƒgƒRƒ‹ƒo[ƒWƒ‡ƒ“‚Æ‚İ‚È‚·
+			// æœ€åˆã®':'ã®å‰ã®æ–‡å­—ãŒæ•°å­—ã ã£ãŸå ´åˆã€ãã‚Œã‚’sshãƒ—ãƒ­ãƒˆã‚³ãƒ«ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã¨ã¿ãªã™
 			p = wcschr(option, ':');
 			switch (*(p-1)) {
 			case '1':
@@ -1789,41 +1774,41 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 				break;
 			}
 
-			// authority part ‚Ü‚Åƒ|ƒCƒ“ƒ^‚ğˆÚ“®
+			// authority part ã¾ã§ãƒã‚¤ãƒ³ã‚¿ã‚’ç§»å‹•
 			p += 3;
 
-			// path part ‚ğØ‚èÌ‚Ä‚é
+			// path part ã‚’åˆ‡ã‚Šæ¨ã¦ã‚‹
 			if ((p2 = wcschr(p, '/')) != NULL) {
 				*p2 = 0;
 			}
 
-			// '@'‚ª‚ ‚Á‚½ê‡A‚»‚ê‚æ‚è‘O‚Íƒ†[ƒUî•ñ
+			// '@'ãŒã‚ã£ãŸå ´åˆã€ãã‚Œã‚ˆã‚Šå‰ã¯ãƒ¦ãƒ¼ã‚¶æƒ…å ±
 			if ((p2 = wcschr(p, '@')) != NULL) {
 				*p2 = 0;
-				// ':'ˆÈ~‚ÍƒpƒXƒ[ƒh
+				// ':'ä»¥é™ã¯ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
 				if ((p3 = wcschr(p, ':')) != NULL) {
 					*p3 = 0;
 					percent_decode(pvar->ssh2_password, sizeof(pvar->ssh2_password), p3 + 1);
 				}
 				percent_decode(pvar->ssh2_username, sizeof(pvar->ssh2_username), p);
-				// p ‚ª host part ‚Ìæ“ª('@'‚ÌŸ‚Ì•¶š)‚ğ·‚·‚æ‚¤‚É‚·‚é
+				// p ãŒ host part ã®å…ˆé ­('@'ã®æ¬¡ã®æ–‡å­—)ã‚’å·®ã™ã‚ˆã†ã«ã™ã‚‹
 				p = p2 + 1;
 			}
 
-			// host part ‚ğ option ‚Ìæ“ª‚ÉˆÚ“®‚µ‚ÄAscheme part ‚ğ’×‚·
-			// portw’è‚ª–³‚©‚Á‚½‚Éport”Ô†‚ğ‘«‚·‚½‚ß‚Ì—ÌˆæŠm•Û‚ÌˆÓ–¡‚à‚ ‚é
+			// host part ã‚’ option ã®å…ˆé ­ã«ç§»å‹•ã—ã¦ã€scheme part ã‚’æ½°ã™
+			// portæŒ‡å®šãŒç„¡ã‹ã£ãŸæ™‚ã«portç•ªå·ã‚’è¶³ã™ãŸã‚ã®é ˜åŸŸç¢ºä¿ã®æ„å‘³ã‚‚ã‚ã‚‹
 			hostlen = wcslen(p);
 			wmemmove_s(option, optlen, p, hostlen);
 			option[hostlen] = 0;
 
-			// ƒ|[ƒgw’è‚ª–³‚¢‚Í":22"‚ğ‘«‚·
+			// ãƒãƒ¼ãƒˆæŒ‡å®šãŒç„¡ã„æ™‚ã¯":22"ã‚’è¶³ã™
 			if (option[0] == '[' && option[hostlen-1] == ']' ||     // IPv6 raw address without port
 			    option[0] != '[' && wcschr(option, ':') == NULL) { // hostname or IPv4 raw address without port
 				wmemcpy_s(option+hostlen, optlen-hostlen, L":22", 3);
 				hostlen += 3;
 			}
 
-			// ƒ|[ƒgw’è‚æ‚èŒã‚ğ‚·‚×‚ÄƒXƒy[ƒX‚Å’×‚·
+			// ãƒãƒ¼ãƒˆæŒ‡å®šã‚ˆã‚Šå¾Œã‚’ã™ã¹ã¦ã‚¹ãƒšãƒ¼ã‚¹ã§æ½°ã™
 			wmemset(option+hostlen, ' ', optlen-hostlen);
 
 			pvar->settings.Enabled = 1;
@@ -1832,11 +1817,11 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 		}
 		else if (wcschr(option, '@') != NULL) {
 			//
-			// user@host Œ`®‚ÌƒTƒ|[ƒg
-			//   æ‚è‡‚¦‚¸ssh‚Å‚Ì‚İƒTƒ|[ƒg‚Ìˆ×Aƒ†[ƒU–¼‚Íttssh“à‚Å’×‚·B
-			//   (sshÚ‘±ˆÈŠO --  ttssh‚É‚ÍŠÖŒW‚È‚¢ê‡‚Å‚à)
-			//   «—ˆ“I‚Ételnet authentication option‚ğƒTƒ|[ƒg‚µ‚½‚Í
-			//   Tera Term–{‘Ì‚Åˆ—‚·‚é‚æ‚¤‚É‚·‚é—\’èB
+			// user@host å½¢å¼ã®ã‚µãƒãƒ¼ãƒˆ
+			//   å–ã‚Šåˆãˆãšsshã§ã®ã¿ã‚µãƒãƒ¼ãƒˆã®ç‚ºã€ãƒ¦ãƒ¼ã‚¶åã¯ttsshå†…ã§æ½°ã™ã€‚
+			//   (sshæ¥ç¶šä»¥å¤– --  ttsshã«ã¯é–¢ä¿‚ãªã„å ´åˆã§ã‚‚)
+			//   å°†æ¥çš„ã«telnet authentication optionã‚’ã‚µãƒãƒ¼ãƒˆã—ãŸæ™‚ã¯
+			//   Tera Termæœ¬ä½“ã§å‡¦ç†ã™ã‚‹ã‚ˆã†ã«ã™ã‚‹äºˆå®šã€‚
 			//
 			char *optionA;
 			wchar_t *p;
@@ -1847,9 +1832,9 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 			strncpy_s(pvar->ssh2_username, sizeof(pvar->ssh2_username), optionA, _TRUNCATE);
 			free(optionA);
 
-			// ƒ†[ƒU–¼•”•ª‚ğƒXƒy[ƒX‚Å’×‚·B
-			// Œã‘±‚ÌTTX‚âTera Term–{‘Ì‚Å‰ğß‚·‚é‚É‚ÍƒXƒy[ƒX‚ğ“Ç‚İ”ò‚Î‚·‚Ì‚ÅA
-			// ƒzƒXƒg–¼‚ğæ“ª‚É‹l‚ß‚é•K—v‚Í–³‚¢B
+			// ãƒ¦ãƒ¼ã‚¶åéƒ¨åˆ†ã‚’ã‚¹ãƒšãƒ¼ã‚¹ã§æ½°ã™ã€‚
+			// å¾Œç¶šã®TTXã‚„Tera Termæœ¬ä½“ã§è§£é‡ˆã™ã‚‹æ™‚ã«ã¯ã‚¹ãƒšãƒ¼ã‚¹ã‚’èª­ã¿é£›ã°ã™ã®ã§ã€
+			// ãƒ›ã‚¹ãƒˆåã‚’å…ˆé ­ã«è©°ã‚ã‚‹å¿…è¦ã¯ç„¡ã„ã€‚
 			wmemset(option, ' ', p-option+1);
 
 			action = OPTION_REPLACE;
@@ -1941,7 +1926,7 @@ static void PASCAL TTXModifyMenu(HMENU menu)
 		{ ID_SSHKEYGENMENU, "MENU_SSH_KEYGEN" },
 		{ ID_SSHSCPMENU, "MENU_SSH_SCP" },
 	};
-	// teraterm‚Ìƒƒjƒ…[ID(tt_res.h)
+	// teratermã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼ID(tt_res.h)
 	const UINT ID_FILE_NEWCONNECTION = 50110;
 	const UINT ID_HELP_ABOUT = 50990;
 	const UINT ID_SETUP_TCPIP = 50360;
@@ -1978,7 +1963,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 	char buf[1024], buf2[2048];
 	char *fp = NULL;
 
-	// TTSSHƒ_ƒCƒAƒƒO‚É•\¦‚·‚éSSH‚ÉŠÖ‚·‚éî•ñ (2004.10.30 yutaka)
+	// TTSSHãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«è¡¨ç¤ºã™ã‚‹SSHã«é–¢ã™ã‚‹æƒ…å ± (2004.10.30 yutaka)
 	if (pvar->socket != INVALID_SOCKET) {
 		buf2[0] = '\0';
 
@@ -2036,7 +2021,8 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			UTIL_get_lang_msgU8("DLG_ABOUT_CLIENTID", pvar, "Client ID:");
 			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), pvar->client_version_string, _TRUNCATE);
+			SSH_get_client_ID_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_PROTOCOL", pvar, "Using protocol:");
@@ -2049,13 +2035,13 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			UTIL_get_lang_msgU8("DLG_ABOUT_KEX", pvar, "Key exchange algorithm:");
 			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), get_kex_algorithm_name(pvar->kex_type), _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), get_kex_algorithm_name(pvar->kex->kex_type), _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_HOSTKEY", pvar, "Host Key:");
 			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), get_ssh2_hostkey_algorithm_name(pvar->hostkey_type), _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), get_ssh2_hostkey_algorithm_name(pvar->kex->hostkey_type), _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 			UTIL_get_lang_msgU8("DLG_ABOUT_ENCRYPTION", pvar, "Encryption:");
@@ -2072,7 +2058,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
-			if (pvar->ctos_compression == COMP_DELAYED) { // ’x‰„ƒpƒPƒbƒgˆ³k‚Ìê‡ (2006.6.23 yutaka)
+			if (pvar->kex->ctos_compression == COMP_DELAYED) { // é…å»¶ãƒ‘ã‚±ãƒƒãƒˆåœ§ç¸®ã®å ´åˆ (2006.6.23 yutaka)
 				UTIL_get_lang_msgU8("DLG_ABOUT_COMPDELAY", pvar, "Delayed Compression:");
 			}
 			else {
@@ -2084,10 +2070,10 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
-			UTIL_get_lang_msgU8("DLG_ABOUT_KEXKEY", pvar, "Key exchange keys:");
+			UTIL_get_lang_msgU8("DLG_ABOUT_KEXPARAM", pvar, "Key exchange param:");
 			strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			CRYPT_get_server_key_info(pvar, buf, sizeof(buf));
+			CRYPT_get_kex_param_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
@@ -2099,7 +2085,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 		}
 
-		// ƒzƒXƒgŒöŠJŒ®‚Ìfingerprint‚ğ•\¦‚·‚éB
+		// ãƒ›ã‚¹ãƒˆå…¬é–‹éµã®fingerprintã‚’è¡¨ç¤ºã™ã‚‹ã€‚
 		// (2014.5.1 yutaka)
 		UTIL_get_lang_msgU8("DLG_ABOUT_FINGERPRINT", pvar, "Host key's fingerprint:");
 		strncat_s(buf2, sizeof(buf2), pvar->UIMsg, _TRUNCATE);
@@ -2147,7 +2133,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 	};
 	SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
-	// TTSSH‚Ìƒo[ƒWƒ‡ƒ“‚ğİ’è‚·‚é (2005.2.28 yutaka)
+	// TTSSHã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’è¨­å®šã™ã‚‹ (2005.2.28 yutaka)
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d.%d ",
 	            TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR,  TTSSH_VERSION_PATCH);
@@ -2160,12 +2146,12 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 			  "\r\nCompatible with SSH protocol version 1.5 and 2.0", _TRUNCATE);
 	SetDlgItemTextA(dlg, IDC_TTSSH_VERSION, buf);
 
-	// OpenSSL‚Ìƒo[ƒWƒ‡ƒ“‚ğİ’è‚·‚é (2005.1.24 yutaka)
-	// ğŒ•¶’Ç‰Á (2005.5.11 yutaka)
-	// OPENSSL_VERSION_TEXT ƒ}ƒNƒ’è‹`‚Å‚Í‚È‚­AŠÖ”‚ğg‚Á‚Äƒo[ƒWƒ‡ƒ“‚ğæ“¾‚·‚éB(2013.11.24 yutaka)
+	// OpenSSLã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’è¨­å®šã™ã‚‹ (2005.1.24 yutaka)
+	// æ¡ä»¶æ–‡è¿½åŠ  (2005.5.11 yutaka)
+	// OPENSSL_VERSION_TEXT ãƒã‚¯ãƒ­å®šç¾©ã§ã¯ãªãã€é–¢æ•°ã‚’ä½¿ã£ã¦ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’å–å¾—ã™ã‚‹ã€‚(2013.11.24 yutaka)
 	SetDlgItemTextA(dlg, IDC_OPENSSL_VERSION, SSLeay_version(SSLEAY_VERSION));
 
-	// zlib‚Ìƒo[ƒWƒ‡ƒ“‚ğİ’è‚·‚é (2005.5.11 yutaka)
+	// zlibã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’è¨­å®šã™ã‚‹ (2005.5.11 yutaka)
 #ifdef ZLIB_VERSION
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "zlib %s", ZLIB_VERSION);
 #else
@@ -2173,12 +2159,12 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 #endif
 	SetDlgItemTextA(dlg, IDC_ZLIB_VERSION, buf);
 
-	// ssh agent client ‚Ìí—Ş‚Æƒo[ƒWƒ‡ƒ“‚ğ•\¦
+	// ssh agent client ã®ç¨®é¡ã¨ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’è¡¨ç¤º
 	SetDlgItemTextA(dlg, IDC_PUTTY_VERSION, putty_get_version());
 }
 
-static WNDPROC g_defAboutDlgEditWndProc;  // Edit Control‚ÌƒTƒuƒNƒ‰ƒX‰»—p
-static int g_deltaSumAboutDlg = 0;        // ƒ}ƒEƒXƒzƒC[ƒ‹‚ÌDelta—İÏ—p
+static WNDPROC g_defAboutDlgEditWndProc;  // Edit Controlã®ã‚µãƒ–ã‚¯ãƒ©ã‚¹åŒ–ç”¨
+static int g_deltaSumAboutDlg = 0;        // ãƒã‚¦ã‚¹ãƒ›ã‚¤ãƒ¼ãƒ«ã®Deltaç´¯ç©ç”¨
 
 static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -2188,7 +2174,7 @@ static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, L
 
 	switch (msg) {
 		case WM_KEYDOWN:
-			// Edit controlã‚Å CTRL+A ‚ğ‰Ÿ‰º‚·‚é‚ÆAƒeƒLƒXƒg‚ğ‘S‘I‘ğ‚·‚éB
+			// Edit controlä¸Šã§ CTRL+A ã‚’æŠ¼ä¸‹ã™ã‚‹ã¨ã€ãƒ†ã‚­ã‚¹ãƒˆã‚’å…¨é¸æŠã™ã‚‹ã€‚
 			if (wp == 'A' && GetKeyState(VK_CONTROL) < 0) {
 				PostMessage(hWnd, EM_SETSEL, 0, -1);
 				return 0;
@@ -2196,7 +2182,7 @@ static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, L
 			break;
 
 		case WM_MOUSEWHEEL:
-			// CTRLorSHIFT + ƒ}ƒEƒXƒzƒC[ƒ‹‚Ìê‡A‰¡ƒXƒNƒ[ƒ‹‚³‚¹‚éB
+			// CTRLorSHIFT + ãƒã‚¦ã‚¹ãƒ›ã‚¤ãƒ¼ãƒ«ã®å ´åˆã€æ¨ªã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã•ã›ã‚‹ã€‚
 			keys = GET_KEYSTATE_WPARAM(wp);
 			delta = GET_WHEEL_DELTA_WPARAM(wp);
 			page = keys & (MK_CONTROL | MK_SHIFT);
@@ -2242,7 +2228,7 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lP
 		TInstVar *pvar = data->pvar;
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
-		// Edit control‚Í“™•ƒtƒHƒ“ƒg‚Å•\¦‚µ‚½‚¢‚Ì‚ÅA•Êİ’èî•ñ‚©‚çƒtƒHƒ“ƒg‚ğƒZƒbƒg‚·‚éB
+		// Edit controlã¯ç­‰å¹…ãƒ•ã‚©ãƒ³ãƒˆã§è¡¨ç¤ºã—ãŸã„ã®ã§ã€åˆ¥è¨­å®šæƒ…å ±ã‹ã‚‰ãƒ•ã‚©ãƒ³ãƒˆã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã€‚
 		// (2014.5.5. yutaka)
 		data->DlgAboutTextFont = UTIL_get_lang_fixedfont(dlg, pvar->ts->UILanguageFileW);
 		if (data->DlgAboutTextFont != NULL) {
@@ -2256,7 +2242,7 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lP
 		about_dlg_set_abouttext(pvar, dlg, SSH_DIGEST_SHA256);
 		SetFocus(GetDlgItem(dlg, IDOK));
 
-		// Edit control‚ğƒTƒuƒNƒ‰ƒX‰»‚·‚éB
+		// Edit controlã‚’ã‚µãƒ–ã‚¯ãƒ©ã‚¹åŒ–ã™ã‚‹ã€‚
 		g_deltaSumAboutDlg = 0;
 		g_defAboutDlgEditWndProc = (WNDPROC)SetWindowLongPtrW(GetDlgItem(dlg, IDC_ABOUTTEXT), GWLP_WNDPROC, (LONG_PTR)AboutDlgEditWindowProc);
 
@@ -2517,7 +2503,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		               pvar->settings.KnownHostsFiles);
 	}
 
-	// SSH2 HeartBeat(keep-alive)‚ğ’Ç‰Á (2005.2.22 yutaka)
+	// SSH2 HeartBeat(keep-alive)ã‚’è¿½åŠ  (2005.2.22 yutaka)
 	{
 		char buf[10];
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
@@ -2572,9 +2558,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹–¼‚ğ exe ‚Ì‚ ‚éƒtƒHƒ‹ƒ_‚©‚ç‚Ì‘Š‘ÎƒpƒX‚Æ‚İ‚È‚µAƒtƒ‹ƒpƒX‚É•ÏŠ·‚·‚é
- *	@return	ƒtƒ‹ƒpƒXƒtƒ@ƒCƒ‹–¼
- *			free()‚·‚é‚±‚Æ
+ *	ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ exe ã®ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€ã‹ã‚‰ã®ç›¸å¯¾ãƒ‘ã‚¹ã¨ã¿ãªã—ã€ãƒ•ãƒ«ãƒ‘ã‚¹ã«å¤‰æ›ã™ã‚‹
+ *	@return	ãƒ•ãƒ«ãƒ‘ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å
+ *			free()ã™ã‚‹ã“ã¨
  */
 wchar_t *get_teraterm_dir_relative_nameW(const wchar_t *basename)
 {
@@ -2585,7 +2571,7 @@ wchar_t *get_teraterm_dir_relative_nameW(const wchar_t *basename)
 		return _wcsdup(basename);
 	}
 
-	// ttermpro.exe‚ÌƒpƒX
+	// ttermpro.exeã®ãƒ‘ã‚¹
 	path = GetExeDirW(NULL);
 	aswprintf(&ret, L"%s\\%s", path, basename);
 	free(path);
@@ -2654,10 +2640,10 @@ int copy_teraterm_dir_relative_path(char *dest, int destsize, const char *basena
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹–¼‚ğŒÂl—pİ’èƒtƒ@ƒCƒ‹ƒtƒHƒ‹ƒ_‚©‚ç‚Ì‘Š‘ÎƒpƒX‚Æ‚İ‚È‚µAƒtƒ‹ƒpƒX‚É•ÏŠ·‚·‚é
+ *	ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å€‹äººç”¨è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ãƒ•ã‚©ãƒ«ãƒ€ã‹ã‚‰ã®ç›¸å¯¾ãƒ‘ã‚¹ã¨ã¿ãªã—ã€ãƒ•ãƒ«ãƒ‘ã‚¹ã«å¤‰æ›ã™ã‚‹
  *		%APPDATA%\teraterm5 (%USERPROFILE%\AppData\Roaming\teraterm5)
- *	@return	ƒtƒ‹ƒpƒXƒtƒ@ƒCƒ‹–¼
- *			free()‚·‚é‚±‚Æ
+ *	@return	ãƒ•ãƒ«ãƒ‘ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å
+ *			free()ã™ã‚‹ã“ã¨
  */
 wchar_t *get_home_dir_relative_nameW(const wchar_t *basename)
 {
@@ -2673,10 +2659,10 @@ wchar_t *get_home_dir_relative_nameW(const wchar_t *basename)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹–¼‚ğƒƒO•Û‘¶ƒtƒHƒ‹ƒ_‚©‚ç‚Ì‘Š‘ÎƒpƒX‚Æ‚İ‚È‚µAƒtƒ‹ƒpƒX‚É•ÏŠ·‚·‚é
+ *	ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ãƒ­ã‚°ä¿å­˜ãƒ•ã‚©ãƒ«ãƒ€ã‹ã‚‰ã®ç›¸å¯¾ãƒ‘ã‚¹ã¨ã¿ãªã—ã€ãƒ•ãƒ«ãƒ‘ã‚¹ã«å¤‰æ›ã™ã‚‹
  *		%LOCALAPPDATA%\teraterm5 (%USERPROFILE%\AppData\Local\teraterm5)
- *	@return	ƒtƒ‹ƒpƒXƒtƒ@ƒCƒ‹–¼
- *			free()‚·‚é‚±‚Æ
+ *	@return	ãƒ•ãƒ«ãƒ‘ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å
+ *			free()ã™ã‚‹ã“ã¨
  */
 wchar_t *get_log_dir_relative_nameW(const wchar_t *basename)
 {
@@ -2907,33 +2893,37 @@ static void move_cur_sel_delta(HWND listbox, int delta)
 static int get_keys_file_name(HWND parent, char *buf, int bufsize,
                               int readonly)
 {
-	OPENFILENAME params;
-	char fullname_buf[2048] = "ssh_known_hosts";
-
-	params.lStructSize = get_OPENFILENAME_SIZE();
-	params.hwndOwner = parent;
-	params.lpstrFilter = NULL;
-	params.lpstrCustomFilter = NULL;
-	params.nFilterIndex = 0;
-	buf[0] = 0;
-	params.lpstrFile = fullname_buf;
-	params.nMaxFile = sizeof(fullname_buf);
-	params.lpstrFileTitle = NULL;
-	params.lpstrInitialDir = NULL;
+	wchar_t *title;
 	if (readonly) {
-		UTIL_get_lang_msg("MSG_OPEN_KNOWNHOSTS_RO_TITLE", pvar,
-		                  "Choose a read-only known-hosts file to add");
+		GetI18nStrWW("TTSSH", "MSG_OPEN_KNOWNHOSTS_RO_TITLE",
+					 L"Choose a read-only known-hosts file to add",
+					 pvar->ts->UILanguageFileW, &title);
 	}
 	else {
-		UTIL_get_lang_msg("MSG_OPEN_KNOWNHOSTS_RW_TITLE", pvar,
-		                  "Choose a read/write known-hosts file");
+		GetI18nStrWW("TTSSH", "MSG_OPEN_KNOWNHOSTS_RW_TITLE",
+					 L"Choose a read/write known-hosts file",
+					 pvar->ts->UILanguageFileW, &title);
 	}
-	params.lpstrTitle = pvar->UIMsg;
+
+	TTOPENFILENAMEW params = {0};
+	params.hwndOwner = parent;
+	params.lpstrFilter = NULL;
+	params.nFilterIndex = 0;
+	params.lpstrFile = L"ssh_known_hosts";
+	params.lpstrInitialDir = NULL;
+	params.lpstrTitle = title;
 	params.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	params.lpstrDefExt = NULL;
+//	params.lpstrInitialDir = pvar->ts->HomeDirW;
 
-	if (GetOpenFileName(&params) != 0) {
-		copy_teraterm_dir_relative_path(buf, bufsize, fullname_buf);
+	wchar_t *filenameW;
+	BOOL r = TTGetOpenFileNameW(&params, &filenameW);
+	free(title);
+	if (r != FALSE) {
+		// ANSIã§ä¿å­˜
+		char *filenameA = ToCharW(filenameW);
+		copy_teraterm_dir_relative_path(buf, bufsize, filenameA);
+		free(filenameA);
 		return 1;
 	} else {
 		int err = CommDlgExtendedError();
@@ -3125,7 +3115,7 @@ static ssh_public_key_t public_key = {NULL, NULL, NULL, NULL, NULL, KEY_UNSPEC};
 
 static void free_ssh_key(void)
 {
-	// DSA_free(), RSA_free()‚ÉNULL‚ğ“n‚µ‚Ä‚à–â‘è‚Í‚È‚µB
+	// DSA_free(), RSA_free()ã«NULLã‚’æ¸¡ã—ã¦ã‚‚å•é¡Œã¯ãªã—ã€‚
 	DSA_free(private_key.dsa);
 	private_key.dsa = NULL;
 	DSA_free(public_key.dsa);
@@ -3277,14 +3267,14 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 
 	case KEY_ED25519:
 	{
-		// ”é–§Œ®‚ğì‚é
+		// ç§˜å¯†éµã‚’ä½œã‚‹
 		private_key.ed25519_pk = malloc(ED25519_PK_SZ);
 		private_key.ed25519_sk = malloc(ED25519_SK_SZ);
 		if (private_key.ed25519_pk == NULL || private_key.ed25519_sk == NULL)
 			goto error;
 		crypto_sign_ed25519_keypair(private_key.ed25519_pk, private_key.ed25519_sk);
 
-		// ŒöŠJŒ®‚ğì‚é
+		// å…¬é–‹éµã‚’ä½œã‚‹
 		public_key.ed25519_pk = malloc(ED25519_PK_SZ);
 		if (public_key.ed25519_pk == NULL)
 			goto error;
@@ -3402,21 +3392,21 @@ int uuencode(unsigned char *src, int srclen, unsigned char *target, int targsize
 }
 
 /**
- *	SCP‚ÌƒpƒX‚ğ•Û‘¶‚·‚é
+ *	SCPã®ãƒ‘ã‚¹ã‚’ä¿å­˜ã™ã‚‹
  *
  *	TODO
- *	- ts‚É‘‚«–ß‚µ‚Ä‚µ‚Ü‚Á‚Ä‚æ‚¢?
- *	- Unicode‰»‚·‚é
+ *	- tsã«æ›¸ãæˆ»ã—ã¦ã—ã¾ã£ã¦ã‚ˆã„?
+ *	- UnicodeåŒ–ã™ã‚‹
  */
 static void SavePaths(HWND dlg, TTTSet *pts)
 {
-	// ‘—MƒpƒX‚ğ ts->ScpSendDir ‚É•Û‘¶
+	// é€ä¿¡ãƒ‘ã‚¹ã‚’ ts->ScpSendDir ã«ä¿å­˜
 	char sendfiledir[MAX_PATH];
 	GetDlgItemTextA(dlg, IDC_SENDFILE_TO, sendfiledir, _countof(sendfiledir));
 	strncpy_s(pts->ScpSendDir, sizeof(pts->ScpSendDir), sendfiledir, _TRUNCATE);
 
 #if 0
-	// óMƒpƒX‚ğ ts->FileDir ‚É•Û‘¶
+	// å—ä¿¡ãƒ‘ã‚¹ã‚’ ts->FileDir ã«ä¿å­˜
 	char recvdir[MAX_PATH];
 	GetDlgItemTextA(dlg, IDC_RECVFILE_TO, recvdir, _countof(recvdir));
 	strncpy_s(pvar->ts->FileDir, sizeof(pvar->ts->FileDir), recvdir, _TRUNCATE);
@@ -3441,16 +3431,19 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			{ IDC_RECEIVEFILE_FROM_LABEL, "DLG_SCP_RECEIVEFILE_FROM" },
 			{ IDC_RECVFILE_TO_LABEL, "DLG_SCP_RECEIVEFILE_TO" },
 			{ IDC_RECV, "DLG_SCP_RECEIVEFILE_RECEIVE" },
+			{ IDHELP, "BTN_HELP" },
 		};
 		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
 
 		DragAcceptFiles(dlg, TRUE);
 
-		// SCPƒtƒ@ƒCƒ‹‘—Mæ‚ğ•\¦‚·‚é
+		// SCPãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡å…ˆã‚’è¡¨ç¤ºã™ã‚‹
 		SetDlgItemTextA(dlg, IDC_SENDFILE_TO, pvar->ts->ScpSendDir);
 
-		// SCPƒtƒ@ƒCƒ‹óMæ‚ğ•\¦‚·‚é
-		SetDlgItemTextW(dlg, IDC_RECVFILE_TO, pvar->ts->FileDirW);
+		// SCPãƒ•ã‚¡ã‚¤ãƒ«å—ä¿¡å…ˆã‚’è¡¨ç¤ºã™ã‚‹
+		wchar_t *dir = GetFileDir(pvar->ts);
+		SetDlgItemTextW(dlg, IDC_RECVFILE_TO, dir);
+		free(dir);
 
 #ifdef SFTP_DEBUG
 		ShowWindow(GetDlgItem(dlg, IDC_SFTP_TEST), SW_SHOW);
@@ -3522,18 +3515,17 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 		}
 
 		switch (LOWORD(wParam)) {
-		case IDOK: {  // ƒtƒ@ƒCƒ‹‘—M
+		case IDOK: {  // ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡
 			wchar_t *filenameW;
 			hGetDlgItemTextW(dlg, IDC_SENDFILE_EDIT, &filenameW);
 			if (filenameW != NULL) {
-				// ‘—MƒpƒX
+				// é€ä¿¡ãƒ‘ã‚¹
 				wchar_t *sendfiledirW;
 				hGetDlgItemTextW(dlg, IDC_SENDFILE_TO, &sendfiledirW);
 
 				char *sendfiledirU8 = ToU8W(sendfiledirW);
 				char *filenameU8 = ToU8W(filenameW);
-				SSH_start_scp(pvar, filenameU8, sendfiledirU8);
-				//SSH_scp_transaction(pvar, "bigfile30.bin", "", FROMREMOTE);
+				SSH_start_scp_send(pvar, filenameU8, sendfiledirU8);
 				free(filenameU8);
 				free(sendfiledirU8);
 				free(sendfiledirW);
@@ -3555,11 +3547,11 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 		}
 
 		case IDC_RECV: {
-			// ƒtƒ@ƒCƒ‹óM
+			// ãƒ•ã‚¡ã‚¤ãƒ«å—ä¿¡
 			wchar_t *FileNameW;
 			hGetDlgItemTextW(dlg, IDC_RECVFILE, &FileNameW);
 			if (FileNameW != NULL) {
-				// óMƒtƒ@ƒCƒ‹‚©‚çƒpƒX‚ğæ‚èœ‚­
+				// å—ä¿¡ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ‘ã‚¹ã‚’å–ã‚Šé™¤ã
 				wchar_t *fn = wcsrchr(FileNameW, L'/');
 				if (fn) {
 					fn++;
@@ -3572,26 +3564,19 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 				}
 				wchar_t *recvfn = replaceInvalidFileNameCharW(fn, '_');
 
-				// óMƒpƒX
+				// å—ä¿¡ãƒ‘ã‚¹
 				wchar_t *recvdirW;
 				hGetDlgItemTextW(dlg, IDC_RECVFILE_TO, &recvdirW);
 				wchar_t *recvdir_expanded;
 				hExpandEnvironmentStringsW(recvdirW, &recvdir_expanded);
 
-				wchar_t *recvpathW;
-				if (recvdir_expanded[0] != 0) {
-					aswprintf(&recvpathW, L"%s\\%s", recvdir_expanded, recvfn);
-				} else {
-					recvpathW = _wcsdup(recvfn);
-				}
-				char *recvpathU8 = ToU8W(recvpathW);
+				char *recvpathU8 = ToU8W(recvdir_expanded);
 				char *FileNameU8 = ToU8W(FileNameW);
-				SSH_scp_transaction(pvar, FileNameU8, recvpathU8, FROMREMOTE);
+				SSH_start_scp_receive(pvar, FileNameU8, recvpathU8);
 				free(FileNameW);
 				free(recvfn);
 				free(recvdirW);
 				free(recvdir_expanded);
-				free(recvpathW);
 				free(recvpathU8);
 				free(FileNameU8);
 
@@ -3606,17 +3591,21 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 		case IDC_SFTP_TEST:
 			SSH_sftp_transaction(pvar);
 			return TRUE;
+
+		case IDHELP:
+			PostMessage(GetParent(dlg), WM_USER_DLGHELP2, HlpMenuFileSshScp, 0);
+			return TRUE;
 		}
 	}
 
 	return FALSE;
 }
 
-// ƒ}ƒNƒƒRƒ}ƒ“ƒh"scpsend"‚©‚çŒÄ‚Ño‚·‚½‚ß‚ÉADLLŠO‚ÖƒGƒNƒXƒ|[ƒg‚·‚éB"ttxssh.def"ƒtƒ@ƒCƒ‹‚É‹LÚB
+// ãƒã‚¯ãƒ­ã‚³ãƒãƒ³ãƒ‰"scpsend"ã‹ã‚‰å‘¼ã³å‡ºã™ãŸã‚ã«ã€DLLå¤–ã¸ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆã™ã‚‹ã€‚"ttxssh.def"ãƒ•ã‚¡ã‚¤ãƒ«ã«è¨˜è¼‰ã€‚
 // (2008.1.1 yutaka)
-__declspec(dllexport) int CALLBACK TTXScpSendfile(char *filename, char *dstfile)
+__declspec(dllexport) int CALLBACK TTXScpSendfile(char *sendfile, char *dest)
 {
-	return SSH_start_scp(pvar, filename, dstfile);
+	return SSH_start_scp_send(pvar, sendfile, dest);
 }
 
 __declspec(dllexport) int CALLBACK TTXScpSendingStatus(void)
@@ -3626,20 +3615,20 @@ __declspec(dllexport) int CALLBACK TTXScpSendingStatus(void)
 
 __declspec(dllexport) int CALLBACK TTXScpReceivefile(char *remotefile, char *localfile)
 {
-	return SSH_scp_transaction(pvar, remotefile, localfile, FROMREMOTE);
+	return SSH_start_scp_receive(pvar, remotefile, localfile);
 }
 
 
 /**
- * TTSSH‚Ìİ’è“à—e(known hosts file)‚ğ•Ô‚·B
- * ƒtƒ‹ƒpƒX‚Å•Ô‚·
+ * TTSSHã®è¨­å®šå†…å®¹(known hosts file)ã‚’è¿”ã™ã€‚
+ * ãƒ•ãƒ«ãƒ‘ã‚¹ã§è¿”ã™
  *
- * @param[in]	filename	ƒtƒ@ƒCƒ‹–¼‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *							NULL‚Ì•¶š”‚ğ•Ô‚·
- * @param[in]	maxlen		ƒtƒ@ƒCƒ‹–¼‚Ì•¶š”
- *							(filename != NULL‚Ì—LŒø)
- * @retval		•¶š”(0ˆÈŠO),(filename == NULL‚Ì‚Í'\0'‚àŠÜ‚Ş)
- *				0	ƒGƒ‰[
+ * @param[in]	filename	ãƒ•ã‚¡ã‚¤ãƒ«åã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *							NULLã®æ™‚æ–‡å­—æ•°ã‚’è¿”ã™
+ * @param[in]	maxlen		ãƒ•ã‚¡ã‚¤ãƒ«åã®æ–‡å­—æ•°
+ *							(filename != NULLã®æ™‚æœ‰åŠ¹)
+ * @retval		æ–‡å­—æ•°(0ä»¥å¤–),(filename == NULLã®æ™‚ã¯'\0'ã‚‚å«ã‚€)
+ *				0	ã‚¨ãƒ©ãƒ¼
  */
 __declspec(dllexport) size_t CALLBACK TTXReadKnownHostsFile(wchar_t *filename, size_t maxlen)
 {
@@ -3714,9 +3703,9 @@ static void keygen_progress(int phase, int count, void *cbarg_) {
 	return;
 }
 
-// bcrypt KDFŒ`®‚Å”é–§Œ®‚ğ•Û‘¶‚·‚é
+// bcrypt KDFå½¢å¼ã§ç§˜å¯†éµã‚’ä¿å­˜ã™ã‚‹
 // based on OpenSSH 6.5:key_save_private(), key_private_to_blob2()
-static void save_bcrypt_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar, int rounds)
+static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, char *comment, HWND dlg, PTInstVar pvar, int rounds)
 {
 	const struct ssh2cipher *cipher = NULL;
 	char *ciphername = DEFAULT_CIPHERNAME;
@@ -3749,7 +3738,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	blocksize = get_cipher_block_size(cipher);
 	keylen = get_cipher_key_len(cipher);
 	ivlen = blocksize;
-	authlen = 0;  // TODO: ‚Æ‚è‚ ‚¦‚¸ŒÅ’è‰»
+	authlen = 0;  // TODO: ã¨ã‚Šã‚ãˆãšå›ºå®šåŒ–
 	key = calloc(1, keylen + ivlen);
 
 	if (strcmp(kdfname, "none") != 0) {
@@ -3761,9 +3750,9 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 		buffer_put_string(kdf, salt, SALT_LEN);
 		buffer_put_int(kdf, rounds);
 	}
-	// ˆÃ†‰»‚Ì€”õ
-	// TODO: OpenSSH 6.5‚Å‚Í -Z ƒIƒvƒVƒ‡ƒ“‚ÅAˆÃ†‰»ƒAƒ‹ƒSƒŠƒYƒ€‚ğw’è‰Â”\‚¾‚ªA
-	// ‚±‚±‚Å‚Í"AES256-CBC"‚ÉŒÅ’è‚Æ‚·‚éB
+	// æš—å·åŒ–ã®æº–å‚™
+	// TODO: OpenSSH 6.5ã§ã¯ -Z ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã§ã€æš—å·åŒ–ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’æŒ‡å®šå¯èƒ½ã ãŒã€
+	// ã“ã“ã§ã¯"AES256-CBC"ã«å›ºå®šã¨ã™ã‚‹ã€‚
 	cipher = get_cipher_by_name(ciphername);
 	cipher_init_SSH2(&cc, cipher, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, pvar);
 	SecureZeroMemory(key, keylen + ivlen);
@@ -3775,7 +3764,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	buffer_put_string(encoded, buffer_ptr(kdf), buffer_len(kdf));
 	buffer_put_int(encoded, 1);			/* number of keys */
 
-	// key_to_blob()‚ğˆê—˜—p‚·‚é‚½‚ßAKey\‘¢‘Ì‚ğ‰Šú‰»‚·‚éB
+	// key_to_blob()ã‚’ä¸€æ™‚åˆ©ç”¨ã™ã‚‹ãŸã‚ã€Keyæ§‹é€ ä½“ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
 	keyblob.type = private_key.type;
 	keyblob.rsa = private_key.rsa;
 	keyblob.dsa = private_key.dsa;
@@ -3837,8 +3826,8 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 
 	len = buffer_len(blob);
 
-	// ”é–§Œ®‚ğƒtƒ@ƒCƒ‹‚É•Û‘¶‚·‚éB
-	fp = fopen(filename, "wb");
+	// ç§˜å¯†éµã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã™ã‚‹ã€‚
+	fp = _wfopen(filename, L"wb");
 	if (fp == NULL) {
 		static const TTMessageBoxInfoW info = {
 			"TTSSH",
@@ -3869,12 +3858,145 @@ ed25519_error:
 	buffer_free(blob);
 }
 
+static BOOL GetPublicKeyFilename(HWND dlg, ssh_keytype type, wchar_t **filename_)
+{
+	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
+
+	wchar_t *titleW = NULL;
+	GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PUBLICKEY_TITLE", L"Save public key as:", UILanguageFileW, &titleW);
+
+	wchar_t *filterW = NULL;
+	const wchar_t *default_filenameW = NULL;
+	switch (type) {
+	case KEY_RSA1:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER",
+					 L"SSH1 RSA key(identity.pub)\\0identity.pub\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"identity.pub";
+		break;
+	case KEY_RSA:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PUBLICKEY_RSA_FILTER",
+					 L"SSH2 RSA key(id_rsa.pub)\\0id_rsa.pub\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_rsa.pub";
+		break;
+	case KEY_DSA:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PUBLICKEY_DSA_FILTER",
+					 L"SSH2 DSA key(id_dsa.pub)\\0id_dsa.pub\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_dsa.pub";
+		break;
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER",
+					 L"SSH2 ECDSA key(id_ecdsa.pub)\\0id_ecdsa.pub\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_ecdsa.pub";
+		break;
+	case KEY_ED25519:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER",
+					 L"SSH2 ED25519 key(id_ed25519.pub)\\0id_ed25519.pub\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_ed25519.pub";
+		break;
+	default:
+		assert(FALSE);
+		break;
+	}
+
+	TTOPENFILENAMEW ofn = {0};
+	ofn.hwndOwner = dlg;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+	ofn.lpstrFile = default_filenameW;
+	ofn.lpstrFilter = filterW;
+	ofn.lpstrTitle = titleW;
+	wchar_t *filename;
+	BOOL r = TTGetSaveFileNameW(&ofn, &filename);
+	free(titleW);
+	free(filterW);
+	if (r == FALSE) {
+		// cancel/failure
+		// int ret = CommDlgExtendedError();
+		*filename_ = NULL;
+		return FALSE;
+	}
+	*filename_ = filename;
+	return TRUE;
+}
+
+static BOOL GetPrivateKeyFilename(HWND dlg, ssh_keytype type, wchar_t **filename_)
+{
+	const wchar_t *UILanguageFileW = pvar->ts->UILanguageFileW;
+
+	wchar_t *titleW = NULL;
+	GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PRIVATEKEY_TITLE", L"Save private key as:", pvar->ts->UILanguageFileW, &titleW);
+
+	wchar_t *filterW = NULL;
+	const wchar_t *default_filenameW = NULL;
+	switch (private_key.type) {
+	case KEY_RSA1:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER",
+					 L"SSH1 RSA key(identity)\\0identity\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"identity";
+		break;
+	case KEY_RSA:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER",
+					 L"SSH2 RSA key(id_rsa)\\0id_rsa\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_rsa";
+		break;
+	case KEY_DSA:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER",
+					 L"SSH2 DSA key(id_dsa)\\0id_dsa\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_dsa";
+		break;
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PRIVATEKEY_ECDSA_FILTER",
+					 L"SSH2 ECDSA key(id_ecdsa)\\0id_ecdsa\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_ecdsa";
+		break;
+	case KEY_ED25519:
+		GetI18nStrWW("TTSSH", "FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER",
+					 L"SSH2 ED25519 key(id_ed25519)\\0id_ed25519\\0All Files(*.*)\\0*.*\\0\\0",
+					 UILanguageFileW, &filterW);
+		default_filenameW = L"id_ed25519";
+		break;
+	default:
+		assert(FALSE);
+		break;
+	}
+
+	TTOPENFILENAMEW ofn = {0};
+	ofn.hwndOwner = dlg;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+	ofn.lpstrFile = default_filenameW;
+	ofn.lpstrFilter = filterW;
+	ofn.lpstrTitle = titleW;
+	wchar_t *filename;
+	BOOL r = TTGetSaveFileNameW(&ofn, &filename);
+	free(titleW);
+	free(filterW);
+	if (r == FALSE) {
+		// cancel/failure
+		// int ret = CommDlgExtendedError();
+		*filename_ = NULL;
+		return FALSE;
+	}
+	*filename_ = filename;
+	return TRUE;
+}
+
 static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
                                         LPARAM lParam)
 {
 	static ssh_keytype key_type;
 	static int saved_key_bits;
-	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -3903,9 +4025,9 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		SendMessage(GetDlgItem(dlg, IDC_ED25519_TYPE), BM_SETCHECK, BST_CHECKED, 0);
 		key_type = KEY_ED25519;
 
-		// bit ’·‚ğ•ÏX‚Å‚«‚é RSA/RSA1 ‚Ì‚½‚ß‚ÉƒfƒtƒHƒ‹ƒg’l‚ğ•Û‘¶
-		//   ‚±‚±‚Åƒ_ƒCƒAƒƒO‚©‚çæ“¾‚·‚é‚Æ 0 ‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚Ì‚Å NG
-		//   bit’·ŒÅ’è‚Ì ED25519 ‚ğƒfƒtƒHƒ‹ƒg‚É‚µ‚½‚½‚ßAWM_INITDIALOG ‚ÌÅŒã‚Åƒ_ƒCƒAƒƒO‚©‚çæ“¾‚·‚é‚Ì‚à NG
+		// bit é•·ã‚’å¤‰æ›´ã§ãã‚‹ RSA/RSA1 ã®ãŸã‚ã«ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’ä¿å­˜
+		//   ã“ã“ã§ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‹ã‚‰å–å¾—ã™ã‚‹ã¨ 0 ã«ãªã£ã¦ã—ã¾ã†ã®ã§ NG
+		//   bité•·å›ºå®šã® ED25519 ã‚’ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã«ã—ãŸãŸã‚ã€WM_INITDIALOG ã®æœ€å¾Œã§ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‹ã‚‰å–å¾—ã™ã‚‹ã®ã‚‚ NG
 		saved_key_bits = 3072;
 
 		// default key bits
@@ -4010,7 +4132,7 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			if (generate_ssh_key(key_type, bits, keygen_progress, &cbarg)) {
 				MSG msg;
 				int c = 0;
-				// Œ®‚ÌŒvZ’†‚É”­¶‚µ‚½ƒCƒxƒ“ƒgiƒ{ƒ^ƒ“˜A‘Å‚È‚Çj‚ğƒtƒ‰ƒbƒVƒ…‚·‚éB
+				// éµã®è¨ˆç®—ä¸­ã«ç™ºç”Ÿã—ãŸã‚¤ãƒ™ãƒ³ãƒˆï¼ˆãƒœã‚¿ãƒ³é€£æ‰“ãªã©ï¼‰ã‚’ãƒ•ãƒ©ãƒƒã‚·ãƒ¥ã™ã‚‹ã€‚
 				while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 					TranslateMessage(&msg);
 					DispatchMessage(&msg);
@@ -4056,8 +4178,8 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				SetFocus(GetDlgItem(dlg, IDC_KEY_EDIT));
 
 			} else {
-				// generate_ssh_key()‚ª¸”s‚µ‚½ê‡‚É‚¨‚¢‚Ä‚àAƒ_ƒCƒAƒƒO‚ğ
-				// ƒNƒ[ƒY‚Å‚«‚é‚æ‚¤‚É‚µ‚Ä‚¨‚­B
+				// generate_ssh_key()ãŒå¤±æ•—ã—ãŸå ´åˆã«ãŠã„ã¦ã‚‚ã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’
+				// ã‚¯ãƒ­ãƒ¼ã‚ºã§ãã‚‹ã‚ˆã†ã«ã—ã¦ãŠãã€‚
 				EnableWindow(GetDlgItem(dlg, IDOK), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDCANCEL), TRUE);
 
@@ -4190,72 +4312,19 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		// saving public key file
 		case IDC_SAVE_PUBLIC_KEY:
 			{
-			int ret;
-			OPENFILENAME ofn;
-			char filename[MAX_PATH];
-			FILE *fp;
-			char comment[1024]; // comment string in private key
-
 			// saving file dialog
-			ZeroMemory(&ofn, sizeof(ofn));
-			ofn.lStructSize = get_OPENFILENAME_SIZE();
-			ofn.hwndOwner = dlg;
-			switch (public_key.type) {
-			case KEY_RSA1:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER", pvar,
-				                  "SSH1 RSA key(identity.pub)\\0identity.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "identity.pub", _TRUNCATE);
-				break;
-			case KEY_RSA:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_RSA_FILTER", pvar,
-				                  "SSH2 RSA key(id_rsa.pub)\\0id_rsa.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_rsa.pub", _TRUNCATE);
-				break;
-			case KEY_DSA:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_DSA_FILTER", pvar,
-				                  "SSH2 DSA key(id_dsa.pub)\\0id_dsa.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_dsa.pub", _TRUNCATE);
-				break;
-			case KEY_ECDSA256:
-			case KEY_ECDSA384:
-			case KEY_ECDSA521:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER", pvar,
-				                  "SSH2 ECDSA key(id_ecdsa.pub)\\0id_ecdsa.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_ecdsa.pub", _TRUNCATE);
-				break;
-			case KEY_ED25519:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER", pvar,
-				                  "SSH2 ED25519 key(id_ed25519.pub)\\0id_ed25519.pub\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_ed25519.pub", _TRUNCATE);
-				break;
-			default:
-				break;
-			}
-			ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
-			ofn.lpstrFile = filename;
-			ofn.nMaxFile = sizeof(filename);
-			UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_TITLE", pvar,
-			                  "Save public key as:");
-			ofn.lpstrTitle = pvar->UIMsg;
-			if (GetSaveFileName(&ofn) == 0) { // failure
-				ret = CommDlgExtendedError();
+			wchar_t *filename;
+			if (GetPublicKeyFilename(dlg, public_key.type, &filename) == FALSE) {
+				// cancel or failure
 				break;
 			}
 
+			char comment[1024];	 // comment string in private key
 			GetDlgItemText(dlg, IDC_COMMENT_EDIT, comment, sizeof(comment));
 
 			// saving public key file
-			fp = fopen(filename, "wb");
+			FILE *fp = _wfopen(filename, L"wb");
+			free(filename);
 			if (fp == NULL) {
 				static const TTMessageBoxInfoW info = {
 					"TTSSH",
@@ -4374,11 +4443,8 @@ public_error:
 			{
 			char buf[1024], buf_conf[1024];  // passphrase
 			int ret, rounds;
-			OPENFILENAME ofn;
-			char filename[MAX_PATH];
-			char comment[1024]; // comment string in private key
 
-			// ƒpƒXƒtƒŒ[ƒY‚Ìƒ`ƒFƒbƒN‚ğs‚¤BƒpƒXƒtƒŒ[ƒY‚Í”é–§Œ®ƒtƒ@ƒCƒ‹‚É•t‚¯‚éB
+			// ãƒ‘ã‚¹ãƒ•ãƒ¬ãƒ¼ã‚ºã®ãƒã‚§ãƒƒã‚¯ã‚’è¡Œã†ã€‚ãƒ‘ã‚¹ãƒ•ãƒ¬ãƒ¼ã‚ºã¯ç§˜å¯†éµãƒ•ã‚¡ã‚¤ãƒ«ã«ä»˜ã‘ã‚‹ã€‚
 			SendMessage(GetDlgItem(dlg, IDC_KEY_EDIT), WM_GETTEXT, sizeof(buf), (LPARAM)buf);
 			SendMessage(GetDlgItem(dlg, IDC_CONFIRM_EDIT), WM_GETTEXT, sizeof(buf_conf), (LPARAM)buf_conf);
 
@@ -4432,61 +4498,13 @@ public_error:
 				}
 			}
 
+			char comment[1024];	 // comment string in private key
 			ssh_make_comment(comment, sizeof(comment));
 
 			// saving file dialog
-			ZeroMemory(&ofn, sizeof(ofn));
-			ofn.lStructSize = get_OPENFILENAME_SIZE();
-			ofn.hwndOwner = dlg;
-			switch (private_key.type) {
-			case KEY_RSA1:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER", pvar,
-				                  "SSH1 RSA key(identity)\\0identity\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "identity", _TRUNCATE);
-				break;
-			case KEY_RSA:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER", pvar,
-				                  "SSH2 RSA key(id_rsa)\\0id_rsa\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_rsa", _TRUNCATE);
-				break;
-			case KEY_DSA:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER", pvar,
-				                  "SSH2 DSA key(id_dsa)\\0id_dsa\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_dsa", _TRUNCATE);
-				break;
-			case KEY_ECDSA256:
-			case KEY_ECDSA384:
-			case KEY_ECDSA521:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_ECDSA_FILTER", pvar,
-				                  "SSH2 ECDSA key(id_ecdsa)\\0id_ecdsa\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_ecdsa", _TRUNCATE);
-				break;
-			case KEY_ED25519:
-				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER", pvar,
-				                  "SSH2 ED25519 key(id_ed25519)\\0id_ed25519\\0All Files(*.*)\\0*.*\\0\\0");
-				memcpy(uimsg, pvar->UIMsg, sizeof(uimsg));
-				ofn.lpstrFilter = uimsg;
-				strncpy_s(filename, sizeof(filename), "id_ed25519", _TRUNCATE);
-				break;
-			default:
-				break;
-			}
-			ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
-			ofn.lpstrFile = filename;
-			ofn.nMaxFile = sizeof(filename);
-			UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_TITLE", pvar,
-			                  "Save private key as:");
-			ofn.lpstrTitle = pvar->UIMsg;
-			if (GetSaveFileName(&ofn) == 0) { // failure
-				ret = CommDlgExtendedError();
+			wchar_t *filename;
+			if (GetPrivateKeyFilename(dlg, private_key.type, &filename) == FALSE) {
+				// cancel
 				break;
 			}
 
@@ -4595,7 +4613,7 @@ public_error:
 				buffer_append(enc, wrapped, len);
 
 				// saving private key file (binary mode)
-				fp = fopen(filename, "wb");
+				fp = _wfopen(filename, L"wb");
 				if (fp == NULL) {
 					static const TTMessageBoxInfoW info = {
 						"TTSSH",
@@ -4636,7 +4654,7 @@ error:;
 					cipher = EVP_aes_128_cbc();
 				}
 
-				fp = fopen(filename, "w");
+				fp = _wfopen(filename, L"w");
 				if (fp == NULL) {
 					static const TTMessageBoxInfoW info = {
 						"TTSSH",
@@ -4672,7 +4690,7 @@ error:;
 				}
 				fclose(fp);
 			}
-
+			free(filename);
 
 			}
 			break;
@@ -4692,11 +4710,11 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 	}
 
 	switch (cmd) {
-	case 50430: // FIXME: ID_CONTROL_SENDBREAK(tt_res.h)‚ğw’è‚µ‚½‚¢‚ªAƒwƒbƒ_‚ğinclude‚·‚é‚ÆA‘½d’è‹`‚Æ‚È‚éB
+	case 50430: // FIXME: ID_CONTROL_SENDBREAK(tt_res.h)ã‚’æŒ‡å®šã—ãŸã„ãŒã€ãƒ˜ãƒƒãƒ€ã‚’includeã™ã‚‹ã¨ã€å¤šé‡å®šç¾©ã¨ãªã‚‹ã€‚
 		if (SSH_notify_break_signal(pvar))
 			return 1;
 		else
-			return 0;  // SSH2‚Åˆ—‚³‚ê‚È‚©‚Á‚½ê‡‚ÍA–{—ˆ‚Ì“®ì‚ğs‚¤‚×‚­Aƒ[ƒ‚ğ•Ô‚·B
+			return 0;  // SSH2ã§å‡¦ç†ã•ã‚Œãªã‹ã£ãŸå ´åˆã¯ã€æœ¬æ¥ã®å‹•ä½œã‚’è¡Œã†ã¹ãã€ã‚¼ãƒ­ã‚’è¿”ã™ã€‚
 
 	case ID_SSHSCPMENU:
 		UTIL_SetDialogFont();
@@ -4839,7 +4857,7 @@ static void _dquote_string(const wchar_t *str, wchar_t *dst, size_t dst_len)
 
 static void dquote_stringW(const wchar_t *str, wchar_t *dst, size_t dst_len)
 {
-	// ",ƒXƒy[ƒX,;,^A-^_ ‚ªŠÜ‚Ü‚ê‚éê‡‚É‚ÍƒNƒI[ƒg‚·‚é
+	// ",ã‚¹ãƒšãƒ¼ã‚¹,;,^A-^_ ãŒå«ã¾ã‚Œã‚‹å ´åˆã«ã¯ã‚¯ã‚ªãƒ¼ãƒˆã™ã‚‹
 	if (wcschr(str, '"') != NULL ||
 	    wcschr(str, ' ') != NULL ||
 	    wcschr(str, ';') != NULL ||
@@ -4877,7 +4895,7 @@ static void dquote_stringW(const wchar_t *str, wchar_t *dst, size_t dst_len)
 		_dquote_string(str, dst, dst_len);
 		return;
 	}
-	// ‚»‚Ì‚Ü‚ÜƒRƒs[‚µ‚Ä–ß‚é
+	// ãã®ã¾ã¾ã‚³ãƒ”ãƒ¼ã—ã¦æˆ»ã‚‹
 	wcsncpy_s(dst, dst_len, str, _TRUNCATE);
 }
 
@@ -4921,7 +4939,7 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 
 		wcsncat_s(cmd, cmdlen, buf, _TRUNCATE);
 
-		// ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚Å‚Ìw’è‚ğƒ`ƒFƒbƒN
+		// ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã§ã®æŒ‡å®šã‚’ãƒã‚§ãƒƒã‚¯
 		p = wcsstr(buf, L" /ssh");
 		if (p != NULL) {
 			switch (*(p + 5)) {
@@ -4937,9 +4955,9 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 			ssh_enable = 0;
 		}
 
-		// ƒzƒXƒg–¼‚Å /ssh /1, /ssh  /2, /ssh1, /ssh2, /nossh, /telnet ‚ª
-		// w’è‚³‚ê‚½‚Æ‚«‚ÍAƒ‰ƒWƒIƒ{ƒ^ƒ“‚Ì SSH ‚¨‚æ‚Ñ SSH ƒvƒƒgƒRƒ‹ƒo[ƒWƒ‡ƒ“‚ğ
-		// “K—p‚·‚é‚Ì‚ğ‚â‚ß‚é
+		// ãƒ›ã‚¹ãƒˆåã§ /ssh /1, /ssh  /2, /ssh1, /ssh2, /nossh, /telnet ãŒ
+		// æŒ‡å®šã•ã‚ŒãŸã¨ãã¯ã€ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³ã® SSH ãŠã‚ˆã³ SSH ãƒ—ãƒ­ãƒˆã‚³ãƒ«ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’
+		// é©ç”¨ã™ã‚‹ã®ã‚’ã‚„ã‚ã‚‹
 		if (pvar->hostdlg_Enabled && ssh_enable == -1) {
 			wcsncat_s(cmd, cmdlen, L" /ssh", _TRUNCATE);
 
@@ -4952,19 +4970,19 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 
 		}
 
-		// ƒZƒbƒVƒ‡ƒ“•¡»‚Ìê‡‚ÍA©“®ƒƒOƒCƒ“—pƒpƒ‰ƒ[ƒ^‚ğ•t‚¯‚éB
+		// ã‚»ãƒƒã‚·ãƒ§ãƒ³è¤‡è£½ã®å ´åˆã¯ã€è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ç”¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ä»˜ã‘ã‚‹ã€‚
 		if (wcsstr(buf, L"DUPLICATE")) {
 			char mark[MAX_PATH];
 			wchar_t tmp[MAX_PATH*2];
 
-			// ©“®ƒƒOƒCƒ“‚Ìê‡‚Í‰º‹Lƒtƒ‰ƒO‚ª0‚Ì‚½‚ßA•K—v‚ÈƒRƒ}ƒ“ƒh‚ğ•t‰Á‚·‚éB
+			// è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ã®å ´åˆã¯ä¸‹è¨˜ãƒ•ãƒ©ã‚°ãŒ0ã®ãŸã‚ã€å¿…è¦ãªã‚³ãƒãƒ³ãƒ‰ã‚’ä»˜åŠ ã™ã‚‹ã€‚
 			if (!pvar->hostdlg_Enabled) {
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
 							 L" /ssh /%d", pvar->settings.ssh_protocol_version);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 			}
 
-			// ƒpƒXƒ[ƒh‚ğŠo‚¦‚Ä‚¢‚ÄA‚©‚Â•¡””FØ—v‹‚Å‚È‚¢ê‡‚É‚Ì‚İƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚É“n‚·B
+			// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’è¦šãˆã¦ã„ã¦ã€ã‹ã¤è¤‡æ•°èªè¨¼è¦æ±‚ã§ãªã„å ´åˆã«ã®ã¿ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã«æ¸¡ã™ã€‚
 			if (pvar->settings.remember_password &&
 			    !pvar->auth_state.multiple_required_auth &&
 			    pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) {
@@ -5035,6 +5053,30 @@ static void PASCAL TTXEnd(void)
 	}
 }
 
+static void PASCAL TTXCloseTCP(TTXSockHooks *hooks)
+{
+	if (pvar->session_settings.Enabled) {
+		pvar->socket = INVALID_SOCKET;
+
+		logputs(LOG_LEVEL_VERBOSE, "Terminating SSH session...");
+
+		// èªè¨¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãŒæ®‹ã£ã¦ã„ã‚Œã°é–‰ã˜ã‚‹ã€‚
+		HOSTS_notify_closing_on_exit(pvar);
+		AUTH_notify_closing_on_exit(pvar);
+
+		*hooks->Precv = pvar->Precv;
+		*hooks->Psend = pvar->Psend;
+		*hooks->PWSAAsyncSelect = pvar->PWSAAsyncSelect;
+		*hooks->Pconnect = pvar->Pconnect;
+
+		pvar->ts->DisableTCPEchoCR = pvar->origDisableTCPEchoCR;
+	}
+
+	TTXEnd();
+	pvar->fatal_error = FALSE;
+	init_TTSSH(pvar);
+}
+
 /* This record contains all the information that the extension forwards to the
    main Tera Term code. It mostly consists of pointers to the above functions.
    Any of the function pointers can be replaced with NULL, in which case
@@ -5091,7 +5133,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 		/* do process initialization */
 #ifdef _DEBUG
 		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-		// ƒŠ[ƒN‚ÌƒuƒƒbƒN”Ô†‚ğŒ³‚ÉƒuƒŒ[ƒN‚ğdŠ|‚¯‚é‚É‚ÍAˆÈ‰º‚Ì‚æ‚¤‚É‚·‚éB
+		// ãƒªãƒ¼ã‚¯æ™‚ã®ãƒ–ãƒ­ãƒƒã‚¯ç•ªå·ã‚’å…ƒã«ãƒ–ãƒ¬ãƒ¼ã‚¯ã‚’ä»•æ›ã‘ã‚‹ã«ã¯ã€ä»¥ä¸‹ã®ã‚ˆã†ã«ã™ã‚‹ã€‚
 		//_CrtSetBreakAlloc(3228);
 #endif
 		setlocale(LC_ALL, "");
@@ -5109,8 +5151,8 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 				(TS_SSH *) MapViewOfFile(__mem_mapping, FILE_MAP_WRITE, 0,
 				                         0, 0);
 			if (pvar->ts_SSH->struct_size != sizeof(TS_SSH)) {
-				// \‘¢‘ÌƒTƒCƒY‚ªˆÙ‚È‚Á‚Ä‚¢‚½‚ç‹¤—Lƒƒ‚ƒŠ‚Íg—p‚µ‚È‚¢
-				// ƒo[ƒWƒ‡ƒ“‚ªˆÙ‚È‚é‚Æ‚«‚âŠJ”­‚É”­¶‚·‚é
+				// æ§‹é€ ä½“ã‚µã‚¤ã‚ºãŒç•°ãªã£ã¦ã„ãŸã‚‰å…±æœ‰ãƒ¡ãƒ¢ãƒªã¯ä½¿ç”¨ã—ãªã„
+				// ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãŒç•°ãªã‚‹ã¨ãã‚„é–‹ç™ºæ™‚ã«ç™ºç”Ÿã™ã‚‹
 				pvar->ts_SSH = NULL;
 			}
 		}

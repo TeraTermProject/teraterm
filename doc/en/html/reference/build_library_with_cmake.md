@@ -65,28 +65,28 @@ Case of Visual Studio 2022 arm64
 
 Using cmake in each environment.
 
-    cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=32 -P buildall.cmake
+    cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=i686 -P buildall.cmake
 
 # Regarding each directory
 
 ## Library directory generated
 
 - Library `*.h` and `*.lib` are created in the following:
-	- `oniguruma_{compiler}`
-	- `libressl_{compiler}`
-	- `putty`
-	- `SFMT_{compiler}`
-	- `zlib_{compiler}`
+    - `cJSON`
+    - `oniguruma_{compiler}`
+    - `libressl_{compiler}`
+    - `SFMT_{compiler}`
+    - `zlib_{compiler}`
 
 ## Downloaded archive directory
 
 - Downloaded archives are stored.
 - Downloading automatically.
-- Re-use these archives downloaded already.
+- Reuse these archives downloaded already.
 - Can be removed if these archives do not need after building.
 
 ## Build directory
 
 - Building under `build/oniguruma/{compiler}/`.
-- Remove it in advance if rebuliding.
+- Remove it in advance if rebuilding.
 - Can be removed if this do not need after building.

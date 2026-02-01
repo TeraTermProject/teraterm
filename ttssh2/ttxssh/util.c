@@ -66,32 +66,32 @@ static int send_until_block(PTInstVar pvar, SOCKET s,
 	return total_sent;
 }
 
-/* Tera Term‚ª“®ì‚µ‚Ä‚¢‚éPCã‚Ì X ƒT[ƒoƒvƒƒOƒ‰ƒ€‚É‘Î‚µ‚ÄAƒf[ƒ^‚ğ‘—‚éB
- * ˆê“x‚Å‘—‚ê‚È‚¢ê‡‚ÍAƒŠƒ“ƒOƒoƒbƒtƒ@‚ÉŠi”[‚µA’x‰„”z‘—‚·‚éB 
+/* Tera TermãŒå‹•ä½œã—ã¦ã„ã‚‹PCä¸Šã® X ã‚µãƒ¼ãƒãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«å¯¾ã—ã¦ã€ãƒ‡ãƒ¼ã‚¿ã‚’é€ã‚‹ã€‚
+ * ä¸€åº¦ã§é€ã‚Œãªã„å ´åˆã¯ã€ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡ã«æ ¼ç´ã—ã€é…å»¶é…é€ã™ã‚‹ã€‚ 
  *
- * “®ìƒtƒ[‚Í‰º‹L‚Ì’Ê‚èB
- * (1) ‰‰ñ‚Ìƒf[ƒ^‚ª“Í‚­B‚à‚µ‚­‚ÍAƒŠƒ“ƒOƒoƒbƒtƒ@‚ª‹óB
- * (2) non-blocking‚Å‘—M‚ğ‚İ‚éB‘S‘—M‚Å‚«‚½‚çreturnB
- * (3) ‘—M‚Å‚«‚È‚©‚Á‚½ƒf[ƒ^‚ÍƒŠƒ“ƒOƒoƒbƒtƒ@‚ÖŠi”[‚µAreturnB
- * (4) Ÿ‚Ìƒf[ƒ^‚ª“Í‚­B
- * (5) ƒŠƒ“ƒOƒoƒbƒtƒ@‚ÖŠi”[‚µAreturnB
- * (6) Ÿ‚Ìƒf[ƒ^‚ª“Í‚­B
- * (7) ƒŠƒ“ƒOƒoƒbƒtƒ@‚ªƒtƒ‹‚É‚È‚Á‚½‚çAƒoƒbƒtƒ@‚Éc‚Á‚Ä‚¢‚éƒf[ƒ^‚ğ blocking ‚Å‘—M‚ğ‚İ‚éB
- *     ‘—M¸”s‚µ‚½‚çAƒGƒ‰[returnB
- * (8) ƒ†[ƒUƒf[ƒ^(data/len)‚Ì‘—M‚ğ blocking ‚Å‘—M‚ğ‚İ‚éB
- *     ‘—M¸”s‚µ‚½‚çAƒGƒ‰[returnB 
- * (9) ‘—M‚Å‚«‚È‚©‚Á‚½ƒ†[ƒUƒf[ƒ^‚ÍƒŠƒ“ƒOƒoƒbƒtƒ@‚ÖŠi”[‚µAreturnB
- * (10) ƒŠƒ“ƒOƒoƒbƒtƒ@‚Éc‚Á‚Ä‚¢‚éƒf[ƒ^‚ğ non-blocking‚Å‘—M‚ğ‚İ‚éB
+ * å‹•ä½œãƒ•ãƒ­ãƒ¼ã¯ä¸‹è¨˜ã®é€šã‚Šã€‚
+ * (1) åˆå›ã®ãƒ‡ãƒ¼ã‚¿ãŒå±Šãã€‚ã‚‚ã—ãã¯ã€ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡ãŒç©ºã€‚
+ * (2) non-blockingã§é€ä¿¡ã‚’è©¦ã¿ã‚‹ã€‚å…¨é€ä¿¡ã§ããŸã‚‰returnã€‚
+ * (3) é€ä¿¡ã§ããªã‹ã£ãŸãƒ‡ãƒ¼ã‚¿ã¯ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡ã¸æ ¼ç´ã—ã€returnã€‚
+ * (4) æ¬¡ã®ãƒ‡ãƒ¼ã‚¿ãŒå±Šãã€‚
+ * (5) ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡ã¸æ ¼ç´ã—ã€returnã€‚
+ * (6) æ¬¡ã®ãƒ‡ãƒ¼ã‚¿ãŒå±Šãã€‚
+ * (7) ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡ãŒãƒ•ãƒ«ã«ãªã£ãŸã‚‰ã€ãƒãƒƒãƒ•ã‚¡ã«æ®‹ã£ã¦ã„ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’ blocking ã§é€ä¿¡ã‚’è©¦ã¿ã‚‹ã€‚
+ *     é€ä¿¡å¤±æ•—ã—ãŸã‚‰ã€ã‚¨ãƒ©ãƒ¼returnã€‚
+ * (8) ãƒ¦ãƒ¼ã‚¶ãƒ‡ãƒ¼ã‚¿(data/len)ã®é€ä¿¡ã‚’ blocking ã§é€ä¿¡ã‚’è©¦ã¿ã‚‹ã€‚
+ *     é€ä¿¡å¤±æ•—ã—ãŸã‚‰ã€ã‚¨ãƒ©ãƒ¼returnã€‚ 
+ * (9) é€ä¿¡ã§ããªã‹ã£ãŸãƒ¦ãƒ¼ã‚¶ãƒ‡ãƒ¼ã‚¿ã¯ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡ã¸æ ¼ç´ã—ã€returnã€‚
+ * (10) ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡ã«æ®‹ã£ã¦ã„ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’ non-blockingã§é€ä¿¡ã‚’è©¦ã¿ã‚‹ã€‚
  *
- * pvar: ‹¤—LƒŠƒ\[ƒX
- * buf: ƒŠƒ“ƒOƒoƒbƒtƒ@
- * blocking_write: “¯ŠúŒ^‚ÌƒpƒPƒbƒg‘—MŠÖ”
- * socket: ”ñ“¯ŠúŒ^‚Ìƒ\ƒPƒbƒgƒnƒ“ƒhƒ‹
- * data: ƒf[ƒ^
- * len: ƒf[ƒ^’·
+ * pvar: å…±æœ‰ãƒªã‚½ãƒ¼ã‚¹
+ * buf: ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡
+ * blocking_write: åŒæœŸå‹ã®ãƒ‘ã‚±ãƒƒãƒˆé€ä¿¡é–¢æ•°
+ * socket: éåŒæœŸå‹ã®ã‚½ã‚±ãƒƒãƒˆãƒãƒ³ãƒ‰ãƒ«
+ * data: ãƒ‡ãƒ¼ã‚¿
+ * len: ãƒ‡ãƒ¼ã‚¿é•·
  *
- * return TRUE: ‘—M¬Œ÷
- *        FALSE: ‘—MƒGƒ‰[
+ * return TRUE: é€ä¿¡æˆåŠŸ
+ *        FALSE: é€ä¿¡ã‚¨ãƒ©ãƒ¼
  */
 BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf *buf,
                               UTILBlockingWriteCallback blocking_write,
@@ -106,14 +106,14 @@ BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf *buf,
 	int first_copy_start;
 	int first_copy_amount;
 
-	// ‰‰ñŒÄ‚Ño‚µ‚ÍA‚©‚È‚ç‚¸‰º‹L if •¶‚É“ü‚éB
+	// åˆå›å‘¼ã³å‡ºã—æ™‚ã¯ã€ã‹ãªã‚‰ãšä¸‹è¨˜ if æ–‡ã«å…¥ã‚‹ã€‚
 	/* Fast path case: buffer is empty, try nonblocking write */
 	if (buf->datalen == 0) {
 #if 1
-		// ‚Ü‚¸‚Í non-blocking ‚ÅƒpƒPƒbƒg‘—M‚·‚éBˆê“x‚Å‚à WSAEWOULDBLOCK ƒGƒ‰[‚É‚È‚Á‚½‚çA
-		// ŠÖ”‚Íu‘—MÏ‚İƒf[ƒ^’·v‚ğ•Ô‚·B
-		// ‚½‚Æ‚¦‚ÎAX ƒT[ƒoƒvƒƒOƒ‰ƒ€‚Æ‚µ‚Ä"xterm"‚ğ‹N“®‚µ‚Ä‚¢‚½ê‡Axterm‚Ì’[––“à‚É‰½‚©
-		// •¶š‚ğ•\¦‚µ‘±‚¯‚Ä‚¢‚éó‘Ô‚ÅA’[––‚ÌƒEƒBƒ“ƒhƒE‚ğƒhƒ‰ƒbƒO‚·‚é‚ÆAŠÖ”‚Í 0 ‚ğ•Ô‚µ‚Ä‚­‚éB
+		// ã¾ãšã¯ non-blocking ã§ãƒ‘ã‚±ãƒƒãƒˆé€ä¿¡ã™ã‚‹ã€‚ä¸€åº¦ã§ã‚‚ WSAEWOULDBLOCK ã‚¨ãƒ©ãƒ¼ã«ãªã£ãŸã‚‰ã€
+		// é–¢æ•°ã¯ã€Œé€ä¿¡æ¸ˆã¿ãƒ‡ãƒ¼ã‚¿é•·ã€ã‚’è¿”ã™ã€‚
+		// ãŸã¨ãˆã°ã€X ã‚µãƒ¼ãƒãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¨ã—ã¦"xterm"ã‚’èµ·å‹•ã—ã¦ã„ãŸå ´åˆã€xtermã®ç«¯æœ«å†…ã«ä½•ã‹
+		// æ–‡å­—ã‚’è¡¨ç¤ºã—ç¶šã‘ã¦ã„ã‚‹çŠ¶æ…‹ã§ã€ç«¯æœ«ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ãƒ‰ãƒ©ãƒƒã‚°ã™ã‚‹ã¨ã€é–¢æ•°ã¯ 0 ã‚’è¿”ã—ã¦ãã‚‹ã€‚
 		int sent_amount = send_until_block(pvar, socket, data, len);
 
 		if (sent_amount < 0) {
@@ -122,15 +122,15 @@ BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf *buf,
 		data += sent_amount;
 		len -= sent_amount;
 #else
-		// ƒmƒ“ƒuƒƒbƒLƒ“ƒOƒ‚[ƒh‚Å‘—‚ê‚È‚©‚Á‚½ê‡AˆÈ~‚Ìˆ—‚Ö‘±‚­‚ªAƒoƒO‚ª‚ ‚é‚½‚ßA
-		// ‚Ü‚Æ‚à‚É“®‚©‚È‚¢B‚ä‚¦‚ÉA‰‰ñ‚ÅƒuƒƒbƒLƒ“ƒOƒ‚[ƒh‚ğg‚¢AŠmÀ‚É‘—M‚µ‚Ä‚µ‚Ü‚¤B
-		// ƒ|[ƒg“]‘—(local-to-remote)‚É‚¨‚¢‚ÄA‚Å‚©‚¢ƒpƒPƒbƒg‚ğóM‚Å‚«‚È‚¢–â‘è‚Ö‚Ì‘ÎˆB
+		// ãƒãƒ³ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰ã§é€ã‚Œãªã‹ã£ãŸå ´åˆã€ä»¥é™ã®å‡¦ç†ã¸ç¶šããŒã€ãƒã‚°ãŒã‚ã‚‹ãŸã‚ã€
+		// ã¾ã¨ã‚‚ã«å‹•ã‹ãªã„ã€‚ã‚†ãˆã«ã€åˆå›ã§ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰ã‚’ä½¿ã„ã€ç¢ºå®Ÿã«é€ä¿¡ã—ã¦ã—ã¾ã†ã€‚
+		// ãƒãƒ¼ãƒˆè»¢é€(local-to-remote)ã«ãŠã„ã¦ã€ã§ã‹ã„ãƒ‘ã‚±ãƒƒãƒˆã‚’å—ä¿¡ã§ããªã„å•é¡Œã¸ã®å¯¾å‡¦ã€‚
 		// (2007.11.29 yutaka)
-		// ƒIƒŠƒWƒiƒ‹ƒR[ƒh‚ÉƒoƒO‚ª‚ ‚é‚Æv‚Á‚Ä‚¢‚½‚ªASSH’x‰„‘—Mˆ—‚É–â‘è‚ª‚ ‚Á‚½‚½‚ßA
-		// ‚»‚ê‚ªª–{Œ´ˆö‚Å‚ ‚èAƒIƒŠƒWƒiƒ‹ƒR[ƒh‚É‚Í–â‘è‚ª‚È‚©‚Á‚½‚Æl‚¦‚éB
-		// –{—ˆ‚Íƒmƒ“ƒuƒƒbƒLƒ“ƒO‚Åˆµ‚¤‚×‚«‚Æ‚±‚ë‚ğA–³—–î—ƒuƒƒbƒLƒ“ƒO‚É‚·‚é‚±‚Æ‚É‚æ‚èA
-		// Tera Term‚ªu‰“š‚È‚µvAXming‚ªuCPUƒXƒg[ƒ‹v‚Æ‚¢‚¤•s‰Âv‹c‚ÈŒ»Û‚ªo‚Ä‚µ‚Ü‚¤
-		// ‚æ‚¤‚ÉŒ©‚¦‚éB‚»‚Ì‚½‚ßA–{—ˆ‚ÌƒR[ƒh‚É–ß‚·‚±‚Æ‚ğŒˆ’f‚·‚éB
+		// ã‚ªãƒªã‚¸ãƒŠãƒ«ã‚³ãƒ¼ãƒ‰ã«ãƒã‚°ãŒã‚ã‚‹ã¨æ€ã£ã¦ã„ãŸãŒã€SSHé…å»¶é€ä¿¡å‡¦ç†ã«å•é¡ŒãŒã‚ã£ãŸãŸã‚ã€
+		// ãã‚ŒãŒæ ¹æœ¬åŸå› ã§ã‚ã‚Šã€ã‚ªãƒªã‚¸ãƒŠãƒ«ã‚³ãƒ¼ãƒ‰ã«ã¯å•é¡ŒãŒãªã‹ã£ãŸã¨è€ƒãˆã‚‹ã€‚
+		// æœ¬æ¥ã¯ãƒãƒ³ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ã§æ‰±ã†ã¹ãã¨ã“ã‚ã‚’ã€ç„¡ç†çŸ¢ç†ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ã«ã™ã‚‹ã“ã¨ã«ã‚ˆã‚Šã€
+		// Tera TermãŒã€Œå¿œç­”ãªã—ã€ã€XmingãŒã€ŒCPUã‚¹ãƒˆãƒ¼ãƒ«ã€ã¨ã„ã†ä¸å¯æ€è­°ãªç¾è±¡ãŒå‡ºã¦ã—ã¾ã†
+		// ã‚ˆã†ã«è¦‹ãˆã‚‹ã€‚ãã®ãŸã‚ã€æœ¬æ¥ã®ã‚³ãƒ¼ãƒ‰ã«æˆ»ã™ã“ã¨ã‚’æ±ºæ–­ã™ã‚‹ã€‚
 		// (2012.10.14 yutaka)
 		if (!blocking_write(pvar, socket, data, len)) {
 			return FALSE;
@@ -140,15 +140,15 @@ BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf *buf,
 #endif
 	}
 
-	// ‰‰ñŒÄ‚Ño‚µ‚Ì non-blocking ‘—M‚ÅA‚·‚×‚Ä‘—‚èØ‚ê‚½‚çA‘¦À‚É¬Œ÷‚Å•Ô‚éB
+	// åˆå›å‘¼ã³å‡ºã—æ™‚ã® non-blocking é€ä¿¡ã§ã€ã™ã¹ã¦é€ã‚Šåˆ‡ã‚ŒãŸã‚‰ã€å³åº§ã«æˆåŠŸã§è¿”ã‚‹ã€‚
 	if (len == 0) {
 		return TRUE;
 	}
 
-	// ƒŠƒ“ƒOƒoƒbƒtƒ@(buf)‚Éc‘¶‚µ‚Ä‚¢‚éƒf[ƒ^‚ÆAV‹K‘—Mƒf[ƒ^‚ğ‘«‚µ‚Ä(desiredlen)A
-	// Œ»İ‚Ìƒoƒbƒtƒ@’·(curlen)‚ª‘«‚è‚é‚©‚ğŒvZ‚·‚éB
+	// ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡(buf)ã«æ®‹å­˜ã—ã¦ã„ã‚‹ãƒ‡ãƒ¼ã‚¿ã¨ã€æ–°è¦é€ä¿¡ãƒ‡ãƒ¼ã‚¿ã‚’è¶³ã—ã¦(desiredlen)ã€
+	// ç¾åœ¨ã®ãƒãƒƒãƒ•ã‚¡é•·(curlen)ãŒè¶³ã‚Šã‚‹ã‹ã‚’è¨ˆç®—ã™ã‚‹ã€‚
 	//
-	// (1)ƒf[ƒ^‚ªæ“ª‚ÉŠi”[‚³‚ê‚Ä‚¢‚éƒP[ƒX
+	// (1)ãƒ‡ãƒ¼ã‚¿ãŒå…ˆé ­ã«æ ¼ç´ã•ã‚Œã¦ã„ã‚‹ã‚±ãƒ¼ã‚¹
 	//
 	//                 <----- buflen ------------->
 	// buf->bufdata -> +--------------------------+
@@ -161,7 +161,7 @@ BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf *buf,
 	//                 buf->datastart
 	//
 	//
-	// (2)ƒf[ƒ^‚ª—¼’[‚ÉŠi”[‚³‚ê‚Ä‚¢‚éƒP[ƒX
+	// (2)ãƒ‡ãƒ¼ã‚¿ãŒä¸¡ç«¯ã«æ ¼ç´ã•ã‚Œã¦ã„ã‚‹ã‚±ãƒ¼ã‚¹
 	//
 	//                 <----- buflen ------------->
 	// buf->bufdata -> +--------------------------+
@@ -202,8 +202,8 @@ BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf *buf,
 	   2) Write data from user
 	   3) Copy remaining user data into buffer
 	 */
-	// ƒoƒbƒtƒ@‚ª‚¢‚Á‚Ï‚¢‚É‚È‚èAV‚µ‚¢ƒf[ƒ^(data)‚ªˆì‚ê‚éê‡‚É space_required ‚ª³‚Æ‚È‚éB
-	// ‚·‚È‚í‚¿Aspace_required‚Íuˆì‚ê‚½•ªv‚ğ•\‚·B
+	// ãƒãƒƒãƒ•ã‚¡ãŒã„ã£ã±ã„ã«ãªã‚Šã€æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿(data)ãŒæº¢ã‚Œã‚‹å ´åˆã« space_required ãŒæ­£ã¨ãªã‚‹ã€‚
+	// ã™ãªã‚ã¡ã€space_requiredã¯ã€Œæº¢ã‚ŒãŸåˆ†ã€ã‚’è¡¨ã™ã€‚
 	//
 	//                                               space_required
 	//                 <----- buflen -------------><-------->
@@ -344,9 +344,9 @@ void UTIL_get_lang_msgW(const char *key, PTInstVar pvar, const wchar_t *def, wch
 }
 
 /*
- *	“™•ƒtƒHƒ“ƒg‚ğæ“¾
- *	@retval		ƒtƒHƒ“ƒgƒnƒ“ƒhƒ‹
- *	@retval		NULL(ƒGƒ‰[)
+ *	ç­‰å¹…ãƒ•ã‚©ãƒ³ãƒˆã‚’å–å¾—
+ *	@retval		ãƒ•ã‚©ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ«
+ *	@retval		NULL(ã‚¨ãƒ©ãƒ¼)
  */
 HFONT UTIL_get_lang_fixedfont(HWND hWnd, const wchar_t *UILanguageFile)
 {
@@ -356,11 +356,11 @@ HFONT UTIL_get_lang_fixedfont(HWND hWnd, const wchar_t *UILanguageFile)
 	BOOL result = GetI18nLogfontW(L"TTSSH", L"DLG_ABOUT_FONT", &logfont,
 								 dpi, UILanguageFile);
 	if (result == FALSE) {
-		// “Ç‚İ‚ß‚È‚©‚Á‚½ê‡‚Í“™•ƒtƒHƒ“ƒg‚ğw’è‚·‚éB
-		// ƒGƒfƒBƒbƒgƒRƒ“ƒgƒ[ƒ‹‚Íƒ_ƒCƒAƒƒO‚Æ“¯‚¶ƒtƒHƒ“ƒg‚ğ‚Á‚Ä‚¨‚è
-		// “™•ƒtƒHƒ“ƒg‚Å‚Í‚È‚¢‚½‚ßB
+		// èª­ã¿è¾¼ã‚ãªã‹ã£ãŸå ´åˆã¯ç­‰å¹…ãƒ•ã‚©ãƒ³ãƒˆã‚’æŒ‡å®šã™ã‚‹ã€‚
+		// ã‚¨ãƒ‡ã‚£ãƒƒãƒˆã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã¯ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã¨åŒã˜ãƒ•ã‚©ãƒ³ãƒˆã‚’æŒã£ã¦ãŠã‚Š
+		// ç­‰å¹…ãƒ•ã‚©ãƒ³ãƒˆã§ã¯ãªã„ãŸã‚ã€‚
 
-		// ƒEƒBƒ“ƒhƒE(ƒ_ƒCƒAƒƒO)‚ÌƒtƒHƒ“ƒg‚ğæ“¾AƒtƒHƒ“ƒg‚‚ğQÆ‚·‚é
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦(ãƒ€ã‚¤ã‚¢ãƒ­ã‚°)ã®ãƒ•ã‚©ãƒ³ãƒˆã‚’å–å¾—ã€ãƒ•ã‚©ãƒ³ãƒˆé«˜ã‚’å‚ç…§ã™ã‚‹
 		HFONT hFontDlg;
 		LOGFONTW logfontDlg;
 		hFontDlg = (HFONT)SendMessage(hWnd, WM_GETFONT, (WPARAM)0, (LPARAM)0);
@@ -372,11 +372,11 @@ HFONT UTIL_get_lang_fixedfont(HWND hWnd, const wchar_t *UILanguageFile)
 		logfont.lfHeight = logfontDlg.lfHeight;
 		logfont.lfWidth = 0;
 	}
-	hFont = CreateFontIndirectW(&logfont);	// ƒGƒ‰[ NULL
+	hFont = CreateFontIndirectW(&logfont);	// ã‚¨ãƒ©ãƒ¼æ™‚ NULL
 #if 1
 	if (hFont == NULL) {
-		// ƒtƒHƒ“ƒg‚ª¶¬‚Å‚«‚È‚©‚Á‚½ê‡ stock object ‚ğg—p‚·‚é
-		// DeleteObject() ‚µ‚Ä‚àok‚Ì‚Í‚¸
+		// ãƒ•ã‚©ãƒ³ãƒˆãŒç”Ÿæˆã§ããªã‹ã£ãŸå ´åˆ stock object ã‚’ä½¿ç”¨ã™ã‚‹
+		// DeleteObject() ã—ã¦ã‚‚okã®ã¯ãš
 		// It is not necessary (but it is not harmful) to
 		// delete stock objects by calling DeleteObject.
 		hFont = GetStockObject(ANSI_FIXED_FONT);

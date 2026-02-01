@@ -16,16 +16,16 @@
 
     <p>
       Selecting this menu brings up the "Send file" dialog.<br>
-      Selecting this menu while holding down CTRL key skips "Send file" dialog
-      and you can send file by only selecting file.<br>
-      At this time, same sending options are used as before.
+      If you select this menu while holding down the CTRL key, it skips the "Send File" dialogand proceed to file selection.<br>
+      In that case, the same sending options as before will be used.
     <p>
 
     <p>
-      This behavior can be changed with <a href="#SpecialOption">Special Option</a>.
+      This behavior can be changed in the configuration file.
+      See "<a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">Skip Send file dialog</a>" for details.
     </p>
 
-    <h2 id="dialog">"Send file" dialog box (to input the file name)</h2>
+    <h2 id="dialog">"Send file" dialog box</h2>
     <dl>
       <dt>File Name</dt>
       <dd>
@@ -71,9 +71,9 @@
 
       <dt id="Binary">Binary</dt>
       <dd>
-	If you select this option, received characters are sent without any
-	modifications. Otherwise, new-line codes are converted and control
-	characters (except TAB, LF and CR) are stripped out.
+        If you select this option, received characters are sent without any
+        modifications. Otherwise, new-line codes are converted and control
+        characters (except TAB, LF and CR) are stripped out.
       </dd>
 
       <dt>Delay setting</dt>
@@ -119,92 +119,26 @@
       </dd>
     </dl>
 
-    <h3 id="SpecialOption">Special options in the Tera Term setup file</h3>
-    See also the following settings
-    <ul>
-      <li><a href="../setup/teraterm-trans.html#FileSendHighSpeedMode">High Speed File Transfer on Serial Connection (When sequential read)</a>
-      <li><a href="../setup/teraterm-trans.html#SendfileSkipOptionDialog">Skip Send file dialog</a>
-    </ul>
-
-
-    <h3>Send size</h3>
-
-    <p>
-      Considering receiver's receive buffer size and processing speed,
-      by inserting a delay for each specified send size,
-      file send can be performed more efficiently than by inserting a delay for each character or each line.
-    </p>
-
-    <p>
-      Dropping of transmitted data may occur at following part.
-    </p>
-
-    <pre>
-                     s1            s2                 s3                s4                         program
-Tera Term ---&gt; Send buffer  ---&gt; Windows ---&gt; (sshd,telnet,pipe) ---&gt; OS,driver      ---&gt; pty + shell, other program
-               in Tera Term                   (serial          )      UART chip,ext       Embedded programs, etc.
-
-               receive bufer &lt;--         &lt;---                    &lt;---                &lt;---
-                     r1            r2                 r3                r4
-    </pre>
-
-    <dl>
-      <dt>s1 Sned buffer in Tera Term</dt>
-      <dd>
-        It is unlikely to drop.<br>
-        Data is sended while watching free size of send buffer.
-      </dd>
-      <dt>s2 Windows</dt>
-      <dd>
-        It is unlikely to drop.<br>
-        Depending on hardware and driver version, various problems may occur, including BSoD.<br>
-        You can see details of driver in Tera Term serial port settings.
-      </dd>
-      <dt>s3 transmission path</dt>
-      <dd>
-        In serial, there is no resend process with error. If error occurs in data, data is dropped.<br>
-        For TCP/IP, pipe, it is unlikely to drop.
-      </dd>
-      <dt>s4 OS,UART chip(receiver)</dt>
-      <dd>
-        Receiving data beyond processing capacity of PC (CPU) (when PROGRAM does not pick up received data from OS or chip) or other causes,
-        Receive buffer of OS (driver) or UART chip are overflows and data is dropped.<br>
-        OS (driver) or program handles flow control depends on implementation.<br>
-        In TCP/IP, flow control and resend on error are performed, and in most cases,
-        protocol stack in OS handles these processes.<br>
-        In serial, user can decide whether flow control is used or not, and resend are not automatically performed in case of overflow or other errors.
-      </dd>
-      <dt>program</dt>
-      <dd>
-        Dropped due to receive buffer overflow, etc. in program.<br>
-        When receive buffer is about to overflow in pseudo terminal(pty), 0x07(BEL) is sent and Tera Term will ring bell.
-      </dd>
-    </dl>
-
-    Receive buffer size of main UART chips and drivers
-    <pre>
-      8250 UART                 no FIFO
-      16550 UART                16 Byte FIFO
-      FT232R                    256 Byte receive buffer
-      TTY drive(Linux 2.6.26)   4KB  (<a href="../reference/sourcecode.html#ttssh">SSH Design and Implementation in TTSSH</a>)
-</pre>
-
-    <p>
-      If echo of sent data is not returned, it is possible that received data has been dropped somewhere.
-    </p>
-
-    <h2>"Send file" dialog box (displayed while sending)</h2>
+    <h2>"Sending file" dialog box</h2>
     <dl>
       <dt>Close</dt>
       <dd>
-	The Close button quits sending.
+        The Close button quits sending.
       </dd>
 
       <dt>Pause/Start</dt>
       <dd>
-	The Pause button pauses sending. The Start button restarts sending.
-	These buttons function as toggles.
+        The Pause button pauses sending. The Start button restarts sending.
+        These buttons function as toggles.
       </dd>
     </dl>
+
+    <h2 id="drop">Drop of transmitted data</h2>
+    <p style="padding-left: 1em;">
+      When sending data at a high bit rate over the serial port, transmitted data may be dropped.<br>
+      This may be caused by insufficient performance of the connected device.<br>
+      Refer to the <a href="../usage/tips/data_drop.html#solution">Solution</a> section.
+    </p>
+
   </body>
 </html>

@@ -48,8 +48,8 @@
 #endif
 
 /**
- *	ANSI256F‚Ìæ“ª16F
- *	INIƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚Ş‚Æ‚«‚ÌƒL[ƒ[ƒh‚ÆF”Ô†‘Î‰
+ *	ANSI256è‰²æ™‚ã®å…ˆé ­16è‰²
+ *	INIãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚€ã¨ãã®ã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰ã¨è‰²ç•ªå·å¯¾å¿œ
  */
 static const struct {
 	int index;
@@ -75,7 +75,7 @@ static const struct {
 };
 
 /**
- *	INIƒtƒ@ƒCƒ‹‚ÌƒL[ƒ[ƒh‚ÆTColorTheme\‘¢‘Ì‚Ìƒƒ“ƒo[‚Ì‘Î‰•\
+ *	INIãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰ã¨TColorThemeæ§‹é€ ä½“ã®ãƒ¡ãƒ³ãƒãƒ¼ã®å¯¾å¿œè¡¨
  */
 static const struct {
 	const wchar_t *key;
@@ -117,7 +117,7 @@ static COLORREF LoadColorOneANSI(const wchar_t *section, const wchar_t *key, con
 		return defcolor;
 	}
 	if (*str == L'#') {
-		// #RRGGBB Œ`®
+		// #RRGGBB å½¢å¼
 		DWORD i32;
 		r = swscanf_s(str, L"#%08x", &i32);
 		if (r == 1) {
@@ -125,7 +125,7 @@ static COLORREF LoadColorOneANSI(const wchar_t *section, const wchar_t *key, con
 			return RGB((i32 & 0xff0000) >> 16, (i32 & 0x00ff00) >> 8, (i32 & 0x0000ff));
 		}
 	}
-	// R, G, B Œ`®
+	// R, G, B å½¢å¼
 	int red, green, blue;
 	r = swscanf_s(str, L"%d , %d , %d", &red, &green, &blue);
 	free(str);
@@ -142,7 +142,7 @@ static COLORREF BGGetColor(const wchar_t *section, const wchar_t *key, COLORREF 
 }
 
 /*
- *	color theme—pƒ[ƒh
+ *	color themeç”¨ãƒ­ãƒ¼ãƒ‰
  */
 static void ThemeLoadColorOld(const wchar_t *file, TColorTheme *theme)
 {
@@ -266,8 +266,8 @@ static void SaveColorANSINew(const wchar_t *section, const TAnsiColorSetting *co
 }
 
 /**
- *	ƒJƒ‰[ƒe[ƒ}‚Ì•Û‘¶
- *		TODO íœ
+ *	ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒã®ä¿å­˜
+ *		TODO å‰Šé™¤
  */
 #if 1
 void ThemeSaveColorOld(TColorTheme *color_theme, const wchar_t *fn)
@@ -287,7 +287,7 @@ void ThemeSaveColorOld(TColorTheme *color_theme, const wchar_t *fn)
 #endif
 
 /**
- *	ƒJƒ‰[ƒe[ƒ}‚Ì•Û‘¶
+ *	ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒã®ä¿å­˜
  */
 void ThemeSaveColor(TColorTheme *color_theme, const wchar_t *fn)
 {
@@ -327,7 +327,7 @@ static const wchar_t *GetBGPatternStr(BG_PATTERN id)
 	for (index = 0;; index++) {
 		const BG_PATTERN_ST *st = ThemeBGPatternList(index);
 		if (st == NULL) {
-			// Œ©‚Â‚©‚ç‚È‚¢
+			// è¦‹ã¤ã‹ã‚‰ãªã„
 			st = ThemeBGPatternList(0);
 			return st->str;
 		}
@@ -343,7 +343,7 @@ static BOOL GetBGPatternID(const wchar_t *str, BG_PATTERN *pattern)
 	for (index = 0;; index++) {
 		const BG_PATTERN_ST *st = ThemeBGPatternList(index);
 		if (st == NULL) {
-			// Œ©‚Â‚©‚ç‚È‚¢
+			// è¦‹ã¤ã‹ã‚‰ãªã„
 			st = ThemeBGPatternList(0);
 			*pattern = st->id;
 			return FALSE;
@@ -428,14 +428,14 @@ static BG_TYPE BGGetType(const wchar_t *section, const wchar_t *name, BG_TYPE de
 }
 
 /**
- *	BG‚ğƒ[ƒh
+ *	BGã‚’ãƒ­ãƒ¼ãƒ‰
  */
 void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg_theme)
 {
 	wchar_t pathW[MAX_PATH];
 	wchar_t *p;
 
-	// Dest ‚Ì“Ç‚İo‚µ
+	// Dest ã®èª­ã¿å‡ºã—
 	bg_theme->BGDest.enable = GetPrivateProfileIntW(section, L"BGDestEnable", 0, file);
 	bg_theme->BGDest.type = BGGetType(section, L"BGDestType", bg_theme->BGDest.type, file);
 	bg_theme->BGDest.pattern = BGGetPattern(section, L"BGPicturePattern", bg_theme->BGDest.pattern, file);
@@ -455,7 +455,7 @@ void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg
 		bg_theme->BGDest.file[0] = 0;
 	}
 
-	// Src1 ‚Ì“Ç‚İo‚µ
+	// Src1 ã®èª­ã¿å‡ºã—
 	bg_theme->BGSrc1.enable = GetPrivateProfileIntW(section, L"BGSrc1Enable", 0, file);
 	bg_theme->BGSrc1.type = BGGetType(section, L"BGSrc1Type", bg_theme->BGSrc1.type, file);
 	bg_theme->BGSrc1.pattern = BGGetPattern(section, L"BGSrc1Pattern", bg_theme->BGSrc1.pattern, file);
@@ -473,7 +473,7 @@ void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg
 		bg_theme->BGSrc1.file[0] = 0;
 	}
 
-	// Src2 ‚Ì“Ç‚İo‚µ
+	// Src2 ã®èª­ã¿å‡ºã—
 	bg_theme->BGSrc2.enable = GetPrivateProfileIntW(section, L"BGSrc2Enable", 0, file);
 	bg_theme->BGSrc2.type = BGGetType(section, L"BGSrc2Type", bg_theme->BGSrc2.type, file);
 	bg_theme->BGSrc2.pattern = BGGetPattern(section, L"BGSrc2Pattern", bg_theme->BGSrc2.pattern, file);
@@ -492,7 +492,7 @@ void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg
 		bg_theme->BGSrc2.file[0] = 0;
 	}
 
-	//‚»‚Ì‘¼“Ç‚İo‚µ
+	//ãã®ä»–èª­ã¿å‡ºã—
 	bg_theme->BGReverseTextAlpha = GetPrivateProfileIntW(section, L"BGReverseTextTone", bg_theme->BGReverseTextAlpha, file);
 	bg_theme->BGReverseTextAlpha = GetPrivateProfileIntW(section, L"BGReverseTextAlpha", bg_theme->BGReverseTextAlpha, file);
 	bg_theme->TextBackAlpha = GetPrivateProfileIntW(section, L"BGTextBackAlpha", bg_theme->TextBackAlpha, file);
@@ -500,7 +500,7 @@ void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg
 }
 
 /**
- *	BG‚ğƒ[ƒh
+ *	BGã‚’ãƒ­ãƒ¼ãƒ‰
  */
 void ThemeLoadBG(const wchar_t *file, BGTheme *bg_theme)
 {
@@ -513,7 +513,7 @@ static void ReadANSIColorSetting(const wchar_t *section, TAnsiColorSetting *colo
 	wchar_t BuffW[512];
 	char Buff[512];
 	int c, r, g, b;
-	// ANSIColor16‚ÍA–¾‚é‚¢/ˆÃ‚¢ƒOƒ‹[ƒv‚ª“ü‚ê‘Ö‚í‚Á‚Ä‚¢‚é
+	// ANSIColor16ã¯ã€æ˜ã‚‹ã„/æš—ã„ã‚°ãƒ«ãƒ¼ãƒ—ãŒå…¥ã‚Œæ›¿ã‚ã£ã¦ã„ã‚‹
 	const static int index256[] = {
 		0,
 		1, 2, 3, 4, 5, 6, 7,
@@ -568,7 +568,7 @@ static void ReadColorSetting(const wchar_t *section, TColorSetting *color, const
 }
 
 /**
- *	ƒJƒ‰[ƒe[ƒ}ƒvƒ‰ƒOƒCƒ“”Å ini ƒtƒ@ƒCƒ‹“Ç‚İ‚İ
+ *	ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒãƒ—ãƒ©ã‚°ã‚¤ãƒ³ç‰ˆ ini ãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿
  */
 static void LoadColorPlugin(const wchar_t *fn, TColorTheme *color_theme)
 {
@@ -588,7 +588,7 @@ static void LoadColorPlugin(const wchar_t *fn, TColorTheme *color_theme)
 }
 
 /**
- *	ƒJƒ‰[ƒe[ƒ}ƒtƒ@ƒCƒ‹“Ç‚İ‚İ,1ƒAƒgƒŠƒrƒ…[ƒg•ª
+ *	ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿,1ã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆåˆ†
  */
 static void LoadColorAttr(const wchar_t *section, const wchar_t *key, const wchar_t *file, TColorSetting *attr)
 {
@@ -631,19 +631,19 @@ static void LoadColorAttr(const wchar_t *section, const wchar_t *key, const wcha
 	if (fields == 2) {
 		free(str);
 		attr->change = change;
-		attr->enable = FALSE;	 // Fw’è‚ª“Ç‚ß‚È‚©‚Á‚½‚Ì‚ÅA•¶š‘®«‚Ì“Æ©F‚Í–³Œø
+		attr->enable = FALSE;	 // è‰²æŒ‡å®šãŒèª­ã‚ãªã‹ã£ãŸã®ã§ã€æ–‡å­—å±æ€§ã®ç‹¬è‡ªè‰²ã¯ç„¡åŠ¹
 		return;
 	}
 	fields = swscanf_s(str, L"%d", &change);
 	free(str);
 	if (fields == 1) {
-		attr->change = FALSE;	 // F•ÏX‚Í‚µ‚È‚¢
+		attr->change = FALSE;	 // è‰²å¤‰æ›´ã¯ã—ãªã„
 		return;
 	}
 }
 
 /*
- *	color theme—pƒ[ƒh
+ *	color themeç”¨ãƒ­ãƒ¼ãƒ‰
  */
 static void ThemeLoadColorDraft(const wchar_t *file, TColorTheme *theme)
 {
@@ -669,7 +669,7 @@ static void ThemeLoadColorDraft(const wchar_t *file, TColorTheme *theme)
 }
 
 /*
- *	ƒJƒ‰[ƒe[ƒ}iniƒtƒ@ƒCƒ‹‚ğƒ[ƒh‚·‚é
+ *	ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒiniãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
  */
 void ThemeLoadColor(const wchar_t *fn, TColorTheme *color_theme)
 {
@@ -680,10 +680,10 @@ void ThemeLoadColor(const wchar_t *fn, TColorTheme *color_theme)
 }
 
 /**
- *	ƒe[ƒ}ƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş
+ *	ãƒ†ãƒ¼ãƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€
  *
- * @param file				ƒtƒ@ƒCƒ‹–¼
- *							NULL‚Ì‚Í\‘¢‘Ì‚ÉƒfƒtƒHƒ‹ƒg’l‚ªİ’è‚³‚ê‚é
+ * @param file				ãƒ•ã‚¡ã‚¤ãƒ«å
+ *							NULLã®æ™‚ã¯æ§‹é€ ä½“ã«ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ãŒè¨­å®šã•ã‚Œã‚‹
  * @param bg_theme
  * @param color_theme
 */
@@ -693,11 +693,11 @@ void ThemeLoad(const wchar_t *file, BGTheme *bg_theme, TColorTheme *color_theme)
 	BOOL color = FALSE;
 	wchar_t *prevDir;
 
-	// ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ğ•Û‘¶
+	// ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ä¿å­˜
 	hGetCurrentDirectoryW(&prevDir);
 
-	// ƒe[ƒ}ƒtƒ@ƒCƒ‹‚Ì‚ ‚éƒfƒBƒŒƒNƒgƒŠ‚Éˆê“I‚ÉˆÚ“®
-	//		ƒe[ƒ}ƒtƒ@ƒCƒ‹‘Š‘ÎƒpƒX‚Å“Ç‚İ‚ß‚é‚æ‚¤
+	// ãƒ†ãƒ¼ãƒãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã«ä¸€æ™‚çš„ã«ç§»å‹•
+	//		ãƒ†ãƒ¼ãƒãƒ•ã‚¡ã‚¤ãƒ«ç›¸å¯¾ãƒ‘ã‚¹ã§èª­ã¿è¾¼ã‚ã‚‹ã‚ˆã†
 	if (file != NULL) {
 		wchar_t *dir = ExtractDirNameW(file);
 		SetCurrentDirectoryW(dir);
@@ -727,18 +727,18 @@ void ThemeLoad(const wchar_t *file, BGTheme *bg_theme, TColorTheme *color_theme)
 	ThemeGetBGDefault(bg_theme);
 	ThemeGetColorDefault(color_theme);
 
-	// BG + ƒJƒ‰[ƒe[ƒ} iniƒtƒ@ƒCƒ‹
+	// BG + ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒ iniãƒ•ã‚¡ã‚¤ãƒ«
 	if (bg && color) {
 		ThemeLoadBG(file, bg_theme);
 		ThemeLoadColor(file, color_theme);
 	}
-	// BGƒe[ƒ} iniƒtƒ@ƒCƒ‹
-	// TODO ‚±‚ÌƒJƒ‰[‚Í“Ç‚İ‚Ü‚È‚¢‚æ‚¤‚É‚µ‚½‚¢
+	// BGãƒ†ãƒ¼ãƒ iniãƒ•ã‚¡ã‚¤ãƒ«
+	// TODO ã“ã®æ™‚ã‚«ãƒ©ãƒ¼ã¯èª­ã¿è¾¼ã¾ãªã„ã‚ˆã†ã«ã—ãŸã„
 	else if (bg) {
 		ThemeLoadBG(file, bg_theme);
 		ThemeLoadColorOld(file, color_theme);
 	}
-	// ƒJƒ‰[ƒe[ƒ} iniƒtƒ@ƒCƒ‹
+	// ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒ iniãƒ•ã‚¡ã‚¤ãƒ«
 	else if (color) {
 		ThemeLoadColor(file, color_theme);
 	}
@@ -754,7 +754,7 @@ void ThemeLoad(const wchar_t *file, BGTheme *bg_theme, TColorTheme *color_theme)
 #endif
 	}
 
-	// ƒJƒŒƒ“ƒgƒtƒHƒ‹ƒ_‚ğŒ³‚É–ß‚·
+	// ã‚«ãƒ¬ãƒ³ãƒˆãƒ•ã‚©ãƒ«ãƒ€ã‚’å…ƒã«æˆ»ã™
 	SetCurrentDirectoryW(prevDir);
 	free(prevDir);
 }

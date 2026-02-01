@@ -36,16 +36,16 @@
 
 #include "asprintf.h"
 
-// Visual Studio ‚Å‚Í‚È‚¢A–³Œø‰»(Á‚·)
+// Visual Studio ã§ã¯ãªã„æ™‚ã€ç„¡åŠ¹åŒ–(æ¶ˆã™)
 #if !defined(_MSC_VER)
 #define _Printf_format_string_
 #endif
 
 /**
- *	—Ìˆæ‚ğŠm•Û‚µ‚ÄA•¶š—ñ‚ğƒtƒH[ƒ}ƒbƒg‚µ‚ÄAƒ|ƒCƒ“ƒ^•Ô‚·
- *	•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
- *	@retval	o—Í•¶š”(I’[‚Ì'\0'‚ğŠÜ‚Ş)
- *			ƒGƒ‰[ -1
+ *	é ˜åŸŸã‚’ç¢ºä¿ã—ã¦ã€æ–‡å­—åˆ—ã‚’ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã—ã¦ã€ãƒã‚¤ãƒ³ã‚¿è¿”ã™
+ *	ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
+ *	@retval	å‡ºåŠ›æ–‡å­—æ•°(çµ‚ç«¯ã®'\0'ã‚’å«ã‚€)
+ *			ã‚¨ãƒ©ãƒ¼æ™‚ -1
  */
 int vasprintf(char **strp, const char *fmt, va_list ap)
 {
@@ -53,9 +53,9 @@ int vasprintf(char **strp, const char *fmt, va_list ap)
 	size_t tmp_size = 128;
 	for(;;) {
 		char *p = (char *)realloc(tmp_ptr, tmp_size);
-		assert(p != NULL);
 		if (p == NULL) {
-			// ƒƒ‚ƒŠ•s‘«
+			// ãƒ¡ãƒ¢ãƒªä¸è¶³
+			assert(0);
 			free(tmp_ptr);
 			*strp = NULL;
 			return -1;
@@ -63,23 +63,30 @@ int vasprintf(char **strp, const char *fmt, va_list ap)
 		tmp_ptr = p;
 		int len = _vsnprintf_s(tmp_ptr, tmp_size, _TRUNCATE, fmt, ap);
 		if (len == -1) {
-			// —Ìˆæ•s‘«
+			// é ˜åŸŸä¸è¶³
 			tmp_size *= 2;
 			continue;
 		}
 
 		len++;	// +1 for '\0' (terminator)
-		tmp_ptr = (char *)realloc(tmp_ptr, len);
-		*strp = tmp_ptr;
+		char *p2 = (char *)realloc(tmp_ptr, len);
+		if (p2 == NULL) {
+			// ãƒ¡ãƒ¢ãƒªä¸è¶³
+			assert(0);
+			free(tmp_ptr);
+			*strp = NULL;
+			return -1;
+		}
+		*strp = p2;
 		return len;
 	}
 }
 
 /**
- *	—Ìˆæ‚ğŠm•Û‚µ‚ÄA•¶š—ñ‚ğƒtƒH[ƒ}ƒbƒg‚µ‚ÄAƒ|ƒCƒ“ƒ^•Ô‚·
- *	•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
- *	@retval	o—Í•¶š”(I’[‚ÌL'\0'‚ğŠÜ‚Ş)
- *			ƒGƒ‰[ -1
+ *	é ˜åŸŸã‚’ç¢ºä¿ã—ã¦ã€æ–‡å­—åˆ—ã‚’ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã—ã¦ã€ãƒã‚¤ãƒ³ã‚¿è¿”ã™
+ *	ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
+ *	@retval	å‡ºåŠ›æ–‡å­—æ•°(çµ‚ç«¯ã®L'\0'ã‚’å«ã‚€)
+ *			ã‚¨ãƒ©ãƒ¼æ™‚ -1
  */
 int vaswprintf(wchar_t **strp, const wchar_t *fmt, va_list ap)
 {
@@ -87,9 +94,9 @@ int vaswprintf(wchar_t **strp, const wchar_t *fmt, va_list ap)
 	size_t tmp_size = 128;
 	for(;;) {
 		wchar_t *p = (wchar_t *)realloc(tmp_ptr, sizeof(wchar_t) * tmp_size);
-		assert(p != NULL);
 		if (p == NULL) {
-			// ƒƒ‚ƒŠ•s‘«
+			// ãƒ¡ãƒ¢ãƒªä¸è¶³
+			assert(0);
 			free(tmp_ptr);
 			*strp = NULL;
 			return -1;
@@ -97,23 +104,31 @@ int vaswprintf(wchar_t **strp, const wchar_t *fmt, va_list ap)
 		tmp_ptr = p;
 		int len = _vsnwprintf_s(tmp_ptr, tmp_size, _TRUNCATE, fmt, ap);
 		if (len == -1) {
-			// —Ìˆæ•s‘«
+			// é ˜åŸŸä¸è¶³
 			tmp_size *= 2;
 			continue;
 		}
 
+		// reduce memory size
 		len++;	// +1 for '\0' (terminator)
-		tmp_ptr = (wchar_t *)realloc(tmp_ptr, sizeof(wchar_t) * len);
-		*strp = tmp_ptr;
+		wchar_t *p2 = (wchar_t *)realloc(tmp_ptr, sizeof(wchar_t) * len);
+		if (p2 == NULL) {
+			// ãƒ¡ãƒ¢ãƒªä¸è¶³
+			assert(0);
+			free(tmp_ptr);
+			*strp = NULL;
+			return -1;
+		}
+		*strp = p2;
 		return len;
 	}
 }
 
 /**
- *	—Ìˆæ‚ğŠm•Û‚µ‚ÄA•¶š—ñ‚ğƒtƒH[ƒ}ƒbƒg‚µ‚ÄAƒ|ƒCƒ“ƒ^•Ô‚·
- *	•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
- *	@retval	o—Í•¶š”(I’[‚Ì'\0'‚ğŠÜ‚Ş)
- *			ƒGƒ‰[ -1
+ *	é ˜åŸŸã‚’ç¢ºä¿ã—ã¦ã€æ–‡å­—åˆ—ã‚’ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã—ã¦ã€ãƒã‚¤ãƒ³ã‚¿è¿”ã™
+ *	ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
+ *	@retval	å‡ºåŠ›æ–‡å­—æ•°(çµ‚ç«¯ã®'\0'ã‚’å«ã‚€)
+ *			ã‚¨ãƒ©ãƒ¼æ™‚ -1
  */
 int asprintf(char **strp, _Printf_format_string_ const char *fmt, ...)
 {
@@ -126,10 +141,10 @@ int asprintf(char **strp, _Printf_format_string_ const char *fmt, ...)
 }
 
 /**
- *	—Ìˆæ‚ğŠm•Û‚µ‚ÄA•¶š—ñ‚ğƒtƒH[ƒ}ƒbƒg‚µ‚ÄAƒ|ƒCƒ“ƒ^•Ô‚·
- *	•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
- *	@retval	o—Í•¶š”(I’[‚Ì'\0'‚ğŠÜ‚Ş)
- *			ƒGƒ‰[ -1
+ *	é ˜åŸŸã‚’ç¢ºä¿ã—ã¦ã€æ–‡å­—åˆ—ã‚’ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã—ã¦ã€ãƒã‚¤ãƒ³ã‚¿è¿”ã™
+ *	ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
+ *	@retval	å‡ºåŠ›æ–‡å­—æ•°(çµ‚ç«¯ã®'\0'ã‚’å«ã‚€)
+ *			ã‚¨ãƒ©ãƒ¼æ™‚ -1
  */
 int aswprintf(wchar_t **strp, _Printf_format_string_ const wchar_t *fmt, ...)
 {
@@ -142,12 +157,12 @@ int aswprintf(wchar_t **strp, _Printf_format_string_ const wchar_t *fmt, ...)
 }
 
 /**
- *	•¶š—ñ‚ğ˜AŒ‹‚·‚é
- *	@param[in]	dest	malloc‚³‚ê‚½—Ìˆæ,•¶š—ñ
- *						*dest == NULL‚Ìê‡‚ÍV‚½‚È—Ìˆæ‚ªŠm•Û‚³‚ê‚é
- *						•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
- *	@param[in]	add		˜AŒ‹‚³‚ê‚é•¶š—ñ
- *						NULL‚Ìê‡‚Í‚È‚É‚às‚í‚È‚¢
+ *	æ–‡å­—åˆ—ã‚’é€£çµã™ã‚‹
+ *	@param[in]	dest	mallocã•ã‚ŒãŸé ˜åŸŸ,æ–‡å­—åˆ—
+ *						*dest == NULLã®å ´åˆã¯æ–°ãŸãªé ˜åŸŸãŒç¢ºä¿ã•ã‚Œã‚‹
+ *						ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
+ *	@param[in]	add		é€£çµã•ã‚Œã‚‹æ–‡å­—åˆ—
+ *						NULLã®å ´åˆã¯ãªã«ã‚‚è¡Œã‚ãªã„
  */
 void awcscat(wchar_t **dest, const wchar_t *add)
 {
@@ -164,7 +179,7 @@ void awcscat(wchar_t **dest, const wchar_t *add)
 		size_t new_len = dest_len + add_len + 1;
 		wchar_t *new_dest = (wchar_t *)realloc(*dest, sizeof(wchar_t) * new_len);
 		if (new_dest == NULL) {
-			// ƒƒ‚ƒŠ•s‘«, ‰½‚às‚í‚È‚¢
+			// ãƒ¡ãƒ¢ãƒªä¸è¶³, ä½•ã‚‚è¡Œã‚ãªã„
 			return;
 		}
 		wmemcpy(new_dest + dest_len, add, add_len + 1);
@@ -173,14 +188,14 @@ void awcscat(wchar_t **dest, const wchar_t *add)
 }
 
 /**
- *	•¶š—ñ‚ğ˜A‘±‚µ‚Ä˜AŒ‹‚·‚é
- *	@param[in]	dest	malloc‚³‚ê‚½—Ìˆæ,•¶š—ñ
- *						*dest == NULL‚Ìê‡‚ÍV‚½‚È—Ìˆæ‚ªŠm•Û‚³‚ê‚é
- *						•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
- *	@param[in]	add		˜AŒ‹‚³‚ê‚é•¶š—ñ
- *						NULL‚Ìê‡‚Í‚È‚É‚às‚í‚È‚¢
- *				NULL ‚Ü‚Å˜A‘±‚µ‚Ä˜AŒ‹‚³‚ê‚é
- *	—á
+ *	æ–‡å­—åˆ—ã‚’é€£ç¶šã—ã¦é€£çµã™ã‚‹
+ *	@param[in]	dest	mallocã•ã‚ŒãŸé ˜åŸŸ,æ–‡å­—åˆ—
+ *						*dest == NULLã®å ´åˆã¯æ–°ãŸãªé ˜åŸŸãŒç¢ºä¿ã•ã‚Œã‚‹
+ *						ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
+ *	@param[in]	add		é€£çµã•ã‚Œã‚‹æ–‡å­—åˆ—
+ *						NULLã®å ´åˆã¯ãªã«ã‚‚è¡Œã‚ãªã„
+ *				NULL ã¾ã§é€£ç¶šã—ã¦é€£çµã•ã‚Œã‚‹
+ *	ä¾‹
  *		wchar_t *full_path = NULL;
  *		awcscats(&full_path, dir, L"\\", filename, NULL);
  *		CreateFileW(full_path, ...);

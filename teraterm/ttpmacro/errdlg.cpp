@@ -80,9 +80,9 @@ BOOL CErrDlg::OnInitDialog()
 
 	SetDlgItemTextW(IDC_ERRMSG,MsgStr);
 
-	// �s�ԍ���擪�ɂ���B
-	// �t�@�C����������B
-	// �G���[�ӏ��Ɉ������B
+	// 行番号を先頭につける。
+	// ファイル名もつける。
+	// エラー箇所に印をつける。
 	_snwprintf_s(buf, _countof(buf), _TRUNCATE, L"%ls:%d:", MacroFileName, LineNo);
 	SetDlgItemTextW(IDC_ERRLINE, buf);
 

@@ -170,7 +170,7 @@ char *get_cipher_string(const struct ssh2cipher *cipher)
 	}
 }
 
-// ˆÃ†ƒAƒ‹ƒSƒŠƒYƒ€–¼‚©‚çŒŸõ‚·‚éB
+// æš—å·ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ åã‹ã‚‰æ¤œç´¢ã™ã‚‹ã€‚
 const struct ssh2cipher *get_cipher_by_name(char *name)
 {
 	const struct ssh2cipher *ptr = ssh2_ciphers;
@@ -189,7 +189,7 @@ const struct ssh2cipher *get_cipher_by_name(char *name)
 	return NULL;
 }
 
-// •\¦–¼
+// è¡¨ç¤ºå
 char *get_cipher_name(int cipher_id)
 {
 	switch (cipher_id) {
@@ -250,14 +250,14 @@ char *get_cipher_name(int cipher_id)
 	case SSH2_CIPHER_AES256_GCM:
 		return "aes256-gcm@openssh.com";
 	case SSH2_CIPHER_CHACHAPOLY:
-		return "chacha20-poly1305@openssh.com(SSH2)";
+		return "chacha20-poly1305@openssh.com";
 
 	default:
 		return "Unknown";
 	}
 }
 
-// ƒŠƒXƒgƒ{ƒbƒNƒX•\¦–¼
+// ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹è¡¨ç¤ºå
 wchar_t *get_listbox_cipher_nameW(int cipher_id, PTInstVar pvar)
 {
 	typedef struct {
@@ -380,18 +380,18 @@ const struct ssh2cipher *choose_SSH2_cipher_algorithm(char *server_proposal, cha
 
 void SSH2_update_cipher_myproposal(PTInstVar pvar)
 {
-	static char buf[512]; // TODO: malloc()‚É‚·‚×‚«
+	static char buf[512]; // TODO: malloc()ã«ã™ã¹ã
 	int cipher;
 	size_t len, i;
 	char *c_str;
 
-	// ’ÊM’†‚ÉŒÄ‚Î‚ê‚é‚Æ‚¢‚¤‚±‚Æ‚ÍƒL[Äì¬
-	// ƒL[Äì¬‚Ìê‡‚Í‰½‚à‚µ‚È‚¢
+	// é€šä¿¡ä¸­ã«å‘¼ã°ã‚Œã‚‹ã¨ã„ã†ã“ã¨ã¯ã‚­ãƒ¼å†ä½œæˆ
+	// ã‚­ãƒ¼å†ä½œæˆã®å ´åˆã¯ä½•ã‚‚ã—ãªã„
 	if (pvar->socket != INVALID_SOCKET) {
 		return;
 	}
 
-	// ˆÃ†ƒAƒ‹ƒSƒŠƒYƒ€—Dæ‡ˆÊ‚É‰‚¶‚ÄAmyproposal[]‚ğ‘‚«Š·‚¦‚éB(2004.11.6 yutaka)
+	// æš—å·ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ å„ªå…ˆé †ä½ã«å¿œã˜ã¦ã€myproposal[]ã‚’æ›¸ãæ›ãˆã‚‹ã€‚(2004.11.6 yutaka)
 	buf[0] = '\0';
 	for (i = 0 ; pvar->settings.CipherOrder[i] != 0 ; i++) {
 		cipher = pvar->settings.CipherOrder[i] - '0';
@@ -504,7 +504,7 @@ void SSH2_update_cipher_myproposal(PTInstVar pvar)
 
 
 //
-// SSH2—pƒAƒ‹ƒSƒŠƒYƒ€‚Ì‰Šú‰»
+// SSH2ç”¨ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã®åˆæœŸåŒ–
 //
 int cipher_init_SSH2(
 	struct sshcipher_ctx **ccp, const struct ssh2cipher *cipher,
@@ -626,7 +626,7 @@ out:
 }
 
 //
-// SSH2—pƒAƒ‹ƒSƒŠƒYƒ€‚Ì”jŠü
+// SSH2ç”¨ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã®ç ´æ£„
 ///
 void cipher_free_SSH2(struct sshcipher_ctx *cc)
 {

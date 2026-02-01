@@ -38,24 +38,24 @@ typedef struct TTTextSt TTText;
 
 /**
  *	TTTextURL
- *	ƒXƒ^ƒeƒBƒbƒNƒeƒLƒXƒgƒNƒŠƒbƒN‚ÅURL‚ğŠJ‚­
+ *	ã‚¹ã‚¿ãƒ†ã‚£ãƒƒã‚¯ãƒ†ã‚­ã‚¹ãƒˆã‚¯ãƒªãƒƒã‚¯ã§URLã‚’é–‹ã
  *
- *	@param	hDlg		ƒ_ƒCƒAƒƒO
+ *	@param	hDlg		ãƒ€ã‚¤ã‚¢ãƒ­ã‚°
  *	@param	id			static text id
- *	@param	text		•\¦‚·‚étext, NULL‚Ì‚Æ‚«‚Í static text ‚Éİ’è‚µ‚Ä‚ ‚étext‚ğg—p‚·‚é
- *	@param	url			ƒNƒŠƒbƒN‚³‚ê‚½‚Æ‚«ŠJ‚­URL, NULL‚Ì‚Æ‚«‚Í•\¦text‚ğŠJ‚­
+ *	@param	text		è¡¨ç¤ºã™ã‚‹text, NULLã®ã¨ãã¯ static text ã«è¨­å®šã—ã¦ã‚ã‚‹textã‚’ä½¿ç”¨ã™ã‚‹
+ *	@param	url			ã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸã¨ãé–‹ãURL, NULLã®ã¨ãã¯è¡¨ç¤ºtextã‚’é–‹ã
  */
 TTText *TTTextURL(HWND hDlg, int id, const wchar_t *text, const char *url);
 
 /**
  *	TTTextMenu
- *	ƒXƒ^ƒeƒBƒbƒNƒeƒLƒXƒg‚©‚çƒƒbƒZ[ƒW‚ğ‘—M
+ *	ã‚¹ã‚¿ãƒ†ã‚£ãƒƒã‚¯ãƒ†ã‚­ã‚¹ãƒˆã‹ã‚‰ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é€ä¿¡
  *
- *	@param	hDlg		ƒ_ƒCƒAƒƒO
+ *	@param	hDlg		ãƒ€ã‚¤ã‚¢ãƒ­ã‚°
  *	@param	id			static text id
- *	@param	text		•\¦‚·‚étext, NULL‚Ì‚Æ‚«‚Í static text ‚Éİ’è‚µ‚Ä‚ ‚étext‚ğg—p‚·‚é
- *	@param	menu_wnd	ƒNƒŠƒbƒN‚³‚ê‚½‚Æ‚«‘—M‚·‚éƒEƒBƒ“ƒhƒE
- *	@param	menu_id		ƒNƒŠƒbƒN‚³‚ê‚½‚Æ‚«‘—M‚·‚éƒƒbƒZ[ƒWID
+ *	@param	text		è¡¨ç¤ºã™ã‚‹text, NULLã®ã¨ãã¯ static text ã«è¨­å®šã—ã¦ã‚ã‚‹textã‚’ä½¿ç”¨ã™ã‚‹
+ *	@param	menu_wnd	ã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸã¨ãé€ä¿¡ã™ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+ *	@param	menu_id		ã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸã¨ãé€ä¿¡ã™ã‚‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ID
  */
 TTText *TTTextMenu(HWND hDlg, int id, const wchar_t *text, HWND menu_wnd, int menu_id);
 

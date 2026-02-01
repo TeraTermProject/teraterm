@@ -36,6 +36,8 @@
 #include <string.h>
 
 #include "ttcommon.h"
+#include "tslib.h"
+#include "codeconv.h"
 
 #include "tekesc.h"
 #include "tttek.h"
@@ -58,12 +60,6 @@ void PASCAL TEKInit(PTEKVar tk, PTTSet ts)
   tk->AdjustSize = FALSE;
   tk->ScaleFont = FALSE;
   tk->TextSize = 0;
-
-  memset(&(tk->TEKlf), 0, sizeof(LOGFONT));
-  tk->TEKlf.lfHeight  = ts->TEKFontSize.y; /* Font Height */
-  tk->TEKlf.lfWidth   = ts->TEKFontSize.x; /* Font Width */
-  tk->TEKlf.lfCharSet = ts->TEKFontCharSet; /* Character Set */
-  strncpy_s(tk->TEKlf.lfFaceName, sizeof(tk->TEKlf.lfFaceName),  ts->TEKFont, _TRUNCATE);
 
   tk->MoveFlag = TRUE;
 
@@ -212,6 +208,7 @@ void PASCAL TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H)
   HDC TempDC;
   HFONT TempOldFont;
   RECT R;
+  LOGFONTW logfont;
 
   if (tk->Select)
     SwitchRubberBand(tk, ts, FALSE);
@@ -248,23 +245,25 @@ void PASCAL TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H)
   TempDC = GetDC(tk->HWin);
   tk->MemDC = CreateCompatibleDC(TempDC);
 
+  TSGetLogFont(tk->HWin, ts, 1, 0, &logfont);
+
   /* Create standard size font */
   if (tk->ScaleFont)
   {
-    tk->TEKlf.lfHeight = (int)((float)tk->ScreenHeight / 35.0);
-    tk->TEKlf.lfWidth = (int)((float)tk->ScreenWidth / 74.0);
+    logfont.lfHeight = (int)((float)tk->ScreenHeight / 35.0);
+    logfont.lfWidth = (int)((float)tk->ScreenWidth / 74.0);
   }
 
-  tk->TEKlf.lfWeight = FW_NORMAL;
-  tk->TEKlf.lfItalic = 0;
-  tk->TEKlf.lfUnderline = 0;
-  tk->TEKlf.lfStrikeOut = 0;
-  tk->TEKlf.lfOutPrecision  = OUT_CHARACTER_PRECIS;
-  tk->TEKlf.lfClipPrecision = CLIP_CHARACTER_PRECIS;
-  tk->TEKlf.lfQuality       = DEFAULT_QUALITY;
-  tk->TEKlf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
+  logfont.lfWeight = FW_NORMAL;
+  logfont.lfItalic = 0;
+  logfont.lfUnderline = 0;
+  logfont.lfStrikeOut = 0;
+  logfont.lfOutPrecision  = OUT_CHARACTER_PRECIS;
+  logfont.lfClipPrecision = CLIP_CHARACTER_PRECIS;
+  logfont.lfQuality       = DEFAULT_QUALITY;
+  logfont.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
 
-  tk->TEKFont[0] = CreateFontIndirect(&tk->TEKlf);
+  tk->TEKFont[0] = CreateFontIndirectW(&logfont);
   /* Check standard font size */
   TempOldFont = SelectObject(TempDC,tk->TEKFont[0]);
   GetTextMetrics(TempDC, &Metrics);
@@ -281,42 +280,42 @@ void PASCAL TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H)
       tk->ScreenWidth = Width;
   }
 
-  Height = tk->TEKlf.lfHeight;
-  Width = tk->TEKlf.lfWidth;
+  Height = logfont.lfHeight;
+  Width = logfont.lfWidth;
 
   /* marker font */
-  tk->TEKlf.lfCharSet = SYMBOL_CHARSET;
-  strncpy_s(tk->TEKlf.lfFaceName, sizeof(tk->TEKlf.lfFaceName), "Symbol", _TRUNCATE);
-  tk->MarkerFont = CreateFontIndirect(&tk->TEKlf);
-  tk->TEKlf.lfCharSet = ts->TEKFontCharSet;
-  strncpy_s(tk->TEKlf.lfFaceName, sizeof(tk->TEKlf.lfFaceName),  ts->TEKFont, _TRUNCATE);
+  logfont.lfCharSet = SYMBOL_CHARSET;
+  wcsncpy_s(logfont.lfFaceName, _countof(logfont.lfFaceName), L"Symbol", _TRUNCATE);
+  tk->MarkerFont = CreateFontIndirectW(&logfont);
+  logfont.lfCharSet = ts->TEKFontCharSet;
+  ACPToWideChar_t(ts->TEKFont, logfont.lfFaceName, _countof(logfont.lfFaceName));
   SelectObject(TempDC,tk->MarkerFont);
   GetTextMetrics(TempDC, &Metrics);
   tk->MarkerW = Metrics.tmAveCharWidth;
   tk->MarkerH = Metrics.tmHeight;
 
   /* second font */
-  tk->TEKlf.lfHeight = (int)((float)tk->ScreenHeight / 38.0);
-  tk->TEKlf.lfWidth = (int)((float)tk->ScreenWidth / 80.0);
-  tk->TEKFont[1] = CreateFontIndirect(&tk->TEKlf);
+  logfont.lfHeight = (int)((float)tk->ScreenHeight / 38.0);
+  logfont.lfWidth = (int)((float)tk->ScreenWidth / 80.0);
+  tk->TEKFont[1] = CreateFontIndirectW(&logfont);
   SelectObject(TempDC,tk->TEKFont[1]);
   GetTextMetrics(TempDC, &Metrics);
   tk->FW[1] = Metrics.tmAveCharWidth;
   tk->FH[1] = Metrics.tmHeight;
 
   /* third font */
-  tk->TEKlf.lfHeight = (int)((float)tk->ScreenHeight / 58.0);
-  tk->TEKlf.lfWidth = (int)((float)tk->ScreenWidth / 121.0);
-  tk->TEKFont[2] = CreateFontIndirect(&tk->TEKlf);
+  logfont.lfHeight = (int)((float)tk->ScreenHeight / 58.0);
+  logfont.lfWidth = (int)((float)tk->ScreenWidth / 121.0);
+  tk->TEKFont[2] = CreateFontIndirectW(&logfont);
   SelectObject(TempDC,tk->TEKFont[2]);
   GetTextMetrics(TempDC, &Metrics);
   tk->FW[2] = Metrics.tmAveCharWidth;
   tk->FH[2] = Metrics.tmHeight;
 
   /* forth font */
-  tk->TEKlf.lfHeight = (int)((float)tk->ScreenHeight / 64.0);
-  tk->TEKlf.lfWidth = (int)((float)tk->ScreenWidth / 133.0);
-  tk->TEKFont[3] = CreateFontIndirect(&tk->TEKlf);
+  logfont.lfHeight = (int)((float)tk->ScreenHeight / 64.0);
+  logfont.lfWidth = (int)((float)tk->ScreenWidth / 133.0);
+  tk->TEKFont[3] = CreateFontIndirectW(&logfont);
   SelectObject(TempDC,tk->TEKFont[3]);
   GetTextMetrics(TempDC, &Metrics);
   tk->FW[3] = Metrics.tmAveCharWidth;
@@ -327,8 +326,8 @@ void PASCAL TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H)
   tk->FontWidth = tk->FW[tk->TextSize];
   tk->FontHeight = tk->FH[tk->TextSize];
 
-  tk->TEKlf.lfHeight = Height;
-  tk->TEKlf.lfWidth = Width;
+  logfont.lfHeight = Height;
+  logfont.lfWidth = Width;
 
   if (ts->TEKColorEmu>0)
     tk->HBits =
@@ -398,6 +397,7 @@ void PASCAL TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H)
   }
 
   tk->ScaleFont = FALSE;
+  tk->TEKlf = logfont;	// GraphText() tekesc.c で参照
 }
 
 int PASCAL TEKParse(PTEKVar tk, PTTSet ts, PComVar cv)
@@ -784,15 +784,6 @@ void PASCAL TEKSetupFont(PTEKVar tk, PTTSet ts)
 //  BOOL Ok;
   RECT R;
 
-//  if (! LoadTTDLG()) return;
-//  Ok = (*ChooseFontDlg)(tk->HWin,&tk->TEKlf,NULL);
-//  if (! Ok) return;
-
-  strncpy_s(ts->TEKFont, sizeof(ts->TEKFont), tk->TEKlf.lfFaceName, _TRUNCATE);
-  ts->TEKFontSize.x = tk->TEKlf.lfWidth;
-  ts->TEKFontSize.y = tk->TEKlf.lfHeight;
-  ts->TEKFontCharSet = tk->TEKlf.lfCharSet;
-
   GetWindowRect(tk->HWin, &R);
   W = R.right - R.left;
   H = R.bottom - R.top;
@@ -868,32 +859,12 @@ void PASCAL TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld)
   InvalidateRect(tk->HWin,NULL,TRUE);
 }
 
-/* BOOL PASCAL TEKSetupWinDlg(PTEKVar tk, PTTSet ts)
-{
-  BOOL Ok;
-  WORD OldEmu;
-
-  ts->VTFlag = 0;
-  ts->SampleFont = tk->TEKFont[0];
-
-  if (! LoadTTDLG()) return FALSE;
-  OldEmu = ts->TEKColorEmu;
-  Ok = (*SetupWin)(tk->HWin, ts);
-
-  if (Ok) TEKResetWin(tk,ts,OldEmu);
-  return Ok;
-} */
-
 void PASCAL TEKRestoreSetup(PTEKVar tk, PTTSet ts)
 {
   int W, H;
   RECT R;
 
   /* change window */
-  strncpy_s(tk->TEKlf.lfFaceName, sizeof(tk->TEKlf.lfFaceName), ts->TEKFont, _TRUNCATE);
-  tk->TEKlf.lfWidth = ts->TEKFontSize.x;
-  tk->TEKlf.lfHeight = ts->TEKFontSize.y;
-  tk->TEKlf.lfCharSet = ts->TEKFontCharSet;
   tk->TextSize = 0;
 
   GetWindowRect(tk->HWin, &R);

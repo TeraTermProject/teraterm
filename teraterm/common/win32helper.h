@@ -31,7 +31,7 @@
 #include <windows.h>
 #include <setupapi.h>
 
-// VS2005(SDK7.1à»â∫)ÇÃÇ∆Ç´,LSTATUSÇ™Ç»Ç¢
+// VS2005(SDK7.1‰ª•‰∏ã)„ÅÆ„Å®„Åç,LSTATUS„Åå„Å™„ÅÑ
 #if defined(_MSC_VER) && !defined(__MINGW32__) && _MSC_VER == 1400
 typedef LONG LSTATUS;
 #endif
@@ -56,6 +56,7 @@ BOOL hSetupDiGetDevicePropertyW(
 	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
 	const DEVPROPKEY *PropertyKey,
 	void **buf, size_t *buf_size);
+DWORD hGetDlgItemCBTextW(HWND hDlg, int id, int index, wchar_t **text);
 
 #ifdef __cplusplus
 }

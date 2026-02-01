@@ -56,7 +56,7 @@ TTCPropSheetDlg::TTCPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd, const wch
 	memset(&m_psh, 0, sizeof(m_psh));
 	m_psh.dwSize = sizeof(m_psh);
 	m_psh.dwFlags = PSH_DEFAULT | PSH_NOAPPLYNOW | PSH_USECALLBACK;
-	//m_psh.dwFlags |= PSH_PROPTITLE;		// u‚ÌƒvƒƒpƒeƒB[v‚ª’Ç‰Á‚³‚ê‚é?
+	//m_psh.dwFlags |= PSH_PROPTITLE;		// ã€Œã®ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ãƒ¼ã€ãŒè¿½åŠ ã•ã‚Œã‚‹?
 	m_psh.hwndParent = hParentWnd;
 	m_psh.hInstance = hInstance;
 	m_psh.pfnCallback = PropSheetProc;
@@ -144,7 +144,7 @@ LRESULT CALLBACK TTCPropSheetDlg::WndProc(HWND dlg, UINT msg, WPARAM wParam, LPA
 		NMHDR *nmhdr = (NMHDR *)lParam;
 		switch(nmhdr->code) {
 #if 0
-		// TVN_SELCHANGED ‚ª‚ ‚ê‚Î•s—vA‚»‚Ì‚¤‚¿Á‚·
+		// TVN_SELCHANGED ãŒã‚ã‚Œã°ä¸è¦ã€ãã®ã†ã¡æ¶ˆã™
 		case TVN_SELCHANGINGW:
 		case TVN_SELCHANGING: {
 			NMTREEVIEWW *pnmtv = (LPNMTREEVIEWW)lParam;
@@ -159,7 +159,7 @@ LRESULT CALLBACK TTCPropSheetDlg::WndProc(HWND dlg, UINT msg, WPARAM wParam, LPA
 #endif
 		case TVN_SELCHANGEDW:
 		case TVN_SELCHANGED: {
-			// ƒcƒŠ[ƒrƒ…[‚ª‘I‘ğ‚³‚ê‚½Aƒ^ƒu‚ğØ‚è‘Ö‚¦‚é
+			// ãƒ„ãƒªãƒ¼ãƒ“ãƒ¥ãƒ¼ãŒé¸æŠã•ã‚ŒãŸã€ã‚¿ãƒ–ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹
 			NMTREEVIEWW *pnmtv = (LPNMTREEVIEWW)lParam;
 			TVITEMW item;
 			item.mask = TVIF_PARAM;
@@ -170,10 +170,10 @@ LRESULT CALLBACK TTCPropSheetDlg::WndProc(HWND dlg, UINT msg, WPARAM wParam, LPA
 			break;
 		}
 		case TCN_SELCHANGE: {
-			// ƒ^ƒu‚ªØ‚è‘Ö‚í‚é‚Æ‚«‚É”­¶AƒcƒŠ[ƒrƒ…[‚Æ“¯Šú
-			//		ƒ^ƒu‚ğƒ}ƒEƒX‚ÅƒNƒŠƒbƒNA
-			// 		ƒ^ƒu‚ÉƒtƒH[ƒJƒX‚ª‚ ‚é‚Æ‚«‚É¶‰EƒL[
-			//		CTRL+PgUp,PgDn ‚â CTRL+TAB‚Å‚Í”­¶‚µ‚È‚¢?? TCN_KEYDOWN‚Åˆ—‚ª•K—v?
+			// ã‚¿ãƒ–ãŒåˆ‡ã‚Šæ›¿ã‚ã‚‹ã¨ãã«ç™ºç”Ÿã€ãƒ„ãƒªãƒ¼ãƒ“ãƒ¥ãƒ¼ã¨åŒæœŸ
+			//		ã‚¿ãƒ–ã‚’ãƒã‚¦ã‚¹ã§ã‚¯ãƒªãƒƒã‚¯ã€
+			// 		ã‚¿ãƒ–ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ãŒã‚ã‚‹ã¨ãã«å·¦å³ã‚­ãƒ¼
+			//		CTRL+PgUp,PgDn ã‚„ CTRL+TABã§ã¯ç™ºç”Ÿã—ãªã„?? TCN_KEYDOWNã§å‡¦ç†ãŒå¿…è¦?
 			HWND hTab = PropSheet_GetTabControl(dlg);
 			int cur_sel = TabCtrl_GetCurSel(hTab);
 			HTREEITEM item = GetTreeItem(cur_sel, TVI_ROOT);
@@ -192,8 +192,8 @@ LRESULT CALLBACK TTCPropSheetDlg::WndProc(HWND dlg, UINT msg, WPARAM wParam, LPA
 	m_OrgUserData = SetWindowLongPtrW(dlg, GWLP_USERDATA, (LONG_PTR)this);
 
 #if 0
-	// 		?? CTRL+PgUp,PgDn ‚Å‚Í‚±‚ÌƒƒbƒZ[ƒW‚Í”­¶‚µ‚È‚¢
-	// ‚»‚Ì‚¤‚¿Á‚·
+	// 		?? CTRL+PgUp,PgDn ã§ã¯ã“ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯ç™ºç”Ÿã—ãªã„
+	// ãã®ã†ã¡æ¶ˆã™
 	switch(msg){
 	case PSM_CHANGED:
 	case PSM_SETCURSEL:
@@ -222,7 +222,7 @@ int CALLBACK TTCPropSheetDlg::PropSheetProc(HWND hWnd, UINT msg, LPARAM lp)
 	switch (msg) {
 	case PSCB_PRECREATE: {
 #if defined(REWRITE_TEMPLATE)
-		// ƒeƒ“ƒvƒŒ[ƒg‚Ì“à—e‚ğ‘‚«Š·‚¦‚é
+		// ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®å†…å®¹ã‚’æ›¸ãæ›ãˆã‚‹
 		// http://home.att.ne.jp/banana/akatsuki/doc/atlwtl/atlwtl15-01/index.html
 		TTCPropSheetDlg*self = gTTCPS;
 		HINSTANCE hInst = self->m_hInst;
@@ -243,11 +243,11 @@ int CALLBACK TTCPropSheetDlg::PropSheetProc(HWND hWnd, UINT msg, LPARAM lp)
 			{ IDCANCEL, "BTN_CANCEL" },
 			{ IDHELP, "BTN_HELP" },
 		};
-		static const int ID_APPLY_NOW = 0x3021;		// afxres.h ‚Å’è‹`‚³‚ê‚Ä‚¢‚é
+		static const int ID_APPLY_NOW = 0x3021;		// afxres.h ã§å®šç¾©ã•ã‚Œã¦ã„ã‚‹
 		TTCPropSheetDlg*self = gTTCPS;
 		self->m_hWnd = hWnd;
 		SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), self->m_UiLanguageFile);
-		SetDlgItemTextW(hWnd, ID_APPLY_NOW, L"");	// &A ‚ªg‚¦‚é‚æ‚¤ "&Apply" ‚ğíœ‚·‚é
+		SetDlgItemTextW(hWnd, ID_APPLY_NOW, L"");	// &A ãŒä½¿ãˆã‚‹ã‚ˆã† "&Apply" ã‚’å‰Šé™¤ã™ã‚‹
 		self->m_OrgProc = SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)WndProcStatic);
 		self->m_OrgUserData = SetWindowLongPtrW(hWnd, GWLP_USERDATA, (LONG_PTR)self);
 		break;
@@ -286,18 +286,18 @@ HTREEITEM TTCPropSheetDlg::GetTreeItem(int nPage, HTREEITEM hParent)
 		TreeView_GetItem(m_hWndTV, &item);
 
 		if (item.lParam == nPage) {
-			// Œ©‚Â‚©‚Á‚½
+			// è¦‹ã¤ã‹ã£ãŸ
 			return hItem;
 		}
 
-		// q
+		// å­
 		HTREEITEM hItemFound = GetTreeItem(nPage, hItem);
 		if (hItemFound != NULL) {
-			// Œ©‚Â‚©‚Á‚½
+			// è¦‹ã¤ã‹ã£ãŸ
 			return hItemFound;
 		}
 
-		// Ÿ
+		// æ¬¡
 		hItem = TreeView_GetNextItem(m_hWndTV, hItem, TVGN_NEXT);
 	}
 
@@ -305,11 +305,11 @@ HTREEITEM TTCPropSheetDlg::GetTreeItem(int nPage, HTREEITEM hParent)
 }
 
 /**
- *	ƒpƒX‚ğì¬‚µ‚Ä•Ô‚·
- *		‘¶İ‚µ‚Ä‚¢‚½‚ç‚»‚ê‚ğ•Ô‚·
+ *	ãƒ‘ã‚¹ã‚’ä½œæˆã—ã¦è¿”ã™
+ *		å­˜åœ¨ã—ã¦ã„ãŸã‚‰ãã‚Œã‚’è¿”ã™
  *	@param	path		L"path1/path2/path3"
- *	@param	HTREEITEM	ŒÄ‚Ño‚µŒ³‚ÍTVI_ROOT (Ä‹A—p)
- *	@param	page_index	ì¬‚µ‚½ƒpƒX‚Éİ’è‚·‚épage_index(0...)
+ *	@param	HTREEITEM	å‘¼ã³å‡ºã—å…ƒã¯TVI_ROOT (å†å¸°ç”¨)
+ *	@param	page_index	ä½œæˆã—ãŸãƒ‘ã‚¹ã«è¨­å®šã™ã‚‹page_index(0...)
  *	@return	HTREEITEM
  */
 HTREEITEM TTCPropSheetDlg::CreatePath(const wchar_t *path, HTREEITEM hParent, int page_index)
@@ -326,7 +326,7 @@ HTREEITEM TTCPropSheetDlg::CreatePath(const wchar_t *path, HTREEITEM hParent, in
 		*p = 0;
 	}
 
-	// ƒpƒX‚ªŠù‚É‘¶İ‚µ‚Ä‚¢‚é‚©?
+	// ãƒ‘ã‚¹ãŒæ—¢ã«å­˜åœ¨ã—ã¦ã„ã‚‹ã‹?
 	HTREEITEM hItem = TreeView_GetChild(m_hWndTV, hParent);
 	while (hItem) {
 		wchar_t text[MAX_PATH];
@@ -339,20 +339,20 @@ HTREEITEM TTCPropSheetDlg::CreatePath(const wchar_t *path, HTREEITEM hParent, in
 		SendMessageW(m_hWndTV, TVM_GETITEMW, 0, (LPARAM)&item);
 
 		if (wcscmp(item.pszText, path_cur) ==0) {
-			// ‘¶İ‚µ‚Ä‚¢‚é
+			// å­˜åœ¨ã—ã¦ã„ã‚‹
 			if (path_next != NULL) {
-				// Ä‹AAŸ‚ğ’T‚·
+				// å†å¸°ã€æ¬¡ã‚’æ¢ã™
 				hItem = CreatePath(path_next, hItem, page_index);
 			}
 			free(path_cur);
 			return hItem;
 		}
 
-		// Ÿ
+		// æ¬¡
 		hItem = TreeView_GetNextItem(m_hWndTV, hItem, TVGN_NEXT);
 	}
 
-	// Œ©‚Â‚©‚ç‚È‚¢Aì‚é
+	// è¦‹ã¤ã‹ã‚‰ãªã„ã€ä½œã‚‹
 	TVINSERTSTRUCTW tvi;
 	tvi.hParent = hParent;
 	tvi.hInsertAfter = TVI_LAST;
@@ -363,7 +363,7 @@ HTREEITEM TTCPropSheetDlg::CreatePath(const wchar_t *path, HTREEITEM hParent, in
 	hItem = (HTREEITEM)SendMessageW(m_hWndTV, TVM_INSERTITEMW, 0, (LPARAM)&tvi);
 
 	if (path_next != NULL) {
-		// Ä‹A‚Å’T‚·(Œ©‚Â‚©‚ç‚¸Aì‚é‚±‚Æ‚É‚È‚é)
+		// å†å¸°ã§æ¢ã™(è¦‹ã¤ã‹ã‚‰ãšã€ä½œã‚‹ã“ã¨ã«ãªã‚‹)
 		hItem = CreatePath(path_next, hItem, page_index);
 	}
 
@@ -376,9 +376,9 @@ void TTCPropSheetDlg::CreateTree(HWND dlg)
 	HWND hTab = PropSheet_GetTabControl(dlg);
 	const int nPageCount = TabCtrl_GetItemCount(hTab);
 
-	// ƒV[ƒg(–Ø‚Ì—t)‚ğ’Ç‰Á‚·‚é
+	// ã‚·ãƒ¼ãƒˆ(æœ¨ã®è‘‰)ã‚’è¿½åŠ ã™ã‚‹
 	for (int i = 0; i < nPageCount; i++) {
-		// ƒy[ƒW‚Ìƒ^ƒCƒgƒ‹æ“¾
+		// ãƒšãƒ¼ã‚¸ã®ã‚¿ã‚¤ãƒˆãƒ«å–å¾—
 		wchar_t page_title[MAX_PATH];
 		TCITEMW	ti;
 		ZeroMemory(&ti, sizeof(ti));
@@ -388,11 +388,11 @@ void TTCPropSheetDlg::CreateTree(HWND dlg)
 		//TabCtrl_GetItem(hTab, i, &ti);
 		SendMessageW(hTab, TCM_GETITEMW, (WPARAM)i, (LPARAM)&ti);
 
-		// ƒpƒX(})‚ğì‚é
+		// ãƒ‘ã‚¹(æ)ã‚’ä½œã‚‹
 		wchar_t *path = m_Page[i].path;
 		HTREEITEM hItem = CreatePath(path, TVI_ROOT, i);
 
-		// ƒV[ƒg‚ğ’Ç‰Á‚·‚é
+		// ã‚·ãƒ¼ãƒˆã‚’è¿½åŠ ã™ã‚‹
 		TVINSERTSTRUCTW tvi;
 		tvi.hParent = hItem;
 		tvi.hInsertAfter = TVI_LAST;
@@ -408,31 +408,31 @@ void TTCPropSheetDlg::AddTreeControl()
 {
 	HWND hTab = PropSheet_GetTabControl(m_hWnd);
 
-	// ƒcƒŠ[‚Å‘I‘ğ‚Å‚«‚é‚Ì‚Åƒ^ƒu‚Í1sİ’è‚É‚·‚é
+	// ãƒ„ãƒªãƒ¼ã§é¸æŠã§ãã‚‹ã®ã§ã‚¿ãƒ–ã¯1è¡Œè¨­å®šã«ã™ã‚‹
 	SetWindowLongPtr(hTab, GWL_STYLE, GetWindowLongPtr(hTab, GWL_STYLE) & ~TCS_MULTILINE);
 
 #if 0
-	// ƒ^ƒu‚ğÁ‚µ‚Ä—Ìˆæ‚ğˆÚ“®‚µ‚æ‚¤‚Æ‚µ‚½‚ª‚¤‚Ü‚­‚¢‚©‚È‚©‚Á‚½
-	// ‚»‚Ì‚¤‚¿‚±‚ÌƒuƒƒbƒN‚ÍÁ‚·
+	// ã‚¿ãƒ–ã‚’æ¶ˆã—ã¦é ˜åŸŸã‚’ç§»å‹•ã—ã‚ˆã†ã¨ã—ãŸãŒã†ã¾ãã„ã‹ãªã‹ã£ãŸ
+	// ãã®ã†ã¡ã“ã®ãƒ–ãƒ­ãƒƒã‚¯ã¯æ¶ˆã™
 	const bool m_HideTab = true;
 	if (m_HideTab) {
-		// ƒ^ƒu•”•ª‚ğ‰B‚·
+		// ã‚¿ãƒ–éƒ¨åˆ†ã‚’éš ã™
 		ShowWindow(hTab, SW_HIDE);
 		EnableWindow(hTab, FALSE);
 
-		// ƒ^ƒu•”•ª‚ÌƒTƒCƒY(‚‚³)
+		// ã‚¿ãƒ–éƒ¨åˆ†ã®ã‚µã‚¤ã‚º(é«˜ã•)
 		RECT item_rect;
 		TabCtrl_GetItemRect(hTab, 0, &item_rect);
 		const int item_height = item_rect.bottom - item_rect.top;
 
-		// tab control‚Ìƒ^ƒu•ªAƒ_ƒCƒAƒƒO‚ğ¬‚³‚­‚·‚é
+		// tab controlã®ã‚¿ãƒ–åˆ†ã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å°ã•ãã™ã‚‹
 		RECT dlg_rect;
 		GetWindowRect(m_hWnd, &dlg_rect);
 		int w = dlg_rect.right - dlg_rect.left;
 		int h = dlg_rect.bottom - dlg_rect.top - item_height;
 		SetWindowPos(m_hWnd, NULL, 0, 0, w, h, SWP_NOZORDER | SWP_NOMOVE);
 
-		// ƒ^ƒuƒRƒ“ƒgƒ[ƒ‹‚ğƒ^ƒu•ªã‚ÉˆÚ“®‚·‚é
+		// ã‚¿ãƒ–ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚’ã‚¿ãƒ–åˆ†ä¸Šã«ç§»å‹•ã™ã‚‹
 		RECT tab_rect;
 		GetWindowRect(hTab, &tab_rect);
 
@@ -444,7 +444,7 @@ void TTCPropSheetDlg::AddTreeControl()
 	}
 #endif
 
-	// ƒcƒŠ[ƒRƒ“ƒgƒ[ƒ‹‚ÌˆÊ’u‚ğŒˆ‚ß‚é
+	// ãƒ„ãƒªãƒ¼ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®ä½ç½®ã‚’æ±ºã‚ã‚‹
 	RECT tree_rect;
 	GetWindowRect(hTab, &tree_rect);
  	int tree_w = TREE_WIDTH;
@@ -454,14 +454,14 @@ void TTCPropSheetDlg::AddTreeControl()
 	pt.y = tree_rect.top;
 	ScreenToClient(m_hWnd, &pt);
 
-	// ƒcƒŠ[ƒRƒ“ƒgƒ[ƒ‹•ªƒ_ƒCƒAƒƒO‚ÌƒTƒCƒY‚ğ‘å‚«‚­‚·‚é
+	// ãƒ„ãƒªãƒ¼ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«åˆ†ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚µã‚¤ã‚ºã‚’å¤§ããã™ã‚‹
 	RECT dlg_rect;
 	GetWindowRect(m_hWnd, &dlg_rect);
 	int w = dlg_rect.right - dlg_rect.left + TREE_WIDTH + CONTROL_SPACE;
 	int h = dlg_rect.bottom - dlg_rect.top;
 	SetWindowPos(m_hWnd, NULL, 0, 0, w, h, SWP_NOZORDER | SWP_NOMOVE);
 
-	// ƒ_ƒCƒAƒƒO‚ÌƒTƒCƒY‚ğ‘å‚«‚­‚µ‚½•ªAƒRƒ“ƒgƒ[ƒ‹‚ğˆÚ“®‚·‚é
+	// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚µã‚¤ã‚ºã‚’å¤§ããã—ãŸåˆ†ã€ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚’ç§»å‹•ã™ã‚‹
 	MoveChildWindows(m_hWnd, TREE_WIDTH + CONTROL_SPACE, 0);
 
 	const DWORD	dwTreeStyle =

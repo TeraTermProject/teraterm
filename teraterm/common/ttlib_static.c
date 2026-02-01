@@ -43,13 +43,13 @@
 #include "ttlib.h"
 
 /**
- *	ƒEƒBƒ“ƒhƒEã‚ÌˆÊ’u‚ðŽæ“¾‚·‚é
+ *	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä¸Šã®ä½ç½®ã‚’å–å¾—ã™ã‚‹
  *	@Param[in]		hWnd
- *	@Param[in]		point		ˆÊ’u(x,y)
- *	@Param[in,out]	InWindow	ƒEƒBƒ“ƒhƒEã
- *	@Param[in,out]	InClient	ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæã
- *	@Param[in,out]	InTitleBar	ƒ^ƒCƒgƒ‹ƒo[ã
- *	@retval			FALSE		–³Œø‚ÈhWnd
+ *	@Param[in]		point		ä½ç½®(x,y)
+ *	@Param[in,out]	InWindow	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä¸Š
+ *	@Param[in,out]	InClient	ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸä¸Š
+ *	@Param[in,out]	InTitleBar	ã‚¿ã‚¤ãƒˆãƒ«ãƒãƒ¼ä¸Š
+ *	@retval			FALSE		ç„¡åŠ¹ãªhWnd
  */
 BOOL GetPositionOnWindow(
 	HWND hWnd, const POINT *point,
@@ -128,36 +128,36 @@ void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const
 }
 
 /**
- *	ƒEƒBƒ“ƒhƒE•\Ž¦‚³‚ê‚Ä‚¢‚éƒfƒBƒXƒvƒŒƒC‚ÌƒfƒXƒNƒgƒbƒv‚Ì”ÍˆÍ‚ðŽæ“¾‚·‚é
- *	@param[in]		hWnd	ƒEƒBƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
- *	@param[out]		rect	ƒfƒXƒNƒgƒbƒv
+ *	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦è¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—ã®ç¯„å›²ã‚’å–å¾—ã™ã‚‹
+ *	@param[in]		hWnd	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+ *	@param[out]		rect	ãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—
  */
 void GetDesktopRect(HWND hWnd, RECT *rect)
 {
 	if (pMonitorFromWindow != NULL) {
-		// ƒ}ƒ‹ƒ`ƒ‚ƒjƒ^‚ªƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚éê‡
+		// ãƒžãƒ«ãƒãƒ¢ãƒ‹ã‚¿ãŒã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹å ´åˆ
 		MONITORINFO monitorInfo;
 		HMONITOR hMonitor = pMonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
 		monitorInfo.cbSize = sizeof(MONITORINFO);
 		pGetMonitorInfoA(hMonitor, &monitorInfo);
 		*rect = monitorInfo.rcWork;
 	} else {
-		// ƒ}ƒ‹ƒ`ƒ‚ƒjƒ^‚ªƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚È‚¢ê‡
+		// ãƒžãƒ«ãƒãƒ¢ãƒ‹ã‚¿ãŒã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ãªã„å ´åˆ
 		SystemParametersInfo(SPI_GETWORKAREA, 0, rect, 0);
 	}
 }
 
 /**
- *	point‚ª‘¶Ý‚·‚éƒfƒBƒXƒvƒŒƒC‚ÌƒfƒXƒNƒgƒbƒv‚Ì”ÍˆÍ‚ðŽæ“¾‚·‚é
+ *	pointãŒå­˜åœ¨ã™ã‚‹ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—ã®ç¯„å›²ã‚’å–å¾—ã™ã‚‹
  */
 void GetDesktopRectFromPoint(const POINT *p, RECT *rect)
 {
 	if (pMonitorFromPoint == NULL) {
-		// NT4.0, 95 ‚Íƒ}ƒ‹ƒ`ƒ‚ƒjƒ^API‚É”ñ‘Î‰ž
+		// NT4.0, 95 ã¯ãƒžãƒ«ãƒãƒ¢ãƒ‹ã‚¿APIã«éžå¯¾å¿œ
 		SystemParametersInfo(SPI_GETWORKAREA, 0, rect, 0);
 	}
 	else {
-		// ƒ}ƒ‹ƒ`ƒ‚ƒjƒ^‚ªƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚éê‡
+		// ãƒžãƒ«ãƒãƒ¢ãƒ‹ã‚¿ãŒã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹å ´åˆ
 		HMONITOR hm;
 		POINT pt;
 		MONITORINFO mi;
@@ -173,10 +173,10 @@ void GetDesktopRectFromPoint(const POINT *p, RECT *rect)
 }
 
 /**
- *	ƒEƒBƒ“ƒhƒE‚ð—Ìˆæ‚©‚ç‚Í‚Ýo‚³‚È‚¢‚æ‚¤‚ÉˆÚ“®‚·‚é
- *	‚Í‚Ýo‚Ä‚¢‚È‚¢ê‡‚ÍˆÚ“®‚µ‚È‚¢
+ *	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é ˜åŸŸã‹ã‚‰ã¯ã¿å‡ºã•ãªã„ã‚ˆã†ã«ç§»å‹•ã™ã‚‹
+ *	ã¯ã¿å‡ºã¦ã„ãªã„å ´åˆã¯ç§»å‹•ã—ãªã„
  *
- *	@param[in]	hWnd		ˆÊ’u‚ð’²®‚·‚éƒEƒBƒ“ƒhƒE
+ *	@param[in]	hWnd		ä½ç½®ã‚’èª¿æ•´ã™ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
  */
 void MoveWindowToDisplayRect(HWND hWnd, const RECT *rect)
 {
@@ -218,12 +218,12 @@ void MoveWindowToDisplayRect(HWND hWnd, const RECT *rect)
 }
 
 /**
- *	ƒEƒBƒ“ƒhƒE‚ðƒfƒBƒXƒvƒŒƒC‚©‚ç‚Í‚Ýo‚³‚È‚¢‚æ‚¤‚ÉˆÚ“®‚·‚é
- *	ƒfƒBƒXƒvƒŒƒC‚ÍƒEƒBƒ“ƒhƒE‚ª‘®‚µ‚Ä‚¢‚éƒfƒBƒXƒvƒŒƒC
- *	‚Ü‚½‚¢‚Å‚¢‚é‚Æ‚«‚Í–ÊÏ‚ÌL‚¢•û
- *	‚Í‚Ýo‚Ä‚¢‚È‚¢ê‡‚ÍˆÚ“®‚µ‚È‚¢
+ *	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã‹ã‚‰ã¯ã¿å‡ºã•ãªã„ã‚ˆã†ã«ç§»å‹•ã™ã‚‹
+ *	ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã¯ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒå±žã—ã¦ã„ã‚‹ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤
+ *	ã¾ãŸã„ã§ã„ã‚‹ã¨ãã¯é¢ç©ã®åºƒã„æ–¹
+ *	ã¯ã¿å‡ºã¦ã„ãªã„å ´åˆã¯ç§»å‹•ã—ãªã„
  *
- *	@param[in]	hWnd		ˆÊ’u‚ð’²®‚·‚éƒEƒBƒ“ƒhƒE
+ *	@param[in]	hWnd		ä½ç½®ã‚’èª¿æ•´ã™ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
  */
 void MoveWindowToDisplay(HWND hWnd)
 {
@@ -233,12 +233,12 @@ void MoveWindowToDisplay(HWND hWnd)
 }
 
 /**
- *	ƒEƒBƒ“ƒhƒE‚ðƒfƒBƒXƒvƒŒƒC‚©‚ç‚Í‚Ýo‚³‚È‚¢‚æ‚¤‚ÉˆÚ“®‚·‚é
- *	ƒfƒBƒXƒvƒŒƒC‚Ípoint‚ª‘®‚µ‚Ä‚¢‚éƒfƒBƒXƒvƒŒƒC
- *	‚Í‚Ýo‚Ä‚¢‚È‚¢ê‡‚ÍˆÚ“®‚µ‚È‚¢
+ *	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã‹ã‚‰ã¯ã¿å‡ºã•ãªã„ã‚ˆã†ã«ç§»å‹•ã™ã‚‹
+ *	ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã¯pointãŒå±žã—ã¦ã„ã‚‹ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤
+ *	ã¯ã¿å‡ºã¦ã„ãªã„å ´åˆã¯ç§»å‹•ã—ãªã„
  *
- *	@param[in]	hWnd		ˆÊ’u‚ð’²®‚·‚éƒEƒBƒ“ƒhƒE
- *	@param[in]	point		ˆÊ’u
+ *	@param[in]	hWnd		ä½ç½®ã‚’èª¿æ•´ã™ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+ *	@param[in]	point		ä½ç½®
  */
 void MoveWindowToDisplayPoint(HWND hWnd, const POINT *point)
 {
@@ -248,20 +248,20 @@ void MoveWindowToDisplayPoint(HWND hWnd, const POINT *point)
 }
 
 /**
- *	ƒEƒBƒ“ƒhƒE‚ðƒfƒBƒXƒvƒŒƒC‚Ì’†‰›‚É”z’u‚·‚é
+ *	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ä¸­å¤®ã«é…ç½®ã™ã‚‹
  *
- *	@param[in]	hWnd		ˆÊ’u‚ð’²®‚·‚éƒEƒBƒ“ƒhƒE
- *	@param[in]	hWndParent	‚±‚ÌƒEƒBƒ“ƒhƒE‚Ì’†‰›‚ÉˆÚ“®‚·‚é
- *							(NULL‚Ìê‡ƒfƒBƒXƒvƒŒƒC‚Ì’†‰›)
+ *	@param[in]	hWnd		ä½ç½®ã‚’èª¿æ•´ã™ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+ *	@param[in]	hWndParent	ã“ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸­å¤®ã«ç§»å‹•ã™ã‚‹
+ *							(NULLã®å ´åˆãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ä¸­å¤®)
  *
- *	hWndParent‚ÌŽw’è‚ª‚ ‚éê‡
- *		hWndParent‚ª•\Ž¦ó‘Ô‚Ìê‡
- *			- hWndParent‚Ì’†‰›‚É”z’u
- *			- ‚½‚¾‚µ•\Ž¦‚³‚ê‚Ä‚¢‚éƒfƒBƒXƒvƒŒƒC‚©‚ç‚Í‚Ýo‚·ê‡‚Í’²®‚³‚ê‚é
- *		hWndParent‚ª”ñ•\Ž¦ó‘Ô‚Ìê‡
- *			- hWnd‚ª•\Ž¦‚³‚ê‚Ä‚¢‚éƒfƒBƒXƒvƒŒƒC‚Ì’†‰›‚É”z’u‚³‚ê‚é
- *	hWndParent‚ªNULL‚Ìê‡
- *		- hWnd‚ª•\Ž¦‚³‚ê‚Ä‚¢‚éƒfƒBƒXƒvƒŒƒC‚Ì’†‰›‚É”z’u‚³‚ê‚é
+ *	hWndParentã®æŒ‡å®šãŒã‚ã‚‹å ´åˆ
+ *		hWndParentãŒè¡¨ç¤ºçŠ¶æ…‹ã®å ´åˆ
+ *			- hWndParentã®ä¸­å¤®ã«é…ç½®
+ *			- ãŸã ã—è¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã‹ã‚‰ã¯ã¿å‡ºã™å ´åˆã¯èª¿æ•´ã•ã‚Œã‚‹
+ *		hWndParentãŒéžè¡¨ç¤ºçŠ¶æ…‹ã®å ´åˆ
+ *			- hWndãŒè¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ä¸­å¤®ã«é…ç½®ã•ã‚Œã‚‹
+ *	hWndParentãŒNULLã®å ´åˆ
+ *		- hWndãŒè¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ä¸­å¤®ã«é…ç½®ã•ã‚Œã‚‹
  */
 void CenterWindow(HWND hWnd, HWND hWndParent)
 {
@@ -279,11 +279,11 @@ void CenterWindow(HWND hWnd, HWND hWndParent)
 	WndHeight = rcWnd.bottom - rcWnd.top;
 
 	if (hWndParent == NULL || !IsWindowVisible(hWndParent) || IsIconic(hWndParent)) {
-		// e‚ªÝ’è‚³‚ê‚Ä‚¢‚È‚¢ or •\Ž¦‚³‚ê‚Ä‚¢‚È‚¢ or icon‰»‚³‚ê‚Ä‚¢‚é ê‡
-		// ƒEƒBƒ“ƒhƒE‚Ì•\Ž¦‚³‚ê‚Ä‚¢‚éƒfƒBƒXƒvƒŒƒC‚Ì’†‰›‚É•\Ž¦‚·‚é
+		// è¦ªãŒè¨­å®šã•ã‚Œã¦ã„ãªã„ or è¡¨ç¤ºã•ã‚Œã¦ã„ãªã„ or iconåŒ–ã•ã‚Œã¦ã„ã‚‹ å ´åˆ
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ä¸­å¤®ã«è¡¨ç¤ºã™ã‚‹
 		GetDesktopRect(hWnd, &rcDesktop);
 
-		// ƒfƒXƒNƒgƒbƒv(•\Ž¦‚³‚ê‚Ä‚¢‚éƒfƒBƒXƒvƒŒƒC)‚Ì’†‰›
+		// ãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—(è¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤)ã®ä¸­å¤®
 		NewX = (rcDesktop.left + rcDesktop.right) / 2 - WndWidth / 2;
 		NewY = (rcDesktop.top + rcDesktop.bottom) / 2 - WndHeight / 2;
 	} else {
@@ -291,14 +291,14 @@ void CenterWindow(HWND hWnd, HWND hWndParent)
 		r = GetWindowRect(hWndParent, &rcParent);
 		assert(r != FALSE); (void)r;
 
-		// hWndParent‚Ì’†‰›
+		// hWndParentã®ä¸­å¤®
 		NewX = (rcParent.left + rcParent.right) / 2 - WndWidth / 2;
 		NewY = (rcParent.top + rcParent.bottom) / 2 - WndHeight / 2;
 
 		GetDesktopRect(hWndParent, &rcDesktop);
 	}
 
-	// ƒfƒXƒNƒgƒbƒv‚©‚ç‚Í‚Ýo‚·ê‡A’²®‚·‚é
+	// ãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—ã‹ã‚‰ã¯ã¿å‡ºã™å ´åˆã€èª¿æ•´ã™ã‚‹
 	if (NewX + WndWidth > rcDesktop.right)
 		NewX = rcDesktop.right - WndWidth;
 	if (NewX < rcDesktop.left)
@@ -309,17 +309,17 @@ void CenterWindow(HWND hWnd, HWND hWndParent)
 	if (NewY < rcDesktop.top)
 		NewY = rcDesktop.top;
 
-	// ˆÚ“®‚·‚é
+	// ç§»å‹•ã™ã‚‹
 	SetWindowPos(hWnd, NULL, NewX, NewY, 0, 0,
 				 SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
 /**
- *	hWnd‚Ì•\Ž¦‚³‚ê‚Ä‚¢‚éƒ‚ƒjƒ^‚ÌDPI‚ðŽæ“¾‚·‚é
- *	Per-monitor DPI awareness‘Î‰ž
+ *	hWndã®è¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹ãƒ¢ãƒ‹ã‚¿ã®DPIã‚’å–å¾—ã™ã‚‹
+ *	Per-monitor DPI awarenesså¯¾å¿œ
  *
- *	@param	hWnd	(NULL‚Ì‚Æ‚«Primary monitor)
- *	@retval	DPI’l(’Êí‚ÌDPI‚Í96)
+ *	@param	hWnd	(NULLã®ã¨ãPrimary monitor)
+ *	@retval	DPIå€¤(é€šå¸¸ã®DPIã¯96)
  */
 int GetMonitorDpiFromWindow(HWND hWnd)
 {

@@ -26,35 +26,232 @@
  <li><a href="#viewmode">TTXViewMode</a></li>
  <li><a href="#recurringcommand">TTXRecurringCommand</a></li>
  <li><a href="#commandlineopt">TTXCommandLineOpt</a></li>
+ <li><a href="#changefontsize">TTXChangeFontSize</a></li>
 </ul>
 
 <hr>
 
 <h2 id="teraterm">Tera Term</h2>
 
-<h3 id="teraterm_5.5.0">YYYY.MM.DD (Ver 5.5.0 not released yet)</h3>
+<h3 id="teraterm_5.6.0">YYYY.MM.DD (Ver 5.6.0 not released yet)</h3>
 <ul class="history">
   <li>変更
     <ul>
+      <li>
+        設定フォルダダイアログ ("Setup &gt; <a href="../menu/setup-directory.html">Setup directory...</a>") に broadcast.log を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/928" target="_blank">issue #928</a>)
+      </li>
+      <li>
+        高ビットレートでシリアル接続した際の受信データの欠落を起きづらくした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/894" target="_blank">issue #894</a>)
+      </li>
+      <li>
+        バイナリデータを受信してファイルとして保存する機能を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/894" target="_blank">issue #894</a>)
+        <ul>
+          <li>ファイル受信ダイアログ ("File &gt; <a href="../menu/file-receivefile.html">Receive file...</a>") を追加した。</li>
+          <li>マクロコマンド <a href="../macro/command/recvfile.html">recvfile</a> を追加した。</li>
+        </ul>
+      </li>
+      <li>
+        <a href="../menu/setup-additional-font.html#Windows_Fonts">Windowsのフォント設定を開く</a>とき、可能であれば "%WINDIR%\Fonts" フォルダを開くかわりに "設定 &gt; 個人用設定 &gt; フォント" を開くようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/979" target="_blank">issue #979</a>)
+      </li>
+      <li>
+        "セッションの複製" で起動した Tera Term のコマンドラインオプションを確認できないようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
+      </li>
+      <li>
+        Serial port タブ ("Setup &gt; <a href="../menu/setup-additional-serialport.html">Serial port...</a>") で RTS と DTR の制御信号の low と high を切り替えられるようにし、RTS と DTR のフロー制御を設定できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/934" target="_blank">issue #934</a>)
+      </li>
+      <li>
+        セッション断の状態でも "File &gt; <a href="../menu/file-chdir.html">Change directory...</a>" を選択できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/969" target="_blank">issue #969</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>バグ修正
+    <ul>
+      <li>
+        シリアルポートのデータ長とフロー制御の設定が "File &gt; Transfer &gt; <a href="../menu/file-transfer-ymodem.html">YMODEM</a>, <a href="../menu/file-transfer-zmodem.html">ZMODEM</a>, <a href="../menu/file-transfer-bplus.html">B-Plus</a>, <a href="../menu/file-transfer-qv.html">Quick-VAN</a>" のメニューの有効/無効状態に反映されるよう修正した。
+        4.66からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/969" target="_blank">issue #969</a>)
+      </li>
+      <li>
+        セッション断発生時に Kermit, XModem, YModem, ZModem, B-Plus, Quick-VAN の転送ダイアログを閉じられない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/973" target="_blank">issue #973</a>)
+      </li>
+      <li>
+        マクロコマンド <a href="../macro/command/kmtrecv.html">kmtrecv</a>, <a href="../macro/command/ymodemrecv.html">ymodemrecv</a>, <a href="../macro/command/bplusrecv.html">bplusrecv</a>, <a href="../macro/command/quickvanrecv.html">quickvanrecv</a> でファイル受信時にPC側でファイル作成に失敗してもエラーダイアログを表示しないようした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/973" target="_blank">issue #973</a>)
+      </li>
+      <li>
+        TERATERM.INI の <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> が機能しなくなっていた不具合を修正した。
+        5.0からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/967" target="_blank">issue #967</a>)
+      </li>
+      <li>
+        印刷 ("File &gt; <a href="../menu/file-print.html">Print...</a>") 時、印刷中ダイアログのCancelボタンで中断できるよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1017" target="_blank">issue #1017</a>)
+      </li>
+      <li>
+        TELNET 接続中でなくても TCP/IP 接続中なら Alt+T アクセスキーで AYT (Are You There) コマンドが送出される問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1086" target="_blank">issue #1086</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>その他
+    <ul>
+      <li><a href="#ttmenu_1.21">TeraTerm Menu 1.21</a> へ差し替えた。</li>
+      <li><a href="#ttssh_3.6.0">TTSSH 3.6.0 </a> へ差し替えた。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_5.5.2">2026.01.21 (Ver 5.5.2)</h3>
+<ul class="history">
+  <!--li>変更
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>バグ修正
+    <ul>
+      <li>
+        <a href="../menu/setup-additional-font.html#CharSpace">文字間スペース</a>を設定して、<a href="../menu/setup-additional-font.html#ResizedFont">描画幅に合わせてリサイズしたフォントを描画</a>をONにした時、正しく描画するよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1006" target="_blank">issue #1006</a>)
+      </li>
+      <li>
+        文字間スペースを "Additional settings &gt; <a href="../menu/setup-additional-font.html">Font</a>" タブから正しく設定できない問題を修正した。
+        5.0からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1008" target="_blank">issue #1008</a>) 
+      </li>
+      <li>
+        ttermpro.exe の /I オプション指定時にマクロコマンド connect でホストに接続出来ない不具合を修正した。
+        5.4.1からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/975" target="_blank">issue #975</a>)
+      </li>
+      <li>
+        ttermpro.exe の /V オプション指定時にウインドウが非表示にならない不具合を修正した。
+        5.4.1からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/975" target="_blank">issue #975</a>)
+      </li>
+      <li>
+        <a href="../macro/command/send.html">send</a>,
+        <a href="../macro/command/sendln.html">sendln</a>,
+        <a href="../macro/command/sendbinary.html">sendbinary</a>,
+        <a href="../macro/command/sendtext.html">sendtext</a> マクロコマンドで送信したデータが
+        <a href="../menu/setup-additional-terminal.html#LocalEcho">ローカルエコー設定</a>に従うよう修正した。
+        5.0からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/147" target="_blank">issue #147</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>その他
+    <ul>
+      <li><a href="#ttssh_3.5.2">TTSSH (3.5.2)</a> へ差し替えた。</li>
+      <li>
+        インストーラに使用している Inno Setup のバージョンを <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.0" target="_blank">6.7.0</a> へ差し替えた。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/963" target="_blank">issue #963</a>)
+      </li>
+      <li><a href="#kanjimenu_0.1.11">TTX KanjiMenu Plugin 0.1.11</a>へ差し替えた。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_5.5.1">2025.11.17 (Ver 5.5.1)</h3>
+<ul class="history">
+  <!--li>変更
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>バグ修正
+    <ul>
+      <li>
+        <a href="../menu/file-log.html#LogStart">"Log" ダイアログボックス(ファイル名指定)</a> でファイル名を変更したとき、ファイル名に合わせて設定が適切に変更されるよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/896" target="_blank">issue #896</a>)
+      </li>
+      <li>
+        バイナリログの取得中にログへコメントを追加 (File &gt; <a href="../menu/file.html#Comment">Comment to Log...</a>) できない問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/863" target="_blank">issue #863</a>)
+      </li>
+      <li>
+        Kermit, Quick-VAN, YMODEM, ZMODEM 送信時にファイルを複数選択したとき、Tera Term がクラッシュする不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/9" target="_blank">issue #9</a>,
+        <a href="https://github.com/TeraTermProject/teraterm/issues/942" target="_blank">#942</a>)
+      </li>
+      <li>
+        YMODEM 受信時にキャンセル受信処理が実装されていない問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/786" target="_blank">issue #786</a>)
+      </li>
+      <li>
+        ZMODEM 受信時にファイルの書き込みができない時、処理が止まらないよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/917" target="_blank">issue #917</a>)
+      </li>
+      <li>
+        ZMODEM の Hex header で送信する CR LF を 0x8D 0x8A から 0x0D 0x8A に修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/889" target="_blank">issue #889</a>)
+      </li>
+      <li>
+        印刷 (File &gt; Print...) がUnicodeに対応していなかったので修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/815" target="_blank">issue #815</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>その他
+    <ul>
+      <li><a href="#ttssh_3.5.1">TTSSH (3.5.1)</a> へ差し替えた。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_5.5.0">2025.09.16 (Ver 5.5.0)</h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>
+        xterm(SGR-Pixels) 形式の拡張マウスイベント通知に対応した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/575" target="_blank">issue #575</a>)
+      </li>
       <li>
         シーケンス OSC 17, 19, 117, 119 を実装した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/532" target="_blank">issue #532</a>)
       </li>
       <li>
-        DEC Special Graphics のマッピングしない設定を追加、設定をINIファイルに保存できるようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/538" target="_blank">issue #538</a>)
+        <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> に "VT220" を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
+      </li>
+      <li>
+        Unicode の文字情報を Unicode 17.0 に更新した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/844" target="_blank">issue #844</a>)
       </li>
       <li>
         <a href="../usage/character_encoding.html">使用可能文字コード</a>を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/510" target="_blank">issue #510</a>)
       </li>
       <li>
-        xterm(SGR-Pixels) 形式の拡張マウスイベント通知に対応した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/575" target="_blank">issue #575</a>)
+        <a href="../setup/teraterm-trans.html#draganddrop">ドラッグ&ドロップによるファイル送信</a>を行った際、<a href="../menu/file-sendfile.html">ディレイ設定</a>が反映されるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/594" target="_blank">issue #594</a>)
+      </li>
+      <li>
+        <a href="../menu/file-log.html#Logging">"Log" ダイアログボックス(ファイルへ書き込み中)</a>に "Hide dialog" ボタンを追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/630" target="_blank">issue #630</a>)
       </li>
       <li>
         [Additional settings] に [UI] タブを追加、<a href="../menu/setup-additional-ui.html#UILanguageFile">UI言語設定</a>と<a href="../menu/setup-additional-ui.html#DLGFont">ダイアログフォント設定</a>を移動した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/460" target="_blank">issue #460</a>)
+      </li>
+      <li>
+        DEC Special Graphics のマッピングしない設定を追加、設定をINIファイルに保存できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/538" target="_blank">issue #538</a>)
       </li>
       <li>
         フォントダイアログのフォントリストに特定のフォントを表示するかどうかをタブごとに選択できるようにした。
@@ -66,63 +263,182 @@
           <li>VTフォント選択時に非表示フォントを表示する/しないを保存する TERATERM.INI の ListHiddenFonts エントリを廃止した。</li>
         </ul>
       </li>
+      <li>
+        <a href="../menu/setup-additional-font.html#DrawAPI">文字描画で使用するAPI</a>をTERATERM.INIに保存するようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/812" target="_blank">issue #812</a>)
+      </li>
+      <li>
+        <a href="../macro/command/sendfile.html">sendfile</a> マクロコマンド実行時、<a href="../menu/file-sendfile.html">ディレイ設定</a>が反映されるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/594" target="_blank">issue #594</a>)
+      </li>
+      <li>
+        シリアルポートの送信待ち時間を設定するマクロコマンド <a href="../macro/command/setserialdelaychar.html">setserialdelaychar</a>, <a href="../macro/command/setserialdelayline.html">setserialdelayline</a> を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/437" target="_blank">issue #437</a>)
+      </li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
       <li>
-        ディスプレイの拡大率100%(96DPI)以外の環境でVTウインドウに漢字を入力する際、変換中のフォントサイズと確定後のフォントサイズが一致しない不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/525" target="_blank">issue #525</a>)
+        <a href="../menu/setup-additional-terminal.html#TerminalID">TerminalID</a> で "VT100J", "VT102J", "VT220J" が選択できなくなっていたので修正した。5.3でLanguage設定をなくしたときから選択できなくなっていた。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/623" target="_blank">issue #623</a>)
       </li>
       <li>
-        ブロードキャストダイアログがUnicodeに対応していなかったので修正した。
+        VT320, VT520, VT525 の Device Attribute を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/689" target="_blank">issue #689</a>)
+      </li>
+      <li>
+        [Kermit]-[Get] で Tera Term がクラッシュする不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/785" target="_blank">issue #785</a>)
+      </li>
+      <li>
+        <a href="../menu/control-broadcast.html">Broadcast command</a>ダイアログのウィンドウリストで右クリック後、Bring selected window to foreground を選択した際、一部のウィンドウがフォアグラウンドで表示されない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/736" target="_blank">issue #736</a>)
+      </li>
+      <li>
+        <a href="../menu/control-broadcast.html">Broadcast command</a>ダイアログがUnicodeに対応していなかったので修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/500" target="_blank">issue #500</a>)
       </li>
       <li>
-        [Additional settings]-[<a href="../menu/setup-additional-ctrlseq.html">Control Sequence</a>] タブの "Beep" プルダウンに設定値が反映されない問題を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/529" target="_blank">issue #529</a>)
+        TEK ウィンドウの印刷ができない不具合を修正した。5.0からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/842">issue #842</a>)
       </li>
       <li>
-        シーケンス OCS 4 259を反転属性の文字色設定に修正した(背景色設定になっていた)
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/532" target="_blank">issue #532</a>)
-      </li>
-      <li>
-        マウスで文字を選択するとき、文字の左右を考慮するよう修正した。
-        Tera Term 5.1以前の動作となった。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/468" target="_blank">issue #468</a>)
-      </li>
-      <li>VTウインドウの<a href="../menu/setup-additional-font.html">フォント選択</a>に下記の修正を行った。(<a href="https://github.com/TeraTermProject/teraterm/issues/335">issue #335</a>)
-        <ul>
-          <li>フォント選択ダイアログで選択したポイントサイズと画面に表示される文字のポイントサイズが一致するよう修正した。</li>
-          <li>画面の解像度が96DPI以外の場合でも、フォント選択ダイアログで選択したポイントサイズが96DPIの場合の値と同じになるよう修正した。</li>
-        </ul>
-      </li>
-      <li>
-        DPI が異なるディスプレイをまたいでウインドウを移動またはリサイズした際、ウインドウが正しいサイズで表示されない不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/555" target="_blank">issue #555</a>)
-      </li>
-      <li>
-        MACRO: タスクスケジューラ経由でマクロを実行出来ない不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/196" target="_blank">issue #196</a>)
-      </li>
-      <li>
-        ダイアログフォント変更してログダイアログを開くと、ログダイアログのフォントが変更されていない不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/590" target="_blank">issue #590</a>)
+        <a href="../macro/command/sendbroadcast.html">send(ln)broadcast</a>、<a href="../macro/command/sendmulticast.html">send(ln)multicast</a>、<a href="../macro/command/sendkcode.html">sendkcode</a> マクロコマンドが送信データをロストする場合がある不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/774" target="_blank">issue #774</a>)
       </li>
     </ul>
   </li>
 
   <li>その他
     <ul>
-      <li>言語ファイルにポルトガル語(Portuguese.lng)を追加した。
+      <li>
+        x64, arm64 バイナリを作成するようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/228" target="_blank">issue #228</a>)
+      </li>
+      <li>
+        既存の言語ファイルのファイル名を変更した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/825" target="_blank">issue #825</a>)
+        <ul>
+          <li>以前の言語ファイル名の指定は無効になります。</li>
+          <li>
+            個人の<a href="../setup/folder.html">設定ファイルフォルダ</a>にある設定ファイルの内容はインストーラによって変更されません。
+            <a href="../menu/setup-additional-ui.html">UI</a>の設定から使いたい言語を選択して、設定を保存し直してください。
+          </li>
+        </ul>
+      </li>
+      <li>
+        ポルトガル語（ブラジル）の言語ファイル(pt_BR.lng)を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/589" target="_blank">issue #589</a>)
       </li>
+      <li>
+        イタリア語の言語ファイル(it_IT.lng)を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/751" target="_blank">issue #751</a>)
+      </li>
+       <li>
+        トルコ語の言語ファイル(tr_TR.lng)を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/748" target="_blank">issue #748</a>)
+       </li>
       <li><a href="#ttssh_3.5.0">TTSSH(3.5.0)</a>へ差し替えた。</li>
+      <li>
+        <a href="#changefontsize_1.00">TTXChangeFontSize</a>を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/599" target="_blank">issue #599</a>)
+      </li>
+      <li>
+        マニュアルに<a href="ctrlseq_device_attributes.html">Device Attribute一覧</a>を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/689" target="_blank">issue #689</a>)
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_5.4.1">2025.08.03 (Ver 5.4.1)</h3>
+<ul class="history">
+  <!--li>変更
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>バグ修正
+    <ul>
+      <li>
+        マウスで文字を選択するとき、文字の左右を考慮するよう修正した。
+        Tera Term 5.1 以前の動作に戻した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/468" target="_blank">issue #468</a>)
+      </li>
+      <li>
+        ディスプレイの拡大率100%(96DPI)以外の環境でVTウィンドウに漢字を入力する際、変換中のフォントサイズと確定後のフォントサイズが一致しない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/525" target="_blank">issue #525</a>)
+      </li>
+      <li>
+        DPI が異なるディスプレイをまたいでウィンドウを移動またはリサイズした際、ウィンドウが正しいサイズで表示されない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/555" target="_blank">issue #555</a>)
+      </li>
+      <li>
+        VTウィンドウを最大化した状態でフォントサイズを変更した際の下記の不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/631" target="_blank">issue #631</a>)
+        <ul>
+          <li>使用中のフォントより小さいフォントサイズを選ぶと画面描画が乱れる。</li>
+          <li>使用中のフォントより大きいフォントサイズを選択するとウィンドウサイズがデスクトップより大きくなる。</li>
+        </ul>
+      </li>
+      <li>
+        ログダイアログにダイアログフォントが反映されない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/590" target="_blank">issue #590</a>)
+      </li>
+      <li>VTウィンドウの<a href="../menu/setup-additional-font.html">フォント選択</a>に下記の修正を行った。(<a href="https://github.com/TeraTermProject/teraterm/issues/335" target="_blank">issue #335</a>)
+        <ul>
+          <li>フォント選択ダイアログで選択したポイントサイズと画面に表示される文字のポイントサイズが一致するよう修正した。</li>
+          <li>画面の解像度が96DPI以外の場合でも、フォント選択ダイアログで選択したポイントサイズが96DPIの場合の値と同じになるよう修正した。</li>
+        </ul>
+      </li>
+      <li>
+        [Additional settings]-[<a href="../menu/setup-additional-ctrlseq.html">Control Sequence</a>] タブの "Beep" プルダウンに設定値が反映されない問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/529" target="_blank">issue #529</a>)
+      </li>
+      <li>
+        Tera Term のコマンドラインオプション <a href="../commandline/teraterm.html#f">/F=</a> がプラグインに反映されるように修正した。<br>
+        加えて、[File]-[Duplicate session]で複製されたセッションに <a href="../commandline/teraterm.html#f">/F=</a> オプションが引き継がれるよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/692" target="_blank">issue #692</a>)
+      </li>
+      <li>
+        タスクスケジューラ経由でマクロを実行出来ない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/196" target="_blank">issue #196</a>)
+      </li>
+      <li>
+        Tera Termマクロを非表示で実行して、<a href="../macro/command/connect.html">connect</a>マクロコマンドでTera Termを起動すると動作が停止する場合があったので修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/607" target="_blank">issue #607</a>)
+      </li>
+      <li>
+        <a href="../macro/command/restoresetup.html">restoresetup</a>マクロコマンドで INI ファイルが相対パスで指定された場合に、%APPDATA%\teraterm5\ からの相対パスと見なされない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/706" target="_blank">issue #706</a>)
+      </li>
+      <li>
+        <a href="../macro/command/logopen.html">logopen</a>マクロコマンドでドライブレター以外の場所に":"を使用したファイル名を指定した場合に、Tera Term がクラッシュする不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/648" target="_blank">issue #648</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>その他
+    <ul>
+      <li><a href="#ttssh_3.4.1">TTSSH(3.4.1)</a>へ差し替えた。</li>
+      <li><a href="#cygterm_1.07_31">CygTerm+ 1.07_31</a>へ差し替えた。</li>
+      <li><a href="#ttproxy_1.0.0.27">TTProxy 1.0.0.27</a>へ差し替えた。</li>
+      <li><a href="#ttyrec_1.06">TTXttyrec Plugin(1.06)</a>へ差し替えた。</li>
+      <li><a href="#viewmode_1.01">TTXViewMode Plugin(1.01)</a>へ差し替えた。</li>
+      <li><a href="#recurringcommand_1.06">TTXRecurringCommand 1.06</a>へ差し替えた。</li>
+      <li>
+        コード署名を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/316" target="_blank">issue #316</a>)
+      </li>
       <li>
         インストーラ: Tera Term がプロトコルや拡張子の「既定のアプリ」の候補に出てくるようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/471" target="_blank">issue #471</a>)
       </li>
+      <li>インストーラに使用している Inno Setup のバージョンを<a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.5.1" target="_blank">6.5.1</a>へ差し替えた。</li>
     </ul>
   </li>
 </ul>
@@ -160,8 +476,8 @@
       <li>[Additional settings]-[General] タブで設定する、新規接続ダイアログの "<a href="../menu/setup-additional-general.html#Port">Default port</a>" は "TCP/IP" または "Serial" の選択になった。<br>
         デフォルトのシリアルポート番号は <a href="../menu/setup-additional-serialport.html">Serial port タブ</a>で選択するようになった。
       </li>
-      <li>[Additional settings]-[<a href="../menu/setup-additional-window.html#">Window</a>] タブの "Reverse" ボタンを "Swap colors" に改名した。
-      <li>[Additional settings]-[<a href="../menu/setup-font.html#">Font</a>] タブの "List proportional fonts in font dialog" を使用可能にした。</li>
+      <li>[Additional settings]-[<a href="../menu/setup-additional-window.html">Window</a>] タブの "Reverse" ボタンを "Swap colors" に改名した。
+      <li>[Additional settings]-[<a href="../menu/setup-font.html">Font</a>] タブの "List proportional fonts in font dialog" を使用可能にした。</li>
       <li><a href="../menu/file-sendfile.html#dialog">Send file ダイアログ</a>の送信ファイル選択の初期ディレクトリが<a href="../setup/folder.html#FileDir">ファイル転送用のフォルダ</a>になるようにした。</li>
       <li><a href="../menu/file-sendfile.html#dialog">Send file ダイアログ</a>のオプションを TERATERM.INI に保存するようにした。
         <ul>
@@ -476,6 +792,7 @@
       <li>動作環境が Windows 7 以上になった。</li>
       <li>Q & A集に輸出規制(EAR)について追記した。</li>
       <li><a href="#ttssh_3.0">TTSSH(3.0)</a>へ差し替えた。</li>
+      <li><a href="#cygterm_1.07_30">CygTerm+ 1.07_30</a>へ差し替えた。</li>
       <li><a href="#ttmenu_1.17">TeraTerm Menu(1.17)</a>へ差し替えた。</li>
       <li><a href="#ttyrec_1.05">TTXttyrec Plugin(1.05)</a>へ差し替えた。</li>
       <li><a href="#resizemenu_1.07">TTXResizeMenu Plugin(1.07)</a>へ差し替えた。</li>
@@ -3741,7 +4058,103 @@
 
 <h2 id="ttssh">TTSSH</h2>
 
-<h3 id="ttssh_3.5.0">YYYY.MM.DD (Ver 3.5.0 not released yet)</h3>
+<h3 id="ttssh_3.6.0">YYYY.MM.DD (Ver 3.6.0 not released yet)</h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>
+        SSH2 の PQC(耐量子暗号)を組み合わせたハイブリッド鍵交換方式 mlkem768x25519-sha256 鍵交換方式に対応した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/338" target="_blank">issue #338</a>)
+        SSH2 の PQC(耐量子暗号)を組み合わせたハイブリッド鍵交換方式 sntrup761x25519-sha512, sntrup761x25519-sha512@openssh.com に対応した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/337" target="_blank">issue #337</a>)
+      </li>
+      <li>
+        About TTSSH ダイアログに表示する鍵交換方式の情報を、DH グループや楕円曲線の情報に変更した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1018" target="_blank">issue #1018</a>)
+      </li>
+    </ul>
+  </li>
+
+  <!--li>バグ修正
+    <ul>
+      <li>
+      </li>
+    </ul>
+  </li-->
+
+  <li>その他
+    <ul>
+      <li>
+        LibreSSL 4.2.1 へ差し替えた。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/962" target="_blank">issue #962</a>)
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="ttssh_3.5.2">2026.01.21 (Ver 3.5.2)</h3>
+<ul class="history">
+  <!--li>変更
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>バグ修正
+    <ul>
+      <li>
+        SCP 受信のときに受信フォルダが指定されていない場合、ダウンロードフォルダに保存されない問題を修正した。
+        3.1 (Tera Term 5.1) からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1057" target="_blank">issue #1057</a>)
+      </li>
+      <li>
+        鍵交換ネゴシエーションに失敗した場合にクラッシュする問題を修正した。
+        3.5.0 (Tera Term 5.5.0)からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1070" target="_blank">issue #1070</a>)
+      </li>
+      <li>
+        SCP 受信中ダイアログのタイトルが "SCP sending file" になっているのを修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1055" target="_blank">issue #1055</a>)
+      </li>
+    </ul>
+  </li>
+
+  <!--li>その他
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+</ul>
+
+<h3 id="ttssh_3.5.1">2025.11.17 (Ver 3.5.1)</h3>
+<ul class="history">
+  <!--li>変更
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>バグ修正
+    <ul>
+      <li>
+        鍵再交換後に通信が切断される問題を修正した。<a href="#ttssh_3.5.0">3.5.0</a> (Tera Term 5.5.0)からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/895" target="_blank">issue #895</a>)
+      </li>
+      <li>
+        SCPファイル転送が低速になった問題を修正した。<a href="#ttssh_3.4.1">3.4.1</a> (Tera Term 5.4.1)からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/883" target="_blank">issue #883</a>)
+      </li>
+    </ul>
+  </li>
+
+  <!--li>その他
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+</ul>
+
+<h3 id="ttssh_3.5.0">2025.09.16 (Ver 3.5.0)</h3>
 <ul class="history">
   <li>変更
     <ul>
@@ -3749,8 +4162,39 @@
         SSH2 の curve25519-sha256, curve25519-sha256@libssh.org 鍵交換方式に対応した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/89" target="_blank">issue #89</a>)
       </li>
+      <li>
+        SSH チャネル数の上限を変更できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/694" target="_blank">issue #694</a>)
+        <ul>
+          <li>teraterm.iniに SSH チャネル数の上限を設定する <a href="../setup/teraterm-ini.html#MaxChannel">MaxChannel</a> エントリを追加した。</li>
+          <li><a href="../setup/teraterm-ini.html#MaxChannel">MaxChannel</a> のデフォルト値は100で、0を指定した場合は無制限となる。</li>
+        </ul>
+      </li>
     </ul>
   </li>
+
+  <!--li>バグ修正
+    <ul>
+    </ul>
+  </li-->
+
+  <li>その他
+    <ul>
+      <li>
+        LibreSSL 4.1.0 へ差し替えた。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/588" target="_blank">issue #588</a>)
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="ttssh_3.4.1">2025.08.03 (Ver 3.4.1)</h3>
+<ul class="history">
+  <!--li>変更
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
 
   <li>バグ修正
     <ul>
@@ -5333,6 +5777,27 @@
 
 
 <h2 id="cygterm">CygTerm+</h2>
+<h3 id="cygterm_1.07_31">v1.07_31 2025/08/03</h3>
+<ul class="history">
+      <li>
+        Tera Term マクロで cygconnect を実行すると「/D=XXXXXXXX\n指定されたファイルがみつかりません。」と表示され、cygterm が起動しない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/645" target="_blank">issue #645</a>)
+      </li>
+</ul>
+
+<h3 id="cygterm_1.07_30">v1.07_30 2022/02/06</h3>
+<ul class="history">
+      <li>
+        読み込む設定ファイルを追加<br>
+        $APPDATA/teraterm5/cygterm.cfg
+      </li>
+      <li>
+        Unicode対応
+      </li>
+      <li>
+        ポータブル版対応
+      </li>
+</ul>
 
 <h3 id="cygterm_1.07_29">v1.07_29 2016/11/26 (by maya)</h3>
 <ul class="history">
@@ -5591,14 +6056,20 @@
 
 <h2 id="ttproxy">TTProxy</h2>
 
+<h3 id="ttproxy_1.0.0.27">2025.08.03 (Ver 1.0.0.27)</h3>
+<ul class="history">
+  <li>バグ修正
+    <ul>
+      <li>
+        Tera Term のコマンドラインオプション /F=<setup file> で相対パスが指定された場合に %APPDATA%\teraterm5\ からの相対パスと見なされない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/653" target="_blank">issue #653</a>)
+      </li>
+    </ul>
+  </li>
+</ul>
+
 <h3 id="ttproxy_1.0.0.26">2019.12.7 (Ver 1.0.0.26)</h3>
 <ul class="history">
-  <!--li>変更
-    <ul>
-      <li></li>
-    </ul>
-  </li -->
-
   <li>バグ修正
     <ul>
       <li>HTTPプロキシ接続がエラーとなり、ステータスコードが400,401,403,405,406,407以外だった場合、メッセージボックスにゴミが表示される問題を修正した。</li>
@@ -5730,6 +6201,14 @@
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
 
+<h3 id="ttmenu_1.21">YYYY.MM.DD(Ver 1.21)</h3>
+<ul class="history">
+      <li>
+        TeraTerm Menu から起動した Tera Term のコマンドラインオプションを確認できないようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
+      </li>
+</ul>
+
 <h3 id="ttmenu_1.20">2024.7.7(Ver 1.20)</h3>
 <ul class="history">
       <li>パスワードを暗号化して保存するLockBoxを追加した。</li>
@@ -5860,6 +6339,11 @@
 
 <h2 id="kanjimenu">TTX KanjiMenu</h2>
 
+<h3 id="kanjimenu_0.1.11">YYYY.MM.DD (Ver 0.1.11)</h3>
+<ul class="history">
+      <li>バージョン情報を修正した。</li>
+</ul>
+
 <h3 id="kanjimenu_0.1.10">2025.03.03 (Ver 0.1.10)</h3>
 <ul class="history">
       <li>設定ダイアログを追加。使用するメニューを設定できるようにした。</li>
@@ -5982,6 +6466,14 @@
 </ul>
 
 <h2 id="ttyrec">TTXttyrec</h2>
+<h3 id="ttyrec_1.06">2025.08.03 (Ver 1.06)</h3>
+<ul class="history">
+  <li>
+    言語ファイルに対応した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/624" target="_blank">issue #624</a>)
+  </li>
+</ul>
+
 <h3 id="ttyrec_1.05">2023.10.15 (Ver 1.05)</h3>
 <ul class="history">
   <li>コマンドラインから再生したとき、[Replay again] が使えなかった問題を修正した。</li>
@@ -6024,12 +6516,28 @@
 </ul>
 
 <h2 id="viewmode">TTXViewMode</h2>
+<h3 id="viewmode_1.01">2025.08.02 (Ver 1.01)</h3>
+<ul class="history">
+  <li>
+    言語ファイルに対応した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/624" target="_blank">issue #624</a>)
+  </li>
+</ul>
+
 <h3 id="viewmode_1.00">2008.12.16 (Ver 1.00)</h3>
 <ul class="history">
   <li>初版。</li>
 </ul>
 
 <h2 id="recurringcommand">TTXRecurringCommand</h2>
+<h3 id="recurringcommand_1.06">2025.08.03 (Ver 1.06)</h3>
+<ul class="history">
+  <li>
+    Tera Term のコマンドラインオプション /F=<setup file> で相対パスが指定された場合に %APPDATA%\teraterm5\ からの相対パスと見なされない不具合を修正した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/692" target="_blank">issue #692</a>)
+  </li>
+</ul>
+
 <h3 id="recurringcommand_1.05">2016.11.30 (Ver 1.05)</h3>
 <ul class="history">
   <li>送信するコマンドの末尾に改行を付加する設定を追加した。</li>
@@ -6068,6 +6576,15 @@
 <h3 id="commandlineopt_20231030">2023.10.30</h3>
 <ul class="history">
   <li>/FG=, /BG= オプションが効かなかったので修正</li>
+</ul>
+
+<h2 id="changefontsize">TTXChangeFontSize</h2>
+<h3 id="changefontsize_1.00">2025.09.16 (Ver 1.00)</h3>
+<ul class="history">
+  <li>
+    原作者のいわもとこういちさんに許諾を得て、ソースをインポートした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/599" target="_blank">issue #599</a>)
+  </li>
 </ul>
 
 </body>

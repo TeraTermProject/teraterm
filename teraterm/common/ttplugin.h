@@ -34,7 +34,7 @@
 #include "ttfileio.h"
 #include "hostname_rec.h"
 
-// プラグインのバージョン
+// 繝励Λ繧ｰ繧､繝ｳ縺ｮ繝舌�ｼ繧ｸ繝ｧ繝ｳ
 #define TTVERSION (WORD)500	/* version 5.00 */
 
 typedef struct {

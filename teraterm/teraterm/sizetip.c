@@ -42,31 +42,31 @@ static TipWin *SizeTip;
 static int tip_enabled = 0;
 
 /*
- *	point ‚ğ
- *	ƒXƒNƒŠ[ƒ“‚©‚ç‚Í‚İo‚µ‚Ä‚¢‚éê‡A“ü‚é‚æ‚¤‚É•â³‚·‚é
- *	NearestMonitor ‚ª TRUE ‚Ì‚Æ‚«AÅ‚à‹ß‚¢ƒ‚ƒjƒ^
- *	FALSE‚Ì‚Æ‚«Aƒ}ƒEƒX‚Ì‚ ‚éƒ‚ƒjƒ^‚ÉˆÚ“®‚³‚¹‚é
- *	ƒfƒBƒXƒvƒŒƒC‚Ì’[‚©‚ç FrameWidth(pixel) ‚æ‚è—£‚ê‚é‚æ‚¤‚É‚·‚é
+ *	point ã‚’
+ *	ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‹ã‚‰ã¯ã¿å‡ºã—ã¦ã„ã‚‹å ´åˆã€å…¥ã‚‹ã‚ˆã†ã«è£œæ­£ã™ã‚‹
+ *	NearestMonitor ãŒ TRUE ã®ã¨ãã€æœ€ã‚‚è¿‘ã„ãƒ¢ãƒ‹ã‚¿
+ *	FALSEã®ã¨ãã€ãƒã‚¦ã‚¹ã®ã‚ã‚‹ãƒ¢ãƒ‹ã‚¿ã«ç§»å‹•ã•ã›ã‚‹
+ *	ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ç«¯ã‹ã‚‰ FrameWidth(pixel) ã‚ˆã‚Šé›¢ã‚Œã‚‹ã‚ˆã†ã«ã™ã‚‹
  */
 static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
 {
 	if (HasMultiMonitorSupport()) {
-		// ƒ}ƒ‹ƒ`ƒ‚ƒjƒ^‚ªƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚éê‡
+		// ãƒãƒ«ãƒãƒ¢ãƒ‹ã‚¿ãŒã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹å ´åˆ
 		HMONITOR hm;
 		MONITORINFO mi;
 		int ix, iy;
 
-		// Œ³‚ÌÀ•W‚ğ•Û‘¶‚µ‚Ä‚¨‚­
+		// å…ƒã®åº§æ¨™ã‚’ä¿å­˜ã—ã¦ãŠã
 		ix = point->x;
 		iy = point->y;
 
 		hm = pMonitorFromPoint(*point, MONITOR_DEFAULTTONULL);
 		if (hm == NULL) {
 			if (NearestMonitor) {
-				// Å‚à‹ß‚¢ƒ‚ƒjƒ^‚É•\¦‚·‚é
+				// æœ€ã‚‚è¿‘ã„ãƒ¢ãƒ‹ã‚¿ã«è¡¨ç¤ºã™ã‚‹
 				hm = pMonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
 			} else {
-				// ƒXƒNƒŠ[ƒ“‚©‚ç‚Í‚İo‚µ‚Ä‚¢‚éê‡‚Íƒ}ƒEƒX‚Ì‚ ‚éƒ‚ƒjƒ^‚É•\¦‚·‚é
+				// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‹ã‚‰ã¯ã¿å‡ºã—ã¦ã„ã‚‹å ´åˆã¯ãƒã‚¦ã‚¹ã®ã‚ã‚‹ãƒ¢ãƒ‹ã‚¿ã«è¡¨ç¤ºã™ã‚‹
 				GetCursorPos(point);
 				hm = pMonitorFromPoint(*point, MONITOR_DEFAULTTONEAREST);
 			}
@@ -86,7 +86,7 @@ static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
 	}
 	else
 	{
-		// ƒ}ƒ‹ƒ`ƒ‚ƒjƒ^‚ªƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚È‚¢ê‡
+		// ãƒãƒ«ãƒãƒ¢ãƒ‹ã‚¿ãŒã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ãªã„å ´åˆ
 		if (point->x < FrameWidth) {
 			point->x = FrameWidth;
 		}
@@ -96,17 +96,17 @@ static void FixPosFromFrame(POINT *point, int FrameWidth, BOOL NearestMonitor)
 	}
 }
 
-/* ƒŠƒTƒCƒY—pƒc[ƒ‹ƒ`ƒbƒv‚ğ•\¦‚·‚é
+/* ãƒªã‚µã‚¤ã‚ºç”¨ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚’è¡¨ç¤ºã™ã‚‹
  *
- * ˆø”F
- *   src        ƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹
- *   cx, cy     ƒc[ƒ‹ƒ`ƒbƒv‚É•\¦‚·‚éc‰¡ƒTƒCƒY
- *   fwSide     ƒŠƒTƒCƒY‚É‚Ç‚±‚ÌƒEƒBƒ“ƒhƒE‚ğ’Í‚ñ‚¾‚©
- *   newX, newY ƒŠƒTƒCƒYŒã‚Ì¶ã‚ÌÀ•W
+ * å¼•æ•°ï¼š
+ *   src        ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+ *   cx, cy     ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã«è¡¨ç¤ºã™ã‚‹ç¸¦æ¨ªã‚µã‚¤ã‚º
+ *   fwSide     ãƒªã‚µã‚¤ã‚ºæ™‚ã«ã©ã“ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’æ´ã‚“ã ã‹
+ *   newX, newY ãƒªã‚µã‚¤ã‚ºå¾Œã®å·¦ä¸Šã®åº§æ¨™
  *
- * ’ˆÓ:
- * Windows9x‚Å‚Í‰æ–Ê‚ÌƒvƒƒpƒeƒB‚ÅuƒEƒBƒ“ƒhƒE‚Ì“à—e‚ğ•\¦‚µ‚½‚Ü‚Ü
- * ƒhƒ‰ƒbƒO‚·‚év‚Éƒ`ƒFƒbƒN‚ğ“ü‚ê‚È‚¢‚ÆAƒc[ƒ‹ƒ`ƒbƒv‚ª•\¦‚³‚ê‚Ü‚¹‚ñB
+ * æ³¨æ„:
+ * Windows9xã§ã¯ç”»é¢ã®ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã§ã€Œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å†…å®¹ã‚’è¡¨ç¤ºã—ãŸã¾ã¾
+ * ãƒ‰ãƒ©ãƒƒã‚°ã™ã‚‹ã€ã«ãƒã‚§ãƒƒã‚¯ã‚’å…¥ã‚Œãªã„ã¨ã€ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ãŒè¡¨ç¤ºã•ã‚Œã¾ã›ã‚“ã€‚
  */
 void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 {
@@ -119,8 +119,8 @@ void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 	/* Generate the tip text */
 	_snprintf_s(str, _countof(str), _TRUNCATE, "%dx%d", cx, cy);
 
-	// ƒEƒBƒ“ƒhƒE‚Ì‰EA‰E‰ºA‰º‚ğ’Í‚ñ‚¾ê‡‚ÍAƒc[ƒ‹ƒ`ƒbƒv‚ğ¶ã‹÷‚É”z’u‚·‚éB
-	// ‚»‚ê‚çˆÈŠO‚ÍƒŠƒTƒCƒYŒã‚Ì¶ã‹÷‚É”z’u‚·‚éB
+	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å³ã€å³ä¸‹ã€ä¸‹ã‚’æ´ã‚“ã å ´åˆã¯ã€ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚’å·¦ä¸Šéš…ã«é…ç½®ã™ã‚‹ã€‚
+	// ãã‚Œã‚‰ä»¥å¤–ã¯ãƒªã‚µã‚¤ã‚ºå¾Œã®å·¦ä¸Šéš…ã«é…ç½®ã™ã‚‹ã€‚
 	if (!(fwSide == WMSZ_RIGHT || fwSide == WMSZ_BOTTOMRIGHT || fwSide == WMSZ_BOTTOM)) {
 		tooltip_movable = 1;
 	}
@@ -131,11 +131,11 @@ void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 		int w, h;
 		const int x_offset = 16;
 
-		// ƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚ğæ“¾
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ã‚’å–å¾—
 		GetWindowRect(src, &wr);
 
-		// sizetip‚ğo‚·ˆÊ’u‚ÍAƒEƒBƒ“ƒhƒE¶ã(X, Y)‚É‘Î‚µ‚ÄA
-		// (X, Y - sizetip‚Ì‚‚³) ‚Æ‚·‚éB
+		// sizetipã‚’å‡ºã™ä½ç½®ã¯ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å·¦ä¸Š(X, Y)ã«å¯¾ã—ã¦ã€
+		// (X, Y - sizetipã®é«˜ã•) ã¨ã™ã‚‹ã€‚
 		SizeTip = TipWinCreate(NULL, src);
 		TipWinSetTextA(SizeTip, str);
 		TipWinGetWindowSize(SizeTip, &w, &h);
@@ -151,7 +151,7 @@ void UpdateSizeTip(HWND src, int cx, int cy, UINT fwSide, int newX, int newY)
 		/* Tip already exists, just set the text */
 		TipWinSetTextA(SizeTip, str);
 
-		// ƒEƒBƒ“ƒhƒE‚Ì¶ã‚ªˆÚ“®‚·‚éê‡
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å·¦ä¸ŠãŒç§»å‹•ã™ã‚‹å ´åˆ
 		if (tooltip_movable) {
 			int frame_width;
 			TipWinGetFrameSize(SizeTip, &frame_width);

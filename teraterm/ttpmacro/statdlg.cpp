@@ -89,7 +89,7 @@ BOOL CStatDlg::OnInitDialog()
 {
 	dpi = GetMonitorDpiFromWindow(m_hWnd);
 	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), dpi);
-	// •Â‚¶‚éƒ{ƒ^ƒ“‚ğ–³Œø‰»
+	// é–‰ã˜ã‚‹ãƒœã‚¿ãƒ³ã‚’ç„¡åŠ¹åŒ–
 	RemoveMenu(GetSystemMenu(m_hWnd, FALSE), SC_CLOSE, MF_BYCOMMAND);
 
 	Update(TextStr,TitleStr,PosX,PosY);
@@ -112,7 +112,7 @@ BOOL CStatDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam)) {
 	case IDOK:
-		// Enter key‰Ÿ‰º‚ÅÁ‚¦‚È‚¢‚æ‚¤‚É‚·‚éB(2010.8.25 yutaka)
+		// Enter keyæŠ¼ä¸‹ã§æ¶ˆãˆãªã„ã‚ˆã†ã«ã™ã‚‹ã€‚(2010.8.25 yutaka)
 		return TRUE;
 	case IDCANCEL:
 		if ((HWND)lParam!=NULL) { // ignore ESC key
@@ -140,14 +140,14 @@ LRESULT CStatDlg::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 	current_WH = R.bottom - R.top;
 
 	if (current_WW == WW && current_WH == WH) {
-		// ƒTƒCƒY‚ª•Ï‚í‚Á‚Ä‚¢‚È‚¯‚ê‚Î‰½‚à‚µ‚È‚¢
+		// ã‚µã‚¤ã‚ºãŒå¤‰ã‚ã£ã¦ã„ãªã‘ã‚Œã°ä½•ã‚‚ã—ãªã„
 		PosX = R.left;
 		PosY = R.top;
 	}
 	else {
 		int new_WW;
 
-		// ‚‚³‚ª•ÏX‚³‚ê‚½‚©AÅ‰‚æ‚è•‚ª‹·‚­‚È‚Á‚½ê‡‚ÍŒ³‚É–ß‚·
+		// é«˜ã•ãŒå¤‰æ›´ã•ã‚ŒãŸã‹ã€æœ€åˆã‚ˆã‚Šå¹…ãŒç‹­ããªã£ãŸå ´åˆã¯å…ƒã«æˆ»ã™
 		if (current_WW < init_WW) {
 			new_WW = init_WW;
 			if (PosX != R.left) {
@@ -211,20 +211,20 @@ void CStatDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 		GetClientRect(&R);
 		CW = R.right-R.left;
 		CH = R.bottom-R.top;
-		// ‰‰ñ‚Ì‚İ
+		// åˆå›ã®ã¿
 		if (is_init) {
-			// ƒEƒCƒ“ƒhƒEƒTƒCƒY‚ÌŒvZ
+			// ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã®è¨ˆç®—
 			GetWindowRect(&R);
 			WW = TW + R.right - R.left - CW;
 			WH = TH + R.bottom - R.top - CH;
-			// ÀÛ‚ÌƒTƒCƒY‚ğæ“¾
+			// å®Ÿéš›ã®ã‚µã‚¤ã‚ºã‚’å–å¾—
 			::SetWindowPos(m_hWnd, HWND_TOP, 0, 0, WW, WH, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 			GetWindowRect(&R);
 			WW = R.right - R.left;
 			WH = R.bottom - R.top;
 			init_WW = WW;
 			init_WH = WH;
-			// CW,CH‚É”½‰f
+			// CW,CHã«åæ˜ 
 			GetClientRect(&R);
 			CW = R.right-R.left;
 			CH = R.bottom-R.top;
@@ -250,10 +250,10 @@ void CStatDlg::Bringup()
 }
 
 /**
- * MFC‚ÌCWnd‚Ì‰B‚êƒƒ“ƒoŠÖ”
- *	‚±‚ÌŠÖ”‚ªFALSE‚ğ•Ô‚·‚Æ
- *	CDialog::OnInitDialog()Œã‚É
- *	CWnd::CenterWindow() ‚ªŒÄ‚Ño‚³‚ê‚È‚¢
+ * MFCã®CWndã®éš ã‚Œãƒ¡ãƒ³ãƒé–¢æ•°
+ *	ã“ã®é–¢æ•°ãŒFALSEã‚’è¿”ã™ã¨
+ *	CDialog::OnInitDialog()å¾Œã«
+ *	CWnd::CenterWindow() ãŒå‘¼ã³å‡ºã•ã‚Œãªã„
  */
 BOOL CStatDlg::CheckAutoCenter()
 {

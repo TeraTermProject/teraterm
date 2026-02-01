@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// “ú–{Œê (“ú–{) resources
+// æ—¥æœ¬èª (æ—¥æœ¬) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
@@ -44,12 +44,12 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // “ú–{Œê (“ú–{) resources
+#endif    // æ—¥æœ¬èª (æ—¥æœ¬) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// ‰pŒê (•Ä‘) resources
+// è‹±èª (ç±³å›½) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -159,7 +159,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // ‰pŒê (•Ä‘) resources
+#endif    // è‹±èª (ç±³å›½) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

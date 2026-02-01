@@ -66,6 +66,7 @@ void SetSync(BOOL OnFlag);
 WORD SendCmnd(char OpId, int WaitFlag);
 WORD GetTTParam(char OpId, PCHAR Param, int destlen);
 int FindRegexStringOne(char *regex, int regex_len, char *target, int target_len);
+void SetRecvFileOption(int AutoStopWaitTime);
 
 extern BOOL Linked;
 extern WORD ComReady;

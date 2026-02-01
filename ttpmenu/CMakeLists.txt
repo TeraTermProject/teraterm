@@ -1,11 +1,9 @@
-﻿set(PACKAGE_NAME "ttpmenu")
-
-project(${PACKAGE_NAME})
+﻿project("ttpmenu")
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../libs/lib_libressl.cmake)
 
 add_executable(
-  ${PACKAGE_NAME} WIN32
+  ${PROJECT_NAME} WIN32
   registry.cpp
   registry.h
   resource.h
@@ -22,20 +20,28 @@ add_executable(
   )
 
 target_compile_definitions(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
 #  UNICODE=1 _UNICODE=1
 )
 
+if(MSVC)
+  target_compile_options(
+    ${PROJECT_NAME}
+    PRIVATE
+    /W4
+  )
+endif(MSVC)
+
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../teraterm/common/ttlib.h
   ../teraterm/common/i18n.h
   ../teraterm/common/codeconv.h
   ../teraterm/common/compat_win.h
   ../teraterm/common/dllutil.h
-  )
+)
 
 source_group(
   "common"
@@ -43,7 +49,7 @@ source_group(
   "teraterm\/common\/")
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ${LIBRESSL_INCLUDE_DIRS}/openssl/sha.h
   ${LIBRESSL_INCLUDE_DIRS}/openssl/evp.h
@@ -59,13 +65,13 @@ source_group(
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     layer_for_unicode
     )
   if(MSVC)
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/common/compat_w95_vs2005.c
       )
@@ -73,13 +79,13 @@ if(SUPPORT_OLD_WINDOWS)
 endif(SUPPORT_OLD_WINDOWS)
 
 set_target_properties(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   .
   ${LIBRESSL_INCLUDE_DIRS}
@@ -90,14 +96,14 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
   else()
     target_link_options(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       /MANIFEST:NO)
   endif()
 endif()
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   common_static
   comctl32
@@ -110,6 +116,6 @@ target_link_libraries(
   )
 
 install(
-  TARGETS ${PACKAGE_NAME}
+  TARGETS ${PROJECT_NAME}
   DESTINATION .
   )

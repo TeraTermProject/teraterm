@@ -36,17 +36,17 @@
 #include "ttcmn_lib.h"
 
 /**
- *	VT Window ‚ÌƒAƒCƒRƒ“‚Æ‚ğƒZƒbƒg‚·‚é
+ *	VT Window ã®ã‚¢ã‚¤ã‚³ãƒ³ã¨ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
  *
- *	@param[in]	cv			İ’è‚·‚é Tera Term ‚Ì cv
- *	@param[in]	hInstance	ƒAƒCƒRƒ“‚ğ•Û‚µ‚Ä‚¢‚éƒ‚ƒWƒ…[ƒ‹‚ÌƒCƒ“ƒXƒ^ƒ“ƒX
- *	@param[in]	IconID		ƒAƒCƒRƒ“‚ÌID
+ *	@param[in]	cv			è¨­å®šã™ã‚‹ Tera Term ã® cv
+ *	@param[in]	hInstance	ã‚¢ã‚¤ã‚³ãƒ³ã‚’ä¿æŒã—ã¦ã„ã‚‹ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
+ *	@param[in]	IconID		ã‚¢ã‚¤ã‚³ãƒ³ã®ID
  *
- *	hInstance = NULL, IconID = 0 ‚Æ‚·‚é‚ÆA
- *  ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚Åw’è‚³‚ê‚½ƒAƒCƒRƒ“A
- *	w’è‚ª‚È‚¢‚Í•W€‚ÌVTƒAƒCƒRƒ“‚ªƒZƒbƒg‚³‚ê‚é
+ *	hInstance = NULL, IconID = 0 ã¨ã™ã‚‹ã¨ã€
+ *  ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã§æŒ‡å®šã•ã‚ŒãŸã‚¢ã‚¤ã‚³ãƒ³ã€
+ *	æŒ‡å®šãŒãªã„æ™‚ã¯æ¨™æº–ã®VTã‚¢ã‚¤ã‚³ãƒ³ãŒã‚»ãƒƒãƒˆã•ã‚Œã‚‹
  *
- *	’Ê’m—Ìˆæ‚ÌƒAƒCƒRƒ“‚ğƒZƒbƒg‚·‚é‚Æ‚«‚Í NotifySetIconID() ‚ğg—p‚·‚é
+ *	é€šçŸ¥é ˜åŸŸã®ã‚¢ã‚¤ã‚³ãƒ³ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã¨ãã¯ NotifySetIconID() ã‚’ä½¿ç”¨ã™ã‚‹
  */
 void WINAPI SetVTIconID(TComVar *cv, HINSTANCE hInstance, WORD IconID)
 {
@@ -79,10 +79,10 @@ static wchar_t *GetCHMFile(const wchar_t *exe_dir, const wchar_t *UILanguageFile
 }
 
 /**
- *	ƒwƒ‹ƒv‚ğŠJ‚­
+ *	ãƒ˜ãƒ«ãƒ—ã‚’é–‹ã
  *
- *	@param[in]	Command			HtmlHelp() API ‚Ì‘æ3ˆø”
- *	@param[in]	Data			HtmlHelp() API ‚Ì‘æ4ˆø”
+ *	@param[in]	Command			HtmlHelp() API ã®ç¬¬3å¼•æ•°
+ *	@param[in]	Data			HtmlHelp() API ã®ç¬¬4å¼•æ•°
  *	@param[in]	ExeDirW
  *	@param[in]	UILanguageFileW
  *
@@ -96,7 +96,7 @@ void WINAPI OpenHelpW(UINT Command, DWORD Data, const wchar_t *ExeDirW, wchar_t 
 
 	HWin = GetDesktopWindow();
 	if (_HtmlHelpW(HWin, chm, Command, Data) == NULL) {
-		// ƒwƒ‹ƒv‚ªŠJ‚¯‚È‚©‚Á‚½
+		// ãƒ˜ãƒ«ãƒ—ãŒé–‹ã‘ãªã‹ã£ãŸ
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			NULL, L"Tera Term: HTML help",
@@ -108,15 +108,15 @@ void WINAPI OpenHelpW(UINT Command, DWORD Data, const wchar_t *ExeDirW, wchar_t 
 }
 
 /**
- *	ƒwƒ‹ƒv‚ğŠJ‚­
+ *	ãƒ˜ãƒ«ãƒ—ã‚’é–‹ã
  *
- *	@param[in]	Command		HtmlHelp() API ‚Ì‘æ3ˆø”
- *	@param[in]	Data		HtmlHelp() API ‚Ì‘æ4ˆø”
+ *	@param[in]	Command		HtmlHelp() API ã®ç¬¬3å¼•æ•°
+ *	@param[in]	Data		HtmlHelp() API ã®ç¬¬4å¼•æ•°
  *
- *	Ÿ‚ÌƒR[ƒh‚Í
+ *	æ¬¡ã®ã‚³ãƒ¼ãƒ‰ã¯
  *		HWND HVTWin = GetParent(hDlgWnd);
  *		PostMessage(HVTWin, WM_USER_DLGHELP2, help_id, 0);
- *	Ÿ‚ÌŠÖ”ŒÄ‚Ño‚µ‚Æ“¯“™
+ *	æ¬¡ã®é–¢æ•°å‘¼ã³å‡ºã—ã¨åŒç­‰
  *		OpenHelpCV(&cv, HH_HELP_CONTEXT, help_id);
  *
  */
@@ -127,10 +127,10 @@ void WINAPI OpenHelpCV(TComVar *cv, UINT Command, DWORD Data)
 }
 
 /**
- *	ƒwƒ‹ƒv‚ğŠJ‚­
+ *	ãƒ˜ãƒ«ãƒ—ã‚’é–‹ã
  *
- *	ŒİŠ·ˆÛ‚Ì‚½‚ß‘¶İ
- *	OpenHelpCV() ‚ÖØ‚è‘Ö‚¦‚ğ‚¨‚·‚·‚ß
+ *	äº’æ›ç¶­æŒã®ãŸã‚å­˜åœ¨
+ *	OpenHelpCV() ã¸åˆ‡ã‚Šæ›¿ãˆã‚’ãŠã™ã™ã‚
  */
 void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFileA)
 {

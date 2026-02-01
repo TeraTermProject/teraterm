@@ -1,11 +1,16 @@
 ﻿# release.bat について
 
+## ビルドの全体像
+
+[readme.md](readme.md) を参照してください。
+
+## 解説
+
 - Tera Term をビルドするためのスクリプト(Windows用batファイル)
   - ミスなくリリース用バイナリを作成することを目的としている
   - 使用ライブラリをダウンロード、展開、ビルドできる
-- 実行前に環境変数 VS_VERSION に使用する Visual Studio のバージョンを設定しておく
-  - 設定していない場合は 2022 を使用する
-  - 設定例 'set VS_VERSION=2019'
+- 実行前に環境変数を設定する
+  - [readme.md](readme.md) を参照してください。
 - 次の機能がある
   - ビルド環境の準備
     - 環境変数 PATH の設定
@@ -20,14 +25,7 @@
   - 使用ツールは次のドキュメントを参照
     - [doc/ja/html/reference/develop.html](../doc/ja/html/reference/develop.html)
 - Tera Termをビルドしたときの最終的な生成ファイル
-  - Release時
-    - installer/Output/teraterm-x.y.exe
-    - installer/Output/teraterm_x.y.zip
-    - installer/Output/teraterm_x.y_pdb.zip
-  - 通常ビルド(snapshot)時
-    - installer/Output/teraterm-x.y-rREV-YYMMDD_HHMMSS-username-snapshot.exe
-    - installer/Output/teraterm-x.y-rREV-YYMMDD_HHMMSS-username-snapshot.zip
-    - installer/Output/teraterm-x.y-rREV-YYMMDD_HHMMSS-username-snapshot_pdb.zip
+  - [readme.md](readme.md) を参照してください。
 
 ## pdbファイル
 

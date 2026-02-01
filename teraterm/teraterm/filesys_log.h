@@ -34,12 +34,12 @@ extern "C" {
 #endif
 
 /**
- * ƒƒOƒoƒbƒtƒ@‚ÌÅ’á‹ó‚«ƒTƒCƒY
- *	"[YYYY-MM-DD HH:MM:SS.000]" ‚Ì•¶š‚ª“ü‚é’ö“x
+ * ãƒ­ã‚°ãƒãƒƒãƒ•ã‚¡ã®æœ€ä½ç©ºãã‚µã‚¤ã‚º
+ *	"[YYYY-MM-DD HH:MM:SS.000]" ã®æ–‡å­—ãŒå…¥ã‚‹ç¨‹åº¦
  */
 #define FILESYS_LOG_FREE_SPACE	(30*2)
 
-// logƒtƒ@ƒCƒ‹‚Ì•¶šƒR[ƒh
+// logãƒ•ã‚¡ã‚¤ãƒ«ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰
 typedef enum LogCode {
 	LOG_UTF8,
 	LOG_UTF16LE,
@@ -47,11 +47,9 @@ typedef enum LogCode {
 } LogCode_t;
 
 // log
-void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd);
 wchar_t *FLogGetLogFilename(const wchar_t *log_filename);
 wchar_t *FLogGetLogFilenameBase(const wchar_t *filename);
 
-void logfile_lock_initialize(void);
 void FLogPause(BOOL Pause);
 void FLogRotateSize(size_t size);
 void FLogRotateRotate(int step);
@@ -71,6 +69,10 @@ int FLogGetCount(void);
 int FLogGetFreeCount(void);
 void FLogWriteFile(void);
 void FLogPutUTF32(unsigned int u32);
+void FLogPutANSI(BYTE b);
+void FLogPutBinary(BYTE b);
+void FLogBinSkip(int add);
+
 void FLogOutputAllBuffer(void);
 
 #ifdef __cplusplus

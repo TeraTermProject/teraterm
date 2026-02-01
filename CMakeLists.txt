@@ -6,7 +6,11 @@ project(teraterm_all)
 if(MSVC)
   if((NOT DEFINED CMAKE_GENERATOR_PLATFORM) OR (CMAKE_GENERATOR_PLATFORM STREQUAL ""))
     set(CMAKE_GENERATOR_PLATFORM "win32")
-    #set(CMAKE_GENERATOR_PLATFORM ${CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE})
+  endif()
+  set(ARCHITECTURE ${CMAKE_VS_PLATFORM_NAME})
+else()
+  if(NOT DEFINED ARCHITECTURE)
+    message(FATAL_ERROR "ARCHITECTURE not defined")
   endif()
 endif()
 
@@ -96,6 +100,8 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GF /Gy /Zi")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /source-charset:utf-8")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /source-charset:utf-8")
   if(${MSVC_VERSION} GREATER_EQUAL 1910)
     # Visual Studio 2017以上の時
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /ZI")
@@ -179,10 +185,11 @@ endif()
 
 if((NOT EXISTS "${CMAKE_BINARY_DIR}/build_config.cmake") OR
     (NOT EXISTS "${CMAKE_BINARY_DIR}/teraterm/common/svnversion.h") OR
-    (NOT EXISTS "${CMAKE_SOURCE_DIR}/buildtools/svnrev/sourcetreeinfo.bat"))
+    (NOT EXISTS "${CMAKE_SOURCE_DIR}/buildtools/svnrev/sourcetreeinfo.bat") OR
+    (NOT EXISTS "${CMAKE_SOURCE_DIR}/installer/build_config.isl"))
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/teraterm/common)
   execute_process(
-    COMMAND ${CMAKE_COMMAND} -DPERL=${PERL} -DSOURCE_DIR=${CMAKE_SOURCE_DIR} -DBINARY_DIR=${CMAKE_BINARY_DIR} -DGIT_EXECUTABLE=${GIT_EXECUTABLE} -DSVN_EXECUTABLE=${Subversion_SVN_EXECUTABLE} -P svnrev.cmake
+    COMMAND ${CMAKE_COMMAND} -DPERL=${PERL} -DSOURCE_DIR=${CMAKE_SOURCE_DIR} -DBINARY_DIR=${CMAKE_BINARY_DIR} -DGIT_EXECUTABLE=${GIT_EXECUTABLE} -DSVN_EXECUTABLE=${Subversion_SVN_EXECUTABLE} -DARCHITECTURE=${ARCHITECTURE} -P svnrev.cmake
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/buildtools/svnrev
     RESULT_VARIABLE rv
   )
@@ -201,27 +208,23 @@ elseif(DEFINED SVNVERSION)
 else()
   set(REVISION_TIME_USER "${DATE}_${TIME}-unknown-${USER}")
 endif()
-if(DEFINED CMAKE_VS_PLATFORM_NAME)
-  set(TT_PLATFORM_NAME "-${CMAKE_VS_PLATFORM_NAME}")
-else()
-endif()
 if(NOT DEFINED SNAPSHOT_DIR)
-  set(SNAPSHOT_DIR "teraterm-${VERSION}${TT_PLATFORM_NAME}-${REVISION_TIME_USER}")
+  set(SNAPSHOT_DIR "teraterm-${VERSION}-${ARCHITECTURE}-${REVISION_TIME_USER}")
 endif()
 set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/${SNAPSHOT_DIR}")
 if(NOT DEFINED SETUP_EXE)
   # not need ".exe"
   if(RELEASE)
-    set(SETUP_EXE "teraterm-${VERSION}${TT_PLATFORM_NAME}")
+    set(SETUP_EXE "teraterm-${VERSION}-${ARCHITECTURE}")
   else()
-    set(SETUP_EXE "teraterm-${VERSION}${TT_PLATFORM_NAME}-${REVISION_TIME_USER}")
+    set(SETUP_EXE "teraterm-${VERSION}-${ARCHITECTURE}-${REVISION_TIME_USER}")
   endif()
 endif()
 if(NOT DEFINED SETUP_ZIP)
   if(RELEASE)
-    set(SETUP_ZIP "teraterm-${VERSION}${TT_PLATFORM_NAME}.zip")
+    set(SETUP_ZIP "teraterm-${VERSION}-${ARCHITECTURE}.zip")
   else()
-    set(SETUP_ZIP "teraterm-${VERSION}${TT_PLATFORM_NAME}-${REVISION_TIME_USER}.zip")
+    set(SETUP_ZIP "teraterm-${VERSION}-${ARCHITECTURE}-${REVISION_TIME_USER}.zip")
   endif()
 endif()
 
@@ -250,3 +253,14 @@ configure_file(
   buildinfo.txt.in
   buildinfo.txt
   @ONLY)
+
+### make_installer_cmake.bat/sh
+if(CMAKE_HOST_WIN32)
+  file(WRITE "${CMAKE_BINARY_DIR}/make_installer_cmake.bat"
+    "pushd %~dp0\n"
+    "\"${CMAKE_COMMAND}\" -P \"${CMAKE_SOURCE_DIR}/installer/install.cmake\"\n"
+    "pause\n")
+else()
+  file(WRITE "${CMAKE_BINARY_DIR}/make_installer_cmake.sh"
+    "\"${CMAKE_COMMAND}\" -P \"${CMAKE_SOURCE_DIR}/installer/install.cmake\"\n")
+endif()

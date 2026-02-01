@@ -31,15 +31,6 @@
 #include "filesys_io.h"
 
 typedef enum {
-	PROTO_KMT = 1,
-	PROTO_XM = 2,
-	PROTO_ZM = 3,
-	PROTO_BP = 4,
-	PROTO_QV = 5,
-	PROTO_YM = 6,
-} ProtoId_t;
-
-typedef enum {
 	OpKmtRcv  = 3,
 	OpKmtGet  = 4,
 	OpKmtSend = 5,
@@ -54,62 +45,112 @@ typedef enum {
 	OpQVSend  = 14,
 	OpYRcv    = 15,
 	OpYSend   = 16,
+	OpRawRcv  = 17,
 } OpId_t;
 
-typedef struct FileVarProto {
-	// ��protosys_proto.cpp���̂ݎg�p
+struct Comm_;
 
-	ProtoId_t ProtoId;
+typedef struct CommOp_ {
+	// 1byte送信
+	int (*BinaryOut)(struct Comm_ *comm, const CHAR *buf, size_t len);
+
+	// 1byte受信
+	int (*Read1Byte)(struct Comm_ *comm, BYTE *b);
+
+	// 1byte送信,送信バッファの先頭に入れる
+	void (*Insert1Byte)(struct Comm_ *comm, BYTE b);
+
+	// 受信バッファをクリアする
+	void (*FlashReceiveBuf)(struct Comm_ *comm);
+} CommOp;
+
+typedef struct Comm_ {
+	const CommOp *op;
+	void *private_data;
+} TComm;
+
+// プロトコルのオペレーション
+//   各プロトコルの実装
+struct FileVarProto;
+struct Proto_;
+typedef struct ProtoOp_ {
+	// 初期化処理
+	// メモリ確保、状態初期化等を行う
+	//	@retval	TRUE	正常終了
+	//	@retval	FALSE	異常終了、初期化失敗
+	BOOL (*Init)(struct Proto_ *pv, PComVar cv, PTTSet ts);
+	// 処理の継続
+	//	@retval	TRUE	正常、処理を継続終了
+	//	@retval	FALSE	終了、引き続きParse()を呼ぶ必要なし
+	BOOL (*Parse)(struct Proto_ *pv);
+	// タイムアウト通知
+	//	タイムアウトが発生したことをプロトコル処理に通知
+	void (*TimeOutProc)(struct Proto_ *pv);
+	// キャンセル通知
+	//	ユーザーがキャンセルしたことをプロトコル処理に通知
+	void (*Cancel)(struct Proto_ *pv);
+	// パラメータ設定
+	//	プロトコルごとのパラメータ設定
+	int (*SetOpt)(struct Proto_ *pv, int request, ...);
+	int (*SetOptV)(struct Proto_ *pv, int request, va_list ap);
+	// 終了処理
+	//	メモリの開放などを行う
+	void (*Destroy)(struct Proto_ *pv);
+} TProtoOp;
+
+typedef struct Proto_ {
+	const TProtoOp *Op;
+	void *PrivateData;
+} TProto;
+
+typedef struct FileVarProto {
+	// ↓protosys_proto.cpp内のみ使用
+
 	OpId_t OpId;
 
 	HWND HMainWin;
 	HWND HWin;
 	wchar_t *DlgCaption;
 
-	// ���M�t�@�C�����z��
-	//	�t���p�X�̃t�@�C�����z��(��ԍŌ��NULL)
+	// 送信ファイル名配列
+	//	フルパスのファイル名配列(一番最後はNULL)
 	wchar_t **FileNames;
-	int FNCount;		// ���M���t�@�C�����z��index(0...)
+	int FNCount;		// 送信中ファイル名配列index(0...)
 
-	// ��M
-	wchar_t *RecievePath;		// ��M�t�H���_(�I�[�Ƀp�X�Z�p���[�^'\\'���t������Ă���)
+	// 受信
+	wchar_t *RecievePath;		// 受信フォルダ(終端にパスセパレータ'\\'が付加されている)
 
-	// ��protosys_proto.cpp���̂ݎg�p
+	// ↑protosys_proto.cpp内のみ使用
 
-	// ���e�v���g�R���Ŏg�p���郏�[�N
+	// ↓各プロトコルで使用するワーク
 	BOOL OverWrite;
 	BOOL Success;
 	BOOL NoMsg;
-	// ���e�v���g�R���Ŏg�p���郏�[�N
+	// ↑各プロトコルで使用するワーク
 
 	// services
+
+	// 送信するファイル名 UTF-8
 	char *(*GetNextFname)(struct FileVarProto *fv);
+	// 受信パス UTF-8
 	char *(*GetRecievePath)(struct FileVarProto *fv);
 	void (*FTSetTimeOut)(struct FileVarProto *fv, int T);
 	void (*SetDialogCation)(struct FileVarProto *fv, const char *key, const wchar_t *default_caption);
 
 	// protocol entrys, data
-	const struct ProtoOp_ *ProtoOp;
-	void *data;
+	TProto *Proto;
 
 	// UI
 	const struct InfoOp_ *InfoOp;
 
-	TFileIO *file;
+	// comm
+	TComm *Comm;
+
+	TFileIO *file_fv;
 } TFileVarProto;
 typedef TFileVarProto *PFileVarProto;
 
-// �v���g�R���̃I�y���[�V����
-typedef struct ProtoOp_ {
-	BOOL (*Init)(struct FileVarProto *fv, PComVar cv, PTTSet ts);
-	BOOL (*Parse)(struct FileVarProto *fv, PComVar cv);
-	void (*TimeOutProc)(struct FileVarProto *fv, PComVar cv);
-	void (*Cancel)(struct FileVarProto *fv, PComVar cv);
-	int (*SetOptV)(struct FileVarProto *fv, int request, va_list ap);
-	void (*Destroy)(struct FileVarProto *fv);
-} TProtoOp;
-
-// UI�ȂǏ��\���p�֐�
+// UIなど情報表示用関数
 typedef struct InfoOp_ {
 	void (*InitDlgProgress)(struct FileVarProto *fv, int *CurProgStat);
 	void (*SetDlgTime)(struct FileVarProto *fv, DWORD elapsed, int bytes);

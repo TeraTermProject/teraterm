@@ -42,6 +42,8 @@
 #include "win32helper.h"
 #include "tipwin2.h"
 #include "tttext.h"
+#include "tslib.h"
+#include "ttcommdlg.h"
 
 #include "ui_pp.h"
 #include "ui_pp_res.h"
@@ -74,8 +76,8 @@ static void LangFree(LangInfo* infos, size_t count)
 }
 
 /**
- *	ÉtÉ@ÉCÉãñºÇÉäÉXÉgÇ∑ÇÈ(ÉtÉ@ÉCÉãñºÇÃÇ›)
- *	infosÇ…í«â¡ÇµÇƒreturnÇ∑ÇÈ
+ *	„Éï„Ç°„Ç§„É´Âêç„Çí„É™„Çπ„Éà„Åô„Çã(„Éï„Ç°„Ç§„É´Âêç„ÅÆ„Åø)
+ *	infos„Å´ËøΩÂä†„Åó„Å¶return„Åô„Çã
  */
 static LangInfo* LangAppendFileList(const wchar_t* folder, LangInfo* infos, size_t* infos_size)
 {
@@ -109,7 +111,7 @@ static LangInfo* LangAppendFileList(const wchar_t* folder, LangInfo* infos, size
 }
 
 /**
- *	lngÉtÉ@ÉCÉãÇÃ Info ÉZÉNÉVÉáÉìÇì«Ç›çûÇﬁ
+ *	lng„Éï„Ç°„Ç§„É´„ÅÆ Info „Çª„ÇØ„Ç∑„Éß„É≥„ÇíË™≠„ÅøËæº„ÇÄ
  */
 static void LangRead(LangInfo* infos, size_t infos_size)
 {
@@ -169,46 +171,12 @@ struct UIPPData {
 	TComVar *pcv;
 	LangInfo* lng_infos;
 	size_t lng_size;
-	size_t selected_lang;	// ëIÇŒÇÍÇƒÇ¢ÇΩlngÉtÉ@ÉCÉãî‘çÜ
+	size_t selected_lang;	// ÈÅ∏„Å∞„Çå„Å¶„ÅÑ„Åülng„Éï„Ç°„Ç§„É´Áï™Âè∑
 	TipWin2 *tipwin2;
 	LOGFONTW DlgFont;
 	HWND hVTWin;
 	HINSTANCE hInst;
 };
-
-static void CreateLogfont(HWND hWnd, const wchar_t *face_name, int point, BYTE char_set, LOGFONTW *logfont)
-{
-	wcsncpy_s(logfont->lfFaceName, _countof(logfont->lfFaceName), face_name,  _TRUNCATE);
-	logfont->lfHeight = -GetFontPixelFromPoint(hWnd, point);
-	logfont->lfCharSet = char_set;
-	logfont->lfWeight = FW_NORMAL;
-	logfont->lfOutPrecision = OUT_DEFAULT_PRECIS;
-	logfont->lfClipPrecision = CLIP_DEFAULT_PRECIS;
-	logfont->lfQuality = DEFAULT_QUALITY;
-	logfont->lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
-
-	GetFontPitchAndFamily(hWnd, logfont);
-}
-
-static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
-{
-	memset(logfont, 0, sizeof(*logfont));
-	if (ts->DialogFontNameW[0] == 0) {
-		// ÉtÉHÉìÉgÇ™ê›íËÇ≥ÇÍÇƒÇ¢Ç»Ç©Ç¡ÇΩÇÁOSÇÃÉtÉHÉìÉgÇégópÇ∑ÇÈ
-		GetMessageboxFontW(logfont);
-		GetFontPitchAndFamily(hWnd, logfont);
-	}
-	else {
-		CreateLogfont(hWnd, ts->DialogFontNameW, ts->DialogFontPoint, (BYTE)ts->DialogFontCharSet, logfont);
-	}
-}
-
-static void SetDlgLogFont(HWND hWnd, const LOGFONTW *logfont, TTTSet *ts)
-{
-	wcsncpy_s(ts->DialogFontNameW, _countof(ts->DialogFontNameW), logfont->lfFaceName, _TRUNCATE);
-	ts->DialogFontPoint = GetFontPointFromPixel(hWnd, -logfont->lfHeight);
-	ts->DialogFontCharSet = logfont->lfCharSet;
-}
 
 static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM /*wParam*/, LPARAM lParam)
 {
@@ -229,7 +197,7 @@ static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM /*wParam*/,
 
 static BOOL ChooseDlgFont(HWND hWnd, UIPPData *dlg_data)
 {
-	// É_ÉCÉAÉçÉOï\é¶
+	// „ÉÄ„Ç§„Ç¢„É≠„Ç∞Ë°®Á§∫
 	CHOOSEFONTW cf = {};
 	cf.lStructSize = sizeof(cf);
 	cf.hwndOwner = hWnd;
@@ -267,7 +235,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		{ IDC_DLGFONT_DEFAULT, "DLG_TAB_FONT_BTN_DEFAULT" },
 		{ IDC_LIST_PRO_FONTS_DLG, "DLG_TAB_FONT_LIST_PRO_FONTS_DLG" },
 		{ IDC_LIST_HIDDEN_FONTS_DLG, "DLG_TAB_GENERAL_LIST_HIDDEN_FONTS" },
-		{ IDC_FONT_FOLDER_LABEL, "DLG_TAB_FONT_FOLDER_LABEL" },
+		{ IDC_FONT_FOLDER, "DLG_TAB_FONT_FOLDER" },
 	};
 
 	switch (msg) {
@@ -279,7 +247,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), data->pts->UILanguageFileW);
 
-			// UI Language, ì«Ç›çûÇ›
+			// UI Language, Ë™≠„ÅøËæº„Åø
 			LangInfo* infos = NULL;
 			size_t infos_size = 0;
 			wchar_t* folder;
@@ -295,10 +263,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			data->lng_infos = infos;
 			data->lng_size = infos_size;
 
-			// UI Languageóp tipwin
+			// UI LanguageÁî® tipwin
 			data->tipwin2 = TipWin2Create(data->hInst, hWnd);
 
-			// UI Language, ëIë
+			// UI Language, ÈÅ∏Êäû
 			data->selected_lang = 0;
 			for (size_t i = 0; i < infos_size; i++) {
 				const LangInfo* p = infos + i;
@@ -313,7 +281,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SendDlgItemMessageW(hWnd, IDC_GENUILANG, CB_SETCURSEL, data->selected_lang, 0);
 			ExpandCBWidth(hWnd, IDC_GENUILANG);
 
-			GetDlgLogFont(GetParent(hWnd), pts, &data->DlgFont);
+			TSGetLogFont(GetParent(hWnd), pts, 2, 0, &data->DlgFont);
 			SetFontStringW(hWnd, IDC_DLGFONT_EDIT, &data->DlgFont);
 
 			ArrangeControls(hWnd, data, ACFCF_INIT_DIALOG);
@@ -321,8 +289,13 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			wchar_t *font_folder;
 			HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
 			if (r == S_OK) {
-				TTTextMenu(hWnd, IDC_FONT_FOLDER, font_folder, NULL, 0);
-				free(font_folder);
+				wchar_t *text;
+				hGetDlgItemTextW(hWnd, IDC_FONT_FOLDER, &text);
+				wchar_t *new_text;
+				aswprintf(&new_text, text, font_folder);
+				TTTextMenu(hWnd, IDC_FONT_FOLDER, new_text, NULL, 0);
+				free(text);
+				free(new_text);
 			}
 
 			return TRUE;
@@ -351,15 +324,15 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						free(pts->UILanguageFileW);
 						pts->UILanguageFileW = _wcsdup(p->fullname);
 
-						// É^ÉCÉgÉãÇÃçXêVÇçsÇ§ÅB(2014.2.23 yutaka)
+						// „Çø„Ç§„Éà„É´„ÅÆÊõ¥Êñ∞„ÇíË°å„ÅÜ„ÄÇ(2014.2.23 yutaka)
 						PostMessage(dlg_data->hVTWin, WM_USER_CHANGETITLE, 0, 0);
 					}
 
-					SetDlgLogFont(GetParent(hWnd), &dlg_data->DlgFont, pts);
+					TSSetLogFont(GetParent(hWnd), &dlg_data->DlgFont, 2, 0, pts);
 
-					// TTXKanjiMenu ÇÕ Language Çå©ÇƒÉÅÉjÉÖÅ[Çï\é¶Ç∑ÇÈÇÃÇ≈ÅAïœçXÇÃâ¬î\ê´Ç™Ç†ÇÈ
-					// OK âüâ∫éûÇ…ÉÅÉjÉÖÅ[çƒï`âÊÇÃÉÅÉbÉZÅ[ÉWÇîÚÇŒÇ∑ÇÊÇ§Ç…ÇµÇΩÅB (2007.7.14 maya)
-					// åæåÍÉtÉ@ÉCÉãÇÃïœçXéûÇ…ÉÅÉjÉÖÅ[ÇÃçƒï`âÊÇ™ïKóv (2012.5.5 maya)
+					// TTXKanjiMenu „ÅØ Language „ÇíË¶ã„Å¶„É°„Éã„É•„Éº„ÇíË°®Á§∫„Åô„Çã„ÅÆ„Åß„ÄÅÂ§âÊõ¥„ÅÆÂèØËÉΩÊÄß„Åå„ÅÇ„Çã
+					// OK Êäº‰∏ãÊôÇ„Å´„É°„Éã„É•„ÉºÂÜçÊèèÁîª„ÅÆ„É°„ÉÉ„Çª„Éº„Ç∏„ÇíÈ£õ„Å∞„Åô„Çà„ÅÜ„Å´„Åó„Åü„ÄÇ (2007.7.14 maya)
+					// Ë®ÄË™û„Éï„Ç°„Ç§„É´„ÅÆÂ§âÊõ¥ÊôÇ„Å´„É°„Éã„É•„Éº„ÅÆÂÜçÊèèÁîª„ÅåÂøÖË¶Å (2012.5.5 maya)
 					PostMessage(dlg_data->hVTWin, WM_USER_CHANGEMENU, 0, 0);
 
 					break;
@@ -399,15 +372,9 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ArrangeControls(hWnd, data, ACFCF_CONTINUE);
 					break;
 
-				case IDC_FONT_FOLDER: {
-					wchar_t *font_folder;
-					HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
-					if (r ==S_OK) {
-						ShellExecuteW(NULL, L"explore", font_folder, NULL, NULL, SW_NORMAL);
-						free(font_folder);
-					}
+				case IDC_FONT_FOLDER:
+					OpenFontFolder();
 					break;
-				}
 
 				default:
 					break;
@@ -442,7 +409,7 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 
 HPROPSHEETPAGE UIPageCreate(HINSTANCE inst, TTTSet *pts)
 {
-	// íç common/tt_res.h Ç∆ ui_pp_res.h Ç≈ílÇàÍívÇ≥ÇπÇÈÇ±Ç∆
+	// Ê≥® common/tt_res.h „Å® ui_pp_res.h „ÅßÂÄ§„Çí‰∏ÄËá¥„Åï„Åõ„Çã„Åì„Å®
 	int id = IDD_TABSHEET_UI;
 
 	UIPPData *dlg_data = (UIPPData *)calloc(1, sizeof(UIPPData));

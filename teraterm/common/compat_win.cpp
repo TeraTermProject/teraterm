@@ -41,32 +41,32 @@
 #include "codeconv.h"
 
 /*
- * ‚±‚Ìƒ\[ƒX‚Å SetupDiGetDevicePropertyW() ‚ğg—p‚µ‚Ä‚¢‚é
- * common_static.lib ‚ğƒŠƒ“ƒN‚µ‚Ä‚¢‚éƒvƒƒWƒFƒNƒg‚Å setupapi.lib ‚ÌƒŠƒ“ƒN‚ª•K—v‚Æ‚È‚é
- * ‚·‚×‚Ä‚ÌƒvƒƒWƒFƒNƒg‚Ì "’Ç‰Á‚ÌˆË‘¶ƒtƒ@ƒCƒ‹" ‚É’Ç‰Á‚·‚é‚Ì‚Í‘å•Ïi“Á‚ÉƒvƒƒWƒFƒNƒgŠO‚Ìƒvƒ‰ƒOƒCƒ“j
- * ‚»‚Ì‚½‚ßA‚±‚Ìƒ‰ƒCƒuƒ‰ƒŠ‚ÌƒŠƒ“ƒNw’è‚Íƒ\[ƒX‚É‹Lq‚·‚é
+ * ã“ã®ã‚½ãƒ¼ã‚¹ã§ SetupDiGetDevicePropertyW() ã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹
+ * common_static.lib ã‚’ãƒªãƒ³ã‚¯ã—ã¦ã„ã‚‹ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã§ setupapi.lib ã®ãƒªãƒ³ã‚¯ãŒå¿…è¦ã¨ãªã‚‹
+ * ã™ã¹ã¦ã®ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã® "è¿½åŠ ã®ä¾å­˜ãƒ•ã‚¡ã‚¤ãƒ«" ã«è¿½åŠ ã™ã‚‹ã®ã¯å¤§å¤‰ï¼ˆç‰¹ã«ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆå¤–ã®ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ï¼‰
+ * ãã®ãŸã‚ã€ã“ã®ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã®ãƒªãƒ³ã‚¯æŒ‡å®šã¯ã‚½ãƒ¼ã‚¹ã«è¨˜è¿°ã™ã‚‹
  */
 #if defined(_MSC_VER)
 #pragma comment(lib, "setupapi.lib")
 #endif
 
 /*
- *	devpkey.h ‚ª‚ ‚éŠÂ‹«?
- *		HAS_DEVPKEY_H ‚ª define ‚³‚ê‚é
+ *	devpkey.h ãŒã‚ã‚‹ç’°å¢ƒ?
+ *		HAS_DEVPKEY_H ãŒ define ã•ã‚Œã‚‹
  */
 #if	defined(_MSC_VER)
 #if	(_MSC_VER > 1400)
 
-// VS2019‚Ì‚Æ‚«(VS2005‚æ‚è‘å‚«‚¢‚Æ‚µ‚Ä‚¢‚é)
+// VS2019ã®ã¨ã(VS2005ã‚ˆã‚Šå¤§ãã„ã¨ã—ã¦ã„ã‚‹)
 #define HAS_DEVPKEY_H	1
 
 #else // _MSC_VER > 1400
 
-// VS2008‚Ì‚Æ‚«
+// VS2008ã®ã¨ã
 #if defined(_INC_SDKDDKVER)
 
-// VS2008 + SDK 7.0‚Å‚Í‚È‚¢‚Æ‚«(SDK 7.1‚Ì‚Æ‚«)
-//   SDK 7.0 ‚Ìê‡‚Í sdkddkver.h ‚ª include ‚³‚ê‚Ä‚¢‚È‚¢
+// VS2008 + SDK 7.0ã§ã¯ãªã„ã¨ã(SDK 7.1ã®ã¨ã)
+//   SDK 7.0 ã®å ´åˆã¯ sdkddkver.h ãŒ include ã•ã‚Œã¦ã„ãªã„
 #define HAS_DEVPKEY_H	1
 
 #endif  //  defined(_INC_SDKDDKVER)
@@ -74,14 +74,14 @@
 #elif defined(__MINGW32__)
 
 #if	__MINGW64_VERSION_MAJOR >= 8
-// mingw64 8+ ‚Ì‚Æ‚«
+// mingw64 8+ ã®ã¨ã
 #define HAS_DEVPKEY_H	1
 #endif
 
 #endif  // defined(_MSC_VER)
 
 /*
- *	devpkey.h ‚Ì include
+ *	devpkey.h ã® include
  */
 #if defined(HAS_DEVPKEY_H)
 
@@ -215,7 +215,7 @@ public:
 static Initializer initializer;
 
 /**
- *	GetConsoleWindow() ‚Æ“¯‚¶“®ì‚ğ‚·‚é
+ *	GetConsoleWindow() ã¨åŒã˜å‹•ä½œã‚’ã™ã‚‹
  *	 https://support.microsoft.com/ja-jp/help/124103/how-to-obtain-a-console-window-handle-hwnd
  */
 static HWND WINAPI GetConsoleWindowLocal(void)
@@ -230,7 +230,7 @@ static HWND WINAPI GetConsoleWindowLocal(void)
 	if (size == 0) {
 		DWORD err = GetLastError();
 		if (err == ERROR_INVALID_HANDLE) {
-			// ƒRƒ“ƒ\[ƒ‹‚ªŠJ‚¢‚Ä‚¢‚È‚¢
+			// ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ãŒé–‹ã„ã¦ã„ãªã„
 			return NULL;
 		}
 	}
@@ -417,15 +417,15 @@ Windows8.1(*3)  6                3                 VER_PLATFORM_WIN32_NT
 Windows10(*2)   6                2                 VER_PLATFORM_WIN32_NT
 Windows10(*3)   10               0                 VER_PLATFORM_WIN32_NT
 
-(*1) GetVersionEx()‚ª c4996 warning ‚Æ‚È‚é‚Ì‚ÍAVS2013(_MSC_VER=1800) ‚©‚ç‚Å‚·B
-(*2) manifest‚É supportedOS Id ‚ğ’Ç‰Á‚µ‚Ä‚¢‚È‚¢B
-(*3) manifest‚É supportedOS Id ‚ğ’Ç‰Á‚µ‚Ä‚¢‚éB
+(*1) GetVersionEx()ãŒ c4996 warning ã¨ãªã‚‹ã®ã¯ã€VS2013(_MSC_VER=1800) ã‹ã‚‰ã§ã™ã€‚
+(*2) manifestã« supportedOS Id ã‚’è¿½åŠ ã—ã¦ã„ãªã„ã€‚
+(*3) manifestã« supportedOS Id ã‚’è¿½åŠ ã—ã¦ã„ã‚‹ã€‚
 */
 static BOOL _GetVersionExA(LPOSVERSIONINFOA lpVersionInformation)
 {
 	static OSVERSIONINFOA VersionInformation;
 	if (pGetVersionExA == NULL) {
-		// ƒGƒ‰[‚ª•Ô‚é‚±‚Æ‚Í‚È‚¢ (2022-08-04)
+		// ã‚¨ãƒ©ãƒ¼ãŒè¿”ã‚‹ã“ã¨ã¯ãªã„ (2022-08-04)
 		VersionInformation = *lpVersionInformation;
 		void **func = (void **) & pGetVersionExA;
 		DLLGetApiAddress(L"kernel32.dll", DLL_LOAD_LIBRARY_SYSTEM, "GetVersionExA", func);
@@ -470,9 +470,9 @@ void WinCompatInit()
 	done = TRUE;
 
 #if _WIN32_IE >= 0x600
-	// _WIN32_IE < 0x600 ‚Ì‚Æ‚« guidItem ‚ªg—p‚Å‚«‚¸
-	// FIELD_OFFSET(NOTIFYICONDATAA, guidItem) ‚È‚Ç‚ªƒGƒ‰[‚Æ‚È‚é‚Ì‚Å
-	// >= 0x600 ‚Ì‚Æ‚«‚Ì‚İ
+	// _WIN32_IE < 0x600 ã®ã¨ã guidItem ãŒä½¿ç”¨ã§ããš
+	// FIELD_OFFSET(NOTIFYICONDATAA, guidItem) ãªã©ãŒã‚¨ãƒ©ãƒ¼ã¨ãªã‚‹ã®ã§
+	// >= 0x600 ã®ã¨ãã®ã¿
 	assert(sizeof(TT_NOTIFYICONDATAA_V2) == NOTIFYICONDATAA_V2_SIZE);
 	assert(sizeof(TT_NOTIFYICONDATAW_V2) == NOTIFYICONDATAW_V2_SIZE);
 #endif
@@ -486,16 +486,16 @@ void WinCompatInit()
 
 	DLLGetApiAddressFromLists(DllInfos);
 
-	// 9x“Á•Êˆ—
+	// 9xç‰¹åˆ¥å‡¦ç†
 	if (!IsWindowsNTKernel()) {
-		// Windows 9x ‚É‘¶İ‚µ‚Ä‚¢‚é‚ª³‚µ‚­“®ì‚µ‚È‚¢‚½‚ß–³Œø‰»‚·‚é
+		// Windows 9x ã«å­˜åœ¨ã—ã¦ã„ã‚‹ãŒæ­£ã—ãå‹•ä½œã—ãªã„ãŸã‚ç„¡åŠ¹åŒ–ã™ã‚‹
 		pOutputDebugStringW = NULL;
 		pExpandEnvironmentStringsW = NULL;
 		pRegQueryValueExW = NULL;
 		pSetupDiGetDeviceRegistryPropertyW = NULL;
 	}
 
-	// GetConsoleWindow“Á•Êˆ—
+	// GetConsoleWindowç‰¹åˆ¥å‡¦ç†
 	if (pGetConsoleWindow == NULL) {
 		pGetConsoleWindow = GetConsoleWindowLocal;
 	}
@@ -750,11 +750,11 @@ static BOOL GetCSIDLFromFKNOWNFOLDERID(REFKNOWNFOLDERID rfid, int *csidl)
 }
 
 /**
- *	SHGetKnownFolderPath() ‚ÌŒİŠ·ŠÖ”
+ *	SHGetKnownFolderPath() ã®äº’æ›é–¢æ•°
  *
- *	@param[out]	ppszPath	ƒpƒX
- *							CoTaskMemFree() ‚Å‚Í‚È‚­Afree() ‚ğg‚Á‚ÄŠJ•ú‚·‚é
- *							ƒGƒ‰[‚ÉŠÖŒW‚È‚­ free() ‚·‚é‚±‚Æ
+ *	@param[out]	ppszPath	ãƒ‘ã‚¹
+ *							CoTaskMemFree() ã§ã¯ãªãã€free() ã‚’ä½¿ã£ã¦é–‹æ”¾ã™ã‚‹
+ *							ã‚¨ãƒ©ãƒ¼ã«é–¢ä¿‚ãªã free() ã™ã‚‹ã“ã¨
  */
 HRESULT _SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath)
 {
@@ -763,11 +763,11 @@ HRESULT _SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToke
 		wchar_t *path;
 		HRESULT r = pSHGetKnownFolderPath(rfid, dwFlags, hToken, &path);
 		*ppszPath = _wcsdup(path);
-		CoTaskMemFree(path);	// ƒGƒ‰[‚ÉŠÖŒW‚È‚­ŒÄ‚Ño‚·•K—v‚ ‚è
+		CoTaskMemFree(path);	// ã‚¨ãƒ©ãƒ¼ã«é–¢ä¿‚ãªãå‘¼ã³å‡ºã™å¿…è¦ã‚ã‚Š
 		return r;
 	}
 
-	// g—pAPI‚Í [ttssh2-dev 28] QÆ
+	// ä½¿ç”¨APIã¯ [ttssh2-dev 28] å‚ç…§
 	int csidl;
 	if (GetCSIDLFromFKNOWNFOLDERID(rfid, &csidl) == FALSE) {
 		*ppszPath = _wcsdup(L"");
@@ -775,7 +775,7 @@ HRESULT _SHGetKnownFolderPath(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToke
 	}
 	wchar_t path[MAX_PATH];
 #if 0
-	// SHGetSpecialFolderLocation() ‚ÅƒJƒo[‚Å‚«‚é?
+	// SHGetSpecialFolderLocation() ã§ã‚«ãƒãƒ¼ã§ãã‚‹?
 	if (pSHGetSpecialFolderPathW != NULL) {
 		BOOL create = (dwFlags & KF_FLAG_CREATE) != 0 ? TRUE : FALSE;
 		BOOL r = SHGetSpecialFolderPathW(NULL, path, csidl, create);
@@ -817,7 +817,7 @@ HRESULT _LoadIconWithScaleDown(HINSTANCE hinst, PCWSTR pszName, int cx, int cy, 
 	HICON hIcon;
 	int fuLoad = LR_DEFAULTCOLOR;
 	if (IsWindowsNT4()) {
-		// Windows NT 4.0 ‚Í 4bit ƒAƒCƒRƒ“‚µ‚©ƒTƒ|[ƒg‚µ‚Ä‚¢‚È‚¢
+		// Windows NT 4.0 ã¯ 4bit ã‚¢ã‚¤ã‚³ãƒ³ã—ã‹ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ãªã„
 		// 16(4bit) color = VGA color
 		fuLoad = LR_VGACOLOR;
 	}
@@ -865,9 +865,9 @@ BOOL _SetupDiGetDevicePropertyW(
 		return r;
 	}
 
-	//	Windows 7 ˆÈ‘O—p
+	//	Windows 7 ä»¥å‰ç”¨
 	if (PropertyKey == &DEVPKEY_Device_InstanceId) {
-		// InstanceId‚ÍAŒn‚ÅŒˆ‚ß‘Å‚¿
+		// InstanceIdã¯Aç³»ã§æ±ºã‚æ‰“ã¡
 		DWORD len_a;
 		r = SetupDiGetDeviceInstanceIdA(DeviceInfoSet,
 										DeviceInfoData,
@@ -883,7 +883,7 @@ BOOL _SetupDiGetDevicePropertyW(
 										&len_a);
 		wchar_t *strW = ToWcharA(str);
 		free(str);
-		DWORD len_w = (DWORD)((wcslen(strW) + 1) * sizeof(wchar_t));  // +1 ‚Í L'\0'
+		DWORD len_w = (DWORD)((wcslen(strW) + 1) * sizeof(wchar_t));  // +1 ã¯ L'\0'
 		*RequiredSize = len_w;
 		if (PropertyBuffer != NULL) {
 			wcscpy((wchar_t *)PropertyBuffer, strW);
@@ -928,7 +928,7 @@ BOOL _SetupDiGetDevicePropertyW(
 											  &len_a);
 		wchar_t *strW = ToWcharA(str);
 		free(str);
-		DWORD len_w = (DWORD)((wcslen(strW) + 1) * sizeof(wchar_t));  // +1 ‚Í L'\0'
+		DWORD len_w = (DWORD)((wcslen(strW) + 1) * sizeof(wchar_t));  // +1 ã¯ L'\0'
 		*RequiredSize = len_w;
 		if (PropertyBuffer != NULL) {
 			wcscpy((wchar_t *)PropertyBuffer, strW);
@@ -940,8 +940,8 @@ BOOL _SetupDiGetDevicePropertyW(
 }
 
 /**
- *	GetComboBoxInfo() ‘ã‘ÖŠÖ”
- *	 Windows 98‚©‚ç
+ *	GetComboBoxInfo() ä»£æ›¿é–¢æ•°
+ *	 Windows 98ã‹ã‚‰
  */
 BOOL WINAPI _GetComboBoxInfo(HWND hWndCombo, PCOMBOBOXINFO info)
 {

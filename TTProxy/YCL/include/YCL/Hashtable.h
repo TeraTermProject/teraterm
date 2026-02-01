@@ -16,29 +16,29 @@
 
 namespace yebisuya {
 
-// �n�b�V���e�[�u�����Ǘ�����N���X�B
+// ハッシュテーブルを管理するクラス。
 template<class TYPE_KEY, class TYPE_VALUE, class KEYCTRL = ValueCtrl<TYPE_KEY>, class VALCTRL = ValueCtrl<TYPE_VALUE> >
 class Hashtable {
-	// TYPE_KEY, TYPE_VALUE�ɂƂ��^:
-	// �E�f�t�H���g�R���X�g���N�^������
-	// �E�R�s�[�R���X�g���N�^������
-	// �E==���Z�q������
-	// �E=���Z�q������(���̏����̂��ߎQ�Ƃ͎w��ł��Ȃ�)
-	// KEYCTRL�AVALCTRL�Ƀf�t�H���g�̂��̂��g�p����ꍇ��
-	// �E�f�t�H���g�R���X�g���N�^�Ő������ꂽ�C���X�^���X��NULL���r����Ɛ^�ɂȂ�
-	// �ENULL�C���X�^���X��NULL���r����Ɛ^�ɂȂ�
-	// �ETYPE_KEY�̓n�b�V���l�𐶐�����hashCode���\�b�h������
-	// �������ɉ����B
+	// TYPE_KEY, TYPE_VALUEにとれる型:
+	// ・デフォルトコンストラクタを持つ
+	// ・コピーコンストラクタを持つ
+	// ・==演算子を持つ
+	// ・=演算子を持つ(この条件のため参照は指定できない)
+	// KEYCTRL、VALCTRLにデフォルトのものを使用する場合は
+	// ・デフォルトコンストラクタで生成されたインスタンスとNULLを比較すると真になる
+	// ・NULLインスタンスとNULLを比較すると真になる
+	// ・TYPE_KEYはハッシュ値を生成するhashCodeメソッドを持つ
+	// が条件に加わる。
 public:
 	typedef Enumeration<TYPE_KEY> KeyEnumeration;
 	typedef Enumeration<TYPE_VALUE> ElementEnumeration;
 private:
-	// �R�s�[�R���X�g���N�^�͎g�p�֎~
+	// コピーコンストラクタは使用禁止
 	Hashtable(Hashtable&);
-	// ������Z�q�͎g�p�֎~
+	// 代入演算子は使用禁止
 	void operator=(Hashtable&);
 
-	// �n�b�V���e�[�u���̃G���g���B
+	// ハッシュテーブルのエントリ。
 	struct Entry {
 		TYPE_KEY key;
 		TYPE_VALUE value;
@@ -47,7 +47,7 @@ private:
 			VALCTRL::initialize(value);
 		}
 	};
-	// �n�b�V���e�[�u���̃G���g����񋓂��邽�߂̃N���X�B
+	// ハッシュテーブルのエントリを列挙するためのクラス。
 	class EnumEntries {
 	private:
 		const Hashtable& table;
@@ -71,7 +71,7 @@ private:
 		}
 	};
 	friend class EnumEntries;
-	// �n�b�V���e�[�u���̃L�[��񋓂��邽�߂̃N���X�B
+	// ハッシュテーブルのキーを列挙するためのクラス。
 	class EnumKeys : public KeyEnumeration {
 	private:
 		EnumEntries entries;
@@ -86,7 +86,7 @@ private:
 			return entries.nextEntry().key;
 		}
 	};
-	// �n�b�V���e�[�u���̒l��񋓂��邽�߂̃N���X�B
+	// ハッシュテーブルの値を列挙するためのクラス。
 	class EnumValues : public ElementEnumeration {
 	private:
 		EnumEntries entries;
@@ -102,22 +102,22 @@ private:
 		}
 	};
 
-	// �G���g���̔z��B
+	// エントリの配列。
 	Entry* backet;
-	// �G���g���̔z��̃T�C�Y
+	// エントリの配列のサイズ
 	int backetSize;
-	// �L���ȃG���g���̐�
+	// 有効なエントリの数
 	int count;
 	enum {
-		// �G���g���̔z���傫������Ƃ��Ɏg�p����T�C�Y
+		// エントリの配列を大きくするときに使用するサイズ
 		BOUNDARY = 8,
 	};
-	// key�Ɠ������L�[�����G���g���̃C���f�b�N�X��Ԃ��B
-	// ����:
-	//	key	��������L�[
-	// �Ԓl:
-	//	key�Ɠ������L�[�������A�܂��ݒ肳��Ă��Ȃ��G���g���̃C���f�b�N�X�B
-	//	�S�ẴG���g�����ݒ�ς݂�key�Ɠ��������̂��Ȃ����-1��Ԃ��B
+	// keyと等しいキーを持つエントリのインデックスを返す。
+	// 引数:
+	//	key	検索するキー
+	// 返値:
+	//	keyと等しいキーを持つか、まだ設定されていないエントリのインデックス。
+	//	全てのエントリが設定済みでkeyと等しいものがなければ-1を返す。
 	int find(const TYPE_KEY& key)const {
 		int found = -1;
 		int h = HASHCODE(key);
@@ -131,10 +131,10 @@ private:
 		}
 		return found;
 	}
-	// �G���g���̔z����w��̃T�C�Y�ɕς��A������x�e�[�u������蒼���B
-	// ����:
-	//	newSize	�V�����z��̃T�C�Y�B
-	//			�L���ȃG���g���̐��������Ȃ����Ă͂����Ȃ��B
+	// エントリの配列を指定のサイズに変え、もう一度テーブルを作り直す。
+	// 引数:
+	//	newSize	新しい配列のサイズ。
+	//			有効なエントリの数よりも少なくしてはいけない。
 	void rehash(int newSize) {
 		Entry* oldBacket = backet;
 		int oldSize = backetSize;
@@ -148,27 +148,27 @@ private:
 		delete[] oldBacket;
 	}
 public:
-	// �f�t�H���g�R���X�g���N�^�B
-	// ��̃n�b�V���e�[�u�������B
+	// デフォルトコンストラクタ。
+	// 空のハッシュテーブルを作る。
 	Hashtable()
 	:backet(NULL), backetSize(0), count(0) {
 	}
-	// �G���g���̔z��̏����T�C�Y���w�肷��R���X�g���N�^�B
-	// ����:
-	//	backetSize	�G���g���̔z��̑傫���B
+	// エントリの配列の初期サイズを指定するコンストラクタ。
+	// 引数:
+	//	backetSize	エントリの配列の大きさ。
 	Hashtable(int backetSize)
 	:backet(new Entry[backetSize]), backetSize(backetSize), count(0) {
 	}
-	// �f�X�g���N�^�B
-	// �G���g���̔z����폜����B
+	// デストラクタ。
+	// エントリの配列を削除する。
 	~Hashtable() {
 		delete[] backet;
 	}
-	// �w��̃L�[�ɑΉ�����l���擾����B
-	// ����:
-	//	key	��������L�[
-	// �Ԓl:
-	//	�L�[�ɑΉ�����l�B������Ȃ����NULL�Ɠ������l��Ԃ��B
+	// 指定のキーに対応する値を取得する。
+	// 引数:
+	//	key	検索するキー
+	// 返値:
+	//	キーに対応する値。見つからなければNULLと等しい値を返す。
 	TYPE_VALUE get(const TYPE_KEY& key)const {
 		TYPE_VALUE value;
 		VALCTRL::initialize(value);
@@ -177,12 +177,12 @@ public:
 			value = backet[index].value;
 		return value;
 	}
-	// �w��̃L�[�ɑΉ�����l��ݒ肷��B
-	// ����:
-	//	key	�ݒ肷��L�[
-	//	value �ݒ肷��l
-	// �Ԓl:
-	//	�O�ɃL�[�ɐݒ肳��Ă����l�B���ݒ肾�����ꍇ��NULL�Ɠ������l��Ԃ��B
+	// 指定のキーに対応する値を設定する。
+	// 引数:
+	//	key	設定するキー
+	//	value 設定する値
+	// 返値:
+	//	前にキーに設定されていた値。未設定だった場合はNULLと等しい値を返す。
 	TYPE_VALUE put(const TYPE_KEY& key, const TYPE_VALUE& value) {
 		int index = find(key);
 		if (index == -1) {
@@ -197,11 +197,11 @@ public:
 		backet[index].value = value;
 		return old;
 	}
-	// �w��̃L�[�ɑΉ�����l���폜����B
-	// ����:
-	//	key	�폜����L�[
-	// �Ԓl:
-	//	�L�[�ɐݒ肳��Ă����l�B���ݒ肾�����ꍇ��NULL�Ɠ������l��Ԃ��B
+	// 指定のキーに対応する値を削除する。
+	// 引数:
+	//	key	削除するキー
+	// 返値:
+	//	キーに設定されていた値。未設定だった場合はNULLと等しい値を返す。
 	TYPE_VALUE remove(const TYPE_KEY& key) {
 		TYPE_VALUE old;
 		VALCTRL::initialize(old);
@@ -217,42 +217,42 @@ public:
 		}
 		return old;
 	}
-	// �L�[��񋓂��邽�߂̃C���X�^���X�𐶐�����B
-	// �g�p���delete��Y��Ȃ��悤�ɒ��ӁB
-	// �Ԓl:
-	//	�L�[��񋓂��邽�߂̃C���X�^���X�B
+	// キーを列挙するためのインスタンスを生成する。
+	// 使用後はdeleteを忘れないように注意。
+	// 返値:
+	//	キーを列挙するためのインスタンス。
 	Pointer<KeyEnumeration> keys()const {
 		return new EnumKeys(*this);
 	}
-	// �l��񋓂��邽�߂̃C���X�^���X�𐶐�����B
-	// �g�p���delete��Y��Ȃ��悤�ɒ��ӁB
-	// �Ԓl:
-	//	�l��񋓂��邽�߂̃C���X�^���X�B
+	// 値を列挙するためのインスタンスを生成する。
+	// 使用後はdeleteを忘れないように注意。
+	// 返値:
+	//	値を列挙するためのインスタンス。
 	Pointer<ElementEnumeration> elements()const {
 		return new EnumValues(*this);
 	}
-	// �L���Ȓl�����L�[�̐����擾����B
-	// �Ԓl:
-	//	�L���Ȓl�����L�[�̐��B
+	// 有効な値を持つキーの数を取得する。
+	// 返値:
+	//	有効な値を持つキーの数。
 	int size()const {
 		return count;
 	}
-	// �w��̃L�[���L���Ȓl�������Ă��邩�ǂ����𔻒肷��B
-	// ����:
-	//	���肷��L�[�B
-	// �Ԓl:
-	//	�L���Ȓl�������Ă���ΐ^�B
+	// 指定のキーが有効な値を持っているかどうかを判定する。
+	// 引数:
+	//	判定するキー。
+	// 返値:
+	//	有効な値を持っていれば真。
 	bool contains(const TYPE_KEY& key)const {
 		int index = find(key);
 		return index != -1 && !VALCTRL::isEmpty(backet[index].value);
 	}
-	// �L���Ȓl����������Ă��Ȃ����ǂ����𔻒肷��B
-	// �Ԓl:
-	//	�L���Ȓl����������Ă��Ȃ���ΐ^�B
+	// 有効な値を一つも持っていないかどうかを判定する。
+	// 返値:
+	//	有効な値を一つも持っていなければ真。
 	bool isEmpty()const {
 		return count == 0;
 	}
-	// �L���Ȓl����������Ă��Ȃ���Ԃɖ߂��B
+	// 有効な値を一つも持っていない状態に戻す。
 	void empty() {
 		delete[] backet;
 		backet = NULL;

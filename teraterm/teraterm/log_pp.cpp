@@ -66,7 +66,7 @@ CLogPropPageDlg::~CLogPropPageDlg()
 	m_TipWin = NULL;
 }
 
-// CLogPropPageDlg ƒƒbƒZ[ƒW ƒnƒ“ƒhƒ‰
+// CLogPropPageDlg ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ ãƒãƒ³ãƒ‰ãƒ©
 
 #define LOG_ROTATE_SIZETYPE_NUM 3
 static const char *LogRotateSizeType[] = {
@@ -97,7 +97,7 @@ void CLogPropPageDlg::OnInitDialog()
 		{ IDC_ROTATE_SIZE_TEXT, "DLG_TAB_LOG_ROTATE_SIZE_TEXT" },
 		{ IDC_ROTATE_STEP_TEXT, "DLG_TAB_LOG_ROTATESTEP" },
 		// Log options
-		// FIXME: ƒƒbƒZ[ƒWƒJƒ^ƒƒO‚ÍŠù‘¶‚ÌƒƒOƒIƒvƒVƒ‡ƒ“‚Ì‚à‚Ì‚ð—¬—p‚µ‚½‚ªAƒAƒNƒZƒ‰ƒŒ[ƒ^ƒL[‚ªd•¡‚·‚é‚©‚à‚µ‚ê‚È‚¢B
+		// FIXME: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚«ã‚¿ãƒ­ã‚°ã¯æ—¢å­˜ã®ãƒ­ã‚°ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã®ã‚‚ã®ã‚’æµç”¨ã—ãŸãŒã€ã‚¢ã‚¯ã‚»ãƒ©ãƒ¬ãƒ¼ã‚¿ã‚­ãƒ¼ãŒé‡è¤‡ã™ã‚‹ã‹ã‚‚ã—ã‚Œãªã„ã€‚
 		{ IDC_LOG_OPTION_GROUP, "DLG_FOPT" },
 		{ IDC_OPT_BINARY, "DLG_FOPT_BINARY" },
 		{ IDC_OPT_APPEND, "DLG_FOPT_APPEND" },
@@ -275,7 +275,7 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			return TRUE;
 
 		case IDC_DEFAULTPATH_PUSH | (BN_CLICKED << 16):
-			// ƒƒOƒfƒBƒŒƒNƒgƒŠ‚Ì‘I‘ðƒ_ƒCƒAƒƒO
+			// ãƒ­ã‚°ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®é¸æŠžãƒ€ã‚¤ã‚¢ãƒ­ã‚°
 			{
 				wchar_t *title = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGDIR_TITLE", L"Select log folder", ts.UILanguageFileW);
 				wchar_t *default_path;
@@ -349,9 +349,7 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			if (wParam == (IDC_DEFAULTNAME_EDITOR | (CBN_SELCHANGE << 16))) {
 				LRESULT r = SendDlgItemMessageW(IDC_DEFAULTNAME_EDITOR, CB_GETCURSEL, 0, 0);
 				if (r != CB_ERR) {
-					LRESULT len = SendDlgItemMessageW(IDC_DEFAULTNAME_EDITOR, CB_GETLBTEXTLEN, r, 0);
-					format = (wchar_t*)malloc((len + 1) * sizeof(wchar_t));
-					SendDlgItemMessageW(IDC_DEFAULTNAME_EDITOR, CB_GETLBTEXT, r, (LPARAM)format);
+					hGetDlgItemCBTextW(m_hWnd, IDC_DEFAULTNAME_EDITOR, r, &format);
 				}
 			}
 			if (format == NULL) {
@@ -363,7 +361,7 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				::GetWindowRect(::GetDlgItem(m_hWnd, IDC_DEFAULTNAME_EDITOR), &rc);
 				m_TipWin->SetText(preview);
 				m_TipWin->SetPos(rc.left, rc.bottom);
-				m_TipWin->SetHideTimer(5 * 1000);  // •\Ž¦ŽžŠÔ
+				m_TipWin->SetHideTimer(5 * 1000);  // è¡¨ç¤ºæ™‚é–“
 				if (!m_TipWin->IsVisible()) {
 					m_TipWin->SetVisible(TRUE);
 				}
@@ -404,10 +402,10 @@ void CLogPropPageDlg::OnOKLogFilename()
 		return;
 	}
 
-	// Œ»ÝŽž‚ðŽæ“¾
+	// ç¾åœ¨æ™‚åˆ»ã‚’å–å¾—
 	time(&time_local);
 	localtime_s(&tm_local, & time_local);
-	// Žž•¶Žš—ñ‚É•ÏŠ·
+	// æ™‚åˆ»æ–‡å­—åˆ—ã«å¤‰æ›
 	wchar_t buf2[MAX_PATH];
 	if (wcslen(def_name) != 0 && wcsftime(buf2, _countof(buf2), def_name, &tm_local) == 0) {
 		static const TTMessageBoxInfoW info = {
@@ -477,7 +475,7 @@ void CLogPropPageDlg::OnOK()
 
 	} else { /* off */
 		ts.LogRotate = ROTATE_NONE;
-		/* Žc‚è‚Ìƒƒ“ƒo[‚ÍˆÓ}“I‚ÉÝ’è‚ðŽc‚·B*/
+		/* æ®‹ã‚Šã®ãƒ¡ãƒ³ãƒãƒ¼ã¯æ„å›³çš„ã«è¨­å®šã‚’æ®‹ã™ã€‚*/
 	}
 
 	// Log Options

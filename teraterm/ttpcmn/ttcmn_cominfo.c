@@ -35,18 +35,18 @@
 #include "ttcmn_cominfo.h"
 
 /**
- *	COMƒ|[ƒg‚ğ—ñ‹“
+ *	COMãƒãƒ¼ãƒˆã‚’åˆ—æŒ™
  *
  *	@param[out]	ComPortTable[MAXCOMPORT]
- *	@param[in]	ComPortMax		ƒe[ƒuƒ‹‚ÌÅ‘åg—p”(Å‘åMAXCOMPORT)
+ *	@param[in]	ComPortMax		ãƒ†ãƒ¼ãƒ–ãƒ«ã®æœ€å¤§ä½¿ç”¨æ•°(æœ€å¤§MAXCOMPORT)
  *	@param[out]	ComPortDesc[MAXCOMPORT]	(4096 in tttypes.h)
- *	@retval	g—p‰Â”\‚ÈCOMƒ|[ƒg” (0=g—p‰Â”\ƒ|[ƒg‚ª‚È‚¢)
+ *	@retval	ä½¿ç”¨å¯èƒ½ãªCOMãƒãƒ¼ãƒˆæ•° (0=ä½¿ç”¨å¯èƒ½ãƒãƒ¼ãƒˆãŒãªã„)
  *
  *		MAXCOMPORT = 4096 in tttypes.h
- *		‚±‚Ì’l‚Íƒe[ƒuƒ‹(COMƒ|[ƒg‚ÌŒÂ”)‚ÌÅ‘å”‚ğ•\‚·
+ *		ã“ã®å€¤ã¯ãƒ†ãƒ¼ãƒ–ãƒ«(COMãƒãƒ¼ãƒˆã®å€‹æ•°)ã®æœ€å¤§æ•°ã‚’è¡¨ã™
  *
- *		’ˆÓ
- *			ComPortDesc‚ÍƒPƒA‚µ‚È‚¢‚Æƒƒ‚ƒŠƒŠ[ƒN‚·‚é
+ *		æ³¨æ„
+ *			ComPortDescã¯ã‚±ã‚¢ã—ãªã„ã¨ãƒ¡ãƒ¢ãƒªãƒªãƒ¼ã‚¯ã™ã‚‹
  */
 int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDesc)
 {
@@ -55,7 +55,7 @@ int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 	ComPortInfo_t *port_info;
 	const ComPortInfo_t *p;
 
-	// ˆÈ‘OŠm•Û‚µ‚½•ª‚ğŠJ•ú‚·‚é
+	// ä»¥å‰ç¢ºä¿ã—ãŸåˆ†ã‚’é–‹æ”¾ã™ã‚‹
 	for (i = 0; i < ComPortMax; i++) {
 		free(ComPortDesc[i]);
 		ComPortDesc[i] = NULL;
@@ -68,7 +68,7 @@ int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 		ComPortDesc[i] = ToCharW(p->friendly_name);
 		p++;
 		if (i == ComPortMax - 1) {
-			// ƒe[ƒuƒ‹‚ğ‚ ‚Ó‚ê‚é
+			// ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ã‚ãµã‚Œã‚‹
 			break;
 		}
 	}
@@ -79,10 +79,10 @@ int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 }
 
 /**
- *	COMƒ|[ƒg‚ğ—ñ‹“‚µ‚Ä‘¶İ‚·‚é‚©ƒ`ƒFƒbƒN‚·‚é
+ *	COMãƒãƒ¼ãƒˆã‚’åˆ—æŒ™ã—ã¦å­˜åœ¨ã™ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
  *
- *	@param[in]	ComPort		ƒ`ƒFƒbƒN‚·‚éƒ|[ƒg”Ô†
- *	@retval	-1	error(Œ»İ‚Íg—p‚³‚ê‚Ä‚¢‚È‚¢)
+ *	@param[in]	ComPort		ãƒã‚§ãƒƒã‚¯ã™ã‚‹ãƒãƒ¼ãƒˆç•ªå·
+ *	@retval	-1	error(ç¾åœ¨ã¯ä½¿ç”¨ã•ã‚Œã¦ã„ãªã„)
  *	@retval	0	NOT FOUND;
  *	@retval	1	FOUND
  */

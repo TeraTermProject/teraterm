@@ -32,7 +32,7 @@
 
 #include <stdio.h>
 #include <windows.h>
-//#include <dwmapi.h>	// compat_win.h “à‚Ì’è‹`‚ğg—p‚·‚é‚½‚ß include ‚µ‚È‚¢
+//#include <dwmapi.h>	// compat_win.h å†…ã®å®šç¾©ã‚’ä½¿ç”¨ã™ã‚‹ãŸã‚ include ã—ãªã„
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
@@ -63,6 +63,7 @@
 #include "win_pp.h"
 #include "serial_pp.h"
 #include "ui_pp.h"
+#include "tekfont_pp.h"
 #include "plugin_pp.h"
 
 #include "addsetting.h"
@@ -76,7 +77,7 @@ const mouse_cursor_t MouseCursor[] = {
 };
 #define MOUSE_CURSOR_MAX (sizeof(MouseCursor)/sizeof(MouseCursor[0]) - 1)
 
-// CSequencePropPageDlg ƒ_ƒCƒAƒƒO
+// CSequencePropPageDlg ãƒ€ã‚¤ã‚¢ãƒ­ã‚°
 class CSequencePropPageDlg : public TTCPropertyPage
 {
 public:
@@ -105,7 +106,7 @@ CSequencePropPageDlg::~CSequencePropPageDlg()
 	free((void *)m_psp.pszTitle);
 }
 
-// CSequencePropPageDlg ƒƒbƒZ[ƒW ƒnƒ“ƒhƒ‰
+// CSequencePropPageDlg ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ ãƒãƒ³ãƒ‰ãƒ©
 
 void CSequencePropPageDlg::OnInitDialog()
 {
@@ -205,7 +206,7 @@ void CSequencePropPageDlg::OnInitDialog()
 	// IDC_BEEP_DROPDOWN
 	SetCurSel(IDC_BEEP_DROPDOWN, ts.Beep);
 
-	// ƒ_ƒCƒAƒƒO‚ÉƒtƒH[ƒJƒX‚ğ“–‚Ä‚é (2004.12.7 yutaka)
+	// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å½“ã¦ã‚‹ (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ACCEPT_MOUSE_EVENT_TRACKING));
 }
 
@@ -307,7 +308,7 @@ void CSequencePropPageDlg::OnHelp()
 	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalCtrlSeq, 0);
 }
 
-// CCopypastePropPageDlg ƒ_ƒCƒAƒƒO
+// CCopypastePropPageDlg ãƒ€ã‚¤ã‚¢ãƒ­ã‚°
 class CCopypastePropPageDlg : public TTCPropertyPage
 {
 public:
@@ -336,7 +337,7 @@ CCopypastePropPageDlg::~CCopypastePropPageDlg()
 	free((void *)m_psp.pszTitle);
 }
 
-// CCopypastePropPageDlg ƒƒbƒZ[ƒW ƒnƒ“ƒhƒ‰
+// CCopypastePropPageDlg ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ ãƒãƒ³ãƒ‰ãƒ©
 
 void CCopypastePropPageDlg::OnInitDialog()
 {
@@ -386,7 +387,7 @@ void CCopypastePropPageDlg::OnInitDialog()
 	// (7)ConfirmChangePaste
 	SetCheck(IDC_CONFIRM_CHANGE_PASTE, (ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE)?BST_CHECKED:BST_UNCHECKED);
 
-	// ƒtƒ@ƒCƒ‹ƒpƒX
+	// ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹
 	SetDlgItemTextA(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile);
 	if (ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE) {
 		EnableDlgItem(IDC_CONFIRM_STRING_FILE, TRUE);
@@ -408,7 +409,7 @@ void CCopypastePropPageDlg::OnInitDialog()
 	// (11) auto text copy
 	SetCheck(IDC_AUTO_TEXT_COPY, ts.AutoTextCopy ? BST_CHECKED : BST_UNCHECKED);
 
-	// ƒ_ƒCƒAƒƒO‚ÉƒtƒH[ƒJƒX‚ğ“–‚Ä‚é
+	// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å½“ã¦ã‚‹
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_LINECOPY));
 }
 
@@ -531,7 +532,7 @@ void CCopypastePropPageDlg::OnHelp()
 	PostMessage(HVTWin, WM_USER_DLGHELP2, HlpMenuSetupAdditionalCopyAndPaste, 0);
 }
 
-// CVisualPropPageDlg ƒ_ƒCƒAƒƒO
+// CVisualPropPageDlg ãƒ€ã‚¤ã‚¢ãƒ­ã‚°
 class CVisualPropPageDlg : public TTCPropertyPage
 {
 public:
@@ -586,7 +587,7 @@ void CVisualPropPageDlg::SetupRGBbox(int index)
 	SetDlgItemNum(IDC_COLOR_BLUE, c);
 }
 
-// CVisualPropPageDlg ƒƒbƒZ[ƒW ƒnƒ“ƒhƒ‰
+// CVisualPropPageDlg ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ ãƒãƒ³ãƒ‰ãƒ©
 
 void CVisualPropPageDlg::OnInitDialog()
 {
@@ -703,23 +704,23 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	SetCheck(IDC_CHECK_FLICKER_LESS_MOVE, ts.EtermLookfeel.BGNoCopyBits != 0);
 
-	// ƒEƒBƒ“ƒhƒE‚ÌŠp‚ğŠÛ‚­‚µ‚È‚¢
+	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è§’ã‚’ä¸¸ãã—ãªã„
 	SetCheck(IDC_CHECK_CORNERDONTROUND, (ts.WindowCornerDontround) != 0);
 	{
 		DWM_WINDOW_CORNER_PREFERENCE preference;
 		if (pDwmGetWindowAttribute == NULL ||
 			pDwmGetWindowAttribute(HVTWin, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference)) != S_OK) {
-			// ƒEƒBƒ“ƒhƒE‚ÌŠp‚ğŠÛ‚­‚µ‚È‚¢‚É‘Î‰‚µ‚Ä‚¢‚È‚¢‚È‚ç disable ‚É‚·‚é
-			//		DwmGetWindowAttribute() API ‚ª‚È‚¢ or
-			//		DwmGetWindowAttribute(DWMWA_WINDOW_CORNER_PREFERENCE) ‚Å S_OK ‚ª•Ô‚ç‚È‚¢
+			// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è§’ã‚’ä¸¸ãã—ãªã„ã«å¯¾å¿œã—ã¦ã„ãªã„ãªã‚‰ disable ã«ã™ã‚‹
+			//		DwmGetWindowAttribute() API ãŒãªã„ or
+			//		DwmGetWindowAttribute(DWMWA_WINDOW_CORNER_PREFERENCE) ã§ S_OK ãŒè¿”ã‚‰ãªã„
 			EnableDlgItem(IDC_CHECK_CORNERDONTROUND, FALSE);
 		}
 	}
 
-	// ƒ_ƒCƒAƒƒO‚ÉƒtƒH[ƒJƒX‚ğ“–‚Ä‚é
+	// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å½“ã¦ã‚‹
 	::SetFocus(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE));
 
-	// ƒc[ƒ‹ƒ`ƒbƒvì¬
+	// ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ä½œæˆ
 	TipWin->Create(m_hWnd);
 }
 
@@ -893,9 +894,9 @@ HBRUSH CVisualPropPageDlg::OnCtlColor(HDC hDC, HWND hWnd)
 }
 
 /**
- *	F‚Ìİ’è‚ğ•ÏX‚µ‚½‚©ƒ`ƒFƒbƒN‚·‚é
- *	@retval	TRUE	•ÏX‚µ‚½
- *	@retval	FALSE	•ÏX‚µ‚Ä‚¢‚È‚¢
+ *	è‰²ã®è¨­å®šã‚’å¤‰æ›´ã—ãŸã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
+ *	@retval	TRUE	å¤‰æ›´ã—ãŸ
+ *	@retval	FALSE	å¤‰æ›´ã—ã¦ã„ãªã„
  */
 BOOL CVisualPropPageDlg::CheckColorChanged()
 {
@@ -908,16 +909,16 @@ BOOL CVisualPropPageDlg::CheckColorChanged()
 }
 
 /**
- *	ƒe[ƒ}ƒJƒ‰[‚ªİ’è‚µ‚Ä‚ ‚é‚©ƒ`ƒFƒbƒN‚·‚é
- *	@retval	TRUE	İ’è‚³‚ê‚Ä‚¢‚é
- *	@retval	FALSE	İ’è‚³‚ê‚Ä‚¢‚È‚¢
+ *	ãƒ†ãƒ¼ãƒã‚«ãƒ©ãƒ¼ãŒè¨­å®šã—ã¦ã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
+ *	@retval	TRUE	è¨­å®šã•ã‚Œã¦ã„ã‚‹
+ *	@retval	FALSE	è¨­å®šã•ã‚Œã¦ã„ãªã„
  */
 BOOL CVisualPropPageDlg::CheckThemeColor()
 {
 	TColorTheme def;	// default color (=ts.ANSIColor[])
 	ThemeGetColorDefault(&def);
-	TColorTheme disp;	// ¡•\¦‚³‚ê‚Ä‚¢‚éF
-	ThemeGetColor(&disp);
+	TColorTheme disp;	// ä»Šè¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹è‰²
+	ThemeGetColor(vt_src, &disp);
 	for (int i = 0; i < 16; i++) {
 		if (disp.ansicolor.color[i] != def.ansicolor.color[i]) {
 			return TRUE;
@@ -1006,7 +1007,7 @@ void CVisualPropPageDlg::OnOK()
 
 	ts.EtermLookfeel.BGNoCopyBits = GetCheck(IDC_CHECK_FLICKER_LESS_MOVE);
 
-	// ƒEƒBƒ“ƒhƒE‚ÌŠp‚ğŠÛ‚­‚µ‚È‚¢
+	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è§’ã‚’ä¸¸ãã—ãªã„
 	if (ts.WindowCornerDontround != GetCheck(IDC_CHECK_CORNERDONTROUND)) {
 		ts.WindowCornerDontround = GetCheck(IDC_CHECK_CORNERDONTROUND);
 		if (pDwmSetWindowAttribute != NULL) {
@@ -1017,10 +1018,10 @@ void CVisualPropPageDlg::OnOK()
 
 	// ANSI Color
 	if (CheckColorChanged()) {
-		// F‚Ì•ÏX‚ªs‚í‚ê‚½
+		// è‰²ã®å¤‰æ›´ãŒè¡Œã‚ã‚ŒãŸ
 		bool set_color = TRUE;
 
-		// ƒJƒ‰[ƒe[ƒ}‚ğg‚Á‚ÄF‚ª•ÏX‚³‚ê‚Ä‚¢‚é?
+		// ã‚«ãƒ©ãƒ¼ãƒ†ãƒ¼ãƒã‚’ä½¿ã£ã¦è‰²ãŒå¤‰æ›´ã•ã‚Œã¦ã„ã‚‹?
 		if (CheckThemeColor()) {
 			static const TTMessageBoxInfoW info = {
 				"Tera Term",
@@ -1033,17 +1034,17 @@ void CVisualPropPageDlg::OnOK()
 			}
 		}
 
-		// F‚ğİ’è(ƒfƒtƒHƒ‹ƒgF)‚É”½‰f
+		// è‰²ã‚’è¨­å®š(ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆè‰²)ã«åæ˜ 
 		for (i = 0; i < 16; i++) {
 			ts.ANSIColor[i] = ANSIColor[i];
 		}
 
-		// İ’è‚³‚ê‚½F‚ğ•\¦‚É”½‰f
+		// è¨­å®šã•ã‚ŒãŸè‰²ã‚’è¡¨ç¤ºã«åæ˜ 
 		if (set_color) {
 			TColorTheme color;
-			// ƒfƒtƒHƒ‹ƒgF‚ğİ’è‚·‚é
+			// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆè‰²ã‚’è¨­å®šã™ã‚‹
 			ThemeGetColorDefault(&color);
-			ThemeSetColor(&color);
+			ThemeSetColor(vt_src, &color);
 		}
 	}
 }
@@ -1054,7 +1055,7 @@ void CVisualPropPageDlg::OnHelp()
 }
 
 /////////////////////////////
-// cygterm.cfg “Ç‚İ‘‚«
+// cygterm.cfg èª­ã¿æ›¸ã
 
 #define CYGTERM_FILE "cygterm.cfg"  // CygTerm configuration file
 #define CYGTERM_FILE_MAXLINE 100
@@ -1189,7 +1190,7 @@ BOOL WriteCygtermConfFile(const char *homedir, cygterm_t *psettings)
 	AppendSlash(tmp, sizeof(tmp));
 	strncat_s(tmp, sizeof(tmp), tmpfile, _TRUNCATE);
 
-	// cygterm.cfg ‚ª‘¶İ‚·‚ê‚ÎA‚¢‚Á‚½‚ñƒƒ‚ƒŠ‚É‚·‚×‚Ä“Ç‚İ‚ŞB
+	// cygterm.cfg ãŒå­˜åœ¨ã™ã‚Œã°ã€ã„ã£ãŸã‚“ãƒ¡ãƒ¢ãƒªã«ã™ã¹ã¦èª­ã¿è¾¼ã‚€ã€‚
 	memset(line, 0, sizeof(line));
 	linenum = 0;
 	fp = fopen(cfg, "r");
@@ -1300,7 +1301,7 @@ BOOL WriteCygtermConfFile(const char *homedir, cygterm_t *psettings)
 		}
 		fclose(tmp_fp);
 
-		// ƒ_ƒCƒŒƒNƒg‚Éƒtƒ@ƒCƒ‹‚É‘‚«‚Ş‚æ‚¤‚É‚µ‚½‚Ì‚ÅA‰º‹Lˆ—‚Í•s—vB
+		// ãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆã«ãƒ•ã‚¡ã‚¤ãƒ«ã«æ›¸ãè¾¼ã‚€ã‚ˆã†ã«ã—ãŸã®ã§ã€ä¸‹è¨˜å‡¦ç†ã¯ä¸è¦ã€‚
 #if 0
 		if (remove(cfg) != 0 && errno != ENOENT) {
 			get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts->UILanguageFile);
@@ -1317,11 +1318,11 @@ BOOL WriteCygtermConfFile(const char *homedir, cygterm_t *psettings)
 			MessageBox(NULL, buf, uimsg, MB_ICONEXCLAMATION);
 		}
 		else {
-			// cygterm.cfg ƒtƒ@ƒCƒ‹‚Ö‚Ì•Û‘¶‚ª¬Œ÷‚µ‚½‚çAƒƒbƒZ[ƒWƒ_ƒCƒAƒƒO‚ğ•\¦‚·‚éB
-			// ‰ü‚ß‚ÄASave setup‚ğÀs‚·‚é•K—v‚Í‚È‚¢‚±‚Æ‚ğ’ˆÓŠ«‹N‚·‚éB
+			// cygterm.cfg ãƒ•ã‚¡ã‚¤ãƒ«ã¸ã®ä¿å­˜ãŒæˆåŠŸã—ãŸã‚‰ã€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤ºã™ã‚‹ã€‚
+			// æ”¹ã‚ã¦ã€Save setupã‚’å®Ÿè¡Œã™ã‚‹å¿…è¦ã¯ãªã„ã“ã¨ã‚’æ³¨æ„å–šèµ·ã™ã‚‹ã€‚
 			// (2012.5.1 yutaka)
-			// Save setup Às‚ÉACygTerm‚Ìİ’è‚ğ•Û‘¶‚·‚é‚æ‚¤‚É‚µ‚½‚±‚Æ‚É‚æ‚èA
-			// ƒ_ƒCƒAƒƒO•\¦‚ª•s—v‚Æ‚È‚é‚½‚ßAíœ‚·‚éB
+			// Save setup å®Ÿè¡Œæ™‚ã«ã€CygTermã®è¨­å®šã‚’ä¿å­˜ã™ã‚‹ã‚ˆã†ã«ã—ãŸã“ã¨ã«ã‚ˆã‚Šã€
+			// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°è¡¨ç¤ºãŒä¸è¦ã¨ãªã‚‹ãŸã‚ã€å‰Šé™¤ã™ã‚‹ã€‚
 			// (2015.11.12 yutaka)
 			get_lang_msg("MSG_TT_NOTICE", uimsg, sizeof(uimsg), "MSG_TT_NOTICE", ts->UILanguageFile);
 			get_lang_msg("MSG_CYGTERM_CONF_SAVED_NOTICE", ts->UIMsg, sizeof(ts->UIMsg),
@@ -1332,7 +1333,7 @@ BOOL WriteCygtermConfFile(const char *homedir, cygterm_t *psettings)
 #endif
 	}
 
-	// –Y‚ê‚¸‚Éƒƒ‚ƒŠƒtƒŠ[‚µ‚Ä‚¨‚­B
+	// å¿˜ã‚Œãšã«ãƒ¡ãƒ¢ãƒªãƒ•ãƒªãƒ¼ã—ã¦ãŠãã€‚
 	for (i = 0; i < linenum; i++) {
 		free(line[i]);
 	}
@@ -1342,7 +1343,7 @@ BOOL WriteCygtermConfFile(const char *homedir, cygterm_t *psettings)
 
 /////////////////////////////
 
-// CCygwinPropPageDlg ƒ_ƒCƒAƒƒO
+// CCygwinPropPageDlg ãƒ€ã‚¤ã‚¢ãƒ­ã‚°
 void ReadCygtermConfFile(const char *homedir, cygterm_t *psettings);
 BOOL WriteCygtermConfFile(const char *homedir, cygterm_t *psettings);
 BOOL CmpCygtermConfFile(const cygterm_t *a, const cygterm_t *b);
@@ -1376,7 +1377,7 @@ CCygwinPropPageDlg::~CCygwinPropPageDlg()
 	free((void *)m_psp.pszTitle);
 }
 
-// CCygwinPropPageDlg ƒƒbƒZ[ƒW ƒnƒ“ƒhƒ‰
+// CCygwinPropPageDlg ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ ãƒãƒ³ãƒ‰ãƒ©
 
 void CCygwinPropPageDlg::OnInitDialog()
 {
@@ -1404,7 +1405,7 @@ void CCygwinPropPageDlg::OnInitDialog()
 	// Cygwin install path
 	SetDlgItemTextA(IDC_CYGWIN_PATH, ts.CygwinDirectory);
 
-	// ƒ_ƒCƒAƒƒO‚ÉƒtƒH[ƒJƒX‚ğ“–‚Ä‚é
+	// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å½“ã¦ã‚‹
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CYGWIN_PATH));
 }
 
@@ -1412,7 +1413,7 @@ BOOL CCygwinPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
 		case IDC_SELECT_FILE | (BN_CLICKED << 16):
-			// Cygwin install ƒfƒBƒŒƒNƒgƒŠ‚Ì‘I‘ğƒ_ƒCƒAƒƒO
+			// Cygwin install ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°
 			wchar_t *title = TTGetLangStrW("Tera Term", "DIRDLG_CYGTERM_DIR_TITLE", L"Select Cygwin directory", ts.UILanguageFileW);
 			wchar_t *buf;
 			hGetDlgItemTextW(m_hWnd, IDC_CYGWIN_PATH, &buf);
@@ -1430,11 +1431,11 @@ BOOL CCygwinPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 }
 
 /**
- * @brief	cygterm_t‚ğ”äŠr‚·‚é
+ * @brief	cygterm_tã‚’æ¯”è¼ƒã™ã‚‹
  * @param	a	cygterm_t
  * @param	b	cygterm_t
- * @retval	TRUE	“¯ˆê
- * @retval	FALSE	ˆÙ‚È‚é
+ * @retval	TRUE	åŒä¸€
+ * @retval	FALSE	ç•°ãªã‚‹
  */
 BOOL CmpCygtermConfFile(const cygterm_t *a, const cygterm_t *b)
 {
@@ -1457,7 +1458,7 @@ void CCygwinPropPageDlg::OnOK()
 {
 	cygterm_t settings_prop;
 
-	// ƒvƒƒpƒeƒB[ƒV[ƒg‚©‚ç’l‚ğæ‚è‚Ş
+	// ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ãƒ¼ã‚·ãƒ¼ãƒˆã‹ã‚‰å€¤ã‚’å–ã‚Šè¾¼ã‚€
 	GetDlgItemTextA(IDC_TERM_EDIT, settings_prop.term, sizeof(settings_prop.term));
 	GetDlgItemTextA(IDC_TERM_TYPE, settings_prop.term_type, sizeof(settings_prop.term_type));
 	GetDlgItemTextA(IDC_PORT_START, settings_prop.port_start, sizeof(settings_prop.port_start));
@@ -1470,7 +1471,7 @@ void CCygwinPropPageDlg::OnOK()
 	settings_prop.home_chdir = GetCheck(IDC_HOME_CHDIR);
 	settings_prop.agent_proxy = GetCheck(IDC_AGENT_PROXY);
 
-	// •ÏX‚³‚ê‚Ä‚¢‚éê‡ cygterm.cfg ‚Ö‘‚«‚Ş
+	// å¤‰æ›´ã•ã‚Œã¦ã„ã‚‹å ´åˆ cygterm.cfg ã¸æ›¸ãè¾¼ã‚€
 	if (CmpCygtermConfFile(&settings_prop, &settings) == FALSE) {
 		if (WriteCygtermConfFile(ts.HomeDir, &settings_prop) == FALSE) {
 			static const TTMessageBoxInfoW info = {
@@ -1494,8 +1495,8 @@ void CCygwinPropPageDlg::OnHelp()
 
 //////////////////////////////////////////////////////////////////////////////
 
-// ƒ^ƒu
-// ‚±‚Ì‡‚Éƒ^ƒu‚ª•\¦‚³‚ê‚é
+// ã‚¿ãƒ–
+// ã“ã®é †ã«ã‚¿ãƒ–ãŒè¡¨ç¤ºã•ã‚Œã‚‹
 enum {
 	PP_GENERAL,
 	PP_UI,
@@ -1513,77 +1514,14 @@ enum {
 	PP_TERMINAL,
 	PP_SERIAL,
 	PP_WINDOW,
+	PP_TEK_WINDOW,
+	PP_TEK_FONT,
 	PP_PLUGIN,
 	PP_DEBUG,
 	PP_MAX,
 };
 
-// CAddSettingPropSheetDlg
-CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd):
-	TTCPropSheetDlg(hInstance, hParentWnd, ts.UILanguageFileW)
-{
-	HPROPSHEETPAGE pages[PP_MAX] = {0};
-
-	AddsettingWin parent_win = AddsettingCheckWin(hParentWnd);
-
-	// CPP,tmfc‚ÌTTCPropertyPage”h¶ƒNƒ‰ƒX‚©‚ç¶¬
-	int i = 0;
-	if (parent_win == ADDSETTING_WIN_VT) {
-		m_Page[i] = new CGeneralPropPageDlg(hInstance, hParentWnd, &cv);
-		pages[PP_GENERAL] = m_Page[i++]->CreatePropertySheetPage();
-		m_Page[i] = new CSequencePropPageDlg(hInstance);
-		pages[PP_SEQUENCE] = m_Page[i++]->CreatePropertySheetPage();
-		m_Page[i] = new CCopypastePropPageDlg(hInstance);
-		pages[PP_COPY_PASTE] = m_Page[i++]->CreatePropertySheetPage();
-		m_Page[i] = new CVisualPropPageDlg(hInstance);
-		pages[PP_VISUAL] = m_Page[i++]->CreatePropertySheetPage();
-		m_Page[i] = new CLogPropPageDlg(hInstance);
-		pages[PP_LOG] = m_Page[i++]->CreatePropertySheetPage();
-		m_Page[i] = new CCygwinPropPageDlg(hInstance);
-		pages[PP_CYGWIN] = m_Page[i++]->CreatePropertySheetPage();
-	}
-	if ((GetKeyState(VK_CONTROL) & 0x8000) != 0 ||
-		(GetKeyState(VK_SHIFT) & 0x8000) != 0 ) {
-		m_Page[i] = new CDebugPropPage(hInstance);
-		pages[PP_DEBUG] = m_Page[i++]->CreatePropertySheetPage();
-	}
-	m_PageCountCPP = i;
-
-	// TTCPropertyPage ‚ğg—p‚µ‚È‚¢ PropertyPage
-	if (parent_win == ADDSETTING_WIN_VT) {
-		pages[PP_ENCODING] = CodingPageCreate(hInstance, &ts);
-		pages[PP_FONT] = FontPageCreate(hInstance, &ts);
-		pages[PP_THEME] = ThemePageCreate(hInstance, &ts);
-		pages[PP_KEYBOARD] = KeyboardPageCreate(hInstance, &ts);
-		pages[PP_MOUSE] = MousePageCreate(hInstance, &ts);
-		pages[PP_TCPIP] = TcpIPPageCreate(hInstance, &ts);
-		pages[PP_TERMINAL] = CreateTerminalPP(hInstance, hParentWnd, & ts);
-		pages[PP_SERIAL] = SerialPageCreate(hInstance, &ts);
-		pages[PP_UI] = UIPageCreate(hInstance, &ts);
-	}
-	pages[PP_WINDOW] = CreateWinPP(hInstance, hParentWnd, &ts);
-	pages[PP_PLUGIN] = PluginPageCreate(hInstance, &ts);
-
-	for (int i = 0; i < PP_MAX; i++) {
-		HPROPSHEETPAGE page = pages[i];
-		if (page != 0) {
-			AddPage(page);
-		}
-	}
-
-	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFileW);
-	SetCaption(title);
-	free(title);
-}
-
-CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
-{
-	for (int i = 0; i < m_PageCountCPP; i++) {
-		delete m_Page[i];
-	}
-}
-
-void CAddSettingPropSheetDlg::SetStartPage(Page page)
+static int GetStartPageNo(CAddSettingPropSheetDlg::Page page)
 {
 	int start_page = PP_GENERAL;
 	switch (page) {
@@ -1611,21 +1549,104 @@ void CAddSettingPropSheetDlg::SetStartPage(Page page)
 	case SerialPortPage:
 		start_page = PP_SERIAL;
 		break;
+	case TekFontPage:
+		start_page = PP_TEK_FONT;
+		break;
 	default:
 		start_page = PP_GENERAL;
 		break;
 	}
-	TTCPropSheetDlg::SetStartPage(start_page);
+	return start_page;
+}
+
+// CAddSettingPropSheetDlg
+CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
+	HINSTANCE hInstance, HWND hParentWnd,
+	CAddSettingPropSheetDlg::Page StartPage):
+	TTCPropSheetDlg(hInstance, hParentWnd, ts.UILanguageFileW)
+{
+	HPROPSHEETPAGE pages[PP_MAX] = {0};
+
+	AddsettingWin parent_win = AddsettingCheckWin(hParentWnd);
+
+	// CPP,tmfcã®TTCPropertyPageæ´¾ç”Ÿã‚¯ãƒ©ã‚¹ã‹ã‚‰ç”Ÿæˆ
+	int i = 0;
+	if (parent_win == ADDSETTING_WIN_VT) {
+		m_Page[i] = new CGeneralPropPageDlg(hInstance, hParentWnd, &cv);
+		pages[PP_GENERAL] = m_Page[i++]->CreatePropertySheetPage();
+		m_Page[i] = new CSequencePropPageDlg(hInstance);
+		pages[PP_SEQUENCE] = m_Page[i++]->CreatePropertySheetPage();
+		m_Page[i] = new CCopypastePropPageDlg(hInstance);
+		pages[PP_COPY_PASTE] = m_Page[i++]->CreatePropertySheetPage();
+		m_Page[i] = new CVisualPropPageDlg(hInstance);
+		pages[PP_VISUAL] = m_Page[i++]->CreatePropertySheetPage();
+		m_Page[i] = new CLogPropPageDlg(hInstance);
+		pages[PP_LOG] = m_Page[i++]->CreatePropertySheetPage();
+		m_Page[i] = new CCygwinPropPageDlg(hInstance);
+		pages[PP_CYGWIN] = m_Page[i++]->CreatePropertySheetPage();
+	}
+	if ((GetKeyState(VK_CONTROL) & 0x8000) != 0 ||
+		(GetKeyState(VK_SHIFT) & 0x8000) != 0 ) {
+		m_Page[i] = new CDebugPropPage(hInstance);
+		pages[PP_DEBUG] = m_Page[i++]->CreatePropertySheetPage();
+	}
+	m_PageCountCPP = i;
+
+	// TTCPropertyPage ã‚’ä½¿ç”¨ã—ãªã„ PropertyPage
+	if (parent_win == ADDSETTING_WIN_VT) {
+		pages[PP_ENCODING] = CodingPageCreate(hInstance, &ts);
+		pages[PP_FONT] = FontPageCreate(hInstance, &ts);
+		pages[PP_THEME] = ThemePageCreate(hInstance, &ts);
+		pages[PP_KEYBOARD] = KeyboardPageCreate(hInstance, &ts);
+		pages[PP_MOUSE] = MousePageCreate(hInstance, &ts);
+		pages[PP_TCPIP] = TcpIPPageCreate(hInstance, &ts);
+		pages[PP_TERMINAL] = CreateTerminalPP(hInstance, hParentWnd, &ts);
+		pages[PP_SERIAL] = SerialPageCreate(hInstance, &ts);
+		pages[PP_UI] = UIPageCreate(hInstance, &ts);
+		pages[PP_WINDOW] = CreateWinVTPP(hInstance, hParentWnd, &ts);
+	}
+	if (parent_win == ADDSETTING_WIN_TEK) {	// TEKã‹ã‚‰å‘¼ã³å‡ºã•ã‚ŒãŸã¨ãã ã‘è¡¨ç¤ºã™ã‚‹
+//	{										// ã„ã¤ã‚‚è¡¨ç¤ºã™ã‚‹
+		pages[PP_TEK_WINDOW] = CreateWinTEKPP(hInstance, hParentWnd, &ts);
+		pages[PP_TEK_FONT] = TEKFontPageCreate(hInstance, hParentWnd, &ts);
+	}
+	pages[PP_PLUGIN] = PluginPageCreate(hInstance, &ts);
+
+	const int start_page_no = GetStartPageNo(StartPage);
+	int available_page_count = 0;
+	int start_page_index = 0;
+	for (int i = 0; i < PP_MAX; i++) {
+		HPROPSHEETPAGE page = pages[i];
+		if (page != 0) {
+			AddPage(page);
+			if (i == start_page_no) {
+				start_page_index = available_page_count;
+			}
+			available_page_count++;
+		}
+	}
+	TTCPropSheetDlg::SetStartPage(start_page_index);
+
+	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFileW);
+	SetCaption(title);
+	free(title);
+}
+
+CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
+{
+	for (int i = 0; i < m_PageCountCPP; i++) {
+		delete m_Page[i];
+	}
 }
 
 /**
- *	hWnd ‚ª‚Ç‚ÌƒEƒBƒ“ƒhƒE‚©’²‚×‚é
- *		hWnd ‚Í VTWIN‚©TEKWIN‚Ì‚Í‚¸
+ *	hWnd ãŒã©ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‹èª¿ã¹ã‚‹
+ *		hWnd ã¯ VTWINã‹TEKWINã®ã¯ãš
  */
 AddsettingWin AddsettingCheckWin(HWND hWnd)
 {
 	if (hWnd == NULL) {
-		// ActiveWin ‚ªg‚¦‚é?
+		// ActiveWin ãŒä½¿ãˆã‚‹?
 		assert(false);
 		if (ActiveWin == IdTEK)
 			hWnd = HTEKWin;

@@ -11,16 +11,16 @@
 
 namespace yebisuya {
 
-// int‚ğƒ‰ƒbƒv‚·‚é‚½‚ß‚ÌƒNƒ‰ƒXB
+// intã‚’ãƒ©ãƒƒãƒ—ã™ã‚‹ãŸã‚ã®ã‚¯ãƒ©ã‚¹ã€‚
 class Integer {
 private:
 	int value;
 public:
-	// ƒfƒtƒHƒ‹ƒgƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	Integer():value(0){}
-	// ‰Šú’l•t‚«ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// åˆæœŸå€¤ä»˜ãã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	Integer(int value):value(value){}
-	// ƒLƒƒƒXƒg‰‰Zq
+	// ã‚­ãƒ£ã‚¹ãƒˆæ¼”ç®—å­
 	operator int()const {
 		return value;
 	}
@@ -70,7 +70,7 @@ public:
 		long v = 0;
 		bool negative = false;
 		const char* p = string;
-		// ‹ó”’‚ÌƒXƒLƒbƒv
+		// ç©ºç™½ã®ã‚¹ã‚­ãƒƒãƒ—
 		while ('\0' < *p && *p <= ' ')
 			p++;
 		if (*p == '-') {
@@ -79,10 +79,10 @@ public:
 		}else if (*p == '+') {
 			p++;
 		}
-		// ‹ó”’‚ÌƒXƒLƒbƒv
+		// ç©ºç™½ã®ã‚¹ã‚­ãƒƒãƒ—
 		while ('\0' < *p && *p <= ' ')
 			p++;
-		// Šî”‚Ì•ÏX
+		// åŸºæ•°ã®å¤‰æ›´
 		if (base == 0) {
 			if (*p == '0') {
 				p++;
@@ -105,14 +105,14 @@ public:
 			}else if ('a' <= *p && *p <= 'z') {
 				d = *p - 'a' + 10;
 			}else{
-				// —]Œv‚È•¶š‚ªŒ©‚Â‚©‚ê‚ÎI—¹
+				// ä½™è¨ˆãªæ–‡å­—ãŒè¦‹ã¤ã‹ã‚Œã°çµ‚äº†
 				break;
 			}
-			// Šî”ˆÈã‚¾‚Á‚½ê‡‚ÍI—¹
+			// åŸºæ•°ä»¥ä¸Šã ã£ãŸå ´åˆã¯çµ‚äº†
 			if (d >= base)
 				break;
 			v = v * base + d;
-			// ƒI[ƒo[ƒtƒ[‚µ‚½ê‡‚ÍI—¹
+			// ã‚ªãƒ¼ãƒãƒ¼ãƒ•ãƒ­ãƒ¼ã—ãŸå ´åˆã¯çµ‚äº†
 			if (v < 0)
 				break;
 			p++;

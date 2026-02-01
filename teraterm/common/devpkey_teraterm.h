@@ -28,7 +28,7 @@
 
 #pragma once
 
-// Ç±ÇÃÉtÉ@ÉCÉãÇÕÇ†ÇΩÇÁÇµÇ¢ÉRÉìÉpÉCÉâä¬ã´Ç≈ÇÕïsóv
+// „Åì„ÅÆ„Éï„Ç°„Ç§„É´„ÅØ„ÅÇ„Åü„Çâ„Åó„ÅÑ„Ç≥„É≥„Éë„Ç§„É©Áí∞Â¢É„Åß„ÅØ‰∏çË¶Å
 #if defined(_MSC_VER) && _MSC_VER > 1400
 #error check file dependency
 #endif
@@ -56,7 +56,7 @@ typedef struct _DEVPROPKEY {
 #define DEFINE_DEVPROPKEY(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8, pid) EXTERN_C const DEVPROPKEY DECLSPEC_SELECTANY name = { { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }, pid }
 
 /*
- * Platform SDKÇÃdevpkey.hÇÊÇË
+ * Platform SDK„ÅÆdevpkey.h„Çà„Çä
  */
 
 DEFINE_DEVPROPKEY(DEVPKEY_Device_FriendlyName,           0xa45c254e, 0xdf1c, 0x4efd, 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 14);    // DEVPROP_TYPE_STRING

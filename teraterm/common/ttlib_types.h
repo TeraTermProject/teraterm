@@ -35,16 +35,16 @@ extern "C" {
 #endif
 
 /**
- * @brief	ƒtƒ@ƒCƒ‹“]‘——pƒtƒHƒ‹ƒ_‚ğæ“¾
+ * @brief	ãƒ•ã‚¡ã‚¤ãƒ«è»¢é€ç”¨ãƒ•ã‚©ãƒ«ãƒ€ã‚’å–å¾—
  * @param	pts	TTTSet
- * @return	ƒtƒHƒ‹ƒ_ •s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
+ * @return	ãƒ•ã‚©ãƒ«ãƒ€ ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  */
 wchar_t *GetFileDir(const TTTSet *pts);
 
 /**
- * @brief	’[––ƒƒO‚ğ•Û‘¶‚·‚éƒtƒHƒ‹ƒ_‚ğæ“¾
+ * @brief	ç«¯æœ«ãƒ­ã‚°ã‚’ä¿å­˜ã™ã‚‹ãƒ•ã‚©ãƒ«ãƒ€ã‚’å–å¾—
  * @param	pts	TTTSet
- * @return	ƒtƒHƒ‹ƒ_ •s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
+ * @return	ãƒ•ã‚©ãƒ«ãƒ€ ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  */
 wchar_t *GetTermLogDir(const TTTSet *pts);
 

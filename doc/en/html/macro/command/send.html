@@ -30,7 +30,11 @@ If &lt;data&gt; is an integer, its lowest-order byte (0-255) is regarded as an A
 </p>
 
 <p>
-  The datas are checked, and when data is judged to be text, data is sent in same as "<a href="sendtext.html">sendtext</a>"; when data is judged to be binary, data is sent in same as "<a href="sendbinary.html">sendbinary</a>".
+  Send characters to VTWin following <a href="../../menu/setup-additional-terminal.html#LocalEcho">local echo setting</a>.
+</p>
+
+<p>
+  The data are checked, and when data is judged to be text, data is sent in same as "<a href="sendtext.html">sendtext</a>"; when data is judged to be binary, data is sent in same as "<a href="sendbinary.html">sendbinary</a>".
 <p>
 
 <h2>Example</h2>
@@ -60,7 +64,7 @@ send command
 
 <pre class="macro-example">
 /* "CTRL+C" is 3 in binary so just send 3 like so.
- * 
+ *
  * CTRL+A = 1, CTRL+B = 2.................. CTRL+Z = 26.
  */
 send #3
@@ -74,8 +78,29 @@ send #9
 See also "<a href="setsync.html">setsync</a>" for the synchronous mode.
 </p>
 
+<h2>Destination</h2>
+
+Destination (host/LocalEcho (sent to VTWin)) of each command is as follows:
+
+<table border="1">
+  <tr>
+    <th></th><th>Host</th><th>LocalEcho</th>
+  </tr>
+  <tr>
+    <th>send/sendln/sendbinary/sendtext</th>
+    <td>Yes</td>
+    <td><a href="../../menu/setup-additional-terminal.html#LocalEcho">Setting</a></td>
+  </tr>
+  <tr>
+    <th>dispstr</th>
+    <td>No</td>
+    <td>Yes</td>
+  </tr>
+</table>
+
 <h2>See also</h2>
 <ul>
+  <li><a href="dispstr.html">dispstr</a></li>
   <li><a href="sendln.html">sendln</a></li>
   <li><a href="sendtext.html">sendtext</a></li>
   <li><a href="sendbinary.html">sendbinary</a></li>

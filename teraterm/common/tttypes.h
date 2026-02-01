@@ -31,6 +31,7 @@
 #pragma once
 
 #include "teraterm.h"
+#include "tttypes_termid.h"
 
 #define IdBreakTimer         1
 #define IdDelayTimer         2
@@ -83,6 +84,7 @@ typedef enum {
 #define WM_USER_CHANGETITLE  WM_USER+14
 #define WM_USER_NOTIFYICON   WM_USER+15
 #define WM_USER_DROPNOTIFY   WM_USER+16
+#define WM_USER_IDLETIMER    WM_USER+17
 
 #define WM_USER_DDEREADY     WM_USER+21
 #define WM_USER_DDECMNDEND   WM_USER+22
@@ -268,7 +270,7 @@ enum LogTimestampType {
 
 // Eterm lookfeel alphablend structure
 typedef struct {
-	int BGEnable;	// 0/1/2 = themeg—p‚µ‚È‚¢/ŒÅ’èƒe[ƒ}/ƒ‰ƒ“ƒ_ƒ€ƒe[ƒ}
+	int BGEnable;	// 0/1/2 = themeä½¿ç”¨ã—ãªã„/å›ºå®šãƒ†ãƒ¼ãƒ/ãƒ©ãƒ³ãƒ€ãƒ ãƒ†ãƒ¼ãƒ
 	int BGUseAlphaBlendAPI;
 	char reserve_BGSPIPath[MAX_PATH];
 	int BGFastSizeMove;
@@ -281,18 +283,18 @@ typedef struct {
 
 /**
  *	TTTSet
- *		ƒZƒbƒVƒ‡ƒ“‚Ì•¡»
- *		‚±‚Ì\‘¢‘Ì‚Í•¡»æ‚ÉƒRƒs[‚³‚ê‚é
- *		path“™A“®“I‚ÉŠm•Û‚µ‚½•”•ª‚ÌƒRƒs[‚Í
- *		../ttcmn_dup.cpp ‚ğQÆ
+ *		ã‚»ãƒƒã‚·ãƒ§ãƒ³ã®è¤‡è£½æ™‚
+ *		ã“ã®æ§‹é€ ä½“ã¯è¤‡è£½å…ˆã«ã‚³ãƒ”ãƒ¼ã•ã‚Œã‚‹
+ *		pathç­‰ã€å‹•çš„ã«ç¢ºä¿ã—ãŸéƒ¨åˆ†ã®ã‚³ãƒ”ãƒ¼ã¯
+ *		../ttcmn_dup.cpp ã‚’å‚ç…§
  */
 struct tttset {
 /*------ VTSet --------*/
 	/* Tera Term home directory */
-	char HomeDir[MAXPATHLEN];		// ŒÂlİ’èƒtƒ@ƒCƒ‹‚Ì‚ ‚éƒtƒHƒ‹ƒ_ switch HomeDirW
+	char HomeDir[MAXPATHLEN];		// å€‹äººè¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€ switch HomeDirW
 
 	/* Setup file name */
-	char SetupFName[MAX_PATH];
+	char SetupFName[MAX_PATH];			// "TERATERM.INI" ã®ãƒ•ãƒ«ãƒ‘ã‚¹ ANSIç‰ˆ
 	char reserve_KeyCnfFN[MAX_PATH];	// switch KeyCnfFNW
 	char LogFN[MAX_PATH];
 	char reserve_MacroFN[MAX_PATH];		// switch MacroFNW
@@ -361,7 +363,7 @@ struct tttset {
 	WORD TermFlag;
 /*------ WinSet --------*/
 	WORD reserve_VTFlag;
-	HFONT SampleFont;
+	HFONT reserve_SampleFont;
 	WORD reserve_TmpColor[12][6];
 	/* Tera Term window setup variables */
 	char Title[TitleBuffSize];
@@ -428,7 +430,7 @@ struct tttset {
 	char MouseCursorName[16];
 	BYTE AlphaBlendActive;
 	BYTE AlphaBlendInactive;
-	BYTE reserve_0[2];				// –¢g—p
+	BYTE reserve_0[2];				// æœªä½¿ç”¨
 	char CygwinDirectory[MAX_PATH];
 	char reserve_Locale[80];
 	int reserve_CodePage;
@@ -436,8 +438,8 @@ struct tttset {
 	char reserve_ViewlogEditor[MAX_PATH];
 	WORD LogTypePlainText;
 	WORD LogTimestamp;
-	char reserve_LogDefaultName[80];		// ”p~,LogDefaultNameW ‚ÖˆÚs
-	char reserve_LogDefaultPath[MAX_PATH];	// ”p~,LogDefaultPathW ‚ÖˆÚs
+	char reserve_LogDefaultName[80];		// å»ƒæ­¢,LogDefaultNameW ã¸ç§»è¡Œ
+	char reserve_LogDefaultPath[MAX_PATH];	// å»ƒæ­¢,LogDefaultPathW ã¸ç§»è¡Œ
 	WORD LogAutoStart;
 	unsigned int PasteFlag;
 	WORD FallbackToCP932;
@@ -449,7 +451,7 @@ struct tttset {
 	char reserve_UIMsg[1024/*MAX_UIMSG*/];
 	WORD BroadcastCommandHistory;
 	WORD AcceptBroadcast;		// 337: 2007/03/20
-	WORD DisableTCPEchoCR;  // TCPLocalEcho/TCPCRSend ‚ğ–³Œø‚É‚·‚é (maya 2007.4.25)
+	WORD DisableTCPEchoCR;  // TCPLocalEcho/TCPCRSend ã‚’ç„¡åŠ¹ã«ã™ã‚‹ (maya 2007.4.25)
 	int ConnectingTimeout;
 	WORD VTCompatTab;
 	WORD TelKeepAliveInterval;
@@ -515,7 +517,7 @@ struct tttset {
 	WORD LogLockExclusive;
 	WORD KermitOpt;
 	WORD FontQuality;
-	char ScpSendDir[MAXPATHLEN];				// SCP ‘—Mæ(ƒzƒXƒg‚ÌƒfƒBƒŒƒNƒgƒŠ)
+	char ScpSendDir[MAXPATHLEN];				// SCP é€ä¿¡å…ˆ(ãƒ›ã‚¹ãƒˆã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª)
 	char reserver_BGImageFilePath[MAX_PATH];
 	int LogRotate;		//	enum rotate_mode LogRotate;
 	DWORD LogRotateSize;
@@ -557,7 +559,7 @@ struct tttset {
 	char LogTimestampFormat[48];
 	int TerminalInputSpeed;
 	int TerminalOutputSpeed;
-	char reserve_DialogFontName[LF_FACESIZE];	// DialogFontNameW ‚ÖˆÚs
+	char reserve_DialogFontName[LF_FACESIZE];	// DialogFontNameW ã¸ç§»è¡Œ
 	int DialogFontPoint;
 	int DialogFontCharSet;
 	int ConfigVersion;
@@ -566,20 +568,20 @@ struct tttset {
 	BYTE UnicodeAmbiguousWidth;
 	BYTE UnicodeEmojiOverride;
 	BYTE UnicodeEmojiWidth;
-	wchar_t *HomeDirW;		// ŒÂlİ’èƒtƒ@ƒCƒ‹‚Ì‚ ‚éƒtƒHƒ‹ƒ_
-	wchar_t *SetupFNameW;	// "TERATERM.INI" ‚Ìƒtƒ‹ƒpƒX
-	wchar_t *KeyCnfFNW;		// "KEYBOARD.CNF" ‚Ìƒtƒ‹ƒpƒX
+	wchar_t *HomeDirW;		// å€‹äººè¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€
+	wchar_t *SetupFNameW;	// "TERATERM.INI" ã®ãƒ•ãƒ«ãƒ‘ã‚¹
+	wchar_t *KeyCnfFNW;		// "KEYBOARD.CNF" ã®ãƒ•ãƒ«ãƒ‘ã‚¹
 	wchar_t *LogFNW;
 	wchar_t *MacroFNW;
-	wchar_t *UILanguageFileW;			// â‘ÎƒpƒX
+	wchar_t *UILanguageFileW;			// çµ¶å¯¾ãƒ‘ã‚¹
 	wchar_t *reserve_UILanguageFileW_ini;
-	wchar_t *ExeDirW;					// ttermpro.exe ‚Ì‚ ‚éƒtƒHƒ‹ƒ_
-	wchar_t *LogDirW;					// ƒvƒƒOƒ‰ƒ€‚Ì“®ì‚Ìlog‚âƒ_ƒ“ƒv‚ğ’u‚­ƒtƒHƒ‹ƒ_AGetLogDirW() ‚Æ“¯ˆêB’[––‚ÌƒƒO‚Í GetTermLogDir() ‚Åæ“¾B
-	wchar_t *FileDirW;					// ƒtƒ@ƒCƒ‹“]‘——pƒtƒHƒ‹ƒ_("%APPDATA%" “™‚ªŠÜ‚Ü‚ê‚é,g—p‘O‚ÉŠÂ‹«•Ï”‚ğ“WŠJ‚·‚é, GetFileDir()‚ğ—˜—p‚·‚é‚Æ•Ö—˜)
-	wchar_t *LogDefaultPathW;			// ƒƒOƒtƒHƒ‹ƒ_([file]/[log]ƒƒjƒ…[‚ÌƒƒO)
+	wchar_t *ExeDirW;					// ttermpro.exe ã®ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€
+	wchar_t *LogDirW;					// ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®å‹•ä½œã®logã‚„ãƒ€ãƒ³ãƒ—ã‚’ç½®ããƒ•ã‚©ãƒ«ãƒ€ã€GetLogDirW() ã¨åŒä¸€ã€‚ç«¯æœ«ã®ãƒ­ã‚°ã¯ GetTermLogDir() ã§å–å¾—ã€‚
+	wchar_t *FileDirW;					// ãƒ•ã‚¡ã‚¤ãƒ«è»¢é€ç”¨ãƒ•ã‚©ãƒ«ãƒ€("%APPDATA%" ç­‰ãŒå«ã¾ã‚Œã‚‹,ä½¿ç”¨å‰ã«ç’°å¢ƒå¤‰æ•°ã‚’å±•é–‹ã™ã‚‹, GetFileDir()ã‚’åˆ©ç”¨ã™ã‚‹ã¨ä¾¿åˆ©)
+	wchar_t *LogDefaultPathW;			// ãƒ­ã‚°ãƒ•ã‚©ãƒ«ãƒ€([file]/[log]ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ãƒ­ã‚°)
 	HINSTANCE PluginVTIconInstance;
 	WORD PluginVTIconID;
-	HINSTANCE TeraTermInstance;
+	HINSTANCE TeraTermInstance;			// WinMain() 1ç•ªç›®ã®å¼•æ•°
 	WORD WindowCornerDontround;
 	wchar_t DialogFontNameW[LF_FACESIZE];
 	BOOL NotifySound;
@@ -601,6 +603,16 @@ struct tttset {
 	WORD AutoComPortReconnectDelayIllegal;		// (ms)
 	WORD AutoComPortReconnectRetryInterval;		// (ms)
 	WORD AutoComPortReconnectRetryCount;		// 0~
+	int nCmdShow;						// WinMain() 4ç•ªç›®ã®å¼•æ•°ã®å€¤
+	WORD VTDrawAPI_ini;					// iniä¿å­˜æ™‚ã€TRUEã®æ™‚API="auto"ã§ä¿å­˜ã™ã‚‹
+	WORD VTDrawAPI;
+	WORD VTDrawAnsiCodePage_ini;		// iniä¿å­˜æ™‚ã€TRUEã®æ™‚ACP=0ã§ä¿å­˜ã™ã‚‹
+	WORD VTDrawAnsiCodePage;
+	char FileReceiveFilter[128];
+	WORD ReceivefileSkipOptionDialog;
+	int ReceivefileAutoStopWaitTime;
+	int FlowCtrlRTS;
+	int FlowCtrlDTR;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;
@@ -613,20 +625,6 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdCRLF 2
 #define IdLF   3
 #define IdAUTO 4
-
-  /* Terminal ID */
-#define IdVT100  1
-#define IdVT100J 2
-#define IdVT101  3
-#define IdVT102  4
-#define IdVT102J 5
-#define IdVT220J 6
-#define IdVT282  7
-#define IdVT320  8
-#define IdVT382  9
-#define IdVT420  10
-#define IdVT520  11
-#define IdVT525  12
 
 #define TermWidthMax  1000
 #define TermHeightMax 500
@@ -700,6 +698,11 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdFlowHard 2    // RTS/CTS(hardware flow)
 #define IdFlowNone 3
 #define IdFlowHardDsrDtr 4  // DSR/DTR(hardware flow)
+  /* RTS,DTR Flow control ID */
+#define IdDisable   0
+#define IdEnable    1
+#define IdHandshake 2
+#define IdToggle    3
 
 /* Control Characters */
 
@@ -771,7 +774,7 @@ typedef struct tttset TTTSet, *PTTSet;
 #define PM   0x9E
 #define APC  0x9F
 
-#define InBuffSize  1024
+#define InBuffSize  (1024*16)
 #define OutBuffSize (1024*16)
 
 typedef struct {
@@ -801,9 +804,9 @@ typedef struct {
 	WORD reserve_Language;
 	/* from TermSet */
 	WORD CRSend;
-	WORD KanjiCodeEcho; 	// íœ
+	WORD KanjiCodeEcho; 	// å‰Šé™¤
 	WORD reserve_JIS7KatakanaEcho;
-	WORD KanjiCodeSend;		// íœ
+	WORD KanjiCodeSend;		// å‰Šé™¤
 	WORD reserve_JIS7KatakanaSend;
 	WORD reserve_KanjiIn;
 	WORD reserve_KanjiOut;
@@ -868,6 +871,8 @@ typedef struct {
 
 	void *StateSend;
 	void *StateEcho;
+
+	CRITICAL_SECTION InBuff_lock;
 } TComVar;
 typedef TComVar *PComVar;
 
@@ -887,7 +892,7 @@ typedef TComVar *PComVar;
 #define ID_WINDOW_UNDO         50816
 #define ID_TEKWINDOW_WINDOW    51810
 
-#define ID_TRANSFER      9 // the position on [File] menu
+#define ID_TRANSFER      12 // the position on [File] menu
 #define ID_SHOWMENUBAR   995
 
 #define MAXNWIN 256

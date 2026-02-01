@@ -53,7 +53,7 @@ static const TKanjiList KanjiList[] = {
 	{ IdISO8859_14,		"ISO8859-14 Latin-8 Celtic",					"ISO8859-14" },
 	{ IdISO8859_15,		"ISO8859-15 Latin-9",							"ISO8859-15" },
 	{ IdISO8859_16,		"ISO8859-16 Latin-10 South-Eastern European",	"ISO8859-16" },
-	// “ú–{Œê
+	// æ—¥æœ¬èª
 	{ IdSJIS,			"SJIS (CP932)",				"SJIS" },
 	{ IdEUC,			NULL,						"EUC-JP" },
 	{ IdEUC,			"EUC",						"EUC" },
@@ -77,7 +77,7 @@ static const TKanjiList KanjiList[] = {
 	{ IdKoreanCP949,	"KS5601 (CP949)",			"KS5601" },
 	{ IdCnGB2312,		"GB2312 (CP936)",			"GB2312" },
 	{ IdCnBig5,			"Big5 (CP950)",				"BIG5" },
-	// «https://www.unicode.org/L2/L1999/99325-E.htm
+	// â†“https://www.unicode.org/L2/L1999/99325-E.htm
 	{ IdCP437,			"CP437 Latin (US)",			"CP437" },
 	{ IdCP737,			"CP737 Greek (A)",			"CP737" },
 	{ IdCP775,			"CP775 BaltRim",			"CP775" },
@@ -94,7 +94,7 @@ static const TKanjiList KanjiList[] = {
 	{ IdCP866,			"CP866 Cyrillic Russian",	"CP866" },
 	{ IdCP869,			"CP869 Greek (B)",			"CP869" },
 	{ IdCP874,			"CP874 Thai",				"CP874" },
-	// «https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
+	// â†“https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
 	{ IdCP1250,			"CP1250 Central European",	"CP1250" },
 	{ IdCP1251,			"CP1251 Cyrillic",			"CP1251" },
 	{ IdCP1252,			"CP1252 Latin 1",			"CP1252" },
@@ -107,8 +107,8 @@ static const TKanjiList KanjiList[] = {
 };
 
 /**
- *	\‘¢‘Ì‚Ì1—v‘f‚ğæ“¾
- *	”ÍˆÍŠO‚É‚È‚Á‚½‚çNULL‚ª•Ô‚é
+ *	æ§‹é€ ä½“ã®1è¦ç´ ã‚’å–å¾—
+ *	ç¯„å›²å¤–ã«ãªã£ãŸã‚‰NULLãŒè¿”ã‚‹
  */
 const TKanjiList *GetKanjiList(int index)
 {
@@ -119,12 +119,12 @@ const TKanjiList *GetKanjiList(int index)
 }
 
 /**
- *	Š¿šƒR[ƒh•¶š—ñ‚ğæ“¾
- *	iniƒtƒ@ƒCƒ‹‚É•Û‘¶‚·‚éŠ¿šƒR[ƒh•¶š—ñ—p
+ *	æ¼¢å­—ã‚³ãƒ¼ãƒ‰æ–‡å­—åˆ—ã‚’å–å¾—
+ *	iniãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã™ã‚‹æ¼¢å­—ã‚³ãƒ¼ãƒ‰æ–‡å­—åˆ—ç”¨
  *
  *	@param[in]	kanji_code (=ts.KanjiCode (receive) or ts.KanjiCodeSend)
  *						IdEUC, IdJIS, IdUTF8, ...
- *	@return	Š¿šƒR[ƒh•¶š—ñ
+ *	@return	æ¼¢å­—ã‚³ãƒ¼ãƒ‰æ–‡å­—åˆ—
  */
 const char *GetKanjiCodeStr(int kanji_code)
 {
@@ -137,12 +137,12 @@ const char *GetKanjiCodeStr(int kanji_code)
 }
 
 /**
- *	Š¿šƒR[ƒh‚ğæ“¾
- *	iniƒtƒ@ƒCƒ‹‚É•Û‘¶‚³‚ê‚Ä‚¢‚éŠ¿šƒR[ƒh•¶š—ñ‚ğŠ¿šƒR[ƒh‚É•ÏŠ·‚·‚é
+ *	æ¼¢å­—ã‚³ãƒ¼ãƒ‰ã‚’å–å¾—
+ *	iniãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã•ã‚Œã¦ã„ã‚‹æ¼¢å­—ã‚³ãƒ¼ãƒ‰æ–‡å­—åˆ—ã‚’æ¼¢å­—ã‚³ãƒ¼ãƒ‰ã«å¤‰æ›ã™ã‚‹
 
  *	@param[in]	kanji_code_str
- *						Š¿šƒR[ƒh•¶š—ñ
- *	@return	Š¿šƒR[ƒh
+ *						æ¼¢å­—ã‚³ãƒ¼ãƒ‰æ–‡å­—åˆ—
+ *	@return	æ¼¢å­—ã‚³ãƒ¼ãƒ‰
  */
 int GetKanjiCodeFromStr(const char *kanji_code_str)
 {

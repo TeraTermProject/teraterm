@@ -1001,7 +1001,7 @@ void GraphText(PTEKVar tk, PTTSet ts, PComVar cv, BYTE b)
 {
   int i, Dx[80];
   HFONT TempFont, TempOld;
-  LOGFONT lf;
+  LOGFONTW lf;
   RECT R;
   int W, H;
   TEXTMETRIC Metrics;
@@ -1018,7 +1018,7 @@ void GraphText(PTEKVar tk, PTTSet ts, PComVar cv, BYTE b)
       if ((tk->GTCount>=sizeof(tk->GTBuff)) ||
 	  (tk->GTCount>=tk->GTLen))
       {
-	memcpy(&lf,&tk->TEKlf,sizeof(lf));
+	lf = tk->TEKlf;
 	switch (tk->GTAngle) {
 	  case 0: lf.lfEscapement = 0; break;
 	  case 1: lf.lfEscapement = 900; break;
@@ -1031,7 +1031,7 @@ void GraphText(PTEKVar tk, PTTSet ts, PComVar cv, BYTE b)
 		  (float)tk->ScreenHeight);
 	lf.lfWidth = W;
 	lf.lfHeight = H;
-	TempFont = CreateFontIndirect(&lf);
+	TempFont = CreateFontIndirectW(&lf);
 	TempOld = SelectObject(tk->MemDC,TempFont);
 	W = (int)((float)(tk->GTWidth + tk->GTSpacing) /
 		  (float)ViewSizeX *

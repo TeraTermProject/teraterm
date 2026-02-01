@@ -43,10 +43,8 @@
 #include "buffer.h"
 #include "vtterm.h"
 #include "vtwin.h"
-#include "clipboar.h"
 #include "filesys.h"
 #include "telnet.h"
-#include "tektypes.h"
 #include "tekwin.h"
 #include "ttdde.h"
 #include "keyboard.h"
@@ -71,12 +69,13 @@ static BOOL AddFontFlag;
 static wchar_t *TSpecialFont;
 CVTWindow* pVTWin;
 static DWORD HtmlHelpCookie;
+HANDLE hIdleTimer;
 
 static void LoadSpecialFont(void)
 {
 	wchar_t *mod_path;
 	if (IsExistFontW(L"Tera Special", SYMBOL_CHARSET, TRUE)) {
-		// ‚·‚Å‚É‘¶İ‚·‚é‚Ì‚Åƒ[ƒh‚µ‚È‚¢
+		// ã™ã§ã«å­˜åœ¨ã™ã‚‹ã®ã§ãƒ­ãƒ¼ãƒ‰ã—ãªã„
 		return;
 	}
 
@@ -88,16 +87,16 @@ static void LoadSpecialFont(void)
 	aswprintf(&TSpecialFont, L"%s\\TSPECIAL1.TTF", mod_path);
 	free(mod_path);
 
-	// teraterm.exe‚Ì‚İ‚Å—LŒø‚ÈƒtƒHƒ“ƒg‚Æ‚È‚éB
-	// remove‚µ‚È‚­‚Ä‚àI—¹‚·‚é‚ÆOS‚©‚ç‚È‚­‚È‚é
+	// teraterm.exeã®ã¿ã§æœ‰åŠ¹ãªãƒ•ã‚©ãƒ³ãƒˆã¨ãªã‚‹ã€‚
+	// removeã—ãªãã¦ã‚‚çµ‚äº†ã™ã‚‹ã¨OSã‹ã‚‰ãªããªã‚‹
 	int r = 0;
 	if (pAddFontResourceExW != NULL) {
 		r = pAddFontResourceExW(TSpecialFont, FR_PRIVATE, NULL);
 	}
 	if (r == 0) {
-		// AddFontResourceEx() ‚ªg‚¦‚È‚©‚Á‚½
-		// ƒVƒXƒeƒ€‘S‘Ì‚Åg‚¦‚éƒtƒHƒ“ƒg‚Æ‚È‚é
-		// remove‚µ‚È‚¢‚ÆOS‚ª’Í‚ñ‚¾‚Ü‚Ü‚Æ‚È‚é
+		// AddFontResourceEx() ãŒä½¿ãˆãªã‹ã£ãŸ
+		// ã‚·ã‚¹ãƒ†ãƒ å…¨ä½“ã§ä½¿ãˆã‚‹ãƒ•ã‚©ãƒ³ãƒˆã¨ãªã‚‹
+		// removeã—ãªã„ã¨OSãŒæ´ã‚“ã ã¾ã¾ã¨ãªã‚‹
 		r = AddFontResourceW(TSpecialFont);
 	}
 	if (r != 0) {
@@ -130,14 +129,17 @@ static void init(void)
 #endif
 }
 
-// Tera Term main engine
-static BOOL OnIdle(LONG lCount)
+/**
+ * Tera Term main engine
+ *
+ *	@retval	FALSE	ã™ãã«å‡¦ç†ã™ã‚‹å¿…è¦ãªã—
+ *	@retval	TRUE	å¼•ãç¶šãå‡¦ç†ã™ã‚‹å¿…è¦ã‚ã‚Š
+ */
+BOOL OnIdle(LONG lCount)
 {
-	static int Busy = 2;
 	int nx, ny;
 	BOOL Size;
-
-	if (lCount==0) Busy = 2;
+	(void)lCount;
 
 	if (cv.Ready)
 	{
@@ -164,17 +166,17 @@ static BOOL OnIdle(LONG lCount)
 				switch (ActiveWin) {
 				case IdVT:
 					Change = pVTWin->Parse();
-					// TEK window‚ÌƒAƒNƒeƒBƒu’†‚É pause ‚ğg‚¤‚ÆACPUg—p—¦100%‚Æ‚È‚é
-					// Œ»Û‚Ö‚Ìb’è‘ÎˆB(2006.2.6 yutaka)
-					// ‘Ò‚¿ŠÔ‚ğ‚È‚­‚µAƒRƒ“ƒeƒLƒXƒgƒXƒCƒbƒ`‚¾‚¯‚É‚·‚éB(2006.3.20 yutaka)
+					// TEK windowã®ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ä¸­ã« pause ã‚’ä½¿ã†ã¨ã€CPUä½¿ç”¨ç‡100%ã¨ãªã‚‹
+					// ç¾è±¡ã¸ã®æš«å®šå¯¾å‡¦ã€‚(2006.2.6 yutaka)
+					// å¾…ã¡æ™‚é–“ã‚’ãªãã—ã€ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚¹ã‚¤ãƒƒãƒã ã‘ã«ã™ã‚‹ã€‚(2006.3.20 yutaka)
 					Sleep(0);
 					break;
 
 				case IdTEK:
 					if (pTEKWin != NULL) {
 						Change = ((CTEKWindow*)pTEKWin)->Parse();
-						// TEK window‚ÌƒAƒNƒeƒBƒu’†‚É pause ‚ğg‚¤‚ÆACPUg—p—¦100%‚Æ‚È‚é
-						// Œ»Û‚Ö‚Ìb’è‘ÎˆB(2006.2.6 yutaka)
+						// TEK windowã®ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ä¸­ã« pause ã‚’ä½¿ã†ã¨ã€CPUä½¿ç”¨ç‡100%ã¨ãªã‚‹
+						// ç¾è±¡ã¸ã®æš«å®šå¯¾å‡¦ã€‚(2006.2.6 yutaka)
 						Sleep(1);
 					}
 					else {
@@ -217,26 +219,29 @@ static BOOL OnIdle(LONG lCount)
 
 		/* Receiver */
 		if (DDELog && DDEGetCount() > 0) {
-			// ƒƒOƒoƒbƒtƒ@‚ª‚Ü‚¾DDEƒNƒ‰ƒCƒAƒ“ƒg‚Ö‘—‚ç‚ê‚Ä‚¢‚È‚¢ê‡‚ÍA
-			// TCPƒpƒPƒbƒg‚ÌóM‚ğs‚í‚È‚¢B
-			// ˜A‘±‚µ‚ÄóM‚ğs‚¤‚ÆAƒƒOƒoƒbƒtƒ@‚ªƒ‰ƒEƒ“ƒhƒƒrƒ“‚É‚æ‚è–¢‘—M‚Ìƒf[ƒ^‚ğ
-			// ã‘‚«‚µ‚Ä‚µ‚Ü‚¤‰Â”\«‚ª‚ ‚éB(2007.6.14 yutaka)
+			// ãƒ­ã‚°ãƒãƒƒãƒ•ã‚¡ãŒã¾ã DDEã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã¸é€ã‚‰ã‚Œã¦ã„ãªã„å ´åˆã¯ã€
+			// TCPãƒ‘ã‚±ãƒƒãƒˆã®å—ä¿¡ã‚’è¡Œã‚ãªã„ã€‚
+			// é€£ç¶šã—ã¦å—ä¿¡ã‚’è¡Œã†ã¨ã€ãƒ­ã‚°ãƒãƒƒãƒ•ã‚¡ãŒãƒ©ã‚¦ãƒ³ãƒ‰ãƒ­ãƒ“ãƒ³ã«ã‚ˆã‚Šæœªé€ä¿¡ã®ãƒ‡ãƒ¼ã‚¿ã‚’
+			// ä¸Šæ›¸ãã—ã¦ã—ã¾ã†å¯èƒ½æ€§ãŒã‚ã‚‹ã€‚(2007.6.14 yutaka)
 
 		} else {
-			CommReceive(&cv);
+			if (cv.PortType == IdSerial) {
+				// ã‚·ãƒªã‚¢ãƒ«æ¥ç¶šã§ã¯ã€åˆ¥ã‚¹ãƒ¬ãƒƒãƒ‰ CommThread() ã§COMãƒãƒ¼ãƒˆã‹ã‚‰èª­ã¿å‡ºã—ã‚’è¡Œã£ã¦ã„ã‚‹ãŸã‚ã€
+				// CommReceive() ã®å‘¼ã³å‡ºã—ã¯ä¸è¦ã€‚
+			} else {
+				CommReceive(&cv);
+			}
 		}
 
 	}
 
+	BOOL Busy = FALSE;
 	if (cv.Ready &&
 	    (cv.RRQ || (cv.OutBuffCount>0) || (cv.InBuffCount>0) || (cv.FlushLen>0) || FLogGetCount() > 0 || (DDEGetCount()>0)) ) {
-		Busy = 2;
-	}
-	else {
-		Busy--;
+		Busy = TRUE;
 	}
 
-	return (Busy>0);
+	return Busy;
 }
 
 static HWND main_window;
@@ -316,11 +321,12 @@ void RemoveModelessHandle(HWND hWnd)
 	modeless_dlg.Remove(hWnd);
 }
 
+#if 0 // not used
 static UINT nMsgLast;
 static POINT ptCursorLast;
 
 /**
- *	idleó‘Ô‚É“ü‚é‚©”»’è‚·‚é
+ *	idleçŠ¶æ…‹ã«å…¥ã‚‹ã‹åˆ¤å®šã™ã‚‹
  */
 static BOOL IsIdleMessage(const MSG* pMsg)
 {
@@ -330,7 +336,7 @@ static BOOL IsIdleMessage(const MSG* pMsg)
 		if (pMsg->message == nMsgLast &&
 			pMsg->pt.x == ptCursorLast.x &&
 			pMsg->pt.y == ptCursorLast.y)
-		{	// “¯‚¶ˆÊ’u‚¾‚Á‚½‚çidle‚É‚Í‚¢‚ç‚È‚¢
+		{	// åŒã˜ä½ç½®ã ã£ãŸã‚‰idleã«ã¯ã„ã‚‰ãªã„
 			return FALSE;
 		}
 
@@ -347,13 +353,18 @@ static BOOL IsIdleMessage(const MSG* pMsg)
 
 	return TRUE;
 }
+#endif
+
+VOID CALLBACK IdleTimerProc(PVOID lpParam, BOOLEAN TimerOrWaitFired)
+{
+	SendMessage(main_window, WM_USER_IDLETIMER, 0, 0);
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
 	(void)hPreInst;
 	(void)lpszCmdLine;
-	(void)nCmdShow;
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
@@ -362,6 +373,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	setlocale(LC_ALL, "");
 
 	ts.TeraTermInstance = hInstance;
+	ts.nCmdShow = nCmdShow;
 	hInst = hInstance;
 	init();
 	_HtmlHelpW(NULL, NULL, HH_INITIALIZE, (DWORD_PTR)&HtmlHelpCookie);
@@ -374,32 +386,55 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);
 	pVTWin = m_pMainWnd;
 	main_window = m_pMainWnd->m_hWnd;
-	// [Tera Term]ƒZƒNƒVƒ‡ƒ“‚ÌDLG_SYSTEM_FONT‚ğ‚Æ‚è‚ ‚¦‚¸ƒZƒbƒg‚·‚é
+
+	// [Tera Term]ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã®DLG_SYSTEM_FONTã‚’ã¨ã‚Šã‚ãˆãšã‚»ãƒƒãƒˆã™ã‚‹
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 
-	BOOL bIdle = TRUE;	// idleó‘Ô‚©?
+	CreateTimerQueueTimer(&hIdleTimer, NULL, IdleTimerProc, 0, IdleTimerPeriod, 0, WT_EXECUTEDEFAULT);
+
 	LONG lCount = 0;
 	MSG msg;
 	for (;;) {
-		// idleó‘Ô‚ÅƒƒbƒZ[ƒW‚ª‚È‚¢ê‡
-		while (bIdle) {
-			if (::PeekMessageA(&msg, NULL, NULL, NULL, PM_NOREMOVE) != FALSE) {
-				// ƒƒbƒZ[ƒW‚ª‘¶İ‚·‚é
-				break;
-			}
-
+		// idleçŠ¶æ…‹ã§ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒãªã„å ´åˆ
+		DWORD idle_enter_tick = GetTickCount();
+		BOOL sleep_enable = FALSE;
+		for (;;) {
+			// idleå‡¦ç†ã‚’è¡Œã†
+			//		- GetMessage()ã§ãƒ–ãƒ­ãƒƒã‚¯ã™ã‚‹ã¨ã€
+			//		  ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦éè¡¨ç¤ºæ™‚ã«idleå‡¦ç†ãŒã§ããªã„
+			//		- ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã‚’ç´ æ—©ãè¡Œã‚ãªã‘ã‚Œã°
+			//		  SCPã®ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®å‡¦ç†ãŒé…ããªã‚Šè»¢é€ãŒæ»ã‚‹
+			//		- é«˜é€Ÿã§å‡¦ç†ã‚’è¡Œã†ã¨CPUæ™‚é–“ã‚’æ¶ˆè²»ã—ã¦ã—ã¾ã†
+			//	20msã¯é«˜é€Ÿã«å‡¦ç†ã—ã¦ã€ãã®å¾ŒSleep()ã™ã‚‹ã“ã¨ã§ãƒãƒ©ãƒ³ã‚¹ã‚’å–ã‚‹
 			const BOOL continue_idle = OnIdle(lCount++);
 			if (!continue_idle) {
-				// FALSE‚ª–ß‚Á‚Ä‚«‚½‚çidleˆ—‚Í•s—v
-				bIdle = FALSE;
+				// FALSEãŒæˆ»ã£ã¦ããŸã‚‰idleå‡¦ç†ã¯ä¸è¦
+				if (!sleep_enable) {
+					if (GetTickCount() - idle_enter_tick > 20) {
+						// 20msä»¥ä¸Šidleå‡¦ç†ä¸è¦ã ã£ãŸã‚‰Sleep()ã‚’å…¥ã‚Œã‚‹
+						sleep_enable = TRUE;
+					}
+				}
+				if (sleep_enable) {
+					Sleep(2);
+				}
+				lCount = 0;
+			}
+			else {
+				idle_enter_tick = GetTickCount();
+				sleep_enable = FALSE;
+			}
+
+			if (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) != FALSE) {
+				// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒå­˜åœ¨ã™ã‚‹
 				break;
 			}
 		}
 
-		// ƒƒbƒZ[ƒW‚ª‹ó‚É‚È‚é‚Ü‚Åˆ—‚·‚é
+		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒç©ºã«ãªã‚‹ã¾ã§å‡¦ç†ã™ã‚‹
 		for(;;) {
-			// ƒƒbƒZ[ƒW‚ª‰½‚à‚È‚¢ê‡AGetMessage()‚ÅƒuƒƒbƒN‚·‚é‚±‚Æ‚ª‚ ‚é
+			// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒä½•ã‚‚ãªã„å ´åˆã€GetMessage()ã§ãƒ–ãƒ­ãƒƒã‚¯ã™ã‚‹ã“ã¨ãŒã‚ã‚‹
 			if (::GetMessageW(&msg, NULL, 0, 0) == FALSE) {
 				// WM_QUIT
 				goto exit_message_loop;
@@ -410,9 +445,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 
 				if (m_pMainWnd->m_hAccel != NULL) {
 					if (!MetaKey(ts.MetaKey)) {
-						// matakey‚ª‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢
-						if (::TranslateAcceleratorW(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg)) {
-							// ƒAƒNƒZƒ‰ƒŒ[ƒ^[ƒL[‚ğˆ—‚µ‚½
+						// matakeyãŒæŠ¼ã•ã‚Œã¦ã„ãªã„
+						if (::TranslateAcceleratorW(m_pMainWnd->m_hWnd, m_pMainWnd->m_hAccel, &msg)) {
+							// ã‚¢ã‚¯ã‚»ãƒ©ãƒ¬ãƒ¼ã‚¿ãƒ¼ã‚­ãƒ¼ã‚’å‡¦ç†ã—ãŸ
 							message_processed = true;
 						}
 					}
@@ -424,19 +459,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				}
 			}
 
-			// idleó‘Ô‚É“ü‚é‚©?
-			if (IsIdleMessage(&msg)) {
-				bIdle = TRUE;
-				lCount = 0;
-			}
+//			// idleçŠ¶æ…‹ã«å…¥ã‚‹ã‹?
+//			if (IsIdleMessage(&msg)) {
+//				lCount = 0;
+//			}
 
-			if (::PeekMessageA(&msg, NULL, NULL, NULL, PM_NOREMOVE) == FALSE) {
-				// ƒƒbƒZ[ƒW‚ª‚È‚­‚È‚Á‚½
+			if (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) == FALSE) {
+				// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒãªããªã£ãŸ
 				break;
 			}
 		}
 	}
 exit_message_loop:
+
+	DeleteTimerQueueTimer(NULL, hIdleTimer, NULL);
 
 	delete m_pMainWnd;
 	m_pMainWnd = NULL;

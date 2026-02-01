@@ -77,7 +77,7 @@ static void TelSendNOP();
 static void TelStopKeepAliveThread();
 
 /**
- *	@retval ‘‚«‚İƒoƒCƒg”
+ *	@retval æ›¸ãè¾¼ã¿ãƒã‚¤ãƒˆæ•°
  */
 static UINT win16_lwrite(HANDLE hFile, const char*buf, UINT length)
 {
@@ -275,7 +275,7 @@ static void ParseTelSB(BYTE b)
 		switch (b) {
 		case SE:
 			if (tr.SubOptCount <= 1) {
-				// ƒpƒ‰ƒ[ƒ^‚È‚µ‚Ì Sub Option ‚Í–³‚¢‚Æv‚í‚ê‚é‚Ì‚Å‚±‚±‚Å‚Í‚¶‚­
+				// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãªã—ã® Sub Option ã¯ç„¡ã„ã¨æ€ã‚ã‚Œã‚‹ã®ã§ã“ã“ã§ã¯ã˜ã
 				tr.SubOptCount = 0;
 				TelStatus = TelIdle;
 				return ;
@@ -286,7 +286,7 @@ static void ParseTelSB(BYTE b)
 				if ((tr.MyOpt[TERMTYPE].Status == Yes) && (tr.SubOptBuff[1] == 1)) {
 					_snprintf_s(TmpStr, sizeof(TmpStr), _TRUNCATE, "%c%c%c%c%s%c%c",
 						IAC, SB, TERMTYPE, 0, ts.TermType, IAC, SE);
-					// 4 ƒoƒCƒg–Ú‚É 0 ‚ª“ü‚é‚Ì‚ÅA‚¸‚ç‚µ‚Ä’·‚³‚ğ‚Æ‚é
+					// 4 ãƒã‚¤ãƒˆç›®ã« 0 ãŒå…¥ã‚‹ã®ã§ã€ãšã‚‰ã—ã¦é•·ã•ã‚’ã¨ã‚‹
 					i = strlen(TmpStr + 4) + 4;
 					CommRawOut(&cv, TmpStr, i);
 
@@ -308,7 +308,7 @@ static void ParseTelSB(BYTE b)
 					_snprintf_s(TmpStr, sizeof(TmpStr), _TRUNCATE,
 						"%c%c%c%c%d,%d%c%c", IAC, SB, TERMSPEED, 0,
 						ts.TerminalInputSpeed, ts.TerminalOutputSpeed, IAC, SE);
-					// 4 ƒoƒCƒg–Ú‚É 0 ‚ª“ü‚é‚Ì‚ÅA‚¸‚ç‚µ‚Ä’·‚³‚ğ‚Æ‚é
+					// 4 ãƒã‚¤ãƒˆç›®ã« 0 ãŒå…¥ã‚‹ã®ã§ã€ãšã‚‰ã—ã¦é•·ã•ã‚’ã¨ã‚‹
 					i = strlen(TmpStr + 4) + 4;
 					CommRawOut(&cv, TmpStr, i);
 
@@ -324,16 +324,16 @@ static void ParseTelSB(BYTE b)
 
 		case IAC:
 			/*
-			 * ˜A‘±‚µ‚½ IAC ‚Í’l‚ª 255 ‚Ìƒf[ƒ^‚Æ‚µ‚Äˆµ‚¤
-			 * ŠÖ”‚ÌÅŒã‚Ì•”•ª‚Å SubOptBuff ‚Éƒf[ƒ^‚ª’Ç‰Á‚³‚ê‚é‚Ì‚ÅA
-			 * ‚±‚±‚Å‚Í‰½‚às‚í‚È‚¢
+			 * é€£ç¶šã—ãŸ IAC ã¯å€¤ãŒ 255 ã®ãƒ‡ãƒ¼ã‚¿ã¨ã—ã¦æ‰±ã†
+			 * é–¢æ•°ã®æœ€å¾Œã®éƒ¨åˆ†ã§ SubOptBuff ã«ãƒ‡ãƒ¼ã‚¿ãŒè¿½åŠ ã•ã‚Œã‚‹ã®ã§ã€
+			 * ã“ã“ã§ã¯ä½•ã‚‚è¡Œã‚ãªã„
 			 */
 			break;
 
 		default:
 			/*
-			 * ƒTƒuƒIƒvƒVƒ‡ƒ“’†‚É‘¼‚Ì TELNET ƒRƒ}ƒ“ƒh‚ª—ˆ‚½ê‡‚Ìˆµ‚¢‚Í
-			 * Œˆ‚Ü‚Á‚Ä‚¢‚È‚¢B‚Æ‚è‚ ‚¦‚¸ƒf[ƒ^‚Æ‚µ‚Ä’Ç‰Á‚µ‚Ä‚¨‚­B
+			 * ã‚µãƒ–ã‚ªãƒ—ã‚·ãƒ§ãƒ³ä¸­ã«ä»–ã® TELNET ã‚³ãƒãƒ³ãƒ‰ãŒæ¥ãŸå ´åˆã®æ‰±ã„ã¯
+			 * æ±ºã¾ã£ã¦ã„ãªã„ã€‚ã¨ã‚Šã‚ãˆãšãƒ‡ãƒ¼ã‚¿ã¨ã—ã¦è¿½åŠ ã—ã¦ãŠãã€‚
 			 */
 			if (tr.SubOptCount >= sizeof(tr.SubOptBuff)-1) {
 				tr.SubOptCount = 0;
@@ -888,7 +888,7 @@ static INT_PTR CALLBACK telnet_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp
 		break;
 
 	case WM_CLOSE:
-		// closeƒ{ƒ^ƒ“‚ª‰Ÿ‰º‚³‚ê‚Ä‚à window ‚ª•Â‚¶‚È‚¢‚æ‚¤‚É‚·‚éB
+		// closeãƒœã‚¿ãƒ³ãŒæŠ¼ä¸‹ã•ã‚Œã¦ã‚‚ window ãŒé–‰ã˜ãªã„ã‚ˆã†ã«ã™ã‚‹ã€‚
 		return TRUE;
 
 	case WM_DESTROY:
@@ -927,7 +927,7 @@ void TelStartKeepAliveThread(void)
 	if (ts.TelKeepAliveInterval > 0) {
 		nop_interval = ts.TelKeepAliveInterval;
 
-		// ƒ‚[ƒhƒŒƒXƒ_ƒCƒAƒƒO‚ğ’Ç‰Á (2007.12.26 yutaka)
+		// ãƒ¢ãƒ¼ãƒ‰ãƒ¬ã‚¹ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¿½åŠ  (2007.12.26 yutaka)
 		keepalive_dialog = CreateDialog(hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
 										HVTWin, telnet_heartbeat_dlg_proc);
 

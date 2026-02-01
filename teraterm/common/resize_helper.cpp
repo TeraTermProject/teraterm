@@ -73,7 +73,7 @@ ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg, BOOL size_box)
 	}
 	LONG_PTR style = GetWindowLongPtrW(dlg, GWL_STYLE);
 	if ((style & WS_THICKFRAME) == 0) {
-		// WS_THICKFRAME (=WS_SIZEBOX) ƒXƒ^ƒCƒ‹‚ª‚È‚¢‚Æ resize‚Å‚«‚È‚¢
+		// WS_THICKFRAME (=WS_SIZEBOX) ã‚¹ã‚¿ã‚¤ãƒ«ãŒãªã„ã¨ resizeã§ããªã„
 		assert(FALSE);
 	}
 	GetWindowRect(dlg, &rect);
@@ -87,7 +87,7 @@ ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg, BOOL size_box)
 
 	if (size_box) {
 		HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(dlg, GWLP_HINSTANCE);
-		// ƒTƒCƒYƒ{ƒbƒNƒX‚ðì¬
+		// ã‚µã‚¤ã‚ºãƒœãƒƒã‚¯ã‚¹ã‚’ä½œæˆ
 		// SBS_SIZEBOX = SBS_SIZEGRIP
 		h->hWndSizeBox =
 			CreateWindowExW(
@@ -122,7 +122,7 @@ void ReiseDlgHelperAdd(ReiseDlgHelper_t *h, UINT id, ResizeHelperAnchor anchor)
 	}
 	HWND item = GetDlgItem(h->hWnd, id);
 	if (item == NULL) {
-		assert(item != NULL);	// ‘¶Ý‚µ‚È‚¢ID‚ªŽw’è‚³‚ê‚Ä‚¢‚é
+		assert(item != NULL);	// å­˜åœ¨ã—ãªã„IDãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹
 		return;
 	}
 #if _DEBUG
@@ -130,7 +130,7 @@ void ReiseDlgHelperAdd(ReiseDlgHelper_t *h, UINT id, ResizeHelperAnchor anchor)
 		char ClassName[32];
 		GetClassNameA(item, ClassName, _countof(ClassName));
 		if (strcmp(ClassName, "ListBox") == 0) {
-			// ListBox ‚Í LBS_NOINTEGRALHEIGHT ‘®«‚ª•K—v
+			// ListBox ã¯ LBS_NOINTEGRALHEIGHT å±žæ€§ãŒå¿…è¦
 			LONG_PTR r = GetWindowLongPtrW(item, GWL_STYLE);
 			assert((r & LBS_NOINTEGRALHEIGHT) != 0);
 		}
@@ -173,8 +173,8 @@ void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h)
 		height = rect.bottom - rect.top;
 
 		if ((p->anchor & RESIZE_HELPER_ANCHOR_NONE_H) != 0) {
-			// 1/2‚µ‚Ä‰Á‚¦‚é‚Ì‚ÅŠï”ƒTƒCƒY‚ÌƒŠƒTƒCƒY‚ª”­¶‚·‚é‚Æ
-			// ­‚µ‚Ã‚ÂˆÊ’u‚ª‚¸‚ê‚é
+			// 1/2ã—ã¦åŠ ãˆã‚‹ã®ã§å¥‡æ•°ã‚µã‚¤ã‚ºã®ãƒªã‚µã‚¤ã‚ºãŒç™ºç”Ÿã™ã‚‹ã¨
+			// å°‘ã—ã¥ã¤ä½ç½®ãŒãšã‚Œã‚‹
 			lt.x += delta_width / 2;
 		} else if ((p->anchor & RESIZE_HELPER_ANCHOR_LR) == RESIZE_HELPER_ANCHOR_LR) {
 			width += delta_width;
@@ -182,8 +182,8 @@ void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h)
 			lt.x += delta_width;
 		}
 		if ((p->anchor & RESIZE_HELPER_ANCHOR_NONE_V) != 0) {
-			// 1/2‚µ‚Ä‰Á‚¦‚é‚Ì‚ÅŠï”ƒTƒCƒY‚ÌƒŠƒTƒCƒY‚ª”­¶‚·‚é‚Æ
-			// ­‚µ‚Ã‚ÂˆÊ’u‚ª‚¸‚ê‚é
+			// 1/2ã—ã¦åŠ ãˆã‚‹ã®ã§å¥‡æ•°ã‚µã‚¤ã‚ºã®ãƒªã‚µã‚¤ã‚ºãŒç™ºç”Ÿã™ã‚‹ã¨
+			// å°‘ã—ã¥ã¤ä½ç½®ãŒãšã‚Œã‚‹
 			lt.y += delta_height / 2;
 		} else if ((p->anchor & RESIZE_HELPER_ANCHOR_TB) == RESIZE_HELPER_ANCHOR_TB) {
 			height += delta_height;
@@ -201,18 +201,18 @@ void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h)
 		SetSizeBoxPos(h);
 	}
 
-	// ˆÚ“®‚µ‚Ä‚¢‚é‚Æ‚«‚ÉƒRƒ“ƒgƒ[ƒ‹‚ªd‚È‚é‚Æ•\Ž¦‚ª—‚ê‚é‚±‚Æ‚ª‚ ‚é
-	// ‘S‘Ì‚ðÄ•`‰æ‚·‚é
+	// ç§»å‹•ã—ã¦ã„ã‚‹ã¨ãã«ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ãŒé‡ãªã‚‹ã¨è¡¨ç¤ºãŒä¹±ã‚Œã‚‹ã“ã¨ãŒã‚ã‚‹
+	// å…¨ä½“ã‚’å†æç”»ã™ã‚‹
 	InvalidateRect(h->hWnd, NULL, TRUE);
 }
 
 /**
- *	WM_GETMINMAXINFO ‚ðˆ—
+ *	WM_GETMINMAXINFO ã‚’å‡¦ç†
  */
 INT_PTR ReiseDlgHelper_WM_GETMINMAXINFO(ReiseDlgHelper_t *h, LPARAM lp)
 {
 	assert(h != NULL);
-	// ‰ŠúƒTƒCƒY‚ðÅ¬ƒTƒCƒY‚Æ‚·‚é
+	// åˆæœŸã‚µã‚¤ã‚ºã‚’æœ€å°ã‚µã‚¤ã‚ºã¨ã™ã‚‹
 	LPMINMAXINFO pmmi = (LPMINMAXINFO)lp;
 	pmmi->ptMinTrackSize.x = h->init_width;
 	pmmi->ptMinTrackSize.y = h->init_height;

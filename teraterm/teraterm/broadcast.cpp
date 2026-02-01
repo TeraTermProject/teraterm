@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// vtwin‚©‚ç•ª—£
+// vtwinã‹ã‚‰åˆ†é›¢
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -55,15 +55,14 @@
 #include "clipboar.h"	// for CBPreparePaste()
 #include "ttime.h"
 #include "history_store.h"
-#include "teraterml.h"
 
 #include "helpid.h"
 #include "broadcast.h"
 
 
-// WM_COPYDATA‚É‚æ‚éƒvƒƒZƒXŠÔ’ÊM‚Ìí•Ê (2005.1.22 yutaka)
-#define IPC_BROADCAST_COMMAND 1		// ‘S’[––‚Ö‘—M
-#define IPC_MULTICAST_COMMAND 2		// ”CˆÓ‚Ì’[––ŒQ‚Ö‘—M
+// WM_COPYDATAã«ã‚ˆã‚‹ãƒ—ãƒ­ã‚»ã‚¹é–“é€šä¿¡ã®ç¨®åˆ¥ (2005.1.22 yutaka)
+#define IPC_BROADCAST_COMMAND 1		// å…¨ç«¯æœ«ã¸é€ä¿¡
+#define IPC_MULTICAST_COMMAND 2		// ä»»æ„ã®ç«¯æœ«ç¾¤ã¸é€ä¿¡
 
 /*
  * COPYDATASTRUCT
@@ -78,7 +77,7 @@
  * cbData
  *  strlen(string) + 1
  *	(wcslen(string) + 1) * sizeof(wchar_t)
- *  buf‚Ì’¼Œã‚É‚Í \0 ‚Í•t‚©‚È‚¢
+ *  bufã®ç›´å¾Œã«ã¯ \0 ã¯ä»˜ã‹ãªã„
  *
  * dwData
  *  IPC_MULTICAST_COMMAND
@@ -90,15 +89,15 @@
  * cbData
  *  strlen(string) + 1 + strlen(string)
  *	(wcslen(name) + 1 + wcslen(string)) * sizeof(wchar_t)
- *  buf‚Ì’¼Œã‚É‚Í \0 ‚Í•t‚©‚È‚¢
+ *  bufã®ç›´å¾Œã«ã¯ \0 ã¯ä»˜ã‹ãªã„
  */
 
 #define BROADCAST_LOGFILE L"broadcast.log"
 
 /**
- *	—š—ğ‚ğ•Û‘¶‚·‚éƒtƒ@ƒCƒ‹–¼(ƒtƒ‹ƒpƒX)‚ğæ“¾
- *	@return	ƒtƒ@ƒCƒ‹–¼
- *			•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
+ *	å±¥æ­´ã‚’ä¿å­˜ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«å(ãƒ•ãƒ«ãƒ‘ã‚¹)ã‚’å–å¾—
+ *	@return	ãƒ•ã‚¡ã‚¤ãƒ«å
+ *			ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  */
 static wchar_t *GetHistoryFileName(TTTSet *ts_)
 {
@@ -123,8 +122,8 @@ BOOL IsUnicharSupport(HWND hwnd)
 	return (BOOL)r;
 }
 
-// ƒhƒƒbƒvƒ_ƒEƒ“‚Ì’†‚ÌƒGƒfƒBƒbƒgƒRƒ“ƒgƒ[ƒ‹‚ğ
-// ƒTƒuƒNƒ‰ƒX‰»‚·‚é‚½‚ß‚ÌƒEƒCƒ“ƒhƒEƒvƒƒV[ƒWƒƒ
+// ãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ã®ä¸­ã®ã‚¨ãƒ‡ã‚£ãƒƒãƒˆã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚’
+// ã‚µãƒ–ã‚¯ãƒ©ã‚¹åŒ–ã™ã‚‹ãŸã‚ã®ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
 static WNDPROC OrigBroadcastEditProc; // Original window procedure
 static HWND BroadcastWindowList;
 
@@ -175,7 +174,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 			break;
 
 		case WM_LBUTTONUP:
-			// ‚·‚Å‚ÉƒeƒLƒXƒg‚ª“ü—Í‚³‚ê‚Ä‚¢‚éê‡‚ÍAƒJ[ƒ\ƒ‹‚ğ––”ö‚ÖˆÚ“®‚³‚¹‚éB
+			// ã™ã§ã«ãƒ†ã‚­ã‚¹ãƒˆãŒå…¥åŠ›ã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ã€ã‚«ãƒ¼ã‚½ãƒ«ã‚’æœ«å°¾ã¸ç§»å‹•ã•ã›ã‚‹ã€‚
 			len = GetWindowText(dlg, buf, sizeof(buf));
 			SendMessage(dlg, EM_SETSEL, len, len);
 			SetFocus(dlg);
@@ -236,7 +235,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 			break;
 
 		case WM_CHAR:
-			// “ü—Í‚µ‚½•¶š‚ªIDC_COMMAND_EDIT‚Éc‚ç‚È‚¢‚æ‚¤‚ÉÌ‚Ä‚é
+			// å…¥åŠ›ã—ãŸæ–‡å­—ãŒIDC_COMMAND_EDITã«æ®‹ã‚‰ãªã„ã‚ˆã†ã«æ¨ã¦ã‚‹
 			return FALSE;
 
 		case WM_IME_COMPOSITION: {
@@ -285,12 +284,12 @@ static LRESULT CALLBACK WindowListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 	switch (msg) {
 	case WM_LBUTTONDOWN:
 		int num = GetRegisteredWindowCount();
-		// ƒNƒŠƒbƒNˆÊ’u‚ÌƒCƒ“ƒfƒbƒNƒX‚ğæ“¾
+		// ã‚¯ãƒªãƒƒã‚¯ä½ç½®ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’å–å¾—
 		POINT pt;
 		pt.x = LOWORD(lParam);
 		pt.y = HIWORD(lParam);
 		int index = SendMessage(hwnd, LB_ITEMFROMPOINT, 0, MAKELPARAM(pt.x, pt.y));
-		if (index > num) { // —]”’‚Ì¶ƒNƒŠƒbƒN‚Í–³‹‚·‚é
+		if (index > num) { // ä½™ç™½ã®å·¦ã‚¯ãƒªãƒƒã‚¯ã¯ç„¡è¦–ã™ã‚‹
 			return FALSE;
 		}
 		break;
@@ -381,7 +380,7 @@ static COPYDATASTRUCT *BuildBroadcastCDSW(const wchar_t *buf)
 	size_t buflen = wcslen(buf);
 
 	cds->dwData = IPC_BROADCAST_COMMAND;
-	cds->cbData = (DWORD)(buflen * sizeof(wchar_t));	// '\0' ‚ÍŠÜ‚Ü‚È‚¢
+	cds->cbData = (DWORD)(buflen * sizeof(wchar_t));	// '\0' ã¯å«ã¾ãªã„
 	cds->lpData = (void *)buf;
 
 	return cds;
@@ -412,26 +411,26 @@ static COPYDATASTRUCT *BuildMulticastCDSW(const wchar_t *name, const wchar_t *bu
 }
 
 /*
- * ƒ_ƒCƒAƒƒO‚Å‘I‘ğ‚³‚ê‚½ƒEƒBƒ“ƒhƒE‚Ì‚İA‚à‚µ‚­‚ÍeƒEƒBƒ“ƒhƒE‚Ì‚İ‚É‘—‚éƒuƒ[ƒhƒLƒƒƒXƒgƒ‚[ƒhB
- * ƒŠƒAƒ‹ƒ^ƒCƒ€ƒ‚[ƒh‚ª off ‚Ì‚É—˜—p‚³‚ê‚éB
+ * ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§é¸æŠã•ã‚ŒãŸã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã¿ã€ã‚‚ã—ãã¯è¦ªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã¿ã«é€ã‚‹ãƒ–ãƒ­ãƒ¼ãƒ‰ã‚­ãƒ£ã‚¹ãƒˆãƒ¢ãƒ¼ãƒ‰ã€‚
+ * ãƒªã‚¢ãƒ«ã‚¿ã‚¤ãƒ ãƒ¢ãƒ¼ãƒ‰ãŒ off ã®æ™‚ã«åˆ©ç”¨ã•ã‚Œã‚‹ã€‚
  */
 static void SendBroadcastMessageToSelected(HWND HVTWin, HWND hWnd, int parent_only, const wchar_t *buf)
 {
 	COPYDATASTRUCT *cds = BuildBroadcastCDSW(buf);
 
 	if (parent_only) {
-		// eƒEƒBƒ“ƒhƒE‚Ì‚İ‚É WM_COPYDATA ƒƒbƒZ[ƒW‚ğ‘—‚é
+		// è¦ªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã¿ã« WM_COPYDATA ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é€ã‚‹
 		SendMessage(GetParent(hWnd), WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)cds);
 	}
 	else {
-		// ƒ_ƒCƒAƒƒO‚Å‘I‘ğ‚³‚ê‚½ƒEƒBƒ“ƒhƒE‚ÉƒƒbƒZ[ƒW‚ğ‘—‚é
+		// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§é¸æŠã•ã‚ŒãŸã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é€ã‚‹
 		int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
 		for (int i = 0 ; i < count ; i++) {
-			// ƒŠƒXƒgƒ{ƒbƒNƒX‚Å‘I‘ğ‚³‚ê‚Ä‚¢‚é‚©
+			// ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã§é¸æŠã•ã‚Œã¦ã„ã‚‹ã‹
 			if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
 				HWND hd = GetNthWin(i);
 				if (hd != NULL) {
-					// WM_COPYDATA‚ğg‚Á‚ÄAƒvƒƒZƒXŠÔ’ÊM‚ğs‚¤B
+					// WM_COPYDATAã‚’ä½¿ã£ã¦ã€ãƒ—ãƒ­ã‚»ã‚¹é–“é€šä¿¡ã‚’è¡Œã†ã€‚
 					SendMessage(hd, WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)cds);
 				}
 			}
@@ -442,8 +441,8 @@ static void SendBroadcastMessageToSelected(HWND HVTWin, HWND hWnd, int parent_on
 }
 
 /**
- * ‘S Tera Term ‚ÖCOPYDATASTRUCT‚ğ‘—M‚·‚é
- *	@param[in]	hWnd	‘—MŒ³
+ * å…¨ Tera Term ã¸COPYDATASTRUCTã‚’é€ä¿¡ã™ã‚‹
+ *	@param[in]	hWnd	é€ä¿¡å…ƒ
  *	@param[in]	cds		COPYDATASTRUCT
  */
 static void SendCDS(HWND hWnd, const COPYDATASTRUCT *cds)
@@ -454,14 +453,14 @@ static void SendCDS(HWND hWnd, const COPYDATASTRUCT *cds)
 		if (hd == NULL) {
 			break;
 		}
-		// WM_COPYDATA‚ğg‚Á‚ÄAƒvƒƒZƒXŠÔ’ÊM‚ğs‚¤B
+		// WM_COPYDATAã‚’ä½¿ã£ã¦ã€ãƒ—ãƒ­ã‚»ã‚¹é–“é€šä¿¡ã‚’è¡Œã†ã€‚
 		SendMessage(hd, WM_COPYDATA, (WPARAM)hWnd, (LPARAM)cds);
 	}
 }
 
 /*
- * ‘S Tera Term ‚ÖƒƒbƒZ[ƒW‚ğ‘—M‚·‚éƒuƒ[ƒhƒLƒƒƒXƒgƒ‚[ƒhB
- * "sendbroadcast"ƒ}ƒNƒƒRƒ}ƒ“ƒh‚©‚ç‚Ì‚İ—˜—p‚³‚ê‚éB
+ * å…¨ Tera Term ã¸ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é€ä¿¡ã™ã‚‹ãƒ–ãƒ­ãƒ¼ãƒ‰ã‚­ãƒ£ã‚¹ãƒˆãƒ¢ãƒ¼ãƒ‰ã€‚
+ * "sendbroadcast"ãƒã‚¯ãƒ­ã‚³ãƒãƒ³ãƒ‰ã‹ã‚‰ã®ã¿åˆ©ç”¨ã•ã‚Œã‚‹ã€‚
  */
 void SendBroadcastMessage(HWND HVTWin, HWND hWnd, const wchar_t *buf)
 {
@@ -471,9 +470,9 @@ void SendBroadcastMessage(HWND HVTWin, HWND hWnd, const wchar_t *buf)
 }
 
 /*
- * ”CˆÓ‚Ì Tera Term ŒQ‚ÖƒƒbƒZ[ƒW‚ğ‘—M‚·‚éƒ}ƒ‹ƒ`ƒLƒƒƒXƒgƒ‚[ƒhBŒµ–§‚É‚ÍA
- * ƒuƒ[ƒhƒLƒƒƒXƒg‘—M‚ğs‚¢AóM‘¤‚ÅƒƒbƒZ[ƒW‚ğæÌ‘I‘ğ‚·‚éB
- * "sendmulticast"ƒ}ƒNƒƒRƒ}ƒ“ƒh‚©‚ç‚Ì‚İ—˜—p‚³‚ê‚éB
+ * ä»»æ„ã® Tera Term ç¾¤ã¸ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é€ä¿¡ã™ã‚‹ãƒãƒ«ãƒã‚­ãƒ£ã‚¹ãƒˆãƒ¢ãƒ¼ãƒ‰ã€‚å³å¯†ã«ã¯ã€
+ * ãƒ–ãƒ­ãƒ¼ãƒ‰ã‚­ãƒ£ã‚¹ãƒˆé€ä¿¡ã‚’è¡Œã„ã€å—ä¿¡å´ã§ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å–æ¨é¸æŠã™ã‚‹ã€‚
+ * "sendmulticast"ãƒã‚¯ãƒ­ã‚³ãƒãƒ³ãƒ‰ã‹ã‚‰ã®ã¿åˆ©ç”¨ã•ã‚Œã‚‹ã€‚
  */
 void SendMulticastMessage(HWND HVTWin_, HWND hWnd, const wchar_t *name, const wchar_t *buf)
 {
@@ -485,7 +484,7 @@ void SendMulticastMessage(HWND HVTWin_, HWND hWnd, const wchar_t *name, const wc
 
 void SetMulticastName(const wchar_t *name)
 {
-	// TODO MulticastName ‚ğ wchar_t ‰»
+	// TODO MulticastName ã‚’ wchar_t åŒ–
 	char *nameA = ToCharW(name);
 	strncpy_s(ts.MulticastName, sizeof(ts.MulticastName), nameA, _TRUNCATE);
 	free(nameA);
@@ -493,7 +492,7 @@ void SetMulticastName(const wchar_t *name)
 
 static int CompareMulticastName(const wchar_t *name)
 {
-	// TODO MulticastName ‚ğ wchar_t ‰»
+	// TODO MulticastName ã‚’ wchar_t åŒ–
 	wchar_t *MulticastNameW = ToWcharA(ts.MulticastName);
 	int result = wcscmp(MulticastNameW, name);
 	free(MulticastNameW);
@@ -501,7 +500,7 @@ static int CompareMulticastName(const wchar_t *name)
 }
 
 /*
- * ƒ_ƒCƒAƒƒO‚Å‘I‘ğ‚³‚ê‚½ƒEƒBƒ“ƒhƒE‚ğ‘O–Ê‚É•\¦‚·‚éB
+ * ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§é¸æŠã•ã‚ŒãŸã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’å‰é¢ã«è¡¨ç¤ºã™ã‚‹ã€‚
  */
 static void ForeSelected()
 {
@@ -530,7 +529,7 @@ static void MinimizeSelected()
 }
 
 //
-// ‚·‚×‚Ä‚Ìƒ^[ƒ~ƒiƒ‹‚Ö“¯ˆêƒRƒ}ƒ“ƒh‚ğ‘—M‚·‚éƒ‚[ƒhƒŒƒXƒ_ƒCƒAƒƒO‚Ì•\¦
+// ã™ã¹ã¦ã®ã‚¿ãƒ¼ãƒŸãƒŠãƒ«ã¸åŒä¸€ã‚³ãƒãƒ³ãƒ‰ã‚’é€ä¿¡ã™ã‚‹ãƒ¢ãƒ¼ãƒ‰ãƒ¬ã‚¹ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®è¡¨ç¤º
 // (2005.1.22 yutaka)
 //
 static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -571,11 +570,11 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			break;
 
 		case WM_INITDIALOG: {
-			// ƒ‰ƒWƒIƒ{ƒ^ƒ“‚ÌƒfƒtƒHƒ‹ƒg‚Í CR ‚É‚·‚éB
+			// ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ CR ã«ã™ã‚‹ã€‚
 			SendMessage(GetDlgItem(hWnd, IDC_RADIO_CR), BM_SETCHECK, BST_CHECKED, 0);
-			// ƒfƒtƒHƒ‹ƒg‚Åƒ`ƒFƒbƒNƒ{ƒbƒNƒX‚ğ checked ó‘Ô‚É‚·‚éB
+			// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã‚’ checked çŠ¶æ…‹ã«ã™ã‚‹ã€‚
 			SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
-			// history ‚ğ”½‰f‚·‚é (2007.3.3 maya)
+			// history ã‚’åæ˜ ã™ã‚‹ (2007.3.3 maya)
 			if (ts.BroadcastCommandHistory) {
 				SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 			}
@@ -583,14 +582,14 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			ApplyBroadCastCommandHistory(hWnd, historyfile);
 			free(historyfile);
 
-			// ƒGƒfƒBƒbƒgƒRƒ“ƒgƒ[ƒ‹‚ÉƒtƒH[ƒJƒX‚ğ‚ ‚Ä‚é
+			// ã‚¨ãƒ‡ã‚£ãƒƒãƒˆã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’ã‚ã¦ã‚‹
 			SetFocus(GetDlgItem(hWnd, IDC_COMMAND_EDIT));
 
-			// ƒTƒuƒNƒ‰ƒX‰»‚³‚¹‚ÄƒŠƒAƒ‹ƒ^ƒCƒ€ƒ‚[ƒh‚É‚·‚é (2008.1.21 yutaka)
+			// ã‚µãƒ–ã‚¯ãƒ©ã‚¹åŒ–ã•ã›ã¦ãƒªã‚¢ãƒ«ã‚¿ã‚¤ãƒ ãƒ¢ãƒ¼ãƒ‰ã«ã™ã‚‹ (2008.1.21 yutaka)
 			hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
 			hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
 			OrigBroadcastEditProc = (WNDPROC)SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditProc);
-			// ƒfƒtƒHƒ‹ƒg‚ÍonBc‚è‚ÍdisableB
+			// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯onã€‚æ®‹ã‚Šã¯disableã€‚
 			SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_SETCHECK, BST_CHECKED, 0);  // default on
 			EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
 			EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), FALSE);
@@ -602,19 +601,19 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			// Tera Term window list
 			BroadcastWindowList = GetDlgItem(hWnd, IDC_LIST);
 			UpdateBroadcastWindowList(BroadcastWindowList);
-			// —]”’ƒNƒŠƒbƒN‘Î‰
+			// ä½™ç™½ã‚¯ãƒªãƒƒã‚¯å¯¾å¿œ
 			DefaultWindowListProc = (WNDPROC)GetWindowLongPtr(BroadcastWindowList, GWLP_WNDPROC);
 			SetWindowLongPtr(BroadcastWindowList, GWLP_WNDPROC, (LONG_PTR)WindowListProc);
 
 			// I18N
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
-			// ƒ_ƒCƒAƒƒO‚Ì‰ŠúƒTƒCƒY‚ğ•Û‘¶
+			// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®åˆæœŸã‚µã‚¤ã‚ºã‚’ä¿å­˜
 			GetWindowRect(hWnd, &rc_dlg);
 			init_width = rc_dlg.right - rc_dlg.left;
 			init_height = rc_dlg.bottom - rc_dlg.top;
 
-			// Œ»İƒTƒCƒY‚©‚ç•K—v‚È’l‚ğŒvZ
+			// ç¾åœ¨ã‚µã‚¤ã‚ºã‹ã‚‰å¿…è¦ãªå€¤ã‚’è¨ˆç®—
 			GetClientRect(hWnd, &rc_dlg);
 			p.x = rc_dlg.right;
 			p.y = rc_dlg.bottom;
@@ -633,16 +632,14 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			list2bottom = p.y - rc.bottom;
 			list2right = p.x - rc.right;
 
-			// ƒŠƒTƒCƒYƒAƒCƒRƒ“‚ğ‰E‰º‚É•\¦‚³‚¹‚½‚¢‚Ì‚ÅAƒXƒe[ƒ^ƒXƒo[‚ğ•t‚¯‚éB
+			// ãƒªã‚µã‚¤ã‚ºã‚¢ã‚¤ã‚³ãƒ³ã‚’å³ä¸‹ã«è¡¨ç¤ºã•ã›ãŸã„ã®ã§ã€ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ãƒãƒ¼ã‚’ä»˜ã‘ã‚‹ã€‚
 			InitCommonControls();
 			hStatus = CreateStatusWindow(
 				WS_CHILD | WS_VISIBLE |
 				CCS_BOTTOM | SBARS_SIZEGRIP, NULL, hWnd, 1);
 
-			// ƒŠƒXƒgXVƒ^ƒCƒ}[‚ÌŠJn
+			// ãƒªã‚¹ãƒˆæ›´æ–°ã‚¿ã‚¤ãƒãƒ¼ã®é–‹å§‹
 			SetTimer(hWnd, list_timer_id, list_timer_tick, NULL);
-
-			AddModelessHandle(hWnd);
 
 			return FALSE;
 		}
@@ -650,9 +647,9 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 		case WM_COMMAND:
 			switch (wp) {
 			case IDC_ENTERKEY_CHECK | (BN_CLICKED << 16):
-				// ƒ`ƒFƒbƒN‚Ì—L–³‚É‚æ‚èAƒ‰ƒWƒIƒ{ƒ^ƒ“‚Ì—LŒøE–³Œø‚ğŒˆ‚ß‚éB
+				// ãƒã‚§ãƒƒã‚¯ã®æœ‰ç„¡ã«ã‚ˆã‚Šã€ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³ã®æœ‰åŠ¹ãƒ»ç„¡åŠ¹ã‚’æ±ºã‚ã‚‹ã€‚
 				checked = SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_GETCHECK, 0, 0);
-				if (checked & BST_CHECKED) { // ‰üsƒR[ƒh‚ ‚è
+				if (checked & BST_CHECKED) { // æ”¹è¡Œã‚³ãƒ¼ãƒ‰ã‚ã‚Š
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CR), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_LF), TRUE);
@@ -666,7 +663,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 			case IDC_REALTIME_CHECK | (BN_CLICKED << 16):
 				checked = SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_GETCHECK, 0, 0);
-				if (checked & BST_CHECKED) { // check‚ ‚è
+				if (checked & BST_CHECKED) { // checkã‚ã‚Š
 					// new handler
 					hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
 					hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
@@ -700,11 +697,11 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 						wchar_t buf[256 + 3];
 						//memset(buf, 0, sizeof(buf));
 
-						// realtime mode‚Ìê‡AEnter key‚Ì‚İ‘—‚éB
+						// realtime modeã®å ´åˆã€Enter keyã®ã¿é€ã‚‹ã€‚
 						// cf. http://logmett.com/forum/viewtopic.php?f=8&t=1601
 						// (2011.3.14 hirata)
 						checked = SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_GETCHECK, 0, 0);
-						if (checked & BST_CHECKED) { // check‚ ‚è
+						if (checked & BST_CHECKED) { // checkã‚ã‚Š
 							wcsncpy_s(buf, _countof(buf), L"\n", _TRUNCATE);
 							SetDlgItemTextA(hWnd, IDC_COMMAND_EDIT, "");
 						}
@@ -714,7 +711,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 								memset(buf, 0, sizeof(buf));
 							}
 
-							// ƒuƒ[ƒhƒLƒƒƒXƒgƒRƒ}ƒ“ƒh‚Ì—š—ğ‚ğ•Û‘¶ (2007.3.3 maya)
+							// ãƒ–ãƒ­ãƒ¼ãƒ‰ã‚­ãƒ£ã‚¹ãƒˆã‚³ãƒãƒ³ãƒ‰ã®å±¥æ­´ã‚’ä¿å­˜ (2007.3.3 maya)
 							history = SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_GETCHECK, 0, 0);
 							if (history) {
 								wchar_t *historyfile = GetHistoryFileName(&ts);
@@ -731,7 +728,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 								ts.BroadcastCommandHistory = FALSE;
 							}
 							checked = SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_GETCHECK, 0, 0);
-							if (checked & BST_CHECKED) { // ‰üsƒR[ƒh‚ ‚è
+							if (checked & BST_CHECKED) { // æ”¹è¡Œã‚³ãƒ¼ãƒ‰ã‚ã‚Š
 								if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_CRLF), BM_GETCHECK, 0, 0) & BST_CHECKED) {
 									wcsncat_s(buf, _countof(buf), L"\r\n", _TRUNCATE);
 
@@ -748,14 +745,14 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 							}
 						}
 
-						// 337: 2007/03/20 ƒ`ƒFƒbƒN‚³‚ê‚Ä‚¢‚½‚çeƒEƒBƒ“ƒhƒE‚É‚Ì‚İ‘—M
+						// 337: 2007/03/20 ãƒã‚§ãƒƒã‚¯ã•ã‚Œã¦ã„ãŸã‚‰è¦ªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«ã®ã¿é€ä¿¡
 						checked = SendMessage(GetDlgItem(hWnd, IDC_PARENT_ONLY), BM_GETCHECK, 0, 0);
 
 						SendBroadcastMessageToSelected(HVTWin, hWnd, (int)checked, buf);
 					}
 
-					// ƒ‚[ƒhƒŒƒXƒ_ƒCƒAƒƒO‚Íˆê“x¶¬‚³‚ê‚é‚ÆAƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ªI—¹‚·‚é‚Ü‚Å
-					// ”jŠü‚³‚ê‚È‚¢‚Ì‚ÅAˆÈ‰º‚ÌuƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒ–ß‚µv‚Í•s—v‚Æv‚í‚ê‚éB(yutaka)
+					// ãƒ¢ãƒ¼ãƒ‰ãƒ¬ã‚¹ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã¯ä¸€åº¦ç”Ÿæˆã•ã‚Œã‚‹ã¨ã€ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ãŒçµ‚äº†ã™ã‚‹ã¾ã§
+					// ç ´æ£„ã•ã‚Œãªã„ã®ã§ã€ä»¥ä¸‹ã®ã€Œã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£æˆ»ã—ã€ã¯ä¸è¦ã¨æ€ã‚ã‚Œã‚‹ã€‚(yutaka)
 #if 0
 					_SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)OrigBroadcastEditProc);
 #endif
@@ -782,8 +779,8 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					return FALSE;
 
 				case IDC_LIST:
-					// ˆê”Ê“I‚ÈƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Æ“¯‚¶‘€ìŠ´‚ğ‚½‚¹‚é‚½‚ßA
-					// uSHIFT+ƒNƒŠƒbƒNv‚É‚æ‚é˜A‘±“I‚È‘I‘ğ‚ğƒTƒ|[ƒg‚·‚éB
+					// ä¸€èˆ¬çš„ãªã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã¨åŒã˜æ“ä½œæ„Ÿã‚’æŒãŸã›ã‚‹ãŸã‚ã€
+					// ã€ŒSHIFT+ã‚¯ãƒªãƒƒã‚¯ã€ã«ã‚ˆã‚‹é€£ç¶šçš„ãªé¸æŠã‚’ã‚µãƒãƒ¼ãƒˆã™ã‚‹ã€‚
 					// (2009.9.28 yutaka)
 					if (HIWORD(wp) == LBN_SELCHANGE && ShiftKey()) {
 						int i, cur, prev;
@@ -797,7 +794,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 							}
 						}
 						if (prev != -1) {
-							// ‚·‚Å‚É‘I‘ğÏ‚İ‚Ì‰ÓŠ‚ª‚ ‚ê‚ÎA‚»‚±‚©‚ç˜A‘±‘I‘ğ‚·‚éB
+							// ã™ã§ã«é¸æŠæ¸ˆã¿ã®ç®‡æ‰€ãŒã‚ã‚Œã°ã€ãã“ã‹ã‚‰é€£ç¶šé¸æŠã™ã‚‹ã€‚
 							for (i = prev ; i < cur ; i++) {
 								ListBox_SetSel(BroadcastWindowList, TRUE, i);
 							}
@@ -820,13 +817,13 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 		case WM_SIZE:
 			{
-				// Ä”z’u
+				// å†é…ç½®
 				int dlg_w, dlg_h;
 				RECT rc_dlg;
 				RECT rc;
 				POINT p;
 
-				// V‚µ‚¢ƒ_ƒCƒAƒƒO‚ÌƒTƒCƒY‚ğ“¾‚é
+				// æ–°ã—ã„ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚µã‚¤ã‚ºã‚’å¾—ã‚‹
 				GetClientRect(hWnd, &rc_dlg);
 				dlg_w = rc_dlg.right;
 				dlg_h = rc_dlg.bottom;
@@ -883,7 +880,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 		case WM_GETMINMAXINFO:
 			{
-				// ƒ_ƒCƒAƒƒO‚Ì‰ŠúƒTƒCƒY‚æ‚è¬‚³‚­‚Å‚«‚È‚¢‚æ‚¤‚É‚·‚é
+				// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®åˆæœŸã‚µã‚¤ã‚ºã‚ˆã‚Šå°ã•ãã§ããªã„ã‚ˆã†ã«ã™ã‚‹
 				LPMINMAXINFO lpmmi;
 				lpmmi = (LPMINMAXINFO)lp;
 				lpmmi->ptMinTrackSize.x = init_width;
@@ -971,7 +968,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			break;
 
 		case WM_VKEYTOITEM:
-			// ƒŠƒXƒgƒ{ƒbƒNƒX‚ÅƒL[‰Ÿ‰º(CTRL+A)‚³‚ê‚½‚çA‘S‘I‘ğB
+			// ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã§ã‚­ãƒ¼æŠ¼ä¸‹(CTRL+A)ã•ã‚ŒãŸã‚‰ã€å…¨é¸æŠã€‚
 			if ((HWND)lp == BroadcastWindowList) {
 				if (ControlKey() && LOWORD(wp) == 'A') {
 					int i, n;
@@ -984,10 +981,6 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				}
 			}
 			return TRUE;
-
-		case WM_NCDESTROY:
-			RemoveModelessHandle(hWnd);
-			return FALSE;
 
 		default:
 			//OutputDebugPrintf("msg %x wp %x lp %x\n", msg, wp, lp);
@@ -1017,7 +1010,7 @@ void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd)
 		return;
 	}
 
-	// ƒ_ƒCƒAƒƒO‚ğƒEƒBƒ“ƒhƒE‚Ì^ã‚É”z’u‚·‚é (2008.1.25 yutaka)
+	// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®çœŸä¸Šã«é…ç½®ã™ã‚‹ (2008.1.25 yutaka)
 	::GetWindowRect(hWnd, &prc);
 	::GetWindowRect(hDlgWnd, &rc);
 	x = prc.left;
@@ -1041,33 +1034,33 @@ BOOL BroadCastReceive(const COPYDATASTRUCT *cds)
 		strW_len = cds->cbData / sizeof(wchar_t);
 		strW_ptr = (wchar_t *)malloc((strW_len + 1) * sizeof(wchar_t));
 		wmemcpy_s(strW_ptr, strW_len, (wchar_t *)cds->lpData, strW_len);
-		strW_ptr[strW_len] = 0;		// ”O‚Ìˆ×
+		strW_ptr[strW_len] = 0;		// å¿µã®ç‚º
 		break;
 	}
 	case IPC_MULTICAST_COMMAND: {
 		wchar_t *name = (wchar_t *)cds->lpData;
 
-		// ƒ}ƒ‹ƒ`ƒLƒƒƒXƒg–¼‚ğƒ`ƒFƒbƒN‚·‚é
+		// ãƒãƒ«ãƒã‚­ãƒ£ã‚¹ãƒˆåã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹
 		if (CompareMulticastName(name) != 0) {
-			// –¼‘O‚ªˆÙ‚È‚Á‚Ä‚¢‚é‚Ì‚Å‰½‚à‚µ‚È‚¢
+			// åå‰ãŒç•°ãªã£ã¦ã„ã‚‹ã®ã§ä½•ã‚‚ã—ãªã„
 			return TRUE;
 		}
 
-		// ƒ}ƒ‹ƒ`ƒLƒƒƒXƒg–¼‚ÌŸ‚Ì•¶š—ñ‚ğæ“¾
+		// ãƒãƒ«ãƒã‚­ãƒ£ã‚¹ãƒˆåã®æ¬¡ã®æ–‡å­—åˆ—ã‚’å–å¾—
 		size_t nlen = wcslen(name);
-		strW_len = cds->cbData  / sizeof(wchar_t) - nlen - 1;	// -1 = name ‚Ì '\0'
+		strW_len = cds->cbData  / sizeof(wchar_t) - nlen - 1;	// -1 = name ã® '\0'
 		strW_ptr = (wchar_t *)malloc((strW_len + 1) * sizeof(wchar_t));
 		wmemcpy_s(strW_ptr, strW_len, (wchar_t *)cds->lpData + nlen + 1, strW_len);
-		strW_ptr[strW_len] = 0;		// ”O‚Ìˆ×
+		strW_ptr[strW_len] = 0;		// å¿µã®ç‚º
 		break;
 	}
 
 	default:
-		// ’m‚ç‚È‚¢ƒƒbƒZ[ƒW‚Ìê‡
+		// çŸ¥ã‚‰ãªã„ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®å ´åˆ
 		return TRUE;
 	}
 
-	// ’[––‚Ö•¶š—ñ‚ğ‘—‚è‚Ş
+	// ç«¯æœ«ã¸æ–‡å­—åˆ—ã‚’é€ã‚Šè¾¼ã‚€
 	SendMem *sm = SendMemTextW(strW_ptr, strW_len);
 	if (sm != NULL) {
 		SendMemInitEcho(sm, FALSE);

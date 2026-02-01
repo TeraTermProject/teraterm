@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* Multi Byte, Double Byte, Single Byte 関連の文字コード変換 */
+/* Multi Byte, Double Byte, Single Byte 髢｢騾｣縺ｮ譁�蟄励さ繝ｼ繝牙､画鋤 */
 
 #include <windows.h>
 #include <assert.h>

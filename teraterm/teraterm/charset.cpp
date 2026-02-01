@@ -47,7 +47,7 @@
 
 #include "charset.h"
 
-// UTF-8‚ª•s³‚È’l‚¾‚Á‚½‚É•\¦‚·‚é•¶š
+// UTF-8ãŒä¸æ­£ãªå€¤ã ã£ãŸæ™‚ã«è¡¨ç¤ºã™ã‚‹æ–‡å­—
 #define REPLACEMENT_CHARACTER	0xfffd		// REPLACEMENT CHARACTER
 //#define REPLACEMENT_CHARACTER	0x2e2e		// Reversed Question Mark (VT382)
 
@@ -68,7 +68,7 @@ typedef struct CharSetDataTag {
 	BOOL Fallbacked;
 
 	// MBCS
-	BOOL KanjiIn;				// TRUE = MBCS‚Ì1byte–Ú‚ğóM‚µ‚Ä‚¢‚é
+	BOOL KanjiIn;				// TRUE = MBCSã®1byteç›®ã‚’å—ä¿¡ã—ã¦ã„ã‚‹
 	WORD Kanji;
 
 	// EUC
@@ -96,7 +96,7 @@ static BOOL IsC1(char32_t b)
 }
 
 /**
- *	ISO2022—pƒ[ƒN‚ğ‰Šú‰»‚·‚é
+ *	ISO2022ç”¨ãƒ¯ãƒ¼ã‚¯ã‚’åˆæœŸåŒ–ã™ã‚‹
  */
 static void CharSetInit2(CharSetData *w)
 {
@@ -122,7 +122,7 @@ static void CharSetInit2(CharSetData *w)
 }
 
 /**
- *	Š¿šŠÖ˜Aƒ[ƒN‚ğ‰Šú‰»‚·‚é
+ *	æ¼¢å­—é–¢é€£ãƒ¯ãƒ¼ã‚¯ã‚’åˆæœŸåŒ–ã™ã‚‹
  */
 CharSetData *CharSetInit(const CharSetOp *op, void *client_data)
 {
@@ -159,7 +159,7 @@ void CharSetFinish(CharSetData *w)
 }
 
 /**
- *	1byte–Úƒ`ƒFƒbƒN
+ *	1byteç›®ãƒã‚§ãƒƒã‚¯
  */
 static BOOL CheckFirstByte(BYTE b, int kanji_code)
 {
@@ -178,10 +178,10 @@ static BOOL CheckFirstByte(BYTE b, int kanji_code)
 
 /**
  *	Double-byte Character Sets
- *	SJIS‚Ì1byte–Ú?
+ *	SJISã®1byteç›®?
  *
- *	‘æ1ƒoƒCƒg0x81...0x9F or 0xE0...0xEF
- *	‘æ1ƒoƒCƒg0x81...0x9F or 0xE0...0xFC
+ *	ç¬¬1ãƒã‚¤ãƒˆ0x81...0x9F or 0xE0...0xEF
+ *	ç¬¬1ãƒã‚¤ãƒˆ0x81...0x9F or 0xE0...0xFC
  */
 static BOOL ismbbleadSJIS(BYTE b)
 {
@@ -192,8 +192,8 @@ static BOOL ismbbleadSJIS(BYTE b)
 }
 
 /**
- *	ts.Language == IdJapanese 
- *	1byte–Úƒ`ƒFƒbƒN
+ *	ts.Language == IdJapanese æ™‚
+ *	1byteç›®ãƒã‚§ãƒƒã‚¯
  */
 static BOOL CheckKanji(CharSetData *w, BYTE b)
 {
@@ -301,7 +301,7 @@ static BOOL ParseFirstJP(CharSetData *w, BYTE b)
 			b = b | 0x80;
 			w->EUCkanaIn = FALSE;
 			{
-				// b‚Ísjis‚Ì”¼ŠpƒJƒ^ƒJƒi
+				// bã¯sjisã®åŠè§’ã‚«ã‚¿ã‚«ãƒŠ
 				unsigned long u32 = CP932ToUTF32(b);
 				w->Op.PutU32(u32, w->ClientData);
 			}
@@ -363,7 +363,7 @@ static BOOL ParseFirstJP(CharSetData *w, BYTE b)
 		    ((ts.KanjiCode==IdJIS) &&
 			 (ts.JIS7Katakana==0) &&
 			 ((ts.TermFlag & TF_FIXEDJIS)!=0))) {
-			// b‚Ísjis‚Ì”¼ŠpƒJƒ^ƒJƒi
+			// bã¯sjisã®åŠè§’ã‚«ã‚¿ã‚«ãƒŠ
 			unsigned long u32 = CP932ToUTF32(b);
 			w->Op.PutU32(u32, w->ClientData);
 		} else {
@@ -541,8 +541,8 @@ static void ParseASCII(CharSetData *w, BYTE b)
 }
 
 /**
- *	REPLACEMENT_CHARACTER ‚Ì•\¦
- *	UTF-8 ƒfƒR[ƒh‚©‚çg—p
+ *	REPLACEMENT_CHARACTER ã®è¡¨ç¤º
+ *	UTF-8 ãƒ‡ã‚³ãƒ¼ãƒ‰ã‹ã‚‰ä½¿ç”¨
  */
 static void PutReplacementChr(CharSetData *w, const BYTE *ptr, size_t len, BOOL fallback)
 {
@@ -556,10 +556,10 @@ static void PutReplacementChr(CharSetData *w, const BYTE *ptr, size_t len, BOOL 
 			w->Op.PutU32(c, w->ClientData);
 		}
 		else {
-			// fallback‚µ‚È‚¢
+			// fallbackã—ãªã„
 			if (c < 0x80) {
-				// •s³‚ÈUTF-8•¶š—ñ‚Ì‚È‚©‚É0x80–¢–‚ª‚ ‚ê‚ÎA
-				// 1•¶š‚ÌUTF-8•¶š‚Æ‚µ‚Ä‚»‚Ì‚Ü‚Ü•\¦‚·‚é
+				// ä¸æ­£ãªUTF-8æ–‡å­—åˆ—ã®ãªã‹ã«0x80æœªæº€ãŒã‚ã‚Œã°ã€
+				// 1æ–‡å­—ã®UTF-8æ–‡å­—ã¨ã—ã¦ãã®ã¾ã¾è¡¨ç¤ºã™ã‚‹
 				w->Op.PutU32(c, w->ClientData);
 			}
 			else {
@@ -570,7 +570,7 @@ static void PutReplacementChr(CharSetData *w, const BYTE *ptr, size_t len, BOOL 
 }
 
 /**
- * UTF-8‚ÅóMƒf[ƒ^‚ğˆ—‚·‚é
+ * UTF-8ã§å—ä¿¡ãƒ‡ãƒ¼ã‚¿ã‚’å‡¦ç†ã™ã‚‹
  *
  * returns TRUE if b is processed
  */
@@ -584,7 +584,7 @@ static BOOL ParseFirstUTF8(CharSetData *w, BYTE b)
 		return r;
 	}
 
-	// UTF-8ƒGƒ“ƒR[ƒh
+	// UTF-8ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰
 	//	The Unicode Standard Chapter 3
 	//	Table 3-7. Well-Formed UTF-8 Byte Sequences
 	// | Code Points        | 1st Byte | 2nd Byte | 3rd Byte | 4th Byte |
@@ -597,47 +597,47 @@ static BOOL ParseFirstUTF8(CharSetData *w, BYTE b)
 	// | U+10000..U+3FFFF   | F0       | 90..BF   | 80..BF   | 80..BF   |
 	// | U+40000..U+FFFFF   | F1..F3   | 80..BF   | 80..BF   | 80..BF   |
 	// | U+100000..U+10FFFF | F4       | 80..8F   | 80..BF   | 80..BF   |
-	//	- 1byte–Ú
+	//	- 1byteç›®
 	//		- 0x00 - 0x7f		ok
 	//		- 0x80 - 0xc1		ng
 	//		- 0xc2 - 0xf4		ok
 	//		- 0xf5 - 0xff		ng
-	//	- 2byte–ÚˆÈ~
+	//	- 2byteç›®ä»¥é™
 	//		- 0x00 - 0x7f		ng
 	//		- 0x80 - 0xbf		ok
 	//		- 0xc0 - 0xff		ng
-	//  - 2byte–Ú—áŠO
-	//		- 1byte == 0xe0 ‚Ì‚Æ‚« 0xa0 - 0xbf‚Ì‚İok
-	//		- 1byte == 0xed ‚Ì‚Æ‚« 0x80 - 0x9f‚Ì‚İok
-	//		- 1byte == 0xf0 ‚Ì‚Æ‚« 0x90 - 0xbf‚Ì‚İok
-	//		- 1byte == 0xf4 ‚Ì‚Æ‚« 0x90 - 0x8f‚Ì‚İok
+	//  - 2byteç›®ä¾‹å¤–
+	//		- 1byte == 0xe0 ã®ã¨ã 0xa0 - 0xbfã®ã¿ok
+	//		- 1byte == 0xed ã®ã¨ã 0x80 - 0x9fã®ã¿ok
+	//		- 1byte == 0xf0 ã®ã¨ã 0x90 - 0xbfã®ã¿ok
+	//		- 1byte == 0xf4 ã®ã¨ã 0x90 - 0x8fã®ã¿ok
 recheck:
 	// 1byte(7bit)
 	if (w->count == 0) {
 		if (IsC0(b)) {
 			// U+0000 .. U+001f
-			// C0§Œä•¶š, C0 Coontrols
+			// C0åˆ¶å¾¡æ–‡å­—, C0 Coontrols
 			w->Op.ParseControl(b, w->ClientData);
 			return TRUE;
 		}
 		else if (b <= 0x7f) {
-			// 0x7fˆÈ‰º, ‚Ì‚Æ‚«A‚»‚Ì‚Ü‚Üo—Í
+			// 0x7fä»¥ä¸‹, ã®ã¨ãã€ãã®ã¾ã¾å‡ºåŠ›
 			w->Op.PutU32(b, w->ClientData);
 			return TRUE;
 		}
 		else if (0xc2 <= b && b <= 0xf4) {
-			// 1byte–Ú•Û‘¶
+			// 1byteç›®ä¿å­˜
 			w->buf[w->count++] = b;
 			return TRUE;
 		}
 
 		// 0x80 - 0xc1, 0xf5 - 0xff
-		// UTF-8‚Å1byte‚ÉoŒ»‚µ‚È‚¢ƒR[ƒh‚Ì‚Æ‚«
+		// UTF-8ã§1byteã«å‡ºç¾ã—ãªã„ã‚³ãƒ¼ãƒ‰ã®ã¨ã
 		if (ts.FallbackToCP932) {
-			// fallback‚·‚éê‡
+			// fallbackã™ã‚‹å ´åˆ
 			if (LangIsJapanese(ts.KanjiCode) && ismbbleadSJIS(b)) {
-				// “ú–{Œê‚Ìê‡ && Shift_JIS 1byte–Ú
-				// Shift_JIS ‚É fallback
+				// æ—¥æœ¬èªã®å ´åˆ && Shift_JIS 1byteç›®
+				// Shift_JIS ã« fallback
 				w->Fallbacked = TRUE;
 				w->ConvJIS = FALSE;
 				w->Kanji = b << 8;
@@ -645,21 +645,21 @@ recheck:
 				return TRUE;
 			}
 		}
-		// fallback‚µ‚È‚¢, •s³‚È•¶š“ü—Í
+		// fallbackã—ãªã„, ä¸æ­£ãªæ–‡å­—å…¥åŠ›
 		w->buf[0] = b;
 		PutReplacementChr(w, w->buf, 1, FALSE);
 		return TRUE;
 	}
 
-	// 2byteˆÈ~³í?
+	// 2byteä»¥é™æ­£å¸¸?
 	if((b & 0xc0) != 0x80) {	// == (b <= 0x7f || 0xc0 <= b)
-		// •s³‚È•¶š, (ãˆÊ2bit‚ª 0b10xx_xxxx ‚Å‚Í‚È‚¢)
+		// ä¸æ­£ãªæ–‡å­—, (ä¸Šä½2bitãŒ 0b10xx_xxxx ã§ã¯ãªã„)
 		PutReplacementChr(w, w->buf, w->count, ts.FallbackToCP932);
 		w->count = 0;
 		goto recheck;
 	}
 
-	// 2byte–ÚˆÈ~•Û‘¶
+	// 2byteç›®ä»¥é™ä¿å­˜
 	w->buf[w->count++] = b;
 
 	// 2byte(11bit)
@@ -669,7 +669,7 @@ recheck:
 			code = ((w->buf[0] & 0x1f) << 6) | (b & 0x3f);
 			if (IsC1(code)) {
 				// U+0080 .. u+009f
-				// C1§Œä•¶š, C1 Controls
+				// C1åˆ¶å¾¡æ–‡å­—, C1 Controls
 				w->Op.ParseControl((BYTE)code, w->ClientData);
 			}
 			else {
@@ -686,7 +686,7 @@ recheck:
 		if ((w->buf[0] & 0xf0) == 0xe0) {
 			if ((w->buf[0] == 0xe0 && (w->buf[1] < 0xa0 || 0xbf < w->buf[1])) ||
 				(w->buf[0] == 0xed && (                 0x9f < w->buf[1]))) {
-				// •s³‚È UTF-8
+				// ä¸æ­£ãª UTF-8
 				PutReplacementChr(w, w->buf, 2, ts.FallbackToCP932);
 				w->count = 0;
 				goto recheck;
@@ -707,7 +707,7 @@ recheck:
 	assert((w->buf[0] & 0xf8) == 0xf0);
 	if ((w->buf[0] == 0xf0 && (w->buf[1] < 0x90 || 0xbf < w->buf[1])) ||
 		(w->buf[0] == 0xf4 && (w->buf[1] < 0x80 || 0x8f < w->buf[1]))) {
-		// •s³‚È UTF-8
+		// ä¸æ­£ãª UTF-8
 		PutReplacementChr(w, w->buf, 3, ts.FallbackToCP932);
 		w->count = 0;
 		goto recheck;
@@ -897,7 +897,7 @@ void ParseFirst(CharSetData *w, BYTE b)
 		return;
 #if !defined(__MINGW32__)
 	default:
-		// gcc/clang‚Å‚Íswitch‚Éenum‚Ìƒƒ“ƒo‚ª‚·‚×‚Ä‚È‚¢‚Æ‚«Œx‚ªo‚é
+		// gcc/clangã§ã¯switchã«enumã®ãƒ¡ãƒ³ãƒãŒã™ã¹ã¦ãªã„ã¨ãè­¦å‘ŠãŒå‡ºã‚‹
 		assert(FALSE);
 		break;
 #endif
@@ -920,7 +920,7 @@ void ParseFirst(CharSetData *w, BYTE b)
 }
 
 /**
- *	w¦(Designate)
+ *	æŒ‡ç¤º(Designate)
  *
  *	@param	Gn			0/1/2/3 = G0/G1/G2/G3
  *	@param	codeset		IdASCII	   0
@@ -934,7 +934,7 @@ void CharSet2022Designate(CharSetData *w, int gn, CharSetCS cs)
 }
 
 /**
- *	ŒÄ‚Ño‚µ(Invoke)
+ *	å‘¼ã³å‡ºã—(Invoke)
  *	@param	shift
  */
 void CharSet2022Invoke(CharSetData *w, CharSet2022Shift shift)
@@ -985,15 +985,15 @@ void CharSet2022Invoke(CharSetData *w, CharSet2022Shift shift)
 }
 
 /**
- *	DEC“ÁêƒtƒHƒ“ƒg(DEC Special Graphics, DSG)
- *	0137(0x5f) ... 0176(0x7e) ‚ÉŒrü‚ÅƒAƒTƒCƒ“‚³‚ê‚Ä‚¢‚é
- *      (0xdf) ...     (0xfe) ‚à?
- *	<ESC>(0 ‚Æ‚¢‚¤“Áê‚ÈƒGƒXƒP[ƒvƒV[ƒPƒ“ƒX‚Å’è‹`
+ *	DECç‰¹æ®Šãƒ•ã‚©ãƒ³ãƒˆ(DEC Special Graphics, DSG)
+ *	0137(0x5f) ... 0176(0x7e) ã«ç½«ç·šã§ã‚¢ã‚µã‚¤ãƒ³ã•ã‚Œã¦ã„ã‚‹
+ *      (0xdf) ...     (0xfe) ã‚‚?
+ *	<ESC>(0 ã¨ã„ã†ç‰¹æ®Šãªã‚¨ã‚¹ã‚±ãƒ¼ãƒ—ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ã§å®šç¾©
  *	about/emulations.html
  *
- *	@param	b		ƒR[ƒh
+ *	@param	b		ã‚³ãƒ¼ãƒ‰
  *	@retval	TRUE	IdSpecial
- *	@retval	FALSE	IdSpecial‚Å‚Í‚È‚¢
+ *	@retval	FALSE	IdSpecialã§ã¯ãªã„
  */
 BOOL CharSetIsSpecial(CharSetData *w, BYTE b)
 {
@@ -1030,7 +1030,7 @@ static void CharSetSaveStateLow(CharSetState *state, const CharSetData *w)
 }
 
 /**
- *	ó‘Ô‚ğ•Û‘¶‚·‚é
+ *	çŠ¶æ…‹ã‚’ä¿å­˜ã™ã‚‹
  */
 void CharSetSaveState(CharSetData *w, CharSetState *state)
 {
@@ -1038,7 +1038,7 @@ void CharSetSaveState(CharSetData *w, CharSetState *state)
 }
 
 /**
- *	ó‘Ô‚ğ•œ‹A‚·‚é
+ *	çŠ¶æ…‹ã‚’å¾©å¸°ã™ã‚‹
  */
 void CharSetLoadState(CharSetData *w, const CharSetState *state)
 {
@@ -1051,8 +1051,8 @@ void CharSetLoadState(CharSetData *w, const CharSetState *state)
 }
 
 /**
- *	ƒtƒH[ƒ‹ƒoƒbƒN‚ÌI—¹
- *		óMƒf[ƒ^UTF-8‚ÉAShift_JISo—Í’†(fallbackó‘Ô)‚ğ’†’f‚·‚é
+ *	ãƒ•ã‚©ãƒ¼ãƒ«ãƒãƒƒã‚¯ã®çµ‚äº†
+ *		å—ä¿¡ãƒ‡ãƒ¼ã‚¿UTF-8æ™‚ã«ã€Shift_JISå‡ºåŠ›ä¸­(fallbackçŠ¶æ…‹)ã‚’ä¸­æ–­ã™ã‚‹
  *
  */
 void CharSetFallbackFinish(CharSetData *w)
@@ -1061,11 +1061,11 @@ void CharSetFallbackFinish(CharSetData *w)
 }
 
 /**
- *	ƒfƒoƒOo—Í‚ğŸ‚Ìƒ‚[ƒh‚É•ÏX‚·‚é
+ *	ãƒ‡ãƒã‚°å‡ºåŠ›ã‚’æ¬¡ã®ãƒ¢ãƒ¼ãƒ‰ã«å¤‰æ›´ã™ã‚‹
  */
 void CharSetSetNextDebugMode(CharSetData *w)
 {
-	// ts.DebugModes ‚É‚Í tttypes.h ‚Ì DBGF_* ‚ª OR ‚Å“ü‚Á‚Ä‚é
+	// ts.DebugModes ã«ã¯ tttypes.h ã® DBGF_* ãŒ OR ã§å…¥ã£ã¦ã‚‹
 	do {
 		w->DebugFlag = (w->DebugFlag + 1) % DEBUG_FLAG_MAXD;
 	} while (w->DebugFlag != DEBUG_FLAG_NONE && !((ts.DebugModes >> (w->DebugFlag - 1)) & 1));

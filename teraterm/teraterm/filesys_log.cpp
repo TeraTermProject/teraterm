@@ -37,26 +37,20 @@
 #include <windows.h>
 #include <assert.h>
 
-#include "teraterm.h"
 #include "tttypes.h"
 #include "ftdlg.h"
 #include "ttwinman.h"
-#include "commlib.h"
-#include "ttcommon.h"
 #include "ttlib.h"
 #include "ttlib_types.h"
-#include "dlglib.h"
 #include "vtterm.h"
-#include "ftlib.h"
 #include "codeconv.h"
 #include "asprintf.h"
-#include "win32helper.h"
+#include "makeoutputstring.h"
 
-#include "filesys_log_res.h"
 #include "filesys_log.h"
 #include "filesys.h"  // for ProtoGetProtoFlag()
 
-#define TitLog      L"Log"
+#define TitLog      L"Logging"
 
 /*
    Line Head flag for timestamping
@@ -72,14 +66,15 @@ typedef struct {
 	wchar_t *FullName;
 
 	HANDLE FileHandle;
-	LONG FileSize, ByteCount;
+	LONG FileSize;		// ? ä½¿ã£ã¦ã„ãªã„
+	LONG ByteCount;		// ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚º
 
 	DWORD StartTime;
 
 	enum enumLineEnd eLineEnd;
 
 	// log rotate
-	int RotateMode;  //  enum rotate_mode RotateMode;
+	enum rotate_mode RotateMode;
 	LONG RotateSize;
 	int RotateStep;
 
@@ -94,32 +89,33 @@ typedef struct {
 	LogCode_t log_code;
 	BOOL bom;
 
-	BOOL FileLog;
-	BOOL BinLog;
+	enum LogModeTag {
+		NONE,
+		BIN_MODE,
+		TEXT_MODE,
+	} LogMode;
+
+	PCHAR cv_LogBuf;	// ãƒãƒƒãƒ•ã‚¡ã®å…ˆé ­
+	int cv_LogPtr;		// æ›¸ãè¾¼ã¿ä½ç½®
+	int cv_LStart;		// èª­å‡ºã—ä½ç½®
+	int cv_LCount;		// ãƒ‡ãƒ¼ã‚¿æ•°
+	int cv_BinSkip;
+	int BuffSize;		// ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º (=InBuffSize)
+
+	CRITICAL_SECTION filelog_lock;   /* ãƒ­ãƒƒã‚¯ç”¨å¤‰æ•° */
 } TFileVar;
 typedef TFileVar *PFileVar;
 
 static PFileVar LogVar = NULL;
 
-static PCHAR cv_LogBuf;
-static int cv_LogPtr, cv_LStart, cv_LCount;
-static PCHAR cv_BinBuf;
-static int cv_BinPtr, cv_BStart, cv_BCount;
-static int cv_BinSkip;
-
-// ’x‰„‘‚«‚İ—pƒXƒŒƒbƒh‚ÌƒƒbƒZ[ƒW
+// é…å»¶æ›¸ãè¾¼ã¿ç”¨ã‚¹ãƒ¬ãƒƒãƒ‰ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 #define WM_DPC_LOGTHREAD_SEND (WM_APP + 1)
 
-static void Log1Bin(BYTE b);
-static void LogBinSkip(int add);
-static BOOL CreateLogBuf(void);
-static BOOL CreateBinBuf(void);
-void LogPut1(BYTE b);
-static void OutputStr(const wchar_t *str);
+static void OutputStr(PFileVar fv, const wchar_t *str);
 static void LogToFile(PFileVar fv);
 static void FLogOutputBOM(PFileVar fv);
 
-static BOOL OpenFTDlg_(PFileVar fv)
+static BOOL OpenFTDlg(PFileVar fv)
 {
 	PFileTransDlg FTDlg = new CFileTransDlg();
 	if (FTDlg == NULL) {
@@ -150,16 +146,16 @@ static BOOL OpenFTDlg_(PFileVar fv)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹–¼•¶š—ñ‚Ì’u‚«Š·‚¦,ƒƒO—p
- *	Ÿ‚Ì•¶š‚ğ’u‚«Š·‚¦‚é
- *		&h	ƒzƒXƒg–¼‚É’uŠ·
- *		&p	TCPƒ|[ƒg”Ô†‚É’uŠ·
- *		&u	ƒƒOƒIƒ“’†‚Ìƒ†[ƒU–¼
+ *	ãƒ•ã‚¡ã‚¤ãƒ«åæ–‡å­—åˆ—ã®ç½®ãæ›ãˆ,ãƒ­ã‚°ç”¨
+ *	æ¬¡ã®æ–‡å­—ã‚’ç½®ãæ›ãˆã‚‹
+ *		&h	ãƒ›ã‚¹ãƒˆåã«ç½®æ›
+ *		&p	TCPãƒãƒ¼ãƒˆç•ªå·ã«ç½®æ›
+ *		&u	ãƒ­ã‚°ã‚ªãƒ³ä¸­ã®ãƒ¦ãƒ¼ã‚¶å
  *
  *	@param	pcv
- *	@param	src	’u‚«Š·‚¦‚é‘O‚Ì•¶š—ñ(ƒtƒ@ƒCƒ‹–¼)
- *	@return	’u‚«Š·‚¦‚ç‚ê‚½•¶š—ñ
- *			•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
+ *	@param	src	ç½®ãæ›ãˆã‚‹å‰ã®æ–‡å­—åˆ—(ãƒ•ã‚¡ã‚¤ãƒ«å)
+ *	@return	ç½®ãæ›ãˆã‚‰ã‚ŒãŸæ–‡å­—åˆ—
+ *			ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
  */
 static wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src)
 {
@@ -180,7 +176,7 @@ static wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src)
 				if (pcv->Open) {
 					switch(pcv->PortType) {
 					case IdTCPIP: {
-						// ƒzƒXƒg–¼‚ªIPv6ƒAƒhƒŒƒX‚¾‚ÆAƒtƒ@ƒCƒ‹–¼‚Ég—p‚Å‚«‚È‚¢•¶š(:)‚ª“ü‚é‚½‚ß’uŠ·
+						// ãƒ›ã‚¹ãƒˆåãŒIPv6ã‚¢ãƒ‰ãƒ¬ã‚¹ã ã¨ã€ãƒ•ã‚¡ã‚¤ãƒ«åã«ä½¿ç”¨ã§ããªã„æ–‡å­—(:)ãŒå…¥ã‚‹ãŸã‚ç½®æ›
 						wchar_t *host = ToWcharA(pts->HostName);
 						wchar_t *host_fix = replaceInvalidFileNameCharW(host, '_');
 						free(host);
@@ -251,7 +247,7 @@ static void FixLogOption(void)
 }
 
 
-// ƒXƒŒƒbƒh‚ÌI—¹‚Æƒtƒ@ƒCƒ‹‚ÌƒNƒ[ƒY
+// ã‚¹ãƒ¬ãƒƒãƒ‰ã®çµ‚äº†ã¨ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¯ãƒ­ãƒ¼ã‚º
 static void CloseFileSync(PFileVar fv)
 {
 	BOOL ret;
@@ -261,10 +257,10 @@ static void CloseFileSync(PFileVar fv)
 	}
 
 	if (fv->LogThread != INVALID_HANDLE_VALUE) {
-		// ƒXƒŒƒbƒh‚ÌI—¹‘Ò‚¿
+		// ã‚¹ãƒ¬ãƒƒãƒ‰ã®çµ‚äº†å¾…ã¡
 		ret = PostThreadMessage(fv->LogThreadId, WM_QUIT, 0, 0);
 		if (ret != 0) {
-			// ƒXƒŒƒbƒhƒLƒ…[‚ÉƒGƒ“ƒLƒ…[‚Å‚«‚½ê‡‚Ì‚İ‘Ò‚¿‡‚í‚¹‚ğs‚¤B
+			// ã‚¹ãƒ¬ãƒƒãƒ‰ã‚­ãƒ¥ãƒ¼ã«ã‚¨ãƒ³ã‚­ãƒ¥ãƒ¼ã§ããŸå ´åˆã®ã¿å¾…ã¡åˆã‚ã›ã‚’è¡Œã†ã€‚
 			WaitForSingleObject(fv->LogThread, INFINITE);
 		}
 		else {
@@ -277,7 +273,7 @@ static void CloseFileSync(PFileVar fv)
 	fv->FileHandle = INVALID_HANDLE_VALUE;
 }
 
-// ’x‰„‘‚«‚İ—pƒXƒŒƒbƒh
+// é…å»¶æ›¸ãè¾¼ã¿ç”¨ã‚¹ãƒ¬ãƒƒãƒ‰
 static unsigned _stdcall DeferredLogWriteThread(void *arg)
 {
 	MSG msg;
@@ -288,7 +284,7 @@ static unsigned _stdcall DeferredLogWriteThread(void *arg)
 
 	PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
 
-	// ƒXƒŒƒbƒhƒLƒ…[‚Ìì¬‚ªI‚í‚Á‚½‚±‚Æ‚ğƒXƒŒƒbƒh¶¬Œ³‚Ö’Ê’m‚·‚éB
+	// ã‚¹ãƒ¬ãƒƒãƒ‰ã‚­ãƒ¥ãƒ¼ã®ä½œæˆãŒçµ‚ã‚ã£ãŸã“ã¨ã‚’ã‚¹ãƒ¬ãƒƒãƒ‰ç”Ÿæˆå…ƒã¸é€šçŸ¥ã™ã‚‹ã€‚
 	if (fv->LogThreadEvent != NULL) {
 		SetEvent(fv->LogThreadEvent);
 	}
@@ -299,7 +295,7 @@ static unsigned _stdcall DeferredLogWriteThread(void *arg)
 				buf = (PCHAR)msg.wParam;
 				buflen = (DWORD)msg.lParam;
 				WriteFile(fv->FileHandle, buf, buflen, &wrote, NULL);
-				free(buf);   // ‚±‚±‚Åƒƒ‚ƒŠ‰ğ•ú
+				free(buf);   // ã“ã“ã§ãƒ¡ãƒ¢ãƒªè§£æ”¾
 				break;
 
 			case WM_QUIT:
@@ -313,14 +309,14 @@ end:
 	return (0);
 }
 
-// ’x‰„‘‚«‚İ—pƒXƒŒƒbƒh‚ğ‹N‚±‚·B
+// é…å»¶æ›¸ãè¾¼ã¿ç”¨ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’èµ·ã“ã™ã€‚
 // (2013.4.19 yutaka)
-// DeferredLogWriteThread ƒXƒŒƒbƒh‚ª‹N°‚µ‚ÄAƒXƒŒƒbƒhƒLƒ…[‚ªì¬‚³‚ê‚é‚æ‚è‘O‚ÉA
-// ƒƒOƒtƒ@ƒCƒ‹‚ÌƒNƒ[ƒY(CloseFileSync)‚ªs‚í‚ê‚é‚ÆAƒGƒ“ƒLƒ…[‚ª¸”s‚µAƒfƒbƒhƒƒbƒN
-// ‚·‚é‚Æ‚¢‚¤–â‘è‚ğC³‚µ‚½B
-// ƒXƒŒƒbƒhŠÔ‚Ì“¯Šú‚ğs‚¤‚½‚ßA–¼‘O‚È‚µƒCƒxƒ“ƒgƒIƒuƒWƒFƒNƒg‚ğg‚Á‚ÄAƒXƒŒƒbƒhƒLƒ…[‚Ì
-// ì¬‚Ü‚Å‘Ò‚¿‡‚í‚¹‚·‚é‚æ‚¤‚É‚µ‚½B–¼‘O•t‚«ƒCƒxƒ“ƒgƒIƒuƒWƒFƒNƒg‚ğg‚¤ê‡‚ÍA
-// ƒVƒXƒeƒ€(Windows OS)ã‚Åƒ†ƒj[ƒN‚È–¼‘O‚É‚·‚é•K—v‚ª‚ ‚éB
+// DeferredLogWriteThread ã‚¹ãƒ¬ãƒƒãƒ‰ãŒèµ·åºŠã—ã¦ã€ã‚¹ãƒ¬ãƒƒãƒ‰ã‚­ãƒ¥ãƒ¼ãŒä½œæˆã•ã‚Œã‚‹ã‚ˆã‚Šå‰ã«ã€
+// ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¯ãƒ­ãƒ¼ã‚º(CloseFileSync)ãŒè¡Œã‚ã‚Œã‚‹ã¨ã€ã‚¨ãƒ³ã‚­ãƒ¥ãƒ¼ãŒå¤±æ•—ã—ã€ãƒ‡ãƒƒãƒ‰ãƒ­ãƒƒã‚¯
+// ã™ã‚‹ã¨ã„ã†å•é¡Œã‚’ä¿®æ­£ã—ãŸã€‚
+// ã‚¹ãƒ¬ãƒƒãƒ‰é–“ã®åŒæœŸã‚’è¡Œã†ãŸã‚ã€åå‰ãªã—ã‚¤ãƒ™ãƒ³ãƒˆã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½¿ã£ã¦ã€ã‚¹ãƒ¬ãƒƒãƒ‰ã‚­ãƒ¥ãƒ¼ã®
+// ä½œæˆã¾ã§å¾…ã¡åˆã‚ã›ã™ã‚‹ã‚ˆã†ã«ã—ãŸã€‚åå‰ä»˜ãã‚¤ãƒ™ãƒ³ãƒˆã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½¿ã†å ´åˆã¯ã€
+// ã‚·ã‚¹ãƒ†ãƒ (Windows OS)ä¸Šã§ãƒ¦ãƒ‹ãƒ¼ã‚¯ãªåå‰ã«ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
 // (2016.9.23 yutaka)
 static void StartThread(PFileVar fv)
 {
@@ -336,8 +332,8 @@ static void StartThread(PFileVar fv)
 
 static void OpenLogFile(PFileVar fv)
 {
-	// LogLockExclusive ‚ª—LŒø‚Èê‡‚É‚Ü‚Á‚½‚­‹¤—L‚µ‚È‚¢‚ÆA
-	// ‘‚«‚İ’†‚ÌƒƒOƒtƒ@ƒCƒ‹‚ğ‘¼‚ÌƒGƒfƒBƒ^‚ÅŠJ‚¯‚È‚¢‚½‚ß
+	// LogLockExclusive ãŒæœ‰åŠ¹ãªå ´åˆã«ã¾ã£ãŸãå…±æœ‰ã—ãªã„ã¨ã€
+	// æ›¸ãè¾¼ã¿ä¸­ã®ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä»–ã®ã‚¨ãƒ‡ã‚£ã‚¿ã§é–‹ã‘ãªã„ãŸã‚
 	int dwShareMode = FILE_SHARE_READ;
 	if (!ts.LogLockExclusive) {
 		dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
@@ -351,25 +347,19 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 	fv->FullName = _wcsdup(fname);
 	FixLogOption();
 
-	if (ts.LogBinary > 0)
-	{
-		fv->BinLog = TRUE;
-		fv->FileLog = FALSE;
-		if (! CreateBinBuf())
-		{
-			return FALSE;
-		}
+	fv->BuffSize = InBuffSize;
+	fv->cv_LogBuf = (char *)malloc(fv->BuffSize);
+	if (fv->cv_LogBuf == NULL) {
+		return FALSE;
 	}
-	else {
-		fv->BinLog = FALSE;
-		fv->FileLog = TRUE;
-		if (! CreateLogBuf())
-		{
-			return FALSE;
-		}
+	fv->cv_LogPtr = 0;
+	fv->cv_LStart = 0;
+	fv->cv_LCount = 0;
+	if (ts.LogBinary > 0) {
+		fv->LogMode = TFileVar::LogModeTag::BIN_MODE;
+	} else {
+		fv->LogMode = TFileVar::LogModeTag::TEXT_MODE;
 	}
-	cv_LStart = cv_LogPtr;
-	cv_LCount = 0;
 
 	OpenLogFile(fv);
 	if (fv->FileHandle == INVALID_HANDLE_VALUE) {
@@ -388,21 +378,19 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 		fv->eLineEnd = Line_FileHead;
 	}
 
-	// BOMo—Í
+	// BOMå‡ºåŠ›
 	if (ts.Append == 0 && ts.LogBinary == 0 && fv->bom) {
-		// ’Ç‹L‚Å‚Í‚È‚¢(V‹K) && ƒoƒCƒiƒŠ‚Å‚Í‚È‚¢ && BOM ‚ğo—Í
+		// è¿½è¨˜ã§ã¯ãªã„(æ–°è¦) && ãƒã‚¤ãƒŠãƒªã§ã¯ãªã„ && BOM ã‚’å‡ºåŠ›æ™‚
 		FLogOutputBOM(fv);
 	}
 
 	// Log rotate configuration
-	fv->RotateMode = ts.LogRotate;
+	fv->RotateMode = (enum rotate_mode)ts.LogRotate;
 	fv->RotateSize = ts.LogRotateSize;
 	fv->RotateStep = ts.LogRotateStep;
 
-	// Log rotate‚ª—LŒø‚Ìê‡A‰Šúƒtƒ@ƒCƒ‹ƒTƒCƒY‚ğİ’è‚·‚éB
-	// Å‰‚Ìƒtƒ@ƒCƒ‹‚ªİ’è‚µ‚½ƒTƒCƒY‚Åƒ[ƒe[ƒg‚µ‚È‚¢–â‘è‚ÌC³B
-	// (2016.4.9 yutaka)
 	if (fv->RotateMode != ROTATE_NONE) {
+		// Log rotateãŒæœ‰åŠ¹ã®å ´åˆã€åˆæœŸãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºã‚’è¨­å®šã™ã‚‹ã€‚
 		DWORD size = GetFileSize(fv->FileHandle, NULL);
 		if (size == -1) {
 			return FALSE;
@@ -413,7 +401,7 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 		fv->ByteCount = 0;
 	}
 
-	if (! OpenFTDlg_(fv)) {
+	if (! OpenFTDlg(fv)) {
 		return FALSE;
 	}
 
@@ -424,101 +412,96 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 		StartThread(fv);
 	}
 
-	if (fv->FileLog) {
-		cv.Log1Byte = LogPut1;
+	if (fv->LogMode == TFileVar::LogModeTag::TEXT_MODE) {
+		cv.Log1Byte = FLogPutANSI;
 	}
-	if (fv->BinLog) {
-		cv.Log1Bin = Log1Bin;
-		cv.LogBinSkip = LogBinSkip;
+	else {
+		cv.Log1Bin = FLogPutBinary;
+		cv.LogBinSkip = FLogBinSkip;
 	}
 
 	return TRUE;
 }
 
 /**
- * Œ»İƒoƒbƒtƒ@‚É‚ ‚éƒf[ƒ^‚ğ‚·‚×‚ÄƒƒO‚É‘‚«o‚·
- * (2013.9.29 yutaka)
+ * ç¾åœ¨ãƒãƒƒãƒ•ã‚¡ã«ã‚ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’ã™ã¹ã¦ãƒ­ã‚°ã«æ›¸ãå‡ºã™
  *
  *	TODO
- *		1s‚Ì’·‚³
+ *		1è¡Œã®é•·ã•
  */
 void FLogOutputAllBuffer(void)
 {
+	if (LogVar == NULL) {
+		return;
+	}
 	PFileVar fv = LogVar;
 	DWORD ofs;
 	int size;
 	wchar_t buf[512];
 	for (ofs = 0 ;  ; ofs++ ) {
-		// 1‚Â‚Ìs‚ğæ“¾‚·‚éB•¶š‚¾‚¯‚È‚Ì‚ÅAƒGƒXƒP[ƒvƒV[ƒPƒ“ƒX‚ÍŠÜ‚Ü‚ê‚È‚¢B
+		// 1ã¤ã®è¡Œã‚’å–å¾—ã™ã‚‹ã€‚æ–‡å­—ã ã‘ãªã®ã§ã€ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ã¯å«ã¾ã‚Œãªã„ã€‚
 		size = BuffGetAnyLineDataW(ofs, buf, _countof(buf));
 		if (size == -1)
 			break;
 
-		OutputStr(buf);
-		OutputStr(L"\r\n");
+		OutputStr(fv, buf);
+		OutputStr(fv, L"\r\n");
 		LogToFile(fv);
 	}
 }
 
 /**
- * ƒƒO‚Ö1byte‘‚«‚İ
- *		ƒoƒbƒtƒ@‚Ö‘‚«‚Ü‚ê‚é
- *		ÀÛ‚Ì‘‚«‚İ‚Í LogToFile() ‚Ås‚í‚ê‚é
+ * ãƒãƒƒãƒ•ã‚¡ã¸1byteæ›¸ãè¾¼ã¿
+ *		å®Ÿéš›ã®æ›¸ãè¾¼ã¿ã¯ LogToFile() ã§è¡Œã‚ã‚Œã‚‹
  */
-void LogPut1(BYTE b)
+static void Put1(PFileVar fv, BYTE b)
 {
-	PFileVar fv = LogVar;
-
-	cv_LogBuf[cv_LogPtr] = b;
-	cv_LogPtr++;
-	if (cv_LogPtr>=InBuffSize)
-		cv_LogPtr = cv_LogPtr-InBuffSize;
-
-	if (fv->FileLog)
-	{
-		if (cv_LCount>=InBuffSize)
-		{
-			cv_LCount = InBuffSize;
-			cv_LStart = cv_LogPtr;
-		}
-		else
-			cv_LCount++;
+	fv->cv_LogBuf[fv->cv_LogPtr] = b;
+	fv->cv_LogPtr++;
+	if (fv->cv_LogPtr >= fv->BuffSize) {
+		fv->cv_LogPtr = fv->cv_LogPtr - fv->BuffSize;
 	}
-	else
-		cv_LCount = 0;
+	if (fv->cv_LCount>=fv->BuffSize) {
+		// ãƒãƒƒãƒ•ã‚¡ãŒã„ã£ã±ã„ã®æ™‚ã€å¤ã„1byteã‚’æ¨ã¦ã‚‹
+		fv->cv_LCount = fv->BuffSize;
+		fv->cv_LStart = fv->cv_LogPtr;
+	}
+	else {
+		fv->cv_LCount++;
+	}
 }
 
-static BOOL Get1(PCHAR Buf, int *Start, int *Count, PBYTE b)
+/**
+ * ãƒãƒƒãƒ•ã‚¡ã‹ã‚‰1byteå–ã‚Šå‡ºã—
+ *
+ *	@return	TRUE/FALSE	å–ã‚Šå‡ºã›ãŸ/ãƒãƒƒãƒ•ã‚¡ãŒç©º
+ */
+static BOOL Get1(PFileVar fv, PBYTE b)
 {
-	if (*Count<=0) return FALSE;
-	*b = Buf[*Start];
-	(*Start)++;
-	if (*Start>=InBuffSize)
-		*Start = *Start-InBuffSize;
-	(*Count)--;
+	if (fv->cv_LCount <= 0) {
+		// ç©º
+		return FALSE;
+	}
+	*b = fv->cv_LogBuf[fv->cv_LStart];
+	fv->cv_LStart++;
+	if (fv->cv_LStart >= fv->BuffSize) {
+		fv->cv_LStart = fv->cv_LStart - fv->BuffSize;
+	}
+	fv->cv_LCount--;
 	return TRUE;
 }
 
-
-
-static CRITICAL_SECTION g_filelog_lock;   /* ƒƒbƒN—p•Ï” */
-
-void logfile_lock_initialize(void)
+static void logfile_lock(PFileVar fv)
 {
-	InitializeCriticalSection(&g_filelog_lock);
+	EnterCriticalSection(&fv->filelog_lock);
 }
 
-static inline void logfile_lock(void)
+static void logfile_unlock(PFileVar fv)
 {
-	EnterCriticalSection(&g_filelog_lock);
+	LeaveCriticalSection(&fv->filelog_lock);
 }
 
-static inline void logfile_unlock(void)
-{
-	LeaveCriticalSection(&g_filelog_lock);
-}
-
-// ƒƒO‚ğƒ[ƒe[ƒg‚·‚éB
+// ãƒ­ã‚°ã‚’ãƒ­ãƒ¼ãƒ†ãƒ¼ãƒˆã™ã‚‹ã€‚
 // (2013.3.21 yutaka)
 static void LogRotate(PFileVar fv)
 {
@@ -536,14 +519,14 @@ static void LogRotate(PFileVar fv)
 		return;
 	}
 
-	logfile_lock();
-	// ƒƒOƒTƒCƒY‚ğÄ‰Šú‰»‚·‚éB
+	logfile_lock(fv);
+	// ãƒ­ã‚°ã‚µã‚¤ã‚ºã‚’å†åˆæœŸåŒ–ã™ã‚‹ã€‚
 	fv->ByteCount = 0;
 
-	// ‚¢‚Á‚½‚ñ¡‚Ìƒtƒ@ƒCƒ‹‚ğƒNƒ[ƒY‚µ‚ÄA•Ê–¼‚Ìƒtƒ@ƒCƒ‹‚ğƒI[ƒvƒ“‚·‚éB
+	// ã„ã£ãŸã‚“ä»Šã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚¯ãƒ­ãƒ¼ã‚ºã—ã¦ã€åˆ¥åã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚ªãƒ¼ãƒ—ãƒ³ã™ã‚‹ã€‚
 	CloseFileSync(fv);
 
-	// ¢‘ãƒ[ƒe[ƒVƒ‡ƒ“‚ÌƒXƒeƒbƒv”‚Ìw’è‚ª‚ ‚é‚©
+	// ä¸–ä»£ãƒ­ãƒ¼ãƒ†ãƒ¼ã‚·ãƒ§ãƒ³ã®ã‚¹ãƒ†ãƒƒãƒ—æ•°ã®æŒ‡å®šãŒã‚ã‚‹ã‹
 	if (fv->RotateStep > 0)
 		loopmax = fv->RotateStep;
 
@@ -556,11 +539,11 @@ static void LogRotate(PFileVar fv)
 			break;
 	}
 	if (i > loopmax) {
-		// ¢‘ã‚ª‚¢‚Á‚Ï‚¢‚É‚È‚Á‚½‚çAÅŒÃ‚Ìƒtƒ@ƒCƒ‹‚©‚ç”pŠü‚·‚éB
+		// ä¸–ä»£ãŒã„ã£ã±ã„ã«ãªã£ãŸã‚‰ã€æœ€å¤ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰å»ƒæ£„ã™ã‚‹ã€‚
 		i = loopmax;
 	}
 
-	// •Êƒtƒ@ƒCƒ‹‚ÉƒŠƒl[ƒ€B
+	// åˆ¥ãƒ•ã‚¡ã‚¤ãƒ«ã«ãƒªãƒãƒ¼ãƒ ã€‚
 	for (k = i-1 ; k >= 0 ; k--) {
 		wchar_t *oldfile;
 		if (k == 0)
@@ -577,7 +560,7 @@ static void LogRotate(PFileVar fv)
 		free(newfile);
 	}
 
-	// ÄƒI[ƒvƒ“
+	// å†ã‚ªãƒ¼ãƒ—ãƒ³
 	OpenLogFile(fv);
 	if (fv->bom) {
 		FLogOutputBOM(fv);
@@ -586,7 +569,7 @@ static void LogRotate(PFileVar fv)
 		StartThread(fv);
 	}
 
-	logfile_unlock();
+	logfile_unlock(fv);
 }
 
 static wchar_t *TimeStampStr(PFileVar fv)
@@ -619,44 +602,34 @@ static wchar_t *TimeStampStr(PFileVar fv)
 }
 
 /**
- * ƒoƒbƒtƒ@“à‚ÌƒƒO‚ğƒtƒ@ƒCƒ‹‚Ö‘‚«‚Ş
+ * ãƒãƒƒãƒ•ã‚¡å†…ã®ãƒ­ã‚°ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã¸æ›¸ãè¾¼ã‚€
  */
 static void LogToFile(PFileVar fv)
 {
-	PCHAR Buf;
-	int Start, Count;
 	BYTE b;
 
-	if (fv->FileLog)
-	{
-		Buf = cv_LogBuf;
-		Start = cv_LStart;
-		Count = cv_LCount;
-	}
-	else if (fv->BinLog)
-	{
-		Buf = cv_BinBuf;
-		Start = cv_BStart;
-		Count = cv_BCount;
-	}
-	else
+	if (fv->LogMode != TFileVar::LogModeTag::TEXT_MODE &&
+		fv->LogMode != TFileVar::LogModeTag::BIN_MODE) {
 		return;
+	}
 
-	if (Buf==NULL) return;
-	if (Count==0) return;
+	if (fv->cv_LCount==0) {
+		return;
+	}
 
-	// ƒƒbƒN‚ğæ‚é(2004.8.6 yutaka)
-	logfile_lock();
+	// ãƒ­ãƒƒã‚¯ã‚’å–ã‚‹(2004.8.6 yutaka)
+	logfile_lock(fv);
 
-	// ‘‚«‚İƒf[ƒ^‚ğì¬‚·‚é
-	DWORD WriteBufMax = 8192;
+	// æ›¸ãè¾¼ã¿ãƒ‡ãƒ¼ã‚¿ã‚’ä½œæˆã™ã‚‹
+	DWORD WriteBufMax = fv->BuffSize;
 	DWORD WriteBufLen = 0;
 	PCHAR WriteBuf = (PCHAR)malloc(WriteBufMax);
-	while (Get1(Buf,&Start,&Count,&b)) {
+	while (Get1(fv, &b)) {
 		if (FLogIsPause() || ProtoGetProtoFlag()) {
 			continue;
 		}
 
+		// fv->BuffSizeã‚ˆã‚Šå¤§ãããªã‚‰ãªã„ã¯ãš
 		if (WriteBufLen >= (WriteBufMax*4/5)) {
 			WriteBufMax *= 2;
 			WriteBuf = (PCHAR)realloc(WriteBuf, WriteBufMax);
@@ -664,10 +637,10 @@ static void LogToFile(PFileVar fv)
 
 		WriteBuf[WriteBufLen++] = b;
 
-		(fv->ByteCount)++;
+		fv->ByteCount++;
 	}
 
-	// ‘‚«‚İ
+	// æ›¸ãè¾¼ã¿
 	if (WriteBufLen > 0) {
 		if (ts.DeferredLogWriteMode) {
 			PostThreadMessage(fv->LogThreadId, WM_DPC_LOGTHREAD_SEND, (WPARAM)WriteBuf, WriteBufLen);
@@ -679,71 +652,19 @@ static void LogToFile(PFileVar fv)
 		}
 	}
 
-	logfile_unlock();
+	logfile_unlock(fv);
 
-	if (fv->FileLog)
-	{
-		cv_LStart = Start;
-		cv_LCount = Count;
-	}
-	else {
-		cv_BStart = Start;
-		cv_BCount = Count;
-	}
 	if (FLogIsPause() || ProtoGetProtoFlag()) return;
 	fv->FLogDlg->RefreshNum(fv->StartTime, fv->FileSize, fv->ByteCount);
 
 
-	// ƒƒOEƒ[ƒe[ƒg
+	// ãƒ­ã‚°ãƒ»ãƒ­ãƒ¼ãƒ†ãƒ¼ãƒˆ
 	LogRotate(fv);
-}
-
-static BOOL CreateLogBuf(void)
-{
-	if (cv_LogBuf==NULL)
-	{
-		cv_LogBuf = (char *)malloc(InBuffSize);
-		cv_LogPtr = 0;
-		cv_LStart = 0;
-		cv_LCount = 0;
-	}
-	return (cv_LogBuf!=NULL);
-}
-
-static void FreeLogBuf(void)
-{
-	free(cv_LogBuf);
-	cv_LogBuf = NULL;
-	cv_LogPtr = 0;
-	cv_LStart = 0;
-	cv_LCount = 0;
-}
-
-static BOOL CreateBinBuf(void)
-{
-	if (cv_BinBuf==NULL)
-	{
-		cv_BinBuf = (PCHAR)malloc(InBuffSize);
-		cv_BinPtr = 0;
-		cv_BStart = 0;
-		cv_BCount = 0;
-	}
-	return (cv_BinBuf!=NULL);
-}
-
-static void FreeBinBuf(void)
-{
-	free(cv_BinBuf);
-	cv_BinBuf = NULL;
-	cv_BinPtr = 0;
-	cv_BStart = 0;
-	cv_BCount = 0;
 }
 
 static void FileTransEnd_(PFileVar fv)
 {
-	fv->FileLog = FALSE;
-	fv->BinLog = FALSE;
+	fv->LogMode = TFileVar::LogModeTag::NONE;
 	cv.Log1Byte = NULL;
 	cv.Log1Bin = NULL;
 	cv.LogBinSkip = NULL;
@@ -754,17 +675,19 @@ static void FileTransEnd_(PFileVar fv)
 		fv->FLogDlg = NULL;
 	}
 	CloseFileSync(fv);
-	FreeLogBuf();
-	FreeBinBuf();
+	free(fv->cv_LogBuf);
+	fv->cv_LogBuf = NULL;
+	fv->cv_LogPtr = 0;
+	fv->cv_LStart = 0;
+	fv->cv_LCount = 0;
 	free(fv->FullName);
 	fv->FullName = NULL;
+	DeleteCriticalSection(&fv->filelog_lock);
 	free(fv);
-
-	LogVar = NULL;
 }
 
 /**
- *	ƒƒO‚ğƒ|[ƒY‚·‚é
+ *	ãƒ­ã‚°ã‚’ãƒãƒ¼ã‚ºã™ã‚‹
  */
 void FLogPause(BOOL Pause)
 {
@@ -777,8 +700,8 @@ void FLogPause(BOOL Pause)
 }
 
 /**
- *	ƒƒOƒ[ƒe[ƒg‚Ìİ’è
- *	ƒƒO‚ÌƒTƒCƒY‚ª<size>ƒoƒCƒg‚ğ’´‚¦‚Ä‚¢‚ê‚ÎAƒ[ƒe[ƒVƒ‡ƒ“‚·‚é‚æ‚¤İ’è‚·‚é
+ *	ãƒ­ã‚°ãƒ­ãƒ¼ãƒ†ãƒ¼ãƒˆã®è¨­å®š
+ *	ãƒ­ã‚°ã®ã‚µã‚¤ã‚ºãŒ<size>ãƒã‚¤ãƒˆã‚’è¶…ãˆã¦ã„ã‚Œã°ã€ãƒ­ãƒ¼ãƒ†ãƒ¼ã‚·ãƒ§ãƒ³ã™ã‚‹ã‚ˆã†è¨­å®šã™ã‚‹
  */
 void FLogRotateSize(size_t size)
 {
@@ -791,8 +714,8 @@ void FLogRotateSize(size_t size)
 }
 
 /**
- *	ƒƒOƒ[ƒe[ƒg‚Ìİ’è
- *	ƒƒOƒtƒ@ƒCƒ‹‚Ì¢‘ã‚ğİ’è‚·‚é
+ *	ãƒ­ã‚°ãƒ­ãƒ¼ãƒ†ãƒ¼ãƒˆã®è¨­å®š
+ *	ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ã®ä¸–ä»£ã‚’è¨­å®šã™ã‚‹
  */
 void FLogRotateRotate(int step)
 {
@@ -804,8 +727,8 @@ void FLogRotateRotate(int step)
 }
 
 /**
- *	ƒƒOƒ[ƒe[ƒg‚Ìİ’è
- *	ƒ[ƒe[ƒVƒ‡ƒ“‚ğ’â~
+ *	ãƒ­ã‚°ãƒ­ãƒ¼ãƒ†ãƒ¼ãƒˆã®è¨­å®š
+ *	ãƒ­ãƒ¼ãƒ†ãƒ¼ã‚·ãƒ§ãƒ³ã‚’åœæ­¢
  */
 void FLogRotateHalt(void)
 {
@@ -818,61 +741,6 @@ void FLogRotateHalt(void)
 	fv->RotateStep = 0;
 }
 
-static INT_PTR CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM)
-{
-	static const DlgTextInfo TextInfos[] = {
-		{ 0, "DLG_COMMENT_TITLE" },
-		{ IDOK, "BTN_OK" }
-	};
-
-	switch (msg) {
-		case WM_INITDIALOG:
-			// ƒGƒfƒBƒbƒgƒRƒ“ƒgƒ[ƒ‹‚ÉƒtƒH[ƒJƒX‚ğ‚ ‚Ä‚é
-			SetFocus(GetDlgItem(hDlgWnd, IDC_EDIT_COMMENT));
-			SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
-			return FALSE;
-
-		case WM_COMMAND:
-			switch (LOWORD(wp)) {
-				case IDOK: {
-					size_t len = SendDlgItemMessageW(hDlgWnd, IDC_EDIT_COMMENT, WM_GETTEXTLENGTH, 0, 0);
-					len += 1;
-					wchar_t *buf = (wchar_t *)malloc(len * sizeof(wchar_t));
-					GetDlgItemTextW(hDlgWnd, IDC_EDIT_COMMENT, buf, (int)len);
-					FLogWriteStr(buf);
-					FLogWriteStr(L"\n");		// TODO ‰üsƒR[ƒh
-					free(buf);
-					TTEndDialog(hDlgWnd, IDOK);
-					break;
-				}
-				default:
-					return FALSE;
-			}
-			break;
-
-		case WM_CLOSE:
-			TTEndDialog(hDlgWnd, 0);
-			return TRUE;
-
-		default:
-			return FALSE;
-	}
-	return TRUE;
-}
-
-/**
- * ƒƒOƒtƒ@ƒCƒ‹‚ÖƒRƒƒ“ƒg‚ğ’Ç‰Á‚·‚é (2004.8.6 yutaka)
- */
-void FLogAddCommentDlg(HINSTANCE hInst, HWND hWnd)
-{
-	PFileVar fv = LogVar;
-	if (fv == NULL) {
-		return;
-	}
-	TTDialogBox(hInst, MAKEINTRESOURCEW(IDD_COMMENT_DIALOG),
-				hWnd, OnCommentDlgProc);
-}
-
 void FLogClose(void)
 {
 	PFileVar fv = LogVar;
@@ -881,15 +749,16 @@ void FLogClose(void)
 	}
 
 	FileTransEnd_(fv);
+	LogVar = NULL;
 }
 
 /**
- *	ƒƒO‚ğƒI[ƒvƒ“‚·‚é
- *	@param[in]	fname	ƒƒOƒtƒ@ƒCƒ‹–¼, CreateFile()‚É“n‚³‚ê‚é
+ *	ãƒ­ã‚°ã‚’ã‚ªãƒ¼ãƒ—ãƒ³ã™ã‚‹
+ *	@param[in]	fname	ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å, CreateFile()ã«æ¸¡ã•ã‚Œã‚‹
  *
- *	ƒƒOƒtƒ@ƒCƒ‹–¼‚Ístrftime‚Ì“WŠJ‚È‚Ç‚Ís‚í‚ê‚È‚¢B
- *	FLogGetLogFilename() ‚â FLogOpenDialog() ‚Å
- *	ƒtƒ@ƒCƒ‹–¼‚ğæ“¾‚Å‚«‚éB
+ *	ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«åã¯strftimeã®å±•é–‹ãªã©ã¯è¡Œã‚ã‚Œãªã„ã€‚
+ *	FLogGetLogFilename() ã‚„ FLogOpenDialog() ã§
+ *	ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–å¾—ã§ãã‚‹ã€‚
  */
 BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom)
 {
@@ -902,7 +771,6 @@ BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom)
 	if (fv == NULL) {
 		return FALSE;
 	}
-	LogVar = fv;
 	memset(fv, 0, sizeof(TFileVar));
 	fv->FileHandle = INVALID_HANDLE_VALUE;
 	fv->LogThread = INVALID_HANDLE_VALUE;
@@ -910,12 +778,17 @@ BOOL FLogOpen(const wchar_t *fname, LogCode_t code, BOOL bom)
 
 	fv->log_code = code;
 	fv->bom = bom;
+
+	InitializeCriticalSection(&fv->filelog_lock);
+
 	BOOL ret = LogStart(fv, fname);
 	if (ret == FALSE) {
 		FileTransEnd_(fv);
+		LogVar = NULL;
+		return FALSE;
 	}
-
-	return ret;
+	LogVar = fv;
+	return TRUE;
 }
 
 BOOL FLogIsOpend(void)
@@ -925,24 +798,37 @@ BOOL FLogIsOpend(void)
 
 BOOL FLogIsOpendText(void)
 {
-	return LogVar != NULL && LogVar->FileLog;
+	PFileVar fv = LogVar;
+	return fv != NULL && (fv->LogMode == TFileVar::LogModeTag::TEXT_MODE);
 }
 
 BOOL FLogIsOpendBin(void)
 {
-	return LogVar != NULL && LogVar->BinLog;
-}
-
-void FLogWriteStr(const wchar_t *str)
-{
-	if (LogVar != NULL) {
-		OutputStr(str);
-	}
+	PFileVar fv = LogVar;
+	return fv != NULL && (fv->LogMode == TFileVar::LogModeTag::BIN_MODE);
 }
 
 /**
- *	ƒƒO‚Ìî•ñ‚ğæ“¾‚·‚é
- *	ƒ}ƒNƒ—p
+ *	ãƒ­ã‚°ã«æ–‡å­—åˆ—ã‚’æ›¸ãè¾¼ã‚€
+ */
+void FLogWriteStr(const wchar_t *str)
+{
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
+		return;
+	}
+	if (str == NULL) {
+		return;
+	}
+	OutputStr(fv, str);
+
+	// ã™ãã«æ›¸ãè¾¼ã‚€
+	LogToFile(fv);
+}
+
+/**
+ *	ãƒ­ã‚°ã®æƒ…å ±ã‚’å–å¾—ã™ã‚‹
+ *	ãƒã‚¯ãƒ­ç”¨
  */
 void FLogInfo(char *param_ptr, size_t param_len)
 {
@@ -965,28 +851,29 @@ void FLogInfo(char *param_ptr, size_t param_len)
 }
 
 /**
- *	Œ»İ‚ÌƒƒOƒtƒ@ƒCƒ‹–¼‚ğæ“¾
+ *	ç¾åœ¨ã®ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–å¾—
  */
 const wchar_t *FLogGetFilename(void)
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return NULL;
 	}
-	return LogVar->FullName;
+	return fv->FullName;
 }
 
 /**
- *	ƒƒOƒtƒ@ƒCƒ‹–¼—p‚ÌCü‚ğs‚¤,ƒtƒ@ƒCƒ‹–¼•”•ª‚Ì‚İ
- *	- strftime() ‚Æ“¯‚¶“ú•t“WŠJ
- *	- İ’è‚³‚ê‚½ƒƒOƒtƒ@ƒCƒ‹ƒtƒHƒ‹ƒ_‚ğ’Ç‰Á
- *	- ƒzƒXƒg–¼,ƒ|[ƒg”Ô†“WŠJ
+ *	ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«åç”¨ã®ä¿®é£¾ã‚’è¡Œã†,ãƒ•ã‚¡ã‚¤ãƒ«åéƒ¨åˆ†ã®ã¿
+ *	- strftime() ã¨åŒã˜æ—¥ä»˜å±•é–‹
+ *	- è¨­å®šã•ã‚ŒãŸãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ãƒ•ã‚©ãƒ«ãƒ€ã‚’è¿½åŠ 
+ *	- ãƒ›ã‚¹ãƒˆå,ãƒãƒ¼ãƒˆç•ªå·å±•é–‹
  *
- *	@param 	filename	ƒtƒ@ƒCƒ‹–¼(ƒpƒX‚ÍŠÜ‚Ü‚È‚¢)
- *	@return	CüÏ‚İƒtƒ@ƒCƒ‹–¼
+ *	@param 	filename	ãƒ•ã‚¡ã‚¤ãƒ«å(ãƒ‘ã‚¹ã¯å«ã¾ãªã„)
+ *	@return	ä¿®é£¾æ¸ˆã¿ãƒ•ã‚¡ã‚¤ãƒ«å
  */
 wchar_t *FLogGetLogFilenameBase(const wchar_t *filename)
 {
-	// ƒtƒ@ƒCƒ‹–¼•”•ª‚ğ’Šo
+	// ãƒ•ã‚¡ã‚¤ãƒ«åéƒ¨åˆ†ã‚’æŠ½å‡º
 	const wchar_t *last_path_sep = wcsrchr(filename, L'\\');
 	wchar_t *format;
 	if (last_path_sep == NULL) {
@@ -996,23 +883,23 @@ wchar_t *FLogGetLogFilenameBase(const wchar_t *filename)
 		format = _wcsdup(last_path_sep + 1);
 	}
 
-	// strftime ‚Ég—p‚Å‚«‚È‚¢•¶š‚ğíœ
+	// strftime ã«ä½¿ç”¨ã§ããªã„æ–‡å­—ã‚’å‰Šé™¤
 	deleteInvalidStrftimeCharW(format);
 
-	// •¶š—ñ’·‚ª0‚É‚È‚Á‚½?
+	// æ–‡å­—åˆ—é•·ãŒ0ã«ãªã£ãŸ?
 	if (format[0] == 0) {
 		free(format);
 		return _wcsdup(L"");
 	}
 
-	// Œ»İ‚ğæ“¾
+	// ç¾åœ¨æ™‚åˆ»ã‚’å–å¾—
 	time_t time_local;
 	time(&time_local);
 	struct tm tm_local;
 	localtime_s(&tm_local, &time_local);
 
-	// strftime()‚Å•ÏŠ·
-	// •¶š—Ìˆæ‚Í©“®Šg’£
+	// strftime()ã§å¤‰æ›
+	// æ–‡å­—é ˜åŸŸã¯è‡ªå‹•æ‹¡å¼µ
 	size_t len = 32;
 	wchar_t *formated = NULL;
 	while (1) {
@@ -1025,19 +912,19 @@ wchar_t *FLogGetLogFilenameBase(const wchar_t *filename)
 		formated = formated_realloc;
 		size_t r = wcsftime(formated, len, format, &tm_local);
 		if (r != 0) {
-			// ƒtƒH[ƒ}ƒbƒg‚Å‚«‚½
+			// ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã§ããŸ
 			break;
 		}
 		len *= 2;
 	}
 	free(format);
 
-	// ƒzƒXƒg–¼‚È‚Ç
+	// ãƒ›ã‚¹ãƒˆåãªã©
 	wchar_t *host = ConvertLognameW(&cv, formated);
 	free(formated);
 
-	// ƒtƒ@ƒCƒ‹–¼‚Ég—p‚Å‚«‚È‚¢•¶š‚ğ’uŠ·
-	//wchar_t *replaced = replaceInvalidFileNameCharW(host, 0);	// íœ
+	// ãƒ•ã‚¡ã‚¤ãƒ«åã«ä½¿ç”¨ã§ããªã„æ–‡å­—ã‚’ç½®æ›
+	//wchar_t *replaced = replaceInvalidFileNameCharW(host, 0);	// å‰Šé™¤
 	wchar_t *replaced = replaceInvalidFileNameCharW(host, L'_');
 	free(host);
 
@@ -1045,17 +932,17 @@ wchar_t *FLogGetLogFilenameBase(const wchar_t *filename)
 }
 
 /**
- *	ƒƒOƒtƒ@ƒCƒ‹–¼‚ğæ“¾
- *	ƒƒOƒtƒ@ƒCƒ‹–¼—p‚ÌCü‚ğs‚¤
- *	- strftime() ‚Æ“¯‚¶“ú•t“WŠJ
- *	- İ’è‚³‚ê‚½ƒƒOƒtƒ@ƒCƒ‹ƒtƒHƒ‹ƒ_‚ğ’Ç‰Á
- *	- ƒzƒXƒg–¼,ƒ|[ƒg”Ô†“WŠJ
+ *	ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–å¾—
+ *	ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«åç”¨ã®ä¿®é£¾ã‚’è¡Œã†
+ *	- strftime() ã¨åŒã˜æ—¥ä»˜å±•é–‹
+ *	- è¨­å®šã•ã‚ŒãŸãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ãƒ•ã‚©ãƒ«ãƒ€ã‚’è¿½åŠ 
+ *	- ãƒ›ã‚¹ãƒˆå,ãƒãƒ¼ãƒˆç•ªå·å±•é–‹
  *
- *	@param[in]	log_filename	ƒtƒ@ƒCƒ‹–¼(‘Š‘Î/â‘Î‚Ç‚¿‚ç‚Å‚àok)
- *								NULL‚Ìê‡ƒfƒtƒHƒ‹ƒgƒtƒ@ƒCƒ‹–¼‚Æ‚È‚é
- *								strftimeŒ`®ok
- *	@return						ƒtƒ‹ƒpƒXƒtƒ@ƒCƒ‹–¼
- *								•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
+ *	@param[in]	log_filename	ãƒ•ã‚¡ã‚¤ãƒ«å(ç›¸å¯¾/çµ¶å¯¾ã©ã¡ã‚‰ã§ã‚‚ok)
+ *								NULLã®å ´åˆãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ•ã‚¡ã‚¤ãƒ«åã¨ãªã‚‹
+ *								strftimeå½¢å¼ok
+ *	@return						ãƒ•ãƒ«ãƒ‘ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å
+ *								ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  */
 wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 {
@@ -1066,8 +953,11 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 		fname = _wcsdup(ts.LogDefaultNameW);
 	}
 	else if (!IsRelativePathW(log_filename)) {
-		// â‘ÎƒpƒX‚ª“ü—Í‚³‚ê‚½
+		// çµ¶å¯¾ãƒ‘ã‚¹ãŒå…¥åŠ›ã•ã‚ŒãŸ
 		dir = ExtractDirNameW(log_filename);
+		if (dir == NULL) {
+			return NULL;
+		}
 		fname = ExtractFileNameW(log_filename);
 	}
 	else {
@@ -1078,7 +968,7 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 	wchar_t *formated = FLogGetLogFilenameBase(fname);
 	free(fname);
 
-	// ˜AŒ‹,³‹K‰»
+	// é€£çµ,æ­£è¦åŒ–
 	wchar_t *logfull = GetFullPathW(dir, formated);
 	free(formated);
 	free(dir);
@@ -1088,73 +978,65 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 
 BOOL FLogIsPause()
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return FALSE;
 	}
-	return LogVar->IsPause;
+	return fv->IsPause;
 }
 
 void FLogWindow(int nCmdShow)
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return;
 	}
 
-	HWND HWndLog = LogVar->FLogDlg->m_hWnd;
+	HWND HWndLog = fv->FLogDlg->m_hWnd;
 	ShowWindow(HWndLog, nCmdShow);
 	if (nCmdShow == SW_RESTORE) {
-		// Šg’£ƒXƒ^ƒCƒ‹ WS_EX_NOACTIVATE ó‘Ô‚ğ‰ğœ‚·‚é
+		// æ‹¡å¼µã‚¹ã‚¿ã‚¤ãƒ« WS_EX_NOACTIVATE çŠ¶æ…‹ã‚’è§£é™¤ã™ã‚‹
 		SetForegroundWindow(HWndLog);
 	}
 }
 
 void FLogShowDlg(void)
 {
-	if (LogVar == NULL) {
+	PFileVar fv = LogVar;
+	if (fv == NULL) {
 		return;
 	}
-	HWND HWndLog = LogVar->FLogDlg->m_hWnd;
+	HWND HWndLog = fv->FLogDlg->m_hWnd;
 	ShowWindow(HWndLog, SW_SHOWNORMAL);
 	SetForegroundWindow(HWndLog);
 }
 
 /**
- * ƒƒO‚Ö1byte‘‚«‚İ
- *		LogPut1() ‚Æˆá‚¤?
+ * ãƒ­ã‚°ã¸1byteæ›¸ãè¾¼ã¿
  */
-//void Log1Bin(PComVar cv, BYTE b)
-static void Log1Bin(BYTE b)
+static void Log1Bin(PFileVar fv, BYTE b)
 {
-	if (LogVar->IsPause || ProtoGetProtoFlag()) {
+	if (fv->IsPause || ProtoGetProtoFlag()) {
 		return;
 	}
-	if (cv_BinSkip > 0) {
-		cv_BinSkip--;
-		return;
+	if (fv->LogMode == TFileVar::LogModeTag::BIN_MODE) {
+		if (fv->cv_BinSkip > 0) {
+			fv->cv_BinSkip--;
+			return;
+		}
 	}
-	cv_BinBuf[cv_BinPtr] = b;
-	cv_BinPtr++;
-	if (cv_BinPtr>=InBuffSize) {
-		cv_BinPtr = cv_BinPtr-InBuffSize;
-	}
-	if (cv_BCount>=InBuffSize) {
-		cv_BCount = InBuffSize;
-		cv_BStart = cv_BinPtr;
-	}
-	else {
-		cv_BCount++;
-	}
+	Put1(fv, b);
 }
 
-static void LogBinSkip(int add)
+static void LogBinSkip(PFileVar fv, int add)
 {
-	if (cv_BinBuf != NULL) {
-		cv_BinSkip += add;
+	if (fv->LogMode == TFileVar::LogModeTag::BIN_MODE) {
+		fv->cv_BinSkip += add;
 	}
 }
 
 /**
- *	ƒƒOƒoƒbƒtƒ@‚É—­‚Ü‚Á‚Ä‚¢‚éƒf[ƒ^‚ÌƒoƒCƒg”‚ğ•Ô‚·
+ *	ãƒ­ã‚°ãƒãƒƒãƒ•ã‚¡ã«æºœã¾ã£ã¦ã„ã‚‹ãƒ‡ãƒ¼ã‚¿ã®ãƒã‚¤ãƒˆæ•°ã‚’è¿”ã™
  */
 int FLogGetCount(void)
 {
@@ -1162,17 +1044,11 @@ int FLogGetCount(void)
 	if (fv == NULL) {
 		return 0;
 	}
-	if (fv->FileLog) {
-		return cv_LCount;
-	}
-	if (fv->BinLog) {
-		return cv_BCount;
-	}
-	return 0;
+	return fv->cv_LCount;
 }
 
 /**
- *	ƒƒOƒoƒbƒtƒ@‚Ì‹ó‚«ƒoƒCƒg”‚ğ•Ô‚·
+ *	ãƒ­ã‚°ãƒãƒƒãƒ•ã‚¡ã®ç©ºããƒã‚¤ãƒˆæ•°ã‚’è¿”ã™
  */
 int FLogGetFreeCount(void)
 {
@@ -1180,17 +1056,11 @@ int FLogGetFreeCount(void)
 	if (fv == NULL) {
 		return 0;
 	}
-	if (fv->FileLog) {
-		return InBuffSize - cv_LCount;
-	}
-	if (fv->BinLog) {
-		return InBuffSize - cv_BCount;
-	}
-	return 0;
+	return fv->BuffSize - fv->cv_LCount;
 }
 
 /**
- * ƒoƒbƒtƒ@“à‚ÌƒƒO‚ğƒtƒ@ƒCƒ‹‚Ö‘‚«‚Ş
+ * ãƒãƒƒãƒ•ã‚¡å†…ã®ãƒ­ã‚°ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã¸æ›¸ãè¾¼ã‚€
  */
 void FLogWriteFile(void)
 {
@@ -1198,34 +1068,22 @@ void FLogWriteFile(void)
 	if (fv == NULL) {
 		return;
 	}
-	if (cv_LogBuf!=NULL)
-	{
-		if (fv->FileLog) {
-			LogToFile(fv);
-		}
-	}
-
-	if (cv_BinBuf!=NULL)
-	{
-		if (fv->BinLog) {
-			LogToFile(fv);
-		}
-	}
+	LogToFile(fv);
 }
 
-void FLogPutUTF32(unsigned int u32)
+/**
+ *	ãƒ­ã‚°ã«1æ–‡å­—æ›¸ãã“ã‚€(text, unicode)
+ */
+static void FLogPutUTF32_(PFileVar fv, unsigned int u32)
 {
-	PFileVar fv = LogVar;
-	BOOL log_available = (cv_LogBuf != 0);
-
-	if (!log_available) {
-		// ƒƒO‚É‚Ío—Í‚µ‚È‚¢
+	if (fv->LogMode != TFileVar::LogModeTag::TEXT_MODE) {
+		// ãƒ­ã‚°ã«ã¯å‡ºåŠ›ã—ãªã„
 		return;
 	}
 
-	// s“ª‚©?(‰üs‚ğo—Í‚µ‚½’¼Œã)
+	// è¡Œé ­ã‹?(æ”¹è¡Œã‚’å‡ºåŠ›ã—ãŸç›´å¾Œ)
 	if (ts.LogTimestamp && fv->eLineEnd) {
-		// ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv‚ğo—Í
+		// ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—ã‚’å‡ºåŠ›
 		fv->eLineEnd = Line_Other; /* clear endmark*/
 		wchar_t* strtime = TimeStampStr(fv);
 		FLogWriteStr(strtime);
@@ -1239,7 +1097,7 @@ void FLogPutUTF32(unsigned int u32)
 		size_t u8_len = UTF32ToUTF8(u32, u8_buf, _countof(u8_buf));
 		for (size_t i = 0; i < u8_len; i++) {
 			BYTE b = u8_buf[i];
-			LogPut1(b);
+			Put1(fv, b);
 		}
 		break;
 	}
@@ -1251,13 +1109,13 @@ void FLogPutUTF32(unsigned int u32)
 		for (size_t i = 0; i < u16_len; i++) {
 			if (fv->log_code == LOG_UTF16LE) {
 				// UTF-16LE
-				LogPut1(u16[i] & 0xff);
-				LogPut1((u16[i] >> 8) & 0xff);
+				Put1(fv, u16[i] & 0xff);
+				Put1(fv, (u16[i] >> 8) & 0xff);
 			}
 			else {
 				// UTF-16BE
-				LogPut1((u16[i] >> 8) & 0xff);
-				LogPut1(u16[i] & 0xff);
+				Put1(fv, (u16[i] >> 8) & 0xff);
+				Put1(fv, u16[i] & 0xff);
 			}
 		}
 	}
@@ -1299,30 +1157,82 @@ static void FLogOutputBOM(PFileVar fv)
 	}
 }
 
-static void OutputStr(const wchar_t *str)
+static void OutputStr(PFileVar fv, const wchar_t *strW)
 {
 	size_t len;
 
-	assert(str != NULL);
+	assert(strW != NULL);
 
-	len = wcslen(str);
-	while(*str != 0) {
-		unsigned int u32;
-		size_t u16_len = UTF16ToUTF32(str, len, &u32);
-		switch (u16_len) {
-		case 0:
-		default:
-			// •ÏŠ·‚Å‚«‚È‚¢
-			str++;
-			len--;
-			break;
-		case 1:
-		case 2: {
-			FLogPutUTF32(u32);
-			str += u16_len;
-			len -= u16_len;
-			break;
+	if (fv->LogMode == TFileVar::LogModeTag::TEXT_MODE) {
+		len = wcslen(strW);
+		while(*strW != 0) {
+			unsigned int u32;
+			size_t u16_len = UTF16ToUTF32(strW, len, &u32);
+			switch (u16_len) {
+			case 0:
+			default:
+				// å¤‰æ›ã§ããªã„
+				strW++;
+				len--;
+				break;
+			case 1:
+			case 2: {
+				FLogPutUTF32_(fv, u32);
+				strW += u16_len;
+				len -= u16_len;
+				break;
+			}
+			}
 		}
+	} else if (fv->LogMode == TFileVar::LogModeTag::BIN_MODE) {
+		char *str = MakeOutputStringConvW(strW, ts.KanjiCode, ts.KanjiIn, ts.KanjiOut, ts.JIS7KatakanaSend, NULL);
+		if (str != NULL) {
+			for (size_t i = 0; str[i] != 0; i++) {
+				Put1(fv, (BYTE)str[i]);
+			}
+			free(str);
 		}
 	}
+}
+
+/**
+ *	ãƒ­ã‚°ã«1æ–‡å­—æ›¸ãã“ã‚€(text, unicode)
+ */
+void FLogPutUTF32(unsigned int u32)
+{
+	PFileVar fv = LogVar;
+	FLogPutUTF32_(fv, u32);
+}
+
+/**
+ *	1æ–‡å­—(ANSI)å‡ºåŠ›
+ *
+ */
+void FLogPutANSI(BYTE b)
+{
+	PFileVar fv = LogVar;
+	if (fv->LogMode != TFileVar::LogModeTag::TEXT_MODE) {
+		return;
+	}
+	Put1(fv, b);
+}
+
+/**
+ *	1æ–‡å­—(Binary)å‡ºåŠ›
+ *
+ */
+void FLogPutBinary(BYTE b)
+{
+	PFileVar fv = LogVar;
+	Log1Bin(fv, b);
+}
+
+/**
+ *	æŒ‡å®šæ–‡å­—ã‚¹ã‚­ãƒƒãƒ—
+ *		Binaryå‡ºåŠ›æ™‚
+ */
+void FLogBinSkip(int add)
+{
+	PFileVar fv = LogVar;
+	LogBinSkip(fv, add);
 }

@@ -258,10 +258,10 @@ void WINAPI SelectWin(int WinId)
 
 void WINAPI ForegroundWin(HWND hWnd)
 {
-	/* ƒEƒBƒ“ƒhƒE‚ªÅ‘å‰»‚¨‚æ‚ÑÅ¬‰»‚³‚ê‚Ä‚¢‚½ê‡A‚»‚Ìó‘Ô‚ğˆÛ‚Å‚«‚é‚æ‚¤‚ÉA
-	 * SW_SHOWNORMAL ‚©‚ç SW_SHOW ‚Ö•ÏX‚µ‚½B
+	/* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒæœ€å¤§åŒ–ãŠã‚ˆã³æœ€å°åŒ–ã•ã‚Œã¦ã„ãŸå ´åˆã€ãã®çŠ¶æ…‹ã‚’ç¶­æŒã§ãã‚‹ã‚ˆã†ã«ã€
+	 * SW_SHOWNORMAL ã‹ã‚‰ SW_SHOW ã¸å¤‰æ›´ã—ãŸã€‚
 	 * (2009.11.8 yutaka)
-	 * ƒEƒBƒ“ƒhƒE‚ªÅ¬‰»‚³‚ê‚Ä‚¢‚é‚Æ‚«‚ÍŒ³‚ÌƒTƒCƒY‚É–ß‚·(SW_RESTORE)‚æ‚¤‚É‚µ‚½B
+	 * ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒæœ€å°åŒ–ã•ã‚Œã¦ã„ã‚‹ã¨ãã¯å…ƒã®ã‚µã‚¤ã‚ºã«æˆ»ã™(SW_RESTORE)ã‚ˆã†ã«ã—ãŸã€‚
 	 * (2009.11.9 maya)
 	 */
 	if (IsIconic(hWnd)) {
@@ -270,7 +270,18 @@ void WINAPI ForegroundWin(HWND hWnd)
 	else {
 		ShowWindow(hWnd, SW_SHOW);
 	}
-	SetForegroundWindow(hWnd);
+
+	DWORD thisThreadId = GetCurrentThreadId();
+	DWORD fgThreadId = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+	if (thisThreadId == fgThreadId) {
+		SetForegroundWindow(hWnd);
+		BringWindowToTop(hWnd);
+	} else {
+		AttachThreadInput(thisThreadId, fgThreadId, TRUE);
+		SetForegroundWindow(hWnd);
+		BringWindowToTop(hWnd);
+		AttachThreadInput(thisThreadId, fgThreadId, FALSE);
+	}
 }
 
 void WINAPI SelectNextWin(HWND HWin, int Next, BOOL SkipIconic)
@@ -321,26 +332,26 @@ void WINAPI UndoAllWin(void) {
 		multi_mon = 1;
 	}
 
-	// ˆê“xA•œŒ³‚µ‚½‚çƒtƒ‰ƒO‚Í—‚Æ‚·B
+	// ä¸€åº¦ã€å¾©å…ƒã—ãŸã‚‰ãƒ•ãƒ©ã‚°ã¯è½ã¨ã™ã€‚
 	pm->WinUndoFlag = FALSE;
 
 	memset(&rc0, 0, sizeof(rc0));
 
 	for (i=0; i < pm->NWin; i++) {
-		// •œŒ³w’è‚ÅA‘O‰ñ‚Ìó‘Ô‚ªc‚Á‚Ä‚¢‚éê‡‚ÍAƒEƒBƒ“ƒhƒE‚Ìó‘Ô‚ğŒ³‚É–ß‚·B
+		// å¾©å…ƒæŒ‡å®šã§ã€å‰å›ã®çŠ¶æ…‹ãŒæ®‹ã£ã¦ã„ã‚‹å ´åˆã¯ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®çŠ¶æ…‹ã‚’å…ƒã«æˆ»ã™ã€‚
 		if (stat == SW_RESTORE && memcmp(&pm->WinPrevRect[i], &rc0, sizeof(rc0)) != 0) {
 			rc = pm->WinPrevRect[i].rcNormalPosition;
 
-			// NT4.0, 95 ‚Íƒ}ƒ‹ƒ`ƒ‚ƒjƒ^API‚É”ñ‘Î‰
+			// NT4.0, 95 ã¯ãƒãƒ«ãƒãƒ¢ãƒ‹ã‚¿APIã«éå¯¾å¿œ
 			if (multi_mon) {
-				// ‘ÎÛƒ‚ƒjƒ^‚Ìî•ñ‚ğæ“¾
+				// å¯¾è±¡ãƒ¢ãƒ‹ã‚¿ã®æƒ…å ±ã‚’å–å¾—
 				HMONITOR hMonitor;
 				MONITORINFO mi;
 				hMonitor = pMonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
 				mi.cbSize = sizeof(MONITORINFO);
 				pGetMonitorInfoA(hMonitor, &mi);
 
-				// ˆÊ’u•â³i•œŒ³‘OŒã‚Å‰ğ‘œ“x‚ª•Ï‚í‚Á‚Ä‚¢‚éê‡‚Ö‚Ì‘Îôj
+				// ä½ç½®è£œæ­£ï¼ˆå¾©å…ƒå‰å¾Œã§è§£åƒåº¦ãŒå¤‰ã‚ã£ã¦ã„ã‚‹å ´åˆã¸ã®å¯¾ç­–ï¼‰
 				if (rc.right > mi.rcMonitor.right) {
 					rc.left -= rc.right - mi.rcMonitor.right;
 					rc.right = mi.rcMonitor.right;
@@ -359,7 +370,7 @@ void WINAPI UndoAllWin(void) {
 				}
 			}
 
-			// ƒEƒBƒ“ƒhƒEˆÊ’u•œŒ³
+			// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½ç½®å¾©å…ƒ
 			SetWindowPos(
 				pm->WinList[i], NULL,
 				rc.left,
@@ -368,7 +379,7 @@ void WINAPI UndoAllWin(void) {
 				rc.bottom - rc.top,
 				SWP_NOZORDER);
 
-			// ƒEƒBƒ“ƒhƒE‚Ìó‘Ô•œŒ³
+			// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®çŠ¶æ…‹å¾©å…ƒ
 			ShowWindow(pm->WinList[i], pm->WinPrevRect[i].showCmd);
 
 		} else {
@@ -392,20 +403,20 @@ int WINAPI GetRegisteredWindowCount(void)
 	return (pm->NWin);
 }
 
-// —LŒø‚ÈƒEƒBƒ“ƒhƒE‚ğ’T‚µAŒ»İˆÊ’u‚ğ‹L‰¯‚³‚¹‚Ä‚¨‚­B
+// æœ‰åŠ¹ãªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’æ¢ã—ã€ç¾åœ¨ä½ç½®ã‚’è¨˜æ†¶ã•ã›ã¦ãŠãã€‚
 static void get_valid_window_and_memorize_rect(HWND myhwnd, HWND hwnd[], int *num, int style)
 {
 	int i, n;
 	WINDOWPLACEMENT wndPlace;
 
-	// Œ³‚É–ß‚·(Undo)ƒƒjƒ…[‚Íˆê“x‚¾‚¯•\¦‚³‚¹‚éB
+	// å…ƒã«æˆ»ã™(Undo)ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¯ä¸€åº¦ã ã‘è¡¨ç¤ºã•ã›ã‚‹ã€‚
 	if (pm->WinUndoFlag == FALSE) {
 		pm->WinUndoFlag = TRUE;
 	} else {
-		// ‚·‚Å‚Éƒƒjƒ…[‚ª•\¦‚³‚ê‚Ä‚¢‚ÄA‚©‚ÂˆÈ‘O‚Æ“¯‚¶ƒXƒ^ƒCƒ‹‚ª‘I‘ğ‚³‚ê‚½‚çA
-		// ƒƒjƒ…[‚ğÁ‚·B
-		// Windows8‚Å‚ÍA‚³‚ç‚É˜A‘±‚µ‚Ä“¯‚¶ƒXƒ^ƒCƒ‹‚ğ‘I‘ğ‚µ‚Ä‚àƒƒjƒ…[‚ªÁ‚¦‚½‚Ü‚Ü‚¾‚ªA
-		// Tera Term‚Å‚Íƒƒjƒ…[‚ª•\¦‚³‚ê‚é‚½‚ßA“®ì‚ªˆÙ‚È‚éB
+		// ã™ã§ã«ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãŒè¡¨ç¤ºã•ã‚Œã¦ã„ã¦ã€ã‹ã¤ä»¥å‰ã¨åŒã˜ã‚¹ã‚¿ã‚¤ãƒ«ãŒé¸æŠã•ã‚ŒãŸã‚‰ã€
+		// ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’æ¶ˆã™ã€‚
+		// Windows8ã§ã¯ã€ã•ã‚‰ã«é€£ç¶šã—ã¦åŒã˜ã‚¹ã‚¿ã‚¤ãƒ«ã‚’é¸æŠã—ã¦ã‚‚ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãŒæ¶ˆãˆãŸã¾ã¾ã ãŒã€
+		// Tera Termã§ã¯ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãŒè¡¨ç¤ºã•ã‚Œã‚‹ãŸã‚ã€å‹•ä½œãŒç•°ãªã‚‹ã€‚
 		if (pm->WinUndoStyle == style)
 			pm->WinUndoFlag = FALSE;
 	}
@@ -413,12 +424,12 @@ static void get_valid_window_and_memorize_rect(HWND myhwnd, HWND hwnd[], int *nu
 
 	n = 0;
 	for (i = 0 ; i < pm->NWin ; i++) {
-		// Œ»İˆÊ’u‚ğŠo‚¦‚Ä‚¨‚­B
+		// ç¾åœ¨ä½ç½®ã‚’è¦šãˆã¦ãŠãã€‚
 		wndPlace.length = sizeof(WINDOWPLACEMENT);
 		GetWindowPlacement(pm->WinList[i], &wndPlace);
 		pm->WinPrevRect[i] = wndPlace;
 
-		// ©•ª©g‚Íæ“ª‚É‚·‚éB
+		// è‡ªåˆ†è‡ªèº«ã¯å…ˆé ­ã«ã™ã‚‹ã€‚
 		if (pm->WinList[i] == myhwnd) {
 			hwnd[n] = hwnd[0];
 			hwnd[0] = myhwnd;
@@ -430,7 +441,7 @@ static void get_valid_window_and_memorize_rect(HWND myhwnd, HWND hwnd[], int *nu
 	*num = n;
 }
 
-// ƒEƒBƒ“ƒhƒE‚ğ¶‰E‚É•À‚×‚Ä•\¦‚·‚é(Show Windows Side by Side)
+// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’å·¦å³ã«ä¸¦ã¹ã¦è¡¨ç¤ºã™ã‚‹(Show Windows Side by Side)
 void WINAPI ShowAllWinSidebySide(HWND myhwnd)
 {
 	int n;
@@ -440,7 +451,7 @@ void WINAPI ShowAllWinSidebySide(HWND myhwnd)
 	TileWindows(NULL, MDITILE_VERTICAL, NULL, n, hwnd);
 }
 
-// ƒEƒBƒ“ƒhƒE‚ğã‰º‚É•À‚×‚Ä•\¦‚·‚é(Show Windows Stacked)
+// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ä¸Šä¸‹ã«ä¸¦ã¹ã¦è¡¨ç¤ºã™ã‚‹(Show Windows Stacked)
 void WINAPI ShowAllWinStacked(HWND myhwnd)
 {
 	int n;
@@ -450,7 +461,7 @@ void WINAPI ShowAllWinStacked(HWND myhwnd)
 	TileWindows(NULL, MDITILE_HORIZONTAL, NULL, n, hwnd);
 }
 
-// ƒEƒBƒ“ƒhƒE‚ğd‚Ë‚Ä•\¦‚·‚é(Cascade)
+// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é‡ã­ã¦è¡¨ç¤ºã™ã‚‹(Cascade)
 void WINAPI ShowAllWinCascade(HWND myhwnd)
 {
 	int n;
@@ -460,21 +471,21 @@ void WINAPI ShowAllWinCascade(HWND myhwnd)
 	CascadeWindows(NULL, MDITILE_SKIPDISABLED, NULL, n, hwnd);
 }
 
-// ‘STera Term‚ÉI—¹w¦‚ğo‚·B
+// å…¨Tera Termã«çµ‚äº†æŒ‡ç¤ºã‚’å‡ºã™ã€‚
 void WINAPI BroadcastClosingMessage(HWND myhwnd)
 {
 	int i, max;
 	HWND hwnd[MAXNWIN];
 
-	// Tera Term‚ğI—¹‚³‚¹‚é‚ÆA‹¤—Lƒƒ‚ƒŠ‚ª•Ï‰»‚·‚é‚½‚ßA
-	// ‚¢‚Á‚½‚ñƒoƒbƒtƒ@‚ÉƒRƒs[‚µ‚Ä‚¨‚­B
+	// Tera Termã‚’çµ‚äº†ã•ã›ã‚‹ã¨ã€å…±æœ‰ãƒ¡ãƒ¢ãƒªãŒå¤‰åŒ–ã™ã‚‹ãŸã‚ã€
+	// ã„ã£ãŸã‚“ãƒãƒƒãƒ•ã‚¡ã«ã‚³ãƒ”ãƒ¼ã—ã¦ãŠãã€‚
 	max = pm->NWin;
 	for (i = 0 ; i < pm->NWin ; i++) {
 		hwnd[i] = pm->WinList[i];
 	}
 
 	for (i = 0 ; i < max ; i++) {
-		// ©•ª©g‚ÍÅŒã‚É‚·‚éB
+		// è‡ªåˆ†è‡ªèº«ã¯æœ€å¾Œã«ã™ã‚‹ã€‚
 		if (hwnd[i] == myhwnd)
 			continue;
 
@@ -490,6 +501,7 @@ int WINAPI CommReadRawByte(PComVar cv, LPBYTE b)
 		return 0;
 	}
 
+	EnterCriticalSection(&cv->InBuff_lock);
 	if ( cv->InBuffCount>0 ) {
 		*b = cv->InBuff[cv->InPtr];
 		cv->InPtr++;
@@ -497,10 +509,12 @@ int WINAPI CommReadRawByte(PComVar cv, LPBYTE b)
 		if ( cv->InBuffCount==0 ) {
 			cv->InPtr = 0;
 		}
+		LeaveCriticalSection(&cv->InBuff_lock);
 		return 1;
 	}
 	else {
 		cv->InPtr = 0;
+		LeaveCriticalSection(&cv->InBuff_lock);
 		return 0;
 	}
 }
@@ -512,12 +526,19 @@ static void LogBinSkip(PComVar cv, int add)
 	}
 }
 
+/**
+ *	å…¥åŠ›ãƒãƒƒãƒ•ã‚¡ã®å…ˆé ­ã«ãƒ‡ãƒ¼ã‚¿ã‚’å…¥ã‚Œã‚‹
+ *	å…¥ã‚ŒãŸãƒ‡ãƒ¼ã‚¿ã¯ãƒã‚¤ãƒŠãƒªãƒ­ã‚°ã«è¨˜éŒ²ã•ã‚Œãªã„
+ *
+ *	@param	b	å…¥ã‚Œã‚‹ãƒ‡ãƒ¼ã‚¿
+ */
 void WINAPI CommInsert1Byte(PComVar cv, BYTE b)
 {
 	if ( ! cv->Ready ) {
 		return;
 	}
 
+	EnterCriticalSection(&cv->InBuff_lock);
 	if (cv->InPtr == 0) {
 		memmove(&(cv->InBuff[1]),&(cv->InBuff[0]),cv->InBuffCount);
 	}
@@ -528,6 +549,7 @@ void WINAPI CommInsert1Byte(PComVar cv, BYTE b)
 	cv->InBuffCount++;
 
 	LogBinSkip(cv, 1);
+	LeaveCriticalSection(&cv->InBuff_lock);
 }
 
 static void Log1Bin(PComVar cv, BYTE b)
@@ -651,20 +673,20 @@ int WINAPI CommBinaryOut(PComVar cv, PCHAR B, int C)
 }
 
 /**
- *	ƒf[ƒ^(•¶š—ñ)‚ğo—Íƒoƒbƒtƒ@‚Ö‘‚«‚Ş
+ *	ãƒ‡ãƒ¼ã‚¿(æ–‡å­—åˆ—)ã‚’å‡ºåŠ›ãƒãƒƒãƒ•ã‚¡ã¸æ›¸ãè¾¼ã‚€
  *
- *	w’èƒf[ƒ^‚ª‚·‚×‚Ä‘‚«‚ß‚È‚¢ê‡‚Í‘‚«‚Ü‚È‚¢
- *	CommRawOut() ‚Í‘‚«‚ß‚é•ª‚¾‚¯‘‚«‚Ş
+ *	æŒ‡å®šãƒ‡ãƒ¼ã‚¿ãŒã™ã¹ã¦æ›¸ãè¾¼ã‚ãªã„å ´åˆã¯æ›¸ãè¾¼ã¾ãªã„
+ *	CommRawOut() ã¯æ›¸ãè¾¼ã‚ã‚‹åˆ†ã ã‘æ›¸ãè¾¼ã‚€
  *
- *	@retval	TRUE	o—Í‚Å‚«‚½
- *	@retval	FALSE	o—Í‚Å‚«‚È‚©‚Á‚½(buffer full)
+ *	@retval	TRUE	å‡ºåŠ›ã§ããŸ
+ *	@retval	FALSE	å‡ºåŠ›ã§ããªã‹ã£ãŸ(buffer full)
  */
 static BOOL WriteOutBuff(PComVar cv, const char *TempStr, int TempLen)
 {
 	BOOL output;
 
 	if (TempLen == 0) {
-		// ’·‚³0‚Å‘‚«‚İ‚É—ˆ‚éê‡‚ ‚è
+		// é•·ã•0ã§æ›¸ãè¾¼ã¿ã«æ¥ã‚‹å ´åˆã‚ã‚Š
 		return TRUE;
 	}
 
@@ -698,11 +720,11 @@ static BOOL WriteOutBuff(PComVar cv, const char *TempStr, int TempLen)
 }
 
 /**
- *	ƒf[ƒ^(•¶š—ñ)‚ğ“ü—Íƒoƒbƒtƒ@‚Ö‘‚«‚Ş
- *	“ü—Íƒoƒbƒtƒ@‚Ö“ü‚ê‚é -> ƒGƒR[‚³‚ê‚é
+ *	ãƒ‡ãƒ¼ã‚¿(æ–‡å­—åˆ—)ã‚’å…¥åŠ›ãƒãƒƒãƒ•ã‚¡ã¸æ›¸ãè¾¼ã‚€
+ *	å…¥åŠ›ãƒãƒƒãƒ•ã‚¡ã¸å…¥ã‚Œã‚‹ -> ã‚¨ã‚³ãƒ¼ã•ã‚Œã‚‹
  *
- *	@retval	TRUE	o—Í‚Å‚«‚½
- *	@retval	FALSE	o—Í‚Å‚«‚È‚©‚Á‚½(buffer full)
+ *	@retval	TRUE	å‡ºåŠ›ã§ããŸ
+ *	@retval	FALSE	å‡ºåŠ›ã§ããªã‹ã£ãŸ(buffer full)
  */
 static BOOL WriteInBuff(PComVar cv, const char *TempStr, int TempLen)
 {
@@ -712,24 +734,29 @@ static BOOL WriteInBuff(PComVar cv, const char *TempStr, int TempLen)
 		return TRUE;
 	}
 
+	EnterCriticalSection(&cv->InBuff_lock);
 	Full = InBuffSize-cv->InBuffCount-TempLen < 0;
 	if (! Full) {
 		memcpy(&(cv->InBuff[cv->InBuffCount]),TempStr,TempLen);
 		cv->InBuffCount = cv->InBuffCount + TempLen;
+		LeaveCriticalSection(&cv->InBuff_lock);
 		return TRUE;
 	}
+	LeaveCriticalSection(&cv->InBuff_lock);
 	return FALSE;
 }
 
 /**
- *	“ü—Íƒoƒbƒtƒ@‚Ìæ“ª‚É‹ó‚«‚ª‚ ‚Á‚½‚ç‹l‚ß‚é
+ *	å…¥åŠ›ãƒãƒƒãƒ•ã‚¡ã®å…ˆé ­ã«ç©ºããŒã‚ã£ãŸã‚‰è©°ã‚ã‚‹
  */
 static void PackInBuff(PComVar cv)
 {
+	EnterCriticalSection(&cv->InBuff_lock);
 	if ( (cv->InPtr>0) && (cv->InBuffCount>0) ) {
 		memmove(cv->InBuff,&(cv->InBuff[cv->InPtr]),cv->InBuffCount);
 		cv->InPtr = 0;
 	}
+	LeaveCriticalSection(&cv->InBuff_lock);
 }
 
 int WINAPI CommBinaryBuffOut(PComVar cv, PCHAR B, int C)
@@ -772,13 +799,13 @@ int WINAPI CommBinaryBuffOut(PComVar cv, PCHAR B, int C)
 }
 
 /**
- *	o—Í—p
+ *	å‡ºåŠ›ç”¨
  *	@param	cv
- *	@param	u32			“ü—Í•¶š
- *	@param	check_only	TRUE‚Åˆ—‚Ís‚í‚¸A
- *	@param	TempStr		o—Í•¶š”
- *	@param	StrLen		TempStr‚Ö‚Ìo—Í•¶š”
- *	@retval	ˆ—‚ğs‚Á‚½
+ *	@param	u32			å…¥åŠ›æ–‡å­—
+ *	@param	check_only	TRUEã§å‡¦ç†ã¯è¡Œã‚ãšã€
+ *	@param	TempStr		å‡ºåŠ›æ–‡å­—æ•°
+ *	@param	StrLen		TempStrã¸ã®å‡ºåŠ›æ–‡å­—æ•°
+ *	@retval	å‡¦ç†ã‚’è¡Œã£ãŸ
  */
 static BOOL OutControl(unsigned int u32, BOOL check_only, char *TempStr, size_t *StrLen, void *data)
 {
@@ -787,7 +814,7 @@ static BOOL OutControl(unsigned int u32, BOOL check_only, char *TempStr, size_t 
 	size_t TempLen = 0;
 	BOOL retval = FALSE;
 	if (check_only == TRUE) {
-		/* ƒ`ƒFƒbƒN‚Ì‚İ */
+		/* ãƒã‚§ãƒƒã‚¯ã®ã¿ */
 		if (d == CR || d == BS || d == 0x15/*ctrl-u*/) {
 			return TRUE;
 		} else {
@@ -841,7 +868,7 @@ static BOOL ControlEcho(unsigned int u32, BOOL check_only, char *TempStr, size_t
 	size_t TempLen = 0;
 	BOOL retval = FALSE;
 	if (check_only == TRUE) {
-		/* ƒ`ƒFƒbƒN‚Ì‚İ */
+		/* ãƒã‚§ãƒƒã‚¯ã®ã¿ */
 		if (d == CR || (d == 0x15/*ctrl-u*/ && cv->TelLineMode)) {
 			return TRUE;
 		} else {
@@ -872,9 +899,9 @@ static BOOL ControlEcho(unsigned int u32, BOOL check_only, char *TempStr, size_t
 }
 
 /**
- * CommTextOut() ‚Ì wchar_t ”Å
+ * CommTextOut() ã® wchar_t ç‰ˆ
  *
- *	@retval		o—Í•¶š”(wchar_t’PˆÊ)
+ *	@retval		å‡ºåŠ›æ–‡å­—æ•°(wchar_tå˜ä½)
  */
 int WINAPI CommTextOutW(PComVar cv, const wchar_t *B, int C)
 {
@@ -882,14 +909,14 @@ int WINAPI CommTextOutW(PComVar cv, const wchar_t *B, int C)
 	BOOL Full = FALSE;
 	int i = 0;
 	while (! Full && (i < C)) {
-		// o—Í—pƒf[ƒ^‚ğì¬
+		// å‡ºåŠ›ç”¨ãƒ‡ãƒ¼ã‚¿ã‚’ä½œæˆ
 		size_t TempLen = 0;
-		size_t output_char_count;	// Á”ï‚µ‚½•¶š”
+		size_t output_char_count;	// æ¶ˆè²»ã—ãŸæ–‡å­—æ•°
 		output_char_count = MakeOutputString(cv->StateSend, &B[i], C - i, TempStr, &TempLen, OutControl, cv);
 
-		// ƒf[ƒ^‚ğo—Íƒoƒbƒtƒ@‚Ö
+		// ãƒ‡ãƒ¼ã‚¿ã‚’å‡ºåŠ›ãƒãƒƒãƒ•ã‚¡ã¸
 		if (WriteOutBuff(cv, TempStr, TempLen)) {
-			i += output_char_count;		// output_char_count •¶š” ˆ—‚µ‚½
+			i += output_char_count;		// output_char_count æ–‡å­—æ•° å‡¦ç†ã—ãŸ
 		} else {
 			Full = TRUE;
 		}
@@ -899,9 +926,9 @@ int WINAPI CommTextOutW(PComVar cv, const wchar_t *B, int C)
 }
 
 /**
- * CommTextEcho() ‚Ì wchar_t ”Å
+ * CommTextEcho() ã® wchar_t ç‰ˆ
  *
- *	@retval		o—Í•¶š”(wchar_t’PˆÊ)
+ *	@retval		å‡ºåŠ›æ–‡å­—æ•°(wchar_tå˜ä½)
  */
 int WINAPI CommTextEchoW(PComVar cv, const wchar_t *B, int C)
 {
@@ -909,14 +936,14 @@ int WINAPI CommTextEchoW(PComVar cv, const wchar_t *B, int C)
 	BOOL Full = FALSE;
 	int i = 0;
 	while (! Full && (i < C)) {
-		// o—Í—pƒf[ƒ^‚ğì¬
+		// å‡ºåŠ›ç”¨ãƒ‡ãƒ¼ã‚¿ã‚’ä½œæˆ
 		size_t TempLen = 0;
-		size_t output_char_count;	// Á”ï‚µ‚½•¶š”
+		size_t output_char_count;	// æ¶ˆè²»ã—ãŸæ–‡å­—æ•°
 		output_char_count = MakeOutputString(cv->StateEcho, &B[i], C - i, TempStr, &TempLen, ControlEcho, cv);
 
-		// ƒf[ƒ^‚ğo—Íƒoƒbƒtƒ@‚Ö
+		// ãƒ‡ãƒ¼ã‚¿ã‚’å‡ºåŠ›ãƒãƒƒãƒ•ã‚¡ã¸
 		if (WriteInBuff(cv, TempStr, TempLen)) {
-			i += output_char_count;		// output_char_count •¶š” ˆ—‚µ‚½
+			i += output_char_count;		// output_char_count æ–‡å­—æ•° å‡¦ç†ã—ãŸ
 		} else {
 			Full = TRUE;
 		}
@@ -965,7 +992,7 @@ int WINAPI CommBinaryEcho(PComVar cv, PCHAR B, int C)
 }
 
 /**
- *	‹¤—Lƒƒ‚ƒŠ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğƒZƒbƒg
+ *	å…±æœ‰ãƒ¡ãƒ¢ãƒªã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’ã‚»ãƒƒãƒˆ
  */
 DllExport void WINAPI SetPMPtr(PMap pm_)
 {
@@ -992,7 +1019,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			break;
 		case DLL_PROCESS_DETACH:
 			/* do process cleanup */
-			// TODO ttermpro.exe‚Ås‚¤
+			// TODO ttermpro.exeã§è¡Œã†
 //			CloseSharedMemory(pm, HMap);
 			break;
 	}

@@ -19,7 +19,8 @@
       <dt>Duplicate session</dt>
       <dd>
         現在のセッションを複製します。
-        TELNET, SSH, Cygwin 接続のみが複製されるます。
+        TELNET, SSH, Cygwin 接続のみが複製されます。<br>
+        TTSSHコマンドラインの<a href="../commandline/ttssh.html#passwd_specify">パスワードを指定するときの注意</a>を参照してください。
       </dd>
 
       <dt><a href="file-log.html">Log...</a></dt>
@@ -32,10 +33,11 @@
         ログの記録を一時中断します。
       </dt>
 
-      <dt>Comment to Log...</dt>
+      <dt id="Comment">Comment to Log...</dt>
       <dd>
         ログファイルへコメントを追加することができます。
-        追加できるコメントは最大255文字までです。
+        追加できるコメントは最大1024Byteまでです。<br>
+        (文字コードによってコメント可能な文字数が変わります)
       </dd>
 
       <dt>View Log</dt>
@@ -72,12 +74,31 @@
         動作を入れ替えることができます。
       </dd>
 
+      <dt id="Receivefile"><a href="file-receivefile.html">Receive file...</a></dt>
+      <dd>
+        受信したデータをファイルに出力します。<br>
+        <dl>
+          <dt>選択したとき</dt>
+          <dd>
+            "Receive file" ダイアログ が表示されます。
+          </dd>
+          <dt>CTRL を押しながら選択したとき</dt>
+          <dd>
+            "Receive file" ダイアログがスキップされて、ファイル選択ダイアログが表示されます。<br>
+            前回と同じ受信オプションが使用されます。
+          </dd>
+        </dl>
+
+        <a href="../setup/teraterm-trans.html#ReceivefileSkipOptionDialog">設定</a>を変更することで
+        動作を入れ替えることができます。
+      </dd>
+
       <dt><a href="file-transfer.html">Transfer</a></dt>
       <dd>
         Kermit/XMODEM/YMODEM/ZMODEM/B-Plus/Quick-VAN プロトコルでファイルを転送します。
       </dd>
 
-      <dt>SSH SCP</dt>
+      <dt><a href="file-ssh-scp.html">SSH SCP</a></dt>
       <dd>
         SCP プロトコルでファイルを転送します。
       </dd>

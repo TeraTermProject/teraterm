@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Receive file ([File] menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Receive file ([File] menu)</h1>
+    <p>
+      Outputs the data received from the host to a file.
+    </p>
+
+    <p style="padding-left: 1em;">
+      Features
+      <ol>
+        <li>
+          Can receive binary data and write it to a file even in environments where file transfer via scp, ftp, Kermit, etc. is not possible.<br>
+          When receiving binary data from a UNIX server, run "stty raw" on the UNIX server.<br>
+          For details, see the <a href="../macro/command/recvfile.html">recvfile macro command example</a>.
+        </li>
+        <li>
+          Less prone to dropping received data during serial connections.
+        </li>
+        <li>
+          It's faster to use "Receive file" than to output received data to the log.
+        </li>
+      </ol>
+    </p>
+
+    <p>
+      Selecting this menu brings up the "Receive file" dialog.<br>
+      If you select this menu while holding down the CTRL key, it skips the "Receive File" dialogand proceed to file selection.<br>
+      In that case, the same receiving options as before will be used.
+    <p>
+
+    <p>
+      This behavior can be changed in the configuration file.
+      See "<a href="../setup/teraterm-trans.html#ReceivefileSkipOptionDialog">Skip Receive file dialog</a>" for details.
+    </p>
+
+    <h2 id="dialog">"Receive file" dialog box</h2>
+    <dl>
+      <dt>Filename (drop file in this dialog)</dt>
+      <dd>
+        Enter or select the output file name.<br>
+        By dropping a file into dialog, You can enter the file name.
+      </dd>
+
+      <dt id="binary">Binary</dt>
+      <dd>
+        Write the received data to the file exactly as received.<br>
+        No conversions are performed (kanji/codepage conversion, line-ending conversion, suppression of control-character output, etc.). Binary mode is fixed.
+      </dd>
+
+      <dt id="ReceivefileAutoStopWaitTime">Auto-stop wait time(sec)</dt>
+      <dd>
+        If there is no received data for the specified duration, the reception will terminate.<br>
+        The default value for the wait time is 5 seconds.<br>
+        If 0 seconds is specified, the receive process will not be terminated and will continue to wait for data.
+      </dd>
+    </dl>
+
+    <h2>"Receiving file" dialog box</h2>
+    <dl>
+      <dt>Cancel</dt>
+      <dd>
+        Pressing the Cancel button will stop the file output.
+      </dd>
+    </dl>
+
+    <h3 id="drop">Drop of received data</h3>
+    <p style="padding-left: 1em;">
+      When receiving data at a high bit rate from the serial port, there may be instances where received data is dropped.<br>
+      This is likely to occur when the PC is under high load and Tera Term's processing cannot keep up.<br>
+      Refer to the <a href="../usage/tips/data_drop.html#solution">Solution</a> section.
+    </p>
+
+  </body>
+</html>

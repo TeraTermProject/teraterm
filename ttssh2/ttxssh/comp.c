@@ -92,17 +92,17 @@ compression_type choose_SSH2_compression_algorithm(char *server_proposal, char *
 
 void SSH2_update_compression_myproposal(PTInstVar pvar)
 {
-	static char buf[128]; // TODO: malloc()‚É‚·‚×‚«
+	static char buf[128]; // TODO: malloc()ã«ã™ã¹ã
 	int index;
 	size_t len, i;
 
-	// ’ÊM’†‚ÉŒÄ‚Î‚ê‚é‚Æ‚¢‚¤‚±‚Æ‚ÍƒL[Äì¬
-	// ƒL[Äì¬‚Ìê‡‚Í‰½‚à‚µ‚È‚¢
+	// é€šä¿¡ä¸­ã«å‘¼ã°ã‚Œã‚‹ã¨ã„ã†ã“ã¨ã¯ã‚­ãƒ¼å†ä½œæˆ
+	// ã‚­ãƒ¼å†ä½œæˆã®å ´åˆã¯ä½•ã‚‚ã—ãªã„
 	if (pvar->socket != INVALID_SOCKET) {
 		return;
 	}
 
-	// ˆ³kƒŒƒxƒ‹‚É‰ž‚¶‚ÄAmyproposal[]‚ð‘‚«Š·‚¦‚éB(2005.7.9 yutaka)
+	// åœ§ç¸®ãƒ¬ãƒ™ãƒ«ã«å¿œã˜ã¦ã€myproposal[]ã‚’æ›¸ãæ›ãˆã‚‹ã€‚(2005.7.9 yutaka)
 	buf[0] = '\0';
 	for (i = 0 ; pvar->settings.CompOrder[i] != 0 ; i++) {
 		index = pvar->settings.CompOrder[i] - '0';
@@ -115,7 +115,7 @@ void SSH2_update_compression_myproposal(PTInstVar pvar)
 	if (len > 0)
 		buf[len - 1] = '\0';  // get rid of comma
 
-	// ˆ³kŽw’è‚ª‚È‚¢ê‡‚ÍAˆ³kƒŒƒxƒ‹‚ð–³ðŒ‚Éƒ[ƒ‚É‚·‚éB
+	// åœ§ç¸®æŒ‡å®šãŒãªã„å ´åˆã¯ã€åœ§ç¸®ãƒ¬ãƒ™ãƒ«ã‚’ç„¡æ¡ä»¶ã«ã‚¼ãƒ­ã«ã™ã‚‹ã€‚
 	if (buf[0] == '\0') {
 		pvar->settings.CompressionLevel = 0;
 	}

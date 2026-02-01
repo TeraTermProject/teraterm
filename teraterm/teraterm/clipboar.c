@@ -65,8 +65,8 @@ static void TrimTrailingNLW(wchar_t *src)
 }
 
 /**
- * ƒtƒ@ƒCƒ‹‚É’è‹`‚³‚ê‚½•¶š—ñ‚ªAtext‚ÉŠÜ‚Ü‚ê‚é‚©‚ğ’²‚×‚éB
- * Œ©‚Â‚©‚ê‚Î TRUE‚ğ•Ô‚·
+ * ãƒ•ã‚¡ã‚¤ãƒ«ã«å®šç¾©ã•ã‚ŒãŸæ–‡å­—åˆ—ãŒã€textã«å«ã¾ã‚Œã‚‹ã‹ã‚’èª¿ã¹ã‚‹ã€‚
+ * è¦‹ã¤ã‹ã‚Œã° TRUEã‚’è¿”ã™
  */
 static BOOL search_dictW(const wchar_t *filename, const wchar_t *text)
 {
@@ -90,10 +90,10 @@ static BOOL search_dictW(const wchar_t *filename, const wchar_t *text)
 		}
 		line_end = wcspbrk(buf, L"\r\n");
 		if (line_end == NULL) {
-			// ‰üs‚ª‚È‚¢
+			// æ”¹è¡ŒãŒãªã„
 			len = wcslen(buf);
 			if (len == 0) {
-				// I—¹
+				// çµ‚äº†
 				break;
 			}
 		} else {
@@ -117,11 +117,11 @@ static BOOL search_dictW(const wchar_t *filename, const wchar_t *text)
 }
 
 /*
- * ƒNƒŠƒbƒvƒ{[ƒh‚Ì“à—e‚ğŠm”F‚µA“\‚è•t‚¯‚ğs‚¤‚©Šm”Fƒ_ƒCƒAƒƒO‚ğo‚·B
+ * ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã®å†…å®¹ã‚’ç¢ºèªã—ã€è²¼ã‚Šä»˜ã‘ã‚’è¡Œã†ã‹ç¢ºèªãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºã™ã€‚
  *
- * •Ô‚è’l:
- *   TRUE  -> –â‘è‚È‚µA“\‚è•t‚¯‚ğÀ{
- *   FALSE -> “\‚è•t‚¯’†~
+ * è¿”ã‚Šå€¤:
+ *   TRUE  -> å•é¡Œãªã—ã€è²¼ã‚Šä»˜ã‘ã‚’å®Ÿæ–½
+ *   FALSE -> è²¼ã‚Šä»˜ã‘ä¸­æ­¢
  */
 static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, wchar_t **out_str_w)
 {
@@ -134,18 +134,18 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
 	}
 
 /*
- * ConfirmChangePasteCR ‚Ì‹““®–â‘è
- * ˆÈ‰º‚Ì“®ì‚Å–â‘è‚È‚¢‚©B
+ * ConfirmChangePasteCR ã®æŒ™å‹•å•é¡Œ
+ * ä»¥ä¸‹ã®å‹•ä½œã§å•é¡Œãªã„ã‹ã€‚
  *
  *		ChangePasteCR	!ChangePasteCR
  *		AddCR	!AddCR	AddCR	!AddCR
- * ‰üs‚ ‚è	o	o	x(2)	o
- * ‰üs–³‚µ	o(1)	x	x	x
+ * æ”¹è¡Œã‚ã‚Š	o	o	x(2)	o
+ * æ”¹è¡Œç„¡ã—	o(1)	x	x	x
  *
- * ChangePasteCR ‚Í AddCR ‚Ì‚ÉŠm”F‚ğs‚¤‚©(1‚ÅŠm”F‚·‚é)‚Æ‚¢‚¤İ’è‚¾‚ªA
- * !ChangePasteCR ‚Ì‚ğl‚¦‚é‚ÆAAddCR ‚Ì‚Íí‚É CR ‚ª“ü‚Á‚Ä‚¢‚é‚Ì‚É
- * Šm”F‚ğs‚í‚È‚¢–‚©‚ç 2 ‚Ìê‡‚Å‚àŠm”F‚Í•s—p‚Æ‚¢‚¤ˆÓv•\¦‚Æ‚à‚Æ‚ê‚éB
- * 2 ‚Ì“®ì‚Í‚Ç‚¿‚ç‚ª‚¢‚¢‚©?
+ * ChangePasteCR ã¯ AddCR ã®æ™‚ã«ç¢ºèªã‚’è¡Œã†ã‹(1ã§ç¢ºèªã™ã‚‹)ã¨ã„ã†è¨­å®šã ãŒã€
+ * !ChangePasteCR ã®æ™‚ã‚’è€ƒãˆã‚‹ã¨ã€AddCR ã®æ™‚ã¯å¸¸ã« CR ãŒå…¥ã£ã¦ã„ã‚‹ã®ã«
+ * ç¢ºèªã‚’è¡Œã‚ãªã„äº‹ã‹ã‚‰ 2 ã®å ´åˆã§ã‚‚ç¢ºèªã¯ä¸ç”¨ã¨ã„ã†æ„æ€è¡¨ç¤ºã¨ã‚‚ã¨ã‚Œã‚‹ã€‚
+ * 2 ã®å‹•ä½œã¯ã©ã¡ã‚‰ãŒã„ã„ã‹?
  */
 	if (AddCR) {
 		if (ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE_CR) {
@@ -153,13 +153,13 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
 		}
 	}
 	else {
-		size_t pos = wcscspn(str_w, L"\r\n");  // ‰üs‚ªŠÜ‚Ü‚ê‚Ä‚¢‚½‚ç
+		size_t pos = wcscspn(str_w, L"\r\n");  // æ”¹è¡ŒãŒå«ã¾ã‚Œã¦ã„ãŸã‚‰
 		if (str_w[pos] != '\0') {
 			confirm = TRUE;
 		}
 	}
 
-	// «‘‚ğƒT[ƒ`‚·‚é
+	// è¾æ›¸ã‚’ã‚µãƒ¼ãƒã™ã‚‹
 	if (ts.ConfirmChangePasteStringFile[0] != '\0') {
 		wchar_t *fname_rel =ToWcharA(ts.ConfirmChangePasteStringFile);
 		wchar_t *fnameW = GetFullPathW(ts.HomeDirW, fname_rel);
@@ -190,10 +190,10 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
 }
 
 /**
- *	ƒNƒŠƒbƒvƒ{[ƒh—pƒeƒLƒXƒg‘—M‚·‚é
+ *	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ç”¨ãƒ†ã‚­ã‚¹ãƒˆé€ä¿¡ã™ã‚‹
  *
- *	@param	str_w	•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *					malloc()‚³‚ê‚½ƒoƒbƒtƒ@A‘—MŠ®—¹‚É©“®‚Åfree()‚³‚ê‚é
+ *	@param	str_w	æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *					malloc()ã•ã‚ŒãŸãƒãƒƒãƒ•ã‚¡ã€é€ä¿¡å®Œäº†æ™‚ã«è‡ªå‹•ã§free()ã•ã‚Œã‚‹
  */
 static void CBSendStart(wchar_t *str_w)
 {
@@ -234,17 +234,17 @@ void CBPreparePaste(HWND HWin, BOOL shouldBeReady, BOOL AddCR, BOOL Bracketed, w
 
 	str_w = GetClipboardTextW(HWin, FALSE);
 	if (str_w == NULL || !IsTextW(str_w, 0)) {
-		// ƒNƒŠƒbƒvƒ{[ƒh‚©‚ç•¶š—ñ‚ğæ“¾‚Å‚«‚È‚©‚Á‚½
+		// ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‹ã‚‰æ–‡å­—åˆ—ã‚’å–å¾—ã§ããªã‹ã£ãŸ
 		return;
 	}
 
 	if (ts.PasteFlag & CPF_TRIM_TRAILING_NL) {
-		// ƒoƒbƒtƒ@ÅŒã‚Ì‰üs‚ğíœ
+		// ãƒãƒƒãƒ•ã‚¡æœ€å¾Œã®æ”¹è¡Œã‚’å‰Šé™¤
 		TrimTrailingNLW(str_w);
 	}
 
 	{
-		// ‰üs‚ğ CR+LF ‚É³‹K‰»Aƒ_ƒCƒAƒƒO‚Å‰üs‚ğ³‚µ‚­•\¦‚·‚é‚½‚ß
+		// æ”¹è¡Œã‚’ CR+LF ã«æ­£è¦åŒ–ã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§æ”¹è¡Œã‚’æ­£ã—ãè¡¨ç¤ºã™ã‚‹ãŸã‚
 		wchar_t *dest = NormalizeLineBreakCRLF(str_w);
 		free(str_w);
 		str_w = dest;
@@ -255,12 +255,12 @@ void CBPreparePaste(HWND HWin, BOOL shouldBeReady, BOOL AddCR, BOOL Bracketed, w
 		return;
 	}
 	if (str_w_edited != NULL) {
-		// ƒ_ƒCƒAƒƒO‚Å•ÒW‚³‚ê‚½
+		// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§ç·¨é›†ã•ã‚ŒãŸ
 		free(str_w);
 		str_w = str_w_edited;
 	}
 
-	// ƒuƒ‰ƒPƒbƒg‚·‚é‚©‚Ç‚¤‚©
+	// ãƒ–ãƒ©ã‚±ãƒƒãƒˆã™ã‚‹ã‹ã©ã†ã‹
 	BOOL AddBracket = FALSE;
 	if (ts.BracketedSupport) {
 		if (!ts.BracketedControlOnly) {
@@ -286,7 +286,7 @@ void CBPreparePaste(HWND HWin, BOOL shouldBeReady, BOOL AddCR, BOOL Bracketed, w
 	}
 
 	{
-		// ‰üs‚ğ CR ‚Ì‚İ‚É³‹K‰»
+		// æ”¹è¡Œã‚’ CR ã®ã¿ã«æ­£è¦åŒ–
 		wchar_t *dest = NormalizeLineBreakCR(str_w, 0);
 		free(str_w);
 		str_w = dest;
@@ -338,7 +338,7 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 
 	str_w = GetClipboardTextW(HWin, FALSE);
 	if (str_w == NULL || !IsTextW(str_w, 0)) {
-		// ƒNƒŠƒbƒvƒ{[ƒh‚©‚ç•¶š—ñ‚ğæ“¾‚Å‚«‚È‚©‚Á‚½
+		// ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‹ã‚‰æ–‡å­—åˆ—ã‚’å–å¾—ã§ããªã‹ã£ãŸ
 		goto error;
 	}
 
@@ -346,7 +346,7 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 		str_mb = ToU8W(str_w);
 	}
 	else {
-		str_mb = MakeOutputStringConvW(str_w, ts.KanjiCodeSend, 0, 0, 0, NULL);
+		str_mb = MakeOutputStringConvW(str_w, ts.KanjiCodeSend, ts.KanjiIn, ts.KanjiOut, ts.JIS7KatakanaSend, NULL);
 	}
 
 	if (str_mb == NULL) {
@@ -385,7 +385,7 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 	free(str_mb);
 	free(str_b64);
 
-	// “\‚è•t‚¯‚Ì€”õ‚ª³í‚Éo—ˆ‚½
+	// è²¼ã‚Šä»˜ã‘ã®æº–å‚™ãŒæ­£å¸¸ã«å‡ºæ¥ãŸ
 	CBSendStart(str_w);
 
 	return;

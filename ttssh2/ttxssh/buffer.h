@@ -34,10 +34,10 @@
 
 #if 1
 typedef struct buffer {
-	char *buf;	   /* ƒoƒbƒtƒ@‚Ìæ“ªƒ|ƒCƒ“ƒ^Brealloc()‚É‚æ‚è•Ï“®‚·‚éB*/
-	size_t offset; /* Œ»İ‚Ì“Ç‚İo‚µˆÊ’u */
-	size_t maxlen; /* ƒoƒbƒtƒ@‚ÌÅ‘åƒTƒCƒY */
-	size_t len;	   /* ƒoƒbƒtƒ@‚ÉŠÜ‚Ü‚ê‚é—LŒø‚Èƒf[ƒ^ƒTƒCƒY */
+	char *buf;	   /* ãƒãƒƒãƒ•ã‚¡ã®å…ˆé ­ãƒã‚¤ãƒ³ã‚¿ã€‚realloc()ã«ã‚ˆã‚Šå¤‰å‹•ã™ã‚‹ã€‚*/
+	size_t offset; /* ç¾åœ¨ã®èª­ã¿å‡ºã—ä½ç½® */
+	size_t maxlen; /* ãƒãƒƒãƒ•ã‚¡ã®æœ€å¤§ã‚µã‚¤ã‚º */
+	size_t len;	   /* ãƒãƒƒãƒ•ã‚¡ã«å«ã¾ã‚Œã‚‹æœ‰åŠ¹ãªãƒ‡ãƒ¼ã‚¿ã‚µã‚¤ã‚º */
 } buffer_t;
 #else
 typedef struct buffer buffer_t;
@@ -53,6 +53,7 @@ void buffer_put_raw(buffer_t *msg, const void *ptr, size_t size);
 char *buffer_get_string(char **data_ptr, int *buflen_ptr);
 void buffer_put_string(buffer_t *msg, const char *ptr, size_t size);
 void buffer_put_cstring(buffer_t *msg, const char *ptr);
+void buffer_put_stringb(buffer_t *msg, buffer_t *v);
 void buffer_put_char(buffer_t *msg, int value);
 void buffer_put_padding(buffer_t *msg, size_t size);
 void buffer_put_int(buffer_t *msg, int value);

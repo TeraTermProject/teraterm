@@ -44,11 +44,11 @@
 #include "ttplug.h"
 
 typedef struct _ExtensionList {
-	//wchar_t *path;					// ƒtƒ‹ƒpƒX
-	wchar_t *filename;				// ƒtƒ@ƒCƒ‹–¼
+	//wchar_t *path;					// ãƒ•ãƒ«ãƒ‘ã‚¹
+	wchar_t *filename;				// ãƒ•ã‚¡ã‚¤ãƒ«å
 	ExtensionEnable enable;
-	TTXExports * exports;			// NULL‚Ì‚Æ‚«‚Íƒ[ƒh‚³‚ê‚Ä‚¢‚È‚¢
-	HMODULE LibHandle;				// NULL‚Ì‚Æ‚«‚Íƒ[ƒh‚³‚ê‚Ä‚¢‚È‚¢
+	TTXExports * exports;			// NULLã®ã¨ãã¯ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ãªã„
+	HMODULE LibHandle;				// NULLã®ã¨ãã¯ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ãªã„
 } ExtensionList;
 
 static ExtensionList *Extensions = NULL;
@@ -59,27 +59,27 @@ static int compareOrder(const void * e1, const void * e2)
 	const ExtensionList *exports1 = (ExtensionList *)e1;
 	const ExtensionList *exports2 = (ExtensionList *)e2;
 
-	// ƒ[ƒh‚³‚ê‚Ä‚¢‚é?
+	// ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ã‚‹?
 	if (exports1->exports != NULL && exports2->exports != NULL) {
-		// —¼•ûƒ[ƒh‚³‚ê‚Ä‚¢‚é
+		// ä¸¡æ–¹ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ã‚‹
 		int diff = exports1->exports->loadOrder - exports2->exports->loadOrder;
 		if (diff != 0) {
 			return diff;
 		}
 	}
 	if (!(exports1->exports == NULL && exports2->exports == NULL)) {
-		// •Ğ•û‚µ‚©ƒ[ƒh‚³‚ê‚Ä‚¢‚È‚¢
+		// ç‰‡æ–¹ã—ã‹ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ãªã„
 		if (exports1->exports == NULL) {
-			// exports1‚ğŒã‚ë
+			// exports1ã‚’å¾Œã‚
 			return 1;
 		}
 		if (exports2->exports == NULL) {
-			// exports2‚ğŒã‚ë
+			// exports2ã‚’å¾Œã‚
 			return -1;
 		}
 	}
 
-	// loadOrder‚Å”»’f‚Å‚«‚È‚¢‚Æ‚«‚ÍAƒpƒX‡
+	// loadOrderã§åˆ¤æ–­ã§ããªã„ã¨ãã¯ã€ãƒ‘ã‚¹é †
 	return wcscmp(exports1->filename, exports2->filename);
 }
 
@@ -91,9 +91,9 @@ static void PluginListAdd(const ExtensionList *item)
 	*pl = *item;
 	wchar_t *filename = wcsrchr(item->filename, L'\\');
 	if (filename == NULL) {
-		filename = item->filename;	// ƒtƒ‹ƒpƒX‚Å‚È‚¢ê‡‚Í‚»‚Ì‚Ü‚Ü
+		filename = item->filename;	// ãƒ•ãƒ«ãƒ‘ã‚¹ã§ãªã„å ´åˆã¯ãã®ã¾ã¾
 	} else {
-		filename++; // '\\'‚ÌŸ‚Ì•¶š‚©‚ç
+		filename++; // '\\'ã®æ¬¡ã®æ–‡å­—ã‹ã‚‰
 	}
 	pl->filename = _wcsdup(filename);
 }
@@ -111,7 +111,7 @@ static void PluginListRead(const wchar_t *SetupFNW)
 		size_t len_ch = wcslen(s) + 1;
 		wchar_t *buf = (wchar_t *)malloc(sizeof(wchar_t) * len_ch);
 		int enable_int;
-		// ""file", 1"  ‚ğ‘z’è
+		// ""file", 1"  ã‚’æƒ³å®š
 		int r = swscanf_s(s, L"\"%[^\"]\", %d", buf, (unsigned int)len_ch, &enable_int);
 		if (r <= 1) {
 			free(buf);
@@ -159,7 +159,7 @@ static void loadExtension(size_t index, const wchar_t *ExeDirW, const wchar_t *U
 	Extensions[index].exports = NULL;
 	Extensions[index].LibHandle = NULL;
 
-	// ƒtƒ@ƒCƒ‹‚ª‚È‚¢
+	// ãƒ•ã‚¡ã‚¤ãƒ«ãŒãªã„
 	if (GetFileAttributesW(filename) == INVALID_FILE_ATTRIBUTES) {
 		free(filename);
 		return;
@@ -219,8 +219,8 @@ static void loadExtension(size_t index, const wchar_t *ExeDirW, const wchar_t *U
 			sub_message = L"unknown";
 			break;
 	}
-	// Œ¾Œêƒtƒ@ƒCƒ‹‚É‚æ‚éƒƒbƒZ[ƒW‚Ì‘Û‰»‚ğs‚Á‚Ä‚¢‚é‚ªA‚±‚Ì“_‚Å‚Íİ’è‚ª
-	// ‚Ü‚¾“Ç‚İ‚Ü‚ê‚Ä‚¢‚È‚¢ˆ×AƒƒbƒZ[ƒW‚ª‰pŒê‚Ì‚Ü‚Ü‚Æ‚È‚éB—vŒŸ“¢B
+	// è¨€èªãƒ•ã‚¡ã‚¤ãƒ«ã«ã‚ˆã‚‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®å›½éš›åŒ–ã‚’è¡Œã£ã¦ã„ã‚‹ãŒã€ã“ã®æ™‚ç‚¹ã§ã¯è¨­å®šãŒ
+	// ã¾ã èª­ã¿è¾¼ã¾ã‚Œã¦ã„ãªã„ç‚ºã€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒè‹±èªã®ã¾ã¾ã¨ãªã‚‹ã€‚è¦æ¤œè¨ã€‚
 	{
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
@@ -274,7 +274,7 @@ static void DeletePluginList(size_t index)
 	}
 	NumExtensions--;
 
-	// ƒŠƒXƒg‚ª‹ó‚É‚È‚Á‚½
+	// ãƒªã‚¹ãƒˆãŒç©ºã«ãªã£ãŸ
 	if (NumExtensions == 0) {
 		free(Extensions);
 		Extensions = NULL;
@@ -282,11 +282,11 @@ static void DeletePluginList(size_t index)
 }
 
 /**
- * ƒvƒ‰ƒOƒCƒ“î•ñ‚ğæ“¾‚·‚é
- * @param index		ƒvƒ‰ƒOƒCƒ“‚ÌƒCƒ“ƒfƒbƒNƒX
- * @param info		ƒvƒ‰ƒOƒCƒ“î•ñ‚ğŠi”[‚·‚é\‘¢‘Ì‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *					•¶š—ñ‚Í‘‚«Š·‚¦‚È‚¢‚±‚Æ
- * @return			¬Œ÷‚µ‚½ê‡‚ÍTRUEA¸”s‚µ‚½ê‡‚ÍFALSE
+ * ãƒ—ãƒ©ã‚°ã‚¤ãƒ³æƒ…å ±ã‚’å–å¾—ã™ã‚‹
+ * @param index		ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+ * @param info		ãƒ—ãƒ©ã‚°ã‚¤ãƒ³æƒ…å ±ã‚’æ ¼ç´ã™ã‚‹æ§‹é€ ä½“ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *					æ–‡å­—åˆ—ã¯æ›¸ãæ›ãˆãªã„ã“ã¨
+ * @return			æˆåŠŸã—ãŸå ´åˆã¯TRUEã€å¤±æ•—ã—ãŸå ´åˆã¯FALSE
  */
 BOOL PluginGetInfo(int index, PluginInfo *info)
 {
@@ -300,11 +300,11 @@ BOOL PluginGetInfo(int index, PluginInfo *info)
 	info->filename = pl->filename;
 	info->enable = pl->enable;
 	if (pl->exports != NULL) {
-		// ƒ[ƒh‚µ‚Ä‚¢‚È‚¢
+		// ãƒ­ãƒ¼ãƒ‰ã—ã¦ã„ãªã„
 		info->loaded = EXTENSION_LOADED;
 		info->load_order = pl->exports->loadOrder;
 	} else {
-		// ƒ[ƒh‚µ‚Ä‚¢‚È‚¢
+		// ãƒ­ãƒ¼ãƒ‰ã—ã¦ã„ãªã„
 		info->loaded = EXTENSION_UNLOADED;
 	}
 
@@ -312,18 +312,18 @@ BOOL PluginGetInfo(int index, PluginInfo *info)
 }
 
 /**
- * ƒvƒ‰ƒOƒCƒ“î•ñ‚ğİ’è‚·‚é
- * @param index		ƒvƒ‰ƒOƒCƒ“‚ÌƒCƒ“ƒfƒbƒNƒX
- * @param info		ƒvƒ‰ƒOƒCƒ“î•ñ‚ğŠi”[‚·‚é\‘¢‘Ì‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *					•¶š—ñ‚Í‘‚«Š·‚¦‚È‚¢‚±‚Æ
- * @return			¬Œ÷‚µ‚½ê‡‚ÍTRUEA¸”s‚µ‚½ê‡‚ÍFALSE
+ * ãƒ—ãƒ©ã‚°ã‚¤ãƒ³æƒ…å ±ã‚’è¨­å®šã™ã‚‹
+ * @param index		ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+ * @param info		ãƒ—ãƒ©ã‚°ã‚¤ãƒ³æƒ…å ±ã‚’æ ¼ç´ã™ã‚‹æ§‹é€ ä½“ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *					æ–‡å­—åˆ—ã¯æ›¸ãæ›ãˆãªã„ã“ã¨
+ * @return			æˆåŠŸã—ãŸå ´åˆã¯TRUEã€å¤±æ•—ã—ãŸå ´åˆã¯FALSE
  */
 void PluginAddInfo(const PluginInfo *info)
 {
-	// ƒtƒ@ƒCƒ‹–¼‚Ì‚İ‚É‚·‚é
+	// ãƒ•ã‚¡ã‚¤ãƒ«åã®ã¿ã«ã™ã‚‹
 	wchar_t *filename = wcsrchr(info->filename, L'\\');
 	if (filename == NULL) {
-		// Œ³‚©‚çƒtƒ@ƒCƒ‹–¼‚¾‚¯‚¾‚Á‚½
+		// å…ƒã‹ã‚‰ãƒ•ã‚¡ã‚¤ãƒ«åã ã‘ã ã£ãŸ
 		filename = info->filename;
 	} else {
 		filename++;
@@ -339,14 +339,14 @@ void PluginAddInfo(const PluginInfo *info)
 		}
 	}
 	if (find == FALSE) {
-		// V‹K’Ç‰Á
+		// æ–°è¦è¿½åŠ 
 		ExtensionList e_item = {};
 		e_item.filename = filename;
 		e_item.enable = info->enable;
 		PluginListAdd(&e_item);
 	}
 	else {
-		// •ÏX
+		// å¤‰æ›´
 		ExtensionList *pl = &Extensions[index];
 		free(pl->filename);
 		pl->filename = _wcsdup(filename);
@@ -361,11 +361,11 @@ static void LoadExtensions(PTTSet ts_)
 
 	if (NumExtensions==0) return;
 
-	// ƒvƒ‰ƒOƒCƒ“‚ğƒ[ƒh
+	// ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚’ãƒ­ãƒ¼ãƒ‰
 	for (size_t i = 0; i < NumExtensions; i++) {
 		const ExtensionList *pl = &Extensions[i];
 		if ((pl->enable == EXTENSION_ENABLE) ||
-			(pl->enable == EXTENSION_UNSPECIFIED ))	// –¢w’è
+			(pl->enable == EXTENSION_UNSPECIFIED ))	// æœªæŒ‡å®š
 		{
 			loadExtension(i, ts_->ExeDirW, ts_->UILanguageFileW);
 		}

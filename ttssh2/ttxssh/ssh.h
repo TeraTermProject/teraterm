@@ -96,6 +96,9 @@ enum channel_type {
 	TYPE_SHELL, TYPE_PORTFWD, TYPE_SCP, TYPE_SFTP, TYPE_AGENT, TYPE_SUBSYSTEM_GEN,
 };
 
+#define CHANNEL_ADD_NUM 50       // チャネル構造体の配列(channels)の要素数の初期値 兼 realloc時の増加数
+#define CHANNEL_MAX_DEFAULT 100  // 最大チャネル数のデフォルト値。iniファイルのMaxChannelの値の方が優先される。0の場合は無制限。
+
 // for SSH1
 #define SSH_MAX_SEND_PACKET_SIZE   250000
 
@@ -305,11 +308,11 @@ struct Enc {
 struct Mac {
 	char            *name;
 	int             enabled;
-	const EVP_MD    *md;
 	unsigned int    mac_len;
 	u_char          *key;
 	unsigned int    key_len;
 	int             etm;
+	struct ssh_hmac_ctx	*hmac_ctx;
 };
 
 struct Comp {
@@ -333,7 +336,7 @@ enum kex_modes {
 };
 
 
-// �z�X�g�L�[(SSH1, SSH2�܂�)�̃f�[�^�\�� (2006.3.21 yutaka)
+// ホストキー(SSH1, SSH2含む)のデータ構造 (2006.3.21 yutaka)
 typedef struct Key {
 	// host key type
 	ssh_keytype type;
@@ -378,6 +381,7 @@ typedef struct {
 
 	int server_protocol_flags;
 	char *server_ID;
+	char *client_ID;
 
 	/* This buffer is used to hold the outgoing data, and encrypted in-place
 	   here if necessary. */
@@ -457,6 +461,7 @@ int SSH_extract_payload(PTInstVar pvar, unsigned char *dest, int len);
 void SSH_end(PTInstVar pvar);
 
 void SSH_get_server_ID_info(PTInstVar pvar, char *dest, int len);
+void SSH_get_client_ID_info(PTInstVar pvar, char *dest, int len);
 void SSH_get_protocol_version_info(PTInstVar pvar, char *dest, int len);
 void SSH_get_compression_info(PTInstVar pvar, char *dest, int len);
 void SSH_get_mac_info(PTInstVar pvar, char *dest, int len);
@@ -478,10 +483,9 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
                       char *to_remote_host, int to_remote_port,
                       char *originator, unsigned short originator_port);
 
-int SSH_start_scp(PTInstVar pvar, char *sendfile, char *dstfile);
+int SSH_start_scp_send(PTInstVar pvar, const char *sendfile, const char *dest);
 int SSH_scp_sending_status(void);
-int SSH_start_scp_receive(PTInstVar pvar, char *filename);
-int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfile, enum scp_dir direction);
+int SSH_start_scp_receive(PTInstVar pvar, const char *filename, const char *dest);
 int SSH_sftp_transaction(PTInstVar pvar);
 
 /* auxiliary SSH2 interfaces for pkt.c */
@@ -528,8 +532,8 @@ typedef struct PacketList {
 	struct PacketList *next;
 } PacketList_t;
 
-// SCP��M�����ɂ�����t���[�����臒l
-// �K�p�� scp_t.filercvsize
+// SCP受信処理におけるフロー制御の閾値
+// 適用先 scp_t.filercvsize
 #define SCPRCV_HIGH_WATER_MARK (1 * 1024 * 1024)  // 1MB
 #define SCPRCV_LOW_WATER_MARK (0)  // 0MB
 

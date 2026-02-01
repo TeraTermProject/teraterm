@@ -61,6 +61,7 @@
 #include "xmodem.h"
 #include "ymodem.h"
 #include "kermit.h"
+#include "vtdraw.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
@@ -72,15 +73,11 @@
 
 #define MaxStrLen (LONG)512
 
-static const PCHAR TermList[] =
-	{ "VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
-	"VT320", "VT382", "VT420", "VT520", "VT525", NULL };
-
 static const PCHAR RussList2[] = { "Windows", "KOI8-R", NULL };
 
 
 /*
- * �V���A���|�[�g�֘A�̐ݒ��`
+ * シリアルポート関連の設定定義
  */
 #define IDENDMARK 0xFFFF
 
@@ -121,12 +118,12 @@ static id_str_pair_t serial_conf_flowctrl[] = {
 
 
 /*
- * �V���A���|�[�g�֘A�̐ݒ�
- * Id���當����ɕϊ�����B
+ * シリアルポート関連の設定
+ * Idから文字列に変換する。
  *
  * return
- *    TRUE: �ϊ�����
- *    FALSE: �ϊ����s
+ *    TRUE: 変換成功
+ *    FALSE: 変換失敗
  */
 int SerialPortConfconvertId2Str(enum serial_port_conf type, WORD id, PCHAR str, int strlen)
 {
@@ -177,12 +174,12 @@ error:
 #define WritePrivateProfileStringA(p1, p2, p3, p4) WritePrivateProfileStringAFileW(p1, p2, p3, p4)
 
 /*
- * �V���A���|�[�g�֘A�̐ݒ�
- * �����񂩂�Id�ɕϊ�����B
+ * シリアルポート関連の設定
+ * 文字列からIdに変換する。
  *
  * return
- *    TRUE: �ϊ�����
- *    FALSE: �ϊ����s
+ *    TRUE: 変換成功
+ *    FALSE: 変換失敗
  */
 static int SerialPortConfconvertStr2Id(enum serial_port_conf type, const wchar_t *str, WORD *id)
 {
@@ -409,7 +406,7 @@ void WriteInt6(PCHAR Sect, PCHAR Key, const wchar_t *FName,
 	WritePrivateProfileStringA(Sect, Key, Temp, FName);
 }
 
-// �t�H���g��񏑂����݁A4�p�����[�^��
+// フォント情報書き込み、4パラメータ版
 static void WriteFont(PCHAR Sect, PCHAR Key, const wchar_t *FName,
 					  PCHAR Name, int x, int y, int charset)
 {
@@ -429,7 +426,7 @@ static int GetNthNumA(/*const*/ char *str, int Nth)
 	return i;
 }
 
-// �t�H���g���ǂݍ��݁A4�p�����[�^��
+// フォント情報読み込み、4パラメータ版
 static void ReadFont(
 	const char *Sect, const char *Key, const char *Default, const wchar_t *FName,
 	char *FontName, size_t FontNameLen, POINT *FontSize, int *FontCharSet)
@@ -438,7 +435,7 @@ static void ReadFont(
 	GetPrivateProfileString(Sect, Key, Default,
 	                        Temp, _countof(Temp), FName);
 	if (Temp[0] == 0) {
-		// �f�t�H���g���Z�b�g����Ă��Ȃ� & ini�ɃG���g���[���Ȃ��ꍇ
+		// デフォルトがセットされていない & iniにエントリーがない場合
 		FontName[0] = 0;
 		FontSize->x = 0;
 		FontSize->y = 0;
@@ -448,11 +445,11 @@ static void ReadFont(
 		FontSize->x = GetNthNumA(Temp, 2);
 		FontSize->y = GetNthNumA(Temp, 3);
 		*FontCharSet = GetNthNumA(Temp, 4);
-		// TODO �����ƃp�[�X����
+		// TODO ちゃんとパースする
 	}
 }
 
-// �t�H���g���ǂݍ��݁A3�p�����[�^��
+// フォント情報読み込み、3パラメータ版
 static void ReadFont3(
 	const wchar_t *Sect, const wchar_t *Key, const wchar_t *Default, const wchar_t *FName,
 	wchar_t *FontName, size_t FontNameLen, int *FontPoint, int *FontCharSet)
@@ -460,7 +457,7 @@ static void ReadFont3(
 	wchar_t *Temp;
 	hGetPrivateProfileStringW(Sect, Key, Default, FName, & Temp);
 	if (Temp[0] == 0) {
-		// �f�t�H���g���Z�b�g����Ă��Ȃ� & ini�ɃG���g���[���Ȃ��ꍇ
+		// デフォルトがセットされていない & iniにエントリーがない場合
 		FontName[0] = 0;
 		*FontPoint = 0;
 		*FontCharSet = 0;
@@ -468,14 +465,14 @@ static void ReadFont3(
 		GetNthStringW(Temp, 1, FontNameLen, FontName);
 		GetNthNumW(Temp, 2, FontPoint);
 		GetNthNumW(Temp, 3, FontCharSet);
-		// TODO �����ƃp�[�X����
+		// TODO ちゃんとパースする
 	}
 	free(Temp);
 }
 
 /**
- *	BG�Z�N�V�����̓ǂݍ���
- *		�e�[�}�ȊO�̃A�C�e��
+ *	BGセクションの読み込み
+ *		テーマ以外のアイテム
  */
 static void DispReadIni(const wchar_t *FName, PTTSet ts)
 {
@@ -523,8 +520,8 @@ static void DispReadIni(const wchar_t *FName, PTTSet ts)
 }
 
 /**
- *	BG�Z�N�V�����̏�������
- *		�e�[�}�ȊO�̃A�C�e��
+ *	BGセクションの書き込み
+ *		テーマ以外のアイテム
  */
 static void DispWriteIni(const wchar_t *FName, PTTSet ts)
 {
@@ -545,7 +542,7 @@ static void DispWriteIni(const wchar_t *FName, PTTSet ts)
 }
 
 /**
- *	Unicode Ambiguous,Emoji �̃f�t�H���g��
+ *	Unicode Ambiguous,Emoji のデフォルト幅
  */
 static int GetDefaultUnicodeWidth(void)
 {
@@ -604,8 +601,8 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	/*
 	 * Version number
-	 * �ݒ�t�@�C�����ǂ̃o�[�W������ Tera Term �ŕۑ����ꂽ����\��
-	 * �ݒ�t�@�C���̕ۑ����͂��̒l�ł͂Ȃ��A���݂� Tera Term �̃o�[�W�������g����
+	 * 設定ファイルがどのバージョンの Tera Term で保存されたかを表す
+	 * 設定ファイルの保存時はこの値ではなく、現在の Tera Term のバージョンが使われる
 	 */
 	GetPrivateProfileString(Section, "Version", TT_VERSION_STR("."), Temp, sizeof(Temp), FName);
 	p = strchr(Temp, '.');
@@ -617,7 +614,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		ts->ConfigVersion = 0;
 	}
 
-	// TTX �� �m�F�ł���悤�ATera Term �̃o�[�W�������i�[���Ă���
+	// TTX で 確認できるよう、Tera Term のバージョンを格納しておく
 	ts->RunningVersion = TT_VERSION_MAJOR * 10000 + TT_VERSION_MINOR;
 
 	/* Port type */
@@ -743,7 +740,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Terminal ID */
 	GetPrivateProfileString(Section, "TerminalID", "",
 	                        Temp, sizeof(Temp), FName);
-	ts->TerminalID = str2id(TermList, Temp, IdVT100);
+	ts->TerminalID = TermIDGetID(Temp);
 
 	/* Title String */
 	GetPrivateProfileString(Section, "Title", "Tera Term",
@@ -864,10 +861,10 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		}
 	}
 
-	// �`�悷��f�o�C�X(�f�B�X�v���C/�v�����^)�ɍ��킹��
-	// GetNearestColor()����ق����ǂ��̂ł͂Ȃ����낤��
-	// �ŋ߂̃f�B�X�v���C�A�_�v�^�Ȃ�24bit color���Ǝv����̂�
-	// ���̃u���b�N�͎�����e���Ȃ��̂�������Ȃ�
+	// 描画するデバイス(ディスプレイ/プリンタ)に合わせて
+	// GetNearestColor()するほうが良いのではないだろうか
+	// 最近のディスプレイアダプタなら24bit colorだと思われるので
+	// このブロックは事実上影響ないのかもしれない
 #if 1
 	{
 		HDC TmpDC = GetDC(0);			/* Get screen device context */
@@ -929,7 +926,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	else
 	  ts->MetaKey = IdMetaOff;
 
-	// Windows95 �n�͍��E�� Alt �̔��ʂɔ�Ή�
+	// Windows95 系は左右の Alt の判別に非対応
 	if (!IsWindowsNTKernel() && ts->MetaKey != IdMetaOff) {
 	  ts->MetaKey = IdMetaOn;
 	}
@@ -1041,7 +1038,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	else if (_stricmp(Temp, "ConnectionElapsed") == 0)
 		ts->LogTimestampType = TIMESTAMP_ELAPSED_CONNECTED;
 	else if (_stricmp(Temp, "") == 0 && GetOnOff(Section, "LogTimestampUTC", FName, FALSE))
-		// LogTimestampType �����ݒ�̏ꍇ�� LogTimestampUTC �̒l���Q�Ƃ���
+		// LogTimestampType が未設定の場合は LogTimestampUTC の値を参照する
 		ts->LogTimestampType = TIMESTAMP_UTC;
 	else
 		ts->LogTimestampType = TIMESTAMP_LOCAL;
@@ -1056,7 +1053,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Default Log file path */
 	hGetPrivateProfileStringW(SectionW, L"LogDefaultPath", ts->LogDirW, FName, &ts->LogDefaultPathW);
 	if (ts->LogDefaultPathW[0] == 0) {
-		// ���w��("LogDefaultPath=")�������ANULL������
+		// 未指定("LogDefaultPath=")だった、NULLを入れる
 		free(ts->LogDefaultPathW);
 		ts->LogDefaultPathW = NULL;
 	}
@@ -1089,7 +1086,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* XMODEM binary file */
 	ts->XmodemBin = GetOnOff(Section, "XmodemBin", FName, TRUE);
 
-	/* XMODEM ��M�R�}���h (2007.12.21 yutaka) */
+	/* XMODEM 受信コマンド (2007.12.21 yutaka) */
 	GetPrivateProfileString(Section, "XModemRcvCommand", "",
 	                        ts->XModemRcvCommand,
 	                        sizeof(ts->XModemRcvCommand), FName);
@@ -1106,7 +1103,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	                        ts->FileSendFilter, sizeof(ts->FileSendFilter),
 	                        FName);
 
-	/* SCP���M��p�X (2012.4.6 yutaka) */
+	/* SCP送信先パス (2012.4.6 yutaka) */
 	GetPrivateProfileString(Section, "ScpSendDir", "",
 	                        ts->ScpSendDir, sizeof(ts->ScpSendDir), FName);
 
@@ -1269,7 +1266,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->NonblinkingCursor =
 		GetOnOff(Section, "NonblinkingCursor", FName, FALSE);
 
-	// �t�H�[�J�X�������̃|���S���J�[�\�� (2008.1.24 yutaka)
+	// フォーカス無効時のポリゴンカーソル (2008.1.24 yutaka)
 	ts->KillFocusCursor =
 		GetOnOff(Section, "KillFocusCursor", FName, TRUE);
 
@@ -1283,7 +1280,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	GetPrivateProfileString(Section, "PassThruPort", "",
 	                        ts->PrnDev, sizeof(ts->PrnDev), FName);
 
-	/* �v�����^�p����R�[�h���󂯕t���邩 */
+	/* プリンタ用制御コードを受け付けるか */
 	if (GetOnOff(Section, "PrinterCtrlSequence", FName, FALSE))
 		ts->TermFlag |= TF_PRINTERCTRL;
 
@@ -1331,7 +1328,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Startup macro -- special option */
 	hGetPrivateProfileStringW(SectionW, L"StartupMacro", L"", FName, &ts->MacroFNW);
 	if (ts->MacroFNW != NULL && ts->MacroFNW[0] == L'\0') {
-		// �w��Ȃ�
+		// 指定なし
 		free(ts->MacroFNW);
 		ts->MacroFNW = NULL;
 	}
@@ -1434,7 +1431,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (GetOnOff(Section, "YmodemLog", FName, FALSE))
 		ts->LogFlag |= LOG_Y;
 
-	/* YMODEM ��M�R�}���h (2010.3.23 yutaka) */
+	/* YMODEM 受信コマンド (2010.3.23 yutaka) */
 	GetPrivateProfileString(Section, "YModemRcvCommand", "rb",
 	                        ts->YModemRcvCommand, sizeof(ts->YModemRcvCommand), FName);
 
@@ -1457,7 +1454,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (GetOnOff(Section, "ZmodemLog", FName, FALSE))
 		ts->LogFlag |= LOG_Z;
 
-	/* ZMODEM ��M�R�}���h (2007.12.21 yutaka) */
+	/* ZMODEM 受信コマンド (2007.12.21 yutaka) */
 	GetPrivateProfileString(Section, "ZModemRcvCommand", "rz",
 	                        ts->ZModemRcvCommand, sizeof(ts->ZModemRcvCommand), FName);
 
@@ -1780,7 +1777,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	else if (_stricmp(Temp, "write") == 0)
 		ts->CtrlFlag |= CSF_CBWRITE;
 	else
-		ts->CtrlFlag |= CSF_CBNONE; // �����������Ȃ�
+		ts->CtrlFlag |= CSF_CBNONE; // 実質何もしない
 
 	// Notify Clipboard Access from Remote
 	ts->NotifyClipboardAccess = GetOnOff(Section, "NotifyClipboardAccess", FName, TRUE);
@@ -1994,7 +1991,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 			  ts->DialogFontNameW, _countof(ts->DialogFontNameW),
 			  &ts->DialogFontPoint, &ts->DialogFontCharSet);
 
-	// Unicode�ݒ�
+	// Unicode設定
 	ts->UnicodeAmbiguousWidth = GetPrivateProfileInt(Section, "UnicodeAmbiguousWidth", 0, FName);
 	if (ts->UnicodeAmbiguousWidth < 1 || 2 < ts->UnicodeAmbiguousWidth) {
 		ts->UnicodeAmbiguousWidth = GetDefaultUnicodeWidth();
@@ -2011,10 +2008,10 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	// rounded corner preference for VT/TEK window
 	ts->WindowCornerDontround = GetOnOff(Section, "WindowCornerDontround", FName, FALSE);
 
-	// �ʒm��
+	// 通知音
 	ts->NotifySound = GetOnOff(Section, "NotifySound", FName, TRUE);
 
-	// �����o�b�N�A�b�v
+	// 自動バックアップ
 	ts->IniAutoBackup = GetOnOff(Section, "IniAutoBackup", FName, TRUE);
 
 	// Bracketed paste mode
@@ -2032,15 +2029,50 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->SendfileSequential = GetOnOff(Section, "SendfileSequential", FName, FALSE);
 	ts->SendfileSkipOptionDialog = GetOnOff(Section, "SendfileSkipOptionDialog", FName, FALSE);
 
+	wchar_t *tmpw;
+	hGetPrivateProfileStringW(SectionW, L"VTDrawAPI", L"Auto", FName, &tmpw);
+	ts->VTDrawAPI_ini = (DWORD)VTDrawFromIni(tmpw);
+	free(tmpw);
+	ts->VTDrawAPI = (DWORD)VTDrawFromID(ts->VTDrawAPI_ini);
+	ts->VTDrawAnsiCodePage_ini = GetPrivateProfileIntW(SectionW, L"VTDrawACP", 0, FName);
+	if (ts->VTDrawAnsiCodePage_ini == 0) {
+		ts->VTDrawAnsiCodePage = GetACP();
+	} else {
+		ts->VTDrawAnsiCodePage = ts->VTDrawAnsiCodePage_ini;
+	}
+
+	// Receivefile
+	GetPrivateProfileString(Section, "FileReceiveFilter", "", ts->FileReceiveFilter, sizeof(ts->FileReceiveFilter), FName);
+	ts->ReceivefileSkipOptionDialog = GetOnOff(Section, "ReceivefileSkipOptionDialog", FName, FALSE);
+	ts->ReceivefileAutoStopWaitTime = GetPrivateProfileInt(Section, "ReceivefileAutoStopWaitTime", 5, FName);
+
+	// シリアルポートRTSとDTRのフローコントロール設定
+	ts->FlowCtrlRTS = GetPrivateProfileInt(Section, "FlowCtrlRTS", -1, FName);
+	if (ts->FlowCtrlRTS == -1) {
+		if (ts->Flow == IdFlowHard) {
+			ts->FlowCtrlRTS = IdHandshake; // RTS/CTS
+		} else {
+			ts->FlowCtrlRTS = IdEnable;
+		}
+	}
+	ts->FlowCtrlDTR = GetPrivateProfileInt(Section, "FlowCtrlDTR", -1, FName);
+	if (ts->FlowCtrlDTR == -1) {
+		if (ts->Flow == IdFlowHardDsrDtr) {
+			ts->FlowCtrlDTR = IdHandshake; // DSR/DTR
+		} else {
+			ts->FlowCtrlDTR = IdEnable;
+		}
+	}
+
 	// Experimental
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreePropertySheet", FName, ts->ExperimentalTreePropertySheetEnable);
 }
 
 /**
- *	UILanguage File �� ExeDir���΃p�X�ɕϊ�
+ *	UILanguage File を ExeDir相対パスに変換
  *
- *	@return ����UILanguageFile�p�X�A�s�v�ɂȂ�����free()���邱��
+ *	@return 相対UILanguageFileパス、不要になったらfree()すること
  */
 static wchar_t *GetUILanguageFileRelPath(const wchar_t *UILanguageFile)
 {
@@ -2049,11 +2081,11 @@ static wchar_t *GetUILanguageFileRelPath(const wchar_t *UILanguageFile)
 	int r = wcsncmp(ExeDirW, UILanguageFile, ExeDirLen);
 	free(ExeDirW);
 	if (r != 0) {
-		// ExeDir �t�H���_�ȉ��� lng �t�@�C���ł͂Ȃ��̂ł��̂܂ܕԂ�
+		// ExeDir フォルダ以下の lng ファイルではないのでそのまま返す
 		return _wcsdup(UILanguageFile);
 	}
 
-	//   ExeDir���΂ɕϊ�����
+	//   ExeDir相対に変換する
 	wchar_t *UILanguageFileRel = _wcsdup(UILanguageFile + ExeDirLen + 1);
 	return UILanguageFileRel;
 }
@@ -2072,7 +2104,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	/* version */
 	ret = WritePrivateProfileString(Section, "Version", TT_VERSION_STR("."), FName);
 	if (ret == 0) {
-		// ini�t�@�C���̏������ݎ��s
+		// iniファイルの書き込み失敗
 		wchar_t *msg, *msg_err, *title;
 		ret = GetLastError();
 		GetI18nStrWW("Tera Term", "MSG_INI_WRITE_ERROR", L"Cannot write ini file", ts->UILanguageFileW, &msg);
@@ -2261,8 +2293,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "AutoWinSwitch", FName, ts->AutoWinSwitch);
 
 	/* Terminal ID */
-	id2str(TermList, ts->TerminalID, IdVT100, Temp, sizeof(Temp));
-	WritePrivateProfileString(Section, "TerminalID", Temp, FName);
+	WritePrivateProfileString(Section, "TerminalID", TermIDGetStr(ts->TerminalID), FName);
 
 	/* Title text */
 	WritePrivateProfileString(Section, "Title", ts->Title, FName);
@@ -2553,11 +2584,11 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	TempW = NULL;
 	if (ts->LogDefaultPathW != NULL &&
 		wcscmp(ts->LogDefaultPathW, ts->LogDirW) != 0) {
-		// �ݒ肳��Ă��� && �قȂ��Ă���Ƃ��A�t�H���_���w�肵�Ă�
+		// 設定されている && 異なっているとき、フォルダを指定してる
 		TempW = ts->LogDefaultPathW;
 	}
 	else {
-		// �ݒ肳��Ă��Ȃ�, �폜
+		// 設定されていない, 削除
 		TempW = NULL;
 	}
 	WritePrivateProfileStringW(SectionW, L"LogDefaultPath", TempW, FName);
@@ -2593,7 +2624,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	/* XMODEM binary flag */
 	WriteOnOff(Section, "XmodemBin", FName, ts->XmodemBin);
 
-	/* XMODEM ��M�R�}���h (2007.12.21 yutaka) */
+	/* XMODEM 受信コマンド (2007.12.21 yutaka) */
 	WritePrivateProfileString(Section, "XmodemRcvCommand",
 	                          ts->XModemRcvCommand, FName);
 
@@ -2736,7 +2767,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	/*   -- special option */
 	WritePrivateProfileString(Section, "PassThruPort", ts->PrnDev, FName);
 
-	/* �v�����^�p����R�[�h���󂯕t���邩 */
+	/* プリンタ用制御コードを受け付けるか */
 	WriteOnOff(Section, "PrinterCtrlSequence", FName,
 		ts->TermFlag & TF_PRINTERCTRL);
 
@@ -2848,7 +2879,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	/* YMODEM log  -- special option */
 	WriteOnOff(Section, "YmodemLog", FName, (WORD) (ts->LogFlag & LOG_Y));
 
-	/* YMODEM ��M�R�}���h (2010.3.23 yutaka) */
+	/* YMODEM 受信コマンド (2010.3.23 yutaka) */
 	WritePrivateProfileString(Section, "YmodemRcvCommand", ts->YModemRcvCommand, FName);
 
 	/* Auto ZMODEM activation -- special option */
@@ -2867,13 +2898,13 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	/* ZMODEM log  -- special option */
 	WriteOnOff(Section, "ZmodemLog", FName, (WORD) (ts->LogFlag & LOG_Z));
 
-	/* ZMODEM ��M�R�}���h (2007.12.21 yutaka) */
+	/* ZMODEM 受信コマンド (2007.12.21 yutaka) */
 	WritePrivateProfileString(Section, "ZmodemRcvCommand", ts->ZModemRcvCommand, FName);
 
 	DispWriteIni(FName, ts);
 
-	// theme�t�H���_�����
-#if 0	// Tera Term ���t�@�C���ۑ����ɍ��?
+	// themeフォルダを作る
+#if 0	// Tera Term がファイル保存時に作る?
 	{
 #define BG_THEME_DIR L"theme"
 		wchar_t *theme_folder = NULL;
@@ -3081,7 +3112,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 			}
 		}
 
-		if (Temp[0] == 0) { // �����͂�������ǔO�̂���
+		if (Temp[0] == 0) { // 無いはずだけれど念のため
 			strncpy_s(Temp, sizeof(Temp), "off", _TRUNCATE);
 		}
 		break;
@@ -3271,7 +3302,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WritePrivateProfileStringW(L"Tera Term", L"DlgFont", TempW, FName);
 	free(TempW);
 
-	// Unicode�ݒ�
+	// Unicode設定
 	WriteInt(Section, "UnicodeAmbiguousWidth", FName, ts->UnicodeAmbiguousWidth);
 	WriteOnOff(Section, "UnicodeEmojiOverride", FName, ts->UnicodeEmojiOverride);
 	WriteInt(Section, "UnicodeEmojiWidth", FName, ts->UnicodeEmojiWidth);
@@ -3281,10 +3312,10 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	// rounded corner preference for VT/TEK window
 	WriteOnOff(Section, "WindowCornerDontround", FName, ts->WindowCornerDontround);
 
-	// �ʒm��
+	// 通知音
 	WriteOnOff(Section, "NotifySound", FName, ts->NotifySound);
 
-	// �����o�b�N�A�b�v
+	// 自動バックアップ
 	WriteOnOff(Section, "IniAutoBackup", FName, ts->IniAutoBackup);
 
 	// Bracketed paste mode
@@ -3302,6 +3333,32 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteInt(Section, "SendfileSize", FName, ts->SendfileSize);
 	WriteOnOff(Section, "SendfileSequential", FName, ts->SendfileSequential);
 	WriteOnOff(Section, "SendfileSkipOptionDialog", FName, ts->SendfileSkipOptionDialog);
+
+	WritePrivateProfileStringW(
+		SectionW, L"VTDrawAPI", VTDrawToIni(ts->VTDrawAPI_ini), FName);
+	WritePrivateProfileIntW(
+		SectionW, L"VTDrawACP", ts->VTDrawAnsiCodePage_ini, FName);
+
+	// Receivefile
+	WritePrivateProfileString(Section, "FileReceiveFilter", ts->FileReceiveFilter, FName);
+	WriteOnOff(Section, "ReceivefileSkipOptionDialog", FName, ts->ReceivefileSkipOptionDialog);
+	WriteInt(Section, "ReceivefileAutoStopWaitTime", FName, ts->ReceivefileAutoStopWaitTime);
+
+	// シリアルポートRTSとDTRのフローコントロール設定
+	WriteInt(Section, "FlowCtrlRTS", FName, ts->FlowCtrlRTS);
+	WriteInt(Section, "FlowCtrlDTR", FName, ts->FlowCtrlDTR);
+}
+
+void SaveVTPos(const PTTSet ts)
+{
+	if (ts->SaveVTWinPos) {
+		/* VT win position */
+		WriteInt2(Section, "VTPos", ts->SetupFNameW, ts->VTPos.x, ts->VTPos.y);
+
+		/* VT terminal size  */
+		WriteInt2(Section, "TerminalSize", ts->SetupFNameW,
+		          ts->TerminalWidth, ts->TerminalHeight);
+	}
 }
 
 void PASCAL _CopySerialList(const wchar_t *IniSrc, const wchar_t *IniDest, const wchar_t *section,
@@ -3516,16 +3573,16 @@ static void ParseHostName(char *HostStr, WORD * port)
 }
 
 /**
- *	�R�}���h���C���̃t�@�C��������t���p�X���쐬����
+ *	コマンドラインのファイル名からフルパスを作成する
  *
- *	@param[in]	command_line	�R�}���h���C���̕�����(�t�@�C����)
- *	@param[in]	default_path	�t�@�C���̑��݂���p�X(�f�t�H���g�p�X)
- *								�t�@�C�������΃p�X�̎��A�t�@�C�����̑O�ɒǉ������
- *								NULL�̂Ƃ��A�J�����g�f�B���N�g�����ǉ������
- *	@param[in]	default_ini		�t�@�C���Ɋg���q�����݂��Ȃ��ꍇ�ǉ������
- *								L".ini"��
- *								NULL�̂Ƃ��ǉ����Ȃ�
- *	@return		�t���p�X�t�@�C����
+ *	@param[in]	command_line	コマンドラインの文字列(ファイル名)
+ *	@param[in]	default_path	ファイルの存在するパス(デフォルトパス)
+ *								ファイルが相対パスの時、ファイル名の前に追加される
+ *								NULLのとき、カレントディレクトリが追加される
+ *	@param[in]	default_ini		ファイルに拡張子が存在しない場合追加される
+ *								L".ini"等
+ *								NULLのとき追加しない
+ *	@return		フルパスファイル名
  */
 static wchar_t *GetFilePath(const wchar_t *command_line, const wchar_t *default_path, const wchar_t *default_ini)
 {
@@ -3533,7 +3590,7 @@ static wchar_t *GetFilePath(const wchar_t *command_line, const wchar_t *default_
 	wchar_t *filepart;
 	wchar_t *tmp;
 	if (command_line == NULL || *command_line == 0) {
-		// ���͂���������
+		// 入力がおかしい
 		return NULL;
 	}
 	if (IsRelativePathW(command_line) && default_path != NULL) {
@@ -3544,18 +3601,18 @@ static wchar_t *GetFilePath(const wchar_t *command_line, const wchar_t *default_
 		full_path = _wcsdup(command_line);
 	}
 
-	// �t�@�C�����̃t���p�X��(���K��)
+	// ファイル名のフルパス化(正規化)
 	hGetFullPathNameW(full_path, &tmp, &filepart);
 	free(full_path);
 	full_path = tmp;
 	if (filepart == NULL) {
-		// �t�@�C���������Ȃ�?
+		// ファイル部分がない?
 		assert(FALSE);
 		free(full_path);
 		return _wcsdup(command_line);
 	}
 
-	// �g���q�̒ǉ�
+	// 拡張子の追加
 	if (default_ini != NULL) {
 		if (wcsrchr(filepart, L'.') == NULL) {
 			awcscat(&full_path, default_ini);
@@ -3565,10 +3622,38 @@ static wchar_t *GetFilePath(const wchar_t *command_line, const wchar_t *default_
 	return full_path;
 }
 
+BOOL ParseFOption(PTTSet ts) {
+	wchar_t Temp[MaxStrLen]; // ttpmacroから呼ばれることを想定しMaxStrLenサイズとする
+	wchar_t *Param, *start, *cur, *next;
+	BOOL isFopt = FALSE;
+
+	/* the first term shuld be executable filename of Tera Term */
+	Param = _wcsdup(GetCommandLineW());
+	start = GetParam(Temp, _countof(Temp), Param);
+
+	cur = start;
+	while ((next = GetParam(Temp, _countof(Temp), cur))) {
+		DequoteParam(Temp, _countof(Temp), Temp);
+		if (_wcsnicmp(Temp, L"/F=", 3) == 0) {	/* setup filename */
+			isFopt = TRUE;
+			wchar_t *f = GetFilePath(&Temp[3], ts->HomeDirW, L".INI");
+			if (f != NULL && _wcsicmp(ts->SetupFNameW, f) != 0) {
+				free(ts->SetupFNameW);
+				ts->SetupFNameW = f;
+				WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
+			}
+			break;
+		}
+		cur = next;
+	}
+	free(Param);
+	return isFopt;
+}
+
 void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 {
 	int pos, c;
-	wchar_t Temp[MaxStrLen]; // ttpmacro����Ă΂�邱�Ƃ�z�肵MaxStrLen�T�C�Y�Ƃ���
+	wchar_t Temp[MaxStrLen]; // ttpmacroから呼ばれることを想定しMaxStrLenサイズとする
 	WORD ParamPort = 0;
 	WORD ParamCom = 0;
 	WORD ParamTCP = 0;
@@ -3606,6 +3691,7 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 				WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
 				_ReadIniFile(ts->SetupFNameW, ts);
 			}
+			break;
 		}
 		cur = next;
 	}
@@ -3684,15 +3770,15 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 				free(DDETopicA);
 			}
 		}
-		// "New connection" �_�C�A���O��\�����Ȃ� (2008.11.14 maya)
+		// "New connection" ダイアログを表示しない (2008.11.14 maya)
 		else if (_wcsicmp(Temp, L"/DS") == 0) {
 			ts->HostDialogOnStartup = FALSE;
 		}
-		// TCPLocalEcho/TCPCRSend �𖳌��ɂ��� (maya 2007.4.25)
+		// TCPLocalEcho/TCPCRSend を無効にする (maya 2007.4.25)
 		else if (_wcsicmp(Temp, L"/E") == 0) {
 			ts->DisableTCPEchoCR = TRUE;
 		}
-		// "New connection" �_�C�A���O��\������ (2013.10.08 maya)
+		// "New connection" ダイアログを表示する (2013.10.08 maya)
 		else if (_wcsicmp(Temp, L"/ES") == 0) {
 			ts->HostDialogOnStartup = TRUE;
 		}
@@ -3771,7 +3857,7 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			ParamTCP = ParsePortNameW(&Temp[3]);
 		}
 		else if (_wcsicmp(Temp, L"/PIPE") == 0 ||
-		         _wcsicmp(Temp, L"/NAMEDPIPE") == 0) {	/* ���O�t���p�C�v */
+		         _wcsicmp(Temp, L"/NAMEDPIPE") == 0) {	/* 名前付きパイプ */
 			ParamPort = IdNamedPipe;
 		}
 		else if (_wcsnicmp(Temp, L"/R=", 3) == 0) {	/* Replay filename */
@@ -3851,7 +3937,7 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 				strncpy_s(ts->HostName, sizeof(ts->HostName), HostNameA, _TRUNCATE);	/* host name */
 				free(HostNameA);
 				if (ParamPort == IdNamedPipe) {
-					// �������Ȃ��B
+					// 何もしない。
 
 				} else {
 					ParamPort = IdTCPIP;
@@ -3914,17 +4000,17 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 }
 
 /**
- *	���̃��W���[���̏�����
- *		���݂�邱�ƂȂ�
- *		*��* ���I�ȃ��[�h���s���Ă��Ȃ����߁A��Ƀ��[�h����Ă����ԂƂȂ��Ă���
+ *	このモジュールの初期化
+ *		現在やることなし
+ *		*注* 動的なロードを行っていないため、常にロードされている状態となっている
  */
 void TTSetInit(void)
 {
 }
 
 /**
- *	���̃��W���[���̏I��
- *		�m�ۂ����������̊J��
+ *	このモジュールの終了
+ *		確保したメモリの開放
  */
 void TTSetUnInit(TTTSet *ts)
 {

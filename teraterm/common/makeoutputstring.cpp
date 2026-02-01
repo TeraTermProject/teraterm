@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// “à•”•¶šƒR[ƒh(wchar_t) -> o—Í•¶šƒR[ƒh‚Ö•ÏŠ·‚·‚é
+// å†…éƒ¨æ–‡å­—ã‚³ãƒ¼ãƒ‰(wchar_t) -> å‡ºåŠ›æ–‡å­—ã‚³ãƒ¼ãƒ‰ã¸å¤‰æ›ã™ã‚‹
 
 #include <assert.h>
 
@@ -47,15 +47,15 @@ typedef enum {
 } CharSet;
 
 typedef struct OutputCharStateTag {
-	IdKanjiCode KanjiCode;		// o—Í•¶šƒR[ƒh(sjis,jis‚È‚Ç)
+	IdKanjiCode KanjiCode;		// å‡ºåŠ›æ–‡å­—ã‚³ãƒ¼ãƒ‰(sjis,jisãªã©)
 
-	// JIS Š¿šIN/OUT/ƒJƒi
+	// JIS æ¼¢å­—IN/OUT/ã‚«ãƒŠ
 	WORD KanjiIn;		// IdKanjiInA / IdKanjiInB
 	WORD KanjiOut;		// IdKanjiOutB / IdKanjiOutJ / IdKanjiOutH
 	BOOL JIS7Katakana;	// (Kanji JIS)kana
 
 	// state
-	CharSet SendCode;		// [in,out](Kanji JIS)’¼‘O‚Ì‘—MƒR[ƒh Ascii/Kana/Kanji
+	CharSet SendCode;		// [in,out](Kanji JIS)ç›´å‰ã®é€ä¿¡ã‚³ãƒ¼ãƒ‰ Ascii/Kana/Kanji
 } OutputCharState;
 
 static const KanjiInOutSt KanjiInList[] = {
@@ -108,13 +108,13 @@ const KanjiInOutSt *GetKanjiOutList(int index)
 }
 
 /**
- *	@retval	true	“ú–{Œê‚Ì”¼ŠpƒJƒ^ƒJƒi
- *	@retval	false	‚»‚Ì‘¼
+ *	@retval	true	æ—¥æœ¬èªã®åŠè§’ã‚«ã‚¿ã‚«ãƒŠ
+ *	@retval	false	ãã®ä»–
  */
 static BOOL IsHalfWidthKatakana(unsigned int u32)
 {
-	// Halfwidth CJK punctuation (U+FF61`FF64)
-	// Halfwidth Katakana variants (U+FF65`FF9F)
+	// Halfwidth CJK punctuation (U+FF61ã€œFF64)
+	// Halfwidth Katakana variants (U+FF65ã€œFF9F)
 	return (0xff61 <= u32 && u32 <= 0xff9f);
 }
 
@@ -133,10 +133,10 @@ void MakeOutputStringDestroy(OutputCharState *state)
 }
 
 /**
- * o—Íİ’è
+ * å‡ºåŠ›è¨­å®š
  *
  *	@param	states
- *	@param	kanji_code	IdSJIS / IdEUC ‚È‚Ç
+ *	@param	kanji_code	IdSJIS / IdEUC ãªã©
  *	@param	KanjiIn		IdKanjiInA / IdKanjiInB
  *	@param	KanjiOut	IdKanjiOutB / IdKanjiOutJ / IdKanjiOutH
  *	@param	jis7katakana
@@ -160,19 +160,19 @@ void MakeOutputStringInit(
 }
 
 /**
- * o—Í—p•¶š—ñ‚ğì¬‚·‚é
+ * å‡ºåŠ›ç”¨æ–‡å­—åˆ—ã‚’ä½œæˆã™ã‚‹
  *
- *	Unicode(UTF-16)•¶š—ñ‚©‚çUnicode(UTF-32)‚ğ1•¶šæ‚èo‚µ‚Ä
- *	o—Í•¶š(TempStr)‚ğì¬‚·‚é
+ *	Unicode(UTF-16)æ–‡å­—åˆ—ã‹ã‚‰Unicode(UTF-32)ã‚’1æ–‡å­—å–ã‚Šå‡ºã—ã¦
+ *	å‡ºåŠ›æ–‡å­—(TempStr)ã‚’ä½œæˆã™ã‚‹
  *
  *	@param	states
- *	@param	B			“ü—Í•¶š—ñ(wchar_t)
- *	@param	C			“ü—Í•¶š—ñ’·
- *	@param	TempStr		o—Í•¶šptr
- *	@param	TempLen_	o—Í•¶š’·
- *	@param	ControlOut	•¶šŒŸ¸/o—ÍŠÖ”
- *	@param	data		ControlOut ‚Ö“n‚·ƒf[ƒ^
- *	@retval	“ü—Í•¶š—ñ‚©‚çg—p‚µ‚½•¶š”
+ *	@param	B			å…¥åŠ›æ–‡å­—åˆ—(wchar_t)
+ *	@param	C			å…¥åŠ›æ–‡å­—åˆ—é•·
+ *	@param	TempStr		å‡ºåŠ›æ–‡å­—ptr
+ *	@param	TempLen_	å‡ºåŠ›æ–‡å­—é•·
+ *	@param	ControlOut	æ–‡å­—æ¤œæŸ»/å‡ºåŠ›é–¢æ•°
+ *	@param	data		ControlOut ã¸æ¸¡ã™ãƒ‡ãƒ¼ã‚¿
+ *	@retval	å…¥åŠ›æ–‡å­—åˆ—ã‹ã‚‰ä½¿ç”¨ã—ãŸæ–‡å­—æ•°
  */
 size_t MakeOutputString(
 	OutputCharState *states,
@@ -183,27 +183,27 @@ size_t MakeOutputString(
 {
 	size_t TempLen = 0;
 	size_t TempLen2;
-	size_t output_char_count;	// Á”ï‚µ‚½•¶š”
+	size_t output_char_count;	// æ¶ˆè²»ã—ãŸæ–‡å­—æ•°
 
 	assert(states != NULL);
 
-	// UTF-32 ‚ğ1•¶šæ‚èo‚·
+	// UTF-32 ã‚’1æ–‡å­—å–ã‚Šå‡ºã™
 	unsigned int u32;
 	size_t u16_len = UTF16ToUTF32(B, C, &u32);
 	if (u16_len == 0) {
-		// ƒfƒR[ƒh‚Å‚«‚È‚¢? ‚ ‚è“¾‚È‚¢‚Ì‚Å‚Í?
+		// ãƒ‡ã‚³ãƒ¼ãƒ‰ã§ããªã„? ã‚ã‚Šå¾—ãªã„ã®ã§ã¯?
 		assert(FALSE);
 		u32 = '?';
 		u16_len = 1;
 	}
 	output_char_count = u16_len;
 
-	// ŠeíƒVƒtƒgó‘Ô‚ğ’Êí‚É–ß‚·
+	// å„ç¨®ã‚·ãƒ•ãƒˆçŠ¶æ…‹ã‚’é€šå¸¸ã«æˆ»ã™
 	if (u32 < 0x100 || (ControlOut != NULL && ControlOut(u32, TRUE, NULL, NULL, data))) {
 		if (states->KanjiCode == IdJIS) {
-			// ¡‚Ì‚Æ‚±‚ëA“ú–{Œê,JIS‚µ‚©‚È‚¢
+			// ä»Šã®ã¨ã“ã‚ã€æ—¥æœ¬èª,JISã—ã‹ãªã„
 			if (states->SendCode == IdKanji) {
-				// Š¿š‚Å‚Í‚È‚¢‚Ì‚ÅAŠ¿šOUT
+				// æ¼¢å­—ã§ã¯ãªã„ã®ã§ã€æ¼¢å­—OUT
 				TempStr[TempLen++] = 0x1B;
 				TempStr[TempLen++] = '(';
 				switch (states->KanjiOut) {
@@ -228,16 +228,16 @@ size_t MakeOutputString(
 		}
 	}
 
-	// 1•¶šˆ—‚·‚é
+	// 1æ–‡å­—å‡¦ç†ã™ã‚‹
 	if (ControlOut != NULL && ControlOut(u32, FALSE, &TempStr[TempLen], &TempLen2, data)) {
-		// “Á•Ê‚È•¶š‚ğˆ—‚µ‚½
+		// ç‰¹åˆ¥ãªæ–‡å­—ã‚’å‡¦ç†ã—ãŸ
 		TempLen += TempLen2;
 		output_char_count = 1;
 	}
 	else {
 		switch (states->KanjiCode) {
 		case IdUTF8: {
-			// UTF-8 ‚Åo—Í
+			// UTF-8 ã§å‡ºåŠ›
 			size_t utf8_len = sizeof(TempStr);
 			utf8_len = UTF32ToUTF8(u32, TempStr, utf8_len);
 			TempLen += utf8_len;
@@ -246,18 +246,18 @@ size_t MakeOutputString(
 		case IdEUC:
 		case IdJIS:
 		case IdSJIS: {
-			// “ú–{Œê
-			// ‚Ü‚¸ CP932(SJIS) ‚É•ÏŠ·‚µ‚Ä‚©‚ço—Í
+			// æ—¥æœ¬èª
+			// ã¾ãš CP932(SJIS) ã«å¤‰æ›ã—ã¦ã‹ã‚‰å‡ºåŠ›
 			char mb_char[2];
 			size_t mb_len = sizeof(mb_char);
 			mb_len = UTF32ToMBCP(u32, 932, mb_char, mb_len);
 			if (mb_len == 0) {
-				// SJIS‚É•ÏŠ·‚Å‚«‚È‚¢
+				// SJISã«å¤‰æ›ã§ããªã„
 				TempStr[TempLen++] = '?';
 			} else {
 				switch (states->KanjiCode) {
 				case IdEUC:
-					// TODO ”¼ŠpƒJƒi
+					// TODO åŠè§’ã‚«ãƒŠ
 					if (mb_len == 1) {
 						TempStr[TempLen++] = mb_char[0];
 					} else {
@@ -275,7 +275,7 @@ size_t MakeOutputString(
 						TempStr[TempLen++] = mb_char[0];
 						states->SendCode = IdASCII;
 					} else if (IsHalfWidthKatakana(u32)) {
-						// ”¼ŠpƒJƒ^ƒJƒi
+						// åŠè§’ã‚«ã‚¿ã‚«ãƒŠ
 						if (states->JIS7Katakana==1) {
 							if (states->SendCode != IdKatakana) {
 								TempStr[TempLen++] = SI;
@@ -286,13 +286,13 @@ size_t MakeOutputString(
 						}
 						states->SendCode = IdKatakana;
 					} else {
-						// Š¿š
+						// æ¼¢å­—
 						WORD K;
 						K = (((WORD)(unsigned char)mb_char[0]) << 8) +
 							(WORD)(unsigned char)mb_char[1];
 						K = CodeConvSJIS2JIS(K);
 						if (states->SendCode != IdKanji) {
-							// Š¿šIN
+							// æ¼¢å­—IN
 							TempStr[TempLen++] = 0x1B;
 							TempStr[TempLen++] = '$';
 							if (states->KanjiIn == IdKanjiInB) {
@@ -343,7 +343,7 @@ size_t MakeOutputString(
 				code_page = 0;
 				break;
 			}
-			/* code_page ‚É•ÏŠ·‚µ‚Äo—Í */
+			/* code_page ã«å¤‰æ›ã—ã¦å‡ºåŠ› */
 			mb_len = sizeof(mb_char);
 			mb_len = UTF32ToMBCP(u32, code_page, mb_char, mb_len);
 			if (mb_len == 0) {
@@ -376,7 +376,7 @@ size_t MakeOutputString(
 			unsigned char byte;
 			int r = UnicodeToISO8859(states->KanjiCode, u32, &byte);
 			if (r == 0) {
-				// •ÏŠ·‚Å‚«‚È‚¢•¶šƒR[ƒh‚¾‚Á‚½
+				// å¤‰æ›ã§ããªã„æ–‡å­—ã‚³ãƒ¼ãƒ‰ã ã£ãŸ
 				byte = '?';
 			}
 			TempStr[TempLen++] = byte;
@@ -411,7 +411,7 @@ size_t MakeOutputString(
 			unsigned char byte;
 			int r = UnicodeToCodePage(states->KanjiCode, u32, &byte);
 			if (r == 0) {
-				// •ÏŠ·‚Å‚«‚È‚¢•¶šƒR[ƒh‚¾‚Á‚½
+				// å¤‰æ›ã§ããªã„æ–‡å­—ã‚³ãƒ¼ãƒ‰ã ã£ãŸ
 				byte = '?';
 			}
 			TempStr[TempLen++] = byte;
@@ -421,7 +421,7 @@ size_t MakeOutputString(
 			break;
 #if !defined(__MINGW32__)
 		default:
-			// gcc/clang‚Å‚Íswitch‚Éenum‚Ìƒƒ“ƒo‚ª‚·‚×‚Ä‚È‚¢‚Æ‚«Œx‚ªo‚é
+			// gcc/clangã§ã¯switchã«enumã®ãƒ¡ãƒ³ãƒãŒã™ã¹ã¦ãªã„ã¨ãè­¦å‘ŠãŒå‡ºã‚‹
 			assert(FALSE);
 			break;
 #endif

@@ -77,14 +77,14 @@ static void SetHostDropdown(HWND dlg, const TTTSet *ts)
 	ExpandCBWidth(dlg, IDC_HOSTNAME);
 	SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
 	if (SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) != 0) {
-		// ˆê”ÔÅ‰‚ğ‘I‘ğ‚·‚é
+		// ä¸€ç•ªæœ€åˆã‚’é¸æŠã™ã‚‹
 		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
 	} else {
-		// ‘I‘ğ‚µ‚È‚¢AƒGƒfƒBƒbƒgƒ{ƒbƒNƒX‚Í‹ó‚É‚È‚é
+		// é¸æŠã—ãªã„ã€ã‚¨ãƒ‡ã‚£ãƒƒãƒˆãƒœãƒƒã‚¯ã‚¹ã¯ç©ºã«ãªã‚‹
 		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
 	}
 
-	// Edit history‚ğ’Ç‰Á(ITEMDATA=999)
+	// Edit historyã‚’è¿½åŠ (ITEMDATA=999)
 	index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING, 0, (LPARAM)L"<Edit host list...>");
 	SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
 }
@@ -97,17 +97,17 @@ static void OpenEditHistory(HWND dlg, TTTSet *ts)
 	data.vtwin = HVTWin;
 	data.title = L"Edit Host list";
 	if (EditHistoryDlg(NULL, dlg, &data)) {
-		// •ÒW‚³‚ê‚½‚Ì‚ÅAƒhƒƒbƒvƒ_ƒEƒ“‚ğÄİ’è‚·‚é
+		// ç·¨é›†ã•ã‚ŒãŸã®ã§ã€ãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ã‚’å†è¨­å®šã™ã‚‹
 		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_RESETCONTENT, 0, 0);
 
 		SetHostDropdown(dlg, ts);
 	}
 
 	if (SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) > 1) {
-		// ˆê”ÔÅ‰‚ğ‘I‘ğ‚·‚é
+		// ä¸€ç•ªæœ€åˆã‚’é¸æŠã™ã‚‹
 		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
 	} else {
-		// "<Edit History...>‚Ì‚İA‘I‘ğ‚µ‚È‚¢AƒGƒfƒBƒbƒgƒ{ƒbƒNƒX‚Í‹ó‚É‚È‚é
+		// "<Edit History...>ã®ã¿ã€é¸æŠã—ãªã„ã€ã‚¨ãƒ‡ã‚£ãƒƒãƒˆãƒœãƒƒã‚¯ã‚¹ã¯ç©ºã«ãªã‚‹
 		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
 	}
 }
@@ -144,14 +144,14 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
-			// ƒtƒ@ƒCƒ‹‚¨‚æ‚Ñ–¼‘O•t‚«ƒpƒCƒv‚Ìê‡ATCP/IPˆµ‚¢‚Æ‚·‚éB
+			// ãƒ•ã‚¡ã‚¤ãƒ«ãŠã‚ˆã³åå‰ä»˜ããƒ‘ã‚¤ãƒ—ã®å ´åˆã€TCP/IPæ‰±ã„ã¨ã™ã‚‹ã€‚
 			if ( GetHNRec->PortType==IdFile ||
 				 GetHNRec->PortType==IdNamedPipe
 				) {
 				GetHNRec->PortType = IdTCPIP;
 			}
 
-			// ƒzƒXƒg (ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“)
+			// ãƒ›ã‚¹ãƒˆ (ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³)
 			SetHostDropdown(Dialog, &ts);
 			SetEditboxEmacsKeybind(Dialog, IDC_HOSTNAME);
 
@@ -171,12 +171,12 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				wchar_t *EntNameW;
 				int index;
 
-				// MaxComPort ‚ğ‰z‚¦‚éƒ|[ƒg‚Í•\¦‚µ‚È‚¢
+				// MaxComPort ã‚’è¶Šãˆã‚‹ãƒãƒ¼ãƒˆã¯è¡¨ç¤ºã—ãªã„
 				if (i > GetHNRec->MaxComPort) {
 					continue;
 				}
 
-				// g—p’†‚Ìƒ|[ƒg‚Í•\¦‚µ‚È‚¢
+				// ä½¿ç”¨ä¸­ã®ãƒãƒ¼ãƒˆã¯è¡¨ç¤ºã—ãªã„
 				if (CheckCOMFlag(p->port_no) == 1) {
 					continue;
 				}
@@ -197,7 +197,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				free(EntNameW);
 			}
 			if (j>0) {
-				// GetHNRec->ComPort ‚ğ‘I‘ğ‚·‚é
+				// GetHNRec->ComPort ã‚’é¸æŠã™ã‚‹
 				SendDlgItemMessageA(Dialog, IDC_HOSTCOM, CB_SETCURSEL, com_index - 1, 0);
 			}
 			else { /* All com ports are already used */
@@ -296,8 +296,8 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 						break;
 					case CBN_SELENDOK:
 						if (dlg_data->HostDropOpen) {
-							//	ƒhƒƒbƒvƒ_ƒEƒ“‚µ‚Ä‚¢‚È‚¢‚Æ‚«‚ÍAƒL[‚©ƒzƒC[ƒ‹‚Å‘I‘ğ‚µ‚Ä‚¢‚é
-							//	Œˆ’è(Enter or OK‰Ÿ‰º)‚·‚é‚Æ•ÒWŠJn
+							//	ãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ã—ã¦ã„ãªã„ã¨ãã¯ã€ã‚­ãƒ¼ã‹ãƒ›ã‚¤ãƒ¼ãƒ«ã§é¸æŠã—ã¦ã„ã‚‹
+							//	æ±ºå®š(Enter or OKæŠ¼ä¸‹)ã™ã‚‹ã¨ç·¨é›†é–‹å§‹
 							if (IsEditHistorySelected(Dialog)) {
 								OpenEditHistory(Dialog, &ts);
 							}

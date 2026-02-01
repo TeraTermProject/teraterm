@@ -35,20 +35,20 @@
 #include "ttlib.h"
 
 /**
- *	lngƒtƒ@ƒCƒ‹(iniƒtƒ@ƒCƒ‹)‚©‚ç•¶š—ñ‚ğæ“¾
+ *	lngãƒ•ã‚¡ã‚¤ãƒ«(iniãƒ•ã‚¡ã‚¤ãƒ«)ã‹ã‚‰æ–‡å­—åˆ—ã‚’å–å¾—
  *
  *	@param[in]		section
- *	@param[in]		key			ƒL[
- *								NULL‚Ì‚Æ‚«‚Í str = def ‚ª•Ô‚é
- *	@param[in]		def			ƒfƒtƒHƒ‹ƒg•¶š—ñ
- *								NULL=–¢w’è
- *	@param[in]		iniFile		iniƒtƒ@ƒCƒ‹
- *	@param[in,out]	str			æ“¾•¶š—ñ
- *								•s—v‚É‚È‚Á‚½‚çfree()‚·‚é
- *	@return						•¶š”
+ *	@param[in]		key			ã‚­ãƒ¼
+ *								NULLã®ã¨ãã¯ str = def ãŒè¿”ã‚‹
+ *	@param[in]		def			ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆæ–‡å­—åˆ—
+ *								NULL=æœªæŒ‡å®š
+ *	@param[in]		iniFile		iniãƒ•ã‚¡ã‚¤ãƒ«
+ *	@param[in,out]	str			å–å¾—æ–‡å­—åˆ—
+ *								ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹
+ *	@return						æ–‡å­—æ•°
  *
- *		str‚É‚Í•K‚¸•¶š—ñ‚ª•Ô‚Á‚Ä‚­‚é‚Ì‚ÅAfree() ‚ª•K—v
- *		(ƒƒ‚ƒŠ‚ª‚È‚¢ str=NULL ‚ª•Ô‚é)
+ *		strã«ã¯å¿…ãšæ–‡å­—åˆ—ãŒè¿”ã£ã¦ãã‚‹ã®ã§ã€free() ãŒå¿…è¦
+ *		(ãƒ¡ãƒ¢ãƒªãŒãªã„æ™‚ str=NULL ãŒè¿”ã‚‹)
  */
 size_t GetI18nStrWW(const char *section, const char *key, const wchar_t *def, const wchar_t *iniFile, wchar_t **str)
 {
@@ -64,7 +64,7 @@ size_t GetI18nStrWW(const char *section, const char *key, const wchar_t *def, co
 		MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
 		hGetPrivateProfileStringW(sectionW, keyW, def, iniFile, str);
 	}
-	assert(*str != NULL);		// ƒƒ‚ƒŠ‚ª‚È‚¢ NULL ‚ª•Ô‚Á‚Ä‚­‚é
+	assert(*str != NULL);		// ãƒ¡ãƒ¢ãƒªãŒãªã„æ™‚ NULL ãŒè¿”ã£ã¦ãã‚‹
 	size = RestoreNewLineW(*str);
 	return size;
 }
@@ -112,22 +112,22 @@ void GetI18nStrU8(const char *section, const char *key, char *buf, int buf_len, 
 }
 
 /**
- *	ƒŠƒXƒg‚ğİ’è‚·‚é
- *	SetDropDownList() ‚Ì‘¼Œ¾Œê”Å
+ *	ãƒªã‚¹ãƒˆã‚’è¨­å®šã™ã‚‹
+ *	SetDropDownList() ã®ä»–è¨€èªç‰ˆ
  *
- *	@param[in]	section			UILanguageFile ‚ÌƒZƒNƒVƒ‡ƒ“–¼
- *	@param[in]	hDlg			ƒ_ƒCƒAƒƒO
+ *	@param[in]	section			UILanguageFile ã®ã‚»ã‚¯ã‚·ãƒ§ãƒ³å
+ *	@param[in]	hDlg			ãƒ€ã‚¤ã‚¢ãƒ­ã‚°
  *	@param[in]	nIDDlgItem		id
- *	@param[in]	I18nTextInfo	ƒeƒLƒXƒgî•ñ
- *	@param[in]	infoCount		ƒeƒLƒXƒgî•ñ”
+ *	@param[in]	I18nTextInfo	ãƒ†ã‚­ã‚¹ãƒˆæƒ…å ±
+ *	@param[in]	infoCount		ãƒ†ã‚­ã‚¹ãƒˆæƒ…å ±æ•°
  *	@param[in]	UILanguageFile	lng file
- *	@param[in]	nsel			I18nTextInfo ‚Ì data ƒƒ“ƒo‚ªƒZƒbƒg‚³‚ê‚Ä‚¢‚È‚¢‚Æ‚«
- *									CB_SETCURSEL ‚Ìˆø”‚Æ“¯‚¶
- *										-1	–¢‘I‘ğ
- *										0`	‘I‘ğ€–Ú
- *								I18nTextInfo ‚Ì data ƒƒ“ƒo‚ªƒZƒbƒg‚³‚ê‚Ä‚¢‚é‚Æ‚«
- *									data ‚Ì’l‚Æ“¯‚¶ƒAƒCƒeƒ€‚ª‘I‘ğ‚³‚ê‚é
- *									“¯‚¶’l‚ª‚È‚¢‚Æ‚«AÅ‰‚Ì’l‚ª‘I‘ğ‚³‚ê‚é
+ *	@param[in]	nsel			I18nTextInfo ã® data ãƒ¡ãƒ³ãƒãŒã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ãªã„ã¨ã
+ *									CB_SETCURSEL ã®å¼•æ•°ã¨åŒã˜
+ *										-1	æœªé¸æŠ
+ *										0ã€œ	é¸æŠé …ç›®
+ *								I18nTextInfo ã® data ãƒ¡ãƒ³ãƒãŒã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ã‚‹ã¨ã
+ *									data ã®å€¤ã¨åŒã˜ã‚¢ã‚¤ãƒ†ãƒ ãŒé¸æŠã•ã‚Œã‚‹
+ *									åŒã˜å€¤ãŒãªã„ã¨ãã€æœ€åˆã®å€¤ãŒé¸æŠã•ã‚Œã‚‹
  */
 void SetI18nListW(const char *section, HWND hDlg, int nIDDlgItem, const I18nTextInfo *infos, size_t infoCount,
 				  const wchar_t *UILanguageFile, uintptr_t nsel)
@@ -155,7 +155,7 @@ void SetI18nListW(const char *section, HWND hDlg, int nIDDlgItem, const I18nText
 	}
 
 	if (infoCount == 0) {
-		// 0 ‚Ì‚Æ‚«‚ÍAI’[‚ğ’T‚·
+		// 0 ã®ã¨ãã¯ã€çµ‚ç«¯ã‚’æ¢ã™
 		i = 0;
 		while (infos[i].key != NULL && infos[i].default_text != NULL) {
 			i++;
@@ -163,7 +163,7 @@ void SetI18nListW(const char *section, HWND hDlg, int nIDDlgItem, const I18nText
 		infoCount = i;
 	}
 
-	// data‚É’l‚ª“ü‚Á‚Ä‚¢‚é?
+	// dataã«å€¤ãŒå…¥ã£ã¦ã„ã‚‹?
 	for (i = 0; i < infoCount; i++) {
 		if (infos[i].data != 0) {
 			data_available = TRUE;
@@ -207,9 +207,9 @@ void SetI18nList(const char *section, HWND hDlg, int nIDDlgItem, const I18nTextI
 }
 
 /**
- * Œ¾Œêƒtƒ@ƒCƒ‹‚©‚çDialog‚ÌƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì•¶š—ñ‚ğ•ÏŠ·‚·‚é
+ * è¨€èªãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰Dialogã®ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®æ–‡å­—åˆ—ã‚’å¤‰æ›ã™ã‚‹
  *
- *	@return Œ¾Œêƒtƒ@ƒCƒ‹‚Å•ÏŠ·‚Å‚«‚½‰ñ”(infoCountˆÈ‰º‚Ì”‚É‚È‚é)
+ *	@return è¨€èªãƒ•ã‚¡ã‚¤ãƒ«ã§å¤‰æ›ã§ããŸå›æ•°(infoCountä»¥ä¸‹ã®æ•°ã«ãªã‚‹)
  */
 int SetI18nDlgStrsW(HWND hDlgWnd, const char *section, const DlgTextInfo *infos, size_t infoCount,
 					const wchar_t *UILanguageFile)
@@ -267,7 +267,7 @@ void SetI18nMenuStrsW(HMENU hMenu, const char *section, const DlgTextInfo *infos
 		}
 		else {
 			if (nIDDlgItem < id_position_threshold) {
-				// ˆê“xModifyMenu()‚µ‚Ä‚¨‚©‚È‚¢‚Æƒƒjƒ…[‚ÌˆÊ’u‚ª‚¸‚ê‚é
+				// ä¸€åº¦ModifyMenu()ã—ã¦ãŠã‹ãªã„ã¨ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ä½ç½®ãŒãšã‚Œã‚‹
 				wchar_t *s;
 				hGetMenuStringW(hMenu, nIDDlgItem, MF_BYPOSITION, &s);
 				ModifyMenuW(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, s);
@@ -287,19 +287,19 @@ void SetI18nMenuStrsA(HMENU hMenu, const char *section, const DlgTextInfo *infos
 }
 
 /**
- *	ƒtƒHƒ“ƒg(LOGFONTW)‚ğæ“¾‚·‚é
+ *	ãƒ•ã‚©ãƒ³ãƒˆ(LOGFONTW)ã‚’å–å¾—ã™ã‚‹
  *
- *	@param[in]	section			UILanguageFile ‚ÌƒZƒNƒVƒ‡ƒ“–¼
- *	@param[in]	key				ƒL[
+ *	@param[in]	section			UILanguageFile ã®ã‚»ã‚¯ã‚·ãƒ§ãƒ³å
+ *	@param[in]	key				ã‚­ãƒ¼
  *	@param[out]	logfont			font
  *	@param[in]	ppi				Pixel Per Inch(=Dot Per Inch)
  *	@param[in]	iniFile			lng file
- *	@retval		TRUE			ƒtƒHƒ“ƒg‚ğæ“¾‚µ‚½,logfont‚ªİ’è‚³‚ê‚é
- *	@retval		FALSE			ƒtƒHƒ“ƒg‚ğæ“¾‚Å‚«‚È‚©‚Á‚½
+ *	@retval		TRUE			ãƒ•ã‚©ãƒ³ãƒˆã‚’å–å¾—ã—ãŸ,logfontãŒè¨­å®šã•ã‚Œã‚‹
+ *	@retval		FALSE			ãƒ•ã‚©ãƒ³ãƒˆã‚’å–å¾—ã§ããªã‹ã£ãŸ
  *
  *	TODO
- *		- –ß‚è’l‚ğ BOOL ‚É•ÏX
- *		- logfont(–ß‚è’l) ‚ğˆø”‚Ìˆê”ÔÅŒã‚É•ÏX
+ *		- æˆ»ã‚Šå€¤ã‚’ BOOL ã«å¤‰æ›´
+ *		- logfont(æˆ»ã‚Šå€¤) ã‚’å¼•æ•°ã®ä¸€ç•ªæœ€å¾Œã«å¤‰æ›´
  */
 int GetI18nLogfontW(const wchar_t *section, const wchar_t *key, PLOGFONTW logfont, int ppi, const wchar_t *iniFile)
 {
@@ -336,7 +336,7 @@ int GetI18nLogfontW(const wchar_t *section, const wchar_t *key, PLOGFONTW logfon
 
 static void LOGFONTWA(const LOGFONTW *logfontW, LOGFONTA *logfontA)
 {
-	// ƒƒ“ƒo‚ª‘S‚­“¯‚¶•”•ª(lfFaceNameˆÈŠO)‚Í’Pƒ‚ÉƒRƒs[‚·‚é
+	// ãƒ¡ãƒ³ãƒãŒå…¨ãåŒã˜éƒ¨åˆ†(lfFaceNameä»¥å¤–)ã¯å˜ç´”ã«ã‚³ãƒ”ãƒ¼ã™ã‚‹
 	size_t copy_size = sizeof(*logfontA) - sizeof(logfontA->lfFaceName);
 	memcpy(logfontA, logfontW, copy_size);
 

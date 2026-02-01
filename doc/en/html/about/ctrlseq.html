@@ -109,7 +109,7 @@
 <tr><td>ESC O</td>	<td>SS3</td>	<td> Temporarily maps the G3 character set into GL or GR, for the next graphic character. </td></tr>
 <tr><td>ESC P</td>	<td>DCS</td>	<td> Device Control String. Introduces a <a href="#DCS">DCS Sequence</a>. </td></tr>
 <tr><td>ESC X</td>	<td>SOS</td>	<td> Start of string. Introduces a <a href="#SOS">SOS Sequence</a>. </td></tr>
-<tr><td>ESC Z</td>	<td>DECID</td>	<td> Reports a Terminal ID. </td></tr>
+<tr><td id="ESC_Z">ESC Z</td>	<td>DECID</td>	<td> Reports a <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a>.(Response is same as<a href="#TerminalID">CSI 0 c</a>)</td></tr>
 <tr><td>ESC [</td>	<td>CSI</td>	<td> Control Sequence Introducer. Introduces a <a href="#CSI">CSI Sequence</a>. </td></tr>
 <tr><td>ESC \</td>	<td>ST</td>	<td> String terminator. Ends a DCS, SOS, OSC, PM and APC sequence. </td></tr>
 <tr><td>ESC ]</td>	<td>OSC</td>	<td> Operating System Command. Introduces a <a href="#OSC">OSC Sequence</a>. </td></tr>
@@ -171,22 +171,26 @@
 <tr><td>CSI <i>Ps</i> a</td>	<td>HPR</td>	<td> Moves cursor to the right <i>Ps</i> columns. The default value of <i>Ps</i> is 1. </td></tr>
 <tr><td>CSI <i>Ps</i> b</td>	<td>REP</td>	<td> Repeat the last output character <i>Ps</i> times. The default value of <i>Ps</i> is 1. </td></tr>
 <tr><td>CSI <i>Ps</i> c</td>	<td>DA</td>	<td> Primary Device Attribute. The default value of <i>Ps</i> is 0.
-<pre>
+<pre id="TerminalID">
 <i>Ps</i> = 0    Asks for the terminal's architectural class and basic attributes.
-Response: Depends the <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> setting.
+Response: Depends the <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> setting. (same as <a href="#ESC_Z">ESC Z</a>.)
   VT100     ESC [ ? 1 ; 2 c
   VT100J    ESC [ ? 5 ; 2 c
   VT101     ESC [ ? 1 ; 0 c
   VT102     ESC [ ? 6 c
   VT102J    ESC [ ? 15 c
-  VT220J    ESC [ ? 62 ; 1 ; 2 ; 5 ; 6 ; 7 ; 8 c
-  VT282     ESC [ ? 62 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 11 c
+  VT220     CSI ? 60 ; 1 ; 2 ; 6 ; 8 ; 9 ; 15 ; c
+  VT220J    CSI ? 62 ; 1 ; 2 ; 5 ; 6 ; 7 ; 8 c
+  VT282     CSI ? 62 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 11 c
   VT320     CSI ? 63 ; 1 ; 2 ; 6 ; 7 ; 8 c
   VT382     CSI ? 63 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 15 c
-  VT420     CSI ? 64 ; 1 ; 2 ; 7 ; 8 ; 9 ; 15 ; 18 ; 21 c"
+  VT420     CSI ? 64 ; 1 ; 2 ; 7 ; 8 ; 9 ; 15 ; 18 ; 21 c
   VT520     CSI ? 65 ; 1 ; 2 ; 7 ; 8 ; 9 ; 12 ; 18 ; 19 ; 21 ; 23 ; 24 ; 42 ; 44 ; 45 ; 46 c
   VT525     CSI ? 65 ; 1 ; 2 ; 7 ; 9 ; 12 ; 18 ; 19 ; 21 ; 22 ; 23 ; 24 ; 42 ; 44 ; 45 ; 46 c
+
+Note The VT100 series has only 7-bit mode. Therefore, explicitly use "ESC [" instead of CSI.
 </pre>
+<a href="ctrlseq_device_attributes.html">Parameter Details</a>
 </td></tr>
 <tr><td>CSI <i>Ps</i> d</td>	<td>VPA</td>	<td> Move to the corresponding vertical position (line <i>Ps</i>) of the current column. The default value of <i>Ps</i> is 1. </tr>
 <tr><td>CSI <i>Ps</i> e</td>	<td>VPR</td>	<td> Moves cursor down <i>Ps</i> lines in the same column. The default value of <i>Ps</i> is 1. </td></tr>
@@ -887,7 +891,7 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> &amp; w
 Response: DCS <i>Ps</i> $ r <i>Pt</i> ST
 <i>Ps</i> = 0    Valid request.
           <i>Pt</i> indicates the current setting of a valid control function
-          that the host asked about. 
+          that the host asked about.
           <i>Pt</i> consists of all the characters in the control function,
           except the CSI or ESC [ introducer characters.
    = 1    Invalid request. Does not send <i>Pt</i>.
@@ -921,14 +925,16 @@ Change color number <i>c</i> to the color specified by <i>spec</i>.<br>
 <i>c</i> accepts following value.
 
 <table border="1">
-<tr><th>value</th>	<th>color</th></tr>
+<tr><th><i>c</i></th>	<th>color number/character attribute</th></tr>
 <tr><td>0-255</td> <td>color number</td></tr>
-<tr><td>256</td> <td>bold attribute text color</td></tr>
+<tr><td>256</td> <td>bold attribute<a href="#Bold">*</a> text color</td></tr>
 <tr><td>257</td> <td>underline attribute text color</td></tr>
 <tr><td>258</td> <td>blink attribute text color</td></tr>
-<tr><td>259</td> <td>reverse attribute text color</td></tr>
+<tr><td>259</td> <td>reverse attribute background color</td></tr>
 </table>
+After 256, same as OSC 5.
 
+<p>
 <i>spec</i> accepts following formats.
 <pre>
 rgb:<i>r</i>/<i>g</i>/<i>b</i>
@@ -955,10 +961,10 @@ The <i>Pt</i> is the <i>c</i> ; <i>spec</i> format, and configure the color of t
 The <i>c</i>  and character attribute are in the following: <br>
 <table border="1">
 <tr><th><i>c</i></th> <th>character attribute</th></tr>
-<tr><td>0</td> <td>bold attribute text color</td></tr>
+<tr><td>0</td> <td>bold attribute<a href="#Bold">*</a> text color</td></tr>
 <tr><td>1</td> <td>underline attribute text color</td></tr>
 <tr><td>2</td> <td>blink attribute text color</td></tr>
-<tr><td>3</td> <td>reverse attribute text color</td></tr>
+<tr><td>3</td> <td>reverse attribute background color</td></tr>
 </table>
 Format of <i>spec</i> is same as OSC 4's <i>spec</i>.<br>
 About Bold attribute, see <a href="#Bold">below</a>.

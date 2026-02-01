@@ -11,7 +11,7 @@
   <body>
     <h1>Tera Term 5 について</h1>
     Tera Term 5 は Tera Term 4 の Unicode化を進めた次のバージョンです。
-    
+
     <h2 id="feature">特徴</h2>
     <ul>
       <li>ターミナル(内部バッファ、描画、キー入力)のUnicode化
@@ -40,7 +40,7 @@
         </ul>
       </li>
     </ul>
-    
+
     <h2 id="requirements">動作環境</h2>
     <ul>
       <li>
@@ -48,7 +48,7 @@
         Visual Studio 2022 でサポートされない Windows バージョンでは動作しなくなりました。
       </li>
     </ul>
-    
+
     <h2 id="misc">その他</h2>
     <ul>
       <li><a href="https://github.com/TeraTermProject/teraterm/wiki/Decision#tera-term-5x" target="_blank">開発ツール,使用ライブラリなど</a>
@@ -78,7 +78,8 @@
             <li>cygterm.cfg は Win32API を使って読み書きしていません。</li>
           </ul>
         </li>
-        <li>Tera Term 5 は起動時に読み込んだ TERATERM.INI が UTF-16 (with LE BOM) でなかった場合、TERATERM.INI を自動的に UTF-16 (with LE BOM) に変換します。<br>
+        <li>Tera Term 5 は、設定ファイルフォルダにある TERATERM.INI が UTF-16 (with LE BOM) でなかった場合、自動的に UTF-16 (with LE BOM) に変換します。<br>
+            <a href="../commandline/teraterm.html#f">/F=</a> コマンドラインオプションで指定された設定ファイルは変換しません。</li>
             変換時には、元のファイルをバックアップします。</li>
         <li>Tera Term 5 は設定ファイルを UTF-16 (with LE BOM) で保存します。</li>
       </ul>

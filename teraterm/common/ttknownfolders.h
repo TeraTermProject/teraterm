@@ -30,9 +30,9 @@
 #pragma once
 
 /*
- *	- compat_win �Ŏg�p
- *	- VS2008 �ȂǂŎg����Â�SDK�Ńr���h����Ƃ��Ɏg�p
- *	  - FOLDERID_* ��SDK���ɒ�`����Ă��Ȃ�����
+ *	- compat_win で使用
+ *	- VS2008 などで使える古いSDKでビルドするときに使用
+ *	  - FOLDERID_* がSDK内に定義されていないため
  */
 #ifdef INITGUID
 #ifdef __cplusplus

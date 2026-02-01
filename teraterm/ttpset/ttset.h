@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-// プラグインで使われる関数
+// 繝励Λ繧ｰ繧､繝ｳ縺ｧ菴ｿ繧上ｌ繧矩未謨ｰ
 
 #pragma once
 
@@ -34,6 +34,9 @@ extern "C" {
 #endif
 
 typedef struct TKeyMap_st *PKeyMap;
+
+BOOL ParseFOption(PTTSet ts);
+void SaveVTPos(const PTTSet ts);
 
 void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts);
 void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts);

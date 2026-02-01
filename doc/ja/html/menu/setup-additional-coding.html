@@ -233,7 +233,7 @@ cells数(2=全角/1=半角)
 
     <p>
       次のデータをもとに属性を決定しています。<br>
-      <a href="http://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt" target="_blank">http://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt</a>
+      <a href="https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt</a>
     </p>
 
     <h2 id="emoji">絵文字の文字幅(セル数)について</h2>
@@ -254,9 +254,8 @@ cells数(2=全角/1=半角)
     </p>
 
     <p>
-      次の情報をもとに絵文字の判定を行っています。<br>
-      <a href="https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt</a><br>
-      ただし、コードポイントU+0080未満は絵文字として扱いません。
+      次のデータの Extended_Pictographic をもとに絵文字の判定を行っています。<br>
+      <a href="https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt</a>
     </p>
 
     <p>
@@ -271,6 +270,10 @@ cells数(2=全角/1=半角)
       <dt>"&#x2764;", U+2764</dt>
       <dd>HEAVY BLACK HEART</dd>
     </dl>
+
+    <h2 id="width_decision">文字幅の決定フロー</h2>
+
+    <img src="cell_width.png">
 
   </body>
 </html>

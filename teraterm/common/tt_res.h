@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ Ç≈ê∂ê¨Ç≥ÇÍÇΩÉCÉìÉNÉãÅ[Éh ÉtÉ@ÉCÉãÅB
-// C:\work\teraterm\teraterm\teraterm\teraterm\plugin_pp_2.rc Ç≈égóp
+// Microsoft Visual C++ „ÅßÁîüÊàê„Åï„Çå„Åü„Ç§„É≥„ÇØ„É´„Éº„Éâ „Éï„Ç°„Ç§„É´„ÄÇ
+// C:\work\teraterm\teraterm\teraterm\teraterm\plugin_pp_2.rc „Åß‰ΩøÁî®
 //
 #define IDI_TTERM                       100
 #define IDR_ACC                         100
@@ -33,7 +33,9 @@
 #define IDI_TTERM_FLAT                  130
 #define IDI_VT_FLAT                     131
 #define IDD_TABSHEET_UI                 132
-#define IDD_TABSHEET_PLUGIN             133
+#define IDD_TABSHEET_TEKFONT            133
+#define IDD_RECVFILEDLG                 134
+#define IDD_TABSHEET_PLUGIN             135
 #define IDR_TEKMENU                     1000
 #define IDC_EDIT_FULLPATH               1001
 #define IDC_FULLPATH_LABEL              1002
@@ -253,6 +255,13 @@
 #define IDC_FILE_DIR                    2628
 #define IDC_FILE_DIR_SELECT             2629
 #define IDC_SENDFILE_RADIO_BULK         2632
+#define IDC_TRANSHIDEDLG                2633
+#define IDC_RECVFILE_FILENAME_TITLE     2634
+#define IDC_RECVFILE_FILENAME_EDIT      2635
+#define IDC_RECVFILE_FILENAME_BUTTON    2636
+#define IDC_RECVFILE_CHECK_BINARY       2637
+#define IDC_RECVFILE_AUTOSTOP_LABEL     2638
+#define IDC_RECVFILE_AUTOSTOP_EDIT      2639
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -274,6 +283,7 @@
 #define ID_FILE_PAUSELOG                50124
 #define ID_FILE_STOPLOG                 50125
 #define ID_FILE_SENDFILE                50130
+#define ID_FILE_RECVFILE                50131
 #define ID_FILE_KERMITRCV               50141
 #define ID_FILE_KERMITGET               50142
 #define ID_FILE_KERMITSEND              50143
@@ -347,9 +357,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        134
-#define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2630
+#define _APS_NEXT_RESOURCE_VALUE        135
+#define _APS_NEXT_COMMAND_VALUE         52007
+#define _APS_NEXT_CONTROL_VALUE         2640
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

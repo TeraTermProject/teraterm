@@ -1,4 +1,4 @@
-﻿/*
+/*
  * (C) 2023- TeraTerm Project
  * All rights reserved.
  *
@@ -227,6 +227,28 @@ static void ArrangeControls(HWND Dialog, LogDlgWork_t *work)
 	}
 }
 
+/**
+ * ログファイルをチェックして、
+ * ラジオボタン、ファイルの状態からコントロールをEnable/Disableする
+ */
+static void ArrangeControlsFilename(HWND Dialog, LogDlgWork_t *work, const wchar_t *filename)
+{
+	const bool file_exist_prev = work->file_exist;
+	CheckLogFile(filename, work);
+	if (work->on_initdialog || file_exist_prev != work->file_exist) {
+		if (work->file_exist) {
+			// ファイルが存在する、設定に合わせて新規(上書き)/追記を選択する
+			CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND,
+							 work->pts->Append == 0 ? IDC_NEW_OVERWRITE : IDC_APPEND);
+		}
+		else {
+			// ファイルが存在しない、新規を選択する
+			CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
+		}
+		ArrangeControls(Dialog, work);
+	}
+}
+
 static LRESULT CALLBACK FNameEditProc(HWND dlg, UINT msg,
 									  WPARAM wParam, LPARAM lParam)
 {
@@ -245,7 +267,7 @@ static LRESULT CALLBACK FNameEditProc(HWND dlg, UINT msg,
 static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
-		{ 0, "DLG_TABSHEET_TITLE_LOG" },
+		{ 0, "DLG_FOPT_TITLE" },
 		{ IDC_SENDFILE_FILENAME_TITLE, "DLG_FOPT_FILENAME_TITLE" },
 		{ IDC_FOPTTEXT, "DLG_FOPT_TEXT" },
 		{ IDC_FOPTBIN, "DLG_FOPT_BINARY" },
@@ -324,6 +346,8 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		//		WM_COMMAND, EN_CHANGE が発生する
 		wchar_t *fname = FLogGetLogFilename(work->info->filename);
 		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
+		ArrangeControlsFilename(Dialog, work, fname);
+		free(fname);
 
 		// ドロップダウンのエディットコントロールのウィンドウハンドルを取得
 		COMBOBOXINFO cbi;
@@ -337,7 +361,6 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 		HistoryStoreSetControl(hs, Dialog, IDC_FOPT_FILENAME_EDIT);
 		ExpandCBWidth(Dialog, IDC_FOPT_FILENAME_EDIT);
-		free(fname);
 
 		CenterWindow(Dialog, GetParent(Dialog));
 
@@ -380,8 +403,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			wchar_t *FNFilter = GetCommonDialogFilterWW(simple_log_filter, UILanguageFile);
 
 			wchar_t *uimsg;
-			GetI18nStrWW("Tera Term", "FILEDLG_TRANS_TITLE_LOG",
-						 L"Log", UILanguageFile, &uimsg);
+			GetI18nStrWW("Tera Term", "DLG_FOPT_TITLE", L"Log", UILanguageFile, &uimsg);
 			wchar_t *caption;
 			aswprintf(&caption, L"Tera Term: %s", uimsg);
 			free(uimsg);
@@ -401,6 +423,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			BOOL Ok = TTGetSaveFileNameW(&ofn, &fname);
 			if (Ok) {
 				SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
+				ArrangeControlsFilename(Dialog, work, fname);
 				free(fname);
 			}
 			free(logdir);
@@ -419,24 +442,19 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			break;
 		case IDC_FOPT_FILENAME_EDIT:
 			switch (HIWORD(wParam)) {
-			case EN_CHANGE: {
+			case CBN_EDITCHANGE: {
 				wchar_t *filename;
 				hGetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, &filename);
-				const bool file_exist_prev = work->file_exist;
-				CheckLogFile(filename, work);
+				ArrangeControlsFilename(Dialog, work, filename);
 				free(filename);
-				if (work->on_initdialog || file_exist_prev != work->file_exist) {
-					if (work->file_exist) {
-						// ファイルが存在する、設定に合わせて新規(上書き)/追記を選択する
-						CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND,
-										 work->pts->Append == 0 ? IDC_NEW_OVERWRITE : IDC_APPEND);
-					}
-					else {
-						// ファイルが存在しない、新規を選択する
-						CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_NEW_OVERWRITE);
-					}
-					ArrangeControls(Dialog, work);
-				}
+				break;
+			}
+			case CBN_SELCHANGE: {
+				int cursor = (int)SendDlgItemMessageA(Dialog, IDC_FOPT_FILENAME_EDIT, CB_GETCURSEL, 0, 0);
+				wchar_t *filename;
+				hGetDlgItemCBTextW(Dialog, IDC_FOPT_FILENAME_EDIT, cursor, &filename);
+				ArrangeControlsFilename(Dialog, work, filename);
+				free(filename);
 				break;
 			}
 			case CBN_DROPDOWN: {
@@ -456,6 +474,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		CheckRadioButton(Dialog, IDC_NEW_OVERWRITE, IDC_APPEND, IDC_APPEND);
 		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, filename);
 		SendDlgItemMessageW(Dialog, IDC_FOPT_FILENAME_EDIT, EM_SETSEL, 0, -1);
+		ArrangeControlsFilename(Dialog, work, filename);
 		free(filename);
 		return TRUE;
 	}
@@ -466,8 +485,9 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			break;
 		}
 		wchar_t *fname = FLogGetLogFilename(work->info->filename);
-		SetWindowTextW(work->file_edit, fname);
+		SetDlgItemTextW(Dialog, IDC_FOPT_FILENAME_EDIT, fname);
 		SendMessageW(work->file_edit, EM_SETSEL, 0, -1);
+		ArrangeControlsFilename(Dialog, work, fname);
 		free(fname);
 		break;
 	}

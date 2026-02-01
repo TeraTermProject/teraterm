@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// âpåÍ (ïƒçë) resources
+// Ëã±Ë™û (Á±≥ÂõΩ) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -173,7 +173,7 @@ BEGIN
     0
 END
 
-#endif    // âpåÍ (ïƒçë) resources
+#endif    // Ëã±Ë™û (Á±≥ÂõΩ) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

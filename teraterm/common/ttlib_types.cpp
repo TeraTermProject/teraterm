@@ -45,17 +45,17 @@ wchar_t *GetFileDir(const TTTSet *pts)
 {
 	wchar_t *dir = NULL;
 	if (pts->FileDirW != NULL && pts->FileDirW[0] != 0) {
-		// ƒtƒ@ƒCƒ‹“]‘——pƒtƒHƒ‹ƒ_‚ªİ’è‚³‚ê‚Ä‚¢‚é
-		// ŠÂ‹«•Ï”‚ğ“WŠJ
+		// ãƒ•ã‚¡ã‚¤ãƒ«è»¢é€ç”¨ãƒ•ã‚©ãƒ«ãƒ€ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹
+		// ç’°å¢ƒå¤‰æ•°ã‚’å±•é–‹
 		hExpandEnvironmentStringsW(pts->FileDirW, &dir);
 		if (DoesFolderExistW(dir)) {
-			// ƒtƒHƒ‹ƒ_‚ª‘¶İ
+			// ãƒ•ã‚©ãƒ«ãƒ€ãŒå­˜åœ¨
 			return dir;
 		}
 		free(dir);
 	}
 
-	// Windows‚ÌƒfƒtƒHƒ‹ƒg‚Ìƒ_ƒEƒ“ƒ[ƒhƒtƒHƒ‹ƒ_‚ğ•Ô‚·
+	// Windowsã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ãƒ•ã‚©ãƒ«ãƒ€ã‚’è¿”ã™
 	_SHGetKnownFolderPath(FOLDERID_Downloads, KF_FLAG_CREATE, NULL, &dir);
 	return dir;
 }
@@ -63,18 +63,18 @@ wchar_t *GetFileDir(const TTTSet *pts)
 wchar_t *GetTermLogDir(const TTTSet *pts)
 {
 	if (pts->LogDefaultPathW != NULL && pts->LogDefaultPathW[0] != '\0') {
-		// ’[––ƒƒOƒtƒHƒ‹ƒ_‚ªw’è‚³‚ê‚Ä‚¢‚éê‡
+		// ç«¯æœ«ãƒ­ã‚°ãƒ•ã‚©ãƒ«ãƒ€ãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹å ´åˆ
 		return _wcsdup(pts->LogDefaultPathW);
 	}
 
-	// ƒtƒ@ƒCƒ‹“]‘——pƒtƒHƒ‹ƒ_
+	// ãƒ•ã‚¡ã‚¤ãƒ«è»¢é€ç”¨ãƒ•ã‚©ãƒ«ãƒ€
 	if (pts->FileDirW != NULL && pts->FileDirW[0] != 0) {
-		// ƒtƒ@ƒCƒ‹“]‘——pƒtƒHƒ‹ƒ_‚ªİ’è‚³‚ê‚Ä‚¢‚é
-		// ŠÂ‹«•Ï”‚ğ“WŠJ
+		// ãƒ•ã‚¡ã‚¤ãƒ«è»¢é€ç”¨ãƒ•ã‚©ãƒ«ãƒ€ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹
+		// ç’°å¢ƒå¤‰æ•°ã‚’å±•é–‹
 		wchar_t *dir;
 		hExpandEnvironmentStringsW(pts->FileDirW, &dir);
 		if (DoesFolderExistW(dir)) {
-			// ƒtƒHƒ‹ƒ_‚ª‘¶İ
+			// ãƒ•ã‚©ãƒ«ãƒ€ãŒå­˜åœ¨
 			return dir;
 		}
 		free(dir);

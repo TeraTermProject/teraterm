@@ -284,6 +284,12 @@
                 zsh 4.3.10
 
 // C H A N G E S //
+v1.07_31 2025/08/03
+        * The issue where executing cygconnect in the Tera Term macro resulted
+          in the message "/D=XXXXXXXX\nThe specified file could not be found"
+          and prevented Cygterm from launching has been fixed.
+          issue: https://github.com/TeraTermProject/teraterm/issues/645
+
 v1.07_30 2022/02/06
         * Add cfg file to read
           $APPDATA/teraterm5/cygterm.cfg

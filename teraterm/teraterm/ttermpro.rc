@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// âpåÍ (ïƒçë) resources
+// Ëã±Ë™û (Á±≥ÂõΩ) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -82,8 +82,8 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,149,130,10
     LTEXT           "Notification",IDC_NOTIFICATION_TITLE,10,167,73,8
     CONTROL         "&Notify sound",IDC_NOTIFY_SOUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,180,220,10
-    PUSHBUTTON      "&Notify test",IDC_NOTIFICATION_TEST_POPUP,20,194,50,14
-    PUSHBUTTON      "&Tray test",IDC_NOTIFICATION_TEST_TRAY,75,194,50,14
+    PUSHBUTTON      "&Notify test",IDC_NOTIFICATION_TEST_POPUP,20,194,76,14
+    PUSHBUTTON      "&Tray test",IDC_NOTIFICATION_TEST_TRAY,101,194,76,14
     LTEXT           "File transfer folder",IDC_FILE_DIR_TITLE,10,213,125,8
     EDITTEXT        IDC_FILE_DIR,21,225,210,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_FILE_DIR_SELECT,235,225,17,14
@@ -295,6 +295,7 @@ BEGIN
     CONTROL         "Elapsed time:",IDC_TRANS_ELAPSED,"Static",SS_LEFTNOWORDWRAP | NOT WS_VISIBLE,15,48,46,8
     RTEXT           "",IDC_TRANS_ETIME,60,48,101,8
     CONTROL         "",IDC_TRANSPROGRESS,"msctls_progress32",NOT WS_VISIBLE | WS_BORDER,15,60,146,12
+    PUSHBUTTON      "Hide &dialog",IDC_TRANSHIDEDLG,18,60,90,14,NOT WS_VISIBLE
     DEFPUSHBUTTON   "Close",IDCANCEL,18,76,40,14
     PUSHBUTTON      "Pau&se",IDC_TRANSPAUSESTART,68,76,40,14
     PUSHBUTTON      "&Help",IDC_TRANSHELP,118,76,40,14
@@ -360,6 +361,22 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,104,207,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,160,207,50,14
     PUSHBUTTON      "HELP",IDHELP,215,207,50,14
+END
+
+IDD_RECVFILEDLG DIALOGEX 0, 0, 271, 102
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Receive file"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "&Filename (drop file in this dialog)",IDC_RECVFILE_FILENAME_TITLE,9,7,249,8
+    COMBOBOX        IDC_RECVFILE_FILENAME_EDIT,18,21,228,93,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_RECVFILE_FILENAME_BUTTON,251,21,14,14
+    CONTROL         "&Binary",IDC_RECVFILE_CHECK_BINARY,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,9,38,248,10
+    LTEXT           "&Auto-stop wait time(sec)",IDC_RECVFILE_AUTOSTOP_LABEL,9,53,246,8
+    EDITTEXT        IDC_RECVFILE_AUTOSTOP_EDIT,18,68,40,12,ES_AUTOHSCROLL | ES_NUMBER
+    DEFPUSHBUTTON   "OK",IDOK,104,82,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,160,82,50,14
+    PUSHBUTTON      "HELP",IDHELP,215,82,50,14
 END
 
 IDD_TABSHEET_THEME DIALOGEX 0, 0, 307, 162
@@ -502,6 +519,18 @@ BEGIN
         BOTTOMMARGIN, 221
     END
 
+    IDD_RECVFILEDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 9
+        RIGHTMARGIN, 265
+        VERTGUIDE, 9
+        VERTGUIDE, 18
+        VERTGUIDE, 90
+        VERTGUIDE, 170
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 96
+    END
+
     IDD_TABSHEET_THEME, DIALOG
     BEGIN
         LEFTMARGIN, 5
@@ -589,9 +618,10 @@ BEGIN
         MENUITEM "Pause Logg&ing",              ID_FILE_PAUSELOG
         MENUITEM "C&omment to Log...",          ID_FILE_COMMENTTOLOG
         MENUITEM "&View Log",                   ID_FILE_VIEWLOG
-        MENUITEM "Sho&w Log dialog...",         ID_FILE_SHOWLOGDIALOG
+        MENUITEM "Sho&w Logging dialog...",     ID_FILE_SHOWLOGDIALOG
         MENUITEM "Stop Logging (&Q)",           ID_FILE_STOPLOG
         MENUITEM "&Send file...",               ID_FILE_SENDFILE
+        MENUITEM "Receive file (&Z)...",        ID_FILE_RECVFILE
         POPUP "&Transfer"
         BEGIN
             POPUP "&Kermit"
@@ -751,7 +781,7 @@ BEGIN
     "I",            ID_ACC_DISCONNECT,      VIRTKEY, ALT, NOINVERT
 END
 
-#endif    // âpåÍ (ïƒçë) resources
+#endif    // Ëã±Ë™û (Á±≥ÂõΩ) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -32,6 +32,7 @@
 #pragma once
 
 #include "teraprnfile.h"
+#include "vtdraw.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,8 +50,8 @@ extern "C" {
 #define AttrReverse       0x10
 #define AttrLineContinued 0x20 /* valid only at the beggining or end of a line */
 #define AttrURL           0x40
-#define AttrKanji         0x80		// 1=‘SŠp(2cell)/0=”¼Šp(1cell)  (buffer.c,h “à•”‚Ì‚İ)
-#define AttrPadding       0x100		// 1=padding(2cell‚ÌŸ‚Ì1cell or s––)  (vtterm - buffer ŠÔ‚Ì‚İ)
+#define AttrKanji         0x80		// 1=å…¨è§’(2cell)/0=åŠè§’(1cell)  (buffer.c,h å†…éƒ¨ã®ã¿)
+#define AttrPadding       0x100		// 1=padding(2cellã®æ¬¡ã®1cell or è¡Œæœ«)  (vtterm - buffer é–“ã®ã¿)
 
   /* Color attribute bit masks */
 #define Attr2Fore         0x01
@@ -64,14 +65,14 @@ extern "C" {
 typedef struct {
 	BYTE Attr;
 	BYTE Attr2;
-	WORD AttrEx;	// ƒAƒgƒŠƒrƒ…[ƒg‚ğ‘‚â‚·ƒeƒXƒg
+	WORD AttrEx;	// ã‚¢ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ãƒˆã‚’å¢—ã‚„ã™ãƒ†ã‚¹ãƒˆ
 	BYTE Fore;
 	BYTE Back;
 } TCharAttr;
 
 typedef TCharAttr *PCharAttr;
 
-void InitBuffer(BOOL use_unicode_api);
+void InitBuffer(IdVtDrawAPI draw_api);
 void LockBuffer(void);
 void UnlockBuffer(void);
 void FreeBuffer(void);

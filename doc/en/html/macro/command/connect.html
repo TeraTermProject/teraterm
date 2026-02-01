@@ -69,7 +69,7 @@ Communication commands except "connect", "<a href="cygconnect.html">cygconnect</
 <h2>Connection method</h2>
 
 <p>
-There are 3 types of connection you can establish from Tera Term macro: 
+There are 3 types of connection you can establish from Tera Term macro:
 </p>
 
 <ul>
@@ -164,7 +164,7 @@ Here x represents COM port number. For example to connect via COM port 1 the com
 </p>
 
 <p>
-source URL: <a href="http://logmett.com/forum/viewtopic.php?t=28">http://logmett.com/forum/viewtopic.php?t=28</a>
+source URL: <s>http://logmett.com/forum/viewtopic.php?t=28</s> (broken link)
 </p>
 
 <h2>Examples</h2>
@@ -206,7 +206,7 @@ connect '<em>myserver</em> /ssh /1 /auth=publickey/user=<em>username</em> /passw
 ; Run Tera Term, open SSH2 session and, not prompt for user name and password and use private key file
 connect '<em>myserver</em> /ssh /2 /auth=publickey /user=<em>username</em> /passwd=<em>password</em> /keyfile=<em>private-key-file</em>'
 
-; Tera Term automatically connects the remote host with the public key 
+; Tera Term automatically connects the remote host with the public key
 ; authentication, and not prompt for user name and password and use private key file.
 connect '<em>myserver</em> /ssh /auth=pageant /user=<em>username</em>'
 
@@ -246,7 +246,7 @@ sendln Password
 
 <pre class="macro-example">
 ; sample macro of Tera Term
-; 
+;
 ; File: ssh2login.ttl
 ; Description: auto login with SSH2 protocol
 ; Environment: generic
@@ -287,7 +287,7 @@ if paramcnt != 3 then
 endif
 
 prompt = 'yutaka@sai(~) '
-sprintf2 var &quot;%s:22 /2 /ssh /auth=password /user=yutaka /passwd=yutaka&quot; param2 
+sprintf2 var &quot;%s:22 /2 /ssh /auth=password /user=yutaka /passwd=yutaka&quot; param2
 messagebox var &quot;test&quot;
 connect var
 wait prompt
@@ -302,16 +302,15 @@ pause 3
 </pre>
 
 
-
 <h2>Note</h2>
 
 <ol>
  <li>In these examples parameters shown with Italic font have to be replaced with their actual values.</li>
  <li>A user's password can include space characters. If the password includes the space character, a user should put the password in quotations by using `"' character. Also, if the password includes the " character, a user should write the " two times.<br>
- NOTICE: A user can not use the "@" character instead of the space character from Tera Term 4.63.
- </li>
+ NOTICE: A user can not use the "@" character instead of the space character from Tera Term 4.63.</li>
  <li>Please remember that entering actual username and password in Tera Term macro will cause them to be stored as an open text and it is your responsibility to keep such macro is secure location.</li>
  <li>When a user re-connect the remote host soon after disconnecting the server, a user could not connect the server. For more detail, refer to "<a href="../appendixes/disconnecttiming.html">here</a>".</li>
+ <li>Please refer to <a href="../../commandline/ttssh.html#passwd_specify">Notes on Specifying a Password</a> of TTSSH command line.</li>
 </ol>
 
 <h2>See also</h2>
@@ -322,6 +321,7 @@ pause 3
   <li><a href="testlink.html">testlink</a></li>
   <li><a href="unlink.html">unlink</a></li>
   <li><a href="../appendixes/disconnecttiming.html">NOTICE: Immediately re-connect the server after disconnection</a></li>
+  <li><a href="../../commandline/ttssh.html#passwd_specify">Notes on Specifying a Password</a></li>
   <li><a href="../syntax/variables.html">Variables</a></li>
 </ul>
 

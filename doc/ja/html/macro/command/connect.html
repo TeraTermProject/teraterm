@@ -164,7 +164,7 @@ xはCOMポート番号を表します。たとえば、COM1に接続したいのなら、 connect '/C=1' と
 </p>
 
 <p>
-出典: <a href="http://logmett.com/forum/viewtopic.php?t=28">http://logmett.com/forum/viewtopic.php?t=28</a>
+出典: <s>http://logmett.com/forum/viewtopic.php?t=28</s> (リンク切れ)
 </p>
 
 <h2>例</h2>
@@ -247,7 +247,7 @@ sendln Password
 
 <pre class="macro-example">
 ; sample macro of Tera Term
-; 
+;
 ; File: ssh2login.ttl
 ; Description: auto login with SSH2 protocol
 ; Environment: generic
@@ -288,7 +288,7 @@ if paramcnt != 3 then
 endif
 
 prompt = 'yutaka@sai(~) '
-sprintf2 var &quot;%s:22 /2 /ssh /auth=password /user=yutaka /passwd=yutaka&quot; param2 
+sprintf2 var &quot;%s:22 /2 /ssh /auth=password /user=yutaka /passwd=yutaka&quot; param2
 messagebox var &quot;test&quot;
 connect var
 wait prompt
@@ -311,6 +311,7 @@ pause 3
 ※パスワードにスペースを含むために "@" を使用する仕様は、4.63 から廃止されました。</li>
  <li>Tera Termマクロにユーザ名とパスワードを指定した場合、そのマクロファイルをプレーンテキストとして保存したのなら、セキュリティ的に安全な場所に置く必要があることを肝に銘じておいてください。</li>
  <li>ホストとの接続を終了してすぐにconnectコマンドで新しい接続を開始しようとした場合、タイミングによっては接続できない場合があります。詳しくは"<a href="../appendixes/disconnecttiming.html">切断後すぐに接続する場合の注意点</a>"を参照してください。</li>
+ <li>TTSSHコマンドラインの<a href="../../commandline/ttssh.html#passwd_specify">パスワードを指定するときの注意</a>を参照してください。</li>
 </ol>
 
 <h2>参照</h2>
@@ -321,6 +322,7 @@ pause 3
   <li><a href="testlink.html">testlink</a></li>
   <li><a href="unlink.html">unlink</a></li>
   <li><a href="../appendixes/disconnecttiming.html">切断後すぐに接続する場合の注意点</a></li>
+  <li><a href="../../commandline/ttssh.html#passwd_specify">パスワードを指定するときの注意</a></li>
   <li><a href="../syntax/variables.html">変数</a></li>
 </ul>
 

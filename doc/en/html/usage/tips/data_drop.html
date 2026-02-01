@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Dropping sent and received data</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Dropping sent and received data</h1>
+
+Data sent or received may be lost for various reasons.<br>
+The locations where drops occur and the solutions are as follows:
+
+<h2 id="send">1. Sending Data</h2>
+
+<pre>
+                    s1               s2                 s3                  s4                  program
+Tera Term ---> Send buffer  ---> OS,driver ---> (sshd,telnet,pipe) ---> UART chip  ---> pty + shell, other program
+               in Tera Term      UART chip      (serial          )      driver,OS       Embedded programs, etc.
+</pre>
+
+<dl>
+  <dt>s1. Sned buffer in Tera Term</dt>
+  <dd>
+    It is unlikely to drop.<br>
+    Data is sended while watching free size of send buffer OutBuff[](16KB).
+  </dd>
+  <dt>s2. OS,UART chip(sender)</dt>
+  <dd>
+    It is unlikely to drop.<br>
+    Depending on hardware and driver version, various problems may occur, including BSoD.<br>
+    You can see details of driver in Tera Term serial port settings.<br>
+    Tera Term will suggest 4KB as the recommended size of the send buffer to the communication device in <a href="https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setupcomm">SetupComm()</a>.
+  </dd>
+  <dt>s3. transmission path</dt>
+  <dd>
+    Cable quality, cable length, crosstalk, signal interference, etc. can cause errors and drops.<br>
+    In serial, there is no resend process with error. If error occurs in data, data is dropped.<br>
+    For TCP/IP, pipe, it is unlikely to drop.
+  </dd>
+  <dt>s4. UART chip,OS(receiver)</dt>
+  <dd>
+    Receiving data beyond processing capacity of PC (CPU) (when PROGRAM does not pick up received data from OS or chip) or other causes,
+    Receive buffer of OS (driver) or UART chip are overflows and data is dropped.<br>
+    OS (driver) or program handles flow control depends on implementation.<br>
+    In TCP/IP, flow control and resend on error are performed, and in most cases,
+    protocol stack in OS handles these processes.<br>
+    In serial, user can decide whether flow control is used or not, and resend are not automatically performed in case of overflow or other errors.
+  </dd>
+  <dt>program</dt>
+  <dd>
+    Dropped due to receive buffer overflow, etc. in program.<br>
+    When receive buffer is about to overflow in pseudo terminal(pty), 0x07(BEL) is sent and Tera Term will ring bell.
+  </dd>
+</dl>
+
+<h2 id="send">2. Receiving Data</h2>
+
+<pre>
+                    r1                  r2                 r3                  r4                  program
+Tera Term ---> Receiving buffer ---> UART chip ---> (sshd,telnet,pipe) ---> OS,driver  ---> pty + shell, other program
+               in Tera Term          driver,OS      (serial          )      UART chip       Embedded programs, etc.
+</pre>
+
+<dl>
+  <dt>program</dt>
+  <dd>
+    It is unlikely to drop.<br>
+    Drop due to send buffer overflow, etc. in program.<br>
+  </dd>
+  <dt>r4. OS,UART chip(sender)</dt>
+  <dd>
+    It is unlikely to drop.<br>
+    Depending on hardware and driver version, various problems may occur.<br>
+  </dd>
+  <dt>r3. transmission path</dt>
+  <dd>
+    Cable quality, cable length, crosstalk, signal interference, etc. can cause errors and drops.<br>
+    In serial, there is no resend process with error. If error occurs in data, data is dropped.<br>
+    For TCP/IP, pipe, it is unlikely to drop.
+  </dd>
+  <dt>r2. UART chip,OS(receiver)</dt>
+  <dd>
+    Tera Term will suggest 16KB as the recommended receive buffer size for the communication device in <a href="https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setupcomm">SetupComm()</a>.<br>
+    If reading from the UART chip or OS is delayed due to high load, the receive buffer of the communication device will overflow and data will be dropped.<br>
+    In TCP/IP, flow control and resend on error are performed, and in most cases,
+    protocol stack in OS handles these processes.<br>
+    In serial, user can decide whether flow control is used or not, and resend are not automatically performed in case of overflow or other errors.
+    <p>
+      Receive buffer size of main UART chips and drivers
+      <pre>
+8250 UART                 no FIFO
+16550 UART                16 Byte FIFO
+FT232R                    256 Byte receive buffer
+TTY drive(Linux 2.6.26)   4KB  (<a href="../../reference/sourcecode.html#ttssh">SSH Design and Implementation in TTSSH</a>)
+      </pre>
+  </dd>
+  <dt>r1. Receiving buffer in Tera Term</dt>
+  <dd>
+    The received data read from the OS is stored in Tera Term's receive buffer InBuff[] (16KB), where it is used for screen drawing, log output, macro processing, etc.<br>
+    If Tera Term processing (screen drawing, log output, macro processing, etc.) is delayed, the receive buffer will overflow and data will be dropped.
+  </dd>
+</dl>
+
+<h2 id="solution">3. Solution</h2>
+
+<ol>
+  <li>Checking the Connection Method</li>
+  For serial connections, make sure the <a href="../../menu/setup-additional-serialport.html#Speed">Serial parameters (baud rate, bit length, etc.)</a> match between the sender and receiver.<br>
+  Setting flow control can help prevent receive buffer overflow.<br>
+  Hardware flow control (RTS/CTS, DSR/DTR) is recommended.<br>
+  <br>
+  <li>If the transmitted data is dropped</li>
+  This is thought to be due to insufficient processing performance of the opposing device "s4. UART chip,OS(receiver)" and "program".<br>
+  The solution is to slow down the communication speed and reduce the amount sent per unit time.<br>
+  For serial connections, lower the baud rate.<br>
+  If the baud rate cannot be changed, such as in embedded devices, set a send delay to prevent the receive buffer from overflowing.<br>
+  A send delay is also effective in cases where line feeds or screen clearing take time, such as with LCD controllers,
+  and sending the next command before the processing is complete causes problems.<br>
+  <br>
+  <li>If received data is dropped</li>
+  This is probably due to insufficient processing performance in "r2. UART chip,OS(receiver)" and "r1. Receiving buffer in Tera Term"<br>
+  When launching a resource-intensive app such as Visual Studio or video/image editing software, the app may temporarily run out of resources and drop.<br>
+  The solution is to slow down the communication speed and reduce the amount sent per unit time.<br>
+  For serial connections, lower the baud rate.<br>
+  <br>
+  <li>Others</li>
+  If data errors occur, the problem may be resolved by using a higher quality cable or by moving the cable away from noise sources (power adapter, power cable, etc.).
+</ol>
+
+</BODY>
+</HTML>

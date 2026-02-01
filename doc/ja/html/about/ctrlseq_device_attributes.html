@@ -1,0 +1,1218 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>Device Attributes</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1 id="primary-device-attribute">Primary Device Attribute</h1>
+
+<a href="ctrlseq.html#TerminalID">DA, Device Attributes</a>
+
+<p>
+TerminalIDの主な目的は、
+アプリケーションが応答文字列を使って接続元の機器を判別できるようにすることです。
+</p>
+
+<h2 id="attributes">Attributes</h2>
+
+<p>first parameter</p>
+
+<table border="1">
+<thead>
+<tr class="header">
+<th>Ps</th>
+<th>Level</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>VT10x</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>VT132</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>VT102</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>VT131</td>
+</tr>
+<tr class="odd">
+<td>61</td>
+<td>service class 1</td>
+</tr>
+<tr class="even">
+<td>62</td>
+<td>service class 2</td>
+</tr>
+<tr class="odd">
+<td>63</td>
+<td>service class 3</td>
+</tr>
+<tr class="even">
+<td>64</td>
+<td>service class 4</td>
+</tr>
+<tr class="odd">
+<td>65</td>
+<td>service class 5</td>
+</tr>
+<tr class="even">
+<td>:</td>
+<td>:</td>
+</tr>
+<tr class="odd">
+<td>69</td>
+<td>service class 9</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>After 2nd parameters (first parameter = 1-7)</p>
+
+<table border="1">
+<thead>
+<tr class="header">
+<th>Ps</th>
+<th>Option Present</th>
+<th>Tera Term Support</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>No options</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>Processor option (STP)</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>Advanced video option (AVO)</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>AVO and STP</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>Graphics option (GPO)</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>GPO and STP</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>GPO and AVO</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>GPO, STP and AVO</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+<p>After 2nd parameters (first parameter = 61-69)</p>
+
+<table border="1">
+<thead>
+<tr class="header">
+<th>Ps</th>
+<th>Levels</th>
+<th>Extension Name</th>
+<th>Tera Term Support</th>
+<th>Remark</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1-4</td>
+<td>132 Column Display</td>
+<td>o</td>
+<td>DECCOLM</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>1-4</td>
+<td>Printer Port</td>
+<td>o</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>1-4</td>
+<td>ReGIS Display</td>
+<td>x</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>1-4</td>
+<td>Sixels Display</td>
+<td>x</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>1-3</td>
+<td>Katakana</td>
+<td>o</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>2-4</td>
+<td>Selectively Erasable Characters</td>
+<td>o</td>
+<td>DECSEL/DECSED/DECSERA</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>2-4</td>
+<td>Dynamically Redefinable Character Sets (DRCS)</td>
+<td>x</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>2-4</td>
+<td>User Defined Keys (UDKs)</td>
+<td>o</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>1-4</td>
+<td>National Replacement Character Sets (NRCS)</td>
+<td>x</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>1-3</td>
+<td>Kanji</td>
+<td>o</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>2</td>
+<td>Status Display</td>
+<td>o</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>1-3</td>
+<td>Serbo-Croation (SCS)</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>1,3</td>
+<td>Block Mode</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>2</td>
+<td>8-bit Interface Architecture</td>
+<td>o</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>2-4</td>
+<td>DEC Technical Character Set (TCS)</td>
+<td>x</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>1-4</td>
+<td>Locator Port</td>
+<td>o</td>
+<td>DEC Locator Mode</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>2</td>
+<td>Terminal State Interrogation (TSI)</td>
+<td>x</td>
+<td>DECRQPSR/DECRSPS</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>2-4</td>
+<td>Windowing capability</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>19</td>
+<td>2-4</td>
+<td>Multiple Sessions (TD/SMP)</td>
+<td>x</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>20</td>
+<td>1-4</td>
+<td>APL</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>21</td>
+<td>2-4</td>
+<td>Horizontal Scrolling</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>22</td>
+<td>2-4</td>
+<td>Color Text</td>
+<td>o</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>23</td>
+<td>1-3</td>
+<td>Greek extension</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>24</td>
+<td>1,3</td>
+<td>Turkish extension</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>25</td>
+<td>2,3</td>
+<td>Arabic Bilingual Mode 1</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>26</td>
+<td>2,3</td>
+<td>Arabic Bilingual Mode 2</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>27</td>
+<td>2,3</td>
+<td>Arabic Bilingual Mode 3</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>28</td>
+<td>2,3</td>
+<td>Rectangular Editing</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>29</td>
+<td>2-4</td>
+<td>Text Locator</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>30</td>
+<td>2,3</td>
+<td>Hanzi</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>31</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>32</td>
+<td>2-4</td>
+<td>Text Macros</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>33</td>
+<td>2,3</td>
+<td>Hangul and Hanja</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>34</td>
+<td>2,3</td>
+<td>Icelandic</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>35</td>
+<td>2,3</td>
+<td>Arabic Bilingual with Text Controls</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>36</td>
+<td>2,3</td>
+<td>Arabic Bilingual with no Text Controls</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>37</td>
+<td>2,3</td>
+<td>Thai</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>38</td>
+<td>2,3</td>
+<td>Character Outlining</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>42</td>
+<td></td>
+<td>ISO Latin-2 character set</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>44</td>
+<td></td>
+<td>VT PCTerm</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>45</td>
+<td></td>
+<td>Soft key mapping</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>46</td>
+<td></td>
+<td>ASCII terminal emulation</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+<pre><code>Tera Term Support
+o = support
+x = not support
+? = ?
+  = ?</code></pre>
+
+<p>first parameter</p>
+
+<table border="1">
+<thead>
+<tr class="header">
+<th>Ps</th>
+<th>VT100</th>
+<th>VT100J</th>
+<th>VT101</th>
+<th>VT102</th>
+<th>VT102J</th>
+<th>VT220</th>
+<th>VT220J</th>
+<th>VT282</th>
+<th>VT320</th>
+<th>VT382</th>
+<th>VT420</th>
+<th>VT520</th>
+<th>VT525</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>o</td>
+<td></td>
+<td>o</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td></td>
+<td>o</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>15</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>60</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>61</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>62</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>63</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>64</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>65</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+</tr>
+</tbody>
+</table>
+
+<p>After 2nd parameters</p>
+
+<table border="1">
+<thead>
+<tr class="header">
+<th>Ps</th>
+<th>VT100</th>
+<th>VT100J</th>
+<th>VT101</th>
+<th>VT102</th>
+<th>VT102J</th>
+<th>VT220</th>
+<th>VT220J</th>
+<th>VT282</th>
+<th>VT320</th>
+<th>VT382</th>
+<th>VT420</th>
+<th>VT520</th>
+<th>VT525</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td></td>
+<td></td>
+<td>o</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>o</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td></td>
+<td>o</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td></td>
+<td>o</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+<td></td>
+<td>o</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td></td>
+<td></td>
+<td>o</td>
+<td></td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td></td>
+<td>o</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>14</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>15</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>16</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>17</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>18</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+</tr>
+<tr class="even">
+<td>19</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+</tr>
+<tr class="odd">
+<td>20</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>21</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+<td>o</td>
+</tr>
+<tr class="odd">
+<td>22</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+</tr>
+<tr class="even">
+<td>23</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+</tr>
+<tr class="odd">
+<td>24</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+</tr>
+<tr class="even">
+<td>42</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+</tr>
+<tr class="odd">
+<td>44</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+</tr>
+<tr class="even">
+<td>45</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+</tr>
+<tr class="odd">
+<td>46</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>o</td>
+<td>o</td>
+</tr>
+</tbody>
+</table>
+
+<pre><code>o = support
+- = Implicit Extensions</code></pre>
+
+<h2 id="reference">reference</h2>
+<ul>
+  <li>VT100 User Guide
+    <ul>
+      <li><a href="https://vt100.net/docs/vt100-ug/chapter3.html#DA" target="_blank">https://vt100.net/docs/vt100-ug/chapter3.html#DA</a>
+        <ul>
+          <li>DA - Device Attributes</li>
+      </ul></li>
+  </ul></li>
+
+  <li>VT220 Programmer Reference Manual
+    <ul>
+      <li><a href="https://vt100.net/docs/vt220-rm/chapter4.html#S4.17.1" target="_blank">https://vt100.net/docs/vt220-rm/chapter4.html#S4.17.1</a>
+        <ul>
+          <li>4.17.1 Device Attributes (DA)</li>
+      </ul></li>
+  </ul></li>
+
+  <li>VT420 Programmer Reference Manual
+    <ul>
+      <li><a href="https://manx-docs.org/details.php/1,2999" target="_blank">https://manx-docs.org/details.php/1,2999</a></li>
+      <li><a href="https://manx-docs.org/collections/mds-199909/cd3/term/vt420rm2.pdf" target="_blank">https://manx-docs.org/collections/mds-199909/cd3/term/vt420rm2.pdf</a>
+        <ul>
+          <li>Device Attributes (DA)
+            <ul>
+              <li>page 228 , 250/378</li>
+          </ul></li>
+      </ul></li>
+  </ul></li>
+
+  <li>VT520/VT525 Video Terminal Programmer Information
+    <ul>
+      <li><a href="https://vt100.net/manx/part/dec/ek-vt520-rm/" target="_blank">https://vt100.net/manx/part/dec/ek-vt520-rm/</a>
+        <ul>
+          <li>Device Attributes
+            <ul>
+              <li>page 4-35 , 143/610</li>
+          </ul></li>
+          <li>DA1 - Primary Device Attributes
+            <ul>
+              <li>page 5-10 , 164/610</li>
+          </ul></li>
+      </ul></li>
+  </ul></li>
+
+  <li>DEC STD 070 Video Systems Reference Manual
+    <ul>
+      <li><a href="https://archive.org/embed/bitsavers_decstandar0VideoSystemsReferenceManualDec91_74264381" target="_blank">https://archive.org/embed/bitsavers_decstandar0VideoSystemsReferenceManualDec91_74264381</a></li>
+      <li><a href="https://vt100.net/manx/details/1,10422" target="_blank">https://vt100.net/manx/details/1,10422</a>
+        <ul>
+          <li>DEVICE ATTRIBUTES (Primary)
+            <ul>
+              <li>page 04-17 , 221/1252</li>
+          </ul></li>
+      </ul></li>
+  </ul></li>
+</ul>
+
+</html>

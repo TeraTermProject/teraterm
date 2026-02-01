@@ -171,8 +171,8 @@ static void NewLine(TProtoLog *pv)
 }
 
 /*
- * ���ɂ���ăR���g���[��������0�ȊO��Ԃ��̂�isprint()���g�p���Ȃ�
- *		VS2022 �� 0x09 �� 0 �ȊO��Ԃ�
+ * 環境によってコントロール文字も0以外を返すのでisprint()を使用しない
+ *		VS2022 は 0x09 も 0 以外を返す
  */
 static int ttisprint(int c)
 {

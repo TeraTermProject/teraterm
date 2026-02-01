@@ -33,11 +33,11 @@ extern "C" {
 #endif
 
 typedef struct {
-	wchar_t *port_name;			// ƒ|[ƒg–¼ "COM%d" ˆÈŠO‚à‚ ‚é
-	int port_no;				// "COM%d" ‚Ì %d•”•ª, 0‚Ìê‡‚Í "COM%d" ˆÈŠO, 1..128(9x)/255(xp) (2^32‚ªãŒÀ?)
-	wchar_t *friendly_name;		// ‘¶İ‚µ‚È‚¢ê‡‚Í NULL
-	wchar_t *property;			// ŒÂ•Ê‚Ì’l‚ğ‚Ü‚Æ‚ß‚½•¶š—ñ
-	// ŒÂ•Ê‚Ì’l
+	wchar_t *port_name;			// ãƒãƒ¼ãƒˆå "COM%d" ä»¥å¤–ã‚‚ã‚ã‚‹
+	int port_no;				// "COM%d" ã® %déƒ¨åˆ†, 0ã®å ´åˆã¯ "COM%d" ä»¥å¤–, 1..128(9x)/255(xp) (2^32ãŒä¸Šé™?)
+	wchar_t *friendly_name;		// å­˜åœ¨ã—ãªã„å ´åˆã¯ NULL
+	wchar_t *property;			// å€‹åˆ¥ã®å€¤ã‚’ã¾ã¨ã‚ãŸæ–‡å­—åˆ—
+	// å€‹åˆ¥ã®å€¤
 	wchar_t *class_name;
 	wchar_t *instance_id;
 	wchar_t *manufacturer;

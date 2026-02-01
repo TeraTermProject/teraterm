@@ -40,7 +40,7 @@
         </ul>
       </li>
     </ul>
-    
+
     <h2 id="requirements">requirements</h2>
     <ul>
       <li>
@@ -48,7 +48,7 @@
         Windows versions that is not targeted by Visual Studio 2022 are not supported.
       <li>
     </ul>
-    
+
     <h2 id="misc">misc</h2>
     <ul>
       <li><a href="https://github.com/TeraTermProject/teraterm/wiki/Decision#tera-term-5x" target="_blank">Development tools, libraries , etc.</a>
@@ -71,14 +71,15 @@
             <li>character encoding of cygterm.cfg is UTF-8 in Cygwin 3.3.4.</li>
           </ul>
         </li>
-        <li>Tera Term 5 suports UTF-16 (with LE BOM) ini file.<br>
+        <li>Tera Term 5 supports UTF-16 (with LE BOM) ini file.<br>
           <ul>
             <li>Win32APIs for ini files are used Unicode version.  cf. <a href="../reference/dev/win32api.html#ini_file">Win32API/ini file</a><br>
                 Tera Term 4 does not use the Unicode version of the API. the item in ini file could not be handled correctly if non ACP characters are included.</li>
             <li>cygterm.cfg is not using Win32API.</li>
           </ul>
         </li>
-        <li>Tera Term 5 automatically converts character encoding of TERATERM.INI files to UTF-16 (with LE BOM) when Tera Term 5 starts if TERATERM.INI is not UTF-16 (with LE BOM).<br>
+        <li>If the TERATERM.INI file in the default configuration folder is not UTF-16 (with LE BOM), Tera Term 5 automatically converts to UTF-16 (with LE BOM).<br>
+            The setup file specified by the <a href="../commandline/teraterm.html#f">/F=</a> command line option is not converted.</li>
             Before conversion, original ini file is backed up.</li>
         <li>Tera Term 5 uses UTF-16 (with LE BOM) character encoding saving setup file (TERATERM.INI).</li>
       </ul>

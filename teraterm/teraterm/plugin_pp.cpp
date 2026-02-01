@@ -59,10 +59,10 @@ typedef struct {
 } PluginDlgData;
 
 /**
- * @brief ƒŠƒXƒg‚Ì“à—e‚ğİ’è‚·‚é
+ * @brief ãƒªã‚¹ãƒˆã®å†…å®¹ã‚’è¨­å®šã™ã‚‹
  *
- * @param hWnd			eƒEƒBƒ“ƒhƒE
- * @param pointer_pos	ƒ|ƒCƒ“ƒ^‚ÌˆÊ’u
+ * @param hWnd			è¦ªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+ * @param pointer_pos	ãƒã‚¤ãƒ³ã‚¿ã®ä½ç½®
  * @param index
  */
 static void SetFromListView(HWND hWnd)
@@ -99,12 +99,12 @@ static void SetFromListView(HWND hWnd)
 }
 
 /**
- * –¼ŒŸØ
+ * ç½²åæ¤œè¨¼
  */
 static wchar_t *VerifySignature(LPCWSTR pwszSourceFile)
 {
 	if (pWinVerifyTrust == NULL) {
-		// WinVerifyTrust‚ªg—p‚Å‚«‚È‚¢ (XP–¢–)
+		// WinVerifyTrustãŒä½¿ç”¨ã§ããªã„ (XPæœªæº€)
 		return _wcsdup(L"-");
 	}
 
@@ -136,7 +136,7 @@ static wchar_t *VerifySignature(LPCWSTR pwszSourceFile)
 		break;
 	}
 
-	// ó‘Ôƒf[ƒ^‚ğ•Â‚¶‚é
+	// çŠ¶æ…‹ãƒ‡ãƒ¼ã‚¿ã‚’é–‰ã˜ã‚‹
 	WinTrustData.dwStateAction = WTD_STATEACTION_CLOSE;
 	pWinVerifyTrust(NULL, &guidAction, &WinTrustData);
 
@@ -144,9 +144,9 @@ static wchar_t *VerifySignature(LPCWSTR pwszSourceFile)
 }
 
 /**
- * @brief ƒƒjƒ…[‚ğo‚µ‚Ä‘I‘ğ‚³‚ê‚½ˆ—‚ğÀs‚·‚é
- * @param hWnd			eƒEƒBƒ“ƒhƒE
- * @param pointer_pos	ƒ|ƒCƒ“ƒ^‚ÌˆÊ’u
+ * @brief ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’å‡ºã—ã¦é¸æŠã•ã‚ŒãŸå‡¦ç†ã‚’å®Ÿè¡Œã™ã‚‹
+ * @param hWnd			è¦ªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+ * @param pointer_pos	ãƒã‚¤ãƒ³ã‚¿ã®ä½ç½®
  * @param index
  */
 static void Popup(HWND hWnd, const POINT *pointer_pos, int index)
@@ -268,7 +268,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			free(verify_str);
 		}
 
-		// •‚ğ’²®
+		// å¹…ã‚’èª¿æ•´
 		for (int i = 0; i < 5; i++) {
 			ListView_SetColumnWidth(hWndList, i, LVSCW_AUTOSIZE);
 		}
@@ -290,7 +290,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			ofn.lpstrInitialDir = pts->ExeDirW;
 			BOOL r = TTGetOpenFileNameW(&ofn, &filename);
 			if (r == TRUE) {
-				// ‘I‘ğ‚³‚ê‚½ƒtƒ@ƒCƒ‹‚ğƒŠƒXƒg‚É’Ç‰Á
+				// é¸æŠã•ã‚ŒãŸãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒªã‚¹ãƒˆã«è¿½åŠ 
 				HWND hWndList = GetDlgItem(hWnd, IDC_SETUP_DIR_LIST);
 
 				int list_count = (int)SendMessageW(hWndList, LVM_GETITEMCOUNT, 0, 0);

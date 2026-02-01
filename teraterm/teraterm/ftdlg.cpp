@@ -69,7 +69,7 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlg::Info *info)
 	HWND hwnd;
 
 	UILanguageFile = info->UILanguageFileW;
-	OpId = info->OpId;	// OpLog or OpSendFile �̂�
+	OpId = info->OpId;	// OpLog or OpSendFile のみ
 	DlgCaption = _wcsdup(info->DlgCaption);
 	FullName = _wcsdup(info->FullName);
 	if (info->FileName != NULL) {
@@ -95,6 +95,8 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlg::Info *info)
 	hwnd = GetForegroundWindow();
 	if (OpId == OpLog) { // parent window is desktop
 		Ok = TTCDialog::Create(hInstance, GetDesktopWindow(), IDD_FILETRANSDLG);
+		HWND HControl = ::GetDlgItem(m_hWnd, IDC_TRANSHIDEDLG);
+		::ShowWindow(HControl, SW_SHOW);
 	}
 	else { // parent window is VT window
 		Ok = TTCDialog::Create(hInstance, NULL, IDD_FILETRANSDLG);
@@ -114,15 +116,15 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlg::Info *info)
 	}
 
 	if (!HideDialog) {
-		// Visible = False �̃_�C�A���O��\������
+		// Visible = False のダイアログを表示する
 		ShowWindow(SW_SHOWNORMAL);
 		if (OpId == OpLog) {
 			ShowWindow(SW_MINIMIZE);
 		}
 	}
 	else {
-		// ���O�Ƀt�H�A�O���E���h�������E�B���h�E�Ƀt�H�[�J�X��߂��B
-		// ���j���[���烍�O���X�^�[�g�������� VTWin �Ƀt�H�[�J�X���߂�Ȃ��̂ŕK�v���ۂ��B
+		// 直前にフォアグラウンドだったウィンドウにフォーカスを戻す。
+		// メニューからログをスタートした時に VTWin にフォーカスが戻らないので必要っぽい。
 		::SetForegroundWindow(hwnd);
 	}
 
@@ -130,7 +132,7 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlg::Info *info)
 }
 
 /**
- *	�e�L�X�g�̕ύX�̂�
+ *	テキストの変更のみ
  */
 void CFileTransDlg::ChangeButton(BOOL PauseFlag)
 {
@@ -206,17 +208,18 @@ BOOL CFileTransDlg::OnInitDialog()
 		{ IDC_FULLPATH_LABEL, "DLG_FILETRANS_FULLPATH" },
 		{ IDC_TRANS_TRANS, "DLG_FILETRANS_TRNAS" },
 		{ IDC_TRANS_ELAPSED, "DLG_FILETRANS_ELAPSED" },
+		{ IDC_TRANSHIDEDLG, "DLG_FOPT_HIDEDIALOG" },
 		{ IDCANCEL, "DLG_FILETRANS_CLOSE" },
 		{ IDC_TRANSPAUSESTART, "DLG_FILETRANS_PAUSE" },
 		{ IDC_TRANSHELP, "BTN_HELP" },
 	};
 
 	if (HideDialog) {
-		// Visible = False �ł��t�H�A�O���E���h�ɗ��Ă��܂��̂ŁA�����Ȃ�Ȃ�
-		// �悤�Ɋg���X�^�C�� WS_EX_NOACTIVATE ���w�肷��B
-		// (Windows 2000 �ȏ�ŗL��)
-		// WS_EX_NOACTIVATE ���w�肷��ƕ\������Ă��鎞���^�X�N�o�[�Ɍ���Ȃ�
-		// �̂� WS_EX_APPWINDOW ���w�肷��B
+		// Visible = False でもフォアグラウンドに来てしまうので、そうならない
+		// ように拡張スタイル WS_EX_NOACTIVATE を指定する。
+		// (Windows 2000 以上で有効)
+		// WS_EX_NOACTIVATE を指定すると表示されている時もタスクバーに現れない
+		// ので WS_EX_APPWINDOW も指定する。
 		ModifyStyleEx(0, WS_EX_NOACTIVATE | WS_EX_APPWINDOW);
 	}
 
@@ -264,6 +267,9 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			else {
 				::PostMessage(HMainWin, WM_USER_DLGHELP2, HlpFileSend, 0);
 			}
+			return TRUE;
+		case IDC_TRANSHIDEDLG:
+			ShowWindow(SW_HIDE);
 			return TRUE;
 		default:
 			return (TTCDialog::OnCommand(wParam,lParam));

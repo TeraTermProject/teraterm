@@ -28,7 +28,7 @@
 
 /*
  * Tera term Micro Framework class
- *		プロパティダイアログ
+ *		繝励Ο繝代ユ繧｣繝繧､繧｢繝ｭ繧ｰ
  */
 #include "tmfc.h"
 
@@ -37,7 +37,7 @@
 #include "dlglib.h"
 #include "ttlib.h"
 
-// テンプレートの書き換えを行う
+// 繝�繝ｳ繝励Ξ繝ｼ繝医�ｮ譖ｸ縺肴鋤縺医ｒ陦後≧
 #define REWRITE_TEMPLATE
 
 ////////////////////////////////////////

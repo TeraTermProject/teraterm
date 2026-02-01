@@ -36,18 +36,22 @@
 extern "C" {
 #endif
 
-// “à•”—p
+// å†…éƒ¨ç”¨
 BOOL OpenExternalSetupTab(HWND hWndParent, CAddSettingPropSheetDlgPage page);
 
-// vtwin‚©‚çg—p
+// vtwinã‹ã‚‰ä½¿ç”¨
 void OpenExternalSetup(HWND hWndParent);
-void OpenSetupTerminal();
-void OpenSetupWin();
-void OpenSetupFont();
-void OpenSetupKeyboard();
-void OpenSetupSerialPort();
-void OpenSetupTCPIP();
-void OpenSetupGeneral();
+void OpenSetupTerminal(HWND hWnd);
+void OpenSetupWin(HWND hWnd);
+void OpenSetupFont(HWND hWnd);
+void OpenSetupKeyboard(HWND hWnd);
+void OpenSetupSerialPort(HWND hWnd);
+void OpenSetupTCPIP(HWND hWnd);
+void OpenSetupGeneral(HWND hWnd);
+
+// TEKã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+void OpenSetupTekWindow(HWND hWnd);
+void OpenSetupTekFont(HWND hWnd);
 
 #ifdef __cplusplus
 }

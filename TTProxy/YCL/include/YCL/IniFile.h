@@ -162,12 +162,12 @@ private:
 		char* buffer = (char*) alloca(size);
 		size_t len = GetPrivateProfileStringAFileW(section, name, INVALID(), buffer, size, filename);
 		if (len < size - 2) {
-			// ‰üs‚ðŠÜ‚ñ‚¾•¶Žš—ñ‚Íiniƒtƒ@ƒCƒ‹‚©‚ç‚ÍŽæ“¾‚Å‚«‚È‚¢‚Ì‚ÅŽæ“¾Ž¸”s‚µ‚½‚±‚Æ‚ª•ª‚©‚é
+			// æ”¹è¡Œã‚’å«ã‚“ã æ–‡å­—åˆ—ã¯iniãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã¯å–å¾—ã§ããªã„ã®ã§å–å¾—å¤±æ•—ã—ãŸã“ã¨ãŒåˆ†ã‹ã‚‹
 			if (buffer[0] == '\n') {
 				exists = false;
 				return NULL;
 			}
-			// ƒGƒXƒP[ƒv•¶Žš‚ð“WŠJ
+			// ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—æ–‡å­—ã‚’å±•é–‹
 			return StringUtil::unescape(buffer);
 		}
 		exists = true;
@@ -179,12 +179,12 @@ private:
 		size_t len = GetPrivateProfileStringW(sectionW, name, L"\n:", buffer, size, filename);
 		free(sectionW);
 		if (len < size - 2) {
-			// ‰üs‚ðŠÜ‚ñ‚¾•¶Žš—ñ‚Íiniƒtƒ@ƒCƒ‹‚©‚ç‚ÍŽæ“¾‚Å‚«‚È‚¢‚Ì‚ÅŽæ“¾Ž¸”s‚µ‚½‚±‚Æ‚ª•ª‚©‚é
+			// æ”¹è¡Œã‚’å«ã‚“ã æ–‡å­—åˆ—ã¯iniãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã¯å–å¾—ã§ããªã„ã®ã§å–å¾—å¤±æ•—ã—ãŸã“ã¨ãŒåˆ†ã‹ã‚‹
 			if (buffer[0] == '\n') {
 				exists = false;
 				return NULL;
 			}
-			// ƒGƒXƒP[ƒv•¶Žš‚ð“WŠJ
+			// ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—æ–‡å­—ã‚’å±•é–‹
 			return StringUtil::unescapeW(buffer);
 		}
 		exists = true;
@@ -284,7 +284,7 @@ public:
 	}
 	bool setString(const char* name, String value) {
 		if (filename != NULL && section != NULL && name != NULL) {
-			// NULL‚Å‚È‚¯‚ê‚ÎƒGƒXƒP[ƒv‚µ‚Ä‚©‚ç""‚ÅŠ‡‚é
+			// NULLã§ãªã‘ã‚Œã°ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—ã—ã¦ã‹ã‚‰""ã§æ‹¬ã‚‹
 			if (value != NULL) {
 				StringBuffer buffer;
 				buffer.append('"');
@@ -302,7 +302,7 @@ public:
 			return false;
 		}
 
-		// NULL‚Å‚È‚¯‚ê‚ÎƒGƒXƒP[ƒv‚µ‚Ä‚©‚ç""‚ÅŠ‡‚é
+		// NULLã§ãªã‘ã‚Œã°ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—ã—ã¦ã‹ã‚‰""ã§æ‹¬ã‚‹
 		if (value != NULL) {
 			WStringBuffer buffer;
 			buffer.append('"');

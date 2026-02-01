@@ -71,6 +71,13 @@
 			<param name="Local" value="html\about\ctrlseq.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+		<UL>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Device Attributes">
+				<param name="Local" value="html\about\ctrlseq_device_attributes.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Q &amp; A ">
 			<param name="Local" value="html\about\qanda.html">
@@ -258,6 +265,11 @@
 				<param name="Local" value="html/usage/tips/vt100_wrap.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="送受信データのドロップ">
+				<param name="Local" value="html/usage/tips/data_drop.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="追加プラグイン">
@@ -282,6 +294,11 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="繰り返しコマンド">
 				<param name="Local" value="html\usage\recurringcommand.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="フォントサイズ変更プラグイン">
+				<param name="Local" value="html\usage\change_fontsize.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 		</UL>
@@ -311,6 +328,11 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Send file">
 				<param name="Local" value="html\menu\file-sendfile.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Receive file">
+				<param name="Local" value="html\menu\file-receivefile.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
@@ -384,6 +406,11 @@
 						</OBJECT>
 				</UL>
 			</UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="SSH SCP">
+				<param name="Local" value="html\menu\file-ssh-scp.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Change directory">
 				<param name="Local" value="html\menu\file-chdir.html">
@@ -546,7 +573,7 @@
 					</OBJECT>
 				<UL>
 					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="Edit History">
+						<param name="Name" value="ホストリストの編集">
 						<param name="Local" value="html\menu\setup-additional-tcpip_edithistory.html">
 						<param name="ImageNumber" value="11">
 						</OBJECT>
@@ -635,6 +662,11 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="[漢字コード] メニュー">
 				<param name="Local" value="html\ttxplugin/kanjimenu.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="[FontSize] メニュー">
+				<param name="Local" value="html\menu\fontsize.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 		</UL>
@@ -1240,6 +1272,16 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="setspeed">
 					<param name="Local" value="html\macro\command\setspeed.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="setserialdelaychar">
+					<param name="Local" value="html\macro\command\setserialdelaychar.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="setserialdelayline">
+					<param name="Local" value="html\macro\command\setserialdelayline.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">

@@ -33,6 +33,8 @@
 
 #include "buffer.h"		// for TCharAttr
 
+#define VTDISP_DEBUG_DISABLE 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -57,88 +59,107 @@ extern "C" {
 #define CS_ANSICOLOR_ALL   270
 #define CS_SP_ALL          271
 #define CS_UNSPEC          0xffffffff
-#define CS_ALL             0xfffffffe	// DispResetColor() �����Ŏg�p
+#define CS_ALL             0xfffffffe	// DispResetColor() だけで使用
+
+// HDC の wapper
+typedef struct ttdc ttdc_t;
+
+// VT Winの描画情報
+typedef struct vtdraw vtdraw_t;
+
+// VTWinの描画情報
+//   TODO 移動する vtwinあたりか?
+extern vtdraw_t *vt_src;
 
 /* prototypes */
-void BGInitialize(BOOL initialize_once);
-void BGLoadThemeFile(const TTTSet *pts);
-void BGSetupPrimary(BOOL forceSetup);
+void BGInitialize(vtdraw_t *vt, BOOL initialize_once);
+void BGLoadThemeFile(vtdraw_t *vt, const TTTSet *pts);
+void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup);
 
-void BGOnSettingChange(void);
+void BGOnSettingChange(vtdraw_t *vt);
 void BGOnEnterSizeMove(void);
-void BGOnExitSizeMove(void);
+void BGOnExitSizeMove(vtdraw_t *vt);
 
-void InitDisp(void);
-void EndDisp(void);
-void DispReset(void);
-void DispConvWinToScreen
-  (int Xw, int Yw, int *Xs, int *Ys, PBOOL Right);
-void DispConvScreenToWin
-  (int Xs, int Ys, int *Xw, int *Yw);
-void ChangeFont(unsigned int dpi);
-void ResetIME(void);
-void ChangeCaret(void);
-void CaretKillFocus(BOOL show);
-void UpdateCaretPosition(BOOL enforce);
-void CaretOn(void);
-void CaretOff(void);
+vtdraw_t *InitDisp(HWND hVTWin);
+void EndDisp(vtdraw_t *vt);
+void DispReset(vtdraw_t *vt);
+void DispConvWinToScreen(vtdraw_t *vt, int Xw, int Yw, int *Xs, int *Ys, PBOOL Right);
+void DispConvScreenToWin(vtdraw_t *vt, int Xs, int Ys, int *Xw, int *Yw);
+void ChangeFont(vtdraw_t *vt, unsigned int dpi);
+void ResetIME(vtdraw_t *vt);
+void ChangeCaret(vtdraw_t *vt);
+void CaretKillFocus(vtdraw_t *vt, BOOL show);
+void UpdateCaretPosition(vtdraw_t *vt, BOOL enforce);
+void CaretOn(vtdraw_t *vt);
+void CaretOff(vtdraw_t *vt);
 void DispDestroyCaret(void);
 BOOL IsCaretOn(void);
-void DispEnableCaret(BOOL On);
+void DispEnableCaret(vtdraw_t *vt, BOOL On);
 BOOL IsCaretEnabled(void);
 void DispSetCaretWidth(BOOL DW);
-void DispChangeWinSize(int Nx, int Ny);
-void ResizeWindow(int x, int y, int w, int h, int cw, int ch);
-void PaintWindow(HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
+void DispChangeWinSize(vtdraw_t *vt, int Nx, int Ny);
+void ResizeWindow(vtdraw_t *vt, int x, int y, int w, int h, int cw, int ch);
+ttdc_t *PaintWindow(vtdraw_t *vt, HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
 		 int* Xs, int* Ys, int* Xe, int* Ye);
-void DispEndPaint(void);
-void DispClearWin(void);
-void DispChangeBackground(void);
-void DispChangeWin(void);
-void DispInitDC(void);
-void DispReleaseDC(void);
-void DispSetupDC(TCharAttr Attr, BOOL Reverse);
-void DispStrA(const char *Buff, const char *WidthInfo, int Count, int Y, int* X);
-void DispStrW(const wchar_t *StrW, const char *WidthInfo, int Count, int Y, int* X);
-BOOL DispDeleteLines(int Count, int YEnd);
-BOOL DispInsertLines(int Count, int YEnd);
-BOOL IsLineVisible(int* X, int* Y);
-void AdjustScrollBar(void);
-void DispScrollToCursor(int CurX, int CurY);
-void DispScrollNLines(int Top, int Bottom, int Direction);
-void DispCountScroll(int n);
-void DispUpdateScroll(void);
-void DispScrollHomePos(void);
-void DispAutoScroll(POINT p);
-void DispHScroll(int Func, int Pos);
-void DispVScroll(int Func, int Pos);
-void DispRestoreWinSize(void);
-void DispSetWinPos(void);
-void DispSetActive(BOOL ActiveFlag);
-int TCharAttrCmp(TCharAttr a, TCharAttr b);
-void DispSetColor(unsigned int num, COLORREF color);
-void DispResetColor(unsigned int num);
-COLORREF DispGetColor(unsigned int num);
-void DispSetCurCharAttr(const TCharAttr *Attr);
-void DispMoveWindow(int x, int y);
-void DispShowWindow(int mode);
-void DispResizeWin(int w, int h);
-BOOL DispWindowIconified(void);
-void DispGetWindowPos(int *x, int *y, BOOL client);
-void DispGetWindowSize(int *width, int *height, BOOL client);
-void DispGetRootWinSize(int *x, int *y, BOOL inPixels);
-int DispFindClosestColor(int red, int green, int blue);
-void DrawStrW(HDC DC, HDC BGDC, const wchar_t *StrW, const char *WidthInfo, int Count, int font_width, int font_height,
-			  int Y, int *X);
-void DrawStrA(HDC DC, HDC BGDC, const char *StrA, const char *WidthInfo, int Count, int font_width, int font_height,
-			  int Y, int *X);
+void DispEndPaint(ttdc_t *dc);
+void DispClearWin(vtdraw_t *vt);
+void DispChangeBackground(vtdraw_t *vt);
+void DispChangeWin(vtdraw_t *vt);
+void DispSetupDC(vtdraw_t *vt, ttdc_t *dc, const TCharAttr *Attr, BOOL Reverse);
+BOOL DispDeleteLines(vtdraw_t *vt, int Count, int YEnd);
+BOOL DispInsertLines(vtdraw_t *vt, int Count, int YEnd);
+BOOL IsLineVisible(vtdraw_t *vt, int *X, int *Y);
+void AdjustScrollBar(vtdraw_t *vt);
+void DispScrollToCursor(vtdraw_t *vt, int CurX, int CurY);
+void DispScrollNLines(vtdraw_t *vt, int Top, int Bottom, int Direction);
+void DispCountScroll(vtdraw_t *vt, int n);
+void DispUpdateScroll(vtdraw_t *vt);
+void DispScrollHomePos(vtdraw_t *vt);
+void DispAutoScroll(vtdraw_t *vt, POINT p);
+void DispHScroll(vtdraw_t *vt, int Func, int Pos);
+void DispVScroll(vtdraw_t *vt, int Func, int Pos);
+void DispRestoreWinSize(vtdraw_t *vt);
+void DispSetWinPos(vtdraw_t *vt);
+void DispSetActive(vtdraw_t *vt, BOOL ActiveFlag);
+void DispSetColor(vtdraw_t *vt, unsigned int num, COLORREF color);
+void DispResetColor(vtdraw_t *vt, unsigned int num);
+COLORREF DispGetColor(vtdraw_t *vt, unsigned int num);
+void DispMoveWindow(vtdraw_t *vt, int x, int y);
+void DispShowWindow(vtdraw_t *vt, int mode);
+void DispResizeWin(vtdraw_t *vt, int w, int h);
+BOOL DispWindowIconified(vtdraw_t *vt);
+void DispGetWindowPos(vtdraw_t *vt, int *x, int *y, BOOL client);
+void DispGetWindowSize(vtdraw_t *vt, int *width, int *height, BOOL client);
+void DispGetRootWinSize(vtdraw_t *vt, int *x, int *y, BOOL inPixels);
+int DispFindClosestColor(vtdraw_t *vt, int red, int green, int blue);
 void DispEnableResizedFont(BOOL enable);
 BOOL DispIsResizedFont();
-void DispSetLogFont(LOGFONTW *VTlf, unsigned int dpi);
+
+ttdc_t *DispInitDC(vtdraw_t *vt);
+ttdc_t *DispInitDCDebug(vtdraw_t *vt, const char *file, int line);
+void DispReleaseDC(vtdraw_t *vt, ttdc_t *dc);
+void DispReleaseDCDebug(vtdraw_t *vt, ttdc_t *dc, const char *file, int line);
+#ifndef VTDISP_DEBUG_DISABLE
+#define DispInitDC(p1)	DispInitDCDebug(p1, __FILE__, __LINE__)
+#define DispReleaseDC(p1, p2) DispReleaseDCDebug(p1, p2, __FILE__, __LINE__)
+#endif
+void DispStrA(vtdraw_t *vt, ttdc_t *dc, const char *Buff, const char *WidthInfo, int Count);
+void DispStrW(vtdraw_t *vt, ttdc_t *dc, const wchar_t *StrW, const char *WidthInfo, int Count);
+BOOL DispIsPrinter(vtdraw_t *vt);
+BOOL DispDCIsPrinter(ttdc_t *dc);
+void DispSetDrawPos(vtdraw_t *vt, ttdc_t *dc, int x, int y);
+HDC DispDCGetRawDC(ttdc_t *dc);
+BOOL DispPrnIsNextPage(vtdraw_t *vt, ttdc_t *dc);
+void DispPrnPosCR(vtdraw_t *vt, ttdc_t *dc);
+void DispPrnPosLF(vtdraw_t *vt, ttdc_t *dc);
+void DispPrnPosFF(vtdraw_t *vt, ttdc_t *dc);
+
+void DispGetCellSize(vtdraw_t *vt, int *width, int *height);
+void DispGetFontSize(vtdraw_t *vt, int *width, int *height);
+void DispSetFontSize(vtdraw_t *vt, int width, int height);
+void DispGetScreenSize(vtdraw_t *vt, int *width, int *height);
 
 extern int WinWidth, WinHeight;
-extern HFONT VTFont[AttrFontMask+1];
-extern int FontHeight, FontWidth, ScreenWidth, ScreenHeight;
 extern BOOL AdjustSize, DontChangeSize;
 extern int CursorX, CursorY;
 extern int WinOrgX, WinOrgY, NewOrgX, NewOrgY;
@@ -166,6 +187,15 @@ extern BOOL IMECompositionState;
 #define WINDOW_LOWER    5
 #define WINDOW_REFRESH  6
 #define WINDOW_TOGGLE_MAXIMIZE 7
+
+#define IdPrnCancel 0
+#define IdPrnScreen 1
+#define IdPrnSelectedText 2
+#define IdPrnScrollRegion 4
+#define IdPrnFile 8
+
+vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **dc, int *mode);
+void VTPrintEnd(vtdraw_t *vt, ttdc_t *dc);
 
 #ifdef __cplusplus
 }

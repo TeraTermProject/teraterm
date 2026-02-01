@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 #if defined(_MSC_VER) && !defined(_Printf_format_string_)
-// ’è‹`‚³‚ê‚Ä‚¢‚È‚¢‚Æ‚«‚Í‰½‚à‚µ‚È‚¢‚æ‚¤‚É’è‹`‚µ‚Ä‚¨‚­
+// å®šç¾©ã•ã‚Œã¦ã„ãªã„ã¨ãã¯ä½•ã‚‚ã—ãªã„ã‚ˆã†ã«å®šç¾©ã—ã¦ãŠã
 #define _Printf_format_string_
 #endif
 

@@ -103,9 +103,9 @@ void SetFontStringW(HWND hWnd, int item, const LOGFONTW *logfont);
 BOOL IsHiddenFont(const LOGFONTW *logfont);
 
 typedef enum {
-	ACFCF_INIT_DIALOG = 0,	// ƒ_ƒCƒAƒƒOƒtƒHƒ“ƒg—p‰Šú‰»
-	ACFCF_INIT_VTWIN,		// VTWin—p‰Šú‰»
-	ACFCF_CONTINUE,			// ƒtƒHƒ“ƒgÝ’èŒã‚ÌÄÝ’è
+	ACFCF_INIT_DIALOG = 0,	// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒ•ã‚©ãƒ³ãƒˆç”¨åˆæœŸåŒ–
+	ACFCF_INIT_VTWIN,		// VTWinç”¨åˆæœŸåŒ–
+	ACFCF_CONTINUE,			// ãƒ•ã‚©ãƒ³ãƒˆè¨­å®šå¾Œã®å†è¨­å®š
 } ACFCF_MODE;
 void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidden, int id_pro, ACFCF_MODE mode);
 

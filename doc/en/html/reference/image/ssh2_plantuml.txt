@@ -126,7 +126,7 @@ group Key Exhnage
     C -> S: SSH_MSG_KEX_DH_GEX_REQUEST
     note left: min\nn\nmax
 
-    note over S #ffffff: finds group that matchs client request size\n  p ... prime\n  g ... generator
+    note over S #ffffff: finds group that matches client request size\n  p ... prime\n  g ... generator
 
     C <- S: SSH_MSG_KEX_DH_GEX_GROUP
     note right: p\ng
@@ -275,7 +275,7 @@ group Authentication
     note left: user name\n"ssh-connection"\n"none"
 
     C <- S: SSH_MSG_USERAUTH_FAILURE
-    note right: supported autentication methods
+    note right: supported authentication methods
 
   end
 

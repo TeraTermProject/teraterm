@@ -36,7 +36,8 @@ TeraTerm Project でのリリース手順について以下に示します。
       </li>
       <li>ブランチをマージする
         <ul>
-          <li>作業中のブランチ・安定版ブランチへの cherry-pick</li>
+          <li>作業ブランチを main ブランチへマージする</li>
+          <li>作業ブランチのコミットを "安定版ブランチへマージするためのブランチ" へ cherry-pick し、安定版ブランチへマージする</li>
         </ul>
       </li>
       <li>issue をクローズする
@@ -55,25 +56,33 @@ TeraTerm Project でのリリース手順について以下に示します。
       <li>Visual Studio (「更新プログラムの確認」から更新する)</li>
       <li>Inno Setup (<a href="https://jrsoftware.org/isdl.php" target="_blank">https://jrsoftware.org/isdl.php</a>)</li>
       <li>Oniguruma (<a href="https://github.com/kkos/oniguruma/" target="_blank">https://github.com/kkos/oniguruma/</a>)</li>
-      <li>SFMT (<a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html" target="_blank">http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html</a>)</li>
+      <li>SFMT (<a href="https://www.math.sci.hiroshima-u.ac.jp/m-mat/MT/SFMT/index-jp.html" target="_blank">https://www.math.sci.hiroshima-u.ac.jp/m-mat/MT/SFMT/index-jp.html</a>)</li>
       <li>LibreSSL (<a href="https://www.libressl.org/" target="_blank">https://www.libressl.org/</a>)</li>
-      <li>zlib (<a href="https://www.zlib.net/" target="_blank">http://www.zlib.net/</a>)</li>
+      <li>zlib (<a href="https://www.zlib.net/" target="_blank">https://www.zlib.net/</a>)</li>
       <!--
-      <li>PuTTY (<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/" target="_blank">http://www.chiark.greenend.org.uk/~sgtatham/putty/</a>)</li>
+      <li>PuTTY (<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/" target="_blank">https://www.chiark.greenend.org.uk/~sgtatham/putty/</a>)</li>
       -->
       <li>The reference C implementation of Argon2 (<a href="https://github.com/P-H-C/phc-winner-argon2/" target="_blank">https://github.com/P-H-C/phc-winner-argon2/</a>)</li>
       <li>cJSON (<a href="https://github.com/DaveGamble/cJSON/" target="_blank">https://github.com/DaveGamble/cJSON/</a>)</li>
       <li>Unicode (<a href="https://www.unicode.org/versions/latest/" target="_blank">https://www.unicode.org/versions/latest/</a>)</li>
     </ul>
+    <p>リリースビルドには CI ツールを使っているため、Visual Studio の詳細バージョンはコントロールできない。どのバージョンになるかは、ビルド時点で CI ツールがどのバージョンを採用しているかに左右される。</p>
     <p>リリースに使うライブラリのバージョンはこの時点でおおむね決定する。</p>
-    <p>リリースビルドには CI ツールを使っているため、Visual Studio の詳細バージョンはコントロールできない。どのバージョンになるかは CI ツールがどのバージョンを採用するかに左右される。</p>
+    <p>安定版リリースでは、ライブラリは元になった定期リリースから更新しない。（ライブラリにセキュリティ修正がある場合は個別に検討する。）</p>
   </li>
   <li>今回のリリースに入れたいものが落ち着く</li>
 </ol>
 
-<h2 id="rc-release">RC作成とその後</h2>
+<h2 id="rc-release">RC 作成とその後</h2>
 
 <ol>
+  <li>RC 作業ブランチを作成する（main ブランチ、または安定版リリース用ブランチから）
+<pre>
+git switch main
+git pull --rebase
+git checkout -b release/5_4_0-RC
+</pre>
+  </li>
   <li>ドキュメントを確認する
     <ul>
       <li>ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。</li>
@@ -81,52 +90,6 @@ TeraTerm Project でのリリース手順について以下に示します。
       <li>変更履歴の順番を変更する。重要なものが先に来るようにする。だいたいの指針としては、ターミナルエミュレーション関係・アプリケーションとしての変更・マクロの順。</li>
       <li>ドキュメント変更点が翻訳されていることを確認し、翻訳忘れがあれば翻訳する。</li>
     </ul>
-  </li>
-  <li>バージョンをインクリメントする
-    <ul>
-      <li>
-        teraterm\common\tt-version.h<br>
-        TT_VERSION_SUBSTR を "RC" にする
-<pre>
-  #define TT_VERSION_MAJOR             5
-  #define TT_VERSION_MINOR             4
-  #define TT_VERSION_PATCH             0
-- #define TT_VERSION_SUBSTR            "dev"
-+ #define TT_VERSION_SUBSTR            "RC"
-</pre>
-        TT_VERSION_MINOR または TT_VERSION_PATCH は、前回のリリース直後にインクリメントされている。
-      </li>
-      <li>ttssh2\ttxssh\ttxssh-version.h<br>
-        TTSSH_VERSION_MINOR または TTSSH_VERSION_PATCH は、前回のリリース直後にインクリメントされている。
-      </li>
-      <li>ttpmenu\ttpmenu.rc // 変更時のみ</li>
-      <li>TTProxy\TTProxy.rc // 変更時のみ</li>
-      <li>TTXKanjiMenu\ttxkanjimenu.rc // 変更時のみ</li>
-      <li>
-        installer\teraterm.iss<br>
-        RC に変更し、アーカイブの作成も有効にします。
-<pre>
-- #define AppVer "5.4.0-dev"
-+ #define AppVer "5.4.0-RC"
-
-  [PreCompile]
-  Name: makechm.bat
-- Name: build.bat
-- ;Name: build.bat; Parameters: rebuild
-+ ;Name: build.bat
-+ Name: build.bat; Parameters: rebuild
-
-  [PostCompile]
-- ;Name: makearchive.bat; Parameters: release
-+ Name: makearchive.bat; Parameters: release
-</pre>
-      </li>
-    </ul>
-    <p>
-      CygTerm+ は例外で、リリースとは関係なくバージョンが上がる。<br />
-      修正がコミットされると即リリース扱いになり、リリース日はその日付となる。そのため、修正・バージョンのインクリメント・変更履歴を同時にコミットする。<br />
-      これはコンパイラの入手が容易なため。
-    </p>
   </li>
   <li>この年における最初のリリースの場合は、著作権表示の「最後の発行の年」をインクリメントする
     <ul>
@@ -150,27 +113,90 @@ TeraTerm Project でのリリース手順について以下に示します。
       <li>doc\ja\html\macro\index.html</li>
     </ul>
   </li>
+  <li>バージョンをインクリメントする
+    <ul>
+      <li>
+        teraterm\common\tt-version.h<br>
+        TT_VERSION_SUBSTR を "RC" にする
+<pre>
+  #define TT_VERSION_MAJOR             5
+  #define TT_VERSION_MINOR             4
+  #define TT_VERSION_PATCH             0
+- #define TT_VERSION_SUBSTR            "dev"
++ #define TT_VERSION_SUBSTR            "RC"
+  //#undef TT_VERSION_SUBSTR
+</pre>
+        TT_VERSION_MINOR または TT_VERSION_PATCH は、前回のリリース直後にインクリメントされている。
+      </li>
+      <li>ttssh2\ttxssh\ttxssh-version.h<br>
+        TTSSH_VERSION_MINOR または TTSSH_VERSION_PATCH は、前回のリリース直後にインクリメントされている。
+      </li>
+      <li>ttpmenu\ttpmenu.rc // 変更時のみ</li>
+      <li>TTProxy\TTProxy.rc // 変更時のみ</li>
+      <li>TTXKanjiMenu\ttxkanjimenu.rc // 変更時のみ</li>
+    </ul>
+  </li>
   <li>インストーラを作成する（確認用）</li>
   <li>サポートされている全 OS でインストーラの実行、起動、接続をチェックする</li>
-  <li id="RC_commit">コミット・push する</li>
-  <li>AppVeyor でビルドする
-    <p>AppVeyor の "github-main" プロジェクトを使用する。</p>
+  <li>コミット、push する</li>
+  <li>作業ブランチをマージするための <a href="https://github.com/TeraTermProject/teraterm/pulls" target="_blank">Pull Request</a> を作成する</li>
+  <li id="RC_commit">Pull Request をマージする（main ブランチ、または定期リリース用ブランチへ）</li>
+  <li><a href="https://github.com/TeraTermProject/teraterm/actions" target="_blank">GitHub Actions</a> で workflow が実行されてビルドされる<br>
+    ビルドは3回実行されます:
+    <ul>
+      <li>作業ブランチへの push</li>
+      <li>Pull Request の作成</li>
+      <li>main ブランチ、または安定版ブランチへのマージコミット</li>
+    </ul>
+    RC の作成では「マージコミットによるビルドバイナリ」を RC 成果物とします。
   </li>
   <!-- ローカルでリリースビルドする場合は、この時点で再度インストーラを作成する。コミットハッシュが変わっているため。 -->
   <li>RCの作成をアナウンスする
     <ul>
       <li>X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)</li>
+      <li>問題の報告は <a href="../about/contacts.html">ここ</a> にあるように GitHub の <a href="https://github.com/TeraTermProject/teraterm/issues" target="_blank">Issues</a> を案内する。</li>
+      <li>GitHub Actions の Artifacts は、GitHub にログインしていないとダウンロードできないことを注記する。</li>
+      <li>例: <a href="https://x.com/Tera_Term/status/1989711573842366794">5.5.1 RC</a></li>
     </ul>
   </li>
-  <li>フィードバックを受け入れる
-    <p>修正が入ったら再度「ドキュメントを確認する」「サポートされている全 OS で起動・接続チェックする」</p>
+  <li>作業ブランチを削除する</li>
+  <li>フィードバックを受け入れる<br>
+    修正が入ったら再度「ドキュメントを確認する」「サポートされている全 OS で起動・接続チェックする」
   </li>
+  <li>RC2 を出す場合は、この項目の手順を作業ブランチの作成から再度行う</li>
 </ol>
 
 <h2 id="release-operation">リリース作業</h2>
 
 <ol>
+  <li>アナウンス文面を考えておく
+    <ul>
+      <li>
+        <a href="#github_release">GitHub の Release</a> 用<br>
+        ドキュメントの変更履歴からリリースノートの概要をまとめる（日本語・英語ともに）<br>
+        ユーザに影響の大きい数項目をピックアップする<br>
+        例: <a href="https://github.com/TeraTermProject/teraterm/releases/tag/v5.5.1">5.5.1</a>
+      </li>
+      <li>
+        <a href="#X_announce">X でのアナウンス</a>用<br>
+        140文字に収まるように短くまとめる（日本語のみ）<br>
+        例: <a href="https://x.com/Tera_Term/status/1990412662459490542">5.5.1</a>
+      </li>
+    </ul>
+  </li>
+  <li>作業ブランチを作成する（main ブランチ、または安定版リリース用ブランチから）
+<pre>
+git switch main
+git pull --rebase
+git checkout -b release/5_4_0
+</pre>
+  </li>
   <li>ドキュメントを確認する (詳細は同上)</li>
+  <li>リリース日を変更する
+    <ul>
+      <li>html/about/history.html</li>
+    </ul>
+  </li>
   <li>"RC" を削除する
     <ul>
       <li>
@@ -180,21 +206,11 @@ TeraTerm Project でのリリース手順について以下に示します。
   #define TT_VERSION_MINOR             4
   #define TT_VERSION_PATCH             0
 - #define TT_VERSION_SUBSTR            "RC"
+- //#undef TT_VERSION_SUBSTR
++ //#define TT_VERSION_SUBSTR            "dev"
 + #undef TT_VERSION_SUBSTR
 </pre>
       </li>
-      <li>
-        installer\teraterm.iss<br>
-<pre>
-- #define AppVer "5.4.0-RC"
-+ #define AppVer "5.4.0"
-</pre>
-     </li>
-    </ul>
-  </li>
-  <li>リリース日を変更する
-    <ul>
-      <li>html/about/history.html</li>
     </ul>
   </li>
   <li>インストーラを作成する（確認用）
@@ -202,26 +218,39 @@ TeraTerm Project でのリリース手順について以下に示します。
       ビルド・インストーラの生成がエラーなくできることを確認する。
     </p>
   </li>
-  <li>コミットする</li>
-  <li>タグを作成し、push する
+  <li>コミット、push する <a href="#login_signpath">*</a></li>
+  <li>作業ブランチをマージするための <a href="https://github.com/TeraTermProject/teraterm/pulls" target="_blank">Pull Request</a> を作成する <a href="#login_signpath">*</a></li>
+  <li>Pull Request をマージする（main ブランチ、または定期リリース用ブランチへ） <a href="#login_signpath">*</a></li>
+  <li>タグを作成し、push する <a href="#login_signpath">*</a>
     <p>
       タグは annotated tags とする。<br/>
       タグ名は「v(バージョン)」。（例: 5.4.0ならば "v5.4.0" ）
     </p>
 <pre>
+git switch main
+git pull --rebase
 git tag -a v5.4.0 -m "Release 5.4.0"
 git push origin v5.4.0
 </pre>
   </li>
-  <li>インストーラを作成する
-    <p>AppVeyor の "github-release" プロジェクトを使用する。</p>
+  <li><a href="https://github.com/TeraTermProject/teraterm/actions" target="_blank">GitHub Actions</a> で workflow が実行されてビルドされる<br>
+    ビルドは4回実行されます:
+    <ul>
+      <li>作業ブランチへの push</li>
+      <li>Pull Request の作成</li>
+      <li>main ブランチ、または安定版ブランチへのマージコミット</li>
+      <li>タグの作成</li>
+    </ul>
+    リリースでは「タグの作成によるビルドバイナリ」をリリース成果物とします。<br>
+    <span id="login_signpath">リリース時に workflow は SignPath にコード署名をリクエストしますが、SignPath の release-signing ポリシーは手動で承認が必要です。そのため workflow は途中で署名リクエストが承認されるのを待ちます。したがって、<a href="https://about.signpath.io/" target="_blank">SignPath.io</a> にログインしておき、署名リクエストを Approve します。</span>
   </li>
   <!-- ローカルでリリースビルドする場合は、この時点で再度インストーラを作成する。コミットハッシュが変わっているため。 -->
-  <li>GitHub の Releases に追加する
+  <li>作業ブランチを削除する</li>
+  <li id="github_release">GitHub の <a href="https://github.com/TeraTermProject/teraterm/releases" target="_blank">Releases</a> に追加する
     <ul>
       <li>上で追加したタグを選択する</li>
       <li>インストーラとポータブル版の zip ファイルとハッシュファイルを追加する</li>
-      <li>ドキュメントの変更履歴からリリースノートの概要を（日本語・英語ともに）記述する</li>
+      <li>リリースノートの概要を記述する</li>
     </ul>
   </li>
   <li>ウイルス対策ソフトの検知を確認する
@@ -235,13 +264,21 @@ git push origin v5.4.0
   <li>プロジェクトWebページ (<a href="https://teratermproject.github.io" target="_blank">https://teratermproject.github.io</a>) を更新する
     <p>更新のしかたは <a href="https://github.com/TeraTermProject/teraterm/wiki/Update-Project-page" target="_blank">プロジェクトページの更新手順</a> を参照</p>
   </li>
-  <li>リリースをアナウンスする
+  <li id="X_announce">リリースをアナウンスする
     <ul>
-      <li>X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)</li>
+      <li>
+        X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)
+        <ul>
+          <li>アナウンスをポストする。</li>
+          <li>そのポストを固定する。</li>
+        </ul>
+      </li>
     </ul>
   </li>
-  <li>定期リリースの場合は、安定版ブランチを作成する
+  <li>安定版ブランチを作成する（定期リリースの場合のみ）
 <pre>
+git switch main
+git pull --rebase
 git checkout -b stable_5_4
 </pre>
   </li>
@@ -249,7 +286,12 @@ git checkout -b stable_5_4
     <p>定期リリースの場合</p>
     <ul>
       <li>
-        main ブランチで作業する。
+        main ブランチを修正する。
+<pre>
+git switch main
+git pull --rebase
+git checkout -b release/unfroze
+</pre>
         <ul>
           <li>
             teraterm/common/tt-version.h<br>
@@ -259,8 +301,10 @@ git checkout -b stable_5_4
 - #define TT_VERSION_MINOR             4
 + #define TT_VERSION_MINOR             5
   #define TT_VERSION_PATCH             0
+- //#define TT_VERSION_SUBSTR            "dev"
 - #undef TT_VERSION_SUBSTR
 + #define TT_VERSION_SUBSTR            "dev"
++ //#undef TT_VERSION_SUBSTR
 </pre>
           </li>
           <li>
@@ -274,36 +318,69 @@ git checkout -b stable_5_4
 </pre>
           </li>
           <li>
-            installer\teraterm.iss<br>
-            AppVer を「次のバージョン-dev」とする
-<pre>
-- #define AppVer "5.4.0"
-+ #define AppVer "5.5.0-dev"
-
-  [PreCompile]
-  Name: makechm.bat
-- ;Name: build.bat
-- Name: build.bat; Parameters: rebuild
-+ Name: build.bat
-+ ;Name: build.bat; Parameters: rebuild
-
-  [PostCompile]
-- Name: makearchive.bat; Parameters: release
-+ ;Name: makearchive.bat; Parameters: release
-</pre>
-          </li>
-          <li>
             doc\en/ja\html\about\history.html<br>
             次バージョンの変更履歴のひな形を追加する。
 <pre>
 &lt;h3 id="teraterm_5.5.0"&gt;YYYY.MM.DD (Ver 5.5.0 not released yet)&lt;/h3&gt;
+&lt;ul class="history"&gt;
+  &lt;!--li&gt;Changes
+    &lt;ul&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+
+  &lt;!--li&gt;Bug fixes
+    &lt;ul&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+
+  &lt;!--li&gt;Misc
+    &lt;ul&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+&lt;/ul&gt;
+
+&lt;h3 id="ttssh_3.5.0"&gt;YYYY.MM.DD (Ver 3.5.0 not released yet)&lt;/h3&gt;
+&lt;ul class="history"&gt;
+  &lt;!--li&gt;Changes
+    &lt;ul&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+
+  &lt;!--li&gt;Bug fixes
+    &lt;ul&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+
+  &lt;!--li&gt;Misc
+    &lt;ul&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+&lt;/ul&gt;
 </pre>
           </li>
-          <li>コミット、push する。</li>
+          <li>コミット、push、マージする。</li>
+          <li>作業ブランチを削除する</li>
         </ul>
       </li>
       <li>
-        安定版ブランチで作業する。
+        安定版ブランチを修正する。
+<pre>
+git switch stable_5_4
+git pull --rebase
+git checkout -b release/unfroze
+</pre>
         <ul>
           <li>
             teraterm/common/tt-version.h<br>
@@ -314,7 +391,10 @@ git checkout -b stable_5_4
 - #define TT_VERSION_PATCH             0
 - #undef TT_VERSION_SUBSTR
 + #define TT_VERSION_PATCH             1
+- //#define TT_VERSION_SUBSTR            "dev"
+- #undef TT_VERSION_SUBSTR
 + #define TT_VERSION_SUBSTR            "dev"
++ //#undef TT_VERSION_SUBSTR
 </pre>
           </li>
           <li>
@@ -328,39 +408,66 @@ git checkout -b stable_5_4
 </pre>
           </li>
           <li>
-            installer\teraterm.iss<br>
-            AppVer を「次のバージョン-dev」とする
-<pre>
-- #define AppVer "5.4.0"
-+ #define AppVer "5.4.1-dev"
-
-  [PreCompile]
-  Name: makechm.bat
-- ;Name: build.bat
-- Name: build.bat; Parameters: rebuild
-+ Name: build.bat
-+ ;Name: build.bat; Parameters: rebuild
-
-  [PostCompile]
-- Name: makearchive.bat; Parameters: release
-+ ;Name: makearchive.bat; Parameters: release
-</pre>
-          </li>
-          <li>
             doc\en/ja\html\about\history.html<br>
             次バージョンの変更履歴のひな形を追加する。
 <pre>
 &lt;h3 id="teraterm_5.4.1"&gt;YYYY.MM.DD (Ver 5.4.1 not released yet)&lt;/h3&gt;
+&lt;ul class="history"&gt;
+  &lt;!--li&gt;Changes
+    &lt;ul&gt;
+      &lt;li&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+
+  &lt;!--li&gt;Bug fixes
+    &lt;ul&gt;
+      &lt;li&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+
+  &lt;!--li&gt;Misc
+    &lt;ul&gt;
+      &lt;li&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+&lt;/ul&gt;
+
+&lt;h3 id="ttssh_3.4.1"&gt;YYYY.MM.DD (Ver 3.4.1 not released yet)&lt;/h3&gt;
+&lt;ul class="history"&gt;
+  &lt;!--li&gt;Changes
+    &lt;ul&gt;
+      &lt;li&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+
+  &lt;!--li&gt;Bug fixes
+    &lt;ul&gt;
+      &lt;li&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+
+  &lt;!--li&gt;Misc
+    &lt;ul&gt;
+      &lt;li&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+&lt;/ul&gt;
 </pre>
           </li>
-          <li>コミット、push する。</li>
+          <li>コミット、push、マージする。</li>
+          <li>作業ブランチを削除する</li>
         </ul>
       </li>
     </ul>
     <p>安定版リリースの場合</p>
     <ul>
       <li>
-        安定版ブランチで作業する。
+        安定版ブランチを修正する。
+<pre>
+git switch stable_5_4
+git pull --rebase
+git checkout -b release/unfroze
+</pre>
         <ul>
           <li>
             teraterm/common/tt-version.h<br>
@@ -371,7 +478,10 @@ git checkout -b stable_5_4
 - #define TT_VERSION_PATCH             1
 - #undef TT_VERSION_SUBSTR
 + #define TT_VERSION_PATCH             2
+- //#define TT_VERSION_SUBSTR            "dev"
+- #undef TT_VERSION_SUBSTR
 + #define TT_VERSION_SUBSTR            "dev"
++ //#undef TT_VERSION_SUBSTR
 </pre>
           </li>
           <li>
@@ -385,35 +495,92 @@ git checkout -b stable_5_4
 </pre>
           </li>
           <li>
-            installer\teraterm.iss<br>
-            安定版ブランチで、AppVer を「次のバージョン-dev」とする
-<pre>
-- #define AppVer "5.4.1"
-+ #define AppVer "5.4.2-dev"
-
-  [PreCompile]
-  Name: makechm.bat
-- ;Name: build.bat
-- Name: build.bat; Parameters: rebuild
-+ Name: build.bat
-+ ;Name: build.bat; Parameters: rebuild
-
-  [PostCompile]
-- Name: makearchive.bat; Parameters: release
-+ ;Name: makearchive.bat; Parameters: release
-</pre>
-          </li>
-          <li>
             doc\en/ja\html\about\history.html<br>
             次バージョンの変更履歴のひな形を追加する。
 <pre>
 &lt;h3 id="teraterm_5.4.2"&gt;YYYY.MM.DD (Ver 5.4.2 not released yet)&lt;/h3&gt;
+&lt;ul class="history"&gt;
+  &lt;!--li&gt;Changes
+    &lt;ul&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+
+  &lt;!--li&gt;Bug fixes
+    &lt;ul&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+
+  &lt;!--li&gt;Misc
+    &lt;ul&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+&lt;/ul&gt;
+
+&lt;h3 id="ttssh_3.4.2"&gt;YYYY.MM.DD (Ver 3.4.2 not released yet)&lt;/h3&gt;
+&lt;ul class="history"&gt;
+  &lt;!--li&gt;Changes
+    &lt;ul&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+
+  &lt;!--li&gt;Bug fixes
+    &lt;ul&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+
+  &lt;!--li&gt;Misc
+    &lt;ul&gt;
+      &lt;li&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li--&gt;
+&lt;/ul&gt;
 </pre>
           </li>
-          <li>コミット、push する。</li>
+          <li>コミット、push、マージする。</li>
+          <li>作業ブランチを削除する</li>
         </ul>
       </li>
     </ul>
+  </li>
+  <li>変更履歴を修正する（安定版リリースの場合のみ）
+    <ul>
+      <li>
+        main ブランチを修正する。
+<pre>
+git switch main
+git pull --rebase
+git checkout -b port/changelog
+</pre>
+        <ul>
+          <li>
+            doc\en/ja\html\about\history.html<br>
+            安定版リリースの変更履歴をコピーし、定期リリースの変更履歴からは削除する。
+          </li>
+          <li>コミット、push、マージする。</li>
+          <li>作業ブランチを削除する</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>GitHub の <a href="https://github.com/TeraTermProject/teraterm/milestones">Milestones</a> を調整する（定期リリースの場合のみ）
+    <ul>
+      <li>リリースしたバージョンの Milestone を close する。</li>
+      <li>次の定期リリースバージョンの Milestone （例: "5.5.0"）を作成する。</li>
+      <li>「次のリリース or later」の Milestone をリネームする。（例: "5.5.0 or later" to "5.6.0 or later"）<br>
+          ここに含まれている issue を「次のリリース」の Milestone に移動する。</li>
+    </ul>
+    安定版リリースのマイルストーンは作成しません。
   </li>
   <li>インストーラバイナリのダウンロードに関する確認をする
     <p>

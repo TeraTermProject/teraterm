@@ -29,16 +29,21 @@
 
 /* TERATERM.EXE, TEK window */
 
+#pragma once
+
+#include "tektypes.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CTEKWindow
 #include "tmfc.h"
 class CTEKWindow : public TTCFrameWnd
 {
 private:
-  TTEKVar tk;
-  HMENU MainMenu, EditMenu, WinMenu,
-    FileMenu, SetupMenu, HelpMenu;
-  LONG HelpId;
+	TTEKVar tk;
+	HMENU MainMenu, EditMenu, WinMenu,
+		FileMenu, SetupMenu, HelpMenu;
+	LONG HelpId;
+	WORD m_OldEmu;
 
 public:
 	CTEKWindow(HINSTANCE hInstance);
@@ -46,6 +51,8 @@ public:
 	void RestoreSetup();
 	void InitMenu(HMENU *Menu);
 	void InitMenuPopup(HMENU SubMenu);
+	void OnSetupPreProcess();
+	void OnSetupPostProcess(BOOL Ok);
 
 protected:
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);

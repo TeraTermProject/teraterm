@@ -30,8 +30,7 @@
 #define SSHMAC_H
 
 #include "ttxssh.h"
-
-struct SSH2Mac;
+#include "digest.h"
 
 typedef enum {
 	HMAC_NONE,      /* disabled line */
@@ -54,16 +53,40 @@ typedef enum {
 	HMAC_IMPLICIT,
 	HMAC_UNKNOWN,
 	HMAC_MAX = HMAC_UNKNOWN,
-} SSH2MacId;
+} mac_algorithm;
 
-char* get_ssh2_mac_name(const struct SSH2Mac *mac);
-char* get_ssh2_mac_name_by_id(SSH2MacId id);
-const EVP_MD* get_ssh2_mac_EVP_MD(const struct SSH2Mac *mac);
-const struct SSH2Mac *get_ssh2_mac(SSH2MacId id);
-int get_ssh2_mac_truncatebits(const struct SSH2Mac *mac);
-int get_ssh2_mac_etm(const struct SSH2Mac *mac);
+typedef struct ssh2_mac_t {
+	mac_algorithm id;
+	char *name;
+	digest_algorithm alg;
+	int truncatebits; /* truncate digest if != 0 */
+	int etm;		  /* Encrypt-then-MAC */
+} ssh2_mac_t;
+
+struct Mac;
+
+char* get_ssh2_mac_name(const struct ssh2_mac_t *mac);
+char* get_ssh2_mac_name_by_id(mac_algorithm id);
+// const EVP_MD* get_ssh2_mac_EVP_MD(const struct SSH2Mac *mac);
+const digest_algorithm get_ssh2_mac_hash_algorithm(const struct ssh2_mac_t *mac);
+const struct ssh2_mac_t *get_ssh2_mac(mac_algorithm id);
+int get_ssh2_mac_truncatebits(const struct ssh2_mac_t *mac);
+int get_ssh2_mac_etm(const struct ssh2_mac_t *mac);
 void normalize_mac_order(char *buf);
-const struct SSH2Mac *choose_SSH2_mac_algorithm(char *server_proposal, char *my_proposal);
+const struct ssh2_mac_t *choose_SSH2_mac_algorithm(char *server_proposal, char *my_proposal);
 void SSH2_update_hmac_myproposal(PTInstVar pvar);
+
+/*
+ * Import from OpenSSH 7.9p1
+ * $OpenBSD: mac.h,v 1.10 2016/07/08 03:44:42 djm Exp $
+ */
+
+int mac_setup_by_alg(struct Mac *mac, const struct ssh2_mac_t *macalg);
+int mac_init(struct Mac *);
+int mac_compute(struct Mac *, u_int32_t, const u_char *, int,
+    u_char *, size_t);
+int mac_check(struct Mac *, u_int32_t, const u_char *, size_t,
+    const u_char *, size_t);
+void mac_clear(struct Mac *);
 
 #endif /* SSHCMAC_H */

@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// âpåÍ (ïƒçë) resources
+// Ëã±Ë™û (Á±≥ÂõΩ) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -62,20 +62,18 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,42,240,10
     CONTROL         "List &hidden fonts in font dialog",IDC_LIST_HIDDEN_FONTS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,59,234,10
-    LTEXT           "Use the link below to open the Fonts folder and view font visibility",IDC_FONT_FOLDER_LABEL,19,76,320,8
-    LTEXT           "??????",IDC_FONT_FOLDER,28,91,99,8,WS_TABSTOP
+    LTEXT           "Open Font Settings/Font Folder (%s)",IDC_FONT_FOLDER,19,76,320,8
     CONTROL         "Dra&wing resized font to fit cell width",IDC_RESIZED_FONT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,112,178,10
     LTEXT           "API for drawing",IDC_VTFONT_TITLE,7,130,123,8
-    CONTROL         "&Unicode API",IDC_VTFONT_UNICODE,"Button",BS_AUTORADIOBUTTON,19,144,93,10
-    CONTROL         "&ANSI API",IDC_VTFONT_ANSI,"Button",BS_AUTORADIOBUTTON,19,162,88,10
-    LTEXT           "&Code page for display character conversion",IDC_VTFONT_CODEPAGE_LABEL,31,177,131,8
-    EDITTEXT        IDC_VTFONT_CODEPAGE_EDIT,32,188,40,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "character space",IDC_CHARACTER_SPACE_TITLE,199,114,115,8
-    EDITTEXT        IDC_SPACE_TOP,233,134,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
-    EDITTEXT        IDC_SPACE_BOTTOM,233,183,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
-    EDITTEXT        IDC_SPACE_LEFT,201,158,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
-    EDITTEXT        IDC_SPACE_RIGHT,267,158,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
+    COMBOBOX        IDC_VTFONT_COMBO,19,141,106,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Code page for character conversion(Auto when 0, %d)",IDC_VTFONT_CODEPAGE_LABEL,19,158,199,8
+    EDITTEXT        IDC_VTFONT_CODEPAGE_EDIT,19,171,40,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "character space",IDC_CHARACTER_SPACE_TITLE,220,114,115,8
+    EDITTEXT        IDC_SPACE_TOP,254,134,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
+    EDITTEXT        IDC_SPACE_BOTTOM,254,183,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
+    EDITTEXT        IDC_SPACE_LEFT,222,158,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
+    EDITTEXT        IDC_SPACE_RIGHT,288,158,40,14,ES_AUTOHSCROLL,WS_EX_RIGHT
 END
 
 
@@ -110,7 +108,7 @@ BEGIN
     0
 END
 
-#endif    // âpåÍ (ïƒçë) resources
+#endif    // Ëã±Ë™û (Á±≥ÂõΩ) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

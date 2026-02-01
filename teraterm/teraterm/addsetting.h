@@ -46,8 +46,6 @@ extern const mouse_cursor_t MouseCursor[];
 class CAddSettingPropSheetDlg: public TTCPropSheetDlg
 {
 public:
-	CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd);
-	~CAddSettingPropSheetDlg();
 	enum Page {
 		DefaultPage,
 		CodingPage,
@@ -58,8 +56,12 @@ public:
 		TermPage,
 		WinPage,
 		SerialPortPage,
+		TekWinPage,
+		TekFontPage
 	};
-	void SetStartPage(Page page);
+
+	CAddSettingPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd, Page StartPage);
+	~CAddSettingPropSheetDlg();
 
 private:
 	int m_PageCountCPP;
@@ -81,6 +83,8 @@ typedef enum {
 	TermPage,
 	WinPage,
 	SerialPortPage,
+	TekWinPage,
+	TekFontPage,
 } CAddSettingPropSheetDlgPage;
 
 typedef enum {

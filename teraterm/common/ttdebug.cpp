@@ -40,10 +40,10 @@
 #include "ttlib.h"
 
 /**
- *	ƒRƒ“ƒ\[ƒ‹ƒEƒBƒ“ƒhƒE‚ğ•\¦‚·‚éƒfƒoƒO—p
- *		ƒfƒoƒO—p‚É–„‚ß‚ñ‚¾printf()Œn‚ğ•\¦‚·‚é‚±‚Æ‚ª‚Å‚«‚é‚æ‚¤‚É‚È‚é
+ *	ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’è¡¨ç¤ºã™ã‚‹ãƒ‡ãƒã‚°ç”¨
+ *		ãƒ‡ãƒã‚°ç”¨ã«åŸ‹ã‚è¾¼ã‚“ã printf()ç³»ã‚’è¡¨ç¤ºã™ã‚‹ã“ã¨ãŒã§ãã‚‹ã‚ˆã†ã«ãªã‚‹
  *
- *	@retval	ƒRƒ“ƒ\[ƒ‹‚ÌWindow Handle
+ *	@retval	ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ã®Window Handle
  */
 HWND DebugConsoleOpen(void)
 {
@@ -56,7 +56,7 @@ HWND DebugConsoleOpen(void)
 	freopen_s(&fp, "CONOUT$", "w", stdout);
 	freopen_s(&fp, "CONOUT$", "w", stderr);
 
-	// •Â‚¶‚éƒ{ƒ^ƒ“‚ğ–³Œø‰»
+	// é–‰ã˜ã‚‹ãƒœã‚¿ãƒ³ã‚’ç„¡åŠ¹åŒ–
 	hWnd = pGetConsoleWindow();
 	HMENU hmenu = GetSystemMenu(hWnd, FALSE);
 	RemoveMenu(hmenu, SC_CLOSE, MF_BYCOMMAND);
@@ -65,12 +65,12 @@ HWND DebugConsoleOpen(void)
 }
 
 //
-// —áŠOƒnƒ“ƒhƒ‰‚ÌƒtƒbƒNiƒXƒ^ƒbƒNƒgƒŒ[ƒX‚Ìƒ_ƒ“ƒvj
+// ä¾‹å¤–ãƒãƒ³ãƒ‰ãƒ©ã®ãƒ•ãƒƒã‚¯ï¼ˆã‚¹ã‚¿ãƒƒã‚¯ãƒˆãƒ¬ãƒ¼ã‚¹ã®ãƒ€ãƒ³ãƒ—ï¼‰
 //
 // cf. http://svn.collab.net/repos/svn/trunk/subversion/libsvn_subr/win32_crashrpt.c
 // (2007.9.30 yutaka)
 //
-// —áŠOƒR[ƒh‚ğ•¶š—ñ‚Ö•ÏŠ·‚·‚é
+// ä¾‹å¤–ã‚³ãƒ¼ãƒ‰ã‚’æ–‡å­—åˆ—ã¸å¤‰æ›ã™ã‚‹
 #if defined(_M_IX86)	// WIN32
 static const char *GetExceptionString(DWORD exception)
 {
@@ -110,7 +110,7 @@ static const char *GetExceptionString(DWORD exception)
 #undef EXCEPTION
 }
 
-/* —áŠO”­¶‚ÉŠÖ”‚ÌŒÄ‚Ño‚µ—š—ğ‚ğ•\¦‚·‚éA—áŠOƒtƒBƒ‹ƒ^ŠÖ” */
+/* ä¾‹å¤–ç™ºç”Ÿæ™‚ã«é–¢æ•°ã®å‘¼ã³å‡ºã—å±¥æ­´ã‚’è¡¨ç¤ºã™ã‚‹ã€ä¾‹å¤–ãƒ•ã‚£ãƒ«ã‚¿é–¢æ•° */
 static void CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 {
 	HGLOBAL gptr;
@@ -129,7 +129,7 @@ static void CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 		goto error;
 	}
 
-	/* ƒVƒ“ƒ{ƒ‹î•ñŠi”[—pƒoƒbƒtƒ@‚Ì‰Šú‰» */
+	/* ã‚·ãƒ³ãƒœãƒ«æƒ…å ±æ ¼ç´ç”¨ãƒãƒƒãƒ•ã‚¡ã®åˆæœŸåŒ– */
 	gptr = GlobalAlloc(GMEM_FIXED, 10000);
 	if (gptr == NULL) {
 		goto error;
@@ -139,7 +139,7 @@ static void CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 	pSym->SizeOfStruct = 10000;
 	pSym->MaxNameLength = 10000 - sizeof(IMAGEHLP_SYMBOL);
 
-	/* ƒXƒ^ƒbƒNƒtƒŒ[ƒ€‚Ì‰Šú‰» */
+	/* ã‚¹ã‚¿ãƒƒã‚¯ãƒ•ãƒ¬ãƒ¼ãƒ ã®åˆæœŸåŒ– */
 	ZeroMemory(&sf, sizeof(sf));
 	sf.AddrPC.Offset = ExInfo->ContextRecord->Eip;
 	sf.AddrStack.Offset = ExInfo->ContextRecord->Esp;
@@ -148,10 +148,10 @@ static void CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 	sf.AddrStack.Mode = AddrModeFlat;
 	sf.AddrFrame.Mode = AddrModeFlat;
 
-	/* ƒVƒ“ƒ{ƒ‹ƒnƒ“ƒhƒ‰‚Ì‰Šú‰» */
+	/* ã‚·ãƒ³ãƒœãƒ«ãƒãƒ³ãƒ‰ãƒ©ã®åˆæœŸåŒ– */
 	SymInitialize(hProcess, NULL, TRUE);
 
-	// ƒŒƒWƒXƒ^ƒ_ƒ“ƒv
+	// ãƒ¬ã‚¸ã‚¹ã‚¿ãƒ€ãƒ³ãƒ—
 	msg[0] = '\0';
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "eax=%08X ebx=%08X ecx=%08X edx=%08X esi=%08X edi=%08X\r\n"
 		   "ebp=%08X esp=%08X eip=%08X efl=%08X\r\n"
@@ -180,10 +180,10 @@ static void CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 		strncat_s(msg, sizeof(msg), buf, _TRUNCATE);
 	}
 
-	/* ƒXƒ^ƒbƒNƒtƒŒ[ƒ€‚ğ‡‚É•\¦‚µ‚Ä‚¢‚­ */
+	/* ã‚¹ã‚¿ãƒƒã‚¯ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’é †ã«è¡¨ç¤ºã—ã¦ã„ã */
 	frame = 0;
 	for (;;) {
-		/* Ÿ‚ÌƒXƒ^ƒbƒNƒtƒŒ[ƒ€‚Ìæ“¾ */
+		/* æ¬¡ã®ã‚¹ã‚¿ãƒƒã‚¯ãƒ•ãƒ¬ãƒ¼ãƒ ã®å–å¾— */
 		bResult = StackWalk(
 			IMAGE_FILE_MACHINE_I386,
 			hProcess,
@@ -195,16 +195,16 @@ static void CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 			SymGetModuleBase,
 			NULL);
 
-		/* ¸”s‚È‚ç‚ÎAƒ‹[ƒv‚ğ”²‚¯‚é */
+		/* å¤±æ•—ãªã‚‰ã°ã€ãƒ«ãƒ¼ãƒ—ã‚’æŠœã‘ã‚‹ */
 		if (!bResult || sf.AddrFrame.Offset == 0)
 			break;
 
 		frame++;
 
-		/* ƒvƒƒOƒ‰ƒ€ƒJƒEƒ“ƒ^i‰¼‘zƒAƒhƒŒƒXj‚©‚çŠÖ”–¼‚ÆƒIƒtƒZƒbƒg‚ğæ“¾ */
+		/* ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚«ã‚¦ãƒ³ã‚¿ï¼ˆä»®æƒ³ã‚¢ãƒ‰ãƒ¬ã‚¹ï¼‰ã‹ã‚‰é–¢æ•°åã¨ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’å–å¾— */
 		bResult = SymGetSymFromAddr(hProcess, sf.AddrPC.Offset, &Disp, pSym);
 
-		/* æ“¾Œ‹‰Ê‚ğ•\¦ */
+		/* å–å¾—çµæœã‚’è¡¨ç¤º */
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "#%d  0x%08x in ", frame, sf.AddrPC.Offset);
 		strncat_s(msg, sizeof(msg), buf, _TRUNCATE);
 		if (bResult) {
@@ -215,7 +215,7 @@ static void CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 			strncat_s(msg, sizeof(msg), buf, _TRUNCATE);
 		}
 
-		// Àsƒtƒ@ƒCƒ‹–¼‚Ìæ“¾
+		// å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«åã®å–å¾—
 		ZeroMemory( &(ih_module), sizeof(ih_module) );
 		ih_module.SizeOfStruct = sizeof(ih_module);
 		bResult = SymGetModuleInfo( hProcess, sf.AddrPC.Offset, &(ih_module) );
@@ -228,7 +228,7 @@ static void CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 			strncat_s(msg, sizeof(msg), buf, _TRUNCATE);
 		}
 
-		// ƒtƒ@ƒCƒ‹–¼‚Æs”Ô†‚Ìæ“¾
+		// ãƒ•ã‚¡ã‚¤ãƒ«åã¨è¡Œç•ªå·ã®å–å¾—
 		ZeroMemory( &(ih_line), sizeof(ih_line) );
 		ih_line.SizeOfStruct = sizeof(ih_line);
 		bResult = pSymGetLineFromAddr( hProcess, sf.AddrPC.Offset, &Disp, &ih_line );
@@ -241,12 +241,12 @@ static void CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 		strncat_s(msg, sizeof(msg), "\n", _TRUNCATE);
 	}
 
-	/* Œãˆ— */
+	/* å¾Œå‡¦ç† */
 	SymCleanup(hProcess);
 	GlobalUnlock(pSym);
 	GlobalFree(pSym);
 
-	// —áŠOˆ—’†‚È‚Ì‚ÅAAPI‚ğ’¼ÚŒÄ‚Ño‚·
+	// ä¾‹å¤–å‡¦ç†ä¸­ãªã®ã§ã€APIã‚’ç›´æ¥å‘¼ã³å‡ºã™
 	::MessageBoxA(NULL, msg, "Tera Term: Application fault", MB_OK | MB_ICONEXCLAMATION);
 
 error:
@@ -268,8 +268,18 @@ static wchar_t *CreateDumpFilename()
 #else
 	char *version = _strdup("unknown");
 #endif
+#if defined(_M_IX86)
+	const char *platform = "x86";
+#elif defined(_M_X64)
+	const char *platform = "x64";
+#elif defined(_M_ARM64)
+	const char *platform = "arm64";
+#else
+	const char *platform = "unknown";
+#endif
 	wchar_t *dump_file;
-	aswprintf(&dump_file, L"teraterm_%04u%02u%02u-%02u%02u%02u_%hs.dmp",
+	aswprintf(&dump_file, L"teraterm_%hs_%04u%02u%02u-%02u%02u%02u_%hs.dmp",
+			  platform,
 			  local_time.wYear, local_time.wMonth, local_time.wDay,
 			  local_time.wHour, local_time.wMinute, local_time.wSecond,
 			  version);
@@ -278,12 +288,12 @@ static wchar_t *CreateDumpFilename()
 }
 
 /**
- *  ƒ~ƒjƒ_ƒ“ƒvƒtƒ@ƒCƒ‹‚ğo—Í
+ *  ãƒŸãƒ‹ãƒ€ãƒ³ãƒ—ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‡ºåŠ›
  */
 static bool DumpMiniDump(const wchar_t *filename, struct _EXCEPTION_POINTERS* pExceptionPointers)
 {
 	if (pMiniDumpWriteDump == NULL) {
-		// MiniDumpWriteDump() ‚ªƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚È‚¢BXP‚æ‚è‘O
+		// MiniDumpWriteDump() ãŒã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ãªã„ã€‚XPã‚ˆã‚Šå‰
 		return false;
 	}
 
@@ -314,14 +324,15 @@ static BOOL DumpFile = TRUE;
 
 static LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS* pExceptionPointers)
 {
+	bool dumped = false;
 	if (DumpFile) {
 		wchar_t *dumpfile = NULL;
 		wchar_t *fname = CreateDumpFilename();
 		wchar_t *logdir = GetLogDirW(NULL);
 		aswprintf(&dumpfile, L"%s\\%s", logdir, fname);
 
-		bool r = DumpMiniDump(dumpfile, pExceptionPointers);
-		if (r) {
+		dumped = DumpMiniDump(dumpfile, pExceptionPointers);
+		if (dumped) {
 			const wchar_t *msg_base =
 				L"minidump '%s'\r\n"
 				L" refer to https://teratermproject.github.io/manual/5/ja/reference/develop.html";
@@ -335,11 +346,13 @@ static LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS* pExceptionPointer
 	}
 
 #if defined(_M_IX86)
-	ApplicationFaultHandler(pExceptionPointers);
+	if (!dumped) {
+		ApplicationFaultHandler(pExceptionPointers);
+	}
 #endif
 
-//	return EXCEPTION_EXECUTE_HANDLER;  /* ‚»‚Ì‚Ü‚ÜƒvƒƒZƒX‚ğI—¹‚³‚¹‚é */
-	return EXCEPTION_CONTINUE_SEARCH;  /* ˆø‚«‘±‚«mƒAƒvƒŠƒP[ƒVƒ‡ƒ“ƒGƒ‰[nƒ|ƒbƒvƒAƒbƒvƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚ğŒÄ‚Ño‚· */
+//	return EXCEPTION_EXECUTE_HANDLER;  /* ãã®ã¾ã¾ãƒ—ãƒ­ã‚»ã‚¹ã‚’çµ‚äº†ã•ã›ã‚‹ */
+	return EXCEPTION_CONTINUE_SEARCH;  /* å¼•ãç¶šãï¼»ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‚¨ãƒ©ãƒ¼ï¼½ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒœãƒƒã‚¯ã‚¹ã‚’å‘¼ã³å‡ºã™ */
 }
 
 void DebugTestCrash(void)
@@ -357,12 +370,12 @@ static void InvalidParameterHandler(const wchar_t* /*expression*/,
 }
 
 /**
- *  —áŠOƒnƒ“ƒhƒ‰‚ÌƒtƒbƒN
+ *  ä¾‹å¤–ãƒãƒ³ãƒ‰ãƒ©ã®ãƒ•ãƒƒã‚¯
  */
 void DebugSetException(void)
 {
 	SetUnhandledExceptionFilter(ExceptionFilter);
 
-	// Cƒ‰ƒ“ƒ^ƒCƒ€–³Œø‚Èƒpƒ‰ƒ[ƒ^ƒGƒ‰[ƒnƒ“ƒhƒ‰
+	// Cãƒ©ãƒ³ã‚¿ã‚¤ãƒ ç„¡åŠ¹ãªãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚¨ãƒ©ãƒ¼ãƒãƒ³ãƒ‰ãƒ©
 	_set_invalid_parameter_handler(InvalidParameterHandler);
 }

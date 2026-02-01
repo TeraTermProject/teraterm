@@ -644,6 +644,12 @@
 		<td>If value is "", program uses "Download folder."</td>
 	</tr>
 	<tr>
+		<td id="FileReceiveFilter"><a href="teraterm-trans.html#FileReceiveFilter">FileReceiveFilter</a></td>
+		<td style="width:250px;"></td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
 		<td id="FileSendFilter"><a href="teraterm-trans.html#filter">FileSendFilter</a></td>
 		<td style="width:250px;"></td>
 		<td style="width:250px;">&lt;-</td>
@@ -664,6 +670,18 @@
 	<tr>
 		<td id="FlowCtrl"><a href="../menu/setup-additional-serialport.html#Speed">FlowCtrl</a></td>
 		<td style="width:250px;">none</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="FlowCtrlDTR"><a href="../menu/setup-additional-serialport.html#FlowCtrlDTR">FlowCtrlDTR</a></td>
+		<td style="width:250px;">1</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="FlowCtrlRTS"><a href="../menu/setup-additional-serialport.html#FlowCtrlRTS">FlowCtrlRTS</a></td>
+		<td style="width:250px;">1</td>
 		<td style="width:250px;">&lt;-</td>
 		<td></td>
 	</tr>
@@ -801,9 +819,9 @@
 	</tr>
 	<tr>
 		<td id="Language">Language</td>
-		<td style="width:250px;">*</td>
-		<td style="width:250px;">English</td>
-		<td>* by the installer</td>
+		<td style="width:250px;"></td>
+		<td style="width:250px;"></td>
+		<td>not used</td>
 	</tr>
 	<tr>
 		<td id="LocalEcho"><a href="../menu/setup-additional-terminal.html#LocalEcho">LocalEcho</a></td>
@@ -1078,6 +1096,18 @@
 	<tr>
 		<td id="QVWinSize"><a href="teraterm-trans.html#qvwinsize">QVWinSize</a></td>
 		<td style="width:250px;">8</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="ReceivefileSkipOptionDialog"><a href="../setup/teraterm-trans.html#ReceivefileSkipOptionDialog">ReceivefileSkipOptionDialog</a></td>
+		<td style="width:250px;">off</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="ReceivefileAutoStopWaitTime"><a href="../menu/file-receivefile.html#ReceivefileAutoStopWaitTime">ReceivefileAutoStopWaitTime</a></td>
+		<td style="width:250px;">5</td>
 		<td style="width:250px;">&lt;-</td>
 		<td></td>
 	</tr>
@@ -1376,6 +1406,24 @@
 		<td>* by the installer</td>
 	</tr>
 	<tr>
+		<td id="UnicodeAmbiguousWidth"><a href="../menu/setup-additional-coding.html#AmbiguousCharactersWidth">UnicodeAmbiguousWidth</a></td>
+		<td style="width:250px;">2</td>
+		<td style="width:250px;">2</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="UnicodeEmojiOverride"><a href="../menu/setup-additional-coding.html#UnicodeEmojiOverride">UnicodeEmojiOverride</a></td>
+		<td style="width:250px;">off</td>
+		<td style="width:250px;">on</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="UnicodeEmojiWidth"><a href="../menu/setup-additional-coding.html#UnicodeEmojiOverride">UnicodeEmojiWidth</a></td>
+		<td style="width:250px;">2</td>
+		<td style="width:250px;">2</td>
+		<td></td>
+	</tr>
+	<tr>
 		<td id="UnicodeToDecSpMapping"><a href="teraterm-term.html#UnicodeDecSpMapping">UnicodeToDecSpMapping</a></td>
 		<td style="width:250px;">3</td>
 		<td style="width:250px;">&lt;-</td>
@@ -1462,6 +1510,18 @@
 	<tr>
 		<td id="VTCompatTab"><a href="teraterm-term.html#vttab">VTCompatTab</a></td>
 		<td style="width:250px;">off</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="VTDrawACP"><a href="../menu/setup-additional-font.html#DrawAPI">VTDrawACP</a></td>
+		<td style="width:250px;">0</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="VTDrawAPI"><a href="../menu/setup-additional-font.html#DrawAPI">VTDrawAPI</a></td>
+		<td style="width:250px;">Auto</td>
 		<td style="width:250px;">&lt;-</td>
 		<td></td>
 	</tr>
@@ -1651,7 +1711,7 @@
 		<th>Note</th>
 	</tr>
 	<tr>
-		<td id="AuthBanner">AuthBanner</td>
+		<td id="AuthBanner"><a href="teraterm-ssh.html#AuthBanner">AuthBanner</a></td>
 		<td style="width:250px;">3</td>
 		<td style="width:250px;">&lt;-</td>
 		<td></td>
@@ -1723,7 +1783,7 @@
 		<td></td>
 	</tr>
 	<tr>
-		<td id="DisablePopupMessage">DisablePopupMessage</td>
+		<td id="DisablePopupMessage"><a href="teraterm-ssh.html#DisablePopupMessage">DisablePopupMessage</a></td>
 		<td style="width:250px;">0</td>
 		<td style="width:250px;">&lt;-</td>
 		<td></td>
@@ -1753,7 +1813,7 @@
 		<td></td>
 	</tr>
 	<tr>
-		<td id="GexMinimalGroupSize">GexMinimalGroupSize</td>
+		<td id="GexMinimalGroupSize"><a href="teraterm-ssh.html#GexMinimalGroupSize">GexMinimalGroupSize</a></td>
 		<td style="width:250px;">0</td>
 		<td style="width:250px;">&lt;-</td>
 		<td></td>
@@ -1783,7 +1843,7 @@
 		<td></td>
 	</tr>
 	<tr>
-		<td id="LogLevel">LogLevel</td>
+		<td id="LogLevel"><a href="teraterm-ssh.html#LogLevel">LogLevel</a></td>
 		<td style="width:250px;">0</td>
 		<td style="width:250px;">&lt;-</td>
 		<td></td>
@@ -1791,6 +1851,12 @@
 	<tr>
 		<td id="MacOrder"><a href="../menu/setup-ssh.html#MacOrder">MacOrder</a></td>
 		<td style="width:250px;">@?:861&gt;5;20&lt;=34</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="MaxChannel"><a href="teraterm-ssh.html#MaxChannel">MaxChannel</a></td>
+		<td style="width:250px;">100</td>
 		<td style="width:250px;">&lt;-</td>
 		<td></td>
 	</tr>
@@ -1837,7 +1903,7 @@
 		<td></td>
 	</tr>
 	<tr>
-		<td id="X11Display">X11Display</td>
+		<td id="X11Display"><a href="teraterm-ssh.html#X11Display">X11Display</a></td>
 		<td style="width:250px;"></td>
 		<td style="width:250px;">&lt;-</td>
 		<td></td>

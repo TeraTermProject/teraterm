@@ -31,12 +31,12 @@
 #include "tt-version.h"
 
 #define TTPMENU_VERSION_MAJOR             1
-#define TTPMENU_VERSION_MINOR             20
+#define TTPMENU_VERSION_MINOR             21
 #define TTPMENU_VERSION_STR(sep)          TT_TOSTR(TTPMENU_VERSION_MAJOR) sep TT_TOSTR(TTPMENU_VERSION_MINOR)
 #define TTPMENU_RES_VERSION_STR           TTPMENU_VERSION_STR(", ") ", 0, 0"
 
 // TTPMENU_RES_PRODUCT_VERSION_STR
-//	リソースファイル(rcファイル) ProductVersion 用
+//	繝ｪ繧ｽ繝ｼ繧ｹ繝輔ぃ繧､繝ｫ(rc繝輔ぃ繧､繝ｫ) ProductVersion 逕ｨ
 #if defined(TT_VERSION_SUBSTR_HASH)
 #define TTPMENU_RES_PRODUCT_VERSION_STR \
 	TTPMENU_VERSION_STR(".") " " TT_VERSION_SUBSTR_HASH

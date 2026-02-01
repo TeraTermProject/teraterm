@@ -101,20 +101,20 @@ static size_t CopySzOrOrd(const WORD *src, WORD *dest)
 {
 	size_t size;
 	if (*src == 0x0000) {
-		// 0x0000 ‚Ì‚Æ‚«A‚È‚É‚à‚È‚¢
+		// 0x0000 ã®ã¨ãã€ãªã«ã‚‚ãªã„
 		if (dest != NULL) {
 			*dest = *src;
 		}
 		size = 1;
 	} else if (*src == 0xffff) {
-		// 0xffff ‚Ì‚Æ‚«A1WORD‚Ìƒf[ƒ^
+		// 0xffff ã®ã¨ãã€1WORDã®ãƒ‡ãƒ¼ã‚¿
 		if (dest != NULL) {
 			*dest++ = *src++;
 			*dest++ = *src++;
 		}
 		size = 2;
 	} else {
-		// ˆÈŠO‚Íwchar_t‚Ì•¶š—ñ
+		// ä»¥å¤–ã¯wchar_tã®æ–‡å­—åˆ—
 		return CopySz(src, dest);
 	}
 	return size;
@@ -155,10 +155,10 @@ static size_t CopyDlgItem(const WORD *src, WORD *dest)
 }
 
 /**
- *	drc		ƒ_ƒCƒAƒƒOƒŠƒ\[ƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *	dest	ƒRƒs[æ(NULL‚Ì‚Æ‚«ƒRƒs[‚µ‚È‚¢)
- *	logfont	İ’è‚·‚éƒtƒHƒ“ƒgî•ñ(‚½‚¾‚µAdest_v‚ªNULL‚Ì‚Íæ“¾)
- *			NULL‚Ì‚Æ‚«İ’è,æ“¾‚µ‚È‚¢
+ *	drc		ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒªã‚½ãƒ¼ã‚¹ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *	dest	ã‚³ãƒ”ãƒ¼å…ˆ(NULLã®ã¨ãã‚³ãƒ”ãƒ¼ã—ãªã„)
+ *	logfont	è¨­å®šã™ã‚‹ãƒ•ã‚©ãƒ³ãƒˆæƒ…å ±(ãŸã ã—ã€dest_vãŒNULLã®æ™‚ã¯å–å¾—)
+ *			NULLã®ã¨ãè¨­å®š,å–å¾—ã—ãªã„
  */
 static size_t CopyDlgTemplate(
 	const WORD *src_v,
@@ -188,7 +188,7 @@ static size_t CopyDlgTemplate(
 	size_t dsize = 0;
 	if (dlg->style & DS_SETFONT) {
 		if (dest == NULL) {
-			// æ“¾
+			// å–å¾—
 			if (logfont != NULL) {
 				memset(logfont, 0, sizeof(*logfont));
 				logfont->lfHeight = *src++;
@@ -199,7 +199,7 @@ static size_t CopyDlgTemplate(
 			}
 			size += t + 1;
 		} else {
-			// ƒZƒbƒg
+			// ã‚»ãƒƒãƒˆ
 			if (logfont != NULL) {
 				*dest++ = (WORD)logfont->lfHeight;
 				src += 1;
@@ -268,10 +268,10 @@ static size_t CopyDlgItemEx(const WORD *src, WORD *dest)
 }
 
 /**
- *	drc_v	ƒ_ƒCƒAƒƒOƒŠƒ\[ƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *	dest_v	ƒRƒs[æ(NULL‚Ì‚Æ‚«ƒRƒs[‚µ‚È‚¢)
- *	logfont	İ’è‚·‚éƒtƒHƒ“ƒgî•ñ(‚½‚¾‚µAdest_v‚ªNULL‚Ì‚Íæ“¾)
- *			NULL‚Ì‚Æ‚«İ’è,æ“¾‚µ‚È‚¢
+ *	drc_v	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒªã‚½ãƒ¼ã‚¹ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *	dest_v	ã‚³ãƒ”ãƒ¼å…ˆ(NULLã®ã¨ãã‚³ãƒ”ãƒ¼ã—ãªã„)
+ *	logfont	è¨­å®šã™ã‚‹ãƒ•ã‚©ãƒ³ãƒˆæƒ…å ±(ãŸã ã—ã€dest_vãŒNULLã®æ™‚ã¯å–å¾—)
+ *			NULLã®ã¨ãè¨­å®š,å–å¾—ã—ãªã„
  */
 static size_t CopyDlgTemplateEx(
 	const DLGTEMPLATE *src_v,
@@ -305,7 +305,7 @@ static size_t CopyDlgTemplateEx(
 	size_t dsize = 0;
 	if (dlg->style & DS_SETFONT) {
 		if (dest == NULL) {
-			// æ“¾
+			// å–å¾—
 			if (logfont != NULL) {
 				memset(logfont, 0, sizeof(*logfont));
 				logfont->lfHeight = *src++;
@@ -322,7 +322,7 @@ static size_t CopyDlgTemplateEx(
 			}
 			size += t + 3;
 		} else {
-			// ƒZƒbƒg
+			// ã‚»ãƒƒãƒˆ
 			if (logfont != NULL) {
 				*dest++ = (WORD)logfont->lfHeight;
 				*dest++ = (WORD)logfont->lfWeight;
@@ -381,7 +381,7 @@ static DLGTEMPLATE *GetDlgTemplate(
 		int size_namediff =
 			(int)wcslen(FontFaceName) - (int)wcslen(logfont.lfFaceName);
 		size_namediff *= sizeof(WCHAR);
-		size_namediff += 3;		// ƒeƒLƒXƒgAƒtƒHƒ“ƒg–¼’·‚Åalign‚ª•Ï‰»‚·‚é
+		size_namediff += 3;		// ãƒ†ã‚­ã‚¹ãƒˆã€ãƒ•ã‚©ãƒ³ãƒˆåé•·ã§alignãŒå¤‰åŒ–ã™ã‚‹
 		size_t new_size_forcast = prev_size + size_namediff;
 		new_size_forcast = (new_size_forcast + 3) & ~3;
 		dest = (DLGTEMPLATE *)malloc(new_size_forcast);
@@ -429,8 +429,8 @@ static LONG FontHeight;
 static BYTE FontCharSet;
 
 /**
- *	ƒ_ƒCƒAƒƒO‚ÌƒtƒHƒ“ƒg‚ğİ’è‚·‚é
- *	height‚Ì’PˆÊ‚Íƒ|ƒCƒ“ƒg
+ *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ•ã‚©ãƒ³ãƒˆã‚’è¨­å®šã™ã‚‹
+ *	heightã®å˜ä½ã¯ãƒã‚¤ãƒ³ãƒˆ
  */
 void TTSetDlgFontW(const wchar_t *face, int height, int charset)
 {
@@ -445,8 +445,8 @@ void TTSetDlgFontW(const wchar_t *face, int height, int charset)
 }
 
 /**
- *	ƒ_ƒCƒAƒƒO‚ÌƒtƒHƒ“ƒg‚ğİ’è‚·‚é
- *	height‚Ì’PˆÊ‚Íƒ|ƒCƒ“ƒg
+ *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ•ã‚©ãƒ³ãƒˆã‚’è¨­å®šã™ã‚‹
+ *	heightã®å˜ä½ã¯ãƒã‚¤ãƒ³ãƒˆ
  */
 void TTSetDlgFontA(const char *face, int height, int charset)
 {
@@ -483,9 +483,9 @@ DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCWSTR lpTemplateName)
 }
 
 /*
- *	ƒ_ƒCƒAƒƒOƒeƒ“ƒvƒŒ[ƒg‚ÌƒNƒ‰ƒX–¼æ“¾
- *	@retval		ƒNƒ‰ƒX•¶š—ñ
- *	@retval		NULL ƒNƒ‰ƒX‚È‚µ
+ *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®ã‚¯ãƒ©ã‚¹åå–å¾—
+ *	@retval		ã‚¯ãƒ©ã‚¹æ–‡å­—åˆ—
+ *	@retval		NULL ã‚¯ãƒ©ã‚¹ãªã—
  */
 const wchar_t *TTGetClassName(const DLGTEMPLATE *DlgTempl)
 {

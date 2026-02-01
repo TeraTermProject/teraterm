@@ -26,7 +26,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ttwinman.h"
 #include "color_sample.h"
 
 typedef struct ColorSampleTag {
@@ -40,14 +39,14 @@ typedef struct ColorSampleTag {
 
 static LRESULT CALLBACK CSProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	ColorSampleWork *work = (ColorSampleWork *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	ColorSampleWork *work = (ColorSampleWork *)GetWindowLongPtrW(hWnd, GWLP_USERDATA);
 	LRESULT Result;
 
 	switch (msg) {
 	case WM_PAINT: {
 		int i, x, y;
 		int DX[3];
-		TEXTMETRIC Metrics;
+		TEXTMETRICA Metrics;
 		RECT TestRect;
 		int FW, FH;
 
@@ -58,7 +57,7 @@ static LRESULT CALLBACK CSProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 		SetTextColor(hDC, work->fore_color);
 		SetBkColor(hDC, work->back_color);
 		SelectObject(hDC, work->SampleFont);
-		GetTextMetrics(hDC, &Metrics);
+		GetTextMetricsA(hDC, &Metrics);
 		FW = Metrics.tmAveCharWidth;
 		FH = Metrics.tmHeight;
 		for (i = 0; i <= 2; i++) {
@@ -67,7 +66,7 @@ static LRESULT CALLBACK CSProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 		GetClientRect(hWnd, &TestRect);
 		x = (int)((TestRect.left + TestRect.right) / 2 - FW * 1.5);
 		y = (TestRect.top + TestRect.bottom - FH) / 2;
-		ExtTextOut(hDC, x, y, ETO_CLIPPED | ETO_OPAQUE, &TestRect, "ABC", 3, &(DX[0]));
+		ExtTextOutA(hDC, x, y, ETO_CLIPPED | ETO_OPAQUE, &TestRect, "ABC", 3, &(DX[0]));
 		break;
 	}
 	default:
@@ -78,7 +77,7 @@ static LRESULT CALLBACK CSProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 	switch (msg) {
 	case WM_NCDESTROY: {
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, 0);
+		SetWindowLongPtrW(hWnd, GWLP_USERDATA, 0);
 		free(work);
 		break;
 	}
@@ -89,17 +88,27 @@ static LRESULT CALLBACK CSProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 	return Result;
 }
 
-ColorSample *ColorSampleInit(HWND hWnd)
+/**
+ * 	@brief カラーサンプル初期化
+ *
+ *	@param hWnd		ダイアログのstatic text
+ *	@param hFont	フォント
+ *					(フォントの破棄は呼び出し側で行うこと)
+ */
+ColorSample *ColorSampleInit(HWND hWnd, HFONT hFont)
 {
 	ColorSampleWork *work = (ColorSampleWork *)calloc(sizeof(*work), 1);
 	work->hWnd = hWnd;
-	work->SampleFont = ts.SampleFont;
-	work->OrigProc = (WNDPROC)SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)CSProc);
-	SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)work);
+	work->SampleFont = hFont;
+	work->OrigProc = (WNDPROC)SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)CSProc);
+	SetWindowLongPtrW(hWnd, GWLP_USERDATA, (LONG_PTR)work);
 	InvalidateRect(hWnd, NULL, TRUE);
 	return work;
 }
 
+/**
+ * 	@brief カラーサンプル色設定
+ */
 void ColorSampleSetColor(ColorSample *work, COLORREF fore_color, COLORREF back_color)
 {
 	work->fore_color = fore_color;

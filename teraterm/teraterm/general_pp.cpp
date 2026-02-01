@@ -83,7 +83,7 @@ CGeneralPropPageDlg::~CGeneralPropPageDlg()
 	data = NULL;
 }
 
-// CGeneralPropPageDlg ƒƒbƒZ[ƒW ƒnƒ“ƒhƒ‰
+// CGeneralPropPageDlg ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ ãƒãƒ³ãƒ‰ãƒ©
 
 void CGeneralPropPageDlg::OnInitDialog()
 {
@@ -142,15 +142,18 @@ void CGeneralPropPageDlg::OnInitDialog()
 	SetCheck(IDC_NOTIFY_SOUND, pts->NotifySound);
 
 	// default port
-	SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM)"TCP/IP");
-	SendDlgItemMessageA(IDC_GENPORT, CB_ADDSTRING, 0, (LPARAM)"Serial");
+	static const I18nTextInfo infos[] = {
+		{ "DLG_GEN_PORT_TCPIP", L"TCP/IP" },
+		{ "DLG_GEN_PORT_SERIAL", L"Serial" }
+	};
+	SetI18nListW("Tera Term", m_hWnd, IDC_GENPORT, infos, _countof(infos), pts->UILanguageFileW, 0);
 	SendDlgItemMessageA(IDC_GENPORT, CB_SETCURSEL, (pts->PortType == IdSerial) ? 1 : 0, 0);
 
 	// File transfer dir
 	SetDlgItemTextW(IDC_FILE_DIR, pts->FileDirW);
 
 #if 0
-	// ƒ_ƒCƒAƒƒO‚ÉƒtƒH[ƒJƒX‚ğ“–‚Ä‚é (2004.12.7 yutaka)
+	// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å½“ã¦ã‚‹ (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
 #endif
 }
@@ -225,7 +228,7 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
 		case IDC_NOTIFICATION_TEST_POPUP | (BN_CLICKED << 16): {
-			// popup‚ğo‚·ƒeƒXƒg
+			// popupã‚’å‡ºã™ãƒ†ã‚¹ãƒˆ
 			NotifyIcon *ni = (NotifyIcon *)data->pcv->NotifyIcon;
 			const wchar_t *msg = L"Test button was pushed";
 			BOOL prev_sound = Notify2GetSound(ni);
@@ -236,7 +239,7 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		case IDC_NOTIFICATION_TEST_TRAY | (BN_CLICKED << 16): {
-			// tray‚Éicon‚ğo‚·(©“®‚ÅÁ‚¦‚È‚¢)
+			// trayã«iconã‚’å‡ºã™(è‡ªå‹•ã§æ¶ˆãˆãªã„)
 			NotifyIcon* ni = (NotifyIcon*)data->pcv->NotifyIcon;
 			BOOL prev_sound = Notify2GetSound(ni);
 			BOOL notify_sound = (BOOL)GetCheck(IDC_NOTIFY_SOUND);
@@ -255,7 +258,7 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				MB_OK };
 			TTMessageBoxW(m_hWnd, &info, data->pts->UILanguageFileW);
 
-			// ’Ê’m—Ìˆæ‚ÌƒAƒCƒRƒ“‚ğÁ‚·
+			// é€šçŸ¥é ˜åŸŸã®ã‚¢ã‚¤ã‚³ãƒ³ã‚’æ¶ˆã™
 			Notify2SetBallonDontHide(ni, FALSE);
 			Notify2Hide(ni);
 			break;
@@ -269,7 +272,7 @@ BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			hGetDlgItemTextW(m_hWnd, IDC_FILE_DIR, &src);
 			if (src != NULL && src[0] == 0) {
 				free(src);
-				// Windows‚ÌƒfƒtƒHƒ‹ƒg‚Ìƒ_ƒEƒ“ƒ[ƒhƒtƒHƒ‹ƒ_
+				// Windowsã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ãƒ•ã‚©ãƒ«ãƒ€
 				_SHGetKnownFolderPath(FOLDERID_Downloads, KF_FLAG_CREATE, NULL, &src);
 			}
 			else {

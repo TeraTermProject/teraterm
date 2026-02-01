@@ -36,13 +36,13 @@
 static IDWriteFactory* pDWriteFactory = NULL;
 
 /**
- *	Direct X‚Ì‰Šú‰»
+ *	Direct Xã®åˆæœŸåŒ–
  */
 BOOL DXInit(void)
 {
 	if (pDWriteCreateFactory == NULL) {
-		// Direct Write ‚ªŽg‚¦‚È‚¢
-		// Windows 7–¢–ž
+		// Direct Write ãŒä½¿ãˆãªã„
+		// Windows 7æœªæº€
 		return FALSE;
 	}
 	assert(pDWriteFactory == NULL);
@@ -59,20 +59,22 @@ BOOL DXInit(void)
 }
 
 /**
- *	Direct X‚ÌI—¹
+ *	Direct Xã®çµ‚äº†
  */
 void DXUninit(void)
 {
-	pDWriteFactory->Release();
-	pDWriteFactory = NULL;
+	if (pDWriteFactory != NULL) {
+		pDWriteFactory->Release();
+		pDWriteFactory = NULL;
+	}
 }
 
 /**
- *	logfont‚©‚çfont family–¼‚ðŽæ“¾‚·‚é
+ *	logfontã‹ã‚‰font familyåã‚’å–å¾—ã™ã‚‹
  *
  *	@param	logfont
- *	@param	font_family		ƒtƒHƒ“ƒgƒtƒ@ƒ~ƒŠ–¼A•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
- *	@retval	FALSE			Žæ“¾Ž¸”s/Windows 7–¢–ž/–¢‰Šú‰»
+ *	@param	font_family		ãƒ•ã‚©ãƒ³ãƒˆãƒ•ã‚¡ãƒŸãƒªåã€ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
+ *	@retval	FALSE			å–å¾—å¤±æ•—/Windows 7æœªæº€/æœªåˆæœŸåŒ–
  */
 BOOL DXGetFontFamilyName(const LOGFONTW *logfont, wchar_t **font_family)
 {
@@ -103,7 +105,7 @@ BOOL DXGetFontFamilyName(const LOGFONTW *logfont, wchar_t **font_family)
 		hr = pFontFamily->GetFamilyNames(&pFamilyName);
 		if (!SUCCEEDED(hr)) break;
 
-		// FontFamily–¼‚ðŽæ“¾
+		// FontFamilyåã‚’å–å¾—
 		BOOL exists = FALSE;
 		UINT32 index = 0;
 		hr = pFamilyName->FindLocaleName(L"en-us", &index, &exists);

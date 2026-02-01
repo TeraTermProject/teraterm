@@ -83,13 +83,13 @@ void HistoryStoreDestroy(HistoryStore *h)
 }
 
 /**
- *	history‚ÌÅV‚É’Ç‰Á
+ *	historyã®æœ€æ–°ã«è¿½åŠ 
  *
  *	@param	h
- *	@param	add_str				’Ç‰Á•¶š—ñ
- *	@param	enable_duplicate	FALSE / TRUE = ’Ç‰Á•¶š—ñ‚Ìd•¡‚ğ‹–‰Â‚µ‚È‚¢ / ‚·‚é
- *	@retval	TRUE				—š—ğ‚Ì“à—e‚ª•Ï‰»‚µ‚½
- *	@retval	FALSE				—š—ğ‚Ì“à—e‚ª•Ï‰»‚µ‚È‚©‚Á‚½
+ *	@param	add_str				è¿½åŠ æ–‡å­—åˆ—
+ *	@param	enable_duplicate	FALSE / TRUE = è¿½åŠ æ–‡å­—åˆ—ã®é‡è¤‡ã‚’è¨±å¯ã—ãªã„ / ã™ã‚‹
+ *	@retval	TRUE				å±¥æ­´ã®å†…å®¹ãŒå¤‰åŒ–ã—ãŸ
+ *	@retval	FALSE				å±¥æ­´ã®å†…å®¹ãŒå¤‰åŒ–ã—ãªã‹ã£ãŸ
  */
 BOOL HistoryStoreAddTop(HistoryStore *h, const wchar_t *add_str, BOOL enable_duplicate)
 {
@@ -108,7 +108,7 @@ BOOL HistoryStoreAddTop(HistoryStore *h, const wchar_t *add_str, BOOL enable_dup
 			for (size_t i = 0; i < h->count; i++) {
 				if (wcscmp(h->ptr[i], add_str) == 0) {
 					if (i == 0) {
-						// Top ‚ª“¯ˆêAHistory‚Í•Ï‰»‚µ‚È‚¢
+						// Top ãŒåŒä¸€ã€Historyã¯å¤‰åŒ–ã—ãªã„
 						free(s);
 						return FALSE;
 					}
@@ -122,42 +122,42 @@ BOOL HistoryStoreAddTop(HistoryStore *h, const wchar_t *add_str, BOOL enable_dup
 		}
 
 		if (to + 1 == h->max) {
-			// ‘‰Á‚µ‚ÄÅ‘åƒTƒCƒY‚ğ’´‚¦‚éê‡‚ÍAÅŒã‚ğíœ‚µ‚Ä‚¨‚­
+			// å¢—åŠ ã—ã¦æœ€å¤§ã‚µã‚¤ã‚ºã‚’è¶…ãˆã‚‹å ´åˆã¯ã€æœ€å¾Œã‚’å‰Šé™¤ã—ã¦ãŠã
 			free(h->ptr[to]);
 			h->ptr[to] = NULL;
 			to--;
 		}
 		else if (to == h->count - 1) {
-			// ƒTƒCƒY‚ª1‚Â‘‚¦‚é
+			// ã‚µã‚¤ã‚ºãŒ1ã¤å¢—ãˆã‚‹
 			h->count++;
 		}
 		else {
-			// ˆÚ“®‚¾‚¯
+			// ç§»å‹•ã ã‘
 		}
 
-		// ˆÚ“®
+		// ç§»å‹•
 		memmove(&h->ptr[from + 1], &h->ptr[from], (to - from + 1) * sizeof(wchar_t *));
 	}
 	else {
 		h->count++;
 	}
 
-	// ’Ç‰Á
+	// è¿½åŠ 
 	h->ptr[0] = s;
 
 	return TRUE;
 }
 
 /**
- *	iniƒtƒ@ƒCƒ‹‚©‚çƒqƒXƒgƒŠ‚ğ“Ç‚İ‚Ş
+ *	iniãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ’ã‚¹ãƒˆãƒªã‚’èª­ã¿è¾¼ã‚€
  *
  *	@param	h
- *	@param	FName				iniƒtƒ@ƒCƒ‹–¼
- *	@param	section				section–¼
- *	@param	key					key‚Ìƒx[ƒX
+ *	@param	FName				iniãƒ•ã‚¡ã‚¤ãƒ«å
+ *	@param	section				sectionå
+ *	@param	key					keyã®ãƒ™ãƒ¼ã‚¹
  *
  *	section="Hosts"
- *	key="host" ‚Ì‚Æ‚«‚Ì—á
+ *	key="host" ã®ã¨ãã®ä¾‹
  *
  *	[Hosts]
  *	host1=sample1
@@ -190,12 +190,12 @@ void HistoryStoreReadIni(HistoryStore *h, const wchar_t *FName, const wchar_t *s
 }
 
 /**
- *	ƒqƒXƒgƒŠ‚ğiniƒtƒ@ƒCƒ‹‚Ö•Û‘¶‚·‚é
+ *	ãƒ’ã‚¹ãƒˆãƒªã‚’iniãƒ•ã‚¡ã‚¤ãƒ«ã¸ä¿å­˜ã™ã‚‹
  *
  *	@param	h
- *	@param	FName				iniƒtƒ@ƒCƒ‹–¼
- *	@param	section				section–¼
- *	@param	key					key‚Ìƒx[ƒX
+ *	@param	FName				iniãƒ•ã‚¡ã‚¤ãƒ«å
+ *	@param	section				sectionå
+ *	@param	key					keyã®ãƒ™ãƒ¼ã‚¹
  */
 void HistoryStoreSaveIni(HistoryStore *h, const wchar_t *FName, const wchar_t *section, const wchar_t *key)
 {
@@ -203,7 +203,7 @@ void HistoryStoreSaveIni(HistoryStore *h, const wchar_t *FName, const wchar_t *s
 		return;
 	}
 
-	// section‚ğ‘S•”Á‚·
+	// sectionã‚’å…¨éƒ¨æ¶ˆã™
 	WritePrivateProfileStringW(section, NULL, NULL, FName);
 
 	if (h->count == 0) {
@@ -219,12 +219,12 @@ void HistoryStoreSaveIni(HistoryStore *h, const wchar_t *FName, const wchar_t *s
 	}
 
 	/* update file */
-	/*  ‘æˆêˆø”‚ªNULL‚Ì‰½‚ª‹N‚±‚é‚©‚ÍMS‚ÌƒhƒLƒ…ƒƒ“ƒg‚É‘‚©‚ê‚Ä‚¢‚È‚¢ */
+	/*  ç¬¬ä¸€å¼•æ•°ãŒNULLã®æ™‚ä½•ãŒèµ·ã“ã‚‹ã‹ã¯MSã®ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆã«æ›¸ã‹ã‚Œã¦ã„ãªã„ */
 	WritePrivateProfileStringW(NULL, NULL, NULL, FName);
 }
 
 /**
- *	ƒqƒXƒgƒŠ‚ğƒhƒƒbƒvƒ_ƒEƒ“‚ÉƒZƒbƒg‚·‚é
+ *	ãƒ’ã‚¹ãƒˆãƒªã‚’ãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ã«ã‚»ãƒƒãƒˆã™ã‚‹
  */
 void HistoryStoreSetControl(HistoryStore *h, HWND dlg, int dlg_item)
 {
@@ -289,7 +289,7 @@ void HistoryStoreGetControl(HistoryStore *h, HWND dlg, int dlg_item)
 }
 
 /**
- *	Ú‘±‚µ‚½ƒzƒXƒg—š—ğ‚ğƒRƒ“ƒ{ƒ{ƒbƒNƒX‚Ü‚½‚ÍƒŠƒXƒgƒ{ƒbƒNƒX‚ÉƒZƒbƒg‚·‚é
+ *	æ¥ç¶šã—ãŸãƒ›ã‚¹ãƒˆå±¥æ­´ã‚’ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ã¾ãŸã¯ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã«ã‚»ãƒƒãƒˆã™ã‚‹
  *	dlglib.h
  */
 void SetComboBoxHostHistory(HWND dlg, int dlg_item, int maxhostlist, const wchar_t *SetupFNW)

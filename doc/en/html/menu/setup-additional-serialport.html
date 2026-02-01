@@ -97,23 +97,67 @@
               <dt>DSR/DTR</dt><dd>Hardware flow(DSR/DTR)</dd>
               <dt>none</dt><dd>No flow control<br>
             </dl>
-
           </dd>
+
+          <dt>CTS, DSR, RING, RLSD</dt>
+          <dd>
+            Displays the status of the control signals.
+            <ul>
+              <li>CTS (Clear To Send) : Ready to send</li>
+              <li>DSR (Data Set Ready) : Data set ready</li>
+              <li>RING (Ring Indicator) : Incoming (ringing)</li>
+              <li>RLSD (Receive Line Signal Detect) : Carrier detected</li>
+            </ul>
+          </dd>
+
+          <dt id="FlowCtrlRTS">RTS</dt>
+          <dd>
+            Displays the status of the RTS (Request To Send) control signal.<br>
+            Set the RTS flow control method to Disable / Enable / Handshake / Toggle.
+            For details, see the description of the fRtsControl member of the <a href="https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-dcb" target="_blank">DCB structure</a>.<br>
+            <ul>
+              <li>Disable : always low</li>
+              <li>Enable : always high</li>
+              <li>Handshake : high when ready to receive</li>
+              <li>Toggle : high while transmitting</li>
+            </ul>
+            When RTS flow control is set to Disable or Enable, clicking RTS temporarily toggles the signal between low and high.
+          </dd>
+
+          <dt id="FlowCtrlDTR">DTR</dt>
+          <dd>
+            Displays the status of the DTR (Data Terminal Ready) control signal.<br>
+            Set the DTR flow control method to Disable / Enable / Handshake.
+            For details, see the description of the fDtrControl member of the <a href="https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-dcb" target="_blank">DCB structure</a>.<br>
+            <ul>
+              <li>Disable : always low</li>
+              <li>Enable : always high</li>
+              <li>Handshake : high when ready to receive</li>
+            </ul>
+            When DTR flow control is set to Disable or Enable, clicking DTR temporarily toggles the signal between low and high.
+          </dd>
+
         </dl>
       </dd>
 
       <dt id="Delay">Transmit delay</dt>
       <dd>
-  Time intervals between characters (lines) being sent, in milliseconds.
-  The unit is milliseconds. You can set the wait time per character (line).
-  If the modem or host drops characters when Tera Term sends a large number of characters, try setting an appropriate delay time.
+        Time intervals between characters (lines) being sent, in milliseconds.
+        The unit is milliseconds. You can set the wait time per character (line).
+        If the modem or host drops characters when Tera Term sends a large number of characters, try setting an appropriate delay time.
       </dd>
 
       <dt id="Information">Detail information of COM port</dt>
       <dd>
-  The detail information of selected port is shown in the text box. <br>
-  You can select all data by using CTRL+A.
-  You can scroll horizontally by using CTRL/SHIFT + wheel.
+        The detail information of selected port is shown in the text box. <br>
+        You can select all data by using CTRL+A.
+        You can scroll horizontally by using CTRL/SHIFT + wheel.
+      </dd>
+
+      <dt id="drop">If the transmitted or received data is dropped</dt>
+      <dd>
+        Data sent or received may be lost for various reasons.<br>
+        See the <a href="../usage/tips/data_drop.html">Dropping sent and received data</a> section for information on the locations of drops and recommended countermeasures.
       </dd>
 
     </dl>

@@ -73,12 +73,12 @@ size_t MakeOutputString(
 	void *data);
 
 /**
- *	Unicode‚ğw’è•¶šƒR[ƒh‚É•ÏŠ·‚·‚é
- *		codeconv.h ‚Å‚Í‚Å‚«‚È‚¢ JIS ƒR[ƒh‚Ö‚Ì•ÏŠ·‰Â
+ *	Unicodeã‚’æŒ‡å®šæ–‡å­—ã‚³ãƒ¼ãƒ‰ã«å¤‰æ›ã™ã‚‹
+ *		codeconv.h ã§ã¯ã§ããªã„ JIS ã‚³ãƒ¼ãƒ‰ã¸ã®å¤‰æ›å¯
  *
- *	@param[in]	strW	Œ³•¶š—ñ
- *	@param[out]	len		•ÏŠ·•¶š—ñ’· (NULL‚Ì‚Æ‚«’l‚ğ•Ô‚³‚È‚¢)
- *	@return				•ÏŠ·•¶š—ñ
+ *	@param[in]	strW	å…ƒæ–‡å­—åˆ—
+ *	@param[out]	len		å¤‰æ›æ–‡å­—åˆ—é•· (NULLã®ã¨ãå€¤ã‚’è¿”ã•ãªã„)
+ *	@return				å¤‰æ›æ–‡å­—åˆ—
  */
 char *MakeOutputStringConvW(
 	const wchar_t *strW,
@@ -86,8 +86,8 @@ char *MakeOutputStringConvW(
 	size_t *len);
 
 /**
- *	Unicode‚ğw’è•¶šƒR[ƒh‚É•ÏŠ·‚·‚é
- *		MakeOutputStringConvW()‚ÌUTF-8”Å
+ *	Unicodeã‚’æŒ‡å®šæ–‡å­—ã‚³ãƒ¼ãƒ‰ã«å¤‰æ›ã™ã‚‹
+ *		MakeOutputStringConvW()ã®UTF-8ç‰ˆ
  */
 char *MakeOutputStringConvU8(
 	const char *strU8,

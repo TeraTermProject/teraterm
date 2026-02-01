@@ -12,66 +12,52 @@
 <h1>Tera Term が使用するフォルダ</h1>
 
 <p>
-<a href="../menu/setup-directory.html">[Setup]-Setup directry</a>で確認できます。
+<a href="../menu/setup-directory.html">[Setup]-Setup directory</a>で確認できます。
 </p>
 
-<ul>
-  <li>インストール版
-    <ul>
-      <li>設定ファイル
-        <ul>
-          <li><code>%APPDATA%\teraterm5</code></li>
-        </ul>
-      </li>
-      <li id="LogDir">動作ログ、ダンプ
-        <ul>
-          <li><code>%LOCALAPPDATA%\teraterm5</code></li>
-        </ul>
-      </li>
-      <li id="FileDir">ファイル転送(優先順,未設定の時一つ下が使用される)
-        <ol>
-          <li><a href="../menu/setup-additional-general.html#FileFolder">ファイル転送用フォルダ</a></li>
-          <li><code>%USERPROFILE%\Downloads</code></li>
-        </ol>
-      </li>
-      <li id="TermLogDir">端末ログ(優先順,未設定の時一つ下が使用される)
-        <ol>
-          <li><a href="../menu/setup-additional-log.html#LogDefaultPath">標準ログ保存先フォルダ</a></li>
-          <li><a href="../menu/setup-additional-general.html#FileFolder">ファイル転送用フォルダ</a></li>
-          <li><code>%LOCALAPPDATA%\teraterm5</code></li>
-        </ol>
-      </li>
-    </ul>
-  </li>
-  
-  <li>ポータブル版
-    <ul>
-      <li>設定ファイル
-        <ul>
-          <li>exeファイルのあるフォルダ</li>
-        </ul>
-      </li>
-      <li>動作ログ、ダンプ
-        <ul>
-          <li>exeファイルのあるフォルダ + <code>\log</code></li>
-        </ul>
-      </li>
-      <li>ファイル転送(優先順,未設定の時一つ下が使用される)
-        <ol>
-          <li><a href="../menu/setup-additional-general.html#FileFolder">ファイル転送用フォルダ</a></li>
-          <li><code>%USERPROFILE%\Downloads</code></li>
-        </ol>
-      </li>
-      <li>端末ログ(優先順,未設定の時一つ下が使用される)
-        <ol>
-          <li><a href="../menu/setup-additional-log.html#LogDefaultPath">標準ログ保存先フォルダ</a></li>
-          <li><a href="../menu/setup-additional-general.html#FileFolder">ファイル転送用フォルダ</a></li>
-          <li>exeファイルのあるフォルダ + <code>\log</code></li>
-        </ol>
-      </li>
-    </ul>
-  </li>
-</ul>
+<table border="1">
+  <tr>
+    <th></th>
+    <th>インストール版</th>
+    <th>ポータブル版</th>
+  </tr>    
+  <tr>
+    <th id="HomeDir">設定ファイル</th>
+    <td><code>%APPDATA%\teraterm5</code></td>
+    <td>exeファイルのあるフォルダ</td>
+  </tr>    
+  <tr>
+    <th id="LogDir">動作ログ、ダンプ</th>
+    <td><code>%LOCALAPPDATA%\teraterm5</code></td>
+    <td>exeファイルのあるフォルダ + <code>\log</code></td>
+  </tr>    
+  <tr>
+    <th id="FileDir">ファイル転送*</th>
+    <td>
+      <a href="../menu/setup-additional-general.html#FileFolder">ファイル転送用フォルダ</a><br>
+      <code>%USERPROFILE%\Downloads</code>
+    </td>
+    <td>
+      <a href="../menu/setup-additional-general.html#FileFolder">ファイル転送用フォルダ</a><br>
+      <code>%USERPROFILE%\Downloads</code>
+    </td>
+  </tr>    
+  <tr>
+    <th id="TermLogDir">端末ログ*</th>
+    <td>
+      <a href="../menu/setup-additional-log.html#LogDefaultPath">標準ログ保存先フォルダ</a><br>
+      <a href="../menu/setup-additional-general.html#FileFolder">ファイル転送用フォルダ</a><br>
+      <code>%LOCALAPPDATA%\teraterm5</code>
+    </td>
+    <td>
+      <a href="../menu/setup-additional-log.html#LogDefaultPath">標準ログ保存先フォルダ</a><br>
+      <a href="../menu/setup-additional-general.html#FileFolder">ファイル転送用フォルダ</a><br>
+      exeファイルのあるフォルダ + <code>\log</code>
+    </td>
+  </tr>    
+</table>
+
+* 優先順,未設定の時一つ下が使用される
 
 <h1>ポータブル版について</h1>
 

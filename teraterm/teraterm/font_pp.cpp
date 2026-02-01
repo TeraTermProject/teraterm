@@ -38,7 +38,7 @@
 #include "font_pp_res.h"
 #include "dlglib.h"
 #include "setting.h"
-#include "vtdisp.h"		// for DispSetLogFont()
+#include "vtdisp.h"		// for DispIsResizedFont()
 #include "compat_win.h"	// for CF_INACTIVEFONTS
 #include "helpid.h"
 #include "codeconv.h"
@@ -47,14 +47,17 @@
 #include "asprintf.h"
 #include "win32helper.h"
 #include "tttext.h"
+#include "tslib.h"
+#include "vtdraw.h"
+#include "ttcommdlg.h"
 
 #include "font_pp.h"
 
-// ƒeƒ“ƒvƒŒ[ƒg‚Ì‘‚«Š·‚¦‚ğs‚¤
+// ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®æ›¸ãæ›ãˆã‚’è¡Œã†
 #define REWRITE_TEMPLATE
 
-#define IDC_SPACE_MAXLEN 6 	  // IDC_SPACE(FontDX, FontDW, FontDY, FontDH)‚ÌÅ‘åŒ…”
-#define IDC_CODEPAGE_MAXLEN 5 // IDC_CODEPAGE(CodePageForANSIDraw)‚ÌÅ‘åŒ…”
+#define IDC_SPACE_MAXLEN 6 	  // IDC_SPACE(FontDX, FontDW, FontDY, FontDH)ã®æœ€å¤§æ¡æ•°
+#define IDC_CODEPAGE_MAXLEN 5 // IDC_CODEPAGE(CodePageForANSIDraw)ã®æœ€å¤§æ¡æ•°
 
 struct FontPPData {
 	HINSTANCE hInst;
@@ -65,42 +68,6 @@ struct FontPPData {
 	TipWin2 *Tipwin;
 };
 
-static void GetDlgLogFont(HWND hWnd, const TTTSet *ts, LOGFONTW *logfont)
-{
-	memset(logfont, 0, sizeof(*logfont));
-	if (ts->DialogFontNameW[0] == 0) {
-		// ƒtƒHƒ“ƒg‚ªİ’è‚³‚ê‚Ä‚¢‚È‚©‚Á‚½‚çOS‚ÌƒtƒHƒ“ƒg‚ğg—p‚·‚é
-		GetMessageboxFontW(logfont);
-	}
-	else {
-		wcsncpy_s(logfont->lfFaceName, _countof(logfont->lfFaceName), ts->DialogFontNameW,  _TRUNCATE);
-		logfont->lfHeight = -GetFontPixelFromPoint(hWnd, ts->DialogFontPoint);
-		logfont->lfCharSet = ts->DialogFontCharSet;
-		logfont->lfWeight = FW_NORMAL;
-		logfont->lfOutPrecision = OUT_DEFAULT_PRECIS;
-		logfont->lfClipPrecision = CLIP_DEFAULT_PRECIS;
-		logfont->lfQuality = DEFAULT_QUALITY;
-		logfont->lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
-	}
-}
-
-static UINT_PTR CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
-{
-	if (Message == WM_INITDIALOG) {
-		FontPPData *dlg_data = (FontPPData *)(((CHOOSEFONTW *)lParam)->lCustData);
-		wchar_t *uimsg;
-		static const wchar_t def[] = L"\"Font style\" selection here won't affect actual font appearance.";
-		GetI18nStrWW("Tera Term", "DLG_CHOOSEFONT_STC6", def, dlg_data->UILanguageFileW, &uimsg);
-		SetDlgItemTextW(Dialog, stc6, uimsg);
-		free(uimsg);
-
-		SetFocus(GetDlgItem(Dialog,cmb1));
-
-		CenterWindow(Dialog, GetParent(Dialog));
-	}
-	return FALSE;
-}
-
 static void EnableCodePage(HWND hWnd, BOOL enable)
 {
 	EnableWindow(GetDlgItem(hWnd, IDC_VTFONT_CODEPAGE_LABEL), enable);
@@ -108,8 +75,8 @@ static void EnableCodePage(HWND hWnd, BOOL enable)
 }
 
 /**
- *	ƒtƒHƒ“ƒg‚ÌCharSet(LOGFONT.charlfCharSet)‚©‚ç
- *	•\¦‚É‘Ã“–‚ÈCodePage‚ğ“¾‚é
+ *	ãƒ•ã‚©ãƒ³ãƒˆã®CharSet(LOGFONT.charlfCharSet)ã‹ã‚‰
+ *	è¡¨ç¤ºã«å¦¥å½“ãªCodePageã‚’å¾—ã‚‹
  */
 static int GetCodePageFromFontCharSet(BYTE char_set)
 {
@@ -199,7 +166,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		{ IDC_LIST_PRO_FONTS_VT, "DLG_TAB_FONT_LIST_PRO_FONTS_VT" },
 		{ IDC_CHARACTER_SPACE_TITLE, "DLG_TAB_FONT_CHARACTER_SPACE" },
 		{ IDC_RESIZED_FONT, "DLG_TAB_FONT_RESIZED_FONT" },
-		{ IDC_FONT_FOLDER_LABEL, "DLG_TAB_FONT_FOLDER_LABEL" },
+		{ IDC_FONT_FOLDER, "DLG_TAB_FONT_FOLDER" },
 	};
 	FontPPData *dlg_data = (FontPPData *)GetWindowLongPtr(hWnd, DWLP_USER);
 	TTTSet *ts = dlg_data == NULL ? NULL : dlg_data->pts;
@@ -211,27 +178,47 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)dlg_data);
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), dlg_data->pts->UILanguageFileW);
 
-			HDC DC = GetDC(hWnd);
-			int dpi = GetDeviceCaps(DC, LOGPIXELSY);
-			ReleaseDC(hWnd, DC);
-			DispSetLogFont(&dlg_data->VTFont, dpi);
-			GetFontPitchAndFamily(hWnd, &dlg_data->VTFont);
+			TSGetLogFont(hWnd, ts, 0, 0, &dlg_data->VTFont);
 
 			SetFontStringW(hWnd, IDC_VTFONT_EDIT, &dlg_data->VTFont);
 
-			CheckDlgButton(hWnd,
-						   UnicodeDebugParam.UseUnicodeApi ? IDC_VTFONT_UNICODE : IDC_VTFONT_ANSI,
-						   BST_CHECKED);
-			SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, UnicodeDebugParam.CodePageForANSIDraw, FALSE);
-			EnableCodePage(hWnd, UnicodeDebugParam.UseUnicodeApi ? FALSE : TRUE);
-			SendDlgItemMessage(hWnd, IDC_VTFONT_CODEPAGE_EDIT, EM_LIMITTEXT, IDC_CODEPAGE_MAXLEN, 0);
+			{
+				static const wchar_t *unicode = L"Unicode API";
+				static const wchar_t *ansi = L"ANSI API";
+				wchar_t *s;
+				aswprintf(&s, L"Auto (%s)",
+						  VTDrawFromID(IdVtDrawAPIAuto) == IdVtDrawAPIUnicode ? unicode : ansi);
+				SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_ADDSTRING, 0, (LPARAM)s);
+				free(s);
+				SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_ADDSTRING, 0, (LPARAM)unicode);
+				SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_ADDSTRING, 0, (LPARAM)ansi);
+				if (IsWindowsNTKernel() == TRUE) {
+					SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_SETCURSEL,
+										ts->VTDrawAPI_ini == IdVtDrawAPIAuto ? 0 :
+										ts->VTDrawAPI_ini == IdVtDrawAPIUnicode ? 1 : 2, 0);
+				} else {
+					SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_SETCURSEL, 0, 0);
+					EnableWindow(GetDlgItem(hWnd, IDC_VTFONT_COMBO), FALSE);
+				}
+
+				wchar_t *fmt;
+				hGetDlgItemTextW(hWnd, IDC_VTFONT_CODEPAGE_LABEL, &fmt);
+				aswprintf(&s, fmt, GetACP());
+				free(fmt);
+				SetDlgItemTextW(hWnd, IDC_VTFONT_CODEPAGE_LABEL, s);
+				free(s);
+
+				SetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, ts->VTDrawAnsiCodePage_ini, FALSE);
+				EnableCodePage(hWnd, ts->VTDrawAPI == IdVtDrawAPIANSI ? TRUE : FALSE);
+				SendDlgItemMessageA(hWnd, IDC_VTFONT_CODEPAGE_EDIT, EM_LIMITTEXT, IDC_CODEPAGE_MAXLEN, 0);
+			}
 
 			ArrangeControlsForChooseFont(hWnd, &dlg_data->VTFont, IDC_LIST_HIDDEN_FONTS, IDC_LIST_PRO_FONTS_VT, ACFCF_INIT_VTWIN);
 
 			SetDlgItemInt(hWnd, IDC_SPACE_LEFT, ts->FontDX, TRUE);
-			SetDlgItemInt(hWnd, IDC_SPACE_RIGHT, ts->FontDW, TRUE);
+			SetDlgItemInt(hWnd, IDC_SPACE_RIGHT, ts->FontDW - ts->FontDX, TRUE);
 			SetDlgItemInt(hWnd, IDC_SPACE_TOP, ts->FontDY, TRUE);
-			SetDlgItemInt(hWnd, IDC_SPACE_BOTTOM, ts->FontDH, TRUE);
+			SetDlgItemInt(hWnd, IDC_SPACE_BOTTOM, ts->FontDH - ts->FontDY, TRUE);
 			SendDlgItemMessage(hWnd, IDC_SPACE_LEFT,   EM_LIMITTEXT, IDC_SPACE_MAXLEN, 0);
 			SendDlgItemMessage(hWnd, IDC_SPACE_RIGHT,  EM_LIMITTEXT, IDC_SPACE_MAXLEN, 0);
 			SendDlgItemMessage(hWnd, IDC_SPACE_TOP,    EM_LIMITTEXT, IDC_SPACE_MAXLEN, 0);
@@ -243,8 +230,13 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			wchar_t *font_folder;
 			HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
 			if (r == S_OK) {
-				TTTextMenu(hWnd, IDC_FONT_FOLDER, font_folder, NULL, 0);
-				free(font_folder);
+				wchar_t *text;
+				hGetDlgItemTextW(hWnd, IDC_FONT_FOLDER, &text);
+				wchar_t *new_text;
+				aswprintf(&new_text, text, font_folder);
+				TTTextMenu(hWnd, IDC_FONT_FOLDER, new_text, NULL, 0);
+				free(text);
+				free(new_text);
 			}
 
 			break;
@@ -253,18 +245,15 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			NMHDR *nmhdr = (NMHDR *)lp;
 			switch (nmhdr->code) {
 				case PSN_APPLY: {
-					UnicodeDebugParam.UseUnicodeApi =
-						IsDlgButtonChecked(hWnd, IDC_VTFONT_UNICODE) == BST_CHECKED;
-					UnicodeDebugParam.CodePageForANSIDraw =
+					LRESULT r = SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_GETCURSEL, 0, 0);
+					ts->VTDrawAPI_ini = (IdVtDrawAPI)r;
+					ts->VTDrawAPI = VTDrawFromID((IdVtDrawAPI)r);
+					ts->VTDrawAnsiCodePage_ini =
 						GetDlgItemInt(hWnd, IDC_VTFONT_CODEPAGE_EDIT, NULL, FALSE);
+					ts->VTDrawAnsiCodePage =
+						ts->VTDrawAnsiCodePage_ini == 0 ? GetACP() : ts->VTDrawAnsiCodePage_ini;
 
-					WideCharToACP_t(dlg_data->VTFont.lfFaceName, ts->VTFont, sizeof(ts->VTFont));
-					HDC DC = GetDC(hWnd);
-					int dpi = GetDeviceCaps(DC, LOGPIXELSY);
-					ReleaseDC(hWnd, DC);
-					ts->VTFontSize.x = dlg_data->VTFont.lfWidth  * 96 / dpi;
-					ts->VTFontSize.y = dlg_data->VTFont.lfHeight * 96 / dpi;
-					ts->VTFontCharSet = dlg_data->VTFont.lfCharSet;
+					TSSetLogFont(hWnd, &dlg_data->VTFont, 0, 0, ts);
 
 					DispEnableResizedFont(IsDlgButtonChecked(hWnd, IDC_RESIZED_FONT) == BST_CHECKED);
 
@@ -278,23 +267,35 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 							if (parsed) {
 								dlgh = GetDlgItemInt(hWnd, IDC_SPACE_BOTTOM, &parsed, TRUE);
 								if (parsed) {
-									if (ts->FontDX != dlgx || ts->FontDW != dlgw || ts->FontDY != dlgy || ts->FontDH != dlgh) {
+									if (ts->FontDX != dlgx ||
+									    ts->FontDW != (dlgw + dlgx) ||
+									    ts->FontDY != dlgy ||
+									    ts->FontDH != (dlgh + dlgy)) {
 										ts->FontDX = dlgx;
-										ts->FontDW = dlgw;
+										ts->FontDW = dlgw + dlgx;
 										ts->FontDY = dlgy;
-										ts->FontDH = dlgh;
-										ChangeFont(0);
-										DispChangeWinSize(ts->TerminalWidth, ts->TerminalHeight);
+										ts->FontDH = dlgh + dlgy;
+										ChangeFont(vt_src, 0);
+										DispChangeWinSize(vt_src, ts->TerminalWidth, ts->TerminalHeight);
 									}
 								}
 							}
 						}
 					}
 
-					// ƒtƒHƒ“ƒg‚Ìİ’è
-					ChangeFont(0);
-					DispChangeWinSize(WinWidth,WinHeight);
-					ChangeCaret();
+					// ãƒ•ã‚©ãƒ³ãƒˆã®è¨­å®š
+					ChangeFont(vt_src, 0);
+					HWND vtwin = GetParent(GetParent(hWnd));
+					if (::IsZoomed(vtwin)) {
+						// æœ€å¤§åŒ–ã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ã€ã‚µã‚¤ã‚ºå¤‰æ›´ã«ã‚ˆã‚Š WM_SIZE ã‚’ç™ºç”Ÿã•ã›ã‚‹ã€‚
+						RECT r;
+						::GetWindowRect(vtwin, &r);
+						SetWindowPos(vtwin, NULL, 0, 0, r.right - r.left, 0, SWP_NOMOVE);
+						SetWindowPos(vtwin, NULL, 0, 0, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+					} else {
+						DispChangeWinSize(vt_src, WinWidth, WinHeight);
+					}
+					ChangeCaret(vt_src);
 
 					break;
 				}
@@ -317,14 +318,14 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					id == IDC_SPACE_TOP ||
 					id == IDC_SPACE_BOTTOM) {
 					BOOL parsed;
-					int dlg = GetDlgItemInt(hWnd, id, &parsed, TRUE);
+					GetDlgItemInt(hWnd, id, &parsed, TRUE); // parseã§ããŸã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹ã€‚æˆ»ã‚Šå€¤ã¯ä½¿ç”¨ã—ãªã„ã€‚
 					if (! parsed) {
 						HWND hEdit = (HWND)lp;
 						if (GetWindowTextLengthW(hEdit) == 0) {
 							SetWindowTextW(hEdit, L"0");
 							break;
 						}
-						// ƒc[ƒ‹ƒ`ƒbƒv‚ğ•\¦
+						// ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚’è¡¨ç¤º
 						wchar_t *uiTitle, *uiText;
 						GetI18nStrWW("Tera Term", "MSG_TOOLTIP_EDITERR_TITLE1", L"Unacceptable Character", ts->UILanguageFileW, &uiTitle);
 						GetI18nStrWW("Tera Term", "MSG_TOOLTIP_EDITERR_TEXT1", L"Only positive and negative integers are acceptable.", ts->UILanguageFileW, &uiText);
@@ -332,7 +333,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						free(uiTitle);
 						free(uiText);
 
-						// –³Œø‚È•¶š‚ğíœ
+						// ç„¡åŠ¹ãªæ–‡å­—ã‚’å‰Šé™¤
 						wchar_t text[IDC_SPACE_MAXLEN + 1];
 						GetWindowTextW(hEdit, &text[0], IDC_SPACE_MAXLEN + 1);
 						wchar_t *orgp = text, *newp = text;
@@ -352,7 +353,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 							text[1] = '\0';
 						}
 
-						// EDITƒRƒ“ƒgƒ[ƒ‹‚ğXV
+						// EDITã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚’æ›´æ–°
 						DWORD startPos, endPos;
 						SendMessage(hEdit, EM_GETSEL, (WPARAM)(&startPos), (LPARAM)(&endPos));
 						SetWindowTextW(hEdit, text);
@@ -364,9 +365,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			}
 
 			switch (wp) {
-			case IDC_VTFONT_ANSI | (BN_CLICKED << 16):
-			case IDC_VTFONT_UNICODE | (BN_CLICKED << 16): {
-				BOOL enable = (wp & 0xffff) == IDC_VTFONT_ANSI ? TRUE : FALSE;
+			case IDC_VTFONT_COMBO | (CBN_SELCHANGE << 16): {
+				IdVtDrawAPI r = (IdVtDrawAPI)SendDlgItemMessageW(hWnd, IDC_VTFONT_COMBO, CB_GETCURSEL, 0, 0);
+				r = VTDrawFromID(r);
+				BOOL enable = r == IdVtDrawAPIANSI ? TRUE : FALSE;
 				EnableCodePage(hWnd, enable);
 				break;
 			}
@@ -381,15 +383,9 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				break;
 			}
 
-			case IDC_FONT_FOLDER: {
-				wchar_t *font_folder;
-				HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
-				if (r ==S_OK) {
-					ShellExecuteW(NULL, L"explore", font_folder, NULL, NULL, SW_NORMAL);
-					free(font_folder);
-				}
+			case IDC_FONT_FOLDER:
+				OpenFontFolder();
 				break;
-			}
 
 			default:
 				break;
@@ -430,7 +426,7 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 
 HPROPSHEETPAGE FontPageCreate(HINSTANCE inst, TTTSet *pts)
 {
-	// ’ common/tt_res.h ‚Æ font_pp_res.h ‚Å’l‚ğˆê’v‚³‚¹‚é‚±‚Æ
+	// æ³¨ common/tt_res.h ã¨ font_pp_res.h ã§å€¤ã‚’ä¸€è‡´ã•ã›ã‚‹ã“ã¨
 	const int id = IDD_TABSHEET_FONT;
 
 	FontPPData *Param = (FontPPData *)calloc(1, sizeof(FontPPData));

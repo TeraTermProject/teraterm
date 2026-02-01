@@ -136,9 +136,14 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
   pvar->SetupMenu = GetSetupMenu(menu);
   pvar->ControlMenu = GetControlMenu(menu);
 
-  InsertMenu(pvar->SetupMenu, ID_SETUP_ADDITIONALSETTINGS, flag, ID_MENU_SETPASS, "&ViewMode password");
+  wchar_t *uimsg;
+  GetI18nStrWW(SECTION, "MENU_SETPASS", L"&ViewMode password", pvar->ts->UILanguageFileW, &uimsg);
+  InsertMenuW(pvar->SetupMenu, ID_SETUP_ADDITIONALSETTINGS, flag, ID_MENU_SETPASS, uimsg);
+  free(uimsg);
   if (pvar->enable) flag |= MF_CHECKED;
-  InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag,  ID_MENU_VIEWMODE, "&View mode");
+  GetI18nStrWW(SECTION, "MENU_VIEWMODE", L"&View mode", pvar->ts->UILanguageFileW, &uimsg);
+  InsertMenuW(pvar->ControlMenu, ID_CONTROL_MACRO, flag,  ID_MENU_VIEWMODE, uimsg);
+  free(uimsg);
   InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND | MF_SEPARATOR,  0, NULL);
 }
 
@@ -156,6 +161,13 @@ static INT_PTR CALLBACK ViewModeInputPass(HWND dlg, UINT msg, WPARAM wParam, LPA
 
   switch (msg) {
     case WM_INITDIALOG:
+	  static const DlgTextInfo text_info[] = {
+		{ 0, "DLG_INPUTPASSWORD_TITLE" },
+		{ IDC_PASSWORD_LABEL, "DLG_INPUTPASSWORD_PASSWORD" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" }
+	  };
+	  SetI18nDlgStrsW(dlg, SECTION, text_info, _countof(text_info), pvar->ts->UILanguageFileW);
       CenterWindow(dlg, GetParent(dlg));
       return TRUE;
     case WM_COMMAND:
@@ -166,7 +178,13 @@ static INT_PTR CALLBACK ViewModeInputPass(HWND dlg, UINT msg, WPARAM wParam, LPA
 	    TTEndDialog(dlg, IDOK);
 	  }
 	  else {
-	    MessageBox(NULL, "Invalid Password", "Invalid Password", MB_OK | MB_ICONEXCLAMATION);
+		static const TTMessageBoxInfoW info = {
+		  SECTION,
+		  "MSG_INVALID", L"Invalid Password",
+		  "MSG_INVALID", L"Invalid Password",
+		  MB_OK | MB_ICONEXCLAMATION
+		};
+		TTMessageBoxW(dlg, &info, pvar->ts->UILanguageFileW);
 	    TTEndDialog(dlg, IDCANCEL);
 	  }
 	  return TRUE;
@@ -184,6 +202,15 @@ static INT_PTR CALLBACK ViewModeSetPass(HWND dlg, UINT msg, WPARAM wParam, LPARA
 
   switch (msg) {
     case WM_INITDIALOG:
+	  static const DlgTextInfo text_info[] = {
+		{ 0, "DLG_SETPASSWORD_TITLE" },
+		{ IDC_CURPASS_LABEL, "DLG_SETPASSWORD_CURPASS" },
+		{ IDC_NEWPASS_LABEL, "DLG_SETPASSWORD_NEWPASS" },
+		{ IDC_RETPASS_LABEL, "DLG_SETPASSWORD_RETPASS" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" }
+	  };
+	  SetI18nDlgStrsW(dlg, SECTION, text_info, _countof(text_info), pvar->ts->UILanguageFileW);
       CenterWindow(dlg, GetParent(dlg));
       return TRUE;
     case WM_COMMAND:
@@ -195,16 +222,34 @@ static INT_PTR CALLBACK ViewModeSetPass(HWND dlg, UINT msg, WPARAM wParam, LPARA
 	    GetDlgItemText(dlg, IDC_RETPASS, passwd2, sizeof(passwd2));
 	    if (strcmp(passwd1, passwd2) == 0) {
 	      strncpy_s(pvar->password, sizeof(pvar->password), passwd1, _TRUNCATE);
-	      MessageBox(NULL, "Password changed", "TTXViewMode", MB_OK | MB_ICONEXCLAMATION);
+		  static const TTMessageBoxInfoW info = {
+			SECTION,
+			"MSG_TITLE", L"TTXViewMode",
+			"MSG_CHANGED", L"Password changed",
+			MB_OK | MB_ICONEXCLAMATION
+		  };
+		  TTMessageBoxW(dlg, &info, pvar->ts->UILanguageFileW);
 	      TTEndDialog(dlg, IDOK);
 	    }
 	    else {
-	      MessageBox(NULL, "New password not matched.", "TTXViewMode", MB_OK | MB_ICONEXCLAMATION);
+		  static const TTMessageBoxInfoW info = {
+			SECTION,
+			"MSG_TITLE", L"TTXViewMode",
+			"MSG_NOTMATCHED", L"New password not matched.",
+			MB_OK | MB_ICONEXCLAMATION
+		  };
+		  TTMessageBoxW(dlg, &info, pvar->ts->UILanguageFileW);
 	      TTEndDialog(dlg, IDCANCEL);
 	    }
 	  }
 	  else {
-	    MessageBox(NULL, "Invalid Password", "TTXViewMode", MB_OK | MB_ICONEXCLAMATION);
+		static const TTMessageBoxInfoW info = {
+		  SECTION,
+		  "MSG_TITLE", L"TTXViewMode",
+		  "MSG_INVALID", L"Invalid Password",
+		  MB_OK | MB_ICONEXCLAMATION
+		};
+		TTMessageBoxW(dlg, &info, pvar->ts->UILanguageFileW);
 	    TTEndDialog(dlg, IDCANCEL);
 	  }
 	  return TRUE;
@@ -233,8 +278,13 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	      /* nothing to do */
 	      break;
 	    case -1:
-	      MessageBox(hWin, "TTXViewMode Error", "Can't display dialog box.",
-	                 MB_OK | MB_ICONEXCLAMATION);
+		  static const TTMessageBoxInfoW info = {
+			SECTION,
+			"MSG_TITLE_ERROR", L"TTXViewMode Error",
+			"MSG_CANNOTDISPLAY", L"Can't display dialog box.",
+			MB_OK | MB_ICONEXCLAMATION
+		  };
+		  TTMessageBoxW(hWin, &info, pvar->ts->UILanguageFileW);
 	      break;
 	  }
         }
@@ -257,8 +307,13 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	case IDCANCEL:
 	  break;
 	case -1:
-	  MessageBox(hWin, "TTXViewMode Error", "Can't display dialog box.",
-	    MB_OK | MB_ICONEXCLAMATION);
+	  static const TTMessageBoxInfoW info = {
+		SECTION,
+		"MSG_TITLE_ERROR", L"TTXViewMode Error",
+		"MSG_CANNOTDISPLAY", L"Can't display dialog box.",
+		MB_OK | MB_ICONEXCLAMATION
+	  };
+	  TTMessageBoxW(hWin, &info, pvar->ts->UILanguageFileW);
 	  break;
       }
       return 1;

@@ -102,7 +102,7 @@
 <tr><td>ESC O</td>	<td>SS3</td>	<td> GL または GR へ G3 を次の一文字に限り呼び出す </td></tr>
 <tr><td>ESC P</td>	<td>DCS</td>	<td>Device Control Sequence (<a href="#DCS">DCSシーケンス</a>を参照)</td></tr>
 <tr><td>ESC X</td>	<td>SOS</td>	<td>文字列開始 (<a href="#SOS">SOSシーケンス</a>を参照)</td></tr>
-<tr><td>ESC Z</td>	<td>DECID</td>	<td>端末IDを返答する</td></tr>
+<tr><td id="ESC_Z">ESC Z</td>	<td>DECID</td>	<td><a href="../menu/setup-additional-terminal.html#TerminalID">端末ID</a>を返答する(応答は<a href="#TerminalID">CSI 0 c</a>と同じ)</td></tr>
 <tr><td>ESC [</td>	<td>CSI</td>	<td>CSIシーケンスを開始 (<a href="#CSI">CSIシーケンス</a>を参照)</td></tr>
 <tr><td>ESC \</td>	<td>ST</td>	<td>文字列終端。DCS, SOS, OSC, PM, APC シーケンスの終端。</td></tr>
 <tr><td>ESC ]</td>	<td>OSC</td>	<td>Operating System Command (<a href="#OSC">OSCシーケンス</a>を参照)</td></tr>
@@ -164,22 +164,26 @@
 <tr><td>CSI <i>Ps</i> a</td>	<td>HPR</td>	<td>カーソルを <i>Ps</i> 桁右に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
 <tr><td>CSI <i>Ps</i> b</td>	<td>REP</td>	<td>最後に出力した文字を <i>Ps</i> 回繰り返す。<i>Ps</i> の省略時の値は 1。</td></tr>
 <tr><td>CSI <i>Ps</i> c</td>	<td>DA</td>	<td>端末特性報告。省略時の <i>Ps</i> の値は 0。
-<pre>
+<pre id="TerminalID">
 <i>Ps</i> = 0    端末特性を要求する。
-応答: <a href="../menu/setup-additional-terminal.html#TerminalID">端末ID</a>の設定により異なる。
+応答: <a href="../menu/setup-additional-terminal.html#TerminalID">端末ID</a>の設定による(<a href="#ESC_Z">ESC Z</a>と同じ)。
   VT100     ESC [ ? 1 ; 2 c
   VT100J    ESC [ ? 5 ; 2 c
   VT101     ESC [ ? 1 ; 0 c
   VT102     ESC [ ? 6 c
   VT102J    ESC [ ? 15 c
-  VT220J    ESC [ ? 62 ; 1 ; 2 ; 5 ; 6 ; 7 ; 8 c
-  VT282     ESC [ ? 62 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 11 c
+  VT220     CSI ? 60 ; 1 ; 2 ; 6 ; 8 ; 9 ; 15 ; c
+  VT220J    CSI ? 62 ; 1 ; 2 ; 5 ; 6 ; 7 ; 8 c
+  VT282     CSI ? 62 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 11 c
   VT320     CSI ? 63 ; 1 ; 2 ; 6 ; 7 ; 8 c
   VT382     CSI ? 63 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 15 c
-  VT420     CSI ? 64 ; 1 ; 2 ; 7 ; 8 ; 9 ; 15 ; 18 ; 21 c"
+  VT420     CSI ? 64 ; 1 ; 2 ; 7 ; 8 ; 9 ; 15 ; 18 ; 21 c
   VT520     CSI ? 65 ; 1 ; 2 ; 7 ; 8 ; 9 ; 12 ; 18 ; 19 ; 21 ; 23 ; 24 ; 42 ; 44 ; 45 ; 46 c
   VT525     CSI ? 65 ; 1 ; 2 ; 7 ; 9 ; 12 ; 18 ; 19 ; 21 ; 22 ; 23 ; 24 ; 42 ; 44 ; 45 ; 46 c
+
+注 VT100系統は7bitモードのみなので、CSI のかわりに"ESC ["と表記しています
 </pre>
+<a href="ctrlseq_device_attributes.html">パラメータ詳細</a>
 </td></tr>
 <tr><td>CSI <i>Ps</i> d</td>	<td>VPA</td>	<td>カーソルを桁位置を変えずに <i>Ps</i> 行目に移動する。<i>Ps</i> の省略時の値は 1。</tr>
 <tr><td>CSI <i>Ps</i> e</td>	<td>VPR</td>	<td>カーソルを <i>Ps</i> 行下に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
@@ -344,7 +348,7 @@
    = 2      画面全体の保護されていない文字を消去する。
 </pre>
 </td></tr>
-<tr><td>CSI ? <i>Ps</i> K</td>	<td>DECSEL</td>	<td>選択的行消去。保護されていない文字のみを消去する。<i>Ps</i> の省略時の値は 0。 
+<tr><td>CSI ? <i>Ps</i> K</td>	<td>DECSEL</td>	<td>選択的行消去。保護されていない文字のみを消去する。<i>Ps</i> の省略時の値は 0。
 <pre>
 <i>Ps</i> = 0      カーソル位置から行末までの保護されていない文字を消去する。
    = 1      行頭からカーソル位置までの保護されていない文字を消去する。
@@ -921,14 +925,16 @@ OSC <i>Ps</i> ; <i>Pt</i> BEL
 <i>c</i> は次の値を受け付ける。
 
 <table border="1">
-<tr><th>値</th>	<th>機能</th></tr>
+<tr><th><i>c</i></th>	<th>色番号/文字属性</th></tr>
 <tr><td>0-255</td> <td>色番号</td></tr>
 <tr><td>256</td> <td>太字(bold)属性<a href="#Bold">*</a>の文字色</td></tr>
 <tr><td>257</td> <td>下線(underline)属性の文字色</td></tr>
 <tr><td>258</td> <td>点滅(blink)属性の文字色</td></tr>
-<tr><td>259</td> <td>反転(reverse)属性の文字色</td></tr>
+<tr><td>259</td> <td>反転(reverse)属性の背景色</td></tr>
 </table>
+256以降は OSC 5 と同等。
 
+<p>
 <i>spec</i> は以下の形式を受け付ける。
 <pre>
 rgb:<i>r</i>/<i>g</i>/<i>b</i>
@@ -954,7 +960,7 @@ OSC 4 ; <i>c</i> ; rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i> ST
 <tr><td>0</td> <td>太字(bold)属性<a href="#Bold">*</a>の文字色</td></tr>
 <tr><td>1</td> <td>下線(underline)属性の文字色</td></tr>
 <tr><td>2</td> <td>点滅(blink)属性の文字色</td></tr>
-<tr><td>3</td> <td>反転(reverse)属性の文字色</td></tr>
+<tr><td>3</td> <td>反転(reverse)属性の背景色</td></tr>
 </table>
 <i>spec</i> の形式は、OSC 4 の <i>spec</i> と同じ。<br>
 太字属性については<a href="#Bold">下記</a>を参照

@@ -69,13 +69,13 @@ void VTActivate()
   SetFocus(HVTWin);
 }
 
-// ƒLƒƒƒvƒVƒ‡ƒ“‚Ì•ÏX
+// ã‚­ãƒ£ãƒ—ã‚·ãƒ§ãƒ³ã®å¤‰æ›´
 //
-// (2005.2.19 yutaka) format ID=13‚ÌV‹K’Ç‰ÁACOM5ˆÈã‚Ì•\¦‚É‘Î‰
-// (2005.3.13 yutaka) ƒ^ƒCƒgƒ‹‚ÌSJIS‚Ö‚Ì•ÏŠ·i“ú–{Œêj‚ğ’Ç‰Á
-// (2006.6.15 maya)   ts.KanjiCode‚ªEUC‚¾‚ÆASJIS‚Å‚àEUC‚Æ‚µ‚Ä
-//                    •ÏŠ·‚µ‚Ä‚µ‚Ü‚¤‚Ì‚ÅA‚±‚±‚Å‚Í•ÏŠ·‚µ‚È‚¢
-// (2007.7.19 maya)   TCP ƒ|[ƒg”Ô† ‚Æ ƒVƒŠƒAƒ‹ƒ|[ƒg‚Ìƒ{[ƒŒ[ƒg‚Ì•\¦‚É‘Î‰
+// (2005.2.19 yutaka) format ID=13ã®æ–°è¦è¿½åŠ ã€COM5ä»¥ä¸Šã®è¡¨ç¤ºã«å¯¾å¿œ
+// (2005.3.13 yutaka) ã‚¿ã‚¤ãƒˆãƒ«ã®SJISã¸ã®å¤‰æ›ï¼ˆæ—¥æœ¬èªï¼‰ã‚’è¿½åŠ 
+// (2006.6.15 maya)   ts.KanjiCodeãŒEUCã ã¨ã€SJISã§ã‚‚EUCã¨ã—ã¦
+//                    å¤‰æ›ã—ã¦ã—ã¾ã†ã®ã§ã€ã“ã“ã§ã¯å¤‰æ›ã—ãªã„
+// (2007.7.19 maya)   TCP ãƒãƒ¼ãƒˆç•ªå· ã¨ ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆã®ãƒœãƒ¼ãƒ¬ãƒ¼ãƒˆã®è¡¨ç¤ºã«å¯¾å¿œ
 /*
  *  TitleFormat
  *    0 0 0 0 0 0 (2)
@@ -88,8 +88,8 @@ void VTActivate()
  */
 void ChangeTitle(void)
 {
-#define HostNameMaxLength 1024	// ƒzƒXƒg–¼Å‘å’·  TODO •Ê‚ÌÅ‘å’·Šî€ or Å‘å’·§ŒÀ‚ğ‚È‚­‚·
-	wchar_t TempTitle[HostNameMaxLength + TitleBuffSize * 2 + 1]; // ƒoƒbƒtƒ@Šg’£
+#define HostNameMaxLength 1024	// ãƒ›ã‚¹ãƒˆåæœ€å¤§é•·  TODO åˆ¥ã®æœ€å¤§é•·åŸºæº– or æœ€å¤§é•·åˆ¶é™ã‚’ãªãã™
+	wchar_t TempTitle[HostNameMaxLength + TitleBuffSize * 2 + 1]; // ãƒãƒƒãƒ•ã‚¡æ‹¡å¼µ
 	wchar_t TempTitleWithRemote[TitleBuffSize * 2];
 
 	{
@@ -100,12 +100,12 @@ void ChangeTitle(void)
 		}
 		title_remote = cv.TitleRemoteW;
 		if (Connecting || !cv.Ready || title_remote == NULL || title_remote[0] == 0) {
-			// ƒŠƒ‚[ƒgƒ^ƒCƒgƒ‹‚ğg—p‚µ‚È‚¢ or İ’è‚³‚ê‚Ä‚¢‚È‚¢
+			// ãƒªãƒ¢ãƒ¼ãƒˆã‚¿ã‚¤ãƒˆãƒ«ã‚’ä½¿ç”¨ã—ãªã„ or è¨­å®šã•ã‚Œã¦ã„ãªã„
 			wcsncpy_s(TempTitleWithRemote, _countof(TempTitleWithRemote), title, _TRUNCATE);
 			wcsncpy_s(TempTitle, _countof(TempTitle), title, _TRUNCATE);
 		}
 		else {
-			// ƒŠƒ‚[ƒg‚©‚ç‚Ìƒ^ƒCƒgƒ‹‚ğ•Ê‚Éˆµ‚¤ (2008.11.1 maya)
+			// ãƒªãƒ¢ãƒ¼ãƒˆã‹ã‚‰ã®ã‚¿ã‚¤ãƒˆãƒ«ã‚’åˆ¥ã«æ‰±ã† (2008.11.1 maya)
 			if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestOff) {
 				wcsncpy_s(TempTitleWithRemote, _countof(TempTitleWithRemote), title, _TRUNCATE);
 			}
@@ -141,7 +141,7 @@ void ChangeTitle(void)
 		}
 		else if (cv.PortType==IdSerial)
 		{
-			// COM5 over‚É‘Î‰
+			// COM5 overã«å¯¾å¿œ
 			wchar_t str[24]; // COMxxxx:xxxxxxxxxxbps
 			if (ts.TitleFormat & 32) {
 				_snwprintf_s(str, _countof(str), _TRUNCATE, L"COM%d:%ubps", ts.ComPort, ts.Baud);

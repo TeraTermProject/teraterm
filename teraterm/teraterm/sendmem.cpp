@@ -46,17 +46,22 @@
 
 #include "sendmem.h"
 
+#include "ttdde.h"
+
+#define TitSend L"Sending file"
+
 typedef enum {
 	SendMemTypeText,
 	SendMemTypeBinary,
+	SendMemTypeSetDelay,
 } SendMemType;
 
-// ‘—M’†‚ÉVTWIN‚É”r‘¼‚ğ‚©‚¯‚é
-#define	USE_ENABLE_WINDOW	0	// 1=”r‘¼‚·‚é
+// é€ä¿¡ä¸­ã«VTWINã«æ’ä»–ã‚’ã‹ã‘ã‚‹
+#define	USE_ENABLE_WINDOW	0	// 1=æ’ä»–ã™ã‚‹
 
 typedef struct SendMemTag {
-	const BYTE *send_ptr;  // ‘—Mƒf[ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^
-	size_t send_len;	   // ‘—Mƒf[ƒ^ƒTƒCƒY
+	const BYTE *send_ptr;  // é€ä¿¡ãƒ‡ãƒ¼ã‚¿ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+	size_t send_len;	   // é€ä¿¡ãƒ‡ãƒ¼ã‚¿ã‚µã‚¤ã‚º
 	SendMemType type;
 	BOOL local_echo_enable;
 	BOOL send_host_enable;
@@ -64,10 +69,10 @@ typedef struct SendMemTag {
 	DWORD delay_per_char;
 	DWORD delay_per_sendsize;
 	DWORD delay_tick;
-	size_t send_size_max;	// ‘—MƒTƒCƒYƒfƒBƒŒƒCA‘—MƒTƒCƒY
+	size_t send_size_max;	// é€ä¿¡ã‚µã‚¤ã‚ºãƒ‡ã‚£ãƒ¬ã‚¤ã€é€ä¿¡ã‚µã‚¤ã‚º
 	SendMemDelayType delay_type;
-	HWND hWnd;	 // ƒ^ƒCƒ}[‚ğó‚¯‚éwindow
-	int timer_id;  // ƒ^ƒCƒ}[ID
+	HWND hWnd;	 // ã‚¿ã‚¤ãƒãƒ¼ã‚’å—ã‘ã‚‹window
+	int timer_id;  // ã‚¿ã‚¤ãƒãƒ¼ID
 	wchar_t *UILanguageFile;
 	wchar_t *dialog_caption;
 	wchar_t *filename;
@@ -89,16 +94,25 @@ typedef struct SendMemTag {
 	CheckEOLData_t *ceol;
 } SendMem;
 
+typedef SendMem *PSendMem;
+
 extern "C" IdTalk TalkStatus;
 extern "C" HWND HVTWin;
 
-static SendMem *sendmem_fifo[10];
+#define SENDMEM_FIFO_ADD_NUM 10
+static PSendMem *sendmem_fifo = NULL;
 static int sendmem_size = 0;
+static int sendmem_max = 0;
 
 static BOOL smptrPush(SendMem *sm)
 {
-	if (sendmem_size >= _countof(sendmem_fifo)) {
-		return FALSE;
+	if (sendmem_size >= sendmem_max) {
+		PSendMem *p = (PSendMem *)realloc(sendmem_fifo, sizeof(PSendMem) * (sendmem_max + SENDMEM_FIFO_ADD_NUM));
+		if (p == NULL) {
+			return FALSE;
+		}
+		sendmem_fifo = p;
+		sendmem_max += SENDMEM_FIFO_ADD_NUM;
 	}
 	sendmem_fifo[sendmem_size] = sm;
 	sendmem_size++;
@@ -192,12 +206,12 @@ static void EndPaste(SendMem *sm)
 	smptrPop();
 
 	if (smptrFront() == NULL) {
-		// Ÿ‚Ì‘—MƒŠƒNƒGƒXƒg‚ª‚È‚¢
+		// æ¬¡ã®é€ä¿¡ãƒªã‚¯ã‚¨ã‚¹ãƒˆãŒãªã„
 
-		// ƒL[“ü—Í‚É–ß‚·
+		// ã‚­ãƒ¼å…¥åŠ›ã«æˆ»ã™
 		TalkStatus = IdTalkKeyb;
 
-		// ‘€ì‚Å‚«‚é‚æ‚¤‚É‚·‚é
+		// æ“ä½œã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹
 #if USE_ENABLE_WINDOW
 		EnableWindow(HVTWin, TRUE);
 		SetFocus(HVTWin);
@@ -215,7 +229,7 @@ static void OnPause(SendMem *sm, BOOL paused)
 	SendMem *p = sm;
 	p->pause = paused;
 	if (!paused) {
-		// ƒ|[ƒY‰ğœ, ƒ^ƒCƒ}[ƒCƒxƒ“ƒg‚ÅÄ‘—‚ÌƒgƒŠƒK‚ğˆø‚­
+		// ãƒãƒ¼ã‚ºè§£é™¤æ™‚, ã‚¿ã‚¤ãƒãƒ¼ã‚¤ãƒ™ãƒ³ãƒˆã§å†é€ã®ãƒˆãƒªã‚¬ã‚’å¼•ã
 		SetTimer(p->hWnd, p->timer_id, 0, NULL);
 	}
 }
@@ -231,7 +245,7 @@ static void SendMemStart_i(SendMem *sm)
 	p->pause = FALSE;
 
 	if (p->hWndParent_ != NULL) {
-		// ƒ_ƒCƒAƒƒO‚ğ¶¬‚·‚é
+		// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’ç”Ÿæˆã™ã‚‹
 		p->dlg = new CFileTransLiteDlg();
 		p->dlg->Create(NULL, NULL, sm->UILanguageFile);
 		if (p->dialog_caption != NULL) {
@@ -246,16 +260,16 @@ static void SendMemStart_i(SendMem *sm)
 
 	TalkStatus = IdTalkSendMem;
 
-	// ‘—MŠJn‚ÉƒEƒBƒ“ƒhƒE‚ğ‘€ì‚Å‚«‚È‚¢‚æ‚¤‚É‚·‚é
+	// é€ä¿¡é–‹å§‹æ™‚ã«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’æ“ä½œã§ããªã„ã‚ˆã†ã«ã™ã‚‹
 #if USE_ENABLE_WINDOW
 	EnableWindow(HVTWin, FALSE);
 #endif
 }
 
 /**
- *	‘—Mƒoƒbƒtƒ@‚Ìî•ñæ“¾
- *	@param[out]		use		g—pbyte
- *	@param[out]		free	‹ó‚«byte
+ *	é€ä¿¡ãƒãƒƒãƒ•ã‚¡ã®æƒ…å ±å–å¾—
+ *	@param[out]		use		ä½¿ç”¨byte
+ *	@param[out]		free	ç©ºãbyte
  */
 static void GetOutBuffInfo(const TComVar *cv_, size_t *use, size_t *free)
 {
@@ -268,9 +282,9 @@ static void GetOutBuffInfo(const TComVar *cv_, size_t *use, size_t *free)
 }
 
 /**
- *	óMƒoƒbƒtƒ@‚Ìî•ñæ“¾
- *	@param[out]		use		g—pbyte
- *	@param[out]		free	‹ó‚«byte
+ *	å—ä¿¡ãƒãƒƒãƒ•ã‚¡ã®æƒ…å ±å–å¾—
+ *	@param[out]		use		ä½¿ç”¨byte
+ *	@param[out]		free	ç©ºãbyte
  */
 static void GetInBuffInfo(const TComVar *cv_, size_t *use, size_t *free)
 {
@@ -283,13 +297,13 @@ static void GetInBuffInfo(const TComVar *cv_, size_t *use, size_t *free)
 }
 
 /**
- *	ƒoƒbƒtƒ@‚Ì‹ó‚«ƒTƒCƒY‚ğ’²‚×‚é
+ *	ãƒãƒƒãƒ•ã‚¡ã®ç©ºãã‚µã‚¤ã‚ºã‚’èª¿ã¹ã‚‹
  */
 static size_t GetBufferFreeSpece(SendMem *p)
 {
 	size_t buff_len = 0;
 
-	// ‘—Mƒoƒbƒtƒ@‚Ì‹ó‚«ƒTƒCƒY
+	// é€ä¿¡ãƒãƒƒãƒ•ã‚¡ã®ç©ºãã‚µã‚¤ã‚º
 	if (p->send_host_enable) {
 		size_t out_buff_free;
 		GetOutBuffInfo(p->cv_, NULL, &out_buff_free);
@@ -297,19 +311,19 @@ static size_t GetBufferFreeSpece(SendMem *p)
 	}
 
 	if (p->local_echo_enable) {
-		// óMƒoƒbƒtƒ@‚Ì‹ó‚«ƒTƒCƒY
+		// å—ä¿¡ãƒãƒƒãƒ•ã‚¡ã®ç©ºãã‚µã‚¤ã‚º
 		size_t in_buff_free;
 		GetInBuffInfo(p->cv_, NULL, &in_buff_free);
 
 		if (p->send_host_enable) {
-			// ‘—M+ƒ[ƒJƒ‹ƒGƒR[‚Ìê‡
+			// é€ä¿¡+ãƒ­ãƒ¼ã‚«ãƒ«ã‚¨ã‚³ãƒ¼ã®å ´åˆ
 			if (buff_len > in_buff_free) {
-				// ƒoƒbƒtƒ@‚Ì¬‚³‚¢•û‚É‡‚í‚¹‚é
+				// ãƒãƒƒãƒ•ã‚¡ã®å°ã•ã„æ–¹ã«åˆã‚ã›ã‚‹
 				buff_len = in_buff_free;
 			}
 		}
 		else {
-			// ƒ[ƒJƒ‹ƒGƒR[‚¾‚¯‚Ìê‡
+			// ãƒ­ãƒ¼ã‚«ãƒ«ã‚¨ã‚³ãƒ¼ã ã‘ã®å ´åˆ
 			buff_len = in_buff_free;
 		}
 	}
@@ -317,7 +331,7 @@ static size_t GetBufferFreeSpece(SendMem *p)
 }
 
 /**
- * ‘—M
+ * é€ä¿¡
  */
 void SendMemContinuously(void)
 {
@@ -335,9 +349,19 @@ void SendMemContinuously(void)
 		return;
 	}
 
-	// I’[?
+	// ãƒã‚¯ãƒ­ã‚³ãƒãƒ³ãƒ‰ setserialdelaycharã€setserialdelayline ã«ã‚ˆã‚‹é€ä¿¡é…å»¶ã‚’åæ˜ ã™ã‚‹
+	if (p->type == SendMemTypeSetDelay) {
+		p->cv_->DelayPerChar = (WORD)p->delay_per_char;
+		p->cv_->DelayPerLine = (WORD)p->delay_per_line;
+		PostMessage((HWND)p->send_ptr, WM_USER_DDECMNDEND, (WPARAM)1, 0);
+		p->send_ptr = NULL;
+		EndPaste(p);
+		return;
+	}
+
+	// çµ‚ç«¯?
 	if (p->send_left == 0) {
-		// I—¹, ‘—Mƒoƒbƒtƒ@‚ª‹ó‚É‚È‚é‚Ü‚Å‘Ò‚Â
+		// çµ‚äº†, é€ä¿¡ãƒãƒƒãƒ•ã‚¡ãŒç©ºã«ãªã‚‹ã¾ã§å¾…ã¤
 		size_t out_buff_use;
 		GetOutBuffInfo(p->cv_, &out_buff_use, NULL);
 
@@ -346,7 +370,7 @@ void SendMemContinuously(void)
 		}
 
 		if (out_buff_use == 0) {
-			// ‘—Mƒoƒbƒtƒ@‚à‹ó‚É‚È‚Á‚½
+			// é€ä¿¡ãƒãƒƒãƒ•ã‚¡ã‚‚ç©ºã«ãªã£ãŸ
 			EndPaste(p);
 			return;
 		}
@@ -354,23 +378,23 @@ void SendMemContinuously(void)
 
 	if (p->waited) {
 		if (GetTickCount() - p->last_send_tick < p->delay_tick) {
-			// ƒEƒGƒCƒg‚·‚é
+			// ã‚¦ã‚¨ã‚¤ãƒˆã™ã‚‹
 			return;
 		}
 	}
 
-	// ‘—M‚Å‚«‚éƒoƒbƒtƒ@ƒTƒCƒY(ƒoƒbƒtƒ@‚Ì‹ó‚«ƒTƒCƒY)
+	// é€ä¿¡ã§ãã‚‹ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º(ãƒãƒƒãƒ•ã‚¡ã®ç©ºãã‚µã‚¤ã‚º)
 	size_t buff_len = GetBufferFreeSpece(p);
 	if (buff_len == 0) {
-		// ƒoƒbƒtƒ@‚É‹ó‚«‚ª‚È‚¢
+		// ãƒãƒƒãƒ•ã‚¡ã«ç©ºããŒãªã„
 		return;
 	}
 
-	// ‘—M’·
+	// é€ä¿¡é•·
 	BOOL need_delay = FALSE;
 	size_t send_len;
 	if (p->delay_per_char > 0) {
-		// 1ƒLƒƒƒ‰ƒNƒ^‘—M
+		// 1ã‚­ãƒ£ãƒ©ã‚¯ã‚¿é€ä¿¡
 		need_delay = TRUE;
 		if (p->type == SendMemTypeBinary) {
 			send_len = 1;
@@ -385,29 +409,29 @@ void SendMemContinuously(void)
 					send_len = 2 * sizeof(wchar_t);
 				}
 				else {
-					// TODO, ƒTƒƒQ[ƒgƒyƒA‚É‚È‚Á‚Ä‚¢‚È‚¢•¶š
+					// TODO, ã‚µãƒ­ã‚²ãƒ¼ãƒˆãƒšã‚¢ã«ãªã£ã¦ã„ãªã„æ–‡å­—
 					send_len = sizeof(wchar_t);
 				}
 			}
 		}
 	}
 	else if (p->delay_per_line > 0) {
-		// 1ƒ‰ƒCƒ“‘—M
+		// 1ãƒ©ã‚¤ãƒ³é€ä¿¡
 		need_delay = TRUE;
 
 		const wchar_t *line_top = (wchar_t *)&p->send_ptr[p->send_index];
 		const size_t send_left_char = p->send_left / sizeof(wchar_t);
 		BOOL eos = TRUE;
 
-		// ‰üs‚ğ’T‚·
+		// æ”¹è¡Œã‚’æ¢ã™
 		const wchar_t *s = line_top;
 		for (size_t i = 0; i < send_left_char; ++i) {
 			const wchar_t c = *s;
 			CheckEOLRet r = CheckEOLCheck(p->ceol, c);
 			if ((r & CheckEOLOutputEOL) != 0) {
-				// ‰üs‚ªŒ©‚Â‚©‚Á‚½
+				// æ”¹è¡ŒãŒè¦‹ã¤ã‹ã£ãŸ
 				if ((r & CheckEOLOutputChar) != 0) {
-					// ‰üs‚ÌŸ‚Ì•¶š‚Ü‚Åi‚ñ‚¾
+					// æ”¹è¡Œã®æ¬¡ã®æ–‡å­—ã¾ã§é€²ã‚“ã 
 					s--;
 				}
 				eos = FALSE;
@@ -416,49 +440,49 @@ void SendMemContinuously(void)
 			s++;
 		}
 
-		// ‘—M•¶š”
+		// é€ä¿¡æ–‡å­—æ•°
 		if (eos == FALSE) {
-			// ‰üs‚Ü‚Å‘—M
+			// æ”¹è¡Œã¾ã§é€ä¿¡
 			send_len = (s - line_top + 1) * sizeof(wchar_t);
 		}
 		else {
-			// ‰üs‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½AÅŒã‚Ü‚Å‘—M
+			// æ”¹è¡ŒãŒè¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã€æœ€å¾Œã¾ã§é€ä¿¡
 			send_len = p->send_left;
 		}
 
-		// ‘—M•¶š”‚ª‘—Mƒoƒbƒtƒ@‚æ‚è‘å‚«‚¢
+		// é€ä¿¡æ–‡å­—æ•°ãŒé€ä¿¡ãƒãƒƒãƒ•ã‚¡ã‚ˆã‚Šå¤§ãã„
 		if (buff_len < send_len) {
-			// ‘—Mƒoƒbƒtƒ@’·‚Ü‚ÅØ‚è‹l‚ß‚é
+			// é€ä¿¡ãƒãƒƒãƒ•ã‚¡é•·ã¾ã§åˆ‡ã‚Šè©°ã‚ã‚‹
 			send_len = buff_len;
 			CheckEOLClear(p->ceol);
 			return;
 		}
 	}
 	else if (p->send_size_max != 0) {
-		// ‘—MƒTƒCƒYãŒÀ
+		// é€ä¿¡ã‚µã‚¤ã‚ºä¸Šé™
 		send_len = p->send_left;
 		if (send_len > p->send_size_max) {
 			need_delay = TRUE;
 			send_len = p->send_size_max;
 		}
 		if (p->type == SendMemTypeText) {
-			// ‘—Mƒf[ƒ^’·‚ğ‹ô”(wchar_t–ˆ)‚É‚·‚é
+			// é€ä¿¡ãƒ‡ãƒ¼ã‚¿é•·ã‚’å¶æ•°(wchar_tæ¯)ã«ã™ã‚‹
 			send_len = send_len & (~1);
 		}
 	}
 	else {
-		// ‘S—Í‘—M
+		// å…¨åŠ›é€ä¿¡
 		send_len = p->send_left;
 		if (buff_len < send_len) {
 			send_len = buff_len;
 		}
 		if (p->type == SendMemTypeText) {
-			// ‘—Mƒf[ƒ^’·‚ğ‹ô”(wchar_t–ˆ)‚É‚·‚é
+			// é€ä¿¡ãƒ‡ãƒ¼ã‚¿é•·ã‚’å¶æ•°(wchar_tæ¯)ã«ã™ã‚‹
 			send_len = send_len & (~1);
 		}
 	}
 
-	// ‘—M‚·‚é
+	// é€ä¿¡ã™ã‚‹
 	if (p->type == SendMemTypeBinary) {
 		const BYTE *send_ptr = (BYTE *)&p->send_ptr[p->send_index];
 		if (p->send_host_enable) {
@@ -479,12 +503,12 @@ void SendMemContinuously(void)
 		}
 	}
 
-	// ‘—M•ªæ‚É‚·‚·‚ß‚é
+	// é€ä¿¡åˆ†å…ˆã«ã™ã™ã‚ã‚‹
 	assert(send_len <= p->send_left);
 	p->send_index += send_len;
 	p->send_left -= send_len;
 
-	// ƒ_ƒCƒAƒƒOXV
+	// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°æ›´æ–°
 	if (p->dlg != NULL) {
 		size_t out_buff_use;
 		GetOutBuffInfo(p->cv_, &out_buff_use, NULL);
@@ -492,16 +516,16 @@ void SendMemContinuously(void)
 	}
 
 	if (p->send_left != 0 && need_delay) {
-		// wait‚É“ü‚é
+		// waitã«å…¥ã‚‹
 		p->waited = TRUE;
 		p->last_send_tick = GetTickCount();
-		// ƒ^ƒCƒ}[‚Íidle‚ğ“®ì‚³‚¹‚é‚½‚ß‚Ég—p‚µ‚Ä‚¢‚é
+		// ã‚¿ã‚¤ãƒãƒ¼ã¯idleã‚’å‹•ä½œã•ã›ã‚‹ãŸã‚ã«ä½¿ç”¨ã—ã¦ã„ã‚‹
 		SetTimer(p->hWnd, p->timer_id, p->delay_tick, NULL);
 	}
 }
 
 /**
- *	‰Šú‰»
+ *	åˆæœŸåŒ–
  */
 static SendMem *SendMemInit_()
 {
@@ -522,7 +546,7 @@ static SendMem *SendMemInit_()
 	p->delay_per_line = 0;  // (ms)
 	p->delay_per_sendsize = 0;
 	p->cv_ = NULL;
-	p->hWnd = HVTWin;		// delay‚Ég—p‚·‚éƒ^ƒCƒ}[—p
+	p->hWnd = HVTWin;		// delayæ™‚ã«ä½¿ç”¨ã™ã‚‹ã‚¿ã‚¤ãƒãƒ¼ç”¨
 	p->timer_id = IdPasteDelayTimer;
 	p->hWndParent_ = NULL;
 	p->ceol = CheckEOLCreate(CheckEOLTypeFile);
@@ -530,16 +554,16 @@ static SendMem *SendMemInit_()
 }
 
 /**
- *	ƒƒ‚ƒŠ‚É‚ ‚éƒeƒLƒXƒg‚ğ‘—M‚·‚é
- *	ƒeƒLƒXƒg‚Í‘—MI—¹Œã‚Éfree()‚³‚ê‚é
- *  •¶š‚Ì•ÏŠ·‚Ís‚í‚ê‚È‚¢
- *	CR‚Í‰º‚Ì‘w‚Å‘—M‚Éİ’è‚µ‚½‰üsƒR[ƒh‚É•ÏŠ·‚³‚ê‚é
- *  LF‚Í‚»‚Ì‚Ü‚Ü‘—M‚³‚ê‚é
+ *	ãƒ¡ãƒ¢ãƒªã«ã‚ã‚‹ãƒ†ã‚­ã‚¹ãƒˆã‚’é€ä¿¡ã™ã‚‹
+ *	ãƒ†ã‚­ã‚¹ãƒˆã¯é€ä¿¡çµ‚äº†å¾Œã«free()ã•ã‚Œã‚‹
+ *  æ–‡å­—ã®å¤‰æ›ã¯è¡Œã‚ã‚Œãªã„
+ *	CRã¯ä¸‹ã®å±¤ã§é€ä¿¡æ™‚ã«è¨­å®šã—ãŸæ”¹è¡Œã‚³ãƒ¼ãƒ‰ã«å¤‰æ›ã•ã‚Œã‚‹
+ *  LFã¯ãã®ã¾ã¾é€ä¿¡ã•ã‚Œã‚‹
  *
- *	@param	str		ƒeƒLƒXƒg‚Öƒ|ƒCƒ“ƒ^(malloc()‚³‚ê‚½—Ìˆæ)
- *					‘—MŒã(’†’fŒã)A©“®“I‚Éfree()‚³‚ê‚é
- *	@param	len		•¶š”(wchar_t’PˆÊ)
- *					L'\0' ‚Í‘—M‚³‚ê‚È‚¢
+ *	@param	str		ãƒ†ã‚­ã‚¹ãƒˆã¸ãƒã‚¤ãƒ³ã‚¿(malloc()ã•ã‚ŒãŸé ˜åŸŸ)
+ *					é€ä¿¡å¾Œ(ä¸­æ–­å¾Œ)ã€è‡ªå‹•çš„ã«free()ã•ã‚Œã‚‹
+ *	@param	len		æ–‡å­—æ•°(wchar_tå˜ä½)
+ *					L'\0' ã¯é€ä¿¡ã•ã‚Œãªã„
  */
 SendMem *SendMemTextW(wchar_t *str, size_t len)
 {
@@ -549,7 +573,7 @@ SendMem *SendMemTextW(wchar_t *str, size_t len)
 	}
 
 	if (len == 0) {
-		// L'\0' ‚Í‘—M‚µ‚È‚¢‚Ì‚Å +1 ‚Í•s—v
+		// L'\0' ã¯é€ä¿¡ã—ãªã„ã®ã§ +1 ã¯ä¸è¦
 		len = wcslen(str);
 	}
 
@@ -568,12 +592,12 @@ SendMem *SendMemTextW(wchar_t *str, size_t len)
 }
 
 /**
- *	ƒƒ‚ƒŠ‚É‚ ‚éƒf[ƒ^‚ğ‘—M‚·‚é
- *	ƒf[ƒ^‚Í‘—MI—¹Œã‚Éfree()‚³‚ê‚é
+ *	ãƒ¡ãƒ¢ãƒªã«ã‚ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’é€ä¿¡ã™ã‚‹
+ *	ãƒ‡ãƒ¼ã‚¿ã¯é€ä¿¡çµ‚äº†å¾Œã«free()ã•ã‚Œã‚‹
  *
- *	@param	ptr		ƒf[ƒ^‚Öƒ|ƒCƒ“ƒ^(malloc()‚³‚ê‚½—Ìˆæ)
- *					‘—MŒã(’†’fŒã)A©“®“I‚Éfree()‚³‚ê‚é
- *	@param	len		ƒf[ƒ^’·(byte)
+ *	@param	ptr		ãƒ‡ãƒ¼ã‚¿ã¸ãƒã‚¤ãƒ³ã‚¿(malloc()ã•ã‚ŒãŸé ˜åŸŸ)
+ *					é€ä¿¡å¾Œ(ä¸­æ–­å¾Œ)ã€è‡ªå‹•çš„ã«free()ã•ã‚Œã‚‹
+ *	@param	len		ãƒ‡ãƒ¼ã‚¿é•·(byte)
  */
 SendMem *SendMemBinary(void *ptr, size_t len)
 {
@@ -589,10 +613,37 @@ SendMem *SendMemBinary(void *ptr, size_t len)
 }
 
 /**
- *	ƒ[ƒJƒ‹ƒGƒR[
+ *	ãƒã‚¯ãƒ­ã‚³ãƒãƒ³ãƒ‰ setserialdelaycharã€setserialdelayline ã«ã‚ˆã‚‹é€ä¿¡é…å»¶ã‚’é€ä¿¡ãƒãƒƒãƒ•ã‚¡ã«pushã™ã‚‹
  *
- *	@param	echo	FALSE	ƒGƒR[‚µ‚È‚¢(ƒfƒtƒHƒ‹ƒg)
- *					TRUE	ƒGƒR[‚·‚é
+ *  SendMemSetDelay()  åˆæœŸåŒ–ã¨ãƒ‘ãƒ©ãƒ¡ã‚¿è¨­å®š
+ *  SendMemInitEcho()  ä½¿ç”¨ã—ãªã„
+ *  SendMemInitDelay() ä½¿ç”¨ã—ãªã„
+ *  SendMemStart()     é€ä¿¡ãƒãƒƒãƒ•ã‚¡ã¸ã®push
+ *
+ *	@param	HWndDdeCli    Tera Term ãƒã‚¯ãƒ­ã®ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+ *	@param	DelayPerChar  ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆã®é€ä¿¡å¾…ã¡æ™‚é–“(1æ–‡å­—ã”ã¨) å˜ä½:ms
+ *	@param	DelayPerLine  ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆã®é€ä¿¡å¾…ã¡æ™‚é–“(1è¡Œã”ã¨)   å˜ä½:ms
+ */
+SendMem *SendMemSetDelay(HWND HWndDdeCli, WORD DelayPerChar, WORD DelayPerLine)
+{
+	SendMem *p = SendMemInit_();
+	if (p == NULL) {
+		return NULL;
+	}
+
+	p->send_ptr = (BYTE *)HWndDdeCli;
+	p->send_len = 0;
+	p->type = SendMemTypeSetDelay;
+	p->delay_per_char = DelayPerChar;
+	p->delay_per_line = DelayPerLine;
+	return p;
+}
+
+/**
+ *	ãƒ­ãƒ¼ã‚«ãƒ«ã‚¨ã‚³ãƒ¼
+ *
+ *	@param	echo	FALSE	ã‚¨ã‚³ãƒ¼ã—ãªã„(ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ)
+ *					TRUE	ã‚¨ã‚³ãƒ¼ã™ã‚‹
  */
 void SendMemInitEcho(SendMem *sm, BOOL echo)
 {
@@ -600,10 +651,10 @@ void SendMemInitEcho(SendMem *sm, BOOL echo)
 }
 
 /**
- *	ƒzƒXƒg(Ú‘±æ)‚Ö‘—M‚·‚é
+ *	ãƒ›ã‚¹ãƒˆ(æ¥ç¶šå…ˆ)ã¸é€ä¿¡ã™ã‚‹
  *
- *	@param	send_host	TRUE	‘—M‚·‚é(ƒfƒtƒHƒ‹ƒg)
- *						FALSE	‘—M‚µ‚È‚¢
+ *	@param	send_host	TRUE	é€ä¿¡ã™ã‚‹(ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ)
+ *						FALSE	é€ä¿¡ã—ãªã„
  */
 void SendMemInitSend(SendMem *sm, BOOL send_host)
 {
@@ -642,7 +693,7 @@ void SendMemInitDelay(SendMem *sm, SendMemDelayType type, DWORD delay_tick, size
 }
 
 /**
- *	‘—MŠ®—¹‚ÅƒR[ƒ‹ƒoƒbƒN
+ *	é€ä¿¡å®Œäº†ã§ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯
  */
 void SendMemInitSetCallback(SendMem *sm, void (*callback)(void *data), void *callback_data)
 {
@@ -650,7 +701,7 @@ void SendMemInitSetCallback(SendMem *sm, void (*callback)(void *data), void *cal
 	sm->callback_data = callback_data;
 }
 
-// ƒZƒbƒg‚·‚é‚Æƒ_ƒCƒAƒƒO‚ªo‚é
+// ã‚»ãƒƒãƒˆã™ã‚‹ã¨ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãŒå‡ºã‚‹
 void SendMemInitDialog(SendMem *sm, HINSTANCE hInstance, HWND hWndParent, const wchar_t *UILanguageFile)
 {
 	sm->hInst_ = hInstance;
@@ -675,7 +726,7 @@ void SendMemInitDialogFilename(SendMem *sm, const wchar_t *filename)
 extern "C" TComVar cv;
 BOOL SendMemStart(SendMem *sm)
 {
-	sm->cv_ = &cv;		// TODO ‚È‚­‚µ‚½‚¢
+	sm->cv_ = &cv;		// TODO ãªãã—ãŸã„
 	SendMemStart_i(sm);
 	return TRUE;
 }
@@ -689,10 +740,10 @@ void SendMemFinish(SendMem *sm)
 }
 
 /**
- *	ƒeƒLƒXƒgƒtƒ@ƒCƒ‹‚ğ‘—M‚·‚é
- *	•¶šƒR[ƒh,‰üsƒR[ƒh‚Í“KØ‚É•ÏŠ·‚³‚ê‚é
+ *	ãƒ†ã‚­ã‚¹ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã‚’é€ä¿¡ã™ã‚‹
+ *	æ–‡å­—ã‚³ãƒ¼ãƒ‰,æ”¹è¡Œã‚³ãƒ¼ãƒ‰ã¯é©åˆ‡ã«å¤‰æ›ã•ã‚Œã‚‹
  *
- *	@param[in]	filename	ƒtƒ@ƒCƒ‹–¼
+ *	@param[in]	filename	ãƒ•ã‚¡ã‚¤ãƒ«å
  *	@param[in]	binary		FALSE	text file
  *							TRUE	binary file
  */
@@ -702,10 +753,9 @@ SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayTy
 	wchar_t *fullpath;
 
 	if (IsRelativePathW(filename)) {
-		// ƒtƒ@ƒCƒ‹–¼‚ğƒtƒ‹ƒpƒX‚É‚·‚é
+		// ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ãƒ•ãƒ«ãƒ‘ã‚¹ã«ã™ã‚‹
 		fullpath = GetFileDir(&ts);
 		awcscats(&fullpath, L"\\", filename, NULL);
-		free(fullpath);
 	}
 	else {
 		fullpath = _wcsdup(filename);
@@ -714,13 +764,13 @@ SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayTy
 	if (!binary) {
 		size_t str_len;
 		wchar_t *str_ptr = LoadFileWW(fullpath, &str_len);
-		assert(str_ptr != NULL);
+		assert(str_ptr != NULL); // ãƒã‚¯ãƒ­ã‚³ãƒãƒ³ãƒ‰ sendfile ã§å­˜åœ¨ã—ãªã„ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æŒ‡å®šã—ãŸå ´åˆã¯ã€str_ptr ã¯ NULLã«ãªã‚‹ã€‚
 		if (str_ptr == NULL) {
 			sm = NULL;
 			goto finish;
 		}
 
-		// ‰üs‚ğ CR ‚Ì‚İ‚É³‹K‰»
+		// æ”¹è¡Œã‚’ CR ã®ã¿ã«æ­£è¦åŒ–
 		wchar_t *dest = NormalizeLineBreakCR(str_ptr, &str_len);
 		free(str_ptr);
 		str_ptr = dest;
@@ -730,7 +780,7 @@ SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayTy
 	else {
 		size_t data_len;
 		unsigned char *data_ptr = LoadFileBinary(fullpath, &data_len);
-		assert(data_ptr != NULL);
+		assert(data_ptr != NULL); // ãƒã‚¯ãƒ­ã‚³ãƒãƒ³ãƒ‰ sendfile ã§å­˜åœ¨ã—ãªã„ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æŒ‡å®šã—ãŸå ´åˆã¯ã€str_ptr ã¯ NULLã«ãªã‚‹ã€‚
 		if (data_ptr == NULL) {
 			sm = NULL;
 			goto finish;
@@ -741,7 +791,7 @@ SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayTy
 		goto finish;
 	}
 	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFileW);
-	SendMemInitDialogCaption(sm, L"send file");			// title
+	SendMemInitDialogCaption(sm, TitSend);	// title
 	SendMemInitDialogFilename(sm, fullpath);
 	SendMemInitDelay(sm, delay_type, delay_tick, send_max);
 	SendMemInitEcho(sm, local_echo);
@@ -770,11 +820,11 @@ BOOL SendMemSendFile2(const wchar_t *filename, BOOL binary, SendMemDelayType del
 }
 
 /**
- *	’Z‚¢•¶š—ñ‚ğ‘—M‚·‚é
- *	@param[in]	str		malloc‚³‚ê‚½—Ìˆæ‚Ì•¶š—ñ
- *						‘—MŒã free() ‚³‚ê‚é
+ *	çŸ­ã„æ–‡å­—åˆ—ã‚’é€ä¿¡ã™ã‚‹
+ *	@param[in]	str		mallocã•ã‚ŒãŸé ˜åŸŸã®æ–‡å­—åˆ—
+ *						é€ä¿¡å¾Œ free() ã•ã‚Œã‚‹
  *	TODO
- *		CBSendStart() @clipboar.c ‚Æ“‡
+ *		CBSendStart() @clipboar.c ã¨çµ±åˆ
  */
 BOOL SendMemPasteString(wchar_t *str)
 {

@@ -28,7 +28,7 @@
 
 // from crypto_api.h
 
-/* $OpenBSD: crypto_api.h,v 1.8 2023/01/15 23:05:32 djm Exp $ */
+/* $OpenBSD: crypto_api.h,v 1.9 2024/09/02 12:13:56 djm Exp $ */
 
 /*
  * Assembled from generated headers and source files by Markus Friedl.
@@ -38,6 +38,14 @@
 #ifndef crypto_api_h
 #define crypto_api_h
 
+// from defines.h
+typedef unsigned char u_int8_t;
+typedef unsigned short int u_int16_t;
+typedef unsigned int u_int32_t;
+typedef long long int int64_t;
+typedef unsigned long long int u_int64_t;
+
+
 #include "openssl/opensslv.h"	// for LIBRESSL_VERSION_NUMBER
 #ifndef LIBRESSL_VERSION_NUMBER
   #include "arc4random.h"
@@ -45,21 +53,14 @@
   #if defined(__MINGW32__) || (_MSC_VER >= 1600)
     #include <stdint.h>
   #else
-    // VS2008‚æ‚èŒÃ‚¢‚Æ stdint.h ‚ª‚È‚¢‚Ì‚ÅŒİŠ·ƒwƒbƒ_‚ğg‚¤
-	//   TODO libressl ‚ª 2008 ‚Åƒrƒ‹ƒh‚Å‚«‚é‚©‚Í•s–¾
+    // VS2008ã‚ˆã‚Šå¤ã„ã¨ stdint.h ãŒãªã„ã®ã§äº’æ›ãƒ˜ãƒƒãƒ€ã‚’ä½¿ã†
+	//   TODO libressl ãŒ 2008 ã§ãƒ“ãƒ«ãƒ‰ã§ãã‚‹ã‹ã¯ä¸æ˜
     #include "compat/stdint.h"
   #endif
   // include LibreSSL header file
   #include "compat/stdlib.h"
 #endif
 #include <stdlib.h>
-
-// from defines.h
-typedef unsigned char u_int8_t;
-typedef unsigned short int u_int16_t;
-typedef unsigned int u_int32_t;
-typedef long long int int64_t;
-typedef unsigned long long int u_int64_t;
 
 typedef int8_t crypto_int8;
 typedef uint8_t crypto_uint8;
@@ -86,6 +87,23 @@ int	crypto_sign_ed25519(unsigned char *, unsigned long long *,
 int	crypto_sign_ed25519_open(unsigned char *, unsigned long long *,
     const unsigned char *, unsigned long long, const unsigned char *);
 int	crypto_sign_ed25519_keypair(unsigned char *, unsigned char *);
+
+#define crypto_kem_sntrup761_PUBLICKEYBYTES 1158
+#define crypto_kem_sntrup761_SECRETKEYBYTES 1763
+#define crypto_kem_sntrup761_CIPHERTEXTBYTES 1039
+#define crypto_kem_sntrup761_BYTES 32
+
+int	crypto_kem_sntrup761_enc(unsigned char *cstr, unsigned char *k,
+    const unsigned char *pk);
+int	crypto_kem_sntrup761_dec(unsigned char *k,
+    const unsigned char *cstr, const unsigned char *sk);
+int	crypto_kem_sntrup761_keypair(unsigned char *pk, unsigned char *sk);
+
+#define crypto_kem_mlkem768_PUBLICKEYBYTES 1184
+#define crypto_kem_mlkem768_SECRETKEYBYTES 2400
+#define crypto_kem_mlkem768_CIPHERTEXTBYTES 1088
+#define crypto_kem_mlkem768_BYTES 32
+
 
 int	bcrypt_pbkdf(const char *, size_t, const u_int8_t *, size_t,
     u_int8_t *, size_t, unsigned int);

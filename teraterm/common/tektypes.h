@@ -28,6 +28,7 @@
  */
 
 /* Constants and types for TEK window */
+#pragma once
 
 #define ViewSizeX 4096
 #define ViewSizeY 3120
@@ -86,7 +87,7 @@ typedef struct {
   int ParseMode;
   int SelectCodeFlag;
 
-  LOGFONT TEKlf;
+  LOGFONT reserve_TEKlf;	// LOGFONTW へ切り替え
   HFONT TEKFont[4];
   HFONT OldMemFont;
   BOOL AdjustSize, ScaleFont;
@@ -145,6 +146,9 @@ typedef struct {
   HFONT MarkerFont;
   BOOL MarkerFlag;
 
-  BYTE HiY, Extra, LoY, HiX, LoX;   
+  BYTE HiY, Extra, LoY, HiX, LoX;
+
+	LOGFONTW TEKlf;
+
 } TTEKVar;
 typedef TTEKVar far *PTEKVar;

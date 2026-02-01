@@ -82,12 +82,12 @@ It recommends that the new name like as Baz....
 
 <ul>
   <li>Source code<br>
-      Read langage file</li>
+      Read language file</li>
   <li>If a message is on dialog, put English message as default text</li>
   <li>Modify language file<br>
       Modify files under installer/release/lang_utf8 folder.
     <ul>
-      <li>English.lng (English)
+      <li>en_US.lng (English)
         <ul>
           <li>Add English message.</li>
           <li>Describe today as message update date.</li>
@@ -95,7 +95,7 @@ It recommends that the new name like as Baz....
           <li>This language file is not read from program. This is a reference for translate to other language.</li>
         </ul>
       </li>
-      <li>Japanese.lng (Japanese)
+      <li>ja_JP.lng (Japanese)
         <ul>
           <li>Add Japanese message.</li>
           <li>Describe today as message update date.</li>
@@ -331,7 +331,7 @@ Otherwise, when a program load an icon image without specifying pixel size for g
 <p>
 Icon file include 4-bit images.<br>
 Windows NT 4.0 supports only 4-bit icon. And notification area icon on Windows 2000 supports only 4-bit icon.<br>
-4-bit color palette is followings:
+4-bit color palette is following:
 </p>
 
 <table border="1">
@@ -386,7 +386,7 @@ Windows NT 4.0 supports only 4-bit icon. And notification area icon on Windows 2
 </table>
 
 <p>
-Source file of each icon images are followings:
+Source file of each icon images are following:
 </p>
 
 <table border="1" style="margin-bottom:1ex;">
@@ -569,7 +569,7 @@ Source file of each icon images are followings:
   <li>Under add/manual folder of TeraTermProject/update_website repository
     <ul>
       <li>License files for web site is managed in TeraTermProject/update_website repository.<br>
-          Replace a license file when it is cahnged.</li>
+          Replace a license file when it is changed.</li>
     </ul>
   </li>
 </ul>
@@ -594,13 +594,13 @@ Required Files
   <dd>
     Output to folder <code>%LOCALAPPDATA%\teraterm5</code>
     when ttermpro.exe crash.<br>
-    File name will be teraterm_YYYMMDD-HHMMSS_HASH.dmp.
+    File name will be teraterm_PLATFORM_YYYMMDD-HHMMSS_HASH.dmp.
   </dd>
 
   <dt>pdb file</dt>
   <dd>
     pdb = program database files (symbol files)<br>
-    debug infomation file for exe file
+    debug information file for exe file
   </dd>
 
   <dt>exe file</dt>

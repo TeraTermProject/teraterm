@@ -38,11 +38,11 @@ typedef struct {
 	int infos[6];
 } CharSetState;
 
-// •¶š‚Ìo—Í
+// æ–‡å­—ã®å‡ºåŠ›
 typedef struct CharSetOpTag {
-	// o—Í‚³‚ê‚é Unicode •¶š
+	// å‡ºåŠ›ã•ã‚Œã‚‹ Unicode æ–‡å­—
 	void (*PutU32)(char32_t code, void *client_data);
-	// o—Í‚³‚ê‚é Control •¶š
+	// å‡ºåŠ›ã•ã‚Œã‚‹ Control æ–‡å­—
 	void (*ParseControl)(BYTE b, void *client_data);
 } CharSetOp;
 

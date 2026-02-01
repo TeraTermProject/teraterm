@@ -42,7 +42,7 @@
 #define	NEW_DIALOG_ENABLE	1		// Vista+
 #define	OLD_DIALOG_ENABLE	1
 
-// IFileOpenDialog‚ªg‚¦‚È‚¢ê‡
+// IFileOpenDialogãŒä½¿ãˆãªã„å ´åˆ
 #if (defined(__MINGW64_VERSION_MAJOR) && (__MINGW64_VERSION_MAJOR <= 8)) || \
 	(_MSC_VER == 1400)
 //		VS2005
@@ -58,11 +58,11 @@ static int CALLBACK BrowseCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM l
 {
 	switch(uMsg) {
 	case BFFM_INITIALIZED: {
-		// ‰Šú‰»
+		// åˆæœŸåŒ–æ™‚
 		const wchar_t *folder = (wchar_t *)lpData;
 		if (folder != NULL && folder[0] != 0) {
-			// ƒtƒHƒ‹ƒ_‚ğ‘I‘ğó‘Ô‚É‚·‚é
-			//		ƒtƒHƒ‹ƒ_‚ª‘¶İ‚µ‚È‚¢‚Æ‚«‚Í 0 ‚ª•Ô‚Á‚Ä‚­‚é
+			// ãƒ•ã‚©ãƒ«ãƒ€ã‚’é¸æŠçŠ¶æ…‹ã«ã™ã‚‹
+			//		ãƒ•ã‚©ãƒ«ãƒ€ãŒå­˜åœ¨ã—ãªã„ã¨ãã¯ 0 ãŒè¿”ã£ã¦ãã‚‹
 			SendMessageW(hwnd, BFFM_SETSELECTIONW, (WPARAM)TRUE, (LPARAM)folder);
 		}
 		break;
@@ -74,11 +74,11 @@ static int CALLBACK BrowseCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM l
 }
 
 /**
- *	API”Å,ŒÃ‚¢
+ *	APIç‰ˆ,å¤ã„
  */
 static BOOL TTSHBrowseForFolderWAPI(const TTBROWSEINFOW *bi, const wchar_t *def, wchar_t **folder)
 {
-	wchar_t buf[MAX_PATH];	// PIDLŒ`®‚Åó‚¯æ‚é‚Ì‚Åƒ_ƒ~[,ˆê‰MAX_PATH’·‚Åó‚¯‚é
+	wchar_t buf[MAX_PATH];	// PIDLå½¢å¼ã§å—ã‘å–ã‚‹ã®ã§ãƒ€ãƒŸãƒ¼,ä¸€å¿œMAX_PATHé•·ã§å—ã‘ã‚‹
 	BROWSEINFOW b = {};
 	b.hwndOwner = bi->hwndOwner;
 	b.pidlRoot = 0;	// 0 = from desktop
@@ -100,11 +100,11 @@ static BOOL TTSHBrowseForFolderWAPI(const TTBROWSEINFOW *bi, const wchar_t *def,
 		return FALSE;
 	}
 
-	// PIDLŒ`®‚Ì–ß‚è’l‚Ìƒtƒ@ƒCƒ‹ƒVƒXƒeƒ€‚ÌƒpƒX‚É•ÏŠ·
+	// PIDLå½¢å¼ã®æˆ»ã‚Šå€¤ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚·ã‚¹ãƒ†ãƒ ã®ãƒ‘ã‚¹ã«å¤‰æ›
 #if _MSC_VER > 1400
-	// VS2005‚Åg‚¦‚éSDK‚É‚ÍSHGetPathFromIDListEx()‚ª“ü‚Á‚Ä‚¢‚È‚¢
+	// VS2005ã§ä½¿ãˆã‚‹SDKã«ã¯SHGetPathFromIDListEx()ãŒå…¥ã£ã¦ã„ãªã„
 	// TODO
-	//	SHGetPathFromIDListEx() ‚ğ win32help ‚Ö‚Á‚Ä‚¢‚­
+	//	SHGetPathFromIDListEx() ã‚’ win32help ã¸æŒã£ã¦ã„ã
 	if (true) {
 		size_t len = MAX_PATH / 2;
 		wchar_t *path = NULL;
@@ -139,20 +139,20 @@ static BOOL TTSHBrowseForFolderWAPI(const TTBROWSEINFOW *bi, const wchar_t *def,
 #endif	// OLD_DIALOG_ENABLE
 
 /**
- *	SHBrowseForFolderW() ‚Ù‚ÚŒİŠ·ŠÖ”
+ *	SHBrowseForFolderW() ã»ã¼äº’æ›é–¢æ•°
  *
  *	@param	TTBROWSEINFOW
- *		- BROWSEINFOW ‚Ì‘ã‚í‚è‚É TTBROWSEINFOW ‚ğg‚¤
- *		- Ÿ‚Ìƒƒ“ƒo‚ª‚È‚¢
+ *		- BROWSEINFOW ã®ä»£ã‚ã‚Šã« TTBROWSEINFOW ã‚’ä½¿ã†
+ *		- æ¬¡ã®ãƒ¡ãƒ³ãƒãŒãªã„
  *  	  - BROWSEINFOW.lpfn
  *		  - BROWSEINFOW.lParam
  *		  - BROWSEINFOW.iImage
- *		- folder ˆø”‚É‘I‘ğƒtƒHƒ‹ƒ_‚ª“ü‚é
- *	@param	def		ƒfƒtƒHƒ‹ƒgƒtƒHƒ‹ƒ_
- *					w’è‚µ‚È‚¢‚Æ‚«‚ÍNULL
- *	@param	folder	w’è‚³‚ê‚½ƒtƒHƒ‹ƒ_
- *					•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
- *					MAX_PATHãŒÀ‚È‚µ
+ *		- folder å¼•æ•°ã«é¸æŠãƒ•ã‚©ãƒ«ãƒ€ãŒå…¥ã‚‹
+ *	@param	def		ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ•ã‚©ãƒ«ãƒ€
+ *					æŒ‡å®šã—ãªã„ã¨ãã¯NULL
+ *	@param	folder	æŒ‡å®šã•ã‚ŒãŸãƒ•ã‚©ãƒ«ãƒ€
+ *					ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
+ *					MAX_PATHä¸Šé™ãªã—
  */
 BOOL TTSHBrowseForFolderW(const TTBROWSEINFOW *bi, const wchar_t *def, wchar_t **folder)
 {
@@ -208,14 +208,14 @@ BOOL TTSHBrowseForFolderW(const TTBROWSEINFOW *bi, const wchar_t *def, wchar_t *
 }
 
 /**
- *	ƒtƒHƒ‹ƒ_‚ğ‘I‘ğ‚·‚é
- *	SHBrowseForFolderW() ‚ğƒR[ƒ‹‚·‚é
+ *	ãƒ•ã‚©ãƒ«ãƒ€ã‚’é¸æŠã™ã‚‹
+ *	SHBrowseForFolderW() ã‚’ã‚³ãƒ¼ãƒ«ã™ã‚‹
  *
- *	@param[in]	def			‘I‘ğƒtƒHƒ‹ƒ_‚Ì‰Šú’l(“Á‚Éw’è‚µ‚È‚¢‚Æ‚«‚Í NULL or "")
- *	@param[out]	**folder	‘I‘ğ‚µ‚½ƒtƒHƒ‹ƒ_‚Ìƒtƒ‹ƒpƒX(ƒLƒƒƒ“ƒZƒ‹‚ÍƒZƒbƒg‚³‚ê‚È‚¢)
- *							•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ(ƒLƒƒƒ“ƒZƒ‹‚Ífree()•s—v)
- *	@retval	TRUE	‘I‘ğ‚µ‚½
- *	@retval	FALSE	ƒLƒƒƒ“ƒZƒ‹‚µ‚½
+ *	@param[in]	def			é¸æŠãƒ•ã‚©ãƒ«ãƒ€ã®åˆæœŸå€¤(ç‰¹ã«æŒ‡å®šã—ãªã„ã¨ãã¯ NULL or "")
+ *	@param[out]	**folder	é¸æŠã—ãŸãƒ•ã‚©ãƒ«ãƒ€ã®ãƒ•ãƒ«ãƒ‘ã‚¹(ã‚­ãƒ£ãƒ³ã‚»ãƒ«æ™‚ã¯ã‚»ãƒƒãƒˆã•ã‚Œãªã„)
+ *							ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨(ã‚­ãƒ£ãƒ³ã‚»ãƒ«æ™‚ã¯free()ä¸è¦)
+ *	@retval	TRUE	é¸æŠã—ãŸ
+ *	@retval	FALSE	ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã—ãŸ
  *
  */
 BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t **folder)
@@ -230,16 +230,16 @@ BOOL doSelectFolderW(HWND hWnd, const wchar_t *def, const wchar_t *msg, wchar_t 
 
 static BOOL GetOpenSaveFileNameWAPI(const TTOPENFILENAMEW *ofn, bool save, wchar_t **filename)
 {
-	// GetSaveFileNameW(), GetOpenFileNameW() ‚ªƒJƒŒƒ“ƒgƒtƒHƒ‹ƒ_‚ğ•ÏX‚µ‚Ä‚µ‚Ü‚¤‚½‚ß
+	// GetSaveFileNameW(), GetOpenFileNameW() ãŒã‚«ãƒ¬ãƒ³ãƒˆãƒ•ã‚©ãƒ«ãƒ€ã‚’å¤‰æ›´ã—ã¦ã—ã¾ã†ãŸã‚
 	wchar_t *curdir;
 	hGetCurrentDirectoryW(&curdir);
 
-	// ‰ŠúƒtƒHƒ‹ƒ_
+	// åˆæœŸãƒ•ã‚©ãƒ«ãƒ€
 	wchar_t *init_dir = NULL;
 	if (ofn->lpstrFile != NULL) {
-		// ‰Šúƒtƒ@ƒCƒ‹w’è‚ ‚è
+		// åˆæœŸãƒ•ã‚¡ã‚¤ãƒ«æŒ‡å®šã‚ã‚Š
 		if (!IsRelativePathW(ofn->lpstrFile)) {
-			// ‰Šúƒtƒ@ƒCƒ‹‚ªâ‘ÎƒpƒX‚È‚çƒpƒX‚ğæ‚èo‚µ‚Ä‰ŠúƒtƒHƒ‹ƒ_‚É‚·‚é
+			// åˆæœŸãƒ•ã‚¡ã‚¤ãƒ«ãŒçµ¶å¯¾ãƒ‘ã‚¹ãªã‚‰ãƒ‘ã‚¹ã‚’å–ã‚Šå‡ºã—ã¦åˆæœŸãƒ•ã‚©ãƒ«ãƒ€ã«ã™ã‚‹
 			init_dir = _wcsdup(ofn->lpstrFile);
 			wchar_t *p = wcsrchr(init_dir, L'\\');
 			if (p != NULL) {
@@ -249,7 +249,7 @@ static BOOL GetOpenSaveFileNameWAPI(const TTOPENFILENAMEW *ofn, bool save, wchar
 	}
 
 	if (init_dir == NULL && ofn->lpstrInitialDir != NULL) {
-		// ‰ŠúƒtƒHƒ‹ƒ_w’è‚ ‚è
+		// åˆæœŸãƒ•ã‚©ãƒ«ãƒ€æŒ‡å®šã‚ã‚Š
 		init_dir = _wcsdup(ofn->lpstrInitialDir);
 	}
 
@@ -303,7 +303,7 @@ static COMDLG_FILTERSPEC *CreateFilterSpec(const wchar_t *filter, UINT *count)
 		p += wcslen(p);
 		p++;
 		if (p - filter > 32*1024) {
-			// ‰½‚©‚¨‚©‚µ‚¢
+			// ä½•ã‹ãŠã‹ã—ã„
 			*count = 0;
 			return NULL;
 		}
@@ -344,18 +344,18 @@ static BOOL GetOpenSaveFileNameW(const TTOPENFILENAMEW *ofn, bool save, wchar_t 
 
 	DWORD options;
 	pFile->GetOptions(&options);
-	// ŒÄ‚Ño‚µ‘¤‚Å–¢İ’è‚È‚ç‚ÎƒNƒŠƒA
+	// å‘¼ã³å‡ºã—å´ã§æœªè¨­å®šãªã‚‰ã°ã‚¯ãƒªã‚¢
 	if (!(OFN_OVERWRITEPROMPT & ofn->Flags)) {
 		options &= ~FOS_OVERWRITEPROMPT;
 	}
 	pFile->SetOptions(options | FOS_NOCHANGEDIR);
 
-	// ‰ŠúƒtƒHƒ‹ƒ_
+	// åˆæœŸãƒ•ã‚©ãƒ«ãƒ€
 	wchar_t* init_dir = NULL;
 	if (ofn->lpstrFile != NULL) {
-		// ‰Šúƒtƒ@ƒCƒ‹w’è‚ ‚è
+		// åˆæœŸãƒ•ã‚¡ã‚¤ãƒ«æŒ‡å®šã‚ã‚Š
 		if (!IsRelativePathW(ofn->lpstrFile)) {
-			// ‰Šúƒtƒ@ƒCƒ‹‚ªâ‘ÎƒpƒX‚È‚çƒpƒX‚ğæ‚èo‚µ‚Ä‰ŠúƒtƒHƒ‹ƒ_‚É‚·‚é
+			// åˆæœŸãƒ•ã‚¡ã‚¤ãƒ«ãŒçµ¶å¯¾ãƒ‘ã‚¹ãªã‚‰ãƒ‘ã‚¹ã‚’å–ã‚Šå‡ºã—ã¦åˆæœŸãƒ•ã‚©ãƒ«ãƒ€ã«ã™ã‚‹
 			init_dir = _wcsdup(ofn->lpstrFile);
 			wchar_t* p = wcsrchr(init_dir, L'\\');
 			if (p != NULL) {
@@ -364,7 +364,7 @@ static BOOL GetOpenSaveFileNameW(const TTOPENFILENAMEW *ofn, bool save, wchar_t 
 		}
 	}
 	if (init_dir == NULL && ofn->lpstrInitialDir != NULL) {
-		// ‰ŠúƒtƒHƒ‹ƒ_w’è‚ ‚è
+		// åˆæœŸãƒ•ã‚©ãƒ«ãƒ€æŒ‡å®šã‚ã‚Š
 		init_dir = _wcsdup(ofn->lpstrInitialDir);
 	}
 	if (init_dir != NULL) {
@@ -378,20 +378,20 @@ static BOOL GetOpenSaveFileNameW(const TTOPENFILENAMEW *ofn, bool save, wchar_t 
 		init_dir = NULL;
 	}
 
-	// ƒ^ƒCƒgƒ‹
+	// ã‚¿ã‚¤ãƒˆãƒ«
 	if (ofn->lpstrTitle != NULL) {
 		pFile->SetTitle(ofn->lpstrTitle);
 	}
 
-	// (Å‰‚©‚ç“ü—Í‚³‚ê‚Ä‚¢‚é)ƒtƒ@ƒCƒ‹–¼
+	// (æœ€åˆã‹ã‚‰å…¥åŠ›ã•ã‚Œã¦ã„ã‚‹)ãƒ•ã‚¡ã‚¤ãƒ«å
 	if (ofn->lpstrFile != NULL) {
-		// ƒtƒ‹ƒpƒX‚Å‚¢‚ê‚é‚Æ‚¾‚ß‚ç‚µ‚¢
+		// ãƒ•ãƒ«ãƒ‘ã‚¹ã§ã„ã‚Œã‚‹ã¨ã ã‚ã‚‰ã—ã„
 		const wchar_t *base = wcsrchr(ofn->lpstrFile, L'\\');
 		if (base != NULL) {
 			base++;
 		}
 		else {
-			// ƒpƒX‹æØ‚è‚ª‚È‚¢
+			// ãƒ‘ã‚¹åŒºåˆ‡ã‚ŠãŒãªã„
 			base = ofn->lpstrFile;
 		}
 		pFile->SetFileName(base);
@@ -435,17 +435,17 @@ static BOOL GetOpenSaveFileNameW(const TTOPENFILENAMEW *ofn, bool save, wchar_t 
 }
 
 /**
- *	GetOpenFileNameW() ŒİŠ·ŠÖ”
- *	ˆÙ‚È‚é“_
- *		- ƒtƒHƒ‹ƒ_‚ª•ÏX‚³‚ê‚È‚¢
- *		- ‰ŠúƒtƒHƒ‹ƒ_İ’è
- *			- ‰Šúƒtƒ@ƒCƒ‹‚Ìƒtƒ‹ƒpƒX‚ğ‰ŠúƒtƒHƒ‹ƒ_‚É‚·‚é
- *		- OFN_SHOWHELP ‚ğƒTƒ|[ƒg‚µ‚Ä‚¢‚È‚¢
+ *	GetOpenFileNameW() äº’æ›é–¢æ•°
+ *	ç•°ãªã‚‹ç‚¹
+ *		- ãƒ•ã‚©ãƒ«ãƒ€ãŒå¤‰æ›´ã•ã‚Œãªã„
+ *		- åˆæœŸãƒ•ã‚©ãƒ«ãƒ€è¨­å®š
+ *			- åˆæœŸãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ãƒ«ãƒ‘ã‚¹ã‚’åˆæœŸãƒ•ã‚©ãƒ«ãƒ€ã«ã™ã‚‹
+ *		- OFN_SHOWHELP ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ãªã„
  *
- *	@param	filename	‘I‘ğ‚³‚ê‚½ƒtƒ@ƒCƒ‹–¼(–ß‚è’l‚ª TRUE‚Ì)
- *						MAX_PATH§ŒÀ‚È‚µA•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
- *	@retval	TRUE		ok‚ª‰Ÿ‚³‚ê‚½
- *	@retval	FALSE		cancel‚ª‰Ÿ‚³‚ê‚½
+ *	@param	filename	é¸æŠã•ã‚ŒãŸãƒ•ã‚¡ã‚¤ãƒ«å(æˆ»ã‚Šå€¤ãŒ TRUEã®æ™‚)
+ *						MAX_PATHåˆ¶é™ãªã—ã€ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
+ *	@retval	TRUE		okãŒæŠ¼ã•ã‚ŒãŸ
+ *	@retval	FALSE		cancelãŒæŠ¼ã•ã‚ŒãŸ
  */
 BOOL TTGetOpenFileNameW(const TTOPENFILENAMEW *ofn, wchar_t **filename)
 {
@@ -455,4 +455,17 @@ BOOL TTGetOpenFileNameW(const TTOPENFILENAMEW *ofn, wchar_t **filename)
 BOOL TTGetSaveFileNameW(const TTOPENFILENAMEW *ofn, wchar_t **filename)
 {
 	return GetOpenSaveFileNameW(ofn, true, filename);
+}
+
+void OpenFontFolder(void)
+{
+	HINSTANCE result = ShellExecuteA(NULL, "open", "ms-settings:fonts", NULL, NULL, SW_SHOWNORMAL);
+	if (result <= (HINSTANCE)32) {
+		wchar_t *font_folder;
+		HRESULT r = _SHGetKnownFolderPath(FOLDERID_Fonts, KF_FLAG_DEFAULT, NULL, &font_folder);
+		if (r == S_OK) {
+			ShellExecuteW(NULL, L"explore", font_folder, NULL, NULL, SW_NORMAL);
+			free(font_folder);
+		}
+	}
 }

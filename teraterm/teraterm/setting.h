@@ -37,8 +37,6 @@ typedef struct
 	BOOL CodePopupEnable;
 	WORD CodePopupKey1;
 	WORD CodePopupKey2;
-	BOOL UseUnicodeApi;
-	int CodePageForANSIDraw;
 } UnicodeDebugParam_t;
 
 extern UnicodeDebugParam_t UnicodeDebugParam;

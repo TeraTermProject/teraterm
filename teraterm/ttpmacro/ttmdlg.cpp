@@ -66,8 +66,10 @@ wchar_t **Params = NULL;
 int ParamCnt;
 int ParamsSize;
 BOOL SleepFlag;
+BOOL IOption;
+BOOL VOption;
 
-// (x,y) = (CW_USEDEFAULT, CW_USEDEFAULT)‚Ì‚Æ‚«ƒZƒ“ƒ^[‚É•\¦
+// (x,y) = (CW_USEDEFAULT, CW_USEDEFAULT)ã®ã¨ãã‚»ãƒ³ã‚¿ãƒ¼ã«è¡¨ç¤º
 static int DlgPosX = CW_USEDEFAULT;
 static int DlgPosY = CW_USEDEFAULT;
 static int DlgPosition = 0;
@@ -76,7 +78,7 @@ static int DlgOffsetY = 0;
 
 static CStatDlg *StatDlg = NULL;
 
-void ParseParam(PBOOL IOption, PBOOL VOption)
+void ParseParam(void)
 {
 	wchar_t *Param, **ptmp;
 	wchar_t Temp[MaxStrLen];
@@ -86,8 +88,8 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	FileName[0] = 0;
 	TopicName[0] = 0;
 	SleepFlag = FALSE;
-	*IOption = FALSE;
-	*VOption = FALSE;
+	IOption = FALSE;
+	VOption = FALSE;
 	Param = GetCommandLineW();
 
 	ParamsSize = 50;
@@ -109,7 +111,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 				continue;
 			}
 			else if (_wcsicmp(Temp, L"/I")==0) {
-				*IOption = TRUE;
+				IOption = TRUE;
 				continue;
 			}
 			else if (_wcsicmp(Temp, L"/S")==0) {
@@ -117,7 +119,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 				continue;
 			}
 			else if (_wcsicmp(Temp, L"/V")==0) {
-				*VOption = TRUE;
+				VOption = TRUE;
 				continue;
 			}
 		}
@@ -157,7 +159,7 @@ BOOL GetFileName(HWND HWin, wchar_t **fname)
 	FNameRec.lpstrFilter = FNFilter;
 	FNameRec.nFilterIndex = 1;
 	FNameRec.lpstrFile = FileName;
-	// ˆÈ‘O“Ç‚İ‚ñ‚¾ .ttl ƒtƒ@ƒCƒ‹‚ÌƒpƒX‚ğ‹L‰¯‚Å‚«‚é‚æ‚¤‚ÉA‰ŠúƒfƒBƒŒƒNƒgƒŠ‚ğŒÅ’è‚É‚µ‚È‚¢B
+	// ä»¥å‰èª­ã¿è¾¼ã‚“ã  .ttl ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹ã‚’è¨˜æ†¶ã§ãã‚‹ã‚ˆã†ã«ã€åˆæœŸãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’å›ºå®šã«ã—ãªã„ã€‚
 	// (2008.4.7 yutaka)
 #if 0
 	FNameRec.lpstrInitialDir = HomeDirW;
@@ -192,8 +194,8 @@ void SetDlgPos(int x, int y, int position, int offset_x, int offset_y)
 /*
   SetDlgPosEX()
 
-   setdlgpos ‚Ìƒpƒ‰ƒ[ƒ^w’è‚Ì‚¤‚¿A‰º‹L‚ÌNo.3‚Æ4‚ğˆ—‚·‚éB
-   No.1‚ÆNo.2‚Í macrodlgbase.h ‚Ì SetDlgPos() ‚Åˆ—‚·‚éB
+   setdlgpos ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿æŒ‡å®šã®ã†ã¡ã€ä¸‹è¨˜ã®No.3ã¨4ã‚’å‡¦ç†ã™ã‚‹ã€‚
+   No.1ã¨No.2ã¯ macrodlgbase.h ã® SetDlgPos() ã§å‡¦ç†ã™ã‚‹ã€‚
 
    setdlgpos [<x> <y> [<position> [<offset x> <offset y>]]]
    1. setdlgpos
@@ -212,7 +214,7 @@ int SetDlgPosEX(HWND hWnd, int width, int height, int *PosX, int *PosY) {
 	POINT pt;
 
 	if (hWnd == NULL || DlgPosition == 0) {
-		return -1;		// ŒÅ’èˆÊ’u
+		return -1;		// å›ºå®šä½ç½®
 	}
 
 	if (Linked) {
@@ -235,15 +237,15 @@ int SetDlgPosEX(HWND hWnd, int width, int height, int *PosX, int *PosY) {
 	}
 	GetDesktopRectFromPoint(&pt, &rcDesktop);
 
-	if (DlgPosition >= 1 && DlgPosition <= 5) {					// ƒfƒBƒXƒvƒŒƒCŠî€
+	if (DlgPosition >= 1 && DlgPosition <= 5) {					// ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤åŸºæº–
 		c_x = rcDesktop.left;
 		c_y = rcDesktop.top;
 		c_width  = rcDesktop.right - rcDesktop.left;
 		c_height = rcDesktop.bottom - rcDesktop.top;
 		position = DlgPosition;
-	} else if (DlgPosition >= 6 && DlgPosition <= 10) {			// vt windowŠî€
+	} else if (DlgPosition >= 6 && DlgPosition <= 10) {			// vt windowåŸºæº–
 		if (! Linked || showflag == 1 || showflag == 3) {
-			return -1; // ”ñƒŠƒ“ƒNA1:Å¬‰»A3:”ñ•\¦ ‚Ìê‡‚ÍŒÅ’èˆÊ’u
+			return -1; // éãƒªãƒ³ã‚¯ã€1:æœ€å°åŒ–ã€3:éè¡¨ç¤º ã®å ´åˆã¯å›ºå®šä½ç½®
 		}
 		position = DlgPosition - 5;
 	} else {
@@ -251,23 +253,23 @@ int SetDlgPosEX(HWND hWnd, int width, int height, int *PosX, int *PosY) {
 	}
 
 	switch (position) {
-	case 1: // ¶ã‹÷
+	case 1: // å·¦ä¸Šéš…
 		new_x = c_x;
 		new_y = c_y;
 		break;
-	case 2: // ‰Eã‹÷
+	case 2: // å³ä¸Šéš…
 		new_x = c_x + c_width - width;
 		new_y = c_y;
 		break;
-	case 3: // ¶‰º‹÷
+	case 3: // å·¦ä¸‹éš…
 		new_x = c_x;
 		new_y = c_y + c_height - height;
 		break;
-	case 4: // ‰E‰º‹÷
+	case 4: // å³ä¸‹éš…
 		new_x = c_x + c_width  - width;
 		new_y = c_y + c_height - height;
 		break;
-	case 5: // ’†‰›
+	case 5: // ä¸­å¤®
 		new_x = c_x + c_width  / 2 - width  / 2;
 		new_y = c_y + c_height / 2 - height / 2;
 		break;
@@ -275,7 +277,7 @@ int SetDlgPosEX(HWND hWnd, int width, int height, int *PosX, int *PosY) {
 	new_x += DlgOffsetX;
 	new_y += DlgOffsetY;
 
-	// ƒfƒXƒNƒgƒbƒv‚©‚ç‚Í‚İo‚³‚È‚¢‚æ‚¤’²®
+	// ãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—ã‹ã‚‰ã¯ã¿å‡ºã•ãªã„ã‚ˆã†èª¿æ•´
 	if (new_x + width > rcDesktop.right) {
 		new_x = rcDesktop.right - width;
 	}
@@ -354,9 +356,9 @@ void BringupStatDlg()
 }
 
 /**
- * @retval 0ˆÈã	‘I‘ğ€–Ú
- * @retval -1		cancelƒ{ƒ^ƒ“
- * @retval -2		closeƒ{ƒ^ƒ“
+ * @retval 0ä»¥ä¸Š	é¸æŠé …ç›®
+ * @retval -1		cancelãƒœã‚¿ãƒ³
+ * @retval -2		closeãƒœã‚¿ãƒ³
  */
 int OpenListDlg(const wchar_t *Text, const wchar_t *Caption, wchar_t **Lists, int Selected, int ext, int DlgWidth, int DlgHeight)
 {

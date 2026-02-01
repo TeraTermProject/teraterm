@@ -90,8 +90,12 @@
 #define CmdSetFlowCtrl      'Z'
 #define CmdSendUTF8String   'a'
 #define CmdSendBinary       'b'
-#define CmdSendCompatString 'c'	// ]—ˆ‚Ì•¶š‘—M‚ÆŒİŠ·, String‚©Binary‚©”»’è•K—v
+#define CmdSendCompatString 'c'	// å¾“æ¥ã®æ–‡å­—é€ä¿¡ã¨äº’æ›, Stringã‹Binaryã‹åˆ¤å®šå¿…è¦
 #define CmdGetTTPos         'd'
+#define CmdSetSerialDelayChar 'e'
+#define CmdSetSerialDelayLine 'f'
+#define CmdSetRecvFileOpt   'g'
+#define CmdRecvFile         'h'
 
 #define LogOptBinary        1
 #define LogOptAppend        2

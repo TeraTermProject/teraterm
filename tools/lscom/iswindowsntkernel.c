@@ -28,7 +28,7 @@
 
 #include <windows.h>
 
-// OS‚ª WindowsNT ƒJ[ƒlƒ‹‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
+// OSãŒ WindowsNT ã‚«ãƒ¼ãƒãƒ«ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
 //
 // return TRUE:  NT kernel
 //        FALSE: Not NT kernel

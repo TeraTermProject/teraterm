@@ -26,8 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* C99•—‚É‹Lq‚Å‚«‚é‚æ‚¤‚Écpp‚Æ‚µ‚½ */
-/* Visual Studio 2005 ‚ª C89 */
+/* C99é¢¨ã«è¨˜è¿°ã§ãã‚‹ã‚ˆã†ã«cppã¨ã—ãŸ */
+/* Visual Studio 2005 ãŒ C89 */
 
 #include <windows.h>
 #include <stdio.h>
@@ -57,18 +57,18 @@
 static const wchar_t *invalidFileNameCharsW = L"\\/:*?\"<>|";
 
 /**
- *	MessageBox‚ğ•\¦‚·‚é
+ *	MessageBoxã‚’è¡¨ç¤ºã™ã‚‹
  *
- *	@param[in]	hWnd			e window
- *	@param[in]	info			ƒ^ƒCƒgƒ‹AƒƒbƒZ[ƒW
- *	@param[in]	UILanguageFile	lngƒtƒ@ƒCƒ‹
- *	@param[in]	...				ƒtƒH[ƒ}ƒbƒgˆø”
+ *	@param[in]	hWnd			è¦ª window
+ *	@param[in]	info			ã‚¿ã‚¤ãƒˆãƒ«ã€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+ *	@param[in]	UILanguageFile	lngãƒ•ã‚¡ã‚¤ãƒ«
+ *	@param[in]	...				ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆå¼•æ•°
  *
- *	info.message ‚ğ‘®‰»•¶š—ñ‚Æ‚µ‚ÄA
- *	UILanguageFile‚æ‚èŒã‚ë‚Ìˆø”‚ğo—Í‚·‚é
+ *	info.message ã‚’æ›¸å¼åŒ–æ–‡å­—åˆ—ã¨ã—ã¦ã€
+ *	UILanguageFileã‚ˆã‚Šå¾Œã‚ã®å¼•æ•°ã‚’å‡ºåŠ›ã™ã‚‹
  *
- *	info.message_key, info.message_default —¼•û‚Æ‚àNULL‚Ìê‡
- *		‰Â•Ïˆø”‚Ì1‚Â–Ú‚ğ‘®‰»•¶š—ñ‚Æ‚µ‚Äg—p‚·‚é
+ *	info.message_key, info.message_default ä¸¡æ–¹ã¨ã‚‚NULLã®å ´åˆ
+ *		å¯å¤‰å¼•æ•°ã®1ã¤ç›®ã‚’æ›¸å¼åŒ–æ–‡å­—åˆ—ã¨ã—ã¦ä½¿ç”¨ã™ã‚‹
  */
 
 static void CALLBACK TTMessageBoxW_WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
@@ -109,7 +109,7 @@ int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILan
 	}
 
 	if (hWnd != NULL) {
-		// ƒEƒBƒ“ƒhƒE‚ğeƒEƒBƒ“ƒhƒE‚Ì’†‰›‚ÖˆÚ“®‚·‚é
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’è¦ªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸­å¤®ã¸ç§»å‹•ã™ã‚‹
 		if (pSetWinEventHook != NULL) {
 			pSetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, &TTMessageBoxW_WinEventProc,
 							 GetCurrentProcessId(), GetCurrentThreadId(), WINEVENT_OUTOFCONTEXT);
@@ -125,18 +125,18 @@ int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILan
 }
 
 /**
- *	MessageBox‚ğ•\¦‚·‚é
+ *	MessageBoxã‚’è¡¨ç¤ºã™ã‚‹
  *
- *	@param[in]	hWnd			e window
- *	@param[in]	info			ƒ^ƒCƒgƒ‹AƒƒbƒZ[ƒW
- *	@param[in]	UILanguageFile	lngƒtƒ@ƒCƒ‹
- *	@param[in]	...				ƒtƒH[ƒ}ƒbƒgˆø”
+ *	@param[in]	hWnd			è¦ª window
+ *	@param[in]	info			ã‚¿ã‚¤ãƒˆãƒ«ã€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+ *	@param[in]	UILanguageFile	lngãƒ•ã‚¡ã‚¤ãƒ«
+ *	@param[in]	...				ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆå¼•æ•°
  *
- *	info.message ‚ğ‘®‰»•¶š—ñ‚Æ‚µ‚ÄA
- *	UILanguageFile‚æ‚èŒã‚ë‚Ìˆø”‚ğo—Í‚·‚é
+ *	info.message ã‚’æ›¸å¼åŒ–æ–‡å­—åˆ—ã¨ã—ã¦ã€
+ *	UILanguageFileã‚ˆã‚Šå¾Œã‚ã®å¼•æ•°ã‚’å‡ºåŠ›ã™ã‚‹
  *
- *	info.message_key, info.message_default —¼•û‚Æ‚àNULL‚Ìê‡
- *		‰Â•Ïˆø”‚Ì1‚Â–Ú‚ğ‘®‰»•¶š—ñ‚Æ‚µ‚Äg—p‚·‚é
+ *	info.message_key, info.message_default ä¸¡æ–¹ã¨ã‚‚NULLã®å ´åˆ
+ *		å¯å¤‰å¼•æ•°ã®1ã¤ç›®ã‚’æ›¸å¼åŒ–æ–‡å­—åˆ—ã¨ã—ã¦ä½¿ç”¨ã™ã‚‹
  */
 int TTMessageBoxA(HWND hWnd, const TTMessageBoxInfoW *info, const char *UILanguageFile, ...)
 {
@@ -177,17 +177,17 @@ int TTMessageBoxA(HWND hWnd, const TTMessageBoxInfoW *info, const char *UILangua
 }
 
 /**
- *	str‚ªƒeƒLƒXƒg‚©‚Ç‚¤‚©ƒ`ƒFƒbƒN
+ *	strãŒãƒ†ã‚­ã‚¹ãƒˆã‹ã©ã†ã‹ãƒã‚§ãƒƒã‚¯
  *
- *	@param[in]	str		ƒeƒXƒg‚·‚é•¶š
- *	@param[in]	len		ƒeƒXƒg‚·‚éƒeƒLƒXƒg’·(L'\0'‚ÍŠÜ‚Ü‚È‚¢)
- *						0‚Ì‚Æ‚«L'\0'‚Ì‘O‚Ü‚ÅƒeƒXƒg‚·‚é
- *	@retval		TRUE	ƒeƒLƒXƒg‚Æv‚í‚ê‚é(’·‚³0‚Ì‚Æ‚«‚àŠÜ‚Ş)
- *				FALSE	ƒeƒLƒXƒg‚Å‚Í‚È‚¢
+ *	@param[in]	str		ãƒ†ã‚¹ãƒˆã™ã‚‹æ–‡å­—
+ *	@param[in]	len		ãƒ†ã‚¹ãƒˆã™ã‚‹ãƒ†ã‚­ã‚¹ãƒˆé•·(L'\0'ã¯å«ã¾ãªã„)
+ *						0ã®ã¨ãL'\0'ã®å‰ã¾ã§ãƒ†ã‚¹ãƒˆã™ã‚‹
+ *	@retval		TRUE	ãƒ†ã‚­ã‚¹ãƒˆã¨æ€ã‚ã‚Œã‚‹(é•·ã•0ã®ã¨ãã‚‚å«ã‚€)
+ *				FALSE	ãƒ†ã‚­ã‚¹ãƒˆã§ã¯ãªã„
  *
- *	ŒŸ¸‚·‚éƒf[ƒ^“à‚É0x20–¢–‚ÌƒeƒLƒXƒg‚É‚Ío‚Ä‚±‚È‚¢•¶š‚ª‚ ‚ê‚Î
- *	ƒoƒCƒiƒŠ‚Æ”»’f
- *	IsTextUnicode() ‚Ì‚Ù‚¤‚ª—Ç‚¢‚©H
+ *	æ¤œæŸ»ã™ã‚‹ãƒ‡ãƒ¼ã‚¿å†…ã«0x20æœªæº€ã®ãƒ†ã‚­ã‚¹ãƒˆã«ã¯å‡ºã¦ã“ãªã„æ–‡å­—ãŒã‚ã‚Œã°
+ *	ãƒã‚¤ãƒŠãƒªã¨åˆ¤æ–­
+ *	IsTextUnicode() ã®ã»ã†ãŒè‰¯ã„ã‹ï¼Ÿ
  */
 BOOL IsTextW(const wchar_t *str, size_t len)
 {
@@ -215,12 +215,12 @@ BOOL IsTextW(const wchar_t *str, size_t len)
 }
 
 /**
- *	ƒNƒŠƒbƒvƒ{[ƒh‚©‚çwchar_t•¶š—ñ‚ğæ“¾‚·‚é
- *	•¶š—ñ’·‚ª•K—v‚È‚Æ‚«‚Íwcslen()‚·‚é‚±‚Æ
+ *	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‹ã‚‰wchar_tæ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹
+ *	æ–‡å­—åˆ—é•·ãŒå¿…è¦ãªã¨ãã¯wcslen()ã™ã‚‹ã“ã¨
  *	@param	hWnd
- *	@param	emtpy		TRUE‚Ì‚Æ‚«ƒNƒŠƒbƒvƒ{[ƒh‚ğ‹ó‚É‚·‚é
- *	@retval	NULL		ƒGƒ‰[
- *	@retval	NULLˆÈŠO	•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^ g—pŒãfree()‚·‚é‚±‚Æ
+ *	@param	emtpy		TRUEã®ã¨ãã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‚’ç©ºã«ã™ã‚‹
+ *	@retval	NULL		ã‚¨ãƒ©ãƒ¼
+ *	@retval	NULLä»¥å¤–	æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ ä½¿ç”¨å¾Œfree()ã™ã‚‹ã“ã¨
  */
 wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 {
@@ -232,12 +232,12 @@ wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 	};
 	UINT Cf = GetPriorityClipboardFormat((UINT *)list, _countof(list));
 	if (Cf == 0) {
-		// ƒNƒŠƒbƒvƒ{[ƒh‚ª‹ó‚¾‚Á‚½
-		// ‹ó•¶š‚ğ•Ô‚·
+		// ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ãŒç©ºã ã£ãŸ
+		// ç©ºæ–‡å­—ã‚’è¿”ã™
 		return _wcsdup(L"");
 	}
 	if (Cf == -1) {
-		// ˆµ‚¦‚éƒf[ƒ^‚ª‚È‚©‚Á‚½
+		// æ‰±ãˆã‚‹ãƒ‡ãƒ¼ã‚¿ãŒãªã‹ã£ãŸ
 		return NULL;
 	}
 
@@ -309,12 +309,12 @@ wchar_t *GetClipboardTextW(HWND hWnd, BOOL empty)
 }
 
 /**
- *	ƒNƒŠƒbƒvƒ{[ƒh‚©‚çANSI•¶š—ñ‚ğæ“¾‚·‚é
- *	•¶š—ñ’·‚ª•K—v‚È‚Æ‚«‚Ístrlen()‚·‚é‚±‚Æ
+ *	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‹ã‚‰ANSIæ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹
+ *	æ–‡å­—åˆ—é•·ãŒå¿…è¦ãªã¨ãã¯strlen()ã™ã‚‹ã“ã¨
  *	@param	hWnd
- *	@param	emtpy	TRUE‚Ì‚Æ‚«ƒNƒŠƒbƒvƒ{[ƒh‚ğ‹ó‚É‚·‚é
- *	@retval	•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^ g—pŒãfree()‚·‚é‚±‚Æ
- *			•¶š‚ª‚È‚¢(‚Ü‚½‚ÍƒGƒ‰[)‚ÍNULL
+ *	@param	emtpy	TRUEã®ã¨ãã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‚’ç©ºã«ã™ã‚‹
+ *	@retval	æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ ä½¿ç”¨å¾Œfree()ã™ã‚‹ã“ã¨
+ *			æ–‡å­—ãŒãªã„(ã¾ãŸã¯ã‚¨ãƒ©ãƒ¼æ™‚)ã¯NULL
  */
 char *GetClipboardTextA(HWND hWnd, BOOL empty)
 {
@@ -348,11 +348,11 @@ char *GetClipboardTextA(HWND hWnd, BOOL empty)
 }
 
 /**
- *	ƒNƒŠƒbƒvƒ{[ƒh‚ÉƒeƒLƒXƒg‚ğƒZƒbƒg‚·‚é
- *	str_w	ƒNƒŠƒbƒvƒ{[ƒh‚ÉƒZƒbƒg‚·‚é•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *			NULL‚Ì‚Æ‚«ƒNƒŠƒbƒvƒ{[ƒh‚ğ‹ó‚É‚·‚é(str_len‚ÍQÆ‚³‚ê‚È‚¢)
- *	str_len	•¶š—ñ’·
- *			0‚Ì‚Æ‚«•¶š—ñ’·‚ª©“®‚ÅZo‚³‚ê‚é
+ *	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«ãƒ†ã‚­ã‚¹ãƒˆã‚’ã‚»ãƒƒãƒˆã™ã‚‹
+ *	str_w	ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«ã‚»ãƒƒãƒˆã™ã‚‹æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *			NULLã®ã¨ãã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‚’ç©ºã«ã™ã‚‹(str_lenã¯å‚ç…§ã•ã‚Œãªã„)
+ *	str_len	æ–‡å­—åˆ—é•·
+ *			0ã®ã¨ãæ–‡å­—åˆ—é•·ãŒè‡ªå‹•ã§ç®—å‡ºã•ã‚Œã‚‹
  */
 BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len)
 {
@@ -376,7 +376,7 @@ BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len)
 	}
 
 	{
-		// •¶š—ñ‚ğƒRƒs[AÅŒã‚ÌL'\0'‚àŠÜ‚ß‚é
+		// æ–‡å­—åˆ—ã‚’ã‚³ãƒ”ãƒ¼ã€æœ€å¾Œã®L'\0'ã‚‚å«ã‚ã‚‹
 		wchar_t *CBCopyWidePtr;
 		const size_t alloc_bytes = (str_len + 1) * sizeof(wchar_t);
 		CBCopyWideHandle = GlobalAlloc(GMEM_MOVEABLE, alloc_bytes);
@@ -396,8 +396,8 @@ BOOL CBSetTextW(HWND hWnd, const wchar_t *str_w, size_t str_len)
 
 	SetClipboardData(CF_UNICODETEXT, CBCopyWideHandle);
 
-	// TODO 9xŒn‚Å‚Í©“®‚ÅCF_TEXT‚ÉƒZƒbƒg‚³‚ê‚È‚¢‚ç‚µ‚¢?
-	// ttl_gui.c ‚Ì TTLVar2Clipb() ‚Å‚Í‚Â‚¬‚Ì2‚Â‚ªs‚í‚ê‚Ä‚¢‚½
+	// TODO 9xç³»ã§ã¯è‡ªå‹•ã§CF_TEXTã«ã‚»ãƒƒãƒˆã•ã‚Œãªã„ã‚‰ã—ã„?
+	// ttl_gui.c ã® TTLVar2Clipb() ã§ã¯ã¤ãã®2ã¤ãŒè¡Œã‚ã‚Œã¦ã„ãŸ
 	//		SetClipboardData(CF_TEXT, hText);
 	//		SetClipboardData(CF_UNICODETEXT, wide_hText);
 	CloseClipboard();
@@ -413,11 +413,11 @@ static void format_line_hexdump(char *buf, int buflen, int addr, int *bytes, int
 
 	buf[0] = 0;
 
-	/* æ“ª‚ÌƒAƒhƒŒƒX•\¦ */
+	/* å…ˆé ­ã®ã‚¢ãƒ‰ãƒ¬ã‚¹è¡¨ç¤º */
 	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%08X : ", addr);
 	strncat_s(buf, buflen, tmp, _TRUNCATE);
 
-	/* ƒoƒCƒiƒŠ•\¦i4ƒoƒCƒg‚²‚Æ‚É‹ó”’‚ğ‘}“üj*/
+	/* ãƒã‚¤ãƒŠãƒªè¡¨ç¤ºï¼ˆ4ãƒã‚¤ãƒˆã”ã¨ã«ç©ºç™½ã‚’æŒ¿å…¥ï¼‰*/
 	for (i = 0; i < byte_cnt; i++) {
 		if (i > 0 && i % 4 == 0) {
 			strncat_s(buf, buflen, " ", _TRUNCATE);
@@ -427,11 +427,11 @@ static void format_line_hexdump(char *buf, int buflen, int addr, int *bytes, int
 		strncat_s(buf, buflen, tmp, _TRUNCATE);
 	}
 
-	/* ASCII•\¦•”•ª‚Ü‚Å‚Ì‹ó”’‚ğ•â‚¤ */
+	/* ASCIIè¡¨ç¤ºéƒ¨åˆ†ã¾ã§ã®ç©ºç™½ã‚’è£œã† */
 	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "   %*s%*s", (16 - byte_cnt) * 2 + 1, " ", (16 - byte_cnt + 3) / 4, " ");
 	strncat_s(buf, buflen, tmp, _TRUNCATE);
 
-	/* ASCII•\¦ */
+	/* ASCIIè¡¨ç¤º */
 	for (i = 0; i < byte_cnt; i++) {
 		c = bytes[i];
 		if (isprint(c)) {
@@ -490,16 +490,16 @@ void OutputDebugHexDump(const void *data, size_t len)
 }
 
 /**
- *	ƒƒjƒ…[‚ğ’Ç‰Á‚·‚é
- *	InsertMenuA() ‚Æ‚Ù‚Ú“¯‚¶“®ì
- *	beforeˆø”‚ğ FALSE ‚É‚·‚é‚ÆŸ‚Ì€–Ú‚É’Ç‰Á‚Å‚«‚é
+ *	ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’è¿½åŠ ã™ã‚‹
+ *	InsertMenuA() ã¨ã»ã¼åŒã˜å‹•ä½œ
+ *	beforeå¼•æ•°ã‚’ FALSE ã«ã™ã‚‹ã¨æ¬¡ã®é …ç›®ã«è¿½åŠ ã§ãã‚‹
  *
- *	@param[in]	hMenu			ƒƒjƒ…[ƒnƒ“ƒhƒ‹ (InsertMenuA() ‚Ì‘æ1ˆø”)
- *	@param[in]	targetItemID	‚±‚ÌID‚Ìƒƒjƒ…[‚Ì‘O–”‚ÍŒã‚ë‚Éƒƒjƒ…[‚ğ’Ç‰Á (InsertMenuA() ‚Ì‘æ2ˆø”)
- *	@param[in]	flags			ƒƒjƒ…[flag (InsertMenuA() ‚Ì‘æ3ˆø”)
- *	@param[in]	newItemID		ƒƒjƒ…[ID (InsertMenuA() ‚Ì‘æ4ˆø”)
- *	@param[in]	text			ƒƒjƒ…[•¶š—ñ (InsertMenuA() ‚Ì‘æ5ˆø”)
- *	@param[in]	before			TRUE/FALSE ‘O‚É’Ç‰Á/Œã‚ë‚É’Ç‰Á (TRUE‚Ì‚Æ‚« InsertMenuA() ‚Æ“¯‚¶“®ì)
+ *	@param[in]	hMenu			ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ³ãƒ‰ãƒ« (InsertMenuA() ã®ç¬¬1å¼•æ•°)
+ *	@param[in]	targetItemID	ã“ã®IDã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®å‰åˆã¯å¾Œã‚ã«ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’è¿½åŠ  (InsertMenuA() ã®ç¬¬2å¼•æ•°)
+ *	@param[in]	flags			ãƒ¡ãƒ‹ãƒ¥ãƒ¼flag (InsertMenuA() ã®ç¬¬3å¼•æ•°)
+ *	@param[in]	newItemID		ãƒ¡ãƒ‹ãƒ¥ãƒ¼ID (InsertMenuA() ã®ç¬¬4å¼•æ•°)
+ *	@param[in]	text			ãƒ¡ãƒ‹ãƒ¥ãƒ¼æ–‡å­—åˆ— (InsertMenuA() ã®ç¬¬5å¼•æ•°)
+ *	@param[in]	before			TRUE/FALSE å‰ã«è¿½åŠ /å¾Œã‚ã«è¿½åŠ  (TRUEã®ã¨ã InsertMenuA() ã¨åŒã˜å‹•ä½œ)
  */
 void TTInsertMenuItemA(HMENU hMenu, UINT targetItemID, UINT flags, UINT newItemID, const char *text, BOOL before)
 {
@@ -518,19 +518,19 @@ void TTInsertMenuItemA(HMENU hMenu, UINT targetItemID, UINT flags, UINT newItemI
 }
 
 /*
- *	•¶š—ñ‚Ì‰üsƒR[ƒh‚ğCR(0x0d)‚¾‚¯‚É‚·‚é
+ *	æ–‡å­—åˆ—ã®æ”¹è¡Œã‚³ãƒ¼ãƒ‰ã‚’CR(0x0d)ã ã‘ã«ã™ã‚‹
  *
- *	@param [in]	*src	“ü—Í•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *	@param [in] *len	“ü—Í•¶š—ñ’·
- *						NULL ‚Ü‚½‚Í 0 ‚Ì‚Æ‚«“à•”‚Å•¶š—ñ’·‚ğ‘ª‚é‚±‚ÌL'\0'‚Í•K{
- *	@param [out] *len	o—Í•¶š—ñ’·(wcslen()‚Æ“¯‚¶)
- *						NULL ‚Ì‚Æ‚«o—Í‚³‚ê‚È‚¢
- *	@return				•ÏŠ·Œã•¶š—ñ(malloc()‚³‚ê‚½—Ìˆæ,free()‚·‚é‚±‚Æ)
- *						NULL ƒƒ‚ƒŠ‚ªŠm•Û‚Å‚«‚È‚©‚Á‚½
+ *	@param [in]	*src	å…¥åŠ›æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *	@param [in] *len	å…¥åŠ›æ–‡å­—åˆ—é•·
+ *						NULL ã¾ãŸã¯ 0 ã®ã¨ãå†…éƒ¨ã§æ–‡å­—åˆ—é•·ã‚’æ¸¬ã‚‹ã“ã®æ™‚L'\0'ã¯å¿…é ˆ
+ *	@param [out] *len	å‡ºåŠ›æ–‡å­—åˆ—é•·(wcslen()ã¨åŒã˜)
+ *						NULL ã®ã¨ãå‡ºåŠ›ã•ã‚Œãªã„
+ *	@return				å¤‰æ›å¾Œæ–‡å­—åˆ—(malloc()ã•ã‚ŒãŸé ˜åŸŸ,free()ã™ã‚‹ã“ã¨)
+ *						NULL ãƒ¡ãƒ¢ãƒªãŒç¢ºä¿ã§ããªã‹ã£ãŸ
  *
- *		“ü—Í•¶š—ñ’·‚Ìw’è‚ª‚ ‚é
- *			“ü—Í•¶š—ñ‚Ì“r’†‚Å L'\0' ‚ªŒ©‚Â‚©‚Á‚½‚çA‚»‚±‚Å•ÏŠ·‚ğI—¹‚·‚é
- *			Œ©‚Â‚©‚ç‚È‚¢‚Æ‚«‚Í“ü—Í•¶š”•ª•ÏŠ·(ÅŒã‚ÉL'\0'‚Í•t‰Á‚³‚ê‚È‚¢)
+ *		å…¥åŠ›æ–‡å­—åˆ—é•·ã®æŒ‡å®šãŒã‚ã‚‹æ™‚
+ *			å…¥åŠ›æ–‡å­—åˆ—ã®é€”ä¸­ã§ L'\0' ãŒè¦‹ã¤ã‹ã£ãŸã‚‰ã€ãã“ã§å¤‰æ›ã‚’çµ‚äº†ã™ã‚‹
+ *			è¦‹ã¤ã‹ã‚‰ãªã„ã¨ãã¯å…¥åŠ›æ–‡å­—æ•°åˆ†å¤‰æ›(æœ€å¾Œã«L'\0'ã¯ä»˜åŠ ã•ã‚Œãªã„)
  */
 wchar_t *NormalizeLineBreakCR(const wchar_t *src, size_t *len)
 {
@@ -570,7 +570,7 @@ wchar_t *NormalizeLineBreakCR(const wchar_t *src, size_t *len)
 			*dest++ = CR;
 		}
 		else if (c == 0) {
-			// EOS‚ğŒ©‚Â‚¯‚½‚Æ‚«‚Í‘Å‚¿Ø‚é
+			// EOSã‚’è¦‹ã¤ã‘ãŸã¨ãã¯æ‰“ã¡åˆ‡ã‚‹
 			*dest++ = 0;
 			find_eos = TRUE;
 			break;
@@ -590,8 +590,8 @@ wchar_t *NormalizeLineBreakCR(const wchar_t *src, size_t *len)
 }
 
 /**
- *	‰üsƒR[ƒh‚ğ CR+LF ‚É•ÏŠ·‚·‚é
- *	@return •ÏŠ·‚³‚ê‚½•¶š—ñ
+ *	æ”¹è¡Œã‚³ãƒ¼ãƒ‰ã‚’ CR+LF ã«å¤‰æ›ã™ã‚‹
+ *	@return å¤‰æ›ã•ã‚ŒãŸæ–‡å­—åˆ—
  */
 wchar_t *NormalizeLineBreakCRLF(const wchar_t *src_)
 {
@@ -600,7 +600,7 @@ wchar_t *NormalizeLineBreakCRLF(const wchar_t *src_)
 	wchar_t *dest;
 	size_t len, need_len, alloc_len;
 
-	// “\‚è•t‚¯ƒf[ƒ^‚Ì’·‚³(len)A‚¨‚æ‚Ñ³‹K‰»Œã‚Ìƒf[ƒ^‚Ì’·‚³(need_len)‚ÌƒJƒEƒ“ƒg
+	// è²¼ã‚Šä»˜ã‘ãƒ‡ãƒ¼ã‚¿ã®é•·ã•(len)ã€ãŠã‚ˆã³æ­£è¦åŒ–å¾Œã®ãƒ‡ãƒ¼ã‚¿ã®é•·ã•(need_len)ã®ã‚«ã‚¦ãƒ³ãƒˆ
 	for (len=0, need_len=0, src=src_; *src != '\0'; src++, len++, need_len++) {
 		if (*src == CR) {
 			need_len++;
@@ -614,7 +614,7 @@ wchar_t *NormalizeLineBreakCRLF(const wchar_t *src_)
 		}
 	}
 
-	// ³‹K‰»Œã‚àƒf[ƒ^’·‚ª•Ï‚í‚ç‚È‚¢ => ³‹K‰»‚Í•K—v‚È‚µ
+	// æ­£è¦åŒ–å¾Œã‚‚ãƒ‡ãƒ¼ã‚¿é•·ãŒå¤‰ã‚ã‚‰ãªã„ => æ­£è¦åŒ–ã¯å¿…è¦ãªã—
 	if (need_len == len) {
 		dest = _wcsdup(src_);
 		return dest;
@@ -700,16 +700,16 @@ void AppendSlashW(wchar_t *Path, size_t destlen)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹–¼(ƒpƒX–¼)‚ğ‰ğÍ‚·‚é
- *	GetFileNamePos() ‚Ì UTF-8”Å
+ *	ãƒ•ã‚¡ã‚¤ãƒ«å(ãƒ‘ã‚¹å)ã‚’è§£æã™ã‚‹
+ *	GetFileNamePos() ã® UTF-8ç‰ˆ
  *
- *	@param[in]	PathName	ƒtƒ@ƒCƒ‹–¼Aƒtƒ‹ƒpƒX
- *	@param[out]	DirLen		––”ö‚ÌƒXƒ‰ƒbƒVƒ…‚ğŠÜ‚ŞƒfƒBƒŒƒNƒgƒŠƒpƒX’·
- *							NULL‚Ì‚Æ‚«’l‚ğ•Ô‚³‚È‚¢
- *	@param[out]	FNPos		ƒtƒ@ƒCƒ‹–¼‚Ö‚Ìindex
- *							&PathName[FNPos] ‚ªƒtƒ@ƒCƒ‹–¼
- *							NULL‚Ì‚Æ‚«’l‚ğ•Ô‚³‚È‚¢
- *	@retval		FALSE		PathName‚ª•s³
+ *	@param[in]	PathName	ãƒ•ã‚¡ã‚¤ãƒ«åã€ãƒ•ãƒ«ãƒ‘ã‚¹
+ *	@param[out]	DirLen		æœ«å°¾ã®ã‚¹ãƒ©ãƒƒã‚·ãƒ¥ã‚’å«ã‚€ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªãƒ‘ã‚¹é•·
+ *							NULLã®ã¨ãå€¤ã‚’è¿”ã•ãªã„
+ *	@param[out]	FNPos		ãƒ•ã‚¡ã‚¤ãƒ«åã¸ã®index
+ *							&PathName[FNPos] ãŒãƒ•ã‚¡ã‚¤ãƒ«å
+ *							NULLã®ã¨ãå€¤ã‚’è¿”ã•ãªã„
+ *	@retval		FALSE		PathNameãŒä¸æ­£
  */
 BOOL GetFileNamePosU8(const char *PathName, int *DirLen, int *FNPos)
 {
@@ -754,16 +754,16 @@ BOOL GetFileNamePosU8(const char *PathName, int *DirLen, int *FNPos)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹–¼(ƒpƒX–¼)‚ğ‰ğÍ‚·‚é
- *	GetFileNamePos() ‚Ì wchar_t”Å
+ *	ãƒ•ã‚¡ã‚¤ãƒ«å(ãƒ‘ã‚¹å)ã‚’è§£æã™ã‚‹
+ *	GetFileNamePos() ã® wchar_tç‰ˆ
  *
- *	@param[in]	PathName	ƒtƒ@ƒCƒ‹–¼Aƒtƒ‹ƒpƒX
- *	@param[out]	DirLen		––”ö‚ÌƒXƒ‰ƒbƒVƒ…‚ğŠÜ‚ŞƒfƒBƒŒƒNƒgƒŠƒpƒX’·
- *							NULL‚Ì‚Æ‚«’l‚ğ•Ô‚³‚È‚¢
- *	@param[out]	FNPos		ƒtƒ@ƒCƒ‹–¼‚Ö‚Ìindex
- *							&PathName[FNPos] ‚ªƒtƒ@ƒCƒ‹–¼
- *							NULL‚Ì‚Æ‚«’l‚ğ•Ô‚³‚È‚¢
- *	@retval		FALSE		PathName‚ª•s³
+ *	@param[in]	PathName	ãƒ•ã‚¡ã‚¤ãƒ«åã€ãƒ•ãƒ«ãƒ‘ã‚¹
+ *	@param[out]	DirLen		æœ«å°¾ã®ã‚¹ãƒ©ãƒƒã‚·ãƒ¥ã‚’å«ã‚€ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªãƒ‘ã‚¹é•·
+ *							NULLã®ã¨ãå€¤ã‚’è¿”ã•ãªã„
+ *	@param[out]	FNPos		ãƒ•ã‚¡ã‚¤ãƒ«åã¸ã®index
+ *							&PathName[FNPos] ãŒãƒ•ã‚¡ã‚¤ãƒ«å
+ *							NULLã®ã¨ãå€¤ã‚’è¿”ã•ãªã„
+ *	@retval		FALSE		PathNameãŒä¸æ­£
  */
 BOOL GetFileNamePosW(const wchar_t *PathName, size_t *DirLen, size_t *FNPos)
 {
@@ -807,7 +807,7 @@ BOOL GetFileNamePosW(const wchar_t *PathName, size_t *DirLen, size_t *FNPos)
 }
 
 /**
- *	ConvHexCharW() ‚Ì wchar_t ”Å
+ *	ConvHexCharW() ã® wchar_t ç‰ˆ
  */
 BYTE ConvHexCharW(wchar_t b)
 {
@@ -826,13 +826,13 @@ BYTE ConvHexCharW(wchar_t b)
 }
 
 /**
- *	Hex2Str() ‚Ì wchar_t ”Å
+ *	Hex2Str() ã® wchar_t ç‰ˆ
  *
- *	@param	Hex		16iƒGƒ“ƒR[ƒh‚³‚ê‚½•¶š—ñ
- *					Str2HexW() ‚Åì¬‚³‚ê‚½•¶š—ñ
- *	@param	MaxLen	•¶š—ñ’·,0=È—ª
- *	@return	ƒfƒR[ƒh‚³‚ê‚½•¶š—ñ
- *			•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
+ *	@param	Hex		16é€²ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ã•ã‚ŒãŸæ–‡å­—åˆ—
+ *					Str2HexW() ã§ä½œæˆã•ã‚ŒãŸæ–‡å­—åˆ—
+ *	@param	MaxLen	æ–‡å­—åˆ—é•·,0=çœç•¥
+ *	@return	ãƒ‡ã‚³ãƒ¼ãƒ‰ã•ã‚ŒãŸæ–‡å­—åˆ—
+ *			ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  */
 wchar_t *Hex2StrW(const wchar_t *Hex, size_t MaxLen)
 {
@@ -891,15 +891,15 @@ wchar_t *Hex2StrW(const wchar_t *Hex, size_t MaxLen)
 }
 
 /**
- *	Str2Hex() ‚Ì wchar_t ”Å
+ *	Str2Hex() ã® wchar_t ç‰ˆ
  *
- *	@param	Str		•¶š—ñ
- *					Hex2StrW() ‚Åì¬‚³‚ê‚½•¶š—ñ
- *	@param	Len		•¶š—ñ’·(wcslen()‚Ì–ß‚è’l‚Æ“¯‚¶),0=È—ª
- *					(0w’èA•¶šI’[‚Ì'\0'‚Í•ÏŠ·‚³‚ê‚È‚¢)
- *	@param	ConvSP	TRUE, L' '‚ğhex‚É•ÏŠ·
- *	@return	16iƒGƒ“ƒR[ƒh‚µ‚½•¶š—ñ
- *			•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
+ *	@param	Str		æ–‡å­—åˆ—
+ *					Hex2StrW() ã§ä½œæˆã•ã‚ŒãŸæ–‡å­—åˆ—
+ *	@param	Len		æ–‡å­—åˆ—é•·(wcslen()ã®æˆ»ã‚Šå€¤ã¨åŒã˜),0=çœç•¥
+ *					(0æŒ‡å®šæ™‚ã€æ–‡å­—çµ‚ç«¯ã®'\0'ã¯å¤‰æ›ã•ã‚Œãªã„)
+ *	@param	ConvSP	TRUEæ™‚, L' 'ã‚’hexã«å¤‰æ›
+ *	@return	16é€²ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ã—ãŸæ–‡å­—åˆ—
+ *			ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  */
 wchar_t *Str2HexW(const wchar_t *Str, size_t Len, BOOL ConvSP)
 {
@@ -969,10 +969,10 @@ wchar_t *Str2HexW(const wchar_t *Str, size_t Len, BOOL ConvSP)
 }
 
 /**
- *	ExtractFileName() ‚Ì wchar_t ”Å
- *	ƒtƒ‹ƒpƒX‚©‚çƒtƒ@ƒCƒ‹–¼•”•ª‚ğæ‚èo‚·
+ *	ExtractFileName() ã® wchar_t ç‰ˆ
+ *	ãƒ•ãƒ«ãƒ‘ã‚¹ã‹ã‚‰ãƒ•ã‚¡ã‚¤ãƒ«åéƒ¨åˆ†ã‚’å–ã‚Šå‡ºã™
  *
- *	@return	ƒtƒ@ƒCƒ‹–¼•”•ª(•s—v‚É‚È‚Á‚½‚çfree()‚·‚é)
+ *	@return	ãƒ•ã‚¡ã‚¤ãƒ«åéƒ¨åˆ†(ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹)
  */
 wchar_t *ExtractFileNameW(const wchar_t *PathName)
 {
@@ -984,33 +984,35 @@ wchar_t *ExtractFileNameW(const wchar_t *PathName)
 }
 
 /**
- *	ExtractDirName() ‚Ì wchar_t ”Å
+ *	ExtractDirName() ã® wchar_t ç‰ˆ
  *
- *	@return	ƒfƒBƒŒƒNƒgƒŠ–¼•”•ª(•s—v‚É‚È‚Á‚½‚çfree()‚·‚é)
+ *	@return	ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªåéƒ¨åˆ†(ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹)
  */
 wchar_t *ExtractDirNameW(const wchar_t *PathName)
 {
 	size_t i;
 	wchar_t *DirName = _wcsdup(PathName);
-	if (!GetFileNamePosW(DirName, &i, NULL))
+	if (!GetFileNamePosW(DirName, &i, NULL)) {
+		free(DirName);
 		return NULL;
+	}
 	DirName[i] = 0;
 	return DirName;
 }
 
 /**
- *	ƒtƒ‹ƒpƒX‚ğæ“¾‚·‚é
+ *	ãƒ•ãƒ«ãƒ‘ã‚¹ã‚’å–å¾—ã™ã‚‹
  *
- *	@param[in]		dir					ƒtƒ@ƒCƒ‹‚ª‘Š‘ÎƒpƒX‚¾‚Á‚½‚ÉŒ³‚Æ‚·‚éƒfƒBƒŒƒNƒgƒŠ
- *	@param[in]		rel_path			rel_path ‘Š‘Î/â‘ÎƒpƒX, ‚±‚ê‚ğƒtƒ‹ƒpƒX‚É•ÏŠ·‚·‚é
- *	@return			ƒtƒ@ƒCƒ‹‚Ìƒtƒ‹ƒpƒX
- *					•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
+ *	@param[in]		dir					ãƒ•ã‚¡ã‚¤ãƒ«ãŒç›¸å¯¾ãƒ‘ã‚¹ã ã£ãŸæ™‚ã«å…ƒã¨ã™ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
+ *	@param[in]		rel_path			rel_path ç›¸å¯¾/çµ¶å¯¾ãƒ‘ã‚¹, ã“ã‚Œã‚’ãƒ•ãƒ«ãƒ‘ã‚¹ã«å¤‰æ›ã™ã‚‹
+ *	@return			ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ãƒ«ãƒ‘ã‚¹
+ *					ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
  */
 wchar_t *GetFullPathW(const wchar_t *dir, const wchar_t *rel_path)
 {
 	wchar_t *fullpath;
 	if (IsRelativePathW(rel_path)) {
-		// ‘Š‘ÎƒpƒXAÀsƒtƒ@ƒCƒ‹ƒtƒHƒ‹ƒ_‚©‚çâ‘ÎƒpƒX‚ğì‚é
+		// ç›¸å¯¾ãƒ‘ã‚¹ã€å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ãƒ•ã‚©ãƒ«ãƒ€ã‹ã‚‰çµ¶å¯¾ãƒ‘ã‚¹ã‚’ä½œã‚‹
 		size_t size = wcslen(dir) + 1 + wcslen(rel_path) + 1;
 		wchar_t *rel = (wchar_t *)malloc(sizeof(wchar_t) * size);
 		wcscpy_s(rel, size, dir);
@@ -1020,25 +1022,25 @@ wchar_t *GetFullPathW(const wchar_t *dir, const wchar_t *rel_path)
 		free(rel);
 	}
 	else {
-		// â‘ÎƒpƒX
+		// çµ¶å¯¾ãƒ‘ã‚¹
 		hGetFullPathNameW(rel_path, &fullpath, NULL);
 	}
 	return fullpath;
 }
 
 /**
- *	UILanguage File (lngƒtƒ@ƒCƒ‹)‚Ìƒtƒ‹ƒpƒX‚ğæ“¾
- *	iniƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚ñ‚Åƒtƒ‹ƒpƒX‚Å•Ô‚·
+ *	UILanguage File (lngãƒ•ã‚¡ã‚¤ãƒ«)ã®ãƒ•ãƒ«ãƒ‘ã‚¹ã‚’å–å¾—
+ *	iniãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚“ã§ãƒ•ãƒ«ãƒ‘ã‚¹ã§è¿”ã™
  *
- *	@param[in]		iniƒtƒ@ƒCƒ‹
- *	@return			UILanguageFileƒpƒXA•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
+ *	@param[in]		iniãƒ•ã‚¡ã‚¤ãƒ«
+ *	@return			UILanguageFileãƒ‘ã‚¹ã€ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
  */
 wchar_t *GetUILanguageFileFullW(const wchar_t *SetupFNameW)
 {
 	const wchar_t *default_lng = L"lang\\Default.lng";
 	wchar_t *UILanguageFileIni;
 	if (SetupFNameW == NULL || SetupFNameW[0] == 0) {
-		UILanguageFileIni = wcsdup(default_lng);
+		UILanguageFileIni = _wcsdup(default_lng);
 	}
 	else {
 		hGetPrivateProfileStringW(L"Tera Term", L"UILanguageFile", default_lng, SetupFNameW,
@@ -1047,11 +1049,11 @@ wchar_t *GetUILanguageFileFullW(const wchar_t *SetupFNameW)
 
 	const size_t len = wcslen(UILanguageFileIni);
 	if (len >= 3 && !IsRelativePathW(UILanguageFileIni)) {
-		// iniƒtƒ@ƒCƒ‹‚Éƒtƒ‹ƒpƒX‚Å‘‚«‚Ü‚ê‚Ä‚¢‚½A‚»‚Ì‚Ü‚Ü•Ô‚·
+		// iniãƒ•ã‚¡ã‚¤ãƒ«ã«ãƒ•ãƒ«ãƒ‘ã‚¹ã§æ›¸ãè¾¼ã¾ã‚Œã¦ã„ãŸæ™‚ã€ãã®ã¾ã¾è¿”ã™
 		return UILanguageFileIni;
 	}
 
-	// UILanguage File ‚Ìƒtƒ‹ƒpƒX = ExeDir + ‘Š‘ÎƒpƒX(ini‚Ì’l)
+	// UILanguage File ã®ãƒ•ãƒ«ãƒ‘ã‚¹ = ExeDir + ç›¸å¯¾ãƒ‘ã‚¹(iniã®å€¤)
 	wchar_t *ExeDirW = GetExeDirW(NULL);
 	wchar_t *UILanguageFileW = GetFullPathW(ExeDirW, UILanguageFileIni);
 	free(UILanguageFileIni);
@@ -1060,12 +1062,12 @@ wchar_t *GetUILanguageFileFullW(const wchar_t *SetupFNameW)
 }
 
 /**
- *	İ’èƒtƒ@ƒCƒ‹(TERATERM.INI“™)‚Ìƒtƒ‹ƒpƒX‚ğæ“¾‚·‚é
+ *	è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«(TERATERM.INIç­‰)ã®ãƒ•ãƒ«ãƒ‘ã‚¹ã‚’å–å¾—ã™ã‚‹
  *
- *	@param[in]	home	İ’èƒtƒ@ƒCƒ‹‚Ì‚ ‚éƒtƒHƒ‹ƒ_
- *						ƒfƒtƒHƒ‹ƒg‚Í GetHomeDirW() ‚Åæ“¾
- *	@param[in]	file	İ’èƒtƒ@ƒCƒ‹–¼(ƒpƒX‚ÍŠÜ‚Ü‚È‚¢)
- *	@return		ƒtƒ‹ƒpƒX (•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ)
+ *	@param[in]	home	è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€
+ *						ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ GetHomeDirW() ã§å–å¾—
+ *	@param[in]	file	è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«å(ãƒ‘ã‚¹ã¯å«ã¾ãªã„)
+ *	@return		ãƒ•ãƒ«ãƒ‘ã‚¹ (ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨)
  */
 wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file)
 {
@@ -1078,11 +1080,11 @@ wchar_t *GetDefaultFNameW(const wchar_t *home, const wchar_t *file)
 }
 
 /**
- *	ƒfƒtƒHƒ‹ƒg‚Ìİ’èƒtƒ@ƒCƒ‹(TERATERM.INI)‚Ìƒtƒ‹ƒpƒX‚ğæ“¾
+ *	ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«(TERATERM.INI)ã®ãƒ•ãƒ«ãƒ‘ã‚¹ã‚’å–å¾—
  *
- *	@param[in]	home	İ’èƒtƒ@ƒCƒ‹‚Ì‚ ‚éƒtƒHƒ‹ƒ_
- *						ƒfƒtƒHƒ‹ƒg‚Í GetHomeDirW() ‚Åæ“¾
- *						NULL‚ÌƒfƒtƒHƒ‹ƒgƒtƒHƒ‹ƒ_
+ *	@param[in]	home	è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€
+ *						ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ GetHomeDirW() ã§å–å¾—
+ *						NULLã®æ™‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ•ã‚©ãƒ«ãƒ€
  */
 wchar_t *GetDefaultSetupFNameW(const wchar_t *home)
 {
@@ -1100,9 +1102,9 @@ wchar_t *GetDefaultSetupFNameW(const wchar_t *home)
 }
 
 /**
- *	ƒGƒXƒP[ƒv•¶š‚ğˆ—‚·‚é
- *	\\,\n,\t,\0 ‚ğ’u‚«Š·‚¦‚é
- *	@return		•¶š”iL'\0'‚ğŠÜ‚Ş)
+ *	ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—æ–‡å­—ã‚’å‡¦ç†ã™ã‚‹
+ *	\\,\n,\t,\0 ã‚’ç½®ãæ›ãˆã‚‹
+ *	@return		æ–‡å­—æ•°ï¼ˆL'\0'ã‚’å«ã‚€)
  */
 size_t RestoreNewLineW(wchar_t *Text)
 {
@@ -1142,7 +1144,7 @@ size_t RestoreNewLineW(wchar_t *Text)
 		}
 	}
 	/* use memcpy to copy with '\0' */
-	j++;	// •¶š—ñ’·
+	j++;	// æ–‡å­—åˆ—é•·
 	memcpy(Text, buf, j * sizeof(wchar_t));
 	return j;
 }
@@ -1300,13 +1302,13 @@ void ConvFNameW(const wchar_t *HomeDir, wchar_t *Temp, size_t templen, const wch
 #endif
 
 /**
- *	path‚ª‘Š‘ÎƒpƒX‚©‚Ç‚¤‚©‚ğ•Ô‚·
- *	NULL‚Ì‚Æ‚« FALSE
+ *	pathãŒç›¸å¯¾ãƒ‘ã‚¹ã‹ã©ã†ã‹ã‚’è¿”ã™
+ *	NULLã®ã¨ã FALSE
  *		TODO
- *			- "\path\path" ("c:\path"‚È‚Çƒhƒ‰ƒCƒu‚ª‚È‚¢ê‡)‚Í‘Š‘ÎƒpƒX?
- *			- "a:path" ‚Í‘Š‘ÎƒpƒX?
- *			- "a:\path" ‚Íâ‘ÎƒpƒX
- *			- "\\path\path" ‚Íâ‘ÎƒpƒX
+ *			- "\path\path" ("c:\path"ãªã©ãƒ‰ãƒ©ã‚¤ãƒ–ãŒãªã„å ´åˆ)ã¯ç›¸å¯¾ãƒ‘ã‚¹?
+ *			- "a:path" ã¯ç›¸å¯¾ãƒ‘ã‚¹?
+ *			- "a:\path" ã¯çµ¶å¯¾ãƒ‘ã‚¹
+ *			- "\\path\path" ã¯çµ¶å¯¾ãƒ‘ã‚¹
  */
 BOOL IsRelativePathW(const wchar_t *path)
 {
@@ -1327,7 +1329,7 @@ BOOL IsRelativePathA(const char *pathA)
 	return r;
 }
 
-// OS‚ª w’è‚³‚ê‚½ƒo[ƒWƒ‡ƒ“‚Æ“™‚µ‚¢ ‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
+// OSãŒ æŒ‡å®šã•ã‚ŒãŸãƒãƒ¼ã‚¸ãƒ§ãƒ³ã¨ç­‰ã—ã„ ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
 BOOL IsWindowsVer(DWORD dwPlatformId, DWORD dwMajorVersion, DWORD dwMinorVersion)
 {
 	OSVERSIONINFOEXA osvi;
@@ -1347,9 +1349,9 @@ BOOL IsWindowsVer(DWORD dwPlatformId, DWORD dwMajorVersion, DWORD dwMinorVersion
 	return (ret);
 }
 
-// OS‚ª w’è‚³‚ê‚½ƒo[ƒWƒ‡ƒ“ˆÈ~ ‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
-//   dwPlatformId ‚ğŒ©‚Ä‚¢‚È‚¢‚Ì‚Å NT ƒJ[ƒlƒ‹“à‚Å‚µ‚©”äŠr‚Å‚«‚È‚¢
-//   5.0 ˆÈã‚Å”äŠr‚·‚é‚±‚Æ
+// OSãŒ æŒ‡å®šã•ã‚ŒãŸãƒãƒ¼ã‚¸ãƒ§ãƒ³ä»¥é™ ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
+//   dwPlatformId ã‚’è¦‹ã¦ã„ãªã„ã®ã§ NT ã‚«ãƒ¼ãƒãƒ«å†…ã§ã—ã‹æ¯”è¼ƒã§ããªã„
+//   5.0 ä»¥ä¸Šã§æ¯”è¼ƒã™ã‚‹ã“ã¨
 BOOL IsWindowsVerOrLater(DWORD dwMajorVersion, DWORD dwMinorVersion)
 {
 	OSVERSIONINFOEXA osvi;
@@ -1367,7 +1369,7 @@ BOOL IsWindowsVerOrLater(DWORD dwMajorVersion, DWORD dwMinorVersion)
 	return (ret);
 }
 
-// OS‚ª Windows XP ˆÈ~ ‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
+// OSãŒ Windows XP ä»¥é™ ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
 //
 // return TRUE:  XP or later
 //        FALSE: 2000 or earlier
@@ -1377,7 +1379,7 @@ BOOL IsWindowsXPOrLater(void)
 }
 
 /**
- *	DeleteComment ‚Ì wchar_t ”Å
+ *	DeleteComment ã® wchar_t ç‰ˆ
  */
 wchar_t *DeleteCommentW(const wchar_t *src)
 {
@@ -1414,24 +1416,24 @@ DWORD TTWinExecA(const char *commandA)
 }
 
 /**
- *	ƒoƒbƒNƒAƒbƒvƒtƒ@ƒCƒ‹‚ğì¬‚·‚é
+ *	ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆã™ã‚‹
  *
- *	@param[in]	fname		ƒtƒ@ƒCƒ‹–¼(ƒtƒ‹ƒpƒX)
- *	@param[in]	prev_str	ƒtƒ@ƒCƒ‹–¼‚Ì‘O‚É’Ç‰Á‚·‚é•¶š—ñ
- *							NULL‚Ìê‡‚ÍAŒ»İ“ú•¶š—ñ‚Æ‚È‚é
- *	—á
+ *	@param[in]	fname		ãƒ•ã‚¡ã‚¤ãƒ«å(ãƒ•ãƒ«ãƒ‘ã‚¹)
+ *	@param[in]	prev_str	ãƒ•ã‚¡ã‚¤ãƒ«åã®å‰ã«è¿½åŠ ã™ã‚‹æ–‡å­—åˆ—
+ *							NULLã®å ´åˆã¯ã€ç¾åœ¨æ—¥æ™‚æ–‡å­—åˆ—ã¨ãªã‚‹
+ *	ä¾‹
  *		frame
  *			"C:\Users\user\AppData\Roaming\teraterm5\TERATERM.INI"
  *		prev_str
  *			NULL
- *		ì¬‚³‚ê‚éƒoƒbƒNƒAƒbƒvƒtƒ@ƒCƒ‹
+ *		ä½œæˆã•ã‚Œã‚‹ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ•ã‚¡ã‚¤ãƒ«
  *			"C:\Users\user\AppData\Roaming\teraterm5\211204_231234_TERATERM.INI"
  */
 void CreateBakupFile(const wchar_t *fname, const wchar_t *prev_str)
 {
 	DWORD attr = GetFileAttributesW(fname);
 	if (attr == INVALID_FILE_ATTRIBUTES) {
-		// ƒtƒ@ƒCƒ‹‚ª‚È‚¢
+		// ãƒ•ã‚¡ã‚¤ãƒ«ãŒãªã„
 		return;
 	}
 
@@ -1462,35 +1464,35 @@ void CreateBakupFile(const wchar_t *fname, const wchar_t *prev_str)
 	}
 }
 
-// common_static.lib ’P‘Ì‚Åƒrƒ‹ƒh‚Å‚«‚é‚æ‚¤’Ç‰Á
-// TODO ‚·‚×‚Äcommon_staticˆÚ“®‚·‚é?
+// common_static.lib å˜ä½“ã§ãƒ“ãƒ«ãƒ‰ã§ãã‚‹ã‚ˆã†è¿½åŠ 
+// TODO ã™ã¹ã¦common_staticç§»å‹•ã™ã‚‹?
 static BOOL _IsWindows2000OrLater(void)
 {
 	return IsWindowsVerOrLater(5, 0);
 }
 
 /**
- *	iniƒtƒ@ƒCƒ‹‚ğŒ»İ‚ÌŠÂ‹«‚É‡‚í‚¹‚Ä•ÏŠ·‚·‚é
+ *	iniãƒ•ã‚¡ã‚¤ãƒ«ã‚’ç¾åœ¨ã®ç’°å¢ƒã«åˆã‚ã›ã¦å¤‰æ›ã™ã‚‹
  *
- *	@param	fname	ƒtƒ‹ƒpƒXƒtƒ@ƒCƒ‹–¼
- *	@param	bak_str	•ÏŠ·‚ÉŒ³ƒtƒ@ƒCƒ‹‚ğƒoƒbƒNƒAƒbƒv‚·‚é‚Æ‚«‚É’Ç‰Á‚·‚é•¶š—ñ
- *	@retval	TRUE	•ÏŠ·‚µ‚½(ƒoƒbƒNƒAƒbƒv‚ğì¬‚µ‚½)
- *	@retval	FALSE	•ÏŠ·‚µ‚È‚©‚Á‚½(ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢)
+ *	@param	fname	ãƒ•ãƒ«ãƒ‘ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å
+ *	@param	bak_str	å¤‰æ›æ™‚ã«å…ƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã™ã‚‹ã¨ãã«è¿½åŠ ã™ã‚‹æ–‡å­—åˆ—
+ *	@retval	TRUE	å¤‰æ›ã—ãŸ(ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã‚’ä½œæˆã—ãŸ)
+ *	@retval	FALSE	å¤‰æ›ã—ãªã‹ã£ãŸ(ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãªã„)
  *
- *	iniƒtƒ@ƒCƒ‹‚Ì•¶šƒR[ƒh
- *		NTŒn‚Å‚ÍANSI‚Ü‚½‚ÍUnicode,UTF16BE BOM)‚ğg—p‚Å‚«‚é
- *		9xŒn‚Å‚ÍANSI‚Ì‚İ
+ *	iniãƒ•ã‚¡ã‚¤ãƒ«ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰
+ *		NTç³»ã§ã¯ANSIã¾ãŸã¯Unicode,UTF16BE BOM)ã‚’ä½¿ç”¨ã§ãã‚‹
+ *		9xç³»ã§ã¯ANSIã®ã¿
  */
 BOOL ConvertIniFileCharCode(const wchar_t *fname,  const wchar_t *bak_str)
 {
 	FILE *fp;
 	_wfopen_s(&fp, fname, L"rb");
 	if (fp == NULL) {
-		// ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢
+		// ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãªã„
 		return FALSE;
 	}
 
-	// ƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€
 	LoadFileCode code;
 	size_t len;
 	char *ini_u8 = LoadFileU8C(fp, &len, &code);
@@ -1534,11 +1536,11 @@ BOOL ConvertIniFileCharCode(const wchar_t *fname,  const wchar_t *bak_str)
 }
 
 /**
- *	ISO8601Šî–{Œ`®‚Ì“ú•¶š—ñ‚ğì¬‚·‚é
+ *	ISO8601åŸºæœ¬å½¢å¼ã®æ—¥æ™‚æ–‡å­—åˆ—ã‚’ä½œæˆã™ã‚‹
  *
- *	@param	t	•¶š—ñ‚ğì¬‚·‚éŠÔ
- *				0‚ÅŒ»İ
- *	@return		•¶š—ñA•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
+ *	@param	t	æ–‡å­—åˆ—ã‚’ä½œæˆã™ã‚‹æ™‚é–“
+ *				0ã§ç¾åœ¨æ™‚åˆ»
+ *	@return		æ–‡å­—åˆ—ã€ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
  */
 wchar_t *MakeISO8601Str(time_t t)
 {
@@ -1604,16 +1606,16 @@ void SaveBmpFromHDC(const wchar_t* fname, HDC hdc, int width, int height)
 }
 
 /**
- *	ƒ_ƒCƒAƒƒOƒtƒHƒ“ƒg‚ğæ“¾‚·‚é
- *	GetMessageboxFontA() ‚Ì unicode”Å
- *	ƒGƒ‰[‚Í”­¶‚µ‚È‚¢
+ *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒ•ã‚©ãƒ³ãƒˆã‚’å–å¾—ã™ã‚‹
+ *	GetMessageboxFontA() ã® unicodeç‰ˆ
+ *	ã‚¨ãƒ©ãƒ¼ã¯ç™ºç”Ÿã—ãªã„
  */
 void GetMessageboxFontW(LOGFONTW *logfont)
 {
 	NONCLIENTMETRICSW nci;
 #if 0
-	// VISTAˆÈ~‚Í\‘¢‘Ì‚ªŠg’£‚³‚ê‚Ä‚¢‚é
-	// ‚±‚±‚Å‚ÍLOGFONTW‚ªæ“¾‚Å‚«‚ê‚Î—Ç‚¢
+	// VISTAä»¥é™ã¯æ§‹é€ ä½“ãŒæ‹¡å¼µã•ã‚Œã¦ã„ã‚‹
+	// ã“ã“ã§ã¯LOGFONTWãŒå–å¾—ã§ãã‚Œã°è‰¯ã„
 	const int st_size = sizeof(mci);
 #else
 	const int st_size = CCSIZEOF_STRUCT(NONCLIENTMETRICSW, lfMessageFont);
@@ -1628,18 +1630,18 @@ void GetMessageboxFontW(LOGFONTW *logfont)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹‚ğƒ‰ƒ“ƒ_ƒ€‚É‘I‚Ô
+ *	ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ©ãƒ³ãƒ€ãƒ ã«é¸ã¶
  *
- *		rand() ‚ğg‚Á‚Ä‚¢‚é‚Ì‚Åƒvƒ‰ƒOƒCƒ“‚Å—˜—p‚·‚é‚Æ‚«‚Ísrand()‚·‚é‚±‚Æ
+ *		rand() ã‚’ä½¿ã£ã¦ã„ã‚‹ã®ã§ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã§åˆ©ç”¨ã™ã‚‹ã¨ãã¯srand()ã™ã‚‹ã“ã¨
  *			srand((unsigned int)time(NULL));
  *
- *	@param[in] filespec_src		“ü—Íƒtƒ@ƒCƒ‹–¼
- *								ƒƒCƒ‹ƒhƒJ[ƒh("*","?"‚È‚Ç)‚ª“ü‚Á‚Ä‚¢‚Ä‚à‚æ‚¢A‚È‚­‚Ä‚à‚æ‚¢
- *								ƒƒCƒ‹ƒhƒJ[ƒh‚ª“ü‚Á‚Ä‚¢‚é‚Æ‚«‚Íƒ‰ƒ“ƒ_ƒ€‚Éƒtƒ@ƒCƒ‹‚ªo—Í‚³‚ê‚é
- *								%HOME% “™‚ÍŠÂ‹«•Ï”‚Æ‚µ‚Ä“WŠJ‚³‚ê‚é
- *								ƒtƒ‹ƒpƒX‚Å‚È‚­‚Ä‚à‚æ‚¢
- *	@return		‘I‚Î‚ê‚½ƒtƒ@ƒCƒ‹A•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
- *				NULL=ƒtƒ@ƒCƒ‹‚ª‚È‚¢
+ *	@param[in] filespec_src		å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«å
+ *								ãƒ¯ã‚¤ãƒ«ãƒ‰ã‚«ãƒ¼ãƒ‰("*","?"ãªã©)ãŒå…¥ã£ã¦ã„ã¦ã‚‚ã‚ˆã„ã€ãªãã¦ã‚‚ã‚ˆã„
+ *								ãƒ¯ã‚¤ãƒ«ãƒ‰ã‚«ãƒ¼ãƒ‰ãŒå…¥ã£ã¦ã„ã‚‹ã¨ãã¯ãƒ©ãƒ³ãƒ€ãƒ ã«ãƒ•ã‚¡ã‚¤ãƒ«ãŒå‡ºåŠ›ã•ã‚Œã‚‹
+ *								%HOME% ç­‰ã¯ç’°å¢ƒå¤‰æ•°ã¨ã—ã¦å±•é–‹ã•ã‚Œã‚‹
+ *								ãƒ•ãƒ«ãƒ‘ã‚¹ã§ãªãã¦ã‚‚ã‚ˆã„
+ *	@return		é¸ã°ã‚ŒãŸãƒ•ã‚¡ã‚¤ãƒ«ã€ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
+ *				NULL=ãƒ•ã‚¡ã‚¤ãƒ«ãŒãªã„
  */
 wchar_t *RandomFileW(const wchar_t *filespec_src)
 {
@@ -1656,10 +1658,10 @@ wchar_t *RandomFileW(const wchar_t *filespec_src)
 		return NULL;
 	}
 
-	//ŠÂ‹«•Ï”‚ğ“WŠJ
+	//ç’°å¢ƒå¤‰æ•°ã‚’å±•é–‹
 	hExpandEnvironmentStringsW(filespec_src, &file_env);
 
-	//â‘ÎƒpƒX‚É•ÏŠ·
+	//çµ¶å¯¾ãƒ‘ã‚¹ã«å¤‰æ›
 	e = hGetFullPathNameW(file_env, &fullpath, NULL);
 	free(file_env);
 	file_env = NULL;
@@ -1667,13 +1669,13 @@ wchar_t *RandomFileW(const wchar_t *filespec_src)
 		return NULL;
 	}
 
-	//ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚Ä‚¢‚é‚©?
+	//ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ã¦ã„ã‚‹ã‹?
 	if (GetFileAttributesW(fullpath) != INVALID_FILE_ATTRIBUTES) {
-		// ƒ}ƒXƒN("*.jpg"‚È‚Ç)‚ª‚È‚­ƒtƒ@ƒCƒ‹‚ª’¼Úw’è‚µ‚Ä‚ ‚éê‡
+		// ãƒã‚¹ã‚¯("*.jpg"ãªã©)ãŒãªããƒ•ã‚¡ã‚¤ãƒ«ãŒç›´æ¥æŒ‡å®šã—ã¦ã‚ã‚‹å ´åˆ
 		return fullpath;
 	}
 
-	//ƒtƒ@ƒCƒ‹‚ğ”‚¦‚é
+	//ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ•°ãˆã‚‹
 	hFind = FindFirstFileW(fullpath,&fd);
 	if (hFind == INVALID_HANDLE_VALUE) {
 		free(fullpath);
@@ -1686,12 +1688,12 @@ wchar_t *RandomFileW(const wchar_t *filespec_src)
 	} while(FindNextFileW(hFind,&fd));
 	FindClose(hFind);
 	if(!file_num) {
-		// 0ŒÂ
+		// 0å€‹
 		free(fullpath);
 		return NULL;
 	}
 
-	//‰½”Ô–Ú‚Ìƒtƒ@ƒCƒ‹‚É‚·‚é‚©Œˆ‚ß‚éB
+	//ä½•ç•ªç›®ã®ãƒ•ã‚¡ã‚¤ãƒ«ã«ã™ã‚‹ã‹æ±ºã‚ã‚‹ã€‚
 	file_num = rand()%file_num + 1;
 
 	hFind = FindFirstFileW(fullpath,&fd);
@@ -1706,7 +1708,7 @@ wchar_t *RandomFileW(const wchar_t *filespec_src)
 	} while(i < file_num && FindNextFileW(hFind,&fd));
 	FindClose(hFind);
 
-	//ƒfƒBƒŒƒNƒgƒŠæ“¾
+	//ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªå–å¾—
 	dir = ExtractDirNameW(fullpath);
 	free(fullpath);
 
@@ -1717,16 +1719,16 @@ wchar_t *RandomFileW(const wchar_t *filespec_src)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹‚ğƒ‰ƒ“ƒ_ƒ€‚É‘I‚Ô
+ *	ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ©ãƒ³ãƒ€ãƒ ã«é¸ã¶
  *
- *	@param[in] filespec_src		“ü—Íƒtƒ@ƒCƒ‹–¼
- *								ƒƒCƒ‹ƒhƒJ[ƒh("*","?"‚È‚Ç)‚ª“ü‚Á‚Ä‚¢‚Ä‚à‚æ‚¢A‚È‚­‚Ä‚à‚æ‚¢
- *								ƒƒCƒ‹ƒhƒJ[ƒh‚ª“ü‚Á‚Ä‚¢‚é‚Æ‚«‚Íƒ‰ƒ“ƒ_ƒ€‚Éƒtƒ@ƒCƒ‹‚ªo—Í‚³‚ê‚é
- *								ƒtƒ‹ƒpƒX‚Å‚È‚­‚Ä‚à‚æ‚¢
- *	@param[out]	filename		ƒtƒ‹ƒpƒXƒtƒ@ƒCƒ‹–¼
- *								ƒJƒŒƒ“ƒgƒtƒHƒ‹ƒ_‘Š‘Î‚Åƒtƒ‹ƒpƒX‚É•ÏŠ·‚³‚ê‚é
- *								ƒtƒ@ƒCƒ‹‚ª‚È‚¢‚Æ‚«‚Í [0] = NULL
- *	@param[in]	destlen			filename ‚Ì—Ìˆæ’·
+ *	@param[in] filespec_src		å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«å
+ *								ãƒ¯ã‚¤ãƒ«ãƒ‰ã‚«ãƒ¼ãƒ‰("*","?"ãªã©)ãŒå…¥ã£ã¦ã„ã¦ã‚‚ã‚ˆã„ã€ãªãã¦ã‚‚ã‚ˆã„
+ *								ãƒ¯ã‚¤ãƒ«ãƒ‰ã‚«ãƒ¼ãƒ‰ãŒå…¥ã£ã¦ã„ã‚‹ã¨ãã¯ãƒ©ãƒ³ãƒ€ãƒ ã«ãƒ•ã‚¡ã‚¤ãƒ«ãŒå‡ºåŠ›ã•ã‚Œã‚‹
+ *								ãƒ•ãƒ«ãƒ‘ã‚¹ã§ãªãã¦ã‚‚ã‚ˆã„
+ *	@param[out]	filename		ãƒ•ãƒ«ãƒ‘ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å
+ *								ã‚«ãƒ¬ãƒ³ãƒˆãƒ•ã‚©ãƒ«ãƒ€ç›¸å¯¾ã§ãƒ•ãƒ«ãƒ‘ã‚¹ã«å¤‰æ›ã•ã‚Œã‚‹
+ *								ãƒ•ã‚¡ã‚¤ãƒ«ãŒãªã„ã¨ãã¯ [0] = NULL
+ *	@param[in]	destlen			filename ã®é ˜åŸŸé•·
  */
 void RandomFile(const char *filespec_src,char *filename, int destlen)
 {
@@ -1743,11 +1745,11 @@ void RandomFile(const char *filespec_src,char *filename, int destlen)
 }
 
 /**
- *	IsDBCSLeadByteEx() ‚Æ‚Ù‚Ú“¯‚¶
- *	ismbblead() ‚ÌŠg’£
+ *	IsDBCSLeadByteEx() ã¨ã»ã¼åŒã˜
+ *	ismbblead() ã®æ‹¡å¼µ
  *
- *	@param	b			ƒeƒXƒg‚·‚é•¶š
- *	@param	code_page	ƒR[ƒhƒy[ƒW,CP_ACP‚ÌŒ»İ‚ÌƒR[ƒhƒy[ƒW
+ *	@param	b			ãƒ†ã‚¹ãƒˆã™ã‚‹æ–‡å­—
+ *	@param	code_page	ã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸,CP_ACPã®æ™‚ç¾åœ¨ã®ã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸
  */
 int __ismbblead(BYTE b, int code_page)
 {
@@ -1756,7 +1758,7 @@ int __ismbblead(BYTE b, int code_page)
 	}
 	switch (code_page) {
 		case 932:
-			// “ú–{Œê shift jis
+			// æ—¥æœ¬èª shift jis
 			if (((0x81 <= b) && (b <= 0x9f)) || ((0xe0 <= b) && (b <= 0xfc))) {
 				return TRUE;
 			}
@@ -1786,10 +1788,10 @@ int __ismbblead(BYTE b, int code_page)
 }
 
 /**
- *	ismbbtrail() ‚ÌŠg’£
+ *	ismbbtrail() ã®æ‹¡å¼µ
  *
- *	@param	b			ƒeƒXƒg‚·‚é•¶š
- *	@param	code_page	ƒR[ƒhƒy[ƒW,CP_ACP‚ÌŒ»İ‚ÌƒR[ƒhƒy[ƒW
+ *	@param	b			ãƒ†ã‚¹ãƒˆã™ã‚‹æ–‡å­—
+ *	@param	code_page	ã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸,CP_ACPã®æ™‚ç¾åœ¨ã®ã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸
  */
 int __ismbbtrail(BYTE b, int code_page)
 {
@@ -1826,10 +1828,10 @@ int __ismbbtrail(BYTE b, int code_page)
 	return FALSE;
 }
 
-// ƒtƒ@ƒCƒ‹–¼‚Ég—p‚Å‚«‚È‚¢•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚©Šm‚©‚ß‚é
+// ãƒ•ã‚¡ã‚¤ãƒ«åã«ä½¿ç”¨ã§ããªã„æ–‡å­—ãŒå«ã¾ã‚Œã¦ã„ã‚‹ã‹ç¢ºã‹ã‚ã‚‹
 BOOL isInvalidFileNameCharW(const wchar_t *FName)
 {
-	// ƒtƒ@ƒCƒ‹‚Ég—p‚·‚é‚±‚Æ‚ª‚Å‚«‚È‚¢•¶š
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã«ä½¿ç”¨ã™ã‚‹ã“ã¨ãŒã§ããªã„æ–‡å­—
 	// cf. Naming Files, Paths, and Namespaces
 	//     http://msdn.microsoft.com/en-us/library/aa365247.aspx
 	static const wchar_t *invalidFileNameStrings[] = {
@@ -1844,7 +1846,7 @@ BOOL isInvalidFileNameCharW(const wchar_t *FName)
 	const wchar_t **p;
 	wchar_t c;
 
-	// ƒ`ƒFƒbƒN‘ÎÛ‚Ì•¶š‚ğ‹­‰»‚µ‚½B(2013.3.9 yutaka)
+	// ãƒã‚§ãƒƒã‚¯å¯¾è±¡ã®æ–‡å­—ã‚’å¼·åŒ–ã—ãŸã€‚(2013.3.9 yutaka)
 	p = invalidFileNameStrings;
 	while (*p) {
 		if (_wcsicmp(FName, *p) == 0) {
@@ -1860,7 +1862,7 @@ BOOL isInvalidFileNameCharW(const wchar_t *FName)
 		}
 	}
 
-	// ƒtƒ@ƒCƒ‹–¼‚Ì––”ö‚ÉƒsƒŠƒIƒh‚¨‚æ‚Ñ‹ó”’‚ÍNGB
+	// ãƒ•ã‚¡ã‚¤ãƒ«åã®æœ«å°¾ã«ãƒ”ãƒªã‚ªãƒ‰ãŠã‚ˆã³ç©ºç™½ã¯NGã€‚
 	c = FName[len - 1];
 	if (c == '.' || c == ' ')
 		return TRUE;
@@ -1869,11 +1871,11 @@ BOOL isInvalidFileNameCharW(const wchar_t *FName)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹–¼‚Ég—p‚Å‚«‚È‚¢•¶š‚ğ c ‚É’u‚«Š·‚¦‚é
+ *	ãƒ•ã‚¡ã‚¤ãƒ«åã«ä½¿ç”¨ã§ããªã„æ–‡å­—ã‚’ c ã«ç½®ãæ›ãˆã‚‹
  *
- *	@param[in]	FName	ƒtƒ@ƒCƒ‹–¼
- *	@param[in]	c		’u‚«Š·‚¦‚é•¶š(0‚Ì‚Æ‚«íœ‚·‚é)
- *	@return		’u‚«Š·‚¦‚½Œã‚Ìƒtƒ@ƒCƒ‹–¼(•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ)
+ *	@param[in]	FName	ãƒ•ã‚¡ã‚¤ãƒ«å
+ *	@param[in]	c		ç½®ãæ›ãˆã‚‹æ–‡å­—(0ã®ã¨ãå‰Šé™¤ã™ã‚‹)
+ *	@return		ç½®ãæ›ãˆãŸå¾Œã®ãƒ•ã‚¡ã‚¤ãƒ«å(ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨)
  */
 wchar_t *replaceInvalidFileNameCharW(const wchar_t *FName, wchar_t c)
 {
@@ -1902,8 +1904,8 @@ wchar_t *replaceInvalidFileNameCharW(const wchar_t *FName, wchar_t c)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹–¼‚Ég—p‚Å‚«‚È‚¢•¶š‚ğ c ‚É’u‚«Š·‚¦‚é
- *	replaceInvalidFileNameCharW() ‚Ì UTF-8 ”Å
+ *	ãƒ•ã‚¡ã‚¤ãƒ«åã«ä½¿ç”¨ã§ããªã„æ–‡å­—ã‚’ c ã«ç½®ãæ›ãˆã‚‹
+ *	replaceInvalidFileNameCharW() ã® UTF-8 ç‰ˆ
  */
 char *replaceInvalidFileNameCharU8(const char *FName, char c)
 {
@@ -1916,16 +1918,16 @@ char *replaceInvalidFileNameCharU8(const char *FName, char c)
 }
 
 /**
- *	g—p‰Â”\‚È strftime() ‘®•¶š‚©ƒ`ƒFƒbƒN‚·‚é
+ *	ä½¿ç”¨å¯èƒ½ãª strftime() æ›¸å¼æ–‡å­—ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
  *
- *	@retval	TRUE	g—p‰Â”\
- *	@retval	FALSE	g—p•s‰Â
+ *	@retval	TRUE	ä½¿ç”¨å¯èƒ½
+ *	@retval	FALSE	ä½¿ç”¨ä¸å¯
  *
- *	- Tera Term ‚Å‚Í strftime() ‚Åg‚¦‚é‚·‚×‚Ä‚Ì‘®‚ğƒTƒ|[ƒg‚µ‚È‚¢
- *	- Visual Studio 2005 ‚ğƒx[ƒX‚É‚µ‚½‘®‚Ì‚İ
- *	- ’Ç‰Á‚·‚éê‡‚ÍŸ‚Ì“_‚ğl—¶‚·‚é‚±‚Æ
- *	  - ƒRƒ“ƒpƒCƒ‰(Visual Studio)‚Ìƒo[ƒWƒ‡ƒ“‚âƒvƒ‰ƒbƒgƒtƒH[ƒ€
- *	  - ƒ}ƒjƒ…ƒAƒ‹‚Ì•ÏX
+ *	- Tera Term ã§ã¯ strftime() ã§ä½¿ãˆã‚‹ã™ã¹ã¦ã®æ›¸å¼ã‚’ã‚µãƒãƒ¼ãƒˆã—ãªã„
+ *	- Visual Studio 2005 ã‚’ãƒ™ãƒ¼ã‚¹ã«ã—ãŸæ›¸å¼ã®ã¿
+ *	- è¿½åŠ ã™ã‚‹å ´åˆã¯æ¬¡ã®ç‚¹ã‚’è€ƒæ…®ã™ã‚‹ã“ã¨
+ *	  - ã‚³ãƒ³ãƒ‘ã‚¤ãƒ©(Visual Studio)ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚„ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ 
+ *	  - ãƒãƒ‹ãƒ¥ã‚¢ãƒ«ã®å¤‰æ›´
  */
 static BOOL IsValidStrftimeCode(const wchar_t c)
 {
@@ -1939,7 +1941,7 @@ static BOOL IsValidStrftimeCode(const wchar_t c)
 	}
 }
 
-// wcsftime ‚É“n‚¹‚È‚¢•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚©Šm‚©‚ß‚é
+// wcsftime ã«æ¸¡ã›ãªã„æ–‡å­—ãŒå«ã¾ã‚Œã¦ã„ã‚‹ã‹ç¢ºã‹ã‚ã‚‹
 BOOL isInvalidStrftimeCharW(const wchar_t *format)
 {
 	size_t i, len, p;
@@ -1956,12 +1958,12 @@ BOOL isInvalidStrftimeCharW(const wchar_t *format)
 					i = p;
 				}
 				else {
-					// g‚¦‚È‚¢‘®
+					// ä½¿ãˆãªã„æ›¸å¼
 					return TRUE;
 				}
 			}
 			else {
-				// % ‚ÅI‚í‚Á‚Ä‚¢‚éê‡‚ÍƒGƒ‰[‚Æ‚·‚é
+				// % ã§çµ‚ã‚ã£ã¦ã„ã‚‹å ´åˆã¯ã‚¨ãƒ©ãƒ¼ã¨ã™ã‚‹
 				return TRUE;
 			}
 		}
@@ -1970,7 +1972,7 @@ BOOL isInvalidStrftimeCharW(const wchar_t *format)
 	return FALSE;
 }
 
-// wcsftime ‚É“n‚¹‚È‚¢•¶š‚ğíœ‚·‚é
+// wcsftime ã«æ¸¡ã›ãªã„æ–‡å­—ã‚’å‰Šé™¤ã™ã‚‹
 void deleteInvalidStrftimeCharW(wchar_t *format)
 {
 	size_t i, j=0, len, p;
@@ -1996,14 +1998,14 @@ void deleteInvalidStrftimeCharW(wchar_t *format)
 					j++;
 				}
 				else {
-					// g‚¦‚È‚¢‘®
+					// ä½¿ãˆãªã„æ›¸å¼
 					i++; // %
 					if (p-i == 2) {
 						i++; // #
 					}
 				}
 			}
-			// % ‚ÅI‚í‚Á‚Ä‚¢‚éê‡‚ÍƒRƒs[‚µ‚È‚¢
+			// % ã§çµ‚ã‚ã£ã¦ã„ã‚‹å ´åˆã¯ã‚³ãƒ”ãƒ¼ã—ãªã„
 		}
 		else {
 			format[j] = format[i];
@@ -2015,17 +2017,17 @@ void deleteInvalidStrftimeCharW(wchar_t *format)
 }
 
 /**
- * DPI Aware (‚DPI‘Î‰)
+ * DPI Aware (é«˜DPIå¯¾å¿œ)
  *
- *	w’èINIƒtƒ@ƒCƒ‹‚Ì Tera Term ƒZƒNƒVƒ‡ƒ“‚ÌDPIAware=on ‚Ì‚Æ‚«
- *	‚DPI‘Î‰‚È‚±‚Æ‚ğWindows‚É’Ê’m‚·‚é
+ *	æŒ‡å®šINIãƒ•ã‚¡ã‚¤ãƒ«ã® Tera Term ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã®DPIAware=on ã®ã¨ã
+ *	é«˜DPIå¯¾å¿œãªã“ã¨ã‚’Windowsã«é€šçŸ¥ã™ã‚‹
  *
- *	@param	SetupFNameW		TERATERM.INI ‚Ìƒtƒ‹ƒpƒX
+ *	@param	SetupFNameW		TERATERM.INI ã®ãƒ•ãƒ«ãƒ‘ã‚¹
  */
 void SetDPIAwareness(const wchar_t *SetupFNameW)
 {
 	if (pIsValidDpiAwarenessContext == NULL || pSetThreadDpiAwarenessContext == NULL) {
-		// ‚DPI‚É‘Î‰‚µ‚Ä‚¢‚È‚¢Windows
+		// é«˜DPIã«å¯¾å¿œã—ã¦ã„ãªã„Windows
 		return;
 	}
 
@@ -2039,14 +2041,14 @@ void SetDPIAwareness(const wchar_t *SetupFNameW)
 }
 
 /**
- *	ƒo[ƒWƒ‡ƒ“î•ñ(aboutbox)—pƒo[ƒWƒ‡ƒ“•¶š—ñ
- *	TT_VERSION_SUBSTR + ("64bit ") + GITVERSION ‚ğ•¶š—ñ‚É‚µ‚Ä•Ô‚·
- *	—á
+ *	ãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±(aboutbox)ç”¨ãƒãƒ¼ã‚¸ãƒ§ãƒ³æ–‡å­—åˆ—
+ *	TT_VERSION_SUBSTR + ("64bit ") + GITVERSION ã‚’æ–‡å­—åˆ—ã«ã—ã¦è¿”ã™
+ *	ä¾‹
  *		"dev (Git 914287eda)"
  *		"dev 64bit (Git 914287eda)"
  *		"(Git 914287eda)"
  *
- *	@return •›ƒo[ƒWƒ‡ƒ“•¶š—ñ •s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
+ *	@return å‰¯ãƒãƒ¼ã‚¸ãƒ§ãƒ³æ–‡å­—åˆ— ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
  */
 char *GetVersionSubstr(void)
 {
@@ -2077,26 +2079,26 @@ char *GetVersionSubstr(void)
 }
 
 /**
- *	ƒvƒƒZƒX‚Ì‹N“®
+ *	ãƒ—ãƒ­ã‚»ã‚¹ã®èµ·å‹•
  *
  *	@param	cmd		cmd != NULL
- *							ƒRƒ}ƒ“ƒh
- *							CreateProcessW() ‚ªg—p‚³‚ê‚é
- *					cmd == NULL‚Ì‚Æ‚«
- *							ƒtƒ@ƒCƒ‹–¼‚ÌŠg’£q‚É‡‚í‚¹‚½ƒvƒƒOƒ‰ƒ€‚ªg—p‚³‚ê‚é
- *							ShellExecuteW() ‚ªg—p‚³‚ê‚é
- *	@param	arg1	cmd != NULL ‚Ì‚Æ‚«
- *							ˆø‚«”1,ˆø”‚ÌƒZƒpƒŒ[ƒ^‚ÍƒXƒy[ƒX,
- *							ƒXƒy[ƒX‚ğŠÜ‚Şˆø”‚Íƒ_ƒuƒ‹ƒNƒI[ƒg‚ÅˆÍ‚Ş
- *							NULL‚Ì‚Æ‚«ˆø”‚È‚µ
- *							cmd‚ªNULLˆÈŠO‚Ì—LŒø
- *					cmd == NULL ‚Ì‚Æ‚«
- *							ShellExecuteW() ‚Ì ‘æ“ñˆø”
- *	@param	arg2			ˆø‚«”2,ƒtƒ@ƒCƒ‹–¼‚ğ‘z’è
- *	@retval	NO_ERROR		ƒGƒ‰[‚È‚µ
- *	@retval	ƒGƒ‰[ƒR[ƒh	(NO_ERRORˆÈŠO)
+ *							ã‚³ãƒãƒ³ãƒ‰
+ *							CreateProcessW() ãŒä½¿ç”¨ã•ã‚Œã‚‹
+ *					cmd == NULLã®ã¨ã
+ *							ãƒ•ã‚¡ã‚¤ãƒ«åã®æ‹¡å¼µå­ã«åˆã‚ã›ãŸãƒ—ãƒ­ã‚°ãƒ©ãƒ ãŒä½¿ç”¨ã•ã‚Œã‚‹
+ *							ShellExecuteW() ãŒä½¿ç”¨ã•ã‚Œã‚‹
+ *	@param	arg1	cmd != NULL ã®ã¨ã
+ *							å¼•ãæ•°1,å¼•æ•°ã®ã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿ã¯ã‚¹ãƒšãƒ¼ã‚¹,
+ *							ã‚¹ãƒšãƒ¼ã‚¹ã‚’å«ã‚€å¼•æ•°ã¯ãƒ€ãƒ–ãƒ«ã‚¯ã‚ªãƒ¼ãƒˆã§å›²ã‚€
+ *							NULLã®ã¨ãå¼•æ•°ãªã—
+ *							cmdãŒNULLä»¥å¤–ã®æ™‚æœ‰åŠ¹
+ *					cmd == NULL ã®ã¨ã
+ *							ShellExecuteW() ã® ç¬¬äºŒå¼•æ•°
+ *	@param	arg2			å¼•ãæ•°2,ãƒ•ã‚¡ã‚¤ãƒ«åã‚’æƒ³å®š
+ *	@retval	NO_ERROR		ã‚¨ãƒ©ãƒ¼ãªã—
+ *	@retval	ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰	(NO_ERRORä»¥å¤–)
  *
- *	TTWinExec()‚àQÆ
+ *	TTWinExec()ã‚‚å‚ç…§
  */
 DWORD TTCreateProcess(const wchar_t *cmd, const wchar_t *arg1, const wchar_t *arg2)
 {
@@ -2140,7 +2142,7 @@ DWORD TTCreateProcess(const wchar_t *cmd, const wchar_t *arg1, const wchar_t *ar
 	else {
 		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"open", arg2, NULL, NULL, SW_NORMAL);
 		if (h <= 32) {
-			// TODO ƒGƒ‰[í•Ê
+			// TODO ã‚¨ãƒ©ãƒ¼ç¨®åˆ¥
 			e = ERROR_FILE_NOT_FOUND;
 		}
 	}

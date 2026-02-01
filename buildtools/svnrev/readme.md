@@ -1,12 +1,16 @@
 ﻿# svnrev
 
-- ソースツリーのsvn(又は git)の情報をヘッダファイル等に書き出すためのツール
+- ソースツリーのgit(又は svn)の情報をヘッダファイル等に書き出すためのツール
   - ソース用のヘッダフィル
-    - 例 `../teraterm/common/svnversion.h`
+    - 例 `../../teraterm/common/svnversion.h`
   - CI用のbatファイル
     - 例 `sourcetree_info.bat`
   - cmake用ファイル
     - 例 buildフォルダの `build_config.cmake`
+  - json用ファイル
+    - 例 buildフォルダの `build_config.json`
+  - Inno Setup用ファイル
+    - 例 installフォルダの `../../installer/build_config.isl`
 
 ## 準備
 
@@ -17,15 +21,15 @@
       strawberry perl が buildtools/perl に展開される
   - または、いくつかのメジャーなperlを探して見つければ使用する
   - perl が見つからない場合は svnversion.default.h が使用される
-- svn(又は git)をインストールしておく
+- git(又は svn)をインストールしておく
+  - Windows用gitの例
+    - git
+      - https://git-scm.com/
   - Windows用svnの例
     - Subversion for Windows
       - http://sourceforge.net/projects/win32svn/
     - TortoiseSVN の command line client tools
       - https://tortoisesvn.net/
-  - Windows用gitの例
-    - git
-      - https://git-scm.com/
   - 標準的なインストールフォルダから自動的に実行ファイルを探す
   - 見つからない場合は環境変数 PATH にあるプログラムを実行する
   - toolinfo.txt にツールのパスを書いておくと優先して使用される
@@ -46,14 +50,51 @@
 
 ## svnrev.pl のオプション
 
+- --architecture
+  - Win32 or x86 or arm64
+  - default Win32
 - --root
   - プロジェクトファイルのパス
   - '.svn/' 又は '.git/' の存在するパス
 - --header
   - ヘッダファイルのパス
+- --cmake
+  - cmakeファイルのパス
+- --json
+  - jsonファイルのパス
 - --svn
   - svnコマンドのパス
 - --git
   - gitコマンドのパス
+- --isl
+  - Inno Setup用ファイルのパス
 
 オプションが toolinfo.txt より優先される
+
+## 使用例
+
+このフォルダで
+```
+$ perl svnrev.pl --architecture x64 --cmake test.cmake --json test.json --isl test.isl --verbose
+root=../..
+tt_version_major=5
+tt_version_minor=6
+tt_version_patch=0
+tt_version_substr=dev
+svn="C:/Program Files/TortoiseSVN/bin/svn.exe"
+git="C:/Program Files/Git/bin/git.exe"
+header="svnversion.h"
+bat="sourcetree_info.bat"
+cmake="test.cmake"
+json="test.json"
+overwrite 0
+architecture="x64"
+SVNREVISION 1234567
+RELEASE 0
+BRANCH_NAME main
+update 'svnversion.h'
+update 'sourcetree_info.bat'
+update 'test.cmake'
+update 'test.json'
+update 'test.isl'
+```

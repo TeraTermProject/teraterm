@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ ‚Å¶¬‚³‚ê‚½ƒCƒ“ƒNƒ‹[ƒh ƒtƒ@ƒCƒ‹B
-// ui_pp.rc ‚ÅŽg—p
+// Microsoft Visual C++ ã§ç”Ÿæˆã•ã‚ŒãŸã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ ãƒ•ã‚¡ã‚¤ãƒ«ã€‚
+// ui_pp.rc ã§ä½¿ç”¨
 //
 #define IDD_TABSHEET_UI                 132
 #define IDC_DLGFONT                     1015
@@ -9,7 +9,6 @@
 #define IDC_DLGFONT_DEFAULT             1018
 #define IDC_LIST_HIDDEN_FONTS_DLG       1019
 #define IDC_LIST_PRO_FONTS_DLG          1022
-#define IDC_FONT_FOLDER_LABEL           2615
 #define IDC_FONT_FOLDER                 2616
 #define IDC_GENUILANG                   2617
 #define IDC_GENUILANG_LABEL             2618

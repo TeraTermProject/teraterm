@@ -34,8 +34,8 @@
 class CMacroDlgBase : public TTCDialog
 {
 protected:
-	int PosX, PosY;  // ƒEƒBƒ“ƒhƒEˆÊ’u
-	int WW, WH;		 // ƒEƒBƒ“ƒhƒE•
+	int PosX, PosY;  // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½ç½®
+	int WW, WH;		 // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å¹…
 
 	CMacroDlgBase()
 	{
@@ -46,20 +46,20 @@ protected:
 	}
 
 	/**
-	 *	ƒ_ƒCƒAƒƒO‚ÌƒTƒCƒY‚ÆˆÊ’u‚ğİ’è‚·‚é
+	 *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚µã‚¤ã‚ºã¨ä½ç½®ã‚’è¨­å®šã™ã‚‹
 	 */
 	void SetDlgPos()
 	{
 		if (WW == 0 || WH == 0) {
-			// ƒEƒBƒ“ƒhƒEˆÊ’u‚Ì‚İİ’è‚·‚é errdlg
+			// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½ç½®ã®ã¿è¨­å®šã™ã‚‹ errdlg
 			if (IsValidPos()) {
 				::SetWindowPos(m_hWnd, HWND_TOP, PosX, PosY, 0, 0, SWP_NOSIZE);
 				MoveWindowToDisplay(m_hWnd);
 			}
 			else {
-				// ’†‰›‚ÉˆÚ“®‚·‚é
+				// ä¸­å¤®ã«ç§»å‹•ã™ã‚‹
 				CenterWindow(m_hWnd, NULL);
-				// ˆÊ’u‚ğ•Û‘¶
+				// ä½ç½®ã‚’ä¿å­˜
 				RECT rcWnd;
 				GetWindowRect(&rcWnd);
 				PosX = rcWnd.left;
@@ -67,18 +67,18 @@ protected:
 			}
 		}
 		else {
-			// ƒEƒBƒ“ƒhƒEƒTƒCƒY‚à‡‚í‚¹‚Äİ’è‚·‚é
+			// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã‚‚åˆã‚ã›ã¦è¨­å®šã™ã‚‹
 			if (IsValidPos()) {
-				// ƒEƒBƒ“ƒhƒEƒTƒCƒY‚ğƒZƒbƒg + w’èˆÊ’u‚ÖˆÚ“®
+				// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã‚’ã‚»ãƒƒãƒˆ + æŒ‡å®šä½ç½®ã¸ç§»å‹•
 				::SetWindowPos(m_hWnd, HWND_TOP, PosX, PosY, WW, WH, 0);
 				MoveWindowToDisplay(m_hWnd);
 			}
 			else {
-				// ƒEƒBƒ“ƒhƒEƒTƒCƒY‚ğƒZƒbƒg
+				// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã‚’ã‚»ãƒƒãƒˆ
 				::SetWindowPos(m_hWnd, HWND_TOP, 0, 0, WW, WH, SWP_NOMOVE);
-				// ƒfƒBƒXƒvƒŒƒC‚Ì’†‰›‚ÉˆÚ“®‚·‚é
+				// ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ä¸­å¤®ã«ç§»å‹•ã™ã‚‹
 				CenterWindow(m_hWnd, NULL);
-				// ˆÊ’u‚ğ•Û‘¶
+				// ä½ç½®ã‚’ä¿å­˜
 				RECT rcWnd;
 				GetWindowRect(&rcWnd);
 				PosX = rcWnd.left;
@@ -89,9 +89,9 @@ protected:
 
 private:
 	/**
-	 *	ƒ_ƒCƒAƒƒOˆÊ’u‚ª—LŒø?
-	 *	@retval TRUE	—LŒø
-	 *	@retval FALSE	–³Œø
+	 *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ä½ç½®ãŒæœ‰åŠ¹?
+	 *	@retval TRUE	æœ‰åŠ¹
+	 *	@retval FALSE	ç„¡åŠ¹
 	 */
 	BOOL IsValidPos()
 	{

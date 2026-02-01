@@ -53,7 +53,8 @@ enum {
 
 /* prototypes */
 struct FileVarProto;
-BOOL XCreate(struct FileVarProto *fv);
+struct Proto_;
+struct Proto_ *XCreate(struct FileVarProto *fv);
 
 #ifdef __cplusplus
 }

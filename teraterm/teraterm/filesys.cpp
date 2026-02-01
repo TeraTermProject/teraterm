@@ -44,6 +44,8 @@
 
 #include "filesys.h"
 
+#define TitSend L"Sending file"
+
 typedef enum {
 	FS_BRACKET_NONE,
 	FS_BRACKET_START,
@@ -97,7 +99,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 	}
 
 	wchar_t *DlgCaption;
-	wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", L"Send file", ts.UILanguageFileW);
+	wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", TitSend, ts.UILanguageFileW);
 	aswprintf(&DlgCaption, L"Tera Term: %s", uimsg);
 	free(uimsg);
 
@@ -107,7 +109,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 	info.DlgCaption = DlgCaption;
 	info.FileName = NULL;
 	info.FullName = fv->FullName;
-	info.HideDialog = FALSE;
+	info.HideDialog = ts.FTHideDialog ? TRUE : FALSE;
 	info.HMainWin = HVTWin;
 
 	FTDlg->Create(hInst, &info);
@@ -169,10 +171,10 @@ static void FreeFileVar(PFileVar *pfv)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹‘—M
- *		Tera Term 4 •û®‚Ìƒtƒ@ƒCƒ‹‘—M
+ *	ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡
+ *		Tera Term 4 æ–¹å¼ã®ãƒ•ã‚¡ã‚¤ãƒ«é€ä¿¡
  *
- *	@param	filename	ƒtƒ@ƒCƒ‹–¼
+ *	@param	filename	ãƒ•ã‚¡ã‚¤ãƒ«å
  *	@param	binaryy		0/1 = text / binary
  */
 BOOL FileSendStart(const wchar_t *filename, int binary)
@@ -292,7 +294,7 @@ static int FSEcho1(PFileVar fv)
 	}
 }
 
-// ˆÈ‰º‚Ì‚Í‚±‚¿‚ç‚ÌŠÖ”‚ğg‚¤
+// ä»¥ä¸‹ã®æ™‚ã¯ã“ã¡ã‚‰ã®é–¢æ•°ã‚’ä½¿ã†
 // - BinaryMode == true
 // - FileBracketMode == FS_BRACKET_NONE
 // - cv.TelFlag == false
@@ -407,14 +409,14 @@ void FileSend(void)
 			SendVar->ByteCount = SendVar->ByteCount + fc;
 
 			if (FileByte==0x0A && fc == 1 && fv->FileCRSend) {
-				// CR ‚ğ‘—‚Á‚½’¼Œã 0x0A ‚¾‚Á‚½ -> ƒtƒ@ƒCƒ‹‚©‚ç1ƒoƒCƒg“Ç‚Ş
+				// CR ã‚’é€ã£ãŸç›´å¾Œ 0x0A ã ã£ãŸ -> ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰1ãƒã‚¤ãƒˆèª­ã‚€
 				ReadFile(SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
 				fc = LOWORD(read_bytes);
 				SendVar->ByteCount = SendVar->ByteCount + fc;
 			}
 
 			if (IsDBCSLeadByte(FileByte)) {
-				// DBCS‚Ì1byte–Ú‚¾‚Á‚½ -> ƒtƒ@ƒCƒ‹‚©‚ç1ƒoƒCƒg“Ç‚ñ‚Å Unicode ‚Æ‚·‚é
+				// DBCSã®1byteç›®ã ã£ãŸ -> ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰1ãƒã‚¤ãƒˆèª­ã‚“ã§ Unicode ã¨ã™ã‚‹
 				char dbcs[2];
 				dbcs[0] = FileByte;
 
@@ -483,7 +485,7 @@ BOOL IsSendVarNULL()
 }
 
 /**
- * TODO: IsSendVarNULL() ‚Æ‚Ìˆá‚¢‚Í?
+ * TODO: IsSendVarNULL() ã¨ã®é•ã„ã¯?
  */
 BOOL FileSnedIsSending(void)
 {

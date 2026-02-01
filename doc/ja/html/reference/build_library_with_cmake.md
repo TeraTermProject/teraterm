@@ -11,11 +11,11 @@
 
 - cmake
   - PATHが通してあればok
-  - cygwinのcmakeはつかえない(Visual Studioをサポートしていない)
+  - Cygwinのcmakeはつかえない(Visual Studioをサポートしていない)
   - Visual Studio 2005 を使う場合は cmake 3.11.4 を使用する必要がある
 - perl
   - ドキュメントファイルの文字コード・改行コード変換に必要
-  - OpenSSL のコンパイル (Tera Term 5は OpenSSL から LibReSSL に切り替えたため使用していない)
+  - OpenSSL のコンパイル (Tera Term 5は OpenSSL から LibreSSL に切り替えたため使用していない)
   - ActivePerl 5.8 以上、または cygwin perl
   - PATHが通っていなければ自動で探す
 
@@ -66,7 +66,7 @@ Visual Studio 2022 arm64 の場合
 
 各々の環境のcmakeを使用する
 
-    cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=32 -P buildall.cmake
+    cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=i686 -P buildall.cmake
 
 # 各フォルダについて
 
@@ -76,7 +76,6 @@ Visual Studio 2022 arm64 の場合
     - `cJSON`
     - `oniguruma_{compiler}`
     - `libressl_{compiler}`
-    - `putty`
     - `SFMT_{compiler}`
     - `zlib_{compiler}`
 

@@ -29,6 +29,8 @@
 #ifndef HOSTKEY_H
 #define HOSTKEY_H
 
+#include "digest.h"
+
 typedef struct Key Key;
 
 typedef enum {
@@ -66,7 +68,7 @@ typedef enum {
 } ssh_agentflag;
 #define isFixedLengthKey(type)	((type) >= KEY_DSA && (type) <= KEY_ED25519)
 
-// fingerprint‚ÌŽí•Ê
+// fingerprintã®ç¨®åˆ¥
 typedef enum {
 	SSH_FP_DEFAULT = 0,
 	SSH_FP_HEX,
@@ -84,16 +86,6 @@ enum fp_type {
 */
 
 typedef enum {
-	SSH_DIGEST_MD5,
-	SSH_DIGEST_RIPEMD160,
-	SSH_DIGEST_SHA1,
-	SSH_DIGEST_SHA256,
-	SSH_DIGEST_SHA384,
-	SSH_DIGEST_SHA512,
-	SSH_DIGEST_MAX,
-} digest_algorithm;
-
-typedef enum {
 	RSA_PUBKEY_SIGN_ALGO_NONE,
 	RSA_PUBKEY_SIGN_ALGO_RSA,
 	RSA_PUBKEY_SIGN_ALGO_RSASHA256,
@@ -108,10 +100,10 @@ char *get_ssh2_hostkey_type_name_from_key(Key *key);
 ssh_keyalgo get_ssh2_hostkey_algorithm_from_name(const char *name);
 char* get_ssh2_hostkey_algorithm_name(ssh_keyalgo algo);
 int get_ssh2_key_hashtype(ssh_keyalgo algo);
+digest_algorithm get_ssh2_key_hash_alg(ssh_keyalgo algo);
 int get_ssh2_agent_flag(ssh_keyalgo algo);
 ssh_keytype get_ssh2_hostkey_type_from_algorithm(ssh_keyalgo algo);
 const char* get_ssh2_hostkey_type_name_from_algorithm(ssh_keyalgo algo);
-char* get_digest_algorithm_name(digest_algorithm id);
 
 void normalize_host_key_order(char *buf);
 void normalize_rsa_pubkey_sign_algo_order(char *buf);

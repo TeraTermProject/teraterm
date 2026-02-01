@@ -30,12 +30,20 @@
 /*	teraterm/ folder only  */
 
 /**
- *	�摜�ǂݍ��݂� GDI+ ���C�u�������g�p����
- *		Windows XP ���痘�p�\
+ *	画像読み込みに GDI+ ライブラリを使用する
+ *		Windows XP から利用可能
  */
 #if !defined(ENABLE_GDIPLUS)
-#define ENABLE_GDIPLUS	1	// 0/1=�L��/����
+#define ENABLE_GDIPLUS	1	// 0/1=有効/無効
 #endif
+
+#define IdleTimerPeriod 1	// OnIdle()の呼び出し間隔(単位:msec)
+                            // ↑ CreateTimerQueueTimer() の精度は約15.6ミリ秒のため、1msecを指定しても呼び出し回数は 64回/1秒 程度
+#define IdleLoopCount 16	// OnIdle()がbusyな場合の最大連続呼び出し回数
+
+extern HANDLE hIdleTimer;
 
 void AddModelessHandle(HWND hWnd);
 void RemoveModelessHandle(HWND hWnd);
+BOOL OnIdle(LONG lCount);
+VOID CALLBACK IdleTimerProc(PVOID lpParam, BOOLEAN TimerOrWaitFired);

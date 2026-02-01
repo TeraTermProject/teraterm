@@ -121,15 +121,15 @@ BOOL CCtrlWindow::OnIdle()
 	if (OutLen>0) {
 		DDESend();
 
-		// Windows2000/XPiƒVƒ“ƒOƒ‹ƒvƒƒZƒbƒTŠÂ‹«j‚É‚¨‚¢‚Äƒ}ƒNƒÀs’†‚ÉCPUg—p—¦‚ª100%‚É‚È‚Á‚Ä‚µ‚Ü‚¤
-		// Œ»Û‚Ö‚Ìb’èˆ’uBttermpro.exe‚Ö‚ÌDDE‘—MŒã‚É–³ğŒ‚É100ƒ~ƒŠ•b‚ÌƒXƒŠ[ƒv‚ğ’Ç‰ÁB
+		// Windows2000/XPï¼ˆã‚·ãƒ³ã‚°ãƒ«ãƒ—ãƒ­ã‚»ãƒƒã‚µç’°å¢ƒï¼‰ã«ãŠã„ã¦ãƒã‚¯ãƒ­å®Ÿè¡Œä¸­ã«CPUä½¿ç”¨ç‡ãŒ100%ã«ãªã£ã¦ã—ã¾ã†
+		// ç¾è±¡ã¸ã®æš«å®šå‡¦ç½®ã€‚ttermpro.exeã¸ã®DDEé€ä¿¡å¾Œã«ç„¡æ¡ä»¶ã«100ãƒŸãƒªç§’ã®ã‚¹ãƒªãƒ¼ãƒ—ã‚’è¿½åŠ ã€‚
 		// (2005.5.25 yutaka)
-		// ˆÈ‰º‚Ìb’èˆ’u‚Í‰ğœB
+		// ä»¥ä¸‹ã®æš«å®šå‡¦ç½®ã¯è§£é™¤ã€‚
 		// (2006.10.13 yutaka)
-		// ˆÈ‰º‚Ìb’èˆ’u‚Í•œŠˆBTera Term–{‘Ì‘¤‚ÌOnIdle()‚É‚¨‚¢‚ÄAXTYP_ADVREQ‚ª•p”É‚É”ò‚Ô‚±‚Æ‚ª
-		// CPU‚ğƒXƒg[ƒ‹‚³‚¹‚Ä‚µ‚Ü‚¤—vˆö‚Æv‚í‚ê‚é‚Ì‚¾‚ªAª–{“IŒ´ˆö‚Í‚¢‚Ü‚¾•s–¾B
+		// ä»¥ä¸‹ã®æš«å®šå‡¦ç½®ã¯å¾©æ´»ã€‚Tera Termæœ¬ä½“å´ã®OnIdle()ã«ãŠã„ã¦ã€XTYP_ADVREQãŒé »ç¹ã«é£›ã¶ã“ã¨ãŒ
+		// CPUã‚’ã‚¹ãƒˆãƒ¼ãƒ«ã•ã›ã¦ã—ã¾ã†è¦å› ã¨æ€ã‚ã‚Œã‚‹ã®ã ãŒã€æ ¹æœ¬çš„åŸå› ã¯ã„ã¾ã ä¸æ˜ã€‚
 		// (2006.11.4 yutaka)
-		// ˆÈ‰º‚Ìb’èˆ’u‚Í DDESend() ‚Ås‚¤‚½‚ßAíœB
+		// ä»¥ä¸‹ã®æš«å®šå‡¦ç½®ã¯ DDESend() ã§è¡Œã†ãŸã‚ã€å‰Šé™¤ã€‚
 		// (2006.11.6 yutaka)
 #if 0
 		Sleep(100);
@@ -139,8 +139,8 @@ BOOL CCtrlWindow::OnIdle()
 	else if (! Pause && (TTLStatus==IdTTLRun)) {
 		Exec();
 
-		// XV‘ÎÛ‚Ìƒ}ƒNƒƒRƒ}ƒ“ƒh‚Ìê‡‚Ì‚İAƒEƒBƒ“ƒhƒE‚ÉXVw¦‚ğo‚·B
-		// –ˆ“x WM_PAINT ‚ğ‘—‚Á‚Ä‚¢‚é‚Æƒ}ƒNƒ‚Ì“®ì‚ª’x‚­‚È‚é‚½‚ßB(2006.2.24 yutaka)
+		// æ›´æ–°å¯¾è±¡ã®ãƒã‚¯ãƒ­ã‚³ãƒãƒ³ãƒ‰ã®å ´åˆã®ã¿ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«æ›´æ–°æŒ‡ç¤ºã‚’å‡ºã™ã€‚
+		// æ¯åº¦ WM_PAINT ã‚’é€ã£ã¦ã„ã‚‹ã¨ãƒã‚¯ãƒ­ã®å‹•ä½œãŒé…ããªã‚‹ãŸã‚ã€‚(2006.2.24 yutaka)
 		if (IsUpdateMacroCommand()) {
 			::InvalidateRect(m_hWnd, NULL, TRUE);
 		}
@@ -271,8 +271,6 @@ BOOL CCtrlWindow::OnInitDialog()
 		{ IDC_CTRLPAUSESTART, "BTN_PAUSE" },
 		{ IDC_CTRLEND, "BTN_END" },
 	};
-	BOOL IOption, VOption;
-	int CmdShow;
 	RECT rc_dlg, rc_filename, rc_lineno;
 	LONG dlg_len, len;
 
@@ -282,10 +280,10 @@ BOOL CCtrlWindow::OnInitDialog()
 
 	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW(IDI_TTMACRO), 0);
 
-	ParseParam(&IOption,&VOption);
+	ParseParam();
 
 	if (FileName[0] == 0 || FileName[0] == '*') {
-		// TTLƒtƒ@ƒCƒ‹w’è‚ª‚È‚¢(or "*")‚Ì‚Æ‚«ƒ_ƒCƒAƒƒO‚©‚ç“ü—Í‚µ‚Ä‚à‚ç‚¤
+		// TTLãƒ•ã‚¡ã‚¤ãƒ«æŒ‡å®šãŒãªã„(or "*")ã®ã¨ããƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‹ã‚‰å…¥åŠ›ã—ã¦ã‚‚ã‚‰ã†
 		wchar_t *ttl;
 		FileName[0] = 0;
 		BOOL r = GetFileName(GetSafeHwnd(), &ttl);
@@ -299,7 +297,7 @@ BOOL CCtrlWindow::OnInitDialog()
 	Params[1] = _wcsdup(ShortName);
 
 	if (FileName[0] == 0) {
-		// TTL ƒtƒ@ƒCƒ‹w’è‚È‚µ
+		// TTL ãƒ•ã‚¡ã‚¤ãƒ«æŒ‡å®šãªã—
 		PostQuitMessage(0);
 		return TRUE;
 	}
@@ -324,15 +322,15 @@ BOOL CCtrlWindow::OnInitDialog()
 	// send the initialization signal to TT
 	SendCmnd(CmdInit,0);
 
-	// ƒ_ƒCƒAƒƒO‚Ì‰ŠúƒTƒCƒY‚ğ•Û‘¶
+	// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®åˆæœŸã‚µã‚¤ã‚ºã‚’ä¿å­˜
 	GetWindowRect(&rc_dlg);
 	m_init_width = rc_dlg.right - rc_dlg.left;
 	m_init_height = rc_dlg.bottom - rc_dlg.top;
 
-	/* ƒ}ƒNƒƒEƒBƒ“ƒhƒE‚ğƒŠƒTƒCƒY‰Â”\‚É‚·‚éB
+	/* ãƒã‚¯ãƒ­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ãƒªã‚µã‚¤ã‚ºå¯èƒ½ã«ã™ã‚‹ã€‚
 	 * (2015.1.2 yutaka)
 	 */
-	// Œ»İƒTƒCƒY‚©‚ç•K—v‚È’l‚ğŒvZ
+	// ç¾åœ¨ã‚µã‚¤ã‚ºã‹ã‚‰å¿…è¦ãªå€¤ã‚’è¨ˆç®—
 	::GetClientRect(m_hWnd, &rc_dlg);
 	ClientToScreen(m_hWnd, &rc_dlg);
 	dlg_len = rc_dlg.right - rc_dlg.left;
@@ -345,32 +343,21 @@ BOOL CCtrlWindow::OnInitDialog()
 	len = rc_lineno.right - rc_lineno.left;
 	m_lineno_ratio = len * 100 / dlg_len;
 
-	// ƒŠƒTƒCƒYƒAƒCƒRƒ“‚ğ‰E‰º‚É•\¦‚³‚¹‚½‚¢‚Ì‚ÅAƒXƒe[ƒ^ƒXƒo[‚ğ•t‚¯‚éB
+	// ãƒªã‚µã‚¤ã‚ºã‚¢ã‚¤ã‚³ãƒ³ã‚’å³ä¸‹ã«è¡¨ç¤ºã•ã›ãŸã„ã®ã§ã€ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ãƒãƒ¼ã‚’ä»˜ã‘ã‚‹ã€‚
 	m_hStatus = ::CreateStatusWindow(
 		WS_CHILD | WS_VISIBLE |
 		CCS_BOTTOM | SBARS_SIZEGRIP, NULL, GetSafeHwnd(), 1);
 
 	CenterWindow(m_hWnd, NULL);
 
-	if (VOption) {
-		return TRUE;
-	}
-	if (IOption) {
-		CmdShow = SW_SHOWMINIMIZED;
-	}
-	else {
-		CmdShow = SW_SHOWDEFAULT;
-	}
-	ShowWindow(CmdShow);
-
 	return TRUE;
 }
 
-// ƒ_ƒCƒAƒƒOã‚ÉƒLƒƒƒ“ƒZƒ‹ƒ{ƒ^ƒ“ IDCANCEL ‚ª‚È‚¢‚Ì‚ÅA
-// ESC‚ª‰Ÿ‚³‚ê‚½‚Æ‚«‚¾‚¯ŒÄ‚Ño‚³‚ê‚é
+// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ä¸Šã«ã‚­ãƒ£ãƒ³ã‚»ãƒ«ãƒœã‚¿ãƒ³ IDCANCEL ãŒãªã„ã®ã§ã€
+// ESCãŒæŠ¼ã•ã‚ŒãŸã¨ãã ã‘å‘¼ã³å‡ºã•ã‚Œã‚‹
 BOOL CCtrlWindow::OnCancel()
 {
-	// ‰½‚à‚¹‚¸‚ÉTRUE‚ğ•Ô‚· -> ESCƒL[‚ğ–³Œø‰»
+	// ä½•ã‚‚ã›ãšã«TRUEã‚’è¿”ã™ -> ESCã‚­ãƒ¼ã‚’ç„¡åŠ¹åŒ–
 	return TRUE;
 }
 
@@ -414,9 +401,9 @@ void CCtrlWindow::OnDestroy()
 	EndTTL();
 	EndDDE();
 
-	// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“I—¹‚ÉƒAƒCƒRƒ“‚ğ”jŠü‚·‚é‚ÆAƒEƒBƒ“ƒhƒE‚ªÁ‚¦‚é‘O‚É
-	// ƒ^ƒCƒgƒ‹ƒo[‚ÌƒAƒCƒRƒ“‚ª "Windows ‚ÌÀsƒtƒ@ƒCƒ‹‚ÌƒAƒCƒRƒ“" ‚É•Ï‚í‚é
-	// ‚±‚Æ‚ª‚ ‚é‚Ì‚Å”jŠü‚µ‚È‚¢
+	// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³çµ‚äº†æ™‚ã«ã‚¢ã‚¤ã‚³ãƒ³ã‚’ç ´æ£„ã™ã‚‹ã¨ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒæ¶ˆãˆã‚‹å‰ã«
+	// ã‚¿ã‚¤ãƒˆãƒ«ãƒãƒ¼ã®ã‚¢ã‚¤ã‚³ãƒ³ãŒ "Windows ã®å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚¢ã‚¤ã‚³ãƒ³" ã«å¤‰ã‚ã‚‹
+	// ã“ã¨ãŒã‚ã‚‹ã®ã§ç ´æ£„ã—ãªã„
 	// TTSetIcon(m_hInst, m_hWnd, NULL, 0);
 
 	::DestroyWindow(m_hStatus);
@@ -434,7 +421,7 @@ void CCtrlWindow::OnPaint()
 	// line number (2005.7.18 yutaka)
 	// added line buffer (2005.7.22 yutaka)
 	// added MACRO filename (2013.9.8 yutaka)
-	// ƒtƒ@ƒCƒ‹–¼‚Ì––”ö‚ÍÈ—ª•\¦‚Æ‚·‚éB(2014.12.30 yutaka)
+	// ãƒ•ã‚¡ã‚¤ãƒ«åã®æœ«å°¾ã¯çœç•¥è¡¨ç¤ºã¨ã™ã‚‹ã€‚(2014.12.30 yutaka)
 	SetDlgItemTextW(IDC_FILENAME, wc::fromUtf8(GetMacroFileName()));
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, ":%d:%s", GetLineNo(), GetLineBuffer());
 	SetDlgItemTextA(IDC_LINENO, buf);
@@ -442,7 +429,7 @@ void CCtrlWindow::OnPaint()
 	EndPaint(&ps);
 }
 
-// ƒ}ƒNƒƒEƒBƒ“ƒhƒE‚ğƒŠƒTƒCƒY‰Â”\‚Æ‚·‚é‚½‚ß‚ÉAOnSizeƒnƒ“ƒhƒ‰‚ğoverride‚·‚éB
+// ãƒã‚¯ãƒ­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ãƒªã‚µã‚¤ã‚ºå¯èƒ½ã¨ã™ã‚‹ãŸã‚ã«ã€OnSizeãƒãƒ³ãƒ‰ãƒ©ã‚’overrideã™ã‚‹ã€‚
 // (2015.1.1 yutaka)
 void CCtrlWindow::OnSize(UINT nType, int cx, int cy)
 {
@@ -454,7 +441,7 @@ void CCtrlWindow::OnSize(UINT nType, int cx, int cy)
 	ClientToScreen(m_hWnd, &rc_dlg);
 	len = rc_dlg.right - rc_dlg.left;
 
-	// TTLƒtƒ@ƒCƒ‹–¼‚ÌÄ”z’u
+	// TTLãƒ•ã‚¡ã‚¤ãƒ«åã®å†é…ç½®
 	HWND hWnd = GetDlgItem(IDC_FILENAME);
 	::GetWindowRect(hWnd, &rc_filename);
 	ScreenToClient(m_hWnd, &rc_filename);
@@ -466,7 +453,7 @@ void CCtrlWindow::OnSize(UINT nType, int cx, int cy)
 	);
 	new_x = rc_filename.left + new_w;
 
-	// s”Ô†‚ÌÄ”z’u
+	// è¡Œç•ªå·ã®å†é…ç½®
 	hWnd = GetDlgItem(IDC_LINENO);
 	::GetWindowRect(hWnd, &rc_lineno);
 	ScreenToClient(m_hWnd, &rc_lineno);
@@ -482,16 +469,16 @@ void CCtrlWindow::OnSize(UINT nType, int cx, int cy)
 	::SendMessage(m_hStatus, WM_SIZE, nType, (cy<<16)|cx );
 }
 
-// ƒ}ƒNƒƒEƒBƒ“ƒhƒE‚ğƒŠƒTƒCƒY‰Â”\‚Æ‚·‚é‚½‚ß‚ÉAOnGetMinMaxInfoƒnƒ“ƒhƒ‰‚ğoverride‚·‚éB
+// ãƒã‚¯ãƒ­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ãƒªã‚µã‚¤ã‚ºå¯èƒ½ã¨ã™ã‚‹ãŸã‚ã«ã€OnGetMinMaxInfoãƒãƒ³ãƒ‰ãƒ©ã‚’overrideã™ã‚‹ã€‚
 // (2015.1.1 yutaka)
 void CCtrlWindow::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
-	// ‰º‹L‚Ìˆ—‚ª‚ ‚é‚ÆARelease build”Å‚Å Tera Term ‚©‚ç ttpmacro.exe ‚ğŒÄ‚Ño‚·‚ÆA
-	// ƒXƒg[ƒ‹‚·‚é‚½‚ßA‚¢‚Á‚½‚ñ–³Œø‰»‚·‚éB
+	// ä¸‹è¨˜ã®å‡¦ç†ãŒã‚ã‚‹ã¨ã€Release buildç‰ˆã§ Tera Term ã‹ã‚‰ ttpmacro.exe ã‚’å‘¼ã³å‡ºã™ã¨ã€
+	// ã‚¹ãƒˆãƒ¼ãƒ«ã™ã‚‹ãŸã‚ã€ã„ã£ãŸã‚“ç„¡åŠ¹åŒ–ã™ã‚‹ã€‚
 #if 0
 	LPMINMAXINFO lpmmi;
 
-	// ƒ_ƒCƒAƒƒO‚Ì‰ŠúƒTƒCƒY‚æ‚è¬‚³‚­‚Å‚«‚È‚¢‚æ‚¤‚É‚·‚é
+	// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®åˆæœŸã‚µã‚¤ã‚ºã‚ˆã‚Šå°ã•ãã§ããªã„ã‚ˆã†ã«ã™ã‚‹
 	lpmmi = (LPMINMAXINFO)lpMMI;
 	lpmmi->ptMinTrackSize.x = m_init_width;
 	lpmmi->ptMinTrackSize.y = m_init_height;

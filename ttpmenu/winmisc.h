@@ -47,23 +47,23 @@
 #define		POSITION_CENTER			0x04
 #define		POSITION_OUTSIDE		0x05
 
-// ƒpƒXƒ[ƒhˆÃ†—p
+// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰æš—å·ç”¨
 #define		ENCRYPT2_SALTLEN		16
 #define		ENCRYPT2_CIPHER			EVP_aes_256_ctr()
 #define		ENCRYPT2_DIGEST			EVP_sha512()
-#define		ENCRYPT2_ITER1			1001	// ƒpƒXƒ[ƒhˆÈŠO
-#define		ENCRYPT2_ITER2			210001	// ƒpƒXƒ[ƒh—p (Ql https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2)
+#define		ENCRYPT2_ITER1			1001	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ä»¥å¤–
+#define		ENCRYPT2_ITER2			210001	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ç”¨ (å‚è€ƒ https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2)
 #define		ENCRYPT2_IKLEN			32
 #define		ENCRYPT2_IVLEN			16
 #define		ENCRYPT2_TAG			"\252\002"
 #define		ENCRYPT2_PWD_MAX_LEN	161
 
-typedef struct {									//	   Œv 259ƒoƒCƒg(MAX_PATH - 1ƒoƒCƒg)
-	unsigned char Tag[2];							// •½•¶     2 Encrypt2¯•Êƒ^ƒO (ENCRYPT2_TAG)
-	unsigned char PassSalt[ENCRYPT2_SALTLEN];		// •½•¶	   16 RAND_bytes()
-	unsigned char PassStr[ENCRYPT2_PWD_MAX_LEN];	// ˆÃ†•¶ 161 EVP_aes_256_ctr()
-	unsigned char EncSalt[ENCRYPT2_SALTLEN];		// ˆÃ†•¶  16 RAND_bytes()
-	unsigned char EncHash[SHA512_DIGEST_LENGTH];	// ˆÃ†•¶  64 HMAC512(Tag ` EncSalt)
+typedef struct {									//	   è¨ˆ 259ãƒã‚¤ãƒˆ(MAX_PATH - 1ãƒã‚¤ãƒˆ)
+	unsigned char Tag[2];							// å¹³æ–‡     2 Encrypt2è­˜åˆ¥ã‚¿ã‚° (ENCRYPT2_TAG)
+	unsigned char PassSalt[ENCRYPT2_SALTLEN];		// å¹³æ–‡	   16 RAND_bytes()
+	unsigned char PassStr[ENCRYPT2_PWD_MAX_LEN];	// æš—å·æ–‡ 161 EVP_aes_256_ctr()
+	unsigned char EncSalt[ENCRYPT2_SALTLEN];		// æš—å·æ–‡  16 RAND_bytes()
+	unsigned char EncHash[SHA512_DIGEST_LENGTH];	// æš—å·æ–‡  64 HMAC512(Tag ã€œ EncSalt)
 } Encrypt2Profile, *Encrypt2ProfileP;
 
 #define	ENCRYPT2_PROFILE_LEN		sizeof(Encrypt2Profile)

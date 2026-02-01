@@ -37,7 +37,7 @@ static bool IsWindowsNTKernel(void)
 #if ALWAYS_ANSI
 	return false;
 #elif defined(_MSC_VER) && _MSC_VER > 1400
-	// VS2005��肠���炵���ꍇ�́ANT�݂̂��^�[�Q�b�g�Ƃ���
+	// VS2005よりあたらしい場合は、NTのみをターゲットとする
 	return true;
 #else
 	static bool kernel_checked;

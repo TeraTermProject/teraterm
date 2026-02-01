@@ -21,7 +21,7 @@ AuthBanner=&lt;Display Method&gt;
 </pre>
 
 <p>
-The display method can be specified from 0 to 3. 
+The display method can be specified from 0 to 3.
 Meaning of each value in the following:
 </p>
 
@@ -46,7 +46,7 @@ AuthBanner=1
 <h1 id="DisablePopupMessage">Suppressing message box</h1>
 
 <p>
-When Tera Term is automated by using macro or non-logon and the error and warning is occurred, 
+When Tera Term is automated by using macro or non-logon and the error and warning is occurred,
 the message box will be shown. Next, Tera Term waits user operation and the procedure can not be continued.<br />
 To prevent this problem, the message box can be suppressed.
 </p>
@@ -81,7 +81,7 @@ DisablePopupMessage=0
 
 <p>
 The RSA host key of SSH server needs 768bit length at least, however some server having the host key less than 768bit exist.<br />
-Basically, when the host key of SSH server length is too small, Tera Term disconnects current session. 
+Basically, when the host key of SSH server length is too small, Tera Term disconnects current session.
 However, this configuration enables to permit exceptionally.
 </p>
 
@@ -113,9 +113,9 @@ EnableRsaShortKeyServer=0
 <h1 id="GexMinimalGroupSize">Minimum group size for Diffie-Hellman Group Exchange</h1>
 
 <p>
-When Diffie-Hellman Group Exchange(diffie-hellman-group-exchange-sha*) is used for key exchanging method, 
+When Diffie-Hellman Group Exchange(diffie-hellman-group-exchange-sha*) is used for key exchanging method,
 SSH client some requests of 'Minimum size', 'Proposed size' and 'Maximum size' regarding group to server.<br />
-As described below, current TTSSH sends 2048 as minimum size to server. When the group size sent from server 
+As described below, current TTSSH sends 2048 as minimum size to server. When the group size sent from server
 is smaller than the minimu size, TTSSH shows the confirmation dialog whether the connection continues.
 </p>
 
@@ -130,8 +130,8 @@ GexMinimalGroupSize=&lt;Minimum size of group&gt;
 
 <p>
 The minimum size of group can be specified with 0 and 1024 to 8192.<br />
-When the value is 0, TTSSH uses the optimal value. Current TTSSH sends 2048 
-in accordance with <a href="https://tools.ietf.org/html/rfc8270" target="_blank">RFC 8270</a>.
+When the value is 0, TTSSH uses the optimal value. Current TTSSH sends 2048
+in accordance with <a href="https://datatracker.ietf.org/doc/html/rfc8270" target="_blank">RFC 8270</a>.
 The value will be changed in the future.<br />
 When the value is specified from 1024 to 8192, the value is used necessarily.
 </p>
@@ -171,6 +171,30 @@ LogLevel=&lt;Value&gt;
 <pre>
 Default:
 LogLevel=0
+</pre>
+
+
+<h1 id="MaxChannel">Maximum number of SSH channels</h1>
+
+<p>
+TTSSH has an upper limit on the number of SSH channels that can be opened, in order to prevent resource exhaustion.
+</p>
+
+<p>
+If the default limit is insufficient, you can change the limit as shown below.
+</p>
+
+<pre>
+MaxChannel=200
+</pre>
+
+<p>
+If the value is set to 0, there is no limit.
+</p>
+
+<pre>
+Default:
+MaxChannel=100
 </pre>
 
 
@@ -232,7 +256,7 @@ The environment variable is disable and the  localhost:0.0 is used.
 </p>
 
 <p>
-This configuration is overwitten with <a href="../commandline/ttssh.html#ssh-x">/ssh-X command line option</a>.
+This configuration is overwritten with <a href="../commandline/ttssh.html#ssh-x">/ssh-X command line option</a>.
 The configuration priority is as follows.
 </p>
 

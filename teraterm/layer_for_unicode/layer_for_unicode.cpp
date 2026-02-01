@@ -29,7 +29,7 @@
 /*
  * W to A Wrapper
  *
- * API–¼‚ÍW”Å‚Ì“ª‚É '_' ‚ğ•t‚¯‚½‚à‚Ì‚ğg—p‚·‚é
+ * APIåã¯Wç‰ˆã®é ­ã« '_' ã‚’ä»˜ã‘ãŸã‚‚ã®ã‚’ä½¿ç”¨ã™ã‚‹
  */
 
 #include <windows.h>
@@ -57,11 +57,11 @@ UINT WINAPI _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch)
 {
 	UINT retval;
 	if (iFile == 0xffffffff) {
-		// ƒtƒ@ƒCƒ‹”–â‚¢‡‚í‚¹
+		// ãƒ•ã‚¡ã‚¤ãƒ«æ•°å•ã„åˆã‚ã›
 		retval = DragQueryFileA(hDrop, iFile, NULL, 0);
 	}
 	else if (lpszFile == NULL) {
-		// ƒtƒ@ƒCƒ‹–¼‚Ì•¶š”–â‚¢‡‚í‚¹
+		// ãƒ•ã‚¡ã‚¤ãƒ«åã®æ–‡å­—æ•°å•ã„åˆã‚ã›
 		char FileNameA[MAX_PATH];
 		retval = DragQueryFileA(hDrop, iFile, FileNameA, MAX_PATH);
 		if (retval != 0) {
@@ -71,7 +71,7 @@ UINT WINAPI _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch)
 		}
 	}
 	else {
-		// ƒtƒ@ƒCƒ‹–¼æ“¾
+		// ãƒ•ã‚¡ã‚¤ãƒ«åå–å¾—
 		char FileNameA[MAX_PATH];
 		retval = DragQueryFileA(hDrop, iFile, FileNameA, MAX_PATH);
 		if (retval != 0) {
@@ -97,11 +97,11 @@ DWORD WINAPI _GetFileAttributesW(LPCWSTR lpFileName)
 }
 
 /**
- * hWnd ‚Éİ’è‚³‚ê‚Ä‚¢‚é•¶š—ñ‚ğæ“¾
+ * hWnd ã«è¨­å®šã•ã‚Œã¦ã„ã‚‹æ–‡å­—åˆ—ã‚’å–å¾—
  *
  * @param[in]		hWnd
- * @param[in,out]	lenW	•¶š”(L'\0'‚ğŠÜ‚Ü‚È‚¢)
- * @return			•¶š—ñ
+ * @param[in,out]	lenW	æ–‡å­—æ•°(L'\0'ã‚’å«ã¾ãªã„)
+ * @return			æ–‡å­—åˆ—
  */
 static wchar_t *SendMessageAFromW_WM_GETTEXT(HWND hWnd, size_t *lenW)
 {
@@ -125,12 +125,12 @@ static wchar_t *SendMessageAFromW_WM_GETTEXT(HWND hWnd, size_t *lenW)
 }
 
 /**
- * hWnd(ListBox) ‚Éİ’è‚³‚ê‚Ä‚¢‚é•¶š—ñ‚ğæ“¾
+ * hWnd(ListBox) ã«è¨­å®šã•ã‚Œã¦ã„ã‚‹æ–‡å­—åˆ—ã‚’å–å¾—
  *
  * @param[in]		hWnd
- * @param[in]		wParam	€–Ú”Ô†(0`)
- * @param[in,out]	lenW	•¶š”(L'\0'‚ğŠÜ‚Ü‚È‚¢)
- * @return			•¶š—ñ
+ * @param[in]		wParam	é …ç›®ç•ªå·(0ã€œ)
+ * @param[in,out]	lenW	æ–‡å­—æ•°(L'\0'ã‚’å«ã¾ãªã„)
+ * @return			æ–‡å­—åˆ—
  */
 static wchar_t *SendMessageAFromW_LB_GETTEXT(HWND hWnd, WPARAM wParam, size_t *lenW)
 {
@@ -165,7 +165,7 @@ int WINAPI _GetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount)
 
 int WINAPI _GetWindowTextLengthW(HWND hWnd)
 {
-	size_t lenW;// •¶š—ñ’·(`\0`‚ÍŠÜ‚Ü‚È‚¢)
+	size_t lenW;// æ–‡å­—åˆ—é•·(`\0`ã¯å«ã¾ãªã„)
 	wchar_t *strW = SendMessageAFromW_WM_GETTEXT(hWnd, &lenW);
 	free(strW);
 	return (int)lenW;
@@ -217,7 +217,7 @@ LRESULT WINAPI _SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	}
 	case BFFM_SETSELECTIONW: {
 		if (wParam == TRUE) {
-			// ƒtƒHƒ‹ƒ_‚ğ‘I‘ğó‘Ô‚É‚·‚é
+			// ãƒ•ã‚©ãƒ«ãƒ€ã‚’é¸æŠçŠ¶æ…‹ã«ã™ã‚‹
 			char *folderA = ToCharW((wchar_t *)lParam);
 			retval = SendMessageA(hWnd, BFFM_SETSELECTIONA, wParam, (LPARAM)folderA);
 			free(folderA);
@@ -308,9 +308,9 @@ UINT WINAPI _GetDlgItemTextW(HWND hDlg, int nIDDlgItem, LPWSTR lpString, int cch
 
 /**
  *	@param[in]		hdc
- *	@param[in]		lpchText	•¶š—ñ
- *	@param[in]		cchText		•¶š”(-1‚Ì‚Æ‚«lpchText‚Ì•¶š—ñ’·)
- *	@param[in]		lprc		•\¦rect
+ *	@param[in]		lpchText	æ–‡å­—åˆ—
+ *	@param[in]		cchText		æ–‡å­—æ•°(-1ã®ã¨ãlpchTextã®æ–‡å­—åˆ—é•·)
+ *	@param[in]		lprc		è¡¨ç¤ºrect
  *	@param[in]		format
  */
 int WINAPI _DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format)
@@ -372,7 +372,7 @@ BOOL WINAPI _Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData)
 		return FALSE;
 	}
 
-	// lpData.cbSize == 952‚Ì‚Æ‚«‚¾‚¯ ANSIŠÖ”‚Åˆ—‚·‚é
+	// lpData.cbSize == 952ã®ã¨ãã ã‘ ANSIé–¢æ•°ã§å‡¦ç†ã™ã‚‹
 	TT_NOTIFYICONDATAA_V2 nid;
 	TT_NOTIFYICONDATAA_V2 *p = &nid;
 	p->cbSize = sizeof(nid);
@@ -527,8 +527,8 @@ DWORD WINAPI _GetPrivateProfileStringW(LPCWSTR lpAppName, LPCWSTR lpKeyName, LPC
 	char *fileA = ToCharW(lpFileName);
 	DWORD r = GetPrivateProfileStringA(appA, keyA, defA, buf, nSize, fileA);
 	if (r == 0 && defA == NULL) {
-		// GetPrivateProfileStringA()‚Ì–ß‚è’l‚Íbuf‚ÉƒZƒbƒg‚µ‚½•¶š”(I’[ŠÜ‚Ü‚¸)
-		// OS‚Ìƒo[ƒWƒ‡ƒ“‚É‚æ‚Á‚Ä‚Ídef‚ªNULL‚ÌAbuf‚ª–¢İ’è‚Æ‚È‚é‚±‚Æ‚ª‚ ‚é
+		// GetPrivateProfileStringA()ã®æˆ»ã‚Šå€¤ã¯bufã«ã‚»ãƒƒãƒˆã—ãŸæ–‡å­—æ•°(çµ‚ç«¯å«ã¾ãš)
+		// OSã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã«ã‚ˆã£ã¦ã¯defãŒNULLã®æ™‚ã€bufãŒæœªè¨­å®šã¨ãªã‚‹ã“ã¨ãŒã‚ã‚‹
 		buf[0] = 0;
 	}
 	::MultiByteToWideChar(CP_ACP, 0, buf, -1, lpReturnedString, nSize);
@@ -709,20 +709,20 @@ DWORD WINAPI _GetFullPathNameW(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR l
 		wchar_t *bufW = ToWcharA(bufA);
 		r = (DWORD)wcslen(bufW);
 		if (nBufferLength == 0 || lpBuffer == NULL) {
-			// •K—v‚È•¶š”‚ğ•Ô‚·('\0'ŠÜ‚Ş)
+			// å¿…è¦ãªæ–‡å­—æ•°ã‚’è¿”ã™('\0'å«ã‚€)
 			r = r + 1;
 		} else {
-			// ƒpƒX‚ğƒRƒs[‚µ‚ÄA•¶š—ñ’·‚ğ•Ô‚·('\0'ŠÜ‚Ü‚È‚¢)
+			// ãƒ‘ã‚¹ã‚’ã‚³ãƒ”ãƒ¼ã—ã¦ã€æ–‡å­—åˆ—é•·ã‚’è¿”ã™('\0'å«ã¾ãªã„)
 			wcsncpy_s(lpBuffer, nBufferLength, bufW, _TRUNCATE);
 
 			if (lpFilePart != NULL) {
 				wchar_t *sep = wcsrchr(lpBuffer, L'\\');
 				if (sep == NULL) {
-					// ƒpƒX‹æØ‚è‚ª‚È‚¢
+					// ãƒ‘ã‚¹åŒºåˆ‡ã‚ŠãŒãªã„
 					*lpFilePart = NULL;
 				}
 				else if (*(sep + 1) == 0) {
-					// ƒpƒX‹æØ‚è‚ª•¶š—ñ‚ÌÅŒã
+					// ãƒ‘ã‚¹åŒºåˆ‡ã‚ŠãŒæ–‡å­—åˆ—ã®æœ€å¾Œ
 					*lpFilePart = NULL;
 				}
 				else {
@@ -829,8 +829,8 @@ BOOL WINAPI _ModifyMenuW(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNe
 }
 
 /**
- *	@param cchMax	ƒoƒbƒtƒ@‚Ì•¶š”(I’[ L'\0' ‚àŠÜ‚Ş(sizeof(buf)/sizeof(wchar_t)))
- *	@retrun			•¶š—ñ’·(I’[ L'\0' ‚ğŠÜ‚Ü‚È‚¢,wcslen()‚Ì–ß‚è’l‚Æ“¯‚¶)
+ *	@param cchMax	ãƒãƒƒãƒ•ã‚¡ã®æ–‡å­—æ•°(çµ‚ç«¯ L'\0' ã‚‚å«ã‚€(sizeof(buf)/sizeof(wchar_t)))
+ *	@retrun			æ–‡å­—åˆ—é•·(çµ‚ç«¯ L'\0' ã‚’å«ã¾ãªã„,wcslen()ã®æˆ»ã‚Šå€¤ã¨åŒã˜)
  */
 int WINAPI _GetMenuStringW(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMax, UINT flags)
 {
@@ -848,8 +848,8 @@ int WINAPI _GetMenuStringW(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMa
 	wchar_t *strW = ToWcharA(strA);
 	len = (int)wcslen(strW);
 	if (lpString != NULL && cchMax != 0) {
-		// •¶š‚ğƒZƒbƒg‚·‚é
-		// ƒZƒbƒg‚µ‚È‚¢‚Æ‚«‚Í•¶š—ñ’·‚ğ•Ô‚·
+		// æ–‡å­—ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
+		// ã‚»ãƒƒãƒˆã—ãªã„ã¨ãã¯æ–‡å­—åˆ—é•·ã‚’è¿”ã™
 		wcsncpy_s(lpString, cchMax, strW, _TRUNCATE);
 		if (len > cchMax - 1) {
 			len = cchMax - 1;
@@ -857,7 +857,7 @@ int WINAPI _GetMenuStringW(HMENU hMenu, UINT uIDItem, LPWSTR lpString, int cchMa
 	}
 	free(strW);
 	free(strA);
-	return len;	// •¶š—ñ’·(L'\0'•ª‚ğŠÜ‚Ü‚È‚¢)
+	return len;	// æ–‡å­—åˆ—é•·(L'\0'åˆ†ã‚’å«ã¾ãªã„)
 }
 
 HANDLE WINAPI _LoadImageW(HINSTANCE hInst, LPCWSTR name, UINT type,
@@ -886,12 +886,12 @@ BOOL WINAPI _SystemParametersInfoW(UINT uiAction, UINT uiParam,
 {
 	if (uiAction == SPI_GETNONCLIENTMETRICS) {
 		NONCLIENTMETRICSA ncmA = {};
-		// NONCLIENTMETRICSA ‚Í VISTA ˆÈ~Šg’£‚³‚ê‚Ä‚¢‚é
+		// NONCLIENTMETRICSA ã¯ VISTA ä»¥é™æ‹¡å¼µã•ã‚Œã¦ã„ã‚‹
 		ncmA.cbSize = CCSIZEOF_STRUCT(NONCLIENTMETRICSA, lfMessageFont);
 		BOOL r = SystemParametersInfoA(SPI_GETNONCLIENTMETRICS, uiParam, &ncmA, 0);
 		if (r != FALSE) {
 			NONCLIENTMETRICSW *ncmW = (NONCLIENTMETRICSW *)pvParam;
-			// Tera Term ‚Åg—p‚·‚éƒƒ“ƒo‚¾‚¯İ’è
+			// Tera Term ã§ä½¿ç”¨ã™ã‚‹ãƒ¡ãƒ³ãƒã ã‘è¨­å®š
 			LOGFONTAtoW(&ncmA.lfStatusFont, &ncmW->lfStatusFont);
 		}
 		return r;
@@ -902,7 +902,7 @@ BOOL WINAPI _SystemParametersInfoW(UINT uiAction, UINT uiParam,
 /**
  *	GetTabbedTextExtentW()
  *
- *	Tera Term ‚Å‚Í TabStop ‚Íg—p‚µ‚Ä‚¢‚È‚¢‚Ì‚ÅƒeƒXƒg‚µ‚Ä‚¢‚È‚¢
+ *	Tera Term ã§ã¯ TabStop ã¯ä½¿ç”¨ã—ã¦ã„ãªã„ã®ã§ãƒ†ã‚¹ãƒˆã—ã¦ã„ãªã„
  */
 DWORD WINAPI _GetTabbedTextExtentW(HDC hdc, LPCWSTR lpString, int chCount,
 								   int nTabPositions, const int *lpnTabStopPositions)
@@ -962,7 +962,7 @@ finish:
 }
 
 /**
- *	ƒ|ƒCƒ“ƒ^‚µ‚©ˆµ‚í‚È‚¢
+ *	ãƒã‚¤ãƒ³ã‚¿ã—ã‹æ‰±ã‚ãªã„
  */
 HRSRC WINAPI _FindResourceW(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType)
 {

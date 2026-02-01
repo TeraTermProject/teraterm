@@ -7,7 +7,7 @@
 ## cmakeのバージョン
 
 - 3.11以上
-- Visual Studio 2017,2019,2022 インストーラーで、オプションを選べば cmake をインストールできます
+- Visual Studio 2017,2019,2022,2026 インストーラーで、オプションを選べば cmake をインストールできます
 - Visual Studio 2005(Expressも含む)のIDEをサポートしている最後のバージョンは 3.11.4 です
 
 ## ライブラリ
@@ -32,8 +32,7 @@ Visual Studio の IDE を使用する場合の例
 インストーラを作成する
 
     cmake --build . --config Release --target Install
-    cmake --build . --config Release --target inno_setup
-    cmake --build . --config Release --target zip
+    make_installer_cmake.bat
 
 ### NMake (Visual Studio, very experimental)
 
@@ -52,14 +51,14 @@ nmakeが利用できる環境から次のように実行します。
 
 msys2等をつかってMinGWが使える環境から次のように実行します。
 
-    mkdir build_mingw
-    cd build_mingw
-    cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+    mkdir build_mingw_msys2_i686
+    cd build_mingw_msys2_i686
+    cmake .. -G "Unix Makefiles" -DARCHITECTURE=i686 -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
     cmake --build . -j
 
 cygwin,linux等では次のように実行します。
 
-    mkdir build_mingw_cygwin
-    cd build_mingw_cygwin
-    cmake .. -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+    mkdir build_mingw_cygwin_i686
+    cd build_mingw_cygwin_i686
+    cmake .. -G "Unix Makefiles" -DARCHITECTURE=i686 -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
     cmake --build . -j

@@ -26,8 +26,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// ttermpro.exe 内で使用する通知関連のAPI
-// プラグインから使用するAPIは ttcmn_notify.h を参照
+// ttermpro.exe 蜀�縺ｧ菴ｿ逕ｨ縺吶ｋ騾夂衍髢｢騾｣縺ｮAPI
+// 繝励Λ繧ｰ繧､繝ｳ縺九ｉ菴ｿ逕ｨ縺吶ｋAPI縺ｯ ttcmn_notify.h 繧貞盾辣ｧ
 
 #pragma once
 

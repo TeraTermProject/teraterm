@@ -74,7 +74,7 @@
 typedef enum {
 	TypUnknown = 0,
 	TypInteger = 1,
-	TypLogical = 2,		// –¢Žg—p?
+	TypLogical = 2,		// æœªä½¿ç”¨?
 	TypString = 3,
 	TypLabel = 4,
 	TypIntArray = 5,
@@ -244,6 +244,7 @@ typedef enum {
 #define RsvContinue     155
 #define RsvRegexOption  156
 #define RsvSendlnMulticast 157
+#define RsvRecvFile     158
 
 #define RsvSetDebug     175
 #define RsvYmodemRecv   176
@@ -296,6 +297,8 @@ typedef enum {
 #define RsvDelPassword2 221
 #define RsvIsPassword2  222
 #define RsvGetTTPos     223
+#define RsvSetSerialDelayChar 224
+#define RsvSetSerialDelayLine 225
 
 #define RsvOperator     1000
 #define RsvBNot         1001

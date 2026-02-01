@@ -123,7 +123,7 @@ GexMinimalGroupSize=&lt;群の最小サイズ&gt;
 
 <p>
 群の最小サイズには 0 および 1024 ～ 8192 が指定できます。<br />
-0 を指定した時は TTSSH が最適と判断した値を使います。現在のバージョンの TTSSH では <a href="https://tools.ietf.org/html/rfc8270" target="_blank">RFC 8270</a> に従い 2048 が送られます。将来のバージョンではこの値が変更される可能性があります。<br />
+0 を指定した時は TTSSH が最適と判断した値を使います。現在のバージョンの TTSSH では <a href="https://datatracker.ietf.org/doc/html/rfc8270" target="_blank">RFC 8270</a> に従い 2048 が送られます。将来のバージョンではこの値が変更される可能性があります。<br />
 1024 ～ 8192 の間の値を指定した場合はその値が使われます。
 </p>
 
@@ -162,6 +162,30 @@ LogLevel=&lt;設定値&gt;
 <pre>
 省略時:
 LogLevel=0
+</pre>
+
+
+<h1 id="MaxChannel">SSH チャネル数の上限</h1>
+
+<p>
+TTSSH には同時に開く SSH チャネル数の上限があります。リソースの枯渇が考えられるためです。
+</p>
+
+<p>
+デフォルトのチャネル数で足りない場合に、以下のように上限を変更することができます。
+</p>
+
+<pre>
+MaxChannel=200
+</pre>
+
+<p>
+0 を指定した時は無制限となります。
+</p>
+
+<pre>
+省略時:
+MaxChannel=100
 </pre>
 
 

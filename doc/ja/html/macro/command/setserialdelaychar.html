@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>setserialdelaychar</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>setserialdelaychar</h1>
+
+<p>
+シリアルポートの送信待ち時間(1文字ごと)を設定する。
+<em>(バージョン5.5.0以降)</em>
+</p>
+
+<h2>形式</h2>
+
+<pre class="macro-syntax">
+setserialdelaychar &lt;delay&gt;
+</pre>
+
+<h2>パラメータ</h2>
+
+<dl>
+	<dt class="macro">整数値 &lt;delay&gt;</dt>
+	<dd>送信待ち時間(1文字ごと)。単位はミリ秒。</dd>
+</dl>
+
+<h2>解説</h2>
+
+<p>
+シリアルポートの送信待ち時間(1文字ごと)を &lt;delay&gt; [ms] に変更します。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+setserialdelaychar 10
+</pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="setserialdelayline.html">setserialdelayline</a></li>
+  <li><a href="../../menu/setup-additional-serialport.html#Delay">Setup &gt; Additional settings &gt; Serial port &gt; Transmit delay</a></li>
+</ul>
+
+</body>
+</html>

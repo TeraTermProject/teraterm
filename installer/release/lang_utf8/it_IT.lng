@@ -1,0 +1,1344 @@
+﻿[Info]
+language=Italian
+date=2026-01-04 by TeraTerm Project
+contributor=R.B. (2026-01-09)
+
+[Tera Term]
+DLG_SYSTEM_FONT=System,14,0
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_FILE=&File
+MENU_FILE_NEW=&Nuova connessione...\tAlt+N
+MENU_FILE_DUPLICATE=D&uplica sessione\tAlt+D
+MENU_FILE_GYGWIN=Connessione Cy&gwin\tAlt+G
+MENU_FILE_LOG=&Registro eventi...
+MENU_FILE_PAUSELOG=Pausa reg&istrazione attività
+MENU_FILE_COMMENTLOG=C&ommento alla registrazione attività...
+MENU_FILE_VIEWLOG=&Visualizza registro attività
+MENU_FILE_SHOWLOGDIALOG=&Visualizza finestra registro eventi...
+MENU_FILE_STOPLOG=Stop registrazione attività (&Q)
+MENU_FILE_SENDFILE=&Invia file...
+MENU_FILE_RECVFILE=Ricevi file(&Z)...
+MENU_FILE_CHANGEDIR=&Cartella trasferimento file...
+MENU_FILE_REPLAYLOG=&Riproduci registro attività...
+MENU_FILE_PRINT=&Stampa...\tAlt+P
+MENU_FILE_DISCONNECT=&Disconnetti\tAlt+I
+MENU_FILE_EXIT=&Esci\tAlt+Q
+MENU_FILE_EXITALL=Esci &da tutto
+
+MENU_TRANS=&Trasferimento
+MENU_TRANS_KERMIT_RCV=&Ricevi
+MENU_TRANS_KERMIT_GET=&Ottieni...
+MENU_TRANS_KERMIT_SEND=&Invia...
+MENU_TRANS_KERMIT_FINISH=&Completato
+MENU_TRANS_X_RCV=&Ricevi...
+MENU_TRANS_X_SEND=&Invia...
+MENU_TRANS_Y_RCV=&Ricevi...
+MENU_TRANS_Y_SEND=&Invia...
+MENU_TRANS_Z_RCV=&Ricevi
+MENU_TRANS_Z_SEND=&Invia...
+MENU_TRANS_BP_RCV=&Ricevi
+MENU_TRANS_BP_SEND=&Invia...
+MENU_TRANS_QV_RCV=&Ricevi
+MENU_TRANS_QV_SEND=&Invia...
+
+MENU_EDIT=&Modifica
+MENU_EDIT_COPY=&Copia\tAlt+C
+MENU_EDIT_COPYTABLE=Copia &tabella
+MENU_EDIT_PASTE=&Incolla\tAlt+V
+MENU_EDIT_PASTECR=Incolla<C&R>\tAlt+R
+MENU_EDIT_CLSCREEN=Pulisci &schermo
+MENU_EDIT_CLBUFFER=Svuota &buffer
+MENU_EDIT_CANCELSELECT=Annulla se&lezione
+MENU_EDIT_SELECTSCREEN=S&eleziona schermo
+MENU_EDIT_SELECTALL=Seleziona &tutto
+
+MENU_SETUP=Impo&stazioni
+MENU_SETUP_TERMINAL=&Terminale...
+MENU_SETUP_WINDOW=Fi&nestra...
+MENU_SETUP_FONT=&Font...
+MENU_SETUP_KEYBOARD=T&astiera...
+MENU_SETUP_SERIALPORT=Porta s&eriale...
+MENU_SETUP_TCPIP=T&CP/IP...
+MENU_SETUP_GENERAL=&Generale...
+MENU_SETUP_ADDITION=Impostazioni a&ggiuntive...
+MENU_SETUP_SAVE=&Salva impostazioni...
+MENU_SETUP_RESTORE=&Ripristina impostazioni...
+MENU_SETUP_OPENSETUP=Cartella file &impostazioni...
+MENU_SETUP_LOADKEYMAP=&Carica mappa tastiera...
+
+MENU_CONTROL=C&ontrollo
+MENU_CONTROL_RESET=&Ripristina terminale
+MENU_CONTROL_RESETTITLE=Ripristina titolo &remoto
+MENU_CONTROL_AREYOUTHERE=Sei qui\tAlt+T
+MENU_CONTROL_SENDBREAK=Invia &break\tAlt+B
+MENU_CONTROL_RESETPORT=Ripristina &porta
+MENU_CONTROL_BROADCAST=Comando &broadcast
+MENU_CONTROL_OPENTEK=&Apri TEK
+MENU_CONTROL_CLOSETEK=&Chiudi TEK
+MENU_CONTROL_MACRO=&Macro
+MENU_CONTROL_SHOW_MACRO=Visualizza &finestra macro
+
+MENU_WINDOW=&Finestra
+MENU_WINDOW_WINDOW=Seleziona &finestra
+MENU_WINDOW_MINIMIZEALL=&Minimizza tutto
+MENU_WINDOW_CASCADE=Finestre in &cascata
+MENU_WINDOW_STACKED=Finestre &sovrapposte
+MENU_WINDOW_SIDEBYSIDE=Finestre aff&iancate
+MENU_WINDOW_RESTOREALL=&Ripristina tutte
+MENU_WINDOW_CASCADE_UNDO=&Annulla - Finestre in cascata
+MENU_WINDOW_STACKED_UNDO=&Annulla - Finestre sovrapposte
+MENU_WINDOW_SIDEBYSIDE_UNDO=&Annulla - Finestre affiancate
+
+MENU_HELP=&Aiuto
+MENU_HELP_INDEX=&Indice contenuti
+MENU_HELP_ABOUT=Info su &Tera Term...
+
+MENU_SHOW_MENUBAR=Visualizza &barra menu
+
+
+TEKMENU_FILE=&File
+TEKMENU_FILE_PRINT=&Stampa...\tAlt+P
+TEKMENU_FILE_EXIT=&Esci\tAlt+Q
+
+TEKMENU_EDIT=&Modifica
+TEKMENU_EDIT_COPY=&Copia\tAlt+C
+TEKMENU_EDIT_COPYSCREEN=Copia &schermo
+TEKMENU_EDIT_PASTE=&Incolla\tAlt+V
+TEKMENU_EDIT_PASTECR=Incolla<C&R>\tAlt+R
+TEKMENU_EDIT_CLSCREEN=A&zzera schermo
+
+TEKMENU_SETUP=Impo&stazioni
+TEKMENU_SETUP_WINDOW=&Finestra
+TEKMENU_SETUP_FONT=&Font
+
+TEKMENU_VTWIN=Finestra-&VT
+
+TEKMENU_WINDOW=&Finestra
+
+TEKMENU_HELP=&Aiuto
+TEKMENU_HELP_INDEX=&Indice contenuti
+TEKMENU_HELP_USING=Uso della &guida in linea
+TEKMENU_HELP_ABOUT=Info su &Tera Term...
+
+TEKMENU_SHOW_MENUBAR=Visualizza &barra menu
+
+; ttermpro
+; filesys.cpp
+MSG_COMMENT_LOG_OPEN_ERROR=Non è ancora aperto dal file registro eventi.
+
+; ttime.c
+MSG_USE_IME_ERROR=Impossibile usare IME
+
+; ttplug.c
+MSG_LOAD_EXT_ERROR=Impossibile caricare l'estensione %s (%d)
+
+; ttwinman.c
+DLG_MAIN_TITLE_CONNECTING=[connessione...]
+DLG_MAIN_TITLE_DISCONNECTED=[disconnessione]
+
+; vtterm.c
+MSG_CBACCESS_TITLE=Acceso agli appunti
+MSG_CBACCESS_REJECT_TITLE=Accesso agli appunti rifiutato
+MSG_CBACCESS_READ=L'host remoto può leggere il contenuto degli appunti.
+MSG_CBACCESS_WRITE=L'host remoto può scrivere negli appunti.
+MSG_CBACCESS_READ_REJECT=Accesso in lettura degli appunti rifiutato da remoto.
+MSG_CBACCESS_WRITE_REJECT=Accesso in scrittura degli appunti rifiutato da remoto.
+
+; vtwin.cpp
+MSG_ALL_TERMINATE_CONF=Vuoi chiudere tutte le finestre Tera Term?
+MSG_DISCONNECT_CONF=Vuoi disconetterti?
+MSG_EXEC_TT_ERROR=Impossibile eseguire Tera Term. (%d)
+MSG_FIND_CYGTERM_DIR_ERROR=Impossibile trovare la cartella Cygwin.
+MSG_CYGTERM_ENV_ALLOC_ERROR=Impossibile allocare la memoria per la variabile ambiente.
+MSG_EXEC_CYGTERM_ERROR=Impossibile eseguire Cygterm.
+MSG_EXEC_TTMENU_ERROR=CImpossibile eseguire il menu TeraTerm. (%d)
+MSG_VIEW_LOGFILE_ERROR=Impossibile visualizzare il file registro eventi. (%d)
+FILEDLG_OPEN_LOGFILE_TITLE=Seleziona file registro eventi da riprodurre in modo binario
+FILEDLG_OPEN_LOGFILE_FILTER=Tutti i file (*.*)\0*.*\0\0
+DIRDLG_CYGTERM_DIR_TITLE=Seleziona cartella Cygwin
+MSG_CYGTERM_CONF_WRITEFILE_ERROR=Impossibile salvare il file di configurazione CygTerm (%d).
+MSG_CYGTERM_CONF_REMOVEFILE_ERROR=Impossibile eliminare il vecchio file di configurazione CygTerm (%d).
+MSG_CYGTERM_CONF_RENAMEFILE_ERROR=Impossibile rinominare il file di configurazione CygTerm (%d).
+MSG_CYGTERM_CONF_SAVED_NOTICE=Il file di configurazione della scheda Cygwin è stato salvato in %s.
+FILEDLG_SELECT_LOGVIEW_APP_TITLE=Scegli un file eseguibile con l'avvio del file registro eventi
+FILEDLG_SELECT_LOGVIEW_APP_FILTER=File eseguibile (*.exe)\0*.exe\0Tutti i file (*.*)\0*.*\0\0
+FILEDLG_SELECT_LOGDIR_TITLE=Seleziona cartella file registro eventi
+FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE=Scegli un file includendo le stringhe per ConfirmChangePaste
+FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=File testo (*.txt)\0*.txt\0Tutti i file (*.*)\0*.*\0\0
+MSG_LOGFILE_INVALID_CHAR_ERROR=Nel nome file del registro eventi ci sono caratteri non validi.
+MSG_LOGFILE_TOOLONG_ERROR=Il nome file del registro eventi è troppo lungo.
+MSG_TT_FILE_OPEN_ERROR=Tera Term: errore apertura file
+MSG_LOGFILE_WRITE_ERROR=Impossibile scrivere nel file registro eventi.\n%s
+MSG_SAVESETUP_PERMISSION_ERROR=Il file TERATERM.INI non dispone dei permessi di scrittura.
+
+DLG_TABSHEET_TITLE=Tera Term: impostazioni aggiuntive
+DLG_TABSHEET_TITLE_GENERAL=Generale
+DLG_TABSHEET_TITLE_SEQUENCE=Sequenza di controllo
+DLG_TABSHEET_TITLE_COPYPASTE=Copia e incolla
+DLG_TABSHEET_TITLE_VISUAL=Visuale
+DLG_TABSHEET_TITLE_LOG=Registro eventi
+DLG_TABSHEET_TITLE_CYGWIN=Cygwin
+DLG_TABSHEET_TITLE_FONT=Font
+DLG_TABSHEET_TITLE_ENCODING=Codifica
+DLG_TABSHEET_TITLE_THEME=Tema
+DLG_TABSHEET_TITLE_MOUSE=Mouse
+DLG_TABSHEET_TITLE_FONT_TEK=Font (TEK)
+
+DLG_TAB_GENERAL_CLICKURL=Abilita URL cliccabil&e
+DLG_TAB_GENERAL_DISABLESENDBREAK=Disabilita a&cceleratore invio break
+DLG_TAB_GENERAL_ACCEPTBROADCAST=Accetta &broadcast
+DLG_TAB_GENERAL_MOUSEWHEEL_SCROLL_LINE=Linee scorrimento con rotella &mouse
+DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE=Scorrimento a&utomatico solo per linea inferiore
+DLG_TAB_GENERAL_CLEAR_ON_RESIZE=A&zzera schermo con ridimensione finestra
+DLG_TAB_GENERAL_CURSOR_CHANGE_IME=Modifica forma cursore con mio stato &IME
+DLG_TAB_GENERAL_LIST_HIDDEN_FONTS=Visualizza font &nascoste nella finestra Font
+DLG_TAB_GENERAL_TITLEFMT_GROUP=Formato titolo
+DLG_TAB_GENERAL_TITLEFMT_DISPHOSTNAME=&Visualizza nome host/porta
+DLG_TAB_GENERAL_TITLEFMT_DISPSESSION=Visualizza numero &sessione
+DLG_TAB_GENERAL_TITLEFMT_DISPVTTEK=Visualizza &VT/TEK
+DLG_TAB_GENERAL_TITLEFMT_SWAPHOSTTITLE=Scambia posizione nome host e &titolo
+DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT=Visualizza numero &porta TCP
+DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED=Visualizza velocità porta se&riale
+DLG_TAB_GENERAL_NOTIFICATION_TITLE=Notifiche
+DLG_TAB_GENERAL_NOTIFIY_SOUND=Audio &notifiche
+DLG_TAB_GENERAL_NOTIFICATION_TEST_NOTIFY=Test &notifica
+DLG_TAB_GENERAL_NOTIFICATION_TEST_MESSAGE=È visualizzata una nuova icona nell'area di notifica (barra sistema),\nche può essere abilitata/disabilitata nelle impostazioni delle notifiche.
+DLG_TAB_GENERAL_NOTIFICATION_TEST_TRAY=Test barra sis&tema
+
+DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=Accetta richiesta monitoraggio evento mouse
+DLG_TAB_SEQUENCE_DISABLE_MOUSE_TRACKING_CTRL=&Disabilita monitoraggio evento mouse con Control premuto
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING=Accetta richiesta cambio &titolo finestra
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF=Off
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OVERWRITE=Sovrascrivi
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_AHEAD=avanti
+DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_LAST=ultima
+DLG_TAB_SEQUENCE_CURSOR_CTRL=Sequenza controllo &cursore
+DLG_TAB_SEQUENCE_WINDOW_CTRL=Sequenza controllo &finestra
+DLG_TAB_SEQUENCE_WINDOW_REPORT=Sequenza &apporto finestra
+DLG_TAB_SEQUENCE_TITLE_REPORT=Rapporto t&itolo finestra
+DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE=Ignora
+DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT=Accetta
+DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY=Vuoto
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS=Accesso a&ppunti da remoto
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF=Off
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON=Lettura/scrittura
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ=Sola lettura
+DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE=Sola scrittura
+DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY=&Notifica accesso appunti da remoto
+DLG_TAB_SEQUENCE_ACCEPT_CLEAR_SBUFF=Accetta svuotamento buffer &scorrimento da remoto
+DLG_TAB_SEQUENCE_PRINT_START=D&isabilita sequenza avvio stampa
+DLG_TAB_SEQUENCE_BEEP_LABEL=&Beep
+DLG_TAB_SEQUENCE_BEEP_DISABLE=Disabilita
+DLG_TAB_SEQUENCE_BEEP_SOUND=Suono
+DLG_TAB_SEQUENCE_BEEP_VISUALBELL=Visualbell
+
+DLG_TAB_COPYPASTE_CONTINUE=Abilita copia &linea continua
+DLG_TAB_COPYPASTE_MOUSEPASTE=&Disabilita incolla con pulsante dx mouse
+DLG_TAB_COPYPASTE_CONFIRMPASTE=&Conferma incolla con pulsante dx mouse
+DLG_TAB_COPYPASTE_MOUSEPASTEM=Disabilita incolla con pulsante centrale &mouse
+DLG_TAB_COPYPASTE_SELECTLBUTTON=Seleziona s&olo con pulsante sx
+DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=Rimuovi cara&ttere nuova linea in incolla
+DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE=Conferma cambio incolla
+DLG_TAB_COPYPASTE_STRINGFILE=File &stringa
+DLG_TAB_COPYPASTE_DELIMITER=Carattere del&imitatore
+DLG_TAB_COPYPASTE_PASTEDELAY=Rit&ardo incolla per linea
+DLG_TAB_COPYPASTE_PASTEDELAY2=ms
+DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE=Quando la finestra è attivata dal mouse a&bilita selezione del testo
+DLG_TAB_COPYPASTE_AUTO_TEXT_COPY=Quando viene selezionato il testo copialo negli appunti di Windows
+
+DLG_TAB_VISUAL_ALPHA=Opacità finestra
+DLG_TAB_VISUAL_ALPHA_ACTIVE=&Attiva
+DLG_TAB_VISUAL_ALPHA_INACTIVE=&Non attiva
+DLG_TAB_VISUAL_MOUSE=Cursore &mouse
+DLG_TAB_VISUAL_FONT_QUALITY=Qualità &font
+DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT=Predefinita
+DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED=Senza antialias
+DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED=Con antialias
+DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE=ClearType
+DLG_TAB_VISUAL_ANSICOLOR=Colore AN&SI
+DLG_TAB_VISUAL_RED=&Rosso
+DLG_TAB_VISUAL_GREEN=&Verde
+DLG_TAB_VISUAL_BLUE=&Blue
+DLG_TAB_VISUAL_CORNER_DONT_ROUND=Angolo finestra non arrotondato
+DLG_TAB_VISUAL_BOLD_COLOR=Co&lore attributo grassetto
+DLG_TAB_VISUAL_BOLD_FONT=Font attributo grassetto
+DLG_TAB_VISUAL_BLINK=Colore attributo &lampeggio
+DLG_TAB_VISUAL_REVERSE=EColore attributo in&verso
+DLG_TAB_VISUAL_UNDERLINE_COLOR=Colore attributo sottolineato
+DLG_TAB_VISUAL_UNDERLINE_FONT=Font attributo sottolineato
+DLG_TAB_VISUAL_URL_COLOR=Colore attributo &URL
+DLG_TAB_VISUAL_URL_FONT=Font attributo &URL
+DLG_TAB_VISUAL_ANSI=Colore A&NSI
+DLG_TAB_VISUAL_FAST_SIZE_MOVE=Quando sposti o muovi finestra disabilita tema
+DLG_TAB_VISUAL_THEME_STARTUP_NO_USE=Nessun uso
+DLG_TAB_VISUAL_THEME_STARTUP_FIXED_THEME=File tema fisso
+DLG_TAB_VISUAL_THEME_STARTUP_RANDOM_THEME=File tema causale
+
+DLG_TAB_LOG_EDITOR=Visualizza editor registro eventi
+DLG_TAB_LOG_EDITOR_EXE=File &exe
+DLG_TAB_LOG_EDITOR_ARG=A&rgomenti
+DLG_TAB_LOG_FILENAME=Nome file registro predefinito(formato strftime)
+DLG_TAB_LOG_FILEPATH=Cartella predefinita &salvataggio registro
+DLG_TAB_LOG_AUTOSTART=Avvio registrazione a&utomatico
+DLG_TAB_LOG_ROTATE=Rota&zione registro
+DLG_TAB_LOG_ROTATE_SIZE_TEXT=&Dim.
+DLG_TAB_LOG_ROTATESTEP=&Ruota
+
+
+DLG_TAB_CYGWIN_PATH=&Percorso installazione Cygwin
+
+DLG_TAB_FONT_VTWINFONT=Font &VTWindow
+DLG_TAB_FONT_BTN_SELECT=&Seleziona...
+DLG_TAB_FONT_VTFONT_TITLE=API disegno
+DLG_TAB_FONT_DLGFONT=Font finestra &dialogo
+DLG_TAB_FONT_TEKFONT=Font TEK
+DLG_TAB_FONT_BTN_DEFAULT=Pred&efinita
+DLG_TAB_FONT_CODEPAGE_LABEL=Pagina &codice visualizzazione conversione carattere(Auto quando 0, %d)
+DLG_TAB_FONT_LIST_PRO_FONTS_VT=Visualizza font &proporzionali nella finestra font
+DLG_TAB_FONT_LIST_PRO_FONTS_DLG=Visualizza font p&roporzionali nella finestra font
+DLG_TAB_FONT_CHARACTER_SPACE=Carattere spazio
+DLG_TAB_FONT_RESIZED_FONT=Di&segna font ridimensionata per adattarla a larghezza cella
+MSG_TOOLTIP_EDITERR_TITLE1=Carattere non accettabile
+MSG_TOOLTIP_EDITERR_TEXT1=Sono accettati solo interi positivi e negativi.
+DLG_TAB_FONT_FOLDER=Apri impostazioni font/cartella font (%s)
+
+DLG_COMMENT_TITLE=Commento al registro
+
+DLG_BROADCAST_TITLE=Tera Term: comando broadcast
+DLG_BROADCAST_HISTORY=Cronologia
+DLG_BROADCAST_PARENTONLY=Invia solo a questo processo
+DLG_BROADCAST_ENTER=Inserisci chiave
+DLG_BROADCAST_SUBMIT=Invia
+DLG_BROADCAST_CLOSE=Chiudi
+DLG_BROADCAST_REALTIME=Modo tempo reale
+DLG_BROADCAST_HELP=Aiuto
+CMENU_BROADCAST_FOREGROUND=Porta la finestra selezionata in primo piano
+CMENU_BROADCAST_MINIMIZE=Minimizza finestra selezionata
+CMENU_BROADCAST_REFRESH=Aggiorna elenco finestra
+CMENU_BROADCAST_SELECT_ALL=Seleziona tutto
+CMENU_BROADCAST_UNSELECT_ALL=Deseleziona tutto
+CMENU_BROADCAST_INVERSE=Inverti selezione
+
+DLG_PRNABORT_PRINTING=Stampa
+
+DLG_PROT_FILENAME=Nome file:
+DLG_PROT_PROTO=Protocollo:
+DLG_PROT_PACKET=Pacchetto#:
+DLG_PROT_TRANS=Byte trasferiti:
+DLG_PROT_ELAPSED=Tempo trascorso:
+
+DLG_FILETRANS_TITLE=Invia file
+DLG_FILETRANS_FILENAME=Nome file:
+DLG_FILETRANS_FULLPATH=Percorso completo:
+DLG_FILETRANS_TRNAS=Byte trasferiti:
+DLG_FILETRANS_ELAPSED=Tempo trascorso:
+DLG_FILETRANS_START=&Avvia
+DLG_FILETRANS_PAUSE=&Ferma
+DLG_FILETRANS_CLOSE=Chiudi
+
+DLG_SETUPDIR_TITLE=Tera Term: impostazione cartella
+DLG_SETUPDIR_INIFILE=File configurazione Tera Term
+DLG_SETUPDIR_KEYBOARDFILE=File configurazione tastiera
+DLG_SETUPDIR_CYGTERMFILE=File configurazione CygTerm
+DLG_SETUPDIR_KNOWNHOSTSFILE=File known_hosts SSH
+DLG_SETUPDIR_NOFILE_ERROR=Il file non esiste (%d).
+DLG_SETUPDIR_OPENFILE_ERROR=Impossibile aprire il file (%d).
+
+DLG_DANDD_TITLE=Tera Term: trascina e rilascia file
+DLG_DANDD_TEXT=Vuoi inviare il contenuto del file?
+DLG_DANDD_SCP_RADIO=&SCP
+DLG_DANDD_SENDFILE_RADIO=Invia fil&e (incolla contenuto del file)
+DLG_DANDD_PASTE_RADIO=&Incolla nome file
+DLG_DANDD_SCP_DEST_LABEL=des&t:
+DLG_DANDD_SCP_DEST_NOTE=dest se vuota è la cartella home
+DLG_DANDD_SEND_BINARY_CHECK=Bina&rio
+DLG_DANDD_PASTE_ESCAPE_CHECK=Es&cape
+DLG_DANDD_PASTE_SPACE_RADIO=Il separat&ore è lo spazio
+DLG_DANDD_PASTE_NEWLINE_RADIO=Il separatore è il rito&rno a capo
+DLG_DANDD_NEXTFILES=Fai quest&o per i successivi %d file
+DLG_DANDD_SAME_NEEXTDROP=Stesso processo per il rilascio successivo
+DLG_DANDD_DONTSHOW_NEEXTDROP=Non visualizzare questa finestra per il prossimo rilascio
+DLG_DANDD_NOTE=Rilascia con CTRL, verrà visualizzata la finestra
+
+TOOLTIP_TITLEBAR_OPACITY=Opacità %.1f %%
+
+; commonlib.c
+MSG_WINSOCK_ERROR=Impossibile usare winsock
+MSG_INVALID_HOST_ERROR=Host non valido
+MSG_CANTOPEN_ERROR=Impossibile aprire %s (0x%08x).
+MSG_CANTOPEN_ERROR_NOTFOUND=Impossibile aprire %s. Non disponibile.
+MSG_CANTOPEN_ERROR_DENIED=Impossibile aprire %s. Accesso negato.
+MSG_CANTOPEN_ERROR_PIPEBUSY=Impossibile aprire %s. Pipe occupata.
+MSG_CANTOPEN_FILE_ERROR=Impossibile aprire il file
+MSG_COMM_REFUSE_ERROR=Connessione rifiutata
+MSG_COMM_REACH_ERROR=Impossibile raggiungere la rete
+MSG_COMM_TIMEOUT_ERROR=Timeout connessione
+MSG_COMM_CONNECT_ERROR=Impossibile collegarsi all'host
+MSG_CREATE_THREAD_ERROR=Impossibile creare il thread
+
+; ttpdlg
+; ttdlg.c
+DLG_ABOUT_TITLE=Info su Tera Term
+
+DLG_SELECT_DIR_TITLE=Seleziona nuova cartella
+
+DLG_GEN_TITLE=Tera Term: impostazione generale
+DLG_GEN_PORT=Nuova connessione predefinita
+DLG_GEN_LANG_UI=&Lingua IU:
+DLG_GEN_PORT_TCPIP=TCP/IP
+DLG_GEN_PORT_SERIAL=Seriale
+
+DLG_HOST_TITLE=Tera Term: nuova connessione
+DLG_HOST_TCPIPHOST=H&ost:
+DLG_HOST_TCPIPPORT=&Porta TCP#:
+DLG_HOST_TCPIPPROTOCOL=Versio&ne IP:
+DLG_HOST_SERIAL=&Seriale
+DLG_HOST_SERIALPORT=Po&rta:
+
+DLG_KEYB_TITLE=Tastiera
+DLG_KEYB_TRANSMIT=Trasmetti CANC con:
+DLG_KEYB_BS=Tasto &backspace
+DLG_KEYB_DEL=Tasto &CANC
+DLG_KEYB_KEYB=&Tastiera:
+DLG_KEYB_META=Tasto &meta:
+DLG_KEYB_META_OFF=off
+DLG_KEYB_META_ON=on
+DLG_KEYB_META_LEFT=sinistra
+DLG_KEYB_META_RIGHT=destra
+DLG_KEYB_DISABLE=Modo disabilitazione:
+DLG_KEYB_APPKEY=Tastiera &applicazione
+DLG_KEYB_APPCUR=&Cursore applicazione
+
+DLG_SERIAL_TITLE=Porta seriale
+DLG_SERIAL_PORT=&Porta:
+DLG_SERIAL_BAUD=V&elocità:
+DLG_SERIAL_DATA=&Dati:
+DLG_SERIAL_PARITY=P&arità:
+DLG_SERIAL_STOP=Bit &stop:
+DLG_SERIAL_FLOW=Controllo &flusso:
+DLG_SERIAL_DELAY=Ritardo trasmissione
+DLG_SERIAL_DELAYCHAR=msec/&car
+DLG_SERIAL_DELAYLINE=msec/&linea
+DLG_SERIAL_OK_CONNECTION=Connetti in una &nuova finestra
+DLG_SERIAL_OK_OPEN=&Nuova apertura
+DLG_SERIAL_OK_CLOSEOPEN=Chiudi a apri &nuova
+DLG_SERIAL_OK_RESET=&Nuove impostazioni
+
+; edit history
+DLG_TCPIP_ADD=&Aggiungi
+DLG_TCPIP_UP=&Su
+DLG_TCPIP_REMOVE=&Elimina
+DLG_TCPIP_DOWN=&Giù
+
+; TCP/IP tab
+DLG_TCPIP_TITLE=TCP/IP
+DLG_TCPIP_HOSTLIST=E&lenco host
+DLG_TCPIP_HISTORYTITLE=Cronologia
+DLG_TCPIP_HISTORY=Aggiungi ad elenco host con nuova conness&ione
+DLG_TCPIP_EDITHISTORY=Modifica elenco host
+DLG_TCPIP_TELNET=T&elnet
+DLG_TCPIP_PORT=&Porta#:
+DLG_TCPIP_KEEPALIVE=&Mantieni attivo in telnet
+DLG_TCPIP_KEEPALIVE_SEC=Sec
+DLG_TCPIP_AUTOCLOSE=Chiusura automatica finestra
+DLG_TCPIP_TERMTYPE=&Tipo terminale:
+
+DLG_TERM_TITLE=Terminale
+DLG_TERM_WIDTHLABEL=Dimensione &terminale
+DLG_TERM_ISWIN=Dim. terminale = fi&nestra
+DLG_TERM_RESIZE=&Ridimensiona automaticamente
+DLG_TERM_NEWLINE=Nuova linea
+DLG_TERM_CRRCV=&Ricezione:
+DLG_TERM_CRSEND=Tras&miss.:
+DLG_TERM_ID=&ID terminale:
+DLG_TERM_LOCALECHO=Eco &locale
+DLG_TERM_ANSBACK=&Risposta:
+DLG_TERM_AUTOSWITCH=Switch a&utomatico (VT<->TEK)
+DLG_TERM_KANJI=Codifica (ric&ezione)
+DLG_TERM_KANA=Kana me&zza larghezza
+DLG_TERM_KANJISEND=Codifica (trasmissio&ne)
+DLG_TERM_KANASEND=Kana me&zza larghezza
+DLG_TERM_KIN=Kanji i&n:
+DLG_TERM_KOUT=Kanji &out:
+DLG_CODING_DECSP_UNICODE_TO_DEC=Mappatura Unicode in DEC grafica speciale
+DLG_CODING_UNICODE_TO_DEC_BOXDRAWING=Carattere disegno box (U+2500-U+257F)
+DLG_CODING_UNICODE_TO_DEC_PUNCTUATION=Punteggiatura, elementi blocco, ombra
+DLG_CODING_UNICODE_TO_DEC_MIDDLEDOT=Punti mezzani (U+00B7,U+2024,U+2219)
+DLG_CODING_DEC_TO_UNICODE=Mappatura DEC grafica speciale in Unicode
+DLG_CODING_DECSP_DO_NOT_MAP=Non mappare
+
+DLG_WIN_TITLE=Finestra
+DLG_WIN_TEK_TITLE=Finestra (TEK)
+DLG_WIN_TITLELABEL=&Titolo:
+DLG_WIN_CURSOR=Forma cursore
+DLG_WIN_BLOCK=B&locco
+DLG_WIN_VERT=Linea &verticale
+DLG_WIN_HORZ=Linea &orizzontale
+DLG_WIN_BOLDFONT=Font &grassetto
+DLG_WIN_HIDETITLE=Nascond&i barra titolo
+DLG_WIN_NO_FRAME=N&essuna cornice
+DLG_WIN_HIDEMENU=Nascondi barra &menu
+DLG_WIN_COLOREMU=Emulazione &colore
+DLG_WIN_PCBOLD16=&16 colori (stile PC)
+DLG_WIN_AIXTERM16=1&6 colori (stile aixterm)
+DLG_WIN_XTERM256=&256 colori (stile xterm)
+DLG_WIN_SCROLL1=Buffer &scorrimento:
+DLG_WIN_SCROLL3=li&nee
+DLG_WIN_COLOR=Colore
+DLG_WIN_TEXT=Te&sto
+DLG_WIN_BG=Sfon&do
+DLG_WIN_ATTRIB=&Attributo
+DLG_WIN_SWAP_COLORS=S&cambia colori
+DLG_WIN_R=&R:
+DLG_WIN_G=&V:
+DLG_WIN_B=&B:
+DLG_WIN_ALWAYSBG=&Usa sempre testo normale BG
+DLG_WIN_NORMAL=Normale
+DLG_WIN_BOLD=Grassetto
+DLG_WIN_BLINK=Lampeggio
+DLG_WIN_REVERSEATTR=Inverso
+DLG_WIN_URL=URL
+DLG_WIN_UNDERLINE=Sottolineato
+
+DLG_CHOOSEFONT_STC6=La selezione 'Stile font' qui non influenzerà l'aspetto reale del font.
+
+DLG_WINLIST_TITLE=Tera Term: elenco finestre
+DLG_WINLIST_LABEL=&Finestra:
+DLG_WINLIST_OPEN=&Apri
+DLG_WINLIST_CLOSEWIN=&Chiudi
+
+MSG_FIND_DIR_ERROR=Impossibile trovare la cartella
+
+; ttpfile
+; ttfile.c
+DLG_FOPT_TITLE=Registro eventi
+DLG_FOPT_FILENAME_TITLE=Nome &file (trascina il file in questa finestra)
+DLG_FOPT_APPEND_LABEL=Modo scrittura
+DLG_FOPT_NEW_OVERWRITE=&Nuovo/sovrascrivi
+DLG_FOPT_APPEND=&Appendi
+DLG_FOPT_BINARY_LABEL=Modo testo o binario
+DLG_FOPT_TEXT=T&esto
+DLG_FOPT_BINARY=Bina&rio
+DLG_FOPT_BOM=&BOM
+DLG_FOPT_PLAIN=Testo sem&plice
+DLG_FOPT_TIMESTAMP=&Data/ora
+DLG_FOPT_HIDEDIALOG=Nascon&di finestra
+DLG_FOPT_ALLBUFFINFIRST=In&cludi buffer schermo
+DLG_FOPT_TIMESTAMP_LOCAL=Ora locale
+DLG_FOPT_TIMESTAMP_UTC=UTC
+DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Tempo trascorso (registrazione)
+DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Tempo trascorso (connessione)
+
+DLG_XOPT=Opzione
+DLG_XOPT_CHECKSUM=Check&sum
+DLG_XOPT_CRC=&CRC
+DLG_XOPT_1K=1&K
+DLG_XOPT_BINARY=Bina&rio
+
+FILEDLG_KEYBOARD_FILTER=File impostazione tastiera (*.cnf)\0*.cnf\0\0
+FILEDLG_SETUP_FILTER=File impostazioni (*.ini)\0*.ini\0\0
+FILEDLG_SAVE_SETUP_TITLE=Tera Term: salvataggio impostazioni
+FILEDLG_RESTORE_SETUP_TITLE=Tera Term: ripristino impostazioni da file
+FILEDLG_LOAD_KEYMAP_TITLE=Tera Term: caricamento mappa tastiera
+FILEDLG_ALL_FILTER=Tutti i file (*.*)\0*.*\0\0
+FILEDLG_USER_FILTER_NAME=Definito da utente
+
+DLG_GETFN_TITLE=Tera Term: ottieni con Kermit
+DLG_GETFN_FILENAME=Nome &file:
+
+; ttftypes.h
+FILEDLG_TRANS_TITLE_LOG=Registro eventi
+FILEDLG_TRANS_TITLE_SENDFILE=Invio file
+FILEDLG_TRANS_TITLE_KMTRCV=Ricezione Kermit
+FILEDLG_TRANS_TITLE_KMTGET=Ottieni Kermit
+FILEDLG_TRANS_TITLE_KMTSEND=Invia Kermit
+FILEDLG_TRANS_TITLE_KMTFIN=Fine Kermit
+FILEDLG_TRANS_TITLE_XRCV=Ricezione XMODEM
+FILEDLG_TRANS_TITLE_XSEND=Invio XMODEM
+FILEDLG_TRANS_TITLE_YRCV=Ricezione YMODEM
+FILEDLG_TRANS_TITLE_YSEND=Invia YMODEM
+FILEDLG_TRANS_TITLE_ZRCV=Ricezione ZMODEM
+FILEDLG_TRANS_TITLE_ZSEND=Invio ZMODEM
+FILEDLG_TRANS_TITLE_BPRCV=Ricezione B-Plus
+FILEDLG_TRANS_TITLE_BPSEND=Invio B-Plus
+FILEDLG_TRANS_TITLE_QVRCV=Ricezione Quick-VAN
+FILEDLG_TRANS_TITLE_QVSEND=Invio Quick-VAN
+FILEDLG_TRANS_TITLE_RECVFILE=Ricevi file
+FILEDLG_TRANS_TITLE_RAWRCV=Ricezione file
+
+; dlg clipboard
+DLG_CLIPBOARD_TITLE=Tera Term: conferma appunti
+
+; ttptek
+; tttek.c
+MSG_TEK_PRINT_ERROR=La stampante non supporta la grafica
+
+; ttpmacro
+FILEDLG_OPEN_MACRO_TITLE=MACRO: apri macro
+FILEDLG_OPEN_MACRO_FILTER=File macro (*.ttl)\0*.ttl\0\0
+
+BTN_PAUSE=Pau&sa
+BTN_START=&Avvia
+BTN_END=&Fine
+BTN_YES=&Sì
+BTN_NO=&No
+BTN_STOP=&Stop macro
+BTN_CONTINUE=&Continua
+
+MSG_MACRO_CONF=MACRO: conferma
+MSG_MACRO_HALT_SCRIPT=Vuoi fermare questo script macro?
+
+; common
+MSG_ERROR=ERRORE
+MSG_TT_ERROR=Tera Term: errore
+MSG_TT_NOTICE=Tera Term: notifica
+MSG_TT_TAKE_EFFECT=Questa opzione avrà effetto la prossima volta che viene avviata una sessione.
+
+BTN_OK=OK
+BTN_CANCEL=Annulla
+BTN_CLOSE=Chiudi
+BTN_HELP=&Aiuto
+BTN_DEFAULT=Predefinito
+
+; help
+HELPFILE=teraterm.chm
+MSG_OPENHELP_ERROR=Impossibile aprire il file della guida online (%s).
+
+; ttset
+MSG_INI_ERROR=Tera Term: errore
+MSG_INI_WRITE_ERROR=Impossibile scrivere il file ini.
+
+; sendfile
+DLG_SENDFILE_READING_METHOD_TITLE=Metodo lettura file
+DLG_SENDFILE_READING_METHOD_BULK=Lett&ura contemporanea
+DLG_SENDFILE_READING_METHOD_SEQUENTIAL=Lettura se&quenziale
+DLG_SENDFILE_READING_METOHD_TOOLTIP=Lettura contemporanea:\n- Invia durante la lettura da un file.\n- Il file testo viene letto come codifica ACP e non è determinata automaticamente.\nLettura sequenziale:\n- Il file è letto in memoria e quindi inviato.\n- La codifica del file testo è determinata automaticamente.\n
+DLG_SENDFILE_BINARY=&Binario
+
+; receivefile
+DLG_RECVFILE_FILENAME_TITLE=&Nome file (trascina il file in questa finestra di dialogo)
+DLG_RECVFILE_BINARY=&Binario
+DLG_RECVFILE_AUTOSTOP_LABEL=&Tempo attesa per arresto automatico (sec)
+
+; theme
+DLG_THEME_PREVIEW_FILE_TITLE=Anteprima/file
+DLG_THEME_PREVIEW_FILE_LOAD=Carica
+DLG_THEME_PREVIEW_FILE_SAVE=Salva
+
+DLG_THEME_BG_TITLE=Sfondo
+DLG_THEME_BG_IMAGE=Immagine sfondo
+
+DLG_THEME_BG_ALPHA_TITLE=Immagine alfa sfondo
+DLG_THEME_BG_ALPHA_TEXT_BACK_ALPHA_TITLE=Sfondo normale alfa (direzione destra opaca):
+DLG_THEME_BG_ALPHA_REVERSE_TEXT_BACK_ALPHA_TITLE=Sfondo inverso alfa:
+DLG_THEME_BG_ALPHA_OTHER_BACK_TITLE=Altro sfondo alfa:
+
+DLG_THEME_COLOR_TITLE=Colore testo
+
+[TTSSH]
+; font
+DLG_SYSTEM_FONT=System,14,0
+DLG_TAHOMA_FONT=Tahoma,8,0
+DLG_ABOUT_FONT=Courier New,8,0
+
+; menu
+MENU_ABOUT=Info su &TTSSH...
+MENU_SSH=SS&H...
+MENU_SSH_AUTH=Autenticazione SSH...
+MENU_SSH_FORWARD=In&oltro SSH...
+MENU_SSH_KEYGEN=Gene&razione chiave SSH...
+
+; dlg about
+DLG_ABOUT_TITLE=Info su TTSSH
+DLG_ABOUT_FP_HASH_ALGORITHM=Algoritmo firma digitale hash:
+DLG_ABOUT_SERVERID=ID server:
+DLG_ABOUT_PROTOCOL=Protocollo usato:
+DLG_ABOUT_ENCRYPTION=Criptazione:
+DLG_ABOUT_SERVERKEY=Chiavi server:
+DLG_ABOUT_KEXKEY=Chiave scambio chiavi:
+DLG_ABOUT_AUTH=Autenticazione:
+DLG_ABOUT_COMP=Compressione:
+DLG_ABOUT_CLIENTID=ID client:
+DLG_ABOUT_KEX=Algoritmo scambio chiave:
+DLG_ABOUT_HOSTKEY=Chiave host:
+DLG_ABOUT_MAC=Algoritmo MAC:
+DLG_ABOUT_MAC_INFO=%s verso il server, %s dal server
+DLG_ABOUT_COMPDELAY=Compressione ritardata:
+DLG_ABOUT_CIPHER_INFO=%s verso il server, %s dal server
+DLG_ABOUT_KEY_INFO=chiave server %d-bit, chiave host %d-bit
+DLG_ABOUT_KEY_INFO2=Chiave client %d-bit, chiave server %d-bit
+DLG_ABOUT_KEY_NONE=Nessuna
+DLG_ABOUT_COMP_INFO=livello %d; rapporto %.1f (%ld:%ld)
+DLG_ABOUT_COMP_INFO2=livello %d
+DLG_ABOUT_COMP_NONE=Nessuno
+DLG_ABOUT_COMP_UPDOWN=Upload %s; Download %s
+DLG_ABOUT_KEXPARAM=Param scambio chiave:
+DLG_ABOUT_KEXPARAM_DH=Gruppo DH %d bit
+DLG_ABOUT_KEXPARAM_NISTP=Curva ellittica NIST P-%d (%d bit)
+DLG_ABOUT_KEXPARAM_X25519=Curva ellittica Curve25519 (255 bit)
+DLG_ABOUT_KEXPARAM_SNTRUP761X25519=Curve25519 (255-bit) elliptic curve, SNTRUP761 (761-degree polynomial)
+DLG_ABOUT_KEXPARAM_MLKEM768X25519=Curve25519 (255-bit) elliptic curve, ML-KEM-768 (768-dimensional lattice)
+DLG_ABOUT_AUTH_INFO=User '%s', autenticazione %s
+DLG_ABOUT_AUTH_INFO2=, chiave %s
+DLG_ABOUT_AUTH_INFO3=, chiave %s con %s
+DLG_ABOUT_FINGERPRINT=Firma digitale chiave host:
+
+; dlg auth
+DLG_AUTH_TITLE=Autenticazione SSH
+DLG_AUTH_TITLE_FAILED=Verifica autenticazione SSH
+DLG_AUTH_BANNER=Accesso a %s
+DLG_AUTH_BANNER2=Richiesta autenticazione.
+DLG_AUTH_BANNER2_FAILED=Autenticazione fallita. Riprova.
+DLG_AUTH_BANNER2_FURTHER=Richiesta ulteriore autenticazione.
+DLG_AUTH_USERNAME=&Nome utente:
+DLG_AUTH_USE_DEFAULT_USERNAME=Usa nome utente pre&definito
+DLG_AUTH_USE_LOGON_USERNAME=Usa nome utente &logon
+DLG_AUTH_PASSWORD=&Passphrase:
+DLG_AUTH_PASTE_CLIPBOARD=In&colla dagli appunti
+DLG_AUTH_CLEAR_CLIPBOARD=Incolla dagli appunti &e cancella gli appunti
+DLG_AUTH_USE_CONTORL_CHARACTERS=Usa cara&tteri di controllo
+DLG_AUTH_SHOW_PASSPHRASE=Vi&sualizza passphrase
+DLG_AUTH_REMEMBER_PASSWORD=Salva password in &memoria
+DLG_AUTH_FWDAGENT=Agente inoltro
+DLG_AUTH_METHOD=Metodi autenticazione
+DLG_AUTH_METHOD_PASSWORD=Per accedere usa pass&word in chiaro
+DLG_AUTH_METHOD_RSA=Per accedere usa chiave &RSA/DSA/ECDSA/ED25519
+DLG_AUTH_METHOD_RHOST=Per accedere usa r&hosts (SSH1)
+DLG_AUTH_METHOD_CHALLENGE1=Per accedere usa challenge/response(&TIS)
+DLG_AUTH_METHOD_CHALLENGE2=Per accedere use tastiera &interattiva
+DLG_AUTH_METHOD_PAGEANT=Per accedere usa P&ageant
+DLG_AUTH_PRIVATEKEY=File c&hiave privata:
+DLG_AUTH_LOCALUSER=Nome &utente locale:
+DLG_AUTH_HOST_PRIVATEKEY=&File chiave privata host:
+DLG_AUTH_TIP_CONTROL_CODE=è stato inserito carattere di controllo
+DLG_AUTH_TIP_PASTE_KEY=Per incollare dagli appunti usa Maiusc+Ins
+MSG_PAGEANT_NOTFOUND=Impossibile trovare Pageant.
+MSG_PAGEANT_NOKEY=Pageant non ha una chiave valida.
+
+; dlg auth setup
+DLG_AUTHSETUP_TITLE=TTSSH: impostazione autenticazione
+DLG_AUTHSETUP_BANNER=Seleziona impostazioni predefinite autenticazione:
+DLG_AUTHSETUP_USERNAME=Nome utente
+DLG_AUTHSETUP_NO_USERNAME=&Non inserire nome utente
+DLG_AUTHSETUP_DEFAULT_USERNAME=U&sa nome utente predefinito
+DLG_AUTHSETUP_LOGON_USERNAME=Us&a nome utente accesso
+DLG_AUTHSETUP_LOGON_USERNAME_TEXT=Nome utente attuale = '%s'
+DLG_AUTHSETUP_METHOD=Metodo autenticazione
+DLG_AUTHSETUP_METHOD_PASSWORD=Per l'accesso usa password in c&hiaro
+DLG_AUTHSETUP_METHOD_RSA=Per l'accesso usa chiave &RSA/DSA/ECDSA/ED25519
+DLG_AUTHSETUP_METHOD_RHOST=Per l'accesso usa r&hosts (SSH1)
+DLG_AUTHSETUP_METHOD_CHALLENGE=Per l'accesso usa SSH1:challenge/response(&TIS) / SSH2:tastiera interattiva
+DLG_AUTHSETUP_METHOD_PAGEANT=Usa P&ageant
+DLG_AUTHSETUP_PRIVATEKEY=File c&hiave privata:
+DLG_AUTHSETUP_LOCALUSER=Nome &utente locale:
+DLG_AUTHSETUP_HOST_PRIVATEKEY=&File chiave privata host:
+DLG_AUTHSETUP_CHECKAUTH=&Verifica metodi autenticazione abilitati prima dell'accesso (SSH2)
+
+FILEDLG_OPEN_PRIVATEKEY_TITLE=Scegli il file con la chiave privata RSA/DSA/ECDSA/ED25519
+FILEDLG_OPEN_PRIVATEKEY_FILTER=File identità \0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\0identità (RSA1)\0identità\0id_rsa (SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa (SSH2)\0id_ecdsa\0id_ed25519 (SSH2)\0id_ed25519\0PuTTY (*.ppk)\0*.ppk\0File PEM (*.pem)\0*.pem\0Tutti i file (*.*)\0*.*\0\0
+MSG_KEYSPECIFY_ERROR=Devi specificare il file che contiene la chiave privata RSA/DSA/ECDSA/ED25519.
+MSG_READKEY_ERROR=errore lettura file chiave privata SSH2\n%s
+MSG_RHOSTS_NOTDEFAULT_ERROR=L'autenticazione rhosts probabilmente fallirà perché non è il metodo di autenticazione predefinito.\nPer usare l'autenticazione Rhosts in TTSSH, è necessario impostarla come predefinita riavviando\nTTSSH e selezionando 'Autenticazione SSH...' dal menu 'Configurazione' prima della connessione.
+MSG_NOAUTHMETHOD_ERROR=Il server non supporta nessuna delle opzioni di autenticazione\nfornite da TTSSH. Questa connessione verrà ora chiusa.
+
+; dlg diff key
+DLG_DIFFERENTKEY_TITLE=AVVISO SICUREZZA
+DLG_DIFFERENTKEY_WARNING=L'elenco host conosciuti contiene una voce per il server '%s', ma il sistema che hai contattato ha presentato una CHIAVE DIVERSA da quella presente nell'elenco host conosciuti. Un sistema ostile potrebbe fingere di essere il server.
+DLG_DIFFERENTKEY_WARNING2=Se scegli di sostituire questa nuova chiave nell'elenco host conosciuti e continui, non riceverai più questo avviso.
+DLG_DIFFERENTKEY_FINGERPRINT=Firma digitale chiave host server:
+DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Algoritmo hash firma digitale:
+DLG_DIFFERENTKEY_REPLACE=Sostituisci chiave esistente con &questa nuova chiave
+
+; dlg diff type key
+DLG_DIFFERENTTYPEKEY_TITLE=AVVISO SICUREZZA
+DLG_DIFFERENTTYPEKEY_WARNING=L'elenco di host conosciuti contiene una voce per il server '%s', ma il sistema che hai contattato ha presentato una CHIAVE DI TIPO DIVERSO da quella presente nell'elenco host conosciuti. Un sistema ostile potrebbe fingere di essere il server.
+DLG_DIFFERENTTYPEKEY_WARNING2=Se scegli di aggiungere questa nuova chiave all'elenco host conosciuti e continui, non riceverai più questo avviso.
+DLG_DIFFERENTTYPEKEY_FINGERPRINT=Firma digitale chiave host server:
+DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Algoritmo hash firma digitale:
+DLG_DIFFERENTTYPEKEY_ADD=&Aggiungi questo sistema e la sua chiave all'elenco host conosciuti
+
+; dlg fwd edit
+DLG_FWD_TITLE=Inoltro porte SSH
+DLG_FWD_BANNER=Seleziona direzione inoltro porte:
+DLG_FWD_LOCAL_PORT=Inoltra porta &locale
+DLG_FWD_LOCAL_LISTEN=&in ascolto
+DLG_FWD_LOCAL_REMOTE=al sistema remoto
+DLG_FWD_LOCAL_REMOTE_PORT=&porta
+DLG_FWD_LOCAL_CHECKIDENTITY=A&ccetta connessioni di altri host
+DLG_FWD_REMOTE_PORT=Inoltra porta server &remoto
+DLG_FWD_REMOTE_LISTEN=in a&scolto
+DLG_FWD_REMOTE_LOCAL=al sistem&a locale
+DLG_FWD_REMOTE_LOCAL_PORT=p&orta
+DLG_FWD_DYNAMIC_PORT=inoltra porta &dinamica
+DLG_FWD_DYNAMIC_LISTEN=in ascol&to
+
+MSG_SAME_SERVERPORT_ERROR=Non è possibile avere due inoltri dalla stessa porta del server (%d).
+MSG_SAME_LOCALPORT_ERROR=Non è possibile avere due inoltri dalla stessa porta locale (%d).
+MSG_UNSPECIFIED_FWD_ERROR1=I seguenti inoltri non sono stati specificati all'inizio di questa sessione SSH:\n\n
+MSG_UNSPECIFIED_FWD_ERROR2=\nA causa di una limitazione del protocollo SSH, questi inoltri non funzioneranno nella sessione SSH attuale.\nSe salvi queste impostazioni e avvii una nuova sessione SSH, l'inoltro dovrebbe funzionare.
+MSG_INVALID_PORT_ERROR=La porta '%s' non è un numero porta valido.\nScegli un nome porta dall'elenco o inserisci un numero compreso tra 1 e 65535.
+
+; dlg fwd setup
+DLG_FWDSETUP_TITLE=TTSSH: impostazioni inoltro
+DLG_FWDSETUP_LIST=Inoltro &porta
+DLG_FWDSETUP_ADD=&Aggiungi...
+DLG_FWDSETUP_EDIT=&Modifica...
+DLG_FWDSETUP_REMOVE=&Rimuovi
+DLG_FWDSETUP_CHECKIDENTITY=Le porte locali accettano connessioni da altri host
+DLG_FWDSETUP_X=Inoltro X
+DLG_FWDSETUP_XAPP=Visualizza applicazioni &X remote nel server X locale
+
+MSG_FWD_REMOTE_XSERVER=server X remoto
+MSG_FWD_REMOTE_XSCREEN=Server X (visualizza %d:%d)
+MSG_FWD_REMOTE=Sistema remoto '%s' porta %s al sistema locale '%s' porta '%s'
+MSG_FWD_LOCAL=Sistema locale '%s' porta %s al sistema remoto '%s' porta %s
+MSG_FWD_X=Applicazioni remote X al server X locale
+MSG_FWD_DYNAMIC=Sistema locale '%s' porta %s al sistema remoto dinamico
+
+; dlg host
+DLG_HOST_TITLE=Tera Term: nuova connessione
+DLG_HOST_TCPIPHOST=Hos&t:
+DLG_HOST_TCPIPHISTORY=Aggiungi ad elenco host
+DLG_HOST_TCPIPSERVICE=Servizio
+DLG_HOST_TCPIPOTHER=Altro
+DLG_HOST_TCPIPPORT=&Porta TCP#:
+DLG_HOST_TCPIPSSHVERSION=&Versione SSH:
+DLG_HOST_TCPIPPROTOCOL=Versio&ne IP:
+DLG_HOST_SERIAL=S&eriale
+DLG_HOST_SERIALPORT=Po&rta:
+DLG_HOST_HELP=&Aiuto
+
+MSG_TCPPORT_NAN_ERROR=Il valore porta TCP deve essere un numero.
+
+; dlg keygen
+DLG_KEYGEN_TITLE=TTSSH: generazione chiave
+DLG_KEYGEN_KEYTYPE=Tipo chiave
+DLG_KEYGEN_PASSPHRASE=Password chiave:
+DLG_KEYGEN_PASSPHRASE2=Conferma password:
+DLG_KEYGEN_COMMENT=C&ommento:
+DLG_KEYGEN_SAVEPUBLIC=Salva chiave pubbl&ica
+DLG_KEYGEN_SAVEPRIVATE=Salva chiave &privata
+DLG_KEYGEN_GENERATE=&Genera
+DLG_KEYGEN_BITS=&Bit chiave:
+DLG_KEYGEN_BCRYPT_KDF=Formato bcrypt &KDF
+DLG_KEYGEN_BCRYPT_ROUNDS=&Cicli:
+
+MSG_KEYBITS_MIN_ERROR=I bit chiave sono troppo piccoli.
+MSG_BCRYPT_ROUNDS_MIN_ERROR=Il numero di arrotondamenti è troppo piccolo.
+MSG_BCRYPT_ROUNDS_MAX_ERROR=Il numero di arrotondamenti è troppo grande.
+MSG_KEYGEN_GENERATING='generazione chiave'
+MSG_KEYGEN_GENERATED='chiave generata'
+
+FILEDLG_SAVE_PUBLICKEY_TITLE=Salva chiave pubblica come:
+FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER=Chiave RSA SSH1 (identity.pub)\0identity.pub\0Tutti i file (*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_RSA_FILTER=Chiave RSA SSH2 (id_rsa.pub)\0id_rsa.pub\0Tutti i file (*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_DSA_FILTER=Chiave DSA SSH2 (id_dsa.pub)\0id_dsa.pub\0Tutti i file (*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER=Chiave ECDSA SSH2 (id_ecdsa.pub)\0id_ecdsa.pub\0Tutti i file (*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER=Chiave ED25519 SSH2 (id_ed25519.pub)\0id_ed25519.pub\0Tutti i file (*.*)\0*.*\0\0
+MSG_SAVE_KEY_OPENFILE_ERROR=Impossibile aprire il file chiave
+MSG_SAVE_KEY_WRITEFILE_ERROR=Impossibile salvare il file chiave
+MSG_SAVE_PRIVATE_KEY_MISMATCH_ERROR=Le due passphrase non corrispondono.
+MSG_SAVE_PRIVATEKEY_EMPTY_WARN=Vuoi usare una passphrase vuota?
+FILEDLG_SAVE_PRIVATEKEY_TITLE=Salva chiave privata come:
+FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER=Chiave RSA SSH1 (identity)\0identity\0Tutti i file (*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER=Chiave RSA SSH2 (id_rsa)\0id_rsa\0Tutti i file (*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER=Chiave DSA SSH2 (id_dsa)\0id_dsa\0Tutti i file (*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_ECDSA_FILTER=Chiave ECDSA SSH2 (id_ecdsa)\0id_ecdsa\0Tutti i file (*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER=Chiave ED25519 SSH2 (id_ed25519)\0id_ed25519\0Tutti i file (*.*)\0*.*\0\0
+
+; dlg setup
+DLG_SSHSETUP_TITLE=TTSSH: impostazione
+DLG_SSHSETUP_COMPRESS=Livello &compressione:
+DLG_SSHSETUP_COMPRESS_NONE=Nessuno
+DLG_SSHSETUP_COMPRESS_HIGHEST=Massimo
+DLG_SSHSETUP_COMPRESS_NOTE=SSH1: 'Livello compressione' determina compressione on/off.\nSSH2: 'Ordine compressione' e 'Livello compressione' determinano compressione on/off.
+DLG_SSHSETUP_CIPHER=Ordine cifratura &preferito
+DLG_SSHSETUP_CIPHER_UP=Sposta su (&1)
+DLG_SSHSETUP_CIPHER_DOWN=Sposta giù (&2)
+DLG_SSHSETUP_CIPHER_BORDER=<le cifre al di sotto di questa riga sono disabilitate>
+DLG_SSHSETUP_KEX=Ordine K&EX (solo SSH2)
+DLG_SSHSETUP_KEX_UP=Sposta su (&3)
+DLG_SSHSETUP_KEX_DOWN=Sposta giù (&4)
+DLG_SSHSETUP_KEX_BORDER=<KEX sotto questa linea sono disabilitati>
+DLG_SSHSETUP_HOST_KEY=Ordine chiave ho&st (solo SSH2)
+DLG_SSHSETUP_HOST_KEY_UP=Sposta su (&5)
+DLG_SSHSETUP_HOST_KEY_DOWN=Sposta giù(&6)
+DLG_SSHSETUP_HOST_KEY_BORDER=<Le chiavi host sotto questa riga sono disabilitate>
+DLG_SSHSETUP_MAC=Or&dine MAC (solo SSH2)
+DLG_SSHSETUP_MAC_UP=Sposta su (&7)
+DLG_SSHSETUP_MAC_DOWN=Sposta giù (&8)
+DLG_SSHSETUP_MAC_BORDER=<I MAC sotto questa linea sono disabilitati>
+DLG_SSHSETUP_COMP=Ordine compress&ione (solo SSH2)
+DLG_SSHSETUP_COMP_UP=Sposta su (&9)
+DLG_SSHSETUP_COMP_DOWN=Sposta giù (&0)
+DLG_SSHSETUP_COMP_BORDER=<I metodi di compressione sotto questa riga sono disabilitati>
+DLG_SSHSETUP_KNOWNHOST=Host conosciuti SSH
+DLG_SSHSETUP_KNOWNHOST_RW=Lettura/scri&ttura file:
+DLG_SSHSETUP_KNOWNHOST_RO=File sola lettu&ra:
+DLG_SSHSETUP_HEARTBEAT=HeartBeat (&keep-alive)
+DLG_SSHSETUP_HEARTBEAT_UNIT=sec. (0 per disabilitare)
+DLG_SSHSETUP_PASSWORD=Ricorda password in &memoria
+DLG_SSHSETUP_FORWARDAGENT=Abilita &agent inoltro
+DLG_SSHSETUP_FORWARDAGENTCONFIRM=C&onferma inoltro agent
+DLG_SSHSETUP_FORWARDAGENTNOTIFY=No&tifica accesso all'agent inoltro
+DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Verifica firma digitale chiave host tramite DNS
+DLG_SSHSETUP_NOTICE=Tutte le opzioni diventano effettive al successivo avvio della sessione.
+DLG_SSHSETUP_HOSTKEY_ROTATION=Rotazio&ne chiave host
+DLG_SSHSETUP_HOSTKEY_ROTATION_NO=No
+DLG_SSHSETUP_HOSTKEY_ROTATION_YES=Sì
+DLG_SSHSETUP_HOSTKEY_ROTATION_ASK=Chiedi
+DLG_SSHSETUP_LOGLEVEL=&Livello registro
+DLG_SSHSETUP_LOGLEVEL_UNIT=(0 per disabilitare)
+
+FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=Seleziona file lettura/scrittura host conosciuti
+FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=Seleziona file di sola lettura host conosciuti da aggiungere
+
+; dlg tis
+DLG_TIS_TITLE=Challenge autenticazione SSH
+DLG_TIS_BANNER=Accesso a %s
+
+; dlg passwd change
+DLG_PASSCHG_TITLE=TTSSH: cambia password
+DLG_PASSCHG_MESSAGE=Il server ha richiesto di modificare la password
+DLG_PASSCHG_OLDPASSWD=&vecchia password
+DLG_PASSCHG_NEWPASSWD=&Nuova password
+DLG_PASSCHG_CONFIRMPASSWD=&Conferma password
+MSG_PASSCHG_MISMATCH=Le password non corrispondono. Riprova.
+
+; dlg unknown host
+DLG_UNKNOWNHOST_TITLE=AVVISO SICUREZZA
+DLG_UNKNOWNHOST_WARNING=Non c'è voce per il server '%s' nell'elenco host conosciuti. Il sistema che hai contattato potrebbe essere un sistema ostile che finge di essere il server.
+DLG_UNKNOWNHOST_WARNING2=Se scegli di aggiungere questo sistema all'elenco degli host conosciuti e continui, non riceverai più questo avviso.
+DLG_UNKNOWNHOST_FINGERPRINT=Firma digitale chiave host server:
+DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Algoritmo hash firma digitale:
+DLG_UNKNOWNHOST_ADD=&Aggiungi questo sistema e la sua chiave all'elenco host conosciuti
+
+DLG_HOSTKEY_SSHFP_NOTFOUND=Nessuna firma digitale chiave host trovata nel DNS.
+DLG_HOSTKEY_SSHFP_MATCH=Trovata corrispondenza firma digitale chiave host nel DNS.
+DLG_HOSTKEY_SSHFP_MISMATCH=Mancata corrispondenza firma digitale chiave host nel DNS.
+DLG_HOSTKEY_SSHFP_DIFFTYPE=Mancata corrispondenza tipo chiave host nel DNS.
+DLG_HOSTKEY_DNSSEC_NG=Trovata firma digitale non sicura nel DNS.
+DLG_HOSTKEY_DNSSEC_OK=Trovata firma digitale sicura nel DNS.
+
+DLG_HOSTKEY_ROTATION_TITLE=Rotazione chiave host
+DLG_HOSTKEY_ROTATION_WARNING=Hai ricevuto l'elenco delle chiavi host dal server remoto `%s'.\nPuoi scegliere di aggiungere '%u' nuove chiavi e rimuovere '%u' chiavi obsolete da questo computer all'elenco degli host conosciuti.\nVuoi aggiornare il file host conosciuti?
+DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=Algoritmo hash firma digitale:
+DLG_HOSTKEY_ROTATION_ADD=%u nuove chiavi:
+DLG_HOSTKEY_ROTATION_REMOVE=%u chiavi obsolete:
+
+; dlg SCP
+DLG_SCP_TITLE=TTSSH: SCP (Secure Copy Protocol)
+DLG_SCP_SENDFILE_FROM=&Da:
+DLG_SCP_SENDFILE_TO=A:
+DLG_SCP_SENDFILE_DRAG=Puoi trascinare il file in questa finestra.
+DLG_SCP_SENDFILE_SEND=&Invia
+DLG_SCP_SENDFILE_CANCEL=&Annulla
+DLG_SCP_RECEIVEFILE_FROM=D&a:
+DLG_SCP_RECEIVEFILE_TO=A:
+DLG_SCP_RECEIVEFILE_RECEIVE=&Ricevi
+DLG_SCP_SELECT_FILE_TITLE=Seleziona il file da inviare con SCP
+DLG_SCP_SELECT_DEST_TITLE=Seleziona cartella destinazione
+
+; dlg SCP progress
+DLG_SCP_PROGRESS_TITLE_SENDFILE=TTSSH: invio file via SCP
+DLG_SCP_PROGRESS_TITLE_RECEIVEFILE=TTSSH: ricezione file via SCP
+DLG_SCP_PROGRESS_FILENAME_LABEL=Nome file:
+DLG_SCP_PROGRESS_BYTES_LABEL=Byte trasferiti:
+DLG_SCP_PROGRESS_TIME_LABEL=Tempo trascorso:
+
+; crypt.c
+MSG_ENCRYPT_ERROR1=%s errore criptazione(1): byte %d (%d)
+MSG_ENCRYPT_ERROR2=%s errore criptazione(2)
+MSG_DECRYPT_ERROR1=%s errore decriptazione(1): byte %d (%d)
+MSG_DECRYPT_ERROR2=%s errore decriptazione(2)
+MSG_CIPHER_INIT_ERROR=Errore inizializzazione criptazione (%d)
+MSG_RSAKEY_SETUP_ERROR=Errore impostazione chiavi RSA
+MSG_UNAVAILABLE_CIPHERS_ERROR=Il server non supporta nessuno degli algoritmi di crittografia TTSSH.\nNon è possibile stabilire una connessione sicura nella direzione da TTSSH al server.\nLa connessione verrà chiusa.
+MSG_CIPHER_NONE_ERROR=Tutti gli algoritmi di crittografia inclusi in questo programma e nel server sono stati disabilitati.\nPer comunicare con questo server, dovrai abilitare altri tipi di crittografia\nella finestra di dialogo 'Configurazione TTSSH' quando esegui nuovamente Tera Term.\nQuesta connessione verrà ora chiusa.
+MSG_RSAKEY_TOOWEAK_ERROR=Le chiavi RSA del server sono troppo deboli. Non è possibile stabilire una connessione sicura.
+MSG_CIPHER_NOTSELECTED_ERROR=Nessuna crittografia selezionata!
+
+; fwd.c
+MSG_FWD_LOCAL_CHANNEL_ERROR=Il server ha tentato di manipolare un canale di inoltro che non esiste.\nIl server ha un bug o è ostile.\nDovresti chiudere questa connessione.
+MSG_FWD_REQUEST_ERROR=Errore di comunicazione durante l'ascolto di una connessione da inoltrare.\nLa porta di ascolto verrà terminata.
+MSG_FWD_REFUSED_ERROR=Connessione rifiutata (forse il servizio non è attualmente in esecuzione)
+MSG_FWD_NETDOWN_ERROR=Impossibile contattare il sistema (probabile problema di rete)
+MSG_FWD_MACHINEDOWN_ERROR=Impossibile contattare il sistema (probabilmente il sistema è offline)
+MSG_FWD_ADDRNOTFOUND_ERROR=Nessun indirizzo trovato per il sistema
+MSG_FWD_CONNECT_ERROR=Non è stato possibile stabilire la connessione di inoltro
+MSG_FWD_CHANNEL_ERROR=Errore di comunicazione %s locale inoltrato %s.\n%s (codice %d).\nLa connessione inoltrata verrà chiusa.
+MSG_FWD_CHANNEL_OPEN_X_ERROR=Il server ha tentato di inoltrare una connessione tramite questo sistema.\nHa richiesto una connessione al server X il %s (visualizza %d:%d).\n%s(codice %d).\nLa connessione inoltrata verrà chiusa.
+MSG_FWD_CHANNEL_OPEN_ERROR=Il server ha tentato di inoltrare una connessione tramite questo sistema.\nHa richiesto una connessione a %s (porta %s).\n%s(codice %d).\nLa connessione inoltrata verrà chiusa.
+DLG_FWDMON_TITLE=Monitor inoltro porta TTSSH
+MSG_FWD_HOSTILE_ATTACK_ERROR=L'host con numero IP %s ha tentato di connettersi alla porta locale inoltrata %d.\nPotrebbe trattarsi di una sorta di attacco ostile.
+MSG_FWD_SOCKET_ERROR=Impossibile inizializzare alcuni socket richiesti per l'inoltro porta.\nAlcuni servizi di inoltro porta potrebbero non essere disponibili.\n(n. err. %d)
+MSG_FWD_DUPLICATE_ERROR=ERRORE INTERNO TTSSH: impossibile impostare l'inoltro porta perché sono state trovate richieste di tipo/porta duplicate
+MSG_FWD_DENIED_HANDLE_ERROR=Il server ha tentato di inoltrare una connessione tramite questo sistema.\nHa richiesto una connessione al sistema %s sulla porta %s.\nSi è verificato un errore durante l'elaborazione della richiesta ed è stata negata.
+MSG_FWD_DENIED_ERROR=Il server ha tentato di inoltrare una connessione tramite questo sistema.\nHa richiesto una connessione al sistema %s sulla porta %d.\nNon è stato specificato questo inoltro a TTSSH in anticipo, quindi la richiesta è stata rifiutata.
+MSG_FWD_DENIED_X_ERROR=Il server ha tentato di inoltrare una connessione attraverso questo sistema.\nHa richiesto una connessione al server X locale.\nNon è stato  specificato questo inoltro a TTSSH in anticipo, quindi la richiesta è stata rifiutata.
+MSG_FWD_DENIED_BY_SERVER_ERROR=Un programma nel computer locale ha tentato di connettersi ad una porta inoltrata.\nLa richiesta di inoltro è stata rifiutata dal server.\nLa connessione è stata chiusa.
+MSG_FWD_COMM_ERROR=Si è verificato un errore di comunicazione durante l'invio dei dati inoltrati ad una porta locale.\nLa connessione inoltrata verrà chiusa.
+MSG_FWD_AGENT_FORWARDING_CONFIRM=Accetti la richiesta di inoltro dell'agent?
+MSG_FWD_AGENT_NOTIFY=Accesso host remoto all'agent.
+MSG_FWD_AGENT_NOTIFY_TITLE=Agent inoltro
+
+; hosts.c
+MSG_HOSTS_READ_ENOENT_ERROR=Si è verificato un errore durante il tentativo di leggere un file host conosciuti.\nIl nome file specificato non esiste.
+MSG_HOSTS_READ_ERROR=Si è verificato un errore durante il tentativo di leggere un file host conosciuti.
+MSG_HOSTS_ALLOC_ERROR=La memoria si è esaurita durante il tentativo di allocare spazio per leggere un file host conosciuti.
+MSG_HOSTS_HOSTNAME_INVALID_ERROR=Il nome host contiene un carattere non valido.\nQuesta sessione verrà terminata.
+MSG_HOSTS_HOSTNAME_EMPTY_ERROR=Il nome host non deve essere vuoto.\nQuesta sessione verrà terminata.
+MSG_HOSTS_FILE_UNSPECIFY_ERROR=Impossibile aggiungere l'host e la relativa chiave perché non è stato specificato alcun file degli host conosciuti.\nRiavvia Tera Term e specifica un file degli host conosciuti in lettura/scrittura nella finestra di dialogo 'Configurazione TTSSH'.
+MSG_HOSTS_WRITE_EACCES_ERROR=Si è verificato un errore durante il tentativo di scrivere la chiave host.\nNon disponi del permesso di scrittura nel file degli host conosciuti.
+MSG_HOSTS_WRITE_ERROR=Si è verificato un errore durante il tentativo di scrivere la chiave host.\nNon è stato possibile scrivere la chiave host.
+
+; keyfiles.c
+MSG_KEYFILES_READ_ENOENT_ERROR=Si è verificato un errore durante il tentativo di leggere il file chiave.\nIl file specificato non esiste.
+MSG_KEYFILES_READ_ERROR=Si è verificato un errore durante il tentativo di leggere il file chiave.
+MSG_KEYFILES_READ_ALLOC_ERROR=La memoria si è esaurita durante il tentativo di allocare spazio per leggere il file chiave.
+MSG_KEYFILES_PRIVATEKEY_NOTCONTAIN_ERROR=Il file chiave specificato non contiene una chiave privata SSH.
+MSG_KEYFILES_PRIVATEKEY_TRUNCATE_ERROR=Il file chiave specificato è troncato e non contiene una chiave privata valida.
+MSG_KEYFILES_PRIVATEKEY_LENGTH_ERROR=Impossibile decriptare il file chiave specificato usando la passphrase.\nIl file non ha la lunghezza corretta.
+MSG_KEYFILES_PRIVATEKEY_NOCIPHER_ERROR=Il file chiave specificato non può essere decriptato usando la passphrase.\nIl tipo di crittografia usata per criptare il file non è supportato da TTSSH per questo scopo.
+MSG_KEYFILES_PASSPHRASE_EMPTY_ERROR=Il file chiave specificato non può essere decriptato usando una passphrase vuota.\nPer l'accesso automatico, è necessario creare un file chiave senza passphrase.\nATTENZIONE: ciò significa che la chiave può essere facilmente rubata.
+MSG_KEYFILES_PASSPHRASE_ERROR=Impossibile decriptare il file chiave specificato usando la passphrase.\nLa passphrase non è corretta.
+MSG_KEYFILES_CRYPTOLIB_ERROR=Errore nella libreria di crittografia.\nForse la chiave memorizzata non è valida.
+
+; pkt.c
+MSG_PKT_OVERSIZED_ERROR=Pacchetto sovradimensionato ricevuto dal server; la connessione verrà chiusa.
+
+; ssh.c
+MSG_SSH_INVALID_COMPDATA_ERROR=Dati compressi non validi nel pacchetto ricevuto
+MSG_SSH_TRUNCATED_PKT_ERROR=Pacchetto ricevuto troncato (%ld > %d) @ grab_payload()
+MSG_SSH_TRUNCATED_PKT_LIM_ERROR=Pacchetto ricevuto troncato (%ld > %d) @ grab_payload_limited()
+MSG_SSH_COREINS_ERROR=Rilevato 'attacco inserimento CORE'.  Connessione terminata.
+MSG_SSH_CORRUPTDATA_ERROR=Rilevati dati danneggiati; connessione terminata.
+MSG_SSH_DECOMPRESS_ERROR=Errore interno: un pacchetto non è stato completamente decompresso.\nQuesto è un bug, segnalalo.
+MSG_SSH_SEND_PKT_ERROR=Si è verificato un errore di comunicazione durante l'invio di un pacchetto SSH.\nLa connessione verrà chiusa. (%s:%d)
+MSG_SSH_COMP_ERROR=Si è verificato un errore durante la compressione dei dati del pacchetto.\nLa connessione verrà chiusa.
+MSG_SSH_UNABLE_FWD_ERROR=\nPotrebbe essersi disconnesso perché non è stato in grado di inoltrare una porta che hai richiesto di inoltrare dal server.\nCiò accade spesso quando qualcuno sta già inoltrando quella porta dal server.
+MSG_SSH_SERVER_DISCON_ERROR=Server disconnesso con messaggio '%s'.%s
+MSG_SSH_SERVER_DISCON_NORES_ERROR=Server disconnesso (nessun motivo fornito).%s
+MSG_SSH_VERSION_ERROR=Questo programma non ha riconosciuto la versione del protocollo del server.
+MSG_SSH_VERSION_MISMATCH=Mancata corrispondenza versione protocollo. server:%d.%d client:%d
+MSG_SSH_SEND_ID_ERROR=Si è verificato un errore durante l'invio della stringa ID SSH.\nLa connessione verrà chiusa.
+MSG_SSH_UNEXP_MSG2_ERROR=Messaggio SSH2 imprevisto (%d) nella fase attuale (%d)
+MSG_SSH_UNEXP_MSG_ERROR=Tipo di pacchetto imprevisto ricevuto: %d
+MSG_SSH_ALLOC_TERMINAL_ERROR=Il server non può allocare uno pseudo-terminale. Potresti riscontrare alcuni problemi con il terminale.
+MSG_SSH_SETUP_COMP_ERROR=Si è verificato un errore durante l'impostazione della compressione.\nLa connessione verrà chiusa.
+MSG_SSH_DECRYPT_RSA_ERROR=Si è verificato un errore durante la decriptazione della challenge RSA.\nForse il file della chiave è danneggiato.
+MSG_SSH_UNSUPPORT_AUTH_METHOD_ERROR=Errore interno: metodo di autenticazione non supportato
+MSG_SSH_AUTH_FAILURE_ERROR=Errore di accesso automatico SSH2: autenticazione utente non riuscita.
+MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=Il server non dispone di un metodo di autenticazione valido.
+MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\nIl metodo di autenticazione non è supportato dal server.
+MSG_SSH_CHANNEL_OPEN_ERROR=Ricevuto SSH2_MSG_CHANNEL_OPEN_FAILURE.\ncanale [%d]: motivo: %s(%d) messaggio: %s
+MSG_SSH_NO_FREE_CHANNEL=Impossibile aprire un nuovo canale. TTSSH sta già aprendo troppi canali.
+MSG_SSH_GEX_SIZE_TITLE=TTSSH: conferma dimensione gruppo GEX
+MSG_SSH_GEX_SIZE_CANCEL=La nuova connessione è stata annullata.
+MSG_SSH_GEX_SIZE_OUTOFRANGE=La dimensione del gruppo ricevuto è fuori intervallo: %d
+MSG_SSH_GEX_SIZE_SMALLER=La dimensione del gruppo ricevuto è inferiore alla dimensione minima richiesta.\nrichiesta: %d, ricevuta: %d\nAccetti il gruppo ricevuto?
+MSG_SSH_GEX_SIZE_LARGER=La dimensione del gruppo ricevuto è maggiore della dimensione massima richiesta.\nrichiesta: %d, ricevuta: %d\nAccetti il gruppo ricevuto?
+MSG_SSH_SUBSYSTEM_REQUEST_ERROR=richiesta sottosistema non riuscita. (%s)
+MSG_SSH_AGENTERROR_TITLE=Richiesta agent errata
+MSG_SSH_AGENTERROR_TOOLARGE=La dimensione della richiesta dell'agent è troppo grande, ignorala.
+MSG_SSH_SCP_FILEOPEN_ERROR_TITLE=TTSSH: errore apertura file
+MSG_SSH_SCP_FILEOPEN_READ_ERROR=Impossibile aprire il file in lettura: %s %s
+MSG_SSH_SCP_FILEOPEN_READONLY_ERROR=il file `%s' è in sola lettura.
+MSG_SSH_SCP_FILEOPEN_OVERWRITE_CONFIRM=il file `%s' esiste già.\nVuoi sovrascriverlo?
+MSG_SSH_SCP_FILEOPEN_WRITE_ERROR=Impossibile aprire il file in scrittura: %s %s
+MSG_SSH_SCP_CONFIRM_TITLE=TTSSH: conferma
+MSG_SSH_SCP_ERROR_TITLE=TTSSH: errore SCP
+MSG_SSH_SCP_ERROR_INIT_TITLE=TTSSH: errore SCP (SCP_INIT)
+
+; ttxssh.c
+MSG_UNKNOWN_OPTION_ERROR=Opzione riga di comando non riconosciuta: %s
+
+MSG_CREATEWINDOW_SCP_ERROR=Impossibile visualizzare la finestra di dialogo SCP.
+MSG_CREATEWINDOW_KEYGEN_ERROR=Impossibile visualizzare la finestra di dialogo Generatore chiavi.
+MSG_CREATEWINDOW_ABOUT_ERROR=Impossibile visualizzare la finestra di dialogo Info programma.
+MSG_CREATEWINDOW_SETUP_ERROR=Impossibile visualizzare la finestra di dialogo Impostazione TTSSH.
+MSG_CREATEWINDOW_FWDSETUP_ERROR=Impossibile visualizzare la finestra di dialogo Impostazione inoltro.
+MSG_CREATEWINDOW_FWDEDIT_ERROR=Impossibile visualizzare la finestra di dialogo Modifica inoltro.
+MSG_CREATEWINDOW_AUTH_ERROR=Impossibile visualizzare la finestra di dialogo di autenticazione.\nConnessione terminata.
+MSG_CREATEWINDOW_AUTHSETUP_ERROR=Impossibile visualizzare la finestra di dialogo Configurazione autenticazione.
+MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=Impossibile visualizzare la finestra di dialogo File: errore %d
+
+MSG_WARNING=WARNING
+MSG_ERROR=ERROR
+MSG_TTSSH_ERROR=Errore TTSSH
+MSG_NONFATAL_ERROR=Tera Term: errore non fatale
+
+BTN_OK=OK
+BTN_CANCEL=Annulla
+BTN_CLOSE=Chiudi
+BTN_DISCONNECT=&Disconnetti
+BTN_CONTINUE=&Continua
+BTN_YES=&Sì
+BTN_NO=&No
+BTN_HELP=&Aiuto
+
+; x11util.c
+MSG_X_AUTH_ERROR=L'applicazione X remota ha inviato dati di autenticazione errati.\nLa sessione X è stata annullata.
+
+
+[TTProxy]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_SETUP=&Proxy...
+MENU_ABOUT=Info su TT&Proxy...
+
+DLG_SETUP_TITLE=Impostazioni proxy
+DLG_SETUP_URL=URL
+DLG_SETUP_TYPE=&Tipo
+DLG_SETUP_HOST=Nome &host
+DLG_SETUP_PORT=&Numero porta
+DLG_SETUP_USER=Nome &utente
+DLG_SETUP_PASS=&Password
+DLG_SETUP_OTHER=&Altre impostazioni...
+
+DLG_OTHER_TITLE=Altre impostazioni
+DLG_OTHER_COMMON=Impostazioni comuni
+DLG_OTHER_TIMEOUT=&Timeout connessione
+DLG_OTHER_SECOND=secondi
+DLG_OTHER_LOG=Registro connessione prox&y
+DLG_OTHER_REFER=Re&fer...
+DLG_OTHER_SOCKS=Impostazioni proxy SOCKS
+DLG_OTHER_RESOLV=&Risoluzione nomi
+DLG_OTHER_RESOLV_AUTO=risoluzione automatica
+DLG_OTHER_RESOLV_REMOTE=risolvi remoti
+DLG_OTHER_RESOLV_LOCAL=risolvi locale
+DLG_OTHER_TELNET=Impostazioni proxy TELNET
+DLG_OTHER_HOST=Chiedi nome &host
+DLG_OTHER_USER=Chiedi nome &utente
+DLG_OTHER_PASS=Chiedi &password
+DLG_OTHER_CONNECT=Messaggio &connessione
+DLG_OTHER_ERROR=Messaggio &errore
+
+DLG_ABOUT_TITLE=Info su TTProxy
+DLG_ABOUT_EXTENSION=Estensione proxy Tera Term
+DLG_ABOUT_YEBISUYA=YebisuyaHompo
+DLG_ABOUT_HOMEPAGE=Sito web TTProxy
+
+MSG_EMPTY_HOSTNAME=Il nome host è vuoto!
+MSG_ILLEGAL_PORT=Numero di porta errato!
+MSG_EMPTY_PARAMETER=Alcuni parametri sono vuoti!
+MSG_PROXY_UNAUTHORIZED=Autorizzazione proxy non riuscita!
+MSG_PROXY_BAD_REQUEST=Il proxy impedisce questa connessione!
+MSG_TYPE_NONE=Senza proxy
+MSG_LOGFILE_SELECT=Selezione file registro
+MSG_UNABLE_TO_GET_ISSUER_CERT=Impossibile ottenere certificato emittente
+MSG_UNABLE_TO_GET_CRL=Impossibile ottenere CRL certificato
+MSG_UNABLE_TO_DECRYPT_CERT_SIGNATURE=Impossibile decriptare la firma del certificato
+MSG_UNABLE_TO_DECRYPT_CRL_SIGNATURE=Impossibile decriptare CRL firma
+MSG_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY=Impossibile decodificare la chiave pubblica dell'emittente
+MSG_CERT_SIGNATURE_FAILURE=Errore nella firma del certificato
+MSG_CRL_SIGNATURE_FAILURE=Errore CRL della firma
+MSG_CERT_NOT_YET_VALID=Il certificato non è ancora valido
+MSG_CERT_HAS_EXPIRED=Il certificato è scaduto
+MSG_CRL_NOT_YET_VALID=La CRL non è ancora valida
+MSG_CRL_HAS_EXPIRED=La CRL è scaduta
+MSG_ERROR_IN_CERT_NOT_BEFORE_FIELD=Errore formato nel campo notBefore del certificato
+MSG_ERROR_IN_CERT_NOT_AFTER_FIELD=Errore formato nel campo notAfter del certificato
+MSG_ERROR_IN_CRL_LAST_UPDATE_FIELD=Errore formato nel campo lastUpdate della CRL
+MSG_ERROR_IN_CRL_NEXT_UPDATE_FIELD=Errore formato nel campo nextUpdate della CRL
+MSG_OUT_OF_MEM=Memoria esaurita
+MSG_DEPTH_ZERO_SELF_SIGNED_CERT=Certificato auto firmato
+MSG_SELF_SIGNED_CERT_IN_CHAIN=Trovato certificato auto firmato trovato nella catena di certificati
+MSG_UNABLE_TO_GET_ISSUER_CERT_LOCALLY=Impossibile ottenere il certificato dell'emittente locale
+MSG_UNABLE_TO_VERIFY_LEAF_SIGNATURE=Impossibile verificare il primo certificato
+MSG_CERT_CHAIN_TOO_LONG=Catena di certificati troppo lunga
+MSG_CERT_REVOKED=Certificato revocato
+MSG_INVALID_CA=Certificato CA non valido
+MSG_PATH_LENGTH_EXCEEDED=Limite lunghezza del percorso superato
+MSG_INVALID_PURPOSE=Scopo del certificato non supportato
+MSG_CERT_UNTRUSTED=Certificato non attendibile
+MSG_CERT_REJECTED=Certificato rifiutato
+MSG_SUBJECT_ISSUER_MISMATCH=Mancata corrispondenza dell'oggetto dell'emittente
+MSG_AKID_SKID_MISMATCH=Mancata corrispondenza dell'autorità e dell'identificatore chiave del soggetto
+MSG_AKID_ISSUER_SERIAL_MISMATCH=Mancata corrispondenza dell'autorità e del numero di serie dell'emittente
+MSG_KEYUSAGE_NO_CERTSIGN=L'uso della chiave non include la firma del certificato
+MSG_APPLICATION_VERIFICATION=Errore di verifica dell'applicazione
+MSG_UNMATCH_COMMON_NAME=Nome comune non corrispondente
+MSG_UNABLE_TO_GET_COMMON_NAME=Impossibile ottenere il nome comune
+
+BTN_OK=OK
+BTN_CANCEL=Annulla
+
+
+[TTMenu]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_LISTCONFIG=Configurazione elenco
+MENU_SETTING=Impostazioni
+MENU_ICON=visualizza icone grandi
+MENU_FONT=specifica font
+MENU_LEFTPOPUP=visualizzazione elenco con clic pulsante sinistro mouse
+MENU_HOTKEY=visualizza tasti di scelta rapida elenco (Ctl+Alt+M)
+MENU_VERSION=Versione
+MENU_EXEC=Esegui
+MENU_CLOSE=Esci
+MENU_NOTRAY=(nessuno)
+
+DLG_ABOUT_TITLE=Info versione
+DLG_ABOUT_APPNAME=Strumento esecuzione Tera Term\nMenu TeraTerm
+
+DLG_CONFIG_TITLE=Configurazione elenco
+DLG_CONFIG_ITEM=Elemento elenco
+DLG_CONFIG_CONFIG=Configurazione
+DLG_CONFIG_NAME=Nome
+DLG_CONFIG_PATTERN=Pattern esecuzione
+DLG_CONFIG_AUTO=accesso automatico
+DLG_CONFIG_HOST=Nome host
+DLG_CONFIG_USER=Nome utente
+DLG_CONFIG_PASS=Password
+DLG_CONFIG_MACRO=file macro specificato
+DLG_CONFIG_LAUNCH=solo esecuzione
+DLG_CONFIG_STARTUP=esegui all'avvio
+DLG_CONFIG_LOCKBOX_CHECK=usa LockBox
+DLG_CONFIG_LOCKBOX_BUTTON=LockBox
+DLG_CONFIG_SSH=usa SSH
+DLG_CONFIG_KEYFILE=File chiave
+DLG_CONFIG_CHALLENGE=usa Challenge
+DLG_CONFIG_PAGEANT=usa Pageant
+DLG_CONFIG_DETAIL=dettagli
+
+DLG_ETC_TITLE=Dettagli configurazione
+DLG_ETC_APP=Applicazione
+DLG_ETC_OPTION=Opzione
+DLG_ETC_CONFIG=File configurazione Tera Term (eccetto esecuzione)
+DLG_ETC_AUTO=Configurazione accesso automatico
+DLG_ETC_LOGFILE=file registro
+DLG_ETC_PROMPT=Chiedi
+DLG_ETC_USER=Nome utente
+DLG_ETC_PASS=Password
+
+DLG_LOCKBOX_TITLE=Menu TeraTerm
+DLG_LOCKBOX_LABEL=Inserisci password LockBox:
+DLG_LOCKBOX_SHOW=Questa password viene usata per bloccare/sbloccare il LockBox.
+DLG_LOCKBOX_WRONG=Password non corretta.
+DLG_LOCKBOX_STRTOOLONG=La password è troppo lunga.
+DLG_LOCKBOX_NOSTR=L password non è stata inserita.
+DLG_LOCKBOX_VALID=Password corretta.
+MSG_ERROR_NOLOCKBOX=errore: LockBox non è configurato.
+MSG_TOOLTIP_CHECK_LOCKBOX=Se LockBox è abilitato, le password di accesso sono memorizzate criptate in LockBox.
+MSG_TOOLTIP_BUTTON_LOCKBOX=Imposta una password per il blocco/sblocco di LockBox.
+
+MSG_ERROR_READREG=Impossibile leggere i dati del registro.\n
+MSG_ERROR_MAKETTL=Impossibile eseguire 'ttpmenu.TTL'\n
+MSG_ERROR_LAUNCH=L'avvio dell'applicazione ha prodotto un errore.\n
+MSG_ERROR_NOREGNAME=errore: nessun nome registro
+MSG_ERROR_INVALIDREGNAME=impossibile usare '\\' nel nome registro
+MSG_ERROR_NOHOST=errore: nessun nome host
+MSG_ERROR_NOMACRO=errore: nessun nome file macro
+MSG_ERROR_CHECKFILE=controllo file [%s] non riuscito.\n
+MSG_ERROR_SAVEREG=errore: impossibile salvare nel registro.\n
+MSG_ERROR_OPENREG=errore: impossibile aprire il registro.\n
+MSG_ERROR_SELECTREG=Seleziona il nome del registro eliminato
+MSG_ERROR_GETDELETEREG=Impossibile ottenere la voce eliminata
+MSG_ERROR_DELETEREG=Impossibile eliminare il registro.\n
+MSG_ERROR_WINCLASS=Impossibile registrare la classe finestra.\n
+
+FILEDLG_MACRO_TITLE=Selezione file macro
+FILEDLG_MACRO_FILTER=File macro file (*.ttl)\0*.ttl\0Tutti i file (*.*)\0*.*\0\0
+FILEDLG_KEY_TITLE=Selezione file chiave privata
+FILEDLG_KEY_FILTER=File identità\0identity;id_rsa;id_dsa\0identità (RSA1)\0identità\0id_rsa (SSH2)\0id_rsa\0id_dsa (SSH2)\0id_dsa\0Tutti i file (*.*)\0*.*\0\0
+FILEDLG_TERATERM_TITLE=Selezione file eseguibile Tera Term
+FILEDLG_TERATERM_FILTER=File eseguibile (*.exe)\0*.exe\0Tutti i file (*.*)\0*.*\0\0
+FILEDLG_INI_TITLE=Selezione file configurazione
+FILEDLG_INI_FILTER=File configurazione (*.ini)\0*.ini\0Tutti i file (*.*)\0*.*\0\0
+FILEDLG_LOG_TITLE=Selezione file registro eventi
+FILEDLG_LOG_FILTER=File registro eventi (*.log)\0*.log\0Tutti i file (*.*)\0*.*\0\0
+
+BTN_OK=OK
+BTN_CANCEL=Annulla
+BTN_DEFAULT=Predefinito
+
+
+[TTXKanjiMenu]
+MENU_KANJI=Codici &Kanjie
+MENU_KANJI_K=Codifica (&K)
+MENU_RECV_SJIS=Ricevi: &Shift_JIS
+MENU_RECV_EUCJP=Ricevi: &EUC-JP
+MENU_RECV_JIS=Ricevi: &JIS
+MENU_RECV_UTF8=Ricevi: &UTF-8
+MENU_RECV_KS5601=Ricevi: &KS5601
+MENU_SEND_SJIS=Invia: S&hift_JIS
+MENU_SEND_EUCJP=Invia: EU&C-JP
+MENU_SEND_JIS=Invia: J&IS
+MENU_SEND_UTF8=Invia: U&TF-8
+MENU_SEND_KS5601=Invia: K&S5601
+MENU_USE_ONE_SETTING=Usa una impostazi&one
+MENU_SJIS=Ricevi/invia: &Shift_JIS
+MENU_EUCJP=Ricevi/invia: &EUC-JP
+MENU_JIS=Ricevi/invia: &JIS
+MENU_UTF8=Ricevi/invia: &UTF-8
+MENU_KS5601=Ricevi/invia: &KS5601
+MENU_SETTING=&Impostazioni menu Kanji
+MENU_SETTING_TITLE=Impostazioni menu Kanji
+MENU_CHARCODE=Visuali&zza menu codice carattere
+MENU_CONTENTS=&Contenuti menu
+MENU_CONTENTS_AUTO=Automatico
+MENU_CONTENTS_JAPANESE=Giapponese
+MENU_CONTENTS_KOREAN=Coreano
+MENU_AMB_MENU=Visualizza menu larghezza caratteri &ambigui
+MENU_USE_ONE_SETTING_MENU=Usa u&n menu impostazione
+BTN_OK=OK
+BTN_CANCEL=Annulla
+BTN_HELP=Aiuto
+
+[TTXAlwaysOnTop]
+MENU_ALWAYSONTOP=&Sempre in primo piano
+
+
+[TTXRecurringCommand]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+MENU_SETUP_RECURRING=Comando ric&orrente
+MENU_CONTROL_RECURRING=Comando ric&orrente
+
+DLG_TITLE=Comando ricorrente
+DLG_ENABLE=&Abilita
+DLG_INTERVAL=&Intervallo (sec)
+DLG_COMMAND=&Comando
+DLG_ADD_NEWLINE=&Aggiungi nuova linea
+
+BTN_OK=OK
+BTN_CANCEL=Annulla
+
+[TTXCheckUpdate]
+MSG_CHECKUPDATE=Vuoi controllare automaticamente gli aggiornamenti?\n  %s
+MENU_CHECKUPDATE=Controllo aggiornamenti...
+
+
+[TTXttyrec]
+MENU_RECORD=Registra TT&Y
+MENU_REPLAY=Ri&produci TTY
+MENU_REPLAYAGAIN=Riproduci ancora
+FILE_FILTER=ttyrec(*.tty)\0*.tty\0Tutti i file (*.*)\0*.*\0\0
+FILE_DEFAULTEXTENSION=tty
+TITLE_STATUS_MSG=Velocità: %d, Pausa: %s
+TITLE_STATUS_ON=ON
+TITLE_STATUS_OFF=OFF
+TITLE_TRIM=%d.%06d sec in attesa. tagliato a %d sec.
+MSG_TITLE=TTXttyplay
+MSG_RSIZE=rsize != sizeof(b), disabilitato.
+
+
+[TTXViewMode]
+MENU_SETPASS=Modo &visualizzazione password
+MENU_VIEWMODE=Modo &visualizzazione
+DLG_SETPASSWORD_TITLE=Imposta password
+DLG_SETPASSWORD_CURPASS=Vecchia password
+DLG_SETPASSWORD_NEWPASS=Nuova password
+DLG_SETPASSWORD_RETPASS=Ridigita password
+DLG_INPUTPASSWORD_TITLE=Inserisci password
+DLG_INPUTPASSWORD_PASSWORD=Password
+MSG_TITLE=TTXViewMode
+MSG_CHANGED=Password modificata
+MSG_INVALID=Password non valida
+MSG_NOTMATCHED=Le nuove password digitate non corrispondono.
+MSG_TITLE_ERROR=Errore TTXViewMode
+MSG_CANNOTDISPLAY=Impossibile visualizzare la finestra di dialogo.
+BTN_OK=OK
+BTN_CANCEL=&Annulla

@@ -88,52 +88,52 @@ void PASCAL TTXEnd(void);
 void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec);
 
 /**
- * ƒvƒ‰ƒOƒCƒ“‚Ìî•ñ‚É‚Â‚¢‚Ä‚ÌAPI
+ * ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã®æƒ…å ±ã«ã¤ã„ã¦ã®API
  */
 
 typedef enum {
 	EXTENSION_DISABLE = 0,
 	EXTENSION_ENABLE = 1,
-	EXTENSION_UNSPECIFIED = 2,	// –³Žw’è(—LŒø/–³Œø‚ÌŽw’è‚È‚µ,ƒ[ƒh‚·‚é)
+	EXTENSION_UNSPECIFIED = 2,	// ç„¡æŒ‡å®š(æœ‰åŠ¹/ç„¡åŠ¹ã®æŒ‡å®šãªã—,ãƒ­ãƒ¼ãƒ‰ã™ã‚‹)
 } ExtensionEnable;
 
 typedef enum {
-	EXTENSION_UNLOADED = 0,		// ƒ[ƒh‚³‚ê‚Ä‚¢‚È‚¢
-	EXTENSION_LOADED = 1,		// ƒ[ƒh‚³‚ê‚Ä‚¢‚é
+	EXTENSION_UNLOADED = 0,		// ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ãªã„
+	EXTENSION_LOADED = 1,		// ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ã‚‹
 } ExtensionLoaded;
 
 /**
- * ƒvƒ‰ƒOƒCƒ“î•ñ
+ * ãƒ—ãƒ©ã‚°ã‚¤ãƒ³æƒ…å ±
  */
 typedef struct {
-	wchar_t *filename;			// ƒtƒ@ƒCƒ‹–¼
+	wchar_t *filename;			// ãƒ•ã‚¡ã‚¤ãƒ«å
 	ExtensionEnable enable;
-	ExtensionLoaded loaded;		// (AddŽž‚Í–³Ž‹)
-	int load_order;				// ƒ[ƒh‡ (AddŽž‚Í–³Ž‹)
+	ExtensionLoaded loaded;		// (Addæ™‚ã¯ç„¡è¦–)
+	int load_order;				// ãƒ­ãƒ¼ãƒ‰é † (Addæ™‚ã¯ç„¡è¦–)
 } PluginInfo;
 
 /**
- * ƒvƒ‰ƒOƒCƒ“î•ñ‚ðŽæ“¾‚·‚é
- * @param index		ƒvƒ‰ƒOƒCƒ“‚ÌƒCƒ“ƒfƒbƒNƒX
- * @param info		ƒvƒ‰ƒOƒCƒ“î•ñ‚ðŠi”[‚·‚é\‘¢‘Ì‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *					•¶Žš—ñ‚Í‘‚«Š·‚¦‚È‚¢‚±‚Æ
- * @return			¬Œ÷‚µ‚½ê‡‚ÍTRUEAŽ¸”s‚µ‚½ê‡‚ÍFALSE
+ * ãƒ—ãƒ©ã‚°ã‚¤ãƒ³æƒ…å ±ã‚’å–å¾—ã™ã‚‹
+ * @param index		ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+ * @param info		ãƒ—ãƒ©ã‚°ã‚¤ãƒ³æƒ…å ±ã‚’æ ¼ç´ã™ã‚‹æ§‹é€ ä½“ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *					æ–‡å­—åˆ—ã¯æ›¸ãæ›ãˆãªã„ã“ã¨
+ * @return			æˆåŠŸã—ãŸå ´åˆã¯TRUEã€å¤±æ•—ã—ãŸå ´åˆã¯FALSE
  */
 BOOL PluginGetInfo(int index, PluginInfo *info);
 
 /**
- * ƒvƒ‰ƒOƒCƒ“î•ñ‚ðÝ’è‚·‚é
+ * ãƒ—ãƒ©ã‚°ã‚¤ãƒ³æƒ…å ±ã‚’è¨­å®šã™ã‚‹
  *
- * “¯‚¶ƒtƒ@ƒCƒ‹–¼‚ª‚ ‚ê‚Î•ÏX‚·‚é
+ * åŒã˜ãƒ•ã‚¡ã‚¤ãƒ«åãŒã‚ã‚Œã°å¤‰æ›´ã™ã‚‹
  *
- * @param info		ƒvƒ‰ƒOƒCƒ“î•ñ‚ðŠi”[‚·‚é\‘¢‘Ì‚Ö‚Ìƒ|ƒCƒ“ƒ^
+ * @param info		ãƒ—ãƒ©ã‚°ã‚¤ãƒ³æƒ…å ±ã‚’æ ¼ç´ã™ã‚‹æ§‹é€ ä½“ã¸ã®ãƒã‚¤ãƒ³ã‚¿
  */
 void PluginAddInfo(const PluginInfo *info);
 
 /**
- * ƒvƒ‰ƒOƒCƒ“‚ÌÝ’è‚ð•Û‘¶
+ * ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã®è¨­å®šã‚’ä¿å­˜
  *
- * @param SetupFNW	Ý’èƒtƒ@ƒCƒ‹–¼
+ * @param SetupFNW	è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«å
  */
 void PluginWriteList(const wchar_t *SetupFNW);
 

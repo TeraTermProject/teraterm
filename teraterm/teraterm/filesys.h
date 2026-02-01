@@ -63,6 +63,7 @@ BOOL BPStartSend(const wchar_t *filename);
 BOOL BPStartReceive(BOOL macro, BOOL autostart);
 BOOL QVStartReceive(BOOL macro);
 BOOL QVStartSend(const wchar_t *filename);
+BOOL RawStartReceive(const wchar_t *filename, int autostop_sec, BOOL macro);
 
 #ifdef __cplusplus
 }

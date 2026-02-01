@@ -54,7 +54,7 @@
 
 #include "setupdirdlg.h"
 
-// Virtual Store‚ª—LŒø‚Å‚ ‚é‚©‚Ç‚¤‚©‚ğ”»•Ê‚·‚éB
+// Virtual StoreãŒæœ‰åŠ¹ã§ã‚ã‚‹ã‹ã©ã†ã‹ã‚’åˆ¤åˆ¥ã™ã‚‹ã€‚
 //
 // [Windows 95-XP]
 // return FALSE (always)
@@ -83,12 +83,12 @@ static BOOL GetVirtualStoreEnvironment(void)
 	DWORD dwType;
 	BYTE bValue;
 
-	// Windows VistaˆÈ‘O‚Í–³‹‚·‚éB
+	// Windows Vistaä»¥å‰ã¯ç„¡è¦–ã™ã‚‹ã€‚
 	if (!IsWindowsVistaOrLater())
 		goto error;
 
-	// UAC‚ª—LŒø‚©‚Ç‚¤‚©B
-	// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System‚ÌEnableLUA(DWORD’l)‚ª0‚©‚Ç‚¤‚©‚Å”»’f‚Å‚«‚Ü‚·(0‚ÍUAC–³ŒøA1‚ÍUAC—LŒø)B
+	// UACãŒæœ‰åŠ¹ã‹ã©ã†ã‹ã€‚
+	// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Systemã®EnableLUA(DWORDå€¤)ãŒ0ã‹ã©ã†ã‹ã§åˆ¤æ–­ã§ãã¾ã™(0ã¯UACç„¡åŠ¹ã€1ã¯UACæœ‰åŠ¹)ã€‚
 	flag = 0;
 	lRet = RegOpenKeyExA(HKEY_LOCAL_MACHINE,
 						 "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
@@ -105,7 +105,7 @@ static BOOL GetVirtualStoreEnvironment(void)
 		if (lRet == ERROR_SUCCESS) {
 			bValue = ((LPBYTE)lpData)[0];
 			if (bValue == 1)
-				// UAC‚ª—LŒø‚Ìê‡AVirtual Store‚ª“­‚­B
+				// UACãŒæœ‰åŠ¹ã®å ´åˆã€Virtual StoreãŒåƒãã€‚
 				flag = 1;
 		}
 		RegCloseKey(hKey);
@@ -113,13 +113,13 @@ static BOOL GetVirtualStoreEnvironment(void)
 	if (flag == 0)
 		goto error;
 
-	// UAC‚ª—LŒøAƒvƒƒZƒX‚ªŠÇ—ÒŒ ŒÀ‚É¸Ši‚µ‚Ä‚¢‚é‚©B
+	// UACãŒæœ‰åŠ¹æ™‚ã€ãƒ—ãƒ­ã‚»ã‚¹ãŒç®¡ç†è€…æ¨©é™ã«æ˜‡æ ¼ã—ã¦ã„ã‚‹ã‹ã€‚
 	flag = 0;
 	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_DEFAULT, &hToken)) {
 		if (GetTokenInformation(hToken, (TOKEN_INFORMATION_CLASS)TokenElevation, &tokenElevation, sizeof(TOKEN_ELEVATION), &dwLength)) {
-			// (0‚Í¸Ši‚µ‚Ä‚¢‚È‚¢A”ñ0‚Í¸Ši‚µ‚Ä‚¢‚é)B
+			// (0ã¯æ˜‡æ ¼ã—ã¦ã„ãªã„ã€é0ã¯æ˜‡æ ¼ã—ã¦ã„ã‚‹)ã€‚
 			if (tokenElevation.TokenIsElevated == 0) {
-				// ŠÇ—ÒŒ ŒÀ‚ğ‚Á‚Ä‚¢‚È‚¯‚ê‚ÎAVirtual Store‚ª“­‚­B
+				// ç®¡ç†è€…æ¨©é™ã‚’æŒã£ã¦ã„ãªã‘ã‚Œã°ã€Virtual StoreãŒåƒãã€‚
 				flag = 1;
 			}
 		}
@@ -146,7 +146,7 @@ static wchar_t *GetExplorerFullPath(void)
 }
 
 //
-// w’è‚µ‚½ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Åƒtƒ@ƒCƒ‹‚ğŠJ‚­B
+// æŒ‡å®šã—ãŸã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã§ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ãã€‚
 //
 // return TRUE: success
 //        FALSE: failure
@@ -156,7 +156,7 @@ static BOOL openFileWithApplication(const wchar_t *filename,
 									const wchar_t *UILanguageFile)
 {
 	if (GetFileAttributesW(filename) == INVALID_FILE_ATTRIBUTES) {
-		// ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢
+		// ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãªã„
 		DWORD no = GetLastError();
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
@@ -171,7 +171,7 @@ static BOOL openFileWithApplication(const wchar_t *filename,
 
 	DWORD e = TTCreateProcess(editor, arg, filename);
 	if (e != NO_ERROR) {
-		// ‹N“®¸”s
+		// èµ·å‹•å¤±æ•—
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
 			"MSG_ERROR", L"ERROR",
@@ -185,11 +185,11 @@ static BOOL openFileWithApplication(const wchar_t *filename,
 }
 
 /**
- *	ƒGƒNƒXƒvƒ[ƒ‰‚Åw’èƒtƒ@ƒCƒ‹‚ÌƒtƒHƒ‹ƒ_‚ğŠJ‚­
- *	ƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚éê‡‚Íƒtƒ@ƒCƒ‹‚ğ‘I‘ğ‚µ‚½ó‘Ô‚ÅŠJ‚­
- *	ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢ê‡‚ÍƒtƒHƒ‹ƒ_‚ğŠJ‚­
+ *	ã‚¨ã‚¯ã‚¹ãƒ—ãƒ­ãƒ¼ãƒ©ã§æŒ‡å®šãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚©ãƒ«ãƒ€ã‚’é–‹ã
+ *	ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹å ´åˆã¯ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é¸æŠã—ãŸçŠ¶æ…‹ã§é–‹ã
+ *	ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãªã„å ´åˆã¯ãƒ•ã‚©ãƒ«ãƒ€ã‚’é–‹ã
  *
- *	@param	file	ƒtƒ@ƒCƒ‹
+ *	@param	file	ãƒ•ã‚¡ã‚¤ãƒ«
  *	@retval TRUE: success
  *	@retval	FALSE: failure
  */
@@ -198,16 +198,16 @@ static BOOL openDirectoryWithExplorer(const wchar_t *file, const wchar_t *UILang
 	BOOL ret;
 	DWORD attr = GetFileAttributesW(file);
 	if (attr == INVALID_FILE_ATTRIBUTES) {
-		// ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢, ƒfƒBƒŒƒNƒgƒŠ‚ğƒI[ƒvƒ“‚·‚é
+		// ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãªã„, ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ã‚ªãƒ¼ãƒ—ãƒ³ã™ã‚‹
 		wchar_t *dir = ExtractDirNameW(file);
 		attr = GetFileAttributesW(dir);
 		if ((attr != INVALID_FILE_ATTRIBUTES) && (attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
-			// ƒtƒHƒ‹ƒ_‚ğŠJ‚­
+			// ãƒ•ã‚©ãƒ«ãƒ€ã‚’é–‹ã
 			INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"explore", dir, NULL, NULL, SW_NORMAL);
 			ret = h > 32 ? TRUE : FALSE;
 		}
 		else {
-			// ƒtƒ@ƒCƒ‹‚àƒtƒHƒ‹ƒ_‚à‘¶İ‚µ‚È‚¢
+			// ãƒ•ã‚¡ã‚¤ãƒ«ã‚‚ãƒ•ã‚©ãƒ«ãƒ€ã‚‚å­˜åœ¨ã—ãªã„
 			DWORD no = GetLastError();
 			static const TTMessageBoxInfoW info = {
 				"Tera Term",
@@ -220,11 +220,11 @@ static BOOL openDirectoryWithExplorer(const wchar_t *file, const wchar_t *UILang
 		}
 		free(dir);
 	} else if ((attr & FILE_ATTRIBUTE_DIRECTORY) != 0) {
-		// w’è‚³‚ê‚½‚Ì‚ªƒtƒHƒ‹ƒ_‚¾‚Á‚½AƒtƒHƒ‹ƒ_‚ğŠJ‚­
+		// æŒ‡å®šã•ã‚ŒãŸã®ãŒãƒ•ã‚©ãƒ«ãƒ€ã ã£ãŸã€ãƒ•ã‚©ãƒ«ãƒ€ã‚’é–‹ã
 		INT_PTR h = (INT_PTR)ShellExecuteW(NULL, L"explore", file, NULL, NULL, SW_NORMAL);
 		ret = h > 32 ? TRUE : FALSE;
 	} else {
-		// ƒtƒHƒ‹ƒ_‚ğŠJ‚­ + ƒtƒ@ƒCƒ‹‘I‘ğ
+		// ãƒ•ã‚©ãƒ«ãƒ€ã‚’é–‹ã + ãƒ•ã‚¡ã‚¤ãƒ«é¸æŠ
 		wchar_t *explorer = GetExplorerFullPath();
 		wchar_t *param;
 		aswprintf(&param, L"/select,%s", file);
@@ -237,22 +237,22 @@ static BOOL openDirectoryWithExplorer(const wchar_t *file, const wchar_t *UILang
 }
 
 /**
- *	ƒtƒ‹ƒpƒXƒtƒ@ƒCƒ‹–¼‚ğ Virtual StoreƒpƒX‚É•ÏŠ·‚·‚éB
- *	@param[in]		filename			•ÏŠ·‘O‚Ìƒtƒ@ƒCƒ‹–¼
- *	@param[out]		vstore_filename		Virtual Store‚Ìƒtƒ@ƒCƒ‹–¼
- *	@retval			TRUE	•ÏŠ·‚µ‚½
- *					FALSE	•ÏŠ·‚µ‚È‚©‚Á‚½(Virtual Store‚É•Û‘¶‚³‚ê‚Ä‚¢‚È‚¢)
+ *	ãƒ•ãƒ«ãƒ‘ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ Virtual Storeãƒ‘ã‚¹ã«å¤‰æ›ã™ã‚‹ã€‚
+ *	@param[in]		filename			å¤‰æ›å‰ã®ãƒ•ã‚¡ã‚¤ãƒ«å
+ *	@param[out]		vstore_filename		Virtual Storeã®ãƒ•ã‚¡ã‚¤ãƒ«å
+ *	@retval			TRUE	å¤‰æ›ã—ãŸ
+ *					FALSE	å¤‰æ›ã—ãªã‹ã£ãŸ(Virtual Storeã«ä¿å­˜ã•ã‚Œã¦ã„ãªã„)
  */
 static BOOL convertVirtualStoreW(const wchar_t *filename, wchar_t **vstore_filename)
 {
 	wchar_t *path = ExtractDirNameW(filename);
 	wchar_t *file = ExtractFileNameW(filename);
 
-	// •s—v‚Èƒhƒ‰ƒCƒuƒŒƒ^[‚ğœ‹‚·‚éB
-	// ƒhƒ‰ƒCƒuƒŒƒ^[‚Íˆê•¶š‚Æ‚ÍŒÀ‚ç‚È‚¢“_‚É’ˆÓB(1•¶š‚Å‚Í?)
+	// ä¸è¦ãªãƒ‰ãƒ©ã‚¤ãƒ–ãƒ¬ã‚¿ãƒ¼ã‚’é™¤å»ã™ã‚‹ã€‚
+	// ãƒ‰ãƒ©ã‚¤ãƒ–ãƒ¬ã‚¿ãƒ¼ã¯ä¸€æ–‡å­—ã¨ã¯é™ã‚‰ãªã„ç‚¹ã«æ³¨æ„ã€‚(1æ–‡å­—ã§ã¯?)
 	wchar_t *path_nodrive = wcsstr(path, L":\\");
 	if (path_nodrive == NULL) {
-		// ƒtƒ‹ƒpƒX‚Å‚Í‚È‚¢, VS‚ğl—¶‚µ‚È‚­‚Ä‚àok
+		// ãƒ•ãƒ«ãƒ‘ã‚¹ã§ã¯ãªã„, VSã‚’è€ƒæ…®ã—ãªãã¦ã‚‚ok
 		free(path);
 		free(file);
 		return FALSE;
@@ -271,7 +271,7 @@ static BOOL convertVirtualStoreW(const wchar_t *filename, wchar_t **vstore_filen
 	if (GetVirtualStoreEnvironment() == FALSE)
 		goto error;
 
-	// Virtual Store‘ÎÛ‚Æ‚È‚éƒtƒHƒ‹ƒ_‚©B
+	// Virtual Storeå¯¾è±¡ã¨ãªã‚‹ãƒ•ã‚©ãƒ«ãƒ€ã‹ã€‚
 	while (*p) {
 		const wchar_t *s = _wgetenv(*p);
 		if (s != NULL && wcsstr(path, s) != NULL) {
@@ -283,14 +283,14 @@ static BOOL convertVirtualStoreW(const wchar_t *filename, wchar_t **vstore_filen
 		goto error;
 
 
-	// Virtual StoreƒpƒX‚ğì‚éB
+	// Virtual Storeãƒ‘ã‚¹ã‚’ä½œã‚‹ã€‚
 	wchar_t *local_appdata;
 	_SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &local_appdata);
 	wchar_t *vs_file;
 	aswprintf(&vs_file, L"%s\\VirtualStore%s\\%s", local_appdata, path_nodrive, file);
 	free(local_appdata);
 
-	// ÅŒã‚ÉAVirtual Store‚Éƒtƒ@ƒCƒ‹‚ª‚ ‚é‚©‚Ç‚¤‚©‚ğ’²‚×‚éB
+	// æœ€å¾Œã«ã€Virtual Storeã«ãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚‹ã‹ã©ã†ã‹ã‚’èª¿ã¹ã‚‹ã€‚
 	if (GetFileAttributesW(vs_file) == INVALID_FILE_ATTRIBUTES) {
 		free(vs_file);
 		goto error;
@@ -311,25 +311,25 @@ epilogue:
 }
 
 /**
- *	ƒŠƒXƒg’è‹`—p\‘¢‘Ì
+ *	ãƒªã‚¹ãƒˆå®šç¾©ç”¨æ§‹é€ ä½“
  */
 typedef enum {
-	LIST_PARAM_STR = 1,			// •¶š—ñ
-	LIST_PARAM_FUNC = 2,		// ŠÖ”
+	LIST_PARAM_STR = 1,			// æ–‡å­—åˆ—
+	LIST_PARAM_FUNC = 2,		// é–¢æ•°
 } SetupListParam;
 typedef struct {
-	const char *key;			// ƒeƒLƒXƒg‚ÌƒL[
-	const wchar_t *def_text;	// ƒfƒtƒHƒ‹ƒgƒeƒLƒXƒg
-	SetupListParam param;		// param_ptr ‚Ì“à—e‚ğ¦‚·
-	void *param_ptr;			// param‚ª¦‚·’l
-	void *data_ptr;				// ŠÖ”–ˆ‚Ég—p‚·‚éƒf[ƒ^
+	const char *key;			// ãƒ†ã‚­ã‚¹ãƒˆã®ã‚­ãƒ¼
+	const wchar_t *def_text;	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ†ã‚­ã‚¹ãƒˆ
+	SetupListParam param;		// param_ptr ã®å†…å®¹ã‚’ç¤ºã™
+	void *param_ptr;			// paramãŒç¤ºã™å€¤
+	void *data_ptr;				// é–¢æ•°æ¯ã«ä½¿ç”¨ã™ã‚‹ãƒ‡ãƒ¼ã‚¿
 } SetupList;
 
 /**
- * @brief ƒƒjƒ…[‚ğo‚µ‚Ä‘I‘ğ‚³‚ê‚½ˆ—‚ğÀs‚·‚é
- * @param hWnd			eƒEƒBƒ“ƒhƒE
- * @param pointer_pos	ƒ|ƒCƒ“ƒ^‚ÌˆÊ’u
- * @param path			ƒtƒ‹ƒpƒX,file or path
+ * @brief ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’å‡ºã—ã¦é¸æŠã•ã‚ŒãŸå‡¦ç†ã‚’å®Ÿè¡Œã™ã‚‹
+ * @param hWnd			è¦ªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+ * @param pointer_pos	ãƒã‚¤ãƒ³ã‚¿ã®ä½ç½®
+ * @param path			ãƒ•ãƒ«ãƒ‘ã‚¹,file or path
  * @param pts			*ts
  */
 static void PopupAndExec(HWND hWnd, const POINT *pointer_pos, const wchar_t *path, const TTTSet *pts)
@@ -355,17 +355,17 @@ static void PopupAndExec(HWND hWnd, const POINT *pointer_pos, const wchar_t *pat
 	DestroyMenu(hMenu);
 	switch (result) {
 	case 1: {
-		// ƒAƒvƒŠ‚ÅŠJ‚­
+		// ã‚¢ãƒ—ãƒªã§é–‹ã
 		openFileWithApplication(path, pts->ViewlogEditorW, pts->ViewlogEditorArg, UILanguageFile);
 		break;
 	}
 	case 2: {
-		// ƒtƒHƒ‹ƒ_‚ğŠJ‚¢‚ÄAƒtƒ@ƒCƒ‹‚ğ‘I‘ğ‚·‚é
+		// ãƒ•ã‚©ãƒ«ãƒ€ã‚’é–‹ã„ã¦ã€ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é¸æŠã™ã‚‹
 		openDirectoryWithExplorer(path, UILanguageFile);
 		break;
 	}
 	case 3: {
-		// ƒNƒŠƒbƒvƒ{[ƒh‚Ö•¶š—ñ‘—M
+		// ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã¸æ–‡å­—åˆ—é€ä¿¡
 		CBSetTextW(hWnd, path, 0);
 		break;
 	}
@@ -415,7 +415,7 @@ static wchar_t *GetTTXSSHKwnownHostFile(const SetupList *list, const TTTSet *)
 }
 
 /**
- *	Virtaul Store‚Ö‚ÌƒpƒX‚ğ•Ô‚·
+ *	Virtaul Storeã¸ã®ãƒ‘ã‚¹ã‚’è¿”ã™
  */
 static wchar_t *GetVirtualStorePath(const SetupList *list, const TTTSet *)
 {
@@ -425,7 +425,7 @@ static wchar_t *GetVirtualStorePath(const SetupList *list, const TTTSet *)
 	if (ret) {
 		return virtual_store_path;
 	} else {
-		// virtual store‚Íg—p‚³‚ê‚Ä‚¢‚È‚¢
+		// virtual storeã¯ä½¿ç”¨ã•ã‚Œã¦ã„ãªã„
 		return NULL;
 	}
 }
@@ -450,8 +450,8 @@ static wchar_t *_GetTermLogPath(const SetupList *list, const TTTSet *pts)
 			int r = wcscmp(d, pts->LogDefaultPathW);
 			free(d);
 			if (r == 0) {
-				// ts->LogDefaultPathW ‚Æ GetTermLogDir() ‚ª“¯‚¶‚È‚ç
-				// •\¦‚µ‚È‚¢
+				// ts->LogDefaultPathW ã¨ GetTermLogDir() ãŒåŒã˜ãªã‚‰
+				// è¡¨ç¤ºã—ãªã„
 				return NULL;
 			}
 			else {
@@ -467,9 +467,17 @@ static wchar_t *_GetTermLogPath(const SetupList *list, const TTTSet *pts)
 	}
 }
 
-static wchar_t *_GetFileDir(const SetupList *list, const TTTSet *pts)
+static wchar_t *_GetFileDir(const SetupList *, const TTTSet *pts)
 {
 	return GetFileDir(pts);
+}
+
+static wchar_t *GetHistoryFileName(const SetupList *, const TTTSet *pts)
+{
+#define BROADCAST_LOGFILE L"broadcast.log"
+	wchar_t *fname = NULL;
+	awcscats(&fname, pts->HomeDirW, L"\\", BROADCAST_LOGFILE, NULL);
+	return fname;
 }
 
 typedef struct {
@@ -511,7 +519,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		//ListView_InsertColumn(hWndList, 1, &lvcol);
 		SendMessage(hWndList, LVM_INSERTCOLUMNA, 1, (LPARAM)&lvcol);
 
-		// İ’èˆê——
+		// è¨­å®šä¸€è¦§
 		const SetupList setup_list[] = {
 			{ "DLG_SETUPDIR_INIFILE", L"Tera Term Configuration File",
 			  LIST_PARAM_STR, pts->SetupFNameW, NULL },
@@ -547,6 +555,8 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			  LIST_PARAM_STR, pts->EtermLookfeel.BGSPIPathW, NULL },
 			{ NULL, L"UI language file",
 			  LIST_PARAM_STR, pts->UILanguageFileW, NULL },
+			{ NULL, L"Broadcast history file",
+			  LIST_PARAM_FUNC, (void*)GetHistoryFileName, NULL },
 		};
 
 		int y = 0;
@@ -555,10 +565,10 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			const SetupListParam param = list->param;
 			wchar_t *s;
 			if (param & LIST_PARAM_STR) {
-				// •¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+				// æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 				s = (wchar_t *)list->param_ptr;
 			} else if (param & LIST_PARAM_FUNC) {
-				// ŠÖ”‚©‚ç•¶š—ñ‚ğ‚à‚ç‚¤
+				// é–¢æ•°ã‹ã‚‰æ–‡å­—åˆ—ã‚’ã‚‚ã‚‰ã†
 				typedef wchar_t *(*func_t)(const SetupList *list, TTTSet *pts);
 				func_t func = (func_t)list->param_ptr;
 				s = func(list, pts);
@@ -567,7 +577,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 				s = NULL;
 			}
 			if (s == NULL) {
-				// •\¦•s—v
+				// è¡¨ç¤ºä¸è¦
 				continue;
 			}
 
@@ -593,12 +603,12 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			y++;
 
 			if (param & LIST_PARAM_FUNC) {
-				// •\¦—p‚É‚à‚ç‚Á‚½•¶š—ñ‚ğŠJ•ú
+				// è¡¨ç¤ºç”¨ã«ã‚‚ã‚‰ã£ãŸæ–‡å­—åˆ—ã‚’é–‹æ”¾
 				free(s);
 			}
 		}
 
-		// •‚ğ’²®
+		// å¹…ã‚’èª¿æ•´
 		for (int i = 0; i < 2; i++) {
 			ListView_SetColumnWidth(hWndList, i, LVSCW_AUTOSIZE);
 		}
@@ -641,7 +651,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	case WM_NOTIFY: {
 		NMHDR *nmhdr = (NMHDR *)lp;
 		if (nmhdr->code == TTN_POP) {
-			// 1‰ñ‚¾‚¯•\¦‚·‚é‚½‚ßA•Â‚¶‚½‚çíœ‚·‚é
+			// 1å›ã ã‘è¡¨ç¤ºã™ã‚‹ãŸã‚ã€é–‰ã˜ãŸã‚‰å‰Šé™¤ã™ã‚‹
 			TipWin2SetTextW(dlg_data->tipwin, IDC_SETUP_DIR_LIST, NULL);
 		}
 		else if (nmhdr->idFrom == IDC_SETUP_DIR_LIST) {

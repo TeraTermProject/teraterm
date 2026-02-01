@@ -27,8 +27,8 @@
  */
 
 // TODO:
-//	- GDI+ Flat API ‚Ö’u‚«‚©‚¦‚Ä DLL ‚ª‚È‚¢ê‡‚ğl—¶
-//	  - GDI+ ‚Í Windows XP‚©‚ç—˜—pok
+//	- GDI+ Flat API ã¸ç½®ãã‹ãˆã¦ DLL ãŒãªã„å ´åˆã‚’è€ƒæ…®
+//	  - GDI+ ã¯ Windows XPã‹ã‚‰åˆ©ç”¨ok
 
 #include <windows.h>
 #include <gdiplus.h>
@@ -56,9 +56,9 @@ void GDIPUninit(void)
 }
 
 /**
- *	Gdiplus::Bitmap ‚Ì‰æ‘œ•Û‘¶
+ *	Gdiplus::Bitmap ã®ç”»åƒä¿å­˜
  *
- *	g‚¢•û
+ *	ä½¿ã„æ–¹
  *	Gdiplus::Bitmap bitmap;
  *	CLSID encoderClsid;
  *	GetEncoderClsid(L"image/png", &encoderClsid);
@@ -107,17 +107,17 @@ static void GDIPSavePNG(Gdiplus::Bitmap *bitmap, const wchar_t *filename)
 #endif
 
 /**
- *	‰æ‘œƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚ñ‚Å HBITMAP ‚ğ•Ô‚·
+ *	ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚“ã§ HBITMAP ã‚’è¿”ã™
  *
- *	GDI+‚Å“Ç‚İ‚ñ‚¾‰æ‘œ‚Í32bit bitmap‚Æ‚È‚é
- *	(32ˆÈŠO‚É‚È‚é‚±‚Æ‚à‚ ‚é‚©‚à‚µ‚ê‚È‚¢)
- *	alphaƒvƒŒ[ƒ“‚ğŠÜ‚ñ‚Å‚¢‚È‚¢‰æ‘œƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş‚ÆA
- *	32bit bitmap‰æ‘œƒf[ƒ^‚Ìalpha’l‚Í•s“§–¾‚É‚È‚Á‚Ä‚¢‚é
+ *	GDI+ã§èª­ã¿è¾¼ã‚“ã ç”»åƒã¯32bit bitmapã¨ãªã‚‹
+ *	(32ä»¥å¤–ã«ãªã‚‹ã“ã¨ã‚‚ã‚ã‚‹ã‹ã‚‚ã—ã‚Œãªã„)
+ *	alphaãƒ—ãƒ¬ãƒ¼ãƒ³ã‚’å«ã‚“ã§ã„ãªã„ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€ã¨ã€
+ *	32bit bitmapç”»åƒãƒ‡ãƒ¼ã‚¿ã®alphaå€¤ã¯ä¸é€æ˜ã«ãªã£ã¦ã„ã‚‹
  *
- *	@param filename	ƒtƒ@ƒCƒ‹–¼
+ *	@param filename	ãƒ•ã‚¡ã‚¤ãƒ«å
  *	@retval			HBITMAP
- *					•s—v‚É‚È‚Á‚½‚ç DeleteObject() ‚·‚é‚±‚Æ
- *	@retval			NULL ƒtƒ@ƒCƒ‹‚ª“Ç‚İ‚ß‚È‚©‚Á‚½
+ *					ä¸è¦ã«ãªã£ãŸã‚‰ DeleteObject() ã™ã‚‹ã“ã¨
+ *	@retval			NULL ãƒ•ã‚¡ã‚¤ãƒ«ãŒèª­ã¿è¾¼ã‚ãªã‹ã£ãŸ
  */
 HBITMAP GDIPLoad(const wchar_t *filename)
 {

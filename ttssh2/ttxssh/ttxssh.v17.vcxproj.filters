@@ -37,6 +37,9 @@
     <ClCompile Include="crypt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="digest.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="dns.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -56,6 +59,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="hash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hmac.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="hosts.c">
@@ -89,6 +95,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="smult_curve25519_ref.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sntrup761.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ssh.c">
@@ -168,6 +177,9 @@
     <ClInclude Include="crypto_api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="digest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="fwd-socks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -178,6 +190,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hostkey.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hmac.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hosts.h">
@@ -193,6 +208,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="keyfiles-putty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libcrux_mlkem768_sha3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mac.h">

@@ -41,12 +41,13 @@
 #include "tt_res.h"
 #include "teraterml.h"
 #include "compat_win.h"
+#include "ttwinman.h"		// for ts
 
 #include "ftdlg_lite.h"
 
-//	ŽžŠÔ		•\Ž¦“à—e
-//	0-2sec		»ŽžŒvƒJ[ƒ\ƒ‹
-//	2sec		i’»50%ˆÈ‰º‚È‚çƒ_ƒCƒAƒƒO‚ðo‚·/ˆÈã‚¾‚Á‚½‚ç»ŽžŒv‚Ì‚Ü‚Ü
+//	æ™‚é–“		è¡¨ç¤ºå†…å®¹
+//	0-2sec		ç ‚æ™‚è¨ˆã‚«ãƒ¼ã‚½ãƒ«
+//	2sec		é€²æ—50%ä»¥ä¸‹ãªã‚‰ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’å‡ºã™/ä»¥ä¸Šã ã£ãŸã‚‰ç ‚æ™‚è¨ˆã®ã¾ã¾
 
 #include "tmfc.h"
 
@@ -66,6 +67,7 @@ public:
 	}
 	void SetUILanguageFile(const wchar_t *UILanguageFile) {
 		static const DlgTextInfo TextInfos[] = {
+			{ 0, "FILEDLG_TRANS_TITLE_SENDFILE" },
 			{ IDC_TRANS_FILENAME, "DLG_FILETRANS_FILENAME" },
 			{ IDC_FULLPATH_LABEL, "DLG_FILETRANS_FULLPATH" },
 			{ IDC_TRANS_TRANS, "DLG_FILETRANS_TRNAS" },
@@ -98,11 +100,11 @@ public:
 private:
 	virtual BOOL OnInitDialog() {
 		if (HideDialog) {
-			// Visible = False ‚Å‚àƒtƒHƒAƒOƒ‰ƒEƒ“ƒh‚É—ˆ‚Ä‚µ‚Ü‚¤‚Ì‚ÅA‚»‚¤‚È‚ç‚È‚¢
-			// ‚æ‚¤‚ÉŠg’£ƒXƒ^ƒCƒ‹ WS_EX_NOACTIVATE ‚ðŽw’è‚·‚éB
-			// (Windows 2000 ˆÈã‚Å—LŒø)
-			// WS_EX_NOACTIVATE ‚ðŽw’è‚·‚é‚Æ•\Ž¦‚³‚ê‚Ä‚¢‚éŽž‚àƒ^ƒXƒNƒo[‚ÉŒ»‚ê‚È‚¢
-			// ‚Ì‚Å WS_EX_APPWINDOW ‚àŽw’è‚·‚éB
+			// Visible = False ã§ã‚‚ãƒ•ã‚©ã‚¢ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ã«æ¥ã¦ã—ã¾ã†ã®ã§ã€ãã†ãªã‚‰ãªã„
+			// ã‚ˆã†ã«æ‹¡å¼µã‚¹ã‚¿ã‚¤ãƒ« WS_EX_NOACTIVATE ã‚’æŒ‡å®šã™ã‚‹ã€‚
+			// (Windows 2000 ä»¥ä¸Šã§æœ‰åŠ¹)
+			// WS_EX_NOACTIVATE ã‚’æŒ‡å®šã™ã‚‹ã¨è¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹æ™‚ã‚‚ã‚¿ã‚¹ã‚¯ãƒãƒ¼ã«ç¾ã‚Œãªã„
+			// ã®ã§ WS_EX_APPWINDOW ã‚‚æŒ‡å®šã™ã‚‹ã€‚
 			ModifyStyleEx(0, WS_EX_NOACTIVATE | WS_EX_APPWINDOW);
 		}
 
@@ -199,7 +201,7 @@ BOOL CFileTransLiteDlg::Create(HINSTANCE hInstance, HWND hParent, const wchar_t 
 	pData->check_2sec = FALSE;
 	pData->show = FALSE;
 	pData->Pause = FALSE;
-	pData->HideDialog = FALSE;
+	pData->HideDialog = ts.FTHideDialog ? TRUE : FALSE;
 
 	BOOL Ok = pData->Create(hInstance, hParent);
 	pData->SetUILanguageFile(UILanguageFile);
@@ -208,7 +210,9 @@ BOOL CFileTransLiteDlg::Create(HINSTANCE hInstance, HWND hParent, const wchar_t 
 	::SendMessage(hWnd, PBM_SETRANGE, (WPARAM)0, MAKELPARAM(0, 100));
 	::SendMessage(hWnd, PBM_SETSTEP, (WPARAM)1, 0);
 	::SendMessage(hWnd, PBM_SETPOS, (WPARAM)0, 0);
-	::ShowWindow(hWnd, SW_SHOW);
+	if (! pData->HideDialog) {
+		::ShowWindow(hWnd, SW_SHOW);
+	}
 
 	pData->SetDlgItemTextA(IDC_TRANS_ETIME, "0:00");
 	pData->StartTime = GetTickCount();
@@ -224,15 +228,19 @@ void CFileTransLiteDlg::ChangeButton(BOOL PauseFlag)
 
 void CFileTransLiteDlg::RefreshNum(size_t ByteCount, size_t FileSize)
 {
+	if (pData->HideDialog) {
+		return;
+	}
+
 	const DWORD now = GetTickCount();
 
 	if (!pData->check_2sec) {
 		DWORD elapsed_ms = now - pData->StartTime;
 		if (elapsed_ms > 2 * 1000) {
-			// 2secŒo‰ß
+			// 2secçµŒéŽ
 			pData->check_2sec = TRUE;
 			if ((100.0 * (double)ByteCount / (double)FileSize) < 50) {
-				// 50%‚É–ž‚½‚È‚¢
+				// 50%ã«æº€ãŸãªã„
 				pData->ShowWindow(SW_SHOWNORMAL);
 			}
 		}

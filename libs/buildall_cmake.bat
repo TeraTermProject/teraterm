@@ -9,6 +9,9 @@ set OPT=
 :pass_set_cmake
 
 :retry_vs
+rem echo f. Visual Studio 18 2026 Win32
+rem echo g. Visual Studio 18 2026 x64
+rem echo h. Visual Studio 18 2026 arm64
 echo 1. Visual Studio 17 2022 Win32
 echo 2. Visual Studio 17 2022 x64
 echo 3. Visual Studio 17 2022 arm64
@@ -20,12 +23,15 @@ echo 8. Visual Studio 12 2013
 echo 9. Visual Studio 11 2012
 echo a. Visual Studio 10 2010
 echo b. Visual Studio 9 2008
-rem echo b. Visual Studio 8 2005
-rem echo c. Visual Studio NMake (experimental)
-rem echo d. Cygwin MinGW Release + Unix Makefiles (experimental)
+rem echo c. Visual Studio 8 2005
+rem echo d. Visual Studio NMake (experimental)
+rem echo e. Cygwin MinGW Release + Unix Makefiles (experimental)
 set /p no="select no "
 
 echo %no%
+if "%no%" == "f" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=win32 & goto build_all
+if "%no%" == "g" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=x64   & goto build_all
+if "%no%" == "h" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=arm64 & goto build_all
 if "%no%" == "1" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=win32 & goto build_all
 if "%no%" == "2" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=x64   & goto build_all
 if "%no%" == "3" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=arm64 & goto build_all

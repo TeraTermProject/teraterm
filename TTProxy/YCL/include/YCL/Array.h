@@ -13,18 +13,18 @@
 
 namespace yebisuya {
 
-// ”z—ñ‚ğŠÇ—‚·‚éƒNƒ‰ƒX
+// é…åˆ—ã‚’ç®¡ç†ã™ã‚‹ã‚¯ãƒ©ã‚¹
 template<class TYPE>
 class Array : public Object {
 private:
-	// ”z—ñ‚ÌÀ‘Ì
+	// é…åˆ—ã®å®Ÿä½“
 	TYPE*const array;
-	// ‘ã“ü‰‰Zq‚ÍÀ‘•‚µ‚È‚¢
+	// ä»£å…¥æ¼”ç®—å­ã¯å®Ÿè£…ã—ãªã„
 	void operator=(Array&);
 public:
-	// ”z—ñ‚Ì’·‚³
+	// é…åˆ—ã®é•·ã•
 	const int length;
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	Array(int length):array(new TYPE[length]), length(length) {
 	}
 	Array(const TYPE source[], int length):array(new TYPE[length]), length(length) {
@@ -38,11 +38,11 @@ protected:
 		delete[] array;
 	}
 public:
-	// ”z—ñ—v‘f‰‰Zq(‘ã“ü—p)
+	// é…åˆ—è¦ç´ æ¼”ç®—å­(ä»£å…¥ç”¨)
 	TYPE& operator[](int index) {
 		return array[index];
 	}
-	// ”z—ñ—v‘f‰‰Zq(QÆ—p)
+	// é…åˆ—è¦ç´ æ¼”ç®—å­(å‚ç…§ç”¨)
 	TYPE operator[](int index)const {
 		return array[index];
 	}

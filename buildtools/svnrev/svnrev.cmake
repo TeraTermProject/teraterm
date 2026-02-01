@@ -11,6 +11,10 @@ set(SVNREV_PL ${CMAKE_CURRENT_LIST_DIR}/svnrev.pl)
 set(SVNVERSION_H ${CMAKE_BINARY_DIR}/teraterm/common/svnversion.h)
 set(BUILD_CONFIG ${CMAKE_BINARY_DIR}/build_config.cmake)
 set(SOURCETREEINFO ${CMAKE_CURRENT_LIST_DIR}/sourcetree_info.bat)
+set(BUILD_CONFIG_ISL ${SOURCE_DIR}/installer/build_config.isl)
+if(NOT (DEFINED ARCHITECTURE))
+  set(ARCHITECTURE "Win32")
+endif()
 
 unset(ARGS)
 if((DEFINED SVN_EXECUTABLE) AND (DEFINED ${SVN_EXECUTABLE}))
@@ -41,11 +45,25 @@ if(0)
 endif()
 
 execute_process(
+  COMMAND ${CMAKE_COMMAND} -E echo ${PERL} ${SVNREV_PL} ${ARGS}
+  --root ${CMAKE_SOURCE_DIR}
+  --header ${SVNVERSION_H}
+  --cmake ${BUILD_CONFIG}
+  --bat ${SOURCETREEINFO}
+  --isl ${BUILD_CONFIG_ISL}
+  --architecture ${ARCHITECTURE}
+  #--verbose
+  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+  RESULT_VARIABLE rv
+)
+execute_process(
   COMMAND ${PERL} ${SVNREV_PL} ${ARGS}
   --root ${CMAKE_SOURCE_DIR}
   --header ${SVNVERSION_H}
   --cmake ${BUILD_CONFIG}
   --bat ${SOURCETREEINFO}
+  --isl ${BUILD_CONFIG_ISL}
+  --architecture ${ARCHITECTURE}
   #--verbose
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
   RESULT_VARIABLE rv

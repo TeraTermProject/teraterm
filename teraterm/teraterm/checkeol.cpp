@@ -60,20 +60,20 @@ void CheckEOLClear(CheckEOLData_t *self)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹‚©‚ç“Ç—p
+ *	ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­è¾¼ç”¨
  */
 static CheckEOLRet CheckEOLCheckFile(CheckEOLData_t *self, unsigned int u32)
 {
-   	// “ü—Í‚ª‰üs(CR or LF)‚Ìê‡A
-	// ‰üs‚Ìí—Ş(CR or LF or CR+LF)‚ğ©“®‚Å”»’è‚·‚é
-	//		“ü—Í    CR hold     ‰üso—Í   	CR hold •ÏX
+   	// å…¥åŠ›ãŒæ”¹è¡Œ(CR or LF)ã®å ´åˆã€
+	// æ”¹è¡Œã®ç¨®é¡(CR or LF or CR+LF)ã‚’è‡ªå‹•ã§åˆ¤å®šã™ã‚‹
+	//		å…¥åŠ›    CR hold     æ”¹è¡Œå‡ºåŠ›   	CR hold å¤‰æ›´
    	// 		+-------+-----------+-----------+------------
-	//		CR      ‚È‚µ        ‚µ‚È‚¢		ƒZƒbƒg‚·‚é
-	//		LF      ‚È‚µ        ‚·‚é		•Ï‰»‚È‚µ
-	//		‚»‚Ì‘¼  ‚È‚µ        ‚µ‚È‚¢		•Ï‰»‚È‚µ
-	//		CR      ‚ ‚è        ‚·‚é		•Ï‰»‚È‚µ(ƒz[ƒ‹ƒh‚µ‚½‚Ü‚Ü)
-	//		LF      ‚ ‚è        ‚·‚é		ƒNƒŠƒA‚·‚é
-	//		‚»‚Ì‘¼  ‚ ‚è        ‚·‚é		ƒNƒŠƒA‚·‚é
+	//		CR      ãªã—        ã—ãªã„		ã‚»ãƒƒãƒˆã™ã‚‹
+	//		LF      ãªã—        ã™ã‚‹		å¤‰åŒ–ãªã—
+	//		ãã®ä»–  ãªã—        ã—ãªã„		å¤‰åŒ–ãªã—
+	//		CR      ã‚ã‚Š        ã™ã‚‹		å¤‰åŒ–ãªã—(ãƒ›ãƒ¼ãƒ«ãƒ‰ã—ãŸã¾ã¾)
+	//		LF      ã‚ã‚Š        ã™ã‚‹		ã‚¯ãƒªã‚¢ã™ã‚‹
+	//		ãã®ä»–  ã‚ã‚Š        ã™ã‚‹		ã‚¯ãƒªã‚¢ã™ã‚‹
 	if (self->cr_hold == FALSE) {
 		if (u32 == CR) {
 			self->cr_hold = TRUE;
@@ -102,50 +102,50 @@ static CheckEOLRet CheckEOLCheckFile(CheckEOLData_t *self, unsigned int u32)
 }
 
 /**
- *	ƒƒO—p
+ *	ãƒ­ã‚°ç”¨
  */
 static CheckEOLRet CheckEOLCheckLog(CheckEOLData_t *self, unsigned int u32)
 {
 	switch (u32) {
 	case CR:
-		// ’P“Æ‚Ì 0x0d(CR) ‚Ííœ‚·‚é
+		// å˜ç‹¬ã® 0x0d(CR) ã¯å‰Šé™¤ã™ã‚‹
 		self->cr_hold = TRUE;
 		return CheckEOLNoOutput;
 	case LF:
 		if (self->cr_hold) {
-			// 0x0a(LF) ‚Ì‘O‚ª 0x0d(CR) ‚È‚ç 0x0d(CR)+0x0a(LF) ‚ğo—Í
+			// 0x0a(LF) ã®å‰ãŒ 0x0d(CR) ãªã‚‰ 0x0d(CR)+0x0a(LF) ã‚’å‡ºåŠ›
 			self->cr_hold = FALSE;
 			return CheckEOLOutputEOL;
 		}
 		else {
-			// 0x0a(LF) ’P‘Ì‚Ì‚Æ‚«‚ÍA‚»‚Ì‚Ü‚Ü(0x0a(LF))o—Í
+			// 0x0a(LF) å˜ä½“ã®ã¨ãã¯ã€ãã®ã¾ã¾(0x0a(LF))å‡ºåŠ›
 			return CheckEOLOutputChar;
 		}
 	default:
-		// ‚»‚Ì‚Ü‚Üo—Í
+		// ãã®ã¾ã¾å‡ºåŠ›
 		self->cr_hold = FALSE;
 		return CheckEOLOutputChar;
 	}
 }
 
 /**
- *	Ÿ‚ÉEOL(‰üs), u32 ‚ğo—Í‚·‚é‚©’²‚×‚é
+ *	æ¬¡ã«EOL(æ”¹è¡Œ), u32 ã‚’å‡ºåŠ›ã™ã‚‹ã‹èª¿ã¹ã‚‹
  *
- *	–ß‚è’l‚Í CheckEOLRet ‚Ì OR ‚Å•Ô‚é
+ *	æˆ»ã‚Šå€¤ã¯ CheckEOLRet ã® OR ã§è¿”ã‚‹
  *
- *	@retval	CheckEOLNoOutput	‰½‚ào—Í‚µ‚È‚¢
- *	@retval	CheckEOLOutputEOL	‰üsƒR[ƒh‚ğo—Í‚·‚é
- *	@retval	CheckEOLOutputChar	u32‚ğ‚»‚Ì‚Ü‚Üo—Í‚·‚é
+ *	@retval	CheckEOLNoOutput	ä½•ã‚‚å‡ºåŠ›ã—ãªã„
+ *	@retval	CheckEOLOutputEOL	æ”¹è¡Œã‚³ãƒ¼ãƒ‰ã‚’å‡ºåŠ›ã™ã‚‹
+ *	@retval	CheckEOLOutputChar	u32ã‚’ãã®ã¾ã¾å‡ºåŠ›ã™ã‚‹
  */
 CheckEOLRet CheckEOLCheck(CheckEOLData_t *self, unsigned int u32)
 {
 	switch(self->type) {
 	case CheckEOLTypeFile:
 	default:
-		// ƒtƒ@ƒCƒ‹‚©‚ç“Ç‚Ş
+		// ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã‚€
 		return CheckEOLCheckFile(self, u32);
 	case CheckEOLTypeLog:
-		// ƒƒO‚Ö‘‚«‚Ş
+		// ãƒ­ã‚°ã¸æ›¸ãè¾¼ã‚€
 		return CheckEOLCheckLog(self, u32);
 	}
 }

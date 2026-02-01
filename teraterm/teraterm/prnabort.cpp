@@ -28,69 +28,80 @@
  */
 
 /* TERATERM.EXE, print-abort dialog box */
+// シンプルな中断ダイアログ
+
 #include <windows.h>
 #include <windowsx.h>
-#include "teraterm.h"
-#include "tttypes.h"
+#include <assert.h>
 #include "ttlib.h"
 #include "dlglib.h"
 #include "tt_res.h"
 #include "prnabort.h"
 
-LRESULT CALLBACK CPrnAbortDlg::OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
+INT_PTR CALLBACK CPrnAbortDlg::OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ IDC_PRNABORT_PRINTING, "DLG_PRNABORT_PRINTING" },
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
 
-	CPrnAbortDlg *self = (CPrnAbortDlg *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
-
 	switch (msg) {
 	case WM_INITDIALOG:
 	{
-		self = (CPrnAbortDlg *)lp;
+		CPrnAbortDlg *self = (CPrnAbortDlg *)lp;
 		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)self);
-		SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), self->m_ts->UILanguageFileW);
+		SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), self->m_UILanguageFileW);
 		return TRUE;
 	}
 
 	case WM_COMMAND:
 	{
+		CPrnAbortDlg *self = (CPrnAbortDlg *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
 		const WORD wID = GET_WM_COMMAND_ID(wp, lp);
-		if (wID == IDOK) {
-			self->DestroyWindow();
-		}
-		if (wID == IDCANCEL) {
-			self->OnCancel();
+		switch (wID) {
+		case IDOK:
+			return TRUE;
+		case IDCANCEL:
+			self->m_AbortFlag = TRUE;
+			return TRUE;
 		}
 		return FALSE;
 	}
-	case WM_NCDESTROY:
-		self->PostNcDestroy();
-		return TRUE;
 
 	default:
 		return FALSE;
 	}
-	return TRUE;
 }
 
-BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PTTSet pts)
+CPrnAbortDlg::CPrnAbortDlg()
 {
-	m_pAbort = AbortFlag;
-	m_hParentWnd = hParent;
-	m_ts = pts;
+	m_AbortFlag = FALSE;
+}
 
-	SetDialogFont(m_ts->DialogFontNameW, m_ts->DialogFontPoint, m_ts->DialogFontCharSet,
-				  m_ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+/**
+ *	ダイアログを生成して表示する
+ *
+ *	@param	hInstance
+ *	@param	hParent
+ *	@param	AbortFlag	中断ボタンが押されると TRUE となる(NULLのとき使用しない)
+ *						IsAborted()でもチェック可
+ *	@param	pts
+ *	@retval	TRUE		ok
+ *	@retval	FALSE		ダイアログ生成失敗(発生しないはず)
+ */
+BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, wchar_t *UILanguageFileW)
+{
+	m_hParentWnd = hParent;
+	m_UILanguageFileW = _wcsdup(UILanguageFileW);
+
 	HWND hWnd = TTCreateDialogParam(
 		hInstance, MAKEINTRESOURCEW(IDD_PRNABORTDLG), hParent,
-		(DLGPROC)OnDlgProc, (LPARAM)this);
-	if (hWnd == NULL)
-	{
+		OnDlgProc, (LPARAM)this);
+	if (hWnd == NULL) {
+		free(m_UILanguageFileW);
 		return FALSE;
 	}
+	CenterWindow(hWnd, ::GetParent(hWnd));
 
 	m_hWnd = hWnd;
 	::EnableWindow(hParent,FALSE);
@@ -99,21 +110,51 @@ BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PT
 	return TRUE;
 }
 
-void CPrnAbortDlg::OnCancel()
-{
-	*m_pAbort = TRUE;
-	DestroyWindow();
-}
-
-void CPrnAbortDlg::PostNcDestroy()
-{
-	delete this;
-}
-
+/**
+ *	ダイアログを破棄
+ */
 BOOL CPrnAbortDlg::DestroyWindow()
 {
+	assert(m_hWnd != NULL);
 	::EnableWindow(m_hParentWnd,TRUE);
 	::SetFocus(m_hParentWnd);
 	::DestroyWindow(m_hWnd);
+	m_hWnd = NULL;
+	free(m_UILanguageFileW);
 	return TRUE;
+}
+
+/**
+ *	Windowsメッセージの処理を行う
+ *
+ *	"Cancel(中断)" ボタンが押されたら後の処理は不要
+ */
+void CPrnAbortDlg::MessagePump()
+{
+	// すでに abort が押されている
+	if (m_AbortFlag) {
+		// メッセージの処理不要
+		return;
+	}
+
+	MSG m;
+	while (PeekMessage(&m, 0,0,0, PM_REMOVE)) {
+		if (!IsDialogMessage(m_hWnd, &m)) {
+			TranslateMessage(&m);
+			DispatchMessage(&m);
+		}
+		if (m_AbortFlag) {
+			break;
+		}
+	}
+}
+
+/**
+ *	Abortボタンが押された?
+ *	@retval	TRUE	押された
+ *	@retval	FALSE	押されていない
+ */
+BOOL CPrnAbortDlg::IsAborted()
+{
+	return m_AbortFlag;
 }

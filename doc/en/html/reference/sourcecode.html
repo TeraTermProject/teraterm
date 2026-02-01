@@ -34,30 +34,30 @@
 
 <hr width=80% align=center>
 
- This article was written by TeraTerm Project in February 2008. The original is in Japanese language and is available from <a class="lnk" onclick="window.open(this.href); return false;" href="http://ttssh2.osdn.jp/manual/ja/reference/sourcecode.html">ttssh2.osdn.jp</a>. Yutaka Hirata and Boris Maisuradze translated the article to English in December 2015.</p> 
-    
-    
+ This article was written by TeraTerm Project in February 2008. The original is in Japanese language and is available from <a class="lnk" onclick="window.open(this.href); return false;" href="http://ttssh2.osdn.jp/manual/ja/reference/sourcecode.html">ttssh2.osdn.jp</a>. Yutaka Hirata and Boris Maisuradze translated the article to English in December 2015.</p>
+
+
 <h2 id="foreword">Foreword</h2>
-    This article describes the source code of Tera Term version 4.58 released in February 2008. The general architecture of Tera Term did not change since then, so this description can be considered as up-to-date.     
+    This article describes the source code of Tera Term version 4.58 released in February 2008. The general architecture of Tera Term did not change since then, so this description can be considered as up-to-date.
 <hr>
 
 
 <h2 id="skillset">Required Skill Sets</h2>
     Most programs included in Tera Term package are written in programming language C. Part of the code is written in C++ and uses Microsoft Foundation Classes (MFC). Knowledge of Win32 API is also required because the source code contains lots of calls to Windows platform specific functions from Win32 API. <br>
-    
+
     Microsoft Visual Studio 2005 Standard Edition or later is required to build the source code. Unfortunately, Express Edition cannot be used as it does not support MFC. Other compilers like C++ Builder, Turbo C++ Explorer and gcc cannot be used either. <br>
-    
-    The main source of information about programming for Windows is MSDN Library provided by Microsoft. Tera Term developers often use MSDN Library as a reference. <br>
-    
+
+    The main source of information about programming for Windows is Microsoft Learn provided by Microsoft. Tera Term developers often use Microsoft Learn as a reference.<br>
+
 <ul>
-  <li><a href="http://msdn2.microsoft.com/en-us/library/default.aspx" target="_blank">MSDN library</a></li>
-  <li><a href="http://msdn2.microsoft.com/ja-jp/library/default.aspx" target="_blank">MSDN library(Japanese)</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/docs/" target="_blank">Microsoft Learn</a></li>
+  <li><a href="https://learn.microsoft.com/ja-jp/docs/" target="_blank">Microsoft Learn(Japanese)</a></li>
 </ul>
 
 <p>
-    The core of Tera Term is written on C++. This should not cause a problem for those who only knows C language because the syntax of both languages is very close. Microsoft Visual C++ (VC++) supports the original ANSI C standard (C89) and does not support newer standard C99. VC++ has its own implementation of C99-like functions. The names of these functions start with underscore (_), which makes it easy to identify them. For example, the _snprintf() of VC++ is different from the snprintf() of ANSI C(C99). 
+    The core of Tera Term is written on C++. This should not cause a problem for those who only knows C language because the syntax of both languages is very close. Microsoft Visual C++ (VC++) supports the original ANSI C standard (C89) and does not support newer standard C99. VC++ has its own implementation of C99-like functions. The names of these functions start with underscore (_), which makes it easy to identify them. For example, the _snprintf() of VC++ is different from the snprintf() of ANSI C(C99).
 </p>
-    
+
     CygTerm is written in C language and should be compiled using gcc compiler included in Cygwin package.
 
 <hr>
@@ -65,24 +65,24 @@
 
 <h2 id="module">Tera Term Package Content</h2>
     Tera Term installation package contains several binary files (.exe and .dll) and their relationship is shown on the drawing below. Executable files have extension ".exe". Dynamically linked libraries (DLL) that are called only when needed, have extension ".dll". All binary files are 32-bit programs (x86) and Tera Term developers currently do not test them in 64-bit OS environments like x86-64, or IA-64.
-     
+
 <div align="center">
 <img src="image/module_relation.png" width=720 height=540>
 </div>
-    
+
 When a user launches Tera Term from desktop shortcut or from Start Menu, "ttermpro.exe" file is executed. Then "ttermpro.exe" calls five DLL files. Tera Term was not designed as all-in-one application intentionally to reduce memory consumption. In the initial design of the program is was assumed that when a number of Tera Term instances start they will share the same DLL files, i.e. only one instance of each DDL file will be loaded into the system memory. <br>
   <br>
-    
-Launching a macro script starts "ttpmacro.exe" program. Macro scripts can be executed by themselves because the Tera Term contains 2 separate programs: "ttermpro.exe" and "ttpmacro.exe". These two programs need to communicate with each other and they use Dynamic Data Exchange (DDE) as their communication mechanism. DDE is considered legacy in current Windows operating systems. If Microsoft decides to stop supporting DDE mechanism in future Windows releases, macro script execution will be impossible. <br>    
+
+Launching a macro script starts "ttpmacro.exe" program. Macro scripts can be executed by themselves because the Tera Term contains 2 separate programs: "ttermpro.exe" and "ttpmacro.exe". These two programs need to communicate with each other and they use Dynamic Data Exchange (DDE) as their communication mechanism. DDE is considered legacy in current Windows operating systems. If Microsoft decides to stop supporting DDE mechanism in future Windows releases, macro script execution will be impossible. <br>
   <br>
-    
+
     Plug-in DLL-s, like TTSSH, TTProxy and TTXKanjiMenu, are dynamically loaded by LoadLibrary() API call at Tera Term startup. DLL filename should follow the pattern "TTX*.DLL" defined in TTXInit()#ttplug.c function. <br>
   <br>
 
         The "keycode.exe", "ttpmenu.exe" are separate applications that are not in direct communication with Tera Term.
 
   <br>
-  
+
 
 <hr>
 
@@ -109,22 +109,22 @@ Launching a macro script starts "ttpmacro.exe" program. Macro scripts can be exe
 </p>
 <p>
   Note that these libraries are called statically (not via dynamic link). When compiling the source code with these libraries use "/MT" option. Tera Term doesn't use dynamic calls to the libraries because not all user environments can support such calls, which may cause Tera Term to crash.
-</p> 
+</p>
 
 <div align="center">
 <img src="image/library_relation.png" width=720 height=540>
 </div>
 
 <hr>
-    
+
 
 <h2 id="plugin">Plug-in Support</h2>
     Tera Term supports external plug-in functionality. Plug-ins should be written and compiled as dynamically linked libraries (DLL files). This allows developers to add new features to Tera Term without modifying its source code. Presence of a plug-in (.dll file) in Tera Term installation directory is enough for it to work. <br>
-    
+
     TTSSH is typical example of Tera Term plug-in module. TTXSamples\ttxtest\ttxtest.c file contains a sample plug-in code. It is recommended to develop plug-ins based on this sample. "TTX KanjiMenu" source code (TTXKanjiMenu\ directory) is another example of practical and simple plug-in module.<br><br>
-    
+
     Plug-in modules are loaded at Tera Term (ttermpro.exe) startup by TTXInit()#ttplug.c function. All DLL files matching "TTX*.DLL" naming pattern will be loaded. When multiple DLL modules are found, export function of each DLL module is loaded by Tera Term core in the order defined by "loadOrder" member of TTXExports structure as follows:
-        
+
 <p>
 <table border=1 align=center>
 <tr>
@@ -148,8 +148,8 @@ Launching a macro script starts "ttpmacro.exe" program. Macro scripts can be exe
 </tr>
 </table>
  </p>
-    
-    The lower is order number value - the higher is corresponding module's priority, i.e. the module with the lowest order number will be contacted by Tera Term core the first. For example, TTXModifyMenu() is called in the following order:    
+
+    The lower is order number value - the higher is corresponding module's priority, i.e. the module with the lowest order number will be contacted by Tera Term core the first. For example, TTXModifyMenu() is called in the following order:
 
   <ul>
    <li>TTXModifyMenu()#ttplug.c -> TTProxy@TTXModifyMenu() -> TTSSH@TTXModifyMenu() -> TTX Kanji Menu@TTXModifyMenu()</li>
@@ -157,8 +157,8 @@ Launching a macro script starts "ttpmacro.exe" program. Macro scripts can be exe
 
     Above function of the DLL module are called in order.
   <br>
-    
-    Export function of a plug-in should be defined as TTXExports structure, which is sent to Tera Term core by TTXBind() function. For example, TTXExports structure of TTX Kanji Menu plug-in looks like shown below. All unused functions are replaced with NULL pointers. <br>    
+
+    Export function of a plug-in should be defined as TTXExports structure, which is sent to Tera Term core by TTXBind() function. For example, TTXExports structure of TTX Kanji Menu plug-in looks like shown below. All unused functions are replaced with NULL pointers. <br>
 
 <pre class=code>
 static TTXExports Exports = {
@@ -184,8 +184,8 @@ static TTXExports Exports = {
 </pre>
 
     The export function of the plug-in module should be designed in such a way that it does not interfere with other plug-ins. Also, when the plug-in module is called by Tera Term core, the module needs to check whether the request was sent to it, or to another module. <br>
-    
-    The table below contains the complete list of plug-in export functions.    
+
+    The table below contains the complete list of plug-in export functions.
 
 <p>
 <table border=1 align=center>
@@ -201,34 +201,34 @@ static TTXExports Exports = {
 
 <tr>
   <td>TTXInit</td>
-  <td>This function is called right after TTXBind(). The function receives global variables (ts and cv) from Tera Term core and initialized plug-in module. </td>      
+  <td>This function is called right after TTXBind(). The function receives global variables (ts and cv) from Tera Term core and initialized plug-in module. </td>
 </tr>
 
 <tr>
   <td>TTXGetUIHooks</td>
   <td>This function can hook a dialog handle. The function is used to change the dialog interface of Tera Term. The hook targets are: <br>
-      &SetupTerminal, &SetupWin, &SetupKeyboard, &SetupSerialPort, &SetupTCPIP, &GetHostName, &ChangeDirectory, &AboutDialog, &ChooseFontDlg, &SetupGeneral, &WindowWindow      
+      &SetupTerminal, &SetupWin, &SetupKeyboard, &SetupSerialPort, &SetupTCPIP, &GetHostName, &ChangeDirectory, &AboutDialog, &ChooseFontDlg, &SetupGeneral, &WindowWindow
   </td>
 </tr>
 
 <tr>
   <td>TTXGetSetupHooks</td>
   <td>This function can hook to setup routine. The hooked function should call the original function. When several plug-in modules exist, each function is called in accordance with order number. The hook targets are: <br>
-      &ReadIniFile, &WriteIniFile, &ReadKeyboardCnf, &CopyHostList, &AddHostToList, &ParseParam      
+      &ReadIniFile, &WriteIniFile, &ReadKeyboardCnf, &CopyHostList, &AddHostToList, &ParseParam
   </td>
 </tr>
 
 <tr>
   <td>TTXOpenTCP</td>
   <td>This function is called only for TCP connections; it should not be used for Serial connections. The function can hook to the socket interfaces: <br>
-      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr, &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt, &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName, &PWSACancelAsyncRequest, &PWSAGetLastError      
+      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr, &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt, &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName, &PWSACancelAsyncRequest, &PWSAGetLastError
   </td>
 </tr>
 
 <tr>
   <td>TTXCloseTCP</td>
   <td>This function is called only for TCP connections; it should not be used for Serial connections. If there is a hook to one of the following socket interfaces, the function must restore the original interface prior to exit: <br>
-      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr, &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt, &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName, &PWSACancelAsyncRequest, &PWSAGetLastError      
+      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr, &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt, &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName, &PWSACancelAsyncRequest, &PWSAGetLastError
   </td>
 </tr>
 
@@ -286,7 +286,7 @@ When new entry is added to TERATERM.INI file it can be read with ReadIniFile()#t
 	ts->ConfirmChangePaste =
 		GetOnOff(Section, "ConfirmChangePaste", FName, TRUE);
 </pre>
-    
+
 Use WriteIniFile()#ttset.c to write into .ini file.
 
 <pre class=code>
@@ -308,10 +308,10 @@ Traditionally string operations were causing majority of buffer overflow errors 
   <br>
 
 <ul>
-  <li><a href="https://msdn.microsoft.com/en-us/library/8ef0s5kh(v=vs.80).aspx" target="_blank">Security Enhancements in the CRT(MSDN Library)</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/security-features-in-the-crt" target="_blank">Security Enhancements in the CRT (Microsoft Learn)</a></li>
 </ul>
 <br>
-    
+
 In order to increase Tera Term security every string operation related function was replaced in the source code with it's secure equivalent. Few examples of such replacements are shown in the table below. <br>
 
   <br>
@@ -338,7 +338,7 @@ In order to increase Tera Term security every string operation related function 
 </tr>
 </table>
   <br>
-  
+
 Since these functions do not work well when default locale changes, Tera Term uses _snprintf_s_l() and similar functions instead. <br>
 
 Each of these functions have suffix "_s" (secure) in their names, which makes it easy to recognize them. Obviously, these functions are not compatible with ANSI C specification. <br>
@@ -346,7 +346,7 @@ Each of these functions have suffix "_s" (secure) in their names, which makes it
 
 It should be noted that in these functions "count" argument (the maximum number of characters to store) is enforced by "_TRUNCATE" macro. If the buffer overflow can occurs, the string will be truncated to avoid this to happen.
 <p>
-    
+
     An example of strncpy_s() function use is shown below. The second argument (numberOfElements) specifies the buffer size including terminating null (\0). Since the write buffer size is only three bytes, five bytes of data specified in the third argument (strSource) are truncates down to two bytes and null is added to the end. After executing these commands buf[] will contain the string "he\0". <br>
 
 <pre class=code>
@@ -355,14 +355,14 @@ strncpy_s(buf, sizeof(buf), "hello", _TRUNCATE);
 </pre>
 
 Below is an example of using strncat_s() function. The first argument (strDest) of strncat_s() function must have terminating null to concatenate strings. The second argument (numberOfElements) is specified with the buffer size that includes terminating null. In this example, when the first strncat_s() function is executed, five bytes (four chars + null) will be stored in str[]. When the second strncat_s() is executed, only two chars will be copied into the buffer, because there are only two free bytes remaining. After executing below code the buffer will contain "TeraTe\0" (4 chars + 2 chars + null).
-  
+
 <pre class=code>
 char str[7];
 str[0] = '\0';
 strncat_s(str, sizeof(str), "Tera", _TRUNCATE);
 strncat_s(str, sizeof(str), "Term", _TRUNCATE);
 </pre>
-    
+
 The final example demonstartes the use of _snprintf_s() function. Don't confuse this function with _snprintf() that doesn't add terminating null to the buffer. After execution of the code shown below buf[] will contain "ab\0".
 
 <pre class=code>
@@ -399,19 +399,19 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 	if (g_pSetLayeredWindowAttributes == NULL)
 		return FALSE;
 
-	return g_pSetLayeredWindowAttributes(hwnd, crKey, 
+	return g_pSetLayeredWindowAttributes(hwnd, crKey,
 	                                     bAlpha, dwFlags);
 }
 </pre>
 The downside of this approach is - too much work creating prototypes for every function that will be used. The easier way to achieve the same result is to use a mechanism called "lazy loading DLL". If the function you want to use is not supported by older Windows version, you can specify it in Visual Studio project settings; mark the function as lazy loaded DLL.
-    
+
 
 
 <h3>Windows 95</h3>
 Visual Studio 2005 and later versions no longer support Microsoft Windows 95. Binary executable files built by Visual Studio 2005 won't run on Windows 95. Visual Studio 2008 and 2010 no longer support Windows 98, NT4.0 and 2000. Windows XP support will also end in near future.
 
   <p>
-      Currently Tera Term can run on Windows 95 despite the fact that it is compiled using Visual Studio 2005. The binary program built by Visual Studio 2005 by default contains link to IsDebuggerPresent function. This causes program to fail under Windows 95 because this function was first introduced in Windows 98. To resolve this issue dummy symbol replacing IsDebuggerPresent function was defined. This is certainly "unofficial" method not supported by Microsoft. For more details please check the header file comapt_w95.h. <br>      
+      Currently Tera Term can run on Windows 95 despite the fact that it is compiled using Visual Studio 2005. The binary program built by Visual Studio 2005 by default contains link to IsDebuggerPresent function. This causes program to fail under Windows 95 because this function was first introduced in Windows 98. To resolve this issue dummy symbol replacing IsDebuggerPresent function was defined. This is certainly "unofficial" method not supported by Microsoft. For more details please check the header file comapt_w95.h. <br>
 
 <ul>
   <li><a href="https://github.com/TeraTermProject/teraterm/blob/4-stable/teraterm/common/compat_w95.h" target="_blank">comapt_w95.h</a></li>
@@ -424,10 +424,10 @@ Visual Studio 2005 and later versions no longer support Microsoft Windows 95. Bi
 <h3>Debug printf</h3>
 In general, Windows applications cannot use printf() function for debugging, because in these applications standard output is not defined. However, application can use printf() together with AllocConsole() and freopen(). <br>
 
-Applications can also display messages in debug console of Visual Studio by using OutputDebugString() API calls. When debugger starts, such debug message can be shown regardless of "Debug build" or "Release build" setting. Furthermore, if external debugger is used, like for example DBCon, debug messages generated by OutputDebugString() will still be displayed. <br>
+Applications can also display messages in debug console of Visual Studio by using OutputDebugString() API calls. When debugger starts, such debug message can be shown regardless of "Debug build" or "Release build" setting. Furthermore, if external debugger is used, like for example <a href="https://www.vector.co.jp/soft/win95/prog/se046776.html" target="_blank">DBCon</a>, debug messages generated by OutputDebugString() will still be displayed. <br>
 
 Tera Term contains wrapper function allowing to send variable length arguments to OutputDebugString().
-  
+
 <pre class=code>
 void OutputDebugPrintf(char *fmt, ...) {
 	char tmp[1024];
@@ -588,12 +588,12 @@ Dynamic Data Exchange (DDE) mechanism was introduced in 1987 in Windows 2.0. Whi
 
 Earlier versions of Microsoft Visual Studio contained DDE spy tool (DDESPY.EXE) that could capture DDE traffic, however this tool is not part of VS anymore. <br>
 
-More information about DDE is available from MSDN Library on Microsoft web site:
+More information about DDE is available from Microsoft Learn on Microsoft web site:
 
 <p>
 <ul>
-  <li><a href="http://msdn2.microsoft.com/en-us/library/ms648711(VS.85).aspx" target="_blank">Dynamic Data Exchange(MSDN library)</a></li>
-  <li><a href="http://msdn2.microsoft.com/en-us/library/ms648712(VS.85).aspx" target="_blank">Dynamic Data Exchange Management Library(MSDN library)</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/windows/win32/dataxchg/dynamic-data-exchange" target="_blank">Dynamic Data Exchange (Microsoft Learn)</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/windows/win32/dataxchg/dynamic-data-exchange-management-library" target="_blank">Dynamic Data Exchange Management Library (Microsoft Learn)</a></li>
 </ul>
 </p>
 
@@ -648,8 +648,8 @@ DDE has a feature called "advise loop". When DDE server enters advise loop, clie
 
   <h3>DDEML Library</h3>
 DDEML Library functions used by Tera Term are listed below.
- 
-  
+
+
 <p>
 <table border=1 align=center>
 <tr>
@@ -679,7 +679,7 @@ DDEML Library functions used by Tera Term are listed below.
 
 <tr>
   <td>DdeClientTransaction</td>
-  <td>Sends a transaction from the client to the server. Type of transactions can be specified. Examples of transaction types are: XTYP_REQUEST, XTYP_EXECUTE, XTYP_ADVSTART, XTYP_POKE. Timeout value can be set to define the maximum amount of time in milliseconds that the client will wait for a response (ACK) from the server. Tera Term uses timeout value of 5000 milliseconds (5 seconds).</td>   
+  <td>Sends a transaction from the client to the server. Type of transactions can be specified. Examples of transaction types are: XTYP_REQUEST, XTYP_EXECUTE, XTYP_ADVSTART, XTYP_POKE. Timeout value can be set to define the maximum amount of time in milliseconds that the client will wait for a response (ACK) from the server. Tera Term uses timeout value of 5000 milliseconds (5 seconds).</td>
 </tr>
 
 <tr>
@@ -718,7 +718,7 @@ During DDE communication Tera Term core (ttermpro.exe) acts as DDE server that's
 When macro program (ttpmacro.exe), which is DDE client, processes a macro script, it will start DDE communication with DDE server only when it reaches "connect" macro command. <br>
 
 If a macro is executed from Tera Term's menu "Control" - "Macro", RunMacro()#ttdde.c function will be called. Then topic name (8 bytes) is created from window handle (HVTWin), DDE is initialized and the server is registered. At the same time DDE buffer (1KB) is created. Finally, topic name is passed to "ttpmacro.exe" in /D argument and "ttpmacro.exe" is launched. <br>
-  
+
 <pre class=code>
 	SetTopic();
 	if (! InitDDE()) return;
@@ -759,7 +759,9 @@ Certain macro commands (like "wait" and few others) need to analyze the data rec
 <img src="image/dde_flowcontrol.png" width=720 height=540>
 </div>
 
-Tera Term core sends the data from the remote host to macro program via DDE communication (DDE transaction). Initially TCP packet received from a remote host will be detected by OnIdle()#teraterm.cpp loop. OnIdle() then calls CommReceive()#commlib.c which places TCP packet into the buffer (cv->InBuff[]). The size of this buffer is 1KB. It is not a ring buffer and once it fills up, it won't be able to store more packets. If this happens Windows kernel will start accumulating received TCP packets, but if the buffer remains full for a long time, eventually we will start loosing packets from the remote host. <br>
+Tera Term core sends the data from the remote host to macro program via DDE communication (DDE transaction). Initially TCP packet received from a remote host will be detected by OnIdle()#teraterm.cpp loop. OnIdle() then calls CommReceive()#commlib.c which places TCP packet into the buffer (cv->InBuff[]). The size of this buffer is 16KB. It is not a ring buffer and once it fills up, it won't be able to store more packets. If this happens Windows kernel will start accumulating received TCP packets, but if the buffer remains full for a long time, eventually we will start loosing packets from the remote host. <br>
+
+Received data from the serial port will be dropped if reading from the UART chip cannot keep up. If you hold down the left mouse button on the title bar of the VT window and do not move the mouse, or if you display the menu of the toolbar, it enters a modal loop that hands control to the OS itself, blocking the normal message loop, which prevents OnIdle() in teraterm.cpp from being executed. To ensure that data can still be received even in this state, OnIdle() in teraterm.cpp is called at regular intervals from the timer in addition to being part of the idle loop.<br>
 
 Log collection, escape sequence analysis and macro execution related operations require data buffering. In all these cases Tera Term uses LogPut1() function to place data into DDE buffer cv.LogBuf[]. In other words, the logging and macro executing functions share the same buffer. The size of this buffer is 1KB and this is ring buffer, i.e the oldest data will be overwritten if the buffer is full. <br>
 
@@ -774,42 +776,42 @@ When the escape sequence analysis is complete, DDEAdv()#ttdde.c function is call
 DDE server's advise loop sends the data in XTYP_ADVDATA transaction type. DDE client (ttpmacro.exe) receives this data and processed it in DdeCallbackProc()#ttmdde.c function. <br>
 
 As it has been mentioned earlier DDE communication buffer and log buffer in Tera Term core are the same (cv.LogBuf[]). For DDE communication the buffer start index is stored in "DStart" and buffer length is "Dcount". For logging corresponding variables are "LStart" and "Lcount". Since the buffer is shared, to avoid data loss, these variables must always be synchronized, i.e. DStart=LStart and Dcount=Lcount. <br>
-  
+
 <hr>
 
-        
+
 
 <h2 id="ttssh">SSH Design and Implementation in TTSSH</h2>
   <h3>Overview</h3>
-Original TTSSH plugin for Tera Term was developed by <a href="http://www.cs.cmu.edu/People/roc/" target="_blank">Robert O'Callahan</a> (currently works as <a href="http://robert.ocallahan.org/" target="_blank">Former Mozilla hacker</a>). It was supporting SSH1, packet compression and port forwarding. However, it did not support SSH2, SCP or SFTP. Development of the original Tera Term stopped in 1998 and its maintenance ended in 2001. <br>
+Original TTSSH plugin for Tera Term was developed by <a href="https://www.csd.cmu.edu/academics/doctoral/degrees-conferred/robert-ocallahan" target="_blank">Robert O'Callahan</a> (currently works as <a href="https://robert.ocallahan.org/" target="_blank">Former Mozilla hacker</a>). It was supporting SSH1, packet compression and port forwarding. However, it did not support SSH2, SCP or SFTP. Development of the original Tera Term stopped in 1998 and its maintenance ended in 2001. <br>
 
 In 2004 newly formed Tera Term Project team resumed development of TTSSH and added SSH2 support to TTSSH. Over the next 3 year period the team implemented full support of SSH2 and SCP. Tera Term Project team is planning to eventually add SFTP support. <br>
 
-Initial TTTSH design was based on <a href="http://www.openssh.com/" target="_blank">OpenSSH</a> code. However, the main differences were that OpenSSH was written for UNIX command line interface, while TTSSH should work under Microsoft Windows and also communicate with Tera Term. As TTSSH developed, the amount of the differences with OpenSSH was increasing and currently the code of these two programs has very significant differences. <br>
+Initial TTTSH design was based on <a href="https://www.openssh.com/" target="_blank">OpenSSH</a> code. However, the main differences were that OpenSSH was written for UNIX command line interface, while TTSSH should work under Microsoft Windows and also communicate with Tera Term. As TTSSH developed, the amount of the differences with OpenSSH was increasing and currently the code of these two programs has very significant differences. <br>
 
 
   <h3>SSH Protocol</h3>
 SSH (Secure Shell) protocols version 1 (version 1.5 to be exact) and version 2 are often referred by short names "SSH1" and "SSH2". These two protocol versions are incompatible with each other. Because of higher security risks associated with SSH1, it is currently barely used. <br>
 
 SSH2 protocol specification is defined in the following Requests for Comment (RFC).
- 
+
 <p>
 <ul>
-  <li><a href="http://www.ietf.org/rfc/rfc4250.txt" target="_blank">RFC4250: The Secure Shell (SSH) Protocol Assigned Numbers</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4251.txt" target="_blank">RFC4251: The Secure Shell (SSH) Protocol Architecture</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4252.txt" target="_blank">RFC4252: The Secure Shell (SSH) Authentication Protocol</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4253.txt" target="_blank">RFC4253: The Secure Shell (SSH) Transport Layer Protocol</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4254.txt" target="_blank">RFC4254: The Secure Shell (SSH) Connection Protocol</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4255.txt" target="_blank">RFC4255: Using DNS to Securely Publish Secure Shell (SSH) Key Fingerprints</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4256.txt" target="_blank">RFC4256: Generic Message Exchange Authentication for the Secure Shell Protocol (SSH)</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4344.txt" target="_blank">RFC4344: The Secure Shell (SSH) Transport Layer Encryption Modes</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc4419.txt" target="_blank">RFC4419: Diffie-Hellman Group Exchange for the Secure Shell (SSH) Transport Layer Protocol</a></li>
-  <!--li><a href="http://www.ietf.org/rfc/rfc5647.txt" target="_blank">RFC5647: AES Galois Counter Mode for the Secure Shell Transport Layer Protocol</a></li-->
-  <li><a href="http://www.ietf.org/rfc/rfc5656.txt" target="_blank">RFC5656: Elliptic Curve Algorithm Integration in the Secure Shell Transport Layer</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc6668.txt" target="_blank">RFC6668: SHA-2 Data Integrity Verification for the Secure Shell (SSH) Transport Layer Protocol</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc8268.txt" target="_blank">RFC8268: More Modular Exponentiation (MODP) Diffie-Hellman (DH) Key Exchange (KEX) Groups for Secure Shell (SSH)</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc8332.txt" target="_blank">RFC8332: Use of RSA Keys with SHA-256 and SHA-512 in the Secure Shell (SSH) Protocol</a></li>
-  <li><a href="http://www.ietf.org/rfc/rfc8709.txt" target="_blank">RFC8709: Ed25519 and Ed448 Public Key Algorithms for the Secure Shell (SSH) Protocol</a></li>
+  <li><a href="https://www.ietf.org/rfc/rfc4250.txt" target="_blank">RFC4250: The Secure Shell (SSH) Protocol Assigned Numbers</a></li>
+  <li><a href="https://www.ietf.org/rfc/rfc4251.txt" target="_blank">RFC4251: The Secure Shell (SSH) Protocol Architecture</a></li>
+  <li><a href="https://www.ietf.org/rfc/rfc4252.txt" target="_blank">RFC4252: The Secure Shell (SSH) Authentication Protocol</a></li>
+  <li><a href="https://www.ietf.org/rfc/rfc4253.txt" target="_blank">RFC4253: The Secure Shell (SSH) Transport Layer Protocol</a></li>
+  <li><a href="https://www.ietf.org/rfc/rfc4254.txt" target="_blank">RFC4254: The Secure Shell (SSH) Connection Protocol</a></li>
+  <li><a href="https://www.ietf.org/rfc/rfc4255.txt" target="_blank">RFC4255: Using DNS to Securely Publish Secure Shell (SSH) Key Fingerprints</a></li>
+  <li><a href="https://www.ietf.org/rfc/rfc4256.txt" target="_blank">RFC4256: Generic Message Exchange Authentication for the Secure Shell Protocol (SSH)</a></li>
+  <li><a href="https://www.ietf.org/rfc/rfc4344.txt" target="_blank">RFC4344: The Secure Shell (SSH) Transport Layer Encryption Modes</a></li>
+  <li><a href="https://www.ietf.org/rfc/rfc4419.txt" target="_blank">RFC4419: Diffie-Hellman Group Exchange for the Secure Shell (SSH) Transport Layer Protocol</a></li>
+  <!--li><a href="https://www.ietf.org/rfc/rfc5647.txt" target="_blank">RFC5647: AES Galois Counter Mode for the Secure Shell Transport Layer Protocol</a></li-->
+  <li><a href="https://www.ietf.org/rfc/rfc5656.txt" target="_blank">RFC5656: Elliptic Curve Algorithm Integration in the Secure Shell Transport Layer</a></li>
+  <li><a href="https://www.ietf.org/rfc/rfc6668.txt" target="_blank">RFC6668: SHA-2 Data Integrity Verification for the Secure Shell (SSH) Transport Layer Protocol</a></li>
+  <li><a href="https://www.ietf.org/rfc/rfc8268.txt" target="_blank">RFC8268: More Modular Exponentiation (MODP) Diffie-Hellman (DH) Key Exchange (KEX) Groups for Secure Shell (SSH)</a></li>
+  <li><a href="https://www.ietf.org/rfc/rfc8332.txt" target="_blank">RFC8332: Use of RSA Keys with SHA-256 and SHA-512 in the Secure Shell (SSH) Protocol</a></li>
+  <li><a href="https://www.ietf.org/rfc/rfc8709.txt" target="_blank">RFC8709: Ed25519 and Ed448 Public Key Algorithms for the Secure Shell (SSH) Protocol</a></li>
 </ul>
 </p>
 
@@ -823,13 +825,13 @@ Since TTSSH is add-on to Tera Term, it needs to exchange information with Tera T
 
   <h3>Transmitting Packets</h3>
 The following code is used when packet is sent to the remote server via SSH2 protocol. Function begin_send_packet() has the return value "pvar-&gt;ssh_state.outbuf + 12", which represents the payload. Payload is pure data; it does not contain packet size, padding, or any other information. <br>
-  
+
 <pre class=code>
 	buffer_t *msg;
 	int len;
 	char *s;
 	unsigned char *outmsg;
-	
+
 	msg = buffer_init();
 	if (msg != NULL) {
 		buffer_put_int(msg, SSH2_DISCONNECT_PROTOCOL_ERROR);
@@ -851,7 +853,7 @@ Once ready, SSH packet is sent by finish_send_packet_special() function, which i
 Packet size is the length of Payload and optional Padding data. It does not include optional 20-byte-long HMAC (keyed-Hashing for Message Authentication) field. Packet size is stored in 4 bytes in big-endian format. These 4 bytes are not included in the size value. <br>
 While using symmetric key based encryption, payload size must be equal to "block size", otherwise encryption algorithm will not work. Block size depends on encryption algorithm. For example, for 3DES-CBC block size is 24 bytes (192 bits), for AES128 it is 16 bytes (128 bits). If payload size is less than the block size, the end of payload has to be padded to reach the block size. <br>
 
-HMAC creates a hash value for encrypted data. Often used hash algorithm examples are "MD5" and "SHA-1". Adding HMAC to the packet allows to detect "falsification of data by a third party." HMAC generates encrypted text by using cryptographic hash function in combination with a secret cryptographic key and a sequence number. Adding a secret key and a sequence number makes it theoretically impossible for a third party to generate HMAC even if the actual payload was altered. <br> 
+HMAC creates a hash value for encrypted data. Often used hash algorithm examples are "MD5" and "SHA-1". Adding HMAC to the packet allows to detect "falsification of data by a third party." HMAC generates encrypted text by using cryptographic hash function in combination with a secret cryptographic key and a sequence number. Adding a secret key and a sequence number makes it theoretically impossible for a third party to generate HMAC even if the actual payload was altered. <br>
 
 <div align="center">
 <img src="image/ssh_packet_format1.png" width=720 height=540>
@@ -877,12 +879,12 @@ The function recv() responsible for receiving packets is part of Tera Term core 
 
 Tera Term core contains idle loop OnIdle()#teraterm.cpp that constantly checks if new packets have arrived and need to be processed. CommReceive() function calls recv(). TTSSH adds the hook and replaces socket function recv() with its own function TTXrecv()#ttxssh.c. <br>
 
-When CommReceive() calls recv() and passes free pointer and the size of the buffer (cv->InBuff[]) as the arguments. Buffer size is 1KB, which means buffer size value received by TTXrecv() will be in the range 1-1024 bytes. <br>
+When CommReceive() calls recv() and passes free pointer and the size of the buffer (cv->InBuff[]) as the arguments. Buffer size is 16KB, which means buffer size value received by TTXrecv() will be in the range 1-16384 bytes. <br>
 
 Then, when PKT_recv() is called by TTXrecv (), the processing becomes a bit more complicated. Below sequence shows handling of the packets when SSH connection is being established.
-  
+
 <ol>
- <li>Call the original recv() in recv_data() to get the packet received from the server by kernel. Update the value of par-&gt;pkt_state.datalen.</li> 
+ <li>Call the original recv() in recv_data() to get the packet received from the server by kernel. Update the value of par-&gt;pkt_state.datalen.</li>
  <li>Perform SSH server version check by using SSH_handle_server_ID(). Update the values of pvar-&gt;pkt_state.datastart and pvar-&gt;pkt_state.datalen.</li>
  <li>Call recv_data() again and since there was no data received from the server, exit the while loop and set connection_closed = TRUE. </li>
     <li>Function recv() will return 0 (zero) as no data was received.</li>
@@ -968,7 +970,7 @@ Terminal line discipline is the module allowing to perform "inline editing" duri
 SCP is one of the programs included in OpenSSH package. It allows to transmit and receive files within SSH session. In order to use the secure copy, in addition to "sshd" the server should support "scp" command. In OpenSSH implementation "scp" is started by sshd daemon as a child process. It should be noted that SCP and SFTP (Secure File Transfer Protocol) are completely different protocols incompatible with each other. SCP can perform only file "receive" or "send" operations. <br>
 
 To transfer files within SSH session, after establishing successful connection between the client and the server, the function responsible for executing external commands (exec) must call "scp".
-  
+
   <p><font size=3>SCP via SSH2</font></p>
 When you send SSH2_MSG_CHANNEL_REQUEST message to the server, you can run an external command by specifying the service name "exec" instead of "pty-req".
 
@@ -984,7 +986,7 @@ When you send SSH2_MSG_CHANNEL_REQUEST message to the server, you can run an ext
 
   <p><font size=3>SCP via SSH1</font></p>
 Sending SSH_CMSG_EXEC_CMD to the server allows to run an external command during SSH1 session.
- 
+
   <p><font size=3>External command has the following format:</font></p>
 <pre>
   * "scp [-v] [-r] [-p] [-d] -t file name"  ;copy Local-to-Remote
@@ -1074,16 +1076,16 @@ When user performs an operation in X11 screen, X server needs to send data via T
 <h2 id="macro">Macro Language Design and Implementation</h2>
   <h3>Overview</h3>
 Tera Term macro script is BASIC-style language. It does not use Bison or Flex like lexical analyzer and is written entirely from the scratch using recursive descent parsing method. Therefore, from this point of view Tera Term macro can not be called a full-fledged scripting language.<br>
-  
+
   <h3>Loading Macro File</h3>
 As soon as ttpmacro.exe starts, it reads entire macro file (.ttl) into the buffer.
-  
+
 <p><ul>
   <li>OnInitDialog()#ttmmain.cpp -> InitTTL() -> InitBuff() -> LoadMacroFile()</li>
 </ul></p>
 
 When ttpmacro.exe reads the content of macro file, it places it into buffer Buff[0]#ttmbuff.c. At this point, since entire content of macro has been read, even accidental deletion of macro file during macro execution will not cause a problem. However, if macro contains "include" statements, included files should exist at the time when "include" macro command is being executed.
-  
+
 <pre class=code>
 #define MAXNESTLEVEL 10     /* defines the maximum number of nested files (up to nine includes) */
 
@@ -1168,7 +1170,7 @@ ExecCmnd() function called from Exec() performs lexical analysis of the commands
 GetReservedWord() function is responsible for detecting whether the input string contains a macro command, or not. Comparison is done by using _stricmp() function, thus the commands are not case sensitive. If supported macro command is detected then corresponding TTLxxx() function is being called. <br>
 
 GetIdentifier() function is responsible for finding identificators. All tokens containing alphanumeric (a-z, A-Z, 0-9) characters, or underscore (_) and not exceeding 32 characters in length will be treated as variables. Statements where a value is assigned to a variable may contain variable name at the left immediately followed by equal sign (=). This complicates variable name detection process. Determination in done in the following order: <br>
-  
+
 <p><ol>
   <li>Find a string</li>
   <li>Find a formula</li>
@@ -1177,7 +1179,7 @@ GetIdentifier() function is responsible for finding identificators. All tokens c
 GetString() function is responsible for finding string values. Since string are surrounded by singe or double quotas ('or "), it is easy to retrieve them. <br>
 GetExpression() function detects the formulas that require calculations. It uses recursive descent method for parsing. <br>
 CheckVar() function can tell whether the variable exists and if it has numeric or string type. If variable not found, NewStrVar() function will register a new variable. <br>
- 
+
 
 <hr>
 
@@ -1189,7 +1191,7 @@ Usually user moves the cursor by pressing corresponding keys on the keyboard, bu
 <br>
 
   <h3>System Caret</h3>
-Tera Term uses system caret to draw the cursor. For this purpose Tera Term utilizes API functions listed below. 
+Tera Term uses system caret to draw the cursor. For this purpose Tera Term utilizes API functions listed below.
 
 <p><ul>
   <li>CreateCaret</li>
@@ -1201,13 +1203,12 @@ Tera Term uses system caret to draw the cursor. For this purpose Tera Term utili
   <li>ShowCaret</li>
 </ul></p>
 
-According to MSDN Library description of <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648399(v=vs.85).aspx" target="_blank">CreateCaret function</a>, 
+According to Microsoft Learn description of <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createcaret" target="_blank">CreateCaret function</a>,
 
 <pre>
-The system provides one caret per queue. A window should create 
-a caret only when it has the keyboard focus or is active. 
-The window should destroy the caret before losing the keyboard 
-focus or becoming inactive. 
+The system provides one caret per queue.
+A window should create a caret only when it has the keyboard focus or is active.
+The window should destroy the caret before losing the keyboard focus or becoming inactive.
 </pre>
 
 Above requirement means that CreateCaret() can be called only when the window is active and DestroyCaret() should be called before the window becomes inactive. <br>
@@ -1268,7 +1269,7 @@ void CaretKillFocus(BOOL show)
 
 
   <h3>Handling Inactive Window Cursor States </h3>
-Since inactive window cursor may be in different states, we need to properly handle cursor state changes. Below is the list of possible cases. 
+Since inactive window cursor may be in different states, we need to properly handle cursor state changes. Below is the list of possible cases.
 
 <p>
 <ul>
@@ -1293,7 +1294,7 @@ Since inactive window cursor may be in different states, we need to properly han
 Tera Term supports UART (16550A) compatible serial ports. Serial ports are also known as Communication Ports, or COM ports. When operating system detects COM port, it assigns it sequential number starting 1 and uses this number in port name like "COM1", "COM2", etc. Microsoft Windows XP supports up-to 256 COM ports (COM1 - COM256). <br>
 
 In the past most personal computers had one or two COM ports. Modern computers do not have COM ports and if such port is needed, USB to Serial converter is being utilized instead. These converters allow user to choose port number. For example, instead of having ports "COM1" and "COM2", there might be 2 ports "COM1" and "COM7". Tera Term can handle such setup and properly detect port numbers (i.e. "COM1" and "COM7"). <br>
- 
+
   <h3>List of COM Ports</h3>
 Older versions of Tera Term would present in connection dialog all possible COM ports from "COM1" to "COM256" and then user had to choose the right port from this huge list. This was not easy. Currently, when connection dialog is called, Tera Term first looks for the COM ports recognized by the operating system and then shows in the list only those ports that are currently available. The detection of available ports is done in DetectComPorts()#ttcmn.c file. API function QueryDosDevice() searches for string "COM" among all MS-DOS device names. <br>
 
@@ -1314,7 +1315,7 @@ Older versions of Tera Term would present in connection dialog all possible COM 
 
   <h3>Retrieve COM Port's Full Name</h3>
 Additionally, ListupSerialPort()#ttcmn.c can retrieve the full name of each COM port. <br>
-  
+
 <pre class=code>
 static void ListupSerialPort(LPWORD ComPortTable, int comports, char **ComPortDesc, int ComPortMax)
 {
@@ -1400,7 +1401,7 @@ cleanup:
 <h2 id="xyzmodem">Binary Transfer Protocols</h2>
   <h3>Overview</h3>
   Creation of personal computers triggered development of communication protocols that would allow to send binary files from one computer to another. Many different protocols were born at that time and most of them have become legacy by now. One of the areas where such protocols are still in demand is communication with embedded devices for uploading or retrieving firmware. Tera Term supports 3 such protocols XMODEM, YMODEM and ZMODEM, which are described in this section. <br>
- 
+
 
   <h3>Specification</h3>
   XMODEM protocol is rather old, it is in use since 1977. XMODEM was developed by Ward Christensen, had simple specifications and was easy to implement. Numerous improvements made to XMODEM protocol during the first years of its existence were consolidated by Chuck Forsberg and the result of this work was called YMODEM protocol. Chuck Forsberg did not stop there and kept improving YMODEM protocol that eventually brought to life ZMODEM protocol. This was happened in 1986. <br>
@@ -1438,7 +1439,7 @@ zmodem.c: ZInit()
   <h3>Entry Points</h3>
   To simplify new protocol implementation all interface functions (entry points) are placed into ttpfile.dll file. Entry points are called ProtoInit(), ProtoParse(), ProtoTimeOutProc() and ProtoCancel(). <br>
   Entry points of XMODEM are shown below.
- 
+
 
 <table border=1 align=center>
 <tr>
@@ -1508,7 +1509,7 @@ Entry points of ZMODEM are shown below.
 </table>
 
   <h3>Testing Connectivity</h3>
-  Binary transfer protocols are usually used with serial connections. Modern PC-s are rarely equipped with serial ports, which makes testing of these protocols more challenging. One on the options is to use Null-modem emulator like <a href="http://com0com.sourceforge.net/" target="_blank">com0com</a>. It will generate two virtual COM ports on a single PC. Then we can use 2 instances of Tera Term to connect these virtual serial ports, or use Tera Term and another software terminal emulator for this purpose. 
+  Binary transfer protocols are usually used with serial connections. Modern PC-s are rarely equipped with serial ports, which makes testing of these protocols more challenging. One on the options is to use Null-modem emulator like <a href="https://com0com.sourceforge.net/" target="_blank">com0com</a>. It will generate two virtual COM ports on a single PC. Then we can use 2 instances of Tera Term to connect these virtual serial ports, or use Tera Term and another software terminal emulator for this purpose.
 
 <div align="center">
 <img src="image/devman_com0com.png" width=468 height=171>
@@ -1517,7 +1518,7 @@ Entry points of ZMODEM are shown below.
 
   <h3>Characters</h3>
   Binary transfer protocol uses character notation such as ACK or CAN, which originates from 7-bit ASCII table. You can refer ASCII table by using man 7 ascii. Most frequently used characters are listed below.
-  
+
 
 <pre class=code>
 Oct   Dec   Hex   Char                        Oct   Dec   Hex   Char
@@ -1551,9 +1552,9 @@ If "XmodemLog" entry of teraterm.ini file is set to "On", Tera Term will log com
 XmodemLog=on
 </pre>
 
-Sample log file where Tera Term (COM10) sends to <a href="http://nanno.dip.jp/softlib/man/rlogin/" target="_blank">RLogin</a> (COM11) 67-byte long file using XMODEM protocol is shown below. <br>
+Sample log file where Tera Term (COM10) sends to <a href="http://nanno.bf1.jp/softlib/man/rlogin/" target="_blank">RLogin</a> (COM11) 67-byte long file using XMODEM protocol is shown below. <br>
 "&lt;&lt;&lt;" indicates the data Tera Term received from the host, "&gt;&gt;&gt;" shows the data Tera Term sent to the host.
-  
+
 <pre class=code>
 &lt;&lt;&lt;
 15                                                  .
@@ -1576,11 +1577,11 @@ Sample log file where Tera Term (COM10) sends to <a href="http://nanno.dip.jp/so
 04                                                  .
 
 &lt;&lt;&lt;
-06 
+06
 </pre>
 
 Step by step explanation of the above log:
-  
+
 <ol>
  <li>NAK is received (15)</li>
  <li>Data block is sent</li>
@@ -1606,7 +1607,7 @@ All this is done in accordance with XMODEM protocol, however it is easy to see t
 01 01 FE 3B 20 73 61 6D 70 6C 65 20 6D 61 63 72     ...; sample macr
 6F 20 6F 66 20 54 65 72 61 20 54 65 72 6D 0D 0A     o of Tera Term..
 3B 0D 0A 3B 20 46 69 6C 65 3A 20 73 63 72 65 65     ;..; File: scree
-6E 63 61 70 74 75 72 65 2E 74 74 6C 0D 0A 3B 20     ncapture.ttl..; 
+6E 63 61 70 74 75 72 65 2E 74 74 6C 0D 0A 3B 20     ncapture.ttl..;
 44 65 73 63 72 69 70 74 69 6F 6E 3A 20 63 61 70     Description: cap
 74 75 72 65 20 73 63 72 65 65 6E 20 63 6F 6E 74     ture screen cont
 65 6E 74 73 20 61 6E 64 20 77 72 69 74 65 20 74     ents and write t
@@ -1666,17 +1667,17 @@ All this is done in accordance with XMODEM protocol, however it is easy to see t
 04                                                  .
 
 &lt;&lt;&lt;
-06 
+06
 </pre>
 
 
   <h3>YMODEM</h3>
   YMODEM is more advanced version of XMODEM protocol. Unlike XMODEM, YMODEM can send file name and file size to the host. Knowing file size allows the host to remove CPMEOF characters from the end of transmitted file and avoid possible file corruption. <br>
- 
+
 More information about YMODEM protocol can be found on Wikipedia.
 
 <ul>
-  <li><a href="http://en.wikipedia.org/wiki/YMODEM" target="_blank">YMODEM - Wikipedia</a></li>
+  <li><a href="https://en.wikipedia.org/wiki/YMODEM" target="_blank">YMODEM - Wikipedia</a></li>
 </ul>
 <br>
 
@@ -1687,9 +1688,9 @@ If "YmodemLog" entry of teraterm.ini file is set to "On", Tera Term will log com
 YmodemLog=on
 </pre>
 
-Sample log file where Tera Term (COM10) sends to <a href="http://nanno.dip.jp/softlib/man/rlogin/" target="_blank">RLogin</a> (COM11) 67-byte long file using YMODEM protocol is shown below. <br>
+Sample log file where Tera Term (COM10) sends to <a href="http://nanno.bf1.jp/softlib/man/rlogin/" target="_blank">RLogin</a> (COM11) 67-byte long file using YMODEM protocol is shown below. <br>
 "&lt;&lt;&lt;" indicates the data Tera Term received from the host, "&gt;&gt;&gt;" shows the data Tera Term sent to the host.
-  
+
 <pre class=code>
 &lt;&lt;&lt;
 43                                                  C
@@ -1908,11 +1909,11 @@ Sample log file where Tera Term (COM10) sends to <a href="http://nanno.dip.jp/so
 00 00 00 00 00                                      .....
 
 &lt;&lt;&lt;
-06 
+06
 </pre>
 
 Step by step explanation of the above log:
-  
+
 <ol>
  <li>'C' request to send (43)</li>
  <li>Block 0 is sent (file information)</li>
@@ -1936,19 +1937,19 @@ TBD
 
 
   <h3>KERMIT</h3>
-KERMIT (Kermit: Frog Muppet from Sesame Street) is a file transfer protocol developed in Columbia University in 1981. It is currently maintained by Kermit project. Specification is available from the following site. <br>  
-  
-  More information about KERMIT project can be found on KERMIT project website. 
+KERMIT (Kermit: Frog Muppet from Sesame Street) is a file transfer protocol developed in Columbia University in 1981. It is currently maintained by Kermit project. Specification is available from the following site. <br>
+
+  More information about KERMIT project can be found on KERMIT project website.
 
 <ul>
-  <li><a href="http://www.kermitproject.org/" target="_blank">The Kermit Project</a></li>
+  <li><a href="https://www.kermitproject.org/" target="_blank">The Kermit Project</a></li>
 </ul>
 <br>
 
 This site distributes KERMIT source code variations for different platforms. They are called C-Kermit, E-Kermit and Kermit95. <br>
 
 If "KmtLog" entry of teraterm.ini file is set to "On", Tera Term will log communication data in "KERMIT.LOG" file. This file will be created in Tera Term installation directory.
-  
+
 <pre class=code>
 ; Kermit log
 KmtLog=on
@@ -1997,9 +1998,9 @@ HCHECK is a single-character type 1 checksum
 
 In order to send more than 94 bytes of data, extended format's field containing data size is increased to two bytes. "LEN" is always zero of basic format (after adding 32 it is equal to ASCII code of whitespace character). Additionally, the size of the header increased by 3 bytes and header checksum was added. <br>
   <br>
-  
+
   Initialization String
-  
+
 <pre class=code>
 Initialization String
 1         2      3       4       5       6       7       8       9       10

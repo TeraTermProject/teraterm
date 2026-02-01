@@ -83,7 +83,7 @@ typedef enum {
 	SSH_CIPHER_MAX = SSH2_CIPHER_CHACHAPOLY,
 } SSHCipherId;
 
-struct ssh2cipher {
+typedef struct ssh2cipher {
 	SSHCipherId id;
 	char *name;
 	u_int block_size;
@@ -92,22 +92,22 @@ struct ssh2cipher {
 	u_int iv_len;
 	u_int auth_len;
 	const EVP_CIPHER *(*func)(void);
-};
+} ssh2cipher;
 
 struct sshcipher_ctx {
-	// TTSSH ‚Å‚Í SSH_CIPHER_NONE ‚ª–³Œø‚È‚Ì‚ÅAplaintext ‚Íg—p‚³‚ê‚È‚¢
+	// TTSSH ã§ã¯ SSH_CIPHER_NONE ãŒç„¡åŠ¹ãªã®ã§ã€plaintext ã¯ä½¿ç”¨ã•ã‚Œãªã„
 	// int	plaintext;
 	
-	// TTSSH ‚Å‚Í CRYPT_encrypt_aead(), CRYPT_decrypt_aead() ‚ª•Ê‚ê‚Ä‚¢‚Ä encrypt ‚ÅØ‚è‘Ö‚¦‚È‚¢‚Ì‚Åg—p‚³‚ê‚È‚¢
+	// TTSSH ã§ã¯ CRYPT_encrypt_aead(), CRYPT_decrypt_aead() ãŒåˆ¥ã‚Œã¦ã„ã¦ encrypt ã§åˆ‡ã‚Šæ›¿ãˆãªã„ã®ã§ä½¿ç”¨ã•ã‚Œãªã„
 	// int	encrypt;
 	
 	EVP_CIPHER_CTX *evp;
 	struct chachapoly_ctx *cp_ctx;
 	
-	// OpenSSH ‚Å ifndef WITH_OPENSSL ‚Ì‚Ég—p‚³‚ê‚é‚à‚Ì‚È‚Ì‚ÅAac_ctx ‚Íg—p‚³‚ê‚È‚¢
+	// OpenSSH ã§ ifndef WITH_OPENSSL ã®æ™‚ã«ä½¿ç”¨ã•ã‚Œã‚‹ã‚‚ã®ãªã®ã§ã€ac_ctx ã¯ä½¿ç”¨ã•ã‚Œãªã„
 	// aesctr_ctx ac_ctx; /* XXX union with evp? */
 	
-	// OpenSSH ‚Å‚Í const struct sshcipher *cipher;
+	// OpenSSH ã§ã¯ const struct sshcipher *cipher;
 	const struct ssh2cipher *cipher;
 };
 

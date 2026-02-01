@@ -67,10 +67,10 @@ OnigSyntaxType *RegexSyntax = ONIG_SYNTAX_RUBY;
 #define ItemName2 "PARAM"
 
 #define OutBufSize 512
-// ƒŠƒ“ƒOƒoƒbƒtƒ@‚ğ 4KB ‚©‚ç 16KB ‚ÖŠg’£‚µ‚½ (2006.10.15 yutaka)
-// Tera Term–{‘Ì‚Ö SendSync ‚ğ‘—‚é‚Æ‚«‚ÌãŒÀƒ`ƒFƒbƒN‚ğ 8KB ‚É‚µ‚½B
-// Tera Term–{‘Ì‘¤‚ÌDDEƒoƒbƒtƒ@‚Í 1KB ‚È‚Ì‚ÅA‚»‚ê‚æ‚è‚à‘å‚«‚È’l‚É‚·‚é‚±‚Æ‚ÅA
-// Tera Term‚Æƒ}ƒNƒ‚ªƒXƒ‰ƒbƒVƒ“ƒOó‘Ô‚É‚È‚é‚±‚Æ‚ğ–h‚®B
+// ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡ã‚’ 4KB ã‹ã‚‰ 16KB ã¸æ‹¡å¼µã—ãŸ (2006.10.15 yutaka)
+// Tera Termæœ¬ä½“ã¸ SendSync ã‚’é€ã‚‹ã¨ãã®ä¸Šé™ãƒã‚§ãƒƒã‚¯ã‚’ 8KB ã«ã—ãŸã€‚
+// Tera Termæœ¬ä½“å´ã®DDEãƒãƒƒãƒ•ã‚¡ã¯ 1KB ãªã®ã§ã€ãã‚Œã‚ˆã‚Šã‚‚å¤§ããªå€¤ã«ã™ã‚‹ã“ã¨ã§ã€
+// Tera Termã¨ãƒã‚¯ãƒ­ãŒã‚¹ãƒ©ãƒƒã‚·ãƒ³ã‚°çŠ¶æ…‹ã«ãªã‚‹ã“ã¨ã‚’é˜²ãã€‚
 #define RingBufSize (4096*4)
 #define RCountLimit (RingBufSize/2)
 
@@ -121,7 +121,7 @@ int Wait4allFoundNum = 0;
 // ring buffer
 static void Put1Byte(BYTE b)
 {
-	// ]—ˆ‚ÌƒŠƒ“ƒOƒoƒbƒtƒ@‚Ö‘‚«‚Ş‚Æ“¯‚ÉAwait4all—p‹¤—Lƒƒ‚ƒŠ‚Ö‚à‘‚«o‚·B(2009.3.12 yutaka)
+	// å¾“æ¥ã®ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡ã¸æ›¸ãè¾¼ã‚€ã¨åŒæ™‚ã«ã€wait4allç”¨å…±æœ‰ãƒ¡ãƒ¢ãƒªã¸ã‚‚æ›¸ãå‡ºã™ã€‚(2009.3.12 yutaka)
 	if (is_wait4all_enabled()) {
 		put_macro_1byte(b);
 		return;
@@ -364,12 +364,12 @@ void DDEOut(const char *B)
 	}
 }
 
-// —LŒø XTYP_EXECUTE ‚Å‘—M‚·‚é
-// –³Œø XTYP_POKE ‚Å‘—M‚·‚é (•ÏX‘O‚Æ“¯‚¶)
+// æœ‰åŠ¹æ™‚ XTYP_EXECUTE ã§é€ä¿¡ã™ã‚‹
+// ç„¡åŠ¹æ™‚ XTYP_POKE ã§é€ä¿¡ã™ã‚‹ (å¤‰æ›´å‰ã¨åŒã˜)
 #define	USE_EXECUTE	1
 
 /**
- *	TeraTerm‚ÖƒoƒCƒiƒŠ‚ğ‘—M
+ *	TeraTermã¸ãƒã‚¤ãƒŠãƒªã‚’é€ä¿¡
  */
 #if USE_EXECUTE
 static void SendBinaryTTExecute(const uint8_t *ptr, size_t len)
@@ -389,18 +389,18 @@ static void SendBinaryTTPoke(const uint8_t *ptr, size_t len)
 	const int retry_count = 10;
 
 	for (i = 0 ; i < retry_count ; i++) {
-		// ƒT[ƒo(Tera Term)‚ÖƒRƒ}ƒ“ƒh—ñ‚ğ‘—‚éB¬Œ÷‚·‚é‚Æ”ñ0‚ª•Ô‚éB
+		// ã‚µãƒ¼ãƒ(Tera Term)ã¸ã‚³ãƒãƒ³ãƒ‰åˆ—ã‚’é€ã‚‹ã€‚æˆåŠŸã™ã‚‹ã¨é0ãŒè¿”ã‚‹ã€‚
 		hd = DdeClientTransaction(encoded_bin,len+1,ConvH,Item,CF_OEMTEXT,XTYP_POKE,1000,NULL);
 		if (hd != 0) {
 			break;
 		} else {
 			UINT ret = DdeGetLastError(Inst);
-			if (ret == DMLERR_BUSY) { // ƒrƒW[‚Ìê‡ƒŠƒgƒ‰ƒC‚ğs‚¤
-				Sleep(100);        // ƒXƒŠ[ƒv‚µ‚ÄƒT[ƒo‚ÖCPU‚ğ‰ñ‚·B100‚Ì’l‚Éª‹’‚Í‚È‚¢B
+			if (ret == DMLERR_BUSY) { // ãƒ“ã‚¸ãƒ¼ã®å ´åˆãƒªãƒˆãƒ©ã‚¤ã‚’è¡Œã†
+				Sleep(100);        // ã‚¹ãƒªãƒ¼ãƒ—ã—ã¦ã‚µãƒ¼ãƒã¸CPUã‚’å›ã™ã€‚100ã®å€¤ã«æ ¹æ‹ ã¯ãªã„ã€‚
 			} else {
-				// ‚æ‚­•ª‚©‚ç‚È‚¢ƒGƒ‰[‚Í‚»‚Ì‚Ü‚ÜÌ‚Ä‚éB
-				// DDEƒT[ƒo(Tera Term)‚ª AutoWinClose=off ‚ÅØ’f‚µ‚½ê‡ADMLERR_NOTPROCESSED ‚ª
-				// •Ô‚Á‚Ä‚­‚éB‚±‚±‚Å”jŠü‚µ‚È‚¯‚ê‚ÎA‰„X‚ÆƒŠƒgƒ‰ƒC‚·‚é‚±‚Æ‚É‚È‚èACPU‚ğH‚¢’×‚·B
+				// ã‚ˆãåˆ†ã‹ã‚‰ãªã„ã‚¨ãƒ©ãƒ¼ã¯ãã®ã¾ã¾æ¨ã¦ã‚‹ã€‚
+				// DDEã‚µãƒ¼ãƒ(Tera Term)ãŒ AutoWinClose=off ã§åˆ‡æ–­ã—ãŸå ´åˆã€DMLERR_NOTPROCESSED ãŒ
+				// è¿”ã£ã¦ãã‚‹ã€‚ã“ã“ã§ç ´æ£„ã—ãªã‘ã‚Œã°ã€å»¶ã€…ã¨ãƒªãƒˆãƒ©ã‚¤ã™ã‚‹ã“ã¨ã«ãªã‚Šã€CPUã‚’é£Ÿã„æ½°ã™ã€‚
 				// (2009.11.22 yutaka)
 				break;
 			}
@@ -433,7 +433,7 @@ static void DDESendRaw(uint8_t command, const char *ptr, size_t len)
 
 void DDESend()
 {
-	OutBuf[OutLen] = 0;  // DDEƒf[ƒ^‚ÌI’[‚Í null ‚ÅI‚í‚é‚±‚Æ‚ğƒT[ƒo‚ªŠú‘Ò‚µ‚Ä‚¢‚éB
+	OutBuf[OutLen] = 0;  // DDEãƒ‡ãƒ¼ã‚¿ã®çµ‚ç«¯ã¯ null ã§çµ‚ã‚ã‚‹ã“ã¨ã‚’ã‚µãƒ¼ãƒãŒæœŸå¾…ã—ã¦ã„ã‚‹ã€‚
 	DDESendRaw(CmdSendCompatString, OutBuf, OutLen + 1);
 	OutLen = 0;
 }
@@ -442,14 +442,14 @@ void DDESendStringU8(const char *strU8)
 {
 	OutBuf[OutLen] = 0;
 	strU8 = OutBuf;
-	size_t len = strlen(strU8) + 1;		// I’[ '\0' ‚à‘—M‚·‚é
+	size_t len = strlen(strU8) + 1;		// çµ‚ç«¯ '\0' ã‚‚é€ä¿¡ã™ã‚‹
 	DDESendRaw(CmdSendUTF8String, strU8, len);
 	OutLen = 0;
 }
 
 void DDESendBinary(const void *ptr, size_t len)
 {
-	OutBuf[OutLen] = 0;  // 1byte’·‚­‘—‚é ?
+	OutBuf[OutLen] = 0;  // 1byteé•·ãé€ã‚‹ ?
 	ptr = OutBuf;
 	len = OutLen + 1;
 	DDESendRaw(CmdSendBinary, ptr, len);
@@ -587,10 +587,10 @@ void SetWait2(PCHAR Str, int Len, int Pos)
 }
 
 
-// ³‹K•\Œ»‚É‚æ‚éƒpƒ^[ƒ“ƒ}ƒbƒ`‚ğs‚¤iOnigurumag—pj
+// æ­£è¦è¡¨ç¾ã«ã‚ˆã‚‹ãƒ‘ã‚¿ãƒ¼ãƒ³ãƒãƒƒãƒã‚’è¡Œã†ï¼ˆOnigurumaä½¿ç”¨ï¼‰
 //
-// return ³: ƒ}ƒbƒ`‚µ‚½ˆÊ’ui1ƒIƒŠƒWƒ“j
-//         0: ƒ}ƒbƒ`‚µ‚È‚©‚Á‚½
+// return æ­£: ãƒãƒƒãƒã—ãŸä½ç½®ï¼ˆ1ã‚ªãƒªã‚¸ãƒ³ï¼‰
+//         0: ãƒãƒƒãƒã—ãªã‹ã£ãŸ
 int FindRegexStringOne(char *regex, int regex_len, char *target, int target_len)
 {
 	int r;
@@ -623,7 +623,7 @@ int FindRegexStringOne(char *regex, int regex_len, char *target, int target_len)
 	if (r >= 0) {
 		int i;
 
-		// ‘O‰ñ‚ÌŒ‹‰Ê‚ğƒNƒŠƒA‚·‚é (2008.3.28 maya)
+		// å‰å›ã®çµæœã‚’ã‚¯ãƒªã‚¢ã™ã‚‹ (2008.3.28 maya)
 		for (i = 1; i <= 9; i++) {
 			LockVar();
 			SetGroupMatchStr(i, "");
@@ -634,7 +634,7 @@ int FindRegexStringOne(char *regex, int regex_len, char *target, int target_len)
 			mstart = region->beg[i];
 			mend = region->end[i];
 
-			// ƒ}ƒbƒ`ƒpƒ^[ƒ“‘S‘Ì‚ğ matchstr ‚ÖŠi”[‚·‚é
+			// ãƒãƒƒãƒãƒ‘ã‚¿ãƒ¼ãƒ³å…¨ä½“ã‚’ matchstr ã¸æ ¼ç´ã™ã‚‹
 			if (i == 0) {
 				ch = target[mend];
 				target[mend] = 0; // null terminate
@@ -643,7 +643,7 @@ int FindRegexStringOne(char *regex, int regex_len, char *target, int target_len)
 				UnlockVar();
 				target[mend] = ch;  // restore
 
-			} else { // c‚è‚Ìƒ}ƒbƒ`ƒpƒ^[ƒ“‚Í groupmatchstr[1-9] ‚ÖŠi”[‚·‚é
+			} else { // æ®‹ã‚Šã®ãƒãƒƒãƒãƒ‘ã‚¿ãƒ¼ãƒ³ã¯ groupmatchstr[1-9] ã¸æ ¼ç´ã™ã‚‹
 				ch = target[mend];
 				target[mend] = 0; // null terminate
 				LockVar();
@@ -674,7 +674,7 @@ int FindRegexStringOne(char *regex, int regex_len, char *target, int target_len)
 	return (matched);
 }
 
-// ³‹K•\Œ»‚É‚æ‚éƒpƒ^[ƒ“ƒ}ƒbƒ`‚ğs‚¤
+// æ­£è¦è¡¨ç¾ã«ã‚ˆã‚‹ãƒ‘ã‚¿ãƒ¼ãƒ³ãƒãƒƒãƒã‚’è¡Œã†
 int FindRegexString(void)
 {
 	int i;
@@ -687,9 +687,9 @@ int FindRegexString(void)
 
 	for (i = 0 ; i < 10 ; i++) {
 		if (PWaitStr[i] && FindRegexStringOne(PWaitStr[i], WaitStrLen[i], RecvLnBuff, RecvLnPtr) > 0) { // matched
-			// ƒ}ƒbƒ`‚µ‚½s‚ğ inputstr ‚ÖŠi”[‚·‚é
+			// ãƒãƒƒãƒã—ãŸè¡Œã‚’ inputstr ã¸æ ¼ç´ã™ã‚‹
 			LockVar();
-			SetInputStr(GetRecvLnBuff());  // ‚±‚±‚Åƒoƒbƒtƒ@‚ªƒNƒŠƒA‚³‚ê‚é
+			SetInputStr(GetRecvLnBuff());  // ã“ã“ã§ãƒãƒƒãƒ•ã‚¡ãŒã‚¯ãƒªã‚¢ã•ã‚Œã‚‹
 			UnlockVar();
 
 			return i+1;
@@ -716,7 +716,7 @@ int Wait()
 	Found = 0;
 	while ((Found==0) && Read1Byte(&b))
 	{
-		if (b == 0x0a) { // ‰üs‚ª—ˆ‚½‚çAƒoƒbƒtƒ@‚ğƒNƒŠƒA‚·‚é‚Ì‚Å‚»‚Ì‘O‚Éƒpƒ^[ƒ“ƒ}ƒbƒ`‚ğs‚¤B(waitregex command)
+		if (b == 0x0a) { // æ”¹è¡ŒãŒæ¥ãŸã‚‰ã€ãƒãƒƒãƒ•ã‚¡ã‚’ã‚¯ãƒªã‚¢ã™ã‚‹ã®ã§ãã®å‰ã«ãƒ‘ã‚¿ãƒ¼ãƒ³ãƒãƒƒãƒã‚’è¡Œã†ã€‚(waitregex command)
 			ret = FindRegexString();
 			if (ret > 0) {
 				Found = ret;
@@ -726,7 +726,7 @@ int Wait()
 
 		PutRecvLnBuff(b);
 
-		if (RegexActionType == REGEX_NONE) { // ³‹K•\Œ»‚È‚µ‚Ìê‡‚Í1ƒoƒCƒg‚¸‚ÂŒŸõ‚·‚é(wait command)
+		if (RegexActionType == REGEX_NONE) { // æ­£è¦è¡¨ç¾ãªã—ã®å ´åˆã¯1ãƒã‚¤ãƒˆãšã¤æ¤œç´¢ã™ã‚‹(wait command)
 			for (i = 9 ; i >= 0 ; i--) {
 				Str = PWaitStr[i];
 				if (Str!=NULL) {
@@ -756,7 +756,7 @@ int Wait()
 		}
 	}
 
-	// ‰üs‚È‚µ‚Å•¶š—ñ‚ª—¬‚ê‚Ä‚­‚éê‡‚É‚àƒpƒ^[ƒ“ƒ}ƒbƒ`‚ğ‚İ‚é
+	// æ”¹è¡Œãªã—ã§æ–‡å­—åˆ—ãŒæµã‚Œã¦ãã‚‹å ´åˆã«ã‚‚ãƒ‘ã‚¿ãƒ¼ãƒ³ãƒãƒƒãƒã‚’è©¦ã¿ã‚‹
 	if (Found == 0) {
 		ret = FindRegexString();
 		if (ret > 0) {
@@ -848,10 +848,10 @@ static int Wait4allOneBuffer(int index)
 }
 
 //
-// ‘Sƒ}ƒNƒ‚Ìƒoƒbƒtƒ@‚ğsnoop‚µAŠú‘Ò‚µ‚½ƒL[ƒ[ƒh‚ª‚·‚×‚Ä‘µ‚¤‚Ü‚ÅƒEƒFƒCƒg‚·‚éB
+// å…¨ãƒã‚¯ãƒ­ã®ãƒãƒƒãƒ•ã‚¡ã‚’snoopã—ã€æœŸå¾…ã—ãŸã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰ãŒã™ã¹ã¦æƒã†ã¾ã§ã‚¦ã‚§ã‚¤ãƒˆã™ã‚‹ã€‚
 //
-//  1: ‘µ‚Á‚½
-//  0: ‘µ‚Á‚Ä‚¢‚È‚¢
+//  1: æƒã£ãŸ
+//  0: æƒã£ã¦ã„ãªã„
 //
 int Wait4all()
 {
@@ -871,20 +871,20 @@ int Wait4all()
 		ret = Wait4allOneBuffer(index[i]);
 		if (ret && found[i] == 0) {
 			Wait4allFoundNum++;
-			// “¯‚¶’[––‚ÅAd•¡‚µ‚Äƒ}ƒbƒ`‚µ‚½ê‡‚ÍA2d‚ÉƒJƒEƒ“ƒg‚µ‚È‚¢‚æ‚¤‚É‚·‚éB
+			// åŒã˜ç«¯æœ«ã§ã€é‡è¤‡ã—ã¦ãƒãƒƒãƒã—ãŸå ´åˆã¯ã€2é‡ã«ã‚«ã‚¦ãƒ³ãƒˆã—ãªã„ã‚ˆã†ã«ã™ã‚‹ã€‚
 			found[i] = 1;
 		}
 	}
 
-	// ¡Œ»İAƒAƒNƒeƒBƒu‚Èttpmacro‚Ì”‚ğæ“¾‚·‚éB
-	// wait4allÀs’†‚ÉAƒvƒƒZƒX‚ª‘Œ¸‚·‚é‚±‚Æ‚ª‚ ‚é‚½‚ßB
+	// ä»Šç¾åœ¨ã€ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãªttpmacroã®æ•°ã‚’å–å¾—ã™ã‚‹ã€‚
+	// wait4allå®Ÿè¡Œä¸­ã«ã€ãƒ—ãƒ­ã‚»ã‚¹ãŒå¢—æ¸›ã™ã‚‹ã“ã¨ãŒã‚ã‚‹ãŸã‚ã€‚
 	curnum = get_macro_active_num();
 	if (curnum < num)
 		num = curnum;
 
 	if (Wait4allFoundNum >= num) {
 		ClearWait();
-		return 1; // ‘S•”‚»‚ë‚Á‚½
+		return 1; // å…¨éƒ¨ãã‚ã£ãŸ
 
 	} else {
 
@@ -903,9 +903,9 @@ static void SetFileCommon(char cmd, const char *filenameU8)
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹–¼(•¶š—ñ)‚ğ‘—M‚·‚é
+ *	ãƒ•ã‚¡ã‚¤ãƒ«å(æ–‡å­—åˆ—)ã‚’é€ä¿¡ã™ã‚‹
  *
- *	@param	filenameU8	•¶š—ñ(UTF-8)
+ *	@param	filenameU8	æ–‡å­—åˆ—(UTF-8)
  */
 void SetFile(const char *filenameU8)
 {
@@ -1042,8 +1042,8 @@ WORD SendCmnd(char OpId, int WaitFlag)
 	if (WaitFlag!=0) {
 		TTLStatus = WaitFlag;
 	}
-	// 1byte+NUL‚¾‚ÆA‚È‚º‚©Visual Studio‚ÅƒfƒoƒbƒO‚Å‚«‚È‚­‚È‚éiƒq[ƒvƒGƒ‰[”­¶j‚Ì‚ÅA
-	// 2byte+NUL‚Å‘—‚éB(2009.2.3 yutaka)
+	// 1byte+NULã ã¨ã€ãªãœã‹Visual Studioã§ãƒ‡ãƒãƒƒã‚°ã§ããªããªã‚‹ï¼ˆãƒ’ãƒ¼ãƒ—ã‚¨ãƒ©ãƒ¼ç™ºç”Ÿï¼‰ã®ã§ã€
+	// 2byte+NULã§é€ã‚‹ã€‚(2009.2.3 yutaka)
 	Cmd[0] = OpId;
 	Cmd[1] = OpId;
 	Cmd[2] = '\0';
@@ -1066,7 +1066,7 @@ WORD GetTTParam(char OpId, PCHAR Param, int destlen)
 	SendCmnd(OpId,0);
 	Data = DdeClientTransaction(NULL,0,ConvH,Item2,CF_OEMTEXT,XTYP_REQUEST,5000,NULL);
 	if (Data == 0) {
-		// ƒgƒ‰ƒ“ƒUƒNƒVƒ‡ƒ“‚ğŠJn‚Å‚«‚È‚¢‚Æ‚«‚ÍƒGƒ‰[‚Æ‚·‚éB(2016.10.22 yutaka)
+		// ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³ã‚’é–‹å§‹ã§ããªã„ã¨ãã¯ã‚¨ãƒ©ãƒ¼ã¨ã™ã‚‹ã€‚(2016.10.22 yutaka)
 		return 0;
 	}
 	DataPtr = (PCHAR)DdeAccessData(Data,NULL);
@@ -1077,4 +1077,17 @@ WORD GetTTParam(char OpId, PCHAR Param, int destlen)
 	DdeFreeDataHandle(Data);
 
 	return 0;
+}
+
+void SetRecvFileOption(int AutoStopWaitTime)
+{
+	char Cmd[6];
+
+	if (AutoStopWaitTime < 0) {
+		AutoStopWaitTime = 0;
+	}
+	Cmd[0] = CmdSetRecvFileOpt;
+	Word2HexStr(AutoStopWaitTime, &(Cmd[1]));
+	Cmd[5] = 0;
+	DdeClientTransaction(Cmd, strlen(Cmd)+1, ConvH, 0, CF_OEMTEXT, XTYP_EXECUTE, 1000, NULL);
 }

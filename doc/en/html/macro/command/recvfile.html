@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>recvfile</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>recvfile</h1>
+
+<p>
+Writes received data to a file. <em>(version 5.6.0 or later)</em>
+</p>
+
+<pre class="macro-syntax">
+recvfile &lt;filename&gt; &lt;binary flag&gt; &lt;auto-stop wait time&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Writes the data received from the host to the file specified by &lt;filename&gt;.<br>
+The next command will not be executed until the write is complete.
+</p>
+
+<p>
+When &lt;filename&gt; is relative path, file is saved relative to <a href="../../setup/folder.html#FileDir">file transfer folder</a>.
+</p>
+
+<p>
+Regardless of the numeric value of &lt;binary flag&gt;, the received data is written to the file unchanged.<br>
+No conversions are performed (kanji/codepage conversion, line-ending conversion, suppression of control-character output, etc.). Binary mode is fixed.
+</p>
+
+<p>
+If no data is received for the number of seconds specified by &lt;auto-stop wait time&gt;, reception is terminated.<br>
+In that case the system variable result is set to 1; otherwise result is set to 0.<br>
+The unit of &lt;auto-stop wait time&gt; is seconds.
+If a value less than or equal to 0 is specified, reception is not terminated and will wait indefinitely for data.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Connect to the remote host
+connect '192.168.0.10:22 /ssh /user=root /passwd=XXXXXX /auth=password'
+
+; Wait for the shell prompt
+waitregex '.*[$#] '
+
+; Wait 3 seconds to allow recvfile to start
+; Save stty settings to "save_stty"
+; Run "stty raw" so that the remote host sends the output data exactly as-is, without any modification
+; Print /var/log/messages to stdout
+; Restore stty settings
+; Wait 5 seconds to signal the end of transmission
+sendln 'sleep 3; save_stty=$(stty -g); stty raw; cat /var/log/messages; stty "${save_stty}"; sleep 5'
+
+; Wait 1 second for sendln to complete
+pause 1
+
+; Save received data to C:\tmp\messages
+; Exit recvfile if no data is received for 3 seconds
+recvfile 'C:\tmp\messages' 1 3
+
+; Wait for the shell prompt
+waitregex '.*[$#] '
+
+; Log out from the remote host
+sendln 'exit'
+
+; Close Tera Term
+closett
+
+; End macro execution
+end
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="changedir.html">changedir</a></li>
+</ul>
+
+</body>
+</html>

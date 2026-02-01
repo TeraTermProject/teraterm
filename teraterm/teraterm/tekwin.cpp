@@ -48,6 +48,8 @@
 #include "dlglib.h"
 #include "codeconv.h"
 #include "compat_win.h"
+#include "externalsetup.h"
+#include "tslib.h"
 
 #define TEKClassName L"TEKWin32"
 
@@ -101,7 +103,7 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 		return;
 	}
 
-	// Windows 11 Ç≈ÉEÉBÉìÉhÉEÇÃäpÇ™ä€Ç≠Ç»ÇÁÇ»Ç¢ÇÊÇ§Ç…Ç∑ÇÈ
+	// Windows 11 „Åß„Ç¶„Ç£„É≥„Éâ„Ç¶„ÅÆËßí„Åå‰∏∏„Åè„Å™„Çâ„Å™„ÅÑ„Çà„ÅÜ„Å´„Åô„Çã
 	if (ts.WindowCornerDontround && pDwmSetWindowAttribute != NULL) {
 		DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_DONOTROUND;
 		pDwmSetWindowAttribute(HTEKWin, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
@@ -247,9 +249,9 @@ void CTEKWindow::OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized)
 }
 
 /**
- *	ÉLÅ[É{Å[ÉhÇ©ÇÁ1ï∂éöì¸óÕ
- *	@param	nChar	UTF-16 char(wchar_t)	IsWindowUnicode() == TRUE éû
- *					ANSI char(char)			IsWindowUnicode() == FALSE éû
+ *	„Ç≠„Éº„Éú„Éº„Éâ„Åã„Çâ1ÊñáÂ≠óÂÖ•Âäõ
+ *	@param	nChar	UTF-16 char(wchar_t)	IsWindowUnicode() == TRUE ÊôÇ
+ *					ANSI char(char)			IsWindowUnicode() == FALSE ÊôÇ
  */
 void CTEKWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
@@ -260,10 +262,10 @@ void CTEKWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 
 	wchar_t u16;
 	if (IsWindowUnicode(HTEKWin) == TRUE) {
-		// ì¸óÕÇÕ UTF-16
+		// ÂÖ•Âäõ„ÅØ UTF-16
 		u16 = (wchar_t)nChar;
 	} else {
-		// ì¸óÕÇÕ ANSI
+		// ÂÖ•Âäõ„ÅØ ANSI
 		//		ANSI(ACP) -> UTF-32 -> UTF-16
 		const char mb_str[2] = {(char)nChar, 0};
 		unsigned int u32;
@@ -622,7 +624,7 @@ LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 	DWORD Style;
 	HMENU SysMenu;
 
-	Style = GetWindowLongPtr (GWL_STYLE);
+	Style = (DWORD)GetWindowLongPtr (GWL_STYLE);
 	TBar = ((Style & WS_SYSMENU)!=0);
 	if (TBar == (ts.HideTitle==0)) {
 		return 0;
@@ -676,13 +678,17 @@ void CTEKWindow::OnFilePrint()
 	if (PrintDC==NULL) {
 		return;
 	}
-	if (! PrnStart(ts.Title)) {
+	wchar_t *TitleW = ToWcharA(ts.Title);
+	if (!PrnStart(PrintDC, TitleW)) {
+		free(TitleW);
 		return;
 	}
+	free(TitleW);
 
 	(*TEKPrint)(&tk,&ts,PrintDC,Sel);
 
-	PrnStop();
+	PrnStop(PrintDC);
+	DeleteDC(PrintDC);
 }
 
 void CTEKWindow::OnFileExit()
@@ -717,41 +723,39 @@ void CTEKWindow::OnEditClearScreen()
 
 void CTEKWindow::OnSetupWindow()
 {
-	BOOL Ok;
-	WORD OldEmu;
-
-	HelpId = HlpTEKSetupWindow;
-	ts.SampleFont = tk.TEKFont[0];
-
-	if (! LoadTTDLG()) {
-		return;
-	}
-	OldEmu = ts.TEKColorEmu;
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
-	Ok = (*SetupWin)(HTEKWin, &ts);
-	if (Ok) {
-		(*TEKResetWin)(&tk,&ts,OldEmu);
-		ChangeTitle();
-		SwitchMenu();
-		SwitchTitleBar();
-	}
+	OpenSetupTekWindow(m_hWnd);
 }
 
 void CTEKWindow::OnSetupFont()
 {
-	BOOL Ok;
+	OpenSetupTekFont(m_hWnd);
+}
 
-	HelpId = HlpTEKSetupFont;
-	if (! LoadTTDLG()) {
-		return;
-	}
-	Ok = (*ChooseFontDlg)(HTEKWin,&tk.TEKlf,&ts);
-	if (! Ok) {
-		return;
-	}
+/**
+ *	Ë®≠ÂÆö„ÉÄ„Ç§„Ç¢„É≠„Ç∞„ÅåÈñã„Åè„Å®„Åç„Å´Âëº„Å∞„Çå„Çã
+ */
+void CTEKWindow::OnSetupPreProcess()
+{
+	m_OldEmu = ts.TEKColorEmu;
+}
 
-	TEKSetupFont(&tk,&ts);
+/**
+ *	Ë®≠ÂÆö„ÉÄ„Ç§„Ç¢„É≠„Ç∞„ÅåÈñâ„Åò„Çã„Å®„Åç„Å´Âëº„Å∞„Çå„Çã
+ *
+ *	@param	Ok	TRUE„ÅÆ„Å®„ÅçOK„Éú„Çø„É≥„ÇíÊäº„Åó„Åü
+ */
+void CTEKWindow::OnSetupPostProcess(BOOL Ok)
+{
+	if (Ok) {
+		// window tab
+		TEKResetWin(&tk,&ts, m_OldEmu);
+		ChangeTitle();
+		SwitchMenu();
+		SwitchTitleBar();
+
+		// font tab
+		TEKSetupFont(&tk,&ts);
+	}
 }
 
 void CTEKWindow::OnVTWin()
@@ -792,7 +796,7 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	LRESULT retval = 0;
 	if (msg == MsgDlgHelp) {
-		// HELPMSGSTRING message éû
+		// HELPMSGSTRING message ÊôÇ
 		//		wp = dialog handle
 		//		lp = initialization structure
 		OnDlgHelp(HelpId, 0);

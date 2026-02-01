@@ -36,10 +36,13 @@ extern "C" {
 #endif
 
   /* Kermit function id */
-#define IdKmtReceive 1
-#define IdKmtGet     2
-#define IdKmtSend    3
-#define IdKmtFinish  4
+typedef enum {
+	IdKmtQuit    = 0,	// 内部で使用、処理が完了した状態
+	IdKmtReceive = 1,
+	IdKmtGet     = 2,
+	IdKmtSend    = 3,
+	IdKmtFinish  = 4,
+} KMT_MODE_T;
 
   /* KERMIT option */
 #define KmtOptLongPacket 1
@@ -52,7 +55,8 @@ enum {
 
 /* prototypes */
 struct FileVarProto;
-BOOL KmtCreate(struct FileVarProto *fv);
+struct Proto_;
+struct Proto_ *KmtCreate(struct FileVarProto *fv);
 
 #ifdef __cplusplus
 }

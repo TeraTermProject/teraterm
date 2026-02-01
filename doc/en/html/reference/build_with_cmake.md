@@ -1,7 +1,7 @@
 ﻿# How to build by using cmake
 
 - You can build Tera Term by using [cmake](<https://cmake.org/>)(EXPERIMENTAL).
-- You can bulid using Visual Studio, NMake, MinGW
+- You can build using Visual Studio, NMake, MinGW
 
 ## cmake version
 
@@ -31,12 +31,11 @@ Use Visual Studio IDE
 To build installer
 
     cmake --build . --config Release --target Install
-    cmake --build . --config Release --target inno_setup
-    cmake --build . --config Release --target zip
+    make_installer_cmake.bat
 
 ### NMake (Visual Studio, very experimental)
 
-Execute vcvars32.bat,etc to prepare an environment where nmake, cl are avaiable,
+Execute vcvars32.bat,etc to prepare an environment where nmake, cl are available,
 Run next commands.
 
     mkdir build_nmake
@@ -51,14 +50,14 @@ Run next commands.
 
 Please execute below commands on the top of source tree by using the cmake available on MinGW.
 
-    mkdir build_mingw
-    cd build_mingw
-    cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+    mkdir build_mingw_msys2_i686
+    cd build_mingw_msys2_i686
+    cmake .. -G "Unix Makefiles" -DARCHITECTURE=i686 -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
     cmake --build . -j
 
 When cygwin, linux
 
-    mkdir build_mingw_cygwin
-    cd build_mingw_cygwin
-    cmake .. -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+    mkdir build_mingw_cygwin_i686
+    cd build_mingw_cygwin_i686
+    cmake .. -G "Unix Makefiles" -DARCHITECTURE=i686 -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
     cmake --build . -j

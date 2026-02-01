@@ -56,25 +56,25 @@ typedef unsigned char uint8_t;
 #endif
 
 /**
- *	ƒf[ƒ^ƒVƒŠƒAƒ‰ƒCƒYî•ñ\‘¢‘Ì
+ *	ãƒ‡ãƒ¼ã‚¿ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºæƒ…å ±æ§‹é€ ä½“
  */
 typedef struct {
-	size_t size;		// ƒf[ƒ^‚ÌƒTƒCƒY(0‚ÅI—¹)
-	size_t offset;		// æ“ª‚©‚ç‚ÌƒIƒtƒZƒbƒg
+	size_t size;		// ãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚º(0ã§çµ‚äº†)
+	size_t offset;		// å…ˆé ­ã‹ã‚‰ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 	enum {
-		COPY = 0,				// ƒf[ƒ^‚ðƒRƒs[‚·‚é
-		MALLOCED_WSTRING = 1,	// malloc‚µ‚½—Ìˆæ‚Ì wchar_t •¶Žš—ñ
+		COPY = 0,				// ãƒ‡ãƒ¼ã‚¿ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
+		MALLOCED_WSTRING = 1,	// mallocã—ãŸé ˜åŸŸã® wchar_t æ–‡å­—åˆ—
 	} type;
 } TSerializeInfo;
 
 /**
- *	ƒf[ƒ^‚ðƒVƒŠƒAƒ‰ƒCƒY‚·‚é
+ *	ãƒ‡ãƒ¼ã‚¿ã‚’ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã™ã‚‹
  *
- *	@param		data	ƒVƒŠƒAƒ‰ƒCƒY‚·‚éƒf[ƒ^
- *	@param		info	ƒVƒŠƒAƒ‰ƒCƒYî•ñ
- *	@param[out]	size_	ƒVƒŠƒAƒ‰ƒCƒY‚µ‚½blobƒTƒCƒY(byte)
- *	@return				ƒVƒŠƒAƒ‰ƒCƒY‚µ‚½blobƒf[ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *						•s—v‚É‚È‚Á‚½‚çfree()‚·‚é‚±‚Æ
+ *	@param		data	ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã™ã‚‹ãƒ‡ãƒ¼ã‚¿
+ *	@param		info	ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºæƒ…å ±
+ *	@param[out]	size_	ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã—ãŸblobã‚µã‚¤ã‚º(byte)
+ *	@return				ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã—ãŸblobãƒ‡ãƒ¼ã‚¿ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *						ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹ã“ã¨
  */
 static uint8_t *SerializeData(const void *data, const TSerializeInfo *info, size_t *size_)
 {
@@ -131,12 +131,12 @@ static uint8_t *SerializeData(const void *data, const TSerializeInfo *info, size
 }
 
 /**
- *	ƒAƒ“ƒVƒŠƒAƒ‰ƒCƒY‚·‚é
+ *	ã‚¢ãƒ³ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã™ã‚‹
  *
- *	@param		blob	ƒVƒŠƒAƒ‰ƒCƒY‚³‚ê‚½ƒf[ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *	@param		size	ƒVƒŠƒAƒ‰ƒCƒY‚³‚ê‚½ƒf[ƒ^‚ÌƒTƒCƒY
- *	@param		info	ƒVƒŠƒAƒ‰ƒCƒYî•ñ
- *	@param[out]	data	‘‚«–ß‚·ƒf[ƒ^
+ *	@param		blob	ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã•ã‚ŒãŸãƒ‡ãƒ¼ã‚¿ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *	@param		size	ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã•ã‚ŒãŸãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚º
+ *	@param		info	ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºæƒ…å ±
+ *	@param[out]	data	æ›¸ãæˆ»ã™ãƒ‡ãƒ¼ã‚¿
  */
 static void UnserializeData(const void *blob, size_t size, const TSerializeInfo *info,
 							void *data)
@@ -177,7 +177,7 @@ static void UnserializeData(const void *blob, size_t size, const TSerializeInfo 
 		}
 		};
 		if (src > end) {
-			// ƒf[ƒ^‚ª‚¨‚©‚µ‚¢?
+			// ãƒ‡ãƒ¼ã‚¿ãŒãŠã‹ã—ã„?
 			assert(FALSE);
 			break;
 		}
@@ -198,8 +198,8 @@ static const uint8_t signature[] = {
 };
 
 /**
- *	@return		0ˆÈŠO	ƒXƒLƒbƒv‚·‚éƒTƒCƒY
- *				0		error(ˆÙ‚È‚Á‚½)
+ *	@return		0ä»¥å¤–	ã‚¹ã‚­ãƒƒãƒ—ã™ã‚‹ã‚µã‚¤ã‚º
+ *				0		error(ç•°ãªã£ãŸ)
  */
 static uint8_t *MakeSignature(size_t *size)
 {
@@ -211,8 +211,8 @@ static uint8_t *MakeSignature(size_t *size)
 }
 
 /**
- *	@return		0ˆÈŠO	ƒXƒLƒbƒv‚·‚éƒTƒCƒY
- *				0		error(ˆÙ‚È‚Á‚½)
+ *	@return		0ä»¥å¤–	ã‚¹ã‚­ãƒƒãƒ—ã™ã‚‹ã‚µã‚¤ã‚º
+ *				0		error(ç•°ãªã£ãŸ)
  */
 static size_t CheckSignature(const uint8_t *ptr, size_t size)
 {
@@ -235,13 +235,13 @@ static size_t CheckSignature(const uint8_t *ptr, size_t size)
 	TSerializeInfo::MALLOCED_WSTRING
 
 /**
- *	TTTset‚ð1‚Â‚ÌƒoƒCƒiƒŠ‚É‚·‚é‚½‚ß‚Ìî•ñ
- *	  •ûj
- *		- ‘S‘Ì‚ðƒRƒs[
- *		- “®“IŠm•Û‚³‚ê‚½•¶Žš—ñ‚ð’Ç‰Á
+ *	TTTsetã‚’1ã¤ã®ãƒã‚¤ãƒŠãƒªã«ã™ã‚‹ãŸã‚ã®æƒ…å ±
+ *	  æ–¹é‡
+ *		- å…¨ä½“ã‚’ã‚³ãƒ”ãƒ¼
+ *		- å‹•çš„ç¢ºä¿ã•ã‚ŒãŸæ–‡å­—åˆ—ã‚’è¿½åŠ 
  */
 static const TSerializeInfo serialize_info[] = {
-	{ sizeof(TTTSet), 0, TSerializeInfo::COPY},	// ‘S‘Ì‚ðƒRƒs[
+	{ sizeof(TTTSet), 0, TSerializeInfo::COPY},	// å…¨ä½“ã‚’ã‚³ãƒ”ãƒ¼
 	{ MALLOCED_WSTRING_INFO(TTTSet, HomeDirW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, SetupFNameW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, KeyCnfFNW) },
@@ -261,11 +261,11 @@ static const TSerializeInfo serialize_info[] = {
 };
 
 /**
- *	TTTSet \‘¢‘Ì‚ðƒoƒCƒiƒŠƒf[ƒ^‚É•ÏŠ·
+ *	TTTSet æ§‹é€ ä½“ã‚’ãƒã‚¤ãƒŠãƒªãƒ‡ãƒ¼ã‚¿ã«å¤‰æ›
  *
- *	@param[in]		ts	TTTSet\‘¢‘Ì‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *	@param[out]		ƒoƒCƒiƒŠƒf[ƒ^‚ÌƒTƒCƒY
- *	@return			ƒoƒCƒiƒŠƒf[ƒ^‚Öƒ|ƒCƒ“ƒ^
+ *	@param[in]		ts	TTTSetæ§‹é€ ä½“ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *	@param[out]		ãƒã‚¤ãƒŠãƒªãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚º
+ *	@return			ãƒã‚¤ãƒŠãƒªãƒ‡ãƒ¼ã‚¿ã¸ãƒã‚¤ãƒ³ã‚¿
  */
 void *TTCMNSerialize(const TTTSet *ts, size_t *size)
 {
@@ -285,11 +285,11 @@ void *TTCMNSerialize(const TTTSet *ts, size_t *size)
 }
 
 /**
- *	ƒoƒCƒiƒŠƒf[ƒ^‚ðTTTSet \‘¢‘Ì‚É•ÏŠ·A
+ *	ãƒã‚¤ãƒŠãƒªãƒ‡ãƒ¼ã‚¿ã‚’TTTSet æ§‹é€ ä½“ã«å¤‰æ›ã€
  *
- *	@param[in]	ptr		ƒoƒCƒiƒŠƒf[ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *	@param[in]	size	ƒoƒCƒiƒŠƒf[ƒ^‚ÌƒTƒCƒY
- *	@param[out]	ts		TTTSet\‘¢‘Ì‚Ö‚Ìƒ|ƒCƒ“ƒ^
+ *	@param[in]	ptr		ãƒã‚¤ãƒŠãƒªãƒ‡ãƒ¼ã‚¿ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *	@param[in]	size	ãƒã‚¤ãƒŠãƒªãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚º
+ *	@param[out]	ts		TTTSetæ§‹é€ ä½“ã¸ã®ãƒã‚¤ãƒ³ã‚¿
  */
 void TTCMNUnserialize(const void *ptr, size_t size, TTTSet *ts)
 {
@@ -301,8 +301,8 @@ void TTCMNUnserialize(const void *ptr, size_t size, TTTSet *ts)
 		UnserializeData(data, size, serialize_info, ts);
 	}
 
-	// ƒƒOƒtƒ@ƒCƒ‹–¼‚Í•¡»Œ³‚Æ“¯ˆê‚É‚Í‚Å‚«‚È‚¢‚Ì‚Åˆø‚«Œp‚¢‚Å‚¢‚È‚¢
-	// ƒ|ƒCƒ“ƒ^‚ÆƒpƒX(ANSI)‚ðƒNƒŠƒA‚·‚é
+	// ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«åã¯è¤‡è£½å…ƒã¨åŒä¸€ã«ã¯ã§ããªã„ã®ã§å¼•ãç¶™ã„ã§ã„ãªã„
+	// ãƒã‚¤ãƒ³ã‚¿ã¨ãƒ‘ã‚¹(ANSI)ã‚’ã‚¯ãƒªã‚¢ã™ã‚‹
 	ts->LogFNW = NULL;
 	ts->LogFN[0] = 0;
 }

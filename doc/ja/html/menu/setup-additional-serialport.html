@@ -97,22 +97,66 @@
               <dt>DSR/DTR</dt><dd>ハードウェアフロー(DSR/DTR)</dd>
               <dt>none</dt><dd>フロー制御なし<br>
             </dl>
-
           </dd>
+
+          <dt>CTS、DSR、RING、RLSD</dt>
+          <dd>
+            制御信号の状態を表示します。
+            <ul>
+              <li>CTS (Clear To Send) : 送信可能</li>
+              <li>DSR (Data Set Ready) : データセット準備完了</li>
+              <li>RING (Ring Indicator) : 着信(呼び出し中)</li>
+              <li>RLSD (Receive Line Signal Detect) : キャリア検出</li>
+            </ul>
+          </dd>
+
+          <dt id="FlowCtrlRTS">RTS</dt>
+          <dd>
+            制御信号 RTS (Request To Send) の状態を表示します。<br>
+            RTS のフロー制御方法 Disable / Enable / Handshake / Toggle を設定します。
+            詳細は <a href="https://learn.microsoft.com/ja-jp/windows/win32/api/winbase/ns-winbase-dcb" target="_blank">DCB 構造体</a> の fRtsControl の説明を参照下さい。<br>
+            <ul>
+              <li>Disable : 常にlow</li>
+              <li>Enable : 常にhigh</li>
+              <li>Handshake : 受信可能な場合にhigh</li>
+              <li>Toggle : 送信時にhigh</li>
+            </ul>
+            RTS のフロー制御が Disable 又は Enable の場合は、RTSをクリックすると一時的に low と high が切り替わります。
+          </dd>
+
+          <dt id="FlowCtrlDTR">DTR</dt>
+          <dd>
+            制御信号 DTR (Data Terminal Ready) の状態を表示します。<br>
+            DTR のフロー制御方法 Disable / Enable / Handshake を設定します。
+            詳細は <a href="https://learn.microsoft.com/ja-jp/windows/win32/api/winbase/ns-winbase-dcb" target="_blank">DCB 構造体</a> の fDtrControl の説明を参照下さい。<br>
+            <ul>
+              <li>Disable : 常にlow</li>
+              <li>Enable : 常にhigh</li>
+              <li>Handshake : 受信可能な場合にhigh</li>
+            </ul>
+            DTR のフロー制御が Disable 又は Enable の場合は、DTRをクリックすると一時的に low と high が切り替わります。
+          </dd>
+
         </dl>
       </dd>
 
       <dt id="Delay">Transmit delay</dt>
       <dd>
-  Tera Term が文字(行)を送出したあと次の文字(行)を送出するまでの待ち時間。
-  単位はミリ秒です。1文字(行)ごとの待ち時間を設定できます。<br>
-  Tera Term から大量の文字を送出したときにモデムやホストが文字を取りこぼす場合には適当な待ち時間を設定してみてください。
+        Tera Term が文字(行)を送出したあと次の文字(行)を送出するまでの待ち時間。
+        単位はミリ秒です。1文字(行)ごとの待ち時間を設定できます。<br>
+        Tera Term から大量の文字を送出したときにモデムやホストが文字を取りこぼす場合には適当な待ち時間を設定してみてください。
       </dd>
 
       <dt id="Information">COMポートの詳細情報</dt>
       <dd>
-  テキストボックスでは選択中のCOMポートに関する詳細情報を表示します。<br>
-  CTRL+Aで全選択ができます。CTRL/SHIFT+ホイールで横スクロールができます。
+        テキストボックスでは選択中のCOMポートに関する詳細情報を表示します。<br>
+        CTRL+Aで全選択ができます。CTRL/SHIFT+ホイールで横スクロールができます。
+      </dd>
+
+      <dt id="drop">送受信データがドロップする場合</dt>
+      <dd>
+        いくつかの理由により送受信データがドロップすることがあります。<br>
+        ドロップの発生箇所と対処方法は<a href="../usage/tips/data_drop.html">送受信データのドロップ</a>を参照下さい。
       </dd>
 
     </dl>

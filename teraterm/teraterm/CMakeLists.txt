@@ -37,8 +37,6 @@ add_executable(
   filesys_proto.h
   keyboard.c
   keyboard.h
-  prnabort.cpp
-  prnabort.h
   scp.cpp
   scp.h
   sendmem.cpp
@@ -56,6 +54,8 @@ add_executable(
   teraterml.h
   theme.h
   themefile.cpp
+  tslib.h
+  tslib.cpp
   tt-version.rc
   ttdde.c
   ttdde.h
@@ -77,6 +77,8 @@ add_executable(
   unicode_test.h
   vtdisp.c
   vtdisp.h
+  vtdraw.cpp
+  vtdraw.h
   vtterm.c
   vtterm.h
   vtwin.cpp
@@ -97,6 +99,8 @@ set(SRC_DIALOG
   coding_pp_res.h
   color_sample.cpp
   color_sample.h
+  commentdlg.cpp
+  commentdlg.h
   debug_pp.cpp
   debug_pp.h
   debug_pp.rc
@@ -126,8 +130,12 @@ set(SRC_DIALOG
   plugin_pp.h
   plugin_pp.rc
   plugin_pp_res.h
+  prnabort.cpp
+  prnabort.h
   protodlg.cpp
   protodlg.h
+  recvfiledlg.cpp
+  recvfiledlg.h
   resource.h
   sendfiledlg.cpp
   sendfiledlg.h
@@ -135,6 +143,10 @@ set(SRC_DIALOG
   serial_pp.h
   setupdirdlg.cpp
   setupdirdlg.h
+  tekfont_pp.cpp
+  tekfont_pp.h
+  tekfont_pp.rc
+  tekfont_pp_res.h
   tcpip_pp.cpp
   tcpip_pp.h
   term_pp.cpp
@@ -265,6 +277,8 @@ target_sources(
   ../ttpfile/protolog.h
   ../ttpfile/quickvan.c
   ../ttpfile/quickvan.h
+  ../ttpfile/raw.c
+  ../ttpfile/raw.h
   ../ttpfile/xmodem.c
   ../ttpfile/xmodem.h
   ../ttpfile/ymodem.c

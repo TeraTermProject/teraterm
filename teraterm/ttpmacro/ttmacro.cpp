@@ -50,6 +50,7 @@
 #include "ttmacro.h"
 #include "ttmlib.h"
 #include "ttlib.h"
+#include "ttmdlg.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -85,7 +86,7 @@ static void init()
 	DLLInit();
 	WinCompatInit();
 
-	// DPI Aware (‚DPI‘Î‰)
+	// DPI Aware (é«˜DPIå¯¾å¿œ)
 	DPIAware = DPI_AWARENESS_CONTEXT_UNAWARE;
 	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
 		wchar_t Temp[4];
@@ -98,7 +99,7 @@ static void init()
 		}
 	}
 
-	// UILanguageFile‚Ì "Tera Term" ƒZƒNƒVƒ‡ƒ“ "DLG_SYSTEM_FONT" ‚ÌƒtƒHƒ“ƒg‚Éİ’è‚·‚é
+	// UILanguageFileã® "Tera Term" ã‚»ã‚¯ã‚·ãƒ§ãƒ³ "DLG_SYSTEM_FONT" ã®ãƒ•ã‚©ãƒ³ãƒˆã«è¨­å®šã™ã‚‹
 	LOGFONTW logfont;
 	GetI18nLogfontW(L"Tera Term", L"DlgFont", &logfont, 0, SetupFNameW);
 	SetDialogFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet,
@@ -143,6 +144,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	Busy = TRUE;
 	pCCtrlWindow = new CCtrlWindow(hInst);
 	pCCtrlWindow->Create();
+
+	if (!VOption) {
+		if (IOption) {
+			nCmdShow = SW_SHOWMINIMIZED;
+		}
+		ShowWindow(pCCtrlWindow->m_hWnd, nCmdShow);
+	}
+
 	Busy = FALSE;
 
 	HWND hWnd = pCCtrlWindow->GetSafeHwnd();
@@ -151,42 +160,42 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	// message pump
 	MSG msg;
 	for (;;) {
-		// Windows‚ÌƒƒbƒZ[ƒW‚ª‚È‚¢ê‡‚Ìƒ‹[ƒv
+		// Windowsã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒãªã„å ´åˆã®ãƒ«ãƒ¼ãƒ—
 		for(;;) {
-			if (PeekMessageA(&msg, NULL, NULL, NULL, PM_NOREMOVE) != FALSE) {
-				// ƒƒbƒZ[ƒW‚ª‘¶İ‚µ‚½Aƒ‹[ƒv‚ğ”²‚¯‚é
+			if (PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) != FALSE) {
+				// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒå­˜åœ¨ã—ãŸã€ãƒ«ãƒ¼ãƒ—ã‚’æŠœã‘ã‚‹
 				break;
 			}
 
 			if (!OnIdle(lCount)) {
-				// idle•s—v
-				if (SleepTick < 500) {	// Å‘å 501ms–¢–
+				// idleä¸è¦
+				if (SleepTick < 500) {	// æœ€å¤§ 501msæœªæº€
 					SleepTick += 2;
 				}
 				lCount = 0;
 				Sleep(SleepTick);
 			} else {
-				// —vidle
+				// è¦idle
 				SleepTick = 0;
 				lCount++;
 			}
 		}
 
-		// Windows‚ÌƒƒbƒZ[ƒW‚ª‹ó‚É‚È‚é‚Ü‚Åˆ—‚·‚é
+		// Windowsã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒç©ºã«ãªã‚‹ã¾ã§å‡¦ç†ã™ã‚‹
 		for(;;) {
 			if (GetMessageW(&msg, NULL, 0, 0) == FALSE) {
 				// WM_QUIT
 				goto exit_message_loop;
 			}
 			if (IsDialogMessageW(hWnd, &msg) != 0) {
-				/* ˆ—‚³‚ê‚½*/
+				/* å‡¦ç†ã•ã‚ŒãŸ*/
 			} else {
 				TranslateMessage(&msg);
 				DispatchMessageW(&msg);
 			}
 
-			if (PeekMessageA(&msg, NULL, NULL, NULL, PM_NOREMOVE) == FALSE) {
-				// ƒƒbƒZ[ƒW‚ª‚È‚­‚È‚Á‚½Aƒ‹[ƒv‚ğ”²‚¯‚é
+			if (PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) == FALSE) {
+				// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒãªããªã£ãŸã€ãƒ«ãƒ¼ãƒ—ã‚’æŠœã‘ã‚‹
 				break;
 			}
 		}

@@ -34,7 +34,7 @@
     Specify character width assumed by Tera Term connecting destination.<br>
     Refer to <a href="#EastAsianWidth">East_Asian_Width and width (cells)</a>.<br>
     Refer to <a href="setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a> for Tera Term drawing character width.
-    If you change Encoding-receive by pull-down, width is changed to typical characte witdh of that code automatically. Nevertheless, that width is not absolutely recommend, you can choose the width what you want for font or other reasons.
+    If you change Encoding-receive by pull-down, width is changed to typical character width of that code automatically. Nevertheless, that width is not absolutely recommend, you can choose the width what you want for font or other reasons.
 
     <h3 id="UnicodeEmojiOverride">Override Emoji Characters width</h3>
 
@@ -56,7 +56,7 @@
     Select display method for <a href="../about/emulations_dec_special.html">DEC Special Graphics</a>
 
     <dl>
-      <dt>Mapping Unicode to DEC Special Grahpics</dt>
+      <dt>Mapping Unicode to DEC Special Graphics</dt>
       <dd>
         Unicode is converted to DEC Special Graphic, displays with "Tera Special" font.<br>
         Character width of DEC Special Graphic is 1 cell (half-width).<br>
@@ -68,7 +68,7 @@
           <dt>Middle dots(U+00B7,U+2024,U+2219)</dt>
         </dl>
       </dd>
-      <dt>Mapping DEC Special Grahpics to Unicode</dt>
+      <dt>Mapping DEC Special Graphics to Unicode</dt>
       <dd>
         DEC Special Graphic is converted to Unicode, displays with VT Window font.
         The character width displayed in Unicode differs for each character.
@@ -233,7 +233,7 @@ cells(2=full/1=half)
 
     <p>
       Attributes are determined based on the following data<br>
-      <a href="http://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt" target="_blank">http://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt</a>
+      <a href="https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt</a>
     </p>
 
     <h2 id="emoji">About Emoji width (cells)</h2>
@@ -253,9 +253,8 @@ cells(2=full/1=half)
     </p>
 
     <p>
-      The following information is used to determine Emoji.<br>
-      <a href="https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt</a><br>
-      However, code points less than U+0080 are not treated as Emoji
+      The following data's Extended_Pictographic property is used to determine if a character is an emoji.<br>
+      <a href="https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt</a>
     </p>
 
     <p>
@@ -270,6 +269,10 @@ cells(2=full/1=half)
       <dt>"&#x2764;", U+2764</dt>
       <dd>HEAVY BLACK HEART</dd>
     </dl>
+
+    <h2 id="width_decision">Character width decision flow</h2>
+
+    <img src="cell_width.png">
 
   </body>
 </html>

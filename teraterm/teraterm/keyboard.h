@@ -34,9 +34,9 @@ extern "C" {
 
 /* KeyDown return type */
 typedef enum {
-	KEYDOWN_OTHER,		/* ‚»‚Ì‘¼ */
-	KEYDOWN_COMMOUT,	/* ƒŠƒ‚[ƒg‚É‘—MiBS Enter Space‚È‚Çj */
-	KEYDOWN_CONTROL,	/* Ctrl,Shift‚È‚Ç */
+	KEYDOWN_OTHER,		/* ãã®ä»– */
+	KEYDOWN_COMMOUT,	/* ãƒªãƒ¢ãƒ¼ãƒˆã«é€ä¿¡ï¼ˆBS Enter Spaceãªã©ï¼‰ */
+	KEYDOWN_CONTROL,	/* Ctrl,Shiftãªã© */
 } KeyDownResult;
 
 void SetKeyMap();

@@ -8,8 +8,8 @@
 
 #include "getopt.h"
 
-#define IPC_BROADCAST_COMMAND 1		// �S�[���֑��M
-#define IPC_MULTICAST_COMMAND 2		// �C�ӂ̒[���Q�֑��M
+#define IPC_BROADCAST_COMMAND 1		// 全端末へ送信
+#define IPC_MULTICAST_COMMAND 2		// 任意の端末群へ送信
 
 BOOL IsUnicharSupport(HWND hwnd)
 {
@@ -22,7 +22,7 @@ static COPYDATASTRUCT *BuildBroadcastCDS(const void *buf, size_t buflen)
 	COPYDATASTRUCT *cds = (COPYDATASTRUCT *)malloc(sizeof(COPYDATASTRUCT));
 
 	cds->dwData = IPC_BROADCAST_COMMAND;
-	cds->cbData = (DWORD)buflen;	// '\0' �͊܂܂Ȃ�
+	cds->cbData = (DWORD)buflen;	// '\0' は含まない
 	cds->lpData = (void *)buf;
 
 	return cds;
@@ -30,13 +30,13 @@ static COPYDATASTRUCT *BuildBroadcastCDS(const void *buf, size_t buflen)
 
 static COPYDATASTRUCT *BuildBroadcastCDS(const wchar_t *buf)
 {
-	size_t buflen = wcslen(buf) * sizeof(wchar_t);	// '\0' �͊܂܂Ȃ�
+	size_t buflen = wcslen(buf) * sizeof(wchar_t);	// '\0' は含まない
 	return BuildBroadcastCDS(buf, buflen);
 }
 
 static COPYDATASTRUCT *BuildBroadcastCDS(const char *buf)
 {
-	size_t buflen = strlen(buf);	// '\0' �͊܂܂Ȃ�
+	size_t buflen = strlen(buf);	// '\0' は含まない
 	return BuildBroadcastCDS(buf, buflen);
 }
 
@@ -57,15 +57,15 @@ static COPYDATASTRUCT *BuildMuitlcastCDS(const void *name, size_t namelen, const
 
 static COPYDATASTRUCT *BuildMuitlcastCDS(const wchar_t *name, const wchar_t *buf)
 {
-	size_t namelen = (wcslen(name) + 1) * sizeof(wchar_t);	// '\0' �܂�
-	size_t buflen = wcslen(buf) * sizeof(wchar_t);	// '\0' �͊܂܂Ȃ�
+	size_t namelen = (wcslen(name) + 1) * sizeof(wchar_t);	// '\0' 含む
+	size_t buflen = wcslen(buf) * sizeof(wchar_t);	// '\0' は含まない
 	return BuildMuitlcastCDS(name, namelen, buf, buflen);
 }
 
 static COPYDATASTRUCT *BuildMuitlcastCDS(const char *name, const char *buf)
 {
-	size_t namelen = strlen(name) + 1;	// '\0' �܂�
-	size_t buflen = strlen(buf);	// '\0' �͊܂܂Ȃ�
+	size_t namelen = strlen(name) + 1;	// '\0' 含む
+	size_t buflen = strlen(buf);	// '\0' は含まない
 	return BuildMuitlcastCDS(name, namelen, buf, buflen);
 }
 
@@ -90,7 +90,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd , LPARAM lp)
 	ewdata_t *ew_data = (ewdata_t *)lp;
 	COPYDATASTRUCT *cds;
 	if (IsUnicharSupport(hWnd)) {
-		// Unicode�ɑΉ� Tera Term 5�n
+		// Unicodeに対応 Tera Term 5系
 		if (ew_data->multicast) {
 			if (ew_data->csdW == NULL) {
 				ew_data->csdW = BuildMuitlcastCDS(ew_data->nameW ,ew_data->strW);
@@ -104,7 +104,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd , LPARAM lp)
 		cds = ew_data->csdW;
 	}
 	else {
-		// Unicode�ɔ�Ή� Tera Term 5�ȑO
+		// Unicodeに非対応 Tera Term 5以前
 		if (ew_data->multicast) {
 			if (ew_data->csdA == NULL) {
 				ew_data->nameA = ToCharW(ew_data->nameW);

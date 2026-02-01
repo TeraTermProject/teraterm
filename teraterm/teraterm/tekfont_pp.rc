@@ -1,0 +1,102 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "tekfont_pp_res.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <winresrc.h>
+#define IDC_STATIC -1
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 (日本) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "tekfont_pp_res.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include <winresrc.h>\r\n"
+    "#define IDC_STATIC -1\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TABSHEET_TEKFONT DIALOGEX 0, 0, 302, 126
+STYLE DS_SETFONT | WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "Property Page"
+FONT 9, "MS UI Gothic", 400, 0, 0x0
+BEGIN
+    LTEXT           "TEK Font",IDC_DLGFONT,6,5,101,9
+    EDITTEXT        IDC_DLGFONT_EDIT,17,22,130,13,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "&Select...",IDC_DLGFONT_CHOOSE,155,21,44,15
+    CONTROL         "List p&roportional fonts in font dialog",IDC_LIST_PRO_FONTS_DLG,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,44,210,11
+    CONTROL         "List &hidden fonts in font dialog",IDC_LIST_HIDDEN_FONTS_DLG,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,61,205,11
+    LTEXT           "Open Font Settings/Font Folder (%s)",IDC_FONT_FOLDER,17,79,280,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_TABSHEET_TEKFONT, DIALOG
+    BEGIN
+        RIGHTMARGIN, 297
+        VERTGUIDE, 6
+        VERTGUIDE, 17
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 120
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

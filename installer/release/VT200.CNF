@@ -172,20 +172,26 @@ LocalEcho=off
 ; ScrollLock
 ScrollLock=70
 
+[User keys]
 ;Example of user key definitions.
-;[User keys]
-;	Ctrl + F1 key: character string
+;
+; Ctrl + F1 key: character string
 ;User1=1083,0,telnet myhost
 ;
-;	Ctrl + F2 key: control characters
+; Ctrl + F2 key: control characters
 ;User2=1084,0,$0D$0A
 ;
-;	Ctrl + F3 key: CR character with new-line code conversion (CR -> CR/CR+LF)
+; Ctrl + F3 key: CR character with new-line code conversion (CR -> CR/CR+LF)
 ;User3=1085,1,$0D
 ;
-;	Ctrl + F4 key: Executing a macro file
+; Ctrl + F4 key: Executing a macro file
 ;User4=1086,2,test.ttl
 ;
-;	Ctrl + F5 key: Executing a menu command
+; Ctrl + F5 key: Executing a menu command
 ;User5=1087,3,50110
-[User keys]
+;
+; Control + 1: Increase font size (When using the TTXChangeFontSize plug-in)
+;User1=1026,3,58151
+;
+; Control + 2: Decrease font size (When using the TTXChangeFontSize plug-in)
+;User2=1027,3,58152

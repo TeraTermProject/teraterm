@@ -37,7 +37,7 @@
 extern "C" {
 #endif
 
-void ParseParam(PBOOL IOption, PBOOL VOption);
+void ParseParam(void);
 BOOL GetFileName(HWND HWin, wchar_t **fname);
 void SetDlgPos(int x, int y, int position, int offset_x, int offset_y);
 int SetDlgPosEX(HWND hWnd, int width, int height, int *PosX, int *PosY);
@@ -58,6 +58,8 @@ extern wchar_t ShortName[MAX_PATH];
 extern wchar_t **Params;
 extern int ParamCnt;
 extern BOOL SleepFlag;
+extern BOOL IOption;
+extern BOOL VOption;
 extern DPI_AWARENESS_CONTEXT DPIAware;
 
 #ifdef __cplusplus

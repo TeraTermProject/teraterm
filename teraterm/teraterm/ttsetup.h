@@ -36,8 +36,8 @@
 extern "C" {
 #endif
 
-// ReadKeyboardCnf ‚Ìˆø”‚ÌŒ^
-// ÀÛ‚ÌŒ^‚Í tttypes_key.h ‚ğ include
+// ReadKeyboardCnf ã®å¼•æ•°ã®å‹
+// å®Ÿéš›ã®å‹ã¯ tttypes_key.h ã‚’ include
 typedef struct TKeyMap_st *PKeyMap;
 
 //typedef void (PASCAL *PReadIniFile)(PCHAR FName, PTTSet ts);

@@ -27,7 +27,7 @@
  */
 
 /*
- *	common contol ‚Ì TOOLTIPS_CLASS ‚ðŽg—p‚µ‚½ƒc[ƒ‹ƒ`ƒbƒv
+ *	common contol ã® TOOLTIPS_CLASS ã‚’ä½¿ç”¨ã—ãŸãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—
  */
 #include <windows.h>
 #include <commctrl.h>
@@ -42,7 +42,7 @@
 typedef struct tagTipWinData {
 	HWND hDlg;
 	HWND hTip;
-	int EdittextId = -1; // EDITTEXT‚Ìƒc[ƒ‹ƒ`ƒbƒvÁ‹Ž—p
+	int EdittextId = -1; // EDITTEXTã®ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—æ¶ˆåŽ»ç”¨
 } TipWin2;
 
 TipWin2 *TipWin2Create(HINSTANCE hInstance, HWND hDlg)
@@ -61,7 +61,7 @@ TipWin2 *TipWin2Create(HINSTANCE hInstance, HWND hDlg)
 	if (hTip == NULL) {
 		return NULL;
 	}
-	//SendMessageW(hTip, TTM_SETMAXTIPWIDTH, 0, INT_MAX);	// OS‚É‚æ‚Á‚Äˆá‚¤?
+	//SendMessageW(hTip, TTM_SETMAXTIPWIDTH, 0, INT_MAX);	// OSã«ã‚ˆã£ã¦é•ã†?
 	SendMessageW(hTip, TTM_SETMAXTIPWIDTH, 0, 200);
 
 	TipWin2 *tWin = (TipWin2 *)calloc(1, sizeof(TipWin2));
@@ -89,30 +89,30 @@ void TipWin2Destroy(TipWin2 *tWin)
 }
 
 /**
- * @brief	ƒc[ƒ‹ƒ`ƒbƒv‚ð“o˜^‚·‚é
+ * @brief	ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚’ç™»éŒ²ã™ã‚‹
  * @param	tWin
- * @param	id ƒ_ƒCƒAƒƒO‚ÌƒRƒ“ƒgƒ[ƒ‹ID
- * @param	text ƒc[ƒ‹ƒ`ƒbƒv
- *			NULL‚Ì‚Æ‚«“o˜^íœ
+ * @param	id ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ID
+ * @param	text ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—
+ *			NULLã®ã¨ãç™»éŒ²å‰Šé™¤
  */
 void TipWin2SetTextW(TipWin2 *tWin, int id, const wchar_t *text)
 {
 	TOOLINFOW toolInfo = {};
 	toolInfo.cbSize = sizeof(toolInfo);
 	toolInfo.hwnd = tWin->hDlg;
-	toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;	// TTF_IDISHWND ‚ª‚ ‚ê‚Îrect‚ÍŽQÆ‚³‚ê‚È‚¢
+	toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;	// TTF_IDISHWND ãŒã‚ã‚Œã°rectã¯å‚ç…§ã•ã‚Œãªã„
 	toolInfo.uId = (UINT_PTR)GetDlgItem(tWin->hDlg, id);
-	toolInfo.lpszText = (LPWSTR)text;	// text ‚Í SendMessage() Žž‚É‘¶Ý‚·‚ê‚Î—Ç‚¢
+	toolInfo.lpszText = (LPWSTR)text;	// text ã¯ SendMessage() æ™‚ã«å­˜åœ¨ã™ã‚Œã°è‰¯ã„
 	SendMessageW(tWin->hTip, TTM_ADDTOOLW, 0, (LPARAM)&toolInfo);
 }
 
 /**
- * @brief ƒc[ƒ‹ƒ`ƒbƒv‚ðíœ‚·‚é
+ * @brief ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚’å‰Šé™¤ã™ã‚‹
  * @param tWin
- * @param id ƒ_ƒCƒAƒƒO‚ÌƒRƒ“ƒgƒ[ƒ‹ID
+ * @param id ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ID
  *
- *	íœ‚Å‚«‚È‚¢‚±‚Æ‚ª‚ ‚é?
- *	TipWin2SetTextW() ‚Ì text = NULL ‚ðŽg—p‚µ‚½‚Ù‚¤‚ª‚æ‚³‚»‚¤
+ *	å‰Šé™¤ã§ããªã„ã“ã¨ãŒã‚ã‚‹?
+ *	TipWin2SetTextW() ã® text = NULL ã‚’ä½¿ç”¨ã—ãŸã»ã†ãŒã‚ˆã•ãã†
  */
 void TipWin2Delete(TipWin2 *tWin, int id)
 {
@@ -125,10 +125,10 @@ void TipWin2Delete(TipWin2 *tWin, int id)
 }
 
 /**
- * @brief ƒc[ƒ‹ƒ`ƒbƒv‚ð—LŒø/–³Œø‰»‚·‚é
+ * @brief ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚’æœ‰åŠ¹/ç„¡åŠ¹åŒ–ã™ã‚‹
  * @param tWin
  *
- *	“Á’è‚ÌƒRƒ“ƒgƒ[ƒ‹‚ÉÝ’è‚·‚é‚±‚Æ‚Í‚Å‚«‚È‚¢
+ *	ç‰¹å®šã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã«è¨­å®šã™ã‚‹ã“ã¨ã¯ã§ããªã„
  */
 void TipWin2Activate(TipWin2 *tWin, BOOL active)
 {
@@ -136,9 +136,9 @@ void TipWin2Activate(TipWin2 *tWin, BOOL active)
 }
 
 /**
- * @brief	ƒc[ƒ‹ƒ`ƒbƒv‚ÌÀ•W‚ðƒfƒBƒXƒvƒŒƒC‚©‚ç‚Í‚Ýo‚³‚È‚¢‚æ‚¤‚¸‚ç‚·
+ * @brief	ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã®åº§æ¨™ã‚’ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã‹ã‚‰ã¯ã¿å‡ºã•ãªã„ã‚ˆã†ãšã‚‰ã™
  * @param	tWin
- * @param	point ƒc[ƒ‹ƒ`ƒbƒv¶ã‹÷‚ÌÀ•W (in, out)
+ * @param	point ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—å·¦ä¸Šéš…ã®åº§æ¨™ (in, out)
  */
 void TipWin2MovePointToDisplay(const TipWin2 *tWin, POINT *point)
 {
@@ -170,9 +170,9 @@ void TipWin2MovePointToDisplay(const TipWin2 *tWin, POINT *point)
 }
 
 /**
- * @brief	EDITTEXT‚Ì“ü—Í§ŒÀ—p‚Ìƒc[ƒ‹ƒ`ƒbƒv‚ÌÁ‹Ž—pƒ^ƒCƒ}[
- * @param	hTip ƒc[ƒ‹ƒ`ƒbƒv‚ÌƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹
- * @param	id EDITTEXT‚ÌƒRƒ“ƒgƒ[ƒ‹ID
+ * @brief	EDITTEXTã®å…¥åŠ›åˆ¶é™ç”¨ã®ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã®æ¶ˆåŽ»ç”¨ã‚¿ã‚¤ãƒžãƒ¼
+ * @param	hTip ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+ * @param	id EDITTEXTã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ID
  */
 static void CALLBACK TipWin2HideEdittextErrMsgProc(const HWND hTip, const UINT /*uMsg*/, const UINT_PTR id, const DWORD /*dwTime*/) // uMsg,dwTime is unused
 {
@@ -185,17 +185,17 @@ static void CALLBACK TipWin2HideEdittextErrMsgProc(const HWND hTip, const UINT /
 }
 
 /**
- * @brief	EDITTEXT‚É“ü—Í§ŒÀ—p‚Ìƒc[ƒ‹ƒ`ƒbƒv‚ð•\Ž¦‚·‚é(ES_NUMBER‘Š“–)
+ * @brief	EDITTEXTã«å…¥åŠ›åˆ¶é™ç”¨ã®ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚’è¡¨ç¤ºã™ã‚‹(ES_NUMBERç›¸å½“)
  * @param	tWin
- * @param	hEdit EDITTEXT‚ÌƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹
- * @param	id EDITTEXT‚ÌƒRƒ“ƒgƒ[ƒ‹ID
- * @param	icon ƒc[ƒ‹ƒ`ƒbƒv‚ÌƒAƒCƒRƒ“
- * @param	title ƒc[ƒ‹ƒ`ƒbƒv‚Ìƒ^ƒCƒgƒ‹
- * @param	text ƒc[ƒ‹ƒ`ƒbƒv‚ÌƒƒbƒZ[ƒW
+ * @param	hEdit EDITTEXTã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+ * @param	id EDITTEXTã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ID
+ * @param	icon ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã®ã‚¢ã‚¤ã‚³ãƒ³
+ * @param	title ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã®ã‚¿ã‚¤ãƒˆãƒ«
+ * @param	text ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
  */
 void TipWin2ShowEdittextErrMsgW(TipWin2 *tWin, const HWND hEdit, const int id, const int icon, const wchar_t *title, const wchar_t *text)
 {
-	// ƒc[ƒ‹ƒ`ƒbƒv‚ÌƒAƒCƒRƒ“Aƒ^ƒCƒgƒ‹AƒƒbƒZ[ƒW‚ðÝ’è
+	// ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã®ã‚¢ã‚¤ã‚³ãƒ³ã€ã‚¿ã‚¤ãƒˆãƒ«ã€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¨­å®š
 	SendMessage(tWin->hTip, TTM_SETTITLEW, icon, (LPARAM)title);
 	TOOLINFOW toolInfo = {};
 	toolInfo.cbSize = sizeof(toolInfo);
@@ -205,7 +205,7 @@ void TipWin2ShowEdittextErrMsgW(TipWin2 *tWin, const HWND hEdit, const int id, c
 	toolInfo.lpszText = (LPWSTR)text;
 	SendMessageW(tWin->hTip, TTM_ADDTOOLW, 0, (LPARAM)&toolInfo);
 
-	// ƒc[ƒ‹ƒ`ƒbƒv‚ÌˆÊ’u‚ðŒvŽZ
+	// ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã®ä½ç½®ã‚’è¨ˆç®—
 	RECT rect;
 	POINT point;
 	SendMessage(hEdit, EM_GETRECT, 0, (LPARAM)(&rect));
@@ -220,16 +220,16 @@ void TipWin2ShowEdittextErrMsgW(TipWin2 *tWin, const HWND hEdit, const int id, c
 	}
 	ClientToScreen(hEdit, &point);
 
-	// ƒc[ƒ‹ƒ`ƒbƒv‚ð—LŒø‰»
+	// ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚’æœ‰åŠ¹åŒ–
 	SendMessageW(tWin->hTip, TTM_TRACKACTIVATE, TRUE, (LPARAM)&toolInfo);
 
-	// ƒc[ƒ‹ƒ`ƒbƒv‚ªƒfƒBƒXƒvƒŒƒC‚©‚ç‚Í‚Ýo‚³‚È‚¢À•W‚ðŽæ“¾
+	// ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ãŒãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã‹ã‚‰ã¯ã¿å‡ºã•ãªã„åº§æ¨™ã‚’å–å¾—
 	TipWin2MovePointToDisplay(tWin, &point);
 
-	// ƒc[ƒ‹ƒ`ƒbƒv‚ð•\Ž¦
+	// ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã‚’è¡¨ç¤º
 	SendMessageW(tWin->hTip, TTM_TRACKPOSITION, 0, (LPARAM)MAKELONG(point.x, point.y));
 
-	// ƒc[ƒ‹ƒ`ƒbƒvÁ‹Ž—p‚Ìƒ^ƒCƒ}[‚ðÝ’è
+	// ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—æ¶ˆåŽ»ç”¨ã®ã‚¿ã‚¤ãƒžãƒ¼ã‚’è¨­å®š
 	if (tWin->EdittextId != -1) {
 		KillTimer(tWin->hTip, tWin->EdittextId);
 	}

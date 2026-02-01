@@ -30,20 +30,20 @@
 #include "ddelib.h"
 
 /**
- *	DDE—p ƒoƒCƒiƒŠƒGƒ“ƒR[ƒh
- *	DDE’ÊM‚Å‚«‚é‚æ‚¤ƒoƒCƒiƒŠ‚ğƒGƒXƒP[ƒv‚³‚ê‚½ƒoƒCƒiƒŠ‚ÉƒGƒ“ƒR[ƒh‚·‚é
+ *	DDEç”¨ ãƒã‚¤ãƒŠãƒªã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰
+ *	DDEé€šä¿¡ã§ãã‚‹ã‚ˆã†ãƒã‚¤ãƒŠãƒªã‚’ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—ã•ã‚ŒãŸãƒã‚¤ãƒŠãƒªã«ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ã™ã‚‹
  *
  *	0x00 -> 0x01 + 0x01
  *	0x01 -> 0x01 + 0x02
  *
- *	@param[in]	src			“ü—ÍƒoƒCƒiƒŠ ptr
- *	@param[in]	sec_len		“ü—ÍƒoƒCƒiƒŠ’·
- *	@param[out]	dest_len	o—ÍƒoƒCƒiƒŠ(ƒGƒ“ƒR[ƒhÏ‚İ)’·
- *	@return					o—ÍƒoƒCƒiƒŠ(ƒGƒ“ƒR[ƒhÏ‚İ)ptr,•s—v‚É‚È‚Á‚½‚çfree()‚·‚é
+ *	@param[in]	src			å…¥åŠ›ãƒã‚¤ãƒŠãƒª ptr
+ *	@param[in]	sec_len		å…¥åŠ›ãƒã‚¤ãƒŠãƒªé•·
+ *	@param[out]	dest_len	å‡ºåŠ›ãƒã‚¤ãƒŠãƒª(ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰æ¸ˆã¿)é•·
+ *	@return					å‡ºåŠ›ãƒã‚¤ãƒŠãƒª(ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰æ¸ˆã¿)ptr,ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹
  */
 uint8_t *EncodeDDEBinary(const uint8_t *src, size_t src_len, size_t *dest_len)
 {
-	uint8_t *d = (uint8_t *)malloc(src_len * 2);	// Å‘å2”{‚Ìƒf[ƒ^’·
+	uint8_t *d = (uint8_t *)malloc(src_len * 2);	// æœ€å¤§2å€ã®ãƒ‡ãƒ¼ã‚¿é•·
 	if (d == NULL) {
 		*dest_len = 0;
 		return NULL;
@@ -68,15 +68,15 @@ uint8_t *EncodeDDEBinary(const uint8_t *src, size_t src_len, size_t *dest_len)
 }
 
 /**
- *	DDE—p ƒoƒCƒiƒŠƒfƒR[ƒh
- *	DDE’ÊM‚Å‚«‚é‚æ‚¤ƒGƒXƒP[ƒv‚³‚ê‚½ƒoƒCƒiƒŠ‚ğƒfƒR[ƒh‚·‚é
+ *	DDEç”¨ ãƒã‚¤ãƒŠãƒªãƒ‡ã‚³ãƒ¼ãƒ‰
+ *	DDEé€šä¿¡ã§ãã‚‹ã‚ˆã†ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—ã•ã‚ŒãŸãƒã‚¤ãƒŠãƒªã‚’ãƒ‡ã‚³ãƒ¼ãƒ‰ã™ã‚‹
  *
  *	0x01 + (x+1) -> x
  *
- *	@param[in]	src			“ü—ÍƒoƒCƒiƒŠ ptr
- *	@param[in]	sec_len		“ü—ÍƒoƒCƒiƒŠ’·
- *	@param[out]	dest_len	o—ÍƒoƒCƒiƒŠ(ƒfƒR[ƒhÏ‚İ)’·
- *	@return					o—ÍƒoƒCƒiƒŠ(ƒfƒR[ƒhÏ‚İ)ptr,•s—v‚É‚È‚Á‚½‚çfree()‚·‚é
+ *	@param[in]	src			å…¥åŠ›ãƒã‚¤ãƒŠãƒª ptr
+ *	@param[in]	sec_len		å…¥åŠ›ãƒã‚¤ãƒŠãƒªé•·
+ *	@param[out]	dest_len	å‡ºåŠ›ãƒã‚¤ãƒŠãƒª(ãƒ‡ã‚³ãƒ¼ãƒ‰æ¸ˆã¿)é•·
+ *	@return					å‡ºåŠ›ãƒã‚¤ãƒŠãƒª(ãƒ‡ã‚³ãƒ¼ãƒ‰æ¸ˆã¿)ptr,ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹
  */
 uint8_t *DecodeDDEBinary(const uint8_t *src, size_t src_len, size_t *dest_len)
 {

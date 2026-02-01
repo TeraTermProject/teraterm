@@ -35,8 +35,8 @@ See LICENSE.TXT for the license.
 #ifndef __FWD_H
 #define __FWD_H
 
-// ѓ|Ѓ[ѓg“]‘—‚Й‚Ё‚Ї‚йѓtѓЌЃ[ђ§Њд‚Ми‡’l
-// “K—pђж Channel_t.bufchain_amount
+// гѓќгѓјгѓ€и»ўйЂЃгЃ«гЃЉгЃ‘г‚‹гѓ•гѓ­гѓје€¶еѕЎгЃ®й–ѕеЂ¤
+// йЃ©з”Ёе…€ Channel_t.bufchain_amount
 #define FWD_HIGH_WATER_MARK (1 * 1024 * 1024)  // 1MB
 #define FWD_LOW_WATER_MARK (0)  // 0MB
 
@@ -86,7 +86,7 @@ typedef enum {
 	FWD_NONE,
 	FWD_LOCAL_TO_REMOTE,
 	FWD_LOCAL_DYNAMIC,
-	FWD_LISTENING_LOCAL, // ”дЉr—p‚Мѓ_ѓ~Ѓ[ЃBѓЌЃ[ѓJѓ‹‚Е listen ‚·‚й‚М‚Н‚±‚к‚ж‚иЏг‚Й‚·‚й
+	FWD_LISTENING_LOCAL, // жЇ”ијѓз”ЁгЃ®гѓЂгѓџгѓјгЂ‚гѓ­гѓјг‚«гѓ«гЃ§ listen гЃ™г‚‹гЃ®гЃЇгЃ“г‚Њг‚€г‚ЉдёЉгЃ«гЃ™г‚‹
 	FWD_REMOTE_TO_LOCAL,
 	FWD_REMOTE_X11_TO_LOCAL
 } FWDType;

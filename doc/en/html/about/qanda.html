@@ -51,7 +51,7 @@ No problem. Need not announce to us. Tera Term has been distributed under the <a
 <p>
 <span class="qanda">Q.</span> EAR (Export Administration Regulations)<br>
 <span class="qanda">A.</span>
-Tera Term includes modules made in the USA. As such, it may be subject to U.S. export control laws known as ECCN-5D002, cryptograhic software. Downloading it outside of Japan will be considered as re-export because the laws applies to re-exports.<br>
+Tera Term includes modules made in the USA. As such, it may be subject to U.S. export control laws known as ECCN-5D002, cryptographic software. Downloading it outside of Japan will be considered as re-export because the laws applies to re-exports.<br>
 Tera Term distributed on TeraTerm Project has been already finished the following.
 <ul>
     <li>A user is able to get the software without restrictions.</li>
@@ -75,7 +75,7 @@ For more information, see the project wiki page "<a href="https://github.com/Ter
 </ul>
 
 <p>
-Please read message and confirm followings:
+Please read message and confirm following:
 </p>
 
 <dl>
@@ -229,43 +229,50 @@ When "Tera Special" font is used to display Box-drwing characters, the font is s
 <p id="logfile_garbled">
   <span class="qanda">Q.</span> Content of log file is not same as displayed in VTWindow. Character that is not able to displayed is outputted.<br>
   <span class="qanda">A.</span> VTWindow displays result of received data which is parsed by control sequence. On the other hand, log file is a record of received data.<br>
-  Therefore "content of log file" is not become same as "displayed content in VTWindow." It is similar that "HTML file" and "result of rendering by web browser" is different.
-<pre>
+  Therefore "content of log file" is not become same as "displayed content in VTWindow." It is similar to the difference between opening a Word document in Word and opening it in a text editor.
+
+<div>
 Example:
+</div>
+
 keyboard input
-- type `l'
-- type `s'
-- type BS
-- type ` '(SPACE)
-- type BS
-- type `s'
-- type ENTER
+<div style="border: 1px solid #666666; color:#000000; background-color:#ffffff; padding:0.2ex;">
+type `l'<br>
+type `s'<br>
+type ENTER
+</div>
 
 display to VTWindow
-```
-ls
-CMakeLists.txt  Makefile  README-j     cygterm.cpp  cygterm_cfg.cpp  sub.cpp
-COPYING         README    cygterm.cfg  cygterm.ico  cygterm_cfg.h    sub.h
-sf-usr-shell:~/cygterm+$ 
-```
+<div style="border: 1px solid #666666; color:#ffffff; background-color:#333333; padding:0.2ex;">
+ls<br>
+<span style="color:#00ff00;">256colors2.pl</span>&nbsp;&nbsp;<span style="color:#00ff00;">ansi.sh</span>&nbsp;&nbsp;<span style="color:#00ff00;">bcetest.sh</span>&nbsp;&nbsp;<span style="color:#00ff00;">color-sgr-decscnm.pl</span>&nbsp;&nbsp;<span style="color:#00ff00;">colortable16.sh</span>&nbsp;&nbsp;<span style="color:#8080ff;">data</span><br>
+% 
+</div>
 
-Text log (BS from keyboard input is not displayed, but SPACE is displayed. TAB is displayed as it is.)
-```
-ls s
-CMakeLists.txt	Makefile  README-j     cygterm.cpp  cygterm_cfg.cpp  sub.cpp
-COPYING		README	  cygterm.cfg  cygterm.ico  cygterm_cfg.h    sub.h
-sf-usr-shell:~/cygterm+$ 
+Text log
+<div style="border: 1px solid #666666; color:#000000; background-color:#ffffff; padding:0.2ex;">
+lls<br>
 
-Binary log (All keyboard input is displayed. TAB is displayed as it is.)
-```
-ls s
-CMakeLists.txt	Makefile  README-j     cygterm.cpp  cygterm_cfg.cpp  sub.cpp
-COPYING		README	  cygterm.cfg  cygterm.ico  cygterm_cfg.h    sub.h
-sf-usr-shell:~/cygterm+$ 
-```
-</pre>
+256colors2.pl&nbsp;&nbsp;ansi.sh&nbsp;&nbsp;bcetest.sh&nbsp;&nbsp;color-sgr-decscnm.pl&nbsp;&nbsp;colortable16.sh&nbsp;&nbsp;data<br>
+%
+</div>
+
+Binary log
+<div style="border: 1px solid #666666; color:#000000; background-color:#ffffff; padding:0.2ex;">
+l<img src="./image/icon-BS.png" style="width:0.8em; height:1em;">ls<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[?2004l<br>
+<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[0m<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[01;32m256colors2.pl<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[0m&nbsp;&nbsp;<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[01;32mansi.sh<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[0m&nbsp;&nbsp;<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[01;32mbcetest.sh<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[0m&nbsp;&nbsp;<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[01;32mcolor-sgr-decscnm.pl<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[0m&nbsp;&nbsp;<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[01;32mcolortable16.sh<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[0m&nbsp;&nbsp;<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[01;34mdata<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[0m<br>
+<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[0m<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[27m<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[24m<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[J% <img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[K<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[?2004h
+</div>
+
 </p>
 
+<p id="selected_highlight">
+<span class="qanda">Q.</span> I selected a range, but it isn't highlighted. The color doesn't change.<br>
+<span class="qanda">A.</span>
+In the <a href="../menu/setup-additional-window.html">Window</a>, select "Reverse" for Attribute and click the "Swap colors" button.<br>
+This occurs because the Normal attribute and Reverse attribute have the same color settings. When text with the Normal attribute is selected, <a href="./emulations.html#reverse">the colors of the Reverse attribute are applied</a>.<br>
+The "Swap colors" button swaps the text and background colors of only the currently active character attribute. If you swap the Normal attribute colors, the Reverse attribute colors remain unchanged.
+</p>
 
 <h2>[About Tera Term 5]</h2>
 
@@ -280,7 +287,7 @@ Tera Term 4 using the ANSI(not Unicode) API can also read/write
 Unicode ini files because the OS converts the character encoding.
 
 But, if the characters cannot be converted in ANSI/Unicode,
-characters will be breaked.
+characters will be broken.
 
 And, Windows 9x does not have a character code conversion function in API,
 Unicode version ini files cannot be used.

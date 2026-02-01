@@ -45,8 +45,8 @@
 #define ENCRYPT2_SALTLEN		16
 #define ENCRYPT2_CIPHER			EVP_aes_256_ctr()
 #define ENCRYPT2_DIGEST			EVP_sha512()
-#define ENCRYPT2_ITER1			1001	// ƒpƒXƒ[ƒhˆÈŠO
-#define ENCRYPT2_ITER2			210001	// ƒpƒXƒ[ƒh—p (Ql https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2)
+#define ENCRYPT2_ITER1			1001	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ä»¥å¤–
+#define ENCRYPT2_ITER2			210001	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ç”¨ (å‚è€ƒ https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2)
 #define ENCRYPT2_IKLEN			32
 #define ENCRYPT2_IVLEN			16
 #define ENCRYPT2_TAG			"\000\002"
@@ -54,23 +54,23 @@
 #define ENCRYPT2_ENCRYPT		TRUE
 #define ENCRYPT2_DECRYPT		FALSE
 
-// Encrypt2 ƒpƒXƒ[ƒhƒvƒƒtƒ@ƒCƒ‹
-typedef struct {									//	   Œv 381ƒoƒCƒg(base64ƒGƒ“ƒR[ƒhŒã‚Í508ƒoƒCƒg + \r\n)
-	unsigned char Tag[2];							// •½•¶		2 Encrypt2¯•Êƒ^ƒO (ENCRYPT2_TAG)
-	unsigned char KeySalt[ENCRYPT2_SALTLEN];		// •½•¶	   16 RAND_bytes()
-	unsigned char KeyHash[SHA512_DIGEST_LENGTH];	// •½•¶	   64 PBKDF2(KeyStr)
-	unsigned char PassSalt[ENCRYPT2_SALTLEN];		// •½•¶	   16 RAND_bytes()
-	unsigned char PassStr[ENCRYPT2_PWD_MAX_LEN];	// ˆÃ†•¶ 203 EVP_aes_256_ctr()
-	unsigned char EncSalt[ENCRYPT2_SALTLEN];		// ˆÃ†•¶  16 RAND_bytes()
-	unsigned char EncHash[SHA512_DIGEST_LENGTH];	// ˆÃ†•¶  64 HMAC512(Tag ` EncSalt)
+// Encrypt2 ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«
+typedef struct {									//	   è¨ˆ 381ãƒã‚¤ãƒˆ(base64ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰å¾Œã¯508ãƒã‚¤ãƒˆ + \r\n)
+	unsigned char Tag[2];							// å¹³æ–‡		2 Encrypt2è­˜åˆ¥ã‚¿ã‚° (ENCRYPT2_TAG)
+	unsigned char KeySalt[ENCRYPT2_SALTLEN];		// å¹³æ–‡	   16 RAND_bytes()
+	unsigned char KeyHash[SHA512_DIGEST_LENGTH];	// å¹³æ–‡	   64 PBKDF2(KeyStr)
+	unsigned char PassSalt[ENCRYPT2_SALTLEN];		// å¹³æ–‡	   16 RAND_bytes()
+	unsigned char PassStr[ENCRYPT2_PWD_MAX_LEN];	// æš—å·æ–‡ 203 EVP_aes_256_ctr()
+	unsigned char EncSalt[ENCRYPT2_SALTLEN];		// æš—å·æ–‡  16 RAND_bytes()
+	unsigned char EncHash[SHA512_DIGEST_LENGTH];	// æš—å·æ–‡  64 HMAC512(Tag ã€œ EncSalt)
 } Encrypt2Profile, *Encrypt2ProfileP;
 
-#define ENCRYPT2_PROFILE_LEN	sizeof(Encrypt2Profile)				// 381 ƒoƒCƒg
-#define ENCRYPT2_BASE64_LEN		sizeof(Encrypt2Profile) / 3 * 4		// 508 ƒoƒCƒg
+#define ENCRYPT2_PROFILE_LEN	sizeof(Encrypt2Profile)				// 381 ãƒã‚¤ãƒˆ
+#define ENCRYPT2_BASE64_LEN		sizeof(Encrypt2Profile) / 3 * 4		// 508 ãƒã‚¤ãƒˆ
 #define ENCRYPT2_MaxLineLen		512
 
-// ƒpƒXƒ[ƒhƒtƒ@ƒCƒ‹ 1s“Ç‚İo‚µ
-// •œ‹A’l -1:ƒGƒ‰[An:“Ç‚İ‚İƒoƒCƒg”
+// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ« 1è¡Œèª­ã¿å‡ºã—
+// å¾©å¸°å€¤ -1:ã‚¨ãƒ©ãƒ¼ã€n:èª­ã¿è¾¼ã¿ãƒã‚¤ãƒˆæ•°
 static int PwdFileReadln(HANDLE FH, unsigned char *lpBuffer, UINT uBytes)
 {
 	DWORD Count;
@@ -120,7 +120,7 @@ static int PwdFileReadln(HANDLE FH, unsigned char *lpBuffer, UINT uBytes)
 	return Rnum;
 }
 
-// ƒpƒXƒ[ƒhƒtƒ@ƒCƒ‹ s’Ç‰Á
+// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ« è¡Œè¿½åŠ 
 static int Encrypt2ProfileAdd(HANDLE FH, Encrypt2ProfileP Profile)
 {
 	DWORD NumberOfBytesWritten;
@@ -142,9 +142,9 @@ static int Encrypt2ProfileAdd(HANDLE FH, Encrypt2ProfileP Profile)
 	return 1;
 }
 
-// ƒpƒXƒ[ƒhƒtƒ@ƒCƒ‹‚©‚çKeyStr(ƒpƒXƒ[ƒh¯•Êq)‚Éƒ}ƒbƒ`‚·‚és‚ğŒŸõ‚·‚é
-// •œ‹A’l  0:ƒ}ƒbƒ`‚·‚és–³‚µA1:ƒ}ƒbƒ`‚·‚és—L‚è
-// Profile‚Éƒ}ƒbƒ`‚µ‚½s‚ÌEncrypt2Profile‚ªİ’è‚³‚ê‚é
+// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰KeyStr(ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰è­˜åˆ¥å­)ã«ãƒãƒƒãƒã™ã‚‹è¡Œã‚’æ¤œç´¢ã™ã‚‹
+// å¾©å¸°å€¤  0:ãƒãƒƒãƒã™ã‚‹è¡Œç„¡ã—ã€1:ãƒãƒƒãƒã™ã‚‹è¡Œæœ‰ã‚Š
+// Profileã«ãƒãƒƒãƒã—ãŸè¡Œã®Encrypt2ProfileãŒè¨­å®šã•ã‚Œã‚‹
 #if defined(_MSC_VER)
 #pragma optimize("", off)
 #elif defined(__clang__)
@@ -176,7 +176,7 @@ static int Encrypt2ProfileSearch (HANDLE FH, const char *KeyStr, Encrypt2Profile
 			CRYPTO_memcmp(Lprofile.Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1) != 0) {
 			continue;
 		}
-		// KeyStr‚Ìhash‚ªˆê’v‚·‚é‚©Šm”F
+		// KeyStrã®hashãŒä¸€è‡´ã™ã‚‹ã‹ç¢ºèª
 		if (PKCS5_PBKDF2_HMAC(KeyStr, strlen(KeyStr),
 							  (const unsigned char *)&(Lprofile.KeySalt), ENCRYPT2_SALTLEN,
 							  ENCRYPT2_ITER1, (EVP_MD *)ENCRYPT2_DIGEST,
@@ -190,7 +190,7 @@ static int Encrypt2ProfileSearch (HANDLE FH, const char *KeyStr, Encrypt2Profile
 				break;
 			}
 			Ret = 1;
-			// ƒ}ƒbƒ`‚·‚és‚ªŒ©‚Â‚©‚Á‚Ä‚àbreak‚µ‚È‚¢(ƒTƒCƒhƒ`ƒƒƒlƒ‹UŒ‚‘Îô)
+			// ãƒãƒƒãƒã™ã‚‹è¡ŒãŒè¦‹ã¤ã‹ã£ã¦ã‚‚breakã—ãªã„(ã‚µã‚¤ãƒ‰ãƒãƒ£ãƒãƒ«æ”»æ’ƒå¯¾ç­–)
 		} else {
 			memcpy(&DummyProfile, &Lprofile, ENCRYPT2_PROFILE_LEN);
 			if ((Dpos = SetFilePointer(FH, 0, NULL, FILE_CURRENT)) == INVALID_SET_FILE_POINTER) {
@@ -221,7 +221,7 @@ static int Encrypt2ProfileSearch (HANDLE FH, const char *KeyStr, Encrypt2Profile
 #pragma GCC pop_options
 #endif
 
-// ƒpƒXƒ[ƒhƒtƒ@ƒCƒ‹ sXV
+// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ« è¡Œæ›´æ–°
 static int Encrypt2ProfileUpdate(HANDLE FH, const char *KeyStr, Encrypt2ProfileP Profile)
 {
 	Encrypt2Profile OldProfile;
@@ -245,7 +245,7 @@ static int Encrypt2ProfileUpdate(HANDLE FH, const char *KeyStr, Encrypt2ProfileP
 	return 1;
 }
 
-// ƒpƒXƒ[ƒhƒtƒ@ƒCƒ‹ síœ
+// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ« è¡Œå‰Šé™¤
 static int Encrypt2ProfileDelete(HANDLE FH, const char *KeyStr)
 {
 	Encrypt2Profile OldProfile;
@@ -275,7 +275,7 @@ static int Encrypt2ProfileDelete(HANDLE FH, const char *KeyStr)
 	return 1;
 }
 
-// Encrypt2 ˆÃ†‰»/•œ†ˆ—
+// Encrypt2 æš—å·åŒ–/å¾©å·å‡¦ç†
 static int Encrypt2EncDec(char *PassStr, const char *EncryptStr, Encrypt2ProfileP profile, int encrypt)
 {
 	unsigned char TmpKeyIV[EVP_MAX_KEY_LENGTH + EVP_MAX_IV_LENGTH];
@@ -295,7 +295,7 @@ static int Encrypt2EncDec(char *PassStr, const char *EncryptStr, Encrypt2Profile
 		}
 	}
 
-	// Œ®“±o
+	// éµå°å‡º
 	if (PKCS5_PBKDF2_HMAC(EncryptStr, strlen(EncryptStr),
 						  (const unsigned char *)&(profile->PassSalt), ENCRYPT2_SALTLEN,
 						  ENCRYPT2_ITER2, (EVP_MD *)ENCRYPT2_DIGEST,
@@ -305,7 +305,7 @@ static int Encrypt2EncDec(char *PassStr, const char *EncryptStr, Encrypt2Profile
 	memcpy(Key, TmpKeyIV, ENCRYPT2_IKLEN);
 	memcpy(IV, TmpKeyIV + ENCRYPT2_IKLEN, ENCRYPT2_IVLEN);
 
-	// €”õ
+	// æº–å‚™
 	if ((Bmem = BIO_new(BIO_s_mem())) == NULL ||
 		(Benc = BIO_new(BIO_f_cipher())) == NULL ||
 		BIO_get_cipher_ctx(Benc, &ctx) != 1 ||
@@ -316,10 +316,10 @@ static int Encrypt2EncDec(char *PassStr, const char *EncryptStr, Encrypt2Profile
 
 	if (encrypt) {
 		int len;
-		// ˆÃ†‰»
+		// æš—å·åŒ–
 		len = strlen(PassStr);
 		memcpy(Buf, PassStr, len);
-		memset(Buf + len, 0x00, ENCRYPT2_PWD_MAX_LEN - len);	// nullƒpƒfƒBƒ“ƒO
+		memset(Buf + len, 0x00, ENCRYPT2_PWD_MAX_LEN - len);	// nullãƒ‘ãƒ‡ã‚£ãƒ³ã‚°
 		if (BIO_write(Bio, Buf, ENCRYPT2_PWD_MAX_LEN) != ENCRYPT2_PWD_MAX_LEN ||
 			BIO_write(Bio, profile->EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN ||
 			BIO_flush(Bio) != 1 ||
@@ -327,7 +327,7 @@ static int Encrypt2EncDec(char *PassStr, const char *EncryptStr, Encrypt2Profile
 			BIO_read(Bmem, profile->EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN) {
 			goto end;
 		}
-		// hmacŠi”[
+		// hmacæ ¼ç´
 		if ((PKCS5_PBKDF2_HMAC(EncryptStr, strlen(EncryptStr),
 							   (const unsigned char *)&(profile->EncSalt), ENCRYPT2_SALTLEN,
 							   ENCRYPT2_ITER1, (EVP_MD *)ENCRYPT2_DIGEST,
@@ -342,7 +342,7 @@ static int Encrypt2EncDec(char *PassStr, const char *EncryptStr, Encrypt2Profile
 		}
 		ret = 1;
 	} else {
-		// •œ†
+		// å¾©å·
 		if (BIO_write(Bmem, profile->PassStr, ENCRYPT2_PWD_MAX_LEN) != ENCRYPT2_PWD_MAX_LEN ||
 			BIO_write(Bmem, profile->EncSalt, ENCRYPT2_SALTLEN) != ENCRYPT2_SALTLEN ||
 			BIO_write(Bmem, profile->EncHash, SHA512_DIGEST_LENGTH) != SHA512_DIGEST_LENGTH ||
@@ -352,7 +352,7 @@ static int Encrypt2EncDec(char *PassStr, const char *EncryptStr, Encrypt2Profile
 			BIO_read(Bio, Lprofile.EncHash, SHA512_DIGEST_LENGTH) != SHA512_DIGEST_LENGTH) {
 			goto end;
 		}
-		// hmac”äŠr
+		// hmacæ¯”è¼ƒ
 		if ((PKCS5_PBKDF2_HMAC(EncryptStr, strlen(EncryptStr),
 							   (const unsigned char *)&(profile->EncSalt), ENCRYPT2_SALTLEN,
 							   ENCRYPT2_ITER1, (EVP_MD *)ENCRYPT2_DIGEST,
@@ -365,10 +365,10 @@ static int Encrypt2EncDec(char *PassStr, const char *EncryptStr, Encrypt2Profile
 		memcpy(PassStr, Lprofile.PassStr, ENCRYPT2_PWD_MAX_LEN);
 		if (CRYPTO_memcmp(Hash, Lprofile.EncHash, SHA512_DIGEST_LENGTH) == 0) {
 			PassStr[ENCRYPT2_PWD_MAX_LEN] = 0;
-			ret = 1;	// ˆê’v
+			ret = 1;	// ä¸€è‡´
 		} else {
 			PassStr[0] = 0;
-			ret = 0;	// •sˆê’v
+			ret = 0;	// ä¸ä¸€è‡´
 		}
 	}
 
@@ -388,7 +388,7 @@ int Encrypt2SetPassword(LPCWSTR FileNameStr, const char *KeyStr, const char *Pas
 		return 0;
 	}
 
-	// ƒtƒ@ƒCƒ‹ƒI[ƒvƒ“A‘¶İ‚µ‚È‚¢ê‡‚ÍV‹Kì¬
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³ã€å­˜åœ¨ã—ãªã„å ´åˆã¯æ–°è¦ä½œæˆ
 	if ((FH = CreateFileW(FileNameStr, GENERIC_READ|GENERIC_WRITE, 0, NULL,
 						  OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE) {
 		return 0;
@@ -398,11 +398,11 @@ int Encrypt2SetPassword(LPCWSTR FileNameStr, const char *KeyStr, const char *Pas
 		if (Encrypt2EncDec(OldProfile.PassStr, EncryptStr, &OldProfile, ENCRYPT2_DECRYPT) == 1 &&
 			CRYPTO_memcmp(OldProfile.PassStr, PassStr, ENCRYPT2_PWD_MAX_LEN) == 0) {
 			CloseHandle(FH);
-			return 1;	// ƒpƒXƒ[ƒh•ÏX–³‚µ
+			return 1;	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰å¤‰æ›´ç„¡ã—
 		}
-		update = TRUE;	// XV
+		update = TRUE;	// æ›´æ–°
 	} else {
-		update = FALSE;	// ’Ç‰Á
+		update = FALSE;	// è¿½åŠ 
 	}
 
 	memcpy(Profile.Tag, ENCRYPT2_TAG, sizeof(ENCRYPT2_TAG) - 1);				// Tag
@@ -484,7 +484,7 @@ int Encrypt2DelPassword(LPCWSTR FileNameStr, const char *KeyStr)
 	}
 
 	if (KeyStr[0] != 0) {
-		// w’è‚³‚ê‚½KeyStr(ƒpƒXƒ[ƒh¯•Êq)‚Ìƒvƒƒtƒ@ƒCƒ‹‚ğíœ
+		// æŒ‡å®šã•ã‚ŒãŸKeyStr(ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰è­˜åˆ¥å­)ã®ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‰Šé™¤
 		if (Encrypt2ProfileSearch(FH, KeyStr, &Profile) == 0) {
 			CloseHandle(FH);
 			return 0;
@@ -497,7 +497,7 @@ int Encrypt2DelPassword(LPCWSTR FileNameStr, const char *KeyStr)
 		return 1;
 	}
 
-	// Encrypt2‚Ì‘Sƒvƒƒtƒ@ƒCƒ‹‚ğíœ
+	// Encrypt2ã®å…¨ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‰Šé™¤
 	DWORD cpos, epos;
 	unsigned char *p, *cp;
 	char ProfileB64[ENCRYPT2_MaxLineLen];
@@ -517,7 +517,7 @@ int Encrypt2DelPassword(LPCWSTR FileNameStr, const char *KeyStr)
 		if ((ProfileB64Len = PwdFileReadln(FH, ProfileB64, ENCRYPT2_MaxLineLen)) <= 0) {
 			break;
 		}
-		// Encrypt2‚Å‚Í‚È‚¢ƒvƒƒtƒ@ƒCƒ‹‚ÍÁ‚³‚È‚¢
+		// Encrypt2ã§ã¯ãªã„ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ã¯æ¶ˆã•ãªã„
 		ProfileLen = b64decode((PCHAR)&Profile, ENCRYPT2_PROFILE_LEN + 1, ProfileB64);
 		if (ProfileB64Len != ENCRYPT2_BASE64_LEN ||
 			ProfileLen != ENCRYPT2_PROFILE_LEN ||

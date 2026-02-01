@@ -46,7 +46,7 @@
 #include "directx.h"
 
 /**
- *	EndDialog() ŒİŠ·ŠÖ”
+ *	EndDialog() äº’æ›é–¢æ•°
  */
 BOOL TTEndDialog(HWND hDlgWnd, INT_PTR nResult)
 {
@@ -54,14 +54,14 @@ BOOL TTEndDialog(HWND hDlgWnd, INT_PTR nResult)
 }
 
 /**
- *	CreateDialogIndirectParam() ŒİŠ·ŠÖ”
+ *	CreateDialogIndirectParam() äº’æ›é–¢æ•°
  */
 HWND TTCreateDialogIndirectParam(
 	HINSTANCE hInstance,
 	LPCWSTR lpTemplateName,
-	HWND hWndParent,			// ƒI[ƒi[ƒEƒBƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-	DLGPROC lpDialogFunc,		// ƒ_ƒCƒAƒƒOƒ{ƒbƒNƒXƒvƒƒV[ƒWƒƒ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-	LPARAM lParamInit)			// ‰Šú‰»’l
+	HWND hWndParent,			// ã‚ªãƒ¼ãƒŠãƒ¼ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+	DLGPROC lpDialogFunc,		// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒœãƒƒã‚¯ã‚¹ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+	LPARAM lParamInit)			// åˆæœŸåŒ–å€¤
 {
 	DLGTEMPLATE *lpTemplate = TTGetDlgTemplate(hInstance, lpTemplateName);
 	HWND hDlgWnd = CreateDialogIndirectParamW(hInstance, lpTemplate, hWndParent, lpDialogFunc, lParamInit);
@@ -70,7 +70,7 @@ HWND TTCreateDialogIndirectParam(
 }
 
 /**
- *	CreateDialogParam() ŒİŠ·ŠÖ”
+ *	CreateDialogParam() äº’æ›é–¢æ•°
  */
 HWND TTCreateDialogParam(
 	HINSTANCE hInstance,
@@ -84,7 +84,7 @@ HWND TTCreateDialogParam(
 }
 
 /**
- *	CreateDialog() ŒİŠ·ŠÖ”
+ *	CreateDialog() äº’æ›é–¢æ•°
  */
 HWND TTCreateDialog(
 	HINSTANCE hInstance,
@@ -97,13 +97,13 @@ HWND TTCreateDialog(
 }
 
 /**
- *	DialogBoxParam() ŒİŠ·ŠÖ”
- *		EndDialog()‚Å‚Í‚È‚­ATTEndDialog()‚ğg—p‚·‚é‚±‚Æ
+ *	DialogBoxParam() äº’æ›é–¢æ•°
+ *		EndDialog()ã§ã¯ãªãã€TTEndDialog()ã‚’ä½¿ç”¨ã™ã‚‹ã“ã¨
  */
 INT_PTR TTDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplateName,
-						 HWND hWndParent,		// ƒI[ƒi[ƒEƒBƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-						 DLGPROC lpDialogFunc,  // ƒ_ƒCƒAƒƒOƒ{ƒbƒNƒXƒvƒƒV[ƒWƒƒ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-						 LPARAM lParamInit)		// ‰Šú‰»’l
+						 HWND hWndParent,		// ã‚ªãƒ¼ãƒŠãƒ¼ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+						 DLGPROC lpDialogFunc,  // ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒœãƒƒã‚¯ã‚¹ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+						 LPARAM lParamInit)		// åˆæœŸåŒ–å€¤
 {
 	DLGTEMPLATE *lpTemplate = TTGetDlgTemplate(hInstance, lpTemplateName);
 	INT_PTR DlgResult = DialogBoxIndirectParamW(hInstance, lpTemplate, hWndParent, lpDialogFunc, lParamInit);
@@ -112,8 +112,8 @@ INT_PTR TTDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplateName,
 }
 
 /**
- *	DialogBox() ŒİŠ·ŠÖ”
- *		EndDialog()‚Å‚Í‚È‚­ATTEndDialog()‚ğg—p‚·‚é‚±‚Æ
+ *	DialogBox() äº’æ›é–¢æ•°
+ *		EndDialog()ã§ã¯ãªãã€TTEndDialog()ã‚’ä½¿ç”¨ã™ã‚‹ã“ã¨
  */
 INT_PTR TTDialogBox(HINSTANCE hInstance, LPCWSTR lpTemplateName, HWND hWndParent, DLGPROC lpDialogFunc)
 {
@@ -121,17 +121,17 @@ INT_PTR TTDialogBox(HINSTANCE hInstance, LPCWSTR lpTemplateName, HWND hWndParent
 }
 
 /**
- *	ƒ_ƒCƒAƒƒOƒtƒHƒ“ƒg‚ğİ’è‚·‚é
- *		1. w’èƒtƒHƒ“ƒg‚ğİ’è‚·‚é(‘¶İ‚µ‚È‚¢ê‡‚Í2‚Ö)
- *		2. lngƒtƒ@ƒCƒ‹“à‚ÌƒtƒHƒ“ƒg‚ğİ’è‚·‚é(İ’è‚ª‚È‚¢,‘¶İ‚µ‚È‚¢ê‡‚Í3‚Ö)
- *		3. MessageBox()‚ÌƒtƒHƒ“ƒg‚ğİ’è‚·‚é
+ *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒ•ã‚©ãƒ³ãƒˆã‚’è¨­å®šã™ã‚‹
+ *		1. æŒ‡å®šãƒ•ã‚©ãƒ³ãƒˆã‚’è¨­å®šã™ã‚‹(å­˜åœ¨ã—ãªã„å ´åˆã¯2ã¸)
+ *		2. lngãƒ•ã‚¡ã‚¤ãƒ«å†…ã®ãƒ•ã‚©ãƒ³ãƒˆã‚’è¨­å®šã™ã‚‹(è¨­å®šãŒãªã„,å­˜åœ¨ã—ãªã„å ´åˆã¯3ã¸)
+ *		3. MessageBox()ã®ãƒ•ã‚©ãƒ³ãƒˆã‚’è¨­å®šã™ã‚‹
  *
- * @param FontName			ƒtƒHƒ“ƒg –¼‘O (NULL‚Ì‚Æ‚«w’è‚È‚µ)
- * @param FontPoint			ƒtƒHƒ“ƒg ƒ|ƒCƒ“ƒg
- * @param FontCharSet		ƒtƒHƒ“ƒg CharSet(•s—v?)
- * @param UILanguageFile	lng ƒtƒ@ƒCƒ‹ (NULL‚Ì‚Æ‚«w’è‚È‚µ)
- * @param Section			lng ƒZƒNƒVƒ‡ƒ“
- * @param Key				lng ƒL[
+ * @param FontName			ãƒ•ã‚©ãƒ³ãƒˆ åå‰ (NULLã®ã¨ãæŒ‡å®šãªã—)
+ * @param FontPoint			ãƒ•ã‚©ãƒ³ãƒˆ ãƒã‚¤ãƒ³ãƒˆ
+ * @param FontCharSet		ãƒ•ã‚©ãƒ³ãƒˆ CharSet(ä¸è¦?)
+ * @param UILanguageFile	lng ãƒ•ã‚¡ã‚¤ãƒ« (NULLã®ã¨ãæŒ‡å®šãªã—)
+ * @param Section			lng ã‚»ã‚¯ã‚·ãƒ§ãƒ³
+ * @param Key				lng ã‚­ãƒ¼
 */
 void SetDialogFont(const wchar_t *FontName, int FontPoint, int FontCharSet,
 				   const wchar_t *UILanguageFile, const char *Section, const char *Key)
@@ -139,13 +139,13 @@ void SetDialogFont(const wchar_t *FontName, int FontPoint, int FontCharSet,
 	LOGFONTW logfont;
 	BOOL result;
 
-	// w’èƒtƒHƒ“ƒg‚ğƒZƒbƒg
+	// æŒ‡å®šãƒ•ã‚©ãƒ³ãƒˆã‚’ã‚»ãƒƒãƒˆ
 	if (FontName != NULL && FontName[0] != 0) {
-		// ‘¶İƒ`ƒFƒbƒN
+		// å­˜åœ¨ãƒã‚§ãƒƒã‚¯
 		result = IsExistFontW(FontName, FontCharSet, TRUE);
 #if 0
-		// ‘¶İ‚ğƒ`ƒFƒbƒN‚µ‚È‚¢
-		//   ‘¶İ‚µ‚È‚­‚Ä‚àƒtƒHƒ“ƒgƒŠƒ“ƒN‚Å‘½•ª‚¤‚Ü‚­•\¦‚³‚ê‚é
+		// å­˜åœ¨ã‚’ãƒã‚§ãƒƒã‚¯ã—ãªã„
+		//   å­˜åœ¨ã—ãªãã¦ã‚‚ãƒ•ã‚©ãƒ³ãƒˆãƒªãƒ³ã‚¯ã§å¤šåˆ†ã†ã¾ãè¡¨ç¤ºã•ã‚Œã‚‹
 		//result = TRUE;
 #endif
 		if (result == TRUE) {
@@ -154,7 +154,7 @@ void SetDialogFont(const wchar_t *FontName, int FontPoint, int FontCharSet,
 		}
 	}
 
-	// .lng‚Ìw’è
+	// .lngã®æŒ‡å®š
 	if (UILanguageFile != NULL && Section != NULL && Key != NULL) {
 		wchar_t *sectionW = ToWcharA(Section);
 		wchar_t *keyW = ToWcharA(Key);
@@ -169,8 +169,8 @@ void SetDialogFont(const wchar_t *FontName, int FontPoint, int FontCharSet,
 		}
 	}
 
-	// ini,lng‚Åw’è‚³‚ê‚½ƒtƒHƒ“ƒg‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½‚Æ‚«A
-	// messagebox()‚ÌƒtƒHƒ“ƒg‚ğ‚Æ‚è‚ ‚¦‚¸‘I‘ğ‚µ‚Ä‚¨‚­
+	// ini,lngã§æŒ‡å®šã•ã‚ŒãŸãƒ•ã‚©ãƒ³ãƒˆãŒè¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã¨ãã€
+	// messagebox()ã®ãƒ•ã‚©ãƒ³ãƒˆã‚’ã¨ã‚Šã‚ãˆãšé¸æŠã—ã¦ãŠã
 	GetMessageboxFontW(&logfont);
 	if (logfont.lfHeight < 0) {
 		logfont.lfHeight = GetFontPointFromPixel(NULL, -logfont.lfHeight);
@@ -180,9 +180,9 @@ void SetDialogFont(const wchar_t *FontName, int FontPoint, int FontCharSet,
 
 
 /**
- *	pixel”‚ğpoint”‚É•ÏŠ·‚·‚é(ƒtƒHƒ“ƒg—p)
- *		’ 1point = 1/72 inch, ƒtƒHƒ“ƒg‚Ì’PˆÊ
- *		’ ƒEƒBƒ“ƒhƒE‚Ì•\¦‹ï‡‚Å”{—¦‚ª•Ï‰»‚·‚é‚Ì‚Å hWnd ‚ª•K—v
+ *	pixelæ•°ã‚’pointæ•°ã«å¤‰æ›ã™ã‚‹(ãƒ•ã‚©ãƒ³ãƒˆç”¨)
+ *		æ³¨ 1point = 1/72 inch, ãƒ•ã‚©ãƒ³ãƒˆã®å˜ä½
+ *		æ³¨ ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è¡¨ç¤ºå…·åˆã§å€ç‡ãŒå¤‰åŒ–ã™ã‚‹ã®ã§ hWnd ãŒå¿…è¦
  */
 int GetFontPixelFromPoint(HWND hWnd, int pixel)
 {
@@ -197,8 +197,8 @@ int GetFontPixelFromPoint(HWND hWnd, int pixel)
 }
 
 /**
- *	point”‚ğpixel”‚É•ÏŠ·‚·‚é(ƒtƒHƒ“ƒg—p)
- *		’ 1point = 1/72 inch, ƒtƒHƒ“ƒg‚Ì’PˆÊ
+ *	pointæ•°ã‚’pixelæ•°ã«å¤‰æ›ã™ã‚‹(ãƒ•ã‚©ãƒ³ãƒˆç”¨)
+ *		æ³¨ 1point = 1/72 inch, ãƒ•ã‚©ãƒ³ãƒˆã®å˜ä½
  */
 int GetFontPointFromPixel(HWND hWnd, int point)
 {
@@ -210,15 +210,15 @@ int GetFontPointFromPixel(HWND hWnd, int point)
 }
 
 /**
- *	ƒRƒ“ƒ{ƒ{ƒbƒNƒXAƒhƒƒbƒvƒ_ƒEƒ“ƒŠƒXƒg‚Ì
- *	ƒŠƒXƒg‚Ì‰¡•‚ğŠg’£‚·‚é(Œ³‚Ì•‚æ‚è‹·‚­‚È‚é‚±‚Æ‚Í‚È‚¢)
- *	ƒZƒbƒg‚³‚ê‚Ä‚¢‚é•¶š‚ª‚·‚×‚ÄŒ©‚¦‚é‚æ‚¤‚É‚·‚é
+ *	ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ã€ãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ãƒªã‚¹ãƒˆã®
+ *	ãƒªã‚¹ãƒˆã®æ¨ªå¹…ã‚’æ‹¡å¼µã™ã‚‹(å…ƒã®å¹…ã‚ˆã‚Šç‹­ããªã‚‹ã“ã¨ã¯ãªã„)
+ *	ã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ã‚‹æ–‡å­—ãŒã™ã¹ã¦è¦‹ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹
  *
- *	@param[in]	dlg		ƒ_ƒCƒAƒƒO‚Ìƒnƒ“ƒhƒ‹
- *	@param[in]	ID		ƒRƒ“ƒ{ƒ{ƒbƒNƒX‚ÌID
+ *	@param[in]	dlg		ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒãƒ³ãƒ‰ãƒ«
+ *	@param[in]	ID		ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ã®ID
  *
- *	ƒRƒ“ƒ{ƒ{ƒbƒNƒX‚ÉƒeƒLƒXƒg‚ğƒZƒbƒg(SetDlgItemTextW(dlg, ID, L"text");)
- *	‚·‚é‘O‚ÉƒR[ƒ‹‚·‚é‚ÆƒtƒH[ƒJƒX‚ª‚¨‚©‚µ‚­‚È‚é‚±‚Æ‚ª‚È‚¢
+ *	ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ã«ãƒ†ã‚­ã‚¹ãƒˆã‚’ã‚»ãƒƒãƒˆ(SetDlgItemTextW(dlg, ID, L"text");)
+ *	ã™ã‚‹å‰ã«ã‚³ãƒ¼ãƒ«ã™ã‚‹ã¨ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ãŒãŠã‹ã—ããªã‚‹ã“ã¨ãŒãªã„
  */
 void ExpandCBWidth(HWND dlg, int ID)
 {
@@ -238,7 +238,7 @@ void ExpandCBWidth(HWND dlg, int ID)
 			max_width = s.cx;
 		free(text);
 	}
-	max_width += GetSystemMetrics(SM_CXVSCROLL);  // ƒXƒNƒ[ƒ‹ƒo[‚Ì•‚à‘«‚µ‚ñ‚Å‚¨‚­
+	max_width += GetSystemMetrics(SM_CXVSCROLL);  // ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ãƒãƒ¼ã®å¹…ã‚‚è¶³ã—è¾¼ã‚“ã§ãŠã
 	max_width += 2 * GetSystemMetrics( SM_CYFIXEDFRAME );
 	SendMessageW(hCtrlWnd, CB_SETDROPPEDWIDTH, max_width, 0);
 	SelectObject(TmpDC, hFont);
@@ -246,20 +246,20 @@ void ExpandCBWidth(HWND dlg, int ID)
 }
 
 /**
- *	GetOpenFileName(), GetSaveFileName() —pƒtƒBƒ‹ƒ^•¶š—ñæ“¾
+ *	GetOpenFileName(), GetSaveFileName() ç”¨ãƒ•ã‚£ãƒ«ã‚¿æ–‡å­—åˆ—å–å¾—
  *
- *	@param[in]	user_filter_mask	ƒ†[ƒU[ƒtƒBƒ‹ƒ^•¶š—ñ
- *									"*.txt", "*.txt;*.log" ‚È‚Ç
- *									NULL‚Ì‚Æ‚«g—p‚µ‚È‚¢
+ *	@param[in]	user_filter_mask	ãƒ¦ãƒ¼ã‚¶ãƒ¼ãƒ•ã‚£ãƒ«ã‚¿æ–‡å­—åˆ—
+ *									"*.txt", "*.txt;*.log" ãªã©
+ *									NULLã®ã¨ãä½¿ç”¨ã—ãªã„
  *	@param[in]	UILanguageFile
- *	@param[out]	len					¶¬‚µ‚½•¶š—ñ’·(wchar_t’PˆÊ)
- *									NULL‚Ì‚Æ‚«‚Í•Ô‚³‚È‚¢
- *	@retval		"User define(*.txt)\0*.txt\0All(*.*)\0*.*\0" ‚È‚Ç
- *				I’[‚Í "\0\0" ‚Æ‚È‚é
+ *	@param[out]	len					ç”Ÿæˆã—ãŸæ–‡å­—åˆ—é•·(wchar_tå˜ä½)
+ *									NULLã®ã¨ãã¯è¿”ã•ãªã„
+ *	@retval		"User define(*.txt)\0*.txt\0All(*.*)\0*.*\0" ãªã©
+ *				çµ‚ç«¯ã¯ "\0\0" ã¨ãªã‚‹
  */
 wchar_t *GetCommonDialogFilterWW(const wchar_t *user_filter_mask, const wchar_t *UILanguageFile, size_t *len)
 {
-	// "ƒ†[ƒU’è‹`(*.txt)\0*.txt"
+	// "ãƒ¦ãƒ¼ã‚¶å®šç¾©(*.txt)\0*.txt"
 	wchar_t *user_filter_str = NULL;
 	size_t user_filter_len = 0;
 	if (user_filter_mask != NULL && user_filter_mask[0] != 0) {
@@ -283,7 +283,7 @@ wchar_t *GetCommonDialogFilterWW(const wchar_t *user_filter_mask, const wchar_t 
 		free(user_filter_name);
 	}
 
-	// "‚·‚×‚Ä‚Ìƒtƒ@ƒCƒ‹(*.*)\0*.*"
+	// "ã™ã¹ã¦ã®ãƒ•ã‚¡ã‚¤ãƒ«(*.*)\0*.*"
 	wchar_t *all_filter_str;
 	size_t all_filter_len;
 	GetI18nStrWW("Tera Term", "FILEDLG_ALL_FILTER", L"All(*.*)\\0*.*", UILanguageFile, &all_filter_str);
@@ -307,7 +307,7 @@ wchar_t *GetCommonDialogFilterWW(const wchar_t *user_filter_mask, const wchar_t 
 		}
 	}
 
-	// ƒtƒBƒ‹ƒ^•¶š—ñ‚ğì‚é
+	// ãƒ•ã‚£ãƒ«ã‚¿æ–‡å­—åˆ—ã‚’ä½œã‚‹
 	size_t filter_len = user_filter_len + all_filter_len;
 	wchar_t* filter_str;
 	if (filter_len != 0) {
@@ -348,22 +348,22 @@ wchar_t *GetCommonDialogFilterWW(const wchar_t *user_filter_mask, const wchar_t 
 }
 
 /**
- *	ƒAƒCƒRƒ“‚ğƒ[ƒh‚·‚é
+ *	ã‚¢ã‚¤ã‚³ãƒ³ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
  *	@param[in]	hinst
  *	@param[in]	name
- *	@param[in]	cx	ƒAƒCƒRƒ“ƒTƒCƒY(96dpi)
- *	@param[in]	cy	ƒAƒCƒRƒ“ƒTƒCƒY
- *	@param[in]	dpi	ƒAƒCƒRƒ“ƒTƒCƒY(cx,cy)‚Ídpi/96”{‚ÌƒTƒCƒY‚Å“Ç‚İ‚Ü‚ê‚é
- *	@param[in]	notify	ƒJƒXƒ^ƒ€’Ê’mƒAƒCƒRƒ“‚Ìê‡‚Í TRUE, ƒEƒBƒ“ƒhƒEƒAƒCƒRƒ“‚Ìê‡‚Í FALSE
+ *	@param[in]	cx	ã‚¢ã‚¤ã‚³ãƒ³ã‚µã‚¤ã‚º(96dpiæ™‚)
+ *	@param[in]	cy	ã‚¢ã‚¤ã‚³ãƒ³ã‚µã‚¤ã‚º
+ *	@param[in]	dpi	ã‚¢ã‚¤ã‚³ãƒ³ã‚µã‚¤ã‚º(cx,cy)ã¯dpi/96å€ã®ã‚µã‚¤ã‚ºã§èª­ã¿è¾¼ã¾ã‚Œã‚‹
+ *	@param[in]	notify	ã‚«ã‚¹ã‚¿ãƒ é€šçŸ¥ã‚¢ã‚¤ã‚³ãƒ³ã®å ´åˆã¯ TRUE, ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¢ã‚¤ã‚³ãƒ³ã®å ´åˆã¯ FALSE
  *	@return		HICON
  *
- *		cx == 0 && cy == 0 ‚Ì‚Æ‚«ƒfƒtƒHƒ‹ƒg‚ÌƒAƒCƒRƒ“ƒTƒCƒY‚Å“Ç‚İ‚Ş
- *		DestroyIcon()‚·‚é‚±‚Æ
+ *		cx == 0 && cy == 0 ã®ã¨ããƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚¢ã‚¤ã‚³ãƒ³ã‚µã‚¤ã‚ºã§èª­ã¿è¾¼ã‚€
+ *		DestroyIcon()ã™ã‚‹ã“ã¨
  */
 HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi, BOOL notify)
 {
 	if (cx == 0 && cy == 0) {
-		// 100%(96dpi?)‚Ì‚Æ‚«AGetSystemMetrics(SM_CXICON)=32
+		// 100%(96dpi?)ã®ã¨ãã€GetSystemMetrics(SM_CXICON)=32
 		if (pGetSystemMetricsForDpi != NULL) {
 			cx = pGetSystemMetricsForDpi(SM_CXICON, dpi);
 			cy = pGetSystemMetricsForDpi(SM_CYICON, dpi);
@@ -379,11 +379,11 @@ HICON TTLoadIcon(HINSTANCE hinst, const wchar_t *name, int cx, int cy, UINT dpi,
 	}
 	HICON hIcon;
 	if (IsWindowsNT4() || (notify && IsWindows2000())) {
-		// 4bit ƒAƒCƒRƒ“
-		// 		1. NT4 ‚Ì‚Æ‚«
-		//				Windows NT 4.0 ‚Í 4bit ƒAƒCƒRƒ“‚µ‚©ƒTƒ|[ƒg‚µ‚Ä‚¢‚È‚¢
-		// 		2. Windows 2000 ‚Ìƒ^ƒXƒNƒgƒŒƒCƒAƒCƒRƒ“‚Ì‚Æ‚«
-		//				Windows 2000 ‚Ìƒ^ƒXƒNƒgƒŒƒC‚Í 4bit ƒAƒCƒRƒ“‚µ‚©ƒTƒ|[ƒg‚µ‚Ä‚¢‚È‚¢
+		// 4bit ã‚¢ã‚¤ã‚³ãƒ³
+		// 		1. NT4 ã®ã¨ã
+		//				Windows NT 4.0 ã¯ 4bit ã‚¢ã‚¤ã‚³ãƒ³ã—ã‹ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ãªã„
+		// 		2. Windows 2000 ã®ã‚¿ã‚¹ã‚¯ãƒˆãƒ¬ã‚¤ã‚¢ã‚¤ã‚³ãƒ³ã®ã¨ã
+		//				Windows 2000 ã®ã‚¿ã‚¹ã‚¯ãƒˆãƒ¬ã‚¤ã¯ 4bit ã‚¢ã‚¤ã‚³ãƒ³ã—ã‹ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ãªã„
 		// LR_VGACOLOR = 16(4bit) color = VGA color
 		hIcon = (HICON)LoadImageW(hinst, name, IMAGE_ICON, cx, cy, LR_VGACOLOR);
 	}
@@ -454,19 +454,19 @@ static LRESULT IconProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 }
 
 /**
- *	ƒ_ƒCƒAƒƒO‚ÌƒRƒ“ƒgƒ[ƒ‹‚ÉƒAƒCƒRƒ“‚ğƒZƒbƒg‚·‚é
+ *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã«ã‚¢ã‚¤ã‚³ãƒ³ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
  *
- *	@param	dlg		ƒ_ƒCƒAƒƒO
- *	@param	nID		ƒRƒ“ƒgƒ[ƒ‹ID
- *	@param	name	ƒAƒCƒRƒ“
- *	@param	cx		ƒAƒCƒRƒ“ƒTƒCƒY
- *	@param	cy		ƒAƒCƒRƒ“ƒTƒCƒY
+ *	@param	dlg		ãƒ€ã‚¤ã‚¢ãƒ­ã‚°
+ *	@param	nID		ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ID
+ *	@param	name	ã‚¢ã‚¤ã‚³ãƒ³
+ *	@param	cx		ã‚¢ã‚¤ã‚³ãƒ³ã‚µã‚¤ã‚º
+ *	@param	cy		ã‚¢ã‚¤ã‚³ãƒ³ã‚µã‚¤ã‚º
  *
- *	cx == 0 && cy == 0 ‚Ì‚Æ‚«ƒfƒtƒHƒ‹ƒg‚ÌƒAƒCƒRƒ“ƒTƒCƒY‚Å“Ç‚İ‚Ş
+ *	cx == 0 && cy == 0 ã®ã¨ããƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚¢ã‚¤ã‚³ãƒ³ã‚µã‚¤ã‚ºã§èª­ã¿è¾¼ã‚€
  *
- *	ƒZƒbƒg‚·‚é—á
+ *	ã‚»ãƒƒãƒˆã™ã‚‹ä¾‹
  *		SetDlgItemIcon(Dialog, IDC_TT_ICON, MAKEINTRESOURCEW(IDI_TTERM), 0, 0);
- *	DPI‚ª•Ï‰»‚µ‚½‚Æ‚«‚ÉƒAƒCƒRƒ“‚ÌƒTƒCƒY‚ğ•ÏX‚·‚é—á
+ *	DPIãŒå¤‰åŒ–ã—ãŸã¨ãã«ã‚¢ã‚¤ã‚³ãƒ³ã®ã‚µã‚¤ã‚ºã‚’å¤‰æ›´ã™ã‚‹ä¾‹
  *		case WM_DPICHANGED:
  *			SendDlgItemMessage(Dialog, IDC_TT_ICON, WM_DPICHANGED, wParam, lParam);
  */
@@ -489,34 +489,34 @@ void SetDlgItemIcon(HWND dlg, int nID, const wchar_t *name, int cx, int cy)
 }
 
 /**
- *	ƒEƒBƒ“ƒhƒE‚ÉƒAƒCƒRƒ“‚ğƒZƒbƒg‚·‚é
+ *	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«ã‚¢ã‚¤ã‚³ãƒ³ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
  *
- *	@param	hInst		ƒAƒCƒRƒ“‚ğ•Û‚µ‚Ä‚¢‚éƒ‚ƒWƒ…[ƒ‹‚Ìinstance
- *						icon_name == NULL ‚Ì‚Æ‚« NULL ‚Å‚à‚æ‚¢
- *	@param	hWnd		ƒAƒCƒRƒ“‚ğİ’è‚·‚éWindow Handle
- *	@param	icon_name	ƒAƒCƒRƒ“–¼
- *						NULL‚Ì‚Æ‚« ƒAƒCƒRƒ“‚ğíœ‚·‚é
- *						id‚©‚ç‚Ì•ÏŠ·‚ÍMAKEINTRESOURCEW()‚ğg‚¤
+ *	@param	hInst		ã‚¢ã‚¤ã‚³ãƒ³ã‚’ä¿æŒã—ã¦ã„ã‚‹ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®instance
+ *						icon_name == NULL ã®ã¨ã NULL ã§ã‚‚ã‚ˆã„
+ *	@param	hWnd		ã‚¢ã‚¤ã‚³ãƒ³ã‚’è¨­å®šã™ã‚‹Window Handle
+ *	@param	icon_name	ã‚¢ã‚¤ã‚³ãƒ³å
+ *						NULLã®ã¨ã ã‚¢ã‚¤ã‚³ãƒ³ã‚’å‰Šé™¤ã™ã‚‹
+ *						idã‹ã‚‰ã®å¤‰æ›ã¯MAKEINTRESOURCEW()ã‚’ä½¿ã†
  *	@param	dpi			dpi
- *						0 ‚Ì‚Æ‚« hWnd ‚ª•\¦‚³‚ê‚Ä‚¢‚éƒ‚ƒjƒ^‚ÌDPI
+ *						0 ã®ã¨ã hWnd ãŒè¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹ãƒ¢ãƒ‹ã‚¿ã®DPI
  */
 void TTSetIcon(HINSTANCE hInst, HWND hWnd, const wchar_t *icon_name, UINT dpi)
 {
 	HICON icon;
 	if (icon_name != NULL) {
 		if (dpi == 0) {
-			// hWnd ‚ª•\¦‚³‚ê‚Ä‚¢‚éƒ‚ƒjƒ^‚ÌDPI
+			// hWnd ãŒè¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹ãƒ¢ãƒ‹ã‚¿ã®DPI
 			dpi = GetMonitorDpiFromWindow(hWnd);
 		}
 
-		// ‘å‚«‚¢ƒAƒCƒRƒ“(32x32,ƒfƒBƒXƒvƒŒƒC‚ÌŠg‘å—¦‚ª100%(dpi=96)‚Ì‚Æ‚«)
+		// å¤§ãã„ã‚¢ã‚¤ã‚³ãƒ³(32x32,ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®æ‹¡å¤§ç‡ãŒ100%(dpi=96)ã®ã¨ã)
 		icon = TTLoadIcon(hInst, icon_name, 0, 0, dpi, FALSE);
 		icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
 		if (icon != NULL) {
 			DestroyIcon(icon);
 		}
 
-		// ¬‚³‚¢ƒAƒCƒRƒ“(16x16,ƒfƒBƒXƒvƒŒƒC‚ÌŠg‘å—¦‚ª100%(dpi=96)‚Ì‚Æ‚«)
+		// å°ã•ã„ã‚¢ã‚¤ã‚³ãƒ³(16x16,ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®æ‹¡å¤§ç‡ãŒ100%(dpi=96)ã®ã¨ã)
 		icon = TTLoadIcon(hInst, icon_name, 16, 16, dpi, FALSE);
 		icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
 		if (icon != NULL) {
@@ -524,7 +524,7 @@ void TTSetIcon(HINSTANCE hInst, HWND hWnd, const wchar_t *icon_name, UINT dpi)
 		}
 	}
 	else {
-		// ƒAƒCƒRƒ“‚ğíœ
+		// ã‚¢ã‚¤ã‚³ãƒ³ã‚’å‰Šé™¤
 		HICON null_icon = NULL;
 		icon = (HICON)::SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)null_icon);
 		if (icon != NULL) {
@@ -538,12 +538,12 @@ void TTSetIcon(HINSTANCE hInst, HWND hWnd, const wchar_t *icon_name, UINT dpi)
 }
 
 /**
- *	ListBox‚ÉƒZƒbƒg‚³‚ê‚Ä‚¢‚é•¶š—ñ‚ğæ“¾‚·‚é
- *	•s—v‚É‚È‚Á‚½‚ç free() ‚·‚é‚±‚Æ
+ *	ListBoxã«ã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ã‚‹æ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹
+ *	ä¸è¦ã«ãªã£ãŸã‚‰ free() ã™ã‚‹ã“ã¨
  *
- *	@param[out]	text	İ’è‚³‚ê‚Ä‚¢‚é•¶š—ñ
- *						•s—v‚É‚È‚Á‚½‚çfree()‚·‚é
- *	@return	ƒGƒ‰[ƒR[ƒh,0(=NO_ERROR)‚Ì‚Æ‚«ƒGƒ‰[‚È‚µ
+ *	@param[out]	text	è¨­å®šã•ã‚Œã¦ã„ã‚‹æ–‡å­—åˆ—
+ *						ä¸è¦ã«ãªã£ãŸã‚‰free()ã™ã‚‹
+ *	@return	ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰,0(=NO_ERROR)ã®ã¨ãã‚¨ãƒ©ãƒ¼ãªã—
  */
 DWORD GetDlgItemIndexTextW(HWND hDlg, int nIDDlgItem, WPARAM index, wchar_t **text)
 {
@@ -555,7 +555,7 @@ DWORD GetDlgItemIndexTextW(HWND hDlg, int nIDDlgItem, WPARAM index, wchar_t **te
 }
 
 /**
- *	ƒtƒHƒ“ƒg•¶š—ñ‚ğ hWnd ‚Éİ’è‚·‚é
+ *	ãƒ•ã‚©ãƒ³ãƒˆæ–‡å­—åˆ—ã‚’ hWnd ã«è¨­å®šã™ã‚‹
  */
 void SetFontStringW(HWND hWnd, int item, const LOGFONTW *logfont)
 {
@@ -574,17 +574,9 @@ void SetFontStringW(HWND hWnd, int item, const LOGFONTW *logfont)
 	SetDlgItemTextW(hWnd, item, b);
 }
 
-static void ConvertLOGFONTWA(const LOGFONTA *logfontA, LOGFONTW *logfontW)
-{
-	logfontW->lfWidth = logfontA->lfWidth;
-	logfontW->lfHeight = logfontA->lfHeight;
-	logfontW->lfCharSet = logfontA->lfCharSet;
-	ACPToWideChar_t(logfontA->lfFaceName, logfontW->lfFaceName, _countof(logfontW->lfFaceName));
-}
-
 /**
- *	ChooseFont() ‚ÌƒtƒHƒ“ƒgˆê——‚Å”ñ•\¦ƒtƒHƒ“ƒg‚©’²‚×‚é
- *	Windows 7 –¢–‚Ìê‡Aí‚ÉFALSE‚ª•Ô‚é
+ *	ChooseFont() ã®ãƒ•ã‚©ãƒ³ãƒˆä¸€è¦§ã§éè¡¨ç¤ºãƒ•ã‚©ãƒ³ãƒˆã‹èª¿ã¹ã‚‹
+ *	Windows 7 æœªæº€ã®å ´åˆã€å¸¸ã«FALSEãŒè¿”ã‚‹
  *
  *	@param	logfont
  */
@@ -596,7 +588,7 @@ BOOL IsHiddenFont(const LOGFONTW *logfont)
 	wchar_t *font_family;
 	BOOL r = DXGetFontFamilyName(logfont, &font_family);
 	if (!r) {
-		// Windows 7 –¢–
+		// Windows 7 æœªæº€
 		return FALSE;
 	}
 
@@ -609,7 +601,7 @@ BOOL IsHiddenFont(const LOGFONTW *logfont)
 	DWORD size = 0;
 	DWORD type = 0;
 
-	// ’l‚ÌƒTƒCƒY‚ğæ“¾
+	// å€¤ã®ã‚µã‚¤ã‚ºã‚’å–å¾—
 	BOOL find = FALSE;
 	if (RegQueryValueExW(hKey, reg_key, nullptr, &type, nullptr, &size) == ERROR_SUCCESS) {
 		if (type == REG_MULTI_SZ) {
@@ -619,11 +611,11 @@ BOOL IsHiddenFont(const LOGFONTW *logfont)
 				const wchar_t *p = (wchar_t *)buf;
 				while (*p) {
 					if (wcscmp(p, font_family) == 0) {
-						// ƒtƒHƒ“ƒg–¼‚ªŒ©‚Â‚©‚Á‚½
+						// ãƒ•ã‚©ãƒ³ãƒˆåãŒè¦‹ã¤ã‹ã£ãŸ
 						find = TRUE;
 						break;
 					}
-					p += wcslen(p) + 1;	// Ÿ‚Ì•¶š—ñ‚ÉˆÚ“®
+					p += wcslen(p) + 1;	// æ¬¡ã®æ–‡å­—åˆ—ã«ç§»å‹•
 				}
 			}
 			free(buf);
@@ -636,19 +628,19 @@ BOOL IsHiddenFont(const LOGFONTW *logfont)
 }
 
 /**
- *	ChooseFont()—pƒ`ƒFƒbƒNƒ{ƒbƒNƒX‚Ì’²®
- *	ƒtƒHƒ“ƒg‚ÆƒVƒXƒeƒ€‚Ìó‘Ô‚©‚çƒ`ƒFƒbƒNƒ{ƒbƒNƒX‚ğ’²®‚·‚é
+ *	ChooseFont()ç”¨ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã®èª¿æ•´
+ *	ãƒ•ã‚©ãƒ³ãƒˆã¨ã‚·ã‚¹ãƒ†ãƒ ã®çŠ¶æ…‹ã‹ã‚‰ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã‚’èª¿æ•´ã™ã‚‹
  *
- *	‘I‘ğ’†ƒtƒHƒ“ƒg‚ª•\¦‚Å‚«‚È‚¢ó‘Ô‚Å ChooseFontW() ‚·‚é‚ÆA
- *	ƒfƒtƒHƒ‹ƒg‚Å‘I‘ğ‚³‚ê‚½ó‘Ô‚Æ‚È‚ç‚È‚¢(CF_INITTOLOGFONTSTRUCT)B
- *	‰ñ”ğ‚·‚é‚½‚ß‘I‘ğ’†ƒtƒHƒ“ƒg‚Ìó‘Ô‚É‡‚í‚¹‚Ä
- *	ƒvƒƒ|[ƒVƒ‡ƒiƒ‹,”ñ•\¦ƒ`ƒFƒbƒNƒ{ƒbƒNƒX‚ğ’²®‚·‚é
- *	(Windows 7ˆÈ~AŠeƒtƒHƒ“ƒg‚ğƒtƒHƒ“ƒgˆê——‚É•\¦/”ñ•\¦‚·‚éİ’è‚ª‚Å‚«‚é)
+ *	é¸æŠä¸­ãƒ•ã‚©ãƒ³ãƒˆãŒè¡¨ç¤ºã§ããªã„çŠ¶æ…‹ã§ ChooseFontW() ã™ã‚‹ã¨ã€
+ *	ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§é¸æŠã•ã‚ŒãŸçŠ¶æ…‹ã¨ãªã‚‰ãªã„(CF_INITTOLOGFONTSTRUCT)ã€‚
+ *	å›é¿ã™ã‚‹ãŸã‚é¸æŠä¸­ãƒ•ã‚©ãƒ³ãƒˆã®çŠ¶æ…‹ã«åˆã‚ã›ã¦
+ *	ãƒ—ãƒ­ãƒãƒ¼ã‚·ãƒ§ãƒŠãƒ«,éè¡¨ç¤ºãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã‚’èª¿æ•´ã™ã‚‹
+ *	(Windows 7ä»¥é™ã€å„ãƒ•ã‚©ãƒ³ãƒˆã‚’ãƒ•ã‚©ãƒ³ãƒˆä¸€è¦§ã«è¡¨ç¤º/éè¡¨ç¤ºã™ã‚‹è¨­å®šãŒã§ãã‚‹)
  *
- *	@param	hWnd		ƒ_ƒCƒAƒƒO
- *	@param	lfont		ƒtƒHƒ“ƒg\‘¢‘Ì
- *	@param	id_hidden	Hiddenƒ`ƒFƒbƒNƒ{ƒbƒNƒXID
- *	@param	id_pro		Proportionalƒ`ƒFƒbƒNƒ{ƒbƒNƒXID
+ *	@param	hWnd		ãƒ€ã‚¤ã‚¢ãƒ­ã‚°
+ *	@param	lfont		ãƒ•ã‚©ãƒ³ãƒˆæ§‹é€ ä½“
+ *	@param	id_hidden	Hiddenãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ID
+ *	@param	id_pro		Proportionalãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ID
  *	@param	mode		ACFCF_MODE
  */
 void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidden, int id_pro, ACFCF_MODE mode)
@@ -658,7 +650,7 @@ void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidde
 
 	// Hidden
 	if (IsWindows7OrLater()) {
-		// Windows 7 ˆÈ~
+		// Windows 7 ä»¥é™
 		const BOOL is_hidden = IsHiddenFont(lfont);
 		enable = !is_hidden ? TRUE : FALSE;
 		switch(mode) {
@@ -674,7 +666,7 @@ void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidde
 		}
 	}
 	else {
-		// Windows 7 ‚æ‚è‘O‚Ì‚Æ‚«‚Íg‚¦‚È‚¢
+		// Windows 7 ã‚ˆã‚Šå‰ã®ã¨ãã¯ä½¿ãˆãªã„
 		check = BST_CHECKED;
 		enable = FALSE;
 	}
@@ -708,8 +700,8 @@ void ArrangeControlsForChooseFont(HWND hWnd, const LOGFONTW *lfont, int id_hidde
 }
 
 /**
- *	logfont ‚Ì lfPitchAndFamily ‚ğƒZƒbƒg‚·‚é
- *	ƒvƒƒ|[ƒVƒ‡ƒiƒ‹ƒtƒHƒ“ƒg‚©‚Ç‚¤‚©‚ğ’²‚×‚éˆ×‚Éì¬
+ *	logfont ã® lfPitchAndFamily ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
+ *	ãƒ—ãƒ­ãƒãƒ¼ã‚·ãƒ§ãƒŠãƒ«ãƒ•ã‚©ãƒ³ãƒˆã‹ã©ã†ã‹ã‚’èª¿ã¹ã‚‹ç‚ºã«ä½œæˆ
  */
 void GetFontPitchAndFamily(HWND hWnd, LOGFONTW *logfont)
 {
@@ -724,7 +716,7 @@ void GetFontPitchAndFamily(HWND hWnd, LOGFONTW *logfont)
 	ReleaseDC(hWnd, hDC);
 
 	if ((tm.tmPitchAndFamily & TMPF_FIXED_PITCH) != 0) {
-		// TMPF_FIXED_PITCH bit ‚ª 1 ‚¾‚Á‚½‚çA‰Â•Ïƒsƒbƒ`(ƒvƒƒ|[ƒVƒ‡ƒiƒ‹ƒtƒHƒ“ƒg)
+		// TMPF_FIXED_PITCH bit ãŒ 1 ã ã£ãŸã‚‰ã€å¯å¤‰ãƒ”ãƒƒãƒ(ãƒ—ãƒ­ãƒãƒ¼ã‚·ãƒ§ãƒŠãƒ«ãƒ•ã‚©ãƒ³ãƒˆ)
 		logfont->lfPitchAndFamily = VARIABLE_PITCH | FF_ROMAN;
 	}
 }

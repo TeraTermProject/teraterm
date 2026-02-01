@@ -39,22 +39,22 @@
 
 #define ORDER 5000
 
-#define ID_MI_KANJIRECV		54010	// óM/‘—ó
-#define ID_MI_KANJISEND		54110	// ‘—M
+#define ID_MI_KANJIRECV		54010	// å—ä¿¡/é€å—
+#define ID_MI_KANJISEND		54110	// é€ä¿¡
 #define ID_MI_USEONESETTING	54200	// Use one setting
-#define ID_MI_SETTING		54201	// İ’è
+#define ID_MI_SETTING		54201	// è¨­å®š
 #define ID_MI_AMB_WIDTH_1	54202
 #define ID_MI_AMB_WIDTH_2	54203
 
-// ƒƒjƒ…[€–Ú–¼‚Ìî•ñ
+// ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®åã®æƒ…å ±
 typedef struct {
-	UINT id;						// ƒƒjƒ…[ID
-	ULONG_PTR data;   				// ƒf[ƒ^
-	const wchar_t *default_text;	// ƒeƒLƒXƒg
-	const char *key;				// ƒL[
+	UINT id;						// ãƒ¡ãƒ‹ãƒ¥ãƒ¼ID
+	ULONG_PTR data;   				// ãƒ‡ãƒ¼ã‚¿
+	const wchar_t *default_text;	// ãƒ†ã‚­ã‚¹ãƒˆ
+	const char *key;				// ã‚­ãƒ¼
 } MenuInfo;
 
-// ‘—ó•ÊŠ¿šƒR[ƒh (“ú–{Œê)
+// é€å—åˆ¥æ¼¢å­—ã‚³ãƒ¼ãƒ‰ (æ—¥æœ¬èª)
 static const MenuInfo MenuNameRecvJ[] = {
 	{ ID_MI_KANJIRECV + 0,		IdSJIS,	L"Recv: &Shift_JIS",	"MENU_RECV_SJIS" },
 	{ ID_MI_KANJIRECV + 1,		IdEUC,	L"Recv: &EUC-JP",		"MENU_RECV_EUCJP" },
@@ -67,7 +67,7 @@ static const MenuInfo MenuNameRecvJ[] = {
 	{ ID_MI_KANJISEND + 3,		IdUTF8, L"Send: U&TF-8",		"MENU_SEND_UTF8" },
 };
 
-// ‘—ó“¯Š¿šƒR[ƒh (“ú–{Œê)
+// é€å—åŒæ¼¢å­—ã‚³ãƒ¼ãƒ‰ (æ—¥æœ¬èª)
 static const MenuInfo MenuNameOneJ[] = {
 	{ ID_MI_KANJIRECV + 0,		IdSJIS, L"Recv/Send: &Shift_JIS",	"MENU_SJIS" },
 	{ ID_MI_KANJIRECV + 1,		IdEUC,	L"Recv/Send: &EUC-JP",		"MENU_EUCJP" },
@@ -75,7 +75,7 @@ static const MenuInfo MenuNameOneJ[] = {
 	{ ID_MI_KANJIRECV + 3,		IdUTF8, L"Recv/Send: &UTF-8",		"MENU_UTF8" },
 };
 
-// ‘—ó•ÊŠ¿šƒR[ƒh (ŠØ‘Œê)
+// é€å—åˆ¥æ¼¢å­—ã‚³ãƒ¼ãƒ‰ (éŸ“å›½èª)
 static const MenuInfo MenuNameRecvK[] = {
 	{ ID_MI_KANJIRECV + 0,		IdKoreanCP949,	L"Recv: &KS5601",		"MENU_RECV_KS5601" },
 	{ ID_MI_KANJIRECV + 1,		IdUTF8,			L"Recv: &UTF-8",		"MENU_RECV_UTF8" },
@@ -84,7 +84,7 @@ static const MenuInfo MenuNameRecvK[] = {
 	{ ID_MI_KANJISEND + 1,		IdUTF8,			L"Send: U&TF-8",		"MENU_SEND_UTF8" },
 };
 
-// ‘—ó“¯Š¿šƒR[ƒh (ŠØ‘Œê)
+// é€å—åŒæ¼¢å­—ã‚³ãƒ¼ãƒ‰ (éŸ“å›½èª)
 static const MenuInfo MenuNameOneK[] = {
 	{ ID_MI_KANJIRECV + 0,		IdKoreanCP949,	L"Recv/Send: &KS5601",	"MENU_KS5601" },
 	{ ID_MI_KANJIRECV + 1,		IdUTF8, 		L"Recv/Send: &UTF-8",	"MENU_UTF8" },
@@ -121,12 +121,12 @@ typedef struct {
 	PSetupTerminal origSetupTermDlg;
 	PReadIniFile origReadIniFile;
 	PWriteIniFile origWriteIniFile;
-	BOOL UseOneSetting;		// TRUE‘—ó“¯ˆêAINIƒtƒ@ƒCƒ‹‚É•Û‘¶
+	BOOL UseOneSetting;		// TRUEæ™‚é€å—åŒä¸€ã€INIãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜
 	BOOL NeedResetCharSet;
 	LanguageEnum language;
 	const MenuInfo *menu_info_ptr;
 	size_t menu_info_count;
-	// INIƒtƒ@ƒCƒ‹‚É•Û‘¶‚·‚é€–Ú
+	// INIãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã™ã‚‹é …ç›®
 	struct {
 		BOOL charcode_menu;
 		LanguageEnum language_ini;
@@ -142,7 +142,7 @@ static TInstVar *pvar;
 static TInstVar InstVar;
 
 /**
- *	ƒƒjƒ…[‚ğì¬‚·‚é
+ *	ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’ä½œæˆã™ã‚‹
  */
 static void CreateMenuInfo(HMENU hMenu, const MenuInfo *infos, size_t count,
 						   const wchar_t *UILanguageFile, const char *section)
@@ -175,17 +175,17 @@ static void CreateMenuInfo(HMENU hMenu, const MenuInfo *infos, size_t count,
 }
 
 /**
- *	hMenu‚Ìƒƒjƒ…[€–Ú‚ğ‚·‚×‚Äíœ‚·‚é
+ *	hMenuã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ã‚’ã™ã¹ã¦å‰Šé™¤ã™ã‚‹
  */
 static void DeleteMenus(HMENU hMenu)
 {
-	// count‚ÌŒÂ”ƒƒjƒ…[‚ğíœ‚·‚é‚Æ‚·‚×‚ÄÁ‚¦‚é
+	// countã®å€‹æ•°ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’å‰Šé™¤ã™ã‚‹ã¨ã™ã¹ã¦æ¶ˆãˆã‚‹
 	size_t i;
 	for (i = 0; i < 100; i++) {
-		// ˆê”Ôã‚Ì€–Ú‚ğíœ
+		// ä¸€ç•ªä¸Šã®é …ç›®ã‚’å‰Šé™¤
 		BOOL r = DeleteMenu(hMenu, 0, MF_BYPOSITION);
 		if (r == FALSE) {
-			// ¸”s = ‚·‚×‚Ä‚Ì€–Ú‚ğíœŠ®—¹
+			// å¤±æ•— = ã™ã¹ã¦ã®é …ç›®ã‚’å‰Šé™¤å®Œäº†
 			return;
 		}
 	}
@@ -236,7 +236,7 @@ static void CheckMenu(HMENU hMenu, const MenuInfo *info_ptr, size_t info_count, 
 }
 
 /**
- *	óM/‘—ó‚Ìƒ`ƒFƒbƒN‚ğ“ü‚ê‚é
+ *	å—ä¿¡/é€å—ã®ãƒã‚§ãƒƒã‚¯ã‚’å…¥ã‚Œã‚‹
  */
 static int UpdateRecvMenu(int val)
 {
@@ -245,7 +245,7 @@ static int UpdateRecvMenu(int val)
 }
 
 /**
- *	‘—M‚Ìƒ`ƒFƒbƒN‚ğ“ü‚ê‚é
+ *	é€ä¿¡ã®ãƒã‚§ãƒƒã‚¯ã‚’å…¥ã‚Œã‚‹
  */
 static int UpdateSendMenu(int val)
 {
@@ -254,7 +254,7 @@ static int UpdateSendMenu(int val)
 }
 
 /*
- * ‰Šú‰»
+ * åˆæœŸåŒ–
  */
 static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->ts = ts;
@@ -263,8 +263,8 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->origWriteIniFile = NULL;
 	pvar->UseOneSetting = TRUE;
 	pvar->NeedResetCharSet = FALSE;
-	// iniƒtƒ@ƒCƒ‹
-	//		iniƒtƒ@ƒCƒ‹“Ç‚İ‚İ•”‚ÉÀÛ‚Ì‰Šú’l‚ª‚ ‚é
+	// iniãƒ•ã‚¡ã‚¤ãƒ«
+	//		iniãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿éƒ¨ã«å®Ÿéš›ã®åˆæœŸå€¤ãŒã‚ã‚‹
 	pvar->ini.charcode_menu = TRUE;
 	pvar->ini.one_setting_menu = TRUE;
 	pvar->ini.language_ini = MENU_AUTO;
@@ -273,9 +273,9 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 }
 
 /*
- * ’[––İ’èƒ_ƒCƒAƒƒO‚ÌƒtƒbƒNŠÖ”1: UseOneSetting —p
+ * ç«¯æœ«è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ•ãƒƒã‚¯é–¢æ•°1: UseOneSetting ç”¨
  *
- * ‘—M‚ÆóM‚ÌŠ¿šƒR[ƒhİ’è‚ª“¯‚¶‚É‚È‚é‚æ‚¤‚É’²®‚·‚éB
+ * é€ä¿¡ã¨å—ä¿¡ã®æ¼¢å­—ã‚³ãƒ¼ãƒ‰è¨­å®šãŒåŒã˜ã«ãªã‚‹ã‚ˆã†ã«èª¿æ•´ã™ã‚‹ã€‚
  */
 static BOOL PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
 	WORD orgRecvCode, orgSendCode;
@@ -288,11 +288,11 @@ static BOOL PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
 
 	if (ret) {
 		if (orgRecvCode == pvar->ts->KanjiCode && orgSendCode != pvar->ts->KanjiCodeSend) {
-			// ‘—MƒR[ƒh‚Ì‚İ•ÏX‚µ‚½ê‡‚Í‘—MƒR[ƒh‚É‡‚í‚¹‚é
+			// é€ä¿¡ã‚³ãƒ¼ãƒ‰ã®ã¿å¤‰æ›´ã—ãŸå ´åˆã¯é€ä¿¡ã‚³ãƒ¼ãƒ‰ã«åˆã‚ã›ã‚‹
 			pvar->ts->KanjiCode = pvar->ts->KanjiCodeSend;
 		}
 		else {
-			// ‚»‚êˆÈŠO‚ÍóMƒR[ƒh‚É‡‚í‚¹‚é
+			// ãã‚Œä»¥å¤–ã¯å—ä¿¡ã‚³ãƒ¼ãƒ‰ã«åˆã‚ã›ã‚‹
 			pvar->ts->KanjiCodeSend = pvar->ts->KanjiCode;
 		}
 	}
@@ -301,10 +301,10 @@ static BOOL PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
 }
 
 /*
- * ’[––İ’èƒ_ƒCƒAƒƒO‚ÌƒtƒbƒNŠÖ”2: “à•”ó‘ÔƒŠƒZƒbƒg—p
+ * ç«¯æœ«è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ•ãƒƒã‚¯é–¢æ•°2: å†…éƒ¨çŠ¶æ…‹ãƒªã‚»ãƒƒãƒˆç”¨
  *
- * ’[––İ’èƒ_ƒCƒAƒƒO‚ğƒtƒbƒN‚µAİ’èƒ_ƒCƒAƒƒO‚ğŠJ‚©‚¸‚É TRUE ‚ğ•Ô‚·–‚É‚æ‚Á‚Ä
- * İ’èƒ_ƒCƒAƒƒOŒÄo‚ÌŒãˆ—‚Ì‚İ‚ğ—˜—p‚·‚éB
+ * ç«¯æœ«è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’ãƒ•ãƒƒã‚¯ã—ã€è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‹ã‹ãšã« TRUE ã‚’è¿”ã™äº‹ã«ã‚ˆã£ã¦
+ * è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°å‘¼å‡ºã®å¾Œå‡¦ç†ã®ã¿ã‚’åˆ©ç”¨ã™ã‚‹ã€‚
  */
 static BOOL PASCAL ResetCharSet(HWND parent, PTTSet ts) {
 	(void)parent;
@@ -315,19 +315,19 @@ static BOOL PASCAL ResetCharSet(HWND parent, PTTSet ts) {
 
 static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks) {
 	if (pvar->NeedResetCharSet) {
-		// “à•”ó‘ÔƒŠƒZƒbƒg‚Ìˆ×‚ÉŒÄ‚Ño‚³‚ê‚½ê‡
+		// å†…éƒ¨çŠ¶æ…‹ãƒªã‚»ãƒƒãƒˆã®ç‚ºã«å‘¼ã³å‡ºã•ã‚ŒãŸå ´åˆ
 		*hooks->SetupTerminal = ResetCharSet;
 	}
 	else if (pvar->UseOneSetting && (pvar->language == MENU_JAPANESE || pvar->language == MENU_KOREAN)) {
-		// UseOneSetting ‚ª TRUE ‚Ì‚Í’[––İ’èƒ_ƒCƒAƒƒO‚ÌŒãˆ—‚Ìˆ×‚ÉƒtƒbƒN‚·‚é
+		// UseOneSetting ãŒ TRUE ã®æ™‚ã¯ç«¯æœ«è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®å¾Œå‡¦ç†ã®ç‚ºã«ãƒ•ãƒƒã‚¯ã™ã‚‹
 		pvar->origSetupTermDlg = *hooks->SetupTerminal;
 		*hooks->SetupTerminal = TTXKanjiMenuSetupTerminal;
 	}
 }
 
 /*
- * Š¿šƒR[ƒhŠÖ˜A‚Ì“à•”ó‘Ô‚ÌƒŠƒZƒbƒg
- * TTX‚©‚ç‚ÍTera Term‚Ì“à•”ó‘Ô‚ğ’¼Ú‚¢‚¶‚ê‚È‚¢ˆ×A’[––İ’èƒ_ƒCƒAƒƒO‚ÌŒãˆ—‚ğ—˜—p‚·‚éB
+ * æ¼¢å­—ã‚³ãƒ¼ãƒ‰é–¢é€£ã®å†…éƒ¨çŠ¶æ…‹ã®ãƒªã‚»ãƒƒãƒˆ
+ * TTXã‹ã‚‰ã¯Tera Termã®å†…éƒ¨çŠ¶æ…‹ã‚’ç›´æ¥ã„ã˜ã‚Œãªã„ç‚ºã€ç«¯æœ«è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®å¾Œå‡¦ç†ã‚’åˆ©ç”¨ã™ã‚‹ã€‚
  */
 static void CallResetCharSet(HWND hWin){
 	pvar->NeedResetCharSet = TRUE;
@@ -335,7 +335,7 @@ static void CallResetCharSet(HWND hWin){
 }
 
 /*
- * İ’è‚Ì“Ç‚İ‚İ
+ * è¨­å®šã®èª­ã¿è¾¼ã¿
  */
 static void PASCAL TTXKanjiMenuReadIniFile(const wchar_t *fn, PTTSet ts) {
 	wchar_t buff[20];
@@ -355,7 +355,7 @@ static void PASCAL TTXKanjiMenuReadIniFile(const wchar_t *fn, PTTSet ts) {
 		pvar->ini.language_ini = MENU_KOREAN;
 		pvar->language = pvar->ini.language_ini;
 	} else {
-		// ©“®İ’è(–¢İ’è)
+		// è‡ªå‹•è¨­å®š(æœªè¨­å®š)
 		pvar->ini.language_ini = MENU_AUTO;
 	}
 	GetPrivateProfileStringW(IniSectionW, L"UseOneSettingMenu", L"on", buff, _countof(buff), fn);
@@ -363,14 +363,14 @@ static void PASCAL TTXKanjiMenuReadIniFile(const wchar_t *fn, PTTSet ts) {
 	GetPrivateProfileStringW(IniSectionW, L"AmbiguousCharacterWidthMenu", L"off", buff, _countof(buff), fn);
 	pvar->ini.ambiguous_menu = _wcsicmp(buff, L"off") == 0 ? FALSE : TRUE;
 
-	// UseOneSetting ‚ª on ‚Ìê‡‚ÍA‘—óMİ’è‚ª“¯‚¶‚É‚È‚é‚æ‚¤‚É’²®‚·‚é
+	// UseOneSetting ãŒ on ã®å ´åˆã¯ã€é€å—ä¿¡è¨­å®šãŒåŒã˜ã«ãªã‚‹ã‚ˆã†ã«èª¿æ•´ã™ã‚‹
 	if (pvar->UseOneSetting) {
 		pvar->ts->KanjiCodeSend = pvar->ts->KanjiCode;
 	}
 }
 
 /*
- * İ’è‚Ì•Û‘¶
+ * è¨­å®šã®ä¿å­˜
  */
 static void PASCAL TTXKanjiMenuWriteIniFile(const wchar_t *fn, PTTSet ts) {
 	/* Call original WriteIniFile */
@@ -391,7 +391,7 @@ static void PASCAL TTXKanjiMenuWriteIniFile(const wchar_t *fn, PTTSet ts) {
 }
 
 /*
- * İ’è‚Ì“Ç‚İ‘‚«‚ğƒtƒbƒN‚·‚é
+ * è¨­å®šã®èª­ã¿æ›¸ãã‚’ãƒ•ãƒƒã‚¯ã™ã‚‹
  */
 static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
 	pvar->origReadIniFile = *hooks->ReadIniFile;
@@ -401,14 +401,14 @@ static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
 }
 
 /*
- * ƒƒjƒ…[€–Ú‚ÌXV
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ã®æ›´æ–°
  *
- * ˆÈ‰º‚Ì“ñ‚Â‚É‚Â‚¢‚Äƒƒjƒ…[€–Ú‚ğXV‚·‚éB
- * 1. UseOneSetting ‚Ìİ’è‚ÉŠî‚Ã‚¢‚ÄAóM—pƒƒjƒ…[€–Ú‚ğóMê—p/‘—óMŒ“—p‚ÌØ‚è‘Ö‚¦‚ğs‚¤
- * 2. ƒƒjƒ…[€–Ú‚Ì‘Û‰»‚ğs‚¤
+ * ä»¥ä¸‹ã®äºŒã¤ã«ã¤ã„ã¦ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ã‚’æ›´æ–°ã™ã‚‹ã€‚
+ * 1. UseOneSetting ã®è¨­å®šã«åŸºã¥ã„ã¦ã€å—ä¿¡ç”¨ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ã‚’å—ä¿¡å°‚ç”¨/é€å—ä¿¡å…¼ç”¨ã®åˆ‡ã‚Šæ›¿ãˆã‚’è¡Œã†
+ * 2. ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ã®å›½éš›åŒ–ã‚’è¡Œã†
  *
- * ’Êí‚Í 1 ‚Åİ’è‚µ‚½€–Ú–¼‚Í 2 ‚Åã‘‚«XV‚³‚ê‚é‚ªAlng ƒtƒ@ƒCƒ‹‚ªİ’è‚³‚ê‚Ä‚¢‚È‚¢A
- * ‚Ü‚½‚Í lng ƒtƒ@ƒCƒ‹‚Éƒƒjƒ…[€–Ú–¼‚ªŠÜ‚Ü‚ê‚Ä‚¢‚È‚¢ê‡‚Ö‚Ì‘Î‰‚Æ‚µ‚Ä 1 ‚ğs‚Á‚Ä‚¢‚éB
+ * é€šå¸¸ã¯ 1 ã§è¨­å®šã—ãŸé …ç›®åã¯ 2 ã§ä¸Šæ›¸ãæ›´æ–°ã•ã‚Œã‚‹ãŒã€lng ãƒ•ã‚¡ã‚¤ãƒ«ãŒè¨­å®šã•ã‚Œã¦ã„ãªã„ã€
+ * ã¾ãŸã¯ lng ãƒ•ã‚¡ã‚¤ãƒ«ã«ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®åãŒå«ã¾ã‚Œã¦ã„ãªã„å ´åˆã¸ã®å¯¾å¿œã¨ã—ã¦ 1 ã‚’è¡Œã£ã¦ã„ã‚‹ã€‚
  */
 static void UpdateMenu(HMENU menu, BOOL UseOneSetting)
 {
@@ -519,10 +519,10 @@ static void PASCAL TTXModifyMenu(HMENU menu)
 
 
 /*
- * ƒ‰ƒWƒIƒƒjƒ…[/ƒ`ƒFƒbƒNƒƒjƒ…[‚Ìó‘Ô‚ğİ’è‚É‡‚í‚¹‚ÄXV‚·‚éB
+ * ãƒ©ã‚¸ã‚ªãƒ¡ãƒ‹ãƒ¥ãƒ¼/ãƒã‚§ãƒƒã‚¯ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®çŠ¶æ…‹ã‚’è¨­å®šã«åˆã‚ã›ã¦æ›´æ–°ã™ã‚‹ã€‚
  */
 static void PASCAL TTXModifyPopupMenu(HMENU menu) {
-	// ƒƒjƒ…[‚ªŒÄ‚Ño‚³‚ê‚½‚çAÅV‚Ìİ’è‚ÉXV‚·‚éB(2007.5.25 yutaka)
+	// ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãŒå‘¼ã³å‡ºã•ã‚ŒãŸã‚‰ã€æœ€æ–°ã®è¨­å®šã«æ›´æ–°ã™ã‚‹ã€‚(2007.5.25 yutaka)
 	if (menu == pvar->hmEncode) {
 		if (pvar->ini.charcode_menu) {
 			UpdateRecvMenu(pvar->ts->KanjiCode);
@@ -570,13 +570,16 @@ static INT_PTR CALLBACK SettingDlgProc(HWND dlg, UINT msg, WPARAM wp, LPARAM lp)
 			{ IDCANCEL, "BTN_CANCEL" },
 			{ IDHELP, "BTN_HELP" },
 		};
+		static const I18nTextInfo infos[] = {
+			{ "MENU_CONTENTS_AUTO", L"Auto" },
+			{ "MENU_CONTENTS_JAPANESE", L"Japanese" },
+			{ "MENU_CONTENTS_KOREAN", L"Korean" }
+		};
 
 		SetI18nDlgStrsW(dlg, "TTXKanjiMenu", TextInfos, _countof(TextInfos), pvar->ts->UILanguageFileW);
 		CheckDlgButton(dlg, IDC_CHECK_CHARCODE,
 					   pvar->ini.charcode_menu ? BST_CHECKED : BST_UNCHECKED);
-		SendDlgItemMessageW(dlg, IDC_LANGUAGE_DROPBOX, CB_ADDSTRING, 0, (LPARAM)L"Auto");
-		SendDlgItemMessageW(dlg, IDC_LANGUAGE_DROPBOX, CB_ADDSTRING, 0, (LPARAM)L"Japanese");
-		SendDlgItemMessageW(dlg, IDC_LANGUAGE_DROPBOX, CB_ADDSTRING, 0, (LPARAM)L"Korean");
+		SetI18nListW("TTXKanjiMenu", dlg, IDC_LANGUAGE_DROPBOX, infos, _countof(infos), pvar->ts->UILanguageFileW, 0);
 		SendDlgItemMessageA(dlg, IDC_LANGUAGE_DROPBOX, CB_SETCURSEL,
 							pvar->ini.language_ini == MENU_JAPANESE ? 1 :
 							pvar->ini.language_ini == MENU_KOREAN ? 2 :
@@ -592,8 +595,8 @@ static INT_PTR CALLBACK SettingDlgProc(HWND dlg, UINT msg, WPARAM wp, LPARAM lp)
 		wchar_t *s;
 		char *ver_substr = GetVersionSubstr();
 		aswprintf(&s,
-				  L"KanjiMenu version %d.%d\r\n%hs",
-				  TTXKANJIMENU_VERSION_MAJOR, TTXKANJIMENU_VERSION_MINOR,
+				  L"KanjiMenu version %d.%d.%d\r\n%hs",
+				  TTXKANJIMENU_VERSION_MAJOR, TTXKANJIMENU_VERSION_MINOR, TTXKANJIMENU_VERSION_PATCH,
 				  ver_substr);
 		free(ver_substr);
 		SetDlgItemTextW(dlg, IDC_VERSION, s);
@@ -656,30 +659,30 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 
 	if ((cmd >= ID_MI_KANJIRECV) && (cmd < ID_MI_USEONESETTING)) {
 		/*
-		 *	ƒ^ƒCƒgƒ‹ƒo[orƒƒjƒ…[ƒo[‚ğ‰B‚µ‚Äƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[‚Å•\¦‚µ‚Ä‚¢‚é‚Æ‚«
-		 *	‚±‚ÌŠÖ”‚ªƒR[ƒ‹‚³‚ê‚½‚Æ‚«Aƒƒjƒ…‚Í DestroyMenu() ‚³‚ê‚Ä‚¢‚éB
-		 *	‚±‚ÌŠÖ”“à‚Å‚Í GetMenuItemInfoW() ‚ªg‚¦‚È‚¢
+		 *	ã‚¿ã‚¤ãƒˆãƒ«ãƒãƒ¼orãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã‚’éš ã—ã¦ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã§è¡¨ç¤ºã—ã¦ã„ã‚‹ã¨ã
+		 *	ã“ã®é–¢æ•°ãŒã‚³ãƒ¼ãƒ«ã•ã‚ŒãŸã¨ãã€ãƒ¡ãƒ‹ãƒ¥ã¯ DestroyMenu() ã•ã‚Œã¦ã„ã‚‹ã€‚
+		 *	ã“ã®é–¢æ•°å†…ã§ã¯ GetMenuItemInfoW() ãŒä½¿ãˆãªã„
 		 */
 		const MenuInfo *menu_info_ptr = SearchMenuItem(pvar->menu_info_ptr, pvar->menu_info_count, cmd);
 		if (menu_info_ptr == NULL) {
-			// ’m‚ç‚È‚¢ƒRƒ}ƒ“ƒh?
+			// çŸ¥ã‚‰ãªã„ã‚³ãƒãƒ³ãƒ‰?
 			assert(FALSE);
 			return 0;
 		}
 		val = (WORD)menu_info_ptr->data;
 		if (cmd < ID_MI_KANJISEND) {
 			if (pvar->UseOneSetting) {
-				// ‘—óƒR[ƒh
+				// é€å—ã‚³ãƒ¼ãƒ‰
 				pvar->cv->KanjiCodeEcho = pvar->ts->KanjiCode = val;
 				pvar->cv->KanjiCodeSend = pvar->ts->KanjiCodeSend = val;
 			}
 			else {
-				// óMƒR[ƒh
+				// å—ä¿¡ã‚³ãƒ¼ãƒ‰
 				pvar->cv->KanjiCodeEcho = pvar->ts->KanjiCode = val;
 			}
 		}
 		else {
-			// ‘—MƒR[ƒh
+			// é€ä¿¡ã‚³ãƒ¼ãƒ‰
 			pvar->cv->KanjiCodeSend = pvar->ts->KanjiCodeSend = val;
 		}
 		CallResetCharSet(hWin);

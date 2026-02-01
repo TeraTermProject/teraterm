@@ -77,7 +77,7 @@ BOOL LoadIME(void)
 	HANDLE hDll;
 	DWORD error;
 	if (HIMEDLL != NULL) {
-		// 2d‰Šú‰»?
+		// 2é‡åˆæœŸåŒ–?
 		return TRUE;
 	}
 	error = DLLGetApiAddressFromList(L"imm32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ERROR_NOT_EXIST, imeapi, &hDll);
@@ -144,13 +144,13 @@ void ResetConversionLogFont(HWND HWnd)
 	if (hIMC != NULL) {
 		BOOL result = FALSE;
 		if (PImmSetCompositionFontW != NULL) {
-			// ImmSetCompositionFontA()‚ğg—p‚·‚é‚Æ
-			// –¢•ÏŠ·•¶š—ñ‚ªw’èƒtƒHƒ“ƒg‚Å•\¦‚³‚ê‚È‚¢‚±‚Æ‚ª‚ ‚é
+			// ImmSetCompositionFontA()ã‚’ä½¿ç”¨ã™ã‚‹ã¨
+			// æœªå¤‰æ›æ–‡å­—åˆ—ãŒæŒ‡å®šãƒ•ã‚©ãƒ³ãƒˆã§è¡¨ç¤ºã•ã‚Œãªã„ã“ã¨ãŒã‚ã‚‹
 			result = PImmSetCompositionFontW(hIMC, &IMELogFontW);
 		}
 		if (result == FALSE) {
-			// ImmSetCompositionFontW() ‚ªƒGƒ‰[‚ğ•Ô‚µ‚Ä‚«‚½‚Æ‚« A() ‚ÅƒŠƒgƒ‰ƒC
-			// 9x ‚Å‚Í W()‚Í‘¶İ‚·‚é‚ªƒGƒ‰[‚ğ•Ô‚µ‚Ä‚­‚é‚æ‚¤‚¾
+			// ImmSetCompositionFontW() ãŒã‚¨ãƒ©ãƒ¼ã‚’è¿”ã—ã¦ããŸã¨ã A() ã§ãƒªãƒˆãƒ©ã‚¤
+			// 9x ã§ã¯ W()ã¯å­˜åœ¨ã™ã‚‹ãŒã‚¨ãƒ©ãƒ¼ã‚’è¿”ã—ã¦ãã‚‹ã‚ˆã†ã 
 			PImmSetCompositionFontA(hIMC, &IMELogFontA);
 		}
 		PImmReleaseContext(HWnd,hIMC);
@@ -189,7 +189,7 @@ void SetConversionLogFont(HWND HWnd, const LOGFONTW *lf)
 	ResetConversionLogFont(HWnd);
 }
 
-// “à•”—p
+// å†…éƒ¨ç”¨
 static const char *GetConvStringA_i(HWND hWnd, DWORD index, size_t *len)
 {
 	HIMC hIMC;
@@ -201,7 +201,7 @@ static const char *GetConvStringA_i(HWND hWnd, DWORD index, size_t *len)
 		goto error_2;
 
 	// Get the size of the result string.
-	//		’ˆÓ ImmGetCompositionStringA() ‚Ì–ß‚è’l‚Í byte ”
+	//		æ³¨æ„ ImmGetCompositionStringA() ã®æˆ»ã‚Šå€¤ã¯ byte æ•°
 	size = PImmGetCompositionStringA(hIMC, index, NULL, 0);
 	if (size <= 0)
 		goto error_1;
@@ -217,7 +217,7 @@ static const char *GetConvStringA_i(HWND hWnd, DWORD index, size_t *len)
 	}
 
 	*len = size;
-	lpstr[size] = 0;	// ƒ^[ƒ~ƒl[ƒg‚·‚é
+	lpstr[size] = 0;	// ã‚¿ãƒ¼ãƒŸãƒãƒ¼ãƒˆã™ã‚‹
 
 	(*PImmReleaseContext)(hWnd, hIMC);
 	return lpstr;
@@ -229,7 +229,7 @@ error_2:
 	return NULL;
 }
 
-// “à•”—p wchar_t”Å
+// å†…éƒ¨ç”¨ wchar_tç‰ˆ
 static const wchar_t *GetConvStringW_i(HWND hWnd, DWORD index, size_t *len)
 {
 	HIMC hIMC;
@@ -241,7 +241,7 @@ static const wchar_t *GetConvStringW_i(HWND hWnd, DWORD index, size_t *len)
 		goto error_2;
 
 	// Get the size of the result string.
-	//		’ˆÓ ImmGetCompositionStringW() ‚Ì–ß‚è’l‚Í byte ”
+	//		æ³¨æ„ ImmGetCompositionStringW() ã®æˆ»ã‚Šå€¤ã¯ byte æ•°
 	size = PImmGetCompositionStringW(hIMC, index, NULL, 0);
 	if (size <= 0)
 		goto error_1;
@@ -257,7 +257,7 @@ static const wchar_t *GetConvStringW_i(HWND hWnd, DWORD index, size_t *len)
 	}
 
 	*len = size/2;
-	lpstr[(size/2)] = 0;	// ƒ^[ƒ~ƒl[ƒg‚·‚é
+	lpstr[(size/2)] = 0;	// ã‚¿ãƒ¼ãƒŸãƒãƒ¼ãƒˆã™ã‚‹
 
 	(*PImmReleaseContext)(hWnd, hIMC);
 	return lpstr;
@@ -270,10 +270,10 @@ error_2:
 }
 
 /*
- *	@param[out]		*len	wchar_t•¶š”('\0'‚ÍŠÜ‚Ü‚È‚¢)
- *	@retval			•ÏŠ·wchar_t•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *					NULL‚Ìê‡•ÏŠ·Šm’è‚µ‚Ä‚¢‚È‚¢(‚Ü‚½‚ÍƒGƒ‰[)
- *					•¶š—ñ‚Íg—pŒãfree()‚·‚é‚±‚Æ
+ *	@param[out]		*len	wchar_tæ–‡å­—æ•°('\0'ã¯å«ã¾ãªã„)
+ *	@retval			å¤‰æ›wchar_tæ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *					NULLã®å ´åˆå¤‰æ›ç¢ºå®šã—ã¦ã„ãªã„(ã¾ãŸã¯ã‚¨ãƒ©ãƒ¼)
+ *					æ–‡å­—åˆ—ã¯ä½¿ç”¨å¾Œfree()ã™ã‚‹ã“ã¨
  */
 const wchar_t *GetConvStringW(HWND hWnd, LPARAM lParam, size_t *len)
 {
@@ -292,10 +292,10 @@ const wchar_t *GetConvStringW(HWND hWnd, LPARAM lParam, size_t *len)
 }
 
 /*
- *	@param[out]		*len	•¶š”('\0'‚ÍŠÜ‚Ü‚È‚¢)
- *	@retval			•ÏŠ·•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *					NULL‚Ìê‡•ÏŠ·Šm’è‚µ‚Ä‚¢‚È‚¢(‚Ü‚½‚ÍƒGƒ‰[)
- *					•¶š—ñ‚Íg—pŒãfree()‚·‚é‚±‚Æ
+ *	@param[out]		*len	æ–‡å­—æ•°('\0'ã¯å«ã¾ãªã„)
+ *	@retval			å¤‰æ›æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *					NULLã®å ´åˆå¤‰æ›ç¢ºå®šã—ã¦ã„ãªã„(ã¾ãŸã¯ã‚¨ãƒ©ãƒ¼)
+ *					æ–‡å­—åˆ—ã¯ä½¿ç”¨å¾Œfree()ã™ã‚‹ã“ã¨
  */
 const char *GetConvStringA(HWND hWnd, LPARAM lParam, size_t *len)
 {
@@ -371,24 +371,24 @@ static void DumpReconvStringSt(RECONVERTSTRING *pReconv, BOOL unicode)
 }
 #endif
 
-// IME‚Ì‘OŒãQÆ•ÏŠ·‹@”\‚Ö‚Ì‘Î‰
-// MS‚©‚ç‚¿‚á‚ñ‚Æd—l‚ª’ñ¦‚³‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅAƒAƒhƒzƒbƒN‚É‚â‚é‚µ‚©‚È‚¢‚ç‚µ‚¢B
+// IMEã®å‰å¾Œå‚ç…§å¤‰æ›æ©Ÿèƒ½ã¸ã®å¯¾å¿œ
+// MSã‹ã‚‰ã¡ã‚ƒã‚“ã¨ä»•æ§˜ãŒæç¤ºã•ã‚Œã¦ã„ãªã„ã®ã§ã€ã‚¢ãƒ‰ãƒ›ãƒƒã‚¯ã«ã‚„ã‚‹ã—ã‹ãªã„ã‚‰ã—ã„ã€‚
 // cf. http://d.hatena.ne.jp/topiyama/20070703
 //	   http://ice.hotmint.com/putty/#DOWNLOAD
 //	   http://27213143.at.webry.info/201202/article_2.html
 //	   http://webcache.googleusercontent.com/search?q=cache:WzlX3ouMscIJ:anago.2ch.net/test/read.cgi/software/1325573999/82+IMR_DOCUMENTFEED&cd=13&hl=ja&ct=clnk&gl=jp
 // (2012.5.9 yutaka)
 /**
- * IME‚Ì‘OŒãQÆ•ÏŠ·‹@”\—p\‘¢‘Ì‚ğì¬‚·‚é
- *		msg == WM_IME_REQUEST,wParam == IMR_DOCUMENTFEED ‚Ì‰“š‚Ég‚¤
- *		ANSI‚©UnicodeƒEƒBƒ“ƒhƒE‚É‚æ‚Á‚ÄQÆ•¶š—ñ‚ğ•ÏX‚·‚é‚±‚Æ
- * unicode		TRUE‚Ì‚Æ‚«unicode
- * str_ptr		QÆ•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
- * str_count	QÆ•¶š—ñ‚Ì•¶š”(char‚È‚çbytes”,wchar_t‚È‚çwchar_t”)
- * cx			ƒJ[ƒ\ƒ‹ˆÊ’u(char/wchar_t’PˆÊ)
- * st_size		¶¬‚µ‚½\‘¢‘Ì‚ÌƒTƒCƒY
- * –ß‚è’l		\‘¢‘Ì‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *				•s—v‚É‚È‚Á‚½‚ç free()‚·‚é‚±‚Æ
+ * IMEã®å‰å¾Œå‚ç…§å¤‰æ›æ©Ÿèƒ½ç”¨æ§‹é€ ä½“ã‚’ä½œæˆã™ã‚‹
+ *		msg == WM_IME_REQUEST,wParam == IMR_DOCUMENTFEED ã®å¿œç­”ã«ä½¿ã†
+ *		ANSIã‹Unicodeã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«ã‚ˆã£ã¦å‚ç…§æ–‡å­—åˆ—ã‚’å¤‰æ›´ã™ã‚‹ã“ã¨
+ * unicode		TRUEã®ã¨ãunicode
+ * str_ptr		å‚ç…§æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ * str_count	å‚ç…§æ–‡å­—åˆ—ã®æ–‡å­—æ•°(charãªã‚‰bytesæ•°,wchar_tãªã‚‰wchar_tæ•°)
+ * cx			ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®(char/wchar_tå˜ä½)
+ * st_size		ç”Ÿæˆã—ãŸæ§‹é€ ä½“ã®ã‚µã‚¤ã‚º
+ * æˆ»ã‚Šå€¤		æ§‹é€ ä½“ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *				ä¸è¦ã«ãªã£ãŸã‚‰ free()ã™ã‚‹ã“ã¨
  */
 static void *CreateReconvStringSt(HWND hWnd, BOOL unicode,
 								  const void *str_ptr, size_t str_count,
@@ -419,8 +419,8 @@ static void *CreateReconvStringSt(HWND hWnd, BOOL unicode,
 		cx_bytes = cx;
 	}
 
-	// •ÏŠ·’†Œó•â•¶š—ñ‚ğæ“¾
-	// ATOK2012‚Å‚Íí‚É complen_count=0 ‚Æ‚È‚éB
+	// å¤‰æ›ä¸­å€™è£œæ–‡å­—åˆ—ã‚’å–å¾—
+	// ATOK2012ã§ã¯å¸¸ã« complen_count=0 ã¨ãªã‚‹ã€‚
 	if (!unicode) {
 		const char *comp_strA;
 		comp_strA = GetConvStringA_i(hWnd, GCS_COMPSTR, &complen_count);
@@ -433,7 +433,7 @@ static void *CreateReconvStringSt(HWND hWnd, BOOL unicode,
 		comp_ptr = comp_strW;
 	}
 
-	// •ÏŠ·•¶š‚àŠÜ‚ß‚½‘S‘Ì‚Ì’·‚³(including null)
+	// å¤‰æ›æ–‡å­—ã‚‚å«ã‚ãŸå…¨ä½“ã®é•·ã•(including null)
 	if (!unicode) {
 		new_str_len_bytes = str_len_bytes + complen_bytes;
 		new_buf_len_bytes = new_str_len_bytes + 1;
@@ -447,8 +447,8 @@ static void *CreateReconvStringSt(HWND hWnd, BOOL unicode,
 	st_size = sizeof(RECONVERTSTRING) + new_buf_len_bytes;
 	pReconv = calloc(1, st_size);
 
-	// Len‚Í•¶š”(char/wchar_t’PˆÊ)
-	// Offset‚Íbyte’PˆÊ
+	// Lenã¯æ–‡å­—æ•°(char/wchar_tå˜ä½)
+	// Offsetã¯byteå˜ä½
 //	pReconv->dwSize				= sizeof(RECONVERTSTRING);
 	pReconv->dwSize				= sizeof(RECONVERTSTRING) + new_buf_len_bytes;
 	pReconv->dwVersion			= 0;
@@ -459,8 +459,8 @@ static void *CreateReconvStringSt(HWND hWnd, BOOL unicode,
 	pReconv->dwTargetStrLen		= complen_count;		// = dwCompStrLen
 	pReconv->dwTargetStrOffset	= cx_bytes;				// = dwCompStrOffset
 
-	// RECONVERTSTRING‚ÌŒã‚ë‚É
-	// QÆ•¶š—ñ‚ğƒRƒs[+ƒJ[ƒ\ƒ‹ˆÊ’u‚É•Ï•¶š—ñ‚ğ‘}“ü
+	// RECONVERTSTRINGã®å¾Œã‚ã«
+	// å‚ç…§æ–‡å­—åˆ—ã‚’ã‚³ãƒ”ãƒ¼+ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã«å¤‰æ–‡å­—åˆ—ã‚’æŒ¿å…¥
 	newbuf = (char *)pReconv + sizeof(RECONVERTSTRING);
 	if (comp_ptr != NULL) {
 		memcpy(newbuf, buf, cx_bytes);
@@ -482,15 +482,15 @@ static void *CreateReconvStringSt(HWND hWnd, BOOL unicode,
 }
 
 /**
- * IME‚Ì‘OŒãQÆ•ÏŠ·‹@”\—p\‘¢‘Ì‚ğì¬‚·‚é
- * ANSIƒEƒBƒ“ƒhƒE—p
- *		msg == WM_IME_REQUEST,wParam == IMR_DOCUMENTFEED ‚Ì‰“š‚Ég‚¤
- * str_ptr		QÆ•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
- * str_count	QÆ•¶š—ñ‚Ì•¶š”(char”,bytes”)
- * cx			ƒJ[ƒ\ƒ‹ˆÊ’u(char’PˆÊ)
- * st_size		¶¬‚µ‚½\‘¢‘Ì‚ÌƒTƒCƒY(byte)
- * –ß‚è’l		\‘¢‘Ì‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *				•s—v‚É‚È‚Á‚½‚ç free()‚·‚é‚±‚Æ
+ * IMEã®å‰å¾Œå‚ç…§å¤‰æ›æ©Ÿèƒ½ç”¨æ§‹é€ ä½“ã‚’ä½œæˆã™ã‚‹
+ * ANSIã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç”¨
+ *		msg == WM_IME_REQUEST,wParam == IMR_DOCUMENTFEED ã®å¿œç­”ã«ä½¿ã†
+ * str_ptr		å‚ç…§æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ * str_count	å‚ç…§æ–‡å­—åˆ—ã®æ–‡å­—æ•°(charæ•°,bytesæ•°)
+ * cx			ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®(charå˜ä½)
+ * st_size		ç”Ÿæˆã—ãŸæ§‹é€ ä½“ã®ã‚µã‚¤ã‚º(byte)
+ * æˆ»ã‚Šå€¤		æ§‹é€ ä½“ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *				ä¸è¦ã«ãªã£ãŸã‚‰ free()ã™ã‚‹ã“ã¨
  */
 void *CreateReconvStringStA(
 	HWND hWnd, const char *str_ptr, size_t str_count,
@@ -502,15 +502,15 @@ void *CreateReconvStringStA(
 }
 
 /**
- * IME‚Ì‘OŒãQÆ•ÏŠ·‹@”\—p\‘¢‘Ì‚ğì¬‚·‚é
- * unicodeƒEƒBƒ“ƒhƒE—p
- *		msg == WM_IME_REQUEST,wParam == IMR_DOCUMENTFEED ‚Ì‰“š‚Ég‚¤
- * str_ptr		QÆ•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
- * str_count	QÆ•¶š—ñ‚Ì•¶š”(wchar_t”)
- * cx			ƒJ[ƒ\ƒ‹ˆÊ’u(wchar_t’PˆÊ)
- * st_size		¶¬‚µ‚½\‘¢‘Ì‚ÌƒTƒCƒY(byte)
- * –ß‚è’l		\‘¢‘Ì‚Ö‚Ìƒ|ƒCƒ“ƒ^
- *				•s—v‚É‚È‚Á‚½‚ç free()‚·‚é‚±‚Æ
+ * IMEã®å‰å¾Œå‚ç…§å¤‰æ›æ©Ÿèƒ½ç”¨æ§‹é€ ä½“ã‚’ä½œæˆã™ã‚‹
+ * unicodeã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç”¨
+ *		msg == WM_IME_REQUEST,wParam == IMR_DOCUMENTFEED ã®å¿œç­”ã«ä½¿ã†
+ * str_ptr		å‚ç…§æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ * str_count	å‚ç…§æ–‡å­—åˆ—ã®æ–‡å­—æ•°(wchar_tæ•°)
+ * cx			ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®(wchar_tå˜ä½)
+ * st_size		ç”Ÿæˆã—ãŸæ§‹é€ ä½“ã®ã‚µã‚¤ã‚º(byte)
+ * æˆ»ã‚Šå€¤		æ§‹é€ ä½“ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+ *				ä¸è¦ã«ãªã£ãŸã‚‰ free()ã™ã‚‹ã“ã¨
  */
 void *CreateReconvStringStW(
 	HWND hWnd, const wchar_t *str_ptr, size_t str_count,
@@ -522,7 +522,7 @@ void *CreateReconvStringStW(
 }
 
 /**
- * IME‚ªg‚¦‚éOS?
+ * IMEãŒä½¿ãˆã‚‹OS?
  */
 BOOL IMEEnabled(void)
 {
@@ -535,14 +535,14 @@ BOOL IMEEnabled(void)
 #if 0
 		int acp = GetACP();
 		if (acp == 932 || acp == 949 || acp = 936 || acp == 950) {
-			// CP932	“ú–{Œê shift jis
+			// CP932	æ—¥æœ¬èª shift jis
 			// CP949	Korean
 			// CP936	GB2312
 			// CP950	Big5
 			return TRUE;
 		}
 #else
-		// DBCS enable ‚È‚çŠ¿š•ÏŠ·‚Å‚«‚é‚Í‚¸
+		// DBCS enable ãªã‚‰æ¼¢å­—å¤‰æ›ã§ãã‚‹ã¯ãš
 		return TRUE;
 #endif
 	}

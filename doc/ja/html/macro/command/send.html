@@ -25,7 +25,11 @@ send &lt;data1&gt; &lt;data2&gt;....
 
 <p>
 &lt;data&gt; が文字列型の場合、文字列をホストへ送信させる。<br>
-&lt;data&gt; が整数型の場合は、その値の下位バイト(0-255)を ASCII コードとみなし、その文字を送信させる。
+&lt;data&gt; が整数型の場合は、その値の下位バイト(0-255)を ASCII コードとみなし、その文字をホストへ送信させる。
+</p>
+
+<p>
+  <a href="../../menu/setup-additional-terminal.html#LocalEcho">ローカルエコー設定</a>に従ってVTWinへも送信させる。
 </p>
 
 <p>
@@ -73,8 +77,29 @@ send #9
 同期モードについては "<a href="setsync.html">setsync</a>" を参照。
 </p>
 
+<h2>送信先</h2>
+
+各コマンドの送信先(ホスト/LocalEcho(VTWinへの送信))の関係は次の通り
+
+<table border="1">
+  <tr>
+    <th></th><th>Host</th><th>LocalEcho</th>
+  </tr>
+  <tr>
+    <th>send/sendln/sendbinary/sendtext</th>
+    <td>Yes</td>
+    <td><a href="../../menu/setup-additional-terminal.html#LocalEcho">Setting</a></td>
+  </tr>
+  <tr>
+    <th>dispstr</th>
+    <td>No</td>
+    <td>Yes</td>
+  </tr>
+</table>
+
 <h2>参照</h2>
 <ul>
+  <li><a href="dispstr.html">dispstr</a></li>
   <li><a href="sendln.html">sendln</a></li>
   <li><a href="sendtext.html">sendtext</a></li>
   <li><a href="sendbinary.html">sendbinary</a></li>

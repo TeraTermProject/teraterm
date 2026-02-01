@@ -61,7 +61,7 @@ INT_PTR CInpDlg::DoModal(HINSTANCE hInst, HWND hWndParent)
 	return TTCDialog::DoModal(hInst, hWndParent, CInpDlg::IDD);
 }
 
-// msgdlg �̂悤�ɁA���b�Z�[�W�������ꍇ�ɂ̓_�C�A���O���g����悤�ɂ��� (2006.7.29 maya)
+// msgdlg のように、メッセージが長い場合にはダイアログを拡げるようにした (2006.7.29 maya)
 BOOL CInpDlg::OnInitDialog()
 {
 	static const DlgTextInfo TextInfos[] = {
@@ -132,14 +132,14 @@ LRESULT CInpDlg::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 	current_WH = R.bottom - R.top;
 
 	if (current_WW == WW && current_WH == WH) {
-		// �T�C�Y���ς���Ă��Ȃ���Ή������Ȃ�
+		// サイズが変わっていなければ何もしない
 		PosX = R.left;
 		PosY = R.top;
 	}
 	else {
 		int new_WW;
 
-		// �������ύX���ꂽ���A�ŏ���蕝�������Ȃ����ꍇ�͌��ɖ߂�
+		// 高さが変更されたか、最初より幅が狭くなった場合は元に戻す
 		if (current_WW < init_WW) {
 			new_WW = init_WW;
 			if (PosX != R.left) {
@@ -187,16 +187,16 @@ void CInpDlg::Relocation(BOOL is_init, int new_WW, int new_WH)
 	CONTROL_GAP_W = c_WW - CW;
 	CONTROL_GAP_H = c_WH - CH;
 
-	// ����̂�
+	// 初回のみ
 	if (is_init) {
-		// �e�L�X�g�R���g���[���T�C�Y��␳
+		// テキストコントロールサイズを補正
 		if (TW < (int)(224 * dpi / 96.f)) {
 			TW = (int)(224 * dpi / 96.f);
 		}
 		if (EW < s.cx) {
 			EW = s.cx;
 		}
-		// �E�C���h�E�T�C�Y�̌v�Z
+		// ウインドウサイズの計算
 		TW += (int)(26 * dpi / 96.f);
 		WW = TW + CONTROL_GAP_W;
 		WH = TH + CONTROL_GAP_H + EH + BH + BH*2;

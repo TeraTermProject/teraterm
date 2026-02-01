@@ -11,7 +11,7 @@
 
 #include	<windows.h>
 
-// Šeí’è”
+// å„ç¨®å®šæ•°
 #define		WM_TMENU_NOTIFY			(WM_USER + 101)
 #define		WM_MENUOPEN				(WM_USER + 102)
 #define		ID_NOENTRY				49999
@@ -34,7 +34,7 @@
 #define		MODE_SMALLICON			0x0000
 #define		MODE_LARGEICON			0x0001
 
-// ƒŒƒWƒXƒgƒŠ‚Ì’l–¼iˆê”Êİ’èj
+// ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã®å€¤åï¼ˆä¸€èˆ¬è¨­å®šï¼‰
 #define		KEY_ICONMODE			L"IconMode"
 #define		KEY_LEFTBUTTONPOPUP		L"LeftButtonPopup"
 #define		KEY_MENUTEXTCOLOR		L"MenuTextColor"
@@ -54,7 +54,7 @@
 #define		KEY_LF_FACENAME			L"lfFaceName"
 #define		KEY_HOTKEY				L"Hotkey"
 
-// ƒŒƒWƒXƒgƒŠ‚Ì’l–¼iƒWƒ‡ƒuİ’èj
+// ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã®å€¤åï¼ˆã‚¸ãƒ§ãƒ–è¨­å®šï¼‰
 #define		KEY_MODE				L"Mode"
 #define		KEY_HOSTNAME			L"HostName"
 #define		KEY_USERFLAG			L"UserFlag"
@@ -81,43 +81,43 @@
 #define		STR_NOENTRY				L"(none)"
 
 typedef enum {
-	MODE_AUTOLOGIN	=		0x0000,		// ©“®‚ÅƒƒOƒCƒ“,ssh‚Å‚Í‚È‚¢‚Æ‚«ƒ}ƒNƒ‚ğg—p‚·‚é
-	MODE_MACRO		=		0x0001,		// w’èƒ}ƒNƒ‚ğ‹N“®‚·‚é
+	MODE_AUTOLOGIN	=		0x0000,		// è‡ªå‹•ã§ãƒ­ã‚°ã‚¤ãƒ³,sshã§ã¯ãªã„ã¨ããƒã‚¯ãƒ­ã‚’ä½¿ç”¨ã™ã‚‹
+	MODE_MACRO		=		0x0001,		// æŒ‡å®šãƒã‚¯ãƒ­ã‚’èµ·å‹•ã™ã‚‹
 	MODE_DIRECT		=		0x0002,		
 } JobMode;
 
-// İ’èî•ñ\‘¢‘Ì
+// è¨­å®šæƒ…å ±æ§‹é€ ä½“
 struct JobInfo {
-	wchar_t	szName[MAX_PATH];			// ƒWƒ‡ƒu–¼
-	BOOL	bStartup;					// ‹N“®‚ÉƒWƒ‡ƒu‚ğÀs‚·‚é‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
-	BOOL	bTtssh;						// ttssh‚ğg—p‚·‚é‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
-	JobMode	dwMode;						// ƒWƒ‡ƒu‚Ìí—Ş
+	wchar_t	szName[MAX_PATH];			// ã‚¸ãƒ§ãƒ–å
+	BOOL	bStartup;					// èµ·å‹•æ™‚ã«ã‚¸ãƒ§ãƒ–ã‚’å®Ÿè¡Œã™ã‚‹ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
+	BOOL	bTtssh;						// ttsshã‚’ä½¿ç”¨ã™ã‚‹ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
+	JobMode	dwMode;						// ã‚¸ãƒ§ãƒ–ã®ç¨®é¡
 
-	// ©“®ƒƒOƒCƒ“—pİ’è
-	wchar_t	szHostName[MAX_PATH];		// ƒzƒXƒg–¼
-	BOOL	bUsername;					// ƒ†[ƒU–¼‚ğ“ü—Í‚·‚é‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
-	wchar_t	szUsername[MAX_PATH];		// ƒ†[ƒU–¼
-	BOOL	bPassword;					// ƒpƒXƒ[ƒh‚ğ“ü—Í‚·‚é‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
-	char	szPassword[MAX_PATH];		// ƒpƒXƒ[ƒh
-	BOOL	bLockBox;					// ƒpƒXƒ[ƒh‚ÌˆÃ†‰»/•œ†‚·‚é‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
+	// è‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ç”¨è¨­å®š
+	wchar_t	szHostName[MAX_PATH];		// ãƒ›ã‚¹ãƒˆå
+	BOOL	bUsername;					// ãƒ¦ãƒ¼ã‚¶åã‚’å…¥åŠ›ã™ã‚‹ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
+	wchar_t	szUsername[MAX_PATH];		// ãƒ¦ãƒ¼ã‚¶å
+	BOOL	bPassword;					// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’å…¥åŠ›ã™ã‚‹ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
+	char	szPassword[MAX_PATH];		// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
+	BOOL	bLockBox;					// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã®æš—å·åŒ–/å¾©å·ã™ã‚‹ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
 
-	// ƒ}ƒNƒÀs—pİ’è
-	wchar_t	szMacroFile[MAX_PATH];		// Às‚·‚éƒ}ƒNƒƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹–¼
+	// ãƒã‚¯ãƒ­å®Ÿè¡Œç”¨è¨­å®š
+	wchar_t	szMacroFile[MAX_PATH];		// å®Ÿè¡Œã™ã‚‹ãƒã‚¯ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«å
 
-	// Ú×İ’è
-	wchar_t	szTeraTerm[MAX_PATH];		// ‹N“®ƒAƒvƒŠiTeraTermj‚Ìƒtƒ@ƒCƒ‹–¼
-	wchar_t	szInitFile[MAX_PATH];		// TeraTerm‚Ìİ’èƒtƒ@ƒCƒ‹i‹N“®‚Ì‚İˆÓŠOj
-	wchar_t	szOption[MAX_PATH];			// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÌƒIƒvƒVƒ‡ƒ“/ˆø”
-	wchar_t	szLog[MAX_PATH];			// ƒƒOƒtƒ@ƒCƒ‹–¼i©“®ƒƒOƒCƒ“‚Ì‚İj
-	wchar_t	szLoginPrompt[MAX_PATH];	// ƒƒOƒCƒ“ƒvƒƒ“ƒvƒgi©“®ƒƒOƒCƒ“‚Ì‚İj
-	wchar_t	szPasswdPrompt[MAX_PATH];	// ƒpƒXƒ[ƒhƒvƒƒ“ƒvƒgi©“®ƒƒOƒCƒ“‚Ì‚İj
+	// è©³ç´°è¨­å®š
+	wchar_t	szTeraTerm[MAX_PATH];		// èµ·å‹•ã‚¢ãƒ—ãƒªï¼ˆTeraTermï¼‰ã®ãƒ•ã‚¡ã‚¤ãƒ«å
+	wchar_t	szInitFile[MAX_PATH];		// TeraTermã®è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ï¼ˆèµ·å‹•ã®ã¿æ„å¤–ï¼‰
+	wchar_t	szOption[MAX_PATH];			// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³/å¼•æ•°
+	wchar_t	szLog[MAX_PATH];			// ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«åï¼ˆè‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ã®ã¿ï¼‰
+	wchar_t	szLoginPrompt[MAX_PATH];	// ãƒ­ã‚°ã‚¤ãƒ³ãƒ—ãƒ­ãƒ³ãƒ—ãƒˆï¼ˆè‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ã®ã¿ï¼‰
+	wchar_t	szPasswdPrompt[MAX_PATH];	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãƒ—ãƒ­ãƒ³ãƒ—ãƒˆï¼ˆè‡ªå‹•ãƒ­ã‚°ã‚¤ãƒ³ã®ã¿ï¼‰
 
-	wchar_t PrivateKeyFile[MAX_PATH];   // ”é–§Œ®ƒtƒ@ƒCƒ‹ (2005.1.27 yutaka)
+	wchar_t PrivateKeyFile[MAX_PATH];   // ç§˜å¯†éµãƒ•ã‚¡ã‚¤ãƒ« (2005.1.27 yutaka)
 	BOOL    bChallenge;                 // keyboard-interative method(/challenge)
 	BOOL    bPageant;                   // use Pageant(/pageant)
 };
 
-// •\¦İ’è\‘¢‘Ì
+// è¡¨ç¤ºè¨­å®šæ§‹é€ ä½“
 struct MenuData {
 	wchar_t		szName[MAXJOBNUM][MAX_PATH];
 	HICON		hLargeIcon[MAXJOBNUM];
@@ -134,21 +134,21 @@ struct MenuData {
 	COLORREF	crSelMenuTxt;
 };
 
-// uLockBox“ü—Ívƒ_ƒCƒAƒƒO LPARAM—p\‘¢‘Ì
+// ã€ŒLockBoxå…¥åŠ›ã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚° LPARAMç”¨æ§‹é€ ä½“
 typedef struct {
-	int		nMessageFlag;				// in : 0:’ÊíƒƒbƒZ[ƒWA1:LockBoxŒë‚èƒƒbƒZ[ƒW
-	BOOL	bLockBox;					// in : ƒpƒXƒ[ƒh‚ÌˆÃ†‰»/•œ†‚·‚é‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
-	char	*pEncryptPassword;			// in : ƒpƒXƒ[ƒh(ˆÃ†•¶)
-	char	*pDecryptPassword;			// out: ƒpƒXƒ[ƒh(•½•¶)
+	int		nMessageFlag;				// in : 0:é€šå¸¸ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã€1:LockBoxèª¤ã‚Šãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+	BOOL	bLockBox;					// in : ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã®æš—å·åŒ–/å¾©å·ã™ã‚‹ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
+	const char	*pEncryptPassword;			// in : ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰(æš—å·æ–‡)
+	char	*pDecryptPassword;			// out: ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰(å¹³æ–‡)
 } LockBoxDlgPrivateData;
 
-// ŠÖ”ˆê——
+// é–¢æ•°ä¸€è¦§
 void	PopupMenu(HWND hWnd);
 void	PopupListMenu(HWND hWnd);
 BOOL	AddTooltip(int idControl);
 BOOL	ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName = NULL);
 BOOL	CreateTooltip(HWND hWnd);
-BOOL	DecryptPassword(char *szEncryptPassword, char *szDecryptPassword, HWND hWnd);
+BOOL	DecryptPassword(const char *szEncryptPassword, char *szDecryptPassword, HWND hWnd);
 BOOL	DeleteLoginHostInformation(HWND hWnd);
 BOOL	ErrorMessage(HWND hWnd, LPTSTR msg,...);
 BOOL	ExtractAssociatedIconEx(char *szPath, HICON *hLargeIcon, HICON *hSmallIcon);

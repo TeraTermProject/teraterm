@@ -91,7 +91,10 @@ TTSSHでは以下のコマンドラインオプションが使用できます。
   <dd>ユーザ名を指定する</dd>
 
   <dt id="passwd">/passwd=&lt;password&gt;</dt>
-  <dd>パスワードを指定する</dd>
+  <dd>
+    パスワードを指定する<br>
+    <a href="#passwd_specify">パスワードを指定するときの注意</a>を参照のこと
+  </dd>
 
   <dt id="keyfile">/keyfile=&lt;file&gt;</dt>
   <dd>
@@ -168,7 +171,7 @@ TTSSHでは以下のコマンドラインオプションが使用できます。
 
   <dt id="nosecuritywarning">/nosecuritywarning</dt>
   <dd>SSHセキュリティ警告(known_hosts)を無視する。原則、<strong>使用禁止</strong>。<br>
-  
+
     <u>※本オプションは、工場などの閉じた環境で、機器の自動試験を実現するために用意されました。<br>
        通信にセキュリティリスクがある場合は、絶対に当該オプションを使用しないでください。<br>
        いずれにおいても自己責任でお願いします。<br>
@@ -202,10 +205,58 @@ ttermpro.exe server7:22 /ssh /2 /auth=password /user=guest /passwd="foo""bar"
 </pre>
 
 
+<h2 id="passwd_specify">パスワードを指定するときの注意</h2>
+
+<p>
+ttermpro.exe にコマンドライン引数でパスワードを指定すると、起動しているプロセスのコマンドライン引数を確認することによって、パスワードを見ることができます。<br>
+コマンドライン引数を見られる権限がなければ見られませんが、悪用される可能性がないとは言い切れません。<br>
+以下に、パスワードが指定されるケースと、回避方法があるかどうかを挙げます。
+</p>
+
+<dl>
+  <dt>コマンドライン引数を指定して実行する</dt>
+  <dd>
+    次のようにコマンドプロンプトから、あるいは「ファイル名を指定して実行」から、あるいはショートカットから起動（接続）する<br>
+    <pre>ttermpro.exe server3:22 /ssh /2 /auth=password /user=guest /passwd=guest</pre>
+    このように起動した場合は、そのプロセスのコマンドライン引数は見えることになります。
+  </dd>
+  <dt>"File &gt; Duplicate session" (Tera Term 5.6.0 に含まれる TTSSH 3.6.0 より前)</dt>
+  <dd>
+    Tera Term が内部でコマンドライン引数を生成して ttermpro.exe を起動しています。そのため、そのプロセスのコマンドライン引数は見えることになります。<br>
+    TTSSH 3.6.0 以降は、コマンドライン引数でパスワードを渡さなくなりました。
+  </dd>
+  <dt>New Connection ダイアログの "Host" に指定して接続する</dt>
+  <dd>
+    New Connection ダイアログの Host には、コマンドライン引数を指定することができます。<br>
+    New Connection ダイアログを表示した Tera Term が未接続のときには、新しい ttermpro.exe を起動しないため問題ありません。<br>
+    Tera Term がすでに接続されているときは新たな ttermpro.exe を引数付きで起動するため、そのプロセスのコマンドライン引数は見えることになります。<br>
+    「接続済みの Tera Term から新たな接続をしない」ことで回避できます。
+  </dd>
+  <dt>connect マクロコマンドの引数に指定する</dt>
+  <dd>
+    connect マクロコマンドの引数は、マクロから ttermpro.exe を起動する引数です。<br>
+    マクロから Tera Term にリンクしていない状態で次のような connect コマンドを実行すると、新たな ttermpro.exe を引数付きで起動するため、そのプロセスのコマンドライン引数は見えることになります。<br>
+    <pre>connect 'server3:22 /ssh /2 /auth=password /user=guest /passwd=guest'</pre>
+    次のように、まず Tera Term とリンクしてからあらためて接続すると、引数付きで新たな ttermpro.exe が起動しません。
+    <pre>
+; '/DS' option suppresses "New Connection" dialog
+connect '/DS'
+connect 'server3:22 /ssh /2 /auth=password /user=guest /passwd=guest'
+    </pre>
+  </dd>
+  <dt>TeraTerm Menu から起動する (Tera Term 5.6.0 に含まれる TeraTerm Menu 1.21 より前)</dt>
+  <dd>
+    TeraTerm Menu は入力した内容をコマンドライン引数にして新たな ttermpro.exe を起動するため、そのプロセスのコマンドライン引数は見えることになります。<br>
+    上記のようなマクロを記述し、SSH 接続設定の代わりにマクロファイルを使う指定をすることで回避できます。<br>
+    TeraTerm Menu 1.21 から、コマンドライン引数でパスワードを渡さなくなりました。
+  </dd>
+</dl>
+
+
 <h2 id="example2">例: Pageantとの連携</h2>
 
 <p>
-<a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html" target="_blank">Pageant</a>をスタートアップフォルダへ設置させます。
+<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html" target="_blank">Pageant</a>をスタートアップフォルダへ設置させます。
 </p>
 
 <pre>

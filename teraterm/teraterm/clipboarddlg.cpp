@@ -61,25 +61,25 @@ static void TTGetCaretPos(HWND hDlgWnd, POINT *p)
 {
 	if (ActiveWin == IdVT) { // VT Window
 		/*
-		 * Caret off Žž‚É GetCaretPos() ‚Å³Šm‚ÈêŠ‚ªŽæ‚ê‚È‚¢‚Ì‚ÅA
-		 * vtdisp.c “à•”‚ÅŠÇ—‚µ‚Ä‚¢‚é’l‚©‚çŒvŽZ‚·‚é
+		 * Caret off æ™‚ã« GetCaretPos() ã§æ­£ç¢ºãªå ´æ‰€ãŒå–ã‚Œãªã„ã®ã§ã€
+		 * vtdisp.c å†…éƒ¨ã§ç®¡ç†ã—ã¦ã„ã‚‹å€¤ã‹ã‚‰è¨ˆç®—ã™ã‚‹
 		 */
 		int x, y;
-		DispConvScreenToWin(CursorX, CursorY, &x, &y);
+		DispConvScreenToWin(vt_src, CursorX, CursorY, &x, &y);
 		p->x = x;
 		p->y = y;
 	}
 	else if (!GetCaretPos(p)) { // Tek Window
 		/*
-		 * Tek Window ‚Í“à•”ŠÇ—‚Ì’l‚ðŽæ‚é‚Ì‚ª–Ê“|‚È‚Ì‚Å GetCaretPos() ‚ðŽg‚¤
-		 * GetCaretPos() ‚ªƒGƒ‰[‚É‚È‚Á‚½ê‡‚Í”O‚Ì‚½‚ß 0, 0 ‚ð“ü‚ê‚Ä‚¨‚­
+		 * Tek Window ã¯å†…éƒ¨ç®¡ç†ã®å€¤ã‚’å–ã‚‹ã®ãŒé¢å€’ãªã®ã§ GetCaretPos() ã‚’ä½¿ã†
+		 * GetCaretPos() ãŒã‚¨ãƒ©ãƒ¼ã«ãªã£ãŸå ´åˆã¯å¿µã®ãŸã‚ 0, 0 ã‚’å…¥ã‚Œã¦ãŠã
 		 */
 		p->x = 0;
 		p->y = 0;
 	}
 
-	// x, y ‚Ì—¼•û‚ª 0 ‚ÌŽž‚ÍeƒEƒBƒ“ƒhƒE‚Ì’†‰›‚ÉˆÚ“®‚³‚¹‚ç‚ê‚é‚Ì‚ÅA
-	// ‚»‚ê‚ð–h‚®ˆ×‚É x ‚ð 1 ‚É‚·‚é
+	// x, y ã®ä¸¡æ–¹ãŒ 0 ã®æ™‚ã¯è¦ªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä¸­å¤®ã«ç§»å‹•ã•ã›ã‚‰ã‚Œã‚‹ã®ã§ã€
+	// ãã‚Œã‚’é˜²ãç‚ºã« x ã‚’ 1 ã«ã™ã‚‹
 	if (p->x == 0 && p->y == 0) {
 		p->x = 1;
 	}
@@ -106,18 +106,18 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 
 			SetDlgItemTextW(hDlgWnd, IDC_EDIT, pdata->data->strW_ptr);
 
-			// ƒŠƒTƒCƒYƒAƒCƒRƒ“‚ð‰E‰º‚É•\Ž¦‚³‚¹‚½‚¢‚Ì‚ÅAƒXƒe[ƒ^ƒXƒo[‚ð•t‚¯‚éB
+			// ãƒªã‚µã‚¤ã‚ºã‚¢ã‚¤ã‚³ãƒ³ã‚’å³ä¸‹ã«è¡¨ç¤ºã•ã›ãŸã„ã®ã§ã€ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ãƒãƒ¼ã‚’ä»˜ã‘ã‚‹ã€‚
 			InitCommonControls();
 			pdata->hStatus = CreateStatusWindow(
 				WS_CHILD | WS_VISIBLE |
 				CCS_BOTTOM | SBARS_SIZEGRIP, NULL, hDlgWnd, 1);
 
-			// ƒ_ƒCƒAƒƒO‚ÌƒTƒCƒY(‰Šú’l)
+			// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚µã‚¤ã‚º(åˆæœŸå€¤)
 			GetWindowRect(hDlgWnd, &rc_dlg);
 			pdata->init_width = rc_dlg.right-rc_dlg.left;
 			pdata->init_height = rc_dlg.bottom-rc_dlg.top;
 
-			// Œ»ÝƒTƒCƒY‚©‚ç•K—v‚È’l‚ðŒvŽZ
+			// ç¾åœ¨ã‚µã‚¤ã‚ºã‹ã‚‰å¿…è¦ãªå€¤ã‚’è¨ˆç®—
 			GetClientRect(hDlgWnd,                                 &rc_dlg);
 			GetWindowRect(GetDlgItem(hDlgWnd, IDC_EDIT),           &rc_edit);
 			GetWindowRect(GetDlgItem(hDlgWnd, IDOK),               &rc_ok);
@@ -130,18 +130,18 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			pdata->edit2bottom = p.y - rc_edit.bottom;
 			pdata->edit2ok = rc_ok.left - rc_edit.right;
 
-			// ƒTƒCƒY‚ð•œŒ³
+			// ã‚µã‚¤ã‚ºã‚’å¾©å…ƒ
 			SetWindowPos(hDlgWnd, NULL, 0, 0,
 			             pdata->data->PasteDialogSize.cx, pdata->data->PasteDialogSize.cy,
 			             SWP_NOZORDER | SWP_NOMOVE);
 
-			// ˆÊ’uˆÚ“®
+			// ä½ç½®ç§»å‹•
 			POINT CaretPos;
 			TTGetCaretPos(hDlgWnd, &CaretPos);
 			SetWindowPos(hDlgWnd, NULL, CaretPos.x, CaretPos.y,
 			             0, 0, SWP_NOSIZE | SWP_NOZORDER);
 
-			// ‰æ–Ê‚©‚ç‚Í‚Ýo‚³‚È‚¢‚æ‚¤ˆÚ“®
+			// ç”»é¢ã‹ã‚‰ã¯ã¿å‡ºã•ãªã„ã‚ˆã†ç§»å‹•
 			MoveWindowToDisplayPoint(hDlgWnd, &CaretPos);
 			//MoveWindowToDisplay(hDlgWnd);
 
@@ -175,7 +175,7 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 
 		case WM_SIZE:
 			{
-				// Ä”z’u
+				// å†é…ç½®
 				int dlg_w, dlg_h;
 
 				GetClientRect(hDlgWnd,                                 &rc_dlg);
@@ -210,7 +210,7 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				             0, 0, dlg_w - p.x - pdata->edit2ok - pdata->ok2right, dlg_h - p.y - pdata->edit2bottom,
 				             SWP_NOMOVE | SWP_NOZORDER);
 
-				// ƒTƒCƒY‚ð•Û‘¶
+				// ã‚µã‚¤ã‚ºã‚’ä¿å­˜
 				GetWindowRect(hDlgWnd, &rc_dlg);
 				pdata->data->PasteDialogSize.cx = rc_dlg.right - rc_dlg.left;
 				pdata->data->PasteDialogSize.cy = rc_dlg.bottom - rc_dlg.top;
@@ -222,7 +222,7 @@ static INT_PTR CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 
 		case WM_GETMINMAXINFO:
 			{
-				// ƒ_ƒCƒAƒƒO‚Ì‰ŠúƒTƒCƒY‚æ‚è¬‚³‚­‚Å‚«‚È‚¢‚æ‚¤‚É‚·‚é
+				// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®åˆæœŸã‚µã‚¤ã‚ºã‚ˆã‚Šå°ã•ãã§ããªã„ã‚ˆã†ã«ã™ã‚‹
 				LPMINMAXINFO lpmmi = (LPMINMAXINFO)lp;
 				lpmmi->ptMinTrackSize.x = pdata->init_width;
 				lpmmi->ptMinTrackSize.y = pdata->init_height;

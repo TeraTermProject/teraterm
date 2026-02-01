@@ -15,8 +15,7 @@ if(NOT DEFINED CMAKE_GENERATOR)
     set(CMAKE_GENERATOR "Unix Makefiles")
   endif()
 endif()
-if((${CMAKE_GENERATOR} MATCHES "Visual Studio 17 2022") OR
-    (${CMAKE_GENERATOR} MATCHES "Visual Studio 16 2019"))
+if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
   # 32bit build for inno setup
   set(GENERATE_OPTION "-A;Win32")
 elseif(EXISTS "C:/msys64/mingw32/bin/cmake.exe")

@@ -42,12 +42,12 @@
 static char CurrentDir[MAXPATHLEN];
 
 /**
- * •¶š‚ğ•`‰æ‚µ‚½‚ÌƒTƒCƒY‚ğZo‚·‚é
+ * æ–‡å­—ã‚’æç”»ã—ãŸæ™‚ã®ã‚µã‚¤ã‚ºã‚’ç®—å‡ºã™ã‚‹
  *	@param[in]	hWnd
- *	@param[in]	Font	ƒtƒHƒ“ƒgƒnƒ“ƒhƒ‹
- *						NULL‚Ì‚ÍhWnd‚Éİ’è‚³‚ê‚Ä‚¢‚éƒtƒHƒ“ƒg
- *	@param[in]	Text	•`‰æ‚·‚éƒeƒLƒXƒg
- *	@param[out]	size	•`‰æƒTƒCƒY(cx,cy)
+ *	@param[in]	Font	ãƒ•ã‚©ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ«
+ *						NULLã®æ™‚ã¯hWndã«è¨­å®šã•ã‚Œã¦ã„ã‚‹ãƒ•ã‚©ãƒ³ãƒˆ
+ *	@param[in]	Text	æç”»ã™ã‚‹ãƒ†ã‚­ã‚¹ãƒˆ
+ *	@param[out]	size	æç”»ã‚µã‚¤ã‚º(cx,cy)
  */
 void CalcTextExtent(HWND hWnd, HFONT hFont, const char *Text, LPSIZE s)
 {

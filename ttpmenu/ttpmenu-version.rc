@@ -29,7 +29,7 @@ BEGIN
             VALUE "FileDescription", "TeraTerm Menu"
             VALUE "FileVersion", TTPMENU_RES_VERSION_STR
             VALUE "InternalName", "ttpmenu"
-            VALUE "LegalCopyright", "Copyright(C) 1997-2003 S.Hayakawa, (C) 2004-2024 TeraTerm Project"
+            VALUE "LegalCopyright", "Copyright(C) 1997-2003 S.Hayakawa, (C) 2004-2025 TeraTerm Project"
             VALUE "OriginalFilename", "ttpmenu.exe"
             VALUE "ProductName", "TeraTerm Menu"
             VALUE "ProductVersion", TTPMENU_RES_PRODUCT_VERSION_STR

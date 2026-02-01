@@ -36,3 +36,9 @@ target_link_libraries(
   #
 #  gdi32
   )
+
+install(
+  TARGETS ${PROJECT_NAME}
+  RUNTIME
+  DESTINATION .
+)

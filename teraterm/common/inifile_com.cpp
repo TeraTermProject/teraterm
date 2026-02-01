@@ -36,7 +36,7 @@
 #include "inifile_com.h"
 
 /**
- *	GetPrivateProfileStringA() ‚Ìƒtƒ@ƒCƒ‹–¼‚¾‚¯‚ª wchar_t ”Å
+ *	GetPrivateProfileStringA() ã®ãƒ•ã‚¡ã‚¤ãƒ«åã ã‘ãŒ wchar_t ç‰ˆ
  */
 DWORD GetPrivateProfileStringAFileW(const char *appA, const char *keyA, const char* defA, char *strA, DWORD size, const wchar_t *filenameW)
 {
@@ -59,8 +59,8 @@ DWORD GetPrivateProfileStringAFileW(const char *appA, const char *keyA, const ch
 		lenW++;	// for L'\0'
 	}
 	lenA = WideCharToMultiByte(CP_ACP, 0, strW, lenW, strA, size, NULL, NULL);
-	// GetPrivateProfileStringW() ‚Ì–ß‚è’l‚Í '\0' ‚ğŠÜ‚Ü‚È‚¢•¶š—ñ’·
-	// WideCharToMultiByte() ‚Ì–ß‚è’l‚Í '\0' ‚ğŠÜ‚Ş•¶š—ñ’·
+	// GetPrivateProfileStringW() ã®æˆ»ã‚Šå€¤ã¯ '\0' ã‚’å«ã¾ãªã„æ–‡å­—åˆ—é•·
+	// WideCharToMultiByte() ã®æˆ»ã‚Šå€¤ã¯ '\0' ã‚’å«ã‚€æ–‡å­—åˆ—é•·
 	if (lenW != 0 && strA[lenA-1] == 0) {
 		lenA--;
 	}
@@ -69,7 +69,7 @@ DWORD GetPrivateProfileStringAFileW(const char *appA, const char *keyA, const ch
 }
 
 /**
- *	WritePrivateProfileStringA() ‚Ìƒtƒ@ƒCƒ‹–¼‚¾‚¯‚ª wchar_t ”Å
+ *	WritePrivateProfileStringA() ã®ãƒ•ã‚¡ã‚¤ãƒ«åã ã‘ãŒ wchar_t ç‰ˆ
  */
 BOOL WritePrivateProfileStringAFileW(const char *appA, const char *keyA, const char *strA, const wchar_t *filenameW)
 {
@@ -84,7 +84,7 @@ BOOL WritePrivateProfileStringAFileW(const char *appA, const char *keyA, const c
 }
 
 /**
- *	GetPrivateProfileIntFileA() ‚Ìƒtƒ@ƒCƒ‹–¼‚¾‚¯‚ª wchar_t ”Å
+ *	GetPrivateProfileIntFileA() ã®ãƒ•ã‚¡ã‚¤ãƒ«åã ã‘ãŒ wchar_t ç‰ˆ
  */
 UINT GetPrivateProfileIntAFileW(const char *appA, const char *keyA, int def, const wchar_t *filenameW)
 {
@@ -98,16 +98,16 @@ UINT GetPrivateProfileIntAFileW(const char *appA, const char *keyA, int def, con
 
 BOOL WritePrivateProfileIntW(const wchar_t *app, const wchar_t *key, int val, const wchar_t *filenameW)
 {
-	// int‚Å‚Í12Œ…‚ ‚ê‚Îok			123456789012
-	// INT_MIN(intÅ¬’l)			-2147483648
-	// INT_MAX(intÅ‘å’l)			2147483647
+	// intã§ã¯12æ¡ã‚ã‚Œã°ok			123456789012
+	// INT_MIN(intæœ€å°å€¤)			-2147483648
+	// INT_MAX(intæœ€å¤§å€¤)			2147483647
 	wchar_t str[16];
 	_snwprintf_s(str, _countof(str), _TRUNCATE, L"%d", val);
 	return WritePrivateProfileStringW(app, key, str, filenameW);
 }
 
 /**
- *	WritePrivateProfileIntA() ‚Ìƒtƒ@ƒCƒ‹–¼‚¾‚¯‚ª wchar_t ”Å
+ *	WritePrivateProfileIntA() ã®ãƒ•ã‚¡ã‚¤ãƒ«åã ã‘ãŒ wchar_t ç‰ˆ
  */
 BOOL WritePrivateProfileIntAFileW(const char *appA, const char *keyA, int val, const wchar_t *filenameW)
 {
@@ -123,18 +123,18 @@ BOOL WritePrivateProfileIntAFileW(const char *appA, const char *keyA, int val, c
 }
 
 /**
- *	ƒtƒ@ƒCƒ‹‚ª‚È‚¢‚È‚ç BOM ‚¾‚¯‚ğ‘‚«‚Ş
+ *	ãƒ•ã‚¡ã‚¤ãƒ«ãŒãªã„ãªã‚‰ BOM ã ã‘ã‚’æ›¸ãè¾¼ã‚€
  *
  *	@param	filename
- *	@param	overwrite	TRUE	ã‘‚«‚·‚é
- *						FALSE	ƒtƒ@ƒCƒ‹‚ª‚ ‚ê‚Î‚È‚É‚à‚µ‚È‚¢
+ *	@param	overwrite	TRUE	ä¸Šæ›¸ãã™ã‚‹
+ *						FALSE	ãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚Œã°ãªã«ã‚‚ã—ãªã„
  */
 void WriteIniBom(const wchar_t *filename, BOOL overwrite)
 {
 	if (!overwrite) {
 		const DWORD attr = GetFileAttributesW(filename);
 		if (attr != INVALID_FILE_ATTRIBUTES) {
-			// ƒtƒ@ƒCƒ‹‚ª‚ ‚é‚È‚ç‚È‚É‚à‚µ‚È‚¢
+			// ãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚‹ãªã‚‰ãªã«ã‚‚ã—ãªã„
 			return;
 		}
 	}

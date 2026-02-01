@@ -9,30 +9,30 @@
 
 namespace yebisuya {
 
-// QÆƒJƒEƒ“ƒ^•t‚«‚ÌƒIƒuƒWƒFƒNƒg‚ÌŠî–{ƒNƒ‰ƒX
+// å‚ç…§ã‚«ã‚¦ãƒ³ã‚¿ä»˜ãã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®åŸºæœ¬ã‚¯ãƒ©ã‚¹
 class Object {
 private:
-	// QÆƒJƒEƒ“ƒ^
+	// å‚ç…§ã‚«ã‚¦ãƒ³ã‚¿
 	unsigned int refCount;
 protected:
-	// ƒfƒtƒHƒ‹ƒgƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	Object():refCount(0) {
 	}
-	// ƒfƒXƒgƒ‰ƒNƒ^
-	// protected‚È‚Ì‚Å”h¶ƒNƒ‰ƒX‚ÅƒfƒXƒgƒ‰ƒNƒ^‚ğpublic‚É‚µ‚È‚¢ŒÀ‚è
-	// ©“®•Ï”‚Æ‚µ‚Ä‚Í¶¬‚Å‚«‚È‚¢
+	// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+	// protectedãªã®ã§æ´¾ç”Ÿã‚¯ãƒ©ã‚¹ã§ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã‚’publicã«ã—ãªã„é™ã‚Š
+	// è‡ªå‹•å¤‰æ•°ã¨ã—ã¦ã¯ç”Ÿæˆã§ããªã„
 	virtual ~Object() {
 	}
-	// “à•”“I‚ÈQÆ‚Ì”‚ÆÀÛ‚ÌQÆƒJƒEƒ“ƒ^‚ª“™‚µ‚¢‚©‚Ç‚¤‚©‚ğ”»’è‚·‚é
+	// å†…éƒ¨çš„ãªå‚ç…§ã®æ•°ã¨å®Ÿéš›ã®å‚ç…§ã‚«ã‚¦ãƒ³ã‚¿ãŒç­‰ã—ã„ã‹ã©ã†ã‹ã‚’åˆ¤å®šã™ã‚‹
 	bool existsOuterReference(unsigned int innerRefCount)const {
 		return refCount != innerRefCount;
 	}
 public:
-	// QÆƒJƒEƒ“ƒ^‚ğ‘‚â‚·
+	// å‚ç…§ã‚«ã‚¦ãƒ³ã‚¿ã‚’å¢—ã‚„ã™
 	virtual int refer() {
 		return ++refCount;
 	}
-	// QÆƒJƒEƒ“ƒ^‚ğŒ¸‚ç‚µA0‚É‚È‚Á‚½‚çdelete‚·‚é
+	// å‚ç…§ã‚«ã‚¦ãƒ³ã‚¿ã‚’æ¸›ã‚‰ã—ã€0ã«ãªã£ãŸã‚‰deleteã™ã‚‹
 	virtual int release() {
 		if (--refCount != 0) {
 			return refCount;

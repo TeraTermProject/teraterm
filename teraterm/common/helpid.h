@@ -113,11 +113,13 @@
 #define HlpUsageRecurringcommand        31300
 #define HlpUsageResizemenu              31400
 #define HlpUsageTtyrec                  31500
+#define HlpUsageChangefontsize          31600
 
 #define HlpMenuFile                         41000
 #define HlpMenuFileNew                      41100
 #define HlpMenuFileLog                      41200
 #define HlpMenuFileSendfile                 41300
+#define HlpMenuFileRecvfile                 41310
 #define HlpMenuFileTransfer                 41400
 #define HlpMenuFileTransferKermit           41410
 #define HlpMenuFileTransferKermitGet        41411
@@ -132,6 +134,7 @@
 #define HlpMenuFileTransferBplusSend        41441
 #define HlpMenuFileTransferQuickvan         41450
 #define HlpMenuFileTransferQuickvanSend     41451
+#define HlpMenuFileSshScp                   41470
 #define HlpMenuFileChdir                    41500
 #define HlpMenuFilePrint                    41600
 #define HlpMenuEdit                         42000
@@ -177,6 +180,7 @@
 #define HlpMenuWindowWindow                 45001
 #define HlpMenuHelp                         46000
 #define HlpMenuResize                       47000
+#define HlpMenuFontsize                     47001
 
 #define HlpMenutekFile          50000
 #define HlpMenutekFilePrint     50001
@@ -392,6 +396,8 @@
 #define HlpMacroCommandSetPassword      92196
 #define HlpMacroCommandSetPassword2     92219
 #define HlpMacroCommandSetrts           92136
+#define HlpMacroCommandSetSerialDelayChar 92224
+#define HlpMacroCommandSetSerialDelayLine 92225
 #define HlpMacroCommandSetspeed         92217
 #define HlpMacroCommandSetsync          92084
 #define HlpMacroCommandSettime          92085

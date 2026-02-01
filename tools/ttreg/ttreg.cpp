@@ -52,7 +52,7 @@ static wchar_t *EscapeCommand(const wchar_t *command)
 }
 
 /**
- * ƒVƒ‡[ƒgƒJƒbƒg‚ğì‚é
+ * ã‚·ãƒ§ãƒ¼ãƒˆã‚«ãƒƒãƒˆã‚’ä½œã‚‹
  *		Win32 API
  */
 HRESULT CreateShortcut(const wchar_t *exe, const wchar_t *args, const wchar_t *dest, const wchar_t *icon_path, int icon_no)
@@ -89,7 +89,7 @@ HRESULT CreateShortcut(const wchar_t *exe, const wchar_t *args, const wchar_t *d
 }
 
 /**
- * ƒVƒ‡[ƒgƒJƒbƒg‚ğì‚é
+ * ã‚·ãƒ§ãƒ¼ãƒˆã‚«ãƒƒãƒˆã‚’ä½œã‚‹
  */
 void CreateShortcut(const wchar_t *dir, const wchar_t *shortcut, const wchar_t *teraterm, const wchar_t *args, const wchar_t *icon_path = NULL, int icon_no = 0)
 {
@@ -101,7 +101,7 @@ void CreateShortcut(const wchar_t *dir, const wchar_t *shortcut, const wchar_t *
 }
 
 /**
- *	ƒŒƒWƒXƒgƒŠ‚ğ‘‚«o‚·
+ *	ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚’æ›¸ãå‡ºã™
  */
 void WriteReg(FILE *fp, const wchar_t *menu, const wchar_t *key, const wchar_t *command, const wchar_t *arg, const wchar_t *icon = NULL)
 {

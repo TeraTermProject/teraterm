@@ -45,23 +45,23 @@
 
 #include "buffer.h"
 
-/* buffer_t.buf ‚ÌŠg’£‚ÌãŒÀ’l (16MB) */
+/* buffer_t.buf ã®æ‹¡å¼µã®ä¸Šé™å€¤ (16MB) */
 #define BUFFER_SIZE_MAX 0x1000000
 
-/* buffer_t.buf ‚ÌŠg’£‚É’Ç‰Á‚ÅŠm•Û‚·‚é—Ê (32KB) */
+/* buffer_t.buf ã®æ‹¡å¼µæ™‚ã«è¿½åŠ ã§ç¢ºä¿ã™ã‚‹é‡ (32KB) */
 #define BUFFER_INCREASE_MARGIN (32*1024)
 
 #if 0
 typedef struct buffer {
-	char *buf;      /* ƒoƒbƒtƒ@‚Ìæ“ªƒ|ƒCƒ“ƒ^Brealloc()‚É‚æ‚è•Ï“®‚·‚éB*/
-	size_t offset;     /* Œ»İ‚Ì“Ç‚İo‚µˆÊ’u */
-	size_t maxlen;     /* ƒoƒbƒtƒ@‚ÌÅ‘åƒTƒCƒY */
-	size_t len;        /* ƒoƒbƒtƒ@‚ÉŠÜ‚Ü‚ê‚é—LŒø‚Èƒf[ƒ^ƒTƒCƒY */
+	char *buf;      /* ãƒãƒƒãƒ•ã‚¡ã®å…ˆé ­ãƒã‚¤ãƒ³ã‚¿ã€‚realloc()ã«ã‚ˆã‚Šå¤‰å‹•ã™ã‚‹ã€‚*/
+	size_t offset;     /* ç¾åœ¨ã®èª­ã¿å‡ºã—ä½ç½® */
+	size_t maxlen;     /* ãƒãƒƒãƒ•ã‚¡ã®æœ€å¤§ã‚µã‚¤ã‚º */
+	size_t len;        /* ãƒãƒƒãƒ•ã‚¡ã«å«ã¾ã‚Œã‚‹æœ‰åŠ¹ãªãƒ‡ãƒ¼ã‚¿ã‚µã‚¤ã‚º */
 } buffer_t;
 #endif
 
-// ƒoƒbƒtƒ@‚ÌƒIƒtƒZƒbƒg‚ğ‰Šú‰»‚µA‚Ü‚¾“Ç‚ñ‚Å‚¢‚È‚¢ó‘Ô‚É‚·‚éB
-// Tera Term(TTSSH)ƒIƒŠƒWƒiƒ‹ŠÖ”B
+// ãƒãƒƒãƒ•ã‚¡ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’åˆæœŸåŒ–ã—ã€ã¾ã èª­ã‚“ã§ã„ãªã„çŠ¶æ…‹ã«ã™ã‚‹ã€‚
+// Tera Term(TTSSH)ã‚ªãƒªã‚¸ãƒŠãƒ«é–¢æ•°ã€‚
 void buffer_rewind(buffer_t *buf)
 {
 	buf->offset = 0;
@@ -99,7 +99,7 @@ buffer_t *buffer_init(void)
 void buffer_free(buffer_t * buf)
 {
 	if (buf != NULL) {
-		// ƒZƒLƒ…ƒŠƒeƒB‘Îô (2006.8.3 yutaka)
+		// ã‚»ã‚­ãƒ¥ãƒªãƒ†ã‚£å¯¾ç­– (2006.8.3 yutaka)
 		int len =  buffer_len(buf);
 		SecureZeroMemory(buf->buf, len);
 		free(buf->buf);
@@ -107,8 +107,8 @@ void buffer_free(buffer_t * buf)
 	}
 }
 
-// ƒoƒbƒtƒ@‚Ì—ÌˆæŠg’£‚ğs‚¤B
-// return: Šg’£‘O‚Ìƒoƒbƒtƒ@ƒ|ƒCƒ“ƒ^[
+// ãƒãƒƒãƒ•ã‚¡ã®é ˜åŸŸæ‹¡å¼µã‚’è¡Œã†ã€‚
+// return: æ‹¡å¼µå‰ã®ãƒãƒƒãƒ•ã‚¡ãƒã‚¤ãƒ³ã‚¿ãƒ¼
 void *buffer_append_space(buffer_t * buf, size_t size)
 {
 	size_t n;
@@ -119,7 +119,7 @@ void *buffer_append_space(buffer_t * buf, size_t size)
 	if (n < buf->maxlen) {
 		//
 	} else {
-		// ƒoƒbƒtƒ@‚ª‘«‚è‚È‚¢‚Ì‚Å•â[‚·‚éB(2005.7.2 yutaka)
+		// ãƒãƒƒãƒ•ã‚¡ãŒè¶³ã‚Šãªã„ã®ã§è£œå……ã™ã‚‹ã€‚(2005.7.2 yutaka)
 		newlen = buf->maxlen + size + BUFFER_INCREASE_MARGIN;
 		if (newlen > BUFFER_SIZE_MAX) {
 			goto panic;
@@ -157,7 +157,7 @@ int buffer_append(buffer_t * buf, const void *ptr, size_t size)
 			break;
 
 		} else {
-			// ƒoƒbƒtƒ@‚ª‘«‚è‚È‚¢‚Ì‚Å•â[‚·‚éB(2005.7.2 yutaka)
+			// ãƒãƒƒãƒ•ã‚¡ãŒè¶³ã‚Šãªã„ã®ã§è£œå……ã™ã‚‹ã€‚(2005.7.2 yutaka)
 			newlen = buf->maxlen + size + BUFFER_INCREASE_MARGIN;
 			if (newlen > BUFFER_SIZE_MAX) {
 				goto panic;
@@ -203,7 +203,7 @@ void buffer_put_raw(buffer_t *msg, const void *ptr, size_t size)
 int buffer_get_ret(buffer_t *msg, void *buf, size_t len)
 {
 	if (len > msg->len - msg->offset) {
-		// TODO: ƒGƒ‰[ˆ—
+		// TODO: ã‚¨ãƒ©ãƒ¼å‡¦ç†
 		OutputDebugPrintf("buffer_get_ret: trying to get more bytes %u than in buffer %u",
 		    len, msg->len - msg->offset);
 		return (-1);
@@ -229,7 +229,7 @@ unsigned int buffer_get_int(buffer_t *msg)
 	unsigned int ret = 0;
 
 	if (buffer_get_int_ret(&ret, msg) == -1) {
-		// TODO: ƒGƒ‰[ˆ—
+		// TODO: ã‚¨ãƒ©ãƒ¼å‡¦ç†
 		logprintf(LOG_LEVEL_ERROR, "buffer_get_int: buffer error");
 	}
 	return (ret);
@@ -247,7 +247,7 @@ int buffer_get_char(buffer_t *msg)
 	char ch;
 
 	if (buffer_get_char_ret(&ch, msg) == -1) {
-		// TODO: ƒGƒ‰[ˆ—
+		// TODO: ã‚¨ãƒ©ãƒ¼å‡¦ç†
 		OutputDebugPrintf("buffer_get_char: buffer error");
 	}
 	return (unsigned char)ch;
@@ -264,7 +264,7 @@ char *buffer_get_string(char **data_ptr, int *buflen_ptr)
 
 	buflen = get_uint32_MSBfirst(data);
 	data += 4;
-	// buflen == 0‚Ìê‡‚Å‚àA'\0'•ª‚ÍŠm•Û‚µAdata_ptr‚ği‚ßAƒŠƒ^[ƒ“‚·‚éB
+	// buflen == 0ã®å ´åˆã§ã‚‚ã€'\0'åˆ†ã¯ç¢ºä¿ã—ã€data_ptrã‚’é€²ã‚ã€ãƒªã‚¿ãƒ¼ãƒ³ã™ã‚‹ã€‚
 //	if (buflen <= 0)
 //		return NULL;
 
@@ -286,7 +286,7 @@ char *buffer_get_string(char **data_ptr, int *buflen_ptr)
 	return(ptr);
 }
 
-// buffer_get_string() ‚Ì buffer_t ”ÅB–{—ˆ‚Í‚±‚¿‚ç‚ª OpenSSH ƒXƒ^ƒCƒ‹B
+// buffer_get_string() ã® buffer_t ç‰ˆã€‚æœ¬æ¥ã¯ã“ã¡ã‚‰ãŒ OpenSSH ã‚¹ã‚¿ã‚¤ãƒ«ã€‚
 // NOTE: You should free the return pointer if it's unused.
 void *buffer_get_string_msg(buffer_t *msg, int *buflen_ptr)
 {
@@ -320,7 +320,7 @@ void buffer_put_string(buffer_t *msg, const char *ptr, size_t size)
 	int ret = -1;
 
 	assert(size == (size_t)(int)size);
-	// uƒTƒCƒY{•¶š—ñv‚Å‘‚«‚ŞBƒTƒCƒY‚Í4byte‚Ìbig-endianB
+	// ã€Œã‚µã‚¤ã‚ºï¼‹æ–‡å­—åˆ—ã€ã§æ›¸ãè¾¼ã‚€ã€‚ã‚µã‚¤ã‚ºã¯4byteã®big-endianã€‚
 	val = htonl((int)size);
 	memcpy(buf, &val, sizeof(val));
 	ret = buffer_append(msg, buf, sizeof(buf));
@@ -332,6 +332,11 @@ void buffer_put_string(buffer_t *msg, const char *ptr, size_t size)
 void buffer_put_cstring(buffer_t *msg, const char *ptr)
 {
 	buffer_put_string(msg, ptr, strlen(ptr));
+}
+
+void buffer_put_stringb(buffer_t *msg, buffer_t *v)
+{
+	buffer_put_string(msg, buffer_ptr(v), buffer_len(v));
 }
 
 void buffer_put_char(buffer_t *msg, int value)
@@ -364,16 +369,16 @@ int buffer_len(buffer_t *msg)
 	return (int)(msg->len);
 }
 
-// ‚Ü‚¾“Ç‚İ‚ñ‚Å‚¢‚È‚¢c‚è‚ÌƒTƒCƒY‚ğ•Ô‚·B–{—ˆ‚Í‚±‚¿‚ç‚ª OpenSSH ƒXƒ^ƒCƒ‹B
+// ã¾ã èª­ã¿è¾¼ã‚“ã§ã„ãªã„æ®‹ã‚Šã®ã‚µã‚¤ã‚ºã‚’è¿”ã™ã€‚æœ¬æ¥ã¯ã“ã¡ã‚‰ãŒ OpenSSH ã‚¹ã‚¿ã‚¤ãƒ«ã€‚
 int buffer_remain_len(buffer_t *msg)
 {
 	return (int)(msg->len - msg->offset);
 }
 
-// buffer_append() ‚â buffer_append_space() ‚ÅƒƒbƒZ[ƒWƒoƒbƒtƒ@‚É’Ç‰Á‚ğs‚¤‚ÆA
-// “à•”‚Å realloc() ‚É‚æ‚èƒoƒbƒtƒ@ƒ|ƒCƒ“ƒ^‚ª•Ï‚í‚Á‚Ä‚µ‚Ü‚¤‚±‚Æ‚ª‚ ‚éB
-// ƒƒbƒZ[ƒWƒoƒbƒtƒ@‚Ìƒ|ƒCƒ“ƒ^‚ğæ“¾‚·‚éÛ‚ÍAƒoƒbƒtƒ@’Ç‰Á‚ªŠ®—¹‚µ‚½Œã‚É
-// s‚í‚È‚¯‚ê‚ÎABOF‚Å—‚¿‚éB
+// buffer_append() ã‚„ buffer_append_space() ã§ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒãƒƒãƒ•ã‚¡ã«è¿½åŠ ã‚’è¡Œã†ã¨ã€
+// å†…éƒ¨ã§ realloc() ã«ã‚ˆã‚Šãƒãƒƒãƒ•ã‚¡ãƒã‚¤ãƒ³ã‚¿ãŒå¤‰ã‚ã£ã¦ã—ã¾ã†ã“ã¨ãŒã‚ã‚‹ã€‚
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒãƒƒãƒ•ã‚¡ã®ãƒã‚¤ãƒ³ã‚¿ã‚’å–å¾—ã™ã‚‹éš›ã¯ã€ãƒãƒƒãƒ•ã‚¡è¿½åŠ ãŒå®Œäº†ã—ãŸå¾Œã«
+// è¡Œã‚ãªã‘ã‚Œã°ã€BOFã§è½ã¡ã‚‹ã€‚
 char *buffer_ptr(buffer_t *msg)
 {
 	return (msg->buf);
@@ -532,12 +537,10 @@ void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *po
 {
 	unsigned char *buf = NULL;
 	size_t len;
-	BN_CTX *bnctx;
 
 	/* Determine length */
-	bnctx = BN_CTX_new();
 	len = EC_POINT_point2oct(curve, point, POINT_CONVERSION_UNCOMPRESSED,
-	    NULL, 0, bnctx);
+	    NULL, 0, NULL);
 	/* Convert */
 	buf = malloc(len);
 	if (buf == NULL) {
@@ -545,7 +548,7 @@ void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *po
 		goto error;
 	}
 	if (EC_POINT_point2oct(curve, point, POINT_CONVERSION_UNCOMPRESSED,
-	    buf, len, bnctx) != len) {
+	    buf, len, NULL) != len) {
 		goto error;
 	}
 	/* Append */
@@ -553,25 +556,19 @@ void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *po
 
 error:
 	free(buf);
-	BN_CTX_free(bnctx);
 }
 
 void buffer_get_ecpoint(char **data, const EC_GROUP *curve, EC_POINT *point)
 {
 	char *buf = *data;
 	size_t len;
-	BN_CTX *bnctx;
-
-	bnctx = BN_CTX_new();
 
 	len = get_uint32_MSBfirst(buf);
 	buf += 4;
-	EC_POINT_oct2point(curve, point, buf, len, bnctx);
+	EC_POINT_oct2point(curve, point, buf, len, NULL);
 	buf += len;
 
 	*data = buf;
-
-	BN_CTX_free(bnctx);
 }
 
 void buffer_get_ecpoint_msg(buffer_t *msg, const EC_GROUP *curve, EC_POINT *point)
@@ -600,30 +597,30 @@ void buffer_dump(FILE *fp, buffer_t *buf)
 	fprintf(fp, "\n");
 }
 
-// ƒoƒbƒtƒ@‚ÌƒIƒtƒZƒbƒg‚ği‚ß‚éB
+// ãƒãƒƒãƒ•ã‚¡ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’é€²ã‚ã‚‹ã€‚
 void buffer_consume(buffer_t *buf, size_t shift_byte)
 {
 	if (shift_byte > buf->len - buf->offset) {
 		// TODO: fatal error
 	} else {
 		buf->offset += shift_byte;
-		// len‚Í•Ï‚¦‚È‚¢B
+		// lenã¯å¤‰ãˆãªã„ã€‚
 	}
 }
 
-// ƒoƒbƒtƒ@‚Ì––”ö‚ğk‘Ş‚·‚éB
+// ãƒãƒƒãƒ•ã‚¡ã®æœ«å°¾ã‚’ç¸®é€€ã™ã‚‹ã€‚
 void buffer_consume_end(buffer_t *buf, size_t shift_byte)
 {
 	if (shift_byte > buf->len - buf->offset) {
 		// TODO: fatal error
 	} else {
 		buf->len -= shift_byte;
-		// offset‚Í•Ï‚¦‚È‚¢B
+		// offsetã¯å¤‰ãˆãªã„ã€‚
 	}
 }
 
 
-// ƒpƒPƒbƒg‚Ìˆ³k
+// ãƒ‘ã‚±ãƒƒãƒˆã®åœ§ç¸®
 int buffer_compress(z_stream *zstream, char *payload, size_t len, buffer_t *compbuf)
 {
 	unsigned char buf[4096];
@@ -639,7 +636,7 @@ int buffer_compress(z_stream *zstream, char *payload, size_t len, buffer_t *comp
 		zstream->next_out = buf;
 		zstream->avail_out = sizeof(buf);
 
-		// ƒoƒbƒtƒ@‚ğˆ³k‚·‚éBˆ³k‚·‚é‚ÆA‹t‚ÉƒTƒCƒY‚ª‘å‚«‚­‚È‚é‚±‚Æ‚àl—¶‚·‚é‚±‚ÆB
+		// ãƒãƒƒãƒ•ã‚¡ã‚’åœ§ç¸®ã™ã‚‹ã€‚åœ§ç¸®ã™ã‚‹ã¨ã€é€†ã«ã‚µã‚¤ã‚ºãŒå¤§ãããªã‚‹ã“ã¨ã‚‚è€ƒæ…®ã™ã‚‹ã“ã¨ã€‚
 		status = deflate(zstream, Z_PARTIAL_FLUSH);
 		if (status == Z_OK) {
 			buffer_append(compbuf, buf, sizeof(buf) - zstream->avail_out);
@@ -651,7 +648,7 @@ int buffer_compress(z_stream *zstream, char *payload, size_t len, buffer_t *comp
 	return 0; // success
 }
 
-// ƒpƒPƒbƒg‚Ì“WŠJ
+// ãƒ‘ã‚±ãƒƒãƒˆã®å±•é–‹
 int buffer_decompress(z_stream *zstream, char *payload, size_t len, buffer_t *compbuf)
 {
 	unsigned char buf[4096];
@@ -667,7 +664,7 @@ int buffer_decompress(z_stream *zstream, char *payload, size_t len, buffer_t *co
 		zstream->next_out = buf;
 		zstream->avail_out = sizeof(buf);
 
-		// ƒoƒbƒtƒ@‚ğ“WŠJ‚·‚éB
+		// ãƒãƒƒãƒ•ã‚¡ã‚’å±•é–‹ã™ã‚‹ã€‚
 		status = inflate(zstream, Z_PARTIAL_FLUSH);
 		if (status == Z_OK) {
 			buffer_append(compbuf, buf, sizeof(buf) - zstream->avail_out);

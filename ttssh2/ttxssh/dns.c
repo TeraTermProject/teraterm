@@ -65,7 +65,7 @@ int verify_hostkey_dns(PTInstVar pvar, char *hostname, Key *key)
 	int found = DNS_VERIFY_NOTFOUND;
 
 	if (pDnsQuery_A == NULL) {
-		// DnsQuery ‚Í Windows 2000 ˆÈã‚Å‚µ‚©“®ì‚µ‚È‚¢‚½‚ß
+		// DnsQuery ã¯ Windows 2000 ä»¥ä¸Šã§ã—ã‹å‹•ä½œã—ãªã„ãŸã‚
 		return DNS_VERIFY_NONE;
 	}
 

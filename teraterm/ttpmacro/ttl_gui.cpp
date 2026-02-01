@@ -80,7 +80,7 @@ WORD TTLClipb2Var()
 		}
 		wchar_t *cbbuffW = GetClipboardTextW(NULL, FALSE);
 		if (cbbuffW == NULL) {
-			// ƒNƒŠƒbƒvƒ{[ƒh‚ğŠJ‚¯‚È‚©‚Á‚½B‚Ü‚½‚ÍƒeƒLƒXƒgƒf[ƒ^‚Å‚Í‚È‚©‚Á‚½B
+			// ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‚’é–‹ã‘ãªã‹ã£ãŸã€‚ã¾ãŸã¯ãƒ†ã‚­ã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã§ã¯ãªã‹ã£ãŸã€‚
 			cblen = 0;
 			SetResult(0);
 			return 0;
@@ -117,8 +117,8 @@ WORD TTLVar2Clipb()
 	if (Err!=0) return Err;
 
 	BOOL r = CBSetTextW(NULL, wc::fromUtf8(Str), 0);
-	// 0 == ƒNƒŠƒbƒvƒ{[ƒh‚ğŠJ‚¯‚È‚©‚Á‚½
-	// 1 == ƒNƒŠƒbƒvƒ{[ƒh‚Ö‚ÌƒRƒs[‚É¬Œ÷‚µ‚½
+	// 0 == ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã‚’é–‹ã‘ãªã‹ã£ãŸ
+	// 1 == ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã¸ã®ã‚³ãƒ”ãƒ¼ã«æˆåŠŸã—ãŸ
 	SetResult(r ? 1 : 0);
 
 	return Err;
@@ -204,9 +204,9 @@ WORD TTLGetPassword()
 	int result = 0;  /* failure */
 
 	Err = 0;
-	GetStrVal(Str,&Err);  // ƒtƒ@ƒCƒ‹–¼
-	GetStrVal(Str2,&Err);  // ƒL[–¼
-	GetStrVar(&VarId,&Err);  // ƒpƒXƒ[ƒhXV‚ÉƒpƒXƒ[ƒh‚ğŠi”[‚·‚é•Ï”
+	GetStrVal(Str,&Err);  // ãƒ•ã‚¡ã‚¤ãƒ«å
+	GetStrVal(Str2,&Err);  // ã‚­ãƒ¼å
+	GetStrVar(&VarId,&Err);  // ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰æ›´æ–°æ™‚ã«ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’æ ¼ç´ã™ã‚‹å¤‰æ•°
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
@@ -227,7 +227,7 @@ WORD TTLGetPassword()
 		free(passwd_encW);
 		Err = OpenInpDlg(input_string, key, L"Enter password", L"", TRUE);
 		if (Err == IDCLOSE) {
-			// •Â‚¶‚éƒ{ƒ^ƒ“(&Šm”Fƒ_ƒCƒAƒƒO)‚ÅAƒ}ƒNƒ‚ÌI—¹‚Æ‚·‚éB
+			// é–‰ã˜ã‚‹ãƒœã‚¿ãƒ³(&ç¢ºèªãƒ€ã‚¤ã‚¢ãƒ­ã‚°)ã§ã€ãƒã‚¯ãƒ­ã®çµ‚äº†ã¨ã™ã‚‹ã€‚
 			TTLStatus = IdTTLEnd;
 			return 0;
 		} else {
@@ -251,9 +251,9 @@ WORD TTLGetPassword()
 	if (result == 1) {
 		SetStrVal(VarId,Temp2);
 	}
-	// ƒpƒXƒ[ƒh“ü—Í‚ª‚È‚¢‚Æ‚«‚Í•Ï”‚ğXV‚µ‚È‚¢
+	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰å…¥åŠ›ãŒãªã„ã¨ãã¯å¤‰æ•°ã‚’æ›´æ–°ã—ãªã„
 
-	SetResult(result);  // ¬Œ÷‰Â”Û‚ğİ’è‚·‚éB
+	SetResult(result);  // æˆåŠŸå¯å¦ã‚’è¨­å®šã™ã‚‹ã€‚
 	return Err;
 }
 
@@ -266,11 +266,11 @@ WORD TTLGetPassword2()
 	WORD Err = 0;
 	int result = 0;
 
-	GetStrVal(FileNameStr, &Err);	// ƒtƒ@ƒCƒ‹–¼
-	GetStrVal(KeyStr, &Err);		// ƒL[–¼
-	GetStrVar(&PassStr, &Err);		// ƒpƒXƒ[ƒhXV‚ÉƒpƒXƒ[ƒh‚ğŠi”[‚·‚é•Ï”
+	GetStrVal(FileNameStr, &Err);	// ãƒ•ã‚¡ã‚¤ãƒ«å
+	GetStrVal(KeyStr, &Err);		// ã‚­ãƒ¼å
+	GetStrVar(&PassStr, &Err);		// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰æ›´æ–°æ™‚ã«ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’æ ¼ç´ã™ã‚‹å¤‰æ•°
 	SetStrVal(PassStr, "");
-	GetStrVal(EncryptStr, &Err);	// ƒpƒXƒ[ƒh•¶š—ñ‚ğˆÃ†‰»‚·‚é‚½‚ß‚ÌƒpƒXƒ[ƒhi‹¤’ÊŒ®j
+	GetStrVal(EncryptStr, &Err);	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰æ–‡å­—åˆ—ã‚’æš—å·åŒ–ã™ã‚‹ãŸã‚ã®ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ï¼ˆå…±é€šéµï¼‰
 	if ((Err == 0) && (GetFirstChar() != 0)) {
 		Err = ErrSyntax;
 	}
@@ -285,7 +285,7 @@ WORD TTLGetPassword2()
 
 	GetAbsPath(FileNameStr, sizeof(FileNameStr));
 	if (Encrypt2IsPassword(wc::fromUtf8(FileNameStr), KeyStr) == 0) {
-		// ƒL[–¼‚Éƒ}ƒbƒ`‚·‚éƒGƒ“ƒgƒŠ–³‚µ
+		// ã‚­ãƒ¼åã«ãƒãƒƒãƒã™ã‚‹ã‚¨ãƒ³ãƒˆãƒªç„¡ã—
 		wchar_t inputW[MaxStrLen] = {};
 		wc key = wc::fromUtf8(KeyStr);
 		size_t inputU8len = sizeof(inputU8);
@@ -296,15 +296,15 @@ WORD TTLGetPassword2()
 			result = Encrypt2SetPassword(wc::fromUtf8(FileNameStr), KeyStr, inputU8, EncryptStr);
 		}
 	} else {
-		// ƒL[–¼‚Éƒ}ƒbƒ`‚·‚éƒGƒ“ƒgƒŠ—L‚è
+		// ã‚­ãƒ¼åã«ãƒãƒƒãƒã™ã‚‹ã‚¨ãƒ³ãƒˆãƒªæœ‰ã‚Š
 		result = Encrypt2GetPassword(wc::fromUtf8(FileNameStr), KeyStr, inputU8, EncryptStr);
 	}
 
-	// ƒpƒXƒ[ƒh“ü—Í‚ª‚È‚¢‚Æ‚«‚Í•Ï”‚ğXV‚µ‚È‚¢
+	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰å…¥åŠ›ãŒãªã„ã¨ãã¯å¤‰æ•°ã‚’æ›´æ–°ã—ãªã„
 	if (result == 1) {
 		SetStrVal(PassStr, inputU8);
 	}
-	SetResult(result);	// ¬Œ÷‰Â”Û‚ğİ’è‚·‚éB
+	SetResult(result);	// æˆåŠŸå¯å¦ã‚’è¨­å®šã™ã‚‹ã€‚
 	return 0;
 }
 
@@ -353,7 +353,7 @@ WORD TTLInputBox(BOOL Paswd)
 		wchar_t input_string[MaxStrLen];
 		Err = OpenInpDlg(input_string,wc::fromUtf8(Str1),wc::fromUtf8(Str2),wc::fromUtf8(Str3),Paswd);
 		if (Err == IDCLOSE) {
-			// •Â‚¶‚éƒ{ƒ^ƒ“(&Šm”Fƒ_ƒCƒAƒƒO)‚ÅAƒ}ƒNƒ‚ÌI—¹‚Æ‚·‚éB
+			// é–‰ã˜ã‚‹ãƒœã‚¿ãƒ³(&ç¢ºèªãƒ€ã‚¤ã‚¢ãƒ­ã‚°)ã§ã€ãƒã‚¯ãƒ­ã®çµ‚äº†ã¨ã™ã‚‹ã€‚
 		  	TTLStatus = IdTTLEnd;
 			SetStrVal(VarId, "");
 		} else {
@@ -450,14 +450,14 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 
 	if (BoxId==IdMsgBox) {
 		ret = OpenMsgDlg(wc::fromUtf8(Str1),wc::fromUtf8(Str2),FALSE);
-		// ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚ğƒLƒƒƒ“ƒZƒ‹‚·‚é‚ÆAƒ}ƒNƒ‚ÌI—¹‚Æ‚·‚éB
+		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒœãƒƒã‚¯ã‚¹ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹ã¨ã€ãƒã‚¯ãƒ­ã®çµ‚äº†ã¨ã™ã‚‹ã€‚
 		// (2008.8.5 yutaka)
 		if (ret == IDCANCEL) {
 			TTLStatus = IdTTLEnd;
 		}
 	} else if (BoxId==IdYesNoBox) {
 		ret = OpenMsgDlg(wc::fromUtf8(Str1),wc::fromUtf8(Str2),TRUE);
-		// ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚ğƒLƒƒƒ“ƒZƒ‹‚·‚é‚ÆAƒ}ƒNƒ‚ÌI—¹‚Æ‚·‚éB
+		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒœãƒƒã‚¯ã‚¹ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹ã¨ã€ãƒã‚¯ãƒ­ã®çµ‚äº†ã¨ã™ã‚‹ã€‚
 		// (2008.8.6 yutaka)
 		if (ret == IDCLOSE) {
 			TTLStatus = IdTTLEnd;
@@ -468,7 +468,7 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 		OpenStatDlg(wc::fromUtf8(Str1), wc::fromUtf8(Str2));
 
 	} else if (BoxId==IdListBox) {
-		//  ƒŠƒXƒgƒ{ƒbƒNƒX‚Ì‘I‘ğˆ‚ğæ“¾‚·‚éB
+		//  ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã®é¸æŠè‚¢ã‚’å–å¾—ã™ã‚‹ã€‚
 		GetStrAryVar(&VarId, Err);
 		while (CheckParameterGiven()) {
 			GetStrVal2(StrTmp, Err, TRUE);
@@ -530,8 +530,8 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 		}
 
 		// return
-		//   0ˆÈã: ‘I‘ğ€–Ú
-		//   -1: ƒLƒƒƒ“ƒZƒ‹
+		//   0ä»¥ä¸Š: é¸æŠé …ç›®
+		//   -1: ã‚­ãƒ£ãƒ³ã‚»ãƒ«
 		//	 -2: close
 		ret = OpenListDlg(wc::fromUtf8(Str1), wc::fromUtf8(Str2), s, sel, ext, width, height);
 
@@ -540,7 +540,7 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 		}
 		free(s);
 
-		// ƒŠƒXƒgƒ{ƒbƒNƒX‚Ì•Â‚¶‚éƒ{ƒ^ƒ“(&Šm”Fƒ_ƒCƒAƒƒO)‚ÅAƒ}ƒNƒ‚ÌI—¹‚Æ‚·‚éB
+		// ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã®é–‰ã˜ã‚‹ãƒœã‚¿ãƒ³(&ç¢ºèªãƒ€ã‚¤ã‚¢ãƒ­ã‚°)ã§ã€ãƒã‚¯ãƒ­ã®çµ‚äº†ã¨ã™ã‚‹ã€‚
 		if (ret == -2) {
 			TTLStatus = IdTTLEnd;
 		}
@@ -550,7 +550,7 @@ static int MessageCommand(MessageCommandBoxId BoxId, LPWORD Err)
 	return 0;
 }
 
-// ƒŠƒXƒgƒ{ƒbƒNƒX
+// ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹
 // (2013.3.13 yutaka)
 WORD TTLListBox()
 {

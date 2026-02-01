@@ -40,16 +40,16 @@ typedef struct {
 	const wchar_t *UILanguageFileW;
 	const wchar_t *filesend_filter;
 	const wchar_t *initial_dir;
-	const wchar_t *initial_file;	// ‰Šúƒtƒ@ƒCƒ‹–¼, NULL=w’è‚È‚µ
-	BOOL skip_dialog;				// TRUE‚ÌƒIƒvƒVƒ‡ƒ“ƒ_ƒCƒAƒƒO‚ğƒXƒLƒbƒv‚·‚é
+	const wchar_t *initial_file;	// åˆæœŸãƒ•ã‚¡ã‚¤ãƒ«å, NULL=æŒ‡å®šãªã—
+	BOOL skip_dialog;				// TRUEã®æ™‚ã‚ªãƒ—ã‚·ãƒ§ãƒ³ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’ã‚¹ã‚­ãƒƒãƒ—ã™ã‚‹
 	// in/out
-	BOOL binary;					// TRUE/FALSE = ƒoƒCƒiƒŠ/ƒeƒLƒXƒg
+	BOOL binary;					// TRUE/FALSE = ãƒã‚¤ãƒŠãƒª/ãƒ†ã‚­ã‚¹ãƒˆ
 	SendMemDelayType delay_type;
 	DWORD delay_tick;
 	size_t send_size;
-	BOOL sequential_read;			// Tera Term 4 ‚Ìƒ‹[ƒ`ƒ“‚ğg—p‚·‚é
+	BOOL sequential_read;			// Tera Term 4 ã®ãƒ«ãƒ¼ãƒãƒ³ã‚’ä½¿ç”¨ã™ã‚‹
 	// out
-	wchar_t *filename;				// IDOKA‘I‘ğƒtƒ@ƒCƒ‹–¼‚ª•Ô‚é,g—pŒãfree()‚·‚é‚±‚Æ
+	wchar_t *filename;				// IDOKæ™‚ã€é¸æŠãƒ•ã‚¡ã‚¤ãƒ«åãŒè¿”ã‚‹,ä½¿ç”¨å¾Œfree()ã™ã‚‹ã“ã¨
 } sendfiledlgdata;
 
 INT_PTR sendfiledlg(HINSTANCE hInstance, HWND hWndParent, sendfiledlgdata *data);

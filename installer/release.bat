@@ -3,7 +3,9 @@ setlocal
 set CUR=%~dp0
 cd /d %CUR%
 
-rem set VS_VERSION=2019
+rem 2026 (v18)
+rem if "%VS_VERSION%" == "" set VS_VERSION=18
+rem 2022
 if "%VS_VERSION%" == "" set VS_VERSION=2022
 
 if "%APPVEYOR%" == "True" set NOPAUSE=1
@@ -12,15 +14,20 @@ if exist ..\buildtools\svnrev\sourcetree_info.bat del ..\buildtools\svnrev\sourc
 call :setup_tools_env
 
 echo =======
-echo 1. force download and rebuild libs / rebuild Tera Term, installer, archive
-echo 2. download and build libs / rebuild Tera Term, installer, archive
-echo 3. download and build libs / build Tera Term, installer, archive
+echo 1. force download and rebuild libs / rebuild Tera Term, installer, zip
+echo 2. download and build libs / rebuild Tera Term, installer, zip
+echo 3. download and build libs / build Tera Term, installer, zip
 echo 4. download and build libs
-echo 5. build libs / rebuild Tera Term, installer, archive
-echo 6. build libs / build Tera Term, installer, archive
+echo 5. build libs / rebuild Tera Term, installer, zip
+echo 6. build libs / build Tera Term, installer, zip
 echo 7. exec cmd.exe
 echo 8. check tools
 echo 9. exit
+echo 10. for multi-stage build stage 0: download libs
+echo 11. for multi-stage build stage 1: rebuild common
+echo 12. for multi-stage build stage 2: build libs / rebuild arch, installer, zip
+echo 13. for multi-stage build stage 1: build common
+echo 14. for multi-stage build stage 2: build libs / build arch, installer, zip
 
 if "%1" == "" (
     set /p no="select no "
@@ -53,10 +60,12 @@ if "%no%" == "4" (
 )
 
 if "%no%" == "5" (
+    call :build_libs
     call :build_teraterm rebuild
 )
 
 if "%no%" == "6" (
+    call :build_libs
     call :build_teraterm
 )
 
@@ -68,7 +77,34 @@ if "%no%" == "8" (
     call :check_tools
 )
 
+if "%no%" == "10" (
+    call :download_libs
+)
+
+if "%no%" == "11" (
+    call :download_libs
+    call :build_teraterm_1 rebuild
+)
+
+if "%no%" == "12" (
+    call :download_libs
+    call :build_libs
+    call :build_teraterm_2 rebuild
+)
+
+if "%no%" == "13" (
+    call :download_libs
+    call :build_teraterm_1
+)
+
+if "%no%" == "14" (
+    call :download_libs
+    call :build_libs
+    call :build_teraterm_2
+)
+
 if not "%NOPAUSE%" == "1" pause
+endlocal
 exit /b 0
 
 
@@ -82,8 +118,9 @@ set OPT=
 if "%1" == "force" set OPT=-DFORCE_DOWNLOAD=on
 %CMAKE% %OPT% -P download.cmake
 if errorlevel 1 (
-   echo download error
-   exit 1
+    echo download error
+    endlocal
+    exit 1
 )
 
 endlocal
@@ -107,22 +144,109 @@ call ..\buildtools\svnrev\svnrev.bat
 call ..\buildtools\svnrev\sourcetree_info.bat
 
 if "%RELEASE%" == "1" (
-    call makearchive.bat release
+    call build_common.bat rebuild
 ) else if "%1" == "rebuild" (
-    call makearchive.bat rebuild
+    call build_common.bat rebuild
 ) else (
-    call makearchive.bat
+    call build_common.bat
 )
 if ERRORLEVEL 1 (
-	echo ERROR call makearchive.bat
-	exit /b 1
+    echo ERROR call build_common.bat
+    endlocal
+    exit /b 1
 )
-call iscc.bat
+if "%RELEASE%" == "1" (
+    call build_arch.bat rebuild
+) else if "%1" == "rebuild" (
+    call build_arch.bat rebuild
+) else (
+    call build_arch.bat
+)
+if ERRORLEVEL 1 (
+    echo ERROR call build_arch.bat
+    endlocal
+    exit /b 1
+)
+call collect_files.bat
+if ERRORLEVEL 1 (
+    echo ERROR call collect_files.bat
+    endlocal
+    exit /b 1
+)
+call create_package.bat
+if ERRORLEVEL 1 (
+    echo ERROR call create_package.bat
+    endlocal
+    exit /b 1
+)
+
+endlocal
+exit /b 0
+
+rem ####################
+rem   stage 1
+:build_teraterm_1
+
+setlocal
+cd /d %CUR%
+call ..\buildtools\svnrev\svnrev.bat
+call ..\buildtools\svnrev\sourcetree_info.bat
+
+if "%RELEASE%" == "1" (
+    call build_common.bat rebuild
+) else if "%1" == "rebuild" (
+    call build_common.bat rebuild
+) else (
+    call build_common.bat
+)
+if ERRORLEVEL 1 (
+    echo ERROR call build_common.bat
+    endlocal
+    exit /b 1
+)
+
+endlocal
+exit /b 0
+
+rem ####################
+rem   stage 2
+:build_teraterm_2
+
+setlocal
+cd /d %CUR%
+call ..\buildtools\svnrev\svnrev.bat
+call ..\buildtools\svnrev\sourcetree_info.bat
 
 if ERRORLEVEL 1 (
-	echo ERROR call iscc.bat
-	exit /b 1
+    echo ERROR call build_common.ba
+    endlocal
+    exit /b 1
 )
+if "%RELEASE%" == "1" (
+    call build_arch.bat rebuild
+) else if "%1" == "rebuild" (
+    call build_arch.bat rebuild
+) else (
+    call build_arch.bat
+)
+if ERRORLEVEL 1 (
+    echo ERROR call build_arch.bat
+    endlocal
+    exit /b 1
+)
+call collect_files.bat
+if ERRORLEVEL 1 (
+    echo ERROR call collect_files.bat
+    endlocal
+    exit /b 1
+)
+call create_package.bat
+if ERRORLEVEL 1 (
+    echo ERROR call create_package.bat
+    endlocal
+    exit /b 1
+)
+
 endlocal
 exit /b 0
 
@@ -167,11 +291,6 @@ exit /b 0
 
 rem ####################
 :search_perl
-if exist %PERL_PATH%\perl.exe (
-    set PERL=%PERL_PATH%\perl.exe
-    exit /b 0
-)
-
 call %CUR%..\buildtools\find_perl.bat
 exit /b
 
@@ -257,16 +376,24 @@ exit
 rem ####################
 :set_vs_env
 
+rem architecture for VsDevCmd.bat
+if "%TARGET%" == "" (set TARGET=Win32)
+if "%TARGET%" == "Win32" (set ARCHITECTURE=x86)
+if "%TARGET%" == "x64"   (set ARCHITECTURE=x64)
+if "%TARGET%" == "ARM64" (set ARCHITECTURE=arm64)
+if "%TARGET%" == "ARM64" if "%HOST_ARCHITECTURE%" == "" (set HOST_ARCHITECTURE=amd64)
+
+rem libs\buildxxx.bat Ç≈ÇÕ %VSxxxCOMNTOOLS% Ç©ÇÁíTÇµÇƒÇ¢ÇÈÇ™ÅAà·Ç¢ÇÕÇ»Ç¢ÇÕÇ∏
 if exist "%VS_BASE%\Community" (
-    call "%VS_BASE%\Community\VC\Auxiliary\Build\vcvars32.bat"
+    call "%VS_BASE%\Community\Common7\Tools\VsDevCmd.bat" -arch=%ARCHITECTURE% -host_arch=%HOST_ARCHITECTURE%
     exit /b 0
 )
 if exist "%VS_BASE%\Professional" (
-    call "%VS_BASE%\Profssional\VC\Auxiliary\Build\vcvars32.bat"
+    call "%VS_BASE%\Profssional\Common7\Tools\VsDevCmd.bat" -arch=%ARCHITECTURE% -host_arch=%HOST_ARCHITECTURE%
     exit /b 0
 )
 if exist "%VS_BASE%\Enterprise" (
-    call "%VS_BASE%\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
+    call "%VS_BASE%\Enterprise\Common7\Tools\VsDevCmd.bat" -arch=%ARCHITECTURE% -host_arch=%HOST_ARCHITECTURE%
     exit /b 0
 )
 :vs_not_found
