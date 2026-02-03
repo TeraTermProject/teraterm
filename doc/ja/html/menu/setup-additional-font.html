@@ -55,20 +55,19 @@
 
       <dt id="ResizedFont">描画幅に合わせてリサイズしたフォントを描画</dt>
       <dd>
-        "&copy;"(U+00A9)など、表示しようとする幅は1cell,2cellのどちらの場合もあります。<br>
-        フォントデザイン(フォントファイル)によっては、フォントの幅は1cell,2cellのどちらの場合もあります。<br>
-        言語やフォントによってフォント幅は表示しようとする幅に合わない場合もあります。<br>
-        cell幅にあわせて文字が描画されると表示は自然になりますが、描画速度が遅くなったり、デザインがフォント開発者の意図と異なってしまうという欠点があります。<br>
-        なお、Tera Termの接続先が想定している文字幅については、
-        <a href="setup-additional-coding.html#AmbiguousCharactersWidth">Ambiguous Characters width 設定</a>、
-        <a href="setup-additional-coding.html#EastAsianWidth">East_Asian_Width特性とセル数について</a>を参照ください。
+        「Tera Term が描画する文字幅」と「フォントデザインの文字幅」が一致しない場合があります。
+        描画幅に合わせると文字全体が表示幅に描画されますが、
+        描画速度が遅くなったり、デザインがフォント開発者の意図と異なってしまうという欠点があります。<br>
         <dl>
           <dt>ON</dt>
           <dd>
-            表示したい幅と描画するフォントの幅が異なっている時、
-            フォントをcell幅に合わせて文字を描画します。
+            表示する幅と描画するフォントの幅が異なっているとき、
+            フォントをセル幅に合わせて拡大・縮小して文字を描画します。
+            <div style="margin-top:1ex; overflow:hidden;">
+              <img src="DrawingResizedFont-greek_on.png" style="float:left; margin-right:1ex;">
+              <img src="DrawingResizedFont-checkmark_on.png" style="float:left;">
+            </div>
           </dd>
-
           <dt>OFF</dt>
           <dd>
             フォントファイルのデザインのまま表示します。
@@ -78,6 +77,10 @@
               <li>Tera Term が半角,1Cellとして表示、フォントデザインが全角,2Cellの場合、
                 全角の左半分が表示されます。
             </ul>
+            <div style="margin-top:1ex; overflow:hidden;">
+              <img src="DrawingResizedFont-greek_off.png" style="float:left; margin-right:1ex;">
+              <img src="DrawingResizedFont-checkmark_off.png" style="float:left;">
+            </div>
           </dd>
         </dl>
       </dd>

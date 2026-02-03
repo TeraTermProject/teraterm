@@ -690,30 +690,16 @@ Cygwin接続時にWindows付属コマンドの出力がCP932で行われる事に対応するためのもので
 FallbackToCP932=off
 </pre>
 
-<h1 id="OverrideCharWidth">文字ごとの文字幅オーバーライド設定を使う</h1>
+<h1 id="CellWidth">文字ごとの描画幅を指定する</h1>
 
 <p>
-Unicode(UTF-8)を使用時、文字ごとに文字幅を設定することができます。<br>
+Unicode(UTF-8)を使用時、文字ごとに描画幅を設定することができます。<br>
 TERATERM.INI に次のセクションを追加することで、コードポイントと文字幅(セル数)を指定します。
 </p>
 <p>
 <a href="../menu/setup-additional-coding.html#OverrideCharWidth">文字ごとの文字幅オーバーライド設定を使う</a>で、
 この設定を使用する/しないを変更できます。
 </p>
-
-設定例<br>
-TERATERM.INI
-<pre>
-[CellWidth1]
-Range1=U+2605,U+2606,2
-Range2=U+00a9,2
-Range3=U+1F363,0
-Range4=U+2665,1
-Range5=U+1F90D,2
-</pre>
-
-表示例<br>
-<img src="OverrideCharWidth.png"><br>
 
 詳細
 <ul>
@@ -728,14 +714,9 @@ Range5=U+1F90D,2
 
       <dt>3項目目</dt>
       <dd>
-          <dl>
-            <dt>1</dt>
-            <dd>1cell</dd>
-            <dt>2</dt>
-            <dd>2cell</dd>
-            <dt>0 (1,2以外)</dt>
-            <dd>無効行</dd>
-          </dl>
+          1 ... 1Cell<br>
+          2 ... 2Cell<br>
+          0 (1,2以外) ... 無効行
       </dd>
     </dl>
   </li>
@@ -746,18 +727,46 @@ Range5=U+1F90D,2
 
       <dt>2項目目</dt>
       <dd>
-          <dl>
-            <dt>1</dt>
-            <dd>1cell</dd>
-            <dt>2</dt>
-            <dd>2cell</dd>
-            <dt>0 (1,2以外)</dt>
-            <dd>無効行</dd>
-          </dl>
+          1 ... 1Cell<br>
+          2 ... 2Cell<br>
+          0 (1,2以外) ... 無効行
       </dd>
     </dl>
   </li>
 </ul>
+
+設定例1<br>
+<pre>
+; TERATERM.INI
+[CellWidth1]
+Range1=U+2605,U+2606,2
+Range2=U+00a9,2
+Range3=U+1F363,0
+Range4=U+2665,1
+Range5=U+1F90D,2
+</pre>
+<p>
+<img src="OverrideCharWidth.png">
+</p>
+
+設定例2
+<p>
+  emacs を CJK 環境にする。<br>
+  Tera Term の Ambiguous の文字幅を 2 Cell に設定する。<br>
+  UnicodeEmojiOverride 設定を off にすることで、East_Asian_Width プロパティの幅そのままと Ambiguous の文字幅設定を使用する。<br>
+<p>
+<img src="UnicodeOverrideCharWidth-off.png">
+</p>
+  ここまでの設定では Ambiguous 文字の描画幅は 2 だが、emacs で width=1 が想定されている Ambiguous 文字もある。<br>
+  これらの文字幅を個別に 1 に設定する。
+</p>
+<pre>
+; TERATERM.INI
+[CellWidth1]
+Range1=U+0000AE,1
+Range2=U+0000FC,1
+</pre>
+<img src="UnicodeOverrideCharWidth-on.png">
 
 </BODY>
 </HTML>
