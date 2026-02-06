@@ -41,6 +41,8 @@ BOOL WritePrivateProfileIntAFileW(const char *appA, const char *keyA, int val, c
 DWORD GetPrivateProfileSectionNamesAFileW(const char *lpszReturnBuffer, DWORD nSize, const wchar_t *filenameW);
 BOOL WritePrivateProfileIntW(const wchar_t *app, const wchar_t *key, int val, const wchar_t *filenameW);
 void WriteIniBom(const wchar_t *filename, BOOL overwrite);
+DWORD GetPrivateProfileOnOffW(const wchar_t *section, const wchar_t *key, const wchar_t *filenameW, BOOL def, BOOL *val);
+DWORD WritePrivateProfileOnOffW(const wchar_t *section, const wchar_t *key, BOOL val, const wchar_t *filenameW);
 
 #ifdef __cplusplus
 }

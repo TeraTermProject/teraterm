@@ -2002,7 +2002,19 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (ts->UnicodeEmojiWidth < 1 || 2 < ts->UnicodeEmojiWidth) {
 		ts->UnicodeEmojiWidth = GetDefaultUnicodeWidth();
 	}
-	ts->UnicodeOverrideCharWidth = (BYTE)GetOnOff(Section, "UnicodeOverrideCharWidth", FName, FALSE);
+	// Unicode Override Info
+	{
+		OverrideCharWidthInfo info;
+		OverrideCharWidthInfoGet(FName, &info);
+		ts->UnicodeOverrideCharWidthEnable = info.enable;
+		ts->UnicodeOverrideCharWidthSelected = info.selected;
+		if (info.count != 0 && info.enable) {
+			const OverrideCharWidthInfoSet *set = &info.sets[info.selected];
+			UnicodeOverrideWidthInit(set->file, set->section);
+		}
+		OverrideCharWidthInfoFree(&info);
+	}
+
 
 	DispEnableResizedFont(GetOnOff(Section, "DrawingResizedFont", FName, TRUE));
 
@@ -2066,9 +2078,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 			ts->FlowCtrlDTR = IdEnable;
 		}
 	}
-
-	// Unicode Override Info
-	UnicodeOverrideWidthInit(FName, L"CellWidth1");
 
 	// Experimental
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
@@ -3312,7 +3321,8 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteInt(Section, "UnicodeAmbiguousWidth", FName, ts->UnicodeAmbiguousWidth);
 	WriteOnOff(Section, "UnicodeEmojiOverride", FName, ts->UnicodeEmojiOverride);
 	WriteInt(Section, "UnicodeEmojiWidth", FName, ts->UnicodeEmojiWidth);
-	WriteOnOff(Section, "UnicodeOverrideCharWidth", FName, ts->UnicodeOverrideCharWidth);
+	WritePrivateProfileOnOffW(L"UnicodeOverrideCharWidth", L"Enable", ts->UnicodeOverrideCharWidthEnable, FName);
+	WritePrivateProfileIntW(L"UnicodeOverrideCharWidth", L"Selected", ts->UnicodeOverrideCharWidthSelected, FName);
 
 	WriteOnOff(Section, "DrawingResizedFont", FName, DispIsResizedFont());
 

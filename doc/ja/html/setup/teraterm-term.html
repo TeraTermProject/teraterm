@@ -694,12 +694,59 @@ FallbackToCP932=off
 
 <p>
 Unicode(UTF-8)‚ðŽg—pŽžA•¶Žš‚²‚Æ‚É•`‰æ•‚ðÝ’è‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B<br>
-TERATERM.INI ‚ÉŽŸ‚ÌƒZƒNƒVƒ‡ƒ“‚ð’Ç‰Á‚·‚é‚±‚Æ‚ÅAƒR[ƒhƒ|ƒCƒ“ƒg‚Æ•¶Žš•(ƒZƒ‹”)‚ðŽw’è‚µ‚Ü‚·B
+ƒR[ƒhƒ|ƒCƒ“ƒg‚Æ•¶Žš•(ƒZƒ‹”)‚ðŽw’è‚µ‚Ü‚·B<br>
+•¡”‚Ì•¶Žš•Ý’è‚ð’è‹`‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B
 </p>
 <p>
+•¶Žš•Ý’è‚Ì’è‹`‚ÍINIƒtƒ@ƒCƒ‹‚ð•ÒW‚·‚é‚±‚Æ‚Ås‚¢‚Ü‚·B<br>
 <a href="../menu/setup-additional-coding.html#OverrideCharWidth">•¶Žš‚²‚Æ‚Ì•¶Žš•ƒI[ƒo[ƒ‰ƒCƒhÝ’è‚ðŽg‚¤</a>‚ÅA
-‚±‚ÌÝ’è‚ðŽg—p‚·‚é/‚µ‚È‚¢‚ð•ÏX‚Å‚«‚Ü‚·B
+‚±‚ÌÝ’è‚ðŽg—p‚·‚é/‚µ‚È‚¢A•¶Žš•Ý’è‚Ì‘I‘ð‚ª‚Å‚«‚Ü‚·B
 </p>
+
+<h2>•¶Žš•Ý’èƒZƒbƒg‚ÌÝ’è</h2>
+
+<p>
+  •¶Žš•Ý’è‚ð•¡”’è‹`‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B
+</p>
+
+Ú×
+
+<ul>
+  <li>ƒZƒNƒVƒ‡ƒ“–¼ UnicodeOverrideCharWidth</li>
+  <li>ƒL[ ListN 1‚©‚ç‡‚É“Ç‚Ýž‚Ü‚êA‘¶Ý‚µ‚È‚­‚È‚é‚Ü‚Å“Ç‚Ýž‚Ü‚ê‚Ü‚·</li>
+  <li>1€–Ú‚Ìê‡
+    <dl>
+      <dt>1€–Ú–Ú</dt>
+      <dd>TERATERM.INI“à‚Ì•¶Žš•Ý’è‚ÌƒZƒNƒVƒ‡ƒ“–¼</dd>
+    </dl>
+  </li>
+  <li>2€–Ú‚Ìê‡
+    <dl>
+      <dt>1€–Ú–Ú</dt>
+      <dd>
+        •¶Žš•Ý’èƒtƒ@ƒCƒ‹–¼<br>
+        ‘Š‘ÎƒpƒX‚Ìê‡ATERATERM.INI ‘Š‘Î‚Æ‚È‚è‚Ü‚·
+      </dd>
+      <dt>2€–Ú–Ú</dt>
+      <dd>•¶Žš•Ý’èƒtƒ@ƒCƒ‹“à‚Ì•¶Žš•Ý’è‚ÌƒZƒNƒVƒ‡ƒ“–¼</dd>
+    </dl>
+  </li>
+  <li>Selected ‘I‘ð‚³‚ê‚Ä‚¢‚éƒŠƒXƒg‚ÌƒCƒ“ƒfƒbƒNƒX(0‚©‚ç,0=List1)</li>
+  <li>Enable on–”‚Íoff</li>
+</ul>
+
+Ý’è—á
+
+<pre>
+[UnicodeOverrideCharWidth]
+List1=CellWidth1
+List2=CellWidth2
+List3=jis0208.ini, CellWidth
+Selected=1
+Enable=on
+</pre>
+
+<h2>•¶Žš•‚ÌÝ’è</h2>
 
 Ú×
 <ul>
@@ -733,12 +780,14 @@ TERATERM.INI ‚ÉŽŸ‚ÌƒZƒNƒVƒ‡ƒ“‚ð’Ç‰Á‚·‚é‚±‚Æ‚ÅAƒR[ƒhƒ|ƒCƒ“ƒg‚Æ•¶Žš•(ƒZƒ‹”)‚ðŽ
       </dd>
     </dl>
   </li>
+  <li>Name RangeN ‚ÍA1‚©‚ç‡‚É“Ç‚Ýž‚Ü‚êA‘¶Ý‚µ‚È‚­‚È‚é‚Ü‚Å“Ç‚Ýž‚Ü‚ê‚Ü‚·</li>
 </ul>
 
 Ý’è—á1<br>
 <pre>
 ; TERATERM.INI
 [CellWidth1]
+Name=sample1
 Range1=U+2605,U+2606,2
 Range2=U+00a9,2
 Range3=U+1F363,0
@@ -762,7 +811,8 @@ Range5=U+1F90D,2
 </p>
 <pre>
 ; TERATERM.INI
-[CellWidth1]
+[CellWidth2]
+Name=sample 2
 Range1=U+0000AE,1
 Range2=U+0000FC,1
 </pre>

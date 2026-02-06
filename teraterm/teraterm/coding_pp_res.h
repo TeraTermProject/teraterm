@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ で生成されたインクルード ファイル。
-// coding_pp.rc で使用
+// Microsoft Visual C++ generated include file.
+// Used by coding_pp.rc
 //
 #define IDC_TERMKANJI                   100
 #define IDC_TERMKANA                    101
@@ -27,9 +27,10 @@
 #define IDC_OVERRIDE_CHAR_WIDTH         2617
 #define IDC_JIS_RECEIVE_TITLE           2618
 #define IDC_JIS_TRANSMIT_TITLE          2619
+#define IDC_OVERRIDE_CHAR_WIDTH_COMBO   2620
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1

@@ -31,11 +31,14 @@
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #include <assert.h>
+#include <wchar.h>
 
 #include "unicode.h"
 
 #include "win32helper.h"
 #include "asprintf.h"
+#include "inifile_com.h"	// GetPrivateProfileOnOffW()
+#include "ttlib.h"			// IsRelativePathW()
 
 /**
  *	East_Asian_Width 参考特性 取得
@@ -842,4 +845,112 @@ int UnicodeOverrideWidthCheck(unsigned int u32, int *width)
 int UnicodeOverrideWidthAvailable(void)
 {
 	return unicode_width_list_count == 0 ? 0 : 1;
+}
+
+/**
+ * iniファイルから、文字幅情報の設定一覧を読み出す
+ *
+ * @param		fname	TERATERM.INI
+ * @param[out]	info	情報一覧
+ *						OverrideCharWidthInfoFree() を使って開放すること
+ */
+void OverrideCharWidthInfoGet(const wchar_t *fname, OverrideCharWidthInfo *info)
+{
+	const wchar_t *tt_section = L"UnicodeOverrideCharWidth";
+
+	size_t count = 0;
+	OverrideCharWidthInfoSet *ptr = NULL;
+
+	int n = 0;
+	for (;;) {
+		wchar_t *key;
+		aswprintf(&key, L"List%d", n + 1);
+		wchar_t *list;
+		hGetPrivateProfileStringW(tt_section, key, L"", fname, &list);
+		free(key);
+		if (list == NULL || list[0] == L'\0') {
+			free(list);
+			break;
+		}
+		size_t len = wcslen(list) + 1;
+		wchar_t *ini = (wchar_t *)malloc(len * sizeof(wchar_t));
+		wchar_t *section = (wchar_t *)malloc(len * sizeof(wchar_t));
+		int r = swscanf_s(list, L"%[^,] , %s", ini, (unsigned int)len, section, (unsigned int)len);
+		if (r != 2) {
+			int r = swscanf_s(list, L"%s", section, (unsigned int)len);
+			if (r == 1) {
+				free(ini);
+				ini = wcsdup(fname);
+			} else {
+				r = 0;
+			}
+		}
+		free(list);
+		if (r != 0) {
+			OverrideCharWidthInfoSet *p = (OverrideCharWidthInfoSet *)
+				realloc(ptr, sizeof(OverrideCharWidthInfoSet) * (count + 1));
+			if (p != NULL) {
+				ptr = p;
+				p = &ptr[count];
+				count += 1;
+				if (IsRelativePathW(ini)) {
+					p->file = NULL;
+					wchar_t *path = _wcsdup(fname);
+					wchar_t *sep = wcsrchr(path, L'\\') + 1;
+					*sep = 0;
+					awcscats(&p->file, path, ini, NULL);
+					free(path);
+					free(ini);
+				} else {
+					p->file = ini;
+				}
+				p->section = section;
+				wchar_t *name;
+				hGetPrivateProfileStringW(section, L"name", L"", p->file, &name);
+				if (name != NULL && name[0] != L'\0') {
+					p->name = name;
+				} else {
+					p->name = wcsdup(p->section);
+					free(name);
+				}
+			}
+		} else {
+			// 行無効
+			free(ini);
+			free(section);
+			continue;
+		}
+		n++;
+	}
+
+	info->count = count;
+	info->sets = ptr;
+	info->enable = FALSE;
+	info->selected = 0;
+
+	if (count != 0) {
+		GetPrivateProfileOnOffW(tt_section, L"Enable", fname, FALSE, &info->enable);
+		info->selected = GetPrivateProfileIntW(tt_section, L"Selected", 0, fname);
+		if (info->selected >= info->count) {
+			info->selected = 0;
+		}
+	}
+}
+
+/**
+ * 文字幅情報の設定一覧を開放する
+ */
+void OverrideCharWidthInfoFree(OverrideCharWidthInfo *info)
+{
+	for (size_t i = 0; i< info->count; i++) {
+		free(info->sets[i].file);
+		info->sets[i].file = NULL;
+		free(info->sets[i].section);
+		info->sets[i].section = NULL;
+		free(info->sets[i].name);
+		info->sets[i].name = NULL;
+	}
+	free(info->sets);
+	info->sets = NULL;
+	info->count = 0;
 }

@@ -34,6 +34,19 @@
 extern "C" {
 #endif
 
+typedef struct {
+	wchar_t *file;		// iniファイルフルパス
+	wchar_t *section;	// セクション
+	wchar_t *name;
+} OverrideCharWidthInfoSet;
+
+typedef struct {
+	size_t count;		// 設定数, 0のとき設定なし他のメンバ―無効
+	int enable;			// 0(FALSE)/1(TRUE)=disable/enable(上書き設定を行う)
+	size_t selected;	// sets[N],  N=0..count-1
+	OverrideCharWidthInfoSet *sets;
+} OverrideCharWidthInfo;
+
 char UnicodeGetWidthProperty(unsigned long u32);
 int UnicodeIsCombiningCharacter(unsigned long u32);
 #if 0
@@ -57,6 +70,8 @@ int UnicodeOverrideWidthInit(const wchar_t *ini, const wchar_t *section);
 void UnicodeOverrideWidthUninit(void);
 int UnicodeOverrideWidthCheck(unsigned int u32, int *width);
 int UnicodeOverrideWidthAvailable(void);
+void OverrideCharWidthInfoGet(const wchar_t *fname, OverrideCharWidthInfo *info);
+void OverrideCharWidthInfoFree(OverrideCharWidthInfo *info);
 
 #ifdef __cplusplus
 }
