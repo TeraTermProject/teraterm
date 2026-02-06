@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <crtdbg.h>
+#include <assert.h>
 
 #include "teraterm.h"
 #include "tttypes.h"
@@ -44,7 +45,7 @@
 #include "ttplug.h"
 
 typedef struct _ExtensionList {
-	//wchar_t *path;					// フルパス
+	wchar_t *path;					// フルパス
 	wchar_t *filename;				// ファイル名
 	ExtensionEnable enable;
 	TTXExports * exports;			// NULLのときはロードされていない
@@ -89,15 +90,13 @@ static void PluginListAdd(const ExtensionList *item)
 	Extensions = (ExtensionList *)realloc(Extensions, sizeof(ExtensionList) * NumExtensions);
 	ExtensionList *pl = &Extensions[NumExtensions - 1];
 	*pl = *item;
-	wchar_t *filename = wcsrchr(item->filename, L'\\');
-	if (filename == NULL) {
-		filename = item->filename;	// フルパスでない場合はそのまま
-	} else {
-		filename++; // '\\'の次の文字から
-	}
-	pl->filename = _wcsdup(filename);
+	pl->path = _wcsdup(pl->path);
+	pl->filename = _wcsdup(pl->filename);
 }
 
+/**
+ *	iniファイルから一覧を取得
+ */
 static void PluginListRead(const wchar_t *SetupFNW)
 {
 	HistoryStore *hs = HistoryStoreCreate(20);
@@ -117,16 +116,14 @@ static void PluginListRead(const wchar_t *SetupFNW)
 			free(buf);
 			continue;
 		}
-		ExtensionEnable enable =
+		PluginInfo info = {};
+		info.filename = buf;
+		info.enable =
 			enable_int == 0 ? EXTENSION_DISABLE :
 			enable_int == 1 ? EXTENSION_ENABLE :
 			EXTENSION_UNSPECIFIED;
-
-		PluginInfo info;
-		info.filename = buf;
-		info.enable = enable;
 		PluginAddInfo(&info);
-		free(buf);
+		free(info.filename);
 	}
 	HistoryStoreDestroy(hs);
 }
@@ -148,24 +145,24 @@ void PluginWriteList(const wchar_t *SetupFNW)
 	HistoryStoreDestroy(hs);
 }
 
-static void loadExtension(size_t index, const wchar_t *ExeDirW, const wchar_t *UILanguageFile)
+/**
+ *	1ファイル読み込む
+ */
+static void loadExtension(ExtensionList *pl, const wchar_t *UILanguageFile)
 {
 	DWORD err;
 	const wchar_t *sub_message;
 	HMODULE hPlugin;
-	wchar_t *filename;
-	aswprintf(&filename, L"%s\\%s", ExeDirW, Extensions[index].filename);
 
-	Extensions[index].exports = NULL;
-	Extensions[index].LibHandle = NULL;
+	pl->exports = NULL;
+	pl->LibHandle = NULL;
 
 	// ファイルがない
-	if (GetFileAttributesW(filename) == INVALID_FILE_ATTRIBUTES) {
-		free(filename);
+	if (GetFileAttributesW(pl->path) == INVALID_FILE_ATTRIBUTES) {
 		return;
 	}
 
-	hPlugin = LoadLibraryW(filename);
+	hPlugin = LoadLibraryW(pl->path);
 	if (hPlugin != NULL) {
 		TTXBindProc bind = NULL;
 		FARPROC *pbind = (FARPROC *)&bind;
@@ -179,16 +176,15 @@ static void loadExtension(size_t index, const wchar_t *ExeDirW, const wchar_t *U
 		if (bind == NULL)
 			*pbind = GetProcAddress(hPlugin, "TTXBind");
 		if (bind != NULL) {
-			TTXExports * exports = (TTXExports *)malloc(sizeof(TTXExports));
+			TTXExports * exports = (TTXExports *)calloc(1, sizeof(TTXExports));
 			if (exports == NULL) {
 				return;
 			}
-			memset(exports, 0, sizeof(TTXExports));
 			exports->size = sizeof(TTXExports);
 
 			if (bind(TTVERSION, exports)) {
-				Extensions[index].exports = exports;
-				Extensions[index].LibHandle = hPlugin;
+				pl->exports = exports;
+				pl->LibHandle = hPlugin;
 				return;
 			}
 			else {
@@ -228,34 +224,37 @@ static void loadExtension(size_t index, const wchar_t *ExeDirW, const wchar_t *U
 			"MSG_LOAD_EXT_ERROR", L"Cannot load extension %s (%d, %s)",
 			MB_OK | MB_ICONEXCLAMATION
 		};
-		TTMessageBoxW(NULL, &info, UILanguageFile, filename, err, sub_message);
+		TTMessageBoxW(NULL, &info, UILanguageFile, pl->path, err, sub_message);
 	}
-
-	free(filename);
 }
 
-static void ListPlugins(const wchar_t *ExeDirW)
+/**
+ *	フォルダ内のプラグイン一覧を取得
+ */
+static void ListPlugins(const wchar_t *dir)
 {
 	wchar_t *load_mask;
 	WIN32_FIND_DATAW fd;
 	HANDLE hFind;
 
-	aswprintf(&load_mask, L"%s\\TTX*.DLL", ExeDirW);
+	aswprintf(&load_mask, L"%s\\TTX*.DLL", dir);
 
 	hFind = FindFirstFileW(load_mask, &fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
 			ExtensionList item = {};
-			item.filename = _wcsdup(fd.cFileName);
+			aswprintf(&item.path, L"%s\\%s", dir, fd.cFileName);
+			item.filename = fd.cFileName;
 			item.enable = EXTENSION_UNSPECIFIED;
 			PluginListAdd(&item);
-			free(item.filename);
+			free(item.path);
 		} while (FindNextFileW(hFind, &fd));
 		FindClose(hFind);
 	}
 	free(load_mask);
 }
 
+#if 0
 static void DeletePluginList(size_t index)
 {
 	if (index >= NumExtensions) {
@@ -280,6 +279,7 @@ static void DeletePluginList(size_t index)
 		Extensions = NULL;
 	}
 }
+#endif
 
 /**
  * プラグイン情報を取得する
@@ -361,16 +361,25 @@ static void LoadExtensions(PTTSet ts_)
 
 	if (NumExtensions==0) return;
 
-	// プラグインをロード
+	// フルパスを作る
 	for (size_t i = 0; i < NumExtensions; i++) {
-		const ExtensionList *pl = &Extensions[i];
-		if ((pl->enable == EXTENSION_ENABLE) ||
-			(pl->enable == EXTENSION_UNSPECIFIED ))	// 未指定
-		{
-			loadExtension(i, ts_->ExeDirW, ts_->UILanguageFileW);
+		ExtensionList *pl = &Extensions[i];
+		if (pl->path == NULL) {
+			aswprintf(&pl->path, L"%s\\%s", ts_->ExeDirW, pl->filename);
 		}
 	}
 
+	// プラグインをロード
+	for (size_t i = 0; i < NumExtensions; i++) {
+		ExtensionList *pl = &Extensions[i];
+		if ((pl->enable == EXTENSION_ENABLE) ||
+			(pl->enable == EXTENSION_UNSPECIFIED ))	// 未指定
+		{
+			loadExtension(pl, ts_->UILanguageFileW);
+		}
+	}
+
+	// プラグインの並べ替え
 	qsort(Extensions, NumExtensions, sizeof(Extensions[0]), compareOrder);
 }
 
@@ -380,6 +389,9 @@ static void UnloadExtensions()
 	for (i = 0; i < NumExtensions; i++) {
 		ExtensionList *p = &Extensions[i];
 		free(p->filename);
+		p->filename = NULL;
+		free(p->path);
+		p->path = NULL;
 		p->filename = NULL;
 		if (p->exports != NULL) {
 			free(p->exports);

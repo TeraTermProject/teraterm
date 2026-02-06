@@ -50,6 +50,12 @@
 #include "plugin_pp.h"
 #include "plugin_pp_res.h"
 
+/* 署名表示 */
+#define ENABLE_VERIFY_SIGNATURE 0
+
+/* プラグインの追加,仕様未決 */
+#define ENABLE_ADD_BUTTON 0
+
 #define REWRITE_TEMPLATE
 
 typedef struct {
@@ -101,6 +107,7 @@ static void SetFromListView(HWND hWnd)
 /**
  * 署名検証
  */
+#if ENABLE_VERIFY_SIGNATURE
 static wchar_t *VerifySignature(LPCWSTR pwszSourceFile)
 {
 	if (pWinVerifyTrust == NULL) {
@@ -142,6 +149,7 @@ static wchar_t *VerifySignature(LPCWSTR pwszSourceFile)
 
 	return str;
 }
+#endif
 
 /**
  * @brief メニューを出して選択された処理を実行する
@@ -218,9 +226,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		lvcol.iSubItem = 3;
 		SendMessageA(hWndList, LVM_INSERTCOLUMNA, 3, (LPARAM)&lvcol);
 
+#if ENABLE_VERIFY_SIGNATURE
 		lvcol.pszText = (LPSTR)"verify";
 		lvcol.iSubItem = 4;
 		SendMessageA(hWndList, LVM_INSERTCOLUMNA, 4, (LPARAM)&lvcol);
+#endif
 
 		for (int i = 0;; i++) {
 			PluginInfo info;
@@ -261,11 +271,13 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SendMessageW(hWndList, LVM_SETITEMW, 0, (LPARAM)&item);
 			free(order_str);
 
+#if ENABLE_VERIFY_SIGNATURE
 			wchar_t *verify_str = VerifySignature(info.filename);
 			item.iSubItem = 4;
 			item.pszText = verify_str;
 			SendMessageW(hWndList, LVM_SETITEMW, 0, (LPARAM)&item);
 			free(verify_str);
+#endif
 		}
 
 		// 幅を調整
@@ -273,8 +285,12 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			ListView_SetColumnWidth(hWndList, i, LVSCW_AUTOSIZE_USEHEADER);
 		}
 
+#if !ENABLE_ADD_BUTTON
+		::ShowWindow(::GetDlgItem(hWnd, IDC_BUTTON_ADD), SW_HIDE);
+#endif
 		return TRUE;
 	}
+#if ENABLE_ADD_BUTTON
 	case WM_COMMAND: {
 		PluginDlgData *data = (PluginDlgData *)GetWindowLongPtrW(hWnd, DWLP_USER);
 		TTTSet *pts = data->pts;
@@ -315,6 +331,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		}
 		return FALSE;
 	}
+#endif
 	case WM_NOTIFY: {
 		NMHDR *nmhdr = (NMHDR *)lp;
 		if (nmhdr->code == PSN_HELP) {
