@@ -3645,7 +3645,7 @@ void MoveCursor(int Xnew, int Ynew)
 
 	/* 最下行でだけ自動スクロールする*/
 	if (ts.AutoScrollOnlyInBottomLine == 0 || WinOrgY == 0) {
-		DispScrollToCursor(CursorX, CursorY);
+		DispScrollToCursor(vt_src, CursorX, CursorY);
 	}
 }
 
@@ -3656,7 +3656,7 @@ void MoveRight(void)
 	CursorX++;
 	/* 最下行でだけ自動スクロールする */
 	if (ts.AutoScrollOnlyInBottomLine == 0 || WinOrgY == 0) {
-		DispScrollToCursor(CursorX, CursorY);
+		DispScrollToCursor(vt_src, CursorX, CursorY);
 	}
 }
 

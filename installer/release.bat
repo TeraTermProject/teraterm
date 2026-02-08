@@ -3,6 +3,9 @@ setlocal
 set CUR=%~dp0
 cd /d %CUR%
 
+rem 2026 (v18)
+rem if "%VS_VERSION%" == "" set VS_VERSION=18
+rem 2022
 if "%VS_VERSION%" == "" set VS_VERSION=2022
 
 if "%APPVEYOR%" == "True" set NOPAUSE=1

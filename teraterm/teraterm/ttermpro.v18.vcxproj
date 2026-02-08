@@ -1,0 +1,636 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BC4CDBE3-6269-47A8-BD74-EEB3A6160E06}</ProjectGuid>
+    <RootNamespace>ttermpro</RootNamespace>
+    <Keyword>MFCProj</Keyword>
+    <ProjectName>ttermpro</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v145</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v145</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v145</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v145</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v145</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v145</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration).$(Platform)\</OutDir>
+    <IntDir>$(Configuration).$(Platform)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <OutDir>$(SolutionDir)$(Configuration).$(Platform)\</OutDir>
+    <IntDir>$(Configuration).$(Platform)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)$(Configuration).$(Platform)\</OutDir>
+    <IntDir>$(Configuration).$(Platform)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration).$(Platform)\</OutDir>
+    <IntDir>$(Configuration).$(Platform)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <OutDir>$(SolutionDir)$(Configuration).$(Platform)\</OutDir>
+    <IntDir>$(Configuration).$(Platform)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)$(Configuration).$(Platform)\</OutDir>
+    <IntDir>$(Configuration).$(Platform)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>$(OutDir)$(ProjectName).tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BrowseInformation />
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0411</Culture>
+      <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>onig.lib;comctl32.lib;ws2_32.lib;imagehlp.lib;setupapi.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\build\$(Platform)\$(Configuration);$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>imagehlp.dll;user32.dll;shell32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+    <PreBuildEvent>
+      <Command>"$(SolutionDir)..\buildtools\svnrev\svnrev.bat"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TypeLibraryName>$(OutDir)$(ProjectName).tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0411</Culture>
+      <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>onig.lib;comctl32.lib;ws2_32.lib;imagehlp.lib;setupapi.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\build\$(Platform)\$(Configuration);$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>imagehlp.dll;user32.dll;shell32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+    <PreBuildEvent>
+      <Command>"$(SolutionDir)..\buildtools\svnrev\svnrev.bat"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TypeLibraryName>$(OutDir)$(ProjectName).tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0411</Culture>
+      <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>onig.lib;comctl32.lib;ws2_32.lib;imagehlp.lib;setupapi.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\build\$(Platform)\$(Configuration);$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>imagehlp.dll;user32.dll;shell32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+    <PreBuildEvent>
+      <Command>"$(SolutionDir)..\buildtools\svnrev\svnrev.bat"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>$(OutDir)$(ProjectName).tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>onig.lib;comctl32.lib;ws2_32.lib;imagehlp.lib;setupapi.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\build\$(Platform)\$(Configuration);$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>imagehlp.dll;user32.dll;shell32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+    <PreBuildEvent>
+      <Command>"$(SolutionDir)..\buildtools\svnrev\svnrev.bat"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TypeLibraryName>$(OutDir)$(ProjectName).tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>onig.lib;comctl32.lib;ws2_32.lib;imagehlp.lib;setupapi.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\build\$(Platform)\$(Configuration);$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>imagehlp.dll;user32.dll;shell32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+    <PreBuildEvent>
+      <Command>"$(SolutionDir)..\buildtools\svnrev\svnrev.bat"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TypeLibraryName>$(OutDir)$(ProjectName).tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>onig.lib;comctl32.lib;ws2_32.lib;imagehlp.lib;setupapi.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\build\$(Platform)\$(Configuration);$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>imagehlp.dll;user32.dll;shell32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>.\teraterm.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+    <PreBuildEvent>
+      <Command>"$(SolutionDir)..\buildtools\svnrev\svnrev.bat"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\cygwin\cyglib\cyglib.c" />
+    <ClCompile Include="..\common\edithistory.cpp" />
+    <ClCompile Include="..\common\ttlib.c" />
+    <ClCompile Include="..\susie_plugin\libsusieplugin.cpp" />
+    <ClCompile Include="..\ttpcmn\ttcmn_dup.cpp" />
+    <ClCompile Include="..\ttpcmn\ttcmn_static.c" />
+    <ClCompile Include="..\ttpdlg\aboutdlg.c" />
+    <ClCompile Include="..\ttpdlg\choosefontdlg.c" />
+    <ClCompile Include="..\ttpdlg\generaldlg.c" />
+    <ClCompile Include="..\ttpdlg\hostdlg.c" />
+    <ClCompile Include="..\ttpdlg\keyboarddlg.c" />
+    <ClCompile Include="..\ttpdlg\serialdlg.cpp" />
+    <ClCompile Include="..\ttpdlg\tcpipdlg.c" />
+    <ClCompile Include="..\ttpdlg\termdlg.c" />
+    <ClCompile Include="..\ttpdlg\windlg.cpp" />
+    <ClCompile Include="..\ttpdlg\windowdlg.cpp" />
+    <ClCompile Include="..\ttpfile\bplus.c" />
+    <ClCompile Include="..\ttpfile\filesys_win32.cpp" />
+    <ClCompile Include="..\ttpfile\ftlib.c" />
+    <ClCompile Include="..\ttpfile\kermit.c" />
+    <ClCompile Include="..\ttpfile\protolog.cpp" />
+    <ClCompile Include="..\ttpfile\quickvan.c" />
+    <ClCompile Include="..\ttpfile\xmodem.c" />
+    <ClCompile Include="..\ttpfile\ymodem.c" />
+    <ClCompile Include="..\ttpfile\zmodem.c" />
+    <ClCompile Include="..\ttpfile\raw.c" />
+    <ClCompile Include="..\ttpset\ttset.c" />
+    <ClCompile Include="..\ttpset\ttset_keyboard.c" />
+    <ClCompile Include="..\ttptek\tekesc.c" />
+    <ClCompile Include="..\ttptek\tttek.c" />
+    <ClCompile Include="addsetting.cpp" />
+    <ClCompile Include="broadcast.cpp" />
+    <ClCompile Include="buffer.c" />
+    <ClCompile Include="charset.cpp" />
+    <ClCompile Include="checkeol.cpp" />
+    <ClCompile Include="clipboar.c" />
+    <ClCompile Include="coding_pp.cpp" />
+    <ClCompile Include="color_sample.cpp" />
+    <ClCompile Include="commentdlg.cpp" />
+    <ClCompile Include="commlib.c" />
+    <ClCompile Include="dnddlg.cpp" />
+    <ClCompile Include="externalsetup.cpp" />
+    <ClCompile Include="filesys.cpp" />
+    <ClCompile Include="filesys_log.cpp" />
+    <ClCompile Include="filesys_proto.cpp" />
+    <ClCompile Include="font_pp.cpp" />
+    <ClCompile Include="ftdlg.cpp" />
+    <ClCompile Include="general_pp.cpp" />
+    <ClCompile Include="keyboard.c" />
+    <ClCompile Include="keyboard_pp.c" />
+    <ClCompile Include="logdlg.cpp" />
+    <ClCompile Include="log_pp.cpp" />
+    <ClCompile Include="mouse_pp.cpp" />
+    <ClCompile Include="scp.cpp" />
+    <ClCompile Include="sendfiledlg.cpp" />
+    <ClCompile Include="recvfiledlg.cpp" />
+    <ClCompile Include="serial_pp.cpp" />
+    <ClCompile Include="setupdirdlg.cpp" />
+    <ClCompile Include="sizetip.c" />
+    <ClCompile Include="prnabort.cpp" />
+    <ClCompile Include="protodlg.cpp" />
+    <ClCompile Include="tcpip_pp.cpp" />
+    <ClCompile Include="tekfont_pp.cpp" />
+    <ClCompile Include="tekwin.cpp" />
+    <ClCompile Include="telnet.c" />
+    <ClCompile Include="teraprn.cpp" />
+    <ClCompile Include="teraterm.cpp" />
+    <ClCompile Include="term_pp.cpp" />
+    <ClCompile Include="themedlg.cpp" />
+    <ClCompile Include="themefile.cpp" />
+    <ClCompile Include="theme_pp.cpp" />
+    <ClCompile Include="tslib.cpp" />
+    <ClCompile Include="ttdde.c" />
+    <ClCompile Include="ttdialog.c" />
+    <ClCompile Include="ttfileio.c" />
+    <ClCompile Include="ttime.c" />
+    <ClCompile Include="ttplug.c" />
+    <ClCompile Include="ttsetup.c" />
+    <ClCompile Include="ttwinman.c" />
+    <ClCompile Include="ttwsk.c" />
+    <ClCompile Include="ui_pp.cpp" />
+    <ClCompile Include="vtdisp.c" />
+    <ClCompile Include="vtdraw.cpp" />
+    <ClCompile Include="vtterm.c" />
+    <ClCompile Include="vtwin.cpp" />
+    <ClCompile Include="winjump.c" />
+    <ClCompile Include="win_pp.cpp" />
+    <ClCompile Include="WSAAsyncGetAddrInfo.c" />
+    <ClCompile Include="unicode.cpp" />
+    <ClInclude Include="../ttpdlg/dlg_res.h" />
+    <ClCompile Include="../ttpdlg/ttdlg.c" />
+    <ClInclude Include="../ttpdlg/ttdlg.h" />
+    <ClInclude Include="..\..\cygwin\cyglib\cyglib.h" />
+    <ClInclude Include="..\common\edithistory.h" />
+    <ClInclude Include="..\common\edithistory_res.h" />
+    <ClInclude Include="..\susie_plugin\libsusieplugin.h" />
+    <ClInclude Include="..\ttpcmn\ttcmn_dup.h" />
+    <ClInclude Include="..\ttpcmn\ttcmn_shared_memory.h" />
+    <ClInclude Include="..\ttpcmn\ttcmn_static.h" />
+    <ClInclude Include="..\ttpfile\bplus.h" />
+    <ClInclude Include="..\ttpfile\filesys_win32.h" />
+    <ClInclude Include="..\ttpfile\file_res.h" />
+    <ClInclude Include="..\ttpfile\ftlib.h" />
+    <ClInclude Include="..\ttpfile\kermit.h" />
+    <ClInclude Include="..\ttpfile\protolog.h" />
+    <ClInclude Include="..\ttpfile\quickvan.h" />
+    <ClInclude Include="..\ttpfile\xmodem.h" />
+    <ClInclude Include="..\ttpfile\ymodem.h" />
+    <ClInclude Include="..\ttpfile\zmodem.h" />
+    <ClInclude Include="..\ttpfile\raw.h" />
+    <ClInclude Include="..\ttpset\ttset.h" />
+    <ClInclude Include="..\ttpset\ttset_i.h" />
+    <ClInclude Include="..\ttptek\tekesc.h" />
+    <ClInclude Include="..\ttptek\ttptek_def.h" />
+    <ClInclude Include="..\ttptek\tttek.h" />
+    <ClInclude Include="broadcast.h" />
+    <ClInclude Include="charset.h" />
+    <ClInclude Include="checkeol.h" />
+    <ClInclude Include="coding_pp.h" />
+    <ClInclude Include="coding_pp_res.h" />
+    <ClInclude Include="color_sample.h" />
+    <ClInclude Include="commentdlg.h" />
+    <ClInclude Include="externalsetup.h" />
+    <ClInclude Include="filesys_log_res.h" />
+    <ClInclude Include="font_pp.h" />
+    <ClInclude Include="font_pp_res.h" />
+    <ClInclude Include="general_pp.h" />
+    <ClInclude Include="keyboard_pp.h" />
+    <ClInclude Include="logdlg.h" />
+    <ClInclude Include="log_pp.h" />
+    <ClInclude Include="mouse_pp.h" />
+    <ClInclude Include="scp.h" />
+    <ClInclude Include="sendfiledlg.h" />
+    <ClInclude Include="recvfiledlg.h" />
+    <ClInclude Include="sendmem.h" />
+    <ClCompile Include="sendmem.cpp" />
+    <ClInclude Include="ftdlg_lite.h" />
+    <ClCompile Include="ftdlg_lite.cpp" />
+    <ClInclude Include="clipboarddlg.h" />
+    <ClCompile Include="clipboarddlg.cpp" />
+    <ClInclude Include="debug_pp.h" />
+    <ClCompile Include="debug_pp.cpp" />
+    <ClInclude Include="serial_pp.h" />
+    <ClInclude Include="tekfont_pp.h" />
+    <ClInclude Include="tekfont_pp_res.h" />
+    <ClInclude Include="term_pp.h" />
+    <ClInclude Include="tslib.h" />
+    <ClInclude Include="ui_pp.h" />
+    <ClInclude Include="ui_pp_res.h" />
+    <ClInclude Include="vtdraw.h" />
+    <ClInclude Include="win_pp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\cygwin\cygterm\cygterm.ico" />
+    <Image Include="..\common\tek.ico" />
+    <Image Include="..\common\teraterm.ico" />
+    <Image Include="..\common\teraterm_3d.ico" />
+    <Image Include="..\common\teraterm_classic.ico" />
+    <Image Include="..\common\teraterm_flat.ico" />
+    <Image Include="..\common\vt.ico" />
+    <Image Include="..\common\vt_3d.ico" />
+    <Image Include="..\common\vt_classic.ico" />
+    <Image Include="..\common\vt_flat.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="../ttpdlg/ttpdlg.rc" />
+    <ResourceCompile Include="..\common\edithistory.rc" />
+    <ResourceCompile Include="coding_pp.rc" />
+    <ResourceCompile Include="debug_pp.rc" />
+    <ResourceCompile Include="filesys_log.rc" />
+    <ResourceCompile Include="font_pp.rc" />
+    <ResourceCompile Include="mouse_pp.rc" />
+    <ResourceCompile Include="tekfont_pp.rc" />
+    <ResourceCompile Include="teraterm_manifest.rc" />
+    <ResourceCompile Include="themedlg.rc" />
+    <ResourceCompile Include="tt-version.rc" />
+    <ResourceCompile Include="ttermpro.rc" />
+    <ResourceCompile Include="ui_pp.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common\codeconv.h" />
+    <ClInclude Include="..\common\compat_win.h" />
+    <ClInclude Include="..\common\dlglib.h" />
+    <ClInclude Include="..\common\tektypes.h" />
+    <ClInclude Include="..\common\teraterm.h" />
+    <ClInclude Include="..\common\tipwin.h" />
+    <ClInclude Include="..\common\tmfc.h" />
+    <ClInclude Include="..\common\tt-version.h" />
+    <ClInclude Include="..\common\tt_res.h" />
+    <ClInclude Include="..\common\ttcommon.h" />
+    <ClInclude Include="..\common\ttddecmnd.h" />
+    <ClInclude Include="..\common\ttlib.h" />
+    <ClInclude Include="..\common\ttplugin.h" />
+    <ClInclude Include="..\common\tttypes.h" />
+    <ClInclude Include="addsetting.h" />
+    <ClInclude Include="buffer.h" />
+    <ClInclude Include="clipboar.h" />
+    <ClInclude Include="commlib.h" />
+    <ClInclude Include="dnddlg.h" />
+    <ClInclude Include="filesys.h" />
+    <ClInclude Include="ftdlg.h" />
+    <ClInclude Include="keyboard.h" />
+    <ClInclude Include="prnabort.h" />
+    <ClInclude Include="protodlg.h" />
+    <ClInclude Include="setupdirdlg.h" />
+    <ClInclude Include="sizetip.h" />
+    <ClInclude Include="tcpip_pp.h" />
+    <ClInclude Include="tekwin.h" />
+    <ClInclude Include="telnet.h" />
+    <ClInclude Include="teraprn.h" />
+    <ClInclude Include="theme.h" />
+    <ClInclude Include="themedlg.h" />
+    <ClInclude Include="themedlg_res.h" />
+    <ClInclude Include="theme_pp.h" />
+    <ClInclude Include="ttdde.h" />
+    <ClInclude Include="ttdialog.h" />
+    <ClInclude Include="ttfileio.h" />
+    <ClInclude Include="ttime.h" />
+    <ClInclude Include="ttplug.h" />
+    <ClInclude Include="ttsetup.h" />
+    <ClInclude Include="ttwinman.h" />
+    <ClInclude Include="ttwsk.h" />
+    <ClInclude Include="vtdisp.h" />
+    <ClInclude Include="vtterm.h" />
+    <ClInclude Include="vtwin.h" />
+    <ClInclude Include="unicode.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\common\common_static.v18.vcxproj">
+      <Project>{ac42387d-23ec-45db-81f9-8933c7efa52a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ttpcmn\ttpcmn.v18.vcxproj">
+      <Project>{118e0d32-5553-4f73-9927-e873c1c500e4}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\ttpmacro\ttpmacro.v18.vcxproj">
+      <Project>{ba519362-a2c2-4b1a-905b-f00791f9038a}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="ttermpro.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

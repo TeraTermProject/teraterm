@@ -1,0 +1,709 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{c944ea9f-5e84-4cb4-9662-58a9031ec1be}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{9f09ffc2-cdc3-4159-92f7-e637db2a2927}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Source Files %28C%29">
+      <UniqueIdentifier>{962df722-a84a-4837-a367-5e66f4d40803}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{e3efecca-9842-408d-979e-a4c7af432f65}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="dialog">
+      <UniqueIdentifier>{23d7c62e-eff4-4a0d-b8b4-7fc703717c0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ttpdlg">
+      <UniqueIdentifier>{1cdaec4a-75c1-4600-b434-45286f5bec80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ttpfile">
+      <UniqueIdentifier>{0494dec4-73a6-4271-9dfa-ad4b61e2b62c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cyglib">
+      <UniqueIdentifier>{ceb6977e-f86f-423e-a1ca-d2fcb004e7cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ttpset">
+      <UniqueIdentifier>{5c80e9f6-d586-4ebc-860d-1d2915b6e1b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ttpcmn">
+      <UniqueIdentifier>{68f0946a-607e-4e50-89d8-edaee85394d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ttptek">
+      <UniqueIdentifier>{2d6ac865-54a1-4b77-80fc-10822ae0226a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="filesys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tekwin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="teraprn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="teraterm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vtwin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="buffer.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="clipboar.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="commlib.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="keyboard.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="sizetip.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="telnet.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttdde.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttfileio.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttime.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\ttlib.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttplug.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttsetup.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttwinman.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttwsk.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="vtdisp.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="vtterm.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="winjump.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="WSAAsyncGetAddrInfo.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="dnddlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="ftdlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="protodlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="prnabort.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="ttdialog.c">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="addsetting.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="../ttpdlg/ttdlg.c">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="unicode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sendmem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="clipboarddlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="debug_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="ftdlg_lite.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="sendfiledlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="coding_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="font_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\susie_plugin\libsusieplugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="broadcast.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filesys_log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="checkeol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\bplus.c">
+      <Filter>ttpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\ftlib.c">
+      <Filter>ttpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\kermit.c">
+      <Filter>ttpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\quickvan.c">
+      <Filter>ttpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\xmodem.c">
+      <Filter>ttpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\ymodem.c">
+      <Filter>ttpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\zmodem.c">
+      <Filter>ttpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="filesys_proto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\filesys_win32.cpp">
+      <Filter>ttpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="setupdirdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\protolog.cpp">
+      <Filter>ttpfile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cygwin\cyglib\cyglib.c">
+      <Filter>cyglib</Filter>
+    </ClCompile>
+    <ClCompile Include="themedlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpset\ttset.c">
+      <Filter>ttpset</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpset\ttset_keyboard.c">
+      <Filter>ttpset</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpcmn\ttcmn_static.c">
+      <Filter>ttpcmn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpcmn\ttcmn_dup.cpp">
+      <Filter>ttpcmn</Filter>
+    </ClCompile>
+    <ClCompile Include="themefile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="charset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="logdlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpdlg\aboutdlg.c">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpdlg\termdlg.c">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpdlg\windlg.cpp">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpdlg\windowdlg.cpp">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpdlg\hostdlg.c">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpdlg\serialdlg.cpp">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpdlg\choosefontdlg.c">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpdlg\keyboarddlg.c">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpdlg\tcpipdlg.c">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpdlg\generaldlg.c">
+      <Filter>ttpdlg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttptek\tekesc.c">
+      <Filter>ttptek</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttptek\tttek.c">
+      <Filter>ttptek</Filter>
+    </ClCompile>
+    <ClCompile Include="theme_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="general_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="keyboard_pp.c">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="mouse_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="log_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\edithistory.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="tcpip_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="win_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="term_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="color_sample.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="serial_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="externalsetup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ui_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="tslib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tekfont_pp.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="vtdraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="commentdlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="recvfiledlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ttpfile\raw.c">
+      <Filter>ttpfile</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\common\tek.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\teraterm.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\teraterm_classic.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\teraterm_flat.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\vt.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\vt_classic.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\teraterm_3d.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\vt_3d.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\cygwin\cygterm\cygterm.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\vt_flat.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="tt-version.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="ttermpro.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="../ttpdlg/ttpdlg.rc">
+      <Filter>ttpdlg</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="debug_pp.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="teraterm_manifest.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="coding_pp.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="font_pp.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="filesys_log.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="themedlg.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="mouse_pp.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="..\common\edithistory.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="ui_pp.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="tekfont_pp.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="sizetip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tt_res.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttfileio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ttlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttwinman.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\teraterm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tektypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tekwin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="telnet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="teraprn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttwsk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ttcommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttdde.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ttddecmnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttplug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ttplugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttsetup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tttypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tt-version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clipboar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="commlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filesys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="keyboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vtterm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vtwin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vtdisp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dnddlg.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="prnabort.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="protodlg.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="ttdialog.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\dlglib.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="ftdlg.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="addsetting.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="../ttpdlg/dlg_res.h">
+      <Filter>ttpdlg</Filter>
+    </ClInclude>
+    <ClInclude Include="../ttpdlg/ttdlg.h">
+      <Filter>ttpdlg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tmfc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tipwin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sendmem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\codeconv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\compat_win.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="unicode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clipboarddlg.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="debug_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="ftdlg_lite.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="sendfiledlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="coding_pp_res.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="coding_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="font_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="font_pp_res.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\susie_plugin\libsusieplugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="broadcast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filesys_log_res.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="checkeol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\bplus.h">
+      <Filter>ttpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\ftlib.h">
+      <Filter>ttpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\kermit.h">
+      <Filter>ttpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\quickvan.h">
+      <Filter>ttpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\xmodem.h">
+      <Filter>ttpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\ymodem.h">
+      <Filter>ttpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\zmodem.h">
+      <Filter>ttpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\file_res.h">
+      <Filter>ttpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\filesys_win32.h">
+      <Filter>ttpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="setupdirdlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\protolog.h">
+      <Filter>ttpfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cygwin\cyglib\cyglib.h">
+      <Filter>cyglib</Filter>
+    </ClInclude>
+    <ClInclude Include="themedlg.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="themedlg_res.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpset\ttset.h">
+      <Filter>ttpset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpset\ttset_i.h">
+      <Filter>ttpset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpcmn\ttcmn_dup.h">
+      <Filter>ttpcmn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpcmn\ttcmn_shared_memory.h">
+      <Filter>ttpcmn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpcmn\ttcmn_static.h">
+      <Filter>ttpcmn</Filter>
+    </ClInclude>
+    <ClInclude Include="theme.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="charset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="logdlg.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttptek\tekesc.h">
+      <Filter>ttptek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttptek\ttptek_def.h">
+      <Filter>ttptek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttptek\tttek.h">
+      <Filter>ttptek</Filter>
+    </ClInclude>
+    <ClInclude Include="theme_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="general_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="keyboard_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="mouse_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="log_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\edithistory.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\edithistory_res.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="tcpip_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="win_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="term_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="color_sample.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serial_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="externalsetup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_pp_res.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="tslib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tekfont_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="tekfont_pp_res.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="vtdraw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="commentdlg.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="recvfiledlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ttpfile\raw.h">
+      <Filter>ttpfile</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

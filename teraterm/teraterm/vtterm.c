@@ -2228,7 +2228,7 @@ static void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 							if (j < NSParam[i]) {
 								b = SubParam[i][++j];
 							}
-							color = DispFindClosestColor(r, g, b);
+							color = DispFindClosestColor(vt_src, r, g, b);
 						}
 					}
 					else if (i < NParam && NSParam[i+1] > 0) {
@@ -2237,13 +2237,13 @@ static void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 						if (NSParam[i] > 1) {
 							b = SubParam[i][2];
 						}
-						color = DispFindClosestColor(r, g, b);
+						color = DispFindClosestColor(vt_src, r, g, b);
 					}
 					else if (i+2 < NParam) {
 						r = Param[++i];
 						g = Param[++i];
 						b = Param[++i];
-						color = DispFindClosestColor(r, g, b);
+						color = DispFindClosestColor(vt_src, r, g, b);
 					}
 					break;
 				  case 5:
@@ -2310,7 +2310,7 @@ static void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 							if (j < NSParam[i]) {
 								b = SubParam[i][++j];
 							}
-							color = DispFindClosestColor(r, g, b);
+							color = DispFindClosestColor(vt_src, r, g, b);
 						}
 					}
 					else if (i < NParam && NSParam[i+1] > 0) {
@@ -2319,13 +2319,13 @@ static void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 						if (NSParam[i] > 1) {
 							b = SubParam[i][2];
 						}
-						color = DispFindClosestColor(r, g, b);
+						color = DispFindClosestColor(vt_src, r, g, b);
 					}
 					else if (i+2 < NParam) {
 						r = Param[++i];
 						g = Param[++i];
 						b = Param[++i];
-						color = DispFindClosestColor(r, g, b);
+						color = DispFindClosestColor(vt_src, r, g, b);
 					}
 					break;
 				  case 5:
@@ -2461,41 +2461,41 @@ static void CSSunSequence() /* Sun terminal private sequences */
 	switch (Param[1]) {
 	  case 1: // De-iconify window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
-			DispShowWindow(WINDOW_RESTORE);
+			DispShowWindow(vt_src, WINDOW_RESTORE);
 		break;
 
 	  case 2: // Iconify window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
-			DispShowWindow(WINDOW_MINIMIZE);
+			DispShowWindow(vt_src, WINDOW_MINIMIZE);
 		break;
 
 	  case 3: // set window position
 		if (ts.WindowFlag & WF_WINDOWCHANGE) {
 			RequiredParams(3);
-			DispMoveWindow(Param[2], Param[3]);
+			DispMoveWindow(vt_src, Param[2], Param[3]);
 		}
 		break;
 
 	  case 4: // set window size
 		if (ts.WindowFlag & WF_WINDOWCHANGE) {
 			RequiredParams(3);
-			DispResizeWin(Param[3], Param[2]);
+			DispResizeWin(vt_src, Param[3], Param[2]);
 		}
 		break;
 
 	  case 5: // Raise window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
-			DispShowWindow(WINDOW_RAISE);
+			DispShowWindow(vt_src, WINDOW_RAISE);
 		break;
 
 	  case 6: // Lower window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
-			DispShowWindow(WINDOW_LOWER);
+			DispShowWindow(vt_src, WINDOW_LOWER);
 		break;
 
 	  case 7: // Refresh window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
-			DispShowWindow(WINDOW_REFRESH);
+			DispShowWindow(vt_src, WINDOW_REFRESH);
 		break;
 
 	  case 8: /* set terminal size */
@@ -2511,10 +2511,10 @@ static void CSSunSequence() /* Sun terminal private sequences */
 		if (ts.WindowFlag & WF_WINDOWCHANGE) {
 			RequiredParams(2);
 			if (Param[2] == 0) {
-				DispShowWindow(WINDOW_RESTORE);
+				DispShowWindow(vt_src, WINDOW_RESTORE);
 			}
 			else if (Param[2] == 1) {
-				DispShowWindow(WINDOW_MAXIMIZE);
+				DispShowWindow(vt_src, WINDOW_MAXIMIZE);
 			}
 		}
 		break;
@@ -2528,13 +2528,13 @@ static void CSSunSequence() /* Sun terminal private sequences */
 			RequiredParams(2);
 			switch (Param[2]) {
 			  case 0:
-			    DispShowWindow(WINDOW_RESTORE);
+			    DispShowWindow(vt_src, WINDOW_RESTORE);
 			    break;
 			  case 1:
-			    DispShowWindow(WINDOW_MAXIMIZE);
+			    DispShowWindow(vt_src, WINDOW_MAXIMIZE);
 			    break;
 			  case 2:
-			    DispShowWindow(WINDOW_TOGGLE_MAXIMIZE);
+			    DispShowWindow(vt_src, WINDOW_TOGGLE_MAXIMIZE);
 			    break;
 			}
 		}
@@ -2542,7 +2542,7 @@ static void CSSunSequence() /* Sun terminal private sequences */
 
 	  case 11: // Report window state
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
-			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%dt", CLocale, DispWindowIconified()?2:1);
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%dt", CLocale, DispWindowIconified(vt_src)?2:1);
 			SendCSIstr(Report, len);
 		}
 		break;
@@ -2553,10 +2553,10 @@ static void CSSunSequence() /* Sun terminal private sequences */
 			switch (Param[2]) {
 			  case 0:
 			  case 1:
-				DispGetWindowPos(&x, &y, FALSE);
+				DispGetWindowPos(vt_src, &x, &y, FALSE);
 				break;
 			  case 2:
-				DispGetWindowPos(&x, &y, TRUE);
+				DispGetWindowPos(vt_src, &x, &y, TRUE);
 				break;
 			  default:
 				return;
@@ -2572,10 +2572,10 @@ static void CSSunSequence() /* Sun terminal private sequences */
 			switch (Param[2]) {
 			  case 0:
 			  case 1:
-				DispGetWindowSize(&x, &y, TRUE);
+				DispGetWindowSize(vt_src, &x, &y, TRUE);
 				break;
 			  case 2:
-				DispGetWindowSize(&x, &y, FALSE);
+				DispGetWindowSize(vt_src, &x, &y, FALSE);
 				break;
 			  default:
 				return;
@@ -4853,7 +4853,7 @@ static void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYT
 
 	if (colornum != CS_UNSPEC) {
 		if (strcmp(ColorSpec, "?") == 0) {
-			color = DispGetColor(colornum);
+			color = DispGetColor(vt_src, colornum);
 			if (mode == 4 || mode == 5) {
 				len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
 					"%d;%d;rgb:%04x/%04x/%04x", CLocale, mode, ColorNumber,
