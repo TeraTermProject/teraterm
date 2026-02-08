@@ -8962,6 +8962,9 @@ static INT_PTR CALLBACK ssh_scp_dlg_thread_proc(HWND hWnd, UINT msg, WPARAM wp, 
 
 	switch (msg) {
 		case WM_INITDIALOG:
+			// 閉じるボタンをグレーアウトする
+			HMENU hSysMenu = GetSystemMenu(hWnd, FALSE);
+			EnableMenuItem(hSysMenu, SC_CLOSE, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 			CenterWindow(hWnd, GetParent(hWnd));
 			return FALSE;
 
@@ -9248,6 +9251,8 @@ static INT_PTR CALLBACK ssh_scp_receive_dlg_thread_proc(HWND hWnd, UINT msg, WPA
 
 	switch (msg) {
 		case WM_INITDIALOG:
+			// 閉じるボタンをグレーアウトする
+			HMENU hSysMenu = GetSystemMenu(hWnd, FALSE);
 			CenterWindow(hWnd, GetParent(hWnd));
 			return FALSE;
 
