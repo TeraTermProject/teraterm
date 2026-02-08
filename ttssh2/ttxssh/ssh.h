@@ -509,6 +509,8 @@ void SSH2_send_kexinit(PTInstVar pvar);
 BOOL do_SSH2_userauth(PTInstVar pvar);
 BOOL do_SSH2_authrequest(PTInstVar pvar);
 void debug_print(int no, char *msg, int len);
+void ssh_scp_thread_lock_initialize(void);
+void ssh_scp_thread_lock_finalize(void);
 void ssh_heartbeat_lock_initialize(void);
 void ssh_heartbeat_lock_finalize(void);
 void ssh_heartbeat_lock(void);
@@ -549,6 +551,7 @@ typedef struct scp {
 	HANDLE thread;
 	PTInstVar pvar;
 	HANDLE ScpStartThreadEvent;
+	BOOL canceled;
 	DWORD stime;
 	int prev_elapsed;
 	int ProgStat;
@@ -563,8 +566,11 @@ typedef struct scp {
 	struct {
 		uint64_t received_size;
 	} recv;
+	HANDLE ScpReceiveThreadEvent;
 	// for sending file
 	long long filesndsize;
+	HANDLE ScpSendThreadEvent;
+	size_t sendsize;
 } scp_t;
 
 enum sftp_state {

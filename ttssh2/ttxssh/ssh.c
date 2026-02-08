@@ -108,7 +108,8 @@ static int channel_used_num = 0;    // 使用チャネル数
 
 static char ssh_ttymodes[] = "\x01\x03\x02\x1c\x03\x08\x04\x15\x05\x04";
 
-static CRITICAL_SECTION g_ssh_scp_lock;   /* SCP受信用ロック */
+static CRITICAL_SECTION g_ssh_scp_lock;			/* SCP受信用ロック */
+static CRITICAL_SECTION g_ssh_scp_thread_lock;	/* SCPスレッド待ち合わせ用ロック */
 
 static int g_scp_sending;  /* SCP送信中か? */
 
@@ -259,6 +260,9 @@ static Channel_t *ssh2_channel_new(PTInstVar pvar, unsigned int window, unsigned
 		c->scp.fileatime = 0;
 		c->scp.pktlist_cursize = 0;
 		c->scp.ScpStartThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		c->scp.ScpSendThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		c->scp.ScpReceiveThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		c->scp.sendsize = SIZE_MAX;
 	}
 	if (type == TYPE_AGENT) {
 		c->agent_msg = buffer_init();
@@ -362,10 +366,29 @@ static void ssh2_channel_delete(Channel_t *c)
 		prev_state = c->scp.state;
 		c->scp.state = SCP_CLOSING;
 
+		if (c->scp.progress_window != NULL) {
+			DestroyWindow(c->scp.progress_window);
+			c->scp.progress_window = NULL;
+		}
+		if (c->scp.thread != INVALID_HANDLE_VALUE) {
+			WaitForSingleObject(c->scp.thread, INFINITE);
+			CloseHandle(c->scp.thread);
+			c->scp.thread = INVALID_HANDLE_VALUE;
+		}
 		if (c->scp.ScpStartThreadEvent != NULL &&
 			c->scp.ScpStartThreadEvent != INVALID_HANDLE_VALUE) {
 			CloseHandle(c->scp.ScpStartThreadEvent);
 			c->scp.ScpStartThreadEvent = NULL;
+		}
+		if (c->scp.ScpSendThreadEvent != NULL &&
+			c->scp.ScpSendThreadEvent != INVALID_HANDLE_VALUE) {
+			CloseHandle(c->scp.ScpSendThreadEvent);
+			c->scp.ScpSendThreadEvent = NULL;
+		}
+		if (c->scp.ScpReceiveThreadEvent != NULL &&
+			c->scp.ScpReceiveThreadEvent != INVALID_HANDLE_VALUE) {
+			CloseHandle(c->scp.ScpReceiveThreadEvent);
+			c->scp.ScpReceiveThreadEvent = NULL;
 		}
 
 		if (c->scp.localfp != NULL) {
@@ -383,15 +406,6 @@ static void ssh2_channel_delete(Channel_t *c)
 				if (prev_state != SCP_CLOSING)
 					remove(c->scp.localfilefull);
 			}
-		}
-		if (c->scp.progress_window != NULL) {
-			DestroyWindow(c->scp.progress_window);
-			c->scp.progress_window = NULL;
-		}
-		if (c->scp.thread != INVALID_HANDLE_VALUE) {
-			WaitForSingleObject(c->scp.thread, INFINITE);
-			CloseHandle(c->scp.thread);
-			c->scp.thread = INVALID_HANDLE_VALUE;
 		}
 
 		// SCP受信の場合のみ、SCP用リストの開放を行う。
@@ -456,6 +470,21 @@ Channel_t *ssh2_local_channel_lookup(int local_num)
 			return (c);
 	}
 	return (NULL);
+}
+
+//
+// SCP thread mutex
+//
+void ssh_scp_thread_lock_initialize(void)
+{
+	InitializeCriticalSection(&g_ssh_scp_lock);
+	InitializeCriticalSection(&g_ssh_scp_thread_lock);
+}
+
+void ssh_scp_thread_lock_finalize(void)
+{
+	DeleteCriticalSection(&g_ssh_scp_lock);
+	DeleteCriticalSection(&g_ssh_scp_thread_lock);
 }
 
 //
@@ -9114,23 +9143,22 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 		if (ret == 0)
 			break;
 
-		// remote_window が回復するまで待つ
-		do {
-			// socket or channelがクローズされたらスレッドを終わる
-			if (pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0)
-				goto abort;
+		EnterCriticalSection(&g_ssh_scp_thread_lock);
+		if (ret > c->remote_window) {
+			// remote_window が回復するまで最大10秒待つ
+			c->scp.sendsize = ret;
+			ResetEvent(c->scp.ScpSendThreadEvent);
+			LeaveCriticalSection(&g_ssh_scp_thread_lock);
+			WaitForSingleObject(c->scp.ScpSendThreadEvent, 10000 /*msec*/);
+			c->scp.sendsize = SIZE_MAX;
+		} else {
+			LeaveCriticalSection(&g_ssh_scp_thread_lock);
+		}
 
-			if (ret > c->remote_window) {
-				Sleep(10);
-			}
-
-			// 10秒抜けられなかったら抜けてしまう
-			count++;
-			if (count > 1000) {
-				break;
-			}
-
-		} while (ret > c->remote_window);
+		// socket or channelがクローズされたらスレッドを終わる
+		if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
+			goto abort;
+		}
 
 		// sending data
 		parm.buf = buf;
@@ -9371,44 +9399,55 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 	c->scp.stime = GetTickCount();
 
 	for (;;) {
-		ssh2_scp_get_packetlist(pvar, c, &data, &buflen);
-		if (data && buflen) {
-			msg.message = WM_RECEIVING_FILE;
+		WaitForSingleObject(c->scp.ScpReceiveThreadEvent, 100);
+		do {
+			ssh2_scp_get_packetlist(pvar, c, &data, &buflen);
+			if (data && buflen) {
+				msg.message = WM_RECEIVING_FILE;
 
-			switch (msg.message) {
-			case WM_RECEIVING_FILE:
-				//data = (unsigned char *)msg.wParam;
-				//buflen = (unsigned int)msg.lParam;
+				switch (msg.message) {
+				case WM_RECEIVING_FILE:
+					//data = (unsigned char *)msg.wParam;
+					//buflen = (unsigned int)msg.lParam;
 
-				if (c->scp.filercvsize >= c->scp.filetotalsize) { // EOF
+					if (c->scp.filercvsize >= c->scp.filetotalsize) { // EOF
+						free(data);  // free!
+						goto done;
+					}
+
+					if (c->scp.filercvsize + buflen > c->scp.filetotalsize) { // overflow (include EOF)
+						buflen = (unsigned int)(c->scp.filetotalsize - c->scp.filercvsize);
+						eof = 1;
+					}
+
+					c->scp.filercvsize += buflen;
+
+					if (fwrite(data, 1, buflen, c->scp.localfp) < buflen) { // error
+						// TODO:
+					}
+
 					free(data);  // free!
-					goto done;
+
+					if (eof)
+						goto done;
+
+					break;
 				}
-
-				if (c->scp.filercvsize + buflen > c->scp.filetotalsize) { // overflow (include EOF)
-					buflen = (unsigned int)(c->scp.filetotalsize - c->scp.filercvsize);
-					eof = 1;
-				}
-
-				c->scp.filercvsize += buflen;
-
-				if (fwrite(data, 1, buflen, c->scp.localfp) < buflen) { // error
-					// TODO:
-				}
-
-				free(data);  // free!
-
-				if (eof)
-					goto done;
-
-				break;
 			}
-		}
-		// Cancelボタンが押下されたらウィンドウが消える。
-		if (is_canceled_window(hWnd)) {
-			pvar->recv.close_request = TRUE;
-			goto cancel_abort;
-		}
+
+			// socket or channelがクローズされたらスレッドを終わる
+			if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
+				goto cancel_abort;
+			}
+
+			// Cancelボタンが押下されたらウィンドウが消える。
+			if (is_canceled_window(hWnd)) {
+				pvar->recv.close_request = TRUE;
+				goto cancel_abort;
+			}
+
+		} while (c->scp.pktlist_head);
+		ResetEvent(c->scp.ScpReceiveThreadEvent);
 	}
 
 done:
@@ -9466,6 +9505,7 @@ static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 	}
 
 	LeaveCriticalSection(&g_ssh_scp_lock);
+	SetEvent(c->scp.ScpReceiveThreadEvent);
 
 	logprintf(LOG_LEVEL_NOTICE,
 		"%s: channel=#%d SCP recv %u(bytes) and enqueued.%s",
@@ -9532,7 +9572,6 @@ static void ssh2_scp_alloc_packetlist(PTInstVar pvar, Channel_t *c)
 {
 	c->scp.pktlist_head = NULL;
 	c->scp.pktlist_tail = NULL;
-	InitializeCriticalSection(&g_ssh_scp_lock);
 	c->scp.pktlist_cursize = 0;
 	pvar->recv.suspended = FALSE;
 	pvar->recv.close_request = FALSE;
@@ -9553,7 +9592,6 @@ static void ssh2_scp_free_packetlist(PTInstVar pvar, Channel_t *c)
 
 	c->scp.pktlist_head = NULL;
 	c->scp.pktlist_tail = NULL;
-	DeleteCriticalSection(&g_ssh_scp_lock);
 }
 
 static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen)
@@ -10325,6 +10363,12 @@ static BOOL handle_SSH2_window_adjust(PTInstVar pvar)
 
 	// 送らずバッファに保存しておいたデータを送る
 	ssh2_channel_retry_send_bufchain(pvar, c);
+
+	EnterCriticalSection(&g_ssh_scp_thread_lock);
+	if (c->remote_window >= c->scp.sendsize) {
+		SetEvent(c->scp.ScpSendThreadEvent);
+	}
+	LeaveCriticalSection(&g_ssh_scp_thread_lock);
 
 	return TRUE;
 }
