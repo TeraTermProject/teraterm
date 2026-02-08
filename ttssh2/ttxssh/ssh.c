@@ -9294,12 +9294,6 @@ static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 	// キューに詰んだデータの総サイズを加算する。
 	c->scp.pktlist_cursize += buflen;
 
-	int self_id = c->self_id;
-	unsigned long pktlist_cursize = c->scp.pktlist_cursize;
-	BOOL suspended = pvar->recv.suspended;
-
-	LeaveCriticalSection(&g_ssh_scp_lock);
-
 	// キューに詰んだデータの総サイズが上限閾値を超えた場合、
 	// SSHサーバのwindows sizeの更新を停止する
 	// これによりリストエントリが増え続け、消費メモリの肥大化を
@@ -9310,10 +9304,12 @@ static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 		pvar->recv.suspended = TRUE;
 	}
 
+	LeaveCriticalSection(&g_ssh_scp_lock);
+
 	logprintf(LOG_LEVEL_NOTICE,
 		"%s: channel=#%d SCP recv %u(bytes) and enqueued.%s",
-		__FUNCTION__, self_id, pktlist_cursize,
-		suspended ? "(suspended)" : ""
+		__FUNCTION__, c->self_id, c->scp.pktlist_cursize,
+		pvar->recv.suspended ? "(suspended)" : ""
 	);
 }
 
