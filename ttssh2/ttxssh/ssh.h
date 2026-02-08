@@ -555,6 +555,7 @@ typedef struct scp {
 	DWORD stime;
 	int prev_elapsed;
 	int ProgStat;
+	DWORD ProcessedTime;
 	// for receiving file
 	long long filetotalsize;
 	long long filercvsize;

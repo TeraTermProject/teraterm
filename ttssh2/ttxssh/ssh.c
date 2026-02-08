@@ -8999,6 +8999,7 @@ static INT_PTR CALLBACK ssh_scp_dlg_thread_proc(HWND hWnd, UINT msg, WPARAM wp, 
 				SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
 				c->scp.prev_elapsed = elapsed;
 			}
+			c->scp.ProcessedTime = GetTickCount();
 			return FALSE;
 
 		case WM_COMMAND:
@@ -9057,8 +9058,8 @@ static unsigned __stdcall ssh_scp_dlg_thread(void *p)
 	SetDlgItemTextU8(hDlgWnd, IDC_FILENAME, c->scp.localfilefull);
 	InitDlgProgress(hDlgWnd, IDC_PROGBAR, &(c->scp.ProgStat));
 	c->scp.prev_elapsed = 0;
-	c->scp.canceled = FALSE;
 	c->scp.filesndsize = 0;
+	c->scp.canceled = FALSE;
 	c->scp.stime = GetTickCount();
 	SetWindowLongPtr(hDlgWnd, GWLP_USERDATA, (LONG_PTR)c);
 	SetTimer(hDlgWnd, c->self_id, SCPDLG_UPDATE_INTERVAL, NULL);
@@ -9102,12 +9103,13 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 	WaitForSingleObject(c->scp.ScpStartThreadEvent, 5000 /*msec*/);
 	ResetEvent(c->scp.ScpStartThreadEvent);
 	c->scp.stime = GetTickCount();
+	c->scp.ProcessedTime = c->scp.stime;
 
 	buflen = min(c->remote_window, 8192*4); // max 32KB
 	buf = malloc(buflen);
 
 	do {
-		int readlen, count=0;
+		int readlen, count = 0;
 
 		// Cancelボタンが押下されたらウィンドウが消える。
 		if (c->scp.canceled == TRUE) {
@@ -9145,7 +9147,19 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 		SendMessage(hWnd, WM_SENDING_FILE, (WPARAM)&parm, 0);
 
 		c->scp.filesndsize += ret;
-
+#if 1
+		// 進捗ダイアログの描画が間に合わない場合は、負荷が下がるまで待つ
+		while (GetTickCount() - c->scp.ProcessedTime > SCPDLG_UPDATE_INTERVAL * 3) {
+			Sleep(20);
+			if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
+				goto cancel_abort;
+			}
+			if (c->scp.canceled == TRUE) {
+				pvar->recv.close_request = TRUE;
+				goto cancel_abort;
+			}
+		}
+#endif
 	} while (ret <= buflen);
 
 	// eof
@@ -9269,6 +9283,7 @@ static INT_PTR CALLBACK ssh_scp_receive_dlg_thread_proc(HWND hWnd, UINT msg, WPA
 				SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
 				c->scp.prev_elapsed = elapsed;
 			}
+			c->scp.ProcessedTime = GetTickCount();
 			return FALSE;
 
 		case WM_COMMAND:
@@ -9375,6 +9390,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 	WaitForSingleObject(c->scp.ScpStartThreadEvent, 5000 /*msec*/);
 	ResetEvent(c->scp.ScpStartThreadEvent);
 	c->scp.stime = GetTickCount();
+	c->scp.ProcessedTime = c->scp.stime;
 
 	for (;;) {
 		WaitForSingleObject(c->scp.ScpReceiveThreadEvent, 100);
@@ -9423,7 +9439,19 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 				pvar->recv.close_request = TRUE;
 				goto cancel_abort;
 			}
-
+#if 1
+			// 進捗ダイアログの描画が間に合わない場合は、負荷が下がるまで待つ
+			while (GetTickCount() - c->scp.ProcessedTime > SCPDLG_UPDATE_INTERVAL * 3) {
+				Sleep(20);
+				if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
+					goto cancel_abort;
+				}
+				if (c->scp.canceled == TRUE) {
+					pvar->recv.close_request = TRUE;
+					goto cancel_abort;
+				}
+			}
+#endif
 		} while (c->scp.pktlist_head);
 		ResetEvent(c->scp.ScpReceiveThreadEvent);
 	}
