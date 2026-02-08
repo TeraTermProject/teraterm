@@ -9039,7 +9039,7 @@ static unsigned __stdcall ssh_scp_dlg_thread(void *p)
 	Channel_t *c = (Channel_t *)p;
 	PTInstVar pvar = c->scp.pvar;
 	BOOL bRet;
-    MSG msg;
+	MSG msg;
 
 	HWND hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_SSHSCP_PROGRESS),
 							 pvar->cv->HWin, ssh_scp_dlg_thread_proc);
@@ -9099,6 +9099,8 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 		// TODO:
 		return 0;
 	}
+	// 進捗ダイアログの描画スレッドの優先度を上げる
+	SetThreadPriority(thread, THREAD_PRIORITY_ABOVE_NORMAL);
 	// スレッド起動待ち
 	WaitForSingleObject(c->scp.ScpStartThreadEvent, 5000 /*msec*/);
 	ResetEvent(c->scp.ScpStartThreadEvent);
@@ -9386,6 +9388,8 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 		// TODO:
 		return 0;
 	}
+	// 進捗ダイアログの描画スレッドの優先度を上げる
+	SetThreadPriority(thread, THREAD_PRIORITY_ABOVE_NORMAL);
 	// スレッド起動待ち
 	WaitForSingleObject(c->scp.ScpStartThreadEvent, 5000 /*msec*/);
 	ResetEvent(c->scp.ScpStartThreadEvent);
