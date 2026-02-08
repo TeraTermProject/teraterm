@@ -8965,6 +8965,10 @@ static INT_PTR CALLBACK ssh_scp_dlg_thread_proc(HWND hWnd, UINT msg, WPARAM wp, 
 			// 閉じるボタンをグレーアウトする
 			HMENU hSysMenu = GetSystemMenu(hWnd, FALSE);
 			EnableMenuItem(hSysMenu, SC_CLOSE, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+			// 最小化時、タスクバーにアイコンが表示されるようにする
+			DWORD dwExStyle = GetWindowLong(hWnd, GWL_EXSTYLE);
+			dwExStyle |= WS_EX_APPWINDOW;
+			SetWindowLong(hWnd, GWL_EXSTYLE, dwExStyle);
 			CenterWindow(hWnd, GetParent(hWnd));
 			return FALSE;
 
@@ -9253,6 +9257,10 @@ static INT_PTR CALLBACK ssh_scp_receive_dlg_thread_proc(HWND hWnd, UINT msg, WPA
 		case WM_INITDIALOG:
 			// 閉じるボタンをグレーアウトする
 			HMENU hSysMenu = GetSystemMenu(hWnd, FALSE);
+			// 最小化時、タスクバーにアイコンが表示されるようにする
+			DWORD dwExStyle = GetWindowLong(hWnd, GWL_EXSTYLE);
+			dwExStyle |= WS_EX_APPWINDOW;
+			SetWindowLong(hWnd, GWL_EXSTYLE, dwExStyle);
 			CenterWindow(hWnd, GetParent(hWnd));
 			return FALSE;
 
