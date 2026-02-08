@@ -118,6 +118,8 @@ enum channel_type {
 #define SCPRCV_HIGH_WATER_MARK  (CHAN_SES_WINDOW_DEFAULT * 0.75)	// 1.5 MB
 #define SCPRCV_LOW_WATER_MARK   (CHAN_SES_WINDOW_DEFAULT * 0.25)	// 0.5 MB
 
+#define SCPDLG_UPDATE_INTERVAL 100 /*msec*/	// SCP進捗ダイアログの表示更新間隔
+
 /* SSH2 constants */
 #define SSH_CHANNEL_INVALID -1
 
@@ -545,8 +547,11 @@ typedef struct scp {
 	struct __stat64 filestat;      // file status information
 	HWND progress_window;
 	HANDLE thread;
-	unsigned int thread_id;
 	PTInstVar pvar;
+	HANDLE ScpStartThreadEvent;
+	DWORD stime;
+	int prev_elapsed;
+	int ProgStat;
 	// for receiving file
 	long long filetotalsize;
 	long long filercvsize;
@@ -558,6 +563,8 @@ typedef struct scp {
 	struct {
 		uint64_t received_size;
 	} recv;
+	// for sending file
+	long long filesndsize;
 } scp_t;
 
 enum sftp_state {
