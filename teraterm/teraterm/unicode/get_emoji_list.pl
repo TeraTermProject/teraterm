@@ -34,7 +34,7 @@ my $emoji_file = "emoji-data.txt";
 my $version = '';
 open(my $fh_e, "<:utf8", $emoji_file) || die "Cannot open $emoji_file.";
 while(my $a = <$fh_e>) {
-	if ($a =~ /^# Version: (\d+\.\d(:?\.\d)?)/) {
+	if ($a =~ /^# Version: (\d+\.\d(?:\.\d)?)/) {
 		$version = $1;
 		last;
 	}
