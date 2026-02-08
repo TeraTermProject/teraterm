@@ -8885,7 +8885,6 @@ void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c)
 
 #define WM_SENDING_FILE (WM_USER + 1)
 #define WM_CHANNEL_CLOSE (WM_USER + 2)
-#define WM_GET_CLOSED_STATUS (WM_USER + 3)
 
 typedef struct scp_dlg_parm {
 	Channel_t *c;
@@ -8896,11 +8895,8 @@ typedef struct scp_dlg_parm {
 
 static INT_PTR CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-	static int closed = 0;
-
 	switch (msg) {
 		case WM_INITDIALOG:
-			closed = 0;
 			CenterWindow(hWnd, GetParent(hWnd));
 			return FALSE;
 
@@ -8937,9 +8933,10 @@ static INT_PTR CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 					// ウィンドウをいきなり破棄するのではなく、非表示にするのみとして、
 					// スレッドからのメッセージを処理できるようにする。
 					// (2011.6.8 yutaka)
-					//EndDialog(hWnd, 0);
+					//TTEndDialog(hWnd, 0);
 					//DestroyWindow(hWnd);
-					closed = 1;
+					Channel_t *c = (Channel_t *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+					c->scp.canceled = TRUE;
 					return TRUE;
 				default:
 					return FALSE;
@@ -8953,31 +8950,10 @@ static INT_PTR CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 		case WM_DESTROY:
 			return TRUE;
 
-		case WM_GET_CLOSED_STATUS:
-			{
-			int *flag = (int *)wp;
-
-
-
-			*flag = closed;
-			}
-			return TRUE;
-
 		default:
 			return FALSE;
 	}
 	return TRUE;
-}
-
-static int is_canceled_window(HWND hd)
-{
-	int closed = 0;
-
-	SendMessage(hd, WM_GET_CLOSED_STATUS, (WPARAM)&closed, 0);
-	if (closed)
-		return 1;
-	else
-		return 0;
 }
 
 static INT_PTR CALLBACK ssh_scp_dlg_thread_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -9081,6 +9057,7 @@ static unsigned __stdcall ssh_scp_dlg_thread(void *p)
 	SetDlgItemTextU8(hDlgWnd, IDC_FILENAME, c->scp.localfilefull);
 	InitDlgProgress(hDlgWnd, IDC_PROGBAR, &(c->scp.ProgStat));
 	c->scp.prev_elapsed = 0;
+	c->scp.canceled = FALSE;
 	c->scp.filesndsize = 0;
 	c->scp.stime = GetTickCount();
 	SetWindowLongPtr(hDlgWnd, GWLP_USERDATA, (LONG_PTR)c);
@@ -9133,7 +9110,7 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 		int readlen, count=0;
 
 		// Cancelボタンが押下されたらウィンドウが消える。
-		if (is_canceled_window(hWnd)) {
+		if (c->scp.canceled == TRUE) {
 			goto cancel_abort;
 		}
 
@@ -9331,7 +9308,7 @@ static unsigned __stdcall ssh_scp_receive_dlg_thread(void *p)
 	Channel_t *c = (Channel_t *)p;
 	PTInstVar pvar = c->scp.pvar;
 	BOOL bRet;
-    MSG msg;
+	MSG msg;
 
 	HWND hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_SSHSCP_PROGRESS),
 							 pvar->cv->HWin, ssh_scp_receive_dlg_thread_proc);
@@ -9351,6 +9328,7 @@ static unsigned __stdcall ssh_scp_receive_dlg_thread(void *p)
 	SetDlgItemTextU8(hDlgWnd, IDC_FILENAME, c->scp.localfilefull);
 	InitDlgProgress(hDlgWnd, IDC_PROGBAR, &(c->scp.ProgStat));
 	c->scp.prev_elapsed = 0;
+	c->scp.canceled = FALSE;
 	c->scp.stime = GetTickCount();
 	SetWindowLongPtr(hDlgWnd, GWLP_USERDATA, (LONG_PTR)c);
 	SetTimer(hDlgWnd, c->self_id, SCPDLG_UPDATE_INTERVAL, NULL);
@@ -9441,7 +9419,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 			}
 
 			// Cancelボタンが押下されたらウィンドウが消える。
-			if (is_canceled_window(hWnd)) {
+			if (c->scp.canceled == TRUE) {
 				pvar->recv.close_request = TRUE;
 				goto cancel_abort;
 			}
