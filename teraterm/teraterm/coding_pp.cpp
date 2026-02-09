@@ -401,15 +401,15 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						const OverrideCharWidthInfo *info = &DlgData->unicode_override_charwidth_info;
 
 						BOOL enable = IsDlgButtonChecked(hWnd, IDC_OVERRIDE_CHAR_WIDTH);
-						size_t selected = (size_t)SendDlgItemMessageW(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO, CB_GETCURSEL, 0, 0);
-
+						size_t selected =
+							(size_t)SendDlgItemMessageW(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO, CB_GETCURSEL, 0, 0);
 						if (!enable) {
-							if (enable != info->enable) {
-								// disableする
-								UnicodeOverrideWidthUninit();
-							}
-						} else {
-							if (selected != info->selected) {
+							// disableする
+							UnicodeOverrideWidthUninit();
+						}
+						else {
+							if ((enable != ts->UnicodeOverrideCharWidthEnable) ||
+								(selected != ts->UnicodeOverrideCharWidthSelected)) {
 								// 設定を読み込む(enableにする/設定を変更する)
 								const OverrideCharWidthInfoSet *set = &info->sets[selected];
 								UnicodeOverrideWidthInit(set->file, set->section);

@@ -597,7 +597,7 @@ const SBCSTable_t *GetSBCSTable(IdKanjiCode kanji_code, int *table_size)
 		// Other ASCII-based
 		{ IdKOI8_NEW, koi8r, _countof(koi8r) },
 	};
-	for (int i = 0; i < _countof(tables); i++) {
+	for (size_t i = 0; i < _countof(tables); i++) {
 		if (kanji_code == tables[i].kanji_code) {
 			if (table_size != NULL) {
 				*table_size = tables[i].size;
@@ -744,6 +744,19 @@ typedef struct {
 static UnicodeWidthList_t *unicode_width_list_ptr;
 static size_t unicode_width_list_count = 0;
 
+static int compare_start(const void * e1, const void * e2)
+{
+	const UnicodeWidthList_t *p1 = (UnicodeWidthList_t *)e1;
+	const UnicodeWidthList_t *p2 = (UnicodeWidthList_t *)e2;
+	if (p1->start == p2->start) {
+		return 0;
+	} else if (p1->start > p2->start) {
+		return 1;
+	} else {
+		return -1;
+	}
+}
+
 int UnicodeOverrideWidthInit(const wchar_t *ini, const wchar_t *section)
 {
 	UnicodeOverrideWidthUninit();
@@ -803,6 +816,9 @@ int UnicodeOverrideWidthInit(const wchar_t *ini, const wchar_t *section)
 		}
 	}
 
+	// リストをソートする
+	qsort(p, c, sizeof(*p), compare_start);
+
 	unicode_width_list_ptr = p;
 	unicode_width_list_count = c;
 
@@ -833,6 +849,9 @@ int UnicodeOverrideWidthCheck(unsigned int u32, int *width)
 		return 0;
 	}
 	const UnicodeWidthList_t *p = unicode_width_list_ptr;
+	if (u32 < p->start) {
+		return 0;
+	}
 	for (size_t i = 0; i < unicode_width_list_count; p++,i++) {
 		if (p->start <= u32 && u32 <= p->end) {
 			*width = p->width;
