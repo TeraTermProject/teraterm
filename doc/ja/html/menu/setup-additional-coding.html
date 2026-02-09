@@ -295,11 +295,11 @@ cells数(2=全角/1=半角)
 
     <p>
       接続先のプログラムは <a href="../about/glossary.html#CJK">CJK</a> 環境のとき、
-      Ambiguous の文字幅を 2 Cell にすることが多いようです。<br>
-      vim は通常 ambiwidth=single で、このときは Ambiguous の文字幅が 1 です。
-      ambiwidth=double のときは Ambiguous の文字幅が 2 になります。<br>
-      emacs は通常 Ambiguous の文字幅が 1 です。
-      (set-language-environment "Japanese") を呼ぶと Ambiguous の文字幅が 2 になります。
+      Ambiguous の文字幅を 2 Cell にします。<br>
+      vim は ambiwidth=single のとき Ambiguous 文字のの文字幅が 1 です。
+      ambiwidth=double のときは Ambiguous 文字のの文字幅が 2 になります。<br>
+      emacs は通常 Ambiguous 文字のの文字幅が 1 です。
+      (set-language-environment "Japanese") を呼ぶと、一部の Ambiguous 文字の文字幅が 2 になります。
     </p>
 
     <div style="margin-top:1ex; overflow:hidden;">
@@ -317,8 +317,8 @@ cells数(2=全角/1=半角)
 
     <p>
      参考情報:<br>
-     vim は ambiwidth=double のとき、ほとんどの Ambiguous の文字幅が 2 になるようです。「ウムラウト文字など一部の文字の幅は 1 にする」等のカスタマイズをしたい場合は、setcellwidths() を使うことができます。<br>
-     emacs で (set-language-environment "Japanese") を呼ぶと use-cjk-char-width-table が有効にされます。これにより一部の Ambiguous の文字幅が 2 に（例えばウムラウト文字は 1 のままで、ギリシャ文字やキリル文字は 2 に）なります。
+     vim は ambiwidth=double のとき、ほとんどの Ambiguous の文字幅が 2 になるようです。vim で「ウムラウト文字など一部の文字の幅は 1 にする」等のカスタマイズをしたい場合は、setcellwidths() を使うことができます。<br>
+     emacs で (set-language-environment "Japanese") を呼ぶと use-cjk-char-width-table が有効にされます。これにより一部の Ambiguous 文字の文字幅が 2 に（例えばウムラウト文字は 1 のままで、ギリシャ文字やキリル文字は 2 に）なります。
     </p>
 
     <h2 id="emoji">絵文字の文字幅(セル数)について</h2>
