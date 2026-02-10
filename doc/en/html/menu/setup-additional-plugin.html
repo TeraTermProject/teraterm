@@ -11,9 +11,20 @@
   <body>
     <h1><a href="setup-additional.html">Additional settings</a> / "Plugin" tab ([Setup] menu)</h1>
 
-    Set enable(load)/disable(unload) plugins.<br>
+    <p>
+      Set enable(load)/disable(unload) plugins.
+    </p>
 
-    Display list of plugins in the plugin folder and settings.
+    <p>
+      Display list of plugins in the plugin folder and settings.
+    </p>
+
+    <p>
+      Plugins are loaded at startup.
+      After startup, plugins cannot be loaded and unloaded.
+      Selecting <a href="../menu/setup-restore.html">Restore Settings</a> will not reload or unload plugin.
+    </p>
+
     <dl>
       <dt>path</dt>
       <dd>
@@ -35,8 +46,9 @@
           </dd>
           <dt>unspecified</dt>
           <dd>
-            Not configured (not set).<br>
-            Unset plugin is loaded.
+            enable/disable setting has not been configured.
+            Default state is unspecified.<br>
+            unspecified plugins is loaded.
           </dd>
         </dl>
       </dd>
