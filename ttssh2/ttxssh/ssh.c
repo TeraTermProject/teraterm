@@ -8823,7 +8823,7 @@ static void do_SSH2_adjust_window_size(PTInstVar pvar, Channel_t *c)
 	int len;
 
 	// ローカルのwindow sizeにまだ余裕があるなら、何もしない。
-	if (c->local_window > c->local_window_max/4)
+	if (c->local_window >= SCPRCV_LOW_WATER_MARK)
 		return;
 
 	{
@@ -8956,6 +8956,9 @@ static INT_PTR CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 	return TRUE;
 }
 
+//
+// SCP 進捗ダイアログの描画スレッドのウィンドウプロシージャ
+//
 static INT_PTR CALLBACK ssh_scp_dlg_thread_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	Channel_t *c;
@@ -8973,9 +8976,21 @@ static INT_PTR CALLBACK ssh_scp_dlg_thread_proc(HWND hWnd, UINT msg, WPARAM wp, 
 				return FALSE;
 			}
 
-			int rate = (int)(100 * c->scp.filesndsize / c->scp.filestat.st_size);
+			long long transfered;
+			long long filesize;
+			if (c->scp.dir == TOREMOTE) {
+				// 送信
+				transfered = c->scp.filesndsize;
+				filesize = c->scp.filestat.st_size;
+			} else {
+				// 受信
+				transfered = c->scp.filercvsize;
+				filesize = c->scp.filetotalsize;
+			}
+
+			int rate = (int)(100 * transfered / filesize);
 			char s[80];
-			_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", c->scp.filesndsize, c->scp.filestat.st_size, rate);
+			_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", transfered, filesize, rate);
 			SendMessage(GetDlgItem(hWnd, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
 			if (c->scp.ProgStat != rate) {
 				c->scp.ProgStat = rate;
@@ -8985,7 +9000,7 @@ static INT_PTR CALLBACK ssh_scp_dlg_thread_proc(HWND hWnd, UINT msg, WPARAM wp, 
 			int elapsed = (GetTickCount() - c->scp.stime) / 1000;
 			if (elapsed > c->scp.prev_elapsed) {
 				if (elapsed > 2) {
-					rate = (int)(c->scp.filesndsize / elapsed);
+					rate = (int)(transfered / elapsed);
 					if (rate < 1200) {
 						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d %s)", elapsed / 60, elapsed % 60, rate, "Bytes/s");
 					} else if (rate < 1200000) {
@@ -9034,6 +9049,9 @@ static INT_PTR CALLBACK ssh_scp_dlg_thread_proc(HWND hWnd, UINT msg, WPARAM wp, 
 	return TRUE;
 }
 
+//
+//  SCP 進捗ダイアログの描画スレッド
+//
 static unsigned __stdcall ssh_scp_dlg_thread(void *p)
 {
 	Channel_t *c = (Channel_t *)p;
@@ -9041,19 +9059,36 @@ static unsigned __stdcall ssh_scp_dlg_thread(void *p)
 	BOOL bRet;
 	MSG msg;
 
+#if 1 // 高負荷対策
+	// スレッドの優先度を上げる
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+#endif
 	HWND hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_SSHSCP_PROGRESS),
 							 pvar->cv->HWin, ssh_scp_dlg_thread_proc);
 	if (hDlgWnd == NULL) {
 		return 1;
 	}
 
-	static const DlgTextInfo text_info[] = {
-		{ 0, "DLG_SCP_PROGRESS_TITLE_SENDFILE" },
-		{ IDC_SCP_PROGRESS_FILENAME_LABEL, "DLG_SCP_PROGRESS_FILENAME_LABEL" },
-		{ IDC_SCP_PROGRESS_BYTE_LABEL, "DLG_SCP_PROGRESS_BYTES_LABEL" },
-		{ IDC_SCP_PROGRESS_TIME_LABEL, "DLG_SCP_PROGRESS_TIME_LABEL" },
-	};
-	SetI18nDlgStrsW(hDlgWnd, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
+	if (c->scp.dir == TOREMOTE) {
+		// 送信
+		static const DlgTextInfo text_info[] = {
+			{ 0, "DLG_SCP_PROGRESS_TITLE_SENDFILE" },
+			{ IDC_SCP_PROGRESS_FILENAME_LABEL, "DLG_SCP_PROGRESS_FILENAME_LABEL" },
+			{ IDC_SCP_PROGRESS_BYTE_LABEL, "DLG_SCP_PROGRESS_BYTES_LABEL" },
+			{ IDC_SCP_PROGRESS_TIME_LABEL, "DLG_SCP_PROGRESS_TIME_LABEL" },
+		};
+		SetI18nDlgStrsW(hDlgWnd, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
+	} else {
+		// 受信
+		static const DlgTextInfo text_info[] = {
+			{ 0, "DLG_SCP_PROGRESS_TITLE_RECEIVEFILE" },
+			{ IDC_SCP_PROGRESS_FILENAME_LABEL, "DLG_SCP_PROGRESS_FILENAME_LABEL" },
+			{ IDC_SCP_PROGRESS_BYTE_LABEL, "DLG_SCP_PROGRESS_BYTES_LABEL" },
+			{ IDC_SCP_PROGRESS_TIME_LABEL, "DLG_SCP_PROGRESS_TIME_LABEL" },
+		};
+		SetWindowText(hDlgWnd, "TTSSH: SCP receiving file");
+		SetI18nDlgStrsW(hDlgWnd, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
+	}
 
 	SetDlgItemTextU8(hDlgWnd, IDC_FILENAME, c->scp.localfilefull);
 	InitDlgProgress(hDlgWnd, IDC_PROGBAR, &(c->scp.ProgStat));
@@ -9061,6 +9096,7 @@ static unsigned __stdcall ssh_scp_dlg_thread(void *p)
 	c->scp.filesndsize = 0;
 	c->scp.canceled = FALSE;
 	c->scp.stime = GetTickCount();
+	c->scp.ProcessedTime = c->scp.stime;
 	SetWindowLongPtr(hDlgWnd, GWLP_USERDATA, (LONG_PTR)c);
 	SetTimer(hDlgWnd, c->self_id, SCPDLG_UPDATE_INTERVAL, NULL);
 	ShowWindow(hDlgWnd, SW_SHOW);
@@ -9070,8 +9106,8 @@ static unsigned __stdcall ssh_scp_dlg_thread(void *p)
 		if (bRet == -1) {
 			break;
 		}
-		// socket or channelがクローズされたらスレッドを終わる
-		if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
+		// キャンセルボタン押下 or socket or channelがクローズされたらスレッドを終わる
+		if (c->scp.canceled == TRUE || pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
 			break;
 		}
 		TranslateMessage(&msg);
@@ -9082,6 +9118,27 @@ static unsigned __stdcall ssh_scp_dlg_thread(void *p)
 	return 0;
 }
 
+//
+//  SCP 進捗ダイアログの描画スレッドを起動
+//
+static HANDLE start_ssh_scp_dlg_thread(Channel_t *c)
+{
+	unsigned int tid;
+
+	HANDLE thread = (HANDLE)_beginthreadex(NULL, 0, ssh_scp_dlg_thread, c, 0, &tid);
+	if (thread == 0) {
+		return 0;
+	}
+	// スレッド起動待ち
+	WaitForSingleObject(c->scp.ScpStartThreadEvent, 5000 /*msec*/);
+	ResetEvent(c->scp.ScpStartThreadEvent);
+	c->scp.stime = GetTickCount();
+	return thread;
+}
+
+//
+//  SCP ファイル送信スレッド
+//
 static unsigned __stdcall ssh_scp_thread(void *p)
 {
 	Channel_t *c = (Channel_t *)p;
@@ -9091,21 +9148,12 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 	size_t ret;
 	HWND hWnd = c->scp.progress_window;
 	scp_dlg_parm_t parm;
-	HANDLE thread;
-	unsigned int tid;
 
-	thread = (HANDLE)_beginthreadex(NULL, 0, ssh_scp_dlg_thread, c, 0, &tid);
+	HANDLE thread = start_ssh_scp_dlg_thread(c);
 	if (thread == 0) {
 		// TODO:
 		return 0;
 	}
-	// 進捗ダイアログの描画スレッドの優先度を上げる
-	SetThreadPriority(thread, THREAD_PRIORITY_ABOVE_NORMAL);
-	// スレッド起動待ち
-	WaitForSingleObject(c->scp.ScpStartThreadEvent, 5000 /*msec*/);
-	ResetEvent(c->scp.ScpStartThreadEvent);
-	c->scp.stime = GetTickCount();
-	c->scp.ProcessedTime = c->scp.stime;
 
 	buflen = min(c->remote_window, 8192*4); // max 32KB
 	buf = malloc(buflen);
@@ -9149,7 +9197,7 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 		SendMessage(hWnd, WM_SENDING_FILE, (WPARAM)&parm, 0);
 
 		c->scp.filesndsize += ret;
-#if 1
+#if 1 // 高負荷対策
 		// 進捗ダイアログの描画が間に合わない場合は、負荷が下がるまで待つ
 		while (GetTickCount() - c->scp.ProcessedTime > SCPDLG_UPDATE_INTERVAL * 3) {
 			Sleep(20);
@@ -9242,131 +9290,10 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 	}
 }
 
-static INT_PTR CALLBACK ssh_scp_receive_dlg_thread_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
-{
-	Channel_t *c;
 
-	switch (msg) {
-		case WM_INITDIALOG:
-			CenterWindow(hWnd, GetParent(hWnd));
-			return FALSE;
-
-		case WM_TIMER:
-			// socket or channelがクローズされていたら何もしない
-			c = (Channel_t *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-			PTInstVar pvar = c->scp.pvar;
-			if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
-				return FALSE;
-			}
-
-			int rate = (int)(100 * c->scp.filercvsize / c->scp.filetotalsize);
-			char s[80];
-			_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", c->scp.filercvsize, c->scp.filetotalsize, rate);
-			SendMessage(GetDlgItem(hWnd, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
-			if (c->scp.ProgStat != rate) {
-				c->scp.ProgStat = rate;
-				SendDlgItemMessage(hWnd, IDC_PROGBAR, PBM_SETPOS, (WPARAM)c->scp.ProgStat, 0);
-			}
-
-			int elapsed = (GetTickCount() - c->scp.stime) / 1000;
-			if (elapsed > c->scp.prev_elapsed) {
-				if (elapsed > 2) {
-					rate = (int)(c->scp.filercvsize / elapsed);
-					if (rate < 1200) {
-						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d %s)", elapsed / 60, elapsed % 60, rate, "Bytes/s");
-					} else if (rate < 1200000) {
-						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100, "KBytes/s");
-					} else {
-						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100, "MBytes/s");
-					}
-				} else {
-					_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d", elapsed / 60, elapsed % 60);
-				}
-				SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
-				c->scp.prev_elapsed = elapsed;
-			}
-			c->scp.ProcessedTime = GetTickCount();
-			return FALSE;
-
-		case WM_COMMAND:
-			switch (LOWORD(wp)) {
-				case IDOK:
-					return TRUE;
-
-				case IDCANCEL:
-					// SCP送信スレッドにIDCANCELを送信する
-					c = (Channel_t *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-					SendMessage(c->scp.progress_window, WM_COMMAND, IDCANCEL, 0);
-					KillTimer(hWnd, c->self_id);
-					TTEndDialog(hWnd, 0);
-					DestroyWindow(hWnd);
-					return TRUE;
-
-				default:
-					return FALSE;
-			}
-			break;
-
-		case WM_CLOSE:
-			// closeボタンが押下されても window が閉じないようにする。
-			return TRUE;
-
-		case WM_DESTROY:
-			return TRUE;
-
-		default:
-			return FALSE;
-	}
-	return TRUE;
-}
-
-static unsigned __stdcall ssh_scp_receive_dlg_thread(void *p)
-{
-	Channel_t *c = (Channel_t *)p;
-	PTInstVar pvar = c->scp.pvar;
-	BOOL bRet;
-	MSG msg;
-
-	HWND hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_SSHSCP_PROGRESS),
-							 pvar->cv->HWin, ssh_scp_receive_dlg_thread_proc);
-	if (hDlgWnd == NULL) {
-		return 1;
-	}
-
-	static const DlgTextInfo text_info[] = {
-		{ 0, "DLG_SCP_PROGRESS_TITLE_RECEIVEFILE" },
-		{ IDC_SCP_PROGRESS_FILENAME_LABEL, "DLG_SCP_SENDFILE_FROM" },
-		{ IDC_SCP_PROGRESS_BYTE_LABEL, "DLG_SCP_PROGRESS_BYTES_LABEL" },
-		{ IDC_SCP_PROGRESS_TIME_LABEL, "DLG_SCP_PROGRESS_TIME_LABEL" },
-	};
-	SetWindowText(hDlgWnd, "TTSSH: SCP receiving file");
-	SetI18nDlgStrsW(hDlgWnd, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
-
-	SetDlgItemTextU8(hDlgWnd, IDC_FILENAME, c->scp.localfilefull);
-	InitDlgProgress(hDlgWnd, IDC_PROGBAR, &(c->scp.ProgStat));
-	c->scp.prev_elapsed = 0;
-	c->scp.canceled = FALSE;
-	c->scp.stime = GetTickCount();
-	SetWindowLongPtr(hDlgWnd, GWLP_USERDATA, (LONG_PTR)c);
-	SetTimer(hDlgWnd, c->self_id, SCPDLG_UPDATE_INTERVAL, NULL);
-	ShowWindow(hDlgWnd, SW_SHOW);
-	SetEvent(c->scp.ScpStartThreadEvent);
-
-	while ((bRet = GetMessage(&msg, hDlgWnd, 0, 0)) != 0) {
-		if (bRet == -1) {
-			break;
-		}
-		// socket or channelがクローズされたらスレッドを終わる
-		if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
-			break;
-		}
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-		Sleep(0);
-	}
-
-	return 0;
-}
+//
+//  SCP ファイル受信スレッド
+//
 
 #define WM_RECEIVING_FILE (WM_USER + 2)
 
@@ -9380,21 +9307,12 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 	unsigned int buflen;
 	int eof = 0;
 	scp_dlg_parm_t parm;
-	HANDLE thread;
-	unsigned int tid;
 
-	thread = (HANDLE)_beginthreadex(NULL, 0, ssh_scp_receive_dlg_thread, c, 0, &tid);
+	HANDLE thread = start_ssh_scp_dlg_thread(c);
 	if (thread == 0) {
 		// TODO:
 		return 0;
 	}
-	// 進捗ダイアログの描画スレッドの優先度を上げる
-	SetThreadPriority(thread, THREAD_PRIORITY_ABOVE_NORMAL);
-	// スレッド起動待ち
-	WaitForSingleObject(c->scp.ScpStartThreadEvent, 5000 /*msec*/);
-	ResetEvent(c->scp.ScpStartThreadEvent);
-	c->scp.stime = GetTickCount();
-	c->scp.ProcessedTime = c->scp.stime;
 
 	for (;;) {
 		WaitForSingleObject(c->scp.ScpReceiveThreadEvent, 100);
@@ -9443,7 +9361,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 				pvar->recv.close_request = TRUE;
 				goto cancel_abort;
 			}
-#if 1
+#if 1 // 高負荷対策
 			// 進捗ダイアログの描画が間に合わない場合は、負荷が下がるまで待つ
 			while (GetTickCount() - c->scp.ProcessedTime > SCPDLG_UPDATE_INTERVAL * 3) {
 				Sleep(20);
@@ -9551,7 +9469,7 @@ static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 
 	// キューに詰んだデータの総サイズが下限閾値を下回った場合、
 	// SSHサーバへwindow sizeの更新を再開する
-	if (c->scp.pktlist_cursize <= SCPRCV_LOW_WATER_MARK) {
+	if (c->scp.pktlist_cursize < SCPRCV_LOW_WATER_MARK) {
 		logprintf(LOG_LEVEL_NOTICE, "%s: SCP receive resumed", __FUNCTION__);
 		// ブロックしている場合
 		if (pvar->recv.suspended) {
@@ -9710,7 +9628,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			}
 			else {
 				// ローカルのwindow sizeをチェック
-				if (c->local_window < c->local_window_max/4) {
+				if (c->local_window < SCPRCV_LOW_WATER_MARK) {
 					// windowサイズを調整する
 					do_SSH2_adjust_window_size(pvar, c);
 				}
