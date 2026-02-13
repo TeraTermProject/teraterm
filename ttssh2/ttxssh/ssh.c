@@ -4317,7 +4317,7 @@ static int SSH_scp_transaction(PTInstVar pvar, const char *filename, const char 
 
 	if (direction == TOREMOTE) {  // copy local to remote
 		struct __stat64 st;
-		fp = fopenU8(filename, "rb");
+		fp = fopenU8(filename, "rbS");
 		if (fp == NULL) {
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
@@ -4422,7 +4422,7 @@ static int SSH_scp_transaction(PTInstVar pvar, const char *filename, const char 
 			}
 		}
 
-		fp = fopenU8(c->scp.localfilefull, "wb");
+		fp = fopenU8(c->scp.localfilefull, "wbS");
 		if (fp == NULL) {
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
