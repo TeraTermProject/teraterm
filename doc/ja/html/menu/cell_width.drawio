@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36" version="29.3.4">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36" version="29.3.6">
   <diagram name="Page-1" id="QJf9veqwGSUIw43c_tSh">
-    <mxGraphModel dx="1426" dy="743" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="713" dy="372" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="zGKfmYL7vTUdgt1reAz5-0" />
         <mxCell id="zGKfmYL7vTUdgt1reAz5-1" parent="zGKfmYL7vTUdgt1reAz5-0" />
@@ -18,13 +18,10 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="zGKfmYL7vTUdgt1reAz5-5" edge="1" parent="zGKfmYL7vTUdgt1reAz5-1" source="zGKfmYL7vTUdgt1reAz5-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fontFamily=Noto Sans JP;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DNoto%2BSans%2BJP;align=left;" target="NJ4BH3G0wsvnnMrGqXP--0" value="Yes">
+        <mxCell id="zGKfmYL7vTUdgt1reAz5-5" edge="1" parent="zGKfmYL7vTUdgt1reAz5-1" source="zGKfmYL7vTUdgt1reAz5-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;fontFamily=Noto Sans JP;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DNoto%2BSans%2BJP;align=left;" target="NJ4BH3G0wsvnnMrGqXP--0" value="Yes">
           <mxGeometry relative="1" x="-0.3333" y="10" as="geometry">
             <mxPoint as="offset" />
-            <Array as="points">
-              <mxPoint x="260" y="360" />
-              <mxPoint x="260" y="360" />
-            </Array>
+            <Array as="points" />
           </mxGeometry>
         </mxCell>
         <mxCell id="zGKfmYL7vTUdgt1reAz5-6" parent="zGKfmYL7vTUdgt1reAz5-1" style="rhombus;whiteSpace=wrap;html=1;shadow=0;fontFamily=Noto Sans JP;fontSize=12;align=center;strokeWidth=1;spacing=6;spacingTop=-4;fillColor=#d5e8d4;strokeColor=#82b366;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DNoto%2BSans%2BJP;" value="&lt;div&gt;Character&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;has&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;Extended_Pictographic&lt;/div&gt;&lt;div&gt;attribute&lt;/div&gt;" vertex="1">
@@ -152,12 +149,10 @@
         <mxCell id="QDvN6JNyhJAI4ja9pGnE-0" parent="zGKfmYL7vTUdgt1reAz5-1" style="rhombus;whiteSpace=wrap;html=1;shadow=0;fontFamily=Noto Sans JP;fontSize=12;align=center;strokeWidth=1;spacing=6;spacingTop=-4;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DNoto%2BSans%2BJP;" value="&lt;div&gt;Setting:&lt;/div&gt;&lt;div&gt;Override&lt;/div&gt;&lt;div&gt;character width&lt;/div&gt;" vertex="1">
           <mxGeometry height="80" width="160" x="40" y="180" as="geometry" />
         </mxCell>
-        <mxCell id="QDvN6JNyhJAI4ja9pGnE-1" edge="1" parent="zGKfmYL7vTUdgt1reAz5-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;fontFamily=Noto Sans JP;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DNoto%2BSans%2BJP;align=left;entryX=-0.011;entryY=0.488;entryDx=0;entryDy=0;entryPerimeter=0;" target="QDvN6JNyhJAI4ja9pGnE-2" value="On">
-          <mxGeometry relative="1" x="-0.3333" y="10" as="geometry">
+        <mxCell id="QDvN6JNyhJAI4ja9pGnE-1" edge="1" parent="zGKfmYL7vTUdgt1reAz5-1" source="QDvN6JNyhJAI4ja9pGnE-0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;fontFamily=Noto Sans JP;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DNoto%2BSans%2BJP;align=left;" target="QDvN6JNyhJAI4ja9pGnE-2" value="On">
+          <mxGeometry relative="1" x="-0.35" y="10" as="geometry">
             <mxPoint as="offset" />
-            <Array as="points">
-              <mxPoint x="239" y="220" />
-            </Array>
+            <Array as="points" />
             <mxPoint x="200" y="220" as="sourcePoint" />
             <mxPoint x="210" y="270" as="targetPoint" />
           </mxGeometry>
@@ -200,19 +195,15 @@
             <mxPoint x="-21" y="-21" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="QDvN6JNyhJAI4ja9pGnE-10" edge="1" parent="zGKfmYL7vTUdgt1reAz5-1" source="QDvN6JNyhJAI4ja9pGnE-2" style="rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;edgeStyle=orthogonalEdgeStyle;fontFamily=Noto Sans JP;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DNoto%2BSans%2BJP;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="zGKfmYL7vTUdgt1reAz5-6" value="">
-          <mxGeometry relative="1" as="geometry">
+        <mxCell id="QDvN6JNyhJAI4ja9pGnE-10" edge="1" parent="zGKfmYL7vTUdgt1reAz5-1" source="QDvN6JNyhJAI4ja9pGnE-2" style="rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;edgeStyle=orthogonalEdgeStyle;fontFamily=Noto Sans JP;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DNoto%2BSans%2BJP;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;align=left;" target="zGKfmYL7vTUdgt1reAz5-6" value="&lt;span class=&quot;--l --r hover:bg-blue-100 hover:dark:bg-blue-600&quot; style=&quot;font-family: Helvetica;&quot;&gt;Not&lt;/span&gt;&lt;span class=&quot;container-target&quot; style=&quot;font-family: Helvetica;&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;span class=&quot;--l --r hover:bg-blue-100 hover:dark:bg-blue-600&quot; style=&quot;font-family: Helvetica;&quot;&gt;found&lt;/span&gt;&lt;span class=&quot;container-target&quot; style=&quot;font-family: Helvetica;&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;span class=&quot;--l --r hover:bg-blue-100 hover:dark:bg-blue-600&quot; style=&quot;font-family: Helvetica;&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;container-target&quot; style=&quot;font-family: Helvetica;&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;span class=&quot;--l --r hover:bg-blue-100 hover:dark:bg-blue-600&quot; style=&quot;font-family: Helvetica;&quot;&gt;table&lt;/span&gt;">
+          <mxGeometry relative="1" y="10" as="geometry">
+            <mxPoint as="offset" />
             <Array as="points">
               <mxPoint x="300" y="290" />
               <mxPoint x="120" y="290" />
             </Array>
             <mxPoint x="180" y="270" as="sourcePoint" />
             <mxPoint x="180" y="330" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="QDvN6JNyhJAI4ja9pGnE-11" connectable="0" parent="QDvN6JNyhJAI4ja9pGnE-10" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;" value="&lt;p&gt;&lt;span class=&quot;--l --r hover:bg-blue-100 hover:dark:bg-blue-600&quot;&gt;Not&lt;/span&gt;&lt;span class=&quot;container-target&quot;&gt; &lt;/span&gt;&lt;span class=&quot;--l --r hover:bg-blue-100 hover:dark:bg-blue-600&quot;&gt;found&lt;/span&gt;&lt;span class=&quot;container-target&quot;&gt; &lt;/span&gt;&lt;span class=&quot;--l --r hover:bg-blue-100 hover:dark:bg-blue-600&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;container-target&quot;&gt; &lt;/span&gt;&lt;span class=&quot;--l --r hover:bg-blue-100 hover:dark:bg-blue-600&quot;&gt;table&lt;/span&gt;&lt;/p&gt;" vertex="1">
-          <mxGeometry relative="1" x="0.0456" y="1" as="geometry">
-            <mxPoint x="66" y="9" as="offset" />
           </mxGeometry>
         </mxCell>
       </root>
