@@ -283,7 +283,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 		case WM_SIZE: {
 			DlgData *data = (DlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
-			ReiseDlgHelper_WM_SIZE(data->resize_helper);
+			ReiseDlgHelper_WM_SIZE(data->resize_helper, wParam, lParam);
 			break;
 		}
 

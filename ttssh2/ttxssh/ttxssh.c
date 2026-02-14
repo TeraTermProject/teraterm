@@ -2294,7 +2294,7 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lP
 
 	case WM_SIZE: {
 		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
-		ReiseDlgHelper_WM_SIZE(data->resize_helper);
+		ReiseDlgHelper_WM_SIZE(data->resize_helper, wParam, lParam);
 		break;
 	}
 

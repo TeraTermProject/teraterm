@@ -703,7 +703,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 
 	case WM_SIZE: {
 		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
-		ReiseDlgHelper_WM_SIZE(dlg_data->resize_helper);
+		ReiseDlgHelper_WM_SIZE(dlg_data->resize_helper, wp, lp);
 
 		// 幅を調整
 		HWND hWndList = GetDlgItem(hDlgWnd, IDC_SETUP_DIR_LIST);
