@@ -719,6 +719,12 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		break;
 	}
 
+	case WM_DPICHANGED: {
+		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
+		ReiseDlgHelper_WM_DPICHANGED(dlg_data->resize_helper, wp, lp);
+		break;
+	}
+
 	default:
 		return FALSE;
 	}

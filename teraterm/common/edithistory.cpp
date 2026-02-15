@@ -293,6 +293,12 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			break;
 		}
 
+		case WM_DPICHANGED: {
+			DlgData *data = (DlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
+			ReiseDlgHelper_WM_DPICHANGED(data->resize_helper, wParam, lParam);
+			break;
+		}
+
 		case WM_DESTROY: {
 			DlgData *data = (DlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
 			ReiseDlgHelperDelete(data->resize_helper);

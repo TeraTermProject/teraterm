@@ -2289,6 +2289,7 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lP
 			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)data->DlgAboutTextFont, MAKELPARAM(TRUE, 0));
 		}
 		SendDlgItemMessage(dlg, IDC_TTSSH_ICON, WM_DPICHANGED, wParam, lParam);
+		ReiseDlgHelper_WM_DPICHANGED(data->resize_helper, wParam, lParam);
 		return FALSE;
 	}
 

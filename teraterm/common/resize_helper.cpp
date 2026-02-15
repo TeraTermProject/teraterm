@@ -248,6 +248,7 @@ void ReiseDlgHelper_WM_GETMINMAXINFO(ReiseDlgHelper_t *h, LPARAM lp)
 	// 初期サイズを最小サイズとする
 	// 現在のDPIに合わせてスケーリング
 	LPMINMAXINFO pmmi = (LPMINMAXINFO)lp;
+	h->dpi = GetMonitorDpiFromWindow(h->hWnd);
 	pmmi->ptMinTrackSize.x = MulDiv(h->init_width, h->dpi, h->init_dpi);
 	pmmi->ptMinTrackSize.y = MulDiv(h->init_height, h->dpi, h->init_dpi);
 }
@@ -255,7 +256,7 @@ void ReiseDlgHelper_WM_GETMINMAXINFO(ReiseDlgHelper_t *h, LPARAM lp)
 void ReiseDlgHelper_WM_DPICHANGED(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp)
 {
 	assert(h != NULL);
-	UINT new_dpi = LOWORD(wp);
+	UINT new_dpi = HIWORD(wp);
 	//OutputDebugPrintf("WM_DPICHANGED dpi %d->%d\n", h->dpi, new_dpi);
 	h->dpi = new_dpi;
 
@@ -268,6 +269,11 @@ void ReiseDlgHelper_WM_DPICHANGED(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp)
 		rect->right - rect->left,
 		rect->bottom - rect->top,
 		SWP_NOZORDER | SWP_NOACTIVATE);
+
+	ArrangeControls(h);
+	if (h->hWndSizeBox != NULL) {
+		SetSizeBoxPos(h);
+	}
 }
 
 ReiseDlgHelper_t *ReiseHelperInit(HWND dlg, BOOL size_box, const ResizeHelperInfo *infos, size_t info_count)
