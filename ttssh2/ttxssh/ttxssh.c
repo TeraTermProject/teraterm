@@ -2279,6 +2279,11 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lP
 		break;
 	}
 
+	case WM_GETDPISCALEDSIZE: {
+		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
+		return ReiseDlgHelper_WM_GETDPISCALEDSIZE(data->resize_helper, wParam, lParam);
+	}
+
 	case WM_DPICHANGED: {
 		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
 		if (data->DlgAboutTextFont != NULL) {

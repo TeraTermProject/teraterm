@@ -713,6 +713,11 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		break;
 	}
 
+	case WM_GETDPISCALEDSIZE: {
+		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
+		return ReiseDlgHelper_WM_GETDPISCALEDSIZE(dlg_data->resize_helper, wp, lp);
+	}
+
 	case WM_GETMINMAXINFO: {
 		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
 		ReiseDlgHelper_WM_GETMINMAXINFO(dlg_data->resize_helper, lp);
