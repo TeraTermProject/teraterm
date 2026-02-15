@@ -177,6 +177,7 @@ static void init_TTSSH(PTInstVar pvar)
 	FWD_init(pvar);
 	FWDUI_init(pvar);
 
+	ssh_scp_thread_lock_initialize();
 	ssh_heartbeat_lock_initialize();
 
 	pvar->cc[MODE_IN] = NULL;
@@ -201,6 +202,7 @@ static void uninit_TTSSH(PTInstVar pvar)
 	// VT ウィンドウのアイコン
 	SetVTIconID(pvar->cv, NULL, 0);
 
+	ssh_scp_thread_lock_finalize();
 	ssh_heartbeat_lock_finalize();
 
 	cipher_free_SSH2(pvar->cc[MODE_IN]);
