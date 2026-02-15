@@ -28,11 +28,16 @@
 
 #include <windows.h>
 #include <assert.h>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 
 #include "compat_win.h"
 #include "resize_helper.h"
 
 #include "ttlib.h"		// for GetMonitorDpiFromWindow()
+
+#include "resize_helper.h"
 
 typedef struct Controls_st {
 	UINT id;
@@ -44,22 +49,83 @@ typedef struct Controls_st {
 typedef struct ReiseDlgHelper_st {
 	Controls *control_list;
 	int control_count;
-	HWND hWnd;			// 初期化時の制御するダイアログのハンドル
-	LONG init_width;	// 初期化時のウィンドウサイズ
+	HWND hWnd;					// 初期化時の制御するダイアログのハンドル
+	LONG init_width;			// 初期化時のウィンドウサイズ
 	LONG init_height;
-	LONG init_c_width;	// 初期化時のクライアントエリア
+	LONG init_c_width;			// 初期化時のクライアントエリア
 	LONG init_c_height;
-	UINT init_dpi;		// 初期化時のDPI
-	UINT dpi;			// 現在のDPI
-	HWND hWndSizeBox;	// サイズボックスのハンドル
+	UINT init_dpi;				// 初期化時のDPI
+	UINT dpi;					// 現在のDPI
+	LONG c_width;				// クライアントエリアのサイズ
+	LONG c_height;
+	HWND sizebox_hWnd;			// サイズボックスのハンドル
+	WNDPROC sizebox_prev_proc;	// 元のウィンドウプロシージャ
+	LONG sizebox_width;
+	LONG sizebox_height;
 } ReiseDlgHelper_t;
+
+static LRESULT CALLBACK SizeBoxWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+	ReiseDlgHelper_t *h = (ReiseDlgHelper_t *)GetWindowLongPtrW(hwnd, GWLP_USERDATA);
+	switch (msg) {
+	case WM_SETCURSOR: {
+		HCURSOR hc = LoadCursorA(NULL, IDC_SIZENWSE);
+		if (hc != NULL) {
+			SetCursor(hc);
+			return TRUE;
+		}
+		break;
+	}
+	case WM_DESTROY: {
+		SetWindowLongPtrW(hwnd, GWLP_WNDPROC, (LONG_PTR)h->sizebox_prev_proc);
+		SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0);
+		h->sizebox_prev_proc = NULL;
+		break;
+	}
+	}
+	if (h != NULL && h->sizebox_prev_proc != NULL) {
+		return CallWindowProcW(h->sizebox_prev_proc, hwnd, msg, wp, lp);
+	}
+	return DefWindowProcW(hwnd, msg, wp, lp);
+}
+
+static void SizeBoxSetPos(ReiseDlgHelper_t *h)
+{
+	RECT rect;
+	GetClientRect(h->hWnd, &rect);
+	int x = rect.right - h->sizebox_width;
+	int y = rect.bottom - h->sizebox_height;
+	SetWindowPos(h->sizebox_hWnd, NULL, x, y, h->sizebox_width, h->sizebox_height,
+				 SWP_NOZORDER | SWP_SHOWWINDOW);
+}
+
+// サイズボックスを作成
+static void SizeBoxCreate(ReiseDlgHelper_t *h)
+{
+	h->sizebox_width = GetSystemMetricsForDpi(SM_CXVSCROLL, h->dpi);
+	h->sizebox_height = GetSystemMetricsForDpi(SM_CYHSCROLL, h->dpi);
+
+	HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtrW(h->hWnd, GWLP_HINSTANCE);
+	h->sizebox_hWnd =
+		CreateWindowExW(
+			0, L"SCROLLBAR", NULL,
+			WS_CHILD | WS_VISIBLE | SBS_SIZEBOX,		// SBS_SIZEBOX = SBS_SIZEGRIP
+			10, 10, 10, 10,
+			h->hWnd, NULL, hInstance, NULL);
+	if (h->sizebox_hWnd == NULL) {
+		return;
+	}
+
+	SetWindowLongPtrW(h->sizebox_hWnd, GWLP_USERDATA, (LONG_PTR)h);
+	h->sizebox_prev_proc = (WNDPROC)SetWindowLongPtrW(h->sizebox_hWnd, GWLP_WNDPROC, (LONG_PTR)SizeBoxWndProc);
+
+	SizeBoxSetPos(h);
+}
 
 static void ArrangeControls(ReiseDlgHelper_t *h)
 {
-	RECT current_client_rect;
-	GetClientRect(h->hWnd, &current_client_rect);
-	const LONG current_c_width = current_client_rect.right - current_client_rect.left;
-	const LONG current_c_height = current_client_rect.bottom - current_client_rect.top;
+	const LONG current_c_width = h->c_width;
+	const LONG current_c_height = h->c_height;
 
 	// クライアントエリアのサイズ
 	if (h->init_c_width == 0 || h->init_c_height == 0) {
@@ -120,19 +186,6 @@ static void ArrangeControls(ReiseDlgHelper_t *h)
 	InvalidateRect(h->hWnd, NULL, TRUE);
 }
 
-static void SetSizeBoxPos(ReiseDlgHelper_t *h)
-{
-	RECT rect;
-	GetClientRect(h->hWnd, &rect);
-	int width = GetSystemMetricsForDpi(SM_CXVSCROLL, h->dpi);	// サイズボックスのサイズ
-	int height = GetSystemMetricsForDpi(SM_CYHSCROLL, h->dpi);
-	int x = rect.right - width;
-	int y = rect.bottom - height;
-	SetWindowPos(h->hWndSizeBox, NULL,
-				 x, y, width, height,
-				 SWP_NOZORDER | SWP_SHOWWINDOW);
-}
-
 ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg, BOOL size_box)
 {
 	RECT rect;
@@ -161,16 +214,7 @@ ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg, BOOL size_box)
 	h->dpi = dpi;
 
 	if (size_box) {
-		HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(dlg, GWLP_HINSTANCE);
-		// サイズボックスを作成
-		// SBS_SIZEBOX = SBS_SIZEGRIP
-		h->hWndSizeBox =
-			CreateWindowExW(
-				0, L"SCROLLBAR", NULL,
-				WS_CHILD | WS_VISIBLE | SBS_SIZEBOX,
-				10, 10, 10, 10,
-				dlg, NULL, hInstance, NULL);
-		SetSizeBoxPos(h);
+		SizeBoxCreate(h);
 	}
 	return h;
 }
@@ -178,8 +222,8 @@ ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg, BOOL size_box)
 void ReiseDlgHelperDelete(ReiseDlgHelper_t *h)
 {
 	if (h != NULL) {
-		if (h->hWndSizeBox != NULL) {
-			DestroyWindow(h->hWndSizeBox);
+		if (h->sizebox_hWnd != NULL) {
+			DestroyWindow(h->sizebox_hWnd);
 		}
 		free(h->control_list);
 		h->control_list = NULL;
@@ -189,10 +233,9 @@ void ReiseDlgHelperDelete(ReiseDlgHelper_t *h)
 
 void ReiseDlgHelperAdd(ReiseDlgHelper_t *h, UINT id, ResizeHelperAnchor anchor)
 {
-	Controls *p;
 	assert(h != NULL);
-	Controls *ary = (Controls *)realloc(h->control_list, sizeof(Controls) * (h->control_count + 1));
-	if (ary == NULL) {
+	Controls *p = (Controls *)realloc(h->control_list, sizeof(Controls) * (h->control_count + 1));
+	if (p == NULL) {
 		return;
 	}
 	HWND item = GetDlgItem(h->hWnd, id);
@@ -211,8 +254,8 @@ void ReiseDlgHelperAdd(ReiseDlgHelper_t *h, UINT id, ResizeHelperAnchor anchor)
 		}
 	}
 #endif
-	h->control_list = ary;
-	p = &ary[h->control_count];
+	h->control_list = p;
+	p = &h->control_list[h->control_count];
 	h->control_count++;
 	p->id = id;
 	p->anchor = anchor;
@@ -227,15 +270,25 @@ void ReiseDlgHelperAdd(ReiseDlgHelper_t *h, UINT id, ResizeHelperAnchor anchor)
 void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp)
 {
 	assert(h != NULL);
-	(void)lp;
 
 	if (wp == SIZE_MINIMIZED) {
 		return;
 	}
 
+	UINT dpi = GetMonitorDpiFromWindow(h->hWnd);
+	if (h->dpi != dpi) {
+		// DPIが変化したとき、WM_DPICHANGEDが発生する前に WM_SIZE が発生する(Per Monitor v2時?)
+		// WM_DPICHANGED前の WM_SIZE は処理せず、WM_DPICHANGED後に行う
+		//   * WM_SIZE 前に、WM_GETMINMAXINFO でサイズの上下限チェックが行われる
+		return;
+	}
+
+	h->c_width = LOWORD(lp);
+	h->c_height = HIWORD(lp);
+
 	ArrangeControls(h);
-	if (h->hWndSizeBox != NULL) {
-		SetSizeBoxPos(h);
+	if (h->sizebox_hWnd != NULL) {
+		SizeBoxSetPos(h);
 	}
 }
 
@@ -249,7 +302,6 @@ void ReiseDlgHelper_WM_GETMINMAXINFO(ReiseDlgHelper_t *h, LPARAM lp)
 	// 初期サイズを最小サイズとする
 	// 現在のDPIに合わせてスケーリング
 	LPMINMAXINFO pmmi = (LPMINMAXINFO)lp;
-	h->dpi = GetMonitorDpiFromWindow(h->hWnd);
 	pmmi->ptMinTrackSize.x = MulDiv(h->init_width, h->dpi, h->init_dpi);
 	pmmi->ptMinTrackSize.y = MulDiv(h->init_height, h->dpi, h->init_dpi);
 }
@@ -303,7 +355,7 @@ BOOL ReiseDlgHelper_WM_GETDPISCALEDSIZE(ReiseDlgHelper_t *h, WPARAM wp, LPARAM l
 void ReiseDlgHelper_WM_DPICHANGED(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp)
 {
 	assert(h != NULL);
-	UINT new_dpi = HIWORD(wp);
+	UINT new_dpi = LOWORD(wp);
 	//OutputDebugPrintf("WM_DPICHANGED dpi %d->%d\n", h->dpi, new_dpi);
 	h->dpi = new_dpi;
 
@@ -317,9 +369,10 @@ void ReiseDlgHelper_WM_DPICHANGED(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp)
 		rect->bottom - rect->top,
 		SWP_NOZORDER | SWP_NOACTIVATE);
 
-	ArrangeControls(h);
-	if (h->hWndSizeBox != NULL) {
-		SetSizeBoxPos(h);
+	if (h->sizebox_hWnd != NULL) {
+		// サイズボックスサイズを更新
+		h->sizebox_width = GetSystemMetricsForDpi(SM_CXVSCROLL, h->dpi);
+		h->sizebox_height = GetSystemMetricsForDpi(SM_CYHSCROLL, h->dpi);
 	}
 }
 
