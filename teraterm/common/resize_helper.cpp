@@ -232,6 +232,14 @@ void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp)
 		return;
 	}
 
+	UINT dpi = GetMonitorDpiFromWindow(h->hWnd);
+	if (h->dpi != dpi) {
+		// DPIが変化したとき、WM_DPICHANGEDが発生する前に WM_SIZE が発生する(Per Monitor v2時?)
+		// WM_DPICHANGED前の WM_SIZE は処理せず、WM_DPICHANGED後に行う
+		//   * WM_SIZE 前に、WM_GETMINMAXINFO でサイズの上下限チェックが行われる
+		return;
+	}
+
 	ArrangeControls(h);
 	if (h->hWndSizeBox != NULL) {
 		SetSizeBoxPos(h);
