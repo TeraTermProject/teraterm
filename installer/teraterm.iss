@@ -48,6 +48,7 @@ AppVerName={#AppName} {#AppVersion} {#Arch}
 #else ; Arch == "x86"
   AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 #endif
+WizardStyle=modern dynamic
 
 ; properties of installer executable
 VersionInfoDescription={#AppName} installer
