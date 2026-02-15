@@ -29,6 +29,7 @@
   #ifndef OutputBaseFilename
     #define OutputBaseFilename "teraterm-unofficial_build" + "-" + Arch
   #endif
+  #define VersionInfoVersion ""
 #endif
 
 ; source dir
@@ -50,6 +51,7 @@ AppVerName={#AppName} {#AppVersion} {#Arch}
 
 ; properties of installer executable
 VersionInfoDescription={#AppName} installer
+VersionInfoVersion={#VersionInfoVersion}
 AppCopyright=(C) 2004-2025 TeraTerm Project
 ; Apps in Settings
 AppPublisher=TeraTerm Project
