@@ -99,7 +99,9 @@ ReiseDlgHelper_t *ReiseHelperInit(HWND dlg, BOOL size_box, const ResizeHelperInf
  *	ウィンドウのメッセージが発生したら呼び出し
  */
 void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp);
-void ReiseDlgHelper_WM_GETMINMAXINFO(ReiseDlgHelper_t *h, LPARAM lp);
+void ReiseDlgHelper_WM_DPICHANGED_BEFOREPARENT(ReiseDlgHelper_t *h);
+void ReiseDlgHelper_WM_DPICHANGED_AFTERPARENT(ReiseDlgHelper_t *h);
+BOOL ReiseDlgHelper_WM_GETMINMAXINFO(ReiseDlgHelper_t *h, LPARAM lp);
 BOOL ReiseDlgHelper_WM_GETDPISCALEDSIZE(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp);
 void ReiseDlgHelper_WM_DPICHANGED(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp);
 
