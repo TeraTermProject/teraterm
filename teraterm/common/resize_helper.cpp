@@ -34,6 +34,7 @@
 #include <crtdbg.h>
 
 #include "ttlib.h"		// for GetMonitorDpiFromWindow()
+#include "compat_win.h"
 
 #include "resize_helper.h"
 
@@ -302,6 +303,52 @@ void ReiseDlgHelper_WM_GETMINMAXINFO(ReiseDlgHelper_t *h, LPARAM lp)
 	LPMINMAXINFO pmmi = (LPMINMAXINFO)lp;
 	pmmi->ptMinTrackSize.x = MulDiv(h->init_width, h->dpi, h->init_dpi);
 	pmmi->ptMinTrackSize.y = MulDiv(h->init_height, h->dpi, h->init_dpi);
+}
+
+BOOL ReiseDlgHelper_WM_GETDPISCALEDSIZE(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp)
+{
+	assert(h != NULL);
+	UINT new_dpi = HIWORD(wp);
+
+	RECT client_rect;
+	GetClientRect(h->hWnd, &client_rect);
+	int tmpScreenWidth = client_rect.right - client_rect.left;
+	int tmpScreenHeight = client_rect.bottom - client_rect.top;
+
+	// Client Areaのサイズからウィンドウサイズを算出
+	if (pAdjustWindowRectExForDpi != NULL || pAdjustWindowRectEx != NULL) {
+		const DWORD Style = (DWORD)::GetWindowLongPtr(h->hWnd, GWL_STYLE);
+		const DWORD ExStyle = (DWORD)::GetWindowLongPtr(h->hWnd, GWL_EXSTYLE);
+		const BOOL bMenu = FALSE; // メニューは無しの想定
+		if (pGetSystemMetricsForDpi != NULL) {
+			// スクロールバーが表示されている場合は、
+			// スクリーンサイズ(クライアントエリアのサイズ)に追加する
+			int min_pos;
+			int max_pos;
+			GetScrollRange(h->hWnd, SB_VERT, &min_pos, &max_pos);
+			if (min_pos != max_pos) {
+				tmpScreenWidth += pGetSystemMetricsForDpi(SM_CXVSCROLL, new_dpi);
+			}
+			GetScrollRange(h->hWnd, SB_HORZ, &min_pos, &max_pos);
+			if (min_pos != max_pos) {
+				tmpScreenHeight += pGetSystemMetricsForDpi(SM_CXHSCROLL, new_dpi);
+			}
+		}
+		RECT Rect = {0, 0, tmpScreenWidth, tmpScreenHeight};
+		if (pAdjustWindowRectExForDpi != NULL) {
+			// Windows 10, version 1607+
+			pAdjustWindowRectExForDpi(&Rect, Style, bMenu, ExStyle, new_dpi);
+		}
+		else {
+			// Windows 2000+
+			pAdjustWindowRectEx(&Rect, Style, bMenu, ExStyle);
+		}
+		SIZE *sz = (SIZE *)lp;
+		sz->cx = Rect.right - Rect.left;
+		sz->cy = Rect.bottom - Rect.top;
+		return TRUE;
+	}
+	return FALSE;
 }
 
 void ReiseDlgHelper_WM_DPICHANGED(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp)
