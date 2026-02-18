@@ -2246,7 +2246,7 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lP
 		g_deltaSumAboutDlg = 0;
 		g_defAboutDlgEditWndProc = (WNDPROC)SetWindowLongPtrW(GetDlgItem(dlg, IDC_ABOUTTEXT), GWLP_WNDPROC, (LONG_PTR)AboutDlgEditWindowProc);
 
-		data->resize_helper = ReiseHelperInit(dlg, TRUE, resize_info, _countof(resize_info));
+		data->resize_helper = ReiseDlgHelperInit(dlg, TRUE, resize_info, _countof(resize_info));
 		CenterWindow(dlg, GetParent(dlg));
 
 		return FALSE;
@@ -2279,11 +2279,6 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lP
 		break;
 	}
 
-	case WM_GETDPISCALEDSIZE: {
-		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
-		return ReiseDlgHelper_WM_GETDPISCALEDSIZE(data->resize_helper, wParam, lParam);
-	}
-
 	case WM_DPICHANGED: {
 		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
 		if (data->DlgAboutTextFont != NULL) {
@@ -2298,16 +2293,12 @@ static INT_PTR CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lP
 		return FALSE;
 	}
 
-	case WM_SIZE: {
-		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
-		ReiseDlgHelper_WM_SIZE(data->resize_helper, wParam, lParam);
-		break;
-	}
-
-	case WM_GETMINMAXINFO: {
-		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtr(dlg, DWLP_USER);
-		ReiseDlgHelper_WM_GETMINMAXINFO(data->resize_helper, lParam);
-		break;
+	default: {
+		AboutDlgData *data = (AboutDlgData *)GetWindowLongPtrW(dlg, DWLP_USER);
+		if (data != NULL) {
+			return ResizeDlgHelperProc(data->resize_helper, dlg, msg, wParam, lParam);
+		}
+		return FALSE;
 	}
 	}
 

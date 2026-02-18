@@ -617,7 +617,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			ListView_SetColumnWidth(hWndList, i, LVSCW_AUTOSIZE_USEHEADER);
 		}
 
-		dlg_data->resize_helper = ReiseHelperInit(hDlgWnd, TRUE, resize_info, _countof(resize_info));
+		dlg_data->resize_helper = ReiseDlgHelperInit(hDlgWnd, TRUE, resize_info, _countof(resize_info));
 
 		CenterWindow(hDlgWnd, GetParent(hDlgWnd));
 
@@ -713,25 +713,13 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		break;
 	}
 
-	case WM_GETDPISCALEDSIZE: {
+	default: {
 		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
-		return ReiseDlgHelper_WM_GETDPISCALEDSIZE(dlg_data->resize_helper, wp, lp);
-	}
-
-	case WM_GETMINMAXINFO: {
-		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
-		ReiseDlgHelper_WM_GETMINMAXINFO(dlg_data->resize_helper, lp);
-		break;
-	}
-
-	case WM_DPICHANGED: {
-		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
-		ReiseDlgHelper_WM_DPICHANGED(dlg_data->resize_helper, wp, lp);
-		break;
-	}
-
-	default:
+		if (dlg_data != NULL) {
+			return ResizeDlgHelperProc(dlg_data->resize_helper, hDlgWnd, msg, wp, lp);
+		}
 		return FALSE;
+	}
 	}
 	return TRUE;
 }
