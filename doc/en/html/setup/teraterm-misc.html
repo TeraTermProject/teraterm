@@ -501,5 +501,37 @@ Default:
 BracketedControlOnly=off
 </pre>
 
+<h1 id="Plugin">Plugin setting</h1>
+<p>
+  Setting loading of Tera Term plugins.<br>
+  Configurable in <a href="../menu/setup-additional-plugin.html">Plugin tab</a>
+</p>
+<p>
+detail
+<ul>
+  <li>Plugin section</li>
+  <li>listN is read from 1 until it no longer exists.</li>
+  <li>Settings
+    <dl>
+      <dt>item 1</dt>
+      <dd>plugin filename</dd>
+      <dt>item 2</dt>
+      <dd>
+        0 ... disable(not loading)<br>
+        1 ... enable(loading)<br>
+        All lines except 0 and 1 are invalid.
+      </dd>
+    </dl>
+  </li>
+</ul>
+example
+<pre>
+[Plugin]
+list1="ttxssh.dll", 1
+list2="ttxkanji.dll", 0
+</pre>
+The default is not set.<br>
+Unconfigured plugins will be loaded.
+
 </BODY>
 </HTML>

@@ -504,5 +504,37 @@ Default:
 BracketedControlOnly=off
 </pre>
 
+<h1 id="Plugin">プラグインの設定</h1>
+<p>
+  Tera Term プラグインのロードを制御します。<br>
+  <a href="../menu/setup-additional-plugin.html">Pluginタブ</a>で設定できます。
+</p>
+<p>
+詳細
+<ul>
+  <li>Pluginセクション</li>
+  <li>listN は、1から存在しなくなるまで読み込まれます。</li>
+  <li>設定内容
+    <dl>
+      <dt>1項目目</dt>
+      <dd>プラグインファイル名</dd>
+      <dt>2項目目</dt>
+      <dd>
+        0 ... disable(読み込まない)<br>
+        1 ... enable(読み込む)<br>
+        0,1以外は無効行
+      </dd>
+    </dl>
+  </li>
+</ul>
+例
+<pre>
+[Plugin]
+list1="ttxssh.dll", 1
+list2="ttxkanji.dll", 0
+</pre>
+デフォルトは未設定です。<br>
+未設定のプラグインは、読み込まれます。
+
 </BODY>
 </HTML>

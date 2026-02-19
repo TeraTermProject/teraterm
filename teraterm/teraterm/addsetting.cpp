@@ -64,6 +64,7 @@
 #include "serial_pp.h"
 #include "ui_pp.h"
 #include "tekfont_pp.h"
+#include "plugin_pp.h"
 
 #include "addsetting.h"
 
@@ -1515,6 +1516,7 @@ enum {
 	PP_WINDOW,
 	PP_TEK_WINDOW,
 	PP_TEK_FONT,
+	PP_PLUGIN,
 	PP_DEBUG,
 	PP_MAX,
 };
@@ -1608,6 +1610,7 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
 		pages[PP_TEK_WINDOW] = CreateWinTEKPP(hInstance, hParentWnd, &ts);
 		pages[PP_TEK_FONT] = TEKFontPageCreate(hInstance, hParentWnd, &ts);
 	}
+	pages[PP_PLUGIN] = PluginPageCreate(hInstance, &ts);
 
 	const int start_page_no = GetStartPageNo(StartPage);
 	int available_page_count = 0;

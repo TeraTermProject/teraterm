@@ -86,6 +86,57 @@ void PASCAL TTXEnd(void);
 /* This function is called when a new Tera Term is being started with certain
    settings and the extension may wish to add some options to the command line */
 void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec);
+
+/**
+ * プラグインの情報についてのAPI
+ */
+
+typedef enum {
+	EXTENSION_DISABLE = 0,
+	EXTENSION_ENABLE = 1,
+	EXTENSION_UNSPECIFIED = 2,	// 無指定(有効/無効の指定なし,ロードする)
+} ExtensionEnable;
+
+typedef enum {
+	EXTENSION_UNLOADED = 0,		// ロードされていない
+	EXTENSION_LOADED = 1,		// ロードされている
+} ExtensionLoaded;
+
+/**
+ * プラグイン情報
+ */
+typedef struct {
+	wchar_t *filename;			// ファイル名
+	ExtensionEnable enable;
+	ExtensionLoaded loaded;		// (Add時は無視)
+	int load_order;				// ロード順 (Add時は無視)
+} PluginInfo;
+
+/**
+ * プラグイン情報を取得する
+ * @param index		プラグインのインデックス
+ * @param info		プラグイン情報を格納する構造体へのポインタ
+ *					文字列は書き換えないこと
+ * @return			成功した場合はTRUE、失敗した場合はFALSE
+ */
+BOOL PluginGetInfo(int index, PluginInfo *info);
+
+/**
+ * プラグイン情報を設定する
+ *
+ * 同じファイル名があれば変更する
+ *
+ * @param info		プラグイン情報を格納する構造体へのポインタ
+ */
+void PluginAddInfo(const PluginInfo *info);
+
+/**
+ * プラグインの設定を保存
+ *
+ * @param SetupFNW	設定ファイル名
+ */
+void PluginWriteList(const wchar_t *SetupFNW);
+
 #ifdef __cplusplus
 }
 #endif
