@@ -80,6 +80,7 @@ Compression=lzma2/ultra64
   ArchitecturesAllowed=x86compatible
   ArchitecturesInstallIn64BitMode=
 #endif
+SetupIconFile=..\teraterm\common\teraterm.ico
 
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl,message_en_US.isl
