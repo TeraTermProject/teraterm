@@ -1036,13 +1036,8 @@ static void ParseControlDumb(BYTE b)
 			RingBell(ts.Beep);
 		break;
 	default:
-		if (TRUE) {
-			// U+2400～のControl Picturesをつかって表示
-			PutU32(0x2400 + b);
-		}
-		else {
-			PutU32(b);
-		}
+		// U+2400～のControl Picturesをつかって表示
+		PutU32(0x2400 + b);
 		break;
 	}
 }
