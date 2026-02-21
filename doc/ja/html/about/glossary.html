@@ -44,6 +44,43 @@ Tera Term の Kermit は今のところ基本的機能しか持っていないので、本家の Kermit に
     </p>
   </dd>
 
+<dt>XMODEM</dt>
+<dd>1977 年に Ward Christensen によって開発されたファイル転送プロトコル。その後 XMODEM/CRC, XMODEM-1k などの拡張プロトコルが開発されました。<br>
+転送速度が遅い、8-bit コードすべてを通す通信回線でなければ使用できないなどの制限があります。
+</dd>
+
+<dt>YMODEM</dt>
+<dd>XMODEM を拡張したファイル転送プロトコル。長い間 Tera Term では対応していませんでしたが、Ver 4.66 から対応しました。</dd>
+
+<dt>ZMODEM</dt>
+<dd>XMODEM, YMODEM を(それらの原形をとどめないほどに)改良したファイル転送プロトコル。エラー訂正機能が強化され、制御文字の一部を通さない回線にも対応し、転送速度をあげるための工夫がなされています。</dd>
+
+</dl>
+
+<h2>端末/制御シーケンス</h2>
+
+端末/制御シーケンスに関する用語
+
+<dl>
+<dt id="Bracketed">Bracketed Paste Mode</dt>
+<dd>
+  xterm 拡張で、有効時、クリップボードから貼り付け時に文字列の前後にTera Term が特別なシーケンスを付加します。<br>
+  具体的には、<a href="../about/ctrlseq.html#Bracketed">DECSET の 2004(&lt;CSI&gt;?2004h)</a> で有効になり、貼り付け時に文字列の前に &lt;ESC&gt;200~, 後ろに &lt;ESC&gt;201~ が付くようになります。<br>
+  sh のようなシェル等が普通にタイプされた文字とペーストされた文字を区別することができるようになります。<br>
+  例えば、貼り付けた文字を未確定として扱いハイライトで表示し、Enterキー等で確定することができます。一方でハイライトを消すためにハイライトオフで再度文字を上書き出力するとログには二重に記録されることになります。
+  <br>
+  関連ページ
+  <ul>
+    <li><a href="../usage/tips/vim.html#Bracketed">vim からの制御シーケンスの使用例 / クリップボードからの貼り付け時に自動インデントを無効にする</a>
+    <li><a href="../setup/teraterm-misc.html#BracketedSupport">Tera Term 設定ファイル / その他 / ブラケットペーストのサポート</a>
+    <li><a href="../setup/teraterm-misc.html#BracketedControlOnly">Tera Term 設定ファイル / その他 / ブラケットペーストを制御文字を含む場合に限定する</a>
+
+  </ul>
+</dd>
+
+<dt id="dumb">dumb端末</dt>
+<dd>改行(0x0d(\r,^J),0x0a(\n,^M))とベル(0x07(^G))しか使えない端末です。</dd>
+
 <dt>TEK4010</dt>
 <dd>Tektronix 社の端末の名前です。図やグラプなどを表示することができ、かつては科学技術系の分野で広く用いられていたようです。<br>
 現在は、X Window 環境などに取って替わられつつありますが、TEK エミュレーターを使用している人はまだまだいます(作者も含めて)。<br>
@@ -62,39 +99,6 @@ VT220 や VT382 などは、VT100の上位互換端末の名前です。</dd>
 <dd>Tera Term のメインウィンドウのことです。起動したときに現れるウィンドウで、タイトル文字列の一番右に「VT」と表示されています。<br>
 VT 端末のエミュレーションをします。</dd>
 
-<dt>XMODEM</dt>
-<dd>1977 年に Ward Christensen によって開発されたファイル転送プロトコル。その後 XMODEM/CRC, XMODEM-1k などの拡張プロトコルが開発されました。<br>
-転送速度が遅い、8-bit コードすべてを通す通信回線でなければ使用できないなどの制限があります。
-</dd>
-
-<dt>YMODEM</dt>
-<dd>XMODEM を拡張したファイル転送プロトコル。長い間 Tera Term では対応していませんでしたが、Ver 4.66 から対応しました。</dd>
-
-<dt>ZMODEM</dt>
-<dd>XMODEM, YMODEM を(それらの原形をとどめないほどに)改良したファイル転送プロトコル。エラー訂正機能が強化され、制御文字の一部を通さない回線にも対応し、転送速度をあげるための工夫がなされています。</dd>
-
-</dl>
-
-<h2>制御シーケンス</h2>
-
-制御シーケンスに関する用語
-
-<dl>
-<dt id="Bracketed">Bracketed Paste Mode</dt>
-<dd>
-  xterm 拡張で、有効時、クリップボードから貼り付け時に文字列の前後にTera Term が特別なシーケンスを付加します。<br>
-  具体的には、<a href="../about/ctrlseq.html#Bracketed">DECSET の 2004(&lt;CSI&gt;?2004h)</a> で有効になり、貼り付け時に文字列の前に &lt;ESC&gt;200~, 後ろに &lt;ESC&gt;201~ が付くようになります。<br>
-  sh のようなシェル等が普通にタイプされた文字とペーストされた文字を区別することができるようになります。<br>
-  例えば、貼り付けた文字を未確定として扱いハイライトで表示し、Enterキー等で確定することができます。一方でハイライトを消すためにハイライトオフで再度文字を上書き出力するとログには二重に記録されることになります。
-  <br>
-  関連ページ
-  <ul>
-    <li><a href="../usage/tips/vim.html#Bracketed">vim からの制御シーケンスの使用例 / クリップボードからの貼り付け時に自動インデントを無効にする</a>
-    <li><a href="../setup/teraterm-misc.html#BracketedSupport">Tera Term 設定ファイル / その他 / ブラケットペーストのサポート</a>
-    <li><a href="../setup/teraterm-misc.html#BracketedControlOnly">Tera Term 設定ファイル / その他 / ブラケットペーストを制御文字を含む場合に限定する</a>
-
-  </ul>
-</dd>
 </dl>
 
 <h2>文字コード</h2>

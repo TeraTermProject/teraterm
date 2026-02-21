@@ -50,6 +50,50 @@ XMODEM プロトコルをベースにしてるようですが、
     </p>
   </dd>
 
+<dt>XMODEM</dt>
+<dd>File transfer protocol developed by Ward Christensen in 1977.</dd>
+<!--
+その後 XMODEM/CRC, XMODEM-1k などの拡張プロトコルが開発されました。
+転送速度が遅い、8-bit コードすべてを通す通信回線でなければ使用できないなどの制限があります。
+-->
+
+<dt>YMODEM</dt>
+<dd>File transfer protocol extends XMODEM.</dd>
+
+<dt>ZMODEM</dt>
+<dd>File transfer protocol extends XMODEM and YMODEM.</dd>
+<!--
+<dd>XMODEM, YMODEM を(それらの原形をとどめないほどに)改良したファイル転送プロトコル。エラー訂正機能が強化され、制御文字の一部を通さない回線にも対応し、転送速度をあげるための工夫がなされています。
+-->
+
+</dl>
+
+<h2>Terminal/Control Sequence</h2>
+
+About Terminal/Control Sequence.
+
+<dl>
+<dt id="Bracketed">Bracketed Paste Mode</dt>
+<dd>
+  The bracketed paste mode is the xterm extension feature. When this feature is enabled, the pasted text is bracketed with control sequences.<br>
+  Specifically, it is enabled by <a href="../about/ctrlseq.html#Bracketed">DECSET 2004(&lt;CSI&gt;?2004h)</a> sequence, the program will receive: ESC [ 200 ~, followed by the pasted text, followed by ESC [ 201 ~.<br>
+  Bracketed paste is a mode which allows programs running in the terminal such as sh to treat pasted text differently from text typed normally.<br>
+
+  For example, a pasted characters can be treated as undecided, highlighted, and confirmed by pressing the Enter key, etc.
+On the other hand, when pasted characters is overwritten again to remove the highlight, it will be recorded twice in the log.<br>
+  <br>
+  Related Pages
+  <ul>
+    <li><a href="../usage/tips/vim.html#Bracketed">Vim Control Sequence Examples / Auto indent can be disabled on pasting from clipboard</a>
+    <li><a href="../setup/teraterm-misc.html#BracketedSupport">Tera Term setup file / Miscellaneous / Supports bracketed paste</a>
+    <li><a href="../setup/teraterm-misc.html#BracketedControlOnly">Tera Term setup file / Miscellaneous / Limit bracketed pasting to cases containing control characters</a>
+      
+  </ul>
+</dd>
+
+<dt id="dumb">dumb terminal</dt>
+<dd>This terminal can only use line feed (0x0d (\r, ^J), 0x0a (\n, ^M)) and bell (0x07 (^G)).</dd>
+
 <dt>TEK4010</dt>
 <dd>Name of Tektronix terminal. This can display diagrams and graphemes, and was used widely in scientific and technical fields.</dd>
 <!--
@@ -80,46 +124,6 @@ This window is displayed when Tera Term start.
 "VT" is displayed to right of window title string.<br>
 Window for VT terminal emulation.</dd>
 
-<dt>XMODEM</dt>
-<dd>File transfer protocol developed by Ward Christensen in 1977.</dd>
-<!--
-その後 XMODEM/CRC, XMODEM-1k などの拡張プロトコルが開発されました。
-転送速度が遅い、8-bit コードすべてを通す通信回線でなければ使用できないなどの制限があります。
--->
-
-<dt>YMODEM</dt>
-<dd>File transfer protocol extends XMODEM.</dd>
-
-<dt>ZMODEM</dt>
-<dd>File transfer protocol extends XMODEM and YMODEM.</dd>
-<!--
-<dd>XMODEM, YMODEM を(それらの原形をとどめないほどに)改良したファイル転送プロトコル。エラー訂正機能が強化され、制御文字の一部を通さない回線にも対応し、転送速度をあげるための工夫がなされています。
--->
-
-</dl>
-
-<h2>Control Sequence</h2>
-
-About Control Sequence.
-
-<dl>
-<dt id="Bracketed">Bracketed Paste Mode</dt>
-<dd>
-  The bracketed paste mode is the xterm extension feature. When this feature is enabled, the pasted text is bracketed with control sequences.<br>
-  Specifically, it is enabled by <a href="../about/ctrlseq.html#Bracketed">DECSET 2004(&lt;CSI&gt;?2004h)</a> sequence, the program will receive: ESC [ 200 ~, followed by the pasted text, followed by ESC [ 201 ~.<br>
-  Bracketed paste is a mode which allows programs running in the terminal such as sh to treat pasted text differently from text typed normally.<br>
-
-  For example, a pasted characters can be treated as undecided, highlighted, and confirmed by pressing the Enter key, etc.
-On the other hand, when pasted characters is overwritten again to remove the highlight, it will be recorded twice in the log.<br>
-  <br>
-  Related Pages
-  <ul>
-    <li><a href="../usage/tips/vim.html#Bracketed">Vim Control Sequence Examples / Auto indent can be disabled on pasting from clipboard</a>
-    <li><a href="../setup/teraterm-misc.html#BracketedSupport">Tera Term setup file / Miscellaneous / Supports bracketed paste</a>
-    <li><a href="../setup/teraterm-misc.html#BracketedControlOnly">Tera Term setup file / Miscellaneous / Limit bracketed pasting to cases containing control characters</a>
-      
-  </ul>
-</dd>
 </dl>
 
 <h2>Character code</h2>
