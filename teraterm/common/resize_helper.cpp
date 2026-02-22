@@ -318,6 +318,64 @@ void ReiseDlgHelper_WM_GETMINMAXINFO(ReiseDlgHelper_t *h, LPARAM lp)
 }
 
 /**
+ *	WM_GETDPISCALEDSIZE を処理 (DPI変更後のウィンドウサイズを返す)
+ */
+BOOL ReiseDlgHelper_WM_GETDPISCALEDSIZE(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp)
+{
+	assert(h != NULL);
+
+	// 「ドラッグ中にウィンドウの内容を表示する」がOffの場合のみ、DPI変更後のサイズを返す
+	BOOL isDraggingFullWindow = FALSE;
+	SystemParametersInfo(SPI_GETDRAGFULLWINDOWS, 0, &isDraggingFullWindow, 0);
+	if (isDraggingFullWindow == TRUE) {
+		return FALSE;
+	}
+
+	UINT new_dpi = wp;
+	RECT client_rect;
+	GetClientRect(h->hWnd, &client_rect);
+	int tmpScreenWidth = client_rect.right - client_rect.left;
+	int tmpScreenHeight = client_rect.bottom - client_rect.top;
+
+	// Client Areaのサイズからウィンドウサイズを算出
+	if (pAdjustWindowRectExForDpi != NULL || pAdjustWindowRectEx != NULL) {
+		const DWORD Style = (DWORD)::GetWindowLongPtr(h->hWnd, GWL_STYLE);
+		const DWORD ExStyle = (DWORD)::GetWindowLongPtr(h->hWnd, GWL_EXSTYLE);
+		const BOOL bMenu = FALSE; // メニューは無しの想定
+		if (pGetSystemMetricsForDpi != NULL) {
+			// スクロールバーが表示されている場合は、
+			// スクリーンサイズ(クライアントエリアのサイズ)に追加する
+			int min_pos;
+			int max_pos;
+			GetScrollRange(h->hWnd, SB_VERT, &min_pos, &max_pos);
+			if (min_pos != max_pos) {
+				tmpScreenWidth += pGetSystemMetricsForDpi(SM_CXVSCROLL, new_dpi);
+			}
+			GetScrollRange(h->hWnd, SB_HORZ, &min_pos, &max_pos);
+			if (min_pos != max_pos) {
+				tmpScreenHeight += pGetSystemMetricsForDpi(SM_CXHSCROLL, new_dpi);
+			}
+		}
+		tmpScreenWidth = MulDiv(tmpScreenWidth, new_dpi, h->dpi);
+		tmpScreenHeight = MulDiv(tmpScreenHeight, new_dpi, h->dpi);
+		RECT Rect = {0, 0, tmpScreenWidth, tmpScreenHeight};
+		if (pAdjustWindowRectExForDpi != NULL) {
+			// Windows 10, version 1607+
+			pAdjustWindowRectExForDpi(&Rect, Style, bMenu, ExStyle, new_dpi);
+		}
+		else {
+			// Windows 2000+
+			pAdjustWindowRectEx(&Rect, Style, bMenu, ExStyle);
+		}
+		SIZE *sz = (SIZE *)lp;
+		sz->cx = (Rect.right - Rect.left);
+		sz->cy = (Rect.bottom - Rect.top);
+		return TRUE;
+	}
+	return FALSE;
+}
+
+/**
  *	DPIが変化した
  */
 void ReiseDlgHelper_WM_DPICHANGED(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp)
@@ -381,6 +439,9 @@ BOOL ResizeDlgHelperProc(ReiseDlgHelper_t *h, HWND hWnd, UINT msg, WPARAM wp, LP
 	case WM_SIZE:
 		ReiseDlgHelper_WM_SIZE(h, wp, lp);
 		return TRUE;
+
+	case WM_GETDPISCALEDSIZE:
+		return ReiseDlgHelper_WM_GETDPISCALEDSIZE(h, wp, lp);
 
 	case WM_DPICHANGED:
 		ReiseDlgHelper_WM_DPICHANGED(h, wp, lp);
