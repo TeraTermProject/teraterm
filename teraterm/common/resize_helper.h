@@ -93,16 +93,18 @@ void ReiseDlgHelperAdd(ReiseDlgHelper_t *h, UINT id, ResizeHelperAnchor anchor);
  *	@param[in]	infos		リサイズ情報リスト
  *	@param[in]	info_count	リサイズ情報数
  */
-ReiseDlgHelper_t *ReiseHelperInit(HWND dlg, BOOL size_box, const ResizeHelperInfo *infos, size_t info_count);
+ReiseDlgHelper_t *ReiseDlgHelperInit(HWND dlg, BOOL size_box, const ResizeHelperInfo *infos, size_t info_count);
 
 /**
- *	ウィンドウのメッセージが発生したら呼び出し
+ *	ウィンドウのメッセージ処理
+ */
+BOOL ResizeDlgHelperProc(ReiseDlgHelper_t* h, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
+
+/**
+ *	ウィンドウのメッセージ処理(個別)
  */
 void ReiseDlgHelper_WM_SIZE(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp);
-void ReiseDlgHelper_WM_DPICHANGED_BEFOREPARENT(ReiseDlgHelper_t *h);
-void ReiseDlgHelper_WM_DPICHANGED_AFTERPARENT(ReiseDlgHelper_t *h);
-BOOL ReiseDlgHelper_WM_GETMINMAXINFO(ReiseDlgHelper_t *h, LPARAM lp);
-BOOL ReiseDlgHelper_WM_GETDPISCALEDSIZE(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp);
+void ReiseDlgHelper_WM_GETMINMAXINFO(ReiseDlgHelper_t *h, LPARAM lp);
 void ReiseDlgHelper_WM_DPICHANGED(ReiseDlgHelper_t *h, WPARAM wp, LPARAM lp);
 
 #ifdef __cplusplus
