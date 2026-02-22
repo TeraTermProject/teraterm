@@ -694,8 +694,7 @@ FallbackToCP932=off
 
 <p>
 Unicode(UTF-8)を使用時、文字ごとに描画幅を設定することができます。<br>
-コードポイントと文字幅(セル数)を指定します。<br>
-複数の文字幅設定を定義することができます。
+コードポイントと文字幅(セル数)を指定します。
 </p>
 <p>
 文字幅設定の定義はINIファイルを編集することで行います。<br>
@@ -703,17 +702,17 @@ Unicode(UTF-8)を使用時、文字ごとに描画幅を設定することができます。<br>
 この設定を使用する/しない、文字幅設定の選択ができます。
 </p>
 
-<h2>文字幅設定セットの設定</h2>
+<h2>使用する文字幅設定を設定する</h2>
 
 <p>
-  文字幅設定を複数定義することができます。
+  文字幅設定を複数定義することができます。どれを使用するか設定します。
 </p>
 
 詳細
 
 <ul>
-  <li>セクション名 UnicodeOverrideCharWidth</li>
-  <li>キー ListN 1から順に読み込まれ、存在しなくなるまで読み込まれます</li>
+  <li>セクション名: UnicodeOverrideCharWidth</li>
+  <li>ListN: 1から順に読み込まれ、存在しなくなるまで読み込まれます</li>
   <li>1項目の場合
     <dl>
       <dt>1項目目</dt>
@@ -725,14 +724,14 @@ Unicode(UTF-8)を使用時、文字ごとに描画幅を設定することができます。<br>
       <dt>1項目目</dt>
       <dd>
         文字幅設定ファイル名<br>
-        相対パスの場合、TERATERM.INI 相対となります
+        相対パスの場合、TERATERM.INI からの相対パスとみなします
       </dd>
       <dt>2項目目</dt>
       <dd>文字幅設定ファイル内の文字幅設定のセクション名</dd>
     </dl>
   </li>
-  <li>Selected 選択されているリストのインデックス(0から,0=List1)</li>
-  <li>Enable on又はoff</li>
+  <li>Selected: 選択されているリストのインデックス (0から,0=List1)</li>
+  <li>Enable: on又はoff</li>
 </ul>
 
 設定例
@@ -746,19 +745,19 @@ Selected=1
 Enable=on
 </pre>
 
-<h2>文字幅の設定</h2>
+<h2>文字幅の設定を定義する</h2>
 
 詳細
+
 <ul>
-  <li>RangeN は、1から順に読み込まれ、存在しなくなるまで読み込まれます</li>
+  <li>Name: 設定名</li>
+  <li>RangeN: 1から順に読み込まれ、存在しなくなるまで読み込まれます</li>
   <li>3項目の場合
     <dl>
       <dt>1項目目</dt>
       <dd>開始コードポイント</dd>
-
       <dt>2項目目</dt>
       <dd>終了コードポイント</dd>
-
       <dt>3項目目</dt>
       <dd>
           1 ... 1Cell<br>
@@ -780,10 +779,9 @@ Enable=on
       </dd>
     </dl>
   </li>
-  <li>Name RangeN は、1から順に読み込まれ、存在しなくなるまで読み込まれます</li>
 </ul>
 
-設定例1<br>
+設定例1
 <pre>
 ; TERATERM.INI
 [CellWidth1]
@@ -800,15 +798,15 @@ Range5=U+1F90D,2
 
 設定例2
 <p>
-  emacs を CJK 環境にする。<br>
+  Emacs を CJK 文字環境に設定する。<br>
   Tera Term の Ambiguous 文字の文字幅を 2 Cell に設定する。<br>
-  UnicodeEmojiOverride 設定を off にする。Ambiguous 文字は Tera Term で設定した幅が、それ以外は East_Asian_Width プロパティの幅が使用される。
+  UnicodeEmojiOverride 設定を off にする。この設定により、Ambiguous 幅の絵文字では Tera Term で設定した幅が、それ以外の絵文字では East_Asian_Width プロパティの幅が使用される。
 </p>
 <p>
 <img src="UnicodeOverrideCharWidth-off.png">
 </p>
 <p>
-  ここまでの設定で Ambiguous 文字はすべて 2 Cell で描画されるが、emacs では width=1 が想定されている Ambiguous 文字もある。<br>
+  ここまでの設定で Ambiguous 文字はすべて 2 Cell で描画されるが、Emacs では width=1 が想定されている Ambiguous 文字もある。<br>
   これらの文字幅を個別に 1 に設定する。
 </p>
 <pre>

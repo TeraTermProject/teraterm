@@ -17,26 +17,28 @@ Unicodeを使用するには、<a href="../menu/setup-additional-coding.html">Additional
 
     <ul>
       <li>
-        文字の表示幅には「接続先（のプログラム）が意図している文字幅」と
-        「Tera Term が描画する文字幅」と
-        「フォントデザインの文字幅」
-        があります。
+        文字の表示幅には次のものがあります。
+        <ul>
+          <li>接続先（のプログラム）が意図している文字幅</li>
+          <li>Tera Term が描画する文字幅</li>
+          <li>フォントデザインの文字幅</li>
+        </ul>
       </li>
       <li>
         接続先のプログラムには、文字幅を計算に入れて描画するものがあります。<br>
         プログラム、ライブラリ例
         <ul>
-          <li>テキストエディタ(vim,emacs,nanoなど)
-          <li>ビュア(more,less,lvなど)
-          <li>bashなどに組み込まれているreadlineライブラリ(行編集ライブラリ)
-          <li>aptitudeなどに組み込まれているcursesライブラリ(端末制御ライブラリ)
+          <li>テキストエディタ(vim,emacs,nanoなど)</li>
+          <li>ビュア(more,less,lvなど)</li>
+          <li>bashなどに組み込まれているreadlineライブラリ(行編集ライブラリ)</li>
+          <li>aptitudeなどに組み込まれているcursesライブラリ(端末制御ライブラリ)</li>
         </ul>
       </li>
       <li>
         Tera Term は
-        <a href="../menu/setup-additional-coding.html#AmbiguousCharactersWidth">Ambiguous Characters width 設定</a>、
-        <a href="../menu/setup-additional-coding.html#UnicodeEmojiOverride">Override Emoji Characters width 設定</a>、
-        <a href="../menu/setup-additional-coding.html#OverrideCharWidth">文字ごとの文字幅オーバーライド設定</a> により、
+        <a href="../menu/setup-additional-coding.html#AmbiguousCharactersWidth">Ambiguous Characters width</a> 設定、
+        <a href="../menu/setup-additional-coding.html#UnicodeEmojiOverride">Override Emoji Characters width</a> 設定、
+        <a href="../menu/setup-additional-coding.html#OverrideCharWidth">文字ごとの文字幅オーバーライド</a> 設定により、
         描画する文字幅を設定することができます<br>
         「接続先が意図している文字幅」と「Tera Term が描画する文字幅」が合っていないと、
         画面崩れが起こりやすくなります。
@@ -87,7 +89,8 @@ Unicodeを使用するには、<a href="../menu/setup-additional-coding.html">Additional
     </p>
 
     <p>
-    例えば、"§"(section sign,節記号,セクションマーク) の文字コードは次のようになります
+      例えば、"§"(section sign,節記号,セクションマーク) の文字コードは次のようになります
+    </p>
 <pre>
 | code               | character code(code point) | cell   |
 |--------------------|----------------------------|--------|
@@ -141,7 +144,7 @@ cells数(2=全角/1=半角)
       Tera Term は次のデータのプロパティをもとに描画する文字幅を決定しています。<br>
       <a href="https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt</a><br>
       Ambiguous 文字の文字幅 については
-      <a href="../menu/setup-additional-coding.html#AmbiguousCharactersWidth">Ambiguous Characters width</a> 設定で指定することができます。<br>
+      <a href="../menu/setup-additional-coding.html#AmbiguousCharactersWidth">Ambiguous Characters width</a> 設定で指定することができます。
     </p>
 
     <p>
@@ -174,7 +177,7 @@ cells数(2=全角/1=半角)
 
     <p>
       絵文字プロパティは East_Asian_Width とは別のプロパティです。
-      絵文字プロパティが Yes の文字でも、それとは別に East_Asian_Width プロパティの値を持っています。<br>
+      絵文字プロパティが Yes の文字でも、それとは別に East_Asian_Width プロパティの値を持っています。
     </p>
 
     <p>

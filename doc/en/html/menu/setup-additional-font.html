@@ -49,23 +49,19 @@
 
       <dt id="ResizedFont">Drawing resized font to fit cell width</dt>
       <dd>
-        Character width to be displayed, such as "&copy;"(U+00A9),
-        can be either 1 or 2cell, and depending on the font design (font file),
-        the font width can also be either 1 or 2cell.<br>
-        Depending on the language and font, font width may not match width to display.<br>
+        The character width used by Tera Term to render text may not match the character width defined by the font design.<br>
         When the text is drawn to fit the cell width, looks natural,
         but drawing may be slower and the font design may differ from the font developer's intent.<br>
-        And refer to
-        <a href="setup-additional-coding.html#AmbiguousCharactersWidth">Ambiguous Characters width</a>,
-        <a href="setup-additional-coding.html#EastAsianWidth">East_Asian_Width and width (cells)</a>
-        for character width assumed by Tera Term connecting destination.
         <dl>
           <dt>ON</dt>
           <dd>
             When the width to be displayed and the width of the font to be drawn are different,
             text is drawn with resizing font to the cell width.
+            <div style="margin-top:1ex; overflow:hidden;">
+              <img src="DrawingResizedFont-greek_on.png" style="float:left; margin-right:1ex;">
+              <img src="DrawingResizedFont-checkmark_on.png" style="float:left;">
+            </div>
           </dd>
-
           <dt>OFF</dt>
           <dd>
             Displays the design of the font file as it is.
@@ -75,6 +71,10 @@
               <li>When Tera Term displays as 1Cell and the font design is 2Cell,
                 The left half of 2Cell is drawn.
             </ul>
+            <div style="margin-top:1ex; overflow:hidden;">
+              <img src="DrawingResizedFont-greek_off.png" style="float:left; margin-right:1ex;">
+              <img src="DrawingResizedFont-checkmark_off.png" style="float:left;">
+            </div>
           </dd>
         </dl>
       </dd>
