@@ -49,6 +49,7 @@ AppVerName={#AppName} {#AppVersion} {#Arch}
   AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 #endif
 WizardStyle=modern dynamic
+WizardSizePercent=125,125
 
 ; properties of installer executable
 VersionInfoDescription={#AppName} installer
