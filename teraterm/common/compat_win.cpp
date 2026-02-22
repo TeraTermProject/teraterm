@@ -198,6 +198,9 @@ DWORD (WINAPI *pCM_Get_DevNode_Status)(
 // dwrite.dll
 HRESULT (WINAPI *pDWriteCreateFactory)(DWRITE_FACTORY_TYPE factoryType, REFIID iid, IUnknown **factory);
 
+// wintrust.dll
+LONG (WINAPI *pWinVerifyTrust)(HWND hwnd, GUID *pgActionID, LPVOID pWVTData);
+
 class Initializer {
 public:
 	Initializer() {
@@ -371,6 +374,11 @@ static const APIInfo Lists_dwrite[] = {
 	{},
 };
 
+static const APIInfo Lists_wintrust[] = {
+	{ "WinVerifyTrust", (void **)&pWinVerifyTrust },
+	{},
+};
+
 static const DllInfo DllInfos[] = {
 	{ L"user32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
 	{ L"msimg32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
@@ -387,6 +395,7 @@ static const DllInfo DllInfos[] = {
 	{ L"advapi32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_advapi32 },
 	{ L"setupapi.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_setupapi },
 	{ L"dwrite.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dwrite },
+	{ L"wintrust.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_wintrust },
 	{},
 };
 

@@ -104,16 +104,21 @@ enum channel_type {
 
 // for SSH2
 /* default window/packet sizes for tcp/x11-fwd-channel */
-// changed CHAN_SES_WINDOW_DEFAULT from 32KB to 128KB. (2007.10.29 maya)
 #define CHAN_SES_PACKET_DEFAULT (32*1024)
-#define CHAN_SES_WINDOW_DEFAULT (4*CHAN_SES_PACKET_DEFAULT)
+#define CHAN_SES_WINDOW_DEFAULT (64*CHAN_SES_PACKET_DEFAULT)		// 2.0 MB
 #define CHAN_TCP_PACKET_DEFAULT (32*1024)
-#define CHAN_TCP_WINDOW_DEFAULT (4*CHAN_TCP_PACKET_DEFAULT)
+#define CHAN_TCP_WINDOW_DEFAULT (64*CHAN_TCP_PACKET_DEFAULT)		// 2.0 MB
 #if 0 // unused
 #define CHAN_X11_PACKET_DEFAULT (16*1024)
 #define CHAN_X11_WINDOW_DEFAULT (4*CHAN_X11_PACKET_DEFAULT)
 #endif
 
+// SCP受信処理におけるフロー制御の閾値
+// 適用先 scp_t.filercvsize
+#define SCPRCV_HIGH_WATER_MARK  (CHAN_SES_WINDOW_DEFAULT * 0.75)	// 1.5 MB
+#define SCPRCV_LOW_WATER_MARK   (CHAN_SES_WINDOW_DEFAULT * 0.25)	// 0.5 MB
+
+#define SCPDLG_UPDATE_INTERVAL 100 /*msec*/	// SCP進捗ダイアログの表示更新間隔
 
 /* SSH2 constants */
 #define SSH_CHANNEL_INVALID -1
@@ -504,6 +509,8 @@ void SSH2_send_kexinit(PTInstVar pvar);
 BOOL do_SSH2_userauth(PTInstVar pvar);
 BOOL do_SSH2_authrequest(PTInstVar pvar);
 void debug_print(int no, char *msg, int len);
+void ssh_scp_thread_lock_initialize(void);
+void ssh_scp_thread_lock_finalize(void);
 void ssh_heartbeat_lock_initialize(void);
 void ssh_heartbeat_lock_finalize(void);
 void ssh_heartbeat_lock(void);
@@ -532,11 +539,6 @@ typedef struct PacketList {
 	struct PacketList *next;
 } PacketList_t;
 
-// SCP受信処理におけるフロー制御の閾値
-// 適用先 scp_t.filercvsize
-#define SCPRCV_HIGH_WATER_MARK (1 * 1024 * 1024)  // 1MB
-#define SCPRCV_LOW_WATER_MARK (0)  // 0MB
-
 typedef struct scp {
 	enum scp_dir dir;              // transfer direction
 	enum scp_state state;          // SCP state
@@ -547,8 +549,13 @@ typedef struct scp {
 	struct __stat64 filestat;      // file status information
 	HWND progress_window;
 	HANDLE thread;
-	unsigned int thread_id;
 	PTInstVar pvar;
+	HANDLE ScpStartThreadEvent;
+	BOOL canceled;
+	DWORD stime;
+	int prev_elapsed;
+	int ProgStat;
+	DWORD ProcessedTime;
 	// for receiving file
 	long long filetotalsize;
 	long long filercvsize;
@@ -560,6 +567,11 @@ typedef struct scp {
 	struct {
 		uint64_t received_size;
 	} recv;
+	HANDLE ScpReceiveThreadEvent;
+	// for sending file
+	long long filesndsize;
+	HANDLE ScpSendThreadEvent;
+	size_t sendsize;
 } scp_t;
 
 enum sftp_state {

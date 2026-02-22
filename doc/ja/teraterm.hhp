@@ -144,6 +144,7 @@ HlpMenuSetupAdditionalWindow=html\menu\setup-additional-window.html
 HlpMenuSetupAdditionalTerminal=html\menu\setup-additional-terminal.html
 HlpMenuSetupAdditionalSerialPort=html\menu\setup-additional-serialport.html
 HlpMenuSetupAdditionalUI=html\menu\setup-additional-ui.html
+HlpMenuSetupAdditionalPlugin=html\menu\setup-additional-plugin.html
 HlpMenuSetupThemeEditor=html\menu\setup-additional-visual-theme.html
 HlpMenuSetupSave=html\menu\setup-save.html
 HlpMenuSetupRestore=html\menu\setup-restore.html

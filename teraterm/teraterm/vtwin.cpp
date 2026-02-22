@@ -4743,6 +4743,7 @@ void CVTWindow::OnSetupSave()
 		(*WriteIniFile)(ts.SetupFNameW, &ts);
 		/* copy host list */
 		(*CopyHostList)(PrevSetupFNW, ts.SetupFNameW);
+		PluginWriteList(ts.SetupFNameW);
 		FreeTTSET();
 		free(PrevSetupFNW);
 		PrevSetupFNW = NULL;

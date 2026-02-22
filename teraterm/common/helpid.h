@@ -169,6 +169,7 @@
 #define HlpMenuSetupAdditionalTerminal      43034
 #define HlpMenuSetupAdditionalSerialPort    43036
 #define HlpMenuSetupAdditionalUI            43037
+#define HlpMenuSetupAdditionalPlugin        43038
 #define HlpMenuSetupSave                    43013
 #define HlpMenuSetupRestore                 43014
 #define HlpMenuSetupDir                     43016

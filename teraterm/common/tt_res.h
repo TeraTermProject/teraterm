@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by ttermpro.rc
+// Microsoft Visual C++ で生成されたインクルード ファイル。
+// C:\work\teraterm\teraterm\teraterm\teraterm\plugin_pp_2.rc で使用
 //
 #define IDI_TTERM                       100
 #define IDR_ACC                         100
@@ -35,6 +35,7 @@
 #define IDD_TABSHEET_UI                 132
 #define IDD_TABSHEET_TEKFONT            133
 #define IDD_RECVFILEDLG                 134
+#define IDD_TABSHEET_PLUGIN             135
 #define IDR_TEKMENU                     1000
 #define IDC_EDIT_FULLPATH               1001
 #define IDC_FULLPATH_LABEL              1002
@@ -352,7 +353,7 @@
 #define ID_FILE_TERATERMMENU            52006
 
 // Next default values for new objects
-//
+// 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1

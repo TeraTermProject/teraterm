@@ -38,6 +38,7 @@ set VSCMNDIR=%VSCMNDIR:\\=\%
 
 if /I %VSCMNDIR% EQU "%VS160COMNTOOLS%" goto vs2019
 if /I %VSCMNDIR% EQU "%VS170COMNTOOLS%" goto vs2022
+if /I %VSCMNDIR% EQU "%VS180COMNTOOLS%" goto vs2026
 
 echo Unknown Visual Studio version
 goto fail
@@ -50,6 +51,10 @@ goto gen_end
 
 :vs2022
 cmake -G "Visual Studio 17 2022" -A %TARGET% -DBUILD_SHARED_LIBS=OFF -DMSVC_STATIC_RUNTIME=ON -S . -B build\%TARGET%
+goto gen_end
+
+:vs2026
+cmake -G "Visual Studio 18 2026" -A %TARGET% -DBUILD_SHARED_LIBS=OFF -DMSVC_STATIC_RUNTIME=ON -S . -B build\%TARGET% -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 goto gen_end
 
 :gen_end

@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="Win32" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="cyglaunch/cyglaunch.v18.vcxproj" Id="11b49891-80f0-4dd3-b6e9-70bbe64a4bbf" />
+  <Project Path="cyglib/cyglib.v18.vcxproj" Id="a171f48c-bfb2-4766-97c3-9b8b7be9d548" />
+  <Project Path="cygtool/cygtool.v18.vcxproj" Id="e8955970-1031-42b4-9419-f82d9dd80c66" />
+</Solution>
