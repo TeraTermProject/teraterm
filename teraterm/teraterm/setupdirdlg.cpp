@@ -487,39 +487,6 @@ typedef struct {
 	ReiseDlgHelper_t *resize_helper;
 } dlg_data_t;
 
-// ★★★★★★★★★★
-// 古いフォントを保持するためのグローバル変数
-HFONT g_hCurrentFont = NULL;
-
-// 子ウィンドウすべてにフォントを適用するためのコールバック
-BOOL CALLBACK SetFontCallback(HWND hWndChild, LPARAM lParam) {
-    SendMessage(hWndChild, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
-    return TRUE;
-}
-
-void UpdateControlFont(HWND hWnd, UINT dpi) {
-    NONCLIENTMETRICS ncm = { sizeof(NONCLIENTMETRICS) };
-
-    // 1. 新しいDPIに基づいたシステムフォント情報を取得
-    if (SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS, sizeof(ncm), &ncm, 0, dpi)) {
-
-        // 2. 新しいフォントを作成 (lfMessageFontは標準のダイアログ用)
-        HFONT hNewFont = CreateFontIndirect(&ncm.lfMessageFont);
-        if (hNewFont) {
-            // 3. 親ウィンドウおよびすべての子コントロールに適用
-            SendMessage(hWnd, WM_SETFONT, (WPARAM)hNewFont, MAKELPARAM(TRUE, 0));
-            EnumChildWindows(hWnd, SetFontCallback, (LPARAM)hNewFont);
-
-            // 4. 古いフォントがあれば削除してメモリリークを防ぐ
-            if (g_hCurrentFont) {
-                DeleteObject(g_hCurrentFont);
-            }
-            g_hCurrentFont = hNewFont;
-        }
-    }
-}
-// ★★★★★★★★★★
-
 static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
@@ -733,18 +700,7 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		}
 		break;
 	}
-#if 0
-	case WM_MOVE: {
-		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
-		ReiseDlgHelper_WM_SIZE(dlg_data->resize_helper, wp, lp);
-		// 幅を調整
-		HWND hWndList = GetDlgItem(hDlgWnd, IDC_SETUP_DIR_LIST);
-		for (int i = 0; i < 2; i++) {
-			ListView_SetColumnWidth(hWndList, i, LVSCW_AUTOSIZE_USEHEADER);
-		}
-		break;
-	}
-#endif
+
 	case WM_SIZE: {
 		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
 		ReiseDlgHelper_WM_SIZE(dlg_data->resize_helper, wp, lp);

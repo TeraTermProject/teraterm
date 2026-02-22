@@ -5450,8 +5450,6 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_DPICHANGED:
 		OnDpiChanged(wp, lp, FALSE);
-		retval = FALSE;
-		// ★
 		break;
 	case WM_COMMAND:
 	{
