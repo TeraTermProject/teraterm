@@ -73,26 +73,15 @@ typedef struct {
  */
 static void SetFromListView(HWND hWnd)
 {
-	HWND hWndList = GetDlgItem(hWnd, IDC_SETUP_DIR_LIST);
-	const int list_count = (int)SendMessageW(hWndList, LVM_GETITEMCOUNT, 0, 0);
+	const int list_count = (int)SendDlgItemMessageW(hWnd, IDC_SETUP_DIR_LIST, LVM_GETITEMCOUNT, 0, 0);
 
 	for (int i = 0; i < list_count; i++) {
-		wchar_t filename[MAX_PATH];
-		LV_ITEMW item{};
-		item.mask = LVIF_TEXT;
-		item.iItem = i;
-		item.iSubItem = 0;
-		item.pszText = filename;
-		item.cchTextMax = _countof(filename);
-		SendMessageW(hWndList, LVM_GETITEMW, 0, (LPARAM)&item);
+		wchar_t *filename;
+		hGetDlgItemLVTextW(hWnd, IDC_SETUP_DIR_LIST, i, 0, &filename);
 
-		wchar_t enable_str[32];
-		item.mask = LVIF_TEXT;
-		item.iItem = i;
-		item.iSubItem = 1;
-		item.pszText = enable_str;
-		item.cchTextMax = _countof(enable_str);
-		SendMessageW(hWndList, LVM_GETITEMW, 0, (LPARAM)&item);
+		wchar_t *enable_str;
+		hGetDlgItemLVTextW(hWnd, IDC_SETUP_DIR_LIST, i, 1, &enable_str);
+
 		ExtensionEnable enable =
 			enable_str[0] == L'e' ? EXTENSION_ENABLE :
 			enable_str[0] == L'd' ? EXTENSION_DISABLE : EXTENSION_UNSPECIFIED;
@@ -101,6 +90,9 @@ static void SetFromListView(HWND hWnd)
 		info.filename = filename;
 		info.enable = enable;
 		PluginAddInfo(&info);
+
+		free(filename);
+		free(enable_str);
 	}
 }
 
@@ -159,17 +151,12 @@ static wchar_t *VerifySignature(LPCWSTR pwszSourceFile)
  */
 static void Popup(HWND hWnd, const POINT *pointer_pos, int index)
 {
-	wchar_t enable_str[32];
-	LV_ITEMW item{};
-	item.mask = LVIF_TEXT;
-	item.iItem = index;
-	item.iSubItem = 1;
-	item.pszText = enable_str;
-	item.cchTextMax = _countof(enable_str);
-	SendMessageW(hWnd, LVM_GETITEMW, 0, (LPARAM)&item);
+	wchar_t *enable_str;
+	hGetDlgItemLVTextW(hWnd, 0, index, 1, &enable_str);
 	ExtensionEnable enable =
 		enable_str[0] == L'e' ? EXTENSION_ENABLE :
 		enable_str[0] == L'd' ? EXTENSION_DISABLE : EXTENSION_UNSPECIFIED;
+	free(enable_str);
 
 	HMENU hMenu= CreatePopupMenu();
 	AppendMenuW(hMenu, enable != EXTENSION_ENABLE ? MF_ENABLED : MF_DISABLED | MF_STRING, 1, L"&Enable");
@@ -179,6 +166,7 @@ static void Popup(HWND hWnd, const POINT *pointer_pos, int index)
 	switch (result) {
 	case 1:
 	case 2: {
+		LV_ITEMW item{};
 		item.mask = LVIF_TEXT;
 		item.iItem = index;
 		item.iSubItem = 1;
