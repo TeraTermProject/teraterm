@@ -135,6 +135,7 @@ static int CodePage = 932;
 vtdraw_t *vt_src;
 
 static void BuffDrawLineI(vtdraw_t *vt, ttdc_t *dc, int SY, int IStart, int IEnd);
+static POINT GetCharCell(int x, int y, BOOL right);
 
 /**
  *	buff_char_t を relセル移動する
@@ -458,6 +459,35 @@ static void GetPosFromPtr(const buff_char_t *b, int *bx, int *by)
 	*by = y;
 }
 
+/**
+ * @brief	POINT比較
+ * @param	p1		POINT
+ * @param	p2		POINT
+ * @retval	-1		p1 が p2 より小さい(p1がp2より左上)
+ * @retval	0		p1とp2が等しい
+ * @retval	1		p1 が p2 より大きい(p1がp2より右下)
+ */
+static int ComparePoint(const POINT *p1, const POINT *p2)
+{
+	if (p1->y < p2->y) {
+		return -1;
+	}
+	else if (p1->y > p2->y) {
+		return 1;
+	}
+	else {
+		if (p1->x < p2->x) {
+			return -1;
+		}
+		else if (p1->x > p2->x) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+}
+
 static BOOL ChangeBuffer(int Nx, int Ny)
 {
 	LONG NewSize;
@@ -545,9 +575,11 @@ static BOOL ChangeBuffer(int Nx, int Ny)
 			SelectEnd.y = 0;
 		}
 
-		Selected = (SelectEnd.y > SelectStart.y) ||
-		           ((SelectEnd.y == SelectStart.y) &&
-		            (SelectEnd.x > SelectStart.x));
+		if (ComparePoint(&SelectStart, &SelectEnd) < 0) {
+			Selected = TRUE;
+		} else {
+			Selected = FALSE;
+		}
 	}
 
 	CodeBuffW = CodeDestW;
@@ -789,9 +821,11 @@ static void BuffScroll(int Count, int Bottom)
 			SelectEnd.x = 0;
 			SelectEnd.y = 0;
 		}
-		Selected = (SelectEnd.y > SelectStart.y) ||
-	               ((SelectEnd.y==SelectStart.y) &&
-	                (SelectEnd.x > SelectStart.x));
+		if (ComparePoint(&SelectStart, &SelectEnd) < 0) {
+			Selected = TRUE;
+		} else {
+			Selected = FALSE;
+		}
 	}
 
 	NewLine(PageStart+CursorY);
@@ -4465,14 +4499,15 @@ void BuffTplClk(int Yw)
 	UnlockBuffer();
 }
 
-
-// The block of the text between old and new cursor positions is being selected.
-// This function enables to select several pages of output from Tera Term window.
-// add (2005.5.15 yutaka)
+/**
+ * The block of the text between old and new cursor positions is being selected.
+ * This function enables to select several pages of output from Tera Term window.
+ *  Start text selection by mouse button down
+ *
+ * @param	Xw	horizontal position in window coordinate (pixels)
+ * @param	Yw	vertical
+ */
 void BuffSeveralPagesSelect(int Xw, int Yw)
-//  Start text selection by mouse button down
-//    Xw: horizontal position in window coordinate (pixels)
-//    Yw: vertical
 {
 	int X, Y;
 	BOOL Right;
@@ -4487,8 +4522,19 @@ void BuffSeveralPagesSelect(int Xw, int Yw)
 		X = NumOfColumns-1;
 	}
 
-	SelectEnd.x = X;
-	SelectEnd.y = Y;
+	POINT pt = GetCharCell(X, Y, Right);
+	if (ComparePoint(&pt, &SelectStart) < 0) {
+		// 選択領域の開始位置より前方のとき
+		SelectStart.x = pt.x;
+		SelectStart.y = pt.y;
+	}
+	else {
+		// 選択領域の開始位置より後方のとき
+		// (前方のときの処理を追加する前と同じ)
+		SelectEnd.x = pt.x;
+		SelectEnd.y = pt.y;
+	}
+
 	//BoxSelect = FALSE; // box selecting disabled
 	SeveralPageSelect = TRUE;
 }
@@ -4658,7 +4704,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 		}
 	}
 	else if (NClick==3) { // drag after tripple click
-		if ((SelectEnd.y > SelectStart.y) || ((SelectEnd.y == SelectStart.y) && (SelectEnd.x >= SelectStart.x))) {
+		if (ComparePoint(&SelectStart, &SelectEnd) <= 0) {
 			if (SelectStart.x == DblClkEnd.x) {
 				SelectEnd = DblClkStart;
 				ChangeSelectRegion();
