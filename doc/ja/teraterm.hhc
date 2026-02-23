@@ -407,6 +407,11 @@
 				</UL>
 			</UL>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="SSH SCP">
+				<param name="Local" value="html\menu\file-ssh-scp.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Change directory">
 				<param name="Local" value="html\menu\file-chdir.html">
 				<param name="ImageNumber" value="11">
@@ -586,6 +591,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="シリアルポート タブ">
 					<param name="Local" value="html\menu\setup-additional-serialport.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="プラグイン タブ">
+					<param name="Local" value="html\menu\setup-additional-plugin.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 			</UL>

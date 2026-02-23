@@ -97,6 +97,9 @@
     <ClCompile Include="smult_curve25519_ref.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sntrup761.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ssh.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -205,6 +208,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="keyfiles-putty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libcrux_mlkem768_sha3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mac.h">

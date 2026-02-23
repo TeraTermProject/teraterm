@@ -108,7 +108,8 @@ static int channel_used_num = 0;    // 使用チャネル数
 
 static char ssh_ttymodes[] = "\x01\x03\x02\x1c\x03\x08\x04\x15\x05\x04";
 
-static CRITICAL_SECTION g_ssh_scp_lock;   /* SCP受信用ロック */
+static CRITICAL_SECTION g_ssh_scp_lock;			/* SCP受信用ロック */
+static CRITICAL_SECTION g_ssh_scp_thread_lock;	/* SCPスレッド待ち合わせ用ロック */
 
 static int g_scp_sending;  /* SCP送信中か? */
 
@@ -122,6 +123,8 @@ static void SSH2_dh_kex_init(PTInstVar pvar);
 static void SSH2_dh_gex_kex_init(PTInstVar pvar);
 static void SSH2_ecdh_kex_init(PTInstVar pvar);
 static void SSH2_curve25519_kex_init(PTInstVar pvar);
+static void SSH2_kem_sntrup761x25519_kex_init(PTInstVar pvar);
+static void SSH2_kem_mlkem768x25519_kex_init(PTInstVar pvar);
 static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar);
 static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar);
 static BOOL handle_SSH2_newkeys(PTInstVar pvar);
@@ -256,6 +259,10 @@ static Channel_t *ssh2_channel_new(PTInstVar pvar, unsigned int window, unsigned
 		c->scp.filemtime = 0;
 		c->scp.fileatime = 0;
 		c->scp.pktlist_cursize = 0;
+		c->scp.ScpStartThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		c->scp.ScpSendThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		c->scp.ScpReceiveThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		c->scp.sendsize = SIZE_MAX;
 	}
 	if (type == TYPE_AGENT) {
 		c->agent_msg = buffer_init();
@@ -357,8 +364,33 @@ static void ssh2_channel_delete(Channel_t *c)
 	if (c->type == TYPE_SCP) {
 		// SCP処理の最後の状態を保存する。
 		prev_state = c->scp.state;
-
 		c->scp.state = SCP_CLOSING;
+
+		if (c->scp.progress_window != NULL) {
+			DestroyWindow(c->scp.progress_window);
+			c->scp.progress_window = NULL;
+		}
+		if (c->scp.thread != INVALID_HANDLE_VALUE) {
+			WaitForSingleObject(c->scp.thread, INFINITE);
+			CloseHandle(c->scp.thread);
+			c->scp.thread = INVALID_HANDLE_VALUE;
+		}
+		if (c->scp.ScpStartThreadEvent != NULL &&
+			c->scp.ScpStartThreadEvent != INVALID_HANDLE_VALUE) {
+			CloseHandle(c->scp.ScpStartThreadEvent);
+			c->scp.ScpStartThreadEvent = NULL;
+		}
+		if (c->scp.ScpSendThreadEvent != NULL &&
+			c->scp.ScpSendThreadEvent != INVALID_HANDLE_VALUE) {
+			CloseHandle(c->scp.ScpSendThreadEvent);
+			c->scp.ScpSendThreadEvent = NULL;
+		}
+		if (c->scp.ScpReceiveThreadEvent != NULL &&
+			c->scp.ScpReceiveThreadEvent != INVALID_HANDLE_VALUE) {
+			CloseHandle(c->scp.ScpReceiveThreadEvent);
+			c->scp.ScpReceiveThreadEvent = NULL;
+		}
+
 		if (c->scp.localfp != NULL) {
 			fclose(c->scp.localfp);
 			if (c->scp.dir == FROMREMOTE) {
@@ -374,15 +406,6 @@ static void ssh2_channel_delete(Channel_t *c)
 				if (prev_state != SCP_CLOSING)
 					remove(c->scp.localfilefull);
 			}
-		}
-		if (c->scp.progress_window != NULL) {
-			DestroyWindow(c->scp.progress_window);
-			c->scp.progress_window = NULL;
-		}
-		if (c->scp.thread != INVALID_HANDLE_VALUE) {
-			WaitForSingleObject(c->scp.thread, INFINITE);
-			CloseHandle(c->scp.thread);
-			c->scp.thread = INVALID_HANDLE_VALUE;
 		}
 
 		// SCP受信の場合のみ、SCP用リストの開放を行う。
@@ -447,6 +470,21 @@ Channel_t *ssh2_local_channel_lookup(int local_num)
 			return (c);
 	}
 	return (NULL);
+}
+
+//
+// SCP thread mutex
+//
+void ssh_scp_thread_lock_initialize(void)
+{
+	InitializeCriticalSection(&g_ssh_scp_lock);
+	InitializeCriticalSection(&g_ssh_scp_thread_lock);
+}
+
+void ssh_scp_thread_lock_finalize(void)
+{
+	DeleteCriticalSection(&g_ssh_scp_lock);
+	DeleteCriticalSection(&g_ssh_scp_thread_lock);
 }
 
 //
@@ -4130,8 +4168,6 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 				return;
 			}
 
-			// changed window size from 128KB to 32KB. (2006.3.6 yutaka)
-			// changed window size from 32KB to 128KB. (2007.10.29 maya)
 			c = ssh2_channel_new(pvar, CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, local_channel_num);
 			if (c == NULL) {
 				// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
@@ -4237,13 +4273,15 @@ static int accessU8(const char *pathU8, int mode)
 /**
  *	SCP support
  *
- *	@param sendfile		ファイル名,UTF-8
- *	@param dstfile		ファイル名,UTF-8
+ *	@param filename		ローカル(Windows上の)ファイル名,UTF-8
+ *						TOREMOTEのとき、読み込みファイル名
+ *						FROMREMOTE のとき、書き込みファイル名
+ *	@param dest			フォルダ名またはファイル名,UTF-8
  *						TOREMOTE のとき、
  *							NULL のとき、ホームフォルダ
  *							相対パス、ホームフォルダからの相対?
  *							絶対パス
- *						TOLOCAL のとき
+ *						FROMREMOTE のとき
  *							NULL のとき、ダウンロードフォルダ
  *							相対パス、カレントフォルダからの相対?
  *							絶対パス
@@ -4251,7 +4289,7 @@ static int accessU8(const char *pathU8, int mode)
  *						FROMREMOTE	copy remote to local
  *
  */
-int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfile, enum scp_dir direction)
+static int SSH_scp_transaction(PTInstVar pvar, const char *filename, const char *dest, enum scp_dir direction)
 {
 	Channel_t *c = NULL;
 	FILE *fp = NULL;
@@ -4279,7 +4317,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 
 	if (direction == TOREMOTE) {  // copy local to remote
 		struct __stat64 st;
-		fp = fopenU8(sendfile, "rb");
+		fp = fopenU8(filename, "rbS");
 		if (fp == NULL) {
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
@@ -4290,21 +4328,21 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			DWORD error = GetLastError();
 			wchar_t *err_str;
 			hFormatMessageW(error, &err_str);
-			wchar_t *fname = ToWcharU8(sendfile);
+			wchar_t *fname = ToWcharU8(filename);
 			TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW, err_str, fname);
 			free(fname);
 			free(err_str);
 			goto error;
 		}
 
-		strncpy_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), sendfile, _TRUNCATE);  // full path
-		ExtractFileNameU8(sendfile, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
-		if (dstfile == NULL || dstfile[0] == '\0') { // remote file path
-			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), ".", _TRUNCATE);  // full path
+		strncpy_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), filename, _TRUNCATE);  // full path
+		ExtractFileNameU8(filename, c->scp.localfile, sizeof(c->scp.localfile));             // file name only
+		if (dest == NULL || dest[0] == '\0') { // remote file path
+			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), ".", _TRUNCATE);   // full path
 		} else {
-			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), dstfile, _TRUNCATE);  // full path
+			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), dest, _TRUNCATE);  // full path
 		}
-		c->scp.localfp = fp;     // file pointer
+		c->scp.localfp = fp; // file pointer
 
 		if (statU8(c->scp.localfilefull, &st) == 0) {
 			c->scp.filestat = st;
@@ -4312,26 +4350,48 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			goto error;
 		}
 	} else { // copy remote to local
-		strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), sendfile, _TRUNCATE);
+		strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), filename, _TRUNCATE);
 
-		if (dstfile == NULL || dstfile[0] == '\0') { // local file path is empty.
+		if (dest == NULL || dest[0] == '\0') { // local file path is empty.
 			char *fn;
-			wchar_t *FileDirExpanded;
+			wchar_t *FileDirExpanded, *FileDirExpandedDS;
 			char *FileDirExpandedU8;
 
-			fn = strrchr(sendfile, '/');
+			fn = strrchr(filename, '/');
 			if (fn && fn[1] == '\0')
 				goto error;
 
 			FileDirExpanded = GetFileDir(pvar->ts);
-			FileDirExpandedU8 = ToU8W(FileDirExpanded);
-			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s\\%s", FileDirExpandedU8, fn ? fn : sendfile);
+			FileDirExpandedDS = DeleteSlashW(FileDirExpanded);
+			FileDirExpandedU8 = ToU8W(FileDirExpandedDS);
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE,
+			            "%s\\%s", FileDirExpandedU8, fn ? fn : filename);
 			free(FileDirExpanded);
+			free(FileDirExpandedDS);
 			free(FileDirExpandedU8);
-			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
-		} else {
-			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s", dstfile);
-			ExtractFileName(dstfile, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
+			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
+		} else if (DoesFolderExist(dest)) { // local file path is a directory.
+			char *fn;
+			wchar_t *FileDirExpanded, *FileDirExpandedDS;
+			char *FileDirExpandedU8;
+
+			fn = strrchr(filename, '/');
+			if (fn && fn[1] == '\0')
+				goto error;
+
+			FileDirExpanded = ToWcharA(dest);
+			FileDirExpandedDS = DeleteSlashW(FileDirExpanded);
+			FileDirExpandedU8 = ToU8W(FileDirExpandedDS);
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE,
+			            "%s\\%s", FileDirExpandedU8, fn ? fn : filename);
+			free(FileDirExpanded);
+			free(FileDirExpandedDS);
+			free(FileDirExpandedU8);
+			ExtractFileName(c->scp.localfilefull, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
+		}
+		else {
+			_snprintf_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), _TRUNCATE, "%s", dest);
+			ExtractFileName(dest, c->scp.localfile, sizeof(c->scp.localfile));  // file name only
 		}
 
 		if (accessU8(c->scp.localfilefull, 0x00) == 0) {
@@ -4362,7 +4422,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			}
 		}
 
-		fp = fopenU8(c->scp.localfilefull, "wb");
+		fp = fopenU8(c->scp.localfilefull, "wbS");
 		if (fp == NULL) {
 			static const TTMessageBoxInfoW info = {
 				"TTSSH",
@@ -4380,7 +4440,7 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			goto error;
 		}
 
-		c->scp.localfp = fp;     // file pointer
+		c->scp.localfp = fp;    // file pointer
 	}
 
 	// setup SCP data
@@ -4399,9 +4459,9 @@ int SSH_scp_transaction(PTInstVar pvar, const char *sendfile, const char *dstfil
 			goto error;
 		}
 		s = "session";
-		buffer_put_string(msg, s, strlen(s));  // ctype
-		buffer_put_int(msg, c->self_id);  // self(channel number)
-		buffer_put_int(msg, c->local_window);  // local_window
+		buffer_put_string(msg, s, strlen(s));     // ctype
+		buffer_put_int(msg, c->self_id);          // self (channel number)
+		buffer_put_int(msg, c->local_window);     // local_window
 		buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
@@ -4425,9 +4485,9 @@ error:
 	return FALSE;
 }
 
-int SSH_start_scp(PTInstVar pvar, char *sendfile, char *dstfile)
+int SSH_start_scp_send(PTInstVar pvar, const char *sendfile, const char *dest)
 {
-	return SSH_scp_transaction(pvar, sendfile, dstfile, TOREMOTE);
+	return SSH_scp_transaction(pvar, sendfile, dest, TOREMOTE);
 }
 
 int SSH_scp_sending_status(void)
@@ -4435,9 +4495,24 @@ int SSH_scp_sending_status(void)
 	return g_scp_sending;
 }
 
-int SSH_start_scp_receive(PTInstVar pvar, char *filename)
+/**
+ *	@param	pvar
+ *	@param	recfile		受信ファイル名(リモートのファイル名),UTF-8
+ *	@param	dest		受信フォルダ/ファイル名,UTF-8
+ *				NULL
+ *					FileDir 又は ダウンロードフォルダ に元ファイル名でダウンロードされる
+ *				フルパス（フォルダ名）
+ *					指定したフォルダに元ファイル名でダウンロードされる
+ *				相対パス（フォルダ名）
+ *					指定したフォルダ（roaming\teraterm5 からの相対）に元ファイル名でダウンロードされる
+ *				フルパス（ファイル名）
+ *					指定したフォルダに指定したファイル名でダウンロードされる
+ *				相対パス（ファイル名）
+ *					指定したフォルダ（roaming\teraterm5 からの相対）に指定したファイル名でダウンロードされる
+ */
+int SSH_start_scp_receive(PTInstVar pvar, const char *recfile, const char *dest)
 {
-	return SSH_scp_transaction(pvar, filename, NULL, FROMREMOTE);
+	return SSH_scp_transaction(pvar, recfile, dest, FROMREMOTE);
 }
 
 
@@ -4764,7 +4839,7 @@ found:
  * クライアントとサーバ両方がサポートしている物のうち、クライアント側で最も前に指定した物が使われる。
  */
 static int
-choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
+choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, int msg_size)
 {
 	char tmp[1024+512];
 	int mode, r, payload_len;
@@ -4776,9 +4851,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 鍵交換アルゴリズム
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (kex algorithms)", __FUNCTION__);
-		msg = tmp;
 		r = -1;
 		goto error;
 	case GetPayloadTruncate:
@@ -4790,17 +4864,15 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->kex_type = choose_SSH2_kex_algorithm(buf, myproposal[PROPOSAL_KEX_ALGS]);
 	if (pvar->kex->kex_type == KEX_DH_UNKNOWN) {  // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown KEX algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown KEX algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -2;
 		goto error;
 	}
 	kexalg = get_kex_algorithm_by_type(pvar->kex->kex_type);
 	if (kexalg == NULL) {
-		strncpy_s(tmp, sizeof(tmp), "unknown KEX algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown KEX algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -2;
 		goto error;
 	}
@@ -4819,9 +4891,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// ホスト鍵アルゴリズム
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (hostkey algorithms)", __FUNCTION__);
-		msg = tmp;
 		r = -3;
 		goto error;
 	case GetPayloadTruncate:
@@ -4833,9 +4904,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->hostkey_type = choose_SSH2_host_key_algorithm(buf, myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS]);
 	if (pvar->kex->hostkey_type == KEY_ALGO_UNSPEC) {
-		strncpy_s(tmp, sizeof(tmp), "unknown host KEY algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown host KEY algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -4;
 		goto error;
 	}
@@ -4843,9 +4913,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 暗号アルゴリズム(クライアント -> サーバ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (encryption algorithms client to server)", __FUNCTION__);
-		msg = tmp;
 		r = -5;
 		goto error;
 	case GetPayloadTruncate:
@@ -4857,9 +4926,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->ciphers[MODE_OUT] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_CTOS]);
 	if (pvar->kex->ciphers[MODE_OUT] == NULL) {
-		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(client to server): ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown Encrypt algorithm(client to server): ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -6;
 		goto error;
 	}
@@ -4867,9 +4935,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 暗号アルゴリズム(サーバ -> クライアント)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (encryption algorithms server to client)", __FUNCTION__);
-		msg = tmp;
 		r = -7;
 		goto error;
 	case GetPayloadTruncate:
@@ -4881,9 +4948,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->ciphers[MODE_IN] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_STOC]);
 	if (pvar->kex->ciphers[MODE_IN] == NULL) {
-		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(server to client): ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown Encrypt algorithm(server to client): ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -8;
 		goto error;
 	}
@@ -4891,9 +4957,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// MACアルゴリズム(クライアント -> サーバ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (MAC algorithms client to server)", __FUNCTION__);
-		msg = tmp;
 		r = -9;
 		goto error;
 	case GetPayloadTruncate:
@@ -4910,9 +4975,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	else {
 		pvar->kex->macs[MODE_OUT] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_CTOS]);
 		if (pvar->kex->macs[MODE_OUT] == NULL) {  // not match
-			strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
-			strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-			msg = tmp;
+			strncpy_s(msg, msg_size, "unknown MAC algorithm: ", _TRUNCATE);
+			strncat_s(msg, msg_size, buf, _TRUNCATE);
 			r = -10;
 			goto error;
 		}
@@ -4921,9 +4985,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// MACアルゴリズム(サーバ -> クライアント)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (MAC algorithms server to client)", __FUNCTION__);
-		msg = tmp;
 		r = -11;
 		goto error;
 	case GetPayloadTruncate:
@@ -4940,9 +5003,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	else {
 		pvar->kex->macs[MODE_IN] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_STOC]);
 		if (pvar->kex->macs[MODE_IN] == NULL) {	 // not match
-			strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
-			strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-			msg = tmp;
+			strncpy_s(msg, msg_size, "unknown MAC algorithm: ", _TRUNCATE);
+			strncat_s(msg, msg_size, buf, _TRUNCATE);
 			r = -12;
 			goto error;
 		}
@@ -4951,9 +5013,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 圧縮アルゴリズム(クライアント -> サーバ)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (compression algorithms client to server)", __FUNCTION__);
-		msg = tmp;
 		r = -13;
 		goto error;
 	case GetPayloadTruncate:
@@ -4965,9 +5026,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->ctos_compression = choose_SSH2_compression_algorithm(buf, myproposal[PROPOSAL_COMP_ALGS_CTOS]);
 	if (pvar->kex->ctos_compression == COMP_UNKNOWN) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown Packet Compression algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown Packet Compression algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -14;
 		goto error;
 	}
@@ -4975,9 +5035,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 	// 圧縮アルゴリズム(サーバ -> クライアント)
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, msg_size, _TRUNCATE,
 		            "%s: truncated packet (compression algorithms server to client)", __FUNCTION__);
-		msg = tmp;
 		r = -15;
 		goto error;
 	case GetPayloadTruncate:
@@ -4989,9 +5048,8 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg)
 
 	pvar->kex->stoc_compression = choose_SSH2_compression_algorithm(buf, myproposal[PROPOSAL_COMP_ALGS_STOC]);
 	if (pvar->kex->stoc_compression == COMP_UNKNOWN) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown Packet Compression algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
+		strncpy_s(msg, msg_size, "unknown Packet Compression algorithm: ", _TRUNCATE);
+		strncat_s(msg, msg_size, buf, _TRUNCATE);
 		r = -16;
 		goto error;
 	}
@@ -5124,8 +5182,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	char buf[1024];
 	char *data;
 	int len, r;
-	char *msg = NULL;
-	char tmp[1024+512];
+	char msg[1024+512];
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXINIT was received.");
 
@@ -5153,9 +5210,8 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	else {
 		pvar->kex->peer = buffer_init();
 		if (pvar->kex->peer == NULL) {
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+			_snprintf_s(msg, sizeof(msg), _TRUNCATE,
 			            "%s: Out of memory", __FUNCTION__);
-			msg = tmp;
 			goto error;
 		}
 	}
@@ -5165,15 +5221,14 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	// cookie
 	if (! get_bytearray_from_payload(pvar, buf, SSH2_COOKIE_LENGTH)) {
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE,
 		            "%s: truncated packet (cookie)", __FUNCTION__);
-		msg = tmp;
 		goto error;
 	}
 	CRYPT_set_server_cookie(pvar, buf);
 
 	// 使用するアルゴリズムの決定
-	r = choose_SSH2_kex_choose_conf(pvar, buf, sizeof(buf), msg);
+	r = choose_SSH2_kex_choose_conf(pvar, buf, sizeof(buf), msg, sizeof(msg));
 	if (r != 0) {
 		goto error;
 	}
@@ -5199,6 +5254,13 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		case KEX_CURVE25519_SHA256_OLD:
 		case KEX_CURVE25519_SHA256:
 			SSH2_curve25519_kex_init(pvar);
+			break;
+		case KEX_SNTRUP761X25519_SHA512_OLD:
+		case KEX_SNTRUP761X25519_SHA512:
+			SSH2_kem_sntrup761x25519_kex_init(pvar);
+			break;
+		case KEX_MLKEM768X25519_SHA256:
+			SSH2_kem_mlkem768x25519_kex_init(pvar);
 			break;
 		default:
 			// TODO
@@ -5612,6 +5674,103 @@ error:;
 	buffer_free(msg);
 
 	notify_fatal_error(pvar, "error occurred @ SSH2_curve25519_kex_init()", TRUE);
+}
+
+
+/*
+ * sntrup761x25519 (draft-ietf-sshm-ntruprime-ssh)
+ *   KEX_SNTRUP761X25519_SHA512_OLD or KEX_SNTRUP761X25519_SHA512
+ *
+ * SSH2_MSG_KEX_ECDH_INIT:
+ *   byte    SSH_MSG_KEX_ECDH_INIT (31)
+ *   string  Q_C, client's ephemeral public key octet string
+ */
+
+static void SSH2_kem_sntrup761x25519_kex_init(PTInstVar pvar)
+{
+	buffer_t *msg = NULL;
+	unsigned char *outmsg;
+	int len;
+	kex *kex = pvar->kex;
+
+	if (kex_kem_sntrup761x25519_keypair(kex) != 0)
+		goto error;
+
+	msg = buffer_init();
+	if (msg == NULL) {
+		// TODO: error check
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
+		goto error;
+	}
+
+	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+
+	len = buffer_len(msg);
+	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
+	memcpy(outmsg, buffer_ptr(msg), len);
+	finish_send_packet(pvar);
+
+	SSH2_dispatch_init(pvar, 2);
+	SSH2_dispatch_add_message(SSH2_MSG_KEX_ECDH_REPLY);
+
+	buffer_free(msg);
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_INIT was sent at SSH2_kem_sntrup761x25519_kex_init().");
+
+	return;
+
+error:;
+	buffer_free(msg);
+
+	notify_fatal_error(pvar, "error occurred @ SSH2_kem_sntrup761x25519_kex_init()", TRUE);
+}
+
+
+/*
+ * mlkem761x25519 (draft-ietf-sshm-mlkem-hybrid-kex)
+ *   KEX_MLKEM768X25519_SHA256
+ *
+ * SSH_MSG_KEX_HYBRID_INIT:
+ *   byte    SSH_MSG_KEX_HYBRID_INIT (31)
+ *   string  Q_C, client's ephemeral public key octet string
+ */
+static void SSH2_kem_mlkem768x25519_kex_init(PTInstVar pvar)
+{
+	buffer_t *msg = NULL;
+	unsigned char *outmsg;
+	int len;
+	kex *kex = pvar->kex;
+
+	if (kex_kem_mlkem768x25519_keypair(kex) != 0)
+		goto error;
+
+	msg = buffer_init();
+	if (msg == NULL) {
+		// TODO: error check
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
+		goto error;
+	}
+
+	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+
+	len = buffer_len(msg);
+	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
+	memcpy(outmsg, buffer_ptr(msg), len);
+	finish_send_packet(pvar);
+
+	SSH2_dispatch_init(pvar, 2);
+	SSH2_dispatch_add_message(SSH2_MSG_KEX_ECDH_REPLY);
+
+	buffer_free(msg);
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_HYBRID_INIT was sent at SSH2_kem_mlkem768x25519_kex_init().");
+
+	return;
+
+error:;
+	buffer_free(msg);
+
+	notify_fatal_error(pvar, "error occurred @ SSH2_kem_mlkem761x25519_kex_init()", TRUE);
 }
 
 
@@ -6369,6 +6528,311 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	return result;
 }
 
+/*
+ * Key Exchange Method Using Hybrid Streamlined NTRU Prime sntrup761 and X25519 with SHA-512
+ *   Reply (SSH2_MSG_KEX_ECDH_REPLY:31)
+ *
+ * return TRUE: 成功
+ *        FALSE: 失敗
+ */
+static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
+{
+	char *data;
+	int len;
+	int bloblen, pklen, siglen;
+	kex *kex = pvar->kex;
+	Key *server_host_key = NULL;
+	buffer_t *shared_secret = NULL;
+	buffer_t *server_blob = NULL;
+	buffer_t *server_host_key_blob = NULL;
+	char *signature;
+	char hash[SSH_DIGEST_MAX_LENGTH];
+	int hashlen;
+	int r;
+
+	u_char *server_public = NULL;
+	BOOL result = FALSE;
+	char *emsg = NULL, emsg_tmp[1024]; // error message
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
+
+	memset(&server_host_key, 0, sizeof(server_host_key));
+
+	// メッセージタイプの後に続くペイロードの先頭
+	data = pvar->ssh_state.payload;
+	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
+	len = pvar->ssh_state.payloadlen - 1;
+
+	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
+
+	/* K_S, server's public host key */
+	bloblen = get_uint32_MSBfirst(data);
+	data += 4;
+	server_host_key_blob = buffer_init();
+	buffer_append(server_host_key_blob, data, bloblen);
+
+	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob", data, bloblen);
+
+	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob), buffer_len(server_host_key_blob));
+	if (server_host_key == NULL) {
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE, "%s: key_from_blob error", __FUNCTION__);
+		emsg = emsg_tmp;
+		goto out;
+	}
+	data += bloblen;
+
+	// known_hosts対応
+	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
+		            "handle_SSH2_kem_sntrup761x25519_kex_reply",
+		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
+		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
+		            get_ssh2_hostkey_type_name(server_host_key->type));
+		emsg = emsg_tmp;
+		goto out;
+	}
+
+	/* Q_S, server public key */
+	server_public = buffer_get_string(&data, &pklen); // 1039 byte sntrup761 public key + 32 bytes X25519 public key
+	server_blob = buffer_init();
+	buffer_append(server_blob, server_public, pklen);
+
+	/* signed H */
+	siglen = get_uint32_MSBfirst(data);
+	data += 4;
+	signature = data;
+	data += siglen;
+
+	push_memdump("KEX_ECDH_REPLY", "signature", signature, siglen);
+
+	/* calc shared secret K */
+	// 共通鍵の生成
+	// Writing using draft-ietf-sshm-ntruprime-ssh notation:
+	//   Q_S --+-- c   ... sntrup761 ciphertext
+	//         +-- K_B ... x25519 public key
+	//   d_C           ... x25519 private key
+	//   sk_C          ... sntrup761 private key
+	//   (x', y') = d_C * K_B
+	//   k_x25519 = stringify(x')       ... x25519 shared secret
+	//   k_sntrup = Decaps(c, sk_C)     ... sntrup761 shared secret
+	//   K = HASH(k_sntrup || k_x25519) ... hybrid shared secret
+	r = kex_kem_sntrup761x25519_dec(kex, server_blob, &shared_secret);
+	if (r != 0)
+		goto out;
+
+	/* calc and verify H */
+	// ハッシュの計算
+	// verify は ssh2_kex_finish() で行う
+	hashlen = sizeof(hash);
+	r = kex_kem_sntrup761x25519_hash(
+		kex->hash_alg,
+		kex->client_version,
+		kex->server_version,
+		kex->my,
+		kex->peer,
+		server_host_key_blob,
+		kex->client_pub,
+		server_blob,
+		shared_secret,
+		hash, &hashlen);
+	if (r < 0) {
+		goto out;
+	}
+
+	{
+		push_memdump("KEX_ECDH_REPLY kem_sntrup761x25519_kex_reply", "my_kex", buffer_ptr(kex->my), buffer_len(kex->my));
+		push_memdump("KEX_ECDH_REPLY kem_sntrup761x25519_kex_reply", "peer_kex", buffer_ptr(kex->peer), buffer_len(kex->peer));
+
+		push_memdump("KEX_ECDH_REPLY kem_sntrup761x25519_kex_reply", "server_public", server_public, pklen);
+		push_memdump("KEX_ECDH_REPLY kem_sntrup761x25519_kex_reply", "shared_secret", buffer_ptr(shared_secret),
+		             buffer_len(shared_secret));
+
+		push_memdump("KEX_ECDH_REPLY kem_sntrup761x25519_kex_reply", "hash", hash, hashlen);
+	}
+
+	// TTSSHバージョン情報に表示するキービット数を求めておく
+	//   アルゴリズムから曲線サイズ・暗号学的強度が確定するので、ビット数は表示しない
+	kex->client_key_bits = 0;
+	kex->server_key_bits = 0;
+
+	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
+
+	r = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
+	if (r == TRUE) {
+		// ホスト鍵の確認が成功したので、後続の処理を行う
+		SSH_notify_host_OK(pvar);
+		// known_hostsダイアログの呼び出したので、以降、何もしない。
+	}
+
+ out:
+	SecureZeroMemory(hash, sizeof(hash));
+	buffer_free(server_host_key_blob);
+	free(server_public);
+	key_free(server_host_key);
+	SecureZeroMemory(kex->c25519_client_key, sizeof(kex->c25519_client_key));
+	SecureZeroMemory(kex->sntrup761_client_key, sizeof(kex->sntrup761_client_key));
+	buffer_free(server_blob);
+	buffer_free(shared_secret);
+	buffer_free(kex->client_pub);
+	kex->client_pub = NULL;
+
+	if (emsg)
+		notify_fatal_error(pvar, emsg, TRUE);
+
+	return result;
+}
+
+/*
+ * PQ/T Hybrid Key Exchange with ML-KEM
+ *   Reply (SSH_MSG_KEX_HYBRID_REPLY:31)
+ *
+ * return TRUE: 成功
+ *        FALSE: 失敗
+ */
+static BOOL handle_SSH2_kem_mlkem768x25519_kex_reply(PTInstVar pvar)
+{
+	char *data;
+	int len;
+	int bloblen, pklen, siglen;
+	kex *kex = pvar->kex;
+	Key *server_host_key = NULL;
+	buffer_t *shared_secret = NULL;
+	buffer_t *server_blob = NULL;
+	buffer_t *server_host_key_blob = NULL;
+	char *signature;
+	char hash[SSH_DIGEST_MAX_LENGTH];
+	int hashlen;
+	int r;
+
+	u_char *server_public = NULL;
+	BOOL result = FALSE;
+	char *emsg = NULL, emsg_tmp[1024]; // error message
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_HYBRID_REPLY was received.");
+
+	memset(&server_host_key, 0, sizeof(server_host_key));
+
+	// メッセージタイプの後に続くペイロードの先頭
+	data = pvar->ssh_state.payload;
+	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
+	len = pvar->ssh_state.payloadlen - 1;
+
+	push_memdump("KEX_HYBRID_REPLY", "key exchange: receiving", data, len);
+
+	/* K_S, server's public host key */
+	bloblen = get_uint32_MSBfirst(data);
+	data += 4;
+	server_host_key_blob = buffer_init();
+	buffer_append(server_host_key_blob, data, bloblen);
+
+	push_memdump("KEX_HYBRID_REPLY", "server_host_key_blob", data, bloblen);
+
+	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob), buffer_len(server_host_key_blob));
+	if (server_host_key == NULL) {
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE, "%s: key_from_blob error", __FUNCTION__);
+		emsg = emsg_tmp;
+		goto out;
+	}
+	data += bloblen;
+
+	// known_hosts対応
+	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s(%s) blob:%s)",
+		            "handle_SSH2_kem_mlkem768x25519_kex_reply",
+		            get_ssh2_hostkey_type_name_from_algorithm(kex->hostkey_type),
+		            get_ssh2_hostkey_algorithm_name(kex->hostkey_type),
+		            get_ssh2_hostkey_type_name(server_host_key->type));
+		emsg = emsg_tmp;
+		goto out;
+	}
+
+	/* S_REPLY, server public key */
+	server_public = buffer_get_string(&data, &pklen); // 1088 byte mlkem768 public key + 32 bytes X25519 public key
+	server_blob = buffer_init();
+	buffer_append(server_blob, server_public, pklen);
+
+	/* signed H */
+	siglen = get_uint32_MSBfirst(data);
+	data += 4;
+	signature = data;
+	data += siglen;
+
+	push_memdump("KEX_HYBRID_REPLY", "signature", signature, siglen);
+
+	/* calc shared secret K */
+	// 共通鍵の生成
+	// Writing using draft-ietf-sshm-mlkem-hybrid-kex notation:
+	//   S_REPLY --+-- S_CT2 ... mlkem768 ciphertext
+	//             +-- S_PK1 ... x25519 public key
+	//   d_C                 ... x25519 private key
+	//   sk_C                ... mlkem768 private key
+	//   (x', y') = d_C * S_PK1
+	//   K_CL = stringify(x')       ... x25519 shared secret
+	//   K_PQ = Decaps(S_CT2, sk_C) ... mlkem768 shared secret
+	//   K = HASH(K_PQ || K_CL)     ... hybrid shared secret
+	r = kex_kem_mlkem768x25519_dec(kex, server_blob, &shared_secret);
+	if (r != 0)
+		goto out;
+
+	/* calc and verify H */
+	// ハッシュの計算
+	// verify は ssh2_kex_finish() で行う
+	hashlen = sizeof(hash);
+	r = kex_kem_mlkem768x25519_hash(
+		kex->hash_alg,
+		kex->client_version,
+		kex->server_version,
+		kex->my,
+		kex->peer,
+		server_host_key_blob,
+		kex->client_pub,
+		server_blob,
+		shared_secret,
+		hash, &hashlen);
+	if (r < 0) {
+		goto out;
+	}
+
+	{
+		push_memdump("KEX_HYBRID_REPLY kem_mlkem768x25519_kex_reply", "my_kex", buffer_ptr(kex->my), buffer_len(kex->my));
+		push_memdump("KEX_HYBRID_REPLY kem_mlkem768x25519_kex_reply", "peer_kex", buffer_ptr(kex->peer), buffer_len(kex->peer));
+
+		push_memdump("KEX_HYBRID_REPLY kem_mlkem768x25519_kex_reply", "server_public", server_public, pklen);
+		push_memdump("KEX_HYBRID_REPLY kem_mlkem768x25519_kex_reply", "shared_secret", buffer_ptr(shared_secret),
+		             buffer_len(shared_secret));
+
+		push_memdump("KEX_HYBRID_REPLY kem_mlkem768x25519_kex_reply", "hash", hash, hashlen);
+	}
+
+	result = ssh2_kex_finish(pvar, hash, hashlen, shared_secret, server_host_key, signature, siglen);
+
+	r = HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, server_host_key);
+	if (r == TRUE) {
+		// ホスト鍵の確認が成功したので、後続の処理を行う
+		SSH_notify_host_OK(pvar);
+		// known_hostsダイアログの呼び出したので、以降、何もしない。
+	}
+
+ out:
+	SecureZeroMemory(hash, sizeof(hash));
+	buffer_free(server_host_key_blob);
+	free(server_public);
+	key_free(server_host_key);
+	SecureZeroMemory(kex->c25519_client_key, sizeof(kex->c25519_client_key));
+	SecureZeroMemory(kex->mlkem768_client_key, sizeof(kex->mlkem768_client_key));
+	buffer_free(server_blob);
+	buffer_free(shared_secret);
+	buffer_free(kex->client_pub);
+	kex->client_pub = NULL;
+
+	if (emsg)
+		notify_fatal_error(pvar, emsg, TRUE);
+
+	return result;
+}
+
 
 // KEXにおいてサーバから返ってくる 31 番メッセージに対するハンドラ
 static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar)
@@ -6393,6 +6857,13 @@ static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar)
 		case KEX_CURVE25519_SHA256_OLD:
 		case KEX_CURVE25519_SHA256:
 			handle_SSH2_curve25519_kex_reply(pvar);
+			break;
+		case KEX_SNTRUP761X25519_SHA512_OLD:
+		case KEX_SNTRUP761X25519_SHA512:
+			handle_SSH2_kem_sntrup761x25519_kex_reply(pvar);
+			break;
+		case KEX_MLKEM768X25519_SHA256:
+			handle_SSH2_kem_mlkem768x25519_kex_reply(pvar);
 			break;
 		default:
 			// TODO
@@ -7002,8 +7473,6 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 	else {
 		// チャネル設定
 		// FWD_prep_forwarding()でshell IDを使うので、先に設定を持ってくる。(2005.7.3 yutaka)
-		// changed window size from 64KB to 32KB. (2006.3.6 yutaka)
-		// changed window size from 32KB to 128KB. (2007.10.29 maya)
 		if (pvar->use_subsystem) {
 			c = ssh2_channel_new(pvar, CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SUBSYSTEM_GEN, -1);
 		}
@@ -8053,7 +8522,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 		}
 
 		if (!send_channel_request_gen(pvar, c, "exec", want_reply, buff, NULL)) {
-			return FALSE;;
+			return FALSE;
 		}
 
 		// SCPで remote-to-local の場合は、サーバからのファイル送信要求を出す。
@@ -8067,7 +8536,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 
 	case TYPE_SFTP:
 		if (!send_channel_request_gen(pvar, c, "subsystem", want_reply, "sftp", NULL)) {
-			return FALSE;;
+			return FALSE;
 		}
 
 		// SFTPセッションを開始するためのネゴシエーションを行う。
@@ -8077,7 +8546,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 
 	case TYPE_SUBSYSTEM_GEN:
 		if (!send_channel_request_gen(pvar, c, "subsystem", want_reply, pvar->subsystem_name, NULL)) {
-			return FALSE;;
+			return FALSE;
 		}
 		pvar->session_nego_status = 0;
 		break;
@@ -8286,7 +8755,7 @@ static BOOL handle_SSH2_channel_success(PTInstVar pvar)
 		}
 
 		if (!send_channel_request_gen(pvar, c, "shell", want_reply, NULL, NULL)) {
-			return FALSE;;
+			return FALSE;
 		}
 
 		if (want_reply == 0) {
@@ -8349,15 +8818,12 @@ static BOOL handle_SSH2_channel_failure(PTInstVar pvar)
 // クライアントのwindow sizeをサーバへ知らせる
 static void do_SSH2_adjust_window_size(PTInstVar pvar, Channel_t *c)
 {
-	// window sizeを32KBへ変更し、local windowの判別を修正。
-	// これによりSSH2のスループットが向上する。(2006.3.6 yutaka)
 	buffer_t *msg;
 	unsigned char *outmsg;
 	int len;
 
 	// ローカルのwindow sizeにまだ余裕があるなら、何もしない。
-	// added /2 (2006.3.6 yutaka)
-	if (c->local_window > c->local_window_max/2)
+	if (c->local_window >= SCPRCV_LOW_WATER_MARK)
 		return;
 
 	{
@@ -8419,7 +8885,6 @@ void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c)
 
 #define WM_SENDING_FILE (WM_USER + 1)
 #define WM_CHANNEL_CLOSE (WM_USER + 2)
-#define WM_GET_CLOSED_STATUS (WM_USER + 3)
 
 typedef struct scp_dlg_parm {
 	Channel_t *c;
@@ -8430,11 +8895,8 @@ typedef struct scp_dlg_parm {
 
 static INT_PTR CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-	static int closed = 0;
-
 	switch (msg) {
 		case WM_INITDIALOG:
-			closed = 0;
 			CenterWindow(hWnd, GetParent(hWnd));
 			return FALSE;
 
@@ -8471,10 +8933,10 @@ static INT_PTR CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 					// ウィンドウをいきなり破棄するのではなく、非表示にするのみとして、
 					// スレッドからのメッセージを処理できるようにする。
 					// (2011.6.8 yutaka)
-					//EndDialog(hWnd, 0);
+					//TTEndDialog(hWnd, 0);
 					//DestroyWindow(hWnd);
-					ShowWindow(hWnd, SW_HIDE);
-					closed = 1;
+					Channel_t *c = (Channel_t *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+					c->scp.canceled = TRUE;
 					return TRUE;
 				default:
 					return FALSE;
@@ -8488,14 +8950,104 @@ static INT_PTR CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 		case WM_DESTROY:
 			return TRUE;
 
-		case WM_GET_CLOSED_STATUS:
-			{
-			int *flag = (int *)wp;
+		default:
+			return FALSE;
+	}
+	return TRUE;
+}
 
+//
+// SCP 進捗ダイアログの描画スレッドのウィンドウプロシージャ
+//
+static INT_PTR CALLBACK ssh_scp_dlg_thread_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+	Channel_t *c;
 
+	switch (msg) {
+		case WM_INITDIALOG:
+			// 閉じるボタンをグレーアウトする
+			HMENU hSysMenu = GetSystemMenu(hWnd, FALSE);
+			EnableMenuItem(hSysMenu, SC_CLOSE, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+			// 最小化時、タスクバーにアイコンが表示されるようにする
+			DWORD dwExStyle = GetWindowLong(hWnd, GWL_EXSTYLE);
+			dwExStyle |= WS_EX_APPWINDOW;
+			SetWindowLong(hWnd, GWL_EXSTYLE, dwExStyle);
+			CenterWindow(hWnd, GetParent(hWnd));
+			return FALSE;
 
-			*flag = closed;
+		case WM_TIMER:
+			// socket or channelがクローズされていたら何もしない
+			c = (Channel_t *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			PTInstVar pvar = c->scp.pvar;
+			if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
+				return FALSE;
 			}
+
+			long long transfered;
+			long long filesize;
+			if (c->scp.dir == TOREMOTE) {
+				// 送信
+				transfered = c->scp.filesndsize;
+				filesize = c->scp.filestat.st_size;
+			} else {
+				// 受信
+				transfered = c->scp.filercvsize;
+				filesize = c->scp.filetotalsize;
+			}
+
+			int rate = (int)(100 * transfered / filesize);
+			char s[80];
+			_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", transfered, filesize, rate);
+			SendMessage(GetDlgItem(hWnd, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
+			if (c->scp.ProgStat != rate) {
+				c->scp.ProgStat = rate;
+				SendDlgItemMessage(hWnd, IDC_PROGBAR, PBM_SETPOS, (WPARAM)c->scp.ProgStat, 0);
+			}
+
+			int elapsed = (GetTickCount() - c->scp.stime) / 1000;
+			if (elapsed > c->scp.prev_elapsed) {
+				if (elapsed > 2) {
+					rate = (int)(transfered / elapsed);
+					if (rate < 1200) {
+						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d %s)", elapsed / 60, elapsed % 60, rate, "Bytes/s");
+					} else if (rate < 1200000) {
+						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100, "KBytes/s");
+					} else {
+						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100, "MBytes/s");
+					}
+				} else {
+					_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d", elapsed / 60, elapsed % 60);
+				}
+				SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
+				c->scp.prev_elapsed = elapsed;
+			}
+			c->scp.ProcessedTime = GetTickCount();
+			return FALSE;
+
+		case WM_COMMAND:
+			switch (LOWORD(wp)) {
+				case IDOK:
+					return TRUE;
+
+				case IDCANCEL:
+					// SCP送信スレッドにIDCANCELを送信する
+					c = (Channel_t *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+					SendMessage(c->scp.progress_window, WM_COMMAND, IDCANCEL, 0);
+					KillTimer(hWnd, c->self_id);
+					TTEndDialog(hWnd, 0);
+					DestroyWindow(hWnd);
+					return TRUE;
+
+				default:
+					return FALSE;
+			}
+			break;
+
+		case WM_CLOSE:
+			// closeボタンが押下されても window が閉じないようにする。
+			return TRUE;
+
+		case WM_DESTROY:
 			return TRUE;
 
 		default:
@@ -8504,48 +9056,122 @@ static INT_PTR CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 	return TRUE;
 }
 
-static int is_canceled_window(HWND hd)
+//
+//  SCP 進捗ダイアログの描画スレッド
+//
+static unsigned __stdcall ssh_scp_dlg_thread(void *p)
 {
-	int closed = 0;
+	Channel_t *c = (Channel_t *)p;
+	PTInstVar pvar = c->scp.pvar;
+	BOOL bRet;
+	MSG msg;
 
-	SendMessage(hd, WM_GET_CLOSED_STATUS, (WPARAM)&closed, 0);
-	if (closed)
+#if 1 // 高負荷対策
+	// スレッドの優先度を上げる
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+#endif
+	HWND hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_SSHSCP_PROGRESS),
+							 pvar->cv->HWin, ssh_scp_dlg_thread_proc);
+	if (hDlgWnd == NULL) {
 		return 1;
-	else
-		return 0;
+	}
+
+	if (c->scp.dir == TOREMOTE) {
+		// 送信
+		static const DlgTextInfo text_info[] = {
+			{ 0, "DLG_SCP_PROGRESS_TITLE_SENDFILE" },
+			{ IDC_SCP_PROGRESS_FILENAME_LABEL, "DLG_SCP_PROGRESS_FILENAME_LABEL" },
+			{ IDC_SCP_PROGRESS_BYTE_LABEL, "DLG_SCP_PROGRESS_BYTES_LABEL" },
+			{ IDC_SCP_PROGRESS_TIME_LABEL, "DLG_SCP_PROGRESS_TIME_LABEL" },
+		};
+		SetI18nDlgStrsW(hDlgWnd, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
+	} else {
+		// 受信
+		static const DlgTextInfo text_info[] = {
+			{ 0, "DLG_SCP_PROGRESS_TITLE_RECEIVEFILE" },
+			{ IDC_SCP_PROGRESS_FILENAME_LABEL, "DLG_SCP_PROGRESS_FILENAME_LABEL" },
+			{ IDC_SCP_PROGRESS_BYTE_LABEL, "DLG_SCP_PROGRESS_BYTES_LABEL" },
+			{ IDC_SCP_PROGRESS_TIME_LABEL, "DLG_SCP_PROGRESS_TIME_LABEL" },
+		};
+		SetWindowText(hDlgWnd, "TTSSH: SCP receiving file");
+		SetI18nDlgStrsW(hDlgWnd, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
+	}
+
+	SetDlgItemTextU8(hDlgWnd, IDC_FILENAME, c->scp.localfilefull);
+	InitDlgProgress(hDlgWnd, IDC_PROGBAR, &(c->scp.ProgStat));
+	c->scp.prev_elapsed = 0;
+	c->scp.filesndsize = 0;
+	c->scp.canceled = FALSE;
+	c->scp.stime = GetTickCount();
+	c->scp.ProcessedTime = c->scp.stime;
+	SetWindowLongPtr(hDlgWnd, GWLP_USERDATA, (LONG_PTR)c);
+	SetTimer(hDlgWnd, c->self_id, SCPDLG_UPDATE_INTERVAL, NULL);
+	ShowWindow(hDlgWnd, SW_SHOW);
+	SetEvent(c->scp.ScpStartThreadEvent);
+
+	while ((bRet = GetMessage(&msg, hDlgWnd, 0, 0)) != 0) {
+		if (bRet == -1) {
+			break;
+		}
+		// キャンセルボタン押下 or socket or channelがクローズされたらスレッドを終わる
+		if (c->scp.canceled == TRUE || pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
+			break;
+		}
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+		Sleep(0);
+	}
+
+	return 0;
 }
 
+//
+//  SCP 進捗ダイアログの描画スレッドを起動
+//
+static HANDLE start_ssh_scp_dlg_thread(Channel_t *c)
+{
+	unsigned int tid;
+
+	HANDLE thread = (HANDLE)_beginthreadex(NULL, 0, ssh_scp_dlg_thread, c, 0, &tid);
+	if (thread == 0) {
+		return 0;
+	}
+	// スレッド起動待ち
+	WaitForSingleObject(c->scp.ScpStartThreadEvent, 5000 /*msec*/);
+	ResetEvent(c->scp.ScpStartThreadEvent);
+	c->scp.stime = GetTickCount();
+	return thread;
+}
+
+//
+//  SCP ファイル送信スレッド
+//
 static unsigned __stdcall ssh_scp_thread(void *p)
 {
 	Channel_t *c = (Channel_t *)p;
 	PTInstVar pvar = c->scp.pvar;
-	long long total_size = 0;
 	char *buf = NULL;
 	size_t buflen;
-	char s[80];
 	size_t ret;
 	HWND hWnd = c->scp.progress_window;
 	scp_dlg_parm_t parm;
-	int rate, ProgStat;
-	DWORD stime;
-	int elapsed, prev_elapsed;
+
+	HANDLE thread = start_ssh_scp_dlg_thread(c);
+	if (thread == 0) {
+		// TODO:
+		return 0;
+	}
 
 	buflen = min(c->remote_window, 8192*4); // max 32KB
 	buf = malloc(buflen);
 
-	SetDlgItemTextU8(hWnd, IDC_FILENAME, c->scp.localfilefull);
-
-	InitDlgProgress(hWnd, IDC_PROGBAR, &ProgStat);
-
-	stime = GetTickCount();
-	prev_elapsed = 0;
-
 	do {
-		int readlen, count=0;
+		int readlen, count = 0;
 
 		// Cancelボタンが押下されたらウィンドウが消える。
-		if (is_canceled_window(hWnd))
+		if (c->scp.canceled == TRUE) {
 			goto cancel_abort;
+		}
 
 		// ファイルから読み込んだデータはかならずサーバへ送信する。
 		readlen = max(4096, min(buflen, c->remote_window)); // min 4KB
@@ -8553,23 +9179,22 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 		if (ret == 0)
 			break;
 
-		// remote_window が回復するまで待つ
-		do {
-			// socket or channelがクローズされたらスレッドを終わる
-			if (pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0)
-				goto abort;
+		EnterCriticalSection(&g_ssh_scp_thread_lock);
+		if (ret > c->remote_window) {
+			// remote_window が回復するまで最大10秒待つ
+			c->scp.sendsize = ret;
+			ResetEvent(c->scp.ScpSendThreadEvent);
+			LeaveCriticalSection(&g_ssh_scp_thread_lock);
+			WaitForSingleObject(c->scp.ScpSendThreadEvent, 10000 /*msec*/);
+			c->scp.sendsize = SIZE_MAX;
+		} else {
+			LeaveCriticalSection(&g_ssh_scp_thread_lock);
+		}
 
-			if (ret > c->remote_window) {
-				Sleep(100);
-			}
-
-			// 100回抜けられなかったら抜けてしまう
-			count++;
-			if (count > 100) {
-				break;
-			}
-
-		} while (ret > c->remote_window);
+		// socket or channelがクローズされたらスレッドを終わる
+		if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
+			goto abort;
+		}
 
 		// sending data
 		parm.buf = buf;
@@ -8578,37 +9203,20 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 		parm.pvar = pvar;
 		SendMessage(hWnd, WM_SENDING_FILE, (WPARAM)&parm, 0);
 
-		total_size += ret;
-
-		rate = (int)(100 * total_size / c->scp.filestat.st_size);
-		_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", total_size, c->scp.filestat.st_size, rate);
-		SendMessage(GetDlgItem(hWnd, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
-		if (ProgStat != rate) {
-			ProgStat = rate;
-			SendDlgItemMessage(hWnd, IDC_PROGBAR, PBM_SETPOS, (WPARAM)ProgStat, 0);
-		}
-
-		elapsed = (GetTickCount() - stime) / 1000;
-		if (elapsed > prev_elapsed) {
-			if (elapsed > 2) {
-				rate = (int)(total_size / elapsed);
-				if (rate < 1200) {
-					_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d %s)", elapsed / 60, elapsed % 60, rate, "Bytes/s");
-				}
-				else if (rate < 1200000) {
-					_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100, "KBytes/s");
-				}
-				else {
-					_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100, "MBytes/s");
-				}
+		c->scp.filesndsize += ret;
+#if 1 // 高負荷対策
+		// 進捗ダイアログの描画が間に合わない場合は、負荷が下がるまで待つ
+		while (GetTickCount() - c->scp.ProcessedTime > SCPDLG_UPDATE_INTERVAL * 3) {
+			Sleep(20);
+			if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
+				goto cancel_abort;
 			}
-			else {
-				_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d", elapsed / 60, elapsed % 60);
+			if (c->scp.canceled == TRUE) {
+				pvar->recv.close_request = TRUE;
+				goto cancel_abort;
 			}
-			SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
-			prev_elapsed = elapsed;
 		}
-
+#endif
 	} while (ret <= buflen);
 
 	// eof
@@ -8621,10 +9229,8 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 	parm.pvar = pvar;
 	SendMessage(hWnd, WM_SENDING_FILE, (WPARAM)&parm, 0);
 
-	ShowWindow(hWnd, SW_HIDE);
-
 	free(buf);
-
+	CloseHandle(thread);
 	return 0;
 
 cancel_abort:
@@ -8636,9 +9242,8 @@ cancel_abort:
 	SendMessage(hWnd, WM_CHANNEL_CLOSE, (WPARAM)&parm, 0);
 
 abort:
-
 	free(buf);
-
+	CloseHandle(thread);
 	return 0;
 }
 
@@ -8668,19 +9273,12 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 		HANDLE thread;
 		unsigned int tid;
 
+		c->scp.pvar = pvar;
 		hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_SSHSCP_PROGRESS),
 								 pvar->cv->HWin, ssh_scp_dlg_proc);
 		if (hDlgWnd != NULL) {
-			static const DlgTextInfo text_info[] = {
-				{ 0, "DLG_SCP_PROGRESS_TITLE_SENDFILE" },
-				{ IDC_SCP_PROGRESS_FILENAME_LABEL, "DLG_SCP_PROGRESS_FILENAME_LABEL" },
-				{ IDC_SCP_PROGRESS_BYTE_LABEL, "DLG_SCP_PROGRESS_BYTES_LABEL" },
-				{ IDC_SCP_PROGRESS_TIME_LABEL, "DLG_SCP_PROGRESS_TIME_LABEL" },
-			};
-			SetI18nDlgStrsW(hDlgWnd, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
-
 			c->scp.progress_window = hDlgWnd;
-			ShowWindow(hDlgWnd, SW_SHOW);
+			SetWindowLongPtr(hDlgWnd, GWLP_USERDATA, (LONG_PTR)c);
 		}
 
 		thread = (HANDLE)_beginthreadex(NULL, 0, ssh_scp_thread, c, 0, &tid);
@@ -8689,7 +9287,6 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 			thread = INVALID_HANDLE_VALUE;
 		}
 		c->scp.thread = thread;
-
 
 	} else if (c->scp.state == SCP_DATA) {
 		// 送信完了
@@ -8701,143 +9298,106 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 }
 
 
+//
+//  SCP ファイル受信スレッド
+//
+
 #define WM_RECEIVING_FILE (WM_USER + 2)
 
 static unsigned __stdcall ssh_scp_receive_thread(void *p)
 {
 	Channel_t *c = (Channel_t *)p;
 	PTInstVar pvar = c->scp.pvar;
-	long long total_size = 0;
-	char s[80];
 	HWND hWnd = c->scp.progress_window;
 	MSG msg;
 	unsigned char *data;
 	unsigned int buflen;
-	int eof;
-	int rate, ProgStat;
-	DWORD stime;
-	int elapsed, prev_elapsed;
+	int eof = 0;
 	scp_dlg_parm_t parm;
 
-	InitDlgProgress(hWnd, IDC_PROGBAR, &ProgStat);
-
-	stime = GetTickCount();
-	prev_elapsed = 0;
+	HANDLE thread = start_ssh_scp_dlg_thread(c);
+	if (thread == 0) {
+		// TODO:
+		return 0;
+	}
 
 	for (;;) {
-		// Cancelボタンが押下されたらウィンドウが消える。
-		if (is_canceled_window(hWnd))
-			goto cancel_abort;
+		WaitForSingleObject(c->scp.ScpReceiveThreadEvent, 100);
+		do {
+			ssh2_scp_get_packetlist(pvar, c, &data, &buflen);
+			if (data && buflen) {
+				msg.message = WM_RECEIVING_FILE;
 
-		ssh2_scp_get_packetlist(pvar, c, &data, &buflen);
-		if (data && buflen) {
-			msg.message = WM_RECEIVING_FILE;
+				switch (msg.message) {
+				case WM_RECEIVING_FILE:
+					//data = (unsigned char *)msg.wParam;
+					//buflen = (unsigned int)msg.lParam;
 
-			switch (msg.message) {
-			case WM_RECEIVING_FILE:
-				//data = (unsigned char *)msg.wParam;
-				//buflen = (unsigned int)msg.lParam;
-				eof = 0;
+					if (c->scp.filercvsize >= c->scp.filetotalsize) { // EOF
+						free(data);  // free!
+						goto done;
+					}
 
-				if (c->scp.filercvsize >= c->scp.filetotalsize) { // EOF
+					if (c->scp.filercvsize + buflen > c->scp.filetotalsize) { // overflow (include EOF)
+						buflen = (unsigned int)(c->scp.filetotalsize - c->scp.filercvsize);
+						eof = 1;
+					}
+
+					c->scp.filercvsize += buflen;
+
+					if (fwrite(data, 1, buflen, c->scp.localfp) < buflen) { // error
+						// TODO:
+					}
+
 					free(data);  // free!
-					goto done;
+
+					if (eof)
+						goto done;
+
+					break;
 				}
-
-				if (c->scp.filercvsize + buflen > c->scp.filetotalsize) { // overflow (include EOF)
-					buflen = (unsigned int)(c->scp.filetotalsize - c->scp.filercvsize);
-					eof = 1;
-				}
-
-				c->scp.filercvsize += buflen;
-
-				if (fwrite(data, 1, buflen, c->scp.localfp) < buflen) { // error
-					// TODO:
-				}
-
-				free(data);  // free!
-
-				rate =(int)(100 * c->scp.filercvsize / c->scp.filetotalsize);
-				_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", c->scp.filercvsize, c->scp.filetotalsize, rate);
-				SendMessage(GetDlgItem(c->scp.progress_window, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
-
-				if (ProgStat != rate) {
-					ProgStat = rate;
-					SendDlgItemMessage(c->scp.progress_window, IDC_PROGBAR, PBM_SETPOS, (WPARAM)ProgStat, 0);
-				}
-
-				elapsed = (GetTickCount() - stime) / 1000;
-				if (elapsed > prev_elapsed) {
-					if (elapsed > 2) {
-						rate = (int)(c->scp.filercvsize / elapsed);
-						if (rate < 1200) {
-							_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d %s)", elapsed / 60, elapsed % 60, rate, "Bytes/s");
-						}
-						else if (rate < 1200000) {
-							_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100, "KBytes/s");
-						}
-						else {
-							_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100, "MBytes/s");
-						}
-					}
-					else {
-						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d", elapsed / 60, elapsed % 60);
-					}
-					SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
-					prev_elapsed = elapsed;
-				}
-
-				if (eof)
-					goto done;
-
-				break;
 			}
-		}
-		Sleep(0);
+
+			// socket or channelがクローズされたらスレッドを終わる
+			if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
+				goto cancel_abort;
+			}
+
+			// Cancelボタンが押下されたらウィンドウが消える。
+			if (c->scp.canceled == TRUE) {
+				pvar->recv.close_request = TRUE;
+				goto cancel_abort;
+			}
+#if 1 // 高負荷対策
+			// 進捗ダイアログの描画が間に合わない場合は、負荷が下がるまで待つ
+			while (GetTickCount() - c->scp.ProcessedTime > SCPDLG_UPDATE_INTERVAL * 3) {
+				Sleep(20);
+				if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
+					goto cancel_abort;
+				}
+				if (c->scp.canceled == TRUE) {
+					pvar->recv.close_request = TRUE;
+					goto cancel_abort;
+				}
+			}
+#endif
+		} while (c->scp.pktlist_head);
+		ResetEvent(c->scp.ScpReceiveThreadEvent);
 	}
 
 done:
 	c->scp.state = SCP_CLOSING;
-	ShowWindow(c->scp.progress_window, SW_HIDE);
 
+cancel_abort:
 	// チャネルのクローズを行いたいが、直接 ssh2_channel_send_close() を呼び出すと、
 	// 当該関数がスレッドセーフではないため、SCP処理が正常に終了しない場合がある。
 	// (2011.6.1 yutaka)
 	parm.c = c;
 	parm.pvar = pvar;
 	SendMessage(hWnd, WM_CHANNEL_CLOSE, (WPARAM)&parm, 0);
+
+	CloseHandle(thread);
 	return 0;
-
-cancel_abort:
-	pvar->recv.close_request = TRUE;
-	return 0;
-}
-
-// do_SSH2_adjust_window_size() をある程度時間が経過してからコールする
-// フロー制御、受信処理を再開
-static void CALLBACK do_SSH2_adjust_window_size_timer(
-	HWND hWnd, UINT uMsg, UINT_PTR nIDEvent, DWORD dwTime)
-{
-	Channel_t *c = (Channel_t *)nIDEvent;
-	PTInstVar pvar = c->scp.pvar;
-
-	(void)hWnd;
-	(void)uMsg;
-	(void)dwTime;
-
-	if (pvar->recv.data_finished) {
-		// 送信終了したのにメッセージが残っていた時対策
-		return;
-	}
-	if (pvar->recv.timer_id != 0) {
-		// SetTimer() はインターバルに発生するので削除する
-		KillTimer(pvar->cv->HWin, pvar->recv.timer_id);
-		pvar->recv.timer_id = 0;
-	}
-
-	logprintf(LOG_LEVEL_NOTICE, "%s: SCP receive, send SSH_MSG_CHANNEL_WINDOW_ADJUST", __FUNCTION__);
-	pvar->recv.suspended = FALSE;
-	do_SSH2_adjust_window_size(pvar, c);
 }
 
 // SSHサーバから送られてきたファイルのデータをリストにつなぐ。
@@ -8846,15 +9406,15 @@ static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 {
 	PacketList_t *p, *old;
 
-	EnterCriticalSection(&g_ssh_scp_lock);
-
 	// allocate new buffer
 	p = malloc(sizeof(PacketList_t));
 	if (p == NULL)
-		goto error;
+		return;
 	p->buf = buf;
 	p->buflen = buflen;
 	p->next = NULL;
+
+	EnterCriticalSection(&g_ssh_scp_lock);
 
 	if (c->scp.pktlist_head == NULL) {
 		c->scp.pktlist_head = p;
@@ -8879,14 +9439,14 @@ static void ssh2_scp_add_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 		pvar->recv.suspended = TRUE;
 	}
 
+	LeaveCriticalSection(&g_ssh_scp_lock);
+	SetEvent(c->scp.ScpReceiveThreadEvent);
+
 	logprintf(LOG_LEVEL_NOTICE,
 		"%s: channel=#%d SCP recv %u(bytes) and enqueued.%s",
 		__FUNCTION__, c->self_id, c->scp.pktlist_cursize,
 		pvar->recv.suspended ? "(suspended)" : ""
 	);
-
-error:;
-	LeaveCriticalSection(&g_ssh_scp_lock);
 }
 
 static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char **buf, unsigned int *buflen)
@@ -8898,7 +9458,8 @@ static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 	if (c->scp.pktlist_head == NULL) {
 		*buf = NULL;
 		*buflen = 0;
-		goto end;
+		LeaveCriticalSection(&g_ssh_scp_lock);
+		return;
 	}
 
 	p = c->scp.pktlist_head;
@@ -8910,45 +9471,44 @@ static void ssh2_scp_get_packetlist(PTInstVar pvar, Channel_t *c, unsigned char 
 	if (c->scp.pktlist_head == NULL)
 		c->scp.pktlist_tail = NULL;
 
-	free(p);
-
 	// キューに詰んだデータの総サイズを減算する。
 	c->scp.pktlist_cursize -= *buflen;
 
 	// キューに詰んだデータの総サイズが下限閾値を下回った場合、
 	// SSHサーバへwindow sizeの更新を再開する
-	if (c->scp.pktlist_cursize <= SCPRCV_LOW_WATER_MARK) {
+	if (c->scp.pktlist_cursize < SCPRCV_LOW_WATER_MARK) {
 		logprintf(LOG_LEVEL_NOTICE, "%s: SCP receive resumed", __FUNCTION__);
 		// ブロックしている場合
 		if (pvar->recv.suspended) {
 			// SCP受信のブロックを解除する。
 			pvar->recv.suspended = FALSE;
 			if (c->scp.filercvsize < c->scp.filetotalsize) {
-				// 続きを受信
-				pvar->recv.timer_id =
-					SetTimer(pvar->cv->HWin, (UINT_PTR)c, USER_TIMER_MINIMUM, do_SSH2_adjust_window_size_timer);
+				// windowサイズを調整する
+				do_SSH2_adjust_window_size(pvar, c);
 			}
 		}
 	}
 
+	unsigned long pktlist_cursize = c->scp.pktlist_cursize;
+	BOOL suspended = pvar->recv.suspended;
+
+	LeaveCriticalSection(&g_ssh_scp_lock);
+
+	free(p);
+
 	logprintf(LOG_LEVEL_NOTICE,
 		"%s: channel=#%d SCP recv %u(bytes) and dequeued.%s",
-		__FUNCTION__, c->self_id, c->scp.pktlist_cursize,
-		pvar->recv.suspended ? "(suspended)" : ""
+		__FUNCTION__, c->self_id, pktlist_cursize,
+		suspended ? "(suspended)" : ""
 	);
-
-end:;
-	LeaveCriticalSection(&g_ssh_scp_lock);
 }
 
 static void ssh2_scp_alloc_packetlist(PTInstVar pvar, Channel_t *c)
 {
 	c->scp.pktlist_head = NULL;
 	c->scp.pktlist_tail = NULL;
-	InitializeCriticalSection(&g_ssh_scp_lock);
 	c->scp.pktlist_cursize = 0;
 	pvar->recv.suspended = FALSE;
-	pvar->recv.timer_id = 0;
 	pvar->recv.close_request = FALSE;
 }
 
@@ -8967,7 +9527,6 @@ static void ssh2_scp_free_packetlist(PTInstVar pvar, Channel_t *c)
 
 	c->scp.pktlist_head = NULL;
 	c->scp.pktlist_tail = NULL;
-	DeleteCriticalSection(&g_ssh_scp_lock);
 }
 
 static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen)
@@ -9017,17 +9576,8 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_SSHSCP_PROGRESS),
 									 pvar->cv->HWin, ssh_scp_dlg_proc);
 			if (hDlgWnd != NULL) {
-				static const DlgTextInfo text_info[] = {
-					{ 0, "DLG_SCP_PROGRESS_TITLE_RECEIVEFILE" },
-					{ IDC_SCP_PROGRESS_FILENAME_LABEL, "DLG_SCP_SENDFILE_FROM" },
-					{ IDC_SCP_PROGRESS_BYTE_LABEL, "DLG_SCP_PROGRESS_BYTES_LABEL" },
-					{ IDC_SCP_PROGRESS_TIME_LABEL, "DLG_SCP_PROGRESS_TIME_LABEL" },
-				};
-				SetI18nDlgStrsW(hDlgWnd, "TTSSH", text_info, _countof(text_info), pvar->ts->UILanguageFileW);
-
 				c->scp.progress_window = hDlgWnd;
-				SetDlgItemTextU8(hDlgWnd, IDC_FILENAME, c->scp.localfilefull);
-				ShowWindow(hDlgWnd, SW_SHOW);
+				SetWindowLongPtr(hDlgWnd, GWLP_USERDATA, (LONG_PTR)c);
 			}
 
 			ssh2_scp_alloc_packetlist(pvar, c);
@@ -9037,7 +9587,6 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 				thread = INVALID_HANDLE_VALUE;
 			}
 			c->scp.thread = thread;
-			c->scp.thread_id = tid;
 
 			goto reply;
 
@@ -9079,10 +9628,6 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 				// 受信終了
 				PTInstVar pvar = c->scp.pvar;
 				pvar->recv.data_finished = TRUE;
-				if (pvar->recv.timer_id != 0) {
-					pvar->recv.timer_id = 0;
-					KillTimer(pvar->cv->HWin, pvar->recv.timer_id);
-				}
 			}
 			else if (pvar->recv.suspended) {
 				// フロー制御中
@@ -9090,24 +9635,9 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			}
 			else {
 				// ローカルのwindow sizeをチェック
-				//	こまめにやらずに、ある程度まとめて調整を行う
-				if (c->local_window < c->local_window_max/2) {
+				if (c->local_window < SCPRCV_LOW_WATER_MARK) {
 					// windowサイズを調整する
-#if 0
-					// すぐに調整する
-					//		すぐにサーバーからデータが受信できる環境の場合、
-					// 		FD_READが優先されてメッセージキューに積まれて
-					// 		他のwindowsのメッセージ処理(キャンセルボタン押下など)が
-					//		できなくなるため使用しない
-					do_ssh2_adjust_window_size(pvar, c);
-#else
-					// 少し時間を置いてから調整
-					//		タイマーを使ってGUIスレッドで関数をコールする
-					if (pvar->recv.timer_id == 0) {
-						pvar->recv.timer_id =
-							SetTimer(pvar->cv->HWin, (UINT_PTR)c, USER_TIMER_MINIMUM, do_SSH2_adjust_window_size_timer);
-					}
-#endif
+					do_SSH2_adjust_window_size(pvar, c);
 				}
 			}
 		}
@@ -9474,8 +10004,6 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 			FWD_open(pvar, remote_id, listen_addr, listen_port, orig_addr, orig_port, &chan_num);
 
 			// channelをアロケートし、必要な情報（remote window size）をここで取っておく。
-			// changed window size from 128KB to 32KB. (2006.3.6 yutaka)
-			// changed window size from 32KB to 128KB. (2007.10.29 maya)
 			c = ssh2_channel_new(pvar, CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, chan_num);
 			if (c == NULL) {
 				// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
@@ -9515,8 +10043,6 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 		FWD_X11_open(pvar, remote_id, NULL, 0, &chan_num);
 
 		// channelをアロケートし、必要な情報（remote window size）をここで取っておく。
-		// changed window size from 128KB to 32KB. (2006.3.6 yutaka)
-		// changed window size from 32KB to 128KB. (2007.10.29 maya)
 		c = ssh2_channel_new(pvar, CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, chan_num);
 		if (c == NULL) {
 			// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
@@ -9772,6 +10298,12 @@ static BOOL handle_SSH2_window_adjust(PTInstVar pvar)
 
 	// 送らずバッファに保存しておいたデータを送る
 	ssh2_channel_retry_send_bufchain(pvar, c);
+
+	EnterCriticalSection(&g_ssh_scp_thread_lock);
+	if (c->remote_window >= c->scp.sendsize) {
+		SetEvent(c->scp.ScpSendThreadEvent);
+	}
+	LeaveCriticalSection(&g_ssh_scp_thread_lock);
 
 	return TRUE;
 }

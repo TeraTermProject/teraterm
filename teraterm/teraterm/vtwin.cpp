@@ -1378,23 +1378,6 @@ void CVTWindow::ResetSetup()
 
 void CVTWindow::RestoreSetup()
 {
-	char TempDir[MAXPATHLEN];
-	char TempName[MAX_PATH];
-
-	if ( strlen(ts.SetupFName)==0 ) {
-		return;
-	}
-
-	ExtractFileName(ts.SetupFName,TempName,sizeof(TempName));
-	ExtractDirName(ts.SetupFName,TempDir);
-	if (TempDir[0]==0)
-		strncpy_s(TempDir, sizeof(TempDir),ts.HomeDir, _TRUNCATE);
-	FitFileName(TempName,sizeof(TempName),".INI");
-
-	strncpy_s(ts.SetupFName, sizeof(ts.SetupFName),TempDir, _TRUNCATE);
-	AppendSlash(ts.SetupFName,sizeof(ts.SetupFName));
-	strncat_s(ts.SetupFName,sizeof(ts.SetupFName),TempName,_TRUNCATE);
-
 	if (LoadTTSET()) {
 		(*ReadIniFile)(ts.SetupFNameW, &ts);
 
@@ -4760,6 +4743,7 @@ void CVTWindow::OnSetupSave()
 		(*WriteIniFile)(ts.SetupFNameW, &ts);
 		/* copy host list */
 		(*CopyHostList)(PrevSetupFNW, ts.SetupFNameW);
+		PluginWriteList(ts.SetupFNameW);
 		FreeTTSET();
 		free(PrevSetupFNW);
 		PrevSetupFNW = NULL;
@@ -4875,7 +4859,7 @@ void CVTWindow::OnControlResetRemoteTitle()
 
 void CVTWindow::OnControlAreYouThere()
 {
-	if (cv.Ready && (cv.PortType==IdTCPIP)) {
+	if (cv.Ready && (cv.PortType==IdTCPIP) && cv.TelFlag) {
 		TelSendAYT();
 	}
 }

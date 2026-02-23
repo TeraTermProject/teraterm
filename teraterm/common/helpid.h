@@ -134,6 +134,7 @@
 #define HlpMenuFileTransferBplusSend        41441
 #define HlpMenuFileTransferQuickvan         41450
 #define HlpMenuFileTransferQuickvanSend     41451
+#define HlpMenuFileSshScp                   41470
 #define HlpMenuFileChdir                    41500
 #define HlpMenuFilePrint                    41600
 #define HlpMenuEdit                         42000
@@ -168,6 +169,7 @@
 #define HlpMenuSetupAdditionalTerminal      43034
 #define HlpMenuSetupAdditionalSerialPort    43036
 #define HlpMenuSetupAdditionalUI            43037
+#define HlpMenuSetupAdditionalPlugin        43038
 #define HlpMenuSetupSave                    43013
 #define HlpMenuSetupRestore                 43014
 #define HlpMenuSetupDir                     43016

@@ -77,6 +77,12 @@
         その他の設定ダイアログのエンコーディングタブで
         <a href="../menu/setup-additional-coding.html#OverrideCharWidth">"文字ごとの文字幅オーバーライド設定を使う"</a>
         がチェックできるようになる。
+        ダム端末のエミュレーションをサポートした。
+        <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> に "dumb" を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1096" target="_blank">issue #1096</a>)
+        プラグインタブ ("Additional settings &gt; <a href="../menu/setup-additional-plugin.html">Plugin</a>") を追加、
+        プラグインのロード設定を可能とした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/604" target="_blank">issue #604</a>)
       </li>
     </ul>
   </li>
@@ -97,6 +103,44 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/973" target="_blank">issue #973</a>)
       </li>
       <li>
+        TERATERM.INI の <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> が機能しなくなっていた不具合を修正した。
+        5.0からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/967" target="_blank">issue #967</a>)
+      </li>
+      <li>
+        印刷 ("File &gt; <a href="../menu/file-print.html">Print...</a>") 時、印刷中ダイアログのCancelボタンで中断できるよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1017" target="_blank">issue #1017</a>)
+      </li>
+      <li>
+        TELNET 接続中でなくても TCP/IP 接続中なら Alt+T アクセスキーで AYT (Are You There) コマンドが送出される問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1086" target="_blank">issue #1086</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>その他
+    <ul>
+      <li><a href="#ttmenu_1.21">TeraTerm Menu 1.21</a> へ差し替えた。</li>
+      <li><a href="#ttssh_3.6.0">TTSSH 3.6.0 </a> へ差し替えた。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_5.5.2">2026.01.21 (Ver 5.5.2)</h3>
+<ul class="history">
+  <!--li>変更
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>バグ修正
+    <ul>
+      <li>
+        <a href="../menu/setup-additional-font.html#CharSpace">文字間スペース</a>を設定して、<a href="../menu/setup-additional-font.html#ResizedFont">描画幅に合わせてリサイズしたフォントを描画</a>をONにした時、正しく描画するよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1006" target="_blank">issue #1006</a>)
+      </li>
+      <li>
         文字間スペースを "Additional settings &gt; <a href="../menu/setup-additional-font.html">Font</a>" タブから正しく設定できない問題を修正した。
         5.0からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1008" target="_blank">issue #1008</a>)
@@ -112,11 +156,6 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/975" target="_blank">issue #975</a>)
       </li>
       <li>
-        TERATERM.INI の <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> が機能しなくなっていた不具合を修正した。
-        5.0からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/967" target="_blank">issue #967</a>)
-      </li>
-      <li>
         <a href="../macro/command/send.html">send</a>,
         <a href="../macro/command/sendln.html">sendln</a>,
         <a href="../macro/command/sendbinary.html">sendbinary</a>,
@@ -125,26 +164,17 @@
         5.0からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/147" target="_blank">issue #147</a>)
       </li>
-      <li>
-        印刷 ("File &gt; <a href="../menu/file-print.html">Print...</a>") 時、印刷中ダイアログのCancelボタンで中断できるよう修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1017" target="_blank">issue #1017</a>)
-      </li>
-      <li>
-        <a href="../menu/setup-additional-font.html#CharSpace">文字間スペース</a>を設定して、<a href="../menu/setup-additional-font.html#ResizedFont">描画幅に合わせてリサイズしたフォントを描画</a>をONにした時、正しく描画するよう修正した。
-        5.0からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1017" target="_blank">issue #1006</a>)
-      </li>
     </ul>
   </li>
 
   <li>その他
     <ul>
-      <li><a href="#ttmenu_1.21">TeraTerm Menu 1.21</a> へ差し替えた。</li>
-      <li><a href="#ttssh_3.6.0">TTSSH 3.6.0 </a> へ差し替えた。</li>
+      <li><a href="#ttssh_3.5.2">TTSSH (3.5.2)</a> へ差し替えた。</li>
       <li>
-        インストーラに使用している Inno Setup のバージョンを <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.5.4" target="_blank">6.5.4</a> へ差し替えた。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/874" target="_blank">issue #874</a>)
+        インストーラに使用している Inno Setup のバージョンを <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.0" target="_blank">6.7.0</a> へ差し替えた。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/963" target="_blank">issue #963</a>)
       </li>
+      <li><a href="#kanjimenu_0.1.11">TTX KanjiMenu Plugin 0.1.11</a>へ差し替えた。</li>
     </ul>
   </li>
 </ul>
@@ -461,8 +491,8 @@
       <li>[Additional settings]-[General] タブで設定する、新規接続ダイアログの "<a href="../menu/setup-additional-general.html#Port">Default port</a>" は "TCP/IP" または "Serial" の選択になった。<br>
         デフォルトのシリアルポート番号は <a href="../menu/setup-additional-serialport.html">Serial port タブ</a>で選択するようになった。
       </li>
-      <li>[Additional settings]-[<a href="../menu/setup-additional-window.html#">Window</a>] タブの "Reverse" ボタンを "Swap colors" に改名した。
-      <li>[Additional settings]-[<a href="../menu/setup-font.html#">Font</a>] タブの "List proportional fonts in font dialog" を使用可能にした。</li>
+      <li>[Additional settings]-[<a href="../menu/setup-additional-window.html">Window</a>] タブの "Reverse" ボタンを "Swap colors" に改名した。
+      <li>[Additional settings]-[<a href="../menu/setup-font.html">Font</a>] タブの "List proportional fonts in font dialog" を使用可能にした。</li>
       <li><a href="../menu/file-sendfile.html#dialog">Send file ダイアログ</a>の送信ファイル選択の初期ディレクトリが<a href="../setup/folder.html#FileDir">ファイル転送用のフォルダ</a>になるようにした。</li>
       <li><a href="../menu/file-sendfile.html#dialog">Send file ダイアログ</a>のオプションを TERATERM.INI に保存するようにした。
         <ul>
@@ -4048,15 +4078,34 @@
   <li>変更
     <ul>
       <li>
+        SSH2 の PQC(耐量子暗号)を組み合わせたハイブリッド鍵交換方式 mlkem768x25519-sha256 鍵交換方式に対応した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/338" target="_blank">issue #338</a>)
+        SSH2 の PQC(耐量子暗号)を組み合わせたハイブリッド鍵交換方式 sntrup761x25519-sha512, sntrup761x25519-sha512@openssh.com に対応した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/337" target="_blank">issue #337</a>)
+      </li>
+      <li>
         About TTSSH ダイアログに表示する鍵交換方式の情報を、DH グループや楕円曲線の情報に変更した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1018" target="_blank">issue #1018</a>)
+      </li>
+      <li>
+        <a href="../menu/file-ssh-scp.html">SCPを用いたファイル受信</a>の速度を改善した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1056" target="_blank">issue #1056</a>)
+      </li>
+      <li>
+        <a href="../menu/file-ssh-scp.html">SCPファイル転送ダイアログ</a>で Enter キー押下時に実行されるボタン(Send/Receive)が入力項目のフォーカス位置に応じて切り替わるよう変更した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1108" target="_blank">issue #1108</a>)
+      </li>
+      <li>
+        SCPを用いたファイル転送中に表示される進捗ダイアログのアイコンをタスクバーに表示するよう変更した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1108" target="_blank">issue #1108</a>)
       </li>
     </ul>
   </li>
 
   <!--li>バグ修正
     <ul>
-      <li></li>
+      <li>
+      </li>
     </ul>
   </li-->
 
@@ -4068,6 +4117,40 @@
       </li>
     </ul>
   </li>
+</ul>
+
+<h3 id="ttssh_3.5.2">2026.01.21 (Ver 3.5.2)</h3>
+<ul class="history">
+  <!--li>変更
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>バグ修正
+    <ul>
+      <li>
+        SCP 受信のときに受信フォルダが指定されていない場合、ダウンロードフォルダに保存されない問題を修正した。
+        3.1 (Tera Term 5.1) からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1057" target="_blank">issue #1057</a>)
+      </li>
+      <li>
+        鍵交換ネゴシエーションに失敗した場合にクラッシュする問題を修正した。
+        3.5.0 (Tera Term 5.5.0)からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1070" target="_blank">issue #1070</a>)
+      </li>
+      <li>
+        SCP 受信中ダイアログのタイトルが "SCP sending file" になっているのを修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1055" target="_blank">issue #1055</a>)
+      </li>
+    </ul>
+  </li>
+
+  <!--li>その他
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
 </ul>
 
 <h3 id="ttssh_3.5.1">2025.11.17 (Ver 3.5.1)</h3>
@@ -6282,6 +6365,11 @@
 
 
 <h2 id="kanjimenu">TTX KanjiMenu</h2>
+
+<h3 id="kanjimenu_0.1.11">YYYY.MM.DD (Ver 0.1.11)</h3>
+<ul class="history">
+      <li>バージョン情報を修正した。</li>
+</ul>
 
 <h3 id="kanjimenu_0.1.10">2025.03.03 (Ver 0.1.10)</h3>
 <ul class="history">

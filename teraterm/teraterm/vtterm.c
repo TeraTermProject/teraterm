@@ -721,6 +721,55 @@ static void Tab(void)
 	if (NeedsOutputBufs()) OutputLogByte(HT);
 }
 
+static void ProcessCR(void)
+{
+	if (ts.CRReceive == IdAUTO) {
+		// 9th Apr 2012: AUTO CR/LF mode (tentner)
+		// a CR or LF will generated a CR+LF, if the next character is the opposite, it will be ignored
+		if(PrevCharacter != LF || !PrevCRorLFGeneratedCRLF) {
+			CarriageReturn(TRUE);
+			LineFeed(CR, TRUE);
+			PrevCRorLFGeneratedCRLF = TRUE;
+		}
+		else {
+			PrevCRorLFGeneratedCRLF = FALSE;
+		}
+	}
+	else {
+		CarriageReturn(TRUE);
+		if (ts.CRReceive==IdCRLF) {
+			CommInsert1Byte(&cv, LF);
+		}
+	}
+}
+
+static void ProcessLF(void)
+{
+	if (ts.CRReceive == IdLF) {
+		// 受信時の改行コードが LF の場合は、サーバから LF のみが送られてくると仮定し、
+		// CR+LFとして扱うようにする。
+		// cf. http://www.neocom.ca/forum/viewtopic.php?t=216
+		// (2007.1.21 yutaka)
+		CarriageReturn(TRUE);
+		LineFeed(LF, TRUE);
+	}
+	else if (ts.CRReceive == IdAUTO) {
+		// 9th Apr 2012: AUTO CR/LF mode (tentner)
+		// a CR or LF will generated a CR+LF, if the next character is the opposite, it will be ignored
+		if(PrevCharacter != CR || !PrevCRorLFGeneratedCRLF) {
+			CarriageReturn(TRUE);
+			LineFeed(LF, TRUE);
+			PrevCRorLFGeneratedCRLF = TRUE;
+		}
+		else {
+			PrevCRorLFGeneratedCRLF = FALSE;
+		}
+	}
+	else {
+		LineFeed(LF, TRUE);
+	}
+}
+
 /**
  *	unicode(char32_t)をバッファへ書き込む
  *		ログにも書き込む場合は PutU32() を使う
@@ -969,7 +1018,31 @@ static void PrnParseControl(BYTE b) // printer mode
 	WriteToPrnFile(PrintFile_, b, TRUE);
 }
 
-static void ParseControl(BYTE b)
+/**
+ *	Dumb Terminal Control
+ */
+static void ParseControlDumb(BYTE b)
+{
+	switch (b)
+	{
+	case LF:
+		ProcessLF();
+		break;
+	case CR:
+		ProcessCR();
+		break;
+	case BEL:
+		if (ts.Beep != IdBeepOff)
+			RingBell(ts.Beep);
+		break;
+	default:
+		// U+2400～のControl Picturesをつかって表示
+		PutU32(0x2400 + b);
+		break;
+	}
+}
+
+static void ParseControlVT(BYTE b)
 {
 	if (PrinterMode) { // printer mode
 		PrnParseControl(b);
@@ -1010,33 +1083,11 @@ static void ParseControl(BYTE b)
 		Tab();
 		break;
 	case LF:
-		if (ts.CRReceive == IdLF) {
-			// 受信時の改行コードが LF の場合は、サーバから LF のみが送られてくると仮定し、
-			// CR+LFとして扱うようにする。
-			// cf. http://www.neocom.ca/forum/viewtopic.php?t=216
-			// (2007.1.21 yutaka)
-			CarriageReturn(TRUE);
-			LineFeed(b, TRUE);
-			break;
-		}
-		else if (ts.CRReceive == IdAUTO) {
-			// 9th Apr 2012: AUTO CR/LF mode (tentner)
-			// a CR or LF will generated a CR+LF, if the next character is the opposite, it will be ignored
-			if(PrevCharacter != CR || !PrevCRorLFGeneratedCRLF) {
-				CarriageReturn(TRUE);
-				LineFeed(b, TRUE);
-				PrevCRorLFGeneratedCRLF = TRUE;
-			}
-			else {
-				PrevCRorLFGeneratedCRLF = FALSE;
-			}
-			break;
-		}
-
+		ProcessLF();
+		break;
 	case VT:
 		LineFeed(b, TRUE);
 		break;
-
 	case FF:
 		if ((ts.AutoWinSwitch>0) && JustAfterESC) {
 			CommInsert1Byte(&cv, b);
@@ -1047,24 +1098,7 @@ static void ParseControl(BYTE b)
 			LineFeed(b, TRUE);
 		break;
 	case CR:
-		if (ts.CRReceive == IdAUTO) {
-			// 9th Apr 2012: AUTO CR/LF mode (tentner)
-			// a CR or LF will generated a CR+LF, if the next character is the opposite, it will be ignored
-			if(PrevCharacter != LF || !PrevCRorLFGeneratedCRLF) {
-				CarriageReturn(TRUE);
-				LineFeed(b, TRUE);
-				PrevCRorLFGeneratedCRLF = TRUE;
-			}
-			else {
-				PrevCRorLFGeneratedCRLF = FALSE;
-			}
-		}
-		else {
-			CarriageReturn(TRUE);
-			if (ts.CRReceive==IdCRLF) {
-				CommInsert1Byte(&cv, LF);
-			}
-		}
+		ProcessCR();
 		break;
 	case SO: /* LS1 */
 		if (ts.ISO2022Flag & ISO2022_SO) {
@@ -1161,6 +1195,16 @@ static void ParseControl(BYTE b)
 		ESCFlag = FALSE;
 		ParseMode = ModeIgnore;
 		break;
+	}
+}
+
+static void ParseControl(BYTE b)
+{
+	if (ts.TerminalID == IdDUMB) {
+		ParseControlDumb(b);
+	}
+	else {
+		ParseControlVT(b);
 	}
 }
 
@@ -2228,7 +2272,7 @@ static void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 							if (j < NSParam[i]) {
 								b = SubParam[i][++j];
 							}
-							color = DispFindClosestColor(r, g, b);
+							color = DispFindClosestColor(vt_src, r, g, b);
 						}
 					}
 					else if (i < NParam && NSParam[i+1] > 0) {
@@ -2237,13 +2281,13 @@ static void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 						if (NSParam[i] > 1) {
 							b = SubParam[i][2];
 						}
-						color = DispFindClosestColor(r, g, b);
+						color = DispFindClosestColor(vt_src, r, g, b);
 					}
 					else if (i+2 < NParam) {
 						r = Param[++i];
 						g = Param[++i];
 						b = Param[++i];
-						color = DispFindClosestColor(r, g, b);
+						color = DispFindClosestColor(vt_src, r, g, b);
 					}
 					break;
 				  case 5:
@@ -2310,7 +2354,7 @@ static void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 							if (j < NSParam[i]) {
 								b = SubParam[i][++j];
 							}
-							color = DispFindClosestColor(r, g, b);
+							color = DispFindClosestColor(vt_src, r, g, b);
 						}
 					}
 					else if (i < NParam && NSParam[i+1] > 0) {
@@ -2319,13 +2363,13 @@ static void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 						if (NSParam[i] > 1) {
 							b = SubParam[i][2];
 						}
-						color = DispFindClosestColor(r, g, b);
+						color = DispFindClosestColor(vt_src, r, g, b);
 					}
 					else if (i+2 < NParam) {
 						r = Param[++i];
 						g = Param[++i];
 						b = Param[++i];
-						color = DispFindClosestColor(r, g, b);
+						color = DispFindClosestColor(vt_src, r, g, b);
 					}
 					break;
 				  case 5:
@@ -2461,41 +2505,41 @@ static void CSSunSequence() /* Sun terminal private sequences */
 	switch (Param[1]) {
 	  case 1: // De-iconify window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
-			DispShowWindow(WINDOW_RESTORE);
+			DispShowWindow(vt_src, WINDOW_RESTORE);
 		break;
 
 	  case 2: // Iconify window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
-			DispShowWindow(WINDOW_MINIMIZE);
+			DispShowWindow(vt_src, WINDOW_MINIMIZE);
 		break;
 
 	  case 3: // set window position
 		if (ts.WindowFlag & WF_WINDOWCHANGE) {
 			RequiredParams(3);
-			DispMoveWindow(Param[2], Param[3]);
+			DispMoveWindow(vt_src, Param[2], Param[3]);
 		}
 		break;
 
 	  case 4: // set window size
 		if (ts.WindowFlag & WF_WINDOWCHANGE) {
 			RequiredParams(3);
-			DispResizeWin(Param[3], Param[2]);
+			DispResizeWin(vt_src, Param[3], Param[2]);
 		}
 		break;
 
 	  case 5: // Raise window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
-			DispShowWindow(WINDOW_RAISE);
+			DispShowWindow(vt_src, WINDOW_RAISE);
 		break;
 
 	  case 6: // Lower window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
-			DispShowWindow(WINDOW_LOWER);
+			DispShowWindow(vt_src, WINDOW_LOWER);
 		break;
 
 	  case 7: // Refresh window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
-			DispShowWindow(WINDOW_REFRESH);
+			DispShowWindow(vt_src, WINDOW_REFRESH);
 		break;
 
 	  case 8: /* set terminal size */
@@ -2511,10 +2555,10 @@ static void CSSunSequence() /* Sun terminal private sequences */
 		if (ts.WindowFlag & WF_WINDOWCHANGE) {
 			RequiredParams(2);
 			if (Param[2] == 0) {
-				DispShowWindow(WINDOW_RESTORE);
+				DispShowWindow(vt_src, WINDOW_RESTORE);
 			}
 			else if (Param[2] == 1) {
-				DispShowWindow(WINDOW_MAXIMIZE);
+				DispShowWindow(vt_src, WINDOW_MAXIMIZE);
 			}
 		}
 		break;
@@ -2528,13 +2572,13 @@ static void CSSunSequence() /* Sun terminal private sequences */
 			RequiredParams(2);
 			switch (Param[2]) {
 			  case 0:
-			    DispShowWindow(WINDOW_RESTORE);
+			    DispShowWindow(vt_src, WINDOW_RESTORE);
 			    break;
 			  case 1:
-			    DispShowWindow(WINDOW_MAXIMIZE);
+			    DispShowWindow(vt_src, WINDOW_MAXIMIZE);
 			    break;
 			  case 2:
-			    DispShowWindow(WINDOW_TOGGLE_MAXIMIZE);
+			    DispShowWindow(vt_src, WINDOW_TOGGLE_MAXIMIZE);
 			    break;
 			}
 		}
@@ -2542,7 +2586,7 @@ static void CSSunSequence() /* Sun terminal private sequences */
 
 	  case 11: // Report window state
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
-			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%dt", CLocale, DispWindowIconified()?2:1);
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%dt", CLocale, DispWindowIconified(vt_src)?2:1);
 			SendCSIstr(Report, len);
 		}
 		break;
@@ -2553,10 +2597,10 @@ static void CSSunSequence() /* Sun terminal private sequences */
 			switch (Param[2]) {
 			  case 0:
 			  case 1:
-				DispGetWindowPos(&x, &y, FALSE);
+				DispGetWindowPos(vt_src, &x, &y, FALSE);
 				break;
 			  case 2:
-				DispGetWindowPos(&x, &y, TRUE);
+				DispGetWindowPos(vt_src, &x, &y, TRUE);
 				break;
 			  default:
 				return;
@@ -2572,10 +2616,10 @@ static void CSSunSequence() /* Sun terminal private sequences */
 			switch (Param[2]) {
 			  case 0:
 			  case 1:
-				DispGetWindowSize(&x, &y, TRUE);
+				DispGetWindowSize(vt_src, &x, &y, TRUE);
 				break;
 			  case 2:
-				DispGetWindowSize(&x, &y, FALSE);
+				DispGetWindowSize(vt_src, &x, &y, FALSE);
 				break;
 			  default:
 				return;
@@ -4853,7 +4897,7 @@ static void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYT
 
 	if (colornum != CS_UNSPEC) {
 		if (strcmp(ColorSpec, "?") == 0) {
-			color = DispGetColor(colornum);
+			color = DispGetColor(vt_src, colornum);
 			if (mode == 4 || mode == 5) {
 				len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
 					"%d;%d;rgb:%04x/%04x/%04x", CLocale, mode, ColorNumber,
@@ -5328,6 +5372,12 @@ static int CommRead1Byte_(PComVar cv, LPBYTE b)
 	return CommRead1Byte(cv, b);
 }
 
+/**
+ *	受信バッファから受信データを取得
+ *
+ *	@retval		0		なにもなし
+ *	@retval		IdTEK	Enter TEK Mode
+ */
 int VTParse()
 {
 	BYTE b;
@@ -5784,12 +5834,18 @@ BOOL WheelToCursorMode() {
 
 void ChangeTerminalID()
 {
-	VTlevel = TermIDGetVTLevel(ts.TerminalID);
-	if (VTlevel == 1) {
-		Send8BitMode = FALSE;
+	if (ts.TerminalID == IdDUMB) {
+		// dumb端末
 	}
 	else {
-		Send8BitMode = ts.Send8BitCtrl;
+		// VT端末
+		VTlevel = TermIDGetVTLevel(ts.TerminalID);
+		if (VTlevel == 1) {
+			Send8BitMode = FALSE;
+		}
+		else {
+			Send8BitMode = ts.Send8BitCtrl;
+		}
 	}
 }
 

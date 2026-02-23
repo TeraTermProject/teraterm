@@ -407,6 +407,7 @@
     <ClCompile Include="poly1305.c" />
     <ClCompile Include="sftp.c" />
     <ClCompile Include="smult_curve25519_ref.c" />
+    <ClCompile Include="sntrup761.c" />
     <ClCompile Include="ssh.c" />
     <ClCompile Include="ssherr.c" />
     <ClCompile Include="ttxssh.c" />
@@ -446,6 +447,7 @@
     <ClInclude Include="key.h" />
     <ClInclude Include="keyfiles.h" />
     <ClInclude Include="keyfiles-putty.h" />
+    <ClInclude Include="libcrux_mlkem768_sha3.h" />
     <ClInclude Include="mac.h" />
     <ClInclude Include="openbsd-compat.h" />
     <ClInclude Include="pkt.h" />

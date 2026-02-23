@@ -85,6 +85,7 @@ target_sources(
   sftp.c
   sftp.h
   smult_curve25519_ref.c
+  sntrup761.c
   ssh.c
   ssh.h
   ssherr.c
@@ -97,11 +98,11 @@ target_sources(
   ttxssh.rc
   util.c
   util.h
+  win32helper_u8.cpp
+  win32helper_u8.h
   x11util.c
   x11util.h
-  win32helper_u8.h
-  win32helper_u8.cpp
-  )
+)
 
 target_sources(
   ${PACKAGE_NAME}

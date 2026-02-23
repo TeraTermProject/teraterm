@@ -76,6 +76,12 @@
         When specify <a href="../setup/teraterm-term.html#OverrideCharWidth">character width</a> settings in TERATERM.INI,
         <a href="../menu/setup-additional-coding.html#OverrideCharWidth">"Use character-by-character width override settings"</a>
         check box becomes available, in Encoding tab of Additional Settings dialog.
+        Added support for dumb terminal emulation.
+        Added "dumb" to <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1096" target="_blank">issue #1096</a>)
+        Add plugin tab ("Additional settings &gt; <a href="../menu/setup-additional-plugin.html">Plugin</a>").
+        Enabled plugin loading settings.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/604" target="_blank">issue #604</a>)
       </li>
     </ul>
   </li>
@@ -96,6 +102,44 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/973" target="_blank">issue #973</a>)
       </li>
       <li>
+        Fixed a bug that caused <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> in TERATERM.INI to stop working.
+        This bug was introduced in 5.0.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/967" target="_blank">issue #967</a>)
+      </li>
+      <li>
+        Fixed an issue Cancel button in printing dialog is not working when printing from print menu ("File &gt; <a href="../menu/file-print.html">Print...</a>").
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1017" target="_blank">issue #1017</a>)
+      </li>
+      <li>
+        Fixed an issue where the Alt+T access key sent the AYT (Are You There) command even when the active TCP/IP connection was not TELNET.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1086" target="_blank">issue #1086</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>Misc
+    <ul>
+      <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.21">1.21</a>.</li>
+      <li>Upgraded TTSSH to <a href="#ttssh_3.6.0">3.6.0</a>.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_5.5.2">2026.01.21 (Ver 5.5.2)</h3>
+<ul class="history">
+  <!--li>Changes
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>Bug fixes
+    <ul>
+      <li>
+        Fixed text was not rendered correctly when setting <a href="../menu/setup-additional-font.html#CharSpace">character space</a> and <a href="../menu/setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a> is on.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1006" target="_blank">issue #1006</a>)
+      </li>
+      <li>
         Fixed an issue where the "Space between characters (lines)" from "Additional settings &gt; <a href="../menu/setup-additional-font.html">Font</a>" tab.
         This bug was introduced in 5.0.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1008" target="_blank">issue #1008</a>)
@@ -111,11 +155,6 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/975" target="_blank">issue #975</a>)
       </li>
       <li>
-        Fixed a bug that caused <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> in TERATERM.INI to stop working.
-        This bug was introduced in 5.0.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/967" target="_blank">issue #967</a>)
-      </li>
-      <li>
         Fixed sending data using
         <a href="../macro/command/send.html">send</a>,
         <a href="../macro/command/sendln.html">sendln</a>,
@@ -125,26 +164,17 @@
         This bug was introduced in 5.0.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/147" target="_blank">issue #147</a>)
       </li>
-      <li>
-        Fixed an issue Cancel button in printing dialog is not working when printing from print menu ("File &gt; <a href="../menu/file-print.html">Print...</a>").
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1017" target="_blank">issue #1017</a>)
-      </li>
-      <li>
-        Fixed text was not rendered correctly when setting <a href="../menu/setup-additional-font.html#CharSpace">character space</a> and <a href="../menu/setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a> is on.
-        This bug was introduced in 5.0.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1006" target="_blank">issue #1006</a>)
-      </li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
-      <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.21">1.21</a>.</li>
-      <li>Upgraded TTSSH to <a href="#ttssh_3.6.0">3.6.0</a>.</li>
+      <li>Upgraded TTSSH to <a href="#ttssh_3.5.2">3.5.2</a>.</li>
       <li>
-        Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.5.4" target="_blank">6.5.4</a>.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/874" target="_blank">issue #874</a>)
+        Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.0" target="_blank">6.7.0</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/963" target="_blank">issue #963</a>)
       </li>
+      <li>Upgraded TTX KanjiMenu Plug-in to <a href="#kanjimenu_0.1.11">0.1.11</a></li>
     </ul>
   </li>
 </ul>
@@ -461,8 +491,8 @@
       <li>"<a href="../menu/setup-additional-general.html#Port">Default port</a>" for new connection dialog, which is configured on [Additional settings]-[General] tab became "TCP/IP" or "Serial" selection.<br>
         Select default Serial port number on <a href="../menu/setup-additional-serialport.html">Serial port tab</a>.
       </li>
-      <li>Renamed "Reverse" button on [Additional settings]-[<a href="../menu/setup-additional-window.html#">Window</a>] tab to "Swap colors."</li>
-      <li>Made "List proportional fonts in font dialog" available on [Additional settings]-[<a href="../menu/setup-font.html#">Font</a>] tab.</li>
+      <li>Renamed "Reverse" button on [Additional settings]-[<a href="../menu/setup-additional-window.html">Window</a>] tab to "Swap colors."</li>
+      <li>Made "List proportional fonts in font dialog" available on [Additional settings]-[<a href="../menu/setup-font.html">Font</a>] tab.</li>
       <li>Changed initial directory for file select dialog of Send file to <a href="../setup/folder.html#FileDir">File transfer folder</a>.</li>
       <li>Send file dialog options are saved in TERATERM.INI.
         <ul>
@@ -4040,15 +4070,34 @@ SYNOPSIS:
   <li>Changes
     <ul>
       <li>
+        Added support for SSH2 hybrid key exchange methods combining post-quantum cryptography (PQC): mlkem768x25519-sha256
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/338" target="_blank">issue #338</a>)
+        Added support for SSH2 hybrid key exchange methods combining post-quantum cryptography (PQC): sntrup761x25519-sha512, sntrup761x25519-sha512@openssh.com
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/337" target="_blank">issue #337</a>)
+      </li>
+      <li>
         Changed the key exchange information displayed in the "About TTSSH" dialog to DH group and elliptic curve details.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1018" target="_blank">issue #1018</a>)
+      </li>
+      <li>
+        Improved the speed of <a href="../menu/file-ssh-scp.html">receiving a file using SCP</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1056" target="_blank">issue #1056</a>)
+      </li>
+      <li>
+        Modified the <a href="../menu/file-ssh-scp.html">SCP file transfer dialog</a> so that the button (Send/Receive) executed when pressing the Enter key switches according to the focus position of the input field.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1108" target="_blank">issue #1108</a>)
+      </li>
+      <li>
+        Modified to display the icon of the progress dialog shown during file transfer using SCP on the taskbar.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1108" target="_blank">issue #1108</a>)
       </li>
     </ul>
   </li>
 
   <!--li>Bug fixes
     <ul>
-      <li></li>
+      <li>
+      </li>
     </ul>
   </li-->
 
@@ -4060,6 +4109,40 @@ SYNOPSIS:
       </li>
     </ul>
   </li>
+</ul>
+
+<h3 id="ttssh_3.5.2">2026.01.21 (Ver 3.5.2)</h3>
+<ul class="history">
+  <!--li>Changes
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>Bug fixes
+    <ul>
+      <li>
+        Fixed an issue where SCP receiving did not save to the Downloads folder if the receiving folder was not specified.
+        This bug was introduced in 3.1 (Tera Term 5.1).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1057" target="_blank">issue #1057</a>)
+      </li>
+      <li>
+        Fixed an issue that caused a crash when key exchange negotiation failed.
+        This bug was introduced in 3.5.0 (Tera Term 5.5.0).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1070" target="_blank">issue #1070</a>)
+      </li>
+      <li>
+        Fixed an issue where the SCP receiving dialog title was "SCP sending file."
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1055" target="_blank">issue #1055</a>)
+      </li>
+    </ul>
+  </li>
+
+  <!--li>Misc
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
 </ul>
 
 <h3 id="ttssh_3.5.1">2025.11.17 (Ver 3.5.1)</h3>
@@ -6272,6 +6355,11 @@ SYNOPSIS:
 
 
 <h2 id="kanjimenu">TTX KanjiMenu</h2>
+
+<h3 id="kanjimenu_0.1.11">YYYY.MM.DD (Ver 0.1.11)</h3>
+<ul class="history">
+      <li>Modify version information.</li>
+</ul>
 
 <h3 id="kanjimenu_0.1.10">2025.03.03 (Ver 0.1.10)</h3>
 <ul class="history">

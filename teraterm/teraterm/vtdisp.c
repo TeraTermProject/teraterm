@@ -29,10 +29,8 @@
 
 /* TERATERM.EXE, VT terminal display routines */
 #include "teraterm.h"
-#include "teraterml.h"
 #include "tttypes.h"
 #include "teraprn.h"
-#include <string.h>
 #include <olectl.h>
 #include <assert.h>
 #include <stdio.h>
@@ -102,6 +100,19 @@ typedef struct vtdraw {
 	BYTE alpha_vtback;				// 通常(アトリビュートなし)のbackのalpha
 	BYTE alpha_back;				// 一般(反転属性(SGR 4)以外)のbackのalpha
 	BYTE BGReverseTextAlpha;		// 反転属性(SGR 4)のbackのalpha
+
+	/*
+	 *	ANSI color table
+	 *		0		黒,Black
+	 *		1-6		少し暗い色(Red, Green, Yellow, Blue, Magenta, Cyan)
+	 *		7		Gray (15より暗い,8より明るい)
+	 *		8		Gray (7より暗い,0より明るい)
+	 *		9-14	明るい色,原色 (Bright Red, Green, Yellow, Blue, Magenta, Cyan)
+	 *		15		白,White 255 (Bright White)
+	 *		16-255	DefaultColorTable[16-255]
+	 */
+	COLORREF ANSIColor[256];
+
 } vtdraw_t;
 
 int WinWidth, WinHeight;		// 画面に表示されている文字数(セル数)
@@ -132,18 +143,6 @@ static BOOL FontReSizeEnableInit = TRUE;	// font_resize_enable の初期値
  *	iniファイル読み込みよりも前に行い、
  *	変数FontReSizeEnableInitを不要にする。
  */
-
-/*
- *	ANSI color table
- *		0		黒,Black
- *		1-6		少し暗い色(Red, Green, Yellow, Blue, Magenta, Cyan)
- *		7		Gray (15より暗い,8より明るい)
- *		8		Gray (7より暗い,0より明るい)
- *		9-14	明るい色,原色 (Bright Red, Green, Yellow, Blue, Magenta, Cyan)
- *		15		白,White 255 (Bright White)
- *		16-255	DefaultColorTable[16-255]
- */
-static COLORREF ANSIColor[256];
 
 // caret variables
 static int CaretStatus;
@@ -210,7 +209,7 @@ typedef struct {
 static vtdisp_work_t vtdisp_work;
 
 static HBITMAP GetBitmapHandleW(const wchar_t *File);
-static void InitColorTable(const COLORREF *ANSIColor16);
+static void InitColorTable(vtdraw_t *vt, const COLORREF *ANSIColor16);
 static void DispInitDC2(vtdraw_t *vt, ttdc_t *dc);
 
 // LoadImage() しか使えない環境かどうかを判別する。
@@ -1251,9 +1250,9 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
   //窓の位置、大きさが変わったかチェック
   point.x = 0;
   point.y = 0;
-  ClientToScreen(HVTWin,&point);
+  ClientToScreen(vt->hVTWin,&point);
 
-  GetClientRect(HVTWin,&rect);
+  GetClientRect(vt->hVTWin,&rect);
   OffsetRect(&rect,point.x,point.y);
 
   if(!forceSetup && EqualRect(&rect,&BGPrevRect))
@@ -1336,7 +1335,7 @@ void BGInitialize(vtdraw_t *vt, BOOL initialize_once)
 {
 	(void)initialize_once;
 
-	InitColorTable(ts.ANSIColor);
+	InitColorTable(vt, ts.ANSIColor);
 
 	BGSetDefaultColor(vt, &ts);
 
@@ -1499,13 +1498,13 @@ static void BGScrollWindow(HWND hwnd, int xa, int ya, RECT *Rect, RECT *ClipRect
 	RECT r;
 
 	if (BGEnable) {
-		InvalidateRect(HVTWin, ClipRect, FALSE);
+		InvalidateRect(hwnd, ClipRect, FALSE);
 	}
 	else if (IsZoomed(hwnd)) {
 		// ウィンドウ最大化時の文字欠け対策
 		switch (ts.MaximizedBugTweak) {
 		case 1: // type 1: ScrollWindow を使わずにすべて書き直す
-			InvalidateRect(HVTWin, ClipRect, FALSE);
+			InvalidateRect(hwnd, ClipRect, FALSE);
 			break;
 		case 2: // type 2: スクロール領域が全体(NULL)の時は隙間部分を除いた領域に差し替える
 			if (Rect == NULL) {
@@ -1540,7 +1539,7 @@ void BGOnExitSizeMove(vtdraw_t *vt)
   BGInSizeMove = FALSE;
 
   BGSetupPrimary(vt, TRUE);
-  InvalidateRect(HVTWin,NULL,FALSE);
+  InvalidateRect(vt->hVTWin,NULL,FALSE);
 
 #if 0
   //ブラシを削除
@@ -1565,7 +1564,7 @@ void BGOnSettingChange(vtdraw_t *vt)
 	CRTHeight = GetSystemMetrics(SM_CYSCREEN);
 
 	BGSetupPrimary(vt, TRUE);
-	InvalidateRect(HVTWin, NULL, FALSE);
+	InvalidateRect(vt->hVTWin, NULL, FALSE);
 }
 
 /**
@@ -1603,7 +1602,7 @@ static int GetIndex16From256(int index256)
  *	@param ANSIColor16	ts.ANSIColor[16]
  *						旧16色カラーテーブル
  */
-static void InitColorTable(const COLORREF *ANSIColor16)
+static void InitColorTable(vtdraw_t *vt, const COLORREF *ANSIColor16)
 {
 	int i;
 
@@ -1611,12 +1610,12 @@ static void InitColorTable(const COLORREF *ANSIColor16)
 	//		ANSIColor16は16色カラーテーブル
 	for (i = 0 ; i < 16 ; i++) {
 		int i256 = GetIndex256From16(i);
-		ANSIColor[i256] = ANSIColor16[i];
+		vt->ANSIColor[i256] = ANSIColor16[i];
 	}
 
 	// ANSIColor[] の16番以降を初期化
 	for (i=16; i<=255; i++) {
-		ANSIColor[i] = RGB(DefaultColorTable[i][0], DefaultColorTable[i][1], DefaultColorTable[i][2]);
+		vt->ANSIColor[i] = RGB(DefaultColorTable[i][0], DefaultColorTable[i][1], DefaultColorTable[i][2]);
 	}
 }
 
@@ -1937,7 +1936,7 @@ static void DispSetLogFont(LOGFONTW *VTlf, unsigned int dpi)
   VTlf->lfStrikeOut = 0;
   VTlf->lfWidth = ts.VTFontSize.x;
   VTlf->lfHeight = ts.VTFontSize.y;
-  VTlf->lfCharSet = ts.VTFontCharSet;
+  VTlf->lfCharSet = (BYTE)ts.VTFontCharSet;
   VTlf->lfOutPrecision  = OUT_CHARACTER_PRECIS;
   VTlf->lfClipPrecision = CLIP_CHARACTER_PRECIS;
   VTlf->lfQuality       = (BYTE)ts.FontQuality;
@@ -1962,7 +1961,7 @@ void ChangeFont(vtdraw_t *vt, unsigned int dpi)
 	DispFontDelete(vt);
 
 	if (dpi == 0) {
-		dpi = GetMonitorDpiFromWindow(HVTWin);
+		dpi = GetMonitorDpiFromWindow(vt->hVTWin);
 	}
 
 	DispSetLogFont(&VTlf, dpi);
@@ -1975,7 +1974,7 @@ void ChangeFont(vtdraw_t *vt, unsigned int dpi)
 			LOGFONTW lf = {0};
 			HFONT hFont = vt->VTFont[AttrDefault];
 			GetObjectW(hFont, sizeof(lf), &lf);
-			SetConversionLogFont(HVTWin, &lf);
+			SetConversionLogFont(vt->hVTWin, &lf);
 		}
 	}
 }
@@ -2001,16 +2000,16 @@ void ResetIME(vtdraw_t *vt)
 		if (ts.UseIME > 0) {
 			if (ts.IMEInline>0) {
 				LOGFONTW VTlf;
-				DispSetLogFont(&VTlf, GetMonitorDpiFromWindow(HVTWin));
-				SetConversionLogFont(HVTWin, &VTlf);
+				DispSetLogFont(&VTlf, GetMonitorDpiFromWindow(vt->hVTWin));
+				SetConversionLogFont(vt->hVTWin, &VTlf);
 			}
 			else {
-				SetConversionWindow(HVTWin,-1,0);
+				SetConversionWindow(vt->hVTWin,-1,0);
 			}
 		}
 	}
 	else {
-		FreeIME(HVTWin);
+		FreeIME(vt->hVTWin);
 	}
 
 	if (IsCaretOn()) CaretOn(vt);
@@ -2024,10 +2023,10 @@ void ChangeCaret(vtdraw_t *vt)
   DestroyCaret();
   switch (ts.CursorShape) {
     case IdVCur:
-		CreateCaret(HVTWin, 0, CurWidth, vt->CellHeight);
+		CreateCaret(vt->hVTWin, 0, CurWidth, vt->CellHeight);
 	break;
     case IdHCur:
-		CreateCaret(HVTWin, 0, vt->CellWidth, CurWidth);
+		CreateCaret(vt->hVTWin, 0, vt->CellWidth, CurWidth);
 	break;
   }
   if (CaretEnabled) {
@@ -2036,7 +2035,7 @@ void ChangeCaret(vtdraw_t *vt)
   CaretOn(vt);
   if (CaretEnabled && (ts.NonblinkingCursor!=0)) {
     T = GetCaretBlinkTime() * 2 / 3;
-    SetTimer(HVTWin,IdCaretTimer,T,NULL);
+    SetTimer(vt->hVTWin,IdCaretTimer,T,NULL);
   }
   UpdateCaretPosition(vt, TRUE);
 }
@@ -2125,7 +2124,7 @@ void UpdateCaretPosition(vtdraw_t *vt, BOOL enforce)
 	  rc.bottom = CaretY + vt->CellHeight;
 	  // 指定よりも1ピクセル小さい範囲が再描画されるため
 	  // rc の right, bottom は1ピクセル大きくしている。
-	  InvalidateRect(HVTWin, &rc, FALSE);
+	  InvalidateRect(vt->hVTWin, &rc, FALSE);
   }
 }
 
@@ -2166,7 +2165,7 @@ void CaretOn(vtdraw_t *vt)
 			// 変換中(漢字や候補ウィンドウが表示されている状態)で
 			// ホストからのエコーを受信してcaret位置が変化した場合、
 			// 変換している位置を更新する必要がある。
-			SetConversionWindow(HVTWin,CaretX,CaretY);
+			SetConversionWindow(vt->hVTWin,CaretX,CaretY);
 		}
 
 		if (ts.CursorShape!=IdVCur) {
@@ -2181,11 +2180,11 @@ void CaretOn(vtdraw_t *vt)
 			DestroyCaret();
 			if (CursorOnDBCS) {
 				/* double width caret */
-				CreateCaret(HVTWin, color, vt->CellWidth * 2, H);
+				CreateCaret(vt->hVTWin, color, vt->CellWidth * 2, H);
 			}
 			else {
 				/* single width caret */
-				CreateCaret(HVTWin, color, vt->CellWidth, H);
+				CreateCaret(vt->hVTWin, color, vt->CellWidth, H);
 			}
 			CaretStatus = 1;
 		}
@@ -2196,7 +2195,7 @@ void CaretOn(vtdraw_t *vt)
 		if (! Active) {
 			CaretKillFocus(vt, TRUE);
 		} else {
-			ShowCaret(HVTWin);
+			ShowCaret(vt->hVTWin);
 		}
 		CaretStatus--;
 	}
@@ -2211,7 +2210,7 @@ void CaretOff(vtdraw_t *vt)
 		if (! Active) {
 			CaretKillFocus(vt, FALSE);
 		} else {
-			HideCaret(HVTWin);
+			HideCaret(vt->hVTWin);
 		}
 		CaretStatus++;
 	}
@@ -2277,12 +2276,12 @@ void DispChangeWinSize(vtdraw_t *vt, int Nx, int Ny)
   vt->ScreenWidth = WinWidth * vt->CellWidth;
   vt->ScreenHeight = WinHeight * vt->CellHeight;
 
-  AdjustScrollBar();
+  AdjustScrollBar(vt);
 
-  GetWindowRect(HVTWin,&R);
+  GetWindowRect(vt->hVTWin,&R);
   W = R.right-R.left;
   H = R.bottom-R.top;
-  GetClientRect(HVTWin,&R);
+  GetClientRect(vt->hVTWin,&R);
   dW = vt->ScreenWidth - R.right + R.left;
   dH = vt->ScreenHeight - R.bottom + R.top;
 
@@ -2293,17 +2292,17 @@ void DispChangeWinSize(vtdraw_t *vt, int Nx, int Ny)
 	// SWP_NOMOVE を指定しているのになぜか 0,0 が反映され、
 	// マルチディスプレイ環境ではプライマリモニタに
 	// 移動してしまうのを修正 (2008.5.29 maya)
-	//SetWindowPos(HVTWin,HWND_TOP,0,0,W+dW,H+dH,SWP_NOMOVE);
+	//SetWindowPos(vt->hVTWin,HWND_TOP,0,0,W+dW,H+dH,SWP_NOMOVE);
 
 	// マルチディスプレイ環境で最大化したときに、
 	// 隣のディスプレイにウィンドウの端がはみ出す問題を修正 (2008.5.30 maya)
 	// また、上記の状態では最大化状態でもウィンドウを移動させることが出来る。
-	if (!IsZoomed(HVTWin)) {
-		SetWindowPos(HVTWin,HWND_TOP,R.left,R.top,W+dW,H+dH,SWP_NOMOVE);
+	if (!IsZoomed(vt->hVTWin)) {
+		SetWindowPos(vt->hVTWin,HWND_TOP,R.left,R.top,W+dW,H+dH,SWP_NOMOVE);
 	}
   }
   else
-    InvalidateRect(HVTWin,NULL,FALSE);
+    InvalidateRect(vt->hVTWin,NULL,FALSE);
 }
 
 /**
@@ -2326,7 +2325,7 @@ void ResizeWindow(vtdraw_t *vt, int x, int y, int w, int h, int cw, int ch)
   dw = vt->ScreenWidth - cw;
   dh = vt->ScreenHeight - ch;
   if ((dw!=0) || (dh!=0)) {
-    SetWindowPos(HVTWin,HWND_TOP,x,y,w+dw,h+dh,SWP_NOMOVE);
+    SetWindowPos(vt->hVTWin,HWND_TOP,x,y,w+dw,h+dh,SWP_NOMOVE);
     AdjustSize = FALSE;
   }
   else {
@@ -2345,11 +2344,11 @@ void ResizeWindow(vtdraw_t *vt, int x, int y, int w, int h, int cw, int ch)
       if (NewY < 0) NewY = 0;
     }
     if ((NewX!=x) || (NewY!=y))
-      SetWindowPos(HVTWin,HWND_TOP,NewX,NewY,w,h,SWP_NOSIZE);
+      SetWindowPos(vt->hVTWin,HWND_TOP,NewX,NewY,w,h,SWP_NOSIZE);
 
     Point.x = 0;
     Point.y = vt->ScreenHeight;
-    ClientToScreen(HVTWin,&Point);
+    ClientToScreen(vt->hVTWin,&Point);
     CompletelyVisible = (Point.y <= VirtualScreen.bottom);
     if (IsCaretOn()) CaretOn(vt);
   }
@@ -2392,7 +2391,7 @@ void DispEndPaint(ttdc_t *dc)
 
 void DispClearWin(vtdraw_t *vt)
 {
-  InvalidateRect(HVTWin,NULL,FALSE);
+  InvalidateRect(vt->hVTWin,NULL,FALSE);
 
   ScrollCount = 0;
   dScroll = 0;
@@ -2401,13 +2400,13 @@ void DispClearWin(vtdraw_t *vt)
   else {
     if ((NumOfLines==WinHeight) && (ts.EnableScrollBuff>0))
     {
-      SetScrollRange(HVTWin,SB_VERT,0,1,FALSE);
+      SetScrollRange(vt->hVTWin,SB_VERT,0,1,FALSE);
     }
     else
-      SetScrollRange(HVTWin,SB_VERT,0,NumOfLines-WinHeight,FALSE);
+      SetScrollRange(vt->hVTWin,SB_VERT,0,NumOfLines-WinHeight,FALSE);
 
-    SetScrollPos(HVTWin,SB_HORZ,0,TRUE);
-    SetScrollPos(HVTWin,SB_VERT,0,TRUE);
+    SetScrollPos(vt->hVTWin,SB_HORZ,0,TRUE);
+    SetScrollPos(vt->hVTWin,SB_VERT,0,TRUE);
   }
   if (IsCaretOn()) CaretOn(vt);
 }
@@ -2415,8 +2414,7 @@ void DispClearWin(vtdraw_t *vt)
 // TODO: DECSCNM / Visual Bell から使われている。必要?
 void DispChangeBackground(vtdraw_t *vt)
 {
-	(void)vt;
-	InvalidateRect(HVTWin,NULL,TRUE);
+	InvalidateRect(vt->hVTWin,NULL,TRUE);
 }
 
 void DispChangeWin(vtdraw_t *vt)
@@ -2472,7 +2470,7 @@ void DispReleaseDC(vtdraw_t *vt, ttdc_t *dc)
 		DeleteDC(dc->VTDC);
 	} else {
 		assert(vt->hVTWin == dc->HVTWin);
-		ReleaseDC(dc->HVTWin, dc->VTDC);
+		ReleaseDC(vt->hVTWin, dc->VTDC);
 	}
 	memset(dc, 0, sizeof(*dc));
 	free(dc);
@@ -2667,10 +2665,10 @@ static void GetDrawAttr(vtdraw_t *vt, const TCharAttr *Attr, BOOL _reverse, COLO
 	if (Attr2Flag & Attr2Fore) {
 		const int index = Get16ColorIndex(Attr->Fore, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBold);
 		if (!reverse) {
-			TextColor = ANSIColor[index];
+			TextColor = vt->ANSIColor[index];
 		}
 		else {
-			BackColor = ANSIColor[index];
+			BackColor = vt->ANSIColor[index];
 		}
 	}
 
@@ -2678,10 +2676,10 @@ static void GetDrawAttr(vtdraw_t *vt, const TCharAttr *Attr, BOOL _reverse, COLO
 	if (Attr2Flag & Attr2Back) {
 		const int index = Get16ColorIndex(Attr->Back, ts.ColorFlag & CF_PCBOLD16, AttrFlag & AttrBlink);
 		if (!reverse) {
-			BackColor = ANSIColor[index];
+			BackColor = vt->ANSIColor[index];
 		}
 		else {
-			TextColor = ANSIColor[index];
+			TextColor = vt->ANSIColor[index];
 		}
 	}
 
@@ -3132,9 +3130,9 @@ BOOL DispDeleteLines(vtdraw_t *vt, int Count, int YEnd)
 	R.right = vt->ScreenWidth;
 	R.top = (CursorY - WinOrgY) * vt->CellHeight;
 	R.bottom = (YEnd + 1 - WinOrgY) * vt->CellHeight;
-	//  ScrollWindow(HVTWin,0,-CellHeight*Count,&R,&R);
-	BGScrollWindow(HVTWin,0,-vt->CellHeight*Count,&R,&R);
-	UpdateWindow(HVTWin);
+	//  ScrollWindow(vt->hVTWin,0,-CellHeight*Count,&R,&R);
+	BGScrollWindow(vt->hVTWin,0,-vt->CellHeight*Count,&R,&R);
+	UpdateWindow(vt->hVTWin);
 	return TRUE;
   }
   else
@@ -3155,9 +3153,9 @@ BOOL DispInsertLines(vtdraw_t *vt, int Count, int YEnd)
     R.right = vt->ScreenWidth;
 	R.top = (CursorY - WinOrgY) * vt->CellHeight;
 	R.bottom = (YEnd + 1 - WinOrgY) * vt->CellHeight;
-	//  ScrollWindow(HVTWin,0,CellHeight*Count,&R,&R);
-	BGScrollWindow(HVTWin, 0, vt->CellHeight * Count, &R, &R);
-	UpdateWindow(HVTWin);
+	//  ScrollWindow(vt->hVTWin,0,CellHeight*Count,&R,&R);
+	BGScrollWindow(vt->hVTWin, 0, vt->CellHeight * Count, &R, &R);
+	UpdateWindow(vt->hVTWin);
     return TRUE;
   }
   else
@@ -3196,7 +3194,7 @@ BOOL IsLineVisible(vtdraw_t *vt, int *X, int *Y)
 
 //-------------- scrolling functions --------------------
 
-void AdjustScrollBar(void) /* called by ChangeWindowSize() */
+void AdjustScrollBar(vtdraw_t *vt) /* called by ChangeWindowSize() */
 {
   LONG XRange, YRange;
   int ScrollPosX, ScrollPosY;
@@ -3211,8 +3209,8 @@ void AdjustScrollBar(void) /* called by ChangeWindowSize() */
   else
     YRange = 0;
 
-  ScrollPosX = GetScrollPos(HVTWin,SB_HORZ);
-  ScrollPosY = GetScrollPos(HVTWin,SB_VERT);
+  ScrollPosX = GetScrollPos(vt->hVTWin, SB_HORZ);
+  ScrollPosY = GetScrollPos(vt->hVTWin, SB_VERT);
   if (ScrollPosX > XRange)
     ScrollPosX = XRange;
   if (ScrollPosY > YRange)
@@ -3225,24 +3223,25 @@ void AdjustScrollBar(void) /* called by ChangeWindowSize() */
 
   DontChangeSize = TRUE;
 
-  SetScrollRange(HVTWin,SB_HORZ,0,XRange,FALSE);
+  SetScrollRange(vt->hVTWin, SB_HORZ, 0, XRange, FALSE);
 
   if ((YRange == 0) && (ts.EnableScrollBuff>0))
   {
-    SetScrollRange(HVTWin,SB_VERT,0,1,FALSE);
+    SetScrollRange(vt->hVTWin,SB_VERT,0,1,FALSE);
   }
   else {
-    SetScrollRange(HVTWin,SB_VERT,0,YRange,FALSE);
+    SetScrollRange(vt->hVTWin,SB_VERT,0,YRange,FALSE);
   }
 
-  SetScrollPos(HVTWin,SB_HORZ,ScrollPosX,TRUE);
-  SetScrollPos(HVTWin,SB_VERT,ScrollPosY,TRUE);
+  SetScrollPos(vt->hVTWin, SB_HORZ, ScrollPosX, TRUE);
+  SetScrollPos(vt->hVTWin, SB_VERT, ScrollPosY, TRUE);
 
   DontChangeSize = FALSE;
 }
 
-void DispScrollToCursor(int CurX, int CurY)
+void DispScrollToCursor(vtdraw_t *vt, int CurX, int CurY)
 {
+  (void)vt;
   if (CurX < NewOrgX)
     NewOrgX = CurX;
   else if (CurX >= NewOrgX+WinWidth)
@@ -3295,17 +3294,17 @@ void DispUpdateScroll(vtdraw_t *vt)
     R.right = vt->ScreenWidth;
     R.top = (SRegionTop-WinOrgY)*vt->CellHeight;
     R.bottom = (SRegionBottom+1-WinOrgY)*vt->CellHeight;
-//  ScrollWindow(HVTWin,0,-d,&R,&R);
-    BGScrollWindow(HVTWin,0,-d,&R,&R);
+//  ScrollWindow(vt->hVTWin,0,-d,&R,&R);
+    BGScrollWindow(vt->hVTWin,0,-d,&R,&R);
 
     if ((SRegionTop==0) && (dScroll>0))
 	{ // update scroll bar if BuffEnd is changed
 	  if ((BuffEnd==WinHeight) &&
           (ts.EnableScrollBuff>0))
-        SetScrollRange(HVTWin,SB_VERT,0,1,TRUE);
+        SetScrollRange(vt->hVTWin,SB_VERT,0,1,TRUE);
       else
-        SetScrollRange(HVTWin,SB_VERT,0,BuffEnd-WinHeight,FALSE);
-      SetScrollPos(HVTWin,SB_VERT,WinOrgY+PageStart,TRUE);
+        SetScrollRange(vt->hVTWin,SB_VERT,0,BuffEnd-WinHeight,FALSE);
+      SetScrollPos(vt->hVTWin,SB_VERT,WinOrgY+PageStart,TRUE);
 	}
     dScroll = 0;
   }
@@ -3324,10 +3323,10 @@ void DispUpdateScroll(vtdraw_t *vt)
   {
     if ((BuffEnd==WinHeight) &&
         (ts.EnableScrollBuff>0))
-      SetScrollRange(HVTWin,SB_VERT,0,1,TRUE);
+      SetScrollRange(vt->hVTWin,SB_VERT,0,1,TRUE);
     else
-      SetScrollRange(HVTWin,SB_VERT,0,BuffEnd-WinHeight,FALSE);
-    SetScrollPos(HVTWin,SB_VERT,NewOrgY+PageStart,TRUE);
+      SetScrollRange(vt->hVTWin,SB_VERT,0,BuffEnd-WinHeight,FALSE);
+    SetScrollPos(vt->hVTWin,SB_VERT,NewOrgY+PageStart,TRUE);
   }
 
   if ((NewOrgX==WinOrgX) &&
@@ -3336,30 +3335,30 @@ void DispUpdateScroll(vtdraw_t *vt)
   if (NewOrgX==WinOrgX)
   {
 	  d = (NewOrgY - WinOrgY) * vt->CellHeight;
-	  //  ScrollWindow(HVTWin,0,-d,NULL,NULL);
-    BGScrollWindow(HVTWin,0,-d,NULL,NULL);
+	  //  ScrollWindow(vt->hVTWin,0,-d,NULL,NULL);
+    BGScrollWindow(vt->hVTWin,0,-d,NULL,NULL);
   }
   else if (NewOrgY==WinOrgY)
   {
     d = (NewOrgX-WinOrgX) * vt->CellWidth;
-//  ScrollWindow(HVTWin,-d,0,NULL,NULL);
-    BGScrollWindow(HVTWin,-d,0,NULL,NULL);
+//  ScrollWindow(vt->hVTWin,-d,0,NULL,NULL);
+    BGScrollWindow(vt->hVTWin,-d,0,NULL,NULL);
   }
   else
-    InvalidateRect(HVTWin,NULL,TRUE);
+    InvalidateRect(vt->hVTWin,NULL,TRUE);
 
   /* Update scroll bars */
   if (NewOrgX!=WinOrgX)
-    SetScrollPos(HVTWin,SB_HORZ,NewOrgX,TRUE);
+    SetScrollPos(vt->hVTWin,SB_HORZ,NewOrgX,TRUE);
 
   if (ts.AutoScrollOnlyInBottomLine == 0 && NewOrgY!=WinOrgY)
   {
     if ((BuffEnd==WinHeight) &&
         (ts.EnableScrollBuff>0))
-      SetScrollRange(HVTWin,SB_VERT,0,1,TRUE);
+      SetScrollRange(vt->hVTWin,SB_VERT,0,1,TRUE);
     else
-      SetScrollRange(HVTWin,SB_VERT,0,BuffEnd-WinHeight,FALSE);
-    SetScrollPos(HVTWin,SB_VERT,NewOrgY+PageStart,TRUE);
+      SetScrollRange(vt->hVTWin,SB_VERT,0,BuffEnd-WinHeight,FALSE);
+    SetScrollPos(vt->hVTWin,SB_VERT,NewOrgY+PageStart,TRUE);
   }
 
   WinOrgX = NewOrgX;
@@ -3436,31 +3435,6 @@ void DispVScroll(vtdraw_t *vt, int Func, int Pos)
 //-------------- end of scrolling functions --------
 
 /**
- *	フォントのCharSet(LOGFONT.charlfCharSet)から
- *	表示に妥当なCodePageを得る
- */
-static int GetCodePageFromFontCharSet(BYTE char_set)
-{
-	static const struct {
-		BYTE CharSet;	// LOGFONT.lfCharSet
-		int CodePage;
-	} table[] = {
-		{ SHIFTJIS_CHARSET,  	932 },
-		{ HANGUL_CHARSET,		949 },
-		{ GB2312_CHARSET,	 	936 },
-		{ CHINESEBIG5_CHARSET,	950 },
-		{ RUSSIAN_CHARSET,		1251 },
-	};
-	int i;
-	for (i = 0; i < _countof(table); i++) {
-		if (table[i].CharSet == char_set) {
-			return table[i].CodePage;
-		}
-	}
-	return CP_ACP;
-}
-
-/**
  *	Restore window size by double clik on caption bar
  *
  */
@@ -3495,19 +3469,19 @@ void DispSetWinPos(vtdraw_t *vt)
 		CaretX = (CursorX-WinOrgX)*vt->CellWidth;
 		CaretY = (CursorY-WinOrgY)*vt->CellHeight;
 		/* set IME conversion window pos. */
-		SetConversionWindow(HVTWin,CaretX,CaretY);
+		SetConversionWindow(vt->hVTWin,CaretX,CaretY);
 	}
 
 	Point.x = 0;
 	Point.y = vt->ScreenHeight;
-	ClientToScreen(HVTWin,&Point);
+	ClientToScreen(vt->hVTWin,&Point);
 	CompletelyVisible = (Point.y <= VirtualScreen.bottom);
 
 	if(BGEnable) {
 		if (BGSrc1.enable) {
 			// 壁紙(Windowsのデスクトップ背景)が有効な時は
 			// 全面書き直し
-			InvalidateRect(HVTWin, NULL, FALSE);
+			InvalidateRect(vt->hVTWin, NULL, FALSE);
 		}
 	}
 }
@@ -3516,9 +3490,9 @@ void DispSetWinPos(vtdraw_t *vt)
  *	ウィンドウの位置を移動する
  *	CSSunSequence()@vtterm.c から呼ばれる
  */
-void DispMoveWindow(int x, int y)
+void DispMoveWindow(vtdraw_t *vt, int x, int y)
 {
-	SetWindowPos(HVTWin, 0, x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
+	SetWindowPos(vt->hVTWin, 0, x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
 	// WM_WINDOWPOSCHANGED を処理しないので
 	// WM_MOVE が発生して DispSetWinPos() がコールされる
 	// DispSetWinPos();
@@ -3535,13 +3509,13 @@ void DispSetActive(vtdraw_t *vt, BOOL ActiveFlag)
 			UpdateCaretPosition(vt, TRUE);
 		}
 
-		SetFocus(HVTWin);
+		SetFocus(vt->hVTWin);
 		ActiveWin = IdVT;
 	}
 	else {
 		if (CanUseIME()) {
 			/* position & font of conv. window -> default */
-			SetConversionWindow(HVTWin,-1,0);
+			SetConversionWindow(vt->hVTWin,-1,0);
 		}
 	}
 }
@@ -3558,7 +3532,7 @@ void DispSetColor(vtdraw_t *vt, unsigned int num, COLORREF color)
 
 	switch (num) {
 	case CS_VT_NORMALFG:
-			vt->BGVTColor[0] = color;
+		vt->BGVTColor[0] = color;
 		break;
 	case CS_VT_NORMALBG:
 		vt->BGVTColor[1] = color;
@@ -3593,18 +3567,22 @@ void DispSetColor(vtdraw_t *vt, unsigned int num, COLORREF color)
 	case CS_VT_UNDERBG:
 		vt->BGVTUnderlineColor[1] = color;
 		break;
-	case CS_TEK_FG:       ts.TEKColor[0] = color; break;
-	case CS_TEK_BG:       ts.TEKColor[1] = color; break;
+	case CS_TEK_FG:
+		ts.TEKColor[0] = color;
+		break;
+	case CS_TEK_BG:
+		ts.TEKColor[1] = color;
+		break;
 	default:
 		if (num <= 255) {
 			if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
 				// 8色モード
 				int i256 = GetIndex256From16(num);
-				ANSIColor[i256] = color;
+				vt->ANSIColor[i256] = color;
 			}
 			else {
 				// 16/256色モード
-				ANSIColor[num] = color;
+				vt->ANSIColor[num] = color;
 			}
 		}
 		else {
@@ -3618,7 +3596,7 @@ void DispSetColor(vtdraw_t *vt, unsigned int num, COLORREF color)
 			InvalidateRect(HTEKWin, NULL, FALSE);
 	}
 	else {
-		InvalidateRect(HVTWin,NULL,FALSE);
+		InvalidateRect(vt->hVTWin,NULL,FALSE);
 	}
 }
 
@@ -3670,7 +3648,7 @@ void DispResetColor(vtdraw_t *vt, unsigned int num)
 	case CS_TEK_BG:
 		break;
 	case CS_ANSICOLOR_ALL:
-		InitColorTable(ts.ANSIColor);
+		InitColorTable(vt, ts.ANSIColor);
 		DispSetNearestColors(0, 255, NULL);
 		break;
 	case CS_SP_ALL:
@@ -3696,7 +3674,7 @@ void DispResetColor(vtdraw_t *vt, unsigned int num)
 		vt->BGVTUnderlineColor[1] = ts.VTUnderlineColor[1];
 
 		// ANSI Color / xterm 256 color
-		InitColorTable(ts.ANSIColor);
+		InitColorTable(vt, ts.ANSIColor);
 		DispSetNearestColors(0, 255, NULL);
 		break;
 	default:
@@ -3704,16 +3682,16 @@ void DispResetColor(vtdraw_t *vt, unsigned int num)
 			if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
 				// 8色モード
 				int i256 = GetIndex256From16(num);
-				ANSIColor[i256] = ts.ANSIColor[num];
+				vt->ANSIColor[i256] = ts.ANSIColor[num];
 			}
 			else {
 				int i16 = GetIndex16From256(num);
-				ANSIColor[num] = ts.ANSIColor[i16];
+				vt->ANSIColor[num] = ts.ANSIColor[i16];
 				DispSetNearestColors(num, num, NULL);
 			}
 		}
 		else if (num <= 255) {
-			ANSIColor[num] = RGB(DefaultColorTable[num][0], DefaultColorTable[num][1], DefaultColorTable[num][2]);
+			vt->ANSIColor[num] = RGB(DefaultColorTable[num][0], DefaultColorTable[num][1], DefaultColorTable[num][2]);
 			DispSetNearestColors(num, num, NULL);
 		}
 	}
@@ -3723,11 +3701,11 @@ void DispResetColor(vtdraw_t *vt, unsigned int num)
 			InvalidateRect(HTEKWin, NULL, FALSE);
 	}
 	else {
-		InvalidateRect(HVTWin, NULL, FALSE);
+		InvalidateRect(vt->hVTWin, NULL, FALSE);
 	}
 }
 
-COLORREF DispGetColor(unsigned int num)
+COLORREF DispGetColor(vtdraw_t *vt, unsigned int num)
 {
 	COLORREF color;
 
@@ -3751,15 +3729,15 @@ COLORREF DispGetColor(unsigned int num)
 			if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
 				// 8色モード
 				int i256 = GetIndex256From16(num);
-				color = ANSIColor[i256];
+				color = vt->ANSIColor[i256];
 			}
 			else {
 				// 16/256色モード
-				color = ANSIColor[num];
+				color = vt->ANSIColor[num];
 			}
 		}
 		else {
-			color = ANSIColor[0];
+			color = vt->ANSIColor[0];
 		}
 		break;
 	}
@@ -3767,17 +3745,17 @@ COLORREF DispGetColor(unsigned int num)
 	return color;
 }
 
-void DispShowWindow(int mode)
+void DispShowWindow(vtdraw_t *vt, int mode)
 {
 	switch (mode) {
 	case WINDOW_MINIMIZE:
-		ShowWindow(HVTWin, SW_MINIMIZE);
+		ShowWindow(vt->hVTWin, SW_MINIMIZE);
 		break;
 	case WINDOW_MAXIMIZE:
-		ShowWindow(HVTWin, SW_MAXIMIZE);
+		ShowWindow(vt->hVTWin, SW_MAXIMIZE);
 		break;
 	case WINDOW_RESTORE:
-		ShowWindow(HVTWin, SW_RESTORE);
+		ShowWindow(vt->hVTWin, SW_RESTORE);
 		break;
 	case WINDOW_RAISE: {
 		//何も起きないことあり
@@ -3788,35 +3766,36 @@ void DispShowWindow(int mode)
 		SetForegroundWindow(HVTWin);
 #else
 		//フォーカスは奪わず最上面に来る
-		BringWindowToTop(HVTWin);
-		if (GetForegroundWindow() != HVTWin) {
-			FlashWindow(HVTWin, TRUE);
+		BringWindowToTop(vt->hVTWin);
+		if (GetForegroundWindow() != vt->hVTWin) {
+			FlashWindow(vt->hVTWin, TRUE);
 		}
 #endif
 	}
 		break;
 	case WINDOW_LOWER:
-		SetWindowPos(HVTWin, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		SetWindowPos(vt->hVTWin, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 		break;
 	case WINDOW_REFRESH:
-		InvalidateRect(HVTWin, NULL, FALSE);
+		InvalidateRect(vt->hVTWin, NULL, FALSE);
 		break;
 	case WINDOW_TOGGLE_MAXIMIZE:
-		if (IsZoomed(HVTWin)) {
-			ShowWindow(HVTWin, SW_RESTORE);
+		if (IsZoomed(vt->hVTWin)) {
+			ShowWindow(vt->hVTWin, SW_RESTORE);
 		}
 		else {
-			ShowWindow(HVTWin, SW_MAXIMIZE);
+			ShowWindow(vt->hVTWin, SW_MAXIMIZE);
 		}
 		break;
 	}
 }
 
-void DispResizeWin(int w, int h) {
+void DispResizeWin(vtdraw_t *vt, int w, int h)
+{
 	RECT r;
 
 	if (w <= 0 || h <= 0) {
-		GetWindowRect(HVTWin,&r);
+		GetWindowRect(vt->hVTWin, &r);
 		if (w <= 0) {
 			w = r.right - r.left;
 		}
@@ -3824,27 +3803,29 @@ void DispResizeWin(int w, int h) {
 			h = r.bottom - r.top;
 		}
 	}
-	SetWindowPos(HVTWin, 0, 0, 0, w, h, SWP_NOMOVE|SWP_NOZORDER|SWP_NOACTIVATE);
+	SetWindowPos(vt->hVTWin, 0, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 	AdjustSize = FALSE;
 }
 
-BOOL DispWindowIconified(void) {
-	return IsIconic(HVTWin);
+BOOL DispWindowIconified(vtdraw_t *vt)
+{
+	return IsIconic(vt->hVTWin);
 }
 
-void DispGetWindowPos(int *x, int *y, BOOL client) {
+void DispGetWindowPos(vtdraw_t *vt, int *x, int *y, BOOL client)
+{
 	WINDOWPLACEMENT wndpl;
 	POINT point;
 
 	if (client) {
 		point.x = point.y = 0;
-		ClientToScreen(HVTWin, &point);
+		ClientToScreen(vt->hVTWin, &point);
 		*x = point.x;
 		*y = point.y;
 	}
 	else {
 		wndpl.length = sizeof(WINDOWPLACEMENT);
-		GetWindowPlacement(HVTWin, &wndpl);
+		GetWindowPlacement(vt->hVTWin, &wndpl);
 
 		switch (wndpl.showCmd) {
 		  case SW_SHOWMAXIMIZED:
@@ -3860,14 +3841,15 @@ void DispGetWindowPos(int *x, int *y, BOOL client) {
 	return;
 }
 
-void DispGetWindowSize(int *width, int *height, BOOL client) {
+void DispGetWindowSize(vtdraw_t *vt, int *width, int *height, BOOL client)
+{
 	RECT r;
 
 	if (client) {
-		GetClientRect(HVTWin, &r);
+		GetClientRect(vt->hVTWin, &r);
 	}
 	else {
-		GetWindowRect(HVTWin, &r);
+		GetWindowRect(vt->hVTWin, &r);
 	}
 	*width = r.right - r.left;
 	*height = r.bottom - r.top;
@@ -3879,10 +3861,10 @@ void DispGetRootWinSize(vtdraw_t *vt, int *x, int *y, BOOL inPixels)
 {
 	RECT desktop, win, client;
 
-	GetWindowRect(HVTWin, &win);
-	GetClientRect(HVTWin, &client);
+	GetWindowRect(vt->hVTWin, &win);
+	GetClientRect(vt->hVTWin, &client);
 
-	GetDesktopRect(HVTWin, &desktop);
+	GetDesktopRect(vt->hVTWin, &desktop);
 
 	if (inPixels) {
 		*x = desktop.right - desktop.left;
@@ -3894,7 +3876,7 @@ void DispGetRootWinSize(vtdraw_t *vt, int *x, int *y, BOOL inPixels)
 	}
 }
 
-int DispFindClosestColor(int red, int green, int blue)
+int DispFindClosestColor(vtdraw_t *vt, int red, int green, int blue)
 {
 	int i, color, diff_r, diff_g, diff_b, diff, min;
 
@@ -3905,9 +3887,10 @@ int DispFindClosestColor(int red, int green, int blue)
 		return -1;
 
 	for (i=0; i<256; i++) {
-		diff_r = red - GetRValue(ANSIColor[i]);
-		diff_g = green - GetGValue(ANSIColor[i]);
-		diff_b = blue - GetBValue(ANSIColor[i]);
+		COLORREF rgba = vt->ANSIColor[i];
+		diff_r = red - GetRValue(rgba);
+		diff_g = green - GetGValue(rgba);
+		diff_b = blue - GetBValue(rgba);
 		diff = diff_r * diff_r + diff_g * diff_g + diff_b * diff_b;
 
 		if (diff < min) {
@@ -3955,7 +3938,7 @@ void ThemeGetColor(vtdraw_t *vt, TColorTheme *data)
 	// ANSI color
 	data->ansicolor.change = TRUE;
 	for (i = 0; i < 16; i++) {
-		data->ansicolor.color[i] = ANSIColor[i];
+		data->ansicolor.color[i] = vt->ANSIColor[i];
 	}
 }
 
@@ -3976,7 +3959,7 @@ void ThemeSetColor(vtdraw_t *vt, const TColorTheme *data)
 	vt->BGURLColor[0] = data->url.fg;
 	vt->BGURLColor[1] = data->url.bg;
 	for (i = 0; i < 16; i++) {
-		ANSIColor[i] = data->ansicolor.color[i];
+		vt->ANSIColor[i] = data->ansicolor.color[i];
 	}
 }
 
@@ -4085,14 +4068,14 @@ void ThemeSetBG(vtdraw_t *vt, const BGTheme *bg_theme)
 	BGDest.color = bg_theme->BGDest.color;
 	BGDest.pattern = bg_theme->BGDest.pattern;
 	BGDest.enable = bg_theme->BGDest.enable;
-	BGDest.alpha = bg_theme->BGDest.alpha;
+	BGDest.alpha = (BYTE)bg_theme->BGDest.alpha;
 
 	BGSrc1.type = bg_theme->BGSrc1.type;
-	BGSrc1.alpha = bg_theme->BGSrc1.alpha;
+	BGSrc1.alpha = (BYTE)bg_theme->BGSrc1.alpha;
 	BGSrc1.enable = bg_theme->BGSrc1.enable;
 
 	BGSrc2.type = bg_theme->BGSrc2.type;
-	BGSrc2.alpha = bg_theme->BGSrc2.alpha;
+	BGSrc2.alpha = (BYTE)bg_theme->BGSrc2.alpha;
 	BGSrc2.color = bg_theme->BGSrc2.color;
 	BGSrc2.enable = bg_theme->BGSrc2.enable;
 
@@ -4359,13 +4342,13 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **pdc, int *mode)
 	if (ts.PrnFont[0]==0) {
 		Prnlf.lfHeight = ts.VTFontSize.y;
 		Prnlf.lfWidth = ts.VTFontSize.x;
-		Prnlf.lfCharSet = ts.VTFontCharSet;
+		Prnlf.lfCharSet = (BYTE)ts.VTFontCharSet;
 		ACPToWideChar_t(ts.VTFont, Prnlf.lfFaceName, _countof(Prnlf.lfFaceName));
 	}
 	else {
 		Prnlf.lfHeight = ts.PrnFontSize.y;
 		Prnlf.lfWidth = ts.PrnFontSize.x;
-		Prnlf.lfCharSet = ts.PrnFontCharSet;
+		Prnlf.lfCharSet = (BYTE)ts.PrnFontCharSet;
 		ACPToWideChar_t(ts.PrnFont, Prnlf.lfFaceName, _countof(Prnlf.lfFaceName));
 	}
 	Prnlf.lfWeight = FW_NORMAL;
