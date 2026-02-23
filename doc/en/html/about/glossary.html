@@ -50,36 +50,6 @@ XMODEM プロトコルをベースにしてるようですが、
     </p>
   </dd>
 
-<dt>TEK4010</dt>
-<dd>Name of Tektronix terminal. This can display diagrams and graphemes, and was used widely in scientific and technical fields.</dd>
-<!--
-現在は、X Window 環境などに取って替わられつつありますが、TEK エミュレーターを使用している人はまだまだいます(作者も含めて)。<br>
-大部分のユーザーは Tera Term の TEK エミュレーション機能を使うことはないでしょう。</dd>
--->
-
-<dt>TEK window</dt>
-<dd>The window that emulates TEK terminal.
-"TEK" is displayed to right of window title string.
-This window is not displayed when Tera Term is started.
-[Control]-[Open TEK] command opens TEK window.
-</dd>
-
-<dt>VT100</dt>
-<dd>Name of DEC(Digital Equipment Corporation)'s terminal.
-The terminal was used widely for Unix, VAX/VMS, and other computers.
-<!--
-現在は、 VT100 そのものはほとんど使用されていませんが、その仕様が事実上の標準となっているため、PC や ワークステーションで動く VT100 エミュレーターが多く作られています。
--->
-<br>
-VT220 and VT382 are names of upwardly compatible terminals of VT100.
-</dd>
-
-<dt>VT window</dt>
-<dd>The main window of Tera Term.
-This window is displayed when Tera Term start.
-"VT" is displayed to right of window title string.<br>
-Window for VT terminal emulation.</dd>
-
 <dt>XMODEM</dt>
 <dd>File transfer protocol developed by Ward Christensen in 1977.</dd>
 <!--
@@ -98,9 +68,9 @@ Window for VT terminal emulation.</dd>
 
 </dl>
 
-<h2>Control Sequence</h2>
+<h2>Terminal/Control Sequence</h2>
 
-About Control Sequence.
+About Terminal/Control Sequence.
 
 <dl>
 <dt id="Bracketed">Bracketed Paste Mode</dt>
@@ -120,6 +90,40 @@ On the other hand, when pasted characters is overwritten again to remove the hig
       
   </ul>
 </dd>
+
+<dt id="dumb">dumb terminal</dt>
+<dd>This terminal can only use line feed (0x0d (\r, ^J), 0x0a (\n, ^M)) and bell (0x07 (^G)).</dd>
+
+<dt>TEK4010</dt>
+<dd>Name of Tektronix terminal. This can display diagrams and graphemes, and was used widely in scientific and technical fields.</dd>
+<!--
+現在は、X Window 環境などに取って替わられつつありますが、TEK エミュレーターを使用している人はまだまだいます(作者も含めて)。<br>
+大部分のユーザーは Tera Term の TEK エミュレーション機能を使うことはないでしょう。</dd>
+-->
+
+<dt>TEK window</dt>
+<dd>The window that emulates TEK terminal.
+"TEK" is displayed to right of window title string.
+This window is not displayed when Tera Term is started.
+[Control]-[Open TEK] command opens TEK window.
+</dd>
+
+<dt id="VT100">VT100</dt>
+<dd>Name of DEC(Digital Equipment Corporation)'s terminal.
+The terminal was used widely for Unix, VAX/VMS, and other computers.
+<!--
+現在は、 VT100 そのものはほとんど使用されていませんが、その仕様が事実上の標準となっているため、PC や ワークステーションで動く VT100 エミュレーターが多く作られています。
+-->
+<br>
+VT220 and VT382 are names of upwardly compatible terminals of VT100.
+</dd>
+
+<dt>VT window</dt>
+<dd>The main window of Tera Term.
+This window is displayed when Tera Term start.
+"VT" is displayed to right of window title string.<br>
+Window for VT terminal emulation.</dd>
+
 </dl>
 
 <h2>Character code</h2>

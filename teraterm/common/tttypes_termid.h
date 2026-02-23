@@ -46,7 +46,8 @@ typedef enum {
 	IdVT382,
 	IdVT420,
 	IdVT520,
-	IdVT525
+	IdVT525,
+	IdDUMB,
 } IdTerminalID;
 
 typedef struct {
