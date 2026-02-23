@@ -73,6 +73,9 @@
         ダム端末のエミュレーションをサポートした。
         <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> に "dumb" を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1096" target="_blank">issue #1096</a>)
+        プラグインタブ ("Additional settings &gt; <a href="../menu/setup-additional-plugin.html">Plugin</a>") を追加、
+        プラグインのロード設定を可能とした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/604" target="_blank">issue #604</a>)
       </li>
     </ul>
   </li>
@@ -133,7 +136,7 @@
       <li>
         文字間スペースを "Additional settings &gt; <a href="../menu/setup-additional-font.html">Font</a>" タブから正しく設定できない問題を修正した。
         5.0からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1008" target="_blank">issue #1008</a>) 
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1008" target="_blank">issue #1008</a>)
       </li>
       <li>
         ttermpro.exe の /I オプション指定時にマクロコマンド connect でホストに接続出来ない不具合を修正した。
@@ -4076,6 +4079,18 @@
       <li>
         About TTSSH ダイアログに表示する鍵交換方式の情報を、DH グループや楕円曲線の情報に変更した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1018" target="_blank">issue #1018</a>)
+      </li>
+      <li>
+        <a href="../menu/file-ssh-scp.html">SCPを用いたファイル受信</a>の速度を改善した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1056" target="_blank">issue #1056</a>)
+      </li>
+      <li>
+        <a href="../menu/file-ssh-scp.html">SCPファイル転送ダイアログ</a>で Enter キー押下時に実行されるボタン(Send/Receive)が入力項目のフォーカス位置に応じて切り替わるよう変更した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1108" target="_blank">issue #1108</a>)
+      </li>
+      <li>
+        SCPを用いたファイル転送中に表示される進捗ダイアログのアイコンをタスクバーに表示するよう変更した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1108" target="_blank">issue #1108</a>)
       </li>
     </ul>
   </li>

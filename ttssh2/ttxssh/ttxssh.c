@@ -177,6 +177,7 @@ static void init_TTSSH(PTInstVar pvar)
 	FWD_init(pvar);
 	FWDUI_init(pvar);
 
+	ssh_scp_thread_lock_initialize();
 	ssh_heartbeat_lock_initialize();
 
 	pvar->cc[MODE_IN] = NULL;
@@ -201,6 +202,7 @@ static void uninit_TTSSH(PTInstVar pvar)
 	// VT ウィンドウのアイコン
 	SetVTIconID(pvar->cv, NULL, 0);
 
+	ssh_scp_thread_lock_finalize();
 	ssh_heartbeat_lock_finalize();
 
 	cipher_free_SSH2(pvar->cc[MODE_IN]);
@@ -3474,6 +3476,20 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 	}
 
 	case WM_COMMAND:
+		// フォーカス位置に応じてEnterキーで実行されるボタンを変更する
+		if (HIWORD(wParam) == EN_SETFOCUS) {
+			switch (LOWORD(wParam)) {
+				case IDC_SENDFILE_EDIT:
+				case IDC_SENDFILE_TO:
+					SendMessage(dlg, DM_SETDEFID, (WPARAM)IDOK, 0);
+					break;
+				case IDC_RECVFILE:
+				case IDC_RECVFILE_TO:
+					SendMessage(dlg, DM_SETDEFID, (WPARAM)IDC_RECV, 0);
+					break;
+			}
+		}
+
 		switch (wParam) {
 		case IDC_SENDFILE_SELECT | (BN_CLICKED << 16): {
 			TTOPENFILENAMEW ofn = {0};
@@ -3497,6 +3513,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 				free(filename);
 			}
 			free(UIMsgW);
+			SendMessage(dlg, DM_SETDEFID, (WPARAM)IDOK, 0);	// Enterキーで実行されるボタンを Send にする
 
 			return TRUE;
 		}
@@ -3510,6 +3527,7 @@ static INT_PTR CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 				free(new_dir);
 			}
 			free(cur_dir);
+			SendMessage(dlg, DM_SETDEFID, (WPARAM)IDC_RECV, 0);	// Enterキーで実行されるボタンを Receive にする
 			}
 			return TRUE;
 		}

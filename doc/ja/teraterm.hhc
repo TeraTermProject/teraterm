@@ -593,6 +593,11 @@
 					<param name="Local" value="html\menu\setup-additional-serialport.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="プラグイン タブ">
+					<param name="Local" value="html\menu\setup-additional-plugin.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
 			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Save setup">

@@ -72,11 +72,11 @@ Using cmake in each environment.
 ## Library directory generated
 
 - Library `*.h` and `*.lib` are created in the following:
-	- `oniguruma_{compiler}`
-	- `libressl_{compiler}`
-	- `putty`
-	- `SFMT_{compiler}`
-	- `zlib_{compiler}`
+    - `cJSON`
+    - `oniguruma_{compiler}`
+    - `libressl_{compiler}`
+    - `SFMT_{compiler}`
+    - `zlib_{compiler}`
 
 ## Downloaded archive directory
 

@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Additional settings / "Plugin" タブ ([Setup] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1><a href="setup-additional.html">Additional settings</a> / "Plugin" タブ ([Setup] メニュー)</h1>
+
+    <p>
+      プラグインの許可(ロードする)/禁止(ロードしない)を設定します。
+    </p>
+
+    <p>
+      プラグインフォルダのプラグイン、設定の一覧が表示されます。
+    </p>
+
+    <p>
+      プラグインのロードは起動時に行われます。
+      起動後にプラグインをロードする、ロードを取り消すことはできません。
+      <a href="../menu/setup-restore.html">設定ファイルの再読み込み</a>を行っても、プラグインが設定どおりに再ロード/ロードの取り消しが行われることはありません。
+    </p>
+
+    <dl>
+      <dt>パス</dt>
+      <dd>
+        プラグインのパス
+      </dd>
+
+      <dt>enable</dt>
+      <dd>
+        右クリックで変更することができます。<br>
+        設定は次の起動時に有効になります。
+        <dl>
+          <dt>enable</dt>
+          <dd>
+            プラグインをロードする。
+          </dd>
+          <dt>disable</dt>
+          <dd>
+            プラグインをロードしない。
+          </dd>
+          <dt>unspecified</dt>
+          <dd>
+            enable/disable設定を行っていません。
+            設定を行っていない状態が初期状態です。<br>
+            設定を行っていないプラグインはロードされます。
+          </dd>
+        </dl>
+      </dd>
+
+      <dt>loaded</dt>
+      <dd>
+        プラグインが現在ロードされているかどうかを示します。
+        <dl>
+          <dt>loaded</dt>
+          <dd>プラグインはロードされている。</dd>
+          <dt>unloaded</dt>
+          <dd>プラグインはロードされていない。</dd>
+        </dl>
+      </dd>
+
+      <dt>order</dt>
+      <dd>
+        ロードされているプラグインの優先順位です。
+      </dd>
+    </dl>
+  </body>
+</html>
