@@ -26,11 +26,19 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
 #include <assert.h>
+#include <wchar.h>
 
 #include "unicode.h"
+
+#include "win32helper.h"
+#include "asprintf.h"
+#include "inifile_com.h"	// GetPrivateProfileOnOffW()
+#include "ttlib.h"			// IsRelativePathW()
 
 /**
  *	East_Asian_Width 参考特性 取得
@@ -589,7 +597,7 @@ const SBCSTable_t *GetSBCSTable(IdKanjiCode kanji_code, int *table_size)
 		// Other ASCII-based
 		{ IdKOI8_NEW, koi8r, _countof(koi8r) },
 	};
-	for (int i = 0; i < _countof(tables); i++) {
+	for (size_t i = 0; i < _countof(tables); i++) {
 		if (kanji_code == tables[i].kanji_code) {
 			if (table_size != NULL) {
 				*table_size = tables[i].size;
@@ -725,4 +733,243 @@ int UnicodeFromCodePage(IdKanjiCode kanji_code, unsigned char b, unsigned short 
 int UnicodeToCodePage(IdKanjiCode kanji_code, unsigned long u32, unsigned char *b)
 {
 	return UnicodeToSBCS(kanji_code, u32, b);
+}
+
+typedef struct {
+	unsigned int start;
+	unsigned int end;
+	int width;
+} UnicodeWidthList_t;
+
+static UnicodeWidthList_t *unicode_width_list_ptr;
+static size_t unicode_width_list_count = 0;
+
+static int compare_start(const void * e1, const void * e2)
+{
+	const UnicodeWidthList_t *p1 = (UnicodeWidthList_t *)e1;
+	const UnicodeWidthList_t *p2 = (UnicodeWidthList_t *)e2;
+	if (p1->start == p2->start) {
+		return 0;
+	} else if (p1->start > p2->start) {
+		return 1;
+	} else {
+		return -1;
+	}
+}
+
+int UnicodeOverrideWidthInit(const wchar_t *ini, const wchar_t *section)
+{
+	UnicodeOverrideWidthUninit();
+
+	UnicodeWidthList_t *p = NULL;
+	size_t c = 0;
+
+	for (size_t i = 1;; i++) {
+		wchar_t *key;
+		aswprintf(&key, L"Range%d", (int)i);
+		wchar_t *value;
+		hGetPrivateProfileStringW(section, key, L"", ini, &value);
+		free(key);
+		if (value[0] == 0) {
+			free(value);
+			break;
+		}
+		unsigned int start;
+		unsigned int end;
+		int width;
+		int r = 0;
+		r = swscanf(value, L"U+%x , U+%x , %d", &start, &end, &width);
+		if (r == 3) {
+			if (width == 1 || width == 2) {
+				UnicodeWidthList_t *p2 = (UnicodeWidthList_t *)realloc(p, sizeof(UnicodeWidthList_t) * (c + 1));
+				if (p2 != NULL) {
+					UnicodeWidthList_t item;
+					item.start = start;
+					item.end = end;
+					item.width = width;
+
+					p = p2;
+					p[c] = item;
+					c++;
+				}
+			}
+			free(value);
+			continue;
+		}
+		r = swscanf(value, L"U+%x , %d", &start, &width);
+		if (r == 2) {
+			if (width == 1 || width == 2) {
+				UnicodeWidthList_t *p2 = (UnicodeWidthList_t *)realloc(p, sizeof(UnicodeWidthList_t) * (c + 1));
+				if (p2 != NULL) {
+					UnicodeWidthList_t item;
+					item.start = start;
+					item.end = start;
+					item.width = width;
+
+					p = p2;
+					p[c] = item;
+					c++;
+				}
+			}
+			free(value);
+			continue;
+		}
+	}
+
+	// リストをソートする
+	qsort(p, c, sizeof(*p), compare_start);
+
+	unicode_width_list_ptr = p;
+	unicode_width_list_count = c;
+
+	return 1;
+}
+
+void UnicodeOverrideWidthUninit(void)
+{
+	if (unicode_width_list_ptr != NULL) {
+		free(unicode_width_list_ptr);
+		unicode_width_list_ptr = NULL;
+		unicode_width_list_count = 0;
+	}
+}
+
+/**
+ *	文字幅Overrideする?
+ *
+ *	@param		u32		コードポイント
+ *	@param[out]	width	文字幅(セル数) 1 or 2
+ *	@retval		TRUE	u32はOverrideする
+ *	@retval		FALSE	u32はOverrideしない
+ */
+int UnicodeOverrideWidthCheck(unsigned int u32, int *width)
+{
+	if (unicode_width_list_count == 0) {
+		*width = 0;
+		return 0;
+	}
+	const UnicodeWidthList_t *p = unicode_width_list_ptr;
+	if (u32 < p->start) {
+		return 0;
+	}
+	for (size_t i = 0; i < unicode_width_list_count; p++,i++) {
+		if (p->start <= u32 && u32 <= p->end) {
+			*width = p->width;
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int UnicodeOverrideWidthAvailable(void)
+{
+	return unicode_width_list_count == 0 ? 0 : 1;
+}
+
+/**
+ * iniファイルから、文字幅情報の設定一覧を読み出す
+ *
+ * @param		fname	TERATERM.INI
+ * @param[out]	info	情報一覧
+ *						OverrideCharWidthInfoFree() を使って開放すること
+ */
+void OverrideCharWidthInfoGet(const wchar_t *fname, OverrideCharWidthInfo *info)
+{
+	const wchar_t *tt_section = L"UnicodeOverrideCharWidth";
+
+	size_t count = 0;
+	OverrideCharWidthInfoSet *ptr = NULL;
+
+	int n = 0;
+	for (;;) {
+		wchar_t *key;
+		aswprintf(&key, L"List%d", n + 1);
+		wchar_t *list;
+		hGetPrivateProfileStringW(tt_section, key, L"", fname, &list);
+		free(key);
+		if (list == NULL || list[0] == L'\0') {
+			free(list);
+			break;
+		}
+		size_t len = wcslen(list) + 1;
+		wchar_t *ini = (wchar_t *)malloc(len * sizeof(wchar_t));
+		wchar_t *section = (wchar_t *)malloc(len * sizeof(wchar_t));
+		int r = swscanf_s(list, L"%[^,] , %s", ini, (unsigned int)len, section, (unsigned int)len);
+		if (r != 2) {
+			int r = swscanf_s(list, L"%s", section, (unsigned int)len);
+			if (r == 1) {
+				free(ini);
+				ini = wcsdup(fname);
+			} else {
+				r = 0;
+			}
+		}
+		free(list);
+		if (r != 0) {
+			OverrideCharWidthInfoSet *p = (OverrideCharWidthInfoSet *)
+				realloc(ptr, sizeof(OverrideCharWidthInfoSet) * (count + 1));
+			if (p != NULL) {
+				ptr = p;
+				p = &ptr[count];
+				count += 1;
+				if (IsRelativePathW(ini)) {
+					p->file = NULL;
+					wchar_t *path = _wcsdup(fname);
+					wchar_t *sep = wcsrchr(path, L'\\') + 1;
+					*sep = 0;
+					awcscats(&p->file, path, ini, NULL);
+					free(path);
+					free(ini);
+				} else {
+					p->file = ini;
+				}
+				p->section = section;
+				wchar_t *name;
+				hGetPrivateProfileStringW(section, L"name", L"", p->file, &name);
+				if (name != NULL && name[0] != L'\0') {
+					p->name = name;
+				} else {
+					p->name = wcsdup(p->section);
+					free(name);
+				}
+			}
+		} else {
+			// 行無効
+			free(ini);
+			free(section);
+			continue;
+		}
+		n++;
+	}
+
+	info->count = count;
+	info->sets = ptr;
+	info->enable = FALSE;
+	info->selected = 0;
+
+	if (count != 0) {
+		GetPrivateProfileOnOffW(tt_section, L"Enable", fname, FALSE, &info->enable);
+		info->selected = GetPrivateProfileIntW(tt_section, L"Selected", 0, fname);
+		if (info->selected >= info->count) {
+			info->selected = 0;
+		}
+	}
+}
+
+/**
+ * 文字幅情報の設定一覧を開放する
+ */
+void OverrideCharWidthInfoFree(OverrideCharWidthInfo *info)
+{
+	for (size_t i = 0; i< info->count; i++) {
+		free(info->sets[i].file);
+		info->sets[i].file = NULL;
+		free(info->sets[i].section);
+		info->sets[i].section = NULL;
+		free(info->sets[i].name);
+		info->sets[i].name = NULL;
+	}
+	free(info->sets);
+	info->sets = NULL;
+	info->count = 0;
 }

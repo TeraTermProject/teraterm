@@ -43,6 +43,9 @@
 #include "helpid.h"
 #include "ttlib_charset.h"
 #include "makeoutputstring.h"
+#include "unicode.h"
+#include "win32helper.h"
+#include "inifile_com.h"
 
 #include "coding_pp.h"
 
@@ -55,6 +58,7 @@ struct CodingPPData {
 	TTTSet *pts;
 	const wchar_t *UILanguageFileW;
 	DLGTEMPLATE *dlg_templ;
+	OverrideCharWidthInfo unicode_override_charwidth_info;
 };
 
 static void EnableWindows(HWND hWnd, const int *list, int count, BOOL enable)
@@ -74,8 +78,10 @@ static void ArrenageItems(HWND hWnd)
 		IDC_TERMKOUTTEXT,
 		IDC_TERMKOUT,
 		IDC_TERMKANA,
+		IDC_JIS_RECEIVE_TITLE,
 	};
 	static const int JJISSendItems[] = {
+		IDC_JIS_TRANSMIT_TITLE,
 		IDC_TERMKANASEND,
 	};
 	static const int UnicodeItems[] = {
@@ -83,6 +89,8 @@ static void ArrenageItems(HWND hWnd)
 		IDC_AMBIGUOUS_WIDTH_COMBO,
 		IDC_EMOJI_WIDTH_CHECK,
 		IDC_EMOJI_WIDTH_COMBO,
+		IDC_OVERRIDE_CHAR_WIDTH,
+		IDC_OVERRIDE_CHAR_WIDTH_COMBO,
 	};
 
 	// 受信コード
@@ -112,10 +120,12 @@ static void ArrenageItems(HWND hWnd)
 		SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
 		CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_CHECKED);
 		SendDlgItemMessage(hWnd, IDC_EMOJI_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
+		//CheckDlgButton(hWnd, IDC_OVERRIDE_CHAR_WIDTH, BST_UNCHECKED);
 	}
 	else {
 		CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_UNCHECKED);
 		SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 0, 0);
+		//CheckDlgButton(hWnd, IDC_OVERRIDE_CHAR_WIDTH, BST_UNCHECKED);
 	}
 
 	if (coding_receive == IdJIS) {
@@ -137,6 +147,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_GEN_TITLE" },
+		// Unicode
+		//   override char width
+		{ IDC_OVERRIDE_CHAR_WIDTH, "DLG_ENCODING_CHAR_WIDTH_PER_CHAR" },
+		// Japanese JIS
 		// { IDC_TERMKANJILABEL, "DLG_TERM_KANJI" },
 		{ IDC_TERMKANJILABEL, "DLG_TERMK_KANJI" },
 		//{ IDC_TERMKANA, "DLG_TERM_KANA" },
@@ -144,6 +158,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		//{ IDC_TERMKANASEND, "DLG_TERM_KANASEND" },
 		{ IDC_TERMKINTEXT, "DLG_TERM_KIN" },
 		{ IDC_TERMKOUTTEXT, "DLG_TERM_KOUT" },
+		// DEC Special Graphics
 		{ IDC_DECSP_UNI2DEC, "DLG_CODING_DECSP_UNICODE_TO_DEC" },
 		{ IDC_DECSP_DEC2UNI, "DLG_CODING_DECSP_DEC_TO_UNICODE" },
 		{ IDC_DECSP_DO_NOT, "DLG_CODING_DECSP_DO_NOT_MAP" },
@@ -156,7 +171,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		case WM_INITDIALOG: {
 			CodingPPData *DlgData = (CodingPPData *)(((PROPSHEETPAGEW_V1 *)lp)->lParam);
 			const TTTSet *ts = DlgData->pts;
-			SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)DlgData);
+			SetWindowLongPtrW(hWnd, DWLP_USER, (LONG_PTR)DlgData);
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), DlgData->pts->UILanguageFileW);
 
 			int recv_index = 0;
@@ -173,13 +188,13 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				LRESULT index = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_ADDSTRING, 0, (LPARAM)p->CodeStrGUI);
 				SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_SETITEMDATA, index, (LPARAM)p->coding);
 				if (ts->KanjiCode == p->coding) {
-					recv_index = index;
+					recv_index = (int)index;
 				}
 
 				index = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_ADDSTRING, 0, (LPARAM)p->CodeStrGUI);
 				SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETITEMDATA, index, (LPARAM)p->coding);
 				if (ts->KanjiCodeSend == p->coding) {
-					send_index = index;
+					send_index = (int)index;
 				}
 			}
 			ExpandCBWidth(hWnd, IDC_TERMKANJI);
@@ -256,6 +271,26 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_CHECKED);
 			} else {
 				CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_UNCHECKED);
+			}
+
+			// 文字ごとの文字幅オーバーライド設定
+			const OverrideCharWidthInfo *info = &DlgData->unicode_override_charwidth_info;
+			if (info->count == 0) {
+				EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH), FALSE);
+				EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO), FALSE);
+			}
+			else {
+				for (size_t i = 0; i < info->count; i++) {
+					SendDlgItemMessageW(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO, CB_ADDSTRING, 0,
+										(LPARAM)info->sets[i].name);
+				}
+				SendDlgItemMessageW(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO, CB_SETCURSEL,
+									ts->UnicodeOverrideCharWidthSelected, 0);
+				ExpandCBWidth(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO);
+				const BOOL enable = (ts->UnicodeOverrideCharWidthEnable == 1) && (UnicodeOverrideWidthAvailable() != 0);
+				EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH), TRUE);
+				CheckDlgButton(hWnd, IDC_OVERRIDE_CHAR_WIDTH, enable ? BST_CHECKED : BST_UNCHECKED);
+				EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO), enable);
 			}
 
 			return TRUE;
@@ -361,6 +396,30 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ts->UnicodeEmojiOverride = (BYTE)IsDlgButtonChecked(hWnd, IDC_EMOJI_WIDTH_CHECK);
 					ts->UnicodeEmojiWidth = (BYTE)GetCurSel(hWnd, IDC_EMOJI_WIDTH_COMBO);
 
+					// Override width
+					{
+						const OverrideCharWidthInfo *info = &DlgData->unicode_override_charwidth_info;
+
+						BOOL enable = IsDlgButtonChecked(hWnd, IDC_OVERRIDE_CHAR_WIDTH);
+						size_t selected =
+							(size_t)SendDlgItemMessageW(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO, CB_GETCURSEL, 0, 0);
+						if (!enable) {
+							// disableする
+							UnicodeOverrideWidthUninit();
+						}
+						else {
+							if ((enable != ts->UnicodeOverrideCharWidthEnable) ||
+								(selected != ts->UnicodeOverrideCharWidthSelected)) {
+								// 設定を読み込む(enableにする/設定を変更する)
+								const OverrideCharWidthInfoSet *set = &info->sets[selected];
+								UnicodeOverrideWidthInit(set->file, set->section);
+							}
+						}
+
+						ts->UnicodeOverrideCharWidthEnable = enable;
+						ts->UnicodeOverrideCharWidthSelected = (BYTE)selected;
+					}
+
 					// DEC Special Graphics
 					ts->Dec2Unicode =
 						(DWORD)(IsDlgButtonChecked(hWnd, IDC_DECSP_DEC2UNI) ? IdDecSpecialDecToUni:
@@ -422,6 +481,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), enable);
 					break;
 				}
+				case IDC_OVERRIDE_CHAR_WIDTH | (BN_CLICKED << 16): {
+					const BOOL enable = (IsDlgButtonChecked(hWnd, IDC_OVERRIDE_CHAR_WIDTH) == BST_CHECKED) ? TRUE : FALSE;
+					EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO), enable);
+					break;
+				}
 				default:
 					break;
 			}
@@ -438,15 +502,22 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 	(void)hwnd;
 	UINT ret_val = 0;
 	switch (uMsg) {
-	case PSPCB_CREATE:
+	case PSPCB_CREATE: {
+		CodingPPData *data = (CodingPPData *)ppsp->lParam;
+		TTTSet *pts = data->pts;
+		OverrideCharWidthInfoGet(pts->SetupFNameW, &data->unicode_override_charwidth_info);
 		ret_val = 1;
 		break;
-	case PSPCB_RELEASE:
+	}
+	case PSPCB_RELEASE: {
+		CodingPPData *data = (CodingPPData *)ppsp->lParam;
+		OverrideCharWidthInfoFree(&data->unicode_override_charwidth_info);
 		free((void *)ppsp->pResource);
 		ppsp->pResource = NULL;
 		free((void *)ppsp->lParam);
 		ppsp->lParam = 0;
 		break;
+	}
 	default:
 		break;
 	}

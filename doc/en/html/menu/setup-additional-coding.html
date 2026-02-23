@@ -28,28 +28,72 @@
 
     <h2>Unicode</h2>
 
+    <p>
+      Select the character width (number of cells) used by Tera Term to render text when using Unicode (UTF-8).<br>
+      Specifying the character width expected by the remote host helps reduce display issues.
+    </p>
+    <p>
+      Refer to <a href="setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a> for Tera Term drawing character width.
+    </p>
+
     <h3 id="AmbiguousCharactersWidth">Ambiguous Characters width</h3>
 
-    Select 1 Cell or 2 Cell.<br>
-    Specify character width assumed by Tera Term connecting destination.<br>
+    <p>
+      Select 1 Cell or 2 Cell for the character width of characters with the Ambiguous East_Asian_Width property.<br>
     Refer to <a href="#EastAsianWidth">East_Asian_Width and width (cells)</a>.<br>
-    Refer to <a href="setup-additional-font.html#ResizedFont">Drawing resized font to fit cell width</a> for Tera Term drawing character width.
-    If you change Encoding-receive by pull-down, width is changed to typical character width of that code automatically. Nevertheless, that width is not absolutely recommend, you can choose the width what you want for font or other reasons.
+    </p>
+    <p>
+      If you change Encoding-receive by pull-down, width is changed to typical character width of that code automatically. Nevertheless, that width is not absolutely recommend, you can choose the width what you want for font or other reasons.
+    </p>
 
     <h3 id="UnicodeEmojiOverride">Override Emoji Characters width</h3>
 
-    When checked, Overrides characters width from East_Asian_Width.<br>
-    Refer to <a href="#emoji">About Emoji width (cells)</a>.
+    <p>
+      Sets the character width for characters whose Emoji property is set to Yes.<br>
+      For details about this property, refer to <a href="../usage/unicode.html#emoji">About Emoji width (cells)</a>.
+    </p>
+
+    <p>
+      When unchecked, the character width is determined based on the value of the East_Asian_Width property.<br>
+      When the same width is applied regardless of the property value (W, N, or A).
+    </p>
+
     <ul>
       <li>Emoji with U+1F000 and above are 2Cell (full-width).
       <li>Emoji less than U+1F000:
         <dl>
-          <dt>selected 2cell</dt>
-          <dd>2Cell(full-width)</dd>
-          <dt>selected 1cell</dt>
-          <dd>1Cell(half-width)</dd>
+          <dt>when selected 2 Cell</dt>
+          <dd>2 Cell (full-width)</dd>
+          <dt>when selected 1 Cell</dt>
+          <dd>1 Cell (half-width)</dd>
         </dl>
     </ul>
+
+    <h3 id="OverrideCharWidth">Override Character width Per Character</h3>
+
+    <p>
+      This check box is enabled if <a href="../setup/teraterm-term.html#OverrideCharWidth">Character width</a> setting is exists in TERATERM.INI file.
+      When checked, User's character width setting is used.
+    </p>
+
+    <p>
+      Tera Term determines character widths according to Unicode specification.<br>
+      If the remote host distinguishes character widths more finely than the
+      "characters with a certain property" described above,
+      this option allows you to flexibly configure character widths in Tera Term.<br>
+      This can be used in following cases.
+      Host's Unicode version differs from Tera Term, user want to uses own character width.
+    </p>
+
+    <h3 id="width_decision">Flow of character width determination</h3>
+
+    <p>
+      As described above, Tera Term provides multiple settings for specifying
+      the character width used for rendering.
+      The following diagram illustrates the priority order of these settings.
+    </p>
+
+    <img src="cell_width.png">
 
     <h2 id="DecSpecial">DEC Special Graphics</h2>
 
@@ -122,157 +166,6 @@
         </p>
       </dd>
     </dl>
-
-    <hr>
-
-    <h1>Unicode setting</h1>
-
-    <h2>Character width (cells)</h2>
-
-    <p>
-      Character width for <a href="../about/glossary.html#SBCS">single-byte character code</a> such as Latin-1 is 1 cell.
-    </p>
-
-    <p>
-      Character width for <a href="../about/glossary.html#DBCS">double-byte character code</a> such as Shift_JIS is 1 cell for 1-byte characters and 2 cells for 2-byte characters.
-    </p>
-
-    <p>
-      In Unicode, character width of a single character changes case-by-case.
-    </p>
-
-    Example, "&#x00A7;" (section sign, section mark)
-<pre>
-| code               | character code(code point) | cell   |
-|--------------------|----------------------------|--------|
-| ISO8859-1(Latin-1) | 0xA7                       | 1      |
-| Shift_JIS(CP932)   | 0x8198                     | 2      |
-| KS5601(CP949)      | 0xA1D7                     | 2      |
-| Big5(CP950)        | 0xA1B1                     | 2      |
-| BG2312(CP936)      | 0xA1EC                     | 2      |
-| Unicode            | 0xA7 (U+00A7)              | 1 or 2 |
-</pre>
-
-    <p>
-      In a multibyte character code environment (<a href="../about/glossary.html#CJK">CJK</a>), character width should be 2 cell, and in other environments it should be 1 cell for natural use.
-      Type of character whose width changes are called Ambiguous.
-
-      Refer to <a href="#EastAsianWidth">East_Asian_Width and width (cells)</a> for detail.
-
-    <h2>About displayed characters</h2>
-    test text in Tera Term repository can be displayed and checked.
-    <ul>
-      <li>Unicode (Kanji) width<br>
-        "wget https://github.com/TeraTermProject/teraterm/raw/main/tests/unicodebuf-east_asian_width.txt -O -"
-      <li>Unicode Emoji width<br>
-        "wget https://raw.githubusercontent.com/TeraTermProject/teraterm/main/tests/unicodebuf-text-emoji.txt -O -"
-    </ul>
-    Please note the following:
-    <ul>
-      <li>Font is displayed unchanged or resized.<br>
-        See <a href="setup-additional-font.html#ResizedFont">Font setting</a>.
-      </li>
-      <li>Character width handled by Tera Term and intended by host may differ.<br>
-        Programs, library examples
-        <ul>
-          <li>Text editor(vim,emacs,nano etc)
-          <li>viewer(more,less,lv etc)
-          <li>readline library linked to bash, etc.
-          <li>curses library linked to aptitude, etc.
-        </ul>
-      </li>
-      <li>Character to be displayed may not be stored in font file.
-        <ul>
-          <li>If the character to be displayed (glyph) does not exist,<br>
-            a black dot will be drawn by OS.
-            Depending on the version of OS, other character may be used.
-          <li>Some OS versions automatically draw using other fonts.<br>
-            This feature is called font linking.
-        </ul>
-      </li>
-    </ul>
-
-    <h2 id="EastAsianWidth">East_Asian_Width and width (cells)</h2>
-
-    <p>
-      Each characters are assigned East_Asian_Width property.
-    </p>
-
-    <p>
-      5 types exsit, each types are defined character width.
-    </p>
-
-    <p>
-      In addition, there are two types of interpretation of character width
-      <ol>
-        <li>In an East Asian context</li>
-        <li>in a non-East Asian context</li>
-      </ol>
-    </p>
-
-    <p>
-      The following table
-    </p>
-
-<pre>
-cells(2=full/1=half)
-|              | East Asian | non-East Asian |
-| property     | context    | context        |
-| F(Fullwidth) | 2          | 2              |
-| H(Halfwidth) | 1          | 1              |
-| W(Wide)      | 2          | 2              |
-| Na(Narrow)   | 1          | 1              |
-| A(Ambiguous) | 2          | 1              |
-| N(Neutral)   | 1          | 1              |
-</pre>
-
-    <p>
-      In <a href="../about/glossary.html#CJK">CJK</a> environment, it is more natural to set the Ambiguous character width to 2Cell.<br>
-      In addition, most Japanese fonts are designed in 2Cell.
-    </p>
-
-    <p>
-      Attributes are determined based on the following data<br>
-      <a href="https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt</a>
-    </p>
-
-    <h2 id="emoji">About Emoji width (cells)</h2>
-
-    <p>
-      Emoji property is other propery from East Asian Width property.
-    </p>
-
-    <p>
-      In the CJK environment, as with the East_Asian_Width property,
-      Characters that are 2 byte in DBCS, 2 cell is more natural.
-    </p>
-
-    <p>
-      In non-CJK environments, many characters handling 1 cell is natural, because 2 cell characters did not exist in traditional character codes.
-      Emoji with code points U+1F000 or higher that did not exist before Unicode, so they may be handled as 2 cell characters.
-    </p>
-
-    <p>
-      The following data's Extended_Pictographic property is used to determine if a character is an emoji.<br>
-      <a href="https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt</a>
-    </p>
-
-    <p>
-      Neutral contains Emoji, that Emoji is unnatural in Japan when rendered in 1cell.
-      Emoji's width can be changed to make them appear more natural.
-    </p>
-
-    <p>Example</p>
-    <dl>
-      <dt>"&#x263a;", U+263A</dt>
-      <dd>WHITE SMILING FACE</dd>
-      <dt>"&#x2764;", U+2764</dt>
-      <dd>HEAVY BLACK HEART</dd>
-    </dl>
-
-    <h2 id="width_decision">Character width decision flow</h2>
-
-    <img src="cell_width.png">
 
   </body>
 </html>

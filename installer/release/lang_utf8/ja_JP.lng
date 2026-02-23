@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Japanese(日本語)
-date=2026-01-04 by TeraTerm Project
+date=2026-01-12 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -467,7 +467,7 @@ DLG_CODING_UNICODE_TO_DEC_PUNCTUATION=
 DLG_CODING_UNICODE_TO_DEC_MIDDLEDOT=中点(U+00B7,U+2024,U+2219)
 DLG_CODING_DECSP_DEC_TO_UNICODE=DEC Special GraphicsをUnicodeへマッピングする
 DLG_CODING_DECSP_DO_NOT_MAP=DEC Special Graphicsをマッピングしない
-
+DLG_ENCODING_CHAR_WIDTH_PER_CHAR=文字ごとの文字幅オーバーライド設定を使う
 DLG_WIN_TITLE=ウィンドウ
 DLG_WIN_TEK_TITLE=ウィンドウ(TEK)
 DLG_WIN_TITLELABEL=タイトル(&T):

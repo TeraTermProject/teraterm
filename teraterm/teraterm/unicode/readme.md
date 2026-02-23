@@ -59,3 +59,24 @@
 - [iso8859.md](iso8859.md)
 - 2部(iso8859-2.tbl)から16部(iso8859-16.tbl)まで
   - 12部は規格上破棄されていて存在しない
+
+## shiftjis.md
+
+- [shiftjis.md](shiftjis.md)
+
+## jis0208.md
+
+- [jis0208.md](jis0208.md)
+
+## UnicodeXX.X-emoji.txt
+
+- Unicode 絵文字の文字幅を一覧にしたテキストファイル
+- プログラムからは利用しない
+- [get_emoji_list.md](get_emoji_list.md)
+
+## UnicodeXX.X-ambi.txt
+
+- Unicode Ambiguous 文字を一覧にしたテキストファイル
+- プログラムからは利用しない
+- [get_ambi_list.md](get_ambi_list.md)
+
