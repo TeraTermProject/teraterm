@@ -46,17 +46,32 @@
 
       <dt>Susie Plug-in path:</dt>
       <dd>
-        Path where plugin file is stored.<br>
-        Susie Plug-in is an external file to load various image files
-        using mage viewer software <a href="../about/glossary.html#susie">Susie</a>.<br>
-        Following information was referenced.
-        <ul>
-          <li><a href="https://www.digitalpad.co.jp/~takechin/download.html" target="_blank">Susie NO HEYA / Susie NO download</a><br>
-            PLUG_API.TXT file in <a href="https://www.digitalpad.co.jp/~takechin/archives/splug004.lzh" target="_blank">https://www.digitalpad.co.jp/~takechin/archives/splug004.lzh</a>
-          </li>
-          <li><a href="https://gist.github.com/tapetums/0a924712fb2fa0a7bb93" target="_blank">Susie plugin API definition file</a></li>
-          <li><a href="http://toro.d.dooo.jp/slplugin.html" target="_blank">TORO's Library / TORO's Software library(Win32/Win64 Plugin)</a></li>
-        </ul>
+        Path where <a href="../about/glossary.html#susie">Susie</a> Plug-in files are stored.<br>
+
+        <p>
+          Use Plug-in with same architecture as Tera Term binary.
+          The architecture is determined by the Plug-in's file extension.
+        </p>
+
+        <table border="1">
+          <caption>Plug-in file extension</caption>
+          <tr>
+            <th>architecture</th>
+            <th>extension</th>
+          </tr>
+          <tr>
+            <td>x86 32bit</td>
+            <td>.spi</td>
+          </tr>
+          <tr>
+            <td>x86 64bit</td>
+            <td>.sph</td>
+          </tr>
+          <tr>
+            <td>ARM 64bit</td>
+            <td>.spha</td>
+          </tr>
+        </table>
       </dd>
 
     </dl>
