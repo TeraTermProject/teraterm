@@ -46,6 +46,7 @@ const static TermIDList TermIDLists[] = {
 	{IdVT420, "VT420"},
 	{IdVT520, "VT520"},
 	{IdVT525, "VT525"},
+	{IdDUMB, "dumb"},
 };
 
 const TermIDList *TermIDGetList(int index)

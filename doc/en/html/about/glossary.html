@@ -43,42 +43,16 @@ XMODEM プロトコルをベースにしてるようですが、
     </p>
 
     <p>
-      Tera Term tries to load images using Susie Plug-ins,
-      and using Windows functions such as GDI+, OleLoadPicture(), LoadImage(),
-      and so on.
-      It seems to be possible to load jpg and gif images on Windows 7 or later.
+      Following information was referenced.
+      <ul>
+        <li><a href="https://www.digitalpad.co.jp/~takechin/download.html" target="_blank">Susie NO HEYA / Susie NO download</a><br>
+          PLUG_API.TXT file in <a href="https://www.digitalpad.co.jp/~takechin/archives/splug004.lzh" target="_blank">https://www.digitalpad.co.jp/~takechin/archives/splug004.lzh</a>
+        </li>
+        <li><a href="https://gist.github.com/tapetums/0a924712fb2fa0a7bb93" target="_blank">Susie plugin API definition file</a></li>
+        <li><a href="http://toro.d.dooo.jp/slplugin.html" target="_blank">TORO's Library / TORO's Software library(Win32/Win64 Plugin)</a></li>
+      </ul>
     </p>
   </dd>
-
-<dt>TEK4010</dt>
-<dd>Name of Tektronix terminal. This can display diagrams and graphemes, and was used widely in scientific and technical fields.</dd>
-<!--
-現在は、X Window 環境などに取って替わられつつありますが、TEK エミュレーターを使用している人はまだまだいます(作者も含めて)。<br>
-大部分のユーザーは Tera Term の TEK エミュレーション機能を使うことはないでしょう。</dd>
--->
-
-<dt>TEK window</dt>
-<dd>The window that emulates TEK terminal.
-"TEK" is displayed to right of window title string.
-This window is not displayed when Tera Term is started.
-[Control]-[Open TEK] command opens TEK window.
-</dd>
-
-<dt>VT100</dt>
-<dd>Name of DEC(Digital Equipment Corporation)'s terminal.
-The terminal was used widely for Unix, VAX/VMS, and other computers.
-<!--
-現在は、 VT100 そのものはほとんど使用されていませんが、その仕様が事実上の標準となっているため、PC や ワークステーションで動く VT100 エミュレーターが多く作られています。
--->
-<br>
-VT220 and VT382 are names of upwardly compatible terminals of VT100.
-</dd>
-
-<dt>VT window</dt>
-<dd>The main window of Tera Term.
-This window is displayed when Tera Term start.
-"VT" is displayed to right of window title string.<br>
-Window for VT terminal emulation.</dd>
 
 <dt>XMODEM</dt>
 <dd>File transfer protocol developed by Ward Christensen in 1977.</dd>
@@ -98,9 +72,9 @@ Window for VT terminal emulation.</dd>
 
 </dl>
 
-<h2>Control Sequence</h2>
+<h2>Terminal/Control Sequence</h2>
 
-About Control Sequence.
+About Terminal/Control Sequence.
 
 <dl>
 <dt id="Bracketed">Bracketed Paste Mode</dt>
@@ -117,9 +91,43 @@ On the other hand, when pasted characters is overwritten again to remove the hig
     <li><a href="../usage/tips/vim.html#Bracketed">Vim Control Sequence Examples / Auto indent can be disabled on pasting from clipboard</a>
     <li><a href="../setup/teraterm-misc.html#BracketedSupport">Tera Term setup file / Miscellaneous / Supports bracketed paste</a>
     <li><a href="../setup/teraterm-misc.html#BracketedControlOnly">Tera Term setup file / Miscellaneous / Limit bracketed pasting to cases containing control characters</a>
-      
+
   </ul>
 </dd>
+
+<dt id="dumb">dumb terminal</dt>
+<dd>This terminal can only use line feed (0x0d (\r, ^J), 0x0a (\n, ^M)) and bell (0x07 (^G)).</dd>
+
+<dt>TEK4010</dt>
+<dd>Name of Tektronix terminal. This can display diagrams and graphemes, and was used widely in scientific and technical fields.</dd>
+<!--
+現在は、X Window 環境などに取って替わられつつありますが、TEK エミュレーターを使用している人はまだまだいます(作者も含めて)。<br>
+大部分のユーザーは Tera Term の TEK エミュレーション機能を使うことはないでしょう。</dd>
+-->
+
+<dt>TEK window</dt>
+<dd>The window that emulates TEK terminal.
+"TEK" is displayed to right of window title string.
+This window is not displayed when Tera Term is started.
+[Control]-[Open TEK] command opens TEK window.
+</dd>
+
+<dt id="VT100">VT100</dt>
+<dd>Name of DEC(Digital Equipment Corporation)'s terminal.
+The terminal was used widely for Unix, VAX/VMS, and other computers.
+<!--
+現在は、 VT100 そのものはほとんど使用されていませんが、その仕様が事実上の標準となっているため、PC や ワークステーションで動く VT100 エミュレーターが多く作られています。
+-->
+<br>
+VT220 and VT382 are names of upwardly compatible terminals of VT100.
+</dd>
+
+<dt>VT window</dt>
+<dd>The main window of Tera Term.
+This window is displayed when Tera Term start.
+"VT" is displayed to right of window title string.<br>
+Window for VT terminal emulation.</dd>
+
 </dl>
 
 <h2>Character code</h2>

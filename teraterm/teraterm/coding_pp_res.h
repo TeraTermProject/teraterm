@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ で生成されたインクルード ファイル。
-// coding_pp.rc で使用
+// Microsoft Visual C++ generated include file.
+// Used by coding_pp.rc
 //
 #define IDC_TERMKANJI                   100
 #define IDC_TERMKANA                    101
@@ -24,6 +24,10 @@
 #define IDC_DEC2UNICODE_PUNCTUATION     2614
 #define IDC_DEC2UNICODE_MIDDLEDOT       2615
 #define IDC_AMBIGUOUS_WIDTH_TITLE       2616
+#define IDC_OVERRIDE_CHAR_WIDTH         2617
+#define IDC_JIS_RECEIVE_TITLE           2618
+#define IDC_JIS_TRANSMIT_TITLE          2619
+#define IDC_OVERRIDE_CHAR_WIDTH_COMBO   2620
 
 // Next default values for new objects
 //
@@ -32,7 +36,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        115
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2618
+#define _APS_NEXT_CONTROL_VALUE         2620
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

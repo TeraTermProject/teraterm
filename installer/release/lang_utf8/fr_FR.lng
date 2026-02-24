@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2026-01-04 by TeraTerm Project
+date=2026-01-12 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -467,7 +467,7 @@ DLG_CODING_UNICODE_TO_DEC_PUNCTUATION=Punctuation, Block Elements, Shade
 DLG_CODING_UNICODE_TO_DEC_MIDDLEDOT=Middle dots (U+00B7,U+2024,U+2219)
 DLG_CODING_DECSP_DEC_TO_UNICODE=Mapping DEC Special Graphics to Unicode
 DLG_CODING_DECSP_DO_NOT_MAP=Do not mapping
-
+DLG_ENCODING_CHAR_WIDTH_PER_CHAR=Override character width per character
 DLG_WIN_TITLE=Fenêtre
 DLG_WIN_TEK_TITLE=Window(TEK)
 DLG_WIN_TITLELABEL=&Titre:

@@ -32,6 +32,7 @@
 #include <crtdbg.h>
 
 #include "codeconv.h"
+#include "win32helper.h"
 
 #include "inifile_com.h"
 
@@ -146,4 +147,30 @@ void WriteIniBom(const wchar_t *filename, BOOL overwrite)
 		fwrite(bom, 1, 2, fp);
 		fclose(fp);
 	}
+}
+
+DWORD GetPrivateProfileOnOffW(const wchar_t *section, const wchar_t *key, const wchar_t *filenameW, BOOL def, BOOL *val)
+{
+	wchar_t *str;
+	DWORD e = hGetPrivateProfileStringW(section, key, L"", filenameW, &str);
+	if (e != NO_ERROR) {
+		*val = def;
+		return e;
+	}
+
+	if (_wcsicmp(str, L"off") == 0) {
+		*val = FALSE;
+	} else if (_wcsicmp(str, L"on") == 0) {
+		*val = TRUE;
+	} else {
+		*val = def;
+	}
+	free(str);
+	return NO_ERROR;
+}
+
+DWORD WritePrivateProfileOnOffW(const wchar_t *section, const wchar_t *key, BOOL val, const wchar_t *filenameW)
+{
+	const wchar_t *on_off = val ? L"on" : L"off";
+	return WritePrivateProfileStringW(section, key, on_off, filenameW);
 }

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2026-01-04 by TeraTerm Project
+date=2026-01-12 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -467,7 +467,7 @@ DLG_CODING_UNICODE_TO_DEC_PUNCTUATION=நிறுத்தம், தொகு�
 DLG_CODING_UNICODE_TO_DEC_MIDDLEDOT=மத்திய புள்ளிகள் (U+00B7,U+2024,U+2219)
 DLG_CODING_DECSP_DEC_TO_UNICODE=பதின்மம் சிறப்பு வரைகலை ஒருங்குறிக்கு வரைபடம்
 DLG_CODING_DECSP_DO_NOT_MAP=Do not mapping
-
+DLG_ENCODING_CHAR_WIDTH_PER_CHAR=Override character width per character
 DLG_WIN_TITLE=சாளர
 DLG_WIN_TEK_TITLE=Window(TEK)
 DLG_WIN_TITLELABEL=&தலைப்பு:

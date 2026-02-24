@@ -72,9 +72,26 @@
       <li>
         Setup directory ("Setup &gt; <a href="../menu/setup-directory.html">Setup directory...</a>) is now resizable.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1106" target="_blank">issue #1106</a>)
+        Character width can now be specified by the user for each Unicode code point.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/318" target="_blank">issue #318</a>,
+        <a href="https://github.com/TeraTermProject/teraterm/issues/1024" target="_blank">issue #1024</a>)<br>
+        When specify <a href="../setup/teraterm-term.html#OverrideCharWidth">character width</a> settings in TERATERM.INI,
+        <a href="../menu/setup-additional-coding.html#OverrideCharWidth">"Use character-by-character width override settings"</a>
+        check box becomes available, in Encoding tab of Additional Settings dialog.
+        Added support for dumb terminal emulation.
+      </li>
+      <li>
+        Added "dumb" to <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1096" target="_blank">issue #1096</a>)
+      </li>
+      <li>
         Add plugin tab ("Additional settings &gt; <a href="../menu/setup-additional-plugin.html">Plugin</a>").
         Enabled plugin loading settings.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/604" target="_blank">issue #604</a>)
+      </li>
+      <li>
+        Susie plugin is now usable with the arm64 version of Tera Term.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1121" target="_blank">issue #1121</a>)
       </li>
     </ul>
   </li>
@@ -107,6 +124,10 @@
         Fixed an issue where the Alt+T access key sent the AYT (Are You There) command even when the active TCP/IP connection was not TELNET.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1086" target="_blank">issue #1086</a>)
       </li>
+      <li>
+        Fixed an issue where Tera Term crashes when using susie plugin.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1121" target="_blank">issue #1121</a>)
+      </li>
     </ul>
   </li>
 
@@ -114,6 +135,10 @@
     <ul>
       <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.21">1.21</a>.</li>
       <li>Upgraded TTSSH to <a href="#ttssh_3.6.0">3.6.0</a>.</li>
+      <li>
+        Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.1" target="_blank">6.7.1</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1125" target="_blank">issue #1125</a>)
+      </li>
     </ul>
   </li>
 </ul>

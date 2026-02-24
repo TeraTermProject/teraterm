@@ -62,6 +62,7 @@
 #include "ymodem.h"
 #include "kermit.h"
 #include "vtdraw.h"
+#include "unicode.h"
 
 #define DllExport __declspec(dllexport)
 #include "ttset.h"
@@ -2001,6 +2002,20 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	if (ts->UnicodeEmojiWidth < 1 || 2 < ts->UnicodeEmojiWidth) {
 		ts->UnicodeEmojiWidth = GetDefaultUnicodeWidth();
 	}
+	// Unicode Override Info
+	{
+		OverrideCharWidthInfo info;
+		OverrideCharWidthInfoGet(FName, &info);
+		ts->UnicodeOverrideCharWidthEnable = info.enable;
+		ts->UnicodeOverrideCharWidthSelected = info.selected;
+		if (info.count != 0 && info.enable) {
+			const OverrideCharWidthInfoSet *set = &info.sets[info.selected];
+			UnicodeOverrideWidthInit(set->file, set->section);
+		}
+		OverrideCharWidthInfoFree(&info);
+	}
+
+
 	DispEnableResizedFont(GetOnOff(Section, "DrawingResizedFont", FName, TRUE));
 
 	DispReadIni(FName, ts);
@@ -3306,6 +3321,8 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteInt(Section, "UnicodeAmbiguousWidth", FName, ts->UnicodeAmbiguousWidth);
 	WriteOnOff(Section, "UnicodeEmojiOverride", FName, ts->UnicodeEmojiOverride);
 	WriteInt(Section, "UnicodeEmojiWidth", FName, ts->UnicodeEmojiWidth);
+	WritePrivateProfileOnOffW(L"UnicodeOverrideCharWidth", L"Enable", ts->UnicodeOverrideCharWidthEnable, FName);
+	WritePrivateProfileIntW(L"UnicodeOverrideCharWidth", L"Selected", ts->UnicodeOverrideCharWidthSelected, FName);
 
 	WriteOnOff(Section, "DrawingResizedFont", FName, DispIsResizedFont());
 

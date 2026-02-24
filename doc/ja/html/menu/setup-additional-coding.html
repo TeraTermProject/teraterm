@@ -28,28 +28,72 @@
 
     <h2>Unicode</h2>
 
+    <p>
+      Unicode(UTF-8)使用時の "Tera Term が描画する文字幅" を設定します。<br>
+      Tera Term の接続先が意図している文字幅を指定すると、画面崩れが少なくなります。
+    </p>
+    <p>
+      描画する文字幅に対して Tera Term がフォントをどのように描画するかについては、
+      <a href="setup-additional-font.html#ResizedFont">描画幅に合わせてリサイズしたフォントを描画</a>
+      を参照ください。<br>
+    </p>
+
     <h3 id="AmbiguousCharactersWidth">Ambiguous Characters width</h3>
 
-    1 Cell または 2 Cell を選択します。<br>
-    Tera Term の接続先が想定している文字幅を指定します。<br>
-    <a href="#EastAsianWidth">East_Asian_Width特性とセル数について</a>を参照ください。<br>
-    Tera Term が描画する文字の幅については<a href="setup-additional-font.html#ResizedFont">描画幅に合わせてリサイズしたフォントを描画</a>を参照ください。<br>
-    Encoding-receive プルダウンを変更すると、その漢字コードで一般的な文字幅で上書きされます。しかし、その文字幅でなければならないというわけではありません。フォントなどの理由により、使いたい幅を選択してください。
+    <p>
+      East_Asian_Width プロパティの値が Ambiguous(曖昧) の文字の文字幅を、1 Cell または 2 Cell から選択します。<br>
+      各プロパティ値については <a href="../usage/unicode.html#EastAsianWidth">East_Asian_Widthプロパティと文字幅(セル数)について</a> を参照ください。<br>
+    </p>
+    <p>
+      Encoding-receive プルダウンを変更すると、そのEncodingで一般的な文字幅に変更されます。しかし、それとは異なる文字幅を使用することもできます。
+    </p>
 
     <h3 id="UnicodeEmojiOverride">Override Emoji Characters width</h3>
 
-    チェックすると、絵文字属性のある文字は East_Asian_Width特性を置き換えて文字幅を設定します。<br>
-    <a href="#emoji">絵文字のセル数について</a>を参照ください。
+    <p>
+      絵文字プロパティが Yes の文字の文字幅を設定します。<br>
+      このプロパティについては <a href="../usage/unicode.html#emoji">絵文字の文字幅(セル数)について</a> を参照ください。
+    </p>
+
+    <p>
+      チェックしないと、East_Asian_Width プロパティの値に基づいて文字幅が決定されます。<br>
+      チェックすると、East_Asian_Width プロパティの値（W, N, A）にかかわらず一律に文字幅を設定します。<br>
+    </p>
+
     <ul>
-      <li>コードポイント U+1F000 以上の絵文字は常に2Cell(全角)として扱います。
+      <li>コードポイント U+1F000 以上の絵文字は常に 2 Cell (全角) として扱います。
       <li>コードポイント U+1F000 未満の絵文字は
         <dl>
-          <dt>2cellが選択されたとき</dt>
-          <dd>2Cell(全角)として扱う</dd>
-          <dt>1cellが選択されたとき</dt>
-          <dd>1Cell(半角)として扱う</dd>
+          <dt>2 Cell が選択されたとき</dt>
+          <dd>2 Cell (全角) として扱う</dd>
+          <dt>1 Cell が選択されたとき</dt>
+          <dd>1 Cell (半角) として扱う</dd>
         </dl>
     </ul>
+
+    <h3 id="OverrideCharWidth">文字ごとの文字幅オーバーライド設定を使う</h3>
+
+    <p>
+      TERATERM.INIに <a href="../setup/teraterm-term.html#CellWidth">文字幅設定</a> が存在すると、チェックボックスが有効になります。
+      チェックすると、ユーザーの文字幅設定が使用されます。
+    </p>
+
+    <p>
+      Tera Term は、Unicodeの仕様や設定に応じて文字幅を決定します。<br>
+      接続先が、上記の「あるプロパティを持つ文字」より細かく文字幅を分けている場合、
+      この設定を用いて柔軟に Tera Term の文字幅を設定することができます。<br>
+      接続先（のプログラム）のUnicodeバージョンが Tera Term と異なっていたり、
+      独自の文字幅を使用したい場合を想定しています。
+    </p>
+
+    <h3 id="width_decision">文字幅の決定フロー</h3>
+
+    <p>
+      ここまでに挙げたように、Tera Term には描画する文字幅を指定する設定が複数あります。
+      設定の優先順位がどうなっているのか以下に図示します。
+    </p>
+
+    <img src="cell_width.png">
 
     <h2 id="DecSpecial">DEC Special Graphics</h2>
 
@@ -123,157 +167,6 @@
         </p>
       </dd>
     </dl>
-
-    <hr>
-
-    <h1>Unicode設定</h1>
-
-    <h2>文字幅(セル数)について</h2>
-
-    <p>
-      Latin-1 など<a href="../about/glossary.html#SBCS">シングルバイト文字コード</a>の文字幅は1cellです。
-    </p>
-
-    <p>
-      Shift_JIS などの<a href="../about/glossary.html#DBCS">ダブルバイト文字コード</a>の文字幅は、1バイト文字は1cell, 2バイト文字は2cellです。
-    </p>
-
-    <p>
-      Unicode では1つの文字の文字幅が場合によって変化します。
-    </p>
-
-    <p>
-    例えば、"§"(section sign,節記号,セクションマーク) の文字コードは次のようになります
-<pre>
-| code               | character code(code point) | cell   |
-|--------------------|----------------------------|--------|
-| ISO8859-1(Latin-1) | 0xA7                       | 1      |
-| Shift_JIS(CP932)   | 0x8198                     | 2      |
-| KS5601(CP949)      | 0xA1D7                     | 2      |
-| Big5(CP950)        | 0xA1B1                     | 2      |
-| BG2312(CP936)      | 0xA1EC                     | 2      |
-| Unicode            | 0xA7 (U+00A7)              | 1 or 2 |
-</pre>
-
-    <p>
-      マルチバイト文字コードを使用していた環境(<a href="../about/glossary.html#CJK">CJK</a>)では 2cell で、
-      その他の環境では 1cell で表示すると自然に使用できます。
-      文字幅が変化する文字種をAmbiguous(曖昧)といいます。
-      詳しくは<a href="#EastAsianWidth">East_Asian_Width特性とセル数について</a>を参照ください。
-    </p>
-
-    <h2>表示される文字について</h2>
-    Tera Term のリポジトリにテスト用テキストがあるので表示してチェックできます。
-    <ul>
-      <li>Unicode(漢字)の文字幅<br>
-        "wget https://github.com/TeraTermProject/teraterm/raw/main/tests/unicodebuf-east_asian_width.txt -O -"
-      <li>Unicode絵文字の文字幅<br>
-        "wget https://raw.githubusercontent.com/TeraTermProject/teraterm/main/tests/unicodebuf-text-emoji.txt -O -"
-    </ul>
-    次のことに注意してください
-    <ul>
-      <li>フォントはそのまま、または、拡大/縮小して表示されます。<br>
-        <a href="setup-additional-font.html#ResizedFont">フォントの設定</a>を参照ください
-      </li>
-      <li>Tera Termの扱う文字幅と、ホストが意図している文字幅が異なることがあります。<br>
-        プログラム、ライブラリ例
-        <ul>
-          <li>テキストエディタ(vim,emacs,nanoなど)
-          <li>ビュア(more,less,lvなど)
-          <li>bashなどに組み込まれているreadlineライブラリ(行編集ライブラリ)
-          <li>aptitudeなどに組み込まれているcursesライブラリ(端末制御ライブラリ)
-        </ul>
-      </li>
-      <li>指定フォントに表示したい文字が収納されていないかもしれません。
-        <ul>
-          <li>表示する文字(指定文字のグリフ)が存在しない場合<br>
-            OSのよって黒い点「・」(例)が描画されます。OSのバージョンによっては他の表示になるかもしれません。
-          <li>OSのバージョンによっては、自動的に他のフォントを使って描画されます。<br>
-            この機能をフォントリンクと呼びます。
-        </ul>
-      </li>
-    </ul>
-
-    <h2 id="EastAsianWidth">East_Asian_Width特性と文字幅(セル数)について</h2>
-
-    <p>
-      Unicodeでは文字幅を5種類の特性に分類して、
-      East_Asian_Width特性(東アジアの文字幅)として定義しています。
-    </p>
-
-    <p>
-      文字幅の解釈には次の2種類があります。
-      <ol>
-        <li>東アジアの従来文字コードの文脈の場合</li>
-        <li>東アジア以外の従来文字コードの文脈の場合</li>
-      </ol>
-    </p>
-
-    <p>
-      これを表にすると次のようになります。
-    </p>
-
-<pre>
-cells数(2=全角/1=半角)
-|                   | 東アジアの           | 東アジア以外の       |
-| 特性              | 従来文字コードの文脈 | 従来文字コードの文脈 |
-| F(Fullwidth,全角) | 2                    | 2                    |
-| H(Halfwidth,半角) | 1                    | 1                    |
-| W(Wide,広)        | 2                    | 2                    |
-| Na(Narrow,狭)     | 1                    | 1                    |
-| A(Ambiguous,曖昧) | 2                    | 1                    |
-| N(Neutral,中立)   | 1                    | 1                    |
-</pre>
-
-    <p>
-      <a href="../about/glossary.html#CJK">CJK</a>環境では、
-      Ambiguousの文字幅を 2Cell にしたほうが自然です。<br>
-      また、日本語フォントでは 2Cell でデザインされていることがほとんどだと思われます。
-    </p>
-
-    <p>
-      次のデータをもとに属性を決定しています。<br>
-      <a href="https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt</a>
-    </p>
-
-    <h2 id="emoji">絵文字の文字幅(セル数)について</h2>
-
-    <p>
-      絵文字属性は East Asian Width の特性とは別の文字特性です。
-    </p>
-
-    <p>
-      CJK環境では、East_Asian_Width特性と同様、
-      DBCS で 2byte の文字は 2Cell で扱うほうが自然です。
-    </p>
-
-    <p>
-      非CJK環境では、従来の文字コードでは全角は存在しなかったので、
-      多くの文字を半角として扱うのが自然です。<br>
-      顔の絵文字など(コードポイントU+1F000以上)はUnicode以降の文字なので、全角としてあつかってよさそうです。
-    </p>
-
-    <p>
-      次のデータの Extended_Pictographic をもとに絵文字の判定を行っています。<br>
-      <a href="https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt" target="_blank">https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt</a>
-    </p>
-
-    <p>
-      Neutralには絵文字が入っていて、1cellで描画すると日本では不自然な表示となります。
-      絵文字の時の文字幅を変更することで自然な表示とすることができます。
-    </p>
-
-    <p>例</p>
-    <dl>
-      <dt>"&#x263a;", U+263A</dt>
-      <dd>WHITE SMILING FACE</dd>
-      <dt>"&#x2764;", U+2764</dt>
-      <dd>HEAVY BLACK HEART</dd>
-    </dl>
-
-    <h2 id="width_decision">文字幅の決定フロー</h2>
-
-    <img src="cell_width.png">
 
   </body>
 </html>

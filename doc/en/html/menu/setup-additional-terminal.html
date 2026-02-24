@@ -68,12 +68,23 @@
 
       <dt id="TerminalID">Terminal ID:</dt>
       <dd>
-	<a href="../about/ctrlseq.html#TerminalID">Terminal ID</a> to be reported to the host when the host requests it.
+        Specify terminal to emulate in VT window.
+        <dl>
+          <dt>VT100...VT525</dt>
+          <dd>
+            Emulates <a href="../about/glossary.html#VT100">DEC's VT terminal</a>.<br>
+            <a href="../about/ctrlseq.html#TerminalID">Terminal ID</a> to be reported to the host when the host requests it.
+          </dd>
+          <dt>dumb</dt>
+          <dd>
+            Emulates <a href="../about/glossary.html#dumb">dumb terminal</a>.
+          </dd>
+        </dl>
 
-	<p>
-	Note that the terminal ID is not identical to the telnet terminal type.<br>
-	To change the telnet terminal type, use the
-	<a href="setup-additional-tcpip.html#TermType">Terminal type in [Setup] Additional Setting "TCP/IP" tab</a>.
+	      <p>
+          Change notification type to the Telnet/SSH server
+          using <a href="setup-additional-tcpip.html#TermType">Terminal type in [Setup] Additional Setting "TCP/IP" tab</a>.
+        </p>
       </dd>
 
       <dt id="LocalEcho">Local echo</dt>
