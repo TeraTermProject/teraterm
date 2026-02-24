@@ -87,6 +87,13 @@
             bmp, png, gif, jpg等<br>
             32bit bmp, 透過pngの場合は8bitのアルファチャンネルが付加されます<br>
             透過gifの場合は1色を透明としてあつかいます。
+
+            <p>
+              Tera Term は <a href="../about/glossary.html#susie">Susie</a> Plug-in を試みたのち、
+              GDI+, OleLoadPicture(), LoadImage() 等の
+              Windows の機能を利用して画像の読み込みを試みます。
+              Windows 7 以降では Windowsの機能で jpg, gif の読み込みが可能のようです。
+            </p>
           </dd>
 
           <dt>パターン</dt>
