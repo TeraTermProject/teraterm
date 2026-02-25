@@ -86,20 +86,15 @@ static BOOL LoadPictureWithSPI(const wchar_t *nameSPI, const wchar_t *nameFile, 
 	char nameFileA[MAX_PATH];
 	WideCharToMultiByte(CP_ACP, 0, image_base, -1, nameFileA, _countof(nameFileA), NULL, NULL);
 
-	HINSTANCE hSPI;
 	char spiVersion[8];
 	int(__stdcall * SPI_IsSupported)(LPCSTR, void *);
 	int(__stdcall * SPI_GetPicture)(LPCSTR buf, LONG_PTR len, unsigned int flag, HANDLE *pHBInfo, HANDLE *pHBm,
 									SUSIE_PROGRESS,
 									LONG_PTR lData);
 	int(__stdcall * SPI_GetPluginInfo)(int, LPSTR, int);
-	int ret;
-
-	ret = FALSE;
-	hSPI = NULL;
 
 	// SPI をロード
-	hSPI = LoadLibraryW(nameSPI);
+	HINSTANCE hSPI = LoadLibraryW(nameSPI);
 	if (!hSPI) {
 		return FALSE;
 	}
@@ -112,17 +107,22 @@ static BOOL LoadPictureWithSPI(const wchar_t *nameSPI, const wchar_t *nameFile, 
 	*p = GetProcAddress(hSPI, "GetPicture");
 
 	if (!SPI_GetPluginInfo || !SPI_IsSupported || !SPI_GetPicture) {
-		goto error;
+	error:
+		FreeLibrary(hSPI);
+		return FALSE;
 	}
 
 	//バージョンチェック
-	SPI_GetPluginInfo(0, spiVersion, 8);
+	int r = SPI_GetPluginInfo(0, spiVersion, 8);
+	if (r == 0) {
+		goto error;
+	}
 
 	if (spiVersion[2] != 'I' || spiVersion[3] != 'N') {
 		goto error;
 	}
 
-	int r = SPI_IsSupported(nameFileA, bufFile);
+	r = SPI_IsSupported(nameFileA, bufFile);
 	if (r == 0) {
 		// プラグインが対応していない画像だった
 		goto error;
@@ -133,14 +133,9 @@ static BOOL LoadPictureWithSPI(const wchar_t *nameSPI, const wchar_t *nameFile, 
 		goto error;
 	}
 
-	ret = TRUE;
+	FreeLibrary(hSPI);
 
-error:
-
-	if (hSPI)
-		FreeLibrary(hSPI);
-
-	return ret;
+	return TRUE;
 }
 
 static unsigned char *LoadImageFile(const wchar_t *image_file, size_t *file_size)
