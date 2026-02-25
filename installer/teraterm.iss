@@ -64,7 +64,7 @@ PrivilegesRequired=none
 ; during installer execution
 ShowLanguageDialog=yes
 UsePreviousLanguage=no
-LicenseFile={#SrcDir}\license.txt
+LicenseFile={#SrcDir}\license.rtf
 DefaultDirName={commonpf}\teraterm5
 AllowNoIcons=true
 DefaultGroupName={#AppName} 5
