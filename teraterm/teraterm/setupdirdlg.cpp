@@ -51,6 +51,7 @@
 #include "tipwin2.h"
 #include "scp.h"
 #include "ttlib_types.h"
+#include "resize_helper.h"
 
 #include "setupdirdlg.h"
 
@@ -483,6 +484,7 @@ static wchar_t *GetHistoryFileName(const SetupList *, const TTTSet *pts)
 typedef struct {
 	TComVar *pcv;
 	TipWin2 *tipwin;
+	ReiseDlgHelper_t *resize_helper;
 } dlg_data_t;
 
 static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -490,16 +492,18 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_SETUPDIR_TITLE" },
 	};
-	dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
-	TComVar *pcv = (dlg_data == NULL) ? NULL : dlg_data->pcv;
-	TTTSet *pts = (pcv == NULL) ? NULL : pcv->ts;
+	static const ResizeHelperInfo resize_info[] = {
+		{ IDC_SETUP_DIR_LIST, RESIZE_HELPER_ANCHOR_LRTB },
+		{ IDOK, RESIZE_HELPER_ANCHOR_RB },
+		{ IDHELP, RESIZE_HELPER_ANCHOR_RB },
+	};
 
 	switch (msg) {
 	case WM_INITDIALOG: {
-		dlg_data = (dlg_data_t *)lp;
-		pcv = dlg_data->pcv;
-		pts = pcv->ts;
-		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)dlg_data);
+		SetWindowLongPtrW(hDlgWnd, DWLP_USER, (LONG_PTR)lp);
+		dlg_data_t *dlg_data = (dlg_data_t *)lp;
+		TComVar *pcv = dlg_data->pcv;
+		TTTSet *pts = pcv->ts;
 
 		// I18N
 		SetDlgTextsW(hDlgWnd, TextInfos, _countof(TextInfos), pts->UILanguageFileW);
@@ -512,12 +516,12 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		lvcol.pszText = (LPSTR)"name";
 		lvcol.iSubItem = 0;
 		//ListView_InsertColumn(hWndList, 0, &lvcol);
-		SendMessage(hWndList, LVM_INSERTCOLUMNA, 0, (LPARAM)&lvcol);
+		SendMessageA(hWndList, LVM_INSERTCOLUMNA, 0, (LPARAM)&lvcol);
 
 		lvcol.pszText = (LPSTR)"path/file";
 		lvcol.iSubItem = 1;
 		//ListView_InsertColumn(hWndList, 1, &lvcol);
-		SendMessage(hWndList, LVM_INSERTCOLUMNA, 1, (LPARAM)&lvcol);
+		SendMessageA(hWndList, LVM_INSERTCOLUMNA, 1, (LPARAM)&lvcol);
 
 		// 設定一覧
 		const SetupList setup_list[] = {
@@ -591,14 +595,14 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			item.iItem = y;
 			item.iSubItem = 0;
 			item.pszText = text;
-			SendMessage(hWndList, LVM_INSERTITEMW, 0, (LPARAM)&item);
+			SendMessageW(hWndList, LVM_INSERTITEMW, 0, (LPARAM)&item);
 			free(text);
 
 			item.mask = LVIF_TEXT;
 			item.iItem = y;
 			item.iSubItem = 1;
 			item.pszText = s;
-			SendMessage(hWndList, LVM_SETITEMW, 0, (LPARAM)&item);
+			SendMessageW(hWndList, LVM_SETITEMW, 0, (LPARAM)&item);
 
 			y++;
 
@@ -610,8 +614,10 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 
 		// 幅を調整
 		for (int i = 0; i < 2; i++) {
-			ListView_SetColumnWidth(hWndList, i, LVSCW_AUTOSIZE);
+			ListView_SetColumnWidth(hWndList, i, LVSCW_AUTOSIZE_USEHEADER);
 		}
+
+		dlg_data->resize_helper = ReiseDlgHelperInit(hDlgWnd, TRUE, resize_info, _countof(resize_info));
 
 		CenterWindow(hDlgWnd, GetParent(hDlgWnd));
 
@@ -622,6 +628,8 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	}
 
 	case WM_COMMAND: {
+		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
+		TComVar *pcv = dlg_data->pcv;
 		switch (LOWORD(wp)) {
 		case IDHELP:
 			OpenHelpCV(pcv, HH_HELP_CONTEXT, HlpMenuSetupDir);
@@ -643,13 +651,20 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		return FALSE;
 	}
 
-	case WM_DESTROY:
+	case WM_DESTROY: {
+		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
 		TipWin2Destroy(dlg_data->tipwin);
 		dlg_data->tipwin = NULL;
+		ReiseDlgHelperDelete(dlg_data->resize_helper);
+		dlg_data->resize_helper = NULL;
 		return TRUE;
+	}
 
 	case WM_NOTIFY: {
+		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
 		NMHDR *nmhdr = (NMHDR *)lp;
+		TComVar *pcv = dlg_data->pcv;
+		TTTSet *pts = pcv->ts;
 		if (nmhdr->code == TTN_POP) {
 			// 1回だけ表示するため、閉じたら削除する
 			TipWin2SetTextW(dlg_data->tipwin, IDC_SETUP_DIR_LIST, NULL);
@@ -685,8 +700,25 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		}
 		break;
 	}
-	default:
+
+	case WM_SIZE: {
+		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
+		ReiseDlgHelper_WM_SIZE(dlg_data->resize_helper, wp, lp);
+		// 幅を調整
+		HWND hWndList = GetDlgItem(hDlgWnd, IDC_SETUP_DIR_LIST);
+		for (int i = 0; i < 2; i++) {
+			ListView_SetColumnWidth(hWndList, i, LVSCW_AUTOSIZE_USEHEADER);
+		}
+		break;
+	}
+
+	default: {
+		dlg_data_t *dlg_data = (dlg_data_t *)GetWindowLongPtrW(hDlgWnd, DWLP_USER);
+		if (dlg_data != NULL) {
+			return ResizeDlgHelperProc(dlg_data->resize_helper, hDlgWnd, msg, wp, lp);
+		}
 		return FALSE;
+	}
 	}
 	return TRUE;
 }

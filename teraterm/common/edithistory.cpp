@@ -157,7 +157,7 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			/* append a blank item to the bottom */
 			SendDlgItemMessageW(Dialog, IDC_TCPIPLIST, LB_ADDSTRING, 0, 0);
 
-			data->resize_helper = ReiseHelperInit(Dialog, TRUE, resize_info, _countof(resize_info));
+			data->resize_helper = ReiseDlgHelperInit(Dialog, TRUE, resize_info, _countof(resize_info));
 
 			CenterWindow(Dialog, GetParent(Dialog));
 
@@ -281,23 +281,19 @@ static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 			}
 			break;
 
-		case WM_SIZE: {
-			DlgData *data = (DlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
-			ReiseDlgHelper_WM_SIZE(data->resize_helper);
-			break;
-		}
-
-		case WM_GETMINMAXINFO: {
-			DlgData *data = (DlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
-			ReiseDlgHelper_WM_GETMINMAXINFO(data->resize_helper, lParam);
-			break;
-		}
-
 		case WM_DESTROY: {
 			DlgData *data = (DlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
 			ReiseDlgHelperDelete(data->resize_helper);
 			data->resize_helper = NULL;
 			break;
+		}
+
+		default: {
+			DlgData *data = (DlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
+			if (data != NULL) {
+				return ResizeDlgHelperProc(data->resize_helper, Dialog, Message, wParam, lParam);
+			}
+			return FALSE;
 		}
 	}
 	return FALSE;
