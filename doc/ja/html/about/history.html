@@ -38,42 +38,6 @@
   <li>変更
     <ul>
       <li>
-        設定フォルダダイアログ ("Setup &gt; <a href="../menu/setup-directory.html">Setup directory...</a>") に broadcast.log を追加した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/928" target="_blank">issue #928</a>)
-      </li>
-      <li>
-        高ビットレートでシリアル接続した際の受信データの欠落を起きづらくした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/894" target="_blank">issue #894</a>)
-      </li>
-      <li>
-        バイナリデータを受信してファイルとして保存する機能を追加した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/894" target="_blank">issue #894</a>)
-        <ul>
-          <li>ファイル受信ダイアログ ("File &gt; <a href="../menu/file-receivefile.html">Receive file...</a>") を追加した。</li>
-          <li>マクロコマンド <a href="../macro/command/recvfile.html">recvfile</a> を追加した。</li>
-        </ul>
-      </li>
-      <li>
-        <a href="../menu/setup-additional-font.html#Windows_Fonts">Windowsのフォント設定を開く</a>とき、可能であれば "%WINDIR%\Fonts" フォルダを開くかわりに "設定 &gt; 個人用設定 &gt; フォント" を開くようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/979" target="_blank">issue #979</a>)
-      </li>
-      <li>
-        "セッションの複製" で起動した Tera Term のコマンドラインオプションを確認できないようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
-      </li>
-      <li>
-        Serial port タブ ("Setup &gt; <a href="../menu/setup-additional-serialport.html">Serial port...</a>") で RTS と DTR の制御信号の low と high を切り替えられるようにし、RTS と DTR のフロー制御を設定できるようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/934" target="_blank">issue #934</a>)
-      </li>
-      <li>
-        セッション断の状態でも "File &gt; <a href="../menu/file-chdir.html">Change directory...</a>" を選択できるようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/969" target="_blank">issue #969</a>)
-      </li>
-      <li>
-        設定フォルダダイアログ ("Setup &gt; <a href="../menu/setup-directory.html">Setup directory...</a>") をリサイズ可能とした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1106" target="_blank">issue #1106</a>)
-      </li>
-      <li>
         Unicode コードポイントごとの文字幅をユーザーが指定できるようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/318" target="_blank">issue #318</a>,
         <a href="https://github.com/TeraTermProject/teraterm/issues/1024" target="_blank">issue #1024</a>)<br>
@@ -88,17 +52,53 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1096" target="_blank">issue #1096</a>)
       </li>
       <li>
+        Serial port タブ ("Setup &gt; <a href="../menu/setup-additional-serialport.html">Serial port...</a>") で RTS と DTR の制御信号の low と high を切り替えられるようにし、RTS と DTR のフロー制御を設定できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/934" target="_blank">issue #934</a>)
+      </li>
+      <li>
+        高ビットレートでシリアル接続した際の受信データの欠落を起きづらくした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/894" target="_blank">issue #894</a>)
+      </li>
+      <li>
+        バイナリデータを受信してファイルとして保存する機能を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/894" target="_blank">issue #894</a>)
+        <ul>
+          <li>ファイル受信ダイアログ ("File &gt; <a href="../menu/file-receivefile.html">Receive file...</a>") を追加した。</li>
+          <li>マクロコマンド <a href="../macro/command/recvfile.html">recvfile</a> を追加した。</li>
+        </ul>
+      </li>
+      <li>
+        "セッションの複製" で起動した Tera Term のコマンドラインオプションを確認できないようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
+      </li>
+      <li>
+        セッション断の状態でも "File &gt; <a href="../menu/file-chdir.html">Change directory...</a>" を選択できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/969" target="_blank">issue #969</a>)
+      </li>
+      <li>
+        エンコーディングタブ ("Additional settings &gt; <a href="../menu/setup-additional-coding.html">Encoding</a>") で文字コードを変更したとき、Override Emoji Characters width、Override Emoji Characters width の設定が自動的に変化しないようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1127" target="_blank">issue #1127</a>)
+      </li>
+      <li>
+        <a href="../menu/setup-additional-font.html#Windows_Fonts">Windowsのフォント設定を開く</a>とき、可能であれば "%WINDIR%\Fonts" フォルダを開くかわりに "設定 &gt; 個人用設定 &gt; フォント" を開くようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/979" target="_blank">issue #979</a>)
+      </li>
+      <li>
         プラグインタブ ("Additional settings &gt; <a href="../menu/setup-additional-plugin.html">Plugin</a>") を追加、
         プラグインのロード設定を可能とした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/604" target="_blank">issue #604</a>)
       </li>
       <li>
-        arm64版Tera Termで、susieプラグインを使用できるようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1121" target="_blank">issue #1121</a>)
+        設定フォルダダイアログ ("Setup &gt; <a href="../menu/setup-directory.html">Setup directory...</a>") に broadcast.log を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/928" target="_blank">issue #928</a>)
       </li>
       <li>
-        エンコーディングタブ ("Additional settings &gt; <a href="../menu/setup-additional-coding.html">Encoding</a>") で文字コードを変更したとき、Override Emoji Characters width、Override Emoji Characters width の設定が自動的に変化しないようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1127" target="_blank">issue #1127</a>)
+        設定フォルダダイアログ ("Setup &gt; <a href="../menu/setup-directory.html">Setup directory...</a>") をリサイズ可能とした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1106" target="_blank">issue #1106</a>)
+      </li>
+      <li>
+        arm64版Tera Termで、susieプラグインを使用できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1121" target="_blank">issue #1121</a>)
       </li>
     </ul>
   </li>
@@ -106,22 +106,13 @@
   <li>バグ修正
     <ul>
       <li>
-        シリアルポートのデータ長とフロー制御の設定が "File &gt; Transfer &gt; <a href="../menu/file-transfer-ymodem.html">YMODEM</a>, <a href="../menu/file-transfer-zmodem.html">ZMODEM</a>, <a href="../menu/file-transfer-bplus.html">B-Plus</a>, <a href="../menu/file-transfer-qv.html">Quick-VAN</a>" のメニューの有効/無効状態に反映されるよう修正した。
-        4.66からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/969" target="_blank">issue #969</a>)
-      </li>
-      <li>
         セッション断発生時に Kermit, XModem, YModem, ZModem, B-Plus, Quick-VAN の転送ダイアログを閉じられない不具合を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/973" target="_blank">issue #973</a>)
       </li>
       <li>
-        マクロコマンド <a href="../macro/command/kmtrecv.html">kmtrecv</a>, <a href="../macro/command/ymodemrecv.html">ymodemrecv</a>, <a href="../macro/command/bplusrecv.html">bplusrecv</a>, <a href="../macro/command/quickvanrecv.html">quickvanrecv</a> でファイル受信時にPC側でファイル作成に失敗してもエラーダイアログを表示しないようした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/973" target="_blank">issue #973</a>)
-      </li>
-      <li>
-        TERATERM.INI の <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> が機能しなくなっていた不具合を修正した。
-        5.0からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/967" target="_blank">issue #967</a>)
+        シリアルポートのデータ長とフロー制御の設定が "File &gt; Transfer &gt; <a href="../menu/file-transfer-ymodem.html">YMODEM</a>, <a href="../menu/file-transfer-zmodem.html">ZMODEM</a>, <a href="../menu/file-transfer-bplus.html">B-Plus</a>, <a href="../menu/file-transfer-qv.html">Quick-VAN</a>" のメニューの有効/無効状態に反映されるよう修正した。
+        4.66からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/969" target="_blank">issue #969</a>)
       </li>
       <li>
         印刷 ("File &gt; <a href="../menu/file-print.html">Print...</a>") 時、印刷中ダイアログのCancelボタンで中断できるよう修正した。
@@ -132,8 +123,17 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1086" target="_blank">issue #1086</a>)
       </li>
       <li>
+        TERATERM.INI の <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> が機能しなくなっていた不具合を修正した。
+        5.0からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/967" target="_blank">issue #967</a>)
+      </li>
+      <li>
         susieプラグインを使用すると Tera Term がクラッシュする問題を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1121" target="_blank">issue #1121</a>)
+      </li>
+      <li>
+        マクロコマンド <a href="../macro/command/kmtrecv.html">kmtrecv</a>, <a href="../macro/command/ymodemrecv.html">ymodemrecv</a>, <a href="../macro/command/bplusrecv.html">bplusrecv</a>, <a href="../macro/command/quickvanrecv.html">quickvanrecv</a> でファイル受信時にPC側でファイル作成に失敗してもエラーダイアログを表示しないようした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/973" target="_blank">issue #973</a>)
       </li>
     </ul>
   </li>

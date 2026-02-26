@@ -38,8 +38,21 @@
   <li>Changes
     <ul>
       <li>
-        Added broadcast.log to Setup directory ("Setup &gt; <a href="../menu/setup-directory.html">Setup directory...</a>").
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/928" target="_blank">issue #928</a>)
+        Character width can now be specified by the user for each Unicode code point.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/318" target="_blank">issue #318</a>,
+        <a href="https://github.com/TeraTermProject/teraterm/issues/1024" target="_blank">issue #1024</a>)<br>
+        When specify <a href="../setup/teraterm-term.html#OverrideCharWidth">character width</a> settings in TERATERM.INI,
+        <a href="../menu/setup-additional-coding.html#OverrideCharWidth">"Use character-by-character width override settings"</a>
+        check box becomes available, in Encoding tab of Additional Settings dialog.
+      </li>
+      <li>
+        Added support for dumb terminal emulation.
+        Added "dumb" to <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1096" target="_blank">issue #1096</a>)
+      </li>
+      <li>
+        In the Serial Port tab ("Setup &gt; <a href="../menu/setup-additional-serialport.html">Serial port...</a>"), added the ability to toggle the RTS and DTR control signals between low and high, and to configure RTS and DTR flow control.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/934" target="_blank">issue #934</a>)
       </li>
       <li>
         Reduced occurrences of lost incoming data on high-bit-rate serial connections.
@@ -54,37 +67,20 @@
         </ul>
       </li>
       <li>
-        Open "Settings &gt; Personalization &gt; Fonts" instead of opening the "%WINDIR%\Fonts" folder if possible when <a href="../menu/setup-additional-font.html#Windows_Fonts">opening Windows font settings</a>.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/979" target="_blank">issue #979</a>)
-      </li>
-      <li>
         Command-line options of Tera Term launched from "Duplicate session" are no longer accessible.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/128" target="_blank">issue #128</a>)
-      </li>
-      <li>
-        In the Serial Port tab ("Setup &gt; <a href="../menu/setup-additional-serialport.html">Serial port...</a>"), added the ability to toggle the RTS and DTR control signals between low and high, and to configure RTS and DTR flow control.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/934" target="_blank">issue #934</a>)
       </li>
       <li>
         "File &gt; <a href="../menu/file-chdir.html">Change directory...</a>" can now be selected even when the session is disconnected.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/969" target="_blank">issue #969</a>)
       </li>
       <li>
-        Setup directory ("Setup &gt; <a href="../menu/setup-directory.html">Setup directory...</a>") is now resizable.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1106" target="_blank">issue #1106</a>)
+        In the Encoding tab ("Additional settings &gt; <a href="../menu/setup-additional-coding.html">Encoding</a>"), "Ambiguous Characters width" and "Override Emoji Characters width" settings are no longer update automatically when the character encoding is changed.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1127" target="_blank">issue #1127</a>)
       </li>
       <li>
-        Character width can now be specified by the user for each Unicode code point.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/318" target="_blank">issue #318</a>,
-        <a href="https://github.com/TeraTermProject/teraterm/issues/1024" target="_blank">issue #1024</a>)<br>
-        When specify <a href="../setup/teraterm-term.html#OverrideCharWidth">character width</a> settings in TERATERM.INI,
-        <a href="../menu/setup-additional-coding.html#OverrideCharWidth">"Use character-by-character width override settings"</a>
-        check box becomes available, in Encoding tab of Additional Settings dialog.
-      </li>
-      <li>
-        Added support for dumb terminal emulation.
-        Added "dumb" to <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a>.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1096" target="_blank">issue #1096</a>)
+        Open "Settings &gt; Personalization &gt; Fonts" instead of opening the "%WINDIR%\Fonts" folder if possible when <a href="../menu/setup-additional-font.html#Windows_Fonts">opening Windows font settings</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/979" target="_blank">issue #979</a>)
       </li>
       <li>
         Add plugin tab ("Additional settings &gt; <a href="../menu/setup-additional-plugin.html">Plugin</a>").
@@ -92,12 +88,16 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/604" target="_blank">issue #604</a>)
       </li>
       <li>
-        Susie plugin is now usable with the arm64 version of Tera Term.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1121" target="_blank">issue #1121</a>)
+        Added broadcast.log to Setup directory ("Setup &gt; <a href="../menu/setup-directory.html">Setup directory...</a>").
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/928" target="_blank">issue #928</a>)
       </li>
       <li>
-        In the Encoding tab ("Additional settings &gt; <a href="../menu/setup-additional-coding.html">Encoding</a>"), "Ambiguous Characters width" and "Override Emoji Characters width" settings are no longer update automatically when the character encoding is changed.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1127" target="_blank">issue #1127</a>)
+        Setup directory ("Setup &gt; <a href="../menu/setup-directory.html">Setup directory...</a>") is now resizable.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1106" target="_blank">issue #1106</a>)
+      </li>
+      <li>
+        Susie plugin is now usable with the arm64 version of Tera Term.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1121" target="_blank">issue #1121</a>)
       </li>
     </ul>
   </li>
@@ -105,22 +105,13 @@
   <li>Bug fixes
     <ul>
       <li>
-        Fixed an issue where the serial port data length and flow control settings were not reflected in the enabled/disabled state of the "File &gt; Transfer &gt; <a href="../menu/file-transfer-ymodem.html">YMODEM</a>, <a href="../menu/file-transfer-zmodem.html">ZMODEM</a>, <a href="../menu/file-transfer-bplus.html">B-Plus</a>, <a href="../menu/file-transfer-qv.html">Quick-VAN</a>" menu items.
-        This bug was introduced in 4.66.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/969" target="_blank">issue #969</a>)
-      </li>
-      <li>
         Fixed a bug that prevented the transfer dialogs for Kermit, XModem, YModem, ZModem, B-Plus and Quick-VAN from being closed when a session was disconnected.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/973" target="_blank">issue #973</a>)
       </li>
       <li>
-        The error dialog is no longer shown when the PC fails to create the file during execution of reception macro commands (<a href="../macro/command/kmtrecv.html">kmtrecv</a>, <a href="../macro/command/ymodemrecv.html">ymodemrecv</a>, <a href="../macro/command/bplusrecv.html">bplusrecv</a> and <a href="../macro/command/quickvanrecv.html">quickvanrecv</a>).
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/973" target="_blank">issue #973</a>)
-      </li>
-      <li>
-        Fixed a bug that caused <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> in TERATERM.INI to stop working.
-        This bug was introduced in 5.0.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/967" target="_blank">issue #967</a>)
+        Fixed an issue where the serial port data length and flow control settings were not reflected in the enabled/disabled state of the "File &gt; Transfer &gt; <a href="../menu/file-transfer-ymodem.html">YMODEM</a>, <a href="../menu/file-transfer-zmodem.html">ZMODEM</a>, <a href="../menu/file-transfer-bplus.html">B-Plus</a>, <a href="../menu/file-transfer-qv.html">Quick-VAN</a>" menu items.
+        This bug was introduced in 4.66.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/969" target="_blank">issue #969</a>)
       </li>
       <li>
         Fixed an issue Cancel button in printing dialog is not working when printing from print menu ("File &gt; <a href="../menu/file-print.html">Print...</a>").
@@ -131,8 +122,17 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1086" target="_blank">issue #1086</a>)
       </li>
       <li>
+        Fixed a bug that caused <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> in TERATERM.INI to stop working.
+        This bug was introduced in 5.0.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/967" target="_blank">issue #967</a>)
+      </li>
+      <li>
         Fixed an issue where Tera Term crashes when using susie plugin.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1121" target="_blank">issue #1121</a>)
+      </li>
+      <li>
+        The error dialog is no longer shown when the PC fails to create the file during execution of reception macro commands (<a href="../macro/command/kmtrecv.html">kmtrecv</a>, <a href="../macro/command/ymodemrecv.html">ymodemrecv</a>, <a href="../macro/command/bplusrecv.html">bplusrecv</a> and <a href="../macro/command/quickvanrecv.html">quickvanrecv</a>).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/973" target="_blank">issue #973</a>)
       </li>
     </ul>
   </li>
