@@ -60,12 +60,13 @@ AppPublisher=TeraTerm Project
 AppPublisherURL=https://teratermproject.github.io/
 AppSupportURL=https://github.com/TeraTermProject/teraterm/issues
 ; execute
-PrivilegesRequired=none
+PrivilegesRequired=admin
+PrivilegesRequiredOverridesAllowed=dialog
 ; during installer execution
 ShowLanguageDialog=yes
 UsePreviousLanguage=no
 LicenseFile={#SrcDir}\license.rtf
-DefaultDirName={commonpf}\teraterm5
+DefaultDirName={autopf}\teraterm5
 AllowNoIcons=true
 DefaultGroupName={#AppName} 5
 ; uninstall
