@@ -1010,7 +1010,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 
 	if (jobInfo.dwMode != MODE_DIRECT)
 		if (wcslen(jobInfo.szInitFile) != 0) {
-			aswprintf(&szTemp, L" /F=\"%s\"", jobInfo.szInitFile);
+			aswprintf(&szTemp, L"/F=\"%s\"", jobInfo.szInitFile);
 			awcscat(&szArgment, szTemp);
 			free(szTemp);
 		}
