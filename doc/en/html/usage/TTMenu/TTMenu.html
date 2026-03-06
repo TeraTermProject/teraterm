@@ -20,8 +20,10 @@ TeraTerm Menu copyright belongs to S.Hayakawa, however the TeraTerm Menu is curr
 </p>
 
 <b>
-NOTE: Users with administrator privileges can use tools such as Process Explorer to display arguments such as the user name and password of Tera Term started from the TeraTerm Menu.<br>
-Please refrain from using TeraTerm Menu in environments where there is a risk of information leakage.
+NOTE: TeraTerm Menu versions prior to 1.21 included in TeraTerm 5.6.0 start
+ttermpro.exe with username and password as arguments.
+Users with administrator privileges can use tools such as Process Explorer to display arguments such as the user name and password of Tera Term started from the TeraTerm Menu.
+Please refer to <a href="../../commandline/ttssh.html#passwd_specify">Notes on Specifying a Password</a> of TTSSH command line.
 </b>
 
 
@@ -55,7 +57,7 @@ When a user uses the TeraTerm Menu for the first time, the menu list is empty. F
 <div class="img"><img class="block" width="455" height="443" src="menulist1.png" alt="Menu list"></div>
 
 <p>
-The above is the example that Tera Term connects to the Linux machine(Fedora) has 192.168.153.128 ip address by SSH protocol. When a user want to use the SSH connection, please check the "use SSH". 
+The above is the example that Tera Term connects to the Linux machine(Fedora) has 192.168.153.128 ip address by SSH protocol. When a user want to use the SSH connection, please check the "use SSH".
 If SSH port number uses any number other than 22, please specify the ip address and port number(ip:port) at the Host Name.<br>
 If the public key authentication uses, please specify the private key file at the Keyfile entry.
 </p>
@@ -70,9 +72,10 @@ When a user specifies the detail configuration on server connection, please push
 The above is the example that the Option specifies the "/KT=UTF8 /KR=UTF8". This option is passed in the Tera Term command line. So, the Tera Term command line will be in the following parameter:
 </p>
 
-<pre class="code"><code>
-"C:\Program Files\teraterm\ttermpro.exe" 192.168.153.128:22 /ssh /auth=password /user=yutaka /passwd=****** /KT=UTF8 /KR=UTF8  
+<pre class="code"><code>"C:\Program Files\teraterm\ttermpro.exe" /M="ttm****.tmp" /KT=UTF8 /KR=UTF8
 </code></pre>
+
+(Connection destination, user, password, etc. are passed to ttermpro.exe with /M option.)
 
 <p>
 Please refer to <a href="../../commandline/ttssh.html#passwd_specify">Notes on Specifying a Password</a> of TTSSH command line.
