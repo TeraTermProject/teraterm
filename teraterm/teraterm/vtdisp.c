@@ -3931,12 +3931,12 @@ void ThemeGetBGDefault(BGTheme *bg_theme)
 	bg_theme->BGSrc2.pattern = BG_STRETCH;
 	bg_theme->BGSrc2.color = RGB(0, 0, 0);
 	bg_theme->BGSrc2.antiAlias = TRUE;
-	bg_theme->BGSrc2.alpha = 0;
+	bg_theme->BGSrc2.alpha = 128;
 	bg_theme->BGSrc2.file[0] = 0;
 
 	bg_theme->BGReverseTextAlpha = 255;
-	bg_theme->TextBackAlpha = 255;
-	bg_theme->BackAlpha = 255;
+	bg_theme->TextBackAlpha = 0;
+	bg_theme->BackAlpha = 0;
 }
 
 #if 0
