@@ -19,20 +19,20 @@
         各ウィンドウに送信するコマンドを入力します。
       </dd>
 
-      <dt>Enter key</dt>
-      <dd>
-        コマンド入力コントロールで入力したコマンドを送信するとき、改行を付加するか選択します。改行として送信する改行コードを "CRLF", "CR", "LF" から選択します。
-      </dd>
-
-      <dt>Submit</dt>
-      <dd>
-        コマンドを送信します。"<a href="./setup-additional.html">AcceptBroadcast</a>" が有効なウィンドウはコマンドを受信します。
-      </dd>
-
       <dt>History</dt>
       <dd>
         送信したコマンドの履歴を保存するかどうか選択します。保存する件数は "<a href="../setup/teraterm-misc.html#broadcast">MaxBroadcatHistory</a>" で設定できます。<br>
         履歴は broadcast.log ファイルに保存されます。<a href="setup-directory.html">[Setup]-Setup directory</a>で確認できます。
+      </dd>
+
+      <dt>^M</dt>
+      <dd>
+        CTRL+M 押下でコマンドを送信するかどうかを選択します。
+      </dd>
+
+      <dt>Enter key</dt>
+      <dd>
+        コマンド入力コントロールで入力したコマンドを送信するとき、改行を付加するか選択します。改行として送信する改行コードを "CRLF", "CR", "LF" から選択します。
       </dd>
 
       <dt>Send to this process only</dt>
@@ -45,6 +45,11 @@
         Tera Term のウィンドウ一覧です。
         コマンドを送信するウィンドウを左クリックで選択します。
         右クリックのコンテキストメニューから、選択したウィンドウに対する操作や一覧の更新ができます。
+      </dd>
+
+      <dt>Submit</dt>
+      <dd>
+        コマンドを送信します。"<a href="./setup-additional.html">AcceptBroadcast</a>" が有効なウィンドウはコマンドを受信します。
       </dd>
 
     </dl>
