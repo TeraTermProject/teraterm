@@ -615,6 +615,7 @@ struct tttset {
 	int FlowCtrlDTR;
 	BYTE UnicodeOverrideCharWidthEnable;	// 0/1=overrideしない/する(文字幅Override設定存在時)
 	BYTE UnicodeOverrideCharWidthSelected;	// 0...
+	BOOL BroadcastSendWithCTRLM;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;

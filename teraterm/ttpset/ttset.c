@@ -1538,6 +1538,10 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->AcceptBroadcast =
 		GetOnOff(Section, "AcceptBroadcast", FName, TRUE);
 
+	// CTRL+M を Submit ボタンクリックとみなす
+	ts->BroadcastSendWithCTRLM =
+		GetOnOff(Section, "BroadcastSendWithCTRLM", FName, FALSE);
+
 	// Confirm send a file when drag and drop (2007.12.28 maya)
 	ts->ConfirmFileDragAndDrop =
 		GetOnOff(Section, "ConfirmFileDragAndDrop", FName, TRUE);
@@ -2943,6 +2947,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	// 337: 2007/03/20 Accept Broadcast
 	WriteOnOff(Section, "AcceptBroadcast", FName, ts->AcceptBroadcast);
+
+	// CTRL+M を Submit ボタンクリックとみなす
+	WriteOnOff(Section, "BroadcastSendWithCTRLM", FName, ts->BroadcastSendWithCTRLM);
 
 	// Confirm send a file when drag and drop (2007.12.28 maya)
 	WriteOnOff(Section, "ConfirmFileDragAndDrop", FName,

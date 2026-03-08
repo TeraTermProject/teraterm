@@ -278,6 +278,24 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 	return CallWindowProcW(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
 }
 
+static HWND hDlgWnd = NULL;
+
+static LRESULT CALLBACK BroadcastEditBatchProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg) {
+		case WM_KEYUP:
+			// CTRL+M を Submit ボタンクリックとみなす
+			if (SendMessage(GetDlgItem(hDlgWnd, IDC_CTRLM_CHECK), BM_GETCHECK, 0, 0)) {
+				if (wParam == 'M' && (GetKeyState(VK_CONTROL) & 0x8000)) {
+					SendDlgItemMessage(hDlgWnd, IDOK, BM_CLICK, 0, 0);
+					SetFocus(dlg);
+					return FALSE;
+				}
+			}
+	}
+	return CallWindowProcW(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
+}
+
 static WNDPROC DefaultWindowListProc;
 
 static LRESULT CALLBACK WindowListProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -581,6 +599,9 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			wchar_t *historyfile = GetHistoryFileName(&ts);
 			ApplyBroadCastCommandHistory(hWnd, historyfile);
 			free(historyfile);
+			if (ts.BroadcastSendWithCTRLM) {
+				SendMessage(GetDlgItem(hWnd, IDC_CTRLM_CHECK), BM_SETCHECK, BST_CHECKED, 0);
+			}
 
 			// エディットコントロールにフォーカスをあてる
 			SetFocus(GetDlgItem(hWnd, IDC_COMMAND_EDIT));
@@ -592,6 +613,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			// デフォルトはon。残りはdisable。
 			SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_SETCHECK, BST_CHECKED, 0);  // default on
 			EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
+			EnableWindow(GetDlgItem(hWnd, IDC_CTRLM_CHECK), FALSE);
 			EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), FALSE);
 			EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CR), FALSE);
 			EnableWindow(GetDlgItem(hWnd, IDC_RADIO_LF), FALSE);
@@ -663,13 +685,16 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 			case IDC_REALTIME_CHECK | (BN_CLICKED << 16):
 				checked = SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_GETCHECK, 0, 0);
+				hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
+				hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
+				// restore old handler
+				SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)OrigBroadcastEditProc);
 				if (checked & BST_CHECKED) { // checkあり
 					// new handler
-					hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
-					hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
 					OrigBroadcastEditProc = (WNDPROC)SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
+					EnableWindow(GetDlgItem(hWnd, IDC_CTRLM_CHECK), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CR), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_LF), FALSE);
@@ -677,10 +702,11 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					EnableWindow(GetDlgItem(hWnd, IDC_PARENT_ONLY), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
 				} else {
-					// restore old handler
-					SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)OrigBroadcastEditProc);
+					// new handler
+					OrigBroadcastEditProc = (WNDPROC)SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditBatchProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), TRUE);
+					EnableWindow(GetDlgItem(hWnd, IDC_CTRLM_CHECK), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CR), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_LF), TRUE);
@@ -726,6 +752,11 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 							}
 							else {
 								ts.BroadcastCommandHistory = FALSE;
+							}
+							if (SendMessage(GetDlgItem(hWnd, IDC_CTRLM_CHECK), BM_GETCHECK, 0, 0)) {
+								ts.BroadcastSendWithCTRLM = TRUE;
+							} else {
+								ts.BroadcastSendWithCTRLM = FALSE;
 							}
 							checked = SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_GETCHECK, 0, 0);
 							if (checked & BST_CHECKED) { // 改行コードあり
@@ -988,8 +1019,6 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 	}
 	return TRUE;
 }
-
-static HWND hDlgWnd = NULL;
 
 void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd)
 {
