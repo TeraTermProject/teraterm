@@ -280,20 +280,42 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 
 static HWND hDlgWnd = NULL;
 
-static LRESULT CALLBACK BroadcastEditBatchProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL HandleBroadcastEditMessage(LPMSG msg)
 {
-	switch (msg) {
+	if (SendMessage(GetDlgItem(hDlgWnd, IDC_REALTIME_CHECK), BM_GETCHECK, 0, 0)) {
+		// リアルタイム入力の場合は何もしない
+		return FALSE;
+	}
+
+	HWND hwndBroadcastEdit = GetWindow(GetDlgItem(hDlgWnd, IDC_COMMAND_EDIT), GW_CHILD);
+
+	if (hwndBroadcastEdit && msg->hwnd == hwndBroadcastEdit) {
+		WORD vkCode = LOWORD(msg->wParam);
+
+		switch (msg->message) {
+		case WM_KEYDOWN:
+			// Enter 又は Ctrl+M 押下時にシステム警告音が鳴らないようにする
+			if (SendMessage(GetDlgItem(hDlgWnd, IDC_CTRLM_CHECK), BM_GETCHECK, 0, 0)) {
+				if (vkCode == VK_RETURN && (GetAsyncKeyState(VK_CONTROL) & 0x8000)) {
+					return TRUE;
+				}
+			}
+			break;
+
 		case WM_KEYUP:
 			// CTRL+M を Submit ボタンクリックとみなす
 			if (SendMessage(GetDlgItem(hDlgWnd, IDC_CTRLM_CHECK), BM_GETCHECK, 0, 0)) {
-				if (wParam == 'M' && (GetKeyState(VK_CONTROL) & 0x8000)) {
+				if (vkCode == 'M' && (GetAsyncKeyState(VK_CONTROL) & 0x8000)) {
 					SendDlgItemMessage(hDlgWnd, IDOK, BM_CLICK, 0, 0);
-					SetFocus(dlg);
-					return FALSE;
+					SetFocus(hwndBroadcastEdit);
+					return TRUE;
 				}
 			}
+			break;
+		}
 	}
-	return CallWindowProcW(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
+
+	return FALSE;
 }
 
 static WNDPROC DefaultWindowListProc;
@@ -702,9 +724,6 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					EnableWindow(GetDlgItem(hWnd, IDC_PARENT_ONLY), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
 				} else {
-					// new handler
-					OrigBroadcastEditProc = (WNDPROC)SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditBatchProc);
-
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_CTRLM_CHECK), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), TRUE);

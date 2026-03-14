@@ -61,6 +61,7 @@
 #endif
 #include "directx.h"
 #include "unicode.h"
+#include "broadcast.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -452,6 +453,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 							message_processed = true;
 						}
 					}
+				}
+
+				if (HandleBroadcastEditMessage(&msg)){
+					// Broadcast command ダイアログのIDC_COMMAND_EDITへのメッセージを処理した
+					message_processed = true;
 				}
 
 				if (!message_processed) {
