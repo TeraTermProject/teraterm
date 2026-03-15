@@ -46,19 +46,33 @@
 
       <dt>Susie Plug-in path:</dt>
       <dd>
-        Susie Plug-in ファイルを保存しているパスを指定します。<br>
-        Susie Plug-in は、画像ビュアーソフト <a href="../about/glossary.html#susie">Susie</a>で
-        様々な画像ファイルを読み込むための外部ファイルです。<br>
-        次の情報を参考にしました。
-        <ul>
-          <li><a href="https://www.digitalpad.co.jp/~takechin/download.html" target="_blank">Susieの部屋 / Susieのだうんろーど</a><br>
-            <a href="https://www.digitalpad.co.jp/~takechin/archives/splug004.lzh" target="_blank">https://www.digitalpad.co.jp/~takechin/archives/splug004.lzh</a> の PLUG_API.TXT
-          </li>
-          <li><a href="https://gist.github.com/tapetums/0a924712fb2fa0a7bb93" target="_blank">Susie プラグイン API 定義ファイル</a></li>
-          <li><a href="http://toro.d.dooo.jp/slplugin.html" target="_blank">TORO's Library / TORO's Software library(Win32/Win64 Plugin)</a></li>
-        </ul>
-      </dd>
+        <a href="../about/glossary.html#susie">Susie</a> Plug-in ファイルを保存しているパスを指定します。
 
+        <p>
+          Tera Termのバイナリと同じアーキテクチャのPlug-inを使用します。
+          アーキテクチャはPlug-inの拡張子で判定しています。
+        </p>
+
+        <table border="1">
+          <caption>Plug-in拡張子</caption>
+          <tr>
+            <th>architecture</th>
+            <th>拡張子</th>
+          </tr>
+          <tr>
+            <td>x86 32bit</td>
+            <td>.spi</td>
+          </tr>
+          <tr>
+            <td>x86 64bit</td>
+            <td>.sph</td>
+          </tr>
+          <tr>
+            <td>ARM 64bit</td>
+            <td>.spha</td>
+          </tr>
+        </table>
+      </dd>
     </dl>
 
   </body>

@@ -464,8 +464,12 @@ static void BGPreloadPicture(BGSrc *src)
 		HANDLE hbuf;
 		BOOL r = SusieLoadPicture(load_file, spi_path, &hbmi, &hbuf);
 		if (r != FALSE) {
-			hbm = CreateBitmapFromBITMAPINFO(hbmi, hbuf);
+			const BITMAPINFO *pbmi = LocalLock(hbmi);
+			const unsigned char *pbuf = LocalLock(hbuf);
+			hbm = CreateBitmapFromBITMAPINFO(pbmi, pbuf);
+			LocalUnlock(hbmi);
 			LocalFree(hbmi);
+			LocalUnlock(hbuf);
 			LocalFree(hbuf);
 		}
 	}

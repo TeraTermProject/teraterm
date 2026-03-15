@@ -160,7 +160,7 @@ FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
     CTEXT           "Tera Term launch tool\nTeraTerm Menu",IDC_APP_NAME,7,7,156,18
     CTEXT           "Version %d.%02d",IDC_VERSION,7,27,156,10
-    LTEXT           "Copyright(C) 1997-2003 S.Hayakawa\r\n(C) 2004-2025 TeraTerm Project",IDC_COPYRIGHT,26,42,137,18
+    LTEXT           "Copyright(C) 1997-2003 S.Hayakawa\r\n(C) 2004-2026 TeraTerm Project",IDC_COPYRIGHT,26,42,137,18
     ICON            "",IDC_TTPMENU_ICON,4,8,20,20
     DEFPUSHBUTTON   "OK",IDOK,61,99,44,14
     EDITTEXT        IDC_SETTINGS,22,61,126,36,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY

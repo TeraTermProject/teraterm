@@ -2453,6 +2453,21 @@ static BOOL isURLchar(unsigned int u32)
 	return url_char[u32] == 0 ? FALSE : TRUE;
 }
 
+/**
+ *	文字コードが2バイト文字か調べる
+ *
+ *	@retval	TRUE	2バイト文字コード
+ *	@retval	FALSE	1バイト文字コード
+ */
+static BOOL IsDBCS(IdKanjiCode code)
+{
+	if (code == IdSJIS || code == IdEUC || code == IdJIS || code == IdKoreanCP949 || code == IdCnGB2312 ||
+		code == IdCnBig5) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
 static BOOL BuffIsHalfWidthFromPropery(const TTTSet *ts_, char width_property)
 {
 	switch (width_property) {
@@ -2462,7 +2477,12 @@ static BOOL BuffIsHalfWidthFromPropery(const TTTSet *ts_, char width_property)
 	default:
 		return TRUE;
 	case 'A':	// Ambiguous 曖昧
-		if (ts_->UnicodeAmbiguousWidth == 2) {
+		if (ts_->KanjiCode == IdUTF8) {
+			if (ts_->UnicodeAmbiguousWidth == 2) {
+				// 全角として扱う
+				return FALSE;
+			}
+		} else if (IsDBCS(ts_->KanjiCode)) {
 			// 全角として扱う
 			return FALSE;
 		}
@@ -2478,29 +2498,46 @@ static BOOL BuffIsHalfWidthFromCode(const TTTSet *ts_, unsigned int u32, char *w
 	int width;
 	*width_property = UnicodeGetWidthProperty(u32);
 	*emoji = (char)UnicodeIsEmoji(u32);
-	if (ts_->KanjiCode == IdUTF8 && ts_->UnicodeOverrideCharWidthEnable != 0 &&
-		UnicodeOverrideWidthCheck(u32, &width) == TRUE) {
-		return width == 1 ? TRUE : FALSE;
-	}
-	if (ts_->UnicodeEmojiOverride) {
-		if (*emoji) {
-			// 絵文字だった場合
-			if (u32 < 0x1f000) {
-				if (ts_->UnicodeEmojiWidth == 2) {
-					// 全角
-					return FALSE;
+	if (ts_->KanjiCode == IdUTF8) {
+		// UTF-8(Unicode) のときの文字幅調整
+
+		// 文字ごとの文字幅オーバーライド設定
+		if( ts_->UnicodeOverrideCharWidthEnable != 0 &&
+			UnicodeOverrideWidthCheck(u32, &width) == TRUE) {
+			return width == 1 ? TRUE : FALSE;
+		}
+
+		// 絵文字文字幅オーバーライド設定
+		if (ts_->UnicodeEmojiOverride) {
+			if (*emoji) {
+				// 絵文字だった場合
+				if (u32 < 0x1f000) {
+					if (ts_->UnicodeEmojiWidth == 2) {
+						// 全角
+						return FALSE;
+					}
+					else {
+						// 半角
+						return TRUE;
+					}
 				}
 				else {
-					// 半角
-					return TRUE;
+					// 常に全角
+					return FALSE;
 				}
-			}
-			else {
-				// 常に全角
-				return FALSE;
 			}
 		}
 	}
+	else if (IsDBCS(ts_->KanjiCode)) {
+		// DBCS
+
+		// 絵文字は全角
+		if (*emoji) {
+			return FALSE;
+		}
+	}
+
+	// 文字属性毎の文字幅
 	return BuffIsHalfWidthFromPropery(ts_, *width_property);
 }
 

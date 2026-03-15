@@ -547,7 +547,7 @@ static void DispWriteIni(const wchar_t *FName, PTTSet ts)
  */
 static int GetDefaultUnicodeWidth(void)
 {
-	return 2;
+	return 1;
 }
 
 static void GetPrivateProfileColor2(const char *appA, const char *keyA, const char *defA, const wchar_t *fname,
@@ -1566,7 +1566,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	{
 		const UINT ui = GetPrivateProfileIntW(SectionW, L"DecSpMappingDir",
-											  (INT)IdDecSpecialUniToDec, FName);
+		                                      (INT)IdDecSpecialDoNot, FName);
 		ts->Dec2Unicode =
 			ui == 0 ? IdDecSpecialUniToDec :
 			ui == 1 ? IdDecSpecialDecToUni :

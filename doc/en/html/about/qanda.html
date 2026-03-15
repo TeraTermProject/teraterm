@@ -44,9 +44,12 @@ No problem. Need not announce to us. Tera Term has been distributed under the <a
 <span class="qanda">Q.</span> I want to participate in Tera Term development.<br>
 <span class="qanda">A.</span> Anybody who would like to participate can participate. Please sign up to GitHub and <A HREF="contacts.html">contact the author</A>.</p>
 
-<p>
+<p id="screenshot">
 <span class="qanda">Q.</span> Can I utilize screenshots from Tera Term?<br>
-<span class="qanda">A.</span> Please use at your own risk under <a href="copyright.html">license</a>.</p>
+<span class="qanda">A.</span>
+Screenshots of this software, screen capture videos, or content featuring the software on screen may be created, used, published, and distributed for both commercial and non-commercial purposes.<br>
+However, such use must not imply endorsement by, or affiliation with, the TeraTerm Project.
+</p>
 
 <p>
 <span class="qanda">Q.</span> EAR (Export Administration Regulations)<br>
@@ -230,6 +233,7 @@ When "Tera Special" font is used to display Box-drwing characters, the font is s
   <span class="qanda">Q.</span> Content of log file is not same as displayed in VTWindow. Character that is not able to displayed is outputted.<br>
   <span class="qanda">A.</span> VTWindow displays result of received data which is parsed by control sequence. On the other hand, log file is a record of received data.<br>
   Therefore "content of log file" is not become same as "displayed content in VTWindow." It is similar to the difference between opening a Word document in Word and opening it in a text editor.
+</p>
 
 <div>
 Example:
@@ -264,7 +268,15 @@ l<img src="./image/icon-BS.png" style="width:0.8em; height:1em;">ls<img src="./i
 <img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[0m<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[27m<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[24m<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[J% <img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[K<img src="./image/icon-ESC.png" style="width:0.8em; height:1em;">[?2004h
 </div>
 
+<p>
+If you are using Bash, you can reduce redraws and help prevent log corruption by disabling the line-editing as follows.<br>
+Instead, you will no longer be able to use key cursor operations.
 </p>
+
+<div style="border: 1px solid #666666; color:#000000; background-color:#ffffff; padding:0.2ex;">
+set +o emacs<br>
+set +o vi
+</div>
 
 <p id="selected_highlight">
 <span class="qanda">Q.</span> I selected a range, but it isn't highlighted. The color doesn't change.<br>
