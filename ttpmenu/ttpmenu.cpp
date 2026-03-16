@@ -154,12 +154,11 @@ static void GetTeraTermPath(wchar_t *path, size_t size)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL ExecStartup(HWND hWnd)
+BOOL ExecStartup(HWND /* hWnd unusedParam */)
 {
 	wchar_t	szEntryName[MAX_PATH];
 	wchar_t	szJobName[MAXJOBNUM][MAX_PATH];
 	HKEY	hKey;
-	DWORD	dwCnt;
 	DWORD	dwIndex = 0;
 	DWORD	dwSize = MAX_PATH;
 
@@ -171,6 +170,7 @@ BOOL ExecStartup(HWND hWnd)
 		wcscpy(szJobName[dwIndex], L"");
 		RegClose(hKey);
 #if 0
+		DWORD dwCnt;
 		for (dwCnt = 0; dwCnt < dwIndex; dwCnt++)
 			ConnectHost(hWnd, 0, szJobName[dwCnt]);
 #endif
@@ -533,7 +533,7 @@ LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL CreateTooltip(HWND hWnd)
+BOOL CreateTooltip(HWND /* hWnd unusedParam */)
 {
 	wchar_t uimsg[MAX_UIMSG];
 
@@ -725,7 +725,7 @@ BOOL InitConfigDlg(HWND hWnd)
 	::SendDlgItemMessage(hWnd, BUTTON_SET, BM_SETIMAGE, (WPARAM) IMAGE_ICON, (LPARAM)(HANDLE) g_hIconLeft);
 	::SendDlgItemMessage(hWnd, BUTTON_DELETE, BM_SETIMAGE, (WPARAM) IMAGE_ICON, (LPARAM)(HANDLE) g_hIconRight);
 
-	::CheckRadioButton(hWnd, RADIO_LOGIN, RADIO_MACRO, RADIO_LOGIN);
+	::CheckRadioButton(hWnd, RADIO_LOGIN, RADIO_DIRECT, RADIO_LOGIN);
 	EnableItem(hWnd, EDIT_MACRO, FALSE);
 	EnableItem(hWnd, BUTTON_MACRO, FALSE);
 	::CheckDlgButton(hWnd, CHECK_USER, 1);
@@ -1244,7 +1244,7 @@ BOOL InitListMenu(HWND hWnd)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL RedrawMenu(HWND hWnd)
+BOOL RedrawMenu(HWND /* hWnd unusedParam */)
 {
 	int			num;
 	wchar_t		szPath[MAX_PATH];
@@ -2223,7 +2223,7 @@ INT_PTR CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-INT_PTR CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM /* lParam unusedParam */)
 {
 	switch(uMsg) {
 	case WM_INITDIALOG:
@@ -2250,7 +2250,7 @@ INT_PTR CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-INT_PTR CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM /* lParam unusedParam */)
 {
 	switch(uMsg) {
 	case WM_INITDIALOG:
@@ -2591,7 +2591,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
+int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR /* nCmdLine unusedParam */, int /* nCmdShow unusedParam */)
 {
 	typedef BOOL (WINAPI *pSetDllDir)(LPCSTR);
 	typedef BOOL (WINAPI *pSetDefDllDir)(DWORD);
