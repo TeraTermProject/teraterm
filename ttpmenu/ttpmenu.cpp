@@ -1567,6 +1567,32 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	return TRUE;
 }
 
+static void EnableWindows(HWND hWnd, const int *list, size_t count, BOOL enable)
+{
+	for (size_t i = 0; i < count; i++) {
+		HWND w = GetDlgItem(hWnd, list[i]);
+		EnableWindow(w, enable);
+	}
+}
+
+static const int autologin_items[] = {
+	EDIT_HOST,
+	CHECK_USER,
+	EDIT_USER,
+	CHECK_PASSWORD,
+	EDIT_PASSWORD,
+	CHECK_LOCKBOX,
+	BUTTON_LOCKBOX,
+	CHECK_TTSSH,
+	IDC_CHALLENGE_CHECK,
+	IDC_PAGEANT_CHECK,
+};
+
+static const int macro_items[] = {
+	EDIT_MACRO,
+	BUTTON_MACRO,
+};
+
 /* ==========================================================================
 	Function Name	: (BOOL) LoadLoginHostInformation()
 	Outline			: 設定情報を取得する。
@@ -1600,39 +1626,20 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 	switch (g_JobInfo.dwMode) {
 	case MODE_AUTOLOGIN:
 		::CheckRadioButton(hWnd, RADIO_LOGIN, RADIO_DIRECT, RADIO_LOGIN);
-		EnableItem(hWnd, EDIT_HOST, TRUE);
-		EnableItem(hWnd, CHECK_USER, TRUE);
+		EnableWindows(hWnd, autologin_items, _countof(autologin_items), TRUE);
+		EnableWindows(hWnd, macro_items, _countof(macro_items), FALSE);
 		EnableItem(hWnd, EDIT_USER, g_JobInfo.bUsername);
-		EnableItem(hWnd, CHECK_PASSWORD, TRUE);
 		EnableItem(hWnd, EDIT_PASSWORD, g_JobInfo.bPassword);
-		EnableItem(hWnd, CHECK_LOCKBOX, TRUE);
-		EnableItem(hWnd, BUTTON_LOCKBOX, TRUE);
-		EnableItem(hWnd, EDIT_MACRO, FALSE);
-		EnableItem(hWnd, BUTTON_MACRO, FALSE);
 		break;
 	case MODE_MACRO:
 		::CheckRadioButton(hWnd, RADIO_LOGIN, RADIO_DIRECT, RADIO_MACRO);
-		EnableItem(hWnd, EDIT_HOST, FALSE);
-		EnableItem(hWnd, CHECK_USER, FALSE);
-		EnableItem(hWnd, EDIT_USER, FALSE);
-		EnableItem(hWnd, CHECK_PASSWORD, FALSE);
-		EnableItem(hWnd, EDIT_PASSWORD, FALSE);
-		EnableItem(hWnd, CHECK_LOCKBOX, FALSE);
-		EnableItem(hWnd, BUTTON_LOCKBOX, FALSE);
-		EnableItem(hWnd, EDIT_MACRO, TRUE);
-		EnableItem(hWnd, BUTTON_MACRO, TRUE);
+		EnableWindows(hWnd, autologin_items, _countof(autologin_items), FALSE);
+		EnableWindows(hWnd, macro_items, _countof(macro_items), TRUE);
 		break;
 	case MODE_DIRECT:
 		::CheckRadioButton(hWnd, RADIO_LOGIN, RADIO_DIRECT, RADIO_DIRECT);
-		EnableItem(hWnd, EDIT_HOST, FALSE);
-		EnableItem(hWnd, CHECK_USER, FALSE);
-		EnableItem(hWnd, EDIT_USER, FALSE);
-		EnableItem(hWnd, CHECK_PASSWORD, FALSE);
-		EnableItem(hWnd, EDIT_PASSWORD, FALSE);
-		EnableItem(hWnd, CHECK_LOCKBOX, FALSE);
-		EnableItem(hWnd, BUTTON_LOCKBOX, FALSE);
-		EnableItem(hWnd, EDIT_MACRO, FALSE);
-		EnableItem(hWnd, BUTTON_MACRO, FALSE);
+		EnableWindows(hWnd, autologin_items, _countof(autologin_items), FALSE);
+		EnableWindows(hWnd, macro_items, _countof(macro_items), FALSE);
 		break;
 	}
 
@@ -1927,44 +1934,25 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		return TRUE;
 
 	case RADIO_LOGIN:
-		EnableItem(hWnd, EDIT_HOST, TRUE);
-		EnableItem(hWnd, CHECK_USER, TRUE);
+		EnableWindows(hWnd, autologin_items, _countof(autologin_items), TRUE);
+		EnableWindows(hWnd, macro_items, _countof(macro_items), FALSE);
 		if (IsDlgButtonChecked(hWnd, CHECK_USER) == 1)
 			EnableItem(hWnd, EDIT_USER, TRUE);
 		else {
 			EnableItem(hWnd, EDIT_USER, FALSE);
 		}
-		EnableItem(hWnd, CHECK_PASSWORD, TRUE);
 		if (IsDlgButtonChecked(hWnd, CHECK_PASSWORD) == 1)
 			EnableItem(hWnd, EDIT_PASSWORD, TRUE);
 		else
 			EnableItem(hWnd, EDIT_PASSWORD, FALSE);
-		EnableItem(hWnd, CHECK_LOCKBOX, TRUE);
-		EnableItem(hWnd, BUTTON_LOCKBOX, TRUE);
-		EnableItem(hWnd, EDIT_MACRO, FALSE);
-		EnableItem(hWnd, BUTTON_MACRO, FALSE);
 		return TRUE;
 	case RADIO_MACRO:
-		EnableItem(hWnd, EDIT_HOST, FALSE);
-		EnableItem(hWnd, CHECK_USER, FALSE);
-		EnableItem(hWnd, EDIT_USER, FALSE);
-		EnableItem(hWnd, CHECK_PASSWORD, FALSE);
-		EnableItem(hWnd, EDIT_PASSWORD, FALSE);
-		EnableItem(hWnd, CHECK_LOCKBOX, FALSE);
-		EnableItem(hWnd, BUTTON_LOCKBOX, FALSE);
-		EnableItem(hWnd, EDIT_MACRO, TRUE);
-		EnableItem(hWnd, BUTTON_MACRO, TRUE);
+		EnableWindows(hWnd, autologin_items, _countof(autologin_items), FALSE);
+		EnableWindows(hWnd, macro_items, _countof(macro_items), TRUE);
 		return TRUE;
 	case RADIO_DIRECT:
-		EnableItem(hWnd, EDIT_HOST, FALSE);
-		EnableItem(hWnd, CHECK_USER, FALSE);
-		EnableItem(hWnd, EDIT_USER, FALSE);
-		EnableItem(hWnd, CHECK_PASSWORD, FALSE);
-		EnableItem(hWnd, EDIT_PASSWORD, FALSE);
-		EnableItem(hWnd, CHECK_LOCKBOX, FALSE);
-		EnableItem(hWnd, BUTTON_LOCKBOX, FALSE);
-		EnableItem(hWnd, EDIT_MACRO, FALSE);
-		EnableItem(hWnd, BUTTON_MACRO, FALSE);
+		EnableWindows(hWnd, autologin_items, _countof(autologin_items), FALSE);
+		EnableWindows(hWnd, macro_items, _countof(macro_items), FALSE);
 		return TRUE;
 	}
 
