@@ -4695,12 +4695,18 @@ static void BuffSeveralPagesSelect(int Xw, int Yw)
 		}
 	}
 
-	// クリック位置をSelectEndに設定する
-	if (ComparePoint(&pt, &SelectEnd) != 0) {
-		// Start と End を入れ替える
-		POINT t = SelectStart;
-		SelectStart = SelectEnd;
-		SelectEnd = t;
+	if (ComparePoint(&SelectStart, &SelectEnd) == 0) {
+		// Start == End は選択されていない状態
+		Selected = FALSE;
+	} else {
+		Selected = TRUE;
+		if (ComparePoint(&pt, &SelectEnd) != 0) {
+			// クリック位置をSelectEndに設定する
+			//   Start と End を入れ替える
+			POINT t = SelectStart;
+			SelectStart = SelectEnd;
+			SelectEnd = t;
+		}
 	}
 
 	LockBuffer();
@@ -4802,13 +4808,12 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 		if (ComparePoint(&pt, &ClickCell) <= 0) {
 			SelectStart = pt;
 			SelectEnd = ClickCell;
-			Selected = TRUE;
 		}
 		else {
 			SelectStart = ClickCell;
 			SelectEnd = pt;
-			Selected = TRUE;
 		}
+		Selected = TRUE;
 	}
 	else {
 		// 選択されているとき
