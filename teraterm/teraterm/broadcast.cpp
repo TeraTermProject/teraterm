@@ -939,17 +939,23 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				             SWP_NOMOVE | SWP_NOZORDER);
 
 				// status bar
-				SendMessage(hStatus , msg , wp , lp);
+				// 高さが半分より小さくなったらステータスバーを表示しない
+				if (dlg_h < init_height / 2) {
+					ShowWindow(hStatus, SW_HIDE);
+				} else {
+					SendMessage(hStatus, msg, wp, lp);
+					ShowWindow(hStatus, SW_SHOW);
+				}
 			}
 			return TRUE;
 
 		case WM_GETMINMAXINFO:
 			{
-				// ダイアログの初期サイズより小さくできないようにする
+				// ダイアログの初期サイズから最小サイズを決める
 				LPMINMAXINFO lpmmi;
 				lpmmi = (LPMINMAXINFO)lp;
-				lpmmi->ptMinTrackSize.x = init_width;
-				lpmmi->ptMinTrackSize.y = init_height;
+				lpmmi->ptMinTrackSize.x = (int)(init_width / 2.5);
+				lpmmi->ptMinTrackSize.y = (int)(init_height / 4.2);
 			}
 			return FALSE;
 
@@ -1054,6 +1060,13 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 	return TRUE;
 }
 
+static void AddClipSiblings(HWND hDlgWnd, int IDC)
+{
+	HWND hWnd = GetDlgItem(hDlgWnd, IDC);
+	LONG style = GetWindowLong(hWnd, GWL_STYLE);
+	SetWindowLong(hWnd, GWL_STYLE, style | WS_CLIPSIBLINGS);
+}
+
 void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd)
 {
 	RECT prc, rc;
@@ -1072,6 +1085,26 @@ void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd)
 	if (hDlgWnd == NULL) {
 		return;
 	}
+
+	// コントロールの重複をクリップする
+	AddClipSiblings(hDlgWnd, IDOK);
+	AddClipSiblings(hDlgWnd, IDCANCEL);
+	AddClipSiblings(hDlgWnd, IDC_BROADCAST_HELP);
+	AddClipSiblings(hDlgWnd, IDC_REALTIME_CHECK);
+	AddClipSiblings(hDlgWnd, IDC_HISTORY_CHECK);
+	AddClipSiblings(hDlgWnd, IDC_RADIO_CRLF);
+	AddClipSiblings(hDlgWnd, IDC_RADIO_CR);
+	AddClipSiblings(hDlgWnd, IDC_RADIO_LF);
+	AddClipSiblings(hDlgWnd, IDC_ENTERKEY_CHECK);
+	AddClipSiblings(hDlgWnd, IDC_PARENT_ONLY);
+	AddClipSiblings(hDlgWnd, IDC_SUBMITKEY_LABEL);
+	AddClipSiblings(hDlgWnd, IDC_SUBMITKEY_TYPE);
+	AddClipSiblings(hDlgWnd, IDC_LIST);
+	AddClipSiblings(hDlgWnd, IDC_STATUSBAR);
+
+	// GROUPBOXを最背面にする
+	SetWindowPos(GetDlgItem(hDlgWnd, IDC_ENTERGROUP), HWND_BOTTOM,
+				 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
 	// ダイアログをウィンドウの真上に配置する (2008.1.25 yutaka)
 	::GetWindowRect(hWnd, &prc);
