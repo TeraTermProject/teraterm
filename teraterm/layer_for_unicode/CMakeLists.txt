@@ -1,11 +1,9 @@
 ﻿cmake_minimum_required(VERSION 3.11)
 
-set(PACKAGE_NAME "layer_for_unicode")
-
-project(${PACKAGE_NAME})
+project("layer_for_unicode")
 
 add_library(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   STATIC
   ../common/codeconv.cpp
   ../common/codeconv.h
@@ -20,7 +18,7 @@ add_library(
   )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../common
   )
@@ -42,7 +40,7 @@ if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
   include("list_obj.cmake")
 
   target_sources(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     ${SRC}
     )
@@ -64,7 +62,7 @@ else()
   enable_language(ASM_NASM)
 
   target_sources(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     ${SRC}
     )
@@ -78,7 +76,7 @@ endif()
 if(MSVC AND (MSVC_VERSION GREATER_EQUAL 1900))
   # Visual Studio 2015+  (1900=VS2015)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PUBLIC
     common_static
     $<$<CONFIG:Release>:libucrt.lib libvcruntime.lib libcmt.lib libcpmt.lib oldnames.lib>
@@ -86,14 +84,14 @@ if(MSVC AND (MSVC_VERSION GREATER_EQUAL 1900))
     )
 elseif(MSVC)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PUBLIC
     $<$<CONFIG:Release>:libcmt.lib libcpmt.lib>
     $<$<CONFIG:Debug>:libcmtd.lib libcpmtd.lib>
     )
 elseif(MINGW)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PUBLIC
     common_static
   )
@@ -101,7 +99,7 @@ else()
 endif()
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PUBLIC
   oleaut32
   advapi32

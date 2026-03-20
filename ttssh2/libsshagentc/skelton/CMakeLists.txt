@@ -1,15 +1,13 @@
-﻿set(PACKAGE_NAME "libsshagentc")
-
-project(${PACKAGE_NAME})
+﻿project("libsshagentc")
 
 add_library(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   ../libputty.h
   skelton.c
 )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ..
 )

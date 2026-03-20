@@ -1,9 +1,7 @@
-﻿set(PACKAGE_NAME "common_static")
-
-project(${PACKAGE_NAME})
+﻿project("common_static")
 
 add_library(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   STATIC
   ../teraterm/unicode.cpp
   ../teraterm/unicode.h
@@ -85,7 +83,7 @@ add_library(
 )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PUBLIC
   ${CMAKE_CURRENT_BINARY_DIR}       # for svnversion.h
   .
@@ -94,14 +92,14 @@ target_include_directories(
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PUBLIC
     layer_for_unicode
   )
 endif()
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PUBLIC
   #
   setupapi
