@@ -137,18 +137,6 @@ static void dquote_stringW(const wchar_t *str, wchar_t *dst, size_t dst_len)
 	wcsncpy_s(dst, dst_len, str, _TRUNCATE);
 }
 
-#if 0
-static void dquote_string(const char *str, char *dst, size_t dst_len)
-{
-	wchar_t *dstW = (wchar_t *)malloc(sizeof(wchar_t) * dst_len);
-	wchar_t *strW = ToWcharA(str);
-	dquote_stringW(strW, dstW, dst_len);
-	WideCharToACP_t(dstW, dst, dst_len);
-	free(strW);
-	free(dstW);
-}
-#endif
-
 /**
  *	フォーマットして文字列を書き込む
  *
@@ -308,7 +296,7 @@ static DWORD ConnectArgs(const TTDupInfo *info, wchar_t **arg, wchar_t **ttl)
 	}
 
 	// コマンドラインに "/M=[TTL FILE]" を追加
-	aswprintf(&szArgment, L" /M=\"%s\"", szMacroFile);
+	aswprintf(&szArgment, L"/M=\"%s\"", szMacroFile);
 
 	// ログ
 	if (info->szLog != NULL) {
@@ -394,7 +382,7 @@ static DWORD ConnectArgs(const TTDupInfo *info, wchar_t **arg, wchar_t **ttl)
 	::CloseHandle(hFile);
 
 	if (add_args != NULL) {
-		awcscat(&szArgment, add_args);
+		awcscats(&szArgment, L" ", add_args, NULL);
 	}
 
 	*arg = szArgment;
