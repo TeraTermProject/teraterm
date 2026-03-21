@@ -29,6 +29,8 @@
 
 #define		STRICT
 
+#include	<assert.h>
+
 #include	"codeconv.h"
 #include	"i18n.h"
 #include	"ttcommdlg.h"
@@ -85,6 +87,11 @@ void SetDlgPos(HWND hWnd, int pos)
 	case POSITION_OUTSIDE:
 		x = cx;
 		y = cy;
+		break;
+	default:
+		assert(FALSE);
+		x = 0;
+		y = 0;
 		break;
 	}
 
@@ -160,23 +167,30 @@ void EncodePassword(const char *cPassword, char *cEncodePassword)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *filter, wchar_t *defaultDir, size_t max_path)
 {
-	wchar_t			*szDirName;
-	wchar_t			szFile[MAX_PATH] = L"";
-	wchar_t			*szPath;
+	wchar_t szFile[MAX_PATH] = L"";
+	wchar_t *szPath;
+	wchar_t *szDirNamePool = (wchar_t *)malloc(MAX_PATH * sizeof(wchar_t));
+	wchar_t *szDirName = szDirNamePool;
+	if (szDirNamePool == NULL) {
+		return FALSE;
+	}
 
-	szDirName	= (wchar_t *) malloc(MAX_PATH * sizeof(wchar_t));
+	assert(defaultDir != NULL);
+	assert(editCtl != 0xffffffff);	// -1が指定されることはない
 
-	if (editCtl != 0xffffffff) {
-		::GetDlgItemTextW(hWnd, editCtl, szDirName, MAX_PATH);
+	::GetDlgItemTextW(hWnd, editCtl, szDirName, MAX_PATH);
+	if (szDirName[0] == 0) {
+		// エディットが空だった時デフォルトを使用する
 		wcscpy(szDirName, defaultDir);
 	}
 
-	if (*szDirName == '"')
+	// "folder" など '"' で囲まれているとき削除する
+	if (*szDirName == L'"')
 		szDirName++;
-	if (szDirName[wcslen(szDirName) - 1] == '"')
-		szDirName[wcslen(szDirName) - 1] = '\0';
+	if (szDirName[wcslen(szDirName) - 1] == L'"')
+		szDirName[wcslen(szDirName) - 1] = L'\0';
 
-	wchar_t *ptr = wcsrchr(szDirName, '\\');
+	wchar_t *ptr = wcsrchr(szDirName, L'\\');
 	if (ptr == NULL) {
 		wcscpy(szFile, szDirName);
 		if (defaultDir != NULL && *szDirName == 0)
@@ -194,9 +208,9 @@ BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *f
 	ofn.lpstrTitle		= title;
 	ofn.lpstrInitialDir	= szDirName;
 	ofn.Flags			= OFN_HIDEREADONLY | OFN_NODEREFERENCELINKS;
-
-	if (::TTGetOpenFileNameW(&ofn, &szPath) == FALSE) {
-		free(szDirName);
+	BOOL r = ::TTGetOpenFileNameW(&ofn, &szPath);
+	free(szDirNamePool);
+	if (r == FALSE) {
 		return	FALSE;
 	}
 
@@ -204,7 +218,6 @@ BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *f
 
 	wcscpy_s(defaultDir, max_path, szPath);
 
-	free(szDirName);
 	free(szPath);
 
 	return	TRUE;
