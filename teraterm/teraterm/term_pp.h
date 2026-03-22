@@ -35,6 +35,7 @@ extern "C" {
 #endif
 
 HPROPSHEETPAGE CreateTerminalPP(HINSTANCE inst, HWND vtwin, TTTSet *pts);
+void UpdateSetupTerminalNewlineCode(int CRSend);
 
 #ifdef __cplusplus
 }
