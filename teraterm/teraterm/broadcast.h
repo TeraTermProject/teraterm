@@ -40,6 +40,7 @@ void SendMulticastMessage(HWND HVTWin, HWND hWnd, const wchar_t *name, const wch
 void SetMulticastName(const wchar_t *name);
 BOOL BroadCastReceive(const COPYDATASTRUCT *cds);
 void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd);
+void UpdateBroadcastNewlineCode(int CRSend);
 
 #ifdef __cplusplus
 }
