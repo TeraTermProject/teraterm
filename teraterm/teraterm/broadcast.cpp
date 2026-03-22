@@ -58,6 +58,8 @@
 
 #include "helpid.h"
 #include "broadcast.h"
+#include "vtwin.h"		// for pVTWin
+#include "term_pp.h"	// for UpdateSetupTerminalNewlineCode()
 
 
 // WM_COPYDATAによるプロセス間通信の種別 (2005.1.22 yutaka)
@@ -570,8 +572,13 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			break;
 
 		case WM_INITDIALOG: {
-			// ラジオボタンのデフォルトは CR にする。
-			SendMessage(GetDlgItem(hWnd, IDC_RADIO_CR), BM_SETCHECK, BST_CHECKED, 0);
+			if (ts.CRSend == IdCRLF) {
+				CheckRadioButton(hWnd, IDC_RADIO_CRLF, IDC_RADIO_LF, IDC_RADIO_CRLF);
+			} else if (ts.CRSend == IdLF) {
+				CheckRadioButton(hWnd, IDC_RADIO_CRLF, IDC_RADIO_LF, IDC_RADIO_LF);
+			} else {
+				CheckRadioButton(hWnd, IDC_RADIO_CRLF, IDC_RADIO_LF, IDC_RADIO_CR);
+			}
 			// デフォルトでチェックボックスを checked 状態にする。
 			SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 			// history を反映する (2007.3.3 maya)
@@ -729,19 +736,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 							}
 							checked = SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_GETCHECK, 0, 0);
 							if (checked & BST_CHECKED) { // 改行コードあり
-								if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_CRLF), BM_GETCHECK, 0, 0) & BST_CHECKED) {
-									wcsncat_s(buf, _countof(buf), L"\r\n", _TRUNCATE);
-
-								} else if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_CR), BM_GETCHECK, 0, 0) & BST_CHECKED) {
-									wcsncat_s(buf, _countof(buf), L"\r", _TRUNCATE);
-
-								} else if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_LF), BM_GETCHECK, 0, 0) & BST_CHECKED) {
-									wcsncat_s(buf, _countof(buf), L"\n", _TRUNCATE);
-
-								} else {
-									wcsncat_s(buf, _countof(buf), L"\r", _TRUNCATE);
-
-								}
+								wcsncat_s(buf, _countof(buf), L"\r", _TRUNCATE);
 							}
 						}
 
@@ -802,6 +797,30 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					}
 					if (HIWORD(wp) == LBN_SELCHANGE) {
 						KeepSelection();
+					}
+					return FALSE;
+
+			    case IDC_RADIO_CRLF:
+					if (IsDlgButtonChecked(hWnd, IDC_RADIO_CRLF) == BST_CHECKED) {
+						ts.CRSend = IdCRLF;
+						UpdateSetupTerminalNewlineCode(ts.CRSend);
+						pVTWin->SetupTerm();
+					}
+					return FALSE;
+
+			    case IDC_RADIO_LF:
+					if (IsDlgButtonChecked(hWnd, IDC_RADIO_LF) == BST_CHECKED) {
+						ts.CRSend = IdLF;
+						UpdateSetupTerminalNewlineCode(ts.CRSend);
+						pVTWin->SetupTerm();
+					}
+					return FALSE;
+
+			    case IDC_RADIO_CR:
+					if (IsDlgButtonChecked(hWnd, IDC_RADIO_CR) == BST_CHECKED) {
+						ts.CRSend = IdCR;
+						UpdateSetupTerminalNewlineCode(ts.CRSend);
+						pVTWin->SetupTerm();
 					}
 					return FALSE;
 
@@ -1069,4 +1088,19 @@ BOOL BroadCastReceive(const COPYDATASTRUCT *cds)
 	}
 
 	return TRUE;
+}
+
+// Enter keyの改行コードボタンを更新する
+// Additional settings / "Terminal" タブで OK 押下時に呼ばれる
+void UpdateBroadcastNewlineCode(int CRSend)
+{
+	if (hDlgWnd) {
+		if (ts.CRSend == IdCRLF) {
+			CheckRadioButton(hDlgWnd, IDC_RADIO_CRLF, IDC_RADIO_LF, IDC_RADIO_CRLF);
+		} else if (ts.CRSend == IdLF) {
+			CheckRadioButton(hDlgWnd, IDC_RADIO_CRLF, IDC_RADIO_LF, IDC_RADIO_LF);
+		} else {
+			CheckRadioButton(hDlgWnd, IDC_RADIO_CRLF, IDC_RADIO_LF, IDC_RADIO_CR);
+		}
+	}
 }
