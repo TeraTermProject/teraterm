@@ -785,8 +785,6 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 								ts.BroadcastCommandHistory = FALSE;
 							}
 
-							ts.BroadcastSubmitKey = GetCurSel(hDlgWnd, IDC_SUBMITKEY_TYPE);
-
 							checked = SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_GETCHECK, 0, 0);
 							if (checked & BST_CHECKED) { // 改行コードあり
 								if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_CRLF), BM_GETCHECK, 0, 0) & BST_CHECKED) {
@@ -867,6 +865,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 				case IDC_SUBMITKEY_TYPE:
 					SubmitKeyType = GetCurSel(hDlgWnd, IDC_SUBMITKEY_TYPE);
+					ts.BroadcastSubmitKey = SubmitKeyType;
 					return FALSE;
 
 				default:
