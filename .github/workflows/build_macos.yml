@@ -46,20 +46,16 @@ jobs:
         if: steps.cache-sfmt.outputs.cache-hit != 'true'
         run: |
           # Download and build SFMT if not cached
-          SFMT_VERSION=1.5.4
           SFMT_DIR="libs/SFMT_macos_${{ matrix.arch }}"
           mkdir -p /tmp/sfmt_build
 
-          # Download first, then extract (avoid pipe issues with redirects)
+          # SFMT has no tagged releases — download from master branch
           curl -fsSL -o /tmp/sfmt_build/sfmt.tar.gz \
-            "https://github.com/MersenneTwister-Lab/SFMT/archive/refs/tags/v${SFMT_VERSION}.tar.gz"
-
-          echo "Downloaded file type:"
-          file /tmp/sfmt_build/sfmt.tar.gz
+            "https://github.com/MersenneTwister-Lab/SFMT/archive/refs/heads/master.tar.gz"
 
           tar xzf /tmp/sfmt_build/sfmt.tar.gz -C /tmp/sfmt_build
 
-          cd /tmp/sfmt_build/SFMT-${SFMT_VERSION}
+          cd /tmp/sfmt_build/SFMT-master
 
           # Build static library
           cc -c -O2 -DMEXP=19937 -DSFMT_MEXP=19937 \
