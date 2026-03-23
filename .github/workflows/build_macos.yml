@@ -50,8 +50,14 @@ jobs:
           SFMT_DIR="libs/SFMT_macos_${{ matrix.arch }}"
           mkdir -p /tmp/sfmt_build
 
-          curl -sL "https://github.com/MersenneTwister-Lab/SFMT/archive/refs/tags/v${SFMT_VERSION}.tar.gz" \
-            | tar xz -C /tmp/sfmt_build
+          # Download first, then extract (avoid pipe issues with redirects)
+          curl -fsSL -o /tmp/sfmt_build/sfmt.tar.gz \
+            "https://github.com/MersenneTwister-Lab/SFMT/archive/refs/tags/v${SFMT_VERSION}.tar.gz"
+
+          echo "Downloaded file type:"
+          file /tmp/sfmt_build/sfmt.tar.gz
+
+          tar xzf /tmp/sfmt_build/sfmt.tar.gz -C /tmp/sfmt_build
 
           cd /tmp/sfmt_build/SFMT-${SFMT_VERSION}
 
