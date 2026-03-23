@@ -55,6 +55,7 @@
 #if ENABLE_GDIPLUS
 #include "ttgdiplus.h"
 #endif
+#include "bitmap.h"
 
 #include "theme.h"
 #include "vtdisp.h"
@@ -329,81 +330,17 @@ static void FillBitmapDC(HDC hdc,COLORREF color)
   DeleteObject(hBrush);
 }
 
-static void DebugSaveFile(const wchar_t* fname, HDC hdc, int width, int height)
+static void DebugSaveFile(const wchar_t *fname, HDC hDC, int width, int height)
 {
-#if 1
-	(void)fname;
-	(void)hdc;
 	(void)width;
 	(void)height;
+#if 1
+	(void)fname;
+	(void)hDC;
 #else
-	if (IsRelativePathW(fname)) {
-		wchar_t *desktop;
-		wchar_t *bmpfile;
-		_SHGetKnownFolderPath(&FOLDERID_Desktop, KF_FLAG_CREATE, NULL, &desktop);
-		bmpfile = NULL;
-		awcscats(&bmpfile, desktop, L"\\", fname, NULL);
-		free(desktop);
-		SaveBmpFromHDC(bmpfile, hdc, width, height);
-		free(bmpfile);
-	}
-	else {
-		SaveBmpFromHDC(fname, hdc, width, height);
-	}
+	SaveBmpFromHDC(hDC, fname);
 #endif
 }
-
-/**
- *	BMP保存、デバグに使うかもしれないので残しておく
- */
-#if 0
-static BOOL SaveBitmapFile(const char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
-{
-  int    bmiSize;
-  DWORD  writtenByte;
-  HANDLE hFile;
-  BITMAPFILEHEADER bfh;
-
-  hFile = CreateFile(nameFile,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
-
-  if(hFile == INVALID_HANDLE_VALUE)
-    return FALSE;
-
-  bmiSize = pbmi->bmiHeader.biSize;
-
-  switch(pbmi->bmiHeader.biBitCount)
-  {
-    case 1:
-      bmiSize += pbmi->bmiHeader.biClrUsed ? sizeof(RGBQUAD) * 2 : 0;
-      break;
-
-    case 2 :
-      bmiSize += sizeof(RGBQUAD) * 4;
-      break;
-
-    case 4 :
-      bmiSize += sizeof(RGBQUAD) * 16;
-      break;
-
-    case 8 :
-      bmiSize += sizeof(RGBQUAD) * 256;
-      break;
-  }
-
-  ZeroMemory(&bfh,sizeof(bfh));
-  bfh.bfType    = MAKEWORD('B','M');
-  bfh.bfOffBits = sizeof(bfh) + bmiSize;
-  bfh.bfSize    = bfh.bfOffBits + pbmi->bmiHeader.biSizeImage;
-
-  WriteFile(hFile,&bfh,sizeof(bfh)                ,&writtenByte,0);
-  WriteFile(hFile,pbmi,bmiSize                    ,&writtenByte,0);
-  WriteFile(hFile,pbuf,pbmi->bmiHeader.biSizeImage,&writtenByte,0);
-
-  CloseHandle(hFile);
-
-  return TRUE;
-}
-#endif
 
 static HBITMAP CreateBitmapFromBITMAPINFO(const BITMAPINFO *pbmi, const unsigned char *pbuf)
 {
