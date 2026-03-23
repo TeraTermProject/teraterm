@@ -1,11 +1,6 @@
 name: Build macOS (ARM64 / x86_64)
 
 on:
-  push:
-    branches:
-      - main
-      - 'claude/**'
-  pull_request:
   workflow_dispatch:
     inputs:
       architecture:
@@ -132,7 +127,7 @@ jobs:
   universal_binary:
     needs: build_macos
     runs-on: macos-14
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    if: always()
 
     steps:
       - name: Download arm64 artifact
