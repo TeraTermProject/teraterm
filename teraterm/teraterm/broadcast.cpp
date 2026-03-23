@@ -589,6 +589,8 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 	RECT rc_dlg, rc, rc_ok;
 	POINT p;
 	static int ok2right, cancel2right, cmdlist2ok, list2bottom, list2right;
+	static UINT init_dpi;	// 初期化時のDPI
+	static UINT dpi;		// 現在のDPI
 	// for update list
 	const int list_timer_id = 100;
 	const int list_timer_tick = 1000; // msec
@@ -664,6 +666,8 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			GetWindowRect(hWnd, &rc_dlg);
 			init_width = rc_dlg.right - rc_dlg.left;
 			init_height = rc_dlg.bottom - rc_dlg.top;
+			init_dpi = GetMonitorDpiFromWindow(hWnd);
+			dpi = init_dpi;
 
 			// 現在サイズから必要な値を計算
 			GetClientRect(hWnd, &rc_dlg);
@@ -881,16 +885,20 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 		case WM_SIZE:
 			{
+				// 新しいダイアログのサイズ
+				int dlg_w = LOWORD(lp);
+				int dlg_h = HIWORD(lp);
+
 				// 再配置
-				int dlg_w, dlg_h;
-				RECT rc_dlg;
+				int new_ok2right = MulDiv(ok2right, dpi, init_dpi);
+				int new_cancel2right = MulDiv(cancel2right, dpi, init_dpi);
+				int new_cmdlist2ok = MulDiv(cmdlist2ok, dpi, init_dpi);
+				int new_list2bottom = MulDiv(list2bottom, dpi, init_dpi);
+				int new_list2right = MulDiv(list2right, dpi, init_dpi);
+				int new_init_height = MulDiv(init_height, dpi, init_dpi);
+
 				RECT rc;
 				POINT p;
-
-				// 新しいダイアログのサイズを得る
-				GetClientRect(hWnd, &rc_dlg);
-				dlg_w = rc_dlg.right;
-				dlg_h = rc_dlg.bottom;
 
 				// OK button
 				GetWindowRect(GetDlgItem(hWnd, IDOK), &rc);
@@ -898,7 +906,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				p.y = rc.top;
 				ScreenToClient(hWnd, &p);
 				SetWindowPos(GetDlgItem(hWnd, IDOK), 0,
-				             dlg_w - ok2right, p.y, 0, 0,
+				             dlg_w - new_ok2right, p.y, 0, 0,
 				             SWP_NOSIZE | SWP_NOZORDER);
 
 				// Cancel button
@@ -907,7 +915,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				p.y = rc.top;
 				ScreenToClient(hWnd, &p);
 				SetWindowPos(GetDlgItem(hWnd, IDCANCEL), 0,
-				             dlg_w - cancel2right, p.y, 0, 0,
+				             dlg_w - new_cancel2right, p.y, 0, 0,
 				             SWP_NOSIZE | SWP_NOZORDER);
 
 				// Help button
@@ -916,7 +924,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				p.y = rc.top;
 				ScreenToClient(hWnd, &p);
 				SetWindowPos(GetDlgItem(hWnd, IDC_BROADCAST_HELP), 0,
-				             dlg_w - ok2right, p.y, 0, 0,
+				             dlg_w - new_ok2right, p.y, 0, 0,
 				             SWP_NOSIZE | SWP_NOZORDER);
 
 				// Command Edit box
@@ -925,7 +933,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				p.y = rc.top;
 				ScreenToClient(hWnd, &p);
 				SetWindowPos(GetDlgItem(hWnd, IDC_COMMAND_EDIT), 0,
-				             0, 0, dlg_w - p.x - ok2right - cmdlist2ok, p.y,
+				             0, 0, dlg_w - p.x - new_ok2right - new_cmdlist2ok, p.y,
 				             SWP_NOMOVE | SWP_NOZORDER);
 
 				// List Edit box
@@ -934,12 +942,12 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				p.y = rc.top;
 				ScreenToClient(hWnd, &p);
 				SetWindowPos(GetDlgItem(hWnd, IDC_LIST), 0,
-				             0, 0, dlg_w - p.x - list2right , dlg_h - p.y - list2bottom,
+				             0, 0, dlg_w - p.x - new_list2right , dlg_h - p.y - new_list2bottom,
 				             SWP_NOMOVE | SWP_NOZORDER);
 
 				// status bar
 				// 高さが半分より小さくなったらステータスバーを表示しない
-				if (dlg_h < init_height / 2) {
+				if (dlg_h < new_init_height / 2) {
 					ShowWindow(hStatus, SW_HIDE);
 				} else {
 					SendMessage(hStatus, msg, wp, lp);
@@ -948,13 +956,35 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			}
 			return TRUE;
 
+		case WM_DPICHANGED:
+			{
+				dpi = LOWORD(wp);
+				// WM_SIZE を送信してコントロールを再配置する
+				GetClientRect(hWnd, &rc);
+				SendMessage(hWnd, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right - rc.left, rc.bottom - rc.top));
+				// 推奨されるサイズと位置にする
+				const RECT *rect = (RECT *)lp;
+				SetWindowPos(hWnd, NULL,
+							 rect->left,
+							 rect->top,
+							 rect->right - rect->left,
+							 rect->bottom - rect->top,
+							 SWP_NOZORDER | SWP_NOACTIVATE);
+			}
+			return FALSE;
+
 		case WM_GETMINMAXINFO:
 			{
-				// ダイアログの初期サイズから最小サイズを決める
-				LPMINMAXINFO lpmmi;
-				lpmmi = (LPMINMAXINFO)lp;
-				lpmmi->ptMinTrackSize.x = (int)(init_width / 2.5);
-				lpmmi->ptMinTrackSize.y = (int)(init_height / 4.2);
+				LPMINMAXINFO lpmmi = (LPMINMAXINFO)lp;
+				if (GetMonitorDpiFromWindow(hWnd) == dpi) {
+					// ダイアログの初期サイズから最小サイズを決める
+					lpmmi->ptMinTrackSize.x = MulDiv(init_width, dpi * 10, init_dpi * 25);
+					lpmmi->ptMinTrackSize.y = MulDiv(init_height, dpi * 10, init_dpi * 42);
+				} else {
+					// DPI変更中はスケーリングしない
+					lpmmi->ptMinTrackSize.x = 1;
+					lpmmi->ptMinTrackSize.y = 1;
+				}
 			}
 			return FALSE;
 
