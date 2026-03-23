@@ -853,8 +853,8 @@ static void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int he
 	if(!hdcDest || !src)
 		return;
 
-	if(bAntiAlias)
-	{
+	if(bAntiAlias || !IsWindowsNTKernel())
+	{	// SetStretchBltMode(HALFTONE) は 95,98,Meではサポートされていない
 		if(src->width != width || src->height != height)
 		{
 			HBITMAP hbm;
@@ -880,7 +880,8 @@ static void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int he
 
 		BitBlt(hdcDest,x,y,width,height,src->hdc,0,0,SRCCOPY);
 	}else{
-		SetStretchBltMode(src->hdc,COLORONCOLOR);
+		SetStretchBltMode(hdcDest, HALFTONE);	// 写真画像は HALFTONE で処理するほうが自然に拡縮できる
+		SetBrushOrgEx(hdcDest, 0, 0, NULL);		// HALFTONE モードを設定後 SetBrushOrgEx() する必要あり
 		StretchBlt(hdcDest,x,y,width,height,src->hdc,0,0,src->width,src->height,SRCCOPY);
 	}
 }
@@ -2906,7 +2907,7 @@ static void DrawChar(vtdraw_t *vt, ttdc_t *dc, HDC BGDC, int x, int y, const wch
 		ExtTextOutW(cell_dc, 0, 0, ETO_OPAQUE, &rect, L"", 0, 0);	// 背景色で塗りつぶし
 
 		// cell_dcに文字を描画
-		SetStretchBltMode(hDC, COLORONCOLOR);
+		SetStretchBltMode(cell_dc, COLORONCOLOR);
 		pTransparentBlt(cell_dc, ts.FontDX * cell, ts.FontDY, vt->FontWidth * cell, vt->FontHeight, char_dc, 0, 0, char_size.cx,
 						char_size.cy, GetBkColor(hDC));
 
@@ -2923,7 +2924,7 @@ static void DrawChar(vtdraw_t *vt, ttdc_t *dc, HDC BGDC, int x, int y, const wch
 		DrawTextBGImage(BGDC, x, y, cell_width, cell_height, BackColor, dc->DCBackAlpha);
 
 		// BGDCに文字を描画
-		SetStretchBltMode(hDC, COLORONCOLOR);
+		SetStretchBltMode(BGDC, COLORONCOLOR);
 		pTransparentBlt(BGDC, ts.FontDX * cell, ts.FontDY, vt->FontWidth * cell, vt->FontHeight, char_dc, 0, 0,
 						char_size.cx, char_size.cy, GetBkColor(hDC));
 
