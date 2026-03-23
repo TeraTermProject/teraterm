@@ -1,26 +1,37 @@
-﻿
-add_subdirectory(ttpcmn)
+
+# Platform abstraction layer (must be built first)
+add_subdirectory(platform)
 set_target_properties(
-  ttpcmn
+  platform
   PROPERTIES FOLDER teraterm)
 
-add_subdirectory(ttpmacro)
-set_target_properties(
-  ttpmacro
-  PROPERTIES FOLDER teraterm)
+if(NOT APPLE)
+  # Windows-only: shared communication library (DLL-based IPC)
+  add_subdirectory(ttpcmn)
+  set_target_properties(
+    ttpcmn
+    PROPERTIES FOLDER teraterm)
+
+  add_subdirectory(ttpmacro)
+  set_target_properties(
+    ttpmacro
+    PROPERTIES FOLDER teraterm)
+endif()
 
 add_subdirectory(teraterm)
 set_target_properties(
   teraterm
   PROPERTIES FOLDER teraterm)
 
-add_subdirectory(keycode)
-set_target_properties(
-  keycode
-  PROPERTIES FOLDER teraterm)
-set_target_properties(
-  keycodeW
-  PROPERTIES FOLDER teraterm)
+if(NOT APPLE)
+  add_subdirectory(keycode)
+  set_target_properties(
+    keycode
+    PROPERTIES FOLDER teraterm)
+  set_target_properties(
+    keycodeW
+    PROPERTIES FOLDER teraterm)
+endif()
 
 add_subdirectory(common)
 set_target_properties(

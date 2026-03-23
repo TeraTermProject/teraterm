@@ -1,5 +1,11 @@
-﻿# TOOLSET ツールセット名
-if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
+# TOOLSET ツールセット名
+if(APPLE)
+  # macOS native build - must be checked before Unix Makefiles
+  if(NOT DEFINED ARCHITECTURE)
+    set(ARCHITECTURE "arm64")
+  endif()
+  set(TOOLSET "macos_${ARCHITECTURE}")
+elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio")
   if(${CMAKE_GENERATOR} MATCHES "Visual Studio 18 2026")
     set(MSVC_TOOLSET_VERSION 145)
   elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio 17 2022")

@@ -1,4 +1,4 @@
-﻿set(PACKAGE_NAME "teraterm")
+set(PACKAGE_NAME "teraterm")
 
 project(${PACKAGE_NAME})
 
@@ -9,6 +9,100 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 
 set(ENABLE_DEBUG_INFO 1)
 
+# ============================================================
+# Platform-independent terminal emulation core sources
+# ============================================================
+set(SRC_TERMINAL_CORE
+  buffer.c
+  buffer.h
+  charset.cpp
+  charset.h
+  checkeol.cpp
+  checkeol.h
+  telnet.c
+  telnet.h
+  vtterm.c
+  vtterm.h
+  unicode_test.h
+)
+
+# ============================================================
+# macOS build
+# ============================================================
+if(APPLE)
+  enable_language(OBJC)
+
+  add_executable(
+    ${PACKAGE_NAME}
+    ${CMAKE_CURRENT_BINARY_DIR}/../common/svnversion.h
+    ${SRC_TERMINAL_CORE}
+    teraterm_macos.m
+  )
+
+  set_source_files_properties(
+    teraterm_macos.m
+    PROPERTIES
+    COMPILE_FLAGS "-fobjc-arc"
+  )
+
+  set_target_properties(
+    ${PACKAGE_NAME}
+    PROPERTIES
+    OUTPUT_NAME "TeraTerm"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
+    MACOSX_BUNDLE TRUE
+    MACOSX_BUNDLE_BUNDLE_NAME "Tera Term"
+    MACOSX_BUNDLE_GUI_IDENTIFIER "org.teratermproject.teraterm"
+    MACOSX_BUNDLE_BUNDLE_VERSION "1.0"
+    MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0"
+    MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/../../teraterm/platform/macos/Info.plist.in"
+  )
+
+  target_include_directories(
+    ${PACKAGE_NAME}
+    PRIVATE
+    .
+    ../teraterm
+    ../common
+    ../platform
+    ../platform/macos
+    ../ttptek
+    ${ONIGURUMA_INCLUDE_DIRS}
+    ${SFMT_INCLUDE_DIRS}
+  )
+
+  target_compile_options(
+    ${PACKAGE_NAME}
+    PRIVATE "-DENABLE_GDIPLUS=0"
+    PRIVATE "-DTT_PLATFORM_MACOS=1"
+  )
+
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    PRIVATE
+    common_static
+    platform
+    ${ONIGURUMA_LIB}
+    ${SFMT_LIB}
+    "-framework Cocoa"
+    "-framework AppKit"
+    "-framework CoreGraphics"
+    "-framework CoreText"
+    "-framework CoreFoundation"
+    "-framework IOKit"
+    "-framework Security"
+  )
+
+  install(
+    TARGETS ${PACKAGE_NAME}
+    BUNDLE DESTINATION .
+  )
+
+# ============================================================
+# Windows build (original)
+# ============================================================
+else()
+
 add_executable(
   ${PACKAGE_NAME} WIN32
   ${CMAKE_CURRENT_BINARY_DIR}/../common/svnversion.h
@@ -16,12 +110,7 @@ add_executable(
   WSAAsyncGetAddrInfo.h
   broadcast.cpp
   broadcast.h
-  buffer.c
-  buffer.h
-  charset.cpp
-  charset.h
-  checkeol.cpp
-  checkeol.h
+  ${SRC_TERMINAL_CORE}
   clipboar.c
   clipboar.h
   commlib.c
@@ -45,8 +134,6 @@ add_executable(
   sizetip.h
   tekwin.cpp
   tekwin.h
-  telnet.c
-  telnet.h
   teraprn.cpp
   teraprn.h
   teraterm.cpp
@@ -74,13 +161,10 @@ add_executable(
   ttwinman.h
   ttwsk.c
   ttwsk.h
-  unicode_test.h
   vtdisp.c
   vtdisp.h
   vtdraw.cpp
   vtdraw.h
-  vtterm.c
-  vtterm.h
   vtwin.cpp
   vtwin.h
   winjump.c
@@ -501,3 +585,5 @@ if(MSVC AND ENABLE_DEBUG_INFO AND (${CMAKE_VERSION} VERSION_GREATER "3.13"))
       )
   endif()
 endif()
+
+endif(APPLE)
