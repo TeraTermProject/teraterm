@@ -38,8 +38,14 @@
   <li>変更
     <ul>
       <li>
-        選択領域より左上で、Shift+左ボタンDown時、選択領域に追加するようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)
+        選択領域より左または上の位置で Shift+左クリック したとき、選択領域が拡張されるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        以前はクリックした位置から既存の選択領域の先頭までが選択領域になった。
+      </li>
+      <li>
+        選択領域の中で Shift+左ボタン をクリックしたとき、選択領域の中心から見てクリック位置より外側の選択が解除されるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        以前は選択領域内のどこをクリックしても、既存の選択領域の先頭からクリックした位置までが選択領域になった。
       </li>
     </ul>
   </li>

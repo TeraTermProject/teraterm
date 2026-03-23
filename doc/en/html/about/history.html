@@ -38,8 +38,14 @@
   <li>Changes
     <ul>
       <li>
-        Area is added to selection with Shift + mouse left button down in the upper-left corner of selection area.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)
+        Selection is extended when Shift+left-clicking to the left of or above the current selection.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        Previously, clicking in that area would create a new selection from the clicked position to the start of the existing selection.
+      </li>
+      <li>
+        Selection is reduced such that, when Shift+left-clicking within it, the portion farther from the center than the click position is deselected.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        Previously, clicking anywhere within the selection would shrink the selection to span from the start of the existing selection to the clicked position.
       </li>
     </ul>
   </li>
