@@ -1,0 +1,197 @@
+name: Build macOS (ARM64 / x86_64)
+
+on:
+  push:
+    branches:
+      - main
+      - 'claude/**'
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      architecture:
+        description: 'Architecture to build'
+        required: false
+        default: 'arm64'
+        type: choice
+        options:
+          - arm64
+          - x86_64
+          - universal
+
+permissions:
+  contents: read
+
+env:
+  RETENTION_DAYS: 7
+
+jobs:
+  build_macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [arm64, x86_64]
+    runs-on: ${{ matrix.arch == 'x86_64' && 'macos-13' || 'macos-14' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install oniguruma cmake ninja perl
+
+      - name: Cache SFMT build
+        id: cache-sfmt
+        uses: actions/cache@v4
+        with:
+          path: libs/SFMT_macos_${{ matrix.arch }}
+          key: sfmt-macos-${{ matrix.arch }}-${{ hashFiles('libs/lib_SFMT.cmake') }}
+
+      - name: Build SFMT from source
+        if: steps.cache-sfmt.outputs.cache-hit != 'true'
+        run: |
+          # Download and build SFMT if not cached
+          SFMT_VERSION=1.5.4
+          SFMT_DIR="libs/SFMT_macos_${{ matrix.arch }}"
+          mkdir -p /tmp/sfmt_build
+
+          curl -sL "https://github.com/MersenneTwister-Lab/SFMT/archive/refs/tags/v${SFMT_VERSION}.tar.gz" \
+            | tar xz -C /tmp/sfmt_build
+
+          cd /tmp/sfmt_build/SFMT-${SFMT_VERSION}
+
+          # Build static library
+          cc -c -O2 -DMEXP=19937 -DSFMT_MEXP=19937 \
+            -arch ${{ matrix.arch }} \
+            -mmacosx-version-min=11.0 \
+            -I. SFMT.c -o SFMT.o
+
+          ar rcs libsfmt.a SFMT.o
+
+          # Install to libs directory
+          mkdir -p "${GITHUB_WORKSPACE}/${SFMT_DIR}/include"
+          mkdir -p "${GITHUB_WORKSPACE}/${SFMT_DIR}/lib"
+          cp SFMT.h SFMT-params.h SFMT-params19937.h \
+            "${GITHUB_WORKSPACE}/${SFMT_DIR}/include/"
+          cp libsfmt.a "${GITHUB_WORKSPACE}/${SFMT_DIR}/lib/"
+
+      - name: Configure CMake
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. \
+            -G Ninja \
+            -DARCHITECTURE=${{ matrix.arch }} \
+            -DCMAKE_TOOLCHAIN_FILE=../macos.toolchain.cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DTTXSSH=OFF \
+            -DENABLE_TTXSAMPLES=OFF
+
+      - name: Build
+        run: |
+          cd build
+          cmake --build . --config Release
+
+      - name: Create release package
+        run: |
+          cd build
+          APP_NAME="TeraTerm.app"
+          ZIP_NAME="teraterm-macos-${{ matrix.arch }}.zip"
+
+          if [ -d "${APP_NAME}" ]; then
+            # Zip the app bundle
+            ditto -c -k --keepParent "${APP_NAME}" "${ZIP_NAME}"
+          else
+            # Fallback: zip the binary
+            ZIP_NAME="teraterm-macos-${{ matrix.arch }}-bin.zip"
+            zip -r "${ZIP_NAME}" TeraTerm* teraterm* || true
+          fi
+
+          # Generate checksums
+          shasum -a 256 ${ZIP_NAME} > "${ZIP_NAME}.sha256sum" || true
+          shasum -a 512 ${ZIP_NAME} > "${ZIP_NAME}.sha512sum" || true
+
+      - name: Upload app bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: teraterm-macos-${{ matrix.arch }}
+          path: |
+            build/teraterm-macos-*.zip
+          retention-days: ${{ env.RETENTION_DAYS }}
+
+      - name: Upload checksums
+        uses: actions/upload-artifact@v4
+        with:
+          name: teraterm-macos-${{ matrix.arch }}-checksums
+          path: |
+            build/teraterm-macos-*.sha256sum
+            build/teraterm-macos-*.sha512sum
+          retention-days: ${{ env.RETENTION_DAYS }}
+
+  # Optional: create a Universal Binary by combining arm64 + x86_64
+  universal_binary:
+    needs: build_macos
+    runs-on: macos-14
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+
+    steps:
+      - name: Download arm64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: teraterm-macos-arm64
+          path: artifacts/arm64
+
+      - name: Download x86_64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: teraterm-macos-x86_64
+          path: artifacts/x86_64
+
+      - name: Create Universal Binary
+        run: |
+          mkdir -p universal
+
+          # Extract both builds
+          cd artifacts/arm64 && unzip -o teraterm-macos-arm64.zip -d ../../arm64_app && cd ../..
+          cd artifacts/x86_64 && unzip -o teraterm-macos-x86_64.zip -d ../../x86_64_app && cd ../..
+
+          # Find the main executable in each bundle
+          ARM64_BIN=$(find arm64_app -name "TeraTerm" -type f | head -1)
+          X86_64_BIN=$(find x86_64_app -name "TeraTerm" -type f | head -1)
+
+          if [ -n "$ARM64_BIN" ] && [ -n "$X86_64_BIN" ]; then
+            # Copy arm64 app as base
+            cp -R arm64_app/TeraTerm.app universal/TeraTerm.app
+
+            # Merge binaries with lipo
+            UNIVERSAL_BIN="universal/TeraTerm.app/Contents/MacOS/TeraTerm"
+            lipo -create "$ARM64_BIN" "$X86_64_BIN" -output "$UNIVERSAL_BIN"
+
+            # Verify
+            echo "Universal binary architectures:"
+            lipo -info "$UNIVERSAL_BIN"
+
+            # Package
+            cd universal
+            ditto -c -k --keepParent TeraTerm.app teraterm-macos-universal.zip
+            shasum -a 256 teraterm-macos-universal.zip > teraterm-macos-universal.zip.sha256sum
+          else
+            echo "Could not find binaries to merge"
+            exit 1
+          fi
+
+      - name: Upload Universal Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: teraterm-macos-universal
+          path: |
+            universal/teraterm-macos-universal.zip
+          retention-days: ${{ env.RETENTION_DAYS }}
+
+      - name: Upload Universal checksums
+        uses: actions/upload-artifact@v4
+        with:
+          name: teraterm-macos-universal-checksums
+          path: |
+            universal/teraterm-macos-universal.zip.sha256sum
+          retention-days: ${{ env.RETENTION_DAYS }}
