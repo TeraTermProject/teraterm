@@ -16,10 +16,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Restore cached libs
         id: cache-libs-restore
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: |
             libs
@@ -47,32 +47,32 @@ jobs:
           cmake --build . --config Release --target zip
           cmake --build . --config Release --target calc_hash
       - name: artifacts zip
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.arch }}-zip
           path: |
             build/teraterm*.zip
       - name: artifacts installer
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.arch }}-installer
           path: |
             build/teraterm*.exe
       - name: artifacts sha256sum
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.arch }}-sha256sum
           path: |
             build/teraterm*.sha256sum
       - name: artifacts sha512sum
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.arch }}-sha512sum
           path: |
             build/teraterm*.sha512sum
       - name: Save libs&buildtools
         id: cache-libs-save
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         if: steps.cache-libs-restore.outputs.cache-hit != 'true'
         with:
           path: |
