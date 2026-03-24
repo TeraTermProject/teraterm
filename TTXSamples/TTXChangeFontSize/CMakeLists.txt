@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.8)
+﻿cmake_minimum_required(VERSION 3.11)
 
 project("TTXChangeFontSize")
 
@@ -13,29 +13,23 @@ include_directories(
 
 add_library(
   ${PROJECT_NAME} SHARED
-  TTXChangeFontSize/TTXChangeFontSize.c
-  TTXChangeFontSize/ReadMe.txt
-  TTXChangeFontSize/ReadMe-ja.txt
-  TTXChangeFontSize/LICENSE
+  TTXChangeFontSize.c
+  ReadMe.txt
+  ReadMe-ja.txt
+  LICENSE
 )
-
-target_compile_definitions(${PROJECT_NAME}
-  PRIVATE
-  TT_VERSION_MAJOR=5)
 
 set_target_properties(
   ${PROJECT_NAME}
   PROPERTIES
   PREFIX ""
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
-  )
+)
 
 target_link_libraries(
   ${PROJECT_NAME}
   common_static
-  #
-#  gdi32
-  )
+)
 
 install(
   TARGETS ${PROJECT_NAME}

@@ -1,21 +1,19 @@
-﻿set(PACKAGE_NAME "cyglib")
-
-project(${PACKAGE_NAME})
+﻿project("cyglib")
 
 add_library(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   cyglib.c
   cyglib.h
   )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PUBLIC
   .
   )
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PUBLIC
   common_static
   )

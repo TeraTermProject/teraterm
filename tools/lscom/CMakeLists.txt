@@ -1,11 +1,9 @@
-﻿set(PACKAGE_NAME "lscom")
-
-project(${PACKAGE_NAME})
+﻿project("lscom")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 add_executable(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   main.cpp
   iswindowsntkernel.c
   #
@@ -17,40 +15,40 @@ add_executable(
   )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../../teraterm/ttpcmn
   ${CMAKE_CURRENT_SOURCE_DIR}/../libs/getopt_mb_uni_src
   )
 
 target_compile_definitions(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   STATIC_GETOPT
   )
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   common_static
 )
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     layer_for_unicode
   )
   if(MSVC)
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/common/compat_w95_vs2005.c
       )
   endif()
   if(MINGW)
     target_link_libraries(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       -Wl,--whole-archive
       mingw_msvcrt
@@ -61,7 +59,7 @@ endif(SUPPORT_OLD_WINDOWS)
 
 if(MINGW)
   target_link_options(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     -municode
     )
