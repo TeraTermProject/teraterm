@@ -1,6 +1,4 @@
-﻿set(PACKAGE_NAME "teraterm")
-
-project(${PACKAGE_NAME})
+﻿project("teraterm")
 
 option(ENABLE_GDIPLUS "Use GDI+ library" ON)
 
@@ -10,7 +8,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 set(ENABLE_DEBUG_INFO 1)
 
 add_executable(
-  ${PACKAGE_NAME} WIN32
+  ${PROJECT_NAME} WIN32
   ${CMAKE_CURRENT_BINARY_DIR}/../common/svnversion.h
   WSAAsyncGetAddrInfo.c
   WSAAsyncGetAddrInfo.h
@@ -166,7 +164,7 @@ set(SRC_DIALOG
 )
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ${SRC_DIALOG}
 )
@@ -176,7 +174,7 @@ source_group(
   FILES ${SRC_DIALOG})
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../teraterm/uni2sjis.map
   ../teraterm/unisym2decsp.map
@@ -194,7 +192,7 @@ source_group(
 )
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../common/tt_res.h
   ../common/ttcommon.h
@@ -216,7 +214,7 @@ target_sources(
 )
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../../teraterm/common/edithistory.cpp
   ../../teraterm/common/edithistory.h
@@ -225,7 +223,7 @@ target_sources(
 )
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../susie_plugin/libsusieplugin.cpp
   ../susie_plugin/libsusieplugin.h
@@ -238,7 +236,7 @@ source_group(
 )
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../ttpdlg/aboutdlg.c
   ../ttpdlg/choosefontdlg.c
@@ -262,7 +260,7 @@ source_group(
   "..\/ttpdlg\/")
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../ttpfile/bplus.c
   ../ttpfile/bplus.h
@@ -293,7 +291,7 @@ source_group(
   "..\/ttpfile\/")
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../ttpset/ttset.c
   ../ttpset/ttset.h
@@ -307,7 +305,7 @@ source_group(
   "..\/ttpset\/")
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../ttpcmn/ttcmn_dup.cpp
   ../ttpcmn/ttcmn_dup.h
@@ -322,7 +320,7 @@ source_group(
   "..\/ttpcmn\/")
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../ttptek/tekesc.c
   ../ttptek/tekesc.h
@@ -343,20 +341,20 @@ if(SUPPORT_OLD_WINDOWS)
       set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB")
     else()
       target_link_options(
-        ${PACKAGE_NAME}
+        ${PROJECT_NAME}
         PRIVATE
         /NODEFAULTLIB
         )
     endif()
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/common/compat_w95_vs2005.c
       )
   endif()
   if(MINGW)
     target_link_libraries(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       -Wl,--whole-archive
       mingw_msvcrt
@@ -370,21 +368,21 @@ if (MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
   else()
     target_link_options(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       /MANIFEST:NO)
   endif()
 endif()
 
 set_target_properties(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PROPERTIES
   OUTPUT_NAME "ttermpro"
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   .
   ../teraterm
@@ -399,7 +397,7 @@ target_include_directories(
 
 if(MINGW)
   target_include_directories(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     .
     )
@@ -408,7 +406,7 @@ endif()
 if(MSVC AND ENABLE_DEBUG_INFO)
   if(${CMAKE_VERSION} VERSION_GREATER "3.13")
     target_link_options(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       /DEBUG:FULL
       /pdbaltpath:ttermpro.pdb
@@ -419,7 +417,7 @@ if(MSVC AND ENABLE_DEBUG_INFO)
   endif()
 elseif(MINGW)
   target_link_options(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     -Wl,-Map=ttermpro.map,-cref
     )
@@ -427,18 +425,18 @@ endif()
 
 if(ENABLE_GDIPLUS)
   target_compile_options(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE "-DENABLE_GDIPLUS=1"
   )
 else(ENABLE_GDIPLUS)
   target_compile_options(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE "-DENABLE_GDIPLUS=0"
   )
 endif(ENABLE_GDIPLUS)
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   common_static
   ttpcmn
@@ -449,14 +447,14 @@ target_link_libraries(
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     layer_for_unicode
     )
 endif()
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   advapi32
   comctl32
@@ -473,14 +471,14 @@ target_link_libraries(
 
 if(ENABLE_GDIPLUS)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     gdiplus.lib
   )
 endif(ENABLE_GDIPLUS)
 
 install(
-  TARGETS ${PACKAGE_NAME}
+  TARGETS ${PROJECT_NAME}
   DESTINATION .
   )
 if(MSVC AND ENABLE_DEBUG_INFO AND (${CMAKE_VERSION} VERSION_GREATER "3.13"))

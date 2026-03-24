@@ -2455,6 +2455,11 @@ void CVTWindow::OnMouseMove(WPARAM nFlags, POINTS point)
 
 void CVTWindow::OnMove(int x, int y)
 {
+	if (vt_src == NULL) {
+		// 初期化中に WM_MOVE が発生する場合対策
+		return;
+	}
+
 	// ウィンドウ位置を保存
 	// 		注 x,y はクライアント領域の左上の座標
 	RECT R;
@@ -2651,6 +2656,11 @@ void CVTWindow::OnSetFocus(HWND hOldWnd)
 
 void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 {
+	if (vt_src == NULL) {
+		// 初期化中に WM_SIZE が発生する場合対策
+		return;
+	}
+
 	// ウィンドウ生成時の最初のWM_SIZE時(monitor_DPI==0のとき)は
 	// DPIのチェックを行わない
 	// ウィンドウ生成時、WM_SIZE, WM_MOVE とメッセージが発生する
