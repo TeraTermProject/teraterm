@@ -59,6 +59,7 @@
 #include "helpid.h"
 #include "broadcast.h"
 
+#define IDC_STATUSBAR 1	// ステータスバー用
 
 // WM_COPYDATAによるプロセス間通信の種別 (2005.1.22 yutaka)
 #define IPC_BROADCAST_COMMAND 1		// 全端末へ送信
@@ -276,6 +277,41 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 			break;
 	}
 	return CallWindowProcW(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
+}
+
+static HWND hDlgWnd = NULL;
+static int SubmitKeyType = IdSubmitKeyTypeNA;
+
+BOOL HandleBroadcastEditMessage(LPMSG msg)
+{
+	if (SubmitKeyType <= IdSubmitKeyTypeNone) {
+		return FALSE;
+	}
+
+	HWND hwndBroadcastEdit = GetWindow(GetDlgItem(hDlgWnd, IDC_COMMAND_EDIT), GW_CHILD);
+	if (hwndBroadcastEdit && msg->hwnd == hwndBroadcastEdit) {
+		WORD vkCode = LOWORD(msg->wParam);
+		switch (msg->message) {
+		case WM_KEYDOWN:
+			// Enter キーまたは Ctrl+M 押下時にシステム警告音が鳴らないようにする
+			if ((SubmitKeyType == IdSubmitKeyTypeEnter && vkCode == VK_RETURN) ||
+				(SubmitKeyType == IdSubmitKeyTypeCtrlM && vkCode == 'M' && (GetAsyncKeyState(VK_CONTROL) & 0x8000))) {
+				return TRUE;
+			}
+			break;
+		case WM_KEYUP:
+			// Enter キーまたは Ctrl+M 押下を Submit ボタンクリックとみなす
+			if ((SubmitKeyType == IdSubmitKeyTypeEnter && vkCode == VK_RETURN && (! GetIMEOpenStatus(hDlgWnd))) ||
+				(SubmitKeyType == IdSubmitKeyTypeCtrlM && vkCode == 'M' && (GetAsyncKeyState(VK_CONTROL) & 0x8000))) {
+				SendDlgItemMessage(hDlgWnd, IDOK, BM_CLICK, 0, 0);
+				SetFocus(hwndBroadcastEdit);
+				return TRUE;
+			}
+			break;
+		}
+	}
+
+	return FALSE;
 }
 
 static WNDPROC DefaultWindowListProc;
@@ -540,6 +576,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 		{ IDC_ENTERKEY_CHECK, "DLG_BROADCAST_ENTER" },
 		{ IDC_PARENT_ONLY, "DLG_BROADCAST_PARENTONLY" },
 		{ IDC_REALTIME_CHECK, "DLG_BROADCAST_REALTIME" },
+		{ IDC_SUBMITKEY_LABEL, "DLG_BROADCAST_SUBMIT_KEY_LABEL" },
 		{ IDOK, "DLG_BROADCAST_SUBMIT" },
 		{ IDCANCEL, "DLG_BROADCAST_CLOSE" },
 		{ IDC_BROADCAST_HELP, "DLG_BROADCAST_HELP" },
@@ -565,6 +602,12 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			if (wp) {  // show
 				// Tera Term window list
 				UpdateBroadcastWindowList(GetDlgItem(hWnd, IDC_LIST));
+				checked = SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_GETCHECK, 0, 0);
+				if (checked & BST_CHECKED) { // checkあり
+					SubmitKeyType = IdSubmitKeyTypeRT;
+				} else {
+					SubmitKeyType = GetCurSel(hDlgWnd, IDC_SUBMITKEY_TYPE);
+				}
 				return TRUE;
 			}
 			break;
@@ -582,6 +625,13 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			ApplyBroadCastCommandHistory(hWnd, historyfile);
 			free(historyfile);
 
+			static const I18nTextInfo infos[] = {
+				{ "DLG_BROADCAST_SUBMIT_KEY_NONE", L"None", IdSubmitKeyTypeNone },
+				{ "DLG_BROADCAST_SUBMIT_KEY_ENTER", L"Enter", IdSubmitKeyTypeEnter },
+				{ "DLG_BROADCAST_SUBMIT_KEY_CTRLM", L"Ctrl+M", IdSubmitKeyTypeCtrlM }
+			};
+			SetI18nListW("Tera Term", hWnd, IDC_SUBMITKEY_TYPE, infos, _countof(infos), ts.UILanguageFileW, ts.BroadcastSubmitKey);
+
 			// エディットコントロールにフォーカスをあてる
 			SetFocus(GetDlgItem(hWnd, IDC_COMMAND_EDIT));
 
@@ -597,6 +647,8 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			EnableWindow(GetDlgItem(hWnd, IDC_RADIO_LF), FALSE);
 			EnableWindow(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), FALSE);
 			EnableWindow(GetDlgItem(hWnd, IDC_PARENT_ONLY), FALSE);
+			EnableWindow(GetDlgItem(hWnd, IDC_SUBMITKEY_LABEL), FALSE);
+			EnableWindow(GetDlgItem(hWnd, IDC_SUBMITKEY_TYPE), FALSE);
 
 			// Tera Term window list
 			BroadcastWindowList = GetDlgItem(hWnd, IDC_LIST);
@@ -636,7 +688,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			InitCommonControls();
 			hStatus = CreateStatusWindow(
 				WS_CHILD | WS_VISIBLE |
-				CCS_BOTTOM | SBARS_SIZEGRIP, NULL, hWnd, 1);
+				CCS_BOTTOM | SBARS_SIZEGRIP, NULL, hWnd, IDC_STATUSBAR);
 
 			// リスト更新タイマーの開始
 			SetTimer(hWnd, list_timer_id, list_timer_tick, NULL);
@@ -663,30 +715,35 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 			case IDC_REALTIME_CHECK | (BN_CLICKED << 16):
 				checked = SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_GETCHECK, 0, 0);
+				hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
+				hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
+				// restore old handler
+				SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)OrigBroadcastEditProc);
 				if (checked & BST_CHECKED) { // checkあり
 					// new handler
-					hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
-					hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
 					OrigBroadcastEditProc = (WNDPROC)SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditProc);
 
+					EnableWindow(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CR), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_LF), FALSE);
-					EnableWindow(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_PARENT_ONLY), FALSE);
+					EnableWindow(GetDlgItem(hWnd, IDC_SUBMITKEY_LABEL), FALSE);
+					EnableWindow(GetDlgItem(hWnd, IDC_SUBMITKEY_TYPE), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
+					SubmitKeyType = IdSubmitKeyTypeRT;
 				} else {
-					// restore old handler
-					SetWindowLongPtrW(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)OrigBroadcastEditProc);
-
+					EnableWindow(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CR), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_LF), TRUE);
-					EnableWindow(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_PARENT_ONLY), TRUE);
+					EnableWindow(GetDlgItem(hWnd, IDC_SUBMITKEY_LABEL), TRUE);
+					EnableWindow(GetDlgItem(hWnd, IDC_SUBMITKEY_TYPE), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
+					SubmitKeyType = GetCurSel(hDlgWnd, IDC_SUBMITKEY_TYPE);
 				}
 				return TRUE;
 			}
@@ -727,6 +784,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 							else {
 								ts.BroadcastCommandHistory = FALSE;
 							}
+
 							checked = SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_GETCHECK, 0, 0);
 							if (checked & BST_CHECKED) { // 改行コードあり
 								if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_CRLF), BM_GETCHECK, 0, 0) & BST_CHECKED) {
@@ -763,7 +821,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				case IDCANCEL:
 					EndDialog(hWnd, 0);
 					//DestroyWindow(hWnd);
-
+					SubmitKeyType = IdSubmitKeyTypeNA;
 					return TRUE;
 
 				case IDC_BROADCAST_HELP:
@@ -805,6 +863,11 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					}
 					return FALSE;
 
+				case IDC_SUBMITKEY_TYPE:
+					SubmitKeyType = GetCurSel(hDlgWnd, IDC_SUBMITKEY_TYPE);
+					ts.BroadcastSubmitKey = SubmitKeyType;
+					return FALSE;
+
 				default:
 					return FALSE;
 			}
@@ -813,6 +876,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 		case WM_CLOSE:
 			//DestroyWindow(hWnd);
 			EndDialog(hWnd, 0);
+			SubmitKeyType = IdSubmitKeyTypeNA;
 			return TRUE;
 
 		case WM_SIZE:
@@ -874,17 +938,23 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				             SWP_NOMOVE | SWP_NOZORDER);
 
 				// status bar
-				SendMessage(hStatus , msg , wp , lp);
+				// 高さが半分より小さくなったらステータスバーを表示しない
+				if (dlg_h < init_height / 2) {
+					ShowWindow(hStatus, SW_HIDE);
+				} else {
+					SendMessage(hStatus, msg, wp, lp);
+					ShowWindow(hStatus, SW_SHOW);
+				}
 			}
 			return TRUE;
 
 		case WM_GETMINMAXINFO:
 			{
-				// ダイアログの初期サイズより小さくできないようにする
+				// ダイアログの初期サイズから最小サイズを決める
 				LPMINMAXINFO lpmmi;
 				lpmmi = (LPMINMAXINFO)lp;
-				lpmmi->ptMinTrackSize.x = init_width;
-				lpmmi->ptMinTrackSize.y = init_height;
+				lpmmi->ptMinTrackSize.x = (int)(init_width / 2.5);
+				lpmmi->ptMinTrackSize.y = (int)(init_height / 4.2);
 			}
 			return FALSE;
 
@@ -989,7 +1059,12 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 	return TRUE;
 }
 
-static HWND hDlgWnd = NULL;
+static void AddClipSiblings(HWND hDlgWnd, int IDC)
+{
+	HWND hWnd = GetDlgItem(hDlgWnd, IDC);
+	LONG style = GetWindowLong(hWnd, GWL_STYLE);
+	SetWindowLong(hWnd, GWL_STYLE, style | WS_CLIPSIBLINGS);
+}
 
 void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd)
 {
@@ -1009,6 +1084,26 @@ void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd)
 	if (hDlgWnd == NULL) {
 		return;
 	}
+
+	// コントロールの重複をクリップする
+	AddClipSiblings(hDlgWnd, IDOK);
+	AddClipSiblings(hDlgWnd, IDCANCEL);
+	AddClipSiblings(hDlgWnd, IDC_BROADCAST_HELP);
+	AddClipSiblings(hDlgWnd, IDC_REALTIME_CHECK);
+	AddClipSiblings(hDlgWnd, IDC_HISTORY_CHECK);
+	AddClipSiblings(hDlgWnd, IDC_RADIO_CRLF);
+	AddClipSiblings(hDlgWnd, IDC_RADIO_CR);
+	AddClipSiblings(hDlgWnd, IDC_RADIO_LF);
+	AddClipSiblings(hDlgWnd, IDC_ENTERKEY_CHECK);
+	AddClipSiblings(hDlgWnd, IDC_PARENT_ONLY);
+	AddClipSiblings(hDlgWnd, IDC_SUBMITKEY_LABEL);
+	AddClipSiblings(hDlgWnd, IDC_SUBMITKEY_TYPE);
+	AddClipSiblings(hDlgWnd, IDC_LIST);
+	AddClipSiblings(hDlgWnd, IDC_STATUSBAR);
+
+	// GROUPBOXを最背面にする
+	SetWindowPos(GetDlgItem(hDlgWnd, IDC_ENTERGROUP), HWND_BOTTOM,
+				 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
 	// ダイアログをウィンドウの真上に配置する (2008.1.25 yutaka)
 	::GetWindowRect(hWnd, &prc);
