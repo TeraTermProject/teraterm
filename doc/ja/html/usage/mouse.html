@@ -16,33 +16,33 @@
 <h3>左ボタン</h3>
 
 <dl>
-  <dt>左クリック</dt>
+  <dt id="LClick">左クリック</dt>
   <dd>
-    クリック位置が、Shift+左クリック時の選択領域の始点になります。<br>
+    クリック位置が、<a href="#Shift_LClick">Shift+左クリック</a>時の選択領域の始点になります。<br>
     選択領域が存在する時、選択領域がキャンセルされます。<br>
     <a href="../menu/setup-additional-copy-and-paste.html#SelectOnActivate">Enabling text selection when the window is activated by mouse</a> が ON のとき、ウィンドウをアクティブにするときのボタン操作が無効化されます。
   </dd>
 
-  <dt>Shift キーを押しながら左クリック</dt>
+  <dt id="Shift_LClick">Shift キーを押しながら左クリック</dt>
   <dd>
-    選択領域がない場合、左クリックした位置から現在位置までを選択領域とします。<br>
+    選択領域がない場合、<a href="#LClick">左クリック</a>した位置から現在位置までを選択領域とします。<br>
     選択領域がある場合、選択済みテキスト領域の伸縮ができます。<br>
     <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a> が ON のとき、選択領域の文字はクリップボードにコピーされます。
   </dd>
 
-  <dt>左ボタンでドラッグ</dt>
+  <dt id="LClick_Drag">左ボタンでドラッグ</dt>
   <dd>
     1文字単位で選択します。<br>
     <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a> が ON のとき、選択領域の文字はクリップボードにコピーされます。
   </dd>
 
-  <dt>Alt キーを押しながら左ボタンでドラッグ</dt>
+  <dt id="Alt_LClick_Drag">Alt キーを押しながら左ボタンでドラッグ</dt>
   <dd>
     矩形(長方形)領域を選択します。<br>
     <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a> が ON のとき、選択領域の文字はクリップボードにコピーされます。
   </dd>
 
-  <dt>左ボタンをダブルクリック</dt>
+  <dt id="LDblclick">左ボタンをダブルクリック</dt>
   <dd>
     1語選択します。<br>
     <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a> が ON のとき、選択領域の文字はクリップボードにコピーされます。<br>
@@ -51,25 +51,25 @@
     1cell で表示されている文字と 2cell以上(漢字や絵文字など)で表示されている文字の間を区切りとします。
   </dd>
 
-  <dt>左ボタンをダブルクリックして(2回目を押したまま)ドラッグ</dt>
+  <dt id="LDblclick_Drag">左ボタンをダブルクリックして(2回目を押したまま)ドラッグ</dt>
   <dd>
     単語単位で選択領域を伸縮できます。<br>
     <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a> が ON のとき、選択領域の文字はクリップボードにコピーされます。
   </dd>
 
-  <dt>左ボタンをトリプルクリック</dt>
+  <dt id="LTripleclick">左ボタンをトリプルクリック</dt>
   <dd>
     1行選択します。<br>
     <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a> が ON のとき、選択領域の文字はクリップボードにコピーされます。
   </dd>
 
-  <dt>左トリプルクリックして(3回目を押したまま)ドラッグ</dt>
+  <dt id="LTripleclick_Drag">左トリプルクリックして(3回目を押したまま)ドラッグ</dt>
   <dd>
     行単位で選択領域を伸縮できます。<br>
     <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a> が ON のとき、選択領域の文字はクリップボードにコピーされます。
   </dd>
 
-  <dt>タイトルバーの上で左ボタンをダブルクリック</dt>
+  <dt id="Titlebar_LDblclick">タイトルバーの上で左ボタンをダブルクリック</dt>
   <dd>
     <a href="../menu/setup-additional-terminal.html#TermIsWin">Term size = win size</a>の設定によって動作が変わります。
     <dl>
@@ -81,19 +81,19 @@
     </dl>
   </dd>
 
-  <dt>Ctrl キーを押しながら左ボタンをクリック</dt>
+  <dt id="Ctrl_LDblclick">Ctrl キーを押しながら左ボタンをクリック</dt>
   <dd>
     メニューバーがなければ、ポップアップメニューが現れます。<br>
     メニューバーを隠すには、<a href="../menu/setup-additional-window.html#PopupMenu">Hide menu bar</A> を ON にしてください。
   </dd>
 
-  <dt>Alt キーを押しながら左ボタンでウィンドウをドラッグ</dt>
+  <dt id="Window_Alt_LClick_Drag">Alt キーを押しながら左ボタンでウィンドウをドラッグ</dt>
   <dd>
     タイトルバーがない場合、ウィンドウを移動します。<br>
     タイトルバーを隠すには、<a href="../menu/setup-additional-window.html#HideTitle">Hide title bar</A> を ON にしてください。
   </dd>
 
-  <dt>Alt+Shift キーを押しながら左ボタンでウィンドウをドラッグ</dt>
+  <dt id="Window_AltShift_LClick_Drag">Alt+Shift キーを押しながら左ボタンでウィンドウをドラッグ</dt>
   <dd>
     タイトルバーあるいはウィンドウ枠がない場合、ウィンドウサイズを変更します。<br>
     ウィンドウ枠をなくすには、<a href="../menu/setup-additional-window.html#NoFrame">No Frame</A> を ON にしてください。
@@ -103,45 +103,45 @@
 <h3>右ボタン</h3>
 
 <dl>
-  <dt>右クリック</dt>
+  <dt id="RClick">右クリック</dt>
   <dd>
     クリップボードの中の文字列をホストへ送出します。<br>
     <a href="../menu/setup-additional-copy-and-paste.html#DisablePasteMouseRButton">Disable mouse R button paste</a> が OFF のときに動作します。
   </dd>
 
-  <dt>右ボタンでドラッグ</dt>
+  <dt id="RClick_Drag">右ボタンでドラッグ</dt>
   <dd>
     文字列を選択し、それをクリップボードにコピーし、さらにそれをホストへ送出します。<br>
     <a href="../menu/setup-additional-copy-and-paste.html#DisablePasteMouseRButton">Disable mouse R button paste</a> が OFF かつ、<a href="../menu/setup-additional-copy-and-paste.html#SelectOnlyByLButton">Select only by L button</a> が OFF のときに動作します。
   </dd>
 
-  <dt>Alt キーを押しながら右ボタンをクリック</dt>
+  <dt id="Alt_RClick_Drag">Alt キーを押しながら右ボタンをクリック</dt>
   <dd>タイトルバーがない場合、ウィンドウを最小化します。</dd>
 </dl>
 
 <h3>中ボタン</h3>
 
 <dl>
-  <dt>中ボタンをクリック</dt>
+  <dt id="MClick">中ボタンをクリック</dt>
   <dd>
     クリップボードの中の文字列をホストへ送出します。<br>
     <a href="../menu/setup-additional-copy-and-paste.html#DisablePasteMouseMButton">Disable mouse M button paste</a> が OFF のときに動作します。
   </dd>
 
-  <dt>中ボタンでドラッグ</dt>
+  <dt id="MClick_Drag">中ボタンでドラッグ</dt>
   <dd>このアクションはサポートされなくなりました。</dd>
 </dl>
 
 <h3>ホイール</h3>
 
 <dl>
-  <dt>マウスホイール</dt>
+  <dt id="Wheel">マウスホイール</dt>
   <dd>
     ホイールの回転でスクロールバーを上下させることができます。<br>
     また、<a href="../menu/setup-additional-keyboard.html#DisableAppCursor">アプリケーションカーソルモード</a>時(viやless等を使用時)には、ホイールの回転を上下のカーソルキーとして送信する事ができます。
   </dd>
 
-  <dt>タイトルバー上でマウスホイール</dt>
+  <dt id="Titlebar_Wheel">タイトルバー上でマウスホイール</dt>
   <dd>
     ウィンドウのタイトルバー上でホイールを回転させると、ウィンドウの透過値を一時的に変更することができます（この値は保存できません）。<br>
     ウィンドウのアクティブ状態が変更されると、<a href="../menu/setup-additional-visual.html#AlphaBlendActive">設定</a>された透過値に戻ります。
