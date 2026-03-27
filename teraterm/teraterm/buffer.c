@@ -6131,6 +6131,12 @@ int BuffGetDispCodePage(void)
 	return CodePage;
 }
 
+/**
+ *	選択領域が存在する?
+ *
+ *	@retval	TRUE	存在する
+ *	@retval	FALSE	存在しない
+ */
 BOOL BuffIsSelected(void)
 {
 	return Selected;
