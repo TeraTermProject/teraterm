@@ -524,7 +524,7 @@ static HBITMAP GetBitmapHandleW(const wchar_t *File)
 	HBITMAP hBitmap = NULL;
 	HRESULT result;
 
-	hFile=CreateFileW(File,GENERIC_READ,0,NULL,OPEN_EXISTING,0,NULL);
+	hFile = CreateFileW(File, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return NULL;
 	}
