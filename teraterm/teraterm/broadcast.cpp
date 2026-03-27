@@ -55,6 +55,7 @@
 #include "clipboar.h"	// for CBPreparePaste()
 #include "ttime.h"
 #include "history_store.h"
+#include "resize_helper.h"
 
 #include "helpid.h"
 #include "broadcast.h"
@@ -586,18 +587,34 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 	static HWND hwndBroadcast     = NULL; // Broadcast dropdown
 	static HWND hwndBroadcastEdit = NULL; // Edit control on Broadcast dropdown
 	// for resize
-	RECT rc_dlg, rc, rc_ok;
-	POINT p;
-	static int ok2right, cancel2right, cmdlist2ok, list2bottom, list2right;
+	RECT rc_dlg;
 	static UINT init_dpi;	// 初期化時のDPI
 	static UINT dpi;		// 現在のDPI
+	static int init_height;
+	static ReiseDlgHelper_t *resize_helper = NULL;
+	static const ResizeHelperInfo resize_info[] = {
+		{ IDOK, RESIZE_HELPER_ANCHOR_RT },
+		{ IDCANCEL, RESIZE_HELPER_ANCHOR_RT },
+		{ IDC_BROADCAST_HELP, RESIZE_HELPER_ANCHOR_RT },
+		{ IDC_REALTIME_CHECK, RESIZE_HELPER_ANCHOR_T },
+		{ IDC_ENTERGROUP, RESIZE_HELPER_ANCHOR_T },
+		{ IDC_HISTORY_CHECK, RESIZE_HELPER_ANCHOR_T },
+		{ IDC_RADIO_CRLF, RESIZE_HELPER_ANCHOR_T },
+		{ IDC_RADIO_CR, RESIZE_HELPER_ANCHOR_T },
+		{ IDC_RADIO_LF, RESIZE_HELPER_ANCHOR_T },
+		{ IDC_ENTERKEY_CHECK, RESIZE_HELPER_ANCHOR_T },
+		{ IDC_PARENT_ONLY, RESIZE_HELPER_ANCHOR_T },
+		{ IDC_SUBMITKEY_LABEL, RESIZE_HELPER_ANCHOR_T },
+		{ IDC_SUBMITKEY_TYPE, RESIZE_HELPER_ANCHOR_T },
+		{ IDC_COMMAND_EDIT, RESIZE_HELPER_ANCHOR_LRT },
+		{ IDC_LIST, RESIZE_HELPER_ANCHOR_LRTB }
+	};
 	// for update list
 	const int list_timer_id = 100;
 	const int list_timer_tick = 1000; // msec
 	static int prev_instances = 0;
 	// for status bar
 	static HWND hStatus = NULL;
-	static int init_width, init_height;
 
 	switch (msg) {
 		case WM_SHOWWINDOW:
@@ -662,31 +679,15 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			// I18N
 			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
 
-			// ダイアログの初期サイズを保存
+			// 最小サイズは初期化時の横:40%、縦:24%にする
+			resize_helper = ReiseDlgHelperInit(hWnd, FALSE, resize_info, _countof(resize_info));
+			ReiseDlgHelperAdjustInitSize(resize_helper, 40, 24);
+
+			// 高DPI対応
 			GetWindowRect(hWnd, &rc_dlg);
-			init_width = rc_dlg.right - rc_dlg.left;
 			init_height = rc_dlg.bottom - rc_dlg.top;
 			init_dpi = GetMonitorDpiFromWindow(hWnd);
 			dpi = init_dpi;
-
-			// 現在サイズから必要な値を計算
-			GetClientRect(hWnd, &rc_dlg);
-			p.x = rc_dlg.right;
-			p.y = rc_dlg.bottom;
-			ClientToScreen(hWnd, &p);
-
-			GetWindowRect(GetDlgItem(hWnd, IDOK), &rc_ok);
-			ok2right = p.x - rc_ok.left;
-
-			GetWindowRect(GetDlgItem(hWnd, IDCANCEL), &rc);
-			cancel2right = p.x - rc.left;
-
-			GetWindowRect(GetDlgItem(hWnd, IDC_COMMAND_EDIT), &rc);
-			cmdlist2ok = rc_ok.left - rc.right;
-
-			GetWindowRect(GetDlgItem(hWnd, IDC_LIST), &rc);
-			list2bottom = p.y - rc.bottom;
-			list2right = p.x - rc.right;
 
 			// リサイズアイコンを右下に表示させたいので、ステータスバーを付ける。
 			InitCommonControls();
@@ -699,6 +700,11 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 			return FALSE;
 		}
+
+		case WM_DESTROY:
+			ReiseDlgHelperDelete(resize_helper);
+			resize_helper = NULL;
+			return TRUE;
 
 		case WM_COMMAND:
 			switch (wp) {
@@ -885,68 +891,10 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 		case WM_SIZE:
 			{
-				// 新しいダイアログのサイズ
-				int dlg_w = LOWORD(lp);
-				int dlg_h = HIWORD(lp);
-
-				// 再配置
-				int new_ok2right = MulDiv(ok2right, dpi, init_dpi);
-				int new_cancel2right = MulDiv(cancel2right, dpi, init_dpi);
-				int new_cmdlist2ok = MulDiv(cmdlist2ok, dpi, init_dpi);
-				int new_list2bottom = MulDiv(list2bottom, dpi, init_dpi);
-				int new_list2right = MulDiv(list2right, dpi, init_dpi);
+				ReiseDlgHelper_WM_SIZE(resize_helper, wp, lp);
+				// 高さが初期サイズの半分より小さくなったらステータスバーを表示しない
+				int dlg_h = HIWORD(lp);		// 新しいダイアログのサイズ
 				int new_init_height = MulDiv(init_height, dpi, init_dpi);
-
-				RECT rc;
-				POINT p;
-
-				// OK button
-				GetWindowRect(GetDlgItem(hWnd, IDOK), &rc);
-				p.x = rc.left;
-				p.y = rc.top;
-				ScreenToClient(hWnd, &p);
-				SetWindowPos(GetDlgItem(hWnd, IDOK), 0,
-				             dlg_w - new_ok2right, p.y, 0, 0,
-				             SWP_NOSIZE | SWP_NOZORDER);
-
-				// Cancel button
-				GetWindowRect(GetDlgItem(hWnd, IDCANCEL), &rc);
-				p.x = rc.left;
-				p.y = rc.top;
-				ScreenToClient(hWnd, &p);
-				SetWindowPos(GetDlgItem(hWnd, IDCANCEL), 0,
-				             dlg_w - new_cancel2right, p.y, 0, 0,
-				             SWP_NOSIZE | SWP_NOZORDER);
-
-				// Help button
-				GetWindowRect(GetDlgItem(hWnd, IDC_BROADCAST_HELP), &rc);
-				p.x = rc.left;
-				p.y = rc.top;
-				ScreenToClient(hWnd, &p);
-				SetWindowPos(GetDlgItem(hWnd, IDC_BROADCAST_HELP), 0,
-				             dlg_w - new_ok2right, p.y, 0, 0,
-				             SWP_NOSIZE | SWP_NOZORDER);
-
-				// Command Edit box
-				GetWindowRect(GetDlgItem(hWnd, IDC_COMMAND_EDIT), &rc);
-				p.x = rc.left;
-				p.y = rc.top;
-				ScreenToClient(hWnd, &p);
-				SetWindowPos(GetDlgItem(hWnd, IDC_COMMAND_EDIT), 0,
-				             0, 0, dlg_w - p.x - new_ok2right - new_cmdlist2ok, p.y,
-				             SWP_NOMOVE | SWP_NOZORDER);
-
-				// List Edit box
-				GetWindowRect(GetDlgItem(hWnd, IDC_LIST), &rc);
-				p.x = rc.left;
-				p.y = rc.top;
-				ScreenToClient(hWnd, &p);
-				SetWindowPos(GetDlgItem(hWnd, IDC_LIST), 0,
-				             0, 0, dlg_w - p.x - new_list2right , dlg_h - p.y - new_list2bottom,
-				             SWP_NOMOVE | SWP_NOZORDER);
-
-				// status bar
-				// 高さが半分より小さくなったらステータスバーを表示しない
 				if (dlg_h < new_init_height / 2) {
 					ShowWindow(hStatus, SW_HIDE);
 				} else {
@@ -956,37 +904,17 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			}
 			return TRUE;
 
+		case WM_GETDPISCALEDSIZE:
+			return ReiseDlgHelper_WM_GETDPISCALEDSIZE(resize_helper, wp, lp);
+
 		case WM_DPICHANGED:
-			{
-				dpi = LOWORD(wp);
-				// WM_SIZE を送信してコントロールを再配置する
-				GetClientRect(hWnd, &rc);
-				SendMessage(hWnd, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right - rc.left, rc.bottom - rc.top));
-				// 推奨されるサイズと位置にする
-				const RECT *rect = (RECT *)lp;
-				SetWindowPos(hWnd, NULL,
-							 rect->left,
-							 rect->top,
-							 rect->right - rect->left,
-							 rect->bottom - rect->top,
-							 SWP_NOZORDER | SWP_NOACTIVATE);
-			}
-			return FALSE;
+			dpi = LOWORD(wp);
+			ReiseDlgHelper_WM_DPICHANGED(resize_helper, wp, lp);
+			return TRUE;
 
 		case WM_GETMINMAXINFO:
-			{
-				LPMINMAXINFO lpmmi = (LPMINMAXINFO)lp;
-				if (GetMonitorDpiFromWindow(hWnd) == dpi) {
-					// ダイアログの初期サイズから最小サイズを決める
-					lpmmi->ptMinTrackSize.x = MulDiv(init_width, dpi * 10, init_dpi * 25);
-					lpmmi->ptMinTrackSize.y = MulDiv(init_height, dpi * 10, init_dpi * 42);
-				} else {
-					// DPI変更中はスケーリングしない
-					lpmmi->ptMinTrackSize.x = 1;
-					lpmmi->ptMinTrackSize.y = 1;
-				}
-			}
-			return FALSE;
+			ReiseDlgHelper_WM_GETMINMAXINFO(resize_helper, lp);
+			return TRUE;
 
 		case WM_TIMER:
 			{
