@@ -728,10 +728,10 @@ BOOL InitConfigDlg(HWND hWnd)
 	::CheckRadioButton(hWnd, RADIO_LOGIN, RADIO_DIRECT, RADIO_LOGIN);
 	EnableItem(hWnd, EDIT_MACRO, FALSE);
 	EnableItem(hWnd, BUTTON_MACRO, FALSE);
-	::CheckDlgButton(hWnd, CHECK_USER, 1);
-	::CheckDlgButton(hWnd, CHECK_PASSWORD, 1);
-	::CheckDlgButton(hWnd, CHECK_LOCKBOX, 0);
-	::CheckDlgButton(hWnd, CHECK_INI_FILE, 1);
+	::CheckDlgButton(hWnd, CHECK_USER, BST_CHECKED);
+	::CheckDlgButton(hWnd, CHECK_PASSWORD, BST_CHECKED);
+	::CheckDlgButton(hWnd, CHECK_LOCKBOX, BST_UNCHECKED);
+	::CheckDlgButton(hWnd, CHECK_INI_FILE, BST_CHECKED);
 
 	InitListBox(hWnd);
 
@@ -1475,11 +1475,11 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 		return FALSE;
 	}
 
-	if (::IsDlgButtonChecked(hWnd, RADIO_LOGIN) == 1)
+	if (::IsDlgButtonChecked(hWnd, RADIO_LOGIN) == BST_CHECKED)
 		g_JobInfo.dwMode = MODE_AUTOLOGIN;
-	if (::IsDlgButtonChecked(hWnd, RADIO_MACRO) == 1)
+	if (::IsDlgButtonChecked(hWnd, RADIO_MACRO) == BST_CHECKED)
 		g_JobInfo.dwMode = MODE_MACRO;
-	if (::IsDlgButtonChecked(hWnd, RADIO_DIRECT) == 1)
+	if (::IsDlgButtonChecked(hWnd, RADIO_DIRECT) == BST_CHECKED)
 		g_JobInfo.dwMode = MODE_DIRECT;
 
 	if (::GetDlgItemTextW(hWnd, EDIT_HOST, g_JobInfo.szHostName, MAX_PATH) == 0 && g_JobInfo.dwMode == MODE_AUTOLOGIN) {
@@ -1857,41 +1857,43 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 			LoadLoginHostInformation(hWnd);
 		return TRUE;
 	case CHECK_USER:
-		if (IsDlgButtonChecked(hWnd, CHECK_USER) == 1)
+		if (IsDlgButtonChecked(hWnd, CHECK_USER) == BST_CHECKED)
 			EnableItem(hWnd, EDIT_USER, TRUE);
 		else {
 			EnableItem(hWnd, EDIT_USER, FALSE);
-			::CheckDlgButton(hWnd, CHECK_PASSWORD, 0);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) 0);
-			::CheckDlgButton(hWnd, CHECK_LOCKBOX, 0);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) 0);
+			::CheckDlgButton(hWnd, CHECK_PASSWORD, BST_UNCHECKED);
+			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) BST_UNCHECKED);
+			::CheckDlgButton(hWnd, CHECK_LOCKBOX, BST_UNCHECKED);
+			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) BST_UNCHECKED);
 		}
 		return TRUE;
 	case CHECK_PASSWORD:
-		if (IsDlgButtonChecked(hWnd, CHECK_PASSWORD) == 1) {
+		if (IsDlgButtonChecked(hWnd, CHECK_PASSWORD) == BST_CHECKED) {
 			EnableItem(hWnd, EDIT_PASSWORD, TRUE);
-			::CheckDlgButton(hWnd, CHECK_USER, 1);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_USER, (LPARAM) 1);
+			::CheckDlgButton(hWnd, CHECK_USER, BST_CHECKED);
+			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_USER, (LPARAM) BST_CHECKED);
 		} else {
 			EnableItem(hWnd, EDIT_PASSWORD, FALSE);
-			::CheckDlgButton(hWnd, CHECK_LOCKBOX, 0);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) 0);
+			::CheckDlgButton(hWnd, CHECK_LOCKBOX, BST_UNCHECKED);
+			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) BST_UNCHECKED);
 		}
 		return TRUE;
 	case CHECK_LOCKBOX:
-		if (IsDlgButtonChecked(hWnd, CHECK_LOCKBOX) == 1) {
-			::CheckDlgButton(hWnd, CHECK_USER, 1);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_USER, (LPARAM) 1);
-			::CheckDlgButton(hWnd, CHECK_PASSWORD, 1);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) 1);
+		if (IsDlgButtonChecked(hWnd, CHECK_LOCKBOX) == BST_CHECKED) {
 			if (g_szLockBox[0] == 0) {
 				pData.bLockBox = g_JobInfo.bLockBox;
 				pData.pEncryptPassword = g_JobInfo.szPassword;
 				pData.pDecryptPassword = szPassword;
 				pData.nMessageFlag = 0;
-				if (TTDialogBoxParam(g_hI, MAKEINTRESOURCEW(DIALOG_LOCKBOX), hWnd, DlgCallBack_LockBox, (LPARAM)&pData) == TRUE) {
-					::CheckDlgButton(hWnd, CHECK_LOCKBOX, 1);
-					::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) 1);
+				if (TTDialogBoxParam(g_hI, MAKEINTRESOURCEW(DIALOG_LOCKBOX), hWnd, DlgCallBack_LockBox, (LPARAM)&pData) == FALSE) {
+					// キャンセルされたのでチェックをはずす
+					::CheckDlgButton(hWnd, CHECK_LOCKBOX, BST_UNCHECKED);
+				} else {
+					// ユーザー、パスワードをEnableにする
+					::CheckDlgButton(hWnd, CHECK_USER, BST_CHECKED);
+					::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_USER, (LPARAM) BST_CHECKED);
+					::CheckDlgButton(hWnd, CHECK_PASSWORD, BST_CHECKED);
+					::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) BST_CHECKED);
 				}
 			}
 		}
@@ -1908,7 +1910,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		}
 		return TRUE;
 	case CHECK_INI_FILE:
-		if (IsDlgButtonChecked(hWnd, CHECK_INI_FILE) == 1)
+		if (IsDlgButtonChecked(hWnd, CHECK_INI_FILE) == BST_CHECKED)
 			EnableItem(hWnd, COMBO_INI_FILE, TRUE);
 		else
 			EnableItem(hWnd, COMBO_INI_FILE, FALSE);
@@ -1938,12 +1940,12 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 	case RADIO_LOGIN:
 		EnableWindows(hWnd, autologin_items, _countof(autologin_items), TRUE);
 		EnableWindows(hWnd, macro_items, _countof(macro_items), FALSE);
-		if (IsDlgButtonChecked(hWnd, CHECK_USER) == 1)
+		if (IsDlgButtonChecked(hWnd, CHECK_USER) == BST_CHECKED)
 			EnableItem(hWnd, EDIT_USER, TRUE);
 		else {
 			EnableItem(hWnd, EDIT_USER, FALSE);
 		}
-		if (IsDlgButtonChecked(hWnd, CHECK_PASSWORD) == 1)
+		if (IsDlgButtonChecked(hWnd, CHECK_PASSWORD) == BST_CHECKED)
 			EnableItem(hWnd, EDIT_PASSWORD, TRUE);
 		else
 			EnableItem(hWnd, EDIT_PASSWORD, FALSE);
