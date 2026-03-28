@@ -70,6 +70,8 @@ HMENU		g_hListMenu;		// 設定一覧ポップアップメニューのハンド�
 HMENU		g_hConfigMenu;		// 表示設定ポップアップメニューのハンドル
 HHOOK		g_hHook = NULL;		// ツールチップ関連フックのハンドル
 HINSTANCE	g_hI;				// アプリケーションインスタンス
+HICON		g_hIconLeft;
+HICON		g_hIconRight;
 
 JobInfo		g_JobInfo;			// カレントの設定情報構造体（設定ダイアログ）
 MenuData	g_MenuData;			// TeraTerm Menuの表示設定等の構造体
@@ -688,8 +690,6 @@ void init_password_control(HWND dlg, int item)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL InitConfigDlg(HWND hWnd)
 {
-	HICON	g_hIconLeft;
-	HICON	g_hIconRight;
 	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_CONFIG_TITLE" },
 		{ LBL_LIST, "DLG_CONFIG_ITEM" },
@@ -977,7 +977,6 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	wchar_t	szName[MAX_PATH];
 	wchar_t	szDirectory[MAX_PATH];
 	wchar_t	szHostName[MAX_PATH];
-	wchar_t	*szArgment = NULL;
 	wchar_t	*szTemp;
 	wchar_t	*pHostName;
 	JobInfo	jobInfo;
@@ -1006,7 +1005,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	if ((pHostName = _wcstok(szHostName, L" ([{'\"|*")) != NULL)
 		pHostName = szHostName;
 
-	szArgment = _wcsdup(L"");
+	wchar_t	*szArgment = _wcsdup(L"");
 
 	if (jobInfo.dwMode != MODE_DIRECT)
 		if (wcslen(jobInfo.szInitFile) != 0) {
@@ -2171,7 +2170,22 @@ INT_PTR CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	case WM_COMMAND:
 		return ManageWMCommand_Config(hWnd, wParam);
 	case WM_DESTROY:
-		::UnhookWindowsHookEx(g_hHook);
+		if (g_hWndTip != NULL) {
+			::DestroyWindow(g_hWndTip);
+			g_hWndTip = NULL;
+		}
+		if (g_hHook != NULL) {
+			::UnhookWindowsHookEx(g_hHook);
+			g_hHook = NULL;
+		}
+		if (g_hIconLeft != NULL) {
+			::DestroyIcon(g_hIconLeft);
+			g_hIconLeft = NULL;
+		}
+		if (g_hIconRight != NULL) {
+			::DestroyIcon(g_hIconRight);
+			g_hIconRight = NULL;
+		}
 		return TRUE;
 	case WM_MEASUREITEM:
 		lpmis = (LPMEASUREITEMSTRUCT) lParam;
@@ -2499,10 +2513,14 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetTaskTray(hWnd, NIM_DELETE);
 		::UnregisterHotKey(hWnd, WM_MENUOPEN);
 		DeleteListMenuIcons();
+		if (g_MenuData.hFont != NULL) {
+			::DeleteObject(g_MenuData.hFont);
+			g_MenuData.hFont = NULL;
+		}
 		::DestroyMenu(g_hListMenu);
 		::DestroyMenu(g_hMenu);
 		::PostQuitMessage(0);
-		return TRUE;	
+		return TRUE;
 	case WM_HOTKEY:
 		if (g_MenuData.bHotkey == TRUE)
 			PopupListMenu(hWnd);
@@ -2690,6 +2708,14 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR /* nCmdLine unusedParam */, in
 		::DispatchMessageW(&msg);
 	}
 
+	if (g_hIcon != NULL) {
+		::DestroyIcon(g_hIcon);
+		g_hIcon = NULL;
+	}
+	if (g_hIconSmall != NULL) {
+		::DestroyIcon(g_hIconSmall);
+		g_hIconSmall = NULL;
+	}
 	free(UILanguageFileW);
 	free(SetupFNameW);
 	RegExit();
