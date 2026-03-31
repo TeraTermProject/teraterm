@@ -110,8 +110,6 @@ BOOL ThemeIsEnabled(void);
 const BG_PATTERN_ST *ThemeBGPatternList(int index);
 
 // file / themefile.cpp
-void ThemeLoadBG(const wchar_t *file, BGTheme *bg_theme);
-void ThemeLoadColor(const wchar_t *fname, TColorTheme *color_theme);
 void ThemeLoad(const wchar_t *fname, BGTheme *bg_theme, TColorTheme *color_theme);
 void ThemeSaveBG(const BGTheme *bg_theme, const wchar_t *fname);
 void ThemeSaveColor(TColorTheme *color_theme, const wchar_t *fname);

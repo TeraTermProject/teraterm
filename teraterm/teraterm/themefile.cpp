@@ -436,7 +436,7 @@ void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg
 	wchar_t *p;
 
 	// Dest の読み出し
-	bg_theme->BGDest.enable = GetPrivateProfileIntW(section, L"BGDestEnable", 0, file);
+	bg_theme->BGDest.enable = GetPrivateProfileIntW(section, L"BGDestEnable", bg_theme->BGDest.enable, file);
 	bg_theme->BGDest.type = BGGetType(section, L"BGDestType", bg_theme->BGDest.type, file);
 	bg_theme->BGDest.pattern = BGGetPattern(section, L"BGPicturePattern", bg_theme->BGDest.pattern, file);
 	bg_theme->BGDest.pattern = BGGetPattern(section, L"BGDestPattern", bg_theme->BGDest.pattern, file);
@@ -502,7 +502,7 @@ void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg
 /**
  *	BGをロード
  */
-void ThemeLoadBG(const wchar_t *file, BGTheme *bg_theme)
+static void ThemeLoadBG(const wchar_t *file, BGTheme *bg_theme)
 {
 	ThemeLoadBGSection(BG_SECTION_OLD, file, bg_theme);
 	ThemeLoadBGSection(BG_SECTION_NEW, file, bg_theme);
@@ -671,7 +671,7 @@ static void ThemeLoadColorDraft(const wchar_t *file, TColorTheme *theme)
 /*
  *	カラーテーマiniファイルをロードする
  */
-void ThemeLoadColor(const wchar_t *fn, TColorTheme *color_theme)
+static void ThemeLoadColor(const wchar_t *fn, TColorTheme *color_theme)
 {
 	ThemeGetColorDefault(color_theme);
 	LoadColorPlugin(fn, color_theme);
