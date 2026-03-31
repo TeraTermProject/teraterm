@@ -101,7 +101,7 @@ const BG_PATTERN_ST *ThemeBGPatternList(int index)
 		{ BG_AUTOFILL, L"autofill" },
 	};
 
-	if (index >= _countof(bg_pattern_list)) {
+	if (index >= (int)_countof(bg_pattern_list)) {
 		return NULL;
 	}
 	return &bg_pattern_list[index];
@@ -258,7 +258,7 @@ static void SaveColorANSINew(const wchar_t *section, const TAnsiColorSetting *co
 	WritePrivateProfileStringW(section, L"ANSIColor", str, fname);
 	free(str);
 
-	for (int i = 0; i < _countof(ansi_list); i++) {
+	for (size_t i = 0; i < _countof(ansi_list); i++) {
 		const int index = ansi_list[i].index;
 		const wchar_t *key = ansi_list[i].key;
 		SaveColorOneANSI(section, key, fname, color->color[index], index);
@@ -276,7 +276,7 @@ void ThemeSaveColorOld(TColorTheme *color_theme, const wchar_t *fn)
 
 	WritePrivateProfileStringW(section, L"Theme", color_theme->name, fn);
 
-	for (int i = 0; i < _countof(color_attr_list); i++) {
+	for (size_t i = 0; i < _countof(color_attr_list); i++) {
 		const wchar_t *key = color_attr_list[i].key;
 		const TColorSetting *color = (TColorSetting *)((UINT_PTR)color_theme + color_attr_list[i].offset);
 		BGSaveColorOne(section, key, color, fn);
@@ -294,7 +294,7 @@ void ThemeSaveColor(TColorTheme *color_theme, const wchar_t *fn)
 	const wchar_t *section = COLOR_THEME_SECTION;
 	WritePrivateProfileStringW(section, L"Theme", color_theme->name, fn);
 
-	for (int i = 0; i < _countof(color_attr_list); i++) {
+	for (size_t i = 0; i < _countof(color_attr_list); i++) {
 		const wchar_t *key = color_attr_list[i].key;
 		const TColorSetting *color = (TColorSetting *)((UINT_PTR)color_theme + color_attr_list[i].offset);
 		BGSaveColorOne(section, key, color, fn);
@@ -430,7 +430,7 @@ static BG_TYPE BGGetType(const wchar_t *section, const wchar_t *name, BG_TYPE de
 /**
  *	BGをロード
  */
-void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg_theme)
+static void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg_theme)
 {
 	wchar_t pathW[MAX_PATH];
 	wchar_t *p;
@@ -493,10 +493,10 @@ void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTheme *bg
 	}
 
 	//その他読み出し
-	bg_theme->BGReverseTextAlpha = GetPrivateProfileIntW(section, L"BGReverseTextTone", bg_theme->BGReverseTextAlpha, file);
-	bg_theme->BGReverseTextAlpha = GetPrivateProfileIntW(section, L"BGReverseTextAlpha", bg_theme->BGReverseTextAlpha, file);
-	bg_theme->TextBackAlpha = GetPrivateProfileIntW(section, L"BGTextBackAlpha", bg_theme->TextBackAlpha, file);
-	bg_theme->BackAlpha = GetPrivateProfileIntW(section, L"BGBackAlpha", bg_theme->BackAlpha, file);
+	bg_theme->BGReverseTextAlpha = (BYTE)GetPrivateProfileIntW(section, L"BGReverseTextTone", bg_theme->BGReverseTextAlpha, file);
+	bg_theme->BGReverseTextAlpha = (BYTE)GetPrivateProfileIntW(section, L"BGReverseTextAlpha", bg_theme->BGReverseTextAlpha, file);
+	bg_theme->TextBackAlpha = (BYTE)GetPrivateProfileIntW(section, L"BGTextBackAlpha", bg_theme->TextBackAlpha, file);
+	bg_theme->BackAlpha = (BYTE)GetPrivateProfileIntW(section, L"BGBackAlpha", bg_theme->BackAlpha, file);
 }
 
 /**
@@ -578,7 +578,7 @@ static void LoadColorPlugin(const wchar_t *fn, TColorTheme *color_theme)
 	wcscpy_s(color_theme->name, _countof(color_theme->name), name);
 	free(name);
 
-	for (int i = 0; i < _countof(color_attr_list); i++) {
+	for (size_t i = 0; i < _countof(color_attr_list); i++) {
 		const wchar_t *key = color_attr_list[i].key;
 		TColorSetting *color = (TColorSetting *)((UINT_PTR)color_theme + color_attr_list[i].offset);
 		ReadColorSetting(section, color, key, fn);
@@ -654,14 +654,14 @@ static void ThemeLoadColorDraft(const wchar_t *file, TColorTheme *theme)
 	wcscpy_s(theme->name, _countof(theme->name), name);
 	free(name);
 
-	for (int i = 0; i < _countof(color_attr_list); i++) {
+	for (size_t i = 0; i < _countof(color_attr_list); i++) {
 		const wchar_t *key = color_attr_list[i].key;
 		TColorSetting *color = (TColorSetting *)((UINT_PTR)theme + color_attr_list[i].offset);
 		LoadColorAttr(section, key, file, color);
 	}
 
 	theme->ansicolor.change = (BOOL)GetPrivateProfileIntW(section, L"ANSIColor", 1, file);
-	for (int i = 0; i < _countof(ansi_list); i++) {
+	for (size_t i = 0; i < _countof(ansi_list); i++) {
 		const int index = ansi_list[i].index;
 		const wchar_t *key = ansi_list[i].key;
 		theme->ansicolor.color[index] = LoadColorOneANSI(section, key, file, theme->ansicolor.color[index]);
