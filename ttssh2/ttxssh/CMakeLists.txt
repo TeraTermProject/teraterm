@@ -1,9 +1,8 @@
-﻿set(PACKAGE_NAME "ttxssh")
+﻿
+project("ttxssh")
 
 option(TTXSSH_LIBRESSL "User LibreSSL" on)
 option(TTXSSH_OPENSSL3 "Use OpenSSL3" off)
-
-project(${PACKAGE_NAME})
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_zlib.cmake)
 if(TTXSSH_LIBRESSL)
@@ -15,11 +14,11 @@ else()
 endif()
 
 add_library(
-  ${PACKAGE_NAME} SHARED
+  ${PROJECT_NAME} SHARED
   )
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../matcher/matcher.c
   arc4random.c
@@ -105,7 +104,7 @@ target_sources(
 )
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../../teraterm/teraterm/WSAAsyncGetAddrInfo.c
   ../../teraterm/common/ttcommon.h
@@ -120,7 +119,7 @@ target_sources(
   )
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../../teraterm/common/edithistory.cpp
   ../../teraterm/common/edithistory.h
@@ -135,7 +134,7 @@ source_group(
 
 if(MINGW)
   target_compile_options(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     -Wno-error=incompatible-pointer-types
   )
@@ -149,20 +148,20 @@ if(SUPPORT_OLD_WINDOWS)
       set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB")
     else()
       target_link_options(
-        ${PACKAGE_NAME}
+        ${PROJECT_NAME}
         PRIVATE
         /NODEFAULTLIB
         )
     endif()
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/common/compat_w95_vs2005.c
       )
   endif()
   if(MINGW)
     target_link_libraries(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       -Wl,--whole-archive
       mingw_msvcrt
@@ -173,7 +172,7 @@ if(SUPPORT_OLD_WINDOWS)
 endif(SUPPORT_OLD_WINDOWS)
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../../teraterm/teraterm
   ../matcher
@@ -184,19 +183,19 @@ target_include_directories(
 
 if(TTXSSH_LIBRESSL)
   target_include_directories(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     ${LIBRESSL_INCLUDE_DIRS}
     )
 elseif(TTXSSH_OPENSSL3)
   target_include_directories(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     ${OPENSSL3_INCLUDE_DIRS}
     )
 else()
   target_include_directories(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     ${OPENSSL_INCLUDE_DIRS}
     )
@@ -204,14 +203,14 @@ endif()
 
 
 set_target_properties(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PROPERTIES
   PREFIX ""
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
 target_compile_definitions(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   $<$<CONFIG:Debug>:_CRTDBG_MAP_ALLOC>
   )
@@ -225,7 +224,7 @@ if(MINGW)
 endif()
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   common_static
   libsshagentc
@@ -236,21 +235,21 @@ target_link_libraries(
 
 if(TTXSSH_LIBRESSL)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     ${LIBRESSL_LIB}
     bcrypt.lib
     )
 elseif(TTXSSH_OPENSSL3)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     ${OPENSSL3_LIB}
     bcrypt.lib
     )
 else()
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     ${OPENSSL_LIB}
     crypt32.lib		# TODO このlibを使用しないパッチを適応したら削除すること
@@ -259,14 +258,14 @@ endif()
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     layer_for_unicode
     )
 endif()
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ws2_32
   gdi32

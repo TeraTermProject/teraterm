@@ -421,6 +421,13 @@ ReiseDlgHelper_t *ReiseDlgHelperInit(HWND dlg, BOOL size_box, const ResizeHelper
 	return h;
 }
 
+void ReiseDlgHelperAdjustInitSize(ReiseDlgHelper_t *h, int percentX, int percentY)
+{
+	assert(h != NULL);
+	h->init_width = MulDiv(h->init_width, percentX, 100);
+	h->init_height = MulDiv(h->init_height, percentY, 100);
+}
+
 BOOL ResizeDlgHelperProc(ReiseDlgHelper_t *h, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	if (h == NULL) {

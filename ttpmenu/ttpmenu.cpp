@@ -70,6 +70,8 @@ HMENU		g_hListMenu;		// 設定一覧ポップアップメニューのハンド�
 HMENU		g_hConfigMenu;		// 表示設定ポップアップメニューのハンドル
 HHOOK		g_hHook = NULL;		// ツールチップ関連フックのハンドル
 HINSTANCE	g_hI;				// アプリケーションインスタンス
+HICON		g_hIconLeft;
+HICON		g_hIconRight;
 
 JobInfo		g_JobInfo;			// カレントの設定情報構造体（設定ダイアログ）
 MenuData	g_MenuData;			// TeraTerm Menuの表示設定等の構造体
@@ -154,12 +156,11 @@ static void GetTeraTermPath(wchar_t *path, size_t size)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL ExecStartup(HWND hWnd)
+BOOL ExecStartup(HWND /* hWnd unusedParam */)
 {
 	wchar_t	szEntryName[MAX_PATH];
 	wchar_t	szJobName[MAXJOBNUM][MAX_PATH];
 	HKEY	hKey;
-	DWORD	dwCnt;
 	DWORD	dwIndex = 0;
 	DWORD	dwSize = MAX_PATH;
 
@@ -171,6 +172,7 @@ BOOL ExecStartup(HWND hWnd)
 		wcscpy(szJobName[dwIndex], L"");
 		RegClose(hKey);
 #if 0
+		DWORD dwCnt;
 		for (dwCnt = 0; dwCnt < dwIndex; dwCnt++)
 			ConnectHost(hWnd, 0, szJobName[dwCnt]);
 #endif
@@ -533,7 +535,7 @@ LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL CreateTooltip(HWND hWnd)
+BOOL CreateTooltip(HWND /* hWnd unusedParam */)
 {
 	wchar_t uimsg[MAX_UIMSG];
 
@@ -688,8 +690,6 @@ void init_password_control(HWND dlg, int item)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL InitConfigDlg(HWND hWnd)
 {
-	HICON	g_hIconLeft;
-	HICON	g_hIconRight;
 	static const DlgTextInfo text_info[] = {
 		{ 0, "DLG_CONFIG_TITLE" },
 		{ LBL_LIST, "DLG_CONFIG_ITEM" },
@@ -725,13 +725,13 @@ BOOL InitConfigDlg(HWND hWnd)
 	::SendDlgItemMessage(hWnd, BUTTON_SET, BM_SETIMAGE, (WPARAM) IMAGE_ICON, (LPARAM)(HANDLE) g_hIconLeft);
 	::SendDlgItemMessage(hWnd, BUTTON_DELETE, BM_SETIMAGE, (WPARAM) IMAGE_ICON, (LPARAM)(HANDLE) g_hIconRight);
 
-	::CheckRadioButton(hWnd, RADIO_LOGIN, RADIO_MACRO, RADIO_LOGIN);
+	::CheckRadioButton(hWnd, RADIO_LOGIN, RADIO_DIRECT, RADIO_LOGIN);
 	EnableItem(hWnd, EDIT_MACRO, FALSE);
 	EnableItem(hWnd, BUTTON_MACRO, FALSE);
-	::CheckDlgButton(hWnd, CHECK_USER, 1);
-	::CheckDlgButton(hWnd, CHECK_PASSWORD, 1);
-	::CheckDlgButton(hWnd, CHECK_LOCKBOX, 0);
-	::CheckDlgButton(hWnd, CHECK_INI_FILE, 1);
+	::CheckDlgButton(hWnd, CHECK_USER, BST_CHECKED);
+	::CheckDlgButton(hWnd, CHECK_PASSWORD, BST_CHECKED);
+	::CheckDlgButton(hWnd, CHECK_LOCKBOX, BST_UNCHECKED);
+	::CheckDlgButton(hWnd, CHECK_INI_FILE, BST_CHECKED);
 
 	InitListBox(hWnd);
 
@@ -977,7 +977,6 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	wchar_t	szName[MAX_PATH];
 	wchar_t	szDirectory[MAX_PATH];
 	wchar_t	szHostName[MAX_PATH];
-	wchar_t	*szArgment = NULL;
 	wchar_t	*szTemp;
 	wchar_t	*pHostName;
 	JobInfo	jobInfo;
@@ -1006,7 +1005,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	if ((pHostName = _wcstok(szHostName, L" ([{'\"|*")) != NULL)
 		pHostName = szHostName;
 
-	szArgment = _wcsdup(L"");
+	wchar_t	*szArgment = _wcsdup(L"");
 
 	if (jobInfo.dwMode != MODE_DIRECT)
 		if (wcslen(jobInfo.szInitFile) != 0) {
@@ -1244,7 +1243,7 @@ BOOL InitListMenu(HWND hWnd)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL RedrawMenu(HWND hWnd)
+BOOL RedrawMenu(HWND /* hWnd unusedParam */)
 {
 	int			num;
 	wchar_t		szPath[MAX_PATH];
@@ -1475,11 +1474,11 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 		return FALSE;
 	}
 
-	if (::IsDlgButtonChecked(hWnd, RADIO_LOGIN) == 1)
+	if (::IsDlgButtonChecked(hWnd, RADIO_LOGIN) == BST_CHECKED)
 		g_JobInfo.dwMode = MODE_AUTOLOGIN;
-	if (::IsDlgButtonChecked(hWnd, RADIO_MACRO) == 1)
+	if (::IsDlgButtonChecked(hWnd, RADIO_MACRO) == BST_CHECKED)
 		g_JobInfo.dwMode = MODE_MACRO;
-	if (::IsDlgButtonChecked(hWnd, RADIO_DIRECT) == 1)
+	if (::IsDlgButtonChecked(hWnd, RADIO_DIRECT) == BST_CHECKED)
 		g_JobInfo.dwMode = MODE_DIRECT;
 
 	if (::GetDlgItemTextW(hWnd, EDIT_HOST, g_JobInfo.szHostName, MAX_PATH) == 0 && g_JobInfo.dwMode == MODE_AUTOLOGIN) {
@@ -1567,6 +1566,34 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	return TRUE;
 }
 
+static void EnableWindows(HWND hWnd, const int *list, size_t count, BOOL enable)
+{
+	for (size_t i = 0; i < count; i++) {
+		HWND w = GetDlgItem(hWnd, list[i]);
+		EnableWindow(w, enable);
+	}
+}
+
+static const int autologin_items[] = {
+	EDIT_HOST,
+	CHECK_USER,
+	EDIT_USER,
+	CHECK_PASSWORD,
+	EDIT_PASSWORD,
+	CHECK_LOCKBOX,
+	BUTTON_LOCKBOX,
+	CHECK_TTSSH,
+	IDC_KEYFILE_PATH,
+	IDC_KEYFILE_BUTTON,
+	IDC_CHALLENGE_CHECK,
+	IDC_PAGEANT_CHECK,
+};
+
+static const int macro_items[] = {
+	EDIT_MACRO,
+	BUTTON_MACRO,
+};
+
 /* ==========================================================================
 	Function Name	: (BOOL) LoadLoginHostInformation()
 	Outline			: 設定情報を取得する。
@@ -1600,39 +1627,20 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 	switch (g_JobInfo.dwMode) {
 	case MODE_AUTOLOGIN:
 		::CheckRadioButton(hWnd, RADIO_LOGIN, RADIO_DIRECT, RADIO_LOGIN);
-		EnableItem(hWnd, EDIT_HOST, TRUE);
-		EnableItem(hWnd, CHECK_USER, TRUE);
+		EnableWindows(hWnd, autologin_items, _countof(autologin_items), TRUE);
+		EnableWindows(hWnd, macro_items, _countof(macro_items), FALSE);
 		EnableItem(hWnd, EDIT_USER, g_JobInfo.bUsername);
-		EnableItem(hWnd, CHECK_PASSWORD, TRUE);
 		EnableItem(hWnd, EDIT_PASSWORD, g_JobInfo.bPassword);
-		EnableItem(hWnd, CHECK_LOCKBOX, TRUE);
-		EnableItem(hWnd, BUTTON_LOCKBOX, TRUE);
-		EnableItem(hWnd, EDIT_MACRO, FALSE);
-		EnableItem(hWnd, BUTTON_MACRO, FALSE);
 		break;
 	case MODE_MACRO:
 		::CheckRadioButton(hWnd, RADIO_LOGIN, RADIO_DIRECT, RADIO_MACRO);
-		EnableItem(hWnd, EDIT_HOST, FALSE);
-		EnableItem(hWnd, CHECK_USER, FALSE);
-		EnableItem(hWnd, EDIT_USER, FALSE);
-		EnableItem(hWnd, CHECK_PASSWORD, FALSE);
-		EnableItem(hWnd, EDIT_PASSWORD, FALSE);
-		EnableItem(hWnd, CHECK_LOCKBOX, FALSE);
-		EnableItem(hWnd, BUTTON_LOCKBOX, FALSE);
-		EnableItem(hWnd, EDIT_MACRO, TRUE);
-		EnableItem(hWnd, BUTTON_MACRO, TRUE);
+		EnableWindows(hWnd, autologin_items, _countof(autologin_items), FALSE);
+		EnableWindows(hWnd, macro_items, _countof(macro_items), TRUE);
 		break;
 	case MODE_DIRECT:
 		::CheckRadioButton(hWnd, RADIO_LOGIN, RADIO_DIRECT, RADIO_DIRECT);
-		EnableItem(hWnd, EDIT_HOST, FALSE);
-		EnableItem(hWnd, CHECK_USER, FALSE);
-		EnableItem(hWnd, EDIT_USER, FALSE);
-		EnableItem(hWnd, CHECK_PASSWORD, FALSE);
-		EnableItem(hWnd, EDIT_PASSWORD, FALSE);
-		EnableItem(hWnd, CHECK_LOCKBOX, FALSE);
-		EnableItem(hWnd, BUTTON_LOCKBOX, FALSE);
-		EnableItem(hWnd, EDIT_MACRO, FALSE);
-		EnableItem(hWnd, BUTTON_MACRO, FALSE);
+		EnableWindows(hWnd, autologin_items, _countof(autologin_items), FALSE);
+		EnableWindows(hWnd, macro_items, _countof(macro_items), FALSE);
 		break;
 	}
 
@@ -1848,41 +1856,43 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 			LoadLoginHostInformation(hWnd);
 		return TRUE;
 	case CHECK_USER:
-		if (IsDlgButtonChecked(hWnd, CHECK_USER) == 1)
+		if (IsDlgButtonChecked(hWnd, CHECK_USER) == BST_CHECKED)
 			EnableItem(hWnd, EDIT_USER, TRUE);
 		else {
 			EnableItem(hWnd, EDIT_USER, FALSE);
-			::CheckDlgButton(hWnd, CHECK_PASSWORD, 0);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) 0);
-			::CheckDlgButton(hWnd, CHECK_LOCKBOX, 0);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) 0);
+			::CheckDlgButton(hWnd, CHECK_PASSWORD, BST_UNCHECKED);
+			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) BST_UNCHECKED);
+			::CheckDlgButton(hWnd, CHECK_LOCKBOX, BST_UNCHECKED);
+			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) BST_UNCHECKED);
 		}
 		return TRUE;
 	case CHECK_PASSWORD:
-		if (IsDlgButtonChecked(hWnd, CHECK_PASSWORD) == 1) {
+		if (IsDlgButtonChecked(hWnd, CHECK_PASSWORD) == BST_CHECKED) {
 			EnableItem(hWnd, EDIT_PASSWORD, TRUE);
-			::CheckDlgButton(hWnd, CHECK_USER, 1);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_USER, (LPARAM) 1);
+			::CheckDlgButton(hWnd, CHECK_USER, BST_CHECKED);
+			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_USER, (LPARAM) BST_CHECKED);
 		} else {
 			EnableItem(hWnd, EDIT_PASSWORD, FALSE);
-			::CheckDlgButton(hWnd, CHECK_LOCKBOX, 0);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) 0);
+			::CheckDlgButton(hWnd, CHECK_LOCKBOX, BST_UNCHECKED);
+			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) BST_UNCHECKED);
 		}
 		return TRUE;
 	case CHECK_LOCKBOX:
-		if (IsDlgButtonChecked(hWnd, CHECK_LOCKBOX) == 1) {
-			::CheckDlgButton(hWnd, CHECK_USER, 1);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_USER, (LPARAM) 1);
-			::CheckDlgButton(hWnd, CHECK_PASSWORD, 1);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) 1);
+		if (IsDlgButtonChecked(hWnd, CHECK_LOCKBOX) == BST_CHECKED) {
 			if (g_szLockBox[0] == 0) {
 				pData.bLockBox = g_JobInfo.bLockBox;
 				pData.pEncryptPassword = g_JobInfo.szPassword;
 				pData.pDecryptPassword = szPassword;
 				pData.nMessageFlag = 0;
-				if (TTDialogBoxParam(g_hI, MAKEINTRESOURCEW(DIALOG_LOCKBOX), hWnd, DlgCallBack_LockBox, (LPARAM)&pData) == TRUE) {
-					::CheckDlgButton(hWnd, CHECK_LOCKBOX, 1);
-					::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) 1);
+				if (TTDialogBoxParam(g_hI, MAKEINTRESOURCEW(DIALOG_LOCKBOX), hWnd, DlgCallBack_LockBox, (LPARAM)&pData) == FALSE) {
+					// キャンセルされたのでチェックをはずす
+					::CheckDlgButton(hWnd, CHECK_LOCKBOX, BST_UNCHECKED);
+				} else {
+					// ユーザー、パスワードをEnableにする
+					::CheckDlgButton(hWnd, CHECK_USER, BST_CHECKED);
+					::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_USER, (LPARAM) BST_CHECKED);
+					::CheckDlgButton(hWnd, CHECK_PASSWORD, BST_CHECKED);
+					::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) BST_CHECKED);
 				}
 			}
 		}
@@ -1899,7 +1909,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		}
 		return TRUE;
 	case CHECK_INI_FILE:
-		if (IsDlgButtonChecked(hWnd, CHECK_INI_FILE) == 1)
+		if (IsDlgButtonChecked(hWnd, CHECK_INI_FILE) == BST_CHECKED)
 			EnableItem(hWnd, COMBO_INI_FILE, TRUE);
 		else
 			EnableItem(hWnd, COMBO_INI_FILE, FALSE);
@@ -1927,44 +1937,25 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		return TRUE;
 
 	case RADIO_LOGIN:
-		EnableItem(hWnd, EDIT_HOST, TRUE);
-		EnableItem(hWnd, CHECK_USER, TRUE);
-		if (IsDlgButtonChecked(hWnd, CHECK_USER) == 1)
+		EnableWindows(hWnd, autologin_items, _countof(autologin_items), TRUE);
+		EnableWindows(hWnd, macro_items, _countof(macro_items), FALSE);
+		if (IsDlgButtonChecked(hWnd, CHECK_USER) == BST_CHECKED)
 			EnableItem(hWnd, EDIT_USER, TRUE);
 		else {
 			EnableItem(hWnd, EDIT_USER, FALSE);
 		}
-		EnableItem(hWnd, CHECK_PASSWORD, TRUE);
-		if (IsDlgButtonChecked(hWnd, CHECK_PASSWORD) == 1)
+		if (IsDlgButtonChecked(hWnd, CHECK_PASSWORD) == BST_CHECKED)
 			EnableItem(hWnd, EDIT_PASSWORD, TRUE);
 		else
 			EnableItem(hWnd, EDIT_PASSWORD, FALSE);
-		EnableItem(hWnd, CHECK_LOCKBOX, TRUE);
-		EnableItem(hWnd, BUTTON_LOCKBOX, TRUE);
-		EnableItem(hWnd, EDIT_MACRO, FALSE);
-		EnableItem(hWnd, BUTTON_MACRO, FALSE);
 		return TRUE;
 	case RADIO_MACRO:
-		EnableItem(hWnd, EDIT_HOST, FALSE);
-		EnableItem(hWnd, CHECK_USER, FALSE);
-		EnableItem(hWnd, EDIT_USER, FALSE);
-		EnableItem(hWnd, CHECK_PASSWORD, FALSE);
-		EnableItem(hWnd, EDIT_PASSWORD, FALSE);
-		EnableItem(hWnd, CHECK_LOCKBOX, FALSE);
-		EnableItem(hWnd, BUTTON_LOCKBOX, FALSE);
-		EnableItem(hWnd, EDIT_MACRO, TRUE);
-		EnableItem(hWnd, BUTTON_MACRO, TRUE);
+		EnableWindows(hWnd, autologin_items, _countof(autologin_items), FALSE);
+		EnableWindows(hWnd, macro_items, _countof(macro_items), TRUE);
 		return TRUE;
 	case RADIO_DIRECT:
-		EnableItem(hWnd, EDIT_HOST, FALSE);
-		EnableItem(hWnd, CHECK_USER, FALSE);
-		EnableItem(hWnd, EDIT_USER, FALSE);
-		EnableItem(hWnd, CHECK_PASSWORD, FALSE);
-		EnableItem(hWnd, EDIT_PASSWORD, FALSE);
-		EnableItem(hWnd, CHECK_LOCKBOX, FALSE);
-		EnableItem(hWnd, BUTTON_LOCKBOX, FALSE);
-		EnableItem(hWnd, EDIT_MACRO, FALSE);
-		EnableItem(hWnd, BUTTON_MACRO, FALSE);
+		EnableWindows(hWnd, autologin_items, _countof(autologin_items), FALSE);
+		EnableWindows(hWnd, macro_items, _countof(macro_items), FALSE);
 		return TRUE;
 	}
 
@@ -2179,7 +2170,22 @@ INT_PTR CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	case WM_COMMAND:
 		return ManageWMCommand_Config(hWnd, wParam);
 	case WM_DESTROY:
-		::UnhookWindowsHookEx(g_hHook);
+		if (g_hWndTip != NULL) {
+			::DestroyWindow(g_hWndTip);
+			g_hWndTip = NULL;
+		}
+		if (g_hHook != NULL) {
+			::UnhookWindowsHookEx(g_hHook);
+			g_hHook = NULL;
+		}
+		if (g_hIconLeft != NULL) {
+			::DestroyIcon(g_hIconLeft);
+			g_hIconLeft = NULL;
+		}
+		if (g_hIconRight != NULL) {
+			::DestroyIcon(g_hIconRight);
+			g_hIconRight = NULL;
+		}
 		return TRUE;
 	case WM_MEASUREITEM:
 		lpmis = (LPMEASUREITEMSTRUCT) lParam;
@@ -2233,7 +2239,7 @@ INT_PTR CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-INT_PTR CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM /* lParam unusedParam */)
 {
 	switch(uMsg) {
 	case WM_INITDIALOG:
@@ -2260,7 +2266,7 @@ INT_PTR CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-INT_PTR CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM /* lParam unusedParam */)
 {
 	switch(uMsg) {
 	case WM_INITDIALOG:
@@ -2507,10 +2513,14 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetTaskTray(hWnd, NIM_DELETE);
 		::UnregisterHotKey(hWnd, WM_MENUOPEN);
 		DeleteListMenuIcons();
+		if (g_MenuData.hFont != NULL) {
+			::DeleteObject(g_MenuData.hFont);
+			g_MenuData.hFont = NULL;
+		}
 		::DestroyMenu(g_hListMenu);
 		::DestroyMenu(g_hMenu);
 		::PostQuitMessage(0);
-		return TRUE;	
+		return TRUE;
 	case WM_HOTKEY:
 		if (g_MenuData.bHotkey == TRUE)
 			PopupListMenu(hWnd);
@@ -2601,7 +2611,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
+int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR /* nCmdLine unusedParam */, int /* nCmdShow unusedParam */)
 {
 	typedef BOOL (WINAPI *pSetDllDir)(LPCSTR);
 	typedef BOOL (WINAPI *pSetDefDllDir)(DWORD);
@@ -2698,6 +2708,14 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 		::DispatchMessageW(&msg);
 	}
 
+	if (g_hIcon != NULL) {
+		::DestroyIcon(g_hIcon);
+		g_hIcon = NULL;
+	}
+	if (g_hIconSmall != NULL) {
+		::DestroyIcon(g_hIconSmall);
+		g_hIconSmall = NULL;
+	}
 	free(UILanguageFileW);
 	free(SetupFNameW);
 	RegExit();
