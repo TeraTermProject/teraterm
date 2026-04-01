@@ -38,6 +38,14 @@
   <li>Changes
     <ul>
       <li>
+        Selection is extended when Shift+left-clicking to the left of or above the current selection.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        Previously, clicking in that area would create a new selection from the clicked position to the start of the existing selection.
+      </li>
+      <li>
+        Selection is reduced such that, when Shift+left-clicking within it, the portion farther from the center than the click position is deselected.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        Previously, clicking anywhere within the selection would shrink the selection to span from the start of the existing selection to the clicked position.
         Added a Submit key option to the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> that allows users to select the key operation used to send commands in non-real-time mode.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1158" target="_blank">issue #1158</a>)<br>
         Since the size of the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> had increased, it was modified so that it can now be resized to smaller than its initial size.

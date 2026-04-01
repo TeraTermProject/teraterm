@@ -88,7 +88,7 @@ public:
 	CVTWindow(HINSTANCE hInstance);
 	~CVTWindow();
 	int Parse();
-	void ButtonUp(BOOL Paste);
+	void ButtonUp(POINT p, BOOL Paste);
 	void ButtonDown(POINT p, int LMR);
 	void InitMenu(HMENU *Menu);
 	void InitMenuPopup(HMENU SubMenu);
