@@ -634,7 +634,7 @@ static WORD TTLConnect(WORD mode)
 
 		strW = ToWcharU8(Str);
 		aswprintf(&command_line, L"%hs /D=%hs %s", command, TopicNameA, strW);
-		e = TTWinExec(command_line);
+		e = TTWinExecWithShowWindow(command_line, SW_NORMAL);
 		free(command_line);
 		free(strW);
 		if (e != NO_ERROR) {
