@@ -46,6 +46,7 @@
 #include "asprintf.h"
 #include "ttwinman.h"
 #include "helpid.h"
+#include "broadcast.h"	// for UpdateBroadcastNewlineCode()
 
 #include "term_pp.h"
 
@@ -59,6 +60,18 @@ typedef struct {
 	TTTSet *pts;
 	HWND VTWin;
 } DialogData;
+
+// New-line の Transmit:を更新する
+// Broadcast commandダイアログの改行コードボタン押下時に呼ばれる
+
+static HWND hDlg = NULL;
+
+void UpdateSetupTerminalNewlineCode(int CRSend)
+{
+	if (hDlg) {
+		SendDlgItemMessage(hDlg, IDC_TERMCRSEND, CB_SETCURSEL, (WPARAM)(CRSend - 1), (LPARAM)0);
+	}
+}
 
 static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -78,6 +91,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 
 	switch (Message) {
 		case WM_INITDIALOG: {
+			hDlg = Dialog;
 			DialogData *data = (DialogData *)(((PROPSHEETPAGEW *)lParam)->lParam);
 			TTTSet *ts = data->pts;
 			SetWindowLongPtrW(Dialog, DWLP_USER, (LONG_PTR)data);
@@ -132,6 +146,10 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			return TRUE;
 		}
 
+		case WM_DESTROY:
+			hDlg = NULL;
+			break;
+
 		case WM_NOTIFY: {
 			DialogData *data = (DialogData *)GetWindowLongPtrW(Dialog, DWLP_USER);
 			TTTSet *ts;
@@ -171,6 +189,7 @@ static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 				}
 				if ((w = (WORD)GetCurSel(Dialog, IDC_TERMCRSEND)) > 0) {
 					ts->CRSend = w;
+					UpdateBroadcastNewlineCode(ts->CRSend);
 				}
 
 				LRESULT sel = SendDlgItemMessageA(Dialog, IDC_TERMID, CB_GETCURSEL, 0, 0);
