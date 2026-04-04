@@ -273,3 +273,36 @@ DWORD TTWinExec(const wchar_t *command)
 	CloseHandle(pi.hProcess);
 	return NO_ERROR;
 }
+
+/**
+ *	ウィンドウの表示方法を指定してプログラムを実行する
+ *
+ *	@param[in]	command		実行するコマンドライン
+ *							CreateProcess() にそのまま渡される
+ *	@param[in]	wShowWindow ウィンドウの表示方法(SW_HIDE, SW_MINIMIZE等)
+ * 	@retval		NO_ERROR	エラーなし
+ *	@retval		エラーコード	(NO_ERROR以外)
+ *
+ *	シンプルにプログラムを起動するだけの関数
+ *		CreateProcess() は CloseHandle() を忘れてハンドルリークを起こしやすい
+ *		単純なプログラム実行ではこの関数を使用すると安全
+ */
+DWORD TTWinExecWithShowWindow(const wchar_t *command, DWORD wShowWindow)
+{
+	STARTUPINFOW si = {};
+	PROCESS_INFORMATION pi = {};
+
+	GetStartupInfoW(&si);
+	si.wShowWindow =wShowWindow;
+
+	BOOL r = CreateProcessW(NULL, (LPWSTR)command, NULL, NULL, FALSE, 0,
+							NULL, NULL, &si, &pi);
+	if (r == 0) {
+		// error
+		return GetLastError();
+	}
+
+	CloseHandle(pi.hThread);
+	CloseHandle(pi.hProcess);
+	return NO_ERROR;
+}
