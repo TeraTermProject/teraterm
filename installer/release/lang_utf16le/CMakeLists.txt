@@ -1,7 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.11)
 
-set(PACKAGE_NAME "lang_utf16le")
-project(${PACKAGE_NAME})
+project("lang_utf16le")
 
 if(NOT DEFINED BINARY_DIR)
   MESSAGE(FATAL_ERROR "check BINARY_DIR")
@@ -50,7 +49,7 @@ ConvertLNG("it_IT.lng" utf16le)
 ConvertLNG("tr_TR.lng" utf16le)
 
 add_custom_target(
-  ${PACKAGE_NAME} ALL
+  ${PROJECT_NAME} ALL
   DEPENDS ${CONVERTED_FILES}
   SOURCES ${SRC_FILES}
   SOURCES ${SCRIPT}

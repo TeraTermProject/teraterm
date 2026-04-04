@@ -1,7 +1,6 @@
-cmake_minimum_required(VERSION 3.11)
+﻿cmake_minimum_required(VERSION 3.11)
 
-set(PACKAGE_NAME "lang")
-project(${PACKAGE_NAME})
+project("lang")
 
 if(NOT DEFINED BINARY_DIR)
   MESSAGE(FATAL_ERROR "check BINARY_DIR")
@@ -50,7 +49,7 @@ ConvertLNG("it_IT.lng" cp1252)
 ConvertLNG("tr_TR.lng" cp1254)
 
 add_custom_target(
-  ${PACKAGE_NAME} ALL
+  ${PROJECT_NAME} ALL
   DEPENDS ${CONVERTED_FILES}
   SOURCES ${SRC_FILES}
   SOURCES ${SCRIPT}

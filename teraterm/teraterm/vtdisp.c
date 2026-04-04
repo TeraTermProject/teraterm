@@ -55,6 +55,7 @@
 #if ENABLE_GDIPLUS
 #include "ttgdiplus.h"
 #endif
+#include "bitmap.h"
 
 #include "theme.h"
 #include "vtdisp.h"
@@ -329,81 +330,17 @@ static void FillBitmapDC(HDC hdc,COLORREF color)
   DeleteObject(hBrush);
 }
 
-static void DebugSaveFile(const wchar_t* fname, HDC hdc, int width, int height)
+static void DebugSaveFile(const wchar_t *fname, HDC hDC, int width, int height)
 {
-#if 1
-	(void)fname;
-	(void)hdc;
 	(void)width;
 	(void)height;
+#if 1
+	(void)fname;
+	(void)hDC;
 #else
-	if (IsRelativePathW(fname)) {
-		wchar_t *desktop;
-		wchar_t *bmpfile;
-		_SHGetKnownFolderPath(&FOLDERID_Desktop, KF_FLAG_CREATE, NULL, &desktop);
-		bmpfile = NULL;
-		awcscats(&bmpfile, desktop, L"\\", fname, NULL);
-		free(desktop);
-		SaveBmpFromHDC(bmpfile, hdc, width, height);
-		free(bmpfile);
-	}
-	else {
-		SaveBmpFromHDC(fname, hdc, width, height);
-	}
+	SaveBmpFromHDC(hDC, fname);
 #endif
 }
-
-/**
- *	BMP保存、デバグに使うかもしれないので残しておく
- */
-#if 0
-static BOOL SaveBitmapFile(const char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
-{
-  int    bmiSize;
-  DWORD  writtenByte;
-  HANDLE hFile;
-  BITMAPFILEHEADER bfh;
-
-  hFile = CreateFile(nameFile,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
-
-  if(hFile == INVALID_HANDLE_VALUE)
-    return FALSE;
-
-  bmiSize = pbmi->bmiHeader.biSize;
-
-  switch(pbmi->bmiHeader.biBitCount)
-  {
-    case 1:
-      bmiSize += pbmi->bmiHeader.biClrUsed ? sizeof(RGBQUAD) * 2 : 0;
-      break;
-
-    case 2 :
-      bmiSize += sizeof(RGBQUAD) * 4;
-      break;
-
-    case 4 :
-      bmiSize += sizeof(RGBQUAD) * 16;
-      break;
-
-    case 8 :
-      bmiSize += sizeof(RGBQUAD) * 256;
-      break;
-  }
-
-  ZeroMemory(&bfh,sizeof(bfh));
-  bfh.bfType    = MAKEWORD('B','M');
-  bfh.bfOffBits = sizeof(bfh) + bmiSize;
-  bfh.bfSize    = bfh.bfOffBits + pbmi->bmiHeader.biSizeImage;
-
-  WriteFile(hFile,&bfh,sizeof(bfh)                ,&writtenByte,0);
-  WriteFile(hFile,pbmi,bmiSize                    ,&writtenByte,0);
-  WriteFile(hFile,pbuf,pbmi->bmiHeader.biSizeImage,&writtenByte,0);
-
-  CloseHandle(hFile);
-
-  return TRUE;
-}
-#endif
 
 static HBITMAP CreateBitmapFromBITMAPINFO(const BITMAPINFO *pbmi, const unsigned char *pbuf)
 {
@@ -587,7 +524,7 @@ static HBITMAP GetBitmapHandleW(const wchar_t *File)
 	HBITMAP hBitmap = NULL;
 	HRESULT result;
 
-	hFile=CreateFileW(File,GENERIC_READ,0,NULL,OPEN_EXISTING,0,NULL);
+	hFile = CreateFileW(File, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return NULL;
 	}
@@ -853,8 +790,8 @@ static void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int he
 	if(!hdcDest || !src)
 		return;
 
-	if(bAntiAlias)
-	{
+	if(bAntiAlias || !IsWindowsNTKernel())
+	{	// SetStretchBltMode(HALFTONE) は 95,98,Meではサポートされていない
 		if(src->width != width || src->height != height)
 		{
 			HBITMAP hbm;
@@ -880,7 +817,8 @@ static void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int he
 
 		BitBlt(hdcDest,x,y,width,height,src->hdc,0,0,SRCCOPY);
 	}else{
-		SetStretchBltMode(src->hdc,COLORONCOLOR);
+		SetStretchBltMode(hdcDest, HALFTONE);	// 写真画像は HALFTONE で処理するほうが自然に拡縮できる
+		SetBrushOrgEx(hdcDest, 0, 0, NULL);		// HALFTONE モードを設定後 SetBrushOrgEx() する必要あり
 		StretchBlt(hdcDest,x,y,width,height,src->hdc,0,0,src->width,src->height,SRCCOPY);
 	}
 }
@@ -2906,7 +2844,7 @@ static void DrawChar(vtdraw_t *vt, ttdc_t *dc, HDC BGDC, int x, int y, const wch
 		ExtTextOutW(cell_dc, 0, 0, ETO_OPAQUE, &rect, L"", 0, 0);	// 背景色で塗りつぶし
 
 		// cell_dcに文字を描画
-		SetStretchBltMode(hDC, COLORONCOLOR);
+		SetStretchBltMode(cell_dc, COLORONCOLOR);
 		pTransparentBlt(cell_dc, ts.FontDX * cell, ts.FontDY, vt->FontWidth * cell, vt->FontHeight, char_dc, 0, 0, char_size.cx,
 						char_size.cy, GetBkColor(hDC));
 
@@ -2923,7 +2861,7 @@ static void DrawChar(vtdraw_t *vt, ttdc_t *dc, HDC BGDC, int x, int y, const wch
 		DrawTextBGImage(BGDC, x, y, cell_width, cell_height, BackColor, dc->DCBackAlpha);
 
 		// BGDCに文字を描画
-		SetStretchBltMode(hDC, COLORONCOLOR);
+		SetStretchBltMode(BGDC, COLORONCOLOR);
 		pTransparentBlt(BGDC, ts.FontDX * cell, ts.FontDY, vt->FontWidth * cell, vt->FontHeight, char_dc, 0, 0,
 						char_size.cx, char_size.cy, GetBkColor(hDC));
 
@@ -3993,12 +3931,12 @@ void ThemeGetBGDefault(BGTheme *bg_theme)
 	bg_theme->BGSrc2.pattern = BG_STRETCH;
 	bg_theme->BGSrc2.color = RGB(0, 0, 0);
 	bg_theme->BGSrc2.antiAlias = TRUE;
-	bg_theme->BGSrc2.alpha = 0;
+	bg_theme->BGSrc2.alpha = 128;
 	bg_theme->BGSrc2.file[0] = 0;
 
 	bg_theme->BGReverseTextAlpha = 255;
-	bg_theme->TextBackAlpha = 255;
-	bg_theme->BackAlpha = 255;
+	bg_theme->TextBackAlpha = 0;
+	bg_theme->BackAlpha = 0;
 }
 
 #if 0

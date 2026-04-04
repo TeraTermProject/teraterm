@@ -35,23 +35,44 @@
 
 <h3 id="teraterm_5.7.0">YYYY.MM.DD (Ver 5.7.0 not released yet)</h3>
 <ul class="history">
-  <!--li>Changes
+  <li>Changes
     <ul>
       <li>
+        Added a Submit key option to the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> that allows users to select the key operation used to send commands in non-real-time mode.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1158" target="_blank">issue #1158</a>)<br>
+        Since the size of the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> had increased, it was modified so that it can now be resized to smaller than its initial size.
+      </li>
+      <li>
+        Improved the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> so that it no longer becomes distorted when moved between displays with different DPI settings.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1180" target="_blank">issue #1180</a>)<br>
+      </li>
+      <li>
+        Selection is extended when Shift+left-clicking to the left of or above the current selection.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        Previously, clicking in that area would create a new selection from the clicked position to the start of the existing selection.
+      </li>
+      <li>
+        Selection is reduced such that, when Shift+left-clicking within it, the portion farther from the center than the click position is deselected.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        Previously, clicking anywhere within the selection would shrink the selection to span from the start of the existing selection to the clicked position.
       </li>
     </ul>
-  </li-->
+  </li>
 
-  <!li>Bug fixes
+  <li>Bug fixes
     <ul>
       <li>
-        Fixed an issue where Tera Term crashes when <a href="../menu/setup-additional-window.html#HideTitle">Hide title bar is on</a>.
+        Fixed an issue where Tera Term crashes at startup when <a href="../menu/setup-additional-window.html#HideTitle">Hide title bar</a> is on.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1168" target="_blank">issue #1168</a>)
       </li>
       <li>
         Fixed an issue where the newline code specified by the Enter key in the <a href="../menu/control-broadcast.html">Broadcast command</a> dialog was not sent as-is.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1178" target="_blank">issue #1178</a>)<br>
         (Previously, it was converted according to the <a href="../menu/setup-additional-terminal.html#CRSend">New-line (Transmit) setting in "Setup &gt; Terminal"</a>.)
+      </li>
+      <li>
+        Fixed an issue where colors in image set as Tera Term background were incorrect.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1159" target="_blank">issue #1159</a>)
       </li>
     </ul>
   </li>
@@ -6319,6 +6340,10 @@ SYNOPSIS:
         Fixed an issue in the "List Configuration" dialog where "Use SSH" became enabled when "specified macro file" or "launch only" was selected.
         This bug was introduced in 1.18.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1169" target="_blank">issue #1169</a>)
+      </li>
+      <li>
+        Fixed a bug where an invalid free() occurred when a filename starting with '"' was entered in the file name box and opening and then closing the file selection dialog.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1176" target="_blank">issue #1176</a>)
       </li>
 </ul>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020- TeraTerm Project
+ * Copyright (C) 2026- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// vtwinから分離
 #pragma once
 
 #include <windows.h>
@@ -35,13 +34,9 @@
 extern "C" {
 #endif
 
-void SendBroadcastMessage(HWND HVTWin, HWND hWnd, const wchar_t *buf);
-void SendMulticastMessage(HWND HVTWin, HWND hWnd, const wchar_t *name, const wchar_t *buf);
-void SetMulticastName(const wchar_t *name);
-BOOL BroadCastReceive(const COPYDATASTRUCT *cds);
-void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd);
-void UpdateBroadcastNewlineCode(int CRSend);
-BOOL HandleBroadcastEditMessage(LPMSG msg);
+BOOL SaveBmpFromBmi(const BITMAPINFO *pbmi, const unsigned char *pbuf, const char *filename);
+BOOL SaveBmpFromHBitmap(HBITMAP hBitmap, const wchar_t *filename);
+BOOL SaveBmpFromHDC(HDC hdc, const wchar_t* filename);
 
 #ifdef __cplusplus
 }
