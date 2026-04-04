@@ -9,6 +9,8 @@ add_library(
   ../teraterm/unicode.h
   asprintf.cpp
   asprintf.h
+  bitmap.cpp
+  bitmap.h
   codeconv.cpp
   codeconv.h
   codeconv_mb.cpp
