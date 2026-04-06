@@ -37,31 +37,39 @@
 extern "C" {
 #endif
 
-typedef enum _BG_TYPE { BG_COLOR = 0, BG_PICTURE, BG_WALLPAPER, BG_NONE } BG_TYPE;
+typedef enum _BG_TYPE {
+	BG_COLOR = 0,
+	BG_PICTURE,
+	BG_WALLPAPER,
+	BG_NONE
+} BG_TYPE;
+
 typedef enum _BG_PATTERN {
-	BG_STRETCH = 0,
-	BG_TILE,
-	BG_CENTER,
+	BG_STRETCH = 0,		// Stretch(画面に合わせて伸縮) アスペクト比は無視される
+	BG_TILE,			// 左上からタイル状に並べる
+	BG_CENTER,			// 中央に表示
 	BG_FIT_WIDTH,
 	BG_FIT_HEIGHT,
-	BG_AUTOFIT,
-	BG_AUTOFILL
+	BG_AUTOFIT,			// アスペクト比を維持して、はみ出してでも最大表示する
+	BG_AUTOFILL			// アスペクト比を維持して、はみ出さないように最大表示する
 } BG_PATTERN;
 
 typedef struct {
 	BG_TYPE type;
-	BG_PATTERN pattern;
-	BOOL enable;
-	BOOL antiAlias;
-	COLORREF color;		// type=BG_PICTURE, BG_WALLPAPER時、画像のない部分塗りつぶし色
+	BOOL enable;				// TRUE=この要素を利用する
 	int alpha;
-	wchar_t file[MAX_PATH];
+	// type=BG_PICTURE時参照
+	BOOL antiAlias;				// TRUE=自前実装拡大縮小を使用
+	// type=BG_PICTURE, BG_WALLPAPER時参照
+	BG_PATTERN pattern;			// 画像の表示方法
+	COLORREF color;				// 画像のない部分塗りつぶし色
+	wchar_t file[MAX_PATH];		// 画像ファイル名
 } TBGSrc;
 
 typedef struct _BGTheme {
-	TBGSrc BGDest;				// 背景画像
-	TBGSrc BGSrc1;				// 壁紙(Windowsのデスクトップ背景)
-	TBGSrc BGSrc2;				// fill color
+	TBGSrc BGDest;				// 背景画像 (type = BG_PICTURE)
+	TBGSrc BGSrc1;				// 壁紙(Windowsのデスクトップ背景, type = BG_WALLPAPER)
+	TBGSrc BGSrc2;				// fill color (type = BG_COLOR)
 	BYTE TextBackAlpha;			// 通常属性(SGR0),back部分のAlpha
 	BYTE BGReverseTextAlpha;	// 反転属性(SGR7),back部分のAlpha
 	BYTE BackAlpha;				// その他のback部分のAlpha

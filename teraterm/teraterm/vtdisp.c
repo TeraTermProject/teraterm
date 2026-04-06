@@ -196,7 +196,7 @@ static HDC hdcBG;
 typedef struct tagWallpaperInfo
 {
 	wchar_t *filename;
-	int  pattern;
+	BG_PATTERN pattern;
 } WallpaperInfo;
 
 static BOOL (WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
@@ -544,18 +544,16 @@ static void BGGetWallpaperInfo(WallpaperInfo *wi)
 		wi->pattern = BG_TILE;
 	else {
 		switch (style) {
-		case 0: // Center(中央に表示)
+		case 0:
 			wi->pattern = BG_CENTER;
 			break;
-		case 2: // Stretch(画面に合わせて伸縮) アスペクト比は無視される
+		case 2:
 			wi->pattern = BG_STRETCH;
 			break;
-		case 10: // Fill(ページ横幅に合わせる) とあるが、和訳がおかしい
-			// アスペクト比を維持して、はみ出してでも最大表示する
+		case 10:
 			wi->pattern = BG_AUTOFILL;
 			break;
-		case 6: // Fit(ページ縦幅に合わせる) とあるが、和訳がおかしい
-			// アスペクト比を維持して、はみ出さないように最大表示する
+		case 6:
 			wi->pattern = BG_AUTOFIT;
 			break;
 		}
@@ -885,59 +883,72 @@ static void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int he
 	}
 }
 
-static void BGLoadPicture(vtdraw_t *vt, HDC hdcDest,BGSrc *src)
+static void BGLoadPicture(const vtdraw_t *vt, HDC hdcDest, BGSrc *src)
 {
-  int x,y,width,height,pattern;
+	int x, y, width, height;
+	BG_PATTERN pattern;
 
-  FillBitmapDC(hdcDest,src->color);
+	FillBitmapDC(hdcDest, src->color);
 
-  if(!src->height || !src->width)
-    return;
+	if (!src->height || !src->width) {
+		return;
+	}
 
-  if(src->pattern == BG_AUTOFIT){
-    if((src->height * vt->ScreenWidth) > (vt->ScreenHeight * src->width))
-      pattern = BG_FIT_WIDTH;
-    else
-      pattern = BG_FIT_HEIGHT;
-  }else{
-    pattern = src->pattern;
-  }
+	if (src->pattern == BG_AUTOFIT) {
+		if ((src->height * vt->ScreenWidth) > (vt->ScreenHeight * src->width)) {
+			pattern = BG_FIT_WIDTH;
+		}
+		else {
+			pattern = BG_FIT_HEIGHT;
+		}
+	}
+	else if (src->pattern == BG_AUTOFILL) {
+		if ((src->height * vt->ScreenWidth) > (vt->ScreenHeight * src->width)) {
+			pattern = BG_FIT_HEIGHT;
+		}
+		else {
+			pattern = BG_FIT_WIDTH;
+		}
+	}
+	else {
+		pattern = src->pattern;
+	}
 
-  switch(pattern)
-  {
-    case BG_STRETCH :
-      BGStretchPicture(hdcDest,src,0,0,vt->ScreenWidth,vt->ScreenHeight,src->antiAlias);
-      break;
+	switch (pattern) {
+		case BG_STRETCH:
+		default:
+			assert(pattern == BG_STRETCH);
+			BGStretchPicture(hdcDest, src, 0, 0, vt->ScreenWidth, vt->ScreenHeight, src->antiAlias);
+			break;
 
-    case BG_FIT_WIDTH :
+		case BG_FIT_WIDTH:
+			height = (src->height * vt->ScreenWidth) / src->width;
+			y = (vt->ScreenHeight - height) / 2;
 
-      height = (src->height * vt->ScreenWidth) / src->width;
-      y      = (vt->ScreenHeight - height) / 2;
+			BGStretchPicture(hdcDest, src, 0, y, vt->ScreenWidth, height, src->antiAlias);
+			break;
 
-      BGStretchPicture(hdcDest,src,0,y,vt->ScreenWidth,height,src->antiAlias);
-      break;
+		case BG_FIT_HEIGHT:
+			width = (src->width * vt->ScreenHeight) / src->height;
+			x = (vt->ScreenWidth - width) / 2;
 
-    case BG_FIT_HEIGHT :
+			BGStretchPicture(hdcDest, src, x, 0, width, vt->ScreenHeight, src->antiAlias);
+			break;
 
-      width = (src->width * vt->ScreenHeight) / src->height;
-      x     = (vt->ScreenWidth - width) / 2;
+		case BG_TILE:
+			for (x = 0; x < vt->ScreenWidth; x += src->width)
+				for (y = 0; y < vt->ScreenHeight; y += src->height)
+					BitBlt(hdcDest, x, y, src->width, src->height, src->hdc, 0, 0, SRCCOPY);
+			break;
 
-      BGStretchPicture(hdcDest,src,x,0,width,vt->ScreenHeight,src->antiAlias);
-      break;
+		case BG_CENTER:
+			x = (vt->ScreenWidth - src->width) / 2;
+			y = (vt->ScreenHeight - src->height) / 2;
 
-    case BG_TILE :
-      for(x = 0;x < vt->ScreenWidth ;x += src->width )
-      for(y = 0;y < vt->ScreenHeight;y += src->height)
-        BitBlt(hdcDest,x,y,src->width,src->height,src->hdc,0,0,SRCCOPY);
-      break;
+			BitBlt(hdcDest, x, y, src->width, src->height, src->hdc, 0, 0, SRCCOPY);
+			break;
 
-    case BG_CENTER :
-      x = (vt->ScreenWidth  -  src->width) / 2;
-      y = (vt->ScreenHeight - src->height) / 2;
-
-      BitBlt(hdcDest,x,y,src->width,src->height,src->hdc,0,0,SRCCOPY);
-      break;
-  }
+	}
 }
 
 typedef struct tagLoadWallpaperStruct
