@@ -359,23 +359,25 @@ void ThemeSaveBG(const BGTheme *bg_theme, const wchar_t *file)
 {
 	const wchar_t *section = BG_SECTION_NEW;
 
+	// Tera Term 壁紙
 	WritePrivateProfileIntW(section, L"BGDestEnable", bg_theme->BGDest.enable, file);
 	WritePrivateProfileStringW(section, L"BGDestFile", bg_theme->BGDest.file, file);
-#if 0
-	WritePrivateProfileStringW(section, L"BGDestType",
-									bg_theme->BGDest.type == BG_PICTURE ? "picture" : "color", file);
-#endif
 	WriteCOLORREF(section, L"BGDestColor", file, bg_theme->BGDest.color);
 	WritePrivateProfileStringW(section, L"BGDestPattern", GetBGPatternStr(bg_theme->BGDest.pattern), file);
 	WritePrivateProfileIntW(section, L"BGDestAlpha", bg_theme->BGDest.alpha, file);
+	WritePrivateProfileIntW(section, L"BGDestAntiAlias", bg_theme->BGDest.antiAlias, file);
 
+	// Windows Desktop 壁紙
 	WritePrivateProfileIntW(section, L"BGSrc1Enable", bg_theme->BGSrc1.enable, file);
 	WritePrivateProfileIntW(section, L"BGSrc1Alpha", bg_theme->BGSrc1.alpha, file);
+	WritePrivateProfileIntW(section, L"BGSrc1AntiAlias", bg_theme->BGSrc1.antiAlias, file);
 
+	// Simple color plane
 	WritePrivateProfileIntW(section, L"BGSrc2Enable", bg_theme->BGSrc2.enable, file);
 	WritePrivateProfileIntW(section, L"BGSrc2Alpha", bg_theme->BGSrc2.alpha, file);
 	WriteCOLORREF(section, L"BGSrc2Color", file, bg_theme->BGSrc2.color);
 
+	// 文字 背景画像透過
 	WritePrivateProfileIntW(section, L"BGReverseTextAlpha", bg_theme->BGReverseTextAlpha, file);
 	WritePrivateProfileIntW(section, L"BGTextBackAlpha", bg_theme->TextBackAlpha, file);
 	WritePrivateProfileIntW(section, L"BGBackAlpha", bg_theme->BackAlpha, file);
@@ -456,7 +458,7 @@ static void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTh
 	}
 
 	// Src1 の読み出し
-	bg_theme->BGSrc1.enable = GetPrivateProfileIntW(section, L"BGSrc1Enable", 0, file);
+	bg_theme->BGSrc1.enable = GetPrivateProfileIntW(section, L"BGSrc1Enable", bg_theme->BGSrc1.enable, file);
 	bg_theme->BGSrc1.type = BGGetType(section, L"BGSrc1Type", bg_theme->BGSrc1.type, file);
 	bg_theme->BGSrc1.pattern = BGGetPattern(section, L"BGSrc1Pattern", bg_theme->BGSrc1.pattern, file);
 	bg_theme->BGSrc1.antiAlias = BGGetOnOff(section, L"BGSrc1AntiAlias", bg_theme->BGSrc1.antiAlias, file);
@@ -474,7 +476,7 @@ static void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTh
 	}
 
 	// Src2 の読み出し
-	bg_theme->BGSrc2.enable = GetPrivateProfileIntW(section, L"BGSrc2Enable", 0, file);
+	bg_theme->BGSrc2.enable = GetPrivateProfileIntW(section, L"BGSrc2Enable", bg_theme->BGSrc2.enable, file);
 	bg_theme->BGSrc2.type = BGGetType(section, L"BGSrc2Type", bg_theme->BGSrc2.type, file);
 	bg_theme->BGSrc2.pattern = BGGetPattern(section, L"BGSrc2Pattern", bg_theme->BGSrc2.pattern, file);
 	bg_theme->BGSrc2.antiAlias = BGGetOnOff(section, L"BGSrc2AntiAlias", bg_theme->BGSrc2.antiAlias, file);
@@ -499,12 +501,40 @@ static void ThemeLoadBGSection(const wchar_t *section, const wchar_t *file, BGTh
 	bg_theme->BackAlpha = (BYTE)GetPrivateProfileIntW(section, L"BGBackAlpha", bg_theme->BackAlpha, file);
 }
 
+static BOOL IsExistsSection(const wchar_t *file, const wchar_t *section)
+{
+	wchar_t sections[128];
+	GetPrivateProfileSectionNamesW(sections, _countof(sections), file);
+	for(size_t i = 0; i < _countof(sections); /**/ ) {
+		const wchar_t *p = &sections[i];
+		size_t len = wcslen(p);
+		if (len == 0) {
+			break;
+		}
+		if (_wcsicmp(p, section) == 0) {
+			return TRUE;
+		}
+		i += len + 1;
+	}
+	return FALSE;
+}
+
 /**
  *	BGをロード
  */
 static void ThemeLoadBG(const wchar_t *file, BGTheme *bg_theme)
 {
-	ThemeLoadBGSection(BG_SECTION_OLD, file, bg_theme);
+	if (IsExistsSection(file, BG_SECTION_OLD)) {
+		// 古いファイル("BG"セクション)には "BG*Enable" キーが含まれていない
+		// "BG*Enable=1"がdefaultの動作
+		bg_theme->BGDest.enable = TRUE;
+		bg_theme->BGSrc1.enable = TRUE;
+		bg_theme->BGSrc2.enable = TRUE;
+
+		// ファイルを読む
+		//   BG*Enable=0 の指定があれば従う
+		ThemeLoadBGSection(BG_SECTION_OLD, file, bg_theme);
+	}
 	ThemeLoadBGSection(BG_SECTION_NEW, file, bg_theme);
 }
 
