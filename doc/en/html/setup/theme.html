@@ -25,7 +25,9 @@
 
   <h2 id="themefile">About theme file</h2>
 
-  There are several types of theme file.
+  <p>
+    There are several types of theme file.
+  </p>
 
   <dl>
     <dt>BG(Backgroup) theme</dt>
@@ -46,21 +48,56 @@
     </dd>
   </dl>
 
-  BG (background) themes and color themes may be saved in separate files,
-  also save both in one file.
+  <p>
+    BG (background) themes and color themes may be saved in separate files,
+    also save both in one file.
+  </p>
 
-  File format is Windows ini file.
+  <p>
+    File format is Windows ini file.
+  </p>
 
   <h2 id="BGTheme">BG(Background) theme</h2>
 
   <h3>section</h3>
 
-  "BG theme"<br>
+  <p>
+    "BG theme"
+  </p>
 
-  The "BG" section can also be read (but will be deprecated).
-  If both are present, "BG theme" has priority.
+  <p>
+    The "BG" section can also be read (but will be deprecated).
+    If both are present, "BG theme" has priority.
 
+  <h4>Simple color plane</h4>
+  <p>
+    simple one color plane.
+  </p>
   <dl>
+    <dt>BGSrc2Enable</dt>
+    <dd>
+      Use Simple color plane (1) / Do not use (0)
+    </dd>
+
+    <dt>BGSrc2Color</dt>
+    <dd>
+      plane color
+    </dd>
+
+    <dt>BGSrc2Alpha</dt>
+    <dd>
+      Alphablend value<br>
+      How much solid color (Src2) to blend with the composite image of Dest and Src1
+    </dd>
+  </dl>
+
+  <h4>Background Image</h4>
+  <dl>
+    <dt>BGDestEnable</dt>
+    <dd>
+      Use Background Image (1) / Do not use (0)
+    </dd>
+
     <dt>BGDestColor</dt>
     <dd>
       If no background image is used, it will be filled with this color.<br>
@@ -79,40 +116,57 @@
     <dt>BGDestPattern</dt>
     <dd>Background pattern
       <dl>
-          <dt>stretch</dt>
-          <dt>tile</dt>
-          <dt>center</dt>
-          <dt>fit_width</dt>
-          <dt>fit_height</dt>
-          <dt>autofit</dt>
-          <dt>autofill</dt>
-          <dd>
-            FitWidth, FitHeight resizes image with aspect ratio maintained.<br>
-            AutoFit switches between FitWidth and FitHeight to adjust window and image size
-            to avoid gaps.
-          </dd>
+        <dt>stretch</dt>
+        <dd>
+          Stretch image to fit the window.
+        </dd>
+        <dt>tile</dt>
+        <dd>
+          Tile image starting from the top-left corner of the window.
+        </dd>
+        <dt>center</dt>
+        <dd>
+          Display image in center of the window.
+        </dd>
+        <dt>fit_width</dt>
+        <dd>
+          Scale image to match the window width while maintaining aspect ratio.
+        </dd>
+        <dt>fit_height</dt>
+        <dd>
+          Scale image to match the window height while maintaining aspect ratio.
+        </dd>
+        <dt>autofit</dt>
+        <dd>
+          Maintain aspect ratio and display at maximum size without overflow.
+        </dd>
+        <dt>autofill</dt>
+        <dd>
+          Maintain aspect ratio and display at maximum size even if it overflows.
+        </dd>
       </dl>
     </dd>
 
-    <dt>BGSrc1Alpha</dt>
+    <dt>BGDestAlpha</dt>
     <dd>
       Alphablend the wallpaper image in Windows.<br>
       This value to alpha blend value the desktop image (Src1) onto the background image (Dest).<br>
       When value is 0, the wallpaper will not be blended.
     </dd>
+  </dl>
 
+  <h4>Desktop wallpaper image</h4>
 
-    <dt>BGSrc2Color</dt>
+  <dl>
+    <dt>BGSrc1Enable</dt>
     <dd>
-      The color to alpha-blend entire background image.
+      Use desktop image (1) / Do not use (0)
     </dd>
+  </dl>
 
-    <dt>BGSrc2Alpha</dt>
-    <dd>
-      Alphablend value<br>
-      How much to blend a solid color (Src2) onto the image of Dest and Src1.
-    </dd>
+  <h4>Background image alpha</h4>
 
+  <dl>
     <dt>BGTextBackAlpha</dt>
     <dd>
       0 - 255<br>
@@ -136,7 +190,9 @@
 
   <h3>section</h3>
 
-  "Color Theme"
+  <p>
+    "Color Theme"
+  </p>
 
   <h3>name</h3>
 
