@@ -46,6 +46,16 @@
         <a href="../menu/control-broadcast.html">ブロードキャストコマンドダイアログ</a>が DPI 設定の異なるディスプレイ間を移動しても表示が崩れないようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1180" target="_blank">issue #1180</a>)<br>
       </li>
+      <li>
+        選択領域より左または上の位置で Shift+左クリック したとき、選択領域が拡張されるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        以前はクリックした位置から既存の選択領域の先頭までが選択領域になった。
+      </li>
+      <li>
+        選択領域の中で Shift+左ボタン をクリックしたとき、選択領域の中心から見てクリック位置より外側の選択が解除されるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        以前は選択領域内のどこをクリックしても、既存の選択領域の先頭からクリックした位置までが選択領域になった。
+      </li>
     </ul>
   </li>
 
@@ -54,6 +64,15 @@
       <li>
         <a href="../menu/setup-additional-window.html#HideTitle">Hide title bar</a> が on の時、起動時にクラッシュする問題を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1168" target="_blank">issue #1168</a>)
+      </li>
+      <li>
+        <a href="../menu/control-broadcast.html">Broadcast command</a> ダイアログの Enter key で指定した改行コードがそのまま送信されない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1178" target="_blank">issue #1178</a>)<br>
+        (以前は、<a href="../menu/setup-additional-terminal.html#CRSend">"Setup &gt; Teminal" の New-line (Transmit)</a> の設定により改行コードが変換されていた)
+      </li>
+      <li>
+        Tera Termの背景に設定した画像の色が不自然になる不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1159" target="_blank">issue #1159</a>)
       </li>
       <li>
         古いテーマファイルが正しく読み込まれない問題を修正した。

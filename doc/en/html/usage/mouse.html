@@ -1,232 +1,300 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
   "http://www.w3.org/TR/html4/strict.dtd">
-<HTML>
-<HEAD>
+<html>
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<TITLE>Mouse</TITLE>
-<META http-equiv="Content-Style-Type" content="text/css">
+<title>Mouse</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
-</HEAD>
-<BODY>
+</head>
+<body>
 
 <h1>Mouse</h1>
 
-<h2>
-VT window
-</h2>
+<h2>VT window</h2>
+
+<h3>Left button</h3>
 
 <dl>
-<dt>Mouse wheel</dt>
-<dd>This package supports mouse wheel button. Also, a user can send cursor key sequences as the mouse wheel rotating when the application cursor mode is enabled by starting vi or less command.</dd>
+  <dt id="LClick">Clicking the left button</dt>
+  <dd>
+    The click position will be starting point for the selection area when <a href="#Shift_LClick">Shift+Left Clicked</a>.<br>
+    Any existing selection area will be canceled.<br>
+    If "<a href="../menu/setup-additional-copy-and-paste.html#SelectOnActivate">Enabling text selection when the window is activated by mouse</a>" is ON, the button operation used to activate the window will be disabled.
+  </dd>
 
-<dt>Mouse wheel on title bar</dt>
-<dd>The value of transparency can be temporarily changed by moving the mouse wheel on the title bar (NOTE: This value can not be recorded).<br />
-    When active status of the window is changed, <a href="../menu/setup-additional-visual.html#AlphaBlendActive">the value of transparency</a> switches to set value.</dd>
+  <dt id="Shift_LClick">Shift + Left click</dt>
+  <dd>
+    If no selection area exists, the area from <a href="#LClick">Left Click</a> position to current position will be selected.<br>
+    If a selection area already exists, you can stretch or shrink the selected text area.<br>
+    When "<a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a>" is ON, the selected text will be copied to the clipboard.
+  </dd>
 
-<dt>Dragging with the left button</dt>
-<dd>Selects text.<br>
-  Depending <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">setting</a>, Selected text is copied to the clipboard.</dd>
+  <dt id="LClick_Drag">Dragging with the left button</dt>
+  <dd>
+    Selects by character.<br>
+    When "<a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a>" is ON, the selected text will be copied to the clipboard.
+  </dd>
 
-<dt>Dragging with the left button while pressing the Alt key</dt>
-<dd>Selects text in a rectangular region of the screen.<br>
-  Depending <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">setting</a>, Selected text is copied to the clipboard.</dd>
+  <dt id="Alt_LClick_Drag">Dragging with the left button while pressing the Alt key</dt>
+  <dd>
+    Selects text in a rectangular region of the screen.<br>
+    When "<a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a>" is ON, the selected text will be copied to the clipboard.
+  </dd>
 
-<dt>Double clicking the left button</dt>
-<dd>Selects a word.<br>
-  Depending <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">setting</a>, Selected text is copied to the clipboard.<br>
-  Word delimiter characters are specified by <a href="../menu/setup-additional-copy-and-paste.html#DelimiterChar">Delimiter characters</a> setting.<br>
-  (ref <a href="../setup/teraterm-win.html#delimiter">DelimDBCS</a>)
-</dd>
+  <dt id="LDblclick">Double clicking the left button</dt>
+  <dd>
+    Selects by word.<br>
+    When "<a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a>" is ON, the selected text will be copied to the clipboard.<br>
+    Word delimiter characters are specified by <a href="../menu/setup-additional-copy-and-paste.html#DelimiterChar">Delimiter characters</a> setting.<br>
+    When <a href="../setup/teraterm-win.html#delimiter">DelimDBCS</a> is ON,
+    the boundary between 1-cell and characters displayed in 2 or more cells (such as Kanji or Emojis) is treated as a delimiter.
+  </dd>
 
-<dt>Triple clicking the left button</dt>
-<dd>Selects a line,<br>
-  Depending <a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">setting</a>, Selected text is copied to the clipboard.</dd>
+  <dt id="LDblclick_Drag">Double clicking the left button and dragging (hold the left button on the second click)</dt>
+  <dd>
+    The selected text area can be expanded or shrunk by word.<br>
+    When "<a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a>" is ON, the selected text will be copied to the clipboard.
+  </dd>
 
-<dt>Left click , then Shift + Left click</dt>
-<dd>Select several pages of output from Tera Term window, and stretch or shrink the selected text area.
-The first click is the start position and the next Shift+click is the end position.
-</dd>
+  <dt id="LTripleclick">Triple clicking the left button</dt>
+  <dd>
+    Selects a line,<br>
+    When "<a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a>" is ON, the selected text will be copied to the clipboard.<br>
+  </dd>
 
-<dt>Dragging with the right button</dt>
-<dd>Selects text, copies it to the clipboard, and then sends it to the host.<br>
-    It is effective when both <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> and <a href="../menu/setup-additional.html">SelectOnlyByLButton</a> are disabled.</dd>
+  <dt id="LTripleclick_Drag">Triple clicking the left button and dragging (hold the left button on the third click)</dt>
+  <dd>
+    The selection area can be expanded or shrunk by line.<br>
+    When "<a href="../menu/setup-additional-copy-and-paste.html#AutoTextCopy">Copy to windows clipboard when text is selected</a>" is ON, the selected text will be copied to the clipboard.<br>
+  </dd>
 
-<dt>Clicking the right button</dt>
-<dd>Sends text in the clipboard to the host.<br>
-    It is effective when <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> is disabled.</dd>
+  <dt id="Titlebar_LDblclick">Double clicking the left button on the title bar</dt>
+  <dd>
+    The behaviour is changed according to the <a href="../menu/setup-additional-terminal.html#TermIsWin">"Term size = win size"</a> setting.
+    <dl>
+      <dt>On</dt>
+      <dd>Maximize window. If the window is already maximized, restore to the original size.</dd>
 
-<dt>Clicking the middle button</dt>
-<dd>Sends text in the clipboard to the host.<br>
-    It is effective when <a href="../setup/teraterm-misc.html#DisablePasteMouseMButton">DisableMouseMButtonPaste</a> is disabled.</dd>
+      <dt>Off</dt>
+      <dd>If the window size (real screen size) is not equal to the terminal size (logical size of the terminal), resizes the window to the terminal size. A further double clicking restores the original window size.</dd>
+    </dl>
+  </dd>
 
-<dt>Double clicking the left button on the title bar</dt>
-<dd>
-  <dl>The behaviour is changed according to the <a href="../menu/setup-additional-terminal.html#TermIsWin">"Term size = win size"</a> setting.
-    <dt>On</dt>
-    <dd>Maximize window. If the window is already maximized, restore to the original size.</dd>
+  <dt>Clicking the left button while pressing the Ctrl key</dt>
+  <dd>
+    If the menu bar is hidden, the pop-up menu appears.<br>
+    To hide the menu bar, check the Hide menu bar option in the <A HREF="../menu/setup-window.html">[Setup] Window</A> dialog box.
+  </dd>
 
-    <dt>Off</dt>
-    <dd>If the window size (real screen size) is not equal to the terminal size (logical size of the terminal), resizes the window to the terminal size. A further double clicking restores the original window size.</dd>
-  </dl>
-</dd>
+  <dt>Dragging the window by the left button while pressing the Alt key</dt>
+  <dd>
+    Moves the window, if the title bar is hidden.<br>
+    To hide the title bar, check the Hide title bar option in the <A HREF="../menu/setup-window.html">[Setup] Window</A> dialog box.
+  </dd>
 
-<dt>Clicking the left button while pressing the Ctrl key</dt>
-<dd>If the menu bar is hidden, the pop-up menu appears. To hide the menu bar, check the Hide menu bar option in the <A HREF="../menu/setup-window.html">[Setup] Window</A> dialog box.</dd>
-
-<dt>Dragging the window by the left button while pressing the Alt key</dt>
-<dd>Moves the window, if the title bar is hidden. To hide the title bar, check the Hide title bar option in the <A HREF="../menu/setup-window.html">[Setup] Window</A> dialog box.</dd>
-
-<dt>Dragging the window by the left button while pressing the Alt+Shift key</dt>
-<dd>Resizes the window, if the title bar or window frame is hidden. To hide the window frame, check the No Frame option in the <A HREF="../menu/setup-window.html">[Setup] Window</A> dialog box.</dd>
-
-<dt>Clicking the right button while pressing the Alt key</dt>
-<dd>Minimizes the window, if the title bar is hidden.</dd>
-
-<dt id="dragdropwindow">Dragging a text file and dropping it into the window</dt>
-  <dl>
-    <dt>Displaying Confirmation Dialog</dt>
-    <dd>
-      <dl>
-        <dt>When <a href="../setup/teraterm-trans.html#draganddrop">ConfirmFileDragAndDrop</a> is on</dt>
-        <dd>Dialog is shown after dropping<br>
-            However, when "Do not display this dialog, next drop" is checked on the dialog, the dialog is not shown. Next, the dialog can be shown by using CTRL key pressing. </dd>
-        <dt>When ConfirmFileDragAndDrop is off</dt>
-        <dd>
-          When one file is dropped, the action is done without dialog displaying. The default action is Send File (Paste content of file).<br>
-          When one or multiple folders are dropped, the action is done without dialog displaying. The default action is Paste Filename.<br>
-          The dialog is shown other than these(multiple files/a file and folder). In this case, the dialog can be shown by using CTRL key pressing.
-        </dd>
-      </dl>
-    </dd>
-    <dt>Dialog</dt>
-    <dd>
-      When the file and folder is dropped, the action can be determined.
-      <dl>
-        <dt id="scp">SCP</dt>
-        <dd>
-          The file is sent with <a href="../menu/file-ssh-scp.html#send">SCP method</a>.<br>
-          On SSH2 connection, this menu can be selected with the file. <br>
-          <dl>
-            <dt>dest</dt>
-            <dd>
-              Specify the destination path. <br>
-              The path is treated as home directory when dest is empty. <br>
-              NOTICE: The "~" may not be used in some cases of remote OS and shell.
-            </dd>
-          </dl>
-        </dd>
-        <dt id="SendFile">Send File (Paste content of file)</dt>
-        <dd>
-          The file content is sent(pasted) into the terminal.<br>
-          When the file is dropped, this menu can be selected with the file. <br>
-          <dl>
-            <dt>Binary</dt>
-            <dd>
-              When this option is checked, the file content is transmitted as it is. <br>
-              When this option is not checked, KANJI and new line code are converted.
-            </dd>
-          </dl>
-        </dd>
-        <dt>Paste Filename</dt>
-        <dd>
-          A file name and folder name is pasted.
-          <dl>
-            <dt>Escape</dt>
-            <dd>
-              When this option is checked, below processing is done.
-              <ul>
-                <li>The path delimiter is changed from "\" to "/". </li>
-                <li>" ;&()$!`'[]{}#^~" characters are escaped with "\". </li>
-              </ul>
-            </dd>
-            <dt>Separator is Space</dt>
-            <dd>When multiple files are dropped, the file delimiter is space. </dd>
-            <dt>Separator is NewLine</dt>
-            <dd>When multiple files are dropped, the file delimiter is new line. </dd>
-          </dl>
-        </dd>
-        <dt>Do this for the next N files</dt>
-        <dd>When this option is checked, remaining files and folders are processed the same way. </dd>
-        <dt>Do same process, next drop</dt>
-        <dd>
-          The dialog setting is recorded into memory, and then the setting is reused by using next action.
-          When the dialog is shown, the dialog setting is update.
-          Otherwise same action is done without confirmation.
-          There are no configuration items and they are not saved file (TERATERM.INI).<br>
-          The type of processing (SCP/Send File/Paste Filename) is recorded.
-        </dd>
-        <dt>Do not display this dialog, next drop</dt>
-        <dd>
-          When this option is checked, the dialog is not shown on next file dropping and the action is done without confirmation. <br>
-          This option can be used when ConfirmFileDragAndDrop is off. <br>
-          This option is a different setting from ConfirmFileDragAndDrop, and then the option can not be saved by using <a href="../menu/setup-save.html">[Setup] Save Setup</a>. <br>
-          For example, when "Do same process, next drop" and SCP are selected, a folder is dropped. Next, when the action can not be done(needing confirmation) or dropping by using CTRL key pressing, the dialog is shown.
-        </dd>
-      </dl>
-      <table id="dialog_parameter" border="1">
-        <tr>
-          <th>item</th>
-          <th>read from / write to</th>
-          <th>condition of write</th>
-        </tr>
-        <tr>
-          <td>Drop type (SCP/Send File/Paste Filename)</td>
-          <td>Configuration of dialog (on memory)</td>
-          <td>When "Do same process, next drop" is "on" and proceeded.</td>
-        </tr>
-        <tr>
-          <td>SCP<br />&nbsp;&nbsp;dest</td>
-          <td>Configuration of Tera Term (ScpSendDir of TERATERM.INI)</td>
-          <td>When Drop type is "SCP" and proceeded.</td>
-        </tr>
-        <tr>
-          <td>Send File<br />&nbsp;&nbsp;Binary</td>
-          <td>Configuration of Tera Term (TransBin of TERATERM.INI)</td>
-          <td>When Drop type is "Send File" and proceeded.</td>
-        </tr>
-        <tr>
-          <td>Paste Filename<br />&nbsp;&nbsp;Escape<br />&nbsp;&nbsp;Separator (Space/NewLine)</td>
-          <td>Configuration of dialog (on memory)</td>
-          <td>When Drop type is "Paste Filename" and proceeded.</td>
-        </tr>
-        <tr>
-          <td>Do this for the next N files</td>
-          <td>none</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>Do same process, next drop</td>
-          <td>Configuration of dialog (on memory)</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>Do not display this dialog, next drop</td>
-          <td>Configuration of dialog (on memory)</td>
-          <td></td>
-        </tr>
-      </table>
-    </dd>
-  </dl>
-
-<dt>Dragging with the middle button</dt>
-<dd>These actions are no longer supported.</dd>
+  <dt id="Window_AltShift_LClick_Drag">Dragging the window by the left button while pressing the Alt+Shift key</dt>
+  <dd>
+    Resizes the window, if the title bar or window frame is hidden.<br>
+    To hide the window frame, check the No Frame option in the <A HREF="../menu/setup-window.html">[Setup] Window</A> dialog box.
+  </dd>
 </dl>
 
-<h2>
-TEK window
-</h2>
+<h3>right button</h3>
 
 <dl>
-<dt>Dragging with the left button</dt>
-<dd>Selects a portion of the screen.</dd>
+  <dt id="RClick">Clicking the right button</dt>
+  <dd>
+    Sends text in the clipboard to the host.<br>
+    It is effective when <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> is disabled.
+  </dd>
 
-<dt>Clicking the right button</dt>
-<dd>Same as VT window.</dd>
+  <dt id="RClick_Drag">Dragging with the right button</dt>
+  <dd>
+    Selects text, copies it to the clipboard, and then sends it to the host.<br>
+    It is effective when both <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> and <a href="../menu/setup-additional.html">SelectOnlyByLButton</a> are disabled.
+  </dd>
 
-<dt>Clicking the left button while pressing the Ctrl key</dt>
-<dd>Same as VT window.</dd>
-
+  <dt id="Alt_RClick_Drag">Clicking the right button while pressing the Alt key</dt>
+  <dd>Minimizes the window, if the title bar is hidden.</dd>
 </dl>
 
-</BODY>
-</HTML>
+<h3>middle button</h3>
+
+<dl>
+  <dt id="MClick">Clicking the middle button</dt>
+  <dd>
+    Sends text in the clipboard to the host.<br>
+    It is effective when <a href="../setup/teraterm-misc.html#DisablePasteMouseMButton">DisableMouseMButtonPaste</a> is disabled.
+  </dd>
+
+  <dt id="MClick_Drag">Dragging with the middle button</dt>
+  <dd>These actions are no longer supported.</dd>
+</dl>
+
+<h3>Mouse wheel</h3>
+
+<dl>
+  <dt id="Wheel">Mouse wheel</dt>
+  <dd>
+    This package supports mouse wheel button.<br>
+    Also, a user can send cursor key sequences as the mouse wheel rotating when the <a href="../menu/setup-additional-keyboard.html#DisableAppCursor">application cursor mode</a> is enabled by starting vi or less command.
+  </dd>
+
+  <dt id="Titlebar_Wheel">Mouse wheel on title bar</dt>
+  <dd>
+    The value of transparency can be temporarily changed by moving the mouse wheel on the title bar (NOTE: This value can not be recorded).<br>
+    When active status of the window is changed, <a href="../menu/setup-additional-visual.html#AlphaBlendActive">the value of transparency</a> switches to set value.
+  </dd>
+</dl>
+
+<h3>Drop</h3>
+
+<dl>
+  <dt id="dragdropwindow">Dragging a text file and dropping it into the window</dt>
+  <dd>
+    Files and folders can be dragged and dropped to be "Sent via SCP," "Sent as content," or "Pasted as file names.".
+    <dl>
+      <dt>Displaying Confirmation Dialog</dt>
+      <dd>
+        <dl>
+          <dt>When <a href="../setup/teraterm-trans.html#draganddrop">ConfirmFileDragAndDrop</a> is on</dt>
+          <dd>
+            Dialog is shown after dropping<br>
+            However, when "Do not display this dialog, next drop" is checked on the dialog, the dialog is not shown. Next, the dialog can be shown by using CTRL key pressing.
+          </dd>
+          <dt>When ConfirmFileDragAndDrop is off</dt>
+          <dd>
+            When one file is dropped, the action is done without dialog displaying. The default action is Send File (Paste content of file).<br>
+            When one or multiple folders are dropped, the action is done without dialog displaying. The default action is Paste Filename.<br>
+            The dialog is shown other than these(multiple files/a file and folder). In this case, the dialog can be shown by using CTRL key pressing.
+          </dd>
+        </dl>
+      </dd>
+      <dt>Dialog</dt>
+      <dd>
+        When the file and folder is dropped, the action can be determined.
+        <dl>
+          <dt id="scp">SCP</dt>
+          <dd>
+            The file is sent with <a href="../menu/file-ssh-scp.html#send">SCP method</a>.<br>
+            On SSH2 connection, this menu can be selected with the file. <br>
+            <dl>
+              <dt>dest</dt>
+              <dd>
+                Specify the destination path. <br>
+                The path is treated as home directory when dest is empty. <br>
+                NOTICE: The "~" may not be used in some cases of remote OS and shell.
+              </dd>
+            </dl>
+          </dd>
+          <dt id="SendFile">Send File (Paste content of file)</dt>
+          <dd>
+            The file content is sent(pasted) into the terminal.<br>
+            When the file is dropped, this menu can be selected with the file. <br>
+            <dl>
+              <dt>Binary</dt>
+              <dd>
+                When this option is checked, the file content is transmitted as it is. <br>
+                When this option is not checked, KANJI and new line code are converted.
+              </dd>
+            </dl>
+          </dd>
+          <dt>Paste Filename</dt>
+          <dd>
+            A file name and folder name is pasted.
+            <dl>
+              <dt>Escape</dt>
+              <dd>
+                When this option is checked, below processing is done.
+                <ul>
+                  <li>The path delimiter is changed from "\" to "/". </li>
+                  <li>" ;&()$!`'[]{}#^~" characters are escaped with "\". </li>
+                </ul>
+              </dd>
+              <dt>Separator is Space</dt>
+              <dd>When multiple files are dropped, the file delimiter is space. </dd>
+              <dt>Separator is NewLine</dt>
+              <dd>When multiple files are dropped, the file delimiter is new line. </dd>
+            </dl>
+          </dd>
+          <dt>Do this for the next N files</dt>
+          <dd>When this option is checked, remaining files and folders are processed the same way. </dd>
+          <dt>Do same process, next drop</dt>
+          <dd>
+            The dialog setting is recorded into memory, and then the setting is reused by using next action.
+            When the dialog is shown, the dialog setting is update.
+            Otherwise same action is done without confirmation.
+            There are no configuration items and they are not saved file (TERATERM.INI).<br>
+            The type of processing (SCP/Send File/Paste Filename) is recorded.
+          </dd>
+          <dt>Do not display this dialog, next drop</dt>
+          <dd>
+            When this option is checked, the dialog is not shown on next file dropping and the action is done without confirmation. <br>
+            This option can be used when ConfirmFileDragAndDrop is off. <br>
+            This option is a different setting from ConfirmFileDragAndDrop, and then the option can not be saved by using <a href="../menu/setup-save.html">[Setup] Save Setup</a>. <br>
+            For example, when "Do same process, next drop" and SCP are selected, a folder is dropped. Next, when the action can not be done(needing confirmation) or dropping by using CTRL key pressing, the dialog is shown.
+          </dd>
+        </dl>
+        <table id="dialog_parameter" border="1">
+          <tr>
+            <th>item</th>
+            <th>read from / write to</th>
+            <th>condition of write</th>
+          </tr>
+          <tr>
+            <td>Drop type (SCP/Send File/Paste Filename)</td>
+            <td>Configuration of dialog (on memory)</td>
+            <td>When "Do same process, next drop" is "on" and proceeded.</td>
+          </tr>
+          <tr>
+            <td>SCP<br>&nbsp;&nbsp;dest</td>
+            <td>Configuration of Tera Term (ScpSendDir of TERATERM.INI)</td>
+            <td>When Drop type is "SCP" and proceeded.</td>
+          </tr>
+          <tr>
+            <td>Send File<br>&nbsp;&nbsp;Binary</td>
+            <td>Configuration of Tera Term (TransBin of TERATERM.INI)</td>
+            <td>When Drop type is "Send File" and proceeded.</td>
+          </tr>
+          <tr>
+            <td>Paste Filename<br>&nbsp;&nbsp;Escape<br>&nbsp;&nbsp;Separator (Space/NewLine)</td>
+            <td>Configuration of dialog (on memory)</td>
+            <td>When Drop type is "Paste Filename" and proceeded.</td>
+          </tr>
+          <tr>
+            <td>Do this for the next N files</td>
+            <td>none</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Do same process, next drop</td>
+            <td>Configuration of dialog (on memory)</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Do not display this dialog, next drop</td>
+            <td>Configuration of dialog (on memory)</td>
+            <td></td>
+          </tr>
+        </table>
+      </dd>
+    </dl>
+  </dd>
+</dl>
+
+<h2>TEK window</h2>
+
+<dl>
+  <dt>Dragging with the left button</dt>
+  <dd>Selects a portion of the screen.</dd>
+
+  <dt>Clicking the right button</dt>
+  <dd>Same as VT window.</dd>
+
+  <dt>Clicking the left button while pressing the Ctrl key</dt>
+  <dd>Same as VT window.</dd>
+</dl>
+
+</body>
+</html>

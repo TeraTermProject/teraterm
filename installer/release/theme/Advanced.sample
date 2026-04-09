@@ -1,9 +1,9 @@
-[BG]
+[BG Theme]
 
 ; Advanced Setting
 ; Image source setting
 ; Type      : Color / Picture / Wallpaper
-: Pattern   : Stretch / Tile / Center / FitWidth / FitHeight / AutoFit
+; Pattern   : Stretch / Tile / Center / FitWidth / FitHeight / AutoFit
 ; AntiAlias : On / Off
 ; Color     : R,G,B (0-255)
 ; Alpha     : 0-255
@@ -11,6 +11,8 @@
 
 ; Dest = (Src1  * Src1Alpha + Dest * (255 - Src1Alpha)) / 255
 ; Dest = (Src2  * Src2Alpha + Dest * (255 - Src2Alpha)) / 255
+
+BGDestEnable=1
 
 BGReverseTextAlpha = 192
 

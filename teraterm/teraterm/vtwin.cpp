@@ -828,7 +828,7 @@ int CVTWindow::Parse()
 	return (VTParse()); // Parse received characters
 }
 
-void CVTWindow::ButtonUp(BOOL Paste)
+void CVTWindow::ButtonUp(POINT p, BOOL Paste)
 {
 	BOOL disableBuffEndSelect = false;
 
@@ -848,15 +848,21 @@ void CVTWindow::ButtonUp(BOOL Paste)
 	TplClk = FALSE;
 	CaretOn(vt_src);
 
+	// ボタンが離された
+	BuffEndSelect(p.x, p.y);
+
 	// SelectOnlyByLButton が on で 中・右クリックしたときに
 	// バッファが選択状態だったら、選択内容がクリップボードに
 	// コピーされてしまう問題を修正 (2007.12.6 maya)
 	if (!disableBuffEndSelect) {
-		// 選択領域の文字を取得、クリップボードへセットする
-		wchar_t *strW = BuffEndSelect();
-		if (strW != NULL) {
-			CBSetTextW(HVTWin, strW, 0);
-			free(strW);
+		if (ts.AutoTextCopy>0) {
+			// 選択領域が存在する?
+			if (BuffIsSelected()) {
+				// 選択領域の文字を取得、クリップボードへセットする
+				wchar_t *strW = BuffCBCopyUnicode(FALSE);
+				CBSetTextW(HVTWin, strW, 0);
+				free(strW);
+			}
 		}
 	}
 
@@ -980,29 +986,34 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 	}
 	else {
 		if (! (LButton || MButton || RButton)) {
+			BOOL select_start = FALSE;
 			BOOL box = FALSE;
+			BOOL shift = FALSE;
 
-			// select several pages of output from Tera Term window (2005.5.15 yutaka)
+			// select several pages of output from Tera Term window
 			if (LMR == IdLeftButton && ShiftKey()) {
-				BuffSeveralPagesSelect(p.x, p.y);
+				select_start = TRUE;
+				shift = TRUE;
 
 			} else {
-				// Select rectangular block with Alt Key. Delete Shift key.(2005.5.15 yutaka)
+				// Select rectangular block with Alt Key. Delete Shift key.
 				if (LMR == IdLeftButton && AltKey()) {
 					box = TRUE;
 				}
 
-				// Starting the selection only by a left button.(2007.11.20 maya)
+				// Starting the selection only by a left button.
 				if (!ts.SelectOnlyByLButton ||
 				    (ts.SelectOnlyByLButton && LMR == IdLeftButton) ) {
-					BuffStartSelect(p.x,p.y, box);
-					TplClk = FALSE;
-
-					/* for AutoScrolling */
-					::SetCapture(HVTWin);
-					::SetTimer(HVTWin, IdScrollTimer, 100, NULL);
+					select_start = TRUE;
 				}
 			}
+
+			BuffStartSelect(p.x,p.y, box,shift);
+			TplClk = FALSE;
+
+			/* for AutoScrolling */
+			::SetCapture(HVTWin);
+			::SetTimer(HVTWin, IdScrollTimer, 100, NULL);
 		}
 
 		switch (LMR) {
@@ -2349,7 +2360,10 @@ void CVTWindow::OnLButtonUp(WPARAM nFlags, POINTS point)
 		return;
 	}
 
-	ButtonUp(FALSE);
+	POINT p;
+	p.x = point.x;
+	p.y = point.y;
+	ButtonUp(p, FALSE);
 }
 
 void CVTWindow::OnMButtonDown(WPARAM nFlags, POINTS point)
@@ -2373,12 +2387,14 @@ void CVTWindow::OnMButtonUp(WPARAM nFlags, POINTS point)
 		return;
 	}
 
-	// added DisablePasteMouseMButton (2008.3.2 maya)
+	POINT p;
+	p.x = point.x;
+	p.y = point.y;
 	if (ts.PasteFlag & CPF_DISABLE_MBUTTON) {
-		ButtonUp(FALSE);
+		ButtonUp(p, FALSE);
 	}
 	else {
-		ButtonUp(TRUE);
+		ButtonUp(p, TRUE);
 	}
 }
 
@@ -2641,10 +2657,13 @@ void CVTWindow::OnRButtonUp(UINT nFlags, POINTS point)
 	 *  ・ts.PasteFlag & CPF_CONFIRM_RBUTTON -> 表示されたメニューからペーストを行うので、
 	 *                                          右ボタンアップによるペーストは行わない
 	 */
+	POINT p;
+	p.x = point.x;
+	p.y = point.y;
 	if ((ts.PasteFlag & CPF_DISABLE_RBUTTON) || (ts.PasteFlag & CPF_CONFIRM_RBUTTON)) {
-		ButtonUp(FALSE);
+		ButtonUp(p, FALSE);
 	} else {
-		ButtonUp(TRUE);
+		ButtonUp(p, TRUE);
 	}
 }
 
@@ -4525,8 +4544,8 @@ void CVTWindow::OnEditSelectAllBuffer()
 
 	ButtonDown(p, IdLeftButton);
 	BuffAllSelect();
-	ButtonUp(FALSE);
-	ChangeSelectRegion();
+	ButtonUp(p, FALSE);
+	::InvalidateRect(m_hWnd, NULL, FALSE);
 }
 
 void CVTWindow::OnEditSelectScreenBuffer()
@@ -4536,8 +4555,8 @@ void CVTWindow::OnEditSelectScreenBuffer()
 
 	ButtonDown(p, IdLeftButton);
 	BuffScreenSelect();
-	ButtonUp(FALSE);
-	ChangeSelectRegion();
+	ButtonUp(p, FALSE);
+	::InvalidateRect(m_hWnd, NULL, FALSE);
 }
 
 void CVTWindow::OnEditCancelSelection()
@@ -4547,8 +4566,8 @@ void CVTWindow::OnEditCancelSelection()
 
 	ButtonDown(p, IdLeftButton);
 	BuffCancelSelection();
-	ButtonUp(FALSE);
-	ChangeSelectRegion();
+	ButtonUp(p, FALSE);
+	::InvalidateRect(m_hWnd, NULL, FALSE);
 }
 
 /**
