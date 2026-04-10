@@ -38,7 +38,6 @@ BOOL IsPortableMode(void);
 wchar_t *GetHomeDirW(HINSTANCE hInst);
 wchar_t* GetLogDirW(HINSTANCE hInst);
 DWORD TTWinExec(const wchar_t *command);
-DWORD TTWinExecWithShowWindow(const wchar_t *command, DWORD wShowWindow);
 
 #ifdef __cplusplus
 }
