@@ -102,16 +102,36 @@
           <dt>Pattern</dt>
           <dd>
             How to draw background images.
-            <ul>
-              <li>stretch</li>
-              <li>tile</li>
-              <li>center</li>
-              <li>fit_withh</li>
-              <li>fit_height</li>
-              <li>autofit</li>
-              <li>autofill</li>
-            </ul>
-            TODO check details and write them.
+            <dl>
+              <dt>stretch</dt>
+              <dd>
+                Stretch image to fit the window.
+              </dd>
+              <dt>tile</dt>
+              <dd>
+                Tile image starting from the top-left corner of the window.
+              </dd>
+              <dt>center</dt>
+              <dd>
+                Display image in center of the window.
+              </dd>
+              <dt>fit_width</dt>
+              <dd>
+                Scale image to match the window width while maintaining aspect ratio.
+              </dd>
+              <dt>fit_height</dt>
+              <dd>
+                Scale image to match the window height while maintaining aspect ratio.
+              </dd>
+              <dt>autofit</dt>
+              <dd>
+                Maintain aspect ratio and display at maximum size without overflow.
+              </dd>
+              <dt>autofill</dt>
+              <dd>
+                Maintain aspect ratio and display at maximum size even if it overflows.
+              </dd>
+            </dl>
           </dd>
 
           <dt>Color</dt>
