@@ -89,10 +89,17 @@
             透過gifの場合は1色を透明としてあつかいます。
 
             <p>
-              Tera Term は <a href="../about/glossary.html#susie">Susie</a> Plug-in を試みたのち、
-              GDI+, OleLoadPicture(), LoadImage() 等の
-              Windows の機能を利用して画像の読み込みを試みます。
-              Windows 7 以降では Windowsの機能で jpg, gif の読み込みが可能のようです。
+              Tera Term は次の順で画像読み込みを試みます。
+              <ul>
+                <li><a href="../about/glossary.html#susie">Susie Plug-in</a></li>
+                <li><a href="../about/glossary.html#wic">WIC</a></li>
+                <li><a href="../about/glossary.html#gdi+">GDI+</a></li>
+                <li><a href="../about/glossary.html#ipicture">OleLoadPicture()</a></li>
+                <li>LoadImage() API</li>
+              </ul>
+            </p>
+            <p>
+              WICが利用可能なWindows Vista以降では、JPG, GIF, PNG の読み込みが可能のようです。
             </p>
           </dd>
 
