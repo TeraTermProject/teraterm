@@ -1389,7 +1389,9 @@ BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 	RegGetStr(hKey, KEY_USERNAME, jobInfo.szUsername, MAX_PATH);
 	RegGetBOOL(hKey, KEY_PASSWDFLAG, jobInfo.bPassword);
 	RegGetBinary(hKey, KEY_PASSWORD, jobInfo.szPassword, &dwSize);
-	RegGetBOOL(hKey, KEY_LOCKBOXFLAG, jobInfo.bLockBox);
+	if (RegGetBOOL(hKey, KEY_LOCKBOXFLAG, jobInfo.bLockBox) == FALSE) {
+		jobInfo.bLockBox = FALSE;
+	}
 
 	RegGetStr(hKey, KEY_TERATERM, jobInfo.szTeraTerm, MAX_PATH);
 	RegGetStr(hKey, KEY_INITFILE, jobInfo.szInitFile, MAX_PATH);
