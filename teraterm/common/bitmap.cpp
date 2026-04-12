@@ -31,13 +31,15 @@
 #include <windows.h>
 #include <ole2.h>
 #include <olectl.h>
+#include <wincodec.h>   // WIC
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <assert.h>
 
+#include "../teraterm/teraterml.h"	// for ENABLE_GDIPLUS 要整理
 #include "libsusieplugin.h"
-
 #include "ttlib.h"
 #include "compat_win.h"
 #include "asprintf.h"
@@ -176,49 +178,68 @@ BOOL SaveBmpFromHDC(HDC hdc, const wchar_t *filename)
 	return SaveBmpFromHBitmap(hBitmap, filename);
 }
 
+BOOL _GetFileSizeEx(HANDLE hFile, PLARGE_INTEGER lpFileSize)
+{
+	lpFileSize->LowPart = GetFileSize(hFile, (DWORD *)&lpFileSize->HighPart);
+	if (lpFileSize->LowPart == INVALID_FILE_SIZE && GetLastError() != NO_ERROR) {
+		lpFileSize->LowPart = 0;
+		lpFileSize->HighPart = 0;
+		return FALSE;
+	}
+	return TRUE;
+}
+
 /**
  *	OleLoadPicture() を使った画像読み込み
  * 	jpeg, bmp を読み込むことができる
- *	(Windowsによっては他の形式も読めるかもしれない)
+ *	(Windowsのバージョンによっては他の形式も読めるかもしれない)
  *
  */
-// .bmp以外の画像ファイルを読む。
-// 壁紙が .bmp 以外のファイルになっていた場合への対処。
-// ?? この関数は Windows 2000 未満の場合には呼んではいけない ??
-// TODO:
-//		IsLoadImageOnlyEnabled() は Vista 未満となっている
-//
 static HBITMAP GetBitmapHandleW(const wchar_t *File)
 {
 	OLE_HANDLE hOle = 0;
 	IStream *iStream=NULL;
-	IPicture *iPicture;
-	HGLOBAL hMem;
-	LPVOID pvData;
+	IPicture *iPicture=NULL;
+	HGLOBAL hMem = NULL;
+	LPVOID pvData = NULL;
 	DWORD nReadByte=0,nFileSize;
 	HANDLE hFile;
 	short type;
 	HBITMAP hBitmap = NULL;
 	HRESULT result;
+	BOOL r;
 
 	hFile = CreateFileW(File, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return NULL;
 	}
 	nFileSize=GetFileSize(hFile,NULL);
-	hMem=GlobalAlloc(GMEM_MOVEABLE,nFileSize);
-	pvData=GlobalLock(hMem);
+	hMem = GlobalAlloc(GMEM_MOVEABLE, nFileSize);
+	if (hMem == NULL) {
+		goto error;
+	}
+	pvData = GlobalLock(hMem);
+	if (pvData == NULL) {
+		goto error;
+	}
 
-	ReadFile(hFile,pvData,nFileSize,&nReadByte,NULL);
-
+	r = ReadFile(hFile, pvData, nFileSize, &nReadByte, NULL);
 	GlobalUnlock(hMem);
 	CloseHandle(hFile);
+	hFile = INVALID_HANDLE_VALUE;
 
-	CreateStreamOnHGlobal(hMem,TRUE,&iStream);
+	if (!r || nReadByte != nFileSize) {
+		goto error;
+	}
+
+	CreateStreamOnHGlobal(hMem, TRUE, &iStream);
 
 	result = OleLoadPicture(iStream, nFileSize, FALSE, IID_IPicture, (LPVOID *)&iPicture);
 	if (result != S_OK || iPicture == NULL) {
 		// 画像ファイルではない,対応した画像ファイル場合
+		if (iStream != NULL) {
+			iStream->Release();
+		}
 		return NULL;
 	}
 
@@ -231,7 +252,18 @@ static HBITMAP GetBitmapHandleW(const wchar_t *File)
 
 	hBitmap=(HBITMAP)(UINT_PTR)hOle;
 
+	iPicture->Release();
+
 	return hBitmap;
+
+error:
+	if (hMem != NULL) {
+		GlobalFree(hMem);
+	}
+	if (hFile != INVALID_HANDLE_VALUE) {
+		CloseHandle(hFile);
+	}
+	return NULL;
 }
 
 static HBITMAP CreateBitmapFromBITMAPINFO(const BITMAPINFO *pbmi, const unsigned char *pbuf)
@@ -239,9 +271,184 @@ static HBITMAP CreateBitmapFromBITMAPINFO(const BITMAPINFO *pbmi, const unsigned
 	void* pvBits;
 	HBITMAP hBmp = CreateDIBSection(NULL, pbmi, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
 
-	if (pbuf != NULL) {
+	if (hBmp != NULL && pbuf != NULL) {
 		memcpy(pvBits, pbuf, pbmi->bmiHeader.biSizeImage);
 	}
+
+	return hBmp;
+}
+
+static HBITMAP CreateHBitmapFromBitmapSource(IWICBitmapSource *pImage)
+{
+	HRESULT hr;
+	WICPixelFormatGUID format;
+	BITMAPINFO bminfo = {};
+	UINT width = 0;
+	UINT height = 0;
+	HBITMAP hBmp = NULL;
+	LPVOID imageBits = NULL;
+
+	// 32bppBGRAか確認
+	hr = pImage->GetPixelFormat(&format);
+	if (SUCCEEDED(hr) && format == GUID_WICPixelFormat32bppBGRA) {
+		hr = S_OK;
+	}
+	else {
+		hr = E_FAIL;
+	}
+
+	// ビットマップサイズを取得
+	if (SUCCEEDED(hr)) {
+		hr = pImage->GetSize(&width, &height);
+	}
+
+	// DIBを生成
+	if (SUCCEEDED(hr)) {
+		bminfo.bmiHeader.biSize = sizeof(BITMAPINFO);
+		bminfo.bmiHeader.biBitCount = 32;
+		bminfo.bmiHeader.biCompression = BI_RGB;
+		bminfo.bmiHeader.biWidth = width;
+		bminfo.bmiHeader.biHeight = -static_cast<LONG>(height);
+		bminfo.bmiHeader.biPlanes = 1;
+		hBmp = CreateDIBSection(NULL, &bminfo, DIB_RGB_COLORS, &imageBits, NULL, 0);
+	}
+
+	// イメージをコピー
+	if (SUCCEEDED(hr)) {
+		hr = pImage->CopyPixels(NULL, width * 4, width * height * 4, reinterpret_cast<BYTE *>(imageBits));
+	}
+	else if (hBmp != NULL) {
+		DeleteObject(hBmp);
+		hBmp = NULL;
+	}
+
+	return hBmp;
+}
+
+static HBITMAP LoadByWICFromImage(const uint8_t *image, size_t imageSize)
+{
+	HRESULT hr;
+	HBITMAP hBmp = NULL;
+	IWICImagingFactory *pFactory = NULL;
+	IWICBitmapDecoder *pDecoder = NULL;
+	IWICFormatConverter *pConverter = NULL;
+	IWICBitmapFrameDecode *pFrame = NULL;
+	IWICBitmapSource *pImage = NULL;
+	IWICStream *pStream = NULL;
+
+	// WIC初期化
+	hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFactory));
+	if (FAILED(hr)) {
+		return NULL;
+	}
+
+	// ストリームを生成
+	hr = pFactory->CreateStream(&pStream);
+
+	if (SUCCEEDED(hr)) {
+		hr = pStream->InitializeFromMemory((BYTE*)image, (DWORD)imageSize);
+		// WICInProcPointer だとエラーが出る環境があるので、BYTE* とする
+	}
+
+	// デコーダを生成
+	if (SUCCEEDED(hr)) {
+		hr = pFactory->CreateDecoderFromStream(pStream, NULL, WICDecodeMetadataCacheOnDemand, &pDecoder);
+	}
+
+	// 最初のフレームを取得
+	if (SUCCEEDED(hr)) {
+		hr = pDecoder->GetFrame(0, &pFrame);
+	}
+
+	// コンバータ生成 (32bppBGRAビットマップ)
+	if (SUCCEEDED(hr)) {
+		hr = pFactory->CreateFormatConverter(&pConverter);
+	}
+	if (SUCCEEDED(hr)) {
+		hr = pConverter->Initialize(pFrame, GUID_WICPixelFormat32bppBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeCustom);
+	}
+
+	// イメージ取得
+	if (SUCCEEDED(hr)) {
+		hr = pConverter->QueryInterface(IID_PPV_ARGS(&pImage));
+	}
+
+	// イメージからビットマップに変換
+	if (SUCCEEDED(hr)) {
+		hBmp = CreateHBitmapFromBitmapSource(pImage);
+	}
+
+	// 解放
+	if (pImage) pImage->Release();
+	if (pConverter) pConverter->Release();
+	if (pFrame) pFrame->Release();
+	if (pDecoder) pDecoder->Release();
+	if (pStream) pStream->Release();
+	if (pFactory) pFactory->Release();
+
+	return hBmp;
+}
+
+static BOOL LoadFile(const wchar_t *filename, uint8_t **file_ptr, size_t *file_size)
+{
+	uint8_t* data_ptr;
+	uint64_t data_size;
+
+	// ファイルを開く
+	HANDLE hFile = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		// open error
+	error:
+		*file_ptr = NULL;
+		*file_size = 0;
+		return FALSE;
+	}
+
+	data_size = GetFileSize(hFile, NULL);
+	data_ptr = (unsigned char *)malloc(data_size);
+	if (data_ptr == NULL) {
+		// memory error
+		CloseHandle(hFile);
+		goto error;
+	}
+	DWORD readBytes;
+	BOOL r = ReadFile(hFile, data_ptr, (DWORD)data_size, &readBytes, NULL);
+	CloseHandle(hFile);
+	if (!r || readBytes != (DWORD)data_size) {
+		// read error
+		free(data_ptr);
+		goto error;
+	}
+
+	*file_ptr = data_ptr;
+	*file_size = (size_t)data_size;
+
+	return TRUE;
+}
+
+/**
+ *	WICをつかって
+ *	ファイルからビットマップを読み込み
+ *
+ *	@param filename	ファイル名
+ *	@return 読み込んだビットマップのハンドルを返す
+ *		    NULLのとき読めなかった
+ */
+static HBITMAP LoadImageWIC(const wchar_t *filename)
+{
+	// ファイルを読み込む
+	uint8_t* file_ptr;
+	size_t file_size;
+	BOOL r = LoadFile(filename, &file_ptr, &file_size);
+	if (r == FALSE) {
+		// error
+		return NULL;
+	}
+
+	// ビットマップハンドルを取得
+	HBITMAP hBmp = LoadByWICFromImage(file_ptr, file_size);
+
+	free(file_ptr);
 
 	return hBmp;
 }
@@ -274,6 +481,11 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 			LocalUnlock(hbuf);
 			LocalFree(hbuf);
 		}
+	}
+
+	// WIC を使って読み込む
+	if (hbm == NULL) {
+		hbm = LoadImageWIC(filename);
 	}
 
 	// GDI+ ライブラリを使って読み込む
