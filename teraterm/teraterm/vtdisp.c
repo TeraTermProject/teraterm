@@ -31,32 +31,20 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "teraprn.h"
-#include <olectl.h>
 #include <assert.h>
-#include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 
 #define VTDISP_DEBUG_DISABLE 1
 #include "ttwinman.h"
 #include "ttime.h"
-#include "ttdialog.h"
-#include "ttcommon.h"
 #include "compat_win.h"
 #include "unicode_test.h"
-#include "setting.h"
 #include "codeconv.h"
-#include "libsusieplugin.h"
 #include "asprintf.h"
-#include "inifile_com.h"
 #include "win32helper.h"
-#include "ttknownfolders.h" // for FOLDERID_Desktop
 #include "ttlib.h"
-#if ENABLE_GDIPLUS
-#include "ttgdiplus.h"
-#endif
 #include "bitmap.h"
-
 #include "theme.h"
 #include "vtdisp.h"
 
@@ -209,19 +197,8 @@ typedef struct {
 } vtdisp_work_t;
 static vtdisp_work_t vtdisp_work;
 
-static HBITMAP GetBitmapHandleW(const wchar_t *File);
 static void InitColorTable(vtdraw_t *vt, const COLORREF *ANSIColor16);
 static void DispInitDC2(vtdraw_t *vt, ttdc_t *dc);
-
-// LoadImage() しか使えない環境かどうかを判別する。
-// LoadImage()では .bmp 以外の画像ファイルが扱えないので要注意。
-// (2014.4.20 yutaka)
-static BOOL IsLoadImageOnlyEnabled(void)
-{
-	// Vista 未満の場合には、今まで通りの読み込みをするようにした
-	// cf. SVN#4571(2011.8.4)
-	return !IsWindowsVistaOrLater();
-}
 
 static HBITMAP CreateScreenCompatibleBitmap(int width,int height)
 {
@@ -342,18 +319,6 @@ static void DebugSaveFile(const wchar_t *fname, HDC hDC, int width, int height)
 #endif
 }
 
-static HBITMAP CreateBitmapFromBITMAPINFO(const BITMAPINFO *pbmi, const unsigned char *pbuf)
-{
-	void* pvBits;
-	HBITMAP hBmp = CreateDIBSection(NULL, pbmi, DIB_RGB_COLORS, &pvBits, NULL, 0x0);
-
-	if (pbuf != NULL) {
-		memcpy(pvBits, pbuf, pbmi->bmiHeader.biSizeImage);
-	}
-
-	return hBmp;
-}
-
 static BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int height,HDC hdcSrc,int sx,int sy,int sw,int sh,BLENDFUNCTION bf)
 {
   HDC hdcDestWork,hdcSrcWork;
@@ -391,46 +356,11 @@ static BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int 
 // 画像読み込み関係
 static void BGPreloadPicture(BGSrc *src)
 {
+	BitmapLoadParam_t param = {};
+	param.SusiePluginPath = ts.EtermLookfeel.BGSPIPathW;
 	HBITMAP hbm = NULL;
 	const wchar_t *load_file = src->fileW;
-	const wchar_t *spi_path = ts.EtermLookfeel.BGSPIPathW;
-
-	// Susie plugin で読み込み
-	if (hbm == NULL) {
-		HANDLE hbmi;
-		HANDLE hbuf;
-		BOOL r = SusieLoadPicture(load_file, spi_path, &hbmi, &hbuf);
-		if (r != FALSE) {
-			const BITMAPINFO *pbmi = LocalLock(hbmi);
-			const unsigned char *pbuf = LocalLock(hbuf);
-			hbm = CreateBitmapFromBITMAPINFO(pbmi, pbuf);
-			LocalUnlock(hbmi);
-			LocalFree(hbmi);
-			LocalUnlock(hbuf);
-			LocalFree(hbuf);
-		}
-	}
-
-	// GDI+ ライブラリを使って読み込む
-#if ENABLE_GDIPLUS
-	if (hbm == NULL) {
-		hbm = GDIPLoad(load_file);
-	}
-#endif
-
-	// OLE を利用して画像(jpeg)を読む
-	//		LoadImage()のみ許可されている環境ではないとき
-	if (hbm == NULL && !IsLoadImageOnlyEnabled()) {
-		hbm = GetBitmapHandleW(load_file);
-	}
-
-	// LoadImageW() API で読み込む
-	if (hbm == NULL) {
-		// LoadImageW() APIは、
-		// Windows 10 のとき高さがマイナスのbmpファイルはロードに失敗する
-		// Windows 7 のときは成功する
-		hbm = LoadImageW(0,load_file,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
-	}
+	BitmapLoad(load_file, &param, &hbm);
 
 	if(hbm) {
 		BITMAP bm;
@@ -495,64 +425,6 @@ static void BGGetWallpaperInfo(WallpaperInfo *wi)
 			break;
 		}
 	}
-}
-
-/**
- *	OleLoadPicture() を使った画像読み込み
- * 	jpeg, bmp を読み込むことができる
- *	(Windowsによっては他の形式も読めるかもしれない)
- *
- */
-// .bmp以外の画像ファイルを読む。
-// 壁紙が .bmp 以外のファイルになっていた場合への対処。
-// この関数は Windows 2000 未満の場合には呼んではいけない
-// TODO:
-//		IsLoadImageOnlyEnabled() は Vista 未満となっている
-//
-static HBITMAP GetBitmapHandleW(const wchar_t *File)
-{
-	OLE_HANDLE hOle = 0;
-	IStream *iStream=NULL;
-	IPicture *iPicture;
-	HGLOBAL hMem;
-	LPVOID pvData;
-	DWORD nReadByte=0,nFileSize;
-	HANDLE hFile;
-	short type;
-	HBITMAP hBitmap = NULL;
-	HRESULT result;
-
-	hFile = CreateFileW(File, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-	if (hFile == INVALID_HANDLE_VALUE) {
-		return NULL;
-	}
-	nFileSize=GetFileSize(hFile,NULL);
-	hMem=GlobalAlloc(GMEM_MOVEABLE,nFileSize);
-	pvData=GlobalLock(hMem);
-
-	ReadFile(hFile,pvData,nFileSize,&nReadByte,NULL);
-
-	GlobalUnlock(hMem);
-	CloseHandle(hFile);
-
-	CreateStreamOnHGlobal(hMem,TRUE,&iStream);
-
-	result = OleLoadPicture(iStream, nFileSize, FALSE, &IID_IPicture, (LPVOID *)&iPicture);
-	if (result != S_OK || iPicture == NULL) {
-		// 画像ファイルではない,対応した画像ファイル場合
-		return NULL;
-	}
-
-	iStream->lpVtbl->Release(iStream);
-
-	iPicture->lpVtbl->get_Type(iPicture,&type);
-	if(type==PICTYPE_BITMAP){
-		iPicture->lpVtbl->get_Handle(iPicture,&hOle);
-	}
-
-	hBitmap=(HBITMAP)(UINT_PTR)hOle;
-
-	return hBitmap;
 }
 
 // 線形補完法により比較的鮮明にビットマップを拡大・縮小する。
@@ -664,77 +536,64 @@ static HBITMAP CreateStretched32BppBitmapBilinear(HBITMAP hbm, INT cxNew, INT cy
 
 static void BGPreloadWallpaper(BGSrc *src)
 {
-	HBITMAP       hbm;
 	WallpaperInfo wi;
+	BGGetWallpaperInfo(&wi);
 	int s_width, s_height;
 
-	BGGetWallpaperInfo(&wi);
-
-	if (IsLoadImageOnlyEnabled()) {
-		//壁紙を読み込み
-		//LR_CREATEDIBSECTION を指定するのがコツ
-		if (wi.pattern == BG_STRETCH) {
-			hbm = LoadImageW(0, wi.filename, IMAGE_BITMAP, CRTWidth, CRTHeight, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-		}
-		else {
-			hbm = LoadImageW(0, wi.filename, IMAGE_BITMAP,         0,        0, LR_LOADFROMFILE);
-		}
+	HBITMAP hbm = NULL;
+	const wchar_t *load_file = wi.filename;
+	BitmapLoad(load_file, NULL, &hbm);
+	if (hbm == NULL) {
+		goto load_finish;
 	}
-	else {
-		BITMAP bm;
-		float ratio;
 
-		hbm = GetBitmapHandleW(wi.filename);
-		if (hbm == NULL) {
-			goto load_finish;
-		}
-
-		GetObject(hbm,sizeof(bm),&bm);
-		// 壁紙の設定に合わせて、画像のストレッチサイズを決める。
-		if (wi.pattern == BG_STRETCH) {
-			s_width = CRTWidth;
-			s_height = CRTHeight;
-		} else if (wi.pattern == BG_AUTOFILL || wi.pattern == BG_AUTOFIT) {
-			if (wi.pattern == BG_AUTOFILL) {
-				if ((bm.bmHeight * CRTWidth) < (bm.bmWidth * CRTHeight)) {
-					wi.pattern = BG_FIT_HEIGHT;
-				}
-				else {
-					wi.pattern = BG_FIT_WIDTH;
-				}
-			}
-			if (wi.pattern == BG_AUTOFIT) {
-				if ((bm.bmHeight * CRTWidth) < (bm.bmWidth * CRTHeight)) {
-					wi.pattern = BG_FIT_WIDTH;
-				}
-				else {
-					wi.pattern = BG_FIT_HEIGHT;
-				}
-			}
-			if (wi.pattern == BG_FIT_WIDTH) {
-				ratio = (float)CRTWidth / bm.bmWidth;
-				s_width = CRTWidth;
-				s_height = (int)(bm.bmHeight * ratio);
+	BITMAP bm;
+	GetObject(hbm,sizeof(bm),&bm);
+	// 壁紙の設定に合わせて、画像のストレッチサイズを決める。
+	if (wi.pattern == BG_STRETCH) {
+		s_width = CRTWidth;
+		s_height = CRTHeight;
+	} else if (wi.pattern == BG_AUTOFILL || wi.pattern == BG_AUTOFIT) {
+		if (wi.pattern == BG_AUTOFILL) {
+			if ((bm.bmHeight * CRTWidth) < (bm.bmWidth * CRTHeight)) {
+				wi.pattern = BG_FIT_HEIGHT;
 			}
 			else {
-				ratio = (float)CRTHeight / bm.bmHeight;
-				s_width = (int)(bm.bmWidth * ratio);
-				s_height = CRTHeight;
+				wi.pattern = BG_FIT_WIDTH;
 			}
-
-		} else {
-			s_width = 0;
-			s_height = 0;
+		}
+		if (wi.pattern == BG_AUTOFIT) {
+			if ((bm.bmHeight * CRTWidth) < (bm.bmWidth * CRTHeight)) {
+				wi.pattern = BG_FIT_WIDTH;
+			}
+			else {
+				wi.pattern = BG_FIT_HEIGHT;
+			}
+		}
+		if (wi.pattern == BG_FIT_WIDTH) {
+			float ratio = (float)CRTWidth / bm.bmWidth;
+			s_width = CRTWidth;
+			s_height = (int)(bm.bmHeight * ratio);
+		}
+		else {
+			float ratio = (float)CRTHeight / bm.bmHeight;
+			s_width = (int)(bm.bmWidth * ratio);
+			s_height = CRTHeight;
 		}
 
-		if (s_width && s_height) {
-			HBITMAP newhbm = CreateStretched32BppBitmapBilinear(hbm, s_width, s_height);
-			DeleteObject(hbm);
-			hbm = newhbm;
-
-			wi.pattern = BG_STRETCH;
-		}
+	} else {
+		s_width = 0;
+		s_height = 0;
 	}
+
+	if (s_width && s_height) {
+		HBITMAP newhbm = CreateStretched32BppBitmapBilinear(hbm, s_width, s_height);
+		DeleteObject(hbm);
+		hbm = newhbm;
+
+		wi.pattern = BG_STRETCH;
+	}
+
 load_finish:
 	free(wi.filename);
 
@@ -782,30 +641,26 @@ static void BGPreloadSrc(BGSrc *src)
 	}
 }
 
-static void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int height,BOOL bAntiAlias)
+static void BGStretchPicture(HDC hdcDest, BGSrc *src, int x, int y, int width, int height)
 {
-	const wchar_t *filename = src->fileW;
 	if(!hdcDest || !src)
 		return;
 
+	const BOOL bAntiAlias = src->antiAlias;
 	if(bAntiAlias || !IsWindowsNTKernel())
 	{	// SetStretchBltMode(HALFTONE) は 95,98,Meではサポートされていない
 		if(src->width != width || src->height != height)
 		{
+			const wchar_t *filename = src->fileW;
 			HBITMAP hbm;
-
-			if (IsLoadImageOnlyEnabled()) {
-				hbm = LoadImageW(0,filename,IMAGE_BITMAP,width,height,LR_LOADFROMFILE);
-			} else {
-				HBITMAP newhbm;
-				hbm = GetBitmapHandleW(filename);
-				newhbm = CreateStretched32BppBitmapBilinear(hbm, width, height);
-				DeleteObject(hbm);
-				hbm = newhbm;
-			}
-
-			if(!hbm)
+			BitmapLoad(filename, NULL, &hbm);
+			if(!hbm) {
+				// 画像ファイルが読めなかった
 				return;
+			}
+			HBITMAP newhbm = CreateStretched32BppBitmapBilinear(hbm, width, height);
+			DeleteObject(hbm);
+			hbm = newhbm;
 
 			DeleteBitmapDC(&(src->hdc));
 			src->hdc = CreateBitmapDC(hbm);
@@ -856,21 +711,21 @@ static void BGLoadPicture(const vtdraw_t *vt, HDC hdcDest, BGSrc *src)
 		case BG_STRETCH:
 		default:
 			assert(pattern == BG_STRETCH);
-			BGStretchPicture(hdcDest, src, 0, 0, vt->ScreenWidth, vt->ScreenHeight, src->antiAlias);
+			BGStretchPicture(hdcDest, src, 0, 0, vt->ScreenWidth, vt->ScreenHeight);
 			break;
 
 		case BG_FIT_WIDTH:
 			height = (src->height * vt->ScreenWidth) / src->width;
 			y = (vt->ScreenHeight - height) / 2;
 
-			BGStretchPicture(hdcDest, src, 0, y, vt->ScreenWidth, height, src->antiAlias);
+			BGStretchPicture(hdcDest, src, 0, y, vt->ScreenWidth, height);
 			break;
 
 		case BG_FIT_HEIGHT:
 			width = (src->width * vt->ScreenHeight) / src->height;
 			x = (vt->ScreenWidth - width) / 2;
 
-			BGStretchPicture(hdcDest, src, x, 0, width, vt->ScreenHeight, src->antiAlias);
+			BGStretchPicture(hdcDest, src, x, 0, width, vt->ScreenHeight);
 			break;
 
 		case BG_TILE:

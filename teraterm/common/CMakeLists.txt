@@ -90,6 +90,7 @@ target_include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}       # for svnversion.h
   .
   ../teraterm
+  ../susie_plugin
 )
 
 if(SUPPORT_OLD_WINDOWS)
