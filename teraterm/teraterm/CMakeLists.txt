@@ -1,7 +1,5 @@
 ﻿project("teraterm")
 
-option(ENABLE_GDIPLUS "Use GDI+ library" ON)
-
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 
@@ -423,18 +421,6 @@ elseif(MINGW)
     )
 endif()
 
-if(ENABLE_GDIPLUS)
-  target_compile_options(
-    ${PROJECT_NAME}
-    PRIVATE "-DENABLE_GDIPLUS=1"
-  )
-else(ENABLE_GDIPLUS)
-  target_compile_options(
-    ${PROJECT_NAME}
-    PRIVATE "-DENABLE_GDIPLUS=0"
-  )
-endif(ENABLE_GDIPLUS)
-
 target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE
@@ -469,13 +455,13 @@ target_link_libraries(
   ws2_32
   )
 
-if(ENABLE_GDIPLUS)
+if(MSVC)
   target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
     gdiplus.lib
   )
-endif(ENABLE_GDIPLUS)
+endif()
 
 install(
   TARGETS ${PROJECT_NAME}

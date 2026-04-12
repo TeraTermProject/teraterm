@@ -38,16 +38,48 @@
 #include <stdint.h>
 #include <assert.h>
 
-#include "../teraterm/teraterml.h"	// for ENABLE_GDIPLUS 要整理
 #include "libsusieplugin.h"
 #include "ttlib.h"
 #include "compat_win.h"
 #include "asprintf.h"
+#if defined(__MINGW32__)
+#define ENABLE_GDIPLUS 0
+#else
+#define ENABLE_GDIPLUS 1
+#endif
 #if ENABLE_GDIPLUS
 #include "ttgdiplus.h"
 #endif
 
 #include "bitmap.h"
+
+#if ENABLE_GDIPLUS
+namespace {
+class Initializer {
+public:
+	Initializer() {
+		initialized = false;
+	}
+	~Initializer() {
+		if (initialized) {
+			// 初期化していたら、終了処理を行う
+			GDIPUninit();
+			initialized = false;
+		}
+	}
+	inline void Init() {
+		if (!initialized) {
+			GDIPInit();
+			initialized = true;
+		}
+	}
+private:
+	bool initialized;
+};
+}
+
+static Initializer initializer;
+#endif
 
 /**
  *	デバグ用ファイル名、desktopに保存する
@@ -480,10 +512,12 @@ static HBITMAP LoadImageWIC(const wchar_t *filename)
 /**
  *	ファイルからビットマップを読み込み
  *
- * @param filename ファイル名
- * @param hBitmap 読み込んだビットマップのハンドルを返す
- * @param param パラメータを指定する
- *				NULLのとき適切にファイルを読む
+ *	@param filename		ファイル名
+ *	@param hBitmap		読み込んだビットマップのハンドルを返す
+ *	@param param		パラメータを指定する
+ *						NULLのとき適切にファイルを読む
+ *	@retval	NO_ERROR			ファイルが読めた、hBitmapにハンドルが返っている
+ *	@retval	ERROR_INVALID_DATA	ファイルが読めない、知らないフォーマット
  */
 DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMAP *hBitmap)
 {
@@ -513,14 +547,15 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 	}
 
 	// GDI+ ライブラリを使って読み込む
+	//	Windows XP から利用可能
 #if ENABLE_GDIPLUS
 	if (hbm == NULL) {
+		initializer.Init();
 		hbm = GDIPLoad(filename);
 	}
 #endif
 
 	// OLE を利用して画像(jpeg)を読む
-	//		LoadImage()のみ許可されている環境ではないとき
 	if (hbm == NULL) {
 		hbm = GetBitmapHandleW(filename);
 	}
@@ -533,6 +568,11 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 		// IMAGE_BITMAPのとき戻り値はHBITMAP
 		// LR_CREATEDIBSECTION を指定すると、DIBを返す
 		hbm = (HBITMAP)LoadImageW(0, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE|LR_CREATEDIBSECTION);
+	}
+
+	if (hbm == NULL) {
+		*hBitmap = NULL;
+		return ERROR_INVALID_DATA;
 	}
 
 	*hBitmap = hbm;

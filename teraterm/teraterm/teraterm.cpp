@@ -56,9 +56,6 @@
 #include "ttdebug.h"
 #include "win32helper.h"
 #include "asprintf.h"
-#if ENABLE_GDIPLUS
-#include "ttgdiplus.h"
-#endif
 #include "directx.h"
 #include "unicode.h"
 #include "broadcast.h"
@@ -380,9 +377,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	init();
 	_HtmlHelpW(NULL, NULL, HH_INITIALIZE, (DWORD_PTR)&HtmlHelpCookie);
 
-#if ENABLE_GDIPLUS
-	GDIPInit();
-#endif
 	DXInit();
 
 	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);
@@ -485,9 +479,6 @@ exit_message_loop:
 	m_pMainWnd = NULL;
 
 	DXUninit();
-#if ENABLE_GDIPLUS
-	GDIPUninit();
-#endif
 
 	_HtmlHelpW(NULL, NULL, HH_CLOSE_ALL, 0);
 	_HtmlHelpW(NULL, NULL, HH_UNINITIALIZE, HtmlHelpCookie);
