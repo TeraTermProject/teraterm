@@ -178,6 +178,9 @@ BOOL SaveBmpFromHDC(HDC hdc, const wchar_t *filename)
 	return SaveBmpFromHBitmap(hBitmap, filename);
 }
 
+/**
+ *	GetFileSizeEx()はWindows 2000,XPごろから
+ */
 BOOL _GetFileSizeEx(HANDLE hFile, PLARGE_INTEGER lpFileSize)
 {
 	lpFileSize->LowPart = GetFileSize(hFile, (DWORD *)&lpFileSize->HighPart);
@@ -213,7 +216,16 @@ static HBITMAP GetBitmapHandleW(const wchar_t *File)
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return NULL;
 	}
-	nFileSize=GetFileSize(hFile,NULL);
+	{
+		LARGE_INTEGER fsize;
+		if (_GetFileSizeEx(hFile, &fsize) == FALSE) {
+			goto error;
+		}
+		if (fsize.u.HighPart != 0) {
+			goto error;
+		}
+		nFileSize = (DWORD)fsize.QuadPart;
+	}
 	hMem = GlobalAlloc(GMEM_MOVEABLE, nFileSize);
 	if (hMem == NULL) {
 		goto error;
@@ -404,7 +416,19 @@ static BOOL LoadFile(const wchar_t *filename, uint8_t **file_ptr, size_t *file_s
 		return FALSE;
 	}
 
-	data_size = GetFileSize(hFile, NULL);
+	{
+		LARGE_INTEGER fsize;
+		if (_GetFileSizeEx(hFile, &fsize) == FALSE) {
+			CloseHandle(hFile);
+			goto error;
+		}
+		if (fsize.u.HighPart != 0) {
+			CloseHandle(hFile);
+			goto error;
+		}
+		data_size = fsize.QuadPart;
+	}
+
 	data_ptr = (unsigned char *)malloc(data_size);
 	if (data_ptr == NULL) {
 		// memory error
@@ -491,7 +515,7 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 	// GDI+ ライブラリを使って読み込む
 #if ENABLE_GDIPLUS
 	if (hbm == NULL) {
-		hbm = GDIPLoad(load_file);
+		hbm = GDIPLoad(filename);
 	}
 #endif
 
