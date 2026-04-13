@@ -437,6 +437,7 @@ BOOL RegGetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD *dwValue)
 									(LPBYTE) dwValue,
 									&dwSize);
 		if (lError != ERROR_SUCCESS) {
+			*dwValue = 0;
 			::SetLastError(lError);
 			return FALSE;
 		}
@@ -618,4 +619,3 @@ BOOL RegGetBYTE(HKEY hKey, const wchar_t *lpszValueName, BYTE &value)
 	value = (BYTE)d;
 	return r;
 }
-
