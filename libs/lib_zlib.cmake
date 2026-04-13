@@ -10,9 +10,7 @@ endif()
 set(ZLIB_INCLUDE_DIRS ${ZLIB_ROOT}/include)
 set(ZLIB_LIBRARY_DIRS ${ZLIB_ROOT}/lib)
 if(MINGW)
-  set(ZLIB_LIB
-    ${ZLIB_LIBRARY_DIRS}/libzlibstatic.a
-    )
+  set(ZLIB_LIB ${ZLIB_LIBRARY_DIRS}/libzs.a)
 else()
   if(IS_MULTI_CONFIG)
     set(ZLIB_LIB
