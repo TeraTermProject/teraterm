@@ -350,11 +350,12 @@ BOOL RegGetStr(HKEY hKey, const wchar_t *lpszValueName, wchar_t *buf, DWORD dwSi
 
 		lError = ::RegQueryValueExW(hKey, lpszValueName, 0, &dwType, (LPBYTE) buf, &dwWriteSize);
 		if (lError != ERROR_SUCCESS) {
+			buf[0] = L'\0';
 			::SetLastError(lError);
 			return FALSE;
 		}
 
-		buf[dwSize - 1] = '\0';
+		buf[dwSize - 1] = L'\0';
 	}
 
 	return TRUE;
@@ -547,6 +548,7 @@ BOOL RegGetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, LPDWORD lp
 										&dwType,
 										(LPBYTE) buf,
 										&dwReadSize)) != ERROR_SUCCESS) {
+			memset(buf, 0, *lpdwSize);
 			::SetLastError(lError);
 			return FALSE;
 		}
