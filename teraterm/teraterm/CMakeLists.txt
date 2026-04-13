@@ -220,13 +220,6 @@ target_sources(
   ../../teraterm/common/edithistory_res.h
 )
 
-target_sources(
-  ${PROJECT_NAME}
-  PRIVATE
-  ../susie_plugin/libsusieplugin.cpp
-  ../susie_plugin/libsusieplugin.h
-)
-
 source_group(
   "common"
   REGULAR_EXPRESSION
@@ -454,14 +447,6 @@ target_link_libraries(
   uuid
   ws2_32
   )
-
-if(MSVC)
-  target_link_libraries(
-    ${PROJECT_NAME}
-    PRIVATE
-    gdiplus.lib
-  )
-endif()
 
 install(
   TARGETS ${PROJECT_NAME}
