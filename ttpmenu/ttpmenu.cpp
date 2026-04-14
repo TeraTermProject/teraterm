@@ -978,11 +978,13 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	wchar_t	szDirectory[MAX_PATH];
 	wchar_t	szHostName[MAX_PATH];
 	wchar_t	*szTemp;
+	wchar_t	*szArgment = _wcsdup(L"");
 	wchar_t	*pHostName;
 	JobInfo	jobInfo;
 
 	DWORD	dwErr = NO_ERROR;
 	wchar_t uimsg[MAX_UIMSG];
+
 
 	wcscpy(szName, (szJobName == NULL) ? g_MenuData.szName[idItem - ID_MENU_MIN] : szJobName);
 
@@ -990,12 +992,15 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 		dwErr = ::GetLastError();
 		UTIL_get_lang_msgW("MSG_ERROR_MAKETTL", uimsg, _countof(uimsg),
 						   L"Couldn't read the registry data.\n", UILanguageFileW);
+		free(szArgment);
 		ErrorMessage(hWnd, dwErr, uimsg);
 		return FALSE;
 	}
 
-	if (szJobName != NULL && jobInfo.bStartup == FALSE)
+	if (szJobName != NULL && jobInfo.bStartup == FALSE) {
+		free(szArgment);
 		return TRUE;
+	}
 
 	if (wcslen(jobInfo.szTeraTerm) == 0) {
 		GetTeraTermPath(jobInfo.szTeraTerm, MAX_PATH);
@@ -1004,8 +1009,6 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	wcscpy(szHostName, jobInfo.szHostName);
 	if ((pHostName = _wcstok(szHostName, L" ([{'\"|*")) != NULL)
 		pHostName = szHostName;
-
-	wchar_t	*szArgment = _wcsdup(L"");
 
 	if (jobInfo.dwMode != MODE_DIRECT)
 		if (wcslen(jobInfo.szInitFile) != 0) {
