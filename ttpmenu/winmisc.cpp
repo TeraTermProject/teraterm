@@ -421,7 +421,11 @@ int Encrypt2EncDec(char *szPassword, const unsigned char *szEncryptKey, Encrypt2
 	}
 
  end:
-	BIO_free(Benc);
-	BIO_free(Bmem);
+	if (Bio != NULL) {
+		BIO_free_all(Bio);
+	} else {
+		BIO_free(Benc);
+		BIO_free(Bmem);
+	}
 	return ret;
 }
