@@ -832,7 +832,7 @@ BOOL InitVersionDlg(HWND hWnd)
 	RegGetStatus(&use_ini, &inifile);
 	wchar_t *setting;
 	if (!use_ini) {
-		aswprintf(&setting, L"use registory");
+		aswprintf(&setting, L"use registry");
 	}
 	else {
 		aswprintf(&setting, L"use ini file\r\n%s", inifile);
