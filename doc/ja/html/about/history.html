@@ -49,19 +49,15 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1168" target="_blank">issue #1168</a>)
       </li>
       <li>
+        <a href="../menu/control-broadcast.html">Broadcast command</a> ダイアログの Enter key で指定した改行コードがそのまま送信されない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1178" target="_blank">issue #1178</a>)<br>
+        (以前は、<a href="../menu/setup-additional-terminal.html#CRSend">"Setup &gt; Teminal" の New-line (Transmit)</a> の設定により改行コードが変換されていた)
+      </li>
+      <li>
         Tera Termの背景に設定した画像の色が不自然になる不具合を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1159" target="_blank">issue #1159</a>)
       </li>
       <li>
-        <a href="../menu/control-broadcast.html">Broadcast command</a> ダイアログの Enter key で指定した改行コードがそのまま送信されない不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1178" target="_blank">issue #1178</a>)<br>
-        (以前は、<a href="../menu/setup-additional-terminal.html#CRSend">"Setup &gt; Teminal" の New-line (Transmit)</a> の設定により改行コードが変換されていた)
-        古いテーマファイルが正しく読み込まれない問題を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1128" target="_blank">issue #1128</a>)
-        ttermpro.exe の /M オプションを使用した際、connect コマンドで開いた VT Window が最小化状態で表示され、マクロコマンドが実行されない不具合を修正した。
-        Control タブ "Control &gt; <a href="../menu/control.html">Macro</a>" または ショートカットから ttermpro.exe の <a href="../commandline/teraterm.html#m">/M=&lt;macro file&gt;</a> オプションを使用してマクロを実行した際、2回目以降の <a href="../macro/command/connect.html">connect</a> コマンドで開いた VT Window が最小化状態で表示され、マクロコマンドが実行されない不具合を修正した。
-        5.5.2 からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1195" target="_blank">issue #1195</a>)
         接続コマンド <a href="../macro/command/connect.html">connect</a> または <a href="../macro/command/cygconnect.html">cygconnect</a> から最小化状態で起動された Tera Term がマクロとリンク出来ない場合がある不具合を修正した。
         5.5.2 からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1195" target="_blank">issue #1195</a>)
