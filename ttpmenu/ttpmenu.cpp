@@ -1180,7 +1180,7 @@ BOOL InitMenu(void)
 VOID DeleteListMenuIcons()
 {
 	for (int cnt = 0; cnt < MAXJOBNUM; cnt++) {
-		memset(g_MenuData.szName, 0, MAX_PATH);
+		g_MenuData.szName[cnt][0] = L'\0';
 		if (g_MenuData.hLargeIcon[cnt] != NULL) {
 			::DestroyIcon(g_MenuData.hLargeIcon[cnt]);
 			g_MenuData.hLargeIcon[cnt] = NULL;
