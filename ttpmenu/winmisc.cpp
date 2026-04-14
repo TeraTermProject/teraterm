@@ -270,9 +270,11 @@ void UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_
 
 int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONTA logfont, HFONT *font, const char *iniFile)
 {
-	if (GetI18nLogfont("TTMenu", key, logfont,
-					   GetDeviceCaps(GetDC(dlg),LOGPIXELSY),
-					   iniFile) == FALSE) {
+	HDC hDC = GetDC(dlg);
+	int dpi = GetDeviceCaps(hDC, LOGPIXELSY);
+	ReleaseDC(dlg, hDC);
+
+	if (GetI18nLogfont("TTMenu", key, logfont, dpi, iniFile) == FALSE) {
 		return FALSE;
 	}
 
