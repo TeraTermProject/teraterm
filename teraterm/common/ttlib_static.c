@@ -333,7 +333,19 @@ int GetMonitorDpiFromWindow(HWND hWnd)
 	else {
 		int dpi = 96;
 		RECT r;
-		GetWindowRect(hWnd, &r);
+		WINDOWPLACEMENT wp;
+		wp.length = sizeof(WINDOWPLACEMENT);
+		if (GetWindowPlacement(hWnd, &wp)) {
+			if (wp.showCmd == SW_MINIMIZE ||
+				wp.showCmd == SW_SHOWMINIMIZED ||
+				wp.showCmd == SW_SHOWMINNOACTIVE) {
+				r = wp.rcNormalPosition;
+			} else {
+				GetWindowRect(hWnd, &r);
+			}
+		} else {
+			GetWindowRect(hWnd, &r);
+		}
 		HINSTANCE hInst = (HINSTANCE)GetWindowLongW(hWnd, GWLP_HINSTANCE);
 		HWND tmphWnd = CreateWindowExW(0, WC_STATICW, (LPCWSTR)NULL, 0,
 							r.left, r.top, r.right - r.left, r.bottom - r.top,
