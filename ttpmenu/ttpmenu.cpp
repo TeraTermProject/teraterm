@@ -79,7 +79,7 @@ MenuData	g_MenuData;			// TeraTerm Menuの表示設定等の構造体
 wchar_t		*SetupFNameW;		// TERATERM.INI
 wchar_t		*UILanguageFileW;
 
-static char g_szLockBox[MAX_PATH];	// パスワード暗号化用パスワード
+static char g_szLockBox[MAX_PATH];	// パスワード暗号化用パスワード(難読化済)
 
 #if (defined(__MINGW32__) && (__MINGW64_VERSION_MAJOR < 13)) || (defined(_MSC_VER) && (_MSC_VER == 1400))
 // MinGW or VS2005(VC8.0)

@@ -124,8 +124,8 @@ BOOL EnableItem(HWND hWnd, int idControl, BOOL flag)
 
 /* ==========================================================================
 	Function Name	: (void) EncodePassword()
-	Outline			: パスワードをエンコード(?)する。
-					  エンコードされた文字列をデコードする
+	Outline			: パスワードをエンコード(難読化)する。
+					  エンコードされた文字列をデコード(可読化)する
 					  入出力は文字列またはバイナリとなる
 	Arguments		: const char *cPassword			(in)	変換する文字列
 					: char		 *cEncodePassword	(out)	変換された文字列
