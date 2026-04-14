@@ -1090,7 +1090,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 
 		SHELLEXECUTEINFOW ExecInfo = {};
 		ExecInfo.cbSize			= sizeof(ExecInfo);
-		ExecInfo.fMask			= SEE_MASK_FLAG_NO_UI | SEE_MASK_NOCLOSEPROCESS;
+		ExecInfo.fMask			= SEE_MASK_FLAG_NO_UI;
 		ExecInfo.hwnd			= hWnd;
 		ExecInfo.lpVerb			= NULL;
 		ExecInfo.lpFile			= jobInfo.szTeraTerm;
