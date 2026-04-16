@@ -92,10 +92,17 @@
             Transparent gif file treat one color as transparent.
 
             <p>
-              Tera Term tries to load images using <a href="../about/glossary.html#susie">Susie</a> Plug-ins,
-              and using Windows functions such as GDI+, OleLoadPicture(), LoadImage(),
-              and so on.
-              It seems to be possible to load jpg and gif images on Windows 7 or later.
+              Tera Term tries to load images in the following order.
+              <ul>
+                <li><a href="../about/glossary.html#susie">Susie Plug-in</a></li>
+                <li><a href="../about/glossary.html#wic">WIC</a></li>
+                <li><a href="../about/glossary.html#gdi+">GDI+</a></li>
+                <li><a href="../about/glossary.html#ipicture">OleLoadPicture()</a></li>
+                <li>LoadImage() API</li>
+              </ul>
+            </p>
+            <p>
+              WIC seems to be possible to load JPG,GIF and PNG images on Windows Vista or later.
             </p>
           </dd>
 

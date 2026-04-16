@@ -38,6 +38,12 @@ BOOL SaveBmpFromBmi(const BITMAPINFO *pbmi, const unsigned char *pbuf, const cha
 BOOL SaveBmpFromHBitmap(HBITMAP hBitmap, const wchar_t *filename);
 BOOL SaveBmpFromHDC(HDC hdc, const wchar_t* filename);
 
+typedef struct {
+	const wchar_t *SusiePluginPath;		// Susieプラグインのパス, NULLのとき使用しない
+} BitmapLoadParam_t;
+
+DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMAP *hBitmap);
+
 #ifdef __cplusplus
 }
 #endif

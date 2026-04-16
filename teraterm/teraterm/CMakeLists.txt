@@ -1,7 +1,5 @@
 ﻿project("teraterm")
 
-option(ENABLE_GDIPLUS "Use GDI+ library" ON)
-
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 
@@ -222,13 +220,6 @@ target_sources(
   ../../teraterm/common/edithistory_res.h
 )
 
-target_sources(
-  ${PROJECT_NAME}
-  PRIVATE
-  ../susie_plugin/libsusieplugin.cpp
-  ../susie_plugin/libsusieplugin.h
-)
-
 source_group(
   "common"
   REGULAR_EXPRESSION
@@ -423,18 +414,6 @@ elseif(MINGW)
     )
 endif()
 
-if(ENABLE_GDIPLUS)
-  target_compile_options(
-    ${PROJECT_NAME}
-    PRIVATE "-DENABLE_GDIPLUS=1"
-  )
-else(ENABLE_GDIPLUS)
-  target_compile_options(
-    ${PROJECT_NAME}
-    PRIVATE "-DENABLE_GDIPLUS=0"
-  )
-endif(ENABLE_GDIPLUS)
-
 target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE
@@ -468,14 +447,6 @@ target_link_libraries(
   uuid
   ws2_32
   )
-
-if(ENABLE_GDIPLUS)
-  target_link_libraries(
-    ${PROJECT_NAME}
-    PRIVATE
-    gdiplus.lib
-  )
-endif(ENABLE_GDIPLUS)
 
 install(
   TARGETS ${PROJECT_NAME}

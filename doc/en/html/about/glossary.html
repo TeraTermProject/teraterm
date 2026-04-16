@@ -255,5 +255,100 @@ Glossary related to Windows.
   </dd>
 </dl>
 
+<h3 id="image_load">Image Loading</h3>
+
+<p>
+  There are several image loading Technologies available on Windows.
+</p>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Technology</th>
+      <th>BMP</th>
+      <th>JPEG</th>
+      <th>PNG</th>
+      <th>Others</th>
+      <th>Features</th>
+      <th>First Supported Windows</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#susie">Susie</a></td>
+      <td>o</td>
+      <td>o</td>
+      <td>o</td>
+      <td>o</td>
+      <td>User-made, Plugin</td>
+      <td>95</td>
+    </tr>
+    <tr>
+      <td>LoadImage() API</td>
+      <td>o</td>
+      <td>x</td>
+      <td>x</td>
+      <td>x</td>
+      <td>For resource loading such as ico, cur</td>
+      <td>Windows 95 and earlier</td>
+    </tr>
+    <tr>
+      <td><a href="#ipicture">IPicture</a></td>
+      <td>o</td>
+      <td>o</td>
+      <td>x/o<sup>*1</sup></td>
+      <td>o</td>
+      <td>GIF and other formats supported, OLE, COM I/F</td>
+      <td>95</td>
+    </tr>
+    <tr>
+      <td><a href="#gdi+">GDI+</a></td>
+      <td>o</td>
+      <td>o</td>
+      <td>o</td>
+      <td>o</td>
+      <td>GIF, TIFF and other formats supported</td>
+      <td>XP</td>
+    </tr>
+    <tr>
+      <td><a href="#wic">WIC</a></td>
+      <td>o</td>
+      <td>o</td>
+      <td>o</td>
+      <td>o</td>
+      <td>Various image formats (RAW, etc.) supported via add-ons</td>
+      <td>Vista</td>
+    </tr>
+  </tbody>
+</table>
+
+<dl>
+  <dt id="ipicture">IPicture</dt>
+  <dd>
+    <ul>
+      <li>Available since Windows 95 and later</li>
+      <li>Since Windows 7, PNG can be loaded (*1 In environments where IE9 is installed)</li>
+      <li>Uses OleLoadPicture() API</li>
+      <li>WMF and EMF formats can also be loaded</li>
+    </ul>
+  </dd>
+
+  <dt id="gdi+">GDI+</dt>
+  <dd>
+    <ul>
+      <li>Available since Windows XP and later</li>
+    </ul>
+  </dd>
+
+  <dt id="wic">WIC (Windows Imaging Component)</dt>
+  <dd>
+    <ul>
+      <li>Available since Windows Vista and later</li>
+      <li>RAW camera formats can also be loaded</li>
+    </ul>
+  </dd>
+
+</dl>
+
 </BODY>
 </HTML>

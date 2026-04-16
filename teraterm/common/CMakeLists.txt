@@ -3,6 +3,8 @@
 add_library(
   ${PROJECT_NAME}
   STATIC
+  ../susie_plugin/libsusieplugin.cpp
+  ../susie_plugin/libsusieplugin.h
   ../teraterm/unicode.cpp
   ../teraterm/unicode.h
   asprintf.cpp
@@ -13,21 +15,21 @@ add_library(
   codeconv.h
   codeconv_mb.cpp
   codeconv_mb.h
+  compat_dwrite.h
   compat_win.cpp
   compat_win.h
-  compat_dwrite.h
   comportinfo.cpp
   comportinfo.h
   ddelib.cpp
   ddelib.h
+  directx.cpp
+  directx.h
   dlglib.c
   dlglib.h
   dlglib_cpp.cpp
   dlglib_tmpl.cpp
   dllutil.cpp
   dllutil.h
-  directx.h
-  directx.cpp
   fileread.cpp
   fileread.h
   getcontent.cpp
@@ -90,6 +92,7 @@ target_include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}       # for svnversion.h
   .
   ../teraterm
+  ../susie_plugin
 )
 
 if(SUPPORT_OLD_WINDOWS)
@@ -103,7 +106,14 @@ endif()
 target_link_libraries(
   ${PROJECT_NAME}
   PUBLIC
-  #
   setupapi
   imagehlp
 )
+
+if(MSVC)
+  target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+    gdiplus.lib
+  )
+endif()

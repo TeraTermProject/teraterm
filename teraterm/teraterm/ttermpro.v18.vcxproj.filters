@@ -150,9 +150,6 @@
     <ClCompile Include="font_pp.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
-    <ClCompile Include="..\susie_plugin\libsusieplugin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="broadcast.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -554,9 +551,6 @@
     </ClInclude>
     <ClInclude Include="font_pp_res.h">
       <Filter>dialog</Filter>
-    </ClInclude>
-    <ClInclude Include="..\susie_plugin\libsusieplugin.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="broadcast.h">
       <Filter>Header Files</Filter>
