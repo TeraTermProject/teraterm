@@ -1,0 +1,107 @@
+name: Build (MinGW / Docker)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build_mingw:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set timezone to JST
+      run: sudo timedatectl set-timezone Asia/Tokyo
+
+    - uses: actions/checkout@v4
+
+    - name: Get runner UID/GID
+      id: uidgid
+      run: |
+        echo "UID=$(id -u)" >> $GITHUB_OUTPUT
+        echo "GID=$(id -g)" >> $GITHUB_OUTPUT
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: buildtools/docker
+        file: buildtools/docker/Dockerfile
+        tags: teraterm_build:latest
+        load: true
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          USER=ttbuilder
+          UID=${{ steps.uidgid.outputs.UID }}
+          GID=${{ steps.uidgid.outputs.GID }}
+
+    - name: Create buildinfo.json
+      shell: bash
+      run: |
+        cd buildtools/svnrev/
+        perl svnrev.pl --root ../.. --header ../../teraterm/common/svnversion.h --cmake build_config.cmake --json build_config.json
+
+    - name: Read buildinfo.json
+      id: read_buildinfo
+      shell: bash
+      run: |
+        json_content=$(cat buildtools/svnrev/build_config.json | jq -c .)
+        echo "json=$json_content" >> $GITHUB_OUTPUT
+
+    - name: Set vars
+      id: vars
+      shell: bash
+      run: |
+        VERSION=${{ fromJson(steps.read_buildinfo.outputs.json).VERSION }}
+        DATE_TIME=${{ fromJson(steps.read_buildinfo.outputs.json).DATE }}_${{ fromJson(steps.read_buildinfo.outputs.json).TIME }}
+        VCSVERSION=${{ fromJson(steps.read_buildinfo.outputs.json).GITVERSION }}
+        RELEASE=${{ fromJson(steps.read_buildinfo.outputs.json).RELEASE }}
+        SNAPSHOT_OUTPUT=teraterm-${VERSION}-i686-${DATE_TIME}-${VCSVERSION}-mingw-snapshot
+        RELEASE_OUTPUT=teraterm-${VERSION}-i686-mingw
+        if [ "$RELEASE" = "0" ]; then
+          OUTPUT=${SNAPSHOT_OUTPUT}
+        else
+          OUTPUT=${RELEASE_OUTPUT}
+        fi
+        echo "OUTPUT=${OUTPUT}" >> $GITHUB_OUTPUT
+        echo "OUTPUT=${OUTPUT}"
+
+    - name: Create output directory
+      run: mkdir -p "${GITHUB_WORKSPACE}/output"
+
+    - name: Build teraterm in container
+      run: |
+        docker run --rm \
+          -v "${GITHUB_WORKSPACE}:/workspaces/teraterm" \
+          -v "${GITHUB_WORKSPACE}/output:/mnt" \
+          -w /workspaces/teraterm \
+          teraterm_build:latest \
+          bash -c '
+            set -ex
+            cd libs
+            cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=i686 -P buildall.cmake
+            cd ..
+            mkdir build
+            cd build
+            cmake .. -G "Unix Makefiles" \
+              -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake \
+              -DARCHITECTURE=i686 \
+              -DSUPPORT_OLD_WINDOWS=on
+            make -j $(nproc)
+            make -j install
+            bash make_installer_cmake.sh
+            cp *.zip /mnt/
+          '
+
+    - name: List built artifacts
+      run: ls -la "${GITHUB_WORKSPACE}/output"
+
+    - name: Upload zip artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.vars.outputs.OUTPUT }}
+        path: output/*.zip
