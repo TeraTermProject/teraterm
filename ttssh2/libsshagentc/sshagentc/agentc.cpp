@@ -276,6 +276,7 @@ static char *get_ms_namedpipe(void)
 {
 	static const char *var_name = "SSH_AUTH_SOCK";
 	static const char *pipename_default = "\\\\.\\pipe\\openssh-ssh-agent";
+#if defined(_MSC_VER)
 	char *var_ptr = NULL;
 	size_t var_size = 0;
 	getenv_s(&var_size, NULL, 0, var_name);
@@ -287,6 +288,16 @@ static char *get_ms_namedpipe(void)
 		var_ptr = _strdup(pipename_default);
 	}
 	return var_ptr;
+#else // defined(__MINGW32__)
+	// getenv_s() が使えない場合
+	char *var_ptr = getenv(var_name);
+	if (var_ptr != NULL) {
+		var_ptr = _strdup(var_ptr);
+	} else {
+		var_ptr = _strdup(pipename_default);
+	}
+	return var_ptr;
+#endif
 }
 #endif
 
