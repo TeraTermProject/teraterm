@@ -247,6 +247,10 @@ if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/TTXAdditional/CMakeLists.txt)
   add_subdirectory(TTXAdditional)
 endif()
 add_subdirectory(cygwin)
+if(SUPPORT_OLD_WINDOWS AND WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+  # 32bitのとき
+  add_subdirectory(libcompatwin)
+endif()
 
 ### create buildinfo.txt
 configure_file(

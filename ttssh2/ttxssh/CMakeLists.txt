@@ -213,14 +213,21 @@ target_compile_definitions(
   ${PROJECT_NAME}
   PRIVATE
   $<$<CONFIG:Debug>:_CRTDBG_MAP_ALLOC>
-  )
+)
 
+if(MSVC)
+  target_link_options(
+    ${PROJECT_NAME}
+    PRIVATE
+    /MAP
+  )
+endif()
 if(MINGW)
   target_link_options(
-    ttxssh
+    ${PROJECT_NAME}
     PRIVATE
     -Wl,-Map=ttxssh.map,-cref
-    )
+  )
 endif()
 
 target_link_libraries(
@@ -262,6 +269,13 @@ if(SUPPORT_OLD_WINDOWS)
     PRIVATE
     layer_for_unicode
     )
+endif()
+
+if(SUPPORT_OLD_WINDOWS AND WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+  target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+    libcompatwin)
 endif()
 
 target_link_libraries(
