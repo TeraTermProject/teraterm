@@ -7,16 +7,40 @@
   - cygterm, msys2termはビルドできない
   - インストーラは作成できない
 
-## 準備
+## 準備 Windowsの場合
 
-- Windowsの場合
-  - Docker Desktop を使えるようにする
-- Linuxの場合
-  - Dockerを使えるようにする
+- Docker Desktop を使えるようにする
+- 次のファイルを取得、次のコマンドを実行
+  - `docker_build.bat`
+  - `Dockerfile`
+  - `build.sh`
+- `docker_build.bat`を実行
+- dockerのコンテナ内のbashが起動する
 
-## ビルド例
+### 実行例
 
-- `docker_build.bat` (windowsのとき) / `docker_build.sh` (linuxのとき) を実行
-  - docker内のbashが起動する
+```
+curl -O https://raw.githubusercontent.com/TeraTermProject/teraterm/refs/heads/main/buildtools/docker/docker_build.bat
+curl -O https://raw.githubusercontent.com/TeraTermProject/teraterm/refs/heads/main/buildtools/docker/Dockerfile
+curl -O https://raw.githubusercontent.com/TeraTermProject/teraterm/refs/heads/main/buildtools/docker/build.sh
+docker_build.bat
+```
+## 準備 Linux(WSL)の場合
+
+- Dockerを使えるようにする
+- 次のファイルを取得、次のコマンドを実行
+  - `docker_build.sh`
+  - `Dockerfile`
+  - `build.sh`
+- `docker_build.bat`を実行
+- dockerのコンテナ内のbashが起動する
+
+
+## ビルド
+
 - `bash ./build.sh` を実行
-- このフォルダに teraterm*.zip ができる
+- dockerを起動したフォルダに teraterm*.zip ができる
+
+## docker-compose.yml
+
+作成中
