@@ -45,13 +45,17 @@
   <li>Bug fixes
     <ul>
       <li>
-        Fixed an issue where Tera Term crashes at startup when <a href="../menu/setup-additional-window.html#HideTitle">Hide title bar</a> is on.
+        Fixed an issue where Tera Term crashes when <a href="../menu/setup-additional-window.html#HideTitle">Hide title bar is on</a>.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1168" target="_blank">issue #1168</a>)
       </li>
       <li>
         Fixed an issue where the newline code specified by the Enter key in the <a href="../menu/control-broadcast.html">Broadcast command</a> dialog was not sent as-is.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1178" target="_blank">issue #1178</a>)<br>
         (Previously, it was converted according to the <a href="../menu/setup-additional-terminal.html#CRSend">New-line (Transmit) setting in "Setup &gt; Terminal"</a>.)
+      </li>
+      <li>
+        Fixed an issue where old bg theme files were not being loaded correctly.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1128" target="_blank">issue #1128</a>)
       </li>
       <li>
         Fixed an issue where colors in image set as Tera Term background were incorrect.
@@ -61,10 +65,6 @@
         Fixed an issue where, in some cases, Tera Term launched in a minimized state could not be linked from the <a href="../macro/command/connect.html">connect</a> or <a href="../macro/command/cygconnect.html">cygconnect</a> macro command.
         This bug was introduced in 5.5.2.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1195" target="_blank">issue #1195</a>)
-      </li>
-      <li>
-        Fixed an issue where old bg theme files were not being loaded correctly.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1128" target="_blank">issue #1128</a>)
       </li>
     </ul>
   </li>
@@ -6319,28 +6319,23 @@ SYNOPSIS:
 <h3 id="ttmenu_1.22">YYYY.MM.DD (Ver 1.22)</h3>
 <ul class="history">
       <li>
-        Fixed an issue where the "Tera Term configuration file" specified in the TeraTerm Menu was not loaded.
-        This bug was introduced in 1.21.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1157" target="_blank">issue #1157</a>)
-      </li>
-      <li>
         Fixed an issue where the "Launch Pattern" radio buttons in the "List Configuration" dialog were split into two groups  "autologin" and "specified macro file" / "launch only".
         This bug was introduced in 1.20.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1169" target="_blank">issue #1169</a>)
       </li>
       <li>
-        Fixed an issue in the "List Configuration" dialog where "Use SSH" became enabled when "specified macro file" or "launch only" was selected.
-        This bug was introduced in 1.18.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1169" target="_blank">issue #1169</a>)
+        Fixed an issue where LockBox could be forcibly enabled when loading settings stored in the registry from versions prior to 1.20.
+        This bug was introduced in 1.20.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1223" target="_blank">issue #1223</a>)
+      </li>
+      <li>
+        Fixed an issue where the "Tera Term configuration file" specified in the TeraTerm Menu was not loaded.
+        This bug was introduced in 1.21.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1157" target="_blank">issue #1157</a>)
       </li>
       <li>
         Fixed a bug where an invalid free() occurred when a filename starting with '"' was entered in the file name box and opening and then closing the file selection dialog.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1176" target="_blank">issue #1176</a>)
-      </li>
-      <li>
-        Fixed an issue where LockBox could be forcibly enabled when loading settings stored in the registry from versions prior to 1.20.
-        This bug was introduced in 1.20.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1223" target="_blank">issue #1223</a>)
       </li>
 </ul>
 

@@ -54,6 +54,10 @@
         (以前は、<a href="../menu/setup-additional-terminal.html#CRSend">"Setup &gt; Teminal" の New-line (Transmit)</a> の設定により改行コードが変換されていた)
       </li>
       <li>
+        古いテーマファイルが正しく読み込まれない問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1128" target="_blank">issue #1128</a>)
+      </li>
+      <li>
         Tera Termの背景に設定した画像の色が不自然になる不具合を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1159" target="_blank">issue #1159</a>)
       </li>
@@ -61,10 +65,6 @@
         接続コマンド <a href="../macro/command/connect.html">connect</a> または <a href="../macro/command/cygconnect.html">cygconnect</a> から最小化状態で起動された Tera Term がマクロとリンク出来ない場合がある不具合を修正した。
         5.5.2 からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1195" target="_blank">issue #1195</a>)
-      </li>
-      <li>
-        古いテーマファイルが正しく読み込まれない問題を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1128" target="_blank">issue #1128</a>)
       </li>
     </ul>
   </li>
@@ -6328,28 +6328,23 @@
 <h3 id="ttmenu_1.22">YYYY.MM.DD (Ver 1.22)</h3>
 <ul class="history">
       <li>
-        TeraTerm Menu で指定した "Tera Term 設定ファイル" が読み込まれない不具合を修正した。
-        1.21 からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1157" target="_blank">issue #1157</a>)
-      </li>
-      <li>
         リスト編集ダイアログの "起動の種類" のラジオボタンが「"autologin"」と「"specified macro file"と"launch only"」の2グループに分かれていた不具合を修正した。
         1.20 からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1169" target="_blank">issue #1169</a>)
       </li>
       <li>
-        リスト編集ダイアログの "use SSH" が "specified macro file" と "launch only" 選択時に有効になっていた不具合を修正した。
-        1.18 からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1169" target="_blank">issue #1169</a>)
+        Ver 1.20 以前でレジストリに保存された設定を読み込んだとき、強制的に LockBox が使用される場合がある不具合を修正した。
+        1.20 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1223" target="_blank">issue #1223</a>)
+      </li>
+      <li>
+        TeraTerm Menu で指定した "Tera Term 設定ファイル" が読み込まれない不具合を修正した。
+        1.21 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1157" target="_blank">issue #1157</a>)
       </li>
       <li>
         ファイル名に '"' ではじまる文字が入力された状態で、ファイル選択ダイアログを開いて閉じた時、不正なアドレスを free() する不具合を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1176" target="_blank">issue #1176</a>)
-      </li>
-      <li>
-        Ver 1.20 以前でレジストリに保存された設定を読み込んだとき、強制的に LockBox が使用される場合がある不具合を修正した。
-        1.20 からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1223" target="_blank">issue #1223</a>)
       </li>
 </ul>
 
