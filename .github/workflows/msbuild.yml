@@ -26,7 +26,7 @@ jobs:
       run: |
         tzutil /s "Tokyo Standard Time"
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Calculate cache hash
       id: cache_hash
@@ -107,7 +107,7 @@ jobs:
       run: |
         tzutil /s "Tokyo Standard Time"
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Calculate cache hash
       id: cache_hash
@@ -250,7 +250,7 @@ jobs:
       run: |
         tzutil /s "Tokyo Standard Time"
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Calculate cache hash
       id: cache_hash
@@ -559,7 +559,7 @@ jobs:
       run: |
         tzutil /s "Tokyo Standard Time"
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Download from artifacts (buildinfo)
       uses: actions/download-artifact@v4
