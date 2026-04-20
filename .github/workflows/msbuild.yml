@@ -37,7 +37,7 @@ jobs:
 
     - name: Restore cached files (buildtools)
       id: cache-buildtools-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           buildtools
@@ -45,7 +45,7 @@ jobs:
 
     - name: Restore cached files (libs/download)
       id: cache-libs_download-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           libs/download
@@ -73,7 +73,7 @@ jobs:
 
     - name: Save cache files (buildtools)
       id: cache-buildtools-save
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           buildtools
@@ -81,7 +81,7 @@ jobs:
 
     - name: Save cache files (libs/download)
       id: cache-libs_download-save
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           libs/download
@@ -118,7 +118,7 @@ jobs:
 
     - name: Restore cached files (buildtools)
       id: cache-buildtools-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           buildtools
@@ -129,7 +129,7 @@ jobs:
 
     - name: Restore cached files (libs)
       id: cache-libs-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         # キャッシュに libs/download は含まれていないが、path が全く同じでないとリストアできないので !libs/download を追加
         path: |
@@ -139,7 +139,7 @@ jobs:
 
     - name: Restore cached files (libs/download)
       id: cache-libs_download-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           libs/download
@@ -214,7 +214,7 @@ jobs:
     - name: Save cache files (libs)
       if: ${{ steps.cache-libs-restore.outputs.cache-hit != 'true' && github.event_name == 'push' }}
       id: cache-libs-save
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           libs
@@ -261,7 +261,7 @@ jobs:
 
     - name: Restore cached files (buildtools)
       id: cache-buildtools-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           buildtools
@@ -272,7 +272,7 @@ jobs:
 
     - name: Restore cached files (libs)
       id: cache-libs-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         # キャッシュに libs/download は含まれていないが、path が全く同じでないとリストアできないので !libs/download を追加
         path: |
@@ -282,7 +282,7 @@ jobs:
 
     - name: Restore cached files (libs/download)
       id: cache-libs_download-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           libs/download
@@ -364,7 +364,7 @@ jobs:
     - name: Save cache files (libs)
       if: ${{ steps.cache-libs-restore.outputs.cache-hit != 'true' && github.event_name == 'push' }}
       id: cache-libs-save
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           libs
