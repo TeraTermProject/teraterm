@@ -1,9 +1,7 @@
-﻿set(PACKAGE_NAME "ttreg")
-
-project(${PACKAGE_NAME})
+﻿project("ttreg")
 
 add_executable(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   ttreg.cpp
 )
 
@@ -12,21 +10,21 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:wmainCRTStartup")
   else()
     target_link_options(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       /ENTRY:wmainCRTStartup
     )
   endif()
 else(MSVC)
   target_link_options(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     -municode
   )
 endif(MSVC)
 
 install(
-  TARGETS ${PACKAGE_NAME}
+  TARGETS ${PROJECT_NAME}
   DESTINATION .
 )
 install(FILES

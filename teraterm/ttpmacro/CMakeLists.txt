@@ -1,13 +1,11 @@
-﻿set(PACKAGE_NAME "ttpmacro")
-
-project(${PACKAGE_NAME})
+﻿project("ttpmacro")
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_libressl.cmake)
 
 add_executable(
-  ${PACKAGE_NAME} WIN32
+  ${PROJECT_NAME} WIN32
   ttm_res.h
   errdlg.cpp
   errdlg.h
@@ -57,14 +55,14 @@ add_executable(
 if(SUPPORT_OLD_WINDOWS)
   if(MSVC)
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/common/compat_w95_vs2005.c
       )
   endif()
   if(MINGW)
     target_link_libraries(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       -Wl,--whole-archive
       mingw_msvcrt
@@ -74,7 +72,7 @@ if(SUPPORT_OLD_WINDOWS)
 endif(SUPPORT_OLD_WINDOWS)
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../common/teraterm.h
   ../common/ttcommon.h
@@ -97,13 +95,13 @@ source_group(
   )
 
 set_target_properties(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ${ONIGURUMA_INCLUDE_DIRS}
   ${SFMT_INCLUDE_DIRS}
@@ -116,7 +114,7 @@ if (MSVC)
 endif()
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   common_static
   ttpcmn
@@ -127,14 +125,14 @@ target_link_libraries(
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     layer_for_unicode
     )
 endif()
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ws2_32
   comctl32
@@ -146,24 +144,24 @@ target_link_libraries(
 if(MSVC)
   if(${CMAKE_VERSION} VERSION_GREATER "3.13")
     target_link_options(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       /DEBUG:FULL
-      /PDBALTPATH:${PACKAGE_NAME}.pdb
+      /PDBALTPATH:${PROJECT_NAME}.pdb
       /map
     )
   endif()
 endif()
 
 install(
-  TARGETS ${PACKAGE_NAME}
+  TARGETS ${PROJECT_NAME}
   DESTINATION .
 )
 
 if(MSVC)
   install(
     FILES
-    $<TARGET_PDB_FILE:${PACKAGE_NAME}>
+    $<TARGET_PDB_FILE:${PROJECT_NAME}>
     $<CONFIG>/ttpmacro.map
     DESTINATION .
   )

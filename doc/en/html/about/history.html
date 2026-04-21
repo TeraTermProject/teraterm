@@ -35,26 +35,66 @@
 
 <h3 id="teraterm_5.7.0">YYYY.MM.DD (Ver 5.7.0 not released yet)</h3>
 <ul class="history">
-  <!--li>Changes
+  <li>Changes
     <ul>
       <li>
+        Added a Submit key option to the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> that allows users to select the key operation used to send commands in non-real-time mode.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1158" target="_blank">issue #1158</a>)<br>
+        Since the size of the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> had increased, it was modified so that it can now be resized to smaller than its initial size.
+      </li>
+      <li>
+        Improved the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> so that it no longer becomes distorted when moved between displays with different DPI settings.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1180" target="_blank">issue #1180</a>)<br>
+      </li>
+      <li>
+        Selection is extended when Shift+left-clicking to the left of or above the current selection.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        Previously, clicking in that area would create a new selection from the clicked position to the start of the existing selection.
+      </li>
+      <li>
+        Selection is reduced such that, when Shift+left-clicking within it, the portion farther from the center than the click position is deselected.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        Previously, clicking anywhere within the selection would shrink the selection to span from the start of the existing selection to the clicked position.
+      </li>
+      <li>
+        Added support for WebP image format. Image loading to use WIC (Windows Imaging Component).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1225" target="_blank">issue #1225</a>)
       </li>
     </ul>
-  </li-->
+  </li>
 
-  <!--li>Bug fixes
+  <li>Bug fixes
     <ul>
       <li>
+        Fixed an issue where Tera Term crashes at startup when <a href="../menu/setup-additional-window.html#HideTitle">Hide title bar</a> is on.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1168" target="_blank">issue #1168</a>)
+      </li>
+      <li>
+        Fixed an issue where the newline code specified by the Enter key in the <a href="../menu/control-broadcast.html">Broadcast command</a> dialog was not sent as-is.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1178" target="_blank">issue #1178</a>)<br>
+        (Previously, it was converted according to the <a href="../menu/setup-additional-terminal.html#CRSend">New-line (Transmit) setting in "Setup &gt; Terminal"</a>.)
+      </li>
+      <li>
+        Fixed an issue where colors in image set as Tera Term background were incorrect.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1159" target="_blank">issue #1159</a>)
+      </li>
+      <li>
+        Fixed an issue where, in some cases, Tera Term launched in a minimized state could not be linked from the <a href="../macro/command/connect.html">connect</a> or <a href="../macro/command/cygconnect.html">cygconnect</a> macro command.
+        This bug was introduced in 5.5.2.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1195" target="_blank">issue #1195</a>)
+      </li>
+      <li>
+        Fixed an issue where old bg theme files were not being loaded correctly.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1128" target="_blank">issue #1128</a>)
       </li>
     </ul>
-  </li-->
+  </li>
 
-  <!--li>Misc
+  <li>Misc
     <ul>
-      <li>
-      </li>
+      <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.22">1.22</a>.</li>
     </ul>
-  </li-->
+  </li>
 </ul>
 
 <h3 id="teraterm_5.6.0">2026.02.28 (Ver 5.6.0)</h3>
@@ -65,7 +105,7 @@
         Character width can now be specified by the user for each Unicode code point.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/318" target="_blank">issue #318</a>,
         <a href="https://github.com/TeraTermProject/teraterm/issues/1024" target="_blank">#1024</a>)<br>
-        When specify <a href="../setup/teraterm-term.html#OverrideCharWidth">character width</a> settings in TERATERM.INI,
+        When specify <a href="../setup/teraterm-term.html#CellWidth">character width</a> settings in TERATERM.INI,
         <a href="../menu/setup-additional-coding.html#OverrideCharWidth">"Use character-by-character width override settings"</a>
         check box becomes available, in the Encoding tab  ("Additional settings &gt; <a href="../menu/setup-additional-coding.html">Encoding</a>") .
       </li>
@@ -6296,6 +6336,34 @@ SYNOPSIS:
 
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
+
+<h3 id="ttmenu_1.22">YYYY.MM.DD (Ver 1.22)</h3>
+<ul class="history">
+      <li>
+        Fixed an issue where the "Tera Term configuration file" specified in the TeraTerm Menu was not loaded.
+        This bug was introduced in 1.21.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1157" target="_blank">issue #1157</a>)
+      </li>
+      <li>
+        Fixed an issue where the "Launch Pattern" radio buttons in the "List Configuration" dialog were split into two groups  "autologin" and "specified macro file" / "launch only".
+        This bug was introduced in 1.20.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1169" target="_blank">issue #1169</a>)
+      </li>
+      <li>
+        Fixed an issue in the "List Configuration" dialog where "Use SSH" became enabled when "specified macro file" or "launch only" was selected.
+        This bug was introduced in 1.18.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1169" target="_blank">issue #1169</a>)
+      </li>
+      <li>
+        Fixed a bug where an invalid free() occurred when a filename starting with '"' was entered in the file name box and opening and then closing the file selection dialog.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1176" target="_blank">issue #1176</a>)
+      </li>
+      <li>
+        Fixed an issue where LockBox could be forcibly enabled when loading settings stored in the registry from versions prior to 1.20.
+        This bug was introduced in 1.20.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1223" target="_blank">issue #1223</a>)
+      </li>
+</ul>
 
 <h3 id="ttmenu_1.21">2026.02.28 (Ver 1.21)</h3>
 <ul class="history">

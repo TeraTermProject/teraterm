@@ -1,33 +1,35 @@
-﻿set(PACKAGE_NAME "common_static")
-
-project(${PACKAGE_NAME})
+﻿project("common_static")
 
 add_library(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   STATIC
+  ../susie_plugin/libsusieplugin.cpp
+  ../susie_plugin/libsusieplugin.h
   ../teraterm/unicode.cpp
   ../teraterm/unicode.h
   asprintf.cpp
   asprintf.h
+  bitmap.cpp
+  bitmap.h
   codeconv.cpp
   codeconv.h
   codeconv_mb.cpp
   codeconv_mb.h
+  compat_dwrite.h
   compat_win.cpp
   compat_win.h
-  compat_dwrite.h
   comportinfo.cpp
   comportinfo.h
   ddelib.cpp
   ddelib.h
+  directx.cpp
+  directx.h
   dlglib.c
   dlglib.h
   dlglib_cpp.cpp
   dlglib_tmpl.cpp
   dllutil.cpp
   dllutil.h
-  directx.h
-  directx.cpp
   fileread.cpp
   fileread.h
   getcontent.cpp
@@ -85,25 +87,33 @@ add_library(
 )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PUBLIC
   ${CMAKE_CURRENT_BINARY_DIR}       # for svnversion.h
   .
   ../teraterm
+  ../susie_plugin
 )
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PUBLIC
     layer_for_unicode
   )
 endif()
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PUBLIC
-  #
   setupapi
   imagehlp
 )
+
+if(MSVC)
+  target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+    gdiplus.lib
+  )
+endif()

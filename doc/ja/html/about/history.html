@@ -35,26 +35,66 @@
 
 <h3 id="teraterm_5.7.0">YYYY.MM.DD (Ver 5.7.0 not released yet)</h3>
 <ul class="history">
-  <!--li>変更
+  <li>変更
     <ul>
       <li>
+        <a href="../menu/control-broadcast.html">ブロードキャストコマンドダイアログ</a>に、非リアルタイムモードでコマンド送信に使用するキー操作を選択できる Submit key オプションを追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1158" target="_blank">issue #1158</a>)<br>
+        <a href="../menu/control-broadcast.html">ブロードキャストコマンドダイアログ</a>のサイズが大きくなったため、初期サイズより小さくできるよう変更した。
+      </li>
+      <li>
+        <a href="../menu/control-broadcast.html">ブロードキャストコマンドダイアログ</a>が DPI 設定の異なるディスプレイ間を移動しても表示が崩れないようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1180" target="_blank">issue #1180</a>)<br>
+      </li>
+      <li>
+        選択領域より左または上の位置で Shift+左クリック したとき、選択領域が拡張されるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        以前はクリックした位置から既存の選択領域の先頭までが選択領域になった。
+      </li>
+      <li>
+        選択領域の中で Shift+左ボタン をクリックしたとき、選択領域の中心から見てクリック位置より外側の選択が解除されるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/903" target="_blank">issue #903</a>)<br>
+        以前は選択領域内のどこをクリックしても、既存の選択領域の先頭からクリックした位置までが選択領域になった。
+      </li>
+      <li>
+        WebP画像フォーマットの読み込みをサポートした。WIC(Windows Imaging Component)を画像読み込みに利用するようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1225" target="_blank">issue #1225</a>)
       </li>
     </ul>
-  </li-->
+  </li>
 
-  <!--li>バグ修正
+  <li>バグ修正
     <ul>
       <li>
+        <a href="../menu/setup-additional-window.html#HideTitle">Hide title bar</a> が on の時、起動時にクラッシュする問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1168" target="_blank">issue #1168</a>)
+      </li>
+      <li>
+        <a href="../menu/control-broadcast.html">Broadcast command</a> ダイアログの Enter key で指定した改行コードがそのまま送信されない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1178" target="_blank">issue #1178</a>)<br>
+        (以前は、<a href="../menu/setup-additional-terminal.html#CRSend">"Setup &gt; Teminal" の New-line (Transmit)</a> の設定により改行コードが変換されていた)
+      </li>
+      <li>
+        Tera Termの背景に設定した画像の色が不自然になる不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1159" target="_blank">issue #1159</a>)
+      </li>
+      <li>
+        接続コマンド <a href="../macro/command/connect.html">connect</a> または <a href="../macro/command/cygconnect.html">cygconnect</a> から最小化状態で起動された Tera Term がマクロとリンク出来ない場合がある不具合を修正した。
+        5.5.2 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1195" target="_blank">issue #1195</a>)
+      </li>
+      <li>
+        古いテーマファイルが正しく読み込まれない問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1128" target="_blank">issue #1128</a>)
       </li>
     </ul>
-  </li-->
+  </li>
 
-  <!--li>その他
+  <li>その他
     <ul>
-      <li>
-      </li>
+      <li><a href="#ttmenu_1.22">TeraTerm Menu 1.22</a> へ差し替えた。</li>
     </ul>
-  </li-->
+  </li>
 </ul>
 
 <h3 id="teraterm_5.6.0">2026.02.28 (Ver 5.6.0)</h3>
@@ -65,7 +105,7 @@
         Unicode コードポイントごとの文字幅をユーザーが指定できるようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/318" target="_blank">issue #318</a>,
         <a href="https://github.com/TeraTermProject/teraterm/issues/1024" target="_blank">#1024</a>)<br>
-        TERATERM.INI に<a href="../setup/teraterm-term.html#OverrideCharWidth">文字幅設定</a>を書くと、
+        TERATERM.INI に<a href="../setup/teraterm-term.html#CellWidth">文字幅設定</a>を書くと、
         Encoding タブ ("Additional settings &gt; <a href="../menu/setup-additional-coding.html">Encoding</a>") で
         <a href="../menu/setup-additional-coding.html#OverrideCharWidth">"文字ごとの文字幅オーバーライド設定を使う"</a>
         がチェックできるようになる。
@@ -6305,6 +6345,34 @@
 
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
+
+<h3 id="ttmenu_1.22">YYYY.MM.DD (Ver 1.22)</h3>
+<ul class="history">
+      <li>
+        TeraTerm Menu で指定した "Tera Term 設定ファイル" が読み込まれない不具合を修正した。
+        1.21 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1157" target="_blank">issue #1157</a>)
+      </li>
+      <li>
+        リスト編集ダイアログの "起動の種類" のラジオボタンが「"autologin"」と「"specified macro file"と"launch only"」の2グループに分かれていた不具合を修正した。
+        1.20 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1169" target="_blank">issue #1169</a>)
+      </li>
+      <li>
+        リスト編集ダイアログの "use SSH" が "specified macro file" と "launch only" 選択時に有効になっていた不具合を修正した。
+        1.18 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1169" target="_blank">issue #1169</a>)
+      </li>
+      <li>
+        ファイル名に '"' ではじまる文字が入力された状態で、ファイル選択ダイアログを開いて閉じた時、不正なアドレスを free() する不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1176" target="_blank">issue #1176</a>)
+      </li>
+      <li>
+        Ver 1.20 以前でレジストリに保存された設定を読み込んだとき、強制的に LockBox が使用される場合がある不具合を修正した。
+        1.20 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1223" target="_blank">issue #1223</a>)
+      </li>
+</ul>
 
 <h3 id="ttmenu_1.21">2026.02.28 (Ver 1.21)</h3>
 <ul class="history">

@@ -1,11 +1,9 @@
-﻿set(PACKAGE_NAME "argon2")
-
-project(${PACKAGE_NAME})
+﻿project("argon2")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 add_library(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   argon2.h
   ../../libs/argon2/src/argon2.c
   ../../libs/argon2/src/blake2/blake2-impl.h
@@ -25,12 +23,12 @@ add_library(
 if(MSVC AND (MSVC_VERSION LESS_EQUAL 1500))
   # Visual Studio 2005, 2008  (1500=VS2008)
   target_sources(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     compat/stdint.h
     )
   target_include_directories(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/compat
     )
@@ -42,10 +40,9 @@ source_group(
   "libs/argon2/")
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PUBLIC
   ${CMAKE_CURRENT_LIST_DIR}/
   PRIVATE
   ${CMAKE_CURRENT_LIST_DIR}/../../libs/argon2/src
   )
-

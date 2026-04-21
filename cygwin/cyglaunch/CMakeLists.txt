@@ -1,16 +1,14 @@
-﻿set(PACKAGE_NAME "cyglaunch")
-
-project(${PACKAGE_NAME})
+﻿project("cyglaunch")
 
 add_executable(
-  ${PACKAGE_NAME} WIN32
+  ${PROJECT_NAME} WIN32
   cyglaunch.c
   cyglaunch.rc
   ../cyglib/cyglib.h
   )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   .
   )
@@ -18,14 +16,14 @@ target_include_directories(
 if(SUPPORT_OLD_WINDOWS)
   if(MSVC)
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/common/compat_w95_vs2005.c
     )
   endif()
   if(MINGW)
     target_link_libraries(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       -Wl,--whole-archive
       mingw_msvcrt
@@ -35,14 +33,14 @@ if(SUPPORT_OLD_WINDOWS)
 endif(SUPPORT_OLD_WINDOWS)
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   common_static
   cyglib
   )
 
 install(
-  TARGETS ${PACKAGE_NAME}
+  TARGETS ${PROJECT_NAME}
   DESTINATION .
   )
 
@@ -67,7 +65,7 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:wmainCRTStartup")
   else()
     target_link_options(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       /ENTRY:wmainCRTStartup
       )
@@ -76,7 +74,7 @@ endif(MSVC)
 
 if(MINGW)
   target_link_options(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     -municode
     )

@@ -1,9 +1,7 @@
-﻿set(PACKAGE_NAME "TTXProxy")
-
-project(${PACKAGE_NAME})
+﻿project("TTXProxy")
 
 add_library(
-  ${PACKAGE_NAME} SHARED
+  ${PROJECT_NAME} SHARED
   Hooker.h
   Logger.h
   ProxyWSockHook.h
@@ -19,19 +17,19 @@ add_library(
 if(SUPPORT_OLD_WINDOWS)
   if(MSVC)
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/common/compat_w95_vs2005.c
       )
   endif()
   if(MINGW)
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/libmingw/tlssup.c
       )
     target_link_libraries(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       -Wl,--whole-archive
       mingw_msvcrt
@@ -41,7 +39,7 @@ if(SUPPORT_OLD_WINDOWS)
 endif(SUPPORT_OLD_WINDOWS)
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../teraterm/common/ttlib.h
   ../teraterm/common/i18n.h
@@ -62,7 +60,7 @@ source_group(
   "teraterm\/common\/")
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   YCL/include/YCL/Array.h
   YCL/include/YCL/ComboBoxCtrl.h
@@ -95,14 +93,14 @@ source_group(
   "YCL\/include\/")
 
 set_target_properties(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PROPERTIES
   PREFIX ""
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../teraterm/teraterm
   YCL/include
@@ -110,7 +108,7 @@ target_include_directories(
   )
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   common_static
   ttpcmn
@@ -118,14 +116,14 @@ target_link_libraries(
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     layer_for_unicode
     )
 endif(SUPPORT_OLD_WINDOWS)
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ws2_32
   version
@@ -134,7 +132,7 @@ target_link_libraries(
   )
 
 install(
-  TARGETS ${PACKAGE_NAME}
+  TARGETS ${PROJECT_NAME}
   RUNTIME
   DESTINATION .
   )

@@ -125,6 +125,8 @@
 #define IDC_ENABLE_ATTR_FONT_UNDERLINE  1081
 #define IDC_ENABLE_ATTR_FONT_BOLD       1082
 #define IDC_CHECK_CORNERDONTROUND       1083
+#define IDC_SUBMITKEY_LABEL             1084
+#define IDC_SUBMITKEY_TYPE              1085
 #define IDD_PRNABORTDLG                 2100
 #define IDD_FILETRANSDLG                2200
 #define IDC_TRANSFNAME                  2201
@@ -353,7 +355,7 @@
 #define ID_FILE_TERATERMMENU            52006
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1

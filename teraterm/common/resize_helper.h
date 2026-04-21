@@ -76,6 +76,11 @@ typedef struct {
 ReiseDlgHelper_t *ReiseDlgHelperCreate(HWND dlg, BOOL size_box);
 
 /**
+ *	指定した割合(%)で初期化時のウィンドウサイズを変更する
+ */
+void ReiseDlgHelperAdjustInitSize(ReiseDlgHelper_t *h, int percentX, int percentY);
+
+/**
  *	終了
  */
 void ReiseDlgHelperDelete(ReiseDlgHelper_t *h);

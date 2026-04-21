@@ -1,6 +1,5 @@
 ﻿
-set(PACKAGE_NAME "chm_en")
-project(${PACKAGE_NAME})
+project("chm_en")
 
 if(NOT DEFINED BINARY_DIR)
   MESSAGE(FATAL_ERROR "check BINARY_DIR")
@@ -49,7 +48,7 @@ list(FILTER SRC EXCLUDE REGEX "build_with_cmake.html")
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${SRC})
 
 add_custom_target(
-  ${PACKAGE_NAME} ALL
+  ${PROJECT_NAME} ALL
   DEPENDS ${BINARY_DIR}/teraterm.chm
   SOURCES ${SRC}
   SOURCES ../htmlhelp_index_make.pl

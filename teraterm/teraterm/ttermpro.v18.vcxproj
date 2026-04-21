@@ -137,7 +137,7 @@
     <ClCompile>
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BrowseInformation />
@@ -180,7 +180,7 @@
     <ClCompile>
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BrowseInformation>
@@ -223,7 +223,7 @@
     <ClCompile>
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BrowseInformation>
@@ -267,7 +267,7 @@
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -311,7 +311,7 @@
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -354,7 +354,7 @@
       <AdditionalOptions>/D"_CRT_SECURE_NO_DEPRECATE" /source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)susie_plugin;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\libs\SFMT;$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)teraterm;$(SolutionDir)common;$(SolutionDir)ttpfile;$(SolutionDir)ttpdlg;$(SolutionDir)ttpcmn;$(SolutionDir)ttptek;$(SolutionDir)..\cygwin\cyglib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -388,7 +388,6 @@
     <ClCompile Include="..\..\cygwin\cyglib\cyglib.c" />
     <ClCompile Include="..\common\edithistory.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
-    <ClCompile Include="..\susie_plugin\libsusieplugin.cpp" />
     <ClCompile Include="..\ttpcmn\ttcmn_dup.cpp" />
     <ClCompile Include="..\ttpcmn\ttcmn_static.c" />
     <ClCompile Include="..\ttpdlg\aboutdlg.c" />
@@ -481,7 +480,6 @@
     <ClInclude Include="..\..\cygwin\cyglib\cyglib.h" />
     <ClInclude Include="..\common\edithistory.h" />
     <ClInclude Include="..\common\edithistory_res.h" />
-    <ClInclude Include="..\susie_plugin\libsusieplugin.h" />
     <ClInclude Include="..\ttpcmn\ttcmn_dup.h" />
     <ClInclude Include="..\ttpcmn\ttcmn_shared_memory.h" />
     <ClInclude Include="..\ttpcmn\ttcmn_static.h" />
