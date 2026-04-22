@@ -29,6 +29,7 @@
   #ifndef OutputBaseFilename
     #define OutputBaseFilename "teraterm-unofficial_build" + "-" + Arch
   #endif
+  #define VersionInfoVersion ""
 #endif
 
 ; source dir
@@ -47,21 +48,25 @@ AppVerName={#AppName} {#AppVersion} {#Arch}
 #else ; Arch == "x86"
   AppId={{07A7E17A-F6D6-44A7-82E6-6BEE528CCA2A}
 #endif
+WizardStyle=modern dynamic
+WizardSizePercent=125,125
 
 ; properties of installer executable
 VersionInfoDescription={#AppName} installer
-AppCopyright=(C) 2004-2025 TeraTerm Project
+VersionInfoVersion={#VersionInfoVersion}
+AppCopyright=(C) 2004-2026 TeraTerm Project
 ; Apps in Settings
 AppPublisher=TeraTerm Project
 AppPublisherURL=https://teratermproject.github.io/
 AppSupportURL=https://github.com/TeraTermProject/teraterm/issues
 ; execute
-PrivilegesRequired=none
+PrivilegesRequired=admin
+PrivilegesRequiredOverridesAllowed=dialog
 ; during installer execution
 ShowLanguageDialog=yes
 UsePreviousLanguage=no
-LicenseFile={#SrcDir}\license.txt
-DefaultDirName={commonpf}\teraterm5
+LicenseFile={#SrcDir}\license.rtf
+DefaultDirName={autopf}\teraterm5
 AllowNoIcons=true
 DefaultGroupName={#AppName} 5
 ; uninstall

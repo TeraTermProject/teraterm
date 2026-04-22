@@ -80,7 +80,6 @@ void BuffReset(void);
 void BuffAllSelect(void);
 void BuffScreenSelect(void);
 void BuffCancelSelection(void);
-void ChangeSelectRegion(void);
 void BuffInsertSpace(int Count);
 void BuffEraseCurToEnd(void);
 void BuffEraseHomeToCur(void);
@@ -110,13 +109,6 @@ void BuffScrollNLines(int n);
 void BuffClearScreen(void);
 void BuffUpdateScroll(void);
 void CursorUpWithScroll(void);
-int BuffUrlDblClk(int Xw, int Yw);
-void BuffDblClk(int Xw, int Yw);
-void BuffTplClk(int Yw);
-void BuffSeveralPagesSelect(int Xw, int Yw);
-void BuffStartSelect(int Xw, int Yw, BOOL Box);
-void BuffChangeSelect(int Xw, int Yw, int NClick);
-wchar_t *BuffEndSelect(void);
 void BuffChangeWinSize(int Nx, int Ny);
 void BuffChangeTerminalSize(int Nx, int Ny);
 void ChangeWin(void);
@@ -146,21 +138,29 @@ int BuffGetCurrentLineData(char *buf, int bufsize);
 wchar_t *BuffGetLineStrW(int Sy, int *cx, size_t *length);
 int BuffGetAnyLineData(int offset_y, char *buf, int bufsize);
 int BuffGetAnyLineDataW(int offset_y, wchar_t *buf, size_t bufsize);
-BOOL BuffCheckMouseOnURL(int Xw, int Yw);
-wchar_t *BuffGetCharInfo(int Xw, int Yw);
 void BuffSetCursorCharAttr(int x, int y, const TCharAttr *Attr);
 TCharAttr BuffGetCursorCharAttr(int x, int y);
 BOOL BuffIsCombiningCharacter(int x, int y, unsigned int u32);
 void BuffSetDispAPI(BOOL unicode);
 void BuffSetDispCodePage(int CodePage);
 int BuffGetDispCodePage(void);
-BOOL BuffIsSelected(void);
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom, CursorLeftM, CursorRightM;
 extern BOOL Wrap;
 
 #define isCursorOnStatusLine (StatusLine && CursorY == NumOfLines-1)
+
+// 領域選択(マウス操作)
+void BuffStartSelect(int Xw, int Yw, BOOL Box, BOOL shift);
+void BuffChangeSelect(int Xw, int Yw, int NClick);
+void BuffEndSelect(int Xw, int Yw);
+BOOL BuffIsSelected(void);
+int BuffUrlDblClk(int Xw, int Yw);
+void BuffDblClk(int Xw, int Yw);
+void BuffTplClk(int Yw);
+BOOL BuffCheckMouseOnURL(int Xw, int Yw);
+wchar_t *BuffGetCharInfo(int Xw, int Yw);
 
 #ifdef __cplusplus
 }

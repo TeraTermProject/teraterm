@@ -30,9 +30,23 @@
 
 #if defined(_M_X64)
 #define PLUGIN_EXT	L".sph"
+#elif defined(_M_ARM64)
+#define PLUGIN_EXT	L".spha"
 #else
 #define PLUGIN_EXT	L".spi"
 #endif
+
+/**
+ *	ダミー関数
+ */
+typedef int(__stdcall *SUSIE_PROGRESS)(int nNum, int nDenom, LONG_PTR lData);
+static int __stdcall susie_progress(int nNum, int nDenom, LONG_PTR lData)
+{
+	(void)nNum;
+	(void)nDenom;
+	(void)lData;
+	return 0;
+}
 
 /**
  * Susie プラグインを使って画像を読み込む
@@ -48,9 +62,12 @@
  *	画像ファイル名はプラグイン内で多分使用されない
  *	プラグイン内でファイルは扱わないので Unicode化はokと思われる
  */
-BOOL LoadPictureWithSPI(const wchar_t *nameSPI, const wchar_t *nameFile, unsigned char *bufFile, size_t sizeFile, HLOCAL *hbuf,
-						HLOCAL *hbmi)
+static BOOL LoadPictureWithSPI(const wchar_t *nameSPI, const wchar_t *nameFile, unsigned char *bufFile, size_t sizeFile,
+							   HLOCAL *hbuf, HLOCAL *hbmi)
 {
+	*hbmi = 0;
+	*hbuf = 0;
+
 	// 画像ファイルのファイル名部分を取り出す
 	const wchar_t *image_base = wcsrchr(nameFile, L'\\');
 	if (image_base != NULL) {
@@ -69,19 +86,15 @@ BOOL LoadPictureWithSPI(const wchar_t *nameSPI, const wchar_t *nameFile, unsigne
 	char nameFileA[MAX_PATH];
 	WideCharToMultiByte(CP_ACP, 0, image_base, -1, nameFileA, _countof(nameFileA), NULL, NULL);
 
-	HINSTANCE hSPI;
 	char spiVersion[8];
 	int(__stdcall * SPI_IsSupported)(LPCSTR, void *);
-	int(__stdcall * SPI_GetPicture)(LPCSTR buf, LONG_PTR len, unsigned int flag, HANDLE *pHBInfo, HANDLE *pHBm, FARPROC,
+	int(__stdcall * SPI_GetPicture)(LPCSTR buf, LONG_PTR len, unsigned int flag, HANDLE *pHBInfo, HANDLE *pHBm,
+									SUSIE_PROGRESS,
 									LONG_PTR lData);
 	int(__stdcall * SPI_GetPluginInfo)(int, LPSTR, int);
-	int ret;
-
-	ret = FALSE;
-	hSPI = NULL;
 
 	// SPI をロード
-	hSPI = LoadLibraryW(nameSPI);
+	HINSTANCE hSPI = LoadLibraryW(nameSPI);
 	if (!hSPI) {
 		return FALSE;
 	}
@@ -93,29 +106,36 @@ BOOL LoadPictureWithSPI(const wchar_t *nameSPI, const wchar_t *nameFile, unsigne
 	p = (FARPROC *)&SPI_GetPicture;
 	*p = GetProcAddress(hSPI, "GetPicture");
 
-	if (!SPI_GetPluginInfo || !SPI_IsSupported || !SPI_GetPicture)
-		goto error;
+	if (!SPI_GetPluginInfo || !SPI_IsSupported || !SPI_GetPicture) {
+	error:
+		FreeLibrary(hSPI);
+		return FALSE;
+	}
 
 	//バージョンチェック
-	SPI_GetPluginInfo(0, spiVersion, 8);
-
-	if (spiVersion[2] != 'I' || spiVersion[3] != 'N')
+	int r = SPI_GetPluginInfo(0, spiVersion, 8);
+	if (r == 0) {
 		goto error;
+	}
 
-	if (!(SPI_IsSupported)(nameFileA, bufFile))
+	if (spiVersion[2] != 'I' || spiVersion[3] != 'N') {
 		goto error;
+	}
 
-	if ((SPI_GetPicture)((LPCSTR)bufFile, sizeFile, 1, hbmi, hbuf, NULL, 0))
+	r = SPI_IsSupported(nameFileA, bufFile);
+	if (r == 0) {
+		// プラグインが対応していない画像だった
 		goto error;
+	}
 
-	ret = TRUE;
+	r = SPI_GetPicture((LPCSTR)bufFile, sizeFile, 1, hbmi, hbuf, susie_progress, 0);
+	if (r != 0) {
+		goto error;
+	}
 
-error:
+	FreeLibrary(hSPI);
 
-	if (hSPI)
-		FreeLibrary(hSPI);
-
-	return ret;
+	return TRUE;
 }
 
 static unsigned char *LoadImageFile(const wchar_t *image_file, size_t *file_size)

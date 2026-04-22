@@ -1,9 +1,7 @@
-﻿set(PACKAGE_NAME "ttpcmn")
-
-project(${PACKAGE_NAME})
+﻿project("ttpcmn")
 
 add_library(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   SHARED
   language.c
   language.h
@@ -27,25 +25,25 @@ if(SUPPORT_OLD_WINDOWS)
       set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB")
     else()
       target_link_options(
-        ${PACKAGE_NAME}
+        ${PROJECT_NAME}
         PRIVATE
         /NODEFAULTLIB
         )
     endif()
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/common/compat_w95_vs2005.c
       )
   endif()
   if(MINGW)
     target_sources(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       ../../teraterm/libmingw/tlssup.c
       )
     target_link_libraries(
-      ${PACKAGE_NAME}
+      ${PROJECT_NAME}
       PRIVATE
       -Wl,--whole-archive
       mingw_msvcrt
@@ -55,7 +53,7 @@ if(SUPPORT_OLD_WINDOWS)
 endif(SUPPORT_OLD_WINDOWS)
 
 target_sources(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../common/teraterm.h
   ../common/tttypes.h
@@ -85,42 +83,42 @@ target_compile_definitions(
   )
 
 set_target_properties(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PROPERTIES
   PREFIX ""
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/"
   )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ../ttpfile
   .
   )
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   common_static
   )
 
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     layer_for_unicode
     )
 endif()
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ole32
   setupapi
   )
 
 install(
-  TARGETS ${PACKAGE_NAME}
+  TARGETS ${PROJECT_NAME}
   RUNTIME
   DESTINATION .
   )

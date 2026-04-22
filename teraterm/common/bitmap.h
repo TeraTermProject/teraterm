@@ -1,5 +1,5 @@
 /*
- * (C) 2024- TeraTerm Project
+ * Copyright (C) 2026- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,8 +34,15 @@
 extern "C" {
 #endif
 
-HPROPSHEETPAGE CreateTerminalPP(HINSTANCE inst, HWND vtwin, TTTSet *pts);
-void UpdateSetupTerminalNewlineCode(int CRSend);
+BOOL SaveBmpFromBmi(const BITMAPINFO *pbmi, const unsigned char *pbuf, const char *filename);
+BOOL SaveBmpFromHBitmap(HBITMAP hBitmap, const wchar_t *filename);
+BOOL SaveBmpFromHDC(HDC hdc, const wchar_t* filename);
+
+typedef struct {
+	const wchar_t *SusiePluginPath;		// Susieプラグインのパス, NULLのとき使用しない
+} BitmapLoadParam_t;
+
+DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMAP *hBitmap);
 
 #ifdef __cplusplus
 }

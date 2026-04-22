@@ -25,83 +25,63 @@
 
   <h2 id="themefile">themeファイルについて</h2>
 
-  テーマファイルにはいくつかの種類がある。
+  <p>
+    テーマファイルにはいくつかの種類があります。
+  </p>
 
   <dl>
     <dt>BG(背景)テーマ</dt>
     <dd>
       [BG Theme]セクションが入ったファイル<br>
-      このセクションには背景画像の設定が入る
+      このセクションには背景画像と文字の背景透過の設定が保存されます。
     </dd>
     <dt>カラーテーマ</dt>
     <dd>
       [Color Theme]セクションが入ったファイル<br>
-      このセクションには文字の色の設定が入る
+      このセクションには文字の色の設定が保存されます。
+    <dd>
     <dt>旧カラーテーマ (廃止予定)</dt>
     <dd>
       [BG]セクションに文字の色の設定が入っている<br>
       Tera Term 4 でサポートしていたカラーテーマ<br>
-      読み込みはできるが廃止予定
+      読み込みは可能です(廃止予定)。
     </dd>
   </dl>
 
-  BG(背景)テーマとカラーテーマを別のファイルに保存しておくことも、
-  1つのファイルに両方を保存することもできる。
+  <p>
+    BG(背景)テーマとカラーテーマを別のファイルに保存しておくことも、
+    1つのファイルに両方を保存することもできます。
+  </p>
 
-  フォーマットはWindowsのiniファイル。
+  <p>
+    フォーマットはWindowsのiniファイルです。
+  </p>
 
   <h2 id="BGTheme">BG(背景)テーマ</h2>
 
   <h3>section</h3>
 
-  "BG theme"<br>
+  <p>
+    セクション名は"BG theme"です。
+  </p>
 
-  "BG"セクションも読み込み可能(廃止予定)。両方ある場合は"BG theme"が優先。
+  <p>
+    従来の"BG"セクションも読み込み可能です(廃止予定)。両方ある場合は"BG theme"の設定が優先されます。
+  </p>
 
+  <h4>Simple color plane</h4>
+  <p>
+    単色のプレーン。
+  </p>
   <dl>
-    <dt>BGDestColor</dt>
+    <dt>BGSrc2Enable</dt>
     <dd>
-      背景画像を使用しない場合はこの色で塗りつぶされる。<br>
-      背景画像が描画されない部分がある場合もこの色で塗りつぶされる。
+      Simple color planeを使用する(1)/しない(0)
     </dd>
-
-    <dt>BGDestFile</dt>
-    <dd>
-      背景画像<br>
-      ファイル名にワイルドカードが指定された場合、一致するファイルからランダムに一つ選びます。<br>
-      相対パスを利用する場合は、テーマファイルからの相対パスを指定してください。<br>
-      読み込めるファイルの種類は、BGSPIPath に格納されたプラグインによります。<br>
-      ビットマップはプラグインが無くても読み込めます。
-    </dd>
-
-    <dt>BGDestPattern</dt>
-    <dd>背景画像描画方法
-      <dl>
-          <dt>stretch</dt>
-          <dt>tile</dt>
-          <dt>center</dt>
-          <dt>fit_width</dt>
-          <dt>fit_height</dt>
-          <dt>autofit</dt>
-          <dt>autofill</dt>
-          <dd>
-            FitWidth、FitHeight は画像のアスペクト比を維持したまま、画像を拡大縮小します。<br>
-            AutoFit は、ウィンドウと画像の間に隙間ができないように、FitWidth と FitHeight を切り替えます。
-          </dd>
-      </dl>
-    </dd>
-
-    <dt>BGSrc1Alpha</dt>
-    <dd>
-      Windowsの壁紙画像をアルファブレンドする。<br>
-      背景画像(Dest)に対して、デスクトップ画像(Src1)をどれぐらいブレンドするを指定する。<br>
-      0のとき壁紙はブレンドされない。
-    </dd>
-
 
     <dt>BGSrc2Color</dt>
     <dd>
-      背景画像全体をアルファブレンドする色
+      単色プレーンの色
     </dd>
 
     <dt>BGSrc2Alpha</dt>
@@ -109,7 +89,81 @@
       アルファブレンド値<br>
       DestとSrc1の合成画像に単色(Src2)をどれぐらいブレンドするか
     </dd>
+  </dl>
 
+  <h4>Background Image</h4>
+  <dl>
+    <dt>BGDestEnable</dt>
+    <dd>
+      背景画像を使用する(1)/しない(0)
+    </dd>
+
+    <dt>BGDestColor</dt>
+    <dd>
+      背景画像が描画されない部分がある場合、この色で塗りつぶされます。
+    </dd>
+
+    <dt>BGDestFile</dt>
+    <dd>
+      背景画像<br>
+      ファイル名にワイルドカードが指定された場合、一致するファイルからランダムに一つ選びます。<br>
+      相対パスを利用する場合は、テーマファイルからの相対パスを指定してください。
+    </dd>
+
+    <dt>BGDestPattern</dt>
+    <dd>背景画像描画方法
+      <dl>
+        <dt>stretch</dt>
+        <dd>
+          画像をウィンドウに合わせて拡大縮小します。
+        </dd>
+        <dt>tile</dt>
+        <dd>
+          画像をウィンドウの左上からタイル状に表示します。
+        </dd>
+        <dt>center</dt>
+        <dd>
+          画像をウィンドウの中央に表示します。
+        </dd>
+        <dt>fit_width</dt>
+        <dd>
+          画像の幅をWindowsの横幅となるように、アスペクト比を維持したまま、画像を拡大縮小します。
+        </dd>
+        <dt>fit_height</dt>
+        <dd>
+          画像の高さをWindowsの高さとなるように、アスペクト比を維持したまま、画像を拡大縮小します。
+        </dd>
+        <dt>autofit</dt>
+        <dd>
+          アスペクト比を維持して、はみ出さないように最大表示します。
+        </dd>
+        <dt>autofill</dt>
+        <dd>
+          アスペクト比を維持して、はみ出してでも最大表示します。
+        </dd>
+      </dl>
+    </dd>
+
+    <dt>BGDestAlpha</dt>
+    <dd>
+      Windowsの壁紙画像をアルファブレンドする。<br>
+      背景画像(Dest)に対して、デスクトップ画像(Src1)をどれぐらいブレンドするを指定する。<br>
+      0のとき壁紙はブレンドされない。
+    </dd>
+  </dl>
+
+  <h4>Desktop wallpaper image</h4>
+
+  <dl>
+    <dt>BGSrc1Enable</dt>
+    <dd>
+      デスクトップ画像を使用する(1)/しない(0)
+    </dd>
+  </dl>
+
+  <h4>背景画像透過</h4>
+
+  <dl>
     <dt>BGTextBackAlpha</dt>
     <dd>
       0 - 255<br>
@@ -133,7 +187,9 @@
 
   <h3>section</h3>
 
-  "Color Theme"
+  <p>
+    "Color Theme"
+  </p>
 
   <h3>name</h3>
 
@@ -199,8 +255,10 @@
 
   <h3>ANSI color</h3>
 
+  <p>
   256色/16色 ANSI colorの最初の16色。<br>
   8色時は、Dark colorを使用しない
+  </p>
 
   <dl>
     <dt>ANSIColor=(0 or 1)</dt>

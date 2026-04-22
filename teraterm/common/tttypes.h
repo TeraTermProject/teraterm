@@ -615,6 +615,7 @@ struct tttset {
 	int FlowCtrlDTR;
 	BYTE UnicodeOverrideCharWidthEnable;	// 0/1=overrideしない/する(文字幅Override設定存在時)
 	BYTE UnicodeOverrideCharWidthSelected;	// 0...
+	int BroadcastSubmitKey;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;
@@ -705,6 +706,13 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdEnable    1
 #define IdHandshake 2
 #define IdToggle    3
+
+  /* Broadcast command Submit type */
+#define IdSubmitKeyTypeNA   -1 // no dialog
+#define IdSubmitKeyTypeRT    0 // real time mode
+#define IdSubmitKeyTypeNone  1
+#define IdSubmitKeyTypeEnter 2
+#define IdSubmitKeyTypeCtrlM 3
 
 /* Control Characters */
 

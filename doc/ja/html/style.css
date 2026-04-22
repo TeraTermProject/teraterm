@@ -152,3 +152,12 @@ th + th, th + td, td + td {
 table[border] th, table[border] td {
 	padding: 0 0.5em;
 }
+
+ol.release > li {
+	margin-bottom: 1em;
+}
+
+ol.release > li > div + div {
+	margin-top: 1em;
+}
+

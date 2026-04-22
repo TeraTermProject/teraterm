@@ -7,7 +7,7 @@
   <Project Path="TTXAdditionalTitle/TTXAdditionalTitle.v18.vcxproj" Id="0ecaf69b-08b4-414a-b822-be8459e463d8" />
   <Project Path="TTXAlwaysOnTop/TTXAlwaysOnTop.v18.vcxproj" Id="e86ddb2c-cc00-43d1-8a1a-4b042ec983d6" />
   <Project Path="TTXCallSysMenu/TTXCallSysMenu.v18.vcxproj" Id="25709a86-e6b8-4cda-906c-02d935e05978" />
-  <Project Path="TTXChangeFontSize/TTXChangeFontSize/TTXChangeFontSize.v18.vcxproj" Id="56807ec2-1793-438f-942e-de7f09283971" />
+  <Project Path="TTXChangeFontSize/TTXChangeFontSize.v18.vcxproj" Id="56807ec2-1793-438f-942e-de7f09283971" />
   <Project Path="TTXCheckUpdate/TTXCheckUpdate.v18.vcxproj" Id="937dfa65-5709-4643-b778-482c15dec581" />
   <Project Path="TTXCommandLineOpt/TTXCommandLineOpt.v18.vcxproj" Id="ee8bfc38-7000-42f1-bbc3-17f19855918a" />
   <Project Path="TTXCopyIniFile/TTXCopyIniFile.v18.vcxproj" Id="2b2b8d6e-4a84-49dd-8291-46172fce422a" />

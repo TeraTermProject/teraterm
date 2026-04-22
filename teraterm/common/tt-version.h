@@ -29,7 +29,7 @@
 #pragma once
 
 #define TT_VERSION_MAJOR             5
-#define TT_VERSION_MINOR             6
+#define TT_VERSION_MINOR             7
 #define TT_VERSION_PATCH             0
 #define TT_VERSION_SUBSTR            "dev"
 //#undef TT_VERSION_SUBSTR

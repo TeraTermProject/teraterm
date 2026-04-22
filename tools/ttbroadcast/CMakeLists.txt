@@ -1,11 +1,9 @@
-﻿set(PACKAGE_NAME "ttbroadcast")
-
-project(${PACKAGE_NAME})
+﻿project("ttbroadcast")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 add_executable(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   ../libs/getopt_mb_uni_src/getopt.c
   ../libs/getopt_mb_uni_src/getopt.h
   main.cpp
@@ -15,19 +13,19 @@ add_executable(
   )
 
 target_include_directories(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../libs/getopt_mb_uni_src
   )
 
 target_compile_definitions(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   STATIC_GETOPT
   )
 
 target_link_libraries(
-  ${PACKAGE_NAME}
+  ${PROJECT_NAME}
   PRIVATE
   ttpcmn
   common_static
@@ -35,7 +33,7 @@ target_link_libraries(
 
 if(MINGW)
   target_link_options(
-    ${PACKAGE_NAME}
+    ${PROJECT_NAME}
     PRIVATE
     -municode
     )

@@ -547,7 +547,7 @@ static void DispWriteIni(const wchar_t *FName, PTTSet ts)
  */
 static int GetDefaultUnicodeWidth(void)
 {
-	return 2;
+	return 1;
 }
 
 static void GetPrivateProfileColor2(const char *appA, const char *keyA, const char *defA, const wchar_t *fname,
@@ -1538,6 +1538,16 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->AcceptBroadcast =
 		GetOnOff(Section, "AcceptBroadcast", FName, TRUE);
 
+	// Broadcast command ダイアログ 非リアルタイムモード時のSubmit key
+	GetPrivateProfileString(Section, "BroadcastSubmitKey", "None", Temp, sizeof(Temp), FName);
+	if (_stricmp(Temp, "Enter") == 0) {
+		ts->BroadcastSubmitKey = IdSubmitKeyTypeEnter;
+	} else if (_stricmp(Temp, "CTRL+M") == 0) {
+		ts->BroadcastSubmitKey = IdSubmitKeyTypeCtrlM;
+	} else {
+		ts->BroadcastSubmitKey = IdSubmitKeyTypeNone;
+	}
+
 	// Confirm send a file when drag and drop (2007.12.28 maya)
 	ts->ConfirmFileDragAndDrop =
 		GetOnOff(Section, "ConfirmFileDragAndDrop", FName, TRUE);
@@ -1566,7 +1576,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	{
 		const UINT ui = GetPrivateProfileIntW(SectionW, L"DecSpMappingDir",
-											  (INT)IdDecSpecialUniToDec, FName);
+		                                      (INT)IdDecSpecialDoNot, FName);
 		ts->Dec2Unicode =
 			ui == 0 ? IdDecSpecialUniToDec :
 			ui == 1 ? IdDecSpecialDecToUni :
@@ -2943,6 +2953,16 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	// 337: 2007/03/20 Accept Broadcast
 	WriteOnOff(Section, "AcceptBroadcast", FName, ts->AcceptBroadcast);
+
+	// Broadcast command ダイアログ 非リアルタイムモード時のSubmit key
+	if (ts->BroadcastSubmitKey == IdSubmitKeyTypeEnter) {
+		strncpy_s(Temp, sizeof(Temp), "Enter", _TRUNCATE);
+	} else if (ts->BroadcastSubmitKey == IdSubmitKeyTypeCtrlM) {
+		strncpy_s(Temp, sizeof(Temp), "CTRL+M", _TRUNCATE);
+	} else {
+		strncpy_s(Temp, sizeof(Temp), "None", _TRUNCATE);
+	}
+	WritePrivateProfileString(Section, "BroadcastSubmitKey", Temp, FName);
 
 	// Confirm send a file when drag and drop (2007.12.28 maya)
 	WriteOnOff(Section, "ConfirmFileDragAndDrop", FName,

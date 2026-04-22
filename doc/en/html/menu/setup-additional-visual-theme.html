@@ -90,21 +90,55 @@
             bmp, png, gif, jpg etc<br>
             32-bit bmp and transparent png has 8-bit alpha channel.<br>
             Transparent gif file treat one color as transparent.
+
+            <p>
+              Tera Term tries to load images in the following order.
+              <ul>
+                <li><a href="../about/glossary.html#susie">Susie Plug-in</a></li>
+                <li><a href="../about/glossary.html#wic">WIC</a></li>
+                <li><a href="../about/glossary.html#gdi+">GDI+</a></li>
+                <li><a href="../about/glossary.html#ipicture">OleLoadPicture()</a></li>
+                <li>LoadImage() API</li>
+              </ul>
+            </p>
+            <p>
+              WIC seems to be possible to load JPG,GIF and PNG images on Windows Vista or later.
+            </p>
           </dd>
 
           <dt>Pattern</dt>
           <dd>
             How to draw background images.
-            <ul>
-              <li>stretch</li>
-              <li>tile</li>
-              <li>center</li>
-              <li>fit_withh</li>
-              <li>fit_height</li>
-              <li>autofit</li>
-              <li>autofill</li>
-            </ul>
-            TODO check details and write them.
+            <dl>
+              <dt>stretch</dt>
+              <dd>
+                Stretch image to fit the window.
+              </dd>
+              <dt>tile</dt>
+              <dd>
+                Tile image starting from the top-left corner of the window.
+              </dd>
+              <dt>center</dt>
+              <dd>
+                Display image in center of the window.
+              </dd>
+              <dt>fit_width</dt>
+              <dd>
+                Scale image to match the window width while maintaining aspect ratio.
+              </dd>
+              <dt>fit_height</dt>
+              <dd>
+                Scale image to match the window height while maintaining aspect ratio.
+              </dd>
+              <dt>autofit</dt>
+              <dd>
+                Maintain aspect ratio and display at maximum size without overflow.
+              </dd>
+              <dt>autofill</dt>
+              <dd>
+                Maintain aspect ratio and display at maximum size even if it overflows.
+              </dd>
+            </dl>
           </dd>
 
           <dt>Color</dt>

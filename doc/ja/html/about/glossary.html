@@ -37,10 +37,14 @@ Tera Term の Kermit は今のところ基本的機能しか持っていないので、本家の Kermit に
     </p>
 
     <p>
-      Tera Term は Susie Plug-in を試みたのち、
-      GDI+, OleLoadPicture(), LoadImage() 等の
-      Windows の機能を利用して画像の読み込みを試みます。
-      Windows 7 以降では Windowsの機能で jpg, gif の読み込みが可能のようです。
+      実装時、次の情報を参考にしました。
+      <ul>
+        <li><a href="https://www.digitalpad.co.jp/~takechin/download.html" target="_blank">Susieの部屋 / Susieのだうんろーど</a><br>
+          <a href="https://www.digitalpad.co.jp/~takechin/archives/splug004.lzh" target="_blank">https://www.digitalpad.co.jp/~takechin/archives/splug004.lzh</a> の PLUG_API.TXT
+        </li>
+        <li><a href="https://gist.github.com/tapetums/0a924712fb2fa0a7bb93" target="_blank">Susie プラグイン API 定義ファイル</a></li>
+        <li><a href="http://toro.d.dooo.jp/slplugin.html" target="_blank">TORO's Library / TORO's Software library(Win32/Win64 Plugin)</a></li>
+      </ul>
     </p>
   </dd>
 
@@ -225,6 +229,101 @@ Windowsに関連する用語
     <p>
     <a href="image/notify_tray_test.png">Notify/Tray test (click to enlarge)<br><img src="image/notify_tray_test.png" width=30%></a>
   </dd>
+</dl>
+
+<h3 id="image_load">画像読み込み</h3>
+
+<p>
+  Windowsで利用できる画像読み込み技術にはいくつかの種類があります。
+</p>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>技術</th>
+      <th>BMP</th>
+      <th>JPEG</th>
+      <th>PNG</th>
+      <th>他</th>
+      <th>特徴</th>
+      <th>初対応 Windows</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#susie">Susie</a></td>
+      <td>o</td>
+      <td>o</td>
+      <td>o</td>
+      <td>o</td>
+      <td>ユーザーメイド、プラグイン</td>
+      <td>95</td>
+    </tr>
+    <tr>
+      <td>LoadImage() API</td>
+      <td>o</td>
+      <td>x</td>
+      <td>x</td>
+      <td>x</td>
+      <td>ico, cur などリソース読込用</td>
+      <td>95 以前から</td>
+    </tr>
+    <tr>
+      <td><a href="#ipicture">IPicture</a></td>
+      <td>o</td>
+      <td>o</td>
+      <td>x/o<sup>*1</sup></td>
+      <td>o</td>
+      <td>GIF など読み込み可能　OLE, COM I/F</td>
+      <td>95</td>
+    </tr>
+    <tr>
+      <td><a href="#gdi+">GDI+</a></td>
+      <td>o</td>
+      <td>o</td>
+      <td>o</td>
+      <td>o</td>
+      <td>GIF, TIFF など読み込み可能</td>
+      <td>XP</td>
+    </tr>
+    <tr>
+      <td><a href="#wic">WIC</a></td>
+      <td>o</td>
+      <td>o</td>
+      <td>o</td>
+      <td>o</td>
+      <td>アドオン経由で各種画像(RAW など)読み込み可能</td>
+      <td>Vista</td>
+    </tr>
+  </tbody>
+</table>
+
+<dl>
+  <dt id="ipicture">IPicture</dt>
+  <dd>
+    <ul>
+      <li>Windows 95以降から利用可</li>
+      <li>Windows 7以降はPNGを読み込むことができる (*1 IE9がインストールされた環境の場合)</li>
+      <li>OleLoadPicture() APIを使用</li>
+      <li>WMF,EMFも読み込み可</li>
+    </ul>
+  </dd>
+
+  <dt id="gdi+">GDI+</dt>
+  <dd>
+    <ul>
+      <li>Windows XP以降から利用可</li>
+    </ul>
+  </dd>
+
+  <dt id="wic">WIC (Windows Imaging Component)</dt>
+  <dd>
+    <ul>
+      <li>Windows Vista以降から利用可</li>
+      <li>RAWカメラフォーマットも読み込み可</li>
+    </ul>
+  </dd>
+
 </dl>
 
 </BODY>

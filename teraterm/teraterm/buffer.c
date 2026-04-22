@@ -108,21 +108,21 @@ static int BuffStartAbs, BuffEndAbs;
 
 // 選択
 static BOOL Selected;			// TRUE = 領域選択されている
-static BOOL Selecting;			// ?
-static POINT SelectStart;
-static POINT SelectEnd;
+static BOOL Selecting;			// TRUE = 選択可能(FALSEの時処理はキャンセルする)短時間でのドラッグをドラッグとみなさない
+static POINT SelectStart;		// 選択領域、start
+static POINT SelectEnd;			// 選択領域、end(含まない)、start==end時 未選択
+static BOOL BoxSelect;			// TRUE=矩形選択 / FALSE=行選択
 static POINT ClickCell;			// クリックした文字cell
-static POINT SelectEndOld;
+static POINT SelectStartOld;	// 描画した選択領域、start
+static POINT SelectEndOld;		// 描画した選択領域、end
 static DWORD SelectStartTime;
-static BOOL BoxSelect;
-static POINT DblClkStart, DblClkEnd;
+static POINT DblClkStart;
+static POINT DblClkEnd;
 
 // 描画
 static int StrChangeStart;	// 描画開始 X (Y=CursorY)
 static int StrChangeCount;	// 描画キャラクタ数(半角単位),0のとき描画するものがない
 static BOOL UseUnicodeApi;
-
-static BOOL SeveralPageSelect;  // add (2005.5.15 yutaka)
 
 static TCharAttr CurCharAttr;
 
@@ -135,6 +135,7 @@ static int CodePage = 932;
 vtdraw_t *vt_src;
 
 static void BuffDrawLineI(vtdraw_t *vt, ttdc_t *dc, int SY, int IStart, int IEnd);
+static void ChangeSelectRegion(void);
 
 /**
  *	buff_char_t を relセル移動する
@@ -458,6 +459,41 @@ static void GetPosFromPtr(const buff_char_t *b, int *bx, int *by)
 	*by = y;
 }
 
+/**
+ * @brief	POINT比較
+ * @param	p1						POINT
+ * @param	p2						POINT(ベースとなる位置)
+ * @retval	マイナス(0未満)			p1 が p2 より小さい(p1がp2より左上)
+ * @retval	0						p1とp2が等しい
+ * @retval	プラス(0より大きい)		p1 が p2 より大きい(p1がp2より右下)
+ */
+static int ComparePoint(const POINT *p1, const POINT *p2)
+{
+	if (p1->y < p2->y) {
+		int len = (p2->y - p1->y - 1) * NumOfColumns;
+		len += NumOfColumns - p1->x;
+		len += p2->x;
+		return -len;
+	}
+	else if (p1->y > p2->y) {
+		int len = (p1->y - p2->y - 1) * NumOfColumns;
+		len += p1->x;
+		len += NumOfColumns - p2->x;
+		return len;
+	}
+	else {
+		if (p1->x < p2->x) {
+			return p1->x - p2->x;
+		}
+		else if (p1->x > p2->x) {
+			return p1->x - p2->x;
+		}
+		else {
+			return 0;
+		}
+	}
+}
+
 static BOOL ChangeBuffer(int Nx, int Ny)
 {
 	LONG NewSize;
@@ -545,9 +581,11 @@ static BOOL ChangeBuffer(int Nx, int Ny)
 			SelectEnd.y = 0;
 		}
 
-		Selected = (SelectEnd.y > SelectStart.y) ||
-		           ((SelectEnd.y == SelectStart.y) &&
-		            (SelectEnd.x > SelectStart.x));
+		if (ComparePoint(&SelectStart, &SelectEnd) < 0) {
+			Selected = TRUE;
+		} else {
+			Selected = FALSE;
+		}
 	}
 
 	CodeBuffW = CodeDestW;
@@ -672,6 +710,7 @@ void BuffAllSelect(void)
 //	SelectEnd.x = NumOfColumns;
 //	SelectEnd.y = BuffEnd - 1;
 	Selecting = TRUE;
+	ChangeSelectRegion();
 }
 
 void BuffScreenSelect(void)
@@ -685,6 +724,7 @@ void BuffScreenSelect(void)
 //	SelectEnd.x = X + NumOfColumns;
 //	SelectEnd.y = Y + PageStart + NumOfLines - 1;
 	Selecting = TRUE;
+	ChangeSelectRegion();
 }
 
 void BuffCancelSelection(void)
@@ -725,14 +765,13 @@ void BuffReset(void)
 	SelectStart.x = 0;
 	SelectStart.y = 0;
 	SelectEnd = SelectStart;
+	SelectStartOld = SelectStart;
 	SelectEndOld = SelectStart;
 	Selected = FALSE;
 
 	StrChangeCount = 0;
 	Wrap = FALSE;
 	StatusLine = 0;
-
-	SeveralPageSelect = FALSE; // yutaka
 
 	/* Alternate Screen Buffer */
 	BuffDiscardSavedScreen();
@@ -789,9 +828,11 @@ static void BuffScroll(int Count, int Bottom)
 			SelectEnd.x = 0;
 			SelectEnd.y = 0;
 		}
-		Selected = (SelectEnd.y > SelectStart.y) ||
-	               ((SelectEnd.y==SelectStart.y) &&
-	                (SelectEnd.x > SelectStart.x));
+		if (ComparePoint(&SelectStart, &SelectEnd) < 0) {
+			Selected = TRUE;
+		} else {
+			Selected = FALSE;
+		}
 	}
 
 	NewLine(PageStart+CursorY);
@@ -1641,6 +1682,66 @@ static int LeftHalfOfDBCS(LONG Line, int CharPtr)
 	return x;
 }
 
+/**
+ *	文字の存在するcell位置を返す
+ *
+ *	VT Window上の(x,y)のcell位置から文字の存在するcell位置を返す
+ *	文字のcell数と、cell上の右側か左側か(right)を判断してcell位置を返す
+ *
+ *	@param[in]	x		VT Windows上の文字(セル)位置
+ *	@param[in]	y		バッファ上のy(PageStart加算済み)
+ *	@param[in]	right	FALSE/TRUE = cell上の左側/右側
+ *	@return		文字のcell位置
+ */
+static POINT GetCharCell(int x, int y, BOOL right)
+{
+//	y = y + PageStart;
+
+	// clip
+	x = x < 0 ? 0 : x > NumOfColumns ? NumOfColumns : x;
+	y = y < 0 ? 0 : y > BuffEnd - 1 ? BuffEnd - 1 : y;
+
+	int ptr = GetLinePtr(y);
+	int x_char = LeftHalfOfDBCS(ptr, x);		// 文字の先頭
+
+	const buff_char_t *b = CodeBuffW + ptr + x_char;
+	int cell = b->cell;
+	if ((cell & 1) == 0) {
+		// 偶数長cell文字(2cellなど)
+		int pos = x - x_char;
+		if (pos >= (cell / 2)) {
+			// 文字の中央より右側なので、一つ右の文字を選択
+			if ((x_char + cell) < (NumOfColumns - 1)) {
+				x = x_char + cell;
+			}
+		}
+	} else {
+		// 奇数長cell文字(1cell,3cellなど)
+		int x_th = x_char + (cell + 1) / 2 - 1;
+		if (x == x_th) {
+			// ちょうど真ん中のcellだった時
+			if (right == FALSE) {
+				// cellの左側なので、文字の先頭
+				x = x_char;
+			} else {
+				// cellの右側なので、一つ右の文字を選択
+				x = x_char + cell;
+			}
+		} else if (x < x_th) {
+			// 文字の左側なので、文字の先頭
+			x = x_char;
+		} else {
+			// 文字の右側なので、一つ右の文字を選択
+			x = x_char + cell;
+		}
+	}
+
+	POINT pos;
+	pos.x = x;
+	pos.y = y;
+	return pos;
+}
+
 static int MoveCharPtr(LONG Line, int *x, int dx)
 // move character pointer x by dx character unit
 //   in the line specified by Line
@@ -2167,11 +2268,18 @@ static wchar_t *ConvertTable(const wchar_t *src, size_t src_len, size_t *str_len
 
 /**
  *	クリップボード用文字列取得
+ *	選択領域の文字列を返す
+ *
  *	@return		文字列
  *				使用後は free() すること
+ *				NULL = 選択されていない(BuffIsSelected()で選択中か判定可)
  */
 wchar_t *BuffCBCopyUnicode(BOOL Table)
 {
+	if (!Selected) {
+		return NULL;
+	}
+
 	wchar_t *str_ptr;
 	size_t str_len;
 	str_ptr = BuffGetStringForCB(
@@ -2345,6 +2453,21 @@ static BOOL isURLchar(unsigned int u32)
 	return url_char[u32] == 0 ? FALSE : TRUE;
 }
 
+/**
+ *	文字コードが2バイト文字か調べる
+ *
+ *	@retval	TRUE	2バイト文字コード
+ *	@retval	FALSE	1バイト文字コード
+ */
+static BOOL IsDBCS(IdKanjiCode code)
+{
+	if (code == IdSJIS || code == IdEUC || code == IdJIS || code == IdKoreanCP949 || code == IdCnGB2312 ||
+		code == IdCnBig5) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
 static BOOL BuffIsHalfWidthFromPropery(const TTTSet *ts_, char width_property)
 {
 	switch (width_property) {
@@ -2354,7 +2477,12 @@ static BOOL BuffIsHalfWidthFromPropery(const TTTSet *ts_, char width_property)
 	default:
 		return TRUE;
 	case 'A':	// Ambiguous 曖昧
-		if (ts_->UnicodeAmbiguousWidth == 2) {
+		if (ts_->KanjiCode == IdUTF8) {
+			if (ts_->UnicodeAmbiguousWidth == 2) {
+				// 全角として扱う
+				return FALSE;
+			}
+		} else if (IsDBCS(ts_->KanjiCode)) {
 			// 全角として扱う
 			return FALSE;
 		}
@@ -2370,29 +2498,46 @@ static BOOL BuffIsHalfWidthFromCode(const TTTSet *ts_, unsigned int u32, char *w
 	int width;
 	*width_property = UnicodeGetWidthProperty(u32);
 	*emoji = (char)UnicodeIsEmoji(u32);
-	if (ts_->KanjiCode == IdUTF8 && ts_->UnicodeOverrideCharWidthEnable != 0 &&
-		UnicodeOverrideWidthCheck(u32, &width) == TRUE) {
-		return width == 1 ? TRUE : FALSE;
-	}
-	if (ts_->UnicodeEmojiOverride) {
-		if (*emoji) {
-			// 絵文字だった場合
-			if (u32 < 0x1f000) {
-				if (ts_->UnicodeEmojiWidth == 2) {
-					// 全角
-					return FALSE;
+	if (ts_->KanjiCode == IdUTF8) {
+		// UTF-8(Unicode) のときの文字幅調整
+
+		// 文字ごとの文字幅オーバーライド設定
+		if( ts_->UnicodeOverrideCharWidthEnable != 0 &&
+			UnicodeOverrideWidthCheck(u32, &width) == TRUE) {
+			return width == 1 ? TRUE : FALSE;
+		}
+
+		// 絵文字文字幅オーバーライド設定
+		if (ts_->UnicodeEmojiOverride) {
+			if (*emoji) {
+				// 絵文字だった場合
+				if (u32 < 0x1f000) {
+					if (ts_->UnicodeEmojiWidth == 2) {
+						// 全角
+						return FALSE;
+					}
+					else {
+						// 半角
+						return TRUE;
+					}
 				}
 				else {
-					// 半角
-					return TRUE;
+					// 常に全角
+					return FALSE;
 				}
-			}
-			else {
-				// 常に全角
-				return FALSE;
 			}
 		}
 	}
+	else if (IsDBCS(ts_->KanjiCode)) {
+		// DBCS
+
+		// 絵文字は全角
+		if (*emoji) {
+			return FALSE;
+		}
+	}
+
+	// 文字属性毎の文字幅
 	return BuffIsHalfWidthFromPropery(ts_, *width_property);
 }
 
@@ -3542,18 +3687,17 @@ static void BuffDrawLineI(vtdraw_t *vt, ttdc_t *dc, int SY, int IStart, int IEnd
 	BuffGetDrawInfoW(vt, dc, SY, IStart, IEnd, DispStrW, DispStrA);
 }
 
-void BuffUpdateRect
-  (int XStart, int YStart, int XEnd, int YEnd)
 // Display text in a rectangular region in the screen
 //   XStart: x position of the upper-left corner (screen cordinate)
 //   YStart: y position
 //   XEnd: x position of the lower-right corner (last character)
 //   YEnd: y position
+void BuffUpdateRect(int XStart, int YStart, int XEnd, int YEnd)
 {
 	int j;
 	int IStart, IEnd;
 	LONG TmpPtr;
-	BOOL TempSel, Caret;
+	BOOL Caret;
 
 	if (XStart >= WinOrgX+WinWidth) {
 		return;
@@ -3589,8 +3733,6 @@ void BuffUpdateRect
 					  XEnd, YEnd,
 					  XEnd - XStart + 1, YEnd - YStart + 1);
 #endif
-
-	TempSel = FALSE;
 
 	Caret = IsCaretOn();
 	if (Caret) {
@@ -4158,24 +4300,79 @@ static void invokeBrowserW(int x, int y)
 	free(url);
 }
 
-void ChangeSelectRegion(void)
+/**
+ *	指定位置の間の再描画
+ *	BuffUpdateRect()の(矩形領域ではなく)行版
+ */
+static void BuffUpdateLine(const POINT *start, const POINT *end)
 {
-	POINT TempStart, TempEnd;
 	int j, IStart, IEnd;
 	BOOL Caret;
 
-	if ((SelectEndOld.x==SelectEnd.x) &&
-	    (SelectEndOld.y==SelectEnd.y)) {
+	ttdc_t *dc = DispInitDC(vt_src);
+
+	Caret = IsCaretOn();
+	if (Caret) {
+		CaretOff(vt_src);
+	}
+	for (j = start->y; j <= end->y; j++) {
+		IStart = 0;
+		IEnd = NumOfColumns - 1;
+		if (j == start->y) {
+			IStart = start->x;
+		}
+		if (j == end->y) {
+			IEnd = end->x;
+		}
+
+		if ((IEnd >= IStart) && (j >= PageStart + WinOrgY) &&
+			(j < PageStart + WinOrgY + WinHeight)) {
+			BuffUpdateRect(IStart, j - PageStart, IEnd, j - PageStart);
+		}
+	}
+	if (Caret) {
+		CaretOn(vt_src);
+	}
+
+	DispReleaseDC(vt_src, dc);
+}
+
+/**
+ *	選択領域と前回描画した選択領域と描画
+ *		- 選択領域を描画
+ *		- 前回の選択領域を通常領域として描画
+ */
+static void ChangeSelectRegion(void)
+{
+	POINT TempStart;
+	POINT TempEnd;
+
+	// TempStart を左上に
+	if (ComparePoint(&SelectStart, &SelectEnd) < 0) {
+		TempStart = SelectStart;
+		TempEnd = SelectEnd;
+	} else {
+		TempStart = SelectEnd;
+		TempEnd = SelectStart;
+	}
+
+	if (ComparePoint(&TempStart, &SelectStartOld) == 0 &&
+		ComparePoint(&TempEnd, &SelectEndOld) == 0) {
+		// 変化なし
 		return;
 	}
 
 	if (BoxSelect) {
 		GetMinMax(SelectStart.x,SelectEndOld.x,SelectEnd.x,
 		          (int *)&TempStart.x,(int *)&TempEnd.x);
+		GetMinMax(SelectStartOld.x, TempStart.x, TempEnd.x,
+		          (int *)&TempStart.x,(int *)&TempEnd.x);
 		GetMinMax(SelectStart.y,SelectEndOld.y,SelectEnd.y,
 		          (int *)&TempStart.y,(int *)&TempEnd.y);
+		GetMinMax(SelectStartOld.y, TempStart.y, TempEnd.y,
+		          (int *)&TempStart.y,(int *)&TempEnd.y);
 		TempEnd.x--;
-		Caret = IsCaretOn();
+		BOOL Caret = IsCaretOn();
 		if (Caret) {
 			CaretOff(vt_src);
 		}
@@ -4184,51 +4381,25 @@ void ChangeSelectRegion(void)
 		if (Caret) {
 			CaretOn(vt_src);
 		}
+		SelectStartOld = SelectStart;
 		SelectEndOld = SelectEnd;
 		return;
 	}
 
-	if ((SelectEndOld.y < SelectEnd.y) || ((SelectEndOld.y == SelectEnd.y) && (SelectEndOld.x <= SelectEnd.x))) {
-		TempStart = SelectEndOld;
-		TempEnd.x = SelectEnd.x - 1;
-		TempEnd.y = SelectEnd.y;
+	POINT PaintStart = SelectStartOld;
+	POINT PaintEnd = SelectEndOld;
+
+	if (ComparePoint(&TempStart, &PaintStart) <= 0) {
+		PaintStart = TempStart;
 	}
-	else {
-		TempStart = SelectEnd;
-		TempEnd.x = SelectEndOld.x-1;
-		TempEnd.y = SelectEndOld.y;
-	}
-	if (TempEnd.x < 0) {
-		TempEnd.x = NumOfColumns - 1;
-		TempEnd.y--;
+	if (ComparePoint(&PaintEnd ,&TempEnd) <= 0) {
+		PaintEnd = TempEnd;
 	}
 
-	Caret = IsCaretOn();
-	if (Caret) {
-		CaretOff(vt_src);
-	}
-	for (j = TempStart.y ; j <= TempEnd.y ; j++) {
-		IStart = 0;
-		IEnd = NumOfColumns-1;
-		if (j==TempStart.y) {
-			IStart = TempStart.x;
-		}
-		if (j==TempEnd.y) {
-			IEnd = TempEnd.x;
-		}
+	BuffUpdateLine(&PaintStart, &PaintEnd);
 
-		if ((IEnd>=IStart) && (j >= PageStart+WinOrgY) &&
-		    (j < PageStart+WinOrgY+WinHeight)) {
-			ttdc_t *dc = DispInitDC(vt_src);
-			BuffUpdateRect(IStart,j-PageStart,IEnd,j-PageStart);
-			DispReleaseDC(vt_src, dc);
-		}
-	}
-	if (Caret) {
-		CaretOn(vt_src);
-	}
-
-	SelectEndOld = SelectEnd;
+	SelectStartOld = TempStart;
+	SelectEndOld = TempEnd;
 }
 
 BOOL BuffUrlDblClk(int Xw, int Yw)
@@ -4425,7 +4596,6 @@ void BuffDblClk(int Xw, int Yw)
 		SelectStart.y = YStart;
 		SelectEnd.x = IEnd;
 		SelectEnd.y = YEnd;
-		SelectEndOld = SelectStart;
 		DblClkStart = SelectStart;
 		DblClkEnd = SelectEnd;
 		Selected = TRUE;
@@ -4457,7 +4627,6 @@ void BuffTplClk(int Yw)
 	SelectStart.y = Y;
 	SelectEnd.x = NumOfColumns;
 	SelectEnd.y = Y;
-	SelectEndOld = SelectStart;
 	DblClkStart = SelectStart;
 	DblClkEnd = SelectEnd;
 	Selected = TRUE;
@@ -4465,14 +4634,16 @@ void BuffTplClk(int Yw)
 	UnlockBuffer();
 }
 
-
-// The block of the text between old and new cursor positions is being selected.
-// This function enables to select several pages of output from Tera Term window.
-// add (2005.5.15 yutaka)
-void BuffSeveralPagesSelect(int Xw, int Yw)
-//  Start text selection by mouse button down
-//    Xw: horizontal position in window coordinate (pixels)
-//    Yw: vertical
+/**
+ * SHIFTを押しながら、マウスボタンダウン(push)
+ * The block of the text between old and new cursor positions is being selected.
+ * This function enables to select several pages of output from Tera Term window.
+ *  Start text selection by mouse button down
+ *
+ * @param	Xw	horizontal position in window coordinate (pixels)
+ * @param	Yw	vertical
+ */
+static void BuffSeveralPagesSelect(int Xw, int Yw)
 {
 	int X, Y;
 	BOOL Right;
@@ -4487,108 +4658,108 @@ void BuffSeveralPagesSelect(int Xw, int Yw)
 		X = NumOfColumns-1;
 	}
 
-	SelectEnd.x = X;
-	SelectEnd.y = Y;
-	//BoxSelect = FALSE; // box selecting disabled
-	SeveralPageSelect = TRUE;
-}
-
-/**
- *	文字の存在するcell位置を返す
- *
- *	VT Window上の(x,y)のcell位置から文字の存在するcell位置を返す
- *	文字のcell数と、cell上の右側か左側か(right)を判断してcell位置を返す
- *
- *	@param[in]	x		VT Windows上の文字(セル)位置
- *	@param[in]	y		バッファ上のy(PageStart加算済み)
- *	@param[in]	right	FALSE/TRUE = cell上の左側/右側
- *	@return		文字のcell位置
- */
-static POINT GetCharCell(int x, int y, BOOL right)
-{
-//	y = y + PageStart;
-
-	// clip
-	x = x < 0 ? 0 : x > NumOfColumns ? NumOfColumns : x;
-	y = y < 0 ? 0 : y > BuffEnd - 1 ? BuffEnd - 1 : y;
-
-	int ptr = GetLinePtr(y);
-	int x_char = LeftHalfOfDBCS(ptr, x);		// 文字の先頭
-
-	const buff_char_t *b = CodeBuffW + ptr + x_char;
-	int cell = b->cell;
-	if ((cell & 1) == 0) {
-		// 偶数長cell文字(2cellなど)
-		int pos = x - x_char;
-		if (pos >= (cell / 2)) {
-			// 文字の中央より右側なので、一つ右の文字を選択
-			if ((x_char + cell) < (NumOfColumns - 1)) {
-				x = x_char + cell;
-			}
+	POINT pt = GetCharCell(X, Y, Right);
+	if (!Selected) {
+		// 選択していない状態
+		if (ComparePoint(&ClickCell, &pt) < 0) {
+			SelectStart = ClickCell;
+			SelectEnd = pt;
+		} else {
+			SelectStart = pt;
+			SelectEnd = ClickCell;
 		}
 	} else {
-		// 奇数長cell文字(1cell,3cellなど)
-		int x_th = x_char + (cell + 1) / 2 - 1;
-		if (x == x_th) {
-			// ちょうど真ん中のcellだった時
-			if (right == FALSE) {
-				// cellの左側なので、文字の先頭
-				x = x_char;
-			} else {
-				// cellの右側なので、一つ右の文字を選択
-				x = x_char + cell;
+		if (ComparePoint(&SelectEnd, &SelectStart) < 0) {
+			assert(FALSE);
+		}
+		if (ComparePoint(&pt, &SelectStart) < 0) {
+			// 選択領域の開始位置より前方のとき
+			SelectStart = pt;
+		}
+		else if (ComparePoint(&SelectEnd, &pt) < 0) {
+			// 選択領域の終了位置より後方のとき
+			SelectEnd = pt;
+		}
+		else {
+			// 選択領域内のとき,近いほうを更新する
+			int len_s = ComparePoint(&pt, &SelectStart);
+			int len_e = ComparePoint(&SelectEnd, &pt);
+			if (len_s < len_e) {
+				// 選択領域の開始位置を更新
+				SelectStart = pt;
 			}
-		} else if (x < x_th) {
-			// 文字の左側なので、文字の先頭
-			x = x_char;
-		} else {
-			// 文字の右側なので、一つ右の文字を選択
-			x = x_char + cell;
+			else {
+				// 選択領域の終了位置を更新
+				SelectEnd = pt;
+			}
 		}
 	}
 
-	POINT pos;
-	pos.x = x;
-	pos.y = y;
-	return pos;
-}
-
-void BuffStartSelect(int Xw, int Yw, BOOL Box)
-//  Start text selection by mouse button down
-//    Xw: horizontal position in window coordinate (pixels)
-//    Yw: vertical
-//    Box: Box selection if TRUE
-{
-	int X, Y;
-	BOOL Right;
-
-	DispConvWinToScreen(vt_src, Xw, Yw, &X, &Y, &Right);
-	Y = Y + PageStart;
-	if ((Y<0) || (Y>=BuffEnd)) {
-		return;
+	if (ComparePoint(&SelectStart, &SelectEnd) == 0) {
+		// Start == End は選択されていない状態
+		Selected = FALSE;
+	} else {
+		Selected = TRUE;
+		if (ComparePoint(&pt, &SelectEnd) != 0) {
+			// クリック位置をSelectEndに設定する
+			//   Start と End を入れ替える
+			POINT t = SelectStart;
+			SelectStart = SelectEnd;
+			SelectEnd = t;
+		}
 	}
-	if (X<0) X = 0;
-	if (X>=NumOfColumns) {
-		X = NumOfColumns-1;
-	}
-
-	SelectEndOld = SelectEnd;
-	SelectEnd = SelectStart;
 
 	LockBuffer();
 	ChangeSelectRegion();
 	UnlockBuffer();
+}
 
+/**
+ *	マウスボタンダウン(push)
+ *  Start text selection by mouse button down
+ *    Xw: horizontal position in window coordinate (pixels)
+ *    Yw: vertical
+ *    Box: Box selection if TRUE
+ */
+void BuffStartSelect(int Xw, int Yw, BOOL Box, BOOL Shift)
+{
+	if (Shift) {
+		BuffSeveralPagesSelect(Xw, Yw);
+		return;
+	}
+
+	int X, Y;
+	BOOL Right;
+
+	DispConvWinToScreen(vt_src, Xw, Yw, &X, &Y, &Right);
+	Y = Y + PageStart;
+	if ((Y<0) || (Y>=BuffEnd)) {
+		return;
+	}
+	if (X<0) X = 0;
+	if (X>=NumOfColumns) {
+		X = NumOfColumns-1;
+	}
+
+	// 選択領域解除
+	SelectEnd = SelectStart;
+	LockBuffer();
+	ChangeSelectRegion();
+	UnlockBuffer();
+	Selected = FALSE;
+
+	// 選択開始ガード
 	SelectStartTime = GetTickCount();
 	Selecting = FALSE;
 
+	// push位置
 	ClickCell = GetCharCell(X, Y, Right);
 
 	SelectEnd = ClickCell;
-	SelectEndOld = SelectEnd;
-	CaretOff(vt_src);
-	Selected = TRUE;
+	SelectStart = ClickCell;
+	Selected = FALSE;
 	BoxSelect = Box;
+	CaretOff(vt_src);
 }
 
 /**
@@ -4605,15 +4776,18 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 	int X, Y;
 	BOOL Right;
 
-	DispConvWinToScreen(vt_src, Xw, Yw, &X, &Y, &Right);
-
 	if (!Selecting) {
+		// 選択ガード?
 		if (GetTickCount() - SelectStartTime < ts.SelectStartDelay) {
+			// ガード中
 			return;
 		}
+		// 選択開始
 		SelectStart = ClickCell;
 		Selecting = TRUE;
 	}
+
+	DispConvWinToScreen(vt_src, Xw, Yw, &X, &Y, &Right);
 
 	Y = Y + PageStart;
 
@@ -4628,7 +4802,25 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 
 	LockBuffer();
 
-	SelectEnd = GetCharCell(X, Y, Right);
+	POINT pt = GetCharCell(X, Y, Right);
+	if (!Selected) {
+		// 選択されていないとき
+		if (ComparePoint(&pt, &ClickCell) <= 0) {
+			SelectStart = pt;
+			SelectEnd = ClickCell;
+		}
+		else {
+			SelectStart = ClickCell;
+			SelectEnd = pt;
+		}
+		Selected = TRUE;
+	}
+	else {
+		// 選択されているとき
+		//   Start == End になることもある
+		//   BuffEndSelect() で Selected の値を再設定する
+		SelectEnd = pt;
+	}
 	X = SelectEnd.x;
 	Y = SelectEnd.y;
 
@@ -4658,7 +4850,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 		}
 	}
 	else if (NClick==3) { // drag after tripple click
-		if ((SelectEnd.y > SelectStart.y) || ((SelectEnd.y == SelectStart.y) && (SelectEnd.x >= SelectStart.x))) {
+		if (ComparePoint(&SelectStart, &SelectEnd) <= 0) {
 			if (SelectStart.x == DblClkEnd.x) {
 				SelectEnd = DblClkStart;
 				ChangeSelectRegion();
@@ -4684,61 +4876,55 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 	UnlockBuffer();
 }
 
-wchar_t *BuffEndSelect(void)
-//  End text selection by mouse button up
+/**
+ *	ボタンUP(Release)
+ *	選択終了ではなく、ボタンUP
+ *
+ *	TODO
+ *		ボタンPush(BuffStartSelect())とボタンReleaseは
+ *		異なる座標の場合があり得る
+ */
+void BuffEndSelect(int Xw, int Yw)
 {
-	wchar_t *retval = NULL;
+	(void)Xw;
+	(void)Yw;
 	if (!Selecting) {
 		if (GetTickCount() - SelectStartTime < ts.SelectStartDelay) {
+			// ガード時間以内なら
+			// 選択領域解除
 			SelectEnd = SelectStart;
-			SelectEndOld = SelectEnd;
 			LockBuffer();
 			ChangeSelectRegion();
 			UnlockBuffer();
 			Selected = FALSE;
-			return NULL;
+			return;
 		}
-		SelectStart = ClickCell;
 	}
 
-	Selected = (SelectStart.x!=SelectEnd.x) ||
-	           (SelectStart.y!=SelectEnd.y);
+	// 選択領域が存在するか評価する
+	//   BuffChangeSelect()で、Start == End となる場合がある
+	Selected = (ComparePoint(&SelectStart, &SelectEnd) != 0);
+
 	if (Selected) {
+		// StartをEndの左上になるよう、入れ替える
 		if (BoxSelect) {
-			if (SelectStart.x>SelectEnd.x) {
-				SelectEndOld.x = SelectStart.x;
+			if (SelectStart.x > SelectEnd.x) {
+				LONG t = SelectStart.x;
 				SelectStart.x = SelectEnd.x;
-				SelectEnd.x = SelectEndOld.x;
+				SelectEnd.x = t;
 			}
-			if (SelectStart.y>SelectEnd.y) {
-				SelectEndOld.y = SelectStart.y;
+			if (SelectStart.y > SelectEnd.y) {
+				LONG t = SelectStart.y;
 				SelectStart.y = SelectEnd.y;
-				SelectEnd.y = SelectEndOld.y;
+				SelectEnd.y = t;
 			}
 		}
-		else if ((SelectEnd.y < SelectStart.y) || ((SelectEnd.y == SelectStart.y) && (SelectEnd.x < SelectStart.x))) {
-			SelectEndOld = SelectStart;
+		else if (ComparePoint(&SelectEnd, &SelectStart) < 0) {
+			POINT t = SelectStart;
 			SelectStart = SelectEnd;
-			SelectEnd = SelectEndOld;
-		}
-
-		if (SeveralPageSelect) { // yutaka
-			// ページをまたぐ選択の場合、Mouse button up時にリージョンを塗り替える。
-			LockBuffer();
-			ChangeSelectRegion();
-			UnlockBuffer();
-			SeveralPageSelect = FALSE;
-			InvalidateRect(HVTWin, NULL, TRUE); // ちょっと画面がちらつく
-		}
-
-		/* copy to the clipboard */
-		if (ts.AutoTextCopy>0) {
-			LockBuffer();
-			retval = BuffCBCopyUnicode(FALSE);
-			UnlockBuffer();
+			SelectEnd = t;
 		}
 	}
-	return retval;
 }
 
 void BuffChangeWinSize(int Nx, int Ny)
@@ -5945,6 +6131,12 @@ int BuffGetDispCodePage(void)
 	return CodePage;
 }
 
+/**
+ *	選択領域が存在する?
+ *
+ *	@retval	TRUE	存在する
+ *	@retval	FALSE	存在しない
+ */
 BOOL BuffIsSelected(void)
 {
 	return Selected;

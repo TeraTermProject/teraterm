@@ -70,7 +70,7 @@ static void EnableWindows(HWND hWnd, const int *list, int count, BOOL enable)
 	}
 }
 
-static void ArrenageItems(HWND hWnd)
+static void ArrenageItems(HWND hWnd, CodingPPData *data)
 {
 	static const int JJISReceiveItems[] = {
 		IDC_TERMKINTEXT,
@@ -106,26 +106,14 @@ static void ArrenageItems(HWND hWnd)
 	// Unicode character width
 	if (is_unicode) {
 		EnableWindows(hWnd, UnicodeItems, _countof(UnicodeItems), TRUE);
+		const OverrideCharWidthInfo *info = &data->unicode_override_charwidth_info;
+		if (info->count == 0) {
+			EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH), FALSE);
+			EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO), FALSE);
+		}
 	}
 	else {
 		EnableWindows(hWnd, UnicodeItems, _countof(UnicodeItems), FALSE);
-	}
-	const int code_page = GetACP();
-	if ((coding_send == IdUTF8 &&
-		 (code_page == 932 || code_page == 949 || code_page == 936 || code_page == 950)) ||
-		coding_send == IdSJIS || coding_send == IdEUC || coding_send == IdJIS ||
-		coding_send == IdKoreanCP949 || coding_send == IdCnGB2312 || coding_send == IdCnBig5) {
-		// UTF-8 で CJK(CP932, CP949, CP936, CP950) のとき
-		//   or DBCS(Unicodeではないので選択できない)のとき
-		SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
-		CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_CHECKED);
-		SendDlgItemMessage(hWnd, IDC_EMOJI_WIDTH_COMBO, CB_SETCURSEL, 1, 0);
-		//CheckDlgButton(hWnd, IDC_OVERRIDE_CHAR_WIDTH, BST_UNCHECKED);
-	}
-	else {
-		CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_UNCHECKED);
-		SendDlgItemMessage(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CB_SETCURSEL, 0, 0);
-		//CheckDlgButton(hWnd, IDC_OVERRIDE_CHAR_WIDTH, BST_UNCHECKED);
 	}
 
 	if (coding_receive == IdJIS) {
@@ -262,16 +250,10 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			CheckDlgButton(hWnd, IDC_DEC2UNICODE_MIDDLEDOT,
 						   (ts->UnicodeDecSpMapping & 0x04) != 0 ? BST_CHECKED : BST_UNCHECKED);
 
-			ArrenageItems(hWnd);
-
 			// character width (現在の値)
 			SetDropDownList(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO, CellWidthList, ts->UnicodeAmbiguousWidth == 1 ? 1 : 2);
 			SetDropDownList(hWnd, IDC_EMOJI_WIDTH_COMBO, CellWidthList, ts->UnicodeEmojiWidth == 1 ? 1 : 2);
-			if (ts->UnicodeEmojiOverride) {
-				CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_CHECKED);
-			} else {
-				CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, BST_UNCHECKED);
-			}
+			CheckDlgButton(hWnd, IDC_EMOJI_WIDTH_CHECK, ts->UnicodeEmojiOverride ? BST_CHECKED : BST_UNCHECKED);
 
 			// 文字ごとの文字幅オーバーライド設定
 			const OverrideCharWidthInfo *info = &DlgData->unicode_override_charwidth_info;
@@ -293,13 +275,15 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO), enable);
 			}
 
+			ArrenageItems(hWnd, DlgData);
+
 			return TRUE;
 		}
 		case WM_NOTIFY: {
 			NMHDR *nmhdr = (NMHDR *)lp;
 			switch (nmhdr->code) {
 				case PSN_APPLY: {
-					CodingPPData *DlgData = (CodingPPData *)GetWindowLongPtr(hWnd, DWLP_USER);
+					CodingPPData *DlgData = (CodingPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
 					TTTSet *ts = DlgData->pts;
 
 					ts->JIS7KatakanaSend = 0;
@@ -453,13 +437,15 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETCURSEL, sel_receive, 0);
 					}
 
-					ArrenageItems(hWnd);
+					CodingPPData *DlgData = (CodingPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
+					ArrenageItems(hWnd, DlgData);
 					break;
 				}
 				case IDC_TERMKANJISEND | (CBN_SELCHANGE << 16): {
 					// 送信コード
 
-					ArrenageItems(hWnd);
+					CodingPPData *DlgData = (CodingPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
+					ArrenageItems(hWnd, DlgData);
 					break;
 				}
 				case IDC_USE_DIFFERENT_CODE | (BN_CLICKED << 16): {

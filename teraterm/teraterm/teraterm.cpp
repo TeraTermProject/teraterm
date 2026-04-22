@@ -56,11 +56,9 @@
 #include "ttdebug.h"
 #include "win32helper.h"
 #include "asprintf.h"
-#if ENABLE_GDIPLUS
-#include "ttgdiplus.h"
-#endif
 #include "directx.h"
 #include "unicode.h"
+#include "broadcast.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -379,9 +377,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	init();
 	_HtmlHelpW(NULL, NULL, HH_INITIALIZE, (DWORD_PTR)&HtmlHelpCookie);
 
-#if ENABLE_GDIPLUS
-	GDIPInit();
-#endif
 	DXInit();
 
 	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);
@@ -454,6 +449,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 					}
 				}
 
+				if (HandleBroadcastEditMessage(&msg)){
+					// Broadcast command ダイアログのIDC_COMMAND_EDITへのメッセージを処理した
+					message_processed = true;
+				}
+
 				if (!message_processed) {
 					::TranslateMessage(&msg);
 					::DispatchMessageW(&msg);
@@ -479,9 +479,6 @@ exit_message_loop:
 	m_pMainWnd = NULL;
 
 	DXUninit();
-#if ENABLE_GDIPLUS
-	GDIPUninit();
-#endif
 
 	_HtmlHelpW(NULL, NULL, HH_CLOSE_ALL, 0);
 	_HtmlHelpW(NULL, NULL, HH_UNINITIALIZE, HtmlHelpCookie);

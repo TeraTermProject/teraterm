@@ -283,10 +283,13 @@ sub write_info_isl {
 	if ($revision eq '') {
 		$revision = "0000";
 	}
+	my $version_info_version = $version;
+	$version_info_version =~ s/^(\d+)\.(\d+)\.(\d+).*$/$1.$2.$3.0/;
 
 	my $content = <<"EOS";
 \x{FEFF}; $header
 #define Version \"$version\"
+#define VersionInfoVersion \"$version_info_version\"
 #define Revision \"$revision\"
 #define Release $svninfo{'release'}
 #define BuildDate \"$date\"
