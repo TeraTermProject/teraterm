@@ -124,8 +124,8 @@ BOOL EnableItem(HWND hWnd, int idControl, BOOL flag)
 
 /* ==========================================================================
 	Function Name	: (void) EncodePassword()
-	Outline			: パスワードをエンコード(?)する。
-					  エンコードされた文字列をデコードする
+	Outline			: パスワードをエンコード(難読化)する。
+					  エンコードされた文字列をデコード(可読化)する
 					  入出力は文字列またはバイナリとなる
 	Arguments		: const char *cPassword			(in)	変換する文字列
 					: char		 *cEncodePassword	(out)	変換された文字列
@@ -270,9 +270,11 @@ void UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_
 
 int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONTA logfont, HFONT *font, const char *iniFile)
 {
-	if (GetI18nLogfont("TTMenu", key, logfont,
-					   GetDeviceCaps(GetDC(dlg),LOGPIXELSY),
-					   iniFile) == FALSE) {
+	HDC hDC = GetDC(dlg);
+	int dpi = GetDeviceCaps(hDC, LOGPIXELSY);
+	ReleaseDC(dlg, hDC);
+
+	if (GetI18nLogfont("TTMenu", key, logfont, dpi, iniFile) == FALSE) {
 		return FALSE;
 	}
 
@@ -419,7 +421,11 @@ int Encrypt2EncDec(char *szPassword, const unsigned char *szEncryptKey, Encrypt2
 	}
 
  end:
-	BIO_free(Benc);
-	BIO_free(Bmem);
+	if (Bio != NULL) {
+		BIO_free_all(Bio);
+	} else {
+		BIO_free(Benc);
+		BIO_free(Bmem);
+	}
 	return ret;
 }
