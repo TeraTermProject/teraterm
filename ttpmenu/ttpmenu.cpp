@@ -156,7 +156,7 @@ static void GetTeraTermPath(wchar_t *path, size_t size)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL ExecStartup(HWND /* hWnd unusedParam */)
+BOOL ExecStartup(HWND hWnd)
 {
 	wchar_t	szEntryName[MAX_PATH];
 	wchar_t	szJobName[MAXJOBNUM][MAX_PATH];
@@ -171,11 +171,10 @@ BOOL ExecStartup(HWND /* hWnd unusedParam */)
 		}
 		wcscpy(szJobName[dwIndex], L"");
 		RegClose(hKey);
-#if 0
+
 		DWORD dwCnt;
 		for (dwCnt = 0; dwCnt < dwIndex; dwCnt++)
 			ConnectHost(hWnd, 0, szJobName[dwCnt]);
-#endif
 	}
 
 	return TRUE;
