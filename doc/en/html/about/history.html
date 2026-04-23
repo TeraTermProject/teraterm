@@ -6322,17 +6322,17 @@ SYNOPSIS:
 <h3 id="ttmenu_1.22">YYYY.MM.DD (Ver 1.22)</h3>
 <ul class="history">
       <li>
-        Fixed an issue where LockBox could be forcibly enabled when loading settings stored in the registry from versions prior to 1.20.
-        This bug was introduced in 1.20.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1223" target="_blank">issue #1223</a>)
-      </li>
-      <li>
         Fixed an issue where the "Tera Term configuration file" specified in the TeraTerm Menu was not loaded.
         This bug was introduced in 1.21.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1157" target="_blank">issue #1157</a>)
       </li>
       <li>
-        Fixed an issue where the "Launch Pattern" radio buttons in the "List Configuration" dialog were split into two groups  "autologin" and "specified macro file" / "launch only".
+        Fixed an issue where the "kick at starting" feature stopped working.
+        This bug was introduced in 1.21.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1251" target="_blank">issue #1251</a>)
+      </li>
+      <li>
+        Fixed an issue where the "Launch Pattern" radio buttons in the "List Configuration" dialog were split into two groups "autologin" and "specified macro file" / "launch only".
         This bug was introduced in 1.20.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1169" target="_blank">issue #1169</a>)
       </li>
@@ -6344,6 +6344,15 @@ SYNOPSIS:
       <li>
         Fixed a bug where an invalid free() occurred when a filename starting with '"' was entered in the file name box and opening and then closing the file selection dialog.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1176" target="_blank">issue #1176</a>)
+      </li>
+      <li>
+        Fixed an issue where LockBox could be forcibly enabled when loading settings stored in the registry from versions prior to 1.20.
+        This bug was introduced in 1.20.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1223" target="_blank">issue #1223</a>)
+      </li>
+      <li>
+        Made minor adjustments.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1234" target="_blank">issue #1234</a>)
       </li>
 </ul>
 
