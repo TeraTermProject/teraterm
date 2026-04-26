@@ -476,7 +476,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 exit_message_loop:
 
 	if (pDeleteTimerQueueTimer != NULL) {
-		DeleteTimerQueueTimer(NULL, hIdleTimer, NULL);
+		pDeleteTimerQueueTimer(NULL, hIdleTimer, NULL);
 	}
 
 	delete m_pMainWnd;
