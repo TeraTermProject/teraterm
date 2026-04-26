@@ -2,7 +2,7 @@ if not "%PERL%" == "" exit /b 0
 
 if "%PERL_PATH%" == "" goto perl_in_path
 set PERL=%PERL_PATH%\perl.exe
-if exist "%PERL%" exist /b 0
+if exist "%PERL%" exit /b 0
 
 :perl_in_path
 set PERL=perl.exe
