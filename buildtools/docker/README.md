@@ -1,7 +1,7 @@
 ﻿# build with MinGW + docker (experimental)
 
 - Thread model win32版のMinGWを使ってビルド
-- dockerでビルド環境を作成、docker中でビルド
+- dockerでビルド環境(linux)を作成、docker中でビルド
 
 - linuxビルドの制限
   - cygterm, msys2termはビルドできない
@@ -43,4 +43,5 @@ docker_build.bat
 
 ## docker-compose.yml
 
+`docker compose run --rm dev bash`
 作成中

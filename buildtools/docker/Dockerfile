@@ -57,7 +57,7 @@ RUN mkdir -p /workspaces && chown ${USER}:${USER} /workspaces
 USER ${USER}
 WORKDIR /workspaces/teraterm
 
-COPY build.sh .
+COPY --chown=${USER}:${USER} build.sh .
 RUN \
 	git config --global user.name "${USER}" && \
 	git config --global user.email "${EMAIL}"

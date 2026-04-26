@@ -1,2 +1,8 @@
+CUR=$(cd "$(dirname "$0")" && pwd)
 docker build --build-arg USER=${USER:-ttbuilder} -t teraterm_build:1.0 -t teraterm_build:latest .
-docker run -it --rm --detach-keys="ctrl-t" --mount type=bind,src=`pwd`,dst=/mnt teraterm_build:latest bash
+
+MOUNTS="--mount type=bind,src=$CUR,dst=/mnt"
+if [ -e "$CUR/../../.git" ]; then
+    MOUNTS="$MOUNTS --mount type=bind,src=$CUR/../..,dst=/workspaces/teraterm/teraterm_host"
+fi
+docker run -it --rm $MOUNTS teraterm_build:latest bash
