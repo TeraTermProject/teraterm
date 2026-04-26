@@ -387,7 +387,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
 				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 
-	CreateTimerQueueTimer(&hIdleTimer, NULL, IdleTimerProc, 0, IdleTimerPeriod, 0, WT_EXECUTEDEFAULT);
+	if (pCreateTimerQueueTimer != NULL) {
+		pCreateTimerQueueTimer(&hIdleTimer, NULL, IdleTimerProc, 0, IdleTimerPeriod, 0, WT_EXECUTEDEFAULT);
+	}
 
 	LONG lCount = 0;
 	MSG msg;
@@ -473,7 +475,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	}
 exit_message_loop:
 
-	DeleteTimerQueueTimer(NULL, hIdleTimer, NULL);
+	if (pDeleteTimerQueueTimer != NULL) {
+		DeleteTimerQueueTimer(NULL, hIdleTimer, NULL);
+	}
 
 	delete m_pMainWnd;
 	m_pMainWnd = NULL;

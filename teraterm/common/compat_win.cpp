@@ -133,6 +133,9 @@ BOOL (WINAPI *pSetDefaultDllDirectories)(DWORD DirectoryFlags);
 BOOL (WINAPI *pSetDllDirectoryA)(LPCSTR lpPathName);
 static BOOL (WINAPI *pGetVersionExA)(LPOSVERSIONINFOA lpVersionInformation);
 LANGID (WINAPI *pGetUserDefaultUILanguage)(void);
+BOOL (WINAPI *pCreateTimerQueueTimer)(PHANDLE phNewTimer, HANDLE TimerQueue, WAITORTIMERCALLBACK Callback,
+									  PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags);
+BOOL(WINAPI *pDeleteTimerQueueTimer)(HANDLE TimerQueue, HANDLE Timer, HANDLE CompletionEvent);
 
 // gdi32
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -309,6 +312,8 @@ static const APIInfo Lists_kernel32[] = {
 	{ "SetDefaultDllDirectories", (void **)&pSetDefaultDllDirectories },
 	{ "SetDllDirectoryA", (void **)&pSetDllDirectoryA },
 	{ "GetUserDefaultUILanguage", (void **)&pGetUserDefaultUILanguage },
+	{ "CreateTimerQueueTimer", (void **)&pCreateTimerQueueTimer },
+	{ "DeleteTimerQueueTimer", (void **)&pDeleteTimerQueueTimer },
 	{},
 };
 

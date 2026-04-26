@@ -182,6 +182,9 @@ BOOL _VerifyVersionInfoA(LPOSVERSIONINFOEXA lpVersionInformation, DWORD dwTypeMa
 extern BOOL (WINAPI *pSetDefaultDllDirectories)(DWORD DirectoryFlags);
 extern BOOL (WINAPI *pSetDllDirectoryA)(LPCSTR lpPathName);
 extern LANGID (WINAPI *pGetUserDefaultUILanguage)(void);
+extern BOOL (WINAPI *pCreateTimerQueueTimer)(PHANDLE phNewTimer, HANDLE TimerQueue, WAITORTIMERCALLBACK Callback,
+											PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags);
+extern BOOL(WINAPI *pDeleteTimerQueueTimer)(HANDLE TimerQueue, HANDLE Timer, HANDLE CompletionEvent);
 
 #if !defined(LOAD_LIBRARY_SEARCH_SYSTEM32)
 #define LOAD_LIBRARY_SEARCH_SYSTEM32        0x00000800
