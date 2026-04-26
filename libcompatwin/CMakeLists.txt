@@ -13,6 +13,8 @@ add_library(${PROJECT_NAME}
   inet_pton.cpp
   inet_pton.asm
   libcompatwin_init.cpp
+  BCryptGenRandom.asm
+  BCryptGenRandom.cpp
 )
 
 source_group(
@@ -20,21 +22,9 @@ source_group(
   REGULAR_EXPRESSION
   "asm")
 
-target_compile_options(${PROJECT_NAME}
-  PRIVATE
-  "$<$<CONFIG:Debug>:/ZI>"
-  "-DUNICODE=1"
-)
-target_link_options(${PROJECT_NAME}
-  PRIVATE
-  "$<$<CONFIG:Debug>:/SAFESEH:NO>"
-)
-target_link_options(${PROJECT_NAME}
-  PRIVATE
-  /MAP)
-
-target_link_libraries(${PROJECT_NAME}
-#  comctl32.lib
-)
-
-#add_subdirectory(test)
+if(MSVC)
+  target_compile_options(${PROJECT_NAME}
+    PRIVATE
+    "$<$<CONFIG:Debug>:/ZI>"
+  )
+endif()

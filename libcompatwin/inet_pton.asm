@@ -28,8 +28,8 @@ init:
     popa
 
     ;; call api
-;inet_pton:
-;_inet_pton@12:
+inet_pton:
+_inet_pton@12:
     jmp [__imp__inet_pton@12]
 
 

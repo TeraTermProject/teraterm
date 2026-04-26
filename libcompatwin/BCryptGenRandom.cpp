@@ -26,34 +26,45 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define WIN32_NO_STATUS
 #include <windows.h>
+#undef WIN32_NO_STATUS
+#include <ntstatus.h>
+#include <wincrypt.h>
+#include <bcrypt.h>
 
-extern "C" BOOL WINAPI _InitOnceExecuteOnce(
-	INIT_ONCE *flag,
-	PINIT_ONCE_FN initFunc,
-    void *Parameter,
-	void **Context)
+/**
+ *	BCryptGenRandom() 互換実装, 存在しない Windows 用
+ *
+ *	@param[in]		hAlgorithm	未使用
+ *	@param[in,out]	pbBuffer
+ *	@param[in]		cbBuffer
+ *	@param[in]		dwFlags		未使用
+ *
+ *	@retval	STATUS_SUCCESS				成功
+ *	@retval	STATUS_INVALID_PARAMETER	pbBuffer が NULL
+ *	@retval	STATUS_UNSUCCESSFUL			CryptoAPI の呼び出しに失敗
+ */
+extern "C" NTSTATUS WINAPI _BCryptGenRandom(
+	BCRYPT_ALG_HANDLE hAlgorithm, PUCHAR pbBuffer, ULONG cbBuffer,
+	ULONG dwFlags)
 {
-	/*
-	 *	flag
-	 *		0:未初期化
-	 *		1:初期化中
-	 *		2:完了
-	 */
-	while (1) {
-		LONG old = InterlockedCompareExchange((LONG *)flag, 1, 0);
-		if (old == 2) {
-			// 初期化済み
-			return TRUE;
-		}
-		if (old == 0) {
-			// 未初期化、自分が初期化を行う
-			initFunc(flag, Parameter, Context);
-			InterlockedExchange((LONG *)flag, 2);
-			return TRUE;
-		}
-		// 別スレッドが初期化中
-		Sleep(1);
+	(void)hAlgorithm;
+	(void)dwFlags;
+	if (pbBuffer == NULL) {
+		return STATUS_INVALID_PARAMETER;
 	}
-	return TRUE;
+
+	HCRYPTPROV hProv = 0;
+	if (!CryptAcquireContextA(&hProv, NULL, NULL,
+							  PROV_RSA_FULL,
+							  CRYPT_VERIFYCONTEXT | CRYPT_SILENT)) {
+		return STATUS_UNSUCCESSFUL;
+	}
+	BOOL ok = CryptGenRandom(hProv, cbBuffer, pbBuffer);
+	CryptReleaseContext(hProv, 0);
+	if (!ok) {
+		return STATUS_UNSUCCESSFUL;
+	}
+	return STATUS_SUCCESS;
 }

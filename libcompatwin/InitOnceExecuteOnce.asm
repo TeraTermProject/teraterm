@@ -28,8 +28,8 @@ init:
     popa
 
     ;; call api
-;InitOnceExecuteOnce:
-;_InitOnceExecuteOnce@16:
+InitOnceExecuteOnce:
+_InitOnceExecuteOnce@16:
     jmp [__imp__InitOnceExecuteOnce@16]
 
 

@@ -237,45 +237,55 @@ target_link_libraries(
   libsshagentc
   ttpcmn
   argon2
-  ${ZLIB_LIB}
-  )
+)
 
 if(TTXSSH_LIBRESSL)
   target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
     ${LIBRESSL_LIB}
-    bcrypt.lib
-    )
+  )
 elseif(TTXSSH_OPENSSL3)
   target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
     ${OPENSSL3_LIB}
-    bcrypt.lib
-    )
+  )
 else()
   target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
     ${OPENSSL_LIB}
-    crypt32.lib		# TODO このlibを使用しないパッチを適応したら削除すること
-    )
+  )
 endif()
-
-if(SUPPORT_OLD_WINDOWS)
-  target_link_libraries(
-    ${PROJECT_NAME}
-    PRIVATE
-    layer_for_unicode
-    )
-endif()
+target_link_libraries(
+  ${PROJECT_NAME}
+  PRIVATE
+  ${ZLIB_LIB}
+)
 
 if(SUPPORT_OLD_WINDOWS AND WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 4)
   target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
-    libcompatwin)
+    layer_for_unicode
+    libcompatwin
+    )
+endif()
+
+if(TTXSSH_LIBRESSL OR TTXSSH_OPENSSL3)
+  target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+    bcrypt
+  )
+else()
+  # TODO このlibを使用しないパッチを適応したら削除すること
+  target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+    crypt32
+  )
 endif()
 
 target_link_libraries(

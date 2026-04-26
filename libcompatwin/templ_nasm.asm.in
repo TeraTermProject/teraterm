@@ -28,8 +28,8 @@ init:
     popa
 
     ;; call api
-;%SYMBOL%:
-;_%SYMBOL%@%PARAM_BYTES%:
+%SYMBOL%:
+_%SYMBOL%@%PARAM_BYTES%:
     jmp [__imp__%SYMBOL%@%PARAM_BYTES%]
 
 

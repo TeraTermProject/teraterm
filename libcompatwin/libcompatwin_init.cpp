@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021- TeraTerm Project
+ * Copyright (C) 2026- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 
 #include <windows.h>
 
-// #define ALWAYS_ANSI	1
+// #define ALWAYS_EMU	1
 
 static HMODULE _GetModuleHandleW(LPCWSTR lpModuleName)
 {
@@ -46,6 +46,9 @@ static HMODULE _GetModuleHandleW(LPCWSTR lpModuleName)
 static DWORD DLLGetApiAddress(const wchar_t *dllPath,
 							  const char *ApiName, void **pFunc)
 {
+#if ALWAYS_EMU
+	return ERROR_PROC_NOT_FOUND;
+#else
 	HMODULE hDll = _GetModuleHandleW(dllPath);
 	if (hDll == NULL) {
 		*pFunc = NULL;
@@ -57,6 +60,7 @@ static DWORD DLLGetApiAddress(const wchar_t *dllPath,
 		}
 		return NO_ERROR; // = 0
 	}
+#endif
 }
 
 extern "C" void compatwin_init_ptr(const wchar_t *dll, const char *func_name, void *wrap_func, void **func_ptr)
