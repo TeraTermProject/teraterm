@@ -130,6 +130,9 @@ UINT WINAPI _DragQueryFileW(HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch);
 BOOL WINAPI _Shell_NotifyIconW(DWORD dwMessage, TT_NOTIFYICONDATAW_V2 *lpData);
 LPITEMIDLIST WINAPI _SHBrowseForFolderW(LPBROWSEINFOW lpbi);
 BOOL WINAPI _SHGetPathFromIDListW(LPITEMIDLIST pidl, LPWSTR pszPath);
+HINSTANCE WINAPI _ShellExecuteW(HWND hwnd, LPCWSTR lpOperation, LPCWSTR lpFile,
+								LPCWSTR lpParameters, LPCWSTR lpDirectory, INT nShowCmd);
+BOOL WINAPI _ShellExecuteExW(SHELLEXECUTEINFOW *pExecInfo);
 
 HWND WINAPI _CreateDialogIndirectParamW(HINSTANCE hInstance, LPCDLGTEMPLATEW lpTemplate,
 								 HWND hWndParent, DLGPROC lpDialogFunc,

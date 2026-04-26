@@ -1019,3 +1019,68 @@ BOOL WINAPI _InsertMenuItemW(HMENU hmenu, UINT item, BOOL fByPosition, LPCMENUIT
 
 	return r;
 }
+
+HINSTANCE WINAPI _ShellExecuteW(HWND hwnd, LPCWSTR lpOperation, LPCWSTR lpFile,
+								LPCWSTR lpParameters, LPCWSTR lpDirectory, INT nShowCmd)
+{
+	if (lpFile == NULL) {
+		// lpFile が NULL のときはエラー
+		return (HINSTANCE)ERROR_PATH_NOT_FOUND;
+	}
+	char *lpOperationA = lpOperation == NULL ? NULL : ToCharW(lpOperation);
+	char *lpFileA = ToCharW(lpFile);
+	char *lpParametersA = lpParameters == NULL ? NULL : ToCharW(lpParameters);
+	char *lpDirectoryA = lpDirectory == NULL ? NULL : ToCharW(lpDirectory);
+
+	HINSTANCE r = ShellExecuteA(hwnd, lpOperationA, lpFileA, lpParametersA, lpDirectoryA, nShowCmd);
+
+	free(lpOperationA);
+	free(lpFileA);
+	free(lpParametersA);
+	free(lpDirectoryA);
+
+	return r;
+}
+
+BOOL WINAPI _ShellExecuteExW(SHELLEXECUTEINFOW *pExecInfo)
+{
+	if (pExecInfo->cbSize != sizeof(SHELLEXECUTEINFOW)) {
+		return FALSE;
+	}
+	char *lpVerb = pExecInfo->lpVerb == NULL ? NULL : ToCharW(pExecInfo->lpVerb);
+	char *lpFile = pExecInfo->lpFile == NULL ? NULL : ToCharW(pExecInfo->lpFile);
+	char *lpParameters = pExecInfo->lpParameters == NULL ? NULL : ToCharW(pExecInfo->lpParameters);
+	char *lpDirectory = pExecInfo->lpDirectory == NULL ? NULL : ToCharW(pExecInfo->lpDirectory);
+	char *lpClass = pExecInfo->lpClass == NULL ? NULL : ToCharW(pExecInfo->lpClass);
+
+	SHELLEXECUTEINFOA ExecInfoA = {};
+	SHELLEXECUTEINFOA *p = &ExecInfoA;
+	p->cbSize = sizeof(*p);
+	p->fMask = pExecInfo->fMask;
+	p->hwnd = pExecInfo->hwnd;
+	p->lpVerb = lpVerb;
+	p->lpFile = lpFile;
+	p->lpParameters = lpParameters;
+	p->lpDirectory = lpDirectory;
+	p->nShow = pExecInfo->nShow;
+	p->hInstApp = pExecInfo->hInstApp;
+	p->lpIDList = pExecInfo->lpIDList;
+	p->lpClass = lpClass;
+	p->hkeyClass = pExecInfo->hkeyClass;
+	p->dwHotKey = pExecInfo->dwHotKey;
+	p->hIcon = pExecInfo->hIcon;
+	p->hProcess = pExecInfo->hProcess;
+
+	BOOL r = ShellExecuteExA(&ExecInfoA);
+
+	pExecInfo->hInstApp = p->hInstApp;
+	pExecInfo->hProcess = p->hProcess;
+
+	free(lpVerb);
+	free(lpFile);
+	free(lpParameters);
+	free(lpDirectory);
+	free(lpClass);
+
+	return r;
+}
