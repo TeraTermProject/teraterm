@@ -77,6 +77,8 @@
 #define SSH1_AGENT_RSA_RESPONSE					4
 #endif
 
+static BOOL (WINAPI *pCryptProtectMemory)(LPVOID pDataIn, DWORD cbDataIn, DWORD dwFlags);
+
 #if PUTTY_SHM
 static PSID usersid;
 #endif
@@ -95,6 +97,31 @@ static uint16_t get_uint16(const uint8_t *p)
 #endif
 
 /**
+ *	CryptProtectMemory が存在する?
+ *
+ *	CryptProtectMemory() APIはVista以降
+ *
+ *	@retval	TRUE	存在する
+ *	@retval	FALSE	存在しない
+ */
+static bool check_protect_api()
+{
+	static BOOL checked = FALSE;
+	if (checked) {
+		return pCryptProtectMemory != NULL;
+	}
+	checked = TRUE;
+
+	HMODULE hDLL = GetModuleHandleA("Crypt32.dll");
+	if (hDLL == NULL) {
+		return FALSE;
+	}
+	void **pFunc = (void **)&pCryptProtectMemory;
+	*pFunc = (void *)GetProcAddress(hDLL, "CryptProtectMemory");
+	return pFunc != NULL;
+}
+
+/**
  *	pageant の named pipe名の一部
  *	from putty windows/utils/cryptapi.c
  *
@@ -102,12 +129,17 @@ static uint16_t get_uint16(const uint8_t *p)
  *	@return		named pipe名の一部
  *				サインイン中は同一文字列が返る
  *				不要になったら free()
+ *				NULLのとき Windows が非対応
  *
- *	TODO
- *		CryptProtectMemory() API は比較的新しい Windows のみと思われる
+ *	この関数内で使用している CryptProtectMemory() APIはVista以降
  */
+#if PUTTY_NAMEDPIPE
 static char *capi_obfuscate_string(const char *realname)
 {
+	if (pCryptProtectMemory == NULL) {
+		return NULL;
+	}
+
 	char *cryptdata;
 	int cryptlen;
 	unsigned char digest[32];
@@ -141,8 +173,8 @@ static char *capi_obfuscate_string(const char *realname)
 	 * the absence of any plausible guess). So we don't abort if we
 	 * can't call CryptProtectMemory at all, or if it fails.
 	 */
-	CryptProtectMemory(cryptdata, cryptlen,
-					   CRYPTPROTECTMEMORY_CROSS_PROCESS);
+	pCryptProtectMemory(cryptdata, cryptlen,
+						CRYPTPROTECTMEMORY_CROSS_PROCESS);
 
 	/*
 	 * We don't want to give away the length of the hostname either,
@@ -167,11 +199,14 @@ static char *capi_obfuscate_string(const char *realname)
 
 	return _strdup(retbuf);
 }
+#endif
 
 /**
  *	pagent named pipe名
  *	from PuTTY windows/utils/agent_named_pipe_name.c
+ *
  */
+#if PUTTY_NAMEDPIPE
 static char *agent_named_pipe_name(void)
 {
 	char user_name[UNLEN+1];
@@ -181,6 +216,9 @@ static char *agent_named_pipe_name(void)
 		return NULL;
 	}
 	char *suffix = capi_obfuscate_string("Pageant");
+	if (suffix == NULL) {
+		return NULL;
+	}
 	// asprintf(&pipename, "\\\\.\\pipe\\pageant.%s.%s", user_name, suffix);
 	const char *base = "\\\\.\\pipe\\pageant.";
 	size_t pipe_len = strlen(base) + 2 + strlen(user_name) + strlen(suffix);
@@ -192,6 +230,7 @@ static char *agent_named_pipe_name(void)
 	free(suffix);
 	return pipename;
 }
+#endif
 
 /**
  *	バッファ操作
@@ -537,12 +576,14 @@ static BOOL query(const Buffer &request, Buffer &reply)
 
 	reply.clear();
 #if PUTTY_NAMEDPIPE
-	char *pname = agent_named_pipe_name();
-	if (pname != NULL) {
-		r = query_namedpipe(pname, request, reply);
-		free(pname);
-		if (r) {
-			goto finish;
+	if (check_protect_api()) {
+		char *pname = agent_named_pipe_name();
+		if (pname != NULL) {
+			r = query_namedpipe(pname, request, reply);
+			free(pname);
+			if (r) {
+				goto finish;
+			}
 		}
 	}
 #endif
@@ -784,6 +825,9 @@ void putty_agent_query_synchronous(const void *req_ptr, int req_len, void **rep_
  */
 static BOOL check_puttyagent_namedpipe()
 {
+	if (!check_protect_api()) {
+		return FALSE;
+	}
 	char *pname = agent_named_pipe_name();
 	DWORD r = GetFileAttributesA(pname);
 	free(pname);
