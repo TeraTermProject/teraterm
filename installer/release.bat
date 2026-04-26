@@ -253,6 +253,12 @@ exit /b 0
 rem ####################
 :setup_tools_env
 
+if exist toolinfo.bat (
+    echo found toolinfo.bat
+    call toolinfo.bat
+    echo toolinfo.bat ok
+)
+
 call %CUR%..\buildtools\find_cygwin.bat
 if not "%CYGWIN_PATH%" == "" goto cygwin_path_pass
 echo cygwin not found
@@ -265,13 +271,8 @@ if exist "%VS_BASE%" goto vs_base_pass
 set VS_BASE=C:\Program Files (x86)\Microsoft Visual Studio\%VS_VERSION%
 :vs_base_pass
 
-
-if exist toolinfo.bat (
-    echo found toolinfo.bat
-    call toolinfo.bat
-    echo toolinfo.bat ok
-) else (
-    set PATH=
+if not exist toolinfo.bat (
+  set PATH=
 )
 
 set PATH=%SystemRoot%;%PATH%
