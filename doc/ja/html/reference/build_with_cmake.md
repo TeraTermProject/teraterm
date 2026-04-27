@@ -22,7 +22,7 @@
 ### Visual Studio
 
 Visual Studio の IDE を使用する場合の例
-(`-A win32` はx86指定。x64の場合は `-A x64`, ARM64の場合は `-A arm64`)
+(`-A Win32` はx86指定。x64の場合は `-A x64`, ARM64の場合は `-A ARM64`)
 
     mkdir build_vs2022
     cd build_vs2022

@@ -29,13 +29,13 @@ rem echo e. Cygwin MinGW Release + Unix Makefiles (experimental)
 set /p no="select no "
 
 echo %no%
-if "%no%" == "f" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=win32 & goto build_all
+if "%no%" == "f" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=Win32 & goto build_all
 if "%no%" == "g" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=x64   & goto build_all
-if "%no%" == "h" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=arm64 & goto build_all
-if "%no%" == "1" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=win32 & goto build_all
+if "%no%" == "h" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=ARM64 & goto build_all
+if "%no%" == "1" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=Win32 & goto build_all
 if "%no%" == "2" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=x64   & goto build_all
-if "%no%" == "3" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=arm64 & goto build_all
-if "%no%" == "4" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=win32 & goto build_all
+if "%no%" == "3" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=ARM64 & goto build_all
+if "%no%" == "4" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=Win32 & goto build_all
 if "%no%" == "5" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=x64   & goto build_all
 if "%no%" == "6" set GENERATOR="Visual Studio 15 2017" & goto build_all
 if "%no%" == "8" set GENERATOR="Visual Studio 14 2015" & goto build_all

@@ -65,11 +65,11 @@ endif()
 # Inno Setup
 #  Create setup.exe
 if(ISCC)
-  if("${ARCHITECTURE}" STREQUAL "arm64")
+  if("${ARCHITECTURE}" STREQUAL "ARM64")
     list(APPEND ISCC_OPTION "/DArch=arm64")
   elseif(("${ARCHITECTURE}" STREQUAL "x64") OR ("${ARCHITECTURE}" STREQUAL "x86_64"))
     list(APPEND ISCC_OPTION "/DArch=x64")
-  elseif(("${ARCHITECTURE}" STREQUAL "win32") OR ("${ARCHITECTURE}" STREQUAL "i686"))
+  elseif(("${ARCHITECTURE}" STREQUAL "Win32") OR ("${ARCHITECTURE}" STREQUAL "i686"))
     list(APPEND ISCC_OPTION "/DArch=x86")
   else()
     message(FATAL_ERROR "ARCHITECTURE=${ARCHITECTURE}")
