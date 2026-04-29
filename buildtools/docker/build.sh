@@ -1,5 +1,8 @@
-clone=true
-#clone=false
+if [ -n "${COPY_FROM_HOST+x}" ]; then
+  clone=false
+else
+  clone=true
+fi
 if $clone; then
   git clone --branch "${BRANCH:-main}" --depth 1 "${URL:-https://github.com/TeraTermProject/teraterm.git}" teraterm
 else
