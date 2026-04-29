@@ -34,7 +34,7 @@
 #include <bcrypt.h>
 
 /**
- *	BCryptGenRandom() 互換実装, 存在しない Windows 用
+ *	BCryptGenRandom() 互換実装, APIが存在しない Windows 用
  *
  *	@param[in]		hAlgorithm	未使用
  *	@param[in,out]	pbBuffer
@@ -45,9 +45,8 @@
  *	@retval	STATUS_INVALID_PARAMETER	pbBuffer が NULL
  *	@retval	STATUS_UNSUCCESSFUL			CryptoAPI の呼び出しに失敗
  */
-extern "C" NTSTATUS WINAPI _BCryptGenRandom(
-	BCRYPT_ALG_HANDLE hAlgorithm, PUCHAR pbBuffer, ULONG cbBuffer,
-	ULONG dwFlags)
+extern "C" NTSTATUS WINAPI _BCryptGenRandom(BCRYPT_ALG_HANDLE hAlgorithm, PUCHAR pbBuffer, ULONG cbBuffer,
+											ULONG dwFlags)
 {
 	(void)hAlgorithm;
 	(void)dwFlags;
@@ -56,14 +55,13 @@ extern "C" NTSTATUS WINAPI _BCryptGenRandom(
 	}
 
 	HCRYPTPROV hProv = 0;
-	if (!CryptAcquireContextA(&hProv, NULL, NULL,
-							  PROV_RSA_FULL,
-							  CRYPT_VERIFYCONTEXT | CRYPT_SILENT)) {
+	if (!CryptAcquireContextA(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
 		return STATUS_UNSUCCESSFUL;
 	}
 	BOOL ok = CryptGenRandom(hProv, cbBuffer, pbBuffer);
 	CryptReleaseContext(hProv, 0);
 	if (!ok) {
+		memset(pbBuffer, 0, cbBuffer);
 		return STATUS_UNSUCCESSFUL;
 	}
 	return STATUS_SUCCESS;
