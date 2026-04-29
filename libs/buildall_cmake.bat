@@ -11,10 +11,10 @@ set OPT=
 :retry_vs
 rem echo f. Visual Studio 18 2026 Win32
 rem echo g. Visual Studio 18 2026 x64
-rem echo h. Visual Studio 18 2026 arm64
+rem echo h. Visual Studio 18 2026 ARM64
 echo 1. Visual Studio 17 2022 Win32
 echo 2. Visual Studio 17 2022 x64
-echo 3. Visual Studio 17 2022 arm64
+echo 3. Visual Studio 17 2022 ARM64
 echo 4. Visual Studio 16 2019 Win32
 echo 5. Visual Studio 16 2019 x64
 echo 6. Visual Studio 15 2017

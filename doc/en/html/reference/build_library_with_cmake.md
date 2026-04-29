@@ -36,7 +36,7 @@ Execute libs/buildall_cmake.bat, and select Visual Studio.
 
     1. Visual Studio 17 2022 Win32
     2. Visual Studio 17 2022 x64
-    3. Visual Studio 17 2022 arm64
+    3. Visual Studio 17 2022 ARM64
     4. Visual Studio 16 2019 Win32
     5. Visual Studio 16 2019 x64
     6. Visual Studio 15 2017
@@ -51,15 +51,15 @@ Execute libs/buildall_cmake.bat, and select Visual Studio.
 
 Case of Visual Studio 2022 x86
 
-    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=win32 -P buildall.cmake
+    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=Win32 -P buildall.cmake
 
 Case of Visual Studio 2022 x64
 
-    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=x64 -P buildall.cmake`
+    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=x64 -P buildall.cmake
 
-Case of Visual Studio 2022 arm64
+Case of Visual Studio 2022 ARM64
 
-    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm64 -P buildall.cmake`
+    cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=ARM64 -P buildall.cmake
 
 ## MinGW common
 
