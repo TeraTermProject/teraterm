@@ -715,24 +715,41 @@ void push_bignum_memdump(char *name, char *desc, BIGNUM *bignum)
 	free(buf); // free
 }
 
-void log_kex_key(PTInstVar pvar, const BIGNUM *secret)
+void log_kex_key(PTInstVar pvar, const BIGNUM *secret, const char *p, unsigned int p_len)
 {
 #ifdef _DEBUG	// KEX logging
 	int fd, i;
 	unsigned char buff[4], *cookie;
-	char *hexstr;
+	char *hexstr = NULL;
 	wchar_t *fname;
 
 	if (pvar->settings.KexKeyLogging && pvar->settings.KexKeyLogFile[0] != 0) {
-		hexstr = BN_bn2hex(secret);
-		if (hexstr == NULL) {
+		if (secret != NULL) {
+			hexstr = BN_bn2hex(secret);
+			if (hexstr == NULL) {
+				return;
+			}
+		}
+		else if (p != NULL) {
+			int i;
+			hexstr = calloc(sizeof(char), p_len*2 + 1);
+			if (hexstr == NULL) {
+				return;
+			}
+
+			// hexify
+			for (i = 0; i < p_len; i++) {
+				_snprintf_s(hexstr + i*2, p_len*2 - i*2 + 1, _TRUNCATE,
+				            "%02X", (unsigned char)p[i]);
+			}
+		}
+		else {
 			return;
 		}
 
 		fname = get_log_dir_relative_nameW(pvar->settings.KexKeyLogFile);
 		if (fname == NULL) {
-			OPENSSL_free(hexstr);
-			return;
+			goto out;
 		}
 
 		fd = _wopen(fname,
@@ -750,7 +767,14 @@ void log_kex_key(PTInstVar pvar, const BIGNUM *secret)
 			_close(fd);
 		}
 		free(fname);
+	}
+
+out:
+	if (secret != NULL) {
 		OPENSSL_free(hexstr);
+	}
+	if (p != NULL && hexstr != NULL) {
+		free(hexstr);
 	}
 #endif
 }
@@ -5299,7 +5323,7 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 	{
 		BIGNUM *priv_key;
 		DH_get0_key(kex->dh, NULL, &priv_key);
-		log_kex_key(pvar, priv_key);
+		log_kex_key(pvar, priv_key, NULL, 0);
 	}
 
 	msg = buffer_init();
@@ -5528,7 +5552,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	{
 		BIGNUM *priv_key;
 		DH_get0_key(kex->dh, NULL, &priv_key);
-		log_kex_key(pvar, priv_key);
+		log_kex_key(pvar, priv_key, NULL, 0);
 	}
 	DH_get0_key(kex->dh, &pub_key, NULL);
 
@@ -5594,7 +5618,7 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 
 	{
 		const BIGNUM *priv_key = EC_KEY_get0_private_key(kex->ec_client_key);
-		log_kex_key(pvar, priv_key);
+		log_kex_key(pvar, priv_key, NULL, 0);
 	}
 
 	msg = buffer_init();
@@ -5643,9 +5667,12 @@ static void SSH2_curve25519_kex_init(PTInstVar pvar)
 	int len;
 	kex *kex = pvar->kex;
 
-
 	if (kex_c25519_keypair(kex) != 0)
 		goto error;
+
+	{
+		log_kex_key(pvar, NULL, kex->c25519_client_key, CURVE25519_SIZE);
+	}
 
 	msg = buffer_init();
 	if (msg == NULL) {
@@ -5696,6 +5723,10 @@ static void SSH2_kem_sntrup761x25519_kex_init(PTInstVar pvar)
 	if (kex_kem_sntrup761x25519_keypair(kex) != 0)
 		goto error;
 
+	{
+		// log_kex_key(pvar, priv_key);
+	}
+
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
@@ -5743,6 +5774,10 @@ static void SSH2_kem_mlkem768x25519_kex_init(PTInstVar pvar)
 
 	if (kex_kem_mlkem768x25519_keypair(kex) != 0)
 		goto error;
+
+	{
+		// log_kex_key(pvar, priv_key);
+	}
 
 	msg = buffer_init();
 	if (msg == NULL) {
