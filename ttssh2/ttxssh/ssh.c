@@ -715,7 +715,7 @@ void push_bignum_memdump(char *name, char *desc, BIGNUM *bignum)
 	free(buf); // free
 }
 
-void log_kex_key(PTInstVar pvar, const BIGNUM *secret, const char *p, unsigned int p_len)
+void log_kex_key(PTInstVar pvar, const BIGNUM *secret, const u_char *p, size_t p_len)
 {
 #ifdef _DEBUG	// KEX logging
 	int fd, i;
@@ -731,7 +731,7 @@ void log_kex_key(PTInstVar pvar, const BIGNUM *secret, const char *p, unsigned i
 			}
 		}
 		else if (p != NULL) {
-			int i;
+			size_t i;
 			hexstr = calloc(sizeof(char), p_len*2 + 1);
 			if (hexstr == NULL) {
 				return;
@@ -740,7 +740,7 @@ void log_kex_key(PTInstVar pvar, const BIGNUM *secret, const char *p, unsigned i
 			// hexify
 			for (i = 0; i < p_len; i++) {
 				_snprintf_s(hexstr + i*2, p_len*2 - i*2 + 1, _TRUNCATE,
-				            "%02X", (unsigned char)p[i]);
+				            "%02X", p[i]);
 			}
 		}
 		else {
