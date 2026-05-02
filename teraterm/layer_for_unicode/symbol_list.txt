@@ -67,6 +67,8 @@ shell32 DragQueryFileW@16
 shell32 Shell_NotifyIconW@8
 shell32 SHBrowseForFolderW@4
 shell32 SHGetPathFromIDListW@8
+shell32 ShellExecuteW@24
+shell32 ShellExecuteExW@4
 
 advapi32 RegQueryValueExW@24
 

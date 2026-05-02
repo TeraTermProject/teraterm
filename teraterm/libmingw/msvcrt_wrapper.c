@@ -325,9 +325,31 @@ static errno_t inner_freopen_s(FILE **f, const char *name, const char *mode)
 	return errno;
 }
 
-static errno_t inner__wfopen_s(FILE **f, const wchar_t *name, const char *mode)
+static FILE *inner__wfopen(const wchar_t *nameW, const wchar_t *modeW)
 {
-	*f = fopen((char *)name, mode);		// TODO
+	char nameA[MAX_PATH];
+	if (WideCharToMultiByte(CP_ACP, 0, nameW, -1, nameA, sizeof(nameA), NULL, NULL) == 0) {
+		return NULL;
+	}
+	char modeA[16];
+	if (WideCharToMultiByte(CP_ACP, 0, modeW, -1, modeA, sizeof(modeA), NULL, NULL) == 0) {
+		return NULL;
+	}
+	return fopen(nameA, modeA);
+}
+
+static int inner_wopen(const wchar_t *filename, int oflag, int pmode)
+{
+	char nameA[MAX_PATH];
+	if (WideCharToMultiByte(CP_ACP, 0, filename, -1, nameA, sizeof(nameA), NULL, NULL) == 0) {
+		return -1;
+	}
+	return _open(nameA, oflag, pmode);
+}
+
+static errno_t inner__wfopen_s(FILE **f, const wchar_t *name, const wchar_t *mode)
+{
+	*f = inner__wfopen(name, mode);
 	return errno;
 }
 
@@ -338,15 +360,28 @@ static char *inner_strtok_s(char* str, const char* delimiters, char** context)
 	return r;
 }
 
+static int inner__wstat(const wchar_t *pathW, struct _stat *st)
+{
+	char pathA[MAX_PATH];
+	if (WideCharToMultiByte(CP_ACP, 0, pathW, -1, pathA, sizeof(pathA), NULL, NULL) == 0) {
+		return -1;
+	}
+	return _stat(pathA, st);
+}
+
+static int inner__wstati64(const wchar_t *pathW, struct _stati64 *st)
+{
+	char pathA[MAX_PATH];
+	if (WideCharToMultiByte(CP_ACP, 0, pathW, -1, pathA, sizeof(pathA), NULL, NULL) == 0) {
+		return -1;
+	}
+	return _stati64(pathA, st);
+}
+
 static int inner__wstat64(const wchar_t *pathW, struct __stat64 *st)
 {
 	struct _stati64 st32;
-	int r = _wstati64(pathW, &st32);
-	if (r != 0) {
-		char pathA[MAX_PATH];
-		WideCharToMultiByte(CP_ACP, 0, pathW, -1, pathA, sizeof(pathA)-1, NULL, NULL);
-		r = _stati64(pathA, &st32);
-	}
+	int r = inner__wstati64(pathW, &st32);
 	if (r == 0) {
 		st->st_gid = st32.st_gid;
 		st->st_atime = st32.st_atime;
@@ -409,8 +444,12 @@ void *_imp__strtok_s = (void *)inner_strtok_s;
 
 void *_imp__fopen_s = (void *)inner_fopen_s;
 void *_imp__freopen_s = (void *)inner_freopen_s;
+void *_imp___wfopen = (void *)inner__wfopen;
 void *_imp___wfopen_s = (void *)inner__wfopen_s;
+void *_imp___wstat = (void *)inner__wstat;
+void *_imp___wstati64 = (void *)inner__wstati64;
 void *_imp___wstat64 = (void *)inner__wstat64;
 void *_imp__tmpnam_s = (void *)inner_tmpnam_s;
+void *_imp___wopen = (void *)inner_wopen;
 
 void *_imp___itoa_s = (void *)inner_itoa_s;

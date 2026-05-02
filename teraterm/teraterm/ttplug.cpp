@@ -111,7 +111,11 @@ static void PluginListRead(const wchar_t *SetupFNW)
 		wchar_t *buf = (wchar_t *)malloc(sizeof(wchar_t) * len_ch);
 		int enable_int;
 		// ""file", 1"  を想定
+#if !defined(__MINGW32__)
 		int r = swscanf_s(s, L"\"%[^\"]\", %d", buf, (unsigned int)len_ch, &enable_int);
+#else
+		int r = swscanf(s, L"\"%[^\"]\", %d", buf, &enable_int);
+#endif
 		if (r <= 1) {
 			free(buf);
 			continue;
@@ -196,24 +200,32 @@ static void loadExtension(ExtensionList *pl, const wchar_t *UILanguageFile)
 
 	err = GetLastError();
 	switch (err) {
-		case 31:
-			sub_message = L"Unresolved dll entry";
-			break;
-		case 1114:
-			sub_message = L"tls entry exists";
-			break;
-		case 2:
-			sub_message = L"rejected by plugin";
-			break;
-		case 193:
-			sub_message = L"invalid dll image";
-			break;
-		case 126:
-			sub_message = L"dll not exist";
-			break;
-		default:
-			sub_message = L"unknown";
-			break;
+	case ERROR_GEN_FAILURE:		// 31
+		sub_message = L"Unresolved dll entry";
+		break;
+	case ERROR_DLL_INIT_FAILED:	// 1114
+		// DllMain() が FALSE を返した
+		sub_message = L"tls entry exists";
+		break;
+	case ERROR_FILE_NOT_FOUND:	// 2
+		// 依存dllが存在しない
+		sub_message = L"rejected by plugin";
+		break;
+	case ERROR_BAD_EXE_FORMAT:	// 193
+		// dllではないファイル、アーキテクチャが異なるファイル
+		sub_message = L"invalid dll image";
+		break;
+	case ERROR_MOD_NOT_FOUND: 	// 126
+		// 依存dllが存在しない
+		sub_message = L"dll not exist";
+		break;
+	case ERROR_PROC_NOT_FOUND:	// 127
+		// プロシージャが存在しない
+		sub_message = L"procedure could not be found";
+		break;
+	default:
+		sub_message = L"unknown";
+		break;
 	}
 	// 言語ファイルによるメッセージの国際化を行っているが、この時点では設定が
 	// まだ読み込まれていない為、メッセージが英語のままとなる。要検討。

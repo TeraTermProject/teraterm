@@ -3820,8 +3820,12 @@ LRESULT CVTWindow::OnIdleTimer(WPARAM wParam, LPARAM lParam)
 			}
 		}
 	}
-	DeleteTimerQueueTimer(NULL, hIdleTimer, NULL);
-	CreateTimerQueueTimer(&hIdleTimer, NULL, IdleTimerProc, 0, IdleTimerPeriod, 0, WT_EXECUTEDEFAULT);
+	if (pDeleteTimerQueueTimer != NULL) {
+		pDeleteTimerQueueTimer(NULL, hIdleTimer, NULL);
+	}
+	if (pCreateTimerQueueTimer != NULL) {
+		pCreateTimerQueueTimer(&hIdleTimer, NULL, IdleTimerProc, 0, IdleTimerPeriod, 0, WT_EXECUTEDEFAULT);
+	}
 	return 0;
 }
 

@@ -213,14 +213,21 @@ target_compile_definitions(
   ${PROJECT_NAME}
   PRIVATE
   $<$<CONFIG:Debug>:_CRTDBG_MAP_ALLOC>
-  )
+)
 
+if(MSVC)
+  target_link_options(
+    ${PROJECT_NAME}
+    PRIVATE
+    /MAP
+  )
+endif()
 if(MINGW)
   target_link_options(
-    ttxssh
+    ${PROJECT_NAME}
     PRIVATE
     -Wl,-Map=ttxssh.map,-cref
-    )
+  )
 endif()
 
 target_link_libraries(
@@ -230,38 +237,55 @@ target_link_libraries(
   libsshagentc
   ttpcmn
   argon2
-  ${ZLIB_LIB}
-  )
+)
 
 if(TTXSSH_LIBRESSL)
   target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
     ${LIBRESSL_LIB}
-    bcrypt.lib
-    )
+  )
 elseif(TTXSSH_OPENSSL3)
   target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
     ${OPENSSL3_LIB}
-    bcrypt.lib
-    )
+  )
 else()
   target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
     ${OPENSSL_LIB}
-    crypt32.lib		# TODO このlibを使用しないパッチを適応したら削除すること
-    )
+  )
 endif()
+target_link_libraries(
+  ${PROJECT_NAME}
+  PRIVATE
+  ${ZLIB_LIB}
+)
 
-if(SUPPORT_OLD_WINDOWS)
+if(SUPPORT_OLD_WINDOWS AND WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 4)
   target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
     layer_for_unicode
+    libcompatwin
     )
+endif()
+
+if(TTXSSH_LIBRESSL OR TTXSSH_OPENSSL3)
+  target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+    bcrypt
+  )
+else()
+  # TODO このlibを使用しないパッチを適応したら削除すること
+  target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+    crypt32
+  )
 endif()
 
 target_link_libraries(

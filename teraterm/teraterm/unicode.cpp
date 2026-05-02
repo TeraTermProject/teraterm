@@ -894,7 +894,11 @@ void OverrideCharWidthInfoGet(const wchar_t *fname, OverrideCharWidthInfo *info)
 		size_t len = wcslen(list) + 1;
 		wchar_t *ini = (wchar_t *)malloc(len * sizeof(wchar_t));
 		wchar_t *section = (wchar_t *)malloc(len * sizeof(wchar_t));
+#if !defined(__MINGW32__)
 		int r = swscanf_s(list, L"%[^,] , %s", ini, (unsigned int)len, section, (unsigned int)len);
+#else
+		int r = swscanf(list, L"%[^,] , %s", ini, section, (unsigned int)len);
+#endif
 		if (r != 2) {
 			int r = swscanf_s(list, L"%s", section, (unsigned int)len);
 			if (r == 1) {

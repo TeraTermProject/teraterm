@@ -1,0 +1,16 @@
+services:
+  dev:
+    image: teraterm_build:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER: ${USER:-ttbuilder}
+        EMAIL: ${EMAIL:-ttbuilder@example.com}
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    container_name: teraterm_mingw
+    volumes:
+      - ../..:/workspaces/teraterm
+    working_dir: /workspaces/teraterm
+    tty: true
