@@ -1,8 +1,7 @@
 ﻿# for oniguruma
-# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=win32 -P buildoniguruma.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=Win32 -P buildoniguruma.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=x64   -P buildoniguruma.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm64 -P buildoniguruma.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm   -P buildoniguruma.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=ARM64 -P buildoniguruma.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 8 2005" -P buildoniguruma.cmake
 # cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=x86_64 -P buildoniguruma.cmake
 # cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=i686 -P buildoniguruma.cmake

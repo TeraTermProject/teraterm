@@ -1,7 +1,7 @@
-﻿# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=win32 -P buildall.cmake
+﻿# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=Win32 -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=x64   -P buildall.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm64 -P buildall.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=win32 -P buildall.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=ARM64 -P buildall.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=Win32 -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 16 2019" -DARCHITECTURE=x64   -P buildall.cmake
 # .\cmake-3.11.4-win32-x86\bin\cmake.exe -DCMAKE_GENERATOR="Visual Studio 8 2005" -P buildall.cmake
 # cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=i686 -P buildall.cmake
@@ -24,11 +24,11 @@ endif()
 if((${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005") OR
     (${CMAKE_GENERATOR} MATCHES "Visual Studio 9 2008"))
   set(BUILD_SSL_LIBRARY OFF)
-  set(ARCHITECTURE win32)
+  set(ARCHITECTURE Win32)
 endif()
 
 if(NOT DEFINED ARCHITECTURE)
-  set(ARCHITECTURE win32)
+  set(ARCHITECTURE Win32)
   #message(FATAL_ERROR "check ARCHITECTURE")
 endif()
 

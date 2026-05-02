@@ -127,7 +127,7 @@ function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DI
         LOG log
         )
 
-      # ダウンロードのステータスを判
+      # ダウンロードのステータスを判定
       list(GET st 0 status_code)
       if(status_code EQUAL 0)
         set(DOWNLOAD_SUCCESS TRUE)

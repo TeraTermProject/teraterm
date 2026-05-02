@@ -5,14 +5,14 @@ set CUR=%~dp0
 cd /d %CUR%
 
 echo =======
-echo 1. vs2022 win32
+echo 1. vs2022 Win32
 echo 2. vs2022 x64
-echo b. vs2022 arm64
-echo 3. vs2019 win32
+echo b. vs2022 ARM64
+echo 3. vs2019 Win32
 echo 4. vs2019 x64
-echo 5. mingw gcc win32
+echo 5. mingw gcc Win32
 echo 6. mingw gcc x64
-echo 7. mingw clang win32
+echo 7. mingw clang Win32
 echo 8. mingw clang x64
 echo 9. exit
 rem echo a. vs2005
@@ -29,10 +29,10 @@ if not "%no%" == "1" goto pass_1
     set COMPILER_FRIENDLY=vs2022
     set GENERATOR=Visual Studio 17 2022
     set CMAKE_COMMAND=cmake
-    set CMAKE_OPTION_LIBS=-DARCHITECTURE=win32
+    set CMAKE_OPTION_LIBS=-DARCHITECTURE=Win32
     set CMAKE_OPTION_GENERATE=-A Win32
     set CMAKE_OPTION_BUILD=--config Release
-    set BUILD_DIR=build_%COMPILER_FRIENDLY%_win32
+    set BUILD_DIR=build_%COMPILER_FRIENDLY%_Win32
     call :build
 :pass_1
 if not "%no%" == "2" goto pass_2
@@ -47,12 +47,12 @@ if not "%no%" == "2" goto pass_2
     call :build
 :pass_2
 if not "%no%" == "b" goto pass_a
-    set COMPILER=VS_143_arm64
-    set COMPILER_FRIENDLY=vs2022_arm64
+    set COMPILER=VS_143_ARM64
+    set COMPILER_FRIENDLY=vs2022_ARM64
     set GENERATOR=Visual Studio 17 2022
     set CMAKE_COMMAND=cmake
-    set CMAKE_OPTION_LIBS=-DARCHITECTURE=arm64
-    set CMAKE_OPTION_GENERATE=-A arm64
+    set CMAKE_OPTION_LIBS=-DARCHITECTURE=ARM64
+    set CMAKE_OPTION_GENERATE=-A ARM64
     set CMAKE_OPTION_BUILD=--config Release
     set BUILD_DIR=build_%COMPILER_FRIENDLY%
     call :build
@@ -62,7 +62,7 @@ if not "%no%" == "3" goto pass_3
     set COMPILER_FRIENDLY=vs2019
     set GENERATOR=Visual Studio 16 2019
     set CMAKE_COMMAND=cmake
-    set CMAKE_OPTION_LIBS=-DARCHITECTURE=win32
+    set CMAKE_OPTION_LIBS=-DARCHITECTURE=Win32
     set CMAKE_OPTION_GENERATE=-A Win32
     set CMAKE_OPTION_BUILD=--config Release
     set BUILD_DIR=build_%COMPILER_FRIENDLY%
@@ -84,7 +84,7 @@ if not "%no%" == "a" goto pass_a
     set COMPILER_FRIENDLY=vs2005
     set GENERATOR=Visual Studio 8 2005
     set CMAKE_COMMAND=..\libs\cmake-3.11.4-win32-x86\bin\cmake.exe
-    set CMAKE_OPTION_LIBS=-DARCHITECTURE=win32
+    set CMAKE_OPTION_LIBS=-DARCHITECTURE=Win32
     set CMAKE_OPTION_GENERATE=
     set CMAKE_OPTION_BUILD=--config Release
     set BUILD_DIR=build_%COMPILER_FRIENDLY%
