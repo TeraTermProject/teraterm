@@ -51,7 +51,7 @@
 #define		ENCRYPT2_SALTLEN		16
 #define		ENCRYPT2_CIPHER			EVP_aes_256_ctr()
 #define		ENCRYPT2_DIGEST			EVP_sha512()
-#define		ENCRYPT2_ITER1			1001	// パスワード以外
+#define		ENCRYPT2_ITER1			1001	// HMACと鍵導出に使用 (反復回数は小さくて良い)
 #define		ENCRYPT2_ITER2			210001	// パスワード用 (参考 https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2)
 #define		ENCRYPT2_IKLEN			32
 #define		ENCRYPT2_IVLEN			16

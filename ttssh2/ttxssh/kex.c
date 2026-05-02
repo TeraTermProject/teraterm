@@ -58,8 +58,8 @@ static const ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
 	{KEX_DH_GRP18_SHA512, "diffie-hellman-group18-sha512",      0,                    SSH_DIGEST_SHA512}, // RFC8268
 	{KEX_CURVE25519_SHA256_OLD, "curve25519-sha256@libssh.org", 0,                    SSH_DIGEST_SHA256}, // not RFC8731, PROTOCOL of OpenSSH
 	{KEX_CURVE25519_SHA256,     "curve25519-sha256",            0,                    SSH_DIGEST_SHA256}, // RFC8731
-	{KEX_SNTRUP761X25519_SHA512_OLD, "sntrup761x25519-sha512@openssh.com", 0,         SSH_DIGEST_SHA512}, // draft-ietf-sshm-ntruprime-ssh
-	{KEX_SNTRUP761X25519_SHA512,     "sntrup761x25519-sha512",  0,                    SSH_DIGEST_SHA512}, // draft-ietf-sshm-ntruprime-ssh
+	{KEX_SNTRUP761X25519_SHA512_OLD, "sntrup761x25519-sha512@openssh.com", 0,         SSH_DIGEST_SHA512}, // RFC9941
+	{KEX_SNTRUP761X25519_SHA512,     "sntrup761x25519-sha512",  0,                    SSH_DIGEST_SHA512}, // RFC9941
 	{KEX_MLKEM768X25519_SHA256, "mlkem768x25519-sha256",        0,                    SSH_DIGEST_SHA256}, // draft-ietf-sshm-mlkem-hybrid-kex
 	{KEX_DH_NONE      , NULL,                                   0,                    SSH_DIGEST_MAX},
 };

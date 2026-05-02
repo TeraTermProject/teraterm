@@ -1,8 +1,7 @@
 ﻿# for libreSSL
-# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=win32 -P buildlibressl.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=Win32 -P buildlibressl.cmake
 # cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=x64   -P buildlibressl.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm64 -P buildlibressl.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=arm   -P buildlibressl.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 17 2022" -DARCHITECTURE=ARM64 -P buildlibressl.cmake
 # cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=x86_64 -P buildlibressl.cmake
 # cmake -DCMAKE_GENERATOR="Unix Makefiles" -DARCHITECTURE=i686 -P buildlibressl.cmake
 
@@ -78,6 +77,12 @@ file_copy(${SRC_DIR}/include/compat/stdlib.h ${CMAKE_CURRENT_LIST_DIR}/include/c
 
 file(MAKE_DIRECTORY "${BUILD_DIR}")
 
+if(DEFINED ARCHITECTURE)
+  if(ARCHITECTURE STREQUAL "win32")
+    set(ARCHITECTURE "Win32")
+  endif()
+endif()
+
 if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
   # multi-configuration
   unset(GENERATE_OPTIONS)
@@ -95,10 +100,12 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
 
   unset(BUILD_OPTIONS)
   list(APPEND BUILD_OPTIONS --config Debug)
+  list(APPEND BUILD_OPTIONS --target crypto)
   cmake_build("${BUILD_DIR}" "${BUILD_OPTIONS}" "")
 
   unset(BUILD_OPTIONS)
   list(APPEND BUILD_OPTIONS --config Release)
+  list(APPEND BUILD_OPTIONS --target crypto)
   cmake_build("${BUILD_DIR}" "${BUILD_OPTIONS}" "")
 else()
   # single-configuration

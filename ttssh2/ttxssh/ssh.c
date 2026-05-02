@@ -5678,7 +5678,7 @@ error:;
 
 
 /*
- * sntrup761x25519 (draft-ietf-sshm-ntruprime-ssh)
+ * sntrup761x25519 (RFC 9941)
  *   KEX_SNTRUP761X25519_SHA512_OLD or KEX_SNTRUP761X25519_SHA512
  *
  * SSH2_MSG_KEX_ECDH_INIT:
@@ -6608,7 +6608,7 @@ static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
 
 	/* calc shared secret K */
 	// 共通鍵の生成
-	// Writing using draft-ietf-sshm-ntruprime-ssh notation:
+	// Writing using RFC 9941 notation:
 	//   Q_S --+-- c   ... sntrup761 ciphertext
 	//         +-- K_B ... x25519 public key
 	//   d_C           ... x25519 private key

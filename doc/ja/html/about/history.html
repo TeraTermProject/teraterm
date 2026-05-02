@@ -60,22 +60,60 @@
         WebP画像フォーマットの読み込みをサポートした。WIC(Windows Imaging Component)を画像読み込みに利用するようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1225" target="_blank">issue #1225</a>)
       </li>
+      <li>
+        インストーラを修正した。<br>
+        "全てのユーザー用にインストール" / "現在のユーザー用にインストール" を選択できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1156" target="_blank">issue #1156</a>)
+      </li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
       <li>
+        Serial poot タブ ("Additional settings &gt; <a href="../menu/setup-additional-serialport.html">Serial port</a>") を開いたときに、115200 以上の速度が選択状態にならない問題を修正した。
+        5.0 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1241" target="_blank">issue #1241</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>その他
+    <ul>
+      <li><a href="#ttmenu_1.23">TeraTerm Menu 1.23</a> へ差し替えた。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_5.6.1">2026.04.28 (Ver 5.6.1)</h3>
+<ul class="history">
+  <!--li>変更
+    <ul>
+      <li>
+      </li>
+    </ul>
+  </li-->
+
+  <li>バグ修正
+    <ul>
+      <li>
         <a href="../menu/setup-additional-window.html#HideTitle">Hide title bar</a> が on の時、起動時にクラッシュする問題を修正した。
+        5.5.2 からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1168" target="_blank">issue #1168</a>)
       </li>
       <li>
         <a href="../menu/control-broadcast.html">Broadcast command</a> ダイアログの Enter key で指定した改行コードがそのまま送信されない不具合を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1178" target="_blank">issue #1178</a>)<br>
-        (以前は、<a href="../menu/setup-additional-terminal.html#CRSend">"Setup &gt; Teminal" の New-line (Transmit)</a> の設定により改行コードが変換されていた)
+        以前は、<a href="../menu/setup-additional-terminal.html#CRSend">"Setup &gt; Teminal" の New-line (Transmit)</a> の設定により改行コードが変換されていた。
+      </li>
+      <li>
+        古いテーマファイルが正しく読み込まれない問題を修正した。
+        5.0 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1128" target="_blank">issue #1128</a>)
       </li>
       <li>
         Tera Termの背景に設定した画像の色が不自然になる不具合を修正した。
+        5.0 からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1159" target="_blank">issue #1159</a>)
       </li>
       <li>
@@ -83,15 +121,12 @@
         5.5.2 からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1195" target="_blank">issue #1195</a>)
       </li>
-      <li>
-        古いテーマファイルが正しく読み込まれない問題を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1128" target="_blank">issue #1128</a>)
-      </li>
     </ul>
   </li>
 
   <li>その他
     <ul>
+      <li><a href="#ttssh_3.6.1">TTSSH 3.6.1</a> へ差し替えた。</li>
       <li><a href="#ttmenu_1.22">TeraTerm Menu 1.22</a> へ差し替えた。</li>
     </ul>
   </li>
@@ -4185,6 +4220,31 @@
   </li-->
 </ul>
 
+<h3 id="ttssh_3.6.1">2026.04.28 (Ver 3.6.1)</h3>
+<ul class="history">
+  <!--li>変更
+    <ul>
+      <li>
+      </li>
+    </ul>
+  </li-->
+
+  <!--li>バグ修正
+    <ul>
+      <li>
+      </li>
+    </ul>
+  </li-->
+
+  <li>その他
+    <ul>
+      <li>
+        バージョンのみ更新。
+      </li>
+    </ul>
+  </li>
+</ul>
+
 <h3 id="ttssh_3.6.0">2026.02.28 (Ver 3.6.0)</h3>
 <ul class="history">
   <li>変更
@@ -6346,12 +6406,30 @@
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
 
-<h3 id="ttmenu_1.22">YYYY.MM.DD (Ver 1.22)</h3>
+<h3 id="ttmenu_1.23">YYYY.MM.DD (Ver 1.23 not released yet)</h3>
 <ul class="history">
+      <li>
+        細かい調整を行った。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1234" target="_blank">issue #1234</a>)
+      </li>
+</ul>
+
+<h3 id="ttmenu_1.22">2026.04.28 (Ver 1.22)</h3>
+<ul class="history">
+      <li>
+        Ver 1.20 以前でレジストリに保存された設定を読み込んだとき、強制的に LockBox が使用される場合がある不具合を修正した。
+        1.20 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1223" target="_blank">issue #1223</a>)
+      </li>
       <li>
         TeraTerm Menu で指定した "Tera Term 設定ファイル" が読み込まれない不具合を修正した。
         1.21 からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1157" target="_blank">issue #1157</a>)
+      </li>
+      <li>
+        "起動時に実行する" が機能しなくなっていた不具合を修正した。
+        1.21 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1251" target="_blank">issue #1251</a>)
       </li>
       <li>
         リスト編集ダイアログの "起動の種類" のラジオボタンが「"autologin"」と「"specified macro file"と"launch only"」の2グループに分かれていた不具合を修正した。
@@ -6367,12 +6445,8 @@
         ファイル名に '"' ではじまる文字が入力された状態で、ファイル選択ダイアログを開いて閉じた時、不正なアドレスを free() する不具合を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1176" target="_blank">issue #1176</a>)
       </li>
-      <li>
-        Ver 1.20 以前でレジストリに保存された設定を読み込んだとき、強制的に LockBox が使用される場合がある不具合を修正した。
-        1.20 からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1223" target="_blank">issue #1223</a>)
-      </li>
 </ul>
+
 
 <h3 id="ttmenu_1.21">2026.02.28 (Ver 1.21)</h3>
 <ul class="history">

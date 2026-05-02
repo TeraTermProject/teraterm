@@ -79,7 +79,7 @@ MenuData	g_MenuData;			// TeraTerm Menuの表示設定等の構造体
 wchar_t		*SetupFNameW;		// TERATERM.INI
 wchar_t		*UILanguageFileW;
 
-static char g_szLockBox[MAX_PATH];	// パスワード暗号化用パスワード
+static char g_szLockBox[MAX_PATH];	// パスワード暗号化用パスワード(難読化済)
 
 #if (defined(__MINGW32__) && (__MINGW64_VERSION_MAJOR < 13)) || (defined(_MSC_VER) && (_MSC_VER == 1400))
 // MinGW or VS2005(VC8.0)
@@ -156,7 +156,7 @@ static void GetTeraTermPath(wchar_t *path, size_t size)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL ExecStartup(HWND /* hWnd unusedParam */)
+BOOL ExecStartup(HWND hWnd)
 {
 	wchar_t	szEntryName[MAX_PATH];
 	wchar_t	szJobName[MAXJOBNUM][MAX_PATH];
@@ -171,11 +171,10 @@ BOOL ExecStartup(HWND /* hWnd unusedParam */)
 		}
 		wcscpy(szJobName[dwIndex], L"");
 		RegClose(hKey);
-#if 0
+
 		DWORD dwCnt;
 		for (dwCnt = 0; dwCnt < dwIndex; dwCnt++)
 			ConnectHost(hWnd, 0, szJobName[dwCnt]);
-#endif
 	}
 
 	return TRUE;
@@ -832,7 +831,7 @@ BOOL InitVersionDlg(HWND hWnd)
 	RegGetStatus(&use_ini, &inifile);
 	wchar_t *setting;
 	if (!use_ini) {
-		aswprintf(&setting, L"use registory");
+		aswprintf(&setting, L"use registry");
 	}
 	else {
 		aswprintf(&setting, L"use ini file\r\n%s", inifile);
@@ -1087,7 +1086,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 
 		SHELLEXECUTEINFOW ExecInfo = {};
 		ExecInfo.cbSize			= sizeof(ExecInfo);
-		ExecInfo.fMask			= SEE_MASK_FLAG_NO_UI | SEE_MASK_NOCLOSEPROCESS;
+		ExecInfo.fMask			= SEE_MASK_FLAG_NO_UI;
 		ExecInfo.hwnd			= hWnd;
 		ExecInfo.lpVerb			= NULL;
 		ExecInfo.lpFile			= jobInfo.szTeraTerm;
@@ -1180,7 +1179,7 @@ BOOL InitMenu(void)
 VOID DeleteListMenuIcons()
 {
 	for (int cnt = 0; cnt < MAXJOBNUM; cnt++) {
-		memset(g_MenuData.szName, 0, MAX_PATH);
+		g_MenuData.szName[cnt][0] = L'\0';
 		if (g_MenuData.hLargeIcon[cnt] != NULL) {
 			::DestroyIcon(g_MenuData.hLargeIcon[cnt]);
 			g_MenuData.hLargeIcon[cnt] = NULL;

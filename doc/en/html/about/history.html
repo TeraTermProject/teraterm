@@ -60,22 +60,60 @@
         Added support for WebP image format. Image loading to use WIC (Windows Imaging Component).
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1225" target="_blank">issue #1225</a>)
       </li>
+      <li>
+        Modified Tera Term installer script.<br>
+        Installer shows dialog to choose between "Install for all users" and "Install for me only".
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1156" target="_blank">issue #1156</a>)
+      </li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
       <li>
-        Fixed an issue where Tera Term crashes at startup when <a href="../menu/setup-additional-window.html#HideTitle">Hide title bar</a> is on.
+        Fixed an issue where speeds above 115200 could not be selected when opening the Serial port tab ("Additional settings &gt; <a href="../menu/setup-additional-serialport.html">Serial port</a>").
+        This bug was introduced in 5.0.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1241" target="_blank">issue #1241</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>Misc
+    <ul>
+      <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.23">1.23</a>.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_5.6.1">2026.04.28 (Ver 5.6.1)</h3>
+<ul class="history">
+  <!--li>Changes
+    <ul>
+      <li>
+      </li>
+    </ul>
+  </li-->
+
+  <li>Bug fixes
+    <ul>
+      <li>
+        Fixed an issue where Tera Term crashes when <a href="../menu/setup-additional-window.html#HideTitle">Hide title bar</a> is on.
+        This bug was introduced in 5.5.2.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1168" target="_blank">issue #1168</a>)
       </li>
       <li>
         Fixed an issue where the newline code specified by the Enter key in the <a href="../menu/control-broadcast.html">Broadcast command</a> dialog was not sent as-is.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1178" target="_blank">issue #1178</a>)<br>
-        (Previously, it was converted according to the <a href="../menu/setup-additional-terminal.html#CRSend">New-line (Transmit) setting in "Setup &gt; Terminal"</a>.)
+        Previously, it was converted according to the <a href="../menu/setup-additional-terminal.html#CRSend">New-line (Transmit) setting in "Setup &gt; Terminal"</a>.
+      </li>
+      <li>
+        Fixed an issue where old bg theme files were not being loaded correctly.
+        This bug was introduced in 5.0.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1128" target="_blank">issue #1128</a>)
       </li>
       <li>
         Fixed an issue where colors in image set as Tera Term background were incorrect.
+        This bug was introduced in 5.0.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1159" target="_blank">issue #1159</a>)
       </li>
       <li>
@@ -83,15 +121,12 @@
         This bug was introduced in 5.5.2.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1195" target="_blank">issue #1195</a>)
       </li>
-      <li>
-        Fixed an issue where old bg theme files were not being loaded correctly.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1128" target="_blank">issue #1128</a>)
-      </li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
+      <li>Upgraded TTSSH to <a href="#ttssh_3.6.1">3.6.1</a>.</li>
       <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.22">1.22</a>.</li>
     </ul>
   </li>
@@ -4177,6 +4212,31 @@ SYNOPSIS:
   </li-->
 </ul>
 
+<h3 id="ttssh_3.6.1">2026.04.28 (Ver 3.6.1)</h3>
+<ul class="history">
+  <!--li>Changes
+    <ul>
+      <li>
+      </li>
+    </ul>
+  </li-->
+
+  <!--li>Bug fixes
+    <ul>
+      <li>
+      </li>
+    </ul>
+  </li-->
+
+  <li>Misc
+    <ul>
+      <li>
+        Version bump only.
+      </li>
+    </ul>
+  </li>
+</ul>
+
 <h3 id="ttssh_3.6.0">2026.02.28 (Ver 3.6.0)</h3>
 <ul class="history">
   <li>Changes
@@ -6337,15 +6397,33 @@ SYNOPSIS:
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
 
-<h3 id="ttmenu_1.22">YYYY.MM.DD (Ver 1.22)</h3>
+<h3 id="ttmenu_1.23">YYYY.MM.DD (Ver 1.23 not released yet)</h3>
 <ul class="history">
+      <li>
+        Made minor adjustments.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1234" target="_blank">issue #1234</a>)
+      </li>
+</ul>
+
+<h3 id="ttmenu_1.22">2026.04.28 (Ver 1.22)</h3>
+<ul class="history">
+      <li>
+        Fixed an issue where LockBox could be forcibly enabled when loading settings stored in the registry from versions prior to 1.20.
+        This bug was introduced in 1.20.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1223" target="_blank">issue #1223</a>)
+      </li>
       <li>
         Fixed an issue where the "Tera Term configuration file" specified in the TeraTerm Menu was not loaded.
         This bug was introduced in 1.21.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1157" target="_blank">issue #1157</a>)
       </li>
       <li>
-        Fixed an issue where the "Launch Pattern" radio buttons in the "List Configuration" dialog were split into two groups  "autologin" and "specified macro file" / "launch only".
+        Fixed an issue where the "kick at starting" feature stopped working.
+        This bug was introduced in 1.21.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1251" target="_blank">issue #1251</a>)
+      </li>
+      <li>
+        Fixed an issue where the "Launch Pattern" radio buttons in the "List Configuration" dialog were split into two groups "autologin" and "specified macro file" / "launch only".
         This bug was introduced in 1.20.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1169" target="_blank">issue #1169</a>)
       </li>
@@ -6358,12 +6436,8 @@ SYNOPSIS:
         Fixed a bug where an invalid free() occurred when a filename starting with '"' was entered in the file name box and opening and then closing the file selection dialog.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1176" target="_blank">issue #1176</a>)
       </li>
-      <li>
-        Fixed an issue where LockBox could be forcibly enabled when loading settings stored in the registry from versions prior to 1.20.
-        This bug was introduced in 1.20.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1223" target="_blank">issue #1223</a>)
-      </li>
 </ul>
+
 
 <h3 id="ttmenu_1.21">2026.02.28 (Ver 1.21)</h3>
 <ul class="history">

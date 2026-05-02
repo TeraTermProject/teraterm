@@ -26,7 +26,7 @@ jobs:
       run: |
         tzutil /s "Tokyo Standard Time"
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Calculate cache hash
       id: cache_hash
@@ -37,7 +37,7 @@ jobs:
 
     - name: Restore cached files (buildtools)
       id: cache-buildtools-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           buildtools
@@ -45,7 +45,7 @@ jobs:
 
     - name: Restore cached files (libs/download)
       id: cache-libs_download-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           libs/download
@@ -73,7 +73,7 @@ jobs:
 
     - name: Save cache files (buildtools)
       id: cache-buildtools-save
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           buildtools
@@ -81,7 +81,7 @@ jobs:
 
     - name: Save cache files (libs/download)
       id: cache-libs_download-save
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           libs/download
@@ -107,7 +107,7 @@ jobs:
       run: |
         tzutil /s "Tokyo Standard Time"
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Calculate cache hash
       id: cache_hash
@@ -118,7 +118,7 @@ jobs:
 
     - name: Restore cached files (buildtools)
       id: cache-buildtools-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           buildtools
@@ -129,7 +129,7 @@ jobs:
 
     - name: Restore cached files (libs)
       id: cache-libs-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         # キャッシュに libs/download は含まれていないが、path が全く同じでないとリストアできないので !libs/download を追加
         path: |
@@ -139,7 +139,7 @@ jobs:
 
     - name: Restore cached files (libs/download)
       id: cache-libs_download-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           libs/download
@@ -187,7 +187,7 @@ jobs:
         )
 
     - name: Upload to artifacts (teraterm_common)
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: teraterm_common
         path: installer/Output/build/teraterm_common
@@ -201,7 +201,7 @@ jobs:
         cp buildtools/svnrev/build_config.json installer/buildinfo/
 
     - name: Upload to artifacts (buildinfo)
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: buildinfo
         path: installer/buildinfo
@@ -214,7 +214,7 @@ jobs:
     - name: Save cache files (libs)
       if: ${{ steps.cache-libs-restore.outputs.cache-hit != 'true' && github.event_name == 'push' }}
       id: cache-libs-save
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           libs
@@ -250,7 +250,7 @@ jobs:
       run: |
         tzutil /s "Tokyo Standard Time"
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Calculate cache hash
       id: cache_hash
@@ -261,7 +261,7 @@ jobs:
 
     - name: Restore cached files (buildtools)
       id: cache-buildtools-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           buildtools
@@ -272,7 +272,7 @@ jobs:
 
     - name: Restore cached files (libs)
       id: cache-libs-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         # キャッシュに libs/download は含まれていないが、path が全く同じでないとリストアできないので !libs/download を追加
         path: |
@@ -282,7 +282,7 @@ jobs:
 
     - name: Restore cached files (libs/download)
       id: cache-libs_download-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           libs/download
@@ -294,13 +294,13 @@ jobs:
         git checkout .
 
     - name: Download from artifacts (teraterm_common)
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: teraterm_common
         path: installer/Output/build/teraterm_common
 
     - name: Download from artifacts (buildinfo)
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: buildinfo
         path: installer/buildinfo
@@ -364,7 +364,7 @@ jobs:
     - name: Save cache files (libs)
       if: ${{ steps.cache-libs-restore.outputs.cache-hit != 'true' && github.event_name == 'push' }}
       id: cache-libs-save
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           libs
@@ -372,7 +372,7 @@ jobs:
         key: cache-${{ matrix.VS_VERSION }}-${{ matrix.arch }}-${{ steps.cache_hash.outputs.hash_value }}
 
     - name: Upload to artifacts (zip)
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}-${{ matrix.arch }}-zip
         path: |
@@ -380,28 +380,28 @@ jobs:
           !installer/Output/*_pdb.zip
 
     - name: Upload to artifacts (pdb)
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}-${{ matrix.arch }}-pdb
         path: |
           installer/Output/*_pdb.zip
 
     - name: Upload to artifacts (exe)
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}-${{ matrix.arch }}-installer
         path: |
           installer/Output/*.exe
 
     - name: Upload artifacts (sha256sum)
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}-${{ matrix.arch }}-sha256sum
         path: |
           installer/Output/*.sha256sum
 
     - name: Upload artifacts (sha512sum)
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}-${{ matrix.arch }}-sha512sum
         path: |
@@ -439,7 +439,7 @@ jobs:
     - name: Upload artifacts for sign (tareterm_portable.zip)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       id: upload-portable
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: portable_unsigned-${{ matrix.arch }}
         path: |
@@ -474,7 +474,7 @@ jobs:
     - name: Upload artifacts for sign (setup.exe)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
       id: upload-setup
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: setup_unsigned-${{ matrix.arch }}
         path: |
@@ -504,7 +504,7 @@ jobs:
 
     - name: Upload artifacts (signed setup.exe)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ steps.vars.outputs.OUTPUT }}_EXE
         path: |
@@ -519,7 +519,7 @@ jobs:
 
     - name: Upload artifacts (portable signed zip)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ steps.vars.outputs.OUTPUT }}_ZIP
         path: |
@@ -543,7 +543,7 @@ jobs:
 
     - name: Upload artifacts (release files)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ steps.vars.outputs.OUTPUT }}_FILES
         path: |
@@ -559,10 +559,10 @@ jobs:
       run: |
         tzutil /s "Tokyo Standard Time"
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Download from artifacts (buildinfo)
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: buildinfo
         path: installer/buildinfo
@@ -605,7 +605,7 @@ jobs:
 
     - name: Download artifacts (FILES)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         path: installer/Output/release
         pattern: teraterm-${{ steps.vars.outputs.VERSION }}-*_FILES
@@ -623,7 +623,7 @@ jobs:
 
     - name: Upload artifacts (checksum)
       if: env.SIGNPATH_API_TOKEN != '' && (steps.vars.outputs.RELEASE == '1' || env.SIGNPATH_FORCE == '1')
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: checksum
         path: |

@@ -70,7 +70,47 @@ static void EnableWindows(HWND hWnd, const int *list, int count, BOOL enable)
 	}
 }
 
-static void ArrenageItems(HWND hWnd, CodingPPData *data)
+/**
+ * Unicode関連のアイテムを調整する
+ */
+static void ArrenageItemsUnicode(HWND hWnd, const CodingPPData *data, bool is_unicode)
+{
+	static const int UnicodeItems[] = {
+		IDC_AMBIGUOUS_WIDTH_TITLE,
+		IDC_AMBIGUOUS_WIDTH_COMBO,
+		IDC_EMOJI_WIDTH_CHECK,
+		IDC_EMOJI_WIDTH_COMBO,
+		IDC_OVERRIDE_CHAR_WIDTH,
+		IDC_OVERRIDE_CHAR_WIDTH_COMBO,
+	};
+
+	if (is_unicode) {
+		// Unicode
+		EnableWindows(hWnd, UnicodeItems, _countof(UnicodeItems), TRUE);
+
+		// Override Emoji Characters width
+		if (!IsDlgButtonChecked(hWnd, IDC_EMOJI_WIDTH_CHECK)) {
+			EnableWindow(GetDlgItem(hWnd, IDC_EMOJI_WIDTH_COMBO), FALSE);
+		}
+
+		// 文字ごとの文字幅オーバーライド
+		const OverrideCharWidthInfo *info = &data->unicode_override_charwidth_info;
+		if (info->count == 0) {
+			EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH), FALSE);
+			EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO), FALSE);
+		} else {
+			if (!IsDlgButtonChecked(hWnd, IDC_OVERRIDE_CHAR_WIDTH)) {
+				EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO), FALSE);
+			}
+		}
+	}
+	else {
+		// Unicodeではない、全てdisable
+		EnableWindows(hWnd, UnicodeItems, _countof(UnicodeItems), FALSE);
+	}
+}
+
+static void ArrenageItems(HWND hWnd, const CodingPPData *data)
 {
 	static const int JJISReceiveItems[] = {
 		IDC_TERMKINTEXT,
@@ -84,14 +124,6 @@ static void ArrenageItems(HWND hWnd, CodingPPData *data)
 		IDC_JIS_TRANSMIT_TITLE,
 		IDC_TERMKANASEND,
 	};
-	static const int UnicodeItems[] = {
-		IDC_AMBIGUOUS_WIDTH_TITLE,
-		IDC_AMBIGUOUS_WIDTH_COMBO,
-		IDC_EMOJI_WIDTH_CHECK,
-		IDC_EMOJI_WIDTH_COMBO,
-		IDC_OVERRIDE_CHAR_WIDTH,
-		IDC_OVERRIDE_CHAR_WIDTH_COMBO,
-	};
 
 	// 受信コード
 	LRESULT curPos = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
@@ -103,18 +135,7 @@ static void ArrenageItems(HWND hWnd, CodingPPData *data)
 
 	bool is_unicode = ((coding_receive == IdUTF8) || (coding_send == IdUTF8));
 
-	// Unicode character width
-	if (is_unicode) {
-		EnableWindows(hWnd, UnicodeItems, _countof(UnicodeItems), TRUE);
-		const OverrideCharWidthInfo *info = &data->unicode_override_charwidth_info;
-		if (info->count == 0) {
-			EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH), FALSE);
-			EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO), FALSE);
-		}
-	}
-	else {
-		EnableWindows(hWnd, UnicodeItems, _countof(UnicodeItems), FALSE);
-	}
+	ArrenageItemsUnicode(hWnd, data, is_unicode);
 
 	if (coding_receive == IdJIS) {
 		EnableWindows(hWnd, JJISReceiveItems, _countof(JJISReceiveItems), TRUE);
@@ -258,8 +279,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			// 文字ごとの文字幅オーバーライド設定
 			const OverrideCharWidthInfo *info = &DlgData->unicode_override_charwidth_info;
 			if (info->count == 0) {
-				EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH), FALSE);
-				EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO), FALSE);
+				CheckDlgButton(hWnd, IDC_OVERRIDE_CHAR_WIDTH, BST_UNCHECKED);
 			}
 			else {
 				for (size_t i = 0; i < info->count; i++) {
@@ -270,9 +290,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 									ts->UnicodeOverrideCharWidthSelected, 0);
 				ExpandCBWidth(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO);
 				const BOOL enable = (ts->UnicodeOverrideCharWidthEnable == 1) && (UnicodeOverrideWidthAvailable() != 0);
-				EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH), TRUE);
 				CheckDlgButton(hWnd, IDC_OVERRIDE_CHAR_WIDTH, enable ? BST_CHECKED : BST_UNCHECKED);
-				EnableWindow(GetDlgItem(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO), enable);
 			}
 
 			ArrenageItems(hWnd, DlgData);

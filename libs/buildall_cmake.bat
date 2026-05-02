@@ -11,10 +11,10 @@ set OPT=
 :retry_vs
 rem echo f. Visual Studio 18 2026 Win32
 rem echo g. Visual Studio 18 2026 x64
-rem echo h. Visual Studio 18 2026 arm64
+rem echo h. Visual Studio 18 2026 ARM64
 echo 1. Visual Studio 17 2022 Win32
 echo 2. Visual Studio 17 2022 x64
-echo 3. Visual Studio 17 2022 arm64
+echo 3. Visual Studio 17 2022 ARM64
 echo 4. Visual Studio 16 2019 Win32
 echo 5. Visual Studio 16 2019 x64
 echo 6. Visual Studio 15 2017
@@ -29,13 +29,13 @@ rem echo e. Cygwin MinGW Release + Unix Makefiles (experimental)
 set /p no="select no "
 
 echo %no%
-if "%no%" == "f" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=win32 & goto build_all
+if "%no%" == "f" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=Win32 & goto build_all
 if "%no%" == "g" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=x64   & goto build_all
-if "%no%" == "h" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=arm64 & goto build_all
-if "%no%" == "1" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=win32 & goto build_all
+if "%no%" == "h" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=ARM64 & goto build_all
+if "%no%" == "1" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=Win32 & goto build_all
 if "%no%" == "2" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=x64   & goto build_all
-if "%no%" == "3" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=arm64 & goto build_all
-if "%no%" == "4" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=win32 & goto build_all
+if "%no%" == "3" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=ARM64 & goto build_all
+if "%no%" == "4" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=Win32 & goto build_all
 if "%no%" == "5" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=x64   & goto build_all
 if "%no%" == "6" set GENERATOR="Visual Studio 15 2017" & goto build_all
 if "%no%" == "8" set GENERATOR="Visual Studio 14 2015" & goto build_all
