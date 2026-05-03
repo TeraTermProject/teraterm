@@ -105,12 +105,13 @@ void HistoryStoreDestroy(HistoryStore *h)
  */
 static BOOL Extend(HistoryStore *h)
 {
-	wchar_t **ptr = (wchar_t **)realloc(h->ptr, (h->max + 10) * sizeof(wchar_t *));
+	const size_t extend = 10;
+	wchar_t **ptr = (wchar_t **)realloc(h->ptr, (h->max + extend) * sizeof(wchar_t *));
 	if (ptr == NULL) {
 		return FALSE;
 	}
 	size_t old_max = h->max;
-	h->max += 10;
+	h->max += extend;
 	h->ptr = ptr;
 	memset(h->ptr + old_max, 0, (h->max - old_max) * sizeof(wchar_t *));
 	return TRUE;
