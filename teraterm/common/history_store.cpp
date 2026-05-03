@@ -225,6 +225,7 @@ void HistoryStoreReadIni(HistoryStore *h, const wchar_t *FName, const wchar_t *s
 		else {
 			h->ptr[count] = item;
 			count++;
+			unset_count = 0;
 			if (count >= h->max && h->no_limit) {
 				if (!Extend(h)) {
 					break;
