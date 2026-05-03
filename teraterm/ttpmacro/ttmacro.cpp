@@ -78,6 +78,8 @@ HWND GetHWND()
 
 static void init()
 {
+	DebugSetException(L"ttpmacro");
+
 	HomeDirW = GetHomeDirW(hInst);
 	SetupFNameW = GetDefaultFNameW(HomeDirW, L"TERATERM.INI");
 
@@ -136,7 +138,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-	DebugSetException();
 
 //	InitCommonControls();
 	init();
