@@ -4,7 +4,6 @@
     <Platform Name="Win32" />
     <Platform Name="x64" />
   </Configurations>
-  <Project Path="TTXAdditionalTitle/TTXAdditionalTitle.v18.vcxproj" Id="0ecaf69b-08b4-414a-b822-be8459e463d8" />
   <Project Path="TTXAlwaysOnTop/TTXAlwaysOnTop.v18.vcxproj" Id="e86ddb2c-cc00-43d1-8a1a-4b042ec983d6" />
   <Project Path="TTXCallSysMenu/TTXCallSysMenu.v18.vcxproj" Id="25709a86-e6b8-4cda-906c-02d935e05978" />
   <Project Path="TTXChangeFontSize/TTXChangeFontSize.v18.vcxproj" Id="56807ec2-1793-438f-942e-de7f09283971" />
