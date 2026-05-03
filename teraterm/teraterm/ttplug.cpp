@@ -99,7 +99,7 @@ static void PluginListAdd(const ExtensionList *item)
  */
 static void PluginListRead(const wchar_t *SetupFNW)
 {
-	HistoryStore *hs = HistoryStoreCreate(20);
+	HistoryStore *hs = HistoryStoreCreate(0);
 	HistoryStoreReadIni(hs, SetupFNW, L"Plugin", L"list");
 
 	for (size_t i = 0;; i++) {

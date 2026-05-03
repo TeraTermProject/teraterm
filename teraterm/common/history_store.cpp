@@ -43,17 +43,32 @@
 
 typedef struct HistoryStoreTag {
 	size_t max;
+	bool no_limit;
 	size_t count;
 	wchar_t **ptr;
 } HistoryStore;
 
+/**
+ *	history作成
+ *
+ *	@param	max					ヒストリ最大数
+ *								0 のとき、上限なし
+ *	@return	HistoryStore		ハンドル
+ */
 HistoryStore *HistoryStoreCreate(size_t max)
 {
 	HistoryStore *h = (HistoryStore *)calloc(1, sizeof(*h));
 	if (h == NULL) {
 		return NULL;
 	}
-	h->max = max;
+	if (max != 0) {
+		h->max = max;
+		h->no_limit = false;
+	}
+	else {
+		h->max = 10;
+		h->no_limit = true;
+	}
 	h->count = 0;
 	h->ptr = (wchar_t **)calloc(h->max, sizeof(wchar_t *));
 	if (h->ptr == NULL) {
@@ -80,6 +95,25 @@ void HistoryStoreDestroy(HistoryStore *h)
 	HistoryStoreClear(h);
 	free(h->ptr);
 	free(h);
+}
+
+/**
+ *	領域を拡張する
+ *
+ *	@retval	TRUE	成功
+ *	@retval	FALSE	失敗
+ */
+static BOOL Extend(HistoryStore *h)
+{
+	wchar_t **ptr = (wchar_t **)realloc(h->ptr, (h->max + 10) * sizeof(wchar_t *));
+	if (ptr == NULL) {
+		return FALSE;
+	}
+	size_t old_max = h->max;
+	h->max += 10;
+	h->ptr = ptr;
+	memset(h->ptr + old_max, 0, (h->max - old_max) * sizeof(wchar_t *));
+	return TRUE;
 }
 
 /**
@@ -122,10 +156,16 @@ BOOL HistoryStoreAddTop(HistoryStore *h, const wchar_t *add_str, BOOL enable_dup
 		}
 
 		if (to + 1 == h->max) {
-			// 増加して最大サイズを超える場合は、最後を削除しておく
-			free(h->ptr[to]);
-			h->ptr[to] = NULL;
-			to--;
+			if (h->no_limit && Extend(h)) {
+				// 拡張成功 → サイズが1つ増える
+				h->count++;
+			}
+			else {
+				// 上限あり、または拡張失敗 → 最後を削除しておく
+				free(h->ptr[to]);
+				h->ptr[to] = NULL;
+				to--;
+			}
 		}
 		else if (to == h->count - 1) {
 			// サイズが1つ増える
@@ -184,6 +224,11 @@ void HistoryStoreReadIni(HistoryStore *h, const wchar_t *FName, const wchar_t *s
 		else {
 			h->ptr[count] = item;
 			count++;
+			if (count >= h->max && h->no_limit) {
+				if (!Extend(h)) {
+					break;
+				}
+			}
 		}
 	}
 	h->count = count;
