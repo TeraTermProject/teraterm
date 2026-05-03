@@ -134,7 +134,7 @@ static void PluginListRead(const wchar_t *SetupFNW)
 
 void PluginWriteList(const wchar_t *SetupFNW)
 {
-	HistoryStore *hs = HistoryStoreCreate(20);
+	HistoryStore *hs = HistoryStoreCreate(0);
 	for (size_t i = 0; i < NumExtensions; i++) {
 		const ExtensionList *pl = &Extensions[i];
 		if (pl->enable == EXTENSION_ENABLE ||
