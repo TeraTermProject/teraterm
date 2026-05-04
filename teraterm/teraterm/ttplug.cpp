@@ -100,6 +100,9 @@ static void PluginListAdd(const ExtensionList *item)
 static void PluginListRead(const wchar_t *SetupFNW)
 {
 	HistoryStore *hs = HistoryStoreCreate(0);
+	if (hs == NULL) {
+		return;
+	}
 	HistoryStoreReadIni(hs, SetupFNW, L"Plugin", L"list");
 
 	for (size_t i = 0;; i++) {
@@ -109,6 +112,9 @@ static void PluginListRead(const wchar_t *SetupFNW)
 		}
 		size_t len_ch = wcslen(s) + 1;
 		wchar_t *buf = (wchar_t *)malloc(sizeof(wchar_t) * len_ch);
+		if (buf == NULL) {
+			continue;
+		}
 		int enable_int;
 		// ""file", 1"  を想定
 #if !defined(__MINGW32__)
