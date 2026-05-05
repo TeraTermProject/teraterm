@@ -40,49 +40,50 @@
 class CVTWindow : public TTCFrameWnd
 {
 private:
-  BOOL FirstPaint, Minimized;
+	BOOL FirstPaint, Minimized;
 
-  /* mouse status */
-  BOOL LButton, MButton, RButton;
-  BOOL DblClk, AfterDblClk, TplClk;
-  int DblClkX, DblClkY;
+	/* mouse status */
+	BOOL LButton, MButton, RButton;
+	BOOL DblClk, AfterDblClk, TplClk;
+	int DblClkX, DblClkY;
 
-  // "Hold" key status
-  BOOL Hold;
+	// "Hold" key status
+	BOOL Hold;
 
-  // ScrollLock key
-  BOOL ScrollLock;
+	// ScrollLock key
+	BOOL ScrollLock;
 
-  HMENU MainMenu, FileMenu, TransMenu, EditMenu,
-    SetupMenu, ControlMenu, WinMenu, HelpMenu;
+	HMENU MainMenu, FileMenu, TransMenu, EditMenu,
+		SetupMenu, ControlMenu, WinMenu, HelpMenu;
 
-  // drag and drop handle
-  void DropInit();
-  void DropUninit();
-  struct DropData_tag *DropData;
-  wchar_t **DropLists;
-  int DropListCount;
-  void DropListFree();
+	// drag and drop handle
+	void DropInit();
+	void DropUninit();
+	struct DropData_tag *DropData;
+	wchar_t **DropLists;
+	int DropListCount;
+	void DropListFree();
 
-  // window attribute
-  BYTE Alpha;
-  void SetWindowAlpha(BYTE alpha);
+	// window attribute
+	BYTE Alpha;
+	void SetWindowAlpha(BYTE alpha);
 
-  // for debug
+	// for debug
 #if UNICODE_DEBUG
-  TipWin *TipWinCodeDebug;
-  int CtrlKeyState;			// 0:開始/1:押す/2:離す/3:押す(表示状態)
-  DWORD CtrlKeyDownTick;	// 最初に押したtick
+	TipWin *TipWinCodeDebug;
+	int CtrlKeyState;			// 0:開始/1:押す/2:離す/3:押す(表示状態)
+	DWORD CtrlKeyDownTick;	// 最初に押したtick
 #endif
 
-  // TipWin
-  CTipWin* TipWin;
+	// TipWin
+	CTipWin* TipWin;
 
-  // for html help
-  LONG HelpId;
+	// for html help
+	LONG HelpId;
 
-  // サイズ変更中(WM_SIZING 〜 WM_EXITSIZEMOVE)はTRUE
-  BOOL isSizing;
+	// 状態
+	BOOL isSizing;		// サイズ変更中(WM_SIZING 〜 WM_EXITSIZEMOVE)はTRUE
+	BOOL isClosing;		// TRUE=ウィンドウクローズ中(WM_DESTROYを受信した)
 
 public:
 	CVTWindow(HINSTANCE hInstance);
