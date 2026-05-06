@@ -1,7 +1,4 @@
 ﻿
-add_subdirectory(TTXAdditionalTitle)
-set_target_properties(TTXAdditionalTitle PROPERTIES FOLDER TTXSamples)
-
 add_subdirectory(TTXAlwaysOnTop)
 set_target_properties(TTXAlwaysOnTop PROPERTIES FOLDER TTXSamples)
 

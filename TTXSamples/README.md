@@ -4,7 +4,7 @@
 
 このフォルダに収められているプラグイン
 
-## TTXAdditionalTitle
+## TTXAdditionalTitle (deprecated)
 
 - [ReadMe.txt](TTXAdditionalTitle/ReadMe.txt)
 - [ReadMe-ja.txt](TTXAdditionalTitle/ReadMe-ja.txt)
