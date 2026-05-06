@@ -682,17 +682,10 @@ static INT_PTR CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 				ListView_HitTest(nmlist->hdr.hwndFrom, &ht);
 				if (ht.flags & LVHT_ONITEM) {
 					int hit_item = ht.iItem;
-
-					wchar_t path[MAX_PATH];
-					LV_ITEMW item;
-					item.mask = TVIF_TEXT;
-					item.iItem = hit_item;
-					item.iSubItem = 1;
-					item.pszText = path;
-					item.cchTextMax = _countof(path);
-					SendMessageW(nmlist->hdr.hwndFrom, LVM_GETITEMW, 0, (LPARAM)&item);
-
+					wchar_t *path;
+					hGetDlgItemLVTextW(hDlgWnd, IDC_SETUP_DIR_LIST, hit_item, 1, &path);
 					PopupAndExec(nmlist->hdr.hwndFrom, &pointer_pos, path, pts);
+					free(path);
 				}
 				break;
 			}
