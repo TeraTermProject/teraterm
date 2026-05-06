@@ -209,7 +209,7 @@ void HistoryStoreReadIni(HistoryStore *h, const wchar_t *FName, const wchar_t *s
 {
 	size_t count = 0;
 	int unset_count = 0;
-	for (size_t i = 0 ; i < h->max; i++) {
+	for (size_t i = 0 ; h->no_limit || i < h->max; i++) {
 		wchar_t *EntName;
 		aswprintf(&EntName, L"%s%d", key, i + 1);
 		wchar_t *item;
