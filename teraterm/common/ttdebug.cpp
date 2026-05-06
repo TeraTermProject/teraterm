@@ -31,6 +31,7 @@
 #include <imagehlp.h>
 #include <shlobj.h>	// for SHGetSpecialFolderPathW()
 #include <intrin.h> // for __debugbreak()
+#include <assert.h>
 
 #include "compat_win.h"
 #include "asprintf.h"
@@ -38,6 +39,8 @@
 
 #include "ttdebug.h"
 #include "ttlib.h"
+
+static const wchar_t *BaseName;
 
 /**
  *	コンソールウィンドウを表示するデバグ用
@@ -278,7 +281,8 @@ static wchar_t *CreateDumpFilename()
 	const char *platform = "unknown";
 #endif
 	wchar_t *dump_file;
-	aswprintf(&dump_file, L"teraterm_%hs_%04u%02u%02u-%02u%02u%02u_%hs.dmp",
+	aswprintf(&dump_file, L"%s_%hs_%04u%02u%02u-%02u%02u%02u_%hs.dmp",
+			  BaseName,
 			  platform,
 			  local_time.wYear, local_time.wMonth, local_time.wDay,
 			  local_time.wHour, local_time.wMinute, local_time.wSecond,
@@ -371,9 +375,15 @@ static void InvalidParameterHandler(const wchar_t* /*expression*/,
 
 /**
  *  例外ハンドラのフック
+ *
+ *	例外が発生した時、ミニダンプを出力する
+ *
+ *	@param	basename	ダンプファイルのベース
  */
-void DebugSetException(void)
+void DebugSetException(const wchar_t *basename)
 {
+	assert(basename != NULL);
+	BaseName = basename;
 	SetUnhandledExceptionFilter(ExceptionFilter);
 
 	// Cランタイム無効なパラメータエラーハンドラ

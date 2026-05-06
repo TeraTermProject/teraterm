@@ -65,6 +65,7 @@
 #include "vtterm.h"
 #include "tttypes_charset.h"
 
+// 入力コードをダンプする
 // #define DEBUG_DUMP_INPUTCODE 1
 
 #define Accept8BitCtrl ((VTlevel >= 2) && (ts.TermFlag & TF_ACCEPT8BITCTRL))
