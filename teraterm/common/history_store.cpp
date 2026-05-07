@@ -209,16 +209,18 @@ void HistoryStoreReadIni(HistoryStore *h, const wchar_t *FName, const wchar_t *s
 {
 	size_t count = 0;
 	int unset_count = 0;
-	for (size_t i = 0 ; h->no_limit || i < h->max; i++) {
+	for (size_t i = 0;; i++) {
 		wchar_t *EntName;
 		aswprintf(&EntName, L"%s%d", key, i + 1);
 		wchar_t *item;
 		hGetPrivateProfileStringW(section, EntName, L"", FName, &item);
 		free(EntName);
 		if (item[0] == 0) {
+			// iniファイルに存在しない
 			free(item);
 			unset_count++;
 			if (unset_count == 10) {
+				// 連続して存在しないとき、読み込み打ち切り
 				break;
 			}
 		}
@@ -226,9 +228,17 @@ void HistoryStoreReadIni(HistoryStore *h, const wchar_t *FName, const wchar_t *s
 			h->ptr[count] = item;
 			count++;
 			unset_count = 0;
-			if (count >= h->max && h->no_limit) {
-				if (!Extend(h)) {
+			if (count >= h->max) {
+				// 上限まで読み込んだ
+				if (!h->no_limit) {
+					// 打ち切り
 					break;
+				}
+				else {
+					if (!Extend(h)) {
+						// 拡張失敗、打ち切り
+						break;
+					}
 				}
 			}
 		}
