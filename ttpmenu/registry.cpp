@@ -50,7 +50,7 @@ static wchar_t *szApplicationName;				// INIファイルのフルパス
 
 static BOOL getSection(const wchar_t *str)
 {
-	szSectionNames[0] = 0;
+	szSectionName[0] = 0;
 	const wchar_t *t = wcsrchr(str, L'\\');
 	if(t){
 		t++;
