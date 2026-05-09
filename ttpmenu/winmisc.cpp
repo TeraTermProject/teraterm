@@ -410,17 +410,23 @@ int Encrypt2EncDec(char *szPassword, const unsigned char *szEncryptKey, Encrypt2
 				 Hash, &HashLen) == NULL ) {
 			goto end;
 		}
-		memcpy(szPassword, Lprofile.PassStr, ENCRYPT2_PWD_MAX_LEN);
 		if (CRYPTO_memcmp(Hash, Lprofile.EncHash, SHA512_DIGEST_LENGTH) == 0) {
+			memcpy(szPassword, Lprofile.PassStr, ENCRYPT2_PWD_MAX_LEN);
 			szPassword[ENCRYPT2_PWD_MAX_LEN] = 0;
 			ret = 1;	// 一致
 		} else {
-			szPassword[0] = 0;
+			SecureZeroMemory(szPassword, ENCRYPT2_PWD_MAX_LEN + 1);
 			ret = 0;	// 不一致
 		}
 	}
 
  end:
+	SecureZeroMemory(TmpKeyIV, sizeof(TmpKeyIV));
+	SecureZeroMemory(Key, sizeof(Key));
+	SecureZeroMemory(IV, sizeof(IV));
+	SecureZeroMemory(&Lprofile, sizeof(Lprofile));
+	SecureZeroMemory(Buf, sizeof(Buf));
+	SecureZeroMemory(Hash, sizeof(Hash));
 	if (Bio != NULL) {
 		BIO_free_all(Bio);
 	} else {

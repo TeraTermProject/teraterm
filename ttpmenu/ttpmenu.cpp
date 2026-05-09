@@ -1058,7 +1058,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 		}
 		dwErr = ConnectHost(g_hI, hWnd, &info);
 		if (passwordW != NULL) {
-			SecureZeroMemory(passwordW, sizeof(wchar_t) * wcslen(passwordW));
+			SecureZeroMemory(passwordW, sizeof(wchar_t) * (wcslen(passwordW) + 1));
 			free(passwordW);
 		}
 	}
@@ -1516,6 +1516,7 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 		SecureZeroMemory(cEncodePassword, sizeof(cEncodePassword));
 	} else if (g_JobInfo.dwMode == MODE_AUTOLOGIN) {
 		if (g_szLockBox[0] == 0) {
+			SecureZeroMemory(cEncodePassword, sizeof(cEncodePassword));
 			UTIL_get_lang_msgW("MSG_ERROR_NOLOCKBOX", uimsg, _countof(uimsg),
 							   L"error: LockBox is not setup.", UILanguageFileW);
 			::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
@@ -1680,6 +1681,7 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 		if (g_JobInfo.dwMode == MODE_AUTOLOGIN) {
 			DecryptPassword(g_JobInfo.szPassword, szEncodePassword, hWnd);
 			::SetDlgItemTextA(hWnd, EDIT_PASSWORD, szEncodePassword);
+			SecureZeroMemory(szEncodePassword, sizeof(szEncodePassword));
 		} else {
 			::SetDlgItemTextA(hWnd, EDIT_PASSWORD, "");
 		}
@@ -1688,6 +1690,7 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 		EncodePassword(g_JobInfo.szPassword, szEncodePassword);
 		CryptProtectMemory(g_JobInfo.szPassword, sizeof(g_JobInfo.szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
 		::SetDlgItemTextA(hWnd, EDIT_PASSWORD, szEncodePassword);
+		SecureZeroMemory(szEncodePassword, sizeof(szEncodePassword));
 	}
 
 	::SetDlgItemTextW(hWnd, EDIT_MACRO, g_JobInfo.szMacroFile);
@@ -1921,6 +1924,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 					::CheckDlgButton(hWnd, CHECK_PASSWORD, BST_CHECKED);
 					::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) BST_CHECKED);
 				}
+				SecureZeroMemory(szPassword, sizeof(szPassword));
 			}
 		}
 		return TRUE;
@@ -1934,6 +1938,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 				::SetDlgItemTextA(hWnd, EDIT_PASSWORD, pData.pDecryptPassword);
 			}
 		}
+		SecureZeroMemory(szPassword, sizeof(szPassword));
 		return TRUE;
 	case CHECK_INI_FILE:
 		if (IsDlgButtonChecked(hWnd, CHECK_INI_FILE) == BST_CHECKED)
@@ -2467,11 +2472,14 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 					UpdateWindow(hWnd);
 					if (Encrypt2EncDec(pData->pDecryptPassword, (const unsigned char *)szEncodeEncryptKey,
 									   (Encrypt2ProfileP)pData->pEncryptPassword, 0) == 0) {
+						SecureZeroMemory(szEncodeEncryptKey, sizeof(szEncodeEncryptKey));
 						error = 1;
 						UTIL_get_lang_msgW("DLG_LOCKBOX_WRONG", uimsg, _countof(uimsg),
 										   L"Incorrect password.", UILanguageFileW);
 						::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
+						SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
 					} else{
+						SecureZeroMemory(szEncodeEncryptKey, sizeof(szEncodeEncryptKey));
 						UTIL_get_lang_msgW("DLG_LOCKBOX_VALID", uimsg, _countof(uimsg),
 										   L"Correct password.", UILanguageFileW);
 						::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
@@ -2482,6 +2490,7 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 						::EndDialog(hWnd, TRUE);
 					}
 				} else {
+					SecureZeroMemory(szEncodeEncryptKey, sizeof(szEncodeEncryptKey));
 					::EndDialog(hWnd, TRUE);
 				}
 			}
@@ -2550,6 +2559,8 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	case WM_ENDSESSION:
 	case WM_DESTROY:
+		SecureZeroMemory(&g_JobInfo, sizeof(g_JobInfo));
+		SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
 		SaveConfig();
 		SetTaskTray(hWnd, NIM_DELETE);
 		::UnregisterHotKey(hWnd, WM_MENUOPEN);
