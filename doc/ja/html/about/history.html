@@ -65,6 +65,11 @@
         "全てのユーザー用にインストール" / "現在のユーザー用にインストール" を選択できるようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1156" target="_blank">issue #1156</a>)
       </li>
+      <li>
+        TTXAdditionalTitleプラグインと同等の機能はTera Termに実装済み。
+        ビルド対象から外した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1280" target="_blank">issue #1280</a>)
+      </li>
     </ul>
   </li>
 
@@ -74,6 +79,14 @@
         Serial poot タブ ("Additional settings &gt; <a href="../menu/setup-additional-serialport.html">Serial port</a>") を開いたときに、115200 以上の速度が選択状態にならない問題を修正した。
         5.0 からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1241" target="_blank">issue #1241</a>)
+      </li>
+      <li>
+        プラグインを 20 個より多くインストールした場合に、21 番目以降のプラグインの有効/無効設定が teraterm.ini に保存・読み込みされない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1271" target="_blank">issue #1271</a>)
+      </li>
+      <li>
+        iniファイルからヒストリ(接続ホスト、ブロードキャストコマンド、プラグイン一覧等)を読み込む処理で、連番に抜けがあると途中で打ち切られる不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1271" target="_blank">issue #1271</a>)
       </li>
       <li>
         TTXttyplay の再生中に VTウィンドウを閉じると、ttermpro.exe がクラッシュする問題を修正した。

@@ -64,6 +64,9 @@
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
+// 起動時にデバグ用コンソールをオープンする
+// #define DEBUG_OPEN_CONSOLE_AT_STARTUP 1
+
 static BOOL AddFontFlag;
 static wchar_t *TSpecialFont;
 CVTWindow* pVTWin;
@@ -121,7 +124,7 @@ static void init(void)
 {
 	DLLInit();
 	WinCompatInit();
-	DebugSetException();
+	DebugSetException(L"teraterm");
 	LoadSpecialFont();
 #if defined(DEBUG_OPEN_CONSOLE_AT_STARTUP)
 	DebugConsoleOpen();

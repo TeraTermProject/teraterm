@@ -60,8 +60,6 @@ copy /y ..\ttpmenu\Release.%TARGET%\ttpmenu.exe %dst%
 copy /y ..\ttpmenu\Release.%TARGET%\ttpmenu.pdb %dst%_pdb
 copy /y ..\ttpmenu\readme.txt %dst%\ttmenu_readme-j.txt
 
-copy /y ..\TTXSamples\Release.%TARGET%\TTXAdditionalTitle.dll %dst%
-copy /y ..\TTXSamples\Release.%TARGET%\TTXAdditionalTitle.pdb %dst%_pdb
 copy /y ..\TTXSamples\Release.%TARGET%\TTXAlwaysOnTop.dll %dst%
 copy /y ..\TTXSamples\Release.%TARGET%\TTXAlwaysOnTop.pdb %dst%_pdb
 copy /y ..\TTXSamples\Release.%TARGET%\TTXCallSysMenu.dll %dst%

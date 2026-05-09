@@ -65,6 +65,11 @@
         Installer shows dialog to choose between "Install for all users" and "Install for me only".
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1156" target="_blank">issue #1156</a>)
       </li>
+      <li>
+        The same functionality has been implemented in Tera Term itself.
+        Excluded the plugin from build targets.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1280" target="_blank">issue #1280</a>)
+      </li>
     </ul>
   </li>
 
@@ -74,6 +79,14 @@
         Fixed an issue where speeds above 115200 could not be selected when opening the Serial port tab ("Additional settings &gt; <a href="../menu/setup-additional-serialport.html">Serial port</a>").
         This bug was introduced in 5.0.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1241" target="_blank">issue #1241</a>)
+      </li>
+      <li>
+        Fixed an issue where enable/disable settings for the 21st and later plugins were not saved to or loaded from teraterm.ini when more than 20 plugins were installed.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1271" target="_blank">issue #1271</a>)
+      </li>
+      <li>
+        Fixed an issue where reading numbered lists (host history, broadcast commands, plugin list, etc.) from teraterm.ini could be cut short if the entry numbers were not consecutive.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1271" target="_blank">issue #1271</a>)
       </li>
       <li>
         Fixed an issue where ttermpro.exe crashes when the VT window is closed during TTXttyplay was playbacking.

@@ -28,17 +28,11 @@
 
 #include <windows.h>
 
-// 起動時にデバグ用コンソールをオープンする
-// #define DEBUG_OPEN_CONSOLE_AT_STARTUP 1
-
-// 入力コードをダンプする
-// #define DEBUG_DUMP_INPUTCODE 1
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void DebugSetException(void);
+void DebugSetException(const wchar_t *basename);
 HWND DebugConsoleOpen(void);
 void DebugTestCrash(void);
 

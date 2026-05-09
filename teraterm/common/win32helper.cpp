@@ -465,3 +465,52 @@ DWORD hGetDlgItemCBTextW(HWND hDlg, int id, int index, wchar_t **text)
 	*text = strW;
 	return NO_ERROR;
 }
+
+/**
+ *	リストビューの文字列取得
+ *
+ *	@param[in]	hDlg		ダイアログ
+ *	@param[in]	id			コントロール(リストビュー)のID
+ *							(0のとき、hDlgをコントロールのハンドルとする)
+ *	@param[in]	item		取得するアイテムのインデックス
+ *	@param[in]	subitem		取得するサブアイテムのインデックス
+ *	@param[out]	text		設定されている文字列
+ *							不要になったらfree()する
+ *	@return	エラーコード,0(=NO_ERROR)のときエラーなし
+ */
+DWORD hGetDlgItemLVTextW(HWND hDlg, int id, int item, int subitem, wchar_t **text)
+{
+	HWND hWnd;
+	if (id == 0) {
+		hWnd = hDlg;
+	} else {
+		hWnd = GetDlgItem(hDlg, id);
+	}
+	assert(hWnd != NULL);
+	size_t buf_len = 64;
+	wchar_t *buf_ptr = NULL;
+
+	for(;;) {
+		wchar_t *p = (wchar_t *)realloc(buf_ptr, sizeof(wchar_t) * buf_len);
+		if (p == NULL) {
+			free(buf_ptr);
+			*text = NULL;
+			return ERROR_NOT_ENOUGH_MEMORY;
+		}
+		buf_ptr = p;
+
+		LV_ITEMW lv_item = {};
+		lv_item.iSubItem = subitem;
+		lv_item.pszText = buf_ptr;
+		lv_item.cchTextMax = (int)buf_len;
+
+		size_t len = (size_t)SendMessageW(hWnd, LVM_GETITEMTEXTW, item, (LPARAM)&lv_item);
+		len += 1;  // +1 = L'\0'
+		if (len < buf_len) {
+			buf_ptr = (wchar_t *)realloc(buf_ptr, sizeof(wchar_t) * len);
+			*text = buf_ptr;
+			return NO_ERROR;
+		}
+		buf_len += 128;
+	}
+}

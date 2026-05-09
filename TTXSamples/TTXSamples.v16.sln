@@ -23,8 +23,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXViewMode", "TTXViewMode\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXCopyIniFile", "TTXCopyIniFile\TTXCopyIniFile.v16.vcxproj", "{2B2B8D6E-4A84-49DD-8291-46172FCE422A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXAdditionalTitle", "TTXAdditionalTitle\TTXAdditionalTitle.v16.vcxproj", "{0ECAF69B-08B4-414A-B822-BE8459E463D8}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXCallSysMenu", "TTXCallSysMenu\TTXCallSysMenu.v16.vcxproj", "{25709A86-E6B8-4CDA-906C-02D935E05978}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXCommandLineOpt", "TTXCommandLineOpt\TTXCommandLineOpt.v16.vcxproj", "{EE8BFC38-7000-42F1-BBC3-17F19855918A}"
