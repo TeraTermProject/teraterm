@@ -163,22 +163,17 @@ static void GetTeraTermPath(wchar_t *path, size_t size)
 BOOL ExecStartup(HWND hWnd)
 {
 	wchar_t	szEntryName[MAX_PATH];
-	wchar_t	szJobName[MAXJOBNUM][MAX_PATH];
 	HKEY	hKey;
 	DWORD	dwIndex = 0;
 	DWORD	dwSize = MAX_PATH;
 
 	if ((hKey = RegOpen(HKEY_CURRENT_USER, TTERM_KEY)) != INVALID_HANDLE_VALUE) {
-		while (RegEnumEx(hKey, dwIndex, szEntryName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
-			wcscpy(szJobName[dwIndex++], szEntryName);
+		while (dwIndex < MAXJOBNUM && RegEnumEx(hKey, dwIndex, szEntryName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
+			ConnectHost(hWnd, 0, szEntryName);
+			dwIndex++;
 			dwSize = MAX_PATH;
 		}
-		wcscpy(szJobName[dwIndex], L"");
 		RegClose(hKey);
-
-		DWORD dwCnt;
-		for (dwCnt = 0; dwCnt < dwIndex; dwCnt++)
-			ConnectHost(hWnd, 0, szJobName[dwCnt]);
 	}
 
 	return TRUE;
