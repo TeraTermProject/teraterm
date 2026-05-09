@@ -118,11 +118,20 @@ struct JobInfo {
 	BOOL    bPageant;                   // use Pageant(/pageant)
 };
 
+// 表示設定構造体(名前とアイコンのリスト)
+#pragma warning(push)
+#pragma warning(disable : 4200) 		// C99 可変長配列の警告を抑止
+struct NameList {
+	NameList	*pNext;
+	HICON		hLargeIcon;
+	HICON		hSmallIcon;
+	wchar_t		szName[];				// 可変長配列
+};
+#pragma warning(pop)
+
 // 表示設定構造体
 struct MenuData {
-	wchar_t		szName[MAXJOBNUM][MAX_PATH];
-	HICON		hLargeIcon[MAXJOBNUM];
-	HICON		hSmallIcon[MAXJOBNUM];
+	NameList	*pNameList;
 	DWORD		dwMenuHeight;
 	DWORD		dwIconMode;
 	BOOL		bLeftButtonPopup;

@@ -650,18 +650,19 @@ BOOL InitListBox(HWND hWnd)
 	wchar_t	szPath[MAX_PATH];
 	DWORD	dwCnt = 0;
 	DWORD	dwIndex = 0;
+	NameList *pNameList = g_MenuData.pNameList;
 
 	::SendDlgItemMessage(hWnd, LIST_HOST, LB_RESETCONTENT, 0, 0);
 
-	while (wcslen(g_MenuData.szName[dwIndex]) != 0) {
-		if (GetApplicationFilename(g_MenuData.szName[dwIndex], szPath) == TRUE) {
-			::SendDlgItemMessageW(hWnd, LIST_HOST, LB_ADDSTRING, 0, (LPARAM)g_MenuData.szName[dwIndex]);
+	while(pNameList) {
+		if (GetApplicationFilename(pNameList->szName, szPath) == TRUE) {
+			::SendDlgItemMessageW(hWnd, LIST_HOST, LB_ADDSTRING, 0, (LPARAM)pNameList->szName);
 			::SendDlgItemMessage(hWnd, LIST_HOST, LB_SETITEMDATA, (WPARAM) dwCnt, (LPARAM) dwIndex);
 			dwCnt++;
 		}
 		dwIndex++;
+		pNameList = pNameList->pNext;
 	}
-
 	return TRUE;
 }
 
@@ -960,6 +961,29 @@ static wchar_t *GetPassword(JobInfo *jobInfo, HWND hWnd)
 }
 
 /* ==========================================================================
+	Function Name	: (NameList *) getNthNameList()
+	Outline			: 表示設定構造体 NameList の N 番目 のリストのアドレスを返す
+	Arguments		: DWORD		N		(In) N 番目
+	Return Value	: 成功 NameListのアドレス / 失敗 NULL
+	Reference		:
+	Renewal			:
+	Notes			:
+	Attention		:
+	Up Date			:
+   ======1=========2=========3=========4=========5=========6=========7======= */
+NameList *getNthNameList(DWORD Nth)
+{
+	NameList *pNameList = g_MenuData.pNameList;
+	for (DWORD i = 0; i < MAXJOBNUM && pNameList; i++) {
+		if (i == Nth) {
+			return pNameList;
+		}
+		pNameList = pNameList->pNext;
+	}
+	return NULL;
+}
+
+/* ==========================================================================
 	Function Name	: (BOOL) ConnectHost()
 	Outline			: 自動ログインまたはアプリケーションの実行をする。
 	Arguments		: HWND		hWnd		(In) ウインドウのハンドル
@@ -984,7 +1008,16 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	DWORD	dwErr = NO_ERROR;
 	wchar_t uimsg[MAX_UIMSG];
 
-	wcscpy(szName, (szJobName == NULL) ? g_MenuData.szName[idItem - ID_MENU_MIN] : szJobName);
+	if (szJobName) {
+		wcscpy_s(szName, _countof(szName), szJobName);
+	} else {
+		NameList *pNameList = getNthNameList(idItem - ID_MENU_MIN);
+		if (pNameList) {
+			wcscpy_s(szName, _countof(szName), pNameList->szName);
+		} else {
+			return FALSE;
+		}
+	}
 
 	if (RegLoadLoginHostInformation(szName, &jobInfo) == FALSE) {
 		dwErr = ::GetLastError();
@@ -1128,11 +1161,6 @@ BOOL InitMenu(void)
 {
 	wchar_t	uimsg[MAX_UIMSG];
 
-	for (int cnt = 0; cnt < MAXJOBNUM; cnt++) {
-		g_MenuData.hLargeIcon[cnt] = NULL;
-		g_MenuData.hSmallIcon[cnt] = NULL;
-	}
-
 	if (g_hListMenu == NULL) {
 		g_hMenu			= ::LoadMenuA(g_hI, (LPCSTR) TTERM_MENU);
 		g_hSubMenu		= ::GetSubMenu(g_hMenu, 0);
@@ -1179,16 +1207,19 @@ BOOL InitMenu(void)
    ======1=========2=========3=========4=========5=========6=========7======= */
 VOID DeleteListMenuIcons()
 {
-	for (int cnt = 0; cnt < MAXJOBNUM; cnt++) {
-		g_MenuData.szName[cnt][0] = L'\0';
-		if (g_MenuData.hLargeIcon[cnt] != NULL) {
-			::DestroyIcon(g_MenuData.hLargeIcon[cnt]);
-			g_MenuData.hLargeIcon[cnt] = NULL;
+	NameList *pNameList = g_MenuData.pNameList;
+	g_MenuData.pNameList = NULL;
+
+	while (pNameList) {
+		if (pNameList->hLargeIcon != NULL) {
+			::DestroyIcon(pNameList->hLargeIcon);
 		}
-		if (g_MenuData.hSmallIcon[cnt] != NULL) {
-			::DestroyIcon(g_MenuData.hSmallIcon[cnt]);
-			g_MenuData.hSmallIcon[cnt] = NULL;
+		if (pNameList->hSmallIcon != NULL) {
+			::DestroyIcon(pNameList->hSmallIcon);
 		}
+		NameList *pNext = pNameList->pNext;
+		free(pNameList);
+		pNameList = pNext;
 	}
 }
 
@@ -1208,23 +1239,35 @@ BOOL InitListMenu(HWND hWnd)
 	wchar_t	szPath[MAX_PATH];
 	wchar_t	szEntryName[MAX_PATH];
 	HKEY	hKey;
-	DWORD	dwCnt;
 	DWORD	dwIndex = 0;
 	DWORD	dwSize = MAX_PATH;
 
 	DeleteListMenuIcons();
 
+	NameList **pBefore = &g_MenuData.pNameList;
 	if ((hKey = RegOpen(HKEY_CURRENT_USER, TTERM_KEY)) != INVALID_HANDLE_VALUE) {
-		while (RegEnumEx(hKey, dwIndex, szEntryName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
-			wcscpy(g_MenuData.szName[dwIndex++], szEntryName);
+		while (dwIndex < MAXJOBNUM && RegEnumEx(hKey, dwIndex, szEntryName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
+			size_t len = wcslen(szEntryName);
+			NameList *pNameList = (NameList *)malloc(sizeof(NameList) + (len + 1) * sizeof(wchar_t));
+			if (pNameList == NULL) {
+				RegClose(hKey);
+				RedrawMenu(hWnd);
+				return FALSE;
+			}
+			wcscpy_s(pNameList->szName, len + 1, szEntryName);
+			if (GetApplicationFilename(szEntryName, szPath) == TRUE) {
+				ExtractAssociatedIconEx(szPath, &(pNameList->hLargeIcon), &(pNameList->hSmallIcon));
+			} else {
+				pNameList->hLargeIcon = NULL;
+				pNameList->hSmallIcon = NULL;
+			}
+			pNameList->pNext = NULL;
+			*pBefore = pNameList;
+			pBefore = &(pNameList->pNext);
+			dwIndex++;
 			dwSize = MAX_PATH;
 		}
-		wcscpy(g_MenuData.szName[dwIndex], L"");
 		RegClose(hKey);
-
-		for (dwCnt = 0; dwCnt < dwIndex; dwCnt++)
-			if (GetApplicationFilename(g_MenuData.szName[dwCnt], szPath) == TRUE)
-				ExtractAssociatedIconEx(szPath, &g_MenuData.hLargeIcon[dwCnt], &g_MenuData.hSmallIcon[dwCnt]);
 	}
 
 	RedrawMenu(hWnd);
@@ -1277,8 +1320,9 @@ BOOL RedrawMenu(HWND /* hWnd unusedParam */)
 	itemNum			= desktopHeight / g_MenuData.dwMenuHeight;
 
 	dwCnt = 0;
-	while (wcslen(g_MenuData.szName[dwCnt]) != 0) {
-		if (GetApplicationFilename(g_MenuData.szName[dwCnt], szPath) == TRUE) {
+	NameList *pNameList = g_MenuData.pNameList;
+	while(pNameList) {
+		if (GetApplicationFilename(pNameList->szName, szPath) == TRUE) {
 			if (dwCnt % itemNum == 0 && dwCnt != 0)
 				::AppendMenuA(g_hListMenu, MF_OWNERDRAW | MF_MENUBARBREAK, ID_MENU_MIN + dwCnt,
 							  (LPCSTR)(UINT_PTR)dwCnt);
@@ -1288,6 +1332,7 @@ BOOL RedrawMenu(HWND /* hWnd unusedParam */)
 			dwValidCnt++;
 		}
 		dwCnt++;
+		pNameList = pNameList->pNext;
 	}
 	if (dwValidCnt == 0) {
 		UTIL_get_lang_msgW("MENU_NOTRAY", uimsg, _countof(uimsg), STR_NOENTRY, UILanguageFileW);
@@ -2230,23 +2275,26 @@ INT_PTR CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			::SetBkColor(lpdis->hDC, crBkgnd);
 		}
 		::GetTextMetrics(lpdis->hDC, &textMetric);
-		::ExtTextOutW(lpdis->hDC,
-					lpdis->rcItem.left + LISTBOX_WIDTH,
-					lpdis->rcItem.top + (ICONSIZE_SMALL - textMetric.tmHeight) / 2,
-					ETO_OPAQUE,
-					&lpdis->rcItem,
-					g_MenuData.szName[lpdis->itemData],
-					(UINT)wcslen(g_MenuData.szName[lpdis->itemData]),
-					NULL);
-		::DrawIconEx(lpdis->hDC,
-					lpdis->rcItem.left + (LISTBOX_WIDTH - ICONSIZE_SMALL) / 2,
-					lpdis->rcItem.top + (LISTBOX_HEIGHT - ICONSIZE_SMALL) / 2,
-					g_MenuData.hSmallIcon[lpdis->itemData],
-					ICONSIZE_SMALL,
-					ICONSIZE_SMALL,
-					0,
-					NULL,
-					DI_NORMAL);
+		NameList *pNameList = getNthNameList(lpdis->itemData);
+		if (pNameList) {
+			::ExtTextOutW(lpdis->hDC,
+						lpdis->rcItem.left + LISTBOX_WIDTH,
+						lpdis->rcItem.top + (ICONSIZE_SMALL - textMetric.tmHeight) / 2,
+						ETO_OPAQUE,
+						&lpdis->rcItem,
+						pNameList->szName,
+						(UINT)wcslen(pNameList->szName),
+						NULL);
+			::DrawIconEx(lpdis->hDC,
+						lpdis->rcItem.left + (LISTBOX_WIDTH - ICONSIZE_SMALL) / 2,
+						lpdis->rcItem.top + (LISTBOX_HEIGHT - ICONSIZE_SMALL) / 2,
+						pNameList->hSmallIcon,
+						ICONSIZE_SMALL,
+						ICONSIZE_SMALL,
+						0,
+						NULL,
+						DI_NORMAL);
+		}
 		return TRUE;
 	}
 
@@ -2525,6 +2573,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	LPDRAWITEMSTRUCT	lpdis;
 	LPMEASUREITEMSTRUCT	lpmis;
 	static UINT			WM_TASKBAR_RESTART;
+	NameList 			*pNameList;
 
 	g_hWnd	= hWnd;
 
@@ -2589,7 +2638,8 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		hDC			= ::GetWindowDC(hWndItem);
 		if (g_MenuData.hFont != NULL)
 			::SelectObject(hDC, (HGDIOBJ) g_MenuData.hFont);
-		::GetTextExtentPoint32W(hDC, g_MenuData.szName[lpmis->itemData], (int)wcslen(g_MenuData.szName[lpmis->itemData]), &size);
+		pNameList = getNthNameList(lpmis->itemData);
+		::GetTextExtentPoint32W(hDC, pNameList->szName, (int)wcslen(pNameList->szName), &size);
 		if (g_MenuData.dwIconMode == MODE_SMALLICON) {
 			lpmis->itemWidth	= ICONSPACE_SMALL + size.cx;
 			lpmis->itemHeight	= g_MenuData.dwMenuHeight;
@@ -2620,23 +2670,26 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			dwIconSpace	= ICONSPACE_SMALL;
 		}
 		::GetTextMetrics(lpdis->hDC, &textMetric);
-		::ExtTextOutW(lpdis->hDC,
-					lpdis->rcItem.left + dwIconSpace,
-					lpdis->rcItem.top + (g_MenuData.dwMenuHeight - textMetric.tmHeight) / 2,
-					ETO_OPAQUE,
-					&lpdis->rcItem,
-					g_MenuData.szName[lpdis->itemData],
-					(UINT)wcslen(g_MenuData.szName[lpdis->itemData]),
-					NULL);
-		::DrawIconEx(lpdis->hDC,
-					lpdis->rcItem.left + (dwIconSpace - dwIconSize) / 2,
-					lpdis->rcItem.top + (g_MenuData.dwMenuHeight - dwIconSize) / 2,
-					(g_MenuData.dwIconMode == MODE_LARGEICON) ? g_MenuData.hLargeIcon[lpdis->itemData] : g_MenuData.hSmallIcon[lpdis->itemData],
-					dwIconSize,
-					dwIconSize,
-					0,
-					NULL,
-					DI_NORMAL);
+		pNameList = getNthNameList(lpdis->itemData);
+		if (pNameList) {
+			::ExtTextOutW(lpdis->hDC,
+						lpdis->rcItem.left + dwIconSpace,
+						lpdis->rcItem.top + (g_MenuData.dwMenuHeight - textMetric.tmHeight) / 2,
+						ETO_OPAQUE,
+						&lpdis->rcItem,
+						pNameList->szName,
+						(UINT)wcslen(pNameList->szName),
+						NULL);
+			::DrawIconEx(lpdis->hDC,
+						lpdis->rcItem.left + (dwIconSpace - dwIconSize) / 2,
+						lpdis->rcItem.top + (g_MenuData.dwMenuHeight - dwIconSize) / 2,
+						(g_MenuData.dwIconMode == MODE_LARGEICON) ? pNameList->hLargeIcon : pNameList->hSmallIcon,
+						dwIconSize,
+						dwIconSize,
+						0,
+						NULL,
+						DI_NORMAL);
+		}
 		return TRUE;
 	}
 
