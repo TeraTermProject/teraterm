@@ -79,7 +79,11 @@ MenuData	g_MenuData;			// TeraTerm Menuの表示設定等の構造体
 wchar_t		*SetupFNameW;		// TERATERM.INI
 wchar_t		*UILanguageFileW;
 
-static char g_szLockBox[MAX_PATH];	// パスワード暗号化用パスワード(難読化済)
+// パスワード暗号化用パスワード
+//   CryptProtectMemory() で暗号化するため、サイズは ENCRYPT2_PWD_MAX_LEN(161バイト) 以上で、
+//   CRYPTPROTECTMEMORY_BLOCK_SIZE(16バイト) の倍数でなければならない。(実際に使用するのは ENCRYPT2_PWD_MAX_LEN まで)
+#define CRYPTPROTECTMEMORYLEN 176
+static char g_szLockBox[CRYPTPROTECTMEMORYLEN];
 
 #if (defined(__MINGW32__) && (__MINGW64_VERSION_MAJOR < 13)) || (defined(_MSC_VER) && (_MSC_VER == 1400))
 // MinGW or VS2005(VC8.0)
@@ -1518,8 +1522,15 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 			return FALSE;
 		}
 		EncodePassword((const char *)g_szLockBox, (char *)cEncodeLockBox);
+		memcpy(cEncodeLockBox, g_szLockBox, sizeof(g_szLockBox));
+		CryptUnprotectMemory(cEncodeLockBox, sizeof(g_szLockBox), CRYPTPROTECTMEMORY_SAME_PROCESS);
 		Encrypt2EncDec((char *)cEncodePassword, cEncodeLockBox, &profile, 1);
+		SecureZeroMemory(cEncodePassword, sizeof(cEncodePassword));
+		SecureZeroMemory(cEncodeLockBox, sizeof(cEncodeLockBox));
 		memcpy(g_JobInfo.szPassword, &profile, ENCRYPT2_PROFILE_LEN);
+		SecureZeroMemory(&profile, sizeof(profile));
+	} else {
+		SecureZeroMemory(cEncodePassword, sizeof(cEncodePassword));
 	}
 
 	if (::GetDlgItemTextW(hWnd, EDIT_MACRO, g_JobInfo.szMacroFile, MAX_PATH) == 0 && g_JobInfo.dwMode == MODE_MACRO) {
@@ -2315,17 +2326,19 @@ INT_PTR CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 BOOL DecryptPassword(const char *szEncryptPassword, char *szDecryptPassword, HWND hWnd)
 {
 	LockBoxDlgPrivateData pData;
-	char szEncryptKey[MAX_PATH];
+	char szEncryptKey[CRYPTPROTECTMEMORYLEN];
 	BOOL ret;
 
 	ret = FALSE;
 	if (g_szLockBox[0] != 0) {
-		EncodePassword((const char *)g_szLockBox, szEncryptKey);
+		memcpy(szEncryptKey, g_szLockBox, CRYPTPROTECTMEMORYLEN);
+		CryptUnprotectMemory(szEncryptKey, CRYPTPROTECTMEMORYLEN, CRYPTPROTECTMEMORY_SAME_PROCESS);
 		if (Encrypt2EncDec(szDecryptPassword, (const unsigned char *)szEncryptKey, (Encrypt2ProfileP)szEncryptPassword, 0) == 1) {
 			ret = TRUE;
 		} else {
 			pData.nMessageFlag = 1;
 		}
+		SecureZeroMemory(szEncryptKey, sizeof(szEncryptKey));
 	} else {
 		pData.nMessageFlag = 0;
 	}
@@ -2362,7 +2375,7 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 {
 	wchar_t uimsg[MAX_UIMSG];
 	WORD cchEncryptKey;
-	char szEncodeEncryptKey[MAX_PATH];
+	char szEncodeEncryptKey[CRYPTPROTECTMEMORYLEN] = {};
 	LockBoxDlgPrivateData *pData;
 	static int error;
 	static const DlgTextInfo text_info[] = {
@@ -2383,8 +2396,10 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)pData);
 
 		if (g_szLockBox[0] != 0) {
-			EncodePassword((const char *)g_szLockBox, szEncodeEncryptKey);
+			memcpy(szEncodeEncryptKey, g_szLockBox, CRYPTPROTECTMEMORYLEN);
+			CryptUnprotectMemory(szEncodeEncryptKey, CRYPTPROTECTMEMORYLEN, CRYPTPROTECTMEMORY_SAME_PROCESS);
 			::SetDlgItemTextA(hWnd, IDC_LOCKBOX_EDIT, (LPCSTR)szEncodeEncryptKey);
+			SecureZeroMemory(szEncodeEncryptKey, sizeof(szEncodeEncryptKey));
 		} else {
 			::SetDlgItemTextA(hWnd, IDC_LOCKBOX_EDIT, "");
 		}
@@ -2432,10 +2447,18 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 								   L"The password is not entered.", UILanguageFileW);
 				::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
 			} else {
-				*(WORD *)szEncodeEncryptKey = (WORD)ENCRYPT2_PWD_MAX_LEN;
-				SendDlgItemMessage(hWnd, IDC_LOCKBOX_EDIT, EM_GETLINE, (WPARAM)0, (LPARAM)szEncodeEncryptKey);
-				szEncodeEncryptKey[cchEncryptKey] = 0;
-				EncodePassword((const char *)szEncodeEncryptKey, g_szLockBox);
+				*(WORD *)szEncodeEncryptKey = ENCRYPT2_PWD_MAX_LEN;
+				LRESULT read = SendDlgItemMessage(hWnd, IDC_LOCKBOX_EDIT, EM_GETLINE, (WPARAM)0, (LPARAM)szEncodeEncryptKey);
+				if (read > 0 && read <= ENCRYPT2_PWD_MAX_LEN) {
+					szEncodeEncryptKey[read] = 0;
+				} else {
+					SecureZeroMemory(szEncodeEncryptKey, sizeof(szEncodeEncryptKey));
+					assert(FALSE);
+				}
+				// 復号可否に関わらず、g_szLockBox を上書きする
+				SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
+				memcpy(g_szLockBox, szEncodeEncryptKey, cchEncryptKey + 1);
+				CryptProtectMemory(g_szLockBox, CRYPTPROTECTMEMORYLEN, CRYPTPROTECTMEMORY_SAME_PROCESS);
 				pData = (LockBoxDlgPrivateData *)GetWindowLongPtr(hWnd, DWLP_USER);
 				if (pData->bLockBox == TRUE) {
 					::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, L"- - -");
