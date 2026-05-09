@@ -933,9 +933,9 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 
 /**
  *	パスワード取得
- *	@retval	パスワード(wchar_t文字列) 不要になったらfree()すること
+ *	@retval	パスワード(wchar_t文字列) 不要になったら SecureZeroMemory() してから free() すること
  */
-static wchar_t *GetPassword(const JobInfo *jobInfo, HWND hWnd)
+static wchar_t *GetPassword(JobInfo *jobInfo, HWND hWnd)
 {
 	wchar_t *szPasswordW;
 	char szRawPassword[MAX_PATH];
@@ -951,7 +951,9 @@ static wchar_t *GetPassword(const JobInfo *jobInfo, HWND hWnd)
 			szPasswordW = ToWcharA(szRawPassword);
 		}
 	} else {
+		CryptUnprotectMemory(jobInfo->szPassword, sizeof(jobInfo->szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
 		EncodePassword((const char *)jobInfo->szPassword, szRawPassword);
+		CryptProtectMemory(jobInfo->szPassword, sizeof(jobInfo->szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
 		szPasswordW = ToWcharA(szRawPassword);
 	}
 	SecureZeroMemory(szRawPassword, sizeof(szRawPassword));
@@ -1323,8 +1325,11 @@ BOOL RegSaveLoginHostInformation(JobInfo *jobInfo)
 	RegSetStr(hKey, KEY_USERNAME, jobInfo->szUsername);
 	RegSetDword(hKey, KEY_PASSWDFLAG, (DWORD) jobInfo->bPassword);
 	RegSetDword(hKey, KEY_LOCKBOXFLAG, (DWORD) jobInfo->bLockBox);
+
 	if (jobInfo->bLockBox == FALSE) {
-		RegSetBinary(hKey, KEY_PASSWORD, jobInfo->szPassword, (DWORD)(strlen(jobInfo->szPassword) + 1));
+		CryptUnprotectMemory(jobInfo->szPassword, sizeof(jobInfo->szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
+		RegSetBinary(hKey, KEY_PASSWORD, jobInfo->szPassword, (DWORD)(strlen(jobInfo->szPassword)));
+		CryptProtectMemory(jobInfo->szPassword, sizeof(jobInfo->szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
 	} else {
 		RegSetBinary(hKey, KEY_PASSWORD, jobInfo->szPassword, ENCRYPT2_PROFILE_LEN);
 	}
@@ -1368,7 +1373,7 @@ BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 {
 	HKEY	hKey;
 	wchar_t	szSubKey[MAX_PATH];
-	DWORD	dwSize = MAX_PATH;
+	DWORD	dwSize;
 	JobInfo jobInfo;
 	DWORD dword_tmp;
 
@@ -1387,8 +1392,16 @@ BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 	RegGetBOOL(hKey, KEY_USERFLAG, jobInfo.bUsername);
 	RegGetStr(hKey, KEY_USERNAME, jobInfo.szUsername, MAX_PATH);
 	RegGetBOOL(hKey, KEY_PASSWDFLAG, jobInfo.bPassword);
-	RegGetBinary(hKey, KEY_PASSWORD, jobInfo.szPassword, &dwSize);
 	RegGetBOOL(hKey, KEY_LOCKBOXFLAG, jobInfo.bLockBox);
+
+	SecureZeroMemory(jobInfo.szPassword, sizeof(jobInfo.szPassword));
+	dwSize = MAX_PATH; // jobInfo.szPassword は 272バイトだが、使用可能なパスワード長は MAX_PATH(260バイト)
+	if (! RegGetBinary(hKey, KEY_PASSWORD, jobInfo.szPassword, &dwSize)) {
+		SecureZeroMemory(jobInfo.szPassword, sizeof(jobInfo.szPassword));
+	}
+	if (jobInfo.bLockBox == FALSE) {
+		CryptProtectMemory(jobInfo.szPassword, sizeof(jobInfo.szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
+	}
 
 	RegGetStr(hKey, KEY_TERATERM, jobInfo.szTeraTerm, MAX_PATH);
 	RegGetStr(hKey, KEY_INITFILE, jobInfo.szInitFile, MAX_PATH);
@@ -1495,6 +1508,8 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	::GetDlgItemTextA(hWnd, EDIT_PASSWORD, (LPSTR)cEncodePassword, MAX_PATH);
 	if (g_JobInfo.bLockBox == FALSE) {
 		EncodePassword((char *)cEncodePassword, g_JobInfo.szPassword);
+		CryptProtectMemory(g_JobInfo.szPassword, sizeof(g_JobInfo.szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
+		SecureZeroMemory(cEncodePassword, sizeof(cEncodePassword));
 	} else if (g_JobInfo.dwMode == MODE_AUTOLOGIN) {
 		if (g_szLockBox[0] == 0) {
 			UTIL_get_lang_msgW("MSG_ERROR_NOLOCKBOX", uimsg, _countof(uimsg),
@@ -1658,7 +1673,9 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 			::SetDlgItemTextA(hWnd, EDIT_PASSWORD, "");
 		}
 	} else {
+		CryptUnprotectMemory(g_JobInfo.szPassword, sizeof(g_JobInfo.szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
 		EncodePassword(g_JobInfo.szPassword, szEncodePassword);
+		CryptProtectMemory(g_JobInfo.szPassword, sizeof(g_JobInfo.szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
 		::SetDlgItemTextA(hWnd, EDIT_PASSWORD, szEncodePassword);
 	}
 

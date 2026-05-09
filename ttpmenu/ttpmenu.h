@@ -98,7 +98,8 @@ struct JobInfo {
 	BOOL	bUsername;					// ユーザ名を入力するかどうかのフラグ
 	wchar_t	szUsername[MAX_PATH];		// ユーザ名
 	BOOL	bPassword;					// パスワードを入力するかどうかのフラグ
-	char	szPassword[MAX_PATH];		// パスワード
+	char	szPassword[272];			// パスワードは CryptProtectMemory() で暗号化するため、サイズは MAX_PATH(260バイト) 以上で、
+										// CRYPTPROTECTMEMORY_BLOCK_SIZE(16バイト) の倍数でなければならない。(実際に使用するのは MAX_PATH まで)
 	BOOL	bLockBox;					// パスワードの暗号化/復号するかどうかのフラグ
 
 	// マクロ実行用設定
