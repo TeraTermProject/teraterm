@@ -2526,6 +2526,8 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	switch(uMsg) {
 	case WM_CREATE:
+		VirtualLock(g_szLockBox, sizeof(g_szLockBox));
+		VirtualLock(&g_JobInfo, sizeof(g_JobInfo));
 		PostMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)g_hIcon);
 		PostMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)g_hIconSmall);
 		SetDlgPos(hWnd, POSITION_CENTER);
