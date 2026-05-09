@@ -1908,6 +1908,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 	switch(LOWORD(wParam)) {
 	case IDOK:
 	case IDCANCEL:
+		::SetDlgItemTextA(hWnd, EDIT_PASSWORD, ""); // エディットコントロールのクリア
 		g_hWndMenu = NULL;
 		::EndDialog(hWnd, TRUE);
 		return TRUE;
@@ -2530,16 +2531,19 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 						InvalidateRect(hWnd, NULL, TRUE);
 						UpdateWindow(hWnd);
 						Sleep(900);
+						::SetDlgItemTextA(hWnd, IDC_LOCKBOX_EDIT, ""); // エディットコントロールのクリア
 						::EndDialog(hWnd, TRUE);
 					}
 				} else {
 					SecureZeroMemory(szEncodeEncryptKey, sizeof(szEncodeEncryptKey));
+					::SetDlgItemTextA(hWnd, IDC_LOCKBOX_EDIT, ""); // エディットコントロールのクリア
 					::EndDialog(hWnd, TRUE);
 				}
 			}
 			InvalidateRect(hWnd, NULL, TRUE);
 			return TRUE;
 		case IDCANCEL:
+			::SetDlgItemTextA(hWnd, IDC_LOCKBOX_EDIT, ""); // エディットコントロールのクリア
 			::EndDialog(hWnd, FALSE);
 			return TRUE;
 		}
