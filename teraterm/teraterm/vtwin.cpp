@@ -650,6 +650,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	vtwin_work.monitor_DPI = 0;
 	vtwin_work.help_id = 0;
 	isSizing = FALSE;
+	isClosing = FALSE;
 
 	// UnicodeDebugParam
 	{
@@ -1742,6 +1743,8 @@ LRESULT CVTWindow::OnNonConfirmClose(WPARAM wParam, LPARAM lParam)
 
 void CVTWindow::OnDestroy()
 {
+	isClosing = TRUE;
+
 	MakeOutputStringDestroy((OutputCharState *)(cv.StateEcho));
 	cv.StateEcho = NULL;
 	MakeOutputStringDestroy((OutputCharState *)(cv.StateSend));
@@ -5487,6 +5490,9 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_COMMAND:
 	{
+		if (isClosing) {
+			break;
+		}
 		const WORD wID = GET_WM_COMMAND_ID(wp, lp);
 		switch (wID) {
 		case ID_FILE_NEWCONNECTION: OnFileNewConnection(); break;
