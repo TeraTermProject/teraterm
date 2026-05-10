@@ -449,10 +449,11 @@ BOOL RegGetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD *dwValue)
 
 /* ==========================================================================
 	Function Name	: (BOOL) RegSetBinary()
-	Outline			: レジストリキーの値から BINARYを書き込む
+	Outline			: レジストリキーの値にBINARYデータを16進数で書き込む
 	Arguments		: HKEY		hKey			(in)	値を設定するキーのハンドル
 					: const wchar_t *lpszValueName	(in)	設定する値
 					: void		*buf			(out)	値データ
+					: DWORD		dwSize			(in)	値データのバイト数(null含まず)
 	Return Value	: 成功	TRUE
 					: 失敗	FALSE
 	Reference		: 
@@ -463,21 +464,32 @@ BOOL RegGetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD *dwValue)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL RegSetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, DWORD dwSize)
 {
-	if(bUseINI){
-		wchar_t t[1024] = {0};
-		LPBYTE s = (LPBYTE)buf;
-		DWORD i;
-		for(i=0; i<dwSize; i++){
-			wchar_t c[4];
-			swprintf_s(c, L"%02X ", s[i]);
-			wcscat_s(t, c);
+	if (bUseINI) {
+		size_t needed = (size_t)dwSize * 3 + 1;
+		wchar_t *t = (wchar_t *)malloc(needed * sizeof(wchar_t));
+		if (t == NULL) {
+			return FALSE;
 		}
-		if (i > 0) {
-			t[i*3-1] = 0;
+		wchar_t *p = t;
+		size_t remain = needed;
+		for (DWORD i = 0; i < dwSize; i++) {
+			int written = swprintf_s(p, remain, L"%02X ", ((BYTE*)buf)[i]);
+			if (written < 0) {
+				free(t);
+				return FALSE;
+			}
+			p += written;
+			remain -= written;
 		}
-		BOOL ret =  WritePrivateProfileStringW(szSectionName, lpszValueName, t, getModuleName());
+		if (dwSize > 0) {
+			*(p - 1) = L'\0';
+		} else {
+			*p = L'\0';
+		}
+		BOOL ret = WritePrivateProfileStringW(szSectionName, lpszValueName, t, getModuleName());
+		free(t);
 		return ret;
-	}else{
+	} else {
 		long	lError;
 		DWORD	dwWriteSize;
 

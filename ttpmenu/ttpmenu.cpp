@@ -180,7 +180,7 @@ BOOL ExecStartup(HWND hWnd)
 }
 
 /* ==========================================================================
-	Function Name	: (BOOL) ErrorMessage()
+	Function Name	: (void) ErrorMessage()
 	Outline			: 指定メッセージ＋システムのエラーメッセージを表示する。
 	Arguments		: HWND			hWnd		(In) 親ウインドウのハンドル
 					: const wchar_t *msg,...	(In) 任意メッセージ文字列
@@ -191,26 +191,28 @@ BOOL ExecStartup(HWND hWnd)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-static BOOL ErrorMessage(HWND hWnd, DWORD dwErr, const wchar_t *msg,...)
+static void ErrorMessage(HWND hWnd, DWORD dwErr, const wchar_t *msg,...)
 {
-	wchar_t	szBuffer[MAX_PATH] = L"";
+	wchar_t	szBuffer[MAX_PATH * 2] = L"";
 
 	va_list ap;
 	va_start(ap, msg);
-	_vswprintf(szBuffer + ::wcslen(szBuffer), msg, ap);
+	_vsnwprintf_s(szBuffer, _countof(szBuffer), _TRUNCATE, msg, ap);
 	va_end(ap);
 
-	::FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM,
-					NULL,
-					dwErr,
-					LANG_NEUTRAL,
-					szBuffer + wcslen(szBuffer),
-					MAX_PATH,
-					NULL);
+	size_t used = wcslen(szBuffer);
+	size_t remaining = _countof(szBuffer) - used;
+	if (remaining > 1) {
+		::FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+						 NULL,
+						 dwErr,
+						 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+						 szBuffer + used,
+						 (DWORD)remaining,
+						 NULL);
+	}
 
 	MessageBoxW(hWnd, szBuffer, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
-
-	return TRUE;
 }
 
 /* ==========================================================================
