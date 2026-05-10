@@ -107,7 +107,7 @@ struct JobInfo {
 
 	// 詳細設定
 	wchar_t	szTeraTerm[MAX_PATH];		// 起動アプリ（TeraTerm）のファイル名
-	wchar_t	szInitFile[MAX_PATH];		// TeraTermの設定ファイル（起動のみ意外）
+	wchar_t	szInitFile[MAX_PATH];		// TeraTermの設定ファイル（起動のみ以外）
 	wchar_t	szOption[MAX_PATH];			// アプリケーションのオプション/引数
 	wchar_t	szLog[MAX_PATH];			// ログファイル名（自動ログインのみ）
 	wchar_t	szLoginPrompt[MAX_PATH];	// ログインプロンプト（自動ログインのみ）
@@ -155,13 +155,11 @@ typedef struct {
 // 関数一覧
 void	PopupMenu(HWND hWnd);
 void	PopupListMenu(HWND hWnd);
-BOOL	AddTooltip(int idControl);
+BOOL	AddTooltip(HWND hWnd, int idControl, const wchar_t *tip);
 BOOL	ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName = NULL);
-BOOL	CreateTooltip(HWND hWnd);
+BOOL	CreateTooltip(HWND /* hWnd unusedParam */);
 BOOL	DecryptPassword(const char *szEncryptPassword, char *szDecryptPassword, HWND hWnd);
 BOOL	DeleteLoginHostInformation(HWND hWnd);
-BOOL	ErrorMessage(HWND hWnd, LPTSTR msg,...);
-BOOL	ExtractAssociatedIconEx(char *szPath, HICON *hLargeIcon, HICON *hSmallIcon);
 BOOL	ExecStartup(HWND hWnd);
 BOOL	InitConfigDlg(HWND hWnd);
 BOOL	InitEtcDlg(HWND hWnd);
@@ -177,7 +175,7 @@ BOOL	ManageWMCommand_Menu(HWND hWnd, WPARAM wParam);
 BOOL	ManageWMCommand_Version(HWND hWnd, WPARAM wParam);
 BOOL	ManageWMNotify_Config(LPARAM lParam);
 BOOL	RedrawMenu(HWND hWnd);
-BOOL	RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *jobInfo);
+BOOL	RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info);
 BOOL	RegSaveLoginHostInformation(JobInfo *jobInfo);
 BOOL	SaveConfig(void);
 BOOL	SaveEtcInformation(HWND hWnd);
@@ -186,9 +184,9 @@ BOOL	SetDefaultEtcDlg(HWND hWnd);
 BOOL	SetMenuFont(HWND hWnd);
 BOOL	SetTaskTray(HWND hWnd, DWORD dwMessage);
 INT_PTR	CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-INT_PTR	CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR	CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM /* lParam unusedParam */);
 INT_PTR	CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-INT_PTR	CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR	CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM /* lParam unusedParam */);
 LRESULT	CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam);
 LRESULT	CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

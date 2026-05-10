@@ -85,6 +85,7 @@ wchar_t		*UILanguageFileW;
 #define CRYPTPROTECTMEMORYLEN 176
 static char g_szLockBox[CRYPTPROTECTMEMORYLEN];
 
+/* not used
 #if (defined(__MINGW32__) && (__MINGW64_VERSION_MAJOR < 13)) || (defined(_MSC_VER) && (_MSC_VER == 1400))
 // MinGW or VS2005(VC8.0)
 static wchar_t* _wcstok(wchar_t *strToken, const wchar_t *strDelimit)
@@ -92,6 +93,7 @@ static wchar_t* _wcstok(wchar_t *strToken, const wchar_t *strDelimit)
 	return wcstok(strToken, strDelimit);
 }
 #endif
+*/
 
 /**
  *	フルパス化する
@@ -223,7 +225,7 @@ static void ErrorMessage(HWND hWnd, DWORD dwErr, const wchar_t *msg,...)
 	Return Value	: 成功 TRUE
 	Reference		: 
 	Renewal			: 
-	Notes			: 
+	Notes			: ダイアログの多重起動抑止(static int open)はシングルスレッド用
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
@@ -1005,9 +1007,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 {
 	wchar_t	szName[MAX_PATH];
 	wchar_t	szDirectory[MAX_PATH];
-	wchar_t	szHostName[MAX_PATH];
 	wchar_t	*szTemp;
-	wchar_t	*pHostName;
 	JobInfo	jobInfo;
 
 	DWORD	dwErr = NO_ERROR;
@@ -1038,10 +1038,6 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	if (wcslen(jobInfo.szTeraTerm) == 0) {
 		GetTeraTermPath(jobInfo.szTeraTerm, MAX_PATH);
 	}
-
-	wcscpy(szHostName, jobInfo.szHostName);
-	if ((pHostName = _wcstok(szHostName, L" ([{'\"|*")) != NULL)
-		pHostName = szHostName;
 
 	wchar_t	*szArgment = _wcsdup(L"");
 

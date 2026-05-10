@@ -303,6 +303,7 @@ LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 			            (LPARAM) (char *) chars);
 			return 0;
 		}
+		break;
 	}
 
 	return CallWindowProc((WNDPROC) GetWindowLongPtr(control, GWLP_USERDATA),
