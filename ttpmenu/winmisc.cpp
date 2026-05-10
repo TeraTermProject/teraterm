@@ -229,17 +229,17 @@ BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *f
 	return	TRUE;
 }
 
-wchar_t* lwcsstri(wchar_t *s1, const wchar_t *s2)
+const wchar_t* lwcsstri(const wchar_t *s1, const wchar_t *s2)
 {
 	size_t	dwLen1 = wcslen(s1);
 	size_t	dwLen2 = wcslen(s2);
 
-	for (size_t dwCnt = 0; dwCnt <= dwLen1; dwCnt++) {
+	for (size_t dwCnt = 0; dwCnt + dwLen2 <= dwLen1; dwCnt++) {
 		size_t dwCnt2;
-		for (dwCnt2 = 0; dwCnt2 <= dwLen2; dwCnt2++)
+		for (dwCnt2 = 0; dwCnt2 < dwLen2; dwCnt2++)
 			if (towlower(s1[dwCnt + dwCnt2]) != towlower(s2[dwCnt2]))
 				break;
-		if (dwCnt2 > dwLen2)
+		if (dwCnt2 == dwLen2)
 			return s1 + dwCnt;
 	}
 
