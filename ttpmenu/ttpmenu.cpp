@@ -2622,6 +2622,13 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		InitListMenu(hWnd);
 		return TRUE;
 	case WM_ENDSESSION:
+		if (wParam == FALSE) {
+			return TRUE;  // キャンセルされた場合は何もしない
+		}
+		SecureZeroMemory(&g_JobInfo, sizeof(g_JobInfo));
+		SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
+		SaveConfig();
+		return TRUE;
 	case WM_DESTROY:
 		SecureZeroMemory(&g_JobInfo, sizeof(g_JobInfo));
 		SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
