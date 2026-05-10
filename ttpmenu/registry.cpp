@@ -581,24 +581,26 @@ BOOL RegGetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, LPDWORD lp
 
 LONG RegEnumEx(HKEY hKey, DWORD dwIndex, wchar_t *lpName, LPDWORD lpcName, LPDWORD lpReserved, wchar_t *lpClass, LPDWORD lpcClass, PFILETIME lpftLastWriteTime)
 {
-	static wchar_t *ptr = szSectionNames;
 	if(bUseINI){
-		if(*szSectionNames == 0){
+		if (dwIndex == 0) {
+			szSectionNames[0] = L'\0';
 			GetPrivateProfileSectionNamesW(szSectionNames, _countof(szSectionNames), getModuleName());
-			ptr = szSectionNames;
 		}
-		if(wcscmp(ptr, L"TTermMenu") == 0){
-			//skip
-			while(*ptr++);
-//			ptr++;
+		DWORD idx = 0;
+		wchar_t *ptr = szSectionNames;
+		while (*ptr) {
+			if (wcscmp(ptr, L"TTermMenu") == 0) {
+				while (*ptr++);
+				continue;
+			}
+			if (idx == dwIndex) {
+				wcscpy_s(lpName, *lpcName, ptr);
+				return ERROR_SUCCESS;
+			}
+			idx++;
+			while (*ptr++);
 		}
-		if(*ptr == 0){
-			return ERROR_NO_MORE_ITEMS;
-		}
-		wcscpy(lpName, ptr);
-		while(*ptr++);
-//		ptr++;
-		return ERROR_SUCCESS;
+		return ERROR_NO_MORE_ITEMS;
 	}else{
 		return ::RegEnumKeyExW(hKey, dwIndex, lpName, lpcName, lpReserved, lpClass, lpcClass, lpftLastWriteTime);
 	}
