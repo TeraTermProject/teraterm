@@ -321,13 +321,13 @@ static BOOL ExtractAssociatedIconEx(const wchar_t *szPath, HICON *hLargeIcon, HI
    ======1=========2=========3=========4=========5=========6=========7======= */
 static BOOL GetApplicationFilename(const wchar_t *szName, wchar_t *szPath)
 {
-	wchar_t	szSubKey[MAX_PATH];
+	wchar_t	szSubKey[MAX_PATH * 2];
 
 	BOOL	bRet;
 	BOOL	bTtssh = FALSE;
 	HKEY	hKey;
 
-	swprintf_s(szSubKey, L"%s\\%s", TTERM_KEY, szName);
+	_snwprintf_s(szSubKey, _countof(szSubKey), _TRUNCATE, L"%s\\%s", TTERM_KEY, szName);
 	if ((hKey = RegOpen(HKEY_CURRENT_USER, szSubKey)) == INVALID_HANDLE_VALUE)
 		return FALSE;
 
@@ -1364,9 +1364,9 @@ BOOL RedrawMenu(HWND hWnd)
 BOOL RegSaveLoginHostInformation(JobInfo *jobInfo)
 {
 	HKEY	hKey;
-	wchar_t	szSubKey[MAX_PATH];
+	wchar_t	szSubKey[MAX_PATH * 2];
 
-	swprintf_s(szSubKey, L"%s\\%s", TTERM_KEY, jobInfo->szName);
+	_snwprintf_s(szSubKey, _countof(szSubKey), _TRUNCATE, L"%s\\%s", TTERM_KEY, jobInfo->szName);
 	if ((hKey = RegCreate(HKEY_CURRENT_USER, szSubKey)) == INVALID_HANDLE_VALUE)
 		return FALSE;
 
@@ -1424,14 +1424,14 @@ BOOL RegSaveLoginHostInformation(JobInfo *jobInfo)
 BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 {
 	HKEY	hKey;
-	wchar_t	szSubKey[MAX_PATH];
+	wchar_t	szSubKey[MAX_PATH * 2];
 	DWORD	dwSize;
 	JobInfo jobInfo;
 	DWORD dword_tmp;
 
 	memset(&jobInfo, 0, sizeof(JobInfo));
 
-	swprintf_s(szSubKey, L"%s\\%s", TTERM_KEY, szName);
+	_snwprintf_s(szSubKey, _countof(szSubKey), _TRUNCATE, L"%s\\%s", TTERM_KEY, szName);
 	if ((hKey = RegOpen(HKEY_CURRENT_USER, szSubKey)) == INVALID_HANDLE_VALUE)
 		return FALSE;
 
@@ -1809,7 +1809,7 @@ BOOL DeleteLoginHostInformation(HWND hWnd)
 {
 	LRESULT	index;
 	wchar_t	szEntryName[MAX_PATH];
-	wchar_t	szSubKey[MAX_PATH];
+	wchar_t	szSubKey[MAX_PATH * 2];
 	wchar_t	uimsg[MAX_UIMSG];
 	DWORD	dwErr;
 
@@ -1827,7 +1827,7 @@ BOOL DeleteLoginHostInformation(HWND hWnd)
 		return FALSE;
 	}
 
-	swprintf_s(szSubKey, L"%s\\%s", TTERM_KEY, szEntryName);
+	_snwprintf_s(szSubKey, _countof(szSubKey), _TRUNCATE, L"%s\\%s", TTERM_KEY, szEntryName);
 	if (RegDelete(HKEY_CURRENT_USER, szSubKey) != ERROR_SUCCESS) {
 		dwErr = ::GetLastError();
 		UTIL_get_lang_msgW("MSG_ERROR_DELETEREG", uimsg, _countof(uimsg),
