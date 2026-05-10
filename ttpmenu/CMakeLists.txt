@@ -113,6 +113,7 @@ target_link_libraries(
   ${LIBRESSL_LIB}
   bcrypt
   ws2_32
+  Crypt32
   )
 
 install(

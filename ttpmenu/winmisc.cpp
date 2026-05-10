@@ -141,6 +141,11 @@ void EncodePassword(const char *cPassword, char *cEncodePassword)
 	DWORD	dwCnt;
 	DWORD	dwPasswordLength = ::lstrlenA(cPassword);
 
+	if (dwPasswordLength == 0 || dwPasswordLength >= MAX_PATH) {
+		cEncodePassword[0] = '\0';
+		return;
+	}
+
 	for (dwCnt = 0; dwCnt < dwPasswordLength; dwCnt++)
 		cEncodePassword[dwPasswordLength - 1 - dwCnt] = cPassword[dwCnt] ^ 0xff;
 
@@ -181,23 +186,24 @@ BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *f
 	::GetDlgItemTextW(hWnd, editCtl, szDirName, MAX_PATH);
 	if (szDirName[0] == 0) {
 		// エディットが空だった時デフォルトを使用する
-		wcscpy(szDirName, defaultDir);
+		wcscpy_s(szDirName, MAX_PATH, defaultDir);
 	}
 
 	// "folder" など '"' で囲まれているとき削除する
 	if (*szDirName == L'"')
 		szDirName++;
-	if (szDirName[wcslen(szDirName) - 1] == L'"')
-		szDirName[wcslen(szDirName) - 1] = L'\0';
+	size_t len = wcslen(szDirName);
+	if (len > 0 && szDirName[len - 1] == L'"')
+		szDirName[len - 1] = L'\0';
 
 	wchar_t *ptr = wcsrchr(szDirName, L'\\');
 	if (ptr == NULL) {
-		wcscpy(szFile, szDirName);
+		wcscpy_s(szFile, MAX_PATH, szDirName);
 		if (defaultDir != NULL && *szDirName == 0)
-			wcscpy(szDirName, defaultDir);
+			wcscpy_s(szDirName, MAX_PATH, defaultDir);
 	} else {
 		*ptr = 0;
-		wcscpy(szFile, ptr + 1);
+		wcscpy_s(szFile, MAX_PATH, ptr + 1);
 	}
 
 	TTOPENFILENAMEW	ofn = {};
@@ -223,17 +229,17 @@ BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *f
 	return	TRUE;
 }
 
-wchar_t* lwcsstri(wchar_t *s1, const wchar_t *s2)
+const wchar_t* lwcsstri(const wchar_t *s1, const wchar_t *s2)
 {
 	size_t	dwLen1 = wcslen(s1);
 	size_t	dwLen2 = wcslen(s2);
 
-	for (size_t dwCnt = 0; dwCnt <= dwLen1; dwCnt++) {
+	for (size_t dwCnt = 0; dwCnt + dwLen2 <= dwLen1; dwCnt++) {
 		size_t dwCnt2;
-		for (dwCnt2 = 0; dwCnt2 <= dwLen2; dwCnt2++)
+		for (dwCnt2 = 0; dwCnt2 < dwLen2; dwCnt2++)
 			if (towlower(s1[dwCnt + dwCnt2]) != towlower(s2[dwCnt2]))
 				break;
-		if (dwCnt2 > dwLen2)
+		if (dwCnt2 == dwLen2)
 			return s1 + dwCnt;
 	}
 
@@ -297,6 +303,7 @@ LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 			            (LPARAM) (char *) chars);
 			return 0;
 		}
+		break;
 	}
 
 	return CallWindowProc((WNDPROC) GetWindowLongPtr(control, GWLP_USERDATA),
@@ -410,17 +417,23 @@ int Encrypt2EncDec(char *szPassword, const unsigned char *szEncryptKey, Encrypt2
 				 Hash, &HashLen) == NULL ) {
 			goto end;
 		}
-		memcpy(szPassword, Lprofile.PassStr, ENCRYPT2_PWD_MAX_LEN);
 		if (CRYPTO_memcmp(Hash, Lprofile.EncHash, SHA512_DIGEST_LENGTH) == 0) {
+			memcpy(szPassword, Lprofile.PassStr, ENCRYPT2_PWD_MAX_LEN);
 			szPassword[ENCRYPT2_PWD_MAX_LEN] = 0;
 			ret = 1;	// 一致
 		} else {
-			szPassword[0] = 0;
+			SecureZeroMemory(szPassword, ENCRYPT2_PWD_MAX_LEN + 1);
 			ret = 0;	// 不一致
 		}
 	}
 
  end:
+	SecureZeroMemory(TmpKeyIV, sizeof(TmpKeyIV));
+	SecureZeroMemory(Key, sizeof(Key));
+	SecureZeroMemory(IV, sizeof(IV));
+	SecureZeroMemory(&Lprofile, sizeof(Lprofile));
+	SecureZeroMemory(Buf, sizeof(Buf));
+	SecureZeroMemory(Hash, sizeof(Hash));
 	if (Bio != NULL) {
 		BIO_free_all(Bio);
 	} else {

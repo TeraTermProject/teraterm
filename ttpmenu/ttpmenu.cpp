@@ -48,7 +48,6 @@
 #include	"win32helper.h"
 #include	"dlglib.h"
 #include	"asprintf.h"
-#include	"codeconv.h"
 
 #include	"ttdup.h"
 
@@ -79,8 +78,13 @@ MenuData	g_MenuData;			// TeraTerm Menuの表示設定等の構造体
 wchar_t		*SetupFNameW;		// TERATERM.INI
 wchar_t		*UILanguageFileW;
 
-static char g_szLockBox[MAX_PATH];	// パスワード暗号化用パスワード(難読化済)
+// パスワード暗号化用パスワード
+//   CryptProtectMemory() で暗号化するため、サイズは ENCRYPT2_PWD_MAX_LEN(161バイト) 以上で、
+//   CRYPTPROTECTMEMORY_BLOCK_SIZE(16バイト) の倍数でなければならない。(実際に使用するのは ENCRYPT2_PWD_MAX_LEN まで)
+#define CRYPTPROTECTMEMORYLEN 176
+static char g_szLockBox[CRYPTPROTECTMEMORYLEN];
 
+/* not used
 #if (defined(__MINGW32__) && (__MINGW64_VERSION_MAJOR < 13)) || (defined(_MSC_VER) && (_MSC_VER == 1400))
 // MinGW or VS2005(VC8.0)
 static wchar_t* _wcstok(wchar_t *strToken, const wchar_t *strDelimit)
@@ -88,6 +92,7 @@ static wchar_t* _wcstok(wchar_t *strToken, const wchar_t *strDelimit)
 	return wcstok(strToken, strDelimit);
 }
 #endif
+*/
 
 /**
  *	フルパス化する
@@ -142,7 +147,7 @@ static void GetTeraTermPath(wchar_t *path, size_t size)
 	wchar_t szTTermPath[MAX_PATH];
 
 	GetTeraTermDir(szTTermPath, MAX_PATH);
-	_snwprintf(path, size, L"%s\\%s", szTTermPath, TERATERM);
+	_snwprintf_s(path, size, _TRUNCATE, L"%s\\%s", szTTermPath, TERATERM);
 }
 
 /* ==========================================================================
@@ -159,29 +164,24 @@ static void GetTeraTermPath(wchar_t *path, size_t size)
 BOOL ExecStartup(HWND hWnd)
 {
 	wchar_t	szEntryName[MAX_PATH];
-	wchar_t	szJobName[MAXJOBNUM][MAX_PATH];
 	HKEY	hKey;
 	DWORD	dwIndex = 0;
 	DWORD	dwSize = MAX_PATH;
 
 	if ((hKey = RegOpen(HKEY_CURRENT_USER, TTERM_KEY)) != INVALID_HANDLE_VALUE) {
-		while (RegEnumEx(hKey, dwIndex, szEntryName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
-			wcscpy(szJobName[dwIndex++], szEntryName);
+		while (dwIndex < MAXJOBNUM && RegEnumEx(hKey, dwIndex, szEntryName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
+			ConnectHost(hWnd, 0, szEntryName);
+			dwIndex++;
 			dwSize = MAX_PATH;
 		}
-		wcscpy(szJobName[dwIndex], L"");
 		RegClose(hKey);
-
-		DWORD dwCnt;
-		for (dwCnt = 0; dwCnt < dwIndex; dwCnt++)
-			ConnectHost(hWnd, 0, szJobName[dwCnt]);
 	}
 
 	return TRUE;
 }
 
 /* ==========================================================================
-	Function Name	: (BOOL) ErrorMessage()
+	Function Name	: (void) ErrorMessage()
 	Outline			: 指定メッセージ＋システムのエラーメッセージを表示する。
 	Arguments		: HWND			hWnd		(In) 親ウインドウのハンドル
 					: const wchar_t *msg,...	(In) 任意メッセージ文字列
@@ -192,26 +192,28 @@ BOOL ExecStartup(HWND hWnd)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-static BOOL ErrorMessage(HWND hWnd, DWORD dwErr, const wchar_t *msg,...)
+static void ErrorMessage(HWND hWnd, DWORD dwErr, const wchar_t *msg,...)
 {
-	wchar_t	szBuffer[MAX_PATH] = L"";
+	wchar_t	szBuffer[MAX_PATH * 2] = L"";
 
 	va_list ap;
 	va_start(ap, msg);
-	_vswprintf(szBuffer + ::wcslen(szBuffer), msg, ap);
+	_vsnwprintf_s(szBuffer, _countof(szBuffer), _TRUNCATE, msg, ap);
 	va_end(ap);
 
-	::FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM,
-					NULL,
-					dwErr,
-					LANG_NEUTRAL,
-					szBuffer + wcslen(szBuffer),
-					MAX_PATH,
-					NULL);
+	size_t used = wcslen(szBuffer);
+	size_t remaining = _countof(szBuffer) - used;
+	if (remaining > 1) {
+		::FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+						 NULL,
+						 dwErr,
+						 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+						 szBuffer + used,
+						 (DWORD)remaining,
+						 NULL);
+	}
 
 	MessageBoxW(hWnd, szBuffer, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
-
-	return TRUE;
 }
 
 /* ==========================================================================
@@ -222,7 +224,7 @@ static BOOL ErrorMessage(HWND hWnd, DWORD dwErr, const wchar_t *msg,...)
 	Return Value	: 成功 TRUE
 	Reference		: 
 	Renewal			: 
-	Notes			: 
+	Notes			: ダイアログの多重起動抑止(static int open)はシングルスレッド用
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
@@ -235,7 +237,7 @@ BOOL SetMenuFont(HWND hWnd)
 	static int	open = 0;
 
 	if (open == 1) {
-		while ((hFontWnd = ::FindWindowA(NULL, "Font")) != NULL) {
+		while ((hFontWnd = ::FindWindowW(L"#32770" /* ダイアログボックスのクラス */, L"Font")) != NULL) {
 			if (hWnd == ::GetParent(hFontWnd)) {
 				::SetForceForegroundWindow(hFontWnd);
 				break;
@@ -287,16 +289,20 @@ BOOL SetMenuFont(HWND hWnd)
 static BOOL ExtractAssociatedIconEx(const wchar_t *szPath, HICON *hLargeIcon, HICON *hSmallIcon)
 {
 	SHFILEINFOW	sfi;
+	*hLargeIcon = NULL;
+	*hSmallIcon = NULL;
 
-	::SHGetFileInfoW(szPath, 0, &sfi, sizeof(sfi), SHGFI_LARGEICON | SHGFI_ICON);
-	*hLargeIcon = ::CopyIcon(sfi.hIcon);
-	::DestroyIcon(sfi.hIcon);
+	if (::SHGetFileInfoW(szPath, 0, &sfi, sizeof(sfi), SHGFI_LARGEICON | SHGFI_ICON) != 0 && sfi.hIcon) {
+		*hLargeIcon = ::CopyIcon(sfi.hIcon);
+		::DestroyIcon(sfi.hIcon);
+	}
 
-	::SHGetFileInfoW(szPath, 0, &sfi, sizeof(sfi), SHGFI_SMALLICON | SHGFI_ICON);
-	*hSmallIcon = ::CopyIcon(sfi.hIcon);
-	::DestroyIcon(sfi.hIcon);
+	if (::SHGetFileInfoW(szPath, 0, &sfi, sizeof(sfi), SHGFI_SMALLICON | SHGFI_ICON) != 0 && sfi.hIcon) {
+		*hSmallIcon = ::CopyIcon(sfi.hIcon);
+		::DestroyIcon(sfi.hIcon);
+	}
 
-	return TRUE;
+	return (*hLargeIcon != NULL && *hSmallIcon != NULL);
 }
 
 /* ==========================================================================
@@ -314,13 +320,13 @@ static BOOL ExtractAssociatedIconEx(const wchar_t *szPath, HICON *hLargeIcon, HI
    ======1=========2=========3=========4=========5=========6=========7======= */
 static BOOL GetApplicationFilename(const wchar_t *szName, wchar_t *szPath)
 {
-	wchar_t	szSubKey[MAX_PATH];
+	wchar_t	szSubKey[MAX_PATH * 2];
 
 	BOOL	bRet;
 	BOOL	bTtssh = FALSE;
 	HKEY	hKey;
 
-	swprintf_s(szSubKey, L"%s\\%s", TTERM_KEY, szName);
+	_snwprintf_s(szSubKey, _countof(szSubKey), _TRUNCATE, L"%s\\%s", TTERM_KEY, szName);
 	if ((hKey = RegOpen(HKEY_CURRENT_USER, szSubKey)) == INVALID_HANDLE_VALUE)
 		return FALSE;
 
@@ -651,18 +657,19 @@ BOOL InitListBox(HWND hWnd)
 	wchar_t	szPath[MAX_PATH];
 	DWORD	dwCnt = 0;
 	DWORD	dwIndex = 0;
+	NameList *pNameList = g_MenuData.pNameList;
 
 	::SendDlgItemMessage(hWnd, LIST_HOST, LB_RESETCONTENT, 0, 0);
 
-	while (wcslen(g_MenuData.szName[dwIndex]) != 0) {
-		if (GetApplicationFilename(g_MenuData.szName[dwIndex], szPath) == TRUE) {
-			::SendDlgItemMessageW(hWnd, LIST_HOST, LB_ADDSTRING, 0, (LPARAM)g_MenuData.szName[dwIndex]);
+	while(pNameList) {
+		if (GetApplicationFilename(pNameList->szName, szPath) == TRUE) {
+			::SendDlgItemMessageW(hWnd, LIST_HOST, LB_ADDSTRING, 0, (LPARAM)pNameList->szName);
 			::SendDlgItemMessage(hWnd, LIST_HOST, LB_SETITEMDATA, (WPARAM) dwCnt, (LPARAM) dwIndex);
 			dwCnt++;
 		}
 		dwIndex++;
+		pNameList = pNameList->pNext;
 	}
-
 	return TRUE;
 }
 
@@ -732,6 +739,13 @@ BOOL InitConfigDlg(HWND hWnd)
 	::CheckDlgButton(hWnd, CHECK_LOCKBOX, BST_UNCHECKED);
 	::CheckDlgButton(hWnd, CHECK_INI_FILE, BST_CHECKED);
 
+	::SendDlgItemMessage(hWnd, EDIT_ENTRY, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_HOST, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_USER, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_PASSWORD, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, IDC_KEYFILE_PATH, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_MACRO, EM_LIMITTEXT, MAX_PATH - 1, 0);
+
 	InitListBox(hWnd);
 
 	return TRUE;
@@ -773,10 +787,10 @@ BOOL InitEtcDlg(HWND hWnd)
 		GetTeraTermPath(g_JobInfo.szTeraTerm, MAX_PATH);
 	}
 	if (wcslen(g_JobInfo.szLoginPrompt) == 0) {
-		wcscpy(g_JobInfo.szLoginPrompt, LOGIN_PROMPT);
+		wcscpy_s(g_JobInfo.szLoginPrompt, _countof(g_JobInfo.szLoginPrompt), LOGIN_PROMPT);
 	}
 	if (wcslen(g_JobInfo.szPasswdPrompt) == 0) {
-		wcscpy(g_JobInfo.szPasswdPrompt, PASSWORD_PROMPT);
+		wcscpy_s(g_JobInfo.szPasswdPrompt, _countof(g_JobInfo.szPasswdPrompt), PASSWORD_PROMPT);
 	}
 
 	::SetDlgItemTextW(hWnd, EDIT_TTMPATH, g_JobInfo.szTeraTerm);
@@ -784,8 +798,14 @@ BOOL InitEtcDlg(HWND hWnd)
 	::SetDlgItemTextW(hWnd, EDIT_OPTION, g_JobInfo.szOption);
 	::SetDlgItemTextW(hWnd, EDIT_PROMPT_USER, g_JobInfo.szLoginPrompt);
 	::SetDlgItemTextW(hWnd, EDIT_PROMPT_PASS, g_JobInfo.szPasswdPrompt);
-
 	::SetDlgItemTextW(hWnd, EDIT_LOG, g_JobInfo.szLog);
+
+	::SendDlgItemMessage(hWnd, EDIT_TTMPATH, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_INITFILE, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_OPTION, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_PROMPT_USER, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_PROMPT_PASS, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_LOG, EM_LIMITTEXT, MAX_PATH - 1, 0);
 
 	return TRUE;
 }
@@ -915,17 +935,16 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 			if (ret == FALSE && ecode == ERROR_TIMEOUT) {
 				Sleep(1000);
 				ret = ::Shell_NotifyIconA(NIM_MODIFY, &nid);
-				if (ret == TRUE)
+				if (ret == TRUE) {
 					break;
-
+				}
 			} else {
 				break;
 			}
 		}
-
+		return ret;
 	} else {
 		::Shell_NotifyIconA(dwMessage, &nid);
-
 	}
 
 	return TRUE;
@@ -933,9 +952,9 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 
 /**
  *	パスワード取得
- *	@retval	パスワード(wchar_t文字列) 不要になったらfree()すること
+ *	@retval	パスワード(wchar_t文字列) 不要になったら SecureZeroMemory() してから free() すること
  */
-static wchar_t *GetPassword(const JobInfo *jobInfo, HWND hWnd)
+static wchar_t *GetPassword(JobInfo *jobInfo, HWND hWnd)
 {
 	wchar_t *szPasswordW;
 	char szRawPassword[MAX_PATH];
@@ -951,11 +970,36 @@ static wchar_t *GetPassword(const JobInfo *jobInfo, HWND hWnd)
 			szPasswordW = ToWcharA(szRawPassword);
 		}
 	} else {
+		CryptUnprotectMemory(jobInfo->szPassword, sizeof(jobInfo->szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
 		EncodePassword((const char *)jobInfo->szPassword, szRawPassword);
+		CryptProtectMemory(jobInfo->szPassword, sizeof(jobInfo->szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
 		szPasswordW = ToWcharA(szRawPassword);
 	}
 	SecureZeroMemory(szRawPassword, sizeof(szRawPassword));
 	return szPasswordW;
+}
+
+/* ==========================================================================
+	Function Name	: (NameList *) getNthNameList()
+	Outline			: 表示設定構造体 NameList の N 番目 のリストのアドレスを返す
+	Arguments		: DWORD		N		(In) N 番目
+	Return Value	: 成功 NameListのアドレス / 失敗 NULL
+	Reference		:
+	Renewal			:
+	Notes			:
+	Attention		:
+	Up Date			:
+   ======1=========2=========3=========4=========5=========6=========7======= */
+NameList *getNthNameList(DWORD Nth)
+{
+	NameList *pNameList = g_MenuData.pNameList;
+	for (DWORD i = 0; i < MAXJOBNUM && pNameList; i++) {
+		if (i == Nth) {
+			return pNameList;
+		}
+		pNameList = pNameList->pNext;
+	}
+	return NULL;
 }
 
 /* ==========================================================================
@@ -975,15 +1019,22 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 {
 	wchar_t	szName[MAX_PATH];
 	wchar_t	szDirectory[MAX_PATH];
-	wchar_t	szHostName[MAX_PATH];
 	wchar_t	*szTemp;
-	wchar_t	*pHostName;
 	JobInfo	jobInfo;
 
 	DWORD	dwErr = NO_ERROR;
 	wchar_t uimsg[MAX_UIMSG];
 
-	wcscpy(szName, (szJobName == NULL) ? g_MenuData.szName[idItem - ID_MENU_MIN] : szJobName);
+	if (szJobName) {
+		wcscpy_s(szName, _countof(szName), szJobName);
+	} else {
+		NameList *pNameList = getNthNameList(idItem - ID_MENU_MIN);
+		if (pNameList) {
+			wcscpy_s(szName, _countof(szName), pNameList->szName);
+		} else {
+			return FALSE;
+		}
+	}
 
 	if (RegLoadLoginHostInformation(szName, &jobInfo) == FALSE) {
 		dwErr = ::GetLastError();
@@ -999,10 +1050,6 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 	if (wcslen(jobInfo.szTeraTerm) == 0) {
 		GetTeraTermPath(jobInfo.szTeraTerm, MAX_PATH);
 	}
-
-	wcscpy(szHostName, jobInfo.szHostName);
-	if ((pHostName = _wcstok(szHostName, L" ([{'\"|*")) != NULL)
-		pHostName = szHostName;
 
 	wchar_t	*szArgment = _wcsdup(L"");
 
@@ -1052,7 +1099,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 		}
 		dwErr = ConnectHost(g_hI, hWnd, &info);
 		if (passwordW != NULL) {
-			SecureZeroMemory(passwordW, sizeof(wchar_t) * wcslen(passwordW));
+			SecureZeroMemory(passwordW, sizeof(wchar_t) * (wcslen(passwordW) + 1));
 			free(passwordW);
 		}
 	}
@@ -1072,12 +1119,12 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 
 		// フルパス化する
 		wchar_t *exe_fullpath = GetFullPath(jobInfo.szTeraTerm);
-		wcscpy_s(jobInfo.szTeraTerm, exe_fullpath);
+		wcscpy_s(jobInfo.szTeraTerm, _countof(jobInfo.szTeraTerm), exe_fullpath);
 		free(exe_fullpath);
 
 		// 実行するプログラムのカレントパス
 		//   プログラムのあるフォルダ
-		wcscpy(szDirectory, jobInfo.szTeraTerm);
+		wcscpy_s(szDirectory, _countof(szDirectory), jobInfo.szTeraTerm);
 		if ((::GetFileAttributesW(jobInfo.szTeraTerm) & FILE_ATTRIBUTE_DIRECTORY) == 0) {
 			wchar_t	*pt = wcsrchr(szDirectory, '\\');
 			if (pt != NULL)
@@ -1127,11 +1174,6 @@ BOOL InitMenu(void)
 {
 	wchar_t	uimsg[MAX_UIMSG];
 
-	for (int cnt = 0; cnt < MAXJOBNUM; cnt++) {
-		g_MenuData.hLargeIcon[cnt] = NULL;
-		g_MenuData.hSmallIcon[cnt] = NULL;
-	}
-
 	if (g_hListMenu == NULL) {
 		g_hMenu			= ::LoadMenuA(g_hI, (LPCSTR) TTERM_MENU);
 		g_hSubMenu		= ::GetSubMenu(g_hMenu, 0);
@@ -1178,16 +1220,19 @@ BOOL InitMenu(void)
    ======1=========2=========3=========4=========5=========6=========7======= */
 VOID DeleteListMenuIcons()
 {
-	for (int cnt = 0; cnt < MAXJOBNUM; cnt++) {
-		g_MenuData.szName[cnt][0] = L'\0';
-		if (g_MenuData.hLargeIcon[cnt] != NULL) {
-			::DestroyIcon(g_MenuData.hLargeIcon[cnt]);
-			g_MenuData.hLargeIcon[cnt] = NULL;
+	NameList *pNameList = g_MenuData.pNameList;
+	g_MenuData.pNameList = NULL;
+
+	while (pNameList) {
+		if (pNameList->hLargeIcon != NULL) {
+			::DestroyIcon(pNameList->hLargeIcon);
 		}
-		if (g_MenuData.hSmallIcon[cnt] != NULL) {
-			::DestroyIcon(g_MenuData.hSmallIcon[cnt]);
-			g_MenuData.hSmallIcon[cnt] = NULL;
+		if (pNameList->hSmallIcon != NULL) {
+			::DestroyIcon(pNameList->hSmallIcon);
 		}
+		NameList *pNext = pNameList->pNext;
+		free(pNameList);
+		pNameList = pNext;
 	}
 }
 
@@ -1207,23 +1252,35 @@ BOOL InitListMenu(HWND hWnd)
 	wchar_t	szPath[MAX_PATH];
 	wchar_t	szEntryName[MAX_PATH];
 	HKEY	hKey;
-	DWORD	dwCnt;
 	DWORD	dwIndex = 0;
 	DWORD	dwSize = MAX_PATH;
 
 	DeleteListMenuIcons();
 
+	NameList **pBefore = &g_MenuData.pNameList;
 	if ((hKey = RegOpen(HKEY_CURRENT_USER, TTERM_KEY)) != INVALID_HANDLE_VALUE) {
-		while (RegEnumEx(hKey, dwIndex, szEntryName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
-			wcscpy(g_MenuData.szName[dwIndex++], szEntryName);
+		while (dwIndex < MAXJOBNUM && RegEnumEx(hKey, dwIndex, szEntryName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
+			size_t len = wcslen(szEntryName);
+			NameList *pNameList = (NameList *)malloc(sizeof(NameList) + (len + 1) * sizeof(wchar_t));
+			if (pNameList == NULL) {
+				RegClose(hKey);
+				RedrawMenu(hWnd);
+				return FALSE;
+			}
+			wcscpy_s(pNameList->szName, len + 1, szEntryName);
+			if (GetApplicationFilename(szEntryName, szPath) == TRUE) {
+				ExtractAssociatedIconEx(szPath, &(pNameList->hLargeIcon), &(pNameList->hSmallIcon));
+			} else {
+				pNameList->hLargeIcon = NULL;
+				pNameList->hSmallIcon = NULL;
+			}
+			pNameList->pNext = NULL;
+			*pBefore = pNameList;
+			pBefore = &(pNameList->pNext);
+			dwIndex++;
 			dwSize = MAX_PATH;
 		}
-		wcscpy(g_MenuData.szName[dwIndex], L"");
 		RegClose(hKey);
-
-		for (dwCnt = 0; dwCnt < dwIndex; dwCnt++)
-			if (GetApplicationFilename(g_MenuData.szName[dwCnt], szPath) == TRUE)
-				ExtractAssociatedIconEx(szPath, &g_MenuData.hLargeIcon[dwCnt], &g_MenuData.hSmallIcon[dwCnt]);
 	}
 
 	RedrawMenu(hWnd);
@@ -1242,12 +1299,11 @@ BOOL InitListMenu(HWND hWnd)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL RedrawMenu(HWND /* hWnd unusedParam */)
+BOOL RedrawMenu(HWND hWnd)
 {
 	int			num;
 	wchar_t		szPath[MAX_PATH];
 	HDC			hDC;
-	HWND		hWndItem;
 	DWORD		itemNum;
 	DWORD		desktopHeight;
 	DWORD		dwCnt = 0;
@@ -1260,33 +1316,43 @@ BOOL RedrawMenu(HWND /* hWnd unusedParam */)
 	for (dwCnt = 0; dwCnt < (DWORD) num; dwCnt++)
 		if (::DeleteMenu(g_hListMenu, ID_MENU_MIN + dwCnt, MF_BYCOMMAND) == FALSE)
 			num++;
-	
-	hWndItem	= ::GetDlgItem((HWND) g_hListMenu, ID_MENU_MIN);
-	hDC			= ::GetWindowDC(hWndItem);
-	if (g_MenuData.hFont != NULL)
-		::SelectObject(hDC, (HGDIOBJ) g_MenuData.hFont);
-	::GetTextMetrics(hDC, &textMetric);
-	if (g_MenuData.dwIconMode == MODE_SMALLICON)
-		g_MenuData.dwMenuHeight	= (ICONSPACE_SMALL > textMetric.tmHeight) ? ICONSPACE_SMALL : textMetric.tmHeight;
-	else
-		g_MenuData.dwMenuHeight	= (ICONSPACE_LARGE > textMetric.tmHeight) ? ICONSPACE_LARGE : textMetric.tmHeight;
-	ReleaseDC(hWndItem, hDC);
+
+	hDC = ::GetDC(hWnd);
+	if (hDC == NULL) {
+		g_MenuData.dwMenuHeight = ICONSPACE_SMALL;
+	} else {
+		if (g_MenuData.hFont != NULL) {
+			::SelectObject(hDC, (HGDIOBJ) g_MenuData.hFont);
+		}
+		::GetTextMetrics(hDC, &textMetric);
+		if (g_MenuData.dwIconMode == MODE_SMALLICON) {
+			g_MenuData.dwMenuHeight	= (ICONSPACE_SMALL > textMetric.tmHeight) ? ICONSPACE_SMALL : textMetric.tmHeight;
+		} else {
+			g_MenuData.dwMenuHeight	= (ICONSPACE_LARGE > textMetric.tmHeight) ? ICONSPACE_LARGE : textMetric.tmHeight;
+		}
+		if (g_MenuData.dwMenuHeight == 0) {
+			g_MenuData.dwMenuHeight = ICONSPACE_SMALL;
+		}
+        ReleaseDC(hWnd, hDC);
+	}
 
 	desktopHeight	= ::GetSystemMetrics(SM_CYSCREEN);
 	itemNum			= desktopHeight / g_MenuData.dwMenuHeight;
 
 	dwCnt = 0;
-	while (wcslen(g_MenuData.szName[dwCnt]) != 0) {
-		if (GetApplicationFilename(g_MenuData.szName[dwCnt], szPath) == TRUE) {
+	NameList *pNameList = g_MenuData.pNameList;
+	while(pNameList) {
+		if (GetApplicationFilename(pNameList->szName, szPath) == TRUE) {
 			if (dwCnt % itemNum == 0 && dwCnt != 0)
-				::AppendMenuA(g_hListMenu, MF_OWNERDRAW | MF_MENUBARBREAK, ID_MENU_MIN + dwCnt,
-							  (LPCSTR)(UINT_PTR)dwCnt);
+				::AppendMenuW(g_hListMenu, MF_OWNERDRAW | MF_MENUBARBREAK, ID_MENU_MIN + dwCnt,
+							  (LPCWSTR)(UINT_PTR)dwCnt);
 			else
-				::AppendMenuA(g_hListMenu, MF_OWNERDRAW | MF_POPUP, ID_MENU_MIN + dwCnt,
-							  (LPCSTR)(UINT_PTR)dwCnt);
+				::AppendMenuW(g_hListMenu, MF_OWNERDRAW | MF_POPUP, ID_MENU_MIN + dwCnt,
+							  (LPCWSTR)(UINT_PTR)dwCnt);
 			dwValidCnt++;
 		}
 		dwCnt++;
+		pNameList = pNameList->pNext;
 	}
 	if (dwValidCnt == 0) {
 		UTIL_get_lang_msgW("MENU_NOTRAY", uimsg, _countof(uimsg), STR_NOENTRY, UILanguageFileW);
@@ -1310,9 +1376,9 @@ BOOL RedrawMenu(HWND /* hWnd unusedParam */)
 BOOL RegSaveLoginHostInformation(JobInfo *jobInfo)
 {
 	HKEY	hKey;
-	wchar_t	szSubKey[MAX_PATH];
+	wchar_t	szSubKey[MAX_PATH * 2];
 
-	swprintf_s(szSubKey, L"%s\\%s", TTERM_KEY, jobInfo->szName);
+	_snwprintf_s(szSubKey, _countof(szSubKey), _TRUNCATE, L"%s\\%s", TTERM_KEY, jobInfo->szName);
 	if ((hKey = RegCreate(HKEY_CURRENT_USER, szSubKey)) == INVALID_HANDLE_VALUE)
 		return FALSE;
 
@@ -1323,8 +1389,11 @@ BOOL RegSaveLoginHostInformation(JobInfo *jobInfo)
 	RegSetStr(hKey, KEY_USERNAME, jobInfo->szUsername);
 	RegSetDword(hKey, KEY_PASSWDFLAG, (DWORD) jobInfo->bPassword);
 	RegSetDword(hKey, KEY_LOCKBOXFLAG, (DWORD) jobInfo->bLockBox);
+
 	if (jobInfo->bLockBox == FALSE) {
-		RegSetBinary(hKey, KEY_PASSWORD, jobInfo->szPassword, (DWORD)(strlen(jobInfo->szPassword) + 1));
+		CryptUnprotectMemory(jobInfo->szPassword, sizeof(jobInfo->szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
+		RegSetBinary(hKey, KEY_PASSWORD, jobInfo->szPassword, (DWORD)(strlen(jobInfo->szPassword)));
+		CryptProtectMemory(jobInfo->szPassword, sizeof(jobInfo->szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
 	} else {
 		RegSetBinary(hKey, KEY_PASSWORD, jobInfo->szPassword, ENCRYPT2_PROFILE_LEN);
 	}
@@ -1367,18 +1436,18 @@ BOOL RegSaveLoginHostInformation(JobInfo *jobInfo)
 BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 {
 	HKEY	hKey;
-	wchar_t	szSubKey[MAX_PATH];
-	DWORD	dwSize = MAX_PATH;
+	wchar_t	szSubKey[MAX_PATH * 2];
+	DWORD	dwSize;
 	JobInfo jobInfo;
 	DWORD dword_tmp;
 
 	memset(&jobInfo, 0, sizeof(JobInfo));
 
-	swprintf_s(szSubKey, L"%s\\%s", TTERM_KEY, szName);
+	_snwprintf_s(szSubKey, _countof(szSubKey), _TRUNCATE, L"%s\\%s", TTERM_KEY, szName);
 	if ((hKey = RegOpen(HKEY_CURRENT_USER, szSubKey)) == INVALID_HANDLE_VALUE)
 		return FALSE;
 
-	wcscpy(jobInfo.szName, szName);
+	wcscpy_s(jobInfo.szName, _countof(jobInfo.szName), szName);
 
 	RegGetStr(hKey, KEY_HOSTNAME, jobInfo.szHostName, MAX_PATH);
 	RegGetDword(hKey, KEY_MODE, dword_tmp);
@@ -1387,8 +1456,16 @@ BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 	RegGetBOOL(hKey, KEY_USERFLAG, jobInfo.bUsername);
 	RegGetStr(hKey, KEY_USERNAME, jobInfo.szUsername, MAX_PATH);
 	RegGetBOOL(hKey, KEY_PASSWDFLAG, jobInfo.bPassword);
-	RegGetBinary(hKey, KEY_PASSWORD, jobInfo.szPassword, &dwSize);
 	RegGetBOOL(hKey, KEY_LOCKBOXFLAG, jobInfo.bLockBox);
+
+	SecureZeroMemory(jobInfo.szPassword, sizeof(jobInfo.szPassword));
+	dwSize = MAX_PATH; // jobInfo.szPassword は 272バイトだが、使用可能なパスワード長は MAX_PATH(260バイト)
+	if (! RegGetBinary(hKey, KEY_PASSWORD, jobInfo.szPassword, &dwSize)) {
+		SecureZeroMemory(jobInfo.szPassword, sizeof(jobInfo.szPassword));
+	}
+	if (jobInfo.bLockBox == FALSE) {
+		CryptProtectMemory(jobInfo.szPassword, sizeof(jobInfo.szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
+	}
 
 	RegGetStr(hKey, KEY_TERATERM, jobInfo.szTeraTerm, MAX_PATH);
 	RegGetStr(hKey, KEY_INITFILE, jobInfo.szInitFile, MAX_PATH);
@@ -1495,16 +1572,25 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	::GetDlgItemTextA(hWnd, EDIT_PASSWORD, (LPSTR)cEncodePassword, MAX_PATH);
 	if (g_JobInfo.bLockBox == FALSE) {
 		EncodePassword((char *)cEncodePassword, g_JobInfo.szPassword);
+		CryptProtectMemory(g_JobInfo.szPassword, sizeof(g_JobInfo.szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
+		SecureZeroMemory(cEncodePassword, sizeof(cEncodePassword));
 	} else if (g_JobInfo.dwMode == MODE_AUTOLOGIN) {
 		if (g_szLockBox[0] == 0) {
+			SecureZeroMemory(cEncodePassword, sizeof(cEncodePassword));
 			UTIL_get_lang_msgW("MSG_ERROR_NOLOCKBOX", uimsg, _countof(uimsg),
 							   L"error: LockBox is not setup.", UILanguageFileW);
 			::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
 			return FALSE;
 		}
-		EncodePassword((const char *)g_szLockBox, (char *)cEncodeLockBox);
+		memcpy(cEncodeLockBox, g_szLockBox, sizeof(g_szLockBox));
+		CryptUnprotectMemory(cEncodeLockBox, sizeof(g_szLockBox), CRYPTPROTECTMEMORY_SAME_PROCESS);
 		Encrypt2EncDec((char *)cEncodePassword, cEncodeLockBox, &profile, 1);
+		SecureZeroMemory(cEncodePassword, sizeof(cEncodePassword));
+		SecureZeroMemory(cEncodeLockBox, sizeof(cEncodeLockBox));
 		memcpy(g_JobInfo.szPassword, &profile, ENCRYPT2_PROFILE_LEN);
+		SecureZeroMemory(&profile, sizeof(profile));
+	} else {
+		SecureZeroMemory(cEncodePassword, sizeof(cEncodePassword));
 	}
 
 	if (::GetDlgItemTextW(hWnd, EDIT_MACRO, g_JobInfo.szMacroFile, MAX_PATH) == 0 && g_JobInfo.dwMode == MODE_MACRO) {
@@ -1613,6 +1699,10 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 	char 	szEncodePassword[MAX_PATH];
 
 	index = ::SendDlgItemMessage(hWnd, LIST_HOST, LB_GETCURSEL, 0, 0);
+	if (index == LB_ERR) {
+		return FALSE;
+	}
+
 	::SendDlgItemMessageW(hWnd, LIST_HOST, LB_GETTEXT, (WPARAM)index, (LPARAM)szName);
 
 	if (RegLoadLoginHostInformation(szName, &g_JobInfo) == FALSE) {
@@ -1644,7 +1734,7 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 	}
 
 	if (wcslen(g_JobInfo.szName) == 0)
-		wcscpy(g_JobInfo.szName, g_JobInfo.szHostName);
+		wcscpy_s(g_JobInfo.szName, _countof(g_JobInfo.szName), g_JobInfo.szHostName);
 
 	::SetDlgItemTextW(hWnd, EDIT_ENTRY, g_JobInfo.szName);
 	::SetDlgItemTextW(hWnd, EDIT_HOST, g_JobInfo.szHostName);
@@ -1654,12 +1744,16 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 		if (g_JobInfo.dwMode == MODE_AUTOLOGIN) {
 			DecryptPassword(g_JobInfo.szPassword, szEncodePassword, hWnd);
 			::SetDlgItemTextA(hWnd, EDIT_PASSWORD, szEncodePassword);
+			SecureZeroMemory(szEncodePassword, sizeof(szEncodePassword));
 		} else {
 			::SetDlgItemTextA(hWnd, EDIT_PASSWORD, "");
 		}
 	} else {
+		CryptUnprotectMemory(g_JobInfo.szPassword, sizeof(g_JobInfo.szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
 		EncodePassword(g_JobInfo.szPassword, szEncodePassword);
+		CryptProtectMemory(g_JobInfo.szPassword, sizeof(g_JobInfo.szPassword), CRYPTPROTECTMEMORY_SAME_PROCESS);
 		::SetDlgItemTextA(hWnd, EDIT_PASSWORD, szEncodePassword);
+		SecureZeroMemory(szEncodePassword, sizeof(szEncodePassword));
 	}
 
 	::SetDlgItemTextW(hWnd, EDIT_MACRO, g_JobInfo.szMacroFile);
@@ -1726,7 +1820,7 @@ BOOL DeleteLoginHostInformation(HWND hWnd)
 {
 	LRESULT	index;
 	wchar_t	szEntryName[MAX_PATH];
-	wchar_t	szSubKey[MAX_PATH];
+	wchar_t	szSubKey[MAX_PATH * 2];
 	wchar_t	uimsg[MAX_UIMSG];
 	DWORD	dwErr;
 
@@ -1744,7 +1838,7 @@ BOOL DeleteLoginHostInformation(HWND hWnd)
 		return FALSE;
 	}
 
-	swprintf_s(szSubKey, L"%s\\%s", TTERM_KEY, szEntryName);
+	_snwprintf_s(szSubKey, _countof(szSubKey), _TRUNCATE, L"%s\\%s", TTERM_KEY, szEntryName);
 	if (RegDelete(HKEY_CURRENT_USER, szSubKey) != ERROR_SUCCESS) {
 		dwErr = ::GetLastError();
 		UTIL_get_lang_msgW("MSG_ERROR_DELETEREG", uimsg, _countof(uimsg),
@@ -1837,6 +1931,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 	switch(LOWORD(wParam)) {
 	case IDOK:
 	case IDCANCEL:
+		::SetDlgItemTextA(hWnd, EDIT_PASSWORD, ""); // エディットコントロールのクリア
 		g_hWndMenu = NULL;
 		::EndDialog(hWnd, TRUE);
 		return TRUE;
@@ -1860,9 +1955,9 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 		else {
 			EnableItem(hWnd, EDIT_USER, FALSE);
 			::CheckDlgButton(hWnd, CHECK_PASSWORD, BST_UNCHECKED);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) BST_UNCHECKED);
+			::SendMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) BST_UNCHECKED);
 			::CheckDlgButton(hWnd, CHECK_LOCKBOX, BST_UNCHECKED);
-			::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) BST_UNCHECKED);
+			::SendMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_LOCKBOX, (LPARAM) BST_UNCHECKED);
 		}
 		return TRUE;
 	case CHECK_PASSWORD:
@@ -1893,6 +1988,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 					::CheckDlgButton(hWnd, CHECK_PASSWORD, BST_CHECKED);
 					::PostMessage(hWnd, WM_COMMAND, (WPARAM) CHECK_PASSWORD, (LPARAM) BST_CHECKED);
 				}
+				SecureZeroMemory(szPassword, sizeof(szPassword));
 			}
 		}
 		return TRUE;
@@ -1906,6 +2002,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 				::SetDlgItemTextA(hWnd, EDIT_PASSWORD, pData.pDecryptPassword);
 			}
 		}
+		SecureZeroMemory(szPassword, sizeof(szPassword));
 		return TRUE;
 	case CHECK_INI_FILE:
 		if (IsDlgButtonChecked(hWnd, CHECK_INI_FILE) == BST_CHECKED)
@@ -2192,7 +2289,7 @@ INT_PTR CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		return TRUE;
 	case WM_DRAWITEM:
 		lpdis = (LPDRAWITEMSTRUCT) lParam;
-		if (lpdis->itemID == -1)
+		if (lpdis->itemID == -1 || lpdis->itemData >= MAXJOBNUM)
 			return TRUE;
 		if (lpdis->itemState & ODS_SELECTED) {
 			::SetTextColor(lpdis->hDC, crSelText);
@@ -2202,23 +2299,26 @@ INT_PTR CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			::SetBkColor(lpdis->hDC, crBkgnd);
 		}
 		::GetTextMetrics(lpdis->hDC, &textMetric);
-		::ExtTextOutW(lpdis->hDC,
-					lpdis->rcItem.left + LISTBOX_WIDTH,
-					lpdis->rcItem.top + (ICONSIZE_SMALL - textMetric.tmHeight) / 2,
-					ETO_OPAQUE,
-					&lpdis->rcItem,
-					g_MenuData.szName[lpdis->itemData],
-					(UINT)wcslen(g_MenuData.szName[lpdis->itemData]),
-					NULL);
-		::DrawIconEx(lpdis->hDC,
-					lpdis->rcItem.left + (LISTBOX_WIDTH - ICONSIZE_SMALL) / 2,
-					lpdis->rcItem.top + (LISTBOX_HEIGHT - ICONSIZE_SMALL) / 2,
-					g_MenuData.hSmallIcon[lpdis->itemData],
-					ICONSIZE_SMALL,
-					ICONSIZE_SMALL,
-					0,
-					NULL,
-					DI_NORMAL);
+		NameList *pNameList = getNthNameList(lpdis->itemData);
+		if (pNameList) {
+			::ExtTextOutW(lpdis->hDC,
+						lpdis->rcItem.left + LISTBOX_WIDTH,
+						lpdis->rcItem.top + (ICONSIZE_SMALL - textMetric.tmHeight) / 2,
+						ETO_OPAQUE,
+						&lpdis->rcItem,
+						pNameList->szName,
+						(UINT)wcslen(pNameList->szName),
+						NULL);
+			::DrawIconEx(lpdis->hDC,
+						lpdis->rcItem.left + (LISTBOX_WIDTH - ICONSIZE_SMALL) / 2,
+						lpdis->rcItem.top + (LISTBOX_HEIGHT - ICONSIZE_SMALL) / 2,
+						pNameList->hSmallIcon,
+						ICONSIZE_SMALL,
+						ICONSIZE_SMALL,
+						0,
+						NULL,
+						DI_NORMAL);
+		}
 		return TRUE;
 	}
 
@@ -2298,17 +2398,19 @@ INT_PTR CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 BOOL DecryptPassword(const char *szEncryptPassword, char *szDecryptPassword, HWND hWnd)
 {
 	LockBoxDlgPrivateData pData;
-	char szEncryptKey[MAX_PATH];
+	char szEncryptKey[CRYPTPROTECTMEMORYLEN];
 	BOOL ret;
 
 	ret = FALSE;
 	if (g_szLockBox[0] != 0) {
-		EncodePassword((const char *)g_szLockBox, szEncryptKey);
+		memcpy(szEncryptKey, g_szLockBox, CRYPTPROTECTMEMORYLEN);
+		CryptUnprotectMemory(szEncryptKey, CRYPTPROTECTMEMORYLEN, CRYPTPROTECTMEMORY_SAME_PROCESS);
 		if (Encrypt2EncDec(szDecryptPassword, (const unsigned char *)szEncryptKey, (Encrypt2ProfileP)szEncryptPassword, 0) == 1) {
 			ret = TRUE;
 		} else {
 			pData.nMessageFlag = 1;
 		}
+		SecureZeroMemory(szEncryptKey, sizeof(szEncryptKey));
 	} else {
 		pData.nMessageFlag = 0;
 	}
@@ -2345,7 +2447,7 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 {
 	wchar_t uimsg[MAX_UIMSG];
 	WORD cchEncryptKey;
-	char szEncodeEncryptKey[MAX_PATH];
+	char szEncodeEncryptKey[CRYPTPROTECTMEMORYLEN] = {};
 	LockBoxDlgPrivateData *pData;
 	static int error;
 	static const DlgTextInfo text_info[] = {
@@ -2364,10 +2466,13 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		SendDlgItemMessage(hWnd, IDC_TTPMENU_ICON, STM_SETICON, (WPARAM)g_hIcon, 0);
 		pData = (LockBoxDlgPrivateData *)lParam;
 		SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)pData);
+		SendDlgItemMessage(hWnd, IDC_LOCKBOX_EDIT, EM_LIMITTEXT, ENCRYPT2_PWD_MAX_LEN, 0);
 
 		if (g_szLockBox[0] != 0) {
-			EncodePassword((const char *)g_szLockBox, szEncodeEncryptKey);
+			memcpy(szEncodeEncryptKey, g_szLockBox, CRYPTPROTECTMEMORYLEN);
+			CryptUnprotectMemory(szEncodeEncryptKey, CRYPTPROTECTMEMORYLEN, CRYPTPROTECTMEMORY_SAME_PROCESS);
 			::SetDlgItemTextA(hWnd, IDC_LOCKBOX_EDIT, (LPCSTR)szEncodeEncryptKey);
+			SecureZeroMemory(szEncodeEncryptKey, sizeof(szEncodeEncryptKey));
 		} else {
 			::SetDlgItemTextA(hWnd, IDC_LOCKBOX_EDIT, "");
 		}
@@ -2415,10 +2520,18 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 								   L"The password is not entered.", UILanguageFileW);
 				::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
 			} else {
-				*(WORD *)szEncodeEncryptKey = (WORD)ENCRYPT2_PWD_MAX_LEN;
-				SendDlgItemMessage(hWnd, IDC_LOCKBOX_EDIT, EM_GETLINE, (WPARAM)0, (LPARAM)szEncodeEncryptKey);
-				szEncodeEncryptKey[cchEncryptKey] = 0;
-				EncodePassword((const char *)szEncodeEncryptKey, g_szLockBox);
+				*(WORD *)szEncodeEncryptKey = ENCRYPT2_PWD_MAX_LEN;
+				LRESULT read = SendDlgItemMessage(hWnd, IDC_LOCKBOX_EDIT, EM_GETLINE, (WPARAM)0, (LPARAM)szEncodeEncryptKey);
+				if (read > 0 && read <= ENCRYPT2_PWD_MAX_LEN) {
+					szEncodeEncryptKey[read] = 0;
+				} else {
+					SecureZeroMemory(szEncodeEncryptKey, sizeof(szEncodeEncryptKey));
+					assert(FALSE);
+				}
+				// 復号可否に関わらず、g_szLockBox を上書きする
+				SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
+				memcpy(g_szLockBox, szEncodeEncryptKey, cchEncryptKey + 1);
+				CryptProtectMemory(g_szLockBox, CRYPTPROTECTMEMORYLEN, CRYPTPROTECTMEMORY_SAME_PROCESS);
 				pData = (LockBoxDlgPrivateData *)GetWindowLongPtr(hWnd, DWLP_USER);
 				if (pData->bLockBox == TRUE) {
 					::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, L"- - -");
@@ -2427,11 +2540,14 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 					UpdateWindow(hWnd);
 					if (Encrypt2EncDec(pData->pDecryptPassword, (const unsigned char *)szEncodeEncryptKey,
 									   (Encrypt2ProfileP)pData->pEncryptPassword, 0) == 0) {
+						SecureZeroMemory(szEncodeEncryptKey, sizeof(szEncodeEncryptKey));
 						error = 1;
 						UTIL_get_lang_msgW("DLG_LOCKBOX_WRONG", uimsg, _countof(uimsg),
 										   L"Incorrect password.", UILanguageFileW);
 						::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
+						SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
 					} else{
+						SecureZeroMemory(szEncodeEncryptKey, sizeof(szEncodeEncryptKey));
 						UTIL_get_lang_msgW("DLG_LOCKBOX_VALID", uimsg, _countof(uimsg),
 										   L"Correct password.", UILanguageFileW);
 						::SetDlgItemTextW(hWnd, IDC_LOCKBOX_MESSAGE, uimsg);
@@ -2439,15 +2555,19 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 						InvalidateRect(hWnd, NULL, TRUE);
 						UpdateWindow(hWnd);
 						Sleep(900);
+						::SetDlgItemTextA(hWnd, IDC_LOCKBOX_EDIT, ""); // エディットコントロールのクリア
 						::EndDialog(hWnd, TRUE);
 					}
 				} else {
+					SecureZeroMemory(szEncodeEncryptKey, sizeof(szEncodeEncryptKey));
+					::SetDlgItemTextA(hWnd, IDC_LOCKBOX_EDIT, ""); // エディットコントロールのクリア
 					::EndDialog(hWnd, TRUE);
 				}
 			}
 			InvalidateRect(hWnd, NULL, TRUE);
 			return TRUE;
 		case IDCANCEL:
+			::SetDlgItemTextA(hWnd, IDC_LOCKBOX_EDIT, ""); // エディットコントロールのクリア
 			::EndDialog(hWnd, FALSE);
 			return TRUE;
 		}
@@ -2481,11 +2601,14 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	LPDRAWITEMSTRUCT	lpdis;
 	LPMEASUREITEMSTRUCT	lpmis;
 	static UINT			WM_TASKBAR_RESTART;
+	NameList 			*pNameList;
 
 	g_hWnd	= hWnd;
 
 	switch(uMsg) {
 	case WM_CREATE:
+		VirtualLock(g_szLockBox, sizeof(g_szLockBox));
+		VirtualLock(&g_JobInfo, sizeof(g_JobInfo));
 		PostMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)g_hIcon);
 		PostMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)g_hIconSmall);
 		SetDlgPos(hWnd, POSITION_CENTER);
@@ -2507,7 +2630,16 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		InitListMenu(hWnd);
 		return TRUE;
 	case WM_ENDSESSION:
+		if (wParam == FALSE) {
+			return TRUE;  // キャンセルされた場合は何もしない
+		}
+		SecureZeroMemory(&g_JobInfo, sizeof(g_JobInfo));
+		SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
+		SaveConfig();
+		return TRUE;
 	case WM_DESTROY:
+		SecureZeroMemory(&g_JobInfo, sizeof(g_JobInfo));
+		SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
 		SaveConfig();
 		SetTaskTray(hWnd, NIM_DELETE);
 		::UnregisterHotKey(hWnd, WM_MENUOPEN);
@@ -2541,7 +2673,8 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		hDC			= ::GetWindowDC(hWndItem);
 		if (g_MenuData.hFont != NULL)
 			::SelectObject(hDC, (HGDIOBJ) g_MenuData.hFont);
-		::GetTextExtentPoint32W(hDC, g_MenuData.szName[lpmis->itemData], (int)wcslen(g_MenuData.szName[lpmis->itemData]), &size);
+		pNameList = getNthNameList(lpmis->itemData);
+		::GetTextExtentPoint32W(hDC, pNameList->szName, (int)wcslen(pNameList->szName), &size);
 		if (g_MenuData.dwIconMode == MODE_SMALLICON) {
 			lpmis->itemWidth	= ICONSPACE_SMALL + size.cx;
 			lpmis->itemHeight	= g_MenuData.dwMenuHeight;
@@ -2553,7 +2686,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	case WM_DRAWITEM:
 		lpdis = (LPDRAWITEMSTRUCT) lParam;
-		if (lpdis->itemID == -1)
+		if (lpdis->itemID == -1 || lpdis->itemData >= MAXJOBNUM)
 			return TRUE;
 		if (g_MenuData.hFont != NULL)
 			::SelectObject(lpdis->hDC, (HGDIOBJ) g_MenuData.hFont);
@@ -2572,23 +2705,26 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			dwIconSpace	= ICONSPACE_SMALL;
 		}
 		::GetTextMetrics(lpdis->hDC, &textMetric);
-		::ExtTextOutW(lpdis->hDC,
-					lpdis->rcItem.left + dwIconSpace,
-					lpdis->rcItem.top + (g_MenuData.dwMenuHeight - textMetric.tmHeight) / 2,
-					ETO_OPAQUE,
-					&lpdis->rcItem,
-					g_MenuData.szName[lpdis->itemData],
-					(UINT)wcslen(g_MenuData.szName[lpdis->itemData]),
-					NULL);
-		::DrawIconEx(lpdis->hDC,
-					lpdis->rcItem.left + (dwIconSpace - dwIconSize) / 2,
-					lpdis->rcItem.top + (g_MenuData.dwMenuHeight - dwIconSize) / 2,
-					(g_MenuData.dwIconMode == MODE_LARGEICON) ? g_MenuData.hLargeIcon[lpdis->itemData] : g_MenuData.hSmallIcon[lpdis->itemData],
-					dwIconSize,
-					dwIconSize,
-					0,
-					NULL,
-					DI_NORMAL);
+		pNameList = getNthNameList(lpdis->itemData);
+		if (pNameList) {
+			::ExtTextOutW(lpdis->hDC,
+						lpdis->rcItem.left + dwIconSpace,
+						lpdis->rcItem.top + (g_MenuData.dwMenuHeight - textMetric.tmHeight) / 2,
+						ETO_OPAQUE,
+						&lpdis->rcItem,
+						pNameList->szName,
+						(UINT)wcslen(pNameList->szName),
+						NULL);
+			::DrawIconEx(lpdis->hDC,
+						lpdis->rcItem.left + (dwIconSpace - dwIconSize) / 2,
+						lpdis->rcItem.top + (g_MenuData.dwMenuHeight - dwIconSize) / 2,
+						(g_MenuData.dwIconMode == MODE_LARGEICON) ? pNameList->hLargeIcon : pNameList->hSmallIcon,
+						dwIconSize,
+						dwIconSize,
+						0,
+						NULL,
+						DI_NORMAL);
+		}
 		return TRUE;
 	}
 

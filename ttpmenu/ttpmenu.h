@@ -1,5 +1,32 @@
-#ifndef TTPMENU_H
-#define TTPMENU_H
+/*
+ * Copyright (C) S.Hayakawa NTT-IT 1998-2002
+ * (C) 2002- TeraTerm Project
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 /* ========================================================================
 	Project  Name		: TeraTerm Menu
 	Outline				: TeraTerm Menu Header
@@ -8,6 +35,9 @@
 	Update				: 2001-11-01(Thu)
     Reference			: Copyright (C) S.Hayakawa 1997-2001
 	======================================================================== */
+
+#ifndef TTPMENU_H
+#define TTPMENU_H
 
 #include	<windows.h>
 
@@ -98,7 +128,8 @@ struct JobInfo {
 	BOOL	bUsername;					// ユーザ名を入力するかどうかのフラグ
 	wchar_t	szUsername[MAX_PATH];		// ユーザ名
 	BOOL	bPassword;					// パスワードを入力するかどうかのフラグ
-	char	szPassword[MAX_PATH];		// パスワード
+	char	szPassword[272];			// パスワードは CryptProtectMemory() で暗号化するため、サイズは MAX_PATH(260バイト) 以上で、
+										// CRYPTPROTECTMEMORY_BLOCK_SIZE(16バイト) の倍数でなければならない。(実際に使用するのは MAX_PATH まで)
 	BOOL	bLockBox;					// パスワードの暗号化/復号するかどうかのフラグ
 
 	// マクロ実行用設定
@@ -106,7 +137,7 @@ struct JobInfo {
 
 	// 詳細設定
 	wchar_t	szTeraTerm[MAX_PATH];		// 起動アプリ（TeraTerm）のファイル名
-	wchar_t	szInitFile[MAX_PATH];		// TeraTermの設定ファイル（起動のみ意外）
+	wchar_t	szInitFile[MAX_PATH];		// TeraTermの設定ファイル（起動のみ以外）
 	wchar_t	szOption[MAX_PATH];			// アプリケーションのオプション/引数
 	wchar_t	szLog[MAX_PATH];			// ログファイル名（自動ログインのみ）
 	wchar_t	szLoginPrompt[MAX_PATH];	// ログインプロンプト（自動ログインのみ）
@@ -117,11 +148,20 @@ struct JobInfo {
 	BOOL    bPageant;                   // use Pageant(/pageant)
 };
 
+// 表示設定構造体(名前とアイコンのリスト)
+#pragma warning(push)
+#pragma warning(disable : 4200) 		// C99 可変長配列の警告を抑止
+struct NameList {
+	NameList	*pNext;
+	HICON		hLargeIcon;
+	HICON		hSmallIcon;
+	wchar_t		szName[];				// 可変長配列
+};
+#pragma warning(pop)
+
 // 表示設定構造体
 struct MenuData {
-	wchar_t		szName[MAXJOBNUM][MAX_PATH];
-	HICON		hLargeIcon[MAXJOBNUM];
-	HICON		hSmallIcon[MAXJOBNUM];
+	NameList	*pNameList;
 	DWORD		dwMenuHeight;
 	DWORD		dwIconMode;
 	BOOL		bLeftButtonPopup;
@@ -145,13 +185,11 @@ typedef struct {
 // 関数一覧
 void	PopupMenu(HWND hWnd);
 void	PopupListMenu(HWND hWnd);
-BOOL	AddTooltip(int idControl);
+BOOL	AddTooltip(HWND hWnd, int idControl, const wchar_t *tip);
 BOOL	ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName = NULL);
-BOOL	CreateTooltip(HWND hWnd);
+BOOL	CreateTooltip(HWND /* hWnd unusedParam */);
 BOOL	DecryptPassword(const char *szEncryptPassword, char *szDecryptPassword, HWND hWnd);
 BOOL	DeleteLoginHostInformation(HWND hWnd);
-BOOL	ErrorMessage(HWND hWnd, LPTSTR msg,...);
-BOOL	ExtractAssociatedIconEx(char *szPath, HICON *hLargeIcon, HICON *hSmallIcon);
 BOOL	ExecStartup(HWND hWnd);
 BOOL	InitConfigDlg(HWND hWnd);
 BOOL	InitEtcDlg(HWND hWnd);
@@ -167,7 +205,7 @@ BOOL	ManageWMCommand_Menu(HWND hWnd, WPARAM wParam);
 BOOL	ManageWMCommand_Version(HWND hWnd, WPARAM wParam);
 BOOL	ManageWMNotify_Config(LPARAM lParam);
 BOOL	RedrawMenu(HWND hWnd);
-BOOL	RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *jobInfo);
+BOOL	RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info);
 BOOL	RegSaveLoginHostInformation(JobInfo *jobInfo);
 BOOL	SaveConfig(void);
 BOOL	SaveEtcInformation(HWND hWnd);
@@ -176,9 +214,9 @@ BOOL	SetDefaultEtcDlg(HWND hWnd);
 BOOL	SetMenuFont(HWND hWnd);
 BOOL	SetTaskTray(HWND hWnd, DWORD dwMessage);
 INT_PTR	CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-INT_PTR	CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR	CALLBACK DlgCallBack_Etc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM /* lParam unusedParam */);
 INT_PTR	CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-INT_PTR	CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR	CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM /* lParam unusedParam */);
 LRESULT	CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam);
 LRESULT	CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
