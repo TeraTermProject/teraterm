@@ -1570,7 +1570,6 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 			::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
 			return FALSE;
 		}
-		EncodePassword((const char *)g_szLockBox, (char *)cEncodeLockBox);
 		memcpy(cEncodeLockBox, g_szLockBox, sizeof(g_szLockBox));
 		CryptUnprotectMemory(cEncodeLockBox, sizeof(g_szLockBox), CRYPTPROTECTMEMORY_SAME_PROCESS);
 		Encrypt2EncDec((char *)cEncodePassword, cEncodeLockBox, &profile, 1);
