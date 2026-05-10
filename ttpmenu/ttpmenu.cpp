@@ -425,8 +425,11 @@ BOOL LoadConfig(void)
 		RegGetBYTE(hKey, KEY_LF_QUALITY, g_MenuData.lfFont.lfQuality);
 		RegGetBYTE(hKey, KEY_LF_PITCHANDFAMILY, g_MenuData.lfFont.lfPitchAndFamily);
 		RegGetStr(hKey, KEY_LF_FACENAME, g_MenuData.lfFont.lfFaceName, LF_FACESIZE);
-	} else
-		::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &(g_MenuData.lfFont));
+	} else {
+		NONCLIENTMETRICSW ncm = { sizeof(NONCLIENTMETRICSW) };
+		SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof(ncm), &ncm, 0);
+		g_MenuData.lfFont = ncm.lfMenuFont;
+	}
 
 	g_szLockBox[0] = 0;
 
