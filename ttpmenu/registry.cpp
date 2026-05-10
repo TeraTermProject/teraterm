@@ -419,17 +419,25 @@ BOOL RegSetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD dwValue)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL RegGetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD *dwValue)
 {
-	int defmark = 0xdeadbeef;
-
 	if(bUseINI){
-		// 読み込みに失敗した場合は false を返す (2007.11.14 yutaka)
-		*dwValue = GetPrivateProfileIntW(szSectionName, lpszValueName, defmark, getModuleName());
-		if (*dwValue == defmark) {
+		wchar_t t[64] = {};
+		const wchar_t *defstr = L"__default__";
+
+		GetPrivateProfileStringW(szSectionName, lpszValueName, defstr, t, _countof(t), getModuleName());
+		if (wcscmp(t, defstr) == 0) {
 			*dwValue = 0;
 			return FALSE;
-		} else {
-			return TRUE;
 		}
+
+		errno = 0;
+		wchar_t *endptr;
+		*dwValue = (DWORD)wcstoul(t, &endptr, 10);
+		if (endptr == t || *endptr != L'\0' || errno != 0) {
+			*dwValue = 0;
+			return FALSE;
+		}
+
+		return TRUE;
 	}else{
 		long	lError;
 		DWORD	dwType = REG_DWORD;
