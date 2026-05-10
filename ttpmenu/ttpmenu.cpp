@@ -48,7 +48,6 @@
 #include	"win32helper.h"
 #include	"dlglib.h"
 #include	"asprintf.h"
-#include	"codeconv.h"
 
 #include	"ttdup.h"
 
