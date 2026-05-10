@@ -288,16 +288,20 @@ BOOL SetMenuFont(HWND hWnd)
 static BOOL ExtractAssociatedIconEx(const wchar_t *szPath, HICON *hLargeIcon, HICON *hSmallIcon)
 {
 	SHFILEINFOW	sfi;
+	*hLargeIcon = NULL;
+	*hSmallIcon = NULL;
 
-	::SHGetFileInfoW(szPath, 0, &sfi, sizeof(sfi), SHGFI_LARGEICON | SHGFI_ICON);
-	*hLargeIcon = ::CopyIcon(sfi.hIcon);
-	::DestroyIcon(sfi.hIcon);
+	if (::SHGetFileInfoW(szPath, 0, &sfi, sizeof(sfi), SHGFI_LARGEICON | SHGFI_ICON) != 0 && sfi.hIcon) {
+		*hLargeIcon = ::CopyIcon(sfi.hIcon);
+		::DestroyIcon(sfi.hIcon);
+	}
 
-	::SHGetFileInfoW(szPath, 0, &sfi, sizeof(sfi), SHGFI_SMALLICON | SHGFI_ICON);
-	*hSmallIcon = ::CopyIcon(sfi.hIcon);
-	::DestroyIcon(sfi.hIcon);
+	if (::SHGetFileInfoW(szPath, 0, &sfi, sizeof(sfi), SHGFI_SMALLICON | SHGFI_ICON) != 0 && sfi.hIcon) {
+		*hSmallIcon = ::CopyIcon(sfi.hIcon);
+		::DestroyIcon(sfi.hIcon);
+	}
 
-	return TRUE;
+	return (*hLargeIcon != NULL && *hSmallIcon != NULL);
 }
 
 /* ==========================================================================
@@ -917,17 +921,16 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 			if (ret == FALSE && ecode == ERROR_TIMEOUT) {
 				Sleep(1000);
 				ret = ::Shell_NotifyIconA(NIM_MODIFY, &nid);
-				if (ret == TRUE)
+				if (ret == TRUE) {
 					break;
-
+				}
 			} else {
 				break;
 			}
 		}
-
+		return ret;
 	} else {
 		::Shell_NotifyIconA(dwMessage, &nid);
-
 	}
 
 	return TRUE;
@@ -1288,12 +1291,11 @@ BOOL InitListMenu(HWND hWnd)
 	Attention		: 
 	Up Date			: 
    ======1=========2=========3=========4=========5=========6=========7======= */
-BOOL RedrawMenu(HWND /* hWnd unusedParam */)
+BOOL RedrawMenu(HWND hWnd)
 {
 	int			num;
 	wchar_t		szPath[MAX_PATH];
 	HDC			hDC;
-	HWND		hWndItem;
 	DWORD		itemNum;
 	DWORD		desktopHeight;
 	DWORD		dwCnt = 0;
@@ -1306,17 +1308,25 @@ BOOL RedrawMenu(HWND /* hWnd unusedParam */)
 	for (dwCnt = 0; dwCnt < (DWORD) num; dwCnt++)
 		if (::DeleteMenu(g_hListMenu, ID_MENU_MIN + dwCnt, MF_BYCOMMAND) == FALSE)
 			num++;
-	
-	hWndItem	= ::GetDlgItem((HWND) g_hListMenu, ID_MENU_MIN);
-	hDC			= ::GetWindowDC(hWndItem);
-	if (g_MenuData.hFont != NULL)
-		::SelectObject(hDC, (HGDIOBJ) g_MenuData.hFont);
-	::GetTextMetrics(hDC, &textMetric);
-	if (g_MenuData.dwIconMode == MODE_SMALLICON)
-		g_MenuData.dwMenuHeight	= (ICONSPACE_SMALL > textMetric.tmHeight) ? ICONSPACE_SMALL : textMetric.tmHeight;
-	else
-		g_MenuData.dwMenuHeight	= (ICONSPACE_LARGE > textMetric.tmHeight) ? ICONSPACE_LARGE : textMetric.tmHeight;
-	ReleaseDC(hWndItem, hDC);
+
+	hDC = ::GetDC(hWnd);
+	if (hDC == NULL) {
+		g_MenuData.dwMenuHeight = ICONSPACE_SMALL;
+	} else {
+		if (g_MenuData.hFont != NULL) {
+			::SelectObject(hDC, (HGDIOBJ) g_MenuData.hFont);
+		}
+		::GetTextMetrics(hDC, &textMetric);
+		if (g_MenuData.dwIconMode == MODE_SMALLICON) {
+			g_MenuData.dwMenuHeight	= (ICONSPACE_SMALL > textMetric.tmHeight) ? ICONSPACE_SMALL : textMetric.tmHeight;
+		} else {
+			g_MenuData.dwMenuHeight	= (ICONSPACE_LARGE > textMetric.tmHeight) ? ICONSPACE_LARGE : textMetric.tmHeight;
+		}
+		if (g_MenuData.dwMenuHeight == 0) {
+			g_MenuData.dwMenuHeight = ICONSPACE_SMALL;
+		}
+        ReleaseDC(hWnd, hDC);
+	}
 
 	desktopHeight	= ::GetSystemMetrics(SM_CYSCREEN);
 	itemNum			= desktopHeight / g_MenuData.dwMenuHeight;
@@ -1326,11 +1336,11 @@ BOOL RedrawMenu(HWND /* hWnd unusedParam */)
 	while(pNameList) {
 		if (GetApplicationFilename(pNameList->szName, szPath) == TRUE) {
 			if (dwCnt % itemNum == 0 && dwCnt != 0)
-				::AppendMenuA(g_hListMenu, MF_OWNERDRAW | MF_MENUBARBREAK, ID_MENU_MIN + dwCnt,
-							  (LPCSTR)(UINT_PTR)dwCnt);
+				::AppendMenuW(g_hListMenu, MF_OWNERDRAW | MF_MENUBARBREAK, ID_MENU_MIN + dwCnt,
+							  (LPCWSTR)(UINT_PTR)dwCnt);
 			else
-				::AppendMenuA(g_hListMenu, MF_OWNERDRAW | MF_POPUP, ID_MENU_MIN + dwCnt,
-							  (LPCSTR)(UINT_PTR)dwCnt);
+				::AppendMenuW(g_hListMenu, MF_OWNERDRAW | MF_POPUP, ID_MENU_MIN + dwCnt,
+							  (LPCWSTR)(UINT_PTR)dwCnt);
 			dwValidCnt++;
 		}
 		dwCnt++;
@@ -1682,6 +1692,10 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 	char 	szEncodePassword[MAX_PATH];
 
 	index = ::SendDlgItemMessage(hWnd, LIST_HOST, LB_GETCURSEL, 0, 0);
+	if (index == LB_ERR) {
+		return FALSE;
+	}
+
 	::SendDlgItemMessageW(hWnd, LIST_HOST, LB_GETTEXT, (WPARAM)index, (LPARAM)szName);
 
 	if (RegLoadLoginHostInformation(szName, &g_JobInfo) == FALSE) {

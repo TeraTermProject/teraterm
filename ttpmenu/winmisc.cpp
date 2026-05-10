@@ -141,6 +141,11 @@ void EncodePassword(const char *cPassword, char *cEncodePassword)
 	DWORD	dwCnt;
 	DWORD	dwPasswordLength = ::lstrlenA(cPassword);
 
+	if (dwPasswordLength == 0 || dwPasswordLength >= MAX_PATH) {
+		cEncodePassword[0] = '\0';
+		return;
+	}
+
 	for (dwCnt = 0; dwCnt < dwPasswordLength; dwCnt++)
 		cEncodePassword[dwPasswordLength - 1 - dwCnt] = cPassword[dwCnt] ^ 0xff;
 

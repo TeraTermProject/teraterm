@@ -354,6 +354,10 @@ BOOL RegGetStr(HKEY hKey, const wchar_t *lpszValueName, wchar_t *buf, DWORD dwSi
 			::SetLastError(lError);
 			return FALSE;
 		}
+		if (dwType != REG_SZ && dwType != REG_EXPAND_SZ) {
+			buf[0] = L'\0';
+			return FALSE;
+		}
 
 		buf[dwSize - 1] = L'\0';
 	}
