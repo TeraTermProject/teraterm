@@ -236,7 +236,7 @@ BOOL SetMenuFont(HWND hWnd)
 	static int	open = 0;
 
 	if (open == 1) {
-		while ((hFontWnd = ::FindWindowA(NULL, "Font")) != NULL) {
+		while ((hFontWnd = ::FindWindowW(L"#32770" /* ダイアログボックスのクラス */, L"Font")) != NULL) {
 			if (hWnd == ::GetParent(hFontWnd)) {
 				::SetForceForegroundWindow(hFontWnd);
 				break;
