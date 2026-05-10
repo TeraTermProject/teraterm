@@ -531,7 +531,7 @@ BOOL RegGetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, LPDWORD lp
 		BOOL ret = GetPrivateProfileStringW(szSectionName, lpszValueName, L"", t, _countof(t), getModuleName());
 		if(ret){
 			size_t size = wcslen(t);
-			while(t[size-1] == ' '){
+			while(size > 0 && t[size-1] == L' '){
 				size--;
 				t[size] = 0;
 			}
@@ -540,6 +540,10 @@ BOOL RegGetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, LPDWORD lp
 			DWORD cnt = 0;
 			*p = 0;
 			for(size_t i=0; i<(size+1)/3; i++){
+				if(cnt >= *lpdwSize){
+					*lpdwSize = 0;
+					return FALSE;
+				}
 				*p++ = (BYTE)wcstol(s, NULL, 16);
 				s += 3;
 				cnt ++;

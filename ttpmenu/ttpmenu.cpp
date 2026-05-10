@@ -2268,7 +2268,7 @@ INT_PTR CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		return TRUE;
 	case WM_DRAWITEM:
 		lpdis = (LPDRAWITEMSTRUCT) lParam;
-		if (lpdis->itemID == -1)
+		if (lpdis->itemID == -1 || lpdis->itemData >= MAXJOBNUM)
 			return TRUE;
 		if (lpdis->itemState & ODS_SELECTED) {
 			::SetTextColor(lpdis->hDC, crSelText);
@@ -2657,7 +2657,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	case WM_DRAWITEM:
 		lpdis = (LPDRAWITEMSTRUCT) lParam;
-		if (lpdis->itemID == -1)
+		if (lpdis->itemID == -1 || lpdis->itemData >= MAXJOBNUM)
 			return TRUE;
 		if (g_MenuData.hFont != NULL)
 			::SelectObject(lpdis->hDC, (HGDIOBJ) g_MenuData.hFont);

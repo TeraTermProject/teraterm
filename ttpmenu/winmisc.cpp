@@ -187,8 +187,9 @@ BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *f
 	// "folder" など '"' で囲まれているとき削除する
 	if (*szDirName == L'"')
 		szDirName++;
-	if (szDirName[wcslen(szDirName) - 1] == L'"')
-		szDirName[wcslen(szDirName) - 1] = L'\0';
+	size_t len = wcslen(szDirName);
+	if (len > 0 && szDirName[len - 1] == L'"')
+		szDirName[len - 1] = L'\0';
 
 	wchar_t *ptr = wcsrchr(szDirName, L'\\');
 	if (ptr == NULL) {
