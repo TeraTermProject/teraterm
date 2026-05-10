@@ -146,7 +146,7 @@ static void GetTeraTermPath(wchar_t *path, size_t size)
 	wchar_t szTTermPath[MAX_PATH];
 
 	GetTeraTermDir(szTTermPath, MAX_PATH);
-	_snwprintf(path, size, L"%s\\%s", szTTermPath, TERATERM);
+	_snwprintf_s(path, size, _TRUNCATE, L"%s\\%s", szTTermPath, TERATERM);
 }
 
 /* ==========================================================================
@@ -773,10 +773,10 @@ BOOL InitEtcDlg(HWND hWnd)
 		GetTeraTermPath(g_JobInfo.szTeraTerm, MAX_PATH);
 	}
 	if (wcslen(g_JobInfo.szLoginPrompt) == 0) {
-		wcscpy(g_JobInfo.szLoginPrompt, LOGIN_PROMPT);
+		wcscpy_s(g_JobInfo.szLoginPrompt, _countof(g_JobInfo.szLoginPrompt), LOGIN_PROMPT);
 	}
 	if (wcslen(g_JobInfo.szPasswdPrompt) == 0) {
-		wcscpy(g_JobInfo.szPasswdPrompt, PASSWORD_PROMPT);
+		wcscpy_s(g_JobInfo.szPasswdPrompt, _countof(g_JobInfo.szPasswdPrompt), PASSWORD_PROMPT);
 	}
 
 	::SetDlgItemTextW(hWnd, EDIT_TTMPATH, g_JobInfo.szTeraTerm);
@@ -1106,12 +1106,12 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 
 		// フルパス化する
 		wchar_t *exe_fullpath = GetFullPath(jobInfo.szTeraTerm);
-		wcscpy_s(jobInfo.szTeraTerm, exe_fullpath);
+		wcscpy_s(jobInfo.szTeraTerm, _countof(jobInfo.szTeraTerm), exe_fullpath);
 		free(exe_fullpath);
 
 		// 実行するプログラムのカレントパス
 		//   プログラムのあるフォルダ
-		wcscpy(szDirectory, jobInfo.szTeraTerm);
+		wcscpy_s(szDirectory, _countof(szDirectory), jobInfo.szTeraTerm);
 		if ((::GetFileAttributesW(jobInfo.szTeraTerm) & FILE_ATTRIBUTE_DIRECTORY) == 0) {
 			wchar_t	*pt = wcsrchr(szDirectory, '\\');
 			if (pt != NULL)
@@ -1427,7 +1427,7 @@ BOOL RegLoadLoginHostInformation(const wchar_t *szName, JobInfo *job_Info)
 	if ((hKey = RegOpen(HKEY_CURRENT_USER, szSubKey)) == INVALID_HANDLE_VALUE)
 		return FALSE;
 
-	wcscpy(jobInfo.szName, szName);
+	wcscpy_s(jobInfo.szName, _countof(jobInfo.szName), szName);
 
 	RegGetStr(hKey, KEY_HOSTNAME, jobInfo.szHostName, MAX_PATH);
 	RegGetDword(hKey, KEY_MODE, dword_tmp);
@@ -1711,7 +1711,7 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 	}
 
 	if (wcslen(g_JobInfo.szName) == 0)
-		wcscpy(g_JobInfo.szName, g_JobInfo.szHostName);
+		wcscpy_s(g_JobInfo.szName, _countof(g_JobInfo.szName), g_JobInfo.szHostName);
 
 	::SetDlgItemTextW(hWnd, EDIT_ENTRY, g_JobInfo.szName);
 	::SetDlgItemTextW(hWnd, EDIT_HOST, g_JobInfo.szHostName);

@@ -57,7 +57,7 @@ static BOOL getSection(const wchar_t *str)
 	}else{
 		t = str;
 	}
-	wcscpy_s(szSectionName, t);
+	wcscpy_s(szSectionName, _countof(szSectionName), t);
 	return TRUE;
 }
 

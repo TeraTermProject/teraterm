@@ -181,7 +181,7 @@ BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *f
 	::GetDlgItemTextW(hWnd, editCtl, szDirName, MAX_PATH);
 	if (szDirName[0] == 0) {
 		// エディットが空だった時デフォルトを使用する
-		wcscpy(szDirName, defaultDir);
+		wcscpy_s(szDirName, MAX_PATH, defaultDir);
 	}
 
 	// "folder" など '"' で囲まれているとき削除する
@@ -192,12 +192,12 @@ BOOL OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *f
 
 	wchar_t *ptr = wcsrchr(szDirName, L'\\');
 	if (ptr == NULL) {
-		wcscpy(szFile, szDirName);
+		wcscpy_s(szFile, MAX_PATH, szDirName);
 		if (defaultDir != NULL && *szDirName == 0)
-			wcscpy(szDirName, defaultDir);
+			wcscpy_s(szDirName, MAX_PATH, defaultDir);
 	} else {
 		*ptr = 0;
-		wcscpy(szFile, ptr + 1);
+		wcscpy_s(szFile, MAX_PATH, ptr + 1);
 	}
 
 	TTOPENFILENAMEW	ofn = {};
