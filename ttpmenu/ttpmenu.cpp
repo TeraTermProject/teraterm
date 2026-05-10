@@ -740,6 +740,13 @@ BOOL InitConfigDlg(HWND hWnd)
 	::CheckDlgButton(hWnd, CHECK_LOCKBOX, BST_UNCHECKED);
 	::CheckDlgButton(hWnd, CHECK_INI_FILE, BST_CHECKED);
 
+	::SendDlgItemMessage(hWnd, EDIT_ENTRY, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_HOST, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_USER, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_PASSWORD, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, IDC_KEYFILE_PATH, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_MACRO, EM_LIMITTEXT, MAX_PATH - 1, 0);
+
 	InitListBox(hWnd);
 
 	return TRUE;
@@ -792,8 +799,14 @@ BOOL InitEtcDlg(HWND hWnd)
 	::SetDlgItemTextW(hWnd, EDIT_OPTION, g_JobInfo.szOption);
 	::SetDlgItemTextW(hWnd, EDIT_PROMPT_USER, g_JobInfo.szLoginPrompt);
 	::SetDlgItemTextW(hWnd, EDIT_PROMPT_PASS, g_JobInfo.szPasswdPrompt);
-
 	::SetDlgItemTextW(hWnd, EDIT_LOG, g_JobInfo.szLog);
+
+	::SendDlgItemMessage(hWnd, EDIT_TTMPATH, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_INITFILE, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_OPTION, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_PROMPT_USER, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_PROMPT_PASS, EM_LIMITTEXT, MAX_PATH - 1, 0);
+	::SendDlgItemMessage(hWnd, EDIT_LOG, EM_LIMITTEXT, MAX_PATH - 1, 0);
 
 	return TRUE;
 }
@@ -2454,6 +2467,7 @@ INT_PTR CALLBACK DlgCallBack_LockBox(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		SendDlgItemMessage(hWnd, IDC_TTPMENU_ICON, STM_SETICON, (WPARAM)g_hIcon, 0);
 		pData = (LockBoxDlgPrivateData *)lParam;
 		SetWindowLongPtr(hWnd, DWLP_USER, (LONG_PTR)pData);
+		SendDlgItemMessage(hWnd, IDC_LOCKBOX_EDIT, EM_LIMITTEXT, ENCRYPT2_PWD_MAX_LEN, 0);
 
 		if (g_szLockBox[0] != 0) {
 			memcpy(szEncodeEncryptKey, g_szLockBox, CRYPTPROTECTMEMORYLEN);
