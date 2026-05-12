@@ -170,8 +170,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 
 			if (!OnIdle(lCount)) {
 				// idle不要
-				if (SleepTick < 500) {	// 最大 501ms未満
-					SleepTick += 2;
+				const DWORD max_sleep_ms = 1;	// 最大 Sleep() 時間、この値未満
+				//const DWORD max_sleep_ms = 500;	// 最大 Sleep() 時間、この値未満
+				if (SleepTick < max_sleep_ms) {
+					SleepTick += 1;
 				}
 				lCount = 0;
 				Sleep(SleepTick);
