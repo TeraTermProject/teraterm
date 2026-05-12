@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Initialize python env and run mcp server
+set -e
+
+# If CLAUDE_PLUGIN_ROOT is not set (e.g. testing locally), use the current directory
+if [ -z "$CLAUDE_PLUGIN_ROOT" ]; then
+  DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  CLAUDE_PLUGIN_ROOT="$(dirname "$DIR")"
+fi
+
+export PYTHONPATH="${CLAUDE_PLUGIN_ROOT}/src:${PYTHONPATH}"
+
+# Start the API server in the background
+python3 -m teraterm_mcp.api_server > /dev/null 2>&1 &
+API_PID=$!
+
+# Ensure API server is killed when MCP server exits
+trap "kill $API_PID 2>/dev/null || true" EXIT
+
+# Start the MCP server
+python3 -m teraterm_mcp.mcp_server
