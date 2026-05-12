@@ -1,0 +1,20 @@
+[project]
+name = "teraterm-mcp"
+version = "1.0.0"
+description = "MCP server and HTTP API for interacting with Tera Term"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "mcp",
+    "httpx",
+    "pydantic"
+]
+
+[project.scripts]
+teraterm-mcp = "teraterm_mcp.mcp_server:main"
+teraterm-api = "teraterm_mcp.api_server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
