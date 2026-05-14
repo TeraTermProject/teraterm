@@ -120,6 +120,7 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
 else()
   # single-configuration
   unset(GENERATE_OPTIONS)
+  list(APPEND GENERATE_OPTIONS "-DARCHITECTURE=${ARCHITECTURE}")
   if(CMAKE_HOST_UNIX)
     list(APPEND GENERATE_OPTIONS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/../mingw.toolchain.cmake")
   endif(CMAKE_HOST_UNIX)
