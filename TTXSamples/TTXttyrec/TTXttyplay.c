@@ -343,6 +343,10 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 			  case '.':
 				pvar->wait.tv_sec = 0;
 				break;
+			  case 'q':
+			  case 'Q':
+				pvar->nowait = !pvar->nowait;
+				break;
 			  case ESC:
 				mode = MODE_ESC;
 				break;
@@ -524,6 +528,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 				free(pvar->openfnW);
 				pvar->openfnW = openfn;
 				pvar->ReplaceHostDlg = TRUE;
+				pvar->nowait = FALSE;
 				// Call New-Connection dialog
 				SendMessage(hWin, WM_COMMAND, MAKELONG(ID_FILE_NEWCONNECTION, 0), 0);
 			}
@@ -537,6 +542,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 			SendMessage(hWin, WM_COMMAND, MAKELONG(ID_EDIT_CLEARBUFFER, 0), 0);
 			pvar->played = FALSE;
 			pvar->ReplaceHostDlg = TRUE;
+			pvar->nowait = FALSE;
 			// Call New-Connection dialog
 			SendMessage(hWin, WM_COMMAND, MAKELONG(ID_FILE_NEWCONNECTION, 0), 0);
 		}
