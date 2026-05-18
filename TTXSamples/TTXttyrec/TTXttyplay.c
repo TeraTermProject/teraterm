@@ -490,6 +490,9 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
 				pvar->openfnW = HostNameW;
 			}
 		}
+		else if (_wcsnicmp(buff, L"/TPW=", 5) == 0) {
+			pvar->maxwait = _wtoi(&buff[5]);
+		}
 	}
 }
 
