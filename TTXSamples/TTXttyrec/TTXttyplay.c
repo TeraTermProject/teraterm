@@ -53,6 +53,7 @@ typedef struct {
 	HMENU FileMenu;
 	HMENU ControlMenu;
 	int maxwait;
+	int minwait;
 	int speed;
 	BOOL pause;
 	BOOL nowait;
@@ -234,7 +235,11 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 		h.len = b[2];
 		if (prh.tv.tv_sec != 0) {
 			pvar->wait = tvshift(tvdiff(prh.tv, h.tv), pvar->speed);
-			if (pvar->maxwait != 0 && pvar->wait.tv_sec >= pvar->maxwait) {
+			if (pvar->wait.tv_sec < pvar->minwait) {
+				pvar->wait.tv_sec = 0;
+				pvar->wait.tv_usec = 0;
+			}
+			else if (pvar->maxwait != 0 && pvar->wait.tv_sec >= pvar->maxwait) {
 				char tbuff[TitleBuffSize];
 				wchar_t *uimsg;
 				char *msg;
@@ -476,6 +481,7 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
 	wchar_t buff[1024];
 	wchar_t *next;
 	pvar->origParseParam(Param, ts, DDETopic);
+	int max, min;
 
 	next = Param;
 	while (next = GetParam(buff, sizeof(buff), next)) {
@@ -491,7 +497,13 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
 			}
 		}
 		else if (_wcsnicmp(buff, L"/TPW=", 5) == 0) {
-			pvar->maxwait = _wtoi(&buff[5]);
+			max = 0;
+			min = 0;
+	    	if (swscanf_s(&buff[5], L"%d,%d", &max, &min) == 0) {
+	    		swscanf_s(&buff[5], L",%d", &min);
+			}
+			pvar->maxwait = max;
+			pvar->minwait = min;
 		}
 	}
 }
