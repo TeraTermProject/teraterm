@@ -213,6 +213,7 @@ void SetDPIAwareness(const wchar_t *SetupFNameW);
 wchar_t *GetFullPathW(const wchar_t *dir, const wchar_t *rel_path);
 char *GetVersionSubstr(void);
 DWORD TTCreateProcess(const wchar_t *cmd, const wchar_t *arg1, const wchar_t *arg2);
+wchar_t* ResolveAbsolutePath(const wchar_t* user_path, const wchar_t* base_dir);
 
 #ifdef __cplusplus
 }
