@@ -57,6 +57,7 @@ typedef struct {
 	int speed;
 	BOOL pause;
 	BOOL nowait;
+	BOOL nowait_ini;
 	BOOL open_error;
 	struct timeval last;
 	struct timeval wait;
@@ -439,6 +440,8 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 		RestoreOLDTitle();
 		pvar->enable = FALSE;
 		pvar->played = TRUE;
+		pvar->nowait = pvar->nowait_ini;
+		pvar->speed = 0;
 	}
 }
 
@@ -487,6 +490,7 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
 	while (next = GetParam(buff, sizeof(buff), next)) {
 		if (_wcsnicmp(buff, L"/ttyplay-nowait", 16) == 0 || _wcsnicmp(buff, L"/tpnw", 6) == 0) {
 			pvar->nowait = TRUE;
+			pvar->nowait_ini = pvar->nowait;
 		}
 		else if (_wcsnicmp(buff, L"/TTYPLAY", 9) == 0 || _wcsnicmp(buff, L"/TP", 4) == 0) {
 			pvar->enable = TRUE;
