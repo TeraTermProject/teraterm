@@ -52,6 +52,8 @@ typedef struct {
 	BOOL played;
 	HMENU FileMenu;
 	HMENU ControlMenu;
+	int skip;
+	int skip_ini;
 	int maxwait;
 	int minwait;
 	int speed;
@@ -137,8 +139,13 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	gettimeofday(&(pvar->last) /*, NULL*/ );
 	pvar->wait.tv_sec = 0;
 	pvar->wait.tv_usec = 1;
+	pvar->skip = 0;
+	pvar->skip_ini = 5;
+	pvar->maxwait = 0;
+	pvar->minwait = 0;
 	pvar->pause = FALSE;
 	pvar->nowait = FALSE;
+	pvar->nowait_ini = FALSE;
 	pvar->open_error = FALSE;
 }
 
@@ -236,7 +243,10 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 		h.len = b[2];
 		if (prh.tv.tv_sec != 0) {
 			pvar->wait = tvshift(tvdiff(prh.tv, h.tv), pvar->speed);
-			if (pvar->wait.tv_sec < pvar->minwait) {
+			if (pvar->wait.tv_sec < pvar->minwait || pvar->skip > 0) {
+				if (pvar->skip > 0) {
+					pvar->skip --;
+				}
 				pvar->wait.tv_sec = 0;
 				pvar->wait.tv_usec = 0;
 			}
@@ -352,6 +362,10 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 			  case 'q':
 			  case 'Q':
 				pvar->nowait = !pvar->nowait;
+				break;
+			  case 'k':
+			  case 'K':
+				pvar->skip += pvar->skip_ini;
 				break;
 			  case ESC:
 				mode = MODE_ESC;
