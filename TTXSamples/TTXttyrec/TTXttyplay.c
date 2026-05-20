@@ -47,6 +47,7 @@ typedef struct {
 	PParseParam origParseParam;
 	PReadIniFile origReadIniFile;
 	BOOL enable;
+	BOOL active;
 	BOOL ChangeTitle;
 	BOOL ReplaceHostDlg;
 	BOOL played;
@@ -133,6 +134,7 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->origPReadFile = NULL;
 	pvar->origPWriteFile = NULL;
 	pvar->enable = FALSE;
+	pvar->active = FALSE;
 	pvar->ChangeTitle = FALSE;
 	pvar->ReplaceHostDlg = FALSE;
 	pvar->played = FALSE;
@@ -211,6 +213,12 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 
 	if (!pvar->enable) {
 		return pvar->origPReadFile(fh, obuff, oblen, rbytes, rol);
+	}
+
+	if (!pvar->active) {
+		pvar->active = TRUE;
+		title_changed = FALSE;
+		first_title_changed = FALSE;
 	}
 
 	if (!first_title_changed) {
@@ -456,6 +464,7 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 		pvar->played = TRUE;
 		pvar->nowait = pvar->nowait_ini;
 		pvar->speed = 0;
+		pvar->active = FALSE;
 	}
 }
 
