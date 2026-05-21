@@ -23,6 +23,9 @@
 
 #define INISECTION "ttyplay"
 
+#define TITLE_MODE_TIME 1
+#define TITLE_MODE_MSEC 2
+
 static HANDLE hInst; /* Instance handle of TTX*.DLL */
 
 enum ParseMode {
@@ -62,6 +65,8 @@ typedef struct {
 	wchar_t *openfnW;
 	char origTitle[TitleBuffSize];
 	char origOLDTitle[TitleBuffSize];
+	int mode_flag;
+	char *fmt_time;
 } TInstVar;
 
 static TInstVar *pvar;
@@ -102,6 +107,41 @@ void ChangeTitleStatus() {
   SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
 }
 
+void ChangeTitleTime(struct timeval tv) {
+	char tbuff[TitleBuffSize];
+  	time_t tvs = tv.tv_sec;
+  	struct tm tm_local;
+
+  	if (localtime_s(&tm_local, &tvs) != 0) {
+		return;
+  	}
+	if (pvar->fmt_time == 0 || *pvar->fmt_time == '\0') {
+		return;
+	}
+	if (strftime(tbuff, sizeof(tbuff), pvar->fmt_time, &tm_local) == 0) {
+		return;
+	}
+	if (pvar->mode_flag & TITLE_MODE_MSEC) {
+		char buff[8];
+		_snprintf_s(buff, sizeof(buff), _TRUNCATE, ".%03d", tv.tv_usec/1000);
+		strncat_s(tbuff, sizeof(tbuff), buff, _TRUNCATE);
+	}
+
+	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
+	SendMessage(pvar->cv->HWin, WM_USER_CHANGETITLE, 0, 0);
+}
+
+void ChangeTitleTimePeriod(struct timeval tv, int period) {
+	static time_t tvs_org;
+	time_t tvs = (time_t)tv.tv_sec*1000+tv.tv_usec/1000;
+
+	if (tvs == tvs_org) return;
+	if (llabs(tvs - tvs_org) < ((period<1000) ? period : 1000)) return;
+	tvs_org = tvs;
+
+	ChangeTitleTime(tv);
+}
+
 HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
   int i, j, items, subitems, cur_id;
   HMENU m;
@@ -138,6 +178,8 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->pause = FALSE;
 	pvar->nowait = FALSE;
 	pvar->open_error = FALSE;
+	pvar->mode_flag = 0;
+	pvar->fmt_time = NULL;
 }
 
 void RestoreTitle() {
@@ -175,6 +217,14 @@ static HANDLE PASCAL TTXCreateFile(LPCSTR FName, DWORD AcMode, DWORD ShMode,
 		}
 		else {
 			pvar->open_error = FALSE;
+
+			if (NULL == pvar->fmt_time) {
+				wchar_t *uimsg;
+				GetI18nStrWW("TTXttyrec", "TITLE_TIME_MSG", 
+					L"%Y/%m/%d %H:%M:%S", pvar->ts->UILanguageFileW, &uimsg);
+				pvar->fmt_time = ToCharW(uimsg);
+				free(uimsg);
+			}
 		}
 	}
 
@@ -183,6 +233,8 @@ static HANDLE PASCAL TTXCreateFile(LPCSTR FName, DWORD AcMode, DWORD ShMode,
 
 static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rbytes, LPOVERLAPPED rol) {
 	static struct recheader prh = { 0, 0, 0 };
+	static struct recheader orh = { 0, 0, 0 };
+	static int speed = 0;
 	static DWORD lbytes;
 	static char ibuff[BUFFSIZE];
 	static BOOL title_changed = FALSE, first_title_changed = FALSE;
@@ -205,7 +257,9 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 	}
 
 	if (!first_title_changed) {
-		ChangeTitleStatus ();
+		if (!(pvar->mode_flag & TITLE_MODE_TIME)) {
+			ChangeTitleStatus ();
+		}
 		first_title_changed = TRUE;
 	}
 
@@ -249,12 +303,18 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 				ChangeTitle(tbuff);
 			}
 		}
+		speed = pvar->speed;
+		orh = prh;
 		prh = h;
 	}
 
 	if (!pvar->nowait) {
 		gettimeofday(&curtime /*, NULL*/ );
 		tdiff = tvdiff(pvar->last, curtime);
+		if (pvar->mode_flag & TITLE_MODE_TIME) {
+			int period = (81<<(8+speed))/256;
+			ChangeTitleTimePeriod(tvadd(orh.tv, tvshift(tdiff, -speed)), period);
+		}
 	}
 
 	if (pvar->nowait || tdiff.tv_sec > pvar->wait.tv_sec ||
@@ -343,6 +403,11 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 			  case '.':
 				pvar->wait.tv_sec = 0;
 				break;
+			  case 't':
+			  case 'T':
+				pvar->mode_flag ^= TITLE_MODE_TIME;
+				speed_changed = TRUE;
+				break;
 			  case ESC:
 				mode = MODE_ESC;
 				break;
@@ -394,7 +459,9 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 	}
 
 	if (speed_changed) {
-		ChangeTitleStatus ();
+		if (!(pvar->mode_flag & TITLE_MODE_TIME)) {
+			ChangeTitleStatus ();
+		}
 	}
 	if (dpos > 0) {
 		pvar->origPWriteFile(fh, tmpbuff, dpos, wbytes, wol);
@@ -430,6 +497,13 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 		RestoreOLDTitle();
 		pvar->enable = FALSE;
 		pvar->played = TRUE;
+		pvar->wait.tv_sec = 0;
+		pvar->wait.tv_usec = 0;
+
+		if (NULL != pvar->fmt_time) {
+			free(pvar->fmt_time);
+			pvar->fmt_time = NULL;
+		}
 	}
 }
 
@@ -478,12 +552,16 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
 		if (_wcsnicmp(buff, L"/ttyplay-nowait", 16) == 0 || _wcsnicmp(buff, L"/tpnw", 6) == 0) {
 			pvar->nowait = TRUE;
 		}
-		else if (_wcsnicmp(buff, L"/TTYPLAY", 9) == 0 || _wcsnicmp(buff, L"/TP", 4) == 0) {
+		else if (_wcsnicmp(buff, L"/TTYPLAY", 9) == 0 || _wcsnicmp(buff, L"/TP", 4) == 0 ||
+			_wcsnicmp(buff, L"/TP=",4) == 0) {
 			pvar->enable = TRUE;
 			if (ts->PortType == IdFile && strlen(ts->HostName) > 0) {
 				wchar_t *HostNameW = ToWcharA(ts->HostName);
 				free(pvar->openfnW);
 				pvar->openfnW = HostNameW;
+			}
+			if (buff[3] == '=') {
+				pvar->mode_flag = _wtol(&buff[4]);
 			}
 		}
 	}
