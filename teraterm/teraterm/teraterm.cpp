@@ -145,16 +145,20 @@ static void SetPaths(TTTSet *pts)
 }
 
 // DPI Aware (高DPI対応)
+//		Windows 10 Version 1703から使用可能な
+//		Per-monitor DPI awareness V2 の機能を利用
 static void SetDpiAware(const wchar_t *iniPath)
 {
-	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
-		wchar_t Temp[4];
-		GetPrivateProfileStringW(L"Tera Term", L"DPIAware", L"on", Temp, _countof(Temp), iniPath);
-		if (_wcsicmp(Temp, L"on") == 0) {
-			if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
-				pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-			}
-		}
+	if (pSetProcessDpiAwarenessContext == NULL) {
+		return;
+	}
+
+	wchar_t Temp[4];
+	GetPrivateProfileStringW(L"Tera Term", L"DPIAware", L"on",
+							 Temp, _countof(Temp), iniPath);
+	if (_wcsicmp(Temp, L"on") == 0) {
+		// Windows 10 1703 以降: PMv2 をプロセス全体に適用
+		pSetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	}
 }
 
