@@ -208,6 +208,9 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 
 	if (!pvar->active) {
 		pvar->active = TRUE;
+		prh.len = 0;
+		prh.tv.tv_sec = 0;
+		prh.tv.tv_usec = 0;
 		title_changed = FALSE;
 		first_title_changed = FALSE;
 	}
