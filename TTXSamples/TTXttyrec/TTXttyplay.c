@@ -365,6 +365,7 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 				break;
 			  case 'k':
 			  case 'K':
+				pvar->wait.tv_sec = 0;
 				pvar->skip += pvar->skip_ini;
 				break;
 			  case ESC:
