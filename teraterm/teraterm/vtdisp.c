@@ -102,6 +102,7 @@ typedef struct vtdraw {
 	 */
 	COLORREF ANSIColor[256];
 
+	const TTTSet *pts;
 } vtdraw_t;
 
 int WinWidth, WinHeight;		// 画面に表示されている文字数(セル数)
@@ -354,10 +355,19 @@ static BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int 
 }
 
 // 画像読み込み関係
-static void BGPreloadPicture(BGSrc *src)
+static void BGPreloadPicture(BGSrc *src, const TTTSet *pts)
 {
+	wchar_t *susie_path = pts == NULL ? NULL :
+		ResolveAbsolutePath(ts.EtermLookfeel.BGSPIPathW, pts->HomeDirW);
+
 	BitmapLoadParam_t param = {};
-	param.SusiePluginPath = ts.EtermLookfeel.BGSPIPathW;
+	if (susie_path == NULL || susie_path[0] == 0) {
+		// 未設定
+		param.SusiePluginPath = NULL;
+	} else {
+		param.SusiePluginPath = susie_path;
+	}
+
 	HBITMAP hbm = NULL;
 	const wchar_t *load_file = src->fileW;
 	BitmapLoad(load_file, &param, &hbm);
@@ -373,6 +383,8 @@ static void BGPreloadPicture(BGSrc *src)
 	}else{
 		src->type = BG_COLOR;
 	}
+
+	free(susie_path);
 }
 
 static void BGGetWallpaperInfo(WallpaperInfo *wi)
@@ -616,7 +628,7 @@ load_finish:
 	src->color = GetSysColor(COLOR_DESKTOP);
 }
 
-static void BGPreloadSrc(BGSrc *src)
+static void BGPreloadSrc(BGSrc *src, const TTTSet *pts)
 {
 	if (!src->enable) {
 		return;
@@ -633,7 +645,7 @@ static void BGPreloadSrc(BGSrc *src)
 			break;
 
 		case BG_PICTURE:
-			BGPreloadPicture(src);
+			BGPreloadPicture(src, pts);
 			break;
 
 		default:
@@ -1069,9 +1081,9 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
   CopyRect(&BGPrevRect,&rect);
 
   //壁紙 or 背景をプリロード
-  BGPreloadSrc(&BGDest);
-  BGPreloadSrc(&BGSrc1);
-  BGPreloadSrc(&BGSrc2);
+  BGPreloadSrc(&BGDest, vt->pts);
+  BGPreloadSrc(&BGSrc1, vt->pts);
+  BGPreloadSrc(&BGSrc2, vt->pts);
 
   _OutputDebugPrintf("BGSetupPrimary : BGInSizeMove = %d\n",BGInSizeMove);
 
@@ -1201,15 +1213,19 @@ void BGLoadThemeFile(vtdraw_t *vt, const TTTSet *pts)
 		BGReadIniFile(vt, NULL);
 		BGEnable = FALSE;
 		break;
-	case 1:
-		if (pts->EtermLookfeel.BGThemeFileW != NULL) {
-			// テーマファイルの指定がある
-			BGReadIniFile(vt, pts->EtermLookfeel.BGThemeFileW);
-			BGEnable = TRUE;
+	case 1: {
+		// テーマファイルの指定がある
+		BGEnable = FALSE;
+		const wchar_t *theme_file = pts->EtermLookfeel.BGThemeFileW;
+		if (theme_file != NULL) {
+			wchar_t *full_path = ResolveAbsolutePath(theme_file, pts->HomeDirW);
+			if (GetFileAttributesW(full_path) != INVALID_FILE_ATTRIBUTES) {
+				BGReadIniFile(vt, full_path);
+				BGEnable = TRUE;
+			}
+			free(full_path);
 		}
-		else {
-			BGEnable = FALSE;
-		}
+	}
 		break;
 	case 2: {
 		// ランダムテーマ (or テーマファイルを指定がない)
@@ -1463,12 +1479,13 @@ static void DispSetNearestColors(int start, int end, HDC DispCtx)
  *	@retval	vtdraw_t	描画先情報(ハンドル)
  *						EndiDisp() で開放する
  */
-vtdraw_t *InitDisp(HWND hVTWin)
+vtdraw_t *InitDisp(HWND hVTWin, const TTTSet *pts)
 {
 	vtdraw_t *vt = (vtdraw_t *)calloc(1, sizeof(*vt));
 	HDC TmpDC;
 	BOOL bMultiDisplaySupport = FALSE;
 	vtdisp_work_t *w = &vtdisp_work;
+	vt->pts = pts;
 
 	TmpDC = GetDC(NULL);
 

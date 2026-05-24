@@ -1,4 +1,4 @@
-﻿# how to build:
+# how to build:
 # mkdir build; cd build
 # cmake .. -G "Unix Makefiles" -DARCHITECTURE=i686 -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
 # cmake .. -G "Unix Makefiles" -DARCHITECTURE=x86_64 -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
@@ -12,6 +12,7 @@ if(NOT DEFINED ARCHITECTURE)
   set(ARCHITECTURE "i686")
 #  set(ARCHITECTURE "x86_64")
 endif()
+message(STATUS "Toolchain: ARCHITECTURE=${ARCHITECTURE}")
 
 # option
 option(USE_CLANG "use clang compiler" OFF)
@@ -28,6 +29,7 @@ elseif(${ARCHITECTURE} STREQUAL "x86_64")
 else()
   message(FATAL_ERROR "ARCHITECTURE=${ARCHITECTURE}")
 endif()
+message(STATUS "Toolchain: PREFIX=${PREFIX}")
 
 set(THREAD_MODEL "-win32")
 #set(THREAD_MODEL "-posix")
@@ -37,16 +39,25 @@ if(MSYS OR (${CMAKE_COMMAND} MATCHES "msys2") OR (${CMAKE_COMMAND} MATCHES "ming
 elseif(CYGWIN OR (${CMAKE_HOST_SYSTEM_NAME} MATCHES "CYGWIN"))
   # Cygwinはposix版のみ
   unset(THREAD_MODEL)
+elseif(APPLE OR (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin"))
+  # macOS (Homebrew) は suffix なし
+  unset(THREAD_MODEL)
 endif()
 
 if(NOT USE_CLANG)
   set(CMAKE_C_COMPILER   ${PREFIX}gcc${THREAD_MODEL})
   set(CMAKE_CXX_COMPILER ${PREFIX}g++${THREAD_MODEL})
   set(CMAKE_RC_COMPILER  ${PREFIX}windres)
+  set(CMAKE_AR           ${PREFIX}gcc-ar${THREAD_MODEL})
+  set(CMAKE_RANLIB       ${PREFIX}gcc-ranlib${THREAD_MODEL})
+  set(CMAKE_NM           ${PREFIX}gcc-nm${THREAD_MODEL})
+  set(CMAKE_OBJCOPY      ${PREFIX}objcopy)
 else()
   set(CMAKE_C_COMPILER   ${PREFIX}clang${THREAD_MODEL})
   set(CMAKE_CXX_COMPILER ${PREFIX}clang++${THREAD_MODEL})
   set(CMAKE_RC_COMPILER  ${PREFIX}windres)
+  set(CMAKE_AR           ${PREFIX}ar)
+  set(CMAKE_RANLIB       ${PREFIX}ranlib)
 endif()
 if(MSYS OR (${CMAKE_COMMAND} MATCHES "msys2") OR (${CMAKE_COMMAND} MATCHES "mingw") OR (${CMAKE_COMMAND} MATCHES "clang64"))
   set(CMAKE_RC_COMPILER windres)

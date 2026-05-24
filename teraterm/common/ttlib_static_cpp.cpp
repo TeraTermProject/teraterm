@@ -2097,3 +2097,38 @@ DWORD TTCreateProcess(const wchar_t *cmd, const wchar_t *arg1, const wchar_t *ar
 	}
 	return e;
 }
+
+/**
+ *	ユーザーパスを絶対パスに変換する
+ *
+ *	変換されたパスが実在するかのチェックは別途行うこと
+ *
+ *	@param[in]	user_path	ユーザー指定パス（相対 or 絶対）
+ *	@param[in]	base_dir	相対パスの場合に使用するベースディレクトリ
+ *							絶対パスではないとき、
+ *							カレントディレクトリをベースにする
+ *	@return		正規化済み絶対パス
+ *				不要になったら free() すること
+ *				失敗時はNULL。
+ */
+wchar_t* ResolveAbsolutePath(const wchar_t* user_path, const wchar_t* base_dir)
+{
+	if (!user_path || !base_dir) return NULL;
+
+	wchar_t *combined;
+
+	if (IsRelativePathW(user_path)) {
+		// 相対パス, base_dir と結合
+		aswprintf(&combined, L"%s\\%s", base_dir, user_path);
+	} else {
+		// 絶対パスはそのまま使う
+		combined = _wcsdup(user_path);
+	}
+
+	// 正規化
+	wchar_t *full;
+	hGetFullPathNameW(combined, &full, NULL);
+	free(combined);
+
+	return full;
+}

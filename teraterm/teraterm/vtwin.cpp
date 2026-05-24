@@ -715,7 +715,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	HVTWin = GetSafeHwnd();
 	if (HVTWin == NULL) return;
 	cv.HWin = HVTWin;
-	vt_src = InitDisp(HVTWin);
+	vt_src = InitDisp(HVTWin, &ts);
 	BGLoadThemeFile(vt_src, &ts);
 
 	// Windows 11 でウィンドウの角が丸くならないようにする
