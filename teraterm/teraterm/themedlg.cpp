@@ -58,6 +58,7 @@
 #include "vtdisp.h"
 #include "tmfc.h"
 #include "tmfc_propdlg.h"
+#include "inifile_com.h"
 
 #include "theme.h"
 #include "themedlg_res.h"
@@ -884,27 +885,31 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		case IDC_FILE_LOAD_BUTTON | (BN_CLICKED << 16): {
 			// load
 			// テーマファイル読み込み
-			OPENFILENAMEW ofn = {};
-			wchar_t theme_file[MAX_PATH];
+			wchar_t *theme_file = NULL;
+			wchar_t *initial_dir = NULL;
 
 			if (ts->EtermLookfeel.BGThemeFileW != NULL) {
-				wcscpy_s(theme_file, _countof(theme_file), ts->EtermLookfeel.BGThemeFileW);
+				theme_file =
+					ResolveAbsolutePath(ts->EtermLookfeel.BGThemeFileW,
+										ts->HomeDirW);
 			}
 			else {
-				theme_file[0] = 0;
+				initial_dir = _wcsdup(ts->HomeDirW);
 			}
 
-			ofn.lStructSize = get_OPENFILENAME_SIZEW();
+			TTOPENFILENAMEW ofn = {};
 			ofn.hwndOwner   = hWnd;
 			ofn.lpstrFile   = theme_file;
-			ofn.nMaxFile    = _countof(theme_file);
+			ofn.lpstrInitialDir = initial_dir;
 			ofn.nFilterIndex = 1;
 			ofn.hInstance = dlg_data->hInst;
 			ofn.lpstrDefExt = L"ini";
 			ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
 			ofn.lpstrTitle = L"select theme file";
 
-			if (GetOpenFileNameW(&ofn)) {
+			if (TTGetOpenFileNameW(&ofn, &theme_file)) {
+				free(ts->EtermLookfeel.BGThemeFileW);
+				ts->EtermLookfeel.BGThemeFileW = theme_file;
 				ThemeLoad(theme_file, &dlg_data->BGTab.bg_theme, &dlg_data->ColorTab.color_theme);
 
 				static const TTMessageBoxInfoW info = {
@@ -927,15 +932,11 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		case IDC_FILE_SAVE_BUTTON | (BN_CLICKED << 16): {
 			// save
 			// テーマファイル書き出し
-			wchar_t theme_file[MAX_PATH];
-			OPENFILENAMEW ofn = {};
+			wchar_t *theme_file = ts->EtermLookfeel.BGThemeFileW;
+			TTOPENFILENAMEW ofn = {};
 
-			theme_file[0] = 0;
-
-			ofn.lStructSize = get_OPENFILENAME_SIZEW();
 			ofn.hwndOwner   = hWnd;
 			ofn.lpstrFile   = theme_file;
-			ofn.nMaxFile    = _countof(theme_file);
 			//ofn.lpstrFilter = "";
 			ofn.nFilterIndex = 1;
 			ofn.hInstance = dlg_data->hInst;
@@ -943,8 +944,11 @@ static INT_PTR CALLBACK FileProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
 			ofn.lpstrTitle = L"save theme file";
 
-			if (GetSaveFileNameW(&ofn)) {
+			if (TTGetSaveFileNameW(&ofn, &theme_file)) {
+				free(ts->EtermLookfeel.BGThemeFileW);
+				ts->EtermLookfeel.BGThemeFileW = theme_file;
 				LRESULT checked = SendDlgItemMessageA(hWnd, IDC_FILE_SAVE_BG_CHECK, BM_GETCHECK, 0, 0);
+				WriteIniBom(theme_file, FALSE);
 				if (checked & BST_CHECKED) {
 					ThemeSaveBG(&dlg_data->BGTab.bg_theme, theme_file);
 				}

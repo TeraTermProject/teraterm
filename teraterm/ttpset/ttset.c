@@ -483,41 +483,12 @@ static void DispReadIni(const wchar_t *FName, PTTSet ts)
 	ts->EtermLookfeel.BGNoFrame = GetOnOff(BG_SECTION, "BGNoFrame", FName, FALSE);
 	ts->EtermLookfeel.BGFastSizeMove = GetOnOff(BG_SECTION, "BGFastSizeMove", FName, TRUE);
 	ts->EtermLookfeel.BGNoCopyBits = GetOnOff(BG_SECTION, "BGFlickerlessMove", FName, TRUE);
-	if (ts->EtermLookfeel.BGSPIPathW != NULL) {
-		free(ts->EtermLookfeel.BGSPIPathW);
-	}
-	hGetPrivateProfileStringW(BG_SECTIONW, L"BGSPIPath", L"plugin", FName, &base);
-	if (base[0] == 0) {
-		free(base);
-		ts->EtermLookfeel.BGSPIPathW = NULL;
-	}
-	else {
-		wchar_t *full;
-		if (IsRelativePathW(base)) {
-			aswprintf(&full, L"%s\\%s", ts->HomeDirW, base);
-			ts->EtermLookfeel.BGSPIPathW = full;
-			free(base);
-		}
-		else {
-			ts->EtermLookfeel.BGSPIPathW = base;
-		}
-	}
-	hGetPrivateProfileStringW(BG_SECTIONW, L"BGThemeFile", L"", FName, &base);
-	if (base[0] == 0) {
-		free(base);
-		ts->EtermLookfeel.BGThemeFileW = NULL;
-	}
-	else {
-		if (IsRelativePathW(base)) {
-			wchar_t *full;
-			aswprintf(&full, L"%s\\%s", ts->HomeDirW, base);
-			ts->EtermLookfeel.BGThemeFileW = full;
-			free(base);
-		}
-		else {
-			ts->EtermLookfeel.BGThemeFileW = base;
-		}
-	}
+	free(ts->EtermLookfeel.BGSPIPathW);
+	hGetPrivateProfileStringW(BG_SECTIONW, L"BGSPIPath", L"plugin", FName,
+							  &ts->EtermLookfeel.BGSPIPathW);
+	free(ts->EtermLookfeel.BGThemeFileW);
+	hGetPrivateProfileStringW(BG_SECTIONW, L"BGThemeFile", L"", FName,
+							  &ts->EtermLookfeel.BGThemeFileW);
 }
 
 /**
