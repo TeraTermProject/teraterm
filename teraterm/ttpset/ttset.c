@@ -3865,7 +3865,9 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			ParamTCP = ParsePortNameW(&Temp[3]);
 		}
 		else if (_wcsicmp(Temp, L"/PIPE") == 0 ||
-		         _wcsicmp(Temp, L"/NAMEDPIPE") == 0) {	/* 名前付きパイプ */
+		         _wcsicmp(Temp, L"/NAMEDPIPE") == 0) {
+			// 名前付きパイプ
+			//		互換性のため "/NAMEDPIPE" は残してある
 			ParamPort = IdNamedPipe;
 		}
 		else if (_wcsnicmp(Temp, L"/R=", 3) == 0) {	/* Replay filename */
@@ -3991,8 +3993,8 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 		break;
 	case IdNamedPipe:
 		if (ts->HostName[0] != 0 && ts->HostName[0] != '\\') {
-			char * p = strchr(ts->HostName, '\\');
-			if (p == NULL) {
+			char *p = strchr(ts->HostName, '\\');
+			if (p != NULL) {
 				*p++ = '\0';
 				_snwprintf_s(Temp, _countof(Temp), _TRUNCATE, L"\\\\%hs\\pipe\\%hs", ts->HostName, p);
 			}
