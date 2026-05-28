@@ -90,14 +90,14 @@ error_return:
 /**
  *	GetPrivateProfileStringW() の動的バッファ版
  *
- *	@param section
- *	@param key
- *	@param def		デフォルト値
- *					NULLのときは L"" を返す
- *	@param ini		iniファイルのパス
- *					NULLのときはファイル指定なし
- *	@param str		文字列を格納するバッファ
- *					不要になったらfree()する
+ *	@param[in]	section
+ *	@param[in]	key
+ *	@param[in]	def		デフォルト値
+ *						NULLのとき、デフォルト値 L"" と同じ
+ *	@param[in]	ini		iniファイルのパス
+ *						NULLのときはファイル指定なし
+ *	@param[out]	str		文字列を格納するバッファ
+ *						不要になったらfree()する
  *	@return	エラーコード,0(=NO_ERROR)のときエラーなし
  *
  *		次の場合 str = L"" が返る (free()すること)

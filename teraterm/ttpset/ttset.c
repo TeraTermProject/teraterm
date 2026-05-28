@@ -1019,10 +1019,12 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->FTHideDialog = GetOnOff(Section, "FTHideDialog", FName, FALSE);
 
 	/* Default Log file name */
+	free(ts->LogDefaultNameW);
 	hGetPrivateProfileStringW(SectionW, L"LogDefaultName", L"teraterm.log", FName,
 							  &ts->LogDefaultNameW);
 
 	/* Default Log file path */
+	free(ts->LogDefaultPathW);
 	hGetPrivateProfileStringW(SectionW, L"LogDefaultPath", ts->LogDirW, FName, &ts->LogDefaultPathW);
 	if (ts->LogDefaultPathW[0] == 0) {
 		// 未指定("LogDefaultPath=")だった、NULLを入れる
@@ -1064,6 +1066,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	                        sizeof(ts->XModemRcvCommand), FName);
 
 	/* Default directory for file transfer */
+	free(ts->FileDirW);
 	hGetPrivateProfileStringW(SectionW, L"FileDir", L"", FName, &ts->FileDirW);
 	if (ts->FileDirW != NULL && ts->FileDirW[0] == 0) {
 		free(ts->FileDirW);
@@ -1298,6 +1301,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		GetPrivateProfileInt(Section, "SendBreakTime", 1000, FName);
 
 	/* Startup macro -- special option */
+	free(ts->MacroFNW);
 	hGetPrivateProfileStringW(SectionW, L"StartupMacro", L"", FName, &ts->MacroFNW);
 	if (ts->MacroFNW != NULL && ts->MacroFNW[0] == L'\0') {
 		// 指定なし
@@ -1494,10 +1498,13 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	          _TRUNCATE);
 
 	// Viewlog Editor path
+	free(ts->ViewlogEditorW);
 	hGetPrivateProfileStringW(SectionW, L"ViewlogEditor", L"notepad.exe", FName, &ts->ViewlogEditorW);
+	free(ts->ViewlogEditorArg);
 	hGetPrivateProfileStringW(SectionW, L"ViewlogEditorArg", NULL, FName, &ts->ViewlogEditorArg);
 
 	// UI language message file (full path)
+	free(ts->UILanguageFileW);
 	ts->UILanguageFileW = GetUILanguageFileFullW(FName);
 
 
@@ -3645,10 +3652,15 @@ BOOL ParseFOption(PTTSet ts) {
 		if (_wcsnicmp(Temp, L"/F=", 3) == 0) {	/* setup filename */
 			isFopt = TRUE;
 			wchar_t *f = GetFilePath(&Temp[3], ts->HomeDirW, L".INI");
-			if (f != NULL && _wcsicmp(ts->SetupFNameW, f) != 0) {
-				free(ts->SetupFNameW);
-				ts->SetupFNameW = f;
-				WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
+			if (f != NULL) {
+				if (_wcsicmp(ts->SetupFNameW, f) != 0) {
+					free(ts->SetupFNameW);
+					ts->SetupFNameW = f;
+					WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
+				}
+				else {
+					free(f);
+				}
 			}
 			break;
 		}
@@ -3693,11 +3705,16 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 		DequoteParam(Temp, _countof(Temp), Temp);
 		if (_wcsnicmp(Temp, L"/F=", 3) == 0) {	/* setup filename */
 			wchar_t *f = GetFilePath(&Temp[3], ts->HomeDirW, L".INI");
-			if (f != NULL && _wcsicmp(ts->SetupFNameW, f) != 0) {
-				free(ts->SetupFNameW);
-				ts->SetupFNameW = f;
-				WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
-				_ReadIniFile(ts->SetupFNameW, ts);
+			if (f != NULL) {
+				if (_wcsicmp(ts->SetupFNameW, f) != 0) {
+					free(ts->SetupFNameW);
+					ts->SetupFNameW = f;
+					WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
+					_ReadIniFile(ts->SetupFNameW, ts);
+				}
+				else {
+					free(f);
+				}
 			}
 			break;
 		}
@@ -3824,6 +3841,7 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			wchar_t *f = GetFilePath(&Temp[3], log_dir, NULL);
 			free(log_dir);
 			if (f != NULL) {
+				free(ts->LogFNW);
 				ts->LogFNW = f;
 				WideCharToACP_t(ts->LogFNW, ts->LogFN, _countof(ts->LogFN));
 			}
@@ -3832,6 +3850,7 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			WideCharToACP_t(&Temp[4], ts->MulticastName, _countof(ts->MulticastName));
 		}
 		else if (_wcsnicmp(Temp, L"/M=", 3) == 0) {	/* macro filename */
+			free(ts->MacroFNW);
 			if ((Temp[3] == 0) || (Temp[3] == '*')) {
 				ts->MacroFNW = _wcsdup(L"*");
 			} else {
@@ -3841,6 +3860,7 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			ts->ComAutoConnect = FALSE;
 		}
 		else if (_wcsicmp(Temp, L"/M") == 0) {	/* macro option without file name */
+			free(ts->MacroFNW);
 			ts->MacroFNW = _wcsdup(L"*");
 			/* Disable auto connect to serial when macro mode (2006.9.15 maya) */
 			ts->ComAutoConnect = FALSE;
