@@ -900,10 +900,10 @@ void OverrideCharWidthInfoGet(const wchar_t *fname, OverrideCharWidthInfo *info)
 		int r = swscanf(list, L"%[^,] , %s", ini, section, (unsigned int)len);
 #endif
 		if (r != 2) {
-			int r = swscanf_s(list, L"%s", section, (unsigned int)len);
+			r = swscanf_s(list, L"%s", section, (unsigned int)len);
 			if (r == 1) {
 				free(ini);
-				ini = wcsdup(fname);
+				ini = _wcsdup(fname);
 			} else {
 				r = 0;
 			}
@@ -933,7 +933,7 @@ void OverrideCharWidthInfoGet(const wchar_t *fname, OverrideCharWidthInfo *info)
 				if (name != NULL && name[0] != L'\0') {
 					p->name = name;
 				} else {
-					p->name = wcsdup(p->section);
+					p->name = _wcsdup(p->section);
 					free(name);
 				}
 			}
