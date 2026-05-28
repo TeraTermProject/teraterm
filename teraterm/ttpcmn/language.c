@@ -90,6 +90,9 @@ DllExport BYTE PASCAL RussConv(int cin, int cout, BYTE b)
 #if 0
 	return CodeConvRussConv(cin, cout, b);
 #else
+	(void)cin;
+	(void)cout;
+	(void)b;
 	return 0;
 #endif
 }
