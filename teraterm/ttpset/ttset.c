@@ -477,7 +477,6 @@ static void ReadFont3(
  */
 static void DispReadIni(const wchar_t *FName, PTTSet ts)
 {
-	wchar_t *base;
 	ts->EtermLookfeel.BGEnable = GetPrivateProfileInt(BG_SECTION, "BGEnable", 0, FName);
 	ts->EtermLookfeel.BGUseAlphaBlendAPI = GetOnOff(BG_SECTION, "BGUseAlphaBlendAPI", FName, TRUE);
 	ts->EtermLookfeel.BGNoFrame = GetOnOff(BG_SECTION, "BGNoFrame", FName, FALSE);
