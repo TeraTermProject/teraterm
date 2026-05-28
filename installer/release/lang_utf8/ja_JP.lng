@@ -1325,7 +1325,6 @@ TITLE_STATUS_MSG=Speed: %d, Pause: %s
 TITLE_STATUS_ON=ON
 TITLE_STATUS_OFF=OFF
 TITLE_TRIM=%d.%06d secs idle. trim to %d secs.
-TITLE_TIME_MSG=%Y年%m月%d日 %H:%M:%S
 MSG_TITLE=TTXttyplay
 MSG_RSIZE=rsize != sizeof(b), Disabled.
 

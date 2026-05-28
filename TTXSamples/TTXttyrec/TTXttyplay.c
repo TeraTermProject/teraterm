@@ -22,6 +22,7 @@
 #define BUFFSIZE 2000
 
 #define INISECTION "ttyplay"
+#define INISECTIONW L"ttyplay"
 
 #define TITLE_MODE_TIME 1
 #define TITLE_MODE_MSEC 2
@@ -107,10 +108,33 @@ void ChangeTitleStatus() {
   SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
 }
 
+void ConvertSafeStrFtimeFormat(wchar_t *fmt) {
+	static const wchar_t *kws=L"aAbBcCdDeFgGhHIjmMnprRStTuUVwWxXyYz%N";
+	if (fmt != NULL) {
+		while (*fmt != L'\0') {
+			if (*fmt == L'%') {
+				fmt++;
+				if (*fmt == L'\0') {
+					fmt--;
+					*fmt=L'\0';
+					break;
+				}
+				if (wcschr(kws, *fmt) == NULL) {
+					*fmt = L'%';
+				}
+			}
+			fmt++;
+		}
+	}
+}
+
 void ChangeTitleTime(struct timeval tv) {
 	char tbuff[TitleBuffSize];
   	time_t tvs = tv.tv_sec;
   	struct tm tm_local;
+	char fmt[40];
+	char buff[8];
+	char *p;
 
   	if (localtime_s(&tm_local, &tvs) != 0) {
 		return;
@@ -118,13 +142,28 @@ void ChangeTitleTime(struct timeval tv) {
 	if (pvar->fmt_time == 0 || *pvar->fmt_time == '\0') {
 		return;
 	}
-	if (strftime(tbuff, sizeof(tbuff), pvar->fmt_time, &tm_local) == 0) {
-		return;
+
+	strncpy_s(fmt, sizeof(fmt), pvar->fmt_time, _TRUNCATE);
+	p = strstr(fmt, "%N");
+	if (p != NULL) {
+		*p = '\0';
+		_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%03d", tv.tv_usec/1000);
+		strncat_s(fmt, sizeof(fmt), buff, _TRUNCATE);
+		strncat_s(fmt, sizeof(fmt), pvar->fmt_time - fmt + p + 2, _TRUNCATE);
 	}
-	if (pvar->mode_flag & TITLE_MODE_MSEC) {
-		char buff[8];
-		_snprintf_s(buff, sizeof(buff), _TRUNCATE, ".%03d", tv.tv_usec/1000);
-		strncat_s(tbuff, sizeof(tbuff), buff, _TRUNCATE);
+	else if (pvar->mode_flag & TITLE_MODE_MSEC) {
+		p = strstr(fmt, "%S");
+		if (p != NULL) {
+			p += 2;
+			*p = '\0';
+			_snprintf_s(buff, sizeof(buff), _TRUNCATE, ".%03d", tv.tv_usec/1000);
+			strncat_s(fmt, sizeof(fmt), buff, _TRUNCATE);
+			strncat_s(fmt, sizeof(fmt), pvar->fmt_time - fmt + p, _TRUNCATE);
+		}
+	}
+
+	if (strftime(tbuff, sizeof(tbuff), fmt, &tm_local) == 0) {
+		return;
 	}
 
 	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
@@ -217,14 +256,6 @@ static HANDLE PASCAL TTXCreateFile(LPCSTR FName, DWORD AcMode, DWORD ShMode,
 		}
 		else {
 			pvar->open_error = FALSE;
-
-			if (NULL == pvar->fmt_time) {
-				wchar_t *uimsg;
-				GetI18nStrWW("TTXttyrec", "TITLE_TIME_MSG", 
-					L"%Y/%m/%d %H:%M:%S", pvar->ts->UILanguageFileW, &uimsg);
-				pvar->fmt_time = ToCharW(uimsg);
-				free(uimsg);
-			}
 		}
 	}
 
@@ -499,11 +530,6 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 		pvar->played = TRUE;
 		pvar->wait.tv_sec = 0;
 		pvar->wait.tv_usec = 0;
-
-		if (NULL != pvar->fmt_time) {
-			free(pvar->fmt_time);
-			pvar->fmt_time = NULL;
-		}
 	}
 }
 
@@ -568,10 +594,16 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
 }
 
 static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
+	wchar_t buff[40];
+
 	(pvar->origReadIniFile)(fn, ts);
 //	ts->TitleFormat = 0;
 	pvar->maxwait = GetPrivateProfileIntAFileW(INISECTION, "MaxWait", 0, fn);
 	pvar->speed = GetPrivateProfileIntAFileW(INISECTION, "Speed", 0, fn);
+	GetPrivateProfileStringW(INISECTIONW, L"TimeFormat", L"%Y/%m/%d %H:%M:%S", buff, _countof(buff), fn);
+	ConvertSafeStrFtimeFormat(buff);
+	free(pvar->fmt_time);
+	pvar->fmt_time = ToCharW(buff);
 }
 
 static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
@@ -696,6 +728,8 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			/* do process cleanup */
 			free(pvar->openfnW);
 			pvar->openfnW = NULL;
+			free(pvar->fmt_time);
+			pvar->fmt_time = NULL;
 			break;
 	}
 	return TRUE;
