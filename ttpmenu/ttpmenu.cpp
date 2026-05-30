@@ -1014,10 +1014,10 @@ static wchar_t *GetPassword(JobInfo *jobInfo, HWND hWnd)
 	Attention		:
 	Up Date			:
    ======1=========2=========3=========4=========5=========6=========7======= */
-NameList *getNthNameList(DWORD Nth)
+static NameList *getNthNameList(ULONG_PTR Nth)
 {
 	NameList *pNameList = g_MenuData.pNameList;
-	for (DWORD i = 0; i < MAXJOBNUM && pNameList; i++) {
+	for (ULONG_PTR i = 0; i < MAXJOBNUM && pNameList; i++) {
 		if (i == Nth) {
 			return pNameList;
 		}
