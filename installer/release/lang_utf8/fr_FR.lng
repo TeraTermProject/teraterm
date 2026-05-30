@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2026-03-19 by TeraTerm Project
+date=2026-05-31 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -1182,6 +1182,8 @@ MENU_ICON=Afficher grande icone
 MENU_FONT=spécifier la police
 MENU_LEFTPOPUP=montrer la liste par clic Gauche
 MENU_HOTKEY=hotkey Montrer la liste(Ctl+Alt+M)
+MENU_LB_CLEAR_SESSIONLOCK=Effacer le mot de passe LockBox lors du verrouillage de la session
+MENU_LB_CLEAR_SUSPEND=Effacer le mot de passe LockBox lors de la mise en veille
 MENU_VERSION=Version
 MENU_EXEC=Executer
 MENU_CLOSE=Quitter

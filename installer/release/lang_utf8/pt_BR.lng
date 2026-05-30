@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Portuguese (Português) - Brazil
-date=2026-03-19 by TeraTerm Project
+date=2026-05-31 by TeraTerm Project
 contributor=Waldemar Vaz Passarinho Neto (2025-05-07)
 
 [Tera Term]
@@ -1175,6 +1175,8 @@ MENU_ICON=exibir ícone grande
 MENU_FONT=especificar fonte
 MENU_LEFTPOPUP=exibir lista com clique esquerdo
 MENU_HOTKEY=atalho para exibir lista (Ctrl+Alt+M)
+MENU_LB_CLEAR_SESSIONLOCK=Limpar a senha do LockBox ao bloquear a sessão
+MENU_LB_CLEAR_SUSPEND=Limpar a senha do LockBox ao suspender
 MENU_VERSION=Versão
 MENU_EXEC=Executar
 MENU_CLOSE=Sair

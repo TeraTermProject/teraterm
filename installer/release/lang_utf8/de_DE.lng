@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2026-03-19 by TeraTerm Project
+date=2026-05-31 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -1182,6 +1182,8 @@ MENU_ICON=Große Symbole anzeigen
 MENU_FONT=Schriftart angeben
 MENU_LEFTPOPUP=showing list by left-click
 MENU_HOTKEY=showing list hotkey(Ctl+Alt+M)
+MENU_LB_CLEAR_SESSIONLOCK=LockBox-Passwort beim Sitzungs­lock löschen
+MENU_LB_CLEAR_SUSPEND=LockBox-Passwort beim Energiesparmodus löschen
 MENU_VERSION=Version
 MENU_EXEC=Ausführen
 MENU_CLOSE=Beenden

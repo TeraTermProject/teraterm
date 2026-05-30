@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Turkish
-date=2026-03-19 by TeraTerm Project
+date=2026-05-31 by TeraTerm Project
 contributor= Mehmet Cagri Aksoy (2025-08-04)
 
 [Tera Term]
@@ -1179,6 +1179,8 @@ MENU_ICON=büyük simge göster
 MENU_FONT=yazı tipi belirle
 MENU_LEFTPOPUP=sol tıkla ile liste göster
 MENU_HOTKEY=liste kısayol tuşunu göster(Ctl+Alt+M)
+MENU_LB_CLEAR_SESSIONLOCK=Oturum kilitlendiğinde LockBox parolasını temizle
+MENU_LB_CLEAR_SUSPEND=Askıya alındığında LockBox parolasını temizle
 MENU_VERSION=Sürüm
 MENU_EXEC=Çalıştır
 MENU_CLOSE=Çık

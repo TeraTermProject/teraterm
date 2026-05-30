@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2026-03-19 by TeraTerm Project
+date=2026-05-31 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -1182,6 +1182,8 @@ MENU_ICON=Показать большие иконки
 MENU_FONT=Специальный шрифт
 MENU_LEFTPOPUP=Показать список клавиш, совместимых с левой кнопкой мыши
 MENU_HOTKEY=Показать список "горячих" клавиш (Ctl+Alt+M)
+MENU_LB_CLEAR_SESSIONLOCK=Очистить пароль LockBox при блокировке сеанса
+MENU_LB_CLEAR_SUSPEND=Очистить пароль LockBox при переходе в спящий режим
 MENU_VERSION=Версия
 MENU_EXEC=Выполнить
 MENU_CLOSE=Выход

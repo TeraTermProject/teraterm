@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean(한국어)
-date=2026-03-19 by TeraTerm Project
+date=2026-05-31 by TeraTerm Project
 contributor=Daeehong Kim (2013-07-25)
 
 [Tera Term]
@@ -1182,6 +1182,8 @@ MENU_ICON=큰 아이콘 보이기
 MENU_FONT=폰트 선택
 MENU_LEFTPOPUP=왼쪽클릭으로 목록 보이기
 MENU_HOTKEY=목록 핫키 보이기(Ctl+Alt+M)
+MENU_LB_CLEAR_SESSIONLOCK=세션 잠금 시 LockBox 비밀번호 삭제
+MENU_LB_CLEAR_SUSPEND=절전 모드에서 LockBox 비밀번호 삭제
 MENU_VERSION=버전
 MENU_EXEC=실행
 MENU_CLOSE=종료

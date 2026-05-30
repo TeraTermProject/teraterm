@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2026-03-19 by TeraTerm Project
+date=2026-05-31 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -1182,6 +1182,8 @@ MENU_ICON=顯示大圖標
 MENU_FONT=字型設定
 MENU_LEFTPOPUP=左擊顯示列表
 MENU_HOTKEY=顯示快捷鍵(Ctl+Alt+M)
+MENU_LB_CLEAR_SESSIONLOCK=在工作階段鎖定時清除 LockBox 密碼
+MENU_LB_CLEAR_SUSPEND=在暫停時清除 LockBox 密碼
 MENU_VERSION=版本資訊
 MENU_EXEC=運行
 MENU_CLOSE=關閉
