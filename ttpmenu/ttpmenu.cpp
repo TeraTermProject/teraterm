@@ -2726,6 +2726,13 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						DI_NORMAL);
 		}
 		return TRUE;
+
+	case WM_POWERBROADCAST:
+		if (wParam == PBT_APMSUSPEND) {
+			// スリープ,休止
+			SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
+		}
+		return TRUE;
 	}
 
 	if (WM_TASKBAR_RESTART != 0 && uMsg == WM_TASKBAR_RESTART)
