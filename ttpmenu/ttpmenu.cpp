@@ -444,6 +444,15 @@ BOOL LoadConfig(void)
 	g_MenuData.crSelMenuTxt	= ::GetSysColor(COLOR_HIGHLIGHTTEXT);
 	g_MenuData.hFont		= ::CreateFontIndirectW(&(g_MenuData.lfFont));
 
+	// スクリーンロック開始時に LockBox のパスワードをクリアする
+	if (RegGetBOOL(hKey, KEY_LB_CLEAR_SESSIONLOCK, g_MenuData.bLockBoxClearSessionLock) == FALSE) {
+		g_MenuData.bLockBoxClearSessionLock = FALSE;
+	}
+	// スリープ,休止開始時に LockBox のパスワードをクリアする
+	if (RegGetBOOL(hKey, KEY_LB_CLEAR_SUSPEND, g_MenuData.bLockBoxClearSuspend) == FALSE) {
+		g_MenuData.bLockBoxClearSuspend = FALSE;
+	}
+
 	return TRUE;
 }
 
@@ -483,6 +492,8 @@ BOOL SaveConfig(void)
 	RegSetDword(hKey, KEY_LF_QUALITY, g_MenuData.lfFont.lfQuality);
 	RegSetDword(hKey, KEY_LF_PITCHANDFAMILY, g_MenuData.lfFont.lfPitchAndFamily);
 	RegSetStr(hKey, KEY_LF_FACENAME, g_MenuData.lfFont.lfFaceName);
+	RegSetDword(hKey, KEY_LB_CLEAR_SESSIONLOCK, g_MenuData.bLockBoxClearSessionLock);
+	RegSetDword(hKey, KEY_LB_CLEAR_SUSPEND, g_MenuData.bLockBoxClearSuspend);
 
 	RegClose(hKey);
 
@@ -1197,6 +1208,8 @@ BOOL InitMenu(void)
 			{ ID_FONT, "MENU_FONT" },
 			{ ID_LEFTPOPUP, "MENU_LEFTPOPUP" },
 			{ ID_HOTKEY, "MENU_HOTKEY" },
+			{ ID_LB_CLEAR_SESSIONLOCK, "MENU_LB_CLEAR_SESSIONLOCK" },
+			{ ID_LB_CLEAR_SUSPEND, "MENU_LB_CLEAR_SUSPEND" },
 		};
 		SetI18nMenuStrsW(g_hConfigMenu, "TTMenu", ConfigMenuTextInfo, _countof(ConfigMenuTextInfo), UILanguageFileW);
 		UTIL_get_lang_msgW("MENU_EXEC", uimsg, _countof(uimsg), L"Execute", UILanguageFileW);
@@ -2215,6 +2228,28 @@ BOOL ManageWMCommand_Menu(HWND hWnd, WPARAM wParam)
 		break;
 	case ID_NOENTRY:
 		return	TRUE;
+	case ID_LB_CLEAR_SESSIONLOCK:
+		if (GetMenuState(g_hConfigMenu, ID_LB_CLEAR_SESSIONLOCK, MF_BYCOMMAND & MF_CHECKED) != 0) {
+			UTIL_get_lang_msgW("MENU_LB_CLEAR_SESSIONLOCK", uimsg, _countof(uimsg), STR_HOTKEY, UILanguageFileW);
+			::ModifyMenuW(g_hConfigMenu, ID_LB_CLEAR_SESSIONLOCK, MF_BYCOMMAND, ID_LB_CLEAR_SESSIONLOCK, uimsg);
+			g_MenuData.bLockBoxClearSessionLock = FALSE;
+		} else {
+			UTIL_get_lang_msgW("MENU_LB_CLEAR_SESSIONLOCK", uimsg, _countof(uimsg), STR_HOTKEY, UILanguageFileW);
+			::ModifyMenuW(g_hConfigMenu, ID_LB_CLEAR_SESSIONLOCK, MF_CHECKED | MF_BYCOMMAND, ID_LB_CLEAR_SESSIONLOCK, uimsg);
+			g_MenuData.bLockBoxClearSessionLock = TRUE;
+		}
+		return	TRUE;
+	case ID_LB_CLEAR_SUSPEND:
+		if (GetMenuState(g_hConfigMenu, ID_LB_CLEAR_SUSPEND, MF_BYCOMMAND & MF_CHECKED) != 0) {
+			UTIL_get_lang_msgW("MENU_LB_CLEAR_SUSPEND", uimsg, _countof(uimsg), STR_HOTKEY, UILanguageFileW);
+			::ModifyMenuW(g_hConfigMenu, ID_LB_CLEAR_SUSPEND, MF_BYCOMMAND, ID_LB_CLEAR_SUSPEND, uimsg);
+			g_MenuData.bLockBoxClearSuspend = FALSE;
+		} else {
+			UTIL_get_lang_msgW("MENU_LB_CLEAR_SUSPEND", uimsg, _countof(uimsg), STR_HOTKEY, UILanguageFileW);
+			::ModifyMenuW(g_hConfigMenu, ID_LB_CLEAR_SUSPEND, MF_CHECKED | MF_BYCOMMAND, ID_LB_CLEAR_SUSPEND, uimsg);
+			g_MenuData.bLockBoxClearSuspend = TRUE;
+		}
+		return	TRUE;
 	default:
 		ConnectHost(hWnd, LOWORD(wParam));
 		return TRUE;
@@ -2728,18 +2763,20 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						DI_NORMAL);
 		}
 		return TRUE;
-
-	case WM_POWERBROADCAST:
-		if (wParam == PBT_APMSUSPEND) {
-			// スリープ,休止
-			SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
-		}
-		return TRUE;
-
 	case WM_WTSSESSION_CHANGE:
 		if (wParam == WTS_SESSION_LOCK) {
 			// スクリーンロック時
-			SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
+			if (g_MenuData.bLockBoxClearSessionLock) {
+				SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
+			}
+		}
+		return TRUE;
+	case WM_POWERBROADCAST:
+		if (wParam == PBT_APMSUSPEND) {
+			// スリープ,休止
+			if (g_MenuData.bLockBoxClearSuspend) {
+				SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
+			}
 		}
 		return TRUE;
 	}

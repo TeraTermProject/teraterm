@@ -83,6 +83,8 @@
 #define		KEY_LF_PITCHANDFAMILY	L"lfPitchAndFamily"
 #define		KEY_LF_FACENAME			L"lfFaceName"
 #define		KEY_HOTKEY				L"Hotkey"
+#define		KEY_LB_CLEAR_SESSIONLOCK	L"LockBoxClearSessionLock"
+#define		KEY_LB_CLEAR_SUSPEND		L"LockBoxClearSuspend"
 
 // レジストリの値名（ジョブ設定）
 #define		KEY_MODE				L"Mode"
@@ -172,6 +174,8 @@ struct MenuData {
 	COLORREF	crMenuTxt;
 	COLORREF	crSelMenuBg;
 	COLORREF	crSelMenuTxt;
+	BOOL		bLockBoxClearSessionLock;
+	BOOL		bLockBoxClearSuspend;
 };
 
 // 「LockBox入力」ダイアログ LPARAM用構造体
