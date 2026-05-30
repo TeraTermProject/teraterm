@@ -447,13 +447,22 @@ BOOL LoadConfig(void)
 	g_MenuData.crSelMenuTxt	= ::GetSysColor(COLOR_HIGHLIGHTTEXT);
 	g_MenuData.hFont		= ::CreateFontIndirectW(&(g_MenuData.lfFont));
 
-	// スクリーンロック開始時に LockBox のパスワードをクリアする
+	// スクリーンロック時にLockBoxのパスワードをクリアする
 	if (RegGetBOOL(hKey, KEY_LB_CLEAR_SESSIONLOCK, g_MenuData.bLockBoxClearSessionLock) == FALSE) {
 		g_MenuData.bLockBoxClearSessionLock = FALSE;
 	}
-	// スリープ,休止開始時に LockBox のパスワードをクリアする
+	if (g_MenuData.bLockBoxClearSessionLock) {
+		UTIL_get_lang_msgW("MENU_LB_CLEAR_SESSIONLOCK", uimsg, _countof(uimsg), STR_LB_CLEAR_SESSIONLOCK, UILanguageFileW);
+		::ModifyMenuW(g_hConfigMenu, ID_LB_CLEAR_SESSIONLOCK, MF_CHECKED | MF_BYCOMMAND, ID_LB_CLEAR_SESSIONLOCK, uimsg);
+	}
+
+	// サスペンド時にLockBoxのパスワードをクリアする (スリープ,休止時)
 	if (RegGetBOOL(hKey, KEY_LB_CLEAR_SUSPEND, g_MenuData.bLockBoxClearSuspend) == FALSE) {
 		g_MenuData.bLockBoxClearSuspend = FALSE;
+	}
+	if (g_MenuData.bLockBoxClearSuspend) {
+		UTIL_get_lang_msgW("MENU_LB_CLEAR_SUSPEND", uimsg, _countof(uimsg), STR_LB_CLEAR_SUSPEND, UILanguageFileW);
+		::ModifyMenuW(g_hConfigMenu, ID_LB_CLEAR_SUSPEND, MF_CHECKED | MF_BYCOMMAND, ID_LB_CLEAR_SUSPEND, uimsg);
 	}
 
 	return TRUE;
@@ -2233,22 +2242,22 @@ BOOL ManageWMCommand_Menu(HWND hWnd, WPARAM wParam)
 		return	TRUE;
 	case ID_LB_CLEAR_SESSIONLOCK:
 		if (GetMenuState(g_hConfigMenu, ID_LB_CLEAR_SESSIONLOCK, MF_BYCOMMAND & MF_CHECKED) != 0) {
-			UTIL_get_lang_msgW("MENU_LB_CLEAR_SESSIONLOCK", uimsg, _countof(uimsg), STR_HOTKEY, UILanguageFileW);
+			UTIL_get_lang_msgW("MENU_LB_CLEAR_SESSIONLOCK", uimsg, _countof(uimsg), STR_LB_CLEAR_SESSIONLOCK, UILanguageFileW);
 			::ModifyMenuW(g_hConfigMenu, ID_LB_CLEAR_SESSIONLOCK, MF_BYCOMMAND, ID_LB_CLEAR_SESSIONLOCK, uimsg);
 			g_MenuData.bLockBoxClearSessionLock = FALSE;
 		} else {
-			UTIL_get_lang_msgW("MENU_LB_CLEAR_SESSIONLOCK", uimsg, _countof(uimsg), STR_HOTKEY, UILanguageFileW);
+			UTIL_get_lang_msgW("MENU_LB_CLEAR_SESSIONLOCK", uimsg, _countof(uimsg), STR_LB_CLEAR_SESSIONLOCK, UILanguageFileW);
 			::ModifyMenuW(g_hConfigMenu, ID_LB_CLEAR_SESSIONLOCK, MF_CHECKED | MF_BYCOMMAND, ID_LB_CLEAR_SESSIONLOCK, uimsg);
 			g_MenuData.bLockBoxClearSessionLock = TRUE;
 		}
 		return	TRUE;
 	case ID_LB_CLEAR_SUSPEND:
 		if (GetMenuState(g_hConfigMenu, ID_LB_CLEAR_SUSPEND, MF_BYCOMMAND & MF_CHECKED) != 0) {
-			UTIL_get_lang_msgW("MENU_LB_CLEAR_SUSPEND", uimsg, _countof(uimsg), STR_HOTKEY, UILanguageFileW);
+			UTIL_get_lang_msgW("MENU_LB_CLEAR_SUSPEND", uimsg, _countof(uimsg), STR_LB_CLEAR_SUSPEND, UILanguageFileW);
 			::ModifyMenuW(g_hConfigMenu, ID_LB_CLEAR_SUSPEND, MF_BYCOMMAND, ID_LB_CLEAR_SUSPEND, uimsg);
 			g_MenuData.bLockBoxClearSuspend = FALSE;
 		} else {
-			UTIL_get_lang_msgW("MENU_LB_CLEAR_SUSPEND", uimsg, _countof(uimsg), STR_HOTKEY, UILanguageFileW);
+			UTIL_get_lang_msgW("MENU_LB_CLEAR_SUSPEND", uimsg, _countof(uimsg), STR_LB_CLEAR_SUSPEND, UILanguageFileW);
 			::ModifyMenuW(g_hConfigMenu, ID_LB_CLEAR_SUSPEND, MF_CHECKED | MF_BYCOMMAND, ID_LB_CLEAR_SUSPEND, uimsg);
 			g_MenuData.bLockBoxClearSuspend = TRUE;
 		}
