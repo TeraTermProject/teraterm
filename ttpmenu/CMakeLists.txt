@@ -114,6 +114,7 @@ target_link_libraries(
   bcrypt
   ws2_32
   Crypt32
+  wtsapi32.lib
   )
 
 install(

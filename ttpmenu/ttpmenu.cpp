@@ -30,6 +30,7 @@
 
 #include	<windows.h>
 #include	<commctrl.h>
+#include	<wtsapi32.h>
 #include	<stdio.h>
 #include	<string.h>
 #define _CRTDBG_MAP_ALLOC
@@ -2638,6 +2639,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SaveConfig();
 		return TRUE;
 	case WM_DESTROY:
+		WTSUnRegisterSessionNotification(hWnd);
 		SecureZeroMemory(&g_JobInfo, sizeof(g_JobInfo));
 		SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
 		SaveConfig();
@@ -2730,6 +2732,13 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_POWERBROADCAST:
 		if (wParam == PBT_APMSUSPEND) {
 			// スリープ,休止
+			SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
+		}
+		return TRUE;
+
+	case WM_WTSSESSION_CHANGE:
+		if (wParam == WTS_SESSION_LOCK) {
+			// スクリーンロック時
 			SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
 		}
 		return TRUE;
@@ -2844,6 +2853,9 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR /* nCmdLine unusedParam */, in
 							NULL);
 	if (hWnd == NULL)
 		return FALSE;
+
+	// セッション変更通知を受信 (WM_WTSSESSION_CHANGE)
+	WTSRegisterSessionNotification(hWnd, NOTIFY_FOR_THIS_SESSION);
 
 	while (::GetMessageW(&msg, NULL, 0, 0)) {
 		::TranslateMessage(&msg);
