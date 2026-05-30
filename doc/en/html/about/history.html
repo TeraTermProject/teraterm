@@ -6427,6 +6427,11 @@ SYNOPSIS:
 <h3 id="ttmenu_1.23">YYYY.MM.DD (Ver 1.23 not released yet)</h3>
 <ul class="history">
       <li>
+        Fixed an issue where the default font name became garbled during initial setup.
+        This bug was introduced in 1.18.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1274" target="_blank">issue #1274</a>)
+      </li>
+      <li>
         Modified to encrypt in-memory passwords using CryptProtectMemory().
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
       </li>
@@ -6445,9 +6450,10 @@ SYNOPSIS:
       <li>
         Added SecureZeroMemory(), out-of-bounds access checks, error handling, and related safeguards.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
-        Fixed an issue where the default font name became garbled during initial setup.
-        This bug was introduced in 1.18.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1274" target="_blank">issue #1274</a>)
+      </li>
+      <li>
+        Added a feature that clears the LockBox password when the screen is locked or when the system enters sleep or hibernation.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
       </li>
       <li>
         Made minor adjustments.
