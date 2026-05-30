@@ -93,12 +93,21 @@
         This bug was introduced in 5.4.0.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1277" target="_blank">issue #1277</a>)
       </li>
+      <li>
+        Fixed an issue where ttermpro.exe crashes when "pipe_name" or "server\pipe_name" is specified with the /PIPE command line option.
+        This bug was introduced in 5.0.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1318" target="_blank">issue #1318</a>)
+      </li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
       <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.23">1.23</a>.</li>
+      <li>
+        Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.2" target="_blank">6.7.2</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1317" target="_blank">issue #1317</a>)
+      </li>
     </ul>
   </li>
 </ul>
@@ -6436,6 +6445,9 @@ SYNOPSIS:
       <li>
         Added SecureZeroMemory(), out-of-bounds access checks, error handling, and related safeguards.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+        Fixed an issue where the default font name became garbled during initial setup.
+        This bug was introduced in 1.18.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1274" target="_blank">issue #1274</a>)
       </li>
       <li>
         Made minor adjustments.

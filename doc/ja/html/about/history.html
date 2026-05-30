@@ -93,12 +93,21 @@
         5.4.0 からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1277" target="_blank">issue #1277</a>)
       </li>
+      <li>
+        /PIPE コマンドラインオプションに "pipe_name" 又は "server\pipe_name" の形式を指定するとクラッシュする問題を修正した。
+        5.0 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1318" target="_blank">issue #1318</a>)
+      </li>
     </ul>
   </li>
 
   <li>その他
     <ul>
       <li><a href="#ttmenu_1.23">TeraTerm Menu 1.23</a> へ差し替えた。</li>
+      <li>
+        インストーラに使用している Inno Setup のバージョンを <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.2" target="_blank">6.7.2</a> へ差し替えた。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1317" target="_blank">issue #1317</a>)
+      </li>
     </ul>
   </li>
 </ul>
@@ -260,7 +269,7 @@
       <li><a href="#ttmenu_1.21">TeraTerm Menu 1.21</a> へ差し替えた。</li>
       <li><a href="#ttssh_3.6.0">TTSSH 3.6.0 </a> へ差し替えた。</li>
       <li>
-        インストーラに使用している Inno Setup のバージョンを <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.0" target="_blank">6.7.1</a> へ差し替えた。
+        インストーラに使用している Inno Setup のバージョンを <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.1" target="_blank">6.7.1</a> へ差し替えた。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1125" target="_blank">issue #1125</a>)
       </li>
     </ul>
@@ -6445,6 +6454,9 @@
       <li>
         SecureZeroMemory()、境界外アクセスのチェック、エラー処理等を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+        初期設定時のデフォルトのフォント名が文字化けする不具合を修正した。
+        1.18 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1274" target="_blank">issue #1274</a>)
       </li>
       <li>
         細かい調整を行った。

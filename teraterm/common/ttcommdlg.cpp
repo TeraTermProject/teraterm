@@ -127,7 +127,6 @@ static BOOL TTSHBrowseForFolderWAPI(const TTBROWSEINFOW *bi, const wchar_t *def,
 	else
 #endif
 	{
-		wchar_t buf[MAX_PATH];
 		if (!SHGetPathFromIDListW(pidl, buf)) {
 			return FALSE;
 		}

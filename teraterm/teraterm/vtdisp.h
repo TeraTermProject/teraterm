@@ -80,7 +80,7 @@ void BGOnSettingChange(vtdraw_t *vt);
 void BGOnEnterSizeMove(void);
 void BGOnExitSizeMove(vtdraw_t *vt);
 
-vtdraw_t *InitDisp(HWND hVTWin);
+vtdraw_t *InitDisp(HWND hVTWin, const TTTSet *pts);
 void EndDisp(vtdraw_t *vt);
 void DispReset(vtdraw_t *vt);
 void DispConvWinToScreen(vtdraw_t *vt, int Xw, int Yw, int *Xs, int *Ys, PBOOL Right);

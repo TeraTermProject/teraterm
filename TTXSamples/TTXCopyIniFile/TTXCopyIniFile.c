@@ -13,7 +13,7 @@ static HANDLE hInst; /* Instance handle of TTX*.DLL */
 typedef struct {
 	PReadIniFile origReadIniFile;
 	PWriteIniFile origWriteIniFile;
-	wchar_t origIniFileName[MAXPATHLEN];
+	wchar_t origIniFileName[MAX_PATH];
 } TInstVar;
 
 static TInstVar *pvar;
