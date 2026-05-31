@@ -282,7 +282,9 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 		if (pvar->wait.tv_sec != 0 || pvar->wait.tv_usec != 0) {
 			pvar->wait.tv_sec = 0;
 			pvar->wait.tv_usec = 0;
-			pvar->last = curtime;
+			if (!pvar->nowait) {
+				pvar->last = curtime;
+			}
 		}
 
 		if (prh.len != 0 && lbytes == 0) {
