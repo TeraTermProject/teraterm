@@ -110,8 +110,8 @@
 #define		STR_ICONMODE			L"showing large icon"
 #define		STR_LEFTBUTTONPOPUP		L"showing list by left-click"
 #define		STR_HOTKEY				L"showing list hotkey(Ctl+Alt+M)"
-#define		STR_LB_CLEAR_SESSIONLOCK	L"clear LockBox password on session lock"
-#define		STR_LB_CLEAR_SUSPEND	L"clear LockBox password on suspend"
+#define		STR_LB_CLEAR_SESSIONLOCK	L"Clear LockBox Password on Session Lock"
+#define		STR_LB_CLEAR_SUSPEND	L"Clear LockBox Password on Hibernate (+legacy S3 Sleep)"
 #define		STR_NOENTRY				L"(none)"
 
 typedef enum {

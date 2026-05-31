@@ -447,7 +447,7 @@ BOOL LoadConfig(void)
 	g_MenuData.crSelMenuTxt	= ::GetSysColor(COLOR_HIGHLIGHTTEXT);
 	g_MenuData.hFont		= ::CreateFontIndirectW(&(g_MenuData.lfFont));
 
-	// スクリーンロック時にLockBoxのパスワードをクリアする
+	// セッションロック時にLockBoxのパスワードを消去
 	if (RegGetBOOL(hKey, KEY_LB_CLEAR_SESSIONLOCK, g_MenuData.bLockBoxClearSessionLock) == FALSE) {
 		g_MenuData.bLockBoxClearSessionLock = FALSE;
 	}
@@ -456,7 +456,7 @@ BOOL LoadConfig(void)
 		::ModifyMenuW(g_hConfigMenu, ID_LB_CLEAR_SESSIONLOCK, MF_CHECKED | MF_BYCOMMAND, ID_LB_CLEAR_SESSIONLOCK, uimsg);
 	}
 
-	// サスペンド時にLockBoxのパスワードをクリアする (スリープ,休止時)
+	// 休止・S3スリープ時にLockBoxのパスワードを消去
 	if (RegGetBOOL(hKey, KEY_LB_CLEAR_SUSPEND, g_MenuData.bLockBoxClearSuspend) == FALSE) {
 		g_MenuData.bLockBoxClearSuspend = FALSE;
 	}
@@ -2777,7 +2777,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	case WM_WTSSESSION_CHANGE:
 		if (wParam == WTS_SESSION_LOCK) {
-			// スクリーンロック時
+			// セッションロック時
 			if (g_MenuData.bLockBoxClearSessionLock) {
 				SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
 			}
@@ -2785,7 +2785,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	case WM_POWERBROADCAST:
 		if (wParam == PBT_APMSUSPEND) {
-			// スリープ,休止
+			// 休止・S3スリープ時
 			if (g_MenuData.bLockBoxClearSuspend) {
 				SecureZeroMemory(g_szLockBox, sizeof(g_szLockBox));
 			}

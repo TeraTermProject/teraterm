@@ -75,8 +75,8 @@ BEGIN
             MENUITEM "specifying font",             ID_FONT
             MENUITEM "showing list by left-click",  ID_LEFTPOPUP
             MENUITEM "showing list hotkey(Ctl+Alt+M)", ID_HOTKEY
-            MENUITEM "clear LockBox password on session lock", ID_LB_CLEAR_SESSIONLOCK
-            MENUITEM "clear LockBox password on suspend", ID_LB_CLEAR_SUSPEND
+            MENUITEM "Clear LockBox Password on Session Lock", ID_LB_CLEAR_SESSIONLOCK
+            MENUITEM "Clear LockBox Password on Hibernate (+legacy S3 Sleep)", ID_LB_CLEAR_SUSPEND
         END
         MENUITEM "Version ",                    ID_VERSION
         MENUITEM SEPARATOR
