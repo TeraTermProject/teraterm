@@ -70,6 +70,17 @@
         Excluded the plugin from build targets.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1280" target="_blank">issue #1280</a>)
       </li>
+      <li>
+        Disallowed loading plugins from outside the folder containing ttermpro.exe
+        when a plugin filename is specified directly in the Plugin section of TERATERM.INI.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1286" target="_blank">issue #1286</a>)<br>
+      </li>
+      <li>
+        Plugin filenames are handled as normal filename(long filename, LFN).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1286" target="_blank">issue #1286</a>)<br>
+        Previously, since short filename,SFN (DOS filename, 8.3 format) is used,
+        "ttxtest.dll-" was treated as "TTXTEST.DLL" and loaded.
+      </li>
     </ul>
   </li>
 
