@@ -52,10 +52,14 @@ typedef struct {
 	BOOL played;
 	HMENU FileMenu;
 	HMENU ControlMenu;
+	int skip;
+	int skip_ini;
 	int maxwait;
+	int minwait;
 	int speed;
 	BOOL pause;
 	BOOL nowait;
+	BOOL nowait_ini;
 	BOOL open_error;
 	struct timeval last;
 	struct timeval wait;
@@ -135,8 +139,13 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	gettimeofday(&(pvar->last) /*, NULL*/ );
 	pvar->wait.tv_sec = 0;
 	pvar->wait.tv_usec = 1;
+	pvar->skip = 0;
+	pvar->skip_ini = 5;
+	pvar->maxwait = 0;
+	pvar->minwait = 0;
 	pvar->pause = FALSE;
 	pvar->nowait = FALSE;
+	pvar->nowait_ini = FALSE;
 	pvar->open_error = FALSE;
 }
 
@@ -234,7 +243,14 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 		h.len = b[2];
 		if (prh.tv.tv_sec != 0) {
 			pvar->wait = tvshift(tvdiff(prh.tv, h.tv), pvar->speed);
-			if (pvar->maxwait != 0 && pvar->wait.tv_sec >= pvar->maxwait) {
+			if (pvar->wait.tv_sec < pvar->minwait || pvar->skip > 0) {
+				if (pvar->skip > 0) {
+					pvar->skip --;
+				}
+				pvar->wait.tv_sec = 0;
+				pvar->wait.tv_usec = 0;
+			}
+			else if (pvar->maxwait != 0 && pvar->wait.tv_sec >= pvar->maxwait) {
 				char tbuff[TitleBuffSize];
 				wchar_t *uimsg;
 				char *msg;
@@ -266,7 +282,9 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 		if (pvar->wait.tv_sec != 0 || pvar->wait.tv_usec != 0) {
 			pvar->wait.tv_sec = 0;
 			pvar->wait.tv_usec = 0;
-			pvar->last = curtime;
+			if (!pvar->nowait) {
+				pvar->last = curtime;
+			}
 		}
 
 		if (prh.len != 0 && lbytes == 0) {
@@ -342,6 +360,15 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 			  case ' ':
 			  case '.':
 				pvar->wait.tv_sec = 0;
+				break;
+			  case 'q':
+			  case 'Q':
+				pvar->nowait = !pvar->nowait;
+				break;
+			  case 'k':
+			  case 'K':
+				pvar->wait.tv_sec = 0;
+				pvar->skip += pvar->skip_ini;
 				break;
 			  case ESC:
 				mode = MODE_ESC;
@@ -430,6 +457,8 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 		RestoreOLDTitle();
 		pvar->enable = FALSE;
 		pvar->played = TRUE;
+		pvar->nowait = pvar->nowait_ini;
+		pvar->speed = 0;
 	}
 }
 
@@ -472,11 +501,13 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
 	wchar_t buff[1024];
 	wchar_t *next;
 	pvar->origParseParam(Param, ts, DDETopic);
+	int max, min;
 
 	next = Param;
 	while (next = GetParam(buff, sizeof(buff), next)) {
 		if (_wcsnicmp(buff, L"/ttyplay-nowait", 16) == 0 || _wcsnicmp(buff, L"/tpnw", 6) == 0) {
 			pvar->nowait = TRUE;
+			pvar->nowait_ini = pvar->nowait;
 		}
 		else if (_wcsnicmp(buff, L"/TTYPLAY", 9) == 0 || _wcsnicmp(buff, L"/TP", 4) == 0) {
 			pvar->enable = TRUE;
@@ -485,6 +516,15 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
 				free(pvar->openfnW);
 				pvar->openfnW = HostNameW;
 			}
+		}
+		else if (_wcsnicmp(buff, L"/TPW=", 5) == 0) {
+			max = 0;
+			min = 0;
+	    	if (swscanf_s(&buff[5], L"%d,%d", &max, &min) == 0) {
+	    		swscanf_s(&buff[5], L",%d", &min);
+			}
+			pvar->maxwait = max;
+			pvar->minwait = min;
 		}
 	}
 }
@@ -524,6 +564,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 				free(pvar->openfnW);
 				pvar->openfnW = openfn;
 				pvar->ReplaceHostDlg = TRUE;
+				pvar->nowait = FALSE;
 				// Call New-Connection dialog
 				SendMessage(hWin, WM_COMMAND, MAKELONG(ID_FILE_NEWCONNECTION, 0), 0);
 			}
@@ -537,6 +578,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 			SendMessage(hWin, WM_COMMAND, MAKELONG(ID_EDIT_CLEARBUFFER, 0), 0);
 			pvar->played = FALSE;
 			pvar->ReplaceHostDlg = TRUE;
+			pvar->nowait = FALSE;
 			// Call New-Connection dialog
 			SendMessage(hWin, WM_COMMAND, MAKELONG(ID_FILE_NEWCONNECTION, 0), 0);
 		}
