@@ -81,7 +81,7 @@ static int EndIfFlag;
 static HWND HMainWin;
 // Timeout
 static DWORD TimeLimit;
-static DWORD TimeStart;
+static ULONGLONG TimeStart;
 // for 'WaitEvent' command
 static int WakeupCondition;
 
@@ -1577,7 +1577,7 @@ static WORD TTLFileLock(void)
 	DWORD timeout;
 	int result;
 	BOOL ret;
-	DWORD dwStart;
+	ULONGLONG dwStart;
 
 	Err = 0;
 	GetIntVal(&fhi,&Err);
@@ -1592,7 +1592,7 @@ static WORD TTLFileLock(void)
 	timeout = timeoutI * 1000;
 
 	result = 1;  // error
-	dwStart = GetTickCount();
+	dwStart = GetTickCount64();
 	do {
 		ret = LockFile(FH, 0, 0, (DWORD)-1, (DWORD)-1);
 		if (ret != 0) { // ロック成功
@@ -1600,7 +1600,7 @@ static WORD TTLFileLock(void)
 			break;
 		}
 		Sleep(1);
-	} while (GetTickCount() - dwStart < (timeout*1000));
+	} while (GetTickCount64() - dwStart < (timeout*1000));
 
 	SetResult(result);
 	return Err;
@@ -3446,7 +3446,7 @@ static WORD TTLPause(void)
 	{
 		TTLStatus = IdTTLPause;
 		TimeLimit = (DWORD)(TimeOut*1000);
-		TimeStart = GetTickCount();
+		TimeStart = GetTickCount64();
 		SetTimer(HMainWin, IdTimeOutTimer, TIMEOUT_TIMER_MS, NULL);
 	}
 	return Err;
@@ -3548,7 +3548,7 @@ static WORD TTLRecvLn(void)
 	if (TimeOut>0)
 	{
 		TimeLimit = (DWORD)TimeOut;
-		TimeStart = GetTickCount();
+		TimeStart = GetTickCount64();
 		SetTimer(HMainWin, IdTimeOutTimer, TIMEOUT_TIMER_MS, NULL);
 	}
 
@@ -5469,10 +5469,9 @@ static WORD TTLUptime(void)
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	// Windows OSが起動してからの経過時間（ミリ秒）を取得する。ただし、49日を経過すると、0に戻る。
-	// GetTickCount64() API(Vista以降)を使うと、オーバーフローしなくなるが、そもそもTera Termでは
-	// 64bit変数をサポートしていないので、意味がない。
-	tick = GetTickCount();
+	// Windows OSが起動してからの経過時間（ミリ秒）を取得する。
+	// マクロ変数は32bitのため下位32bitのみ格納する。
+	tick = (DWORD)GetTickCount64();
 
 	SetIntVal(VarId, tick);
 
@@ -5533,7 +5532,7 @@ static WORD TTLWait(BOOL Ln)
 		if (TimeOut>0)
 		{
 			TimeLimit = (DWORD)TimeOut;
-			TimeStart = GetTickCount();
+			TimeStart = GetTickCount64();
 			SetTimer(HMainWin, IdTimeOutTimer, TIMEOUT_TIMER_MS, NULL);
 		}
 	}
@@ -5603,7 +5602,7 @@ static WORD TTLWaitEvent(void)
 	if (TimeOut>0)
 	{
 		TimeLimit = (DWORD)TimeOut;
-		TimeStart = GetTickCount();
+		TimeStart = GetTickCount64();
 		SetTimer(HMainWin, IdTimeOutTimer, TIMEOUT_TIMER_MS, NULL);
 	}
 
@@ -5645,7 +5644,7 @@ static WORD TTLWaitN(void)
 	if (TimeOut>0)
 	{
 		TimeLimit = (DWORD)TimeOut;
-		TimeStart = GetTickCount();
+		TimeStart = GetTickCount64();
 		SetTimer(HMainWin, IdTimeOutTimer, TIMEOUT_TIMER_MS, NULL);
 	}
 
@@ -5685,7 +5684,7 @@ static WORD TTLWaitRecv(void)
 	if (TimeOut>0)
 	{
 		TimeLimit = (DWORD)TimeOut;
-		TimeStart = GetTickCount();
+		TimeStart = GetTickCount64();
 		SetTimer(HMainWin, IdTimeOutTimer, TIMEOUT_TIMER_MS, NULL);
 	}
 	return Err;
@@ -6559,17 +6558,8 @@ void SetResult(int ResultCode)
 
 BOOL CheckTimeout()
 {
-	BOOL ret;
-	DWORD TimeUp = (TimeStart+TimeLimit);
-
-	if (TimeUp > TimeStart) {
-		ret = (GetTickCount() > TimeUp);
-	}
-	else { // for DWORD overflow (49.7 days)
-		DWORD TimeTmp = GetTickCount();
-		ret = (TimeUp < TimeTmp && TimeTmp >= TimeStart);
-	}
-	return ret;
+	ULONGLONG TimeUp = TimeStart + TimeLimit;
+	return (GetTickCount64() > TimeUp);
 }
 
 BOOL TestWakeup(int Wakeup)

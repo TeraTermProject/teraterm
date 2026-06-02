@@ -398,7 +398,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	MSG msg;
 	for (;;) {
 		// idle状態でメッセージがない場合
-		DWORD idle_enter_tick = GetTickCount();
+		ULONGLONG idle_enter_tick = GetTickCount64();
 		BOOL sleep_enable = FALSE;
 		for (;;) {
 			// idle処理を行う
@@ -412,7 +412,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 			if (!continue_idle) {
 				// FALSEが戻ってきたらidle処理は不要
 				if (!sleep_enable) {
-					if (GetTickCount() - idle_enter_tick > 20) {
+					if (GetTickCount64() - idle_enter_tick > 20) {
 						// 20ms以上idle処理不要だったらSleep()を入れる
 						sleep_enable = TRUE;
 					}
@@ -423,7 +423,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				lCount = 0;
 			}
 			else {
-				idle_enter_tick = GetTickCount();
+				idle_enter_tick = GetTickCount64();
 				sleep_enable = FALSE;
 			}
 

@@ -239,7 +239,7 @@ static HWND WINAPI GetConsoleWindowLocal(void)
 	}
 
 	// Format a "unique" NewWindowTitle.
-	wsprintfA(pszNewWindowTitle, "%d/%d", GetTickCount(), GetCurrentProcessId());
+	wsprintfA(pszNewWindowTitle, "%I64u/%d", GetTickCount64(), GetCurrentProcessId());
 
 	// Change current window title.
 	SetConsoleTitleA(pszNewWindowTitle);

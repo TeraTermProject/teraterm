@@ -552,10 +552,10 @@ typedef struct scp {
 	PTInstVar pvar;
 	HANDLE ScpStartThreadEvent;
 	BOOL canceled;
-	DWORD stime;
-	int prev_elapsed;
+	ULONGLONG stime;
+	ULONGLONG prev_elapsed;
 	int ProgStat;
-	DWORD ProcessedTime;
+	ULONGLONG ProcessedTime;
 	// for receiving file
 	long long filetotalsize;
 	long long filercvsize;

@@ -44,7 +44,7 @@ void SetRB(HWND HDlg, int R, int FirstId, int LastId);
 void GetRB(HWND HDlg, LPWORD R, int FirstId, int LastId);
 void SetDlgNum(HWND HDlg, int id_Item, LONG Num);
 void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int *prog);
-void SetDlgTime(HWND HDlg, int id_Item, DWORD elapsed, int bytes);
+void SetDlgTime(HWND HDlg, int id_Item, ULONGLONG elapsed, int bytes);
 void SetDropDownList(HWND HDlg, int Id_Item, const char *List[], int nsel);
 void SetDropDownListW(HWND HDlg, int Id_Item, const wchar_t *List[], int nsel);
 LONG GetCurSel(HWND HDlg, int Id_Item);

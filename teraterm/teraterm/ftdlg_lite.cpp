@@ -174,8 +174,8 @@ public:
 	BOOL Pause;
 	BOOL check_2sec;
 	BOOL show;
-	DWORD prev_elapsed;
-	DWORD StartTime;
+	ULONGLONG prev_elapsed;
+	ULONGLONG StartTime;
 	BOOL HideDialog;
 
 	CFileTransLiteDlg::Observer *observer_;
@@ -215,7 +215,7 @@ BOOL CFileTransLiteDlg::Create(HINSTANCE hInstance, HWND hParent, const wchar_t 
 	}
 
 	pData->SetDlgItemTextA(IDC_TRANS_ETIME, "0:00");
-	pData->StartTime = GetTickCount();
+	pData->StartTime = GetTickCount64();
 	pData->prev_elapsed = 0;
 
 	return Ok;
@@ -232,10 +232,10 @@ void CFileTransLiteDlg::RefreshNum(size_t ByteCount, size_t FileSize)
 		return;
 	}
 
-	const DWORD now = GetTickCount();
+	const ULONGLONG now = GetTickCount64();
 
 	if (!pData->check_2sec) {
-		DWORD elapsed_ms = now - pData->StartTime;
+		ULONGLONG elapsed_ms = now - pData->StartTime;
 		if (elapsed_ms > 2 * 1000) {
 			// 2sec経過
 			pData->check_2sec = TRUE;
@@ -247,10 +247,10 @@ void CFileTransLiteDlg::RefreshNum(size_t ByteCount, size_t FileSize)
 	}
 
 	char NumStr[24];
-	DWORD elapsed = (now - pData->StartTime) / 1000;
+	ULONGLONG elapsed = (now - pData->StartTime) / 1000;
 	if (elapsed != pData->prev_elapsed && elapsed != 0) {
 		char elapsed_str[24];
-		_snprintf_s(elapsed_str, sizeof(elapsed_str), _TRUNCATE, "%ld:%02ld",
+		_snprintf_s(elapsed_str, sizeof(elapsed_str), _TRUNCATE, "%llu:%02llu",
 					elapsed / 60, elapsed % 60);
 
 		char speed_str[24];

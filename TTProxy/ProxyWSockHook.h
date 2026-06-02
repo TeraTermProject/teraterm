@@ -471,7 +471,7 @@ private:
         in_addr addr;
         struct in6_addr addr6;
         char* buffer;
-        DWORD time;
+        ULONGLONG time;
         ConnectionInfo(ProxyInfo& proxy, String realhost):proxy(proxy), realhost(realhost), buffer(NULL) {
         }
         ~ConnectionInfo() {
@@ -664,7 +664,7 @@ private:
             ConnectionInfo* info = table.get(url);
             ::LeaveCriticalSection(&section);
             if (info != NULL) {
-                info->time = ::GetTickCount();
+                info->time = ::GetTickCount64();
                 return info;
             }
             ProxyInfo proxy;
@@ -688,8 +688,8 @@ private:
                 }
             }
             if (i >= countof(list)) {
-                DWORD now = ::GetTickCount();
-                DWORD max = 0;
+                ULONGLONG now = ::GetTickCount64();
+                ULONGLONG max = 0;
                 int index = -1;
                 for (i = 0; i < countof(list); i++) {
                     if (list[i] != NULL) {
@@ -709,7 +709,7 @@ private:
             info->addr6.s6_addr[11] = 0xff;
             info->addr6.s6_addr[15] = i + 1;
 
-            info->time = ::GetTickCount();
+            info->time = ::GetTickCount64();
             return info;
         }
     };

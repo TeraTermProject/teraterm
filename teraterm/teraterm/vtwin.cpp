@@ -2207,7 +2207,7 @@ void CVTWindow::OnKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 #if UNICODE_DEBUG
 	if (UnicodeDebugParam.CodePopupEnable)
 	{
-		const DWORD now = GetTickCount();
+		const ULONGLONG now = GetTickCount64();
 		switch(CtrlKeyState) {
 		case 0:
 			if (nChar == UnicodeDebugParam.CodePopupKey1) {

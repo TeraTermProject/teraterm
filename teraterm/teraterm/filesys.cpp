@@ -66,7 +66,7 @@ typedef struct {
 	LONG FileSize; // uint64_t FileSize;  TODO
 	LONG ByteCount; // uint64_t ByteCount;
 
-	DWORD StartTime;
+	ULONGLONG StartTime;
 	BOOL FilePause;
 
 	BOOL FileRetrySend, FileRetryEcho, FileCRSend, FileReadEOF, BinaryMode;
@@ -118,7 +118,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 	free(DlgCaption);
 
 	fv->FilePause = FALSE;
-	fv->StartTime = GetTickCount();
+	fv->StartTime = GetTickCount64();
 	fv->SendDlg = FTDlg; /* File send */
 
 	return TRUE;

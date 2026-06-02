@@ -79,7 +79,7 @@ typedef struct {
 
 	int ProgStat;
 
-	DWORD StartTime;
+	ULONGLONG StartTime;
 
 	DWORD FileMtime;
 
@@ -1086,7 +1086,7 @@ static BOOL KmtSendNextFile(PKmtVar kv)
 
 	kv->ByteCount = 0;
 	kv->ProgStat = 0;
-	kv->StartTime = GetTickCount();
+	kv->StartTime = GetTickCount64();
 
 	fv->InfoOp->SetDlgProtoFileName(fv, kv->FullName);
 	fv->InfoOp->SetDlgByteCount(fv, kv->ByteCount);
@@ -1191,7 +1191,7 @@ static BOOL KmtInit(TProto *pv, PComVar cv, PTTSet ts)
 
 	if (kv->KmtMode == IdKmtSend) {
 		fv->InfoOp->InitDlgProgress(fv, &kv->ProgStat);
-		kv->StartTime = GetTickCount();
+		kv->StartTime = GetTickCount64();
 	}
 	else {
 		kv->ProgStat = -1;
@@ -1347,7 +1347,7 @@ static BOOL FTCreateFile(PKmtVar kv)
 	if (kv->ProgStat != -1) {
 		kv->ProgStat = 0;
 	}
-	kv->StartTime = GetTickCount();
+	kv->StartTime = GetTickCount64();
 
 	return TRUE;
 }

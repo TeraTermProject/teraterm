@@ -116,7 +116,7 @@ typedef struct {
 
 	int ProgStat;
 
-	DWORD StartTime;
+	ULONGLONG StartTime;
 
 	DWORD FileMtime;
 
@@ -640,7 +640,7 @@ static void ZSendFileDat(PZVar zv)
 
 	zv->ByteCount = 0;
 	zv->ProgStat = 0;
-	zv->StartTime = GetTickCount();
+	zv->StartTime = GetTickCount64();
 	fv->InfoOp->SetDlgByteCount(fv, zv->ByteCount);
 	fv->InfoOp->SetDlgPercent(fv, zv->ByteCount, zv->FileSize, &zv->ProgStat);
 	fv->InfoOp->SetDlgTime(fv, zv->StartTime, zv->ByteCount);
@@ -746,7 +746,7 @@ static BOOL ZInit(TProto *pv, PComVar cv, PTTSet ts)
 	fv->InfoOp->SetDlgProtoText(fv, "ZMODEM");
 
 	fv->InfoOp->InitDlgProgress(fv, &zv->ProgStat);
-	zv->StartTime = GetTickCount();
+	zv->StartTime = GetTickCount64();
 
 	zv->FileSize = 0;
 	zv->FileMtime = 0;
@@ -1107,7 +1107,7 @@ static BOOL FTCreateFile(PZVar zv)
 	if (zv->ProgStat != -1) {
 		zv->ProgStat = 0;
 	}
-	zv->StartTime = GetTickCount();
+	zv->StartTime = GetTickCount64();
 
 	return TRUE;
 }
@@ -1169,7 +1169,7 @@ static BOOL ZParseFile(PZVar zv)
 	if (zv->FileSize > 0)
 		fv->InfoOp->SetDlgPercent(fv,
 					  0, zv->FileSize, &zv->ProgStat);
-	fv->InfoOp->SetDlgTime(fv, GetTickCount(), zv->ByteCount);
+	fv->InfoOp->SetDlgTime(fv, GetTickCount64(), zv->ByteCount);
 
 	/* set timeout for data */
 	fv->FTSetTimeOut(fv, zv->TimeOut);

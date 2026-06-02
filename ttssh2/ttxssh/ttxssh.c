@@ -604,7 +604,7 @@ static unsigned short find_local_port(PTInstVar pvar)
 	   if we're unlucky). They do not need to be (and are not)
 	   cryptographically strong.
 	 */
-	srand((unsigned) GetTickCount());
+	srand((unsigned)GetTickCount64());
 
 	for (tries = 20; tries > 0; tries--) {
 		memset(&hints, 0, sizeof(hints));
