@@ -162,23 +162,32 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	MSG msg;
 	for (;;) {
 		// Windowsのメッセージがない場合のループ
+		DWORD idle_enter_tick = GetTickCount();
+		BOOL sleep_enable = FALSE;
 		for(;;) {
+			BOOL b = OnIdle(lCount);
+			if (!b) {
+				// idle不要
+				if (!sleep_enable) {
+					const DWORD boost_time_ms = 5000;
+					if (GetTickCount() - idle_enter_tick > boost_time_ms) {
+						// idle不要時間がある程度継続したら、Sleep()を入れる
+						sleep_enable = TRUE;
+					}
+				}
+				if (sleep_enable) {
+					Sleep(2);
+				}
+				lCount = 0;
+			} else {
+				// 要idle
+				idle_enter_tick = GetTickCount();
+				sleep_enable = FALSE;
+			}
+
 			if (PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE) != FALSE) {
 				// メッセージが存在した、ループを抜ける
 				break;
-			}
-
-			if (!OnIdle(lCount)) {
-				// idle不要
-				if (SleepTick < 500) {	// 最大 501ms未満
-					SleepTick += 2;
-				}
-				lCount = 0;
-				Sleep(SleepTick);
-			} else {
-				// 要idle
-				SleepTick = 0;
-				lCount++;
 			}
 		}
 
