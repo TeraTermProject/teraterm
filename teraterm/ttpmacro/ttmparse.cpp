@@ -1768,7 +1768,7 @@ void GetStrVal(PCHAR Str, LPWORD Err)
 void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion)
 {
 	TVariableType VarType;
-	int VarId;
+	long long VarId;
 
 	Str[0] = 0;
 	if (*Err!=0) return;
@@ -1782,8 +1782,9 @@ void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion)
 				strncpy_s(Str, MaxStrLen, StrVarPtr((TVarId)VarId), _TRUNCATE);
 				break;
 			case TypInteger:
+			case TypInteger64:
 				if (AutoConversion)
-					_snprintf_s(Str, MaxStrLen, _TRUNCATE, "%d", VarId);
+					_snprintf_s(Str, MaxStrLen, _TRUNCATE, "%lld", VarId);
 				else
 					*Err = ErrTypeMismatch;
 				break;
