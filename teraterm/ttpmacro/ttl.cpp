@@ -5490,6 +5490,7 @@ static WORD TTLUptime(void)
 	// Windows OSが起動してからの経過時間（ミリ秒）を取得する。
 	// マクロ変数は32bitのため下位32bitのみ格納する。
 	tick = (DWORD)GetTickCount64();
+
 	SetIntVal(VarId, tick);
 
 	return Err;
