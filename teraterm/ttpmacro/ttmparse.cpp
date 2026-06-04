@@ -1662,27 +1662,24 @@ BOOL GetExpression(TVariableType *ValType, long long *Val, LPWORD Err)
 	}
 }
 
-void GetIntVal(long long *Val, LPWORD Err)
+void GetIntVal(int *Val, LPWORD Err)
 {
 	TVariableType ValType;
+	long long tmp = 0;
 
 	UpdateLineParsePtr();
 
 	if (*Err != 0) return;
-	if (! GetExpression(&ValType,Val,Err))
+	if (! GetExpression(&ValType, &tmp, Err))
 	{
 		*Err = ErrSyntax;
 		return;
 	}
 	if (*Err!=0) return;
-	if (ValType!=TypInteger && ValType!=TypInteger64)
+	if (ValType!=TypInteger && ValType!=TypInteger64) {
 		*Err = ErrTypeMismatch;
-}
-
-void GetIntVal(int *Val, LPWORD Err)
-{
-	long long tmp = 0;
-	GetIntVal(&tmp, Err);
+		return;
+	}
 	*Val = (int)tmp;
 }
 
@@ -1875,7 +1872,7 @@ const char *StrVarPtr(TVarId VarId)
 }
 
 // for ifdefined (2006.9.23 maya)
-void GetVarType(TVariableType *ValType, long long *Val, LPWORD Err)
+void GetVarType(TVariableType *ValType, int *Val, LPWORD Err)
 {
 	TName Name;
 	WORD WId;
@@ -1919,13 +1916,6 @@ void GetVarType(TVariableType *ValType, long long *Val, LPWORD Err)
 	}
 
 	*Err = 0;
-}
-
-void GetVarType(TVariableType *ValType, int *Val, LPWORD Err)
-{
-	long long tmp = 0;
-	GetVarType(ValType, &tmp, Err);
-	*Val = (int)tmp;
 }
 
 BOOL GetIndex(int *Index, LPWORD Err)

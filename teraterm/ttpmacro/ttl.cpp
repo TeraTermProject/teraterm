@@ -373,7 +373,7 @@ static WORD TTLCommCmdFile(char Cmd, int Wait)
 
 static WORD TTLCommCmdBin(char Cmd, int Wait)
 {
-	long long Val;
+	int Val;
 	WORD Err;
 
 	Err = 0;
@@ -394,7 +394,7 @@ static WORD TTLCommCmdBin(char Cmd, int Wait)
 
 static WORD TTLCommCmdDeb(void)
 {
-	long long Val;
+	int Val;
 	WORD Err;
 
 	Err = 0;
@@ -414,7 +414,7 @@ static WORD TTLCommCmdDeb(void)
 
 static WORD TTLCommCmdInt(char Cmd, int Wait)
 {
-	long long Val;
+	int Val;
 	char Str[21];
 	WORD Err;
 
@@ -910,7 +910,7 @@ static WORD TTLDim(WORD type)
 	TVariableType VarType;
 	TName Name;
 	TVarId VarId;
-	long long size;
+	int size;
 
 	Err = 0;
 
@@ -922,10 +922,10 @@ static WORD TTLDim(WORD type)
 	if (Err!=0) return Err;
 
 	if (type == RsvIntDim) {
-		Err = NewIntAryVar(Name, (int)size);
+		Err = NewIntAryVar(Name, size);
 	}
 	else { // type == RsvStrDim
-		Err = NewStrAryVar(Name, (int)size);
+		Err = NewStrAryVar(Name, size);
 	}
 	return Err;
 }
@@ -933,7 +933,7 @@ static WORD TTLDim(WORD type)
 static WORD TTLDisconnect(void)
 {
 	WORD Err;
-	long long Val = 1;
+	int Val = 1;
 	char Str[21];
 
 	Err = 0;
@@ -999,7 +999,7 @@ static WORD TTLDispStr(void)
 static WORD TTLDo(void)
 {
 	WORD WId, Err;
-	long long Val = 1;
+	int Val = 1;
 
 	Err = 0;
 	if (CheckParameterGiven()) {
@@ -1046,9 +1046,9 @@ static WORD TTLElse(void)
 	return 0;
 }
 
-static long long CheckElseIf(LPWORD Err)
+static int CheckElseIf(LPWORD Err)
 {
-	long long Val;
+	int Val;
 	WORD WId;
 
 	*Err = 0;
@@ -1064,7 +1064,7 @@ static long long CheckElseIf(LPWORD Err)
 static WORD TTLElseIf(void)
 {
 	WORD Err;
-	long long Val;
+	int Val;
 
 	Val = CheckElseIf(&Err);
 	if (Err!=0) return Err;
@@ -1104,7 +1104,7 @@ static WORD TTLEndIf(void)
 static WORD TTLEndWhile(BOOL mode)
 {
 	WORD Err;
-	long long Val = mode;
+	int Val = mode;
 
 	Err = 0;
 	if (CheckParameterGiven()) {
@@ -2095,7 +2095,7 @@ static WORD TTLFileWrite(BOOL addCRLF)
 	WORD Err, P;
 	int fhi;
 	HANDLE FH;
-	long long Val;
+	int Val;
 	TStrVal Str;
 
 	Err = 0;
@@ -3038,7 +3038,7 @@ static WORD TTLIfDefined(void)
 {
 	WORD Err;
 	TVariableType VarType;
-	long long Val;
+	int Val;
 
 	GetVarType(&VarType,&Val,&Err);
 
@@ -3304,7 +3304,7 @@ EndLogOptions:
 static WORD TTLLoop(void)
 {
 	WORD WId, Err;
-	long long Val = 1;
+	int Val = 1;
 
 	Err = 0;
 	if (CheckParameterGiven()) {
@@ -4283,7 +4283,7 @@ static WORD TTLSetEnv(void)
 static WORD TTLSetExitCode(void)
 {
 	WORD Err;
-	long long Val;
+	int Val;
 
 	Err = 0;
 	GetIntVal(&Val,&Err);
@@ -4328,7 +4328,7 @@ static WORD TTLSetFileAttr(void)
 static WORD TTLSetSync(void)
 {
 	WORD Err;
-	long long Val;
+	int Val;
 
 	Err = 0;
 	GetIntVal(&Val,&Err);
@@ -4378,7 +4378,7 @@ static WORD TTLSetTime(void)
 static WORD TTLShow(void)
 {
 	WORD Err;
-	long long Val;
+	int Val;
 
 	Err = 0;
 	GetIntVal(&Val,&Err);
@@ -5502,7 +5502,8 @@ static WORD TTLWait(BOOL Ln)
 	WORD Err;
 	TVariableType ValType;
 	TVarId VarId;
-	int i, Val;
+	int i;
+	long long Val;
 	int TimeOut;
 
 	ClearWait();
@@ -5709,7 +5710,7 @@ static WORD TTLWaitRecv(void)
 static WORD TTLWhile(BOOL mode)
 {
 	WORD Err;
-	long long Val = mode;
+	int Val = mode;
 
 	Err = 0;
 	if (CheckParameterGiven()) {
