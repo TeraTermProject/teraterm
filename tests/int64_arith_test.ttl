@@ -1,0 +1,129 @@
+; int64 変数の算術・比較テスト（接続不要）
+;
+; 32ビットを超える値を使って int64 の算術・比較が
+; 正しく動作することを確認する。
+;
+; 使い方: Tera Term マクロとして単体で実行する（接続不要）
+;
+; テスト値:
+;   $7FFFFFFF  = 2147483647 (32bit int の最大値)
+;   $80000000  = 2147483648 (32bit では負になるが int64 では正)
+;   $100000000 = 4294967296 (32bit では表現不可)
+
+int64 a
+int64 b
+int64 r
+
+; === 加算 ===
+; 2147483647 + 1 = 2147483648 (32bit ではオーバーフロー)
+a = $7FFFFFFF
+b = 1
+r = a + b
+if r <> $80000000 then
+    messagebox 'NG: 加算エラー ($7FFFFFFF + 1)' 'int64 test'
+    end
+endif
+
+; 2147483648 + 2147483648 = 4294967296
+a = $80000000
+b = $80000000
+r = a + b
+if r <> $100000000 then
+    messagebox 'NG: 加算エラー ($80000000 + $80000000)' 'int64 test'
+    end
+endif
+
+; === 減算 ===
+; 2147483648 - 1 = 2147483647
+a = $80000000
+b = 1
+r = a - b
+if r <> $7FFFFFFF then
+    messagebox 'NG: 減算エラー ($80000000 - 1)' 'int64 test'
+    end
+endif
+
+; 4294967296 - 4294967295 = 1
+a = $100000000
+b = $FFFFFFFF
+r = a - b
+if r <> 1 then
+    messagebox 'NG: 減算エラー ($100000000 - $FFFFFFFF)' 'int64 test'
+    end
+endif
+
+; === 乗算 ===
+; 100000 * 100000 = 10000000000 (> 2^32)
+a = 100000
+b = 100000
+r = a * b
+if r <> 10000000000 then
+    messagebox 'NG: 乗算エラー (100000 * 100000)' 'int64 test'
+    end
+endif
+
+; === 除算 ===
+; 10000000000 / 100000 = 100000
+a = 10000000000
+b = 100000
+r = a / b
+if r <> 100000 then
+    messagebox 'NG: 除算エラー (10000000000 / 100000)' 'int64 test'
+    end
+endif
+
+; === 剰余 ===
+; 10000000001 % 100000 = 1
+a = 10000000001
+b = 100000
+r = a % b
+if r <> 1 then
+    messagebox 'NG: 剰余エラー (10000000001 mod 100000)' 'int64 test'
+    end
+endif
+
+; === 比較: < ===
+a = $7FFFFFFF
+b = $80000000
+if a >= b then
+    messagebox 'NG: 比較エラー ($7FFFFFFF < $80000000)' 'int64 test'
+    end
+endif
+
+; === 比較: > ===
+if b <= a then
+    messagebox 'NG: 比較エラー ($80000000 > $7FFFFFFF)' 'int64 test'
+    end
+endif
+
+; === 比較: <= ===
+a = $80000000
+b = $80000000
+if a > b then
+    messagebox 'NG: 比較エラー ($80000000 <= $80000000)' 'int64 test'
+    end
+endif
+
+; === 比較: >= ===
+if a < b then
+    messagebox 'NG: 比較エラー ($80000000 >= $80000000)' 'int64 test'
+    end
+endif
+
+; === 比較: == ===
+if a <> b then
+    messagebox 'NG: 比較エラー ($80000000 == $80000000)' 'int64 test'
+    end
+endif
+
+; === 比較: <> ===
+a = $7FFFFFFF
+b = $80000000
+if a == b then
+    messagebox 'NG: 比較エラー ($7FFFFFFF <> $80000000)' 'int64 test'
+    end
+endif
+
+messagebox 'OK: int64 算術・比較 全テスト合格' 'int64 test'
+
+end
