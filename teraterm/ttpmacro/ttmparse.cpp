@@ -415,6 +415,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 	case 'u':
 		if (_stricmp(Str,"unlink")==0) *WordId = RsvUnlink;
 		else if (_stricmp(Str,"until")==0) *WordId = RsvUntil;
+		else if (_stricmp(Str,"uptime64")==0) *WordId = RsvUptime64;
 		else if (_stricmp(Str,"uptime")==0) *WordId = RsvUptime;
 		break;
 	case 'v':

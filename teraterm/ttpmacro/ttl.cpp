@@ -5479,6 +5479,7 @@ static WORD TTLUptime(void)
 {
 	WORD Err;
 	TVarId VarId;
+	DWORD tick;
 
 	Err = 0;
 	GetIntVar(&VarId,&Err);
@@ -5486,9 +5487,26 @@ static WORD TTLUptime(void)
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	// SetIntVal が変数の型に応じて格納する:
-	//   TypInteger64 → 64ビット全体を格納
-	//   TypInteger   → 下位32ビットのみ格納（従来の動作を維持）
+	// Windows OSが起動してからの経過時間（ミリ秒）を取得する。
+	// マクロ変数は32bitのため下位32bitのみ格納する。
+	tick = (DWORD)GetTickCount64();
+	SetIntVal(VarId, tick);
+
+	return Err;
+}
+
+static WORD TTLUptime64(void)
+{
+	WORD Err;
+	TVarId VarId;
+
+	Err = 0;
+	GetIntVar(&VarId,&Err);
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	// int64変数にOS起動からの経過時間（ミリ秒）を64ビットで格納する。
 	SetIntVal(VarId, (long long)GetTickCount64());
 
 	return Err;
@@ -6382,6 +6400,8 @@ static int ExecCmnd(void)
 			Err = TTLWhile(FALSE); break;
 		case RsvUptime:
 			Err = TTLUptime(); break;
+		case RsvUptime64:
+			Err = TTLUptime64(); break;
 		case RsvVar2Clipb:
 			Err = TTLVar2Clipb(); break;    // add 'var2clipb' (2006.9.17 maya)
 		case RsvWaitRegex:

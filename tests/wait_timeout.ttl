@@ -6,18 +6,18 @@
 ;
 ; 使い方: Tera Term マクロとして単体で実行する（接続不要）
 ;
-; int64 変数を使って uptime を 64ビットで取得し、
+; uptime64 で 64ビットの経過時間を取得し、
 ; 49.7 日オーバーフローに依存しない経過時間計測を行う。
 
 int64 tick_start
 int64 tick_end
 
-uptime tick_start
+uptime64 tick_start
 
 ; 3 秒間 pause する
 pause 3
 
-uptime tick_end
+uptime64 tick_end
 
 ; 経過時間を計算（ミリ秒）
 elapsed = tick_end - tick_start

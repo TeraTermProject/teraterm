@@ -302,6 +302,7 @@ typedef enum {
 #define RsvSetSerialDelayChar 224
 #define RsvSetSerialDelayLine 225
 #define RsvInt64        226
+#define RsvUptime64     227
 
 #define RsvOperator     1000
 #define RsvBNot         1001
