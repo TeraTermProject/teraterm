@@ -157,6 +157,10 @@ rem ####################
 setlocal
 cd /d %CUR%..\libs
 call buildall.bat
+if errorlevel 1 (
+    endlocal
+    exit /b 1
+)
 endlocal
 exit /b 0
 
