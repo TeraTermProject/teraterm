@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>uptime</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>uptime</h1>
+
+<p>
+Gets System Up Time. <em>(version 5.7.0 or later)</em>
+</p>
+
+<pre class="macro-syntax">
+uptime &lt;intvar&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Retrieves the number of milliseconds that have elapsed since the Windows OS was started,
+and then stores the value into the &lt;int64var&gt; variable.
+</p>
+
+<p>
+The time is valid after the system is run continuously for 49.7 days.
+</p>
+
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; How to get the uptime in Windows
+int64 var
+uptime64 var
+day = var / 86400000
+var = var % 86400000
+hour = var / 3600000
+var = var % 3600000
+min = var / 60000
+var = var % 60000
+sec = var / 1000
+
+sprintf2 str "System Up Time: %d Days, %d Hours, %d Minutes, %d Seconds" day hour min sec
+messagebox str "uptime"
+</pre>
+
+<pre class="macro-example">
+int64 varstart
+int64 varend
+uptime64 varstart
+
+; do something...
+
+uptime varend
+diff = varend - varstart
+sprintf2 str "MACRO running time: %d msec" diff
+messagebox str "running time"
+</pre>
+
+</body>
+</html>

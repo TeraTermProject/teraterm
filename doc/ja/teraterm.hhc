@@ -2015,6 +2015,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="uptime64">
+					<param name="Local" value="html\macro\command\uptime64.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="var2clipb">
 					<param name="Local" value="html\macro\command\var2clipb.html">
 					<param name="ImageNumber" value="11">
