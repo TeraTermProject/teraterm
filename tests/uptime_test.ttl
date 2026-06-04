@@ -1,0 +1,38 @@
+; uptime コマンドのテスト（接続不要）
+;
+; GetTickCount64() への置き換え後、uptime コマンドが
+; 正常動作することを確認する。
+; uptime は OS 起動からの経過時間（ミリ秒）の下位 32 ビットを
+; int 変数に格納する。
+;
+; 使い方: Tera Term マクロとして単体で実行する（接続不要）
+
+uptime tick_start
+
+; 3 秒間 pause する
+pause 3
+
+uptime tick_end
+
+; 経過時間を計算（ミリ秒）
+; 注意: 32bit のため 49.7 日でオーバーフローするが、
+;       短時間の計測では影響なし
+elapsed = tick_end - tick_start
+
+; 3000ms ±500ms 以内であることを確認
+if elapsed < 2500 then
+    sprintf2 msg 'NG: pause が早すぎる (%d ms)' elapsed
+    messagebox msg 'uptime test'
+    end
+endif
+
+if elapsed > 3500 then
+    sprintf2 msg 'NG: pause が遅すぎる (%d ms)' elapsed
+    messagebox msg 'uptime test'
+    end
+endif
+
+sprintf2 msg 'OK: pause が正常に完了した (%d ms)' elapsed
+messagebox msg 'uptime test'
+
+end
