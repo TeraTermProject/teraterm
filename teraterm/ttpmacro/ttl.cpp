@@ -373,7 +373,7 @@ static WORD TTLCommCmdFile(char Cmd, int Wait)
 
 static WORD TTLCommCmdBin(char Cmd, int Wait)
 {
-	int Val;
+	long long Val;
 	WORD Err;
 
 	Err = 0;
@@ -394,7 +394,7 @@ static WORD TTLCommCmdBin(char Cmd, int Wait)
 
 static WORD TTLCommCmdDeb(void)
 {
-	int Val;
+	long long Val;
 	WORD Err;
 
 	Err = 0;
@@ -414,7 +414,7 @@ static WORD TTLCommCmdDeb(void)
 
 static WORD TTLCommCmdInt(char Cmd, int Wait)
 {
-	int Val;
+	long long Val;
 	char Str[21];
 	WORD Err;
 
@@ -910,7 +910,7 @@ static WORD TTLDim(WORD type)
 	TVariableType VarType;
 	TName Name;
 	TVarId VarId;
-	int size;
+	long long size;
 
 	Err = 0;
 
@@ -922,10 +922,10 @@ static WORD TTLDim(WORD type)
 	if (Err!=0) return Err;
 
 	if (type == RsvIntDim) {
-		Err = NewIntAryVar(Name, size);
+		Err = NewIntAryVar(Name, (int)size);
 	}
 	else { // type == RsvStrDim
-		Err = NewStrAryVar(Name, size);
+		Err = NewStrAryVar(Name, (int)size);
 	}
 	return Err;
 }
@@ -933,7 +933,7 @@ static WORD TTLDim(WORD type)
 static WORD TTLDisconnect(void)
 {
 	WORD Err;
-	int Val = 1;
+	long long Val = 1;
 	char Str[21];
 
 	Err = 0;
@@ -961,7 +961,7 @@ static WORD TTLDispStr(void)
 	TStrVal Str, buff;
 	WORD Err;
 	TVariableType ValType;
-	int Val;
+	long long Val;
 
 	if (! Linked)
 		return ErrLinkFirst;
@@ -999,7 +999,7 @@ static WORD TTLDispStr(void)
 static WORD TTLDo(void)
 {
 	WORD WId, Err;
-	int Val = 1;
+	long long Val = 1;
 
 	Err = 0;
 	if (CheckParameterGiven()) {
@@ -1046,9 +1046,9 @@ static WORD TTLElse(void)
 	return 0;
 }
 
-static int CheckElseIf(LPWORD Err)
+static long long CheckElseIf(LPWORD Err)
 {
-	int Val;
+	long long Val;
 	WORD WId;
 
 	*Err = 0;
@@ -1064,7 +1064,7 @@ static int CheckElseIf(LPWORD Err)
 static WORD TTLElseIf(void)
 {
 	WORD Err;
-	int Val;
+	long long Val;
 
 	Val = CheckElseIf(&Err);
 	if (Err!=0) return Err;
@@ -1104,7 +1104,7 @@ static WORD TTLEndIf(void)
 static WORD TTLEndWhile(BOOL mode)
 {
 	WORD Err;
-	int Val = mode;
+	long long Val = mode;
 
 	Err = 0;
 	if (CheckParameterGiven()) {
@@ -2095,7 +2095,7 @@ static WORD TTLFileWrite(BOOL addCRLF)
 	WORD Err, P;
 	int fhi;
 	HANDLE FH;
-	int Val;
+	long long Val;
 	TStrVal Str;
 
 	Err = 0;
@@ -3038,7 +3038,7 @@ static WORD TTLIfDefined(void)
 {
 	WORD Err;
 	TVariableType VarType;
-	int Val;
+	long long Val;
 
 	GetVarType(&VarType,&Val,&Err);
 
@@ -3074,7 +3074,7 @@ static WORD TTLIf(void)
 {
 	WORD Err, Tmp, WId;
 	TVariableType ValType;
-	int Val;
+	long long Val;
 
 	if (! GetExpression(&ValType,&Val,&Err))
 		return ErrSyntax;
@@ -3304,7 +3304,7 @@ EndLogOptions:
 static WORD TTLLoop(void)
 {
 	WORD WId, Err;
-	int Val = 1;
+	long long Val = 1;
 
 	Err = 0;
 	if (CheckParameterGiven()) {
@@ -3921,7 +3921,7 @@ static WORD GetParamStrings(void)
 	TStrVal Str;
 	WORD Err;
 	TVariableType ValType;
-	int Val;
+	long long Val;
 	BOOL EndOfLine;
 
 	EndOfLine = FALSE;
@@ -4033,7 +4033,7 @@ static WORD GetBroadcastString(char *buff, int bufflen, BOOL crlf)
 	TStrVal Str;
 	WORD Err;
 	TVariableType ValType;
-	int Val;
+	long long Val;
 	char tmp[3];
 
 	buff[0] = '\0';
@@ -4283,7 +4283,7 @@ static WORD TTLSetEnv(void)
 static WORD TTLSetExitCode(void)
 {
 	WORD Err;
-	int Val;
+	long long Val;
 
 	Err = 0;
 	GetIntVal(&Val,&Err);
@@ -4328,7 +4328,7 @@ static WORD TTLSetFileAttr(void)
 static WORD TTLSetSync(void)
 {
 	WORD Err;
-	int Val;
+	long long Val;
 
 	Err = 0;
 	GetIntVal(&Val,&Err);
@@ -4378,7 +4378,7 @@ static WORD TTLSetTime(void)
 static WORD TTLShow(void)
 {
 	WORD Err;
-	int Val;
+	long long Val;
 
 	Err = 0;
 	GetIntVal(&Val,&Err);
@@ -5457,11 +5457,28 @@ static WORD TTLUnlink(void)
 }
 
 
+// int64 varname — 64ビット整数変数の宣言
+static WORD TTLInt64Decl(void)
+{
+	WORD Err, WordId;
+	TVariableType VarType;
+	TName Name;
+	TVarId VarId;
+
+	Err = 0;
+	if (! GetIdentifier(Name)) return ErrSyntax;
+	if (CheckReservedWord(Name, &WordId)) return ErrSyntax;
+	if (CheckVar(Name, &VarType, &VarId)) return ErrSyntax;
+	if (GetFirstChar() != 0) return ErrSyntax;
+
+	if (! NewInt64Var(Name, 0)) return ErrTooManyVar;
+	return 0;
+}
+
 static WORD TTLUptime(void)
 {
 	WORD Err;
 	TVarId VarId;
-	DWORD tick;
 
 	Err = 0;
 	GetIntVar(&VarId,&Err);
@@ -5469,11 +5486,10 @@ static WORD TTLUptime(void)
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	// Windows OSが起動してからの経過時間（ミリ秒）を取得する。
-	// マクロ変数は32bitのため下位32bitのみ格納する。
-	tick = (DWORD)GetTickCount64();
-
-	SetIntVal(VarId, tick);
+	// SetIntVal が変数の型に応じて格納する:
+	//   TypInteger64 → 64ビット全体を格納
+	//   TypInteger   → 下位32ビットのみ格納（従来の動作を維持）
+	SetIntVal(VarId, (long long)GetTickCount64());
 
 	return Err;
 }
@@ -5693,7 +5709,7 @@ static WORD TTLWaitRecv(void)
 static WORD TTLWhile(BOOL mode)
 {
 	WORD Err;
-	int Val = mode;
+	long long Val = mode;
 
 	Err = 0;
 	if (CheckParameterGiven()) {
@@ -5896,7 +5912,7 @@ static int ExecCmnd(void)
 	TStrVal Str;
 	TName Cmnd;
 	TVariableType ValType, VarType;
-	int Val;
+	long long Val;
 
 	Err = 0;
 
@@ -6184,6 +6200,8 @@ static int ExecCmnd(void)
 			Err = TTLInputBox(FALSE); break;
 		case RsvInt2Str:
 			Err = TTLInt2Str(); break;
+		case RsvInt64:
+			Err = TTLInt64Decl(); break;
 		case RsvIntDim:
 		case RsvStrDim:
 			Err = TTLDim(WId); break;
@@ -6437,9 +6455,13 @@ static int ExecCmnd(void)
 						}
 					}
 					if (Err) return Err;
-					if (VarType==ValType) {
-						switch (ValType) {
-						case TypInteger: SetIntVal(VarId,Val); break;
+					if (VarType==ValType ||
+					    (VarType==TypInteger && ValType==TypInteger64) ||
+					    (VarType==TypInteger64 && ValType==TypInteger)) {
+						switch (VarType) {
+						case TypInteger:
+						case TypInteger64:
+							SetIntVal(VarId,Val); break;
 						case TypString:
 							if (StrConst)
 								SetStrVal(VarId,Str);
@@ -6461,6 +6483,7 @@ static int ExecCmnd(void)
 				else {
 					switch (ValType) {
 					case TypInteger: E = NewIntVar(Cmnd,Val); break;
+					case TypInteger64: E = NewInt64Var(Cmnd,Val); break;
 					case TypString:
 						if (StrConst)
 							E = NewStrVar(Cmnd,Str);

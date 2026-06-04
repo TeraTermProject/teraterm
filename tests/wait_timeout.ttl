@@ -1,0 +1,41 @@
+; pause コマンドのタイムアウトテスト
+;
+; GetTickCount64() への置き換え後、タイムアウト機構が
+; 正常動作することを確認する。
+; OS 起動から 49.7 日以上経過した環境でも正しく動作することを想定。
+;
+; 使い方: Tera Term マクロとして単体で実行する（接続不要）
+;
+; int64 変数を使って uptime を 64ビットで取得し、
+; 49.7 日オーバーフローに依存しない経過時間計測を行う。
+
+int64 tick_start
+int64 tick_end
+
+uptime tick_start
+
+; 3 秒間 pause する
+pause 3
+
+uptime tick_end
+
+; 経過時間を計算（ミリ秒）
+elapsed = tick_end - tick_start
+
+; 3000ms ±500ms 以内であることを確認
+if elapsed < 2500 then
+    sprintf2 msg 'NG: pause が早すぎる (%d ms)' elapsed
+    messagebox msg 'pause timeout test'
+    end
+endif
+
+if elapsed > 3500 then
+    sprintf2 msg 'NG: pause が遅すぎる (%d ms)' elapsed
+    messagebox msg 'pause timeout test'
+    end
+endif
+
+sprintf2 msg 'OK: pause が正常に完了した (%d ms)' elapsed
+messagebox msg 'pause timeout test'
+
+end
