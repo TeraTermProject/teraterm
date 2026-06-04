@@ -38,35 +38,50 @@ echo %no%
 
 if "%no%" == "1" (
     call :download_libs force
+    if errorlevel 1 exit /b 1
     call :build_libs
+    if errorlevel 1 exit /b 1
     call :build_teraterm rebuild
+    if errorlevel 1 exit /b 1
 )
 
 if "%no%" == "2" (
     call :download_libs
+    if errorlevel 1 exit /b 1
     call :build_libs
+    if errorlevel 1 exit /b 1
     call :build_teraterm rebuild
+    if errorlevel 1 exit /b 1
 )
 
 if "%no%" == "3" (
     call :download_libs
+    if errorlevel 1 exit /b 1
     call :build_libs
+    if errorlevel 1 exit /b 1
     call :build_teraterm
+    if errorlevel 1 exit /b 1
 )
 
 if "%no%" == "4" (
     call :download_libs
+    if errorlevel 1 exit /b 1
     call :build_libs
+    if errorlevel 1 exit /b 1
 )
 
 if "%no%" == "5" (
     call :build_libs
+    if errorlevel 1 exit /b 1
     call :build_teraterm rebuild
+    if errorlevel 1 exit /b 1
 )
 
 if "%no%" == "6" (
     call :build_libs
+    if errorlevel 1 exit /b 1
     call :build_teraterm
+    if errorlevel 1 exit /b 1
 )
 
 if "%no%" == "7" (
@@ -83,24 +98,34 @@ if "%no%" == "10" (
 
 if "%no%" == "11" (
     call :download_libs
+    if errorlevel 1 exit /b 1
     call :build_teraterm_1 rebuild
+    if errorlevel 1 exit /b 1
 )
 
 if "%no%" == "12" (
     call :download_libs
+    if errorlevel 1 exit /b 1
     call :build_libs
+    if errorlevel 1 exit /b 1
     call :build_teraterm_2 rebuild
+    if errorlevel 1 exit /b 1
 )
 
 if "%no%" == "13" (
     call :download_libs
+    if errorlevel 1 exit /b 1
     call :build_teraterm_1
+    if errorlevel 1 exit /b 1
 )
 
 if "%no%" == "14" (
     call :download_libs
+    if errorlevel 1 exit /b 1
     call :build_libs
+    if errorlevel 1 exit /b 1
     call :build_teraterm_2
+    if errorlevel 1 exit /b 1
 )
 
 if not "%NOPAUSE%" == "1" pause
