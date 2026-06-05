@@ -1,7 +1,7 @@
 @rem インストーラ,zipを作成
 @rem   test
 @rem     release.batを実行、
-@rem     7. exec cmd.exe を選んでから使用すると、このbatをテストできます
+@rem     7. exec cmd.exe を選んでから使用すると、このbatだけテストができます
 setlocal
 
 
@@ -29,7 +29,7 @@ if "%RELEASE%" == "1" (
     set OUTPUT=%SNAPSHOT_OUTPUT%
 )
 
-rem ポータブルでコピーして使って使用(テストに使用)
+rem ポータブル版をコピーして取っておく(署名に使用する)
 %CMAKE% -E rm -rf Output/portable/teraterm-%arch%
 %CMAKE% -E copy_directory Output/build/teraterm-%arch% Output/portable/teraterm-%arch%
 if ERRORLEVEL 1 (
@@ -39,7 +39,7 @@ if ERRORLEVEL 1 (
 )
 
 
-rem (オプション)インストーラ作成
+rem (署名なし)インストーラ作成
 set INNO_SETUP_OUTPUT="/DOutputBaseFilename=%OUTPUT%"
 if "%RELEASE%" == "1" (
     set INNO_SETUP_APPVERSION="/DAppVersion=%VERSION%"
@@ -56,7 +56,7 @@ if ERRORLEVEL 1 (
     exit /b 1
 )
 
-rem (オプション)ポータブル版zip作成
+rem (署名なし)ポータブル版のzipを作成
 pushd Output
 %CMAKE% -E rm -rf %OUTPUT%
 %CMAKE% -E rm -rf %OUTPUT%_pdb
@@ -90,7 +90,7 @@ if ERRORLEVEL 1 (
 )
 popd
 
-rem ハッシュ作成
+rem ハッシュを作成
 pushd Output
 %CMAKE% -E sha256sum %OUTPUT%.exe %OUTPUT%.zip %OUTPUT%_pdb.zip > %OUTPUT%.sha256sum
 if ERRORLEVEL 1 (
