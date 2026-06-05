@@ -104,6 +104,7 @@
   <li>その他
     <ul>
       <li><a href="#ttmenu_1.23">TeraTerm Menu 1.23</a> へ差し替えた。</li>
+      <li><a href="#ttyrec_1.07">TTXttyrec Plugin 1.07</a> へ差し替えた。</li>
       <li>
         インストーラに使用している Inno Setup のバージョンを <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.2" target="_blank">6.7.2</a> へ差し替えた。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1317" target="_blank">issue #1317</a>)
@@ -6745,11 +6746,27 @@
 </ul>
 
 <h2 id="ttyrec">TTXttyrec</h2>
-<h3 id="ttyrec_1.07">2026.05.26 (Ver 1.07)</h3>
+<h3 id="ttyrec_1.07">YYYY.MM.DD (Ver 1.07 not released yet)</h3>
 <ul class="history">
-  <li>再生 再実行時、ステータスをタイトルに表示しない問題を修正</li>
-  <li>ttyファイルでないファイルをTTY再生した後、ttyファイルをTTY再生すると表示が崩れる問題を修正</li>
-  (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  <li>
+    TTY再生中に一時的にノーウェイトモードにできるようにした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1326" target="_blank">issue #1326</a>)
+  </li>
+  <li>
+    TTY再生のウェイト時間を制限できるようにした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1326" target="_blank">issue #1326</a>)
+    <ul>
+      <li><a href="../commandline/ttxttyplay.html#TPW">/TPW</a> コマンドラインオプションを追加した。</li>
+    </ul>
+  </li>
+  <li>
+    再生 再実行時、ステータスをタイトルに表示しない問題を修正
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  </li>
+  <li>
+    ttyファイルでないファイルをTTY再生した後、ttyファイルをTTY再生すると表示が崩れる問題を修正
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  </li>
 </ul>
 
 <h3 id="ttyrec_1.06">2025.08.03 (Ver 1.06)</h3>

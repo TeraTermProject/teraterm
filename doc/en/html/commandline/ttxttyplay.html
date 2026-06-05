@@ -27,6 +27,19 @@ You can use the following command line parameters on TTXttyplay.
   <dt id="nowait">/ttyplay-nowait</dt>
   <dt id="tpnw">/tpnw (short option for /ttyplay-nowait)</dt>
   <dd>no-wait mode.</dd>
+
+  <dt id="TPW">/TPW=[&lt;MaxWait&gt;][,[&lt;MinWait&gt;]]</dt>
+  <dd>wait period limit</dd>
+  <dd>
+    <ul>
+      <li><span class="syntax">MaxWait</span><br>
+          maximum wait period[seconds]<br>
+          If the wait period exceeds MaxWait, over period be cut off.</li>
+      <li><span class="syntax">MinWait</span><br>
+          minimum wait period[seconds]<br>
+          If the wait period is less than MinWait, that wait will be skipped.</li>
+    </ul>
+  </dd>
 </dl>
 
 
@@ -35,6 +48,7 @@ You can use the following command line parameters on TTXttyplay.
 <pre>
 ttermpro.exe /ttyplay /R="C:\Documents and Settings\doda\My Documents\record.tty"
 ttermpro.exe /ttyplay /ttyplay-nowait /R=example.tty
+ttermpro.exe /ttyplay /TPW=5,2 /R=example.tty
 </pre>
 
 </body>
