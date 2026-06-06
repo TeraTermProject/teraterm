@@ -405,6 +405,9 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						BOOL enable = IsDlgButtonChecked(hWnd, IDC_OVERRIDE_CHAR_WIDTH);
 						LRESULT selected =
 							SendDlgItemMessageW(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO, CB_GETCURSEL, 0, 0);
+						if (selected == CB_ERR) {
+							selected = 0;
+						}
 						if (!enable) {
 							// disableする
 							UnicodeOverrideWidthUninit();
