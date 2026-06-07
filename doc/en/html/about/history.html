@@ -6740,19 +6740,25 @@ SYNOPSIS:
 <h3 id="ttyrec_1.07">YYYY.MM.DD (Ver 1.07 not released yet)</h3>
 <ul class="history">
   <li>
-    playback speed can be switch to no-wait mode.
+    Added support for temporarily switching playback to no-wait mode.
     (<a href="https://github.com/TeraTermProject/teraterm/issues/1326" target="_blank">issue #1326</a>)
   </li>
   <li>
-    the wait period possible to limit for playback.
+    Added support for limiting playback wait time limit.
     (<a href="https://github.com/TeraTermProject/teraterm/issues/1326" target="_blank">issue #1326</a>)
     <ul>
-      <li>added the <a href="../commandline/ttxttyplay.html#TPW">/TPW</a> command line option.</li>
+      <li>Added the <a href="../commandline/ttxttyplay.html#TPW">/TPW</a> command line option.</li>
     </ul>
   </li>
   <li>
     The recording time can now be displayed in the title bar during playback.
     (<a href="https://github.com/TeraTermProject/teraterm/issues/1298" target="_blank">issue #1298</a>)
+    Fixed status not being displayed in the title during subsequent TTY file playbacks.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  </li>
+  <li>
+    Fixed display corruption when playing a tty file after a non-tty file.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
   </li>
 </ul>
 
