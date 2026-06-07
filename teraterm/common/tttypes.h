@@ -873,8 +873,6 @@ typedef struct {
 
 	void *StateSend;
 	void *StateEcho;
-
-	CRITICAL_SECTION InBuff_lock;
 } TComVar;
 typedef TComVar *PComVar;
 
