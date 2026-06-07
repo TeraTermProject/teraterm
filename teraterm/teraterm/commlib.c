@@ -1119,20 +1119,27 @@ void CommSend(PComVar cv)
 			break;
 
 		case IdSerial:
+			D = 0;
+			ResetEvent(wol.hEvent);
 			if (! PWriteFile(cv->ComID,&(cv->OutBuff[cv->OutPtr]),C,(LPDWORD)&D,&wol)) {
 				if (GetLastError() == ERROR_IO_PENDING) {
-					if (WaitForSingleObject(wol.hEvent,1000) != WAIT_OBJECT_0) {
-						D = C; /* Time out, ignore data */
+					DErr = WaitForSingleObject(wol.hEvent,1000);
+					if (DErr == WAIT_OBJECT_0) {
+						if (! GetOverlappedResult(cv->ComID,&wol,(LPDWORD)&D,FALSE)) {
+							ClearCommError(cv->ComID,&DErr,&Stat);
+							D = C; // 送信済のデータは再送しない
+						}
+					} else if (DErr == WAIT_TIMEOUT) {
+						D = C; // Time out, 送信済のデータは再送しない
+					} else {
+						ClearCommError(cv->ComID,&DErr,&Stat);
+						D = C;
 					}
-					else {
-						GetOverlappedResult(cv->ComID,&wol,(LPDWORD)&D,FALSE);
-					}
-				}
-				else { /* I/O error */
-					D = C; /* ignore error */
+				} else {
+					ClearCommError(cv->ComID,&DErr,&Stat);
+					D = C; // I/O error, 送信済のデータは再送しない
 				}
 			}
-			ClearCommError(cv->ComID,&DErr,&Stat);
 			break;
 
 		case IdFile:
@@ -1154,12 +1161,12 @@ void CommSend(PComVar cv)
 			break;
 	}
 
-	cv->OutBuffCount = cv->OutBuffCount - D;
-	if ( cv->OutBuffCount==0 ) {
+	cv->OutBuffCount -= D;
+	if ( cv->OutBuffCount <= 0 ) {
 		cv->OutPtr = 0;
 	}
 	else {
-		cv->OutPtr = cv->OutPtr + D;
+		cv->OutPtr += D;
 	}
 
 	if ( (C==D) && (delay>0) ) {
