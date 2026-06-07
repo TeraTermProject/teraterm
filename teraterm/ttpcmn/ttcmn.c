@@ -723,19 +723,17 @@ static BOOL WriteOutBuff(PComVar cv, const char *TempStr, int TempLen)
  */
 static BOOL WriteInBuff(PComVar cv, const char *TempStr, int TempLen)
 {
-	BOOL Full;
-
 	if (TempLen == 0) {
 		return TRUE;
 	}
 
-	Full = InBuffSize-cv->InBuffCount-TempLen < 0;
-	if (! Full) {
-		memcpy(&(cv->InBuff[cv->InBuffCount]),TempStr,TempLen);
-		cv->InBuffCount = cv->InBuffCount + TempLen;
-		return TRUE;
+    if (InBuffSize - cv->InPtr - cv->InBuffCount < TempLen) {
+        return FALSE;
 	}
-	return FALSE;
+
+	memcpy(&(cv->InBuff[cv->InPtr + cv->InBuffCount]), TempStr, TempLen);
+	cv->InBuffCount += TempLen;
+	return TRUE;
 }
 
 /**
@@ -743,8 +741,10 @@ static BOOL WriteInBuff(PComVar cv, const char *TempStr, int TempLen)
  */
 static void PackInBuff(PComVar cv)
 {
-	if ( (cv->InPtr>0) && (cv->InBuffCount>0) ) {
-		memmove(cv->InBuff,&(cv->InBuff[cv->InPtr]),cv->InBuffCount);
+	if (cv->InBuffCount == 0) {
+		cv->InPtr = 0;
+	} else if (cv->InPtr > 0 && cv->InPtr + cv->InBuffCount > InBuffSize / 4 * 3) {
+		memmove(cv->InBuff, &(cv->InBuff[cv->InPtr]), cv->InBuffCount);
 		cv->InPtr = 0;
 	}
 }

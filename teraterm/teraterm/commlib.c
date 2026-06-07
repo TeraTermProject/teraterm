@@ -242,7 +242,7 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 
 	/* enable receive request */
 	SetCommMask(cv->ComID,0);
-	SetCommMask(cv->ComID,EV_RXCHAR);
+	SetCommMask(cv->ComID,EV_RXCHAR | EV_ERR);
 }
 
 // 名前付きパイプが正しい書式かをチェックする。
@@ -919,54 +919,55 @@ void CommReceive(PComVar cv)
 	}
 
 	/* Compact buffer */
-	if ((cv->InBuffCount>0) && (cv->InPtr>0)) {
-		memmove(cv->InBuff,&(cv->InBuff[cv->InPtr]),cv->InBuffCount);
+	if (cv->InBuffCount == 0) {
+		cv->InPtr = 0;
+	} else if (cv->InPtr > 0 && cv->InPtr + cv->InBuffCount > InBuffSize / 4 * 3) {
+		memmove(cv->InBuff, &(cv->InBuff[cv->InPtr]), cv->InBuffCount);
 		cv->InPtr = 0;
 	}
 
-	if (cv->InBuffCount<InBuffSize) {
+	if (cv->InPtr + cv->InBuffCount < InBuffSize) {
 		switch (cv->PortType) {
 			case IdTCPIP:
-				C = Precv(cv->s, &(cv->InBuff[cv->InBuffCount]),
-				          InBuffSize-cv->InBuffCount, 0);
+				C = Precv(cv->s, &(cv->InBuff[cv->InPtr + cv->InBuffCount]),
+				          InBuffSize - cv->InPtr - cv->InBuffCount, 0);
 				if (C == SOCKET_ERROR) {
 					C = 0;
 					PWSAGetLastError();
 				}
-				cv->InBuffCount = cv->InBuffCount + C;
+				cv->InBuffCount += C;
 				break;
 			case IdSerial:
 				do {
-					ClearCommError(cv->ComID,&DErr,NULL);
-					if (! PReadFile(cv->ComID,&(cv->InBuff[cv->InBuffCount]),
-					                InBuffSize-cv->InBuffCount,&C,&rol)) {
+					C = 0;
+					if (! PReadFile(cv->ComID, &(cv->InBuff[cv->InPtr + cv->InBuffCount]),
+									InBuffSize - cv->InPtr - cv->InBuffCount, &C, &rol)) {
 						if (GetLastError() == ERROR_IO_PENDING) {
 							if (WaitForSingleObject(rol.hEvent, 1000) != WAIT_OBJECT_0) {
-								C = 0;
+								C = 0; // タイムアウト
+							} else {
+								if (!GetOverlappedResult(cv->ComID, &rol, &C, FALSE)) {
+									ClearCommError(cv->ComID, &DErr, NULL);
+									C = 0;
+								}
 							}
-							else {
-								GetOverlappedResult(cv->ComID,&rol,&C,FALSE);
-							}
-						}
-						else {
+						} else {
+							ClearCommError(cv->ComID,&DErr,NULL); // 切断、パリティエラー等
 							C = 0;
 						}
 					}
-					cv->InBuffCount = cv->InBuffCount + C;
-				} while ((C!=0) && (cv->InBuffCount<InBuffSize));
-				ClearCommError(cv->ComID,&DErr,NULL);
+					cv->InBuffCount += C;
+				} while ((C != 0) && (cv->InPtr + cv->InBuffCount < InBuffSize));
 				break;
 			case IdFile:
-				if (PReadFile(cv->ComID,&(cv->InBuff[cv->InBuffCount]),
-				              InBuffSize-cv->InBuffCount,&C,NULL)) {
+				if (PReadFile(cv->ComID, &(cv->InBuff[cv->InPtr + cv->InBuffCount]),
+				              InBuffSize - cv->InPtr - cv->InBuffCount, &C, NULL)) {
 					if (C == 0) {
 						DErr = ERROR_HANDLE_EOF;
+					} else {
+						cv->InBuffCount += C;
 					}
-					else {
-						cv->InBuffCount = cv->InBuffCount + C;
-					}
-				}
-				else {
+				} else {
 					DErr = GetLastError();
 				}
 				break;
@@ -974,21 +975,19 @@ void CommReceive(PComVar cv)
 			case IdNamedPipe:
 				// キューの中に最低1バイト以上のデータが入っていることを確認できているため、
 				// ReadFile() はブロックすることはないため、一括して読む。
-				if (PReadFile(cv->ComID,&(cv->InBuff[cv->InBuffCount]),
-				              InBuffSize-cv->InBuffCount,&C,NULL)) {
+				if (PReadFile(cv->ComID, &(cv->InBuff[cv->InPtr + cv->InBuffCount]),
+				              InBuffSize - cv->InPtr - cv->InBuffCount, &C, NULL)) {
 					if (C == 0) {
 						DErr = ERROR_HANDLE_EOF;
+					} else {
+						cv->InBuffCount += C;
 					}
-					else {
-						cv->InBuffCount = cv->InBuffCount + C;
-					}
-				}
-				else {
+				} else {
 					DErr = GetLastError();
 				}
 
 				// 1バイト以上読めたら、イベントを起こし、スレッドを再開させる。
-				if (cv->InBuffCount > 0) {
+				if (C > 0) {
 					cv->RRQ = FALSE;
 					SetEvent(ReadEnd);
 				}
@@ -1012,8 +1011,7 @@ void CommReceive(PComVar cv)
 				if (DErr != ERROR_IO_PENDING) {
 					PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 					cv->RRQ = FALSE;
-				}
-				else {
+				} else {
 					cv->RRQ = TRUE;
 				}
 				return;
@@ -1022,8 +1020,7 @@ void CommReceive(PComVar cv)
 				if (DErr != ERROR_IO_PENDING) {
 					PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 					cv->RRQ = FALSE;
-				}
-				else {
+				} else {
 					cv->RRQ = TRUE;
 				}
 				SetEvent(ReadEnd);
