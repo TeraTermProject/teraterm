@@ -159,7 +159,7 @@ static BOOL RawReadPacket(void *arg)
 		rv->ByteCount += cv->InBuffCount;
 		cv->InBuffCount = 0;
 		cv->InPtr = 0;
-		elapsed = (GetTickCount() - prev_elapsed) / 100;
+		elapsed = (GetTickCount() - rv->StartTime) / 100;
 		if (elapsed != prev_elapsed) {
 			prev_elapsed = elapsed;
 			fv->InfoOp->SetDlgByteCount(fv, rv->ByteCount);
