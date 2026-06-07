@@ -102,8 +102,8 @@ static int CloseSocket(SOCKET s)
 	return Pclosesocket(s);
 }
 
-#define CommInQueSize 16384
-#define CommOutQueSize 4096
+#define CommInQueSize  (1024*64)
+#define CommOutQueSize (1024*4)
 #define CommXonLim 768
 #define CommXoffLim 3328
 
@@ -864,6 +864,7 @@ void CommClose(PComVar cv)
 				ClearCOMFlag(cv->ComPort);
 			}
 			TTXCloseFile(); /* TTPLUG */
+			SetupComm(cv->ComID, 4096, 4096); // デフォルト値に戻す
 			break;
 		case IdFile:
 			if (cv->ComID != INVALID_HANDLE_VALUE) {
@@ -1059,7 +1060,7 @@ void CommSend(PComVar cv)
 			break;
 		case IdSerial:
 			ClearCommError(cv->ComID,&DErr,&Stat);
-			Max = OutBuffSize - Stat.cbOutQue;
+			Max = CommOutQueSize - Stat.cbOutQue;
 			break;
 		case IdFile:
 			Max = cv->OutBuffCount;
