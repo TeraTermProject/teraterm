@@ -29,7 +29,8 @@ and then stores the value into the &lt;intvar&gt; variable.
 </p>
 
 <p>
-The time wraps around to zero if the system is run continuously for 49.7 days.
+Since version 5.7.0, the value is stored as a 64-bit integer,
+so it will not wrap around even if the system is run continuously for more than 49.7 days.
 </p>
 
 

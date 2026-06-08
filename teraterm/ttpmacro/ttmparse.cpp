@@ -73,8 +73,7 @@ typedef struct {
 	TVariableType Type;
 	union {
 		char *Str;
-		int Int;
-		long long Int64;
+		long long Int;
 		TLab Lab;
 		TIntAry IntAry;
 		TStrAry StrAry;
@@ -292,7 +291,6 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"include")==0) *WordId = RsvInclude ;
 		else if (_stricmp(Str,"inputbox")==0) *WordId = RsvInputBox;
 		else if (_stricmp(Str,"int2str")==0) *WordId = RsvInt2Str;
-		else if (_stricmp(Str,"int64")==0) *WordId = RsvInt64;
 		else if (_stricmp(Str,"intdim")==0) *WordId = RsvIntDim;
 		else if (_stricmp(Str,"ispassword")==0) *WordId = RsvIsPassword;    // add 'ispassword'  (2012.5.24 yutaka)
 		else if (_stricmp(Str,"ispassword2")==0) *WordId = RsvIsPassword2;
@@ -415,7 +413,6 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 	case 'u':
 		if (_stricmp(Str,"unlink")==0) *WordId = RsvUnlink;
 		else if (_stricmp(Str,"until")==0) *WordId = RsvUntil;
-		else if (_stricmp(Str,"uptime64")==0) *WordId = RsvUptime64;
 		else if (_stricmp(Str,"uptime")==0) *WordId = RsvUptime;
 		break;
 	case 'v':
@@ -889,14 +886,7 @@ static Variable_t *NewVar(const char *name, TVariableType type)
 BOOL NewIntVar(const char *Name, long long InitVal)
 {
 	Variable_t *v = NewVar(Name, TypeInteger);
-	v->Value.Int = (int)InitVal;
-	return TRUE;
-}
-
-BOOL NewInt64Var(const char *Name, long long InitVal)
-{
-	Variable_t *v = NewVar(Name, TypeInteger64);
-	v->Value.Int64 = InitVal;
+	v->Value.Int = InitVal;
 	return TRUE;
 }
 
@@ -988,7 +978,7 @@ void CopyLabel(WORD ILabel, BINT *Ptr, LPWORD Level)
  */
 static BOOL IsIntType(TVariableType t)
 {
-	return t == TypInteger || t == TypInteger64;
+	return t == TypInteger;
 }
 
 static BOOL GetFactor(TVariableType *ValType, long long *Val, LPWORD Err)
@@ -1019,9 +1009,6 @@ static BOOL GetFactor(TVariableType *ValType, long long *Val, LPWORD Err)
 			switch (*ValType) {
 				case TypInteger:
 					*Val = Variables[VarId].Value.Int;
-					break;
-				case TypInteger64:
-					*Val = Variables[VarId].Value.Int64;
 					break;
 				case TypString: *Val = VarId; break;
 				case TypIntArray:
@@ -1138,7 +1125,6 @@ static BOOL EvalMultiplication(TVariableType *ValType, long long *Val, LPWORD Er
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
-		if (Type == TypInteger64) *ValType = TypInteger64;
 
 		if (Val2 == 0 && WId != RsvMul) {
 			*Err = ErrDivByZero;
@@ -1200,7 +1186,6 @@ static BOOL EvalAddition(TVariableType *ValType, long long *Val, LPWORD Err)
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
-		if (Type == TypInteger64) *ValType = TypInteger64;
 
 		switch (WId) {
 			case RsvPlus:    Val1 = Val1 + Val2;  break;
@@ -1257,12 +1242,11 @@ static BOOL EvalBitShift(TVariableType *ValType, long long *Val, LPWORD Err)
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
-		if (Type == TypInteger64) *ValType = TypInteger64;
 
 		if (WId == RsvALShift)
 			Val2 = -Val2;
 
-		const long long valbits = (*ValType == TypInteger64) ? 64 : (long long)INT_BIT;
+		const long long valbits = 64;
 		if (Val2 <= -valbits) {
 			Val1 = 0;
 		} else if (Val2 < 0) {
@@ -1271,10 +1255,7 @@ static BOOL EvalBitShift(TVariableType *ValType, long long *Val, LPWORD Err)
 			; /* do nothing */
 		} else if (Val2 < valbits) {
 			if (WId == RsvLRShift) {
-				if (*ValType == TypInteger64)
-					Val1 = (unsigned long long)Val1 >> Val2;
-				else
-					Val1 = (unsigned int)Val1 >> Val2;
+				Val1 = (unsigned long long)Val1 >> Val2;
 			} else {
 				Val1 = Val1 >> Val2;
 			}
@@ -1331,7 +1312,6 @@ static BOOL EvalBitAnd(TVariableType *ValType, long long *Val, LPWORD Err)
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
-		if (Type == TypInteger64) *ValType = TypInteger64;
 
 		Val1 = Val1 & Val2;
 		*Val = Val1;
@@ -1380,7 +1360,6 @@ static BOOL EvalBitXor(TVariableType *ValType, long long *Val, LPWORD Err)
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
-		if (Type == TypInteger64) *ValType = TypInteger64;
 
 		Val1 = Val1 ^ Val2;
 		*Val = Val1;
@@ -1429,7 +1408,6 @@ static BOOL EvalBitOr(TVariableType *ValType, long long *Val, LPWORD Err)
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
-		if (Type == TypInteger64) *ValType = TypInteger64;
 
 		Val1 = Val1 | Val2;
 		*Val = Val1;
@@ -1677,11 +1655,28 @@ void GetIntVal(int *Val, LPWORD Err)
 		return;
 	}
 	if (*Err!=0) return;
-	if (ValType!=TypInteger && ValType!=TypInteger64) {
+	if (ValType!=TypInteger) {
 		*Err = ErrTypeMismatch;
 		return;
 	}
 	*Val = (int)tmp;
+}
+
+void GetInt64Val(long long *Val, LPWORD Err)
+{
+	TVariableType ValType;
+
+	UpdateLineParsePtr();
+
+	if (*Err != 0) return;
+	if (! GetExpression(&ValType, Val, Err))
+	{
+		*Err = ErrSyntax;
+		return;
+	}
+	if (*Err!=0) return;
+	if (ValType!=TypInteger)
+		*Err = ErrTypeMismatch;
 }
 
 void SetIntVal(TVarId VarId, long long Val)
@@ -1693,10 +1688,7 @@ void SetIntVal(TVarId VarId, long long Val)
 	}
 	else {
 		Variable_t *v = &Variables[VarId];
-		if (v->Type == TypInteger64)
-			v->Value.Int64 = Val;
-		else
-			v->Value.Int = (int)Val;
+		v->Value.Int = Val;
 	}
 }
 
@@ -1709,8 +1701,6 @@ long long CopyIntVal(TVarId VarId)
 	}
 	else {
 		v = &Variables[VarId];
-		if (v->Type == TypInteger64)
-			return v->Value.Int64;
 		return v->Value.Int;
 	}
 }
@@ -1727,7 +1717,6 @@ void GetIntVar(PVarId VarId, LPWORD Err)
 		if (CheckVar(Name, &VarType, VarId)) {
 			switch (VarType) {
 			case TypInteger:
-			case TypInteger64:
 				break;
 			case TypIntArray:
 				if (GetIndex(&Index, Err)) {
@@ -1783,7 +1772,6 @@ void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion)
 				strncpy_s(Str, MaxStrLen, StrVarPtr((TVarId)VarId), _TRUNCATE);
 				break;
 			case TypInteger:
-			case TypInteger64:
 				if (AutoConversion)
 					_snprintf_s(Str, MaxStrLen, _TRUNCATE, "%lld", VarId);
 				else

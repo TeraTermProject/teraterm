@@ -4408,7 +4408,8 @@ void TTLShowMINIMIZE(void)
 static WORD TTLSprintf(int getvar)
 {
 	TStrVal Fmt;
-	int Num, NumWidth, NumPrecision;
+	long long Num;
+	int NumWidth, NumPrecision;
 	TStrVal Str;
 	WORD Err = 0, TmpErr;
 	TVarId VarId;
@@ -4620,19 +4621,40 @@ static WORD TTLSprintf(int getvar)
 					else {
 						// 数値として読めるかトライ
 						TmpErr = 0;
-						GetIntVal(&Num, &TmpErr);
+						GetInt64Val(&Num, &TmpErr);
 						if (TmpErr == 0) {
-							if (!width_asterisk && !precision_asterisk) {
-								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, Num);
-							}
-							else if (width_asterisk && !precision_asterisk) {
-								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumWidth, Num);
-							}
-							else if (!width_asterisk && precision_asterisk) {
-								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumPrecision, Num);
-							}
-							else { // width_asterisk && precision_asterisk
-								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumWidth, NumPrecision, Num);
+							// %d/%i/%o/%u/%x/%X を %lld 等に変換して 64bit 値を正しく出力する
+							char subFmt64[MaxStrLen];
+							int sflen = (int)strlen(subFmt);
+							char fspec = subFmt[sflen - 1];
+							if (fspec != 'c') {
+								_snprintf_s(subFmt64, sizeof(subFmt64), _TRUNCATE, "%.*sll%c", sflen - 1, subFmt, fspec);
+								if (!width_asterisk && !precision_asterisk) {
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt64, Num);
+								}
+								else if (width_asterisk && !precision_asterisk) {
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt64, NumWidth, Num);
+								}
+								else if (!width_asterisk && precision_asterisk) {
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt64, NumPrecision, Num);
+								}
+								else { // width_asterisk && precision_asterisk
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt64, NumWidth, NumPrecision, Num);
+								}
+							} else {
+								// %c は int で渡す
+								if (!width_asterisk && !precision_asterisk) {
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, (int)Num);
+								}
+								else if (width_asterisk && !precision_asterisk) {
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumWidth, (int)Num);
+								}
+								else if (!width_asterisk && precision_asterisk) {
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumPrecision, (int)Num);
+								}
+								else { // width_asterisk && precision_asterisk
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumWidth, NumPrecision, (int)Num);
+								}
 							}
 						}
 						else {
@@ -5457,29 +5479,10 @@ static WORD TTLUnlink(void)
 }
 
 
-// int64 varname — 64ビット整数変数の宣言
-static WORD TTLInt64Decl(void)
-{
-	WORD Err, WordId;
-	TVariableType VarType;
-	TName Name;
-	TVarId VarId;
-
-	Err = 0;
-	if (! GetIdentifier(Name)) return ErrSyntax;
-	if (CheckReservedWord(Name, &WordId)) return ErrSyntax;
-	if (CheckVar(Name, &VarType, &VarId)) return ErrSyntax;
-	if (GetFirstChar() != 0) return ErrSyntax;
-
-	if (! NewInt64Var(Name, 0)) return ErrTooManyVar;
-	return 0;
-}
-
 static WORD TTLUptime(void)
 {
 	WORD Err;
 	TVarId VarId;
-	DWORD tick;
 
 	Err = 0;
 	GetIntVar(&VarId,&Err);
@@ -5487,27 +5490,6 @@ static WORD TTLUptime(void)
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	// Windows OSが起動してからの経過時間（ミリ秒）を取得する。
-	// マクロ変数は32bitのため下位32bitのみ格納する。
-	tick = (DWORD)GetTickCount64();
-
-	SetIntVal(VarId, tick);
-
-	return Err;
-}
-
-static WORD TTLUptime64(void)
-{
-	WORD Err;
-	TVarId VarId;
-
-	Err = 0;
-	GetIntVar(&VarId,&Err);
-	if ((Err==0) && (GetFirstChar()!=0))
-		Err = ErrSyntax;
-	if (Err!=0) return Err;
-
-	// int64変数にOS起動からの経過時間（ミリ秒）を64ビットで格納する。
 	SetIntVal(VarId, (long long)GetTickCount64());
 
 	return Err;
@@ -6220,8 +6202,6 @@ static int ExecCmnd(void)
 			Err = TTLInputBox(FALSE); break;
 		case RsvInt2Str:
 			Err = TTLInt2Str(); break;
-		case RsvInt64:
-			Err = TTLInt64Decl(); break;
 		case RsvIntDim:
 		case RsvStrDim:
 			Err = TTLDim(WId); break;
@@ -6401,8 +6381,6 @@ static int ExecCmnd(void)
 			Err = TTLWhile(FALSE); break;
 		case RsvUptime:
 			Err = TTLUptime(); break;
-		case RsvUptime64:
-			Err = TTLUptime64(); break;
 		case RsvVar2Clipb:
 			Err = TTLVar2Clipb(); break;    // add 'var2clipb' (2006.9.17 maya)
 		case RsvWaitRegex:
@@ -6477,12 +6455,9 @@ static int ExecCmnd(void)
 						}
 					}
 					if (Err) return Err;
-					if (VarType==ValType ||
-					    (VarType==TypInteger && ValType==TypInteger64) ||
-					    (VarType==TypInteger64 && ValType==TypInteger)) {
+					if (VarType==ValType) {
 						switch (VarType) {
 						case TypInteger:
-						case TypInteger64:
 							SetIntVal(VarId,Val); break;
 						case TypString:
 							if (StrConst)
@@ -6505,7 +6480,6 @@ static int ExecCmnd(void)
 				else {
 					switch (ValType) {
 					case TypInteger: E = NewIntVar(Cmnd,Val); break;
-					case TypInteger64: E = NewInt64Var(Cmnd,Val); break;
 					case TypString:
 						if (StrConst)
 							E = NewStrVar(Cmnd,Str);

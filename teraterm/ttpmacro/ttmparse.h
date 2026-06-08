@@ -79,14 +79,12 @@ typedef enum {
 	TypLabel = 4,
 	TypIntArray = 5,
 	TypStrArray = 6,
-	TypInteger64 = 7,
 	TypeUnknown = TypUnknown,
 	TypeInteger = TypInteger,
 	TypeString = TypString,
 	TypeLabel = TypLabel,
 	TypeIntArray = TypIntArray,
 	TypeStrArray = TypStrArray,
-	TypeInteger64 = TypInteger64,
 } TVariableType;
 
 #define RsvBeep         1
@@ -301,8 +299,6 @@ typedef enum {
 #define RsvGetTTPos     223
 #define RsvSetSerialDelayChar 224
 #define RsvSetSerialDelayLine 225
-#define RsvInt64        226
-#define RsvUptime64     227
 
 #define RsvOperator     1000
 #define RsvBNot         1001
@@ -364,7 +360,6 @@ BOOL GetLabelName(PCHAR Name);
 BOOL GetString(PCHAR Str, LPWORD Err);
 BOOL CheckVar(const char *Name, TVariableType *VarType, PVarId VarId);
 BOOL NewIntVar(const char *Name, long long InitVal);
-BOOL NewInt64Var(const char *Name, long long InitVal);
 BOOL NewStrVar(const char *Name, const char *InitVal);
 BOOL NewLabVar(const char *Name, BINT InitVal, WORD ILevel);
 int NewIntAryVar(const char *Name, int size);
@@ -373,6 +368,7 @@ void DelLabVar(WORD ILevel);
 void CopyLabel(WORD ILabel, BINT *Ptr, LPWORD Level);
 BOOL GetExpression(TVariableType *ValType, long long *Val, LPWORD Err);
 void GetIntVal(int *Val, LPWORD Err);
+void GetInt64Val(long long *Val, LPWORD Err);
 void SetIntVal(TVarId VarId, long long Val);
 long long CopyIntVal(TVarId VarId);
 void GetIntVar(PVarId VarId, LPWORD Err);

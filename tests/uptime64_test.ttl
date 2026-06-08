@@ -5,19 +5,13 @@
 ; OS 起動から 49.7 日以上経過した環境でも正しく動作することを想定。
 ;
 ; 使い方: Tera Term マクロとして単体で実行する（接続不要）
-;
-; uptime64 で 64ビットの経過時間を取得し、
-; 49.7 日オーバーフローに依存しない経過時間計測を行う。
 
-int64 tick_start
-int64 tick_end
-
-uptime64 tick_start
+uptime tick_start
 
 ; 3 秒間 pause する
 pause 3
 
-uptime64 tick_end
+uptime tick_end
 
 ; 経過時間を計算（ミリ秒）
 elapsed = tick_end - tick_start

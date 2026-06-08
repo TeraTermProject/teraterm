@@ -1,11 +1,8 @@
 ; uptime コマンドのテスト（接続不要）
 ;
-; uptime64 のヘルプが動作することを確認する
-;
 ; 使い方: Tera Term マクロとして単体で実行する（接続不要）
 
-int64 var
-uptime64 var
+uptime var
 day = var / 86400000
 var = var % 86400000
 hour = var / 3600000

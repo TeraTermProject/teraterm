@@ -7,7 +7,7 @@ Default topic=html\index.html
 Display compile progress=No
 Full-text search=Yes
 Index file=Index.hhk
-Language=0x409 ‰pŒê (•Ä‘)
+Language=0x409 ï¿½pï¿½ï¿½ (ï¿½Äï¿½)
 Title=Tera Term help
 
 [WINDOWS]
@@ -395,7 +395,6 @@ HlpMacroCommandToupper=html\macro\command\toupper.html
 HlpMacroCommandUnlink=html\macro\command\unlink.html
 HlpMacroCommandUntil=html\macro\command\until.html
 HlpMacroCommandUptime=html\macro\command\uptime.html
-HlpMacroCommandUptime64=html\macro\command\uptime64.html
 HlpMacroCommandVar2clipb=html\macro\command\var2clipb.html
 HlpMacroCommandWait=html\macro\command\wait.html
 HlpMacroCommandWait4all=html\macro\command\wait4all.html

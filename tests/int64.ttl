@@ -1,0 +1,14 @@
+; 整数型 64bit 拡張のテスト（接続不要）
+;
+; sprintf2 の %d で 64bit 値が正しく出力されることを確認する
+;
+; 使い方: Tera Term マクロとして単体で実行する（接続不要）
+
+var = 2147483647
+var = var * 2147483647
+; var は 4611686014132420609 (64bit で正確に表現される)
+
+sprintf2 str "%d" var
+messagebox str "int64 test"
+
+end
