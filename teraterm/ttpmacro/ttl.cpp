@@ -2318,12 +2318,12 @@ static WORD TTLFor(void)
 {
 	WORD Err;
 	TVarId VarId;
-	int ValStart, ValEnd, i;
+	long long ValStart, ValEnd, i;
 
 	Err = 0;
 	GetIntVar(&VarId,&Err);
-	GetIntVal(&ValStart,&Err);
-	GetIntVal(&ValEnd,&Err);
+	GetInt64Val(&ValStart,&Err);
+	GetInt64Val(&ValEnd,&Err);
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
@@ -3131,18 +3131,18 @@ static WORD TTLInt2Str(void)
 {
 	TVarId VarId;
 	WORD Err;
-	int Num;
+	long long Num;
 	TStrVal Str2;
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
 
-	GetIntVal(&Num,&Err);
+	GetInt64Val(&Num,&Err);
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	_snprintf_s(Str2,sizeof(Str2),_TRUNCATE,"%d",Num);
+	_snprintf_s(Str2,sizeof(Str2),_TRUNCATE,"%lld",Num);
 
 	SetStrVal(VarId,Str2);
 	return Err;
@@ -4740,7 +4740,7 @@ static WORD TTLStr2Int(void)
 	TVarId VarId;
 	WORD Err;
 	TStrVal Str;
-	int Num;
+	long long Num;
 
 	Err = 0;
 	GetIntVar(&VarId,&Err);
@@ -4762,7 +4762,7 @@ static WORD TTLStr2Int(void)
 	// 10 : decimal
 	// 0x10, $10: hex
 	if (Str[0] == '0' && tolower(Str[1]) == 'x') {
-		if (sscanf(Str,"%i",&Num)!=1)
+		if (sscanf(Str,"%lli",&Num)!=1)
 		{
 			Num = 0;
 			SetResult(0);
@@ -4771,7 +4771,7 @@ static WORD TTLStr2Int(void)
 			SetResult(1);
 		}
 	} else {
-		if (sscanf(Str,"%d",&Num)!=1)
+		if (sscanf(Str,"%lld",&Num)!=1)
 		{
 			Num = 0;
 			SetResult(0);
