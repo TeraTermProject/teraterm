@@ -122,12 +122,18 @@ static void PluginListAdd(const wchar_t *fullpath, ExtensionEnable enable)
 
 /**
  *	ファイル名を表す文字列が "ttx*.dll" にマッチするか調べる
+ *
+ *	最短は "ttx.dll"
+ *
+ *	@retval	TRUE	マッチした
+ *	@retval	FALSE	マッチしない
  */
 static BOOL MatchTTXFileName(const wchar_t *fname)
 {
 	const size_t len = wcslen(fname);
-	// "ttx" + 1文字以上 + ".dll" = 最低8文字
-	if (len < 8) {
+	// "ttx" + 0文字以上 + ".dll" = 7文字以上
+	if (len < 7) {
+		// 7文字未満=マッチしない
 		return FALSE;
 	}
 
@@ -182,12 +188,11 @@ static wchar_t *GetFilename(const wchar_t *fullpath)
  * ファイル名からリストへのポインタを取得
  *
  * @param filename	プラグインのファイル名
- * @return	ExtensionList へのポインタ
- * 			NULLのとき見つからなかった
+ * @retval	ExtensionList へのポインタ
+ * @retval	NULL	見つからなかった
  */
-static ExtensionList *PluginGetInfoIndex(const wchar_t *filename)
+static ExtensionList *PluginGetInfo(const wchar_t *filename)
 {
-	int index = 0;
 	for (int i = 0; i < NumExtensions; i++) {
 		if (_wcsicmp(Extensions[i].filename, filename) == 0) {
 			ExtensionList *pl = &Extensions[i];
@@ -235,7 +240,7 @@ static void PluginListRead(const wchar_t *SetupFNW)
 #endif
 		if (r == 2) {
 			wchar_t *filename = GetFilename(fname);
-			ExtensionList *pl = PluginGetInfoIndex(filename);
+			ExtensionList *pl = PluginGetInfo(filename);
 			if (pl != NULL) {
 				pl->enable =
 					enable_int == 0 ? EXTENSION_DISABLE :
@@ -450,13 +455,18 @@ BOOL PluginGetInfo(int index, PluginInfo *info)
 
 /**
  * プラグイン情報を変更する
- * @param info		プラグイン情報を格納する構造体へのポインタ
- *					文字列は書き換えないこと
- * @return			成功した場合はTRUE、失敗した場合はFALSE
+ *
+ * @param info.filename		プラグインファイル名
+ *							ファイル名部分のみ
+ * @param info.enable		ExtensionEnable.EXTENSION_DISABLE
+ *							ExtensionEnable.EXTENSION_ENABLE
+ *							ExtensionEnable.EXTENSION_UNSPECIFIED
  */
 void PluginChangeInfo(const PluginInfo *info)
 {
-	ExtensionList *pl = PluginGetInfoIndex(info->filename);
+	wchar_t *filename = GetFilename(info->filename);
+	ExtensionList *pl = PluginGetInfo(filename);
+	free(filename);
 	if (pl == NULL) {
 		// 見つからない
 		return;
