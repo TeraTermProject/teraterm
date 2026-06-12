@@ -1,0 +1,209 @@
+; リテラルの代入
+lit_64_1 = 1L
+strspecial fmt 'input:[1L]\nexpect:1\nresult:%lld'
+sprintf2 msg fmt lit_64_1
+messagebox msg "lit_64_1"
+
+;   int32 上限より上
+lit_64_2 = 2147483648L
+strspecial fmt 'input:[2147483648L]\nexpect:2147483648\nresult:%lld'
+sprintf2 msg fmt lit_64_2
+messagebox msg "lit_64_2"
+
+;   int64 上限
+lit_64_3 = 9223372036854775807L
+strspecial fmt 'input:[9223372036854775807L]\nexpect:9223372036854775807\nresult:%lld'
+sprintf2 msg fmt lit_64_3
+messagebox msg "lit_64_3"
+
+;   int64 上限より上
+lit_64_4 = 9223372036854775808L
+strspecial fmt 'input:[9223372036854775808L]\nexpect:-9223372036854775808\nresult:%lld'
+sprintf2 msg fmt lit_64_4
+messagebox msg "lit_64_4"
+
+;   int32 下限より下
+lit_64_5 = -2147483649L
+strspecial fmt 'input:[-2147483649L]\nexpect:-2147483649L\nresult:%lld'
+sprintf2 msg fmt lit_64_5
+messagebox msg "lit_64_5"
+
+;   int64 下限
+lit_64_6 = -9223372036854775808L
+strspecial fmt 'input:[-9223372036854775808L]\nexpect:-9223372036854775808\nresult:%lld'
+sprintf2 msg fmt lit_64_6
+messagebox msg "lit_64_6"
+
+;   int64 下限より下
+lit_64_7 = -9223372036854775809L
+strspecial fmt 'input:[-9223372036854775809L]\nexpect:9223372036854775807\nresult:%lld'
+sprintf2 msg fmt lit_64_7
+messagebox msg "lit_64_7"
+
+;   後ろにスペース
+lit_64_8 = 2L 
+strspecial fmt 'input:[2L ]\nexpect:2\nresult:%lld'
+sprintf2 msg fmt lit_64_8
+messagebox msg "lit_64_8"
+
+;   後ろに英字
+lit_64_9 = 3LA
+strspecial fmt 'input:[3A]\nexpect:3\nresult:%lld\nSyntax error'
+sprintf2 msg fmt lit_64_9
+messagebox msg "lit_64_9"
+
+;   16進表記
+lit_64_10 = $3AL
+strspecial fmt 'input:[$3AL]\nexpect:58\nresult:%d'
+sprintf2 msg fmt lit_64_10
+messagebox msg "lit_64_10"
+
+
+; 変数同士の代入
+var_string = 'a'
+var_int32 = 1
+var_int64 = 1L
+
+;   Type mismatch
+var_int32 = var_string
+var_int32 = var_int64
+var_int64 = var_string
+var_int64 = var_int32
+var_string = var_int32
+var_string = var_int64
+
+
+; 演算
+; https://teratermproject.github.io/manual/5/ja/macro/syntax/expressions.html
+o1_1 = not 1L
+o1_2 = ~ 2L
+o1_3 = ! 3L
+o1_4 = + 4L
+o1_5 = - 5L
+strspecial fmt 'expect:0xfffffffffffffffe 0xfffffffffffffffd 0 4 -5\nresult:0x%16llx 0x%16llx %lld %lld %lld'
+sprintf2 o1 fmt o1_1 o1_2 o1_3 o1_4 o1_5
+messagebox o1 'o1'
+
+o2_1 = 2L * 2L
+o2_2 = 50000L * 50000L
+o2_3 = 2L / 2L
+o2_4 = 3L % 2L
+strspecial fmt 'expect:4 2500000000 1 1\nresult:%lld %lld %lld %lld'
+sprintf2 o2 fmt o2_1 o2_2 o2_3 o2_4
+messagebox o2 'o2'
+
+o3_1 = 1L + 1L
+o3_2 = 2000000000L + 2000000000L
+o3_3 = 1L - 1L
+o3_4 = -2147483648L - 1L
+strspecial fmt 'expect:2 4000000000 0 -2147483649\nresult:%lld %lld %lld %lld'
+sprintf2 o3 fmt o3_1 o3_2 o3_3 o3_4
+messagebox o3 'o3'
+
+o4_1 = 1L << 4
+o4_2 = $2000000000000001L << 7
+o4_3 = 16L >> 4
+o4_4 = -4L >> 2 ; 0xfffffffffffffffc >> 2
+o4_5 = 16L >>> 4
+o4_6 = -4L >>> 2 ; 0xfffffffffffffffc >>> 2
+strspecial fmt 'expect:0x0000000000000010 0x0000000000000080 0x0000000000000001 0xffffffffffffffff 0x0000000000000001 0x000000003fffffff\nresult:0x%016llx 0x%016llx 0x%016llx 0x%016llx 0x%016llx 0x%016llx'
+sprintf2 o4 fmt o4_1 o4_2 o4_3 o4_4 o4_5 o4_6
+messagebox o4 'o4'
+
+o5_1 = 3L and 10L
+o5_2 = 3L & 10L
+strspecial fmt 'expect:0x2 0x2\nresult:0x%llx 0x%llx'
+sprintf2 o5 fmt o5_1 o5_2
+messagebox o5 'o5'
+
+o6_1 = 3L xor 10L
+o6_2 = 3L ^ 10L
+strspecial fmt 'expect:0x9 0x9\nresult:0x%llx 0x%llx'
+sprintf2 o6 fmt o6_1 o6_2
+messagebox o6 'o6'
+
+o7_1 = 3L or 10L
+o7_2 = 3L | 10L
+strspecial fmt 'expect:0xb 0xb\nresult:0x%llx 0x%llx'
+sprintf2 o7 fmt o7_1 o7_2
+messagebox o7 'o7'
+
+o8_1 = 1L < 2L
+o8_2 = 1L < 1L
+o8_3 = 1L < 0L
+o8_4 = 1L > 2L
+o8_5 = 1L > 1L
+o8_6 = 1L > 0L
+o8_7 = 1L <= 2L
+o8_8 = 1L <= 1L
+o8_9 = 1L <= 0L
+o8_10 = 1L >= 2L
+o8_11 = 1L >= 1L
+o8_12 = 1L >= 0L
+strspecial fmt 'expect:1 0 0 0 0 1 1 1 0 0 1 1\nresult:%lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld'
+sprintf2 o8 fmt o8_1 o8_2 o8_3 o8_4 o8_5 o8_6 o8_7 o8_8 o8_9 o8_10 o8_11 o8_12
+messagebox o8 'o8'
+
+o9_1 = 1L = 2L
+o9_2 = 1L = 1L
+o9_3 = 1L == 2L
+o9_4 = 1L == 1L
+o9_5 = 1L <> 2L
+o9_6 = 1L <> 1L
+o9_7 = 1L != 2L
+o9_8 = 1L != 1L
+strspecial fmt 'expect:0 1 0 1 1 0 1 0\nresult:%lld %lld %lld %lld %lld %lld %lld %lld'
+sprintf2 o9 fmt o9_1 o9_2 o9_3 o9_4 o9_5 o9_6 o9_7 o9_8
+messagebox o9 'o9'
+
+o10_1 = 0L && 0L
+o10_2 = 0L && 1L
+o10_3 = 1L && 0L
+o10_4 = 1L && 1L
+strspecial fmt 'expect:0 0 0 1\nresult:%lld %lld %lld %lld'
+sprintf2 o10 fmt o10_1 o10_2 o10_3 o10_4
+messagebox o10 'o10'
+
+o11_1 = 0L || 0L
+o11_2 = 0L || 1L
+o11_3 = 1L || 0L
+o11_4 = 1L || 1L
+strspecial fmt 'expect:0 1 1 1\nresult:%lld %lld %lld %lld'
+sprintf2 o11 fmt o11_1 o11_2 o11_3 o11_4
+messagebox o11 'o11'
+
+;   最初の引数の型（Integer or Integer64）が、新しい変数の型になる
+o2_5 = 2 * 2
+ifdefined o2_5
+messagebox result 'o2_5' ; Integer
+
+o2_6 = 2L * 2
+ifdefined o2_6
+messagebox result 'o2_6' ; Integer64
+
+o2_7 = 2 * 2L
+ifdefined o2_7
+messagebox result 'o2_7' ; Integer
+
+
+; マクロコマンド
+ifdefined lit_64_1
+messagebox result 'ifdefined'
+
+sprintf2 sp '%d %02d %lld %02lld' 1 2 1L 2L
+messagebox sp 'sprintf2'
+
+;   Type mismatch
+sprintf2 sp '%d' 1L
+
+;   Type mismatch
+sprintf2 sp '%lld' 1
+
+;   配列
+int64dim int64ary 3
+int64ary[0] = 2000000000L
+int64ary[1] = 2000000000L
+int64ary[2] = int64ary[0] + int64ary[1]
+sprintf2 sp '%lld + %lld = %lld' int64ary[0] int64ary[1] int64ary[2]
+messagebox sp 'int64 array'
+

@@ -79,12 +79,16 @@ typedef enum {
 	TypLabel = 4,
 	TypIntArray = 5,
 	TypStrArray = 6,
+	TypInteger64 = 7,
+	TypInt64Array = 8,
 	TypeUnknown = TypUnknown,
 	TypeInteger = TypInteger,
 	TypeString = TypString,
 	TypeLabel = TypLabel,
 	TypeIntArray = TypIntArray,
 	TypeStrArray = TypStrArray,
+	TypeInteger64 = TypInteger64,
+	TypeInt64Array = TypInt64Array,
 } TVariableType;
 
 #define RsvBeep         1
@@ -299,6 +303,7 @@ typedef enum {
 #define RsvGetTTPos     223
 #define RsvSetSerialDelayChar 224
 #define RsvSetSerialDelayLine 225
+#define RsvInt64Dim     226
 
 #define RsvOperator     1000
 #define RsvBNot         1001
@@ -319,7 +324,7 @@ typedef enum {
 #define RsvLNot         1016
 #define RsvLAnd         1017
 #define RsvLOr          1018
-#define RsvLXor         1019
+#define RsvLXor         1019 // 不使用
 #define RsvARShift      1020 // arithmetic right shift
 #define RsvALShift      1021 // arithmetic left shift
 #define RsvLRShift      1022 // logical right shift
@@ -361,16 +366,22 @@ BOOL GetString(PCHAR Str, LPWORD Err);
 BOOL CheckVar(const char *Name, TVariableType *VarType, PVarId VarId);
 BOOL NewIntVar(const char *Name, int InitVal);
 BOOL NewStrVar(const char *Name, const char *InitVal);
-BOOL NewLabVar(const char *Name, BINT InitVal, WORD ILevel);
 int NewIntAryVar(const char *Name, int size);
 int NewStrAryVar(const char *Name, int size);
+BOOL NewInt64Var(const char *Name, long long InitVal);
+int NewInt64AryVar(const char *Name, int size);
+BOOL NewLabVar(const char *Name, BINT InitVal, WORD ILevel);
 void DelLabVar(WORD ILevel);
 void CopyLabel(WORD ILabel, BINT *Ptr, LPWORD Level);
-BOOL GetExpression(TVariableType *ValType, int *Val, LPWORD Err);
+BOOL GetExpression(TVariableType *ValType, long long *Val, LPWORD Err);
 void GetIntVal(int *Val, LPWORD Err);
 void SetIntVal(TVarId VarId, int Val);
 int CopyIntVal(TVarId VarId);
 void GetIntVar(PVarId VarId, LPWORD Err);
+void GetInt64Val(long long *Val, LPWORD Err);
+void SetInt64Val(TVarId VarId, long long Val);
+long long CopyInt64Val(TVarId VarId);
+void GetInt64Var(PVarId VarId, LPWORD Err);
 void GetStrVal(PCHAR Str, LPWORD Err);
 void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion);
 void GetStrVar(PVarId VarId, LPWORD Err);
@@ -379,13 +390,16 @@ const char *StrVarPtr(TVarId VarId);
 void GetVarType(TVariableType *ValType, int *Val, LPWORD Err);
 TVarId GetIntVarFromArray(TVarId VarId, int Index, LPWORD Err);
 TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err);
+TVarId GetInt64VarFromArray(TVarId VarId, int Index, LPWORD Err);
 BOOL GetIndex(int *Index, LPWORD Err);
 void GetAryVar(PVarId VarId, WORD VarType, LPWORD Err);
 void GetAryVarByName(PVarId VarId, const char *Name, WORD VarType, LPWORD Err);
 void SetIntValInArray(TVarId VarId, int Index, int Val, LPWORD Err);
 void SetStrValInArray(TVarId VarId, int Index, const char *Str, LPWORD Err);
+void SetInt64ValInArray(TVarId VarId, int Index, long long Val, LPWORD Err);
 int GetIntAryVarSize(TVarId VarId);
 int GetStrAryVarSize(TVarId VarId);
+int GetInt64AryVarSize(TVarId VarId);
 
 extern WORD TTLStatus;
 extern char LineBuff[MaxLineLen];

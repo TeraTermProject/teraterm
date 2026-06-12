@@ -64,6 +64,11 @@ typedef struct {
 } TStrAry, *PStrAry;
 
 typedef struct {
+    int size;
+    long long *val;
+} TInt64Ary, *PInt64Ary;
+
+typedef struct {
 	BINT val;
 	WORD level;
 } TLab;
@@ -77,6 +82,8 @@ typedef struct {
 		TLab Lab;
 		TIntAry IntAry;
 		TStrAry StrAry;
+		long long Int64;
+		TInt64Ary Int64Ary;
 	} Value;
 } Variable_t;
 
@@ -292,6 +299,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"inputbox")==0) *WordId = RsvInputBox;
 		else if (_stricmp(Str,"int2str")==0) *WordId = RsvInt2Str;
 		else if (_stricmp(Str,"intdim")==0) *WordId = RsvIntDim;
+		else if (_stricmp(Str,"int64dim")==0) *WordId = RsvInt64Dim;
 		else if (_stricmp(Str,"ispassword")==0) *WordId = RsvIsPassword;    // add 'ispassword'  (2012.5.24 yutaka)
 		else if (_stricmp(Str,"ispassword2")==0) *WordId = RsvIsPassword2;
 		break;
@@ -815,19 +823,20 @@ BOOL GetString(PCHAR Str, LPWORD Err)
 	return TRUE;
 }
 
-BOOL GetNumber(int *Num)
+BOOL GetNumber(long long *Num)
 {
 	BYTE b;
 
 	*Num = 0;
+	int IntNum = 0;
 
 	b = GetFirstChar();
 	if (b==0) return FALSE;
 	if (isdigit(b)) { /* decimal constant */
-		*Num = b - '0';
+		IntNum = b - '0';
 		if (LinePtr<LineLen) b = LineBuff[LinePtr];
 		while ((LinePtr<LineLen) && isdigit(b)) {
-			*Num = *Num * 10 + b - '0';
+			IntNum = IntNum * 10 + b - '0';
 			LinePtr++;
 			if (LinePtr<LineLen) b = LineBuff[LinePtr];
 		}
@@ -840,16 +849,75 @@ BOOL GetNumber(int *Num)
 				b = (b|0x20) - 'a' + 10;
 			else
 				b = b - '0';
-			*Num = *Num * 16 + b;
+			IntNum = IntNum * 16 + b;
 			LinePtr++;
 			if (LinePtr<LineLen) b = LineBuff[LinePtr];
 		}
 	}
 	else {
 		LinePtr--;
+		*Num = IntNum;
 		return FALSE;
 	}
+	*Num = IntNum;
 	return TRUE;
+}
+
+BOOL GetNumber64(long long *Num)
+{
+	BYTE b;
+
+	*Num = 0;
+	WORD StartLinePtr = LinePtr;
+
+	b = GetFirstChar();
+	if (b == 0)
+		return FALSE;
+	if (isdigit(b)) { /* decimal constant */
+		*Num = b - '0';
+		if (LinePtr < LineLen)
+			b = LineBuff[LinePtr];
+		while ((LinePtr < LineLen) && isdigit(b)) {
+			*Num = *Num * 10 + b - '0';
+			LinePtr++;
+			if (LinePtr < LineLen)
+				b = LineBuff[LinePtr];
+		}
+	}
+	else if (b == '$') { /* hexadecimal constant */
+		if (LinePtr < LineLen)
+			b = LineBuff[LinePtr];
+		while ((LinePtr < LineLen) && isxdigit(b)) {  // [0-9A-Fa-f]
+			if (isalpha(b))
+				b = (b | 0x20) - 'a' + 10;
+			else
+				b = b - '0';
+			*Num = *Num * 16 + b;
+			LinePtr++;
+			if (LinePtr < LineLen)
+				b = LineBuff[LinePtr];
+		}
+	}
+	else {
+		LinePtr--;
+		return FALSE;
+	}
+
+	// "L" の検出
+	if (LinePtr >= LineLen) { // 行の最後まで来ている = "L" が存在しえない
+		LinePtr = StartLinePtr;
+		return FALSE;
+	}
+	if (b == 'L') { // 数値の直後が "L"
+		LinePtr++;
+		if (LinePtr < LineLen)
+			b = LineBuff[LinePtr];
+		return TRUE;
+	}
+
+	// 数値の直後が "L" 以外
+	LinePtr = StartLinePtr;
+	return FALSE;
 }
 
 BOOL CheckVar(const char *Name, TVariableType *VarType, PVarId VarId)
@@ -923,6 +991,26 @@ int NewStrAryVar(const char *Name, int size)
 	return 0;
 }
 
+BOOL NewInt64Var(const char *Name, long long InitVal)
+{
+	Variable_t *v = NewVar(Name, TypeInteger64);
+	v->Value.Int64 = InitVal;
+	return TRUE;
+}
+
+int NewInt64AryVar(const char *Name, int size)
+{
+	Variable_t *v = NewVar(Name, TypeInt64Array);
+	TInt64Ary *int64Ary = &v->Value.Int64Ary;
+	long long *array = (long long *)calloc(size, sizeof(long long));
+	if (array == NULL) {
+		return ErrFewMemory;
+	}
+	int64Ary->val = array;
+	int64Ary->size = size;
+	return 0;
+}
+
 BOOL NewLabVar(const char *Name, BINT InitVal, WORD ILevel)
 {
 	Variable_t *v = NewVar(Name, TypeLabel);
@@ -976,7 +1064,7 @@ void CopyLabel(WORD ILabel, BINT *Ptr, LPWORD Level)
  *   Evaluate following operator.
  *     not, ~, !, +(unary), -(unary)
  */
-static BOOL GetFactor(TVariableType *ValType, int *Val, LPWORD Err)
+static BOOL GetFactor(TVariableType *ValType, long long *Val, LPWORD Err)
 {
 	TName Name;
 	WORD P, WId;
@@ -988,7 +1076,7 @@ static BOOL GetFactor(TVariableType *ValType, int *Val, LPWORD Err)
 	if (GetIdentifier(Name)) {
 		if (CheckReservedWord(Name,&WId)) {
 			if (GetFactor(ValType, Val, Err)) {
-				if ((*Err==0) && (*ValType!=TypInteger))
+				if ((*Err==0) && (*ValType!=TypInteger && *ValType!=TypInteger64))
 					*Err = ErrTypeMismatch;
 				switch (WId) {
 					case RsvBNot: *Val = ~(*Val); break;
@@ -1002,10 +1090,30 @@ static BOOL GetFactor(TVariableType *ValType, int *Val, LPWORD Err)
 		}
 		else if (CheckVar(Name, ValType, &VarId)) {
 			switch (*ValType) {
+				case TypInteger64:
+					*Val = Variables[VarId].Value.Int64;
+					break;
 				case TypInteger:
 					*Val = Variables[VarId].Value.Int;
 					break;
-				case TypString: *Val = VarId; break;
+				case TypString:
+					*Val = VarId;
+					break;
+				case TypInt64Array:
+					if (GetIndex(&Index, Err)) {
+						TInt64Ary *int64Ary = &Variables[VarId].Value.Int64Ary;
+						if (Index >= 0 && Index < int64Ary->size) {
+							*Val = int64Ary->val[Index];
+							*ValType = TypInteger64;
+						}
+						else {
+							*Err = ErrOutOfRange;
+						}
+					}
+					else if (*Err == 0) {
+						*Val = VarId;
+					}
+					break;
 				case TypIntArray:
 					if (GetIndex(&Index, Err)) {
 						TIntAry *intAry = &Variables[VarId].Value.IntAry;
@@ -1038,11 +1146,13 @@ static BOOL GetFactor(TVariableType *ValType, int *Val, LPWORD Err)
 		else
 			*Err = ErrVarNotInit;
 	}
+	else if (GetNumber64(Val))
+		*ValType = TypInteger64;
 	else if (GetNumber(Val))
 		*ValType = TypInteger;
 	else if (GetOperator(&WId)) {
 		if (GetFactor(ValType, Val, Err)) {
-			if ((*Err==0) && (*ValType != TypInteger))
+			if ((*Err==0) && (*ValType != TypInteger && *ValType != TypInteger64))
 				*Err = ErrTypeMismatch;
 			switch (WId) {
 				case RsvPlus:                    break;
@@ -1078,11 +1188,11 @@ static BOOL GetFactor(TVariableType *ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     *, /, %
  */
-static BOOL EvalMultiplication(TVariableType *ValType, int *Val, LPWORD Err)
+static BOOL EvalMultiplication(TVariableType *ValType, long long *Val, LPWORD Err)
 {
 	WORD P, Er;
 	TVariableType Type;
-	int Val1, Val2;
+	long long Val1, Val2;
 	WORD WId;
 
 	if (! GetFactor(&Type, &Val1, &Er)) return FALSE;
@@ -1090,7 +1200,7 @@ static BOOL EvalMultiplication(TVariableType *ValType, int *Val, LPWORD Err)
 	*Val = Val1;
 	*Err = Er;
 	if (Er) return TRUE;
-	if (Type!=TypInteger) return TRUE;
+	if (Type!=TypInteger && Type!=TypInteger64) return TRUE;
 
 	while (TRUE) {
 		P = LinePtr;
@@ -1116,7 +1226,7 @@ static BOOL EvalMultiplication(TVariableType *ValType, int *Val, LPWORD Err)
 			return TRUE;
 		}
 
-		if (Type!=TypInteger) {
+		if (Type!=TypInteger && Type!=TypInteger64) {
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
@@ -1140,11 +1250,11 @@ static BOOL EvalMultiplication(TVariableType *ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     +, -
  */
-static BOOL EvalAddition(TVariableType *ValType, int *Val, LPWORD Err)
+static BOOL EvalAddition(TVariableType *ValType, long long *Val, LPWORD Err)
 {
 	WORD P, Er;
 	TVariableType Type;
-	int Val1, Val2;
+	long long Val1, Val2;
 	WORD WId;
 
 	if (! EvalMultiplication(&Type, &Val1, &Er)) return FALSE;
@@ -1152,7 +1262,7 @@ static BOOL EvalAddition(TVariableType *ValType, int *Val, LPWORD Err)
 	*Val = Val1;
 	*Err = Er;
 	if (Er) return TRUE;
-	if (Type!=TypInteger) return TRUE;
+	if (Type!=TypInteger && Type!=TypInteger64) return TRUE;
 
 	while (TRUE) {
 		P = LinePtr;
@@ -1177,7 +1287,7 @@ static BOOL EvalAddition(TVariableType *ValType, int *Val, LPWORD Err)
 			return TRUE;
 		}
 
-		if (Type!=TypInteger) {
+		if (Type!=TypInteger && Type!=TypInteger64) {
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
@@ -1195,11 +1305,11 @@ static BOOL EvalAddition(TVariableType *ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     >>, <<, >>>
  */
-static BOOL EvalBitShift(TVariableType *ValType, int *Val, LPWORD Err)
+static BOOL EvalBitShift(TVariableType *ValType, long long *Val, LPWORD Err)
 {
 	WORD P, Er;
 	TVariableType Type;
-	int Val1, Val2;
+	long long Val1, Val2;
 	WORD WId;
 
 	if (! EvalAddition(&Type, &Val1, &Er)) return FALSE;
@@ -1207,7 +1317,7 @@ static BOOL EvalBitShift(TVariableType *ValType, int *Val, LPWORD Err)
 	*Val = Val1;
 	*Err = Er;
 	if (Er) return TRUE;
-	if (Type!=TypInteger) return TRUE;
+	if (Type!=TypInteger && Type!=TypInteger64) return TRUE;
 
 	while (TRUE) {
 		P = LinePtr;
@@ -1233,7 +1343,7 @@ static BOOL EvalBitShift(TVariableType *ValType, int *Val, LPWORD Err)
 			return TRUE;
 		}
 
-		if (Type!=TypInteger) {
+		if (Type!=TypInteger && Type!=TypInteger64) {
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
@@ -1270,11 +1380,11 @@ static BOOL EvalBitShift(TVariableType *ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     &
  */
-static BOOL EvalBitAnd(TVariableType *ValType, int *Val, LPWORD Err)
+static BOOL EvalBitAnd(TVariableType *ValType, long long *Val, LPWORD Err)
 {
 	WORD P, Er;
 	TVariableType Type;
-	int Val1, Val2;
+	long long Val1, Val2;
 	WORD WId;
 
 	if (! EvalBitShift(&Type, &Val1, &Er)) return FALSE;
@@ -1282,7 +1392,7 @@ static BOOL EvalBitAnd(TVariableType *ValType, int *Val, LPWORD Err)
 	*Val = Val1;
 	*Err = Er;
 	if (Er) return TRUE;
-	if (Type!=TypInteger) return TRUE;
+	if (Type!=TypInteger && Type!=TypInteger64) return TRUE;
 
 	while (TRUE) {
 		P = LinePtr;
@@ -1303,7 +1413,7 @@ static BOOL EvalBitAnd(TVariableType *ValType, int *Val, LPWORD Err)
 			return TRUE;
 		}
 
-		if (Type!=TypInteger) {
+		if (Type!=TypInteger && Type!=TypInteger64) {
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
@@ -1318,11 +1428,11 @@ static BOOL EvalBitAnd(TVariableType *ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     ^
  */
-static BOOL EvalBitXor(TVariableType *ValType, int *Val, LPWORD Err)
+static BOOL EvalBitXor(TVariableType *ValType, long long *Val, LPWORD Err)
 {
 	WORD P, Er;
 	TVariableType Type;
-	int Val1, Val2;
+	long long Val1, Val2;
 	WORD WId;
 
 	if (! EvalBitAnd(&Type, &Val1, &Er)) return FALSE;
@@ -1330,7 +1440,7 @@ static BOOL EvalBitXor(TVariableType *ValType, int *Val, LPWORD Err)
 	*Val = Val1;
 	*Err = Er;
 	if (Er) return TRUE;
-	if (Type!=TypInteger) return TRUE;
+	if (Type!=TypInteger && Type!=TypInteger64) return TRUE;
 
 	while (TRUE) {
 		P = LinePtr;
@@ -1351,7 +1461,7 @@ static BOOL EvalBitXor(TVariableType *ValType, int *Val, LPWORD Err)
 			return TRUE;
 		}
 
-		if (Type!=TypInteger) {
+		if (Type!=TypInteger && Type!=TypInteger64) {
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
@@ -1366,11 +1476,11 @@ static BOOL EvalBitXor(TVariableType *ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     |
  */
-static BOOL EvalBitOr(TVariableType *ValType, int *Val, LPWORD Err)
+static BOOL EvalBitOr(TVariableType *ValType, long long *Val, LPWORD Err)
 {
 	WORD P, Er;
 	TVariableType Type;
-	int Val1, Val2;
+	long long Val1, Val2;
 	WORD WId;
 
 	if (! EvalBitXor(&Type, &Val1, &Er)) return FALSE;
@@ -1378,7 +1488,7 @@ static BOOL EvalBitOr(TVariableType *ValType, int *Val, LPWORD Err)
 	*Val = Val1;
 	*Err = Er;
 	if (Er) return TRUE;
-	if (Type!=TypInteger) return TRUE;
+	if (Type!=TypInteger && Type!=TypInteger64) return TRUE;
 
 	while (TRUE) {
 		P = LinePtr;
@@ -1399,7 +1509,7 @@ static BOOL EvalBitOr(TVariableType *ValType, int *Val, LPWORD Err)
 			return TRUE;
 		}
 
-		if (Type!=TypInteger) {
+		if (Type!=TypInteger && Type!=TypInteger64) {
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
@@ -1414,11 +1524,11 @@ static BOOL EvalBitOr(TVariableType *ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     <, >, <=, >=
  */
-static BOOL EvalGreater(TVariableType *ValType, int *Val, LPWORD Err)
+static BOOL EvalGreater(TVariableType *ValType, long long *Val, LPWORD Err)
 {
 	WORD P, Er;
 	TVariableType Type;
-	int Val1, Val2;
+	long long Val1, Val2;
 	WORD WId;
 
 	if (! EvalBitOr(&Type, &Val1, &Er)) return FALSE;
@@ -1426,7 +1536,7 @@ static BOOL EvalGreater(TVariableType *ValType, int *Val, LPWORD Err)
 	*Val = Val1;
 	*Err = Er;
 	if (Er) return TRUE;
-	if (Type!=TypInteger) return TRUE;
+	if (Type!=TypInteger && Type!=TypInteger64) return TRUE;
 
 	while (TRUE) {
 		P = LinePtr;
@@ -1453,7 +1563,7 @@ static BOOL EvalGreater(TVariableType *ValType, int *Val, LPWORD Err)
 			return TRUE;
 		}
 
-		if (Type!=TypInteger) {
+		if (Type!=TypInteger && Type!=TypInteger64) {
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
@@ -1473,11 +1583,11 @@ static BOOL EvalGreater(TVariableType *ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     =, ==, <>, !=
  */
-static BOOL EvalEqual(TVariableType *ValType, int *Val, LPWORD Err)
+static BOOL EvalEqual(TVariableType *ValType, long long *Val, LPWORD Err)
 {
 	WORD P, Er;
 	TVariableType Type;
-	int Val1, Val2;
+	long long Val1, Val2;
 	WORD WId;
 
 	if (! EvalGreater(&Type, &Val1, &Er)) return FALSE;
@@ -1485,7 +1595,7 @@ static BOOL EvalEqual(TVariableType *ValType, int *Val, LPWORD Err)
 	*Val = Val1;
 	*Err = Er;
 	if (Er) return TRUE;
-	if (Type!=TypInteger) return TRUE;
+	if (Type!=TypInteger && Type!=TypInteger64) return TRUE;
 
 	while (TRUE) {
 		P = LinePtr;
@@ -1510,7 +1620,7 @@ static BOOL EvalEqual(TVariableType *ValType, int *Val, LPWORD Err)
 			return TRUE;
 		}
 
-		if (Type!=TypInteger) {
+		if (Type!=TypInteger && Type!=TypInteger64) {
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
@@ -1528,11 +1638,11 @@ static BOOL EvalEqual(TVariableType *ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     &&
  */
-static BOOL EvalLogicalAnd(TVariableType *ValType, int *Val, LPWORD Err)
+static BOOL EvalLogicalAnd(TVariableType *ValType, long long *Val, LPWORD Err)
 {
 	WORD P, Er;
 	TVariableType Type;
-	int Val1, Val2;
+	long long Val1, Val2;
 	WORD WId;
 
 	if (! EvalEqual(&Type, &Val1, &Er)) return FALSE;
@@ -1540,7 +1650,7 @@ static BOOL EvalLogicalAnd(TVariableType *ValType, int *Val, LPWORD Err)
 	*Val = Val1;
 	*Err = Er;
 	if (Er) return TRUE;
-	if (Type!=TypInteger) return TRUE;
+	if (Type!=TypInteger && Type!=TypInteger64) return TRUE;
 
 	while (TRUE) {
 		P = LinePtr;
@@ -1561,7 +1671,7 @@ static BOOL EvalLogicalAnd(TVariableType *ValType, int *Val, LPWORD Err)
 			return TRUE;
 		}
 
-		if (Type!=TypInteger) {
+		if (Type!=TypInteger && Type!=TypInteger64) {
 			*Err = ErrTypeMismatch;
 			return TRUE;
 		}
@@ -1576,11 +1686,11 @@ static BOOL EvalLogicalAnd(TVariableType *ValType, int *Val, LPWORD Err)
  *   Evaluate following operator.
  *     ||
  */
-BOOL GetExpression(TVariableType *ValType, int *Val, LPWORD Err)
+BOOL GetExpression(TVariableType *ValType, long long *Val, LPWORD Err)
 {
 	WORD P1, P2, Er;
 	TVariableType Type;
-	int Val1, Val2;
+	long long Val1, Val2;
 	WORD WId;
 
 	P1 = LinePtr;
@@ -1595,7 +1705,7 @@ BOOL GetExpression(TVariableType *ValType, int *Val, LPWORD Err)
 		LinePtr = P1;
 		return TRUE;
 	}
-	if (Type!=TypInteger) return TRUE;
+	if (Type!=TypInteger && Type!=TypInteger64) return TRUE;
 
 	while (TRUE) {
 		P2 = LinePtr;
@@ -1618,7 +1728,7 @@ BOOL GetExpression(TVariableType *ValType, int *Val, LPWORD Err)
 			return TRUE;
 		}
 
-		if (Type!=TypInteger) {
+		if (Type!=TypInteger && Type!=TypInteger64) {
 			*Err = ErrTypeMismatch;
 			LinePtr = P1;
 			return TRUE;
@@ -1635,11 +1745,12 @@ BOOL GetExpression(TVariableType *ValType, int *Val, LPWORD Err)
 void GetIntVal(int *Val, LPWORD Err)
 {
 	TVariableType ValType;
+	long long llVal;
 
 	UpdateLineParsePtr();
 
 	if (*Err != 0) return;
-	if (! GetExpression(&ValType,Val,Err))
+	if (! GetExpression(&ValType,&llVal,Err))
 	{
 		*Err = ErrSyntax;
 		return;
@@ -1647,6 +1758,7 @@ void GetIntVal(int *Val, LPWORD Err)
 	if (*Err!=0) return;
 	if (ValType!=TypInteger)
 		*Err = ErrTypeMismatch;
+	*Val = (int)llVal;
 }
 
 void SetIntVal(TVarId VarId, int Val)
@@ -1711,6 +1823,86 @@ void GetIntVar(PVarId VarId, LPWORD Err)
 		*Err = ErrSyntax;
 }
 
+void GetInt64Val(long long *Val, LPWORD Err)
+{
+	TVariableType ValType;
+
+	UpdateLineParsePtr();
+
+	if (*Err != 0) return;
+	if (! GetExpression(&ValType,Val,Err))
+	{
+		*Err = ErrSyntax;
+		return;
+	}
+	if (*Err!=0) return;
+	if (ValType!=TypInteger64)
+		*Err = ErrTypeMismatch;
+}
+
+void SetInt64Val(TVarId VarId, long long Val)
+{
+	if (VarId >> 16) {
+		Variable_t *v = &Variables[(VarId>>16)-1];
+		long long *int_val = &v->Value.Int64Ary.val[VarId & 0xffff];
+		*int_val = Val;
+	}
+	else {
+		Variable_t *v = &Variables[VarId];
+		v->Value.Int64 = Val;
+	}
+}
+
+long long CopyInt64Val(TVarId VarId)
+{
+	Variable_t *v;
+
+	if (VarId >> 16) {
+		v = &Variables[(VarId>>16)-1];
+		return v->Value.Int64Ary.val[VarId & 0xffff];
+	}
+	else {
+		v = &Variables[VarId];
+		return v->Value.Int64;
+	}
+}
+
+void GetInt64Var(PVarId VarId, LPWORD Err)
+{
+	TName Name;
+	TVariableType VarType;
+	int Index;
+
+	if (*Err!=0) return;
+
+	if (GetIdentifier(Name)) {
+		if (CheckVar(Name, &VarType, VarId)) {
+			switch (VarType) {
+			case TypInteger64:
+				break;
+			case TypInt64Array:
+				if (GetIndex(&Index, Err)) {
+					*VarId = GetInt64VarFromArray(*VarId, Index, Err);
+				}
+				else if (*Err == 0) {
+					*Err = ErrTypeMismatch;
+				}
+				break;
+			default:
+				*Err = ErrTypeMismatch;
+			}
+		}
+		else {
+			if (NewInt64Var(Name, 0))
+				CheckVar(Name, &VarType, VarId);
+			else
+				*Err = ErrTooManyVar;
+		}
+	}
+	else
+		*Err = ErrSyntax;
+}
+
 /**
  *	文字列を取得する
  *	@param	Str	文字列へのポインタ (MaxStrLen byte の領域が必要)
@@ -1728,7 +1920,7 @@ void GetStrVal(PCHAR Str, LPWORD Err)
 void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion)
 {
 	TVariableType VarType;
-	int VarId;
+	long long VarId;
 
 	Str[0] = 0;
 	if (*Err!=0) return;
@@ -1741,9 +1933,15 @@ void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion)
 			case TypString:
 				strncpy_s(Str, MaxStrLen, StrVarPtr((TVarId)VarId), _TRUNCATE);
 				break;
+			case TypInteger64:
+				if (AutoConversion)
+					_snprintf_s(Str, MaxStrLen, _TRUNCATE, "%lld", VarId);
+				else
+					*Err = ErrTypeMismatch;
+				break;
 			case TypInteger:
 				if (AutoConversion)
-					_snprintf_s(Str, MaxStrLen, _TRUNCATE, "%d", VarId);
+					_snprintf_s(Str, MaxStrLen, _TRUNCATE, "%d", (int)VarId);
 				else
 					*Err = ErrTypeMismatch;
 				break;
@@ -1921,6 +2119,17 @@ TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err)
 	return ((VarId+1) << 16) | Index;
 }
 
+TVarId GetInt64VarFromArray(TVarId VarId, int Index, LPWORD Err)
+{
+	TInt64Ary *int64Ary = &Variables[VarId].Value.Int64Ary;
+	if (Index < 0 || Index >= int64Ary->size) {
+		*Err = ErrOutOfRange;
+		return -1;
+	}
+	*Err = 0;
+	return ((VarId+1) << 16) | Index;
+}
+
 void GetAryVar(PVarId VarId, WORD VarType, LPWORD Err)
 {
 	TName Name;
@@ -1969,6 +2178,16 @@ void SetStrValInArray(TVarId VarId, int Index, const char *Str, LPWORD Err)
 	}
 }
 
+void SetInt64ValInArray(TVarId VarId, int Index, long long Val, LPWORD Err)
+{
+	TVarId id;
+
+	id = GetInt64VarFromArray(VarId, Index, Err);
+	if (*Err == 0) {
+		SetInt64Val(id, Val);
+	}
+}
+
 int GetIntAryVarSize(TVarId VarId)
 {
 	TIntAry *intAry = &Variables[VarId].Value.IntAry;
@@ -1979,4 +2198,10 @@ int GetStrAryVarSize(TVarId VarId)
 {
 	TIntAry *strAry = &Variables[VarId].Value.IntAry;
 	return strAry->size;
+}
+
+int GetInt64AryVarSize(TVarId VarId)
+{
+	TInt64Ary *int64Ary = &Variables[VarId].Value.Int64Ary;
+	return int64Ary->size;
 }

@@ -1,0 +1,173 @@
+; リテラルの代入
+lit_32_1 = 1
+strspecial fmt 'input:[1]\nexpect:1\nresult:%d'
+sprintf2 msg fmt lit_32_1
+messagebox msg "lit_32_1"
+
+;   int32 上限
+lit_32_2 = 2147483647
+strspecial fmt 'input:[2147483647]\nexpect:2147483647\nresult:%d'
+sprintf2 msg fmt lit_32_2
+messagebox msg "lit_32_2"
+
+;   int32 上限より上
+lit_32_3 = 2147483648
+strspecial fmt 'input:[2147483648]\nexpect:-2147483648\nresult:%d'
+sprintf2 msg fmt lit_32_3
+messagebox msg "lit_32_3"
+
+;   int32 下限
+lit_32_4 = -2147483648
+strspecial fmt 'input:[-2147483648]\nexpect:-2147483648\nresult:%d'
+sprintf2 msg fmt lit_32_4
+messagebox msg "lit_32_4"
+
+;   int32 下限より下
+lit_32_5 = -2147483649
+strspecial fmt 'input:[-2147483649]\nexpect:2147483647\nresult:%d'
+sprintf2 msg fmt lit_32_5
+messagebox msg "lit_32_5"
+
+;   後ろにスペース
+lit_32_6 = 2 
+strspecial fmt 'input:[2 ]\nexpect:2\nresult:%d'
+sprintf2 msg fmt lit_32_6
+messagebox msg "lit_32_6"
+
+;   後ろに英字
+lit_32_7 = 3A
+strspecial fmt 'input:[3A]\nexpect:3\nresult:%d\nSyntax error'
+sprintf2 msg fmt lit_32_7
+messagebox msg "lit_32_7"
+
+;   16進表記
+lit_32_8 = $3A
+strspecial fmt 'input:[$3A]\nexpect:58\nresult:%d'
+sprintf2 msg fmt lit_32_8
+messagebox msg "lit_32_8"
+
+
+; 変数同士の代入
+var_string = 'a'
+var_int32 = 1
+
+;   Type mismatch
+var_int32 = var_string
+var_string = var_int32
+
+
+; 演算
+; https://teratermproject.github.io/manual/5/ja/macro/syntax/expressions.html
+o1_1 = not 1
+o1_2 = ~ 2
+o1_3 = ! 3
+o1_4 = + 4
+o1_5 = - 5
+strspecial fmt 'expect:0xfffffffe 0xfffffffd 0 4 -5\nresult:0x%08x 0x%08x %d %d %d'
+sprintf2 o1 fmt o1_1 o1_2 o1_3 o1_4 o1_5
+messagebox o1 'o1'
+
+o2_1 = 2 * 2
+o2_2 = 50000 * 50000
+o2_3 = 2 / 2
+o2_4 = 3 % 2
+strspecial fmt 'expect:4 -1794967296 1 1\nresult:%d %d %d %d'
+sprintf2 o2 fmt o2_1 o2_2 o2_3 o2_4
+messagebox o2 'o2'
+
+o3_1 = 1 + 1
+o3_2 = 2000000000 + 2000000000
+o3_3 = 1 - 1
+o3_4 = -2147483648 - 1
+strspecial fmt 'expect:2 -294967296 0 2147483647\nresult:%d %d %d %d'
+sprintf2 o3 fmt o3_1 o3_2 o3_3 o3_4
+messagebox o3 'o3'
+
+o4_1 = 1 << 4
+o4_2 = $20000001 << 7 ;
+o4_3 = 16 >> 4
+o4_4 = -4 >> 2 ; 0xfffffffc >> 2
+o4_5 = 16 >>> 4
+o4_6 = -4 >>> 2 ; 0xfffffffc >>> 2
+strspecial fmt 'expect:0x00000010 0x00000080 0x00000001 0xffffffff 0x00000001 0x3fffffff\nresult:0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x'
+sprintf2 o4 fmt o4_1 o4_2 o4_3 o4_4 o4_5 o4_6
+messagebox o4 'o4'
+
+o5_1 = 3 and 10
+o5_2 = 3 & 10
+strspecial fmt 'expect:0x2 0x2\nresult:0x%x 0x%x'
+sprintf2 o5 fmt o5_1 o5_2
+messagebox o5 'o5'
+
+o6_1 = 3 xor 10
+o6_2 = 3 ^ 10
+strspecial fmt 'expect:0x9 0x9\nresult:0x%x 0x%x'
+sprintf2 o6 fmt o6_1 o6_2
+messagebox o6 'o6'
+
+o7_1 = 3 or 10
+o7_2 = 3 | 10
+strspecial fmt 'expect:0xb 0xb\nresult:0x%x 0x%x'
+sprintf2 o7 fmt o7_1 o7_2
+messagebox o7 'o7'
+
+o8_1 = 1 < 2
+o8_2 = 1 < 1
+o8_3 = 1 < 0
+o8_4 = 1 > 2
+o8_5 = 1 > 1
+o8_6 = 1 > 0
+o8_7 = 1 <= 2
+o8_8 = 1 <= 1
+o8_9 = 1 <= 0
+o8_10 = 1 >= 2
+o8_11 = 1 >= 1
+o8_12 = 1 >= 0
+strspecial fmt 'expect:1 0 0 0 0 1 1 1 0 0 1 1\nresult:%d %d %d %d %d %d %d %d %d %d %d %d'
+sprintf2 o8 fmt o8_1 o8_2 o8_3 o8_4 o8_5 o8_6 o8_7 o8_8 o8_9 o8_10 o8_11 o8_12
+messagebox o8 'o8'
+
+o9_1 = 1 = 2
+o9_2 = 1 = 1
+o9_3 = 1 == 2
+o9_4 = 1 == 1
+o9_5 = 1 <> 2
+o9_6 = 1 <> 1
+o9_7 = 1 != 2
+o9_8 = 1 != 1
+strspecial fmt 'expect:0 1 0 1 1 0 1 0\nresult:%d %d %d %d %d %d %d %d'
+sprintf2 o9 fmt o9_1 o9_2 o9_3 o9_4 o9_5 o9_6 o9_7 o9_8
+messagebox o9 'o9'
+
+o10_1 = 0 && 0
+o10_2 = 0 && 1
+o10_3 = 1 && 0
+o10_4 = 1 && 1
+strspecial fmt 'expect:0 0 0 1\nresult:%d %d %d %d'
+sprintf2 o10 fmt o10_1 o10_2 o10_3 o10_4
+messagebox o10 'o10'
+
+o11_1 = 0 || 0
+o11_2 = 0 || 1
+o11_3 = 1 || 0
+o11_4 = 1 || 1
+strspecial fmt 'expect:0 1 1 1\nresult:%d %d %d %d'
+sprintf2 o11 fmt o11_1 o11_2 o11_3 o11_4
+messagebox o11 'o11'
+
+
+; マクロコマンド
+ifdefined lit_32_1
+messagebox result 'ifdefined'
+
+sprintf2 sp '%d %02d' 1 2
+messagebox sp 'sprintf2'
+
+;   配列
+intdim int32ary 3
+int32ary[0] = 1000000000
+int32ary[1] = 1000000000
+int32ary[2] = int32ary[0] + int32ary[1]
+sprintf2 sp '%d + %d = %d' int32ary[0] int32ary[1] int32ary[2]
+messagebox sp 'int array'
+

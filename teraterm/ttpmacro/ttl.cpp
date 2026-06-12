@@ -924,6 +924,9 @@ static WORD TTLDim(WORD type)
 	if (type == RsvIntDim) {
 		Err = NewIntAryVar(Name, size);
 	}
+	else if (type == RsvInt64Dim) {
+		Err = NewInt64AryVar(Name, size);
+	}
 	else { // type == RsvStrDim
 		Err = NewStrAryVar(Name, size);
 	}
@@ -961,7 +964,7 @@ static WORD TTLDispStr(void)
 	TStrVal Str, buff;
 	WORD Err;
 	TVariableType ValType;
-	int Val;
+	long long Val;
 
 	if (! Linked)
 		return ErrLinkFirst;
@@ -3074,7 +3077,7 @@ static WORD TTLIf(void)
 {
 	WORD Err, Tmp, WId;
 	TVariableType ValType;
-	int Val;
+	long long Val;
 
 	if (! GetExpression(&ValType,&Val,&Err))
 		return ErrSyntax;
@@ -3921,7 +3924,7 @@ static WORD GetParamStrings(void)
 	TStrVal Str;
 	WORD Err;
 	TVariableType ValType;
-	int Val;
+	long long Val;
 	BOOL EndOfLine;
 
 	EndOfLine = FALSE;
@@ -4033,7 +4036,8 @@ static WORD GetBroadcastString(char *buff, int bufflen, BOOL crlf)
 	TStrVal Str;
 	WORD Err;
 	TVariableType ValType;
-	int Val;
+	long long Val;
+	int IntVal;
 	char tmp[3];
 
 	buff[0] = '\0';
@@ -4044,17 +4048,18 @@ static WORD GetBroadcastString(char *buff, int bufflen, BOOL crlf)
 			AddBroadcastString(buff, bufflen, Str);
 		}
 		else if (GetExpression(&ValType, &Val, &Err)) {
+			IntVal = (int)Val;
 			if (Err!=0) return Err;
 			switch (ValType) {
 				case TypInteger:
-					Val = LOBYTE(Val);
-					if (Val == 0 || Val == 1) {
+					IntVal = LOBYTE(IntVal);
+					if (IntVal == 0 || IntVal == 1) {
 						tmp[0] = 1;
-						tmp[1] = Val + 1;
+						tmp[1] = IntVal + 1;
 						tmp[2] = 0;
 					}
 					else {
-						tmp[0] = Val;
+						tmp[0] = IntVal;
 						tmp[1] = 0;
 					}
 					strncat_s(buff, bufflen, tmp, _TRUNCATE);
@@ -4408,19 +4413,22 @@ void TTLShowMINIMIZE(void)
 static WORD TTLSprintf(int getvar)
 {
 	TStrVal Fmt;
-	int Num, NumWidth, NumPrecision;
+	long long Num;
+	int IntNum, NumWidth, NumPrecision;
 	TStrVal Str;
 	WORD Err = 0, TmpErr;
 	TVarId VarId;
 	char buf[MaxStrLen];
 	char *p, subFmt[MaxStrLen], buf2[MaxStrLen];
-	int width_asterisk, precision_asterisk, reg_beg, reg_end, reg_len, i;
+	int width_asterisk, precision_asterisk;
+	int reg_beg, reg_end, reg_len, i;
 	char *match_str;
 
 	enum arg_type {
 		INTEGER,
 		DOUBLE,
 		STRING,
+		INTEGER64,
 		NONE
 	};
 	enum arg_type type;
@@ -4441,10 +4449,15 @@ static WORD TTLSprintf(int getvar)
 	}
 
 //	pattern = (UChar* )"^%[-+0 #]*(?:[1-9][0-9]*)?(?:\\.[0-9]*)?$";
-	pattern = (UChar* )"^%[-+0 #]*([1-9][0-9]*|\\*)?(?:\\.([0-9]*|\\*))?$";
+//	pattern = (UChar* )"^%[-+0 #]*([1-9][0-9]*|\\*)?(?:\\.([0-9]*|\\*))?$";
 	//               flags--------
 	//                       width------------------
 	//                                     precision--------------------
+	pattern = (UChar *)"^%[-+0 #]*([1-9][0-9]*|\\*)?(?:\\.([0-9]*|\\*))?(ll)?$";
+	//               flags--------
+	//                       width------------------
+	//                                     precision--------------------
+	//                                                   length modifier-----
 
 	r = onig_new(&reg, pattern, pattern + strlen((char *)pattern),
 	             ONIG_OPTION_NONE, ONIG_ENCODING_ASCII, ONIG_SYNTAX_DEFAULT,
@@ -4530,7 +4543,7 @@ static WORD TTLSprintf(int getvar)
 
 					// width, precision が * かどうかチェック
 					width_asterisk = precision_asterisk = 0;
-					if (region->num_regs != 3) {
+					if (region->num_regs != 4) {
 						SetResult(-1);
 						goto exit2;
 					}
@@ -4577,6 +4590,28 @@ static WORD TTLSprintf(int getvar)
 						}
 					}
 
+					// length modifier
+					reg_beg = region->beg[3];
+					reg_end = region->end[3];
+					reg_len = reg_end - reg_beg;
+					match_str = (char *)calloc(reg_len + 1, sizeof(char));
+					for (i = 0; i < reg_len; i++) {
+						match_str[i] = str[reg_beg + i];
+					}
+					if (strcmp(match_str, "ll") == 0) {
+						switch (*p) {
+							case 'd':
+							case 'i':
+							case 'o':
+							case 'u':
+							case 'x':
+							case 'X':
+								type = INTEGER64;
+								break;
+						}
+					}
+					free(match_str);
+
 					if (type == STRING || type == DOUBLE) {
 						// 文字列として読めるかトライ
 						TmpErr = 0;
@@ -4617,10 +4652,10 @@ static WORD TTLSprintf(int getvar)
 							goto exit1;
 						}
 					}
-					else {
+					else if (type == INTEGER64) {
 						// 数値として読めるかトライ
 						TmpErr = 0;
-						GetIntVal(&Num, &TmpErr);
+						GetInt64Val(&Num, &TmpErr);
 						if (TmpErr == 0) {
 							if (!width_asterisk && !precision_asterisk) {
 								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, Num);
@@ -4633,6 +4668,31 @@ static WORD TTLSprintf(int getvar)
 							}
 							else { // width_asterisk && precision_asterisk
 								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumWidth, NumPrecision, Num);
+							}
+						}
+						else {
+							SetResult(3);
+							Err = TmpErr;
+							goto exit1;
+						}
+					}
+					else { // INTEGER
+						// 数値として読めるかトライ
+						TmpErr = 0;
+						IntNum = (int)Num;
+						GetIntVal(&IntNum, &TmpErr);
+						if (TmpErr == 0) {
+							if (!width_asterisk && !precision_asterisk) {
+								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, IntNum);
+							}
+							else if (width_asterisk && !precision_asterisk) {
+								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumWidth, IntNum);
+							}
+							else if (!width_asterisk && precision_asterisk) {
+								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumPrecision, IntNum);
+							}
+							else { // width_asterisk && precision_asterisk
+								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumWidth, NumPrecision, IntNum);
 							}
 						}
 						else {
@@ -5487,7 +5547,8 @@ static WORD TTLWait(BOOL Ln)
 	WORD Err;
 	TVariableType ValType;
 	TVarId VarId;
-	int i, Val;
+	int i;
+	long long Val;
 	int TimeOut;
 
 	ClearWait();
@@ -5897,7 +5958,7 @@ static int ExecCmnd(void)
 	TStrVal Str;
 	TName Cmnd;
 	TVariableType ValType, VarType;
-	int Val;
+	long long Val;
 
 	Err = 0;
 
@@ -6187,7 +6248,9 @@ static int ExecCmnd(void)
 			Err = TTLInt2Str(); break;
 		case RsvIntDim:
 		case RsvStrDim:
-			Err = TTLDim(WId); break;
+		case RsvInt64Dim:
+			Err = TTLDim(WId);
+			break;
 		case RsvKmtFinish:
 			Err = TTLCommCmd(CmdKmtFinish,IdTTLWaitCmndResult); break;
 		case RsvKmtGet:
@@ -6429,6 +6492,11 @@ static int ExecCmnd(void)
 							VarId = GetIntVarFromArray(VarId, Index, &Err);
 							if (!Err) VarType = TypInteger;
 							break;
+						case TypInt64Array:
+							VarId = GetInt64VarFromArray(VarId, Index, &Err);
+							if (!Err)
+								VarType = TypInteger64;
+							break;
 						case TypStrArray:
 							VarId = GetStrVarFromArray(VarId, Index, &Err);
 							if (!Err) VarType = TypString;
@@ -6440,14 +6508,19 @@ static int ExecCmnd(void)
 					if (Err) return Err;
 					if (VarType==ValType) {
 						switch (ValType) {
-						case TypInteger: SetIntVal(VarId,Val); break;
+						case TypInteger:
+							SetIntVal(VarId, (int)Val);
+							break;
+						case TypInteger64:
+							SetInt64Val(VarId, Val);
+							break;
 						case TypString:
 							if (StrConst)
 								SetStrVal(VarId,Str);
 							else {
 								SetStrVal(VarId, StrVarPtr((TVarId)Val));
 							}
-						break;
+							break;
 						default:
 							Err = ErrSyntax;
 						}
@@ -6461,7 +6534,12 @@ static int ExecCmnd(void)
 				}
 				else {
 					switch (ValType) {
-					case TypInteger: E = NewIntVar(Cmnd,Val); break;
+					case TypInteger64:
+						E = NewInt64Var(Cmnd,Val);
+						break;
+					case TypInteger:
+						E = NewIntVar(Cmnd,(int)Val);
+						break;
 					case TypString:
 						if (StrConst)
 							E = NewStrVar(Cmnd,Str);
