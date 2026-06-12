@@ -72,7 +72,7 @@ private:
 #if UNICODE_DEBUG
 	TipWin *TipWinCodeDebug;
 	int CtrlKeyState;			// 0:開始/1:押す/2:離す/3:押す(表示状態)
-	DWORD CtrlKeyDownTick;	// 最初に押したtick
+	ULONGLONG CtrlKeyDownTick;	// 最初に押したtick
 #endif
 
 	// TipWin

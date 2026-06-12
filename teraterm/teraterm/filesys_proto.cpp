@@ -92,7 +92,7 @@ static PFileVarProto FileVar = NULL;
 static PProtoDlg PtDlg = NULL;
 static BOOL cv_ProtoFlag = FALSE;
 
-static void _SetDlgTime(TFileVarProto *fv, DWORD elapsed, int bytes)
+static void _SetDlgTime(TFileVarProto *fv, ULONGLONG elapsed, int bytes)
 {
 	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, elapsed, bytes);
 }

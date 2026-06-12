@@ -956,24 +956,24 @@ char *mctimelocal(const char *format, BOOL utc_flag)
  *	@return	経過時間の文字列
  *			不要になったらfree()すること
  */
-char *strelapsed(DWORD start_time)
+char *strelapsed(ULONGLONG start_time)
 {
 	size_t sizeof_strtime = 20;
 	char *strtime = malloc(sizeof_strtime);
 	int days, hours, minutes, seconds, msecs;
-	DWORD delta = GetTickCount() - start_time;
+	ULONGLONG delta = GetTickCount64() - start_time;
 
-	msecs = delta % 1000;
+	msecs = (int)(delta % 1000);
 	delta /= 1000;
 
-	seconds = delta % 60;
+	seconds = (int)(delta % 60);
 	delta /= 60;
 
-	minutes = delta % 60;
+	minutes = (int)(delta % 60);
 	delta /= 60;
 
-	hours = delta % 24;
-	days = delta / 24;
+	hours = (int)(delta % 24);
+	days = (int)(delta / 24);
 
 	_snprintf_s(strtime, sizeof_strtime, _TRUNCATE,
 		"%d %02d:%02d:%02d.%03d",

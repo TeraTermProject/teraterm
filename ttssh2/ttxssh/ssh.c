@@ -9039,24 +9039,24 @@ static INT_PTR CALLBACK ssh_scp_dlg_thread_proc(HWND hWnd, UINT msg, WPARAM wp, 
 				SendDlgItemMessage(hWnd, IDC_PROGBAR, PBM_SETPOS, (WPARAM)c->scp.ProgStat, 0);
 			}
 
-			int elapsed = (GetTickCount() - c->scp.stime) / 1000;
+			ULONGLONG elapsed = (GetTickCount64() - c->scp.stime) / 1000;
 			if (elapsed > c->scp.prev_elapsed) {
 				if (elapsed > 2) {
 					rate = (int)(transfered / elapsed);
 					if (rate < 1200) {
-						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d %s)", elapsed / 60, elapsed % 60, rate, "Bytes/s");
+						_snprintf_s(s, sizeof(s), _TRUNCATE, "%llu:%02llu (%d %s)", elapsed / 60, elapsed % 60, rate, "Bytes/s");
 					} else if (rate < 1200000) {
-						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100, "KBytes/s");
+						_snprintf_s(s, sizeof(s), _TRUNCATE, "%llu:%02llu (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100, "KBytes/s");
 					} else {
-						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100, "MBytes/s");
+						_snprintf_s(s, sizeof(s), _TRUNCATE, "%llu:%02llu (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100, "MBytes/s");
 					}
 				} else {
-					_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d", elapsed / 60, elapsed % 60);
+					_snprintf_s(s, sizeof(s), _TRUNCATE, "%llu:%02llu", elapsed / 60, elapsed % 60);
 				}
 				SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
 				c->scp.prev_elapsed = elapsed;
 			}
-			c->scp.ProcessedTime = GetTickCount();
+			c->scp.ProcessedTime = GetTickCount64();
 			return FALSE;
 
 		case WM_COMMAND:
@@ -9137,7 +9137,7 @@ static unsigned __stdcall ssh_scp_dlg_thread(void *p)
 	c->scp.prev_elapsed = 0;
 	c->scp.filesndsize = 0;
 	c->scp.canceled = FALSE;
-	c->scp.stime = GetTickCount();
+	c->scp.stime = GetTickCount64();
 	c->scp.ProcessedTime = c->scp.stime;
 	SetWindowLongPtr(hDlgWnd, GWLP_USERDATA, (LONG_PTR)c);
 	SetTimer(hDlgWnd, c->self_id, SCPDLG_UPDATE_INTERVAL, NULL);
@@ -9174,7 +9174,7 @@ static HANDLE start_ssh_scp_dlg_thread(Channel_t *c)
 	// スレッド起動待ち
 	WaitForSingleObject(c->scp.ScpStartThreadEvent, 5000 /*msec*/);
 	ResetEvent(c->scp.ScpStartThreadEvent);
-	c->scp.stime = GetTickCount();
+	c->scp.stime = GetTickCount64();
 	return thread;
 }
 
@@ -9241,7 +9241,7 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 		c->scp.filesndsize += ret;
 #if 1 // 高負荷対策
 		// 進捗ダイアログの描画が間に合わない場合は、負荷が下がるまで待つ
-		while (GetTickCount() - c->scp.ProcessedTime > SCPDLG_UPDATE_INTERVAL * 3) {
+		while (GetTickCount64() - c->scp.ProcessedTime > SCPDLG_UPDATE_INTERVAL * 3) {
 			Sleep(20);
 			if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
 				goto cancel_abort;
@@ -9405,7 +9405,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 			}
 #if 1 // 高負荷対策
 			// 進捗ダイアログの描画が間に合わない場合は、負荷が下がるまで待つ
-			while (GetTickCount() - c->scp.ProcessedTime > SCPDLG_UPDATE_INTERVAL * 3) {
+			while (GetTickCount64() - c->scp.ProcessedTime > SCPDLG_UPDATE_INTERVAL * 3) {
 				Sleep(20);
 				if (pvar == NULL || pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0) {
 					goto cancel_abort;

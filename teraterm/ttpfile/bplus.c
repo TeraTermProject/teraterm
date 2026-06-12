@@ -80,7 +80,7 @@ typedef struct {
 
 	int ProgStat;
 
-	DWORD StartTime;
+	ULONGLONG StartTime;
 
 	DWORD FileMtime;
 
@@ -162,7 +162,7 @@ static BOOL BPInit(TProto *pv, PComVar cv, PTTSet ts)
   fv->InfoOp->SetDlgProtoText(fv, "B-Plus");
 
   fv->InfoOp->InitDlgProgress(fv, &bv->ProgStat);
-  bv->StartTime = GetTickCount();
+  bv->StartTime = GetTickCount64();
 
   /* file name, file size */
   if (bv->BPMode==IdBPSend)
@@ -610,7 +610,7 @@ static BOOL FTCreateFile(PBPVar bv)
 	if (bv->ProgStat != -1) {
 		bv->ProgStat = 0;
 	}
-	bv->StartTime = GetTickCount();
+	bv->StartTime = GetTickCount64();
 
 	return TRUE;
 }

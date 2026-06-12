@@ -805,7 +805,7 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 			break;
 	}
 	cv->Ready = TRUE;
-	cv->ConnectedTime = GetTickCount();
+	cv->ConnectedTime = GetTickCount64();
 }
 
 BOOL CommCanClose(PComVar cv)

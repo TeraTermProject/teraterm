@@ -80,7 +80,7 @@ typedef struct {
 
 	int ProgStat;
 
-	DWORD StartTime;
+	ULONGLONG StartTime;
 
 	DWORD FileMtime;
 
@@ -299,7 +299,7 @@ static BOOL XInit(TProto *pv, PComVar cv, PTTSet ts)
 		xv->ProgStat = -1;
 	}
 	fv->InfoOp->SetDlgProtoFileName(fv, xv->FullName);
-	xv->StartTime = GetTickCount();
+	xv->StartTime = GetTickCount64();
 
 	xv->PktNumOffset = 0;
 	xv->PktNum = 0;

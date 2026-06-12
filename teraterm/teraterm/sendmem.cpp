@@ -82,7 +82,7 @@ typedef struct SendMemTag {
 	size_t send_left;
 	size_t send_index;
 	BOOL waited;
-	DWORD last_send_tick;
+	ULONGLONG last_send_tick;
 	//
 	CFileTransLiteDlg *dlg;
 	class SendMemDlgObserver *dlg_observer;
@@ -377,7 +377,7 @@ void SendMemContinuously(void)
 	}
 
 	if (p->waited) {
-		if (GetTickCount() - p->last_send_tick < p->delay_tick) {
+		if (GetTickCount64() - p->last_send_tick < p->delay_tick) {
 			// ウエイトする
 			return;
 		}
@@ -518,7 +518,7 @@ void SendMemContinuously(void)
 	if (p->send_left != 0 && need_delay) {
 		// waitに入る
 		p->waited = TRUE;
-		p->last_send_tick = GetTickCount();
+		p->last_send_tick = GetTickCount64();
 		// タイマーはidleを動作させるために使用している
 		SetTimer(p->hWnd, p->timer_id, p->delay_tick, NULL);
 	}

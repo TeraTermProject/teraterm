@@ -869,7 +869,7 @@ typedef struct {
 
 	void *NotifyIcon;
 
-	DWORD ConnectedTime;
+	ULONGLONG ConnectedTime;
 
 	void (*Log1Byte)(BYTE b);
 	void (*Log1Bin)(BYTE b);

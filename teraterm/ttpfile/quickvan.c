@@ -65,7 +65,7 @@ typedef struct {
 
 	int ProgStat;
 
-	DWORD StartTime;
+	ULONGLONG StartTime;
 
 	DWORD FileMtime;
 
@@ -192,7 +192,7 @@ static BOOL QVInit(TProto *pv, PComVar cv, PTTSet ts)
   fv->InfoOp->SetDlgProtoText(fv, "Quick-VAN");
 
   fv->InfoOp->InitDlgProgress(fv, &qv->ProgStat);
-  qv->StartTime = GetTickCount();
+  qv->StartTime = GetTickCount64();
 
   qv->SeqNum = 0;
   qv->FileNum = 0;
@@ -470,7 +470,7 @@ static BOOL FTCreateFile(PQVVar qv)
 	if (qv->ProgStat != -1) {
 		qv->ProgStat = 0;
 	}
-	qv->StartTime = GetTickCount();
+	qv->StartTime = GetTickCount64();
 
 	return TRUE;
 }
@@ -930,7 +930,7 @@ static void QVSendVFILE(PQVVar qv)
   /* file no. */
   qv->FileNum++;
   qv->ProgStat = 0;
-  qv->StartTime = GetTickCount();
+  qv->StartTime = GetTickCount64();
   i = 3;
   QVPutNum2(qv,qv->FileNum,&i);
   /* file name */

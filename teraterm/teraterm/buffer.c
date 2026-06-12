@@ -115,7 +115,7 @@ static BOOL BoxSelect;			// TRUE=矩形選択 / FALSE=行選択
 static POINT ClickCell;			// クリックした文字cell
 static POINT SelectStartOld;	// 描画した選択領域、start
 static POINT SelectEndOld;		// 描画した選択領域、end
-static DWORD SelectStartTime;
+static ULONGLONG SelectStartTime;
 static POINT DblClkStart;
 static POINT DblClkEnd;
 
@@ -4749,7 +4749,7 @@ void BuffStartSelect(int Xw, int Yw, BOOL Box, BOOL Shift)
 	Selected = FALSE;
 
 	// 選択開始ガード
-	SelectStartTime = GetTickCount();
+	SelectStartTime = GetTickCount64();
 	Selecting = FALSE;
 
 	// push位置
@@ -4778,7 +4778,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 
 	if (!Selecting) {
 		// 選択ガード?
-		if (GetTickCount() - SelectStartTime < ts.SelectStartDelay) {
+		if (GetTickCount64() - SelectStartTime < ts.SelectStartDelay) {
 			// ガード中
 			return;
 		}
@@ -4889,7 +4889,7 @@ void BuffEndSelect(int Xw, int Yw)
 	(void)Xw;
 	(void)Yw;
 	if (!Selecting) {
-		if (GetTickCount() - SelectStartTime < ts.SelectStartDelay) {
+		if (GetTickCount64() - SelectStartTime < ts.SelectStartDelay) {
 			// ガード時間以内なら
 			// 選択領域解除
 			SelectEnd = SelectStart;
