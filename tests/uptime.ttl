@@ -3,7 +3,7 @@
 ; 使い方: Tera Term マクロとして単体で実行する（接続不要）
 
 uptime var
-uptime sec msec
+uptime secvar msecvar
 
 day = var / 86400000
 var = var % 86400000
@@ -17,8 +17,8 @@ sprintf2 str "System Up Time: %d Days, %d Hours, %d Minutes, %d Seconds" day hou
 messagebox str "uptime"
 
 
-day = sec / 86400
-var = sec % 86400
+day = secvar / 86400
+var = secvar % 86400
 hour = var / 3600
 var = var % 3600
 min = var / 60
