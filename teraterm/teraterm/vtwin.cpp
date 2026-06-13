@@ -643,6 +643,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	FirstPaint = TRUE;
 	ScrollLock = FALSE;  // 初期値は無効 (2006.11.14 yutaka)
 	Alpha = 255;
+	TipWin = NULL;
 #if UNICODE_DEBUG
 	TipWinCodeDebug = NULL;
 #endif
@@ -812,7 +813,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 
 CVTWindow::~CVTWindow()
 {
-	if (ts.HideWindow==0) {
+	if (TipWin != NULL) {
 		TipWin->Destroy();
 		delete TipWin;
 		TipWin = NULL;
