@@ -654,6 +654,9 @@ void CommThread(void *arg)
 			if (! cv->Ready) {
 				_endthread();
 			}
+			if (Evt & EV_ERR) {
+				ClearCommError(cv->ComID, &DErr, NULL);
+			}
 			if (! cv->RRQ) {
 				PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_READ);
 			}
@@ -853,6 +856,7 @@ void CommClose(PComVar cv)
 			break;
 		case IdSerial:
 			if ( cv->ComID != INVALID_HANDLE_VALUE ) {
+				SetupComm(cv->ComID, 4096, 4096); // デフォルト値に戻す
 				CloseHandle(ReadEnd);
 				CloseHandle(wol.hEvent);
 				CloseHandle(rol.hEvent);
@@ -864,7 +868,6 @@ void CommClose(PComVar cv)
 				ClearCOMFlag(cv->ComPort);
 			}
 			TTXCloseFile(); /* TTPLUG */
-			SetupComm(cv->ComID, 4096, 4096); // デフォルト値に戻す
 			break;
 		case IdFile:
 			if (cv->ComID != INVALID_HANDLE_VALUE) {
