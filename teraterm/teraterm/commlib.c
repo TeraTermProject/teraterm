@@ -602,13 +602,9 @@ void NamedPipeThread(void *arg)
 {
 	PComVar cv = (PComVar)arg;
 	DWORD DErr;
-	HANDLE REnd;
-	char Temp[20];
 	char Buffer[1];  // 1byte
 	DWORD BytesRead, TotalBytesAvail, BytesLeftThisMessage;
 
-	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READENDNAME, cv->ComPort);
-	REnd = OpenEvent(EVENT_ALL_ACCESS,FALSE, Temp);
 	while (TRUE) {
 		BytesRead = 0;
 		// 名前付きパイプはイベントを待つことができない仕様なので、キューの中身を
@@ -625,7 +621,7 @@ void NamedPipeThread(void *arg)
 				PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_READ);
 			}
 			// ReadFile() が終わるまで待つ。
-			WaitForSingleObject(REnd,INFINITE);
+			WaitForSingleObject(ReadEnd,INFINITE);
 		}
 		else {
 			DErr = GetLastError();
@@ -644,11 +640,7 @@ void CommThread(void *arg)
 	DWORD Evt;
 	PComVar cv = (PComVar)arg;
 	DWORD DErr;
-	HANDLE REnd;
-	char Temp[20];
 
-	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READENDNAME, cv->ComPort);
-	REnd = OpenEvent(EVENT_ALL_ACCESS,FALSE, Temp);
 	while (TRUE) {
 		if (WaitCommEvent(cv->ComID,&Evt,NULL)) {
 			if (! cv->Ready) {
@@ -660,7 +652,7 @@ void CommThread(void *arg)
 			if (! cv->RRQ) {
 				PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_READ);
 			}
-			WaitForSingleObject(REnd,INFINITE);
+			WaitForSingleObject(ReadEnd,INFINITE);
 		}
 		else {
 			DErr = GetLastError();  // this returns 995 (operation aborted) if a USB com port is removed
@@ -781,12 +773,6 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 			cv->ComPort = 0;
 			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READENDNAME, cv->ComPort);
 			ReadEnd = CreateEvent(NULL,FALSE,FALSE,Temp);
-			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", WRITENAME, cv->ComPort);
-			memset(&wol,0,sizeof(OVERLAPPED));
-			wol.hEvent = CreateEvent(NULL,TRUE,TRUE,Temp);
-			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READNAME, cv->ComPort);
-			memset(&rol,0,sizeof(OVERLAPPED));
-			rol.hEvent = CreateEvent(NULL,TRUE,FALSE,Temp);
 
 			/* create the receiver thread */
 			if (_beginthread(NamedPipeThread,0,cv) == -1) {
@@ -879,8 +865,6 @@ void CommClose(PComVar cv)
 		case IdNamedPipe:
 			if ( cv->ComID != INVALID_HANDLE_VALUE ) {
 				CloseHandle(ReadEnd);
-				CloseHandle(wol.hEvent);
-				CloseHandle(rol.hEvent);
 				PCloseFile(cv->ComID);
 			}
 			TTXCloseFile(); /* TTPLUG */
