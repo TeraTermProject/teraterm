@@ -438,15 +438,6 @@ BOOL LoadConfig(void)
 		g_MenuData.lfFont = ncm.lfMenuFont;
 	}
 
-	g_szLockBox[0] = 0;
-
-	RegClose(hKey);
-
-	g_MenuData.crMenuBg		= ::GetSysColor(COLOR_MENU);
-	g_MenuData.crSelMenuBg	= ::GetSysColor(COLOR_HIGHLIGHT);
-	g_MenuData.crSelMenuTxt	= ::GetSysColor(COLOR_HIGHLIGHTTEXT);
-	g_MenuData.hFont		= ::CreateFontIndirectW(&(g_MenuData.lfFont));
-
 	// セッションロック時にLockBoxのパスワードを消去
 	if (RegGetBOOL(hKey, KEY_LB_CLEAR_SESSIONLOCK, g_MenuData.bLockBoxClearSessionLock) == FALSE) {
 		g_MenuData.bLockBoxClearSessionLock = FALSE;
@@ -464,6 +455,15 @@ BOOL LoadConfig(void)
 		UTIL_get_lang_msgW("MENU_LB_CLEAR_SUSPEND", uimsg, _countof(uimsg), STR_LB_CLEAR_SUSPEND, UILanguageFileW);
 		::ModifyMenuW(g_hConfigMenu, ID_LB_CLEAR_SUSPEND, MF_CHECKED | MF_BYCOMMAND, ID_LB_CLEAR_SUSPEND, uimsg);
 	}
+
+	g_szLockBox[0] = 0;
+
+	RegClose(hKey);
+
+	g_MenuData.crMenuBg		= ::GetSysColor(COLOR_MENU);
+	g_MenuData.crSelMenuBg	= ::GetSysColor(COLOR_HIGHLIGHT);
+	g_MenuData.crSelMenuTxt	= ::GetSysColor(COLOR_HIGHLIGHTTEXT);
+	g_MenuData.hFont		= ::CreateFontIndirectW(&(g_MenuData.lfFont));
 
 	return TRUE;
 }
