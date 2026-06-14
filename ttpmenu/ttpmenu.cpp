@@ -49,7 +49,7 @@
 #include	"win32helper.h"
 #include	"dlglib.h"
 #include	"asprintf.h"
-
+#include	"ttdebug.h"
 #include	"ttdup.h"
 
 // TTLファイルを保存する場合定義する(デバグ用)
@@ -2828,6 +2828,8 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR /* nCmdLine unusedParam */, in
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
+
+	DebugSetException(L"ttpmenu");
 
 	if ((module = GetModuleHandleA("kernel32.dll")) != NULL) {
 		if ((setDefDllDir = (pSetDefDllDir)GetProcAddress(module, "SetDefaultDllDirectories")) != NULL) {

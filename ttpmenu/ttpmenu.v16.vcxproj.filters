@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="registry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ttpmenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="winmisc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttpmenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttpmenu-version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="winmisc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\libressl\include\openssl\crypto.h">
+      <Filter>Header Files %28openssl%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\libressl\include\openssl\evp.h">
+      <Filter>Header Files %28openssl%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\libressl\include\openssl\hmac.h">
+      <Filter>Header Files %28openssl%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\libressl\include\openssl\rand.h">
+      <Filter>Header Files %28openssl%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\libressl\include\openssl\sha.h">
+      <Filter>Header Files %28openssl%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\teraterm\common\asprintf.h">
+      <Filter>Header Files %28common%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\teraterm\common\codeconv.h">
+      <Filter>Header Files %28common%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\teraterm\common\dlglib.h">
+      <Filter>Header Files %28common%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\teraterm\common\fileread.h">
+      <Filter>Header Files %28common%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\teraterm\common\i18n.h">
+      <Filter>Header Files %28common%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\teraterm\common\ttcommdlg.h">
+      <Filter>Header Files %28common%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\teraterm\common\ttdebug.h">
+      <Filter>Header Files %28common%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\teraterm\common\ttdup.h">
+      <Filter>Header Files %28common%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\teraterm\common\ttlib.h">
+      <Filter>Header Files %28common%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\teraterm\common\tt-version.h">
+      <Filter>Header Files %28common%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\teraterm\common\win32helper.h">
+      <Filter>Header Files %28common%29</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ttpmenu.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="ttpmenu-version.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="teraterm.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="right.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="left.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{77f5f5fd-595c-4441-9189-707c22355e52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{4e738a60-e352-4bd2-9634-f6643dcfbc19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{6d409006-33c9-4605-8d8e-2e12cca4c682}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files %28openssl%29">
+      <UniqueIdentifier>{39ccc8fc-dab2-4cbb-b483-f040b734ed7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files %28common%29">
+      <UniqueIdentifier>{12a2b176-9249-4f5a-89c2-b7ddc4814ea5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
