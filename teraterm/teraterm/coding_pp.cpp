@@ -304,34 +304,25 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					CodingPPData *DlgData = (CodingPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
 					TTTSet *ts = DlgData->pts;
 
-					ts->JIS7KatakanaSend = 0;
-					ts->JIS7Katakana = 0;
-					ts->KanjiIn = 0;
-					ts->KanjiOut = 0;
-
 					// 受信コード
 					int curPos = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
 					IdKanjiCode coding =
 						(IdKanjiCode)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETITEMDATA, curPos, 0);
 					ts->KanjiCode = coding;
+
+					// JIS
+					ts->JIS7Katakana = (IsDlgButtonChecked(hWnd, IDC_TERMKANA) == BST_CHECKED);
+					ts->JIS7KatakanaSend = (IsDlgButtonChecked(hWnd, IDC_TERMKANASEND) == BST_CHECKED);
+					ts->KanjiIn = (WORD)GetCurSel(hWnd, IDC_TERMKIN);
+					ts->KanjiOut = (WORD)GetCurSel(hWnd, IDC_TERMKOUT);
+
 					switch (coding) {
 					case IdUTF8:
 					case IdSJIS:
 					case IdEUC:
 						break;
-					case IdJIS: {
-						ts->JIS7Katakana = (IsDlgButtonChecked(hWnd, IDC_TERMKANA) == BST_CHECKED);
-						ts->JIS7KatakanaSend = (IsDlgButtonChecked(hWnd, IDC_TERMKANASEND) == BST_CHECKED);
-						WORD w = (WORD)GetCurSel(hWnd, IDC_TERMKIN);
-						if (w > 0) {
-							ts->KanjiIn = w;
-						}
-						w = (WORD)GetCurSel(hWnd, IDC_TERMKOUT);
-						if (w > 0) {
-							ts->KanjiOut = w;
-						}
+					case IdJIS:
 						break;
-					}
 					case IdKoreanCP949:
 					case IdCnGB2312:
 					case IdCnBig5:
