@@ -122,13 +122,13 @@ typedef struct {
 BOOL PluginGetInfo(int index, PluginInfo *info);
 
 /**
- * プラグイン情報を設定する
+ * プラグイン情報を変更する
  *
  * 同じファイル名があれば変更する
  *
  * @param info		プラグイン情報を格納する構造体へのポインタ
  */
-void PluginAddInfo(const PluginInfo *info);
+void PluginChangeInfo(const PluginInfo *info);
 
 /**
  * プラグインの設定を保存

@@ -89,7 +89,7 @@ static void SetFromListView(HWND hWnd)
 		PluginInfo info = {};
 		info.filename = filename;
 		info.enable = enable;
-		PluginAddInfo(&info);
+		PluginChangeInfo(&info);
 
 		free(filename);
 		free(enable_str);
