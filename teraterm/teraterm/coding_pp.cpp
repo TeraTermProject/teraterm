@@ -310,7 +310,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					ts->KanjiOut = 0;
 
 					// 受信コード
-					int curPos = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
+					LRESULT curPos = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
 					IdKanjiCode coding =
 						(IdKanjiCode)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETITEMDATA, curPos, 0);
 					ts->KanjiCode = coding;
@@ -389,7 +389,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					}
 
 					// 送信コード
-					curPos = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
+					curPos = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
 					coding = (IdKanjiCode)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETITEMDATA, curPos, 0);
 					ts->KanjiCodeSend = coding;
 
@@ -403,8 +403,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						const OverrideCharWidthInfo *info = &DlgData->unicode_override_charwidth_info;
 
 						BOOL enable = IsDlgButtonChecked(hWnd, IDC_OVERRIDE_CHAR_WIDTH);
-						size_t selected =
-							(size_t)SendDlgItemMessageW(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO, CB_GETCURSEL, 0, 0);
+						LRESULT selected =
+							SendDlgItemMessageW(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO, CB_GETCURSEL, 0, 0);
+						if (selected == CB_ERR) {
+							selected = 0;
+						}
 						if (!enable) {
 							// disableする
 							UnicodeOverrideWidthUninit();
