@@ -163,8 +163,14 @@ static void ssh2_send_newkeys(PTInstVar pvar);
 
 // マクロ
 #define remained_payload(pvar) ((pvar)->ssh_state.payload + payload_current_offset(pvar))
-#define remained_payloadlen(pvar) ((pvar)->ssh_state.payloadlen - (pvar)->ssh_state.payload_grabbed)
-#define payload_current_offset(pvar) ((pvar)->ssh_state.payload_grabbed - 1)
+#define remained_payloadlen(pvar) \
+	(((pvar)->ssh_state.payloadlen > (pvar)->ssh_state.payload_grabbed) \
+	 ? ((pvar)->ssh_state.payloadlen - (pvar)->ssh_state.payload_grabbed) \
+	 : 0)
+#define payload_current_offset(pvar) \
+	(((pvar)->ssh_state.payload_grabbed > 0)       \
+	 ? ((pvar)->ssh_state.payload_grabbed - 1) \
+	 : 0)
 
 //
 // Global request confirm
@@ -798,15 +804,17 @@ static unsigned int get_predecryption_amount(PTInstVar pvar)
 
 /* Get up to 'limit' bytes into the payload buffer.
    'limit' is counted from the start of the payload data.
-   Returns the amount of data in the payload buffer, or
-   -1 if there is an error.
+   Returns TRUE on success, FALSE if there is an error.
+   The amount of data in the payload buffer is stored in *len,
    We can return more than limit in some cases. */
-static int buffer_packet_data(PTInstVar pvar, int limit)
+static BOOL buffer_packet_data(PTInstVar pvar, unsigned int limit, unsigned int *len)
 {
-	if (pvar->ssh_state.payloadlen >= 0) {
-		return pvar->ssh_state.payloadlen;
-	} else {
-		int cur_decompressed_bytes =
+	if (SSHv2(pvar) ||
+	    !pvar->ssh_state.decompressing) {
+		*len = pvar->ssh_state.payloadlen;
+		return TRUE;
+	} else { // SSH1 decompressing
+		unsigned int cur_decompressed_bytes =
 			pvar->ssh_state.decompress_stream.next_out - pvar->ssh_state.postdecompress_inbuf;
 
 		while (limit > cur_decompressed_bytes) {
@@ -833,16 +841,18 @@ static int buffer_packet_data(PTInstVar pvar, int limit)
 				break;
 			case Z_BUF_ERROR:
 				pvar->ssh_state.payloadlen = cur_decompressed_bytes;
-				return cur_decompressed_bytes;
+				*len = cur_decompressed_bytes;
+				return TRUE;
 			default:
 				UTIL_get_lang_msg("MSG_SSH_INVALID_COMPDATA_ERROR", pvar,
 				                  "Invalid compressed data in received packet");
 				notify_fatal_error(pvar, pvar->UIMsg, TRUE);
-				return -1;
+				return FALSE;
 			}
 		}
 
-		return cur_decompressed_bytes;
+		*len = cur_decompressed_bytes;
+		return TRUE;
 	}
 }
 
@@ -854,51 +864,50 @@ static int buffer_packet_data(PTInstVar pvar, int limit)
    The payload pointer is set to point to the first byte of the actual data
    (after the packet type byte).
 */
-static BOOL grab_payload(PTInstVar pvar, int num_bytes)
+static BOOL grab_payload(PTInstVar pvar, unsigned int num_bytes)
 {
 	/* Accept maximum of 4MB of payload data */
-	int in_buffer = buffer_packet_data(pvar, PACKET_MAX_SIZE);
+	unsigned int in_buffer = 0;
 
-	if (in_buffer < 0) {
+	if (!buffer_packet_data(pvar, PACKET_MAX_SIZE, &in_buffer)) {
 		return FALSE;
-	} else {
-		pvar->ssh_state.payload_grabbed += num_bytes;
-		if (pvar->ssh_state.payload_grabbed > in_buffer) {
-			char buf[128];
-			UTIL_get_lang_msg("MSG_SSH_TRUNCATED_PKT_ERROR", pvar,
-			                  "Received truncated packet (%ld > %d) @ grab_payload()");
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
-			            pvar->ssh_state.payload_grabbed, in_buffer);
-			notify_fatal_error(pvar, buf, TRUE);
-			return FALSE;
-		} else {
-			return TRUE;
-		}
 	}
-}
-
-static BOOL grab_payload_limited(PTInstVar pvar, int num_bytes)
-{
-	int in_buffer;
 
 	pvar->ssh_state.payload_grabbed += num_bytes;
-	in_buffer = buffer_packet_data(pvar, pvar->ssh_state.payload_grabbed);
-
-	if (in_buffer < 0) {
+	if (pvar->ssh_state.payload_grabbed > in_buffer) {
+		char buf[128];
+		UTIL_get_lang_msg("MSG_SSH_TRUNCATED_PKT_ERROR", pvar,
+		                  "Received truncated packet (%u > %u) @ grab_payload()");
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
+		            pvar->ssh_state.payload_grabbed, in_buffer);
+		notify_fatal_error(pvar, buf, TRUE);
 		return FALSE;
-	} else {
-		if (pvar->ssh_state.payload_grabbed > in_buffer) {
-			char buf[128];
-			UTIL_get_lang_msg("MSG_SSH_TRUNCATED_PKT_LIM_ERROR", pvar,
-			                  "Received truncated packet (%ld > %d) @ grab_payload_limited()");
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
-			            pvar->ssh_state.payload_grabbed, in_buffer);
-			notify_fatal_error(pvar, buf, TRUE);
-			return FALSE;
-		} else {
-			return TRUE;
-		}
 	}
+
+	return TRUE;
+}
+
+static BOOL grab_payload_limited(PTInstVar pvar, unsigned int num_bytes)
+{
+	unsigned int in_buffer = 0;
+
+	pvar->ssh_state.payload_grabbed += num_bytes;
+
+	if (!buffer_packet_data(pvar, pvar->ssh_state.payload_grabbed, &in_buffer)) {
+		return FALSE;
+	}
+
+	if (pvar->ssh_state.payload_grabbed > in_buffer) {
+		char buf[128];
+		UTIL_get_lang_msg("MSG_SSH_TRUNCATED_PKT_LIM_ERROR", pvar,
+		                  "Received truncated packet (%u > %u) @ grab_payload_limited()");
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
+		            pvar->ssh_state.payload_grabbed, in_buffer);
+		notify_fatal_error(pvar, buf, TRUE);
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 static PayloadStat get_byte_from_payload(PTInstVar pvar, unsigned char *val)
@@ -1046,7 +1055,6 @@ static int prep_packet_ssh1(PTInstVar pvar, char *data, unsigned int len, unsign
 		pvar->ssh_state.decompress_stream.next_in = pvar->ssh_state.payload;
 		pvar->ssh_state.decompress_stream.avail_in = pvar->ssh_state.payloadlen;
 		pvar->ssh_state.decompress_stream.next_out = pvar->ssh_state.postdecompress_inbuf;
-		pvar->ssh_state.payloadlen = -1;
 	} else {
 		pvar->ssh_state.payload++;
 	}
@@ -1174,7 +1182,8 @@ unsigned char *begin_send_packet(PTInstVar pvar, int type, int len)
 
 	if (pvar->ssh_state.compressing) {
 		buf_ensure_size(&pvar->ssh_state.precompress_outbuf,
-		                &pvar->ssh_state.precompress_outbuflen, 1 + len);
+		                &pvar->ssh_state.precompress_outbuflen,
+		                (unsigned int)(1 + len));
 		buf = pvar->ssh_state.precompress_outbuf;
 	} else {
 		/* For SSHv2,
@@ -1630,7 +1639,7 @@ static BOOL handle_rsa_auth_refused(PTInstVar pvar)
 static BOOL handle_TIS_challenge(PTInstVar pvar)
 {
 	if (grab_payload(pvar, 4)) {
-		int len = get_payload_uint32(pvar, 0);
+		unsigned int len = get_payload_uint32(pvar, 0);
 
 		if (grab_payload(pvar, len)) {
 			logputs(LOG_LEVEL_VERBOSE, "Received TIS challenge");
@@ -1678,7 +1687,7 @@ static BOOL handle_debug(PTInstVar pvar)
 {
 	BOOL always_display;
 	char *description;
-	int description_len;
+	unsigned int description_len;
 	char buf[2048];
 
 	if (SSHv1(pvar)) {
@@ -1724,7 +1733,7 @@ static BOOL handle_disconnect(PTInstVar pvar)
 {
 	int reason_code;
 	char *description;
-	int description_len;
+	unsigned int description_len;
 	char buf[2048];
 	char *explanation = "";
 	char uimsg[MAX_UIMSG];
@@ -1830,18 +1839,18 @@ static BOOL handle_auth_success(PTInstVar pvar)
  */
 static BOOL handle_server_public_key(PTInstVar pvar)
 {
-	int server_key_public_exponent_len;
-	int server_key_public_modulus_pos;
-	int server_key_public_modulus_len;
-	int host_key_bits_pos;
-	int host_key_public_exponent_len;
-	int host_key_public_modulus_pos;
-	int host_key_public_modulus_len;
-	int protocol_flags_pos;
-	int supported_ciphers;
+	unsigned int server_key_public_exponent_len;
+	unsigned int server_key_public_modulus_pos;
+	unsigned int server_key_public_modulus_len;
+	unsigned int host_key_bits_pos;
+	unsigned int host_key_public_exponent_len;
+	unsigned int host_key_public_modulus_pos;
+	unsigned int host_key_public_modulus_len;
+	unsigned int protocol_flags_pos;
+	unsigned int supported_ciphers;
 	char *inmsg;
 	Key hostkey;
-	int supported_types;
+	unsigned int supported_types;
 	int ret;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH_SMSG_PUBLIC_KEY was received.");
@@ -2202,8 +2211,8 @@ static BOOL handle_data(PTInstVar pvar)
 
 static BOOL handle_channel_open(PTInstVar pvar)
 {
-	int host_len;
-	int originator_len;
+	unsigned int host_len;
+	unsigned int originator_len;
 
 	if ((pvar->ssh_state.
 		 server_protocol_flags & SSH_PROTOFLAG_HOST_IN_FWD_OPEN) != 0) {
@@ -2239,7 +2248,7 @@ static BOOL handle_channel_open(PTInstVar pvar)
 
 static BOOL handle_X11_channel_open(PTInstVar pvar)
 {
-	int originator_len;
+	unsigned int originator_len;
 
 	if ((pvar->ssh_state.server_protocol_flags & SSH_PROTOFLAG_HOST_IN_FWD_OPEN) != 0) {
 		if (grab_payload(pvar, 8)
@@ -2275,7 +2284,7 @@ static BOOL handle_channel_open_failure(PTInstVar pvar)
 
 static BOOL handle_channel_data(PTInstVar pvar)
 {
-	int len;
+	unsigned int len;
 
 	if (grab_payload(pvar, 8)
 	 && grab_payload(pvar, len = get_payload_uint32(pvar, 4))) {
@@ -2701,7 +2710,7 @@ static void enque_simple_auth_handlers(PTInstVar pvar)
 
 static BOOL handle_rsa_challenge(PTInstVar pvar)
 {
-	int challenge_bytes;
+	unsigned int challenge_bytes;
 
 	if (!grab_payload(pvar, 2)) {
 		return FALSE;
@@ -5214,7 +5223,8 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 {
 	char buf[1024];
 	char *data;
-	int len, r;
+	unsigned int len;
+	int r;
 	char msg[1024+512];
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXINIT was received.");
@@ -6978,8 +6988,8 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 
 static void ssh2_prep_userauth(PTInstVar pvar)
 {
-	int type = (1 << SSH_AUTH_PASSWORD) | (1 << SSH_AUTH_RSA) |
-	           (1 << SSH_AUTH_TIS) | (1 << SSH_AUTH_PAGEANT);
+	unsigned int type = (1 << SSH_AUTH_PASSWORD) | (1 << SSH_AUTH_RSA) |
+	                    (1 << SSH_AUTH_TIS) | (1 << SSH_AUTH_PAGEANT);
 
 	// 認証方式の設定
 	AUTH_set_supported_auth_types(pvar, type);
@@ -7609,7 +7619,7 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 	//   partial が TRUE のとき
 	//     "次の認証" のために、このあと表示されるダイアログで利用される
 	if (!pvar->tryed_ssh2_authlist || partial) {
-		int type = 0;
+		unsigned int type = 0;
 
 		pvar->tryed_ssh2_authlist = TRUE;
 		pvar->auth_state.partial_success = partial;

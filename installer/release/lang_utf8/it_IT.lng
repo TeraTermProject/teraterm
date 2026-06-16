@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Italian
-date=2026-05-31 by TeraTerm Project
+date=2026-06-17 by TeraTerm Project
 contributor=R.B. (2026-06-18)
 
 [Tera Term]
@@ -1014,8 +1014,8 @@ MSG_PKT_OVERSIZED_ERROR=Pacchetto sovradimensionato ricevuto dal server; la conn
 
 ; ssh.c
 MSG_SSH_INVALID_COMPDATA_ERROR=Dati compressi non validi nel pacchetto ricevuto
-MSG_SSH_TRUNCATED_PKT_ERROR=Pacchetto ricevuto troncato (%ld > %d) @ grab_payload()
-MSG_SSH_TRUNCATED_PKT_LIM_ERROR=Pacchetto ricevuto troncato (%ld > %d) @ grab_payload_limited()
+MSG_SSH_TRUNCATED_PKT_ERROR=Pacchetto ricevuto troncato (%u > %u) @ grab_payload()
+MSG_SSH_TRUNCATED_PKT_LIM_ERROR=Pacchetto ricevuto troncato (%u > %u) @ grab_payload_limited()
 MSG_SSH_COREINS_ERROR=Rilevato 'attacco inserimento CORE'.  Connessione terminata.
 MSG_SSH_CORRUPTDATA_ERROR=Rilevati dati danneggiati; connessione terminata.
 MSG_SSH_DECOMPRESS_ERROR=Errore interno: un pacchetto non è stato completamente decompresso.\nQuesto è un bug, segnalalo.
