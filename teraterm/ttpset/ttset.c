@@ -1024,12 +1024,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* Default Log file path */
 	free(ts->LogDefaultPathW);
-	hGetPrivateProfileStringW(SectionW, L"LogDefaultPath", ts->LogDirW, FName, &ts->LogDefaultPathW);
-	if (ts->LogDefaultPathW[0] == 0) {
-		// 未指定("LogDefaultPath=")だった、NULLを入れる
-		free(ts->LogDefaultPathW);
-		ts->LogDefaultPathW = NULL;
-	}
+	hGetPrivateProfileStringW(SectionW, L"LogDefaultPath", L"", FName, &ts->LogDefaultPathW);
 
 	/* Auto start logging (2007.5.31 maya) */
 	ts->LogAutoStart = GetOnOff(Section, "LogAutoStart", FName, FALSE);
@@ -1067,10 +1062,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Default directory for file transfer */
 	free(ts->FileDirW);
 	hGetPrivateProfileStringW(SectionW, L"FileDir", L"", FName, &ts->FileDirW);
-	if (ts->FileDirW != NULL && ts->FileDirW[0] == 0) {
-		free(ts->FileDirW);
-		ts->FileDirW = NULL;
-	}
 
 	/* filter on file send (2007.6.5 maya) */
 	GetPrivateProfileString(Section, "FileSendFilter", "",
@@ -1302,11 +1293,6 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Startup macro -- special option */
 	free(ts->MacroFNW);
 	hGetPrivateProfileStringW(SectionW, L"StartupMacro", L"", FName, &ts->MacroFNW);
-	if (ts->MacroFNW != NULL && ts->MacroFNW[0] == L'\0') {
-		// 指定なし
-		free(ts->MacroFNW);
-		ts->MacroFNW = NULL;
-	}
 
 	/* TEK GIN Mouse keycode -- special option */
 	ts->GINMouseCode =
@@ -2583,17 +2569,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 							   ts->LogDefaultNameW, FName);
 
 	/* Default Log file path */
-	TempW = NULL;
-	if (ts->LogDefaultPathW != NULL &&
-		wcscmp(ts->LogDefaultPathW, ts->LogDirW) != 0) {
-		// 設定されている && 異なっているとき、フォルダを指定してる
-		TempW = ts->LogDefaultPathW;
-	}
-	else {
-		// 設定されていない, 削除
-		TempW = NULL;
-	}
-	WritePrivateProfileStringW(SectionW, L"LogDefaultPath", TempW, FName);
+	WritePrivateProfileStringW(SectionW, L"LogDefaultPath", ts->LogDefaultPathW, FName);
 
 	/* Auto start logging (2007.5.31 maya) */
 	WriteOnOff(Section, "LogAutoStart", FName, ts->LogAutoStart);
