@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Turkish
-date=2026-01-12 by TeraTerm Project
+date=2026-06-17 by TeraTerm Project
 contributor= Mehmet Cagri Aksoy (2025-08-04)
 
 [Tera Term]
@@ -1010,8 +1010,8 @@ MSG_PKT_OVERSIZED_ERROR=Sunucudan aşırı büyük paket alındı; bağlantı ka
 
 ; ssh.c
 MSG_SSH_INVALID_COMPDATA_ERROR=Alınan pakette geçersiz sıkıştırılmış veri
-MSG_SSH_TRUNCATED_PKT_ERROR=grab_payload()'da kesilmiş paket (%ld > %d)
-MSG_SSH_TRUNCATED_PKT_LIM_ERROR=grab_payload_limited()'da kesilmiş paket (%ld > %d)
+MSG_SSH_TRUNCATED_PKT_ERROR=grab_payload()'da kesilmiş paket (%u > %u)
+MSG_SSH_TRUNCATED_PKT_LIM_ERROR=grab_payload_limited()'da kesilmiş paket (%u > %u)
 MSG_SSH_COREINS_ERROR='CORE ekleme saldırısı' tespit edildi. Bağlantı durduruluyor.
 MSG_SSH_CORRUPTDATA_ERROR=Bozuk veri tespit edildi; bağlantı sonlandırılıyor.
 MSG_SSH_DECOMPRESS_ERROR=İç hata: bir paket tam olarak açılamadı.\nBu bir hatadır, lütfen rapor edin.
