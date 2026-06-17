@@ -371,7 +371,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				SetDropDownList(Dialog, IDC_SERIALBAUD, BaudList, 0);
 				i = sel = 0;
 				while (BaudList[i] != NULL) {
-					if ((WORD)atoi(BaudList[i]) == ts->Baud) {
+					if ((DWORD)atoi(BaudList[i]) == ts->Baud) {
 						SendDlgItemMessage(Dialog, IDC_SERIALBAUD, CB_SETCURSEL, i, 0);
 						sel = 1;
 						break;
