@@ -35,6 +35,19 @@ int gettimeofday(struct timeval *tv /*, struct timezone *tz*/ ) {
 	return 0;
 }
 
+struct timeval tvadd(struct timeval a, struct timeval b) {
+	struct timeval add;
+
+	add.tv_sec = b.tv_sec + a.tv_sec;
+	add.tv_usec = b.tv_usec + a.tv_usec;
+	if (add.tv_usec >= 1000000) {
+		add.tv_usec -= 1000000;
+		add.tv_sec++;
+	}
+
+	return add;
+}
+
 struct timeval tvdiff(struct timeval a, struct timeval b) {
 	struct timeval diff;
 

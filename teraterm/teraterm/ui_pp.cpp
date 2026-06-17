@@ -352,7 +352,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			UIPPData *data = (UIPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
 			switch (wp) {
 				case IDC_GENUILANG | (CBN_SELCHANGE << 16): {
-					size_t ui_sel = (size_t)SendDlgItemMessageA(hWnd, IDC_GENUILANG, CB_GETCURSEL, 0, 0);
+					LRESULT ui_sel = SendDlgItemMessageA(hWnd, IDC_GENUILANG, CB_GETCURSEL, 0, 0);
 					wchar_t *info_text = LangInfoText(data->lng_infos + ui_sel);
 					TipWin2SetTextW(data->tipwin2, IDC_GENUILANG, info_text);
 					free(info_text);
