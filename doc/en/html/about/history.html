@@ -42,6 +42,15 @@
       <li>
         Improved communication speed by revising the internal processing for data reception and COM port transmission.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1299" target="_blank">issue #1299</a>)
+        Disallowed loading plugins from outside the folder containing ttermpro.exe
+        when a plugin filename is specified directly in the Plugin section of TERATERM.INI.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1286" target="_blank">issue #1286</a>)<br>
+      </li>
+      <li>
+        Plugin filenames are handled as normal filename(long filename, LFN).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1286" target="_blank">issue #1286</a>)<br>
+        Previously, since short filename,SFN (DOS filename, 8.3 format) is used,
+        "ttxtest.dll-" was treated as "TTXTEST.DLL" and loaded.
       </li>
     </ul>
   </li-->
@@ -57,6 +66,11 @@
         Fixed an issue where ttermpro.exe crashes when "pipe_name" or "server\pipe_name" is specified with the /PIPE command line option.
         This bug was introduced in 5.0.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1318" target="_blank">issue #1318</a>)
+      </li>
+      <li>
+        Fixed an issue where file reception via zmodem failed during high-speed serial communication using USB CDC-ACM.
+        This bug was introduced in 5.5.1.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1299" target="_blank">issue #1299</a>)
       </li>
     </ul>
   </li>
