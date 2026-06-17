@@ -153,7 +153,7 @@ typedef TFileVarProto *PFileVarProto;
 // UIなど情報表示用関数
 typedef struct InfoOp_ {
 	void (*InitDlgProgress)(struct FileVarProto *fv, int *CurProgStat);
-	void (*SetDlgTime)(struct FileVarProto *fv, DWORD elapsed, int bytes);
+	void (*SetDlgTime)(struct FileVarProto *fv, ULONGLONG elapsed, int bytes);
 	void (*SetDlgPacketNum)(struct FileVarProto *fv, LONG Num);
 	void (*SetDlgByteCount)(struct FileVarProto *fv, LONG Num);
 	void (*SetDlgPercent)(struct FileVarProto *fv, LONG a, LONG b, int *p);

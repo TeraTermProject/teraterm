@@ -38,7 +38,7 @@ typedef struct {
 	const char *FullName;	// Windows上のファイル名 UTF-8
 	BOOL FileOpen;
 	LONG ByteCount;
-	DWORD StartTime;
+	ULONGLONG StartTime;
 	PComVar cv;
 	enum {
 		STATE_FLUSH,		// 処理開始時に受信データを捨てる
@@ -148,12 +148,12 @@ static BOOL RawReadPacket(void *arg)
 	PComVar cv = rv->cv;
 	BYTE Buff[InBuffSize];
 	int BuffCount;
-	static DWORD prev_elapsed;
-	DWORD elapsed;
+	static ULONGLONG prev_elapsed;
+	ULONGLONG elapsed;
 
 	if (cv->InBuffCount > 0) {
 		if (rv->StartTime == 0) {
-			rv->StartTime = GetTickCount();
+			rv->StartTime = GetTickCount64();
 			prev_elapsed = rv->StartTime;
 			fv->InfoOp->SetDlgPacketNum(fv, 1);
 		}
@@ -166,7 +166,7 @@ static BOOL RawReadPacket(void *arg)
 		LeaveCriticalSection(&cv->InBuff_lock);
 		file->WriteFile(file, Buff, BuffCount);
 		rv->ByteCount += BuffCount;
-		elapsed = (GetTickCount() - prev_elapsed) / 250;
+		elapsed = (GetTickCount64() - prev_elapsed) / 250;
 		if (elapsed != prev_elapsed) {
 			prev_elapsed = elapsed;
 			fv->InfoOp->SetDlgByteCount(fv, rv->ByteCount);

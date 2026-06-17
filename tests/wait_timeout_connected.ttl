@@ -1,0 +1,43 @@
+; wait コマンドのタイムアウトテスト（接続必要）
+;
+; GetTickCount64() への置き換え後、wait コマンドのタイムアウトが
+; 正常動作することを確認する。
+; OS 起動から 49.7 日以上経過した環境でも正しく動作することを想定。
+;
+; 使い方: SSH/Telnet 等でホストに接続した状態で実行する。
+
+timeout = 3
+
+uptime tick_start
+
+; 出現しない文字列を wait で待ち、3 秒でタイムアウトさせる
+wait 'XXXXXXXXXX_NEVER_APPEAR_XXXXXXXXXX'
+
+uptime tick_end
+
+; タイムアウトで抜けたことを確認 (result == 1)
+if result <> 1 then
+    messagebox 'NG: wait がタイムアウトしなかった' 'wait timeout test'
+    end
+endif
+
+; 経過時間を計算（ミリ秒）
+elapsed = tick_end - tick_start
+
+; 3000ms ±500ms 以内であることを確認
+if elapsed < 2500 then
+    sprintf2 msg 'NG: タイムアウトが早すぎる (%d ms)' elapsed
+    messagebox msg 'wait timeout test'
+    end
+endif
+
+if elapsed > 3500 then
+    sprintf2 msg 'NG: タイムアウトが遅すぎる (%d ms)' elapsed
+    messagebox msg 'wait timeout test'
+    end
+endif
+
+sprintf2 msg 'OK: wait が正常にタイムアウトした (%d ms)' elapsed
+messagebox msg 'wait timeout test'
+
+end

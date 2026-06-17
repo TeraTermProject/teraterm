@@ -90,7 +90,7 @@ void Encrypt(const char *InStr, PCHAR OutStr)
 	if (InStr[0]==0) {
 		return;
 	}
-	srand(LOWORD(GetTickCount()));
+	srand((unsigned)GetTickCount64());
 	r = (BYTE)(rand() & 0x3f);
 	r2 = (~r) & 0x3f;
 	OutStr[0] = r;

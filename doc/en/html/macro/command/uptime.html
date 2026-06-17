@@ -17,11 +17,21 @@
 Gets System Up Time. <em>(version 4.81 or later)</em>
 </p>
 
+<h2>1) Format 1</h2>
+
 <pre class="macro-syntax">
 uptime &lt;intvar&gt;
 </pre>
 
+<h2>2) Format 2</h2>
+
+<pre class="macro-syntax">
+uptime &lt;secvar&gt; &lt;msecvar&gt;
+</pre>
+
 <h2>Remarks</h2>
+
+<h3>Format 1</h3>
 
 <p>
 Retrieves the number of milliseconds that have elapsed since the Windows OS was started,
@@ -32,11 +42,29 @@ and then stores the value into the &lt;intvar&gt; variable.
 The time wraps around to zero if the system is run continuously for 49.7 days.
 </p>
 
+<h3>Format 2</h3>
+
+<p>
+Retrieves the number of milliseconds that have elapsed since the Windows OS was started
+using <code>GetTickCount64()</code>, and then stores the following values:
+</p>
+
+<dl>
+<dt>&lt;secvar&gt;</dt>
+<dd>Windows OS uptime in seconds (<code>GetTickCount64() / 1000</code>)</dd>
+<dt>&lt;msecvar&gt;</dt>
+<dd>Sub-second portion of the uptime in milliseconds (<code>GetTickCount64() % 1000</code>)</dd>
+</dl>
+
+<p>
+Both &lt;secvar&gt; and &lt;msecvar&gt; must be integer variables.
+</p>
+
 
 <h2>Example</h2>
 
 <pre class="macro-example">
-; How to get the uptime in Windows
+; Format 1: How to get the uptime in Windows
 uptime var
 day = var / 86400000
 var = var % 86400000
@@ -59,6 +87,13 @@ uptime varend
 diff = varend - varstart
 sprintf2 str "MACRO running time: %d msec" diff
 messagebox str "running time"
+</pre>
+
+<pre class="macro-example">
+; Format 2: Get uptime as seconds and milliseconds
+uptime sec msec
+sprintf2 str "System Up Time: %d.%03d seconds" sec msec
+messagebox str "uptime"
 </pre>
 
 </body>

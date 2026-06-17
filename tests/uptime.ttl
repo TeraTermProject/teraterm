@@ -1,0 +1,31 @@
+; uptime コマンドのテスト（接続不要）
+;
+; 使い方: Tera Term マクロとして単体で実行する（接続不要）
+
+uptime var
+uptime secvar msecvar
+
+day = var / 86400000
+var = var % 86400000
+hour = var / 3600000
+var = var % 3600000
+min = var / 60000
+var = var % 60000
+sec = var / 1000
+
+sprintf2 str "System Up Time: %d Days, %d Hours, %d Minutes, %d Seconds" day hour min sec
+messagebox str "uptime"
+
+
+day = secvar / 86400
+var = secvar % 86400
+hour = var / 3600
+var = var % 3600
+min = var / 60
+sec = var % 60
+
+
+sprintf2 str "System Up Time: %d Days, %d Hours, %d Minutes, %d Seconds" day hour min sec
+messagebox str "uptime"
+
+end

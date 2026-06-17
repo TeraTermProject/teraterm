@@ -69,7 +69,7 @@ typedef struct {
 	LONG FileSize;		// ? 使っていない
 	LONG ByteCount;		// ファイルサイズ
 
-	DWORD StartTime;
+	ULONGLONG StartTime;
 
 	enum enumLineEnd eLineEnd;
 
@@ -406,7 +406,7 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 	}
 
 	fv->IsPause = FALSE;
-	fv->StartTime = GetTickCount();
+	fv->StartTime = GetTickCount64();
 
 	if (ts.DeferredLogWriteMode) {
 		StartThread(fv);

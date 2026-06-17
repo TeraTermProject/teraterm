@@ -153,13 +153,14 @@ void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int 
 	}
 }
 
-void SetDlgTime(HWND HDlg, int id_Item, DWORD stime, int bytes)
+void SetDlgTime(HWND HDlg, int id_Item, ULONGLONG stime, int bytes)
 {
-	static int prev_elapsed;
-	int elapsed, rate;
+	static ULONGLONG prev_elapsed;
+	ULONGLONG elapsed;
+	int rate;
 	wchar_t buff[64];
 
-	elapsed = (GetTickCount() - stime) / 1000;
+	elapsed = (GetTickCount64() - stime) / 1000;
 
 	if (elapsed == 0) {
 		prev_elapsed = 0;
@@ -172,15 +173,15 @@ void SetDlgTime(HWND HDlg, int id_Item, DWORD stime, int bytes)
 	}
 	prev_elapsed = elapsed;
 
-	rate = bytes / elapsed;
+	rate = (int)(bytes / elapsed);
 	if (rate < 1200) {
-		_snwprintf_s(buff, _countof(buff), _TRUNCATE, L"%d:%02d (%dBytes/s)", elapsed / 60, elapsed % 60, rate);
+		_snwprintf_s(buff, _countof(buff), _TRUNCATE, L"%llu:%02llu (%dBytes/s)", elapsed / 60, elapsed % 60, rate);
 	}
 	else if (rate < 1200000) {
-		_snwprintf_s(buff, _countof(buff), _TRUNCATE, L"%d:%02d (%d.%02dKB/s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100);
+		_snwprintf_s(buff, _countof(buff), _TRUNCATE, L"%llu:%02llu (%d.%02dKB/s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100);
 	}
 	else {
-		_snwprintf_s(buff, _countof(buff), _TRUNCATE, L"%d:%02d (%d.%02dMB/s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100);
+		_snwprintf_s(buff, _countof(buff), _TRUNCATE, L"%llu:%02llu (%d.%02dMB/s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100);
 	}
 
 	SetDlgItemTextW(HDlg, id_Item, buff);

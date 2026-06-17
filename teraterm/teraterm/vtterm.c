@@ -196,8 +196,8 @@ static int FilterTop, FilterBottom, FilterLeft, FilterRight;
 static BOOL SavedIMEstatus;
 
 /* Beep over-used */
-static DWORD BeepStartTime = 0;
-static DWORD BeepSuppressTime = 0;
+static ULONGLONG BeepStartTime = 0;
+static ULONGLONG BeepSuppressTime = 0;
 static DWORD BeepOverUsedCount = 0;
 
 static _locale_t CLocale = NULL;
@@ -345,7 +345,7 @@ void ResetTerminal() /*reset variables but don't update screen */
 	LastPutCharacter = 0;
 
 	// Beep over-used
-	BeepStartTime = GetTickCount();
+	BeepStartTime = GetTickCount64();
 	BeepSuppressTime = BeepStartTime - ts.BeepSuppressTime * 1000;
 	BeepStartTime -= (ts.BeepOverUsedTime * 1000);
 	BeepOverUsedCount = ts.BeepOverUsedCount;
@@ -5398,8 +5398,8 @@ int VTParse()
 	while ((c>0) && (ChangeEmu==0)) {
 #if defined(DEBUG_DUMP_INPUTCODE)
 		{
-			static DWORD prev_tick;
-			DWORD now = GetTickCount();
+			static ULONGLONG prev_tick;
+			ULONGLONG now = GetTickCount64();
 			if (prev_tick == 0) prev_tick = now;
 			if (now - prev_tick > 1*1000) {
 				printf("\n");
@@ -5777,9 +5777,9 @@ static void VisualBell(void)
 
 static void RingBell(int type)
 {
-	DWORD now;
+	ULONGLONG now;
 
-	now = GetTickCount();
+	now = GetTickCount64();
 	if (now - BeepSuppressTime < ts.BeepSuppressTime * 1000) {
 		BeepSuppressTime = now;
 	}

@@ -137,7 +137,7 @@ DllExport BOOL HasMultiMonitorSupport();
 DllExport BOOL HasDnsQuery();
 DllExport BOOL HasBalloonTipSupport();
 DllExport char *mctimelocal(const char *format, BOOL utc_flag);
-char *strelapsed(DWORD start_time);
+char *strelapsed(ULONGLONG start_time);
 
 void b64encode(PCHAR dst, int dsize, PCHAR src, int len);
 DllExport int b64decode(PCHAR dst, int dsize, PCHAR src);

@@ -72,7 +72,7 @@ typedef struct {
 
 	int ProgStat;
 
-	DWORD StartTime;
+	ULONGLONG StartTime;
 
 	DWORD FileMtime;
 
@@ -341,7 +341,7 @@ static void initialize_file_info(PYVar yv)
 	} else {
 		yv->ProgStat = -1;
 	}
-	yv->StartTime = GetTickCount();
+	yv->StartTime = GetTickCount64();
 	fv->InfoOp->SetDlgProtoFileName(fv, yv->FullName);
 
 	yv->PktNumOffset = 0;
@@ -501,7 +501,7 @@ static BOOL FTCreateFile(PYVar yv)
 	if (yv->ProgStat != -1) {
 		yv->ProgStat = 0;
 	}
-	yv->StartTime = GetTickCount();
+	yv->StartTime = GetTickCount64();
 
 	return TRUE;
 }

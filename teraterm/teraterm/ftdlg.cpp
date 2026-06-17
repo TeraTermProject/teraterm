@@ -151,13 +151,13 @@ void CFileTransDlg::ChangeButton(BOOL PauseFlag)
 	}
 }
 
-void CFileTransDlg::RefreshNum(DWORD StartTime, LONG FileSize, LONG ByteCount)
+void CFileTransDlg::RefreshNum(ULONGLONG StartTime, LONG FileSize, LONG ByteCount)
 {
 	char NumStr[24];
 	double rate;
 	int rate2;
-	static DWORD prev_elapsed;
-	DWORD elapsed;
+	static ULONGLONG prev_elapsed;
+	ULONGLONG elapsed;
 
 	if (OpId == OpSendFile) {
 		if (StartTime == 0) {
@@ -165,17 +165,17 @@ void CFileTransDlg::RefreshNum(DWORD StartTime, LONG FileSize, LONG ByteCount)
 			prev_elapsed = 0;
 		}
 		else {
-			elapsed = (GetTickCount() - StartTime) / 1000;
+			elapsed = (GetTickCount64() - StartTime) / 1000;
 			if (elapsed != prev_elapsed && elapsed != 0) {
-				rate2 = ByteCount / elapsed;
+				rate2 = (int)(ByteCount / elapsed);
 				if (rate2 < 1200) {
-					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%d:%02d (%dBytes/s)", elapsed / 60, elapsed % 60, rate2);
+					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%llu:%02llu (%dBytes/s)", elapsed / 60, elapsed % 60, rate2);
 				}
 				else if (rate2 < 1200000) {
-					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%d:%02d (%d.%02dKB/s)", elapsed / 60, elapsed % 60, rate2 / 1000, rate2 / 10 % 100);
+					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%llu:%02llu (%d.%02dKB/s)", elapsed / 60, elapsed % 60, rate2 / 1000, rate2 / 10 % 100);
 				}
 				else {
-					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%d:%02d (%d.%02dMB/s)", elapsed / 60, elapsed % 60, rate2 / (1000*1000), rate2 / 10000 % 100);
+					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%llu:%02llu (%d.%02dMB/s)", elapsed / 60, elapsed % 60, rate2 / (1000*1000), rate2 / 10000 % 100);
 				}
 				SetDlgItemText(IDC_TRANS_ETIME, NumStr);
 				prev_elapsed = elapsed;

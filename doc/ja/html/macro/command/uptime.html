@@ -17,11 +17,21 @@
 OSの稼働時間を取得する。<em>(バージョン4.81以降)</em>
 </p>
 
+<h2>1) 形式1</h2>
+
 <pre class="macro-syntax">
 uptime &lt;intvar&gt;
 </pre>
 
-<h2>解説</h2>
+<h2>2) 形式2</h2>
+
+<pre class="macro-syntax">
+uptime &lt;secvar&gt; &lt;msecvar&gt;
+</pre>
+
+<h2>説明</h2>
+
+<h3>形式1</h3>
 
 <p>
 Windows OSの稼働時間（ミリ秒）を &lt;intvar&gt; に格納する。
@@ -31,11 +41,28 @@ Windows OSの稼働時間（ミリ秒）を &lt;intvar&gt; に格納する。
 ※稼働時間が49日を経過すると、0に戻る。
 </p>
 
+<h3>形式2</h3>
+
+<p>
+<code>GetTickCount64()</code> を使ってWindows OSの稼働時間を取得し、下記の値を格納する。
+</p>
+
+<dl>
+<dt>&lt;secvar&gt;</dt>
+<dd>Windows OSの稼働時間（秒単位）(<code>GetTickCount64() / 1000</code>)</dd>
+<dt>&lt;msecvar&gt;</dt>
+<dd>稼働時間の1秒未満の部分（ミリ秒単位）(<code>GetTickCount64() % 1000</code>)</dd>
+</dl>
+
+<p>
+&lt;secvar&gt; と &lt;msecvar&gt; はともに整数型変数でなければならない。
+</p>
+
 
 <h2>例</h2>
 
 <pre class="macro-example">
-; How to get the uptime in Windows
+; 形式1: Windowsの稼働時間を取得する例
 uptime var
 day = var / 86400000
 var = var % 86400000
@@ -58,6 +85,13 @@ uptime varend
 diff = varend - varstart
 sprintf2 str "MACRO running time: %d msec" diff
 messagebox str "running time"
+</pre>
+
+<pre class="macro-example">
+; 形式2: 稼働時間を秒とミリ秒で取得する例
+uptime sec msec
+sprintf2 str "System Up Time: %d.%03d seconds" sec msec
+messagebox str "uptime"
 </pre>
 
 </body>

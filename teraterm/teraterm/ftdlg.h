@@ -57,7 +57,7 @@ public:
 
 	BOOL Create(HINSTANCE hInstance, Info *info);
 	void ChangeButton(BOOL PauseFlag);
-	void RefreshNum(DWORD StartTime, LONG FileSize, LONG ByteCount);
+	void RefreshNum(ULONGLONG StartTime, LONG FileSize, LONG ByteCount);
 
 private:
 	virtual BOOL OnCancel();
