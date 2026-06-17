@@ -12,6 +12,7 @@ add_executable(
   ttpmenu.cpp
   ttpmenu.h
   winmisc.cpp
+  winmisc.h
   #
   left.ico
   right.ico
@@ -39,8 +40,14 @@ target_sources(
   ../teraterm/common/ttlib.h
   ../teraterm/common/i18n.h
   ../teraterm/common/codeconv.h
-  ../teraterm/common/compat_win.h
-  ../teraterm/common/dllutil.h
+  ../teraterm/common/asprintf.h
+  ../teraterm/common/dlglib.h
+  ../teraterm/common/fileread.h
+  ../teraterm/common/ttcommdlg.h
+  ../teraterm/common/ttdebug.h
+  ../teraterm/common/ttdup.h
+  ../teraterm/common/win32helper.h
+  ../teraterm/common/tt-version.h
 )
 
 source_group(
@@ -107,12 +114,11 @@ target_link_libraries(
   PRIVATE
   common_static
   comctl32
-  user32
-  gdi32
-  comdlg32
   ${LIBRESSL_LIB}
   bcrypt
   ws2_32
+  Crypt32
+  wtsapi32
   )
 
 install(

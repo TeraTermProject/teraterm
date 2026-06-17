@@ -1,6 +1,6 @@
 ﻿[Info]
 language=English
-date=2026-03-19 by TeraTerm Project
+date=2026-05-31 by TeraTerm Project
 contributor=-
 
 [Tera Term]
@@ -1179,6 +1179,8 @@ MENU_ICON=showing large icon
 MENU_FONT=specifying font
 MENU_LEFTPOPUP=showing list by left-click
 MENU_HOTKEY=showing list hotkey(Ctl+Alt+M)
+MENU_LB_CLEAR_SESSIONLOCK=Clear LockBox Password on Session Lock
+MENU_LB_CLEAR_SUSPEND=Clear LockBox Password on Hibernate (+legacy S3 Sleep)
 MENU_VERSION=Version
 MENU_EXEC=Execute
 MENU_CLOSE=Quit

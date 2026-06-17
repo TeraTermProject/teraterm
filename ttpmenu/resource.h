@@ -76,6 +76,8 @@
 #define ID_FONT                         40040
 #define ID_LEFTPOPUP                    40041
 #define ID_HOTKEY                       40042
+#define ID_LB_CLEAR_SESSIONLOCK         40043
+#define ID_LB_CLEAR_SUSPEND             40044
 
 // Next default values for new objects
 // 
@@ -84,7 +86,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        116
-#define _APS_NEXT_COMMAND_VALUE         40043
+#define _APS_NEXT_COMMAND_VALUE         40045
 #define _APS_NEXT_CONTROL_VALUE         1061
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

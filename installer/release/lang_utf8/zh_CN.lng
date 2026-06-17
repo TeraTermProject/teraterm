@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Simplified Chinese
-date=2026-03-19 by TeraTerm Project
+date=2026-05-31 by TeraTerm Project
 contributor=LiShaohui (2017-04-11); tuwulin365@126.com(2025-12-18)
 
 [Tera Term]
@@ -1179,6 +1179,8 @@ MENU_ICON=显示大图标
 MENU_FONT=字体设置
 MENU_LEFTPOPUP=左击显示列表
 MENU_HOTKEY=显示快捷键(Ctl+Alt+M)
+MENU_LB_CLEAR_SESSIONLOCK=会话锁定阶段清除 LockBox 密码
+MENU_LB_CLEAR_SUSPEND=休眠阶段清除 LockBox 密码（+ 传统 S3 睡眠机制）
 MENU_VERSION=版本信息
 MENU_EXEC=运行
 MENU_CLOSE=退出
