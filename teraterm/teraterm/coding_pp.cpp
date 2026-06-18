@@ -113,16 +113,16 @@ static void ArrenageItemsUnicode(HWND hWnd, const CodingPPData *data, bool is_un
 static void ArrenageItems(HWND hWnd, const CodingPPData *data)
 {
 	static const int JJISReceiveItems[] = {
-		IDC_TERMKINTEXT,
-		IDC_TERMKIN,
-		IDC_TERMKOUTTEXT,
-		IDC_TERMKOUT,
-		IDC_TERMKANA,
 		IDC_JIS_RECEIVE_TITLE,
+		IDC_TERMKANA,
 	};
 	static const int JJISSendItems[] = {
 		IDC_JIS_TRANSMIT_TITLE,
 		IDC_TERMKANASEND,
+		IDC_TERMKINTEXT,
+		IDC_TERMKIN,
+		IDC_TERMKOUTTEXT,
+		IDC_TERMKOUT,
 	};
 
 	// 受信コード
