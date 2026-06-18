@@ -113,6 +113,7 @@ typedef struct {
 	BOOL FileOpen;
 	LONG FileSize;
 	LONG ByteCount;
+ 	DWORD PrevElapsed;
 
 	int ProgStat;
 
@@ -186,6 +187,22 @@ typedef TZVar *PZVar;
 
 #define ZCBIN	1
 #define ZCNL	2
+
+static void update_dialog(PZVar zv, BOOL use_tick)
+{
+	PFileVarProto fv = zv->fv;
+ 	DWORD elapsed;
+
+	elapsed = (GetTickCount() - zv->StartTime) / 100; // 更新頻度は10回/秒
+	if (elapsed != zv->PrevElapsed || !use_tick) {
+		zv->PrevElapsed = elapsed;
+		fv->InfoOp->SetDlgByteCount(fv, zv->ByteCount);
+		fv->InfoOp->SetDlgTime(fv, zv->StartTime, zv->ByteCount);
+		if (zv->FileSize > 0) {
+			fv->InfoOp->SetDlgPercent(fv, zv->ByteCount, zv->FileSize, &zv->ProgStat);
+		}
+	}
+}
 
 static void add_recvbuf(PZVar zv, char *fmt, ...)
 {
@@ -641,9 +658,7 @@ static void ZSendFileDat(PZVar zv)
 	zv->ByteCount = 0;
 	zv->ProgStat = 0;
 	zv->StartTime = GetTickCount();
-	fv->InfoOp->SetDlgByteCount(fv, zv->ByteCount);
-	fv->InfoOp->SetDlgPercent(fv, zv->ByteCount, zv->FileSize, &zv->ProgStat);
-	fv->InfoOp->SetDlgTime(fv, zv->StartTime, zv->ByteCount);
+	update_dialog(zv, FALSE);
 
 	add_sendbuf(zv, "%s: ZFILE: ZF0=%x ZF1=%x ZF2=%x file=%s size=%lu",
 		__FUNCTION__,
@@ -688,9 +703,7 @@ static void ZSendDataDat(PZVar zv)
 		}
 	} while ((c != 0) && (zv->PktOutCount <= zv->MaxDataLen - 2));
 
-	fv->InfoOp->SetDlgByteCount(fv, zv->ByteCount);
-	fv->InfoOp->SetDlgPercent(fv, zv->ByteCount, zv->FileSize, &zv->ProgStat);
-	fv->InfoOp->SetDlgTime(fv, zv->StartTime, zv->ByteCount);
+	update_dialog(zv, TRUE);
 	zv->Pos = zv->ByteCount;
 
 	zv->PktOut[zv->PktOutCount] = ZDLE;
@@ -747,6 +760,7 @@ static BOOL ZInit(TProto *pv, PComVar cv, PTTSet ts)
 
 	fv->InfoOp->InitDlgProgress(fv, &zv->ProgStat);
 	zv->StartTime = GetTickCount();
+	zv->PrevElapsed = 0;
 
 	zv->FileSize = 0;
 	zv->FileMtime = 0;
@@ -825,6 +839,8 @@ static BOOL ZInit(TProto *pv, PComVar cv, PTTSet ts)
 static void ZTimeOutProc(TProto *pv)
 {
 	PZVar zv = pv->PrivateData;
+
+	update_dialog(zv, FALSE);
 	switch (zv->ZState) {
 	case Z_RecvInit:
 		ZSendRInit(zv);
@@ -1165,11 +1181,7 @@ static BOOL ZParseFile(PZVar zv)
 	ZStoHdr(zv, 0);
 	zv->ZState = Z_RecvData;
 
-	fv->InfoOp->SetDlgByteCount(fv, 0);
-	if (zv->FileSize > 0)
-		fv->InfoOp->SetDlgPercent(fv,
-					  0, zv->FileSize, &zv->ProgStat);
-	fv->InfoOp->SetDlgTime(fv, GetTickCount(), zv->ByteCount);
+	update_dialog(zv, FALSE);
 
 	/* set timeout for data */
 	fv->FTSetTimeOut(fv, zv->TimeOut);
@@ -1204,10 +1216,7 @@ static BOOL ZWriteData(PZVar zv)
 	zv->ByteCount = zv->ByteCount + zv->PktInPtr;
 	zv->Pos = zv->Pos + zv->PktInPtr;
 	ZStoHdr(zv, zv->Pos);
-	fv->InfoOp->SetDlgByteCount(fv, zv->ByteCount);
-	if (zv->FileSize > 0)
-		fv->InfoOp->SetDlgPercent(fv, zv->ByteCount, zv->FileSize, &zv->ProgStat);
-	fv->InfoOp->SetDlgTime(fv, zv->StartTime, zv->ByteCount);
+	update_dialog(zv, TRUE);
 
 	/* set timeout for data */
 	fv->FTSetTimeOut(fv, zv->TimeOut);
@@ -1309,8 +1318,10 @@ static BOOL ZParse(TProto *pv)
 			}
 			if (zv->PktOutCount <= 0)
 				zv->Sending = FALSE;
-			if ((zv->ZMode == IdZReceive) && (zv->PktOutCount > 0))
+			if ((zv->ZMode == IdZReceive) && (zv->PktOutCount > 0)) {
+				update_dialog(zv, TRUE);
 				return TRUE;
+			}
 		}
 
 		c = ZRead1Byte(zv, &b);
@@ -1320,6 +1331,7 @@ static BOOL ZParse(TProto *pv)
 					zv->CanCount--;
 				if (zv->CanCount <= 0) {
 					zv->ZState = Z_End;
+					update_dialog(zv, FALSE);
 					return FALSE;
 				}
 			} else
@@ -1328,6 +1340,7 @@ static BOOL ZParse(TProto *pv)
 					zv->CanCount--;
 					if (zv->CanCount <= 0) {
 						zv->ZState = Z_End;
+						update_dialog(zv, FALSE);
 						return FALSE;
 					}
 					break;
@@ -1414,6 +1427,7 @@ static BOOL ZParse(TProto *pv)
 					b = b - 0x57;
 				else {
 					zv->ZPktState = Z_PktGetPAD;
+					update_dialog(zv, TRUE);
 					return TRUE;
 				}
 
@@ -1533,12 +1547,17 @@ static BOOL ZParse(TProto *pv)
 				break;
 			}
 
-		if (zv->Sending && (zv->PktOutCount > 0))
+		if (zv->Sending && (zv->PktOutCount > 0)) {
+			update_dialog(zv, TRUE);
 			return TRUE;
+		}
 	} while (zv->Sending);
 
-	if (zv->ZState == Z_End)
+	if (zv->ZState == Z_End) {
+		update_dialog(zv, FALSE);
 		return FALSE;
+	}
+
 	return TRUE;
 }
 
