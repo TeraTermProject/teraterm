@@ -63,9 +63,7 @@ release.bat を直接起動したり、コマンドプロンプトから release
   - インストーラー、zipを作成します。
 
 - teraterm.iss
-- teraterm_cmake.iss
   - インストーラー(Inno Setup)スクリプトファイル。
-  - teraterm_cmake.iss は cmakeビルド時に使用します。
 
 - iscc_signed.cmake
   - msbuild.yml から呼び出され、署名済みバイナリを含んだインストーラを作成します
