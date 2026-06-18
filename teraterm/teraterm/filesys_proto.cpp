@@ -221,10 +221,8 @@ static int BinaryOut(struct Comm_ *comm, const CHAR *buf, size_t len)
 static void FlashReceiveBuf(struct Comm_ *comm)
 {
 	PComVar pcv = (PComVar)comm->private_data;
-	EnterCriticalSection(&pcv->InBuff_lock);
 	pcv->InBuffCount = 0;
 	pcv->InPtr = 0;
-	LeaveCriticalSection(&pcv->InBuff_lock);
 }
 
 static const CommOp CommOpList =  {
@@ -807,11 +805,7 @@ int ProtoDlgParse(void)
 	if (PtDlg==NULL)
 		return P;
 
-	if (cv.PortType == IdSerial) {
-		// シリアル接続では、別スレッド CommThread() で読み出しを行っているため、CommReceive()の呼び出しは不要
-	} else {
-		CommReceive(&cv); //ダイアログ表示中に受信したデータを処理できるように読み取りを行わせる
-	}
+	CommReceive(&cv); //ダイアログ表示中に受信したデータを処理できるように読み取りを行わせる
 
 	PFileVarProto fv = FileVar;
 	if (fv->Proto->Op->Parse(fv->Proto))

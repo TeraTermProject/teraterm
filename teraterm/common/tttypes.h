@@ -776,7 +776,7 @@ typedef struct tttset TTTSet, *PTTSet;
 #define PM   0x9E
 #define APC  0x9F
 
-#define InBuffSize  (1024*16)
+#define InBuffSize  (1024*64)
 #define OutBuffSize (1024*16)
 
 typedef struct {
@@ -873,8 +873,6 @@ typedef struct {
 
 	void *StateSend;
 	void *StateEcho;
-
-	CRITICAL_SECTION InBuff_lock;
 } TComVar;
 typedef TComVar *PComVar;
 

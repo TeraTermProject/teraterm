@@ -501,7 +501,6 @@ int WINAPI CommReadRawByte(PComVar cv, LPBYTE b)
 		return 0;
 	}
 
-	EnterCriticalSection(&cv->InBuff_lock);
 	if ( cv->InBuffCount>0 ) {
 		*b = cv->InBuff[cv->InPtr];
 		cv->InPtr++;
@@ -509,12 +508,10 @@ int WINAPI CommReadRawByte(PComVar cv, LPBYTE b)
 		if ( cv->InBuffCount==0 ) {
 			cv->InPtr = 0;
 		}
-		LeaveCriticalSection(&cv->InBuff_lock);
 		return 1;
 	}
 	else {
 		cv->InPtr = 0;
-		LeaveCriticalSection(&cv->InBuff_lock);
 		return 0;
 	}
 }
@@ -538,7 +535,6 @@ void WINAPI CommInsert1Byte(PComVar cv, BYTE b)
 		return;
 	}
 
-	EnterCriticalSection(&cv->InBuff_lock);
 	if (cv->InPtr == 0) {
 		memmove(&(cv->InBuff[1]),&(cv->InBuff[0]),cv->InBuffCount);
 	}
@@ -549,7 +545,6 @@ void WINAPI CommInsert1Byte(PComVar cv, BYTE b)
 	cv->InBuffCount++;
 
 	LogBinSkip(cv, 1);
-	LeaveCriticalSection(&cv->InBuff_lock);
 }
 
 static void Log1Bin(PComVar cv, BYTE b)
@@ -728,22 +723,17 @@ static BOOL WriteOutBuff(PComVar cv, const char *TempStr, int TempLen)
  */
 static BOOL WriteInBuff(PComVar cv, const char *TempStr, int TempLen)
 {
-	BOOL Full;
-
 	if (TempLen == 0) {
 		return TRUE;
 	}
 
-	EnterCriticalSection(&cv->InBuff_lock);
-	Full = InBuffSize-cv->InBuffCount-TempLen < 0;
-	if (! Full) {
-		memcpy(&(cv->InBuff[cv->InBuffCount]),TempStr,TempLen);
-		cv->InBuffCount = cv->InBuffCount + TempLen;
-		LeaveCriticalSection(&cv->InBuff_lock);
-		return TRUE;
+    if (InBuffSize - cv->InPtr - cv->InBuffCount < TempLen) {
+        return FALSE;
 	}
-	LeaveCriticalSection(&cv->InBuff_lock);
-	return FALSE;
+
+	memcpy(&(cv->InBuff[cv->InPtr + cv->InBuffCount]), TempStr, TempLen);
+	cv->InBuffCount += TempLen;
+	return TRUE;
 }
 
 /**
@@ -751,12 +741,12 @@ static BOOL WriteInBuff(PComVar cv, const char *TempStr, int TempLen)
  */
 static void PackInBuff(PComVar cv)
 {
-	EnterCriticalSection(&cv->InBuff_lock);
-	if ( (cv->InPtr>0) && (cv->InBuffCount>0) ) {
-		memmove(cv->InBuff,&(cv->InBuff[cv->InPtr]),cv->InBuffCount);
+	if (cv->InBuffCount == 0) {
+		cv->InPtr = 0;
+	} else if (cv->InPtr > 0 && cv->InPtr + cv->InBuffCount > InBuffSize / 4 * 3) {
+		memmove(cv->InBuff, &(cv->InBuff[cv->InPtr]), cv->InBuffCount);
 		cv->InPtr = 0;
 	}
-	LeaveCriticalSection(&cv->InBuff_lock);
 }
 
 int WINAPI CommBinaryBuffOut(PComVar cv, PCHAR B, int C)
