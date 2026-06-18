@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2026-06-17 by TeraTerm Project
+date=2026-06-18 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -1013,7 +1013,9 @@ MSG_PKT_OVERSIZED_ERROR=Слишком большой пакет, получен
 
 ; ssh.c
 MSG_SSH_INVALID_COMPDATA_ERROR=Ошибка сжатия данных в принятом пакете
+MSG_SSH_INVALID_PKT_SIZE_ERROR=Received invalid packet size (%u) @ grab_payload()
 MSG_SSH_TRUNCATED_PKT_ERROR=Принят усеченный пакет (%u > %u) @ grab_payload()
+MSG_SSH_INVALID_PKT_SIZE_LIM_ERROR=Received invalid packet size (%u) @ grab_payload_limited()
 MSG_SSH_TRUNCATED_PKT_LIM_ERROR=Принят усеченный пакет (%u > %u) @ grab_payload_limited()
 MSG_SSH_COREINS_ERROR=Обнаружена атака ядра 'CORE insertion attack'. Соединение будет закрыто.
 MSG_SSH_CORRUPTDATA_ERROR=Обнаружено повреждение данных. Соединение будет закрыто.
