@@ -866,24 +866,36 @@ static BOOL buffer_packet_data(PTInstVar pvar, unsigned int limit, unsigned int 
 */
 static BOOL grab_payload(PTInstVar pvar, unsigned int num_bytes)
 {
-	/* Accept maximum of 4MB of payload data */
 	unsigned int in_buffer = 0;
 
-	if (!buffer_packet_data(pvar, PACKET_MAX_SIZE, &in_buffer)) {
-		return FALSE;
-	}
-
-	pvar->ssh_state.payload_grabbed += num_bytes;
-	if (pvar->ssh_state.payload_grabbed > in_buffer) {
+	/* 進める長さや累積長さが PACKET_MAX_SIZE を超える場合はエラー */
+	if (num_bytes > PACKET_MAX_SIZE ||
+	    num_bytes > PACKET_MAX_SIZE - pvar->ssh_state.payload_grabbed) {
 		char buf[128];
-		UTIL_get_lang_msg("MSG_SSH_TRUNCATED_PKT_ERROR", pvar,
-		                  "Received truncated packet (%u > %u) @ grab_payload()");
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
-		            pvar->ssh_state.payload_grabbed, in_buffer);
+		UTIL_get_lang_msg("MSG_SSH_INVALID_PKT_SIZE_ERROR", pvar,
+		                  "Received invalid packet size (%u) @ grab_payload()");
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg, num_bytes);
 		notify_fatal_error(pvar, buf, TRUE);
 		return FALSE;
 	}
 
+	/* SSH1で圧縮が有効なら、最大 4MB を解凍する */
+	if (!buffer_packet_data(pvar, PACKET_MAX_SIZE, &in_buffer)) {
+		return FALSE;
+	}
+
+	/* 実際にデータが来ていない場合はエラー */
+	if (pvar->ssh_state.payload_grabbed + num_bytes > in_buffer) {
+		char buf[128];
+		UTIL_get_lang_msg("MSG_SSH_TRUNCATED_PKT_ERROR", pvar,
+		                  "Received truncated packet (%u > %u) @ grab_payload()");
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
+		            pvar->ssh_state.payload_grabbed + num_bytes, in_buffer);
+		notify_fatal_error(pvar, buf, TRUE);
+		return FALSE;
+	}
+
+	pvar->ssh_state.payload_grabbed += num_bytes;
 	return TRUE;
 }
 
@@ -891,22 +903,34 @@ static BOOL grab_payload_limited(PTInstVar pvar, unsigned int num_bytes)
 {
 	unsigned int in_buffer = 0;
 
-	pvar->ssh_state.payload_grabbed += num_bytes;
-
-	if (!buffer_packet_data(pvar, pvar->ssh_state.payload_grabbed, &in_buffer)) {
-		return FALSE;
-	}
-
-	if (pvar->ssh_state.payload_grabbed > in_buffer) {
+	/* 進める長さや累積長さが PACKET_MAX_SIZE を超える場合はエラー */
+	if (num_bytes > PACKET_MAX_SIZE ||
+	    num_bytes > PACKET_MAX_SIZE - pvar->ssh_state.payload_grabbed) {
 		char buf[128];
-		UTIL_get_lang_msg("MSG_SSH_TRUNCATED_PKT_LIM_ERROR", pvar,
-		                  "Received truncated packet (%u > %u) @ grab_payload_limited()");
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
-		            pvar->ssh_state.payload_grabbed, in_buffer);
+		UTIL_get_lang_msg("MSG_SSH_INVALID_PKT_SIZE_LIM_ERROR", pvar,
+		                  "Received invalid packet size (%u) @ grab_payload_limited()");
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg, num_bytes);
 		notify_fatal_error(pvar, buf, TRUE);
 		return FALSE;
 	}
 
+	/* SSH1で圧縮が有効なら、num_bytes バイトを解凍する */
+	if (!buffer_packet_data(pvar, pvar->ssh_state.payload_grabbed + num_bytes, &in_buffer)) {
+		return FALSE;
+	}
+
+	/* 実際にデータが来ていない場合はエラー */
+	if (pvar->ssh_state.payload_grabbed + num_bytes > in_buffer) {
+		char buf[128];
+		UTIL_get_lang_msg("MSG_SSH_TRUNCATED_PKT_LIM_ERROR", pvar,
+		                  "Received truncated packet (%u > %u) @ grab_payload_limited()");
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg,
+		            pvar->ssh_state.payload_grabbed + num_bytes, in_buffer);
+		notify_fatal_error(pvar, buf, TRUE);
+		return FALSE;
+	}
+
+	pvar->ssh_state.payload_grabbed += num_bytes;
 	return TRUE;
 }
 
