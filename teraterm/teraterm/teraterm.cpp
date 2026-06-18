@@ -124,7 +124,7 @@ static void init(void)
 {
 	DLLInit();
 	WinCompatInit();
-	DebugSetException(L"teraterm");
+	DebugSetException(L"ttermpro");
 	LoadSpecialFont();
 #if defined(DEBUG_OPEN_CONSOLE_AT_STARTUP)
 	DebugConsoleOpen();
