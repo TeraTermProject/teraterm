@@ -1,7 +1,7 @@
 ﻿[Info]
 language=Italian
 date=2026-05-31 by TeraTerm Project
-contributor=R.B. (2026-02-23)
+contributor=R.B. (2026-06-18)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -310,7 +310,7 @@ DLG_BROADCAST_HISTORY=Cronologia
 DLG_BROADCAST_PARENTONLY=Invia solo a questo processo
 DLG_BROADCAST_ENTER=Inserisci chiave
 DLG_BROADCAST_SUBMIT=Invia
-DLG_BROADCAST_SUBMIT_KEY_LABEL=Tasto di invio
+DLG_BROADCAST_SUBMIT_KEY_LABEL=Tasto Invio
 DLG_BROADCAST_SUBMIT_KEY_NONE=Nessuno
 DLG_BROADCAST_SUBMIT_KEY_ENTER=Invio
 DLG_BROADCAST_SUBMIT_KEY_CTRLM=Ctrl+M
@@ -471,7 +471,7 @@ DLG_CODING_UNICODE_TO_DEC_PUNCTUATION=Punteggiatura, elementi blocco, ombra
 DLG_CODING_UNICODE_TO_DEC_MIDDLEDOT=Punti mezzani (U+00B7,U+2024,U+2219)
 DLG_CODING_DEC_TO_UNICODE=Mappatura DEC grafica speciale in Unicode
 DLG_CODING_DECSP_DO_NOT_MAP=Non mappare
-DLG_ENCODING_CHAR_WIDTH_PER_CHAR=Sostituisci la larghezza del carattere per carattere
+DLG_ENCODING_CHAR_WIDTH_PER_CHAR=Sostituisci larghezza carattere per carattere
 DLG_WIN_TITLE=Finestra
 DLG_WIN_TEK_TITLE=Finestra (TEK)
 DLG_WIN_TITLELABEL=&Titolo:
