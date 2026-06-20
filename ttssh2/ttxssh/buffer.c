@@ -52,14 +52,12 @@
 /* buffer_t.buf の拡張時に追加で確保する量 (32KB) */
 #define BUFFER_INCREASE_MARGIN (32*1024)
 
-#if 0
-typedef struct buffer {
+struct buffer {
 	char *buf;      /* バッファの先頭ポインタ。realloc()により変動する。*/
-	size_t offset;     /* 現在の読み出し位置 */
-	size_t maxlen;     /* バッファの最大サイズ */
-	size_t len;        /* バッファに含まれる有効なデータサイズ */
-} buffer_t;
-#endif
+	size_t offset;  /* 現在の読み出し位置/書き込み位置 */
+	size_t maxlen;  /* バッファの最大サイズ（確保済みサイズ） */
+	size_t len;     /* バッファに含まれる有効なデータサイズ */
+};
 
 // バッファのオフセットを初期化し、まだ読んでいない状態にする。
 // Tera Term(TTSSH)オリジナル関数。
@@ -582,7 +580,7 @@ int buffer_put_bignum2(buffer_t *buf, const BIGNUM *v)
 	/* Get the value of in binary */
 	oi = BN_bn2bin(v, d+1);
 	hasnohigh = (d[1] & 0x80) ? 0 : 1;
-	if ((r = buffer_put_string(buf, d + hasnohigh, bytes - hasnohigh)) != 0)
+	if ((r = buffer_put_string(buf, (char *)(d + hasnohigh), bytes - hasnohigh)) != 0)
 		goto error;
 	//memset(buf, 0, bytes);
 
@@ -598,7 +596,7 @@ static void buffer_get_bignum2_internal(char **data, BIGNUM *value)
 
 	len = get_uint32_MSBfirst(buf);
 	buf += 4;
-	BN_bin2bn(buf, len, value);
+	BN_bin2bn((unsigned char *)buf, len, value);
 	buf += len;
 
 	*data = buf;
@@ -636,11 +634,11 @@ int buffer_get_bignum_SECSH(buffer_t *buf, BIGNUM *v)
 		char *tmp = (char *)malloc(bytes + 1);
 		tmp[0] = '\0';
 		memcpy(tmp + 1, d, bytes);
-		BN_bin2bn(tmp, bytes + 1, v);
+		BN_bin2bn((unsigned char*)tmp, bytes + 1, v);
 		free(tmp);
 	}
 	else {
-		BN_bin2bn(d, bytes, v);
+		BN_bin2bn((unsigned char*)d, bytes, v);
 	}
 
 	buf->offset += bytes;
@@ -697,7 +695,7 @@ int buffer_put_ec(buffer_t *buf, const EC_POINT *v, const EC_GROUP *g)
 		goto error;
 	}
 	/* Append */
-	if ((r = buffer_put_string(buf, d, len)) != 0)
+	if ((r = buffer_put_string(buf, (char *)d, len)) != 0)
 		goto error;
 
 error:
@@ -712,7 +710,7 @@ static void buffer_get_ec_internal(char **data, EC_POINT *v, const EC_GROUP *g)
 
 	len = get_uint32_MSBfirst(buf);
 	buf += 4;
-	EC_POINT_oct2point(g, v, buf, len, NULL);
+	EC_POINT_oct2point(g, v, (unsigned char*)buf, len, NULL);
 	buf += len;
 
 	*data = buf;
@@ -778,7 +776,7 @@ int buffer_compress(z_stream *zstream, char *payload, size_t len, buffer_t *comp
 	int status;
 
 	// input buffer
-	zstream->next_in = payload;
+	zstream->next_in = (Bytef *)payload;
 	zstream->avail_in = (uInt)len;
 	assert(len == (size_t)(uInt)len);
 
@@ -808,7 +806,7 @@ int buffer_decompress(z_stream *zstream, char *payload, size_t len, buffer_t *co
 	int status;
 
 	// input buffer
-	zstream->next_in = payload;
+	zstream->next_in = (Bytef*)payload;
 	zstream->avail_in = (uInt)len;
 	assert(len == (size_t)(uInt)len);
 
