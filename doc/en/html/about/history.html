@@ -73,6 +73,15 @@
       <li>
         Changed DPI awareness setting to process-wide instead of GUI thread only.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1314" target="_blank">issue #1314</a>)
+        Disallowed loading plugins from outside the folder containing ttermpro.exe
+        when a plugin filename is specified directly in the Plugin section of TERATERM.INI.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1286" target="_blank">issue #1286</a>)<br>
+      </li>
+      <li>
+        Plugin filenames are handled as normal filename(long filename, LFN).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1286" target="_blank">issue #1286</a>)<br>
+        Previously, since short filename,SFN (DOS filename, 8.3 format) is used,
+        "ttxtest.dll-" was treated as "TTXTEST.DLL" and loaded.
       </li>
     </ul>
   </li>
@@ -97,12 +106,23 @@
         This bug was introduced in 5.4.0.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1277" target="_blank">issue #1277</a>)
       </li>
+      <li>
+        Fixed an issue where ttermpro.exe crashes when "pipe_name" or "server\pipe_name" is specified with the /PIPE command line option.
+        This bug was introduced in 5.0.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1318" target="_blank">issue #1318</a>)
+      </li>
+      <li>
+        Fixed an issue where file reception via zmodem failed during high-speed serial communication using USB CDC-ACM.
+        This bug was introduced in 5.5.1.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1299" target="_blank">issue #1299</a>)
+      </li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
       <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.23">1.23</a>.</li>
+      <li>Upgraded TTXttyrec Plugin to <a href="#ttyrec_1.07">1.07</a>.</li>
       <li>
         Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.2" target="_blank">6.7.2</a>.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1317" target="_blank">issue #1317</a>)
@@ -6431,6 +6451,34 @@ SYNOPSIS:
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1274" target="_blank">issue #1274</a>)
       </li>
       <li>
+        Added the following option under Right-click the task tray icon &gt; Settings.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+        <ul>
+          <li>Clear LockBox password from memory when session is locked.</li>
+          <li>Clear LockBox password from memory when migrating to S4-Hibernate and the legacy S3-Sleep.</li>
+        </ul>
+      </li>
+      <li>
+        Modified to encrypt in-memory passwords using CryptProtectMemory().
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+      </li>
+      <li>
+        Updated to prevent password data from being paged out.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+      </li>
+      <li>
+        Reduced overall memory usage.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+      </li>
+      <li>
+        Added an input length limit to the text box.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+      </li>
+      <li>
+        Added SecureZeroMemory(), out-of-bounds access checks, error handling, and related safeguards.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+      </li>
+      <li>
         Made minor adjustments.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1234" target="_blank">issue #1234</a>, <a href="https://github.com/TeraTermProject/teraterm/issues/1285" target="_blank">#1285</a>)
       </li>
@@ -6734,6 +6782,33 @@ SYNOPSIS:
 </ul>
 
 <h2 id="ttyrec">TTXttyrec</h2>
+<h3 id="ttyrec_1.07">YYYY.MM.DD (Ver 1.07 not released yet)</h3>
+<ul class="history">
+  <li>
+    Added support for temporarily switching playback to no-wait mode.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1326" target="_blank">issue #1326</a>)
+  </li>
+  <li>
+    Added support for limiting playback wait time limit.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1326" target="_blank">issue #1326</a>)
+    <ul>
+      <li>Added the <a href="../commandline/ttxttyplay.html#TPW">/TPW</a> command line option.</li>
+    </ul>
+  </li>
+  <li>
+    Added support for displaying the recording time in the title bar during playback.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1298" target="_blank">issue #1298</a>)
+  </li>
+  <li>
+    Fixed status not being displayed in the title during subsequent TTY file playbacks.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  </li>
+  <li>
+    Fixed display corruption when playing a tty file after a non-tty file.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  </li>
+</ul>
+
 <h3 id="ttyrec_1.06">2025.08.03 (Ver 1.06)</h3>
 <ul class="history">
   <li>

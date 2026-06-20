@@ -50,14 +50,14 @@ static wchar_t *szApplicationName;				// INIファイルのフルパス
 
 static BOOL getSection(const wchar_t *str)
 {
-	szSectionNames[0] = 0;
+	szSectionName[0] = 0;
 	const wchar_t *t = wcsrchr(str, L'\\');
 	if(t){
 		t++;
 	}else{
 		t = str;
 	}
-	wcscpy_s(szSectionName, t);
+	wcscpy_s(szSectionName, _countof(szSectionName), t);
 	return TRUE;
 }
 
@@ -354,6 +354,10 @@ BOOL RegGetStr(HKEY hKey, const wchar_t *lpszValueName, wchar_t *buf, DWORD dwSi
 			::SetLastError(lError);
 			return FALSE;
 		}
+		if (dwType != REG_SZ && dwType != REG_EXPAND_SZ) {
+			buf[0] = L'\0';
+			return FALSE;
+		}
 
 		buf[dwSize - 1] = L'\0';
 	}
@@ -415,17 +419,25 @@ BOOL RegSetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD dwValue)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL RegGetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD *dwValue)
 {
-	int defmark = 0xdeadbeef;
-
 	if(bUseINI){
-		// 読み込みに失敗した場合は false を返す (2007.11.14 yutaka)
-		*dwValue = GetPrivateProfileIntW(szSectionName, lpszValueName, defmark, getModuleName());
-		if (*dwValue == defmark) {
+		wchar_t t[64] = {};
+		const wchar_t *defstr = L"__default__";
+
+		GetPrivateProfileStringW(szSectionName, lpszValueName, defstr, t, _countof(t), getModuleName());
+		if (wcscmp(t, defstr) == 0) {
 			*dwValue = 0;
 			return FALSE;
-		} else {
-			return TRUE;
 		}
+
+		errno = 0;
+		wchar_t *endptr;
+		*dwValue = (DWORD)wcstoul(t, &endptr, 10);
+		if (endptr == t || *endptr != L'\0' || errno != 0) {
+			*dwValue = 0;
+			return FALSE;
+		}
+
+		return TRUE;
 	}else{
 		long	lError;
 		DWORD	dwType = REG_DWORD;
@@ -449,10 +461,11 @@ BOOL RegGetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD *dwValue)
 
 /* ==========================================================================
 	Function Name	: (BOOL) RegSetBinary()
-	Outline			: レジストリキーの値から BINARYを書き込む
+	Outline			: レジストリキーの値にBINARYデータを16進数で書き込む
 	Arguments		: HKEY		hKey			(in)	値を設定するキーのハンドル
 					: const wchar_t *lpszValueName	(in)	設定する値
 					: void		*buf			(out)	値データ
+					: DWORD		dwSize			(in)	値データのバイト数(null含まず)
 	Return Value	: 成功	TRUE
 					: 失敗	FALSE
 	Reference		: 
@@ -463,21 +476,32 @@ BOOL RegGetDword(HKEY hKey, const wchar_t *lpszValueName, DWORD *dwValue)
    ======1=========2=========3=========4=========5=========6=========7======= */
 BOOL RegSetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, DWORD dwSize)
 {
-	if(bUseINI){
-		wchar_t t[1024] = {0};
-		LPBYTE s = (LPBYTE)buf;
-		DWORD i;
-		for(i=0; i<dwSize; i++){
-			wchar_t c[4];
-			swprintf_s(c, L"%02X ", s[i]);
-			wcscat_s(t, c);
+	if (bUseINI) {
+		size_t needed = (size_t)dwSize * 3 + 1;
+		wchar_t *t = (wchar_t *)malloc(needed * sizeof(wchar_t));
+		if (t == NULL) {
+			return FALSE;
 		}
-		if (i > 0) {
-			t[i*3-1] = 0;
+		wchar_t *p = t;
+		size_t remain = needed;
+		for (DWORD i = 0; i < dwSize; i++) {
+			int written = swprintf_s(p, remain, L"%02X ", ((BYTE*)buf)[i]);
+			if (written < 0) {
+				free(t);
+				return FALSE;
+			}
+			p += written;
+			remain -= written;
 		}
-		BOOL ret =  WritePrivateProfileStringW(szSectionName, lpszValueName, t, getModuleName());
+		if (dwSize > 0) {
+			*(p - 1) = L'\0';
+		} else {
+			*p = L'\0';
+		}
+		BOOL ret = WritePrivateProfileStringW(szSectionName, lpszValueName, t, getModuleName());
+		free(t);
 		return ret;
-	}else{
+	} else {
 		long	lError;
 		DWORD	dwWriteSize;
 
@@ -519,7 +543,7 @@ BOOL RegGetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, LPDWORD lp
 		BOOL ret = GetPrivateProfileStringW(szSectionName, lpszValueName, L"", t, _countof(t), getModuleName());
 		if(ret){
 			size_t size = wcslen(t);
-			while(t[size-1] == ' '){
+			while(size > 0 && t[size-1] == L' '){
 				size--;
 				t[size] = 0;
 			}
@@ -528,6 +552,10 @@ BOOL RegGetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, LPDWORD lp
 			DWORD cnt = 0;
 			*p = 0;
 			for(size_t i=0; i<(size+1)/3; i++){
+				if(cnt >= *lpdwSize){
+					*lpdwSize = 0;
+					return FALSE;
+				}
 				*p++ = (BYTE)wcstol(s, NULL, 16);
 				s += 3;
 				cnt ++;
@@ -561,24 +589,26 @@ BOOL RegGetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, LPDWORD lp
 
 LONG RegEnumEx(HKEY hKey, DWORD dwIndex, wchar_t *lpName, LPDWORD lpcName, LPDWORD lpReserved, wchar_t *lpClass, LPDWORD lpcClass, PFILETIME lpftLastWriteTime)
 {
-	static wchar_t *ptr = szSectionNames;
 	if(bUseINI){
-		if(*szSectionNames == 0){
+		if (dwIndex == 0) {
+			szSectionNames[0] = L'\0';
 			GetPrivateProfileSectionNamesW(szSectionNames, _countof(szSectionNames), getModuleName());
-			ptr = szSectionNames;
 		}
-		if(wcscmp(ptr, L"TTermMenu") == 0){
-			//skip
-			while(*ptr++);
-//			ptr++;
+		DWORD idx = 0;
+		wchar_t *ptr = szSectionNames;
+		while (*ptr) {
+			if (wcscmp(ptr, L"TTermMenu") == 0) {
+				while (*ptr++);
+				continue;
+			}
+			if (idx == dwIndex) {
+				wcscpy_s(lpName, *lpcName, ptr);
+				return ERROR_SUCCESS;
+			}
+			idx++;
+			while (*ptr++);
 		}
-		if(*ptr == 0){
-			return ERROR_NO_MORE_ITEMS;
-		}
-		wcscpy(lpName, ptr);
-		while(*ptr++);
-//		ptr++;
-		return ERROR_SUCCESS;
+		return ERROR_NO_MORE_ITEMS;
 	}else{
 		return ::RegEnumKeyExW(hKey, dwIndex, lpName, lpcName, lpReserved, lpClass, lpcClass, lpftLastWriteTime);
 	}

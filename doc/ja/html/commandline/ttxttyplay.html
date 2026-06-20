@@ -24,9 +24,30 @@ TTXttyplayでは以下のコマンドラインオプションが使用できます。
   <dt id="TP">/TP (/ttyplay の短い形式)</dt>
   <dd>TTXttyplayを有効にします。Tera Termの<a href="teraterm.html#r">/R=オプション</a>で指定されたファイルを、ttyrec形式のファイルとして再生します。</dd>
 
+  <dt id="TP=1">/TP=1</dt>
+  <dd>TTXttyplayを有効にします。Tera Termの<a href="teraterm.html#r">/R=オプション</a>で指定されたファイルを、ttyrec形式のファイルとして再生します。</dd>
+  <dd>タイトルに録画日時を表示します。</dd>
+
+  <dt id="TP=3">/TP=3</dt>
+  <dd>TTXttyplayを有効にします。Tera Termの<a href="teraterm.html#r">/R=オプション</a>で指定されたファイルを、ttyrec形式のファイルとして再生します。</dd>
+  <dd>タイトルに録画日時をミリ秒まで表示します。</dd>
+
   <dt id="nowait">/ttyplay-nowait</dt>
   <dt id="tpnw">/tpnw (/ttyplay-nowait の短い形式)</dt>
   <dd>ノーウェイトモード。</dd>
+
+  <dt id="TPW">/TPW=[&lt;maxwait&gt;][,[&lt;minwait&gt;]]</dt>
+  <dd>ウェイト時間制限</dd>
+  <dd>
+    <ul>
+      <li><span class="syntax">maxwait</span><br>
+          ウェイト時間の最大値[秒]<br>
+          ウェイト時間が指定時間以上の場合、ウェイトはそこで中断し次の表示に移ります。</li>
+      <li><span class="syntax">minwait</span><br>
+          ウェイト時間の最小値[秒]<br>
+          ウェイト時間が指定時間以下の場合、ウェイトせずスキップするようにします。</li>
+    </ul>
+  </dd>
 </dl>
 
 
@@ -35,6 +56,7 @@ TTXttyplayでは以下のコマンドラインオプションが使用できます。
 <pre>
 ttermpro.exe /ttyplay /R="C:\Documents and Settings\doda\My Documents\record.tty"
 ttermpro.exe /ttyplay /ttyplay-nowait /R=example.tty
+ttermpro.exe /ttyplay /TPW=5,2 /R=example.tty
 </pre>
 
 </body>

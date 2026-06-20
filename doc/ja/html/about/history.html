@@ -73,6 +73,15 @@
       <li>
         高DPI設定をGUIスレッドのみではなく、プロセス全体で行うようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1314" target="_blank">issue #1314</a>)
+        TERATERM.INI の Plugin セクションに、プラグインファイル名の直接書くことで
+        ttermpro.exeがあるフォルダ以外からプライグインをロード可能だったので、できないようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1286" target="_blank">issue #1286</a>)<br>
+      </li>
+      <li>
+        プラグインファイル名を通常のファイル名(ロングファイル名,LFN)で扱うようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1286" target="_blank">issue #1286</a>)<br>
+        従来はショートファイル名,SFN(DOSファイル名,8.3形式)で扱っていたため、
+        "ttxtest.dll-" は "TTXTEST.DLL" として扱われ、ロードされていた。
       </li>
     </ul>
   </li>
@@ -97,12 +106,23 @@
         5.4.0 からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1277" target="_blank">issue #1277</a>)
       </li>
+      <li>
+        /PIPE コマンドラインオプションに "pipe_name" 又は "server\pipe_name" の形式を指定するとクラッシュする問題を修正した。
+        5.0 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1318" target="_blank">issue #1318</a>)
+      </li>
+      <li>
+        USB CDC-ACM を使用した高速なシリアル接続時に zmodem によるファイル受信が失敗する不具合を修正した。
+        5.5.1 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1299" target="_blank">issue #1299</a>)
+      </li>
     </ul>
   </li>
 
   <li>その他
     <ul>
       <li><a href="#ttmenu_1.23">TeraTerm Menu 1.23</a> へ差し替えた。</li>
+      <li><a href="#ttyrec_1.07">TTXttyrec Plugin 1.07</a> へ差し替えた。</li>
       <li>
         インストーラに使用している Inno Setup のバージョンを <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.2" target="_blank">6.7.2</a> へ差し替えた。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1317" target="_blank">issue #1317</a>)
@@ -6440,6 +6460,34 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1274" target="_blank">issue #1274</a>)
       </li>
       <li>
+        タスクトレイのアイコンを右クリック &gt; 設定 に下記のオプションを追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+        <ul>
+          <li>セッションロック時にLockBoxパスワードをメモリから消去する。</li>
+          <li>S4-Hibernateおよび従来のS3-Sleepへの移行時にLockBoxパスワードをメモリから消去する。</li>
+        </ul>
+      </li>
+      <li>
+        メモリ内のパスワードを CryptProtectMemory() で暗号化するよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+      </li>
+      <li>
+        パスワード情報がページアウトされないよう修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+      </li>
+      <li>
+        メモリ使用量を削減した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+      </li>
+      <li>
+        テキストボックスに入力文字数制限を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+      </li>
+      <li>
+        SecureZeroMemory()、境界外アクセスのチェック、エラー処理等を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
+      </li>
+      <li>
         細かい調整を行った。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1234" target="_blank">issue #1234</a>, <a href="https://github.com/TeraTermProject/teraterm/issues/1285" target="_blank">#1285</a>)
       </li>
@@ -6744,6 +6792,33 @@
 </ul>
 
 <h2 id="ttyrec">TTXttyrec</h2>
+<h3 id="ttyrec_1.07">YYYY.MM.DD (Ver 1.07 not released yet)</h3>
+<ul class="history">
+  <li>
+    再生中に一時的にノーウェイトモードにできるようにした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1326" target="_blank">issue #1326</a>)
+  </li>
+  <li>
+    再生のウェイト時間を制限できるようにした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1326" target="_blank">issue #1326</a>)
+    <ul>
+      <li><a href="../commandline/ttxttyplay.html#TPW">/TPW</a> コマンドラインオプションを追加した。</li>
+    </ul>
+  </li>
+  <li>
+    再生時に録画時刻をタイトルバーに表示できるようにした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1298" target="_blank">issue #1298</a>)
+  </li>
+  <li>
+    2回目以降のttyファイル再生で、ステータスがタイトルに表示されない問題を修正した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  </li>
+  <li>
+    ttyファイルでないファイルを再生した後、ttyファイルを再生すると表示が崩れる問題を修正した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  </li>
+</ul>
+
 <h3 id="ttyrec_1.06">2025.08.03 (Ver 1.06)</h3>
 <ul class="history">
   <li>

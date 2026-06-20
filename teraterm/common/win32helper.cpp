@@ -90,14 +90,14 @@ error_return:
 /**
  *	GetPrivateProfileStringW() の動的バッファ版
  *
- *	@param section
- *	@param key
- *	@param def		デフォルト値
- *					NULLのときは L"" を返す
- *	@param ini		iniファイルのパス
- *					NULLのときはファイル指定なし
- *	@param str		文字列を格納するバッファ
- *					不要になったらfree()する
+ *	@param[in]	section
+ *	@param[in]	key
+ *	@param[in]	def		デフォルト値
+ *						NULLのとき、デフォルト値 L"" と同じ
+ *	@param[in]	ini		iniファイルのパス
+ *						NULLのときはファイル指定なし
+ *	@param[out]	str		文字列を格納するバッファ
+ *						不要になったらfree()する
  *	@return	エラーコード,0(=NO_ERROR)のときエラーなし
  *
  *		次の場合 str = L"" が返る (free()すること)
@@ -175,27 +175,41 @@ error_return:
  *
  *	@param fullpath		fullpathを格納するバッファ
  *						不要になったらfree()する
+ *	@param filepart		パスを除いたファイル名
+ *						NULLのとき確保されない
+ *						ファイル名が無い場合は NULLがセットされる
+ *						不要になったらfree()する
  *	@return	エラーコード,0(=NO_ERROR)のときエラーなし
  */
 DWORD hGetFullPathNameW(const wchar_t *lpFileName, wchar_t **fullpath, wchar_t **filepart)
 {
+	*fullpath = NULL;
+	if (filepart != NULL) {
+		*filepart = NULL;
+	}
+
 	size_t len = GetFullPathNameW(lpFileName, 0, NULL, NULL);		// include L'\0'
 	if (len == 0) {
-		*fullpath = NULL;
-		if (filepart != NULL) {
-			*filepart = NULL;
-		}
 		return GetLastError();
 	}
 	wchar_t *path = (wchar_t *)malloc(sizeof(wchar_t) * len);
+	if (path == NULL) {
+		return ERROR_NOT_ENOUGH_MEMORY;
+	}
 	wchar_t *file;
 	len = GetFullPathNameW(lpFileName, (DWORD)len, path, &file);
 	if (len == 0) {
+		DWORD err = GetLastError();
 		free(path);
-		return GetLastError();
+		return err;
 	}
-	if (filepart != NULL) {
-		*filepart = file;
+	if (filepart != NULL && file != NULL) {
+		wchar_t *fp = _wcsdup(file);
+		if (fp == NULL) {
+			free(path);
+			return ERROR_NOT_ENOUGH_MEMORY;
+		}
+		*filepart = fp;
 	}
 	*fullpath = path;
 	return NO_ERROR;

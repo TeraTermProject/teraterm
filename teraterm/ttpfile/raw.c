@@ -146,8 +146,6 @@ static BOOL RawReadPacket(void *arg)
 	TFileIO *file = rv->file;
 	PFileVarProto fv = rv->fv;
 	PComVar cv = rv->cv;
-	BYTE Buff[InBuffSize];
-	int BuffCount;
 	static DWORD prev_elapsed;
 	DWORD elapsed;
 
@@ -157,16 +155,11 @@ static BOOL RawReadPacket(void *arg)
 			prev_elapsed = rv->StartTime;
 			fv->InfoOp->SetDlgPacketNum(fv, 1);
 		}
-		// クリティカルセクションの時間を短くするため memcpy() してから WriteFile()する
-		EnterCriticalSection(&cv->InBuff_lock);
-		memcpy(Buff, &(cv->InBuff[cv->InPtr]), cv->InBuffCount);
-		BuffCount = cv->InBuffCount;
+		file->WriteFile(file, &(cv->InBuff[cv->InPtr]), cv->InBuffCount);
+		rv->ByteCount += cv->InBuffCount;
 		cv->InBuffCount = 0;
 		cv->InPtr = 0;
-		LeaveCriticalSection(&cv->InBuff_lock);
-		file->WriteFile(file, Buff, BuffCount);
-		rv->ByteCount += BuffCount;
-		elapsed = (GetTickCount() - prev_elapsed) / 250;
+		elapsed = (GetTickCount() - rv->StartTime) / 100;
 		if (elapsed != prev_elapsed) {
 			prev_elapsed = elapsed;
 			fv->InfoOp->SetDlgByteCount(fv, rv->ByteCount);
