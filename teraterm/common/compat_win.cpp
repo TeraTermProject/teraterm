@@ -102,6 +102,7 @@
 
 BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
+BOOL (WINAPI *pSetProcessDpiAwarenessContext)(DPI_AWARENESS_CONTEXT value);
 BOOL (WINAPI *pIsValidDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
 UINT (WINAPI *pGetDpiForWindow)(HWND hwnd);
 BOOL (WINAPI *pSetLayeredWindowAttributes)(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
@@ -259,6 +260,7 @@ static HWND WINAPI GetConsoleWindowLocal(void)
 static const APIInfo Lists_user32[] = {
 	{ "SetLayeredWindowAttributes", (void **)&pSetLayeredWindowAttributes },
 	{ "SetThreadDpiAwarenessContext", (void **)&pSetThreadDpiAwarenessContext },
+	{ "SetProcessDpiAwarenessContext", (void **)&pSetProcessDpiAwarenessContext },
 	{ "IsValidDpiAwarenessContext", (void **)&pIsValidDpiAwarenessContext },
 	{ "GetDpiForWindow", (void **)&pGetDpiForWindow },
 	{ "AdjustWindowRectEx", (void **)&pAdjustWindowRectEx },
