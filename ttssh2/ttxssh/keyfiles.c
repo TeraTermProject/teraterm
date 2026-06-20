@@ -1530,13 +1530,13 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	}
 
 	len = buffer_get_int(blob);
-	if (strncmp(blob->buf + blob->offset, "if-modn{sign{rsa", strlen("if-modn{sign{rsa") - 1) == 0) {
+	if (strncmp(buffer_tail_ptr(blob), "if-modn{sign{rsa", strlen("if-modn{sign{rsa") - 1) == 0) {
 		result->type = KEY_RSA;
 	}
-	else if (strncmp(blob->buf + blob->offset, "dl-modp{sign{dsa", strlen("dl-modp{sign{dsa") - 1) == 0) {
+	else if (strncmp(buffer_tail_ptr(blob), "dl-modp{sign{dsa", strlen("dl-modp{sign{dsa") - 1) == 0) {
 		result->type = KEY_DSA;
 	}
-	else if (strncmp(blob->buf + blob->offset, "ec-modp", strlen("ec-modp") - 1) == 0) {
+	else if (strncmp(buffer_tail_ptr(blob), "ec-modp", strlen("ec-modp") - 1) == 0) {
 		result->type = KEY_ECDSA256;
 	}
 	else {
@@ -1547,7 +1547,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 
 	len = buffer_get_int(blob);
 	encname = (char *)malloc(len + 1);
-	strncpy_s(encname, len + 1, blob->buf + blob->offset, _TRUNCATE);
+	strncpy_s(encname, len + 1, buffer_tail_ptr(blob), _TRUNCATE);
 	if (strcmp(encname, "3des-cbc") == 0) {
 		encflag = 1;
 	}
@@ -1561,7 +1561,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	buffer_consume(blob, len);
 
 	len = buffer_get_int(blob);
-	if (len > (blob->len - blob->offset)) {
+	if (len < 0 || len > buffer_remain_len(blob)) {
 		strncpy_s(errmsg, errmsg_len, "body size error", _TRUNCATE);
 		goto error;
 	}
@@ -1595,7 +1595,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		cipher = get_cipher_by_name("3des-cbc");
 		cipher_init_SSH2(&cc, cipher, key, 24, iv, 8, CIPHER_DECRYPT, pvar);
 		decrypted = (char *)malloc(len);
-		ret = EVP_Cipher(cc->evp, decrypted, blob->buf + blob->offset, len);
+		ret = EVP_Cipher(cc->evp, decrypted, buffer_tail_ptr(blob), len);
 		if (ret == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 			cipher_free_SSH2(cc);
@@ -1608,12 +1608,12 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		*invalid_passphrase = TRUE;
 	}
 	else { // none
-		buffer_append(blob2, blob->buf + blob->offset, len);
+		buffer_append(blob2, buffer_tail_ptr(blob), len);
 	}
 	buffer_rewind(blob2);
 
 	len = buffer_get_int(blob2);
-	if (len <= 0 || len > (blob2->len - blob2->offset)) {
+	if (len <= 0 || len > buffer_remain_len(blob2)) {
 		strncpy_s(errmsg, errmsg_len, "blob size error", _TRUNCATE);
 		goto error;
 	}

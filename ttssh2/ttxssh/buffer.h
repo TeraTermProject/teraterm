@@ -32,16 +32,7 @@
 #include <openssl/ec.h>
 #include <zlib.h>
 
-#if 1
-typedef struct buffer {
-	char *buf;	   /* バッファの先頭ポインタ。realloc()により変動する。*/
-	size_t offset; /* 現在の読み出し位置 */
-	size_t maxlen; /* バッファの最大サイズ */
-	size_t len;	   /* バッファに含まれる有効なデータサイズ */
-} buffer_t;
-#else
 typedef struct buffer buffer_t;
-#endif
 
 void buffer_clear(buffer_t *buf);
 buffer_t *buffer_init(void);

@@ -51,14 +51,12 @@
 /* buffer_t.buf の拡張時に追加で確保する量 (32KB) */
 #define BUFFER_INCREASE_MARGIN (32*1024)
 
-#if 0
-typedef struct buffer {
+struct buffer {
 	char *buf;      /* バッファの先頭ポインタ。realloc()により変動する。*/
 	size_t offset;     /* 現在の読み出し位置 */
 	size_t maxlen;     /* バッファの最大サイズ */
 	size_t len;        /* バッファに含まれる有効なデータサイズ */
-} buffer_t;
-#endif
+};
 
 // バッファのオフセットを初期化し、まだ読んでいない状態にする。
 // Tera Term(TTSSH)オリジナル関数。
@@ -442,7 +440,7 @@ void buffer_put_bignum2(buffer_t *msg, const BIGNUM *value)
 	bytes = BN_num_bytes(value) + 1; /* extra padding byte */
 	buf = malloc(bytes);
 	if (buf == NULL) {
-		*buf = 0;
+		abort();
 		goto error;
 	}
 
@@ -450,7 +448,7 @@ void buffer_put_bignum2(buffer_t *msg, const BIGNUM *value)
 	/* Get the value of in binary */
 	oi = BN_bn2bin(value, buf+1);
 	hasnohigh = (buf[1] & 0x80) ? 0 : 1;
-	buffer_put_string(msg, buf+hasnohigh, bytes-hasnohigh);
+	buffer_put_string(msg, (char *)(buf+hasnohigh), bytes-hasnohigh);
 	//memset(buf, 0, bytes);
 
 error:
@@ -464,7 +462,7 @@ void buffer_get_bignum2(char **data, BIGNUM *value)
 
 	len = get_uint32_MSBfirst(buf);
 	buf += 4;
-	BN_bin2bn(buf, len, value);
+	BN_bin2bn((unsigned char *)buf, len, value);
 	buf += len;
 
 	*data = buf;
@@ -497,11 +495,11 @@ void buffer_get_bignum_SECSH(buffer_t *buffer, BIGNUM *value)
 		char *tmp = (char *)malloc(bytes + 1);
 		tmp[0] = '\0';
 		memcpy(tmp + 1, buf, bytes);
-		BN_bin2bn(tmp, bytes + 1, value);
+		BN_bin2bn((unsigned char*)tmp, bytes + 1, value);
 		free(tmp);
 	}
 	else {
-		BN_bin2bn(buf, bytes, value);
+		BN_bin2bn((unsigned char*)buf, bytes, value);
 	}
 
 	buffer->offset += bytes;
@@ -544,7 +542,7 @@ void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *po
 	/* Convert */
 	buf = malloc(len);
 	if (buf == NULL) {
-		*buf = 0;
+		abort();
 		goto error;
 	}
 	if (EC_POINT_point2oct(curve, point, POINT_CONVERSION_UNCOMPRESSED,
@@ -552,7 +550,7 @@ void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *po
 		goto error;
 	}
 	/* Append */
-	buffer_put_string(msg, buf, len);
+	buffer_put_string(msg, (char *)buf, len);
 
 error:
 	free(buf);
@@ -565,7 +563,7 @@ void buffer_get_ecpoint(char **data, const EC_GROUP *curve, EC_POINT *point)
 
 	len = get_uint32_MSBfirst(buf);
 	buf += 4;
-	EC_POINT_oct2point(curve, point, buf, len, NULL);
+	EC_POINT_oct2point(curve, point, (unsigned char*)buf, len, NULL);
 	buf += len;
 
 	*data = buf;
@@ -627,7 +625,7 @@ int buffer_compress(z_stream *zstream, char *payload, size_t len, buffer_t *comp
 	int status;
 
 	// input buffer
-	zstream->next_in = payload;
+	zstream->next_in = (Bytef *)payload;
 	zstream->avail_in = (uInt)len;
 	assert(len == (size_t)(uInt)len);
 
@@ -655,7 +653,7 @@ int buffer_decompress(z_stream *zstream, char *payload, size_t len, buffer_t *co
 	int status;
 
 	// input buffer
-	zstream->next_in = payload;
+	zstream->next_in = (Bytef*)payload;
 	zstream->avail_in = (uInt)len;
 	assert(len == (size_t)(uInt)len);
 
