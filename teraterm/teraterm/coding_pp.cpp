@@ -113,16 +113,16 @@ static void ArrenageItemsUnicode(HWND hWnd, const CodingPPData *data, bool is_un
 static void ArrenageItems(HWND hWnd, const CodingPPData *data)
 {
 	static const int JJISReceiveItems[] = {
-		IDC_TERMKINTEXT,
-		IDC_TERMKIN,
-		IDC_TERMKOUTTEXT,
-		IDC_TERMKOUT,
-		IDC_TERMKANA,
 		IDC_JIS_RECEIVE_TITLE,
+		IDC_TERMKANA,
 	};
 	static const int JJISSendItems[] = {
 		IDC_JIS_TRANSMIT_TITLE,
 		IDC_TERMKANASEND,
+		IDC_TERMKINTEXT,
+		IDC_TERMKIN,
+		IDC_TERMKOUTTEXT,
+		IDC_TERMKOUT,
 	};
 
 	// 受信コード
@@ -400,12 +400,15 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					const BOOL checked = (IsDlgButtonChecked(hWnd, IDC_USE_DIFFERENT_CODE) == BST_CHECKED) ? TRUE : FALSE;
 					EnableWindow(GetDlgItem(hWnd, IDC_TERMKANJISEND), checked ? TRUE : FALSE);
 					if (!checked) {
-						// USE_DIFFRENT_CODEのチェックが入っていないるとき
+						// USE_DIFFRENT_CODEのチェックが入っていないとき
 						LRESULT recv_index = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
 						LRESULT send_index = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
 						if (recv_index != send_index) {
 							// 送受信コードが異なっているなら、送信コードを受信と同一にする
 							SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETCURSEL, recv_index, 0);
+
+							CodingPPData *DlgData = (CodingPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
+							ArrenageItems(hWnd, DlgData);
 						}
 					}
 					break;
