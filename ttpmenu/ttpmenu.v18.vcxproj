@@ -151,7 +151,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\libressl\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>common_static.lib;odbc32.lib;odbccp32.lib;comctl32.lib;crypto.lib;Bcrypt.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;comctl32.lib;crypto.lib;Bcrypt.lib;ws2_32.lib;Crypt32.lib;wtsapi32.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -186,7 +186,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\libressl\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>common_static.lib;odbc32.lib;odbccp32.lib;comctl32.lib;crypto.lib;Bcrypt.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;comctl32.lib;crypto.lib;Bcrypt.lib;ws2_32.lib;Crypt32.lib;wtsapi32.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -220,7 +220,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\libressl\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>common_static.lib;odbc32.lib;odbccp32.lib;comctl32.lib;crypto.lib;Bcrypt.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;comctl32.lib;crypto.lib;Bcrypt.lib;ws2_32.lib;Crypt32.lib;wtsapi32.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -255,7 +255,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\libressl\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>common_static.lib;odbc32.lib;odbccp32.lib;comctl32.lib;crypto.lib;Bcrypt.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;comctl32.lib;crypto.lib;Bcrypt.lib;ws2_32.lib;Crypt32.lib;wtsapi32.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -291,7 +291,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\libressl\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>common_static.lib;odbc32.lib;odbccp32.lib;comctl32.lib;crypto.lib;Bcrypt.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;comctl32.lib;crypto.lib;Bcrypt.lib;ws2_32.lib;Crypt32.lib;wtsapi32.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -326,7 +326,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\libressl\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>common_static.lib;odbc32.lib;odbccp32.lib;comctl32.lib;crypto.lib;Bcrypt.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common_static.lib;comctl32.lib;crypto.lib;Bcrypt.lib;ws2_32.lib;Crypt32.lib;wtsapi32.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -342,13 +342,25 @@
     <Image Include="left.ico" />
     <Image Include="right.ico" />
     <Image Include="teraterm.ico" />
-    <Image Include="ttpmenu.ico" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\teraterm\common\codeconv.h" />
-    <ClInclude Include="..\teraterm\common\compat_win.h" />
-    <ClInclude Include="..\teraterm\common\dllutil.h" />
     <ClInclude Include="..\teraterm\common\i18n.h" />
+    <ClInclude Include="..\teraterm\common\asprintf.h" />
+    <ClInclude Include="..\teraterm\common\dlglib.h" />
+    <ClInclude Include="..\teraterm\common\fileread.h" />
+    <ClInclude Include="..\teraterm\common\ttcommdlg.h" />
+    <ClInclude Include="..\teraterm\common\ttdebug.h" />
+    <ClInclude Include="..\teraterm\common\ttdup.h" />
+    <ClInclude Include="..\teraterm\common\ttlib.h" />
+    <ClInclude Include="..\teraterm\common\tt-version.h" />
+    <ClInclude Include="..\teraterm\common\win32helper.h" />
+    <ClInclude Include="..\libs\libressl\include\openssl\sha.h" />
+    <ClInclude Include="..\libs\libressl\include\openssl\evp.h" />
+    <ClInclude Include="..\libs\libressl\include\openssl\rand.h" />
+    <ClInclude Include="..\libs\libressl\include\openssl\hmac.h" />
+    <ClInclude Include="..\libs\libressl\include\openssl\crypto.h" />
+    <ClInclude Include="registry.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ttpmenu-version.h" />
     <ClInclude Include="ttpmenu.h" />

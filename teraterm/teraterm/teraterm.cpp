@@ -59,6 +59,7 @@
 #include "directx.h"
 #include "unicode.h"
 #include "broadcast.h"
+#include "codeconv.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -120,15 +121,60 @@ static void UnloadSpecialFont(void)
 	}
 }
 
-static void init(void)
+static void SetPaths(TTTSet *pts)
+{
+	/* Get home directory (ttermpro.exeのフォルダ) */
+	pts->ExeDirW = GetExeDirW(hInst);
+
+	// LogDir
+	pts->LogDirW = GetLogDirW(hInst);
+
+	// HomeDir
+	pts->HomeDirW = GetHomeDirW(hInst);
+	WideCharToACP_t(pts->HomeDirW, pts->HomeDir, _countof(pts->HomeDir));
+	SetCurrentDirectoryW(pts->HomeDirW);		// TODO 必要??
+
+	// TERATERM.INI のフルパス
+	pts->SetupFNameW = NULL;
+	awcscats(&pts->SetupFNameW, pts->HomeDirW, L"\\TERATERM.INI", NULL);
+	WideCharToACP_t(pts->SetupFNameW, pts->SetupFName, _countof(pts->SetupFName));
+
+	// KEYBOARD.CNF のフルパス
+	pts->KeyCnfFNW = NULL;
+	awcscats(&pts->KeyCnfFNW, pts->HomeDirW, L"\\KEYBOARD.CNF", NULL);
+}
+
+// DPI Aware (高DPI対応)
+//		Windows 10 Version 1703から使用可能な
+//		Per-monitor DPI awareness V2 の機能を利用
+static void SetDpiAware(const wchar_t *iniPath)
+{
+	if (pSetProcessDpiAwarenessContext == NULL) {
+		return;
+	}
+
+	wchar_t Temp[4];
+	GetPrivateProfileStringW(L"Tera Term", L"DPIAware", L"on",
+							 Temp, _countof(Temp), iniPath);
+	if (_wcsicmp(Temp, L"on") == 0) {
+		// Windows 10 1703 以降: PMv2 をプロセス全体に適用
+		pSetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+	}
+}
+
+static void init(TTTSet *pts)
 {
 	DLLInit();
 	WinCompatInit();
-	DebugSetException(L"teraterm");
+	DebugSetException(L"ttermpro");
 	LoadSpecialFont();
 #if defined(DEBUG_OPEN_CONSOLE_AT_STARTUP)
 	DebugConsoleOpen();
 #endif
+	SetPaths(pts);
+	SetDpiAware(pts->SetupFNameW);
+	_HtmlHelpW(NULL, NULL, HH_INITIALIZE, (DWORD_PTR)&HtmlHelpCookie);
+	DXInit();
 }
 
 /**
@@ -227,12 +273,7 @@ BOOL OnIdle(LONG lCount)
 			// 上書きしてしまう可能性がある。(2007.6.14 yutaka)
 
 		} else {
-			if (cv.PortType == IdSerial) {
-				// シリアル接続では、別スレッド CommThread() でCOMポートから読み出しを行っているため、
-				// CommReceive() の呼び出しは不要。
-			} else {
-				CommReceive(&cv);
-			}
+			CommReceive(&cv);
 		}
 
 	}
@@ -359,6 +400,8 @@ static BOOL IsIdleMessage(const MSG* pMsg)
 
 VOID CALLBACK IdleTimerProc(PVOID lpParam, BOOLEAN TimerOrWaitFired)
 {
+	(void)lpParam;
+	(void)TimerOrWaitFired;
 	SendMessage(main_window, WM_USER_IDLETIMER, 0, 0);
 }
 
@@ -377,10 +420,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	ts.TeraTermInstance = hInstance;
 	ts.nCmdShow = nCmdShow;
 	hInst = hInstance;
-	init();
-	_HtmlHelpW(NULL, NULL, HH_INITIALIZE, (DWORD_PTR)&HtmlHelpCookie);
-
-	DXInit();
+	init(&ts);
 
 	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);
 	pVTWin = m_pMainWnd;

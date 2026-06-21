@@ -102,8 +102,8 @@ static int CloseSocket(SOCKET s)
 	return Pclosesocket(s);
 }
 
-#define CommInQueSize 16384
-#define CommOutQueSize 4096
+#define CommInQueSize  (1024*64)
+#define CommOutQueSize (1024*4)
 #define CommXonLim 768
 #define CommXoffLim 3328
 
@@ -142,8 +142,6 @@ void CommInit(PComVar cv)
 	cv->NotifyIcon = NULL;
 
 	cv->ConnectedTime = 0;
-
-	InitializeCriticalSection(&cv->InBuff_lock); // CommInit()は一度しか呼ばれないので、DeleteCriticalSection() していない。
 }
 
 /* reset a serial port which is already open */
@@ -157,8 +155,6 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 		(cv->PortType != IdSerial)) {
 			return;
 	}
-
-	EnterCriticalSection(&cv->InBuff_lock);
 
 	ClearCommError(cv->ComID,&DErr,NULL);
 	SetupComm(cv->ComID,CommInQueSize,CommOutQueSize);
@@ -246,9 +242,7 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 
 	/* enable receive request */
 	SetCommMask(cv->ComID,0);
-	SetCommMask(cv->ComID,EV_RXCHAR);
-
-	LeaveCriticalSection(&cv->InBuff_lock);
+	SetCommMask(cv->ComID,EV_RXCHAR | EV_ERR);
 }
 
 // 名前付きパイプが正しい書式かをチェックする。
@@ -608,13 +602,9 @@ void NamedPipeThread(void *arg)
 {
 	PComVar cv = (PComVar)arg;
 	DWORD DErr;
-	HANDLE REnd;
-	char Temp[20];
 	char Buffer[1];  // 1byte
 	DWORD BytesRead, TotalBytesAvail, BytesLeftThisMessage;
 
-	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READENDNAME, cv->ComPort);
-	REnd = OpenEvent(EVENT_ALL_ACCESS,FALSE, Temp);
 	while (TRUE) {
 		BytesRead = 0;
 		// 名前付きパイプはイベントを待つことができない仕様なので、キューの中身を
@@ -631,7 +621,7 @@ void NamedPipeThread(void *arg)
 				PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_READ);
 			}
 			// ReadFile() が終わるまで待つ。
-			WaitForSingleObject(REnd,INFINITE);
+			WaitForSingleObject(ReadEnd,INFINITE);
 		}
 		else {
 			DErr = GetLastError();
@@ -650,23 +640,19 @@ void CommThread(void *arg)
 	DWORD Evt;
 	PComVar cv = (PComVar)arg;
 	DWORD DErr;
-	HANDLE REnd;
-	char Temp[20];
 
-	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READENDNAME, cv->ComPort);
-	REnd = OpenEvent(EVENT_ALL_ACCESS,FALSE, Temp);
 	while (TRUE) {
 		if (WaitCommEvent(cv->ComID,&Evt,NULL)) {
 			if (! cv->Ready) {
 				_endthread();
 			}
-			cv->RRQ = TRUE;
-			CommReceive(cv);
-			cv->RRQ = FALSE;
-			if (cv->InBuffCount > InBuffSize / 3) {
-				PostMessage(cv->HWin, WM_USER_IDLETIMER, 0, 0);
-				Sleep(1);
+			if (Evt & EV_ERR) {
+				ClearCommError(cv->ComID, &DErr, NULL);
 			}
+			if (! cv->RRQ) {
+				PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_READ);
+			}
+			WaitForSingleObject(ReadEnd,INFINITE);
 		}
 		else {
 			DErr = GetLastError();  // this returns 995 (operation aborted) if a USB com port is removed
@@ -758,6 +744,8 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 			break;
 
 		case IdSerial:
+			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READENDNAME, cv->ComPort);
+			ReadEnd = CreateEvent(NULL,FALSE,FALSE,Temp);
 			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", WRITENAME, cv->ComPort);
 			memset(&wol,0,sizeof(OVERLAPPED));
 			wol.hEvent = CreateEvent(NULL,TRUE,TRUE,Temp);
@@ -785,12 +773,6 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 			cv->ComPort = 0;
 			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READENDNAME, cv->ComPort);
 			ReadEnd = CreateEvent(NULL,FALSE,FALSE,Temp);
-			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", WRITENAME, cv->ComPort);
-			memset(&wol,0,sizeof(OVERLAPPED));
-			wol.hEvent = CreateEvent(NULL,TRUE,TRUE,Temp);
-			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READNAME, cv->ComPort);
-			memset(&rol,0,sizeof(OVERLAPPED));
-			rol.hEvent = CreateEvent(NULL,TRUE,FALSE,Temp);
 
 			/* create the receiver thread */
 			if (_beginthread(NamedPipeThread,0,cv) == -1) {
@@ -860,6 +842,8 @@ void CommClose(PComVar cv)
 			break;
 		case IdSerial:
 			if ( cv->ComID != INVALID_HANDLE_VALUE ) {
+				SetupComm(cv->ComID, 4096, 4096); // デフォルト値に戻す
+				CloseHandle(ReadEnd);
 				CloseHandle(wol.hEvent);
 				CloseHandle(rol.hEvent);
 				PurgeComm(cv->ComID, PURGE_TXABORT | PURGE_RXABORT |
@@ -881,8 +865,6 @@ void CommClose(PComVar cv)
 		case IdNamedPipe:
 			if ( cv->ComID != INVALID_HANDLE_VALUE ) {
 				CloseHandle(ReadEnd);
-				CloseHandle(wol.hEvent);
-				CloseHandle(rol.hEvent);
 				PCloseFile(cv->ComID);
 			}
 			TTXCloseFile(); /* TTPLUG */
@@ -923,57 +905,56 @@ void CommReceive(PComVar cv)
 		return;
 	}
 
-	EnterCriticalSection(&cv->InBuff_lock);
-
 	/* Compact buffer */
-	if ((cv->InBuffCount>0) && (cv->InPtr>0)) {
-		memmove(cv->InBuff,&(cv->InBuff[cv->InPtr]),cv->InBuffCount);
+	if (cv->InBuffCount == 0) {
+		cv->InPtr = 0;
+	} else if (cv->InPtr > 0 && cv->InPtr + cv->InBuffCount > InBuffSize / 4 * 3) {
+		memmove(cv->InBuff, &(cv->InBuff[cv->InPtr]), cv->InBuffCount);
 		cv->InPtr = 0;
 	}
 
-	if (cv->InBuffCount<InBuffSize) {
+	if (cv->InPtr + cv->InBuffCount < InBuffSize) {
 		switch (cv->PortType) {
 			case IdTCPIP:
-				C = Precv(cv->s, &(cv->InBuff[cv->InBuffCount]),
-				          InBuffSize-cv->InBuffCount, 0);
+				C = Precv(cv->s, &(cv->InBuff[cv->InPtr + cv->InBuffCount]),
+				          InBuffSize - cv->InPtr - cv->InBuffCount, 0);
 				if (C == SOCKET_ERROR) {
 					C = 0;
 					PWSAGetLastError();
 				}
-				cv->InBuffCount = cv->InBuffCount + C;
+				cv->InBuffCount += C;
 				break;
 			case IdSerial:
 				do {
-					ClearCommError(cv->ComID,&DErr,NULL);
-					if (! PReadFile(cv->ComID,&(cv->InBuff[cv->InBuffCount]),
-					                InBuffSize-cv->InBuffCount,&C,&rol)) {
+					C = 0;
+					if (! PReadFile(cv->ComID, &(cv->InBuff[cv->InPtr + cv->InBuffCount]),
+									InBuffSize - cv->InPtr - cv->InBuffCount, &C, &rol)) {
 						if (GetLastError() == ERROR_IO_PENDING) {
 							if (WaitForSingleObject(rol.hEvent, 1000) != WAIT_OBJECT_0) {
-								C = 0;
+								C = 0; // タイムアウト
+							} else {
+								if (!GetOverlappedResult(cv->ComID, &rol, &C, FALSE)) {
+									ClearCommError(cv->ComID, &DErr, NULL);
+									C = 0;
+								}
 							}
-							else {
-								GetOverlappedResult(cv->ComID,&rol,&C,FALSE);
-							}
-						}
-						else {
+						} else {
+							ClearCommError(cv->ComID,&DErr,NULL); // 切断、パリティエラー等
 							C = 0;
 						}
 					}
-					cv->InBuffCount = cv->InBuffCount + C;
-				} while ((C!=0) && (cv->InBuffCount<InBuffSize));
-				ClearCommError(cv->ComID,&DErr,NULL);
+					cv->InBuffCount += C;
+				} while ((C != 0) && (cv->InPtr + cv->InBuffCount < InBuffSize));
 				break;
 			case IdFile:
-				if (PReadFile(cv->ComID,&(cv->InBuff[cv->InBuffCount]),
-				              InBuffSize-cv->InBuffCount,&C,NULL)) {
+				if (PReadFile(cv->ComID, &(cv->InBuff[cv->InPtr + cv->InBuffCount]),
+				              InBuffSize - cv->InPtr - cv->InBuffCount, &C, NULL)) {
 					if (C == 0) {
 						DErr = ERROR_HANDLE_EOF;
+					} else {
+						cv->InBuffCount += C;
 					}
-					else {
-						cv->InBuffCount = cv->InBuffCount + C;
-					}
-				}
-				else {
+				} else {
 					DErr = GetLastError();
 				}
 				break;
@@ -981,29 +962,25 @@ void CommReceive(PComVar cv)
 			case IdNamedPipe:
 				// キューの中に最低1バイト以上のデータが入っていることを確認できているため、
 				// ReadFile() はブロックすることはないため、一括して読む。
-				if (PReadFile(cv->ComID,&(cv->InBuff[cv->InBuffCount]),
-				              InBuffSize-cv->InBuffCount,&C,NULL)) {
+				if (PReadFile(cv->ComID, &(cv->InBuff[cv->InPtr + cv->InBuffCount]),
+				              InBuffSize - cv->InPtr - cv->InBuffCount, &C, NULL)) {
 					if (C == 0) {
 						DErr = ERROR_HANDLE_EOF;
+					} else {
+						cv->InBuffCount += C;
 					}
-					else {
-						cv->InBuffCount = cv->InBuffCount + C;
-					}
-				}
-				else {
+				} else {
 					DErr = GetLastError();
 				}
 
 				// 1バイト以上読めたら、イベントを起こし、スレッドを再開させる。
-				if (cv->InBuffCount > 0) {
+				if (C > 0) {
 					cv->RRQ = FALSE;
 					SetEvent(ReadEnd);
 				}
 				break;
 		}
 	}
-
-	LeaveCriticalSection(&cv->InBuff_lock);
 
 	if (cv->InBuffCount==0) {
 		switch (cv->PortType) {
@@ -1014,13 +991,14 @@ void CommReceive(PComVar cv)
 				}
 				break;
 			case IdSerial:
+				cv->RRQ = FALSE;
+				SetEvent(ReadEnd);
 				return;
 			case IdFile:
 				if (DErr != ERROR_IO_PENDING) {
 					PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 					cv->RRQ = FALSE;
-				}
-				else {
+				} else {
 					cv->RRQ = TRUE;
 				}
 				return;
@@ -1029,8 +1007,7 @@ void CommReceive(PComVar cv)
 				if (DErr != ERROR_IO_PENDING) {
 					PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 					cv->RRQ = FALSE;
-				}
-				else {
+				} else {
 					cv->RRQ = TRUE;
 				}
 				SetEvent(ReadEnd);
@@ -1067,7 +1044,7 @@ void CommSend(PComVar cv)
 			break;
 		case IdSerial:
 			ClearCommError(cv->ComID,&DErr,&Stat);
-			Max = OutBuffSize - Stat.cbOutQue;
+			Max = CommOutQueSize - Stat.cbOutQue;
 			break;
 		case IdFile:
 			Max = cv->OutBuffCount;
@@ -1129,20 +1106,27 @@ void CommSend(PComVar cv)
 			break;
 
 		case IdSerial:
+			D = 0;
+			ResetEvent(wol.hEvent);
 			if (! PWriteFile(cv->ComID,&(cv->OutBuff[cv->OutPtr]),C,(LPDWORD)&D,&wol)) {
 				if (GetLastError() == ERROR_IO_PENDING) {
-					if (WaitForSingleObject(wol.hEvent,1000) != WAIT_OBJECT_0) {
-						D = C; /* Time out, ignore data */
+					DErr = WaitForSingleObject(wol.hEvent,1000);
+					if (DErr == WAIT_OBJECT_0) {
+						if (! GetOverlappedResult(cv->ComID,&wol,(LPDWORD)&D,FALSE)) {
+							ClearCommError(cv->ComID,&DErr,&Stat);
+							D = C; // 送信済のデータは再送しない
+						}
+					} else if (DErr == WAIT_TIMEOUT) {
+						D = C; // Time out, 送信済のデータは再送しない
+					} else {
+						ClearCommError(cv->ComID,&DErr,&Stat);
+						D = C;
 					}
-					else {
-						GetOverlappedResult(cv->ComID,&wol,(LPDWORD)&D,FALSE);
-					}
-				}
-				else { /* I/O error */
-					D = C; /* ignore error */
+				} else {
+					ClearCommError(cv->ComID,&DErr,&Stat);
+					D = C; // I/O error, 送信済のデータは再送しない
 				}
 			}
-			ClearCommError(cv->ComID,&DErr,&Stat);
 			break;
 
 		case IdFile:
@@ -1164,12 +1148,12 @@ void CommSend(PComVar cv)
 			break;
 	}
 
-	cv->OutBuffCount = cv->OutBuffCount - D;
-	if ( cv->OutBuffCount==0 ) {
+	cv->OutBuffCount -= D;
+	if ( cv->OutBuffCount <= 0 ) {
 		cv->OutPtr = 0;
 	}
 	else {
-		cv->OutPtr = cv->OutPtr + D;
+		cv->OutPtr += D;
 	}
 
 	if ( (C==D) && (delay>0) ) {

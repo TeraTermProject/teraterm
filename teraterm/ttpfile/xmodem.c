@@ -299,7 +299,7 @@ static BOOL XInit(TProto *pv, PComVar cv, PTTSet ts)
 		xv->ProgStat = -1;
 	}
 	fv->InfoOp->SetDlgProtoFileName(fv, xv->FullName);
-	xv->StartTime = GetTickCount();
+	xv->StartTime = 0;
 
 	xv->PktNumOffset = 0;
 	xv->PktNum = 0;
@@ -460,6 +460,10 @@ static BOOL XReadPacket(PXVar xv)
 	if (!GetPkt)
 		return TRUE;
 
+	if (xv->StartTime == 0) {
+		xv->StartTime = GetTickCount();
+	}
+
 	if ((xv->PktIn[1] == 0) && (xv->PktNum == 0) &&
 		(xv->PktNumOffset == 0)) {
 		if (xv->NAKMode == XnakNAK)
@@ -609,6 +613,9 @@ static BOOL XSendPacket(PXVar xv)
 			return TRUE; //送信するものがないなら処理を抜ける
 		}
 
+		if (xv->StartTime == 0) {
+			xv->StartTime = GetTickCount();
+		}
 
 		// reset timeout timer
 		fv->FTSetTimeOut(fv, xv->TOutVLong);

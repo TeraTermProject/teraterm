@@ -11,59 +11,6 @@
 
 <h1>Tera Term 設定ファイルの全項目一覧</h1>
 
-<h2><a href="theme.html">BG</a></h2>
-
-<table border="1">
-	<tr>
-		<th>項目</th>
-		<th style="width:250px;">INIデフォルト</th>
-		<th style="width:250px;">プログラムデフォルト</th>
-		<th>備考</th>
-	</tr>
-	<tr>
-		<td id="BGEnable">BGEnable</td>
-		<td style="width:250px;">off</td>
-		<td style="width:250px;">&lt;-</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td id="BGFastSizeMove">BGFastSizeMove</td>
-		<td style="width:250px;">on</td>
-		<td style="width:250px;">&lt;-</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td id="BGFlickerlessMove">BGFlickerlessMove</td>
-		<td style="width:250px;">on</td>
-		<td style="width:250px;">&lt;-</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td id="BGNoFrame">BGNoFrame</td>
-		<td style="width:250px;">on</td>
-		<td style="width:250px;">&lt;-</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td id="BGSPIPath">BGSPIPath</td>
-		<td style="width:250px;">plugin</td>
-		<td style="width:250px;">&lt;-</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td id="BGUseAlphaBlendAPI">BGUseAlphaBlendAPI</td>
-		<td style="width:250px;">on</td>
-		<td style="width:250px;">&lt;-</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td id="BGThemeFile">BGThemeFile</td>
-		<td style="width:250px;">theme\*.ini</td>
-		<td style="width:250px;">&lt;-</td>
-		<td></td>
-	</tr>
-</table>
-
 <h2>Tera Term</h2>
 
 <table border="1">
@@ -1430,12 +1377,6 @@
 		<td></td>
 	</tr>
 	<tr>
-		<td id="UnicodeOverrideCharWidth"><a href="../menu/setup-additional-coding.html#OverrideCharWidth">UnicodeOverrideCharWidth</a></td>
-		<td style="width:250px;">off</td>
-		<td style="width:250px;">off</td>
-		<td></td>
-	</tr>
-	<tr>
 		<td id="UnicodeToDecSpMapping"><a href="teraterm-term.html#UnicodeDecSpMapping">UnicodeToDecSpMapping</a></td>
 		<td style="width:250px;">3</td>
 		<td style="width:250px;">&lt;-</td>
@@ -1713,6 +1654,122 @@
 	</tr>
 </table>
 
+<h2 id="HostList">Hosts</h3>
+
+host list
+
+<pre>
+[Hosts]
+Host1=1st item
+Host2=2nd item
+Host3=3rd item
+ :
+</pre>
+
+<h2 id="UnicodeOverrideCharWidth"><a href="../menu/setup-additional-coding.html#OverrideCharWidth">UnicodeOverrideCharWidth</a></h3>
+
+<table border="1">
+	<tr>
+		<th>項目</th>
+		<th style="width:250px;">INIデフォルト</th>
+		<th style="width:250px;">プログラムデフォルト</th>
+		<th>備考</th>
+	</tr>
+	<tr>
+		<td>Enable</td>
+		<td style="width:250px;">off</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Selected</td>
+		<td style="width:250px;">0</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+</table>
+
+<p>
+character width settings list
+</p>
+
+<pre>
+[UnicodeOverrideCharWidth]
+List1=1st item
+List2=2nd item
+List3=3rd item
+ :
+</pre>
+
+<p>
+cf. <a href="./teraterm-term.html#CellWidthToUse">使用する文字幅設定を設定する</a>, <a href="./teraterm-term.html#DefineCellWidthSetting">文字幅設定を定義する</a>
+</p>
+
+<h2 id="PluginList"><a href="teraterm-misc.html#Plugin">Plugin</a></h3>
+
+plugin list
+
+<pre>
+[Plugin]
+list1=1st item
+list2=2nd item
+list3=3rd item
+ :
+</pre>
+
+<h2><a href="theme.html">BG</a></h2>
+
+<table border="1">
+	<tr>
+		<th>項目</th>
+		<th style="width:250px;">INIデフォルト</th>
+		<th style="width:250px;">プログラムデフォルト</th>
+		<th>備考</th>
+	</tr>
+	<tr>
+		<td id="BGEnable">BGEnable</td>
+		<td style="width:250px;">off</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="BGFastSizeMove">BGFastSizeMove</td>
+		<td style="width:250px;">on</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="BGFlickerlessMove">BGFlickerlessMove</td>
+		<td style="width:250px;">on</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="BGNoFrame">BGNoFrame</td>
+		<td style="width:250px;">on</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="BGSPIPath">BGSPIPath</td>
+		<td style="width:250px;">plugin</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="BGUseAlphaBlendAPI">BGUseAlphaBlendAPI</td>
+		<td style="width:250px;">on</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td id="BGThemeFile">BGThemeFile</td>
+		<td style="width:250px;">theme\*.ini</td>
+		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+</table>
+
 <h2>TTSSH</h2>
 
 <table border="1">
@@ -1922,28 +1979,6 @@
 	</tr>
 </table>
 
-<h2 id="HostList">Hosts</h2>
-
-host list
-
-<pre>
-Host1=1st item
-Host2=2nd item
-Host3=3rd item
- :
-</pre>
-
-<h2 id="PluginList">Plugin</h2>
-
-<a href="teraterm-misc.html#Plugin">plugin list</a>
-
-<pre>
-list1=1st item
-list2=2nd item
-list3=3rd item
- :
-</pre>
-
 <h2>TTProxy</h2>
 
 <table border="1">
@@ -2051,6 +2086,23 @@ list3=3rd item
 		<td id="RecordStartSize">RecordStartSize</td>
 		<td style="width:250px;">on</td>
 		<td style="width:250px;">&lt;-</td>
+		<td></td>
+	</tr>
+</table>
+
+<h2>ttyplay</h2>
+
+<table border="1">
+	<tr>
+		<th>項目</th>
+		<th style="width:250px;">INIデフォルト</th>
+		<th style="width:250px;">プログラムデフォルト</th>
+		<th>備考</th>
+	</tr>
+	<tr>
+		<td id="TimeFormat">TimeFormat</td>
+		<td style="width:250px;"></td>
+		<td style="width:250px;">%Y/%m/%d %H:%M:%S</td>
 		<td></td>
 	</tr>
 </table>

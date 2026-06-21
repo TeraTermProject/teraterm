@@ -561,7 +561,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 
 	CommInit(&cv);
 	cv.ts = &ts;
-	isFirstInstance = StartTeraTerm(m_hInst, &ts);
+	isFirstInstance = StartTeraTerm(&ts);
 
 	TTXInit(&ts, &cv); /* TTPLUG */
 
@@ -602,17 +602,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		free(ParamW);
 	}
 	FreeTTSET();
-
-	// DPI Aware (高DPI対応)
-	if (pIsValidDpiAwarenessContext != NULL && pSetThreadDpiAwarenessContext != NULL) {
-		wchar_t Temp[4];
-		GetPrivateProfileStringW(L"Tera Term", L"DPIAware", L"on", Temp, _countof(Temp), ts.SetupFNameW);
-		if (_wcsicmp(Temp, L"on") == 0) {
-			if (pIsValidDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) == TRUE) {
-				pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-			}
-		}
-	}
 
 	// duplicate sessionの指定があるなら、共有メモリからコピーする (2004.12.7 yutaka)
 	if (ts.DuplicateSession == 1) {

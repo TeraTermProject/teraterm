@@ -40,6 +40,7 @@
 #include "ttlib.h"
 #include "asprintf.h"
 #include "history_store.h"
+#include "win32helper.h"
 
 #include "ttplugin.h"
 #include "ttplug.h"
@@ -84,18 +85,133 @@ static int compareOrder(const void * e1, const void * e2)
 	return wcscmp(exports1->filename, exports2->filename);
 }
 
-static void PluginListAdd(const ExtensionList *item)
+/**
+ *	ロードするプライグインを追加する
+ *
+ *	@param	fullpath
+ *	@param	enable
+ */
+static void PluginListAdd(const wchar_t *fullpath, ExtensionEnable enable)
 {
+	wchar_t *fullpath_normalized;
+	wchar_t *filepart;
+	DWORD e = hGetFullPathNameW(fullpath, &fullpath_normalized, &filepart);
+	if (e != NO_ERROR) {
+		return;
+	}
+	if (filepart == NULL) {
+		free(fullpath_normalized);
+		return;
+	}
+
+	ExtensionList item = {};
+	item.path = fullpath_normalized;
+	item.filename = filepart;
+	item.enable = enable;
+
+	ExtensionList *p = (ExtensionList *)realloc(Extensions, sizeof(ExtensionList) * (NumExtensions + 1));
+	if (p == NULL) {
+		free(fullpath_normalized);
+		free(filepart);
+		return;
+	}
+	Extensions = p;
+	Extensions[NumExtensions] = item;
 	NumExtensions++;
-	Extensions = (ExtensionList *)realloc(Extensions, sizeof(ExtensionList) * NumExtensions);
-	ExtensionList *pl = &Extensions[NumExtensions - 1];
-	*pl = *item;
-	pl->path = _wcsdup(pl->path);
-	pl->filename = _wcsdup(pl->filename);
 }
 
 /**
- *	iniファイルから一覧を取得
+ *	ファイル名を表す文字列が "ttx*.dll" にマッチするか調べる
+ *
+ *	最短は "ttx.dll"
+ *
+ *	@retval	TRUE	マッチした
+ *	@retval	FALSE	マッチしない
+ */
+static BOOL MatchTTXFileName(const wchar_t *fname)
+{
+	const size_t len = wcslen(fname);
+	// "ttx" + 0文字以上 + ".dll" = 7文字以上
+	if (len < 7) {
+		// 7文字未満=マッチしない
+		return FALSE;
+	}
+
+	// 先頭が "ttx" で始まる
+	if (_wcsnicmp(fname, L"ttx", 3) != 0) {
+		return FALSE;
+	}
+
+	// 末尾が ".dll" (大文字小文字無視)
+	if (_wcsicmp(fname + len - 4, L".dll") != 0) {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+/**
+ *	フルパス(ファイル名のみ)からファイル名を取得
+ *
+ *	@param	fullpath
+ *	@retval	ファイル名へのポインタ(不要になったらfree()すること)
+ *	@retval	NULL ファイル名が無かった
+ */
+static wchar_t *GetFilename(const wchar_t *fullpath)
+{
+	const wchar_t *filename_c;
+
+	// ファイル名のみにする
+	filename_c = wcsrchr(fullpath, L'\\');
+	if (filename_c == NULL) {
+		// パス区切り '/' も考慮
+		filename_c = wcsrchr(fullpath, L'/');
+	}
+
+	if (filename_c == NULL) {
+		// 元からファイル名だけだった
+		wchar_t *filename = _wcsdup(fullpath);
+		return filename;
+	}
+
+	filename_c++;
+	if (*filename_c == 0) {
+		// パス区切りが文字端だった
+		return NULL;
+	}
+
+	wchar_t *filename = _wcsdup(filename_c);
+	return filename;
+}
+
+/**
+ * ファイル名からリストへのポインタを取得
+ *
+ * @param filename	プラグインのファイル名
+ * @retval	ExtensionList へのポインタ
+ * @retval	NULL	見つからなかった
+ */
+static ExtensionList *PluginGetInfo(const wchar_t *filename)
+{
+	for (int i = 0; i < NumExtensions; i++) {
+		if (_wcsicmp(Extensions[i].filename, filename) == 0) {
+			ExtensionList *pl = &Extensions[i];
+			return pl;
+		}
+	}
+
+	// 見つからなかった
+	return NULL;
+}
+
+/**
+ *	iniファイルを読んで enable/disable 設定を行う
+ *
+ *	[Plugin]
+ *	list1=file, 1
+ *	  :
+ *
+ *	@param	SetupFNW	iniファイル
  */
 static void PluginListRead(const wchar_t *SetupFNW)
 {
@@ -111,29 +227,29 @@ static void PluginListRead(const wchar_t *SetupFNW)
 			break;
 		}
 		size_t len_ch = wcslen(s) + 1;
-		wchar_t *buf = (wchar_t *)malloc(sizeof(wchar_t) * len_ch);
-		if (buf == NULL) {
+		wchar_t *fname = (wchar_t *)malloc(sizeof(wchar_t) * len_ch);
+		if (fname == NULL) {
 			continue;
 		}
 		int enable_int;
 		// ""file", 1"  を想定
 #if !defined(__MINGW32__)
-		int r = swscanf_s(s, L"\"%[^\"]\", %d", buf, (unsigned int)len_ch, &enable_int);
+		int r = swscanf_s(s, L"\"%[^\"]\", %d", fname, (unsigned int)len_ch, &enable_int);
 #else
-		int r = swscanf(s, L"\"%[^\"]\", %d", buf, &enable_int);
+		int r = swscanf(s, L"\"%[^\"]\", %d", fname, &enable_int);
 #endif
-		if (r <= 1) {
-			free(buf);
-			continue;
+		if (r == 2) {
+			wchar_t *filename = GetFilename(fname);
+			ExtensionList *pl = PluginGetInfo(filename);
+			if (pl != NULL) {
+				pl->enable =
+					enable_int == 0 ? EXTENSION_DISABLE :
+					enable_int == 1 ? EXTENSION_ENABLE :
+					EXTENSION_UNSPECIFIED;
+			}
+			free(filename);
 		}
-		PluginInfo info = {};
-		info.filename = buf;
-		info.enable =
-			enable_int == 0 ? EXTENSION_DISABLE :
-			enable_int == 1 ? EXTENSION_ENABLE :
-			EXTENSION_UNSPECIFIED;
-		PluginAddInfo(&info);
-		free(info.filename);
+		free(fname);
 	}
 	HistoryStoreDestroy(hs);
 }
@@ -188,6 +304,7 @@ static void loadExtension(ExtensionList *pl, const wchar_t *UILanguageFile)
 		if (bind != NULL) {
 			TTXExports * exports = (TTXExports *)calloc(1, sizeof(TTXExports));
 			if (exports == NULL) {
+				FreeLibrary(hPlugin);
 				return;
 			}
 			exports->size = sizeof(TTXExports);
@@ -248,6 +365,7 @@ static void loadExtension(ExtensionList *pl, const wchar_t *UILanguageFile)
 
 /**
  *	フォルダ内のプラグイン一覧を取得
+ *	dir のプラグインをリストする
  */
 static void ListPlugins(const wchar_t *dir)
 {
@@ -260,12 +378,19 @@ static void ListPlugins(const wchar_t *dir)
 	hFind = FindFirstFileW(load_mask, &fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
-			ExtensionList item = {};
-			aswprintf(&item.path, L"%s\\%s", dir, fd.cFileName);
-			item.filename = fd.cFileName;
-			item.enable = EXTENSION_UNSPECIFIED;
-			PluginListAdd(&item);
-			free(item.path);
+			const wchar_t *filename = fd.cFileName;
+			if (MatchTTXFileName(filename) == FALSE) {
+				// - 8.3(Short File Name)変換で "TTX*.DLL" にマッチしても
+				//   実際のファイル名が "TTX*.DLL" ではない場合がある
+				// - cFileName は MAX_PATH(260=3+256+1)文字
+				//   - NTFSのファイル名長は256文字,終端L"\0"含む (内部文字コードはUTF-16LE?)
+				//   - Ext4のファイル名長は256byte終端"\0"含む (概ねUTF-8と思われる)
+				continue;
+			}
+			wchar_t *fullpath;
+			aswprintf(&fullpath, L"%s\\%s", dir, filename);
+			PluginListAdd(fullpath, EXTENSION_UNSPECIFIED);
+			free(fullpath);
 		} while (FindNextFileW(hFind, &fd));
 		FindClose(hFind);
 	}
@@ -301,10 +426,9 @@ static void DeletePluginList(size_t index)
 
 /**
  * プラグイン情報を取得する
- * @param index		プラグインのインデックス
- * @param info		プラグイン情報を格納する構造体へのポインタ
- *					文字列は書き換えないこと
- * @return			成功した場合はTRUE、失敗した場合はFALSE
+ * @param[in]	index		プラグインのインデックス
+ * @param[out]	info		プラグイン情報を格納する構造体へのポインタ
+ * @return					成功した場合はTRUE、失敗した場合はFALSE
  */
 BOOL PluginGetInfo(int index, PluginInfo *info)
 {
@@ -318,7 +442,7 @@ BOOL PluginGetInfo(int index, PluginInfo *info)
 	info->filename = pl->filename;
 	info->enable = pl->enable;
 	if (pl->exports != NULL) {
-		// ロードしていない
+		// ロードしている
 		info->loaded = EXTENSION_LOADED;
 		info->load_order = pl->exports->loadOrder;
 	} else {
@@ -330,46 +454,26 @@ BOOL PluginGetInfo(int index, PluginInfo *info)
 }
 
 /**
- * プラグイン情報を設定する
- * @param index		プラグインのインデックス
- * @param info		プラグイン情報を格納する構造体へのポインタ
- *					文字列は書き換えないこと
- * @return			成功した場合はTRUE、失敗した場合はFALSE
+ * プラグイン情報を変更する
+ *
+ * @param info.filename		プラグインファイル名
+ *							ファイル名部分のみ
+ * @param info.enable		ExtensionEnable.EXTENSION_DISABLE
+ *							ExtensionEnable.EXTENSION_ENABLE
+ *							ExtensionEnable.EXTENSION_UNSPECIFIED
  */
-void PluginAddInfo(const PluginInfo *info)
+void PluginChangeInfo(const PluginInfo *info)
 {
-	// ファイル名のみにする
-	wchar_t *filename = wcsrchr(info->filename, L'\\');
-	if (filename == NULL) {
-		// 元からファイル名だけだった
-		filename = info->filename;
-	} else {
-		filename++;
+	wchar_t *filename = GetFilename(info->filename);
+	ExtensionList *pl = PluginGetInfo(filename);
+	free(filename);
+	if (pl == NULL) {
+		// 見つからない
+		return;
 	}
 
-	BOOL find = FALSE;
-	int index = 0;
-	for (int i = 0; i < NumExtensions; i++) {
-		if (wcscmp(Extensions[i].filename, filename) == 0) {
-			index = i;
-			find = TRUE;
-			break;
-		}
-	}
-	if (find == FALSE) {
-		// 新規追加
-		ExtensionList e_item = {};
-		e_item.filename = filename;
-		e_item.enable = info->enable;
-		PluginListAdd(&e_item);
-	}
-	else {
-		// 変更
-		ExtensionList *pl = &Extensions[index];
-		free(pl->filename);
-		pl->filename = _wcsdup(filename);
-		pl->enable = info->enable;
-	}
+	// 変更
+	pl->enable = info->enable;
 }
 
 static void LoadExtensions(PTTSet ts_)
@@ -378,14 +482,6 @@ static void LoadExtensions(PTTSet ts_)
 	PluginListRead(ts_->SetupFNameW);
 
 	if (NumExtensions==0) return;
-
-	// フルパスを作る
-	for (size_t i = 0; i < NumExtensions; i++) {
-		ExtensionList *pl = &Extensions[i];
-		if (pl->path == NULL) {
-			aswprintf(&pl->path, L"%s\\%s", ts_->ExeDirW, pl->filename);
-		}
-	}
 
 	// プラグインをロード
 	for (size_t i = 0; i < NumExtensions; i++) {
@@ -410,7 +506,6 @@ static void UnloadExtensions()
 		p->filename = NULL;
 		free(p->path);
 		p->path = NULL;
-		p->filename = NULL;
 		if (p->exports != NULL) {
 			free(p->exports);
 			p->exports = NULL;

@@ -11,6 +11,7 @@ struct timezone {
 #endif
 
 int gettimeofday(struct timeval *tv /*, struct timezone *tz*/ );
+struct timeval tvadd(struct timeval a, struct timeval b);
 struct timeval tvdiff(struct timeval a, struct timeval b);
 struct timeval tvshift(struct timeval tv, int shift);
 int tvcmp(struct timeval a, struct timeval b);

@@ -74,9 +74,9 @@ void	EncodePassword(const char *cPassword, char *cEncodePassword);
 BOOL	EnableItem(HWND hWnd, int idControl, BOOL flag);
 BOOL	OpenFileDlg(HWND hWnd, UINT editCtl, const wchar_t *title, const wchar_t *filter, wchar_t *defaultDir, size_t max_path);
 BOOL	SetForceForegroundWindow(HWND hWnd);
-wchar_t* lwcsstri(wchar_t *s1, const wchar_t *s2);
+const wchar_t* lwcsstri(const wchar_t *s1, const wchar_t *s2);
 void	UTIL_get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const wchar_t *iniFile);
-int		UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
+int		UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONTA logfont, HFONT *font, const char *iniFile);
 LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
                                    WPARAM wParam, LPARAM lParam);
 int		Encrypt2EncDec(char *szPassword, const unsigned char *szEncryptKey, Encrypt2ProfileP profile, int encrypt);

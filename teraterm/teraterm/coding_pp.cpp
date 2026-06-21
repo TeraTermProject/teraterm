@@ -113,16 +113,16 @@ static void ArrenageItemsUnicode(HWND hWnd, const CodingPPData *data, bool is_un
 static void ArrenageItems(HWND hWnd, const CodingPPData *data)
 {
 	static const int JJISReceiveItems[] = {
-		IDC_TERMKINTEXT,
-		IDC_TERMKIN,
-		IDC_TERMKOUTTEXT,
-		IDC_TERMKOUT,
-		IDC_TERMKANA,
 		IDC_JIS_RECEIVE_TITLE,
+		IDC_TERMKANA,
 	};
 	static const int JJISSendItems[] = {
 		IDC_JIS_TRANSMIT_TITLE,
 		IDC_TERMKANASEND,
+		IDC_TERMKINTEXT,
+		IDC_TERMKIN,
+		IDC_TERMKOUTTEXT,
+		IDC_TERMKOUT,
 	};
 
 	// 受信コード
@@ -185,9 +185,8 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 			int recv_index = 0;
 			int send_index = 0;
-			int i = 0;
-			while(1) {
-				const TKanjiList *p = GetKanjiList(i++);
+			for (int i = 0;; i++) {
+				const TKanjiList *p = GetKanjiList(i);
 				if (p == NULL) {
 					break;
 				}
@@ -304,94 +303,22 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					CodingPPData *DlgData = (CodingPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
 					TTTSet *ts = DlgData->pts;
 
-					ts->JIS7KatakanaSend = 0;
-					ts->JIS7Katakana = 0;
-					ts->KanjiIn = 0;
-					ts->KanjiOut = 0;
-
 					// 受信コード
-					int curPos = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
+					LRESULT curPos = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
 					IdKanjiCode coding =
 						(IdKanjiCode)SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETITEMDATA, curPos, 0);
-					ts->KanjiCode = coding;
-					switch (coding) {
-					case IdUTF8:
-					case IdSJIS:
-					case IdEUC:
-						break;
-					case IdJIS: {
-						ts->JIS7Katakana = (IsDlgButtonChecked(hWnd, IDC_TERMKANA) == BST_CHECKED);
-						ts->JIS7KatakanaSend = (IsDlgButtonChecked(hWnd, IDC_TERMKANASEND) == BST_CHECKED);
-						WORD w = (WORD)GetCurSel(hWnd, IDC_TERMKIN);
-						if (w > 0) {
-							ts->KanjiIn = w;
-						}
-						w = (WORD)GetCurSel(hWnd, IDC_TERMKOUT);
-						if (w > 0) {
-							ts->KanjiOut = w;
-						}
-						break;
-					}
-					case IdKoreanCP949:
-					case IdCnGB2312:
-					case IdCnBig5:
-					case IdISO8859_1:
-					case IdISO8859_2:
-					case IdISO8859_3:
-					case IdISO8859_4:
-					case IdISO8859_5:
-					case IdISO8859_6:
-					case IdISO8859_7:
-					case IdISO8859_8:
-					case IdISO8859_9:
-					case IdISO8859_10:
-					case IdISO8859_11:
-					case IdISO8859_13:
-					case IdISO8859_14:
-					case IdISO8859_15:
-					case IdISO8859_16:
-					case IdCP437:
-					case IdCP737:
-					case IdCP775:
-					case IdCP850:
-					case IdCP852:
-					case IdCP855:
-					case IdCP857:
-					case IdCP860:
-					case IdCP861:
-					case IdCP862:
-					case IdCP863:
-					case IdCP864:
-					case IdCP865:
-					case IdCP866:
-					case IdCP869:
-					case IdCP874:
-					case IdCP1250:
-					case IdCP1251:
-					case IdCP1252:
-					case IdCP1253:
-					case IdCP1254:
-					case IdCP1255:
-					case IdCP1256:
-					case IdCP1257:
-					case IdCP1258:
-					case IdKOI8_NEW:
-						// SBCS(Single Byte Code Set)
-						break;
-					case IdDebug:	// MinGW警告対策
-						break;
-#if !defined(__MINGW32__)
-					default:
-						// gcc/clangではswitchにenumのメンバがすべてないとき警告が出る
-						assert(FALSE);
-						break;
-#endif
-					}
+					ts->KanjiCode = (WORD)coding;
 
 					// 送信コード
-					curPos = (int)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
+					curPos = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
 					coding = (IdKanjiCode)SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETITEMDATA, curPos, 0);
-					ts->KanjiCodeSend = coding;
+					ts->KanjiCodeSend = (WORD)coding;
+
+					// JIS
+					ts->JIS7Katakana = (IsDlgButtonChecked(hWnd, IDC_TERMKANA) == BST_CHECKED);
+					ts->JIS7KatakanaSend = (IsDlgButtonChecked(hWnd, IDC_TERMKANASEND) == BST_CHECKED);
+					ts->KanjiIn = (WORD)GetCurSel(hWnd, IDC_TERMKIN);
+					ts->KanjiOut = (WORD)GetCurSel(hWnd, IDC_TERMKOUT);
 
 					// characters as wide
 					ts->UnicodeAmbiguousWidth = (BYTE)GetCurSel(hWnd, IDC_AMBIGUOUS_WIDTH_COMBO);
@@ -403,8 +330,11 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 						const OverrideCharWidthInfo *info = &DlgData->unicode_override_charwidth_info;
 
 						BOOL enable = IsDlgButtonChecked(hWnd, IDC_OVERRIDE_CHAR_WIDTH);
-						size_t selected =
-							(size_t)SendDlgItemMessageW(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO, CB_GETCURSEL, 0, 0);
+						LRESULT selected =
+							SendDlgItemMessageW(hWnd, IDC_OVERRIDE_CHAR_WIDTH_COMBO, CB_GETCURSEL, 0, 0);
+						if (selected == CB_ERR) {
+							selected = 0;
+						}
 						if (!enable) {
 							// disableする
 							UnicodeOverrideWidthUninit();
@@ -418,7 +348,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 							}
 						}
 
-						ts->UnicodeOverrideCharWidthEnable = enable;
+						ts->UnicodeOverrideCharWidthEnable = (BYTE)enable;
 						ts->UnicodeOverrideCharWidthSelected = (BYTE)selected;
 					}
 
@@ -470,12 +400,15 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 					const BOOL checked = (IsDlgButtonChecked(hWnd, IDC_USE_DIFFERENT_CODE) == BST_CHECKED) ? TRUE : FALSE;
 					EnableWindow(GetDlgItem(hWnd, IDC_TERMKANJISEND), checked ? TRUE : FALSE);
 					if (!checked) {
-						// USE_DIFFRENT_CODEのチェックが入っていないるとき
+						// USE_DIFFRENT_CODEのチェックが入っていないとき
 						LRESULT recv_index = SendDlgItemMessageA(hWnd, IDC_TERMKANJI, CB_GETCURSEL, 0, 0);
 						LRESULT send_index = SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_GETCURSEL, 0, 0);
 						if (recv_index != send_index) {
 							// 送受信コードが異なっているなら、送信コードを受信と同一にする
 							SendDlgItemMessageA(hWnd, IDC_TERMKANJISEND, CB_SETCURSEL, recv_index, 0);
+
+							CodingPPData *DlgData = (CodingPPData *)GetWindowLongPtrW(hWnd, DWLP_USER);
+							ArrenageItems(hWnd, DlgData);
 						}
 					}
 					break;

@@ -181,16 +181,16 @@ BOOL OpenSharedMemory(BOOL *first_instance_, PMap *pm_, HANDLE *HMap_)
 	return FALSE;
 }
 
-void CloseSharedMemory(PMap pm, HANDLE HMap)
+void CloseSharedMemory(PMap ppm, HANDLE HMap)
 {
-	UnmapViewOfFile(pm);
+	UnmapViewOfFile(ppm);
 	CloseHandle(HMap);
 }
 
 static BOOL FirstInstance;
 static HANDLE HMap = NULL;
 
-BOOL StartTeraTerm(HINSTANCE hInst, PTTSet ts)
+BOOL StartTeraTerm(PTTSet ts)
 {
 	OpenSharedMemory(&FirstInstance, &pm, &HMap);
 	SetPMPtr(pm);
@@ -199,28 +199,6 @@ BOOL StartTeraTerm(HINSTANCE hInst, PTTSet ts)
 		// init window list
 		pm->NWin = 0;
 	}
-
-	// if (FirstInstance) { の部分から移動 (2008.3.13 maya)
-	// 起動時には、共有メモリの HomeDir と SetupFName は空になる
-	/* Get home directory (ttermpro.exeのフォルダ) */
-	ts->ExeDirW = GetExeDirW(hInst);
-
-	// LogDir
-	ts->LogDirW = GetLogDirW(hInst);
-
-	// HomeDir
-	ts->HomeDirW = GetHomeDirW(hInst);
-	WideCharToACP_t(ts->HomeDirW, ts->HomeDir, _countof(ts->HomeDir));
-	SetCurrentDirectoryW(ts->HomeDirW);		// TODO 必要??
-
-	// TERATERM.INI のフルパス
-	ts->SetupFNameW = NULL;
-	awcscats(&ts->SetupFNameW, ts->HomeDirW, L"\\TERATERM.INI", NULL);
-	WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
-
-	// KEYBOARD.CNF のフルパス
-	ts->KeyCnfFNW = NULL;
-	awcscats(&ts->KeyCnfFNW, ts->HomeDirW, L"\\KEYBOARD.CNF", NULL);
 
 	// ポータブルモードではなく、
 	// 個人設定ファイルのあるフォルダ HomeDirW に TERATERM.INI が存在しないとき
