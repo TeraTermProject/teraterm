@@ -99,6 +99,7 @@ typedef struct {
 	int ZMode;
 	ZState_E ZState;
 	ZStatePkt_E ZPktState;
+	BOOL isZCancel;
 	int MaxDataLen, TimeOut, CanCount;
 	BOOL CtlEsc, CRC32, HexLo, Quoted, CRRecv;
 	WORD CRC;
@@ -654,6 +655,7 @@ static void ZSendFileDat(PZVar zv)
 	zv->PktOutPtr = 0;
 	zv->Sending = TRUE;
 	zv->ZState = Z_SendFileDat;
+	zv->isZCancel = FALSE;
 
 	zv->ByteCount = 0;
 	zv->ProgStat = 0;
@@ -856,6 +858,10 @@ static void ZTimeOutProc(TProto *pv)
 		break;
 	default:
 		break;
+	}
+
+	if (zv->isZCancel) {
+		zv->ZState = Z_End;
 	}
 }
 
@@ -1542,7 +1548,9 @@ static BOOL ZParse(TProto *pv)
 				ZSendDataDat(zv);
 				break;
 			case Z_Cancel:
-				zv->ZState = Z_End;
+				if (! zv->isZCancel) {
+					zv->ZState = Z_End;
+				}
 				break;
 			default:
 				break;
@@ -1566,8 +1574,17 @@ static void ZCancel(TProto *pv)
 {
 	PZVar zv = pv->PrivateData;
 	ZSendCancel(zv);
+
 	if (! zv->cv->Ready){
 		ProtoEnd();	// セッション断の場合は直接 ProtoEnd() を呼んでウィンドウを閉じる
+	}
+
+	// Cancel送信後、0.5秒経過したら終了する
+	if (! zv->isZCancel) {
+		zv->isZCancel = TRUE;
+		PFileVarProto fv = zv->fv;
+		KillTimer(fv->HMainWin, IdProtoTimer);
+		SetTimer(fv->HMainWin, IdProtoTimer, 500, NULL);
 	}
 }
 
