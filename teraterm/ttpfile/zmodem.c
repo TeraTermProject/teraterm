@@ -1075,6 +1075,7 @@ static void ZParseHdr(PZVar zv)
 		}
 		break;
 	case ZEOF:
+		update_dialog(zv, FALSE);
 		if (zv->Pos != ZRclHdr(zv)) {
 			ZSendRPOS(zv);
 			return;
