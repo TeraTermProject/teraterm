@@ -98,7 +98,7 @@ static INT_PTR CALLBACK proc(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 				SetI18nListW("Tera Term", Dialog, IDC_KEYBMETA, infos, _countof(infos), ts->UILanguageFileW, ts->MetaKey);
 			}
 
-			SetDropDownList(Dialog, IDC_KEYBKEYB, RussList2, ts->RussKeyb);
+			SetDropDownList(Dialog, IDC_KEYBKEYB, RussList2, ts->RussKeyb == 0 ? 0 : 1);
 			if (IsWindowUnicode(Dialog) != TRUE || GetACP() != 1251) {
 				// 非Unicode(ANSI)動作 && CP1251(Russian)のとき、
 				// このオプションは使用可能となる
@@ -130,7 +130,7 @@ static INT_PTR CALLBACK proc(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 					ts->MetaKey = w - 1;
 				}
 				if ((w = (WORD)GetCurSel(Dialog, IDC_KEYBKEYB)) > 0) {
-					ts->RussKeyb = w;
+					ts->RussKeyb = w;	// 0=Windows / 1=KOI8-R
 				}
 				break;
 			}

@@ -1618,7 +1618,7 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		else if (acp == 1251) {
 			// CP1251	Russian,Cyrillic キリル
 			UINT code_page = CP_ACP;
-			if (ts.RussKeyb != /*IdWindows*/0) {
+			if (ts.RussKeyb != 0) {
 				code_page = 20866; /*koi8-r*/
 			}
 			char mb_str[2];

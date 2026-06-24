@@ -397,7 +397,7 @@ struct tttset {
 	WORD UseIME;
 	WORD IMEInline;
 	WORD MetaKey;
-	WORD RussKeyb;
+	WORD RussKeyb;				// 0 = 通常 / 0以外 = キーコードはKOI8-R (9xのときのみ有効)
 /*------ PortSet --------*/
 	WORD PortType;
 	/* TCP/IP */
