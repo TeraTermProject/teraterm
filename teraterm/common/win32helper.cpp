@@ -244,8 +244,10 @@ DWORD hGetCurrentDirectoryW(wchar_t **dir)
  *	hWndの文字列を取得する
  *	不要になったら free() すること
  *
- *	@param[out]	text	設定されている文字列
+ *	@param[out]	text	設定されている文字列へのポインタ
+ *						文字列が設定されいないときは L"" へのポインタ
  *						不要になったらfree()する
+ *						エラー時は NULL がセットされる
  *	@return	エラーコード,0(=NO_ERROR)のときエラーなし
  */
 DWORD hGetWindowTextW(HWND hWnd, wchar_t **text)
@@ -278,6 +280,9 @@ DWORD hGetWindowTextW(HWND hWnd, wchar_t **text)
 	return 0;
 }
 
+/**
+ *	@param[out]	text	hGetWindowTextW() と同じ
+ */
 DWORD hGetDlgItemTextW(HWND hDlg, int id, wchar_t **text)
 {
 	HWND hWnd = GetDlgItem(hDlg, id);

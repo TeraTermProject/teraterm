@@ -213,10 +213,6 @@ void CGeneralPropPageDlg::OnOK()
 	// File transfer dir
 	free(pts->FileDirW);
 	hGetDlgItemTextW(m_hWnd, IDC_FILE_DIR, &pts->FileDirW);
-	if (pts->FileDirW != NULL && pts->FileDirW[0] == 0) {
-		free(pts->FileDirW);
-		pts->FileDirW = NULL;
-	}
 }
 
 void CGeneralPropPageDlg::OnHelp()

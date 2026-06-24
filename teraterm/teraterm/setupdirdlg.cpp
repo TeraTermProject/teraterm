@@ -446,18 +446,8 @@ static wchar_t *_GetTermLogPath(const SetupList *list, const TTTSet *pts)
 	if (list->data_ptr == 0) {
 		// Default log save folder
 		// LogDefaultNameW
-		if (pts->LogDefaultPathW != NULL) {
-			wchar_t *d = GetTermLogDir(pts);
-			int r = wcscmp(d, pts->LogDefaultPathW);
-			free(d);
-			if (r == 0) {
-				// ts->LogDefaultPathW と GetTermLogDir() が同じなら
-				// 表示しない
-				return NULL;
-			}
-			else {
-				return _wcsdup(pts->LogDefaultPathW);
-			}
+		if (pts->LogDefaultPathW != NULL && pts->LogDefaultPathW[0] != 0) {
+			return _wcsdup(pts->LogDefaultPathW);
 		}
 		else {
 			return _wcsdup(L"");
