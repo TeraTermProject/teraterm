@@ -95,9 +95,10 @@
 #define NonNull(msg) ((msg)?(msg):"(null)")
 
 typedef enum {
-	GetPayloadError = 0,
+	GetPayloadError = 0, // grab_payload() に失敗
 	GetPayloadOK = 1,
-	GetPayloadTruncate = 2
+	GetPayloadTruncate = 2, // 切り詰めて格納された ... get_string_from_payload() のみ
+	GetPayloadAllocError = 3 // malloc() に失敗 ... get_stringb_from_payload() のみ
 } PayloadStat;
 
 static struct global_confirm global_confirms;
@@ -946,7 +947,25 @@ static PayloadStat get_byte_from_payload(PTInstVar pvar, unsigned char *val)
 	*val = *data;
 	return GetPayloadOK;
 }
-#define get_boolean_from_payload(pvar, val) get_byte_from_payload(pvar, val)
+
+// BOOL にしてもいいが、boolean を int で保持しているところがあるため int で受け取る
+static PayloadStat get_boolean_from_payload(PTInstVar pvar, int* val)
+{
+	unsigned char data;
+
+	PayloadStat ret = get_byte_from_payload(pvar, &data);
+	if (ret != GetPayloadOK) {
+		return ret;
+	}
+
+	if (data == 0) { // The value 0 represents FALSE,
+		*val = 0;
+	}
+	else { // and the value 1 represents TRUE. All non-zero values MUST be interpreted as TRUE
+		*val = 1;
+	}
+	return GetPayloadOK;
+}
 
 static PayloadStat get_bytearray_from_payload(PTInstVar pvar, unsigned char *buff, unsigned int len)
 {
@@ -1017,6 +1036,32 @@ static PayloadStat get_string_from_payload(
 	}
 }
 #define get_namelist_from_payload(pvar, buff, bufflen, size) get_string_from_payload(pvar, buff, bufflen, size, TRUE)
+
+static PayloadStat get_stringb_from_payload(PTInstVar pvar, buffer_t **buff)
+{
+	unsigned int size;
+	unsigned char *data;
+
+	if (!get_uint32_from_payload(pvar, &size)) {
+		return GetPayloadError;
+	}
+
+	data = remained_payload(pvar);
+	if (!grab_payload(pvar, size)) {
+		return GetPayloadError;
+	}
+
+	buffer_free(*buff);
+	*buff = buffer_init();
+	if (*buff == NULL) {
+		return GetPayloadAllocError;
+	}
+	if (buffer_append(*buff, data, size) != 0) {
+		return GetPayloadAllocError;
+	}
+
+	return GetPayloadOK;
+}
 
 static PayloadStat get_mpint_from_payload(PTInstVar pvar, BIGNUM *bn)
 {
@@ -1709,35 +1754,25 @@ static BOOL handle_ignore(PTInstVar pvar)
 
 static BOOL handle_debug(PTInstVar pvar)
 {
-	BOOL always_display;
-	char *description;
+	int always_display = 1;
+	char description[1024] = "";
 	unsigned int description_len;
 	char buf[2048];
 
 	if (SSHv1(pvar)) {
 		logputs(LOG_LEVEL_VERBOSE, "SSH_MSG_DEBUG was received.");
 
-		if (grab_payload(pvar, 4)
-		 && grab_payload(pvar, description_len =
-		                 get_payload_uint32(pvar, 0))) {
-			always_display = FALSE;
-			description = pvar->ssh_state.payload + 4;
-			description[description_len] = 0;
-		} else {
+		if (get_string_from_payload(pvar, description, sizeof(description), &description_len, TRUE) != 1) {
 			return TRUE;
 		}
+		always_display = 0;
 	} else {
 		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_DEBUG was received.");
 
-		if (grab_payload(pvar, 5)
-		 && grab_payload(pvar,
-		                 (description_len = get_payload_uint32(pvar, 1)) + 4)
-		 && grab_payload(pvar,
-		                 get_payload_uint32(pvar, 5 + description_len))) {
-			always_display = pvar->ssh_state.payload[0] != 0;
-			description = pvar->ssh_state.payload + 5;
-			description[description_len] = 0;
-		} else {
+		if (get_boolean_from_payload(pvar, &always_display) != 1) {
+			return TRUE;
+		}
+		if (get_string_from_payload(pvar, description, sizeof(description), &description_len, TRUE) != 1) {
 			return TRUE;
 		}
 	}
@@ -1756,7 +1791,7 @@ static BOOL handle_debug(PTInstVar pvar)
 static BOOL handle_disconnect(PTInstVar pvar)
 {
 	int reason_code;
-	char *description;
+	char description[1024] = "";
 	unsigned int description_len;
 	char buf[2048];
 	char *explanation = "";
@@ -1765,34 +1800,25 @@ static BOOL handle_disconnect(PTInstVar pvar)
 	if (SSHv1(pvar)) {
 		logputs(LOG_LEVEL_VERBOSE, "SSH_MSG_DISCONNECT was received.");
 
-		if (grab_payload(pvar, 4)
-		 && grab_payload(pvar, description_len = get_payload_uint32(pvar, 0))) {
-			reason_code = -1;
-			description = pvar->ssh_state.payload + 4;
-			description[description_len] = 0;
-		} else {
+		if (get_string_from_payload(pvar, description, sizeof(description), &description_len, TRUE) != 1) {
+			logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (description)", __FUNCTION__);
 			return TRUE;
 		}
+		reason_code = -1;
 	} else {
 		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_DISCONNECT was received.");
 
-		if (grab_payload(pvar, 8)
-		 && grab_payload(pvar,
-		                 (description_len = get_payload_uint32(pvar, 4)) + 4)
-		 && grab_payload(pvar,
-		                 get_payload_uint32(pvar, 8 + description_len))) {
-			reason_code = get_payload_uint32(pvar, 0);
-			description = pvar->ssh_state.payload + 8;
-			description[description_len] = 0;
-		} else {
+		if (!get_uint32_from_payload(pvar, &reason_code)) {
+			logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (reason code)", __FUNCTION__);
+			return TRUE;
+		}
+		if (get_string_from_payload(pvar, description, sizeof(description), &description_len, TRUE) != 1) {
+			logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (description)", __FUNCTION__);
 			return TRUE;
 		}
 	}
 
 	chop_newlines(description);
-	if (description[0] == 0) {
-		description = NULL;
-	}
 
 	if (get_handler(pvar, SSH_SMSG_FAILURE) == handle_forwarding_failure) {
 		UTIL_get_lang_msg("MSG_SSH_UNABLE_FWD_ERROR", pvar,
@@ -1802,7 +1828,7 @@ static BOOL handle_disconnect(PTInstVar pvar)
 		explanation = uimsg;
 	}
 
-	if (description != NULL) {
+	if (description[0] != '\0') {
 		UTIL_get_lang_msg("MSG_SSH_SERVER_DISCON_ERROR", pvar,
 		                  "Server disconnected with message '%s'%s");
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
@@ -1830,7 +1856,7 @@ static BOOL handle_disconnect(PTInstVar pvar)
 static BOOL handle_unimplemented(PTInstVar pvar)
 {
 	/* Should never receive this since we only send base 2.0 protocol messages */
-	grab_payload(pvar, 4);
+	// grab_payload(pvar, 4);
 	return TRUE;
 }
 
@@ -4918,11 +4944,13 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, 
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(msg, msg_size, _TRUNCATE,
-		            "%s: truncated packet (kex algorithms)", __FUNCTION__);
+		            "%s: payload corrupted. (kex_algorithms)", __FUNCTION__);
 		r = -1;
 		goto error;
 	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed kex algorithms is too long.", __FUNCTION__);
+		// buf よりも長い文字列がリモートから届いたので、切り詰めて格納された。
+		// 優先順位が高い方式でマッチすれば通信を行えるので、警告を記録するのみで処理を続行する。
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed kex_algorithms is too long.", __FUNCTION__);
 		break;
 	}
 
@@ -4958,11 +4986,11 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, 
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(msg, msg_size, _TRUNCATE,
-		            "%s: truncated packet (hostkey algorithms)", __FUNCTION__);
+		            "%s: payload corrupted. (server_host_key_algorithms)", __FUNCTION__);
 		r = -3;
 		goto error;
 	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed hostkey algorithms is too long.", __FUNCTION__);
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed server_host_key_algorithms is too long.", __FUNCTION__);
 		break;
 	}
 
@@ -4980,11 +5008,11 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, 
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(msg, msg_size, _TRUNCATE,
-		            "%s: truncated packet (encryption algorithms client to server)", __FUNCTION__);
+		            "%s: payload corrupted. (encryption_algorithms_client_to_server)", __FUNCTION__);
 		r = -5;
 		goto error;
 	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed encryption algorithms (client to server) is too long.", __FUNCTION__);
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed encryption_algorithms_client_to_server is too long.", __FUNCTION__);
 		break;
 	}
 
@@ -5002,11 +5030,11 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, 
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(msg, msg_size, _TRUNCATE,
-		            "%s: truncated packet (encryption algorithms server to client)", __FUNCTION__);
+		            "%s: payload corrupted. (encryption_algorithms_server_to_client)", __FUNCTION__);
 		r = -7;
 		goto error;
 	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed encryption algorithms (server to client) is too long.", __FUNCTION__);
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed encryption_algorithms_server_to_client is too long.", __FUNCTION__);
 		break;
 	}
 
@@ -5024,11 +5052,11 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, 
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(msg, msg_size, _TRUNCATE,
-		            "%s: truncated packet (MAC algorithms client to server)", __FUNCTION__);
+		            "%s: payload corrupted. (mac_algorithms_client_to_server)", __FUNCTION__);
 		r = -9;
 		goto error;
 	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed MAC algorithms (client to server) is too long.", __FUNCTION__);
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed mac_algorithms_client_to_server is too long.", __FUNCTION__);
 		break;
 	}
 
@@ -5052,11 +5080,11 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, 
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(msg, msg_size, _TRUNCATE,
-		            "%s: truncated packet (MAC algorithms server to client)", __FUNCTION__);
+		            "%s: payload corrupted. (mac_algorithms_server_to_client)", __FUNCTION__);
 		r = -11;
 		goto error;
 	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed MAC algorithms (server to client) is too long.", __FUNCTION__);
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed mac_algorithms_server_to_client is too long.", __FUNCTION__);
 		break;
 	}
 
@@ -5080,11 +5108,11 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, 
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(msg, msg_size, _TRUNCATE,
-		            "%s: truncated packet (compression algorithms client to server)", __FUNCTION__);
+		            "%s: payload corrupted. (compression_algorithms_client_to_server)", __FUNCTION__);
 		r = -13;
 		goto error;
 	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed compression algorithms (client to server) is too long.", __FUNCTION__);
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed compression_algorithms_client_to_server is too long.", __FUNCTION__);
 		break;
 	}
 
@@ -5102,11 +5130,11 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, 
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		_snprintf_s(msg, msg_size, _TRUNCATE,
-		            "%s: truncated packet (compression algorithms server to client)", __FUNCTION__);
+		            "%s: payload corrupted. (compression_algorithms_server_to_client)", __FUNCTION__);
 		r = -15;
 		goto error;
 	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed compression algorithms (server to client) is too long.", __FUNCTION__);
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed compression_algorithms_server_to_client is too long.", __FUNCTION__);
 		break;
 	}
 
@@ -5127,10 +5155,10 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, 
 		// 言語の name-list が取れないという事は KEXINIT パケットのフォーマット自体が想定外であり
 		// 異常な状態であるが、通信に必要なアルゴリズムはすでにネゴ済みで通信自体は行える。
 		// 今まではこの部分のチェックを行っていなかったので、警告を記録するのみで処理を続行する。
-		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (language client to server)", __FUNCTION__);
+		logprintf(LOG_LEVEL_WARNING, "%s: payload corrupted. (languages_client_to_server)", __FUNCTION__);
 		goto skip;
 	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed language (client to server) is too long.", __FUNCTION__);
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed languages_client_to_server is too long.", __FUNCTION__);
 		break;
 	}
 
@@ -5141,10 +5169,10 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, 
 	switch (get_namelist_from_payload(pvar, buf, buf_size, &payload_len)) {
 	case GetPayloadError:
 		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
-		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (language server to client)", __FUNCTION__);
+		logprintf(LOG_LEVEL_WARNING, "%s: payload corrupted. (languages_server_to_client)", __FUNCTION__);
 		goto skip;
 	case GetPayloadTruncate:
-		logprintf(LOG_LEVEL_WARNING, "%s: server proposed language (server to client) is too long.", __FUNCTION__);
+		logprintf(LOG_LEVEL_WARNING, "%s: server proposed languages_server_to_client is too long.", __FUNCTION__);
 		break;
 	}
 
@@ -5153,9 +5181,9 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, 
 	// first_kex_packet_follows:
 	// KEXINIT パケットの後に、アルゴリズムのネゴ結果を推測して鍵交換パケットを送っているか。
 	// SSH_MSG_KEXINIT の後の鍵交換はクライアント側から送るのでサーバ側が 1 にする事はないはず。
-	if (!get_boolean_from_payload(pvar, buf)) {
+	if (!get_byte_from_payload(pvar, buf)) {
 		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
-		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (first_kex_packet_follows)", __FUNCTION__);
+		logprintf(LOG_LEVEL_WARNING, "%s: payload corrupted. (first_kex_packet_follows)", __FUNCTION__);
 		goto skip;
 	}
 	if (buf[0] != 0) {
@@ -5166,7 +5194,7 @@ choose_SSH2_kex_choose_conf(PTInstVar pvar, char *buf, int buf_size, char *msg, 
 	// reserved: 現状は常に 0 となる。
 	if (!get_uint32_from_payload(pvar, &payload_len)) {
 		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
-		logprintf(LOG_LEVEL_WARNING, "%s: truncated packet (reserved)", __FUNCTION__ );
+		logprintf(LOG_LEVEL_WARNING, "%s: payload corrupted. (reserved)", __FUNCTION__ );
 		goto skip;
 	}
 	if (payload_len != 0) {
@@ -5245,13 +5273,16 @@ error:
  */
 static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 {
-	char buf[1024];
 	char *data;
 	unsigned int len;
+	char buf[1024];
 	int r;
-	char msg[1024+512];
+	char *emsg = NULL, emsg_tmp[1024 + 512]; // error message
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXINIT was received.");
+
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	// すでにキー交換が終わっているにも関わらず、サーバから SSH2_MSG_KEXINIT が
 	// 送られてくる場合は、キー再作成を行う。(2004.10.24 yutaka)
@@ -5266,9 +5297,6 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		SSH2_send_kexinit(pvar);
 	}
 
-	data = remained_payload(pvar);
-	len = remained_payloadlen(pvar);
-
 	// KEX の最後で exchange-hash (session-id) を計算するのに使うので保存しておく
 	if (pvar->kex->peer != NULL) {
 		// already allocated
@@ -5277,26 +5305,32 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	else {
 		pvar->kex->peer = buffer_init();
 		if (pvar->kex->peer == NULL) {
-			_snprintf_s(msg, sizeof(msg), _TRUNCATE,
+			_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 			            "%s: Out of memory", __FUNCTION__);
+			emsg = emsg_tmp;
 			goto error;
 		}
 	}
+	// buffer_append() しているが、メッセージデータ全体なので grab_payload() していない。
+	// grab_payload() は続く処理で各フィールドに対して個別に行う。
+	// pvar->kex->peer に格納されるが、各フィールドがエラーになったら使われない。
 	buffer_append(pvar->kex->peer, data, len);
 
 	push_memdump("KEXINIT", "exchange algorithm list: receiving", data, len);
 
 	// cookie
 	if (! get_bytearray_from_payload(pvar, buf, SSH2_COOKIE_LENGTH)) {
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE,
-		            "%s: truncated packet (cookie)", __FUNCTION__);
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+		            "%s: payload corrupted. (cookie)", __FUNCTION__);
+		emsg = emsg_tmp;
 		goto error;
 	}
 	CRYPT_set_server_cookie(pvar, buf);
 
 	// 使用するアルゴリズムの決定
-	r = choose_SSH2_kex_choose_conf(pvar, buf, sizeof(buf), msg, sizeof(msg));
+	r = choose_SSH2_kex_choose_conf(pvar, buf, sizeof(buf), emsg_tmp, sizeof(emsg_tmp));
 	if (r != 0) {
+		emsg = emsg_tmp;
 		goto error;
 	}
 
@@ -5340,7 +5374,8 @@ error:;
 	buffer_free(pvar->kex->peer);
 	pvar->kex->peer = NULL;
 
-	notify_fatal_error(pvar, msg, TRUE);
+	if (emsg)
+		notify_fatal_error(pvar, emsg, TRUE);
 
 	return FALSE;
 }
@@ -5521,9 +5556,15 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	if (p == NULL || g == NULL)
 		goto error;
 
-	if (!get_mpint_from_payload(pvar, p) || !get_mpint_from_payload(pvar, g)) {
+	if (!get_mpint_from_payload(pvar, p)) {
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
-		            "%s:truncated packet (mpint)", __FUNCTION__);
+		            "%s: payload corrupted. (p, safe prime)", __FUNCTION__);
+		notify_fatal_error(pvar, tmpbuf, FALSE);
+		return FALSE;
+	}
+	if (!get_mpint_from_payload(pvar, g)) {
+		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
+		            "%s: payload corrupted. (g, generator for subgroup in GF(p))", __FUNCTION__);
 		notify_fatal_error(pvar, tmpbuf, FALSE);
 		return FALSE;
 	}
@@ -5986,14 +6027,14 @@ static void ssh2_send_newkeys(PTInstVar pvar)
 static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 {
 	char *data;
-	int len;
+	unsigned int len;
 	int bloblen, pklen, siglen;
 	kex *kex = pvar->kex;
 	Key *server_host_key = NULL;
 	buffer_t *shared_secret = NULL;
 	buffer_t *server_blob = NULL;
 	buffer_t *server_host_key_blob = NULL;
-	char *signature;
+	char signature[512] = "";
 	char hash[SSH_DIGEST_MAX_LENGTH];
 	int hashlen;
 	int r;
@@ -6007,21 +6048,22 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXDH_REPLY was received.");
 
-	memset(&server_host_key, 0, sizeof(server_host_key));
-
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	push_memdump("KEXDH_REPLY", "key exchange: receiving", data, len);
 
 	/* K_S, server's public host key */
-	bloblen = get_uint32_MSBfirst(data);
-	data += 4;
-	server_host_key_blob = buffer_init();
-	buffer_append(server_host_key_blob, data, bloblen);
+	if (get_stringb_from_payload(pvar, &server_host_key_blob) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (K_S, server's public host key)", __FUNCTION__);
+		goto out;
+	}
+	data = buffer_ptr(server_host_key_blob);
+	bloblen = buffer_len(server_host_key_blob);
 
 	push_memdump("KEXDH_REPLY", "server_host_key_blob", data, bloblen);
 
+	memset(&server_host_key, 0, sizeof(server_host_key));
 	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob),
 	                                buffer_len(server_host_key_blob));
 	if (server_host_key == NULL) {
@@ -6030,7 +6072,6 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto out;
 	}
-	data += bloblen;
 
 	// known_hosts対応 (2006.3.20)
 	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
@@ -6045,15 +6086,18 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	}
 
 	/* DH parameter f, server public DH key */
-	server_public = buffer_get_string(&data, &pklen); // data part of mpint
-	server_blob = buffer_init();
-	buffer_append(server_blob, server_public, pklen);
+	if (get_stringb_from_payload(pvar, &server_blob) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (DH parameter f, server public DH key)", __FUNCTION__);
+		goto out;
+	}
+	server_public = buffer_ptr(server_blob); // data part of mpint
+	pklen = buffer_len(server_blob);
 
 	/* signed H */
-	siglen = get_uint32_MSBfirst(data);
-	data += 4;
-	signature = data;
-	data += siglen;
+	if (get_string_from_payload(pvar, signature, sizeof(signature), &siglen, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (signature of H)", __FUNCTION__);
+		goto out;
+	}
 
 	push_memdump("KEXDH_REPLY", "signature", signature, siglen);
 
@@ -6125,7 +6169,6 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
  out:
 	SecureZeroMemory(hash, sizeof(hash));
 	buffer_free(server_host_key_blob);
-	free(server_public);
 	BN_clear_free(dh_server_pub);
 	key_free(server_host_key);
 	buffer_free(server_blob);
@@ -6150,7 +6193,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 {
 	char *data;
-	int len;
+	unsigned int len;
 	int bloblen;
 	kex *kex = pvar->kex;
 	BIGNUM *dh_server_pub = NULL;
@@ -6158,7 +6201,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	buffer_t *shared_secret = NULL;
 	buffer_t *server_host_key_blob = NULL;
 	Key *server_host_key = NULL;
-	char *signature = NULL;
+	char signature[512] = "";
 	char hash[SSH_DIGEST_MAX_LENGTH];
 	int slen, hashlen;
 	int r;
@@ -6168,21 +6211,22 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_REPLY was received.");
 
-	memset(&server_host_key, 0, sizeof(server_host_key));
-
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	push_memdump("DH_GEX_REPLY", "key exchange: receiving", data, len);
 
 	/* K_S, server's public host key */
-	bloblen = get_uint32_MSBfirst(data);
-	data += 4;
-	server_host_key_blob = buffer_init();
-	buffer_append(server_host_key_blob, data, bloblen);
+	if (get_stringb_from_payload(pvar, &server_host_key_blob) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (K_S, server's public host key)", __FUNCTION__);
+		goto error;
+	}
+	data = buffer_ptr(server_host_key_blob);
+	bloblen = buffer_len(server_host_key_blob);
 
 	push_memdump("DH_GEX_REPLY", "server_host_key_blob", data, bloblen);
 
+	memset(&server_host_key, 0, sizeof(server_host_key));
 	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob),
 	                                buffer_len(server_host_key_blob));
 	if (server_host_key == NULL) {
@@ -6191,7 +6235,6 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
-	data += bloblen;
 
 	// known_hosts対応 (2006.3.20)
 	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
@@ -6213,13 +6256,16 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto error;
 	}
-	buffer_get_bignum2(&data, dh_server_pub);
+	if (get_mpint_from_payload(pvar, dh_server_pub) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (DH parameter f, server public DH key)", __FUNCTION__);
+		goto error;
+	}
 
 	/* signed H */
-	slen = get_uint32_MSBfirst(data);
-	data += 4;
-	signature = data;
-	data += slen;
+	if (get_string_from_payload(pvar, signature, sizeof(signature), &slen, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (signature of H)", __FUNCTION__);
+		goto error;
+	}
 
 	push_memdump("DH_GEX_REPLY", "signature", signature, slen);
 
@@ -6319,14 +6365,14 @@ error:
 static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 {
 	char *data;
-	int len;
+	unsigned int len;
 	int bloblen, pklen, siglen;
 	kex *kex = pvar->kex;
 	Key *server_host_key = NULL;
 	buffer_t *shared_secret = NULL;
 	buffer_t *server_blob = NULL;
 	buffer_t *server_host_key_blob = NULL;
-	char *signature;
+	char signature[512] = "";
 	char hash[SSH_DIGEST_MAX_LENGTH];
 	int hashlen;
 	int r;
@@ -6337,21 +6383,22 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
 
-	memset(&server_host_key, 0, sizeof(server_host_key));
-
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
 	/* K_S, server's public host key */
-	bloblen = get_uint32_MSBfirst(data);
-	data += 4;
-	server_host_key_blob = buffer_init();
-	buffer_append(server_host_key_blob, data, bloblen);
+	if (get_stringb_from_payload(pvar, &server_host_key_blob) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (K_S, server's public host key)", __FUNCTION__);
+		goto out;
+	}
+	data = buffer_ptr(server_host_key_blob);
+	bloblen = buffer_len(server_host_key_blob);
 
 	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob", data, bloblen);
 
+	memset(&server_host_key, 0, sizeof(server_host_key));
 	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob),
 	                                buffer_len(server_host_key_blob));
 	if (server_host_key == NULL) {
@@ -6360,7 +6407,6 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 		emsg = emsg_tmp;
 		goto out;
 	}
-	data += bloblen;
 
 	// known_hosts対応 (2006.3.20)
 	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
@@ -6375,15 +6421,18 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	}
 
 	/* Q_S, server public key */
-	server_public = buffer_get_string(&data, &pklen); // octet string (form, X, Y)
-	server_blob = buffer_init();
-	buffer_append(server_blob, server_public, pklen);
+	if (get_stringb_from_payload(pvar, &server_blob) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (Q_S, server public key)", __FUNCTION__);
+		goto out;
+	}
+	server_public = buffer_ptr(server_blob); // octet string (form, X, Y)
+	pklen = buffer_len(server_blob);
 
 	/* signed H */
-	siglen = get_uint32_MSBfirst(data);
-	data += 4;
-	signature = data;
-	data += siglen;
+	if (get_string_from_payload(pvar, signature, sizeof(signature), &siglen, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (signature of H)", __FUNCTION__);
+		goto out;
+	}
 
 	push_memdump("KEX_ECDH_REPLY", "signature", signature, siglen);
 
@@ -6439,7 +6488,6 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
  out:
 	SecureZeroMemory(hash, sizeof(hash));
 	buffer_free(server_host_key_blob);
-	free(server_public);
 	EC_KEY_free(kex->ec_client_key);
 	kex->ec_client_key = NULL;
 	key_free(server_host_key);
@@ -6464,14 +6512,14 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 {
 	char *data;
-	int len;
+	unsigned int len;
 	int bloblen, pklen, siglen;
 	kex *kex = pvar->kex;
 	Key *server_host_key = NULL;
 	buffer_t *shared_secret = NULL;
 	buffer_t *server_blob = NULL;
 	buffer_t *server_host_key_blob = NULL;
-	char *signature;
+	char signature[512] = "";
 	char hash[SSH_DIGEST_MAX_LENGTH];
 	int hashlen;
 	int r;
@@ -6482,21 +6530,22 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
 
-	memset(&server_host_key, 0, sizeof(server_host_key));
-
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
 	/* K_S, server's public host key */
-	bloblen = get_uint32_MSBfirst(data);
-	data += 4;
-	server_host_key_blob = buffer_init();
-	buffer_append(server_host_key_blob, data, bloblen);
+	if (get_stringb_from_payload(pvar, &server_host_key_blob) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (K_S, server's public host key)", __FUNCTION__);
+		goto out;
+	}
+	data = buffer_ptr(server_host_key_blob);
+	bloblen = buffer_len(server_host_key_blob);
 
 	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob", data, bloblen);
 
+	memset(&server_host_key, 0, sizeof(server_host_key));
 	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob),
 	                                buffer_len(server_host_key_blob));
 	if (server_host_key == NULL) {
@@ -6520,15 +6569,18 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 	}
 
 	/* Q_S, server public key */
-	server_public = buffer_get_string(&data, &pklen); // 32 bytes public key
-	server_blob = buffer_init();
-	buffer_append(server_blob, server_public, CURVE25519_SIZE);
+	if (get_stringb_from_payload(pvar, &server_blob) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (Q_S, server public key)", __FUNCTION__);
+		goto out;
+	}
+	server_public = buffer_ptr(server_blob); // 32 bytes public key
+	pklen = buffer_len(server_blob);
 
 	/* signed H */
-	siglen = get_uint32_MSBfirst(data);
-	data += 4;
-	signature = data;
-	data += siglen;
+	if (get_string_from_payload(pvar, signature, sizeof(signature), &siglen, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (signature of H)", __FUNCTION__);
+		goto out;
+	}
 
 	push_memdump("KEX_ECDH_REPLY", "signature", signature, siglen);
 
@@ -6584,7 +6636,6 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
  out:
 	SecureZeroMemory(hash, sizeof(hash));
 	buffer_free(server_host_key_blob);
-	free(server_public);
 	key_free(server_host_key);
 	SecureZeroMemory(kex->c25519_client_key, sizeof(kex->c25519_client_key));
 	buffer_free(server_blob);
@@ -6608,14 +6659,14 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
 {
 	char *data;
-	int len;
+	unsigned int len;
 	int bloblen, pklen, siglen;
 	kex *kex = pvar->kex;
 	Key *server_host_key = NULL;
 	buffer_t *shared_secret = NULL;
 	buffer_t *server_blob = NULL;
 	buffer_t *server_host_key_blob = NULL;
-	char *signature;
+	char signature[512] = "";
 	char hash[SSH_DIGEST_MAX_LENGTH];
 	int hashlen;
 	int r;
@@ -6626,28 +6677,28 @@ static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
 
-	memset(&server_host_key, 0, sizeof(server_host_key));
-
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
 	/* K_S, server's public host key */
-	bloblen = get_uint32_MSBfirst(data);
-	data += 4;
-	server_host_key_blob = buffer_init();
-	buffer_append(server_host_key_blob, data, bloblen);
+	if (get_stringb_from_payload(pvar, &server_host_key_blob) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (K_S, server's public host key)", __FUNCTION__);
+		goto out;
+	}
+	data = buffer_ptr(server_host_key_blob);
+	bloblen = buffer_len(server_host_key_blob);
 
 	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob", data, bloblen);
 
+	memset(&server_host_key, 0, sizeof(server_host_key));
 	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob), buffer_len(server_host_key_blob));
 	if (server_host_key == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE, "%s: key_from_blob error", __FUNCTION__);
 		emsg = emsg_tmp;
 		goto out;
 	}
-	data += bloblen;
 
 	// known_hosts対応
 	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
@@ -6662,15 +6713,18 @@ static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
 	}
 
 	/* Q_S, server public key */
-	server_public = buffer_get_string(&data, &pklen); // 1039 byte sntrup761 public key + 32 bytes X25519 public key
-	server_blob = buffer_init();
-	buffer_append(server_blob, server_public, pklen);
+	if (get_stringb_from_payload(pvar, &server_blob) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (Q_S, server public key)", __FUNCTION__);
+		goto out;
+	}
+	server_public = buffer_ptr(server_blob); // 1039 byte sntrup761 public key + 32 bytes X25519 public key
+	pklen = buffer_len(server_blob);
 
 	/* signed H */
-	siglen = get_uint32_MSBfirst(data);
-	data += 4;
-	signature = data;
-	data += siglen;
+	if (get_string_from_payload(pvar, signature, sizeof(signature), &siglen, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (signature of H)", __FUNCTION__);
+		goto out;
+	}
 
 	push_memdump("KEX_ECDH_REPLY", "signature", signature, siglen);
 
@@ -6736,7 +6790,6 @@ static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
  out:
 	SecureZeroMemory(hash, sizeof(hash));
 	buffer_free(server_host_key_blob);
-	free(server_public);
 	key_free(server_host_key);
 	SecureZeroMemory(kex->c25519_client_key, sizeof(kex->c25519_client_key));
 	SecureZeroMemory(kex->sntrup761_client_key, sizeof(kex->sntrup761_client_key));
@@ -6761,14 +6814,14 @@ static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
 static BOOL handle_SSH2_kem_mlkem768x25519_kex_reply(PTInstVar pvar)
 {
 	char *data;
-	int len;
+	unsigned int len;
 	int bloblen, pklen, siglen;
 	kex *kex = pvar->kex;
 	Key *server_host_key = NULL;
 	buffer_t *shared_secret = NULL;
 	buffer_t *server_blob = NULL;
 	buffer_t *server_host_key_blob = NULL;
-	char *signature;
+	char signature[512] = "";
 	char hash[SSH_DIGEST_MAX_LENGTH];
 	int hashlen;
 	int r;
@@ -6779,28 +6832,28 @@ static BOOL handle_SSH2_kem_mlkem768x25519_kex_reply(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_HYBRID_REPLY was received.");
 
-	memset(&server_host_key, 0, sizeof(server_host_key));
-
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	push_memdump("KEX_HYBRID_REPLY", "key exchange: receiving", data, len);
 
 	/* K_S, server's public host key */
-	bloblen = get_uint32_MSBfirst(data);
-	data += 4;
-	server_host_key_blob = buffer_init();
-	buffer_append(server_host_key_blob, data, bloblen);
+	if (get_stringb_from_payload(pvar, &server_host_key_blob) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (K_S, server's public host key)", __FUNCTION__);
+		goto out;
+	}
+	data = buffer_ptr(server_host_key_blob);
+	bloblen = buffer_len(server_host_key_blob);
 
 	push_memdump("KEX_HYBRID_REPLY", "server_host_key_blob", data, bloblen);
 
+	memset(&server_host_key, 0, sizeof(server_host_key));
 	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob), buffer_len(server_host_key_blob));
 	if (server_host_key == NULL) {
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE, "%s: key_from_blob error", __FUNCTION__);
 		emsg = emsg_tmp;
 		goto out;
 	}
-	data += bloblen;
 
 	// known_hosts対応
 	if (server_host_key->type != get_ssh2_hostkey_type_from_algorithm(kex->hostkey_type)) {  // ホストキーの種別比較
@@ -6815,15 +6868,18 @@ static BOOL handle_SSH2_kem_mlkem768x25519_kex_reply(PTInstVar pvar)
 	}
 
 	/* S_REPLY, server public key */
-	server_public = buffer_get_string(&data, &pklen); // 1088 byte mlkem768 public key + 32 bytes X25519 public key
-	server_blob = buffer_init();
-	buffer_append(server_blob, server_public, pklen);
+	if (get_stringb_from_payload(pvar, &server_blob) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (S_REPLY, server public key)", __FUNCTION__);
+		goto out;
+	}
+	server_public = buffer_ptr(server_blob); // 1088 byte mlkem768 public key + 32 bytes X25519 public key
+	pklen = buffer_len(server_blob);
 
 	/* signed H */
-	siglen = get_uint32_MSBfirst(data);
-	data += 4;
-	signature = data;
-	data += siglen;
+	if (get_string_from_payload(pvar, signature, sizeof(signature), &siglen, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (signature of H)", __FUNCTION__);
+		goto out;
+	}
 
 	push_memdump("KEX_HYBRID_REPLY", "signature", signature, siglen);
 
@@ -6884,7 +6940,6 @@ static BOOL handle_SSH2_kem_mlkem768x25519_kex_reply(PTInstVar pvar)
  out:
 	SecureZeroMemory(hash, sizeof(hash));
 	buffer_free(server_host_key_blob);
-	free(server_public);
 	key_free(server_host_key);
 	SecureZeroMemory(kex->c25519_client_key, sizeof(kex->c25519_client_key));
 	SecureZeroMemory(kex->mlkem768_client_key, sizeof(kex->mlkem768_client_key));
@@ -7069,15 +7124,13 @@ BOOL do_SSH2_userauth(PTInstVar pvar)
 
 static BOOL handle_SSH2_service_accept(PTInstVar pvar)
 {
-	char *data, *svc;
+	char svc[128] = "";
+	int svc_len;
 
-	data = pvar->ssh_state.payload;
-
-	if ((svc = buffer_get_string(&data, NULL)) == NULL) {
-		logprintf(LOG_LEVEL_ERROR, "%s: buffer_get_string returns NULL.", __FUNCTION__);
+	if (get_string_from_payload(pvar, svc, sizeof(svc), &svc_len, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (service name)", __FUNCTION__);
 	}
 	logprintf(LOG_LEVEL_VERBOSE, "SSH2_MSG_SERVICE_ACCEPT was received. service-name=%s", NonNull(svc));
-	free(svc);
 
 	SSH2_dispatch_init(pvar, 5);
 	if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
@@ -7118,19 +7171,19 @@ static BOOL handle_SSH2_ext_info(PTInstVar pvar)
 	logputs(LOG_LEVEL_INFO, "SSH2_EXT_INFO was received.");
 
 	if (!get_uint32_from_payload(pvar, &num_of_exts)) {
-		logprintf(LOG_LEVEL_WARNING, "%s: ext info payload was corrupted", __FUNCTION__);
+		logprintf(LOG_LEVEL_WARNING, "%s: payload corrupted. (nr-extensions)", __FUNCTION__);
 		return FALSE;
 	}
 	logprintf(LOG_LEVEL_VERBOSE, "%s: %d extensions", __FUNCTION__, num_of_exts);
 
 	for (i=0; i<num_of_exts; i++) {
 		if (!get_string_from_payload(pvar, ext_name, sizeof(ext_name), &len, TRUE)) {
-			logprintf(LOG_LEVEL_WARNING, "%s: can't get extension name", __FUNCTION__);
+			logprintf(LOG_LEVEL_WARNING, "%s: payload corrupted. (extension-name)", __FUNCTION__);
 			return FALSE;
 		}
 		if (strcmp(ext_name, "server-sig-algs") == 0) {
 			if (!get_namelist_from_payload(pvar, ext_val, sizeof(ext_val), &len)) {
-				logprintf(LOG_LEVEL_WARNING, "%s: can't get extension value", __FUNCTION__);
+				logprintf(LOG_LEVEL_WARNING, "%s: payload corrupted. (extension-value)", __FUNCTION__);
 				return FALSE;
 			}
 			if (pvar->kex->server_sig_algs) {
@@ -7143,10 +7196,10 @@ static BOOL handle_SSH2_ext_info(PTInstVar pvar)
 		}
 		else {
 			if (!get_string_from_payload(pvar, ext_val, sizeof(ext_val), &len, TRUE)) {
-				logprintf(LOG_LEVEL_WARNING, "%s: can't get extension value", __FUNCTION__);
+				logprintf(LOG_LEVEL_WARNING, "%s: payload corrupted. (extension-value)", __FUNCTION__);
 				return FALSE;
 			}
-			logprintf(LOG_LEVEL_VERBOSE, "%s: extension: ext_name: %s", __FUNCTION__, ext_name);
+			logprintf(LOG_LEVEL_VERBOSE, "%s: extension: %s, value: %s", __FUNCTION__, ext_name, ext_val);
 		}
 	}
 
@@ -7497,23 +7550,23 @@ void halt_ssh_heartbeat_thread(PTInstVar pvar)
 
 static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 {
+	char *data;
+	unsigned int len;
 	buffer_t *msg;
 	char *s;
 	unsigned char *outmsg;
-	int len;
 	Channel_t *c;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_SUCCESS was received.");
 
-	{
-		int len = pvar->ssh_state.payloadlen;
-		char *data = pvar->ssh_state.payload;
-		logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-						  data, len - 1,
-						  "receive %s:%d %s() len=%d",
-						  __FILE__, __LINE__,
-						  __FUNCTION__, len - 1);
-	}
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
+
+	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+						data, len - 1,
+						"receive %s:%d %s() len=%d",
+						__FILE__, __LINE__,
+						__FUNCTION__, len - 1);
 
 	// パスワードの破棄 (2006.8.22 yutaka)
 	if (pvar->settings.remember_password == 0) {
@@ -7589,15 +7642,16 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 
 static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 {
-	int len;
 	char *data;
-	char *cstring;
+	unsigned int len;
+	char auth_method_list[256] = "";
+	int auth_method_list_len;
 	int partial;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_FAILURE was received.");
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen;
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
 					  data, len - 1,
@@ -7605,12 +7659,19 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 					  __FILE__, __LINE__,
 					  __FUNCTION__, len - 1);
 
-	cstring = buffer_get_string(&data, NULL); // 認証方式リストの取得
-	partial = data[0];
-	data += 1;
+	// 認証方式リストの取得
+	if (get_string_from_payload(pvar, auth_method_list, sizeof(auth_method_list), &auth_method_list_len, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (authentications that can continue)", __FUNCTION__);
+		return FALSE;
+	}
+	// partial success
+	if (get_boolean_from_payload(pvar, &partial) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (partial success)", __FUNCTION__);
+		return FALSE;
+	}
 
 	// 有効な認証方式がない場合
-	if (cstring == NULL) {
+	if (auth_method_list[0] == '\0') {
 		UTIL_get_lang_msg("MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR", pvar,
 		                  "The server doesn't have valid authentication method.");
 		notify_fatal_error(pvar, pvar->UIMsg, TRUE);
@@ -7619,7 +7680,7 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 
 	// partial が TRUE のときは次の認証の準備をする
 	if (partial) {
-		logprintf(LOG_LEVEL_VERBOSE, "Authenticated using \"%s\" with partial success.", cstring);
+		logprintf(LOG_LEVEL_VERBOSE, "Authenticated using \"%s\" with partial success.", auth_method_list);
 
 		// はじめて次の認証を要するとき
 		if (!pvar->auth_state.partial_success) {
@@ -7649,21 +7710,21 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		pvar->auth_state.partial_success = partial;
 
 		// 認証ダイアログのラジオボタンを更新
-		if (strstr(cstring, "password")) {
+		if (strstr(auth_method_list, "password")) {
 			type |= (1 << SSH_AUTH_PASSWORD);
 		}
-		if (strstr(cstring, "publickey")) {
+		if (strstr(auth_method_list, "publickey")) {
 			type |= (1 << SSH_AUTH_RSA);
 			type |= (1 << SSH_AUTH_PAGEANT);
 		}
-		if (strstr(cstring, "keyboard-interactive")) {
+		if (strstr(auth_method_list, "keyboard-interactive")) {
 			type |= (1 << SSH_AUTH_TIS);
 		}
 		if (!AUTH_set_supported_auth_types(pvar, type))
 			return FALSE;
 
-		pvar->ssh2_authlist = cstring; // 不要になったらフリーすること
-		logprintf(LOG_LEVEL_VERBOSE, "method list from server: %s", cstring);
+		pvar->ssh2_authlist = _strdup(auth_method_list);  // 不要になったらフリーすること
+		logprintf(LOG_LEVEL_VERBOSE, "method list from server: %s", auth_method_list);
 
 		if (pvar->auth_state.partial_success) {
 			// 複数認証時、ダイアログを出す処理へ
@@ -7926,43 +7987,47 @@ BOOL handle_SSH2_userauth_msg60(PTInstVar pvar)
 BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 {
 	// SSH2_MSG_USERAUTH_INFO_REQUEST
-	int len;
 	char *data;
-	int slen = 0, echo;
+	unsigned int len;
+	unsigned int echo;
 	unsigned int i;
-	char *prompt = NULL;
+	char name[128] = "", inst[128] = "", lang[128] = "";
+	int name_len, inst_len, lang_len;
+	char lprompt[512] = "";
+	char prompt[128] = "";
+	int prompt_len = 0;
 	char *prompt_disp = NULL;
-	char *name, *inst, *lang;
-	char lprompt[512];
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_INFO_REQUEST was received.");
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen;
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-					  data, len - 1,
+					  data, len,
 					  "receive %s:%d %s() len=%d",
 					  __FILE__, __LINE__,
-					  __FUNCTION__, len - 1);
+					  __FUNCTION__, len);
 
 	///////// step1
 	// get string
-	name = buffer_get_string(&data, NULL);
-	inst = buffer_get_string(&data, NULL);
-	lang = buffer_get_string(&data, NULL);
-	lprompt[0] = 0;
-	if (inst == NULL) {
-		logprintf(LOG_LEVEL_ERROR, "%s: buffer_get_string returns NULL. (inst)", __FUNCTION__);
+	if (get_string_from_payload(pvar, name, sizeof(name), &name_len, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (name)", __FUNCTION__);
+		return FALSE;
 	}
-	else if (strlen(inst) > 0) {
+	if (get_string_from_payload(pvar, inst, sizeof(inst), &inst_len, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (instruction)", __FUNCTION__);
+		return FALSE;
+	}
+	if (get_string_from_payload(pvar, lang, sizeof(lang), &lang_len, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (language tag)", __FUNCTION__);
+		return FALSE;
+	}
+	if (strlen(inst) > 0) {
 		strncat_s(lprompt, sizeof(lprompt), inst, _TRUNCATE);
 		strncat_s(lprompt, sizeof(lprompt), "\r\n", _TRUNCATE);
 	}
-	if (lang == NULL) {
-		logprintf(LOG_LEVEL_ERROR, "%s: buffer_get_string returns NULL. (lang)", __FUNCTION__);
-	}
-	else if (strlen(lang) > 0) {
+	if (strlen(lang) > 0) {
 		strncat_s(lprompt, sizeof(lprompt), lang, _TRUNCATE);
 		strncat_s(lprompt, sizeof(lprompt), "\r\n", _TRUNCATE);
 	}
@@ -7970,13 +8035,11 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	logprintf(LOG_LEVEL_VERBOSE, "%s: user=%s, inst=%s, lang=%s", __FUNCTION__,
 	          NonNull(name), NonNull(inst), NonNull(lang));
 
-	free(name);
-	free(inst);
-	free(lang);
-
 	// num-prompts
-	pvar->userauth_inforeq_num = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &pvar->userauth_inforeq_num)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (num-prompts)", __FUNCTION__);
+		return FALSE;
+	}
 
 	logprintf(LOG_LEVEL_VERBOSE, "%s: prompts=%d", __FUNCTION__, pvar->userauth_inforeq_num);
 
@@ -8004,34 +8067,33 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 
 		for (i = 0; i < pvar->userauth_inforeq_num; i++) {
 			// get string
-			slen = get_uint32_MSBfirst(data);
-			data += 4;
-			prompt = data; // prompt
-			data += slen;
+			if (get_string_from_payload(pvar, prompt, sizeof(prompt), &prompt_len, TRUE) != 1) {
+				logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (prompt %d)", __FUNCTION__, i);
+				return FALSE;
+			}
 
 			// get boolean
-			echo = data[0];
-			data[0] = '\0'; // ログ出力の為、一時的に NUL Terminate する
+			if (get_boolean_from_payload(pvar, &echo) != 1) {
+				logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (echo %d)", __FUNCTION__, i);
+				return FALSE;
+			}
 
 			logprintf(LOG_LEVEL_VERBOSE, "%s:   prompt[%d]=\"%s\", echo=%d", __FUNCTION__,
-			          pvar->userauth_inforeq_index, prompt, echo);
-
-			data[0] = echo; // ログ出力を行ったので、元の値に書き戻す
-			data += 1;
+			          i, prompt, prompt_len);
 
 			// バッファに保存
-			buffer_put_string(pvar->userauth_inforeq_prompts, prompt, slen);
+			buffer_put_string(pvar->userauth_inforeq_prompts, prompt, prompt_len);
 			buffer_put_int(pvar->userauth_inforeq_prompts, echo);
 		}
 		buffer_rewind(pvar->userauth_inforeq_prompts);
 
 		// 1個目のプロンプトでダイアログを表示
-		prompt_disp = buffer_get_string_msg(pvar->userauth_inforeq_prompts, &slen);
+		prompt_disp = buffer_get_string_msg(pvar->userauth_inforeq_prompts, &prompt_len);
 		echo = buffer_get_int(pvar->userauth_inforeq_prompts);
 
 		// keyboard-interactive method
 		if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
-			AUTH_set_TIS_mode(pvar, prompt_disp, slen, echo);
+			AUTH_set_TIS_mode(pvar, prompt_disp, prompt_len, echo);
 			AUTH_advance_to_next_cred(pvar);
 			pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
 			//try_send_credentials(pvar);
@@ -8050,12 +8112,11 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 void SSH2_send_userauth_infores(PTInstVar pvar)
 {
 	int len;
-	char *data;
-	int slen = 0, echo;
-	char *s, *prompt_disp = NULL;
+	int echo;
+	char *s;
+	char *prompt_disp = NULL;
+	int prompt_len = 0;
 	unsigned char *outmsg;
-
-	data = pvar->ssh_state.payload;
 
 	if (pvar->userauth_inforeq_num) {
 		// ダイアログへの入力（レスポンス）を保持
@@ -8067,12 +8128,12 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 
 	if (pvar->userauth_inforeq_index < pvar->userauth_inforeq_num) {
 		// 次のプロンプトでダイアログを表示
-		prompt_disp = buffer_get_string_msg(pvar->userauth_inforeq_prompts, &slen);
+		prompt_disp = buffer_get_string_msg(pvar->userauth_inforeq_prompts, &prompt_len);
 		echo = buffer_get_int(pvar->userauth_inforeq_prompts);
 
 		// keyboard-interactive method
 		if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
-			AUTH_set_TIS_mode(pvar, prompt_disp, slen, echo);
+			AUTH_set_TIS_mode(pvar, prompt_disp, prompt_len, echo);
 			AUTH_advance_to_next_cred(pvar);
 			pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
 			//try_send_credentials(pvar);
@@ -8108,135 +8169,137 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 
 BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 {
-		// SSH2_MSG_USERAUTH_PK_OK
-		buffer_t *msg = NULL;
-		char *s, *username;
-		unsigned char *outmsg;
-		int len;
-		char *connect_id = "ssh-connection";
+	// SSH2_MSG_USERAUTH_PK_OK
+	char *data;
+	unsigned int len;
+	buffer_t *msg = NULL;
+	char *s, *username;
+	unsigned char *outmsg;
+	char *connect_id = "ssh-connection";
 
-		unsigned char *puttykey;
-		buffer_t *signbuf;
-		unsigned char *signedmsg;
-		int signedlen;
+	unsigned char *puttykey;
+	buffer_t *signbuf;
+	unsigned char *signedmsg;
+	int signedlen;
 
-		unsigned char *keytype_name, *keyalgo_name;
-		ssh_keytype keytype;
-		ssh_keyalgo keyalgo;
-		ssh_agentflag signflag;
+	unsigned char *keytype_name, *keyalgo_name;
+	ssh_keytype keytype;
+	ssh_keyalgo keyalgo;
+	ssh_agentflag signflag;
 
-		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_PK_OK was received.");
-		{
-			const char *data = pvar->ssh_state.payload;
-			int len = pvar->ssh_state.payloadlen;
-			logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-							  data, len - 1,
-							  "receive %s:%d %s() len=%d",
-							  __FILE__, __LINE__,
-							  __FUNCTION__, len - 1);
-		}
-		username = pvar->auth_state.user;  // ユーザ名
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_PK_OK was received.");
 
-		// 署名するデータを作成
-		signbuf = buffer_init();
-		if (signbuf == NULL) {
-			safefree(pvar->pageant_key);
-			return FALSE;
-		}
-		buffer_append_length(signbuf, pvar->kex->session_id, pvar->kex->session_id_len);
-		buffer_put_char(signbuf, SSH2_MSG_USERAUTH_REQUEST);
-		s = username;  // ユーザ名
-		buffer_put_string(signbuf, s, strlen(s));
-		s = connect_id;
-		buffer_put_string(signbuf, s, strlen(s));
-		s = "publickey";
-		buffer_put_string(signbuf, s, strlen(s));
-		buffer_put_char(signbuf, 1); // true
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
-		puttykey = pvar->pageant_curkey;
+	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+					  data, len,
+					  "receive %s:%d %s() len=%d",
+					  __FILE__, __LINE__,
+					  __FUNCTION__, len);
 
-		// 鍵種別から利用する署名アルゴリズムを決定する
-		len = get_uint32_MSBfirst(puttykey+4);
-		keytype_name = puttykey + 8;
-		keytype = get_hostkey_type_from_name(keytype_name);
-		keyalgo = choose_SSH2_keysign_algorithm(pvar, keytype);
-		keyalgo_name = get_ssh2_hostkey_algorithm_name(keyalgo);
-		signflag = get_ssh2_agent_flag(keyalgo);
+	username = pvar->auth_state.user;  // ユーザ名
 
-		// アルゴリズムをコピーする
-		len = strlen(keyalgo_name);
-		buffer_put_string(signbuf, keyalgo_name, len);
-
-		// 鍵をコピーする
-		len = get_uint32_MSBfirst(puttykey);
-		puttykey += 4;
-		buffer_put_string(signbuf, puttykey, len);
-		puttykey += len;
-
-		// Pageant に署名してもらう
-		signedmsg = putty_sign_ssh2_key(pvar->pageant_curkey,
-		                                buffer_ptr(signbuf), buffer_len(signbuf),
-		                                &signedlen, signflag);
-		buffer_free(signbuf);
-		if (signedmsg == NULL) {
-			safefree(pvar->pageant_key);
-			return FALSE;
-		}
-
-
-		// ペイロードの構築
-		msg = buffer_init();
-		if (msg == NULL) {
-			safefree(pvar->pageant_key);
-			safefree(signedmsg);
-			return FALSE;
-		}
-		s = username;  // ユーザ名
-		buffer_put_string(msg, s, strlen(s));
-		s = connect_id;
-		buffer_put_string(msg, s, strlen(s));
-		s = "publickey";
-		buffer_put_string(msg, s, strlen(s));
-		buffer_put_char(msg, 1); // true
-
-		puttykey = pvar->pageant_curkey;
-
-		// アルゴリズムをコピーする
-		len = strlen(keyalgo_name);
-		buffer_put_string(msg, keyalgo_name, len);
-
-		// 鍵をコピーする
-		len = get_uint32_MSBfirst(puttykey);
-		puttykey += 4;
-		buffer_put_string(msg, puttykey, len);
-		puttykey += len;
-
-		// 署名されたデータ
-		len  = get_uint32_MSBfirst(signedmsg);
-		buffer_put_string(msg, signedmsg + 4, len);
-		free(signedmsg);
-
-		// パケット送信
-		len = buffer_len(msg);
-		outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_REQUEST, len);
-		memcpy(outmsg, buffer_ptr(msg), len);
-		finish_send_packet(pvar);
-		{
-			logprintf(LOG_LEVEL_VERBOSE,
-					  "%s: sending SSH2_MSG_USERAUTH_REQUEST method=publickey",
-					  __FUNCTION__);
-			logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-							  buffer_ptr(msg), len,
-							  "send %s:%d %s() len=%d",
-							  __FILE__, __LINE__,
-							  __FUNCTION__, len);
-		}
-		buffer_free(msg);
-
-		pvar->pageant_keyfinal = TRUE;
-
-		return TRUE;
+	// 署名するデータを作成
+	signbuf = buffer_init();
+	if (signbuf == NULL) {
+		safefree(pvar->pageant_key);
+		return FALSE;
 	}
+	buffer_append_length(signbuf, pvar->kex->session_id, pvar->kex->session_id_len);
+	buffer_put_char(signbuf, SSH2_MSG_USERAUTH_REQUEST);
+	s = username;  // ユーザ名
+	buffer_put_string(signbuf, s, strlen(s));
+	s = connect_id;
+	buffer_put_string(signbuf, s, strlen(s));
+	s = "publickey";
+	buffer_put_string(signbuf, s, strlen(s));
+	buffer_put_char(signbuf, 1); // true
+
+	puttykey = pvar->pageant_curkey;
+
+	// 鍵種別から利用する署名アルゴリズムを決定する
+	len = get_uint32_MSBfirst(puttykey+4);
+	keytype_name = puttykey + 8;
+	keytype = get_hostkey_type_from_name(keytype_name);
+	keyalgo = choose_SSH2_keysign_algorithm(pvar, keytype);
+	keyalgo_name = get_ssh2_hostkey_algorithm_name(keyalgo);
+	signflag = get_ssh2_agent_flag(keyalgo);
+
+	// アルゴリズムをコピーする
+	len = strlen(keyalgo_name);
+	buffer_put_string(signbuf, keyalgo_name, len);
+
+	// 鍵をコピーする
+	len = get_uint32_MSBfirst(puttykey);
+	puttykey += 4;
+	buffer_put_string(signbuf, puttykey, len);
+	puttykey += len;
+
+	// Pageant に署名してもらう
+	signedmsg = putty_sign_ssh2_key(pvar->pageant_curkey,
+	                                buffer_ptr(signbuf), buffer_len(signbuf),
+	                                &signedlen, signflag);
+	buffer_free(signbuf);
+	if (signedmsg == NULL) {
+		safefree(pvar->pageant_key);
+		return FALSE;
+	}
+
+
+	// ペイロードの構築
+	msg = buffer_init();
+	if (msg == NULL) {
+		safefree(pvar->pageant_key);
+		safefree(signedmsg);
+		return FALSE;
+	}
+	s = username;  // ユーザ名
+	buffer_put_string(msg, s, strlen(s));
+	s = connect_id;
+	buffer_put_string(msg, s, strlen(s));
+	s = "publickey";
+	buffer_put_string(msg, s, strlen(s));
+	buffer_put_char(msg, 1); // true
+
+	puttykey = pvar->pageant_curkey;
+
+	// アルゴリズムをコピーする
+	len = strlen(keyalgo_name);
+	buffer_put_string(msg, keyalgo_name, len);
+
+	// 鍵をコピーする
+	len = get_uint32_MSBfirst(puttykey);
+	puttykey += 4;
+	buffer_put_string(msg, puttykey, len);
+	puttykey += len;
+
+	// 署名されたデータ
+	len  = get_uint32_MSBfirst(signedmsg);
+	buffer_put_string(msg, signedmsg + 4, len);
+	free(signedmsg);
+
+	// パケット送信
+	len = buffer_len(msg);
+	outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_REQUEST, len);
+	memcpy(outmsg, buffer_ptr(msg), len);
+	finish_send_packet(pvar);
+	{
+		logprintf(LOG_LEVEL_VERBOSE,
+				  "%s: sending SSH2_MSG_USERAUTH_REQUEST method=publickey",
+				  __FUNCTION__);
+		logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+						  buffer_ptr(msg), len,
+						  "send %s:%d %s() len=%d",
+						  __FILE__, __LINE__,
+						  __FUNCTION__, len);
+	}
+	buffer_free(msg);
+
+	pvar->pageant_keyfinal = TRUE;
+
+	return TRUE;
+}
 
 #define PASSWD_MAXLEN 150
 
@@ -8327,12 +8390,12 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 {
 	int len;
 	INT_PTR ret;
-	char *data;
 	buffer_t *msg = NULL;
 	char *s, *username;
 	unsigned char *outmsg;
 	char *connect_id = "ssh-connection";
-	char *info, *lang;
+	char info[128] = "", lang[128] = "";
+	int info_len, lang_len;
 	struct change_password cp;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_PASSWD_CHANGEREQ was received.");
@@ -8350,21 +8413,17 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 		return FALSE;
 	}
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen;
+	if (get_string_from_payload(pvar, info, sizeof(info), &info_len, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (prompt)", __FUNCTION__);
+		return FALSE;
+	}
+	if (get_string_from_payload(pvar, lang, sizeof(lang), &lang_len, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (language tag)", __FUNCTION__);
+		return FALSE;
+	}
 
-	info = buffer_get_string(&data, NULL);
-	lang = buffer_get_string(&data, NULL);
-	if (info == NULL || lang == NULL) {
-		logprintf(LOG_LEVEL_ERROR,
-			"%s: buffer_get_string returns NULL. info=%s, lang=%s", __FUNCTION__,
-			NonNull(info), NonNull(lang));
-	}
-	else {
-		logprintf(LOG_LEVEL_VERBOSE, "%s: info=%s, lang=%s\n", __FUNCTION__, info, lang);
-	}
-	free(info);
-	free(lang);
+	logprintf(LOG_LEVEL_VERBOSE, "%s: info=%s, lang=%s\n", __FUNCTION__,
+		NonNull(info), NonNull(lang));
 
 	msg = buffer_init();
 	if (msg == NULL) {
@@ -8551,8 +8610,8 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 
 static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 {
-	int len;
 	char *data;
+	unsigned int len;
 	int id, remote_id;
 	Channel_t *c;
 	char buff[MAX_PATH + 30];
@@ -8565,16 +8624,19 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN_CONFIRMATION was received.");
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen;
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-					  data, len - 1,
+					  data, len,
 					  "receive %s:%d %s() len=%d",
 					  __FILE__, __LINE__,
-					  __FUNCTION__, len - 1);
-	id = get_uint32_MSBfirst(data);
-	data += 4;
+					  __FUNCTION__, len);
+
+	if (!get_uint32_from_payload(pvar, &id)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (recipient channel)", __FUNCTION__);
+		return FALSE;
+	}
 
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
@@ -8582,8 +8644,10 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 		return FALSE;
 	}
 
-	remote_id = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &remote_id)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (sender channel)", __FUNCTION__);
+		return FALSE;
+	}
 
 	c->remote_id = remote_id;
 	if (c->self_id == pvar->shell_id) {
@@ -8592,10 +8656,14 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 	}
 
 	// remote window size
-	c->remote_window = get_uint32_MSBfirst(data);
-	data += 4;
-	c->remote_maxpacket = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &c->remote_window)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (initial window size)", __FUNCTION__);
+		return FALSE;
+	}
+	if (!get_uint32_from_payload(pvar, &c->remote_maxpacket)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (maximum packet size)", __FUNCTION__);
+		return FALSE;
+	}
 
 	switch (c->type) {
 	case TYPE_PORTFWD:
@@ -8669,22 +8737,25 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 // SSH2 port-forwarding においてセッションがオープンできない場合のサーバからのリプライ（失敗）
 static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 {
-	int len;
 	char *data;
+	unsigned int len;
 	int id;
 	Channel_t *c;
 	int reason;
-	char *cstring;
+	char description[256] = "";
+	int description_len;
 	char tmpbuf[256];
 	char *rmsg;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN_FAILURE was received.");
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen;
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
-	id = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &id)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (recipient channel)", __FUNCTION__);
+		return FALSE;
+	}
 
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
@@ -8692,8 +8763,10 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 		return FALSE;
 	}
 
-	reason = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &reason)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (reason code)", __FUNCTION__);
+		return FALSE;
+	}
 
 	if (reason == SSH2_OPEN_ADMINISTRATIVELY_PROHIBITED) {
 		rmsg = "administratively prohibited";
@@ -8707,23 +8780,21 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 		rmsg = "unknown reason";
 	}
 
-	cstring = buffer_get_string(&data, NULL);
-
-	if (cstring == NULL) {
-		logprintf(LOG_LEVEL_ERROR, "%s: buffer_get_string returns NULL", __FUNCTION__);
+	if (get_string_from_payload(pvar, description, sizeof(description), &description_len, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (description)", __FUNCTION__);
+		return FALSE;
 	}
+
 	UTIL_get_lang_msg("MSG_SSH_CHANNEL_OPEN_ERROR", pvar,
 	                  "SSH2_MSG_CHANNEL_OPEN_FAILURE was received.\r\nchannel [%d]: reason: %s(%d) message: %s");
 	_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, pvar->UIMsg,
-	            id, rmsg, reason, NonNull(cstring));
+	            id, rmsg, reason, NonNull(description));
 	if ((pvar->settings.DisablePopupMessage & POPUP_MSG_FWD_channel_open) == 0) {
 		notify_nonfatal_error(pvar, tmpbuf);
 	}
 	else {
 		logputs(LOG_LEVEL_ERROR, tmpbuf);
 	}
-
-	free(cstring);
 
 	if (c->type == TYPE_PORTFWD) {
 		FWD_failed_open(pvar, c->local_num, reason);
@@ -8738,9 +8809,10 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 // SSH2_MSG_GLOBAL_REQUEST for OpenSSH 6.8
 static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 {
-	int len, n;
 	char *data;
-	char *rtype;
+	unsigned int len;
+	char rtype[128] = "";
+	int rtype_len;
 	int want_reply;
 	int success = 0;
 	buffer_t *msg;
@@ -8749,15 +8821,18 @@ static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_GLOBAL_REQUEST was received.");
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
-	rtype = buffer_get_string(&data, &n);
-	len -= (n + 4);
+	if (get_string_from_payload(pvar, rtype, sizeof(rtype), &rtype_len, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (request name)", __FUNCTION__);
+		return TRUE;
+	}
 
-	want_reply = data[0];
-	data++;
-	len--;
+	if (get_boolean_from_payload(pvar, &want_reply) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (want reply)", __FUNCTION__);
+		return TRUE;
+	}
 
 	if (rtype == NULL) {
 		// rtype が NULL で無い事の保証
@@ -8770,7 +8845,6 @@ static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 		success = update_client_input_hostkeys(pvar, data, len);
 
 	}
-	free(rtype);
 
 	if (want_reply) {
 		msg = buffer_init();
@@ -8869,14 +8943,20 @@ static BOOL handle_SSH2_channel_success(PTInstVar pvar)
 
 static BOOL handle_SSH2_channel_failure(PTInstVar pvar)
 {
-	Channel_t *c;
 	char *data;
+	unsigned int len;
 	int channel_id;
-
-	data = pvar->ssh_state.payload;
-	channel_id = get_uint32_MSBfirst(data);
+	Channel_t *c;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_FAILURE was received.");
+
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
+
+	if (!get_uint32_from_payload(pvar, &channel_id)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (recipient channel)", __FUNCTION__);
+		return FALSE;
+	}
 
 	c = ssh2_channel_lookup(channel_id);
 	if (c == NULL) {
@@ -9817,18 +9897,22 @@ error:
 
 static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 {
-	int len;
 	char *data;
+	unsigned int len;
 	int id;
-	unsigned int str_len;
 	Channel_t *c;
+	unsigned int str_len;
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen;
+	// logputs(LOG_LEVEL_SSHDUMP, "SSH2_MSG_CHANNEL_DATA was received.");
+
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	// channel number
-	id = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &id)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (recipient channel)", __FUNCTION__);
+		return FALSE;
+	}
 
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
@@ -9841,11 +9925,22 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 	}
 
 	// string length
-	str_len = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &str_len)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (data length)", __FUNCTION__);
+		return FALSE;
+	}
+
+	// check data
+	data = remained_payload(pvar);
+	if (!grab_payload(pvar, str_len)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (data)", __FUNCTION__);
+		return FALSE;
+	}
 
 	if (LogLevel(pvar, LOG_LEVEL_SSHDUMP)) {
-		logprintf(LOG_LEVEL_SSHDUMP, "SSH2_MSG_CHANNEL_DATA was received. local:%d remote:%d len:%d", c->self_id, c->remote_id, str_len);
+		logprintf(LOG_LEVEL_SSHDUMP,
+		          "SSH2_MSG_CHANNEL_DATA was received. local:%d remote:%d len:%d",
+		          c->self_id, c->remote_id, str_len);
 		init_memdump();
 		push_memdump("SSH receiving packet", "PKT_recv", (char *)data, str_len);
 	}
@@ -9900,23 +9995,25 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 // SSH2_MSG_CHANNEL_EXTENDED_DATA を処理するようにした。(2006.10.30 maya)
 static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 {
-	int len;
 	char *data;
+	unsigned int len;
 	int id;
-	unsigned int strlen;
 	Channel_t *c;
+	unsigned int str_len;
 	int data_type;
 
-	logputs(LOG_LEVEL_SSHDUMP, "SSH2_MSG_CHANNEL_EXTENDED_DATA was received.");
+	// logputs(LOG_LEVEL_SSHDUMP, "SSH2_MSG_CHANNEL_EXTENDED_DATA was received.");
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen;
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	//debug_print(80, data, len);
 
 	// channel number
-	id = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &id)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (recipient channel)", __FUNCTION__);
+		return FALSE;
+	}
 
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
@@ -9929,39 +10026,58 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 	}
 
 	// data_type_code
-	data_type = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &data_type)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (data_type_code)", __FUNCTION__);
+		return FALSE;
+	}
 
 	// string length
-	strlen = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &str_len)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (data length)", __FUNCTION__);
+		return FALSE;
+	}
+
+	// check data
+	data = remained_payload(pvar);
+	if (!grab_payload(pvar, str_len)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (data)", __FUNCTION__);
+		return FALSE;
+	}
+
+	if (LogLevel(pvar, LOG_LEVEL_SSHDUMP)) {
+		logprintf(LOG_LEVEL_SSHDUMP,
+		          "SSH2_MSG_CHANNEL_EXTENDED_DATA was received. local:%d remote:%d data_type_code:%d len:%d",
+		          c->self_id, c->remote_id, data_type, str_len);
+		init_memdump();
+		push_memdump("SSH receiving packet", "PKT_recv", (char *)data, str_len);
+	}
 
 	// バッファサイズのチェック
-	if (strlen > c->local_maxpacket) {
+	if (str_len > c->local_maxpacket) {
 		logprintf(LOG_LEVEL_WARNING, "%s: Data length is larger than local_maxpacket. "
-			"len:%d local_maxpacket:%d", __FUNCTION__, strlen, c->local_maxpacket);
+			"len:%d local_maxpacket:%d", __FUNCTION__, str_len, c->local_maxpacket);
 	}
-	if (strlen > c->local_window) {
+	if (str_len > c->local_window) {
 		// local window sizeより大きなパケットは捨てる
 		logprintf(LOG_LEVEL_WARNING, "%s: Data length is larger than local_window. "
-			"len:%d local_window:%d", __FUNCTION__, strlen, c->local_window);
+			"len:%d local_window:%d", __FUNCTION__, str_len, c->local_window);
 		return FALSE;
 	}
 
 	// ペイロードとしてクライアント(Tera Term)へ渡す
 	if (c->type == TYPE_SHELL || c->type == TYPE_SUBSYSTEM_GEN) {
-		pvar->ssh_state.payload_datalen = strlen;
+		pvar->ssh_state.payload_datalen = str_len;
 		pvar->ssh_state.payload_datastart = 12; // id + data_type + strlen
 
 	} else if (c->type == TYPE_PORTFWD) {
 		//debug_print(0, data, strlen);
-		FWD_received_data(pvar, c->local_num, data, strlen);
+		FWD_received_data(pvar, c->local_num, data, str_len);
 
 	} else if (c->type == TYPE_SCP) {  // SCP
-		char *msg = (char *)malloc(strlen+1);
+		char *msg = (char *)malloc(str_len+1);
 		wchar_t *msgW;
-		memcpy(msg, data, strlen);
-		msg[strlen] = '\0';
+		memcpy(msg, data, str_len);
+		msg[str_len] = '\0';
 		msgW = ToWcharU8(msg);
 		if (msgW) {
 			NotifySetIconID(pvar->cv, hInst, pvar->settings.IconID);
@@ -9974,7 +10090,7 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 	} else if (c->type == TYPE_SFTP) {  // SFTP
 
 	} else if (c->type == TYPE_AGENT) {  // agent forward
-		if (!SSH_agent_response(pvar, c, 0, data, strlen)) {
+		if (!SSH_agent_response(pvar, c, 0, data, str_len)) {
 			return FALSE;
 		}
 	}
@@ -9982,7 +10098,7 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 	//debug_print(200, data, strlen);
 
 	// ウィンドウサイズの調整
-	c->local_window -= strlen;
+	c->local_window -= str_len;
 
 	if (c->type == TYPE_SCP && pvar->recv.suspended) {
 		logprintf(LOG_LEVEL_NOTICE, "%s: SCP suspended", __FUNCTION__);
@@ -9997,19 +10113,21 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 
 static BOOL handle_SSH2_channel_eof(PTInstVar pvar)
 {
-	int len;
 	char *data;
+	unsigned int len;
 	int id;
 	Channel_t *c;
 
 	// 切断時にサーバが SSH2_MSG_CHANNEL_EOF を送ってくるので、チャネルを解放する。(2005.6.19 yutaka)
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen;
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	// channel number
-	id = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &id)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (recipient channel)", __FUNCTION__);
+		return FALSE;
+	}
 
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
@@ -10034,11 +10152,11 @@ static BOOL handle_SSH2_channel_eof(PTInstVar pvar)
 
 static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 {
-	int len;
 	char *data;
+	unsigned int len;
 	Channel_t *c = NULL;
-	int buflen;
-	char *ctype;
+	char ctype[128] = "";
+	int ctype_len;
 	int remote_id;
 	int remote_window;
 	int remote_maxpacket;
@@ -10046,21 +10164,30 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 	buffer_t *msg;
 	unsigned char *outmsg;
 
-	logprintf(LOG_LEVEL_VERBOSE, "%s: SSH2_MSG_CHANNEL_OPEN was received.", __FUNCTION__);
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN was received.");
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen;
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	// get string
-	ctype = buffer_get_string(&data, &buflen);
+	if (get_string_from_payload(pvar, ctype, sizeof(ctype), &ctype_len, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (channel type)", __FUNCTION__);
+		return FALSE;
+	}
 
 	// get value
-	remote_id = get_uint32_MSBfirst(data);
-	data += 4;
-	remote_window = get_uint32_MSBfirst(data);
-	data += 4;
-	remote_maxpacket = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &remote_id)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (sender channel)", __FUNCTION__);
+		return FALSE;
+	}
+	if (!get_uint32_from_payload(pvar, &remote_window)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (initial window size)", __FUNCTION__);
+		return FALSE;
+	}
+	if (!get_uint32_from_payload(pvar, &remote_maxpacket)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (maximum packet size)", __FUNCTION__);
+		return FALSE;
+	}
 
 	logprintf(LOG_LEVEL_VERBOSE,
 		"%s: type=%s, channel=%d, init_winsize=%d, max_packetsize:%d", __FUNCTION__,
@@ -10072,18 +10199,33 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_get_string returns NULL. (ctype)", __FUNCTION__);
 	}
 	else if (strcmp(ctype, "forwarded-tcpip") == 0) { // port-forwarding(remote to local)
-		char *listen_addr, *orig_addr;
+		char listen_addr[48] = "", orig_addr[48] = "";
+		int listen_addr_len, orig_addr_len;
 		int listen_port, orig_port;
 
-		listen_addr = buffer_get_string(&data, &buflen);  // 0.0.0.0
-		listen_port = get_uint32_MSBfirst(data); // 5000
-		data += 4;
+		// 0.0.0.0
+		if (get_string_from_payload(pvar, listen_addr, sizeof(listen_addr), &listen_addr_len, TRUE) != 1) {
+			logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (address that was connected)", __FUNCTION__);
+			return FALSE;
+		}
+		// 5000
+		if (!get_uint32_from_payload(pvar, &listen_port)) {
+			logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (port that was connected)", __FUNCTION__);
+			return FALSE;
+		}
 
-		orig_addr = buffer_get_string(&data, &buflen);  // 127.0.0.1
-		orig_port = get_uint32_MSBfirst(data);  // 32776
-		data += 4;
+		// 127.0.0.1
+		if (get_string_from_payload(pvar, orig_addr, sizeof(orig_addr), &orig_addr_len, TRUE) != 1) {
+			logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (originator IP address)", __FUNCTION__);
+			return FALSE;
+		}
+		// 32776
+		if (!get_uint32_from_payload(pvar, &orig_port)) {
+			logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (originator port)", __FUNCTION__);
+			return FALSE;
+		}
 
-		if (listen_addr && orig_addr) {
+		if (listen_addr[0] != '\0' && orig_addr != '\0') {
 			logprintf(LOG_LEVEL_VERBOSE,
 				"%s: %s: listen_addr=%s, listen_port=%d, orig_addr=%s, orig_port=%d", __FUNCTION__,
 				ctype, listen_addr, listen_port, orig_addr, orig_port);
@@ -10114,12 +10256,19 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 
 	} else if (strcmp(ctype, "x11") == 0) { // port-forwarding(X11)
 		// X applicationをターミナル上で実行すると、SSH2_MSG_CHANNEL_OPEN が送られてくる。
-		char *orig_str;
+		char orig_str[48] = "";
+		int orig_str_len;
 		int orig_port;
 
-		orig_str = buffer_get_string(&data, NULL);  // "127.0.0.1"
-		orig_port = get_uint32_MSBfirst(data);
-		data += 4;
+		// "127.0.0.1"
+		if (get_string_from_payload(pvar, orig_str, sizeof(orig_str), &orig_str_len, TRUE) != 1) {
+			logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (originator address)", __FUNCTION__);
+			return FALSE;
+		}
+		if (!get_uint32_from_payload(pvar, &orig_port)) {
+			logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (originator port)", __FUNCTION__);
+			return FALSE;
+		}
 
 		logprintf(LOG_LEVEL_VERBOSE, "%s: %s: orig_addr=%s, orig_port=%d", __FUNCTION__,
 			ctype, orig_str, orig_port);
@@ -10182,16 +10331,12 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 		// unknown type(unsupported)
 	}
 
-	free(ctype);
-
 	return(TRUE);
 }
 
 
 static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 {
-	int len;
-	char *data;
 	int id;
 	Channel_t *c;
 
@@ -10201,11 +10346,11 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 		finish_memdump();
 	}
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen;
+	if (!get_uint32_from_payload(pvar, &id)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (recipient channel)", __FUNCTION__);
+		return FALSE;
+	}
 
-	id = get_uint32_MSBfirst(data);
-	data += 4;
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
 		logprintf(LOG_LEVEL_ERROR, "%s: channel not found. (%d)", __FUNCTION__, id);
@@ -10251,22 +10396,26 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 
 static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 {
-	int len;
 	char *data;
+	unsigned int len;
 	int id;
-	char *request;
+	Channel_t *c;
+	char request[128] = "";
+	int request_len;
 	int want_reply;
 	int success = 0;
-	Channel_t *c;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_REQUEST was received.");
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen;
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
-	// ID(4) + string(any) + want_reply(1) + exit status(4)
-	id = get_uint32_MSBfirst(data);
-	data += 4;
+	// channel number
+	if (!get_uint32_from_payload(pvar, &id)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (recipient channel)", __FUNCTION__);
+		return FALSE;
+	}
+
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
 		logprintf(LOG_LEVEL_ERROR, "%s: channel not found. (%d)", __FUNCTION__, id);
@@ -10277,10 +10426,17 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 		return FALSE;
 	}
 
-	request = buffer_get_string(&data, NULL);
+	// request type
+	if (get_string_from_payload(pvar, request, sizeof(request), &request_len, TRUE) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (request)", __FUNCTION__);
+		return FALSE;
+	}
 
-	want_reply = data[0];
-	data += 1;
+	// want reply
+	if (get_boolean_from_payload(pvar, &want_reply) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (want reply)", __FUNCTION__);
+		return FALSE;
+	}
 
 	logprintf(LOG_LEVEL_VERBOSE,
 		"%s: local=%d, remote=%d, request=%s, want_reply=%d",  __FUNCTION__,
@@ -10292,17 +10448,19 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 	}
 	else if (strcmp(request, "exit-status") == 0) {
 		// 終了コードが含まれているならば
-		int estat = get_uint32_MSBfirst(data);
+		int exit_status;
+		if (!get_uint32_from_payload(pvar, &exit_status)) {
+			logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (exit_status)", __FUNCTION__);
+			return FALSE;
+		}
 		success = 1;
-		logprintf(LOG_LEVEL_VERBOSE, "%s: exit-status=%d", __FUNCTION__, estat);
+		logprintf(LOG_LEVEL_VERBOSE, "%s: exit-status=%d", __FUNCTION__, exit_status);
 	}
 	else if (strcmp(request, "keepalive@openssh.com") == 0) {
 		// 古い OpenSSH では SUCCESS を返しても keepalive に
 		// 応答したと看做されないので FAILURE を返す。[teraterm:1278]
 		success = 0;
 	}
-
-	free(request);
 
 	if (want_reply) {
 		buffer_t *msg;
@@ -10342,22 +10500,24 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 
 static BOOL handle_SSH2_window_adjust(PTInstVar pvar)
 {
-	int len;
 	char *data;
+	unsigned int len;
 	int id;
 	unsigned int adjust;
 	Channel_t *c;
 
 	logputs(LOG_LEVEL_SSHDUMP, "SSH2_MSG_CHANNEL_WINDOW_ADJUST was received.");
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen;
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	//debug_print(80, data, len);
 
 	// channel number
-	id = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &id)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (recipient channel)", __FUNCTION__);
+		return FALSE;
+	}
 
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
@@ -10371,8 +10531,10 @@ static BOOL handle_SSH2_window_adjust(PTInstVar pvar)
 		return FALSE;
 	}
 
-	adjust = get_uint32_MSBfirst(data);
-	data += 4;
+	if (!get_uint32_from_payload(pvar, &adjust)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: payload corrupted. (bytes to add)", __FUNCTION__);
+		return FALSE;
+	}
 
 	// window sizeの調整
 	c->remote_window += adjust;
