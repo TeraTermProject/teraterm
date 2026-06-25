@@ -1077,7 +1077,7 @@ static int prep_packet_ssh1(PTInstVar pvar, char *data, unsigned int len, unsign
 
 static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsigned int aadlen, unsigned int authlen)
 {
-	unsigned int padding;
+	unsigned int padding_length;
 
 	if (authlen > 0) {
 		if (!CRYPT_decrypt_aead(pvar, data, len, aadlen, authlen)) {
@@ -1114,13 +1114,13 @@ static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsign
 	}
 
 	// パディング長の取得
-	padding = (unsigned int) data[4];
+	padding_length = (unsigned int)data[4];
 
-	// パケット長(4バイト) 部分とパディング長(1バイト)部分をスキップした SSH ペイロードの先頭
+	// パケット長(4バイト)部分とパディング長(1バイト)部分をスキップした SSH ペイロードの先頭
 	pvar->ssh_state.payload = data + 4 + 1;
 
-	// パディング長部分(1バイト)とパディングを除いた実際のペイロード長
-	pvar->ssh_state.payloadlen = len - 1 - padding;
+	// パディング長部分(1バイト)とパディング長を除いた実際のペイロード長
+	pvar->ssh_state.payloadlen = len - 1 - padding_length;
 
 	pvar->ssh_state.payload_grabbed = 0;
 
@@ -1145,10 +1145,10 @@ static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsign
 
 		// ポインタの更新。
 		pvar->ssh_state.payload = buffer_ptr(pvar->decomp_buffer);
-		pvar->ssh_state.payload++;
+		pvar->ssh_state.payload++; // メッセージタイプのぶん進める
 		pvar->ssh_state.payloadlen = buffer_len(pvar->decomp_buffer);
 	} else {
-		pvar->ssh_state.payload++;
+		pvar->ssh_state.payload++; // メッセージタイプのぶん進める
 	}
 
 	if (!grab_payload_limited(pvar, 1)) {
@@ -5966,10 +5966,8 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	memset(&server_host_key, 0, sizeof(server_host_key));
 
-	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
-	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
-	len = pvar->ssh_state.payloadlen - 1;
+	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
 
 	push_memdump("KEXDH_REPLY", "key exchange: receiving", data, len);
 
@@ -6129,10 +6127,8 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	memset(&server_host_key, 0, sizeof(server_host_key));
 
-	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
-	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
-	len = pvar->ssh_state.payloadlen - 1;
+	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
 
 	push_memdump("DH_GEX_REPLY", "key exchange: receiving", data, len);
 
@@ -6300,10 +6296,8 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	memset(&server_host_key, 0, sizeof(server_host_key));
 
-	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
-	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
-	len = pvar->ssh_state.payloadlen - 1;
+	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
@@ -6447,10 +6441,8 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 
 	memset(&server_host_key, 0, sizeof(server_host_key));
 
-	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
-	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
-	len = pvar->ssh_state.payloadlen - 1;
+	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
@@ -6593,10 +6585,8 @@ static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
 
 	memset(&server_host_key, 0, sizeof(server_host_key));
 
-	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
-	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
-	len = pvar->ssh_state.payloadlen - 1;
+	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
 
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
 
@@ -6748,10 +6738,8 @@ static BOOL handle_SSH2_kem_mlkem768x25519_kex_reply(PTInstVar pvar)
 
 	memset(&server_host_key, 0, sizeof(server_host_key));
 
-	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
-	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
-	len = pvar->ssh_state.payloadlen - 1;
+	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
 
 	push_memdump("KEX_HYBRID_REPLY", "key exchange: receiving", data, len);
 
@@ -7043,7 +7031,6 @@ static BOOL handle_SSH2_service_accept(PTInstVar pvar)
 {
 	char *data, *svc;
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
 
 	if ((svc = buffer_get_string(&data, NULL)) == NULL) {
@@ -7482,10 +7469,10 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 		int len = pvar->ssh_state.payloadlen;
 		char *data = pvar->ssh_state.payload;
 		logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-						  data, len,
+						  data, len - 1,
 						  "receive %s:%d %s() len=%d",
 						  __FILE__, __LINE__,
-						  __FUNCTION__, len);
+						  __FUNCTION__, len - 1);
 	}
 
 	// パスワードの破棄 (2006.8.22 yutaka)
@@ -7569,16 +7556,14 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_FAILURE was received.");
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
 	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-					  data, len,
+					  data, len - 1,
 					  "receive %s:%d %s() len=%d",
 					  __FILE__, __LINE__,
-					  __FUNCTION__, len);
+					  __FUNCTION__, len - 1);
 
 	cstring = buffer_get_string(&data, NULL); // 認証方式リストの取得
 	partial = data[0];
@@ -7913,16 +7898,14 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_INFO_REQUEST was received.");
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
 	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-					  data, len,
+					  data, len - 1,
 					  "receive %s:%d %s() len=%d",
 					  __FILE__, __LINE__,
-					  __FUNCTION__, len);
+					  __FUNCTION__, len - 1);
 
 	///////// step1
 	// get string
@@ -8054,10 +8037,10 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 			const char *data = pvar->ssh_state.payload;
 			int len = pvar->ssh_state.payloadlen;
 			logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-							  data, len,
+							  data, len - 1,
 							  "receive %s:%d %s() len=%d",
 							  __FILE__, __LINE__,
-							  __FUNCTION__, len);
+							  __FUNCTION__, len - 1);
 		}
 		username = pvar->auth_state.user;  // ユーザ名
 
@@ -8274,9 +8257,7 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 		return FALSE;
 	}
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
 	info = buffer_get_string(&data, NULL);
@@ -8491,15 +8472,14 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN_CONFIRMATION was received.");
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
-	logprintf_hexdump(LOG_LEVEL_SSHDUMP, data, len,
+	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
+					  data, len - 1,
 					  "receive %s:%d %s() len=%d",
 					  __FILE__, __LINE__,
-					  __FUNCTION__, len);
+					  __FUNCTION__, len - 1);
 	id = get_uint32_MSBfirst(data);
 	data += 4;
 
@@ -8607,9 +8587,7 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN_FAILURE was received.");
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
 	id = get_uint32_MSBfirst(data);
@@ -8678,19 +8656,8 @@ static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_GLOBAL_REQUEST was received.");
 
-	// SSH2 packet format:
-	// size(4) + padding size(1) + type(1) + payload(N) + padding(X)
-	//                                       ^data
-	//           <-----------------size---------------------------->
-	//                             <--------len------->
-	//
-	// data: メッセージタイプに続くペイロードの先頭を指すポインタ
 	data = pvar->ssh_state.payload;
-	// len = size - (padding size + sizeof(padding size)) = sizeof(type) + sizeof(payload):
-	// ペイロード部分の長さ。type 分も含む
-	len = pvar->ssh_state.payloadlen;
-
-	len--;   // type 分を除く
+	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
 
 	rtype = buffer_get_string(&data, &n);
 	len -= (n + 4);
@@ -9763,9 +9730,7 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 	unsigned int str_len;
 	Channel_t *c;
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
 	// channel number
@@ -9851,9 +9816,7 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_SSHDUMP, "SSH2_MSG_CHANNEL_EXTENDED_DATA was received.");
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
 	//debug_print(80, data, len);
@@ -9948,9 +9911,7 @@ static BOOL handle_SSH2_channel_eof(PTInstVar pvar)
 
 	// 切断時にサーバが SSH2_MSG_CHANNEL_EOF を送ってくるので、チャネルを解放する。(2005.6.19 yutaka)
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
 	// channel number
@@ -9994,9 +9955,7 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE, "%s: SSH2_MSG_CHANNEL_OPEN was received.", __FUNCTION__);
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
 	// get string
@@ -10149,9 +10108,7 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 		finish_memdump();
 	}
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
 	id = get_uint32_MSBfirst(data);
@@ -10211,9 +10168,7 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_REQUEST was received.");
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
 	// ID(4) + string(any) + want_reply(1) + exit status(4)
@@ -10302,9 +10257,7 @@ static BOOL handle_SSH2_window_adjust(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_SSHDUMP, "SSH2_MSG_CHANNEL_WINDOW_ADJUST was received.");
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
 	//debug_print(80, data, len);
