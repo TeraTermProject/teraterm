@@ -128,11 +128,10 @@ typedef struct {
 	size_t menu_info_count;
 	// INIファイルに保存する項目
 	struct {
-		BOOL charcode_menu;
-		LanguageEnum language_ini;
-		BOOL ambiguous_menu;
-		BOOL setting_menu;
-		BOOL one_setting_menu;
+		BOOL charcode_menu;		// 文字コードメニューを表示
+		LanguageEnum language_ini;	// メニュー内容
+		BOOL ambiguous_menu;	// Ambiguous(曖昧)文字幅メニューを表示
+		BOOL one_setting_menu;	// 送受信両方を変更
 	} ini;
 } TInstVar;
 
@@ -269,7 +268,6 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->ini.one_setting_menu = TRUE;
 	pvar->ini.language_ini = MENU_AUTO;
 	pvar->ini.ambiguous_menu = FALSE;
-	pvar->ini.setting_menu = TRUE;
 }
 
 /*
@@ -466,13 +464,11 @@ static void UpdateMenu(HMENU menu, BOOL UseOneSetting)
 			EnableMenuItem(menu, ID_MI_AMB_WIDTH_2, MF_BYCOMMAND | MF_GRAYED);
 		}
 	}
-	if (pvar->ini.setting_menu) {
-		if (pvar->ini.ambiguous_menu || pvar->ini.charcode_menu) {
-			AppendMenuA(menu, MF_SEPARATOR, 0, NULL);
-		}
-		CreateMenuInfo(menu, MenuSetting, _countof(MenuSetting),
-					   pvar->ts->UILanguageFileW, IniSection);
+	if (pvar->ini.ambiguous_menu || pvar->ini.charcode_menu) {
+		AppendMenuA(menu, MF_SEPARATOR, 0, NULL);
 	}
+	CreateMenuInfo(menu, MenuSetting, _countof(MenuSetting),
+				   pvar->ts->UILanguageFileW, IniSection);
 }
 
 /*
