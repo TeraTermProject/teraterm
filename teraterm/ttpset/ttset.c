@@ -909,7 +909,7 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* Russian keyboard type */
 	GetPrivateProfileStringW(SectionW, L"RussKeyb", L"Windows",
-							 TempW, sizeof(TempW), FName);
+							 TempW, _countof(TempW), FName);
 	ts->RussKeyb = (_wcsicmp(L"KOI8-R", TempW) == 0) ? 1 : 0;
 
 	/* Serial port ID */
