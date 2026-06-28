@@ -62,6 +62,7 @@ typedef struct {
 	int maxwait;
 	int minwait;
 	int speed;
+	BOOL quit;
 	BOOL pause;
 	BOOL nowait;
 	BOOL nowait_ini;
@@ -224,6 +225,7 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->skip_ini = 5;
 	pvar->maxwait = 0;
 	pvar->minwait = 0;
+	pvar->quit = FALSE;
 	pvar->pause = FALSE;
 	pvar->nowait = FALSE;
 	pvar->nowait_ini = FALSE;
@@ -296,6 +298,11 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 
 	if (!pvar->enable) {
 		return pvar->origPReadFile(fh, obuff, oblen, rbytes, rol);
+	}
+
+	if (pvar->quit) {
+		pvar->quit = FALSE;
+		return TRUE;
 	}
 
 	if (!pvar->active) {
@@ -476,6 +483,10 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 			  case 'K':
 				pvar->wait.tv_sec = 0;
 				pvar->skip += pvar->skip_ini;
+				break;
+			  case 'e':
+			  case 'E':
+				pvar->quit = TRUE;
 				break;
 			  case ESC:
 				mode = MODE_ESC;
