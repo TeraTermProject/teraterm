@@ -556,7 +556,7 @@ struct tttset {
 	int ZmodemTimeOutFin;
 	WORD WaitCom;
 	WORD reserve_ListHiddenFonts;
-	char LogTimestampFormat[48];
+	char reserve_LogTimestampFormat[48];
 	int TerminalInputSpeed;
 	int TerminalOutputSpeed;
 	char reserve_DialogFontName[LF_FACESIZE];	// DialogFontNameW へ移行
@@ -616,6 +616,7 @@ struct tttset {
 	BYTE UnicodeOverrideCharWidthEnable;	// 0/1=overrideしない/する(文字幅Override設定存在時)
 	BYTE UnicodeOverrideCharWidthSelected;	// 0...
 	int BroadcastSubmitKey;
+	wchar_t *LogTimestampFormatW;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;

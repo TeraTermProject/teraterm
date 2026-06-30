@@ -993,9 +993,8 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->LogAllBuffIncludedInFirst = GetOnOff(Section, "LogIncludeScreenBuffer", FName, FALSE);
 
 	/* Timestamp format of Log each line */
-	GetPrivateProfileString(Section, "LogTimestampFormat", "%Y-%m-%d %H:%M:%S.%N",
-	                        ts->LogTimestampFormat, sizeof(ts->LogTimestampFormat),
-	                        FName);
+	hGetPrivateProfileStringW(SectionW, L"LogTimestampFormat", L"%Y-%m-%d %H:%M:%S.%N", FName,
+							  &ts->LogTimestampFormatW);
 
 	/* Timestamp type */
 	GetPrivateProfileString(Section, "LogTimestampType", "", Temp, sizeof(Temp), FName);
@@ -2542,8 +2541,8 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "LogIncludeScreenBuffer", FName, ts->LogAllBuffIncludedInFirst);
 
 	/* Timestamp format of Log each line */
-	WritePrivateProfileString(Section, "LogTimestampFormat",
-	                          ts->LogTimestampFormat, FName);
+	WritePrivateProfileStringW(SectionW, L"LogTimestampFormat",
+							   ts->LogTimestampFormatW, FName);
 
 	/* Timestamp type */
 	switch (ts->LogTimestampType) {
