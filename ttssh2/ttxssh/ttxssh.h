@@ -304,7 +304,6 @@ typedef struct _TInstVar {
 	wchar_t ssh2_keyfile[MAX_PATH];
 	time_t ssh_heartbeat_tick;
 	HANDLE ssh_heartbeat_thread;
-	int keyboard_interactive_password_input;
 	int userauth_retry_count;
 	buffer_t *decomp_buffer;
 	buffer_t *authbanner_buffer;

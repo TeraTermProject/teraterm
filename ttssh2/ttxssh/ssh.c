@@ -113,6 +113,11 @@ static CRITICAL_SECTION g_ssh_scp_thread_lock;	/* SCPスレッド待ち合わせ
 
 static int g_scp_sending;  /* SCP送信中か? */
 
+// SSH2_MSG_USERAUTH_INFO_REQUEST によるダイアログのレスポンス受け取り用
+static unsigned int userauth_inforeq_num = 0; // プロンプト数
+static unsigned int userauth_inforeq_index = 0;
+static buffer_t *msg_userauth_infores = NULL; // サーバへの返信を保持する
+
 static void try_send_credentials(PTInstVar pvar);
 static void prep_compression(PTInstVar pvar);
 
@@ -6952,9 +6957,6 @@ BOOL do_SSH2_userauth(PTInstVar pvar)
 	unsigned char *outmsg;
 	int len;
 
-	// パスワードが入力されたら 1 を立てる (2005.3.12 yutaka)
-	pvar->keyboard_interactive_password_input = 0;
-
 	// すでにログイン処理を行っている場合は、SSH2_MSG_SERVICE_REQUESTの送信は
 	// しないことにする。OpenSSHでは支障ないが、Tru64 UNIXではサーバエラーとなってしまうため。
 	// (2005.3.10 yutaka)
@@ -7853,11 +7855,8 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	// SSH2_MSG_USERAUTH_INFO_REQUEST
 	int len;
 	char *data;
-	int slen = 0, num, echo;
-	char *s, *prompt = NULL;
-	buffer_t *msg;
-	unsigned char *outmsg;
-	int i;
+	int slen = 0, echo;
+	char *prompt = NULL;
 	char *name, *inst, *lang;
 	char lprompt[512];
 
@@ -7867,10 +7866,10 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	len = pvar->ssh_state.payloadlen;
 
 	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-					  data, len - 1,
-					  "receive %s:%d %s() len=%d",
-					  __FILE__, __LINE__,
-					  __FUNCTION__, len - 1);
+	                  data, len,
+	                  "receive %s:%d %s() len=%d",
+	                  __FILE__, __LINE__,
+	                  __FUNCTION__, len);
 
 	///////// step1
 	// get string
@@ -7894,36 +7893,37 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	}
 
 	logprintf(LOG_LEVEL_VERBOSE, "%s: user=%s, inst=%s, lang=%s", __FUNCTION__,
-		NonNull(name), NonNull(inst), NonNull(lang));
+	          NonNull(name), NonNull(inst), NonNull(lang));
 
 	free(name);
 	free(inst);
 	free(lang);
 
 	// num-prompts
-	num = get_uint32_MSBfirst(data);
+	userauth_inforeq_num = get_uint32_MSBfirst(data);
 	data += 4;
 
-	logprintf(LOG_LEVEL_VERBOSE, "%s: prompts=%d", __FUNCTION__, num);
+	logprintf(LOG_LEVEL_VERBOSE, "%s: prompts=%d", __FUNCTION__, userauth_inforeq_num);
 
 	///////// step2
 	// サーバへパスフレーズを送る
-	msg = buffer_init();
-	if (msg == NULL) {
+	msg_userauth_infores = buffer_init();
+	if (msg_userauth_infores == NULL) {
 		// TODO: error check
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		return FALSE;
 	}
-	buffer_put_int(msg, num);
+	buffer_put_int(msg_userauth_infores, userauth_inforeq_num);
 
 	// パスワード変更の場合、メッセージがあれば、表示する。(2010.11.11 yutaka)
-	if (num == 0) {
+	if (userauth_inforeq_num == 0) {
 		if (strlen(lprompt) > 0)
 			MessageBox(pvar->cv->HWin, lprompt, "USERAUTH INFO_REQUEST", MB_OK | MB_ICONINFORMATION);
 	}
 
-	// プロンプトの数だけ prompt & echo が繰り返される。
-	for (i = 0 ; i < num ; i++) {
+	if (userauth_inforeq_num > 0) {
+		// 1個目のプロンプトを読み取り、ダイアログを表示
+
 		// get string
 		slen = get_uint32_MSBfirst(data);
 		data += 4;
@@ -7934,48 +7934,96 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 		echo = data[0];
 		data[0] = '\0'; // ログ出力の為、一時的に NUL Terminate する
 
-		logprintf(LOG_LEVEL_VERBOSE, "%s:   prompt[%d]=\"%s\", echo=%d, pass-state=%d", __FUNCTION__,
-			i, prompt, slen, pvar->keyboard_interactive_password_input);
+		logprintf(LOG_LEVEL_VERBOSE, "%s:   prompt[%d]=\"%s\", echo=%d", __FUNCTION__,
+		          userauth_inforeq_index, prompt, echo);
 
 		data[0] = echo; // ログ出力を行ったので、元の値に書き戻す
 		data += 1;
 
-		// keyboard-interactive method (2005.3.12 yutaka)
-		if (pvar->keyboard_interactive_password_input == 0 &&
-			pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
+		// keyboard-interactive method
+		if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
 			AUTH_set_TIS_mode(pvar, prompt, slen, echo);
 			AUTH_advance_to_next_cred(pvar);
 			pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
 			//try_send_credentials(pvar);
-			buffer_free(msg);
-			return TRUE;
 		}
-
-		// TODO: ここでプロンプトを表示してユーザから入力させるのが正解。
-		s = pvar->auth_state.cur_cred.password;
-		buffer_put_string(msg, s, strlen(s));
-
-		// リトライに対応できるよう、フラグをクリアする。(2010.11.11 yutaka)
-		pvar->keyboard_interactive_password_input = 0;
+	}
+	else {
+		// プロンプトがない場合はすぐに送信する
+		SSH2_send_userauth_infores(pvar);
 	}
 
-	len = buffer_len(msg);
+	return TRUE;
+}
+
+void SSH2_send_userauth_infores(PTInstVar pvar)
+{
+	int len;
+	char *data;
+	int slen = 0, echo;
+	char *s, *prompt = NULL;
+	unsigned char *outmsg;
+
+	data = pvar->ssh_state.payload;
+
+	if (userauth_inforeq_num) {
+		// ダイアログへの入力（レスポンス）を保持
+		s = pvar->auth_state.cur_cred.password;
+		buffer_put_string(msg_userauth_infores, s, strlen(s));
+	}
+
+	userauth_inforeq_index++;
+
+	if (userauth_inforeq_index < userauth_inforeq_num) {
+		// 次のプロンプトを読み取り、ダイアログを表示
+
+		// get string
+		slen = get_uint32_MSBfirst(data);
+		data += 4;
+		prompt = data;  // prompt
+		data += slen;
+
+		// get boolean
+		echo = data[0];
+		data[0] = '\0'; // ログ出力の為、一時的に NUL Terminate する
+
+		logprintf(LOG_LEVEL_VERBOSE, "%s:   prompt[%d]=\"%s\", echo=%d", __FUNCTION__,
+		          userauth_inforeq_index, prompt, echo);
+
+		data[0] = echo; // ログ出力を行ったので、元の値に書き戻す
+		data += 1;
+
+		// keyboard-interactive method
+		if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
+			AUTH_set_TIS_mode(pvar, prompt, slen, echo);
+			AUTH_advance_to_next_cred(pvar);
+			pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
+			//try_send_credentials(pvar);
+		}
+
+		return;
+	}
+
+	len = buffer_len(msg_userauth_infores);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_INFO_RESPONSE, len);
-	memcpy(outmsg, buffer_ptr(msg), len);
+	memcpy(outmsg, buffer_ptr(msg_userauth_infores), len);
 	finish_send_packet(pvar);
 	{
 		logprintf(LOG_LEVEL_VERBOSE,
-				  "SSH2_MSG_USERAUTH_INFO_RESPONSE was sent %s().",
-				  __FUNCTION__);
+		          "SSH2_MSG_USERAUTH_INFO_RESPONSE was sent %s().",
+		          __FUNCTION__);
 		logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-						  buffer_ptr(msg), len,
-						  "send %s:%d %s() len=%d",
-						  __FILE__, __LINE__,
-						  __FUNCTION__, len);
+		                  buffer_ptr(msg_userauth_infores), buffer_len(msg_userauth_infores),
+		                  "send %s:%d %s() len=%d",
+		                  __FILE__, __LINE__,
+		                  __FUNCTION__, buffer_len(msg_userauth_infores));
 	}
-	buffer_free(msg);
+	userauth_inforeq_num = 0;
+	userauth_inforeq_index = 0;
+	buffer_free(msg_userauth_infores);
+	msg_userauth_infores = NULL;
 
-	return TRUE;
+	return;
 }
 
 BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
