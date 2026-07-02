@@ -311,6 +311,11 @@ typedef struct _TInstVar {
 	BOOL tryed_ssh2_authlist;
 	HWND ssh_hearbeat_dialog;
 
+	/* SSH2_MSG_USERAUTH_INFO_REQUEST によるダイアログのレスポンス受け取り用 */
+	unsigned int userauth_inforeq_num; // プロンプト数
+	unsigned int userauth_inforeq_index;
+	buffer_t *userauth_infores; // サーバへの返信を保持する
+
 	/* Pageant との通信用 */
 	unsigned char *pageant_key;
 	unsigned char *pageant_curkey;
