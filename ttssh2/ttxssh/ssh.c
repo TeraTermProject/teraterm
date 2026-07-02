@@ -3083,6 +3083,7 @@ void SSH_init(PTInstVar pvar)
 	pvar->nosession = FALSE;
 	pvar->userauth_inforeq_num = 0;
 	pvar->userauth_inforeq_index = 0;
+	pvar->userauth_inforeq_prompts = NULL;
 	pvar->userauth_infores = NULL;
 }
 
@@ -3675,6 +3676,7 @@ void SSH_end(PTInstVar pvar)
 
 	pvar->userauth_inforeq_num = 0;
 	pvar->userauth_inforeq_index = 0;
+	buffer_free(pvar->userauth_inforeq_prompts);
 	buffer_free(pvar->userauth_infores);
 
 	// SSH2 で使われるものだが、まだ SSH2 かどうか分からない時点の
@@ -7908,6 +7910,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	int len;
 	char *data;
 	int slen = 0, echo;
+	unsigned int i;
 	char *prompt = NULL;
 	char *name, *inst, *lang;
 	char lprompt[512];
@@ -7977,23 +7980,36 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	}
 
 	if (pvar->userauth_inforeq_num > 0) {
-		// 1個目のプロンプトを読み取り、ダイアログを表示
+		// すべてのプロンプトをここで読み込む
+		buffer_free(pvar->userauth_inforeq_prompts);
+		pvar->userauth_inforeq_prompts = buffer_init();
 
-		// get string
-		slen = get_uint32_MSBfirst(data);
-		data += 4;
-		prompt = data;  // prompt
-		data += slen;
+		for (i = 0; i < pvar->userauth_inforeq_num; i++) {
+			// get string
+			slen = get_uint32_MSBfirst(data);
+			data += 4;
+			prompt = data;  // prompt
+			data += slen;
 
-		// get boolean
-		echo = data[0];
-		data[0] = '\0'; // ログ出力の為、一時的に NUL Terminate する
+			// get boolean
+			echo = data[0];
+			data[0] = '\0'; // ログ出力の為、一時的に NUL Terminate する
 
-		logprintf(LOG_LEVEL_VERBOSE, "%s:   prompt[%d]=\"%s\", echo=%d", __FUNCTION__,
-		          pvar->userauth_inforeq_index, prompt, echo);
+			logprintf(LOG_LEVEL_VERBOSE, "%s:   prompt[%d]=\"%s\", echo=%d", __FUNCTION__,
+			          pvar->userauth_inforeq_index, prompt, echo);
 
-		data[0] = echo; // ログ出力を行ったので、元の値に書き戻す
-		data += 1;
+			data[0] = echo; // ログ出力を行ったので、元の値に書き戻す
+			data += 1;
+
+			// バッファに保存
+			buffer_put_string(pvar->userauth_inforeq_prompts, prompt, slen);
+			buffer_put_int(pvar->userauth_inforeq_prompts, echo);
+		}
+		buffer_rewind(pvar->userauth_inforeq_prompts);
+
+		// 1個目のプロンプトでダイアログを表示
+		prompt = buffer_get_string_msg(pvar->userauth_inforeq_prompts, &slen);
+		echo = buffer_get_int(pvar->userauth_inforeq_prompts);
 
 		// keyboard-interactive method
 		if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
@@ -8030,23 +8046,9 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 	pvar->userauth_inforeq_index++;
 
 	if (pvar->userauth_inforeq_index < pvar->userauth_inforeq_num) {
-		// 次のプロンプトを読み取り、ダイアログを表示
-
-		// get string
-		slen = get_uint32_MSBfirst(data);
-		data += 4;
-		prompt = data;  // prompt
-		data += slen;
-
-		// get boolean
-		echo = data[0];
-		data[0] = '\0'; // ログ出力の為、一時的に NUL Terminate する
-
-		logprintf(LOG_LEVEL_VERBOSE, "%s:   prompt[%d]=\"%s\", echo=%d", __FUNCTION__,
-		          pvar->userauth_inforeq_index, prompt, echo);
-
-		data[0] = echo; // ログ出力を行ったので、元の値に書き戻す
-		data += 1;
+		// 次のプロンプトでダイアログを表示
+		prompt = buffer_get_string_msg(pvar->userauth_inforeq_prompts, &slen);
+		echo = buffer_get_int(pvar->userauth_inforeq_prompts);
 
 		// keyboard-interactive method
 		if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
@@ -8075,6 +8077,8 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 	}
 	pvar->userauth_inforeq_num = 0;
 	pvar->userauth_inforeq_index = 0;
+	buffer_free(pvar->userauth_inforeq_prompts);
+	pvar->userauth_inforeq_prompts = NULL;
 	buffer_free(pvar->userauth_infores);
 	pvar->userauth_infores = NULL;
 
