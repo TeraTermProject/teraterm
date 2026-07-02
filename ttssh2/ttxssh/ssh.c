@@ -113,11 +113,6 @@ static CRITICAL_SECTION g_ssh_scp_thread_lock;	/* SCPスレッド待ち合わせ
 
 static int g_scp_sending;  /* SCP送信中か? */
 
-// SSH2_MSG_USERAUTH_INFO_REQUEST によるダイアログのレスポンス受け取り用
-static unsigned int userauth_inforeq_num = 0; // プロンプト数
-static unsigned int userauth_inforeq_index = 0;
-static buffer_t *msg_userauth_infores = NULL; // サーバへの返信を保持する
-
 static void try_send_credentials(PTInstVar pvar);
 static void prep_compression(PTInstVar pvar);
 
@@ -3062,6 +3057,9 @@ void SSH_init(PTInstVar pvar)
 	pvar->agentfwd_enable = FALSE;
 	pvar->use_subsystem = FALSE;
 	pvar->nosession = FALSE;
+	pvar->userauth_inforeq_num = 0;
+	pvar->userauth_inforeq_index = 0;
+	pvar->userauth_infores = NULL;
 }
 
 void SSH_open(PTInstVar pvar)
@@ -3650,6 +3648,10 @@ void SSH_end(PTInstVar pvar)
 			}
 		}
 	}
+
+	pvar->userauth_inforeq_num = 0;
+	pvar->userauth_inforeq_index = 0;
+	buffer_free(pvar->userauth_infores);
 
 	// SSH2 で使われるものだが、まだ SSH2 かどうか分からない時点の
 	// SSH_init() で初期化されるので、必ず解放する。
@@ -7900,28 +7902,29 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	free(lang);
 
 	// num-prompts
-	userauth_inforeq_num = get_uint32_MSBfirst(data);
+	pvar->userauth_inforeq_num = get_uint32_MSBfirst(data);
 	data += 4;
 
-	logprintf(LOG_LEVEL_VERBOSE, "%s: prompts=%d", __FUNCTION__, userauth_inforeq_num);
+	logprintf(LOG_LEVEL_VERBOSE, "%s: prompts=%d", __FUNCTION__, pvar->userauth_inforeq_num);
 
 	///////// step2
 	// サーバへパスフレーズを送る
-	msg_userauth_infores = buffer_init();
-	if (msg_userauth_infores == NULL) {
+	buffer_free(pvar->userauth_infores);
+	pvar->userauth_infores = buffer_init();
+	if (pvar->userauth_infores == NULL) {
 		// TODO: error check
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		return FALSE;
 	}
-	buffer_put_int(msg_userauth_infores, userauth_inforeq_num);
+	buffer_put_int(pvar->userauth_infores, pvar->userauth_inforeq_num);
 
 	// パスワード変更の場合、メッセージがあれば、表示する。(2010.11.11 yutaka)
-	if (userauth_inforeq_num == 0) {
+	if (pvar->userauth_inforeq_num == 0) {
 		if (strlen(lprompt) > 0)
 			MessageBox(pvar->cv->HWin, lprompt, "USERAUTH INFO_REQUEST", MB_OK | MB_ICONINFORMATION);
 	}
 
-	if (userauth_inforeq_num > 0) {
+	if (pvar->userauth_inforeq_num > 0) {
 		// 1個目のプロンプトを読み取り、ダイアログを表示
 
 		// get string
@@ -7935,7 +7938,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 		data[0] = '\0'; // ログ出力の為、一時的に NUL Terminate する
 
 		logprintf(LOG_LEVEL_VERBOSE, "%s:   prompt[%d]=\"%s\", echo=%d", __FUNCTION__,
-		          userauth_inforeq_index, prompt, echo);
+		          pvar->userauth_inforeq_index, prompt, echo);
 
 		data[0] = echo; // ログ出力を行ったので、元の値に書き戻す
 		data += 1;
@@ -7966,15 +7969,15 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 
 	data = pvar->ssh_state.payload;
 
-	if (userauth_inforeq_num) {
+	if (pvar->userauth_inforeq_num) {
 		// ダイアログへの入力（レスポンス）を保持
 		s = pvar->auth_state.cur_cred.password;
-		buffer_put_string(msg_userauth_infores, s, strlen(s));
+		buffer_put_string(pvar->userauth_infores, s, strlen(s));
 	}
 
-	userauth_inforeq_index++;
+	pvar->userauth_inforeq_index++;
 
-	if (userauth_inforeq_index < userauth_inforeq_num) {
+	if (pvar->userauth_inforeq_index < pvar->userauth_inforeq_num) {
 		// 次のプロンプトを読み取り、ダイアログを表示
 
 		// get string
@@ -7988,7 +7991,7 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 		data[0] = '\0'; // ログ出力の為、一時的に NUL Terminate する
 
 		logprintf(LOG_LEVEL_VERBOSE, "%s:   prompt[%d]=\"%s\", echo=%d", __FUNCTION__,
-		          userauth_inforeq_index, prompt, echo);
+		          pvar->userauth_inforeq_index, prompt, echo);
 
 		data[0] = echo; // ログ出力を行ったので、元の値に書き戻す
 		data += 1;
@@ -8004,24 +8007,24 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 		return;
 	}
 
-	len = buffer_len(msg_userauth_infores);
+	len = buffer_len(pvar->userauth_infores);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_INFO_RESPONSE, len);
-	memcpy(outmsg, buffer_ptr(msg_userauth_infores), len);
+	memcpy(outmsg, buffer_ptr(pvar->userauth_infores), len);
 	finish_send_packet(pvar);
 	{
 		logprintf(LOG_LEVEL_VERBOSE,
 		          "SSH2_MSG_USERAUTH_INFO_RESPONSE was sent %s().",
 		          __FUNCTION__);
 		logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-		                  buffer_ptr(msg_userauth_infores), buffer_len(msg_userauth_infores),
+		                  buffer_ptr(pvar->userauth_infores), buffer_len(pvar->userauth_infores),
 		                  "send %s:%d %s() len=%d",
 		                  __FILE__, __LINE__,
-		                  __FUNCTION__, buffer_len(msg_userauth_infores));
+		                  __FUNCTION__, buffer_len(pvar->userauth_infores));
 	}
-	userauth_inforeq_num = 0;
-	userauth_inforeq_index = 0;
-	buffer_free(msg_userauth_infores);
-	msg_userauth_infores = NULL;
+	pvar->userauth_inforeq_num = 0;
+	pvar->userauth_inforeq_index = 0;
+	buffer_free(pvar->userauth_infores);
+	pvar->userauth_infores = NULL;
 
 	return;
 }
