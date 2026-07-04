@@ -8,10 +8,10 @@
 #include <stdio.h>
 #include <string.h>
 
-
 #include "inifile_com.h"
 #include "ttcommdlg.h"
 #include "codeconv.h"
+#include "ttlib_types.h"
 
 #include "gettimeofday.h"
 
@@ -220,6 +220,7 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	gettimeofday(&(pvar->last) /*, NULL*/ );
 	pvar->wait.tv_sec = 0;
 	pvar->wait.tv_usec = 1;
+	pvar->openfnW = NULL;
 	pvar->skip = 0;
 	pvar->skip_ini = 5;
 	pvar->maxwait = 0;
@@ -672,6 +673,14 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 			TTOPENFILENAMEW ofn;
 			wchar_t *openfn;
 			wchar_t *uimsg1, *uimsg2;
+			wchar_t *logdir;
+
+			if (pvar->openfnW == NULL) {
+				logdir = GetTermLogDir(pvar->ts);
+			}
+			else {
+				logdir = ExtractDirNameW(pvar->openfnW);
+			}
 
 			GetI18nStrWW("TTXttyrec", "FILE_FILTER", L"ttyrec(*.tty)\\0*.tty\\0All files(*.*)\\0*.*\\0\\0", pvar->ts->UILanguageFileW, &uimsg1);
 			GetI18nStrWW("TTXttyrec", "FILE_DEFAULTEXTENSION", L"tty", pvar->ts->UILanguageFileW, &uimsg2);
@@ -679,6 +688,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 			ofn.hwndOwner = hWin;
 			ofn.lpstrFilter = uimsg1;
 			ofn.lpstrDefExt = uimsg2;
+			ofn.lpstrInitialDir = logdir;
 			// ofn.lpstrTitle = L"";
 			ofn.Flags = OFN_FILEMUSTEXIST;
 
@@ -692,6 +702,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 			}
 			free(uimsg1);
 			free(uimsg2);
+			free(logdir);
 		}
 		return 1;
 	case ID_MENU_AGAIN:
