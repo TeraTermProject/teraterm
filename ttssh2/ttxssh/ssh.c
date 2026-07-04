@@ -7944,8 +7944,8 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 			echo = data[0];
 			data[0] = '\0'; // ログ出力の為、一時的に NUL Terminate する
 
-			logprintf(LOG_LEVEL_VERBOSE, "%s:   prompt[%d]=\"%s\", echo=%d", __FUNCTION__, pvar->userauth_inforeq_index,
-			          prompt, echo);
+			logprintf(LOG_LEVEL_VERBOSE, "%s:   prompt[%d]=\"%s\", echo=%d", __FUNCTION__,
+			          pvar->userauth_inforeq_index, prompt, echo);
 
 			data[0] = echo; // ログ出力を行ったので、元の値に書き戻す
 			data += 1;
@@ -7983,7 +7983,7 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 	int len;
 	char *data;
 	int slen = 0, echo;
-	char *s, *prompt = NULL;
+	char *s, *prompt_disp = NULL;
 	unsigned char *outmsg;
 
 	data = pvar->ssh_state.payload;
@@ -7998,18 +7998,18 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 
 	if (pvar->userauth_inforeq_index < pvar->userauth_inforeq_num) {
 		// 次のプロンプトでダイアログを表示
-		prompt = buffer_get_string_msg(pvar->userauth_inforeq_prompts, &slen);
+		prompt_disp = buffer_get_string_msg(pvar->userauth_inforeq_prompts, &slen);
 		echo = buffer_get_int(pvar->userauth_inforeq_prompts);
 
 		// keyboard-interactive method
 		if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
-			AUTH_set_TIS_mode(pvar, prompt, slen, echo);
+			AUTH_set_TIS_mode(pvar, prompt_disp, slen, echo);
 			AUTH_advance_to_next_cred(pvar);
 			pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
 			//try_send_credentials(pvar);
 		}
 
-		free(prompt);
+		free(prompt_disp);
 		return;
 	}
 
