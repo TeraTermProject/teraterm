@@ -36,7 +36,7 @@ extern "C" {
 
 void CopyShmemToTTSet(PTTSet ts);
 void CopyTTSetToShmem(PTTSet ts);
-BOOL StartTeraTerm(HINSTANCE hInst, PTTSet ts);
+BOOL StartTeraTerm(PTTSet ts);
 //void RestartTeraTerm(HWND hwnd, PTTSet ts);
 BOOL OpenSharedMemory(BOOL *first_instance_, PMap *pm_, HANDLE *HMap_);
 void CloseSharedMemory(PMap pm, HANDLE HMap);
