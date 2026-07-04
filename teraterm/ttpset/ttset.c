@@ -74,9 +74,6 @@
 
 #define MaxStrLen (LONG)512
 
-static const PCHAR RussList2[] = { "Windows", "KOI8-R", NULL };
-
-
 /*
  * シリアルポート関連の設定定義
  */
@@ -911,9 +908,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		GetOnOff(Section, "DisableAppCursor", FName, FALSE);
 
 	/* Russian keyboard type */
-	GetPrivateProfileString(Section, "RussKeyb", "",
-	                        Temp, sizeof(Temp), FName);
-	ts->RussKeyb = str2id(RussList2, Temp, /*IdWindows*/0);
+	GetPrivateProfileStringW(SectionW, L"RussKeyb", L"Windows",
+							 TempW, _countof(TempW), FName);
+	ts->RussKeyb = (_wcsicmp(L"KOI8-R", TempW) == 0) ? 1 : 0;
 
 	/* Serial port ID */
 	ts->ComPort = GetPrivateProfileInt(Section, "ComPort", 1, FName);
@@ -2468,8 +2465,8 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WriteOnOff(Section, "DisableAppCursor", FName, ts->DisableAppCursor);
 
 	/* Russian keyboard type */
-	id2str(RussList2, ts->RussKeyb, /*IdWindows*/0, Temp, sizeof(Temp));
-	WritePrivateProfileString(Section, "RussKeyb", Temp, FName);
+	WritePrivateProfileStringW(SectionW, L"RussKeyb",
+							   ts->RussKeyb == 0 ? L"Windows" : L"KOI8-R", FName);
 
 	/* Serial port ID */
 	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d", ts->ComPort);
