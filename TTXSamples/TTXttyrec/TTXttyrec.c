@@ -19,6 +19,7 @@
 #define ID_MENUITEM 55301
 
 #define INISECTION "ttyrec"
+#define INISECTIONW L"ttyrec"
 
 static HANDLE hInst; /* Instance handle of TTX*.DLL */
 
@@ -32,6 +33,9 @@ typedef struct {
   HMENU FileMenu;
   BOOL record;
   BOOL rec_stsize;
+  BOOL rec_auto;
+  wchar_t *rec_name;
+  wchar_t *rec_path;
 } TInstVar;
 
 struct recheader {
@@ -99,11 +103,26 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->fh = INVALID_HANDLE_VALUE;
   pvar->rec_stsize = FALSE;
   pvar->record = FALSE;
+  pvar->rec_auto = FALSE;
+  pvar->rec_name = NULL;
+  pvar->rec_path = NULL;
 }
 
 static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
   (pvar->origReadIniFile)(fn, ts);
   pvar->rec_stsize = GetOnOff(INISECTION, "RecordStartSize", fn, TRUE);
+  pvar->rec_auto = GetOnOff(INISECTION, "RecordAutoStart", fn, FALSE);
+
+  size_t len = MAX_PATH;
+  wchar_t *buff = (wchar_t*)malloc(len);
+  GetPrivateProfileStringW(INISECTIONW, L"RecordDefaultName", L"teraterm.tty", buff, len, fn);
+  free(pvar->rec_name);
+  pvar->rec_name = buff;
+
+  buff = (wchar_t*)malloc(len);
+  GetPrivateProfileStringW(INISECTIONW, L"RecordDefaultPath", L"", buff, len, fn);
+  free(pvar->rec_path);
+  pvar->rec_path = buff;
 }
 
 static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
@@ -176,11 +195,20 @@ BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID buff, DWORD len, LPDWORD rbytes, LPOVE
 static void PASCAL TTXOpenTCP(TTXSockHooks *hooks) {
   pvar->origPrecv = *hooks->Precv;
   *hooks->Precv = TTXrecv;
+  if (pvar->rec_auto) {
+    wchar_t *_fname;
+    _fname = GetAutoFilename(pvar->cv, pvar->rec_name, pvar->rec_path, L"teraterm.tty");
+    StartRecording(_fname);
+    free(_fname);
+  }
 }
 
 static void PASCAL TTXCloseTCP(TTXSockHooks *hooks) {
   if (pvar->origPrecv) {
     *hooks->Precv = pvar->origPrecv;
+  }
+  if (pvar->rec_auto) {
+    StopRecording();
   }
 }
 
@@ -188,12 +216,21 @@ static void PASCAL TTXOpenFile(TTXFileHooks *hooks) {
   if (pvar->cv->PortType == IdSerial) {
     pvar->origPReadFile = *hooks->PReadFile;
     *hooks->PReadFile = TTXReadFile;
+    if (pvar->rec_auto) {
+      wchar_t *_fname;
+      _fname = GetAutoFilename(pvar->cv, pvar->rec_name, pvar->rec_path, L"teraterm.tty");
+      StartRecording(_fname);
+      free(_fname);
+    }
   }
 }
 
 static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
   if (pvar->origPReadFile) {
     *hooks->PReadFile = pvar->origPReadFile;
+  }
+  if (pvar->rec_auto) {
+    StopRecording();
   }
 }
 
@@ -260,6 +297,8 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 
 static void PASCAL TTXEnd(void) {
   StopRecording();
+  free(pvar->rec_name);
+  pvar->rec_name = NULL;
 }
 
 static TTXExports Exports = {
