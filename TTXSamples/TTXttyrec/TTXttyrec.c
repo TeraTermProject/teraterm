@@ -13,6 +13,7 @@
 #include "ttcommdlg.h"
 
 #include "gettimeofday.h"
+#include "autofilename.h"
 
 #define ORDER 6000
 #define ID_MENUITEM 55301
