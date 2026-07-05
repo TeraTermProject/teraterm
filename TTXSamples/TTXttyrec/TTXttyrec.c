@@ -36,6 +36,9 @@ typedef struct {
   BOOL rec_auto;
   wchar_t *rec_name;
   wchar_t *rec_path;
+  int tel_mode;
+  int tel_buf_len;
+  char *tel_buf;
 } TInstVar;
 
 struct recheader {
@@ -106,6 +109,9 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->rec_auto = FALSE;
   pvar->rec_name = NULL;
   pvar->rec_path = NULL;
+  pvar->tel_mode = 0;
+  pvar->tel_buf_len = 32;
+  pvar->tel_buf = (char*)malloc(pvar->tel_buf_len);
 }
 
 static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
@@ -145,6 +151,72 @@ void WriteData(HANDLE fh, char *buff, int len) {
   return;
 }
 
+void WriteDataTelnet(HANDLE fh, char *buff, int len) {
+  char *p;
+  int sz;
+
+  if (pvar->tel_buf_len < len){
+    free(pvar->tel_buf);
+    pvar->tel_buf_len = len;
+    pvar->tel_buf = (char *)malloc(pvar->tel_buf_len);
+  }
+  p = pvar->tel_buf;
+  for (int i=0; i < len; i ++){
+    char ch = buff[i];
+    switch (pvar->tel_mode) {
+      case 0:
+        if (ch == (char)0xff) {
+          pvar->tel_mode = 1;
+        }
+        else {
+          *p++ = ch;
+        }
+        break;
+      case 1:
+        if (ch == (char)0xff) {
+          *p++ = ch;
+          pvar->tel_mode = 0;
+        }
+        else if ((char)0xfb <= ch && ch <= (char)0xfe) {
+          pvar->tel_mode = 2;
+        }
+        else if (ch == (char)0xfa) {
+          pvar->tel_mode = 3;
+        }
+        else {
+          pvar->tel_mode = 0;
+        }
+        break;
+      case 2:
+        pvar->tel_mode = 0;
+        break;
+      case 3:
+        if (ch == (char)0xff) {
+          pvar->tel_mode = 4;
+        }
+        break;
+      case 4:
+        if (ch == (char)0xf0) {
+          pvar->tel_mode = 0;
+        }
+        else if (ch != (char)0xff) {
+          pvar->tel_mode = 3;
+        }
+        break;
+      default:
+        pvar->tel_mode = 0;
+        break;
+    }
+  }
+
+  sz = (int)(p - pvar->tel_buf);
+  if (sz > 0) {
+    WriteData(fh, pvar->tel_buf, sz);
+  }
+
+  return;
+}
+
 void StartRecording(wchar_t *fname)
 {
   pvar->fh = CreateFileW(fname, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -177,7 +249,12 @@ int PASCAL TTXrecv(SOCKET s, char *buff, int len, int flags) {
 
   rlen = pvar->origPrecv(s, buff, len, flags);
   if (pvar->record && rlen > 0) {
-    WriteData(pvar->fh, buff, rlen);
+    if (pvar->cv->TelFlag) {
+      WriteDataTelnet(pvar->fh, buff, rlen);
+    }
+    else {
+      WriteData(pvar->fh, buff, rlen);
+    }
   }
   return rlen;
 }
@@ -297,6 +374,8 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 
 static void PASCAL TTXEnd(void) {
   StopRecording();
+  free(pvar->tel_buf);
+  pvar->tel_buf = NULL;
   free(pvar->rec_name);
   pvar->rec_name = NULL;
 }
