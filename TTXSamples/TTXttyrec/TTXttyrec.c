@@ -106,6 +106,11 @@ static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
   pvar->rec_stsize = GetOnOff(INISECTION, "RecordStartSize", fn, TRUE);
 }
 
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
+  pvar->origReadIniFile = *hooks->ReadIniFile;
+  *hooks->ReadIniFile = TTXReadIniFile;
+}
+
 void WriteData(HANDLE fh, char *buff, int len) {
   struct timeval t;
   int b[3];
@@ -119,11 +124,6 @@ void WriteData(HANDLE fh, char *buff, int len) {
   WriteFile(pvar->fh, buff, len, &w, NULL);
 
   return;
-}
-
-static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
-  pvar->origReadIniFile = *hooks->ReadIniFile;
-  *hooks->ReadIniFile = TTXReadIniFile;
 }
 
 int PASCAL TTXrecv(SOCKET s, char *buff, int len, int flags) {
