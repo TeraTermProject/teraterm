@@ -126,6 +126,33 @@ void WriteData(HANDLE fh, char *buff, int len) {
   return;
 }
 
+void StartRecording(wchar_t *fname)
+{
+  pvar->fh = CreateFileW(fname, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  if (pvar->fh != INVALID_HANDLE_VALUE) {
+    pvar->record = TRUE;
+    CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_CHECKED);
+    if (pvar->cv->Ready) {
+      if (pvar->rec_stsize) {
+        char buff[20];
+        _snprintf_s(buff, sizeof(buff), _TRUNCATE, "\033[8;%d;%dt",
+          pvar->ts->TerminalHeight, pvar->ts->TerminalWidth);
+        WriteData(pvar->fh, buff, (int)strlen(buff));
+      }
+    }
+  }
+}
+
+void StopRecording()
+{
+  if (pvar->fh != INVALID_HANDLE_VALUE) {
+    CloseHandle(pvar->fh);
+    pvar->fh = INVALID_HANDLE_VALUE;
+  }
+  pvar->record = FALSE;
+  CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_UNCHECKED);
+}
+
 int PASCAL TTXrecv(SOCKET s, char *buff, int len, int flags) {
   int rlen;
 
@@ -200,21 +227,14 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 {
 	if (cmd==ID_MENUITEM) {
 		if (pvar->record) {
-			if (pvar->fh != INVALID_HANDLE_VALUE) {
-				CloseHandle(pvar->fh);
-				pvar->fh = INVALID_HANDLE_VALUE;
-			}
-			pvar->record = FALSE;
-			CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_UNCHECKED);
+			StopRecording();
 		}
 		else {
 			TTOPENFILENAMEW ofn;
 			wchar_t *fname;
 			wchar_t *uimsg1, *uimsg2;
 
-			if (pvar->fh != INVALID_HANDLE_VALUE) {
-				CloseHandle(pvar->fh);
-			}
+			StopRecording();
 
 			GetI18nStrWW("TTXttyrec", "FILE_FILTER", L"ttyrec(*.tty)\\0*.tty\\0All files(*.*)\\0*.*\\0\\0", pvar->ts->UILanguageFileW, &uimsg1);
 			GetI18nStrWW("TTXttyrec", "FILE_DEFAULTEXTENSION", L"tty", pvar->ts->UILanguageFileW, &uimsg2);
@@ -227,18 +247,8 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			//ofn.lpstrTitle = L"";
 			ofn.Flags = OFN_OVERWRITEPROMPT;
 			if (TTGetSaveFileNameW(&ofn, &fname)) {
-				pvar->fh = CreateFileW(fname, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+				StartRecording(fname);
 				free(fname);
-				if (pvar->fh != INVALID_HANDLE_VALUE) {
-					pvar->record = TRUE;
-					CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_CHECKED);
-					if (pvar->rec_stsize) {
-						char buff[20];
-						_snprintf_s(buff, sizeof(buff), _TRUNCATE, "\033[8;%d;%dt",
-									pvar->ts->TerminalHeight, pvar->ts->TerminalWidth);
-						WriteData(pvar->fh, buff, (int)strlen(buff));
-					}
-				}
 			}
 			free(uimsg1);
 			free(uimsg2);
@@ -249,10 +259,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 }
 
 static void PASCAL TTXEnd(void) {
-  if (pvar->fh != INVALID_HANDLE_VALUE) {
-    CloseHandle(pvar->fh);
-    pvar->fh = INVALID_HANDLE_VALUE;
-  }
+  StopRecording();
 }
 
 static TTXExports Exports = {
