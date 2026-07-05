@@ -119,7 +119,7 @@ static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
   pvar->rec_stsize = GetOnOff(INISECTION, "RecordStartSize", fn, TRUE);
   pvar->rec_auto = GetOnOff(INISECTION, "RecordAutoStart", fn, FALSE);
 
-  size_t len = MAX_PATH;
+  DWORD len = MAX_PATH;
   wchar_t *buff = (wchar_t*)malloc(len);
   GetPrivateProfileStringW(INISECTIONW, L"RecordDefaultName", L"teraterm.tty", buff, len, fn);
   free(pvar->rec_name);

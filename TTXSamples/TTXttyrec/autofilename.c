@@ -222,6 +222,5 @@ wchar_t *GetAutoFilename(const TComVar *pcv, const wchar_t *filename, const wcha
 	free(fname);
 	free(dir);
 
-  MessageBoxW(0, full, L"GetFilename()", 0);
 	return full;
 }
