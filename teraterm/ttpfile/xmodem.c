@@ -89,6 +89,7 @@ typedef struct {
 		STATE_NORMAL,
 		STATE_CANCELED,		// キャンセル通知を受けた
 	} state;
+	BOOL isXCancel;
 
 	TComm *Comm;
 	PComVar cv;
@@ -353,13 +354,18 @@ static BOOL XInit(TProto *pv, PComVar cv, PTTSet ts)
 		break;
 	}
 	xv->state = STATE_FLUSH;
+	xv->isXCancel = FALSE;
 	return TRUE;
 }
 
 static void XCancel(TProto *pv)
 {
 	PXVar xv = pv->PrivateData;
-	XCancel_(xv);
+	if (xv->XMode == IdXSend) {
+		xv->isXCancel = TRUE;
+	} else {
+		XCancel_(xv);
+	}
 }
 
 static void XTimeOutProc(TProto *pv)
@@ -607,6 +613,11 @@ static BOOL XSendPacket(PXVar xv)
 				break;
 			}
 			xv->CANCount = 0;
+		}
+
+		if (xv->isXCancel) {
+			XCancel_(xv); // ブロック境界(ACK/NAKの直後)で CAN を送信する
+			return FALSE;
 		}
 
 		if (!SendFlag){
