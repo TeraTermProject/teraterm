@@ -6832,6 +6832,17 @@
     ttyファイルでないファイルを再生した後、ttyファイルを再生すると表示が崩れる問題を修正した。
     (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
   </li>
+  <li>
+    自動録画を追加した。接続開始で録画を開始し、接続切断で録画を停止する。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1405" target="_blank">issue #1405</a>)
+    <ul>
+      <li>teraterm.ini に RecordAutoStart エントリを追加した。自動録画有無を設定。デフォルトはoff。</li>
+      <li>teraterm.ini に RecordDefaultPath エントリを追加した。録画ファイル保存先を設定可能。</li>
+      <li>teraterm.ini に RecordDefaultName エントリを追加した。録画ファイル名を設定可能。</li>
+      <li>録画ファイル名に strftime のフォーマットを使えるようにした。</li>
+      <li>録画ファイル名に &amp;h(接続中のホスト名/COMポート名)、&amp;p(接続中のポート番号)、&amp;u(ユーザ名)を含めることができるようにした。</li>
+    </ul>
+  </li>
 </ul>
 
 <h3 id="ttyrec_1.06">2025.08.03 (Ver 1.06)</h3>
