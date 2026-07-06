@@ -77,6 +77,7 @@ typedef struct {
 	BOOL FileOpen;
 	LONG FileSize;
 	LONG ByteCount;
+ 	DWORD PrevElapsed;
 
 	int ProgStat;
 
@@ -89,6 +90,7 @@ typedef struct {
 		STATE_NORMAL,
 		STATE_CANCELED,		// キャンセル通知を受けた
 	} state;
+	BOOL isXCancel;
 
 	TComm *Comm;
 	PComVar cv;
@@ -96,6 +98,32 @@ typedef struct {
 	TFileIO *file;
 } TXVar;
 typedef TXVar *PXVar;
+
+static void update_dialog(PXVar xv, BOOL force_update)
+{
+	PFileVarProto fv = xv->fv;
+ 	DWORD elapsed;
+
+	elapsed = (GetTickCount() - xv->StartTime) / 100; // 更新頻度は10回/秒
+	if (elapsed != xv->PrevElapsed || force_update) {
+		if (xv->XMode == IdXReceive) {
+			xv->PrevElapsed = elapsed;
+			fv->InfoOp->SetDlgPacketNum(fv, xv->PktNumOffset + xv->PktNum);
+			fv->InfoOp->SetDlgByteCount(fv, xv->ByteCount);
+			fv->InfoOp->SetDlgTime(fv, xv->StartTime, xv->ByteCount);
+		} else if (xv->XMode == IdXSend) {
+			xv->PrevElapsed = elapsed;
+			if (xv->PktNumSent == 0) {
+				fv->InfoOp->SetDlgPacketNum(fv, xv->PktNumOffset + 256);
+			} else {
+				fv->InfoOp->SetDlgPacketNum(fv, xv->PktNumOffset + xv->PktNumSent);
+			}
+			fv->InfoOp->SetDlgByteCount(fv, xv->ByteCount);
+			fv->InfoOp->SetDlgPercent(fv, xv->ByteCount, xv->FileSize, &xv->ProgStat);
+			fv->InfoOp->SetDlgTime(fv, xv->StartTime, xv->ByteCount);
+		}
+	}
+}
 
 static int XRead1Byte(PXVar xv, LPBYTE b)
 {
@@ -300,6 +328,7 @@ static BOOL XInit(TProto *pv, PComVar cv, PTTSet ts)
 	}
 	fv->InfoOp->SetDlgProtoFileName(fv, xv->FullName);
 	xv->StartTime = 0;
+	xv->PrevElapsed = 0;
 
 	xv->PktNumOffset = 0;
 	xv->PktNum = 0;
@@ -353,13 +382,19 @@ static BOOL XInit(TProto *pv, PComVar cv, PTTSet ts)
 		break;
 	}
 	xv->state = STATE_FLUSH;
+	xv->isXCancel = FALSE;
 	return TRUE;
 }
 
 static void XCancel(TProto *pv)
 {
 	PXVar xv = pv->PrivateData;
-	XCancel_(xv);
+	if (xv->XMode == IdXSend) {
+		xv->isXCancel = TRUE;
+	} else {
+		XCancel_(xv);
+	}
+	update_dialog(xv, TRUE);
 }
 
 static void XTimeOutProc(TProto *pv)
@@ -373,6 +408,7 @@ static void XTimeOutProc(TProto *pv)
 		XSendNAK(xv);
 		break;
 	}
+	update_dialog(xv, TRUE);
 }
 
 static BOOL XReadPacket(PXVar xv)
@@ -409,6 +445,7 @@ static BOOL XReadPacket(PXVar xv)
 				b = ACK;
 				fv->Success = TRUE;
 				XWrite(xv, &b, 1);
+				update_dialog(xv, TRUE);
 				return FALSE;
 				break;
 			case CAN:
@@ -417,6 +454,7 @@ static BOOL XReadPacket(PXVar xv)
 					continue;
 				}
 				else {
+					update_dialog(xv, TRUE);
 					return FALSE;
 				}
 				break;
@@ -530,11 +568,7 @@ static BOOL XReadPacket(PXVar xv)
 	}
 
 	xv->ByteCount = xv->ByteCount + c;
-
-	fv->InfoOp->SetDlgPacketNum(fv, xv->PktNumOffset + xv->PktNum);
-	fv->InfoOp->SetDlgByteCount(fv, xv->ByteCount);
-	fv->InfoOp->SetDlgTime(fv, xv->StartTime, xv->ByteCount);
-
+	update_dialog(xv, FALSE);
 	fv->FTSetTimeOut(fv, xv->TOutLong);
 
 	return TRUE;
@@ -560,6 +594,7 @@ static BOOL XSendPacket(PXVar xv)
 			case ACK:
 				if (!xv->FileOpen) {
 					fv->Success = TRUE;
+					update_dialog(xv, TRUE);
 					return FALSE;
 				} else if (xv->PktNumSent == (BYTE) (xv->PktNum + 1)) {
 					xv->PktNum = xv->PktNumSent;
@@ -589,6 +624,7 @@ static BOOL XSendPacket(PXVar xv)
 					continue;
 				}
 				else {
+					update_dialog(xv, TRUE);
 					return FALSE;
 				}
 				break;
@@ -607,6 +643,12 @@ static BOOL XSendPacket(PXVar xv)
 				break;
 			}
 			xv->CANCount = 0;
+		}
+
+		if (xv->isXCancel) {
+			XCancel_(xv); // ブロック境界(ACK/NAKの直後)で CAN を送信する
+			update_dialog(xv, TRUE);
+			return FALSE;
 		}
 
 		if (!SendFlag){
@@ -686,15 +728,7 @@ static BOOL XSendPacket(PXVar xv)
 	}
 
 	if (xv->PktBufCount == 0) {
-		if (xv->PktNumSent == 0) {
-			fv->InfoOp->SetDlgPacketNum(fv, xv->PktNumOffset + 256);
-		}
-		else {
-			fv->InfoOp->SetDlgPacketNum(fv, xv->PktNumOffset + xv->PktNumSent);
-		}
-		fv->InfoOp->SetDlgByteCount(fv, xv->ByteCount);
-		fv->InfoOp->SetDlgPercent(fv, xv->ByteCount, xv->FileSize, &xv->ProgStat);
-		fv->InfoOp->SetDlgTime(fv, xv->StartTime, xv->ByteCount);
+		update_dialog(xv, !xv->FileOpen);
 	}
 
 	return TRUE;
