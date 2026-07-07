@@ -189,7 +189,7 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
 
 static void PASCAL TTXModifyPopupMenu(HMENU menu) {
   if (menu==pvar->FileMenu) {
-    if (pvar->cv->Ready)
+    if (pvar->cv->Ready || pvar->record)
       EnableMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_ENABLED);
     else
       EnableMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_GRAYED);

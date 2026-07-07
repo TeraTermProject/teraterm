@@ -128,11 +128,16 @@
         起動したのち "Setup &gt; Save setup.." するとクラッシュする問題を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1335" target="_blank">issue #1335</a>)
       </li>
+      <li>
+        XMODEMを使用したファイル送信中にCancelボタンを押下しても、受信側のXMODEMが停止しない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1408" target="_blank">issue #1408</a>)
+      </li>
     </ul>
   </li>
 
   <li>その他
     <ul>
+      <li><a href="#ttssh_3.7.0">TTSSH 3.7.0</a> へ差し替えた。</li>
       <li><a href="#ttmenu_1.23">TeraTerm Menu 1.23</a> へ差し替えた。</li>
       <li><a href="#ttyrec_1.07">TTXttyrec Plugin 1.07</a> へ差し替えた。</li>
       <li>
@@ -4263,12 +4268,14 @@
     </ul>
   </li-->
 
-  <!--li>バグ修正
+  <li>バグ修正
     <ul>
       <li>
+        SSH_MSG_USERAUTH_INFO_REQUEST のプロンプトが複数あった場合に正しく処理されない問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1390" target="_blank">issue #1390</a>)
       </li>
     </ul>
-  </li-->
+  </li>
 
   <!--li>その他
     <ul>
@@ -6832,6 +6839,13 @@
   <li>
     "TTY Record" メニューのファイル選択ダイアログの初期ディレクトリを <a href="../setup/folder.html#TermLogDir">端末ログフォルダ</a> に変更した。
     (<a href="https://github.com/TeraTermProject/teraterm/issues/1384" target="_blank">issue #1384</a>)
+    切断後も録画状態のとき "TTY Record" メニューが無効にならないようにし、録画を停止できるようにした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1284" target="_blank">issue #1284</a>)
+  </li>
+  <li>
+    "TTY Replay" メニューのファイル選択ダイアログの初期ディレクトリを指定するように修正した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1382" target="_blank">issue #1382</a>)<br>
+    直前に再生したファイルがあればそのフォルダ、なければ <a href="../setup/folder.html#TermLogDir">端末ログフォルダ</a> になる。
   </li>
 </ul>
 
