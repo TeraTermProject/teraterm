@@ -74,6 +74,9 @@ typedef struct {
 	char origOLDTitle[TitleBuffSize];
 	int mode_flag;
 	char *fmt_time;
+	char *origHostName;
+	int name_cnt_ini;
+	int name_cnt;
 } TInstVar;
 
 static TInstVar *pvar;
@@ -207,6 +210,44 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
   return NULL;
 }
 
+wchar_t *ExtractPath(wchar_t *path, int n)
+{
+	if (n > 0) {
+		wchar_t *p = &path[wcslen(path)];
+		int cnt = 0;
+		while (p > path) {
+			p--;
+			if (*p == L'\\' || *p == L'/') {
+				cnt++;
+				if (cnt >= n) {
+					return &p[1];
+				}
+			}
+		}
+	}
+	return path;
+}
+
+void ChangeHostName()
+{
+	free(pvar->origHostName);
+	pvar->origHostName = _strdup(pvar->ts->HostName);
+	wchar_t *hostnameW = ToWcharA(pvar->origHostName);
+	char *hostname = ToCharW(ExtractPath(hostnameW, pvar->name_cnt));
+	strncpy_s(pvar->ts->HostName, sizeof(pvar->ts->HostName), hostname, _TRUNCATE);
+	free(hostname);
+	free(hostnameW);
+}
+
+void RestoreOLDHostName()
+{
+	if (pvar->origHostName != NULL) {
+		strncpy_s(pvar->ts->HostName, sizeof(pvar->ts->HostName), pvar->origHostName, _TRUNCATE);
+		free(pvar->origHostName);
+		pvar->origHostName = NULL;
+	}
+}
+
 static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->ts = ts;
 	pvar->cv = cv;
@@ -233,6 +274,9 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->open_error = FALSE;
 	pvar->mode_flag = 0;
 	pvar->fmt_time = NULL;
+	pvar->origHostName = NULL;
+	pvar->name_cnt_ini = 0;
+	pvar->name_cnt = 0;
 }
 
 void RestoreTitle() {
@@ -270,6 +314,7 @@ static HANDLE PASCAL TTXCreateFile(LPCSTR FName, DWORD AcMode, DWORD ShMode,
 		}
 		else {
 			pvar->open_error = FALSE;
+			ChangeHostName();
 		}
 	}
 
@@ -583,6 +628,8 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 		pvar->wait.tv_usec = 0;
 		pvar->nowait = pvar->nowait_ini;
 		pvar->speed = 0;
+		RestoreOLDHostName();
+		pvar->name_cnt = pvar->name_cnt_ini;
 	}
 }
 
@@ -654,6 +701,14 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
 			pvar->maxwait = max;
 			pvar->minwait = min;
 		}
+		else if (_wcsnicmp(buff, L"/TPN", 5) == 0 || _wcsnicmp(buff, L"/TPN=", 5) == 0) {
+			int cnt = 1;
+			if (buff[4] == L'=') {
+				cnt = 0;
+	    		swscanf_s(&buff[5], L"%d", &cnt);
+			}
+			pvar->name_cnt = cnt;
+		}
 	}
 }
 
@@ -668,6 +723,8 @@ static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
 	ConvertSafeStrFtimeFormat(buff);
 	free(pvar->fmt_time);
 	pvar->fmt_time = ToCharW(buff);
+	pvar->name_cnt_ini = GetPrivateProfileIntAFileW(INISECTION, "TitlePathMode", 0, fn);
+	pvar->name_cnt = pvar->name_cnt_ini;
 }
 
 static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
