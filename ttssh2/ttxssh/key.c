@@ -2397,18 +2397,8 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 	int siglen_i;
 	int ret;
 
-	// SSH2 packet format:
-	// [size(4) + padding size(1) + type(1)] + [payload(N) + padding(X)]
-	//  header                                     body
-	//                                         ^data
-	//            <-----------------size------------------------------->
-	//                              <---------len-------->
-	//
-	// data = payload(N) + padding(X): パディングも含めたボディすべてを指す。
 	data = pvar->ssh_state.payload;
-	// len = size - (padding size + 1): パディングを除くボディ。typeが先頭に含まれる。
-	len = pvar->ssh_state.payloadlen;
-	len--;   // type 分を除く
+	len = pvar->ssh_state.payloadlen - 1; // メッセージデータの長さ
 
 	bsig = buffer_init();
 	if (bsig == NULL)

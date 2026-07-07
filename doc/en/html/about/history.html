@@ -129,11 +129,16 @@
         "Setup &gt; Save setup..".
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1335" target="_blank">issue #1335</a>)
       </li>
+      <li>
+        Fixed an issue where XMODEM transfers from the local host to a remote system did not stop on the receiver side when the Cancel button was pressed during file transmission.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1408" target="_blank">issue #1408</a>)
+      </li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
+      <li>Upgraded TTSSH to <a href="#ttssh_3.7.0">3.7.0</a>.</li>
       <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.23">1.23</a>.</li>
       <li>Upgraded TTXttyrec Plugin to <a href="#ttyrec_1.07">1.07</a>.</li>
       <li>
@@ -4256,12 +4261,14 @@ SYNOPSIS:
     </ul>
   </li-->
 
-  <!--li>Bug fixes
+  <li>Bug fixes
     <ul>
       <li>
+        Fixed an issue where multiple prompts in an SSH_MSG_USERAUTH_INFO_REQUEST message were not handled correctly.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1390" target="_blank">issue #1390</a>)
       </li>
     </ul>
-  </li-->
+  </li>
 
   <!--li>Misc
     <ul>
@@ -6819,6 +6826,19 @@ SYNOPSIS:
   <li>
     Fixed display corruption when playing a tty file after a non-tty file.
     (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  </li>
+  <li>
+    Fixed an issue where the "TTY Record" menu was disabled after disconnection while recording was still in progress, preventing the recording from being stopped.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1284" target="_blank">issue #1284</a>)
+  </li>
+  <li>
+    Changed the initial directory of the file selection dialog for the "TTY Replay" menu.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1382" target="_blank">issue #1382</a>)<br>
+    The dialog now opens in the folder of the most recently replayed file, or the <a href="../setup/folder.html#TermLogDir">Terminal log folder</a> if no previously replayed file exists.
+  </li>
+  <li>
+    Changed the initial directory of the file selection dialog for the "TTY Record" menu to the <a href="../setup/folder.html#TermLogDir">Terminal log folder</a>.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1384" target="_blank">issue #1384</a>)
   </li>
   <li>
     Added the ability to stop playback while it is in progress.
