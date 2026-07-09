@@ -47,14 +47,8 @@
   <li>Bug fixes
     <ul>
       <li>
-        Fixed an issue where speeds above 115200 could not be selected when opening the Serial port tab ("Additional settings &gt; <a href="../menu/setup-additional-serialport.html">Serial port</a>").
-        This bug was introduced in 5.0.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1241" target="_blank">issue #1241</a>)
-      </li>
-      <li>
-        Fixed an issue where ttermpro.exe crashes when "pipe_name" or "server\pipe_name" is specified with the /PIPE command line option.
-        This bug was introduced in 5.0.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1318" target="_blank">issue #1318</a>)
+        Fixed an issue where XMODEM transfers from the local host to a remote system did not stop on the receiver side when the Cancel button was pressed during file transmission.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1408" target="_blank">issue #1408</a>)
       </li>
       <li>
         Fixed an issue where file reception via ZMODEM failed during high-speed serial communication using USB CDC-ACM.
@@ -62,12 +56,18 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1299" target="_blank">issue #1299</a>)
       </li>
       <li>
+        Fixed an issue where ttermpro.exe crashes when "pipe_name" or "server\pipe_name" is specified with the /PIPE command line option.
+        This bug was introduced in 5.0.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1318" target="_blank">issue #1318</a>)
+      </li>
+      <li>
         Fixed an issue where ttermpro.exe crashed when macro reloaded the setup file after launching with the /V option.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1347" target="_blank">issue #1347</a>)
       </li>
       <li>
-        Fixed an issue where XMODEM transfers from the local host to a remote system did not stop on the receiver side when the Cancel button was pressed during file transmission.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1408" target="_blank">issue #1408</a>)
+        Fixed an issue where speeds above 115200 could not be selected when opening the Serial port tab ("Additional settings &gt; <a href="../menu/setup-additional-serialport.html">Serial port</a>").
+        This bug was introduced in 5.0.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1241" target="_blank">issue #1241</a>)
       </li>
     </ul>
   </li>
