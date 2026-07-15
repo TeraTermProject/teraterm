@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2026-05-31 by TeraTerm Project
+date=2026-06-18 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -1017,8 +1017,10 @@ MSG_PKT_OVERSIZED_ERROR=Oversized packet received from server; connection will c
 
 ; ssh.c
 MSG_SSH_INVALID_COMPDATA_ERROR=Invalid compressed data in received packet
-MSG_SSH_TRUNCATED_PKT_ERROR=Received truncated packet (%ld > %d) @ grab_payload()
-MSG_SSH_TRUNCATED_PKT_LIM_ERROR=Received truncated packet (%ld > %d) @ grab_payload_limited()
+MSG_SSH_INVALID_PKT_SIZE_ERROR=Received invalid packet size (%u) @ grab_payload()
+MSG_SSH_TRUNCATED_PKT_ERROR=Received truncated packet (%u > %u) @ grab_payload()
+MSG_SSH_INVALID_PKT_SIZE_LIM_ERROR=Received invalid packet size (%u) @ grab_payload_limited()
+MSG_SSH_TRUNCATED_PKT_LIM_ERROR=Received truncated packet (%u > %u) @ grab_payload_limited()
 MSG_SSH_COREINS_ERROR='CORE insertion attack' detected.  Aborting connection.
 MSG_SSH_CORRUPTDATA_ERROR=Detected corrupted data; connection terminating.
 MSG_SSH_DECOMPRESS_ERROR=Internal error: a packet was not fully decompressed.\nThis is a bug, please report it.

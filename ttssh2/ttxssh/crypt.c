@@ -591,8 +591,8 @@ BOOL CRYPT_set_host_RSA_key(PTInstVar pvar,
 	return pvar->crypt_state.host_key.RSA_key != NULL;
 }
 
-BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
-                                 int receiver_ciphers)
+BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, unsigned int sender_ciphers,
+                                 unsigned int receiver_ciphers)
 {
 	int cipher_mask;
 

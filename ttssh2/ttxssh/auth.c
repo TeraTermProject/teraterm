@@ -1239,7 +1239,7 @@ char *AUTH_get_user_name(PTInstVar pvar)
 }
 
 // pvar->auth_state.supported_types を更新する
-int AUTH_set_supported_auth_types(PTInstVar pvar, int types)
+int AUTH_set_supported_auth_types(PTInstVar pvar, unsigned int types)
 {
 	logprintf(LOG_LEVEL_VERBOSE, "Server reports supported authentication method mask = %d", types);
 
