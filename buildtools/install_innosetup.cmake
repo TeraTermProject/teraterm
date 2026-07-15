@@ -7,7 +7,7 @@ endif()
 
 # innosetup 6.7.1
 set(INNOSETUP_EXE "innosetup-6.7.1.exe")
-set(INNOSETUP_URL "https://files.jrsoftware.org/is/6/${INNOSETUP_EXE}")
+set(INNOSETUP_URL "https://github.com/jrsoftware/issrc/releases/download/is-6_7_1/${INNOSETUP_EXE}")
 set(INNOSETUP_HASH "4d11e8050b6185e0d49bd9e8cc661a7a59f44959a621d31d11033124c4e8a7b0")
 set(INNOSETUP_CHECK_FILE innosetup6/ISCC.exe)
 set(INNOSETUP_CHECK_HASH "eb6f4410c8db367a5f74127e8025ad2ccacc0afabbe783959d237df3050f97fb")
