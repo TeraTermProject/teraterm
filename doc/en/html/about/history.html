@@ -4254,6 +4254,16 @@ SYNOPSIS:
 
 <h3 id="ttssh_3.7.0">YYYY.MM.DD (Ver 3.7.0 not released yet)</h3>
 <ul class="history">
+  <li>Security fixes
+    <ul>
+      <li>
+        Fixed a vulnerability where received SSH2 packet lengths were processed without proper validation.
+        This bug was introduced in TTSSH2 1.00 alpha1 (UTF-8 TeraTerm Pro 2.05).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1417" target="_blank">issue #1417</a>, <a href="https://teratermproject.github.io/SA/JVN65294474-en.html" target="_blank">TTSSH2 has out-of-bounds access vulnerability</a>)
+      </li>
+    </ul>
+  </li>
+
   <!--li>Changes
     <ul>
       <li>
