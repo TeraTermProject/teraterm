@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2026-05-31 by TeraTerm Project
+date=2026-06-18 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -1017,8 +1017,10 @@ MSG_PKT_OVERSIZED_ERROR=Paquet surdimensionné reçu du serveur, la connexion va
 
 ; ssh.c
 MSG_SSH_INVALID_COMPDATA_ERROR=Données compressées invalides dans le paquet reçu.
-MSG_SSH_TRUNCATED_PKT_ERROR=Paquet incomplet reçu (%ld > %d) @ grab_payload()
-MSG_SSH_TRUNCATED_PKT_LIM_ERROR=Paquet incomplet reçu (%ld > %d) @ grab_payload_limited()
+MSG_SSH_INVALID_PKT_SIZE_ERROR=Received invalid packet size (%u) @ grab_payload()
+MSG_SSH_TRUNCATED_PKT_ERROR=Paquet incomplet reçu (%u > %u) @ grab_payload()
+MSG_SSH_INVALID_PKT_SIZE_LIM_ERROR=Received invalid packet size (%u) @ grab_payload_limited()
+MSG_SSH_TRUNCATED_PKT_LIM_ERROR=Paquet incomplet reçu (%u > %u) @ grab_payload_limited()
 MSG_SSH_COREINS_ERROR='attaque par insertion-CORE' détectée.  Connexion coupée.
 MSG_SSH_CORRUPTDATA_ERROR=Données corrompues détectées; Connexion coupée.
 MSG_SSH_DECOMPRESS_ERROR=Erreur Interne: un paquet n'a pas pu être décompressé.\nCeci est un bug, merci de nous en informer.

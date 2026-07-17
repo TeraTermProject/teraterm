@@ -396,7 +396,7 @@ typedef struct {
 	   packet data for compression. User data is never streamed through here;
 	   it is compressed directly from the user's buffer. */
 	unsigned char *precompress_outbuf;
-	long precompress_outbuflen;
+	unsigned int precompress_outbuflen;
 	/* this is the length of the packet data, including the type header */
 	long outgoing_packet_len;
 
@@ -404,13 +404,22 @@ typedef struct {
 	   packet data. User data is never streamed through here; it is decompressed
 	   directly to the user's buffer. */
 	unsigned char *postdecompress_inbuf;
-	long postdecompress_inbuflen;
+	unsigned int postdecompress_inbuflen;
 
+	// SSH2 packet format:
+	//   | packet_length(4) | padding_length(1) | payload(n1) | padding(n2) | mac |
+	//                                          | type | data |
+	//                       <---------------------------------------------> packet_length
+	//                                                         <-----------> padding_length
+	//                                                  ^pvar->ssh_state.payload
+	//                                                  メッセージタイプの次 = data があればメッセージデータの先頭
+	//                                            <----------> pvar->ssh_state.payloadlen
+	//                                                         メッセージタイプを含む、ペイロード全体の長さ
 	unsigned char *payload;
-	long payload_grabbed;
-	long payloadlen;
-	long payload_datastart;
-	long payload_datalen;
+	unsigned int payload_grabbed;
+	unsigned int payloadlen;
+	unsigned int payload_datastart;
+	unsigned int payload_datalen;
 
 	uint32 receiver_sequence_number;
 	uint32 sender_sequence_number;
@@ -522,6 +531,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar);
 BOOL handle_SSH2_userauth_pkok(PTInstVar pvar);
 BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar);
 int SSH_notify_break_signal(PTInstVar pvar);
+void SSH2_send_userauth_infores(PTInstVar pvar);
 
 ///
 enum scp_state {

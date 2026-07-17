@@ -11,6 +11,7 @@
 
 #include "inifile_com.h"
 #include "ttcommdlg.h"
+#include "ttlib_types.h"
 
 #include "gettimeofday.h"
 
@@ -188,7 +189,7 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
 
 static void PASCAL TTXModifyPopupMenu(HMENU menu) {
   if (menu==pvar->FileMenu) {
-    if (pvar->cv->Ready)
+    if (pvar->cv->Ready || pvar->record)
       EnableMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_ENABLED);
     else
       EnableMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_GRAYED);
@@ -210,10 +211,13 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			TTOPENFILENAMEW ofn;
 			wchar_t *fname;
 			wchar_t *uimsg1, *uimsg2;
+			wchar_t *logdir;
 
 			if (pvar->fh != INVALID_HANDLE_VALUE) {
 				CloseHandle(pvar->fh);
 			}
+
+			logdir = GetTermLogDir(pvar->ts);
 
 			GetI18nStrWW("TTXttyrec", "FILE_FILTER", L"ttyrec(*.tty)\\0*.tty\\0All files(*.*)\\0*.*\\0\\0", pvar->ts->UILanguageFileW, &uimsg1);
 			GetI18nStrWW("TTXttyrec", "FILE_DEFAULTEXTENSION", L"tty", pvar->ts->UILanguageFileW, &uimsg2);
@@ -222,7 +226,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			ofn.lpstrFilter = uimsg1;
 			ofn.lpstrFile = NULL;
 			ofn.lpstrDefExt = uimsg2;
-			ofn.lpstrInitialDir = pvar->ts->LogDirW;
+			ofn.lpstrInitialDir = logdir;
 			//ofn.lpstrTitle = L"";
 			ofn.Flags = OFN_OVERWRITEPROMPT;
 			if (TTGetSaveFileNameW(&ofn, &fname)) {
@@ -241,6 +245,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			}
 			free(uimsg1);
 			free(uimsg2);
+			free(logdir);
 		}
 		return 1;
 	}

@@ -8,10 +8,10 @@
 #include <stdio.h>
 #include <string.h>
 
-
 #include "inifile_com.h"
 #include "ttcommdlg.h"
 #include "codeconv.h"
+#include "ttlib_types.h"
 
 #include "gettimeofday.h"
 
@@ -62,6 +62,7 @@ typedef struct {
 	int maxwait;
 	int minwait;
 	int speed;
+	BOOL quit;
 	BOOL pause;
 	BOOL nowait;
 	BOOL nowait_ini;
@@ -73,6 +74,9 @@ typedef struct {
 	char origOLDTitle[TitleBuffSize];
 	int mode_flag;
 	char *fmt_time;
+	char *origHostName;
+	int name_cnt_ini;
+	int name_cnt;
 } TInstVar;
 
 static TInstVar *pvar;
@@ -206,6 +210,44 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
   return NULL;
 }
 
+wchar_t *ExtractPath(wchar_t *path, int n)
+{
+	if (n > 0) {
+		wchar_t *p = &path[wcslen(path)];
+		int cnt = 0;
+		while (p > path) {
+			p--;
+			if (*p == L'\\' || *p == L'/') {
+				cnt++;
+				if (cnt >= n) {
+					return &p[1];
+				}
+			}
+		}
+	}
+	return path;
+}
+
+void ChangeHostName()
+{
+	free(pvar->origHostName);
+	pvar->origHostName = _strdup(pvar->ts->HostName);
+	wchar_t *hostnameW = ToWcharA(pvar->origHostName);
+	char *hostname = ToCharW(ExtractPath(hostnameW, pvar->name_cnt));
+	strncpy_s(pvar->ts->HostName, sizeof(pvar->ts->HostName), hostname, _TRUNCATE);
+	free(hostname);
+	free(hostnameW);
+}
+
+void RestoreOLDHostName()
+{
+	if (pvar->origHostName != NULL) {
+		strncpy_s(pvar->ts->HostName, sizeof(pvar->ts->HostName), pvar->origHostName, _TRUNCATE);
+		free(pvar->origHostName);
+		pvar->origHostName = NULL;
+	}
+}
+
 static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->ts = ts;
 	pvar->cv = cv;
@@ -220,16 +262,21 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	gettimeofday(&(pvar->last) /*, NULL*/ );
 	pvar->wait.tv_sec = 0;
 	pvar->wait.tv_usec = 1;
+	pvar->openfnW = NULL;
 	pvar->skip = 0;
 	pvar->skip_ini = 5;
 	pvar->maxwait = 0;
 	pvar->minwait = 0;
+	pvar->quit = FALSE;
 	pvar->pause = FALSE;
 	pvar->nowait = FALSE;
 	pvar->nowait_ini = FALSE;
 	pvar->open_error = FALSE;
 	pvar->mode_flag = 0;
 	pvar->fmt_time = NULL;
+	pvar->origHostName = NULL;
+	pvar->name_cnt_ini = 0;
+	pvar->name_cnt = 0;
 }
 
 void RestoreTitle() {
@@ -267,6 +314,7 @@ static HANDLE PASCAL TTXCreateFile(LPCSTR FName, DWORD AcMode, DWORD ShMode,
 		}
 		else {
 			pvar->open_error = FALSE;
+			ChangeHostName();
 		}
 	}
 
@@ -296,6 +344,11 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 
 	if (!pvar->enable) {
 		return pvar->origPReadFile(fh, obuff, oblen, rbytes, rol);
+	}
+
+	if (pvar->quit) {
+		pvar->quit = FALSE;
+		return TRUE;
 	}
 
 	if (!pvar->active) {
@@ -477,6 +530,10 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 				pvar->wait.tv_sec = 0;
 				pvar->skip += pvar->skip_ini;
 				break;
+			  case 'e':
+			  case 'E':
+				pvar->quit = TRUE;
+				break;
 			  case ESC:
 				mode = MODE_ESC;
 				break;
@@ -571,6 +628,8 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 		pvar->wait.tv_usec = 0;
 		pvar->nowait = pvar->nowait_ini;
 		pvar->speed = 0;
+		RestoreOLDHostName();
+		pvar->name_cnt = pvar->name_cnt_ini;
 	}
 }
 
@@ -642,6 +701,14 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
 			pvar->maxwait = max;
 			pvar->minwait = min;
 		}
+		else if (_wcsnicmp(buff, L"/TPN", 5) == 0 || _wcsnicmp(buff, L"/TPN=", 5) == 0) {
+			int cnt = 1;
+			if (buff[4] == L'=') {
+				cnt = 0;
+	    		swscanf_s(&buff[5], L"%d", &cnt);
+			}
+			pvar->name_cnt = cnt;
+		}
 	}
 }
 
@@ -656,6 +723,8 @@ static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
 	ConvertSafeStrFtimeFormat(buff);
 	free(pvar->fmt_time);
 	pvar->fmt_time = ToCharW(buff);
+	pvar->name_cnt_ini = GetPrivateProfileIntAFileW(INISECTION, "TitlePathMode", 0, fn);
+	pvar->name_cnt = pvar->name_cnt_ini;
 }
 
 static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
@@ -672,6 +741,14 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 			TTOPENFILENAMEW ofn;
 			wchar_t *openfn;
 			wchar_t *uimsg1, *uimsg2;
+			wchar_t *logdir;
+
+			if (pvar->openfnW == NULL) {
+				logdir = GetTermLogDir(pvar->ts);
+			}
+			else {
+				logdir = ExtractDirNameW(pvar->openfnW);
+			}
 
 			GetI18nStrWW("TTXttyrec", "FILE_FILTER", L"ttyrec(*.tty)\\0*.tty\\0All files(*.*)\\0*.*\\0\\0", pvar->ts->UILanguageFileW, &uimsg1);
 			GetI18nStrWW("TTXttyrec", "FILE_DEFAULTEXTENSION", L"tty", pvar->ts->UILanguageFileW, &uimsg2);
@@ -679,6 +756,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 			ofn.hwndOwner = hWin;
 			ofn.lpstrFilter = uimsg1;
 			ofn.lpstrDefExt = uimsg2;
+			ofn.lpstrInitialDir = logdir;
 			// ofn.lpstrTitle = L"";
 			ofn.Flags = OFN_FILEMUSTEXIST;
 
@@ -692,6 +770,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 			}
 			free(uimsg1);
 			free(uimsg2);
+			free(logdir);
 		}
 		return 1;
 	case ID_MENU_AGAIN:

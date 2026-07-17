@@ -140,7 +140,7 @@ unsigned int CRYPT_get_sender_MAC_size(PTInstVar pvar);
 BOOL CRYPT_build_sender_MAC(PTInstVar pvar, uint32 sequence_number,
   char *data, int len, char *MAC);
 
-BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers, int receiver_ciphers);
+BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, unsigned int sender_ciphers, unsigned int receiver_ciphers);
 BOOL CRYPT_choose_ciphers(PTInstVar pvar);
 #define CRYPT_get_sender_cipher(pvar) ((pvar)->crypt_state.sender_cipher)
 #define CRYPT_get_receiver_cipher(pvar) ((pvar)->crypt_state.receiver_cipher)

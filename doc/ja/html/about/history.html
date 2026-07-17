@@ -96,11 +96,6 @@
   <li>バグ修正
     <ul>
       <li>
-        Serial poot タブ ("Additional settings &gt; <a href="../menu/setup-additional-serialport.html">Serial port</a>") を開いたときに、115200 以上の速度が選択状態にならない問題を修正した。
-        5.0 からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1241" target="_blank">issue #1241</a>)
-      </li>
-      <li>
         プラグインを 20 個より多くインストールした場合に、21 番目以降のプラグインの有効/無効設定が teraterm.ini に保存・読み込みされない不具合を修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1271" target="_blank">issue #1271</a>)
       </li>
@@ -114,20 +109,6 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1277" target="_blank">issue #1277</a>)
       </li>
       <li>
-        /PIPE コマンドラインオプションに "pipe_name" 又は "server\pipe_name" の形式を指定するとクラッシュする問題を修正した。
-        5.0 からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1318" target="_blank">issue #1318</a>)
-      </li>
-      <li>
-        USB CDC-ACM を使用した高速なシリアル接続時に zmodem によるファイル受信が失敗する不具合を修正した。
-        5.5.1 からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1299" target="_blank">issue #1299</a>)
-      </li>
-      <li>
-        /V オプション付きで起動、マクロで設定ファイルを再読み込みしたときクラッシュする問題を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1347" target="_blank">issue #1347</a>)
-      </li>
-      <li>
         設定内容が空の時、"Setup &gt; Save setup..." で TERATERM.INI から項目が削除される問題を修正した。
         TERATERM.INI の Tera Term セクションの RussKeyb を削除して、
         起動したのち "Setup &gt; Save setup.." するとクラッシュする問題を修正した。
@@ -138,12 +119,60 @@
 
   <li>その他
     <ul>
-      <li><a href="#ttmenu_1.23">TeraTerm Menu 1.23</a> へ差し替えた。</li>
+      <li><a href="#ttssh_3.7.0">TTSSH 3.7.0</a> へ差し替えた。</li>
+      <li><a href="#ttmenu_1.24">TeraTerm Menu 1.24</a> へ差し替えた。</li>
       <li><a href="#ttyrec_1.07">TTXttyrec Plugin 1.07</a> へ差し替えた。</li>
       <li>
         インストーラに使用している Inno Setup のバージョンを <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.2" target="_blank">6.7.2</a> へ差し替えた。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1317" target="_blank">issue #1317</a>)
       </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_5.6.2">2026.07.15 (Ver 5.6.2)</h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>
+        高DPI設定をGUIスレッドのみではなく、プロセス全体で行うようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1314" target="_blank">issue #1314</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>バグ修正
+    <ul>
+      <li>
+        XMODEMを使用したファイル送信中にCancelボタンを押下しても、受信側のXMODEMが停止しない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1408" target="_blank">issue #1408</a>)
+      </li>
+      <li>
+        USB CDC-ACM を使用した高速なシリアル接続時に ZMODEM によるファイル受信が失敗する不具合を修正した。
+        5.5.1 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1299" target="_blank">issue #1299</a>)
+      </li>
+      <li>
+        /PIPE コマンドラインオプションに "pipe_name" 又は "server\pipe_name" の形式を指定するとクラッシュする問題を修正した。
+        5.0 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1318" target="_blank">issue #1318</a>)
+      </li>
+      <li>
+        /V オプション付きで起動、マクロで設定ファイルを再読み込みしたときクラッシュする問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1347" target="_blank">issue #1347</a>)
+      </li>
+      <li>
+        Serial poot タブ ("Additional settings &gt; <a href="../menu/setup-additional-serialport.html">Serial port</a>") を開いたときに、115200 以上の速度が選択状態にならない問題を修正した。
+        5.0 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1241" target="_blank">issue #1241</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>その他
+    <ul>
+      <li><a href="#ttssh_3.6.2">TTSSH 3.6.2</a> へ差し替えた。</li>
+      <li><a href="#ttmenu_1.23">TeraTerm Menu 1.23</a> へ差し替えた。</li>
     </ul>
   </li>
 </ul>
@@ -4283,6 +4312,46 @@
   </li-->
 </ul>
 
+<h3 id="ttssh_3.6.2">2026.07.15 (Ver 3.6.2)</h3>
+<ul class="history">
+  <li>セキュリティ修正
+    <ul>
+      <li>
+        受信した SSH2 パケットの長さを正しくチェックせずに処理する脆弱性を修正した。
+        TTSSH2 1.00 alpha1 (UTF-8 TeraTerm Pro 2.05) からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1417" target="_blank">issue #1417</a>, <a href="https://teratermproject.github.io/SA/JVN65294474.html" target="_blank">TTSSH2 のメモリ境界外アクセスの脆弱性</a>)
+      </li>
+    </ul>
+  </li>
+
+  <!--li>変更
+    <ul>
+      <li>
+      </li>
+    </ul>
+  </li-->
+
+  <li>バグ修正
+    <ul>
+      <li>
+        SSH_MSG_USERAUTH_INFO_REQUEST のプロンプトが複数あった場合に正しく処理されない問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1390" target="_blank">issue #1390</a>)
+      </li>
+      <li>
+        PuTTY の ed25519 秘密鍵ファイルの読み取りを修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1418" target="_blank">issue #1418</a>)
+      </li>
+    </ul>
+  </li>
+
+  <!--li>その他
+    <ul>
+      <li>
+      </li>
+    </ul>
+  </li-->
+</ul>
+
 <h3 id="ttssh_3.6.1">2026.04.28 (Ver 3.6.1)</h3>
 <ul class="history">
   <!--li>変更
@@ -6469,13 +6538,8 @@
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
 
-<h3 id="ttmenu_1.23">YYYY.MM.DD (Ver 1.23 not released yet)</h3>
+<h3 id="ttmenu_1.24">YYYY.MM.DD (Ver 1.24 not released yet)</h3>
 <ul class="history">
-      <li>
-        初期設定時のデフォルトのフォント名が文字化けする不具合を修正した。
-        1.18 からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1274" target="_blank">issue #1274</a>)
-      </li>
       <li>
         タスクトレイのアイコンを右クリック &gt; 設定 に下記のオプションを追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
@@ -6507,6 +6571,15 @@
       <li>
         細かい調整を行った。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1234" target="_blank">issue #1234</a>, <a href="https://github.com/TeraTermProject/teraterm/issues/1285" target="_blank">#1285</a>)
+      </li>
+</ul>
+
+<h3 id="ttmenu_1.23">2026.07.15 (Ver 1.23)</h3>
+<ul class="history">
+      <li>
+        初期設定時のデフォルトのフォント名が文字化けする不具合を修正した。
+        1.18 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1274" target="_blank">issue #1274</a>)
       </li>
 </ul>
 
@@ -6833,6 +6906,28 @@
   <li>
     ttyファイルでないファイルを再生した後、ttyファイルを再生すると表示が崩れる問題を修正した。
     (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  </li>
+  <li>
+    切断後も録画状態のとき "TTY Record" メニューが無効にならないようにし、録画を停止できるようにした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1284" target="_blank">issue #1284</a>)
+  </li>
+  <li>
+    "TTY Replay" メニューのファイル選択ダイアログの初期ディレクトリを指定するように修正した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1382" target="_blank">issue #1382</a>)<br>
+    直前に再生したファイルがあればそのフォルダ、なければ <a href="../setup/folder.html#TermLogDir">端末ログフォルダ</a> になる。
+  </li>
+  <li>
+    "TTY Record" メニューのファイル選択ダイアログの初期ディレクトリを <a href="../setup/folder.html#TermLogDir">端末ログフォルダ</a> に変更した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1384" target="_blank">issue #1384</a>)
+  </li>
+  <li>
+    再生中に停止できるようにした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1388" target="_blank">issue #1388</a>)
+  </li>
+  <li>
+    再生中のタイトルバーにファイルパスを短縮して表示する機能を追加した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1386" target="_blank">issue #1386</a>)<br>
+    ファイルパスの表示オプションとして、ファイル名のみ、および親ディレクトリ付きファイル名を選択できる。
   </li>
 </ul>
 

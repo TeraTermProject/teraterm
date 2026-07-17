@@ -1326,16 +1326,19 @@ ecdsa_error:
 
 		result->ed25519_pk = buffer_get_string(&pub, &pklen);
 		sk = buffer_get_string(&pri, &sklen);
+		if (pklen != ED25519_PK_SZ) {
+			free(sk);
+			goto error;
+		}
+		if (sklen + pklen != ED25519_SK_SZ) {
+			free(sk);
+			goto error;
+		}
 		result->ed25519_sk = malloc(pklen + sklen + 1);
 		memcpy(result->ed25519_sk, sk, sklen);
 		memcpy(result->ed25519_sk + sklen, result->ed25519_pk, pklen);
 		result->ed25519_sk[sklen + pklen] = '\0';
 		free(sk);
-
-		if (pklen != ED25519_PK_SZ)
-			goto error;
-		if (sklen + pklen != ED25519_SK_SZ)
-			goto error;
 
 		break;
 	}

@@ -304,13 +304,18 @@ typedef struct _TInstVar {
 	wchar_t ssh2_keyfile[MAX_PATH];
 	time_t ssh_heartbeat_tick;
 	HANDLE ssh_heartbeat_thread;
-	int keyboard_interactive_password_input;
 	int userauth_retry_count;
 	buffer_t *decomp_buffer;
 	buffer_t *authbanner_buffer;
 	char *ssh2_authlist;
 	BOOL tryed_ssh2_authlist;
 	HWND ssh_hearbeat_dialog;
+
+	/* SSH2_MSG_USERAUTH_INFO_REQUEST によるダイアログのレスポンス受け取り用 */
+	unsigned int userauth_inforeq_num; // プロンプト数
+	unsigned int userauth_inforeq_index;
+	buffer_t *userauth_inforeq_prompts; // サーバからのプロンプトを保持する
+	buffer_t *userauth_infores; // サーバへの返信を保持する
 
 	/* Pageant との通信用 */
 	unsigned char *pageant_key;

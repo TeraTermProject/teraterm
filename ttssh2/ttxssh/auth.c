@@ -1239,7 +1239,7 @@ char *AUTH_get_user_name(PTInstVar pvar)
 }
 
 // pvar->auth_state.supported_types を更新する
-int AUTH_set_supported_auth_types(PTInstVar pvar, int types)
+int AUTH_set_supported_auth_types(PTInstVar pvar, unsigned int types)
 {
 	logprintf(LOG_LEVEL_VERBOSE, "Server reports supported authentication method mask = %d", types);
 
@@ -1421,8 +1421,7 @@ static BOOL end_TIS_dlg(PTInstVar pvar, HWND dlg)
 
 	// add
 	if (SSHv2(pvar)) {
-		pvar->keyboard_interactive_password_input = 1;
-		handle_SSH2_userauth_inforeq(pvar);
+		SSH2_send_userauth_infores(pvar);
 	}
 
 	SSH_notify_cred(pvar);
