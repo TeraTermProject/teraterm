@@ -154,10 +154,20 @@ function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DI
   # アーカイブファイルを展開する
   message("expand ${EXT_DIR}/${DIR_IN_ARC}")
   file(MAKE_DIRECTORY ${EXT_DIR})
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} -E tar "xf" ${DOWN_DIR}/${SRC_ARC}
-    WORKING_DIRECTORY ${EXT_DIR}
-    )
+  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.24")
+    # TOUCH は cmake 3.24 以降、展開したファイルの日時を現在時刻にする
+    file(ARCHIVE_EXTRACT
+      INPUT ${DOWN_DIR}/${SRC_ARC}
+      DESTINATION ${EXT_DIR}
+      TOUCH
+      )
+  else()
+    # アーカイブ内の日時のまま展開される
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -E tar "xf" ${DOWN_DIR}/${SRC_ARC}
+      WORKING_DIRECTORY ${EXT_DIR}
+      )
+  endif()
 
   # renameする
   message("rename ${EXT_DIR}/${RENAME_DIR}")
