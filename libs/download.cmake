@@ -172,6 +172,15 @@ function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DI
   # renameする
   message("rename ${EXT_DIR}/${RENAME_DIR}")
   file(REMOVE_RECURSE ${EXT_DIR}/${RENAME_DIR})
+  # file(REMOVE_RECURSE) は失敗しても中断しない
+  # 消し残しがあるまま rename すると分かりにくいエラーになるのでここでチェックする
+  # エディタなどがファイルを開いているとロックされて削除できない(Windows)
+  if(EXISTS ${EXT_DIR}/${RENAME_DIR})
+    message(FATAL_ERROR
+      "Cannot remove ${EXT_DIR}/${RENAME_DIR}\n"
+      "The file or folder may be locked by another process "
+      "(editor, explorer, shell, anti-virus, etc.).")
+  endif()
   file(RENAME ${EXT_DIR}/${DIR_IN_ARC} ${EXT_DIR}/${RENAME_DIR})
 
 endfunction()
