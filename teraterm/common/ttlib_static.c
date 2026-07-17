@@ -368,4 +368,194 @@ void OutputDebugPrintfW(const wchar_t *fmt, ...)
 	OutputDebugStringW(tmp);
 }
 
+/**
+ *
+ *	現在の時間を文字列にして返す
+ *
+ *	@param	format		strftime likeなフォーマット
+ *	@param	utc_flag	TRUE / FALSE = UTCで出力 / ローカルタイムで出力
+ *	@return	経過時刻文字列
+ *			不要になったらfree()すること
+ */
+wchar_t *ttstrftime(const wchar_t *format, BOOL utc_flag)
+{
+	// 現在時刻
+	FILETIME ft;
+	GetSystemTimeAsFileTime(&ft); // 1601/1/1 (UTC) から 100ns単位
+	ULARGE_INTEGER ull;
+	ull.LowPart = ft.dwLowDateTime;
+	ull.HighPart = ft.dwHighDateTime;
+
+	// 100ns単位から秒単位(time_t)に変換  1970/1/1から
+	long long now_ms = (ull.QuadPart - 116444736000000000LL) / (10*1000); // nano->micro->milli
+	time_t now = now_ms / 1000;
+
+	struct tm tm;
+	if (utc_flag) {
+		// UTC
+		gmtime_s(&tm, &now);
+	} else {
+		// local
+		localtime_s(&tm, &now);
+	}
+
+	// 独自フォーマットで展開する
+	// 未対応の指定子はそのまま出力する
+	size_t format_len = wcslen(format);
+
+	// 出力バッファ
+	// 独自フォーマット展開時の最大展開率は %Y(2文字->4文字) 等で 2 倍程度。
+	// 余裕を持って format 長の 4 倍 + α を確保する。
+	// (それでも溢れる場合は wcsncat_s が切り詰めるためオーバーフローしない)
+	size_t sizeof_strtime = format_len * 4 + 1;
+	wchar_t *strtime = malloc(sizeof(wchar_t) * sizeof_strtime);
+	if (strtime == NULL) {
+		return NULL;
+	}
+
+	static const wchar_t week[][4] = {
+		L"Sun", L"Mon", L"Tue", L"Wed", L"Thu", L"Fri", L"Sat"
+	};
+	static const wchar_t month[][4] = {
+		L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun",
+		L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
+	};
+	size_t i;
+
+	strtime[0] = L'\0';
+	for (i = 0; i < format_len; i++) {
+		if (format[i] == L'%') {
+			wchar_t tmp[5];
+			wchar_t c = format[i + 1];
+			switch (c) {
+			case 'a':
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L"%s", week[tm.tm_wday]);
+				wcsncat_s(strtime, sizeof_strtime, tmp, _TRUNCATE);
+				i++;
+				break;
+			// 'A' 未実装
+			case 'b':
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L"%s", month[tm.tm_mon]);
+				wcsncat_s(strtime, sizeof_strtime, tmp, _TRUNCATE);
+				i++;
+				break;
+			// 'c' 未実装
+			case 'd':
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L"%02d", tm.tm_mday);
+				wcsncat_s(strtime, sizeof_strtime, tmp, _TRUNCATE);
+				i++;
+				break;
+			case 'e':
+				// マニュアルに記載なし
+				// %Hの0埋めなし("01"ではなく"1"など)、
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L"%2d", tm.tm_mday);
+				wcsncat_s(strtime, sizeof_strtime, tmp, _TRUNCATE);
+				i++;
+				break;
+			case 'H':
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L"%02d", tm.tm_hour);
+				wcsncat_s(strtime, sizeof_strtime, tmp, _TRUNCATE);
+				i++;
+				break;
+			// 'I' 未実装
+			case 'N':
+				// Tera Term オリジナル実装
+				// ミリ秒 3桁
+				// マニュアルに記載なし
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L"%03d", (int)(now_ms % 1000));
+				wcsncat_s(strtime, sizeof_strtime, tmp, _TRUNCATE);
+				i++;
+				break;
+			case 'm':
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L"%02d", tm.tm_mon + 1);
+				wcsncat_s(strtime, sizeof_strtime, tmp, _TRUNCATE);
+				i++;
+				break;
+			case 'M':
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L"%02d", tm.tm_min);
+				wcsncat_s(strtime, sizeof_strtime, tmp, _TRUNCATE);
+				i++;
+				break;
+			// 'p' 未実装
+			case 'S':
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L"%02d", tm.tm_sec);
+				wcsncat_s(strtime, sizeof_strtime, tmp, _TRUNCATE);
+				i++;
+				break;
+			// 'U' 未実装
+			case 'w':
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L"%d", tm.tm_wday);
+				wcsncat_s(strtime, sizeof_strtime, tmp, _TRUNCATE);
+				i++;
+				break;
+			// 'W' 未実装
+			// 'x' 未実装
+			// 'X' 未実装
+			case 'y':
+				// 年 2桁
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L"%02d", (tm.tm_year + 1900) % 100);
+				wcsncat_s(strtime, sizeof_strtime, tmp, _TRUNCATE);
+				i++;
+				break;
+			case 'Y':
+				// 年 4桁
+				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE, L"%04d", (tm.tm_year + 1900));
+				wcsncat_s(strtime, sizeof_strtime, tmp, _TRUNCATE);
+				i++;
+				break;
+			// 'z' 未実装
+			// 'Z' 未実装
+			case '%':
+				wcsncat_s(strtime, sizeof_strtime, L"%", _TRUNCATE);
+				i++;
+				break;
+			case '\0':
+			default:
+				// 未対応の指定子は '%' を残してそのまま出力する
+				// (i は進めないので、次ループで指定子文字がリテラルとして連結される)
+				wcsncat_s(strtime, sizeof_strtime, L"%", _TRUNCATE);
+				break;
+			}
+		}
+		else {
+			const wchar_t lit[2] = { format[i], L'\0' };
+			wcsncat_s(strtime, sizeof_strtime, lit, _TRUNCATE);
+		}
+	}
+
+	return strtime;
+}
+
+/*
+ *	現在までの経過時間を文字列にして返す
+ *
+ *	@return	経過時間の文字列
+ *			不要になったらfree()すること
+ */
+wchar_t *strelapsedW(DWORD start_time)
+{
+	size_t sizeof_strtime = 20;
+	wchar_t *strtime = malloc(sizeof(wchar_t) * sizeof_strtime);
+	int days, hours, minutes, seconds, msecs;
+	DWORD delta = GetTickCount() - start_time;
+
+	msecs = delta % 1000;
+	delta /= 1000;
+
+	seconds = delta % 60;
+	delta /= 60;
+
+	minutes = delta % 60;
+	delta /= 60;
+
+	hours = delta % 24;
+	days = delta / 24;
+
+	_snwprintf_s(strtime, sizeof_strtime, _TRUNCATE,
+				 L"%d %02d:%02d:%02d.%03d",
+				 days, hours, minutes, seconds, msecs);
+
+	return strtime;
+}
+
 /* vim: set ts=4 sw=4 ff=dos : */

@@ -5408,6 +5408,19 @@ int VTParse()
 			printf("%02x(%c) ", b, isprint(b) ? b : '.');
 		}
 #endif
+		if (ts.TerminalID == IdDUMB && ts.LogTimestamp) {
+			if (CursorX == 0) {
+				if (b != '\n' && b != '\r') {
+					wchar_t *time_strW = FLogTimeStampStrW(ts.LogTimestampType,
+														   ts.LogTimestampFormatW, cv.ConnectedTime,
+														   cv.ConnectedTime);
+					for (size_t i = 0; i < wcslen(time_strW); i++) {
+						PutU32(time_strW[i]);
+					}
+					free(time_strW);
+				}
+			}
+		}
 		switch (ParseMode) {
 		case ModeFirst:
 			ParseFirst(charset_data, b);

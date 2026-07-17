@@ -572,33 +572,52 @@ static void LogRotate(PFileVar fv)
 	logfile_unlock(fv);
 }
 
-static wchar_t *TimeStampStr(PFileVar fv)
+/**
+ *  タイムスタンプ用時間文字列を作成する
+ *
+ *	@param	timestamp_type
+ *		TIMESTAMP_LOCAL
+ *		TIMESTAMP_UTC
+ *		TIMESTAMP_ELAPSED_LOGSTART
+ *		TIMESTAMP_ELAPSED_CONNECTED
+ *	@param	format			LOCAL or UTC 時のフォーマット
+ *	@param	start_time		LOGSTART の開始時間
+ *	@param	connected_time	CONNECTED の開始時間
+ *	@return	時間文字列、不要になったらfree()すること
+ */
+wchar_t* FLogTimeStampStrW(enum LogTimestampType timestamp_type, const wchar_t* format,
+						   DWORD start_time, DWORD connected_time)
 {
-	char *strtime = NULL;
-	switch (ts.LogTimestampType) {
-	case TIMESTAMP_LOCAL:
+	wchar_t *time_strW = NULL;
+	switch (timestamp_type) {
 	default:
-		strtime = mctimelocal(ts.LogTimestampFormat, FALSE);
+		assert(FALSE);
+		// FALLTHROUGH
+	case TIMESTAMP_LOCAL:
+		time_strW = ttstrftime(format, FALSE);
 		break;
 	case TIMESTAMP_UTC:
-		strtime = mctimelocal(ts.LogTimestampFormat, TRUE);
+		time_strW = ttstrftime(format, TRUE);
 		break;
 	case TIMESTAMP_ELAPSED_LOGSTART:
-		strtime = strelapsed(fv->StartTime);
+		time_strW = strelapsedW(start_time);
 		break;
 	case TIMESTAMP_ELAPSED_CONNECTED:
-		strtime = strelapsed(cv.ConnectedTime);
+		time_strW = strelapsedW(connected_time);
 		break;
 	}
 
-	char tmp[128];
-	tmp[0] = 0;
-	strncat_s(tmp, sizeof(tmp), "[", _TRUNCATE);
-	strncat_s(tmp, sizeof(tmp), strtime, _TRUNCATE);
-	strncat_s(tmp, sizeof(tmp), "] ", _TRUNCATE);
-	free(strtime);
+	wchar_t *ret;
+	aswprintf(&ret, L"[%s] ", time_strW);
+	free(time_strW);
 
-	return ToWcharA(tmp);
+	return ret;
+}
+
+static wchar_t *TimeStampStr(PFileVar fv)
+{
+	return FLogTimeStampStrW((enum LogTimestampType)ts.LogTimestampType,
+							 ts.LogTimestampFormatW, fv->StartTime, cv.ConnectedTime);
 }
 
 /**
@@ -1082,12 +1101,14 @@ static void FLogPutUTF32_(PFileVar fv, unsigned int u32)
 	}
 
 	// 行頭か?(改行を出力した直後)
-	if (ts.LogTimestamp && fv->eLineEnd) {
-		// タイムスタンプを出力
-		fv->eLineEnd = Line_Other; /* clear endmark*/
-		wchar_t* strtime = TimeStampStr(fv);
-		FLogWriteStr(strtime);
-		free(strtime);
+	if (ts.TerminalID != IdDUMB && ts.LogTimestamp) {
+		if (fv->eLineEnd) {
+			// タイムスタンプを出力
+			fv->eLineEnd = Line_Other; /* clear endmark*/
+			wchar_t* strtime = TimeStampStr(fv);
+			FLogWriteStr(strtime);
+			free(strtime);
+		}
 	}
 
 	switch(fv->log_code) {

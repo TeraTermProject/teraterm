@@ -141,7 +141,11 @@ SYNOPSIS of strftime similar format:
 
 	  <dt id="LogTimestamp">Timestamp</dt>
 	  <dd>
-	    If you select this option, a timestamp is added on top of each log line. The timestamp is added when the first character of the line appears.<br>
+	    If you select this option, timestamp is output when first character of the line appears.<br>
+	    When <a href="setup-additional-terminal.html#TerminalID">Terminal ID</a> is dumb,
+	    timestamp is output to both VTWin and log file.<br>
+	    When it is other than dumb, the timestamp is output to log file.<br>
+	    <br>
 	    The timestamp type can be selected from following.
 	    <dl id="LogTimestampType">
 	      <dt>Local Time</dt>

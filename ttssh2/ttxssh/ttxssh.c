@@ -830,14 +830,14 @@ void logputs(int level, char *msg)
 {
 	if (level <= pvar->settings.LogLevel) {
 		char *buf;
-		char *strtime;
+		wchar_t *strtime;
 		int len;
 		int file;
 		BOOL enable_log = TRUE;
 		BOOL enable_outputdebugstring = FALSE;
 
-		strtime = mctimelocal("%Y-%m-%d %H:%M:%S.%NZ", TRUE);
-		len = asprintf(&buf, "%s [%lu] %s\n",
+		strtime = ttstrftime(L"%Y-%m-%d %H:%M:%S.%NZ", TRUE);
+		len = asprintf(&buf, "%ls [%lu] %s\n",
 					   strtime, GetCurrentProcessId(), msg);
 		free(strtime);
 
