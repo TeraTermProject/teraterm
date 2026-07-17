@@ -1,7 +1,7 @@
-﻿[Info]
+[Info]
 language=Italian
 date=2026-06-18 by TeraTerm Project
-contributor=R.B. (2026-06-18)
+contributor=R.B. (2026-07-17)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -1014,9 +1014,9 @@ MSG_PKT_OVERSIZED_ERROR=Pacchetto sovradimensionato ricevuto dal server; la conn
 
 ; ssh.c
 MSG_SSH_INVALID_COMPDATA_ERROR=Dati compressi non validi nel pacchetto ricevuto
-MSG_SSH_INVALID_PKT_SIZE_ERROR=Received invalid packet size (%u) @ grab_payload()
+MSG_SSH_INVALID_PKT_SIZE_ERROR=Ricevuta dimensione pacchetto non valida (%u) @ grab_payload()
 MSG_SSH_TRUNCATED_PKT_ERROR=Pacchetto ricevuto troncato (%u > %u) @ grab_payload()
-MSG_SSH_INVALID_PKT_SIZE_LIM_ERROR=Received invalid packet size (%u) @ grab_payload_limited()
+MSG_SSH_INVALID_PKT_SIZE_LIM_ERROR=Ricevuta dimensione pacchetto non valida (%u) @ grab_payload_limited()
 MSG_SSH_TRUNCATED_PKT_LIM_ERROR=Pacchetto ricevuto troncato (%u > %u) @ grab_payload_limited()
 MSG_SSH_COREINS_ERROR=Rilevato 'attacco inserimento CORE'.  Connessione terminata.
 MSG_SSH_CORRUPTDATA_ERROR=Rilevati dati danneggiati; connessione terminata.
