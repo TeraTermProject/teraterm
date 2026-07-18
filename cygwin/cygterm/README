@@ -114,9 +114,9 @@
     Overwritten with the value of cygterm.cfg readed later.
     Then it will be overwritten by command line options.
 
-    When portable mode, cygterm reads next only one file.
+    In portable mode, cygterm reads only the following file.
 
-    - $APPDATA/teraterm5/cygterm.cfg
+    - cygterm.cfg in the same folder as cygterm.exe
 
     An example of cygterm.cfg
       +-----------------------------------------------------------------------

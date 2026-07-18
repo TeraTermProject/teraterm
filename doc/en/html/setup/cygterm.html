@@ -12,8 +12,22 @@
 <h1>CygTerm+ setup file</h1>
 
 <p>
-cygterm.cfg is a configuration file.  This includes definitions for the command lines of a terminal emulator and a shell, and several parameters.<br>
-cygterm.cfg is loaded from the same directory cygterm.exe exists in.
+cygterm.cfg is a configuration file. It defines the command lines for the terminal emulator and shell, along with other parameters.
+</p>
+
+<p>
+In normal mode, configuration files are read in the following order. Values read later override earlier values.
+</p>
+<ol>
+  <li>cygterm.cfg in the same folder as cygterm.exe</li>
+  <li>/etc/cygterm.conf</li>
+  <li>$APPDATA/teraterm5/cygterm.cfg</li>
+  <li>~/.cygtermrc</li>
+</ol>
+<p>
+$SHELL and $USER are set before the configuration files are read, and command-line options take precedence over all configuration files.<br>
+In portable mode, only cygterm.cfg in the same folder as cygterm.exe is read.<br>
+The character encoding of the configuration files is UTF-8. (Shift_JIS is used in Cygwin 1.5 environments.)
 </p>
 
 <p>
@@ -82,6 +96,12 @@ ENV_1 = HOME=/home
   <dd>
     If this parameter is set to yes, current directory is changed to home
     directory before invoke a shell. (default: no)
+  </dd>
+
+  <dt>SOCKET_TIMEOUT</dt>
+  <dd>
+    Specifies how many seconds to wait for a telnet connection from the
+    terminal emulator before the socket times out. (default: 5 seconds)
   </dd>
 
   <dt>SSH_AGENT_PROXY</dt>
