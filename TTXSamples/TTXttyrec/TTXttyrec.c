@@ -14,11 +14,13 @@
 #include "ttlib_types.h"
 
 #include "gettimeofday.h"
+#include "autofilename.h"
 
 #define ORDER 6000
 #define ID_MENUITEM 55301
 
 #define INISECTION "ttyrec"
+#define INISECTIONW L"ttyrec"
 
 static HANDLE hInst; /* Instance handle of TTX*.DLL */
 
@@ -32,6 +34,12 @@ typedef struct {
   HMENU FileMenu;
   BOOL record;
   BOOL rec_stsize;
+  BOOL rec_auto;
+  wchar_t *rec_name;
+  wchar_t *rec_path;
+  int tel_mode;
+  int tel_buf_len;
+  char *tel_buf;
 } TInstVar;
 
 struct recheader {
@@ -99,11 +107,34 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->fh = INVALID_HANDLE_VALUE;
   pvar->rec_stsize = FALSE;
   pvar->record = FALSE;
+  pvar->rec_auto = FALSE;
+  pvar->rec_name = NULL;
+  pvar->rec_path = NULL;
+  pvar->tel_mode = 0;
+  pvar->tel_buf_len = 32;
+  pvar->tel_buf = (char*)malloc(pvar->tel_buf_len);
 }
 
 static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
   (pvar->origReadIniFile)(fn, ts);
   pvar->rec_stsize = GetOnOff(INISECTION, "RecordStartSize", fn, TRUE);
+  pvar->rec_auto = GetOnOff(INISECTION, "RecordAutoStart", fn, FALSE);
+
+  DWORD len = MAX_PATH;
+  wchar_t *buff = (wchar_t*)malloc(len);
+  GetPrivateProfileStringW(INISECTIONW, L"RecordDefaultName", L"teraterm.tty", buff, len, fn);
+  free(pvar->rec_name);
+  pvar->rec_name = buff;
+
+  buff = (wchar_t*)malloc(len);
+  GetPrivateProfileStringW(INISECTIONW, L"RecordDefaultPath", L"", buff, len, fn);
+  free(pvar->rec_path);
+  pvar->rec_path = buff;
+}
+
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
+  pvar->origReadIniFile = *hooks->ReadIniFile;
+  *hooks->ReadIniFile = TTXReadIniFile;
 }
 
 void WriteData(HANDLE fh, char *buff, int len) {
@@ -121,9 +152,97 @@ void WriteData(HANDLE fh, char *buff, int len) {
   return;
 }
 
-static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
-  pvar->origReadIniFile = *hooks->ReadIniFile;
-  *hooks->ReadIniFile = TTXReadIniFile;
+void WriteDataTelnet(HANDLE fh, char *buff, int len) {
+  char *p;
+  int sz;
+
+  if (pvar->tel_buf_len < len){
+    free(pvar->tel_buf);
+    pvar->tel_buf_len = len;
+    pvar->tel_buf = (char *)malloc(pvar->tel_buf_len);
+  }
+  p = pvar->tel_buf;
+  for (int i=0; i < len; i ++){
+    char ch = buff[i];
+    switch (pvar->tel_mode) {
+      case 0:
+        if (ch == (char)0xff) {
+          pvar->tel_mode = 1;
+        }
+        else {
+          *p++ = ch;
+        }
+        break;
+      case 1:
+        if (ch == (char)0xff) {
+          *p++ = ch;
+          pvar->tel_mode = 0;
+        }
+        else if ((char)0xfb <= ch && ch <= (char)0xfe) {
+          pvar->tel_mode = 2;
+        }
+        else if (ch == (char)0xfa) {
+          pvar->tel_mode = 3;
+        }
+        else {
+          pvar->tel_mode = 0;
+        }
+        break;
+      case 2:
+        pvar->tel_mode = 0;
+        break;
+      case 3:
+        if (ch == (char)0xff) {
+          pvar->tel_mode = 4;
+        }
+        break;
+      case 4:
+        if (ch == (char)0xf0) {
+          pvar->tel_mode = 0;
+        }
+        else if (ch != (char)0xff) {
+          pvar->tel_mode = 3;
+        }
+        break;
+      default:
+        pvar->tel_mode = 0;
+        break;
+    }
+  }
+
+  sz = (int)(p - pvar->tel_buf);
+  if (sz > 0) {
+    WriteData(fh, pvar->tel_buf, sz);
+  }
+
+  return;
+}
+
+void StartRecording(wchar_t *fname)
+{
+  pvar->fh = CreateFileW(fname, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  if (pvar->fh != INVALID_HANDLE_VALUE) {
+    pvar->record = TRUE;
+    CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_CHECKED);
+    if (pvar->cv->Ready) {
+      if (pvar->rec_stsize) {
+        char buff[20];
+        _snprintf_s(buff, sizeof(buff), _TRUNCATE, "\033[8;%d;%dt",
+          pvar->ts->TerminalHeight, pvar->ts->TerminalWidth);
+        WriteData(pvar->fh, buff, (int)strlen(buff));
+      }
+    }
+  }
+}
+
+void StopRecording()
+{
+  if (pvar->fh != INVALID_HANDLE_VALUE) {
+    CloseHandle(pvar->fh);
+    pvar->fh = INVALID_HANDLE_VALUE;
+  }
+  pvar->record = FALSE;
+  CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_UNCHECKED);
 }
 
 int PASCAL TTXrecv(SOCKET s, char *buff, int len, int flags) {
@@ -131,7 +250,12 @@ int PASCAL TTXrecv(SOCKET s, char *buff, int len, int flags) {
 
   rlen = pvar->origPrecv(s, buff, len, flags);
   if (pvar->record && rlen > 0) {
-    WriteData(pvar->fh, buff, rlen);
+    if (pvar->cv->TelFlag) {
+      WriteDataTelnet(pvar->fh, buff, rlen);
+    }
+    else {
+      WriteData(pvar->fh, buff, rlen);
+    }
   }
   return rlen;
 }
@@ -149,11 +273,20 @@ BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID buff, DWORD len, LPDWORD rbytes, LPOVE
 static void PASCAL TTXOpenTCP(TTXSockHooks *hooks) {
   pvar->origPrecv = *hooks->Precv;
   *hooks->Precv = TTXrecv;
+  if (pvar->rec_auto) {
+    wchar_t *_fname;
+    _fname = GetAutoFilename(pvar->cv, pvar->rec_name, pvar->rec_path, L"teraterm.tty");
+    StartRecording(_fname);
+    free(_fname);
+  }
 }
 
 static void PASCAL TTXCloseTCP(TTXSockHooks *hooks) {
   if (pvar->origPrecv) {
     *hooks->Precv = pvar->origPrecv;
+  }
+  if (pvar->rec_auto) {
+    StopRecording();
   }
 }
 
@@ -161,12 +294,21 @@ static void PASCAL TTXOpenFile(TTXFileHooks *hooks) {
   if (pvar->cv->PortType == IdSerial) {
     pvar->origPReadFile = *hooks->PReadFile;
     *hooks->PReadFile = TTXReadFile;
+    if (pvar->rec_auto) {
+      wchar_t *_fname;
+      _fname = GetAutoFilename(pvar->cv, pvar->rec_name, pvar->rec_path, L"teraterm.tty");
+      StartRecording(_fname);
+      free(_fname);
+    }
   }
 }
 
 static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
   if (pvar->origPReadFile) {
     *hooks->PReadFile = pvar->origPReadFile;
+  }
+  if (pvar->rec_auto) {
+    StopRecording();
   }
 }
 
@@ -200,12 +342,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 {
 	if (cmd==ID_MENUITEM) {
 		if (pvar->record) {
-			if (pvar->fh != INVALID_HANDLE_VALUE) {
-				CloseHandle(pvar->fh);
-				pvar->fh = INVALID_HANDLE_VALUE;
-			}
-			pvar->record = FALSE;
-			CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_UNCHECKED);
+			StopRecording();
 		}
 		else {
 			TTOPENFILENAMEW ofn;
@@ -213,9 +350,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			wchar_t *uimsg1, *uimsg2;
 			wchar_t *logdir;
 
-			if (pvar->fh != INVALID_HANDLE_VALUE) {
-				CloseHandle(pvar->fh);
-			}
+			StopRecording();
 
 			logdir = GetTermLogDir(pvar->ts);
 
@@ -230,18 +365,8 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 			//ofn.lpstrTitle = L"";
 			ofn.Flags = OFN_OVERWRITEPROMPT;
 			if (TTGetSaveFileNameW(&ofn, &fname)) {
-				pvar->fh = CreateFileW(fname, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+				StartRecording(fname);
 				free(fname);
-				if (pvar->fh != INVALID_HANDLE_VALUE) {
-					pvar->record = TRUE;
-					CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_CHECKED);
-					if (pvar->rec_stsize) {
-						char buff[20];
-						_snprintf_s(buff, sizeof(buff), _TRUNCATE, "\033[8;%d;%dt",
-									pvar->ts->TerminalHeight, pvar->ts->TerminalWidth);
-						WriteData(pvar->fh, buff, (int)strlen(buff));
-					}
-				}
 			}
 			free(uimsg1);
 			free(uimsg2);
@@ -253,10 +378,11 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 }
 
 static void PASCAL TTXEnd(void) {
-  if (pvar->fh != INVALID_HANDLE_VALUE) {
-    CloseHandle(pvar->fh);
-    pvar->fh = INVALID_HANDLE_VALUE;
-  }
+  StopRecording();
+  free(pvar->tel_buf);
+  pvar->tel_buf = NULL;
+  free(pvar->rec_name);
+  pvar->rec_name = NULL;
 }
 
 static TTXExports Exports = {
