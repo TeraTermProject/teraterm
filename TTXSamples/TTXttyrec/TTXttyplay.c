@@ -14,6 +14,7 @@
 #include "ttlib_types.h"
 
 #include "gettimeofday.h"
+#include "autofilename.h"
 
 #define ORDER 6001
 #define ID_MENU_REPLAY 55302
@@ -115,26 +116,6 @@ void ChangeTitleStatus() {
   strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
   pvar->ChangeTitle = TRUE;
   SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
-}
-
-void ConvertSafeStrFtimeFormat(wchar_t *fmt) {
-	static const wchar_t *kws=L"aAbBcCdDeFgGhHIjmMnprRStTuUVwWxXyYz%N";
-	if (fmt != NULL) {
-		while (*fmt != L'\0') {
-			if (*fmt == L'%') {
-				fmt++;
-				if (*fmt == L'\0') {
-					fmt--;
-					*fmt=L'\0';
-					break;
-				}
-				if (wcschr(kws, *fmt) == NULL) {
-					*fmt = L'%';
-				}
-			}
-			fmt++;
-		}
-	}
 }
 
 void ChangeTitleTime(struct timeval tv) {
