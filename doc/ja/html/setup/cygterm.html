@@ -12,8 +12,22 @@
 <h1>CygTerm+ 設定ファイル</h1>
 
 <p>
-cygterm.cfg は設定ファイルです。 使用する端末エミュレータのコマンドラインや起動するシェルのコマンドライン等を設定します。<br>
-cygterm.cfg は cygterm.exe と同じディレクトリにないといけません。
+cygterm.cfg は設定ファイルです。使用する端末エミュレータのコマンドラインや起動するシェルのコマンドライン等を設定します。
+</p>
+
+<p>
+通常版では、次の順序で設定ファイルを読み込みます。後から読み込んだ値が先に読み込んだ値を上書きします。
+</p>
+<ol>
+  <li>cygterm.exe と同じフォルダの cygterm.cfg</li>
+  <li>/etc/cygterm.conf</li>
+  <li>$APPDATA/teraterm5/cygterm.cfg</li>
+  <li>~/.cygtermrc</li>
+</ol>
+<p>
+$SHELL と $USER は設定ファイルの読み込み前に設定され、最後にコマンドラインオプションで指定した値が上書きします。<br>
+ポータブル版では、cygterm.exe と同じフォルダの cygterm.cfg だけを読み込みます。<br>
+設定ファイルの文字コードは UTF-8 です。(Cygwin 1.5 環境では Shift_JIS)
 </p>
 
 <p>
@@ -93,6 +107,12 @@ ENV_1 = HOME=/home
   <dd>
     patch level 01 に含まれる"ホームディレクトリへの移動"を機能させるか
     どうかを指定します。デフォルトは無効です。
+  </dd>
+
+  <dt>SOCKET_TIMEOUT</dt>
+  <dd>
+    ターミナル・エミュレータからのtelnet接続を待ち受けるソケットが
+    タイムアウトするまでの時間を指定します。(デフォルト: 5秒)
   </dd>
 
   <dt>SSH_AGENT_PROXY</dt>
