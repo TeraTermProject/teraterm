@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Traditional Chinese
-date=2026-06-18 by TeraTerm Project
+date=2026-07-18 by TeraTerm Project
 contributor=kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -883,7 +883,7 @@ DLG_SSHSETUP_COMP_BORDER=<該條線以下的壓縮算法被禁用>
 DLG_SSHSETUP_KNOWNHOST=SSH 已知主機
 DLG_SSHSETUP_KNOWNHOST_RW=讀寫(&W):
 DLG_SSHSETUP_KNOWNHOST_RO=只讀(&R):
-DLG_SSHSETUP_HEARTBEAT=心跳協定(&keep-alive)
+DLG_SSHSETUP_HEARTBEAT=&Keepalive
 DLG_SSHSETUP_HEARTBEAT_UNIT=秒(0表示禁用)
 DLG_SSHSETUP_PASSWORD=儲存在記憶體中的密碼(&M)
 DLG_SSHSETUP_FORWARDAGENT=啟用代理轉發(&A)

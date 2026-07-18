@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Turkish
-date=2026-06-18 by TeraTerm Project
+date=2026-07-18 by TeraTerm Project
 contributor= Mehmet Cagri Aksoy (2025-08-04)
 
 [Tera Term]
@@ -880,7 +880,7 @@ DLG_SSHSETUP_COMP_BORDER=<bu satırın altındaki Sıkıştırma yöntemleri dev
 DLG_SSHSETUP_KNOWNHOST=SSH Bilinen Ana Bilgisayarlar
 DLG_SSHSETUP_KNOWNHOST_RW=Oku/&yaz dosyası:
 DLG_SSHSETUP_KNOWNHOST_RO=&Salt okunur dosyalar:
-DLG_SSHSETUP_HEARTBEAT=HeartBeat(&canlı tut)
+DLG_SSHSETUP_HEARTBEAT=&canlı tut
 DLG_SSHSETUP_HEARTBEAT_UNIT=saniye (kapatmak için 0)
 DLG_SSHSETUP_PASSWORD=Parolayı &bellekte hatırla
 DLG_SSHSETUP_FORWARDAGENT=&Agent yönlendirmeyi etkinleştir

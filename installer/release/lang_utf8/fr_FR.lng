@@ -1,6 +1,6 @@
 ﻿[Info]
 language=French
-date=2026-06-18 by TeraTerm Project
+date=2026-07-18 by TeraTerm Project
 contributor=Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -883,7 +883,7 @@ DLG_SSHSETUP_COMP_BORDER=<Compression methods below this line are disabled>
 DLG_SSHSETUP_KNOWNHOST=SSH Hôtes connus
 DLG_SSHSETUP_KNOWNHOST_RW=Fichier R/W:
 DLG_SSHSETUP_KNOWNHOST_RO=Fichier Lect seule:
-DLG_SSHSETUP_HEARTBEAT=HeartBeat(garder actif)
+DLG_SSHSETUP_HEARTBEAT=&Keepalive
 DLG_SSHSETUP_HEARTBEAT_UNIT=sec.(0 pour éteindre)
 DLG_SSHSETUP_PASSWORD=Garder mot de passe en mémoire
 DLG_SSHSETUP_FORWARDAGENT=Activer &agent forwarding

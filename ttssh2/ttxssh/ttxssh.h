@@ -173,7 +173,7 @@ typedef struct _TS_SSH {
 	int WriteBufferSize;
 
 	int ssh_protocol_version; // SSH version (2004.10.11 yutaka)
-	int ssh_heartbeat_overtime; // SSH heartbeat(keepalive) (2004.12.11 yutaka)
+	int ssh_heartbeat_overtime; // SSH Keepalive
 	// whether password will permanently store on heap memory (2006.8.5 yutaka)
 	int remember_password;
 

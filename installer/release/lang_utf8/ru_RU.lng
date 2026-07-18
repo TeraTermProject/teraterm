@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2026-06-18 by TeraTerm Project
+date=2026-07-18 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -883,7 +883,7 @@ DLG_SSHSETUP_COMP_BORDER=<Сжатия ниже этой линии отключ
 DLG_SSHSETUP_KNOWNHOST=SSH известные хосты
 DLG_SSHSETUP_KNOWNHOST_RW=&Чтение/запись:
 DLG_SSHSETUP_KNOWNHOST_RO=&Только чтение:
-DLG_SSHSETUP_HEARTBEAT=Удержание активности
+DLG_SSHSETUP_HEARTBEAT=&Keepalive
 DLG_SSHSETUP_HEARTBEAT_UNIT=сек.(0 - выключить)
 DLG_SSHSETUP_PASSWORD=&Запомнить пароль в памяти
 DLG_SSHSETUP_FORWARDAGENT=&Включить агент пересылки
