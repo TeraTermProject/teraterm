@@ -46,6 +46,7 @@ typedef struct {
 	int PktNumOffset;
 	int PktReadMode;
 	YMODEM_MODE_T YMode;
+	BOOL isYCancel;
 	WORD YOpt, TextFlag;
 	WORD NAKMode;
 	int NAKCount;
@@ -361,6 +362,8 @@ static BOOL YInit(TProto *pv, PComVar cv, PTTSet ts)
 	PYVar yv = pv->PrivateData;
 	PFileVarProto fv = yv->fv;
 
+	yv->isYCancel = FALSE;
+
 	if (yv->YMode == IdYSend) {
 		char *filename = fv->GetNextFname(fv);
 		if (filename == NULL) {
@@ -456,7 +459,12 @@ static BOOL YInit(TProto *pv, PComVar cv, PTTSet ts)
 static void YCancel(TProto *pv)
 {
 	PYVar yv = pv->PrivateData;
-	YCancel_(yv);
+
+	if (yv->YMode == IdYSend) {
+		yv->isYCancel = TRUE; // ブロック境界で CAN を送信する
+	} else {
+		YCancel_(yv);
+	}
 }
 
 static void YTimeOutProc(TProto *pv)
@@ -763,6 +771,12 @@ static BOOL YReadPacket(PYVar yv)
 static BOOL YSendPacket(PYVar yv)
 {
 	PFileVarProto fv = yv->fv;
+
+	if (yv->isYCancel) {
+		YCancel_(yv);
+		return FALSE;
+	}
+
 	// If current buffer is empty.
 	if (0 == yv->PktBufCount)
 	{
