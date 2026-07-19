@@ -6916,14 +6916,12 @@ SYNOPSIS:
     The file path options as added the filename or the filename include the parent directory.
   </li>
   <li>
-    Added auto recording starts when connected and stops when disconnected.
+    Added support for automatic recording. Recording starts on connection and stops on disconnection.
     (<a href="https://github.com/TeraTermProject/teraterm/issues/1405" target="_blank">issue #1405</a>)
     <ul>
       <li>Added RecordAutoStart entry(Start auto recording) to teraterm.ini. Default is off.</li>
       <li>Added RecordDefaultPath entry(default recording directory) to teraterm.ini.</li>
       <li>Added RecordDefaultName entry(default recording filename) to teraterm.ini.</li>
-      <li>Default recording filename is able to used strftime format.</li>
-      <li>Default recording filename is able to include &amp;h(host name/COM port name), &amp;p(port number), or &amp;u(user name).</li>
     </ul>
   </li>
 </ul>
