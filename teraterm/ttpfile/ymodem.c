@@ -675,18 +675,17 @@ static BOOL YReadPacket(PYVar yv)
 		return TRUE;
 	}
 
-	// オールゼロならば、全ファイル受信の完了を示す。
-	if (yv->PktIn[1] == 0x00 && yv->PktIn[2] == 0xFF &&
-		yv->SendFileInfo == 0
-		) {
+	// データ部がオールゼロならば、全ファイル受信の完了を示す。
+	if (yv->SendFileInfo == 0 && yv->PktIn[1] == 0x00 && yv->PktIn[2] == 0xFF) {
 		c = yv->__DataLen;
-		while ((c>0) && (yv->PktIn[2+c]==0x00))
+		while ((c>2) && (yv->PktIn[c]==0x00)) {
 			c--;
-		if (c == 0) {
-		  b = ACK;
-		  YWrite(yv, &b, 1);
-		  fv->Success = TRUE;
-		  return FALSE;
+		}
+		if (c == 2) {
+			b = ACK;
+			YWrite(yv, &b, 1);
+			fv->Success = TRUE;
+			return FALSE;
 		}
 	}
 
