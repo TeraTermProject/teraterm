@@ -70,6 +70,7 @@ typedef struct {
 	BOOL FileOpen;
 	LONG FileSize;
 	LONG ByteCount;
+ 	DWORD PrevElapsed;
 
 	int ProgStat;
 
@@ -107,6 +108,32 @@ typedef TYVar *PYVar;
 
 #define XnakNAK 1
 #define XnakC 2
+
+static void update_dialog(PYVar yv, BOOL force_update)
+{
+	PFileVarProto fv = yv->fv;
+ 	DWORD elapsed;
+
+	elapsed = (GetTickCount() - yv->StartTime) / 100; // 更新頻度は10回/秒
+	if (elapsed != yv->PrevElapsed || force_update) {
+		if (yv->YMode == IdYReceive) {
+			yv->PrevElapsed = elapsed;
+			fv->InfoOp->SetDlgPacketNum(fv, yv->PktNumOffset + yv->PktNum);
+			fv->InfoOp->SetDlgByteCount(fv, yv->ByteCount);
+			fv->InfoOp->SetDlgTime(fv, yv->StartTime, yv->ByteCount);
+		} else if (yv->YMode == IdYSend) {
+			yv->PrevElapsed = elapsed;
+			if (0 == yv->PktNumSent) {
+				fv->InfoOp->SetDlgPacketNum(fv, yv->PktNumOffset + 256);
+			} else {
+				fv->InfoOp->SetDlgPacketNum(fv, yv->PktNumOffset + yv->PktNumSent);
+			}
+			fv->InfoOp->SetDlgByteCount(fv, yv->ByteCount);
+			fv->InfoOp->SetDlgPercent(fv, yv->ByteCount, yv->FileSize, &yv->ProgStat);
+			fv->InfoOp->SetDlgTime(fv, yv->StartTime, yv->ByteCount);
+		}
+	}
+}
 
 static int YRead1Byte(PYVar yv, LPBYTE b)
 {
@@ -343,6 +370,7 @@ static void initialize_file_info(PYVar yv)
 		yv->ProgStat = -1;
 	}
 	yv->StartTime = GetTickCount();
+	yv->PrevElapsed = 0;
 	fv->InfoOp->SetDlgProtoFileName(fv, yv->FullName);
 
 	yv->PktNumOffset = 0;
@@ -463,6 +491,7 @@ static void YCancel(TProto *pv)
 	if (yv->YMode == IdYSend) {
 		yv->isYCancel = TRUE; // ブロック境界で CAN を送信する
 	} else {
+		update_dialog(yv, TRUE);
 		YCancel_(yv);
 	}
 }
@@ -510,6 +539,7 @@ static BOOL FTCreateFile(PYVar yv)
 		yv->ProgStat = 0;
 	}
 	yv->StartTime = GetTickCount();
+	yv->PrevElapsed = 0;
 
 	return TRUE;
 }
@@ -758,9 +788,7 @@ static BOOL YReadPacket(PYVar yv)
 
 	yv->ByteCount = yv->ByteCount + c;
 
-	fv->InfoOp->SetDlgPacketNum(fv, yv->PktNumOffset + yv->PktNum);
-	fv->InfoOp->SetDlgByteCount(fv, yv->ByteCount);
-	fv->InfoOp->SetDlgTime(fv, yv->StartTime, yv->ByteCount);
+	update_dialog(yv, yv->ByteCount == yv->FileSize);
 
 	fv->FTSetTimeOut(fv,yv->TOutLong);
 
@@ -774,6 +802,7 @@ static BOOL YSendPacket(PYVar yv)
 
 	if (yv->isYCancel) {
 		YCancel_(yv);
+		update_dialog(yv, TRUE);
 		return FALSE;
 	}
 
@@ -823,6 +852,7 @@ static BOOL YSendPacket(PYVar yv)
 				{
 					fv->Success = TRUE;
 					yv->LastMessage = isym;
+					update_dialog(yv, TRUE);
 					return FALSE;
 				}
 				// 次のブロックを送る
@@ -861,6 +891,7 @@ static BOOL YSendPacket(PYVar yv)
 				// 直前も CAN の場合はキャンセル
 				if (yv->LastMessage == CAN) {
 					fv->Success = FALSE;       // failure
+					update_dialog(yv, TRUE);
 					return FALSE;
 				}
 				break;
@@ -912,6 +943,7 @@ static BOOL YSendPacket(PYVar yv)
 					// たとえば、サーバに同名のファイルが存在する場合など。
 					// (2010.3.23 yutaka)
 					fv->Success = FALSE;       // failure
+					update_dialog(yv, TRUE);
 					return FALSE;
 				}
 			}
@@ -1135,6 +1167,7 @@ static BOOL YSendPacket(PYVar yv)
 				// たとえば、サーバに同名のファイルが存在する場合など。
 				// (2010.3.23 yutaka)
 				fv->Success = FALSE;       // failure
+				update_dialog(yv, TRUE);
 				return FALSE;
 			}
 		}
@@ -1158,18 +1191,7 @@ static BOOL YSendPacket(PYVar yv)
 	// Update dialog window.
 	if (0 == yv->PktBufCount)
 	{
-		if (0 == yv->PktNumSent)
-		{
-			fv->InfoOp->SetDlgPacketNum(fv, yv->PktNumOffset + 256);
-		}
-		else
-		{
-			fv->InfoOp->SetDlgPacketNum(fv, yv->PktNumOffset + yv->PktNumSent);
-		}
-
-		fv->InfoOp->SetDlgByteCount(fv, yv->ByteCount);
-		fv->InfoOp->SetDlgPercent(fv, yv->ByteCount, yv->FileSize, &yv->ProgStat);
-		fv->InfoOp->SetDlgTime(fv, yv->StartTime, yv->ByteCount);
+		update_dialog(yv, yv->ByteCount == yv->FileSize);
 	}
 
 	return TRUE;
