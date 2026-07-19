@@ -120,6 +120,7 @@ static void update_dialog(PYVar yv, BOOL force_update)
 			yv->PrevElapsed = elapsed;
 			fv->InfoOp->SetDlgPacketNum(fv, yv->PktNumOffset + yv->PktNum);
 			fv->InfoOp->SetDlgByteCount(fv, yv->ByteCount);
+			fv->InfoOp->SetDlgPercent(fv, yv->ByteCount, yv->FileSize, &yv->ProgStat);
 			fv->InfoOp->SetDlgTime(fv, yv->StartTime, yv->ByteCount);
 		} else if (yv->YMode == IdYSend) {
 			yv->PrevElapsed = elapsed;
@@ -357,17 +358,12 @@ static void initialize_file_info(PYVar yv)
 		}
 		yv->FileOpen = file->OpenRead(file, yv->FullName);
 		yv->FileSize = file->GetFSize(file, yv->FullName);
+		fv->InfoOp->InitDlgProgress(fv, &yv->ProgStat);
 	} else {
 		yv->FileOpen = FALSE;
 		yv->FileSize = 0;
 		yv->FileMtime = 0;
 		yv->RecvFilesize = FALSE;
-	}
-
-	if (yv->YMode == IdYSend) {
-		fv->InfoOp->InitDlgProgress(fv, &yv->ProgStat);
-	} else {
-		yv->ProgStat = -1;
 	}
 	yv->StartTime = GetTickCount();
 	yv->PrevElapsed = 0;
@@ -409,6 +405,9 @@ static BOOL YInit(TProto *pv, PComVar cv, PTTSet ts)
 	}
 
 	initialize_file_info(yv);
+	if (yv->YMode == IdYReceive) {
+		fv->InfoOp->InitDlgProgress(fv, &yv->ProgStat);
+	}
 
 	yv->TOutInit = ts->YmodemTimeOutInit;
 	yv->TOutInitCRC = ts->YmodemTimeOutInitCRC;
