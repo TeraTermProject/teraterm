@@ -896,6 +896,9 @@ static BOOL YSendPacket(PYVar yv)
 
 			case 'C':
 			case 'G':
+				if (yv->StartTime == 0) {
+					yv->StartTime = GetTickCount();
+				}
 				// 'C'を受け取ると、ブロックの送信を開始する。
 				if ((0 == yv->PktNum) && (0 == yv->PktNumOffset) && !(yv->LastMessage == 'C'))
 				{
