@@ -13,6 +13,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="autofilename.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="gettimeofday.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -29,6 +32,9 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="autofilename.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="gettimeofday.h">
       <Filter>Header Files</Filter>
     </ClInclude>
