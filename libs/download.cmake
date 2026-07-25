@@ -154,14 +154,33 @@ function(download_extract SRC_URL ARC_HASH DOWN_DIR EXT_DIR DIR_IN_ARC RENAME_DI
   # アーカイブファイルを展開する
   message("expand ${EXT_DIR}/${DIR_IN_ARC}")
   file(MAKE_DIRECTORY ${EXT_DIR})
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} -E tar "xf" ${DOWN_DIR}/${SRC_ARC}
-    WORKING_DIRECTORY ${EXT_DIR}
-    )
+  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.24")
+    # TOUCH は cmake 3.24 以降、展開したファイルの日時を現在時刻にする
+    file(ARCHIVE_EXTRACT
+      INPUT ${DOWN_DIR}/${SRC_ARC}
+      DESTINATION ${EXT_DIR}
+      TOUCH
+      )
+  else()
+    # アーカイブ内の日時のまま展開される
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -E tar "xf" ${DOWN_DIR}/${SRC_ARC}
+      WORKING_DIRECTORY ${EXT_DIR}
+      )
+  endif()
 
   # renameする
   message("rename ${EXT_DIR}/${RENAME_DIR}")
   file(REMOVE_RECURSE ${EXT_DIR}/${RENAME_DIR})
+  # file(REMOVE_RECURSE) は失敗しても中断しない
+  # 消し残しがあるまま rename すると分かりにくいエラーになるのでここでチェックする
+  # エディタなどがファイルを開いているとロックされて削除できない(Windows)
+  if(EXISTS ${EXT_DIR}/${RENAME_DIR})
+    message(FATAL_ERROR
+      "Cannot remove ${EXT_DIR}/${RENAME_DIR}\n"
+      "The file or folder may be locked by another process "
+      "(editor, explorer, shell, anti-virus, etc.).")
+  endif()
   file(RENAME ${EXT_DIR}/${DIR_IN_ARC} ${EXT_DIR}/${RENAME_DIR})
 
 endfunction()
@@ -218,12 +237,12 @@ endfunction()
 # libressl
 function(download_libressl)
   message("libressl")
-  set(DIR_IN_ARC "libressl-4.2.1")
+  set(DIR_IN_ARC "libressl-4.3.2")
   set(RENAME_DIR "libressl")
   set(CHECK_FILE "libressl/ChangeLog")
-  set(CHECK_FILE_HASH "f99c885d5318dc6357b4bb3563c0fb7ea536ff1734c67a436aa2532ebb4b5bd7")
-  set(SRC_URL "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-4.2.1.tar.gz")
-  set(ARC_HASH "6d5c2f58583588ea791f4c8645004071d00dfa554a5bf788a006ca1eb5abd70b")
+  set(CHECK_FILE_HASH "77940636a099c10dbdd9b0427ee9d227e58013b61cc4c37a5618ed4b7c2a8629")
+  set(SRC_URL "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-4.3.2.tar.gz")
+  set(ARC_HASH "edf01aee24c65d69e6a9efcb9d44bcda682ff9d4f3bbbd95e794e1dfa90847b5")
   #   ARC_HASH was picked from https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/SHA256
   set(DOWN_DIR "${CMAKE_CURRENT_LIST_DIR}/download/libressl")
   download_extract(
