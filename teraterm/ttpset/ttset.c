@@ -4032,6 +4032,7 @@ void TTSetUnInit(TTTSet *ts)
 		(void **)&ts->DelimListW,
 		(void **)&ts->ViewlogEditorW,
 		(void **)&ts->ViewlogEditorArg,
+		(void **)&ts->LogTimestampFormatW,
 	};
 	int i;
 	for(i = 0; i < _countof(ptr_list); i++) {
