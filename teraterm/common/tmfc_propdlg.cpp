@@ -175,8 +175,10 @@ LRESULT CALLBACK TTCPropSheetDlg::WndProc(HWND dlg, UINT msg, WPARAM wParam, LPA
 			// フォーカスを移すので、抑止されたままだと移動先が分からない。
 			// エディットはキャレットで分かるが、チェックボックスは枠が出ないと
 			// フォーカスの有無が全く見えない(TCP/IP ページなど)。
-			// WM_UPDATEUISTATE はページとその子コントロールへ伝播する。
-			SendMessageW(hPage, WM_UPDATEUISTATE,
+			// ページだけでなくシート枠全体(m_hWnd)へ送り、タブを含む全子ウィンドウ
+			// へ伝播させる(タブはページの子ではなくシート枠の子。ツリー+タブ併用時に
+			// タブへフォーカスが移っても枠が出るよう、タブ切替時の解除と送り先を揃える)。
+			SendMessageW(m_hWnd, WM_UPDATEUISTATE,
 						 MAKEWPARAM(UIS_CLEAR, UISF_HIDEFOCUS), 0);
 		}
 		break;
@@ -250,23 +252,18 @@ LRESULT CALLBACK TTCPropSheetDlg::WndProc(HWND dlg, UINT msg, WPARAM wParam, LPA
 	m_OrgProc = SetWindowLongPtrW(dlg, GWLP_WNDPROC, (LONG_PTR)WndProcStatic);
 	m_OrgUserData = SetWindowLongPtrW(dlg, GWLP_USERDATA, (LONG_PTR)this);
 
-#if 0
-	// 		?? CTRL+PgUp,PgDn ではこのメッセージは発生しない
-	// そのうち消す
-	switch(msg){
-	case PSM_CHANGED:
-	case PSM_SETCURSEL:
-	case PSM_SETCURSELID: {
-		if (m_TreeView) {
-			HWND hTab = PropSheet_GetTabControl(dlg);
-			int cur_sel = TabCtrl_GetCurSel(hTab);
-			int a = 0;
-		}
+	// タブ切り替え、初回表示のとき、フォーカス枠の抑止(UISF_HIDEFOCUS)を解除する。
+	// マウス操作で始まると Windows はフォーカス枠を表示しない。
+	// フォーカスがどこにあるかわからなくなる。
+	// 現在ページだけでなくシート枠全体(m_hWnd)へ送り、全子ウィンドウへ伝播させる。
+	// ページだけに送ると、SHIFT+Tab でタブへフォーカスが移ったとき枠が出なくなる。
+	// ページが TTCPropertyPage 派生か否かに関わらず、枠側で一括して枠を表示する。
+	if ((msg == WM_SHOWWINDOW && wParam) ||
+		(msg == WM_NOTIFY && ((NMHDR *)lParam)->code == TCN_SELCHANGE)) {
+		SendMessageW(m_hWnd, WM_UPDATEUISTATE,
+					 MAKEWPARAM(UIS_CLEAR, UISF_HIDEFOCUS), 0);
+	}
 
-		break;
-	}
-	}
-#endif
 	return result;
 }
 
