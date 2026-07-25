@@ -81,7 +81,7 @@ static const char *GetLogRotateSizeType(int val)
 	return LogRotateSizeType[val];
 }
 
-void CLogPropPageDlg::OnInitDialog()
+BOOL CLogPropPageDlg::OnInitDialog()
 {
 	TTCPropertyPage::OnInitDialog();
 
@@ -213,8 +213,8 @@ void CLogPropPageDlg::OnInitDialog()
 */
 	m_TipWin->Create(m_hWnd);
 
-	PostMessage(m_hWnd, WM_NEXTDLGCTL,
-				(WPARAM)GetDlgItem(IDC_VIEWLOG_EDITOR_EXE), TRUE);
+	// TRUE を返す。ダイアログマネージャが先頭 TABSTOPにフォーカスを設定する。
+	return TRUE;
 }
 
 wchar_t *CLogPropPageDlg::MakePreviewStr(const wchar_t *format, const wchar_t *UILanguageFile)
