@@ -5,6 +5,8 @@ add_library(
   TTXttyplay.c
   gettimeofday.c
   gettimeofday.h
+  autofilename.c
+  autofilename.h
   ReadMe.txt
   ReadMe-ja.txt
   )
@@ -58,6 +60,8 @@ add_library(
   TTXttyrec.c
   gettimeofday.c
   gettimeofday.h
+  autofilename.c
+  autofilename.h
   ReadMe.txt
   ReadMe-ja.txt
   )

@@ -249,6 +249,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="autofilename.c" />
     <ClCompile Include="gettimeofday.c" />
     <ClCompile Include="TTXttyrec.c" />
   </ItemGroup>
@@ -257,6 +258,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="autofilename.h" />
     <ClInclude Include="gettimeofday.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
