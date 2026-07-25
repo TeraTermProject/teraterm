@@ -42,6 +42,9 @@
 #define TREE_WIDTH 200
 #define CONTROL_SPACE 5
 
+// ツリーをマウスでクリックしたとき、ページ側へフォーカスを移すための内部メッセージ
+#define WM_TTCPS_SET_PAGE_FOCUS		(WM_APP + 1)
+
 BOOL TTCPropSheetDlg::m_TreeViewInit = FALSE;
 
 // quick hack :-(
@@ -64,6 +67,8 @@ TTCPropSheetDlg::TTCPropSheetDlg(HINSTANCE hInstance, HWND hParentWnd, const wch
 	m_PageCount = 0;
 	m_StartPage = 0;
 	m_TreeView = m_TreeViewInit;
+	m_ShowTab = FALSE;
+	m_hWndTV = NULL;
 }
 
 TTCPropSheetDlg::~TTCPropSheetDlg()
@@ -86,6 +91,21 @@ void TTCPropSheetDlg::SetTreeViewModeInit(BOOL enable)
 void TTCPropSheetDlg::SetTreeViewMode(BOOL enable)
 {
 	m_TreeView = enable;
+}
+
+/**
+ *	ツリー表示時にタブを表示するか設定する
+ *
+ *	既定は FALSE(隠す)。ツリーでページを選べるのでタブは無くてよく、
+ *	隠した分はページ領域に使う。TRUE にするとツリーとタブが両方出る。
+ *	ツリー非表示(SetTreeViewMode(FALSE))のときはタブでしかページを
+ *	選べないため、この設定に関わらずタブは表示される。
+ *
+ *	DoModal() より前に呼ぶこと。
+ */
+void TTCPropSheetDlg::SetTabMode(BOOL enable)
+{
+	m_ShowTab = enable;
 }
 
 void TTCPropSheetDlg::AddPage(HPROPSHEETPAGE hpage, const wchar_t *path)
@@ -140,6 +160,27 @@ LRESULT CALLBACK TTCPropSheetDlg::WndProc(HWND dlg, UINT msg, WPARAM wParam, LPA
 		CenterWindow(dlg, m_hParentWnd);
 		break;
 		}
+	case WM_TTCPS_SET_PAGE_FOCUS: {
+		// ツリーのクリックで切り替えたページへフォーカスを移す。
+		// ページはダイアログなので SetFocus(hPage) でページ内のコントロールへ
+		// フォーカスが移る。comctl32 はページをアクティブにするたびフォーカスを
+		// 先頭の TABSTOP へリセットするため、常にそのページの最初のコントロールに
+		// なる(前回操作していたコントロールには戻らない)。
+		HWND hPage = PropSheet_GetCurrentPageHwnd(m_hWnd);
+		if (hPage != NULL) {
+			SetFocus(hPage);
+			// フォーカス枠を表示する。
+			// マウス操作で始まった場合、Windows はフォーカス枠を抑止する
+			// (UISF_HIDEFOCUS)。ここはユーザーがクリックしていないコントロールへ
+			// フォーカスを移すので、抑止されたままだと移動先が分からない。
+			// エディットはキャレットで分かるが、チェックボックスは枠が出ないと
+			// フォーカスの有無が全く見えない(TCP/IP ページなど)。
+			// WM_UPDATEUISTATE はページとその子コントロールへ伝播する。
+			SendMessageW(hPage, WM_UPDATEUISTATE,
+						 MAKEWPARAM(UIS_CLEAR, UISF_HIDEFOCUS), 0);
+		}
+		break;
+	}
 	case WM_NOTIFY: {
 		NMHDR *nmhdr = (NMHDR *)lParam;
 		switch(nmhdr->code) {
@@ -167,6 +208,24 @@ LRESULT CALLBACK TTCPropSheetDlg::WndProc(HWND dlg, UINT msg, WPARAM wParam, LPA
 			SendMessageW(m_hWndTV, TVM_GETITEMW, 0, (LPARAM)&item);
 			WPARAM page_index = item.lParam;
 			SendMessageW(m_hWnd, PSM_SETCURSEL, page_index, 0);
+			// PSM_SETCURSEL はページをアクティブするときに、
+			// そのページ内のコントロールへフォーカスを移す。
+			//
+			// つまり操作の種類に関わらず、
+			// この時点でツリーからフォーカスが外れている。
+			// タブのクリックから同期した場合は TVC_UNKNOWN になる。
+			if (pnmtv->action == TVC_BYMOUSE) {
+				// マウスでクリックしたときは、
+				// クリック処理でツリーへフォーカスが移動する。
+				// PostMessage でページ内へフォーカスを移動する
+				PostMessageW(m_hWnd, WM_TTCPS_SET_PAGE_FOCUS, 0, 0);
+			}
+			else if (pnmtv->action == TVC_BYKEYBOARD) {
+				// キーボードではツリーの操作を続けられるようフォーカスを戻す。
+				// マウスのときと違い、この後ツリーへフォーカスが戻る処理は
+				// 無いので、遅延させずここで戻す。
+				SetFocus(m_hWndTV);
+			}
 			break;
 		}
 		case TCN_SELCHANGE: {
@@ -404,47 +463,81 @@ void TTCPropSheetDlg::CreateTree(HWND dlg)
 	}
 }
 
+/**
+ *	タブ行を隠し、空いた分だけページ領域を上へ広げる
+ *
+ *	ページの位置はプロパティシートマネージャがタブコントロールの表示領域
+ *	(TabCtrl_AdjustRect)から決めるので、タブコントロール自体を上へ広げて
+ *	表示領域を広げる。タブコントロールは非表示にするので、はみ出したタブ行は
+ *	描画されない。
+ *
+ *	既に生成済みのページはページ切り替えまで再配置されないため、
+ *	現在のページだけはここで明示的に移動する。
+ *
+ *	@param	hTab	タブコントロール(PropSheet_GetTabControl の戻り値)
+ */
+void TTCPropSheetDlg::HideTab(HWND hTab)
+{
+	// タブ行 + 枠の高さ(タブコントロールの上端から表示領域の上端まで)
+	RECT adjust_rect;
+	SetRect(&adjust_rect, 0, 0, 0, 0);
+	TabCtrl_AdjustRect(hTab, TRUE, &adjust_rect);	// 表示領域→ウィンドウ矩形
+	const int top_margin = -adjust_rect.top;
+	if (top_margin <= 0) {
+		return;
+	}
+
+	// タブを隠す。EnableWindow(FALSE) はしない
+	// (プロパティシートマネージャがタブの選択状態を参照するため)
+	ShowWindow(hTab, SW_HIDE);
+
+	// タブコントロールを上へ広げる。表示領域の下端は変えない
+	RECT tab_rect;
+	GetWindowRect(hTab, &tab_rect);
+	POINT tab_pt;
+	tab_pt.x = tab_rect.left;
+	tab_pt.y = tab_rect.top - top_margin;
+	ScreenToClient(m_hWnd, &tab_pt);
+	SetWindowPos(hTab, NULL,
+				 tab_pt.x, tab_pt.y,
+				 tab_rect.right - tab_rect.left,
+				 tab_rect.bottom - tab_rect.top + top_margin,
+				 SWP_NOZORDER);
+
+	// 生成済みのページを新しい表示領域へ移動する
+	// (これをしないと、ページを切り替えるまで元の位置に残る)
+	HWND hPage = PropSheet_GetCurrentPageHwnd(m_hWnd);
+	if (hPage != NULL) {
+		RECT page_rect;
+		GetWindowRect(hTab, &page_rect);
+		TabCtrl_AdjustRect(hTab, FALSE, &page_rect);	// ウィンドウ矩形→表示領域
+		POINT page_pt;
+		page_pt.x = page_rect.left;
+		page_pt.y = page_rect.top;
+		ScreenToClient(m_hWnd, &page_pt);
+		SetWindowPos(hPage, NULL,
+					 page_pt.x, page_pt.y,
+					 page_rect.right - page_rect.left,
+					 page_rect.bottom - page_rect.top,
+					 SWP_NOZORDER);
+	}
+}
+
 void TTCPropSheetDlg::AddTreeControl()
 {
+	if (m_hWndTV != NULL) {
+		// WM_INITDIALOG と WM_SHOWWINDOW の両方から呼ばれるので、2 回目は何もしない
+		// (ツリーが 2 つできる、タブを 2 回隠す、を防ぐ)
+		return;
+	}
+
 	HWND hTab = PropSheet_GetTabControl(m_hWnd);
 
 	// ツリーで選択できるのでタブは1行設定にする
 	SetWindowLongPtr(hTab, GWL_STYLE, GetWindowLongPtr(hTab, GWL_STYLE) & ~TCS_MULTILINE);
 
-#if 0
-	// タブを消して領域を移動しようとしたがうまくいかなかった
-	// そのうちこのブロックは消す
-	const bool m_HideTab = true;
-	if (m_HideTab) {
-		// タブ部分を隠す
-		ShowWindow(hTab, SW_HIDE);
-		EnableWindow(hTab, FALSE);
-
-		// タブ部分のサイズ(高さ)
-		RECT item_rect;
-		TabCtrl_GetItemRect(hTab, 0, &item_rect);
-		const int item_height = item_rect.bottom - item_rect.top;
-
-		// tab controlのタブ分、ダイアログを小さくする
-		RECT dlg_rect;
-		GetWindowRect(m_hWnd, &dlg_rect);
-		int w = dlg_rect.right - dlg_rect.left;
-		int h = dlg_rect.bottom - dlg_rect.top - item_height;
-		SetWindowPos(m_hWnd, NULL, 0, 0, w, h, SWP_NOZORDER | SWP_NOMOVE);
-
-		// タブコントロールをタブ分上に移動する
-		RECT tab_rect;
-		GetWindowRect(hTab, &tab_rect);
-
-		POINT start;
-		start.x = tab_rect.left;
-		start.y = tab_rect.top - item_height;
-		ScreenToClient(m_hWnd, &start);
-		SetWindowPos(hTab, NULL, start.x, start.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-	}
-#endif
-
 	// ツリーコントロールの位置を決める
+	// タブを隠す前の矩形を使う(隠すとタブコントロールを上へ広げるため)
 	RECT tree_rect;
 	GetWindowRect(hTab, &tree_rect);
  	int tree_w = TREE_WIDTH;
@@ -453,6 +546,11 @@ void TTCPropSheetDlg::AddTreeControl()
 	pt.x = tree_rect.left;
 	pt.y = tree_rect.top;
 	ScreenToClient(m_hWnd, &pt);
+
+	if (!m_ShowTab) {
+		// ツリーでページを選べるのでタブ行は不要。隠して、空いた分だけページを広げる
+		HideTab(hTab);
+	}
 
 	// ツリーコントロール分ダイアログのサイズを大きくする
 	RECT dlg_rect;
