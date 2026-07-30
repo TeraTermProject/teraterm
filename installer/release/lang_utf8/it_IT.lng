@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Italian
-date=2026-06-18 by TeraTerm Project
+date=2026-07-18 by TeraTerm Project
 contributor=R.B. (2026-07-17)
 
 [Tera Term]
@@ -880,7 +880,7 @@ DLG_SSHSETUP_COMP_BORDER=<I metodi di compressione sotto questa riga sono disabi
 DLG_SSHSETUP_KNOWNHOST=Host conosciuti SSH
 DLG_SSHSETUP_KNOWNHOST_RW=Lettura/scri&ttura file:
 DLG_SSHSETUP_KNOWNHOST_RO=File sola lettu&ra:
-DLG_SSHSETUP_HEARTBEAT=HeartBeat (&keep-alive)
+DLG_SSHSETUP_HEARTBEAT=&Keepalive
 DLG_SSHSETUP_HEARTBEAT_UNIT=sec. (0 per disabilitare)
 DLG_SSHSETUP_PASSWORD=Ricorda password in &memoria
 DLG_SSHSETUP_FORWARDAGENT=Abilita &agent inoltro

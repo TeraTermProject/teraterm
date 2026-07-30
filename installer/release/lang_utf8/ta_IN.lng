@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2026-06-18 by TeraTerm Project
+date=2026-07-18 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -880,7 +880,7 @@ DLG_SSHSETUP_COMP_BORDER=<இந்த வரிக்கு கீழே உள
 DLG_SSHSETUP_KNOWNHOST=பாஓடு அறியப்பட்ட புரவலன்கள்
 DLG_SSHSETUP_KNOWNHOST_RW=கோப்பைப் படிக்க/&எழுத:
 DLG_SSHSETUP_KNOWNHOST_RO=படிக்க மட்டும் கோப்புகள்:
-DLG_SSHSETUP_HEARTBEAT=இதயத் துடிப்பு(&உயிருடன் வைக்க)
+DLG_SSHSETUP_HEARTBEAT=&உயிருடன் வைக்க
 DLG_SSHSETUP_HEARTBEAT_UNIT=நொடி.(அனைக்க 0)
 DLG_SSHSETUP_PASSWORD=நினைவகத்தில் கடவுச்சொல்லை நினைவில் கொள்க
 DLG_SSHSETUP_FORWARDAGENT=முகவர் முன்னோக்குதலை இயக்கு

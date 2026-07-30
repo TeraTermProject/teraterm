@@ -367,7 +367,7 @@ static void read_ssh_options(PTInstVar pvar, const wchar_t *fileName)
 	// default is SSH2 (2004.11.30 yutaka)
 	settings->ssh_protocol_version = GetPrivateProfileInt("TTSSH", "ProtocolVersion", 2, fileName);
 
-	// SSH heartbeat time(second) (2004.12.11 yutaka)
+	// SSH Keepalive time(second)
 	settings->ssh_heartbeat_overtime = GetPrivateProfileInt("TTSSH", "HeartBeat", 300, fileName);
 
 	// パスワード認証および公開鍵認証に使うパスワードをメモリ上に保持しておくかどうかを
@@ -509,7 +509,7 @@ static void write_ssh_options(PTInstVar pvar, const wchar_t *fileName,
 	    settings->ssh_protocol_version==2 ? "2" : "1",
 	    fileName);
 
-	// SSH heartbeat time(second) (2004.12.11 yutaka)
+	// SSH Keepalive time(second)
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 	            "%d", settings->ssh_heartbeat_overtime);
 	WritePrivateProfileString("TTSSH", "HeartBeat", buf, fileName);
@@ -2510,7 +2510,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		               pvar->settings.KnownHostsFiles);
 	}
 
-	// SSH2 HeartBeat(keep-alive)を追加 (2005.2.22 yutaka)
+	// SSH Keepalive
 	{
 		char buf[10];
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
@@ -2848,7 +2848,7 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 		                                buf + bufindex);
 	}
 
-	// get SSH HeartBeat(keep-alive)
+	// get SSH Keepalive
 	SendMessage(GetDlgItem(dlg, IDC_HEARTBEAT_EDIT), WM_GETTEXT, sizeof(buf), (LPARAM)buf);
 	i = atoi(buf);
 	if (i < 0)

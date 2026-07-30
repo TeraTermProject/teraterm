@@ -154,10 +154,10 @@
 	</dl>
       </dd>
 
-      <dt id="HeartBeat">HeartBeat (keep-alive)</dt>
+      <dt id="Keepalive">Keepalive</dt>
       <dd>
-	一定時間ごとにパケットをホストに送信し、接続を維持します。
-	(特に NAT 環境下で有効。) 0を指定すると当該機能を無効化します。
+	指定時間以上 SSH パケットの送信がなかった場合に、接続維持用のパケットを送信します。
+	0 を指定すると無効になります。
       </dd>
 
       <dt id="RememberPassword">Remember password in memory</dt>

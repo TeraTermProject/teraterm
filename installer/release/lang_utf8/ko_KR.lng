@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean(한국어)
-date=2026-06-18 by TeraTerm Project
+date=2026-07-18 by TeraTerm Project
 contributor=Daeehong Kim (2013-07-25)
 
 [Tera Term]
@@ -883,7 +883,7 @@ DLG_SSHSETUP_COMP_BORDER=<이 줄 밑의 압축들은 비활성화>
 DLG_SSHSETUP_KNOWNHOST=알고있는 SSH 호스트
 DLG_SSHSETUP_KNOWNHOST_RW=읽고쓰기(&W):
 DLG_SSHSETUP_KNOWNHOST_RO=읽기전용(&R):
-DLG_SSHSETUP_HEARTBEAT=심박(연결유지(&K))
+DLG_SSHSETUP_HEARTBEAT=연결유지(&K)
 DLG_SSHSETUP_HEARTBEAT_UNIT=초.(끌려면 0)
 DLG_SSHSETUP_PASSWORD=메모리에 암호 기억(&M)
 DLG_SSHSETUP_FORWARDAGENT=agent 포워딩 활성화(&A)

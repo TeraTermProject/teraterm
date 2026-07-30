@@ -155,11 +155,10 @@
 	</dl>
       </dd>
 
-      <dt id="HeartBeat">HeartBeat (keep-alive)</dt>
+      <dt id="Keepalive">Keepalive</dt>
       <dd>
-	A Keep-alive packet is sent on a regular basis to maintain the
-	connection (particularly useful under NAT). If 0 is specified,
-	this feature is disabled.
+	A keepalive packet is sent if no SSH packets have been transmitted for the specified period of time.
+	If 0 is specified, this feature is disabled.
       </dd>
 
       <dt id="RememberPassword">Remember password in memory</dt>
