@@ -107,7 +107,6 @@ static int CloseSocket(SOCKET s)
 #define CommXonLim 768
 #define CommXoffLim 3328
 
-#define READENDNAME "ReadEnd"
 #define WRITENAME "Write"
 #define READNAME "Read"
 #define PRNWRITENAME "PrnWrite"
@@ -744,8 +743,7 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 			break;
 
 		case IdSerial:
-			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READENDNAME, cv->ComPort);
-			ReadEnd = CreateEvent(NULL,FALSE,FALSE,Temp);
+			ReadEnd = CreateEvent(NULL, FALSE, FALSE, NULL);
 			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", WRITENAME, cv->ComPort);
 			memset(&wol,0,sizeof(OVERLAPPED));
 			wol.hEvent = CreateEvent(NULL,TRUE,TRUE,Temp);
@@ -771,8 +769,7 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 
 		case IdNamedPipe:
 			cv->ComPort = 0;
-			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READENDNAME, cv->ComPort);
-			ReadEnd = CreateEvent(NULL,FALSE,FALSE,Temp);
+			ReadEnd = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 			/* create the receiver thread */
 			if (_beginthread(NamedPipeThread,0,cv) == -1) {
