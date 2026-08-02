@@ -2259,6 +2259,34 @@ void DispChangeWinSize(vtdraw_t *vt, int Nx, int Ny)
 }
 
 /**
+ *	pts の色・フォント設定を表示へ再適用する
+ *
+ *	実行中に /F= 指定で設定ファイルを読み直した後
+ *	(セッション複製の DDE 経由接続や新規接続ダイアログ)に呼ぶ。
+ *	桁数・行数は変えず、フォントに合わせてウィンドウサイズを再計算する。
+ *
+ *	@param[in]	vt		対象の描画コンテキスト。
+ *						NULL(ウィンドウ生成前)のときは何もしない
+ *						(起動時は InitDisp() / ChangeFont() が pts から適用する)
+ *	@param[in]	pts		適用する設定。現状は &ts を渡すこと
+ *
+ *	@todo ChangeFont() の引数に pts を渡せるようにする
+ *	@todo ChangeFont() は DispChangeFont() のほうが妥当そう
+ */
+void DispApplySetup(vtdraw_t *vt, const TTTSet *pts)
+{
+	TColorTheme color_theme;
+
+	if (vt == NULL || pts == NULL) {
+		return;
+	}
+	ThemeGetColorDefaultTS(pts, &color_theme);
+	ThemeSetColor(vt, &color_theme);
+	ChangeFont(vt, 0);
+	DispChangeWinSize(vt, WinWidth, WinHeight);
+}
+
+/**
  *	ウィンドウのサイズが変化する時(WM_SIZEが発生した時)に、
  *	AdjustSize == TRUEの時にコールされる
  *

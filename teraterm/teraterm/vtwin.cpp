@@ -3850,9 +3850,15 @@ void CVTWindow::OnFileNewConnection()
 
 			if ((GetHNRec.PortType==IdTCPIP) && LoadTTSET()) {
 				wchar_t *command = NULL;
+				wchar_t *prev_setup = _wcsdup(ts.SetupFNameW);
 				awcscats(&command, ttermpro, L" ", hostname, NULL);
 				(*ParseParam)(command, &ts, NULL);
 				free(command);
+				if (prev_setup != NULL && _wcsicmp(prev_setup, ts.SetupFNameW) != 0) {
+					// /F= で設定ファイルが読み直された。色とフォントを表示へ再適用する
+					DispApplySetup(vt_src, &ts);
+				}
+				free(prev_setup);
 				FreeTTSET();
 			}
 			SetKeyMap();
