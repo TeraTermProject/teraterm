@@ -379,12 +379,13 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
                      u_char *signature, u_int signaturelen,
                      u_char *data, u_int datalen)
 {
+	buffer_t *b = NULL;
+	char *ktype = NULL;
 	ECDSA_SIG *sig;
-	unsigned char digest[SSH_DIGEST_MAX_LENGTH], *sigblob;
+	unsigned char digest[SSH_DIGEST_MAX_LENGTH];
 	unsigned int len, dlen;
 	int ret = -1;
 	digest_algorithm hash_alg;
-	char *ptr;
 	BIGNUM *r, *s;
 
 	OpenSSL_add_all_digests();
@@ -394,20 +395,20 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 		goto error;
 	}
 
-	ptr = signature;
+	b = buffer_init();
+	if (b == NULL)
+		goto error;
 
-	len = get_uint32_MSBfirst(ptr);
-	ptr += 4;
-	if (strncmp(get_ssh2_hostkey_type_name(keytype), ptr, len) != 0) {
+	buffer_append(b, signature, signaturelen);
+	buffer_rewind(b);
+
+	ktype = buffer_get_string(b, NULL);
+	if (strcmp(get_ssh2_hostkey_type_name(keytype), ktype) != 0) {
 		ret = -3;
 		goto error;
 	}
-	ptr += len;
 
-	len = get_uint32_MSBfirst(ptr);
-	ptr += 4;
-	sigblob = ptr;
-	ptr += len;
+	len = buffer_get_int(b);
 
 	/* parse signature */
 	if ((sig = ECDSA_SIG_new()) == NULL) {
@@ -424,12 +425,8 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	}
 
 	ECDSA_SIG_set0(sig, r, s);
-	buffer_get_bignum2((char **)&sigblob, r);
-	buffer_get_bignum2((char **)&sigblob, s);
-	if (sigblob != ptr) {
-		ret = -7;
-		goto error;
-	}
+	buffer_get_bignum2(b, r);
+	buffer_get_bignum2(b, s);
 
 	/* hash the data */
 	hash_alg = keytype_to_hash_alg(keytype);
@@ -445,19 +442,21 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	ECDSA_SIG_free(sig);
 
 error:
+	buffer_free(b);
+	free(ktype);
+
 	return ret;
 }
 
 static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int signaturelen,
                               unsigned char *data, unsigned int datalen)
 {
-	buffer_t *b;
+	buffer_t *b = NULL;
 	char *ktype = NULL;
 	unsigned char *sigblob = NULL, *sm = NULL, *m = NULL;
 	unsigned int len;
 	unsigned long long smlen, mlen;
 	int rlen, ret;
-	char *bptr;
 
 	ret = -1;
 	b = buffer_init();
@@ -465,12 +464,12 @@ static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int s
 		goto error;
 
 	buffer_append(b, signature, signaturelen);
-	bptr = buffer_ptr(b);
-	ktype = buffer_get_string(&bptr, NULL);
+	buffer_rewind(b);
+	ktype = buffer_get_string(b, NULL);
 	if (strcmp("ssh-ed25519", ktype) != 0) {
 		goto error;
 	}
-	sigblob = buffer_get_string(&bptr, &len);
+	sigblob = buffer_get_string(b, &len);
 	rlen = buffer_remain_len(b);
 	if (rlen != 0) {
 		goto error;
@@ -1322,8 +1321,9 @@ error:
 //
 Key *key_from_blob(char *data, int blen)
 {
-	int keynamelen, len;
-	char key[128];
+	buffer_t *b = NULL;
+	char *ktype = NULL;
+	int len;
 	RSA *rsa = NULL;
 	DSA *dsa = NULL;
 	EC_KEY *ecdsa = NULL;
@@ -1344,16 +1344,15 @@ Key *key_from_blob(char *data, int blen)
 
 	memset(hostkey, 0, sizeof(Key));
 
-	keynamelen = get_uint32_MSBfirst(data);
-	if (keynamelen >= sizeof(key)) {
+	b = buffer_init();
+	if (b == NULL)
 		goto error;
-	}
-	data += 4;
-	memcpy(key, data, keynamelen);
-	key[keynamelen] = 0;
-	data += keynamelen;
 
-	type = get_hostkey_type_from_name(key);
+	buffer_append(b, data, blen);
+	buffer_rewind(b);
+
+	ktype = buffer_get_string(b, NULL);
+	type = get_hostkey_type_from_name(ktype);
 
 	switch (type) {
 	case KEY_RSA: // RSA key
@@ -1368,8 +1367,8 @@ Key *key_from_blob(char *data, int blen)
 			goto error;
 		}
 
-		buffer_get_bignum2(&data, e);
-		buffer_get_bignum2(&data, n);
+		buffer_get_bignum2(b, e);
+		buffer_get_bignum2(b, n);
 
 		hostkey->type = type;
 		hostkey->rsa = rsa;
@@ -1393,10 +1392,10 @@ Key *key_from_blob(char *data, int blen)
 			goto error;
 		}
 
-		buffer_get_bignum2(&data, p);
-		buffer_get_bignum2(&data, dsa_q);
-		buffer_get_bignum2(&data, g);
-		buffer_get_bignum2(&data, pub_key);
+		buffer_get_bignum2(b, p);
+		buffer_get_bignum2(b, dsa_q);
+		buffer_get_bignum2(b, g);
+		buffer_get_bignum2(b, pub_key);
 
 		hostkey->type = type;
 		hostkey->dsa = dsa;
@@ -1405,7 +1404,7 @@ Key *key_from_blob(char *data, int blen)
 	case KEY_ECDSA256: // ECDSA
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
-		curve = buffer_get_string(&data, NULL);
+		curve = buffer_get_string(b, NULL);
 		if (type != key_curve_name_to_keytype(curve)) {
 			goto error;
 		}
@@ -1420,7 +1419,7 @@ Key *key_from_blob(char *data, int blen)
 			goto error;
 		}
 
-		buffer_get_ecpoint(&data, EC_KEY_get0_group(ecdsa), q);
+		buffer_get_ecpoint(b, EC_KEY_get0_group(ecdsa), q);
 		if (key_ec_validate_public(EC_KEY_get0_group(ecdsa), q) == -1) {
 			goto error;
 		}
@@ -1434,7 +1433,7 @@ Key *key_from_blob(char *data, int blen)
 		break;
 
 	case KEY_ED25519:
-		pk = buffer_get_string(&data, &len);
+		pk = buffer_get_string(b, &len);
 		if (pk == NULL)
 			goto error;
 		if (len != ED25519_PK_SZ)
@@ -1452,6 +1451,9 @@ Key *key_from_blob(char *data, int blen)
 	return (hostkey);
 
 error:
+	buffer_free(b);
+	free(ktype);
+
 	if (rsa != NULL)
 		RSA_free(rsa);
 	if (dsa != NULL)
@@ -1895,7 +1897,7 @@ Key *key_private_deserialize(buffer_t *blob)
 	BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
 	BIGNUM *g, *pub_key, *priv_key;
 
-	type_name = buffer_get_string_msg(blob, NULL);
+	type_name = buffer_get_string(blob, NULL);
 	if (type_name == NULL)
 		goto error;
 	type = get_hostkey_type_from_name(type_name);
@@ -1908,12 +1910,12 @@ Key *key_private_deserialize(buffer_t *blob)
 			RSA_get0_factors(k->rsa, &p, &q);
 			RSA_get0_crt_params(k->rsa, &dmp1, &dmq1, &iqmp);
 
-			buffer_get_bignum2_msg(blob, n);
-			buffer_get_bignum2_msg(blob, e);
-			buffer_get_bignum2_msg(blob, d);
-			buffer_get_bignum2_msg(blob, iqmp);
-			buffer_get_bignum2_msg(blob, p);
-			buffer_get_bignum2_msg(blob, q);
+			buffer_get_bignum2(blob, n);
+			buffer_get_bignum2(blob, e);
+			buffer_get_bignum2(blob, d);
+			buffer_get_bignum2(blob, iqmp);
+			buffer_get_bignum2(blob, p);
+			buffer_get_bignum2(blob, q);
 
 			/* Generate additional parameters */
 			rsa_generate_additional_parameters(k->rsa);
@@ -1922,11 +1924,11 @@ Key *key_private_deserialize(buffer_t *blob)
 		case KEY_DSA:
 			DSA_get0_pqg(k->dsa, &p, &q, &g);
 			DSA_get0_key(k->dsa, &pub_key, &priv_key);
-			buffer_get_bignum2_msg(blob, p);
-			buffer_get_bignum2_msg(blob, q);
-			buffer_get_bignum2_msg(blob, g);
-			buffer_get_bignum2_msg(blob, pub_key);
-			buffer_get_bignum2_msg(blob, priv_key);
+			buffer_get_bignum2(blob, p);
+			buffer_get_bignum2(blob, q);
+			buffer_get_bignum2(blob, g);
+			buffer_get_bignum2(blob, pub_key);
+			buffer_get_bignum2(blob, priv_key);
 			break;
 
 		case KEY_ECDSA256:
@@ -1941,7 +1943,7 @@ Key *key_private_deserialize(buffer_t *blob)
 			EC_POINT *q = NULL;
 
 			nid = keytype_to_cipher_nid(type);
-			curve = buffer_get_string_msg(blob, NULL);
+			curve = buffer_get_string(blob, NULL);
 			skt = key_curve_name_to_keytype(curve);
 			if (nid != keytype_to_cipher_nid(skt))
 				goto ecdsa_error;
@@ -1953,8 +1955,8 @@ Key *key_private_deserialize(buffer_t *blob)
 			if ((exponent = BN_new()) == NULL)
 				goto ecdsa_error;
 
-			buffer_get_ecpoint_msg(blob, EC_KEY_get0_group(k->ecdsa), q);
-			buffer_get_bignum2_msg(blob, exponent);
+			buffer_get_ecpoint(blob, EC_KEY_get0_group(k->ecdsa), q);
+			buffer_get_bignum2(blob, exponent);
 			if (EC_KEY_set_public_key(k->ecdsa, q) != 1)
 				goto ecdsa_error;
 			if (EC_KEY_set_private_key(k->ecdsa, exponent) != 1)
@@ -1979,8 +1981,8 @@ ecdsa_error:
 			break;
 
 		case KEY_ED25519:
-			k->ed25519_pk = buffer_get_string_msg(blob, &pklen);
-			k->ed25519_sk = buffer_get_string_msg(blob, &sklen);
+			k->ed25519_pk = buffer_get_string(blob, &pklen);
+			k->ed25519_sk = buffer_get_string(blob, &sklen);
 			if (pklen != ED25519_PK_SZ)
 				goto error;
 			if (sklen != ED25519_SK_SZ)
@@ -2440,7 +2442,7 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 		free(blob);
 		blob = NULL;
 
-		sig = buffer_get_string_msg(bsig, &siglen_i);
+		sig = buffer_get_string(bsig, &siglen_i);
 		siglen = siglen_i;
 		// 手抜き。hostkey algorithm を使うのは RSA の時のみなので、
 		// とりあえず KEY_ALGO_RSA を指定しておく。
@@ -2511,7 +2513,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		key_free(key);
 		key = NULL;
 
-		blob = buffer_get_string_msg(b, &len);
+		blob = buffer_get_string(b, &len);
 		key = key_from_blob(blob, len);
 		if (key == NULL) {
 			logprintf(LOG_LEVEL_ERROR, "Not found host key into blob %p (%d)", blob, len);

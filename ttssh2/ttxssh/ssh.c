@@ -6146,7 +6146,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	buffer_clear(server_blob);
 	buffer_put_string(server_blob, server_public, pklen);
 	buffer_rewind(server_blob);
-	buffer_get_bignum2_msg(server_blob, dh_server_pub);
+	buffer_get_bignum2(server_blob, dh_server_pub);
 	kex->server_key_bits = BN_num_bits(dh_server_pub);
 	*/
 	DH_get0_pqg(kex->dh, &dh_p, NULL, NULL);
@@ -8119,7 +8119,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 		buffer_rewind(pvar->userauth_inforeq_prompts);
 
 		// 1個目のプロンプトでダイアログを表示
-		prompt_disp = buffer_get_string_msg(pvar->userauth_inforeq_prompts, &prompt_len);
+		prompt_disp = buffer_get_string(pvar->userauth_inforeq_prompts, &prompt_len);
 		echo = buffer_get_int(pvar->userauth_inforeq_prompts);
 
 		// keyboard-interactive method
@@ -8165,7 +8165,7 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 
 	if (pvar->userauth_inforeq_index < pvar->userauth_inforeq_num) {
 		// 次のプロンプトでダイアログを表示
-		prompt_disp = buffer_get_string_msg(pvar->userauth_inforeq_prompts, &prompt_len);
+		prompt_disp = buffer_get_string(pvar->userauth_inforeq_prompts, &prompt_len);
 		echo = buffer_get_int(pvar->userauth_inforeq_prompts);
 
 		// keyboard-interactive method

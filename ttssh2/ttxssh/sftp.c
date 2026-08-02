@@ -279,8 +279,8 @@ static void sftp_do_init_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 	sftp_syslog(pvar, "SFTP server version %u, remote version %u", type, c->sftp.version);
 
 	while (buffer_remain_len(msg) > 0) {
-		char *name = buffer_get_string_msg(msg, NULL);
-		char *value = buffer_get_string_msg(msg, NULL);
+		char *name = buffer_get_string(msg, NULL);
+		char *value = buffer_get_string(msg, NULL);
 		int known = 0;
 
         if (strcmp(name, "posix-rename@openssh.com") == 0 &&
@@ -395,8 +395,8 @@ static char *sftp_do_realpath_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 		goto error;
 	}
 
-	filename = buffer_get_string_msg(msg, NULL);
-	longname = buffer_get_string_msg(msg, NULL);
+	filename = buffer_get_string(msg, NULL);
+	longname = buffer_get_string(msg, NULL);
 	//a = decode_attrib(&msg);
 
 	sftp_console_message(pvar, c, "SSH_FXP_REALPATH %s -> %s", c->sftp.path, filename);

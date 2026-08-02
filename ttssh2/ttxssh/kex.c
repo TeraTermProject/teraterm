@@ -644,7 +644,6 @@ kex_dh_dec(kex *kex, buffer_t *dh_blob,
 	buffer_t *buf = NULL;
 	BIGNUM *dh_pub = NULL;
 	int r;
-	char *data;
 
 	*shared_secretp = NULL;
 
@@ -658,8 +657,9 @@ kex_dh_dec(kex *kex, buffer_t *dh_blob,
 	}
 
 	buffer_put_stringb(buf, dh_blob);
-	data = buffer_ptr(buf);
-	buffer_get_bignum2(&data, dh_pub);
+	buffer_rewind(buf);
+
+	buffer_get_bignum2(buf, dh_pub);
 	buffer_clear(buf);
 	if ((r = kex_dh_compute_key(kex, dh_pub, buf)) != 0)
 		goto out;
@@ -870,7 +870,6 @@ kex_ecdh_dec_key_group(kex *kex, buffer_t *ec_blob,
 	u_char *kbuf = NULL;
 	size_t klen = 0;
 	int r = 0;
-	char *data;
 
 	*shared_secretp = NULL;
 
@@ -879,12 +878,13 @@ kex_ecdh_dec_key_group(kex *kex, buffer_t *ec_blob,
 		goto out;
 	}
 	buffer_put_stringb(buf, ec_blob);
+	buffer_rewind(buf);
+
 	if ((dh_pub = EC_POINT_new(group)) == NULL) {
 		r = SSH_ERR_ALLOC_FAIL;
 		goto out;
 	}
-	data = buffer_ptr(buf);
-	buffer_get_ecpoint(&data, group, dh_pub);
+	buffer_get_ecpoint(buf, group, dh_pub);
 	buffer_clear(buf);
 
 	if (key_ec_validate_public(group, dh_pub) != 0) {

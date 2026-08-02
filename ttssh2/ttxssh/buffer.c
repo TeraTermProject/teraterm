@@ -253,10 +253,8 @@ int buffer_get_char(buffer_t *msg)
 	return (unsigned char)ch;
 }
 
-// getting string buffer.
 // NOTE: You should free the return pointer if it's unused.
-// (2005.6.26 yutaka)
-char *buffer_get_string(char **data_ptr, int *buflen_ptr)
+static char *buffer_get_string_internal(char **data_ptr, int *buflen_ptr)
 {
 	char *data = *data_ptr;
 	char *ptr;
@@ -286,9 +284,8 @@ char *buffer_get_string(char **data_ptr, int *buflen_ptr)
 	return(ptr);
 }
 
-// buffer_get_string() の buffer_t 版。本来はこちらが OpenSSH スタイル。
 // NOTE: You should free the return pointer if it's unused.
-void *buffer_get_string_msg(buffer_t *msg, int *buflen_ptr)
+void *buffer_get_string(buffer_t *msg, int *buflen_ptr)
 {
 	char *data, *olddata;
 	void *ret = NULL;
@@ -305,7 +302,7 @@ void *buffer_get_string_msg(buffer_t *msg, int *buflen_ptr)
 	if (len - 4 < datalen)
 		goto error;
 
-	ret = buffer_get_string(&data, buflen_ptr);
+	ret = buffer_get_string_internal(&data, buflen_ptr);
 	off = data - olddata;
 	msg->offset += off;
 
@@ -457,7 +454,7 @@ error:
 	free(buf);
 }
 
-void buffer_get_bignum2(char **data, BIGNUM *value)
+static void buffer_get_bignum2_internal(char **data, BIGNUM *value)
 {
 	char *buf = *data;
 	int len;
@@ -470,13 +467,13 @@ void buffer_get_bignum2(char **data, BIGNUM *value)
 	*data = buf;
 }
 
-void buffer_get_bignum2_msg(buffer_t *msg, BIGNUM *value)
+void buffer_get_bignum2(buffer_t *msg, BIGNUM *value)
 {
 	char *data, *olddata;
 	size_t off;
 
 	data = olddata = buffer_tail_ptr(msg);
-	buffer_get_bignum2(&data, value);
+	buffer_get_bignum2_internal(&data, value);
 	off = data - olddata;
 	msg->offset += off;
 }
@@ -558,7 +555,7 @@ error:
 	free(buf);
 }
 
-void buffer_get_ecpoint(char **data, const EC_GROUP *curve, EC_POINT *point)
+static void buffer_get_ecpoint_internal(char **data, const EC_GROUP *curve, EC_POINT *point)
 {
 	char *buf = *data;
 	size_t len;
@@ -571,13 +568,13 @@ void buffer_get_ecpoint(char **data, const EC_GROUP *curve, EC_POINT *point)
 	*data = buf;
 }
 
-void buffer_get_ecpoint_msg(buffer_t *msg, const EC_GROUP *curve, EC_POINT *point)
+void buffer_get_ecpoint(buffer_t *msg, const EC_GROUP *curve, EC_POINT *point)
 {
 	char *data, *olddata;
 	size_t off;
 
 	data = olddata = buffer_tail_ptr(msg);
-	buffer_get_ecpoint(&data, curve, point);
+	buffer_get_ecpoint_internal(&data, curve, point);
 	off = data - olddata;
 	msg->offset += off;
 }

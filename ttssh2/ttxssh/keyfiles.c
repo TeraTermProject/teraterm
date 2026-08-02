@@ -482,7 +482,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	 * デコードしたデータを解析する。
 	 */
 	// 暗号化アルゴリズムの名前
-	ciphername = buffer_get_string_msg(copy_consumed, NULL);
+	ciphername = buffer_get_string(copy_consumed, NULL);
 	cipher = get_cipher_by_name(ciphername);
 	if (cipher == NULL && strcmp(ciphername, "none") != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: unknown cipher name", __FUNCTION__);
@@ -495,7 +495,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		goto error;
 	}
 
-	kdfname = buffer_get_string_msg(copy_consumed, NULL);
+	kdfname = buffer_get_string(copy_consumed, NULL);
 	if (kdfname == NULL ||
 	    (!strcmp(kdfname, "none") && !strcmp(kdfname, KDFNAME))) {
 		logprintf(LOG_LEVEL_ERROR, "%s: unknown kdf name", __FUNCTION__ );
@@ -507,7 +507,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	}
 
 	/* kdf options */
-	kdfp = buffer_get_string_msg(copy_consumed, &klen);
+	kdfp = buffer_get_string(copy_consumed, &klen);
 	if (kdfp == NULL) {
 		logprintf(LOG_LEVEL_ERROR, "%s: kdf options not set", __FUNCTION__);
 		goto error;
@@ -531,7 +531,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	}
 
 	/* pubkey */
-	cp = buffer_get_string_msg(copy_consumed, &len);
+	cp = buffer_get_string(copy_consumed, &len);
 	if (cp == NULL) {
 		logprintf(LOG_LEVEL_ERROR, "%s: pubkey not found", __FUNCTION__);
 		goto error;
@@ -556,7 +556,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	ivlen = blocksize;
 	key = calloc(1, keylen + ivlen);
 	if (!strcmp(kdfname, KDFNAME)) {
-		salt = buffer_get_string_msg(kdf, &slen);
+		salt = buffer_get_string(kdf, &slen);
 		if (salt == NULL) {
 			logprintf(LOG_LEVEL_ERROR, "%s: salt not set", __FUNCTION__);
 			goto error;
@@ -602,7 +602,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		goto error;
 
 	/* comment */
-	comment = buffer_get_string_msg(b, NULL);
+	comment = buffer_get_string(b, NULL);
 
 	i = 0;
 	while (buffer_remain_len(b)) {
@@ -1152,15 +1152,16 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		}
 	}
 
+	buffer_rewind(public_blob);
+	buffer_rewind(private_blob);
+
 	switch (result->type) {
 	case KEY_RSA:
 	{
-		char *pubkey_type, *pub, *pri;
+		char *pubkey_type;
 		BIGNUM *e, *n, *d, *iqmp, *p, *q;
 
-		pub = buffer_ptr(public_blob);
-		pri = buffer_ptr(private_blob);
-		pubkey_type = buffer_get_string(&pub, NULL);
+		pubkey_type = buffer_get_string(public_blob, NULL);
 		if (strcmp(pubkey_type, "ssh-rsa") != 0) {
 			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
 			free(pubkey_type);
@@ -1192,24 +1193,22 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			goto error;
 		}
 
-		buffer_get_bignum2(&pub, e);
-		buffer_get_bignum2(&pub, n);
+		buffer_get_bignum2(public_blob, e);
+		buffer_get_bignum2(public_blob, n);
 
-		buffer_get_bignum2(&pri, d);
-		buffer_get_bignum2(&pri, p);
-		buffer_get_bignum2(&pri, q);
-		buffer_get_bignum2(&pri, iqmp);
+		buffer_get_bignum2(private_blob, d);
+		buffer_get_bignum2(private_blob, p);
+		buffer_get_bignum2(private_blob, q);
+		buffer_get_bignum2(private_blob, iqmp);
 
 		break;
 	}
 	case KEY_DSA:
 	{
-		char *pubkey_type, *pub, *pri;
+		char *pubkey_type;
 		BIGNUM *p, *q, *g, *pub_key, *priv_key;
 
-		pub = buffer_ptr(public_blob);
-		pri = buffer_ptr(private_blob);
-		pubkey_type = buffer_get_string(&pub, NULL);
+		pubkey_type = buffer_get_string(public_blob, NULL);
 		if (strcmp(pubkey_type, "ssh-dss") != 0) {
 			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
 			free(pubkey_type);
@@ -1238,12 +1237,12 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			goto error;
 		}
 
-		buffer_get_bignum2(&pub, p);
-		buffer_get_bignum2(&pub, q);
-		buffer_get_bignum2(&pub, g);
-		buffer_get_bignum2(&pub, pub_key);
+		buffer_get_bignum2(public_blob, p);
+		buffer_get_bignum2(public_blob, q);
+		buffer_get_bignum2(public_blob, g);
+		buffer_get_bignum2(public_blob, pub_key);
 
-		buffer_get_bignum2(&pri, priv_key);
+		buffer_get_bignum2(private_blob, priv_key);
 
 		break;
 	}
@@ -1251,7 +1250,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
 	{
-		char *pubkey_type, *pub, *pri;
+		char *pubkey_type;
 		int success = 0;
 		unsigned int nid;
 		char *curve = NULL;
@@ -1259,9 +1258,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		BIGNUM *exponent = NULL;
 		EC_POINT *q = NULL;
 
-		pub = buffer_ptr(public_blob);
-		pri = buffer_ptr(private_blob);
-		pubkey_type = buffer_get_string(&pub, NULL);
+		pubkey_type = buffer_get_string(public_blob, NULL);
 		if ((result->type == KEY_ECDSA256 && strcmp(pubkey_type, "ecdsa-sha2-nistp256") != 0) ||
 		    (result->type == KEY_ECDSA384 && strcmp(pubkey_type, "ecdsa-sha2-nistp384") != 0) ||
 		    (result->type == KEY_ECDSA521 && strcmp(pubkey_type, "ecdsa-sha2-nistp521") != 0)) {
@@ -1272,7 +1269,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		free(pubkey_type);
 
 		nid = keytype_to_cipher_nid(result->type);
-		curve = buffer_get_string(&pub, NULL);
+		curve = buffer_get_string(public_blob, NULL);
 		skt = key_curve_name_to_keytype(curve);
 		if (nid != keytype_to_cipher_nid(skt))
 			goto ecdsa_error;
@@ -1284,8 +1281,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		if ((exponent = BN_new()) == NULL)
 			goto ecdsa_error;
 
-		buffer_get_ecpoint(&pub, EC_KEY_get0_group(result->ecdsa), q);
-		buffer_get_bignum2(&pri, exponent);
+		buffer_get_ecpoint(public_blob, EC_KEY_get0_group(result->ecdsa), q);
+		buffer_get_bignum2(private_blob, exponent);
 		if (EC_KEY_set_public_key(result->ecdsa, q) != 1)
 			goto ecdsa_error;
 		if (EC_KEY_set_private_key(result->ecdsa, exponent) != 1)
@@ -1311,12 +1308,11 @@ ecdsa_error:
 	}
 	case KEY_ED25519:
 	{
-		char *pubkey_type, *pub, *pri;
+		char *pubkey_type;
 		unsigned int pklen, sklen;
 		char *sk;
-		pub = buffer_ptr(public_blob);
-		pri = buffer_ptr(private_blob);
-		pubkey_type = buffer_get_string(&pub, NULL);
+
+		pubkey_type = buffer_get_string(public_blob, NULL);
 		if (strcmp(pubkey_type, "ssh-ed25519") != 0) {
 			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
 			free(pubkey_type);
@@ -1324,8 +1320,8 @@ ecdsa_error:
 		}
 		free(pubkey_type);
 
-		result->ed25519_pk = buffer_get_string(&pub, &pklen);
-		sk = buffer_get_string(&pri, &sklen);
+		result->ed25519_pk = buffer_get_string(public_blob, &pklen);
+		sk = buffer_get_string(private_blob, &sklen);
 		if (pklen != ED25519_PK_SZ) {
 			free(sk);
 			goto error;
@@ -1708,7 +1704,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		BN_CTX *ctx = NULL;
 
 		dummy = buffer_get_int(blob2);
-		curve = buffer_get_string_msg(blob2, NULL);
+		curve = buffer_get_string(blob2, NULL);
 
 		if (strncmp(curve, "nistp256", strlen("nistp256")) == 0) {
 			result->type = KEY_ECDSA256;
