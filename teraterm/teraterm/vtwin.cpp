@@ -3855,7 +3855,7 @@ void CVTWindow::OnFileNewConnection()
 				(*ParseParam)(command, &ts, NULL);
 				free(command);
 				if (prev_setup != NULL && _wcsicmp(prev_setup, ts.SetupFNameW) != 0) {
-					// /F= で設定ファイルが読み直された。色とフォントを表示へ再適用する
+					// /F= で設定ファイルが読み直された。色,フォント,メニューを表示へ再適用する
 					DispApplySetup(vt_src, &ts);
 				}
 				free(prev_setup);

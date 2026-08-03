@@ -2259,10 +2259,10 @@ void DispChangeWinSize(vtdraw_t *vt, int Nx, int Ny)
 }
 
 /**
- *	pts の色・フォント設定を表示へ再適用する
- *
+ *	設定(色,フォント,メニュー)を表示へ適用する
  *	実行中に /F= 指定で設定ファイルを読み直した後
  *	(セッション複製の DDE 経由接続や新規接続ダイアログ)に呼ぶ。
+ *
  *	桁数・行数は変えず、フォントに合わせてウィンドウサイズを再計算する。
  *
  *	@param[in]	vt		対象の描画コンテキスト。
@@ -2275,15 +2275,15 @@ void DispChangeWinSize(vtdraw_t *vt, int Nx, int Ny)
  */
 void DispApplySetup(vtdraw_t *vt, const TTTSet *pts)
 {
-	TColorTheme color_theme;
-
 	if (vt == NULL || pts == NULL) {
 		return;
 	}
+	TColorTheme color_theme;
 	ThemeGetColorDefaultTS(pts, &color_theme);
 	ThemeSetColor(vt, &color_theme);
 	ChangeFont(vt, 0);
 	DispChangeWinSize(vt, WinWidth, WinHeight);
+	PostMessage(vt->hVTWin, WM_USER_CHANGEMENU, 0, 0);
 }
 
 /**
