@@ -295,7 +295,7 @@ static void ssh2_channel_add_bufchain(PTInstVar pvar, Channel_t *c, unsigned cha
 		free(p);
 		return;
 	}
-	buffer_put_raw(p->msg, buf, buflen);
+	buffer_put(p->msg, buf, buflen);
 	p->next = NULL;
 
 	if (c->bufchain == NULL) {
@@ -1050,7 +1050,7 @@ static PayloadStat get_stringb_from_payload(PTInstVar pvar, buffer_t **buff)
 	if (*buff == NULL) {
 		return GetPayloadAllocError;
 	}
-	if (buffer_append(*buff, data, size) != 0) {
+	if (buffer_put(*buff, data, size) != 0) {
 		return GetPayloadAllocError;
 	}
 
@@ -1426,7 +1426,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 			}
 
 			// 圧縮対象はヘッダを除くペイロードのみ。
-			buffer_append(msg, "\0\0\0\0\0", 5);  // 5 = packet-length(4) + padding(1)
+			buffer_put(msg, "\0\0\0\0\0", 5);  // 5 = packet-length(4) + padding(1)
 			if (buffer_compress(&pvar->ssh_state.compress_stream, pvar->ssh_state.outbuf + 12, len, msg) == -1) {
 				UTIL_get_lang_msg("MSG_SSH_COMP_ERROR", pvar,
 				                  "An error occurred while compressing packet data.\n"
@@ -2208,11 +2208,11 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len)
 				// for SSH2 KEX
 				//   クライアントバージョンの保存
 				buffer_clear(pvar->kex->client_version);
-				buffer_append(pvar->kex->client_version, TTSSH_ID, strlen(TTSSH_ID));
+				buffer_put(pvar->kex->client_version, TTSSH_ID, strlen(TTSSH_ID));
 
 				//   サーババージョンの保存 (2005.3.9)
 				buffer_clear(pvar->kex->server_version);
-				buffer_append(pvar->kex->server_version, ID, strlen(ID));
+				buffer_put(pvar->kex->server_version, ID, strlen(ID));
 
 				// サーババージョンのチェック
 				server_version_check(pvar);
@@ -4715,7 +4715,7 @@ void SSH2_packet_start(buffer_t *msg, unsigned char type)
 	memset(buf, 0, sizeof(buf));
 	buf[len - 1] = type;
 	buffer_clear(msg);
-	buffer_append(msg, buf, len);
+	buffer_put(msg, buf, len);
 }
 
 // クライアントからサーバへのキー交換開始要求
@@ -4742,7 +4742,7 @@ void SSH2_send_kexinit(PTInstVar pvar)
 	// cookieのセット
 	CRYPT_set_random_data(pvar, cookie, sizeof(cookie));
 	CRYPT_set_client_cookie(pvar, cookie);
-	buffer_append(msg, cookie, sizeof(cookie));
+	buffer_put(msg, cookie, sizeof(cookie));
 
 	// クライアントのキー情報
 	for (i = 0 ; i < PROPOSAL_MAX ; i++) {
@@ -5306,10 +5306,10 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 			goto error;
 		}
 	}
-	// buffer_append() しているが、メッセージデータ全体なので grab_payload() していない。
+	// buffer_put() しているが、メッセージデータ全体なので grab_payload() していない。
 	// grab_payload() は続く処理で各フィールドに対して個別に行う。
 	// pvar->kex->peer に格納されるが、各フィールドがエラーになったら使われない。
-	buffer_append(pvar->kex->peer, data, len);
+	buffer_put(pvar->kex->peer, data, len);
 
 	push_memdump("KEXINIT", "exchange algorithm list: receiving", data, len);
 
@@ -5406,7 +5406,7 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 		goto error;
 	}
 
-	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+	buffer_put(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEXDH_INIT, len);
@@ -5707,7 +5707,7 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 		goto error;
 	}
 
-	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+	buffer_put(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
@@ -5760,7 +5760,7 @@ static void SSH2_curve25519_kex_init(PTInstVar pvar)
 		goto error;
 	}
 
-	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+	buffer_put(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
@@ -5813,7 +5813,7 @@ static void SSH2_kem_sntrup761x25519_kex_init(PTInstVar pvar)
 		goto error;
 	}
 
-	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+	buffer_put(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
@@ -5865,7 +5865,7 @@ static void SSH2_kem_mlkem768x25519_kex_init(PTInstVar pvar)
 		goto error;
 	}
 
-	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+	buffer_put(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
@@ -7107,7 +7107,6 @@ BOOL do_SSH2_userauth(PTInstVar pvar)
 	}
 	s = "ssh-userauth";
 	buffer_put_string(msg, s, strlen(s));
-	//buffer_put_padding(msg, 32); // XXX:
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_SERVICE_REQUEST, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
@@ -7296,7 +7295,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 			goto error;
 		}
 		// セッションID
-		buffer_append_length(signbuf, pvar->kex->session_id, pvar->kex->session_id_len);
+		buffer_put_string(signbuf, pvar->kex->session_id, pvar->kex->session_id_len);
 		buffer_put_char(signbuf, SSH2_MSG_USERAUTH_REQUEST);
 		s = username;  // ユーザ名
 		buffer_put_string(signbuf, s, strlen(s));
@@ -7310,7 +7309,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		buffer_put_string(signbuf, s, strlen(s));
 
 		s = buffer_ptr(blob);
-		buffer_append_length(signbuf, s, bloblen);
+		buffer_put_string(signbuf, s, bloblen);
 
 		// 署名の作成
 		if (generate_SSH2_keysign(keypair, &signature, &siglen, buffer_ptr(signbuf), buffer_len(signbuf), keyalgo) == FALSE) {
@@ -7328,8 +7327,8 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		buffer_put_string(msg, s, strlen(s));
 
 		s = buffer_ptr(blob);
-		buffer_append_length(msg, s, bloblen);
-		buffer_append_length(msg, signature, siglen);
+		buffer_put_string(msg, s, bloblen);
+		buffer_put_string(msg, signature, siglen);
 
 		buffer_free(blob);
 		buffer_free(signbuf);
@@ -7840,18 +7839,18 @@ void sanitize_str(buffer_t *buff, unsigned char *src, size_t srclen)
 	for (i=0; i<srclen; i++) {
 		if (src[i] < 0x20 && src[i] != '\t') {
 			if (cplen > 0) {
-				buffer_append(buff, start, cplen);
+				buffer_put(buff, start, cplen);
 			}
 
 			if (src[i] == '\r') {
-				buffer_append(buff, "\r\n", 2);
+				buffer_put(buff, "\r\n", 2);
 
 				if (i < srclen - 1 && src[i+1] == '\n') {
 					i++;
 				}
 			}
 			else if (src[i] == '\n') {
-				buffer_append(buff, "\r\n", 2);
+				buffer_put(buff, "\r\n", 2);
 			}
 
 			start = src + i + 1;
@@ -7863,10 +7862,10 @@ void sanitize_str(buffer_t *buff, unsigned char *src, size_t srclen)
 	}
 
 	if (cplen > 0) {
-		buffer_append(buff, start, cplen);
+		buffer_put(buff, start, cplen);
 	}
 
-	buffer_append(buff, "\0", 1);
+	buffer_put(buff, "\0", 1);
 }
 
 /**
@@ -8251,7 +8250,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		safefree(pvar->pageant_key);
 		return FALSE;
 	}
-	buffer_append_length(signbuf, pvar->kex->session_id, pvar->kex->session_id_len);
+	buffer_put_string(signbuf, pvar->kex->session_id, pvar->kex->session_id_len);
 	buffer_put_char(signbuf, SSH2_MSG_USERAUTH_REQUEST);
 	s = username;  // ユーザ名
 	buffer_put_string(signbuf, s, strlen(s));
@@ -10673,12 +10672,12 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 		*agent_request_len = req_len + 4;
 
 		if (*agent_request_len > buflen) {
-			buffer_put_raw(agent_msg, data, buflen);
+			buffer_put(agent_msg, data, buflen);
 			return TRUE;
 		}
 	}
 	else {
-		buffer_put_raw(agent_msg, data, buflen);
+		buffer_put(agent_msg, data, buflen);
 		if (*agent_request_len > buffer_len(agent_msg)) {
 			return TRUE;
 		}

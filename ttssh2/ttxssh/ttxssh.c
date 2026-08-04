@@ -3781,7 +3781,7 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	SecureZeroMemory(key, keylen + ivlen);
 	free(key);
 
-	buffer_append(encoded, AUTH_MAGIC, sizeof(AUTH_MAGIC));
+	buffer_put(encoded, AUTH_MAGIC, sizeof(AUTH_MAGIC));
 	buffer_put_cstring(encoded, ciphername);
 	buffer_put_cstring(encoded, kdfname);
 	buffer_put_string(encoded, buffer_ptr(kdf), buffer_len(kdf));
@@ -3836,7 +3836,7 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	}
 
 	buffer_clear(blob);
-	buffer_append(blob, MARK_BEGIN, sizeof(MARK_BEGIN) - 1);
+	buffer_put(blob, MARK_BEGIN, sizeof(MARK_BEGIN) - 1);
 	for (i = 0; i < n; i++) {
 		buffer_put_char(blob, cp[i]);
 		if (i % 70 == 69)
@@ -3844,7 +3844,7 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	}
 	if (i % 70 != 69)
 		buffer_put_char(blob, '\n');
-	buffer_append(blob, MARK_END, sizeof(MARK_END) - 1);
+	buffer_put(blob, MARK_END, sizeof(MARK_END) - 1);
 	free(cp);
 
 	len = buffer_len(blob);
@@ -4423,8 +4423,8 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 					buffer_put_string(b, keyname, strlen(keyname));
 					s = curve_keytype_to_name(public_key.type);
 					buffer_put_string(b, s, strlen(s));
-					buffer_put_ecpoint(b, EC_KEY_get0_group(ecdsa),
-					                      EC_KEY_get0_public_key(ecdsa));
+					buffer_put_ec(b, EC_KEY_get0_public_key(ecdsa) ,
+					                 EC_KEY_get0_group(ecdsa));
 					break;
 
 				case KEY_ED25519:
@@ -4570,17 +4570,17 @@ public_error:
 				tmp[1] = (rnd >> 8) & 0xff;
 				tmp[2] = tmp[0];
 				tmp[3] = tmp[1];
-				buffer_append(b, tmp, 4);
+				buffer_put(b, tmp, 4);
 
 				// set private key
 				rsa = private_key.rsa;
 				RSA_get0_key(rsa, &n, &e, &d);
 				RSA_get0_factors(rsa, &p, &q);
 				RSA_get0_crt_params(rsa, &dmp1, &dmq1, &iqmp);
-				buffer_put_bignum(b, d);
-				buffer_put_bignum(b, iqmp);
-				buffer_put_bignum(b, q);
-				buffer_put_bignum(b, p);
+				buffer_put_bignum1(b, d);
+				buffer_put_bignum1(b, iqmp);
+				buffer_put_bignum1(b, q);
+				buffer_put_bignum1(b, p);
 
 				// padding with 8byte align
 				while (buffer_len(b) % 8) {
@@ -4604,8 +4604,8 @@ public_error:
 
 				/* Store public key.  This will be in plain text. */
 				buffer_put_int(enc, BN_num_bits(n));
-				buffer_put_bignum(enc, n);
-				buffer_put_bignum(enc, e);
+				buffer_put_bignum1(enc, n);
+				buffer_put_bignum1(enc, e);
 				buffer_put_string(enc, comment, strlen(comment));
 
 				// setup the MD5ed passphrase to cipher encryption key
@@ -4633,7 +4633,7 @@ public_error:
 					goto error;
 				}
 
-				buffer_append(enc, wrapped, len);
+				buffer_put(enc, wrapped, len);
 
 				// saving private key file (binary mode)
 				fp = _wfopen(filename, L"wb");

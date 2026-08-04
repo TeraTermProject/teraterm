@@ -417,7 +417,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	// ファイルをすべて読み込む
 	for (;;) {
 		len = fread(buf, 1, sizeof(buf), fp);
-		buffer_append(blob, buf, len);
+		buffer_put(blob, buf, len);
 		if (buffer_len(blob) > MAX_KEY_FILE_SIZE) {
 			logprintf(LOG_LEVEL_WARNING, "%s: key file too large.", __FUNCTION__);
 			goto error;
@@ -1111,7 +1111,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			goto error;
 		}
 		buffer_clear(private_blob);
-		buffer_append(private_blob, decrypted, len);
+		buffer_put(private_blob, decrypted, len);
 		free(decrypted);
 		cipher_free_SSH2(cc);
 	}
@@ -1287,7 +1287,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		if ((exponent = BN_new()) == NULL)
 			goto ecdsa_error;
 
-		buffer_get_ecpoint(public_blob, EC_KEY_get0_group(result->ecdsa), q);
+		buffer_get_ec(public_blob, q, EC_KEY_get0_group(result->ecdsa));
 		buffer_get_bignum2(private_blob, exponent);
 		if (EC_KEY_set_public_key(result->ecdsa, q) != 1)
 			goto ecdsa_error;
@@ -1513,7 +1513,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	chain = BIO_push(b64, bmem);
 	BIO_set_mem_eof_return(chain, 0);
 	while ((len2 = BIO_read(chain, buf, sizeof(buf))) > 0) {
-		buffer_append(blob, buf, len2);
+		buffer_put(blob, buf, len2);
 	}
 	BIO_free_all(chain);
 	buffer_rewind(blob);
@@ -1621,14 +1621,14 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 			cipher_free_SSH2(cc);
 			goto error;
 		}
-		buffer_append(blob2, decrypted, len);
+		buffer_put(blob2, decrypted, len);
 		free(decrypted);
 		cipher_free_SSH2(cc);
 
 		*invalid_passphrase = TRUE;
 	}
 	else { // none
-		buffer_append(blob2, blob->buf + blob->offset, len);
+		buffer_put(blob2, blob->buf + blob->offset, len);
 	}
 	buffer_rewind(blob2);
 

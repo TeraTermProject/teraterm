@@ -159,7 +159,7 @@ static void sftp_console_message(PTInstVar pvar, Channel_t *c, char *fmt, ...)
 //
 // buffer_t
 //    +---------+------------------------------------+
-//    | msg_len | data                               |  
+//    | msg_len | data                               |
 //    +---------+------------------------------------+
 //       4byte   <------------- msg_len ------------->
 //
@@ -172,7 +172,7 @@ static void sftp_buffer_alloc(buffer_t **message)
 		goto error;
 	}
 	// Message length(4byte)
-	buffer_put_int(msg, 0); 
+	buffer_put_int(msg, 0);
 
 	*message = msg;
 
@@ -209,7 +209,7 @@ static void sftp_get_msg(PTInstVar pvar, Channel_t *c, unsigned char *data, unsi
 	// バッファを確保し、データをすべて放り込む。以降は buffer_t 型を通して操作する。
 	// そうしたほうが OpenSSH のコードとの親和性が良くなるため。
 	buffer_clear(msg);
-	buffer_append(msg, data, buflen);
+	buffer_put(msg, data, buflen);
 	buffer_rewind(msg);
 
 	if (buffer_get_int(msg, &msg_len) != 0) {
@@ -262,7 +262,7 @@ void sftp_do_init(PTInstVar pvar, Channel_t *c)
 
 	// ネゴシエーションの開始
 	sftp_buffer_alloc(&msg);
-	buffer_put_char(msg, SSH2_FXP_INIT); 
+	buffer_put_char(msg, SSH2_FXP_INIT);
 	buffer_put_int(msg, SSH2_FILEXFER_VERSION);
 	sftp_send_msg(pvar, c, msg);
 	sftp_buffer_free(msg);
@@ -346,7 +346,7 @@ static void sftp_do_realpath(PTInstVar pvar, Channel_t *c, char *path)
 
 /* Convert from SSH2_FX_ status to text error message */
 static const char *fx2txt(int status)
-{       
+{
     switch (status) {
     case SSH2_FX_OK:
         return("No error");
@@ -385,7 +385,7 @@ static char *sftp_do_realpath_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 		goto error;
 	}
 
-	expected_id = c->sftp.msg_id - 1; 
+	expected_id = c->sftp.msg_id - 1;
 	if (id != expected_id) {
 		sftp_syslog(pvar, "ID mismatch (%u != %u)", id, expected_id);
 		goto error;
@@ -430,14 +430,14 @@ error:
 
 u_int
 sftp_proto_version(struct sftp *conn)
-{       
+{
     return conn->version;
-} 
+}
 
 static void
 help(void)
 {
-	sftp_console_message(g_pvar, g_channel, 
+	sftp_console_message(g_pvar, g_channel,
 		"Available commands:\r\n"
 	    "bye                                Quit sftp\r\n"
 	    "cd path                            Change remote directory to 'path'\r\n"
@@ -482,7 +482,7 @@ help(void)
  *
  * If "lastquote" is not NULL, the quoting character used for the last
  * argument is placed in *lastquote ("\0", "'" or "\"").
- * 
+ *
  * If "terminated" is not NULL, *terminated will be set to 1 when the
  * last argument's quote has been properly terminated or 0 otherwise.
  * This parameter is only of use if "sloppy" is set.
@@ -527,7 +527,7 @@ makeargv(const char *arg, int *argcp, int sloppy, char *lastquote,
 				state = q;
 				if (lastquote != NULL)
 					*lastquote = arg[i];
-			} else if (state == MA_UNQUOTED) 
+			} else if (state == MA_UNQUOTED)
 				state = q;
 			else if (state == q)
 				state = MA_UNQUOTED;
@@ -1176,8 +1176,8 @@ void sftp_response(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned i
 		sftp_do_init_recv(pvar, c, msg);
 
 		// コンソールを起動する。
-		hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_SFTP_DIALOG), 
-				pvar->cv->HWin, (DLGPROC)OnSftpConsoleDlgProc);	
+		hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_SFTP_DIALOG),
+				pvar->cv->HWin, (DLGPROC)OnSftpConsoleDlgProc);
 		if (hDlgWnd != NULL) {
 			c->sftp.console_window = hDlgWnd;
 			ShowWindow(hDlgWnd, SW_SHOW);

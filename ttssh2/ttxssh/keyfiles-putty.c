@@ -106,7 +106,7 @@ BOOL ppk_read_blob(FILE* fp, int nlines, buffer_t *blob)
 	chain = BIO_push(b64, bmem);
 	BIO_set_mem_eof_return(chain, 0);
 	while ((len = BIO_read(chain, buf, sizeof(buf))) > 0) {
-		buffer_append(blob, buf, len);
+		buffer_put(blob, buf, len);
 	}
 	BIO_free_all(chain);
 
@@ -298,7 +298,7 @@ void ssh2_ppk_derive_keys(
 			            tag, taglen,
 			            NULL, 0,
 			            params->type, 0x13);
-			buffer_append(storage, tag, taglen);
+			buffer_put(storage, tag, taglen);
 
 			free(tag);
 
@@ -320,7 +320,7 @@ void ssh2_ppk_derive_keys(
 				EVP_DigestUpdate(ctx, u, 4);
 				EVP_DigestUpdate(ctx, passphrase, strlen(passphrase));
 				EVP_DigestFinal(ctx, buf, &len);
-				buffer_append(storage, buf, 20);
+				buffer_put(storage, buf, 20);
 				cipherkey_write_byte += 20;
 			}
 			// TTSSH の buffer_t には shrink する関数がないので、
@@ -338,7 +338,7 @@ void ssh2_ppk_derive_keys(
 			EVP_DigestUpdate(ctx, "putty-private-key-file-mac-key", 30);
 			EVP_DigestUpdate(ctx, passphrase, strlen(passphrase));
 			EVP_DigestFinal(ctx, buf, &len);
-			buffer_append(storage, buf, mac_keylen);
+			buffer_put(storage, buf, mac_keylen);
 
 			EVP_MD_CTX_free(ctx);
 

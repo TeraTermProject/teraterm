@@ -47,45 +47,46 @@ buffer_t *buffer_init(void);
 void buffer_clear(buffer_t *buf);
 void buffer_free(buffer_t *buf);
 
-int buffer_len(buffer_t *msg);
-int buffer_remain_len(buffer_t *msg);
-char *buffer_ptr(buffer_t *msg);
-char *buffer_tail_ptr(buffer_t *msg);
+/* バッファ全体の長さ */
+int buffer_len(buffer_t *buf);
+/* まだ読み込んでいない残りのサイズを返す。OpenSSH の sshbuf_len() に相当 */
+int buffer_remain_len(buffer_t *buf);
+/* バッファの先頭のポインタを返す */
+char *buffer_ptr(buffer_t *buf);
+/* 現在のポインタを返す。OpenSSH の sshbuf_ptr() に相当 */
+char *buffer_tail_ptr(buffer_t *buf);
 
 void buffer_consume(buffer_t *buf, size_t shift_byte);
 void buffer_consume_end(buffer_t *buf, size_t shift_byte);
 void buffer_rewind(buffer_t *buf);
 void *buffer_append_space(buffer_t * buf, size_t size);
 
-int buffer_get(buffer_t *msg, void *buf, size_t len);
-int buffer_append(buffer_t *buf, const void *ptr, size_t size);
-int buffer_append_length(buffer_t *msg, const void *ptr, size_t size);
-void buffer_put_raw(buffer_t *msg, const void *ptr, size_t size);
+int buffer_get(buffer_t *buf, void *v, size_t len);
+int buffer_put(buffer_t *buf, const void *v, size_t len);
 
 int buffer_get_int(buffer_t *buf, unsigned int *valp);
-void buffer_put_int(buffer_t *msg, int value);
+void buffer_put_int(buffer_t *buf, int val);
 
 int buffer_get_char(buffer_t *buf, u_char *valp);
-void buffer_put_char(buffer_t *msg, int value);
+void buffer_put_char(buffer_t *buf, int val);
 
-void *buffer_get_string(buffer_t *msg, int *buflen_ptr);
-void buffer_put_string(buffer_t *msg, const char *ptr, size_t size);
-void buffer_put_cstring(buffer_t *msg, const char *ptr);
-void buffer_put_stringb(buffer_t *msg, buffer_t *v);
-void buffer_put_padding(buffer_t *msg, size_t size);
+void *buffer_get_string(buffer_t *buf, int *lenp);
+void buffer_put_string(buffer_t *buf, const char *v, size_t len);
+void buffer_put_cstring(buffer_t *buf, const char *v);
+void buffer_put_stringb(buffer_t *buf, buffer_t *v);
 
-void buffer_put_bignum(buffer_t *buffer, const BIGNUM *value);
+void buffer_put_bignum1(buffer_t *buf, const BIGNUM *v);
 
-void buffer_get_bignum2(buffer_t *msg, BIGNUM *value);
-void buffer_put_bignum2(buffer_t *msg, const BIGNUM *value);
+void buffer_get_bignum2(buffer_t *buf, BIGNUM *v);
+void buffer_put_bignum2(buffer_t *buf, const BIGNUM *v);
 int buffer_put_bignum2_bytes(buffer_t *buf, const void *v, size_t len);
 
-void buffer_get_bignum_SECSH(buffer_t *buffer, BIGNUM *value);
+void buffer_get_bignum_SECSH(buffer_t *buf, BIGNUM *v);
 
-void buffer_get_ecpoint(buffer_t *msg, const EC_GROUP *curve, EC_POINT *point);
-void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *point);
+void buffer_get_ec(buffer_t *buf, EC_POINT *v, const EC_GROUP *g);
+void buffer_put_ec(buffer_t *buf, const EC_POINT *v, const EC_GROUP *g);
 
-int buffer_overflow_verify(buffer_t *msg, size_t len);
+int buffer_overflow_verify(buffer_t *buf, size_t len);
 int buffer_compress(z_stream *zstream, char *payload, size_t len, buffer_t *compbuf);
 int buffer_decompress(z_stream *zstream, char *payload, size_t len, buffer_t *compbuf);
 

@@ -399,7 +399,7 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	if (b == NULL)
 		goto error;
 
-	buffer_append(b, signature, signaturelen);
+	buffer_put(b, signature, signaturelen);
 	buffer_rewind(b);
 
 	ktype = buffer_get_string(b, NULL);
@@ -466,7 +466,7 @@ static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int s
 	if (b == NULL)
 		goto error;
 
-	buffer_append(b, signature, signaturelen);
+	buffer_put(b, signature, signaturelen);
 	buffer_rewind(b);
 	ktype = buffer_get_string(b, NULL);
 	if (strcmp("ssh-ed25519", ktype) != 0) {
@@ -1286,8 +1286,8 @@ int key_to_blob(Key *key, char **blobp, int *lenp)
 		buffer_put_string(b, sshname, strlen(sshname));
 		tmp = curve_keytype_to_name(key->type);
 		buffer_put_string(b, tmp, strlen(tmp));
-		buffer_put_ecpoint(b, EC_KEY_get0_group(key->ecdsa),
-		                      EC_KEY_get0_public_key(key->ecdsa));
+		buffer_put_ec(b, EC_KEY_get0_public_key(key->ecdsa),
+		                 EC_KEY_get0_group(key->ecdsa));
 		break;
 	case KEY_ED25519:
 		buffer_put_cstring(b, sshname);
@@ -1351,7 +1351,7 @@ Key *key_from_blob(char *data, int blen)
 	if (b == NULL)
 		goto error;
 
-	buffer_append(b, data, blen);
+	buffer_put(b, data, blen);
 	buffer_rewind(b);
 
 	ktype = buffer_get_string(b, NULL);
@@ -1422,7 +1422,7 @@ Key *key_from_blob(char *data, int blen)
 			goto error;
 		}
 
-		buffer_get_ecpoint(b, EC_KEY_get0_group(ecdsa), q);
+		buffer_get_ec(b, q, EC_KEY_get0_group(ecdsa));
 		if (key_ec_validate_public(EC_KEY_get0_group(ecdsa), q) == -1) {
 			goto error;
 		}
@@ -1562,7 +1562,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 
 		s = get_ssh2_hostkey_algorithm_name(keyalgo);
 		buffer_put_string(msg, s, strlen(s));
-		buffer_append_length(msg, sig, slen);
+		buffer_put_string(msg, sig, slen);
 		len = buffer_len(msg);
 
 		// setting
@@ -1612,7 +1612,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		// setting
 		s = get_ssh2_hostkey_type_name_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
-		buffer_append_length(msg, sigblob, sizeof(sigblob));
+		buffer_put_string(msg, sigblob, sizeof(sigblob));
 		len = buffer_len(msg);
 
 		// setting
@@ -1739,8 +1739,8 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 		buffer_put_string(msg, s, strlen(s));
 		tmp = curve_keytype_to_name(keypair->type);
 		buffer_put_string(msg, tmp, strlen(tmp));
-		buffer_put_ecpoint(msg, EC_KEY_get0_group(keypair->ecdsa),
-		                        EC_KEY_get0_public_key(keypair->ecdsa));
+		buffer_put_ec(msg, EC_KEY_get0_public_key(keypair->ecdsa),
+		                   EC_KEY_get0_group(keypair->ecdsa));
 		break;
 	case KEY_ED25519:
 		s = get_ssh2_hostkey_type_name_from_key(keypair);
@@ -1846,8 +1846,8 @@ void key_private_serialize(Key *key, buffer_t *b)
 		case KEY_ECDSA384:
 		case KEY_ECDSA521:
 			buffer_put_cstring(b, curve_keytype_to_name(key->type));
-			buffer_put_ecpoint(b, EC_KEY_get0_group(key->ecdsa),
-				EC_KEY_get0_public_key(key->ecdsa));
+			buffer_put_ec(b, EC_KEY_get0_public_key(key->ecdsa),
+			                 EC_KEY_get0_group(key->ecdsa));
 			buffer_put_bignum2(b, (BIGNUM *)EC_KEY_get0_private_key(key->ecdsa));
 			break;
 
@@ -1958,7 +1958,7 @@ Key *key_private_deserialize(buffer_t *blob)
 			if ((exponent = BN_new()) == NULL)
 				goto ecdsa_error;
 
-			buffer_get_ecpoint(blob, EC_KEY_get0_group(k->ecdsa), q);
+			buffer_get_ec(blob, q, EC_KEY_get0_group(k->ecdsa));
 			buffer_get_bignum2(blob, exponent);
 			if (EC_KEY_set_public_key(k->ecdsa, q) != 1)
 				goto ecdsa_error;
