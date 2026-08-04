@@ -204,7 +204,7 @@ static void sftp_send_msg(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 static void sftp_get_msg(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen, buffer_t **message)
 {
 	buffer_t *msg = *message;
-	int msg_len;
+	unsigned int msg_len;
 
 	// バッファを確保し、データをすべて放り込む。以降は buffer_t 型を通して操作する。
 	// そうしたほうが OpenSSH のコードとの親和性が良くなるため。
@@ -212,7 +212,10 @@ static void sftp_get_msg(PTInstVar pvar, Channel_t *c, unsigned char *data, unsi
 	buffer_append(msg, data, buflen);
 	buffer_rewind(msg);
 
-	msg_len = buffer_get_int(msg);
+	if (buffer_get_int(msg, &msg_len) != 0) {
+		sftp_syslog(pvar, "Message length error");
+		goto error;
+	}
 	if (msg_len > SFTP_MAX_MSG_LENGTH) {
 		// TODO:
 		sftp_syslog(pvar, "Received message too long %u", msg_len);
@@ -269,13 +272,18 @@ void sftp_do_init(PTInstVar pvar, Channel_t *c)
 
 static void sftp_do_init_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 {
-	unsigned int type;
+	u_char type;
 
-	type = buffer_get_char(msg);
+	if (buffer_get_char(msg, &type) != 0) {
+		goto error;
+	}
 	if (type != SSH2_FXP_VERSION) {
 		goto error;
 	}
-	c->sftp.version = buffer_get_int(msg);
+	if (buffer_get_int(msg, &c->sftp.version) != 0) {
+		sftp_syslog(pvar, "SFTP server version %u, remote version missing", type);
+		goto error;
+	}
 	sftp_syslog(pvar, "SFTP server version %u, remote version %u", type, c->sftp.version);
 
 	while (buffer_remain_len(msg) > 0) {
@@ -366,11 +374,16 @@ static const char *fx2txt(int status)
 
 static char *sftp_do_realpath_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 {
-	unsigned int type, expected_id, count, id;
+	u_char type;
+	unsigned int expected_id, count, id;
 	char *filename = NULL, *longname;
 
-	type = buffer_get_char(msg);
-	id = buffer_get_int(msg);
+	if (buffer_get_char(msg, &type) != 0) {
+		goto error;
+	}
+	if (buffer_get_int(msg, &id) != 0) {
+		goto error;
+	}
 
 	expected_id = c->sftp.msg_id - 1; 
 	if (id != expected_id) {
@@ -379,17 +392,24 @@ static char *sftp_do_realpath_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 	}
 
 	if (type == SSH2_FXP_STATUS) {
-		unsigned int status = buffer_get_int(msg);
+		unsigned int status;
+		if (buffer_get_int(msg, &status) != 0) {
+			sftp_syslog(pvar, "status missing");
+			goto error;
+		}
 
 		sftp_syslog(pvar, "Couldn't canonicalise: %s", fx2txt(status));
 		goto error;
 	} else if (type != SSH2_FXP_NAME) {
-        sftp_syslog(pvar, "Expected SSH2_FXP_NAME(%u) packet, got %u",
-            SSH2_FXP_NAME, type);
+		sftp_syslog(pvar, "Expected SSH2_FXP_NAME(%u) packet, got %u",
+		            SSH2_FXP_NAME, type);
 		goto error;
 	}
 
-	count = buffer_get_int(msg);
+	if (buffer_get_int(msg, &count) != 0) {
+		sftp_syslog(pvar, "count missing");
+		goto error;
+	}
 	if (count != 1) {
 		sftp_syslog(pvar, "Got multiple names (%d) from SSH_FXP_REALPATH", count);
 		goto error;

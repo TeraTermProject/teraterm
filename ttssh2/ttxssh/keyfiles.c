@@ -521,7 +521,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	}
 
 	/* number of keys */
-	if (buffer_get_int_ret(&nkeys, copy_consumed) < 0) {
+	if (buffer_get_int(copy_consumed, &nkeys) != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: key counter missing", __FUNCTION__);
 		goto error;
 	}
@@ -539,7 +539,10 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	free(cp); /* XXX check pubkey against decrypted private key */
 
 	/* size of encrypted key blob */
-	len = buffer_get_int(copy_consumed);
+	if (buffer_get_int(copy_consumed, &len) != 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: encrypted data missing", __FUNCTION__);
+		goto error;
+	}
 	blocksize = get_cipher_block_size(cipher);
 	authlen = 0;  // TODO: とりあえず固定化
 	if (len < blocksize) {
@@ -561,7 +564,10 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 			logprintf(LOG_LEVEL_ERROR, "%s: salt not set", __FUNCTION__);
 			goto error;
 		}
-		rounds = buffer_get_int(kdf);
+		if (buffer_get_int(kdf, &rounds) != 0) {
+			logprintf(LOG_LEVEL_ERROR, "%s: rounds missing", __FUNCTION__);
+			goto error;
+		}
 		// TODO: error check
 		if (bcrypt_pbkdf(passphrase, strlen(passphrase), salt, slen,
 		    key, keylen + ivlen, rounds) < 0) {
@@ -586,8 +592,8 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	}
 
 	/* check bytes */
-	if (buffer_get_int_ret(&check1, b) < 0 ||
-	    buffer_get_int_ret(&check2, b) < 0) {
+	if (buffer_get_int(b, &check1) != 0 ||
+	    buffer_get_int(b, &check2) != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: check bytes missing", __FUNCTION__);
 		goto error;
 	}
@@ -606,7 +612,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 
 	i = 0;
 	while (buffer_remain_len(b)) {
-		if (buffer_get_char_ret(&pad, b) == -1 ||
+		if (buffer_get_char(b, &pad) != 0 ||
 		    pad != (++i & 0xff)) {
 			logprintf(LOG_LEVEL_ERROR, "%s: bad padding", __FUNCTION__);
 			key_free(keyfmt);
@@ -1517,18 +1523,27 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		strncpy_s(errmsg, errmsg_len, "key body not present", _TRUNCATE);
 		goto error;
 	}
-	i = buffer_get_int(blob);
+	if (buffer_get_int(blob, &i) != 0) {
+		strncpy_s(errmsg, errmsg_len, "magic number missing", _TRUNCATE);
+		goto error;
+	}
 	if (i != 0x3f6ff9eb) {
 		strncpy_s(errmsg, errmsg_len, "magic number error", _TRUNCATE);
 		goto error;
 	}
-	len = buffer_get_int(blob);
+	if (buffer_get_int(blob, &len) != 0) {
+		strncpy_s(errmsg, errmsg_len, "body missing", _TRUNCATE);
+		goto error;
+	}
 	if (len == 0 || len > buffer_len(blob)) {
 		strncpy_s(errmsg, errmsg_len, "body size error", _TRUNCATE);
 		goto error;
 	}
 
-	len = buffer_get_int(blob);
+	if (buffer_get_int(blob, &len) != 0) {
+		strncpy_s(errmsg, errmsg_len, "key type missing", _TRUNCATE);
+		goto error;
+	}
 	if (strncmp(blob->buf + blob->offset, "if-modn{sign{rsa", strlen("if-modn{sign{rsa") - 1) == 0) {
 		result->type = KEY_RSA;
 	}
@@ -1544,7 +1559,10 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	}
 	buffer_consume(blob, len);
 
-	len = buffer_get_int(blob);
+	if (buffer_get_int(blob, &len) != 0) {
+		strncpy_s(errmsg, errmsg_len, "encryption type missing", _TRUNCATE);
+		goto error;
+	}
 	encname = (char *)malloc(len + 1);
 	strncpy_s(encname, len + 1, blob->buf + blob->offset, _TRUNCATE);
 	if (strcmp(encname, "3des-cbc") == 0) {
@@ -1559,7 +1577,10 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	}
 	buffer_consume(blob, len);
 
-	len = buffer_get_int(blob);
+	if (buffer_get_int(blob, &len) != 0) {
+		strncpy_s(errmsg, errmsg_len, "body missing", _TRUNCATE);
+		goto error;
+	}
 	if (len > (blob->len - blob->offset)) {
 		strncpy_s(errmsg, errmsg_len, "body size error", _TRUNCATE);
 		goto error;
@@ -1611,7 +1632,10 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	}
 	buffer_rewind(blob2);
 
-	len = buffer_get_int(blob2);
+	if (buffer_get_int(blob2, &len) != 0) {
+		strncpy_s(errmsg, errmsg_len, "blob missing", _TRUNCATE);
+		goto error;
+	}
 	if (len <= 0 || len > (blob2->len - blob2->offset)) {
 		strncpy_s(errmsg, errmsg_len, "blob size error", _TRUNCATE);
 		goto error;
@@ -1681,7 +1705,10 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 			goto error;
 		}
 
-		param = buffer_get_int(blob2);
+		if (buffer_get_int(blob2, &param) != 0) {
+			strncpy_s(errmsg, errmsg_len, "predefined DSA parameters missing", _TRUNCATE);
+			goto error;
+		}
 		if (param != 0) {
 			strncpy_s(errmsg, errmsg_len, "predefined DSA parameters not supported", _TRUNCATE);
 			goto error;
@@ -1703,7 +1730,10 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		EC_POINT *q = NULL;
 		BN_CTX *ctx = NULL;
 
-		dummy = buffer_get_int(blob2);
+		if (buffer_get_int(blob2, &dummy) != 0) {
+			strncpy_s(errmsg, errmsg_len, "dummy missing", _TRUNCATE);
+			goto error;
+		}
 		curve = buffer_get_string(blob2, NULL);
 
 		if (strncmp(curve, "nistp256", strlen("nistp256")) == 0) {

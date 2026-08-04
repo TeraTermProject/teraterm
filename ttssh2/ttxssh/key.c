@@ -408,19 +408,22 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 		goto error;
 	}
 
-	len = buffer_get_int(b);
-
-	/* parse signature */
-	if ((sig = ECDSA_SIG_new()) == NULL) {
+	if (buffer_get_int(b, &len) != 0) {
 		ret = -4;
 		goto error;
 	}
-	if ((r = BN_new()) == NULL) {
+
+	/* parse signature */
+	if ((sig = ECDSA_SIG_new()) == NULL) {
 		ret = -5;
 		goto error;
 	}
-	if ((s = BN_new()) == NULL) {
+	if ((r = BN_new()) == NULL) {
 		ret = -6;
+		goto error;
+	}
+	if ((s = BN_new()) == NULL) {
+		ret = -7;
 		goto error;
 	}
 

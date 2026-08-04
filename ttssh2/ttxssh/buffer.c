@@ -44,6 +44,7 @@
 #include "openbsd-compat.h"
 
 #include "buffer.h"
+#include "ssherr.h"
 
 /* buffer_t.buf の拡張の上限値 (16MB) */
 #define BUFFER_SIZE_MAX 0x1000000
@@ -200,57 +201,38 @@ void buffer_put_raw(buffer_t *msg, const void *ptr, size_t size)
 	ret = buffer_append(msg, ptr, size);
 }
 
-int buffer_get_ret(buffer_t *msg, void *buf, size_t len)
+int buffer_get(buffer_t *buf, void *v, size_t len)
 {
-	if (len > msg->len - msg->offset) {
+	if (len > buf->len - buf->offset) {
 		// TODO: エラー処理
-		OutputDebugPrintf("buffer_get_ret: trying to get more bytes %u than in buffer %u",
-		    len, msg->len - msg->offset);
-		return (-1);
+		OutputDebugPrintf("buffer_get: trying to get more bytes %u than in buffer %u",
+		                  len, buf->len - buf->offset);
+		return SSH_ERR_MESSAGE_INCOMPLETE;
 	}
-	memcpy(buf, msg->buf + msg->offset, len);
-	msg->offset += len;
-	return (0);
+	memcpy(v, buf->buf + buf->offset, len);
+	buf->offset += len;
+	return 0;
 }
 
-int buffer_get_int_ret(unsigned int *ret, buffer_t *msg)
+int buffer_get_int(buffer_t *buf, unsigned int *valp)
 {
-	unsigned char buf[4];
+	unsigned char tmp[4];
+	int r;
 
-	if (buffer_get_ret(msg, (char *) buf, 4) == -1)
-		return (-1);
-	if (ret != NULL)
-		*ret = get_uint32(buf);
-	return (0);
+	if ((r = buffer_get(buf, (char *)tmp, 4)) != 0)
+		return r;
+	if (valp != NULL)
+		*valp = get_uint32(tmp);
+	return 0;
 }
 
-unsigned int buffer_get_int(buffer_t *msg)
+int buffer_get_char(buffer_t *buf, u_char *valp)
 {
-	unsigned int ret = 0;
+	int r;
 
-	if (buffer_get_int_ret(&ret, msg) == -1) {
-		// TODO: エラー処理
-		logprintf(LOG_LEVEL_ERROR, "buffer_get_int: buffer error");
-	}
-	return (ret);
-}
-
-int buffer_get_char_ret(char *ret, buffer_t *msg)
-{
-	if (buffer_get_ret(msg, ret, 1) == -1)
-		return (-1);
-	return (0);
-}
-
-int buffer_get_char(buffer_t *msg)
-{
-	char ch;
-
-	if (buffer_get_char_ret(&ch, msg) == -1) {
-		// TODO: エラー処理
-		OutputDebugPrintf("buffer_get_char: buffer error");
-	}
-	return (unsigned char)ch;
+	if ((r = buffer_get(buf, valp, 1)) != 0)
+		return r;
+	return 0;
 }
 
 // NOTE: You should free the return pointer if it's unused.
@@ -483,7 +465,9 @@ void buffer_get_bignum_SECSH(buffer_t *buffer, BIGNUM *value)
 	char *buf;
 	unsigned int bits, bytes;
 
-	bits = buffer_get_int(buffer);
+	if (buffer_get_int(buffer, &bits) != 0) {
+		return;
+	}
 	bytes = (bits + 7) / 8;
 
 	if ((buffer->len - buffer->offset) < bytes) {
