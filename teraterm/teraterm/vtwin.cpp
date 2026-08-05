@@ -556,52 +556,41 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	WNDCLASSW wc;
 	RECT rect;
 	DWORD Style;
-	BOOL isFirstInstance;
 	m_hInst = hInstance;
 
 	CommInit(&cv);
 	cv.ts = &ts;
-	isFirstInstance = StartTeraTerm(&ts);
+	StartTeraTerm(&ts);
 
 	TTXInit(&ts, &cv); /* TTPLUG */
 
 	MsgDlgHelp = RegisterWindowMessage(HELPMSGSTRING);
 
-	ParseFOption(&ts);
-
-	if (isFirstInstance) {
-		/* first instance */
-		if (LoadTTSET()) {
-			/* read setup info from "teraterm.ini" */
-			(*ReadIniFile)(ts.SetupFNameW, &ts);
-			FreeTTSET();
-		}
-		else {
-			abort();
-		}
-
-	} else {
-		// 2つめ以降のプロセスにおいても、ディスクから TERATERM.INI を読む。(2004.11.4 yutaka)
-		if (LoadTTSET()) {
-			/* read setup info from "teraterm.ini" */
-			(*ReadIniFile)(ts.SetupFNameW, &ts);
-			FreeTTSET();
-		}
-		else {
-			abort();
-		}
-	}
-
-	/* Parse command line parameters*/
-	if (LoadTTSET()) {
+	/* Parse command line parameters */
+	{
 		// GetCommandLineW() in MSDN remark
 		//  The lifetime of the returned value is managed by the
 		//  system, applications should not free or modify this value.
 		wchar_t *ParamW = _wcsdup(GetCommandLineW());
-		(*ParseParam)(ParamW, &ts, &(TopicName[0]));
+		ParseFOption(ParamW, &ts);
 		free(ParamW);
+
+		if (LoadTTSET()) {
+			/* read setup info from "teraterm.ini" */
+			(*ReadIniFile)(ts.SetupFNameW, &ts);
+			FreeTTSET();
+		}
+		else {
+			abort();
+		}
+
+		if (LoadTTSET()) {
+			wchar_t *ParamW = _wcsdup(GetCommandLineW());
+			(*ParseParam)(ParamW, &ts, &(TopicName[0]));
+			free(ParamW);
+		}
+		FreeTTSET();
 	}
-	FreeTTSET();
 
 	// duplicate sessionの指定があるなら、共有メモリからコピーする (2004.12.7 yutaka)
 	if (ts.DuplicateSession == 1) {
@@ -4045,10 +4034,13 @@ void CVTWindow::OnDuplicateSession()
 		wcsncat_s(Command, _countof(Command), ts.KeyCnfFNW, _TRUNCATE);
 	}
 
-	if (ParseFOption(&ts)) {
+	wchar_t *setup_def = GetDefaultSetupFNameW(NULL);
+	if (wcscmp(setup_def, ts.SetupFNameW) != 0) {
+		// INIファイルがデフォルトと異なっている、/F= で指定する
 		wcsncat_s(Command, _countof(Command), L" /F=", _TRUNCATE);
 		wcsncat_s(Command, _countof(Command), ts.SetupFNameW, _TRUNCATE);
 	}
+	free(setup_def);
 
 	wchar_t *hostnameW = ToWcharA(ts.HostName);
 	const wchar_t *commandline = wcschr(Command, L' ') + 1;	// 実行ファイル名以降

@@ -621,8 +621,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			free(commandline);
 			free(tmp_u8);
 			if (prev_setup != NULL && _wcsicmp(prev_setup, ts.SetupFNameW) != 0) {
-				/* /F= で設定ファイルが読み直された。色,フォント,メニューを表示へ再適用する */
-				DispApplySetup(vt_src, &ts);
+				/* /F= で設定ファイルが変更された。読み直して表示へ再適用する */
+				PostMessage(HVTWin, WM_USER_ACCELCOMMAND, IdCmdRestoreSetup, 0);
 			}
 			free(prev_setup);
 		}
