@@ -3608,17 +3608,28 @@ static wchar_t *GetFilePath(const wchar_t *command_line, const wchar_t *default_
 	return full_path;
 }
 
-BOOL ParseFOption(PTTSet ts) {
-	wchar_t Temp[MaxStrLen]; // ttpmacroから呼ばれることを想定しMaxStrLenサイズとする
-	wchar_t *Param, *start, *cur, *next;
+/**
+ *	コマンドラインの /F= を解釈して ts->SetupFNameW にセットする
+ *	(ANSI版 ts->SetupFName にもセットする, 廃止予定)
+ *
+ *	@param[in]	command_line (内容は破壊される)
+ *				the first term shuld be executable filename of Tera Term
+ *	@param[out]	ts
+ *	@retval		TRUE	/F= が存在した
+ *	@retval		FALSE	/F= が存在しない
+ *
+ *	@todo 初期化時にしか使用していない, 初期化近辺に移動して static 化
+ *	@todo GetParam() の引数3 は const, 戻り値 const, 動的文字バッファ版が必要
+ */
+BOOL ParseFOption(const wchar_t *command_line, PTTSet ts)
+{
+	wchar_t Temp[MaxStrLen]; // パラメータを取り出す文字バッファ
+	const wchar_t *cur;
+	const wchar_t *next;
 	BOOL isFopt = FALSE;
 
-	/* the first term shuld be executable filename of Tera Term */
-	Param = _wcsdup(GetCommandLineW());
-	start = GetParam(Temp, _countof(Temp), Param);
-
-	cur = start;
-	while ((next = GetParam(Temp, _countof(Temp), cur))) {
+	cur = GetParam(Temp, _countof(Temp), (wchar_t *)command_line);
+	while ((next = GetParam(Temp, _countof(Temp), (wchar_t *)cur))) {
 		DequoteParam(Temp, _countof(Temp), Temp);
 		if (_wcsnicmp(Temp, L"/F=", 3) == 0) {	/* setup filename */
 			isFopt = TRUE;
@@ -3637,7 +3648,6 @@ BOOL ParseFOption(PTTSet ts) {
 		}
 		cur = next;
 	}
-	free(Param);
 	return isFopt;
 }
 

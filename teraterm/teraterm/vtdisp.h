@@ -98,6 +98,7 @@ void DispEnableCaret(vtdraw_t *vt, BOOL On);
 BOOL IsCaretEnabled(void);
 void DispSetCaretWidth(BOOL DW);
 void DispChangeWinSize(vtdraw_t *vt, int Nx, int Ny);
+void DispApplySetup(vtdraw_t *vt, const TTTSet *pts);
 void ResizeWindow(vtdraw_t *vt, int x, int y, int w, int h, int cw, int ch);
 ttdc_t *PaintWindow(vtdraw_t *vt, HDC PaintDC, RECT PaintRect, BOOL fBkGnd,
 		 int* Xs, int* Ys, int* Xe, int* Ye);
