@@ -103,7 +103,7 @@ void ParseParam(void)
 	start = GetParam(Temp, _countof(Temp), Param);
 	ParamCnt = 0;
 
-	for (cur = start; next = GetParam(Temp, sizeof(Temp), cur); cur = next) {
+	for (cur = start; next = GetParam(Temp, _countof(Temp), cur); cur = next) {
 		DequoteParam(Temp, _countof(Temp), Temp);
 		if (ParamCnt == 0) {
 			if (_wcsnicmp(Temp,L"/D=",3)==0) { // DDE option

@@ -59,10 +59,10 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
   int x, y;
 
   /* the first term shuld be executable filename of Tera Term */
-  start = GetParam(buff, sizeof(buff), Param);
+  start = GetParam(buff, _countof(buff), Param);
 
   cur = start;
-  while (next = GetParam(buff, sizeof(buff), cur)) {
+  while (next = GetParam(buff, _countof(buff), cur)) {
     if (_wcsnicmp(buff, L"/FG=", 4) == 0) {
       ColorStr2ColorRef(&(ts->VTColor[0]), &buff[4]);
       wmemset(cur, ' ', next - cur);

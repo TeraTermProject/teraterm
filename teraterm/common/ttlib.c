@@ -876,6 +876,11 @@ char *strelapsed(DWORD start_time)
 	return strA;
 }
 
+/**
+ *	@param[in]	buff	パラメータを入れるバッファ
+ *	@param[in]	size	buffer文字数(bytes = size*sizeof(wchar_t))
+ *	@retval		NULL 終了
+ */
 wchar_t * PASCAL GetParam(wchar_t *buff, size_t size, wchar_t *param)
 {
 	wchar_t *tmp;
