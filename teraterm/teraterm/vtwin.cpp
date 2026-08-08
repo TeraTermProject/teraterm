@@ -647,17 +647,26 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 
 	InitSettings();
 
-	// duplicate sessionの指定があるなら、共有メモリからコピーする (2004.12.7 yutaka)
-	if (ts.DuplicateSession == 1) {
+	// "/DUPLICATE" オプションがあると ts.DuplicateSession == 1となる
+	// 共有メモリに複製元の設定がない場合もチェック
+	if (ts.DuplicateSession == 1 && IsShmemAvailable()) {
 		// 共有メモリの座標は複製元の現在のウィンドウ座標になる。
 		// 上で読み込んだ TERATERM.INI の値を使いたいので、待避して戻す。
 		POINT VTPos = ts.VTPos;
 		POINT TEKPos = ts.TEKPos;
+		wchar_t *macro = NULL;
+		if (ts.MacroFNW != NULL) {
+			macro = _wcsdup(ts.MacroFNW);
+		}
 
+		// 複製元の設定を共有メモリから引き継ぐ
+		//   /F で指定したINIファイルを読み込んでいても上書きされる
 		CopyShmemToTTSet(&ts);
 
 		ts.VTPos = VTPos;
 		ts.TEKPos = TEKPos;
+		ts.MacroFNW = macro;
+		ts.HostName[0] = 0;
 	}
 
 	InitKeyboard();
@@ -4048,9 +4057,6 @@ static BOOL IsCygterm()
 // すでに開いているセッションの複製を作る
 void CVTWindow::OnDuplicateSession()
 {
-	// 現在の設定内容を共有メモリへコピーしておく
-	CopyTTSetToShmem(&ts);
-
 	if (IsCygterm()) {
 		// cygwin接続
 		OnCygwinConnection();
@@ -4062,47 +4068,65 @@ void CVTWindow::OnDuplicateSession()
 		return;
 	}
 
-	const char *exec = "ttermpro";	// 仮実行ファイル名
-	wchar_t Command[1024];
-	Command[0] = 0;
+	// 現在の設定内容(ts)を共有メモリへコピーしておく
+	//	 (INIファイルに保存されていなくても)設定を複製先に引き継ぐことができる。
+	//	 "/DUPLICATE" オプション付きで起動すると
+	//	 CopyShmemToTTSet()で共有メモリから設定にリストアされる。
+	//	 /F= でINIファイルを指定しても、"/DUPLICATE" オプションのほうが優先される
+	CopyTTSetToShmem(&ts);
+
+	const char *exec = "ttermpro";			// 仮実行ファイル名
+	wchar_t ExecOption[1024];			    // ttermpro.exe の引数(起動時オプション)
+	wchar_t Command[1024];				    // connect コマンドの追加オプション
+	const wchar_t* connect_option = NULL;	// connect コマンドの追加オプション
+
+	// セッションの複製を示すオプション
+	wcscpy_s(ExecOption, _countof(ExecOption), L"/DUPLICATE");
 
 	if (cv.TelFlag) {
 		// telnet
-		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
-					 L"%hs /DUPLICATE /nossh", exec);
+		connect_option = L"/nossh";
 
 	} else if (cv.isSSH) {
 		// SSH
+		// SSHの時は、プラグインにオプション生成してもらう
+		// TTSSH は "/DUPLICATE" を見て自動ログイン用オプションを追記する
 		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
 					 L"%hs /DUPLICATE", exec);
-
-		// telnt以外の時は、プラグインにオプション生成してもらう
-		// プラグインからコマンドラインを返す
 		TTXSetCommandLine(Command, _countof(Command), NULL); /* TTPLUG */
+
+		// 実行ファイル名以降を connect のオプションにする
+		//   プラグインは末尾への追記だけでなく挿入も行う(TTSSH の /ssh-consume= 等)
+		//   ため、プラグイン呼び出し前後の差分で切り出すことはできない
+		//   "/DUPLICATE" は ExecOption と重複するが、再度処理されても問題ない
+		connect_option = wcschr(Command, L' ');
+		if (connect_option != NULL) {
+			connect_option++;
+		}
 	} else {
 		// 来ないはず
 		assert(FALSE);
 	}
 
 	if (ts.KeyCnfFNW != NULL) {
-		wcsncat_s(Command, _countof(Command), L" /K=", _TRUNCATE);
-		wcsncat_s(Command, _countof(Command), ts.KeyCnfFNW, _TRUNCATE);
+		wcsncat_s(ExecOption, _countof(ExecOption), L" /K=", _TRUNCATE);
+		wcsncat_s(ExecOption, _countof(ExecOption), ts.KeyCnfFNW, _TRUNCATE);
 	}
 
 	wchar_t *setup_def = GetDefaultSetupFNameW(NULL);
 	if (wcscmp(setup_def, ts.SetupFNameW) != 0) {
 		// INIファイルがデフォルトと異なっている、/F= で指定する
-		wcsncat_s(Command, _countof(Command), L" /F=", _TRUNCATE);
-		wcsncat_s(Command, _countof(Command), ts.SetupFNameW, _TRUNCATE);
+		wcsncat_s(ExecOption, _countof(ExecOption), L" /F=", _TRUNCATE);
+		wcsncat_s(ExecOption, _countof(ExecOption), ts.SetupFNameW, _TRUNCATE);
 	}
 	free(setup_def);
 
 	wchar_t *hostnameW = ToWcharA(ts.HostName);
-	const wchar_t *commandline = wcschr(Command, L' ') + 1;	// 実行ファイル名以降
 	TTDupInfo info = {};
 	info.szHostName = hostnameW;
 	info.port = ts.TCPPort;
-	info.szOption = commandline;
+	info.szConnectOption = connect_option;
+	info.szExecOption = ExecOption;
 	info.mode = TTDUP_COMMANDLINE;
 	DWORD e = ConnectHost(m_hInst, m_hWnd, &info);
 	free(hostnameW);

@@ -61,11 +61,16 @@ static const char DupDataName[] = "dupdata";
 void CopyShmemToTTSet(PTTSet ts)
 {
 	DWORD size = pm->DuplicateDataSizeLow;
-	HANDLE handle = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, size, DupDataName);
-	void *ptr = (void *)MapViewOfFile(handle, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-	TTCMNUnserialize(ptr, (size_t)size, ts);
-	UnmapViewOfFile(ptr);
-	CloseHandle(handle);
+	if (size == 0) {
+		return;
+	}
+	HANDLE handle = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, DupDataName);
+	if (handle != NULL) {
+		void* ptr = (void*)MapViewOfFile(handle, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+		TTCMNUnserialize(ptr, (size_t)size, ts);
+		UnmapViewOfFile(ptr);
+		CloseHandle(handle);
+	}
 	pm->DuplicateDataSizeLow = 0;
 }
 
@@ -88,6 +93,11 @@ void CopyTTSetToShmem(PTTSet ts)
 		pm->DuplicateDataSizeLow = (DWORD)size;
 		free(ptr);
 	}
+}
+
+BOOL IsShmemAvailable(void)
+{
+	return pm->DuplicateDataSizeLow != 0;
 }
 
 static void CopyFiles(const wchar_t *file_list[], const wchar_t *src_dir, const wchar_t *dest_dir)
