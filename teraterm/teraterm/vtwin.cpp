@@ -594,10 +594,12 @@ static void ParseFOption(const wchar_t *command_line, PTTSet ts)
  *	- コマンドラインの /F= から設定ファイル名を決定 (ParseFOption())
  *	- 設定ファイル (TERATERM.INI) の読み込み (ReadIniFile())
  *	- コマンドラインオプションを設定へ反映 (ParseParam())
+ *	- セッション複製時、複製元の設定を共有メモリから引き継ぐ (CopyShmemToTTSet())
+ *	- キーボード設定の初期化 (InitKeyboard(), SetKeyMap())
  *
  *	ウィンドウ作成前に CVTWindow のコンストラクタから1度だけ呼ばれる
  */
-static void InitSettings()
+static void InitSettings(void)
 {
 	CommInit(&cv);
 	cv.ts = &ts;
@@ -608,29 +610,52 @@ static void InitSettings()
 	//   iniファイルの読み込みはこの後に行う
 	TTXInit(&ts, &cv); /* TTPLUG */
 
-	/* Parse command line parameters */
+	// Parse command line parameters
+	// GetCommandLineW() in MSDN remark
+	//  The lifetime of the returned value is managed by the
+	//  system, applications should not free or modify this value.
+	wchar_t *ParamW = _wcsdup(GetCommandLineW());
 
 	// コマンドラインから /F= オプションを先に処理する
-	ParseFOption(GetCommandLineW(), &ts);
+	ParseFOption(ParamW, &ts);
 
-	if (LoadTTSET()) {
-		/* read setup info from "teraterm.ini" */
-		(*ReadIniFile)(ts.SetupFNameW, &ts);
-		FreeTTSET();
-	}
-	else {
+	if (!LoadTTSET()) {
 		abort();
 	}
-
-	if (LoadTTSET()) {
-		// GetCommandLineW() in MSDN remark
-		//  The lifetime of the returned value is managed by the
-		//  system, applications should not free or modify this value.
-		wchar_t *ParamW = _wcsdup(GetCommandLineW());
-		(*ParseParam)(ParamW, &ts, &(TopicName[0]));
-		free(ParamW);
-	}
+	/* read setup info from "teraterm.ini" */
+	(*ReadIniFile)(ts.SetupFNameW, &ts);
 	FreeTTSET();
+
+	LoadTTSET();
+	(*ParseParam)(ParamW, &ts, &(TopicName[0]));
+	FreeTTSET();
+
+	free(ParamW);
+	ParamW = NULL;
+
+	// "/DUPLICATE" オプションがあると ts.DuplicateSession == 1となる
+	// 共有メモリに複製元の設定がない場合もチェック
+	if (ts.DuplicateSession == 1 && IsShmemAvailable()) {
+		// 共有メモリの座標は複製元の現在のウィンドウ座標になる。
+		// 上で読み込んだ TERATERM.INI の値を使いたいので、待避して戻す。
+		POINT VTPos = ts.VTPos;
+		POINT TEKPos = ts.TEKPos;
+		wchar_t *macro = ts.MacroFNW;
+		ts.MacroFNW = NULL;
+
+		// 複製元の設定を共有メモリから引き継ぐ
+		//   /F で指定したINIファイルを読み込んでいても上書きされる
+		CopyShmemToTTSet(&ts);
+
+		ts.VTPos = VTPos;
+		ts.TEKPos = TEKPos;
+		free(ts.MacroFNW);	// 複製元のマクロ指定は使用しない
+		ts.MacroFNW = macro;
+		ts.HostName[0] = 0;
+	}
+
+	InitKeyboard();
+	SetKeyMap();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -646,31 +671,6 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	MsgDlgHelp = RegisterWindowMessage(HELPMSGSTRING);
 
 	InitSettings();
-
-	// "/DUPLICATE" オプションがあると ts.DuplicateSession == 1となる
-	// 共有メモリに複製元の設定がない場合もチェック
-	if (ts.DuplicateSession == 1 && IsShmemAvailable()) {
-		// 共有メモリの座標は複製元の現在のウィンドウ座標になる。
-		// 上で読み込んだ TERATERM.INI の値を使いたいので、待避して戻す。
-		POINT VTPos = ts.VTPos;
-		POINT TEKPos = ts.TEKPos;
-		wchar_t *macro = NULL;
-		if (ts.MacroFNW != NULL) {
-			macro = _wcsdup(ts.MacroFNW);
-		}
-
-		// 複製元の設定を共有メモリから引き継ぐ
-		//   /F で指定したINIファイルを読み込んでいても上書きされる
-		CopyShmemToTTSet(&ts);
-
-		ts.VTPos = VTPos;
-		ts.TEKPos = TEKPos;
-		ts.MacroFNW = macro;
-		ts.HostName[0] = 0;
-	}
-
-	InitKeyboard();
-	SetKeyMap();
 
 	/* window status */
 	AdjustSize = TRUE;
