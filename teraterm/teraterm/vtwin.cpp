@@ -548,6 +548,91 @@ private:
 
 static SerialReconnect *serail_reconnect;
 
+/**
+ *	コマンドラインの /F= を解釈して ts->SetupFNameW にセットする
+ *	(ANSI版 ts->SetupFName にもセットする, 廃止予定)
+ *
+ *	@param[in]	command_line
+ *				the first term shuld be executable filename of Tera Term
+ *	@param[out]	ts
+ */
+static void ParseFOption(const wchar_t *command_line, PTTSet ts)
+{
+	wchar_t *param;
+	const wchar_t *cur;
+	const wchar_t *next;
+
+	cur = GetParamAlloc(command_line, &param);
+	free(param);
+	while (cur != NULL && (next = GetParamAlloc(cur, &param)) != NULL) {
+		DequoteParam(param, wcslen(param) + 1, param);
+		if (_wcsnicmp(param, L"/F=", 3) == 0) {	/* setup filename */
+			wchar_t *f = GetFilePath(&param[3], ts->HomeDirW, L".INI");
+			if (f != NULL) {
+				if (_wcsicmp(ts->SetupFNameW, f) != 0) {
+					free(ts->SetupFNameW);
+					ts->SetupFNameW = f;
+					WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
+				}
+				else {
+					free(f);
+				}
+			}
+			free(param);
+			break;
+		}
+		free(param);
+		cur = next;
+	}
+}
+
+/**
+ *	起動時の初期化, グローバル変数 ts, cv を初期化する
+ *	- 通信関連構造体 cv の初期化 (CommInit())
+ *	- 共有メモリのオープンなどプロセス共通の初期化 (StartTeraTerm())
+ *	- TTX プラグインのロード (TTXInit())
+ *	- コマンドラインの /F= から設定ファイル名を決定 (ParseFOption())
+ *	- 設定ファイル (TERATERM.INI) の読み込み (ReadIniFile())
+ *	- コマンドラインオプションを設定へ反映 (ParseParam())
+ *
+ *	ウィンドウ作成前に CVTWindow のコンストラクタから1度だけ呼ばれる
+ */
+static void InitSettings()
+{
+	CommInit(&cv);
+	cv.ts = &ts;
+	StartTeraTerm(&ts);
+
+	// プラグインの初期化
+	//   ReadIniFile() / ParseParam() のフックが設定される
+	//   iniファイルの読み込みはこの後に行う
+	TTXInit(&ts, &cv); /* TTPLUG */
+
+	/* Parse command line parameters */
+
+	// コマンドラインから /F= オプションを先に処理する
+	ParseFOption(GetCommandLineW(), &ts);
+
+	if (LoadTTSET()) {
+		/* read setup info from "teraterm.ini" */
+		(*ReadIniFile)(ts.SetupFNameW, &ts);
+		FreeTTSET();
+	}
+	else {
+		abort();
+	}
+
+	if (LoadTTSET()) {
+		// GetCommandLineW() in MSDN remark
+		//  The lifetime of the returned value is managed by the
+		//  system, applications should not free or modify this value.
+		wchar_t *ParamW = _wcsdup(GetCommandLineW());
+		(*ParseParam)(ParamW, &ts, &(TopicName[0]));
+		free(ParamW);
+	}
+	FreeTTSET();
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow constructor
 
@@ -558,39 +643,9 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	DWORD Style;
 	m_hInst = hInstance;
 
-	CommInit(&cv);
-	cv.ts = &ts;
-	StartTeraTerm(&ts);
-
-	TTXInit(&ts, &cv); /* TTPLUG */
-
 	MsgDlgHelp = RegisterWindowMessage(HELPMSGSTRING);
 
-	/* Parse command line parameters */
-	{
-		// GetCommandLineW() in MSDN remark
-		//  The lifetime of the returned value is managed by the
-		//  system, applications should not free or modify this value.
-		wchar_t *ParamW = _wcsdup(GetCommandLineW());
-		ParseFOption(ParamW, &ts);
-		free(ParamW);
-
-		if (LoadTTSET()) {
-			/* read setup info from "teraterm.ini" */
-			(*ReadIniFile)(ts.SetupFNameW, &ts);
-			FreeTTSET();
-		}
-		else {
-			abort();
-		}
-
-		if (LoadTTSET()) {
-			wchar_t *ParamW = _wcsdup(GetCommandLineW());
-			(*ParseParam)(ParamW, &ts, &(TopicName[0]));
-			free(ParamW);
-		}
-		FreeTTSET();
-	}
+	InitSettings();
 
 	// duplicate sessionの指定があるなら、共有メモリからコピーする (2004.12.7 yutaka)
 	if (ts.DuplicateSession == 1) {
