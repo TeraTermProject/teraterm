@@ -578,7 +578,7 @@ kex_dh_compute_key(kex *kex, BIGNUM *dh_pub, buffer_t *out)
 	BIGNUM *shared_secret = NULL;
 	u_char *kbuf = NULL;
 	size_t klen = 0;
-	int kout, r = 0;
+	int kout, r;
 
 	if (!dh_pub_is_valid(kex->dh, dh_pub)) {
 		r = SSH_ERR_MESSAGE_INCOMPLETE;
@@ -595,7 +595,7 @@ kex_dh_compute_key(kex *kex, BIGNUM *dh_pub, buffer_t *out)
 		r = SSH_ERR_LIBCRYPTO_ERROR;
 		goto out;
 	}
-	buffer_put_bignum2(out, shared_secret);
+	r = buffer_put_bignum2(out, shared_secret);
  out:
 	SecureZeroMemory(kbuf, klen);
 	BN_clear_free(shared_secret);
@@ -627,7 +627,8 @@ kex_dh_keypair(struct kex* kex)
 	//   len:  4 bytes ... length of mpint data (m)
 	//   data: m bytes ... data part of mpint
 
-	buffer_put_bignum2(buf, pub_key);
+	if ((r = buffer_put_bignum2(buf, pub_key)) != 0)
+		goto out;
 
 	kex->client_pub = buf;
 	buf = NULL;
@@ -656,10 +657,14 @@ kex_dh_dec(kex *kex, buffer_t *dh_blob,
 		goto out;
 	}
 
-	buffer_put_stringb(buf, dh_blob);
+	if ((r = buffer_put_stringb(buf, dh_blob)) != 0) {
+		goto out;
+	}
 	buffer_rewind(buf);
 
-	buffer_get_bignum2(buf, dh_pub);
+	if ((r = buffer_get_bignum2(buf, dh_pub)) != 0) {
+		goto out;
+	}
 	buffer_clear(buf);
 	if ((r = kex_dh_compute_key(kex, dh_pub, buf)) != 0)
 		goto out;
@@ -688,6 +693,7 @@ kex_dh_hash(const digest_algorithm hash_alg,
     char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
+	int r;
 
 	if (*hashlen < ssh_digest_bytes(hash_alg))
 		return SSH_ERR_INVALID_ARGUMENT;
@@ -695,27 +701,36 @@ kex_dh_hash(const digest_algorithm hash_alg,
 	if (b == NULL)
 		return SSH_ERR_ALLOC_FAIL;
 
-	buffer_put_stringb(b, client_version);
-	buffer_put_stringb(b, server_version);
+	if ((r = buffer_put_stringb(b, client_version)) != 0 ||
+	    (r = buffer_put_stringb(b, server_version)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	buffer_put_int(b, buffer_len(client_kexinit) + 1);
-	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit));
-	buffer_put_int(b, buffer_len(server_kexinit) + 1);
-	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit));
-
-	buffer_put_stringb(b, serverhostkeyblob);
+	if ((r = buffer_put_int(b, buffer_len(client_kexinit) + 1)) != 0 ||
+	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	    (r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
+	    (r = buffer_put_int(b, buffer_len(server_kexinit) + 1)) != 0 ||
+	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	    (r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
+	    (r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
+		buffer_free(b);
+		return r;
+	}
+	
 	// OpenSSH:
 	//  off が 4 の sshbuf を sshbuf_put_stringb() する
 	//   「size-off（データの長さ）」と「off 以降のデータ」が格納される
 	// TTSSH:
 	//   「client_pub の最初から最後まで」を buffer_put() する
 	//   先頭にある4バイトの長さからデータの最後までがそのまま格納される
-	buffer_put(b, buffer_ptr(client_pub), buffer_len(client_pub));
-	buffer_put_stringb(b, server_pub);
-	buffer_put(b, buffer_ptr(shared_secret), buffer_len(shared_secret));
+	if ((r = buffer_put(b, buffer_ptr(client_pub), buffer_len(client_pub))) != 0 ||
+	    (r = buffer_put_stringb(b, server_pub)) != 0 ||
+	    (r = buffer_put(b, buffer_ptr(shared_secret), buffer_len(shared_secret))) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
@@ -752,6 +767,7 @@ kexgex_hash(const digest_algorithm hash_alg,
     char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
+	int r;
 
 	if (*hashlen < ssh_digest_bytes(hash_alg))
 		return SSH_ERR_INVALID_ARGUMENT;
@@ -759,34 +775,48 @@ kexgex_hash(const digest_algorithm hash_alg,
 	if (b == NULL)
 		return SSH_ERR_ALLOC_FAIL;
 
-	buffer_put_stringb(b, client_version);
-	buffer_put_stringb(b, server_version);
+	if ((r = buffer_put_stringb(b, client_version)) != 0 ||
+	    (r = buffer_put_stringb(b, server_version)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	buffer_put_int(b, buffer_len(client_kexinit) + 1);
-	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit));
-	buffer_put_int(b, buffer_len(server_kexinit) + 1);
-	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit));
-
-	buffer_put_stringb(b, serverhostkeyblob);
+	if ((r = buffer_put_int(b, buffer_len(client_kexinit) + 1)) != 0 ||
+	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	    (r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
+	    (r = buffer_put_int(b, buffer_len(server_kexinit) + 1)) != 0 ||
+	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	    (r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
+	    (r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	// DH group sizeのビット数を加算する
-	buffer_put_int(b, kexgex_min);
-	buffer_put_int(b, kexgex_bits);
-	buffer_put_int(b, kexgex_max);
+	if ((r = buffer_put_int(b, kexgex_min)) != 0 ||
+	    (r = buffer_put_int(b, kexgex_bits)) != 0 ||
+		(r = buffer_put_int(b, kexgex_max)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	// DH鍵の素数と生成元を加算する
-	buffer_put_bignum2(b, kexgex_p);
-	buffer_put_bignum2(b, kexgex_g);
+	if ((r = buffer_put_bignum2(b, kexgex_p)) != 0 ||
+	    (r = buffer_put_bignum2(b, kexgex_g)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	/*
 	 * GEX は引数の型が異なる（OpenSSH 7.9以前のまま）
 	 */
-	buffer_put_bignum2(b, client_dh_pub);
-	buffer_put_bignum2(b, server_dh_pub);
-	buffer_put(b, shared_secret, secretlen);
+	if ((r = buffer_put_bignum2(b, client_dh_pub)) != 0 ||
+	    (r = buffer_put_bignum2(b, server_dh_pub)) != 0 ||
+		(r = buffer_put(b, shared_secret, secretlen)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
@@ -846,7 +876,8 @@ kex_ecdh_keypair(kex *kex)
 	//   X:    m bytes
 	//   Y:    m bytes
 
-	buffer_put_ec(buf, public_key, group);
+	if (buffer_put_ec(buf, public_key, group) != 0)
+		goto out;
 
 	kex->ec_client_key = client_key;
 	kex->ec_group = group;
@@ -877,14 +908,18 @@ kex_ecdh_dec_key_group(kex *kex, buffer_t *ec_blob,
 		r = SSH_ERR_ALLOC_FAIL;
 		goto out;
 	}
-	buffer_put_stringb(buf, ec_blob);
+	if ((r = buffer_put_stringb(buf, ec_blob)) != 0) {
+		goto out;
+	}
 	buffer_rewind(buf);
 
 	if ((dh_pub = EC_POINT_new(group)) == NULL) {
 		r = SSH_ERR_ALLOC_FAIL;
 		goto out;
 	}
-	buffer_get_ec(buf, dh_pub, group);
+	if ((r = buffer_get_ec(buf, dh_pub, group)) != 0) {
+		goto out;
+	}
 	buffer_clear(buf);
 
 	if (key_ec_validate_public(group, dh_pub) != 0) {
@@ -903,7 +938,9 @@ kex_ecdh_dec_key_group(kex *kex, buffer_t *ec_blob,
 		goto out;
 	}
 
-	buffer_put_bignum2(buf, shared_secret);
+	if ((r = buffer_put_bignum2(buf, shared_secret)) != 0) {
+		goto out;
+	}
 	*shared_secretp = buf;
 	buf = NULL;
  out:
@@ -943,6 +980,8 @@ kex_ecdh_hash(const digest_algorithm hash_alg,
     char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
+	int r;
+
 
 	if (*hashlen < ssh_digest_bytes(hash_alg))
 		return SSH_ERR_INVALID_ARGUMENT;
@@ -950,27 +989,36 @@ kex_ecdh_hash(const digest_algorithm hash_alg,
 	if (b == NULL)
 		return SSH_ERR_ALLOC_FAIL;
 
-	buffer_put_stringb(b, client_version);
-	buffer_put_stringb(b, server_version);
+	if ((r = buffer_put_stringb(b, client_version)) != 0 ||
+	    (r = buffer_put_stringb(b, server_version)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	buffer_put_int(b, buffer_len(client_kexinit) + 1);
-	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit));
-	buffer_put_int(b, buffer_len(server_kexinit) + 1);
-	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit));
+	if ((r = buffer_put_int(b, buffer_len(client_kexinit) + 1)) != 0 ||
+	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	    (r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
+	    (r = buffer_put_int(b, buffer_len(server_kexinit) + 1)) != 0 ||
+	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	    (r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
+	    (r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
-	buffer_put_stringb(b, serverhostkeyblob);
 	// OpenSSH:
 	//  off が 4 の sshbuf を sshbuf_put_stringb() する
 	//   「size-off（データの長さ）」と「off 以降のデータ」が格納される
 	// TTSSH:
 	//   「client_pub の最初から最後まで」を buffer_put() する
 	//   先頭にある4バイトの長さからデータの最後までがそのまま格納される
-	buffer_put(b, buffer_ptr(client_pub), buffer_len(client_pub));
-	buffer_put_stringb(b, server_pub);
-	buffer_put(b, buffer_ptr(shared_secret), buffer_len(shared_secret));
+	if ((r = buffer_put(b, buffer_ptr(client_pub), buffer_len(client_pub))) != 0 ||
+	    (r = buffer_put_stringb(b, server_pub)) != 0 ||
+	    (r = buffer_put(b, buffer_ptr(shared_secret), buffer_len(shared_secret))) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
@@ -1063,7 +1111,8 @@ kex_c25519_keypair(kex *kex)
 	// data format of kex->client_pub
 	//   len:  4 bytes  ... length of data
 	//   data: 32 bytes ... x25519 public key
-	buffer_put_int(buf, CURVE25519_SIZE);
+	if ((r = buffer_put_int(buf, CURVE25519_SIZE)) != 0)
+		goto out;
 	if (buffer_append_space(buf, CURVE25519_SIZE) == NULL) {
 		r = SSH_ERR_ALLOC_FAIL;
 		goto out;
@@ -1126,6 +1175,7 @@ kex_c25519_hash(const digest_algorithm hash_alg,
     char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
+	int r;
 
 	if (*hashlen < ssh_digest_bytes(hash_alg))
 		return SSH_ERR_INVALID_ARGUMENT;
@@ -1133,18 +1183,24 @@ kex_c25519_hash(const digest_algorithm hash_alg,
 	if (b == NULL)
 		return SSH_ERR_ALLOC_FAIL;
 
-	buffer_put_stringb(b, client_version);
-	buffer_put_stringb(b, server_version);
+	if ((r = buffer_put_stringb(b, client_version)) != 0 ||
+	    (r = buffer_put_stringb(b, server_version)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	buffer_put_int(b, buffer_len(client_kexinit) + 1);
-	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit));
-	buffer_put_int(b, buffer_len(server_kexinit) + 1);
-	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit));
+	if ((r = buffer_put_int(b, buffer_len(client_kexinit) + 1)) != 0 ||
+		(r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+		(r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
+		(r = buffer_put_int(b, buffer_len(server_kexinit) + 1)) != 0 ||
+		(r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+		(r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
+		(r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
-	buffer_put_stringb(b, serverhostkeyblob);
 	// OpenSSH:
 	//  off が 0 の sshbuf を sshbuf_put_stringb() する
 	//   「size-off = size（データの長さ）」と「off 以降 = すべてのデータ」が格納される
@@ -1152,9 +1208,12 @@ kex_c25519_hash(const digest_algorithm hash_alg,
 	//   「client_pub の最初から最後まで」を buffer_put() する
 	//   先頭にある4バイトの長さからデータの最後までがそのまま格納される
 	// cf. kex_c25519_keypair()
-	buffer_put(b, buffer_ptr(client_pub), buffer_len(client_pub));
-	buffer_put_stringb(b, server_pub);
-	buffer_put(b, buffer_ptr(shared_secret), buffer_len(shared_secret));
+	if ((r = buffer_put(b, buffer_ptr(client_pub), buffer_len(client_pub))) != 0 ||
+	    (r = buffer_put_stringb(b, server_pub)) != 0 ||
+	    (r = buffer_put(b, buffer_ptr(shared_secret), buffer_len(shared_secret))) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
@@ -1214,7 +1273,8 @@ int kex_kem_sntrup761x25519_keypair(kex *kex)
 	//   x25519 public key:    32 bytes
 
 	need = crypto_kem_sntrup761_PUBLICKEYBYTES + CURVE25519_SIZE;
-	buffer_put_int(buf, need);
+	if ((r = buffer_put_int(buf, need)) != 0)
+		goto out;
 
 	// OpenSSH
 	// if ((r = sshbuf_reserve(buf, need, &cp)) != 0)
@@ -1292,13 +1352,17 @@ kex_kem_sntrup761x25519_dec(kex *kex, buffer_t *server_blob,
 		r = SSH_ERR_ALLOC_FAIL;
 		goto out;
 	}
-	buffer_consume(buf, crypto_kem_sntrup761_BYTES);
-	buffer_put(buf, buffer_ptr(buf2), buffer_len(buf2));
+	if ((r = buffer_consume(buf, crypto_kem_sntrup761_BYTES)) != 0 ||
+	    (r = buffer_put(buf, buffer_ptr(buf2), buffer_len(buf2))) != 0) {
+		goto out;
+	}
 
 	if ((r = ssh_digest_buffer(kex->hash_alg, buf, hash, sizeof(hash))) != 0)
 		goto out;
 	buffer_clear(buf);
-	buffer_put_string(buf, hash, ssh_digest_bytes(kex->hash_alg));
+	if ((r = buffer_put_string(buf, hash, ssh_digest_bytes(kex->hash_alg))) != 0)
+		goto out;
+
 	if (decoded != 0) {
 		r = SSH_ERR_SIGNATURE_INVALID;
 		goto out;
@@ -1329,6 +1393,7 @@ kex_kem_sntrup761x25519_hash(const digest_algorithm hash_alg,
     char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
+	int r;
 
 	if (*hashlen < ssh_digest_bytes(hash_alg))
 		return SSH_ERR_INVALID_ARGUMENT;
@@ -1336,18 +1401,24 @@ kex_kem_sntrup761x25519_hash(const digest_algorithm hash_alg,
 	if (b == NULL)
 		return SSH_ERR_ALLOC_FAIL;
 
-	buffer_put_stringb(b, client_version);
-	buffer_put_stringb(b, server_version);
+	if ((r = buffer_put_stringb(b, client_version)) != 0 ||
+	    (r = buffer_put_stringb(b, server_version)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	buffer_put_int(b, buffer_len(client_kexinit) + 1);
-	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit));
-	buffer_put_int(b, buffer_len(server_kexinit) + 1);
-	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit));
+	if ((r = buffer_put_int(b, buffer_len(client_kexinit) + 1)) != 0 ||
+	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	    (r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
+	    (r = buffer_put_int(b, buffer_len(server_kexinit) + 1)) != 0 ||
+	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	    (r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
+	    (r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
-	buffer_put_stringb(b, serverhostkeyblob);
 	// OpenSSH:
 	//  off が 0 の sshbuf を sshbuf_put_stringb() する
 	//   「size-off = size（データの長さ）」と「off 以降 = すべてのデータ」が格納される
@@ -1355,9 +1426,12 @@ kex_kem_sntrup761x25519_hash(const digest_algorithm hash_alg,
 	//   「client_pub の最初から最後まで」を buffer_put() する
 	//   先頭にある4バイトの長さからデータの最後までがそのまま格納される
 	// cf. kex_kem_sntrup761x25519_keypair()
-	buffer_put(b, buffer_ptr(client_pub), buffer_len(client_pub));
-	buffer_put_stringb(b, server_pub);
-	buffer_put(b, buffer_ptr(shared_secret), buffer_len(shared_secret));
+	if ((r = buffer_put(b, buffer_ptr(client_pub), buffer_len(client_pub))) != 0 ||
+	    (r = buffer_put_stringb(b, server_pub)) != 0 ||
+	    (r = buffer_put(b, buffer_ptr(shared_secret), buffer_len(shared_secret))) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
@@ -1415,7 +1489,8 @@ int kex_kem_mlkem768x25519_keypair(kex *kex)
 	//   x25519 public key:    32 bytes
 
 	need = crypto_kem_mlkem768_PUBLICKEYBYTES + CURVE25519_SIZE;
-	buffer_put_int(buf, need);
+	if ((r = buffer_put_int(buf, need)) != 0)
+		goto out;
 
 	// OpenSSH
 	// if ((r = sshbuf_reserve(buf, need, &cp)) != 0)
@@ -1492,7 +1567,8 @@ kex_kem_mlkem768x25519_dec(kex *kex, buffer_t *server_blob,
 	// OpenSSH
 	// if ((r = sshbuf_put(buf, mlkem_key, sizeof(mlkem_key))) != 0)
 	//     goto out;
-	buffer_put(buf, mlkem_key, sizeof(mlkem_key));
+	if ((r = buffer_put(buf, mlkem_key, sizeof(mlkem_key))) != 0)
+		goto out;
 
 	// OpenSSH
 	// if ((r = kexc25519_shared_key_ext(kex->c25519_client_key, server_pub,
@@ -1505,12 +1581,14 @@ kex_kem_mlkem768x25519_dec(kex *kex, buffer_t *server_blob,
 		r = SSH_ERR_ALLOC_FAIL;
 		goto out;
 	}
-	buffer_put(buf, buffer_ptr(buf2), buffer_len(buf2));
+	if ((r = buffer_put(buf, buffer_ptr(buf2), buffer_len(buf2))) != 0)
+		goto out;
 
 	if ((r = ssh_digest_buffer(kex->hash_alg, buf, hash, sizeof(hash))) != 0)
 		goto out;
 	buffer_clear(buf);
-	buffer_put_string(buf, hash, ssh_digest_bytes(kex->hash_alg));
+	if ((r = buffer_put_string(buf, hash, ssh_digest_bytes(kex->hash_alg))) != 0)
+		goto out;
 
 	/* success */
 	r = 0;
@@ -1542,6 +1620,7 @@ kex_kem_mlkem768x25519_hash(const digest_algorithm hash_alg,
     char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;
+	int r;
 
 	if (*hashlen < ssh_digest_bytes(hash_alg))
 		return SSH_ERR_INVALID_ARGUMENT;
@@ -1549,18 +1628,24 @@ kex_kem_mlkem768x25519_hash(const digest_algorithm hash_alg,
 	if (b == NULL)
 		return SSH_ERR_ALLOC_FAIL;
 
-	buffer_put_stringb(b, client_version);
-	buffer_put_stringb(b, server_version);
+	if ((r = buffer_put_stringb(b, client_version)) != 0 ||
+	    (r = buffer_put_stringb(b, server_version)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	buffer_put_int(b, buffer_len(client_kexinit) + 1);
-	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit));
-	buffer_put_int(b, buffer_len(server_kexinit) + 1);
-	buffer_put_char(b, SSH2_MSG_KEXINIT);
-	buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit));
+	if ((r = buffer_put_int(b, buffer_len(client_kexinit) + 1)) != 0 ||
+		(r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+		(r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
+		(r = buffer_put_int(b, buffer_len(server_kexinit) + 1)) != 0 ||
+		(r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+		(r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
+		(r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
-	buffer_put_stringb(b, serverhostkeyblob);
 	// OpenSSH:
 	//  off が 0 の sshbuf を sshbuf_put_stringb() する
 	//   「size-off = size（データの長さ）」と「off 以降 = すべてのデータ」が格納される
@@ -1568,9 +1653,12 @@ kex_kem_mlkem768x25519_hash(const digest_algorithm hash_alg,
 	//   「client_pub の最初から最後まで」を buffer_put() する
 	//   先頭にある4バイトの長さからデータの最後までがそのまま格納される
 	// cf. kex_kem_mlkem768x25519_keypair()
-	buffer_put(b, buffer_ptr(client_pub), buffer_len(client_pub));
-	buffer_put_stringb(b, server_pub);
-	buffer_put(b, buffer_ptr(shared_secret), buffer_len(shared_secret));
+	if ((r = buffer_put(b, buffer_ptr(client_pub), buffer_len(client_pub))) != 0 ||
+	    (r = buffer_put_stringb(b, server_pub)) != 0 ||
+	    (r = buffer_put(b, buffer_ptr(shared_secret), buffer_len(shared_secret))) != 0) {
+		buffer_free(b);
+		return r;
+	}
 
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 

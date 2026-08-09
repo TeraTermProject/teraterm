@@ -56,8 +56,8 @@ char *buffer_ptr(buffer_t *buf);
 /* 現在のポインタを返す。OpenSSH の sshbuf_ptr() に相当 */
 char *buffer_tail_ptr(buffer_t *buf);
 
-void buffer_consume(buffer_t *buf, size_t shift_byte);
-void buffer_consume_end(buffer_t *buf, size_t shift_byte);
+int buffer_consume(buffer_t *buf, size_t shift_byte);
+int buffer_consume_end(buffer_t *buf, size_t shift_byte);
 void buffer_rewind(buffer_t *buf);
 void *buffer_append_space(buffer_t * buf, size_t size);
 
@@ -65,26 +65,26 @@ int buffer_get(buffer_t *buf, void *v, size_t len);
 int buffer_put(buffer_t *buf, const void *v, size_t len);
 
 int buffer_get_int(buffer_t *buf, unsigned int *valp);
-void buffer_put_int(buffer_t *buf, int val);
+int buffer_put_int(buffer_t *buf, int val);
 
 int buffer_get_char(buffer_t *buf, u_char *valp);
-void buffer_put_char(buffer_t *buf, int val);
+int buffer_put_char(buffer_t *buf, int val);
 
 void *buffer_get_string(buffer_t *buf, int *lenp);
-void buffer_put_string(buffer_t *buf, const char *v, size_t len);
-void buffer_put_cstring(buffer_t *buf, const char *v);
-void buffer_put_stringb(buffer_t *buf, buffer_t *v);
+int buffer_put_string(buffer_t *buf, const char *v, size_t len);
+int buffer_put_cstring(buffer_t *buf, const char *v);
+int buffer_put_stringb(buffer_t *buf, buffer_t *v);
 
-void buffer_put_bignum1(buffer_t *buf, const BIGNUM *v);
+int buffer_put_bignum1(buffer_t *buf, const BIGNUM *v);
 
-void buffer_get_bignum2(buffer_t *buf, BIGNUM *v);
-void buffer_put_bignum2(buffer_t *buf, const BIGNUM *v);
+int buffer_get_bignum2(buffer_t *buf, BIGNUM *v);
+int buffer_put_bignum2(buffer_t *buf, const BIGNUM *v);
 int buffer_put_bignum2_bytes(buffer_t *buf, const void *v, size_t len);
 
-void buffer_get_bignum_SECSH(buffer_t *buf, BIGNUM *v);
+int buffer_get_bignum_SECSH(buffer_t *buf, BIGNUM *v);
 
-void buffer_get_ec(buffer_t *buf, EC_POINT *v, const EC_GROUP *g);
-void buffer_put_ec(buffer_t *buf, const EC_POINT *v, const EC_GROUP *g);
+int buffer_get_ec(buffer_t *buf, EC_POINT *v, const EC_GROUP *g);
+int buffer_put_ec(buffer_t *buf, const EC_POINT *v, const EC_GROUP *g);
 
 int buffer_overflow_verify(buffer_t *buf, size_t len);
 int buffer_compress(z_stream *zstream, char *payload, size_t len, buffer_t *compbuf);

@@ -3770,8 +3770,10 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 			salt, SALT_LEN, key, keylen + ivlen, rounds) < 0)
 			//fatal("bcrypt_pbkdf failed");
 			;
-		buffer_put_string(kdf, salt, SALT_LEN);
-		buffer_put_int(kdf, rounds);
+		if (buffer_put_string(kdf, salt, SALT_LEN) != 0 ||
+		    buffer_put_int(kdf, rounds) != 0) {
+			goto ed25519_error;
+		}
 	}
 	// 暗号化の準備
 	// TODO: OpenSSH 6.5では -Z オプションで、暗号化アルゴリズムを指定可能だが、
@@ -3781,11 +3783,13 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	SecureZeroMemory(key, keylen + ivlen);
 	free(key);
 
-	buffer_put(encoded, AUTH_MAGIC, sizeof(AUTH_MAGIC));
-	buffer_put_cstring(encoded, ciphername);
-	buffer_put_cstring(encoded, kdfname);
-	buffer_put_string(encoded, buffer_ptr(kdf), buffer_len(kdf));
-	buffer_put_int(encoded, 1);			/* number of keys */
+	if (buffer_put(encoded, AUTH_MAGIC, sizeof(AUTH_MAGIC)) != 0 ||
+	    buffer_put_cstring(encoded, ciphername) != 0 ||
+	    buffer_put_cstring(encoded, kdfname) != 0 ||
+	    buffer_put_string(encoded, buffer_ptr(kdf), buffer_len(kdf)) != 0||
+	    buffer_put_int(encoded, 1) != 0) { /* number of keys */
+		goto ed25519_error;
+	}
 
 	// key_to_blob()を一時利用するため、Key構造体を初期化する。
 	keyblob.type = private_key.type;
@@ -3794,29 +3798,42 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	keyblob.ecdsa = private_key.ecdsa;
 	keyblob.ed25519_pk = private_key.ed25519_pk;
 	keyblob.ed25519_sk = private_key.ed25519_sk;
-	key_to_blob(&keyblob, &cp, &len);			/* public key */
+	if (key_to_blob(&keyblob, &cp, &len) != 0) { /* public key */
+		goto ed25519_error;
+	}
 
-	buffer_put_string(encoded, cp, len);
+	if (buffer_put_string(encoded, cp, len) != 0) {
+		goto ed25519_error;
+	}
 
 	SecureZeroMemory(cp, len);
 	free(cp);
 
 	/* Random check bytes */
 	check = arc4random();
-	buffer_put_int(b, check);
-	buffer_put_int(b, check);
+	if (buffer_put_int(b, check) != 0 ||
+	    buffer_put_int(b, check) != 0) {
+		goto ed25519_error;
+	}
 
 	/* append private key and comment*/
 	key_private_serialize(&keyblob, b);
-	buffer_put_cstring(b, comment);
+	if (buffer_put_cstring(b, comment) != 0) {
+		goto ed25519_error;
+	}
 
 	/* padding */
 	i = 0;
-	while (buffer_len(b) % blocksize)
-		buffer_put_char(b, ++i & 0xff);
+	while (buffer_len(b) % blocksize) {
+		if (buffer_put_char(b, ++i & 0xff) != 0) {
+			goto ed25519_error;
+		}
+	}
 
 	/* length */
-	buffer_put_int(encoded, buffer_len(b));
+	if (buffer_put_int(encoded, buffer_len(b)) != 0) {
+		goto ed25519_error;
+	}
 
 	/* encrypt */
 	cp = buffer_append_space(encoded, buffer_len(b) + authlen);
@@ -3836,15 +3853,27 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	}
 
 	buffer_clear(blob);
-	buffer_put(blob, MARK_BEGIN, sizeof(MARK_BEGIN) - 1);
-	for (i = 0; i < n; i++) {
-		buffer_put_char(blob, cp[i]);
-		if (i % 70 == 69)
-			buffer_put_char(blob, '\n');
+	if (buffer_put(blob, MARK_BEGIN, sizeof(MARK_BEGIN) - 1) != 0) {
+		goto ed25519_error;
 	}
-	if (i % 70 != 69)
-		buffer_put_char(blob, '\n');
-	buffer_put(blob, MARK_END, sizeof(MARK_END) - 1);
+	for (i = 0; i < n; i++) {
+		if (buffer_put_char(blob, cp[i]) != 0) {
+			goto ed25519_error;
+		}
+		if (i % 70 == 69) {
+			if (buffer_put_char(blob, '\n') != 0) {
+				goto ed25519_error;
+			}
+		}
+	}
+	if (i % 70 != 69) {
+		if (buffer_put_char(blob, '\n') != 0) {
+			goto ed25519_error;
+		}
+	}
+	if (buffer_put(blob, MARK_END, sizeof(MARK_END) - 1) != 0) {
+		goto ed25519_error;
+	}
 	free(cp);
 
 	len = buffer_len(blob);
@@ -4401,36 +4430,45 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 					DSA_get0_key(dsa, &pub_key, NULL);
 
 					keyname = "ssh-dss";
-					buffer_put_string(b, keyname, strlen(keyname));
-					buffer_put_bignum2(b, p);
-					buffer_put_bignum2(b, q);
-					buffer_put_bignum2(b, g);
-					buffer_put_bignum2(b, pub_key);
+					if (buffer_put_string(b, keyname, strlen(keyname)) != 0 ||
+					    buffer_put_bignum2(b, p) != 0 ||
+					    buffer_put_bignum2(b, q) != 0 ||
+					    buffer_put_bignum2(b, g) != 0 ||
+					    buffer_put_bignum2(b, pub_key) != 0) {
+						goto public_error;
+					}
 					break;
 
 				case KEY_RSA: // RSA
 					RSA_get0_key(rsa, &n, &e, NULL);
 					keyname = "ssh-rsa";
-					buffer_put_string(b, keyname, strlen(keyname));
-					buffer_put_bignum2(b, e);
-					buffer_put_bignum2(b, n);
+					if (buffer_put_string(b, keyname, strlen(keyname)) != 0 ||
+					    buffer_put_bignum2(b, e) != 0 ||
+					    buffer_put_bignum2(b, n) != 0) {
+						goto public_error;
+					}
 					break;
 
 				case KEY_ECDSA256: // ECDSA
 				case KEY_ECDSA384:
 				case KEY_ECDSA521:
 					keyname = get_ssh2_hostkey_type_name(public_key.type);
-					buffer_put_string(b, keyname, strlen(keyname));
+					if (buffer_put_string(b, keyname, strlen(keyname)) != 0)
+						goto public_error;
 					s = curve_keytype_to_name(public_key.type);
-					buffer_put_string(b, s, strlen(s));
-					buffer_put_ec(b, EC_KEY_get0_public_key(ecdsa) ,
-					                 EC_KEY_get0_group(ecdsa));
+					if (buffer_put_string(b, s, strlen(s)) != 0 ||
+					    buffer_put_ec(b, EC_KEY_get0_public_key(ecdsa),
+					                     EC_KEY_get0_group(ecdsa)) != 0) {
+						goto public_error;
+					}
 					break;
 
 				case KEY_ED25519:
 					keyname = get_ssh2_hostkey_type_name(public_key.type);
-					buffer_put_cstring(b, keyname);
-					buffer_put_string(b, public_key.ed25519_pk, ED25519_PK_SZ);
+					if (buffer_put_cstring(b, keyname) != 0 ||
+					    buffer_put_string(b, public_key.ed25519_pk, ED25519_PK_SZ) != 0) {
+						goto public_error;
+					}
 					break;
 				}
 
@@ -4570,21 +4608,26 @@ public_error:
 				tmp[1] = (rnd >> 8) & 0xff;
 				tmp[2] = tmp[0];
 				tmp[3] = tmp[1];
-				buffer_put(b, tmp, 4);
+				if (buffer_put(b, tmp, 4) != 0)
+					goto error;
 
 				// set private key
 				rsa = private_key.rsa;
 				RSA_get0_key(rsa, &n, &e, &d);
 				RSA_get0_factors(rsa, &p, &q);
 				RSA_get0_crt_params(rsa, &dmp1, &dmq1, &iqmp);
-				buffer_put_bignum1(b, d);
-				buffer_put_bignum1(b, iqmp);
-				buffer_put_bignum1(b, q);
-				buffer_put_bignum1(b, p);
+				if (buffer_put_bignum1(b, d) != 0 ||
+				    buffer_put_bignum1(b, iqmp) != 0 ||
+				    buffer_put_bignum1(b, q) != 0 ||
+					buffer_put_bignum1(b, p) != 0) {
+					goto error;
+				}
 
 				// padding with 8byte align
 				while (buffer_len(b) % 8) {
-					buffer_put_char(b, 0);
+					if (buffer_put_char(b, 0) != 0) {
+						goto error;
+					}
 				}
 
 				//
@@ -4593,20 +4636,28 @@ public_error:
 				// encrypted buffer
 			    /* First store keyfile id string. */
 				for (i = 0 ; authfile_id_string[i] ; i++) {
-					buffer_put_char(enc, authfile_id_string[i]);
+					if (buffer_put_char(enc, authfile_id_string[i]) != 0) {
+						goto error;
+					}
 				}
-				buffer_put_char(enc, 0x0a); // LF
-				buffer_put_char(enc, 0);
+				if (buffer_put_char(enc, 0x0a) != 0 || // LF
+				    buffer_put_char(enc, 0) != 0) {
+					goto error;
+				}
 
 				/* Store cipher type. */
-				buffer_put_char(enc, cipher_num);
-				buffer_put_int(enc, 0);  // type is 'int'!! (For future extension)
+				if (buffer_put_char(enc, cipher_num) != 0 ||
+				    buffer_put_int(enc, 0) != 0) { // type is 'int'!! (For future extension)
+					goto error;
+				}
 
 				/* Store public key.  This will be in plain text. */
-				buffer_put_int(enc, BN_num_bits(n));
-				buffer_put_bignum1(enc, n);
-				buffer_put_bignum1(enc, e);
-				buffer_put_string(enc, comment, strlen(comment));
+				if (buffer_put_int(enc, BN_num_bits(n)) != 0 ||
+				    buffer_put_bignum1(enc, n) != 0 ||
+				    buffer_put_bignum1(enc, e) != 0 ||
+				    buffer_put_string(enc, comment, strlen(comment)) != 0) {
+					goto error;
+				}
 
 				// setup the MD5ed passphrase to cipher encryption key
 				MD5_Init(&md);
@@ -4633,7 +4684,8 @@ public_error:
 					goto error;
 				}
 
-				buffer_put(enc, wrapped, len);
+				if (buffer_put(enc, wrapped, len) != 0)
+					goto error;
 
 				// saving private key file (binary mode)
 				fp = _wfopen(filename, L"wb");

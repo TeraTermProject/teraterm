@@ -145,7 +145,7 @@ panic:
 int buffer_put(buffer_t * buf, const void *v, size_t len)
 {
 	size_t n;
-	int ret = -1;
+	int ret = SSH_ERR_INTERNAL_ERROR;
 	size_t newlen;
 
 	for (;;) {
@@ -161,20 +161,16 @@ int buffer_put(buffer_t * buf, const void *v, size_t len)
 			// バッファが足りないので補充する。(2005.7.2 yutaka)
 			newlen = buf->maxlen + len + BUFFER_INCREASE_MARGIN;
 			if (newlen > BUFFER_SIZE_MAX) {
-				goto panic;
+				return SSH_ERR_NO_BUFFER_SPACE;
 			}
 			buf->buf = realloc(buf->buf, newlen);
 			if (buf->buf == NULL)
-				goto panic;
+				return SSH_ERR_ALLOC_FAIL;
 			buf->maxlen = newlen;
 		}
 	}
 
-	return (ret);
-
-panic:
-	abort();
-	return (ret);
+	return ret;
 }
 
 int buffer_get(buffer_t *buf, void *v, size_t len)
@@ -268,11 +264,11 @@ error:;
 	return (ret);
 }
 
-void buffer_put_string(buffer_t *msg, const char *v, size_t len)
+int buffer_put_string(buffer_t *msg, const char *v, size_t len)
 {
 	char buf[4];
 	int val;
-	int ret = -1;
+	int ret = SSH_ERR_INTERNAL_ERROR;
 
 	assert(len == (size_t)(int)len);
 	// 「サイズ＋文字列」で書き込む。サイズは4byteのbig-endian。
@@ -282,31 +278,33 @@ void buffer_put_string(buffer_t *msg, const char *v, size_t len)
 	if (v != NULL) {
 		ret = buffer_put(msg, v, len);
 	}
+
+	return ret;
 }
 
-void buffer_put_cstring(buffer_t *buf, const char *v)
+int buffer_put_cstring(buffer_t *buf, const char *v)
 {
-	buffer_put_string(buf, v, strlen(v));
+	return buffer_put_string(buf, v, strlen(v));
 }
 
-void buffer_put_stringb(buffer_t *buf, buffer_t *v)
+int buffer_put_stringb(buffer_t *buf, buffer_t *v)
 {
-	buffer_put_string(buf, buffer_ptr(v), buffer_len(v));
+	return buffer_put_string(buf, buffer_ptr(v), buffer_len(v));
 }
 
-void buffer_put_char(buffer_t *buf, int val)
+int buffer_put_char(buffer_t *buf, int val)
 {
 	char ch = (char)val;
 
-	buffer_put(buf, &ch, 1);
+	return buffer_put(buf, &ch, 1);
 }
 
-void buffer_put_int(buffer_t *buf, int val)
+int buffer_put_int(buffer_t *buf, int val)
 {
 	char tmp[4];
 
 	set_uint32_MSBfirst(tmp, val);
-	buffer_put(buf, tmp, sizeof(tmp));
+	return buffer_put(buf, tmp, sizeof(tmp));
 }
 
 int buffer_len(buffer_t *buf)
@@ -342,63 +340,71 @@ int buffer_overflow_verify(buffer_t *buf, size_t len)
 }
 
 // for SSH1
-void buffer_put_bignum1(buffer_t *buf, const BIGNUM *v)
+int buffer_put_bignum1(buffer_t *buf, const BIGNUM *v)
 {
 	unsigned int bits, bin_size;
 	unsigned char *d;
 	int oi;
 	char msg[2];
+	int r = 0;
 
 	bits = BN_num_bits(v);
 	bin_size = (bits + 7) / 8;
 	d = malloc(bin_size);
 	if (d == NULL) {
 		*d = 0;
-		goto error;
+		return SSH_ERR_ALLOC_FAIL;
 	}
 
 	d[0] = '\0';
 	/* Get the value of in binary */
 	oi = BN_bn2bin(v, d);
 	if (oi != bin_size) {
+		r = SSH_ERR_INTERNAL_ERROR;
 		goto error;
 	}
 
 	/* Store the number of bits in the buffer in two bytes, msb first. */
 	set_ushort16_MSBfirst(msg, bits);
-	buffer_put(buf, msg, 2);
+	if ((r = buffer_put(buf, msg, 2)) != 0)
+		goto error;
 
 	/* Store the binary data. */
-	buffer_put(buf, (char *)d, oi);
+	if ((r = buffer_put(buf, (char *)d, oi)) != 0)
+		goto error;
 
 error:
 	free(d);
+	return r;
 }
 
 // for SSH2
-void buffer_put_bignum2(buffer_t *buf, const BIGNUM *v)
+int buffer_put_bignum2(buffer_t *buf, const BIGNUM *v)
 {
 	unsigned int bytes;
 	unsigned char *d;
 	int oi;
 	unsigned int hasnohigh = 0;
+	int r = 0;
 
 	bytes = BN_num_bytes(v) + 1; /* extra padding byte */
 	d = malloc(bytes);
 	if (d == NULL) {
 		*d = 0;
-		goto error;
+		return SSH_ERR_ALLOC_FAIL;
 	}
 
 	d[0] = '\0';
 	/* Get the value of in binary */
 	oi = BN_bn2bin(v, d+1);
 	hasnohigh = (d[1] & 0x80) ? 0 : 1;
-	buffer_put_string(buf, d + hasnohigh, bytes - hasnohigh);
+	if ((r = buffer_put_string(buf, d + hasnohigh, bytes - hasnohigh)) != 0)
+		goto error;
 	//memset(buf, 0, bytes);
 
 error:
 	free(d);
+	return r;
 }
 
 static void buffer_get_bignum2_internal(char **data, BIGNUM *value)
@@ -414,7 +420,7 @@ static void buffer_get_bignum2_internal(char **data, BIGNUM *value)
 	*data = buf;
 }
 
-void buffer_get_bignum2(buffer_t *buf, BIGNUM *v)
+int buffer_get_bignum2(buffer_t *buf, BIGNUM *v)
 {
 	char *data, *olddata;
 	size_t off;
@@ -423,20 +429,23 @@ void buffer_get_bignum2(buffer_t *buf, BIGNUM *v)
 	buffer_get_bignum2_internal(&data, v);
 	off = data - olddata;
 	buf->offset += off;
+
+	return 0;
 }
 
-void buffer_get_bignum_SECSH(buffer_t *buf, BIGNUM *v)
+int buffer_get_bignum_SECSH(buffer_t *buf, BIGNUM *v)
 {
 	char *d;
 	unsigned int bits, bytes;
+	int r;
 
-	if (buffer_get_int(buf, &bits) != 0) {
-		return;
+	if ((r = buffer_get_int(buf, &bits)) != 0) {
+		return r;
 	}
 	bytes = (bits + 7) / 8;
 
 	if ((buf->len - buf->offset) < bytes) {
-		return;
+		return SSH_ERR_NO_BUFFER_SPACE;
 	}
 	d = buf->buf + buf->offset;
 	if ((*d & 0x80) != 0) {
@@ -451,6 +460,8 @@ void buffer_get_bignum_SECSH(buffer_t *buf, BIGNUM *v)
 	}
 
 	buf->offset += bytes;
+
+	return 0;
 }
 
 int buffer_put_bignum2_bytes(buffer_t *buf, const void *v, size_t len)
@@ -460,7 +471,7 @@ int buffer_put_bignum2_bytes(buffer_t *buf, const void *v, size_t len)
 	int prepend;
 
 	if (len > BUFFER_SIZE_MAX - 5)
-		return -9; // SSH_ERR_NO_BUFFER_SPACE
+		return SSH_ERR_NO_BUFFER_SPACE;
 
 	/* Skip leading zero bytes */
 	for (; len > 0 && *s == 0; len--, s++)
@@ -479,10 +490,11 @@ int buffer_put_bignum2_bytes(buffer_t *buf, const void *v, size_t len)
 	return 0;
 }
 
-void buffer_put_ec(buffer_t *buf, const EC_POINT *v, const EC_GROUP *g)
+int buffer_put_ec(buffer_t *buf, const EC_POINT *v, const EC_GROUP *g)
 {
 	unsigned char *d = NULL;
 	size_t len;
+	int r = 0;
 
 	/* Determine length */
 	len = EC_POINT_point2oct(g, v, POINT_CONVERSION_UNCOMPRESSED,
@@ -491,17 +503,20 @@ void buffer_put_ec(buffer_t *buf, const EC_POINT *v, const EC_GROUP *g)
 	d = malloc(len);
 	if (d == NULL) {
 		*d = 0;
-		goto error;
+		return SSH_ERR_ALLOC_FAIL;
 	}
 	if (EC_POINT_point2oct(g, v, POINT_CONVERSION_UNCOMPRESSED,
 	    d, len, NULL) != len) {
+		return SSH_ERR_INTERNAL_ERROR;
 		goto error;
 	}
 	/* Append */
-	buffer_put_string(buf, d, len);
+	if ((r = buffer_put_string(buf, d, len)) != 0)
+		goto error;
 
 error:
 	free(d);
+	return r;
 }
 
 static void buffer_get_ec_internal(char **data, EC_POINT *v, const EC_GROUP *g)
@@ -517,7 +532,7 @@ static void buffer_get_ec_internal(char **data, EC_POINT *v, const EC_GROUP *g)
 	*data = buf;
 }
 
-void buffer_get_ec(buffer_t *buf, EC_POINT *v, const EC_GROUP *g)
+int buffer_get_ec(buffer_t *buf, EC_POINT *v, const EC_GROUP *g)
 {
 	char *data, *olddata;
 	size_t off;
@@ -526,6 +541,8 @@ void buffer_get_ec(buffer_t *buf, EC_POINT *v, const EC_GROUP *g)
 	buffer_get_ec_internal(&data, v, g);
 	off = data - olddata;
 	buf->offset += off;
+
+	return 0;
 }
 
 void buffer_dump(FILE *fp, buffer_t *buf)
@@ -544,25 +561,27 @@ void buffer_dump(FILE *fp, buffer_t *buf)
 }
 
 // バッファのオフセットを進める。
-void buffer_consume(buffer_t *buf, size_t shift_byte)
+int buffer_consume(buffer_t *buf, size_t len)
 {
-	if (shift_byte > buf->len - buf->offset) {
-		// TODO: fatal error
+	if (len > buf->len - buf->offset) {
+		return SSH_ERR_MESSAGE_INCOMPLETE;
 	} else {
-		buf->offset += shift_byte;
+		buf->offset += len;
 		// lenは変えない。
 	}
+	return 0;
 }
 
 // バッファの末尾を縮退する。
-void buffer_consume_end(buffer_t *buf, size_t shift_byte)
+int buffer_consume_end(buffer_t *buf, size_t len)
 {
-	if (shift_byte > buf->len - buf->offset) {
-		// TODO: fatal error
+	if (len > buf->len - buf->offset) {
+		return SSH_ERR_MESSAGE_INCOMPLETE;
 	} else {
-		buf->len -= shift_byte;
+		buf->len -= len;
 		// offsetは変えない。
 	}
+	return 0;
 }
 
 
@@ -585,7 +604,9 @@ int buffer_compress(z_stream *zstream, char *payload, size_t len, buffer_t *comp
 		// バッファを圧縮する。圧縮すると、逆にサイズが大きくなることも考慮すること。
 		status = deflate(zstream, Z_PARTIAL_FLUSH);
 		if (status == Z_OK) {
-			buffer_put(compbuf, buf, sizeof(buf) - zstream->avail_out);
+			if (buffer_put(compbuf, buf, sizeof(buf) - zstream->avail_out) != 0) {
+				return -1; // error
+			}
 		} else {
 			return -1; // error
 		}
@@ -613,7 +634,9 @@ int buffer_decompress(z_stream *zstream, char *payload, size_t len, buffer_t *co
 		// バッファを展開する。
 		status = inflate(zstream, Z_PARTIAL_FLUSH);
 		if (status == Z_OK) {
-			buffer_put(compbuf, buf, sizeof(buf) - zstream->avail_out);
+			if (buffer_put(compbuf, buf, sizeof(buf) - zstream->avail_out) != 0) {
+				return -1; // error
+			}
 
 		} else if (status == Z_OK) {
 			break;

@@ -417,7 +417,10 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	// ファイルをすべて読み込む
 	for (;;) {
 		len = fread(buf, 1, sizeof(buf), fp);
-		buffer_put(blob, buf, len);
+		if (buffer_put(blob, buf, len) != 0) {
+			logprintf(LOG_LEVEL_WARNING, "%s: buffer put error", __FUNCTION__);
+			goto error;
+		}
 		if (buffer_len(blob) > MAX_KEY_FILE_SIZE) {
 			logprintf(LOG_LEVEL_WARNING, "%s: key file too large.", __FUNCTION__);
 			goto error;
@@ -438,14 +441,21 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	cp += m1len;
 	len -= m1len;
 	while (len) {
-		if (*cp != '\n' && *cp != '\r')
-			buffer_put_char(encoded, *cp);
+		if (*cp != '\n' && *cp != '\r') {
+			if (buffer_put_char(encoded, *cp) != 0) {
+				logprintf(LOG_LEVEL_WARNING, "%s: buffer put error", __FUNCTION__);
+				goto error;
+			}
+		}
 		last = *cp;
 		len--;
 		cp++;
 		if (last == '\n') {
 			if (len >= m2len && !memcmp(cp, MARK_END, m2len)) {
-				buffer_put_char(encoded, '\0');
+				if (buffer_put_char(encoded, '\0') != 0) {
+					logprintf(LOG_LEVEL_WARNING, "%s: buffer put error", __FUNCTION__);
+					goto error;
+				}
 				break;
 			}
 		}
@@ -470,13 +480,19 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		goto error;
 	}
 
-	buffer_consume_end(copy_consumed, len - dlen);
+	if (buffer_consume_end(copy_consumed, len - dlen) != 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_consume_end() error", __FUNCTION__);
+		goto error;
+	}
 	if (buffer_remain_len(copy_consumed) < sizeof(AUTH_MAGIC) ||
 	    memcmp(buffer_tail_ptr(copy_consumed), AUTH_MAGIC, sizeof(AUTH_MAGIC))) {
 		logprintf(LOG_LEVEL_ERROR, "%s: bad magic", __FUNCTION__);
 		goto error;
 	}
-	buffer_consume(copy_consumed, sizeof(AUTH_MAGIC));
+	if (buffer_consume(copy_consumed, sizeof(AUTH_MAGIC)) != 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_consume() error", __FUNCTION__);
+		goto error;
+	}
 
 	/*
 	 * デコードしたデータを解析する。
@@ -583,7 +599,10 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	if (ret == 0) {
 		goto error;
 	}
-	buffer_consume(copy_consumed, len);
+	if (buffer_consume(copy_consumed, len) != 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_consume() error", __FUNCTION__);
+		goto error;
+	}
 
 	if (buffer_remain_len(copy_consumed) != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: key blob has trailing data (len = %u)", __FUNCTION__,
@@ -1034,7 +1053,10 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 				s[0] = b[i];
 				s[1] = b[i+1];
 				s[2] = '\0';
-				buffer_put_char(passphrase_salt, strtoul(s, NULL, 16));
+				if (buffer_put_char(passphrase_salt, strtoul(s, NULL, 16)) != 0) {
+					strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+					goto error;
+				}
 			}
 			else {
 				strncpy_s(errmsg, errmsg_len, "file format error", _TRUNCATE);
@@ -1111,7 +1133,10 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			goto error;
 		}
 		buffer_clear(private_blob);
-		buffer_put(private_blob, decrypted, len);
+		if (buffer_put(private_blob, decrypted, len) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 		free(decrypted);
 		cipher_free_SSH2(cc);
 	}
@@ -1125,11 +1150,14 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		int i;
 
 		macdata = buffer_init();
-		buffer_put_cstring(macdata, get_ssh2_hostkey_type_name(result->type));
-		buffer_put_cstring(macdata, encryption);
-		buffer_put_cstring(macdata, comment);
-		buffer_put_string(macdata, buffer_ptr(public_blob), buffer_len(public_blob));
-		buffer_put_string(macdata, buffer_ptr(private_blob), buffer_len(private_blob));
+		if (buffer_put_cstring(macdata, get_ssh2_hostkey_type_name(result->type)) != 0 ||
+		    buffer_put_cstring(macdata, encryption) != 0 ||
+		    buffer_put_cstring(macdata, comment) != 0 ||
+		    buffer_put_string(macdata, buffer_ptr(public_blob), buffer_len(public_blob)) != 0 ||
+		    buffer_put_string(macdata, buffer_ptr(private_blob), buffer_len(private_blob)) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 
 		if (fmt_version == 2) {
 			md = EVP_sha1();
@@ -1199,13 +1227,19 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			goto error;
 		}
 
-		buffer_get_bignum2(public_blob, e);
-		buffer_get_bignum2(public_blob, n);
+		if (buffer_get_bignum2(public_blob, e) != 0 ||
+		    buffer_get_bignum2(public_blob, n) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 
-		buffer_get_bignum2(private_blob, d);
-		buffer_get_bignum2(private_blob, p);
-		buffer_get_bignum2(private_blob, q);
-		buffer_get_bignum2(private_blob, iqmp);
+		if (buffer_get_bignum2(public_blob, d) != 0 ||
+		    buffer_get_bignum2(public_blob, p) != 0 ||
+		    buffer_get_bignum2(public_blob, q) != 0 ||
+		    buffer_get_bignum2(public_blob, iqmp) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 
 		break;
 	}
@@ -1243,12 +1277,14 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			goto error;
 		}
 
-		buffer_get_bignum2(public_blob, p);
-		buffer_get_bignum2(public_blob, q);
-		buffer_get_bignum2(public_blob, g);
-		buffer_get_bignum2(public_blob, pub_key);
-
-		buffer_get_bignum2(private_blob, priv_key);
+		if (buffer_get_bignum2(public_blob, p) != 0 ||
+		    buffer_get_bignum2(public_blob, q) != 0 ||
+		    buffer_get_bignum2(public_blob, g) != 0 ||
+		    buffer_get_bignum2(public_blob, pub_key) != 0 ||
+		    buffer_get_bignum2(public_blob, priv_key) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 
 		break;
 	}
@@ -1287,8 +1323,9 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		if ((exponent = BN_new()) == NULL)
 			goto ecdsa_error;
 
-		buffer_get_ec(public_blob, q, EC_KEY_get0_group(result->ecdsa));
-		buffer_get_bignum2(private_blob, exponent);
+		if (buffer_get_ec(public_blob, q, EC_KEY_get0_group(result->ecdsa)) != 0 ||
+		    buffer_get_bignum2(public_blob, exponent) != 0)
+			goto ecdsa_error;
 		if (EC_KEY_set_public_key(result->ecdsa, q) != 1)
 			goto ecdsa_error;
 		if (EC_KEY_set_private_key(result->ecdsa, exponent) != 1)
@@ -1513,7 +1550,10 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	chain = BIO_push(b64, bmem);
 	BIO_set_mem_eof_return(chain, 0);
 	while ((len2 = BIO_read(chain, buf, sizeof(buf))) > 0) {
-		buffer_put(blob, buf, len2);
+		if (buffer_put(blob, buf, len2) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 	}
 	BIO_free_all(chain);
 	buffer_rewind(blob);
@@ -1557,7 +1597,10 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		strncpy_s(errmsg, errmsg_len, "unknown key type", _TRUNCATE);
 		goto error;
 	}
-	buffer_consume(blob, len);
+	if (buffer_consume(blob, len) != 0) {
+		strncpy_s(errmsg, errmsg_len, "buffer_consume() error", _TRUNCATE);
+		goto error;
+	}
 
 	if (buffer_get_int(blob, &len) != 0) {
 		strncpy_s(errmsg, errmsg_len, "encryption type missing", _TRUNCATE);
@@ -1575,7 +1618,10 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		strncpy_s(errmsg, errmsg_len, "unknown encryption type", _TRUNCATE);
 		goto error;
 	}
-	buffer_consume(blob, len);
+	if (buffer_consume(blob, len) != 0) {
+		strncpy_s(errmsg, errmsg_len, "buffer_consume() error", _TRUNCATE);
+		goto error;
+	}
 
 	if (buffer_get_int(blob, &len) != 0) {
 		strncpy_s(errmsg, errmsg_len, "body missing", _TRUNCATE);
@@ -1621,14 +1667,20 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 			cipher_free_SSH2(cc);
 			goto error;
 		}
-		buffer_put(blob2, decrypted, len);
+		if (buffer_put(blob2, decrypted, len) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 		free(decrypted);
 		cipher_free_SSH2(cc);
 
 		*invalid_passphrase = TRUE;
 	}
-	else { // none
-		buffer_put(blob2, blob->buf + blob->offset, len);
+	else {	// none
+		if (buffer_put(blob2, blob->buf + blob->offset, len) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 	}
 	buffer_rewind(blob2);
 
@@ -1670,12 +1722,15 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 			goto error;
 		}
 
-		buffer_get_bignum_SECSH(blob2, e);
-		buffer_get_bignum_SECSH(blob2, d);
-		buffer_get_bignum_SECSH(blob2, n);
-		buffer_get_bignum_SECSH(blob2, iqmp);
-		buffer_get_bignum_SECSH(blob2, p);
-		buffer_get_bignum_SECSH(blob2, q);
+		if (buffer_get_bignum_SECSH(blob2, e) != 0 ||
+		    buffer_get_bignum_SECSH(blob2, d) != 0 ||
+		    buffer_get_bignum_SECSH(blob2, n) != 0 ||
+		    buffer_get_bignum_SECSH(blob2, iqmp) != 0 ||
+		    buffer_get_bignum_SECSH(blob2, p) != 0 ||
+		    buffer_get_bignum_SECSH(blob2, q) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 
 		break;
 	}
@@ -1713,11 +1768,15 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 			strncpy_s(errmsg, errmsg_len, "predefined DSA parameters not supported", _TRUNCATE);
 			goto error;
 		}
-		buffer_get_bignum_SECSH(blob2, p);
-		buffer_get_bignum_SECSH(blob2, g);
-		buffer_get_bignum_SECSH(blob2, q);
-		buffer_get_bignum_SECSH(blob2, pub_key);
-		buffer_get_bignum_SECSH(blob2, priv_key);
+
+		if (buffer_get_bignum_SECSH(blob2, p) != 0 ||
+		    buffer_get_bignum_SECSH(blob2, g) != 0 ||
+		    buffer_get_bignum_SECSH(blob2, q) != 0 ||
+		    buffer_get_bignum_SECSH(blob2, pub_key) != 0 ||
+		    buffer_get_bignum_SECSH(blob2, priv_key) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 
 		break;
 	}
@@ -1758,7 +1817,8 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		if ((exponent = BN_new()) == NULL)
 			goto ecdsa_error;
 
-		buffer_get_bignum_SECSH(blob2, exponent);
+		if (buffer_get_bignum_SECSH(blob2, exponent) != 0)
+			goto ecdsa_error;
 		if (EC_KEY_set_private_key(result->ecdsa, exponent) != 1)
 			goto ecdsa_error;
 		if (key_ec_validate_private(result->ecdsa) != 0)
