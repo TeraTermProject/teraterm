@@ -50,6 +50,78 @@
 #include "filesys_log.h"
 #include "filesys.h"  // for ProtoGetProtoFlag()
 
+/**
+ *	メインのログ出力
+ *
+ *	機能一覧
+ *	- ログのオープン/クローズ
+ *		- FLogOpen(), FLogClose()
+ *		- テキストモード/バイナリモード(排他, ts.LogBinary)
+ *		- ログの文字コード UTF-8/UTF-16LE/UTF-16BE, BOM出力
+ *		- 追記/上書き(ts.Append)
+ *	- リングバッファ処理
+ *		- リングバッファへ追加
+ *			- Put1()
+ *		- メインループから定期的にファイルへ書き出される
+ *			- FLogWriteFile() -> LogToFile()
+ *		- ファイル上の順序はリングバッファへの投入順
+ *	- 遅延書き込み
+ *		- ts.DeferredLogWriteMode が 1 の時スレッドを使う
+ *		- 専用スレッド(DeferredLogWriteThread())がファイルへ書き込む
+ *		- TODO ロックが怪しい?
+ *		  - logfile_lock(), logfile_unlock()
+ *	- タイムスタンプ付与
+ *		- テキストモード時、ts.LogTimestamp が 1 の時、行頭にタイムスタンプを付与
+ *		- ローカル時刻/UTC/経過時間(ログ開始から,接続から)
+ *	- タイムスタンプ用文字列生成
+ *		- FLogTimeStampStrW()
+ *	- ログローテート
+ *		- サイズ契機でファイルを世代管理(LogRotate())
+ *		- FLogRotateSize(), FLogRotateRotate(), FLogRotateHalt()
+ *	- 一時停止(ポーズ)/再開
+ *		- FLogPause(), FLogIsPause()
+ *		- 停止中の受信データはログに残らない(破棄される)
+ *	- 表示バッファの一括書き出し
+ *		- ログ開始時に画面の内容をログへ書き出す機能用
+ *		- FLogOutputAllBuffer()
+ *	- ログファイル名の生成
+ *		- strftime 展開, &h(ホスト名)/&p(ポート番号)/&u(ユーザ名)の置換
+ *		- FLogGetLogFilenameBase(), ConvertLognameW()
+ *	- 進捗ダイアログ(CFileTransDlg)
+ *		- 書き込みバイト数などの表示, 表示/非表示切り替え
+ *		- FLogWindow(), FLogShowDlg()
+ *	- 状態取得
+ *		- オープン状態 FLogIsOpend(), FLogIsOpendText(), FLogIsOpendBin()
+ *		- バッファの蓄積量/空き FLogGetCount(), FLogGetFreeCount()
+ *		- ファイル名 FLogGetFilename(), マクロ loginfo 用情報 FLogInfo()
+ */
+
+/**
+ *	ログへの書き込み経路
+ *
+ *	1. 端末のエコーをログ(テキストログ)
+ *		- ホスト->受信バッファ->パース->端末へ出力(=ログ) となるので書き込みまで少しかかる
+ *		- FLogPutUTF32()
+ *		- FLogPutANSI()
+ *			= cv.Log1Byte(), tekesc 用のログ
+ *		- ログが一時停止状態の時は何もしない
+ *		@TODO
+ *			- Tekは以前dllだったため関数へのポインタが必要だったが現在はexeに内蔵している
+ *			- cv.Log1Byte() を削除, FLogPutANSI() を直接読み出し
+ *	2. バイナリログ
+ *		- 受信バッファに入ったものをそのままログへ出力
+ *		- 受信バッファ処理から呼ばれる
+ *		- テキストログとバイナリログは排他
+ *		- FLogPutBinary()
+ *			= cv.Log1Bin()
+ *		- FLogBinSkip()
+ *			= cv.LogBinSkip()
+ *		- ttpcmn.dll 内にバッファ処理があるため、関数へのポインタが必要だった
+ *	3. マクロからログへ書き込み
+ *		- logwriteマクロコマンド、即時書き込み
+ *		- FLogWriteStr()
+ */
+
 #define TitLog      L"Logging"
 
 /*
@@ -66,7 +138,7 @@ typedef struct {
 	wchar_t *FullName;
 
 	HANDLE FileHandle;
-	LONG FileSize;		// ? 使っていない
+	LONG FileSize;		// 未使用	TODO 削除
 	LONG ByteCount;		// ファイルサイズ
 
 	DWORD StartTime;
@@ -625,7 +697,10 @@ static void LogToFile(PFileVar fv)
 	DWORD WriteBufLen = 0;
 	PCHAR WriteBuf = (PCHAR)malloc(WriteBufMax);
 	while (Get1(fv, &b)) {
-		if (FLogIsPause() || ProtoGetProtoFlag()) {
+		// xmodemなど処理中?
+		if (ProtoGetProtoFlag()) {
+			// 処理中はログ出力を止める
+			//  TODO バイナリログへの入力を止めればokでは?
 			continue;
 		}
 
@@ -810,6 +885,13 @@ BOOL FLogIsOpendBin(void)
 
 /**
  *	ログに文字列を書き込む
+ *	logwriteマクロコマンド用
+ *
+ *	@param	str		ログへ書き込む文字列
+ *
+ *	logwriteマクロコマンドは
+ *	ログのポーズ状態にかかわらずログへ書き込む
+ *
  */
 void FLogWriteStr(const wchar_t *str)
 {
@@ -820,10 +902,17 @@ void FLogWriteStr(const wchar_t *str)
 	if (str == NULL) {
 		return;
 	}
+
+	// ポーズ状態を取得、ポーズ解除
+	BOOL paused = fv->IsPause;
+	fv->IsPause = FALSE;
 	OutputStr(fv, str);
 
 	// すぐに書き込む
 	LogToFile(fv);
+
+	// ポーズ状態を復帰
+	fv->IsPause = paused;
 }
 
 /**
@@ -1200,6 +1289,9 @@ static void OutputStr(PFileVar fv, const wchar_t *strW)
  */
 void FLogPutUTF32(unsigned int u32)
 {
+	if (FLogIsPause()) {
+		return;
+	}
 	PFileVar fv = LogVar;
 	FLogPutUTF32_(fv, u32);
 }
@@ -1210,6 +1302,9 @@ void FLogPutUTF32(unsigned int u32)
  */
 void FLogPutANSI(BYTE b)
 {
+	if (FLogIsPause()) {
+		return;
+	}
 	PFileVar fv = LogVar;
 	if (fv->LogMode != TFileVar::LogModeTag::TEXT_MODE) {
 		return;
