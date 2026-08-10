@@ -35,8 +35,8 @@
 #if 1
 typedef struct buffer {
 	char *buf;	   /* バッファの先頭ポインタ。realloc()により変動する。*/
-	size_t offset; /* 現在の読み出し位置 */
-	size_t maxlen; /* バッファの最大サイズ */
+	size_t offset; /* 現在の読み出し/書き込み位置 */
+	size_t maxlen; /* バッファの最大サイズ（確保済みサイズ） */
 	size_t len;	   /* バッファに含まれる有効なデータサイズ */
 } buffer_t;
 #else
@@ -70,10 +70,24 @@ int buffer_put_int(buffer_t *buf, int val);
 int buffer_get_char(buffer_t *buf, u_char *valp);
 int buffer_put_char(buffer_t *buf, int val);
 
-void *buffer_get_string(buffer_t *buf, int *lenp);
+void *buffer_get_string_(buffer_t *buf, int *lenp);
+int buffer_get_string(buffer_t *buf, u_char **valp, size_t *lenp);
+int buffer_get_cstring(buffer_t *buf, char **valp, size_t *lenp);
+int buffer_get_stringb(buffer_t *buf, buffer_t *v);
 int buffer_put_string(buffer_t *buf, const char *v, size_t len);
 int buffer_put_cstring(buffer_t *buf, const char *v);
 int buffer_put_stringb(buffer_t *buf, buffer_t *v);
+
+/*
+ * "Direct" variant of sshbuf_get_string, returns pointer into the sshbuf to
+ * avoid an malloc+memcpy. The pointer is guaranteed to be valid until the
+ * next sshbuf-modifying function call. Caller does not free.
+ */
+int buffer_get_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp);
+/* Skip past a string */
+#define buffer_skip_string(buf) buffer_get_string_direct(buf, NULL, NULL)
+/* Another variant: "peeks" into the buffer without modifying it */
+int buffer_peek_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp);
 
 int buffer_put_bignum1(buffer_t *buf, const BIGNUM *v);
 

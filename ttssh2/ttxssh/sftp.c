@@ -287,9 +287,15 @@ static void sftp_do_init_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 	sftp_syslog(pvar, "SFTP server version %u, remote version %u", type, c->sftp.version);
 
 	while (buffer_remain_len(msg) > 0) {
-		char *name = buffer_get_string(msg, NULL);
-		char *value = buffer_get_string(msg, NULL);
+		char *name = NULL;
+		char *value = NULL; 
 		int known = 0;
+
+		if (buffer_get_string(msg, &name, NULL) != 0 ||
+		    buffer_get_string(msg, &value, NULL) != 0) {
+			sftp_syslog(pvar, "buffer put error");
+			goto error;
+		}
 
         if (strcmp(name, "posix-rename@openssh.com") == 0 &&
             strcmp(value, "1") == 0) {
@@ -415,8 +421,12 @@ static char *sftp_do_realpath_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 		goto error;
 	}
 
-	filename = buffer_get_string(msg, NULL);
-	longname = buffer_get_string(msg, NULL);
+	if (buffer_get_string(msg, &filename, NULL) != 0 ||
+	    buffer_get_string(msg, &longname, NULL) != 0) {
+		sftp_syslog(pvar, "buffer put error");
+		goto error;
+	}
+
 	//a = decode_attrib(&msg);
 
 	sftp_console_message(pvar, c, "SSH_FXP_REALPATH %s -> %s", c->sftp.path, filename);

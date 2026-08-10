@@ -142,6 +142,85 @@ panic:
 	return (NULL);
 }
 
+// from OpenSSH 10.4p1 sshbuf.c
+static int sshbuf_check_sanity(buffer_t *buf)
+{
+	if (buf == NULL || buf->maxlen > BUFFER_SIZE_MAX || buf->len > buf->maxlen || buf->offset > buf->len) {
+		return SSH_ERR_INTERNAL_ERROR;
+	}
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf.c
+int buffer_check_reserve(buffer_t *buf, size_t len)
+{
+	int r;
+
+	if ((r = sshbuf_check_sanity(buf)) != 0)
+		return r;
+
+	/* Check that len is reasonable and that max_size + available < len */
+	if (len > BUFFER_SIZE_MAX || BUFFER_SIZE_MAX - len < buf->len - buf->offset)
+		return SSH_ERR_NO_BUFFER_SPACE;
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf.c
+int buffer_allocate(buffer_t *buf, size_t len)
+{
+	size_t rlen, need;
+	u_char *dp;
+	int r;
+
+	if ((r = buffer_check_reserve(buf, len)) != 0)
+		return r;
+
+	if (len + buf->len <= buf->maxlen)
+		return 0; /* already have it. */
+
+	/*
+	 * Prefer to alloc in SSHBUF_SIZE_INC units, but
+	 * allocate less if doing so would overflow max_size.
+	 */
+	need = len + buf->len - buf->maxlen;
+	rlen = buf->maxlen + need;
+
+	if (rlen > BUFFER_SIZE_MAX)
+		rlen = buf->maxlen + need;
+
+	if ((dp = realloc(buf->buf, rlen)) == NULL) {
+		return SSH_ERR_ALLOC_FAIL;
+	}
+	buf->maxlen = rlen;
+	buf->buf = dp;
+	if ((r = buffer_check_reserve(buf, len)) < 0) {
+		/* shouldn't fail */
+		return r;
+	}
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf.c
+// buf->len は len バイト（拡張した長さ） 進むので、
+// この関数を呼んだら dpp に len バイト書き込まなければならない
+int buffer_reserve(buffer_t *buf, size_t len, u_char **dpp)
+{
+	u_char *dp;
+	int r;
+
+	if (dpp != NULL)
+		*dpp = NULL;
+
+	if ((r = buffer_allocate(buf, len)) != 0)
+		return r;
+
+	dp = buf->buf + buf->len; // 拡張前のデータ末尾のポインタ
+	buf->len += len;
+	if (dpp != NULL)
+		*dpp = dp;
+	return 0;
+}
+
 int buffer_put(buffer_t * buf, const void *v, size_t len)
 {
 	size_t n;
@@ -239,7 +318,7 @@ static char *buffer_get_string_internal(char **data_ptr, int *buflen_ptr)
 }
 
 // NOTE: You should free the return pointer if it's unused.
-void *buffer_get_string(buffer_t *buf, int *lenp)
+void *buffer_get_string_(buffer_t *buf, int *lenp)
 {
 	char *data, *olddata;
 	void *ret = NULL;
@@ -262,6 +341,143 @@ void *buffer_get_string(buffer_t *buf, int *lenp)
 
 error:;
 	return (ret);
+}
+
+
+// from OpenSSH 10.4p1 sshbuf-getput-basic.c
+int buffer_get_string(buffer_t *buf, u_char **valp, size_t *lenp)
+{
+	const u_char *val;
+	size_t len;
+	int r;
+
+	if (valp != NULL)
+		*valp = NULL;
+	if (lenp != NULL)
+		*lenp = 0;
+	if ((r = buffer_get_string_direct(buf, &val, &len)) < 0)
+			return r;
+		if (valp != NULL) {
+		if ((*valp = malloc(len + 1)) == NULL) {
+			logprintf(LOG_LEVEL_ERROR, "%s: malloc failed.", __FUNCTION__);
+			return SSH_ERR_ALLOC_FAIL;
+		}
+		if (len != 0)
+			memcpy(*valp, val, len);
+		(*valp)[len] = '\0';
+	}
+	if (lenp != NULL)
+		*lenp = len;
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf-getput-basic.c
+int buffer_get_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp)
+{
+	size_t len;
+	const u_char *p;
+	int r;
+
+	if (valp != NULL)
+		*valp = NULL;
+	if (lenp != NULL)
+		*lenp = 0;
+	if ((r = buffer_peek_string_direct(buf, &p, &len)) < 0)
+		return r;
+	if (valp != NULL)
+		*valp = p;
+	if (lenp != NULL)
+		*lenp = len;
+	if (buffer_consume(buf, len + 4) != 0) {
+		/* Shouldn't happen */
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_INTERNAL_ERROR", __FUNCTION__);
+		return SSH_ERR_INTERNAL_ERROR;
+	}
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf-getput-basic.c
+int buffer_peek_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp)
+{
+	uint32_t len;
+	const u_char *p = buffer_tail_ptr(buf);
+
+	if (valp != NULL)
+		*valp = NULL;
+	if (lenp != NULL)
+		*lenp = 0;
+	if (buffer_remain_len(buf) < 4) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_MESSAGE_INCOMPLETE", __FUNCTION__);
+		return SSH_ERR_MESSAGE_INCOMPLETE;
+	}
+	len = PEEK_U32(p);
+	if (len > BUFFER_SIZE_MAX - 4) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_STRING_TOO_LARGE", __FUNCTION__);
+		return SSH_ERR_STRING_TOO_LARGE;
+	}
+	if (buffer_remain_len(buf) - 4 < len) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_MESSAGE_INCOMPLETE", __FUNCTION__);
+		return SSH_ERR_MESSAGE_INCOMPLETE;
+	}
+	if (valp != NULL)
+		*valp = p + 4;
+	if (lenp != NULL)
+		*lenp = len;
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf-getput-basic.c
+int buffer_get_cstring(buffer_t *buf, char **valp, size_t *lenp)
+{
+	size_t len;
+	const u_char *p, *z;
+	int r;
+
+	if (valp != NULL)
+		*valp = NULL;
+	if (lenp != NULL)
+		*lenp = 0;
+	if ((r = buffer_peek_string_direct(buf, &p, &len)) != 0)
+		return r;
+	/* Allow a \0 only at the end of the string */
+	if (len > 0 && (z = memchr(p, '\0', len)) != NULL && z < p + len - 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_INVALID_FORMAT", __FUNCTION__);
+		return SSH_ERR_INVALID_FORMAT;
+	}
+	if ((r = buffer_skip_string(buf)) != 0)
+		return -1;
+	if (valp != NULL) {
+		if ((*valp = malloc(len + 1)) == NULL) {
+			logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_ALLOC_FAIL", __FUNCTION__);
+			return SSH_ERR_ALLOC_FAIL;
+		}
+		if (len != 0)
+			memcpy(*valp, p, len);
+		(*valp)[len] = '\0';
+	}
+	if (lenp != NULL)
+		*lenp = (size_t)len;
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf-getput-basic.c
+int buffer_get_stringb(buffer_t *buf, buffer_t *v)
+{
+	uint32_t len;
+	u_char *p;
+	int r;
+
+	/*
+	 * Use sshbuf_peek_string_direct() to figure out if there is
+	 * a complete string in 'buf' and copy the string directly
+	 * into 'v'.
+	 */
+	if ((r = buffer_peek_string_direct(buf, NULL, NULL)) != 0 ||
+	    (r = buffer_get_int(buf, &len)) != 0 ||
+	    (r = buffer_reserve(v, len, &p)) != 0 ||
+	    (r = buffer_get(buf, p, len)) != 0)
+		return r;
+	return 0;
 }
 
 int buffer_put_string(buffer_t *msg, const char *v, size_t len)

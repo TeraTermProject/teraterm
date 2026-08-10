@@ -409,7 +409,8 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 		goto error;
 	buffer_rewind(b);
 
-	ktype = buffer_get_string(b, NULL);
+	if ((ret = buffer_get_string(b, &ktype, NULL)) != 0)
+		goto error;
 	if (strcmp(get_ssh2_hostkey_type_name(keytype), ktype) != 0) {
 		ret = SSH_ERR_KEY_TYPE_MISMATCH;
 		goto error;
@@ -480,12 +481,14 @@ static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int s
 	if ((r = buffer_put(b, signature, signaturelen)) != 0)
 		goto error;
 	buffer_rewind(b);
-	ktype = buffer_get_string(b, NULL);
+	if ((r = buffer_get_string(b, &ktype, NULL)) != 0)
+		goto error;
 	if (strcmp("ssh-ed25519", ktype) != 0) {
 		r = SSH_ERR_KEY_TYPE_MISMATCH;
 		goto error;
 	}
-	sigblob = buffer_get_string(b, &len);
+	if ((r = buffer_get_string(b, &sigblob, &len)) != 0)
+		goto error;
 	rlen = buffer_remain_len(b);
 	if (rlen != 0) {
 		r = SSH_ERR_UNEXPECTED_TRAILING_DATA;
@@ -1380,7 +1383,8 @@ Key *key_from_blob(char *data, int blen)
 		goto error;
 	buffer_rewind(b);
 
-	ktype = buffer_get_string(b, NULL);
+	if (buffer_get_string(b, &ktype, NULL) != 0)
+		goto error;
 	type = get_hostkey_type_from_name(ktype);
 
 	switch (type) {
@@ -1437,7 +1441,8 @@ Key *key_from_blob(char *data, int blen)
 	case KEY_ECDSA256: // ECDSA
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
-		curve = buffer_get_string(b, NULL);
+		if (buffer_get_string(b, &curve, NULL) != 0)
+			goto error;
 		if (type != key_curve_name_to_keytype(curve)) {
 			goto error;
 		}
@@ -1468,7 +1473,8 @@ Key *key_from_blob(char *data, int blen)
 		break;
 
 	case KEY_ED25519:
-		pk = buffer_get_string(b, &len);
+		if (buffer_get_string(b, &pk, &len) != 0)
+			goto error;
 		if (pk == NULL)
 			goto error;
 		if (len != ED25519_PK_SZ)
@@ -1979,7 +1985,8 @@ Key *key_private_deserialize(buffer_t *blob)
 	BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
 	BIGNUM *g, *pub_key, *priv_key;
 
-	type_name = buffer_get_string(blob, NULL);
+	if (buffer_get_string(blob, &type_name, NULL) != 0)
+		goto error;
 	if (type_name == NULL)
 		goto error;
 	type = get_hostkey_type_from_name(type_name);
@@ -2031,7 +2038,8 @@ Key *key_private_deserialize(buffer_t *blob)
 			EC_POINT *q = NULL;
 
 			nid = keytype_to_cipher_nid(type);
-			curve = buffer_get_string(blob, NULL);
+			if (buffer_get_string(blob, &curve, NULL) != 0)
+				goto ecdsa_error;
 			skt = key_curve_name_to_keytype(curve);
 			if (nid != keytype_to_cipher_nid(skt))
 				goto ecdsa_error;
@@ -2070,8 +2078,9 @@ ecdsa_error:
 			break;
 
 		case KEY_ED25519:
-			k->ed25519_pk = buffer_get_string(blob, &pklen);
-			k->ed25519_sk = buffer_get_string(blob, &sklen);
+			if (buffer_get_string(blob, &k->ed25519_pk, &pklen) != 0 ||
+			    buffer_get_string(blob, &k->ed25519_sk, &sklen) != 0)
+				goto error;
 			if (pklen != ED25519_PK_SZ)
 				goto error;
 			if (sklen != ED25519_SK_SZ)
@@ -2537,7 +2546,10 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 		free(blob);
 		blob = NULL;
 
-		sig = buffer_get_string(bsig, &siglen_i);
+		if (buffer_get_string(bsig, &sig, &siglen_i) != 0) {
+			logprintf(LOG_LEVEL_FATAL, "buffer put error");
+			goto error;
+		}
 		siglen = siglen_i;
 		// 手抜き。hostkey algorithm を使うのは RSA の時のみなので、
 		// とりあえず KEY_ALGO_RSA を指定しておく。
@@ -2608,7 +2620,10 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		key_free(key);
 		key = NULL;
 
-		blob = buffer_get_string(b, &len);
+		if (buffer_get_string(b, &blob, &len) != 0) {
+			logprintf(LOG_LEVEL_FATAL, "buffer put error");
+			goto error;
+		}
 		key = key_from_blob(blob, len);
 		if (key == NULL) {
 			logprintf(LOG_LEVEL_ERROR, "Not found host key into blob %p (%d)", blob, len);

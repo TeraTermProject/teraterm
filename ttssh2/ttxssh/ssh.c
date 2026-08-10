@@ -8216,7 +8216,10 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 		buffer_rewind(pvar->userauth_inforeq_prompts);
 
 		// 1個目のプロンプトでダイアログを表示
-		prompt_disp = buffer_get_string(pvar->userauth_inforeq_prompts, &prompt_len);
+		if (buffer_get_string(pvar->userauth_inforeq_prompts, &prompt_disp, &prompt_len) != 0) {
+			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
+			goto err;
+		}
 		if (buffer_get_int(pvar->userauth_inforeq_prompts, &echo) != 0) {
 			logprintf(LOG_LEVEL_ERROR, "%s: missing echo.", __FUNCTION__);
 			free(prompt_disp);
@@ -8268,7 +8271,10 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 
 	if (pvar->userauth_inforeq_index < pvar->userauth_inforeq_num) {
 		// 次のプロンプトでダイアログを表示
-		prompt_disp = buffer_get_string(pvar->userauth_inforeq_prompts, &prompt_len);
+		if (buffer_get_string(pvar->userauth_inforeq_prompts, &prompt_disp, &prompt_len) != 0) {
+			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
+			return;
+		}
 		if (buffer_get_int(pvar->userauth_inforeq_prompts, &echo) != 0) {
 			logprintf(LOG_LEVEL_ERROR, "%s: missing echo.", __FUNCTION__);
 			free(prompt_disp);

@@ -498,7 +498,10 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	 * デコードしたデータを解析する。
 	 */
 	// 暗号化アルゴリズムの名前
-	ciphername = buffer_get_string(copy_consumed, NULL);
+	if (buffer_get_string(copy_consumed, &ciphername, NULL) != 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
+		goto error;
+	}
 	cipher = get_cipher_by_name(ciphername);
 	if (cipher == NULL && strcmp(ciphername, "none") != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: unknown cipher name", __FUNCTION__);
@@ -511,7 +514,10 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		goto error;
 	}
 
-	kdfname = buffer_get_string(copy_consumed, NULL);
+	if (buffer_get_string(copy_consumed, &kdfname, NULL) != 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
+		goto error;
+	}
 	if (kdfname == NULL ||
 	    (!strcmp(kdfname, "none") && !strcmp(kdfname, KDFNAME))) {
 		logprintf(LOG_LEVEL_ERROR, "%s: unknown kdf name", __FUNCTION__ );
@@ -523,7 +529,10 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	}
 
 	/* kdf options */
-	kdfp = buffer_get_string(copy_consumed, &klen);
+	if (buffer_get_string(copy_consumed, &kdfp, &klen) != 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
+		goto error;
+	}
 	if (kdfp == NULL) {
 		logprintf(LOG_LEVEL_ERROR, "%s: kdf options not set", __FUNCTION__);
 		goto error;
@@ -547,7 +556,10 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	}
 
 	/* pubkey */
-	cp = buffer_get_string(copy_consumed, &len);
+	if (buffer_get_string(copy_consumed, &cp, &len) != 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
+		goto error;
+	}
 	if (cp == NULL) {
 		logprintf(LOG_LEVEL_ERROR, "%s: pubkey not found", __FUNCTION__);
 		goto error;
@@ -575,7 +587,10 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	ivlen = blocksize;
 	key = calloc(1, keylen + ivlen);
 	if (!strcmp(kdfname, KDFNAME)) {
-		salt = buffer_get_string(kdf, &slen);
+		if (buffer_get_string(kdf, &salt, &slen) != 0) {
+			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
+			goto error;
+		}
 		if (salt == NULL) {
 			logprintf(LOG_LEVEL_ERROR, "%s: salt not set", __FUNCTION__);
 			goto error;
@@ -627,7 +642,10 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		goto error;
 
 	/* comment */
-	comment = buffer_get_string(b, NULL);
+	if (buffer_get_string(b, &comment, NULL) != 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
+		goto error;
+	}
 
 	i = 0;
 	while (buffer_remain_len(b)) {
@@ -1195,7 +1213,10 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		char *pubkey_type;
 		BIGNUM *e, *n, *d, *iqmp, *p, *q;
 
-		pubkey_type = buffer_get_string(public_blob, NULL);
+		if (buffer_get_string(public_blob, &pubkey_type, NULL) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 		if (strcmp(pubkey_type, "ssh-rsa") != 0) {
 			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
 			free(pubkey_type);
@@ -1248,7 +1269,10 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		char *pubkey_type;
 		BIGNUM *p, *q, *g, *pub_key, *priv_key;
 
-		pubkey_type = buffer_get_string(public_blob, NULL);
+		if (buffer_get_string(public_blob, &pubkey_type, NULL) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 		if (strcmp(pubkey_type, "ssh-dss") != 0) {
 			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
 			free(pubkey_type);
@@ -1300,7 +1324,10 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		BIGNUM *exponent = NULL;
 		EC_POINT *q = NULL;
 
-		pubkey_type = buffer_get_string(public_blob, NULL);
+		if (buffer_get_string(public_blob, &pubkey_type, NULL) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 		if ((result->type == KEY_ECDSA256 && strcmp(pubkey_type, "ecdsa-sha2-nistp256") != 0) ||
 		    (result->type == KEY_ECDSA384 && strcmp(pubkey_type, "ecdsa-sha2-nistp384") != 0) ||
 		    (result->type == KEY_ECDSA521 && strcmp(pubkey_type, "ecdsa-sha2-nistp521") != 0)) {
@@ -1311,7 +1338,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		free(pubkey_type);
 
 		nid = keytype_to_cipher_nid(result->type);
-		curve = buffer_get_string(public_blob, NULL);
+		if (buffer_get_string(public_blob, &curve, NULL) != 0)
+			goto ecdsa_error;
 		skt = key_curve_name_to_keytype(curve);
 		if (nid != keytype_to_cipher_nid(skt))
 			goto ecdsa_error;
@@ -1355,7 +1383,10 @@ ecdsa_error:
 		unsigned int pklen, sklen;
 		char *sk;
 
-		pubkey_type = buffer_get_string(public_blob, NULL);
+		if (buffer_get_string(public_blob, &pubkey_type, NULL) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 		if (strcmp(pubkey_type, "ssh-ed25519") != 0) {
 			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
 			free(pubkey_type);
@@ -1363,8 +1394,11 @@ ecdsa_error:
 		}
 		free(pubkey_type);
 
-		result->ed25519_pk = buffer_get_string(public_blob, &pklen);
-		sk = buffer_get_string(private_blob, &sklen);
+		if (buffer_get_string(public_blob, &result->ed25519_pk, &pklen) != 0 ||
+		    buffer_get_string(private_blob, &sk, &sklen) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 		if (pklen != ED25519_PK_SZ) {
 			free(sk);
 			goto error;
@@ -1793,7 +1827,10 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 			strncpy_s(errmsg, errmsg_len, "dummy missing", _TRUNCATE);
 			goto error;
 		}
-		curve = buffer_get_string(blob2, NULL);
+		if (buffer_get_string(blob2, &curve, NULL) != 0) {
+			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
+			goto error;
+		}
 
 		if (strncmp(curve, "nistp256", strlen("nistp256")) == 0) {
 			result->type = KEY_ECDSA256;
