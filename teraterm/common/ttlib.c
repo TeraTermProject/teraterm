@@ -876,42 +876,21 @@ char *strelapsed(DWORD start_time)
 	return strA;
 }
 
+/**
+ *	@param[in]	buff	パラメータを入れるバッファ
+ *	@param[in]	size	buffer文字数(bytes = size*sizeof(wchar_t))
+ *	@retval		NULL 終了
+ */
 wchar_t * PASCAL GetParam(wchar_t *buff, size_t size, wchar_t *param)
 {
-	size_t i = 0;
-	BOOL quoted = FALSE;
-
-	while (*param == ' ' || *param == '\t') {
-		param++;
-	}
-
-	if (*param == '\0' || *param == ';') {
+	wchar_t *tmp;
+	const wchar_t *next = GetParamAlloc(param, &tmp);
+	if (next == NULL) {
 		return NULL;
 	}
-
-	while (*param != '\0' && (quoted || (*param != ';' && *param != ' ' && *param != '\t'))) {
-		if (*param == '"') {
-			if (*(param+1) != '"') {
-				quoted = !quoted;
-			}
-			else {
-				if (i < size - 1) {
-					buff[i++] = *param;
-				}
-				param++;
-			}
-		}
-		if (i < size - 1) {
-			buff[i++] = *param;
-		}
-		param++;
-	}
-	if (!quoted && (buff[i-1] == ';')) {
-		i--;
-	}
-
-	buff[i] = '\0';
-	return (param);
+	wcsncpy_s(buff, size, tmp, _TRUNCATE);
+	free(tmp);
+	return (wchar_t *)next;
 }
 
 void PASCAL DequoteParam(wchar_t *dest, size_t dest_len, wchar_t *src)

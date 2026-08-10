@@ -49,7 +49,9 @@ typedef struct {
 	const wchar_t *szUsername;		// ユーザ名
 	const wchar_t *szPasswordW;		// パスワード(NULL時はユーザーがパスワードを入力)
 
-	const wchar_t *szOption;		// 追加オプション/引数
+	const wchar_t *szConnectOption;	// connect コマンドに追加するオプション(NULL可)
+									//   TTL の connect '...' に埋め込まれるため「'」は使用できない
+	const wchar_t *szExecOption;	// ttermpro.exe のコマンドライン引数に追加するオプション(NULL可)
 
 	const wchar_t *szLog;			// ログファイル名
 

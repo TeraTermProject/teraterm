@@ -548,6 +548,116 @@ private:
 
 static SerialReconnect *serail_reconnect;
 
+/**
+ *	コマンドラインの /F= を解釈して ts->SetupFNameW にセットする
+ *	(ANSI版 ts->SetupFName にもセットする, 廃止予定)
+ *
+ *	@param[in]	command_line
+ *				the first term shuld be executable filename of Tera Term
+ *	@param[out]	ts
+ */
+static void ParseFOption(const wchar_t *command_line, PTTSet ts)
+{
+	wchar_t *param;
+	const wchar_t *cur;
+	const wchar_t *next;
+
+	cur = GetParamAlloc(command_line, &param);
+	free(param);
+	while (cur != NULL && (next = GetParamAlloc(cur, &param)) != NULL) {
+		DequoteParam(param, wcslen(param) + 1, param);
+		if (_wcsnicmp(param, L"/F=", 3) == 0) {	/* setup filename */
+			wchar_t *f = GetFilePath(&param[3], ts->HomeDirW, L".INI");
+			if (f != NULL) {
+				if (_wcsicmp(ts->SetupFNameW, f) != 0) {
+					free(ts->SetupFNameW);
+					ts->SetupFNameW = f;
+					WideCharToACP_t(ts->SetupFNameW, ts->SetupFName, _countof(ts->SetupFName));
+				}
+				else {
+					free(f);
+				}
+			}
+			free(param);
+			break;
+		}
+		free(param);
+		cur = next;
+	}
+}
+
+/**
+ *	起動時の初期化, グローバル変数 ts, cv を初期化する
+ *	- 通信関連構造体 cv の初期化 (CommInit())
+ *	- 共有メモリのオープンなどプロセス共通の初期化 (StartTeraTerm())
+ *	- TTX プラグインのロード (TTXInit())
+ *	- コマンドラインの /F= から設定ファイル名を決定 (ParseFOption())
+ *	- 設定ファイル (TERATERM.INI) の読み込み (ReadIniFile())
+ *	- コマンドラインオプションを設定へ反映 (ParseParam())
+ *	- セッション複製時、複製元の設定を共有メモリから引き継ぐ (CopyShmemToTTSet())
+ *	- キーボード設定の初期化 (InitKeyboard(), SetKeyMap())
+ *
+ *	ウィンドウ作成前に CVTWindow のコンストラクタから1度だけ呼ばれる
+ */
+static void InitSettings(void)
+{
+	CommInit(&cv);
+	cv.ts = &ts;
+	StartTeraTerm(&ts);
+
+	// プラグインの初期化
+	//   ReadIniFile() / ParseParam() のフックが設定される
+	//   iniファイルの読み込みはこの後に行う
+	TTXInit(&ts, &cv); /* TTPLUG */
+
+	// Parse command line parameters
+	// GetCommandLineW() in MSDN remark
+	//  The lifetime of the returned value is managed by the
+	//  system, applications should not free or modify this value.
+	wchar_t *ParamW = _wcsdup(GetCommandLineW());
+
+	// コマンドラインから /F= オプションを先に処理する
+	ParseFOption(ParamW, &ts);
+
+	if (!LoadTTSET()) {
+		abort();
+	}
+	/* read setup info from "teraterm.ini" */
+	(*ReadIniFile)(ts.SetupFNameW, &ts);
+	FreeTTSET();
+
+	LoadTTSET();
+	(*ParseParam)(ParamW, &ts, &(TopicName[0]));
+	FreeTTSET();
+
+	free(ParamW);
+	ParamW = NULL;
+
+	// "/DUPLICATE" オプションがあると ts.DuplicateSession == 1となる
+	// 共有メモリに複製元の設定がない場合もチェック
+	if (ts.DuplicateSession == 1 && IsShmemAvailable()) {
+		// 共有メモリの座標は複製元の現在のウィンドウ座標になる。
+		// 上で読み込んだ TERATERM.INI の値を使いたいので、待避して戻す。
+		POINT VTPos = ts.VTPos;
+		POINT TEKPos = ts.TEKPos;
+		wchar_t *macro = ts.MacroFNW;
+		ts.MacroFNW = NULL;
+
+		// 複製元の設定を共有メモリから引き継ぐ
+		//   /F で指定したINIファイルを読み込んでいても上書きされる
+		CopyShmemToTTSet(&ts);
+
+		ts.VTPos = VTPos;
+		ts.TEKPos = TEKPos;
+		free(ts.MacroFNW);	// 複製元のマクロ指定は使用しない
+		ts.MacroFNW = macro;
+		ts.HostName[0] = 0;
+	}
+
+	InitKeyboard();
+	SetKeyMap();
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow constructor
 
@@ -558,55 +668,9 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	DWORD Style;
 	m_hInst = hInstance;
 
-	CommInit(&cv);
-	cv.ts = &ts;
-	StartTeraTerm(&ts);
-
-	TTXInit(&ts, &cv); /* TTPLUG */
-
 	MsgDlgHelp = RegisterWindowMessage(HELPMSGSTRING);
 
-	/* Parse command line parameters */
-	{
-		// GetCommandLineW() in MSDN remark
-		//  The lifetime of the returned value is managed by the
-		//  system, applications should not free or modify this value.
-		wchar_t *ParamW = _wcsdup(GetCommandLineW());
-		ParseFOption(ParamW, &ts);
-		free(ParamW);
-
-		if (LoadTTSET()) {
-			/* read setup info from "teraterm.ini" */
-			(*ReadIniFile)(ts.SetupFNameW, &ts);
-			FreeTTSET();
-		}
-		else {
-			abort();
-		}
-
-		if (LoadTTSET()) {
-			wchar_t *ParamW = _wcsdup(GetCommandLineW());
-			(*ParseParam)(ParamW, &ts, &(TopicName[0]));
-			free(ParamW);
-		}
-		FreeTTSET();
-	}
-
-	// duplicate sessionの指定があるなら、共有メモリからコピーする (2004.12.7 yutaka)
-	if (ts.DuplicateSession == 1) {
-		// 共有メモリの座標は複製元の現在のウィンドウ座標になる。
-		// 上で読み込んだ TERATERM.INI の値を使いたいので、待避して戻す。
-		POINT VTPos = ts.VTPos;
-		POINT TEKPos = ts.TEKPos;
-
-		CopyShmemToTTSet(&ts);
-
-		ts.VTPos = VTPos;
-		ts.TEKPos = TEKPos;
-	}
-
-	InitKeyboard();
-	SetKeyMap();
+	InitSettings();
 
 	/* window status */
 	AdjustSize = TRUE;
@@ -3993,9 +4057,6 @@ static BOOL IsCygterm()
 // すでに開いているセッションの複製を作る
 void CVTWindow::OnDuplicateSession()
 {
-	// 現在の設定内容を共有メモリへコピーしておく
-	CopyTTSetToShmem(&ts);
-
 	if (IsCygterm()) {
 		// cygwin接続
 		OnCygwinConnection();
@@ -4007,47 +4068,65 @@ void CVTWindow::OnDuplicateSession()
 		return;
 	}
 
-	const char *exec = "ttermpro";	// 仮実行ファイル名
-	wchar_t Command[1024];
-	Command[0] = 0;
+	// 現在の設定内容(ts)を共有メモリへコピーしておく
+	//	 (INIファイルに保存されていなくても)設定を複製先に引き継ぐことができる。
+	//	 "/DUPLICATE" オプション付きで起動すると
+	//	 CopyShmemToTTSet()で共有メモリから設定にリストアされる。
+	//	 /F= でINIファイルを指定しても、"/DUPLICATE" オプションのほうが優先される
+	CopyTTSetToShmem(&ts);
+
+	const char *exec = "ttermpro";			// 仮実行ファイル名
+	wchar_t ExecOption[1024];			    // ttermpro.exe の引数(起動時オプション)
+	wchar_t Command[1024];				    // connect コマンドの追加オプション
+	const wchar_t* connect_option = NULL;	// connect コマンドの追加オプション
+
+	// セッションの複製を示すオプション
+	wcscpy_s(ExecOption, _countof(ExecOption), L"/DUPLICATE");
 
 	if (cv.TelFlag) {
 		// telnet
-		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
-					 L"%hs /DUPLICATE /nossh", exec);
+		connect_option = L"/nossh";
 
 	} else if (cv.isSSH) {
 		// SSH
+		// SSHの時は、プラグインにオプション生成してもらう
+		// TTSSH は "/DUPLICATE" を見て自動ログイン用オプションを追記する
 		_snwprintf_s(Command, _countof(Command), _TRUNCATE,
 					 L"%hs /DUPLICATE", exec);
-
-		// telnt以外の時は、プラグインにオプション生成してもらう
-		// プラグインからコマンドラインを返す
 		TTXSetCommandLine(Command, _countof(Command), NULL); /* TTPLUG */
+
+		// 実行ファイル名以降を connect のオプションにする
+		//   プラグインは末尾への追記だけでなく挿入も行う(TTSSH の /ssh-consume= 等)
+		//   ため、プラグイン呼び出し前後の差分で切り出すことはできない
+		//   "/DUPLICATE" は ExecOption と重複するが、再度処理されても問題ない
+		connect_option = wcschr(Command, L' ');
+		if (connect_option != NULL) {
+			connect_option++;
+		}
 	} else {
 		// 来ないはず
 		assert(FALSE);
 	}
 
 	if (ts.KeyCnfFNW != NULL) {
-		wcsncat_s(Command, _countof(Command), L" /K=", _TRUNCATE);
-		wcsncat_s(Command, _countof(Command), ts.KeyCnfFNW, _TRUNCATE);
+		wcsncat_s(ExecOption, _countof(ExecOption), L" /K=", _TRUNCATE);
+		wcsncat_s(ExecOption, _countof(ExecOption), ts.KeyCnfFNW, _TRUNCATE);
 	}
 
 	wchar_t *setup_def = GetDefaultSetupFNameW(NULL);
 	if (wcscmp(setup_def, ts.SetupFNameW) != 0) {
 		// INIファイルがデフォルトと異なっている、/F= で指定する
-		wcsncat_s(Command, _countof(Command), L" /F=", _TRUNCATE);
-		wcsncat_s(Command, _countof(Command), ts.SetupFNameW, _TRUNCATE);
+		wcsncat_s(ExecOption, _countof(ExecOption), L" /F=", _TRUNCATE);
+		wcsncat_s(ExecOption, _countof(ExecOption), ts.SetupFNameW, _TRUNCATE);
 	}
 	free(setup_def);
 
 	wchar_t *hostnameW = ToWcharA(ts.HostName);
-	const wchar_t *commandline = wcschr(Command, L' ') + 1;	// 実行ファイル名以降
 	TTDupInfo info = {};
 	info.szHostName = hostnameW;
 	info.port = ts.TCPPort;
-	info.szOption = commandline;
+	info.szConnectOption = connect_option;
+	info.szExecOption = ExecOption;
 	info.mode = TTDUP_COMMANDLINE;
 	DWORD e = ConnectHost(m_hInst, m_hWnd, &info);
 	free(hostnameW);

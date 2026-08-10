@@ -295,7 +295,7 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
   pvar->origParseParam(Param, ts, DDETopic);
 
   next = Param;
-  while (next = GetParam(buff, sizeof(buff), next)) {
+  while (next = GetParam(buff, _countof(buff), next)) {
     if (_wcsnicmp(buff, L"/W=", 3) == 0) {
       strncpy_s(pvar->orig_title, sizeof(pvar->orig_title), pvar->ts->Title, _TRUNCATE);
       SetTitleStr(pvar->orig_title, FALSE);

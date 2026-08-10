@@ -145,6 +145,7 @@ void b64encode(PCHAR dst, int dsize, PCHAR src, int len);
 DllExport int b64decode(PCHAR dst, int dsize, PCHAR src);
 
 DllExport wchar_t * PASCAL GetParam(wchar_t *buff, size_t size, wchar_t *param);
+const wchar_t *GetParamAlloc(const wchar_t *param, wchar_t **buff);
 DllExport void PASCAL DequoteParam(wchar_t *dest, size_t dest_len, wchar_t *src);
 void PASCAL DeleteComment(PCHAR dest, int dest_size, PCHAR src);
 wchar_t *DeleteCommentW(const wchar_t *src);
@@ -216,6 +217,7 @@ wchar_t *GetFullPathW(const wchar_t *dir, const wchar_t *rel_path);
 char *GetVersionSubstr(void);
 DWORD TTCreateProcess(const wchar_t *cmd, const wchar_t *arg1, const wchar_t *arg2);
 wchar_t* ResolveAbsolutePath(const wchar_t* user_path, const wchar_t* base_dir);
+wchar_t *GetFilePath(const wchar_t *command_line, const wchar_t *default_path, const wchar_t *default_ini);
 
 #ifdef __cplusplus
 }

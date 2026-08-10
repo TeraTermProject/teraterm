@@ -2132,3 +2132,110 @@ wchar_t* ResolveAbsolutePath(const wchar_t* user_path, const wchar_t* base_dir)
 
 	return full;
 }
+
+/**
+ *	コマンドラインのファイル名からフルパスを作成する
+ *
+ *	@param[in]	command_line	コマンドラインの文字列(ファイル名)
+ *	@param[in]	default_path	ファイルの存在するパス(デフォルトパス)
+ *								ファイルが相対パスの時、ファイル名の前に追加される
+ *								NULLのとき、カレントディレクトリが追加される
+ *	@param[in]	default_ini		ファイルに拡張子が存在しない場合追加される
+ *								L".ini"等
+ *								NULLのとき追加しない
+ *	@return		フルパスファイル名
+ *				不要になったら free() すること
+ *				失敗時はNULL。
+ */
+wchar_t *GetFilePath(const wchar_t *command_line, const wchar_t *default_path, const wchar_t *default_ini)
+{
+	wchar_t *full_path;
+	wchar_t *filepart;
+	wchar_t *tmp;
+	if (command_line == NULL || *command_line == 0) {
+		// 入力がおかしい
+		return NULL;
+	}
+	if (IsRelativePathW(command_line) && default_path != NULL) {
+		full_path = NULL;
+		awcscats(&full_path, default_path, L"\\", command_line, NULL);
+	}
+	else {
+		full_path = _wcsdup(command_line);
+	}
+
+	// ファイル名のフルパス化(正規化)
+	hGetFullPathNameW(full_path, &tmp, &filepart);
+	free(full_path);
+	full_path = tmp;
+	if (filepart == NULL) {
+		// ファイル部分がない?
+		assert(FALSE);
+		free(full_path);
+		return _wcsdup(command_line);
+	}
+
+	// 拡張子の追加
+	if (default_ini != NULL) {
+		if (wcsrchr(filepart, L'.') == NULL) {
+			awcscat(&full_path, default_ini);
+		}
+	}
+
+	return full_path;
+}
+
+/**
+ *	パラメータ文字列から先頭のパラメータを1つ切り出す
+ *	GetParam() の動的バッファ版
+ *
+ *	@param[in]	param	パラメータ文字列
+ *	@param[out]	buff	切り出したパラメータ
+ *						不要になったら free() すること
+ *						パラメータがないとき NULL
+ *	@return		次のパラメータの位置(param 内を指す)
+ *				パラメータがないとき NULL
+ */
+const wchar_t *GetParamAlloc(const wchar_t *param, wchar_t **buff)
+{
+	size_t i = 0;
+	BOOL quoted = FALSE;
+
+	*buff = NULL;
+
+	while (*param == ' ' || *param == '\t') {
+		param++;
+	}
+
+	if (*param == '\0' || *param == ';') {
+		return NULL;
+	}
+
+	// 切り出すパラメータは param より長くならない
+	wchar_t *dest = (wchar_t *)malloc(sizeof(wchar_t) * (wcslen(param) + 1));
+	if (dest == NULL) {
+		return NULL;
+	}
+
+	while (*param != '\0' && (quoted || (*param != ';' && *param != ' ' && *param != '\t'))) {
+		if (*param == '"') {
+			if (*(param+1) != '"') {
+				quoted = !quoted;
+			}
+			else {
+				dest[i++] = *param;
+				param++;
+			}
+		}
+		dest[i++] = *param;
+		param++;
+	}
+	if (!quoted && (dest[i-1] == ';')) {
+		i--;
+	}
+	dest[i] = '\0';
+
+	wchar_t *shrunk = (wchar_t *)realloc(dest, sizeof(wchar_t) * (i + 1));
+	*buff = (shrunk != NULL) ? shrunk : dest;
+	return param;
+}

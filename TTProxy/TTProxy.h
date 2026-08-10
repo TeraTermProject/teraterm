@@ -93,7 +93,7 @@ private:
 	static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic) {
 		size_t param_len = wcslen(param);
 		wchar_t option[1024];
-		int opt_len = sizeof(option);
+		int opt_len = _countof(option);
 		int action;
 		wchar_t *start, *cur, *next;
 

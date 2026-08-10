@@ -1096,7 +1096,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, const wchar_t *szJobName)
 		TTDupInfo info = {};
 		info.szHostName = jobInfo.szHostName;
 		info.szUsername = jobInfo.szUsername;
-		info.szOption = szArgment;
+		info.szExecOption = szArgment;
 
 		if (jobInfo.bTtssh != TRUE) {
 			// TELNET

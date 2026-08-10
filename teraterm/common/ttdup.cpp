@@ -213,10 +213,10 @@ static wchar_t *CreateTempTTL(HANDLE *pFile)
 	return ttl;
 }
 
-static void MakeTTL(HANDLE hFile, const TTDupInfo *info)
+static void MakeTTL(HANDLE hFile, const TTDupInfo *info, const wchar_t *connect_opt)
 {
 	int port = info->port != 0 ? info->port : DEFAULT_PORT_TELNET;
-	fwritefU8(hFile, L"connect '%s:%d'\r\n", info->szHostName, port);
+	fwritefU8(hFile, L"connect '%s:%d /nossh%s'\r\n", info->szHostName, port, connect_opt);
 
 	if (info->szUsername == NULL) {
 		return;
@@ -286,13 +286,20 @@ static DWORD ConnectArgs(const TTDupInfo *info, wchar_t **arg, wchar_t **ttl)
 {
 	wchar_t *szMacroFile = NULL;
 	wchar_t *szArgment = NULL;
-	const wchar_t *add_args = info->szOption;
+	wchar_t *connect_opt;	// connect コマンドの追加オプション(先頭に " " 付き、ないときは L"")
 	DWORD retval = NO_ERROR;
 
 	HANDLE hFile;
 	szMacroFile = CreateTempTTL(&hFile);
 	if (szMacroFile == NULL) {
 		return ERROR_OPEN_FAILED;
+	}
+
+	if (info->szConnectOption != NULL && info->szConnectOption[0] != 0) {
+		aswprintf(&connect_opt, L" %s", info->szConnectOption);
+	}
+	else {
+		connect_opt = _wcsdup(L"");
 	}
 
 	// コマンドラインに "/M=[TTL FILE]" を追加
@@ -307,21 +314,19 @@ static DWORD ConnectArgs(const TTDupInfo *info, wchar_t **arg, wchar_t **ttl)
 	switch (info->mode) {
 	case TTDUP_TELNET:
 		// TELNET
-		MakeTTL(hFile, info);
-
-		// /nossh SSHを使わない
-		awcscat(&szArgment, L" /nossh");
+		MakeTTL(hFile, info, connect_opt);
 		break;
 	case TTDUP_SSH_CHALLENGE: {
 		// keyboard-interactive
 		int port = info->port != 0 ? info->port : DEFAULT_PORT_SSH;
 		wchar_t *passwd_opt = GetPasswordOption(info->szPasswordW);
 		fwritefU8(hFile,
-				  L"connect '%s:%d /ssh /auth=challenge /user=%s %s'\r\n",
+				  L"connect '%s:%d /ssh /auth=challenge /user=%s %s%s'\r\n",
 				  info->szHostName,
 				  port,
 				  info->szUsername,
-				  passwd_opt);
+				  passwd_opt,
+				  connect_opt);
 		SecureZeroStringW(passwd_opt);
 		free(passwd_opt);
 		break;
@@ -330,10 +335,11 @@ static DWORD ConnectArgs(const TTDupInfo *info, wchar_t **arg, wchar_t **ttl)
 		// Pageant
 		int port = info->port != 0 ? info->port : DEFAULT_PORT_SSH;
 		fwritefU8(hFile,
-				  L"connect '%s:%d /ssh /auth=pageant /user=%s'\r\n",
+				  L"connect '%s:%d /ssh /auth=pageant /user=%s%s'\r\n",
 				  info->szHostName,
 				  port,
-				  info->szUsername);
+				  info->szUsername,
+				  connect_opt);
 		break;
 	}
 	case TTDUP_SSH_PASSWORD: {
@@ -341,11 +347,12 @@ static DWORD ConnectArgs(const TTDupInfo *info, wchar_t **arg, wchar_t **ttl)
 		int port = info->port != 0 ? info->port : DEFAULT_PORT_SSH;
 		wchar_t *passwd_opt = GetPasswordOption(info->szPasswordW);
 		fwritefU8(hFile,
-				  L"connect '%s:%d /ssh /auth=password /user=%s %s'\r\n",
+				  L"connect '%s:%d /ssh /auth=password /user=%s %s%s'\r\n",
 				  info->szHostName,
 				  port,
 				  info->szUsername,
-				  passwd_opt);
+				  passwd_opt,
+				  connect_opt);
 		SecureZeroStringW(passwd_opt);
 		free(passwd_opt);
 		break;
@@ -357,21 +364,21 @@ static DWORD ConnectArgs(const TTDupInfo *info, wchar_t **arg, wchar_t **ttl)
 		wchar_t keyfile[MAX_PATH];
 		dquote_stringW(info->PrivateKeyFile, keyfile, _countof(keyfile));
 		fwritefU8(hFile,
-				  L"connect '%s:%d /ssh /auth=publickey /user=%s %s /keyfile=%s'\r\n",
+				  L"connect '%s:%d /ssh /auth=publickey /user=%s %s /keyfile=%s%s'\r\n",
 				  info->szHostName,
 				  port,
 				  info->szUsername,
 				  passwd_opt,
-				  keyfile);
+				  keyfile,
+				  connect_opt);
 		SecureZeroStringW(passwd_opt);
 		free(passwd_opt);
 		break;
 	}
 	case TTDUP_COMMANDLINE: {
 		// コマンドラインですべて指定
-		fwritefU8(hFile, L"connect '%s:%d %s'\r\n",
-				  info->szHostName, info->port, add_args);
-		add_args = NULL;
+		fwritefU8(hFile, L"connect '%s:%d%s'\r\n",
+				  info->szHostName, info->port, connect_opt);
 		break;
 	}
 	default:
@@ -380,9 +387,10 @@ static DWORD ConnectArgs(const TTDupInfo *info, wchar_t **arg, wchar_t **ttl)
 	}
 
 	::CloseHandle(hFile);
+	free(connect_opt);
 
-	if (add_args != NULL) {
-		awcscats(&szArgment, L" ", add_args, NULL);
+	if (info->szExecOption != NULL && info->szExecOption[0] != 0) {
+		awcscats(&szArgment, L" ", info->szExecOption, NULL);
 	}
 
 	*arg = szArgment;

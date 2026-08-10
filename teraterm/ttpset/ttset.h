@@ -35,7 +35,6 @@ extern "C" {
 
 typedef struct TKeyMap_st *PKeyMap;
 
-BOOL ParseFOption(const wchar_t *command_line, PTTSet ts);
 void SaveVTPos(const PTTSet ts);
 
 void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts);
