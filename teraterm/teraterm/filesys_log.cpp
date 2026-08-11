@@ -739,6 +739,7 @@ static void LogToFile(PFileVar fv)
 
 static void FileTransEnd_(PFileVar fv)
 {
+	LogToFile(fv);
 	fv->LogMode = TFileVar::LogModeTag::NONE;
 	cv.Log1Byte = NULL;
 	cv.Log1Bin = NULL;
