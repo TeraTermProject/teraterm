@@ -1715,10 +1715,10 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 				}
 
 			} else if (wcsncmp(option + 1, L"user=", 5) == 0) {
-				WideCharToACP_t(option + 6, pvar->ssh2_username, sizeof(pvar->ssh2_username));
+				WideCharToMultiByte(CP_UTF8, 0, option + 6, -1, pvar->ssh2_username, sizeof(pvar->ssh2_username), NULL, NULL);
 
 			} else if (wcsncmp(option + 1, L"passwd=", 7) == 0) {
-				WideCharToACP_t(option + 8, pvar->ssh2_password, sizeof(pvar->ssh2_password));
+				WideCharToMultiByte(CP_UTF8, 0, option + 8, -1, pvar->ssh2_password, sizeof(pvar->ssh2_password), NULL, NULL);
 
 			} else if (wcsncmp(option + 1, L"keyfile=", 8) == 0) {
 				const wchar_t *keyfileW = option + 9;
@@ -1825,14 +1825,10 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 			//   将来的にtelnet authentication optionをサポートした時は
 			//   Tera Term本体で処理するようにする予定。
 			//
-			char *optionA;
 			wchar_t *p;
 			p = wcschr(option, '@');
 			*p = 0;
-
-			optionA = ToCharW(option);
-			strncpy_s(pvar->ssh2_username, sizeof(pvar->ssh2_username), optionA, _TRUNCATE);
-			free(optionA);
+			WideCharToMultiByte(CP_UTF8, 0, option, -1, pvar->ssh2_username, sizeof(pvar->ssh2_username), NULL, NULL);
 
 			// ユーザ名部分をスペースで潰す。
 			// 後続のTTXやTera Term本体で解釈する時にはスペースを読み飛ばすので、
@@ -4880,6 +4876,11 @@ static void _dquote_string(const wchar_t *str, wchar_t *dst, size_t dst_len)
 
 static void dquote_stringW(const wchar_t *str, wchar_t *dst, size_t dst_len)
 {
+	if (str == NULL || *str == L'\0') {
+		*dst = L'\0';
+		return;
+	}
+
 	// ",スペース,;,^A-^_ が含まれる場合にはクオートする
 	if (wcschr(str, '"') != NULL ||
 	    wcschr(str, ' ') != NULL ||
@@ -4922,14 +4923,11 @@ static void dquote_stringW(const wchar_t *str, wchar_t *dst, size_t dst_len)
 	wcsncpy_s(dst, dst_len, str, _TRUNCATE);
 }
 
-static void dquote_string(const char *str, char *dst, size_t dst_len)
+static void dquote_stringU8toW(const char *str, wchar_t *dst, size_t dst_len)
 {
-	wchar_t *dstW = malloc(sizeof(wchar_t) * dst_len);
-	wchar_t *strW = ToWcharA(str);
-	dquote_stringW(strW, dstW, dst_len);
-	WideCharToACP_t(dstW, dst, dst_len);
+	wchar_t *strW = ToWcharU8(str);
+	dquote_stringW(strW, dst, dst_len);
 	free(strW);
-	free(dstW);
 }
 
 static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
@@ -4995,7 +4993,7 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 
 		// セッション複製の場合は、自動ログイン用パラメータを付ける。
 		if (wcsstr(buf, L"DUPLICATE")) {
-			char mark[MAX_PATH];
+			wchar_t mark[MAX_PATH];
 			wchar_t tmp[MAX_PATH*2];
 
 			// 自動ログインの場合は下記フラグが0のため、必要なコマンドを付加する。
@@ -5005,22 +5003,25 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 			}
 
+			wchar_t user[MAX_PATH];
+			dquote_stringU8toW(pvar->auth_state.user, user, _countof(user));
+
 			// パスワードを覚えていて、かつ複数認証要求でない場合にのみコマンドラインに渡す。
 			if (pvar->settings.remember_password &&
 			    !pvar->auth_state.multiple_required_auth &&
 			    pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) {
-				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
+				dquote_stringU8toW(pvar->auth_state.cur_cred.password, mark, _countof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-				             L" /auth=password /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				             L" /auth=password /user=%s /passwd=%s", user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->settings.remember_password &&
 			           !pvar->auth_state.multiple_required_auth &&
 			           pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
 				wchar_t markW[MAX_PATH];
-				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
+				dquote_stringU8toW(pvar->auth_state.cur_cred.password, mark, _countof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-				             L" /auth=publickey /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				             L" /auth=publickey /user=%s /passwd=%s", user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 				dquote_stringW(pvar->session_settings.DefaultRSAPrivateKeyFile, markW, _countof(markW));
@@ -5030,15 +5031,15 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 			} else if (pvar->settings.remember_password &&
 			           !pvar->auth_state.multiple_required_auth &&
 			           pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
-				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
+				dquote_stringU8toW(pvar->auth_state.cur_cred.password, mark, _countof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-				             L" /auth=challenge /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				             L" /auth=challenge /user=%s /passwd=%s", user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT &&
 			           !pvar->auth_state.multiple_required_auth) {
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-				             L" /auth=pageant /user=%hs", pvar->auth_state.user);
+				             L" /auth=pageant /user=%s", user);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else {
