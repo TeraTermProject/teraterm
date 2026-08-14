@@ -2503,7 +2503,10 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 	bsig = buffer_init();
 	if (bsig == NULL)
 		goto error;
-	cp = buffer_append_space(bsig, len);
+	if (buffer_reserve(bsig, len, &cp) != 0) {
+		logprintf(LOG_LEVEL_FATAL, "buffer_reserve() error");
+		goto error;
+	}
 	memcpy(cp, data, len);
 
 	if (ctx->nnew == 0) {
@@ -2613,7 +2616,8 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 	if (b == NULL)
 		goto error;
 
-	cp = buffer_append_space(b, datalen);
+	if (buffer_reserve(b, datalen, &cp) != 0)
+		goto error;
 	memcpy(cp, dataptr, datalen);
 
 	while (buffer_remain_len(b) > 0) {

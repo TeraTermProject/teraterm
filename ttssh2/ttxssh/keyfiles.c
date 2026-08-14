@@ -467,8 +467,8 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 
 	// ファイルのスキャンが終わったので、base64 decodeする。
 	len = buffer_len(encoded);
-	if ((cp = buffer_append_space(copy_consumed, len)) == NULL) {
-		logprintf(LOG_LEVEL_ERROR, "%s: buffer_append_space", __FUNCTION__);
+	if (buffer_reserve(copy_consumed, len, &cp) != 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_reserve() error", __FUNCTION__);
 		goto error;
 	}
 	if ((dlen = b64decode(cp, len, buffer_ptr(encoded))) < 0) {
@@ -538,8 +538,8 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		goto error;
 	}
 	if (klen > 0) {
-		if ((cp = buffer_append_space(kdf, klen)) == NULL) {
-			logprintf(LOG_LEVEL_ERROR, "%s: kdf alloc failed", __FUNCTION__);
+		if (buffer_reserve(kdf, klen, &cp) != 0) {
+			logprintf(LOG_LEVEL_ERROR, "%s: buffer_reserve() error", __FUNCTION__);
 			goto error;
 		}
 		memcpy(cp, kdfp, klen);
@@ -607,8 +607,11 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		}
 	}
 
-	// 復号化
-	cp = buffer_append_space(b, len);
+	// 復号
+	if (buffer_reserve(b, len, &cp) != 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: buffer_reserve() error", __FUNCTION__);
+		goto error;
+	}
 	cipher_init_SSH2(&cc, cipher, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, pvar);
 	ret = EVP_Cipher(cc->evp, cp, buffer_tail_ptr(copy_consumed), len);
 	if (ret == 0) {

@@ -3836,7 +3836,9 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	}
 
 	/* encrypt */
-	cp = buffer_append_space(encoded, buffer_len(b) + authlen);
+	if (buffer_reserve(encoded, buffer_len(b) + authlen, &cp) != 0) {
+		goto ed25519_error;
+	}
 	if (EVP_Cipher(cc->evp, cp, buffer_ptr(b), buffer_len(b)) == 0) {
 		//strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 		//free(decrypted);

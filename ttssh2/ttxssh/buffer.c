@@ -108,40 +108,6 @@ void buffer_free(buffer_t * buf)
 	}
 }
 
-// バッファの領域拡張を行う。
-// return: 拡張前のバッファポインター
-void *buffer_append_space(buffer_t * buf, size_t size)
-{
-	size_t n;
-	size_t newlen;
-	void *p;
-
-	n = buf->offset + size;
-	if (n < buf->maxlen) {
-		//
-	} else {
-		// バッファが足りないので補充する。(2005.7.2 yutaka)
-		newlen = buf->maxlen + size + BUFFER_INCREASE_MARGIN;
-		if (newlen > BUFFER_SIZE_MAX) {
-			goto panic;
-		}
-		buf->buf = realloc(buf->buf, newlen);
-		if (buf->buf == NULL)
-			goto panic;
-		buf->maxlen = newlen;
-	}
-
-	p = buf->buf + buf->offset;
-	//buf->offset += size;
-	buf->len = buf->offset + size;
-
-	return (p);
-
-panic:
-	abort();
-	return (NULL);
-}
-
 // from OpenSSH 10.4p1 sshbuf.c
 static int sshbuf_check_sanity(buffer_t *buf)
 {
@@ -461,6 +427,8 @@ int buffer_get_cstring(buffer_t *buf, char **valp, size_t *lenp)
 }
 
 // from OpenSSH 10.4p1 sshbuf-getput-basic.c
+// buffer_reserve() で v の offset は進まないため、
+// このあと v の末尾に buffer_put するには buffer_consume() が必要
 int buffer_get_stringb(buffer_t *buf, buffer_t *v)
 {
 	uint32_t len;
@@ -533,7 +501,7 @@ int buffer_remain_len(buffer_t *buf)
 	return (int)(buf->len - buf->offset);
 }
 
-// buffer_put() や buffer_append_space() でメッセージバッファに追加を行うと、
+// buffer_put() や buffer_reserve() でメッセージバッファに追加を行うと、
 // 内部で realloc() によりバッファポインタが変わってしまうことがある。
 // メッセージバッファのポインタを取得する際は、バッファ追加が完了した後に
 // 行わなければ、BOFで落ちる。
@@ -684,7 +652,7 @@ int buffer_put_bignum2_bytes(buffer_t *buf, const void *v, size_t len)
 {
 	u_char *d;
 	const u_char *s = (const u_char *)v;
-	int prepend;
+	int prepend, r;
 
 	if (len > BUFFER_SIZE_MAX - 5)
 		return SSH_ERR_NO_BUFFER_SPACE;
@@ -698,7 +666,9 @@ int buffer_put_bignum2_bytes(buffer_t *buf, const void *v, size_t len)
 	 */
 	prepend = len > 0 && (s[0] & 0x80) != 0;
 
-	d = buffer_append_space(buf, len + 4 + prepend);
+	if ((r = buffer_reserve(buf, len + 4 + prepend, &d)) != 0) {
+		return r;
+	}
 	POKE_U32(d, len + prepend);
 	if (prepend)
 		d[4] = 0;

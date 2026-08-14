@@ -1471,8 +1471,8 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		set_uint32(data, packet_length);
 		data[4] = (unsigned char) padding_size;
 		if (msg) {
-			// パケット圧縮の場合、バッファを拡張する。(2011.6.10 yutaka)
-			buffer_append_space(msg, padding_size + SSH_DIGEST_MAX_LENGTH);
+			// パケット圧縮の場合、バッファを拡張する。
+			buffer_reserve(msg, padding_size + SSH_DIGEST_MAX_LENGTH, NULL);
 			// realloc()されると、ポインタが変わる可能性があるので、再度取り直す。
 			data = buffer_ptr(msg);
 		}

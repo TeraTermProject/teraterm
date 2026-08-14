@@ -59,7 +59,7 @@ char *buffer_tail_ptr(buffer_t *buf);
 int buffer_consume(buffer_t *buf, size_t shift_byte);
 int buffer_consume_end(buffer_t *buf, size_t shift_byte);
 void buffer_rewind(buffer_t *buf);
-void *buffer_append_space(buffer_t * buf, size_t size);
+int buffer_reserve(buffer_t *buf, size_t len, u_char **dpp);
 
 int buffer_get(buffer_t *buf, void *v, size_t len);
 int buffer_put(buffer_t *buf, const void *v, size_t len);
