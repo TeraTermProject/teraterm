@@ -58,7 +58,7 @@ static const struct {
 	{VK_SHIFT, "VK_SHIFT"},
 };
 
-void CDebugPropPage::OnInitDialog()
+BOOL CDebugPropPage::OnInitDialog()
 {
 	// popup
 	SetCheck(IDC_DEBUG_POPUP_ENABLE, UnicodeDebugParam.CodePopupEnable);
@@ -86,6 +86,7 @@ void CDebugPropPage::OnInitDialog()
 		}
 	}
 	SetDlgItemTextA(IDC_DEBUG_CONSOLE_BUTTON, caption);
+	return TRUE;
 }
 
 BOOL CDebugPropPage::OnCommand(WPARAM wParam, LPARAM)

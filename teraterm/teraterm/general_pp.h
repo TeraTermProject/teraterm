@@ -39,7 +39,7 @@ public:
 	CGeneralPropPageDlg(HINSTANCE inst, HWND hVTWin, TComVar *pcv);
 	virtual ~CGeneralPropPageDlg();
 private:
-	void OnInitDialog();
+	BOOL OnInitDialog();
 	void OnOK();
 	enum { IDD = IDD_TABSHEET_GENERAL };
 	void OnHelp();

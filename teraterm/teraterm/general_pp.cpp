@@ -85,7 +85,7 @@ CGeneralPropPageDlg::~CGeneralPropPageDlg()
 
 // CGeneralPropPageDlg メッセージ ハンドラ
 
-void CGeneralPropPageDlg::OnInitDialog()
+BOOL CGeneralPropPageDlg::OnInitDialog()
 {
 	TTCPropertyPage::OnInitDialog();
 
@@ -152,10 +152,8 @@ void CGeneralPropPageDlg::OnInitDialog()
 	// File transfer dir
 	SetDlgItemTextW(IDC_FILE_DIR, pts->FileDirW);
 
-#if 0
-	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
-	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
-#endif
+	// TRUE を返す。ダイアログマネージャが先頭 TABSTOPにフォーカスを設定する。
+	return TRUE;
 }
 
 void CGeneralPropPageDlg::OnOK()

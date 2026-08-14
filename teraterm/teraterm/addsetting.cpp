@@ -84,7 +84,7 @@ public:
 	CSequencePropPageDlg(HINSTANCE inst);
 	virtual ~CSequencePropPageDlg();
 private:
-	void OnInitDialog();
+	BOOL OnInitDialog();
 	void OnOK();
 	enum { IDD = IDD_TABSHEET_SEQUENCE };
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
@@ -108,7 +108,7 @@ CSequencePropPageDlg::~CSequencePropPageDlg()
 
 // CSequencePropPageDlg メッセージ ハンドラ
 
-void CSequencePropPageDlg::OnInitDialog()
+BOOL CSequencePropPageDlg::OnInitDialog()
 {
 	TTCPropertyPage::OnInitDialog();
 
@@ -206,8 +206,8 @@ void CSequencePropPageDlg::OnInitDialog()
 	// IDC_BEEP_DROPDOWN
 	SetCurSel(IDC_BEEP_DROPDOWN, ts.Beep);
 
-	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
-	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ACCEPT_MOUSE_EVENT_TRACKING));
+	// TRUE を返す。ダイアログマネージャが先頭 TABSTOPにフォーカスを設定する。
+	return TRUE;
 }
 
 BOOL CSequencePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -315,7 +315,7 @@ public:
 	CCopypastePropPageDlg(HINSTANCE inst);
 	virtual ~CCopypastePropPageDlg();
 private:
-	void OnInitDialog();
+	BOOL OnInitDialog();
 	void OnOK();
 	enum { IDD = IDD_TABSHEET_COPYPASTE };
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
@@ -339,7 +339,7 @@ CCopypastePropPageDlg::~CCopypastePropPageDlg()
 
 // CCopypastePropPageDlg メッセージ ハンドラ
 
-void CCopypastePropPageDlg::OnInitDialog()
+BOOL CCopypastePropPageDlg::OnInitDialog()
 {
 	TTCPropertyPage::OnInitDialog();
 
@@ -409,8 +409,8 @@ void CCopypastePropPageDlg::OnInitDialog()
 	// (11) auto text copy
 	SetCheck(IDC_AUTO_TEXT_COPY, ts.AutoTextCopy ? BST_CHECKED : BST_UNCHECKED);
 
-	// ダイアログにフォーカスを当てる
-	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_LINECOPY));
+	// TRUE を返す。ダイアログマネージャが先頭 TABSTOPにフォーカスを設定する。
+	return TRUE;
 }
 
 BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -539,7 +539,7 @@ public:
 	CVisualPropPageDlg(HINSTANCE inst);
 	virtual ~CVisualPropPageDlg();
 private:
-	void OnInitDialog();
+	BOOL OnInitDialog();
 	void OnOK();
 	HBRUSH OnCtlColor(HDC hDC, HWND hWnd);
 	enum { IDD = IDD_TABSHEET_VISUAL };
@@ -589,7 +589,7 @@ void CVisualPropPageDlg::SetupRGBbox(int index)
 
 // CVisualPropPageDlg メッセージ ハンドラ
 
-void CVisualPropPageDlg::OnInitDialog()
+BOOL CVisualPropPageDlg::OnInitDialog()
 {
 	TTCPropertyPage::OnInitDialog();
 
@@ -717,11 +717,11 @@ void CVisualPropPageDlg::OnInitDialog()
 		}
 	}
 
-	// ダイアログにフォーカスを当てる
-	::SetFocus(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE));
-
 	// ツールチップ作成
 	TipWin->Create(m_hWnd);
+
+	// TRUE を返す。ダイアログマネージャが先頭 TABSTOPにフォーカスを設定する。
+	return TRUE;
 }
 
 void CVisualPropPageDlg::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
@@ -1354,7 +1354,7 @@ public:
 	CCygwinPropPageDlg(HINSTANCE inst);
 	virtual ~CCygwinPropPageDlg();
 private:
-	void OnInitDialog();
+	BOOL OnInitDialog();
 	void OnOK();
 	enum { IDD = IDD_TABSHEET_CYGWIN };
 	cygterm_t settings;
@@ -1379,7 +1379,7 @@ CCygwinPropPageDlg::~CCygwinPropPageDlg()
 
 // CCygwinPropPageDlg メッセージ ハンドラ
 
-void CCygwinPropPageDlg::OnInitDialog()
+BOOL CCygwinPropPageDlg::OnInitDialog()
 {
 	TTCPropertyPage::OnInitDialog();
 
@@ -1405,8 +1405,8 @@ void CCygwinPropPageDlg::OnInitDialog()
 	// Cygwin install path
 	SetDlgItemTextA(IDC_CYGWIN_PATH, ts.CygwinDirectory);
 
-	// ダイアログにフォーカスを当てる
-	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CYGWIN_PATH));
+	// TRUE を返す。ダイアログマネージャが先頭 TABSTOPにフォーカスを設定する。
+	return TRUE;
 }
 
 BOOL CCygwinPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)

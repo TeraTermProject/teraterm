@@ -42,6 +42,7 @@ public:
 	void SetCaption(const wchar_t *caption);
 	void SetTreeViewMode(BOOL enable);
 	static void SetTreeViewModeInit(BOOL enable);
+	void SetTabMode(BOOL enable);
 	void SetStartPage(int start);
 
 private:
@@ -68,8 +69,12 @@ private:
 
 	// tree control
 	BOOL m_TreeView;
+	// ツリー表示時にタブを表示するか(FALSE = 隠す)
+	// ツリーでページを選べるのでタブは無くてよい。TRUE にすると両方出る
+	BOOL m_ShowTab;
 	HWND m_hWndTV;
 	void AddTreeControl();
+	void HideTab(HWND hTab);
 	void CreateTree(HWND dlg);
 	HTREEITEM CreatePath(const wchar_t *path, HTREEITEM hParent, int data);
 	HTREEITEM GetTreeItem(int nPage, HTREEITEM hParent);

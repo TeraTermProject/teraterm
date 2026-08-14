@@ -37,7 +37,7 @@ public:
 	CDebugPropPage(HINSTANCE inst);
 	virtual ~CDebugPropPage();
 private:
-	void OnInitDialog();
+	BOOL OnInitDialog();
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	void OnOK();
 };
