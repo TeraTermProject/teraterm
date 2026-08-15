@@ -1,6 +1,7 @@
 name: Build (MinGW / Docker)
 
 on:
+  push:
   workflow_dispatch:
 
 permissions:

@@ -19,7 +19,7 @@ env:
 
 jobs:
   download_libs:
-    runs-on: windows-2022
+    runs-on: windows-2025
 
     steps:
     - name: Set timezone to JST
@@ -90,10 +90,10 @@ jobs:
   build_common:
     strategy:
       matrix:
-        windows: [windows-2022]
+        windows: [windows-2025]
         include:
-          - windows: windows-2022
-            VS_VERSION: 2022
+          - windows: windows-2025
+            VS_VERSION: 18
 
     runs-on: ${{ matrix.windows }}
 
@@ -224,11 +224,12 @@ jobs:
   build_arch:
     strategy:
       matrix:
-        windows: [windows-2022]
+        windows: [windows-2025]
         arch: [x86, x64, arm64]
         include:
-          - windows: windows-2022
-            VS_VERSION: 2022
+          - windows: windows-2025
+            VS_VERSION: 18
+            VS_NAME: 2026
           - arch: x86
             TARGET: Win32
           - arch: x64
@@ -374,7 +375,7 @@ jobs:
     - name: Upload to artifacts (zip)
       uses: actions/upload-artifact@v7
       with:
-        name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}-${{ matrix.arch }}-zip
+        name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_NAME }}-${{ matrix.arch }}-zip
         path: |
           installer/Output/*.zip
           !installer/Output/*_pdb.zip
@@ -382,28 +383,28 @@ jobs:
     - name: Upload to artifacts (pdb)
       uses: actions/upload-artifact@v7
       with:
-        name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}-${{ matrix.arch }}-pdb
+        name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_NAME }}-${{ matrix.arch }}-pdb
         path: |
           installer/Output/*_pdb.zip
 
     - name: Upload to artifacts (exe)
       uses: actions/upload-artifact@v7
       with:
-        name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}-${{ matrix.arch }}-installer
+        name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_NAME }}-${{ matrix.arch }}-installer
         path: |
           installer/Output/*.exe
 
     - name: Upload artifacts (sha256sum)
       uses: actions/upload-artifact@v7
       with:
-        name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}-${{ matrix.arch }}-sha256sum
+        name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_NAME }}-${{ matrix.arch }}-sha256sum
         path: |
           installer/Output/*.sha256sum
 
     - name: Upload artifacts (sha512sum)
       uses: actions/upload-artifact@v7
       with:
-        name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_VERSION }}-${{ matrix.arch }}-sha512sum
+        name: BUILD-${{ github.run_number }}-${{ github.run_id }}-VS${{ matrix.VS_NAME }}-${{ matrix.arch }}-sha512sum
         path: |
           installer/Output/*.sha512sum
 
@@ -550,7 +551,7 @@ jobs:
           installer/Output/release
 
   finalize:
-    runs-on: windows-2022
+    runs-on: windows-2025
 
     needs: [build_common, build_arch]
 
