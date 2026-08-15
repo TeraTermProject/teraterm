@@ -1027,8 +1027,8 @@ typedef struct {
 
 static BOOL IsEditHistorySelected(HWND dlg)
 {
-	LRESULT index = SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCURSEL, 0, 0);
-	LRESULT data = SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETITEMDATA, (WPARAM)index, 0);
+	LRESULT index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_GETCURSEL, 0, 0);
+	LRESULT data = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_GETITEMDATA, (WPARAM)index, 0);
 	return data == 999;
 }
 
@@ -1037,18 +1037,18 @@ static void SetHostDropdown(HWND dlg, const TTTSet *ts)
 	LRESULT index;
 	SetComboBoxHostHistory(dlg, IDC_HOSTNAME, MAXHOSTLIST, ts->SetupFNameW);
 	ExpandCBWidth(dlg, IDC_HOSTNAME);
-	SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
-	if (SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) != 0) {
+	SendDlgItemMessageW(dlg, IDC_HOSTNAME, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
+	if (SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) != 0) {
 		// 一番最初を選択する
-		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
+		SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
 	} else {
 		// 選択しない、エディットボックスは空になる
-		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
+		SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
 	}
 
 	// Edit historyを追加(ITEMDATA=999)
 	index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING, 0, (LPARAM)L"<Edit host list...>");
-	SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
+	SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
 }
 
 static void OpenEditHistory(HWND dlg, TTTSet *ts)
@@ -1060,17 +1060,17 @@ static void OpenEditHistory(HWND dlg, TTTSet *ts)
 	data.title = L"Edit Host list";
 	if (EditHistoryDlg(NULL, dlg, &data)) {
 		// 編集されたので、ドロップダウンを再設定する
-		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_RESETCONTENT, 0, 0);
+		SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_RESETCONTENT, 0, 0);
 
 		SetHostDropdown(dlg, ts);
 	}
 
-	if (SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) > 1) {
+	if (SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) > 1) {
 		// 一番最初を選択する
-		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
+		SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
 	} else {
 		// "<Edit History...>のみ、選択しない、エディットボックスは空になる
-		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
+		SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
 	}
 }
 
@@ -1206,7 +1206,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 		CheckRadioButton(dlg, IDC_HOSTTCPIP, IDC_HOSTSERIAL,
 		                 IDC_HOSTTCPIP + GetHNRec->PortType - 1);
 		if (GetHNRec->PortType == IdTCPIP) {
-			SendMessageA(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_HOSTNAME), TRUE);
+			SendMessageW(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_HOSTNAME), TRUE);
 			enable_dlg_items(dlg, IDC_HOSTCOMLABEL, IDC_HOSTCOM, FALSE);
 
 			enable_dlg_items(dlg, IDC_SSH_VERSION, IDC_SSH_VERSION, TRUE);
