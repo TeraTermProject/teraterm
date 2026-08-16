@@ -8119,6 +8119,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	char *prompt = NULL;
 	int prompt_len = 0;
 	char *prompt_disp = NULL;
+	size_t prompt_disp_len = 0;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_INFO_REQUEST was received.");
 
@@ -8216,7 +8217,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 		buffer_rewind(pvar->userauth_inforeq_prompts);
 
 		// 1個目のプロンプトでダイアログを表示
-		if (buffer_get_string(pvar->userauth_inforeq_prompts, &prompt_disp, &prompt_len) != 0) {
+		if (buffer_get_string(pvar->userauth_inforeq_prompts, &prompt_disp, &prompt_disp_len) != 0) {
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
 			goto err;
 		}
@@ -8228,7 +8229,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 
 		// keyboard-interactive method
 		if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
-			AUTH_set_TIS_mode(pvar, prompt_disp, prompt_len, echo);
+			AUTH_set_TIS_mode(pvar, prompt_disp, (int)prompt_disp_len, echo);
 			AUTH_advance_to_next_cred(pvar);
 			pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
 			//try_send_credentials(pvar);
@@ -8256,7 +8257,7 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 	int echo;
 	char *s;
 	char *prompt_disp = NULL;
-	int prompt_len = 0;
+	size_t prompt_len = 0;
 	unsigned char *outmsg;
 
 	if (pvar->userauth_inforeq_num) {
@@ -8283,7 +8284,7 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 
 		// keyboard-interactive method
 		if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
-			AUTH_set_TIS_mode(pvar, prompt_disp, prompt_len, echo);
+			AUTH_set_TIS_mode(pvar, prompt_disp, (int)prompt_len, echo);
 			AUTH_advance_to_next_cred(pvar);
 			pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
 			//try_send_credentials(pvar);

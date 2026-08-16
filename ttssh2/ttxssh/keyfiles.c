@@ -397,7 +397,8 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	unsigned char buf[1024];
 	unsigned char *cp, last, pad;
 	char *ciphername = NULL, *kdfname = NULL, *kdfp = NULL, *key = NULL, *salt = NULL, *comment = NULL;
-	unsigned int len, klen, nkeys, blocksize, keylen, ivlen, slen, rounds;
+	unsigned int len, nkeys, blocksize, keylen, ivlen, rounds;
+	size_t klen, publen, slen;
 	unsigned int check1, check2, m1len, m2len;
 	int dlen, i;
 	const struct ssh2cipher *cipher;
@@ -556,7 +557,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	}
 
 	/* pubkey */
-	if (buffer_get_string(copy_consumed, &cp, &len) != 0) {
+	if (buffer_get_string(copy_consumed, &cp, &publen) != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
 		goto error;
 	}
@@ -1383,7 +1384,7 @@ ecdsa_error:
 	case KEY_ED25519:
 	{
 		char *pubkey_type;
-		unsigned int pklen, sklen;
+		size_t pklen, sklen;
 		char *sk;
 
 		if (buffer_get_string(public_blob, &pubkey_type, NULL) != 0) {
