@@ -44,6 +44,7 @@
 #include "openbsd-compat.h"
 
 #include "buffer.h"
+#include "ssherr.h"
 
 /* buffer_t.buf の拡張の上限値 (16MB) */
 #define BUFFER_SIZE_MAX 0x1000000
@@ -51,14 +52,12 @@
 /* buffer_t.buf の拡張時に追加で確保する量 (32KB) */
 #define BUFFER_INCREASE_MARGIN (32*1024)
 
-#if 0
-typedef struct buffer {
+struct buffer {
 	char *buf;      /* バッファの先頭ポインタ。realloc()により変動する。*/
-	size_t offset;     /* 現在の読み出し位置 */
-	size_t maxlen;     /* バッファの最大サイズ */
-	size_t len;        /* バッファに含まれる有効なデータサイズ */
-} buffer_t;
-#endif
+	size_t offset;  /* 現在の読み出し位置/書き込み位置 */
+	size_t maxlen;  /* バッファの最大サイズ（確保済みサイズ） */
+	size_t len;     /* バッファに含まれる有効なデータサイズ */
+};
 
 // バッファのオフセットを初期化し、まだ読んでいない状態にする。
 // Tera Term(TTSSH)オリジナル関数。
@@ -107,156 +106,152 @@ void buffer_free(buffer_t * buf)
 	}
 }
 
-// バッファの領域拡張を行う。
-// return: 拡張前のバッファポインター
-void *buffer_append_space(buffer_t * buf, size_t size)
+// from OpenSSH 10.4p1 sshbuf.c
+static int sshbuf_check_sanity(buffer_t *buf)
 {
-	size_t n;
-	size_t newlen;
-	void *p;
-
-	n = buf->offset + size;
-	if (n < buf->maxlen) {
-		//
-	} else {
-		// バッファが足りないので補充する。(2005.7.2 yutaka)
-		newlen = buf->maxlen + size + BUFFER_INCREASE_MARGIN;
-		if (newlen > BUFFER_SIZE_MAX) {
-			goto panic;
-		}
-		buf->buf = realloc(buf->buf, newlen);
-		if (buf->buf == NULL)
-			goto panic;
-		buf->maxlen = newlen;
+	if (buf == NULL || buf->maxlen > BUFFER_SIZE_MAX || buf->len > buf->maxlen || buf->offset > buf->len) {
+		return SSH_ERR_INTERNAL_ERROR;
 	}
-
-	p = buf->buf + buf->offset;
-	//buf->offset += size;
-	buf->len = buf->offset + size;
-
-	return (p);
-
-panic:
-	abort();
-	return (NULL);
+	return 0;
 }
 
-int buffer_append(buffer_t * buf, const void *ptr, size_t size)
+// from OpenSSH 10.4p1 sshbuf.c
+int buffer_check_reserve(buffer_t *buf, size_t len)
+{
+	int r;
+
+	if ((r = sshbuf_check_sanity(buf)) != 0)
+		return r;
+
+	/* Check that len is reasonable and that max_size + available < len */
+	if (len > BUFFER_SIZE_MAX || BUFFER_SIZE_MAX - len < buf->len - buf->offset)
+		return SSH_ERR_NO_BUFFER_SPACE;
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf.c
+int buffer_allocate(buffer_t *buf, size_t len)
+{
+	size_t rlen, need;
+	u_char *dp;
+	int r;
+
+	if ((r = buffer_check_reserve(buf, len)) != 0)
+		return r;
+
+	if (len + buf->len <= buf->maxlen)
+		return 0; /* already have it. */
+
+	/*
+	 * Prefer to alloc in SSHBUF_SIZE_INC units, but
+	 * allocate less if doing so would overflow max_size.
+	 */
+	need = len + buf->len - buf->maxlen;
+	rlen = buf->maxlen + need;
+
+	if (rlen > BUFFER_SIZE_MAX)
+		rlen = buf->maxlen + need;
+
+	if ((dp = realloc(buf->buf, rlen)) == NULL) {
+		return SSH_ERR_ALLOC_FAIL;
+	}
+	buf->maxlen = rlen;
+	buf->buf = dp;
+	if ((r = buffer_check_reserve(buf, len)) < 0) {
+		/* shouldn't fail */
+		return r;
+	}
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf.c
+// buf->len は len バイト（拡張した長さ） 進むので、
+// この関数を呼んだら dpp に len バイト書き込まなければならない
+int buffer_reserve(buffer_t *buf, size_t len, u_char **dpp)
+{
+	u_char *dp;
+	int r;
+
+	if (dpp != NULL)
+		*dpp = NULL;
+
+	if ((r = buffer_allocate(buf, len)) != 0)
+		return r;
+
+	dp = buf->buf + buf->len; // 拡張前のデータ末尾のポインタ
+	buf->len += len;
+	if (dpp != NULL)
+		*dpp = dp;
+	return 0;
+}
+
+int buffer_put(buffer_t * buf, const void *v, size_t len)
 {
 	size_t n;
-	int ret = -1;
+	int ret = SSH_ERR_INTERNAL_ERROR;
 	size_t newlen;
 
 	for (;;) {
-		n = buf->offset + size;
+		n = buf->offset + len;
 		if (n < buf->maxlen) {
-			memcpy(buf->buf + buf->offset, ptr, size);
-			buf->offset += size;
+			memcpy(buf->buf + buf->offset, v, len);
+			buf->offset += len;
 			buf->len = buf->offset;
 			ret = 0;
 			break;
 
 		} else {
 			// バッファが足りないので補充する。(2005.7.2 yutaka)
-			newlen = buf->maxlen + size + BUFFER_INCREASE_MARGIN;
+			newlen = buf->maxlen + len + BUFFER_INCREASE_MARGIN;
 			if (newlen > BUFFER_SIZE_MAX) {
-				goto panic;
+				return SSH_ERR_NO_BUFFER_SPACE;
 			}
 			buf->buf = realloc(buf->buf, newlen);
 			if (buf->buf == NULL)
-				goto panic;
+				return SSH_ERR_ALLOC_FAIL;
 			buf->maxlen = newlen;
 		}
 	}
 
-	return (ret);
-
-panic:
-	abort();
-	return (ret);
+	return ret;
 }
 
-int buffer_append_length(buffer_t * msg, const void *ptr, size_t size)
+int buffer_get(buffer_t *buf, void *v, size_t len)
 {
-	char buf[4];
-	int val;
-	int ret = -1;
-
-	assert(size == (size_t)(int)size);
-	val = htonl((int)size);
-	memcpy(buf, &val, sizeof(val));
-	ret = buffer_append(msg, buf, sizeof(buf));
-	if (ptr != NULL) {
-		ret = buffer_append(msg, ptr, size);
-	}
-
-	return (ret);
-}
-
-void buffer_put_raw(buffer_t *msg, const void *ptr, size_t size)
-{
-	int ret = -1;
-
-	ret = buffer_append(msg, ptr, size);
-}
-
-int buffer_get_ret(buffer_t *msg, void *buf, size_t len)
-{
-	if (len > msg->len - msg->offset) {
+	if (len > buf->len - buf->offset) {
 		// TODO: エラー処理
-		OutputDebugPrintf("buffer_get_ret: trying to get more bytes %u than in buffer %u",
-		    len, msg->len - msg->offset);
-		return (-1);
+		OutputDebugPrintf("buffer_get: trying to get more bytes %u than in buffer %u",
+		                  len, buf->len - buf->offset);
+		return SSH_ERR_MESSAGE_INCOMPLETE;
 	}
-	memcpy(buf, msg->buf + msg->offset, len);
-	msg->offset += len;
-	return (0);
+	memcpy(v, buf->buf + buf->offset, len);
+	buf->offset += len;
+	return 0;
 }
 
-int buffer_get_int_ret(unsigned int *ret, buffer_t *msg)
+int buffer_get_int(buffer_t *buf, unsigned int *valp)
 {
-	unsigned char buf[4];
+	unsigned char tmp[4];
+	int r;
 
-	if (buffer_get_ret(msg, (char *) buf, 4) == -1)
-		return (-1);
-	if (ret != NULL)
-		*ret = get_uint32(buf);
-	return (0);
+	if ((r = buffer_get(buf, (char *)tmp, 4)) != 0)
+		return r;
+	if (valp != NULL)
+		*valp = get_uint32(tmp);
+	return 0;
 }
 
-unsigned int buffer_get_int(buffer_t *msg)
+int buffer_get_char(buffer_t *buf, u_char *valp)
 {
-	unsigned int ret = 0;
+	int r;
 
-	if (buffer_get_int_ret(&ret, msg) == -1) {
-		// TODO: エラー処理
-		logprintf(LOG_LEVEL_ERROR, "buffer_get_int: buffer error");
-	}
-	return (ret);
+	if ((r = buffer_get(buf, valp, 1)) != 0)
+		return r;
+	return 0;
 }
 
-int buffer_get_char_ret(char *ret, buffer_t *msg)
-{
-	if (buffer_get_ret(msg, ret, 1) == -1)
-		return (-1);
-	return (0);
-}
-
-int buffer_get_char(buffer_t *msg)
-{
-	char ch;
-
-	if (buffer_get_char_ret(&ch, msg) == -1) {
-		// TODO: エラー処理
-		OutputDebugPrintf("buffer_get_char: buffer error");
-	}
-	return (unsigned char)ch;
-}
-
-// getting string buffer.
 // NOTE: You should free the return pointer if it's unused.
-// (2005.6.26 yutaka)
-char *buffer_get_string(char **data_ptr, int *buflen_ptr)
+static char *buffer_get_string_internal(char **data_ptr, int *buflen_ptr)
 {
 	char *data = *data_ptr;
 	char *ptr;
@@ -286,9 +281,8 @@ char *buffer_get_string(char **data_ptr, int *buflen_ptr)
 	return(ptr);
 }
 
-// buffer_get_string() の buffer_t 版。本来はこちらが OpenSSH スタイル。
 // NOTE: You should free the return pointer if it's unused.
-void *buffer_get_string_msg(buffer_t *msg, int *buflen_ptr)
+void *buffer_get_string_(buffer_t *buf, int *lenp)
 {
 	char *data, *olddata;
 	void *ret = NULL;
@@ -296,225 +290,370 @@ void *buffer_get_string_msg(buffer_t *msg, int *buflen_ptr)
 	int len, datalen;
 
 	// Check size
-	len = buffer_remain_len(msg);
+	len = buffer_remain_len(buf);
 	if (len < 4)
 		goto error;
 
-	data = olddata = buffer_tail_ptr(msg);
+	data = olddata = buffer_tail_ptr(buf);
 	datalen = get_uint32_MSBfirst(data);
 	if (len - 4 < datalen)
 		goto error;
 
-	ret = buffer_get_string(&data, buflen_ptr);
+	ret = buffer_get_string_internal(&data, lenp);
 	off = data - olddata;
-	msg->offset += off;
+	buf->offset += off;
 
 error:;
 	return (ret);
 }
 
-void buffer_put_string(buffer_t *msg, const char *ptr, size_t size)
+
+// from OpenSSH 10.4p1 sshbuf-getput-basic.c
+int buffer_get_string(buffer_t *buf, u_char **valp, size_t *lenp)
+{
+	const u_char *val;
+	size_t len;
+	int r;
+
+	if (valp != NULL)
+		*valp = NULL;
+	if (lenp != NULL)
+		*lenp = 0;
+	if ((r = buffer_get_string_direct(buf, &val, &len)) < 0)
+			return r;
+		if (valp != NULL) {
+		if ((*valp = malloc(len + 1)) == NULL) {
+			logprintf(LOG_LEVEL_ERROR, "%s: malloc failed.", __FUNCTION__);
+			return SSH_ERR_ALLOC_FAIL;
+		}
+		if (len != 0)
+			memcpy(*valp, val, len);
+		(*valp)[len] = '\0';
+	}
+	if (lenp != NULL)
+		*lenp = len;
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf-getput-basic.c
+int buffer_get_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp)
+{
+	size_t len;
+	const u_char *p;
+	int r;
+
+	if (valp != NULL)
+		*valp = NULL;
+	if (lenp != NULL)
+		*lenp = 0;
+	if ((r = buffer_peek_string_direct(buf, &p, &len)) < 0)
+		return r;
+	if (valp != NULL)
+		*valp = p;
+	if (lenp != NULL)
+		*lenp = len;
+	if (buffer_consume(buf, len + 4) != 0) {
+		/* Shouldn't happen */
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_INTERNAL_ERROR", __FUNCTION__);
+		return SSH_ERR_INTERNAL_ERROR;
+	}
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf-getput-basic.c
+int buffer_peek_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp)
+{
+	uint32_t len;
+	const u_char *p = buffer_tail_ptr(buf);
+
+	if (valp != NULL)
+		*valp = NULL;
+	if (lenp != NULL)
+		*lenp = 0;
+	if (buffer_remain_len(buf) < 4) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_MESSAGE_INCOMPLETE", __FUNCTION__);
+		return SSH_ERR_MESSAGE_INCOMPLETE;
+	}
+	len = PEEK_U32(p);
+	if (len > BUFFER_SIZE_MAX - 4) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_STRING_TOO_LARGE", __FUNCTION__);
+		return SSH_ERR_STRING_TOO_LARGE;
+	}
+	if (buffer_remain_len(buf) - 4 < len) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_MESSAGE_INCOMPLETE", __FUNCTION__);
+		return SSH_ERR_MESSAGE_INCOMPLETE;
+	}
+	if (valp != NULL)
+		*valp = p + 4;
+	if (lenp != NULL)
+		*lenp = len;
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf-getput-basic.c
+int buffer_get_cstring(buffer_t *buf, char **valp, size_t *lenp)
+{
+	size_t len;
+	const u_char *p, *z;
+	int r;
+
+	if (valp != NULL)
+		*valp = NULL;
+	if (lenp != NULL)
+		*lenp = 0;
+	if ((r = buffer_peek_string_direct(buf, &p, &len)) != 0)
+		return r;
+	/* Allow a \0 only at the end of the string */
+	if (len > 0 && (z = memchr(p, '\0', len)) != NULL && z < p + len - 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_INVALID_FORMAT", __FUNCTION__);
+		return SSH_ERR_INVALID_FORMAT;
+	}
+	if ((r = buffer_skip_string(buf)) != 0)
+		return -1;
+	if (valp != NULL) {
+		if ((*valp = malloc(len + 1)) == NULL) {
+			logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_ALLOC_FAIL", __FUNCTION__);
+			return SSH_ERR_ALLOC_FAIL;
+		}
+		if (len != 0)
+			memcpy(*valp, p, len);
+		(*valp)[len] = '\0';
+	}
+	if (lenp != NULL)
+		*lenp = (size_t)len;
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf-getput-basic.c
+// buffer_reserve() で v の offset は進まないため、
+// このあと v の末尾に buffer_put するには buffer_consume() が必要
+int buffer_get_stringb(buffer_t *buf, buffer_t *v)
+{
+	uint32_t len;
+	u_char *p;
+	int r;
+
+	/*
+	 * Use sshbuf_peek_string_direct() to figure out if there is
+	 * a complete string in 'buf' and copy the string directly
+	 * into 'v'.
+	 */
+	if ((r = buffer_peek_string_direct(buf, NULL, NULL)) != 0 ||
+	    (r = buffer_get_int(buf, &len)) != 0 ||
+	    (r = buffer_reserve(v, len, &p)) != 0 ||
+	    (r = buffer_get(buf, p, len)) != 0)
+		return r;
+	return 0;
+}
+
+int buffer_put_string(buffer_t *msg, const char *v, size_t len)
 {
 	char buf[4];
 	int val;
-	int ret = -1;
+	int ret = SSH_ERR_INTERNAL_ERROR;
 
-	assert(size == (size_t)(int)size);
+	assert(len == (size_t)(int)len);
 	// 「サイズ＋文字列」で書き込む。サイズは4byteのbig-endian。
-	val = htonl((int)size);
+	val = htonl((int)len);
 	memcpy(buf, &val, sizeof(val));
-	ret = buffer_append(msg, buf, sizeof(buf));
-	if (ptr != NULL) {
-		ret = buffer_append(msg, ptr, size);
+	ret = buffer_put(msg, buf, sizeof(buf));
+	if (v != NULL) {
+		ret = buffer_put(msg, v, len);
 	}
+
+	return ret;
 }
 
-void buffer_put_cstring(buffer_t *msg, const char *ptr)
+int buffer_put_cstring(buffer_t *buf, const char *v)
 {
-	buffer_put_string(msg, ptr, strlen(ptr));
+	return buffer_put_string(buf, v, strlen(v));
 }
 
-void buffer_put_stringb(buffer_t *msg, buffer_t *v)
+int buffer_put_stringb(buffer_t *buf, buffer_t *v)
 {
-	buffer_put_string(msg, buffer_ptr(v), buffer_len(v));
+	return buffer_put_string(buf, buffer_ptr(v), buffer_len(v));
 }
 
-void buffer_put_char(buffer_t *msg, int value)
+int buffer_put_char(buffer_t *buf, int val)
 {
-	char ch = (char)value;
+	char ch = (char)val;
 
-	buffer_append(msg, &ch, 1);
+	return buffer_put(buf, &ch, 1);
 }
 
-void buffer_put_padding(buffer_t *msg, size_t size)
+int buffer_put_int(buffer_t *buf, int val)
 {
-	char ch = ' ';
-	size_t i;
+	char tmp[4];
 
-	for (i = 0 ; i < size ; i++) {
-		buffer_append(msg, &ch, 1);
-	}
+	set_uint32_MSBfirst(tmp, val);
+	return buffer_put(buf, tmp, sizeof(tmp));
 }
 
-void buffer_put_int(buffer_t *msg, int value)
+int buffer_len(buffer_t *buf)
 {
-	char buf[4];
-
-	set_uint32_MSBfirst(buf, value);
-	buffer_append(msg, buf, sizeof(buf));
+	return (int)(buf->len);
 }
 
-int buffer_len(buffer_t *msg)
+int buffer_remain_len(buffer_t *buf)
 {
-	return (int)(msg->len);
+	return (int)(buf->len - buf->offset);
 }
 
-// まだ読み込んでいない残りのサイズを返す。本来はこちらが OpenSSH スタイル。
-int buffer_remain_len(buffer_t *msg)
-{
-	return (int)(msg->len - msg->offset);
-}
-
-// buffer_append() や buffer_append_space() でメッセージバッファに追加を行うと、
+// buffer_put() や buffer_reserve() でメッセージバッファに追加を行うと、
 // 内部で realloc() によりバッファポインタが変わってしまうことがある。
 // メッセージバッファのポインタを取得する際は、バッファ追加が完了した後に
 // 行わなければ、BOFで落ちる。
-char *buffer_ptr(buffer_t *msg)
+char *buffer_ptr(buffer_t *buf)
 {
-	return (msg->buf);
+	return (buf->buf);
 }
 
-char *buffer_tail_ptr(buffer_t *msg)
+char *buffer_tail_ptr(buffer_t *buf)
 {
-	return (char *)(msg->buf + msg->offset);
+	return (char *)(buf->buf + buf->offset);
 }
 
-int buffer_overflow_verify(buffer_t *msg, size_t len)
+int buffer_overflow_verify(buffer_t *buf, size_t len)
 {
-	if (msg->offset + len > msg->maxlen) {
+	if (buf->offset + len > buf->maxlen) {
 		return -1;  // error
 	}
 	return 0; // no problem
 }
 
 // for SSH1
-void buffer_put_bignum(buffer_t *buffer, const BIGNUM *value)
+int buffer_put_bignum1(buffer_t *buf, const BIGNUM *v)
 {
 	unsigned int bits, bin_size;
-	unsigned char *buf;
+	unsigned char *d;
 	int oi;
 	char msg[2];
+	int r = 0;
 
-	bits = BN_num_bits(value);
+	bits = BN_num_bits(v);
 	bin_size = (bits + 7) / 8;
-	buf = malloc(bin_size);
-	if (buf == NULL) {
-		*buf = 0;
-		goto error;
+	d = malloc(bin_size);
+	if (d == NULL) {
+		*d = 0;
+		return SSH_ERR_ALLOC_FAIL;
 	}
 
-	buf[0] = '\0';
+	d[0] = '\0';
 	/* Get the value of in binary */
-	oi = BN_bn2bin(value, buf);
+	oi = BN_bn2bin(v, d);
 	if (oi != bin_size) {
+		r = SSH_ERR_INTERNAL_ERROR;
 		goto error;
 	}
 
 	/* Store the number of bits in the buffer in two bytes, msb first. */
 	set_ushort16_MSBfirst(msg, bits);
-	buffer_append(buffer, msg, 2);
+	if ((r = buffer_put(buf, msg, 2)) != 0)
+		goto error;
 
 	/* Store the binary data. */
-	buffer_append(buffer, (char *)buf, oi);
+	if ((r = buffer_put(buf, (char *)d, oi)) != 0)
+		goto error;
 
 error:
-	free(buf);
+	free(d);
+	return r;
 }
 
 // for SSH2
-void buffer_put_bignum2(buffer_t *msg, const BIGNUM *value)
+int buffer_put_bignum2(buffer_t *buf, const BIGNUM *v)
 {
 	unsigned int bytes;
-	unsigned char *buf;
+	unsigned char *d;
 	int oi;
 	unsigned int hasnohigh = 0;
+	int r = 0;
 
-	bytes = BN_num_bytes(value) + 1; /* extra padding byte */
-	buf = malloc(bytes);
-	if (buf == NULL) {
-		*buf = 0;
-		goto error;
+	bytes = BN_num_bytes(v) + 1; /* extra padding byte */
+	d = malloc(bytes);
+	if (d == NULL) {
+		*d = 0;
+		return SSH_ERR_ALLOC_FAIL;
 	}
 
-	buf[0] = '\0';
+	d[0] = '\0';
 	/* Get the value of in binary */
-	oi = BN_bn2bin(value, buf+1);
-	hasnohigh = (buf[1] & 0x80) ? 0 : 1;
-	buffer_put_string(msg, buf+hasnohigh, bytes-hasnohigh);
+	oi = BN_bn2bin(v, d+1);
+	hasnohigh = (d[1] & 0x80) ? 0 : 1;
+	if ((r = buffer_put_string(buf, (char *)(d + hasnohigh), bytes - hasnohigh)) != 0)
+		goto error;
 	//memset(buf, 0, bytes);
 
 error:
-	free(buf);
+	free(d);
+	return r;
 }
 
-void buffer_get_bignum2(char **data, BIGNUM *value)
+static void buffer_get_bignum2_internal(char **data, BIGNUM *value)
 {
 	char *buf = *data;
 	int len;
 
 	len = get_uint32_MSBfirst(buf);
 	buf += 4;
-	BN_bin2bn(buf, len, value);
+	BN_bin2bn((unsigned char *)buf, len, value);
 	buf += len;
 
 	*data = buf;
 }
 
-void buffer_get_bignum2_msg(buffer_t *msg, BIGNUM *value)
+int buffer_get_bignum2(buffer_t *buf, BIGNUM *v)
 {
 	char *data, *olddata;
 	size_t off;
 
-	data = olddata = buffer_tail_ptr(msg);
-	buffer_get_bignum2(&data, value);
+	data = olddata = buffer_tail_ptr(buf);
+	buffer_get_bignum2_internal(&data, v);
 	off = data - olddata;
-	msg->offset += off;
+	buf->offset += off;
+
+	return 0;
 }
 
-void buffer_get_bignum_SECSH(buffer_t *buffer, BIGNUM *value)
+int buffer_get_bignum_SECSH(buffer_t *buf, BIGNUM *v)
 {
-	char *buf;
+	char *d;
 	unsigned int bits, bytes;
+	int r;
 
-	bits = buffer_get_int(buffer);
+	if ((r = buffer_get_int(buf, &bits)) != 0) {
+		return r;
+	}
 	bytes = (bits + 7) / 8;
 
-	if ((buffer->len - buffer->offset) < bytes) {
-		return;
+	if ((buf->len - buf->offset) < bytes) {
+		return SSH_ERR_NO_BUFFER_SPACE;
 	}
-	buf = buffer->buf + buffer->offset;
-	if ((*buf & 0x80) != 0) {
+	d = buf->buf + buf->offset;
+	if ((*d & 0x80) != 0) {
 		char *tmp = (char *)malloc(bytes + 1);
 		tmp[0] = '\0';
-		memcpy(tmp + 1, buf, bytes);
-		BN_bin2bn(tmp, bytes + 1, value);
+		memcpy(tmp + 1, d, bytes);
+		BN_bin2bn((unsigned char*)tmp, bytes + 1, v);
 		free(tmp);
 	}
 	else {
-		BN_bin2bn(buf, bytes, value);
+		BN_bin2bn((unsigned char*)d, bytes, v);
 	}
 
-	buffer->offset += bytes;
+	buf->offset += bytes;
+
+	return 0;
 }
 
 int buffer_put_bignum2_bytes(buffer_t *buf, const void *v, size_t len)
 {
 	u_char *d;
 	const u_char *s = (const u_char *)v;
-	int prepend;
+	int prepend, r;
 
 	if (len > BUFFER_SIZE_MAX - 5)
-		return -9; // SSH_ERR_NO_BUFFER_SPACE
+		return SSH_ERR_NO_BUFFER_SPACE;
 
 	/* Skip leading zero bytes */
 	for (; len > 0 && *s == 0; len--, s++)
@@ -525,7 +664,9 @@ int buffer_put_bignum2_bytes(buffer_t *buf, const void *v, size_t len)
 	 */
 	prepend = len > 0 && (s[0] & 0x80) != 0;
 
-	d = buffer_append_space(buf, len + 4 + prepend);
+	if ((r = buffer_reserve(buf, len + 4 + prepend, &d)) != 0) {
+		return r;
+	}
 	POKE_U32(d, len + prepend);
 	if (prepend)
 		d[4] = 0;
@@ -533,53 +674,59 @@ int buffer_put_bignum2_bytes(buffer_t *buf, const void *v, size_t len)
 	return 0;
 }
 
-void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *point)
+int buffer_put_ec(buffer_t *buf, const EC_POINT *v, const EC_GROUP *g)
 {
-	unsigned char *buf = NULL;
+	unsigned char *d = NULL;
 	size_t len;
+	int r = 0;
 
 	/* Determine length */
-	len = EC_POINT_point2oct(curve, point, POINT_CONVERSION_UNCOMPRESSED,
+	len = EC_POINT_point2oct(g, v, POINT_CONVERSION_UNCOMPRESSED,
 	    NULL, 0, NULL);
 	/* Convert */
-	buf = malloc(len);
-	if (buf == NULL) {
-		*buf = 0;
-		goto error;
+	d = malloc(len);
+	if (d == NULL) {
+		*d = 0;
+		return SSH_ERR_ALLOC_FAIL;
 	}
-	if (EC_POINT_point2oct(curve, point, POINT_CONVERSION_UNCOMPRESSED,
-	    buf, len, NULL) != len) {
+	if (EC_POINT_point2oct(g, v, POINT_CONVERSION_UNCOMPRESSED,
+	    d, len, NULL) != len) {
+		return SSH_ERR_INTERNAL_ERROR;
 		goto error;
 	}
 	/* Append */
-	buffer_put_string(msg, buf, len);
+	if ((r = buffer_put_string(buf, (char *)d, len)) != 0)
+		goto error;
 
 error:
-	free(buf);
+	free(d);
+	return r;
 }
 
-void buffer_get_ecpoint(char **data, const EC_GROUP *curve, EC_POINT *point)
+static void buffer_get_ec_internal(char **data, EC_POINT *v, const EC_GROUP *g)
 {
 	char *buf = *data;
 	size_t len;
 
 	len = get_uint32_MSBfirst(buf);
 	buf += 4;
-	EC_POINT_oct2point(curve, point, buf, len, NULL);
+	EC_POINT_oct2point(g, v, (unsigned char*)buf, len, NULL);
 	buf += len;
 
 	*data = buf;
 }
 
-void buffer_get_ecpoint_msg(buffer_t *msg, const EC_GROUP *curve, EC_POINT *point)
+int buffer_get_ec(buffer_t *buf, EC_POINT *v, const EC_GROUP *g)
 {
 	char *data, *olddata;
 	size_t off;
 
-	data = olddata = buffer_tail_ptr(msg);
-	buffer_get_ecpoint(&data, curve, point);
+	data = olddata = buffer_tail_ptr(buf);
+	buffer_get_ec_internal(&data, v, g);
 	off = data - olddata;
-	msg->offset += off;
+	buf->offset += off;
+
+	return 0;
 }
 
 void buffer_dump(FILE *fp, buffer_t *buf)
@@ -598,25 +745,27 @@ void buffer_dump(FILE *fp, buffer_t *buf)
 }
 
 // バッファのオフセットを進める。
-void buffer_consume(buffer_t *buf, size_t shift_byte)
+int buffer_consume(buffer_t *buf, size_t len)
 {
-	if (shift_byte > buf->len - buf->offset) {
-		// TODO: fatal error
+	if (len > buf->len - buf->offset) {
+		return SSH_ERR_MESSAGE_INCOMPLETE;
 	} else {
-		buf->offset += shift_byte;
+		buf->offset += len;
 		// lenは変えない。
 	}
+	return 0;
 }
 
 // バッファの末尾を縮退する。
-void buffer_consume_end(buffer_t *buf, size_t shift_byte)
+int buffer_consume_end(buffer_t *buf, size_t len)
 {
-	if (shift_byte > buf->len - buf->offset) {
-		// TODO: fatal error
+	if (len > buf->len - buf->offset) {
+		return SSH_ERR_MESSAGE_INCOMPLETE;
 	} else {
-		buf->len -= shift_byte;
+		buf->len -= len;
 		// offsetは変えない。
 	}
+	return 0;
 }
 
 
@@ -627,7 +776,7 @@ int buffer_compress(z_stream *zstream, char *payload, size_t len, buffer_t *comp
 	int status;
 
 	// input buffer
-	zstream->next_in = payload;
+	zstream->next_in = (Bytef *)payload;
 	zstream->avail_in = (uInt)len;
 	assert(len == (size_t)(uInt)len);
 
@@ -639,7 +788,9 @@ int buffer_compress(z_stream *zstream, char *payload, size_t len, buffer_t *comp
 		// バッファを圧縮する。圧縮すると、逆にサイズが大きくなることも考慮すること。
 		status = deflate(zstream, Z_PARTIAL_FLUSH);
 		if (status == Z_OK) {
-			buffer_append(compbuf, buf, sizeof(buf) - zstream->avail_out);
+			if (buffer_put(compbuf, buf, sizeof(buf) - zstream->avail_out) != 0) {
+				return -1; // error
+			}
 		} else {
 			return -1; // error
 		}
@@ -655,7 +806,7 @@ int buffer_decompress(z_stream *zstream, char *payload, size_t len, buffer_t *co
 	int status;
 
 	// input buffer
-	zstream->next_in = payload;
+	zstream->next_in = (Bytef*)payload;
 	zstream->avail_in = (uInt)len;
 	assert(len == (size_t)(uInt)len);
 
@@ -667,7 +818,9 @@ int buffer_decompress(z_stream *zstream, char *payload, size_t len, buffer_t *co
 		// バッファを展開する。
 		status = inflate(zstream, Z_PARTIAL_FLUSH);
 		if (status == Z_OK) {
-			buffer_append(compbuf, buf, sizeof(buf) - zstream->avail_out);
+			if (buffer_put(compbuf, buf, sizeof(buf) - zstream->avail_out) != 0) {
+				return -1; // error
+			}
 
 		} else if (status == Z_OK) {
 			break;

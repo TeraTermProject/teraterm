@@ -28,6 +28,7 @@
 #include "key.h"
 #include "resource.h"
 #include "dlglib.h"
+#include "ssherr.h"
 
 #include <openssl/rsa.h>
 #include <openssl/dsa.h>
@@ -298,7 +299,7 @@ int ssh_rsa_verify(RSA *key,
 {
 	u_char digest[SSH_DIGEST_MAX_LENGTH], *sigblob;
 	u_int len, dlen, modlen;
-	int ret = -1, nid;
+	int ret = SSH_ERR_INTERNAL_ERROR, nid;
 	char *ptr, *algo_name;
 	BIGNUM *n;
 	digest_algorithm hash_alg;
@@ -306,13 +307,13 @@ int ssh_rsa_verify(RSA *key,
 	OpenSSL_add_all_digests();
 
 	if (key == NULL) {
-		ret = -2;
+		ret = SSH_ERR_INVALID_ARGUMENT;
 		goto error;
 	}
 
 	RSA_get0_key(key, &n, NULL, NULL);
 	if (BN_num_bits(n) < SSH_RSA_MINIMUM_MODULUS_SIZE) {
-		ret = -3;
+		ret = SSH_ERR_KEY_LENGTH;
 		goto error;
 	}
 	//debug_print(41, signature, signaturelen);
@@ -324,7 +325,7 @@ int ssh_rsa_verify(RSA *key,
 	ptr += 4;
 	if (strncmp(algo_name, ptr, len) != 0) {
 		logprintf(10, "%s: signature type mismatch: sig: %s, hostkey: %s", __FUNCTION__, ptr, algo_name);
-		ret = -4;
+		ret = SSH_ERR_KEY_TYPE_MISMATCH;
 		goto error;
 	}
 	ptr += len;
@@ -344,7 +345,7 @@ int ssh_rsa_verify(RSA *key,
 	/* RSA_verify expects a signature of RSA_size */
 	modlen = RSA_size(key);
 	if (len > modlen) {
-		ret = -5;
+		ret = SSH_ERR_KEY_BITS_MISMATCH;
 		goto error;
 
 	} else if (len < modlen) {
@@ -357,21 +358,24 @@ int ssh_rsa_verify(RSA *key,
 
 	nid = get_ssh2_key_hashtype(keyalgo);
 	hash_alg = get_ssh2_key_hash_alg(keyalgo);
-	if (ssh_digest_memory(hash_alg, data, datalen, digest, sizeof(digest)) != 0) {
+	if ((ret = ssh_digest_memory(hash_alg, data, datalen, digest, sizeof(digest))) != 0) {
 		logprintf(10, "%s: ssh_digest_memory %d failed", __FUNCTION__, hash_alg);
-		ret = -6;
 		goto error;
 	}
 	dlen = ssh_digest_bytes(hash_alg);
 
-	ret = openssh_RSA_verify(nid, digest, dlen, sigblob, len, key);
+	if (openssh_RSA_verify(nid, digest, dlen, sigblob, len, key) != 1) {
+		ret = SSH_ERR_SIGNATURE_INVALID;
+	}
+	ret = 0;
 
-	SecureZeroMemory(digest, sizeof(digest));
 	SecureZeroMemory(sigblob, len);
 	//free(sigblob);
 	//debug("ssh_rsa_verify: signature %scorrect", (ret==0) ? "in" : "");
 
 error:
+	SecureZeroMemory(digest, sizeof(digest));
+
 	return ret;
 }
 
@@ -379,103 +383,119 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
                      u_char *signature, u_int signaturelen,
                      u_char *data, u_int datalen)
 {
-	ECDSA_SIG *sig;
-	unsigned char digest[SSH_DIGEST_MAX_LENGTH], *sigblob;
+	buffer_t *b = NULL;
+	char *ktype = NULL;
+	ECDSA_SIG *sig = NULL;
+	unsigned char digest[SSH_DIGEST_MAX_LENGTH];
 	unsigned int len, dlen;
-	int ret = -1;
+	int ret = SSH_ERR_INTERNAL_ERROR;
 	digest_algorithm hash_alg;
-	char *ptr;
 	BIGNUM *r, *s;
 
 	OpenSSL_add_all_digests();
 
 	if (key == NULL) {
-		ret = -2;
+		ret = SSH_ERR_INVALID_ARGUMENT;
 		goto error;
 	}
 
-	ptr = signature;
-
-	len = get_uint32_MSBfirst(ptr);
-	ptr += 4;
-	if (strncmp(get_ssh2_hostkey_type_name(keytype), ptr, len) != 0) {
-		ret = -3;
+	b = buffer_init();
+	if (b == NULL) {
+		ret = SSH_ERR_ALLOC_FAIL;
 		goto error;
 	}
-	ptr += len;
 
-	len = get_uint32_MSBfirst(ptr);
-	ptr += 4;
-	sigblob = ptr;
-	ptr += len;
+	if ((ret = buffer_put(b, signature, signaturelen)) != 0)
+		goto error;
+	buffer_rewind(b);
+
+	if ((ret = buffer_get_string(b, &ktype, NULL)) != 0)
+		goto error;
+	if (strcmp(get_ssh2_hostkey_type_name(keytype), ktype) != 0) {
+		ret = SSH_ERR_KEY_TYPE_MISMATCH;
+		goto error;
+	}
+
+	if (buffer_get_int(b, &len) != 0) {
+		ret = SSH_ERR_UNEXPECTED_TRAILING_DATA;
+		goto error;
+	}
 
 	/* parse signature */
 	if ((sig = ECDSA_SIG_new()) == NULL) {
-		ret = -4;
+		ret = SSH_ERR_ALLOC_FAIL;
 		goto error;
 	}
 	if ((r = BN_new()) == NULL) {
-		ret = -5;
+		ret = SSH_ERR_ALLOC_FAIL;
 		goto error;
 	}
 	if ((s = BN_new()) == NULL) {
-		ret = -6;
+		ret = SSH_ERR_ALLOC_FAIL;
 		goto error;
 	}
 
 	ECDSA_SIG_set0(sig, r, s);
-	buffer_get_bignum2((char **)&sigblob, r);
-	buffer_get_bignum2((char **)&sigblob, s);
-	if (sigblob != ptr) {
-		ret = -7;
+	if ((ret = buffer_get_bignum2(b, r)) != 0 ||
+	    (ret = buffer_get_bignum2(b, s)) != 0) {
 		goto error;
 	}
 
 	/* hash the data */
 	hash_alg = keytype_to_hash_alg(keytype);
-	if (ssh_digest_memory(hash_alg, data, datalen, digest, sizeof(digest)) != 0) {
-		ret = -8;
+	if ((ret = ssh_digest_memory(hash_alg, data, datalen, digest, sizeof(digest))) != 0) {
 		goto error;
 	}
 	dlen = ssh_digest_bytes(hash_alg);
 
-	ret = ECDSA_do_verify(digest, dlen, sig, key);
-	SecureZeroMemory(digest, sizeof(digest));
-
-	ECDSA_SIG_free(sig);
+	if (ECDSA_do_verify(digest, dlen, sig, key) != 1) {
+		ret = SSH_ERR_SIGNATURE_INVALID;
+	}
+	ret = 0;
 
 error:
+	buffer_free(b);
+	ECDSA_SIG_free(sig);
+	SecureZeroMemory(digest, sizeof(digest));
+	free(ktype);
+
 	return ret;
 }
 
 static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int signaturelen,
                               unsigned char *data, unsigned int datalen)
 {
-	buffer_t *b;
+	buffer_t *b = NULL;
 	char *ktype = NULL;
 	unsigned char *sigblob = NULL, *sm = NULL, *m = NULL;
 	unsigned int len;
 	unsigned long long smlen, mlen;
-	int rlen, ret;
-	char *bptr;
+	int rlen, ret, r = SSH_ERR_INTERNAL_ERROR;
 
-	ret = -1;
 	b = buffer_init();
-	if (b == NULL)
-		goto error;
-
-	buffer_append(b, signature, signaturelen);
-	bptr = buffer_ptr(b);
-	ktype = buffer_get_string(&bptr, NULL);
-	if (strcmp("ssh-ed25519", ktype) != 0) {
+	if (b == NULL) {
+		r = SSH_ERR_ALLOC_FAIL;
 		goto error;
 	}
-	sigblob = buffer_get_string(&bptr, &len);
+
+	if ((r = buffer_put(b, signature, signaturelen)) != 0)
+		goto error;
+	buffer_rewind(b);
+	if ((r = buffer_get_string(b, &ktype, NULL)) != 0)
+		goto error;
+	if (strcmp("ssh-ed25519", ktype) != 0) {
+		r = SSH_ERR_KEY_TYPE_MISMATCH;
+		goto error;
+	}
+	if ((r = buffer_get_string(b, &sigblob, &len)) != 0)
+		goto error;
 	rlen = buffer_remain_len(b);
 	if (rlen != 0) {
+		r = SSH_ERR_UNEXPECTED_TRAILING_DATA;
 		goto error;
 	}
 	if (len > crypto_sign_ed25519_BYTES) {
+		r = SSH_ERR_INVALID_FORMAT;
 		goto error;
 	}
 
@@ -494,9 +514,10 @@ static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int s
 	if (ret == 0 && mlen != datalen) {
 		//debug2("%s: crypto_sign_ed25519_open "
 		//    "mlen != datalen (%llu != %u)", __func__, mlen, datalen);
-		ret = -1;
+		r = SSH_ERR_SIGNATURE_INVALID;
 	}
 	/* XXX compare 'm' and 'data' ? */
+	r = 0;
 
 error:
 	buffer_free(b);
@@ -515,15 +536,14 @@ error:
 		free(m);
 	}
 
-	/* translate return code carefully */
-	return (ret == 0) ? 1 : -1;
+	return r;
 }
 
 int key_verify(Key *key,
                unsigned char *signature, unsigned int signaturelen,
                unsigned char *data, unsigned int datalen, ssh_keyalgo keyalgo)
 {
-	int ret = 0;
+	int ret = SSH_ERR_INTERNAL_ERROR;
 
 	switch (key->type) {
 	case KEY_RSA:
@@ -541,10 +561,10 @@ int key_verify(Key *key,
 		ret = ssh_ed25519_verify(key, signature, signaturelen, data, datalen);
 		break;
 	default:
-		return -1;
+		ret = SSH_ERR_KEY_TYPE_UNKNOWN;
 	}
 
-	return (ret);   // success
+	return ret;
 }
 
 static char *copy_mp_int(char *num)
@@ -696,7 +716,7 @@ char* key_fingerprint_raw(Key *k, digest_algorithm hash_alg, int *dgst_raw_lengt
 		len = nlen + elen;
 		blob = malloc(len);
 		if (blob == NULL) {
-			// TODO:
+			return retval;
 		}
 		BN_bn2bin(n, blob);
 		BN_bn2bin(e, blob + nlen);
@@ -709,7 +729,9 @@ char* key_fingerprint_raw(Key *k, digest_algorithm hash_alg, int *dgst_raw_lengt
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
 	case KEY_ED25519:
-		key_to_blob(k, &blob, &len);
+		if (key_to_blob(k, &blob, &len) != 0) {
+			return retval;
+		}
 		break;
 
 	case KEY_UNSPEC:
@@ -1255,7 +1277,7 @@ int key_to_blob(Key *key, char **blobp, int *lenp)
 	buffer_t *b;
 	char *sshname, *tmp;
 	int len;
-	int ret = 1;  // success
+	int ret = 0;
 	BIGNUM *e = NULL, *n = NULL;
 	BIGNUM *p, *q, *g, *pub_key;
 
@@ -1265,35 +1287,43 @@ int key_to_blob(Key *key, char **blobp, int *lenp)
 	switch (key->type) {
 	case KEY_RSA:
 		RSA_get0_key(key->rsa, &n, &e, NULL);
-		buffer_put_string(b, sshname, strlen(sshname));
-		buffer_put_bignum2(b, e);
-		buffer_put_bignum2(b, n);
+		if ((ret = buffer_put_string(b, sshname, strlen(sshname))) != 0 ||
+		    (ret = buffer_put_bignum2(b, e)) != 0 ||
+		    (ret = buffer_put_bignum2(b, n)) != 0) {
+			goto error;
+		}
 		break;
 	case KEY_DSA:
 		DSA_get0_pqg(key->dsa, &p, &q, &g);
 		DSA_get0_key(key->dsa, &pub_key, NULL);
-		buffer_put_string(b, sshname, strlen(sshname));
-		buffer_put_bignum2(b, p);
-		buffer_put_bignum2(b, q);
-		buffer_put_bignum2(b, g);
-		buffer_put_bignum2(b, pub_key);
+		if ((ret = buffer_put_string(b, sshname, strlen(sshname))) != 0 ||
+		    (ret = buffer_put_bignum2(b, p)) != 0 ||
+		    (ret = buffer_put_bignum2(b, q)) != 0 ||
+		    (ret = buffer_put_bignum2(b, g)) != 0 ||
+		    (ret = buffer_put_bignum2(b, pub_key)) != 0) {
+			goto error;
+		}
 		break;
 	case KEY_ECDSA256:
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
-		buffer_put_string(b, sshname, strlen(sshname));
 		tmp = curve_keytype_to_name(key->type);
-		buffer_put_string(b, tmp, strlen(tmp));
-		buffer_put_ecpoint(b, EC_KEY_get0_group(key->ecdsa),
-		                      EC_KEY_get0_public_key(key->ecdsa));
+		if ((ret = buffer_put_string(b, sshname, strlen(sshname))) != 0 ||
+		    (ret = buffer_put_string(b, tmp, strlen(tmp))) != 0 ||
+		    (ret = buffer_put_ec(b, EC_KEY_get0_public_key(key->ecdsa),
+		                            EC_KEY_get0_group(key->ecdsa))) != 0) {
+			goto error;
+		}
 		break;
 	case KEY_ED25519:
-		buffer_put_cstring(b, sshname);
-		buffer_put_string(b, key->ed25519_pk, ED25519_PK_SZ);
+		if ((ret = buffer_put_cstring(b, sshname)) != 0 ||
+		    (ret = buffer_put_string(b, key->ed25519_pk, ED25519_PK_SZ)) != 0) {
+			goto error;
+		}
 		break;
 
 	default:
-		ret = 0;
+		ret = SSH_ERR_KEY_TYPE_UNKNOWN;
 		goto error;
 	}
 
@@ -1303,7 +1333,7 @@ int key_to_blob(Key *key, char **blobp, int *lenp)
 	if (blobp != NULL) {
 		*blobp = malloc(len);
 		if (*blobp == NULL) {
-			ret = 0;
+			ret = SSH_ERR_ALLOC_FAIL;
 			goto error;
 		}
 		memcpy(*blobp, buffer_ptr(b), len);
@@ -1312,7 +1342,7 @@ int key_to_blob(Key *key, char **blobp, int *lenp)
 error:
 	buffer_free(b);
 
-	return (ret);
+	return ret;
 }
 
 
@@ -1322,8 +1352,9 @@ error:
 //
 Key *key_from_blob(char *data, int blen)
 {
-	int keynamelen, len;
-	char key[128];
+	buffer_t *b = NULL;
+	char *ktype = NULL;
+	int len;
 	RSA *rsa = NULL;
 	DSA *dsa = NULL;
 	EC_KEY *ecdsa = NULL;
@@ -1344,16 +1375,17 @@ Key *key_from_blob(char *data, int blen)
 
 	memset(hostkey, 0, sizeof(Key));
 
-	keynamelen = get_uint32_MSBfirst(data);
-	if (keynamelen >= sizeof(key)) {
+	b = buffer_init();
+	if (b == NULL)
 		goto error;
-	}
-	data += 4;
-	memcpy(key, data, keynamelen);
-	key[keynamelen] = 0;
-	data += keynamelen;
 
-	type = get_hostkey_type_from_name(key);
+	if (buffer_put(b, data, blen) != 0)
+		goto error;
+	buffer_rewind(b);
+
+	if (buffer_get_string(b, &ktype, NULL) != 0)
+		goto error;
+	type = get_hostkey_type_from_name(ktype);
 
 	switch (type) {
 	case KEY_RSA: // RSA key
@@ -1368,8 +1400,10 @@ Key *key_from_blob(char *data, int blen)
 			goto error;
 		}
 
-		buffer_get_bignum2(&data, e);
-		buffer_get_bignum2(&data, n);
+		if (buffer_get_bignum2(b, e) != 0 ||
+		    buffer_get_bignum2(b, n) != 0) {
+			goto error;
+		}
 
 		hostkey->type = type;
 		hostkey->rsa = rsa;
@@ -1393,10 +1427,12 @@ Key *key_from_blob(char *data, int blen)
 			goto error;
 		}
 
-		buffer_get_bignum2(&data, p);
-		buffer_get_bignum2(&data, dsa_q);
-		buffer_get_bignum2(&data, g);
-		buffer_get_bignum2(&data, pub_key);
+		if (buffer_get_bignum2(b, p) != 0 ||
+		    buffer_get_bignum2(b, dsa_q) != 0 ||
+		    buffer_get_bignum2(b, g) != 0 ||
+		    buffer_get_bignum2(b, pub_key) != 0) {
+			goto error;
+		}
 
 		hostkey->type = type;
 		hostkey->dsa = dsa;
@@ -1405,7 +1441,8 @@ Key *key_from_blob(char *data, int blen)
 	case KEY_ECDSA256: // ECDSA
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
-		curve = buffer_get_string(&data, NULL);
+		if (buffer_get_string(b, &curve, NULL) != 0)
+			goto error;
 		if (type != key_curve_name_to_keytype(curve)) {
 			goto error;
 		}
@@ -1420,7 +1457,9 @@ Key *key_from_blob(char *data, int blen)
 			goto error;
 		}
 
-		buffer_get_ecpoint(&data, EC_KEY_get0_group(ecdsa), q);
+		if (buffer_get_ec(b, q, EC_KEY_get0_group(ecdsa)) != 0) {
+			goto error;
+		}
 		if (key_ec_validate_public(EC_KEY_get0_group(ecdsa), q) == -1) {
 			goto error;
 		}
@@ -1434,7 +1473,8 @@ Key *key_from_blob(char *data, int blen)
 		break;
 
 	case KEY_ED25519:
-		pk = buffer_get_string(&data, &len);
+		if (buffer_get_string(b, &pk, &len) != 0)
+			goto error;
 		if (pk == NULL)
 			goto error;
 		if (len != ED25519_PK_SZ)
@@ -1452,6 +1492,9 @@ Key *key_from_blob(char *data, int blen)
 	return (hostkey);
 
 error:
+	buffer_free(b);
+	free(ktype);
+
 	if (rsa != NULL)
 		RSA_free(rsa);
 	if (dsa != NULL)
@@ -1467,25 +1510,33 @@ error:
 
 static int ssh_ed25519_sign(Key *key, char **sigp, int *lenp, char *data, int datalen)
 {
-	char *sig;
+	char *sig = NULL;
 	int slen, len;
 	unsigned long long smlen;
-	int ret;
+	int r, ret;
 	buffer_t *b;
 
 	smlen = slen = datalen + crypto_sign_ed25519_BYTES;
 	sig = malloc(slen);
+	if (sig == NULL)
+		return SSH_ERR_ALLOC_FAIL;
 
 	if ((ret = crypto_sign_ed25519(sig, &smlen, data, datalen,
 	    key->ed25519_sk)) != 0 || smlen <= datalen) {
 		//error("%s: crypto_sign_ed25519 failed: %d", __func__, ret);
-		free(sig);
-		return -1;
+		r = SSH_ERR_INVALID_ARGUMENT;
+		goto out;
 	}
 	/* encode signature */
 	b = buffer_init();
-	buffer_put_cstring(b, "ssh-ed25519");
-	buffer_put_string(b, sig, (int)(smlen - datalen));
+	if (b == NULL) {
+		r = SSH_ERR_ALLOC_FAIL;
+		goto out;
+	}
+	if (buffer_put_cstring(b, "ssh-ed25519") != 0 ||
+	    buffer_put_string(b, sig, (int)(smlen - datalen)) != 0) {
+		goto out;
+	}
 	len = buffer_len(b);
 	if (lenp != NULL)
 		*lenp = len;
@@ -1493,11 +1544,16 @@ static int ssh_ed25519_sign(Key *key, char **sigp, int *lenp, char *data, int da
 		*sigp = malloc(len);
 		memcpy(*sigp, buffer_ptr(b), len);
 	}
+	/* success */
+	r = 0;
+out:
 	buffer_free(b);
-	SecureZeroMemory(sig, slen);
-	free(sig);
+	if (sig != NULL) {
+		SecureZeroMemory(sig, slen);
+		free(sig);
+	}
 
-	return 0;
+	return r;
 }
 
 
@@ -1556,8 +1612,10 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		}
 
 		s = get_ssh2_hostkey_algorithm_name(keyalgo);
-		buffer_put_string(msg, s, strlen(s));
-		buffer_append_length(msg, sig, slen);
+		if (buffer_put_string(msg, s, strlen(s)) != 0 ||
+		    buffer_put_string(msg, sig, slen) != 0) {
+			goto error;
+		}
 		len = buffer_len(msg);
 
 		// setting
@@ -1606,8 +1664,10 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 
 		// setting
 		s = get_ssh2_hostkey_type_name_from_key(keypair);
-		buffer_put_string(msg, s, strlen(s));
-		buffer_append_length(msg, sigblob, sizeof(sigblob));
+		if (buffer_put_string(msg, s, strlen(s)) != 0 ||
+		    buffer_put_string(msg, sigblob, sizeof(sigblob)) != 0) {
+			goto error;
+		}
 		len = buffer_len(msg);
 
 		// setting
@@ -1651,13 +1711,17 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 			goto error;
 		}
 		ECDSA_SIG_get0(sig, &br, &bs);
-		buffer_put_bignum2(buf2, br);
-		buffer_put_bignum2(buf2, bs);
+		if (buffer_put_bignum2(buf2, br) != 0 ||
+		    buffer_put_bignum2(buf2, bs) != 0) {
+			goto error;
+		}
 		ECDSA_SIG_free(sig);
 
 		s = get_ssh2_hostkey_type_name_from_key(keypair);
-		buffer_put_string(msg, s, strlen(s));
-		buffer_put_string(msg, buffer_ptr(buf2), buffer_len(buf2));
+		if (buffer_put_string(msg, s, strlen(s)) != 0 ||
+		    buffer_put_string(msg, buffer_ptr(buf2), buffer_len(buf2)) != 0) {
+			goto error;
+		}
 		buffer_free(buf2);
 		len = buffer_len(msg);
 
@@ -1693,18 +1757,19 @@ error:
 }
 
 
-BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
+int get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 {
 	buffer_t *msg = NULL;
 	Key *keypair;
 	char *s, *tmp;
 	BIGNUM *e = NULL, *n = NULL;
 	BIGNUM *p, *q, *g, *pub_key;
+	int ret = 0;
 
 	msg = buffer_init();
 	if (msg == NULL) {
-		// TODO: error check
-		return FALSE;
+		ret = SSH_ERR_ALLOC_FAIL;
+		goto out;
 	}
 
 	keypair = pvar->auth_state.cur_cred.key_pair;
@@ -1713,43 +1778,53 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 	case KEY_RSA: // RSA
 		s = get_ssh2_hostkey_type_name_from_key(keypair);
 		RSA_get0_key(keypair->rsa, &n, &e, NULL);
-		buffer_put_string(msg, s, strlen(s));
-		buffer_put_bignum2(msg, e); // 公開指数
-		buffer_put_bignum2(msg, n); // p×q
+		if ((ret = buffer_put_string(msg, s, strlen(s))) != 0 ||
+		    (ret = buffer_put_bignum2(msg, e)) != 0 || // 公開指数
+		    (ret = buffer_put_bignum2(msg, n)) != 0) { // p×q
+			goto out;
+		}
 		break;
 	case KEY_DSA: // DSA
+		s = get_ssh2_hostkey_type_name_from_key(keypair);
 		DSA_get0_pqg(keypair->dsa, &p, &q, &g);
 		DSA_get0_key(keypair->dsa, &pub_key, NULL);
-		s = get_ssh2_hostkey_type_name_from_key(keypair);
-		buffer_put_string(msg, s, strlen(s));
-		buffer_put_bignum2(msg, p); // 素数
-		buffer_put_bignum2(msg, q); // (p-1)の素因数
-		buffer_put_bignum2(msg, g); // 整数
-		buffer_put_bignum2(msg, pub_key); // 公開鍵
+		if ((ret = buffer_put_string(msg, s, strlen(s))) != 0 ||
+		    (ret = buffer_put_bignum2(msg, p)) != 0 ||       // 素数
+		    (ret = buffer_put_bignum2(msg, q)) != 0 ||       // (p-1)の素因数
+		    (ret = buffer_put_bignum2(msg, g)) != 0 ||       // 整数
+		    (ret = buffer_put_bignum2(msg, pub_key)) != 0) { // 公開鍵
+			goto out;
+		}
 		break;
 	case KEY_ECDSA256: // ECDSA
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
 		s = get_ssh2_hostkey_type_name_from_key(keypair);
-		buffer_put_string(msg, s, strlen(s));
 		tmp = curve_keytype_to_name(keypair->type);
-		buffer_put_string(msg, tmp, strlen(tmp));
-		buffer_put_ecpoint(msg, EC_KEY_get0_group(keypair->ecdsa),
-		                        EC_KEY_get0_public_key(keypair->ecdsa));
+		if ((ret = buffer_put_string(msg, s, strlen(s))) != 0 ||
+		    (ret = buffer_put_string(msg, tmp, strlen(tmp))) != 0 ||
+		    (ret = buffer_put_ec(msg, EC_KEY_get0_public_key(keypair->ecdsa),
+		                              EC_KEY_get0_group(keypair->ecdsa))) != 0) {
+			goto out;
+		}
 		break;
 	case KEY_ED25519:
 		s = get_ssh2_hostkey_type_name_from_key(keypair);
-		buffer_put_cstring(msg, s);
-		buffer_put_string(msg, keypair->ed25519_pk, ED25519_PK_SZ);
+		if ((ret = buffer_put_cstring(msg, s)) != 0 ||
+			(ret = buffer_put_string(msg, keypair->ed25519_pk, ED25519_PK_SZ)) != 0) {
+			goto out;
+		}
 		break;
 	default:
-		return FALSE;
+		ret = SSH_ERR_KEY_TYPE_UNKNOWN;
+		goto out;
 	}
 
 	*blobptr = msg;
 	*bloblen = buffer_len(msg);
 
-	return TRUE;
+out:
+	return ret;
 }
 
 digest_algorithm keytype_to_hash_alg(ssh_keytype type)
@@ -1804,14 +1879,17 @@ ssh_keytype nid_to_keytype(int nid)
 	return KEY_UNSPEC;
 }
 
-void key_private_serialize(Key *key, buffer_t *b)
+int key_private_serialize(Key *key, buffer_t *b)
 {
 	char *s;
 	BIGNUM *e, *n, *d, *iqmp, *p, *q;
 	BIGNUM *g, *pub_key, *priv_key;
+	int r = SSH_ERR_INTERNAL_ERROR;
 
 	s = get_ssh2_hostkey_type_name_from_key(key);
-	buffer_put_cstring(b, s);
+	if ((r = buffer_put_cstring(b, s)) != 0) {
+		goto out;
+	}
 
 	switch (key->type) {
 		case KEY_RSA:
@@ -1819,41 +1897,53 @@ void key_private_serialize(Key *key, buffer_t *b)
 			RSA_get0_factors(key->rsa, &p, &q);
 			RSA_get0_crt_params(key->rsa, NULL, NULL, &iqmp);
 
-			buffer_put_bignum2(b, n);
-			buffer_put_bignum2(b, e);
-			buffer_put_bignum2(b, d);
-			buffer_put_bignum2(b, iqmp);
-			buffer_put_bignum2(b, p);
-			buffer_put_bignum2(b, q);
+			if ((r = buffer_put_bignum2(b, n)) != 0 ||
+			    (r = buffer_put_bignum2(b, e)) != 0 ||
+			    (r = buffer_put_bignum2(b, d)) != 0 ||
+			    (r = buffer_put_bignum2(b, iqmp)) != 0 ||
+			    (r = buffer_put_bignum2(b, p)) != 0 ||
+			    (r = buffer_put_bignum2(b, q)) != 0) {
+				goto out;
+			}
 			break;
 
 		case KEY_DSA:
 			DSA_get0_pqg(key->dsa, &p, &q, &g);
 			DSA_get0_key(key->dsa, &pub_key, &priv_key);
-			buffer_put_bignum2(b, p);
-			buffer_put_bignum2(b, q);
-			buffer_put_bignum2(b, g);
-			buffer_put_bignum2(b, pub_key);
-			buffer_put_bignum2(b, priv_key);
+
+			if ((r = buffer_put_bignum2(b, p)) != 0 ||
+			    (r = buffer_put_bignum2(b, q)) != 0 ||
+			    (r = buffer_put_bignum2(b, g)) != 0 ||
+			    (r = buffer_put_bignum2(b, pub_key)) != 0 ||
+			    (r = buffer_put_bignum2(b, priv_key)) != 0) {
+				goto out;
+			}
 			break;
 
 		case KEY_ECDSA256:
 		case KEY_ECDSA384:
 		case KEY_ECDSA521:
-			buffer_put_cstring(b, curve_keytype_to_name(key->type));
-			buffer_put_ecpoint(b, EC_KEY_get0_group(key->ecdsa),
-				EC_KEY_get0_public_key(key->ecdsa));
-			buffer_put_bignum2(b, (BIGNUM *)EC_KEY_get0_private_key(key->ecdsa));
+			if ((r = buffer_put_cstring(b, curve_keytype_to_name(key->type))) != 0 ||
+			    (r = buffer_put_ec(b, EC_KEY_get0_public_key(key->ecdsa),
+			                          EC_KEY_get0_group(key->ecdsa))) != 0 ||
+			    (r = buffer_put_bignum2(b, (BIGNUM *)EC_KEY_get0_private_key(key->ecdsa))) != 0) {
+				goto out;
+			}
 			break;
 
 		case KEY_ED25519:
-			buffer_put_string(b, key->ed25519_pk, ED25519_PK_SZ);
-			buffer_put_string(b, key->ed25519_sk, ED25519_SK_SZ);
+			if ((r = buffer_put_string(b, key->ed25519_pk, ED25519_PK_SZ)) != 0 ||
+			    (r = buffer_put_string(b, key->ed25519_sk, ED25519_SK_SZ)) != 0) {
+				goto out;
+			}
 			break;
 
 		default:
 			break;
 	}
+
+out:
+	return r;
 }
 
 /* calculate p-1 and q-1 */
@@ -1895,7 +1985,8 @@ Key *key_private_deserialize(buffer_t *blob)
 	BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
 	BIGNUM *g, *pub_key, *priv_key;
 
-	type_name = buffer_get_string_msg(blob, NULL);
+	if (buffer_get_string(blob, &type_name, NULL) != 0)
+		goto error;
 	if (type_name == NULL)
 		goto error;
 	type = get_hostkey_type_from_name(type_name);
@@ -1908,12 +1999,14 @@ Key *key_private_deserialize(buffer_t *blob)
 			RSA_get0_factors(k->rsa, &p, &q);
 			RSA_get0_crt_params(k->rsa, &dmp1, &dmq1, &iqmp);
 
-			buffer_get_bignum2_msg(blob, n);
-			buffer_get_bignum2_msg(blob, e);
-			buffer_get_bignum2_msg(blob, d);
-			buffer_get_bignum2_msg(blob, iqmp);
-			buffer_get_bignum2_msg(blob, p);
-			buffer_get_bignum2_msg(blob, q);
+			if (buffer_get_bignum2(blob, n) != 0 ||
+			    buffer_get_bignum2(blob, e) != 0 ||
+			    buffer_get_bignum2(blob, d) != 0 ||
+			    buffer_get_bignum2(blob, iqmp) != 0 ||
+			    buffer_get_bignum2(blob, p) != 0 ||
+			    buffer_get_bignum2(blob, q) != 0) {
+				goto error;
+			}
 
 			/* Generate additional parameters */
 			rsa_generate_additional_parameters(k->rsa);
@@ -1922,11 +2015,15 @@ Key *key_private_deserialize(buffer_t *blob)
 		case KEY_DSA:
 			DSA_get0_pqg(k->dsa, &p, &q, &g);
 			DSA_get0_key(k->dsa, &pub_key, &priv_key);
-			buffer_get_bignum2_msg(blob, p);
-			buffer_get_bignum2_msg(blob, q);
-			buffer_get_bignum2_msg(blob, g);
-			buffer_get_bignum2_msg(blob, pub_key);
-			buffer_get_bignum2_msg(blob, priv_key);
+
+			if (buffer_get_bignum2(blob, p) != 0 ||
+			    buffer_get_bignum2(blob, q) != 0 ||
+			    buffer_get_bignum2(blob, g) != 0 ||
+			    buffer_get_bignum2(blob, pub_key) != 0 ||
+			    buffer_get_bignum2(blob, priv_key) != 0) {
+				goto error;
+			}
+
 			break;
 
 		case KEY_ECDSA256:
@@ -1941,7 +2038,8 @@ Key *key_private_deserialize(buffer_t *blob)
 			EC_POINT *q = NULL;
 
 			nid = keytype_to_cipher_nid(type);
-			curve = buffer_get_string_msg(blob, NULL);
+			if (buffer_get_string(blob, &curve, NULL) != 0)
+				goto ecdsa_error;
 			skt = key_curve_name_to_keytype(curve);
 			if (nid != keytype_to_cipher_nid(skt))
 				goto ecdsa_error;
@@ -1953,8 +2051,9 @@ Key *key_private_deserialize(buffer_t *blob)
 			if ((exponent = BN_new()) == NULL)
 				goto ecdsa_error;
 
-			buffer_get_ecpoint_msg(blob, EC_KEY_get0_group(k->ecdsa), q);
-			buffer_get_bignum2_msg(blob, exponent);
+			if (buffer_get_ec(blob, q, EC_KEY_get0_group(k->ecdsa)) != 0 ||
+			    buffer_get_bignum2(blob, exponent) != 0)
+				goto ecdsa_error;
 			if (EC_KEY_set_public_key(k->ecdsa, q) != 1)
 				goto ecdsa_error;
 			if (EC_KEY_set_private_key(k->ecdsa, exponent) != 1)
@@ -1979,8 +2078,9 @@ ecdsa_error:
 			break;
 
 		case KEY_ED25519:
-			k->ed25519_pk = buffer_get_string_msg(blob, &pklen);
-			k->ed25519_sk = buffer_get_string_msg(blob, &sklen);
+			if (buffer_get_string(blob, &k->ed25519_pk, &pklen) != 0 ||
+			    buffer_get_string(blob, &k->ed25519_sk, &sklen) != 0)
+				goto error;
 			if (pklen != ED25519_PK_SZ)
 				goto error;
 			if (sklen != ED25519_SK_SZ)
@@ -2403,7 +2503,10 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 	bsig = buffer_init();
 	if (bsig == NULL)
 		goto error;
-	cp = buffer_append_space(bsig, len);
+	if (buffer_reserve(bsig, len, &cp) != 0) {
+		logprintf(LOG_LEVEL_FATAL, "buffer_reserve() error");
+		goto error;
+	}
 	memcpy(cp, data, len);
 
 	if (ctx->nnew == 0) {
@@ -2433,21 +2536,30 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 			continue;
 
 		buffer_clear(b);
-		buffer_put_cstring(b, "hostkeys-prove-00@openssh.com");
-		buffer_put_string(b, pvar->kex->session_id, pvar->kex->session_id_len);
-		key_to_blob(ctx->keys[i], (char **)&blob, &bloblen);
-		buffer_put_string(b, blob, bloblen);
+		if (buffer_put_cstring(b, "hostkeys-prove-00@openssh.com") != 0 ||
+		    buffer_put_string(b, pvar->kex->session_id, pvar->kex->session_id_len) != 0) {
+			logprintf(LOG_LEVEL_FATAL, "buffer put error");
+			goto error;
+		}
+		if (key_to_blob(ctx->keys[i], (char **)&blob, &bloblen) != 0 ||
+		    buffer_put_string(b, blob, bloblen) != 0) {
+			logprintf(LOG_LEVEL_FATAL, "buffer put error");
+			goto error;
+		}
 		free(blob);
 		blob = NULL;
 
-		sig = buffer_get_string_msg(bsig, &siglen_i);
+		if (buffer_get_string(bsig, &sig, &siglen_i) != 0) {
+			logprintf(LOG_LEVEL_FATAL, "buffer put error");
+			goto error;
+		}
 		siglen = siglen_i;
 		// 手抜き。hostkey algorithm を使うのは RSA の時のみなので、
 		// とりあえず KEY_ALGO_RSA を指定しておく。
 		ret = key_verify(ctx->keys[i], sig, siglen, buffer_ptr(b), buffer_len(b), KEY_ALGO_RSA);
 		free(sig);
 		sig = NULL;
-		if (ret != 1) {
+		if (ret != 0) {
 			logprintf(LOG_LEVEL_ERROR,
 				"server gave bad signature for %s key %u",
 				get_ssh2_hostkey_type_name_from_key(ctx->keys[i]), i);
@@ -2504,14 +2616,18 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 	if (b == NULL)
 		goto error;
 
-	cp = buffer_append_space(b, datalen);
+	if (buffer_reserve(b, datalen, &cp) != 0)
+		goto error;
 	memcpy(cp, dataptr, datalen);
 
 	while (buffer_remain_len(b) > 0) {
 		key_free(key);
 		key = NULL;
 
-		blob = buffer_get_string_msg(b, &len);
+		if (buffer_get_string(b, &blob, &len) != 0) {
+			logprintf(LOG_LEVEL_FATAL, "buffer put error");
+			goto error;
+		}
 		key = key_from_blob(blob, len);
 		if (key == NULL) {
 			logprintf(LOG_LEVEL_ERROR, "Not found host key into blob %p (%d)", blob, len);
@@ -2585,14 +2701,20 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 	else if (ctx->nnew != 0) { // 新規追加するべき鍵が存在する。
 		buffer_clear(b);
 
-		buffer_put_cstring(b, "hostkeys-prove-00@openssh.com");
-		buffer_put_char(b, 1);  /* bool: want reply */
+		if (buffer_put_cstring(b, "hostkeys-prove-00@openssh.com") != 0 ||
+		    buffer_put_char(b, 1) != 0) { /* bool: want reply */
+			logprintf(LOG_LEVEL_FATAL, "buffer put error");
+			goto error;
+		}
 
 		for (i = 0; i < ctx->nkeys; i++) {
 			if (ctx->keys_seen[i])
 				continue;
-			key_to_blob(ctx->keys[i], (char **) & blob, &len);
-			buffer_put_string(b, blob, len);
+			if (key_to_blob(ctx->keys[i], (char **)&blob, &len)  != 0 ||
+			    buffer_put_string(b, blob, len) != 0) {
+				logprintf(LOG_LEVEL_FATAL, "buffer put error");
+				goto error;
+			}
 			free(blob);
 			blob = NULL;
 		}

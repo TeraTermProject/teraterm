@@ -141,7 +141,7 @@ class TTCPropertyPage : public TTCWnd
 public:
 	TTCPropertyPage(HINSTANCE inst, int id);
 	virtual ~TTCPropertyPage();
-	virtual void OnInitDialog();
+	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	virtual void OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar);
 	virtual BOOL OnCommand(WPARAM wp, LPARAM lp);

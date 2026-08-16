@@ -39,7 +39,7 @@ public:
 	CLogPropPageDlg(HINSTANCE inst);
 	virtual ~CLogPropPageDlg();
 private:
-	void OnInitDialog();
+	BOOL OnInitDialog();
 	void OnOK();
 	void OnOKLogFilename();
 	enum { IDD = IDD_TABSHEET_LOG };

@@ -67,8 +67,16 @@ HPROPSHEETPAGE TTCPropertyPage::CreatePropertySheetPage()
 	return ::CreatePropertySheetPageW((LPCPROPSHEETPAGEW)&m_psp);
 }
 
-void TTCPropertyPage::OnInitDialog()
+/**
+ *	ページ初期化(WM_INITDIALOG)
+ *
+ *	戻り値は WM_INITDIALOG の戻り値としてそのまま返る(Proc 参照)
+ *	@retval	TRUE	既定フォーカス(先頭 TABSTOP)をダイアログマネージャに設定させる
+ *	@retval	FALSE	フォーカスは自分で設定した(既定フォーカスは設定させない)
+ */
+BOOL TTCPropertyPage::OnInitDialog()
 {
+	return FALSE;
 }
 
 void TTCPropertyPage::OnOK()
@@ -102,8 +110,7 @@ INT_PTR CALLBACK TTCPropertyPage::Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM
 		self = (TTCPropertyPage *)(((PROPSHEETPAGE *)lp)->lParam);
 		::SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)self);
 		self->m_hWnd = hDlgWnd;
-		self->OnInitDialog();
-		break;
+		return self->OnInitDialog();
 	case WM_NOTIFY:
 	{
 		NMHDR * nmhdr = (NMHDR *)lp;
