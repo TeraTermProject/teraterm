@@ -872,9 +872,9 @@ typedef struct {
 
 	DWORD ConnectedTime;
 
-	void (*Log1Byte)(BYTE b);
-	void (*Log1Bin)(BYTE b);
-	void (*LogBinSkip)(int add);
+	void (*reserve_Log1Byte)(BYTE b);	// FLogPutANSI() を直接呼ぶよう変更
+	void (*reserve_Log1Bin)(BYTE b);	// FLogPutBinary() を直接呼ぶよう変更
+	void (*reserve_LogBinSkip)(int add);	// FLogBinSkip() を直接呼ぶよう変更
 
 	TTTSet *ts;
 

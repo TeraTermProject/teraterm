@@ -32,6 +32,7 @@
 
 #include "tttypes.h"
 #include "makeoutputstring.h"
+#include "../teraterm/filesys_log.h"
 
 #include "ttcommon.h"
 
@@ -56,13 +57,6 @@ int WINAPI CommReadRawByte(PComVar cv, LPBYTE b)
 	}
 }
 
-static void LogBinSkip(PComVar cv, int add)
-{
-	if (cv->LogBinSkip != NULL) {
-		cv->LogBinSkip(add);
-	}
-}
-
 /**
  *	入力バッファの先頭にデータを入れる
  *	入れたデータはバイナリログに記録されない
@@ -84,14 +78,7 @@ void WINAPI CommInsert1Byte(PComVar cv, BYTE b)
 	cv->InBuff[cv->InPtr] = b;
 	cv->InBuffCount++;
 
-	LogBinSkip(cv, 1);
-}
-
-static void Log1Bin(PComVar cv, BYTE b)
-{
-	if (cv->Log1Bin != NULL) {
-		cv->Log1Bin(b);
-	}
+	FLogBinSkip(1);
 }
 
 int WINAPI CommRead1Byte(PComVar cv, LPBYTE b)
@@ -122,7 +109,7 @@ int WINAPI CommRead1Byte(PComVar cv, LPBYTE b)
 			if ( *b != 0xFF ) {
 				cv->TelMode = TRUE;
 				CommInsert1Byte(cv,*b);
-				LogBinSkip(cv, -1);
+				FLogBinSkip(-1);
 				c = 0;
 			}
 		}
@@ -141,7 +128,7 @@ int WINAPI CommRead1Byte(PComVar cv, LPBYTE b)
 	}
 
 	if (c == 1) {
-		Log1Bin(cv, *b);
+		FLogPutBinary(*b);
 	}
 
 	return c;
