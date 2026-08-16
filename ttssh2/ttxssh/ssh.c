@@ -33,6 +33,7 @@
 #include "libputty.h"
 #include "key.h"
 #include "ttcommon.h"
+#include "ssherr.h"
 #include "codeconv.h"
 #include "ttxssh-version.h"
 
@@ -295,7 +296,8 @@ static void ssh2_channel_add_bufchain(PTInstVar pvar, Channel_t *c, unsigned cha
 		free(p);
 		return;
 	}
-	buffer_put_raw(p->msg, buf, buflen);
+	if (buffer_put(p->msg, buf, buflen) != 0)
+		return;
 	p->next = NULL;
 
 	if (c->bufchain == NULL) {
@@ -1050,7 +1052,7 @@ static PayloadStat get_stringb_from_payload(PTInstVar pvar, buffer_t **buff)
 	if (*buff == NULL) {
 		return GetPayloadAllocError;
 	}
-	if (buffer_append(*buff, data, size) != 0) {
+	if (buffer_put(*buff, data, size) != 0) {
 		return GetPayloadAllocError;
 	}
 
@@ -1426,7 +1428,8 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 			}
 
 			// 圧縮対象はヘッダを除くペイロードのみ。
-			buffer_append(msg, "\0\0\0\0\0", 5);  // 5 = packet-length(4) + padding(1)
+			if (buffer_put(msg, "\0\0\0\0\0", 5) != 0) // 5 = packet-length(4) + padding(1)
+				return;
 			if (buffer_compress(&pvar->ssh_state.compress_stream, pvar->ssh_state.outbuf + 12, len, msg) == -1) {
 				UTIL_get_lang_msg("MSG_SSH_COMP_ERROR", pvar,
 				                  "An error occurred while compressing packet data.\n"
@@ -1468,8 +1471,8 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		set_uint32(data, packet_length);
 		data[4] = (unsigned char) padding_size;
 		if (msg) {
-			// パケット圧縮の場合、バッファを拡張する。(2011.6.10 yutaka)
-			buffer_append_space(msg, padding_size + SSH_DIGEST_MAX_LENGTH);
+			// パケット圧縮の場合、バッファを拡張する。
+			buffer_reserve(msg, padding_size + SSH_DIGEST_MAX_LENGTH, NULL);
 			// realloc()されると、ポインタが変わる可能性があるので、再度取り直す。
 			data = buffer_ptr(msg);
 		}
@@ -2208,11 +2211,11 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len)
 				// for SSH2 KEX
 				//   クライアントバージョンの保存
 				buffer_clear(pvar->kex->client_version);
-				buffer_append(pvar->kex->client_version, TTSSH_ID, strlen(TTSSH_ID));
+				buffer_put(pvar->kex->client_version, TTSSH_ID, strlen(TTSSH_ID));
 
 				//   サーババージョンの保存 (2005.3.9)
 				buffer_clear(pvar->kex->server_version);
-				buffer_append(pvar->kex->server_version, ID, strlen(ID));
+				buffer_put(pvar->kex->server_version, ID, strlen(ID));
 
 				// サーババージョンのチェック
 				server_version_check(pvar);
@@ -3179,20 +3182,24 @@ void SSH_notify_disconnecting(PTInstVar pvar, char *reason)
 		if (msg == NULL) {
 			// TODO: error check
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
-			return;
+			goto out;
 		}
-		buffer_put_int(msg, SSH2_DISCONNECT_BY_APPLICATION);
-		buffer_put_string(msg, reason, strlen(reason));
 		s = "";
-		buffer_put_string(msg, s, strlen(s));
+		if (buffer_put_int(msg, SSH2_DISCONNECT_BY_APPLICATION) != 0 ||
+		    buffer_put_string(msg, reason, strlen(reason)) != 0 ||
+		    buffer_put_string(msg, s, strlen(s)) != 0) {
+			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
+			goto out;
+		}
 
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_DISCONNECT, len);
 		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
-		buffer_free(msg);
-
 		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_DISCONNECT was sent at SSH_notify_disconnecting().");
+
+out:
+		buffer_free(msg);
 	}
 }
 
@@ -3290,13 +3297,16 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
-		buffer_put_int(msg, c->remote_id);
-		buffer_put_string(msg, req_type, strlen(req_type));
-		buffer_put_char(msg, 0);    // want_reply
-		buffer_put_int(msg, cols);  // columns
-		buffer_put_int(msg, rows);  // lines
-		buffer_put_int(msg, x);     // window width (pixel):
-		buffer_put_int(msg, y);     // window height (pixel):
+		if (buffer_put_int(msg, c->remote_id) != 0 ||
+		    buffer_put_string(msg, req_type, strlen(req_type)) != 0 ||
+		    buffer_put_char(msg, 0) != 0 ||   // want_reply
+		    buffer_put_int(msg, cols) != 0 || // columns
+		    buffer_put_int(msg, rows) != 0 || // lines
+		    buffer_put_int(msg, x) != 0 ||    // window width (pixel):
+		    buffer_put_int(msg, y) != 0) {    // window height (pixel):
+			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
+			return;
+		}
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_REQUEST, len);
 		memcpy(outmsg, buffer_ptr(msg), len);
@@ -3344,10 +3354,13 @@ int SSH_notify_break_signal(PTInstVar pvar)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			goto error;
 		}
-		buffer_put_int(msg, c->remote_id);
-		buffer_put_string(msg, req_type, strlen(req_type));
-		buffer_put_char(msg, 0);  // want_reply
-		buffer_put_int(msg, 1000);  // break-length (msec)
+		if (buffer_put_int(msg, c->remote_id) != 0 ||
+		    buffer_put_string(msg, req_type, strlen(req_type)) != 0 ||
+		    buffer_put_char(msg, 0) != 0 ||   // want_reply
+		    buffer_put_int(msg, 1000) != 0) { // break-length (msec)
+			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
+			goto error;
+		}
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_REQUEST, len);
 		memcpy(outmsg, buffer_ptr(msg), len);
@@ -3786,8 +3799,10 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
-		buffer_put_int(msg, c->remote_id);
-		buffer_put_string(msg, (char *)buf, buflen);
+		if (buffer_put_int(msg, c->remote_id) != 0 ||
+		    buffer_put_string(msg, (char *)buf, buflen) != 0) {
+			return;
+		}
 
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_DATA, len);
@@ -3885,10 +3900,12 @@ void SSH_fail_channel_open(PTInstVar pvar, uint32 remote_channel_num)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
-		buffer_put_int(msg, remote_channel_num);
-		buffer_put_int(msg, SSH2_OPEN_ADMINISTRATIVELY_PROHIBITED);
-		buffer_put_string(msg, "", 0); // description
-		buffer_put_string(msg, "", 0); // language tag
+		if (buffer_put_int(msg, remote_channel_num) != 0 ||
+		    buffer_put_int(msg, SSH2_OPEN_ADMINISTRATIVELY_PROHIBITED) != 0 ||
+		    buffer_put_string(msg, "", 0) != 0 || // description
+		    buffer_put_string(msg, "", 0) != 0) { // language tag
+			return;
+		}
 
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN_FAILURE, len);
@@ -3914,10 +3931,12 @@ void SSH2_confirm_channel_open(PTInstVar pvar, Channel_t *c)
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		return;
 	}
-	buffer_put_int(msg, c->remote_id);
-	buffer_put_int(msg, c->self_id);
-	buffer_put_int(msg, c->local_window);
-	buffer_put_int(msg, c->local_maxpacket);
+	if (buffer_put_int(msg, c->remote_id) != 0 ||
+	    buffer_put_int(msg, c->self_id) != 0 ||
+	    buffer_put_int(msg, c->local_window) != 0 ||
+	    buffer_put_int(msg, c->local_maxpacket) != 0) {
+		return;
+	}
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN_CONFIRMATION, len);
@@ -3992,7 +4011,9 @@ void SSH2_channel_input_eof(PTInstVar pvar, Channel_t *c)
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		return;
 	}
-	buffer_put_int(msg, c->remote_id);  // remote ID
+	if (buffer_put_int(msg, c->remote_id) != 0) { // remote ID
+		return;
+	}
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_EOF, len);
@@ -4066,11 +4087,12 @@ void SSH_request_forwarding(PTInstVar pvar, char *bind_address, int from_server_
 			return;
 		}
 		req = "tcpip-forward";
-		buffer_put_string(msg, req, strlen(req)); // ctype
-		buffer_put_char(msg, 1);  // want reply
-		buffer_put_string(msg, bind_address, strlen(bind_address));
-
-		buffer_put_int(msg, from_server_port);  // listening port
+		if (buffer_put_string(msg, req, strlen(req)) != 0 || // ctype
+		    buffer_put_char(msg, 1) != 0 ||                  // want reply
+		    buffer_put_string(msg, bind_address, strlen(bind_address)) != 0 ||
+			buffer_put_int(msg, from_server_port) != 0) {    // listening port
+			return;
+		}
 
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_GLOBAL_REQUEST, len);
@@ -4088,7 +4110,7 @@ void SSH_cancel_request_forwarding(PTInstVar pvar, char *bind_address, int from_
 {
 	if (SSHv2(pvar)) {
 		buffer_t *msg;
-		char *s;
+		char *req;
 		unsigned char *outmsg;
 		int len;
 
@@ -4098,12 +4120,13 @@ void SSH_cancel_request_forwarding(PTInstVar pvar, char *bind_address, int from_
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
-		s = "cancel-tcpip-forward";
-		buffer_put_string(msg, s, strlen(s)); // ctype
-		buffer_put_char(msg, reply);  // want reply
-		buffer_put_string(msg, bind_address, strlen(bind_address));
-
-		buffer_put_int(msg, from_server_port);  // listening port
+		req = "cancel-tcpip-forward";
+		if (buffer_put_string(msg, req, strlen(req)) != 0 || // ctype
+		    buffer_put_char(msg, reply) != 0 ||              // want reply
+		    buffer_put_string(msg, bind_address, strlen(bind_address)) != 0 ||
+		    buffer_put_int(msg, from_server_port) != 0) {    // listening port
+			return;
+		}
 
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_GLOBAL_REQUEST, len);
@@ -4181,15 +4204,15 @@ void SSH_request_X11_forwarding(PTInstVar pvar,
 		}
 		newdata[newlen - 1] = '\0';
 
-		buffer_put_int(msg, c->remote_id);
-		buffer_put_string(msg, req_type, strlen(req_type)); // service name
-		buffer_put_char(msg, 0);  // want_reply (false)
-		buffer_put_char(msg, 0);  // single connection
-
-		buffer_put_string(msg, auth_protocol, strlen(auth_protocol)); // protocol ("MIT-MAGIC-COOKIE-1")
-		buffer_put_string(msg, newdata, strlen(newdata)); // cookie
-
-		buffer_put_int(msg, screen_num);
+		if (buffer_put_int(msg, c->remote_id) != 0 ||
+		    buffer_put_string(msg, req_type, strlen(req_type)) != 0 ||           // service name
+		    buffer_put_char(msg, 0) != 0 ||                                      // want_reply (false)
+		    buffer_put_char(msg, 0) != 0 ||                                      // single connection
+		    buffer_put_string(msg, auth_protocol, strlen(auth_protocol)) != 0 || // protocol ("MIT-MAGIC-COOKIE-1")
+		    buffer_put_string(msg, newdata, strlen(newdata)) != 0 ||             // cookie
+		    buffer_put_int(msg, screen_num) != 0) {
+			return;
+		}
 
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_REQUEST, len);
@@ -4278,18 +4301,24 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 				return;
 			}
 			s = "direct-tcpip";
-			buffer_put_string(msg, s, strlen(s)); // ctype
-			buffer_put_int(msg, c->self_id);  // self
-			buffer_put_int(msg, c->local_window);  // local_window
-			buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
+			if (buffer_put_string(msg, s, strlen(s)) != 0 ||    // ctype
+			    buffer_put_int(msg, c->self_id) != 0 ||         // self
+			    buffer_put_int(msg, c->local_window) != 0 ||    // local_window
+			    buffer_put_int(msg, c->local_maxpacket) != 0) { // local_maxpacket
+				return;
+			}
 
 			s = to_remote_host;
-			buffer_put_string(msg, s, strlen(s)); // target host
-			buffer_put_int(msg, to_remote_port);  // target port
+			if (buffer_put_string(msg, s, strlen(s)) != 0 || // target host
+			    buffer_put_int(msg, to_remote_port) != 0) {  // target port
+				return;
+			}
 
 			s = originator;
-			buffer_put_string(msg, s, strlen(s)); // originator host
-			buffer_put_int(msg, originator_port);  // originator port
+			if (buffer_put_string(msg, s, strlen(s)) != 0 || // originator host
+				buffer_put_int(msg, originator_port) != 0) { // originator port
+				return;
+			}
 
 			len = buffer_len(msg);
 			outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
@@ -4552,10 +4581,12 @@ static int SSH_scp_transaction(PTInstVar pvar, const char *filename, const char 
 			goto error;
 		}
 		s = "session";
-		buffer_put_string(msg, s, strlen(s));     // ctype
-		buffer_put_int(msg, c->self_id);          // self (channel number)
-		buffer_put_int(msg, c->local_window);     // local_window
-		buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
+		if (buffer_put_string(msg, s, strlen(s)) != 0 ||    // ctype
+		    buffer_put_int(msg, c->self_id) != 0 ||         // self (channel number)
+		    buffer_put_int(msg, c->local_window) != 0 ||    // local_window
+		    buffer_put_int(msg, c->local_maxpacket) != 0) { // local_maxpacket
+			goto error;
+		}
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
 		memcpy(outmsg, buffer_ptr(msg), len);
@@ -4641,10 +4672,12 @@ int SSH_sftp_transaction(PTInstVar pvar)
 		goto error;
 	}
 	s = "session";
-	buffer_put_string(msg, s, strlen(s));  // ctype
-	buffer_put_int(msg, c->self_id);  // self(channel number)
-	buffer_put_int(msg, c->local_window);  // local_window
-	buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
+	if (buffer_put_string(msg, s, strlen(s)) != 0 ||    // ctype
+	    buffer_put_int(msg, c->self_id) != 0 ||         // self (channel number)
+	    buffer_put_int(msg, c->local_window) != 0 ||    // local_window
+	    buffer_put_int(msg, c->local_maxpacket) != 0) { // local_maxpacket
+		goto error;
+	}
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
@@ -4715,7 +4748,7 @@ void SSH2_packet_start(buffer_t *msg, unsigned char type)
 	memset(buf, 0, sizeof(buf));
 	buf[len - 1] = type;
 	buffer_clear(msg);
-	buffer_append(msg, buf, len);
+	buffer_put(msg, buf, len);
 }
 
 // クライアントからサーバへのキー交換開始要求
@@ -4742,14 +4775,19 @@ void SSH2_send_kexinit(PTInstVar pvar)
 	// cookieのセット
 	CRYPT_set_random_data(pvar, cookie, sizeof(cookie));
 	CRYPT_set_client_cookie(pvar, cookie);
-	buffer_append(msg, cookie, sizeof(cookie));
+	if (buffer_put(msg, cookie, sizeof(cookie)) != 0)
+		return;
 
 	// クライアントのキー情報
 	for (i = 0 ; i < PROPOSAL_MAX ; i++) {
-		buffer_put_string(msg, myproposal[i], strlen(myproposal[i]));
+		if (buffer_put_string(msg, myproposal[i], strlen(myproposal[i])) != 0) {
+			return;
+		}
 	}
-	buffer_put_char(msg, 0);
-	buffer_put_int(msg, 0);
+	if (buffer_put_char(msg, 0) != 0 ||
+		buffer_put_int(msg, 0) != 0) {
+		return;
+	}
 
 
 	logprintf(LOG_LEVEL_VERBOSE,
@@ -5306,10 +5344,11 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 			goto error;
 		}
 	}
-	// buffer_append() しているが、メッセージデータ全体なので grab_payload() していない。
+	// buffer_put() しているが、メッセージデータ全体なので grab_payload() していない。
 	// grab_payload() は続く処理で各フィールドに対して個別に行う。
 	// pvar->kex->peer に格納されるが、各フィールドがエラーになったら使われない。
-	buffer_append(pvar->kex->peer, data, len);
+	if (buffer_put(pvar->kex->peer, data, len) != 0)
+		goto error;
 
 	push_memdump("KEXINIT", "exchange algorithm list: receiving", data, len);
 
@@ -5406,7 +5445,8 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 		goto error;
 	}
 
-	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+	if (buffer_put(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub)) != 0)
+		goto error;
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEXDH_INIT, len);
@@ -5495,9 +5535,11 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 	}
 
 	// サーバへgroup sizeを送って、p と g を作ってもらう。
-	buffer_put_int(msg, kex->min);
-	buffer_put_int(msg, kex->nbits);
-	buffer_put_int(msg, kex->max);
+	if (buffer_put_int(msg, kex->min) != 0 ||
+	    buffer_put_int(msg, kex->nbits) != 0 ||
+	    buffer_put_int(msg, kex->max) != 0) {
+		goto error;
+	}
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_DH_GEX_REQUEST, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
@@ -5643,7 +5685,9 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 		goto error;
 	}
 
-	buffer_put_bignum2(msg, pub_key);
+	if (buffer_put_bignum2(msg, pub_key) != 0) {
+		goto error;
+	}
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_DH_GEX_INIT, len);
@@ -5707,7 +5751,8 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 		goto error;
 	}
 
-	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+	if (buffer_put(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub)) != 0)
+		goto error;
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
@@ -5760,7 +5805,8 @@ static void SSH2_curve25519_kex_init(PTInstVar pvar)
 		goto error;
 	}
 
-	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+	if (buffer_put(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub)) != 0)
+		goto error;
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
@@ -5813,7 +5859,8 @@ static void SSH2_kem_sntrup761x25519_kex_init(PTInstVar pvar)
 		goto error;
 	}
 
-	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+	if (buffer_put(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub)) != 0)
+		goto error;
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
@@ -5865,7 +5912,8 @@ static void SSH2_kem_mlkem768x25519_kex_init(PTInstVar pvar)
 		goto error;
 	}
 
-	buffer_append(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub));
+	if (buffer_put(msg, buffer_ptr(kex->client_pub), buffer_len(kex->client_pub)) != 0)
+		goto error;
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
@@ -5932,8 +5980,8 @@ static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, buffer_t *s
 		}
 	}
 
-	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen, pvar->kex->hostkey_type)) != 1) {
-		if (ret == -3 && hostkey->type == KEY_RSA) {
+	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen, pvar->kex->hostkey_type)) != 0) {
+		if (ret == SSH_ERR_KEY_LENGTH) {
 			if (!pvar->settings.EnableRsaShortKeyServer) {
 				BIGNUM *n;
 				RSA_get0_key(hostkey->rsa, &n, NULL, NULL);
@@ -6146,7 +6194,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	buffer_clear(server_blob);
 	buffer_put_string(server_blob, server_public, pklen);
 	buffer_rewind(server_blob);
-	buffer_get_bignum2_msg(server_blob, dh_server_pub);
+	buffer_get_bignum2(server_blob, dh_server_pub);
 	kex->server_key_bits = BN_num_bits(dh_server_pub);
 	*/
 	DH_get0_pqg(kex->dh, &dh_p, NULL, NULL);
@@ -7081,7 +7129,7 @@ static void ssh2_prep_userauth(PTInstVar pvar)
 // ユーザ認証の開始
 BOOL do_SSH2_userauth(PTInstVar pvar)
 {
-	buffer_t *msg;
+	buffer_t *msg = NULL;
 	char *s;
 	unsigned char *outmsg;
 	int len;
@@ -7106,8 +7154,9 @@ BOOL do_SSH2_userauth(PTInstVar pvar)
 		return FALSE;
 	}
 	s = "ssh-userauth";
-	buffer_put_string(msg, s, strlen(s));
-	//buffer_put_padding(msg, 32); // XXX:
+	if (buffer_put_string(msg, s, strlen(s)) != 0) {
+		goto error;
+	}
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_SERVICE_REQUEST, len);
 	memcpy(outmsg, buffer_ptr(msg), len);
@@ -7120,6 +7169,10 @@ BOOL do_SSH2_userauth(PTInstVar pvar)
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_SERVICE_REQUEST was sent at do_SSH2_userauth().");
 
 	return TRUE;
+
+error:
+	buffer_free(msg);
+	return FALSE;
 }
 
 
@@ -7239,36 +7292,50 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 
 	// ペイロードの構築
 	username = pvar->auth_state.user;  // ユーザ名
-	buffer_put_string(msg, username, strlen(username));
-	buffer_put_string(msg, connect_id, strlen(connect_id));
+	if (buffer_put_string(msg, username, strlen(username)) != 0 ||
+	    buffer_put_string(msg, connect_id, strlen(connect_id)) != 0) {
+		goto error;
+	}
 
 	if (!pvar->tryed_ssh2_authlist) { // "none"メソッドの送信
 		// 認証リストをサーバから取得する。
 		// SSH2_MSG_USERAUTH_FAILUREが返るが、サーバにはログは残らない。
 		// (2007.4.27 yutaka)
 		s = "none";  // method name
-		buffer_put_string(msg, s, strlen(s));
+		if (buffer_put_string(msg, s, strlen(s)) != 0) {
+			goto error;
+		}
 
 	} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) { // パスワード認証
 		// password authentication method
 		s = "password";
-		buffer_put_string(msg, s, strlen(s));
-		buffer_put_char(msg, 0); // 0
+		if (buffer_put_string(msg, s, strlen(s)) != 0 ||
+		    buffer_put_char(msg, 0) != 0) {
+			goto error;
+		}
 
 		if (pvar->ssh2_autologin == 1) { // SSH2自動ログイン
 			s = pvar->ssh2_password;
 		} else {
 			s = pvar->auth_state.cur_cred.password;  // パスワード
 		}
-		buffer_put_string(msg, s, strlen(s));
+		if (buffer_put_string(msg, s, strlen(s)) != 0) {
+			goto error;
+		}
 
 	} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) { // keyboard-interactive (2005.3.12 yutaka)
 		s = "keyboard-interactive";  // method name
-		buffer_put_string(msg, s, strlen(s));
+		if (buffer_put_string(msg, s, strlen(s)) != 0) {
+			goto error;
+		}
 		s = "";  // language tag
-		buffer_put_string(msg, s, strlen(s));
+		if (buffer_put_string(msg, s, strlen(s)) != 0) {
+			goto error;
+		}
 		s = "";  // submethods
-		buffer_put_string(msg, s, strlen(s));
+		if (buffer_put_string(msg, s, strlen(s)) != 0) {
+			goto error;
+		}
 
 		SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_INFO_REQUEST);
 
@@ -7282,7 +7349,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		ssh_keyalgo keyalgo;
 		char *keyalgo_name;
 
-		if (get_SSH2_publickey_blob(pvar, &blob, &bloblen) == FALSE) {
+		if (get_SSH2_publickey_blob(pvar, &blob, &bloblen) != 0) {
 			goto error;
 		}
 
@@ -7296,21 +7363,33 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 			goto error;
 		}
 		// セッションID
-		buffer_append_length(signbuf, pvar->kex->session_id, pvar->kex->session_id_len);
-		buffer_put_char(signbuf, SSH2_MSG_USERAUTH_REQUEST);
+		if (buffer_put_string(signbuf, pvar->kex->session_id, pvar->kex->session_id_len) != 0 ||
+		    buffer_put_char(signbuf, SSH2_MSG_USERAUTH_REQUEST) != 0) {
+			goto error;
+		}
 		s = username;  // ユーザ名
-		buffer_put_string(signbuf, s, strlen(s));
+		if (buffer_put_string(signbuf, s, strlen(s)) != 0) {
+			goto error;
+		}
 		s = connect_id;
-		buffer_put_string(signbuf, s, strlen(s));
+		if (buffer_put_string(signbuf, s, strlen(s)) != 0) {
+			goto error;
+		}
 		s = "publickey";
-		buffer_put_string(signbuf, s, strlen(s));
-		buffer_put_char(signbuf, 1); // true
+		if (buffer_put_string(signbuf, s, strlen(s)) != 0 ||
+		    buffer_put_char(signbuf, 1) != 0) { // true
+			goto error;
+		}
 
 		s = keyalgo_name;
-		buffer_put_string(signbuf, s, strlen(s));
+		if (buffer_put_string(signbuf, s, strlen(s)) != 0) {
+			goto error;
+		}
 
 		s = buffer_ptr(blob);
-		buffer_append_length(signbuf, s, bloblen);
+		if (buffer_put_string(signbuf, s, bloblen) != 0) {
+			goto error;
+		}
 
 		// 署名の作成
 		if (generate_SSH2_keysign(keypair, &signature, &siglen, buffer_ptr(signbuf), buffer_len(signbuf), keyalgo) == FALSE) {
@@ -7321,15 +7400,21 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 
 		// step3
 		s = "publickey";
-		buffer_put_string(msg, s, strlen(s));
-		buffer_put_char(msg, 1); // true
+		if (buffer_put_string(msg, s, strlen(s)) != 0 ||
+		    buffer_put_char(msg, 1) != 0) { // true
+			goto error;
+		}
 
 		s = keyalgo_name;
-		buffer_put_string(msg, s, strlen(s));
+		if (buffer_put_string(msg, s, strlen(s)) != 0) {
+			goto error;
+		}
 
 		s = buffer_ptr(blob);
-		buffer_append_length(msg, s, bloblen);
-		buffer_append_length(msg, signature, siglen);
+		if (buffer_put_string(msg, s, bloblen) != 0 ||
+		    buffer_put_string(msg, signature, siglen) != 0) {
+			goto error;
+		}
 
 		buffer_free(blob);
 		buffer_free(signbuf);
@@ -7342,8 +7427,10 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		ssh_keyalgo keyalgo;
 
 		s = "publickey";
-		buffer_put_string(msg, s, strlen(s));
-		buffer_put_char(msg, 0); // false
+		if (buffer_put_string(msg, s, strlen(s)) != 0 ||
+		    buffer_put_char(msg, 0) != 0) { // false
+			goto error;
+		}
 
 		if (pvar->pageant_keycurrent != 0) {
 			// 直前の鍵をスキップ
@@ -7365,12 +7452,16 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 
 		// アルゴリズムをコピーする
 		len = strlen(keyalgo_name);
-		buffer_put_string(msg, keyalgo_name, len);
+		if (buffer_put_string(msg, keyalgo_name, len) != 0) {
+			goto error;
+		}
 
 		// 鍵をコピーする
 		len = get_uint32_MSBfirst(puttykey);
 		puttykey += 4;
-		buffer_put_string(msg, puttykey, len);
+		if (buffer_put_string(msg, puttykey, len) != 0) {
+			goto error;
+		}
 		puttykey += len;
 
 		pvar->pageant_keycurrent++;
@@ -7627,10 +7718,12 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 			return FALSE;
 		}
 		s = "session";
-		buffer_put_string(msg, s, strlen(s));  // ctype
-		buffer_put_int(msg, c->self_id);  // self(channel number)
-		buffer_put_int(msg, c->local_window);  // local_window
-		buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
+		if (buffer_put_string(msg, s, strlen(s)) != 0 ||    // ctype
+		    buffer_put_int(msg, c->self_id) != 0 ||         // self (channel number)
+		    buffer_put_int(msg, c->local_window) != 0 ||    // local_window
+		    buffer_put_int(msg, c->local_maxpacket) != 0) { // local_maxpacket
+			return FALSE;
+		}
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
 		memcpy(outmsg, buffer_ptr(msg), len);
@@ -7840,18 +7933,18 @@ void sanitize_str(buffer_t *buff, unsigned char *src, size_t srclen)
 	for (i=0; i<srclen; i++) {
 		if (src[i] < 0x20 && src[i] != '\t') {
 			if (cplen > 0) {
-				buffer_append(buff, start, cplen);
+				buffer_put(buff, start, cplen);
 			}
 
 			if (src[i] == '\r') {
-				buffer_append(buff, "\r\n", 2);
+				buffer_put(buff, "\r\n", 2);
 
 				if (i < srclen - 1 && src[i+1] == '\n') {
 					i++;
 				}
 			}
 			else if (src[i] == '\n') {
-				buffer_append(buff, "\r\n", 2);
+				buffer_put(buff, "\r\n", 2);
 			}
 
 			start = src + i + 1;
@@ -7863,10 +7956,10 @@ void sanitize_str(buffer_t *buff, unsigned char *src, size_t srclen)
 	}
 
 	if (cplen > 0) {
-		buffer_append(buff, start, cplen);
+		buffer_put(buff, start, cplen);
 	}
 
-	buffer_append(buff, "\0", 1);
+	buffer_put(buff, "\0", 1);
 }
 
 /**
@@ -8081,7 +8174,9 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		goto err;
 	}
-	buffer_put_int(pvar->userauth_infores, pvar->userauth_inforeq_num);
+	if (buffer_put_int(pvar->userauth_infores, pvar->userauth_inforeq_num) != 0) {
+		goto err;
+	}
 
 	// パスワード変更の場合、メッセージがあれば、表示する。(2010.11.11 yutaka)
 	if (pvar->userauth_inforeq_num == 0) {
@@ -8111,16 +8206,25 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 			          i, prompt, prompt_len);
 
 			// バッファに保存
-			buffer_put_string(pvar->userauth_inforeq_prompts, prompt, prompt_len);
-			buffer_put_int(pvar->userauth_inforeq_prompts, echo);
+			if (buffer_put_string(pvar->userauth_inforeq_prompts, prompt, prompt_len) != 0 ||
+			    buffer_put_int(pvar->userauth_inforeq_prompts, echo) != 0) {
+				goto err;
+			}
 
 			free(prompt);
 		}
 		buffer_rewind(pvar->userauth_inforeq_prompts);
 
 		// 1個目のプロンプトでダイアログを表示
-		prompt_disp = buffer_get_string_msg(pvar->userauth_inforeq_prompts, &prompt_len);
-		echo = buffer_get_int(pvar->userauth_inforeq_prompts);
+		if (buffer_get_string(pvar->userauth_inforeq_prompts, &prompt_disp, &prompt_len) != 0) {
+			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
+			goto err;
+		}
+		if (buffer_get_int(pvar->userauth_inforeq_prompts, &echo) != 0) {
+			logprintf(LOG_LEVEL_ERROR, "%s: missing echo.", __FUNCTION__);
+			free(prompt_disp);
+			goto err;
+		}
 
 		// keyboard-interactive method
 		if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
@@ -8158,15 +8262,24 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 	if (pvar->userauth_inforeq_num) {
 		// ダイアログへの入力（レスポンス）を保持
 		s = pvar->auth_state.cur_cred.password;
-		buffer_put_string(pvar->userauth_infores, s, strlen(s));
+		if (buffer_put_string(pvar->userauth_infores, s, strlen(s)) != 0) {
+			return;
+		}
 	}
 
 	pvar->userauth_inforeq_index++;
 
 	if (pvar->userauth_inforeq_index < pvar->userauth_inforeq_num) {
 		// 次のプロンプトでダイアログを表示
-		prompt_disp = buffer_get_string_msg(pvar->userauth_inforeq_prompts, &prompt_len);
-		echo = buffer_get_int(pvar->userauth_inforeq_prompts);
+		if (buffer_get_string(pvar->userauth_inforeq_prompts, &prompt_disp, &prompt_len) != 0) {
+			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
+			return;
+		}
+		if (buffer_get_int(pvar->userauth_inforeq_prompts, &echo) != 0) {
+			logprintf(LOG_LEVEL_ERROR, "%s: missing echo.", __FUNCTION__);
+			free(prompt_disp);
+			return;
+		}
 
 		// keyboard-interactive method
 		if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
@@ -8244,15 +8357,23 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		safefree(pvar->pageant_key);
 		return FALSE;
 	}
-	buffer_append_length(signbuf, pvar->kex->session_id, pvar->kex->session_id_len);
-	buffer_put_char(signbuf, SSH2_MSG_USERAUTH_REQUEST);
+	if (buffer_put_string(signbuf, pvar->kex->session_id, pvar->kex->session_id_len) != 0 ||
+	    buffer_put_char(signbuf, SSH2_MSG_USERAUTH_REQUEST) != 0) {
+		return FALSE;
+	}
 	s = username;  // ユーザ名
-	buffer_put_string(signbuf, s, strlen(s));
+	if (buffer_put_string(signbuf, s, strlen(s)) != 0) {
+		return FALSE;
+	}
 	s = connect_id;
-	buffer_put_string(signbuf, s, strlen(s));
+	if (buffer_put_string(signbuf, s, strlen(s)) != 0) {
+		return FALSE;
+	}
 	s = "publickey";
-	buffer_put_string(signbuf, s, strlen(s));
-	buffer_put_char(signbuf, 1); // true
+	if (buffer_put_string(signbuf, s, strlen(s)) != 0 ||
+	    buffer_put_char(signbuf, 1) != 0) { // true
+		return FALSE;
+	}
 
 	puttykey = pvar->pageant_curkey;
 
@@ -8266,12 +8387,16 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 
 	// アルゴリズムをコピーする
 	len = strlen(keyalgo_name);
-	buffer_put_string(signbuf, keyalgo_name, len);
+	if (buffer_put_string(signbuf, keyalgo_name, len) != 0) {
+		return FALSE;
+	}
 
 	// 鍵をコピーする
 	len = get_uint32_MSBfirst(puttykey);
 	puttykey += 4;
-	buffer_put_string(signbuf, puttykey, len);
+	if (buffer_put_string(signbuf, puttykey, len) != 0) {
+		return FALSE;
+	}
 	puttykey += len;
 
 	// Pageant に署名してもらう
@@ -8293,28 +8418,40 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		return FALSE;
 	}
 	s = username;  // ユーザ名
-	buffer_put_string(msg, s, strlen(s));
+	if (buffer_put_string(msg, s, strlen(s)) != 0) {
+		return FALSE;
+	}
 	s = connect_id;
-	buffer_put_string(msg, s, strlen(s));
+	if (buffer_put_string(msg, s, strlen(s)) != 0) {
+		return FALSE;
+	}
 	s = "publickey";
-	buffer_put_string(msg, s, strlen(s));
-	buffer_put_char(msg, 1); // true
+	if (buffer_put_string(msg, s, strlen(s)) != 0 ||
+	    buffer_put_char(msg, 1) != 0) { // true
+		return FALSE;
+	}
 
 	puttykey = pvar->pageant_curkey;
 
 	// アルゴリズムをコピーする
 	len = strlen(keyalgo_name);
-	buffer_put_string(msg, keyalgo_name, len);
+	if (buffer_put_string(msg, keyalgo_name, len) != 0) {
+		return FALSE;
+	}
 
 	// 鍵をコピーする
 	len = get_uint32_MSBfirst(puttykey);
 	puttykey += 4;
-	buffer_put_string(msg, puttykey, len);
+	if (buffer_put_string(msg, puttykey, len) != 0) {
+		return FALSE;
+	}
 	puttykey += len;
 
 	// 署名されたデータ
 	len  = get_uint32_MSBfirst(signedmsg);
-	buffer_put_string(msg, signedmsg + 4, len);
+	if (buffer_put_string(msg, signedmsg + 4, len) != 0) {
+		return FALSE;
+	}
 	free(signedmsg);
 
 	// パケット送信
@@ -8471,21 +8608,30 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 
 	// ペイロードの構築
 	username = pvar->auth_state.user;  // ユーザ名
-	buffer_put_string(msg, username, strlen(username));
+	if (buffer_put_string(msg, username, strlen(username)) != 0) {
+		goto err;
+	}
 
 	// password authentication method
 	s = connect_id;
-	buffer_put_string(msg, s, strlen(s));
+	if (buffer_put_string(msg, s, strlen(s)) != 0) {
+		goto err;
+	}
 	s = "password";
-	buffer_put_string(msg, s, strlen(s));
-
-	buffer_put_char(msg, 1); // additional info
+	if (buffer_put_string(msg, s, strlen(s)) != 0 ||
+	    buffer_put_char(msg, 1) != 0) { // additional info
+		goto err;
+	}
 
 	s = cp.passwd;
-	buffer_put_string(msg, s, strlen(s));
+	if (buffer_put_string(msg, s, strlen(s)) != 0) {
+		goto err;
+	}
 
 	s = cp.new_passwd;
-	buffer_put_string(msg, s, strlen(s));
+	if (buffer_put_string(msg, s, strlen(s)) != 0) {
+		goto err;
+	}
 
 	// パケット送信
 	len = buffer_len(msg);
@@ -8517,7 +8663,7 @@ err:
 
 /*
  * SSH_MSG_CHANNEL_REQUEST 送信関数
- * type-specific data が string で 0 〜 2 の物に対応。
+ * type-specific data が string で 0 - 2 の物に対応。
  * 使用しないメッセージは NULL にする。
  * type-specific data が他の形式には対応していないので、自前で送る事。
  */
@@ -8537,16 +8683,19 @@ static BOOL send_channel_request_gen(PTInstVar pvar, Channel_t *c, unsigned char
 		return FALSE;
 	}
 
-	buffer_put_int(msg, c->remote_id);
-	buffer_put_string(msg, req, strlen(req));
-
-	buffer_put_char(msg, want_reply);
+	if (buffer_put_int(msg, c->remote_id) != 0 ||
+	    buffer_put_string(msg, req, strlen(req)) != 0 ||
+	    buffer_put_char(msg, want_reply) != 0) {
+		return FALSE;
+	}
 
 	if (msg1) {
-		buffer_put_string(msg, msg1, strlen(msg1));
+		if (buffer_put_string(msg, msg1, strlen(msg1)) != 0)
+			return FALSE;
 	}
 	if (msg2) {
-		buffer_put_string(msg, msg1, strlen(msg1));
+		if (buffer_put_string(msg, msg2, strlen(msg2)) != 0)
+			return FALSE;
 	}
 
 	len = buffer_len(msg);
@@ -8586,48 +8735,66 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 		return FALSE;
 	}
 
-	buffer_put_int(msg, c->remote_id);
-	buffer_put_string(msg, req_type, strlen(req_type));
-	buffer_put_char(msg, want_reply);  // want_reply (disableに変更 2005/3/28 yutaka)
+	if (buffer_put_int(msg, c->remote_id) != 0 ||
+	    buffer_put_string(msg, req_type, strlen(req_type)) != 0 ||
+	    buffer_put_char(msg, want_reply) != 0) {
+		return FALSE;
+	}
 
-	buffer_put_string(msg, pvar->ts->TermType, strlen(pvar->ts->TermType));
-	buffer_put_int(msg, pvar->ssh_state.win_cols);  // columns
-	buffer_put_int(msg, pvar->ssh_state.win_rows);  // lines
+	if (buffer_put_string(msg, pvar->ts->TermType, strlen(pvar->ts->TermType)) != 0 ||
+	    buffer_put_int(msg, pvar->ssh_state.win_cols) != 0 || // columns
+	    buffer_put_int(msg, pvar->ssh_state.win_rows) != 0) { // lines
+		return FALSE;
+	}
 	get_window_pixel_size(pvar, &x, &y);
-	buffer_put_int(msg, x);  // window width (pixel):
-	buffer_put_int(msg, y);  // window height (pixel):
+	if (buffer_put_int(msg, x) != 0 || // window width (pixel):
+	    buffer_put_int(msg, y) != 0) { // window height (pixel):
+		return FALSE;
+	}
 
 	// TTY modeはここで渡す (2005.7.17 yutaka)
-	buffer_put_char(ttymsg, SSH2_TTY_OP_OSPEED);
-	buffer_put_int(ttymsg, pvar->ts->TerminalOutputSpeed);  // baud rate
-	buffer_put_char(ttymsg, SSH2_TTY_OP_ISPEED);
-	buffer_put_int(ttymsg, pvar->ts->TerminalInputSpeed);  // baud rate
+	if (buffer_put_char(ttymsg, SSH2_TTY_OP_OSPEED) != 0 ||
+	    buffer_put_int(ttymsg, pvar->ts->TerminalOutputSpeed) != 0 || // baud rate
+	    buffer_put_char(ttymsg, SSH2_TTY_OP_ISPEED) != 0 ||
+	    buffer_put_int(ttymsg, pvar->ts->TerminalInputSpeed) != 0) {  // baud rate
+		return FALSE;
+	}
 
 	// VERASE
-	buffer_put_char(ttymsg, SSH2_TTY_KEY_VERASE);
+	if (buffer_put_char(ttymsg, SSH2_TTY_KEY_VERASE) != 0) {
+		return FALSE;
+	}
 	if (pvar->ts->BSKey == IdBS) {
-		buffer_put_int(ttymsg, 0x08); // BS key
+		if (buffer_put_int(ttymsg, 0x08) != 0) { // BS key
+			return FALSE;
+		}
 	} else {
-		buffer_put_int(ttymsg, 0x7F); // DEL key
+		if (buffer_put_int(ttymsg, 0x7F) != 0) { // DEL key
+			return FALSE;
+		}
 	}
 
 	switch (pvar->ts->CRReceive) {
 	  case IdLF:
-		buffer_put_char(ttymsg, SSH2_TTY_OP_ONLCR);
-		buffer_put_int(ttymsg, 0);
+		if (buffer_put_char(ttymsg, SSH2_TTY_OP_ONLCR) != 0 ||
+		    buffer_put_int(ttymsg, 0) != 0) {
+			return FALSE;
+		}
 		break;
 	  case IdCR:
-		buffer_put_char(ttymsg, SSH2_TTY_OP_ONLCR);
-		buffer_put_int(ttymsg, 1);
+		if (buffer_put_char(ttymsg, SSH2_TTY_OP_ONLCR) != 0 ||
+		    buffer_put_int(ttymsg, 1) != 0) {
+			return FALSE;
+		}
 		break;
 	  default:
 		break;
 	}
 
-	buffer_put_char(ttymsg, SSH2_TTY_OP_END); // End of terminal modes
-
-	// SSH2では文字列として書き込む。
-	buffer_put_string(msg, buffer_ptr(ttymsg), buffer_len(ttymsg));
+	if (buffer_put_char(ttymsg, SSH2_TTY_OP_END) != 0 || // End of terminal modes
+	    buffer_put_string(msg, buffer_ptr(ttymsg), buffer_len(ttymsg)) != 0) {
+		return FALSE;
+	}
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_REQUEST, len);
@@ -9064,8 +9231,10 @@ static void do_SSH2_adjust_window_size(PTInstVar pvar, Channel_t *c)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
-		buffer_put_int(msg, c->remote_id);
-		buffer_put_int(msg, c->local_window_max - c->local_window);
+		if (buffer_put_int(msg, c->remote_id) != 0 ||
+		    buffer_put_int(msg, c->local_window_max - c->local_window) != 0) {
+			return;
+		}
 
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_WINDOW_ADJUST, len);
@@ -9099,7 +9268,9 @@ void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
-		buffer_put_int(msg, c->remote_id);
+		if (buffer_put_int(msg, c->remote_id) != 0) {
+			return;
+		}
 
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_CLOSE, len);
@@ -10362,10 +10533,12 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 				logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 				goto err;
 			}
-			buffer_put_int(msg, remote_id);
-			buffer_put_int(msg, SSH2_OPEN_ADMINISTRATIVELY_PROHIBITED);
-			buffer_put_string(msg, "", 0); // description
-			buffer_put_string(msg, "", 0); // language tag
+			if (buffer_put_int(msg, remote_id) != 0 ||
+			    buffer_put_int(msg, SSH2_OPEN_ADMINISTRATIVELY_PROHIBITED) != 0 ||
+			    buffer_put_string(msg, "", 0) != 0 || // description
+			    buffer_put_string(msg, "", 0) != 0) { // language tag
+				goto err;
+			}
 
 			len = buffer_len(msg);
 			outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN_FAILURE, len);
@@ -10666,12 +10839,14 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 		*agent_request_len = req_len + 4;
 
 		if (*agent_request_len > buflen) {
-			buffer_put_raw(agent_msg, data, buflen);
+			if (buffer_put(agent_msg, data, buflen) != 0)
+				goto error;
 			return TRUE;
 		}
 	}
 	else {
-		buffer_put_raw(agent_msg, data, buflen);
+		if (buffer_put(agent_msg, data, buflen) != 0)
+			goto error;
 		if (*agent_request_len > buffer_len(agent_msg)) {
 			return TRUE;
 		}
