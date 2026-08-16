@@ -1308,6 +1308,7 @@ static void OutputStr(PFileVar fv, const wchar_t *strW)
 
 /**
  *	ログに1文字書きこむ(text, unicode)
+ *	端末からのエコー用
  */
 void FLogPutUTF32(unsigned int u32)
 {

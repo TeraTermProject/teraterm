@@ -298,6 +298,7 @@ source_group(
 target_sources(
   ${PROJECT_NAME}
   PRIVATE
+  ../ttpcmn/ttcmn_buff.c
   ../ttpcmn/ttcmn_dup.cpp
   ../ttpcmn/ttcmn_dup.h
   ../ttpcmn/ttcmn_shared_memory.h

@@ -58,15 +58,20 @@ DllExport void PASCAL ShowAllWinCascade(HWND);
 DllExport void PASCAL BroadcastClosingMessage(HWND myhwnd);
 DllExport void PASCAL UndoAllWin(void);
 
-DllExport int PASCAL CommReadRawByte(PComVar cv, LPBYTE b);
-DllExport int PASCAL CommRead1Byte(PComVar cv, LPBYTE b);
-DllExport void PASCAL CommInsert1Byte(PComVar cv, BYTE b);
-DllExport int PASCAL CommRawOut(PComVar cv, PCHAR B, int C);
-DllExport int PASCAL CommBinaryOut(PComVar cv, PCHAR B, int C);
-DllExport int PASCAL CommBinaryBuffOut(PComVar cv, PCHAR B, int C);
-DllExport int PASCAL CommTextOutW(PComVar cv, const wchar_t *B, int C);
-DllExport int PASCAL CommBinaryEcho(PComVar cv, PCHAR B, int C);
-DllExport int PASCAL CommTextEchoW(PComVar cv, const wchar_t *B, int C);
+// 入出力バッファ制御
+// ttermpro.exe では ttcmn_buff.c が実体
+// ttpcmn.dll では ttcmn_impl.cpp の wrapper
+// プラグインからは ttpcmn.lib 経由で従来どおり呼び出せる
+// DllExport を付けないのは、ttermpro.exe では実体を直接リンクしているため
+int WINAPI CommReadRawByte(PComVar cv, LPBYTE b);
+int WINAPI CommRead1Byte(PComVar cv, LPBYTE b);
+void WINAPI CommInsert1Byte(PComVar cv, BYTE b);
+int WINAPI CommRawOut(PComVar cv, PCHAR B, int C);
+int WINAPI CommBinaryOut(PComVar cv, PCHAR B, int C);
+int WINAPI CommBinaryBuffOut(PComVar cv, PCHAR B, int C);
+int WINAPI CommTextOutW(PComVar cv, const wchar_t *B, int C);
+int WINAPI CommBinaryEcho(PComVar cv, PCHAR B, int C);
+int WINAPI CommTextEchoW(PComVar cv, const wchar_t *B, int C);
 
 #ifdef __cplusplus
 }

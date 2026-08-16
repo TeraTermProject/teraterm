@@ -388,6 +388,7 @@
     <ClCompile Include="..\..\cygwin\cyglib\cyglib.c" />
     <ClCompile Include="..\common\edithistory.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
+    <ClCompile Include="..\ttpcmn\ttcmn_buff.c" />
     <ClCompile Include="..\ttpcmn\ttcmn_dup.cpp" />
     <ClCompile Include="..\ttpcmn\ttcmn_static.c" />
     <ClCompile Include="..\ttpdlg\aboutdlg.c" />
