@@ -270,6 +270,11 @@
 				<param name="Local" value="html/usage/tips/data_drop.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="ユーザ名またはパスワードに非 ASCII 文字を使用する場合の注意">
+				<param name="Local" value="html/usage/tips/login_nonascii.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="追加プラグイン">

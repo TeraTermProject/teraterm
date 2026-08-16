@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>ユーザ名またはパスワードに非 ASCII 文字を使用する場合の注意</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>ユーザ名またはパスワードに非 ASCII 文字を使用する場合の注意</h1>
+
+<h3>SSH 接続</h3>
+SSH プロトコルでは、ユーザ名およびパスワードは UTF-8 で送信されることが <a href="https://datatracker.ietf.org/doc/html/rfc4252" target="_blank">RFC 4252</a> により規定されています。<br>
+Tera Term は非 ASCII 文字を含むユーザ名やパスワードを UTF-8 で送信しますが、接続先の SSH サーバが UTF-8 を正しく処理できない場合、SSH 認証に失敗します。<br>
+また、SSH 接続に関係する処理（PAM、SSSD、LDAP など）の実装によっては、ロケール依存の文字コードでパスワードを処理する場合があり、非 ASCII 文字を含むパスワードが正しく認識されないことがあります。
+
+<h3>Telnet 接続</h3>
+Telnet プロトコルは本来 ASCII を前提としており、ユーザ名およびパスワードに非 ASCII 文字が使用されることは想定されていません。<br>
+Tera Term は非 ASCII 文字を含むユーザ名およびパスワードを送信する際、設定された送信文字コードに従ってエンコードを行いますが、接続先の Telnet サーバが同じ文字コードを使用していない場合、認証に失敗する可能性があります。
+
+</BODY>
+</HTML>

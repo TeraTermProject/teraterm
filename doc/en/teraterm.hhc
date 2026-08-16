@@ -252,6 +252,11 @@
 				<param name="Local" value="html/usage/tips/data_drop.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
+			<LI><OBJECT type="text/sitemap">
+				<param name="Name" value="Notes on Using Non-ASCII Characters in User Names or Passwords">
+				<param name="Local" value="html/usage/tips/login_nonascii.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Additional plugins">
