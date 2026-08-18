@@ -50,6 +50,11 @@ struct recheader {
 	int len;
 };
 
+struct recmarker {
+	int id;
+	struct timeval tv;
+};
+
 typedef struct {
 	PTTSet ts;
 	PComVar cv;
@@ -89,6 +94,7 @@ typedef struct {
 	char *origHostName;
 	int name_cnt_ini;
 	int name_cnt;
+	struct recmarker marker[8];
 } TInstVar;
 
 static TInstVar *pvar;
@@ -124,6 +130,7 @@ void RestoreOLDTitle() {
 
 void ChangeTitleStatus() {
   char tbuff[TitleBuffSize];
+  char buff[TitleBuffSize];
   wchar_t *uimsg1, *uimsg2, *uimsg3;
   char *msg1, *msg2, *msg3;
 
@@ -142,6 +149,10 @@ void ChangeTitleStatus() {
   free(msg3);
   if (pvar->loop) {
 	strncat_s(tbuff, sizeof(tbuff), ", Loop", _TRUNCATE);
+  }
+  if (pvar->marker[1].id) {
+	_snprintf_s(buff, sizeof(buff), _TRUNCATE, ", Marker: #%d", pvar->marker[1].id);
+	strncat_s(tbuff, sizeof(tbuff), buff, _TRUNCATE);
   }
   SaveTitle();
   if (pvar->mode_flag & MODE_FLAG_AHEAD) {
@@ -267,6 +278,18 @@ void RestoreOLDHostName()
 	}
 }
 
+static void ClearMarkerList() {
+	int sz = sizeof(struct recmarker)*_countof(pvar->marker);
+	memset(&pvar->marker[0], 0, sz);
+}
+
+static void AddMarkerList() {
+	if (pvar->marker[1].id != pvar->marker[0].id) {
+		int sz = sizeof(struct recmarker)*(_countof(pvar->marker)-1);
+		memcpy(&pvar->marker[1], &pvar->marker[0], sz);
+	}
+}
+
 static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->ts = ts;
 	pvar->cv = cv;
@@ -299,6 +322,7 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->origHostName = NULL;
 	pvar->name_cnt_ini = 0;
 	pvar->name_cnt = 0;
+	ClearMarkerList();
 }
 
 void RestoreTitle() {
@@ -357,6 +381,7 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 	static DWORD lbytes;
 	static char ibuff[BUFFSIZE];
 	static BOOL title_changed = FALSE, first_title_changed = FALSE;
+	static int frame_id = 0;
 
 	int b[3];
 	DWORD rsize;
@@ -387,8 +412,10 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 		prh.len = 0;
 		prh.tv.tv_sec = 0;
 		prh.tv.tv_usec = 0;
+		lbytes = 0;
 		title_changed = FALSE;
 		first_title_changed = FALSE;
+		frame_id = 0;
 	}
 
 	if (!pvar->origTitleSaved) {
@@ -425,6 +452,9 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 		h.tv.tv_sec = b[0];
 		h.tv.tv_usec = b[1];
 		h.len = b[2];
+		pvar->marker[0].id = frame_id;
+		pvar->marker[0].tv = h.tv;
+		frame_id ++;
 		if (pvar->skip > 0) {
 			pvar->skip --;
 			prh.tv.tv_sec = 0;
@@ -584,6 +614,21 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 				pvar->loop = !(pvar->loop);
 				speed_changed = TRUE;
 				break;
+			  case 'm':
+			  case 'M':
+				AddMarkerList();
+				speed_changed = TRUE;
+				break;
+			  case 'j':
+			  case 'J':
+				pvar->skip = pvar->marker[1].id;
+				if (pvar->skip >= pvar->marker[0].id) {
+					pvar->skip -= pvar->marker[0].id;
+					break;
+				}
+				pvar->quit = TRUE;
+				pvar->again = TRUE;
+				break;
 			  case ESC:
 				mode = MODE_ESC;
 				break;
@@ -689,6 +734,7 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 			pvar->nowait = pvar->nowait_ini;
 			pvar->speed = 0;
 			pvar->name_cnt = pvar->name_cnt_ini;
+			ClearMarkerList();
 		}
 	}
 }
