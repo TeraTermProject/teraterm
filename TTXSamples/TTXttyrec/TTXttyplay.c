@@ -318,6 +318,12 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 
 	*rbytes = 0;
 
+	if (pvar->quit) {
+		pvar->pause = FALSE;
+		pvar->quit = FALSE;
+		return TRUE;
+	}
+
 	if (pvar->pause) {
 		SetLastError(ERROR_IO_PENDING);
 		return FALSE;
@@ -327,13 +333,9 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 		return pvar->origPReadFile(fh, obuff, oblen, rbytes, rol);
 	}
 
-	if (pvar->quit) {
-		pvar->quit = FALSE;
-		return TRUE;
-	}
-
 	if (!pvar->active) {
 		pvar->active = TRUE;
+		pvar->pause = FALSE;
 		prh.len = 0;
 		prh.tv.tv_sec = 0;
 		prh.tv.tv_usec = 0;
