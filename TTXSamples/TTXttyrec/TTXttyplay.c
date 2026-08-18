@@ -64,6 +64,8 @@ typedef struct {
 	int minwait;
 	int speed;
 	BOOL quit;
+	BOOL loop;
+	BOOL again;
 	BOOL pause;
 	BOOL nowait;
 	BOOL nowait_ini;
@@ -113,6 +115,9 @@ void ChangeTitleStatus() {
   free(msg1);
   free(msg2);
   free(msg3);
+  if (pvar->loop) {
+	strncat_s(tbuff, sizeof(tbuff), ", Loop", _TRUNCATE);
+  }
   strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
   pvar->ChangeTitle = TRUE;
   SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
@@ -249,6 +254,8 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->maxwait = 0;
 	pvar->minwait = 0;
 	pvar->quit = FALSE;
+	pvar->loop = FALSE;
+	pvar->again = FALSE;
 	pvar->pause = FALSE;
 	pvar->nowait = FALSE;
 	pvar->nowait_ini = FALSE;
@@ -356,6 +363,7 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 		}
 		if (rsize == 0) {
 			// EOF reached
+			pvar->again = pvar->loop;
 			return TRUE;
 		}
 		else if (rsize != sizeof(b)) {
@@ -366,8 +374,7 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 				MB_ICONEXCLAMATION
 			};
 			TTMessageBoxW(pvar->cv->HWin, &info, pvar->ts->UILanguageFileW);
-			pvar->enable = FALSE;
-			RestoreOLDTitle();
+			pvar->quit = TRUE;
 			return FALSE;
 		}
 		h.tv.tv_sec = b[0];
@@ -434,6 +441,7 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 			}
 			else if (lbytes == 0) {
 				// EOF reached
+				pvar->again = pvar->loop;
 				return TRUE;
 			}
 			prh.len -= lbytes;
@@ -516,9 +524,19 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 				pvar->wait.tv_sec = 0;
 				pvar->skip += pvar->skip_ini;
 				break;
+			  case 'b':
+			  case 'B':
+				pvar->quit = TRUE;
+				pvar->again = TRUE;
+				break;
 			  case 'e':
 			  case 'E':
 				pvar->quit = TRUE;
+				break;
+			  case 'l':
+			  case 'L':
+				pvar->loop = !(pvar->loop);
+				speed_changed = TRUE;
 				break;
 			  case ESC:
 				mode = MODE_ESC;
@@ -607,15 +625,21 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 	}
 	if (pvar->enable) {
 		RestoreOLDTitle();
+		RestoreOLDHostName();
 		pvar->enable = FALSE;
 		pvar->active = FALSE;
 		pvar->played = TRUE;
 		pvar->wait.tv_sec = 0;
 		pvar->wait.tv_usec = 0;
-		pvar->nowait = pvar->nowait_ini;
-		pvar->speed = 0;
-		RestoreOLDHostName();
-		pvar->name_cnt = pvar->name_cnt_ini;
+		if (pvar->again) {
+			pvar->again = FALSE;
+			PostMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_MENU_AGAIN, 0), 0);
+		}
+		else {
+			pvar->nowait = pvar->nowait_ini;
+			pvar->speed = 0;
+			pvar->name_cnt = pvar->name_cnt_ini;
+		}
 	}
 }
 
@@ -765,7 +789,6 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 			SendMessage(hWin, WM_COMMAND, MAKELONG(ID_EDIT_CLEARBUFFER, 0), 0);
 			pvar->played = FALSE;
 			pvar->ReplaceHostDlg = TRUE;
-			pvar->nowait = FALSE;
 			// Call New-Connection dialog
 			SendMessage(hWin, WM_COMMAND, MAKELONG(ID_FILE_NEWCONNECTION, 0), 0);
 		}
