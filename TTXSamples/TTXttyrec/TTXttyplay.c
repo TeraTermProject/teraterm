@@ -25,8 +25,15 @@
 #define INISECTION "ttyplay"
 #define INISECTIONW L"ttyplay"
 
-#define TITLE_MODE_TIME 1
-#define TITLE_MODE_MSEC 2
+#define MODE_FLAG_TIME      1
+#define MODE_FLAG_MSEC      2
+#define MODE_FLAG_ORIG      4
+#define MODE_FLAG_AHEAD     8
+
+#define TITLE_MODE_MASK     (MODE_FLAG_TIME|MODE_FLAG_ORIG)
+#define TITLE_MODE_STATUS   0
+#define TITLE_MODE_TIME     MODE_FLAG_TIME
+#define TITLE_MODE_OFF      MODE_FLAG_ORIG
 
 static HANDLE hInst; /* Instance handle of TTX*.DLL */
 
@@ -73,8 +80,10 @@ typedef struct {
 	struct timeval last;
 	struct timeval wait;
 	wchar_t *openfnW;
+	BOOL origTitleSaved;
 	char origTitle[TitleBuffSize];
 	char origOLDTitle[TitleBuffSize];
+	WORD origAcceptTitleChangeRequest;
 	int mode_flag;
 	char *fmt_time;
 	char *origHostName;
@@ -91,8 +100,24 @@ static TInstVar InstVar;
 #define GetControlMenu(menu)	GetSubMenuByChildID(menu, ID_CONTROL_RESETTERMINAL)
 #define GetHelpMenu(menu)	GetSubMenuByChildID(menu, ID_HELP_ABOUT)
 
+static void SaveTitle() {
+	if (!pvar->origTitleSaved) {
+		strncpy_s(pvar->origOLDTitle, sizeof(pvar->origOLDTitle), pvar->ts->Title, _TRUNCATE);
+		pvar->origAcceptTitleChangeRequest = pvar->ts->AcceptTitleChangeRequest;
+		pvar->origTitleSaved = TRUE;
+	}
+}
+
+static void RestoreSavedTitle() {
+	if (pvar->origTitleSaved) {
+		strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), pvar->origOLDTitle, _TRUNCATE);
+		pvar->ts->AcceptTitleChangeRequest = pvar->origAcceptTitleChangeRequest;
+		pvar->origTitleSaved = FALSE;
+	}
+}
+
 void RestoreOLDTitle() {
-	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), pvar->origOLDTitle, _TRUNCATE);
+	RestoreSavedTitle();
 	pvar->ChangeTitle = TRUE;
 	SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
 }
@@ -118,13 +143,16 @@ void ChangeTitleStatus() {
   if (pvar->loop) {
 	strncat_s(tbuff, sizeof(tbuff), ", Loop", _TRUNCATE);
   }
+  SaveTitle();
+  if (pvar->mode_flag & MODE_FLAG_AHEAD) {
+    pvar->ts->AcceptTitleChangeRequest = IdTitleChangeRequestAhead;
+  }
   strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
   pvar->ChangeTitle = TRUE;
   SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
 }
 
-void ChangeTitleTime(struct timeval tv) {
-	char tbuff[TitleBuffSize];
+static BOOL GetTimeString(char *str, int size, struct timeval tv, BOOL msec) {
   	time_t tvs = tv.tv_sec;
   	struct tm tm_local;
 	char fmt[40];
@@ -132,10 +160,10 @@ void ChangeTitleTime(struct timeval tv) {
 	char *p;
 
   	if (localtime_s(&tm_local, &tvs) != 0) {
-		return;
+		return FALSE;
   	}
 	if (pvar->fmt_time == 0 || *pvar->fmt_time == '\0') {
-		return;
+		return FALSE;
 	}
 
 	strncpy_s(fmt, sizeof(fmt), pvar->fmt_time, _TRUNCATE);
@@ -146,7 +174,7 @@ void ChangeTitleTime(struct timeval tv) {
 		strncat_s(fmt, sizeof(fmt), buff, _TRUNCATE);
 		strncat_s(fmt, sizeof(fmt), pvar->fmt_time - fmt + p + 2, _TRUNCATE);
 	}
-	else if (pvar->mode_flag & TITLE_MODE_MSEC) {
+	else if (msec) {
 		p = strstr(fmt, "%S");
 		if (p != NULL) {
 			p += 2;
@@ -157,15 +185,14 @@ void ChangeTitleTime(struct timeval tv) {
 		}
 	}
 
-	if (strftime(tbuff, sizeof(tbuff), fmt, &tm_local) == 0) {
-		return;
+	if (strftime(str, size, fmt, &tm_local) == 0) {
+		return FALSE;
 	}
-
-	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
-	SendMessage(pvar->cv->HWin, WM_USER_CHANGETITLE, 0, 0);
+	return TRUE;
 }
 
 void ChangeTitleTimePeriod(struct timeval tv, int period) {
+	char tbuff[TitleBuffSize];
 	static time_t tvs_org;
 	time_t tvs = (time_t)tv.tv_sec*1000+tv.tv_usec/1000;
 
@@ -173,7 +200,13 @@ void ChangeTitleTimePeriod(struct timeval tv, int period) {
 	if (llabs(tvs - tvs_org) < ((period<1000) ? period : 1000)) return;
 	tvs_org = tvs;
 
-	ChangeTitleTime(tv);
+	if (! GetTimeString(tbuff, TitleBuffSize, tv, pvar->mode_flag & MODE_FLAG_MSEC)) {
+		return;
+	}
+	SaveTitle();
+	pvar->ts->AcceptTitleChangeRequest = IdTitleChangeRequestOff;
+	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
+	SendMessage(pvar->cv->HWin, WM_USER_CHANGETITLE, 0, 0);
 }
 
 HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
@@ -262,12 +295,16 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->open_error = FALSE;
 	pvar->mode_flag = 0;
 	pvar->fmt_time = NULL;
+	pvar->origTitleSaved = FALSE;
 	pvar->origHostName = NULL;
 	pvar->name_cnt_ini = 0;
 	pvar->name_cnt = 0;
 }
 
 void RestoreTitle() {
+	if ((pvar->mode_flag & TITLE_MODE_MASK) != TITLE_MODE_STATUS) {
+		return;
+	}
 	ChangeTitleStatus ();
 /*
 	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), pvar->origTitle, _TRUNCATE);
@@ -277,6 +314,10 @@ void RestoreTitle() {
 }
 
 void ChangeTitle(char *title) {
+	if ((pvar->mode_flag & TITLE_MODE_MASK) != TITLE_MODE_STATUS) {
+		return;
+	}
+	SaveTitle();
 	strncpy_s(pvar->origTitle, sizeof(pvar->origTitle), pvar->ts->Title, _TRUNCATE);
 	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), title, _TRUNCATE);
 	pvar->ChangeTitle = TRUE;
@@ -350,8 +391,12 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 		first_title_changed = FALSE;
 	}
 
+	if (!pvar->origTitleSaved) {
+		first_title_changed = FALSE;
+	}
+
 	if (!first_title_changed) {
-		if (!(pvar->mode_flag & TITLE_MODE_TIME)) {
+		if ((pvar->mode_flag & TITLE_MODE_MASK) == TITLE_MODE_STATUS) {
 			ChangeTitleStatus ();
 		}
 		first_title_changed = TRUE;
@@ -415,7 +460,7 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 	if (!pvar->nowait) {
 		gettimeofday(&curtime /*, NULL*/ );
 		tdiff = tvdiff(pvar->last, curtime);
-		if (pvar->mode_flag & TITLE_MODE_TIME) {
+		if (pvar->mode_flag & MODE_FLAG_TIME) {
 			int period = (81<<(8+speed))/256;
 			ChangeTitleTimePeriod(tvadd(orh.tv, tvshift(tdiff, -speed)), period);
 		}
@@ -512,7 +557,8 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 				break;
 			  case 't':
 			  case 'T':
-				pvar->mode_flag ^= TITLE_MODE_TIME;
+				pvar->mode_flag ^= MODE_FLAG_TIME;
+				RestoreSavedTitle();
 				speed_changed = TRUE;
 				break;
 			  case 'q':
@@ -589,8 +635,12 @@ static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbyt
 	}
 
 	if (speed_changed) {
-		if (!(pvar->mode_flag & TITLE_MODE_TIME)) {
+		if ((pvar->mode_flag & TITLE_MODE_MASK) == TITLE_MODE_STATUS) {
 			ChangeTitleStatus ();
+		}
+		else {
+			pvar->ChangeTitle = TRUE;
+			SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
 		}
 	}
 	if (dpos > 0) {
@@ -609,7 +659,7 @@ static void PASCAL TTXOpenFile(TTXFileHooks *hooks) {
 		*hooks->PReadFile = TTXReadFile;
 		*hooks->PWriteFile = TTXWriteFile;
 
-		strncpy_s(pvar->origOLDTitle, sizeof(pvar->origOLDTitle), pvar->ts->Title, _TRUNCATE);
+		SaveTitle();
 	}
 }
 
@@ -676,6 +726,9 @@ static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 			EnableMenuItem(pvar->FileMenu, ID_MENU_REPLAY, MF_BYCOMMAND | MF_ENABLED);
 		}
 	}
+	if (pvar->enable) {
+		RestoreSavedTitle();
+	}
 }
 
 static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
@@ -729,6 +782,7 @@ static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
 //	ts->TitleFormat = 0;
 	pvar->maxwait = GetPrivateProfileIntAFileW(INISECTION, "MaxWait", 0, fn);
 	pvar->speed = GetPrivateProfileIntAFileW(INISECTION, "Speed", 0, fn);
+	pvar->mode_flag = GetPrivateProfileIntAFileW(INISECTION, "ModeFlag", 0, fn);
 	GetPrivateProfileStringW(INISECTIONW, L"TimeFormat", L"%Y/%m/%d %H:%M:%S", buff, _countof(buff), fn);
 	ConvertSafeStrFtimeFormat(buff);
 	free(pvar->fmt_time);
