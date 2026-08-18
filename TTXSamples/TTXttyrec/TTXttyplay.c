@@ -373,12 +373,15 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 		h.tv.tv_sec = b[0];
 		h.tv.tv_usec = b[1];
 		h.len = b[2];
+		if (pvar->skip > 0) {
+			pvar->skip --;
+			prh.tv.tv_sec = 0;
+			pvar->wait.tv_sec = 0;
+			pvar->wait.tv_usec = 0;
+		}
 		if (prh.tv.tv_sec != 0) {
 			pvar->wait = tvshift(tvdiff(prh.tv, h.tv), pvar->speed);
-			if (pvar->wait.tv_sec < pvar->minwait || pvar->skip > 0) {
-				if (pvar->skip > 0) {
-					pvar->skip --;
-				}
+			if (pvar->wait.tv_sec < pvar->minwait) {
 				pvar->wait.tv_sec = 0;
 				pvar->wait.tv_usec = 0;
 			}
