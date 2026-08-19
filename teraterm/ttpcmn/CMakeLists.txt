@@ -8,6 +8,7 @@ add_library(
   ttcmn.c
   ttcmn_cominfo.c
   ttcmn_cominfo.h
+  ttcmn_impl.cpp
   ttcmn_lib.cpp
   ttcmn_lib.h
   ttcmn_notify.cpp

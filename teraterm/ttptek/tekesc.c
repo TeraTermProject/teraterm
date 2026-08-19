@@ -32,6 +32,7 @@
 #include "tttypes.h"
 #include "tektypes.h"
 #include "ttcommon.h"
+#include "../teraterm/filesys_log.h"
 #include <math.h>
 #include <string.h>
 
@@ -40,12 +41,6 @@
 
 #include "tekesc.h"
 #include "tttek.h"
-
-static void Log1Byte(PComVar cv, BYTE b)
-{
-	if (cv->Log1Byte != NULL)
-		cv->Log1Byte(b);
-}
 
 void ChangeTextSize(PTEKVar tk, PTTSet ts)
 {
@@ -60,7 +55,7 @@ void BackSpace(PTEKVar tk, PComVar cv)
 {
   tk->CaretX = tk->CaretX - tk->FontWidth;
   if (tk->CaretX < 0) tk->CaretX = 0;
-  Log1Byte(cv,BS);
+  FLogPutANSI(BS);
 }
 
 void LineFeed(PTEKVar tk, PComVar cv)
@@ -81,18 +76,18 @@ void LineFeed(PTEKVar tk, PComVar cv)
       tk->CaretOffset = 0;
     }
   }
-  Log1Byte(cv,LF);
+  FLogPutANSI(LF);
 }
 
 void CarriageReturn(PTEKVar tk, PComVar cv)
 {
   tk->CaretX = tk->CaretOffset;
-  Log1Byte(cv,CR);
+  FLogPutANSI(CR);
 }
 
 void Tab(PTEKVar tk, PComVar cv)
 {
-  Log1Byte(cv,HT);
+  FLogPutANSI(HT);
   tk->CaretX = tk->CaretX + (tk->FontWidth << 3);
   if (tk->CaretX >= tk->ScreenWidth)
   {
@@ -340,7 +335,7 @@ void DispChar(PTEKVar tk, PComVar cv, BYTE b)
   InvalidateRect(tk->HWin,&R,FALSE);
   tk->CaretX = R.right;
 
-  Log1Byte(cv,b);
+  FLogPutANSI(b);
 
   if (tk->CaretX > tk->ScreenWidth - tk->FontWidth)
   {

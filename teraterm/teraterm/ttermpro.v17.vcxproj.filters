@@ -204,6 +204,9 @@
     <ClCompile Include="..\ttpset\ttset_keyboard.c">
       <Filter>ttpset</Filter>
     </ClCompile>
+    <ClCompile Include="..\ttpcmn\ttcmn_buff.c">
+      <Filter>ttpcmn</Filter>
+    </ClCompile>
     <ClCompile Include="..\ttpcmn\ttcmn_static.c">
       <Filter>ttpcmn</Filter>
     </ClCompile>

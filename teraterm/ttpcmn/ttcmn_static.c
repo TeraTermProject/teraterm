@@ -200,10 +200,29 @@ void CloseSharedMemory(PMap ppm, HANDLE HMap)
 static BOOL FirstInstance;
 static HANDLE HMap = NULL;
 
+// 入出力バッファ制御(ttcmn_buff.c)の実体
+// ttpcmn.dll がエクスポートしている互換 API から呼び出される
+// メンバの順序は CommBuffFuncs (ttcmn_i.h) と合わせること
+static const CommBuffFuncs CommBuffFuncTable = {
+	CommReadRawByte,
+	CommRead1Byte,
+	CommInsert1Byte,
+	CommRawOut,
+	CommBinaryOut,
+	CommBinaryBuffOut,
+	CommTextOutW,
+	CommBinaryEcho,
+	CommTextEchoW,
+};
+
 BOOL StartTeraTerm(PTTSet ts)
 {
 	OpenSharedMemory(&FirstInstance, &pm, &HMap);
 	SetPMPtr(pm);
+
+	// plugin から ttpcmn.dll 経由で呼ばれる可能性がある為
+	// TTXInit() より前に登録しておく
+	CommBuffSetFuncs(&CommBuffFuncTable);
 
 	if (FirstInstance) {
 		// init window list

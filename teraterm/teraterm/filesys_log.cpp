@@ -103,23 +103,18 @@
  *		- ホスト->受信バッファ->パース->端末へ出力(=ログ) となるので書き込みまで少しかかる
  *		- FLogPutUTF32()
  *		- FLogPutANSI()
- *			= cv.Log1Byte(), tekesc 用のログ
+ *			tekesc 用のログ
  *		- ログが一時停止状態の時は何もしない
- *		@TODO
- *			- Tekは以前dllだったため関数へのポインタが必要だったが現在はexeに内蔵している
- *			- cv.Log1Byte() を削除, FLogPutANSI() を直接読み出し
  *	2. バイナリログ
  *		- 受信バッファに入ったものをそのままログへ出力
- *		- 受信バッファ処理から呼ばれる
+ *		- 受信バッファ処理(ttcmn_buff.c)から呼ばれる
  *		- テキストログとバイナリログは排他
  *		- FLogPutBinary()
- *			= cv.Log1Bin()
  *		- FLogBinSkip()
- *			= cv.LogBinSkip()
- *		- ttpcmn.dll 内にバッファ処理があるため、関数へのポインタが必要だった
  *	3. マクロからログへ書き込み
  *		- logwriteマクロコマンド、即時書き込み
  *		- FLogWriteStr()
+ *
  */
 
 #define TitLog      L"Logging"
@@ -138,7 +133,6 @@ typedef struct {
 	wchar_t *FullName;
 
 	HANDLE FileHandle;
-	LONG FileSize;		// 未使用	TODO 削除
 	LONG ByteCount;		// ファイルサイズ
 
 	DWORD StartTime;
@@ -209,7 +203,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 	info.HideDialog = ts.LogHideDialog ? TRUE : FALSE;
 	info.HMainWin = HVTWin;
 	FTDlg->Create(hInst, &info);
-	FTDlg->RefreshNum(0, fv->FileSize, fv->ByteCount);
+	FTDlg->RefreshNum(0, 0, fv->ByteCount);
 
 	fv->FLogDlg = FTDlg;
 
@@ -484,14 +478,6 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 		StartThread(fv);
 	}
 
-	if (fv->LogMode == TFileVar::LogModeTag::TEXT_MODE) {
-		cv.Log1Byte = FLogPutANSI;
-	}
-	else {
-		cv.Log1Bin = FLogPutBinary;
-		cv.LogBinSkip = FLogBinSkip;
-	}
-
 	return TRUE;
 }
 
@@ -749,7 +735,7 @@ static void LogToFile(PFileVar fv)
 	logfile_unlock(fv);
 
 	if (FLogIsPause() || ProtoGetProtoFlag()) return;
-	fv->FLogDlg->RefreshNum(fv->StartTime, fv->FileSize, fv->ByteCount);
+	fv->FLogDlg->RefreshNum(fv->StartTime, 0, fv->ByteCount);
 
 
 	// ログ・ローテート
@@ -760,9 +746,6 @@ static void FileTransEnd_(PFileVar fv)
 {
 	LogToFile(fv);
 	fv->LogMode = TFileVar::LogModeTag::NONE;
-	cv.Log1Byte = NULL;
-	cv.Log1Bin = NULL;
-	cv.LogBinSkip = NULL;
 	PFileTransDlg FLogDlg = fv->FLogDlg;
 	if (FLogDlg != NULL) {
 		FLogDlg->DestroyWindow();
@@ -1308,6 +1291,7 @@ static void OutputStr(PFileVar fv, const wchar_t *strW)
 
 /**
  *	ログに1文字書きこむ(text, unicode)
+ *	端末からのエコー用
  */
 void FLogPutUTF32(unsigned int u32)
 {
@@ -1315,6 +1299,10 @@ void FLogPutUTF32(unsigned int u32)
 		return;
 	}
 	PFileVar fv = LogVar;
+	if (fv == NULL) {
+		// ログを取っていない
+		return;
+	}
 	FLogPutUTF32_(fv, u32);
 }
 
@@ -1327,11 +1315,11 @@ void FLogPutANSI(BYTE b)
 	if (FLogIsPause()) {
 		return;
 	}
-	PFileVar fv = LogVar;
-	if (fv->LogMode != TFileVar::LogModeTag::TEXT_MODE) {
+	if (!FLogIsOpendText()) {
+		// テキストモードのログを取っていない
 		return;
 	}
-	Put1(fv, b);
+	Put1(LogVar, b);
 }
 
 /**
@@ -1340,8 +1328,11 @@ void FLogPutANSI(BYTE b)
  */
 void FLogPutBinary(BYTE b)
 {
-	PFileVar fv = LogVar;
-	Log1Bin(fv, b);
+	if (!FLogIsOpendBin()) {
+		// バイナリモードのログを取っていない
+		return;
+	}
+	Log1Bin(LogVar, b);
 }
 
 /**
@@ -1350,6 +1341,9 @@ void FLogPutBinary(BYTE b)
  */
 void FLogBinSkip(int add)
 {
-	PFileVar fv = LogVar;
-	LogBinSkip(fv, add);
+	if (!FLogIsOpendBin()) {
+		// バイナリモードのログを取っていない
+		return;
+	}
+	LogBinSkip(LogVar, add);
 }
