@@ -96,14 +96,14 @@ jobs:
             make -j $(nproc)
             make -j install
             bash make_installer_cmake.sh
-            cp *.zip /mnt/
+            cp *.zip* *.iso* /mnt/
           '
 
     - name: List built artifacts
       run: ls -la "${GITHUB_WORKSPACE}/output"
 
-    - name: Upload zip artifact
+    - name: Upload zip/iso artifact
       uses: actions/upload-artifact@v7
       with:
         name: ${{ steps.vars.outputs.OUTPUT }}
-        path: output/*.zip
+        path: output/*

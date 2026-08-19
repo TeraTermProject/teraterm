@@ -61,6 +61,13 @@ if(NOT DEFINED SETUP_ZIP)
     set(SETUP_ZIP "teraterm-${VERSION}-${ARCHITECTURE}-${REVISION_TIME_USER}.zip")
   endif()
 endif()
+if(NOT DEFINED SETUP_ISO)
+  if(RELEASE)
+    set(SETUP_ISO "teraterm-${VERSION}-${ARCHITECTURE}.iso")
+  else()
+    set(SETUP_ISO "teraterm-${VERSION}-${ARCHITECTURE}-${REVISION_TIME_USER}.iso")
+  endif()
+endif()
 
 # Inno Setup
 #  Create setup.exe
@@ -96,6 +103,22 @@ execute_process(
   COMMAND "${CMAKE_COMMAND}" -E tar cvf ${SETUP_ZIP} --format=zip ${CMAKE_INSTALL_PREFIX}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
+
+# iso
+#  ISO 内は zip と同一内容で、ツリーの中身を ISO ルート直下に展開する
+#  xorrisofs がない環境では作成しない
+find_program(XORRISOFS xorrisofs)
+if(XORRISOFS)
+  execute_process(
+    COMMAND ${XORRISOFS} -iso-level 3 -J -R -V TERATERM -o ${SETUP_ISO} ${CMAKE_INSTALL_PREFIX}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
+  file(SHA256 ${SETUP_EXE}.iso SHA_OUT)
+  file(WRITE "${CMAKE_BINARY_DIR}/${SETUP_EXE}.iso.sha256sum" "${SHA_OUT} ${SETUP_EXE}.iso")
+  file(SHA512 ${SETUP_EXE}.iso SHA_OUT)
+  file(WRITE "${CMAKE_BINARY_DIR}/${SETUP_EXE}.iso.sha512sum" "${SHA_OUT} ${SETUP_EXE}.iso")
+endif(XORRISOFS)
+
 file(RENAME ${CMAKE_INSTALL_PREFIX}/_TTXFixedWinSize.dll ${CMAKE_INSTALL_PREFIX}/TTXFixedWinSize.dll)
 file(RENAME ${CMAKE_INSTALL_PREFIX}/_TTXOutputBuffering.dll ${CMAKE_INSTALL_PREFIX}/TTXOutputBuffering.dll)
 file(RENAME ${CMAKE_INSTALL_PREFIX}/_TTXResizeWin.dll ${CMAKE_INSTALL_PREFIX}/TTXResizeWin.dll)
