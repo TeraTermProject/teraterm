@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>MACROの実行速度について</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>MACROの実行速度について</h1>
+
+<p>
+  マクロの受信待ちはメッセージ駆動で動作しており、
+  文字列を送信、応答を受信して判定、次の文字列を送信、といった動作は、
+  デフォルト設定のままで余分な待ち時間なしに行うことができます。
+</p>
+
+<p>
+  TERATERM.INIのMacroセクションのBoostTimeで、
+  マクロの実行速度と待機中のCPU負荷のバランスを調整することができます。
+  単位はmsです。
+</p>
+
+<p>
+  デフォルト(未設定)又は0を指定した場合、ウィンドウメッセージが来るまで待機します。
+  データを受信するとメッセージが発生するので、待ち時間なしですぐに処理されます。
+  メッセージが来ない場合は最大1ms待ってから状態を確認します。
+  この待ち時間はタイマ分解能により実際は最大15.6ms程度になることがあります。
+</p>
+
+<p>
+  1以上の値を設定した場合、最後に命令を実行してから指定時間の間は、
+  待ち時間なしの状態となります。この間はCPUを1コア占有します。
+  指定時間を過ぎるとメッセージ駆動の待機となります。
+  データを受信するとメッセージが発生するので、待ち時間なしですぐに処理されます。
+  メッセージが来ない場合は最大2ms待ってから状態を確認します。
+  この待ち時間はタイマ分解能により実際は最大15.6ms程度になることがあります。
+</p>
+
+500msに設定する場合
+<pre>
+[Macro]
+BoostTime=500
+</pre>
+
+<p>
+  BoostTimeを省略した場合は、0を指定した場合と同じです。
+</p>
+
+</body>
+</html>
