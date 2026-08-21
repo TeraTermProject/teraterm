@@ -102,8 +102,14 @@ jobs:
     - name: List built artifacts
       run: ls -la "${GITHUB_WORKSPACE}/output"
 
-    - name: Upload zip/iso artifact
+    - name: Upload zip artifact
       uses: actions/upload-artifact@v7
       with:
         name: ${{ steps.vars.outputs.OUTPUT }}
-        path: output/*
+        path: output/*.zip*
+
+    - name: Upload iso artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ steps.vars.outputs.OUTPUT }}-iso
+        path: output/*.iso*
