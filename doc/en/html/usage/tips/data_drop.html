@@ -9,7 +9,12 @@
 </HEAD>
 <BODY>
 
-<h1>Dropping sent and received data</h1>
+<ul>
+  <li><a href="#SendReceiveDrop">Dropping sent and received data</a></li>
+  <li><a href="#SerialSendLimit">Reducing drops during serial transmission</a></li>
+</ul>
+
+<h1 id="SendReceiveDrop">Dropping sent and received data</h1>
 
 Data sent or received may be lost for various reasons.<br>
 The locations where drops occur and the solutions are as follows:
@@ -130,6 +135,60 @@ TTY drive(Linux 2.6.26)   4KB  (<a href="../../reference/sourcecode.html#ttssh">
   <li>Others</li>
   If data errors occur, the problem may be resolved by using a higher quality cable or by moving the cable away from noise sources (power adapter, power cable, etc.).
 </ol>
+
+<h1 id="SerialSendLimit">Reducing drops during serial transmission</h1>
+
+<p>
+  For serial communication, limiting the send size passed to the API lowers
+  the transmission performance and tries to reduce data drops.
+</p>
+
+<p>
+  This can be adjusted by setting SerialSendLimit in the Tera Term section
+  of TERATERM.INI.
+</p>
+
+Default:
+<pre>
+[Tera Term]
+SerialSendLimit=0
+</pre>
+
+<p>
+  When the receiving side drops data while Tera Term sends a large amount
+  of data, setting this parameter may improve the symptom.<br>
+  It may also help in environments where the sending Windows machine
+  crashes (BSoD etc.).
+</p>
+
+<h2>File send throughput</h2>
+<p>
+  We measured how the speed changes with this parameter.<br>
+  (The speed and the effect will vary depending on the environment.
+  The values are for reference.)
+</p>
+<pre>
+SerialSendLimit   819200 bps     460800 bps     38400 bps
+==========================================================
+  0               77.14 KB/s     44.78 KB/s     3.76 KB/s
+  1                1.88 KB/s                    1.91 KB/s
+  2                3.74 KB/s                    3.51 KB/s
+  3                5.64 KB/s                    3.76 KB/s
+  4                7.50 KB/s                    3.76 KB/s
+  8               14.30 KB/s
+ 16               26.38 KB/s     25.52 KB/s
+ 32               47.33 KB/s     43.49 KB/s
+ 48               67.04 KB/s     44.76 KB/s
+ 64               74.96 KB/s
+128               76.86 KB/s
+256               77.05 KB/s
+512               77.14 KB/s
+
+Environment:
+        USB serial-cable  Controller         driver
+Send    Elecom UC-SGT     PL-2303 XA / HXA   Prolific 3.3.11.152
+Receive Elecom UC-SGT     PL-2303 TA         Elecom   3.4.62.294
+</pre>
 
 </BODY>
 </HTML>

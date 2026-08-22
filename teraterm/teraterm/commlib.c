@@ -106,6 +106,7 @@ static int CloseSocket(SOCKET s)
 #define CommOutQueSize (1024*4)
 #define CommXonLim 768
 #define CommXoffLim 3328
+static DWORD CommWriteLimit;	// WriteFile制限 0=制限しない/1～=送信バイト数制限
 
 #define WRITENAME "Write"
 #define READNAME "Read"
@@ -174,6 +175,11 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 
 	cv->DelayPerChar = ts->DelayPerChar;
 	cv->DelayPerLine = ts->DelayPerLine;
+	CommWriteLimit = ts->SerialSendLimit;
+	if ((int)ts->SerialSendLimit < 0) {
+		// intでマイナスは待ちなしとして扱う
+		CommWriteLimit = 0;
+	}
 
 	memset(&dcb,0,sizeof(DCB));
 	dcb.DCBlength = sizeof(DCB);
@@ -1042,6 +1048,11 @@ void CommSend(PComVar cv)
 		case IdSerial:
 			ClearCommError(cv->ComID,&DErr,&Stat);
 			Max = CommOutQueSize - Stat.cbOutQue;
+			if (CommWriteLimit != 0) {
+				if (Max > (int)CommWriteLimit) {
+					Max = (int)CommWriteLimit;
+				}
+			}
 			break;
 		case IdFile:
 			Max = cv->OutBuffCount;

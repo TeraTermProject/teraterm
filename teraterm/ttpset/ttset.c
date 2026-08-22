@@ -2048,6 +2048,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 		}
 	}
 
+	// シリアル送信制限(Read only)
+	ts->SerialSendLimit = GetPrivateProfileIntW(SectionW, L"SerialSendLimit", 0, FName);
+
 	// Experimental
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreeProprtySheet", FName, FALSE);
 	ts->ExperimentalTreePropertySheetEnable = GetOnOff("Experimental", "TreePropertySheet", FName, ts->ExperimentalTreePropertySheetEnable);
