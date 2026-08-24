@@ -161,11 +161,11 @@ static void env_destry(sh_env_t *envp)
 
 sh_env_t *create_sh_env(void)
 {
-	sh_env_t *sh_env = (sh_env_t *)calloc(sizeof(*sh_env), 1);
+	sh_env_t *sh_env = (sh_env_t *)calloc(1, sizeof(*sh_env));
 	if (sh_env == NULL) {
 		return NULL;
 	}
-	sh_env_private_t *pr_data = (sh_env_private_t *)calloc(sizeof(*pr_data), 1);
+	sh_env_private_t *pr_data = (sh_env_private_t *)calloc(1, sizeof(*pr_data));
 	if (pr_data == NULL) {
 		free(sh_env);
 		return NULL;
@@ -377,11 +377,11 @@ static void dump(cfg_data_t *cfg_data, void (*print)(const char* msg, ...))
 
 cfg_data_t *create_cfg(void)
 {
-	cfg_data_t *cfg_data = (cfg_data_t *)calloc(sizeof(*cfg_data), 1);
+	cfg_data_t *cfg_data = (cfg_data_t *)calloc(1, sizeof(*cfg_data));
 	if (cfg_data == NULL) {
 		return NULL;
 	}
-	cfg_private_data_t *pr_data = (cfg_private_data_t *)calloc(sizeof(*pr_data), 1);
+	cfg_private_data_t *pr_data = (cfg_private_data_t *)calloc(1, sizeof(*pr_data));
 	if (pr_data == NULL) {
 		free(cfg_data);
 		return NULL;
