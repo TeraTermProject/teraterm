@@ -1575,6 +1575,7 @@ void GetMessageboxFontW(LOGFONTW *logfont)
 	nci.cbSize = st_size;
 	r = SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
 	assert(r == TRUE);
+	(void)r;
 	*logfont = nci.lfStatusFont;
 }
 
