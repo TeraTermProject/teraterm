@@ -9,11 +9,6 @@
 </HEAD>
 <BODY>
 
-<ul>
-  <li><a href="#SendReceiveDrop">‘—ŽóMƒf[ƒ^‚Ìƒhƒƒbƒv</a></li>
-  <li><a href="#SerialSendLimit">ƒVƒŠƒAƒ‹‘—MŽž‚ÌƒhƒƒbƒvŒyŒ¸</a></li>
-</ul>
-
 <h1 id="SendReceiveDrop">‘—ŽóMƒf[ƒ^‚Ìƒhƒƒbƒv</h1>
 
 ‚¢‚­‚Â‚©‚Ì——R‚É‚æ‚è‘—ŽóMƒf[ƒ^‚ªƒhƒƒbƒv‚·‚é‚±‚Æ‚ª‚ ‚è‚Ü‚·B<br>
@@ -52,7 +47,11 @@ Tera Term ---> Tera Term“à  ---> OS,driver  ---> (sshd,telnet,pipe) ---> UARTƒ`ƒ
     OS(ƒhƒ‰ƒCƒo)AUART ƒ`ƒbƒv‚ÌŽóMƒoƒbƒtƒ@‚ªƒI[ƒo[ƒtƒ[‚µ‚Äƒhƒƒbƒv‚µ‚Ü‚·B<br>
     ƒtƒ[§Œä“™‚Í OS(ƒhƒ‰ƒCƒo)‚ªs‚¤‚© program ‚ªs‚¤‚©‚ÍŽÀ‘•‚É‚æ‚è‚Ü‚·B<br>
     TCP/IP ‚Å‚Íƒtƒ[§ŒäAƒGƒ‰[Žž‚ÌÄ‘—‚ªs‚í‚êA‘½‚­‚Ìê‡ OS “à‚ÌƒvƒƒgƒRƒ‹ƒXƒ^ƒbƒN‚ª‚±‚ê‚ç‚Ìˆ—‚ðs‚¢‚Ü‚·B<br>
-    ƒVƒŠƒAƒ‹‚Å‚Íƒtƒ[§Œä‚Ì—L–³‚Íƒ†[ƒU[‚ªŒˆ‚ß‚é‚±‚Æ‚ª‚Å‚«AƒI[ƒo[ƒtƒ[“™ƒGƒ‰[Žž‚ÌÄ‘—‚ÍŽ©“®‚Ås‚í‚ê‚Ü‚¹‚ñB
+    ƒVƒŠƒAƒ‹‚Å‚Íƒtƒ[§Œä‚Ì—L–³‚Íƒ†[ƒU[‚ªŒˆ‚ß‚é‚±‚Æ‚ª‚Å‚«AƒI[ƒo[ƒtƒ[“™ƒGƒ‰[Žž‚ÌÄ‘—‚ÍŽ©“®‚Ås‚í‚ê‚Ü‚¹‚ñB<br>
+    ƒVƒŠƒAƒ‹’ÊM‚ÅŽóM‘¤ƒfƒoƒCƒX‚ª’á‘¬‚ÈŽžATera Term‚Ì‘—MƒpƒtƒH[ƒ}ƒ“ƒX‚ð—Ž‚Æ‚·
+    (<a href="../../menu/setup-additional-serialport.html#Delay">‘—M’x‰„</a>,
+    <a href="../../setup/teraterm-com.html#SerialSendLimit">‘—MƒTƒCƒY§ŒÀ</a>)
+    ‚±‚Æ‚Å‰ü‘P‚Å‚«‚é‰Â”\«‚ª‚ ‚è‚Ü‚·B
   </dd>
   <dt>program</dt>
   <dd>
@@ -133,60 +132,6 @@ TTY drive(Linux 2.6.26)   4KB  (<a href="../../reference/sourcecode.html#ttssh">
   <li>‚»‚Ì‘¼</li>
   ƒf[ƒ^ƒGƒ‰[‚ª”­¶‚·‚éê‡‚ÍA‚•iŽ¿‚ÈƒP[ƒuƒ‹‚ðŽg—p‚µ‚½‚èAƒmƒCƒY”­¶Œ¹(“dŒ¹ƒAƒ_ƒvƒ^A“dŒ¹ƒP[ƒuƒ‹“™)‚©‚çƒP[ƒuƒ‹‚ð—£‚·‚±‚Æ‚Å‰ü‘P‚³‚ê‚éê‡‚ª‚ ‚è‚Ü‚·B
 </ol>
-
-<h1 id="SerialSendLimit">ƒVƒŠƒAƒ‹‘—MŽž‚ÌƒhƒƒbƒvŒyŒ¸</h1>
-
-<p>
-  ƒVƒŠƒAƒ‹’ÊMŽžAAPI‚É“n‚·‘—MƒTƒCƒY‚ð§ŒÀ‚·‚é‚±‚Æ‚ÅA‘—MƒpƒtƒH[ƒ}ƒ“ƒX‚ð‰º‚°A
-  ƒf[ƒ^ƒhƒƒbƒv‚ÌŒyŒ¸‚ðŽŽ‚Ý‚Ü‚·B
-</p>
-
-<p>
-  TERATERM.INI ‚Ì Tera Term ƒZƒNƒVƒ‡ƒ“
-  SerialSendLimit ‚É’l‚ðÝ’è‚·‚é‚±‚Æ‚Å’²®‚Å‚«‚Ü‚·B
-</p>
-
-Default:
-<pre>
-[Tera Term]
-SerialSendLimit=0
-</pre>
-
-<p>
-  Tera Term‚©‚ç‘å—Ê‚É‘—M‚µ‚½‚Æ‚«AŽóM‘¤‚ªŽóMƒf[ƒ^‚ðƒhƒƒbƒv‚·‚éê‡
-  ƒpƒ‰ƒ[ƒ^‚ÌÝ’è‚ÅÇó‚ª‰ü‘P‚·‚é‰Â”\«‚ª‚ ‚è‚Ü‚·B<br>
-  ‘—M‚µ‚Ä‚¢‚éWindows‚ªBSoD“™‚Å—Ž‚¿‚éŠÂ‹«‚Ìê‡‚É‚à—LŒø‚È‰Â”\«‚ª‚ ‚è‚Ü‚·B
-</p>
-
-<h2>ƒtƒ@ƒCƒ‹‘—M‚ÌƒXƒ‹[ƒvƒbƒg</h2>
-<p>
-  ƒpƒ‰ƒ[ƒ^‚ðÝ’è‚µ‚Ä‚Ç‚ê‚®‚ç‚¢‘¬“x‚ª•Ï‰»‚·‚é‚©Œv‘ª‚µ‚Ü‚µ‚½B<br>
-  (‘¬“x‚âŒø‰Ê‚ÍŠÂ‹«‚É‚æ‚Á‚ÄˆÙ‚È‚é‚ÆŽv‚í‚ê‚Ü‚·B’l‚ÍŽQl’l‚Å‚·B)
-</p>
-<pre>
-SerialSendLimit   819200 bps     460800 bps     38400 bps
-==========================================================
-  0               77.14 KB/s     44.78 KB/s     3.76 KB/s
-----------------------------------------------------------
-  1                1.88 KB/s                    1.91 KB/s
-  2                3.74 KB/s                    3.51 KB/s
-  3                5.64 KB/s                    3.76 KB/s
-  4                7.50 KB/s                    3.76 KB/s
-  8               14.30 KB/s
- 16               26.38 KB/s     25.52 KB/s
- 32               47.33 KB/s     43.49 KB/s
- 48               67.04 KB/s     44.76 KB/s
- 64               74.96 KB/s
-128               76.86 KB/s
-256               77.05 KB/s
-512               77.14 KB/s
-----------------------------------------------------------
-
-Environment:
-        USB serial-cable  Controller         driver
-Send    Elecom UC-SGT     PL-2303 XA / HXA   Prolific 3.3.11.152
-Receive Elecom UC-SGT     PL-2303 TA         Elecom   3.4.62.294
-</pre>
 
 </BODY>
 </HTML>
