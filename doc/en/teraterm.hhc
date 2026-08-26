@@ -2075,6 +2075,11 @@
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="MACRO execution speed">
+				<param name="Local" value="html\macro\appendixes\speed.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Oniguruma Regular Expressions">
 				<param name="Local" value="html\reference\RE.txt">
 				<param name="ImageNumber" value="11">
