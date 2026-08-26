@@ -890,6 +890,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 						UpdateSetupTerminalNewlineCode(ts.CRSend);
 						pVTWin->SetupTerm();
 					}
+					return FALSE;
 
 				case IDC_SUBMITKEY_TYPE:
 					SubmitKeyType = GetCurSel(hDlgWnd, IDC_SUBMITKEY_TYPE);

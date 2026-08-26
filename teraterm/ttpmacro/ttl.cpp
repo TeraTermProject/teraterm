@@ -980,7 +980,7 @@ static WORD TTLDispStr(void)
 					Str[0] = LOBYTE(Val);
 					Str[1] = 0;
 					strncat_s(buff, MaxStrLen, Str, _TRUNCATE);
-					/* Falls through. */
+					break;
 				case TypString:
 					strncat_s(buff, MaxStrLen, StrVarPtr((TVarId)Val), _TRUNCATE);
 					break;

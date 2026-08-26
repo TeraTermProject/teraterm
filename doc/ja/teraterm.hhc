@@ -20,7 +20,7 @@
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="まえがき ">
+			<param name="Name" value="まえがき">
 			<param name="Local" value="html\about\foreword.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
@@ -50,14 +50,14 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="動作環境 ">
+			<param name="Name" value="動作環境">
 			<param name="Local" value="html\about\requirements.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="エミュレーション ">
+			<param name="Name" value="エミュレーション">
 			<param name="Local" value="html\about\emulations.html">
-			<param name="ImageNumber" value="11">
+			<param name="ImageNumber" value="1">
 			</OBJECT>
 		<UL>
 			<LI><OBJECT type="text/sitemap">
@@ -69,7 +69,7 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="対応制御シーケンス">
 			<param name="Local" value="html\about\ctrlseq.html">
-			<param name="ImageNumber" value="11">
+			<param name="ImageNumber" value="1">
 			</OBJECT>
 		<UL>
 			<LI><OBJECT type="text/sitemap">
@@ -79,27 +79,27 @@
 				</OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Q &amp; A ">
+			<param name="Name" value="Q &amp; A">
 			<param name="Local" value="html\about\qanda.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="要望集 ">
+			<param name="Name" value="要望集">
 			<param name="Local" value="html\about\requests.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="作者への連絡 ">
+			<param name="Name" value="作者への連絡">
 			<param name="Local" value="html\about\contacts.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="用語集 ">
+			<param name="Name" value="用語集">
 			<param name="Local" value="html\about\glossary.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="執筆者一覧 ">
+			<param name="Name" value="執筆者一覧">
 			<param name="Local" value="html\about\writer.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
@@ -114,7 +114,7 @@
 			<param name="Name" value="キーボード">
 			<param name="Local" value="html\usage\keyboard.html">
 			<param name="ImageNumber" value="11">
-		    </OBJECT>
+			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="マウス">
 			<param name="Local" value="html\usage\mouse.html">
@@ -342,11 +342,13 @@
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Transfer">
+				<param name="Local" value="html\menu\file-transfer.html">
 				<param name="ImageNumber" value="1">
 				</OBJECT>
 			<UL>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Kermit">
+					<param name="Local" value="html\menu\file-transfer-kermit.html">
 					<param name="ImageNumber" value="1">
 					</OBJECT>
 				<UL>
@@ -363,6 +365,7 @@
 				</UL>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="XMODEM">
+					<param name="Local" value="html\menu\file-transfer-xmodem.html">
 					<param name="ImageNumber" value="1">
 					</OBJECT>
 				<UL>
@@ -378,7 +381,13 @@
 						</OBJECT>
 				</UL>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="YMODEM">
+					<param name="Local" value="html\menu\file-transfer-ymodem.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="ZMODEM">
+					<param name="Local" value="html\menu\file-transfer-zmodem.html">
 					<param name="ImageNumber" value="1">
 					</OBJECT>
 				<UL>
@@ -390,6 +399,7 @@
 				</UL>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="B-Plus">
+					<param name="Local" value="html\menu\file-transfer-bplus.html">
 					<param name="ImageNumber" value="1">
 					</OBJECT>
 				<UL>
@@ -401,6 +411,7 @@
 				</UL>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Quick-VAN">
+					<param name="Local" value="html\menu\file-transfer-qv.html">
 					<param name="ImageNumber" value="1">
 					</OBJECT>
 				<UL>
@@ -501,7 +512,7 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Additional settings">
 				<param name="Local" value="html\menu\setup-additional.html">
-				<param name="ImageNumber" value="11">
+				<param name="ImageNumber" value="1">
 				</OBJECT>
 			<UL>
 				<LI> <OBJECT type="text/sitemap">
@@ -552,7 +563,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Theme タブ">
 					<param name="Local" value="html\menu\setup-additional-theme.html">
-					<param name="ImageNumber" value="11">
+					<param name="ImageNumber" value="1">
 					</OBJECT>
 				<UL>
 					<LI> <OBJECT type="text/sitemap">
@@ -574,7 +585,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="TCP/IP タブ">
 					<param name="Local" value="html\menu\setup-additional-tcpip.html">
-					<param name="ImageNumber" value="11">
+					<param name="ImageNumber" value="1">
 					</OBJECT>
 				<UL>
 					<LI> <OBJECT type="text/sitemap">
@@ -589,13 +600,13 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="Window タブ">
-					<param name="Local" value="html\menu\setup-additional-window.html">
+					<param name="Name" value="シリアルポート タブ">
+					<param name="Local" value="html\menu\setup-additional-serialport.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="シリアルポート タブ">
-					<param name="Local" value="html\menu\setup-additional-serialport.html">
+					<param name="Name" value="Window タブ">
+					<param name="Local" value="html\menu\setup-additional-window.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -724,8 +735,15 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="[Window] メニュー">
 			<param name="Local" value="html\menutek\window.html">
-			<param name="ImageNumber" value="11">
+			<param name="ImageNumber" value="1">
 			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Window">
+				<param name="Local" value="html\menutek\window-window.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="[Help] メニュー">
 			<param name="Local" value="html\menutek\help.html">
@@ -782,52 +800,57 @@
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Tera Term 設定ファイル">
-			<param name="Local" value="html\setup\teraterm.html">
+			<param name="Name" value="Tera Term が使用するフォルダ">
+			<param name="Local" value="html\setup\folder.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
-			<UL>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="ターミナルエミュレーション">
-					<param name="Local" value="html\setup\teraterm-term.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="ウィンドウ">
-					<param name="Local" value="html\setup\teraterm-win.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="通信">
-					<param name="Local" value="html\setup\teraterm-com.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="ファイル転送">
-					<param name="Local" value="html\setup\teraterm-trans.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="印刷">
-					<param name="Local" value="html\setup\teraterm-prn.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="その他">
-					<param name="Local" value="html\setup\teraterm-misc.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="TTSSH">
-					<param name="Local" value="html\setup\teraterm-ssh.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="設定ファイルの全項目一覧">
-					<param name="Local" value="html\setup\teraterm-ini.html">
-					<param name="ImageNumber" value="11">
-					</OBJECT>
-			</UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Tera Term 設定ファイル">
+			<param name="Local" value="html\setup\teraterm.html">
+			<param name="ImageNumber" value="1">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="設定ファイルの全項目一覧">
+				<param name="Local" value="html\setup\teraterm-ini.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="ターミナルエミュレーション">
+				<param name="Local" value="html\setup\teraterm-term.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="ウィンドウ">
+				<param name="Local" value="html\setup\teraterm-win.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="通信">
+				<param name="Local" value="html\setup\teraterm-com.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="ファイル転送">
+				<param name="Local" value="html\setup\teraterm-trans.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="印刷">
+				<param name="Local" value="html\setup\teraterm-prn.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="その他">
+				<param name="Local" value="html\setup\teraterm-misc.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="TTSSH">
+				<param name="Local" value="html\setup\teraterm-ssh.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="キーボード設定ファイル概要">
 			<param name="Local" value="html\setup\keyboard.html">
@@ -899,30 +922,37 @@
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="CMakeビルドシステムを使用したビルド(experimental)">
-			<param name="ImageNumber" value="11">
+			<param name="ImageNumber" value="1">
 			</OBJECT>
 		<UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="ライブラリのビルド">
 				<param name="Local" value="html\reference\build_library_with_cmake.html">
 				<param name="ImageNumber" value="11">
-			  </OBJECT>
+				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Tera Termのビルド">
 				<param name="Local" value="html\reference\build_with_cmake.html">
 				<param name="ImageNumber" value="11">
-			  </OBJECT>
+				</OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="ソースコード解説">
 			<param name="Local" value="html\reference\sourcecode.html">
-			<param name="ImageNumber" value="11">
+			<param name="ImageNumber" value="1">
 			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Win32 API に関するメモ">
-			<param name="Local" value="html\reference\dev\win32api.html">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Win32 API に関するメモ">
+				<param name="Local" value="html\reference\dev\win32api.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="内部構造">
+				<param name="Local" value="html\reference\dev\unicode.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+		</UL>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="MACRO ヘルプ">
@@ -1162,6 +1192,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="quickvansend">
 					<param name="Local" value="html\macro\command\quickvansend.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="recvfile">
+					<param name="Local" value="html\macro\command\recvfile.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">

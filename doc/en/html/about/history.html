@@ -134,6 +134,10 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1459" target="_blank">issue #1459</a>)
       </li>
       <li>
+        Fixed an issue where ttpmacro.exe crashed when an integer was passed to the "<a href="../macro/command/dispstr.html">dispstr</a>" macro command.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1485" target="_blank">issue #1485</a>)
+      </li>
+      <li>
         Fixed an issue where macro response could be delayed by a wait in the receive polling loop.
         This bug was introduced in version 4.103.
         See <a href="../macro/appendixes/speed.html">MACRO execution speed</a>.
@@ -6862,7 +6866,6 @@ SYNOPSIS:
   <li>Fixed an issue when Tera Term is not connected to host, an application fault occurs.</li>
 </ul>
 
-<h2 id="resizemenu">TTXResizeMenu</h2>
 <h3 id="resizemenu_1.06">2019.12.7 (Ver 1.06)</h3>
 <ul class="history">
   <li>Fixed the access key for the 16th and subsequent entries in the menu.</li>
