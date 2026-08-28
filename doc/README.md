@@ -34,3 +34,7 @@
       - cygwinのperl時
         - perl-XML-Parser
     - `linkchecker.bat`を実行する
+- linkchecker_lychee.bat
+    - [lychee](https://github.com/lycheeverse/lychee/)を使ったリンクチェック
+- linkchecker_md.bat
+    - lycheeを使ったMarkdownドキュメントのチェック
