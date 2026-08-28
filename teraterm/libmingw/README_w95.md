@@ -18,7 +18,7 @@
 - CランタイムDLLのバージョンを吸収するためのwrapperを作成
   - msvcrt_wrapper.c を作成
 - Windows System Libraries (WSL) を参照
-  - https://ja.osdn.net/projects/mingw/releases/
+  - https://sourceforge.net/p/mingw/news/
 
 ### 未解決シンボルの追加について
 
@@ -156,7 +156,7 @@ make -j zip
 
 create_locale()がうまく解決できないため今のところ使えない
 
-- [MinGW-W64](http://mingw-w64.org/doku.php/download/mingw-builds)
+- [MinGW-W64](https://www.mingw-w64.org/downloads/#mingw-w64-builds)
 - Version 8.1.0
 - Architecture i686
 - Thread win32

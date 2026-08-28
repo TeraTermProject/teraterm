@@ -21,8 +21,8 @@
 
 ## TTXChangeFontSize
 
-- [ReadMe.txt](TTXChangeFontSize/TTXChangeFontSize/ReadMe.txt)
-- [ReadMe-ja.txt](TTXChangeFontSize/TTXChangeFontSize/ReadMe-ja.txt)
+- [ReadMe.txt](TTXChangeFontSize/ReadMe.txt)
+- [ReadMe-ja.txt](TTXChangeFontSize/ReadMe-ja.txt)
 
 ## TTXCheckUpdate
 
