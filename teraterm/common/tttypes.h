@@ -617,10 +617,12 @@ struct tttset {
 	BYTE UnicodeOverrideCharWidthSelected;	// 0...
 	int BroadcastSubmitKey;
 	wchar_t *LogTimestampFormatW;
+	DWORD SerialSendLimit;				// シリアル送信制限(0=制限しない/1～=送信バイト数)
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;
 };
+
 
 typedef struct tttset TTTSet, *PTTSet;
 
