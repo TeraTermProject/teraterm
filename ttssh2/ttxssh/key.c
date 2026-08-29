@@ -468,7 +468,7 @@ static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int s
 	buffer_t *b = NULL;
 	char *ktype = NULL;
 	unsigned char *sigblob = NULL, *sm = NULL, *m = NULL;
-	unsigned int len;
+	size_t len;
 	unsigned long long smlen, mlen;
 	int rlen, ret, r = SSH_ERR_INTERNAL_ERROR;
 
@@ -1354,7 +1354,7 @@ Key *key_from_blob(char *data, int blen)
 {
 	buffer_t *b = NULL;
 	char *ktype = NULL;
-	int len;
+	size_t len;
 	RSA *rsa = NULL;
 	DSA *dsa = NULL;
 	EC_KEY *ecdsa = NULL;
@@ -1980,7 +1980,7 @@ Key *key_private_deserialize(buffer_t *blob)
 	int success = 0;
 	char *type_name = NULL;
 	Key *k = NULL;
-	unsigned int pklen, sklen;
+	size_t pklen, sklen;
 	int type;
 	BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
 	BIGNUM *g, *pub_key, *priv_key;
@@ -2494,7 +2494,6 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 	buffer_t *bsig = NULL;
 	char *cp, *sig;
 	size_t i, ndone, siglen;
-	int siglen_i;
 	int ret;
 
 	data = pvar->ssh_state.payload;
@@ -2549,11 +2548,10 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 		free(blob);
 		blob = NULL;
 
-		if (buffer_get_string(bsig, &sig, &siglen_i) != 0) {
+		if (buffer_get_string(bsig, &sig, &siglen) != 0) {
 			logprintf(LOG_LEVEL_FATAL, "buffer put error");
 			goto error;
 		}
-		siglen = siglen_i;
 		// 手抜き。hostkey algorithm を使うのは RSA の時のみなので、
 		// とりあえず KEY_ALGO_RSA を指定しておく。
 		ret = key_verify(ctx->keys[i], sig, siglen, buffer_ptr(b), buffer_len(b), KEY_ALGO_RSA);
@@ -2593,10 +2591,11 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 {
 	int success = 1;  // OpenSSH 6.8の実装では、常に成功で返すようになっているため、
 	                  // それに合わせて Tera Term でも成功と返すことにする。
-	int len;
+	size_t len;
 	size_t i;
 	char *cp, *fp;
 	unsigned char *blob = NULL;
+	int bloblen;
 	buffer_t *b = NULL;
 	struct hostkeys_update_ctx *ctx = NULL;
 	Key *key = NULL, **tmp;
@@ -2628,9 +2627,9 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 			logprintf(LOG_LEVEL_FATAL, "buffer put error");
 			goto error;
 		}
-		key = key_from_blob(blob, len);
+		key = key_from_blob(blob, (int)len);
 		if (key == NULL) {
-			logprintf(LOG_LEVEL_ERROR, "Not found host key into blob %p (%d)", blob, len);
+			logprintf(LOG_LEVEL_ERROR, "Not found host key into blob %p (%d)", blob, (int)len);
 			goto error;
 		}
 		free(blob);
@@ -2710,8 +2709,8 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		for (i = 0; i < ctx->nkeys; i++) {
 			if (ctx->keys_seen[i])
 				continue;
-			if (key_to_blob(ctx->keys[i], (char **)&blob, &len)  != 0 ||
-			    buffer_put_string(b, blob, len) != 0) {
+			if (key_to_blob(ctx->keys[i], (char **)&blob, &bloblen)  != 0 ||
+			    buffer_put_string(b, blob, bloblen) != 0) {
 				logprintf(LOG_LEVEL_FATAL, "buffer put error");
 				goto error;
 			}
@@ -2720,7 +2719,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		}
 
 		len = buffer_len(b);
-		outmsg = begin_send_packet(pvar, SSH2_MSG_GLOBAL_REQUEST, len);
+		outmsg = begin_send_packet(pvar, SSH2_MSG_GLOBAL_REQUEST, (int)len);
 		memcpy(outmsg, buffer_ptr(b), len);
 		finish_send_packet(pvar);
 
