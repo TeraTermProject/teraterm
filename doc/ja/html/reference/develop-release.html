@@ -31,6 +31,10 @@ TeraTerm Project でのリリース手順について以下に示します。
     <ul>
       <li>プロジェクトチーム内で確認する
         <ul>
+          <li>
+            管理用の issue を作成する。<br>
+            例: <a href="https://github.com/TeraTermProject/teraterm/issues/1478">#1478</a>
+          </li>
           <li>今回のリリースに入れるもの・次回以降に延期するものを整理・決定する</li>
         </ul>
       </li>
@@ -42,10 +46,8 @@ TeraTerm Project でのリリース手順について以下に示します。
       </li>
       <li>issue をクローズする
         <ul>
-          <li>すでに修正済み、処理済みのものはクローズする<br>
-              リリース時には、対象のマイルストーンのチケットはすべてクローズされている状態になる</li>
-          <li>次のリリースへ回すものはマイルストーンを変更する<br>
-              次のリリース用マイルストーンを作成する</li>
+          <li>すでに修正済み、処理済みのものはクローズする</li>
+          <li>次のリリースへ回すものはマイルストーンを変更する</li>
         </ul>
       </li>
       <li>この時点で新たに出てくるチケットの対応を検討する</li>
@@ -467,6 +469,12 @@ git checkout -b port/changelog
           ここに含まれている issue を「次のリリース」の Milestone に移動する。</li>
     </ul>
     安定版リリースのマイルストーンは作成しません。
+  </li>
+  <li>次の安定版リリースのための、安定版ブランチへのマージ管理用の issue を作成する
+    <p>
+      Needs MFC の issue はこの issue で管理する。<br>
+      例: <a href="https://github.com/TeraTermProject/teraterm/issues/1436">#1436</a>
+    </p>
   </li>
   <li>インストーラバイナリのダウンロードに関する確認をする
     <div>
