@@ -58,6 +58,10 @@ static BOOL PrintAbortFlag = FALSE;
 
 static UINT_PTR CALLBACK PrintHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
+	if (uiMsg == WM_INITDIALOG) {
+		// TRUEを返すとデフォルトのコントロールにフォーカスが設定される
+		return TRUE;
+	}
 	(void)hdlg;
 	(void)uiMsg;
 	(void)wParam;
