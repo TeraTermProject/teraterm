@@ -7,4 +7,4 @@
 
 - https://jrsoftware.org/isinfo.php
 
-buildtools/innosetup6/ISCC.exe を使ってインストーラーを作成します。
+buildtools/innosetup7/ISCC.exe を使ってインストーラーを作成します。

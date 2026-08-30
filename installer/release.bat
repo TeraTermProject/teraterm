@@ -394,7 +394,7 @@ echo INNO_SETUP=%INNO_SETUP%
 goto search_iscc_not_found
 
 :search_iscc_1
-set INNO_SETUP=%CUR%..\buildtools\innosetup6\ISCC.exe
+set INNO_SETUP=%CUR%..\buildtools\innosetup7\ISCC.exe
 if exist %INNO_SETUP% exit /b 0
 set INNO_SETUP="C:\Program Files (x86)\Inno Setup 6\iscc.exe"
 if exist %INNO_SETUP% exit /b 0
