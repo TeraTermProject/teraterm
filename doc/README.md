@@ -35,6 +35,12 @@
         - perl-XML-Parser
     - `linkchecker.bat`を実行する
 - linkchecker_lychee.bat
+    - `linkchecker_lychee.cmake`を実行する
+- linkchecker_lychee.cmake
     - [lychee](https://github.com/lycheeverse/lychee/)を使ったリンクチェック
+    - htmlをUTF-8に変換してからチェックする
+    - 次のパッケージを事前にインストールしておく
+      - cygwinのlibiconv (iconv)
+        - `..\buildtools\install_cygwin.bat`でインストールされる
 - linkchecker_md.bat
     - lycheeを使ったMarkdownドキュメントのチェック
