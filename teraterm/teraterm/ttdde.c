@@ -614,11 +614,17 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		if (LoadTTSET()) {
 			char *tmp_u8;
 			wchar_t *commandline;
+			wchar_t *prev_setup = _wcsdup(ts.SetupFNameW);
 			asprintf(&tmp_u8, "a %s", ParamFileName); // "a" = dummy exe name
 			commandline = ToWcharU8(tmp_u8);
 			(*ParseParam)(commandline, &ts, NULL);
 			free(commandline);
 			free(tmp_u8);
+			if (prev_setup != NULL && _wcsicmp(prev_setup, ts.SetupFNameW) != 0) {
+				/* /F= で設定ファイルが変更された。読み直して表示へ再適用する */
+				PostMessage(HVTWin, WM_USER_ACCELCOMMAND, IdCmdRestoreSetup, 0);
+			}
+			free(prev_setup);
 		}
 		FreeTTSET();
 		cv.NoMsg = 1; /* suppress error messages */
