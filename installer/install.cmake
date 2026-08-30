@@ -6,7 +6,9 @@ message(CMAKE_HOST_SYSTEM_NAME=${CMAKE_HOST_SYSTEM_NAME})
 if(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
   find_program(
     ISCC ISCC.exe
-    HINTS "${CMAKE_SOURCE_DIR}/../buildtools/innosetup6"
+    HINTS "${CMAKE_SOURCE_DIR}/../buildtools/innosetup7"
+    HINTS "C:/Program Files/Inno Setup 7/"
+    HINTS "$ENV{LOCALAPPDATA}/Programs/Inno Setup 7"
     HINTS "C:/Program Files (x86)/Inno Setup 6/"
     HINTS "C:/Program Files/Inno Setup 6/"
     HINTS "$ENV{LOCALAPPDATA}/Programs/Inno Setup 6"

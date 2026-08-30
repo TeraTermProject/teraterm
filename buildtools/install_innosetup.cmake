@@ -5,12 +5,12 @@ else()
   option(REMOVE_TMP "" OFF)
 endif()
 
-# innosetup 6.7.2
-set(INNOSETUP_EXE "innosetup-6.7.2.exe")
-set(INNOSETUP_URL "https://github.com/jrsoftware/issrc/releases/download/is-6_7_2/${INNOSETUP_EXE}")
-set(INNOSETUP_HASH "9f27f8386e554eb093336a1ca5c2dcacb7dbf04ab020889491d7ac53c38a12ff")
-set(INNOSETUP_CHECK_FILE innosetup6/ISCC.exe)
-set(INNOSETUP_CHECK_HASH "bb8d5f6cfaddc1446d1db2b900b056b8393faaeaf987bdfe25a2905702d2c9c6")
+# innosetup 7.1.0
+set(INNOSETUP_EXE "innosetup-7.1.0-x64.exe")
+set(INNOSETUP_URL "https://github.com/jrsoftware/issrc/releases/download/is-7_1_0/${INNOSETUP_EXE}")
+set(INNOSETUP_HASH "0362a383ed217d4c4239b5933866dd96d3eb2102737da92f80f6057a4b40df2f")
+set(INNOSETUP_CHECK_FILE innosetup7/ISCC.exe)
+set(INNOSETUP_CHECK_HASH "d06ebd38f38e3cee60a3c50cc45bd449d77e0bc6a5cabc607ea9886808e4de1a")
 
 # check innosetup
 if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${INNOSETUP_CHECK_FILE})
@@ -25,23 +25,23 @@ endif()
 
 # download
 message("download ${INNOSETUP_EXE} from ${INNOSETUP_URL}")
-file(MAKE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/download/innosetup6")
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/download/innosetup7")
 file(DOWNLOAD
   ${INNOSETUP_URL}
-  ${CMAKE_CURRENT_LIST_DIR}/download/innosetup6/${INNOSETUP_EXE}
+  ${CMAKE_CURRENT_LIST_DIR}/download/innosetup7/${INNOSETUP_EXE}
   EXPECTED_HASH SHA256=${INNOSETUP_HASH}
   SHOW_PROGRESS
   )
 
 # setup
-if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/innosetup6")
-  file(REMOVE_RECURSE "${CMAKE_CURRENT_LIST_DIR}/innosetup6")
+if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/innosetup7")
+  file(REMOVE_RECURSE "${CMAKE_CURRENT_LIST_DIR}/innosetup7")
 endif()
-file(MAKE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/innosetup6")
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/innosetup7")
 execute_process(
-  COMMAND ${CMAKE_CURRENT_LIST_DIR}/download/innosetup6/${INNOSETUP_EXE} /dir=. /CURRENTUSER /PORTABLE=1 /VERYSILENT
-  WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/innosetup6"
+  COMMAND ${CMAKE_CURRENT_LIST_DIR}/download/innosetup7/${INNOSETUP_EXE} /dir=. /CURRENTUSER /PORTABLE=1 /VERYSILENT
+  WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/innosetup7"
   )
 if(REMOVE_TMP)
-  file(REMOVE_RECURSE "${CMAKE_CURRENT_LIST_DIR}/download/innosetup6")
+  file(REMOVE_RECURSE "${CMAKE_CURRENT_LIST_DIR}/download/innosetup7")
 endif()
