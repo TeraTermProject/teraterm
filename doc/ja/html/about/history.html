@@ -38,13 +38,13 @@
   <li>変更
     <ul>
       <li>
-        <a href="../menu/control-broadcast.html">ブロードキャストコマンドダイアログ</a>に、非リアルタイムモードでコマンド送信に使用するキー操作を選択できる Submit key オプションを追加した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1158" target="_blank">issue #1158</a>)<br>
-        <a href="../menu/control-broadcast.html">ブロードキャストコマンドダイアログ</a>のサイズが大きくなったため、初期サイズより小さくできるよう変更した。
+        <a href="../setup/teraterm-com.html#SerialSendLimit">シリアル送信時の送信サイズ制限</a>を実装した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1000" target="_blank">issue #1000</a>)
       </li>
       <li>
-        <a href="../menu/control-broadcast.html">ブロードキャストコマンドダイアログ</a>が DPI 設定の異なるディスプレイ間を移動しても表示が崩れないようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1180" target="_blank">issue #1180</a>)<br>
+        <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> が "dumb" の時、
+        ログ取得時のタイムスタンプをVT Windowとログファイルへ出力するようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/255" target="_blank">issue #255</a>)
       </li>
       <li>
         選択領域より左または上の位置で Shift+左クリック したとき、選択領域が拡張されるようにした。
@@ -57,23 +57,13 @@
         以前は選択領域内のどこをクリックしても、既存の選択領域の先頭からクリックした位置までが選択領域になった。
       </li>
       <li>
+        <a href="../menu/control-broadcast.html">ブロードキャストコマンドダイアログ</a>に、非リアルタイムモードでコマンド送信に使用するキー操作を選択できる Submit key オプションを追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1158" target="_blank">issue #1158</a>)<br>
+        <a href="../menu/control-broadcast.html">ブロードキャストコマンドダイアログ</a>のサイズが大きくなったため、初期サイズより小さくできるよう変更した。
+      </li>
+      <li>
         WebP画像フォーマットの読み込みをサポートした。WIC(Windows Imaging Component)を画像読み込みに利用するようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1225" target="_blank">issue #1225</a>)
-      </li>
-      <li>
-        インストーラを修正した。<br>
-        "全てのユーザー用にインストール" / "現在のユーザー用にインストール" を選択できるようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1156" target="_blank">issue #1156</a>)
-      </li>
-      <li>
-        TTXAdditionalTitleプラグインと同等の機能はTera Termに実装済み。
-        ビルド対象から外した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1280" target="_blank">issue #1280</a>)
-      </li>
-      <li>
-        TERATERM.INI の Plugin セクションに、プラグインファイル名の直接書くことで
-        ttermpro.exeがあるフォルダ以外からプライグインをロード可能だったので、できないようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1286" target="_blank">issue #1286</a>)<br>
       </li>
       <li>
         プラグインファイル名を通常のファイル名(ロングファイル名,LFN)で扱うようにした。
@@ -82,13 +72,9 @@
         "ttxtest.dll-" は "TTXTEST.DLL" として扱われ、ロードされていた。
       </li>
       <li>
-        <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> が "dumb" の時、
-        ログ取得時のタイムスタンプをVT Windowとログファイルへ出力するようにした。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/255" target="_blank">issue #255</a>)
-      </li>
-      <li>
-        <a href="../setup/teraterm-com.html#SerialSendLimit">シリアル送信時の送信サイズ制限</a>を実装した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1000" target="_blank">issue #1000</a>)
+        TERATERM.INI の Plugin セクションに、プラグインファイル名の直接書くことで
+        ttermpro.exeがあるフォルダ以外からプライグインをロード可能だったので、できないようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1286" target="_blank">issue #1286</a>)<br>
       </li>
     </ul>
   </li>
@@ -96,23 +82,13 @@
   <li>バグ修正
     <ul>
       <li>
-        プラグインを 20 個より多くインストールした場合に、21 番目以降のプラグインの有効/無効設定が teraterm.ini に保存・読み込みされない不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1271" target="_blank">issue #1271</a>)
+        接続先がパイプのTera Termを複数動作させると動作がおかしくなる不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1455" target="_blank">issue #1455</a>)
       </li>
       <li>
-        iniファイルからヒストリ(接続ホスト、ブロードキャストコマンド、プラグイン一覧等)を読み込む処理で、連番に抜けがあると途中で打ち切られる不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1271" target="_blank">issue #1271</a>)
-      </li>
-      <li>
-        TTXttyplay の再生中に VTウィンドウを閉じると、ttermpro.exe がクラッシュする問題を修正した。
-        5.4.0 からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1277" target="_blank">issue #1277</a>)
-      </li>
-      <li>
-        設定内容が空の時、"Setup &gt; Save setup..." で TERATERM.INI から項目が削除される問題を修正した。
-        TERATERM.INI の Tera Term セクションの RussKeyb を削除して、
-        起動したのち "Setup &gt; Save setup.." するとクラッシュする問題を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1335" target="_blank">issue #1335</a>)
+        セッションの複製で、コマンドラインの /F= で指定した設定(色,フォント,メニューの言語)が複製先に反映されない不具合を修正した。
+        5.6.0 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1453" target="_blank">issue #1453</a>)
       </li>
       <li>
         YMODEMを使用したファイル送信中にCancelボタンを押下しても、受信側のYMODEMが停止しない不具合を修正した。
@@ -123,13 +99,26 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1448" target="_blank">issue #1448</a>)
       </li>
       <li>
-        接続先がパイプのTera Termを複数動作させると動作がおかしくなる不具合を修正した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1455" target="_blank">issue #1455</a>)
+        <a href="../menu/control-broadcast.html">ブロードキャストコマンドダイアログ</a>が DPI 設定の異なるディスプレイ間を移動しても表示が崩れないようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1180" target="_blank">issue #1180</a>)<br>
       </li>
       <li>
-        セッションの複製で、コマンドラインの /F= で指定した設定(色,フォント,メニューの言語)が複製先に反映されない不具合を修正した。
-        5.6.0 からの不具合。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1453" target="_blank">issue #1453</a>)
+        iniファイルからヒストリ(接続ホスト、ブロードキャストコマンド、プラグイン一覧等)を読み込む処理で、連番に抜けがあると途中で打ち切られる不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1271" target="_blank">issue #1271</a>)
+      </li>
+      <li>
+        設定内容が空の時、"Setup &gt; Save setup..." で TERATERM.INI から項目が削除される問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1335" target="_blank">issue #1335</a>)
+      </li>
+      <li>
+        TERATERM.INI の Tera Term セクションの RussKeyb を削除して、起動したのち "Setup &gt; Save setup.." するとクラッシュする問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1380" target="_blank">issue #1380</a>)
+      </li>
+      <li>
+        マクロの受信待ちに待ち時間が入り、応答が遅くなることがある不具合を修正した。
+        4.103 からの不具合。
+        <a href="../macro/appendixes/speed.html">MACROの実行速度について</a>も参照。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1290" target="_blank">issue #1290</a>)
       </li>
       <li>
         ログの一時中断中に、マクロコマンド "<a href="../macro/command/logwrite.html">logwrite</a>" でログに書き込めない不具合を修正した。
@@ -141,10 +130,13 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1485" target="_blank">issue #1485</a>)
       </li>
       <li>
-        マクロの受信待ちに待ち時間が入り、応答が遅くなることがある不具合を修正した。
-        4.103 からの不具合。
-        <a href="../macro/appendixes/speed.html">MACROの実行速度について</a>も参照。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1290" target="_blank">issue #1290</a>)
+        プラグインを 20 個より多くインストールした場合に、21 番目以降のプラグインの有効/無効設定が teraterm.ini に保存・読み込みされない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1271" target="_blank">issue #1271</a>)
+      </li>
+      <li>
+        TTXttyplay の再生中に VTウィンドウを閉じると、ttermpro.exe がクラッシュする問題を修正した。
+        5.4.0 からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1277" target="_blank">issue #1277</a>)
       </li>
     </ul>
   </li>
@@ -155,8 +147,18 @@
       <li><a href="#ttmenu_1.24">TeraTerm Menu 1.24</a> へ差し替えた。</li>
       <li><a href="#ttyrec_1.07">TTXttyrec Plugin 1.07</a> へ差し替えた。</li>
       <li>
+        インストーラを修正した。<br>
+        "全てのユーザー用にインストール" / "現在のユーザー用にインストール" を選択できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1156" target="_blank">issue #1156</a>)
+      </li>
+      <li>
         インストーラに使用している Inno Setup のバージョンを <a href="https://jrsoftware.org/files/is7-whatsnew.htm#7.1.0" target="_blank">7.1.0</a> へ差し替えた。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1511" target="_blank">issue #1511</a>)
+      </li>
+      <li>
+        TTXAdditionalTitleプラグインと同等の機能はTera Termに実装済み。
+        ビルド対象から外した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1280" target="_blank">issue #1280</a>)
       </li>
     </ul>
   </li>
@@ -6589,11 +6591,11 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
       </li>
       <li>
-        パスワード情報がページアウトされないよう修正した。
+        SecureZeroMemory()、境界外アクセスのチェック、エラー処理等を追加した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
       </li>
       <li>
-        メモリ使用量を削減した。
+        パスワード情報がページアウトされないよう修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
       </li>
       <li>
@@ -6601,7 +6603,7 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
       </li>
       <li>
-        SecureZeroMemory()、境界外アクセスのチェック、エラー処理等を追加した。
+        メモリ使用量を削減した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
       </li>
       <li>
@@ -6920,6 +6922,10 @@
 <h3 id="ttyrec_1.07">YYYY.MM.DD (Ver 1.07 not released yet)</h3>
 <ul class="history">
   <li>
+    再生中に停止できるようにした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1388" target="_blank">issue #1388</a>)
+  </li>
+  <li>
     再生中に一時的にノーウェイトモードにできるようにした。
     (<a href="https://github.com/TeraTermProject/teraterm/issues/1326" target="_blank">issue #1326</a>)
   </li>
@@ -6931,38 +6937,8 @@
     </ul>
   </li>
   <li>
-    再生時に録画時刻をタイトルバーに表示できるようにした。
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1298" target="_blank">issue #1298</a>)
-  </li>
-  <li>
-    2回目以降のttyファイル再生で、ステータスがタイトルに表示されない問題を修正した。
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
-  </li>
-  <li>
-    ttyファイルでないファイルを再生した後、ttyファイルを再生すると表示が崩れる問題を修正した。
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
-  </li>
-  <li>
-    切断後も録画状態のとき "TTY Record" メニューが無効にならないようにし、録画を停止できるようにした。
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1284" target="_blank">issue #1284</a>)
-  </li>
-  <li>
-    "TTY Replay" メニューのファイル選択ダイアログの初期ディレクトリを指定するように修正した。
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1382" target="_blank">issue #1382</a>)<br>
-    直前に再生したファイルがあればそのフォルダ、なければ <a href="../setup/folder.html#TermLogDir">端末ログフォルダ</a> になる。
-  </li>
-  <li>
-    "TTY Record" メニューのファイル選択ダイアログの初期ディレクトリを <a href="../setup/folder.html#TermLogDir">端末ログフォルダ</a> に変更した。
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1384" target="_blank">issue #1384</a>)
-  </li>
-  <li>
-    再生中に停止できるようにした。
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1388" target="_blank">issue #1388</a>)
-  </li>
-  <li>
-    再生中のタイトルバーにファイルパスを短縮して表示する機能を追加した。
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1386" target="_blank">issue #1386</a>)<br>
-    ファイルパスの表示オプションとして、ファイル名のみ、および親ディレクトリ付きファイル名を選択できる。
+    マーカを設定した位置に移動して再生する機能、ループ再生機能、先頭に戻って再生する機能を追加した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1487" target="_blank">issue #1487</a>)
   </li>
   <li>
     自動録画機能を追加した。接続開始で録画を開始し、接続切断で録画を停止する。
@@ -6974,8 +6950,34 @@
     </ul>
   </li>
   <li>
-    マーカを設定した位置に移動して再生する機能、ループ再生機能、先頭に戻って再生する機能を追加した。
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1487" target="_blank">issue #1487</a>)
+    再生時に録画時刻をタイトルバーに表示できるようにした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1298" target="_blank">issue #1298</a>)
+  </li>
+  <li>
+    再生中のタイトルバーにファイルパスを短縮して表示する機能を追加した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1386" target="_blank">issue #1386</a>)<br>
+    ファイルパスの表示オプションとして、ファイル名のみ、および親ディレクトリ付きファイル名を選択できる。
+  </li>
+  <li>
+    2回目以降のttyファイル再生で、ステータスがタイトルに表示されない問題を修正した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  </li>
+  <li>
+    切断後も録画状態のとき "TTY Record" メニューが無効にならないようにし、録画を停止できるようにした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1284" target="_blank">issue #1284</a>)
+  </li>
+  <li>
+    ttyファイルでないファイルを再生した後、ttyファイルを再生すると表示が崩れる問題を修正した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  </li>
+  <li>
+    "TTY Replay" メニューのファイル選択ダイアログの初期ディレクトリを指定するように修正した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1382" target="_blank">issue #1382</a>)<br>
+    直前に再生したファイルがあればそのフォルダ、なければ <a href="../setup/folder.html#TermLogDir">端末ログフォルダ</a> になる。
+  </li>
+  <li>
+    "TTY Record" メニューのファイル選択ダイアログの初期ディレクトリを <a href="../setup/folder.html#TermLogDir">端末ログフォルダ</a> に変更した。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1384" target="_blank">issue #1384</a>)
   </li>
 </ul>
 
