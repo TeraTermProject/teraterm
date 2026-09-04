@@ -4337,6 +4337,11 @@
         RFC 4252 に準拠するよう、コマンドライン及びマクロコマンドで指定したユーザー名とパスワードを UTF-8 で送信するよう修正した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1460" target="_blank">issue #1460</a>)
       </li>
+      <li>
+        SCP を用いたファイルの送信または受信後、VT ウィンドウがアクティブ状態に戻らない不具合を修正した。
+        3.6.0 (Tera Term 5.6.0)からの不具合。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1519" target="_blank">issue #1519</a>)
+      </li>
     </ul>
   </li>
 
@@ -4354,7 +4359,7 @@
     <ul>
       <li>
         受信した SSH2 パケットの長さを正しくチェックせずに処理する脆弱性を修正した。
-        TTSSH2 1.00 alpha1 (UTF-8 TeraTerm Pro 2.05) からの不具合。
+        3.1 (Tera Term 5.6.0) からの不具合。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1417" target="_blank">issue #1417</a>, <a href="https://teratermproject.github.io/SA/JVN65294474.html" target="_blank">TTSSH2 のメモリ境界外アクセスの脆弱性</a>)
       </li>
     </ul>
