@@ -9525,9 +9525,13 @@ static unsigned __stdcall ssh_scp_dlg_thread(void *p)
 		Sleep(0);
 	}
 
+	// ダイアログを閉じる
+	if (IsWindow(hDlgWnd)) {
+		DestroyWindow(hDlgWnd);
+	}
+
 	// VT Window をアクティブ化する
 	if (pvar != NULL && pvar->NotificationWindow != NULL) {
-		Sleep(20); // UIスレッド終了待ち
 		HWND hVTWin = pvar->NotificationWindow;
 		SetActiveWindow(hVTWin);
 		SetFocus(hVTWin);
