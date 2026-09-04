@@ -29,9 +29,9 @@
 #pragma once
 
 #define TT_VERSION_MAJOR             5
-#define TT_VERSION_MINOR             7
+#define TT_VERSION_MINOR             8
 #define TT_VERSION_PATCH             0
-#define TT_VERSION_SUBSTR            "RC"
+#define TT_VERSION_SUBSTR            "dev"
 //#undef TT_VERSION_SUBSTR
 // SUBSTR が不要な時は undef する
 //  使用例 "dev", "RC", "RC2"
