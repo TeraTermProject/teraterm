@@ -48,7 +48,7 @@ endif()
 
 # install packages
 execute_process(
-  COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --upgrade-also --packages cmake,bash,tar,make,perl,perl-HTML-Parser,gcc-core,gcc-g++,icoutils
+  COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --upgrade-also --packages cmake,bash,tar,make,perl,perl-HTML-Parser,gcc-core,gcc-g++,icoutils,libiconv
   WORKING_DIRECTORY ${CYGWIN_ROOT}
 )
 # install packages for notify
