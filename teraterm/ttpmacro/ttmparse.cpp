@@ -110,6 +110,9 @@ void EndVar()
 			free(v->Value.IntAry.val);
 			break;
 		case TypeStrArray:
+			for (int i = 0; i < v->Value.StrAry.size; i++) {
+				free(v->Value.StrAry.val[i]);
+			}
 			free(v->Value.StrAry.val);
 			break;
 		default:
@@ -215,11 +218,12 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 	case 'd':
 		if (_stricmp(Str,"delpassword")==0) *WordId = RsvDelPassword;
 		else if (_stricmp(Str,"delpassword2")==0) *WordId = RsvDelPassword2;
+		else if (_stricmp(Str,"delvar")==0) *WordId = RsvDelVar;
 		else if (_stricmp(Str,"disconnect")==0) *WordId = RsvDisconnect;
 		else if (_stricmp(Str,"dispstr")==0) *WordId = RsvDispStr;
 		else if (_stricmp(Str,"do")==0) *WordId = RsvDo;
 		else if (_stricmp(Str,"dirname")==0) *WordId = RsvDirname;
-		else if (_stricmp(Str, "dirnamebox") == 0) *WordId = RsvDirnameBox;
+		else if (_stricmp(Str,"dirnamebox") == 0) *WordId = RsvDirnameBox;
 		break;
 	case 'e':
 		if (_stricmp(Str,"else")==0) *WordId = RsvElse;
@@ -920,6 +924,44 @@ int NewStrAryVar(const char *Name, int size)
 	}
 	strAry->val = array;
 	strAry->size = size;
+	return 0;
+}
+
+int DelVar(TVarId VarId)
+{
+	Variable_t *v = &Variables[VarId];
+
+	// 削除する
+	free(v->Name);
+	switch (v->Type) {
+	case TypeString:
+		free(v->Value.Str);
+		break;
+	case TypeIntArray:
+		free(v->Value.IntAry.val);
+		break;
+	case TypeStrArray:
+		for (int i = 0; i < v->Value.StrAry.size; i++) {
+			free(v->Value.StrAry.val[i]);
+		}
+		free(v->Value.StrAry.val);
+		break;
+	default:
+		break;
+	}
+
+	// 後ろを前につめる
+	size_t left = (VariableCount - 1) - VarId;
+	if (left > 0) {
+		memmove(v, v+1, sizeof(Variable_t) * left);
+	}
+	VariableCount--;
+	Variable_t *newVars = (Variable_t *)realloc(Variables, sizeof(Variable_t) * VariableCount);
+	if (newVars == NULL) {
+		VariableCount++;
+		return ErrFewMemory;
+	}
+	Variables = newVars;
 	return 0;
 }
 

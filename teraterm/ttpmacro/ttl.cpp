@@ -302,6 +302,47 @@ BOOL InitTTL(HWND HWin)
 	return TRUE;
 }
 
+static BOOL isSystemVariables(TName Name)
+{
+	// システム変数
+	const char *SysVal[] = {
+		"result",
+		"timeout",
+		"mtimeout",
+		"inputstr",
+		"matchstr",
+		"groupmatchstr1",
+		"groupmatchstr2",
+		"groupmatchstr3",
+		"groupmatchstr4",
+		"groupmatchstr5",
+		"groupmatchstr6",
+		"groupmatchstr7",
+		"groupmatchstr8",
+		"groupmatchstr9",
+		"paramcnt",
+		"param1",
+		"param2",
+		"param3",
+		"param4",
+		"param5",
+		"param6",
+		"param7",
+		"param8",
+		"param9",
+		"params"
+	};
+
+	int i;
+	for(i = 0; i < sizeof(SysVal) / sizeof(SysVal[0]); i++) {
+		if (_stricmp(Name, SysVal[i]) == 0) {
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
 void EndTTL()
 {
 	int i;
@@ -3862,6 +3903,28 @@ static WORD TTLRegexOption(void)
 	return 0;
 }
 
+static WORD TTLDelVar(void)
+{
+	TName Name;
+	WORD WordId;
+	TVariableType VarType;
+	TVarId VarId;
+	WORD Err;
+
+	if (! GetIdentifier(Name)) return ErrSyntax;
+
+	do {
+		Err = 0;
+		if (isSystemVariables(Name)) return ErrSyntax;
+		if (CheckReservedWord(Name, &WordId)) return ErrSyntax;
+		if (CheckVar(Name, &VarType, &VarId) == FALSE) return ErrVarNotInit;
+		if (VarType == TypUnknown || VarType == TypLabel) return ErrSyntax;
+		if ((Err = DelVar(VarId)) != 0) return Err;
+	} while (GetIdentifier(Name));
+
+	return 0;
+}
+
 static WORD TTLReturn(void)
 {
 	if (GetFirstChar()==0)
@@ -6042,6 +6105,8 @@ static int ExecCmnd(void)
 			Err = TTLDelPassword(); break;
 		case RsvDelPassword2:
 			Err = TTLDelPassword2(); break;
+		case RsvDelVar:
+			Err = TTLDelVar(); break;
 		case RsvDirname:
 			Err = TTLDirname(); break;
 		case RsvDirnameBox:

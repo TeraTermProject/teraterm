@@ -245,6 +245,7 @@ typedef enum {
 #define RsvRegexOption  156
 #define RsvSendlnMulticast 157
 #define RsvRecvFile     158
+#define RsvDelVar       159
 
 #define RsvSetDebug     175
 #define RsvYmodemRecv   176
@@ -366,6 +367,7 @@ int NewIntAryVar(const char *Name, int size);
 int NewStrAryVar(const char *Name, int size);
 void DelLabVar(WORD ILevel);
 void CopyLabel(WORD ILabel, BINT *Ptr, LPWORD Level);
+int DelVar(TVarId VarId);
 BOOL GetExpression(TVariableType *ValType, int *Val, LPWORD Err);
 void GetIntVal(int *Val, LPWORD Err);
 void SetIntVal(TVarId VarId, int Val);
