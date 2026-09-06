@@ -3623,6 +3623,41 @@ static WORD TTLRecvFile(void)
 	return SendCmnd(CmdRecvFile, IdTTLWaitCmndResult);
 }
 
+static WORD TTLReDim(void)
+{
+	TName Name;
+	WORD WordId;
+	TVariableType VarType;
+	TVarId VarId;
+	int Size;
+	WORD Err;
+	TStrVal Str;
+	BOOL Preserve;
+
+	Err = 0;
+	if (! GetIdentifier(Name)) return ErrSyntax;
+	if (isSystemVariables(Name)) return ErrSyntax;
+	if (CheckReservedWord(Name, &WordId)) return ErrSyntax;
+	if (CheckVar(Name, &VarType, &VarId) == FALSE) return ErrVarNotInit;
+	if (VarType != TypeIntArray && VarType != TypeStrArray) return ErrTypeMismatch;
+
+	GetIntVal(&Size, &Err);
+	if (Err != 0) return Err;
+	if (Size < 1 || Size > 65536) return ErrOutOfRange;
+
+	GetStrVal(Str, &Err);
+	if (Err == 0 && _stricmp(Str, "Preserve") == 0) {
+		Preserve = TRUE;
+	} else {
+		Preserve = FALSE;
+	}
+
+	Err = ReDim(VarId, Size, Preserve);
+	if (Err != 0) return Err;
+
+	return 0;
+}
+
 static WORD TTLRegexOption(void)
 {
 	TStrVal Str;
@@ -6305,6 +6340,8 @@ static int ExecCmnd(void)
 			Err = TTLRecvLn(); break;
 		case RsvRecvFile:
 			Err = TTLRecvFile(); break;
+		case RsvReDim:
+			Err = TTLReDim(); break;
 		case RsvRegexOption:
 			Err = TTLRegexOption(); break;
 		case RsvRestoreSetup:

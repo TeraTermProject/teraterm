@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>redim</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>redim</h1>
+
+ユーザー変数の配列サイズを変更する。<em>(バージョン5.8.0以降)</em>
+
+<pre class="macro-syntax">
+redim &lt;array&gt; &lt;size&gt; ['Preserve']
+</pre>
+
+<h2>パラメータ</h2>
+
+<dl>
+  <dt class="macro">配列 &lt;array&gt;</dt>
+  <dd>整数配列または文字列配列。</dd>
+  <dt class="macro">整数 &lt;size&gt;</dt>
+  <dd>配列サイズ(1 ～ 65536)。</dd>
+  <dt class="macro">文字列 'Preserve'</dt>
+  <dd>省略可能。省略時は既存のデータは初期化される。<br>
+      'Preserve' を指定すると既存のデータを保持したまま配列サイズを変更する。<br>
+      指定された配列サイズが元のサイズより小さい場合は、縮小部分の要素を削除する。</dt>
+</dl>
+
+<h2>返り値</h2>
+
+なし
+
+<h2>解説</h2>
+
+整数配列または文字列配列の配列サイズを変更する。<br>
+システム変数及び未使用状態の変数には使用できない。
+
+<h2>例</h2>
+
+<pre class="macro-example">
+strdim strarray 1                 ; Array declaration is required.
+
+for size 1 65536
+  redim strarray size 'Preserve'  ; Resize the array while preserving existing data.
+  index = size - 1
+  sprintf2 title 'element : %d' index
+  inputbox 'Input finished without data.' title
+  strcompare inputstr ''
+  if result = 0 then
+    goto show_listbox
+  endif
+  strarray[index] = inputstr
+next
+
+:show_listbox
+listbox 'Input data' 'strarray' strarray
+</pre>
+
+<h2>参照</h2>
+
+<ul>
+  <li><a href="../syntax/variables.html">変数</a></li>
+  <li><a href="../command/strdim.html">strdim</a></li>
+  <li><a href="../command/intdim.html">intdim</a></li>
+</ul>
+
+</body>
+</html>

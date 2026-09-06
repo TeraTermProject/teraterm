@@ -2005,6 +2005,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="redim">
+					<param name="Local" value="html\macro\command\redim.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="rotateleft">
 					<param name="Local" value="html\macro\command\rotateleft.html">
 					<param name="ImageNumber" value="11">

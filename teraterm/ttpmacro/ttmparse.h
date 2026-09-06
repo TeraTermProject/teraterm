@@ -246,6 +246,7 @@ typedef enum {
 #define RsvSendlnMulticast 157
 #define RsvRecvFile     158
 #define RsvDelVar       159
+#define RsvReDim        160
 
 #define RsvSetDebug     175
 #define RsvYmodemRecv   176
@@ -388,6 +389,7 @@ void SetIntValInArray(TVarId VarId, int Index, int Val, LPWORD Err);
 void SetStrValInArray(TVarId VarId, int Index, const char *Str, LPWORD Err);
 int GetIntAryVarSize(TVarId VarId);
 int GetStrAryVarSize(TVarId VarId);
+int ReDim(TVarId VarId, int size, BOOL Preserve);
 
 extern WORD TTLStatus;
 extern char LineBuff[MaxLineLen];
