@@ -170,6 +170,7 @@ error:
 #define GetPrivateProfileString(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
 #define GetPrivateProfileStringA(p1, p2, p3, p4, p5, p6) GetPrivateProfileStringAFileW(p1, p2, p3, p4, p5, p6)
 #define WritePrivateProfileStringA(p1, p2, p3, p4) WritePrivateProfileStringAFileW(p1, p2, p3, p4)
+#define WritePrivateProfileStringW(p1, p2, p3, p4) WritePrivateProfileStringWFileW(p1, p2, p3, p4)
 
 /*
  * シリアルポート関連の設定

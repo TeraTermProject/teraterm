@@ -36,6 +36,27 @@
 
 #include "inifile_com.h"
 
+BOOL WritePrivateProfileStringWFileW(const wchar_t *appW, const wchar_t *keyW, const wchar_t *strW, const wchar_t *filenameW)
+{
+	wchar_t *str1W = strW == NULL ? L"" : strW;
+	DWORD lenW_max = (DWORD)(wcslen(str1W) + 2);
+	wchar_t *bufW = (wchar_t *)malloc(sizeof(wchar_t) * lenW_max);
+	if (0 == GetPrivateProfileStringW(appW, keyW, L"", bufW, lenW_max, filenameW)) {
+		if (GetPrivateProfileStringW(appW, keyW, L"*", bufW, lenW_max, filenameW)) {
+			bufW[0] = str1W[0] + 1;
+			bufW[1] = L'\0';
+		}
+	}
+	int r = wcsncmp(str1W, bufW, lenW_max);
+	free(bufW);
+	if (r == 0) {
+		return TRUE;
+	}
+	return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
+}
+
+#define WritePrivateProfileStringW(p1, p2, p3, p4) WritePrivateProfileStringWFileW(p1, p2, p3, p4)
+
 /**
  *	GetPrivateProfileStringA() のファイル名だけが wchar_t 版
  */
