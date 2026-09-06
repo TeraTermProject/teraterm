@@ -356,6 +356,9 @@ static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 
 // channel close時にチャネル構造体をリストへ返却する
 // (2007.4.26 yutaka)
+
+#define WM_REQUEST_CLOSE (WM_USER + 3)
+
 static void ssh2_channel_delete(Channel_t *c)
 {
 	bufchain_t *ch, *ptr;
@@ -376,8 +379,7 @@ static void ssh2_channel_delete(Channel_t *c)
 		c->scp.state = SCP_CLOSING;
 
 		if (c->scp.progress_window != NULL) {
-			DestroyWindow(c->scp.progress_window);
-			c->scp.progress_window = NULL;
+			SendMessage(c->scp.progress_window, WM_REQUEST_CLOSE, 0, 0);
 		}
 		if (c->scp.thread != INVALID_HANDLE_VALUE) {
 			WaitForSingleObject(c->scp.thread, INFINITE);
@@ -9438,6 +9440,7 @@ static INT_PTR CALLBACK ssh_scp_dlg_thread_proc(HWND hWnd, UINT msg, WPARAM wp, 
 					SendMessage(c->scp.progress_window, WM_COMMAND, IDCANCEL, 0);
 					KillTimer(hWnd, c->self_id);
 					TTEndDialog(hWnd, 0);
+					ShowWindow(hWnd, SW_HIDE); // ちらつき防止
 					DestroyWindow(hWnd);
 					return TRUE;
 
@@ -9450,8 +9453,15 @@ static INT_PTR CALLBACK ssh_scp_dlg_thread_proc(HWND hWnd, UINT msg, WPARAM wp, 
 			// closeボタンが押下されても window が閉じないようにする。
 			return TRUE;
 
-		case WM_DESTROY:
+		case WM_REQUEST_CLOSE:
+			ShowWindow(hWnd, SW_HIDE); // ちらつき防止
+			DestroyWindow(hWnd);
 			return TRUE;
+
+		case WM_DESTROY:
+			c = (Channel_t *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			c->scp.progress_window = NULL;
+			return FALSE;
 
 		default:
 			return FALSE;
@@ -9523,6 +9533,13 @@ static unsigned __stdcall ssh_scp_dlg_thread(void *p)
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 		Sleep(0);
+	}
+
+	// VT Window をアクティブ化する
+	if (pvar != NULL && pvar->NotificationWindow != NULL) {
+		HWND hVTWin = pvar->NotificationWindow;
+		SetActiveWindow(hVTWin);
+		SetFocus(hVTWin);
 	}
 
 	return 0;
