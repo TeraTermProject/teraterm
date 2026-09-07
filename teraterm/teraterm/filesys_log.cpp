@@ -46,6 +46,7 @@
 #include "codeconv.h"
 #include "asprintf.h"
 #include "makeoutputstring.h"
+#include "compat_win.h"
 
 #include "filesys_log.h"
 #include "filesys.h"  // for ProtoGetProtoFlag()
@@ -472,7 +473,7 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 	}
 
 	fv->IsPause = FALSE;
-	fv->StartTime = GetTickCount64();
+	fv->StartTime = pGetTickCount64();
 
 	if (ts.DeferredLogWriteMode) {
 		StartThread(fv);
@@ -658,12 +659,12 @@ wchar_t* FLogTimeStampStrW(enum LogTimestampType timestamp_type, const wchar_t* 
 		time_strW = ttstrftime(format, TRUE);
 		break;
 	case TIMESTAMP_ELAPSED_LOGSTART: {
-		ULONGLONG elapsed = GetTickCount64() - start_time;
+		ULONGLONG elapsed = pGetTickCount64() - start_time;
 		time_strW = strelapsedW(elapsed);
 		break;
 	}
 	case TIMESTAMP_ELAPSED_CONNECTED: {
-		ULONGLONG elapsed = GetTickCount64() - connected_time;
+		ULONGLONG elapsed = pGetTickCount64() - connected_time;
 		time_strW = strelapsedW(elapsed);
 		break;
 	}

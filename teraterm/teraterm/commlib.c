@@ -51,6 +51,7 @@
 #include "helpid.h"
 #include "vtwin.h"
 #include "makeoutputstring.h"
+#include "compat_win.h"
 
 static SOCKET OpenSocket(PComVar);
 static void AsyncConnect(PComVar);
@@ -790,7 +791,7 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 			break;
 	}
 	cv->Ready = TRUE;
-	cv->ConnectedTime = GetTickCount64();
+	cv->ConnectedTime = pGetTickCount64();
 }
 
 BOOL CommCanClose(PComVar cv)
