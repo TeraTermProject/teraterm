@@ -162,7 +162,7 @@ void CFileTransDlg::RefreshNum(ULONGLONG StartTime, LONG FileSize, LONG ByteCoun
 			prev_elapsed = 0;
 		}
 		else {
-			ULONGLONG elapsed = (GetTickCount64() - StartTime) / 1000;
+			ULONGLONG elapsed = (pGetTickCount64() - StartTime) / 1000;
 			if (elapsed != prev_elapsed && elapsed != 0) {
 				ULONGLONG rate2;
 				rate2 = ByteCount / elapsed;

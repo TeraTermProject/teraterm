@@ -137,6 +137,7 @@ LANGID (WINAPI *pGetUserDefaultUILanguage)(void);
 BOOL (WINAPI *pCreateTimerQueueTimer)(PHANDLE phNewTimer, HANDLE TimerQueue, WAITORTIMERCALLBACK Callback,
 									  PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags);
 BOOL(WINAPI *pDeleteTimerQueueTimer)(HANDLE TimerQueue, HANDLE Timer, HANDLE CompletionEvent);
+ULONGLONG (WINAPI *pGetTickCount64)();
 
 // gdi32
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -204,19 +205,6 @@ HRESULT (WINAPI *pDWriteCreateFactory)(DWRITE_FACTORY_TYPE factoryType, REFIID i
 
 // wintrust.dll
 LONG (WINAPI *pWinVerifyTrust)(HWND hwnd, GUID *pgActionID, LPVOID pWVTData);
-
-class Initializer {
-public:
-	Initializer() {
-		DLLInit();
-		WinCompatInit();
-	}
-	~Initializer() {
-		DLLExit();
-	}
-};
-
-static Initializer initializer;
 
 /**
  *	GetConsoleWindow() と同じ動作をする
@@ -316,6 +304,7 @@ static const APIInfo Lists_kernel32[] = {
 	{ "GetUserDefaultUILanguage", (void **)&pGetUserDefaultUILanguage },
 	{ "CreateTimerQueueTimer", (void **)&pCreateTimerQueueTimer },
 	{ "DeleteTimerQueueTimer", (void **)&pDeleteTimerQueueTimer },
+	{ "GetTickCount64", (void **)&pGetTickCount64 },
 	{},
 };
 
@@ -954,3 +943,83 @@ BOOL WINAPI _GetComboBoxInfo(HWND hWndCombo, PCOMBOBOXINFO info)
 {
 	return (BOOL)SendMessageA(hWndCombo, CB_GETCOMBOBOXINFO, 0, (LPARAM)info);
 }
+
+/**
+ *	GetTickCount64() 互換関数
+ *		GetTickCount64() は Vista から
+ */
+static struct GetTickCount64WorkTag {
+	BOOL NeedExist;
+	CRITICAL_SECTION cs;
+	DWORD High;
+	DWORD Last;
+} GetTickCount64Work;
+
+static ULONGLONG _GetTickCount64(void);
+
+static void _GetTickCount64Init()
+{
+	if (pGetTickCount64 != NULL) {
+		return;
+	}
+	struct GetTickCount64WorkTag *p = &GetTickCount64Work;
+	p->NeedExist = TRUE;
+	p->High = 0;
+	p->Last = GetTickCount();
+	InitializeCriticalSection(&p->cs);
+	pGetTickCount64 = _GetTickCount64;
+}
+
+static void _GetTickCount64Exit()
+{
+	struct GetTickCount64WorkTag *p = &GetTickCount64Work;
+	if (p->NeedExist) {
+		// 互換関数を使用していたときのみ後始末する
+		// (本物の API を使用しているときは pGetTickCount64 をそのまま残す)
+		pGetTickCount64 = NULL;
+		p->NeedExist = FALSE;
+		DeleteCriticalSection(&p->cs);
+	}
+}
+
+/**
+ *	GetTickCount64() 互換関数
+ *
+ *	制限
+ *	- 別バイナリ間で上位32bitを共有していない
+ *	- 前回のコールから0xffffffff(ms)以上経過すると正しい値を返さない
+ */
+static ULONGLONG _GetTickCount64(void)
+{
+	struct GetTickCount64WorkTag *p = &GetTickCount64Work;
+	EnterCriticalSection(&p->cs);
+
+	DWORD cur = GetTickCount();
+	if (cur < p->Last) {
+		// 繰り上がった
+		p->High++;
+	}
+	p->Last = cur;
+
+	ULONGLONG result = ((ULONGLONG)p->High << 32) | cur;
+	LeaveCriticalSection(&p->cs);
+
+	return result;
+}
+
+namespace {
+class Initializer {
+public:
+	Initializer() {
+		DLLInit();
+		WinCompatInit();
+		_GetTickCount64Init();
+	}
+	~Initializer() {
+		_GetTickCount64Exit();
+		DLLExit();
+	}
+};
+}
+
+static Initializer initializer;
