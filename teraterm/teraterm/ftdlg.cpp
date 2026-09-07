@@ -54,6 +54,7 @@ CFileTransDlg::CFileTransDlg()
 	FileName = NULL;
 	FullName = NULL;
 	ProgStat = 0;
+	prev_elapsed = 0;
 }
 
 CFileTransDlg::~CFileTransDlg()
@@ -151,13 +152,9 @@ void CFileTransDlg::ChangeButton(BOOL PauseFlag)
 	}
 }
 
-void CFileTransDlg::RefreshNum(DWORD StartTime, LONG FileSize, LONG ByteCount)
+void CFileTransDlg::RefreshNum(ULONGLONG StartTime, LONG FileSize, LONG ByteCount)
 {
 	char NumStr[24];
-	double rate;
-	int rate2;
-	static DWORD prev_elapsed;
-	DWORD elapsed;
 
 	if (OpId == OpSendFile) {
 		if (StartTime == 0) {
@@ -165,17 +162,18 @@ void CFileTransDlg::RefreshNum(DWORD StartTime, LONG FileSize, LONG ByteCount)
 			prev_elapsed = 0;
 		}
 		else {
-			elapsed = (GetTickCount() - StartTime) / 1000;
+			ULONGLONG elapsed = (GetTickCount64() - StartTime) / 1000;
 			if (elapsed != prev_elapsed && elapsed != 0) {
+				ULONGLONG rate2;
 				rate2 = ByteCount / elapsed;
 				if (rate2 < 1200) {
-					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%d:%02d (%dBytes/s)", elapsed / 60, elapsed % 60, rate2);
+					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%lld:%02lld (%lldBytes/s)", elapsed / 60, elapsed % 60, rate2);
 				}
 				else if (rate2 < 1200000) {
-					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%d:%02d (%d.%02dKB/s)", elapsed / 60, elapsed % 60, rate2 / 1000, rate2 / 10 % 100);
+					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%lld:%02lld (%lld.%02lldKB/s)", elapsed / 60, elapsed % 60, rate2 / 1000, rate2 / 10 % 100);
 				}
 				else {
-					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%d:%02d (%d.%02dMB/s)", elapsed / 60, elapsed % 60, rate2 / (1000*1000), rate2 / 10000 % 100);
+					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%lld:%02lld (%lld.%02lldMB/s)", elapsed / 60, elapsed % 60, rate2 / (1000*1000), rate2 / 10000 % 100);
 				}
 				SetDlgItemText(IDC_TRANS_ETIME, NumStr);
 				prev_elapsed = elapsed;
@@ -183,7 +181,7 @@ void CFileTransDlg::RefreshNum(DWORD StartTime, LONG FileSize, LONG ByteCount)
 		}
 
 		if (FileSize > 0) {
-			rate = 100.0 * (double)ByteCount / (double)FileSize;
+			double rate = 100.0 * (double)ByteCount / (double)FileSize;
 			if (ProgStat < (int)rate) {
 				ProgStat = (int)rate;
 				SendDlgItemMessage(IDC_TRANSPROGRESS, PBM_SETPOS, (WPARAM)ProgStat, 0);

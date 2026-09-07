@@ -870,7 +870,8 @@ char *mctimelocal(const char *format, BOOL utc_flag)
  */
 char *strelapsed(DWORD start_time)
 {
-	wchar_t *strW = strelapsedW(start_time);
+	DWORD elapsed = GetTickCount() - start_time;
+	wchar_t *strW = strelapsedW(elapsed);
 	char *strA = ToCharW(strW);
 	free(strW);
 	return strA;
