@@ -39,6 +39,7 @@
 #include <assert.h>
 
 #include "compat_win.h"
+#include "asprintf.h"
 
 #include "ttlib.h"
 
@@ -529,31 +530,31 @@ wchar_t *ttstrftime(const wchar_t *format, BOOL utc_flag)
 /*
  *	現在までの経過時間を文字列にして返す
  *
+ *	@param	elapsed			経過時間(ms)
  *	@return	経過時間の文字列
  *			不要になったらfree()すること
  */
-wchar_t *strelapsedW(DWORD start_time)
+wchar_t *strelapsedW(ULONGLONG elapsed)
 {
-	size_t sizeof_strtime = 20;
-	wchar_t *strtime = malloc(sizeof(wchar_t) * sizeof_strtime);
-	int days, hours, minutes, seconds, msecs;
-	DWORD delta = GetTickCount() - start_time;
+	ULONGLONG days;
+	int hours, minutes, seconds, msecs;
 
-	msecs = delta % 1000;
-	delta /= 1000;
+	msecs = elapsed % 1000;
+	elapsed /= 1000;
 
-	seconds = delta % 60;
-	delta /= 60;
+	seconds = elapsed % 60;
+	elapsed /= 60;
 
-	minutes = delta % 60;
-	delta /= 60;
+	minutes = elapsed % 60;
+	elapsed /= 60;
 
-	hours = delta % 24;
-	days = delta / 24;
+	hours = elapsed % 24;
+	days = elapsed / 24;
 
-	_snwprintf_s(strtime, sizeof_strtime, _TRUNCATE,
-				 L"%d %02d:%02d:%02d.%03d",
-				 days, hours, minutes, seconds, msecs);
+	wchar_t *strtime;
+	aswprintf(&strtime,
+			  L"%lld %02d:%02d:%02d.%03d",
+			  days, hours, minutes, seconds, msecs);
 
 	return strtime;
 }

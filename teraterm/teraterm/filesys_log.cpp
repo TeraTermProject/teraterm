@@ -135,7 +135,7 @@ typedef struct {
 	HANDLE FileHandle;
 	LONG ByteCount;		// ファイルサイズ
 
-	DWORD StartTime;
+	ULONGLONG StartTime;
 
 	enum enumLineEnd eLineEnd;
 
@@ -472,7 +472,7 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 	}
 
 	fv->IsPause = FALSE;
-	fv->StartTime = GetTickCount();
+	fv->StartTime = GetTickCount64();
 
 	if (ts.DeferredLogWriteMode) {
 		StartThread(fv);
@@ -644,7 +644,7 @@ static void LogRotate(PFileVar fv)
  *	@return	時間文字列、不要になったらfree()すること
  */
 wchar_t* FLogTimeStampStrW(enum LogTimestampType timestamp_type, const wchar_t* format,
-						   DWORD start_time, DWORD connected_time)
+						   ULONGLONG start_time, ULONGLONG connected_time)
 {
 	wchar_t *time_strW = NULL;
 	switch (timestamp_type) {
@@ -657,12 +657,16 @@ wchar_t* FLogTimeStampStrW(enum LogTimestampType timestamp_type, const wchar_t* 
 	case TIMESTAMP_UTC:
 		time_strW = ttstrftime(format, TRUE);
 		break;
-	case TIMESTAMP_ELAPSED_LOGSTART:
-		time_strW = strelapsedW(start_time);
+	case TIMESTAMP_ELAPSED_LOGSTART: {
+		ULONGLONG elapsed = GetTickCount64() - start_time;
+		time_strW = strelapsedW(elapsed);
 		break;
-	case TIMESTAMP_ELAPSED_CONNECTED:
-		time_strW = strelapsedW(connected_time);
+	}
+	case TIMESTAMP_ELAPSED_CONNECTED: {
+		ULONGLONG elapsed = GetTickCount64() - connected_time;
+		time_strW = strelapsedW(elapsed);
 		break;
+	}
 	}
 
 	wchar_t *ret;
