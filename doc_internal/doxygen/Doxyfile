@@ -1,4 +1,4 @@
-# Doxyfile 1.8.16
+Ôªø# Doxyfile 1.8.16
 
 # This file describes the settings to be used by the documentation system
 # doxygen (www.doxygen.org) for a project.
@@ -841,8 +841,7 @@ INPUT                  = ../..
 # possible encodings.
 # The default value is: UTF-8.
 
-INPUT_ENCODING         = CP932
-#INPUT_ENCODING         = UTF-8		# *.mdÇÕUTF-8Ç»ÇÒÇæÇØÇ«ÅcBOMÇ™Ç†ÇÍÇŒok?
+INPUT_ENCODING         = UTF-8
 
 # If the value of the INPUT tag contains directories, you can use the
 # FILE_PATTERNS tag to specify one or more wildcard patterns (like *.cpp and
@@ -861,7 +860,8 @@ INPUT_ENCODING         = CP932
 FILE_PATTERNS          = *.c \
                          *.cc \
                          *.cpp \
-                         *.h
+                         *.h \
+                         *.md
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
