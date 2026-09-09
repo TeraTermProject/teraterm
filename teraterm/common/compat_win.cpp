@@ -955,7 +955,7 @@ static struct GetTickCount64WorkTag {
 	DWORD Last;
 } GetTickCount64Work;
 
-static ULONGLONG _GetTickCount64(void);
+static ULONGLONG  WINAPI _GetTickCount64(void);
 
 static void _GetTickCount64Init()
 {
@@ -989,7 +989,7 @@ static void _GetTickCount64Exit()
  *	- 別バイナリ間で上位32bitを共有していない
  *	- 前回のコールから0xffffffff(ms)以上経過すると正しい値を返さない
  */
-static ULONGLONG _GetTickCount64(void)
+static ULONGLONG  WINAPI _GetTickCount64(void)
 {
 	struct GetTickCount64WorkTag *p = &GetTickCount64Work;
 	EnterCriticalSection(&p->cs);
