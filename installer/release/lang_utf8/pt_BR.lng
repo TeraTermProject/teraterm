@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Portuguese (Português) - Brazil
-date=2026-07-18 by TeraTerm Project
+date=2026-09-09 by TeraTerm Project
 contributor=Waldemar Vaz Passarinho Neto (2025-05-07)
 
 [Tera Term]
@@ -737,7 +737,7 @@ DLG_AUTHSETUP_HOST_PRIVATEKEY=Arquivo de chave privada do &host:
 DLG_AUTHSETUP_CHECKAUTH=&Verificar métodos de autenticação antes do login (SSH2)
 
 FILEDLG_OPEN_PRIVATEKEY_TITLE=Selecione um arquivo com a chave privada RSA/DSA/ECDSA/ED25519
-FILEDLG_OPEN_PRIVATEKEY_FILTER=arquivos de identidade\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0Arquivos PEM(*.pem)\0*.pem\0todos(*.*)\0*.*\0\0
+FILEDLG_OPEN_PRIVATEKEY_FILTER=arquivos de identidade\0identity*;id_rsa*;id_dsa*;id_ecdsa*;id_ed25519*;*.ppk;*.pem\0identity(RSA1)\0identity*\0id_rsa(SSH2)\0id_rsa*\0id_dsa(SSH2)\0id_dsa*\0id_ecdsa(SSH2)\0id_ecdsa*\0id_ed25519(SSH2)\0id_ed25519*\0PuTTY(*.ppk)\0*.ppk\0Arquivos PEM(*.pem)\0*.pem\0todos(*.*)\0*.*\0\0
 MSG_KEYSPECIFY_ERROR=Você deve especificar um arquivo contendo a chave privada RSA/DSA/ECDSA/ED25519.
 MSG_READKEY_ERROR=erro de leitura do arquivo de chave privada SSH2\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=A autenticação Rhosts provavelmente falhará porque não era o método de autenticação padrão.\nPara usar autenticação Rhosts no TTSSH, você precisa defini-la como padrão reiniciando\n o TTSSH e selecionando "Autenticação SSH..." no menu Configuração antes de conectar.
