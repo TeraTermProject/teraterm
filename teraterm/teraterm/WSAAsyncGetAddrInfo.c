@@ -41,55 +41,122 @@
 #include <process.h>
 #include "WSAAsyncGetAddrInfo.h"
 #include "ttwsk.h"
+#include "codeconv.h"
+
+typedef int (WINAPI *TIdnToAscii)(DWORD dwFlags, LPCWSTR lpUnicodeCharStr, int cchUnicodeChar,
+                                  LPWSTR lpASCIICharStr, int cchASCIIChar);
+static TIdnToAscii pIdnToAscii;
+static BOOL Initialized = FALSE;
 
 struct getaddrinfo_args {
-  HWND hWnd;
-  unsigned int wMsg;
-  char *hostname;
-  char *portname;
-  struct addrinfo hints;
-  struct addrinfo **res;
-  HANDLE *lpHandle;
+	HWND hWnd;
+	unsigned int wMsg;
+	wchar_t *hostname;
+	wchar_t *portname;
+	struct addrinfo hints;
+	struct addrinfo **res;
+	HANDLE handle;
 };
 
-static unsigned __stdcall getaddrinfo_thread(void * p);
+static unsigned __stdcall getaddrinfo_thread(void * p)
+{
+	int gai;
+	struct getaddrinfo_args *ga = (struct getaddrinfo_args *)p;
 
-HANDLE PASCAL WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
-                           const char *hostname,
-                           const char *portname,
-                           struct addrinfo *hints,
-                           struct addrinfo **res)
+	// ホスト名に非 ASCII 文字が含まれる?
+	BOOL is_non_ascii = FALSE;
+	for (const wchar_t *s = ga->hostname; *s != 0; s++) {
+		if (*s >= 0x80) {
+			is_non_ascii = TRUE;
+			break;
+		}
+	}
+
+	// 国際化ドメイン名(IDN)の解決
+	// IdnToAscii() で ACE 形式 (xn--) へ変換
+	// 変換後は ASCII なので getaddrinfo() で解決できる。
+	const wchar_t *hostname = ga->hostname;
+	wchar_t ace_host[256];
+	if (pIdnToAscii != NULL && is_non_ascii) {
+		if (pIdnToAscii(0, ga->hostname, -1, ace_host, _countof(ace_host)) > 0) {
+			// 変換できた時は ACE形式から解決
+			hostname = ace_host;
+		}
+	}
+
+	// ACE 形式へ変換済みなら、全文字 ASCII なので変換可能
+	char *hostnameA = ToCharW(hostname);
+	char *portnameA = ToCharW(ga->portname);
+	gai = getaddrinfo(hostnameA, portnameA, &ga->hints, ga->res);
+	free(hostnameA);
+	free(portnameA);
+
+	/* send value of gai as message to window hWnd */
+	PostMessage(ga->hWnd, ga->wMsg, (WPARAM)ga->handle, MAKELPARAM(0, gai));
+
+	free(ga->hostname);
+	free(ga->portname);
+	free(p);
+
+	return 0;
+}
+
+/**
+ *	ホスト名解決
+ *
+ *	Internationalized Domain Name(IDN、国際化ドメイン名)
+ *
+ *	@param	hWnd		通知するウィンドウ
+ *	@param	wMsg		通知するメッセージ
+ *	@param	hostname	ホスト名
+ *	@param	portname	ポート名
+ *	@param	hints
+ *	@param	res
+ *
+ */
+HANDLE PASCAL WSAAsyncGetAddrInfoW(
+	HWND hWnd, unsigned int wMsg,
+	const wchar_t *hostname,
+	const wchar_t *portname,
+	struct addrinfo *hints,
+	struct addrinfo **res)
 {
 	HANDLE thread;
 	unsigned tid;
 	struct getaddrinfo_args * ga;
 
+	if (Initialized == FALSE) {
+		Initialized = TRUE;
+		HMODULE normaliz = LoadLibraryA("Normaliz.dll");
+		if (normaliz != NULL) {
+			// XP+IE7,Vista以降
+			pIdnToAscii = (TIdnToAscii)GetProcAddress(normaliz, "IdnToAscii");
+		}
+	}
+
+	if (hostname == NULL || portname == NULL) {
+		return NULL;
+	}
+
 	/*
 	* allocate structure to pass args to sub-thread dynamically
 	* WSAAsyncGetAddrInfo() is reentrant
 	*/
-	if ((ga = (struct getaddrinfo_args *)malloc(sizeof(struct getaddrinfo_args))) == NULL)
+	if ((ga = (struct getaddrinfo_args *)malloc(sizeof(struct getaddrinfo_args))) == NULL) {
 		return NULL;
+	}
 
 	/* packing arguments struct addrinfo_args */
 	ga->hWnd = hWnd;
 	ga->wMsg = wMsg;
-	ga->hostname = _strdup(hostname); // ポインタだけ渡すと、スレッド先で不定となる。(2012.11.7 yutaka)
-	ga->portname = _strdup(portname);
-	ga->hints = *hints; // ポインタだけ渡すと、スレッド先で不定となる。(2016.3.11 yutaka)
+	ga->hostname = _wcsdup(hostname);
+	ga->portname = _wcsdup(portname);
+	ga->hints = *hints;
 	ga->res = res;
-
-	ga->lpHandle = (HANDLE *)malloc(sizeof(HANDLE));
-	if (ga->lpHandle == NULL) {
-		free(ga->hostname);
-		free(ga->portname);
-		return NULL;
-	}
 
 	/* create sub-thread running getaddrinfo() */
 	thread = (HANDLE)_beginthreadex(NULL, 0, getaddrinfo_thread, ga, CREATE_SUSPENDED, &tid);
 	if (thread == 0) {
-		free(ga->lpHandle);
 		free(ga->hostname);
 		free(ga->portname);
 		free(ga);
@@ -97,42 +164,25 @@ HANDLE PASCAL WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
 	}
 
 	/* return thread handle */
-	*ga->lpHandle = thread;
+	ga->handle = thread;
 	ResumeThread(thread);
 	return thread;
 }
 
-static unsigned __stdcall getaddrinfo_thread(void * p)
+/*
+ *	ホスト名解決 ANSI版
+ */
+HANDLE PASCAL WSAAsyncGetAddrInfo(
+	HWND hWnd, unsigned int wMsg,
+	const char *hostname,
+	const char *portname,
+	struct addrinfo *hints,
+	struct addrinfo **res)
 {
-	int gai;
-	HWND hWnd;
-	unsigned int wMsg;
-	const char *hostname;
-	const char *portname;
-	struct addrinfo *hints;
-	struct addrinfo **res;
-	struct getaddrinfo_args *ga;
-
-	/* unpacking arguments */
-	ga = (struct getaddrinfo_args *)p;
-	hWnd = ga->hWnd;
-	wMsg = ga->wMsg;
-	hostname = ga->hostname;
-	portname = ga->portname;
-	hints = &ga->hints;
-	res = ga->res;
-
-	/* call getaddrinfo */
-//	gai = Pgetaddrinfo(hostname, portname, hints, res);
-	gai = getaddrinfo(hostname, portname, hints, res);
-
-	/* send value of gai as message to window hWnd */
-	PostMessage(hWnd, wMsg, (WPARAM)*ga->lpHandle, MAKELPARAM(0, gai));
-
-	free(ga->lpHandle);
-	free(ga->hostname);
-	free(ga->portname);
-	free(p);
-
-	return 0;
+	wchar_t *hostnameW = ToWcharA(hostname);
+	wchar_t *portnameW = ToWcharA(portname);
+	HANDLE h = WSAAsyncGetAddrInfoW(hWnd, wMsg, hostnameW, portnameW, hints, res);
+	free(hostnameW);
+	free(portnameW);
+	return h;
 }

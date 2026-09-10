@@ -42,5 +42,11 @@ HANDLE PASCAL WSAAsyncGetAddrInfo(HWND hWnd,
 			   const char *portname,
 			   struct addrinfo *hints,
 			   struct addrinfo **res);
+HANDLE PASCAL WSAAsyncGetAddrInfoW(
+	HWND hWnd, unsigned int wMsg,
+	const wchar_t *hostname,
+	const wchar_t *portname,
+	struct addrinfo *hints,
+	struct addrinfo **res);
 
 #endif /* __WSAASYNCGETADDRINFO__ */
