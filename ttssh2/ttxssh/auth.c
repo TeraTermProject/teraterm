@@ -511,12 +511,12 @@ static wchar_t *get_key_file_name(HWND parent, const wchar_t *UILanguageFileW)
 {
 	static const wchar_t *fullname_def = L"identity";
 	static const wchar_t *filter_def =
-		L"identity files\\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\\0"
-		L"identity(RSA1)\\0identity\\0"
-		L"id_rsa(SSH2)\\0id_rsa\\0"
-		L"id_dsa(SSH2)\\0id_dsa\\0"
-		L"id_ecdsa(SSH2)\\0id_ecdsa\\0"
-		L"id_ed25519(SSH2)\\0id_ed25519\\0"
+		L"identity files\\0identity.*;id_rsa.*;id_dsa.*;id_ecdsa.*;id_ed25519.*;*.ppk;*.pem\\0"
+		L"identity(RSA1)\\0identity.*\\0"
+		L"id_rsa(SSH2)\\0id_rsa.*\\0"
+		L"id_dsa(SSH2)\\0id_dsa.*\\0"
+		L"id_ecdsa(SSH2)\\0id_ecdsa.*\\0"
+		L"id_ed25519(SSH2)\\0id_ed25519.*\\0"
 		L"PuTTY(*.ppk)\\0*.ppk\\0"
 		L"PEM files(*.pem)\\0*.pem\\0"
 		L"all(*.*)\\0*.*\\0"
