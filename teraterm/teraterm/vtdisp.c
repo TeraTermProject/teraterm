@@ -628,10 +628,22 @@ load_finish:
 	src->color = GetSysColor(COLOR_DESKTOP);
 }
 
-static void BGPreloadSrc(BGSrc *src, const TTTSet *pts)
+static void BGPreloadSrc(BGSrc *src, const TTTSet *pts, BOOL Force)
 {
 	if (!src->enable) {
 		return;
+	}
+
+	if (Force == FALSE) {
+		if (src->hdc) {
+			HBITMAP hbm = (HBITMAP)GetCurrentObject(src->hdc, OBJ_BITMAP);
+			if (hbm) {
+				BITMAP bm;
+				if (GetObject(hbm, sizeof(bm), &bm) != 0) {
+					return; // 既にロード済で HBITMAP が有効な場合は再ロードしない
+				}
+			}
+		}
 	}
 
 	DeleteBitmapDC(&(src->hdc));
@@ -1075,15 +1087,21 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
   GetClientRect(vt->hVTWin,&rect);
   OffsetRect(&rect,point.x,point.y);
 
-  if(!forceSetup && EqualRect(&rect,&BGPrevRect))
-    return;
+  if(!forceSetup && EqualRect(&rect,&BGPrevRect)) {
+	  // RDP 再接続等で HBITMAP が OS により無効化されている可能性がある。
+	  // HBITMAP が無効なら壁紙 or 背景を再ロードする。
+	  BGPreloadSrc(&BGDest, vt->pts, FALSE);
+	  BGPreloadSrc(&BGSrc1, vt->pts, FALSE);
+	  BGPreloadSrc(&BGSrc2, vt->pts, FALSE);
+	  return;
+  }
 
   CopyRect(&BGPrevRect,&rect);
 
   //壁紙 or 背景をプリロード
-  BGPreloadSrc(&BGDest, vt->pts);
-  BGPreloadSrc(&BGSrc1, vt->pts);
-  BGPreloadSrc(&BGSrc2, vt->pts);
+  BGPreloadSrc(&BGDest, vt->pts, TRUE);
+  BGPreloadSrc(&BGSrc1, vt->pts, TRUE);
+  BGPreloadSrc(&BGSrc2, vt->pts, TRUE);
 
   _OutputDebugPrintf("BGSetupPrimary : BGInSizeMove = %d\n",BGInSizeMove);
 
