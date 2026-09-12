@@ -110,6 +110,9 @@ void EndVar()
 			free(v->Value.IntAry.val);
 			break;
 		case TypeStrArray:
+			for (int i = 0; i < v->Value.StrAry.size; i++) {
+				free(v->Value.StrAry.val[i]);
+			}
 			free(v->Value.StrAry.val);
 			break;
 		default:
@@ -215,11 +218,12 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 	case 'd':
 		if (_stricmp(Str,"delpassword")==0) *WordId = RsvDelPassword;
 		else if (_stricmp(Str,"delpassword2")==0) *WordId = RsvDelPassword2;
+		else if (_stricmp(Str,"delvar")==0) *WordId = RsvDelVar;
 		else if (_stricmp(Str,"disconnect")==0) *WordId = RsvDisconnect;
 		else if (_stricmp(Str,"dispstr")==0) *WordId = RsvDispStr;
 		else if (_stricmp(Str,"do")==0) *WordId = RsvDo;
 		else if (_stricmp(Str,"dirname")==0) *WordId = RsvDirname;
-		else if (_stricmp(Str, "dirnamebox") == 0) *WordId = RsvDirnameBox;
+		else if (_stricmp(Str,"dirnamebox") == 0) *WordId = RsvDirnameBox;
 		break;
 	case 'e':
 		if (_stricmp(Str,"else")==0) *WordId = RsvElse;
@@ -341,6 +345,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		if (_stricmp(Str,"random")==0) *WordId = RsvRandom;    // add 'random' (2006.2.11 yutaka)
 		else if (_stricmp(Str,"recvln")==0) *WordId = RsvRecvLn;
 		else if (_stricmp(Str,"recvfile")==0) *WordId = RsvRecvFile;
+		else if (_stricmp(Str,"redim")==0) *WordId = RsvReDim;
 		else if (_stricmp(Str,"regexoption")==0) *WordId = RsvRegexOption;
 		else if (_stricmp(Str,"restoresetup")==0) *WordId = RsvRestoreSetup;
 		else if (_stricmp(Str,"return")==0) *WordId = RsvReturn;
@@ -920,6 +925,110 @@ int NewStrAryVar(const char *Name, int size)
 	}
 	strAry->val = array;
 	strAry->size = size;
+	return 0;
+}
+
+int DelVar(TVarId VarId)
+{
+	Variable_t *v = &Variables[VarId];
+
+	// 削除する
+	free(v->Name);
+	switch (v->Type) {
+	case TypeString:
+		free(v->Value.Str);
+		break;
+	case TypeIntArray:
+		free(v->Value.IntAry.val);
+		break;
+	case TypeStrArray:
+		for (int i = 0; i < v->Value.StrAry.size; i++) {
+			free(v->Value.StrAry.val[i]);
+		}
+		free(v->Value.StrAry.val);
+		break;
+	default:
+		break;
+	}
+
+	// 後ろを前につめる
+	size_t left = (VariableCount - 1) - VarId;
+	if (left > 0) {
+		memmove(v, v+1, sizeof(Variable_t) * left);
+	}
+	VariableCount--;
+	Variable_t *newVars = (Variable_t *)realloc(Variables, sizeof(Variable_t) * VariableCount);
+	if (newVars == NULL) {
+		VariableCount++;
+		return ErrFewMemory;
+	}
+	Variables = newVars;
+	return 0;
+}
+
+int ReDim(TVarId VarId, int Size, BOOL Preserve)
+{
+	Variable_t *v = &Variables[VarId];
+
+	switch (v->Type) {
+	case TypeIntArray:
+		{
+			TIntAry *intAry = &v->Value.IntAry;
+			int *array = (int *)realloc(intAry->val, Size * sizeof(int));
+			if (array == NULL) {
+				return ErrFewMemory;
+			}
+			if (Preserve) {
+				// 拡張部分を初期化
+				if (Size > intAry->size) {
+					memset(array + intAry->size, 0, (Size - intAry->size) * sizeof(int));
+				}
+			} else {
+				// 全体を初期化
+				memset(array, 0, Size * sizeof(int));
+			}
+			intAry->val = array;
+			intAry->size = Size;
+		}
+		break;
+
+	case TypeStrArray:
+		{
+			TStrAry *strAry = &v->Value.StrAry;
+
+			// 縮小部分の文字列をfree
+			for (int i = Size; i < strAry->size; i++) {
+				free(strAry->val[i]);
+				strAry->val[i] = NULL; // realloc失敗用
+			}
+
+			char **array = (char **)realloc(strAry->val, Size * sizeof(char *));
+			if (array == NULL) {
+				return ErrFewMemory;
+			}
+			if (Preserve) {
+				// 拡張部分を初期化
+				if (Size > strAry->size) {
+					memset(array + strAry->size, 0, (Size - strAry->size) * sizeof(char *));
+				}
+			} else {
+				// 全体を初期化(既存部分はfree)
+				for (int i = 0; i < Size; i++) {
+					if (i < strAry->size) {
+						free(array[i]);
+					}
+					array[i] = NULL;
+				}
+			}
+			strAry->val = array;
+			strAry->size = Size;
+		}
+		break;
+
+	default:
+		return ErrTypeMismatch;
+	}
+
 	return 0;
 }
 

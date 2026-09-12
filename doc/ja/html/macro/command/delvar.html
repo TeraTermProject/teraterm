@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>delvar</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>delvar</h1>
+
+指定されたユーザー変数を未使用状態に戻す。<em>(バージョン5.8.0以降)</em>
+
+<pre class="macro-syntax">
+delvar &lt;variable1&gt; [&lt;variable2&gt; ...]
+</pre>
+
+<h2>パラメータ</h2>
+
+<dl>
+  <dt class="macro">変数 &lt;variable1&gt;</dt>
+  <dd>未使用状態に戻すユーザー変数</dd>
+  <dt class="macro">変数 [&lt;variable2&gt; ...]</dt>
+  <dd>未使用状態に戻すユーザー変数。省略可能。複数指定可。</dd>
+</dl>
+
+<h2>返り値</h2>
+
+なし
+
+<h2>解説</h2>
+
+ユーザー変数の型、値、配列サイズを消去し、未使用状態に戻す。<br>
+システム変数及び未使用状態の変数には使用できない。<br>
+ユーザー変数の型および値は初めて値が代入されたときに決まる。いったん型が決まると違う型の値を代入することはできない。<br>
+delvar を使用すると指定されたユーザー変数が未使用状態に戻り、別の型の値の代入が可能になる。
+
+<h2>例</h2>
+
+<pre class="macro-example">
+strdim array 10
+array[0] = 'String Array'
+var = 'Character string'
+
+delvar array var
+
+intdim array 10
+array[0] = 12345  ; Integer Array
+var = 999         ; Integer
+</pre>
+
+<h2>参照</h2>
+
+<ul>
+  <li><a href="../syntax/variables.html">変数</a></li>
+  <li><a href="../command/strdim.html">strdim</a></li>
+  <li><a href="../command/intdim.html">intdim</a></li>
+</ul>
+
+</body>
+</html>
