@@ -33,6 +33,8 @@ add_executable(
   filesys_proto.h
   keyboard.c
   keyboard.h
+  name_resolve.c
+  name_resolve.h
   scp.cpp
   scp.h
   sendmem.cpp
@@ -50,8 +52,8 @@ add_executable(
   teraterml.h
   theme.h
   themefile.cpp
-  tslib.h
   tslib.cpp
+  tslib.h
   tt-version.rc
   ttdde.c
   ttdde.h
