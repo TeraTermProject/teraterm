@@ -76,20 +76,30 @@ static unsigned __stdcall getaddrinfo_thread(void * p)
 	// IdnToAscii() で ACE 形式 (xn--) へ変換
 	// 変換後は ASCII なので getaddrinfo() で解決できる。
 	const wchar_t *hostname = ga->hostname;
-	wchar_t ace_host[256];
+	wchar_t *ace_host = NULL;
 	if (pIdnToAscii != NULL && is_non_ascii) {
-		if (pIdnToAscii(0, ga->hostname, -1, ace_host, _countof(ace_host)) > 0) {
-			// 変換できた時は ACE形式から解決
-			hostname = ace_host;
+		// 必要な長さを問い合わせてから変換する
+		int len = pIdnToAscii(0, ga->hostname, -1, NULL, 0);
+		if (len > 0) {
+			ace_host = (wchar_t *)malloc(len * sizeof(wchar_t));
+			if (ace_host != NULL) {
+				len = pIdnToAscii(0, ga->hostname, -1, ace_host, len);
+				if (len > 0) {
+					// 変換できた時は ACE形式から解決
+					hostname = ace_host;
+				}
+			}
 		}
+		// 変換できなかったときは変換せずそのまま渡す(従来動作)
 	}
 
-	// ACE 形式へ変換済みなら、全文字 ASCII なので変換可能
+	// ACE 形式へ変換済みなら全文字 ASCII なので CP_ACP 変換でも情報は失われない
 	char *hostnameA = ToCharW(hostname);
 	char *portnameA = ToCharW(ga->portname);
 	gai = getaddrinfo(hostnameA, portnameA, &ga->hints, ga->res);
 	free(hostnameA);
 	free(portnameA);
+	free(ace_host);
 
 	/* send value of gai as message to window hWnd */
 	PostMessage(ga->hWnd, ga->wMsg, (WPARAM)ga->handle, MAKELPARAM(0, gai));
@@ -114,7 +124,7 @@ static unsigned __stdcall getaddrinfo_thread(void * p)
  *	@param	res
  *
  */
-HANDLE PASCAL WSAAsyncGetAddrInfoW(
+HANDLE WINAPI WSAAsyncGetAddrInfoW(
 	HWND hWnd, unsigned int wMsg,
 	const wchar_t *hostname,
 	const wchar_t *portname,
