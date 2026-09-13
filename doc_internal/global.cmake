@@ -12,7 +12,9 @@ message("HTAGS=${HTAGS}")
 execute_process(
   COMMAND ${HTAGS} -ans --tabs 4 -F
   WORKING_DIRECTORY ".."
-  )
+)
 
-file(MAKE_DIRECTORY global)
-file(RENAME ../HTML global/HTML)
+if(EXISTS ../HTML)
+  file(MAKE_DIRECTORY global)
+  file(RENAME ../HTML global/HTML)
+endif()

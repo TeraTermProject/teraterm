@@ -1258,10 +1258,10 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			goto error;
 		}
 
-		if (buffer_get_bignum2(public_blob, d) != 0 ||
-		    buffer_get_bignum2(public_blob, p) != 0 ||
-		    buffer_get_bignum2(public_blob, q) != 0 ||
-		    buffer_get_bignum2(public_blob, iqmp) != 0) {
+		if (buffer_get_bignum2(private_blob, d) != 0 ||
+		    buffer_get_bignum2(private_blob, p) != 0 ||
+		    buffer_get_bignum2(private_blob, q) != 0 ||
+		    buffer_get_bignum2(private_blob, iqmp) != 0) {
 			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
 			goto error;
 		}
@@ -1309,7 +1309,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		    buffer_get_bignum2(public_blob, q) != 0 ||
 		    buffer_get_bignum2(public_blob, g) != 0 ||
 		    buffer_get_bignum2(public_blob, pub_key) != 0 ||
-		    buffer_get_bignum2(public_blob, priv_key) != 0) {
+		    buffer_get_bignum2(private_blob, priv_key) != 0) {
 			strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
 			goto error;
 		}
@@ -1356,7 +1356,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			goto ecdsa_error;
 
 		if (buffer_get_ec(public_blob, q, EC_KEY_get0_group(result->ecdsa)) != 0 ||
-		    buffer_get_bignum2(public_blob, exponent) != 0)
+		    buffer_get_bignum2(private_blob, exponent) != 0)
 			goto ecdsa_error;
 		if (EC_KEY_set_public_key(result->ecdsa, q) != 1)
 			goto ecdsa_error;
