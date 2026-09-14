@@ -8,9 +8,6 @@ set_target_properties(TTXCallSysMenu PROPERTIES FOLDER TTXSamples)
 add_subdirectory(TTXCommandLineOpt)
 set_target_properties(TTXCommandLineOpt PROPERTIES FOLDER TTXSamples)
 
-add_subdirectory(TTXCopyIniFile)
-set_target_properties(TTXCopyIniFile PROPERTIES FOLDER TTXSamples)
-
 add_subdirectory(TTXFixedWinSize)
 set_target_properties(TTXFixedWinSize PROPERTIES FOLDER TTXSamples)
 
