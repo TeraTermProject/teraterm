@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>delvar</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+<h1>delvar</h1>
+
+Restores the specified user variable to the unused state. <em>(version 5.8.0 or later)</em>
+
+<pre class="macro-syntax">
+delvar &lt;variable1&gt; [&lt;variable2&gt; ...]
+</pre>
+
+<h2>Parameters</h2>
+
+<dl>
+  <dt class="macro">Variable &lt;variable1&gt;</dt>
+  <dd>User variable to be restored to the unused state.</dd>
+  <dt class="macro">Variable [&lt;variable2&gt; ...]</dt>
+  <dd>User variables to be restored to the unused state. Optional. Multiple allowed.</dd>
+</dl>
+
+<h2>Return Value</h2>
+
+None.
+
+<h2>Remarks</h2>
+
+Removes the type, value, and array size of the user variable and resets it to the unused state.<br>
+This command cannot be used with system variables or unused variables.<br>
+The type of a variable is determined when a value is assigned to it for the first time.
+Once the type of the variable is determined, values of a different type cannot be assigned to it.<br>
+By using delvar, the specified user variable is restored to the unused state, allowing a value of a different type to be assigned again.
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+strdim array 10
+array[0] = "String Array"
+var = "Character string"
+
+delvar array var
+
+intdim array 10
+array[0] = 12345  ; Integer Array
+var = 999         ; Integer
+</pre>
+
+<h2>See also</h2>
+
+<ul>
+  <li><a href="../syntax/variables.html">Variables</a></li>
+  <li><a href="../command/strdim.html">strdim</a></li>
+  <li><a href="../command/intdim.html">intdim</a></li>
+</ul>
+
+</body>
+</html>

@@ -142,6 +142,22 @@ LRESULT CErrDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 			}
 		}
 		return TRUE;
-	}
+
+    case WM_DESTROY:
+        if (MsgStr) {
+            free(MsgStr);
+            MsgStr = NULL;
+        }
+        if (LineStr) {
+            free(LineStr);
+            LineStr = NULL;
+        }
+        if (MacroFileName) {
+            free(MacroFileName);
+            MacroFileName = NULL;
+        }
+        return FALSE;
+    }
+
 	return FALSE;
 }
