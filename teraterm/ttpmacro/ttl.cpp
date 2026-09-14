@@ -3646,11 +3646,14 @@ static WORD TTLReDim(void)
 	if (Size < 1 || Size > 65536) return ErrOutOfRange;
 
 	GetStrVal(Str, &Err);
-	if (Err == 0 && Str[0] != '\0') {
-		if (_stricmp(Str, "Preserve") != 0) {
+	if (Err == 0) {
+		if (Str[0] == '\0') {
+			Preserve = FALSE;
+		} else if (_stricmp(Str, "Preserve") == 0) {
+			Preserve = TRUE;
+		} else {
 			return ErrSyntax;
 		}
-		Preserve = TRUE;
 	} else if (Err == ErrSyntax) { // パラメタが無い場合は ErrSyntax が返る
 		Preserve = FALSE;
 	} else {
