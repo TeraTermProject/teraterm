@@ -49,6 +49,10 @@ BOOL WritePrivateProfileStringWifNeeded(const wchar_t *appW, const wchar_t *keyW
 			bufW[0] = str1W[0] + 1;
 			bufW[1] = L'\0';
 		}
+		else if (strW == NULL) {
+			bufW[0] = str1W[0] + 1;
+			bufW[1] = L'\0';
+		}
 	}
 	int r = wcsncmp(str1W, bufW, lenW_max);
 	free(bufW);
