@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-BOOL WritePrivateProfileStringWFileW(const wchar_t *appA, const wchar_t *keyA, const wchar_t *strA, const wchar_t *filenameW);
+BOOL WritePrivateProfileStringWifNeeded(const wchar_t *appA, const wchar_t *keyA, const wchar_t *strA, const wchar_t *filenameW);
 DWORD GetPrivateProfileStringAFileW(const char *appA, const char *keyA, const char* defA, char *strA, DWORD size, const wchar_t *filenameW);
 BOOL WritePrivateProfileStringAFileW(const char *appA, const char *keyA, const char *strA, const wchar_t *filenameW);
 UINT GetPrivateProfileIntAFileW(const char *appA, const char *keyA, int def, const wchar_t *filenameW);

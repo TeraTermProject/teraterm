@@ -36,7 +36,10 @@
 
 #include "inifile_com.h"
 
-BOOL WritePrivateProfileStringWFileW(const wchar_t *appW, const wchar_t *keyW, const wchar_t *strW, const wchar_t *filenameW)
+/**
+ *	書き込みが必要な時だけ、WritePrivateProfileStringW() を呼び出す
+ */
+BOOL WritePrivateProfileStringWifNeeded(const wchar_t *appW, const wchar_t *keyW, const wchar_t *strW, const wchar_t *filenameW)
 {
 	wchar_t *str1W = strW == NULL ? L"" : strW;
 	DWORD lenW_max = (DWORD)(wcslen(str1W) + 2);
@@ -55,7 +58,7 @@ BOOL WritePrivateProfileStringWFileW(const wchar_t *appW, const wchar_t *keyW, c
 	return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
 }
 
-#define WritePrivateProfileStringW(p1, p2, p3, p4) WritePrivateProfileStringWFileW(p1, p2, p3, p4)
+#define WritePrivateProfileStringW(p1, p2, p3, p4) WritePrivateProfileStringWifNeeded(p1, p2, p3, p4)
 
 /**
  *	GetPrivateProfileStringA() のファイル名だけが wchar_t 版
