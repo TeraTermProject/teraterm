@@ -41,24 +41,54 @@
  */
 BOOL WritePrivateProfileStringWifNeeded(const wchar_t *appW, const wchar_t *keyW, const wchar_t *strW, const wchar_t *filenameW)
 {
-	wchar_t *str1W = strW == NULL ? L"" : strW;
-	DWORD lenW_max = (DWORD)(wcslen(str1W) + 2);
-	wchar_t *bufW = (wchar_t *)malloc(sizeof(wchar_t) * lenW_max);
-	if (0 == GetPrivateProfileStringW(appW, keyW, L"", bufW, lenW_max, filenameW)) {
-		if (GetPrivateProfileStringW(appW, keyW, L"*", bufW, lenW_max, filenameW)) {
-			bufW[0] = str1W[0] + 1;
-			bufW[1] = L'\0';
-		}
-		else if (strW == NULL) {
-			bufW[0] = str1W[0] + 1;
-			bufW[1] = L'\0';
-		}
+	//キー削除・追加・更新以外の場合
+	if (NULL == appW || NULL == keyW || NULL == filenameW) {
+		return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
 	}
-	int r = wcsncmp(str1W, bufW, lenW_max);
-	free(bufW);
-	if (r == 0) {
-		return TRUE;
+
+	//キー削除の場合
+	if (strW == NULL) {
+		wchar_t buf1W[2];
+		DWORD dwSize = GetPrivateProfileStringW(appW, keyW, L"", buf1W, _countof(buf1W), filenameW);
+		//strWはNULLかつファイルが無い場合は削除しない(キーがなくてもここに来るらしい)
+		if (0x02 == GetLastError()) {
+			return TRUE;
+		}
+		//strWはNULLかつiniキーなしの場合は書き込みしない
+		if (0 == dwSize) {
+			if (0 != GetPrivateProfileStringW(appW, keyW, L"*", buf1W, _countof(buf1W), filenameW)) {
+				return TRUE;
+			}
+		}
+		//strWはNULLかつiniキーありの場合は書き込む(キー削除)
+		return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
 	}
+
+	//キー追加・更新の場合
+	else {
+		DWORD lenW_max = (DWORD)(wcslen(strW) + 2);
+		wchar_t *buf2W = (wchar_t *)malloc(sizeof(wchar_t) * lenW_max);
+		DWORD dwSize = GetPrivateProfileStringW(appW, keyW, L"", buf2W, lenW_max, filenameW);
+		//ファイルが無い場合は書き込む(キーがなくてもここに来るらしい)
+		if (0x02 == GetLastError()) {
+			free(buf2W);
+			return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
+		}
+		//iniキーなしの場合は書き込む
+		if (0 == dwSize) {
+			if (0 != GetPrivateProfileStringW(appW, keyW, L"*", buf2W, lenW_max, filenameW)) {
+				free(buf2W);
+				return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
+			}
+		}
+		//strWとiniキーの値が同じ場合は書き込みしない
+		if (wcsncmp(strW, buf2W, lenW_max) == 0) {
+			free(buf2W);
+			return TRUE;
+		}
+		free(buf2W);
+	}
+
 	return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
 }
 
