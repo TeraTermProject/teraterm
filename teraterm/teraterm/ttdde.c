@@ -643,7 +643,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	case CmdGetTitle: {
 		// title is transferred later by XTYP_REQUEST
-		char *titleU8 = ToU8A(ts.Title);
+		char *titleU8 = ToU8W(ts.TitleW);
 		if (titleU8 == NULL) {
 			ParamFileName[0] = 0;
 		}
@@ -835,12 +835,12 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	case CmdSetTitle: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
-		WideCharToACP_t(ParamFileNameW, ts.Title, _countof(ts.Title));
 		if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) {
 			free(cv.TitleRemoteW);
 			cv.TitleRemoteW = NULL;
 		}
-		ChangeTitle();
+		SetLocalTitle(ParamFileNameW);
+		free(ParamFileNameW);
 		break;
 	}
 	case CmdShowTT:

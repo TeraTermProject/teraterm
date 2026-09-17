@@ -711,8 +711,8 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->TerminalID = TermIDGetID(Temp);
 
 	/* Title String */
-	GetPrivateProfileString(Section, "Title", "Tera Term",
-	                        ts->Title, sizeof(ts->Title), FName);
+	free(ts->TitleW);
+	hGetPrivateProfileStringW(SectionW, L"Title", L"Tera Term", FName, &ts->TitleW);
 
 	/* Cursor shape */
 	GetPrivateProfileString(Section, "CursorShape", "",
@@ -2283,7 +2283,7 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	WritePrivateProfileString(Section, "TerminalID", TermIDGetStr(ts->TerminalID), FName);
 
 	/* Title text */
-	WritePrivateProfileString(Section, "Title", ts->Title, FName);
+	WritePrivateProfileStringW(SectionW, L"Title", ts->TitleW, FName);
 
 	/* Cursor shape */
 	switch (ts->CursorShape) {
@@ -3817,9 +3817,8 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			ts->HideWindow = 1;
 		}
 		else if (_wcsnicmp(Temp, L"/W=", 3) == 0) {	/* Window title */
-		    char* TitleA = ToCharW(&Temp[3]);
-			strncpy_s(ts->Title, sizeof(ts->Title), TitleA, _TRUNCATE);
-			free(TitleA);
+			free(ts->TitleW);
+			ts->TitleW = _wcsdup(&Temp[3]);
 		}
 		else if (_wcsnicmp(Temp, L"/X=", 3) == 0) {	/* Window pos (X) */
 			if (swscanf(&Temp[3], L"%d", &pos) == 1) {
@@ -3953,6 +3952,7 @@ void TTSetUnInit(TTTSet *ts)
 		(void **)&ts->ViewlogEditorW,
 		(void **)&ts->ViewlogEditorArg,
 		(void **)&ts->LogTimestampFormatW,
+		(void **)&ts->TitleW,
 	};
 	int i;
 	for(i = 0; i < _countof(ptr_list); i++) {

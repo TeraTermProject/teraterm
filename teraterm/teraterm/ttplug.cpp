@@ -41,6 +41,7 @@
 #include "asprintf.h"
 #include "history_store.h"
 #include "win32helper.h"
+#include "ttwinman.h"
 
 #include "ttplugin.h"
 #include "ttplug.h"
@@ -519,6 +520,33 @@ static void UnloadExtensions()
 	NumExtensions = 0;
 }
 
+/**
+ *	プラグインに渡す Tera Term の関数
+ *
+ *	GetImports() でプラグインに渡す
+ *	@see	TTXImports
+ */
+const static TTXImports imports = {
+	SetLocalTitle,
+	GetLocalTitle,
+};
+
+/**
+ *	プラグインに TTXImports を渡す
+ *
+ *	@param	size	プラグインが知っている sizeof(TTXImports)
+ *	@return	TTXImports へのポインタ
+ *			サイズが一致しない場合は NULL
+ */
+static const TTXImports *GetImports(size_t size)
+{
+	if (size != sizeof(imports)) {
+		// サイズが違うものは使用できない
+		return NULL;
+	}
+	return &imports;
+}
+
 void PASCAL TTXInit(PTTSet ts_, PComVar cv_)
 {
 	int i;
@@ -533,6 +561,15 @@ void PASCAL TTXInit(PTTSet ts_, PComVar cv_)
 		}
 		if (Extensions[i].exports->TTXInit != NULL) {
 			Extensions[i].exports->TTXInit(ts_, cv_);
+		}
+		if (Extensions[i].exports->TTXInit2 != NULL) {
+			if (Extensions[i].exports->TTXInit2(ts_, cv_, GetImports) == FALSE) {
+				// API 不整合。このプラグインは以降のフック呼び出しから外す
+				free(Extensions[i].exports);
+				Extensions[i].exports = NULL;
+				FreeLibrary(Extensions[i].LibHandle);
+				Extensions[i].LibHandle = NULL;
+			}
 		}
 	}
 }

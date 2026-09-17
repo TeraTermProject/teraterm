@@ -46,7 +46,7 @@
 static struct {
 	BOOL PerProcessCalled;
 	BOOL old_VTDrawAPI;
-	char *orgTitle;
+	wchar_t *orgTitle;
 	HWND hWnd_disable;
 } ExternalSetupData;
 
@@ -89,7 +89,7 @@ static void ExternalSetupPreProcess(HWND hWnd, CAddSettingPropSheetDlgPage page)
 		;
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::WinPage) {
-		ExternalSetupData.orgTitle = _strdup(ts.Title);
+		ExternalSetupData.orgTitle = _wcsdup(ts.TitleW);
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::SerialPortPage) {
 		;
@@ -165,7 +165,7 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 
 			// タイトルが変更されていたら、リモートタイトルをクリアする
 			if ((ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) &&
-				(strcmp(ExternalSetupData.orgTitle, ts.Title) != 0)) {
+				(wcscmp(ExternalSetupData.orgTitle, ts.TitleW) != 0)) {
 				free(cv.TitleRemoteW);
 				cv.TitleRemoteW = NULL;
 			}

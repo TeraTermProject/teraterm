@@ -94,10 +94,7 @@ void ChangeTitle(void)
 
 	{
 		const wchar_t *title_remote;
-		wchar_t *title = ToWcharA(ts.Title);
-		if (title == NULL) {
-			title = _wcsdup(L"");
-		}
+		const wchar_t *title = (ts.TitleW != NULL) ? ts.TitleW : L"";
 		title_remote = cv.TitleRemoteW;
 		if (Connecting || !cv.Ready || title_remote == NULL || title_remote[0] == 0) {
 			// リモートタイトルを使用しない or 設定されていない
@@ -122,7 +119,6 @@ void ChangeTitle(void)
 			}
 			wcsncpy_s(TempTitle, _countof(TempTitle), TempTitleWithRemote, _TRUNCATE);
 		}
-		free(title);
 	}
 
 	if ((ts.TitleFormat & 1)!=0)
@@ -264,4 +260,31 @@ HMODULE LoadHomeDLL(const wchar_t *DLLname)
 	handle = LoadLibraryW(DLLpath);
 	free(DLLpath);
 	return handle;
+}
+
+/**
+ *	ローカルタイトルを設定する
+ *
+ *	@param	title	タイトル文字列
+ *					ts.TitleW を指定しない
+ */
+void SetLocalTitle(const wchar_t *title)
+{
+	if (title == ts.TitleW) {
+		return;
+	}
+	free(ts.TitleW);
+	ts.TitleW = _wcsdup(title != NULL ? title : L"");
+	ChangeTitle();
+}
+
+/**
+ *	ローカルタイトルを取得する
+ *
+ *	@return	タイトル文字列(NULLを返さない)
+ *			次に SetLocalTitle() が呼ばれると無効になる
+ */
+const wchar_t *GetLocalTitle(void)
+{
+	return (ts.TitleW != NULL) ? ts.TitleW : L"";
 }

@@ -86,8 +86,7 @@ typedef struct {
 	struct timeval wait;
 	wchar_t *openfnW;
 	BOOL origTitleSaved;
-	char origTitle[TitleBuffSize];
-	char origOLDTitle[TitleBuffSize];
+	wchar_t *origOLDTitle;
 	WORD origAcceptTitleChangeRequest;
 	int mode_flag;
 	char *fmt_time;
@@ -95,6 +94,7 @@ typedef struct {
 	int name_cnt_ini;
 	int name_cnt;
 	struct recmarker marker[8];
+	const TTXImports *imports;
 } TInstVar;
 
 static TInstVar *pvar;
@@ -108,7 +108,8 @@ static TInstVar InstVar;
 
 static void SaveTitle() {
 	if (!pvar->origTitleSaved) {
-		strncpy_s(pvar->origOLDTitle, sizeof(pvar->origOLDTitle), pvar->ts->Title, _TRUNCATE);
+		const wchar_t *title = (pvar->ts->TitleW != NULL) ? pvar->ts->TitleW : L"";
+		pvar->origOLDTitle = _wcsdup(title);
 		pvar->origAcceptTitleChangeRequest = pvar->ts->AcceptTitleChangeRequest;
 		pvar->origTitleSaved = TRUE;
 	}
@@ -116,7 +117,9 @@ static void SaveTitle() {
 
 static void RestoreSavedTitle() {
 	if (pvar->origTitleSaved) {
-		strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), pvar->origOLDTitle, _TRUNCATE);
+		pvar->imports->SetLocalTitle(pvar->origOLDTitle);
+		free(pvar->origOLDTitle);
+		pvar->origOLDTitle = NULL;
 		pvar->ts->AcceptTitleChangeRequest = pvar->origAcceptTitleChangeRequest;
 		pvar->origTitleSaved = FALSE;
 	}
@@ -158,7 +161,9 @@ void ChangeTitleStatus() {
   if (pvar->mode_flag & MODE_FLAG_AHEAD) {
     pvar->ts->AcceptTitleChangeRequest = IdTitleChangeRequestAhead;
   }
-  strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
+  wchar_t *tbuffW = ToWcharA(tbuff);
+  pvar->imports->SetLocalTitle(tbuffW);
+  free(tbuffW);
   pvar->ChangeTitle = TRUE;
   SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
 }
@@ -216,7 +221,9 @@ void ChangeTitleTimePeriod(struct timeval tv, int period) {
 	}
 	SaveTitle();
 	pvar->ts->AcceptTitleChangeRequest = IdTitleChangeRequestOff;
-	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
+	wchar_t *tbuffW = ToWcharA(tbuff);
+	pvar->imports->SetLocalTitle(tbuffW);
+	free(tbuffW);
 	SendMessage(pvar->cv->HWin, WM_USER_CHANGETITLE, 0, 0);
 }
 
@@ -290,9 +297,15 @@ static void AddMarkerList() {
 	}
 }
 
-static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
+static BOOL TTXInit2(PTTSet ts, PComVar cv, const TTXImports *(*GetImports)(size_t size))
+{
+	const TTXImports *imports = GetImports(sizeof(TTXImports));
+	if (imports == NULL) {
+		return FALSE;
+	}
 	pvar->ts = ts;
 	pvar->cv = cv;
+	pvar->imports = imports;
 	pvar->origPCreateFile = NULL;
 	pvar->origPReadFile = NULL;
 	pvar->origPWriteFile = NULL;
@@ -323,6 +336,7 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->name_cnt_ini = 0;
 	pvar->name_cnt = 0;
 	ClearMarkerList();
+	return TRUE;
 }
 
 void RestoreTitle() {
@@ -342,8 +356,9 @@ void ChangeTitle(char *title) {
 		return;
 	}
 	SaveTitle();
-	strncpy_s(pvar->origTitle, sizeof(pvar->origTitle), pvar->ts->Title, _TRUNCATE);
-	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), title, _TRUNCATE);
+	wchar_t *titleW = ToWcharA(title);
+	pvar->imports->SetLocalTitle(titleW);
+	free(titleW);
 	pvar->ChangeTitle = TRUE;
 	SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
 }
@@ -923,7 +938,7 @@ static TTXExports Exports = {
 	sizeof(TTXExports),
 	ORDER,
 
-	TTXInit,
+	NULL, // TTXInit,
 	TTXGetUIHooks,
 	TTXGetSetupHooks,
 	NULL, // TTXOpenTCP,
@@ -935,11 +950,18 @@ static TTXExports Exports = {
 	NULL, // TTXEnd,
 	NULL, // TTXSetCommandLine,
 	TTXOpenFile,
-	TTXCloseFile
+	TTXCloseFile,
+	TTXInit2,
 };
 
 BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
 	int size = sizeof(Exports) - sizeof(exports->size);
+
+	// TTXInit() ではなく TTXInit2() で初期化を行う
+	// TTXInit2() を使用しないTera Termでは動作しないようFALSEを返す
+	if (!TTXExportsHas(exports, TTXInit2)) {
+		return FALSE;
+	}
 
 	if (size > exports->size) {
 		size = exports->size;
@@ -972,6 +994,8 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			pvar->openfnW = NULL;
 			free(pvar->fmt_time);
 			pvar->fmt_time = NULL;
+			free(pvar->origOLDTitle);
+			pvar->origOLDTitle = NULL;
 			break;
 	}
 	return TRUE;
