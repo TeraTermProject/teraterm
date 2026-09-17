@@ -5839,6 +5839,13 @@ void EndTerm()
 	CLocale = NULL;
 	CharSetFinish(charset_data);
 	charset_data = NULL;
+
+	while (TitleStack != NULL) {
+		PTStack t = TitleStack;
+		TitleStack = t->next;
+		free(t->title);
+		free(t);
+	}
 }
 
 BOOL BracketedPasteMode() {
