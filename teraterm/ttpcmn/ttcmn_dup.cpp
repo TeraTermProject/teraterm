@@ -44,7 +44,6 @@
 #include "tt-version.h"
 #include "ttlib.h"
 #include "tt_res.h"
-#include "codeconv.h"
 #include "compat_win.h"
 #include "asprintf.h"
 #include "ttcommon.h"
