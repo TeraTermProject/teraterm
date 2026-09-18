@@ -45,6 +45,20 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1339" target="_blank">issue #1339</a>)<br>
         Previously it was 32bit, up to about 49.7 days.
       </li>
+      <li>
+        Changed the <a href="../menu/setup-additional-window.html#Title">local title</a>
+        (<a href="../commandline/teraterm.html#w">/W=</a> command line option,
+        <a href="../macro/command/settitle.html">settitle</a> macro command)
+        to be handled in Unicode.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)<br>
+        Previously it was held as an ANSI string, and characters that could not be converted were replaced with "?".
+      </li>
+      <li>
+        Added support for plugins to call Tera Term functions.<br>
+        Added TTXInit2() to TTXExports so that plugins can obtain TTXImports,
+        which holds pointers to Tera Term functions.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)
+      </li>
     </ul>
   </li>
 
@@ -6969,6 +6983,14 @@ SYNOPSIS:
 </ul>
 
 <h2 id="ttyrec">TTXttyrec</h2>
+<h3 id="ttyrec_1.08">YYYY.MM.DD (Ver 1.08 not released yet)</h3>
+<ul class="history">
+  <li>
+    Changed the title bar display to be handled in Unicode.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)
+  </li>
+</ul>
+
 <h3 id="ttyrec_1.07">2026.09.04 (Ver 1.07)</h3>
 <ul class="history">
   <li>

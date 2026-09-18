@@ -4156,9 +4156,7 @@ vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **pdc, int *mode)
 	}
 
 	/* start printing */
-	wchar_t *TitleW = ToWcharA(ts.Title);
-	BOOL r = PrnStart(PrintDC, TitleW);
-	free(TitleW);
+	BOOL r = PrnStart(PrintDC, ts.TitleW);
 	if (!r) {
 		goto error;
 	}

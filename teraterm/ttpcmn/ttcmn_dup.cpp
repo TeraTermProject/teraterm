@@ -44,7 +44,6 @@
 #include "tt-version.h"
 #include "ttlib.h"
 #include "tt_res.h"
-#include "codeconv.h"
 #include "compat_win.h"
 #include "asprintf.h"
 #include "ttcommon.h"
@@ -258,6 +257,7 @@ static const TSerializeInfo serialize_info[] = {
 	{ MALLOCED_WSTRING_INFO(TTTSet, ViewlogEditorW) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, ViewlogEditorArg) },
 	{ MALLOCED_WSTRING_INFO(TTTSet, LogTimestampFormatW) },
+	{ MALLOCED_WSTRING_INFO(TTTSet, TitleW) },
 	{ 0, 0, TSerializeInfo::COPY },
 };
 
