@@ -49,6 +49,7 @@
 #include "vtwin.h"
 #include "makeoutputstring.h"
 #include "name_resolve.h"
+#include "compat_win.h"
 
 #include "commlib.h"
 
@@ -767,7 +768,7 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 			break;
 	}
 	cv->Ready = TRUE;
-	cv->ConnectedTime = GetTickCount();
+	cv->ConnectedTime = pGetTickCount64();
 }
 
 BOOL CommCanClose(PComVar cv)
