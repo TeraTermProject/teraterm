@@ -21,25 +21,26 @@
     <dl>
       <dt id="Host">Host</dt>
       <dd>
-	Enter the host name or IP address(IPv4 and IPv6) or named pipe.<br>
+	Enter the host name or IP address(IPv4 and IPv6) or named pipe or serial port.<br>
 	The IPv6 address is surround with the bracket. (Refer to <a href="https://datatracker.ietf.org/doc/html/rfc3986" target="_blank">RFC3986</a> / <a href="https://datatracker.ietf.org/doc/html/rfc5952#section-6" target="_blank">RFC5952</a>)<br>
-	You can enter not only the host name or address, but also the
-	<a href="../commandline/teraterm.html">command line parameters</a>
-	like the following:<br>
-    Please refer to <a href="../commandline/ttssh.html#passwd_specify">Notes on Specifying a Password</a> of TTSSH command line.
+	You can enter not only a host name or address, but the entire <a href="../commandline/teraterm.html">command line parameters</a> containing the host name or address.
 
-    <pre>
-    myhost.example.com                  Host name only.
-    myhost.example.com:23               Host name with a port number.
-    foohost.example.org /F=FOOHOST.INI  Host name &amp; setup file name.
-    /C=1                                Specifies the serial port connection.
-    /R=LOG.DAT                          Replays the log file.
-    [2001:db8:1:2:8401:2ff:fe03:405]    IPv6 address
-    [fe80::8401:2ff:fe03:405%3]:8022    IPv6 address and Port number
-    user@myhost.example.com:10022 /ssh  SSH connection to a port number other than 22
-    ssh://user@myhost.example.com       SSH connection to the SSH protocol(ssh://)
-    \\.\pipe\vmware-serial-port         Named pipe connection
-    </pre>
+<pre>
+myhost.example.com                  Host name only.
+myhost.example.com:23               Host name with a port number.
+[2001:db8:1:2:8401:2ff:fe03:405]    IPv6 address
+[fe80::8401:2ff:fe03:405%3]:8022    IPv6 address and Port number
+\\.\pipe\vmware-serial-port         Named pipe connection
+/C=1                                Specifies the serial port connection.
+
+foohost.example.org /F=FOOHOST.INI  Host name &amp; setup file name.
+/R=TERATERM.LOG                     Replays the log file.
+user@myhost.example.com:10022 /ssh  SSH connection to a port number other than 22
+ssh://user@myhost.example.com       SSH connection to the SSH protocol(ssh://)
+198.51.100.12 ; staging server      You can also add comments.
+</pre>
+
+    Please refer to <a href="../commandline/ttssh.html#passwd_specify">Notes on Specifying a Password</a> of TTSSH command line.
 
     <dl>
       <dt id="HostList">Host List</dt>
