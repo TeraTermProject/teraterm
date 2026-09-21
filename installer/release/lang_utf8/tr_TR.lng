@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Turkish
-date=2026-07-18 by TeraTerm Project
+date=2026-09-09 by TeraTerm Project
 contributor= Mehmet Cagri Aksoy (2025-08-04)
 
 [Tera Term]
@@ -740,7 +740,7 @@ DLG_AUTHSETUP_HOST_PRIVATEKEY=Ana bilgisayar özel anahtarı &dosyası:
 DLG_AUTHSETUP_CHECKAUTH=&Giriş öncesi etkinleştirilmiş kimlik doğrulama yöntemlerini kontrol et (SSH2)
 
 FILEDLG_OPEN_PRIVATEKEY_TITLE=RSA/DSA/ECDSA/ED25519 özel anahtarı içeren bir dosya seçin
-FILEDLG_OPEN_PRIVATEKEY_FILTER=kimlik dosyaları\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0PEM dosyaları(*.pem)\0*.pem\0tümü(*.*)\0*.*\0\0
+FILEDLG_OPEN_PRIVATEKEY_FILTER=kimlik dosyaları\0identity*;id_rsa*;id_dsa*;id_ecdsa*;id_ed25519*;*.ppk;*.pem\0identity(RSA1)\0identity*\0id_rsa(SSH2)\0id_rsa*\0id_dsa(SSH2)\0id_dsa*\0id_ecdsa(SSH2)\0id_ecdsa*\0id_ed25519(SSH2)\0id_ed25519*\0PuTTY(*.ppk)\0*.ppk\0PEM dosyaları(*.pem)\0*.pem\0tümü(*.*)\0*.*\0\0
 MSG_KEYSPECIFY_ERROR=RSA/DSA/ECDSA/ED25519 özel anahtarı içeren bir dosya belirtmelisiniz.
 MSG_READKEY_ERROR=SSH2 özel anahtar dosyası okuma hatası\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts kimlik doğrulaması muhtemelen başarısız olacak çünkü varsayılan kimlik doğrulama yöntemi değildi.\nTTSSH'da Rhosts kimlik doğrulamasını kullanmak için, TTSSH'ı yeniden başlatarak\nve bağlanmadan önce Kurulum menüsünden "SSH Kimlik Doğrulaması..." seçerek varsayılan olarak ayarlamanız gerekir.
