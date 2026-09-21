@@ -6107,6 +6107,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	bloblen = buffer_len(server_host_key_blob);
 
 	push_memdump("KEXDH_REPLY", "server_host_key_blob", data, bloblen);
+	logprintf_hexdump(LOG_LEVEL_VERBOSE, data, bloblen, "server_host_key_blob %s:%d %s() bloblen=%d", __FILE__, __LINE__, __FUNCTION__, bloblen);
 
 	memset(&server_host_key, 0, sizeof(server_host_key));
 	server_host_key = key_from_blob(buffer_ptr(server_host_key_blob),

@@ -1379,29 +1379,36 @@ Key *key_from_blob(char *data, int blen)
 	if (b == NULL)
 		goto error;
 
-	if (buffer_put(b, data, blen) != 0)
+	if (buffer_put(b, data, blen) != 0) {
+		logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 		goto error;
+	}
 	buffer_rewind(b);
 
-	if (buffer_get_string(b, &ktype, NULL) != 0)
+	if (buffer_get_string(b, &ktype, NULL) != 0) {
+		logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 		goto error;
+	}
 	type = get_hostkey_type_from_name(ktype);
 
 	switch (type) {
 	case KEY_RSA: // RSA key
 		rsa = RSA_new();
 		if (rsa == NULL) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
 		n = BN_new();
 		e = BN_new();
 		RSA_set0_key(rsa, n, e, NULL);
 		if (n == NULL || e == NULL) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
 
 		if (buffer_get_bignum2(b, e) != 0 ||
 		    buffer_get_bignum2(b, n) != 0) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
 
