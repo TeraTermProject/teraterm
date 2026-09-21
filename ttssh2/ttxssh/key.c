@@ -1366,18 +1366,24 @@ Key *key_from_blob(char *data, int blen)
 	BIGNUM *e = NULL, *n = NULL;
 	BIGNUM *p, *dsa_q, *g, *pub_key;
 
-	if (data == NULL)
+	if (data == NULL) {
+		logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 		goto error;
+	}
 
 	hostkey = malloc(sizeof(Key));
-	if (hostkey == NULL)
+	if (hostkey == NULL) {
+		logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 		goto error;
+	}
 
 	memset(hostkey, 0, sizeof(Key));
 
 	b = buffer_init();
-	if (b == NULL)
+	if (b == NULL) {
+		logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 		goto error;
+	}
 
 	if (buffer_put(b, data, blen) != 0) {
 		logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
@@ -1419,6 +1425,7 @@ Key *key_from_blob(char *data, int blen)
 	case KEY_DSA: // DSA key
 		dsa = DSA_new();
 		if (dsa == NULL) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
 		p = BN_new();
@@ -1431,6 +1438,7 @@ Key *key_from_blob(char *data, int blen)
 		    dsa_q == NULL ||
 		    g == NULL ||
 		    pub_key == NULL) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
 
@@ -1438,6 +1446,7 @@ Key *key_from_blob(char *data, int blen)
 		    buffer_get_bignum2(b, dsa_q) != 0 ||
 		    buffer_get_bignum2(b, g) != 0 ||
 		    buffer_get_bignum2(b, pub_key) != 0) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
 
@@ -1448,30 +1457,38 @@ Key *key_from_blob(char *data, int blen)
 	case KEY_ECDSA256: // ECDSA
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
-		if (buffer_get_string(b, &curve, NULL) != 0)
+		if (buffer_get_string(b, &curve, NULL) != 0) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
+		}
 		if (type != key_curve_name_to_keytype(curve)) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
 
 		ecdsa = EC_KEY_new_by_curve_name(keytype_to_cipher_nid(type));
 		if (ecdsa == NULL) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
 
 		q = EC_POINT_new(EC_KEY_get0_group(ecdsa));
 		if (q == NULL) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
 
 		if (buffer_get_ec(b, q, EC_KEY_get0_group(ecdsa)) != 0) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
 		if (key_ec_validate_public(EC_KEY_get0_group(ecdsa), q) == -1) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
 
 		if (EC_KEY_set_public_key(ecdsa, q) != 1) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
 
@@ -1480,12 +1497,18 @@ Key *key_from_blob(char *data, int blen)
 		break;
 
 	case KEY_ED25519:
-		if (buffer_get_string(b, &pk, &len) != 0)
+		if (buffer_get_string(b, &pk, &len) != 0) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
-		if (pk == NULL)
+		}
+		if (pk == NULL) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
-		if (len != ED25519_PK_SZ)
+		}
+		if (len != ED25519_PK_SZ) {
+			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
+		}
 
 		hostkey->type = type;
 		hostkey->ed25519_pk = pk;
@@ -1493,12 +1516,15 @@ Key *key_from_blob(char *data, int blen)
 		break;
 
 	default: // unknown key
+		logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 		goto error;
 	}
 
+	logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 	return (hostkey);
 
 error:
+	logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 	buffer_free(b);
 	free(ktype);
 
