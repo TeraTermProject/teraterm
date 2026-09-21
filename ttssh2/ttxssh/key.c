@@ -1396,6 +1396,7 @@ Key *key_from_blob(char *data, int blen)
 		goto error;
 	}
 	type = get_hostkey_type_from_name(ktype);
+	logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s() type=%d ktype=%s", __FILE__, __LINE__, __FUNCTION__, type, ktype);
 
 	switch (type) {
 	case KEY_RSA: // RSA key
@@ -1461,11 +1462,14 @@ Key *key_from_blob(char *data, int blen)
 			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
+		logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s() curve=%s", __FILE__, __LINE__, __FUNCTION__, curve);
+
 		if (type != key_curve_name_to_keytype(curve)) {
 			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
 			goto error;
 		}
 
+		logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s() keytype_to_cipher_nid(type)=%d", __FILE__, __LINE__, __FUNCTION__, keytype_to_cipher_nid(type));
 		ecdsa = EC_KEY_new_by_curve_name(keytype_to_cipher_nid(type));
 		if (ecdsa == NULL) {
 			logprintf(LOG_LEVEL_VERBOSE, "%s:%d %s()", __FILE__, __LINE__, __FUNCTION__);
