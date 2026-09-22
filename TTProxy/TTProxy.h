@@ -24,7 +24,7 @@ class TTProxy : public DynamicLinkLibrary<TTProxy> {
 		OPTION_REPLACE = 2,
 	};
 public:
-	TTProxy():initialized(false), showing_error_message(false) {
+	TTProxy():initialized(false), showing_error_message(false), imports(NULL) {
 	}
 	bool processAttach() {
 		DisableThreadLibraryCalls(GetInstanceHandle());
@@ -44,6 +44,7 @@ private:
 	WString realhost;
 	PTTSet ts;
 	PComVar cv;
+	const TTXImports *imports;	// NULL のときは使用できない(Tera Term が古い)
 	PReadIniFile ORIG_ReadIniFile;
 	PWriteIniFile ORIG_WriteIniFile;
 	PParseParam ORIG_ParseParam;
@@ -180,7 +181,13 @@ private:
 
 		getInstance().ORIG_ParseParam(param, ts, DDETopic);
 		if (getInstance().ts->HostName[0] == '\0' && getInstance().realhost != NULL) {
-			WideCharToACP_t(getInstance().realhost, getInstance().ts->HostName, sizeof getInstance().ts->HostName);
+			if (getInstance().imports != NULL) {
+				getInstance().imports->SetConnectHostName(getInstance().realhost);
+			}
+			else {
+				// ts->HostNameW を設定できないので、ANSI のみ設定する
+				WideCharToACP_t(getInstance().realhost, getInstance().ts->HostName, sizeof getInstance().ts->HostName);
+			}
 		}
 	}
 
@@ -194,6 +201,14 @@ private:
 		Logger::set_folder(ts->LogDirW);
 
 		ProxyWSockHook::setMessageShower(&getInstance().shower);
+	}
+
+	static BOOL TTXInit2(PTTSet ts, PComVar cv, const TTXImports *(*GetImports)(size_t size)) {
+		(void)ts;
+		(void)cv;
+		// TTXImports が使用できなくても、このプラグインは動作させる
+		getInstance().imports = GetImports(sizeof(TTXImports));
+		return TRUE;
 	}
 
 	static void PASCAL TTXGetSetupHooks(TTXSetupHooks* hooks) {
@@ -307,7 +322,10 @@ private:
 			NULL,
 			TTProxy::TTXProcessCommand,
 			TTProxy::TTXEnd,
-			TTProxy::TTXSetCommandLine
+			TTProxy::TTXSetCommandLine,
+			NULL,
+			NULL,
+			TTProxy::TTXInit2,
 		};
 
 		int size = sizeof EXPORTS - sizeof exports->size;
