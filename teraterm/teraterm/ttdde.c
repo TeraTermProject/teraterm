@@ -1125,7 +1125,9 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	case CmdGetHostname:  // add 'gethostname' (2008.12.15 maya)
 		if (cv.Open) {
 			if (cv.PortType == IdTCPIP) {
-				strncpy_s(ParamFileName, sizeof(ParamFileName),ts.HostName, _TRUNCATE);
+				char *hostnameU8 = ToU8W(GetConnectHostName());
+				strncpy_s(ParamFileName, sizeof(ParamFileName), hostnameU8, _TRUNCATE);
+				free(hostnameU8);
 			}
 			else if (cv.PortType == IdSerial) {
 				_snprintf_s(ParamFileName, sizeof(ParamFileName), _TRUNCATE, "COM%d", ts.ComPort);
