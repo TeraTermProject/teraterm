@@ -38,11 +38,6 @@
   <li>Changes
     <ul>
       <li>
-        Partially supported Internationalized Domain Names (IDN).
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
-        Host names are limited to characters representable in the system ANSI code page (CP932 on Japanese Windows).
-      </li>
-      <li>
         Changed the elapsed time of log timestamps (since log start, since connection) to 64bit.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1339" target="_blank">issue #1339</a>)<br>
         Previously it was 32bit, up to about 49.7 days.
@@ -62,9 +57,15 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)
       </li>
       <li>
-        Changed the connection host name to be handled in Unicode.
+        Changed the connection host name to be handled in Unicode, and supported connecting to hosts with Internationalized Domain Names (IDN).
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
-        Previously it was held as an ANSI string, and characters that could not be converted were replaced with "?".
+        Previously it was held as an ANSI string, and characters that could not be converted were replaced with "?".<br>
+        The host name is held in Unicode and converted to Punycode (ACE form) for the DNS query.
+      </li>
+      <li>
+        Added PWSAAsyncGetAddrInfoW, which receives the host name and port name in UTF-16, to the plug-in (TTX) socket hooks TTXSockHooks.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        The existing PWSAAsyncGetAddrInfo is kept for compatibility but is no longer called by Tera Term.
       </li>
     </ul>
   </li>

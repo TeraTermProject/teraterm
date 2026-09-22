@@ -74,6 +74,10 @@ typedef HANDLE (PASCAL *TWSAAsyncGetAddrInfo)
   (HWND hWnd, unsigned int wMsg, const char * hostname,
    const char * portname, struct addrinfo * hints,
    struct addrinfo * * res);
+typedef HANDLE (WINAPI *TWSAAsyncGetAddrInfoW)
+  (HWND hWnd, unsigned int wMsg, const wchar_t * hostname,
+   const wchar_t * portname, struct addrinfo * hints,
+   struct addrinfo * * res);
 // typedef int (PASCAL *Tgetaddrinfo)(const char *name, const char *port, const struct addrinfo *hints, struct addrinfo **res);
 typedef void (PASCAL *Tfreeaddrinfo)(struct addrinfo *ai);
 
@@ -99,6 +103,7 @@ extern TWSAGetLastError PWSAGetLastError;
 extern TWSAStartup PWSAStartup;
 extern TWSACleanup PWSACleanup;
 extern TWSAAsyncGetAddrInfo PWSAAsyncGetAddrInfo;
+extern TWSAAsyncGetAddrInfoW PWSAAsyncGetAddrInfoW;
 // extern Tgetaddrinfo Pgetaddrinfo;
 extern Tfreeaddrinfo Pfreeaddrinfo;
 

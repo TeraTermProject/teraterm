@@ -57,7 +57,8 @@ typedef struct {
   TWSAGetLastError * PWSAGetLastError;
 //  Tgetaddrinfo * Pgetaddrinfo;
   Tfreeaddrinfo * Pfreeaddrinfo;
-  TWSAAsyncGetAddrInfo * PWSAAsyncGetAddrInfo;
+  TWSAAsyncGetAddrInfo * PWSAAsyncGetAddrInfo;	// 互換のため残している。Tera Term 本体は呼ばない
+  TWSAAsyncGetAddrInfoW * PWSAAsyncGetAddrInfoW;
 } TTXSockHooks;
 
 typedef struct {

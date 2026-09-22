@@ -38,11 +38,6 @@
   <li>変更
     <ul>
       <li>
-        国際化ドメイン名(IDN,Internationalized Domain Name)に一部対応した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
-        ホスト名に使える文字はシステムの ANSI コードページ(日本語 Windows では CP932)で表現できる範囲に限られる。
-      </li>
-      <li>
         ログのタイムスタンプの経過時間(ログ開始から,接続開始から)を64bitに変更した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1339" target="_blank">issue #1339</a>)<br>
         以前は32bitで、最大約49.7日だった。
@@ -62,9 +57,15 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)<br>
       </li>
       <li>
-        接続先ホスト名を Unicode で扱うようにした。
+        接続先ホスト名を Unicode で扱うようにし、国際化ドメイン名(IDN,Internationalized Domain Name)のホストへ接続できるようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
-        変更前は ANSI 文字列で保持していたため、変換できない文字は "?" に置き換えられていた。
+        変更前は ANSI 文字列で保持していたため、変換できない文字は "?" に置き換えられていた。<br>
+        接続先ホスト名を Unicode で保持し、名前解決時に Punycode(ACE 形式) へ変換して DNS へ問い合わせるようにした。
+      </li>
+      <li>
+        プラグイン(TTX)のソケットフック TTXSockHooks に、ホスト名,ポート名を UTF-16 で受け取る PWSAAsyncGetAddrInfoW を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        従来の PWSAAsyncGetAddrInfo は互換のため残しているが、Tera Term からは呼ばれなくなった。
       </li>
     </ul>
   </li>

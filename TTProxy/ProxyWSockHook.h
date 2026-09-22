@@ -1873,15 +1873,21 @@ private:                                                   \
         return handle;
     }
 
-    DECLARE_HOOKAPI(HANDLE, WSAAsyncGetAddrInfo, (HWND window, UINT message, const char* hostname, const char* portname, struct addrinfo* hints, struct addrinfo** res), (window, message, hostname, portname, hints, res)) {
-        ConnectionInfo* info = connectioninfolist.find(hostname);
+    DECLARE_HOOKAPI(HANDLE, WSAAsyncGetAddrInfoW, (HWND window, UINT message, const wchar_t* hostname, const wchar_t* portname, struct addrinfo* hints, struct addrinfo** res), (window, message, hostname, portname, hints, res)) {
+        // 接続情報(URL, 実ホスト名)は ANSI で管理しているので変換して照合する
+        char* hostnameA = ToCharW(hostname);
+        ConnectionInfo* info = connectioninfolist.find(hostnameA);
         if (info == NULL || info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
-            return ORIG_WSAAsyncGetAddrInfo(window, message, hostname, portname, hints, res);
+            free(hostnameA);
+            return ORIG_WSAAsyncGetAddrInfoW(window, message, hostname, portname, hints, res);
         }
         HANDLE handle = connectioninfolist.getTask(info);
-        int bufferLength = sizeof (DUMMYHOSTENT) + strlen(hostname) + 1;
+        int bufferLength = sizeof (DUMMYHOSTENT) + strlen(hostnameA) + 1;
         info->buffer = new char[bufferLength];
-        info->fillBuffer(info->buffer, bufferLength, portname, hints->ai_family);
+        char* portnameA = ToCharW(portname);
+        info->fillBuffer(info->buffer, bufferLength, portnameA, hints->ai_family);
+        free(portnameA);
+        free(hostnameA);
         DUMMYHOSTENT* d = (DUMMYHOSTENT*)info->buffer;
         *res = d->ai;
         if (aicount < 256) {
@@ -1953,7 +1959,7 @@ private:                                                   \
         LOADAPI(connect)
         LOADAPI(gethostbyname)
         LOADAPI(WSAAsyncGetHostByName)
-        LOADAPI(WSAAsyncGetAddrInfo)
+        LOADAPI(WSAAsyncGetAddrInfoW)
         LOADAPI(freeaddrinfo)
         LOADAPI(WSAAsyncSelect)
         LOADAPI(WSACancelAsyncRequest)
@@ -2090,7 +2096,7 @@ public:
         SETUP_HOOKAPI(connect)
         SETUP_HOOKAPI(gethostbyname)
         SETUP_HOOKAPI(WSAAsyncGetHostByName)
-        SETUP_HOOKAPI(WSAAsyncGetAddrInfo)
+        SETUP_HOOKAPI(WSAAsyncGetAddrInfoW)
         SETUP_HOOKAPI(freeaddrinfo)
         SETUP_HOOKAPI(WSAAsyncSelect)
         SETUP_HOOKAPI(WSACancelAsyncRequest)
@@ -2104,7 +2110,7 @@ public:
         INSTALL_HOOKAPI(connect)
         INSTALL_HOOKAPI(gethostbyname)
         INSTALL_HOOKAPI(WSAAsyncGetHostByName)
-        INSTALL_HOOKAPI(WSAAsyncGetAddrInfo)
+        INSTALL_HOOKAPI(WSAAsyncGetAddrInfoW)
         INSTALL_HOOKAPI(freeaddrinfo)
         INSTALL_HOOKAPI(WSAAsyncSelect)
         INSTALL_HOOKAPI(WSACancelAsyncRequest)
@@ -2119,7 +2125,7 @@ public:
         UNINSTALL_HOOKAPI(connect)
         UNINSTALL_HOOKAPI(gethostbyname)
         UNINSTALL_HOOKAPI(WSAAsyncGetHostByName)
-        UNINSTALL_HOOKAPI(WSAAsyncGetAddrInfo)
+        UNINSTALL_HOOKAPI(WSAAsyncGetAddrInfoW)
         UNINSTALL_HOOKAPI(freeaddrinfo)
         UNINSTALL_HOOKAPI(WSAAsyncSelect)
         UNINSTALL_HOOKAPI(WSACancelAsyncRequest)
