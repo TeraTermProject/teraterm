@@ -1750,8 +1750,8 @@ private:                                                   \
             struct sockaddr_in6* in6 = (struct sockaddr_in6*) name;
             info = connectioninfolist.get(in6->sin6_addr);
             if (info == NULL && defaultProxy.type != ProxyInfo::TYPE_NONE) {
-                DWORD bufflen = 64;
-                char* buff = new char[64];
+                char buff[64];
+                DWORD bufflen = _countof(buff);
                 WSAAddressToString((struct sockaddr*)name, sizeof(struct sockaddr_in6), NULL, buff, &bufflen);
                 info = new ConnectionInfo(defaultProxy, buff);
                 holder = info;
