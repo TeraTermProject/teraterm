@@ -658,7 +658,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{ // TTMACRO is waiting for connecting to the host
 			// シリアル接続で自動接続が無効の場合は、接続ダイアログを出さない (2006.9.15 maya)
 			if (!((ts.PortType==IdSerial) && (ts.ComAutoConnect == FALSE)) &&
-				((ts.PortType==IdSerial) || (ts.HostName[0]!=0)))
+				((ts.PortType==IdSerial) || (GetConnectHostName()[0]!=0)))
 			{
 				cv.NoMsg = 1;
 				// start connecting

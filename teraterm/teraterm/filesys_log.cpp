@@ -244,9 +244,8 @@ static wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src)
 					switch(pcv->PortType) {
 					case IdTCPIP: {
 						// ホスト名がIPv6アドレスだと、ファイル名に使用できない文字(:)が入るため置換
-						wchar_t *host = ToWcharA(pts->HostName);
+						const wchar_t *host = GetConnectHostName();
 						wchar_t *host_fix = replaceInvalidFileNameCharW(host, '_');
-						free(host);
 						add_text = host_fix;
 						break;
 					}

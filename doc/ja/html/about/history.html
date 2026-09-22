@@ -53,13 +53,18 @@
         <a href="../macro/command/settitle.html">settitle</a> マクロコマンド)を
         Unicode で扱うようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)<br>
-        以前は ANSI 文字列で持っていたため、変換できない文字は "?" に置き換えられていた。
+        変更前はローカルタイトルを ANSI 文字列で保持していたため、変換できない文字は "?" に置き換えられていた。
       </li>
       <li>
         プラグインから Tera Term の関数を呼び出せるようにした。<br>
         TTXExports に TTXInit2() を追加、Tera Term の関数のポインタを持つ TTXImports を
         プラグインから取得できるようにした。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)<br>
+      </li>
+      <li>
+        接続先ホスト名を Unicode で扱うようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        変更前は ANSI 文字列で保持していたため、変換できない文字は "?" に置き換えられていた。
       </li>
     </ul>
   </li>

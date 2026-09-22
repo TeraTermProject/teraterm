@@ -47,6 +47,7 @@
 #include "codeconv.h"
 #include "helpid.h"
 #include "vtwin.h"
+#include "ttwinman.h"
 #include "makeoutputstring.h"
 #include "name_resolve.h"
 #include "compat_win.h"
@@ -356,13 +357,12 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 				TTXOpenTCP(); /* TTPLUG */
 				cv->Open = TRUE;
 				/* resolving address */
-				wchar_t *host_nameW = ToWcharA(ts->HostName);
+				const wchar_t *host_nameW = GetConnectHostName();
 				name_resolve_t *nr;
 				DWORD err = NameResolveStart(&nr, HW, WM_USER_GETHOST,
 				                             host_nameW, ts->TCPPort,
 				                             ts->ProtocolFamily, SOCK_STREAM,
 				                             &cv->res0);
-				free(host_nameW);
 				if (err != ERROR_SUCCESS)
 					InvalidHost = TRUE;
 				else {

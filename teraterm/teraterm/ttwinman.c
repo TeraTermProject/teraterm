@@ -39,6 +39,7 @@
 #include "i18n.h"
 #include "commlib.h"
 #include "codeconv.h"
+#include "ttwinman.h"
 #include "asprintf.h"
 
 HWND HVTWin = NULL;
@@ -154,10 +155,7 @@ void ChangeTitle(void)
 		}
 		else if (cv.PortType == IdNamedPipe)
 		{
-			wchar_t str[_countof(TempTitle)];
-			wchar_t *host_name = ToWcharA(ts.HostName);
-			wcsncpy_s(str, _countof(str), host_name, _TRUNCATE);
-			free(host_name);
+			const wchar_t *str = GetConnectHostName();
 
 			if (ts.TitleFormat & 8) {
 				// format ID = 13(8 + 5): <hots/port> - <title>
@@ -168,15 +166,12 @@ void ChangeTitle(void)
 			}
 		}
 		else {
-			wchar_t str[_countof(TempTitle)];
-			wchar_t *host_name = ToWcharA(ts.HostName);
+			wchar_t host_port[_countof(TempTitle)];
+			const wchar_t *str = GetConnectHostName();
 			if (ts.TitleFormat & 16) {
-				_snwprintf_s(str, _countof(str), _TRUNCATE, L"%s:%d", host_name, ts.TCPPort);
+				_snwprintf_s(host_port, _countof(host_port), _TRUNCATE, L"%s:%d", str, ts.TCPPort);
+				str = host_port;
 			}
-			else {
-				wcsncpy_s(str, _countof(str), host_name, _TRUNCATE);
-			}
-			free(host_name);
 
 			if (ts.TitleFormat & 8) {
 				// format ID = 13(8 + 5): <hots/port> - <title>
@@ -287,4 +282,49 @@ void SetLocalTitle(const wchar_t *title)
 const wchar_t *GetLocalTitle(void)
 {
 	return (ts.TitleW != NULL) ? ts.TitleW : L"";
+}
+
+/**
+ *	接続先ホスト名を設定する
+ *
+ *	ts.HostNameW と ts.HostName(ANSI) の両方を設定する
+ *
+ *	@param	hostname	ホスト名
+ *						NULL のときは空にする
+ *						ts.HostNameW を指定しない
+ */
+void SetConnectHostName(const wchar_t *hostname)
+{
+	if (hostname == ts.HostNameW) {
+		return;
+	}
+	free(ts.HostNameW);
+	ts.HostNameW = _wcsdup(hostname != NULL ? hostname : L"");
+	WideCharToACP_t(ts.HostNameW, ts.HostName, _countof(ts.HostName));
+}
+
+/**
+ *	接続先ホスト名を取得する
+ *
+ *	ts.HostName(ANSI) だけを書き換えるプラグイン(TTProxy 1.0.0.27 以前など)が
+ *	あるため、ts.HostName が ts.HostNameW と食い違っているときは
+ *	ts.HostName から ts.HostNameW を作り直して返す
+ *
+ *	@return	ホスト名(NULLを返さない)
+ *			次に SetConnectHostName() または GetConnectHostName() が
+ *			呼ばれると無効になる
+ */
+const wchar_t *GetConnectHostName(void)
+{
+	if (ts.HostNameW != NULL) {
+		char hostnameA[_countof(ts.HostName)];
+		WideCharToACP_t(ts.HostNameW, hostnameA, _countof(hostnameA));
+		if (strcmp(hostnameA, ts.HostName) == 0) {
+			return ts.HostNameW;
+		}
+	}
+	// ts.HostNameW が未設定、または ts.HostName だけが書き換えられている
+	free(ts.HostNameW);
+	ts.HostNameW = ToWcharA(ts.HostName);
+	return (ts.HostNameW != NULL) ? ts.HostNameW : L"";
 }

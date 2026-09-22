@@ -61,6 +61,11 @@
         which holds pointers to Tera Term functions.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)
       </li>
+      <li>
+        Changed the connection host name to be handled in Unicode.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        Previously it was held as an ANSI string, and characters that could not be converted were replaced with "?".
+      </li>
     </ul>
   </li>
 
