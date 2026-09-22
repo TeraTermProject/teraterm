@@ -2,6 +2,7 @@
 #define _YEBISOCKS_PROXYWSOCKHOOK_H_
 
 #include <YCL/StringBuffer.h>
+#include <YCL/WStringBuffer.h>
 #include <YCL/Dialog.h>
 #include <YCL/ComboBoxCtrl.h>
 #include <YCL/EditBoxCtrl.h>
@@ -16,6 +17,7 @@ using namespace yebisuya;
 
 #include "ttlib.h"
 #include "i18n.h"
+#include "idn.h"
 
 extern wchar_t *UILanguageFileW;
 
@@ -56,6 +58,35 @@ private:
         char* alias;
         char hostname[1];
     };
+
+    /**
+     *	ホスト名を名前解決やプロキシサーバへの送信に使える ASCII に変換する
+     *
+     *	非 ASCII 文字を含む場合は ACE 形式 (xn--) へ変換する(idn.cpp)
+     *	変換できない場合は ANSI へ変換する
+     */
+    static String toAsciiHostname(const wchar_t* hostname) {
+        if (hostname == NULL) {
+            return NULL;
+        }
+        wchar_t* ascii = IdnHostNameToAscii(hostname);
+        String result = toAnsi(ascii);
+        free(ascii);
+        return result;
+    }
+
+    /**
+     *	文字列を ANSI に変換する
+     */
+    static String toAnsi(const wchar_t* str) {
+        if (str == NULL) {
+            return NULL;
+        }
+        char* a = ToCharW(str);
+        String result = a;
+        free(a);
+        return result;
+    }
 
     class AsyncSelectInfoTable {
     private:
@@ -178,6 +209,21 @@ private:
             }
             return TYPE_NONE;
         }
+        static Type parseType(const wchar_t* string, const wchar_t* end) {
+            // 種別名は ASCII のみなので、ASCII 以外を含むものは該当なし
+            int length = (int) (end - string);
+            char* buffer = (char*) alloca(length + 1);
+            char* dst = buffer;
+            while (length-- > 0 && *string != '\0') {
+                wchar_t ch = *string++;
+                if (ch >= 0x80) {
+                    return TYPE_NONE;
+                }
+                *dst++ = (char) ch;
+            }
+            *dst = '\0';
+            return parseType(buffer);
+        }
         static const char* getTypeName(Type type) {
             if (type != TYPE_NONE && type != TYPE_NONE_FORCE) {
                 const PROXY_TYPE_TABLE* table = proxy_type_table();
@@ -190,10 +236,10 @@ private:
             return NULL;
         }
 
-        static int parsePort(const char* string) {
-            return parsePort(string, string + strlen(string));
+        static int parsePort(const wchar_t* string) {
+            return parsePort(string, string + wcslen(string));
         }
-        static int parsePort(const char* string, const char* end) {
+        static int parsePort(const wchar_t* string, const wchar_t* end) {
             if (string > end || *string < '1' || '9' < *string)
                 return -1;
             int digit = 0;
@@ -268,8 +314,8 @@ private:
             return url;
         }
 #else
-        static String parse(const char* url, ProxyInfo& proxy) {
-            char* p = strstr((char*) url, "://");
+        static WString parse(const wchar_t* url, ProxyInfo& proxy) {
+            const wchar_t* p = wcsstr(url, L"://");
             if (p == NULL) {
                 proxy.type = TYPE_NONE;
                 return NULL;
@@ -278,13 +324,13 @@ private:
             if (proxy.type == TYPE_NONE)
                 return NULL;
             p += 3;
-            const char* start = p;
+            const wchar_t* start = p;
 
             // user:pass があれば格納する
-            String tmp = String(start);
+            WString tmp = WString(start);
             int index = tmp.indexOf('@');
             if (index > -1) {
-                tmp = String(p, index);
+                tmp = WString(p, index);
                 index = tmp.indexOf(':');
                 if (index == -1) {
                     proxy.user = urldecode(p, p + tmp.length());
@@ -306,10 +352,10 @@ private:
                     in_blacket = false;
                 }else if (!in_blacket && *p == ':') {
                     if (*start == '[') {
-                        proxy.host = String(start + 1, p - start - 2);
+                        proxy.host = WString(start + 1, p - start - 2);
                     }
                     else {
-                        proxy.host = String(start, p - start);
+                        proxy.host = WString(start, p - start);
                     }
                     start = p + 1;
                 }
@@ -322,7 +368,7 @@ private:
                         proxy.type = TYPE_NONE;
                         return NULL;
                     }
-                    proxy.host = String(start, p - start);
+                    proxy.host = WString(start, p - start);
                 }else{
                     // ポート番号を格納する
                     proxy.port = parsePort(start, p);
@@ -339,28 +385,32 @@ private:
             return url;
         }
 #endif
-        String generateURL()const {
+        WString generateURL()const {
             if (type == TYPE_NONE || host == NULL)
                 return NULL;
-            StringBuffer buffer;
-            buffer.append(getTypeName(type));
-            buffer.append("://");
-            if (type != TYPE_SSL) {
-                if (user != NULL) {
-                    urlencode(user, buffer);
-                    if (pass != NULL) {
-                        buffer.append(':');
-                        urlencode(pass, buffer);
-                    }
-                    buffer.append('@');
+            // type://user:pass@ の部分は ANSI で組み立てる
+            StringBuffer prefix;
+            prefix.append(getTypeName(type));
+            prefix.append("://");
+            if (type != TYPE_SSL && user != NULL) {
+                urlencode(user, prefix);
+                if (pass != NULL) {
+                    prefix.append(':');
+                    urlencode(pass, prefix);
                 }
+                prefix.append('@');
+            }
+            wchar_t* prefixW = ToWcharA(prefix.toString());
+            WStringBuffer buffer = prefixW;
+            free(prefixW);
+            if (type != TYPE_SSL) {
                 if (host.indexOf(':') == -1) {
                     buffer.append(host);
                 }
                 else {
-                    buffer.append("[");
+                    buffer.append(L"[");
                     buffer.append(host);
-                    buffer.append("]");
+                    buffer.append(L"]");
                 }
                 if (port != 0) {
                     buffer.append(':');
@@ -371,7 +421,7 @@ private:
                     while (digit > 0) {
                         int d = (unsigned) port / digit % 10;
                         digit /= 10;
-                        buffer.append('0' + d);
+                        buffer.append((wchar_t) ('0' + d));
                     }
                 }
             }
@@ -407,6 +457,14 @@ private:
             }
             *dst = '\0';
             return buffer;
+        }
+        // user, pass は ANSI で扱うので、変換してから展開する
+        static String urldecode(const wchar_t* start, const wchar_t* end) {
+            WString tmp(start, end - start);
+            char* a = ToCharW(tmp);
+            String result = urldecode(a, a + strlen(a));
+            free(a);
+            return result;
         }
         static String urlencode(const char* string, StringBuffer& buffer) {
             static const char table[] = "0123456789ABCDEF";
@@ -458,7 +516,7 @@ private:
             return port;
         }
         Type type;
-        String host;
+        WString host;
         unsigned short port;
         String user;
         String pass;
@@ -466,16 +524,20 @@ private:
 
     struct ConnectionInfo {
         ProxyInfo proxy;
-        String realhost;
+        WString realhost;
         unsigned short  realport;
         in_addr addr;
         struct in6_addr addr6;
         char* buffer;
         DWORD time;
-        ConnectionInfo(ProxyInfo& proxy, String realhost):proxy(proxy), realhost(realhost), buffer(NULL) {
+        ConnectionInfo(ProxyInfo& proxy, WString realhost):proxy(proxy), realhost(realhost), buffer(NULL) {
         }
         ~ConnectionInfo() {
             delete[] buffer;
+        }
+        // fillBuffer() に渡すバッファのサイズ
+        int getBufferLength() {
+            return (int) (sizeof (DUMMYHOSTENT) + toAnsi(realhost).length() + 1);
         }
         void fillBuffer(char* buffer, int bufferLength) {
           fillBuffer(buffer, bufferLength, "ssh");
@@ -546,7 +608,7 @@ private:
                 case AF_UNSPEC:
                 default:
                     memset(&hints, 0, sizeof hints);
-                    getaddrinfo(proxy.host, NULL, &hints, &res0);
+                    getaddrinfo(toAsciiHostname(proxy.host), NULL, &hints, &res0);
                     if (res0) {
                         int flag = 0;
                         for (res = res0; res; res = res->ai_next) {
@@ -583,7 +645,7 @@ private:
                     break;
             }
 
-            strcpy_s(dst->hostname, bufferLength - sizeof (DUMMYHOSTENT), realhost);
+            strncpy_s(dst->hostname, bufferLength - offsetof(DUMMYHOSTENT, hostname), toAnsi(realhost), _TRUNCATE);
         }
     };
     class ConnectionInfoHolder {
@@ -614,7 +676,7 @@ private:
     private:
         CRITICAL_SECTION section;
         ConnectionInfoHolder list[254];
-        Hashtable<String,ConnectionInfo*> table;
+        Hashtable<WString,ConnectionInfo*> table;
     public:
         ConnectionInfoList() {
             ::InitializeCriticalSection(&section);
@@ -659,7 +721,7 @@ private:
             ::LeaveCriticalSection(&section);
             return info;
         }
-        ConnectionInfo* find(const char* url) {
+        ConnectionInfo* find(const wchar_t* url) {
             ::EnterCriticalSection(&section);
             ConnectionInfo* info = table.get(url);
             ::LeaveCriticalSection(&section);
@@ -668,7 +730,7 @@ private:
                 return info;
             }
             ProxyInfo proxy;
-            String realhost = ProxyInfo::parse(url, proxy);
+            WString realhost = ProxyInfo::parse(url, proxy);
             if (realhost == NULL || realhost.length() == 0) {
                 proxy = instance().defaultProxy;
                 if (proxy.type != ProxyInfo::TYPE_NONE) {
@@ -925,7 +987,7 @@ private:
 
             if (proxy.type != ProxyInfo::TYPE_NONE && proxy.type != ProxyInfo::TYPE_SSL) {
                 if (proxy.host != NULL) {
-                    host.SetWindowText(proxy.host);
+                    host.SetWindowTextW(proxy.host);
                     if (proxy.port != 0) {
                         char buffer[16];
                         _itoa_s(proxy.port, buffer, sizeof buffer, 10);
@@ -1032,11 +1094,10 @@ private:
             if (id != 0) {
                 proxy.type = (ProxyInfo::Type) type.getCurSel();
                 if (proxy.type != ProxyInfo::TYPE_NONE && proxy.type != ProxyInfo::TYPE_SSL) {
-                    proxy.host = host.GetWindowText();
-                    if (host.GetWindowTextLength() == 0) {
+                    if (host.GetWindowTextLengthW() == 0) {
                         proxy.host = NULL;
                     }else{
-                        proxy.host = host.GetWindowText();
+                        proxy.host = host.GetWindowTextW();
                     }
                     proxy.port = GetDlgItemInt(IDC_PORT, NULL, FALSE);
                     proxy.user = user.GetWindowTextLength() > 0 ? user.GetWindowText() : NULL;
@@ -1048,11 +1109,11 @@ private:
                     proxy.pass = NULL;
                 }
             }
-            String urlS = proxy.generateURL();
+            WString urlS = proxy.generateURL();
             if (urlS == NULL) {
-                urlS = "none:///";
+                urlS = L"none:///";
             }
-            url.SetWindowText(urlS);
+            url.SetWindowTextW(urlS);
         }
     public:
         ProxyInfo proxy;
@@ -1742,7 +1803,9 @@ private:                                                   \
             struct sockaddr_in* in = (struct sockaddr_in*) name;
             info = connectioninfolist.get(in->sin_addr);
             if (info == NULL && defaultProxy.type != ProxyInfo::TYPE_NONE) {
-                info = new ConnectionInfo(defaultProxy, inet_ntoa(in->sin_addr));
+                wchar_t* addr = ToWcharA(inet_ntoa(in->sin_addr));
+                info = new ConnectionInfo(defaultProxy, addr);
+                free(addr);
                 holder = info;
             }
         }
@@ -1750,9 +1813,9 @@ private:                                                   \
             struct sockaddr_in6* in6 = (struct sockaddr_in6*) name;
             info = connectioninfolist.get(in6->sin6_addr);
             if (info == NULL && defaultProxy.type != ProxyInfo::TYPE_NONE) {
-                char buff[64];
+                wchar_t buff[64];
                 DWORD bufflen = _countof(buff);
-                WSAAddressToString((struct sockaddr*)name, sizeof(struct sockaddr_in6), NULL, buff, &bufflen);
+                WSAAddressToStringW((struct sockaddr*)name, sizeof(struct sockaddr_in6), NULL, buff, &bufflen);
                 info = new ConnectionInfo(defaultProxy, buff);
                 holder = info;
             }
@@ -1761,9 +1824,9 @@ private:                                                   \
             if (info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
                 info = NULL;
             }else{
-                const char* hostname;
+                String hostname;
                 if (info->proxy.type == ProxyInfo::TYPE_SSL) {
-                    hostname = info->realhost;
+                    hostname = toAsciiHostname(info->realhost);
                 }else{
                     info->realport = ntohs(((struct sockaddr_in*) name)->sin_port);
                     if (name->sa_family == AF_INET) {
@@ -1771,7 +1834,7 @@ private:                                                   \
                     } else { // AF_INET6
                         ((struct sockaddr_in6*) name)->sin6_port = htons(info->proxy.getPort());
                     }
-                    hostname = info->proxy.host;
+                    hostname = toAsciiHostname(info->proxy.host);
                 }
                 struct addrinfo hints, *res;
                 memset(&hints, 0, sizeof hints);
@@ -1819,34 +1882,38 @@ private:                                                   \
         }else{
             return SOCKET_ERROR;
         }
+        // プロキシサーバへは ASCII (IDN は ACE 形式) で送る
+        String realhost = toAsciiHostname(info->realhost);
         switch (info->proxy.type) {
         default:
             result = 0;
             break;
         case ProxyInfo::TYPE_HTTP:
-            result = begin_relay_http(info->proxy, info->realhost, info->realport, s);
+            result = begin_relay_http(info->proxy, realhost, info->realport, s);
             break;
         case ProxyInfo::TYPE_TELNET:
-            result = begin_relay_telnet(info->proxy, info->realhost, info->realport, s);
+            result = begin_relay_telnet(info->proxy, realhost, info->realport, s);
             break;
         case ProxyInfo::TYPE_SOCKS4:
-            result = begin_relay_socks4(info->proxy, info->realhost, info->realport, s);
+            result = begin_relay_socks4(info->proxy, realhost, info->realport, s);
             break;
         case ProxyInfo::TYPE_SOCKS5:
-            result = begin_relay_socks5(info->proxy, info->realhost, info->realport, s);
+            result = begin_relay_socks5(info->proxy, realhost, info->realport, s);
             break;
         }
         return result;
     }
 
     DECLARE_HOOKAPI(struct hostent*, gethostbyname, (const char* hostname), (hostname)) {
-        ConnectionInfo* info = connectioninfolist.find(hostname);
+        wchar_t* hostnameW = ToWcharA(hostname);
+        ConnectionInfo* info = connectioninfolist.find(hostnameW);
+        free(hostnameW);
         if (info != NULL) {
             if (info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
-                hostname = info->realhost;
+                return ORIG_gethostbyname(toAsciiHostname(info->realhost));
             }else{
                 if (info->buffer == NULL) {
-                    int bufferLength = sizeof (DUMMYHOSTENT) + strlen(info->realhost);
+                    int bufferLength = info->getBufferLength();
                     info->buffer = new char[bufferLength];
                     info->fillBuffer(info->buffer, bufferLength);
                 }
@@ -1857,7 +1924,9 @@ private:                                                   \
     }
 
     DECLARE_HOOKAPI(HANDLE, WSAAsyncGetHostByName, (HWND window, UINT message, const char* hostname, char* buffer, int bufferLength), (window, message, hostname, buffer, bufferLength)) {
-        ConnectionInfo* info = connectioninfolist.find(hostname);
+        wchar_t* hostnameW = ToWcharA(hostname);
+        ConnectionInfo* info = connectioninfolist.find(hostnameW);
+        free(hostnameW);
         if (info == NULL || info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
             return ORIG_WSAAsyncGetHostByName(window, message, hostname, buffer, bufferLength);
         }
@@ -1874,20 +1943,16 @@ private:                                                   \
     }
 
     DECLARE_HOOKAPI(HANDLE, WSAAsyncGetAddrInfoW, (HWND window, UINT message, const wchar_t* hostname, const wchar_t* portname, struct addrinfo* hints, struct addrinfo** res), (window, message, hostname, portname, hints, res)) {
-        // 接続情報(URL, 実ホスト名)は ANSI で管理しているので変換して照合する
-        char* hostnameA = ToCharW(hostname);
-        ConnectionInfo* info = connectioninfolist.find(hostnameA);
+        ConnectionInfo* info = connectioninfolist.find(hostname);
         if (info == NULL || info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
-            free(hostnameA);
             return ORIG_WSAAsyncGetAddrInfoW(window, message, hostname, portname, hints, res);
         }
         HANDLE handle = connectioninfolist.getTask(info);
-        int bufferLength = sizeof (DUMMYHOSTENT) + strlen(hostnameA) + 1;
+        int bufferLength = info->getBufferLength();
         info->buffer = new char[bufferLength];
         char* portnameA = ToCharW(portname);
         info->fillBuffer(info->buffer, bufferLength, portnameA, hints->ai_family);
         free(portnameA);
-        free(hostnameA);
         DUMMYHOSTENT* d = (DUMMYHOSTENT*)info->buffer;
         *res = d->ai;
         if (aicount < 256) {
@@ -1979,7 +2044,7 @@ private:                                                   \
         if (temp != NULL) {
             defaultProxy.type = ProxyInfo::parseType(temp);
             if (defaultProxy.type != ProxyInfo::TYPE_NONE) {
-                defaultProxy.host = ini.getString("ProxyHost");
+                defaultProxy.host = ini.getStringW(L"ProxyHost");
                 if (defaultProxy.host == NULL || defaultProxy.type == ProxyInfo::TYPE_NONE_FORCE) {
                     defaultProxy.type = ProxyInfo::TYPE_NONE;
                 }else{
@@ -2013,7 +2078,7 @@ private:                                                   \
     }
     void _save(IniFile& ini) {
         const char* type = NULL;
-        const char* host = NULL;
+        const wchar_t* host = NULL;
         const char* port = NULL;
         const char* user = NULL;
         const char* pass = NULL;
@@ -2033,7 +2098,7 @@ private:                                                   \
             }
         }
         ini.setString("ProxyType",  type);
-        ini.setString("ProxyHost",  host);
+        ini.setString(L"ProxyHost", host);
         ini.setString("ProxyPort",  port);
         ini.setString("ProxyUser",  user);
         ini.setString("ProxyPass",  pass);
@@ -2135,14 +2200,14 @@ public:
         UNINSTALL_HOOKAPI(recvfrom)
         UNINSTALL_HOOKAPI(closesocket)
     }
-    static String generateURL() {
+    static WString generateURL() {
         return instance().defaultProxy.generateURL();
     }
-    static String parseURL(const char* url, BOOL prefix) {
+    static WString parseURL(const wchar_t* url, BOOL prefix) {
         ProxyInfo proxy;
-        String realhost = ProxyInfo::parse(url, proxy);
+        WString realhost = ProxyInfo::parse(url, proxy);
         if (realhost != NULL) {
-            if (realhost.indexOf("://") != -1 && !prefix) {
+            if (realhost.indexOf(L"://") != -1 && !prefix) {
                 proxy.type = proxy.TYPE_NONE;
             }
             if (realhost.length() == 0) {

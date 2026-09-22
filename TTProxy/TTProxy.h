@@ -41,7 +41,7 @@ private:
 	bool initialized;
 	bool showing_error_message;
 	String error_message;
-	String realhost;
+	WString realhost;
 	PTTSet ts;
 	PComVar cv;
 	PReadIniFile ORIG_ReadIniFile;
@@ -139,9 +139,7 @@ private:
 				if (wcslen(option + 1) >= 6 && option[6] == '=') {
 					option[6] = '\0';
 					if (_wcsicmp(option + 1, L"proxy") == 0) {
-						char *url = ToCharW(option + 7);
-						ProxyWSockHook::parseURL(url, TRUE);
-						free(url);
+						ProxyWSockHook::parseURL(option + 7, TRUE);
 						action = OPTION_CLEAR;
 					}else{
 						option[6] = '=';
@@ -149,16 +147,14 @@ private:
 				}
 				else if (_wcsicmp(option+1, L"noproxy") == 0) {
 					// -noproxy は -proxy=none:// の別名
-					ProxyWSockHook::parseURL("none://", TRUE);
+					ProxyWSockHook::parseURL(L"none://", TRUE);
 					action = OPTION_CLEAR;
 				}
 			}else{
-				char *url = ToCharW(option);
-				String realhost = ProxyWSockHook::parseURL(url, FALSE);
-				free(url);
+				WString realhost = ProxyWSockHook::parseURL(option, FALSE);
 				if (realhost != NULL) {
 					getInstance().realhost = realhost;
-					if (realhost.indexOf("://") == -1) {
+					if (realhost.indexOf(L"://") == -1) {
 						action = OPTION_CLEAR;
 					}
 					else {
@@ -184,7 +180,7 @@ private:
 
 		getInstance().ORIG_ParseParam(param, ts, DDETopic);
 		if (getInstance().ts->HostName[0] == '\0' && getInstance().realhost != NULL) {
-			strcpy_s(getInstance().ts->HostName, sizeof getInstance().ts->HostName, getInstance().realhost);
+			WideCharToACP_t(getInstance().realhost, getInstance().ts->HostName, sizeof getInstance().ts->HostName);
 		}
 	}
 
@@ -277,10 +273,7 @@ private:
 	}
 
 	static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec) {
-		String urlA = ProxyWSockHook::generateURL();
-		wchar_t *urlW = ToWcharA(urlA);
-		WString url = urlW;
-		free(urlW);
+		WString url = ProxyWSockHook::generateURL();
 		if (url != NULL) {
 			if (wcslen(cmd) + 8 + url.length() >= (unsigned) cmdlen)
 				return;

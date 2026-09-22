@@ -84,6 +84,7 @@
   <li>その他
     <ul>
       <li><a href="#ttssh_3.8.0">TTSSH 3.8.0</a> へ差し替えた。</li>
+      <li><a href="#ttproxy_1.0.0.28">TTProxy 1.0.0.28</a> へ差し替えた。</li>
     </ul>
   </li>
 </ul>
@@ -6517,6 +6518,23 @@
 
 
 <h2 id="ttproxy">TTProxy</h2>
+
+<h3 id="ttproxy_1.0.0.28">YYYY.MM.DD (Ver 1.0.0.28 not released yet)</h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>
+        プロキシのホスト名を Unicode で扱うようにした(設定ダイアログ、設定ファイルの ProxyHost)。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)
+      </li>
+      <li>
+        国際化ドメイン名(IDN)のホストへプロキシ経由で接続できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        ASCII 以外の文字を含むホスト名は、ACE 形式(xn--)に変換してプロキシサーバへ送る。
+      </li>
+    </ul>
+  </li>
+</ul>
 
 <h3 id="ttproxy_1.0.0.27">2025.08.03 (Ver 1.0.0.27)</h3>
 <ul class="history">
