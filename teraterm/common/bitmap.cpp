@@ -292,9 +292,13 @@ static HBITMAP GetBitmapHandleW(const wchar_t *File)
 	iPicture->get_Type(&type);
 	if(type==PICTYPE_BITMAP){
 		iPicture->get_Handle(&hOle);
+	} else {
+		iPicture->Release();
+		return NULL;
 	}
 
-	hBitmap=(HBITMAP)(UINT_PTR)hOle;
+	HBITMAP hRaw = (HBITMAP)(UINT_PTR)hOle;
+	hBitmap = (HBITMAP)CopyImage(hRaw, IMAGE_BITMAP, 0, 0, LR_COPYRETURNORG);
 
 	iPicture->Release();
 
