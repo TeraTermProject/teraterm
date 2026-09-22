@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021- TeraTerm Project
+ * (C) 2026- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,39 +26,17 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* Internationalized Domain Name (IDN, 国際化ドメイン名) */
+
 #pragma once
 
-#include <windows.h>
-#include <setupapi.h>
-
-// VS2005(SDK7.1以下)のとき,LSTATUSがない
-#if defined(_MSC_VER) && !defined(__MINGW32__) && _MSC_VER == 1400
-typedef LONG LSTATUS;
-#endif
+#include <wchar.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-DWORD hGetModuleFileNameW(HMODULE hModule, wchar_t **buf);
-DWORD hGetPrivateProfileStringW(const wchar_t *section, const wchar_t *key, const wchar_t *def, const wchar_t *ini, wchar_t **str);
-DWORD hGetFullPathNameW(const wchar_t *lpFileName, wchar_t **fullpath, wchar_t **filepart);
-DWORD hGetCurrentDirectoryW(wchar_t **dir);
-DWORD hGetWindowTextW(HWND hWnd, wchar_t **text);
-DWORD hGetDlgItemTextW(HWND hDlg, int id, wchar_t **text);
-DWORD hExpandEnvironmentStringsW(const wchar_t *src, wchar_t **expanded);
-LSTATUS hRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, void **lpData,
-						  LPDWORD lpcbData);
-DWORD hGetMenuStringW(HMENU hMenu, UINT uIDItem, UINT flags, wchar_t **text);
-DWORD hDragQueryFileW(HDROP hDrop, UINT iFile, wchar_t **filename);
-DWORD hFormatMessageW(DWORD error, wchar_t **message);
-BOOL hSetupDiGetDevicePropertyW(
-	HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData,
-	const DEVPROPKEY *PropertyKey,
-	void **buf, size_t *buf_size);
-DWORD hGetDlgItemCBTextW(HWND hDlg, int id, int index, wchar_t **text);
-DWORD hGetDlgItemLVTextW(HWND hDlg, int id, int item, int subitem, wchar_t **text);
-DWORD hIdnToAscii(const wchar_t *unicode, wchar_t **ascii);
+wchar_t *IdnHostNameToAscii(const wchar_t *hostname);
 
 #ifdef __cplusplus
 }
