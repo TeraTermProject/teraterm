@@ -104,6 +104,18 @@ typedef struct {
 	 *	ローカルタイトルを取得する
 	 */
 	const wchar_t *(*GetLocalTitle)(void);
+
+	/**
+	 *	接続先ホスト名を設定する
+	 *
+	 *	ts->HostNameW と ts->HostName(ANSI) の両方が設定される
+	 */
+	void (*SetConnectHostName)(const wchar_t *hostname);
+
+	/**
+	 *	接続先ホスト名を取得する
+	 */
+	const wchar_t *(*GetConnectHostName)(void);
 } TTXImports;
 
 /**

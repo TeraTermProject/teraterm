@@ -529,6 +529,8 @@ static void UnloadExtensions()
 const static TTXImports imports = {
 	SetLocalTitle,
 	GetLocalTitle,
+	SetConnectHostName,
+	GetConnectHostName,
 };
 
 /**
