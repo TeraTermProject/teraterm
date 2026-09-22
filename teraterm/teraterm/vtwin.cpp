@@ -5299,6 +5299,21 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 	return 0;
 }
 
+void CVTWindow::OnDisplayChange()
+{
+	BGSetupPrimary(vt_src, TRUE);
+}
+
+void CVTWindow::OnWTSSessionChange(WPARAM wp)
+{
+	if (wp == WTS_CONSOLE_CONNECT ||
+		wp == WTS_REMOTE_CONNECT ||
+		wp == WTS_SESSION_LOGON ||
+		wp == WTS_SESSION_UNLOCK) {
+		BGSetupPrimary(vt_src, TRUE);
+	}
+}
+
 LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const UINT WM_TASKBER_CREATED = RegisterWindowMessage("TaskbarCreated");
@@ -5554,6 +5569,12 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_DPICHANGED:
 		OnDpiChanged(wp, lp, FALSE);
+		break;
+	case WM_DISPLAYCHANGE:
+		OnDisplayChange();
+		break;
+	case WM_WTSSESSION_CHANGE:
+		OnWTSSessionChange(wp);
 		break;
 	case WM_COMMAND:
 	{

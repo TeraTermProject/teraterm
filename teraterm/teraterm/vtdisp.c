@@ -31,6 +31,7 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "teraprn.h"
+#include <wtsapi32.h>
 #include <assert.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
@@ -381,7 +382,7 @@ static void BGPreloadPicture(BGSrc *src, const TTTSet *pts)
 		src->width  = bm.bmWidth;
 		src->height = bm.bmHeight;
 	}else{
-		src->type = BG_COLOR;
+		// 以前の設定を維持する
 	}
 
 	free(susie_path);
@@ -622,16 +623,36 @@ load_finish:
 		src->pattern = wi.pattern;
 
 	}else{
-		src->hdc = NULL;
+		// 以前の設定を維持する
 	}
 
 	src->color = GetSysColor(COLOR_DESKTOP);
 }
 
-static void BGPreloadSrc(BGSrc *src, const TTTSet *pts)
+static void BGPreloadSrc(BGSrc *src, const TTTSet *pts, BOOL forceReload)
 {
 	if (!src->enable) {
 		return;
+	}
+
+	if (forceReload == FALSE && src->hdc) {
+		HDC memdc = CreateCompatibleDC(src->hdc);
+		if (memdc) {
+			HBITMAP bmp = CreateCompatibleBitmap(src->hdc, 1, 1);
+			if (!bmp) {
+				DeleteDC(memdc);
+			} else {
+				SelectObject(memdc, bmp);
+				BOOL ok = BitBlt(memdc, 0, 0, 1, 1, src->hdc, 0, 0, SRCCOPY);
+				DeleteObject(bmp);
+				DeleteDC(memdc);
+				if (ok) {
+					// 1x1ピクセルの画像の読み取りに成功した。
+					// → HBITMAP(デバイス依存ビットマップ)は使用可能とみなす。
+					return;
+				}
+			}
+		}
 	}
 
 	DeleteBitmapDC(&(src->hdc));
@@ -1075,15 +1096,23 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
   GetClientRect(vt->hVTWin,&rect);
   OffsetRect(&rect,point.x,point.y);
 
-  if(!forceSetup && EqualRect(&rect,&BGPrevRect))
-    return;
+  if (!forceSetup && EqualRect(&rect,&BGPrevRect)) {
+	  // クラウド環境(RDP等)でディスプレイデバイスが再構成されると、
+	  // DDB(デバイス依存ビットマップ)が作成時のデバイスと互換性を失い
+	  // 描画不能になることがある。
+	  // HBITMAPが使用不可なら壁紙 or 背景を再ロードする。
+	  BGPreloadSrc(&BGDest, vt->pts, FALSE);
+	  BGPreloadSrc(&BGSrc1, vt->pts, FALSE);
+	  BGPreloadSrc(&BGSrc2, vt->pts, FALSE);
+	  return;
+  }
 
   CopyRect(&BGPrevRect,&rect);
 
   //壁紙 or 背景をプリロード
-  BGPreloadSrc(&BGDest, vt->pts);
-  BGPreloadSrc(&BGSrc1, vt->pts);
-  BGPreloadSrc(&BGSrc2, vt->pts);
+  BGPreloadSrc(&BGDest, vt->pts, TRUE);
+  BGPreloadSrc(&BGSrc1, vt->pts, TRUE);
+  BGPreloadSrc(&BGSrc2, vt->pts, TRUE);
 
   _OutputDebugPrintf("BGSetupPrimary : BGInSizeMove = %d\n",BGInSizeMove);
 
@@ -1242,6 +1271,10 @@ void BGLoadThemeFile(vtdraw_t *vt, const TTTSet *pts)
 	}
 
 	DecideBGEnable();
+
+	if (BGEnable) {
+		WTSRegisterSessionNotification(vt->hVTWin, NOTIFY_FOR_THIS_SESSION);
+	}
 }
 
 /**
@@ -1692,6 +1725,7 @@ void EndDisp(vtdraw_t *vt)
 	DispFontDelete(vt);
 
 	if (!vt->IsPrinter) {
+		WTSUnRegisterSessionNotification(vt->hVTWin);
 		BGDestruct();
 
 		free(BGDest.fileW);
