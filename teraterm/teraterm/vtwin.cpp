@@ -85,6 +85,7 @@
 #include <assert.h>
 #include <wchar.h>
 #include <htmlhelp.h>
+#include <wtsapi32.h>
 
 #include "tt_res.h"
 #include "vtwin.h"
@@ -1828,6 +1829,7 @@ void CVTWindow::OnDestroy()
 	}
 
 	EndTerm();
+	WTSUnRegisterSessionNotification(HVTWin);
 	EndDisp(vt_src);
 	vt_src = NULL;
 	sendfiledlgUnInit();
@@ -3942,6 +3944,7 @@ void CVTWindow::OnFileNewConnection()
 			}
 			SetKeyMap();
 			BGLoadThemeFile(vt_src, &ts);
+			WTSRegisterSessionNotification(HVTWin, NOTIFY_FOR_THIS_SESSION);
 			if (ts.MacroFNW != NULL && ts.MacroFNW[0] != 0) {
 				RunMacroW(ts.MacroFNW,TRUE);
 				free(ts.MacroFNW);
@@ -5301,16 +5304,22 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 
 void CVTWindow::OnDisplayChange()
 {
-	BGSetupPrimary(vt_src, TRUE);
+	if (ThemeIsEnabled()) {
+		BGSetupPrimary(vt_src, TRUE);
+		::InvalidateRect(m_hWnd, NULL, FALSE);
+	}
 }
 
 void CVTWindow::OnWTSSessionChange(WPARAM wp)
 {
-	if (wp == WTS_CONSOLE_CONNECT ||
-		wp == WTS_REMOTE_CONNECT ||
-		wp == WTS_SESSION_LOGON ||
-		wp == WTS_SESSION_UNLOCK) {
-		BGSetupPrimary(vt_src, TRUE);
+	if (ThemeIsEnabled()) {
+		if (wp == WTS_CONSOLE_CONNECT ||
+			wp == WTS_REMOTE_CONNECT ||
+			wp == WTS_SESSION_LOGON ||
+			wp == WTS_SESSION_UNLOCK) {
+			BGSetupPrimary(vt_src, TRUE);
+			::InvalidateRect(m_hWnd, NULL, FALSE);
+		}
 	}
 }
 

@@ -31,7 +31,6 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "teraprn.h"
-#include <wtsapi32.h>
 #include <assert.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
@@ -260,8 +259,16 @@ static HDC  CreateBitmapDC(HBITMAP hbm)
   _OutputDebugPrintf("CreateBitmapDC : hbm = %p\n",hbm);
 
   hdc = CreateCompatibleDC(NULL);
+  if (hdc == NULL) {
+	DeleteObject(hbm);
+	return NULL;
+  }
 
-  SelectObject(hdc,hbm);
+  if (SelectObject(hdc, hbm) == NULL) {
+	DeleteDC(hdc);
+	DeleteObject(hbm);
+	return NULL;
+  }
 
   return hdc;
 }
@@ -378,6 +385,7 @@ static void BGPreloadPicture(BGSrc *src, const TTTSet *pts)
 
 		GetObject(hbm,sizeof(bm),&bm);
 
+		DeleteBitmapDC(&(src->hdc));
 		src->hdc    = CreateBitmapDC(hbm);
 		src->width  = bm.bmWidth;
 		src->height = bm.bmHeight;
@@ -617,6 +625,7 @@ load_finish:
 
 		GetObject(hbm,sizeof(bm),&bm);
 
+		DeleteBitmapDC(&(src->hdc));
 		src->hdc     = CreateBitmapDC(hbm);
 		src->width   = bm.bmWidth;
 		src->height  = bm.bmHeight;
@@ -629,10 +638,13 @@ load_finish:
 	src->color = GetSysColor(COLOR_DESKTOP);
 }
 
-static void BGPreloadSrc(BGSrc *src, const TTTSet *pts, BOOL forceReload)
+// 復帰値
+//   TRUE  背景の再構築が必要
+//   FALSE 既存の描画リソースをそのまま利用可能
+static BOOL BGPreloadSrc(BGSrc *src, const TTTSet *pts, BOOL forceReload)
 {
 	if (!src->enable) {
-		return;
+		return FALSE;
 	}
 
 	if (forceReload == FALSE && src->hdc) {
@@ -649,29 +661,32 @@ static void BGPreloadSrc(BGSrc *src, const TTTSet *pts, BOOL forceReload)
 				if (ok) {
 					// 1x1ピクセルの画像の読み取りに成功した。
 					// → HBITMAP(デバイス依存ビットマップ)は使用可能とみなす。
-					return;
+					return FALSE;
 				}
 			}
 		}
 	}
 
-	DeleteBitmapDC(&(src->hdc));
-
+	BOOL ret = FALSE;
 	switch (src->type) {
 		case BG_COLOR:
 			break;
 
 		case BG_WALLPAPER:
 			BGPreloadWallpaper(src);
+			ret = TRUE;
 			break;
 
 		case BG_PICTURE:
 			BGPreloadPicture(src, pts);
+			ret = TRUE;
 			break;
 
 		default:
 			break;
 	}
+
+	return ret;
 }
 
 static void BGStretchPicture(HDC hdcDest, BGSrc *src, int x, int y, int width, int height)
@@ -1084,6 +1099,7 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
 {
   POINT point;
   RECT rect;
+  BOOL preloaded = FALSE;
 
   if(!BGEnable)
     return;
@@ -1101,19 +1117,22 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
 	  // DDB(デバイス依存ビットマップ)が作成時のデバイスと互換性を失い
 	  // 描画不能になることがある。
 	  // HBITMAPが使用不可なら壁紙 or 背景を再ロードする。
-	  BGPreloadSrc(&BGDest, vt->pts, FALSE);
-	  BGPreloadSrc(&BGSrc1, vt->pts, FALSE);
-	  BGPreloadSrc(&BGSrc2, vt->pts, FALSE);
-	  return;
+	  preloaded |= BGPreloadSrc(&BGDest, vt->pts, FALSE);
+	  preloaded |= BGPreloadSrc(&BGSrc1, vt->pts, FALSE);
+	  preloaded |= BGPreloadSrc(&BGSrc2, vt->pts, FALSE);
+	  if (preloaded == FALSE) {
+		  return;
+	  }
   }
 
   CopyRect(&BGPrevRect,&rect);
 
   //壁紙 or 背景をプリロード
-  BGPreloadSrc(&BGDest, vt->pts, TRUE);
-  BGPreloadSrc(&BGSrc1, vt->pts, TRUE);
-  BGPreloadSrc(&BGSrc2, vt->pts, TRUE);
-
+  if (preloaded == FALSE) {
+	  BGPreloadSrc(&BGDest, vt->pts, TRUE);
+	  BGPreloadSrc(&BGSrc1, vt->pts, TRUE);
+	  BGPreloadSrc(&BGSrc2, vt->pts, TRUE);
+  }
   _OutputDebugPrintf("BGSetupPrimary : BGInSizeMove = %d\n",BGInSizeMove);
 
   //作業用 DC 作成
@@ -1271,10 +1290,6 @@ void BGLoadThemeFile(vtdraw_t *vt, const TTTSet *pts)
 	}
 
 	DecideBGEnable();
-
-	if (BGEnable) {
-		WTSRegisterSessionNotification(vt->hVTWin, NOTIFY_FOR_THIS_SESSION);
-	}
 }
 
 /**
@@ -1725,7 +1740,6 @@ void EndDisp(vtdraw_t *vt)
 	DispFontDelete(vt);
 
 	if (!vt->IsPrinter) {
-		WTSUnRegisterSessionNotification(vt->hVTWin);
 		BGDestruct();
 
 		free(BGDest.fileW);
