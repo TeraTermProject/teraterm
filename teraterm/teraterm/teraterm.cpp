@@ -60,6 +60,8 @@
 #include "unicode.h"
 #include "broadcast.h"
 #include "codeconv.h"
+#include "ttplug.h"
+#include "ttsetup.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -524,6 +526,11 @@ exit_message_loop:
 
 	delete m_pMainWnd;
 	m_pMainWnd = NULL;
+
+	// プラグインの終了処理
+	TTXEnd(); /* TTPLUG */
+
+	TTSetUnInit(&ts);
 
 	DXUninit();
 

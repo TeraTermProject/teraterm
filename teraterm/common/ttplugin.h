@@ -120,7 +120,7 @@ typedef struct {
   void (PASCAL * TTXModifyMenu)(HMENU menu); /* called first to last */
   void (PASCAL * TTXModifyPopupMenu)(HMENU menu); /* called first to last */
   int (PASCAL * TTXProcessCommand)(HWND hWin, WORD cmd); /* returns TRUE if handled, called last to first */
-  void (PASCAL * TTXEnd)(void); /* called last to first */
+  void (PASCAL * TTXEnd)(void); /* called last to first, VTWinが破棄され、メッセージループが終了した後に呼び出されます。 */
   void (PASCAL * TTXSetCommandLine)(wchar_t *cmd, int cmdlen, PGetHNRec rec); /* called first to last */
   void (PASCAL * TTXOpenFile)(TTXFileHooks * hooks); /* called first to last */
   void (PASCAL * TTXCloseFile)(TTXFileHooks * hooks); /* called last to first */
