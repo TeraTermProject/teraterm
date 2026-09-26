@@ -85,6 +85,7 @@
 #include <assert.h>
 #include <wchar.h>
 #include <htmlhelp.h>
+#include <wtsapi32.h>
 
 #include "tt_res.h"
 #include "vtwin.h"
@@ -760,6 +761,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	cv.HWin = HVTWin;
 	vt_src = InitDisp(HVTWin, &ts);
 	BGLoadThemeFile(vt_src, &ts);
+	WTSRegisterSessionNotification(HVTWin, NOTIFY_FOR_THIS_SESSION);
 
 	// Windows 11 でウィンドウの角が丸くならないようにする
 	if (ts.WindowCornerDontround && pDwmSetWindowAttribute != NULL) {
@@ -1828,6 +1830,7 @@ void CVTWindow::OnDestroy()
 	}
 
 	EndTerm();
+	WTSUnRegisterSessionNotification(HVTWin);
 	EndDisp(vt_src);
 	vt_src = NULL;
 	sendfiledlgUnInit();
@@ -5299,6 +5302,29 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 	return 0;
 }
 
+void CVTWindow::OnDisplayChange()
+{
+	if (vt_src == NULL || !ThemeIsEnabled()) {
+		return;
+	}
+	BGSetupPrimary(vt_src, TRUE);
+	::InvalidateRect(m_hWnd, NULL, FALSE);
+}
+
+void CVTWindow::OnWTSSessionChange(WPARAM wp)
+{
+	if (vt_src == NULL || !ThemeIsEnabled()) {
+		return;
+	}
+	if (wp == WTS_CONSOLE_CONNECT ||
+		wp == WTS_REMOTE_CONNECT ||
+		wp == WTS_SESSION_LOGON ||
+		wp == WTS_SESSION_UNLOCK) {
+		BGSetupPrimary(vt_src, TRUE);
+		::InvalidateRect(m_hWnd, NULL, FALSE);
+	}
+}
+
 LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const UINT WM_TASKBER_CREATED = RegisterWindowMessage("TaskbarCreated");
@@ -5554,6 +5580,12 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_DPICHANGED:
 		OnDpiChanged(wp, lp, FALSE);
+		break;
+	case WM_DISPLAYCHANGE:
+		OnDisplayChange();
+		break;
+	case WM_WTSSESSION_CHANGE:
+		OnWTSSessionChange(wp);
 		break;
 	case WM_COMMAND:
 	{

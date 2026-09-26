@@ -292,9 +292,45 @@ static HBITMAP GetBitmapHandleW(const wchar_t *File)
 	iPicture->get_Type(&type);
 	if(type==PICTYPE_BITMAP){
 		iPicture->get_Handle(&hOle);
+	} else {
+		iPicture->Release();
+		return NULL;
 	}
 
-	hBitmap=(HBITMAP)(UINT_PTR)hOle;
+	HBITMAP hRaw = (HBITMAP)(UINT_PTR)hOle;
+
+	BITMAP bm;
+	if (GetObject(hRaw, sizeof(bm), &bm)) {
+		HDC hScreenDC = GetDC(NULL);
+		if (hScreenDC) {
+			hBitmap = CreateCompatibleBitmap(hScreenDC, bm.bmWidth, bm.bmHeight);
+			if (hBitmap) {
+				HDC hSrcDC = CreateCompatibleDC(hScreenDC);
+				HDC hDstDC = CreateCompatibleDC(hScreenDC);
+				if (hSrcDC && hDstDC) {
+					HBITMAP hOldSrcBmp = (HBITMAP)SelectObject(hSrcDC, hRaw);
+					HBITMAP hOldDstBmp = (HBITMAP)SelectObject(hDstDC, hBitmap);
+					BOOL ok = BitBlt(hDstDC, 0, 0, bm.bmWidth, bm.bmHeight, hSrcDC, 0, 0, SRCCOPY);
+					SelectObject(hSrcDC, hOldSrcBmp);
+					SelectObject(hDstDC, hOldDstBmp);
+					if (!ok) {
+						DeleteObject(hBitmap);
+						hBitmap = NULL;
+					}
+				} else {
+					DeleteObject(hBitmap);
+					hBitmap = NULL;
+				}
+				if (hSrcDC) {
+					DeleteDC(hSrcDC);
+				}
+				if (hDstDC) {
+					DeleteDC(hDstDC);
+				}
+			}
+			ReleaseDC(NULL, hScreenDC);
+		}
+	}
 
 	iPicture->Release();
 

@@ -241,6 +241,8 @@ protected:
 	void OnHelpAbout();
 	LRESULT OnDropNotify(WPARAM ShowMenu, LPARAM lParam);
 	LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam, BOOL calcOnly);
+	void OnDisplayChange();
+	void OnWTSSessionChange(WPARAM wp);
 	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
 
 private:
