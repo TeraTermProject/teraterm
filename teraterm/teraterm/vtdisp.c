@@ -383,14 +383,19 @@ static void BGPreloadPicture(BGSrc *src, const TTTSet *pts)
 	if(hbm) {
 		BITMAP bm;
 
-		GetObject(hbm,sizeof(bm),&bm);
-
-		DeleteBitmapDC(&(src->hdc));
-		src->hdc    = CreateBitmapDC(hbm);
-		src->width  = bm.bmWidth;
-		src->height = bm.bmHeight;
+		if (GetObject(hbm, sizeof(bm), &bm) == 0) {
+			DeleteObject(hbm);
+		} else {
+			HDC new_hdc = CreateBitmapDC(hbm);
+			if (new_hdc) {
+				DeleteBitmapDC(&(src->hdc));
+				src->hdc    = new_hdc;
+				src->width  = bm.bmWidth;
+				src->height = bm.bmHeight;
+			}
+		}
 	}else{
-		// 以前の設定を維持する
+		src->type = BG_COLOR; // 画像が読めない場合は、単色塗りにフォールバックする
 	}
 
 	free(susie_path);
@@ -623,23 +628,27 @@ load_finish:
 	{
 		BITMAP bm;
 
-		GetObject(hbm,sizeof(bm),&bm);
-
-		DeleteBitmapDC(&(src->hdc));
-		src->hdc     = CreateBitmapDC(hbm);
-		src->width   = bm.bmWidth;
-		src->height  = bm.bmHeight;
-		src->pattern = wi.pattern;
-
+		if (GetObject(hbm, sizeof(bm), &bm) == 0) {
+			DeleteObject(hbm);
+		} else {
+			HDC new_hdc = CreateBitmapDC(hbm);
+			if (new_hdc) {
+				DeleteBitmapDC(&(src->hdc));
+				src->hdc     = new_hdc;
+				src->width   = bm.bmWidth;
+				src->height  = bm.bmHeight;
+				src->pattern = wi.pattern;
+			}
+		}
 	}else{
-		// 以前の設定を維持する
+		src->hdc = NULL; // 壁紙を読めない場合は再読み込み出来るようにしておく
 	}
 
 	src->color = GetSysColor(COLOR_DESKTOP);
 }
 
 // 復帰値
-//   TRUE  背景の再構築が必要
+//   TRUE  描画リソースの再構築を行った
 //   FALSE 既存の描画リソースをそのまま利用可能
 static BOOL BGPreloadSrc(BGSrc *src, const TTTSet *pts, BOOL forceReload)
 {
@@ -654,8 +663,9 @@ static BOOL BGPreloadSrc(BGSrc *src, const TTTSet *pts, BOOL forceReload)
 			if (!bmp) {
 				DeleteDC(memdc);
 			} else {
-				SelectObject(memdc, bmp);
+				HBITMAP oldBmp = SelectObject(memdc, bmp);
 				BOOL ok = BitBlt(memdc, 0, 0, 1, 1, src->hdc, 0, 0, SRCCOPY);
+				SelectObject(memdc, oldBmp);
 				DeleteObject(bmp);
 				DeleteDC(memdc);
 				if (ok) {
