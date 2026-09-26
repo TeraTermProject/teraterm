@@ -64,12 +64,17 @@
     </ul>
   </li>
 
-  <!--li>バグ修正
+  <li>バグ修正
     <ul>
       <li>
+        プラグインが表示したメッセージボックスなどが開いたまま Tera Term が閉じられると、
+        実行しようとしたプラグインのコードが解放済みで異常終了する不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1556" target="_blank">issue #1556</a>)<br>
+        プラグインの終了処理 TTXEnd() をメッセージループ終了後に行うようにした。
+        TTXEnd() が呼ばれる時点でメインウィンドウは既に破棄されている。
       </li>
     </ul>
-  </li-->
+  </li>
 
   <li>その他
     <ul>

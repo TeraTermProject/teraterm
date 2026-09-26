@@ -64,12 +64,17 @@
     </ul>
   </li>
 
-  <!--li>Bug fixes
+  <li>Bug fixes
     <ul>
       <li>
+        Fixed an issue where Tera Term crashed when it was closed while a message box or similar shown by a plugin was still open,
+        because the plugin code to be executed had already been unloaded.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1556" target="_blank">issue #1556</a>)<br>
+        The plugin termination TTXEnd() is now called after the message loop has ended.
+        The main window has already been destroyed when TTXEnd() is called.
       </li>
     </ul>
-  </li-->
+  </li>
 
   <li>Misc
     <ul>
