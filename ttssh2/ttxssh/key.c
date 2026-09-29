@@ -1515,8 +1515,8 @@ static int ssh_ed25519_sign(Key *key, char **sigp, size_t *lenp, char *data, siz
 	size_t slen;
 	size_t len;
 	unsigned long long smlen;
-	int r, ret;
-	buffer_t *b;
+	int r = SSH_ERR_INTERNAL_ERROR, ret;
+	buffer_t *b = NULL;
 
 	smlen = slen = datalen + crypto_sign_ed25519_BYTES;
 	sig = malloc(slen);

@@ -1666,7 +1666,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		strncpy_s(errmsg, errmsg_len, "body missing", _TRUNCATE);
 		goto error;
 	}
-	if (len < 0 || len > buffer_remain_len(blob)) {
+	if (len > buffer_remain_len(blob)) {
 		strncpy_s(errmsg, errmsg_len, "body size error", _TRUNCATE);
 		goto error;
 	}
@@ -1727,7 +1727,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		strncpy_s(errmsg, errmsg_len, "blob missing", _TRUNCATE);
 		goto error;
 	}
-	if (len <= 0 || len > buffer_remain_len(blob2)) {
+	if (len == 0 || len > buffer_remain_len(blob2)) {
 		strncpy_s(errmsg, errmsg_len, "blob size error", _TRUNCATE);
 		goto error;
 	}
