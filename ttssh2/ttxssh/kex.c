@@ -1271,7 +1271,7 @@ int kex_kem_sntrup761x25519_keypair(kex *kex)
 	//   x25519 public key:    32 bytes
 
 	need = crypto_kem_sntrup761_PUBLICKEYBYTES + CURVE25519_SIZE;
-	if ((r = buffer_put_u32(buf, need)) != 0 ||
+	if ((r = buffer_put_u32(buf, (uint32_t)need)) != 0 ||
 	    (r = buffer_reserve(buf, need, &cp)) != 0) {
 		goto out;
 	}
@@ -1456,7 +1456,7 @@ int kex_kem_mlkem768x25519_keypair(kex *kex)
 	//   x25519 public key:    32 bytes
 
 	need = crypto_kem_mlkem768_PUBLICKEYBYTES + CURVE25519_SIZE;
-	if ((r = buffer_put_u32(buf, need)) != 0)
+	if ((r = buffer_put_u32(buf, (uint32_t)need)) != 0)
 		goto out;
 
 	if (buffer_reserve(buf, need, &cp) != 0)

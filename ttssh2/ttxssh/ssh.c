@@ -1221,7 +1221,7 @@ static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsign
 		// ポインタの更新。
 		pvar->ssh_state.payload = buffer_ptr(pvar->decomp_buffer);
 		pvar->ssh_state.payload++; // メッセージタイプのぶん進める
-		pvar->ssh_state.payloadlen = buffer_len(pvar->decomp_buffer);
+		pvar->ssh_state.payloadlen = (unsigned int)buffer_len(pvar->decomp_buffer);
 	} else {
 		pvar->ssh_state.payload++; // メッセージタイプのぶん進める
 	}
@@ -1440,7 +1440,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 				return;
 			}
 			data = buffer_ptr(msg);
-			len = buffer_len(msg) - 5;  // 'len' is overwritten.
+			len = (unsigned int)(buffer_len(msg) - 5);  // 'len' is overwritten.
 
 		} else {
 			// 無圧縮
@@ -8007,7 +8007,7 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 		if (pvar->authbanner_buffer != NULL) {
 			sanitize_str(pvar->authbanner_buffer, message, message_len);
 			msg = buffer_ptr(pvar->authbanner_buffer);
-			message_len = buffer_len(pvar->authbanner_buffer) - 1;	// NUL Terminate 分は数えない
+			message_len = (int)buffer_len(pvar->authbanner_buffer) - 1;	// NUL Terminate 分は数えない
 		}
 		else {
 			// メモリ確保失敗時は変換前の文字列を表示する。
@@ -8405,7 +8405,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 
 	// Pageant に署名してもらう
 	signedmsg = putty_sign_ssh2_key(pvar->pageant_curkey,
-	                                buffer_ptr(signbuf), buffer_len(signbuf),
+	                                buffer_ptr(signbuf), (int)buffer_len(signbuf),
 	                                &signedlen, signflag);
 	buffer_free(signbuf);
 	if (signedmsg == NULL) {

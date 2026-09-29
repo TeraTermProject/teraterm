@@ -3836,7 +3836,7 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	if (buffer_reserve(encoded, buffer_len(b) + authlen, &cp) != 0) {
 		goto ed25519_error;
 	}
-	if (EVP_Cipher(cc->evp, cp, buffer_ptr(b), buffer_len(b)) == 0) {
+	if (EVP_Cipher(cc->evp, cp, buffer_ptr(b), (unsigned int)buffer_len(b)) == 0) {
 		//strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 		//free(decrypted);
 		//goto error;
@@ -4575,7 +4575,8 @@ public_error:
 				unsigned int rnd;
 				unsigned char tmp[128];
 				RSA *rsa;
-				int i, len;
+				int i;
+				size_t len;
 				char authfile_id_string[] = "SSH PRIVATE KEY FILE FORMAT 1.1";
 				MD5_CTX md;
 				unsigned char digest[16];
@@ -4679,7 +4680,7 @@ public_error:
 					goto error;
 				}
 
-				if (EVP_Cipher(cc->evp, wrapped, buffer_ptr(b), len) == 0) {
+				if (EVP_Cipher(cc->evp, wrapped, buffer_ptr(b), (unsigned int)len) == 0) {
 					goto error;
 				}
 

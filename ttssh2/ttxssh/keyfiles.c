@@ -398,7 +398,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	unsigned char *cp, last, pad;
 	char *ciphername = NULL, *kdfname = NULL, *kdfp = NULL, *key = NULL, *salt = NULL, *comment = NULL;
 	unsigned int len, nkeys, blocksize, keylen, ivlen, rounds;
-	size_t klen, publen, slen;
+	size_t klen, publen, slen, encoded_len;
 	unsigned int check1, check2, m1len, m2len;
 	int dlen, i;
 	const struct ssh2cipher *cipher;
@@ -434,14 +434,14 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	m1len = sizeof(MARK_BEGIN) - 1;
 	m2len = sizeof(MARK_END) - 1;
 	cp = buffer_ptr(blob);
-	len = buffer_len(blob);
-	if (len < m1len || memcmp(cp, MARK_BEGIN, m1len)) {
+	encoded_len = buffer_len(blob);
+	if (encoded_len < m1len || memcmp(cp, MARK_BEGIN, m1len)) {
 		logprintf(LOG_LEVEL_VERBOSE, "%s: missing begin marker", __FUNCTION__);
 		goto error;
 	}
 	cp += m1len;
-	len -= m1len;
-	while (len) {
+	encoded_len -= m1len;
+	while (encoded_len) {
 		if (*cp != '\n' && *cp != '\r') {
 			if (buffer_put_u8(encoded, *cp) != 0) {
 				logprintf(LOG_LEVEL_WARNING, "%s: buffer put error", __FUNCTION__);
@@ -449,10 +449,10 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 			}
 		}
 		last = *cp;
-		len--;
+		encoded_len--;
 		cp++;
 		if (last == '\n') {
-			if (len >= m2len && !memcmp(cp, MARK_END, m2len)) {
+			if (encoded_len >= m2len && !memcmp(cp, MARK_END, m2len)) {
 				if (buffer_put_u8(encoded, '\0') != 0) {
 					logprintf(LOG_LEVEL_WARNING, "%s: buffer put error", __FUNCTION__);
 					goto error;
@@ -461,27 +461,27 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 			}
 		}
 	}
-	if (!len) {
+	if (!encoded_len) {
 		logprintf(LOG_LEVEL_VERBOSE, "%s: no end marker", __FUNCTION__);
 		goto error;
 	}
 
 	// ファイルのスキャンが終わったので、base64 decodeする。
-	len = buffer_len(encoded);
-	if (buffer_reserve(copy_consumed, len, &cp) != 0) {
+	encoded_len = buffer_len(encoded);
+	if (buffer_reserve(copy_consumed, encoded_len, &cp) != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_reserve() error", __FUNCTION__);
 		goto error;
 	}
-	if ((dlen = b64decode(cp, len, buffer_ptr(encoded))) < 0) {
+	if ((dlen = b64decode(cp, (int)encoded_len, buffer_ptr(encoded))) < 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: base64 decode failed", __FUNCTION__);
 		goto error;
 	}
-	if ((unsigned int)dlen > len) {
-		logprintf(LOG_LEVEL_ERROR, "%s: crazy base64 length %d > %u", __FUNCTION__, dlen, len);
+	if ((size_t)dlen > encoded_len) {
+		logprintf(LOG_LEVEL_ERROR, "%s: crazy base64 length %d > %u", __FUNCTION__, dlen, (unsigned int)encoded_len);
 		goto error;
 	}
 
-	if (buffer_consume_end(copy_consumed, len - dlen) != 0) {
+	if (buffer_consume_end(copy_consumed, encoded_len - dlen) != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_consume_end() error", __FUNCTION__);
 		goto error;
 	}
@@ -878,7 +878,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	unsigned int cipherkey_len, cipheriv_len, mackey_len;
 	buffer_t *passphrase_salt = buffer_init();
 	const struct ssh2cipher *ciphertype;
-	int lines, len;
+	int lines;
+	size_t len;
 	ppk_argon2_parameters params;
 	unsigned fmt_version = 0;
 
@@ -1147,7 +1148,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		cipher_init_SSH2(&cc, ciphertype, cipherkey, 32, cipheriv, 16, CIPHER_DECRYPT, pvar);
 		len = buffer_len(private_blob);
 		decrypted = (char *)malloc(len);
-		ret = EVP_Cipher(cc->evp, decrypted, buffer_ptr(private_blob), len);
+		ret = EVP_Cipher(cc->evp, decrypted, buffer_ptr(private_blob), (unsigned int)len);
 		if (ret == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 			free(decrypted);
@@ -1187,7 +1188,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		else {
 			md = EVP_sha256();
 		}
-		mac_simple(md, (unsigned char *)mackey, mackey_len, buffer_ptr(macdata), buffer_len(macdata), binary);
+		mac_simple(md, (unsigned char *)mackey, mackey_len, buffer_ptr(macdata), (int)buffer_len(macdata), binary);
 
 		buffer_free(macdata);
 
