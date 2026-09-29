@@ -3827,7 +3827,7 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	}
 
 	/* length */
-	if (buffer_put_int(encoded, buffer_len(b)) != 0) {
+	if (buffer_put_int(encoded, (unsigned int)buffer_len(b)) != 0) {
 		goto ed25519_error;
 	}
 

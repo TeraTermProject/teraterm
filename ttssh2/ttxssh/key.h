@@ -55,7 +55,7 @@ Key *key_new(int type);
 void key_free(Key *key);
 void key_init(Key *key);
 int key_to_blob(Key *key, char **blobp, int *lenp);
-Key *key_from_blob(char *data, int blen);
+Key *key_from_blob(char *data, size_t blen);
 int get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen);
 BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data, int datalen, ssh_keyalgo keyalgo);
 

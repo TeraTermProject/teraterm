@@ -99,7 +99,7 @@ void buffer_free(buffer_t * buf)
 {
 	if (buf != NULL) {
 		// セキュリティ対策 (2006.8.3 yutaka)
-		int len =  buffer_len(buf);
+		size_t len =  buffer_len(buf);
 		SecureZeroMemory(buf->buf, len);
 		free(buf->buf);
 		free(buf);
@@ -287,10 +287,10 @@ void *buffer_get_string_(buffer_t *buf, int *lenp)
 	char *data, *olddata;
 	void *ret = NULL;
 	size_t off;
-	int len, datalen;
+	uint32_t datalen;
 
 	// Check size
-	len = buffer_remain_len(buf);
+	size_t len = buffer_remain_len(buf);
 	if (len < 4)
 		goto error;
 
@@ -481,7 +481,7 @@ int buffer_put_char(buffer_t *buf, int val)
 	return buffer_put(buf, &ch, 1);
 }
 
-int buffer_put_int(buffer_t *buf, int val)
+int buffer_put_int(buffer_t *buf, unsigned int val)
 {
 	char tmp[4];
 
@@ -489,14 +489,14 @@ int buffer_put_int(buffer_t *buf, int val)
 	return buffer_put(buf, tmp, sizeof(tmp));
 }
 
-int buffer_len(buffer_t *buf)
+size_t buffer_len(buffer_t *buf)
 {
-	return (int)(buf->len);
+	return buf->len;
 }
 
-int buffer_remain_len(buffer_t *buf)
+size_t buffer_remain_len(buffer_t *buf)
 {
-	return (int)(buf->len - buf->offset);
+	return buf->len - buf->offset;
 }
 
 // buffer_put() や buffer_reserve() でメッセージバッファに追加を行うと、
@@ -731,7 +731,7 @@ int buffer_get_ec(buffer_t *buf, EC_POINT *v, const EC_GROUP *g)
 
 void buffer_dump(FILE *fp, buffer_t *buf)
 {
-	int i;
+	size_t i;
 	char *ch = buffer_ptr(buf);
 
 	for (i = 0 ; i < buffer_len(buf) ; i++) {

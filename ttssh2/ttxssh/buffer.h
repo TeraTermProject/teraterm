@@ -39,9 +39,9 @@ void buffer_clear(buffer_t *buf);
 void buffer_free(buffer_t *buf);
 
 /* バッファ全体の長さ */
-int buffer_len(buffer_t *buf);
+size_t buffer_len(buffer_t *buf);
 /* まだ読み込んでいない残りのサイズを返す。OpenSSH の sshbuf_len() に相当 */
-int buffer_remain_len(buffer_t *buf);
+size_t buffer_remain_len(buffer_t *buf);
 /* バッファの先頭のポインタを返す */
 char *buffer_ptr(buffer_t *buf);
 /* 現在のポインタを返す。OpenSSH の sshbuf_ptr() に相当 */
@@ -56,7 +56,7 @@ int buffer_get(buffer_t *buf, void *v, size_t len);
 int buffer_put(buffer_t *buf, const void *v, size_t len);
 
 int buffer_get_int(buffer_t *buf, unsigned int *valp);
-int buffer_put_int(buffer_t *buf, int val);
+int buffer_put_int(buffer_t *buf, unsigned int val);
 
 int buffer_get_char(buffer_t *buf, u_char *valp);
 int buffer_put_char(buffer_t *buf, int val);

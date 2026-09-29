@@ -541,7 +541,7 @@ typedef struct memtag {
 	char *name;
 	char *desc;
 	time_t time;
-	int len;
+	size_t len;
 	char *data;
 } memtag_t;
 
@@ -583,12 +583,12 @@ static void displine_memdump(FILE *fp, int addr, int *bytes, int byte_cnt)
 
 
 /* ダンプルーチン */
-static void dump_memdump(FILE *fp, char *data, int len)
+static void dump_memdump(FILE *fp, char *data, size_t len)
 {
 	int c, addr;
 	int bytes[16], *ptr;
 	int byte_cnt;
-	int i;
+	size_t i;
 
 	addr = 0;
 	byte_cnt = 0;
@@ -690,7 +690,7 @@ void save_memdump(wchar_t *filename)
 	fclose(fp);
 }
 
-void push_memdump(char *name, char *desc, char *data, int len)
+void push_memdump(char *name, char *desc, char *data, size_t len)
 {
 	memtag_t *ptr;
 	char *dp;
@@ -1241,7 +1241,7 @@ static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsign
    or for the packet type byte).
    Returns a pointer to the payload data area, a region of length 'len',
    to be filled by the caller. */
-unsigned char *begin_send_packet(PTInstVar pvar, int type, int len)
+unsigned char *begin_send_packet(PTInstVar pvar, int type, size_t len)
 {
 	unsigned char *buf;
 
@@ -1349,7 +1349,7 @@ error:
    into outbuf + 12 */
 void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 {
-	unsigned int len = pvar->ssh_state.outgoing_packet_len;
+	unsigned int len = (unsigned int)pvar->ssh_state.outgoing_packet_len;
 	unsigned char *data;
 	unsigned int data_length;
 	buffer_t *msg = NULL; // for SSH2 packet compression
@@ -3177,7 +3177,7 @@ void SSH_notify_disconnecting(PTInstVar pvar, char *reason)
 		buffer_t *msg;
 		unsigned char *outmsg;
 		char *s;
-		int len;
+		size_t len;
 
 		// SSH2 serverにdisconnectを伝える
 		msg = buffer_init();
@@ -3278,7 +3278,7 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 		buffer_t *msg;
 		char *req_type = "window-change";
 		unsigned char *outmsg;
-		int len;
+		size_t len;
 		Channel_t *c;
 
 		c = ssh2_channel_lookup(pvar->shell_id);
@@ -3335,7 +3335,7 @@ int SSH_notify_break_signal(PTInstVar pvar)
 		buffer_t *msg;
 		char *req_type = "break";
 		unsigned char *outmsg;
-		int len;
+		size_t len;
 		Channel_t *c;
 
 		c = ssh2_channel_lookup(pvar->shell_id);
@@ -3768,7 +3768,7 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 {
 	buffer_t *msg;
 	unsigned char *outmsg;
-	unsigned int len;
+	size_t len;
 
 	// SSH2鍵交換中の場合は、パケットを送れないのでいったん保存しておく
 	if (pvar->kex->kex_status & KEX_FLAG_REKEYING) {
@@ -3891,7 +3891,7 @@ void SSH_fail_channel_open(PTInstVar pvar, uint32 remote_channel_num)
 		finish_send_packet(pvar);
 
 	} else { // SSH2 (2005.6.26 yutaka)
-		int len;
+		size_t len;
 		Channel_t *c = NULL;
 		buffer_t *msg;
 		unsigned char *outmsg;
@@ -3923,7 +3923,7 @@ void SSH2_confirm_channel_open(PTInstVar pvar, Channel_t *c)
 {
 	buffer_t *msg;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 
 	if (c == NULL)
 		return;
@@ -3992,7 +3992,7 @@ void SSH2_channel_input_eof(PTInstVar pvar, Channel_t *c)
 {
 	buffer_t *msg;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 
 	if (c == NULL)
 		return;
@@ -4076,7 +4076,7 @@ void SSH_request_forwarding(PTInstVar pvar, char *bind_address, int from_server_
 		buffer_t *msg;
 		char *req;
 		unsigned char *outmsg;
-		int len;
+		size_t len;
 
 		logprintf(LOG_LEVEL_VERBOSE, "%s: Forwarding request (SSH2 RtoL): "
 				  "bind_addr=%s, remote_port=%d, to_host=%s, to_port=%d", __FUNCTION__,
@@ -4114,7 +4114,7 @@ void SSH_cancel_request_forwarding(PTInstVar pvar, char *bind_address, int from_
 		buffer_t *msg;
 		char *req;
 		unsigned char *outmsg;
-		int len;
+		size_t len;
 
 		msg = buffer_init();
 		if (msg == NULL) {
@@ -4174,7 +4174,7 @@ void SSH_request_X11_forwarding(PTInstVar pvar,
 		buffer_t *msg;
 		char *req_type = "x11-req";
 		unsigned char *outmsg;
-		int len;
+		size_t len;
 		Channel_t *c;
 		int newlen;
 		char *newdata;
@@ -4272,7 +4272,7 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 			buffer_t *msg;
 			char *s;
 			unsigned char *outmsg;
-			int len;
+			size_t len;
 			Channel_t *c;
 
 			// SSH2鍵交換中の場合、パケットを捨てる。(2005.6.21 yutaka)
@@ -4575,7 +4575,7 @@ static int SSH_scp_transaction(PTInstVar pvar, const char *filename, const char 
 		buffer_t *msg;
 		char *s;
 		unsigned char *outmsg;
-		int len;
+		size_t len;
 
 		// session open
 		msg = buffer_init();
@@ -4647,7 +4647,7 @@ int SSH_sftp_transaction(PTInstVar pvar)
 	buffer_t *msg;
 	char *s;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 	Channel_t *c = NULL;
 //	FILE *fp = NULL;
 //	struct __stat64 st;
@@ -4759,7 +4759,8 @@ void SSH2_send_kexinit(PTInstVar pvar)
 	char cookie[SSH2_COOKIE_LENGTH];
 	buffer_t *msg;
 	unsigned char *outmsg;
-	int len, i;
+	size_t len;
+	int i;
 
 	msg = buffer_init();
 	if (msg == NULL) {
@@ -5428,7 +5429,7 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 {
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 	kex *kex = pvar->kex;
 
 	if (kex_dh_keypair(kex) != 0)
@@ -5485,7 +5486,7 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 {
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 	kex *kex = pvar->kex;
 	u_int nbits;
 
@@ -5581,7 +5582,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 {
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 	kex *kex = pvar->kex;
 	BIGNUM *p = NULL, *g = NULL;
 	BIGNUM *pub_key;
@@ -5735,7 +5736,7 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 {
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 	kex *kex = pvar->kex;
 
 	if (kex_ecdh_keypair(kex) != 0)
@@ -5790,7 +5791,7 @@ static void SSH2_curve25519_kex_init(PTInstVar pvar)
 {
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 	kex *kex = pvar->kex;
 
 	if (kex_c25519_keypair(kex) != 0)
@@ -5844,7 +5845,7 @@ static void SSH2_kem_sntrup761x25519_kex_init(PTInstVar pvar)
 {
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 	kex *kex = pvar->kex;
 
 	if (kex_kem_sntrup761x25519_keypair(kex) != 0)
@@ -5897,7 +5898,7 @@ static void SSH2_kem_mlkem768x25519_kex_init(PTInstVar pvar)
 {
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 	kex *kex = pvar->kex;
 
 	if (kex_kem_mlkem768x25519_keypair(kex) != 0)
@@ -6073,7 +6074,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 {
 	char *data;
 	unsigned int len;
-	int bloblen, pklen;
+	size_t bloblen, pklen;
 	kex *kex = pvar->kex;
 	Key *server_host_key = NULL;
 	buffer_t *shared_secret = NULL;
@@ -6240,7 +6241,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 {
 	char *data;
 	unsigned int len;
-	int bloblen;
+	size_t bloblen;
 	kex *kex = pvar->kex;
 	BIGNUM *dh_server_pub = NULL;
 	BIGNUM *pub_key, *dh_p, *dh_g;
@@ -6413,7 +6414,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 {
 	char *data;
 	unsigned int len;
-	int bloblen, pklen;
+	size_t bloblen, pklen;
 	kex *kex = pvar->kex;
 	Key *server_host_key = NULL;
 	buffer_t *shared_secret = NULL;
@@ -6561,7 +6562,7 @@ static BOOL handle_SSH2_curve25519_kex_reply(PTInstVar pvar)
 {
 	char *data;
 	unsigned int len;
-	int bloblen, pklen;
+	size_t bloblen, pklen;
 	kex *kex = pvar->kex;
 	Key *server_host_key = NULL;
 	buffer_t *shared_secret = NULL;
@@ -6709,7 +6710,7 @@ static BOOL handle_SSH2_kem_sntrup761x25519_kex_reply(PTInstVar pvar)
 {
 	char *data;
 	unsigned int len;
-	int bloblen, pklen;
+	size_t bloblen, pklen;
 	kex *kex = pvar->kex;
 	Key *server_host_key = NULL;
 	buffer_t *shared_secret = NULL;
@@ -6865,7 +6866,7 @@ static BOOL handle_SSH2_kem_mlkem768x25519_kex_reply(PTInstVar pvar)
 {
 	char *data;
 	unsigned int len;
-	int bloblen, pklen;
+	size_t bloblen, pklen;
 	kex *kex = pvar->kex;
 	Key *server_host_key = NULL;
 	buffer_t *shared_secret = NULL;
@@ -7134,7 +7135,7 @@ BOOL do_SSH2_userauth(PTInstVar pvar)
 	buffer_t *msg = NULL;
 	char *s;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 
 	// すでにログイン処理を行っている場合は、SSH2_MSG_SERVICE_REQUESTの送信は
 	// しないことにする。OpenSSHでは支障ないが、Tru64 UNIXではサーバエラーとなってしまうため。
@@ -7529,7 +7530,7 @@ static LRESULT CALLBACK ssh_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, L
 			buffer_t *msg;
 			char *s;
 			unsigned char *outmsg;
-			int len;
+			size_t len;
 
 			msg = buffer_init();
 			if (msg == NULL) {
@@ -8255,7 +8256,7 @@ err:
 
 void SSH2_send_userauth_infores(PTInstVar pvar)
 {
-	int len;
+	size_t len;
 	int echo;
 	char *s;
 	char *prompt_disp = NULL;
@@ -8674,7 +8675,7 @@ static BOOL send_channel_request_gen(PTInstVar pvar, Channel_t *c, unsigned char
 {
 	buffer_t *msg;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 
 	msg = buffer_init();
 	if (msg == NULL) {
@@ -8718,7 +8719,8 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 	buffer_t *msg, *ttymsg;
 	char *req_type = "pty-req";  // pseudo terminalのリクエスト
 	unsigned char *outmsg;
-	int len, x, y;
+	size_t len;
+	int x, y;
 #ifdef DONT_WANTCONFIRM
 	int want_reply = 0; // false
 #else
@@ -9221,7 +9223,7 @@ static void do_SSH2_adjust_window_size(PTInstVar pvar, Channel_t *c)
 {
 	buffer_t *msg;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 
 	// ローカルのwindow sizeにまだ余裕があるなら、何もしない。
 	if (c->local_window >= SCPRCV_LOW_WATER_MARK)
@@ -9258,7 +9260,7 @@ void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c)
 	if (SSHv2(pvar)) {
 		buffer_t *msg;
 		unsigned char *outmsg;
-		int len;
+		size_t len;
 
 		// このchannelについてcloseを送信済みなら送らない
 		if (c->state & SSH_CHANNEL_STATE_CLOSE_SENT) {
@@ -10398,7 +10400,7 @@ static BOOL handle_SSH2_channel_eof(PTInstVar pvar)
 static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 {
 	char *data;
-	unsigned int len;
+	size_t len;
 	Channel_t *c = NULL;
 	char *ctype = NULL;
 	int ctype_len;
@@ -10717,7 +10719,7 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 	if (want_reply) {
 		buffer_t *msg;
 		unsigned char *outmsg;
-		int len;
+		size_t len;
 		int type;
 
 		if (success) {

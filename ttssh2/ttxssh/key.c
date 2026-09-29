@@ -1350,7 +1350,7 @@ error:
 // バッファからキー情報を取り出す(for SSH2)
 // NOTE: 返値はアロケート領域になるので、呼び出し側で解放すること。
 //
-Key *key_from_blob(char *data, int blen)
+Key *key_from_blob(char *data, size_t blen)
 {
 	buffer_t *b = NULL;
 	char *ktype = NULL;
@@ -2627,7 +2627,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 			logprintf(LOG_LEVEL_FATAL, "buffer put error");
 			goto error;
 		}
-		key = key_from_blob(blob, (int)len);
+		key = key_from_blob(blob, len);
 		if (key == NULL) {
 			logprintf(LOG_LEVEL_ERROR, "Not found host key into blob %p (%d)", blob, (int)len);
 			goto error;

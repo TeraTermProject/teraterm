@@ -398,7 +398,7 @@ typedef struct {
 	unsigned char *precompress_outbuf;
 	unsigned int precompress_outbuflen;
 	/* this is the length of the packet data, including the type header */
-	long outgoing_packet_len;
+	size_t outgoing_packet_len;
 
 	/* This buffer is used by the SSH protocol processing to store decompressed
 	   packet data. User data is never streamed through here; it is decompressed
@@ -628,7 +628,7 @@ typedef struct channel {
 	unsigned int state;
 } Channel_t;
 
-unsigned char *begin_send_packet(PTInstVar pvar, int type, int len);
+unsigned char *begin_send_packet(PTInstVar pvar, int type, size_t len);
 void finish_send_packet_special(PTInstVar pvar, int skip_compress);
 void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen, int retry);
 Channel_t* ssh2_local_channel_lookup(int local_num);

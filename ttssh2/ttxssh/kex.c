@@ -708,10 +708,10 @@ kex_dh_hash(const digest_algorithm hash_alg,
 	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	if ((r = buffer_put_int(b, buffer_len(client_kexinit) + 1)) != 0 ||
+	if ((r = buffer_put_int(b, (unsigned int)(buffer_len(client_kexinit) + 1))) != 0 ||
 	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
-	    (r = buffer_put_int(b, buffer_len(server_kexinit) + 1)) != 0 ||
+	    (r = buffer_put_int(b, (unsigned int)(buffer_len(server_kexinit) + 1))) != 0 ||
 	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
 	    (r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
@@ -782,10 +782,10 @@ kexgex_hash(const digest_algorithm hash_alg,
 	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	if ((r = buffer_put_int(b, buffer_len(client_kexinit) + 1)) != 0 ||
+	if ((r = buffer_put_int(b, (unsigned int)(buffer_len(client_kexinit) + 1))) != 0 ||
 	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
-	    (r = buffer_put_int(b, buffer_len(server_kexinit) + 1)) != 0 ||
+	    (r = buffer_put_int(b, (unsigned int)(buffer_len(server_kexinit) + 1))) != 0 ||
 	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
 	    (r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
@@ -996,10 +996,10 @@ kex_ecdh_hash(const digest_algorithm hash_alg,
 	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	if ((r = buffer_put_int(b, buffer_len(client_kexinit) + 1)) != 0 ||
+	if ((r = buffer_put_int(b, (unsigned int)(buffer_len(client_kexinit) + 1))) != 0 ||
 	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
-	    (r = buffer_put_int(b, buffer_len(server_kexinit) + 1)) != 0 ||
+	    (r = buffer_put_int(b, (unsigned int)(buffer_len(server_kexinit) + 1))) != 0 ||
 	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
 	    (r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
@@ -1188,10 +1188,10 @@ kex_c25519_hash(const digest_algorithm hash_alg,
 	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	if ((r = buffer_put_int(b, buffer_len(client_kexinit) + 1)) != 0 ||
+	if ((r = buffer_put_int(b, (unsigned int)(buffer_len(client_kexinit) + 1))) != 0 ||
 		(r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
 		(r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
-		(r = buffer_put_int(b, buffer_len(server_kexinit) + 1)) != 0 ||
+		(r = buffer_put_int(b, (unsigned int)(buffer_len(server_kexinit) + 1))) != 0 ||
 		(r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
 		(r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
 		(r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
@@ -1375,10 +1375,10 @@ kex_kem_sntrup761x25519_hash(const digest_algorithm hash_alg,
 	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	if ((r = buffer_put_int(b, buffer_len(client_kexinit) + 1)) != 0 ||
+	if ((r = buffer_put_int(b, (unsigned int)(buffer_len(client_kexinit) + 1))) != 0 ||
 	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
-	    (r = buffer_put_int(b, buffer_len(server_kexinit) + 1)) != 0 ||
+	    (r = buffer_put_int(b, (unsigned int)(buffer_len(server_kexinit) + 1))) != 0 ||
 	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
 	    (r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
@@ -1572,10 +1572,10 @@ kex_kem_mlkem768x25519_hash(const digest_algorithm hash_alg,
 	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	if ((r = buffer_put_int(b, buffer_len(client_kexinit) + 1)) != 0 ||
+	if ((r = buffer_put_int(b, (unsigned int)(buffer_len(client_kexinit) + 1))) != 0 ||
 		(r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
 		(r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
-		(r = buffer_put_int(b, buffer_len(server_kexinit) + 1)) != 0 ||
+		(r = buffer_put_int(b, (unsigned int)(buffer_len(server_kexinit) + 1))) != 0 ||
 		(r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
 		(r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
 		(r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
