@@ -229,7 +229,7 @@ int buffer_get(buffer_t *buf, void *v, size_t len)
 	return 0;
 }
 
-int buffer_get_int(buffer_t *buf, unsigned int *valp)
+int buffer_get_u32(buffer_t *buf, uint32_t *valp)
 {
 	unsigned char tmp[4];
 	int r;
@@ -241,7 +241,7 @@ int buffer_get_int(buffer_t *buf, unsigned int *valp)
 	return 0;
 }
 
-int buffer_get_char(buffer_t *buf, u_char *valp)
+int buffer_get_u8(buffer_t *buf, uint8_t *valp)
 {
 	int r;
 
@@ -439,7 +439,7 @@ int buffer_get_stringb(buffer_t *buf, buffer_t *v)
 	 * into 'v'.
 	 */
 	if ((r = buffer_peek_string_direct(buf, NULL, NULL)) != 0 ||
-	    (r = buffer_get_int(buf, &len)) != 0 ||
+	    (r = buffer_get_u32(buf, &len)) != 0 ||
 	    (r = buffer_reserve(v, len, &p)) != 0 ||
 	    (r = buffer_get(buf, p, len)) != 0)
 		return r;
@@ -474,14 +474,14 @@ int buffer_put_stringb(buffer_t *buf, buffer_t *v)
 	return buffer_put_string(buf, buffer_ptr(v), buffer_len(v));
 }
 
-int buffer_put_char(buffer_t *buf, int val)
+int buffer_put_u8(buffer_t *buf, uint8_t val)
 {
-	char ch = (char)val;
+	uint8_t ch = val;
 
 	return buffer_put(buf, &ch, 1);
 }
 
-int buffer_put_int(buffer_t *buf, unsigned int val)
+int buffer_put_u32(buffer_t *buf, uint32_t val)
 {
 	char tmp[4];
 
@@ -621,7 +621,7 @@ int buffer_get_bignum_SECSH(buffer_t *buf, BIGNUM *v)
 	unsigned int bits, bytes;
 	int r;
 
-	if ((r = buffer_get_int(buf, &bits)) != 0) {
+	if ((r = buffer_get_u32(buf, &bits)) != 0) {
 		return r;
 	}
 	bytes = (bits + 7) / 8;

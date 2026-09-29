@@ -443,7 +443,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	len -= m1len;
 	while (len) {
 		if (*cp != '\n' && *cp != '\r') {
-			if (buffer_put_char(encoded, *cp) != 0) {
+			if (buffer_put_u8(encoded, *cp) != 0) {
 				logprintf(LOG_LEVEL_WARNING, "%s: buffer put error", __FUNCTION__);
 				goto error;
 			}
@@ -453,7 +453,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		cp++;
 		if (last == '\n') {
 			if (len >= m2len && !memcmp(cp, MARK_END, m2len)) {
-				if (buffer_put_char(encoded, '\0') != 0) {
+				if (buffer_put_u8(encoded, '\0') != 0) {
 					logprintf(LOG_LEVEL_WARNING, "%s: buffer put error", __FUNCTION__);
 					goto error;
 				}
@@ -547,7 +547,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	}
 
 	/* number of keys */
-	if (buffer_get_int(copy_consumed, &nkeys) != 0) {
+	if (buffer_get_u32(copy_consumed, &nkeys) != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: key counter missing", __FUNCTION__);
 		goto error;
 	}
@@ -568,7 +568,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	free(cp); /* XXX check pubkey against decrypted private key */
 
 	/* size of encrypted key blob */
-	if (buffer_get_int(copy_consumed, &len) != 0) {
+	if (buffer_get_u32(copy_consumed, &len) != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: encrypted data missing", __FUNCTION__);
 		goto error;
 	}
@@ -596,7 +596,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 			logprintf(LOG_LEVEL_ERROR, "%s: salt not set", __FUNCTION__);
 			goto error;
 		}
-		if (buffer_get_int(kdf, &rounds) != 0) {
+		if (buffer_get_u32(kdf, &rounds) != 0) {
 			logprintf(LOG_LEVEL_ERROR, "%s: rounds missing", __FUNCTION__);
 			goto error;
 		}
@@ -630,8 +630,8 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	}
 
 	/* check bytes */
-	if (buffer_get_int(b, &check1) != 0 ||
-	    buffer_get_int(b, &check2) != 0) {
+	if (buffer_get_u32(b, &check1) != 0 ||
+	    buffer_get_u32(b, &check2) != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: check bytes missing", __FUNCTION__);
 		goto error;
 	}
@@ -653,7 +653,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 
 	i = 0;
 	while (buffer_remain_len(b)) {
-		if (buffer_get_char(b, &pad) != 0 ||
+		if (buffer_get_u8(b, &pad) != 0 ||
 		    pad != (++i & 0xff)) {
 			logprintf(LOG_LEVEL_ERROR, "%s: bad padding", __FUNCTION__);
 			key_free(keyfmt);
@@ -1075,7 +1075,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 				s[0] = b[i];
 				s[1] = b[i+1];
 				s[2] = '\0';
-				if (buffer_put_char(passphrase_salt, strtoul(s, NULL, 16)) != 0) {
+				if (buffer_put_u8(passphrase_salt, (u_char)strtoul(s, NULL, 16)) != 0) {
 					strncpy_s(errmsg, errmsg_len, "buffer put error", _TRUNCATE);
 					goto error;
 				}
@@ -1601,7 +1601,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		strncpy_s(errmsg, errmsg_len, "key body not present", _TRUNCATE);
 		goto error;
 	}
-	if (buffer_get_int(blob, &i) != 0) {
+	if (buffer_get_u32(blob, &i) != 0) {
 		strncpy_s(errmsg, errmsg_len, "magic number missing", _TRUNCATE);
 		goto error;
 	}
@@ -1609,7 +1609,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		strncpy_s(errmsg, errmsg_len, "magic number error", _TRUNCATE);
 		goto error;
 	}
-	if (buffer_get_int(blob, &len) != 0) {
+	if (buffer_get_u32(blob, &len) != 0) {
 		strncpy_s(errmsg, errmsg_len, "body missing", _TRUNCATE);
 		goto error;
 	}
@@ -1618,7 +1618,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		goto error;
 	}
 
-	if (buffer_get_int(blob, &len) != 0) {
+	if (buffer_get_u32(blob, &len) != 0) {
 		strncpy_s(errmsg, errmsg_len, "key type missing", _TRUNCATE);
 		goto error;
 	}
@@ -1640,7 +1640,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		goto error;
 	}
 
-	if (buffer_get_int(blob, &len) != 0) {
+	if (buffer_get_u32(blob, &len) != 0) {
 		strncpy_s(errmsg, errmsg_len, "encryption type missing", _TRUNCATE);
 		goto error;
 	}
@@ -1661,7 +1661,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		goto error;
 	}
 
-	if (buffer_get_int(blob, &len) != 0) {
+	if (buffer_get_u32(blob, &len) != 0) {
 		strncpy_s(errmsg, errmsg_len, "body missing", _TRUNCATE);
 		goto error;
 	}
@@ -1722,7 +1722,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	}
 	buffer_rewind(blob2);
 
-	if (buffer_get_int(blob2, &len) != 0) {
+	if (buffer_get_u32(blob2, &len) != 0) {
 		strncpy_s(errmsg, errmsg_len, "blob missing", _TRUNCATE);
 		goto error;
 	}
@@ -1798,7 +1798,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 			goto error;
 		}
 
-		if (buffer_get_int(blob2, &param) != 0) {
+		if (buffer_get_u32(blob2, &param) != 0) {
 			strncpy_s(errmsg, errmsg_len, "predefined DSA parameters missing", _TRUNCATE);
 			goto error;
 		}
@@ -1827,7 +1827,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		EC_POINT *q = NULL;
 		BN_CTX *ctx = NULL;
 
-		if (buffer_get_int(blob2, &dummy) != 0) {
+		if (buffer_get_u32(blob2, &dummy) != 0) {
 			strncpy_s(errmsg, errmsg_len, "dummy missing", _TRUNCATE);
 			goto error;
 		}

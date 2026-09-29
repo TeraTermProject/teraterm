@@ -3767,7 +3767,7 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 			//fatal("bcrypt_pbkdf failed");
 			;
 		if (buffer_put_string(kdf, salt, SALT_LEN) != 0 ||
-		    buffer_put_int(kdf, rounds) != 0) {
+		    buffer_put_u32(kdf, rounds) != 0) {
 			goto ed25519_error;
 		}
 	}
@@ -3783,7 +3783,7 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	    buffer_put_cstring(encoded, ciphername) != 0 ||
 	    buffer_put_cstring(encoded, kdfname) != 0 ||
 	    buffer_put_string(encoded, buffer_ptr(kdf), buffer_len(kdf)) != 0||
-	    buffer_put_int(encoded, 1) != 0) { /* number of keys */
+	    buffer_put_u32(encoded, 1) != 0) { /* number of keys */
 		goto ed25519_error;
 	}
 
@@ -3807,8 +3807,8 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 
 	/* Random check bytes */
 	check = arc4random();
-	if (buffer_put_int(b, check) != 0 ||
-	    buffer_put_int(b, check) != 0) {
+	if (buffer_put_u32(b, check) != 0 ||
+	    buffer_put_u32(b, check) != 0) {
 		goto ed25519_error;
 	}
 
@@ -3821,13 +3821,13 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	/* padding */
 	i = 0;
 	while (buffer_len(b) % blocksize) {
-		if (buffer_put_char(b, ++i & 0xff) != 0) {
+		if (buffer_put_u8(b, ++i & 0xff) != 0) {
 			goto ed25519_error;
 		}
 	}
 
 	/* length */
-	if (buffer_put_int(encoded, (unsigned int)buffer_len(b)) != 0) {
+	if (buffer_put_u32(encoded, (uint32_t)buffer_len(b)) != 0) {
 		goto ed25519_error;
 	}
 
@@ -3855,17 +3855,17 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 		goto ed25519_error;
 	}
 	for (i = 0; i < n; i++) {
-		if (buffer_put_char(blob, cp[i]) != 0) {
+		if (buffer_put_u8(blob, cp[i]) != 0) {
 			goto ed25519_error;
 		}
 		if (i % 70 == 69) {
-			if (buffer_put_char(blob, '\n') != 0) {
+			if (buffer_put_u8(blob, '\n') != 0) {
 				goto ed25519_error;
 			}
 		}
 	}
 	if (i % 70 != 69) {
-		if (buffer_put_char(blob, '\n') != 0) {
+		if (buffer_put_u8(blob, '\n') != 0) {
 			goto ed25519_error;
 		}
 	}
@@ -4623,7 +4623,7 @@ public_error:
 
 				// padding with 8byte align
 				while (buffer_len(b) % 8) {
-					if (buffer_put_char(b, 0) != 0) {
+					if (buffer_put_u8(b, 0) != 0) {
 						goto error;
 					}
 				}
@@ -4634,23 +4634,23 @@ public_error:
 				// encrypted buffer
 			    /* First store keyfile id string. */
 				for (i = 0 ; authfile_id_string[i] ; i++) {
-					if (buffer_put_char(enc, authfile_id_string[i]) != 0) {
+					if (buffer_put_u8(enc, authfile_id_string[i]) != 0) {
 						goto error;
 					}
 				}
-				if (buffer_put_char(enc, 0x0a) != 0 || // LF
-				    buffer_put_char(enc, 0) != 0) {
+				if (buffer_put_u8(enc, 0x0a) != 0 || // LF
+				    buffer_put_u8(enc, 0) != 0) {
 					goto error;
 				}
 
 				/* Store cipher type. */
-				if (buffer_put_char(enc, cipher_num) != 0 ||
-				    buffer_put_int(enc, 0) != 0) { // type is 'int'!! (For future extension)
+				if (buffer_put_u8(enc, cipher_num) != 0 ||
+				    buffer_put_u32(enc, 0) != 0) { // type is 'int'!! (For future extension)
 					goto error;
 				}
 
 				/* Store public key.  This will be in plain text. */
-				if (buffer_put_int(enc, BN_num_bits(n)) != 0 ||
+				if (buffer_put_u32(enc, BN_num_bits(n)) != 0 ||
 				    buffer_put_bignum1(enc, n) != 0 ||
 				    buffer_put_bignum1(enc, e) != 0 ||
 				    buffer_put_string(enc, comment, strlen(comment)) != 0) {

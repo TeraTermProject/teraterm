@@ -172,7 +172,7 @@ static void sftp_buffer_alloc(buffer_t **message)
 		goto error;
 	}
 	// Message length(4byte)
-	buffer_put_int(msg, 0);
+	buffer_put_u32(msg, 0);
 
 	*message = msg;
 
@@ -212,7 +212,7 @@ static void sftp_get_msg(PTInstVar pvar, Channel_t *c, unsigned char *data, unsi
 	buffer_put(msg, data, buflen);
 	buffer_rewind(msg);
 
-	if (buffer_get_int(msg, &msg_len) != 0) {
+	if (buffer_get_u32(msg, &msg_len) != 0) {
 		sftp_syslog(pvar, "Message length error");
 		goto error;
 	}
@@ -237,8 +237,8 @@ static void sftp_send_string_request(PTInstVar pvar, Channel_t *c, unsigned int 
 	buffer_t *msg;
 
 	sftp_buffer_alloc(&msg);
-	buffer_put_char(msg, code);
-	buffer_put_int(msg, id);
+	buffer_put_u8(msg, code);
+	buffer_put_u32(msg, id);
 	buffer_put_string(msg, s, len);
 	sftp_send_msg(pvar, c, msg);
 	sftp_syslog(pvar, "Sent message fd %d T:%u I:%u", c->remote_id, code, id);
@@ -262,8 +262,8 @@ void sftp_do_init(PTInstVar pvar, Channel_t *c)
 
 	// ネゴシエーションの開始
 	sftp_buffer_alloc(&msg);
-	buffer_put_char(msg, SSH2_FXP_INIT);
-	buffer_put_int(msg, SSH2_FILEXFER_VERSION);
+	buffer_put_u8(msg, SSH2_FXP_INIT);
+	buffer_put_u32(msg, SSH2_FILEXFER_VERSION);
 	sftp_send_msg(pvar, c, msg);
 	sftp_buffer_free(msg);
 
@@ -274,13 +274,13 @@ static void sftp_do_init_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 {
 	u_char type;
 
-	if (buffer_get_char(msg, &type) != 0) {
+	if (buffer_get_u8(msg, &type) != 0) {
 		goto error;
 	}
 	if (type != SSH2_FXP_VERSION) {
 		goto error;
 	}
-	if (buffer_get_int(msg, &c->sftp.version) != 0) {
+	if (buffer_get_u32(msg, &c->sftp.version) != 0) {
 		sftp_syslog(pvar, "SFTP server version %u, remote version missing", type);
 		goto error;
 	}
@@ -384,10 +384,10 @@ static char *sftp_do_realpath_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 	unsigned int expected_id, count, id;
 	char *filename = NULL, *longname;
 
-	if (buffer_get_char(msg, &type) != 0) {
+	if (buffer_get_u8(msg, &type) != 0) {
 		goto error;
 	}
-	if (buffer_get_int(msg, &id) != 0) {
+	if (buffer_get_u32(msg, &id) != 0) {
 		goto error;
 	}
 
@@ -399,7 +399,7 @@ static char *sftp_do_realpath_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 
 	if (type == SSH2_FXP_STATUS) {
 		unsigned int status;
-		if (buffer_get_int(msg, &status) != 0) {
+		if (buffer_get_u32(msg, &status) != 0) {
 			sftp_syslog(pvar, "status missing");
 			goto error;
 		}
@@ -412,7 +412,7 @@ static char *sftp_do_realpath_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 		goto error;
 	}
 
-	if (buffer_get_int(msg, &count) != 0) {
+	if (buffer_get_u32(msg, &count) != 0) {
 		sftp_syslog(pvar, "count missing");
 		goto error;
 	}

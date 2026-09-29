@@ -3187,7 +3187,7 @@ void SSH_notify_disconnecting(PTInstVar pvar, char *reason)
 			goto out;
 		}
 		s = "";
-		if (buffer_put_int(msg, SSH2_DISCONNECT_BY_APPLICATION) != 0 ||
+		if (buffer_put_u32(msg, SSH2_DISCONNECT_BY_APPLICATION) != 0 ||
 		    buffer_put_string(msg, reason, strlen(reason)) != 0 ||
 		    buffer_put_string(msg, s, strlen(s)) != 0) {
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
@@ -3299,13 +3299,13 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
-		if (buffer_put_int(msg, c->remote_id) != 0 ||
+		if (buffer_put_u32(msg, c->remote_id) != 0 ||
 		    buffer_put_string(msg, req_type, strlen(req_type)) != 0 ||
-		    buffer_put_char(msg, 0) != 0 ||   // want_reply
-		    buffer_put_int(msg, cols) != 0 || // columns
-		    buffer_put_int(msg, rows) != 0 || // lines
-		    buffer_put_int(msg, x) != 0 ||    // window width (pixel):
-		    buffer_put_int(msg, y) != 0) {    // window height (pixel):
+		    buffer_put_u8(msg, 0) != 0 ||   // want_reply
+		    buffer_put_u32(msg, cols) != 0 || // columns
+		    buffer_put_u32(msg, rows) != 0 || // lines
+		    buffer_put_u32(msg, x) != 0 ||    // window width (pixel):
+		    buffer_put_u32(msg, y) != 0) {    // window height (pixel):
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
 			return;
 		}
@@ -3356,10 +3356,10 @@ int SSH_notify_break_signal(PTInstVar pvar)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			goto error;
 		}
-		if (buffer_put_int(msg, c->remote_id) != 0 ||
+		if (buffer_put_u32(msg, c->remote_id) != 0 ||
 		    buffer_put_string(msg, req_type, strlen(req_type)) != 0 ||
-		    buffer_put_char(msg, 0) != 0 ||   // want_reply
-		    buffer_put_int(msg, 1000) != 0) { // break-length (msec)
+		    buffer_put_u8(msg, 0) != 0 ||   // want_reply
+		    buffer_put_u32(msg, 1000) != 0) { // break-length (msec)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
 			goto error;
 		}
@@ -3801,7 +3801,7 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
-		if (buffer_put_int(msg, c->remote_id) != 0 ||
+		if (buffer_put_u32(msg, c->remote_id) != 0 ||
 		    buffer_put_string(msg, (char *)buf, buflen) != 0) {
 			return;
 		}
@@ -3902,8 +3902,8 @@ void SSH_fail_channel_open(PTInstVar pvar, uint32 remote_channel_num)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
-		if (buffer_put_int(msg, remote_channel_num) != 0 ||
-		    buffer_put_int(msg, SSH2_OPEN_ADMINISTRATIVELY_PROHIBITED) != 0 ||
+		if (buffer_put_u32(msg, remote_channel_num) != 0 ||
+		    buffer_put_u32(msg, SSH2_OPEN_ADMINISTRATIVELY_PROHIBITED) != 0 ||
 		    buffer_put_string(msg, "", 0) != 0 || // description
 		    buffer_put_string(msg, "", 0) != 0) { // language tag
 			return;
@@ -3933,10 +3933,10 @@ void SSH2_confirm_channel_open(PTInstVar pvar, Channel_t *c)
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		return;
 	}
-	if (buffer_put_int(msg, c->remote_id) != 0 ||
-	    buffer_put_int(msg, c->self_id) != 0 ||
-	    buffer_put_int(msg, c->local_window) != 0 ||
-	    buffer_put_int(msg, c->local_maxpacket) != 0) {
+	if (buffer_put_u32(msg, c->remote_id) != 0 ||
+	    buffer_put_u32(msg, c->self_id) != 0 ||
+	    buffer_put_u32(msg, c->local_window) != 0 ||
+	    buffer_put_u32(msg, c->local_maxpacket) != 0) {
 		return;
 	}
 
@@ -4013,7 +4013,7 @@ void SSH2_channel_input_eof(PTInstVar pvar, Channel_t *c)
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		return;
 	}
-	if (buffer_put_int(msg, c->remote_id) != 0) { // remote ID
+	if (buffer_put_u32(msg, c->remote_id) != 0) { // remote ID
 		return;
 	}
 
@@ -4090,9 +4090,9 @@ void SSH_request_forwarding(PTInstVar pvar, char *bind_address, int from_server_
 		}
 		req = "tcpip-forward";
 		if (buffer_put_string(msg, req, strlen(req)) != 0 || // ctype
-		    buffer_put_char(msg, 1) != 0 ||                  // want reply
+		    buffer_put_u8(msg, 1) != 0 ||                  // want reply
 		    buffer_put_string(msg, bind_address, strlen(bind_address)) != 0 ||
-			buffer_put_int(msg, from_server_port) != 0) {    // listening port
+			buffer_put_u32(msg, from_server_port) != 0) {    // listening port
 			return;
 		}
 
@@ -4124,9 +4124,9 @@ void SSH_cancel_request_forwarding(PTInstVar pvar, char *bind_address, int from_
 		}
 		req = "cancel-tcpip-forward";
 		if (buffer_put_string(msg, req, strlen(req)) != 0 || // ctype
-		    buffer_put_char(msg, reply) != 0 ||              // want reply
+		    buffer_put_u8(msg, reply) != 0 ||              // want reply
 		    buffer_put_string(msg, bind_address, strlen(bind_address)) != 0 ||
-		    buffer_put_int(msg, from_server_port) != 0) {    // listening port
+		    buffer_put_u32(msg, from_server_port) != 0) {    // listening port
 			return;
 		}
 
@@ -4206,13 +4206,13 @@ void SSH_request_X11_forwarding(PTInstVar pvar,
 		}
 		newdata[newlen - 1] = '\0';
 
-		if (buffer_put_int(msg, c->remote_id) != 0 ||
+		if (buffer_put_u32(msg, c->remote_id) != 0 ||
 		    buffer_put_string(msg, req_type, strlen(req_type)) != 0 ||           // service name
-		    buffer_put_char(msg, 0) != 0 ||                                      // want_reply (false)
-		    buffer_put_char(msg, 0) != 0 ||                                      // single connection
+		    buffer_put_u8(msg, 0) != 0 ||                                      // want_reply (false)
+		    buffer_put_u8(msg, 0) != 0 ||                                      // single connection
 		    buffer_put_string(msg, auth_protocol, strlen(auth_protocol)) != 0 || // protocol ("MIT-MAGIC-COOKIE-1")
 		    buffer_put_string(msg, newdata, strlen(newdata)) != 0 ||             // cookie
-		    buffer_put_int(msg, screen_num) != 0) {
+		    buffer_put_u32(msg, screen_num) != 0) {
 			return;
 		}
 
@@ -4304,21 +4304,21 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 			}
 			s = "direct-tcpip";
 			if (buffer_put_string(msg, s, strlen(s)) != 0 ||    // ctype
-			    buffer_put_int(msg, c->self_id) != 0 ||         // self
-			    buffer_put_int(msg, c->local_window) != 0 ||    // local_window
-			    buffer_put_int(msg, c->local_maxpacket) != 0) { // local_maxpacket
+			    buffer_put_u32(msg, c->self_id) != 0 ||         // self
+			    buffer_put_u32(msg, c->local_window) != 0 ||    // local_window
+			    buffer_put_u32(msg, c->local_maxpacket) != 0) { // local_maxpacket
 				return;
 			}
 
 			s = to_remote_host;
 			if (buffer_put_string(msg, s, strlen(s)) != 0 || // target host
-			    buffer_put_int(msg, to_remote_port) != 0) {  // target port
+			    buffer_put_u32(msg, to_remote_port) != 0) {  // target port
 				return;
 			}
 
 			s = originator;
 			if (buffer_put_string(msg, s, strlen(s)) != 0 || // originator host
-				buffer_put_int(msg, originator_port) != 0) { // originator port
+				buffer_put_u32(msg, originator_port) != 0) { // originator port
 				return;
 			}
 
@@ -4584,9 +4584,9 @@ static int SSH_scp_transaction(PTInstVar pvar, const char *filename, const char 
 		}
 		s = "session";
 		if (buffer_put_string(msg, s, strlen(s)) != 0 ||    // ctype
-		    buffer_put_int(msg, c->self_id) != 0 ||         // self (channel number)
-		    buffer_put_int(msg, c->local_window) != 0 ||    // local_window
-		    buffer_put_int(msg, c->local_maxpacket) != 0) { // local_maxpacket
+		    buffer_put_u32(msg, c->self_id) != 0 ||         // self (channel number)
+		    buffer_put_u32(msg, c->local_window) != 0 ||    // local_window
+		    buffer_put_u32(msg, c->local_maxpacket) != 0) { // local_maxpacket
 			goto error;
 		}
 		len = buffer_len(msg);
@@ -4675,9 +4675,9 @@ int SSH_sftp_transaction(PTInstVar pvar)
 	}
 	s = "session";
 	if (buffer_put_string(msg, s, strlen(s)) != 0 ||    // ctype
-	    buffer_put_int(msg, c->self_id) != 0 ||         // self (channel number)
-	    buffer_put_int(msg, c->local_window) != 0 ||    // local_window
-	    buffer_put_int(msg, c->local_maxpacket) != 0) { // local_maxpacket
+	    buffer_put_u32(msg, c->self_id) != 0 ||         // self (channel number)
+	    buffer_put_u32(msg, c->local_window) != 0 ||    // local_window
+	    buffer_put_u32(msg, c->local_maxpacket) != 0) { // local_maxpacket
 		goto error;
 	}
 	len = buffer_len(msg);
@@ -4787,8 +4787,8 @@ void SSH2_send_kexinit(PTInstVar pvar)
 			return;
 		}
 	}
-	if (buffer_put_char(msg, 0) != 0 ||
-		buffer_put_int(msg, 0) != 0) {
+	if (buffer_put_u8(msg, 0) != 0 ||
+		buffer_put_u32(msg, 0) != 0) {
 		return;
 	}
 
@@ -5538,9 +5538,9 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 	}
 
 	// サーバへgroup sizeを送って、p と g を作ってもらう。
-	if (buffer_put_int(msg, kex->min) != 0 ||
-	    buffer_put_int(msg, kex->nbits) != 0 ||
-	    buffer_put_int(msg, kex->max) != 0) {
+	if (buffer_put_u32(msg, kex->min) != 0 ||
+	    buffer_put_u32(msg, kex->nbits) != 0 ||
+	    buffer_put_u32(msg, kex->max) != 0) {
 		goto error;
 	}
 	len = buffer_len(msg);
@@ -7313,7 +7313,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		// password authentication method
 		s = "password";
 		if (buffer_put_string(msg, s, strlen(s)) != 0 ||
-		    buffer_put_char(msg, 0) != 0) {
+		    buffer_put_u8(msg, 0) != 0) {
 			goto error;
 		}
 
@@ -7367,7 +7367,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		}
 		// セッションID
 		if (buffer_put_string(signbuf, pvar->kex->session_id, pvar->kex->session_id_len) != 0 ||
-		    buffer_put_char(signbuf, SSH2_MSG_USERAUTH_REQUEST) != 0) {
+		    buffer_put_u8(signbuf, SSH2_MSG_USERAUTH_REQUEST) != 0) {
 			goto error;
 		}
 		s = username;  // ユーザ名
@@ -7380,7 +7380,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		}
 		s = "publickey";
 		if (buffer_put_string(signbuf, s, strlen(s)) != 0 ||
-		    buffer_put_char(signbuf, 1) != 0) { // true
+		    buffer_put_u8(signbuf, 1) != 0) { // true
 			goto error;
 		}
 
@@ -7404,7 +7404,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		// step3
 		s = "publickey";
 		if (buffer_put_string(msg, s, strlen(s)) != 0 ||
-		    buffer_put_char(msg, 1) != 0) { // true
+		    buffer_put_u8(msg, 1) != 0) { // true
 			goto error;
 		}
 
@@ -7431,7 +7431,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 
 		s = "publickey";
 		if (buffer_put_string(msg, s, strlen(s)) != 0 ||
-		    buffer_put_char(msg, 0) != 0) { // false
+		    buffer_put_u8(msg, 0) != 0) { // false
 			goto error;
 		}
 
@@ -7722,9 +7722,9 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 		}
 		s = "session";
 		if (buffer_put_string(msg, s, strlen(s)) != 0 ||    // ctype
-		    buffer_put_int(msg, c->self_id) != 0 ||         // self (channel number)
-		    buffer_put_int(msg, c->local_window) != 0 ||    // local_window
-		    buffer_put_int(msg, c->local_maxpacket) != 0) { // local_maxpacket
+		    buffer_put_u32(msg, c->self_id) != 0 ||         // self (channel number)
+		    buffer_put_u32(msg, c->local_window) != 0 ||    // local_window
+		    buffer_put_u32(msg, c->local_maxpacket) != 0) { // local_maxpacket
 			return FALSE;
 		}
 		len = buffer_len(msg);
@@ -8178,7 +8178,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 		logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 		goto err;
 	}
-	if (buffer_put_int(pvar->userauth_infores, pvar->userauth_inforeq_num) != 0) {
+	if (buffer_put_u32(pvar->userauth_infores, pvar->userauth_inforeq_num) != 0) {
 		goto err;
 	}
 
@@ -8211,7 +8211,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 
 			// バッファに保存
 			if (buffer_put_string(pvar->userauth_inforeq_prompts, prompt, prompt_len) != 0 ||
-			    buffer_put_int(pvar->userauth_inforeq_prompts, echo) != 0) {
+			    buffer_put_u32(pvar->userauth_inforeq_prompts, echo) != 0) {
 				goto err;
 			}
 
@@ -8224,7 +8224,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
 			goto err;
 		}
-		if (buffer_get_int(pvar->userauth_inforeq_prompts, &echo) != 0) {
+		if (buffer_get_u32(pvar->userauth_inforeq_prompts, &echo) != 0) {
 			logprintf(LOG_LEVEL_ERROR, "%s: missing echo.", __FUNCTION__);
 			free(prompt_disp);
 			goto err;
@@ -8279,7 +8279,7 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer put error", __FUNCTION__);
 			return;
 		}
-		if (buffer_get_int(pvar->userauth_inforeq_prompts, &echo) != 0) {
+		if (buffer_get_u32(pvar->userauth_inforeq_prompts, &echo) != 0) {
 			logprintf(LOG_LEVEL_ERROR, "%s: missing echo.", __FUNCTION__);
 			free(prompt_disp);
 			return;
@@ -8362,7 +8362,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		return FALSE;
 	}
 	if (buffer_put_string(signbuf, pvar->kex->session_id, pvar->kex->session_id_len) != 0 ||
-	    buffer_put_char(signbuf, SSH2_MSG_USERAUTH_REQUEST) != 0) {
+	    buffer_put_u8(signbuf, SSH2_MSG_USERAUTH_REQUEST) != 0) {
 		return FALSE;
 	}
 	s = username;  // ユーザ名
@@ -8375,7 +8375,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 	}
 	s = "publickey";
 	if (buffer_put_string(signbuf, s, strlen(s)) != 0 ||
-	    buffer_put_char(signbuf, 1) != 0) { // true
+	    buffer_put_u8(signbuf, 1) != 0) { // true
 		return FALSE;
 	}
 
@@ -8431,7 +8431,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 	}
 	s = "publickey";
 	if (buffer_put_string(msg, s, strlen(s)) != 0 ||
-	    buffer_put_char(msg, 1) != 0) { // true
+	    buffer_put_u8(msg, 1) != 0) { // true
 		return FALSE;
 	}
 
@@ -8623,7 +8623,7 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 	}
 	s = "password";
 	if (buffer_put_string(msg, s, strlen(s)) != 0 ||
-	    buffer_put_char(msg, 1) != 0) { // additional info
+	    buffer_put_u8(msg, 1) != 0) { // additional info
 		goto err;
 	}
 
@@ -8687,9 +8687,9 @@ static BOOL send_channel_request_gen(PTInstVar pvar, Channel_t *c, unsigned char
 		return FALSE;
 	}
 
-	if (buffer_put_int(msg, c->remote_id) != 0 ||
+	if (buffer_put_u32(msg, c->remote_id) != 0 ||
 	    buffer_put_string(msg, req, strlen(req)) != 0 ||
-	    buffer_put_char(msg, want_reply) != 0) {
+	    buffer_put_u8(msg, want_reply) != 0) {
 		return FALSE;
 	}
 
@@ -8740,55 +8740,55 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 		return FALSE;
 	}
 
-	if (buffer_put_int(msg, c->remote_id) != 0 ||
+	if (buffer_put_u32(msg, c->remote_id) != 0 ||
 	    buffer_put_string(msg, req_type, strlen(req_type)) != 0 ||
-	    buffer_put_char(msg, want_reply) != 0) {
+	    buffer_put_u8(msg, want_reply) != 0) {
 		return FALSE;
 	}
 
 	if (buffer_put_string(msg, pvar->ts->TermType, strlen(pvar->ts->TermType)) != 0 ||
-	    buffer_put_int(msg, pvar->ssh_state.win_cols) != 0 || // columns
-	    buffer_put_int(msg, pvar->ssh_state.win_rows) != 0) { // lines
+	    buffer_put_u32(msg, pvar->ssh_state.win_cols) != 0 || // columns
+	    buffer_put_u32(msg, pvar->ssh_state.win_rows) != 0) { // lines
 		return FALSE;
 	}
 	get_window_pixel_size(pvar, &x, &y);
-	if (buffer_put_int(msg, x) != 0 || // window width (pixel):
-	    buffer_put_int(msg, y) != 0) { // window height (pixel):
+	if (buffer_put_u32(msg, x) != 0 || // window width (pixel):
+	    buffer_put_u32(msg, y) != 0) { // window height (pixel):
 		return FALSE;
 	}
 
 	// TTY modeはここで渡す (2005.7.17 yutaka)
-	if (buffer_put_char(ttymsg, SSH2_TTY_OP_OSPEED) != 0 ||
-	    buffer_put_int(ttymsg, pvar->ts->TerminalOutputSpeed) != 0 || // baud rate
-	    buffer_put_char(ttymsg, SSH2_TTY_OP_ISPEED) != 0 ||
-	    buffer_put_int(ttymsg, pvar->ts->TerminalInputSpeed) != 0) {  // baud rate
+	if (buffer_put_u8(ttymsg, SSH2_TTY_OP_OSPEED) != 0 ||
+	    buffer_put_u32(ttymsg, pvar->ts->TerminalOutputSpeed) != 0 || // baud rate
+	    buffer_put_u8(ttymsg, SSH2_TTY_OP_ISPEED) != 0 ||
+	    buffer_put_u32(ttymsg, pvar->ts->TerminalInputSpeed) != 0) {  // baud rate
 		return FALSE;
 	}
 
 	// VERASE
-	if (buffer_put_char(ttymsg, SSH2_TTY_KEY_VERASE) != 0) {
+	if (buffer_put_u8(ttymsg, SSH2_TTY_KEY_VERASE) != 0) {
 		return FALSE;
 	}
 	if (pvar->ts->BSKey == IdBS) {
-		if (buffer_put_int(ttymsg, 0x08) != 0) { // BS key
+		if (buffer_put_u32(ttymsg, 0x08) != 0) { // BS key
 			return FALSE;
 		}
 	} else {
-		if (buffer_put_int(ttymsg, 0x7F) != 0) { // DEL key
+		if (buffer_put_u32(ttymsg, 0x7F) != 0) { // DEL key
 			return FALSE;
 		}
 	}
 
 	switch (pvar->ts->CRReceive) {
 	  case IdLF:
-		if (buffer_put_char(ttymsg, SSH2_TTY_OP_ONLCR) != 0 ||
-		    buffer_put_int(ttymsg, 0) != 0) {
+		if (buffer_put_u8(ttymsg, SSH2_TTY_OP_ONLCR) != 0 ||
+		    buffer_put_u32(ttymsg, 0) != 0) {
 			return FALSE;
 		}
 		break;
 	  case IdCR:
-		if (buffer_put_char(ttymsg, SSH2_TTY_OP_ONLCR) != 0 ||
-		    buffer_put_int(ttymsg, 1) != 0) {
+		if (buffer_put_u8(ttymsg, SSH2_TTY_OP_ONLCR) != 0 ||
+		    buffer_put_u32(ttymsg, 1) != 0) {
 			return FALSE;
 		}
 		break;
@@ -8796,7 +8796,7 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 		break;
 	}
 
-	if (buffer_put_char(ttymsg, SSH2_TTY_OP_END) != 0 || // End of terminal modes
+	if (buffer_put_u8(ttymsg, SSH2_TTY_OP_END) != 0 || // End of terminal modes
 	    buffer_put_string(msg, buffer_ptr(ttymsg), buffer_len(ttymsg)) != 0) {
 		return FALSE;
 	}
@@ -9236,8 +9236,8 @@ static void do_SSH2_adjust_window_size(PTInstVar pvar, Channel_t *c)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
-		if (buffer_put_int(msg, c->remote_id) != 0 ||
-		    buffer_put_int(msg, c->local_window_max - c->local_window) != 0) {
+		if (buffer_put_u32(msg, c->remote_id) != 0 ||
+		    buffer_put_u32(msg, c->local_window_max - c->local_window) != 0) {
 			return;
 		}
 
@@ -9273,7 +9273,7 @@ void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			return;
 		}
-		if (buffer_put_int(msg, c->remote_id) != 0) {
+		if (buffer_put_u32(msg, c->remote_id) != 0) {
 			return;
 		}
 
@@ -10553,8 +10553,8 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 				logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 				goto err;
 			}
-			if (buffer_put_int(msg, remote_id) != 0 ||
-			    buffer_put_int(msg, SSH2_OPEN_ADMINISTRATIVELY_PROHIBITED) != 0 ||
+			if (buffer_put_u32(msg, remote_id) != 0 ||
+			    buffer_put_u32(msg, SSH2_OPEN_ADMINISTRATIVELY_PROHIBITED) != 0 ||
 			    buffer_put_string(msg, "", 0) != 0 || // description
 			    buffer_put_string(msg, "", 0) != 0) { // language tag
 				goto err;
@@ -10733,7 +10733,7 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 			logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
 			goto err;
 		}
-		buffer_put_int(msg, c->remote_id);
+		buffer_put_u32(msg, c->remote_id);
 
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, type, len);

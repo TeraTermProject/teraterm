@@ -84,7 +84,7 @@ char *ppk_read_body(FILE * fp)
 			}
 			return buffer_ptr(buf);
 		}
-		buffer_put_char(buf, c);
+		buffer_put_u8(buf, c);
 	}
 }
 
@@ -329,7 +329,7 @@ void ssh2_ppk_derive_keys(
 
 			/* In this version of the format, the CBC IV was always all 0. */
 			for (i = 0; i < ivlen; i++) {
-				buffer_put_char(storage, 0);
+				buffer_put_u8(storage, 0);
 			}
 
 			/* Completely separate hash for the MAC key. */

@@ -416,7 +416,7 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 		goto error;
 	}
 
-	if (buffer_get_int(b, &len) != 0) {
+	if (buffer_get_u32(b, &len) != 0) {
 		ret = SSH_ERR_UNEXPECTED_TRAILING_DATA;
 		goto error;
 	}
@@ -2701,7 +2701,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		buffer_clear(b);
 
 		if (buffer_put_cstring(b, "hostkeys-prove-00@openssh.com") != 0 ||
-		    buffer_put_char(b, 1) != 0) { /* bool: want reply */
+		    buffer_put_u8(b, 1) != 0) { /* bool: want reply */
 			logprintf(LOG_LEVEL_FATAL, "buffer put error");
 			goto error;
 		}

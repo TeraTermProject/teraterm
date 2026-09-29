@@ -708,11 +708,11 @@ kex_dh_hash(const digest_algorithm hash_alg,
 	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	if ((r = buffer_put_int(b, (unsigned int)(buffer_len(client_kexinit) + 1))) != 0 ||
-	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	if ((r = buffer_put_u32(b, (uint32_t)(buffer_len(client_kexinit) + 1))) != 0 ||
+	    (r = buffer_put_u8(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
-	    (r = buffer_put_int(b, (unsigned int)(buffer_len(server_kexinit) + 1))) != 0 ||
-	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	    (r = buffer_put_u32(b, (uint32_t)(buffer_len(server_kexinit) + 1))) != 0 ||
+	    (r = buffer_put_u8(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
 	    (r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
 		buffer_free(b);
@@ -782,11 +782,11 @@ kexgex_hash(const digest_algorithm hash_alg,
 	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	if ((r = buffer_put_int(b, (unsigned int)(buffer_len(client_kexinit) + 1))) != 0 ||
-	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	if ((r = buffer_put_u32(b, (uint32_t)(buffer_len(client_kexinit) + 1))) != 0 ||
+	    (r = buffer_put_u8(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
-	    (r = buffer_put_int(b, (unsigned int)(buffer_len(server_kexinit) + 1))) != 0 ||
-	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	    (r = buffer_put_u32(b, (uint32_t)(buffer_len(server_kexinit) + 1))) != 0 ||
+	    (r = buffer_put_u8(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
 	    (r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
 		buffer_free(b);
@@ -794,9 +794,9 @@ kexgex_hash(const digest_algorithm hash_alg,
 	}
 
 	// DH group sizeのビット数を加算する
-	if ((r = buffer_put_int(b, kexgex_min)) != 0 ||
-	    (r = buffer_put_int(b, kexgex_bits)) != 0 ||
-		(r = buffer_put_int(b, kexgex_max)) != 0) {
+	if ((r = buffer_put_u32(b, kexgex_min)) != 0 ||
+	    (r = buffer_put_u32(b, kexgex_bits)) != 0 ||
+		(r = buffer_put_u32(b, kexgex_max)) != 0) {
 		buffer_free(b);
 		return r;
 	}
@@ -996,11 +996,11 @@ kex_ecdh_hash(const digest_algorithm hash_alg,
 	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	if ((r = buffer_put_int(b, (unsigned int)(buffer_len(client_kexinit) + 1))) != 0 ||
-	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	if ((r = buffer_put_u32(b, (uint32_t)(buffer_len(client_kexinit) + 1))) != 0 ||
+	    (r = buffer_put_u8(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
-	    (r = buffer_put_int(b, (unsigned int)(buffer_len(server_kexinit) + 1))) != 0 ||
-	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	    (r = buffer_put_u32(b, (uint32_t)(buffer_len(server_kexinit) + 1))) != 0 ||
+	    (r = buffer_put_u8(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
 	    (r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
 		buffer_free(b);
@@ -1112,7 +1112,7 @@ kex_c25519_keypair(kex *kex)
 	//   len:  4 bytes  ... length of data
 	//   data: 32 bytes ... x25519 public key
 
-	if ((r = buffer_put_int(buf, CURVE25519_SIZE)) != 0 ||
+	if ((r = buffer_put_u32(buf, CURVE25519_SIZE)) != 0 ||
 	    (r = buffer_reserve(buf, CURVE25519_SIZE, &cp)) != 0) {
 		goto out;
 	}
@@ -1188,11 +1188,11 @@ kex_c25519_hash(const digest_algorithm hash_alg,
 	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	if ((r = buffer_put_int(b, (unsigned int)(buffer_len(client_kexinit) + 1))) != 0 ||
-		(r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	if ((r = buffer_put_u32(b, (uint32_t)(buffer_len(client_kexinit) + 1))) != 0 ||
+		(r = buffer_put_u8(b, SSH2_MSG_KEXINIT)) != 0 ||
 		(r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
-		(r = buffer_put_int(b, (unsigned int)(buffer_len(server_kexinit) + 1))) != 0 ||
-		(r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+		(r = buffer_put_u32(b, (uint32_t)(buffer_len(server_kexinit) + 1))) != 0 ||
+		(r = buffer_put_u8(b, SSH2_MSG_KEXINIT)) != 0 ||
 		(r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
 		(r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
 		buffer_free(b);
@@ -1271,7 +1271,7 @@ int kex_kem_sntrup761x25519_keypair(kex *kex)
 	//   x25519 public key:    32 bytes
 
 	need = crypto_kem_sntrup761_PUBLICKEYBYTES + CURVE25519_SIZE;
-	if ((r = buffer_put_int(buf, need)) != 0 ||
+	if ((r = buffer_put_u32(buf, need)) != 0 ||
 	    (r = buffer_reserve(buf, need, &cp)) != 0) {
 		goto out;
 	}
@@ -1375,11 +1375,11 @@ kex_kem_sntrup761x25519_hash(const digest_algorithm hash_alg,
 	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	if ((r = buffer_put_int(b, (unsigned int)(buffer_len(client_kexinit) + 1))) != 0 ||
-	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	if ((r = buffer_put_u32(b, (uint32_t)(buffer_len(client_kexinit) + 1))) != 0 ||
+	    (r = buffer_put_u8(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
-	    (r = buffer_put_int(b, (unsigned int)(buffer_len(server_kexinit) + 1))) != 0 ||
-	    (r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	    (r = buffer_put_u32(b, (uint32_t)(buffer_len(server_kexinit) + 1))) != 0 ||
+	    (r = buffer_put_u8(b, SSH2_MSG_KEXINIT)) != 0 ||
 	    (r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
 	    (r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
 		buffer_free(b);
@@ -1456,7 +1456,7 @@ int kex_kem_mlkem768x25519_keypair(kex *kex)
 	//   x25519 public key:    32 bytes
 
 	need = crypto_kem_mlkem768_PUBLICKEYBYTES + CURVE25519_SIZE;
-	if ((r = buffer_put_int(buf, need)) != 0)
+	if ((r = buffer_put_u32(buf, need)) != 0)
 		goto out;
 
 	if (buffer_reserve(buf, need, &cp) != 0)
@@ -1572,11 +1572,11 @@ kex_kem_mlkem768x25519_hash(const digest_algorithm hash_alg,
 	}
 
 	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
-	if ((r = buffer_put_int(b, (unsigned int)(buffer_len(client_kexinit) + 1))) != 0 ||
-		(r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+	if ((r = buffer_put_u32(b, (uint32_t)(buffer_len(client_kexinit) + 1))) != 0 ||
+		(r = buffer_put_u8(b, SSH2_MSG_KEXINIT)) != 0 ||
 		(r = buffer_put(b, buffer_ptr(client_kexinit), buffer_len(client_kexinit))) != 0 ||
-		(r = buffer_put_int(b, (unsigned int)(buffer_len(server_kexinit) + 1))) != 0 ||
-		(r = buffer_put_char(b, SSH2_MSG_KEXINIT)) != 0 ||
+		(r = buffer_put_u32(b, (uint32_t)(buffer_len(server_kexinit) + 1))) != 0 ||
+		(r = buffer_put_u8(b, SSH2_MSG_KEXINIT)) != 0 ||
 		(r = buffer_put(b, buffer_ptr(server_kexinit), buffer_len(server_kexinit))) != 0 ||
 		(r = buffer_put_stringb(b, serverhostkeyblob)) != 0) {
 		buffer_free(b);
