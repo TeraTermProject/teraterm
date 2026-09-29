@@ -194,7 +194,7 @@ int kexgex_hash(
     BIGNUM *kexgex_g,
     BIGNUM *client_dh_pub,
     BIGNUM *server_dh_pub,
-    char *shared_secret, unsigned int secretlen,
+    char *shared_secret, size_t secretlen,
     char *hash, unsigned int *hashlen);
 
 int kex_ecdh_keypair(kex *kex);

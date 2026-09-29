@@ -848,7 +848,7 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 		"%s: Local channel#%d recv has been `%s' for flow control(buffer size %lu, recv %s).",
 		__FUNCTION__, channel_num,
 		c->bufchain_recv_suspended ? "disabled" : "enabled",
-		c->bufchain_amount,
+		(unsigned long)c->bufchain_amount,
 		changed ? "changed" : ""
 		);
 

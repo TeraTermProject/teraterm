@@ -283,7 +283,7 @@ static Channel_t *ssh2_channel_new(PTInstVar pvar, unsigned int window, unsigned
 
 // remote_windowの空きがない場合に、送れなかったバッファをリスト（入力順）へつないでおく。
 // ここで確保したメモリは ssh2_channel_retry_send_bufchain() で解放する。
-static void ssh2_channel_add_bufchain(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen)
+static void ssh2_channel_add_bufchain(PTInstVar pvar, Channel_t *c, unsigned char *buf, size_t buflen)
 {
 	bufchain_t *p, *old;
 
@@ -322,7 +322,7 @@ static void ssh2_channel_add_bufchain(PTInstVar pvar, Channel_t *c, unsigned cha
 static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 {
 	bufchain_t *ch;
-	unsigned int size;
+	size_t size;
 	bufchain_t* ch_origin = c->bufchain;
 
 	while (c->bufchain) {
@@ -335,7 +335,7 @@ static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 		if (c->local_num == -1) { // shell or SCP
 			SSH2_send_channel_data(pvar, c, buffer_ptr(ch->msg), size, TRUE);
 		} else { // port-forwarding
-			SSH_channel_send(pvar, c->local_num, -1, buffer_ptr(ch->msg), size, TRUE);
+			SSH_channel_send(pvar, c->local_num, -1, buffer_ptr(ch->msg), (int)size, TRUE);
 		}
 
 		c->bufchain = ch->next;
@@ -3764,7 +3764,7 @@ void SSH_end(PTInstVar pvar)
 	channel_used_num = 0;
 }
 
-void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen, int retry)
+void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, size_t buflen, int retry)
 {
 	buffer_t *msg;
 	unsigned char *outmsg;
@@ -3788,7 +3788,7 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 		return;
 	}
 
-	if ((unsigned int)buflen > c->remote_window) {
+	if (buflen > c->remote_window) {
 		unsigned int offset = 0;
 		// 送れないデータはいったん保存しておく
 		ssh2_channel_add_bufchain(pvar, c, buf + offset, buflen - offset);
@@ -3814,11 +3814,11 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 		buffer_free(msg);
 
 		logprintf(LOG_LEVEL_SSHDUMP, "%s: sending SSH2_MSG_CHANNEL_DATA. "
-				  "local:%d remote:%d len:%d", __FUNCTION__, c->self_id, c->remote_id, buflen);
+				  "local:%d remote:%d len:%d", __FUNCTION__, c->self_id, c->remote_id, (int)buflen);
 
 		// remote window sizeの調整
 		if (buflen <= c->remote_window) {
-			c->remote_window -= buflen;
+			c->remote_window -= (unsigned int)buflen;
 		}
 		else {
 			c->remote_window = 0;
@@ -7283,7 +7283,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 	buffer_t *msg = NULL;
 	char *s, *username;
 	unsigned char *outmsg;
-	int len;
+	size_t len;
 	char *connect_id = "ssh-connection";
 
 	msg = buffer_init();
@@ -7491,7 +7491,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 						  buffer_ptr(msg), len,
 						  "send %s:%d %s() len=%d",
 						  __FILE__, __LINE__,
-						  __FUNCTION__, len);
+						  __FUNCTION__, (int)len);
 #endif
 	}
 	buffer_free(msg);
@@ -7660,7 +7660,7 @@ void halt_ssh_heartbeat_thread(PTInstVar pvar)
 static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 {
 	char *data;
-	unsigned int len;
+	size_t len;
 	buffer_t *msg;
 	char *s;
 	unsigned char *outmsg;
@@ -7672,10 +7672,10 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 	len = remained_payloadlen(pvar);
 
 	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-						data, len - 1,
+						data, len,
 						"receive %s:%d %s() len=%d",
 						__FILE__, __LINE__,
-						__FUNCTION__, len - 1);
+						__FUNCTION__, (int)len);
 
 	// パスワードの破棄 (2006.8.22 yutaka)
 	if (pvar->settings.remember_password == 0) {
@@ -7737,7 +7737,7 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 							  buffer_ptr(msg), len,
 							  "send %s:%d %s() len=%d",
 							  __FILE__, __LINE__,
-							  __FUNCTION__, len);
+							  __FUNCTION__, (int)len);
 		}
 		buffer_free(msg);
 	}
@@ -7765,10 +7765,10 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 	len = remained_payloadlen(pvar);
 
 	logprintf_hexdump(LOG_LEVEL_SSHDUMP,
-					  data, len - 1,
+					  data, len,
 					  "receive %s:%d %s() len=%d",
 					  __FILE__, __LINE__,
-					  __FUNCTION__, len - 1);
+					  __FUNCTION__, (int)len);
 
 	// 認証方式リストの取得
 	if (get_string_from_payload(pvar, &auth_method_list, &auth_method_list_len, TRUE) != 1) {
@@ -8257,7 +8257,7 @@ err:
 void SSH2_send_userauth_infores(PTInstVar pvar)
 {
 	size_t len;
-	int echo;
+	unsigned int echo;
 	char *s;
 	char *prompt_disp = NULL;
 	size_t prompt_disp_len = 0;
@@ -8309,7 +8309,7 @@ void SSH2_send_userauth_infores(PTInstVar pvar)
 		                  buffer_ptr(pvar->userauth_infores), buffer_len(pvar->userauth_infores),
 		                  "send %s:%d %s() len=%d",
 		                  __FILE__, __LINE__,
-		                  __FUNCTION__, buffer_len(pvar->userauth_infores));
+		                  __FUNCTION__, (int)buffer_len(pvar->userauth_infores));
 	}
 
 	pvar->userauth_inforeq_num = 0;
@@ -8326,7 +8326,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 {
 	// SSH2_MSG_USERAUTH_PK_OK
 	char *data;
-	unsigned int len;
+	size_t len;
 	buffer_t *msg = NULL;
 	char *s, *username;
 	unsigned char *outmsg;
@@ -8351,7 +8351,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 					  data, len,
 					  "receive %s:%d %s() len=%d",
 					  __FILE__, __LINE__,
-					  __FUNCTION__, len);
+					  __FUNCTION__, (int)len);
 
 	username = pvar->auth_state.user;  // ユーザ名
 
@@ -8471,7 +8471,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 						  buffer_ptr(msg), len,
 						  "send %s:%d %s() len=%d",
 						  __FILE__, __LINE__,
-						  __FUNCTION__, len);
+						  __FUNCTION__, (int)len);
 	}
 	buffer_free(msg);
 
@@ -8567,7 +8567,7 @@ static INT_PTR CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, 
 
 BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 {
-	int len;
+	size_t len;
 	INT_PTR ret;
 	buffer_t *msg = NULL;
 	char *s, *username;
@@ -8650,7 +8650,7 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 						  buffer_ptr(msg), len,
 						  "send %s:%d %s() len=%d",
 						  __FILE__, __LINE__,
-						  __FUNCTION__, len);
+						  __FUNCTION__, (int)len);
 	}
 	buffer_free(msg);
 
@@ -9034,7 +9034,7 @@ err:
 static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 {
 	char *data;
-	unsigned int len;
+	size_t len;
 	char *rtype = NULL;
 	int rtype_len;
 	int want_reply;

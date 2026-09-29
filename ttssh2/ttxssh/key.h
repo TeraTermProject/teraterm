@@ -36,8 +36,8 @@
 #define	ED25519_PK_SZ	crypto_sign_ed25519_PUBLICKEYBYTES
 
 int key_verify(Key *key,
-               unsigned char *signature, unsigned int signaturelen,
-               unsigned char *data, unsigned int datalen, ssh_keyalgo key_algo);
+               unsigned char *signature, size_t signaturelen,
+               unsigned char *data, size_t datalen, ssh_keyalgo key_algo);
 RSA *duplicate_RSA(RSA *src);
 DSA *duplicate_DSA(DSA *src);
 unsigned char *duplicate_ED25519_PK(unsigned char *src);
@@ -57,7 +57,7 @@ void key_init(Key *key);
 int key_to_blob(Key *key, char **blobp, int *lenp);
 Key *key_from_blob(char *data, size_t blen);
 int get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen);
-BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data, int datalen, ssh_keyalgo keyalgo);
+BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data, size_t datalen, ssh_keyalgo keyalgo);
 
 int keytype_to_hash_nid(ssh_keytype type);
 digest_algorithm keytype_to_hash_alg(ssh_keytype type);
@@ -70,6 +70,6 @@ Key *key_private_deserialize(buffer_t *blob);
 int key_ec_validate_private(EC_KEY *key);
 int key_ec_validate_public(const EC_GROUP *group, const EC_POINT *public);
 
-int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen);
+int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, size_t datalen);
 
 #endif /* __KEY_H_ */

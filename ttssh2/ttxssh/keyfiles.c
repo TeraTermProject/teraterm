@@ -625,7 +625,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 
 	if (buffer_remain_len(copy_consumed) != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: key blob has trailing data (len = %u)", __FUNCTION__,
-			buffer_remain_len(copy_consumed));
+			(unsigned int)buffer_remain_len(copy_consumed));
 		goto error;
 	}
 

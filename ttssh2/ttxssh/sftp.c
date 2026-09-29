@@ -190,7 +190,7 @@ static void sftp_buffer_free(buffer_t *message)
 static void sftp_send_msg(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 {
 	char *p;
-	int len;
+	size_t len;
 
 	len = buffer_len(msg);
 	p = buffer_ptr(msg);

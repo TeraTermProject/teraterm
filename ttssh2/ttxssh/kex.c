@@ -763,7 +763,7 @@ kexgex_hash(const digest_algorithm hash_alg,
     BIGNUM *kexgex_g,
     BIGNUM *client_dh_pub,
     BIGNUM *server_dh_pub,
-    char *shared_secret, unsigned int secretlen,
+    char *shared_secret, size_t secretlen,
     char *hash, unsigned int *hashlen)
 {
 	buffer_t *b;

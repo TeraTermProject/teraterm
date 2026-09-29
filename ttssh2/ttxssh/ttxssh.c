@@ -920,9 +920,9 @@ static void format_line_hexdump(char *buf, int buflen, int addr, int *bytes, int
 }
 
 #if defined(_MSC_VER)
-void logprintf_hexdump(int level, const char *data, int len, _Printf_format_string_ const char *fmt, ...)
+void logprintf_hexdump(int level, const char *data, size_t len, _Printf_format_string_ const char *fmt, ...)
 #else
-void logprintf_hexdump(int level, const char *data, int len, const char *fmt, ...)
+void logprintf_hexdump(int level, const char *data, size_t len, const char *fmt, ...)
 #endif
 {
 	char buff[4096];
@@ -930,7 +930,7 @@ void logprintf_hexdump(int level, const char *data, int len, const char *fmt, ..
 	int c, addr;
 	int bytes[16], *ptr;
 	int byte_cnt;
-	int i;
+	size_t i;
 
 	if (level <= pvar->settings.LogLevel) {
 		va_start(params, fmt);
@@ -3330,14 +3330,14 @@ static void ssh_make_comment(char *comment, int maxlen)
 }
 
 // uuencode (rfc1521)
-int uuencode(unsigned char *src, int srclen, unsigned char *target, int targsize)
+int uuencode(unsigned char *src, size_t srclen, unsigned char *target, size_t targsize)
 {
 	char base64[] ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	char pad = '=';
-	int datalength = 0;
+	size_t datalength = 0;
 	unsigned char input[3];
 	unsigned char output[4];
-	int i;
+	size_t i;
 
 	while (srclen > 2) {
 		input[0] = *src++;
@@ -3391,7 +3391,7 @@ int uuencode(unsigned char *src, int srclen, unsigned char *target, int targsize
 		return (-1);
 	target[datalength] = '\0';  /* Returned value doesn't count \0. */
 
-	return (datalength); // success
+	return (int)datalength; // success
 }
 
 /**
@@ -4411,7 +4411,7 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				DSA *dsa = public_key.dsa;
 				RSA *rsa = public_key.rsa;
 				EC_KEY *ecdsa = public_key.ecdsa;
-				int len;
+				size_t len;
 				char *blob;
 				char *uuenc; // uuencode data
 				int uulen;

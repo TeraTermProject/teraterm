@@ -379,13 +379,13 @@ void notify_fatal_error(PTInstVar pvar, char *msg, BOOL send_disconnect);
 void logputs(int level, char *msg);
 #if defined(_MSC_VER)
 void logprintf(int level, _Printf_format_string_ const char *fmt, ...);
-void logprintf_hexdump(int level, const char *data, int len, _Printf_format_string_ const char *fmt, ...);
+void logprintf_hexdump(int level, const char *data, size_t len, _Printf_format_string_ const char *fmt, ...);
 #elif defined(__GNUC__)
 void logprintf(int level, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
-void logprintf_hexdump(int level, const char *data, int len, const char *fmt, ...) __attribute__ ((format (printf, 4, 5)));
+void logprintf_hexdump(int level, const char *data, size_t len, const char *fmt, ...) __attribute__ ((format (printf, 4, 5)));
 #else
 void logprintf(int level, const char *fmt, ...);
-void logprintf_hexdump(int level, const char *data, int len, const char *fmt, ...);
+void logprintf_hexdump(int level, const char *data, size_t len, const char *fmt, ...);
 #endif
 
 void get_teraterm_dir_relative_name(char *buf, int bufsize, const char *basename);
@@ -393,6 +393,6 @@ wchar_t *get_teraterm_dir_relative_nameW(const wchar_t *basename);
 int copy_teraterm_dir_relative_path(char *dest, int destsize, const char *basename);
 wchar_t *get_home_dir_relative_nameW(const wchar_t *basename);
 wchar_t *get_log_dir_relative_nameW(const wchar_t *basename);
-int uuencode(unsigned char *src, int srclen, unsigned char *target, int targsize);
+int uuencode(unsigned char *src, size_t srclen, unsigned char *target, size_t targsize);
 
 #endif

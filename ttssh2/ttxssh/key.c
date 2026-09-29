@@ -76,8 +76,8 @@ struct hostkeys_update_ctx {
 //
 
 int ssh_dss_verify(DSA *key,
-                   u_char *signature, u_int signaturelen,
-                   u_char *data, u_int datalen)
+                   u_char *signature, size_t signaturelen,
+                   u_char *data, size_t datalen)
 {
 	DSA_SIG *sig;
 	unsigned char digest[SSH_DIGEST_MAX_LENGTH], *sigblob;
@@ -294,8 +294,8 @@ done:
 }
 
 int ssh_rsa_verify(RSA *key,
-                   u_char *signature, u_int signaturelen,
-                   u_char *data, u_int datalen, ssh_keyalgo keyalgo)
+                   u_char *signature, size_t signaturelen,
+                   u_char *data, size_t datalen, ssh_keyalgo keyalgo)
 {
 	u_char digest[SSH_DIGEST_MAX_LENGTH], *sigblob;
 	u_int len, dlen, modlen;
@@ -380,8 +380,8 @@ error:
 }
 
 int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
-                     u_char *signature, u_int signaturelen,
-                     u_char *data, u_int datalen)
+                     u_char *signature, size_t signaturelen,
+                     u_char *data, size_t datalen)
 {
 	buffer_t *b = NULL;
 	char *ktype = NULL;
@@ -462,8 +462,8 @@ error:
 	return ret;
 }
 
-static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int signaturelen,
-                              unsigned char *data, unsigned int datalen)
+static int ssh_ed25519_verify(Key *key, unsigned char *signature, size_t signaturelen,
+                              unsigned char *data, size_t datalen)
 {
 	buffer_t *b = NULL;
 	char *ktype = NULL;
@@ -540,8 +540,8 @@ error:
 }
 
 int key_verify(Key *key,
-               unsigned char *signature, unsigned int signaturelen,
-               unsigned char *data, unsigned int datalen, ssh_keyalgo keyalgo)
+               unsigned char *signature, size_t signaturelen,
+               unsigned char *data, size_t datalen, ssh_keyalgo keyalgo)
 {
 	int ret = SSH_ERR_INTERNAL_ERROR;
 
@@ -1508,10 +1508,11 @@ error:
 }
 
 
-static int ssh_ed25519_sign(Key *key, char **sigp, int *lenp, char *data, int datalen)
+static int ssh_ed25519_sign(Key *key, char **sigp, int *lenp, char *data, size_t datalen)
 {
 	char *sig = NULL;
-	int slen, len;
+	size_t slen;
+	int len;
 	unsigned long long smlen;
 	int r, ret;
 	buffer_t *b;
@@ -1557,7 +1558,7 @@ out:
 }
 
 
-BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data, int datalen, ssh_keyalgo keyalgo)
+BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data, size_t datalen, ssh_keyalgo keyalgo)
 {
 	buffer_t *msg = NULL;
 	char *s;
@@ -2587,7 +2588,7 @@ error:
 // return 1: success
 //        0: fail
 //
-int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
+int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, size_t datalen)
 {
 	int success = 1;  // OpenSSH 6.8の実装では、常に成功で返すようになっているため、
 	                  // それに合わせて Tera Term でも成功と返すことにする。
