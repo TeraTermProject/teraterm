@@ -651,7 +651,7 @@ static void InitSettings(void)
 		ts.TEKPos = TEKPos;
 		free(ts.MacroFNW);	// 複製元のマクロ指定は使用しない
 		ts.MacroFNW = macro;
-		ts.HostName[0] = 0;
+		SetConnectHostName(L"");	// 複製元の接続先は使用しない
 	}
 
 	InitKeyboard();
@@ -3772,7 +3772,7 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 LRESULT CVTWindow::OnCommStart(WPARAM wParam, LPARAM lParam)
 {
 	// 自動接続が無効のときも接続ダイアログを出すようにした (2006.9.15 maya)
-	if (((ts.PortType!=IdSerial) && (ts.HostName[0]==0)) ||
+	if (((ts.PortType!=IdSerial) && (GetConnectHostName()[0]==0)) ||
 	    ((ts.PortType==IdSerial) && (ts.ComAutoConnect == FALSE))) {
 		if (ts.HostDialogOnStartup) {
 			OnFileNewConnection();
@@ -4045,8 +4045,9 @@ static BOOL IsCygterm()
 		return 0;
 	}
 
-	if ((strcmp(ts.HostName, "127.0.0.1") == 0 ||
-		 strcmp(ts.HostName, "localhost") == 0)) {
+	const wchar_t *hostname = GetConnectHostName();
+	if ((wcscmp(hostname, L"127.0.0.1") == 0 ||
+		 wcscmp(hostname, L"localhost") == 0)) {
 		// localhostへの接続でポートがcygterm.cfgの範囲内の時はcygwin接続とみなす。
 		return 1;
 	}
@@ -4121,7 +4122,7 @@ void CVTWindow::OnDuplicateSession()
 	}
 	free(setup_def);
 
-	wchar_t *hostnameW = ToWcharA(ts.HostName);
+	wchar_t *hostnameW = _wcsdup(GetConnectHostName());
 	TTDupInfo info = {};
 	info.szHostName = hostnameW;
 	info.port = ts.TCPPort;

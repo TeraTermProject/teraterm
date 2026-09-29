@@ -298,7 +298,7 @@ struct tttset {
 	char reserve_KeyCnfFN[MAX_PATH];	// switch KeyCnfFNW
 	char LogFN[MAX_PATH];
 	char reserve_MacroFN[MAX_PATH];		// switch MacroFNW
-	char HostName[1024];
+	char HostName[1024];				// switch HostNameW
 
 	POINT VTPos;
 	char VTFont[LF_FACESIZE];
@@ -619,6 +619,7 @@ struct tttset {
 	wchar_t *LogTimestampFormatW;
 	DWORD SerialSendLimit;				// シリアル送信制限(0=制限しない/1～=送信バイト数)
 	wchar_t *TitleW;						// local title (TComVar.TitleRemoteW = remote title)
+	wchar_t *HostNameW;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;

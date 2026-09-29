@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006- TeraTerm Project
+ * (C) 2026- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,46 +26,47 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TERATERM.EXE, variables, flags related to VT win and TEK win */
+/* Internationalized Domain Name (IDN, 国際化ドメイン名) */
 
-#include "tttypes.h"	// for IdTalk
+#include <windows.h>
+#include <stdlib.h>
+#include <wchar.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "win32helper.h"
 
-/* prototypes */
-void VTActivate();
-void ChangeTitle(void);
-void SetLocalTitle(const wchar_t *title);
-const wchar_t *GetLocalTitle(void);
-void SetConnectHostName(const wchar_t *hostname);
-const wchar_t *GetConnectHostName(void);
-void SwitchMenu();
-void SwitchTitleBar();
-HMODULE LoadHomeDLL(const wchar_t *DLLname);
+#include "idn.h"
 
-extern HWND HVTWin;
-extern HWND HTEKWin;
-extern int ActiveWin; /* IdVT, IdTEK */
-//extern int TalkStatus; /* IdTalkKeyb, IdTalkCB, IdTalkTextFile */
-extern IdTalk TalkStatus;
-extern BOOL KeybEnabled; /* keyboard switch */
-extern BOOL Connecting;
+/**
+ *	ホスト名を名前解決やサーバへの送信に使える ASCII に変換する
+ *
+ *	国際化ドメイン名(IDN)など非 ASCII 文字を含むときは
+ *	IdnToAscii() で ACE 形式 (xn--) へ変換する
+ *	ASCII のみのとき、変換できないときは元のホスト名をそのまま返す
+ *
+ *	@param	hostname	ホスト名
+ *	@return	ASCII のホスト名、不要になったら free() すること
+ *			hostname が NULL のときは NULL
+ */
+wchar_t *IdnHostNameToAscii(const wchar_t *hostname)
+{
+	if (hostname == NULL) {
+		return NULL;
+	}
 
-/* 'help' button on dialog box */
-extern WORD MsgDlgHelp;
+	BOOL is_non_ascii = FALSE;
+	for (const wchar_t *s = hostname; *s != 0; s++) {
+		if (*s >= 0x80) {
+			is_non_ascii = TRUE;
+			break;
+		}
+	}
 
-extern TTTSet ts;
-extern TComVar cv;
-
-/* pointers to window objects */
-extern void* pTEKWin;
-/* instance handle */
-extern HINSTANCE hInst;
-
-extern int SerialNo;
-
-#ifdef __cplusplus
+	if (is_non_ascii) {
+		wchar_t *ace;
+		if (hIdnToAscii(hostname, &ace) == NO_ERROR) {
+			return ace;
+		}
+		// 変換できなかったときは変換せずそのまま返す
+	}
+	return _wcsdup(hostname);
 }
-#endif

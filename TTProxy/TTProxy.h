@@ -24,7 +24,7 @@ class TTProxy : public DynamicLinkLibrary<TTProxy> {
 		OPTION_REPLACE = 2,
 	};
 public:
-	TTProxy():initialized(false), showing_error_message(false) {
+	TTProxy():initialized(false), showing_error_message(false), imports(NULL) {
 	}
 	bool processAttach() {
 		DisableThreadLibraryCalls(GetInstanceHandle());
@@ -41,9 +41,10 @@ private:
 	bool initialized;
 	bool showing_error_message;
 	String error_message;
-	String realhost;
+	WString realhost;
 	PTTSet ts;
 	PComVar cv;
+	const TTXImports *imports;	// NULL のときは使用できない(Tera Term が古い)
 	PReadIniFile ORIG_ReadIniFile;
 	PWriteIniFile ORIG_WriteIniFile;
 	PParseParam ORIG_ParseParam;
@@ -139,9 +140,7 @@ private:
 				if (wcslen(option + 1) >= 6 && option[6] == '=') {
 					option[6] = '\0';
 					if (_wcsicmp(option + 1, L"proxy") == 0) {
-						char *url = ToCharW(option + 7);
-						ProxyWSockHook::parseURL(url, TRUE);
-						free(url);
+						ProxyWSockHook::parseURL(option + 7, TRUE);
 						action = OPTION_CLEAR;
 					}else{
 						option[6] = '=';
@@ -149,16 +148,14 @@ private:
 				}
 				else if (_wcsicmp(option+1, L"noproxy") == 0) {
 					// -noproxy は -proxy=none:// の別名
-					ProxyWSockHook::parseURL("none://", TRUE);
+					ProxyWSockHook::parseURL(L"none://", TRUE);
 					action = OPTION_CLEAR;
 				}
 			}else{
-				char *url = ToCharW(option);
-				String realhost = ProxyWSockHook::parseURL(url, FALSE);
-				free(url);
+				WString realhost = ProxyWSockHook::parseURL(option, FALSE);
 				if (realhost != NULL) {
 					getInstance().realhost = realhost;
-					if (realhost.indexOf("://") == -1) {
+					if (realhost.indexOf(L"://") == -1) {
 						action = OPTION_CLEAR;
 					}
 					else {
@@ -184,7 +181,13 @@ private:
 
 		getInstance().ORIG_ParseParam(param, ts, DDETopic);
 		if (getInstance().ts->HostName[0] == '\0' && getInstance().realhost != NULL) {
-			strcpy_s(getInstance().ts->HostName, sizeof getInstance().ts->HostName, getInstance().realhost);
+			if (getInstance().imports != NULL) {
+				getInstance().imports->SetConnectHostName(getInstance().realhost);
+			}
+			else {
+				// ts->HostNameW を設定できないので、ANSI のみ設定する
+				WideCharToACP_t(getInstance().realhost, getInstance().ts->HostName, sizeof getInstance().ts->HostName);
+			}
 		}
 	}
 
@@ -198,6 +201,14 @@ private:
 		Logger::set_folder(ts->LogDirW);
 
 		ProxyWSockHook::setMessageShower(&getInstance().shower);
+	}
+
+	static BOOL TTXInit2(PTTSet ts, PComVar cv, const TTXImports *(*GetImports)(size_t size)) {
+		(void)ts;
+		(void)cv;
+		// TTXImports が使用できなくても、このプラグインは動作させる
+		getInstance().imports = GetImports(sizeof(TTXImports));
+		return TRUE;
 	}
 
 	static void PASCAL TTXGetSetupHooks(TTXSetupHooks* hooks) {
@@ -216,7 +227,7 @@ private:
 		}
 		(FARPROC&) *hooks->Pconnect = ProxyWSockHook::hook_connect((FARPROC) *hooks->Pconnect);
 		(FARPROC&) *hooks->PWSAAsyncGetHostByName = ProxyWSockHook::hook_WSAAsyncGetHostByName((FARPROC) *hooks->PWSAAsyncGetHostByName);
-		(FARPROC&) *hooks->PWSAAsyncGetAddrInfo = ProxyWSockHook::hook_WSAAsyncGetAddrInfo((FARPROC) *hooks->PWSAAsyncGetAddrInfo);
+		(FARPROC&) *hooks->PWSAAsyncGetAddrInfoW = ProxyWSockHook::hook_WSAAsyncGetAddrInfoW((FARPROC) *hooks->PWSAAsyncGetAddrInfoW);
 		(FARPROC&) *hooks->Pfreeaddrinfo = ProxyWSockHook::hook_freeaddrinfo((FARPROC) *hooks->Pfreeaddrinfo);
 		(FARPROC&) *hooks->PWSAAsyncSelect = ProxyWSockHook::hook_WSAAsyncSelect((FARPROC) *hooks->PWSAAsyncSelect);
 		(FARPROC&) *hooks->PWSACancelAsyncRequest = ProxyWSockHook::hook_WSACancelAsyncRequest((FARPROC) *hooks->PWSACancelAsyncRequest);
@@ -226,7 +237,7 @@ private:
 		// unhook functions
 		ProxyWSockHook::unhook_connect((FARPROC) *hooks->Pconnect);
 		ProxyWSockHook::unhook_WSAAsyncGetHostByName((FARPROC) *hooks->PWSAAsyncGetHostByName);
-		ProxyWSockHook::unhook_WSAAsyncGetAddrInfo((FARPROC) *hooks->PWSAAsyncGetAddrInfo);
+		ProxyWSockHook::unhook_WSAAsyncGetAddrInfoW((FARPROC) *hooks->PWSAAsyncGetAddrInfoW);
 		ProxyWSockHook::unhook_freeaddrinfo((FARPROC) *hooks->Pfreeaddrinfo);
 		ProxyWSockHook::unhook_WSAAsyncSelect((FARPROC) *hooks->PWSAAsyncSelect);
 		ProxyWSockHook::unhook_WSACancelAsyncRequest((FARPROC) *hooks->PWSACancelAsyncRequest);
@@ -277,10 +288,7 @@ private:
 	}
 
 	static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec) {
-		String urlA = ProxyWSockHook::generateURL();
-		wchar_t *urlW = ToWcharA(urlA);
-		WString url = urlW;
-		free(urlW);
+		WString url = ProxyWSockHook::generateURL();
 		if (url != NULL) {
 			if (wcslen(cmd) + 8 + url.length() >= (unsigned) cmdlen)
 				return;
@@ -314,7 +322,10 @@ private:
 			NULL,
 			TTProxy::TTXProcessCommand,
 			TTProxy::TTXEnd,
-			TTProxy::TTXSetCommandLine
+			TTProxy::TTXSetCommandLine,
+			NULL,
+			NULL,
+			TTProxy::TTXInit2,
 		};
 
 		int size = sizeof EXPORTS - sizeof exports->size;

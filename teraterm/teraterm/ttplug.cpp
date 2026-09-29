@@ -529,6 +529,8 @@ static void UnloadExtensions()
 const static TTXImports imports = {
 	SetLocalTitle,
 	GetLocalTitle,
+	SetConnectHostName,
+	GetConnectHostName,
 };
 
 /**
@@ -595,7 +597,8 @@ void PASCAL TTXOpenTCP(void)
 		&Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,
 		&Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,
 		&PWSACancelAsyncRequest, &PWSAGetLastError,
-		/* &Pgetaddrinfo,*/ &Pfreeaddrinfo, &PWSAAsyncGetAddrInfo
+		/* &Pgetaddrinfo,*/ &Pfreeaddrinfo, &PWSAAsyncGetAddrInfo,
+		&PWSAAsyncGetAddrInfoW
 	};
 	TTXInternalOpenTCP(&SockHooks);
 }
@@ -621,7 +624,8 @@ void PASCAL TTXCloseTCP(void)
 		&Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,
 		&Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,
 		&PWSACancelAsyncRequest, &PWSAGetLastError,
-		/* &Pgetaddrinfo,*/ &Pfreeaddrinfo, &PWSAAsyncGetAddrInfo
+		/* &Pgetaddrinfo,*/ &Pfreeaddrinfo, &PWSAAsyncGetAddrInfo,
+		&PWSAAsyncGetAddrInfoW
 	};
 	TTXInternalCloseTCP(&SockHooks);
 }

@@ -10,7 +10,6 @@
 #include "ttplugin.h"
 #include "tt_res.h"
 #include "ttcommdlg.h"
-#include "codeconv.h"
 #include "ttlib_types.h"
 #include "asprintf.h"
 
@@ -255,18 +254,14 @@ void ChangeHostName()
 		return;
 	}
 	free(pvar->origHostNameW);
-	pvar->origHostNameW = ToWcharA(pvar->ts->HostName);
-	char *hostname = ToCharW(ExtractPath(pvar->origHostNameW, pvar->name_cnt));
-	strncpy_s(pvar->ts->HostName, sizeof(pvar->ts->HostName), hostname, _TRUNCATE);
-	free(hostname);
+	pvar->origHostNameW = _wcsdup(pvar->imports->GetConnectHostName());
+	pvar->imports->SetConnectHostName(ExtractPath(pvar->origHostNameW, pvar->name_cnt));
 }
 
 void RestoreOLDHostName()
 {
 	if (pvar->origHostNameW != NULL) {
-		char *hostname = ToCharW(pvar->origHostNameW);
-		strncpy_s(pvar->ts->HostName, sizeof(pvar->ts->HostName), hostname, _TRUNCATE);
-		free(hostname);
+		pvar->imports->SetConnectHostName(pvar->origHostNameW);
 		free(pvar->origHostNameW);
 		pvar->origHostNameW = NULL;
 	}
@@ -783,10 +778,12 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
 		else if (_wcsnicmp(buff, L"/TTYPLAY", 9) == 0 || _wcsnicmp(buff, L"/TP", 4) == 0 ||
 			_wcsnicmp(buff, L"/TP=",4) == 0) {
 			pvar->enable = TRUE;
-			if (ts->PortType == IdFile && strlen(ts->HostName) > 0) {
-				wchar_t *HostNameW = ToWcharA(ts->HostName);
-				free(pvar->openfnW);
-				pvar->openfnW = HostNameW;
+			if (ts->PortType == IdFile) {
+				const wchar_t *HostNameW = pvar->imports->GetConnectHostName();
+				if (HostNameW[0] != 0) {
+					free(pvar->openfnW);
+					pvar->openfnW = _wcsdup(HostNameW);
+				}
 			}
 			if (buff[3] == '=') {
 				pvar->mode_flag = _wtol(&buff[4]);

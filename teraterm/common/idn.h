@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006- TeraTerm Project
+ * (C) 2026- TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,45 +26,17 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TERATERM.EXE, variables, flags related to VT win and TEK win */
+/* Internationalized Domain Name (IDN, 国際化ドメイン名) */
 
-#include "tttypes.h"	// for IdTalk
+#pragma once
+
+#include <wchar.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* prototypes */
-void VTActivate();
-void ChangeTitle(void);
-void SetLocalTitle(const wchar_t *title);
-const wchar_t *GetLocalTitle(void);
-void SetConnectHostName(const wchar_t *hostname);
-const wchar_t *GetConnectHostName(void);
-void SwitchMenu();
-void SwitchTitleBar();
-HMODULE LoadHomeDLL(const wchar_t *DLLname);
-
-extern HWND HVTWin;
-extern HWND HTEKWin;
-extern int ActiveWin; /* IdVT, IdTEK */
-//extern int TalkStatus; /* IdTalkKeyb, IdTalkCB, IdTalkTextFile */
-extern IdTalk TalkStatus;
-extern BOOL KeybEnabled; /* keyboard switch */
-extern BOOL Connecting;
-
-/* 'help' button on dialog box */
-extern WORD MsgDlgHelp;
-
-extern TTTSet ts;
-extern TComVar cv;
-
-/* pointers to window objects */
-extern void* pTEKWin;
-/* instance handle */
-extern HINSTANCE hInst;
-
-extern int SerialNo;
+wchar_t *IdnHostNameToAscii(const wchar_t *hostname);
 
 #ifdef __cplusplus
 }

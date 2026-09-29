@@ -42,11 +42,7 @@
 #include "WSAAsyncGetAddrInfo.h"
 #include "ttwsk.h"
 #include "codeconv.h"
-
-typedef int (WINAPI *TIdnToAscii)(DWORD dwFlags, LPCWSTR lpUnicodeCharStr, int cchUnicodeChar,
-                                  LPWSTR lpASCIICharStr, int cchASCIIChar);
-static TIdnToAscii pIdnToAscii;
-static BOOL Initialized = FALSE;
+#include "idn.h"
 
 struct getaddrinfo_args {
 	HWND hWnd;
@@ -63,35 +59,10 @@ static unsigned __stdcall getaddrinfo_thread(void * p)
 	int gai;
 	struct getaddrinfo_args *ga = (struct getaddrinfo_args *)p;
 
-	// ホスト名に非 ASCII 文字が含まれる?
-	BOOL is_non_ascii = FALSE;
-	for (const wchar_t *s = ga->hostname; *s != 0; s++) {
-		if (*s >= 0x80) {
-			is_non_ascii = TRUE;
-			break;
-		}
-	}
-
 	// 国際化ドメイン名(IDN)の解決
-	// IdnToAscii() で ACE 形式 (xn--) へ変換
-	// 変換後は ASCII なので getaddrinfo() で解決できる。
-	const wchar_t *hostname = ga->hostname;
-	wchar_t *ace_host = NULL;
-	if (pIdnToAscii != NULL && is_non_ascii) {
-		// 必要な長さを問い合わせてから変換する
-		int len = pIdnToAscii(0, ga->hostname, -1, NULL, 0);
-		if (len > 0) {
-			ace_host = (wchar_t *)malloc(len * sizeof(wchar_t));
-			if (ace_host != NULL) {
-				len = pIdnToAscii(0, ga->hostname, -1, ace_host, len);
-				if (len > 0) {
-					// 変換できた時は ACE形式から解決
-					hostname = ace_host;
-				}
-			}
-		}
-		// 変換できなかったときは変換せずそのまま渡す(従来動作)
-	}
+	// ACE 形式 (xn--) へ変換すると ASCII になるので getaddrinfo() で解決できる。
+	// 変換できなかったときは変換せずそのまま渡す(従来動作)
+	wchar_t *hostname = IdnHostNameToAscii(ga->hostname);
 
 	// ACE 形式へ変換済みなら全文字 ASCII なので CP_ACP 変換でも情報は失われない
 	char *hostnameA = ToCharW(hostname);
@@ -99,7 +70,7 @@ static unsigned __stdcall getaddrinfo_thread(void * p)
 	gai = getaddrinfo(hostnameA, portnameA, &ga->hints, ga->res);
 	free(hostnameA);
 	free(portnameA);
-	free(ace_host);
+	free(hostname);
 
 	/* send value of gai as message to window hWnd */
 	PostMessage(ga->hWnd, ga->wMsg, (WPARAM)ga->handle, MAKELPARAM(0, gai));
@@ -134,15 +105,6 @@ HANDLE WINAPI WSAAsyncGetAddrInfoW(
 	HANDLE thread;
 	unsigned tid;
 	struct getaddrinfo_args * ga;
-
-	if (Initialized == FALSE) {
-		Initialized = TRUE;
-		HMODULE normaliz = LoadLibraryA("Normaliz.dll");
-		if (normaliz != NULL) {
-			// XP+IE7,Vista以降
-			pIdnToAscii = (TIdnToAscii)GetProcAddress(normaliz, "IdnToAscii");
-		}
-	}
 
 	if (hostname == NULL || portname == NULL) {
 		return NULL;

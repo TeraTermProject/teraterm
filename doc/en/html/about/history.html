@@ -38,11 +38,6 @@
   <li>Changes
     <ul>
       <li>
-        Partially supported Internationalized Domain Names (IDN).
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
-        Host names are limited to characters representable in the system ANSI code page (CP932 on Japanese Windows).
-      </li>
-      <li>
         Changed the elapsed time of log timestamps (since log start, since connection) to 64bit.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1339" target="_blank">issue #1339</a>)<br>
         Previously it was 32bit, up to about 49.7 days.
@@ -61,6 +56,21 @@
         which holds pointers to Tera Term functions.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)
       </li>
+      <li>
+        Changed the connection host name to be handled in Unicode, and supported connecting to hosts with Internationalized Domain Names (IDN).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        Previously it was held as an ANSI string, and characters that could not be converted were replaced with "?".<br>
+        The host name is held in Unicode and converted to Punycode (ACE form) for the DNS query.
+      </li>
+      <li>
+        Added PWSAAsyncGetAddrInfoW, which receives the host name and port name in UTF-16, to the plug-in (TTX) socket hooks TTXSockHooks.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        The existing PWSAAsyncGetAddrInfo is kept for compatibility but is no longer called by Tera Term.
+      </li>
+      <li>
+        Added SetConnectHostName() and GetConnectHostName(), which set and get the connection host name in Unicode, to TTXImports.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)
+      </li>
     </ul>
   </li>
 
@@ -74,6 +84,7 @@
   <li>Misc
     <ul>
       <li>Upgraded TTSSH to <a href="#ttssh_3.8.0">3.8.0</a>.</li>
+      <li>Upgraded TTProxy to <a href="#ttproxy_1.0.0.28">1.0.0.28</a>.</li>
     </ul>
   </li>
 </ul>
@@ -6500,6 +6511,23 @@ SYNOPSIS:
 
 
 <h2 id="ttproxy">TTProxy</h2>
+
+<h3 id="ttproxy_1.0.0.28">YYYY.MM.DD (Ver 1.0.0.28 not released yet)</h3>
+<ul class="history">
+  <li>Changes
+    <ul>
+      <li>
+        Changed the proxy host name to be handled in Unicode (setup dialog, ProxyHost in the setup file).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)
+      </li>
+      <li>
+        Supported connecting to hosts with Internationalized Domain Names (IDN) via a proxy.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        Host names containing non-ASCII characters are converted to ACE form (xn--) before being sent to the proxy server.
+      </li>
+    </ul>
+  </li>
+</ul>
 
 <h3 id="ttproxy_1.0.0.27">2025.08.03 (Ver 1.0.0.27)</h3>
 <ul class="history">

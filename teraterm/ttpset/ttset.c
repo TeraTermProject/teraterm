@@ -3473,7 +3473,7 @@ static int ParsePortNameW(const wchar_t *buff)
 	return port;
 }
 
-static void ParseHostName(char *HostStr, WORD * port)
+static void ParseHostName(wchar_t *HostStr, WORD * port)
 {
 	/*
 	 * hostname.example.jp
@@ -3492,15 +3492,15 @@ static void ParseHostName(char *HostStr, WORD * port)
 	 */
 
 	int i, is_telnet_handler = 0, is_port = 0;
-	char *s;
-	char b;
+	wchar_t *s;
+	wchar_t b;
 
 	/* strlen("telnet://") == 9 */
-	if ((_strnicmp(HostStr, "telnet://", 9) == 0) ||
-		(_strnicmp(HostStr, "tn3270://", 9) == 0)) {
+	if ((_wcsnicmp(HostStr, L"telnet://", 9) == 0) ||
+		(_wcsnicmp(HostStr, L"tn3270://", 9) == 0)) {
 		/* trim "telnet://" and tail "/" */
-		memmove(HostStr, &(HostStr[9]), strlen(HostStr) - 8);
-		i = strlen(HostStr);
+		memmove(HostStr, &(HostStr[9]), sizeof(wchar_t) * (wcslen(HostStr) - 8));
+		i = wcslen(HostStr);
 		if (i > 0 && (HostStr[i - 1] == '/'))
 			HostStr[i - 1] = '\0';
 		is_telnet_handler = 1;
@@ -3515,12 +3515,12 @@ static void ParseHostName(char *HostStr, WORD * port)
 			if (*s == ']') {
 				/* found IPv6 raw address */
 				/* triming [ ] */
-				size_t len = strlen(HostStr);
-				char *lastptr = &HostStr[len - 1];
-				memmove(HostStr, HostStr + 1, len - 1);
+				size_t len = wcslen(HostStr);
+				wchar_t *lastptr = &HostStr[len - 1];
+				memmove(HostStr, HostStr + 1, sizeof(wchar_t) * (len - 1));
 				s = s - 1;
 				lastptr = lastptr - 1;
-				memmove(s, s + 1, lastptr - s);
+				memmove(s, s + 1, sizeof(wchar_t) * (lastptr - s));
 				/* because of triming 2 characters */
 				HostStr[len - 2] = '\0';
 
@@ -3553,7 +3553,7 @@ static void ParseHostName(char *HostStr, WORD * port)
 	} while (b != '\0' && b != ':');
 	if (b == ':') {
 		s[i - 1] = '\0';
-		*port = ParsePortName(&(s[i]));
+		*port = ParsePortNameW(&(s[i]));
 		is_port = 1;
 	}
 	if (is_telnet_handler == 1 && is_port == 0) {
@@ -3576,6 +3576,8 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 	wchar_t *start, *cur, *next;
 
 	ts->HostName[0] = 0;
+	free(ts->HostNameW);
+	ts->HostNameW = NULL;
 	//ts->KeyCnfFN[0] = 0;
 
 	/* Set AutoConnect true as default (2008.2.16 by steven)*/
@@ -3784,11 +3786,12 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 		else if (_wcsnicmp(Temp, L"/R=", 3) == 0) {	/* Replay filename */
 			wchar_t *f = GetFilePath(&Temp[3], ts->HomeDirW, NULL);
 			if (f != NULL) {
+				free(ts->HostNameW);
+				ts->HostNameW = f;
 				WideCharToACP_t(f, ts->HostName, _countof(ts->HostName));
-				if (strlen(ts->HostName) > 0) {
+				if (f[0] != 0) {
 					ParamPort = IdFile;
 				}
-				free(f);
 			}
 		}
 		else if (_wcsicmp(Temp, L"/T=0") == 0) {	/* telnet disable */
@@ -3853,9 +3856,9 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 			if (JustAfterHost && ((c=ParsePortNameW(Temp)) > 0))
 				ParamTCP = c;
 			else {
-				char *HostNameA = ToCharW(Temp);
-				strncpy_s(ts->HostName, sizeof(ts->HostName), HostNameA, _TRUNCATE);	/* host name */
-				free(HostNameA);
+				free(ts->HostNameW);
+				ts->HostNameW = _wcsdup(Temp);
+				WideCharToACP_t(ts->HostNameW, ts->HostName, _countof(ts->HostName));
 				if (ParamPort == IdNamedPipe) {
 					// 何もしない。
 
@@ -3874,8 +3877,9 @@ void PASCAL _ParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic)
 		ts->MacroFNW = NULL;
 	}
 
-	if ((ts->HostName[0] != 0) && (ParamPort == IdTCPIP)) {
-		ParseHostName(ts->HostName, &ParamTCP);
+	if ((ts->HostNameW != NULL) && (ts->HostName[0] != 0) && (ParamPort == IdTCPIP)) {
+		ParseHostName(ts->HostNameW, &ParamTCP);
+		WideCharToACP_t(ts->HostNameW, ts->HostName, _countof(ts->HostName));
 	}
 
 	switch (ParamPort) {
@@ -3953,6 +3957,7 @@ void TTSetUnInit(TTTSet *ts)
 		(void **)&ts->ViewlogEditorArg,
 		(void **)&ts->LogTimestampFormatW,
 		(void **)&ts->TitleW,
+		(void **)&ts->HostNameW,
 	};
 	int i;
 	for(i = 0; i < _countof(ptr_list); i++) {

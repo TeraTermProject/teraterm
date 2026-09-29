@@ -259,7 +259,7 @@ public:
 	//	chr 探す文字。
 	// 返値:
 	//	文字の見つかったインデックス。見つからなければ-1。
-	int indexOf(char chr)const {
+	int indexOf(wchar_t chr)const {
 		return indexOf(chr, 0);
 	}
 	// 指定の文字がどの位置にあるかを指定の位置から探す。
@@ -308,7 +308,7 @@ public:
 	//	chr 探す文字。
 	// 返値:
 	//	文字の見つかったインデックス。見つからなければ-1。
-	int lastIndexOf(char chr)const {
+	int lastIndexOf(wchar_t chr)const {
 		return lastIndexOf(chr, (size_t) -1);
 	}
 	// 指定の文字が指定の位置よりも前で最後に見つかる位置を取得する。
@@ -324,7 +324,7 @@ public:
 		const wchar_t* s = string;
 		const wchar_t* end = string + from;
 		const wchar_t* found = NULL;
-		while (*s != '0' && s <= end) {
+		while (*s != '\0' && s <= end) {
 			if (*s == chr)
 				found = s;
 			s++;
@@ -380,7 +380,7 @@ public:
 	//	index 取り出す文字の位置。
 	// 返値:
 	//	指定の位置にある文字。
-	char charAt(size_t index)const {
+	wchar_t charAt(size_t index)const {
 		return index < length() ? string[index] : '\0';
 	}
 	// 指定の文字を指定の文字に置き換えます。
@@ -389,13 +389,11 @@ public:
 	//	newChr 置き換える文字。
 	// 返値:
 	//	置換後の文字列。
-	WString replace(char oldChr, char newChr)const {
+	WString replace(wchar_t oldChr, wchar_t newChr)const {
 		WString result(string);
-		char* s = (char*) result.string;
+		wchar_t* s = (wchar_t*) result.string;
 		while (*s != '\0'){
-			if (WString::isLeadByte(*s))
-				s++;
-			else if (*s == oldChr)
+			if (*s == oldChr)
 				*s = newChr;
 			s++;
 		}
@@ -406,11 +404,9 @@ public:
 	//	変換後の文字列。
 	WString toLowerCase()const {
 		WString result(string);
-		char* s = (char*) result.string;
+		wchar_t* s = (wchar_t*) result.string;
 		while (*s != '\0'){
-			if (WString::isLeadByte(*s))
-				s++;
-			else if ('A' <= *s && *s <= 'Z')
+			if ('A' <= *s && *s <= 'Z')
 				*s += 'a' - 'A';
 			s++;
 		}
@@ -421,11 +417,9 @@ public:
 	//	変換後の文字列。
 	WString toUpperCase()const {
 		WString result(string);
-		char* s = (char*) result.string;
+		wchar_t* s = (wchar_t*) result.string;
 		while (*s != '\0'){
-			if (WString::isLeadByte(*s))
-				s++;
-			else if ('a' <= *s && *s <= 'z')
+			if ('a' <= *s && *s <= 'z')
 				*s += 'A' - 'a';
 			s++;
 		}
@@ -436,11 +430,11 @@ public:
 	//	削除後の文字列。
 	WString trim()const {
 		const wchar_t* s = string;
-		while (*s != '\0' && (unsigned char) *s <= ' ')
+		while (*s != '\0' && *s <= ' ')
 			s++;
 		const wchar_t* start = s;
 		s = string + length();
-		while (s > start && (*s != '\0' && (unsigned char) *s <= ' '))
+		while (s > start && (*s != '\0' && *s <= ' '))
 			s--;
 		return WString(start, s - start);
 	}
@@ -458,7 +452,7 @@ public:
 	//	index 取得する文字のインデックス。
 	// 返値:
 	//	指定のインデックスにある文字。
-	char operator[](size_t index)const {
+	wchar_t operator[](size_t index)const {
 		return charAt(index);
 	}
 	// 文字列を連結するための+演算子。
