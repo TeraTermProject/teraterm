@@ -1086,7 +1086,7 @@ static char *format_host_key(PTInstVar pvar)
 	{
 		Key *key = &pvar->hosts_state.hostkey;
 		char *blob = NULL;
-		int blen, uulen, msize;
+		size_t blen, uulen, msize;
 		char *uu = NULL;
 		int n;
 
@@ -1184,7 +1184,7 @@ static char *format_specified_host_key(Key *key, char *hostname, unsigned short 
 	{
 		//Key *key = &pvar->hosts_state.hostkey;
 		char *blob = NULL;
-		int blen, uulen, msize;
+		size_t blen, uulen, msize;
 		char *uu = NULL;
 		int n;
 

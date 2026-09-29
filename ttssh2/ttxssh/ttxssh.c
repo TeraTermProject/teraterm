@@ -3738,7 +3738,8 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	struct sshcipher_ctx *cc = NULL;
 	Key keyblob;
 	unsigned char *cp = NULL;
-	unsigned int len, check;
+	size_t len;
+	unsigned int check;
 	FILE *fp;
 
 	b = buffer_init();

@@ -54,10 +54,10 @@ Key *key_new_private(int type);
 Key *key_new(int type);
 void key_free(Key *key);
 void key_init(Key *key);
-int key_to_blob(Key *key, char **blobp, int *lenp);
+int key_to_blob(Key *key, char **blobp, size_t *lenp);
 Key *key_from_blob(char *data, size_t blen);
-int get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen);
-BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data, size_t datalen, ssh_keyalgo keyalgo);
+int get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, size_t *bloblen);
+BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, size_t *siglen, char *data, size_t datalen, ssh_keyalgo keyalgo);
 
 int keytype_to_hash_nid(ssh_keytype type);
 digest_algorithm keytype_to_hash_alg(ssh_keytype type);

@@ -7345,9 +7345,9 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 	} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) { // 公開鍵認証
 		buffer_t *signbuf = NULL;
 		buffer_t *blob = NULL;
-		int bloblen;
+		size_t bloblen;
 		char *signature = NULL;
-		int siglen;
+		size_t siglen;
 		Key *keypair = pvar->auth_state.cur_cred.key_pair;
 		ssh_keyalgo keyalgo;
 		char *keyalgo_name;

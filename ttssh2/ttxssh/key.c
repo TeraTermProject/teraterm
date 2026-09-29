@@ -470,7 +470,8 @@ static int ssh_ed25519_verify(Key *key, unsigned char *signature, size_t signatu
 	unsigned char *sigblob = NULL, *sm = NULL, *m = NULL;
 	size_t len;
 	unsigned long long smlen, mlen;
-	int rlen, ret, r = SSH_ERR_INTERNAL_ERROR;
+	size_t rlen;
+	int ret, r = SSH_ERR_INTERNAL_ERROR;
 
 	b = buffer_init();
 	if (b == NULL) {
@@ -700,7 +701,7 @@ char* key_fingerprint_raw(Key *k, digest_algorithm hash_alg, int *dgst_raw_lengt
 {
 	char *blob = NULL;
 	char *retval = NULL;
-	int len = 0;
+	size_t len = 0;
 	int nlen, elen;
 	RSA *rsa;
 	BIGNUM *e = NULL, *n = NULL;
@@ -1272,11 +1273,11 @@ char *curve_keytype_to_name(ssh_keytype type)
 // キー情報からバッファへ変換する (for SSH2)
 // NOTE:
 //
-int key_to_blob(Key *key, char **blobp, int *lenp)
+int key_to_blob(Key *key, char **blobp, size_t *lenp)
 {
 	buffer_t *b;
 	char *sshname, *tmp;
-	int len;
+	size_t len;
 	int ret = 0;
 	BIGNUM *e = NULL, *n = NULL;
 	BIGNUM *p, *q, *g, *pub_key;
@@ -1508,11 +1509,11 @@ error:
 }
 
 
-static int ssh_ed25519_sign(Key *key, char **sigp, int *lenp, char *data, size_t datalen)
+static int ssh_ed25519_sign(Key *key, char **sigp, size_t *lenp, char *data, size_t datalen)
 {
 	char *sig = NULL;
 	size_t slen;
-	int len;
+	size_t len;
 	unsigned long long smlen;
 	int r, ret;
 	buffer_t *b;
@@ -1558,7 +1559,7 @@ out:
 }
 
 
-BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data, size_t datalen, ssh_keyalgo keyalgo)
+BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, size_t *siglen, char *data, size_t datalen, ssh_keyalgo keyalgo)
 {
 	buffer_t *msg = NULL;
 	char *s;
@@ -1575,6 +1576,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	{
 		u_char digest[SSH_DIGEST_MAX_LENGTH], *sig;
 		u_int slen, dlen, len;
+		size_t msglen;
 		int ok, nid;
 		digest_algorithm hash_alg;
 
@@ -1617,16 +1619,16 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		    buffer_put_string(msg, sig, slen) != 0) {
 			goto error;
 		}
-		len = buffer_len(msg);
+		msglen = buffer_len(msg);
 
 		// setting
-		*siglen = len;
-		*sigptr = malloc(len);
+		*siglen = msglen;
+		*sigptr = malloc(msglen);
 		if (*sigptr == NULL) {
 			free(sig);
 			goto error;
 		}
-		memcpy(*sigptr, buffer_ptr(msg), len);
+		memcpy(*sigptr, buffer_ptr(msg), msglen);
 		free(sig);
 
 		break;
@@ -1635,7 +1637,8 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	{
 		DSA_SIG *sig;
 		u_char digest[SSH_DIGEST_MAX_LENGTH], sigblob[SIGBLOB_LEN];
-		u_int rlen, slen, len, dlen;
+		u_int rlen, slen, dlen;
+		size_t len;
 		BIGNUM *bignum_r, *bignum_s;
 
 		// ダイジェストの計算
@@ -1687,7 +1690,8 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	{
 		ECDSA_SIG *sig;
 		u_char digest[SSH_DIGEST_MAX_LENGTH];
-		u_int len, dlen;
+		u_int dlen;
+		size_t len;
 		buffer_t *buf2 = NULL;
 		BIGNUM *br, *bs;
 		digest_algorithm hash_alg;
@@ -1758,7 +1762,7 @@ error:
 }
 
 
-int get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
+int get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, size_t *bloblen)
 {
 	buffer_t *msg = NULL;
 	Key *keypair;
@@ -2490,7 +2494,7 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 	char *data;
 	int len;
 	unsigned char *blob = NULL;
-	int bloblen;
+	size_t bloblen;
 	buffer_t *b = NULL;
 	buffer_t *bsig = NULL;
 	char *cp, *sig;
@@ -2596,7 +2600,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, size_t datalen)
 	size_t i;
 	char *cp, *fp;
 	unsigned char *blob = NULL;
-	int bloblen;
+	size_t bloblen;
 	buffer_t *b = NULL;
 	struct hostkeys_update_ctx *ctx = NULL;
 	Key *key = NULL, **tmp;
