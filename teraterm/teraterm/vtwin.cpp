@@ -1836,10 +1836,6 @@ void CVTWindow::OnDestroy()
 
 	FreeBuffer();
 
-	TTXEnd(); /* TTPLUG */
-
-	TTSetUnInit(&ts);
-
 	Notify2Uninitialize((NotifyIcon *)cv.NotifyIcon);
 	cv.NotifyIcon = NULL;
 
