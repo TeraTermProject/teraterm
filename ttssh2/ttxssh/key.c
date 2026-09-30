@@ -1515,7 +1515,7 @@ static int ssh_ed25519_sign(Key *key, char **sigp, size_t *lenp, char *data, siz
 	size_t slen;
 	size_t len;
 	unsigned long long smlen;
-	int r = SSH_ERR_INTERNAL_ERROR, ret;
+	int r, ret;
 	buffer_t *b = NULL;
 
 	smlen = slen = datalen + crypto_sign_ed25519_BYTES;
@@ -1535,8 +1535,8 @@ static int ssh_ed25519_sign(Key *key, char **sigp, size_t *lenp, char *data, siz
 		r = SSH_ERR_ALLOC_FAIL;
 		goto out;
 	}
-	if (buffer_put_cstring(b, "ssh-ed25519") != 0 ||
-	    buffer_put_string(b, sig, (int)(smlen - datalen)) != 0) {
+	if ((r = buffer_put_cstring(b, "ssh-ed25519")) != 0 ||
+	    (r = buffer_put_string(b, sig, (int)(smlen - datalen))) != 0) {
 		goto out;
 	}
 	len = buffer_len(b);
