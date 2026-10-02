@@ -217,7 +217,7 @@ Root: HKA; Subkey: Software\Classes\TeraTerm.telnet\DefaultIcon; ValueType: stri
 Root: HKA; Subkey: Software\Classes\TeraTerm.telnet\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /T=1 /nossh /E %1"; Components: TeraTerm; Tasks: telnetassoc
 Root: HKA; Subkey: Software\Classes\TeraTerm.ssh; ValueType: string; ValueData: "URL: SSH Protocol"; Flags: uninsdeletekey; Components: TTSSH; Tasks: sshassoc
 Root: HKA; Subkey: Software\Classes\TeraTerm.ssh; ValueName: EditFlags; ValueType: dword; ValueData: 2; Components: TTSSH; Tasks: sshassoc
-Root: HKA; Subkey: Software\Classes\TeraTerm.ssh; ValueName: URL Protocol; ValueType: string; Components: TTSSH; Tasks: telnetassoc
+Root: HKA; Subkey: Software\Classes\TeraTerm.ssh; ValueName: URL Protocol; ValueType: string; Components: TTSSH; Tasks: sshassoc
 Root: HKA; Subkey: Software\Classes\TeraTerm.ssh\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Components: TTSSH; Tasks: sshassoc
 Root: HKA; Subkey: Software\Classes\TeraTerm.ssh\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /ssh %1"; Components: TTSSH; Tasks: sshassoc
 Root: HKA; Subkey: Software\Classes\TeraTerm.MacroFile; ValueType: string; ValueData: "Tera Term Macro File"; Flags: uninsdeletekey; Components: TeraTerm; Tasks: macroassoc
