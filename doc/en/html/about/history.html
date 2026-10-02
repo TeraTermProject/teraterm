@@ -54,6 +54,14 @@
         The plugin termination TTXEnd() is now called after the message loop has ended.
         The main window has already been destroyed when TTXEnd() is called.
       </li>
+      <li>
+        Fixed an issue where file extension associations such as .ttl and URL associations such as ssh were not registered when the installer installed Tera Term for the current user only.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1562" target="_blank">issue #1562</a>)
+      </li>
+      <li>
+        Fixed an issue where the ssh URL association was registered incompletely when ssh was selected but telnet was not selected in the installer.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1562" target="_blank">issue #1562</a>)
+      </li>
     </ul>
   </li>
 
