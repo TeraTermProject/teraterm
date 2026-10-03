@@ -52,6 +52,11 @@
 /* buffer_t.buf の拡張時に追加で確保する量 (32KB) */
 #define BUFFER_INCREASE_MARGIN (32*1024)
 
+/* bignum の最大長 (OpenSSH sshbuf.h の SSHBUF_MAX_BIGNUM、16384 bit) */
+#define BUFFER_MAX_BIGNUM (16384 / 8)
+/* EC point の最大長 (OpenSSH sshbuf.h の SSHBUF_MAX_ECPOINT、P-521 の非圧縮形式) */
+#define BUFFER_MAX_ECPOINT ((528 * 2 / 8) + 1)
+
 struct buffer {
 	char *buf;      /* バッファの先頭ポインタ。realloc()により変動する。*/
 	size_t offset;  /* 現在の読み出し位置/書き込み位置 */
@@ -478,29 +483,38 @@ error:
 	return r;
 }
 
-static void buffer_get_bignum2_internal(char **data, BIGNUM *value)
-{
-	char *buf = *data;
-	int len;
-
-	len = get_uint32_MSBfirst(buf);
-	buf += 4;
-	BN_bin2bn((unsigned char *)buf, len, value);
-	buf += len;
-
-	*data = buf;
-}
-
+// from OpenSSH 10.4p1 sshbuf-getput-crypto.c, sshbuf-getput-basic.c
+//   sshbuf_get_bignum2() + sshbuf_get_bignum2_bytes_direct()
 int buffer_get_bignum2(buffer_t *buf, BIGNUM *v)
 {
-	char *data, *olddata;
-	size_t off;
+	const char *d;
+	const unsigned char *p;
+	size_t len;
+	int r;
 
-	data = olddata = buffer_tail_ptr(buf);
-	buffer_get_bignum2_internal(&data, v);
-	off = data - olddata;
-	buf->offset += off;
-
+	if ((r = buffer_peek_string_direct(buf, &d, &len)) < 0)
+		return r;
+	p = (const unsigned char *)d;
+	/* Refuse negative (MSB set) bignums */
+	if (len != 0 && (*p & 0x80) != 0) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_BIGNUM_IS_NEGATIVE", __FUNCTION__);
+		return SSH_ERR_BIGNUM_IS_NEGATIVE;
+	}
+	/* Refuse overlong bignums, allow prepended \0 to avoid MSB set */
+	if (len > BUFFER_MAX_BIGNUM + 1 || (len == BUFFER_MAX_BIGNUM + 1 && *p != 0)) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_BIGNUM_TOO_LARGE", __FUNCTION__);
+		return SSH_ERR_BIGNUM_TOO_LARGE;
+	}
+	/* 先頭の 0 は BN_bin2bn() が読み飛ばすので、ここでは除去しない */
+	if (v != NULL && BN_bin2bn(p, (int)len, v) == NULL) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_ALLOC_FAIL", __FUNCTION__);
+		return SSH_ERR_ALLOC_FAIL;
+	}
+	if (buffer_consume(buf, len + 4) != 0) {
+		/* Shouldn't happen */
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_INTERNAL_ERROR", __FUNCTION__);
+		return SSH_ERR_INTERNAL_ERROR;
+	}
 	return 0;
 }
 
@@ -592,29 +606,37 @@ error:
 	return r;
 }
 
-static void buffer_get_ec_internal(char **data, EC_POINT *v, const EC_GROUP *g)
-{
-	char *buf = *data;
-	size_t len;
-
-	len = get_uint32_MSBfirst(buf);
-	buf += 4;
-	EC_POINT_oct2point(g, v, (unsigned char*)buf, len, NULL);
-	buf += len;
-
-	*data = buf;
-}
-
+// from OpenSSH 10.4p1 sshbuf-getput-crypto.c
+//   sshbuf_get_ec() + get_ec()
 int buffer_get_ec(buffer_t *buf, EC_POINT *v, const EC_GROUP *g)
 {
-	char *data, *olddata;
-	size_t off;
+	const char *d;
+	const unsigned char *p;
+	size_t len;
+	int r;
 
-	data = olddata = buffer_tail_ptr(buf);
-	buffer_get_ec_internal(&data, v, g);
-	off = data - olddata;
-	buf->offset += off;
-
+	if ((r = buffer_peek_string_direct(buf, &d, &len)) < 0)
+		return r;
+	p = (const unsigned char *)d;
+	/* Refuse overlong bignums */
+	if (len == 0 || len > BUFFER_MAX_ECPOINT) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_ECPOINT_TOO_LARGE", __FUNCTION__);
+		return SSH_ERR_ECPOINT_TOO_LARGE;
+	}
+	/* Only handle uncompressed points */
+	if (*p != POINT_CONVERSION_UNCOMPRESSED) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_INVALID_FORMAT", __FUNCTION__);
+		return SSH_ERR_INVALID_FORMAT;
+	}
+	if (v != NULL && EC_POINT_oct2point(g, v, p, len, NULL) != 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_INVALID_FORMAT", __FUNCTION__);
+		return SSH_ERR_INVALID_FORMAT;
+	}
+	if (buffer_consume(buf, len + 4) != 0) {
+		/* Shouldn't happen */
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_INTERNAL_ERROR", __FUNCTION__);
+		return SSH_ERR_INTERNAL_ERROR;
+	}
 	return 0;
 }
 
