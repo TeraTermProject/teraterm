@@ -337,15 +337,14 @@ static int buffer_peek_string_direct(buffer_t *buf, const char **valp, size_t *l
 
 int buffer_put_string(buffer_t *msg, const char *v, size_t len)
 {
-	char buf[4];
-	int val;
-	int ret = SSH_ERR_INTERNAL_ERROR;
+	int ret;
 
-	assert(len == (size_t)(int)len);
+	if (len > BUFFER_SIZE_MAX - 4)
+		return SSH_ERR_NO_BUFFER_SPACE;
+
 	// 「サイズ＋文字列」で書き込む。サイズは4byteのbig-endian。
-	val = htonl((int)len);
-	memcpy(buf, &val, sizeof(val));
-	ret = buffer_put(msg, buf, sizeof(buf));
+	if ((ret = buffer_put_u32(msg, (uint32_t)len)) != 0)
+		return ret;
 	if (v != NULL) {
 		ret = buffer_put(msg, v, len);
 	}
