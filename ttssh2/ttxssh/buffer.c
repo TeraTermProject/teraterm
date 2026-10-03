@@ -59,6 +59,9 @@ struct buffer {
 	size_t len;     /* バッファに含まれる有効なデータサイズ */
 };
 
+static int buffer_get_string_direct(buffer_t *buf, const char **valp, size_t *lenp);
+static int buffer_peek_string_direct(buffer_t *buf, const char **valp, size_t *lenp);
+
 // バッファのオフセットを初期化し、まだ読んでいない状態にする。
 // Tera Term(TTSSH)オリジナル関数。
 void buffer_rewind(buffer_t *buf)
@@ -116,7 +119,7 @@ static int sshbuf_check_sanity(buffer_t *buf)
 }
 
 // from OpenSSH 10.4p1 sshbuf.c
-int buffer_check_reserve(buffer_t *buf, size_t len)
+static int buffer_check_reserve(buffer_t *buf, size_t len)
 {
 	int r;
 
@@ -130,10 +133,10 @@ int buffer_check_reserve(buffer_t *buf, size_t len)
 }
 
 // from OpenSSH 10.4p1 sshbuf.c
-int buffer_allocate(buffer_t *buf, size_t len)
+static int buffer_allocate(buffer_t *buf, size_t len)
 {
 	size_t rlen, need;
-	u_char *dp;
+	char *dp;
 	int r;
 
 	if ((r = buffer_check_reserve(buf, len)) != 0)
@@ -167,9 +170,9 @@ int buffer_allocate(buffer_t *buf, size_t len)
 // from OpenSSH 10.4p1 sshbuf.c
 // buf->len は len バイト（拡張した長さ） 進むので、
 // この関数を呼んだら dpp に len バイト書き込まなければならない
-int buffer_reserve(buffer_t *buf, size_t len, u_char **dpp)
+int buffer_reserve(buffer_t *buf, size_t len, char **dpp)
 {
-	u_char *dp;
+	char *dp;
 	int r;
 
 	if (dpp != NULL)
@@ -216,12 +219,12 @@ int buffer_put(buffer_t * buf, const void *v, size_t len)
 	return ret;
 }
 
-int buffer_get(buffer_t *buf, void *v, size_t len)
+static int buffer_get(buffer_t *buf, void *v, size_t len)
 {
 	if (len > buf->len - buf->offset) {
 		// TODO: エラー処理
 		OutputDebugPrintf("buffer_get: trying to get more bytes %u than in buffer %u",
-		                  len, buf->len - buf->offset);
+		                  (unsigned int)len, (unsigned int)(buf->len - buf->offset));
 		return SSH_ERR_MESSAGE_INCOMPLETE;
 	}
 	memcpy(v, buf->buf + buf->offset, len);
@@ -250,68 +253,10 @@ int buffer_get_u8(buffer_t *buf, uint8_t *valp)
 	return 0;
 }
 
-// NOTE: You should free the return pointer if it's unused.
-static char *buffer_get_string_internal(char **data_ptr, int *buflen_ptr)
-{
-	char *data = *data_ptr;
-	char *ptr;
-	unsigned int buflen;
-
-	buflen = get_uint32_MSBfirst(data);
-	data += 4;
-	// buflen == 0の場合でも、'\0'分は確保し、data_ptrを進め、リターンする。
-//	if (buflen <= 0)
-//		return NULL;
-
-	ptr = malloc(buflen + 1);
-	if (ptr == NULL) {
-		logprintf(LOG_LEVEL_ERROR, "%s: malloc failed.", __FUNCTION__);
-		if (buflen_ptr != NULL)
-			*buflen_ptr = 0;
-		return NULL;
-	}
-	memcpy(ptr, data, buflen);
-	ptr[buflen] = '\0'; // null-terminate
-	data += buflen;
-
-	*data_ptr = data;
-	if (buflen_ptr != NULL)
-		*buflen_ptr = buflen;
-
-	return(ptr);
-}
-
-// NOTE: You should free the return pointer if it's unused.
-void *buffer_get_string_(buffer_t *buf, int *lenp)
-{
-	char *data, *olddata;
-	void *ret = NULL;
-	size_t off;
-	uint32_t datalen;
-
-	// Check size
-	size_t len = buffer_remain_len(buf);
-	if (len < 4)
-		goto error;
-
-	data = olddata = buffer_tail_ptr(buf);
-	datalen = get_uint32_MSBfirst(data);
-	if (len - 4 < datalen)
-		goto error;
-
-	ret = buffer_get_string_internal(&data, lenp);
-	off = data - olddata;
-	buf->offset += off;
-
-error:;
-	return (ret);
-}
-
-
 // from OpenSSH 10.4p1 sshbuf-getput-basic.c
-int buffer_get_string(buffer_t *buf, u_char **valp, size_t *lenp)
+int buffer_get_string(buffer_t *buf, char **valp, size_t *lenp)
 {
-	const u_char *val;
+	const char *val;
 	size_t len;
 	int r;
 
@@ -320,8 +265,8 @@ int buffer_get_string(buffer_t *buf, u_char **valp, size_t *lenp)
 	if (lenp != NULL)
 		*lenp = 0;
 	if ((r = buffer_get_string_direct(buf, &val, &len)) < 0)
-			return r;
-		if (valp != NULL) {
+		return r;
+	if (valp != NULL) {
 		if ((*valp = malloc(len + 1)) == NULL) {
 			logprintf(LOG_LEVEL_ERROR, "%s: malloc failed.", __FUNCTION__);
 			return SSH_ERR_ALLOC_FAIL;
@@ -336,10 +281,10 @@ int buffer_get_string(buffer_t *buf, u_char **valp, size_t *lenp)
 }
 
 // from OpenSSH 10.4p1 sshbuf-getput-basic.c
-int buffer_get_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp)
+static int buffer_get_string_direct(buffer_t *buf, const char **valp, size_t *lenp)
 {
 	size_t len;
-	const u_char *p;
+	const char *p;
 	int r;
 
 	if (valp != NULL)
@@ -361,10 +306,10 @@ int buffer_get_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp)
 }
 
 // from OpenSSH 10.4p1 sshbuf-getput-basic.c
-int buffer_peek_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp)
+static int buffer_peek_string_direct(buffer_t *buf, const char **valp, size_t *lenp)
 {
 	uint32_t len;
-	const u_char *p = buffer_tail_ptr(buf);
+	const char *p = buffer_tail_ptr(buf);
 
 	if (valp != NULL)
 		*valp = NULL;
@@ -387,62 +332,6 @@ int buffer_peek_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp)
 		*valp = p + 4;
 	if (lenp != NULL)
 		*lenp = len;
-	return 0;
-}
-
-// from OpenSSH 10.4p1 sshbuf-getput-basic.c
-int buffer_get_cstring(buffer_t *buf, char **valp, size_t *lenp)
-{
-	size_t len;
-	const u_char *p, *z;
-	int r;
-
-	if (valp != NULL)
-		*valp = NULL;
-	if (lenp != NULL)
-		*lenp = 0;
-	if ((r = buffer_peek_string_direct(buf, &p, &len)) != 0)
-		return r;
-	/* Allow a \0 only at the end of the string */
-	if (len > 0 && (z = memchr(p, '\0', len)) != NULL && z < p + len - 1) {
-		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_INVALID_FORMAT", __FUNCTION__);
-		return SSH_ERR_INVALID_FORMAT;
-	}
-	if ((r = buffer_skip_string(buf)) != 0)
-		return -1;
-	if (valp != NULL) {
-		if ((*valp = malloc(len + 1)) == NULL) {
-			logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_ALLOC_FAIL", __FUNCTION__);
-			return SSH_ERR_ALLOC_FAIL;
-		}
-		if (len != 0)
-			memcpy(*valp, p, len);
-		(*valp)[len] = '\0';
-	}
-	if (lenp != NULL)
-		*lenp = (size_t)len;
-	return 0;
-}
-
-// from OpenSSH 10.4p1 sshbuf-getput-basic.c
-// buffer_reserve() で v の offset は進まないため、
-// このあと v の末尾に buffer_put するには buffer_consume() が必要
-int buffer_get_stringb(buffer_t *buf, buffer_t *v)
-{
-	uint32_t len;
-	u_char *p;
-	int r;
-
-	/*
-	 * Use sshbuf_peek_string_direct() to figure out if there is
-	 * a complete string in 'buf' and copy the string directly
-	 * into 'v'.
-	 */
-	if ((r = buffer_peek_string_direct(buf, NULL, NULL)) != 0 ||
-	    (r = buffer_get_u32(buf, &len)) != 0 ||
-	    (r = buffer_reserve(v, len, &p)) != 0 ||
-	    (r = buffer_get(buf, p, len)) != 0)
-		return r;
 	return 0;
 }
 
@@ -469,7 +358,7 @@ int buffer_put_cstring(buffer_t *buf, const char *v)
 	return buffer_put_string(buf, v, strlen(v));
 }
 
-int buffer_put_stringb(buffer_t *buf, buffer_t *v)
+int buffer_put_stringb(buffer_t *buf, const buffer_t *v)
 {
 	return buffer_put_string(buf, buffer_ptr(v), buffer_len(v));
 }
@@ -489,12 +378,12 @@ int buffer_put_u32(buffer_t *buf, uint32_t val)
 	return buffer_put(buf, tmp, sizeof(tmp));
 }
 
-size_t buffer_len(buffer_t *buf)
+size_t buffer_len(const buffer_t *buf)
 {
 	return buf->len;
 }
 
-size_t buffer_remain_len(buffer_t *buf)
+size_t buffer_remain_len(const buffer_t *buf)
 {
 	return buf->len - buf->offset;
 }
@@ -503,14 +392,14 @@ size_t buffer_remain_len(buffer_t *buf)
 // 内部で realloc() によりバッファポインタが変わってしまうことがある。
 // メッセージバッファのポインタを取得する際は、バッファ追加が完了した後に
 // 行わなければ、BOFで落ちる。
-char *buffer_ptr(buffer_t *buf)
+char *buffer_ptr(const buffer_t *buf)
 {
 	return (buf->buf);
 }
 
-char *buffer_tail_ptr(buffer_t *buf)
+char *buffer_tail_ptr(const buffer_t *buf)
 {
-	return (char *)(buf->buf + buf->offset);
+	return buf->buf + buf->offset;
 }
 
 int buffer_overflow_verify(buffer_t *buf, size_t len)
@@ -524,7 +413,8 @@ int buffer_overflow_verify(buffer_t *buf, size_t len)
 // for SSH1
 int buffer_put_bignum1(buffer_t *buf, const BIGNUM *v)
 {
-	unsigned int bits, bin_size;
+	unsigned int bits;
+	size_t bin_size;
 	unsigned char *d;
 	int oi;
 	char msg[2];
@@ -648,7 +538,7 @@ int buffer_get_bignum_SECSH(buffer_t *buf, BIGNUM *v)
 
 int buffer_put_bignum2_bytes(buffer_t *buf, const void *v, size_t len)
 {
-	u_char *d;
+	char *d;
 	const u_char *s = (const u_char *)v;
 	int prepend, r;
 
@@ -667,7 +557,7 @@ int buffer_put_bignum2_bytes(buffer_t *buf, const void *v, size_t len)
 	if ((r = buffer_reserve(buf, len + 4 + prepend, &d)) != 0) {
 		return r;
 	}
-	POKE_U32(d, len + prepend);
+	POKE_U32(d, (u_int32_t)(len + prepend));
 	if (prepend)
 		d[4] = 0;
 	memcpy(d + 4 + prepend, s, len);
@@ -729,7 +619,7 @@ int buffer_get_ec(buffer_t *buf, EC_POINT *v, const EC_GROUP *g)
 	return 0;
 }
 
-void buffer_dump(FILE *fp, buffer_t *buf)
+void buffer_dump(FILE *fp, const buffer_t *buf)
 {
 	size_t i;
 	char *ch = buffer_ptr(buf);

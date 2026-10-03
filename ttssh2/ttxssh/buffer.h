@@ -40,21 +40,21 @@ void buffer_clear(buffer_t *buf);
 void buffer_free(buffer_t *buf);
 
 /* バッファ全体の長さ */
-size_t buffer_len(buffer_t *buf);
+size_t buffer_len(const buffer_t *buf);
 /* まだ読み込んでいない残りのサイズを返す。OpenSSH の sshbuf_len() に相当 */
-size_t buffer_remain_len(buffer_t *buf);
+size_t buffer_remain_len(const buffer_t *buf);
 /* バッファの先頭のポインタを返す */
-char *buffer_ptr(buffer_t *buf);
+char *buffer_ptr(const buffer_t *buf);
 /* 現在のポインタを返す。OpenSSH の sshbuf_ptr() に相当 */
-char *buffer_tail_ptr(buffer_t *buf);
+char *buffer_tail_ptr(const buffer_t *buf);
 
 int buffer_consume(buffer_t *buf, size_t shift_byte);
 int buffer_consume_end(buffer_t *buf, size_t shift_byte);
 void buffer_rewind(buffer_t *buf);
-int buffer_reserve(buffer_t *buf, size_t len, u_char **dpp);
+int buffer_reserve(buffer_t *buf, size_t len, char **dpp);
 
-int buffer_get(buffer_t *buf, void *v, size_t len);
 int buffer_put(buffer_t *buf, const void *v, size_t len);
+int buffer_put_stringb(buffer_t *buf, const buffer_t *v);
 
 int buffer_get_u32(buffer_t *buf, uint32_t *valp);
 int buffer_put_u32(buffer_t *buf, uint32_t val);
@@ -62,24 +62,9 @@ int buffer_put_u32(buffer_t *buf, uint32_t val);
 int buffer_get_u8(buffer_t *buf, uint8_t *valp);
 int buffer_put_u8(buffer_t *buf, uint8_t val);
 
-void *buffer_get_string_(buffer_t *buf, int *lenp);
-int buffer_get_string(buffer_t *buf, u_char **valp, size_t *lenp);
-int buffer_get_cstring(buffer_t *buf, char **valp, size_t *lenp);
-int buffer_get_stringb(buffer_t *buf, buffer_t *v);
+int buffer_get_string(buffer_t *buf, char **valp, size_t *lenp);
 int buffer_put_string(buffer_t *buf, const char *v, size_t len);
 int buffer_put_cstring(buffer_t *buf, const char *v);
-int buffer_put_stringb(buffer_t *buf, buffer_t *v);
-
-/*
- * "Direct" variant of sshbuf_get_string, returns pointer into the sshbuf to
- * avoid an malloc+memcpy. The pointer is guaranteed to be valid until the
- * next sshbuf-modifying function call. Caller does not free.
- */
-int buffer_get_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp);
-/* Skip past a string */
-#define buffer_skip_string(buf) buffer_get_string_direct(buf, NULL, NULL)
-/* Another variant: "peeks" into the buffer without modifying it */
-int buffer_peek_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp);
 
 int buffer_put_bignum1(buffer_t *buf, const BIGNUM *v);
 
@@ -95,5 +80,7 @@ int buffer_put_ec(buffer_t *buf, const EC_POINT *v, const EC_GROUP *g);
 int buffer_overflow_verify(buffer_t *buf, size_t len);
 int buffer_compress(z_stream *zstream, char *payload, size_t len, buffer_t *compbuf);
 int buffer_decompress(z_stream *zstream, char *payload, size_t len, buffer_t *compbuf);
+
+void buffer_dump(FILE *fp, const buffer_t *buf);
 
 #endif				/* BUFFER_H */
