@@ -54,7 +54,6 @@ void buffer_rewind(buffer_t *buf);
 int buffer_reserve(buffer_t *buf, size_t len, char **dpp);
 
 int buffer_put(buffer_t *buf, const void *v, size_t len);
-int buffer_put_stringb(buffer_t *buf, const buffer_t *v);
 
 int buffer_get_u32(buffer_t *buf, uint32_t *valp);
 int buffer_put_u32(buffer_t *buf, uint32_t val);
@@ -62,9 +61,23 @@ int buffer_put_u32(buffer_t *buf, uint32_t val);
 int buffer_get_u8(buffer_t *buf, uint8_t *valp);
 int buffer_put_u8(buffer_t *buf, uint8_t val);
 
-int buffer_get_string(buffer_t *buf, char **valp, size_t *lenp);
+int buffer_get_string(buffer_t *buf, u_char **valp, size_t *lenp);
+int buffer_get_cstring(buffer_t *buf, char **valp, size_t *lenp);
+int buffer_get_stringb(buffer_t *buf, buffer_t *v);
 int buffer_put_string(buffer_t *buf, const char *v, size_t len);
 int buffer_put_cstring(buffer_t *buf, const char *v);
+int buffer_put_stringb(buffer_t *buf, const buffer_t *v);
+
+/*
+ * "Direct" variant of sshbuf_get_string, returns pointer into the sshbuf to
+ * avoid an malloc+memcpy. The pointer is guaranteed to be valid until the
+ * next sshbuf-modifying function call. Caller does not free.
+ */
+int buffer_get_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp);
+/* Skip past a string */
+#define buffer_skip_string(buf) buffer_get_string_direct(buf, NULL, NULL)
+/* Another variant: "peeks" into the buffer without modifying it */
+int buffer_peek_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp);
 
 int buffer_put_bignum1(buffer_t *buf, const BIGNUM *v);
 

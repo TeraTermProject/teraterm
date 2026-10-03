@@ -64,9 +64,6 @@ struct buffer {
 	size_t len;     /* バッファに含まれる有効なデータサイズ */
 };
 
-static int buffer_get_string_direct(buffer_t *buf, const char **valp, size_t *lenp);
-static int buffer_peek_string_direct(buffer_t *buf, const char **valp, size_t *lenp);
-
 // バッファのオフセットを初期化し、まだ読んでいない状態にする。
 // Tera Term(TTSSH)オリジナル関数。
 void buffer_rewind(buffer_t *buf)
@@ -259,9 +256,9 @@ int buffer_get_u8(buffer_t *buf, uint8_t *valp)
 }
 
 // from OpenSSH 10.4p1 sshbuf-getput-basic.c
-int buffer_get_string(buffer_t *buf, char **valp, size_t *lenp)
+int buffer_get_string(buffer_t *buf, u_char **valp, size_t *lenp)
 {
-	const char *val;
+	const u_char *val;
 	size_t len;
 	int r;
 
@@ -286,10 +283,10 @@ int buffer_get_string(buffer_t *buf, char **valp, size_t *lenp)
 }
 
 // from OpenSSH 10.4p1 sshbuf-getput-basic.c
-static int buffer_get_string_direct(buffer_t *buf, const char **valp, size_t *lenp)
+int buffer_get_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp)
 {
 	size_t len;
-	const char *p;
+	const u_char *p;
 	int r;
 
 	if (valp != NULL)
@@ -311,10 +308,10 @@ static int buffer_get_string_direct(buffer_t *buf, const char **valp, size_t *le
 }
 
 // from OpenSSH 10.4p1 sshbuf-getput-basic.c
-static int buffer_peek_string_direct(buffer_t *buf, const char **valp, size_t *lenp)
+int buffer_peek_string_direct(buffer_t *buf, const u_char **valp, size_t *lenp)
 {
 	uint32_t len;
-	const char *p = buffer_tail_ptr(buf);
+	const u_char *p = (const u_char *)buffer_tail_ptr(buf);
 
 	if (valp != NULL)
 		*valp = NULL;
@@ -337,6 +334,62 @@ static int buffer_peek_string_direct(buffer_t *buf, const char **valp, size_t *l
 		*valp = p + 4;
 	if (lenp != NULL)
 		*lenp = len;
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf-getput-basic.c
+int buffer_get_cstring(buffer_t *buf, char **valp, size_t *lenp)
+{
+	size_t len;
+	const u_char *p, *z;
+	int r;
+
+	if (valp != NULL)
+		*valp = NULL;
+	if (lenp != NULL)
+		*lenp = 0;
+	if ((r = buffer_peek_string_direct(buf, &p, &len)) != 0)
+		return r;
+	/* Allow a \0 only at the end of the string */
+	if (len > 0 && (z = memchr(p, '\0', len)) != NULL && z < p + len - 1) {
+		logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_INVALID_FORMAT", __FUNCTION__);
+		return SSH_ERR_INVALID_FORMAT;
+	}
+	if ((r = buffer_skip_string(buf)) != 0)
+		return -1;
+	if (valp != NULL) {
+		if ((*valp = malloc(len + 1)) == NULL) {
+			logprintf(LOG_LEVEL_ERROR, "%s: SSH_ERR_ALLOC_FAIL", __FUNCTION__);
+			return SSH_ERR_ALLOC_FAIL;
+		}
+		if (len != 0)
+			memcpy(*valp, p, len);
+		(*valp)[len] = '\0';
+	}
+	if (lenp != NULL)
+		*lenp = (size_t)len;
+	return 0;
+}
+
+// from OpenSSH 10.4p1 sshbuf-getput-basic.c
+// buffer_reserve() で v の offset は進まないため、
+// このあと v の末尾に buffer_put するには buffer_consume() が必要
+int buffer_get_stringb(buffer_t *buf, buffer_t *v)
+{
+	uint32_t len;
+	u_char *p;
+	int r;
+
+	/*
+	 * Use sshbuf_peek_string_direct() to figure out if there is
+	 * a complete string in 'buf' and copy the string directly
+	 * into 'v'.
+	 */
+	if ((r = buffer_peek_string_direct(buf, NULL, NULL)) != 0 ||
+	    (r = buffer_get_u32(buf, &len)) != 0 ||
+	    (r = buffer_reserve(v, len, (char **)&p)) != 0 ||
+	    (r = buffer_get(buf, p, len)) != 0)
+		return r;
 	return 0;
 }
 
@@ -487,7 +540,7 @@ error:
 //   sshbuf_get_bignum2() + sshbuf_get_bignum2_bytes_direct()
 int buffer_get_bignum2(buffer_t *buf, BIGNUM *v)
 {
-	const char *d;
+	const u_char *d;
 	const unsigned char *p;
 	size_t len;
 	int r;
@@ -610,7 +663,7 @@ error:
 //   sshbuf_get_ec() + get_ec()
 int buffer_get_ec(buffer_t *buf, EC_POINT *v, const EC_GROUP *g)
 {
-	const char *d;
+	const u_char *d;
 	const unsigned char *p;
 	size_t len;
 	int r;
