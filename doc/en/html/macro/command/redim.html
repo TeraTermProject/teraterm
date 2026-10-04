@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>redim</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+<h1>redim</h1>
+
+Resizes the array of a user variable. <em>(version 5.8.0 or later)</em>
+
+<pre class="macro-syntax">
+redim &lt;array&gt; &lt;size&gt; ['Preserve']
+</pre>
+
+<h2>Parameters</h2>
+
+<dl>
+  <dt class="macro">Array &lt;array&gt;</dt>
+  <dd>Integer array or String array.</dd>
+  <dt class="macro">Integer &lt;size&gt;</dt>
+  <dd>Array size (1-65536).</dd>
+  <dt class="macro">String 'Preserve'</dt>
+  <dd>Optional. If omitted, existing data is initialized.<br>
+      Specifying 'Preserve' changes the array size while preserving existing data.<br>
+      If the specified array size is smaller than the original size, the elements in the truncated portion are removed.</dd>
+</dl>
+
+<h2>Return Value</h2>
+
+None.
+
+<h2>Remarks</h2>
+
+Changes the size of an Integer array or a String array.<br>
+Cannot be used with system variables or unused variables.
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+strdim strarray 1                 ; Array declaration is required.
+
+for size 1 65536
+  redim strarray size 'Preserve'  ; Resize the array while preserving existing data.
+  index = size - 1
+  sprintf2 title 'element : %d' index
+  inputbox 'Input finished without data.' title
+  strcompare inputstr ''
+  if result = 0 then
+    goto show_listbox
+  endif
+  strarray[index] = inputstr
+next
+
+:show_listbox
+listbox 'Input data' 'strarray' strarray
+</pre>
+
+<h2>See also</h2>
+
+<ul>
+  <li><a href="../syntax/variables.html">Variables</a></li>
+  <li><a href="../command/strdim.html">strdim</a></li>
+  <li><a href="../command/intdim.html">intdim</a></li>
+</ul>
+
+</body>
+</html>
