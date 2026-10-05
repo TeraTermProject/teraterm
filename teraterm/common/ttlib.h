@@ -139,7 +139,7 @@ DllExport BOOL HasBalloonTipSupport();
 DllExport char *mctimelocal(const char *format, BOOL utc_flag);
 wchar_t *ttstrftime(const wchar_t *format, BOOL utc_flag);
 char *strelapsed(DWORD start_time);
-wchar_t *strelapsedW(DWORD start_time);
+wchar_t *strelapsedW(ULONGLONG start_time);
 
 void b64encode(PCHAR dst, int dsize, PCHAR src, int len);
 DllExport int b64decode(PCHAR dst, int dsize, PCHAR src);

@@ -872,7 +872,7 @@ typedef struct {
 
 	void *NotifyIcon;
 
-	DWORD ConnectedTime;
+	DWORD reserve_ConnectedTime;
 
 	void (*reserve_Log1Byte)(BYTE b);	// FLogPutANSI() を直接呼ぶよう変更
 	void (*reserve_Log1Bin)(BYTE b);	// FLogPutBinary() を直接呼ぶよう変更
@@ -884,6 +884,8 @@ typedef struct {
 
 	void *StateSend;
 	void *StateEcho;
+
+	ULONGLONG ConnectedTime;	// 接続開始 tick
 } TComVar;
 typedef TComVar *PComVar;
 

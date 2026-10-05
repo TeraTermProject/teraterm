@@ -186,6 +186,7 @@ extern LANGID (WINAPI *pGetUserDefaultUILanguage)(void);
 extern BOOL (WINAPI *pCreateTimerQueueTimer)(PHANDLE phNewTimer, HANDLE TimerQueue, WAITORTIMERCALLBACK Callback,
 											PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags);
 extern BOOL(WINAPI *pDeleteTimerQueueTimer)(HANDLE TimerQueue, HANDLE Timer, HANDLE CompletionEvent);
+extern ULONGLONG (WINAPI *pGetTickCount64)(void);
 
 #if !defined(LOAD_LIBRARY_SEARCH_SYSTEM32)
 #define LOAD_LIBRARY_SEARCH_SYSTEM32        0x00000800
