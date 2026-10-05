@@ -740,6 +740,9 @@ BOOL PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 	return FALSE;
 }
 
+/*
+ * プラグインの終了処理と DLL の解放
+ */
 void PASCAL TTXEnd(void)
 {
 	int i;
