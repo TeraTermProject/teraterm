@@ -38,11 +38,6 @@
   <li>変更
     <ul>
       <li>
-        ログのタイムスタンプの経過時間(ログ開始から,接続開始から)を64bitに変更した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1339" target="_blank">issue #1339</a>)<br>
-        以前は32bitで、最大約49.7日だった。
-      </li>
-      <li>
         <a href="../menu/setup-additional-window.html#Title">ローカルタイトル</a>
         (<a href="../commandline/teraterm.html#w">/W=</a> コマンドラインオプション,
         <a href="../macro/command/settitle.html">settitle</a> マクロコマンド)を
@@ -76,6 +71,11 @@
 
   <li>バグ修正
     <ul>
+      <li>
+        ログのタイムスタンプの経過時間(ログ開始から,接続開始から)が、約49.7日を超えると0に戻る問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1339" target="_blank">issue #1339</a>)<br>
+        内部で32bitから64bitに変更した。
+      </li>
       <li>
         プラグインが表示したメッセージボックスなどが開いたまま Tera Term が閉じられると、
         実行しようとしたプラグインのコードが解放済みで異常終了する不具合を修正した。

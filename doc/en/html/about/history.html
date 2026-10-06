@@ -38,11 +38,6 @@
   <li>Changes
     <ul>
       <li>
-        Changed the elapsed time of log timestamps (since log start, since connection) to 64bit.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1339" target="_blank">issue #1339</a>)<br>
-        Previously it was 32bit, up to about 49.7 days.
-      </li>
-      <li>
         Changed the <a href="../menu/setup-additional-window.html#Title">local title</a>
         (<a href="../commandline/teraterm.html#w">/W=</a> command line option,
         <a href="../macro/command/settitle.html">settitle</a> macro command)
@@ -76,6 +71,11 @@
 
   <li>Bug fixes
     <ul>
+      <li>
+        Fixed an issue where the elapsed time in log timestamps (since log start and since connection start) reset to 0 after approximately 49.7 days.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1339" target="_blank">issue #1339</a>)<br>
+        Internally changed the elapsed time from 32-bit to 64-bit.
+      </li>
       <li>
         Fixed an issue where Tera Term crashed when it was closed while a message box or similar shown by a plugin was still open,
         because the plugin code to be executed had already been unloaded.
