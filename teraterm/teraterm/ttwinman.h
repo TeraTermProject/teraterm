@@ -40,6 +40,8 @@ void VTActivate();
 void ChangeTitle(void);
 void SetLocalTitle(const wchar_t *title);
 const wchar_t *GetLocalTitle(void);
+void SetConnectHostName(const wchar_t *hostname);
+const wchar_t *GetConnectHostName(void);
 void SwitchMenu();
 void SwitchTitleBar();
 HMODULE LoadHomeDLL(const wchar_t *DLLname);

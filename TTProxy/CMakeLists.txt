@@ -48,6 +48,7 @@ target_sources(
   ../teraterm/common/tt-version.h
   ../teraterm/common/codeconv.h
   ../teraterm/common/dlglib.h
+  ../teraterm/common/idn.h
   ../teraterm/teraterm/ttdialog.h
   ../teraterm/teraterm/ttfileio.h
   ../teraterm/teraterm/ttsetup.h

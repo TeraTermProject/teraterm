@@ -37,14 +37,13 @@
 #include "tt_res.h"		// ID_FILE_EXIT
 #include "ttwsk.h"
 #include "asprintf.h"
-#include "codeconv.h"
 #include "WSAAsyncGetAddrInfo.h"
 #include "name_resolve.h"
 
 struct name_resolve_st {
 	HWND notify_wnd;     // 完了通知先ウィンドウ
 	UINT notify_msg;     // 完了通知メッセージ
-	HANDLE task;         // PWSAAsyncGetAddrInfo() のタスクハンドル
+	HANDLE task;         // PWSAAsyncGetAddrInfoW() のタスクハンドル
 };
 
 DWORD NameResolveStart(name_resolve_t **nr, HWND notify_wnd, UINT notify_msg,
@@ -71,17 +70,9 @@ DWORD NameResolveStart(name_resolve_t **nr, HWND notify_wnd, UINT notify_msg,
 	hints.ai_family = protocol_family;
 	hints.ai_socktype = socktype;
 	hints.ai_protocol = (socktype == SOCK_DGRAM) ? IPPROTO_UDP : IPPROTO_TCP;
-#if 0
 	wchar_t *pname;
 	aswprintf(&pname, L"%d", port);
-	r->task = WSAAsyncGetAddrInfoW(notify_wnd, notify_msg, host, pname, &hints, res);
-#else
-	char *pname;
-	asprintf(&pname, "%d", port);
-	char *hostA = ToCharW(host);
-	r->task = PWSAAsyncGetAddrInfo(notify_wnd, notify_msg, hostA, pname, &hints, res);
-	free(hostA);
-#endif
+	r->task = PWSAAsyncGetAddrInfoW(notify_wnd, notify_msg, host, pname, &hints, res);
 	free(pname);
 	if (r->task == 0) {
 		free(r);

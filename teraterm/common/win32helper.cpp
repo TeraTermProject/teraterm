@@ -533,3 +533,39 @@ DWORD hGetDlgItemLVTextW(HWND hDlg, int id, int item, int subitem, wchar_t **tex
 		buf_len += 128;
 	}
 }
+
+/**
+ *	IdnToAscii() の結果を malloc したバッファで返す
+ *
+ *	@param[in]	unicode	Unicode のドメイン名
+ *	@param[out]	ascii	ACE 形式 (xn--) のドメイン名
+ *						不要になったら free() すること
+ *						エラー時は NULL
+ *	@retval		NO_ERROR					成功
+ *	@retval		ERROR_CALL_NOT_IMPLEMENTED	IdnToAscii() が使用できない(Normaliz.dll がない)
+ *	@retval		その他						GetLastError() の値
+ */
+DWORD hIdnToAscii(const wchar_t *unicode, wchar_t **ascii)
+{
+	*ascii = NULL;
+	if (pIdnToAscii == NULL) {
+		return ERROR_CALL_NOT_IMPLEMENTED;
+	}
+
+	int len = pIdnToAscii(0, unicode, -1, NULL, 0);
+	if (len == 0) {
+		return GetLastError();
+	}
+	wchar_t *buf = (wchar_t *)malloc(sizeof(wchar_t) * len);
+	if (buf == NULL) {
+		return ERROR_NOT_ENOUGH_MEMORY;
+	}
+	len = pIdnToAscii(0, unicode, -1, buf, len);
+	if (len == 0) {
+		DWORD error = GetLastError();
+		free(buf);
+		return error;
+	}
+	*ascii = buf;
+	return NO_ERROR;
+}

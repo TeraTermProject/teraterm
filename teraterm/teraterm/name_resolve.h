@@ -31,7 +31,7 @@
  *
  *	CommOpen() に埋め込まれていた名前解決(非同期 getaddrinfo +
  *	完了待ちのメッセージポンプ + キャンセル)を切り出したもの。
- *	内部でフック済みの PWSAAsyncGetAddrInfo()(TTPLUG フック対応。
+ *	内部でフック済みの PWSAAsyncGetAddrInfoW()(TTPLUG フック対応。
  *	TTProxy がプロキシ経由の解決に差し替え得る)を呼ぶため、
  *	完了通知は「HWND + ウィンドウメッセージ」形式を維持している。
  *

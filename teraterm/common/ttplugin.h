@@ -57,7 +57,8 @@ typedef struct {
   TWSAGetLastError * PWSAGetLastError;
 //  Tgetaddrinfo * Pgetaddrinfo;
   Tfreeaddrinfo * Pfreeaddrinfo;
-  TWSAAsyncGetAddrInfo * PWSAAsyncGetAddrInfo;
+  TWSAAsyncGetAddrInfo * PWSAAsyncGetAddrInfo;	// 互換のため残している。Tera Term 本体は呼ばない
+  TWSAAsyncGetAddrInfoW * PWSAAsyncGetAddrInfoW;
 } TTXSockHooks;
 
 typedef struct {
@@ -103,6 +104,18 @@ typedef struct {
 	 *	ローカルタイトルを取得する
 	 */
 	const wchar_t *(*GetLocalTitle)(void);
+
+	/**
+	 *	接続先ホスト名を設定する
+	 *
+	 *	ts->HostNameW と ts->HostName(ANSI) の両方が設定される
+	 */
+	void (*SetConnectHostName)(const wchar_t *hostname);
+
+	/**
+	 *	接続先ホスト名を取得する
+	 */
+	const wchar_t *(*GetConnectHostName)(void);
 } TTXImports;
 
 /**
@@ -120,7 +133,7 @@ typedef struct {
   void (PASCAL * TTXModifyMenu)(HMENU menu); /* called first to last */
   void (PASCAL * TTXModifyPopupMenu)(HMENU menu); /* called first to last */
   int (PASCAL * TTXProcessCommand)(HWND hWin, WORD cmd); /* returns TRUE if handled, called last to first */
-  void (PASCAL * TTXEnd)(void); /* called last to first */
+  void (PASCAL * TTXEnd)(void); /* called last to first, VTWinが破棄され、メッセージループが終了した後に呼び出されます。 */
   void (PASCAL * TTXSetCommandLine)(wchar_t *cmd, int cmdlen, PGetHNRec rec); /* called first to last */
   void (PASCAL * TTXOpenFile)(TTXFileHooks * hooks); /* called first to last */
   void (PASCAL * TTXCloseFile)(TTXFileHooks * hooks); /* called last to first */

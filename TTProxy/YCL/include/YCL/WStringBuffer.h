@@ -70,9 +70,9 @@ private:
 			buffer = new wchar_t[bufferSize];
 		}
 		if (source != NULL) {
-			memcpy(buffer, source, validLength);
+			memcpy(buffer, source, sizeof(wchar_t) * validLength);
 		}
-		memset(buffer + validLength, '\0', bufferSize - validLength);
+		memset(buffer + validLength, 0, sizeof(wchar_t) * (bufferSize - validLength));
 	}
 public:
 	// デフォルトコンストラクタ。
@@ -137,7 +137,7 @@ public:
 	//	index	文字の位置。
 	// 返値:
 	//	指定の位置の文字。
-	char charAt(size_t index)const {
+	wchar_t charAt(size_t index)const {
 		return index < validLength ? buffer[index] : '\0';
 	}
 	// 指定の位置の文字を取得する。
@@ -156,7 +156,7 @@ public:
 	// 引数:
 	//	index	変更する文字の位置。
 	//	chr	変更する文字。
-	void setCharAt(int index, char chr) {
+	void setCharAt(int index, wchar_t chr) {
 		charAt(index) = chr;
 	}
 	// 文字を追加する。
@@ -185,7 +185,7 @@ public:
 	WStringBuffer& append(const wchar_t* source, size_t length) {
 		size_t oldLength = validLength;
 		ensureCapacity(validLength + length);
-		memcpy(buffer + oldLength, source, length);
+		memcpy(buffer + oldLength, source, sizeof(wchar_t) * length);
 		validLength += length;
 		return *this;
 	}
@@ -206,7 +206,7 @@ public:
 	WStringBuffer& remove(size_t start, size_t end) {
 		if (start < end) {
 			if (end < validLength){
-				memcpy(buffer + start, buffer + end, validLength - end);
+				memmove(buffer + start, buffer + end, sizeof(wchar_t) * (validLength - end));
 				validLength -= end - start;
 			}else{
 				validLength = start;
@@ -221,15 +221,15 @@ public:
 	//	source	置換する文字列。
 	// 返値:
 	//	置換結果。
-	WStringBuffer& replace(size_t start, size_t end, const char* source) {
+	WStringBuffer& replace(size_t start, size_t end, const wchar_t* source) {
 		if (end > validLength)
 			end = validLength;
 		if (start < end) {
-			size_t length = strlen(source);
+			size_t length = wcslen(source);
 			size_t oldLength = validLength;
 			ensureCapacity(validLength += length - (end - start));
-			memcpy(buffer + start + length, buffer + end, oldLength - end);
-			memcpy(buffer + start, source, length);
+			memmove(buffer + start + length, buffer + end, sizeof(wchar_t) * (oldLength - end));
+			memcpy(buffer + start, source, sizeof(wchar_t) * length);
 		}
 		return *this;
 	}
@@ -258,7 +258,7 @@ public:
 	//	source	挿入する文字。
 	// 返値:
 	//	挿入結果。
-	WStringBuffer& insert(size_t index, char chr) {
+	WStringBuffer& insert(size_t index, wchar_t chr) {
 		return insert(index, &chr, 1);
 	}
 	// 指定の位置に文字列を挿入する。
@@ -267,8 +267,8 @@ public:
 	//	source	挿入する文字列。
 	// 返値:
 	//	挿入結果。
-	WStringBuffer& insert(size_t index, const char* source) {
-		return insert(index, source, strlen(source));
+	WStringBuffer& insert(size_t index, const wchar_t* source) {
+		return insert(index, source, wcslen(source));
 	}
 	// 指定の位置に文字列を挿入する。
 	// 引数:
@@ -277,15 +277,15 @@ public:
 	//	length	文字列の長さ。
 	// 返値:
 	//	挿入結果。
-	WStringBuffer& insert(size_t index, const char* source, size_t length) {
+	WStringBuffer& insert(size_t index, const wchar_t* source, size_t length) {
 		if (index >= validLength)
 			index = validLength;
 		size_t oldLength = validLength;
 		ensureCapacity(validLength + length);
-		char* temp = (char*) alloca(oldLength - index);
-		memcpy(temp, buffer + index, oldLength - index);
-		memcpy(buffer + index, source, length);
-		memcpy(buffer + index + length, temp, oldLength - index);
+		wchar_t* temp = (wchar_t*) alloca(sizeof(wchar_t) * (oldLength - index));
+		memcpy(temp, buffer + index, sizeof(wchar_t) * (oldLength - index));
+		memcpy(buffer + index, source, sizeof(wchar_t) * length);
+		memcpy(buffer + index + length, temp, sizeof(wchar_t) * (oldLength - index));
 		validLength += length;
 		return *this;
 	}
@@ -322,7 +322,7 @@ public:
 	//	変更する一文字。
 	// 返値:
 	//	変更結果。
-	WStringBuffer& set(char chr) {
+	WStringBuffer& set(wchar_t chr) {
 		ensureCapacity(1);
 		buffer[0] = chr;
 		validLength = 1;
@@ -333,10 +333,10 @@ public:
 	//	source	変更する文字列。
 	// 返値:
 	//	変更結果。
-	WStringBuffer& set(const char* source) {
-		size_t length = strlen(source);
+	WStringBuffer& set(const wchar_t* source) {
+		size_t length = wcslen(source);
 		ensureCapacity(validLength = length);
-		memcpy(buffer, source, length);
+		memcpy(buffer, source, sizeof(wchar_t) * length);
 		return *this;
 	}
 
@@ -360,7 +360,7 @@ public:
 	//	ch	変更する一文字。
 	// 返値:
 	//	代入結果。
-	WStringBuffer& operator=(char ch) {
+	WStringBuffer& operator=(wchar_t ch) {
 		return set(ch);
 	}
 	// 代入演算子。
@@ -369,7 +369,7 @@ public:
 	//	source	変更する文字列。
 	// 返値:
 	//	代入結果。
-	WStringBuffer& operator=(const char* source) {
+	WStringBuffer& operator=(const wchar_t* source) {
 		return set(source);
 	}
 	// 連結代入演算子。
@@ -378,7 +378,7 @@ public:
 	//	ch	追加する文字。
 	// 返値:
 	//	代入結果。
-	WStringBuffer& operator+=(char ch) {
+	WStringBuffer& operator+=(wchar_t ch) {
 		return append(ch);
 	}
 	// 連結代入演算子。

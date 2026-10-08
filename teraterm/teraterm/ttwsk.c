@@ -57,6 +57,7 @@ TWSACleanup PWSACleanup;
 // Tgetaddrinfo Pgetaddrinfo;
 Tfreeaddrinfo Pfreeaddrinfo;
 TWSAAsyncGetAddrInfo PWSAAsyncGetAddrInfo;
+TWSAAsyncGetAddrInfoW PWSAAsyncGetAddrInfoW;
 
 void CheckWinsock()
 {
@@ -181,6 +182,7 @@ BOOL LoadWinsock()
 
     Pfreeaddrinfo = freeaddrinfo;
     PWSAAsyncGetAddrInfo = WSAAsyncGetAddrInfo;
+    PWSAAsyncGetAddrInfoW = WSAAsyncGetAddrInfoW;
 
     if (Err)
     {

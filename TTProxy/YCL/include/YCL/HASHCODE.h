@@ -16,10 +16,18 @@ private:
 			h = h * 31 + *value++;
 		return h;
 	}
+	static int generateHashCode(const wchar_t* value) {
+		int h = 0;
+		while (*value != '\0')
+			h = h * 31 + *value++;
+		return h;
+	}
 
 	int value;
 public:
 	HASHCODE(const char* value):value(generateHashCode(value)) {
+	}
+	HASHCODE(const wchar_t* value):value(generateHashCode(value)) {
 	}
 	HASHCODE(const HASHCODE& code):value(code.value) {
 	}

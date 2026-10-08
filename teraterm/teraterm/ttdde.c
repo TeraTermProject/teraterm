@@ -658,7 +658,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{ // TTMACRO is waiting for connecting to the host
 			// シリアル接続で自動接続が無効の場合は、接続ダイアログを出さない (2006.9.15 maya)
 			if (!((ts.PortType==IdSerial) && (ts.ComAutoConnect == FALSE)) &&
-				((ts.PortType==IdSerial) || (ts.HostName[0]!=0)))
+				((ts.PortType==IdSerial) || (GetConnectHostName()[0]!=0)))
 			{
 				cv.NoMsg = 1;
 				// start connecting
@@ -1125,7 +1125,9 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	case CmdGetHostname:  // add 'gethostname' (2008.12.15 maya)
 		if (cv.Open) {
 			if (cv.PortType == IdTCPIP) {
-				strncpy_s(ParamFileName, sizeof(ParamFileName),ts.HostName, _TRUNCATE);
+				char *hostnameU8 = ToU8W(GetConnectHostName());
+				strncpy_s(ParamFileName, sizeof(ParamFileName), hostnameU8, _TRUNCATE);
+				free(hostnameU8);
 			}
 			else if (cv.PortType == IdSerial) {
 				_snprintf_s(ParamFileName, sizeof(ParamFileName), _TRUNCATE, "COM%d", ts.ComPort);
