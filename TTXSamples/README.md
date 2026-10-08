@@ -34,7 +34,7 @@
 - [ReadMe.txt](TTXCommandLineOpt/ReadMe.txt)
 - [ReadMe-ja.txt](TTXCommandLineOpt/ReadMe-ja.txt)
 
-## TTXCopyIniFile
+## TTXCopyIniFile (deprecated)
 
 - [ReadMe.txt](TTXCopyIniFile/ReadMe.txt)
 - [ReadMe-ja.txt](TTXCopyIniFile/ReadMe-ja.txt)
