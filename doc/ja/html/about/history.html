@@ -38,19 +38,53 @@
   <li>変更
     <ul>
       <li>
-        ログのタイムスタンプの経過時間(ログ開始から,接続開始から)を64bitに変更した。
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1339" target="_blank">issue #1339</a>)<br>
-        以前は32bitで、最大約49.7日だった。
+        <a href="../menu/setup-additional-window.html#Title">ローカルタイトル</a>
+        (<a href="../commandline/teraterm.html#w">/W=</a> コマンドラインオプション,
+        <a href="../macro/command/settitle.html">settitle</a> マクロコマンド)を
+        Unicode で扱うようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)<br>
+        変更前はローカルタイトルを ANSI 文字列で保持していたため、変換できない文字は "?" に置き換えられていた。
+      </li>
+      <li>
+        プラグインから Tera Term の関数を呼び出せるようにした。<br>
+        TTXExports に TTXInit2() を追加、Tera Term の関数のポインタを持つ TTXImports を
+        プラグインから取得できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)<br>
+      </li>
+      <li>
+        接続先ホスト名を Unicode で扱うようにし、国際化ドメイン名(IDN,Internationalized Domain Name)のホストへ接続できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        変更前は ANSI 文字列で保持していたため、変換できない文字は "?" に置き換えられていた。<br>
+        接続先ホスト名を Unicode で保持し、名前解決時に Punycode(ACE 形式) へ変換して DNS へ問い合わせるようにした。
+      </li>
+      <li>
+        プラグイン(TTX)のソケットフック TTXSockHooks に、ホスト名,ポート名を UTF-16 で受け取る PWSAAsyncGetAddrInfoW を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        従来の PWSAAsyncGetAddrInfo は互換のため残しているが、Tera Term からは呼ばれなくなった。
+      </li>
+      <li>
+        TTXImports に、接続先ホスト名を Unicode で設定、取得する SetConnectHostName(), GetConnectHostName() を追加した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)
       </li>
     </ul>
   </li>
 
-  <!--li>バグ修正
+  <li>バグ修正
     <ul>
       <li>
+        ログのタイムスタンプの経過時間(ログ開始から,接続開始から)が、約49.7日を超えると0に戻る問題を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1339" target="_blank">issue #1339</a>)<br>
+        内部で32bitから64bitに変更した。
+      </li>
+      <li>
+        プラグインが表示したメッセージボックスなどが開いたまま Tera Term が閉じられると、
+        実行しようとしたプラグインのコードが解放済みで異常終了する不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1556" target="_blank">issue #1556</a>)<br>
+        プラグインの終了処理 TTXEnd() をメッセージループ終了後に行うようにした。
+        TTXEnd() が呼ばれる時点でメインウィンドウは既に破棄されている。
       </li>
     </ul>
-  </li-->
+  </li>
 
   <li>その他
     <ul>
@@ -58,6 +92,14 @@
       <li>
         TTXCopyIniFile プラグインと同等の機能が既に Tera Term に実装済みのため、ビルド対象から除外した。
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1544" target="_blank">issue #1544</a>)
+      <li><a href="#ttproxy_1.0.0.28">TTProxy 1.0.0.28</a> へ差し替えた。</li>
+      <li>
+        インストーラーで現在のユーザー用にインストールした時、.ttl などの拡張子の関連付けや、ssh などの URL の関連付けが行われない不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1562" target="_blank">issue #1562</a>)
+      </li>
+      <li>
+        インストーラーで ssh の URL の関連付けだけを選択し telnet を選択しなかったとき、ssh の関連付けの登録が不完全になる不具合を修正した。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1562" target="_blank">issue #1562</a>)
       </li>
     </ul>
   </li>
@@ -4376,12 +4418,15 @@
     </ul>
   </li>
 
-  <!--li>その他
+  <li>その他
     <ul>
       <li>
+        LibreSSL 4.3.3 へ差し替え、ARM64 で特定の場合に SSH 接続できない不具合が解消された。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1567" target="_blank">issue #1567</a>,
+        <a href="https://github.com/TeraTermProject/teraterm/issues/1554" target="_blank">issue #1554</a>)
       </li>
     </ul>
-  </li-->
+  </li>
 </ul>
 
 <h3 id="ttssh_3.7.0">2026.09.04 (Ver 3.7.0)</h3>
@@ -6493,6 +6538,23 @@
 
 <h2 id="ttproxy">TTProxy</h2>
 
+<h3 id="ttproxy_1.0.0.28">YYYY.MM.DD (Ver 1.0.0.28 not released yet)</h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>
+        プロキシのホスト名を Unicode で扱うようにした(設定ダイアログ、設定ファイルの ProxyHost)。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)
+      </li>
+      <li>
+        国際化ドメイン名(IDN)のホストへプロキシ経由で接続できるようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        ASCII 以外の文字を含むホスト名は、ACE 形式(xn--)に変換してプロキシサーバへ送る。
+      </li>
+    </ul>
+  </li>
+</ul>
+
 <h3 id="ttproxy_1.0.0.27">2025.08.03 (Ver 1.0.0.27)</h3>
 <ul class="history">
   <li>バグ修正
@@ -6981,6 +7043,14 @@
 </ul>
 
 <h2 id="ttyrec">TTXttyrec</h2>
+<h3 id="ttyrec_1.08">YYYY.MM.DD (Ver 1.08 not released yet)</h3>
+<ul class="history">
+  <li>
+    タイトルバーの表示を Unicode で扱うようにした。
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)
+  </li>
+</ul>
+
 <h3 id="ttyrec_1.07">2026.09.04 (Ver 1.07)</h3>
 <ul class="history">
   <li>

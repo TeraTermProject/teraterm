@@ -441,6 +441,7 @@
     <ClCompile Include="logdlg.cpp" />
     <ClCompile Include="log_pp.cpp" />
     <ClCompile Include="mouse_pp.cpp" />
+    <ClCompile Include="name_resolve.c" />
     <ClCompile Include="plugin_pp.cpp" />
     <ClCompile Include="scp.cpp" />
     <ClCompile Include="sendfiledlg.cpp" />
@@ -519,6 +520,7 @@
     <ClInclude Include="logdlg.h" />
     <ClInclude Include="log_pp.h" />
     <ClInclude Include="mouse_pp.h" />
+    <ClInclude Include="name_resolve.h" />
     <ClInclude Include="plugin_pp.h" />
     <ClInclude Include="plugin_pp_res.h" />
     <ClInclude Include="scp.h" />

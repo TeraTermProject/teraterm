@@ -38,19 +38,53 @@
   <li>Changes
     <ul>
       <li>
-        Changed the elapsed time of log timestamps (since log start, since connection) to 64bit.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1339" target="_blank">issue #1339</a>)<br>
-        Previously it was 32bit, up to about 49.7 days.
+        Changed the <a href="../menu/setup-additional-window.html#Title">local title</a>
+        (<a href="../commandline/teraterm.html#w">/W=</a> command line option,
+        <a href="../macro/command/settitle.html">settitle</a> macro command)
+        to be handled in Unicode.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)<br>
+        Previously it was held as an ANSI string, and characters that could not be converted were replaced with "?".
+      </li>
+      <li>
+        Added support for plugins to call Tera Term functions.<br>
+        Added TTXInit2() to TTXExports so that plugins can obtain TTXImports,
+        which holds pointers to Tera Term functions.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)
+      </li>
+      <li>
+        Changed the connection host name to be handled in Unicode, and supported connecting to hosts with Internationalized Domain Names (IDN).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        Previously it was held as an ANSI string, and characters that could not be converted were replaced with "?".<br>
+        The host name is held in Unicode and converted to Punycode (ACE form) for the DNS query.
+      </li>
+      <li>
+        Added PWSAAsyncGetAddrInfoW, which receives the host name and port name in UTF-16, to the plug-in (TTX) socket hooks TTXSockHooks.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        The existing PWSAAsyncGetAddrInfo is kept for compatibility but is no longer called by Tera Term.
+      </li>
+      <li>
+        Added SetConnectHostName() and GetConnectHostName(), which set and get the connection host name in Unicode, to TTXImports.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)
       </li>
     </ul>
   </li>
 
-  <!--li>Bug fixes
+  <li>Bug fixes
     <ul>
       <li>
+        Fixed an issue where the elapsed time in log timestamps (since log start and since connection start) reset to 0 after approximately 49.7 days.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1339" target="_blank">issue #1339</a>)<br>
+        Internally changed the elapsed time from 32-bit to 64-bit.
+      </li>
+      <li>
+        Fixed an issue where Tera Term crashed when it was closed while a message box or similar shown by a plugin was still open,
+        because the plugin code to be executed had already been unloaded.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1556" target="_blank">issue #1556</a>)<br>
+        The plugin termination TTXEnd() is now called after the message loop has ended.
+        The main window has already been destroyed when TTXEnd() is called.
       </li>
     </ul>
-  </li-->
+  </li>
 
   <li>Misc
     <ul>
@@ -58,6 +92,14 @@
       <li>
         Removed the TTXCopyIniFile plugin from the build, as equivalent functionality is already implemented in Tera Term.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1544" target="_blank">issue #1544</a>)
+      <li>Upgraded TTProxy to <a href="#ttproxy_1.0.0.28">1.0.0.28</a>.</li>
+      <li>
+        Fixed an issue where file extension associations such as .ttl and URL associations such as ssh were not registered when the installer installed Tera Term for the current user only.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1562" target="_blank">issue #1562</a>)
+      </li>
+      <li>
+        Fixed an issue where the ssh URL association was registered incompletely when ssh was selected but telnet was not selected in the installer.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1562" target="_blank">issue #1562</a>)
       </li>
     </ul>
   </li>
@@ -4368,12 +4410,15 @@ SYNOPSIS:
     </ul>
   </li>
 
-  <!--li>Misc
+  <li>Misc
     <ul>
       <li>
+        Upgraded LibreSSL to 4.3.3, resolving an issue where SSH connections could fail in certain cases on ARM64.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1567" target="_blank">issue #1567</a>,
+        <a href="https://github.com/TeraTermProject/teraterm/issues/1554" target="_blank">issue #1554</a>)
       </li>
     </ul>
-  </li-->
+  </li>
 </ul>
 
 <h3 id="ttssh_3.7.0">2026.09.04 (Ver 3.7.0)</h3>
@@ -6486,6 +6531,23 @@ SYNOPSIS:
 
 <h2 id="ttproxy">TTProxy</h2>
 
+<h3 id="ttproxy_1.0.0.28">YYYY.MM.DD (Ver 1.0.0.28 not released yet)</h3>
+<ul class="history">
+  <li>Changes
+    <ul>
+      <li>
+        Changed the proxy host name to be handled in Unicode (setup dialog, ProxyHost in the setup file).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)
+      </li>
+      <li>
+        Supported connecting to hosts with Internationalized Domain Names (IDN) via a proxy.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        Host names containing non-ASCII characters are converted to ACE form (xn--) before being sent to the proxy server.
+      </li>
+    </ul>
+  </li>
+</ul>
+
 <h3 id="ttproxy_1.0.0.27">2025.08.03 (Ver 1.0.0.27)</h3>
 <ul class="history">
   <li>Bug fixes
@@ -6970,6 +7032,14 @@ SYNOPSIS:
 </ul>
 
 <h2 id="ttyrec">TTXttyrec</h2>
+<h3 id="ttyrec_1.08">YYYY.MM.DD (Ver 1.08 not released yet)</h3>
+<ul class="history">
+  <li>
+    Changed the title bar display to be handled in Unicode.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)
+  </li>
+</ul>
+
 <h3 id="ttyrec_1.07">2026.09.04 (Ver 1.07)</h3>
 <ul class="history">
   <li>

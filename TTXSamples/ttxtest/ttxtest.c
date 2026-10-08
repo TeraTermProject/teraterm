@@ -94,6 +94,23 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->cv = cv;
 }
 
+static BOOL TTXInit2(PTTSet ts, PComVar cv, const TTXImports *(*GetImports)(size_t size))
+{
+	const TTXImports *imports;
+	wchar_t *p;
+	(void)ts;
+	(void)cv;
+	imports = GetImports(sizeof(TTXImports));
+	if (imports == NULL) {
+		// TTXImports が使用できなくても、このプラグインは動作させる
+		return TRUE;
+	}
+	p = _wcsdup(imports->GetLocalTitle());
+	imports->SetLocalTitle(p);
+	free(p);
+	return TRUE;
+}
+
 /* This function is called when Tera Term is opening a TCP connection, before
    any Winsock functions have actually been called.
 
@@ -386,7 +403,8 @@ static TTXExports Exports = {
   TTXEnd,
   TTXSetCommandLine,
   TTXOpenFile,
-  TTXCloseFile
+  TTXCloseFile,
+  TTXInit2,
 };
 
 /* This is the function that Tera Term calls to retrieve the export

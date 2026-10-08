@@ -190,6 +190,9 @@ static void GetSDKInfo(char *buf, size_t buf_size)
 				             //   10.0.26100.4188  May 2025
 				strncat_s(buf, buf_size, " for Windows 11 (10.0.26100)", _TRUNCATE);
 				break;
+			case 0x0A000011:  // NTDDI_WIN11_SE
+				strncat_s(buf, buf_size, " for Windows 11 (10.0.28000)", _TRUNCATE);
+				break;
 			default: {
 				char str[32];
 				sprintf_s(str, sizeof(str), " (NTDDI_VERSION=0x%08X)",

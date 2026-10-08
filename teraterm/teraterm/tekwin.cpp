@@ -678,12 +678,9 @@ void CTEKWindow::OnFilePrint()
 	if (PrintDC==NULL) {
 		return;
 	}
-	wchar_t *TitleW = ToWcharA(ts.Title);
-	if (!PrnStart(PrintDC, TitleW)) {
-		free(TitleW);
+	if (!PrnStart(PrintDC, ts.TitleW)) {
 		return;
 	}
-	free(TitleW);
 
 	(*TEKPrint)(&tk,&ts,PrintDC,Sel);
 

@@ -266,6 +266,10 @@ BOOL _SetupDiGetDevicePropertyW(HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceI
 // wintrust.dll
 extern LONG (WINAPI *pWinVerifyTrust)(HWND hwnd, GUID *pgActionID, LPVOID pWVTData);
 
+// Normaliz.dll
+extern int (WINAPI *pIdnToAscii)(DWORD dwFlags, LPCWSTR lpUnicodeCharStr, int cchUnicodeChar,
+								  LPWSTR lpASCIICharStr, int cchASCIIChar);
+
 void WinCompatInit();
 
 #ifdef __cplusplus

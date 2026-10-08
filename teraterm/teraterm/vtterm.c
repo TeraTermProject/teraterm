@@ -2674,22 +2674,23 @@ static void CSSunSequence() /* Sun terminal private sequences */
 		  case IdTitleReportAccept: {
 			wchar_t *osc_str;
 			const wchar_t *remote = (cv.TitleRemoteW == NULL) ? L"" : cv.TitleRemoteW;
+			const wchar_t *local = (ts.TitleW == NULL) ? L"" : ts.TitleW;
 			switch (ts.AcceptTitleChangeRequest) {
 			  case IdTitleChangeRequestOff:
-				aswprintf(&osc_str, L"L%hs", ts.Title);
+				aswprintf(&osc_str, L"L%s", local);
 				break;
 
 			  case IdTitleChangeRequestAhead:
-				aswprintf(&osc_str, L"L%s %hs", remote, ts.Title);
+				aswprintf(&osc_str, L"L%s %s", remote, local);
 				break;
 
 			  case IdTitleChangeRequestLast:
-				aswprintf(&osc_str, L"L%hs %s", ts.Title, remote);
+				aswprintf(&osc_str, L"L%s %s", local, remote);
 				break;
 
 			  default:
 				if (cv.TitleRemoteW == NULL) {
-					aswprintf(&osc_str, L"L%hs", ts.Title);
+					aswprintf(&osc_str, L"L%s", local);
 				}
 				else {
 					aswprintf(&osc_str, L"L%s", remote);
@@ -2715,26 +2716,27 @@ static void CSSunSequence() /* Sun terminal private sequences */
 
 		  case IdTitleReportAccept: {
 			wchar_t *osc_str;
-			wchar_t *remote = (cv.TitleRemoteW == NULL) ? L"" : cv.TitleRemoteW;
+			const wchar_t *remote = (cv.TitleRemoteW == NULL) ? L"" : cv.TitleRemoteW;
+			const wchar_t *local = (ts.TitleW == NULL) ? L"" : ts.TitleW;
 			switch (ts.AcceptTitleChangeRequest) {
 			  case IdTitleChangeRequestOff:
-				aswprintf(&osc_str, L"l%hs", ts.Title);
+				aswprintf(&osc_str, L"l%s", local);
 				break;
 
 			  case IdTitleChangeRequestAhead:
-				aswprintf(&osc_str, L"l%s %hs", remote, ts.Title);
+				aswprintf(&osc_str, L"l%s %s", remote, local);
 				break;
 
 			  case IdTitleChangeRequestLast:
-				aswprintf(&osc_str, L"l%hs %s", ts.Title, remote);
+				aswprintf(&osc_str, L"l%s %s", local, remote);
 				break;
 
 			  default:
 				if (cv.TitleRemoteW == NULL) {
-					aswprintf(&osc_str, L"l%hs", ts.Title);
+					aswprintf(&osc_str, L"l%s", local);
 				}
 				else {
-					aswprintf(&osc_str, L"l%s", cv.TitleRemoteW);
+					aswprintf(&osc_str, L"l%s", remote);
 				}
 			}
 			SendOSCstrW(osc_str, ST);
@@ -5264,7 +5266,7 @@ static void XSequence(BYTE b)
 		}
 		else if (!realloc_failed && StrBuffSize < ts.MaxOSCBufferSize) {
 			if (StrBuff == NULL || StrBuffSize == 0) {
-				new_size = sizeof(ts.Title);
+				new_size = TitleBuffSize;
 			}
 			else {
 				new_size = StrBuffSize * 2;
@@ -5837,6 +5839,13 @@ void EndTerm()
 	CLocale = NULL;
 	CharSetFinish(charset_data);
 	charset_data = NULL;
+
+	while (TitleStack != NULL) {
+		PTStack t = TitleStack;
+		TitleStack = t->next;
+		free(t->title);
+		free(t);
+	}
 }
 
 BOOL BracketedPasteMode() {

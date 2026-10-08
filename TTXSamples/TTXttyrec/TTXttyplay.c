@@ -1,17 +1,17 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <wchar.h>
+
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttplugin.h"
 #include "tt_res.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "inifile_com.h"
 #include "ttcommdlg.h"
-#include "codeconv.h"
 #include "ttlib_types.h"
+#include "asprintf.h"
 
 #include "gettimeofday.h"
 #include "autofilename.h"
@@ -22,7 +22,10 @@
 
 #define BUFFSIZE 2000
 
-#define INISECTION "ttyplay"
+// wcsftime() の出力バッファサイズ(文字数)
+// ローカルタイトル(ts->TitleW)は可変長なので TitleBuffSize とは無関係
+#define TITLEBUFFSIZE 256
+
 #define INISECTIONW L"ttyplay"
 
 #define MODE_FLAG_TIME      1
@@ -86,15 +89,15 @@ typedef struct {
 	struct timeval wait;
 	wchar_t *openfnW;
 	BOOL origTitleSaved;
-	char origTitle[TitleBuffSize];
-	char origOLDTitle[TitleBuffSize];
+	wchar_t *origOLDTitle;
 	WORD origAcceptTitleChangeRequest;
 	int mode_flag;
-	char *fmt_time;
-	char *origHostName;
+	wchar_t *fmt_time;
+	wchar_t *origHostNameW;
 	int name_cnt_ini;
 	int name_cnt;
 	struct recmarker marker[8];
+	const TTXImports *imports;
 } TInstVar;
 
 static TInstVar *pvar;
@@ -108,7 +111,8 @@ static TInstVar InstVar;
 
 static void SaveTitle() {
 	if (!pvar->origTitleSaved) {
-		strncpy_s(pvar->origOLDTitle, sizeof(pvar->origOLDTitle), pvar->ts->Title, _TRUNCATE);
+		const wchar_t *title = (pvar->ts->TitleW != NULL) ? pvar->ts->TitleW : L"";
+		pvar->origOLDTitle = _wcsdup(title);
 		pvar->origAcceptTitleChangeRequest = pvar->ts->AcceptTitleChangeRequest;
 		pvar->origTitleSaved = TRUE;
 	}
@@ -116,94 +120,80 @@ static void SaveTitle() {
 
 static void RestoreSavedTitle() {
 	if (pvar->origTitleSaved) {
-		strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), pvar->origOLDTitle, _TRUNCATE);
+		pvar->imports->SetLocalTitle(pvar->origOLDTitle);
+		free(pvar->origOLDTitle);
+		pvar->origOLDTitle = NULL;
 		pvar->ts->AcceptTitleChangeRequest = pvar->origAcceptTitleChangeRequest;
 		pvar->origTitleSaved = FALSE;
 	}
 }
 
-void RestoreOLDTitle() {
-	RestoreSavedTitle();
-	pvar->ChangeTitle = TRUE;
-	SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
-}
-
 void ChangeTitleStatus() {
-  char tbuff[TitleBuffSize];
-  char buff[TitleBuffSize];
+  wchar_t *tbuff;
   wchar_t *uimsg1, *uimsg2, *uimsg3;
-  char *msg1, *msg2, *msg3;
 
   GetI18nStrWW("TTXttyrec", "TITLE_STATUS_MSG", L"Speed: %d, Pause: %s", pvar->ts->UILanguageFileW, &uimsg1);
   GetI18nStrWW("TTXttyrec", "TITLE_STATUS_ON",  L"ON",                   pvar->ts->UILanguageFileW, &uimsg2);
   GetI18nStrWW("TTXttyrec", "TITLE_STATUS_OFF", L"OFF",                  pvar->ts->UILanguageFileW, &uimsg3);
-  msg1 = ToCharW(uimsg1);
-  msg2 = ToCharW(uimsg2);
-  msg3 = ToCharW(uimsg3);
+  aswprintf(&tbuff, uimsg1, pvar->speed, pvar->pause ? uimsg2: uimsg3);
   free(uimsg1);
   free(uimsg2);
   free(uimsg3);
-  _snprintf_s(tbuff, sizeof(tbuff), _TRUNCATE, msg1, pvar->speed, pvar->pause ? msg2: msg3);
-  free(msg1);
-  free(msg2);
-  free(msg3);
   if (pvar->loop) {
-	strncat_s(tbuff, sizeof(tbuff), ", Loop", _TRUNCATE);
+	awcscat(&tbuff, L", Loop");
   }
   if (pvar->marker[1].id) {
-	_snprintf_s(buff, sizeof(buff), _TRUNCATE, ", Marker: #%d", pvar->marker[1].id);
-	strncat_s(tbuff, sizeof(tbuff), buff, _TRUNCATE);
+	wchar_t *buff;
+	aswprintf(&buff, L", Marker: #%d", pvar->marker[1].id);
+	awcscat(&tbuff, buff);
+	free(buff);
   }
   SaveTitle();
   if (pvar->mode_flag & MODE_FLAG_AHEAD) {
     pvar->ts->AcceptTitleChangeRequest = IdTitleChangeRequestAhead;
   }
-  strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
-  pvar->ChangeTitle = TRUE;
-  SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
+  pvar->imports->SetLocalTitle(tbuff);
+  free(tbuff);
 }
 
-static BOOL GetTimeString(char *str, int size, struct timeval tv, BOOL msec) {
+static BOOL GetTimeString(wchar_t *str, size_t size, struct timeval tv, BOOL msec) {
   	time_t tvs = tv.tv_sec;
   	struct tm tm_local;
-	char fmt[40];
-	char buff[8];
-	char *p;
+	wchar_t *fmt;
+	wchar_t *p;
+	size_t len;
 
   	if (localtime_s(&tm_local, &tvs) != 0) {
 		return FALSE;
   	}
-	if (pvar->fmt_time == 0 || *pvar->fmt_time == '\0') {
+	if (pvar->fmt_time == NULL || *pvar->fmt_time == L'\0') {
 		return FALSE;
 	}
 
-	strncpy_s(fmt, sizeof(fmt), pvar->fmt_time, _TRUNCATE);
-	p = strstr(fmt, "%N");
-	if (p != NULL) {
-		*p = '\0';
-		_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%03d", tv.tv_usec/1000);
-		strncat_s(fmt, sizeof(fmt), buff, _TRUNCATE);
-		strncat_s(fmt, sizeof(fmt), pvar->fmt_time - fmt + p + 2, _TRUNCATE);
+	if ((p = wcsstr(pvar->fmt_time, L"%N")) != NULL) {
+		// "%N" をミリ秒に置き換える
+		aswprintf(&fmt, L"%.*s%03d%s",
+				  (int)(p - pvar->fmt_time), pvar->fmt_time, tv.tv_usec/1000, p + 2);
 	}
-	else if (msec) {
-		p = strstr(fmt, "%S");
-		if (p != NULL) {
-			p += 2;
-			*p = '\0';
-			_snprintf_s(buff, sizeof(buff), _TRUNCATE, ".%03d", tv.tv_usec/1000);
-			strncat_s(fmt, sizeof(fmt), buff, _TRUNCATE);
-			strncat_s(fmt, sizeof(fmt), pvar->fmt_time - fmt + p, _TRUNCATE);
-		}
+	else if (msec && (p = wcsstr(pvar->fmt_time, L"%S")) != NULL) {
+		// "%S" の直後にミリ秒を挿入する
+		aswprintf(&fmt, L"%.*s.%03d%s",
+				  (int)(p + 2 - pvar->fmt_time), pvar->fmt_time, tv.tv_usec/1000, p + 2);
 	}
-
-	if (strftime(str, size, fmt, &tm_local) == 0) {
+	else {
+		fmt = _wcsdup(pvar->fmt_time);
+	}
+	if (fmt == NULL) {
 		return FALSE;
 	}
-	return TRUE;
+
+	len = wcsftime(str, size, fmt, &tm_local);
+	free(fmt);
+	return len != 0;
 }
 
 void ChangeTitleTimePeriod(struct timeval tv, int period) {
-	char tbuff[TitleBuffSize];
+	wchar_t tbuff[TITLEBUFFSIZE];
 	static time_t tvs_org;
 	time_t tvs = (time_t)tv.tv_sec*1000+tv.tv_usec/1000;
 
@@ -211,13 +201,12 @@ void ChangeTitleTimePeriod(struct timeval tv, int period) {
 	if (llabs(tvs - tvs_org) < ((period<1000) ? period : 1000)) return;
 	tvs_org = tvs;
 
-	if (! GetTimeString(tbuff, TitleBuffSize, tv, pvar->mode_flag & MODE_FLAG_MSEC)) {
+	if (! GetTimeString(tbuff, _countof(tbuff), tv, pvar->mode_flag & MODE_FLAG_MSEC)) {
 		return;
 	}
 	SaveTitle();
 	pvar->ts->AcceptTitleChangeRequest = IdTitleChangeRequestOff;
-	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
-	SendMessage(pvar->cv->HWin, WM_USER_CHANGETITLE, 0, 0);
+	pvar->imports->SetLocalTitle(tbuff);
 }
 
 HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
@@ -260,21 +249,21 @@ wchar_t *ExtractPath(wchar_t *path, int n)
 
 void ChangeHostName()
 {
-	free(pvar->origHostName);
-	pvar->origHostName = _strdup(pvar->ts->HostName);
-	wchar_t *hostnameW = ToWcharA(pvar->origHostName);
-	char *hostname = ToCharW(ExtractPath(hostnameW, pvar->name_cnt));
-	strncpy_s(pvar->ts->HostName, sizeof(pvar->ts->HostName), hostname, _TRUNCATE);
-	free(hostname);
-	free(hostnameW);
+	if (pvar->name_cnt <= 0) {
+		// 加工不要, origHostNameW は NULL のまま(復元も不要)
+		return;
+	}
+	free(pvar->origHostNameW);
+	pvar->origHostNameW = _wcsdup(pvar->imports->GetConnectHostName());
+	pvar->imports->SetConnectHostName(ExtractPath(pvar->origHostNameW, pvar->name_cnt));
 }
 
 void RestoreOLDHostName()
 {
-	if (pvar->origHostName != NULL) {
-		strncpy_s(pvar->ts->HostName, sizeof(pvar->ts->HostName), pvar->origHostName, _TRUNCATE);
-		free(pvar->origHostName);
-		pvar->origHostName = NULL;
+	if (pvar->origHostNameW != NULL) {
+		pvar->imports->SetConnectHostName(pvar->origHostNameW);
+		free(pvar->origHostNameW);
+		pvar->origHostNameW = NULL;
 	}
 }
 
@@ -290,9 +279,15 @@ static void AddMarkerList() {
 	}
 }
 
-static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
+static BOOL TTXInit2(PTTSet ts, PComVar cv, const TTXImports *(*GetImports)(size_t size))
+{
+	const TTXImports *imports = GetImports(sizeof(TTXImports));
+	if (imports == NULL) {
+		return FALSE;
+	}
 	pvar->ts = ts;
 	pvar->cv = cv;
+	pvar->imports = imports;
 	pvar->origPCreateFile = NULL;
 	pvar->origPReadFile = NULL;
 	pvar->origPWriteFile = NULL;
@@ -319,10 +314,11 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->mode_flag = 0;
 	pvar->fmt_time = NULL;
 	pvar->origTitleSaved = FALSE;
-	pvar->origHostName = NULL;
+	pvar->origHostNameW = NULL;
 	pvar->name_cnt_ini = 0;
 	pvar->name_cnt = 0;
 	ClearMarkerList();
+	return TRUE;
 }
 
 void RestoreTitle() {
@@ -330,22 +326,14 @@ void RestoreTitle() {
 		return;
 	}
 	ChangeTitleStatus ();
-/*
-	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), pvar->origTitle, _TRUNCATE);
-	pvar->ChangeTitle = TRUE;
-	SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
-*/
 }
 
-void ChangeTitle(char *title) {
+void ChangeTitle(const wchar_t *title) {
 	if ((pvar->mode_flag & TITLE_MODE_MASK) != TITLE_MODE_STATUS) {
 		return;
 	}
 	SaveTitle();
-	strncpy_s(pvar->origTitle, sizeof(pvar->origTitle), pvar->ts->Title, _TRUNCATE);
-	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), title, _TRUNCATE);
-	pvar->ChangeTitle = TRUE;
-	SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
+	pvar->imports->SetLocalTitle(title);
 }
 
 static HANDLE PASCAL TTXCreateFile(LPCSTR FName, DWORD AcMode, DWORD ShMode,
@@ -468,18 +456,16 @@ static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rby
 				pvar->wait.tv_usec = 0;
 			}
 			else if (pvar->maxwait != 0 && pvar->wait.tv_sec >= pvar->maxwait) {
-				char tbuff[TitleBuffSize];
+				wchar_t *tbuff;
 				wchar_t *uimsg;
-				char *msg;
 				GetI18nStrWW("TTXttyrec", "TITLE_TRIM", L"%d.%06d secs idle. trim to %d secs.", pvar->ts->UILanguageFileW, &uimsg);
-				msg = ToCharW(uimsg);
+				aswprintf(&tbuff, uimsg, pvar->wait.tv_sec, pvar->wait.tv_usec, pvar->maxwait);
 				free(uimsg);
-				_snprintf_s(tbuff, sizeof(tbuff), _TRUNCATE, msg, pvar->wait.tv_sec, pvar->wait.tv_usec, pvar->maxwait);
-				free(msg);
 				pvar->wait.tv_sec = pvar->maxwait;
 				pvar->wait.tv_usec = 0;
 				title_changed = TRUE;
 				ChangeTitle(tbuff);
+				free(tbuff);
 			}
 		}
 		speed = pvar->speed;
@@ -719,7 +705,7 @@ static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 		*hooks->PWriteFile = pvar->origPWriteFile;
 	}
 	if (pvar->enable) {
-		RestoreOLDTitle();
+		RestoreSavedTitle();
 		RestoreOLDHostName();
 		pvar->enable = FALSE;
 		pvar->active = FALSE;
@@ -792,10 +778,12 @@ static void PASCAL TTXParseParam(wchar_t *Param, PTTSet ts, PCHAR DDETopic) {
 		else if (_wcsnicmp(buff, L"/TTYPLAY", 9) == 0 || _wcsnicmp(buff, L"/TP", 4) == 0 ||
 			_wcsnicmp(buff, L"/TP=",4) == 0) {
 			pvar->enable = TRUE;
-			if (ts->PortType == IdFile && strlen(ts->HostName) > 0) {
-				wchar_t *HostNameW = ToWcharA(ts->HostName);
-				free(pvar->openfnW);
-				pvar->openfnW = HostNameW;
+			if (ts->PortType == IdFile) {
+				const wchar_t *HostNameW = pvar->imports->GetConnectHostName();
+				if (HostNameW[0] != 0) {
+					free(pvar->openfnW);
+					pvar->openfnW = _wcsdup(HostNameW);
+				}
 			}
 			if (buff[3] == '=') {
 				pvar->mode_flag = _wtol(&buff[4]);
@@ -826,14 +814,14 @@ static void PASCAL TTXReadIniFile(const wchar_t *fn, PTTSet ts) {
 
 	(pvar->origReadIniFile)(fn, ts);
 //	ts->TitleFormat = 0;
-	pvar->maxwait = GetPrivateProfileIntAFileW(INISECTION, "MaxWait", 0, fn);
-	pvar->speed = GetPrivateProfileIntAFileW(INISECTION, "Speed", 0, fn);
-	pvar->mode_flag = GetPrivateProfileIntAFileW(INISECTION, "ModeFlag", 0, fn);
+	pvar->maxwait = GetPrivateProfileIntW(INISECTIONW, L"MaxWait", 0, fn);
+	pvar->speed = GetPrivateProfileIntW(INISECTIONW, L"Speed", 0, fn);
+	pvar->mode_flag = GetPrivateProfileIntW(INISECTIONW, L"ModeFlag", 0, fn);
 	GetPrivateProfileStringW(INISECTIONW, L"TimeFormat", L"%Y/%m/%d %H:%M:%S", buff, _countof(buff), fn);
 	ConvertSafeStrFtimeFormat(buff);
 	free(pvar->fmt_time);
-	pvar->fmt_time = ToCharW(buff);
-	pvar->name_cnt_ini = GetPrivateProfileIntAFileW(INISECTION, "TitlePathMode", 0, fn);
+	pvar->fmt_time = _wcsdup(buff);
+	pvar->name_cnt_ini = GetPrivateProfileIntW(INISECTIONW, L"TitlePathMode", 0, fn);
 	pvar->name_cnt = pvar->name_cnt_ini;
 }
 
@@ -923,7 +911,7 @@ static TTXExports Exports = {
 	sizeof(TTXExports),
 	ORDER,
 
-	TTXInit,
+	NULL, // TTXInit,
 	TTXGetUIHooks,
 	TTXGetSetupHooks,
 	NULL, // TTXOpenTCP,
@@ -935,11 +923,18 @@ static TTXExports Exports = {
 	NULL, // TTXEnd,
 	NULL, // TTXSetCommandLine,
 	TTXOpenFile,
-	TTXCloseFile
+	TTXCloseFile,
+	TTXInit2,
 };
 
 BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
 	int size = sizeof(Exports) - sizeof(exports->size);
+
+	// TTXInit() ではなく TTXInit2() で初期化を行う
+	// TTXInit2() を使用しないTera Termでは動作しないようFALSEを返す
+	if (!TTXExportsHas(exports, TTXInit2)) {
+		return FALSE;
+	}
 
 	if (size > exports->size) {
 		size = exports->size;
@@ -972,6 +967,10 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			pvar->openfnW = NULL;
 			free(pvar->fmt_time);
 			pvar->fmt_time = NULL;
+			free(pvar->origOLDTitle);
+			pvar->origOLDTitle = NULL;
+			free(pvar->origHostNameW);
+			pvar->origHostNameW = NULL;
 			break;
 	}
 	return TRUE;

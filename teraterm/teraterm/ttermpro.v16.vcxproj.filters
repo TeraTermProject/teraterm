@@ -324,6 +324,9 @@
     <ClCompile Include="plugin_pp.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="name_resolve.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\common\tek.ico">
@@ -713,6 +716,9 @@
     </ClInclude>
     <ClInclude Include="plugin_pp_res.h">
       <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="name_resolve.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

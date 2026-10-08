@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2026-07-18 by TeraTerm Project
+date=2026-09-09 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -740,7 +740,7 @@ DLG_AUTHSETUP_HOST_PRIVATEKEY=புரவலன் தனிப்பட்ட 
 DLG_AUTHSETUP_CHECKAUTH=&உள்நுழைவதற்கு முன் செயல்படுத்தப்பட்ட அங்கீகார முறைகளைச் சரிபார்க்கவும் (பாஓடு2)
 
 FILEDLG_OPEN_PRIVATEKEY_TITLE=ஆர்ச்ஏ/டிஎச்எ/இசிடிஎச்எ/இடி25519 தனிப்பட்ட விசையுடன் ஒரு கோப்பைத் தேர்ந்தெடுக்கவும்
-FILEDLG_OPEN_PRIVATEKEY_FILTER=அடையாளக் கோப்புகள்\0அடையாளம்;id_rsa;id_டிஎச்எ;id_இசிடிஎச்எ;id_ed25519;*.ppk;*.pem\0identity(ஆர்ச்ஏ1)\0identity\0id_rsa(பாஓடு2)\0id\0d_rsa\0id_rsa(பாஓடு2) 0id_இசிடிஎச்எ \0id_ed25519(பாஓடு2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0PEM கோப்புகள்(*.pem)\0*.pem\0all(*.*)\0*.*\0\0
+FILEDLG_OPEN_PRIVATEKEY_FILTER=அடையாளக் கோப்புகள்\0identity*;id_rsa*;id_dsa*;id_ecdsa*;id_ed25519*;*.ppk;*.pem\0identity(RSA1)\0identity*\0id_rsa(SSH2)\0id_rsa*\0id_dsa(SSH2)\0id_dsa*\0id_ecdsa(SSH2)\0id_ecdsa*\0id_ed25519(SSH2)\0id_ed25519*\0PuTTY(*.ppk)\0*.ppk\0PEM கோப்புகள்(*.pem)\0*.pem\0all(*.*)\0*.*\0\0
 MSG_KEYSPECIFY_ERROR=ஆர்ச்ஏ/டிஎச்எ/இசிடிஎச்எ/இடி25519 தனிப்பட்ட திறவுகோலைக் கொண்ட கோப்பை நீங்கள் குறிப்பிட வேண்டும்.
 MSG_READKEY_ERROR=வாசிப்பு பிழை பாஓடு2 தனிப்பட்ட திறவுகோல் கோப்பு\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=ஆர்புரவலன்கள் அங்கீகாரம் தோல்வியடையும் ஏனெனில் இது இயல்புநிலை அங்கீகார முறை இல்லை.\nதேமுபாஓடுஇல் ஆர்புரவலன்கள் அங்கீகாரத்தைப் பயன்படுத்த, \nதேமுபாஓடுஐ மறுதொடக்கம் செய்து, "பாஓடு பட்டியல்வை அங்கீகரித்தல்..." என்பதைத் தேர்ந்தெடுத்து இயல்புநிலையாக அமைக்க வேண்டும். இணைக்கும் முன்.
