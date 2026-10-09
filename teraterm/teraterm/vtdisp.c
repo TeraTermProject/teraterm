@@ -259,9 +259,16 @@ static HDC  CreateBitmapDC(HBITMAP hbm)
   _OutputDebugPrintf("CreateBitmapDC : hbm = %p\n",hbm);
 
   hdc = CreateCompatibleDC(NULL);
+  if (hdc == NULL) {
+	DeleteObject(hbm);
+	return NULL;
+  }
 
-  SaveDC(hdc);
-  SelectObject(hdc,hbm);
+  if (SelectObject(hdc, hbm) == NULL) {
+	DeleteDC(hdc);
+	DeleteObject(hbm);
+	return NULL;
+  }
 
   return hdc;
 }
@@ -280,11 +287,12 @@ static void DeleteBitmapDC(HDC *hdc)
 
   hbm = GetCurrentObject(*hdc,OBJ_BITMAP);
 
-  RestoreDC(*hdc,-1);
-  DeleteObject(hbm);
   DeleteDC(*hdc);
-
   *hdc = 0;
+
+  if (hbm) {
+    DeleteObject(hbm);
+  }
 }
 
 static void FillBitmapDC(HDC hdc,COLORREF color)
@@ -375,13 +383,19 @@ static void BGPreloadPicture(BGSrc *src, const TTTSet *pts)
 	if(hbm) {
 		BITMAP bm;
 
-		GetObject(hbm,sizeof(bm),&bm);
-
-		src->hdc    = CreateBitmapDC(hbm);
-		src->width  = bm.bmWidth;
-		src->height = bm.bmHeight;
+		if (GetObject(hbm, sizeof(bm), &bm) == 0) {
+			DeleteObject(hbm);
+		} else {
+			HDC new_hdc = CreateBitmapDC(hbm);
+			if (new_hdc) {
+				DeleteBitmapDC(&(src->hdc));
+				src->hdc    = new_hdc;
+				src->width  = bm.bmWidth;
+				src->height = bm.bmHeight;
+			}
+		}
 	}else{
-		src->type = BG_COLOR;
+		src->type = BG_COLOR; // 画像が読めない場合は、単色塗りにフォールバックする
 	}
 
 	free(susie_path);
@@ -614,43 +628,75 @@ load_finish:
 	{
 		BITMAP bm;
 
-		GetObject(hbm,sizeof(bm),&bm);
-
-		src->hdc     = CreateBitmapDC(hbm);
-		src->width   = bm.bmWidth;
-		src->height  = bm.bmHeight;
-		src->pattern = wi.pattern;
-
+		if (GetObject(hbm, sizeof(bm), &bm) == 0) {
+			DeleteObject(hbm);
+		} else {
+			HDC new_hdc = CreateBitmapDC(hbm);
+			if (new_hdc) {
+				DeleteBitmapDC(&(src->hdc));
+				src->hdc     = new_hdc;
+				src->width   = bm.bmWidth;
+				src->height  = bm.bmHeight;
+				src->pattern = wi.pattern;
+			}
+		}
 	}else{
-		src->hdc = NULL;
+		src->hdc = NULL; // 壁紙を読めない場合は再読み込み出来るようにしておく
 	}
 
 	src->color = GetSysColor(COLOR_DESKTOP);
 }
 
-static void BGPreloadSrc(BGSrc *src, const TTTSet *pts)
+// 復帰値
+//   TRUE  描画リソースの再構築を行った
+//   FALSE 既存の描画リソースをそのまま利用可能
+static BOOL BGPreloadSrc(BGSrc *src, const TTTSet *pts, BOOL forceReload)
 {
 	if (!src->enable) {
-		return;
+		return FALSE;
 	}
 
-	DeleteBitmapDC(&(src->hdc));
+	if (forceReload == FALSE && src->hdc) {
+		HDC memdc = CreateCompatibleDC(src->hdc);
+		if (memdc) {
+			HBITMAP bmp = CreateCompatibleBitmap(src->hdc, 1, 1);
+			if (!bmp) {
+				DeleteDC(memdc);
+			} else {
+				HBITMAP oldBmp = SelectObject(memdc, bmp);
+				BOOL ok = BitBlt(memdc, 0, 0, 1, 1, src->hdc, 0, 0, SRCCOPY);
+				SelectObject(memdc, oldBmp);
+				DeleteObject(bmp);
+				DeleteDC(memdc);
+				if (ok) {
+					// 1x1ピクセルの画像の読み取りに成功した。
+					// → HBITMAP(デバイス依存ビットマップ)は使用可能とみなす。
+					return FALSE;
+				}
+			}
+		}
+	}
 
+	BOOL ret = FALSE;
 	switch (src->type) {
 		case BG_COLOR:
 			break;
 
 		case BG_WALLPAPER:
 			BGPreloadWallpaper(src);
+			ret = TRUE;
 			break;
 
 		case BG_PICTURE:
 			BGPreloadPicture(src, pts);
+			ret = TRUE;
 			break;
 
 		default:
 			break;
 	}
+
+	return ret;
 }
 
 static void BGStretchPicture(HDC hdcDest, BGSrc *src, int x, int y, int width, int height)
@@ -1063,6 +1109,7 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
 {
   POINT point;
   RECT rect;
+  BOOL preloaded = FALSE;
 
   if(!BGEnable)
     return;
@@ -1075,16 +1122,27 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
   GetClientRect(vt->hVTWin,&rect);
   OffsetRect(&rect,point.x,point.y);
 
-  if(!forceSetup && EqualRect(&rect,&BGPrevRect))
-    return;
+  if (!forceSetup && EqualRect(&rect,&BGPrevRect)) {
+	  // クラウド環境(RDP等)でディスプレイデバイスが再構成されると、
+	  // DDB(デバイス依存ビットマップ)が作成時のデバイスと互換性を失い
+	  // 描画不能になることがある。
+	  // HBITMAPが使用不可なら壁紙 or 背景を再ロードする。
+	  preloaded |= BGPreloadSrc(&BGDest, vt->pts, FALSE);
+	  preloaded |= BGPreloadSrc(&BGSrc1, vt->pts, FALSE);
+	  preloaded |= BGPreloadSrc(&BGSrc2, vt->pts, FALSE);
+	  if (preloaded == FALSE) {
+		  return;
+	  }
+  }
 
   CopyRect(&BGPrevRect,&rect);
 
   //壁紙 or 背景をプリロード
-  BGPreloadSrc(&BGDest, vt->pts);
-  BGPreloadSrc(&BGSrc1, vt->pts);
-  BGPreloadSrc(&BGSrc2, vt->pts);
-
+  if (preloaded == FALSE) {
+	  BGPreloadSrc(&BGDest, vt->pts, TRUE);
+	  BGPreloadSrc(&BGSrc1, vt->pts, TRUE);
+	  BGPreloadSrc(&BGSrc2, vt->pts, TRUE);
+  }
   _OutputDebugPrintf("BGSetupPrimary : BGInSizeMove = %d\n",BGInSizeMove);
 
   //作業用 DC 作成
