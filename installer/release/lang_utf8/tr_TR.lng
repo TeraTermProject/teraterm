@@ -428,6 +428,8 @@ DLG_SERIAL_OK_CONNECTION=&Yeni pencerede bağlan
 DLG_SERIAL_OK_OPEN=&Yeni aç
 DLG_SERIAL_OK_CLOSEOPEN=Kapat ve &yeni aç
 DLG_SERIAL_OK_RESET=&Yeni ayar
+DLG_SERIAL_DEVICE_MANAGER_PROPERTIES=Device Manager Properties
+DLG_SERIAL_RUN_AS_ADMINISTRATOR=Run as administrator
 
 ; edit history
 DLG_TCPIP_ADD=&Ekle

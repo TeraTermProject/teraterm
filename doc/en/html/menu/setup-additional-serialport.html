@@ -156,11 +156,47 @@
 
       <dt id="Property">Device Manager Properties</dt>
       <dd>
-        The [Open] button shows the properties of the selected COM port, the same as in Device Manager.
-        Depending on the device driver, driver-specific detailed settings are available.<br>
-        Administrator privileges are required to change the settings.
-        When Tera Term is not running as administrator, a shield icon is shown on the button and a UAC prompt appears.<br>
-        Changing the settings may restart the device. Do not change them while connected.
+        <dl>
+          <dt>[Open] button</dt>
+          <dd>
+            Shows the properties of the selected COM port, the same as in Device Manager.<br>
+            Depending on the device driver, device-specific settings may be available for viewing or changing.
+            <p>
+              When [Run as administrator] is checked and Tera Term is not already running as an administrator,
+              a shield icon appears on the [Open] button.
+              If a UAC prompt appears, approving it opens the properties window.
+            </p>
+            <ul>
+              <li>
+                <small>
+                  Even when the shield is displayed, if elevation fails (for example, on an older version of Windows),
+                  the properties may open without a UAC prompt and with standard privileges.
+                </small>
+              </li>
+              <li>
+                <small>If you cancel the UAC prompt, the dialog does not open.</small>
+              </li>
+            </ul>
+          </dd>
+
+          <dt>[Run as administrator] checkbox</dt>
+          <dd>
+            Check this box to open the properties dialog as an administrator when you click [Open].
+            <dl>
+              <dt>ON</dt>
+              <dd>
+                All operations are available in the properties dialog.
+                Changing settings may restart the device.
+              </dd>
+              <dt>OFF</dt>
+              <dd>
+                Settings that can be changed or viewed without administrator privileges are available.<br>
+                If Tera Term is already running as an administrator (or on Windows 7 and earlier),
+                there are no restrictions on operations in the dialog.
+              </dd>
+            </dl>
+          </dd>
+        </dl>
       </dd>
 
       <dt id="drop">If the transmitted or received data is dropped</dt>

@@ -518,6 +518,8 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		{ IDC_SERIALDELAY, "DLG_SERIAL_DELAY" },
 		{ IDC_SERIALDELAYCHAR_LABEL, "DLG_SERIAL_DELAYCHAR" },
 		{ IDC_SERIALDELAYLINE_LABEL, "DLG_SERIAL_DELAYLINE" },
+		{ IDC_CONFIG_TEXT, "DLG_SERIAL_DEVICE_MANAGER_PROPERTIES" },
+		{ IDC_CONFIG_CHECKBOX, "DLG_SERIAL_RUN_AS_ADMINISTRATOR" },
 	};
 
 	switch (Message) {
@@ -587,6 +589,11 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			SetDropDownList(Dialog, IDC_SERIALRTS, RtsList, ts->FlowCtrlRTS + 1);
 			SetDropDownList(Dialog, IDC_SERIALDTR, DtrList, ts->FlowCtrlDTR + 1);
 			SetComStatus(Dialog, ts->FlowCtrlRTS, ts->FlowCtrlDTR);
+
+			CheckDlgButton(Dialog, IDC_CONFIG_CHECKBOX, BST_CHECKED);
+			if (!IsProcessElevated()) {
+				SendDlgItemMessage(Dialog, IDC_BUTTON_CONFIG, BCM_SETSHIELD, 0, TRUE);
+			}
 
 			timer_id = SetTimer(Dialog, NULL, 100, ComPortStatusUpdateProc);
 
@@ -818,13 +825,22 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 						// デバイスマネージャのプロパティを表示する
 						DCB dcb;
 						ts2DCB(dlg_data->pts, &dcb);
-						BOOL elevation = TRUE;
+						BOOL elevation = IsDlgButtonChecked(Dialog, IDC_CONFIG_CHECKBOX);
 						if (ComPortInfoShowDeviceProperties(info, Dialog, elevation, &dcb) == 1) {
 							// ポート設定が変更されたらダイアログに反映する
 							DCB2Ctrl(Dialog, &dcb);
 						}
 					}
 					return TRUE;
+				case IDC_CONFIG_CHECKBOX:
+					if (HIWORD(wParam) == BN_CLICKED) {
+						if (!IsProcessElevated()) {
+							BOOL shield = IsDlgButtonChecked(Dialog, IDC_CONFIG_CHECKBOX);
+							SendDlgItemMessageW(Dialog, IDC_BUTTON_CONFIG, BCM_SETSHIELD, 0, shield);
+						}
+						return TRUE;
+					}
+
 				default:
 					break;
 			}

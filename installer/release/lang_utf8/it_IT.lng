@@ -428,6 +428,8 @@ DLG_SERIAL_OK_CONNECTION=Connetti in una &nuova finestra
 DLG_SERIAL_OK_OPEN=&Nuova apertura
 DLG_SERIAL_OK_CLOSEOPEN=Chiudi a apri &nuova
 DLG_SERIAL_OK_RESET=&Nuove impostazioni
+DLG_SERIAL_DEVICE_MANAGER_PROPERTIES=Device Manager Properties
+DLG_SERIAL_RUN_AS_ADMINISTRATOR=Run as administrator
 
 ; edit history
 DLG_TCPIP_ADD=&Aggiungi

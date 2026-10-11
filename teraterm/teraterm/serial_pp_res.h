@@ -23,6 +23,7 @@
 #define IDC_CONFIG_TEXT                 1082
 #define IDC_BUTTON_CONFIG               1083
 #define IDC_CONFIG_BUTTON               1083
+#define IDC_CONFIG_CHECKBOX             1084
 #define IDC_CHECK_CTS                   1301
 #define IDC_CHECK_RTS                   1302
 #define IDC_SERIALRTS                   1303
