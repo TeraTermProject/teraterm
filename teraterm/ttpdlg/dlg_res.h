@@ -4,17 +4,11 @@
 //
 #define IDI_TTERM                       100
 #define IDC_TERMWIDTH                   101
-#define IDC_SERIALPORT_LABEL            101
 #define IDC_TERMHEIGHT                  102
-#define IDC_SERIALBAUD_LEBAL            102
 #define IDC_TERMISWIN                   103
-#define IDC_SERIALDATA_LABEL            103
 #define IDC_TERMRESIZE                  104
-#define IDC_SERIALPARITY_LABEL          104
 #define IDC_TERMCRRCV                   105
-#define IDC_SERIALSTOP_LABEL            105
 #define IDC_TERMCRSEND                  106
-#define IDC_SERIALFLOW_LABEL            106
 #define IDC_TERMID                      107
 #define IDC_TERMLOCALECHO               108
 #define IDC_TERMANSBACKTEXT             109
@@ -60,15 +54,6 @@
 #define IDC_KEYBAPPKEY                  311
 #define IDC_KEYBAPPCUR                  312
 #define IDC_KEYBHELP                    399
-#define IDD_SERIALDLG                   400
-#define IDC_SERIALPORT                  401
-#define IDC_SERIALBAUD                  402
-#define IDC_SERIALDATA                  403
-#define IDC_SERIALPARITY                404
-#define IDC_SERIALSTOP                  405
-#define IDC_SERIALFLOW                  406
-#define IDC_SERIALDELAYCHAR             407
-#define IDC_SERIALDELAYLINE             408
 #define IDD_TCPIPDLG                    500
 #define IDC_TCPIPHISTORY                507
 #define IDC_TCPIPAUTOCLOSE              508
@@ -78,12 +63,9 @@
 #define IDC_TCPIPTELNETKEEPALIVE        513
 #define IDC_TCPIPTELNETKEEPALIVESEC     514
 #define IDC_TCPIP_EDITHISTORY           515
-#define IDC_TCPIPHISTORYTITLE           516
-#define IDC_TCPIPPROT                   517
 #define IDC_TCPIPPORTLABEL              518
 #define IDC_TCPIPTELNETKEEPALIVELABEL   519
 #define IDC_TCPIP_TELNET                520
-#define IDC_TCPIPNEWCONNENTTITLE        525
 #define IDD_HOSTDLG                     600
 #define IDC_HOSTTCPIP                   601
 #define IDC_HOSTSERIAL                  602
@@ -104,7 +86,6 @@
 #define IDD_GENDLG                      1000
 #define IDC_HOSTTCPPROTOCOLLABEL        1019
 #define IDC_HOSTTCPPROTOCOL             1020
-#define IDC_LOCALE_BOX                  1022
 #define IDC_TT_VERSION                  1027
 #define IDC_AUTHOR_URL                  1028
 #define IDC_ONIGURUMA_LABEL             1031
@@ -120,9 +101,6 @@
 #define IDC_DIRCURRENT_LABEL            1041
 #define IDC_DIRNEW_LABEL                1042
 #define IDC_KEYBTRANS                   1043
-#define IDC_SERIALDELAYLINE_LABEL       1044
-#define IDC_SERIALDELAYCHAR_LABEL       1045
-#define IDC_SERIALDELAY                 1046
 #define IDC_WINTITLELABEL               1050
 #define IDC_WINCURSOR                   1051
 #define IDC_WINREDLABEL                 1052
@@ -140,7 +118,6 @@
 #define IDC_BUILDTOOL                   1072
 #define IDC_GENLANG_UI                  1077
 #define IDC_SFMT_VERSION                1078
-#define IDC_SERIALTEXT                  1079
 #define IDC_GENLANUI_INFO               1080
 #define IDC_GENHELP                     1099
 #define IDD_TERMDLG                     1100
@@ -149,14 +126,6 @@
 #define IDC_WINLISTCLOSE                1202
 #define IDC_WINLISTHELP                 1299
 #define IDC_GENLANGUI_LABEL             1300
-#define IDC_CHECK_CTS                   1301
-#define IDC_CHECK_RTS                   1302
-#define IDC_SERIALRTS                   1303
-#define IDC_CHECK_DSR                   1304
-#define IDC_CHECK_DTR                   1305
-#define IDC_SERIALDTR                   1306
-#define IDC_CHECK_RING                  1307
-#define IDC_CHECK_RLSD                  1308
 
 // Next default values for new objects
 //

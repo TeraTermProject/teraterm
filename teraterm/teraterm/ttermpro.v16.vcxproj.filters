@@ -400,6 +400,9 @@
     <ResourceCompile Include="tekfont_pp.rc">
       <Filter>dialog</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="serial_pp.rc">
+      <Filter>dialog</Filter>
+    </ResourceCompile>
     <ResourceCompile Include="plugin_pp.rc">
       <Filter>dialog</Filter>
     </ResourceCompile>
@@ -679,6 +682,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="serial_pp.h">
+      <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="serial_pp_res.h">
       <Filter>dialog</Filter>
     </ClInclude>
     <ClInclude Include="externalsetup.h">

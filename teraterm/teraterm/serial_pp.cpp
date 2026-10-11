@@ -39,7 +39,7 @@
 #include "tttypes.h"
 #include "ttlib.h"
 #include "dlglib.h"
-#include "dlg_res.h"
+#include "serial_pp_res.h"
 #include "comportinfo.h"
 #include "helpid.h"
 #include "asprintf.h"
