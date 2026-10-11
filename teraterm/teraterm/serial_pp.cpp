@@ -89,7 +89,6 @@ static const char *StopList[] = {"1 bit", "2 bit", NULL};
 static const char *FlowList[] = {"XON/XOFF", "RTS/CTS", "DSR/DTR", "NONE", NULL};
 static const char *RtsList[] = {"Disable", "Enable", "Handshake", "Toggle", NULL};
 static const char *DtrList[] = {"Disable", "Enable", "Handshake", NULL};
-static UINT_PTR timer_id = 0;
 
 typedef struct {
 	PTTSet pts;
@@ -101,6 +100,7 @@ typedef struct {
 	WNDPROC g_defSerialDlgEditWndProc;			// Edit Controlのサブクラス化用
 	BOOL show_all_port;
 	TComVar *pcv;
+	UINT_PTR timer_id;
 } SerialDlgData;
 
 /*
@@ -610,7 +610,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				SendDlgItemMessage(Dialog, IDC_BUTTON_CONFIG, BCM_SETSHIELD, 0, TRUE);
 			}
 
-			timer_id = SetTimer(Dialog, 0, 100, ComPortStatusUpdateProc);
+			dlg_data->timer_id = SetTimer(Dialog, 0, 100, ComPortStatusUpdateProc);
 
 			return TRUE;
 		}
@@ -701,9 +701,9 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				break;
 			}
 			case PSN_RESET: {
-				if (timer_id) {
-					KillTimer(Dialog, timer_id);
-					timer_id = 0;
+				if (data->timer_id) {
+					KillTimer(Dialog, data->timer_id);
+					data->timer_id = 0;
 				}
 				DCB dcb;
 				if (GetCommState(data->pcv->ComID, &dcb)) {
