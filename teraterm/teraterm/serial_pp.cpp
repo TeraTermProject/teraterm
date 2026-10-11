@@ -47,7 +47,6 @@
 #include "asprintf.h"
 #include "win32helper.h"
 #include "compat_win.h"
-#include "ttwinman.h"
 
 #include "serial_pp.h"
 
@@ -70,6 +69,16 @@
 // MaxComPortより大きなポートが存在するとき、MaxComPortをオーバーライドする
 #define ENABLE_MAXCOMPORT_OVERRIDE	0
 
+#if defined(_DEBUG)
+#  define UNREACHABLE() abort()
+#elif defined(_MSC_VER)
+#  define UNREACHABLE() __assume(0)
+#elif defined(__GNUC__)
+#  define UNREACHABLE() __builtin_unreachable()
+#else
+#  define UNREACHABLE() abort()
+#endif
+
 static const char *BaudList[] = {
 	"110","300","600","1200","2400","4800","9600",
 	"14400","19200","38400","57600","115200",
@@ -80,7 +89,7 @@ static const char *StopList[] = {"1 bit", "2 bit", NULL};
 static const char *FlowList[] = {"XON/XOFF", "RTS/CTS", "DSR/DTR", "NONE", NULL};
 static const char *RtsList[] = {"Disable", "Enable", "Handshake", "Toggle", NULL};
 static const char *DtrList[] = {"Disable", "Enable", "Handshake", NULL};
-static UINT_PTR timer_id = NULL;
+static UINT_PTR timer_id = 0;
 
 typedef struct {
 	PTTSet pts;
@@ -91,6 +100,7 @@ typedef struct {
 	int g_deltaSumSerialDlg;					// マウスホイールのDelta累積用
 	WNDPROC g_defSerialDlgEditWndProc;			// Edit Controlのサブクラス化用
 	BOOL show_all_port;
+	TComVar *pcv;
 } SerialDlgData;
 
 /*
@@ -233,7 +243,7 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 	for (int i = 1; i <= max_com; i++) {
 
 		wchar_t *com_name = NULL;
-		int item_data;
+		int item_data = 0;
 		if (port_index < dlg_data->ComPortInfoCount) {
 			p = port_info + port_index;
 			if (p->port_no == i) {
@@ -291,7 +301,8 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 		EnableWindow(GetDlgItem(hWnd, IDC_BUTTON_CONFIG), FALSE);
 	}
 	else {
-		if (cv.Open && (cv.PortType == IdSerial)) {
+		TComVar* cv = dlg_data->pcv;
+		if (cv->Open && (cv->PortType == IdSerial)) {
 			// 接続中の時は選択できないようにする
 			EnableWindow(GetDlgItem(hWnd, id), FALSE);
 		}
@@ -462,8 +473,10 @@ static void DCB2Ctrl(HWND hWnd, const DCB *dcb)
  */
 static void SetComStatus(HWND Dialog, int FlowCtrlRTS, int FlowCtrlDTR)
 {
+	SerialDlgData* dlg_data = (SerialDlgData*)GetWindowLongPtrW(Dialog, DWLP_USER);
+	TComVar* cv = dlg_data->pcv;
 	DCB dcb;
-	if (GetCommState(cv.ComID, &dcb)) {
+	if (GetCommState(cv->ComID, &dcb)) {
 		dcb.fDtrControl = SendDlgItemMessageA(Dialog, IDC_SERIALDTR, CB_GETCURSEL, 0, 0);
 		dcb.fRtsControl = SendDlgItemMessageA(Dialog, IDC_SERIALRTS, CB_GETCURSEL, 0, 0);
 
@@ -479,12 +492,12 @@ static void SetComStatus(HWND Dialog, int FlowCtrlRTS, int FlowCtrlDTR)
 			dcb.fOutxDsrFlow = FALSE;
 		}
 
-		SetCommState(cv.ComID, &dcb);
+		SetCommState(cv->ComID, &dcb);
 	}
 
-	EscapeCommFunction(cv.ComID, FlowCtrlRTS == IdDisable || FlowCtrlRTS == IdToggle ? CLRRTS : SETRTS);
+	EscapeCommFunction(cv->ComID, FlowCtrlRTS == IdDisable || FlowCtrlRTS == IdToggle ? CLRRTS : SETRTS);
 	SendMessage(GetDlgItem(Dialog, IDC_CHECK_RTS), BM_SETCHECK, FlowCtrlRTS == IdDisable || FlowCtrlRTS == IdToggle ? BST_UNCHECKED : BST_CHECKED, 0);
-	EscapeCommFunction(cv.ComID, FlowCtrlDTR == IdDisable ? CLRDTR : SETDTR);
+	EscapeCommFunction(cv->ComID, FlowCtrlDTR == IdDisable ? CLRDTR : SETDTR);
 	SendMessage(GetDlgItem(Dialog, IDC_CHECK_DTR), BM_SETCHECK, FlowCtrlDTR == IdDisable ? BST_UNCHECKED : BST_CHECKED, 0);
 
 	EnableWindow(GetDlgItem(Dialog, IDC_CHECK_RTS), FlowCtrlRTS == IdDisable || FlowCtrlRTS == IdEnable ? TRUE : FALSE);
@@ -492,8 +505,10 @@ static void SetComStatus(HWND Dialog, int FlowCtrlRTS, int FlowCtrlDTR)
 }
 
 static void CALLBACK ComPortStatusUpdateProc(HWND Dialog, UINT, UINT_PTR, DWORD) {
+	SerialDlgData* dlg_data = (SerialDlgData*)GetWindowLongPtrW(Dialog, DWLP_USER);
+	TComVar* cv = dlg_data->pcv;
 	DWORD status;
-	if (GetCommModemStatus(cv.ComID, &status)) {
+	if (GetCommModemStatus(cv->ComID, &status)) {
 		SendMessage(GetDlgItem(Dialog, IDC_CHECK_CTS),  BM_SETCHECK, status & MS_CTS_ON  ? BST_CHECKED : BST_UNCHECKED, 0);
 		SendMessage(GetDlgItem(Dialog, IDC_CHECK_DSR),  BM_SETCHECK, status & MS_DSR_ON  ? BST_CHECKED : BST_UNCHECKED, 0);
 		SendMessage(GetDlgItem(Dialog, IDC_CHECK_RING), BM_SETCHECK, status & MS_RING_ON ? BST_CHECKED : BST_UNCHECKED, 0);
@@ -595,7 +610,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				SendDlgItemMessage(Dialog, IDC_BUTTON_CONFIG, BCM_SETSHIELD, 0, TRUE);
 			}
 
-			timer_id = SetTimer(Dialog, NULL, 100, ComPortStatusUpdateProc);
+			timer_id = SetTimer(Dialog, 0, 100, ComPortStatusUpdateProc);
 
 			return TRUE;
 		}
@@ -605,7 +620,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			PTTSet ts = data->pts;
 			switch (nmhdr->code) {
 			case PSN_APPLY: {
-				int w;
+				WORD w;
 				char Temp[128];
 				Temp[0] = 0;
 				GetDlgItemTextA(Dialog, IDC_SERIALPORT, Temp, sizeof(Temp)-1);
@@ -645,13 +660,13 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				}
 
 				int rts = (int)SendDlgItemMessageA(Dialog, IDC_CHECK_RTS, BM_GETCHECK, 0, 0);
-				EscapeCommFunction(cv.ComID, rts ? SETRTS : CLRRTS);
+				EscapeCommFunction(data->pcv->ComID, rts ? SETRTS : CLRRTS);
 				int dtr = (int)SendDlgItemMessageA(Dialog, IDC_CHECK_DTR, BM_GETCHECK, 0, 0);
-				EscapeCommFunction(cv.ComID, dtr ? SETDTR : CLRDTR);
-				ts->FlowCtrlRTS = SendDlgItemMessageA(Dialog, IDC_SERIALRTS, CB_GETCURSEL, 0, 0);
-				ts->FlowCtrlDTR = SendDlgItemMessageA(Dialog, IDC_SERIALDTR, CB_GETCURSEL, 0, 0);
+				EscapeCommFunction(data->pcv->ComID, dtr ? SETDTR : CLRDTR);
+				ts->FlowCtrlRTS = (int)SendDlgItemMessageA(Dialog, IDC_SERIALRTS, CB_GETCURSEL, 0, 0);
+				ts->FlowCtrlDTR = (int)SendDlgItemMessageA(Dialog, IDC_SERIALDTR, CB_GETCURSEL, 0, 0);
 				DCB dcb;
-				if (GetCommState(cv.ComID, &dcb)) {
+				if (GetCommState(data->pcv->ComID, &dcb)) {
 					dcb.fRtsControl = ts->FlowCtrlRTS;
 					dcb.fDtrControl = ts->FlowCtrlDTR;
 
@@ -667,12 +682,12 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 						dcb.fOutxDsrFlow = FALSE;
 					}
 
-					SetCommState(cv.ComID, &dcb);
+					SetCommState(data->pcv->ComID, &dcb);
 				}
 
-				ts->DelayPerChar = GetDlgItemInt(Dialog,IDC_SERIALDELAYCHAR,NULL,FALSE);
+				ts->DelayPerChar = (WORD)GetDlgItemInt(Dialog,IDC_SERIALDELAYCHAR,NULL,FALSE);
 
-				ts->DelayPerLine = GetDlgItemInt(Dialog,IDC_SERIALDELAYLINE,NULL,FALSE);
+				ts->DelayPerLine = (WORD)GetDlgItemInt(Dialog,IDC_SERIALDELAYLINE,NULL,FALSE);
 
 				// TODO 削除
 				// 全般タブの「標準のポート」でデフォルトの接続ポートを指定する
@@ -688,10 +703,10 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			case PSN_RESET: {
 				if (timer_id) {
 					KillTimer(Dialog, timer_id);
-					timer_id = NULL;
+					timer_id = 0;
 				}
 				DCB dcb;
-				if (GetCommState(cv.ComID, &dcb)) {
+				if (GetCommState(data->pcv->ComID, &dcb)) {
 					dcb.fRtsControl = ts->FlowCtrlRTS;
 					dcb.fDtrControl = ts->FlowCtrlDTR;
 
@@ -706,7 +721,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 						dcb.fOutxDsrFlow = FALSE;
 					}
 
-					SetCommState(cv.ComID, &dcb);
+					SetCommState(data->pcv->ComID, &dcb);
 				}
 				break;
 			}
@@ -748,7 +763,6 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 				case IDC_SERIALFLOW:
 					if (HIWORD(wParam) == CBN_SELCHANGE) {
-						SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
 						WORD Flow = (WORD)SendDlgItemMessageA(Dialog, IDC_SERIALFLOW, CB_GETCURSEL, 0, 0) + 1;
 						if (Flow == 4) {
 							Flow = 3;
@@ -770,6 +784,8 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 								rts = 1; // Enable
 								dtr = 2; // Handshake
 								break;
+							default:
+								UNREACHABLE();
 						}
 						SendDlgItemMessage(Dialog, IDC_SERIALRTS, CB_SETCURSEL, rts, 0);
 						SendDlgItemMessage(Dialog, IDC_SERIALDTR, CB_SETCURSEL, dtr, 0);
@@ -779,18 +795,18 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 				case IDC_CHECK_RTS:
 					if (HIWORD(wParam) == BN_CLICKED) {
-						SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
+						SerialDlgData* data = (SerialDlgData*)GetWindowLongPtrW(Dialog, DWLP_USER);
 						int rts = (int)SendDlgItemMessageA(Dialog, IDC_CHECK_RTS, BM_GETCHECK, 0, 0);
-						EscapeCommFunction(cv.ComID, rts ? CLRRTS : SETRTS); // 即時反映する
+						EscapeCommFunction(data->pcv->ComID, rts ? CLRRTS : SETRTS); // 即時反映する
 						SendMessage(GetDlgItem(Dialog, IDC_CHECK_RTS),  BM_SETCHECK, rts ? BST_UNCHECKED : BST_CHECKED, 0);
 					}
 					return TRUE;
 
 				case IDC_CHECK_DTR:
 					if (HIWORD(wParam) == BN_CLICKED) {
-						SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
+						SerialDlgData* data = (SerialDlgData*)GetWindowLongPtrW(Dialog, DWLP_USER);
 						int dtr = (int)SendDlgItemMessageA(Dialog, IDC_CHECK_DTR, BM_GETCHECK, 0, 0);
-						EscapeCommFunction(cv.ComID, dtr ? CLRDTR : SETDTR); // 即時反映する
+						EscapeCommFunction(data->pcv->ComID, dtr ? CLRDTR : SETDTR); // 即時反映する
 						SendMessage(GetDlgItem(Dialog, IDC_CHECK_DTR),  BM_SETCHECK, dtr ? BST_UNCHECKED : BST_CHECKED, 0);
 					}
 					return TRUE;
@@ -798,15 +814,14 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 				case IDC_SERIALRTS:
 				case IDC_SERIALDTR:
 					if (HIWORD(wParam) == CBN_SELCHANGE) {
-						SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
 						WORD Flow = (WORD)SendDlgItemMessageA(Dialog, IDC_SERIALFLOW, CB_GETCURSEL, 0, 0) + 1;
 						if (Flow == 4) {
 							Flow = 3;
 						} else if (Flow == 3) {
 							Flow = 4;
 						}
-						int FlowCtrlRTS = SendDlgItemMessageA(Dialog, IDC_SERIALRTS, CB_GETCURSEL, 0, 0);
-						int FlowCtrlDTR = SendDlgItemMessageA(Dialog, IDC_SERIALDTR, CB_GETCURSEL, 0, 0);
+						int FlowCtrlRTS = (int)SendDlgItemMessageA(Dialog, IDC_SERIALRTS, CB_GETCURSEL, 0, 0);
+						int FlowCtrlDTR = (int)SendDlgItemMessageA(Dialog, IDC_SERIALDTR, CB_GETCURSEL, 0, 0);
 						SetComStatus(Dialog, FlowCtrlRTS, FlowCtrlDTR);
 					}
 					return TRUE;
@@ -851,6 +866,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp)
 {
+	(void)hwnd;
 	UINT ret_val = 0;
 	switch (uMsg) {
 	case PSPCB_CREATE:
@@ -872,11 +888,12 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 	return ret_val;
 }
 
-HPROPSHEETPAGE SerialPageCreate(HINSTANCE inst, TTTSet *pts)
+HPROPSHEETPAGE SerialPageCreate(HINSTANCE inst, TTTSet *pts, TComVar *pcv)
 {
 	SerialDlgData *Param = (SerialDlgData *)calloc(1, sizeof(SerialDlgData));
 	Param->hInst = inst;
 	Param->pts = pts;
+	Param->pcv = pcv;
 	Param->ComPortInfoPtr = ComPortInfoGet(&Param->ComPortInfoCount);
 	Param->show_all_port = !SHOW_ONLY_EXSITING_PORT;
 
