@@ -138,6 +138,9 @@ BOOL (WINAPI *pCreateTimerQueueTimer)(PHANDLE phNewTimer, HANDLE TimerQueue, WAI
 									  PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags);
 BOOL(WINAPI *pDeleteTimerQueueTimer)(HANDLE TimerQueue, HANDLE Timer, HANDLE CompletionEvent);
 ULONGLONG (WINAPI *pGetTickCount64)();
+BOOL (WINAPI *pWow64DisableWow64FsRedirection)(PVOID *OldValue);
+BOOL (WINAPI *pWow64RevertWow64FsRedirection)(PVOID OldValue);
+DWORD (WINAPI *pGetProcessId)(HANDLE Process);
 
 // gdi32
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -309,6 +312,9 @@ static const APIInfo Lists_kernel32[] = {
 	{ "CreateTimerQueueTimer", (void **)&pCreateTimerQueueTimer },
 	{ "DeleteTimerQueueTimer", (void **)&pDeleteTimerQueueTimer },
 	{ "GetTickCount64", (void **)&pGetTickCount64 },
+	{ "Wow64DisableWow64FsRedirection", (void **)&pWow64DisableWow64FsRedirection },
+	{ "Wow64RevertWow64FsRedirection", (void **)&pWow64RevertWow64FsRedirection },
+	{ "GetProcessId", (void **)&pGetProcessId },
 	{},
 };
 

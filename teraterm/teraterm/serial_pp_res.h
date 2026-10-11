@@ -20,6 +20,9 @@
 #define IDC_SERIALDELAYCHAR_LABEL       1045
 #define IDC_SERIALDELAY                 1046
 #define IDC_SERIALTEXT                  1079
+#define IDC_CONFIG_TEXT                 1082
+#define IDC_BUTTON_CONFIG               1083
+#define IDC_CONFIG_BUTTON               1083
 #define IDC_CHECK_CTS                   1301
 #define IDC_CHECK_RTS                   1302
 #define IDC_SERIALRTS                   1303
@@ -28,4 +31,3 @@
 #define IDC_SERIALDTR                   1306
 #define IDC_CHECK_RING                  1307
 #define IDC_CHECK_RLSD                  1308
-

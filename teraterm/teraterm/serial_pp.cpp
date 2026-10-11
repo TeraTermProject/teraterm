@@ -35,6 +35,8 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <assert.h>
+#include <windows.h>
+#include <commctrl.h>
 
 #include "tttypes.h"
 #include "ttlib.h"
@@ -48,6 +50,11 @@
 #include "ttwinman.h"
 
 #include "serial_pp.h"
+
+// 古い SDK 用
+#if !defined(BCM_SETSHIELD)
+#define BCM_SETSHIELD	0x160C
+#endif
 
 // テンプレートの書き換えを行う
 #define REWRITE_TEMPLATE
@@ -281,6 +288,7 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 	if (dlg_data->ComPortInfoCount == 0) {
 		// COMポートなし
 		serial_dlg_set_comport_info(hWnd, dlg_data, -1, -1, NULL);
+		EnableWindow(GetDlgItem(hWnd, IDC_BUTTON_CONFIG), FALSE);
 	}
 	else {
 		if (cv.Open && (cv.PortType == IdSerial)) {
@@ -288,8 +296,165 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 			EnableWindow(GetDlgItem(hWnd, id), FALSE);
 		}
 		serial_dlg_set_comport_info(hWnd, dlg_data, -1, ts->ComPort, NULL);
+		EnableWindow(GetDlgItem(hWnd, IDC_BUTTON_CONFIG), FALSE);
 	}
 	SendDlgItemMessage(hWnd, id, CB_SETCURSEL, sel_index - 1, 0);  // sel_index = 1 origin
+}
+
+#define CommXonLim 2048
+#define CommXoffLim 2048
+
+static void ts2DCB(const TTTSet *pts, DCB *dcb)
+{
+	memset(dcb, 0, sizeof(DCB));
+	dcb->BaudRate = pts->Baud;
+	dcb->DCBlength = sizeof(DCB);
+	dcb->BaudRate = pts->Baud;
+	dcb->fBinary = TRUE;
+	switch (pts->Parity) {
+		case IdParityNone:
+			dcb->Parity = NOPARITY;
+			break;
+		case IdParityOdd:
+			dcb->fParity = TRUE;
+			dcb->Parity = ODDPARITY;
+			break;
+		case IdParityEven:
+			dcb->fParity = TRUE;
+			dcb->Parity = EVENPARITY;
+			break;
+		case IdParityMark:
+			dcb->fParity = TRUE;
+			dcb->Parity = MARKPARITY;
+			break;
+		case IdParitySpace:
+			dcb->fParity = TRUE;
+			dcb->Parity = SPACEPARITY;
+			break;
+	}
+
+	dcb->fDtrControl = DTR_CONTROL_ENABLE;
+	dcb->fRtsControl = RTS_CONTROL_ENABLE;
+	switch (pts->Flow) {
+		case IdFlowX:
+			dcb->fOutX = TRUE;
+			dcb->fInX = TRUE;
+			dcb->XonLim = CommXonLim;
+			dcb->XoffLim = CommXoffLim;
+			dcb->XonChar = XON;
+			dcb->XoffChar = XOFF;
+			break;
+		case IdFlowHard:  // RTS/CTS
+			dcb->fOutxCtsFlow = TRUE;
+			dcb->fRtsControl = RTS_CONTROL_HANDSHAKE;
+			break;
+		case IdFlowHardDsrDtr:	// DSR/DTR
+			dcb->fOutxDsrFlow = TRUE;
+			dcb->fDtrControl = DTR_CONTROL_HANDSHAKE;
+			break;
+	}
+
+	switch (pts->DataBit) {
+		case IdDataBit7:
+			dcb->ByteSize = 7;
+			break;
+		case IdDataBit8:
+			dcb->ByteSize = 8;
+			break;
+	}
+	switch (pts->StopBit) {
+		case IdStopBit1:
+			dcb->StopBits = ONESTOPBIT;
+			break;
+		case IdStopBit2:
+			dcb->StopBits = TWOSTOPBITS;
+			break;
+	}
+}
+
+static void DCB2Ctrl(HWND hWnd, const DCB *dcb)
+{
+	// speed, baud rate
+	{
+		int i, sel;
+		i = sel = 0;
+		while (BaudList[i] != NULL) {
+			if ((WORD)atoi(BaudList[i]) == dcb->BaudRate) {
+				SendDlgItemMessage(hWnd, IDC_SERIALBAUD, CB_SETCURSEL, i, 0);
+				sel = 1;
+				break;
+			}
+			i++;
+		}
+		if (!sel) {
+			SetDlgItemInt(hWnd, IDC_SERIALBAUD, dcb->BaudRate, FALSE);
+		}
+	}
+
+	// data bits
+	switch (dcb->ByteSize) {
+		case 7:
+			SendDlgItemMessage(hWnd, IDC_SERIALDATA, CB_SETCURSEL, IdDataBit7 - 1, 0);
+			break;
+		case 8:
+			SendDlgItemMessage(hWnd, IDC_SERIALDATA, CB_SETCURSEL, IdDataBit8 - 1, 0);
+			break;
+	}
+
+	// parity
+	switch (dcb->Parity) {
+		case NOPARITY:
+			SendDlgItemMessage(hWnd, IDC_SERIALPARITY, CB_SETCURSEL, IdParityNone - 1, 0);
+			break;
+		case ODDPARITY:
+			SendDlgItemMessage(hWnd, IDC_SERIALPARITY, CB_SETCURSEL, IdParityOdd - 1, 0);
+			break;
+		case EVENPARITY:
+			SendDlgItemMessage(hWnd, IDC_SERIALPARITY, CB_SETCURSEL, IdParityEven - 1, 0);
+			break;
+		case MARKPARITY:
+			SendDlgItemMessage(hWnd, IDC_SERIALPARITY, CB_SETCURSEL, IdParityMark - 1, 0);
+			break;
+		case SPACEPARITY:
+			SendDlgItemMessage(hWnd, IDC_SERIALPARITY, CB_SETCURSEL, IdParitySpace - 1, 0);
+			break;
+	}
+
+	// stop bits
+	switch (dcb->StopBits) {
+		case ONESTOPBIT:
+			SendDlgItemMessage(hWnd, IDC_SERIALSTOP, CB_SETCURSEL, IdStopBit1 - 1, 0);
+			break;
+		case TWOSTOPBITS:
+			SendDlgItemMessage(hWnd, IDC_SERIALSTOP, CB_SETCURSEL, IdStopBit2 - 1, 0);
+			break;
+	}
+
+	// flow control
+	int flow;
+	if (dcb->fInX && dcb->fOutX) {
+		flow = IdFlowX;
+	}
+	else if (dcb->fOutxCtsFlow) {
+		flow = IdFlowHard;
+	}
+	else if (dcb->fOutxDsrFlow) {
+		flow = IdFlowHardDsrDtr;
+	}
+	else {
+		flow = IdFlowNone;
+	}
+	int flow_sel = flow - 1;
+	if (flow == IdFlowHardDsrDtr) {
+		flow_sel = 2;
+	}
+	else if (flow == IdFlowNone) {
+		flow_sel = 3;
+	}
+	SendDlgItemMessage(hWnd, IDC_SERIALFLOW, CB_SETCURSEL, flow_sel, 0);
+
+	SendDlgItemMessage(hWnd, IDC_SERIALRTS, CB_SETCURSEL, dcb->fRtsControl, 0);
+	SendDlgItemMessage(hWnd, IDC_SERIALDTR, CB_SETCURSEL, dcb->fDtrControl, 0);
 }
 
 /*
@@ -546,7 +711,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 			}
 			break;
 		}
-		case WM_COMMAND:
+		case WM_COMMAND: {
 			switch (LOWORD(wParam)) {
 				case IDC_SERIALPORT:
 					if (HIWORD(wParam) == CBN_SELCHANGE) {
@@ -557,10 +722,12 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 						if (item_data >= 0) {
 							// 詳細情報を表示する
 							serial_dlg_set_comport_info(Dialog, dlg_data, item_data, -1, NULL);
+							EnableWindow(GetDlgItem(Dialog, IDC_BUTTON_CONFIG), TRUE);
 						}
 						else if (item_data == -1) {
 							// 情報なしを表示する
 							serial_dlg_set_comport_info(Dialog, dlg_data, -1, -1, NULL);
+							EnableWindow(GetDlgItem(Dialog, IDC_BUTTON_CONFIG), FALSE);
 						}
 						else {
 							// 選択方法変更
@@ -636,7 +803,32 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 						SetComStatus(Dialog, FlowCtrlRTS, FlowCtrlDTR);
 					}
 					return TRUE;
+
+				case IDC_BUTTON_CONFIG:
+					if (HIWORD(wParam) == BN_CLICKED) {
+						SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
+						LRESULT sel = SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_GETCURSEL, 0, 0);
+						LRESULT item_data = SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_GETITEMDATA, sel, 0);
+						if (item_data < 0 || item_data >= dlg_data->ComPortInfoCount) {
+							// ポート情報がない
+							return TRUE;
+						}
+						const ComPortInfo_t *info = &dlg_data->ComPortInfoPtr[item_data];
+
+						// デバイスマネージャのプロパティを表示する
+						DCB dcb;
+						ts2DCB(dlg_data->pts, &dcb);
+						BOOL elevation = TRUE;
+						if (ComPortInfoShowDeviceProperties(info, Dialog, elevation, &dcb) == 1) {
+							// ポート設定が変更されたらダイアログに反映する
+							DCB2Ctrl(Dialog, &dcb);
+						}
+					}
+					return TRUE;
+				default:
+					break;
 			}
+		}
 	}
 	return FALSE;
 }
