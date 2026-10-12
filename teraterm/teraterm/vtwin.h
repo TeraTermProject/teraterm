@@ -85,6 +85,8 @@ private:
 	BOOL isSizing;		// サイズ変更中(WM_SIZING 〜 WM_EXITSIZEMOVE)はTRUE
 	BOOL isClosing;		// TRUE=ウィンドウクローズ中(WM_DESTROYを受信した)
 
+	DWORD InactiveTick;	// VTWindowが非アクティブになった時刻
+
 public:
 	CVTWindow(HINSTANCE hInstance);
 	~CVTWindow();

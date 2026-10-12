@@ -52,6 +52,7 @@
 #endif
 
 #include "bitmap.h"
+#include "ttdebug.h" // #1534 test
 
 #if ENABLE_GDIPLUS
 namespace {
@@ -574,12 +575,18 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 			LocalFree(hbmi);
 			LocalUnlock(hbuf);
 			LocalFree(hbuf);
+			WriteDebugPrintf("BitmapLoad : SusieLoadPicture() ok filename=%ls spi_path=%ls\n", filename, spi_path); // #1534 test
 		}
 	}
 
 	// WIC を使って読み込む
 	if (hbm == NULL) {
 		hbm = LoadImageWIC(filename);
+		{ // #1534 test
+			if (hbm) {
+				WriteDebugPrintf("BitmapLoad : LoadImageWIC() ok filename=%ls\n", filename);
+			}
+		}
 	}
 
 	// GDI+ ライブラリを使って読み込む
@@ -588,12 +595,22 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 	if (hbm == NULL) {
 		initializer.Init();
 		hbm = GDIPLoad(filename);
+		{ // #1534 test
+			if (hbm) {
+				WriteDebugPrintf("BitmapLoad : GDIPLoad() ok filename=%ls\n", filename);
+			}
+		}
 	}
 #endif
 
 	// OLE を利用して画像(jpeg)を読む
 	if (hbm == NULL) {
 		hbm = GetBitmapHandleW(filename);
+		{ // #1534 test
+			if (hbm) {
+				WriteDebugPrintf("BitmapLoad : GetBitmapHandleW() ok filename=%ls\n", filename);
+			}
+		}
 	}
 
 	// LoadImageW() API で読み込む
@@ -604,10 +621,16 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 		// IMAGE_BITMAPのとき戻り値はHBITMAP
 		// LR_CREATEDIBSECTION を指定すると、DIBを返す
 		hbm = (HBITMAP)LoadImageW(0, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE|LR_CREATEDIBSECTION);
+		{ // #1534 test
+			if (hbm) {
+				WriteDebugPrintf("BitmapLoad : LoadImageW() ok filename=%ls\n", filename);
+			}
+		}
 	}
 
 	if (hbm == NULL) {
 		*hBitmap = NULL;
+		WriteDebugPrintf("BitmapLoad : error filename=%ls\n", filename);
 		return ERROR_INVALID_DATA;
 	}
 

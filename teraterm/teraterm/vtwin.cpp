@@ -68,6 +68,7 @@
 #include "buffer.h"
 #include "cyglib.h"
 #include "theme.h"
+#include "ttdebug.h" // #1534 test
 
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
@@ -695,6 +696,8 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	vtwin_work.help_id = 0;
 	isSizing = FALSE;
 	isClosing = FALSE;
+	UnsetGdiReconfigInProgressFlag();
+	InactiveTick = GetTickCount();
 
 	// UnicodeDebugParam
 	{
@@ -1603,6 +1606,22 @@ void CVTWindow::OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized)
 		SetWindowAlpha(ts.AlphaBlendInactive);
 	} else {
 		SetWindowAlpha(ts.AlphaBlendActive);
+	}
+
+	// アクティブ化時、背景画像を再ロードする
+	if (nState == WA_INACTIVE) {
+		InactiveTick = GetTickCount();
+		WriteDebugPrintf("OnActivate : WA_INACTIVE\n"); // #1534 test
+	} else if (vt_src && ThemeIsEnabled() && !bMinimized) {
+		DWORD tick = GetTickCount();
+		if (tick - InactiveTick >= 60 * 1000) {
+			WriteDebugPrintf("OnActivate : SetTimer\n"); // #1534 test
+			InactiveTick = tick;
+			::KillTimer(m_hWnd, IdGdiReconfigWaitTimer);
+			::SetTimer(m_hWnd, IdGdiReconfigWaitTimer, GDI_RECONFIG_WAIT_TIME, NULL);
+		} else {
+			WriteDebugPrintf("OnActivate : < 60 sec\n"); // #1534 test
+		}
 	}
 }
 
@@ -2741,11 +2760,13 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 		//    (WM_MOVE,)WM_SIZE, WM_DPICHANGED の順でメッセージが発生する
 		//
 		// WM_SIZEの処理のため、2 が妥当となるよう実装した
+		WriteDebugPrintf("OnSize : DPI\n"); // #1534 test
 		return;
 	}
 	RECT R;
 	int w, h;
 
+	const BOOL wasMinimized = Minimized;
 	Minimized = (nType==SIZE_MINIMIZED);
 
 	if (FirstPaint && Minimized)
@@ -2757,9 +2778,11 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 		}
 		FirstPaint = FALSE;
 		Startup();
+		WriteDebugPrintf("OnSize : FirstPaint && Minimized\n"); // #1534 test
 		return;
 	}
 	if (Minimized || DontChangeSize) {
+		WriteDebugPrintf("OnSize : Minimized || DontChangeSize\n"); // #1534 test
 		return;
 	}
 
@@ -2827,6 +2850,13 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 		AdjustSize = FALSE;
 	}
 #endif
+
+	// 最小化からの復帰時、背景画像を再ロードする
+	if (wasMinimized && !Minimized && !isSizing && ThemeIsEnabled()) {
+		WriteDebugPrintf("OnSize : SetTimer\n"); // #1534 test
+		::KillTimer(m_hWnd, IdGdiReconfigWaitTimer);
+		::SetTimer(m_hWnd, IdGdiReconfigWaitTimer, GDI_RECONFIG_WAIT_TIME, NULL);
+	}
 }
 
 // リサイズ中の処理として、以下の二つを行う。
@@ -3101,6 +3131,14 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 		case IdPrnProcTimer:
 			PrnFileDirectProc(PrintFile_);
 			break;
+		case IdGdiReconfigWaitTimer:
+			UnsetGdiReconfigInProgressFlag();
+			if (vt_src != NULL && ThemeIsEnabled()) {
+				WriteDebugPrintf("OnTimer : IdGdiReconfigWaitTimer\n"); // #1534 test
+				BGSetupPrimary(vt_src, TRUE);
+				::InvalidateRect(m_hWnd, NULL, FALSE);
+			}
+			break;
 	}
 }
 
@@ -3165,6 +3203,7 @@ LRESULT CVTWindow::OnWindowPosChanging(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnSettingChange(WPARAM wParam, LPARAM lParam)
 {
+	WriteDebugPrintf("OnSettingChange : BGOnSettingChange()\n"); // #1534 test
 	BGOnSettingChange(vt_src);
 	return TTCFrameWnd::DefWindowProc(WM_SETTINGCHANGE,wParam,lParam);
 }
@@ -3179,6 +3218,7 @@ LRESULT CVTWindow::OnEnterSizeMove(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 {
+	WriteDebugPrintf("OnExitSizeMove : BGOnExitSizeMove()\n"); // #1534 test
 	BGOnExitSizeMove(vt_src);
 
 	EnableSizeTip(0);
@@ -5302,23 +5342,29 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 void CVTWindow::OnDisplayChange()
 {
 	if (vt_src == NULL || !ThemeIsEnabled()) {
-		return;
+		UnsetGdiReconfigInProgressFlag();
+	} else {
+		// グラフィック再構成後に、背景画像を再ロードする
+		WriteDebugPrintf("OnDisplayChange : SetTimer\n"); // #1534 test
+		SetGdiReconfigInProgressFlag();
+		::KillTimer(m_hWnd, IdGdiReconfigWaitTimer);
+		::SetTimer(m_hWnd, IdGdiReconfigWaitTimer, GDI_RECONFIG_WAIT_TIME, NULL);
 	}
-	BGSetupPrimary(vt_src, TRUE);
-	::InvalidateRect(m_hWnd, NULL, FALSE);
 }
 
 void CVTWindow::OnWTSSessionChange(WPARAM wp)
 {
+	WriteDebugPrintf("OnWTSSessionChange : wp=%d\n", (int)wp); // #1534 test
 	if (vt_src == NULL || !ThemeIsEnabled()) {
-		return;
-	}
-	if (wp == WTS_CONSOLE_CONNECT ||
-		wp == WTS_REMOTE_CONNECT ||
-		wp == WTS_SESSION_LOGON ||
-		wp == WTS_SESSION_UNLOCK) {
-		BGSetupPrimary(vt_src, TRUE);
-		::InvalidateRect(m_hWnd, NULL, FALSE);
+		UnsetGdiReconfigInProgressFlag();
+	} else if (wp == WTS_CONSOLE_CONNECT ||
+			   wp == WTS_REMOTE_CONNECT ||
+			   wp == WTS_SESSION_LOGON ||
+			   wp == WTS_SESSION_UNLOCK) {
+		// グラフィック再構成後に、背景画像を再ロードする
+		SetGdiReconfigInProgressFlag();
+		::KillTimer(m_hWnd, IdGdiReconfigWaitTimer);
+		::SetTimer(m_hWnd, IdGdiReconfigWaitTimer, GDI_RECONFIG_WAIT_TIME, NULL);
 	}
 }
 
