@@ -52,6 +52,7 @@
 #endif
 
 #include "bitmap.h"
+#include "ttdebug.h" // #1534 test
 
 #if ENABLE_GDIPLUS
 namespace {
@@ -292,9 +293,45 @@ static HBITMAP GetBitmapHandleW(const wchar_t *File)
 	iPicture->get_Type(&type);
 	if(type==PICTYPE_BITMAP){
 		iPicture->get_Handle(&hOle);
+	} else {
+		iPicture->Release();
+		return NULL;
 	}
 
-	hBitmap=(HBITMAP)(UINT_PTR)hOle;
+	HBITMAP hRaw = (HBITMAP)(UINT_PTR)hOle;
+
+	BITMAP bm;
+	if (GetObject(hRaw, sizeof(bm), &bm)) {
+		HDC hScreenDC = GetDC(NULL);
+		if (hScreenDC) {
+			hBitmap = CreateCompatibleBitmap(hScreenDC, bm.bmWidth, bm.bmHeight);
+			if (hBitmap) {
+				HDC hSrcDC = CreateCompatibleDC(hScreenDC);
+				HDC hDstDC = CreateCompatibleDC(hScreenDC);
+				if (hSrcDC && hDstDC) {
+					HBITMAP hOldSrcBmp = (HBITMAP)SelectObject(hSrcDC, hRaw);
+					HBITMAP hOldDstBmp = (HBITMAP)SelectObject(hDstDC, hBitmap);
+					BOOL ok = BitBlt(hDstDC, 0, 0, bm.bmWidth, bm.bmHeight, hSrcDC, 0, 0, SRCCOPY);
+					SelectObject(hSrcDC, hOldSrcBmp);
+					SelectObject(hDstDC, hOldDstBmp);
+					if (!ok) {
+						DeleteObject(hBitmap);
+						hBitmap = NULL;
+					}
+				} else {
+					DeleteObject(hBitmap);
+					hBitmap = NULL;
+				}
+				if (hSrcDC) {
+					DeleteDC(hSrcDC);
+				}
+				if (hDstDC) {
+					DeleteDC(hDstDC);
+				}
+			}
+			ReleaseDC(NULL, hScreenDC);
+		}
+	}
 
 	iPicture->Release();
 
@@ -538,12 +575,18 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 			LocalFree(hbmi);
 			LocalUnlock(hbuf);
 			LocalFree(hbuf);
+			WriteDebugPrintf("BitmapLoad : SusieLoadPicture() ok filename=%ls spi_path=%ls\n", filename, spi_path); // #1534 test
 		}
 	}
 
 	// WIC を使って読み込む
 	if (hbm == NULL) {
 		hbm = LoadImageWIC(filename);
+		{ // #1534 test
+			if (hbm) {
+				WriteDebugPrintf("BitmapLoad : LoadImageWIC() ok filename=%ls\n", filename);
+			}
+		}
 	}
 
 	// GDI+ ライブラリを使って読み込む
@@ -552,12 +595,22 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 	if (hbm == NULL) {
 		initializer.Init();
 		hbm = GDIPLoad(filename);
+		{ // #1534 test
+			if (hbm) {
+				WriteDebugPrintf("BitmapLoad : GDIPLoad() ok filename=%ls\n", filename);
+			}
+		}
 	}
 #endif
 
 	// OLE を利用して画像(jpeg)を読む
 	if (hbm == NULL) {
 		hbm = GetBitmapHandleW(filename);
+		{ // #1534 test
+			if (hbm) {
+				WriteDebugPrintf("BitmapLoad : GetBitmapHandleW() ok filename=%ls\n", filename);
+			}
+		}
 	}
 
 	// LoadImageW() API で読み込む
@@ -568,10 +621,16 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 		// IMAGE_BITMAPのとき戻り値はHBITMAP
 		// LR_CREATEDIBSECTION を指定すると、DIBを返す
 		hbm = (HBITMAP)LoadImageW(0, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE|LR_CREATEDIBSECTION);
+		{ // #1534 test
+			if (hbm) {
+				WriteDebugPrintf("BitmapLoad : LoadImageW() ok filename=%ls\n", filename);
+			}
+		}
 	}
 
 	if (hbm == NULL) {
 		*hBitmap = NULL;
+		WriteDebugPrintf("BitmapLoad : error filename=%ls\n", filename);
 		return ERROR_INVALID_DATA;
 	}
 

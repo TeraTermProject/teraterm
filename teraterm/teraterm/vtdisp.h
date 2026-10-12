@@ -74,6 +74,8 @@ extern vtdraw_t *vt_src;
 /* prototypes */
 void BGInitialize(vtdraw_t *vt, BOOL initialize_once);
 void BGLoadThemeFile(vtdraw_t *vt, const TTTSet *pts);
+void SetGdiReconfigInProgressFlag(void);
+void UnsetGdiReconfigInProgressFlag(void);
 void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup);
 
 void BGOnSettingChange(vtdraw_t *vt);
@@ -194,6 +196,8 @@ extern BOOL IMECompositionState;
 #define IdPrnSelectedText 2
 #define IdPrnScrollRegion 4
 #define IdPrnFile 8
+
+#define GDI_RECONFIG_WAIT_TIME 2000	// GDIリソースの再構成待ち時間 2000msec
 
 vtdraw_t *VTPrintInit(int PrnFlag, ttdc_t **dc, int *mode);
 void VTPrintEnd(vtdraw_t *vt, ttdc_t *dc);

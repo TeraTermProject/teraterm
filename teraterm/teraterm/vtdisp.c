@@ -52,6 +52,9 @@
 
 #include "defaultcolortable.c"
 
+#include <stdio.h>   // #1534 test
+#include "ttdebug.h" // #1534 test
+
 #if 1
 #define _OutputDebugPrintf(...)  OutputDebugPrintf(__VA_ARGS__)
 #else
@@ -173,6 +176,7 @@ static BGSrc BGSrc1;	// 壁紙(Windowsのデスクトップ背景)用
 static BGSrc BGSrc2;	// fill color用
 
 static int  BGEnable;
+static BOOL IsGdiReconfigInProgress;  // TRUE=セッション再接続中(タイマーIdGdiReconfigWaitTimerが有効)
 
 static RECT BGPrevRect;
 
@@ -209,8 +213,16 @@ static HBITMAP CreateScreenCompatibleBitmap(int width,int height)
   _OutputDebugPrintf("CreateScreenCompatibleBitmap : width = %d height = %d\n",width,height);
 
   hdc = GetDC(NULL);
+  if (!hdc) {
+	  WriteDebugPrintf("CreateScreenCompatibleBitmap : hdc=NULL err=%d\n", GetLastError()); // #1534 test
+  }
 
   hbm = CreateCompatibleBitmap(hdc,width,height);
+  if(!hbm) { // #1534 test
+	  WriteDebugPrintf("CreateScreenCompatibleBitmap : fail in CreateCompatibleBitmap err=%d\n", GetLastError());
+  } else {
+	  WriteDebugPrintf("CreateScreenCompatibleBitmap : ok\n");
+  }
 
   ReleaseDC(NULL,hdc);
 
@@ -259,9 +271,16 @@ static HDC  CreateBitmapDC(HBITMAP hbm)
   _OutputDebugPrintf("CreateBitmapDC : hbm = %p\n",hbm);
 
   hdc = CreateCompatibleDC(NULL);
+  if (hdc == NULL) {
+	DeleteObject(hbm);
+	return NULL;
+  }
 
-  SaveDC(hdc);
-  SelectObject(hdc,hbm);
+  if (SelectObject(hdc, hbm) == NULL) {
+	DeleteDC(hdc);
+	DeleteObject(hbm);
+	return NULL;
+  }
 
   return hdc;
 }
@@ -280,11 +299,12 @@ static void DeleteBitmapDC(HDC *hdc)
 
   hbm = GetCurrentObject(*hdc,OBJ_BITMAP);
 
-  RestoreDC(*hdc,-1);
-  DeleteObject(hbm);
   DeleteDC(*hdc);
-
   *hdc = 0;
+
+  if (hbm) {
+    DeleteObject(hbm);
+  }
 }
 
 static void FillBitmapDC(HDC hdc,COLORREF color)
@@ -375,13 +395,44 @@ static void BGPreloadPicture(BGSrc *src, const TTTSet *pts)
 	if(hbm) {
 		BITMAP bm;
 
-		GetObject(hbm,sizeof(bm),&bm);
-
-		src->hdc    = CreateBitmapDC(hbm);
-		src->width  = bm.bmWidth;
-		src->height = bm.bmHeight;
+		if (GetObject(hbm, sizeof(bm), &bm) == 0) {
+			DeleteObject(hbm);
+		} else {
+			HDC new_hdc = CreateBitmapDC(hbm);
+			if (new_hdc) {
+				DeleteBitmapDC(&(src->hdc));
+				src->hdc    = new_hdc;
+				src->width  = bm.bmWidth;
+				src->height = bm.bmHeight;
+			}
+		}
 	}else{
-		src->type = BG_COLOR;
+		{ // #1534 test
+			char str[16];
+			if (src == &BGDest) {
+				sprintf(str, "BGDest");
+			} else if (src == &BGSrc1) {
+				sprintf(str, "BGDSrc1");
+			} else if (src == &BGSrc2) {
+				sprintf(str, "BGDSrc2");
+			} else {
+				sprintf(str, "unknown");
+			}
+			WriteDebugPrintf("BGPreloadPicture : %s->type=%d fallback\n", str, src->type);
+		}
+		src->type = BG_COLOR; // 画像が読めない場合は、単色塗りにフォールバックする
+
+		{ // #1534 test 画像ファイルが開けるか確認する
+			HANDLE hFile = CreateFileW(src->fileW, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+			if (hFile == INVALID_HANDLE_VALUE) {
+				// open error
+				DWORD err = GetLastError();
+				WriteDebugPrintf("BGPreloadPicture : CreateFileW err=%d\n", err);
+			} else {
+				CloseHandle(hFile);
+				WriteDebugPrintf("BGPreloadPicture : CreateFileW ok\n");
+			}
+		}
 	}
 
 	free(susie_path);
@@ -614,15 +665,33 @@ load_finish:
 	{
 		BITMAP bm;
 
-		GetObject(hbm,sizeof(bm),&bm);
-
-		src->hdc     = CreateBitmapDC(hbm);
-		src->width   = bm.bmWidth;
-		src->height  = bm.bmHeight;
-		src->pattern = wi.pattern;
-
+		if (GetObject(hbm, sizeof(bm), &bm) == 0) {
+			DeleteObject(hbm);
+		} else {
+			HDC new_hdc = CreateBitmapDC(hbm);
+			if (new_hdc) {
+				DeleteBitmapDC(&(src->hdc));
+				src->hdc     = new_hdc;
+				src->width   = bm.bmWidth;
+				src->height  = bm.bmHeight;
+				src->pattern = wi.pattern;
+			}
+		}
 	}else{
-		src->hdc = NULL;
+		src->hdc = NULL; // 壁紙を読めない場合は再読み込み出来るようにしておく
+		{ // #1534 test
+			char str[16];
+			if (src == &BGDest) {
+				sprintf(str, "BGDest");
+			} else if (src == &BGSrc1) {
+				sprintf(str, "BGDSrc1");
+			} else if (src == &BGSrc2) {
+				sprintf(str, "BGDSrc2");
+			} else {
+				sprintf(str, "unknown");
+			}
+			WriteDebugPrintf("BGPreloadWallpaper : %s->hdc fallback\n", str);
+		}
 	}
 
 	src->color = GetSysColor(COLOR_DESKTOP);
@@ -1051,6 +1120,14 @@ static HDC CreateBGImage(vtdraw_t *vt, int width, int height)
 	return hdc_bg;
 }
 
+void SetGdiReconfigInProgressFlag(void) {
+	IsGdiReconfigInProgress = TRUE;
+}
+
+void UnsetGdiReconfigInProgressFlag(void) {
+	IsGdiReconfigInProgress = FALSE;
+}
+
 /**
  *
  *	ThemeSetBG(), ThemeSetColor() のあとにコールする
@@ -1067,6 +1144,14 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
   if(!BGEnable)
     return;
 
+  // GDIリソースの再構成中は背景の描画をスキップする
+  if (IsGdiReconfigInProgress) {
+	  WriteDebugPrintf("BGSetupPrimary : IsGdiReconfigInProgress=%s forceSetup=%s\n",
+					   IsGdiReconfigInProgress ? "true" : "false",
+					   forceSetup ? "true" : "false"); // #1534 test
+	  return;
+  }
+
   //窓の位置、大きさが変わったかチェック
   point.x = 0;
   point.y = 0;
@@ -1077,6 +1162,10 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
 
   if(!forceSetup && EqualRect(&rect,&BGPrevRect))
     return;
+
+  // 背景画像のフォールバックを元に戻す
+  WriteDebugPrintf("BGSetupPrimary : BGDest.type=%d\n", BGDest.type); // #1534 test
+  BGDest.type = BG_PICTURE;
 
   CopyRect(&BGPrevRect,&rect);
 
@@ -1105,6 +1194,15 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
 	  }
 
 	  hdcBG = CreateBGImage(vt, vt->ScreenWidth, vt->ScreenHeight);
+  }
+
+  { // #1534 test
+	  HDC hdc = GetDC(NULL);
+	  WriteDebugPrintf("BGSetupPrimary : hdc=%08lx forceSetup=%s BGDest.type=%d hdcBGWork=%08lx hdcBGBuffer=%08lx hdcBG=%08lx pixel=%d(%d,%d)\n",
+					   hdc, forceSetup ? "true" : "false", BGDest.type,
+					   (unsigned long)hdcBGWork, (unsigned long)hdcBGBuffer, (unsigned long)hdcBG,
+					   GetDeviceCaps(hdc,BITSPIXEL), GetDeviceCaps(hdc ,HORZRES), GetDeviceCaps(hdc ,VERTRES));
+	  ReleaseDC(NULL, hdc);
   }
 }
 

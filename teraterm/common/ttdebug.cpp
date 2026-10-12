@@ -28,6 +28,7 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <share.h>  // for _wfsopen()
 #include <imagehlp.h>
 #include <shlobj.h>	// for SHGetSpecialFolderPathW()
 #include <intrin.h> // for __debugbreak()
@@ -345,6 +346,7 @@ static LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS* pExceptionPointer
 			MessageBoxW(NULL, msg, L"Tera Term", MB_OK);
 			free(msg);
 		}
+		free(logdir);
 		free(fname);
 		free(dumpfile);
 	}
@@ -388,4 +390,39 @@ void DebugSetException(const wchar_t *basename)
 
 	// Cランタイム無効なパラメータエラーハンドラ
 	_set_invalid_parameter_handler(InvalidParameterHandler);
+}
+
+/**
+ *	デバグメッセージをファイルに出力する (仮：issue #1534 用)
+ */
+#if defined(_MSC_VER)
+void WriteDebugPrintf(_Printf_format_string_ const char *fmt, ...)
+#else
+void WriteDebugPrintf(const char *fmt, ...)
+#endif
+{
+	SYSTEMTIME local_time;
+	GetLocalTime(&local_time);
+
+	static FILE *fp = NULL;
+	if (fp == NULL) {
+		wchar_t *logdir = GetLogDirW(NULL);
+		wchar_t *debug_file;
+		aswprintf(&debug_file, L"%s\\debug_%04d%02d%02d-%02d%02d%02d-%03d.txt", logdir,
+				  local_time.wYear, local_time.wMonth, local_time.wDay,
+				  local_time.wHour, local_time.wMinute, local_time.wSecond, local_time.wMilliseconds);
+		fp = _wfsopen(debug_file, L"a", _SH_DENYWR);
+		free(debug_file);
+		free(logdir);
+	}
+
+	fprintf(fp, "%02d-%02d-%02d %02d:%02d:%02d.%03d ",
+			local_time.wYear, local_time.wMonth, local_time.wDay,
+			local_time.wHour, local_time.wMinute, local_time.wSecond, local_time.wMilliseconds);
+
+	va_list arg;
+	va_start(arg, fmt);
+	vfprintf(fp, fmt, arg);
+	va_end(arg);
+	fflush(fp);
 }
