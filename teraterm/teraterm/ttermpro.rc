@@ -614,6 +614,7 @@ BEGIN
     POPUP "&File"
     BEGIN
         MENUITEM "&New connection...\tAlt+N",   ID_FILE_NEWCONNECTION
+        MENUITEM "New &tab\tCtrl+Shift+T",      ID_FILE_NEWTAB
         MENUITEM "D&uplicate session\tAlt+D",   ID_FILE_DUPLICATESESSION
         MENUITEM "Cy&gwin connection\tAlt+G",   ID_FILE_CYGWINCONNECTION
         MENUITEM SEPARATOR
@@ -667,6 +668,7 @@ BEGIN
         MENUITEM "&Export Console to TXT...",   ID_FILE_EXPORTBUFFER
         MENUITEM SEPARATOR
         MENUITEM "&Disconnect\tAlt+I",          ID_FILE_DISCONNECT
+        MENUITEM "&Close tab\tCtrl+Shift+W",    ID_FILE_CLOSETAB
         MENUITEM "E&xit\tAlt+Q",                ID_FILE_EXIT
         MENUITEM "Exit &All",                   ID_FILE_EXITALL
     END
@@ -784,6 +786,10 @@ BEGIN
     "G",            ID_ACC_CYGWINCONNECTION, VIRTKEY, ALT, NOINVERT
     "D",            ID_ACC_DUPLICATESESSION, VIRTKEY, ALT, NOINVERT
     "I",            ID_ACC_DISCONNECT,      VIRTKEY, ALT, NOINVERT
+    "T",            ID_FILE_NEWTAB,         VIRTKEY, CONTROL, SHIFT, NOINVERT
+    "W",            ID_FILE_CLOSETAB,       VIRTKEY, CONTROL, SHIFT, NOINVERT
+    VK_TAB,         ID_TAB_NEXT,            VIRTKEY, CONTROL, NOINVERT
+    VK_TAB,         ID_TAB_PREV,            VIRTKEY, CONTROL, SHIFT, NOINVERT
 END
 
 #endif    // âpåÍ (ïƒçë) resources

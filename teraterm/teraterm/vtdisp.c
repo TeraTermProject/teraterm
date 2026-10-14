@@ -2076,6 +2076,21 @@ void DispSetCaretWidth(BOOL DW)
 }
 
 /**
+ *	The window that is moved, minimized, raised ...
+ *	In the tabbed window the VT window is a child, these apply to the frame
+ */
+static HWND TopWindow(const vtdraw_t *vt)
+{
+	HWND root = GetAncestor(vt->hVTWin, GA_ROOT);
+	return root != NULL ? root : vt->hVTWin;
+}
+
+static BOOL IsChildVT(const vtdraw_t *vt)
+{
+	return (GetWindowLongPtr(vt->hVTWin, GWL_STYLE) & WS_CHILD) != 0;
+}
+
+/**
  *	ウィンドウのサイズが変化
  *	BuffChangeWinSize() からコールされる
  *
@@ -2181,6 +2196,12 @@ void ResizeWindow(vtdraw_t *vt, int x, int y, int w, int h, int cw, int ch)
   if ((dw!=0) || (dh!=0)) {
     SetWindowPos(vt->hVTWin,HWND_TOP,x,y,w+dw,h+dh,SWP_NOMOVE);
     AdjustSize = FALSE;
+  }
+  else if (IsChildVT(vt)) {
+    // the frame keeps itself on the screen
+    AdjustSize = FALSE;
+    CompletelyVisible = TRUE;
+    if (IsCaretOn()) CaretOn(vt);
   }
   else {
     AdjustSize = FALSE;
@@ -3346,7 +3367,7 @@ void DispSetWinPos(vtdraw_t *vt)
  */
 void DispMoveWindow(vtdraw_t *vt, int x, int y)
 {
-	SetWindowPos(vt->hVTWin, 0, x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
+	SetWindowPos(TopWindow(vt), 0, x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
 	// WM_WINDOWPOSCHANGED を処理しないので
 	// WM_MOVE が発生して DispSetWinPos() がコールされる
 	// DispSetWinPos();
@@ -3601,15 +3622,16 @@ COLORREF DispGetColor(vtdraw_t *vt, unsigned int num)
 
 void DispShowWindow(vtdraw_t *vt, int mode)
 {
+	HWND top = TopWindow(vt);
 	switch (mode) {
 	case WINDOW_MINIMIZE:
-		ShowWindow(vt->hVTWin, SW_MINIMIZE);
+		ShowWindow(top, SW_MINIMIZE);
 		break;
 	case WINDOW_MAXIMIZE:
-		ShowWindow(vt->hVTWin, SW_MAXIMIZE);
+		ShowWindow(top, SW_MAXIMIZE);
 		break;
 	case WINDOW_RESTORE:
-		ShowWindow(vt->hVTWin, SW_RESTORE);
+		ShowWindow(top, SW_RESTORE);
 		break;
 	case WINDOW_RAISE: {
 		//何も起きないことあり
@@ -3620,25 +3642,25 @@ void DispShowWindow(vtdraw_t *vt, int mode)
 		SetForegroundWindow(HVTWin);
 #else
 		//フォーカスは奪わず最上面に来る
-		BringWindowToTop(vt->hVTWin);
-		if (GetForegroundWindow() != vt->hVTWin) {
-			FlashWindow(vt->hVTWin, TRUE);
+		BringWindowToTop(top);
+		if (GetForegroundWindow() != top) {
+			FlashWindow(top, TRUE);
 		}
 #endif
 	}
 		break;
 	case WINDOW_LOWER:
-		SetWindowPos(vt->hVTWin, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		SetWindowPos(top, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 		break;
 	case WINDOW_REFRESH:
-		InvalidateRect(vt->hVTWin, NULL, FALSE);
+		InvalidateRect(top, NULL, FALSE);
 		break;
 	case WINDOW_TOGGLE_MAXIMIZE:
-		if (IsZoomed(vt->hVTWin)) {
-			ShowWindow(vt->hVTWin, SW_RESTORE);
+		if (IsZoomed(top)) {
+			ShowWindow(top, SW_RESTORE);
 		}
 		else {
-			ShowWindow(vt->hVTWin, SW_MAXIMIZE);
+			ShowWindow(top, SW_MAXIMIZE);
 		}
 		break;
 	}

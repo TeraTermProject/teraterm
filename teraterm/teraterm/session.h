@@ -74,6 +74,10 @@ void SessionDestroy(TTSession *session);
 void SessionSwitch(TTSession *session);
 TTSession *SessionGetActive(void);
 int SessionGetCount(void);
+TTSession *SessionGetAt(int index);
+TTTSet *SessionGetTS(TTSession *session);
+BOOL SessionIsPluginSession(TTSession *session);
+TComVar *SessionGetCV(TTSession *session);
 
 TTSession *SessionEnter(TTSession *session);
 void SessionLeave(TTSession *prev);

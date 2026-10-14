@@ -55,6 +55,36 @@
 #include "commlib.h"
 #include "session.h"
 
+/*
+ *	TTX plugins (ttssh2, TTProxy ...) were initialized with the first
+ *	session's settings and connection, they hook only its connection.
+ *	The hooked functions are per session (see ttwsk.c, ttfileio.c)
+ */
+static BOOL UsePlugins(void)
+{
+	return SessionIsPluginSession(SessionGetActive());
+}
+
+static void TTXOpenTCPForSession(void)
+{
+	if (UsePlugins()) TTXOpenTCP();
+}
+
+static void TTXCloseTCPForSession(void)
+{
+	if (UsePlugins()) TTXCloseTCP();
+}
+
+static void TTXOpenFileForSession(void)
+{
+	if (UsePlugins()) TTXOpenFile();
+}
+
+static void TTXCloseFileForSession(void)
+{
+	if (UsePlugins()) TTXCloseFile();
+}
+
 /* create socket */
 static SOCKET OpenSocket(PComVar cv)
 {
@@ -353,7 +383,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 				InvalidHost = TRUE;
 			}
 			else {
-				TTXOpenTCP(); /* TTPLUG */
+				TTXOpenTCPForSession(); /* TTPLUG */
 				cv->Open = TRUE;
 				/* resolving address */
 				const wchar_t *host_nameW = GetConnectHostName();
@@ -412,7 +442,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 
 		case IdSerial:
 			InitFileIO(IdSerial);  /* TTPLUG */
-			TTXOpenFile(); /* TTPLUG */
+			TTXOpenFileForSession(); /* TTPLUG */
 			_snprintf_s(P, sizeof(P), _TRUNCATE, "COM%d", ts->ComPort);
 			strncpy_s(ErrMsg, sizeof(ErrMsg),P, _TRUNCATE);
 			strncpy_s(P, sizeof(P),"\\\\.\\", _TRUNCATE);
@@ -470,7 +500,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 
 		case IdFile:
 			InitFileIO(IdFile);  /* TTPLUG */
-			TTXOpenFile(); /* TTPLUG */
+			TTXOpenFileForSession(); /* TTPLUG */
 			cv->ComID = PCreateFile(ts->HostName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 			InvalidHost = (cv->ComID == INVALID_HANDLE_VALUE);
 			if (InvalidHost) {
@@ -492,7 +522,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 
 		case IdNamedPipe:
 			InitFileIO(IdNamedPipe);  /* TTPLUG */
-			TTXOpenFile(); /* TTPLUG */
+			TTXOpenFileForSession(); /* TTPLUG */
 
 			memset(P, 0, sizeof(P));
 			strncpy_s(P, sizeof(P), ts->HostName, _TRUNCATE);
@@ -813,7 +843,7 @@ void CommClose(PComVar cv)
 				Pclosesocket(cv->s);
 			}
 			cv->s = INVALID_SOCKET;
-			TTXCloseTCP(); /* TTPLUG */
+			TTXCloseTCPForSession(); /* TTPLUG */
 			FreeWinsock();
 			break;
 		case IdSerial:
@@ -829,13 +859,13 @@ void CommClose(PComVar cv)
 				PCloseFile(cv->ComID);
 				ClearCOMFlag(cv->ComPort);
 			}
-			TTXCloseFile(); /* TTPLUG */
+			TTXCloseFileForSession(); /* TTPLUG */
 			break;
 		case IdFile:
 			if (cv->ComID != INVALID_HANDLE_VALUE) {
 				PCloseFile(cv->ComID);
 			}
-			TTXCloseFile(); /* TTPLUG */
+			TTXCloseFileForSession(); /* TTPLUG */
 			break;
 
 		case IdNamedPipe:
@@ -843,7 +873,7 @@ void CommClose(PComVar cv)
 				CloseHandle(cv->ReadEnd);
 				PCloseFile(cv->ComID);
 			}
-			TTXCloseFile(); /* TTPLUG */
+			TTXCloseFileForSession(); /* TTPLUG */
 			break;
 	}
 	cv->ComID = INVALID_HANDLE_VALUE;

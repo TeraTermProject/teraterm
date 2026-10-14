@@ -63,6 +63,7 @@
 #include "ttplug.h"
 #include "ttsetup.h"
 #include "session.h"
+#include "frame.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -145,6 +146,14 @@ static void SetPaths(TTTSet *pts)
 	// KEYBOARD.CNF のフルパス
 	pts->KeyCnfFNW = NULL;
 	awcscats(&pts->KeyCnfFNW, pts->HomeDirW, L"\\KEYBOARD.CNF", NULL);
+}
+
+/**
+ *	paths of a new tab's settings
+ */
+void InitSessionPaths(TTTSet *pts)
+{
+	SetPaths(pts);
 }
 
 // DPI Aware (高DPI対応)
@@ -428,9 +437,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	hInst = hInstance;
 	init(g_ts);
 
-	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);
-	pVTWin = m_pMainWnd;
-	main_window = m_pMainWnd->m_hWnd;
+	// one window, each connection is a tab
+	main_window = FrameCreate(hInstance);
+	CVTWindow *first_tab = new CVTWindow(hInstance);
+	pVTWin = first_tab;
+	FrameAddTab(first_tab, SessionGetActive());
 
 	// [Tera Term]セクションのDLG_SYSTEM_FONTをとりあえずセットする
 	SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
@@ -454,7 +465,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 			//		  SCPのダイアログの処理が遅くなり転送が滞る
 			//		- 高速で処理を行うとCPU時間を消費してしまう
 			//	20msは高速に処理して、その後Sleep()することでバランスを取る
-			const BOOL continue_idle = OnIdle(lCount++);
+			// every tab, connections in the background keep running
+			BOOL continue_idle = FALSE;
+			for (int i = 0; i < SessionGetCount(); i++) {
+				TTSession *s = SessionGetAt(i);
+				if (!SessionGetCV(s)->Ready) {
+					continue;
+				}
+				TTSession *prev = SessionEnter(s);
+				if (OnIdle(lCount)) {
+					continue_idle = TRUE;
+				}
+				SessionLeave(prev);
+			}
+			lCount++;
 			if (!continue_idle) {
 				// FALSEが戻ってきたらidle処理は不要
 				if (!sleep_enable) {
@@ -490,10 +514,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 			if (modeless_dlg.HandleMessage(&msg) == FALSE) {
 				bool message_processed = false;
 
-				if (m_pMainWnd->m_hAccel != NULL) {
+				CVTWindow *active_vt = FrameGetActiveVT();
+				if (active_vt != NULL && active_vt->m_hAccel != NULL) {
 					if (!MetaKey(g_ts->MetaKey)) {
 						// matakeyが押されていない
-						if (::TranslateAcceleratorW(m_pMainWnd->m_hWnd, m_pMainWnd->m_hAccel, &msg)) {
+						if (::TranslateAcceleratorW(active_vt->m_hWnd, active_vt->m_hAccel, &msg)) {
 							// アクセラレーターキーを処理した
 							message_processed = true;
 						}
@@ -528,8 +553,7 @@ exit_message_loop:
 		pDeleteTimerQueueTimer(NULL, hIdleTimer, NULL);
 	}
 
-	delete m_pMainWnd;
-	m_pMainWnd = NULL;
+	// the tabs were deleted when they were closed
 
 	// プラグインの終了処理
 	TTXEnd(); /* TTPLUG */

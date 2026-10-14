@@ -33,8 +33,10 @@
 #include "ttwsk.h"
 #include <wspiapi.h>
 #include "WSAAsyncGetAddrInfo.h"
+#include "session.h"
 
 static HANDLE HWinsock = NULL;
+static int WinsockUsers;		// sessions that called LoadWinsock()
 
 Tclosesocket Pclosesocket;
 Tconnect Pconnect;
@@ -111,14 +113,18 @@ BOOL LoadWinsock()
 {
   BOOL Err;
 
-  if (HWinsock == NULL)
+  // the function pointers are per session (a plugin may hook them for its
+  // session only), a new session gets them here
+  if (HWinsock == NULL || Psocket == NULL)
   {
-    char wsock32_dll[MAX_PATH];
+    if (HWinsock == NULL) {
+      char wsock32_dll[MAX_PATH];
 
-    GetSystemDirectory(wsock32_dll, sizeof(wsock32_dll));
-    strncat_s(wsock32_dll, sizeof(wsock32_dll), "\\wsock32.dll", _TRUNCATE);
-    HWinsock = LoadLibrary(wsock32_dll);
-    if (HWinsock == NULL) return FALSE;
+      GetSystemDirectory(wsock32_dll, sizeof(wsock32_dll));
+      strncat_s(wsock32_dll, sizeof(wsock32_dll), "\\wsock32.dll", _TRUNCATE);
+      HWinsock = LoadLibrary(wsock32_dll);
+      if (HWinsock == NULL) return FALSE;
+    }
 
     Err = FALSE;
 
@@ -186,15 +192,22 @@ BOOL LoadWinsock()
 
     if (Err)
     {
-      FreeLibrary(HWinsock);
-      HWinsock = NULL;
+      Psocket = NULL;
+      if (WinsockUsers == 0) {
+        FreeLibrary(HWinsock);
+        HWinsock = NULL;
+      }
       return FALSE;
     }
   }
 
   CheckWinsock();
 
-  return (HWinsock != NULL);
+  if (HWinsock == NULL) {
+    return FALSE;
+  }
+  WinsockUsers++;
+  return TRUE;
 }
 
 void FreeWinsock()
@@ -202,9 +215,44 @@ void FreeWinsock()
   HANDLE HTemp;
 
   if (HWinsock == NULL) return;
+  if (WinsockUsers > 0) {
+    WinsockUsers--;
+  }
+  if (WinsockUsers > 0) {
+    // another tab still uses winsock
+    PWSACleanup();
+    return;
+  }
   HTemp = HWinsock;
   HWinsock = NULL;
   PWSACleanup();
   Sleep(50); // for safety
   FreeLibrary(HTemp);
+}
+
+void WinsockRegisterSessionVars(void)
+{
+	static const SessionVar v[] = {
+		SESSION_VAR(Pclosesocket),
+		SESSION_VAR(Pconnect),
+		SESSION_VAR(Phtonl),
+		SESSION_VAR(Phtons),
+		SESSION_VAR(Pinet_addr),
+		SESSION_VAR(Pioctlsocket),
+		SESSION_VAR(Precv),
+		SESSION_VAR(Pselect),
+		SESSION_VAR(Psend),
+		SESSION_VAR(Psetsockopt),
+		SESSION_VAR(Psocket),
+		SESSION_VAR(PWSAAsyncSelect),
+		SESSION_VAR(PWSAAsyncGetHostByName),
+		SESSION_VAR(PWSACancelAsyncRequest),
+		SESSION_VAR(PWSAGetLastError),
+		SESSION_VAR(PWSAStartup),
+		SESSION_VAR(PWSACleanup),
+		SESSION_VAR(Pfreeaddrinfo),
+		SESSION_VAR(PWSAAsyncGetAddrInfo),
+		SESSION_VAR(PWSAAsyncGetAddrInfoW),
+	};
+	SessionRegisterVars(v, _countof(v));
 }

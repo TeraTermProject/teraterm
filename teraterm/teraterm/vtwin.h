@@ -36,6 +36,7 @@
 #include "tmfc.h"
 #include "unicode_test.h"
 #include "tipwin.h"
+#include "session.h"
 
 class CVTWindow : public TTCFrameWnd
 {
@@ -85,9 +86,21 @@ private:
 	BOOL isSizing;		// サイズ変更中(WM_SIZING 〜 WM_EXITSIZEMOVE)はTRUE
 	BOOL isClosing;		// TRUE=ウィンドウクローズ中(WM_DESTROYを受信した)
 
+	// tab
+	TTSession *m_session;	// session of this window, made active in Proc()
+	BOOL IsTab();
+	void SetVTMenu();
+	void DrawVTMenuBar();
+	LRESULT ProcMain(UINT msg, WPARAM wp, LPARAM lp);
+
 public:
-	CVTWindow(HINSTANCE hInstance);
+	CVTWindow(HINSTANCE hInstance, const wchar_t *command_line = NULL);
 	~CVTWindow();
+	HMENU GetMainMenu() { return MainMenu; }
+	TTSession *GetSession() { return m_session; }
+	void OnFrameActivate(UINT nState);
+	void OnFrameDpiChanged(UINT dpi);
+	void ApplyDarkMode(BOOL dark);
 	int Parse();
 	void ButtonUp(POINT p, BOOL Paste);
 	void ButtonDown(POINT p, int LMR);

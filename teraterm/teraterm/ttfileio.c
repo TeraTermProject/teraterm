@@ -32,6 +32,7 @@
 
 #include "ttfileio.h"
 #include "ttplug.h" /* TTPLUG */
+#include "session.h"
 
 TReadFile PReadFile;
 TWriteFile PWriteFile;
@@ -57,4 +58,16 @@ void InitFileIO(int ConnType)
   PCreateFile = CreateFile;
   PCloseFile = CloseHandle;
   return;
+}
+
+// a plugin may hook these for its session only
+void FileIORegisterSessionVars(void)
+{
+	static const SessionVar v[] = {
+		SESSION_VAR(PReadFile),
+		SESSION_VAR(PWriteFile),
+		SESSION_VAR(PCreateFile),
+		SESSION_VAR(PCloseFile),
+	};
+	SessionRegisterVars(v, _countof(v));
 }

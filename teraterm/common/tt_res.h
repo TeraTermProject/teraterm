@@ -304,6 +304,10 @@
 #define ID_FILE_REPLAYLOG               50171
 #define ID_FILE_PRINT2                  50180
 #define ID_FILE_EXPORTBUFFER            50181
+#define ID_FILE_NEWTAB                  50113
+#define ID_FILE_CLOSETAB                50114
+#define ID_TAB_NEXT                     50115
+#define ID_TAB_PREV                     50116
 #define ID_FILE_DISCONNECT              50190
 #define ID_FILE_EXIT                    50199
 #define ID_FILE_EXITALL                 50200

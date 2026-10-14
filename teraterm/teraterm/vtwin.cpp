@@ -135,6 +135,7 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
 
 #include "win32helper.h"
 #include "session.h"
+#include "frame.h"
 
 #define VTClassName L"VTWin32"
 
@@ -195,11 +196,18 @@ void CVTWindow::SetWindowAlpha(BYTE alpha)
 	if (pSetLayeredWindowAttributes == NULL) {
 		return;	// レイヤードウインドウのサポートなし
 	}
-	if (Alpha == alpha) {
+	// in a tab the frame (top level window) gets the alpha,
+	// the tabs share it, so always apply
+	const HWND hWnd = IsTab() ? ::GetAncestor(HVTWin, GA_ROOT) : HVTWin;
+	if (Alpha == alpha && !IsTab()) {
 		return;	// 変化なしなら何もしない
 	}
-	LONG_PTR lp = GetWindowLongPtr(GWL_EXSTYLE);
+	LONG_PTR lp = ::GetWindowLongPtr(hWnd, GWL_EXSTYLE);
 	if (lp == 0) {
+		return;
+	}
+	if (alpha == 255 && (lp & WS_EX_LAYERED) == 0) {
+		Alpha = alpha;
 		return;
 	}
 
@@ -208,13 +216,13 @@ void CVTWindow::SetWindowAlpha(BYTE alpha)
 	// アルファ値が255の場合、画面のちらつきを抑えるため何もしないこととする。(2006.4.1 yutaka)
 	// 呼び出し元で、値が変更されたときのみ設定を反映する。(2007.10.19 maya)
 	if (alpha < 255) {
-		::SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp | WS_EX_LAYERED);
-		pSetLayeredWindowAttributes(HVTWin, 0, alpha, LWA_ALPHA);
+		::SetWindowLongPtr(hWnd, GWL_EXSTYLE, lp | WS_EX_LAYERED);
+		pSetLayeredWindowAttributes(hWnd, 0, alpha, LWA_ALPHA);
 	}
 	else {
 		// アルファ値が 255 の場合、透明化属性を削除して再描画する。(2007.10.22 maya)
-		::SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp & ~WS_EX_LAYERED);
-		::RedrawWindow(HVTWin, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME);
+		::SetWindowLongPtr(hWnd, GWL_EXSTYLE, lp & ~WS_EX_LAYERED);
+		::RedrawWindow(hWnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 	Alpha = alpha;
 }
@@ -603,22 +611,33 @@ static void ParseFOption(const wchar_t *command_line, PTTSet ts)
  *
  *	ウィンドウ作成前に CVTWindow のコンストラクタから1度だけ呼ばれる
  */
-static void InitSettings(void)
+static void InitSettings(const wchar_t *command_line)
 {
+	static BOOL process_initialized = FALSE;
+
 	CommInit(g_cv);
 	g_cv->ts = g_ts;
-	StartTeraTerm(g_ts);
+	if (!process_initialized) {
+		// once per process, not for each tab
+		process_initialized = TRUE;
+		StartTeraTerm(g_ts);
 
-	// プラグインの初期化
-	//   ReadIniFile() / ParseParam() のフックが設定される
-	//   iniファイルの読み込みはこの後に行う
-	TTXInit(g_ts, g_cv); /* TTPLUG */
+		// プラグインの初期化
+		//   ReadIniFile() / ParseParam() のフックが設定される
+		//   iniファイルの読み込みはこの後に行う
+		//   plugins keep the settings of this (first) session
+		TTXInit(g_ts, g_cv); /* TTPLUG */
+	}
+	else {
+		InitSessionPaths(g_ts);
+	}
 
 	// Parse command line parameters
 	// GetCommandLineW() in MSDN remark
 	//  The lifetime of the returned value is managed by the
 	//  system, applications should not free or modify this value.
-	wchar_t *ParamW = _wcsdup(GetCommandLineW());
+	//  a new tab has its own command line
+	wchar_t *ParamW = _wcsdup(command_line != NULL ? command_line : GetCommandLineW());
 
 	// コマンドラインから /F= オプションを先に処理する
 	ParseFOption(ParamW, g_ts);
@@ -665,16 +684,22 @@ static void InitSettings(void)
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow constructor
 
-CVTWindow::CVTWindow(HINSTANCE hInstance)
+CVTWindow::CVTWindow(HINSTANCE hInstance, const wchar_t *command_line)
 {
 	WNDCLASSW wc;
 	RECT rect;
 	DWORD Style;
 	m_hInst = hInstance;
+	m_session = SessionGetActive();
+	const HWND frame = FrameGetHWND();
 
 	MsgDlgHelp = RegisterWindowMessage(HELPMSGSTRING);
 
-	InitSettings();
+	InitSettings(command_line);
+	if (frame != NULL) {
+		// a tab has no title bar of its own
+		g_ts->HideTitle = 0;
+	}
 
 	/* window status */
 	AdjustSize = TRUE;
@@ -731,6 +756,10 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		        WS_BORDER | WS_THICKFRAME |
 		        WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 #endif
+	if (frame != NULL) {
+		// tab in the frame window
+		Style = WS_CHILD | WS_CLIPSIBLINGS | WS_VSCROLL | WS_HSCROLL;
+	}
 
 	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = (WNDPROC)ProcStub;
@@ -747,7 +776,10 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	RegisterClassW(&wc);
 	m_hAccel = ::LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACC));
 
-	if (g_ts->VTPos.x==CW_USEDEFAULT) {
+	if (frame != NULL) {
+		FrameGetContentRect(&rect);
+	}
+	else if (g_ts->VTPos.x==CW_USEDEFAULT) {
 		rect = rectDefault;
 	}
 	else {
@@ -757,12 +789,16 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		rect.bottom = rect.top + 100;
 	}
 	// dark user interface, set up before the window is created
+	if (frame != NULL && FrameGetActiveVT() != NULL) {
+		// another tab is open, keep its (current) mode
+		g_ts->DarkMode = DarkModeIsEnabled();
+	}
 	DarkModeInit(g_ts->DarkMode);
 	if (DarkModeIsEnabled()) {
 		SetDarkTerminalColors(g_ts, TRUE);
 	}
 
-	CreateW(hInstance, VTClassName, L"Tera Term", Style, rect, NULL, NULL);
+	CreateW(hInstance, VTClassName, L"Tera Term", Style, rect, frame, NULL);
 
 	/*--------- Init2 -----------------*/
 	HVTWin = GetSafeHwnd();
@@ -808,7 +844,10 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	WinMenu = NULL;
 	if ((g_ts->HideTitle==0) && (g_ts->PopupMenu==0)) {
 		InitMenu(&MainMenu);
-		::SetMenu(HVTWin,MainMenu);
+		if (!IsTab()) {
+			// a tab's menu is shown by the frame
+			::SetMenu(HVTWin,MainMenu);
+		}
 	}
 
 	g_cv->StateEcho = MakeOutputStringCreate();
@@ -854,6 +893,10 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		Startup();
 		return;
 	}
+	if (IsTab()) {
+		// the frame shows the tab
+		return;
+	}
 	SetWindowAlpha(g_ts->AlphaBlendActive);
 	int CmdShow = g_ts->nCmdShow;
 	if (g_ts->Minimize > 0) {
@@ -861,6 +904,60 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	}
 	ShowWindow(CmdShow);
 	ChangeCaret(vt_src);
+}
+
+/**
+ *	TRUE when this window is a tab (child) of the frame window
+ */
+BOOL CVTWindow::IsTab()
+{
+	return m_hWnd != NULL && (::GetWindowLongPtr(m_hWnd, GWL_STYLE) & WS_CHILD) != 0;
+}
+
+/**
+ *	show MainMenu, a tab's menu bar belongs to the frame
+ */
+void CVTWindow::SetVTMenu()
+{
+	if (IsTab()) {
+		FrameChildMenuChanged(HVTWin, MainMenu);
+	}
+	else {
+		::SetMenu(HVTWin, MainMenu);
+	}
+}
+
+void CVTWindow::DrawVTMenuBar()
+{
+	::DrawMenuBar(IsTab() ? ::GetAncestor(HVTWin, GA_ROOT) : HVTWin);
+}
+
+/**
+ *	the frame was activated / deactivated (a tab gets no WM_ACTIVATE)
+ *	or this tab was selected / unselected
+ */
+void CVTWindow::OnFrameActivate(UINT nState)
+{
+	TTSession *prev = SessionEnter(m_session);
+	OnActivate(nState, NULL, FALSE);
+	SessionLeave(prev);
+}
+
+/**
+ *	the frame moved to a monitor with another DPI
+ */
+void CVTWindow::OnFrameDpiChanged(UINT dpi)
+{
+	TTSession *prev = SessionEnter(m_session);
+	vtwin_work.monitor_DPI = GetMonitorDpiFromWindow(m_hWnd);
+	ChangeFont(vt_src, dpi);
+	// keep the window size, the number of columns and lines follows the new font
+	AdjustSize = FALSE;
+	RECT rc;
+	::GetClientRect(m_hWnd, &rc);
+	OnSize(SIZE_RESTORED, rc.right, rc.bottom);
+	::InvalidateRect(m_hWnd, NULL, TRUE);
+	SessionLeave(prev);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1768,6 +1865,13 @@ void CVTWindow::OnClose()
 	FileSendEnd();
 	ProtoEnd();
 
+	if (IsTab() && !::IsIconic(::GetAncestor(HVTWin, GA_ROOT))) {
+		// the frame moves, the tab gets no WM_MOVE
+		RECT R;
+		::GetWindowRect(::GetAncestor(HVTWin, GA_ROOT), &R);
+		g_ts->VTPos.x = R.left;
+		g_ts->VTPos.y = R.top;
+	}
 	SaveVTPos(g_ts);
 	Notify2UnsetWindow((NotifyIcon *)g_cv->NotifyIcon);
 
@@ -2188,7 +2292,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 
 void CVTWindow::OnDropFiles(HDROP hDropInfo)
 {
-	::SetForegroundWindow(HVTWin);
+	::SetForegroundWindow(::GetAncestor(HVTWin, GA_ROOT));
 	if (g_cv->Ready && IsSendVarNULL())
 	{
 		const UINT ShowDialog =
@@ -2541,8 +2645,9 @@ void CVTWindow::OnMove(int x, int y)
 
 	// ウィンドウ位置を保存
 	// 		注 x,y はクライアント領域の左上の座標
+	//		a tab saves the position of the frame
 	RECT R;
-	::GetWindowRect(HVTWin,&R);
+	::GetWindowRect(::GetAncestor(HVTWin, GA_ROOT),&R);
 	g_ts->VTPos.x = R.left;
 	g_ts->VTPos.y = R.top;
 
@@ -3562,8 +3667,8 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 		InitMenu(&MainMenu);
 	}
 
-	::SetMenu(HVTWin, MainMenu);
-	::DrawMenuBar(HVTWin);
+	SetVTMenu();
+	DrawVTMenuBar();
 
 	B1 = ((g_ts->MenuFlag & MF_SHOWWINMENU)!=0);
 	B2 = (WinMenu!=NULL);
@@ -3583,7 +3688,7 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 			DestroyMenu(WinMenu);
 			WinMenu = NULL;
 		}
-		::DrawMenuBar(HVTWin);
+		DrawVTMenuBar();
 	}
 
 	::GetSystemMenu(HVTWin,TRUE);
@@ -3604,6 +3709,10 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 	DWORD Style,ExStyle;
 	HMENU SysMenu;
 
+	if (IsTab()) {
+		// the frame has the title bar
+		return 0;
+	}
 	Style = (DWORD)::GetWindowLongPtr (HVTWin, GWL_STYLE);
 	ExStyle = (DWORD)::GetWindowLongPtr (HVTWin, GWL_EXSTYLE);
 	TBar = ((Style & WS_SYSMENU)!=0);
@@ -3864,7 +3973,7 @@ LRESULT CVTWindow::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 	Notify2Event((NotifyIcon *)g_cv->NotifyIcon, wParam, lParam);
 
 	if (lParam == NIN_BALLOONUSERCLICK) {
-		::SetForegroundWindow(m_hWnd);
+		::SetForegroundWindow(::GetAncestor(m_hWnd, GA_ROOT));
 	}
 
 	return 0;
@@ -3937,7 +4046,11 @@ void CVTWindow::OnFileNewConnection()
 		}
 
 		static const wchar_t *ttermpro = L"ttermpro";
-		if (! g_cv->Ready) {
+		// SSH (ttssh2) works only in the first session for now,
+		// another SSH connection opens its own window
+		const BOOL ssh = (GetHNRec.PortType == IdTCPIP) && (GetHNRec.TCPPort == 22);
+		const BOOL own_window = ssh && IsTab() && !SessionIsPluginSession(m_session);
+		if (! g_cv->Ready && ! own_window) {
 			g_ts->PortType = GetHNRec.PortType;
 			g_ts->Telnet = GetHNRec.Telnet;
 			g_ts->TCPPort = GetHNRec.TCPPort;
@@ -4003,7 +4116,17 @@ void CVTWindow::OnFileNewConnection()
 				free(hostname_nocomment);
 			}
 			TTXSetCommandLine(Command, _countof(Command), &GetHNRec); /* TTPLUG */
-			TTWinExec(Command);
+			if (IsTab() && ! own_window) {
+				// open in a new tab
+				FramePostNewTab(Command);
+			}
+			else {
+				TTWinExec(Command);
+				if (own_window && ! g_cv->Ready) {
+					// this tab is not used
+					::PostMessage(HVTWin, WM_CLOSE, 0, 0);
+				}
+			}
 		}
 	}
 	else {/* canceled */
@@ -4566,6 +4689,11 @@ void CVTWindow::OnFileDisconnect()
 
 void CVTWindow::OnFileExit()
 {
+	if (IsTab()) {
+		// close all tabs
+		::PostMessageW(::GetAncestor(m_hWnd, GA_ROOT), WM_CLOSE, 0, 0);
+		return;
+	}
 	OnClose();
 }
 
@@ -4866,16 +4994,32 @@ void CVTWindow::OnSetupGeneral()
  */
 void CVTWindow::OnSetupDarkMode()
 {
-	g_ts->DarkMode = !DarkModeIsEnabled();
-	DarkModeSetEnabled(g_ts->DarkMode);
+	const BOOL dark = !DarkModeIsEnabled();
+	DarkModeSetEnabled(dark);
+	if (IsTab()) {
+		// the frame and every tab
+		FrameDarkModeChanged();
+		return;
+	}
+	ApplyDarkMode(dark);
+}
+
+/**
+ *	apply dark mode on / off to this window and its terminal colors
+ */
+void CVTWindow::ApplyDarkMode(BOOL dark)
+{
+	TTSession *prev = SessionEnter(m_session);
+	g_ts->DarkMode = dark;
 	DarkModeApplyToWindow(m_hWnd);
 	if (HTEKWin != NULL) {
 		DarkModeApplyToWindow(HTEKWin);
 	}
-	if (SetDarkTerminalColors(g_ts, g_ts->DarkMode)) {
+	if (SetDarkTerminalColors(g_ts, dark)) {
 		DispResetColor(vt_src, CS_ALL);
 		::InvalidateRect(m_hWnd, NULL, FALSE);
 	}
+	SessionLeave(prev);
 }
 
 void CVTWindow::OnSetupSave()
@@ -5430,7 +5574,43 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 	return 0;
 }
 
+/**
+ *	Window procedure
+ *	Tera Term's state (g_ts, g_cv, module variables) is per session, make
+ *	this window's session active while the message is processed
+ */
 LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
+{
+	if (msg == WM_COMMAND && IsTab()) {
+		switch (LOWORD(wp)) {
+		case ID_FILE_NEWTAB:
+		case ID_FILE_CLOSETAB:
+		case ID_TAB_NEXT:
+		case ID_TAB_PREV:
+			// handled by the frame, posted so that the session is not switched
+			// while this window procedure runs
+			::PostMessageW(::GetParent(m_hWnd), WM_COMMAND, LOWORD(wp), 0);
+			return 0;
+		}
+	}
+
+	TTSession *prev = SessionEnter(m_session);
+	LRESULT result = ProcMain(msg, wp, lp);
+	if (IsTab()) {
+		switch (msg) {
+		case WM_SETTEXT:
+			FrameChildTitleChanged(m_hWnd);
+			break;
+		case WM_SIZE:
+			FrameChildSizeChanged(m_hWnd);
+			break;
+		}
+	}
+	SessionLeave(prev);
+	return result;
+}
+
+LRESULT CVTWindow::ProcMain(UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const UINT WM_TASKBER_CREATED = RegisterWindowMessage("TaskbarCreated");
 
@@ -5469,7 +5649,13 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_DESTROY:
 		OnDestroy();
-		PostQuitMessage(0);
+		if (IsTab()) {
+			// the frame removes the tab, quits after the last one
+			FrameChildDestroyed(m_hWnd);
+		}
+		else {
+			PostQuitMessage(0);
+		}
 		break;
 	case WM_DROPFILES:
 		OnDropFiles((HDROP)wp);
