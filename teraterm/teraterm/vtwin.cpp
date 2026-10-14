@@ -136,6 +136,8 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
 #include "win32helper.h"
 #include "session.h"
 #include "frame.h"
+#include "sidebar.h"
+#include "devices.h"
 #include "dbglog.h"
 
 #define VTClassName L"VTWin32"
@@ -3910,7 +3912,9 @@ LRESULT CVTWindow::OnCommStart(WPARAM wParam, LPARAM lParam)
 	// 自動接続が無効のときも接続ダイアログを出すようにした (2006.9.15 maya)
 	if (((g_ts->PortType!=IdSerial) && (GetConnectHostName()[0]==0)) ||
 	    ((g_ts->PortType==IdSerial) && (g_ts->ComAutoConnect == FALSE))) {
-		if (g_ts->HostDialogOnStartup) {
+		// at start-up with saved devices in the sidebar, the sidebar is the way in
+		const BOOL use_sidebar = IsTab() && FrameTabCount() == 1 && SidebarIsVisible() && DevicesCount() > 0;
+		if (g_ts->HostDialogOnStartup && !use_sidebar) {
 			OnFileNewConnection();
 		}
 		else {
@@ -5606,6 +5610,8 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_FILE_CLOSETAB:
 		case ID_TAB_NEXT:
 		case ID_TAB_PREV:
+		case ID_FILE_SIDEBAR:
+		case ID_FILE_ADDDEVICE:
 			// handled by the frame, posted so that the session is not switched
 			// while this window procedure runs
 			::PostMessageW(::GetParent(m_hWnd), WM_COMMAND, LOWORD(wp), 0);

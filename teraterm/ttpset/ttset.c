@@ -860,9 +860,16 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	ts->TEKColorEmu = GetOnOff(Section, "TEKColorEmulation", FName, FALSE);
 
 	/* VT Font */
-	ReadFont(Section, "VTFont", "Terminal,0,-13,1", FName,
+	ReadFont(Section, "VTFont", "Consolas,0,-15,0", FName,
 			 ts->VTFont, _countof(ts->VTFont),
 			 &ts->VTFontSize, &(ts->VTFontCharSet));
+	// modern look: the old bitmap "Terminal" font (and no font) become Consolas
+	if (ts->VTFont[0] == 0 || _stricmp(ts->VTFont, "Terminal") == 0) {
+		strncpy_s(ts->VTFont, _countof(ts->VTFont), "Consolas", _TRUNCATE);
+		ts->VTFontSize.x = 0;
+		ts->VTFontSize.y = -15;
+		ts->VTFontCharSet = 0;
+	}
 
 	/* Bold font flag */
 	if (GetOnOff(Section, "EnableBold", FName, TRUE))

@@ -64,6 +64,7 @@
 #include "ttsetup.h"
 #include "session.h"
 #include "frame.h"
+#include "sidebar.h"
 #include "dbglog.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
@@ -524,7 +525,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				bool message_processed = false;
 
 				CVTWindow *active_vt = FrameGetActiveVT();
-				if (active_vt != NULL && active_vt->m_hAccel != NULL) {
+				// keys typed in the sidebar (search box, list) stay there
+				if (active_vt != NULL && active_vt->m_hAccel != NULL && !SidebarOwnsWindow(msg.hwnd)) {
 					if (!MetaKey(g_ts->MetaKey)) {
 						// matakeyが押されていない
 						if (::TranslateAcceleratorW(active_vt->m_hWnd, active_vt->m_hAccel, &msg)) {

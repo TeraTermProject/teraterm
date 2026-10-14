@@ -89,6 +89,10 @@ add_executable(
   frame.h
   dbglog.c
   dbglog.h
+  devices.cpp
+  devices.h
+  sidebar.cpp
+  sidebar.h
   winjump.c
   winjump.h
 )

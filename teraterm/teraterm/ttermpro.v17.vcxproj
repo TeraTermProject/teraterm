@@ -479,6 +479,8 @@
     <ClCompile Include="session.c" />
     <ClCompile Include="frame.cpp" />
     <ClCompile Include="dbglog.c" />
+    <ClCompile Include="devices.cpp" />
+    <ClCompile Include="sidebar.cpp" />
     <ClCompile Include="winjump.c" />
     <ClCompile Include="win_pp.cpp" />
     <ClCompile Include="WSAAsyncGetAddrInfo.c" />
@@ -626,6 +628,8 @@
     <ClInclude Include="session.h" />
     <ClInclude Include="frame.h" />
     <ClInclude Include="dbglog.h" />
+    <ClInclude Include="devices.h" />
+    <ClInclude Include="sidebar.h" />
     <ClInclude Include="unicode.h" />
   </ItemGroup>
   <ItemGroup>

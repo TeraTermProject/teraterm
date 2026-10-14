@@ -45,10 +45,13 @@
 #include "frame.h"
 #include "vtdisp.h"
 #include "dbglog.h"
+#include "devices.h"
+#include "sidebar.h"
 
 #define FRAME_CLASS_NAME	L"TeraTermTabFrame"
 #define WM_APP_REMOVETAB	(WM_APP + 1)
 #define WM_APP_NEWTAB		(WM_APP + 2)
+#define STATUS_TIMER_ID		1
 
 #define TAB_MAX_WIDTH		220
 #define TAB_MIN_WIDTH		90
@@ -59,6 +62,7 @@ typedef struct {
 	TTSession *session;
 	wchar_t *title;
 	BOOL closing;
+	BOOL was_connected;	// connected at some point (not an empty tab)
 } Tab;
 
 static HWND frame_wnd;
@@ -89,7 +93,18 @@ static int Scale(int v)
 
 static int TabBarHeight(void)
 {
-	return Scale(30);
+	return Scale(32);
+}
+
+static int StatusBarHeight(void)
+{
+	return Scale(24);
+}
+
+// left edge of the tab strip, the content and the status bar (right of the sidebar)
+static int BarLeft(void)
+{
+	return SidebarWidth();
 }
 
 static HFONT GetTabFont(void)
@@ -119,7 +134,7 @@ static int TabWidth(void)
 	RECT rc;
 	GetClientRect(frame_wnd, &rc);
 	const int plus = Scale(32);
-	int w = tab_count > 0 ? (rc.right - plus) / tab_count : TAB_MAX_WIDTH;
+	int w = tab_count > 0 ? (rc.right - BarLeft() - plus) / tab_count : TAB_MAX_WIDTH;
 	if (w > Scale(TAB_MAX_WIDTH)) w = Scale(TAB_MAX_WIDTH);
 	if (w < Scale(TAB_MIN_WIDTH)) w = Scale(TAB_MIN_WIDTH);
 	return w;
@@ -128,7 +143,7 @@ static int TabWidth(void)
 static void GetTabRect(int index, RECT *r)
 {
 	const int w = TabWidth();
-	r->left = index * w;
+	r->left = BarLeft() + index * w;
 	r->right = r->left + w;
 	r->top = 0;
 	r->bottom = TabBarHeight();
@@ -146,7 +161,7 @@ static void GetCloseRect(const RECT *tab, RECT *r)
 static void GetPlusRect(RECT *r)
 {
 	const int w = TabWidth();
-	r->left = tab_count * w + Scale(4);
+	r->left = BarLeft() + tab_count * w + Scale(4);
 	r->right = r->left + Scale(26);
 	r->top = Scale(3);
 	r->bottom = TabBarHeight() - Scale(3);
@@ -334,12 +349,127 @@ static void PaintTabBar(HDC dc_out)
 }
 
 /*
+ *	status bar: connection of the active tab
+ */
+static void GetStatusRect(RECT *r)
+{
+	GetClientRect(frame_wnd, r);
+	r->left = BarLeft();
+	r->top = r->bottom - StatusBarHeight();
+}
+
+static void InvalidateStatusBar(void)
+{
+	RECT r;
+	GetStatusRect(&r);
+	InvalidateRect(frame_wnd, &r, FALSE);
+}
+
+static void StatusText(wchar_t *left, size_t left_count, wchar_t *right, size_t right_count, BOOL *connected)
+{
+	left[0] = 0;
+	right[0] = 0;
+	*connected = FALSE;
+	if (active_tab < 0) {
+		return;
+	}
+	const TTTSet *ts = SessionGetTS(tabs[active_tab].session);
+	const TComVar *cv = SessionGetCV(tabs[active_tab].session);
+	*connected = cv->Open && cv->Ready;
+	if (!cv->Open) {
+		wcscpy_s(left, left_count, tabs[active_tab].was_connected ? L"Disconnected" : L"Not connected");
+	}
+	else if (cv->PortType == IdSerial) {
+		swprintf_s(left, left_count, L"Serial   COM%d   %lu baud", ts->ComPort, (unsigned long)ts->Baud);
+	}
+	else if (cv->PortType == IdTCPIP) {
+		const wchar_t *proto = cv->isSSH ? L"SSH" : (ts->Telnet ? L"Telnet" : L"TCP");
+		wchar_t host[256];
+		if (ts->HostNameW != NULL && ts->HostNameW[0] != 0) {
+			wcsncpy_s(host, _countof(host), ts->HostNameW, _TRUNCATE);
+		}
+		else {
+			MultiByteToWideChar(CP_ACP, 0, ts->HostName, -1, host, _countof(host));
+			host[_countof(host) - 1] = 0;
+		}
+		swprintf_s(left, left_count, L"%s   %s:%d%s", proto, host, ts->TCPPort, cv->Ready ? L"" : L"   connecting...");
+	}
+	else if (cv->PortType == IdFile) {
+		wcscpy_s(left, left_count, L"Replaying log");
+	}
+	else {
+		wcscpy_s(left, left_count, L"Named pipe");
+	}
+	swprintf_s(right, right_count, L"%d x %d", ts->TerminalWidth, ts->TerminalHeight);
+}
+
+static void PaintStatusBar(HDC dc_out)
+{
+	RECT r;
+	GetStatusRect(&r);
+	if (r.right <= r.left) {
+		return;
+	}
+	const int w = r.right - r.left, h = r.bottom - r.top;
+	HDC dc = CreateCompatibleDC(dc_out);
+	HBITMAP bmp = CreateCompatibleBitmap(dc_out, w, h);
+	HGDIOBJ old_bmp = SelectObject(dc, bmp);
+	HGDIOBJ old_font = SelectObject(dc, GetTabFont());
+	SetBkMode(dc, TRANSPARENT);
+
+	TabColors c;
+	GetColors(&c);
+	RECT all = { 0, 0, w, h };
+	FillSolid(dc, &all, c.bar);
+	RECT line = { 0, 0, w, Scale(1) };
+	FillSolid(dc, &line, c.tab);
+
+	wchar_t left[400], right[64];
+	BOOL connected;
+	StatusText(left, _countof(left), right, _countof(right), &connected);
+
+	const int dot = Scale(8);
+	RECT d;
+	d.left = Scale(10);
+	d.top = (h - dot) / 2;
+	d.right = d.left + dot;
+	d.bottom = d.top + dot;
+	HBRUSH brush = CreateSolidBrush(connected ? RGB(46, 204, 113) : RGB(128, 128, 128));
+	HGDIOBJ old_brush = SelectObject(dc, brush);
+	HGDIOBJ old_pen = SelectObject(dc, GetStockObject(NULL_PEN));
+	Ellipse(dc, d.left, d.top, d.right + 1, d.bottom + 1);
+	SelectObject(dc, old_pen);
+	SelectObject(dc, old_brush);
+	DeleteObject(brush);
+
+	SetTextColor(dc, c.text_inactive);
+	RECT tr = { Scale(10) + dot + Scale(8), 0, w - Scale(10), h };
+	DrawTextW(dc, right, -1, &tr, DT_SINGLELINE | DT_VCENTER | DT_RIGHT | DT_NOPREFIX);
+	SIZE rs;
+	GetTextExtentPoint32W(dc, right, (int)wcslen(right), &rs);
+	tr.right -= rs.cx + Scale(16);
+	SetTextColor(dc, c.text);
+	DrawTextW(dc, left, -1, &tr, DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_END_ELLIPSIS | DT_NOPREFIX);
+
+	BitBlt(dc_out, r.left, r.top, w, h, dc, 0, 0, SRCCOPY);
+	SelectObject(dc, old_font);
+	SelectObject(dc, old_bmp);
+	DeleteObject(bmp);
+	DeleteDC(dc);
+}
+
+/*
  *	layout
  */
 void FrameGetContentRect(RECT *rc)
 {
 	GetClientRect(frame_wnd, rc);
+	rc->left = BarLeft();
 	rc->top = TabBarHeight();
+	rc->bottom -= StatusBarHeight();
+	if (rc->right < rc->left) {
+		rc->right = rc->left;
+	}
 	if (rc->bottom < rc->top) {
 		rc->bottom = rc->top;
 	}
@@ -356,6 +486,25 @@ static void LayoutActive(void)
 	SetWindowPos(tabs[active_tab].hWnd, NULL, rc.left, rc.top,
 				 rc.right - rc.left, rc.bottom - rc.top, SWP_NOZORDER | SWP_NOACTIVATE);
 	laying_out = FALSE;
+}
+
+/**
+ *	place the sidebar and the active tab (window resized, sidebar shown,
+ *	hidden or resized)
+ */
+void FrameLayout(void)
+{
+	if (frame_wnd == NULL) {
+		return;
+	}
+	HWND sidebar = SidebarGetHWND();
+	if (sidebar != NULL && SidebarIsVisible()) {
+		RECT rc;
+		GetClientRect(frame_wnd, &rc);
+		SetWindowPos(sidebar, NULL, 0, 0, SidebarWidth(), rc.bottom, SWP_NOZORDER | SWP_NOACTIVATE);
+	}
+	LayoutActive();
+	InvalidateRect(frame_wnd, NULL, TRUE);
 }
 
 /**
@@ -386,13 +535,15 @@ void FrameChildSizeChanged(HWND vt)
 	GetClientRect(frame_wnd, &client);
 	const int dw = (win.right - win.left) - client.right;
 	const int dh = (win.bottom - win.top) - client.bottom;
-	SetWindowPos(frame_wnd, NULL, 0, 0, cw + dw, ch + TabBarHeight() + dh,
+	SetWindowPos(frame_wnd, NULL, 0, 0, cw + BarLeft() + dw, ch + TabBarHeight() + StatusBarHeight() + dh,
 				 SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
 /*
  *	tabs
  */
+static void CloseTab(int index);
+
 static int FindTab(HWND vt)
 {
 	for (int i = 0; i < tab_count; i++) {
@@ -449,6 +600,7 @@ static void SelectTab(int index)
 	SetFocus(tabs[index].hWnd);
 	UpdateCaption();
 	InvalidateTabBar();
+	InvalidateStatusBar();
 }
 
 void FrameAddTab(CVTWindow *vt, TTSession *session)
@@ -460,6 +612,7 @@ void FrameAddTab(CVTWindow *vt, TTSession *session)
 	t->session = session;
 	t->title = NULL;
 	t->closing = FALSE;
+	t->was_connected = FALSE;
 	tab_count++;
 	UpdateTitle(tab_count - 1);
 	DbgLog("tab: %d added (session %p), %d tabs", tab_count - 1, session, tab_count);
@@ -469,14 +622,18 @@ void FrameAddTab(CVTWindow *vt, TTSession *session)
 		if (DarkModeIsEnabled()) {
 			DarkModeApplyToWindow(frame_wnd);
 		}
+		// saved devices live next to TERATERM.INI
+		DevicesLoad(SessionGetTS(session)->HomeDirW);
+		SidebarCreate(frame_wnd, frame_inst);
 		// first tab, the frame wraps the terminal size from the settings
 		RECT child;
 		GetWindowRect(t->hWnd, &child);
 		RECT win, client;
 		GetWindowRect(frame_wnd, &win);
 		GetClientRect(frame_wnd, &client);
-		const int w = (child.right - child.left) + (win.right - win.left) - client.right;
-		const int h = (child.bottom - child.top) + TabBarHeight() + (win.bottom - win.top) - client.bottom;
+		const int w = (child.right - child.left) + BarLeft() + (win.right - win.left) - client.right;
+		const int h = (child.bottom - child.top) + TabBarHeight() + StatusBarHeight() +
+					  (win.bottom - win.top) - client.bottom;
 		UINT flags = SWP_NOZORDER | SWP_NOACTIVATE;
 		int x = 0, y = 0;
 		const TTTSet *ts = SessionGetTS(session);
@@ -489,6 +646,7 @@ void FrameAddTab(CVTWindow *vt, TTSession *session)
 		}
 		SetWindowPos(frame_wnd, NULL, x, y, w, h, flags);
 		SelectTab(0);
+		FrameLayout();
 		if (ts->nCmdShow != SW_HIDE && ts->HideWindow == 0) {
 			ShowWindow(frame_wnd, ts->Minimize > 0 ? SW_SHOWMINIMIZED : ts->nCmdShow);
 			UpdateWindow(frame_wnd);
@@ -550,6 +708,29 @@ void FramePostNewTab(const wchar_t *command_line)
 }
 
 /**
+ *	Open a connection from the sidebar
+ *	An empty tab (never connected, e.g. the start-up tab) is replaced by it.
+ */
+void FrameConnect(const wchar_t *command_line)
+{
+	HWND empty = NULL;
+	if (active_tab >= 0 && !tabs[active_tab].closing) {
+		const TComVar *cv = SessionGetCV(tabs[active_tab].session);
+		if (cv->Open) {
+			tabs[active_tab].was_connected = TRUE;
+		}
+		else if (!tabs[active_tab].was_connected) {
+			empty = tabs[active_tab].hWnd;
+		}
+	}
+	const int before = tab_count;
+	FrameNewTab(command_line);
+	if (empty != NULL && tab_count > before) {
+		CloseTab(FindTab(empty));
+	}
+}
+
+/**
  *	VT window rebuilt its menu
  */
 void FrameChildMenuChanged(HWND vt, HMENU menu)
@@ -569,10 +750,14 @@ void FrameChildTitleChanged(HWND vt)
 		return;
 	}
 	UpdateTitle(i);
+	if (SessionGetCV(tabs[i].session)->Open) {
+		tabs[i].was_connected = TRUE;
+	}
 	if (i == active_tab) {
 		UpdateCaption();
 	}
 	InvalidateTabBar();
+	InvalidateStatusBar();
 }
 
 /**
@@ -742,6 +927,15 @@ static BOOL OnFrameCommand(WORD id)
 			SelectTab((active_tab + tab_count - 1) % tab_count);
 		}
 		return TRUE;
+	case ID_FILE_SIDEBAR:
+		SidebarSetVisible(!SidebarIsVisible());
+		if (!SidebarIsVisible() && active_tab >= 0) {
+			SetFocus(tabs[active_tab].hWnd);
+		}
+		return TRUE;
+	case ID_FILE_ADDDEVICE:
+		SidebarAddDevice();
+		return TRUE;
 	}
 	return FALSE;
 }
@@ -750,9 +944,10 @@ static void OnDpiChanged(WPARAM wp, LPARAM lp)
 {
 	const RECT *r = (const RECT *)lp;
 	const UINT dpi = LOWORD(wp);
+	SidebarDpiChanged();
 	SetWindowPos(frame_wnd, NULL, r->left, r->top, r->right - r->left, r->bottom - r->top,
 				 SWP_NOZORDER | SWP_NOACTIVATE);
-	LayoutActive();
+	FrameLayout();
 	for (int i = 0; i < tab_count; i++) {
 		if (i != active_tab) {
 			// same size as the active tab, so the terminal size is right when selected
@@ -780,6 +975,7 @@ static LRESULT CALLBACK FrameProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		PAINTSTRUCT ps;
 		HDC dc = BeginPaint(hWnd, &ps);
 		PaintTabBar(dc);
+		PaintStatusBar(dc);
 		EndPaint(hWnd, &ps);
 		return 0;
 	}
@@ -793,8 +989,19 @@ static LRESULT CALLBACK FrameProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		return 1;
 	}
 	case WM_SIZE:
-		LayoutActive();
-		InvalidateTabBar();
+		FrameLayout();
+		return 0;
+	case WM_TIMER:
+		if (wp == STATUS_TIMER_ID) {
+			// connection state and terminal size of the tabs
+			for (int i = 0; i < tab_count; i++) {
+				if (SessionGetCV(tabs[i].session)->Open) {
+					tabs[i].was_connected = TRUE;
+				}
+			}
+			InvalidateTabBar();
+			InvalidateStatusBar();
+		}
 		return 0;
 	case WM_MOUSEMOVE: {
 		POINT pt = { GET_X_LPARAM(lp), GET_Y_LPARAM(lp) };
@@ -829,6 +1036,12 @@ static LRESULT CALLBACK FrameProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		}
 		return 0;
 	case WM_INITMENUPOPUP:
+		if (active_tab >= 0) {
+			LRESULT r = SendMessageW(tabs[active_tab].hWnd, msg, wp, lp);
+			CheckMenuItem((HMENU)wp, ID_FILE_SIDEBAR, MF_BYCOMMAND | (SidebarIsVisible() ? MF_CHECKED : MF_UNCHECKED));
+			return r;
+		}
+		break;
 	case WM_ENTERMENULOOP:
 	case WM_EXITMENULOOP:
 	case WM_MENUSELECT:
@@ -868,6 +1081,7 @@ static LRESULT CALLBACK FrameProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		CloseAll();
 		return 0;
 	case WM_DESTROY:
+		KillTimer(hWnd, STATUS_TIMER_ID);
 		DbgLog("frame: closed");
 		frame_wnd = NULL;
 		PostQuitMessage(0);
@@ -906,6 +1120,9 @@ HWND FrameCreate(HINSTANCE hInstance)
 	if (frame_wnd != NULL && DarkModeIsEnabled()) {
 		DarkModeApplyToWindow(frame_wnd);
 	}
+	if (frame_wnd != NULL) {
+		SetTimer(frame_wnd, STATUS_TIMER_ID, 1000, NULL);
+	}
 	return frame_wnd;
 }
 
@@ -919,8 +1136,14 @@ void FrameDarkModeChanged(void)
 	for (int i = 0; i < tab_count; i++) {
 		tabs[i].vt->ApplyDarkMode(dark);
 	}
+	SidebarDarkModeChanged();
 	DrawMenuBar(frame_wnd);
 	RedrawWindow(frame_wnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_FRAME);
+}
+
+int FrameTabCount(void)
+{
+	return tab_count;
 }
 
 HWND FrameGetHWND(void)

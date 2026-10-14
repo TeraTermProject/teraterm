@@ -66,6 +66,12 @@
     <ClCompile Include="dbglog.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="devices.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sidebar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="buffer.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
@@ -508,6 +514,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dbglog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="devices.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sidebar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vtdisp.h">

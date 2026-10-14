@@ -41,8 +41,9 @@
 
 class CVTWindow;
 
-// the frame handles ID_FILE_NEWTAB, ID_FILE_CLOSETAB, ID_TAB_NEXT and
-// ID_TAB_PREV (tt_res.h), a tab posts them to the frame
+// the frame handles ID_FILE_NEWTAB, ID_FILE_CLOSETAB, ID_TAB_NEXT,
+// ID_TAB_PREV, ID_FILE_SIDEBAR and ID_FILE_ADDDEVICE (tt_res.h),
+// a tab posts them to the frame
 
 HWND FrameCreate(HINSTANCE hInstance);
 HWND FrameGetHWND(void);
@@ -52,6 +53,9 @@ CVTWindow *FrameGetActiveVT(void);
 HWND FrameGetActiveVTHWND(void);
 void FrameNewTab(const wchar_t *command_line);
 void FramePostNewTab(const wchar_t *command_line);
+void FrameConnect(const wchar_t *command_line);
+void FrameLayout(void);
+int FrameTabCount(void);
 void FrameChildMenuChanged(HWND vt, HMENU menu);
 void FrameChildTitleChanged(HWND vt);
 void FrameChildSizeChanged(HWND vt);
