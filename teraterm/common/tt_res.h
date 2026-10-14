@@ -303,6 +303,7 @@
 #define ID_FILE_CHANGEDIR               50170
 #define ID_FILE_REPLAYLOG               50171
 #define ID_FILE_PRINT2                  50180
+#define ID_FILE_EXPORTBUFFER            50181
 #define ID_FILE_DISCONNECT              50190
 #define ID_FILE_EXIT                    50199
 #define ID_FILE_EXITALL                 50200
@@ -323,6 +324,7 @@
 #define ID_SETUP_TCPIP                  50360
 #define ID_SETUP_GENERAL                50370
 #define ID_SETUP_ADDITIONALSETTINGS     50375
+#define ID_SETUP_DARKMODE               50376
 #define ID_SETUP_SAVE                   50380
 #define ID_SETUP_RESTORE                50390
 #define ID_OPEN_SETUP                   50391

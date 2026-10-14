@@ -664,6 +664,7 @@ BEGIN
         MENUITEM "&Replay Log...",              ID_FILE_REPLAYLOG
         MENUITEM SEPARATOR
         MENUITEM "&Print...\tAlt+P",            ID_FILE_PRINT2
+        MENUITEM "&Export Console to TXT...",   ID_FILE_EXPORTBUFFER
         MENUITEM SEPARATOR
         MENUITEM "&Disconnect\tAlt+I",          ID_FILE_DISCONNECT
         MENUITEM "E&xit\tAlt+Q",                ID_FILE_EXIT
@@ -695,6 +696,7 @@ BEGIN
         MENUITEM "T&CP/IP...",                  ID_SETUP_TCPIP
         MENUITEM "&General...",                 ID_SETUP_GENERAL
         MENUITEM "A&dditional settings...",     ID_SETUP_ADDITIONALSETTINGS
+        MENUITEM "Dar&k mode",                  ID_SETUP_DARKMODE
         MENUITEM SEPARATOR
         MENUITEM "&Save setup...",              ID_SETUP_SAVE
         MENUITEM "&Restore setup...",           ID_SETUP_RESTORE

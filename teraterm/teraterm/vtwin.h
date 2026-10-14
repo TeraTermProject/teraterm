@@ -201,6 +201,7 @@ protected:
 	void OnFileDisconnect();
 	void OnFileExit();
 	void OnEditCopy();
+	void OnFileExportBuffer();
 	void OnEditCopyTable();
 	void OnEditPaste();
 	void OnEditPasteCR();
@@ -216,6 +217,7 @@ protected:
 	void OnSetupSerialPort();
 	void OnSetupTCPIP();
 	void OnSetupGeneral();
+	void OnSetupDarkMode();
 	void OnSetupSave();
 	void OnSetupRestore();
 	void OnOpenSetupDirectory();

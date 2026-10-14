@@ -1992,6 +1992,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	// rounded corner preference for VT/TEK window
 	ts->WindowCornerDontround = GetOnOff(Section, "WindowCornerDontround", FName, FALSE);
 
+	// dark user interface
+	ts->DarkMode = GetOnOff(Section, "DarkMode", FName, FALSE);
+
 	// 通知音
 	ts->NotifySound = GetOnOff(Section, "NotifySound", FName, TRUE);
 
@@ -3300,6 +3303,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	// rounded corner preference for VT/TEK window
 	WriteOnOff(Section, "WindowCornerDontround", FName, ts->WindowCornerDontround);
+
+	// dark user interface
+	WriteOnOff(Section, "DarkMode", FName, ts->DarkMode);
 
 	// 通知音
 	WriteOnOff(Section, "NotifySound", FName, ts->NotifySound);

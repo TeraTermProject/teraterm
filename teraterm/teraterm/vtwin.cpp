@@ -104,6 +104,9 @@
 #include "recvfiledlg.h"
 #include "setting.h"
 #include "broadcast.h"
+#include "darkmode.h"
+
+static BOOL SetDarkTerminalColors(TTTSet *pts, BOOL dark);
 #include "asprintf.h"
 #include "teraprn.h"
 #include "setupdirdlg.h"
@@ -752,6 +755,12 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		rect.right = rect.left + 100;
 		rect.bottom = rect.top + 100;
 	}
+	// dark user interface, set up before the window is created
+	DarkModeInit(ts.DarkMode);
+	if (DarkModeIsEnabled()) {
+		SetDarkTerminalColors(&ts, TRUE);
+	}
+
 	CreateW(hInstance, VTClassName, L"Tera Term", Style, rect, NULL, NULL);
 
 	/*--------- Init2 -----------------*/
@@ -760,6 +769,9 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	cv.HWin = HVTWin;
 	vt_src = InitDisp(HVTWin, &ts);
 	BGLoadThemeFile(vt_src, &ts);
+	if (DarkModeIsEnabled()) {
+		DarkModeApplyToWindow(HVTWin);
+	}
 
 	// Windows 11 でウィンドウの角が丸くならないようにする
 	if (ts.WindowCornerDontround && pDwmSetWindowAttribute != NULL) {
@@ -1098,6 +1110,7 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		{ ID_FILE_REPLAYLOG, "MENU_FILE_REPLAYLOG" },
 		{ ID_FILE_CHANGEDIR, "MENU_FILE_CHANGEDIR" },
 		{ ID_FILE_PRINT2, "MENU_FILE_PRINT" },
+		{ ID_FILE_EXPORTBUFFER, "MENU_FILE_EXPORTBUFFER" },
 		{ ID_FILE_DISCONNECT, "MENU_FILE_DISCONNECT" },
 		{ ID_FILE_EXIT, "MENU_FILE_EXIT" },
 		{ ID_FILE_EXITALL, "MENU_FILE_EXITALL" },
@@ -1137,6 +1150,7 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		{ ID_SETUP_TCPIP, "MENU_SETUP_TCPIP" },
 		{ ID_SETUP_GENERAL, "MENU_SETUP_GENERAL" },
 		{ ID_SETUP_ADDITIONALSETTINGS, "MENU_SETUP_ADDITION" },
+		{ ID_SETUP_DARKMODE, "MENU_SETUP_DARKMODE" },
 		{ ID_SETUP_SAVE, "MENU_SETUP_SAVE" },
 		{ ID_SETUP_RESTORE, "MENU_SETUP_RESTORE" },
 		{ ID_OPEN_SETUP, "MENU_SETUP_OPENSETUP" },
@@ -1309,6 +1323,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		}
 	}
 	else if (SubMenu == SetupMenu)
+	{
 		/*
 		 * ネットワーク接続中(TCP/IPを選択して接続した状態)はシリアルポート
 		 * (ID_SETUP_SERIALPORT)のメニューが選択できないようになっていたが、
@@ -1320,6 +1335,11 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		else {
 			EnableMenuItem(SetupMenu,ID_SETUP_SERIALPORT,MF_BYCOMMAND | MF_ENABLED);
 		}
+		EnableMenuItem(SetupMenu, ID_SETUP_DARKMODE,
+					   MF_BYCOMMAND | (DarkModeIsSupported() ? MF_ENABLED : MF_GRAYED));
+		CheckMenuItem(SetupMenu, ID_SETUP_DARKMODE,
+					  MF_BYCOMMAND | (DarkModeIsEnabled() ? MF_CHECKED : MF_UNCHECKED));
+	}
 
 	else if (SubMenu == ControlMenu)
 	{
@@ -4556,6 +4576,101 @@ void CVTWindow::OnEditCopy()
 	free(strW);
 }
 
+/**
+ *	Switch terminal colors between the Tera Term default (black on white)
+ *	and a dark scheme. Colors the user changed are left alone.
+ *
+ *	@retval	TRUE	colors were changed
+ */
+static BOOL SetDarkTerminalColors(TTTSet *pts, BOOL dark)
+{
+	static const COLORREF light[3][2] = {
+		{ RGB(0, 0, 0), RGB(255, 255, 255) },		// VTColor
+		{ RGB(0, 0, 255), RGB(255, 255, 255) },		// VTBoldColor
+		{ RGB(255, 255, 255), RGB(0, 0, 0) },		// VTReverseColor
+	};
+	static const COLORREF dark_colors[3][2] = {
+		{ RGB(204, 204, 204), RGB(30, 30, 30) },
+		{ RGB(110, 170, 255), RGB(30, 30, 30) },
+		{ RGB(30, 30, 30), RGB(204, 204, 204) },
+	};
+	COLORREF *targets[3] = { pts->VTColor, pts->VTBoldColor, pts->VTReverseColor };
+	const COLORREF (*from)[2] = dark ? light : dark_colors;
+	const COLORREF (*to)[2] = dark ? dark_colors : light;
+	for (int i = 0; i < 3; i++) {
+		if (targets[i][0] != from[i][0] || targets[i][1] != from[i][1]) {
+			return FALSE;
+		}
+	}
+	for (int i = 0; i < 3; i++) {
+		targets[i][0] = to[i][0];
+		targets[i][1] = to[i][1];
+	}
+	return TRUE;
+}
+
+/**
+ *	Export the whole console (scrollback + screen) to a UTF-8 text file
+ */
+void CVTWindow::OnFileExportBuffer()
+{
+	// default file name: <host>_YYYYMMDD_HHMMSS.txt
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+	const wchar_t *host = GetConnectHostName();
+	if (host == NULL || host[0] == 0) {
+		host = L"console";
+	}
+	wchar_t fname[MAX_PATH];
+	_snwprintf_s(fname, _countof(fname), _TRUNCATE, L"%ls_%04d%02d%02d_%02d%02d%02d.txt",
+				 host, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+	// characters not allowed in file names (e.g. IPv6 ':')
+	for (wchar_t *p = fname; *p != 0; p++) {
+		if (wcschr(L"\\/:*?\"<>|", *p) != NULL) {
+			*p = L'_';
+		}
+	}
+
+	TTOPENFILENAMEW ofn = {};
+	ofn.hwndOwner = m_hWnd;
+	ofn.hInstance = hInst;
+	ofn.lpstrFile = fname;
+	ofn.lpstrFilter = L"Text files (*.txt)\0*.txt\0All files (*.*)\0*.*\0\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrDefExt = L"txt";
+	ofn.lpstrTitle = L"Tera Term: Export console to TXT";
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
+	wchar_t *filename;
+	if (!TTGetSaveFileNameW(&ofn, &filename)) {
+		return;
+	}
+
+	wchar_t *textW = BuffGetAllTextW(NULL);
+	char *textU8 = (textW != NULL) ? ToU8W(textW) : NULL;
+	free(textW);
+
+	BOOL ok = FALSE;
+	HANDLE h = CreateFileW(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (h != INVALID_HANDLE_VALUE) {
+		DWORD len = (textU8 != NULL) ? (DWORD)strlen(textU8) : 0;
+		DWORD written = 0;
+		ok = (len == 0) || (WriteFile(h, textU8, len, &written, NULL) && written == len);
+		CloseHandle(h);
+	}
+	free(textU8);
+	free(filename);
+
+	if (!ok) {
+		static const TTMessageBoxInfoW info = {
+			"Tera Term",
+			"MSG_TT_ERROR", L"Tera Term: ERROR",
+			"MSG_EXPORTBUFFER_ERROR", L"Could not write the text file.",
+			MB_OK | MB_ICONEXCLAMATION
+		};
+		TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
+	}
+}
+
 void CVTWindow::OnEditCopyTable()
 {
 	// copy selected text to clipboard in Excel format
@@ -4742,6 +4857,24 @@ void CVTWindow::OnSetupTCPIP()
 void CVTWindow::OnSetupGeneral()
 {
 	OpenSetupGeneral(m_hWnd);
+}
+
+/**
+ *	Toggle dark user interface
+ *	Save setup to keep the setting
+ */
+void CVTWindow::OnSetupDarkMode()
+{
+	ts.DarkMode = !DarkModeIsEnabled();
+	DarkModeSetEnabled(ts.DarkMode);
+	DarkModeApplyToWindow(m_hWnd);
+	if (HTEKWin != NULL) {
+		DarkModeApplyToWindow(HTEKWin);
+	}
+	if (SetDarkTerminalColors(&ts, ts.DarkMode)) {
+		DispResetColor(vt_src, CS_ALL);
+		::InvalidateRect(m_hWnd, NULL, FALSE);
+	}
 }
 
 void CVTWindow::OnSetupSave()
@@ -5301,6 +5434,10 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	static const UINT WM_TASKBER_CREATED = RegisterWindowMessage("TaskbarCreated");
 
 	LRESULT retval = 0;
+	if (DarkModeHandleNCMessage(m_hWnd, msg, wp, lp, &retval)) {
+		// dark menu bar
+		return retval;
+	}
 	if (msg == MsgDlgHelp) {
 		// HELPMSGSTRING message 時
 		//		wp = dialog handle
@@ -5588,6 +5725,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_FILE_QVSEND: OnFileQVSend(); break;
 		case ID_FILE_CHANGEDIR: OnFileChangeDir(); break;
 		case ID_FILE_PRINT2: OnFilePrint(); break;
+		case ID_FILE_EXPORTBUFFER: OnFileExportBuffer(); break;
 		case ID_FILE_DISCONNECT: OnFileDisconnect(); break;
 		case ID_FILE_EXIT: OnFileExit(); break;
 		case ID_FILE_EXITALL: OnAllClose(); break;
@@ -5601,6 +5739,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_EDIT_SELECTALL: OnEditSelectAllBuffer(); break;
 		case ID_EDIT_SELECTSCREEN: OnEditSelectScreenBuffer(); break;
 		case ID_SETUP_ADDITIONALSETTINGS: OnExternalSetup(); break;
+		case ID_SETUP_DARKMODE: OnSetupDarkMode(); break;
 		case ID_SETUP_TERMINAL: OnSetupTerminal(); break;
 		case ID_SETUP_WINDOW: OnSetupWindow(); break;
 		case ID_SETUP_FONT: OnSetupFont(); break;

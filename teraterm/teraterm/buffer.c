@@ -2298,6 +2298,18 @@ wchar_t *BuffCBCopyUnicode(BOOL Table)
 	return str_ptr;
 }
 
+/**
+ *	Get the whole buffer (scrollback + screen) as text
+ *	The current selection is not changed
+ *
+ *	@param[out]	len		length of the string (can be NULL)
+ *	@return		string, free() after use
+ */
+wchar_t *BuffGetAllTextW(size_t *len)
+{
+	return BuffGetStringForCB(0, 0, 0, BuffEnd, FALSE, len);
+}
+
 void BuffPrint(BOOL ScrollRegion)
 // Print screen or selected text
 {

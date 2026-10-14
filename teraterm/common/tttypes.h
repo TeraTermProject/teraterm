@@ -618,6 +618,7 @@ struct tttset {
 	int BroadcastSubmitKey;
 	wchar_t *LogTimestampFormatW;
 	DWORD SerialSendLimit;				// シリアル送信制限(0=制限しない/1～=送信バイト数)
+	WORD DarkMode;						// dark user interface (title bar, menus, dialogs)
 	wchar_t *TitleW;						// local title (TComVar.TitleRemoteW = remote title)
 	wchar_t *HostNameW;
 

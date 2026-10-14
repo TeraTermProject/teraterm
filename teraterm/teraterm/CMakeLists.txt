@@ -81,6 +81,8 @@ add_executable(
   vtterm.h
   vtwin.cpp
   vtwin.h
+  darkmode.cpp
+  darkmode.h
   winjump.c
   winjump.h
 )

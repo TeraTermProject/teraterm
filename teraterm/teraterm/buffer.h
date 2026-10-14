@@ -96,6 +96,7 @@ void BuffCopyBox(int SrcXStart, int SrcYStart, int SrcXEnd, int SrcYEnd, int Src
 void BuffChangeAttrBox(int XStart, int YStart, int XEnd, int YEnd, const PCharAttr attr, const PCharAttr mask);
 void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, const PCharAttr attr, const PCharAttr mask);
 wchar_t *BuffCBCopyUnicode(BOOL Table);
+wchar_t *BuffGetAllTextW(size_t *len);
 void BuffPrint(BOOL ScrollRegion);
 void BuffDumpCurrentLine(PrintFile *handle, BYTE TERM);
 int BuffPutUnicode(unsigned int uc, const TCharAttr *Attr, BOOL Insert);
