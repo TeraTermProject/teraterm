@@ -87,6 +87,8 @@ add_executable(
   session.h
   frame.cpp
   frame.h
+  dbglog.c
+  dbglog.h
   winjump.c
   winjump.h
 )

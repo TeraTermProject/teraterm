@@ -143,6 +143,24 @@ typedef struct {
 static TInstVar InstVar;
 
 /*
+ *	One SSH instance per Tera Term session (tab)
+ *
+ *	pvar points to the instance of the active session. Tera Term calls
+ *	TTXSessionSwitch() when it makes another session active, the
+ *	connection state kept in ssh.c is switched with it.
+ *	The first instance is InstVar (initialized by TTXInit()).
+ */
+typedef struct {
+	void *session;			// Tera Term's session, NULL = not bound yet
+	TInstVar *pvar;
+	void *ssh_state;		// ssh.c state while not active
+} SSHInstance;
+
+static SSHInstance *instances;
+static int instance_count;
+static int active_instance = -1;
+
+/*
 This code makes lots of assumptions about the order in which Tera Term
 does things, and how. A key assumption is that the Notification window
 passed into WSAAsyncSelect is the main terminal window. We also assume
@@ -5131,6 +5149,150 @@ static void PASCAL TTXEnd(void)
 	}
 }
 
+static SSHInstance *AddInstance(void *session, TInstVar *pv)
+{
+	instances = (SSHInstance *)realloc(instances, sizeof(SSHInstance) * (instance_count + 1));
+	SSHInstance *inst = &instances[instance_count++];
+	inst->session = session;
+	inst->pvar = pv;
+	inst->ssh_state = malloc(SSH_session_state_size());
+	SSH_session_state_init(inst->ssh_state);
+	return inst;
+}
+
+static int FindInstance(void *session)
+{
+	int i;
+	for (i = 0; i < instance_count; i++) {
+		if (instances[i].session == session) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+/**
+ *	Tera Term made another session active
+ *	@param	session		Tera Term's session (only used as a key)
+ *	@param	ts, cv		settings and connection of the session
+ */
+static void PASCAL TTXSessionSwitch(void *session, PTTSet ts, PComVar cv)
+{
+	int index;
+
+	if (instances == NULL) {
+		// the first session uses InstVar, set up by TTXInit()
+		AddInstance(session, &InstVar);
+		active_instance = 0;
+		SSH_session_state_save(instances[0].ssh_state);
+		pvar = &InstVar;
+		return;
+	}
+	if (active_instance >= 0 && instances[active_instance].session == session) {
+		return;
+	}
+
+	index = FindInstance(session);
+	if (index < 0) {
+		// new session, same set up as TTXInit() did for the first one
+		TInstVar *pv = (TInstVar *)calloc(1, sizeof(TInstVar));
+		pv->ts_SSH = InstVar.ts_SSH;
+		pv->ReadIniFile = InstVar.ReadIniFile;
+		pv->WriteIniFile = InstVar.WriteIniFile;
+		pv->ParseParam = InstVar.ParseParam;
+		pv->settings = *pv->ts_SSH;
+		pv->ts = ts;
+		pv->cv = cv;
+		pv->fatal_error = FALSE;
+		pv->showing_err = FALSE;
+		pv->err_msg = NULL;
+		AddInstance(session, pv);
+		index = instance_count - 1;
+
+		// init_TTSSH() works on the ssh.c state of the new session
+		if (active_instance >= 0) {
+			SSH_session_state_save(instances[active_instance].ssh_state);
+		}
+		SSH_session_state_load(instances[index].ssh_state);
+		active_instance = index;
+		pvar = pv;
+		init_TTSSH(pv);
+		return;
+	}
+
+	if (active_instance >= 0) {
+		SSH_session_state_save(instances[active_instance].ssh_state);
+	}
+	SSH_session_state_load(instances[index].ssh_state);
+	active_instance = index;
+	pvar = instances[index].pvar;
+}
+
+/**
+ *	Make the SSH instance that owns pv active inside TTSSH (pvar and the
+ *	ssh.c state), for events that arrive outside of its Tera Term session
+ *	(port forwarding sockets, heartbeat)
+ *	@return	the instance that was active, pass it back to restore
+ */
+PTInstVar TTSSH_activate_instance(PTInstVar pv)
+{
+	int i;
+	PTInstVar prev = pvar;
+
+	if (pv == NULL || pv == pvar) {
+		return prev;
+	}
+	for (i = 0; i < instance_count; i++) {
+		if (instances[i].pvar == pv) {
+			if (active_instance >= 0) {
+				SSH_session_state_save(instances[active_instance].ssh_state);
+			}
+			SSH_session_state_load(instances[i].ssh_state);
+			active_instance = i;
+			pvar = pv;
+			break;
+		}
+	}
+	return prev;
+}
+
+/**
+ *	Tera Term destroyed a session (its connection is closed already)
+ *	It is not the active one
+ */
+static void PASCAL TTXSessionEnd(void *session)
+{
+	const int index = FindInstance(session);
+	SSHInstance inst;
+	TInstVar *active_pvar;
+
+	if (index < 0 || index == active_instance) {
+		return;
+	}
+	inst = instances[index];
+
+	// clean up with its state loaded
+	active_pvar = pvar;
+	SSH_session_state_save(instances[active_instance].ssh_state);
+	SSH_session_state_load(inst.ssh_state);
+	pvar = inst.pvar;
+	uninit_TTSSH(inst.pvar);
+	free(inst.pvar->err_msg);
+	inst.pvar->err_msg = NULL;
+	SSH_session_state_load(instances[active_instance].ssh_state);
+	pvar = active_pvar;
+
+	if (inst.pvar != &InstVar) {
+		free(inst.pvar);
+	}
+	free(inst.ssh_state);
+	memmove(&instances[index], &instances[index + 1], sizeof(SSHInstance) * (instance_count - index - 1));
+	instance_count--;
+	if (active_instance > index) {
+		active_instance--;
+	}
+}
+
 static void PASCAL TTXCloseTCP(TTXSockHooks *hooks)
 {
 	if (pvar->session_settings.Enabled) {
@@ -5177,7 +5339,12 @@ static TTXExports Exports = {
 	TTXModifyPopupMenu,
 	TTXProcessCommand,
 	TTXEnd,
-	TTXSetCommandLine
+	TTXSetCommandLine,
+	NULL,	// TTXOpenFile
+	NULL,	// TTXCloseFile
+	NULL,	// TTXInit2
+	TTXSessionSwitch,
+	TTXSessionEnd,
 };
 
 BOOL __declspec(dllexport)

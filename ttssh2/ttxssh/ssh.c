@@ -486,16 +486,23 @@ Channel_t *ssh2_local_channel_lookup(int local_num)
 //
 // SCP thread mutex
 //
+// the locks are shared by all sessions (tabs), they are created once and
+// stay until the process ends
+static BOOL g_ssh_scp_lock_initialized;
+
 void ssh_scp_thread_lock_initialize(void)
 {
+	if (g_ssh_scp_lock_initialized) {
+		return;
+	}
+	g_ssh_scp_lock_initialized = TRUE;
 	InitializeCriticalSection(&g_ssh_scp_lock);
 	InitializeCriticalSection(&g_ssh_scp_thread_lock);
 }
 
 void ssh_scp_thread_lock_finalize(void)
 {
-	DeleteCriticalSection(&g_ssh_scp_lock);
-	DeleteCriticalSection(&g_ssh_scp_thread_lock);
+	// another session may still use them
 }
 
 //
@@ -7530,11 +7537,14 @@ static LRESULT CALLBACK ssh_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, L
 			char *s;
 			unsigned char *outmsg;
 			int len;
+			// the connection of another tab may be active
+			PTInstVar prev = TTSSH_activate_instance(pvar);
 
 			msg = buffer_init();
 			if (msg == NULL) {
 				// TODO: error check
 				logprintf(LOG_LEVEL_ERROR, "%s: buffer_init returns NULL.", __FUNCTION__);
+				TTSSH_activate_instance(prev);
 				return FALSE;
 			}
 			s = "ssh-heartbeat";
@@ -7553,6 +7563,7 @@ static LRESULT CALLBACK ssh_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, L
 			} else {
 				logputs(LOG_LEVEL_SSHDUMP, "SSH2_MSG_IGNORE was sent at ssh_heartbeat_dlg_proc().");
 			}
+			TTSSH_activate_instance(prev);
 			}
 			return TRUE;
 			break;
@@ -7591,15 +7602,11 @@ static LRESULT CALLBACK ssh_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, L
 
 static unsigned __stdcall ssh_heartbeat_thread(void *p)
 {
-	static int instance = 0;
 	PTInstVar pvar = (PTInstVar)p;
 	time_t tick;
 
-	// すでに実行中なら何もせずに返る。
-	if (instance > 0)
-		return 0;
-	instance++;
-
+	// one thread per SSH connection (tab), start_ssh_heartbeat_thread() is
+	// called once per connection
 	for (;;) {
 		// ソケットがクローズされたらスレッドを終わる
 		if (pvar->socket == INVALID_SOCKET)
@@ -7616,8 +7623,6 @@ static unsigned __stdcall ssh_heartbeat_thread(void *p)
 
 		Sleep(100); // yield
 	}
-
-	instance = 0;
 
 	return 0;
 }
@@ -10906,4 +10911,59 @@ error:
 	// 使い終わったバッファをクリア
 	buffer_clear(agent_msg);
 	return TRUE;
+}
+
+/*
+ *	Per session state of this file
+ *
+ *	Tera Term has one SSH connection per tab (session). The connection
+ *	state that lives in file-static variables here is saved / loaded when
+ *	the active session changes (see TTXSessionSwitch() in ttxssh.c).
+ */
+typedef struct {
+	struct global_confirm global_confirms;
+	Channel_t *channels;
+	int channel_max_num;
+	int channel_used_num;
+	int scp_sending;
+	unsigned char handle_messages[HANDLE_MESSAGE_MAX];
+	int handle_message_count;
+	int handle_message_stage;
+} SSHSessionState;
+
+size_t SSH_session_state_size(void)
+{
+	return sizeof(SSHSessionState);
+}
+
+/* the state of a new session (no connection) */
+void SSH_session_state_init(void *dst)
+{
+	memset(dst, 0, sizeof(SSHSessionState));
+}
+
+void SSH_session_state_save(void *dst)
+{
+	SSHSessionState *s = (SSHSessionState *)dst;
+	s->global_confirms = global_confirms;
+	s->channels = channels;
+	s->channel_max_num = channel_max_num;
+	s->channel_used_num = channel_used_num;
+	s->scp_sending = g_scp_sending;
+	memcpy(s->handle_messages, handle_messages, sizeof(handle_messages));
+	s->handle_message_count = handle_message_count;
+	s->handle_message_stage = handle_message_stage;
+}
+
+void SSH_session_state_load(const void *src)
+{
+	const SSHSessionState *s = (const SSHSessionState *)src;
+	global_confirms = s->global_confirms;
+	channels = s->channels;
+	channel_max_num = s->channel_max_num;
+	channel_used_num = s->channel_used_num;
+	g_scp_sending = s->scp_sending;
+	memcpy(handle_messages, s->handle_messages, sizeof(handle_messages));
+	handle_message_count = s->handle_message_count;
+	handle_message_stage = s->handle_message_stage;
 }

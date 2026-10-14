@@ -855,8 +855,29 @@ void FWD_suspend_resume_local_connection(PTInstVar pvar, Channel_t* c, int notif
 }
 
 
+static LRESULT accept_wnd_proc_main(HWND wnd, UINT msg, WPARAM wParam,
+                                    LPARAM lParam);
+
+/* socket events of a forwarded connection, its SSH instance (tab) may not be
+   the active one */
 static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
                                         LPARAM lParam)
+{
+	PTInstVar pvar = (PTInstVar) GetWindowLongPtr(wnd, GWLP_USERDATA);
+	PTInstVar prev;
+	LRESULT result;
+
+	if (pvar == NULL) {
+		return accept_wnd_proc_main(wnd, msg, wParam, lParam);
+	}
+	prev = TTSSH_activate_instance(pvar);
+	result = accept_wnd_proc_main(wnd, msg, wParam, lParam);
+	TTSSH_activate_instance(prev);
+	return result;
+}
+
+static LRESULT accept_wnd_proc_main(HWND wnd, UINT msg, WPARAM wParam,
+                                    LPARAM lParam)
 {
 	PTInstVar pvar = (PTInstVar) GetWindowLongPtr(wnd, GWLP_USERDATA);
 

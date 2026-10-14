@@ -44,6 +44,7 @@
 #include "session.h"
 #include "frame.h"
 #include "vtdisp.h"
+#include "dbglog.h"
 
 #define FRAME_CLASS_NAME	L"TeraTermTabFrame"
 #define WM_APP_REMOVETAB	(WM_APP + 1)
@@ -461,6 +462,7 @@ void FrameAddTab(CVTWindow *vt, TTSession *session)
 	t->closing = FALSE;
 	tab_count++;
 	UpdateTitle(tab_count - 1);
+	DbgLog("tab: %d added (session %p), %d tabs", tab_count - 1, session, tab_count);
 
 	if (tab_count == 1) {
 		// dark mode is known after the settings were read (by the first tab)
@@ -513,11 +515,13 @@ HWND FrameGetActiveVTHWND(void)
 void FrameNewTab(const wchar_t *command_line)
 {
 	TTSession *s = SessionCreate();
+	DbgLog("tab: new tab, session %p, %s", s, command_line != NULL ? "with connection" : "new connection dialog");
 	SessionSwitch(s);
 	g_ts->TeraTermInstance = frame_inst;
 	g_ts->nCmdShow = SW_SHOW;
 	CVTWindow *vt = new CVTWindow(frame_inst, command_line != NULL ? command_line : L"ttermpro");
 	if (vt->m_hWnd == NULL) {
+		DbgLog("tab: creating the window failed (session %p)", s);
 		delete vt;
 		pVTWin = NULL;
 		// back to the tab that was active
@@ -582,6 +586,7 @@ void FrameChildDestroyed(HWND vt)
 		return;
 	}
 	tabs[i].closing = TRUE;
+	DbgLog("tab: %d closing (session %p)", i, tabs[i].session);
 	PostMessageW(frame_wnd, WM_APP_REMOVETAB, (WPARAM)vt, 0);
 }
 
@@ -594,6 +599,7 @@ static void RemoveTab(HWND vt)
 	Tab t = tabs[i];
 	memmove(&tabs[i], &tabs[i + 1], sizeof(Tab) * (tab_count - i - 1));
 	tab_count--;
+	DbgLog("tab: %d removed (session %p), %d tabs left", i, t.session, tab_count);
 
 	if (tab_count == 0) {
 		// last tab, quit (the session stays for the clean up in WinMain)
@@ -862,6 +868,7 @@ static LRESULT CALLBACK FrameProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		CloseAll();
 		return 0;
 	case WM_DESTROY:
+		DbgLog("frame: closed");
 		frame_wnd = NULL;
 		PostQuitMessage(0);
 		return 0;

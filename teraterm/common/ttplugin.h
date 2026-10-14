@@ -154,6 +154,26 @@ typedef struct {
 	 *	@retval	FALSE			このプラグインは使用しない
 	 */
 	BOOL (*TTXInit2)(PTTSet ts, PComVar cv, const TTXImports *(*GetImports)(size_t size));
+
+	/**
+	 *	Tabs: Tera Term has one session (settings, connection) per tab
+	 *
+	 *	TTXSessionSwitch() is called when another session becomes active,
+	 *	all later calls (hooks, TTXOpenTCP() ...) are for that session.
+	 *	The first call is right after TTXInit(), for the session TTXInit()
+	 *	was called with. A plugin that does not export it only works for
+	 *	the first session: its TTXOpenTCP() / TTXOpenFile() ... are not
+	 *	called for the other sessions.
+	 *
+	 *	@param	session		key of the session (opaque)
+	 *	@param	ts, cv		settings and connection of the session
+	 */
+	void (PASCAL * TTXSessionSwitch)(void *session, PTTSet ts, PComVar cv);
+
+	/**
+	 *	A session was closed (not the active one)
+	 */
+	void (PASCAL * TTXSessionEnd)(void *session);
 } TTXExports;
 
 /* On entry, 'size' is set to the size of the structure and the rest of

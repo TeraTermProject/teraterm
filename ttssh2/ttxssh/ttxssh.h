@@ -373,6 +373,7 @@ typedef struct _TInstVar {
 #define LogLevel(pvar, level) ((pvar)->settings.LogLevel >= (level))
 
 void notify_established_secure_connection(PTInstVar pvar);
+PTInstVar TTSSH_activate_instance(PTInstVar pv);
 void notify_closed_connection(PTInstVar pvar, char *send_msg);
 void notify_nonfatal_error(PTInstVar pvar, char *msg);
 void notify_fatal_error(PTInstVar pvar, char *msg, BOOL send_disconnect);

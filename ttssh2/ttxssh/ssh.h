@@ -520,6 +520,12 @@ BOOL do_SSH2_authrequest(PTInstVar pvar);
 void debug_print(int no, char *msg, int len);
 void ssh_scp_thread_lock_initialize(void);
 void ssh_scp_thread_lock_finalize(void);
+
+// per session (tab) state
+size_t SSH_session_state_size(void);
+void SSH_session_state_init(void *dst);
+void SSH_session_state_save(void *dst);
+void SSH_session_state_load(const void *src);
 void ssh_heartbeat_lock_initialize(void);
 void ssh_heartbeat_lock_finalize(void);
 void ssh_heartbeat_lock(void);

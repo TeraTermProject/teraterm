@@ -326,6 +326,51 @@ static bool DumpMiniDump(const wchar_t *filename, struct _EXCEPTION_POINTERS* pE
 
 static BOOL DumpFile = TRUE;
 
+/**
+ *	add the crash (code, module+offset) to debug.log next to the dump
+ *	the address can be looked up in the matching build's exe / pdb
+ */
+static void LogCrash(const wchar_t *logdir, const wchar_t *dumpfile, struct _EXCEPTION_POINTERS *ep)
+{
+	void *addr = ep->ExceptionRecord->ExceptionAddress;
+	HMODULE mod = NULL;
+	wchar_t modname[MAX_PATH] = L"?";
+	GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+					   (LPCWSTR)addr, &mod);
+	if (mod != NULL) {
+		GetModuleFileNameW(mod, modname, _countof(modname));
+	}
+	const wchar_t *base = wcsrchr(modname, L'\\');
+	base = (base != NULL) ? base + 1 : modname;
+
+	SYSTEMTIME t;
+	GetLocalTime(&t);
+	wchar_t *line = NULL;
+	aswprintf(&line, L"%04u-%02u-%02u %02u:%02u:%02u.%03u [%5lu] CRASH %s code %08lx at %s+%llx, dump %s\r\n",
+			  t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds,
+			  GetCurrentThreadId(), BaseName, ep->ExceptionRecord->ExceptionCode, base,
+			  (unsigned long long)((char *)addr - (char *)mod), dumpfile != NULL ? dumpfile : L"(none)");
+	if (line == NULL) {
+		return;
+	}
+	char u8[2048];
+	int len = WideCharToMultiByte(CP_UTF8, 0, line, -1, u8, sizeof(u8), NULL, NULL);
+	free(line);
+	if (len <= 1) {
+		return;
+	}
+	wchar_t *path = NULL;
+	aswprintf(&path, L"%s\\debug.log", logdir);
+	HANDLE h = CreateFileW(path, FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS,
+						   FILE_ATTRIBUTE_NORMAL, NULL);
+	free(path);
+	if (h != INVALID_HANDLE_VALUE) {
+		DWORD written;
+		WriteFile(h, u8, (DWORD)(len - 1), &written, NULL);
+		CloseHandle(h);
+	}
+}
+
 static LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS* pExceptionPointers)
 {
 	bool dumped = false;
@@ -336,6 +381,7 @@ static LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS* pExceptionPointer
 		aswprintf(&dumpfile, L"%s\\%s", logdir, fname);
 
 		dumped = DumpMiniDump(dumpfile, pExceptionPointers);
+		LogCrash(logdir, dumped ? dumpfile : NULL, pExceptionPointers);
 		if (dumped) {
 			const wchar_t *msg_base =
 				L"minidump '%s'\r\n"

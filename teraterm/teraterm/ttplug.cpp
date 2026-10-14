@@ -45,6 +45,8 @@
 
 #include "ttplugin.h"
 #include "ttplug.h"
+#include "session.h"
+#include "dbglog.h"
 
 typedef struct _ExtensionList {
 	wchar_t *path;					// フルパス
@@ -574,6 +576,54 @@ void PASCAL TTXInit(PTTSet ts_, PComVar cv_)
 			}
 		}
 	}
+
+	for (i = 0; i < NumExtensions; i++) {
+		if (Extensions[i].exports != NULL) {
+			DbgLog("plugin loaded: %ls (%s)", Extensions[i].filename,
+				   Extensions[i].exports->TTXSessionSwitch != NULL ? "every tab" : "first tab only");
+		}
+	}
+
+	// the plugins were initialized for this session
+	TTXSessionSwitch(SessionGetActive(), ts_, cv_);
+}
+
+/**
+ *	TRUE when the plugin works for the active session
+ *	A plugin without TTXSessionSwitch() keeps one state, for the first session
+ */
+static BOOL ForActiveSession(const TTXExports *exports)
+{
+	return exports->TTXSessionSwitch != NULL || SessionIsPluginSession(SessionGetActive());
+}
+
+void PASCAL TTXSessionSwitch(void *session, PTTSet ts_, PComVar cv_)
+{
+	int i;
+
+	for (i = 0; i < NumExtensions; i++) {
+		if (Extensions[i].exports == NULL) {
+			continue;
+		}
+		if (Extensions[i].exports->TTXSessionSwitch != NULL) {
+			Extensions[i].exports->TTXSessionSwitch(session, ts_, cv_);
+		}
+	}
+}
+
+void PASCAL TTXSessionEnd(void *session)
+{
+	int i;
+
+	DbgLog("plugins: session %p ended", session);
+	for (i = NumExtensions - 1; i >= 0; i--) {
+		if (Extensions[i].exports == NULL) {
+			continue;
+		}
+		if (Extensions[i].exports->TTXSessionEnd != NULL) {
+			Extensions[i].exports->TTXSessionEnd(session);
+		}
+	}
 }
 
 static void PASCAL TTXInternalOpenTCP(TTXSockHooks * hooks)
@@ -584,7 +634,7 @@ static void PASCAL TTXInternalOpenTCP(TTXSockHooks * hooks)
 		if (Extensions[i].exports == NULL) {
 			continue;
 		}
-		if (Extensions[i].exports->TTXOpenTCP != NULL) {
+		if (Extensions[i].exports->TTXOpenTCP != NULL && ForActiveSession(Extensions[i].exports)) {
 			Extensions[i].exports->TTXOpenTCP(hooks);
 		}
 	}
@@ -611,7 +661,7 @@ static void PASCAL TTXInternalCloseTCP(TTXSockHooks * hooks)
 		if (Extensions[i].exports == NULL) {
 			continue;
 		}
-		if (Extensions[i].exports->TTXCloseTCP != NULL) {
+		if (Extensions[i].exports->TTXCloseTCP != NULL && ForActiveSession(Extensions[i].exports)) {
 			Extensions[i].exports->TTXCloseTCP(hooks);
 		}
 	}
@@ -638,7 +688,7 @@ static void PASCAL TTXInternalOpenFile(TTXFileHooks * hooks)
 		if (Extensions[i].exports == NULL) {
 			continue;
 		}
-		if (Extensions[i].exports->TTXOpenFile != NULL) {
+		if (Extensions[i].exports->TTXOpenFile != NULL && ForActiveSession(Extensions[i].exports)) {
 			Extensions[i].exports->TTXOpenFile(hooks);
 		}
 	}
@@ -660,7 +710,7 @@ static void PASCAL TTXInternalCloseFile(TTXFileHooks * hooks)
 		if (Extensions[i].exports == NULL) {
 			continue;
 		}
-		if (Extensions[i].exports->TTXCloseFile != NULL) {
+		if (Extensions[i].exports->TTXCloseFile != NULL && ForActiveSession(Extensions[i].exports)) {
 			Extensions[i].exports->TTXCloseFile(hooks);
 		}
 	}

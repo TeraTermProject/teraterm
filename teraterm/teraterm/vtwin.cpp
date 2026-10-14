@@ -136,6 +136,7 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
 #include "win32helper.h"
 #include "session.h"
 #include "frame.h"
+#include "dbglog.h"
 
 #define VTClassName L"VTWin32"
 
@@ -3782,6 +3783,7 @@ LRESULT CVTWindow::OnCommNotify(WPARAM wParam, LPARAM lParam)
 			CommProcRRQ(g_cv);
 			break;
 		case FD_CLOSE:
+			DbgLog("comm: connection closed by the other side or failed (session %p)", m_session);
 			if (g_cv->PortType == IdTCPIP) {
 				if (TCPLocalEchoUsed) {
 					TCPLocalEchoUsed=FALSE;
@@ -3809,6 +3811,7 @@ LRESULT CVTWindow::OnCommNotify(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 {
+	DbgLog("comm: connected (session %p)", m_session);
 	serail_reconnect->ResetAutoConnectPort();
 
 	CommStart(g_cv,lParam,g_ts);
@@ -4053,11 +4056,7 @@ void CVTWindow::OnFileNewConnection()
 		}
 
 		static const wchar_t *ttermpro = L"ttermpro";
-		// SSH (ttssh2) works only in the first session for now,
-		// another SSH connection opens its own window
-		const BOOL ssh = (GetHNRec.PortType == IdTCPIP) && (GetHNRec.TCPPort == 22);
-		const BOOL own_window = ssh && IsTab() && !SessionIsPluginSession(m_session);
-		if (! g_cv->Ready && ! own_window) {
+		if (! g_cv->Ready) {
 			g_ts->PortType = GetHNRec.PortType;
 			g_ts->Telnet = GetHNRec.Telnet;
 			g_ts->TCPPort = GetHNRec.TCPPort;
@@ -4123,16 +4122,12 @@ void CVTWindow::OnFileNewConnection()
 				free(hostname_nocomment);
 			}
 			TTXSetCommandLine(Command, _countof(Command), &GetHNRec); /* TTPLUG */
-			if (IsTab() && ! own_window) {
+			if (IsTab()) {
 				// open in a new tab
 				FramePostNewTab(Command);
 			}
 			else {
 				TTWinExec(Command);
-				if (own_window && ! g_cv->Ready) {
-					// this tab is not used
-					::PostMessage(HVTWin, WM_CLOSE, 0, 0);
-				}
 			}
 		}
 	}
@@ -4692,6 +4687,20 @@ void CVTWindow::Disconnect(BOOL confirm)
 void CVTWindow::OnFileDisconnect()
 {
 	Disconnect(TRUE);
+}
+
+/**
+ *	open the folder with debug.log and crash dumps
+ */
+void CVTWindow::OnHelpDebugFolder()
+{
+	wchar_t *dir = GetLogDirW(NULL);
+	if (dir == NULL) {
+		return;
+	}
+	DbgLog("help: debug log folder opened");
+	ShellExecuteW(HVTWin, L"open", dir, NULL, NULL, SW_SHOWNORMAL);
+	free(dir);
 }
 
 void CVTWindow::OnFileExit()
@@ -5973,6 +5982,7 @@ LRESULT CVTWindow::ProcMain(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_WINDOW_UNDO: OnWindowUndo(); break;
 		case ID_HELP_INDEX2: OnHelpIndex(); break;
 		case ID_HELP_ABOUT: OnHelpAbout(); break;
+		case ID_HELP_DEBUGFOLDER: OnHelpDebugFolder(); break;
 		default:
 			OnCommand(wp, lp);
 			break;

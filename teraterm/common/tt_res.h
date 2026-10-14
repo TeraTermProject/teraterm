@@ -345,6 +345,7 @@
 #define ID_CONTROL_SHOW_MACRO           50480
 #define ID_HELP_INDEX2                  50910
 #define ID_HELP_ABOUT                   50990
+#define ID_HELP_DEBUGFOLDER             50991
 #define ID_TEKFILE_PRINT                51110
 #define ID_TEKFILE_EXIT                 51190
 #define ID_TEKEDIT_COPY                 51210

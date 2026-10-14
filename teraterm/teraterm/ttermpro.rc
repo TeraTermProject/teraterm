@@ -725,6 +725,7 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "&Index",                      ID_HELP_INDEX2
+        MENUITEM "Open &debug log folder",      ID_HELP_DEBUGFOLDER
         MENUITEM SEPARATOR
         MENUITEM "&About Tera Term...",         ID_HELP_ABOUT
     END

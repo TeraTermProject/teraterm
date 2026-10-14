@@ -93,6 +93,10 @@ BOOL PASCAL TTXProcessCommand(HWND hWin, WORD cmd);
  */
 void PASCAL TTXEnd(void);
 
+/* tabs, see TTXExports in ttplugin.h */
+void PASCAL TTXSessionSwitch(void *session, PTTSet ts, PComVar cv);
+void PASCAL TTXSessionEnd(void *session);
+
 /* This function is called when a new Tera Term is being started with certain
    settings and the extension may wish to add some options to the command line */
 void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec);

@@ -64,6 +64,7 @@
 #include "ttsetup.h"
 #include "session.h"
 #include "frame.h"
+#include "dbglog.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -437,6 +438,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	hInst = hInstance;
 	init(g_ts);
 
+#if defined(_M_IX86)
+	DbgLog("---- Tera Term started (x86), tabs build ----");
+#elif defined(_M_ARM64)
+	DbgLog("---- Tera Term started (arm64), tabs build ----");
+#else
+	DbgLog("---- Tera Term started (x64), tabs build ----");
+#endif
+
 	// one window, each connection is a tab
 	main_window = FrameCreate(hInstance);
 	CVTWindow *first_tab = new CVTWindow(hInstance);
@@ -554,6 +563,8 @@ exit_message_loop:
 	}
 
 	// the tabs were deleted when they were closed
+
+	DbgLog("---- Tera Term exiting ----");
 
 	// プラグインの終了処理
 	TTXEnd(); /* TTPLUG */

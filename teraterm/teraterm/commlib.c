@@ -54,36 +54,7 @@
 
 #include "commlib.h"
 #include "session.h"
-
-/*
- *	TTX plugins (ttssh2, TTProxy ...) were initialized with the first
- *	session's settings and connection, they hook only its connection.
- *	The hooked functions are per session (see ttwsk.c, ttfileio.c)
- */
-static BOOL UsePlugins(void)
-{
-	return SessionIsPluginSession(SessionGetActive());
-}
-
-static void TTXOpenTCPForSession(void)
-{
-	if (UsePlugins()) TTXOpenTCP();
-}
-
-static void TTXCloseTCPForSession(void)
-{
-	if (UsePlugins()) TTXCloseTCP();
-}
-
-static void TTXOpenFileForSession(void)
-{
-	if (UsePlugins()) TTXOpenFile();
-}
-
-static void TTXCloseFileForSession(void)
-{
-	if (UsePlugins()) TTXCloseFile();
-}
+#include "dbglog.h"
 
 /* create socket */
 static SOCKET OpenSocket(PComVar cv)
@@ -327,6 +298,16 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	cv->Open = FALSE;
 	cv->PortType = ts->PortType;
 	cv->ComPort = 0;
+	if (ts->PortType == IdSerial) {
+		DbgLog("comm: open COM%d %u baud (session %p)", ts->ComPort, (unsigned)ts->Baud, SessionGetActive());
+	}
+	else if (ts->PortType == IdTCPIP) {
+		DbgLog("comm: open %s port %d telnet=%d (session %p)", ts->HostName, ts->TCPPort, ts->Telnet, SessionGetActive());
+	}
+	else {
+		DbgLog("comm: open port type %d (session %p)", ts->PortType, SessionGetActive());
+	}
+
 	cv->RetryCount = 0;
 	cv->RetryWithOtherProtocol = TRUE;
 	cv->s = INVALID_SOCKET;
@@ -383,7 +364,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 				InvalidHost = TRUE;
 			}
 			else {
-				TTXOpenTCPForSession(); /* TTPLUG */
+				TTXOpenTCP(); /* TTPLUG */
 				cv->Open = TRUE;
 				/* resolving address */
 				const wchar_t *host_nameW = GetConnectHostName();
@@ -442,7 +423,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 
 		case IdSerial:
 			InitFileIO(IdSerial);  /* TTPLUG */
-			TTXOpenFileForSession(); /* TTPLUG */
+			TTXOpenFile(); /* TTPLUG */
 			_snprintf_s(P, sizeof(P), _TRUNCATE, "COM%d", ts->ComPort);
 			strncpy_s(ErrMsg, sizeof(ErrMsg),P, _TRUNCATE);
 			strncpy_s(P, sizeof(P),"\\\\.\\", _TRUNCATE);
@@ -500,7 +481,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 
 		case IdFile:
 			InitFileIO(IdFile);  /* TTPLUG */
-			TTXOpenFileForSession(); /* TTPLUG */
+			TTXOpenFile(); /* TTPLUG */
 			cv->ComID = PCreateFile(ts->HostName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 			InvalidHost = (cv->ComID == INVALID_HANDLE_VALUE);
 			if (InvalidHost) {
@@ -522,7 +503,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 
 		case IdNamedPipe:
 			InitFileIO(IdNamedPipe);  /* TTPLUG */
-			TTXOpenFileForSession(); /* TTPLUG */
+			TTXOpenFile(); /* TTPLUG */
 
 			memset(P, 0, sizeof(P));
 			strncpy_s(P, sizeof(P), ts->HostName, _TRUNCATE);
@@ -597,6 +578,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 
 BreakSC:
 	if (InvalidHost) {
+		DbgLog("comm: open failed (session %p)", SessionGetActive());
 		PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 		if ( (ts->PortType==IdTCPIP) && cv->Open ) {
 			if ( cv->s!=INVALID_SOCKET ) {
@@ -823,6 +805,7 @@ void CommClose(PComVar cv)
 		return;
 	}
 	cv->Open = FALSE;
+	DbgLog("comm: close (session %p)", SessionGetActive());
 
 	/* disable event message posting & flush buffer */
 	cv->RRQ = FALSE;
@@ -843,7 +826,7 @@ void CommClose(PComVar cv)
 				Pclosesocket(cv->s);
 			}
 			cv->s = INVALID_SOCKET;
-			TTXCloseTCPForSession(); /* TTPLUG */
+			TTXCloseTCP(); /* TTPLUG */
 			FreeWinsock();
 			break;
 		case IdSerial:
@@ -859,13 +842,13 @@ void CommClose(PComVar cv)
 				PCloseFile(cv->ComID);
 				ClearCOMFlag(cv->ComPort);
 			}
-			TTXCloseFileForSession(); /* TTPLUG */
+			TTXCloseFile(); /* TTPLUG */
 			break;
 		case IdFile:
 			if (cv->ComID != INVALID_HANDLE_VALUE) {
 				PCloseFile(cv->ComID);
 			}
-			TTXCloseFileForSession(); /* TTPLUG */
+			TTXCloseFile(); /* TTPLUG */
 			break;
 
 		case IdNamedPipe:
@@ -873,7 +856,7 @@ void CommClose(PComVar cv)
 				CloseHandle(cv->ReadEnd);
 				PCloseFile(cv->ComID);
 			}
-			TTXCloseFileForSession(); /* TTPLUG */
+			TTXCloseFile(); /* TTPLUG */
 			break;
 	}
 	cv->ComID = INVALID_HANDLE_VALUE;

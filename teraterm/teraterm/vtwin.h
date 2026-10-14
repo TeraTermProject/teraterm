@@ -254,6 +254,7 @@ protected:
 	void OnWindowUndo();
 	void OnHelpIndex();
 	void OnHelpAbout();
+	void OnHelpDebugFolder();
 	LRESULT OnDropNotify(WPARAM ShowMenu, LPARAM lParam);
 	LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam, BOOL calcOnly);
 	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);

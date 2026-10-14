@@ -33,6 +33,8 @@
 
 #include "ttwinman.h"
 #include "session.h"
+#include "ttplug.h"
+#include "dbglog.h"
 
 struct TTSession {
 	TTTSet *ts;
@@ -144,6 +146,7 @@ void SessionInit(void)
 	first->static_tscv = TRUE;
 	active = first;
 	AddToList(first);
+	DbgLog("session %p created (first), %u bytes of state per session", first, (unsigned)state_size);
 }
 
 /**
@@ -158,6 +161,7 @@ TTSession *SessionCreate(void)
 	s->state = (unsigned char *)malloc(state_size);
 	memcpy(s->state, default_state, state_size);
 	AddToList(s);
+	DbgLog("session %p created (%d sessions)", s, session_count);
 	return s;
 }
 
@@ -169,6 +173,8 @@ TTSession *SessionCreate(void)
 void SessionDestroy(TTSession *s)
 {
 	assert(s != active);
+	DbgLog("session %p destroyed", s);
+	TTXSessionEnd(s);
 	RemoveFromList(s);
 	free(s->state);
 	if (!s->static_tscv) {
@@ -189,6 +195,8 @@ void SessionSwitch(TTSession *s)
 	g_ts = s->ts;
 	g_cv = s->cv;
 	active = s;
+	// plugins with per session state (ttssh2)
+	TTXSessionSwitch(s, s->ts, s->cv);
 }
 
 TTSession *SessionGetActive(void)
