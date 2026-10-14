@@ -691,6 +691,7 @@ CVTWindow::CVTWindow(HINSTANCE hInstance, const wchar_t *command_line)
 	DWORD Style;
 	m_hInst = hInstance;
 	m_session = SessionGetActive();
+	isClosing = FALSE;
 	const HWND frame = FrameGetHWND();
 
 	MsgDlgHelp = RegisterWindowMessage(HELPMSGSTRING);
@@ -938,6 +939,9 @@ void CVTWindow::DrawVTMenuBar()
  */
 void CVTWindow::OnFrameActivate(UINT nState)
 {
+	if (isClosing) {
+		return;
+	}
 	TTSession *prev = SessionEnter(m_session);
 	OnActivate(nState, NULL, FALSE);
 	SessionLeave(prev);
@@ -948,6 +952,9 @@ void CVTWindow::OnFrameActivate(UINT nState)
  */
 void CVTWindow::OnFrameDpiChanged(UINT dpi)
 {
+	if (isClosing) {
+		return;
+	}
 	TTSession *prev = SessionEnter(m_session);
 	vtwin_work.monitor_DPI = GetMonitorDpiFromWindow(m_hWnd);
 	ChangeFont(vt_src, dpi);
@@ -5009,6 +5016,9 @@ void CVTWindow::OnSetupDarkMode()
  */
 void CVTWindow::ApplyDarkMode(BOOL dark)
 {
+	if (isClosing) {
+		return;
+	}
 	TTSession *prev = SessionEnter(m_session);
 	g_ts->DarkMode = dark;
 	DarkModeApplyToWindow(m_hWnd);
@@ -5592,6 +5602,12 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 			::PostMessageW(::GetParent(m_hWnd), WM_COMMAND, LOWORD(wp), 0);
 			return 0;
 		}
+	}
+
+	if (isClosing && msg != WM_DESTROY) {
+		// after WM_DESTROY the terminal (vt_src, buffer) is gone, a tab still
+		// gets messages until it is destroyed (WM_KILLFOCUS ...)
+		return ::DefWindowProcW(m_hWnd, msg, wp, lp);
 	}
 
 	TTSession *prev = SessionEnter(m_session);
