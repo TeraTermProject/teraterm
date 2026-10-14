@@ -280,22 +280,6 @@ git push origin v5.4.0
       Anti-Virus Software may reports false positive.
     </div>
   </li>
-  <li id="rel-update_web">Update project web page (<a href="https://teratermproject.github.io" target="_blank">https://teratermproject.github.io</a>).
-    <div>
-      Please refer to the "<a href="https://github.com/TeraTermProject/teraterm/wiki/Update-Project-page" target="_blank">How to update project home page</a>" page (in Japanese) in the wiki for update instructions.
-    </div>
-  </li>
-  <li id="rel-X_announce">Announce release.
-    <ul>
-      <li>
-        X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)
-        <ul>
-          <li>Post the announcement.</li>
-          <li>Pin that post.</li>
-        </ul>
-      </li>
-    </ul>
-  </li>
   <li id="rel-new_stable_branch">Create stable branch and push (only for periodic releases).
 <pre>
 git switch main
@@ -455,10 +439,27 @@ git checkout -b port/changelog
       <li>
         doc\en/ja\html\about\history.html<br>
         e.g. <a href="https://github.com/TeraTermProject/teraterm/commit/3c7ece59a6363116b0a34ccae7dbc2c7046f28ab">A commit to apply the stable release changelog to the main branch</a>
-
       </li>
       <li>Commit and push and merge.</li>
       <li>Delete a working branch.</li>
+    </ul>
+  </li>
+  <li id="rel-update_web">Update project web page (<a href="https://teratermproject.github.io" target="_blank">https://teratermproject.github.io</a>).
+    <ul>
+      <li>Update the version number on the website. (<a href="https://github.com/TeraTermProject/web/commit/6768c8eba97d042f3ad67f12004e901b115c8c81">Example</a>)</li>
+      <li>The manual of main is already updated by above process.</li>
+      <li>Please refer to the "<a href="https://github.com/TeraTermProject/teraterm/wiki/Update-Project-page" target="_blank">How to update project home page</a>" page (in Japanese) in the wiki for update instructions.</li>
+    </ul>
+  </li>
+  <li id="rel-X_announce">Announce release.
+    <ul>
+      <li>
+        X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)
+        <ul>
+          <li>Post the announcement.</li>
+          <li>Pin that post.</li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li id="rel-github_milestone">Configure GitHub <a href="https://github.com/TeraTermProject/teraterm/milestones">Milestones</a> (only for periodic releases).
