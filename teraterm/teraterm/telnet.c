@@ -42,6 +42,7 @@
 #include "telnet.h"
 #include "asprintf.h"
 #include "tt_res.h"
+#include "session.h"
 
 int TelStatus;
 
@@ -69,9 +70,16 @@ typedef TelRec *PTelRec;
 
 static TelRec tr;
 
-static HANDLE keepalive_thread = INVALID_HANDLE_VALUE;
-static HWND keepalive_dialog = NULL;
-static int nop_interval = 0;
+// telnet keep-alive (NOP) of a session
+// it is used by the keep-alive thread, so it must not move while the thread runs
+typedef struct {
+	TTSession *session;
+	TComVar *cv;
+	volatile int nop_interval;
+	HWND dialog;
+	HANDLE thread;
+} KeepAlive;
+static KeepAlive *keepalive;
 
 static void TelSendNOP();
 static void TelStopKeepAliveThread();
@@ -121,12 +129,12 @@ void InitTelnet(void)
 	tr.MyOpt[TERMSPEED].Accept = TRUE;
 	tr.MyOpt[NAWS].Accept = TRUE;
 	tr.HisOpt[NAWS].Accept = TRUE;
-	tr.WinSize.x = ts.TerminalWidth;
-	tr.WinSize.y = ts.TerminalHeight;
+	tr.WinSize.x = g_ts->TerminalWidth;
+	tr.WinSize.y = g_ts->TerminalHeight;
 
-	if ((ts.LogFlag & LOG_TEL) != 0) {
+	if ((g_ts->LogFlag & LOG_TEL) != 0) {
 		wchar_t *full_path = NULL;
-		awcscats(&full_path, ts.LogDirW, L"\\", L"TELNET.LOG", NULL);
+		awcscats(&full_path, g_ts->LogDirW, L"\\", L"TELNET.LOG", NULL);
 		tr.LogFile = CreateFileW(full_path, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
 								 CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		free(full_path);
@@ -182,7 +190,7 @@ static void SendBack(BYTE a, BYTE b)
 	Str3[0] = IAC;
 	Str3[1] = a;
 	Str3[2] = b;
-	CommRawOut(&cv, Str3, 3);
+	CommRawOut(g_cv, Str3, 3);
 	if (tr.LogFile)
 		TelWriteLog(Str3, 3);
 }
@@ -221,7 +229,7 @@ static void SendWinSize(void)
 	TmpBuff[i++] = IAC;
 	TmpBuff[i++] = SE;
 
-	CommRawOut(&cv, TmpBuff, i);
+	CommRawOut(g_cv, TmpBuff, i);
 	if (tr.LogFile)
 		TelWriteLog(TmpBuff, i);
 }
@@ -285,10 +293,10 @@ static void ParseTelSB(BYTE b)
 			case TERMTYPE:
 				if ((tr.MyOpt[TERMTYPE].Status == Yes) && (tr.SubOptBuff[1] == 1)) {
 					_snprintf_s(TmpStr, sizeof(TmpStr), _TRUNCATE, "%c%c%c%c%s%c%c",
-						IAC, SB, TERMTYPE, 0, ts.TermType, IAC, SE);
+						IAC, SB, TERMTYPE, 0, g_ts->TermType, IAC, SE);
 					// 4 バイト目に 0 が入るので、ずらして長さをとる
 					i = strlen(TmpStr + 4) + 4;
-					CommRawOut(&cv, TmpStr, i);
+					CommRawOut(g_cv, TmpStr, i);
 
 					if (tr.LogFile)
 						TelWriteLog(TmpStr, i);
@@ -307,10 +315,10 @@ static void ParseTelSB(BYTE b)
 				if ((tr.MyOpt[TERMSPEED].Status == Yes) && (tr.SubOptBuff[1] == 1)) {
 					_snprintf_s(TmpStr, sizeof(TmpStr), _TRUNCATE,
 						"%c%c%c%c%d,%d%c%c", IAC, SB, TERMSPEED, 0,
-						ts.TerminalInputSpeed, ts.TerminalOutputSpeed, IAC, SE);
+						g_ts->TerminalInputSpeed, g_ts->TerminalOutputSpeed, IAC, SE);
 					// 4 バイト目に 0 が入るので、ずらして長さをとる
 					i = strlen(TmpStr + 4) + 4;
-					CommRawOut(&cv, TmpStr, i);
+					CommRawOut(g_cv, TmpStr, i);
 
 					if (tr.LogFile)
 						TelWriteLog(TmpStr, i);
@@ -410,36 +418,36 @@ static void ParseTelWill(BYTE b)
 
 	switch (b) {
 	case ECHO:
-		if (ts.TelEcho) {
+		if (g_ts->TelEcho) {
 			switch (tr.HisOpt[ECHO].Status) {
 			case Yes:
-				ts.LocalEcho = 0;
+				g_ts->LocalEcho = 0;
 				break;
 			case No:
-				ts.LocalEcho = 1;
+				g_ts->LocalEcho = 1;
 				break;
 			default:
 				break;
 			}
 		}
 		if (tr.HisOpt[ECHO].Status == Yes) {
-			cv.TelLineMode = FALSE;
+			g_cv->TelLineMode = FALSE;
 		}
 		break;
 
 	case SGA:
 		if (tr.HisOpt[SGA].Status == Yes) {
-			cv.TelLineMode = FALSE;
+			g_cv->TelLineMode = FALSE;
 		}
 		break;
 
 	case BINARY:
 		switch (tr.HisOpt[BINARY].Status) {
 		case Yes:
-			cv.TelBinRecv = TRUE;
+			g_cv->TelBinRecv = TRUE;
 			break;
 		case No:
-			cv.TelBinRecv = FALSE;
+			g_cv->TelBinRecv = FALSE;
 			break;
 		default:
 			break;
@@ -496,30 +504,30 @@ static void ParseTelWont(BYTE b)
 
 	switch (b) {
 	case ECHO:
-		if (ts.TelEcho) {
+		if (g_ts->TelEcho) {
 			switch (tr.HisOpt[ECHO].Status) {
 			case Yes:
-				ts.LocalEcho = 0;
+				g_ts->LocalEcho = 0;
 				break;
 			case No:
-				ts.LocalEcho = 1;
+				g_ts->LocalEcho = 1;
 				break;
 			default:
 				break;
 			}
 		}
 		if (tr.HisOpt[ECHO].Status == Yes) {
-			cv.TelLineMode = FALSE;
+			g_cv->TelLineMode = FALSE;
 		}
 		break;
 
 	case BINARY:
 		switch (tr.HisOpt[BINARY].Status) {
 		case Yes:
-			cv.TelBinRecv = TRUE;
+			g_cv->TelBinRecv = TRUE;
 			break;
 		case No:
-			cv.TelBinRecv = FALSE;
+			g_cv->TelBinRecv = FALSE;
 			break;
 		default:
 			break;
@@ -582,10 +590,10 @@ static void ParseTelDo(BYTE b)
 	case BINARY:
 		switch (tr.MyOpt[BINARY].Status) {
 		case Yes:
-			cv.TelBinSend = TRUE;
+			g_cv->TelBinSend = TRUE;
 			break;
 		case No:
-			cv.TelBinSend = FALSE;
+			g_cv->TelBinSend = FALSE;
 			break;
 		default:
 			break;
@@ -599,7 +607,7 @@ static void ParseTelDo(BYTE b)
 
 	case SGA:
 		if (tr.MyOpt[SGA].Status==Yes)
-			cv.TelLineMode = FALSE;
+			g_cv->TelLineMode = FALSE;
 		break;
 
 	default:
@@ -654,10 +662,10 @@ static void ParseTelDont(BYTE b)
 	case BINARY:
 		switch (tr.MyOpt[BINARY].Status) {
 		case Yes:
-			cv.TelBinSend = TRUE;
+			g_cv->TelBinSend = TRUE;
 			break;
 		case No:
-			cv.TelBinSend = FALSE;
+			g_cv->TelBinSend = FALSE;
 			break;
 		default:
 			break;
@@ -675,9 +683,9 @@ void ParseTel(BOOL *Size, int *nx, int *ny)
 	BYTE b;
 	int c;
 
-	c = CommReadRawByte(&cv, &b);
+	c = CommReadRawByte(g_cv, &b);
 
-	while ((c>0) && (cv.TelMode)) {
+	while ((c>0) && (g_cv->TelMode)) {
 		if (tr.LogFile) {
 			if (TelStatus==TelIAC) {
 				win16_lwrite(tr.LogFile, "\015\012<", 3);
@@ -697,9 +705,9 @@ void ParseTel(BOOL *Size, int *nx, int *ny)
 			case TelDont: ParseTelDont(b); break;
 			case TelNop: TelStatus = TelIdle; break;
 		}
-		if (TelStatus == TelIdle) cv.TelMode = FALSE;
+		if (TelStatus == TelIdle) g_cv->TelMode = FALSE;
 
-		if (cv.TelMode) c = CommReadRawByte(&cv, &b);
+		if (g_cv->TelMode) c = CommReadRawByte(g_cv, &b);
 	}
 
 	*Size = tr.ChangeWinSize;
@@ -824,8 +832,8 @@ void TelSendAYT(void)
 
 	Str[0] = IAC;
 	Str[1] = AYT;
-	CommRawOut(&cv, Str, 2);
-	CommSend(&cv);
+	CommRawOut(g_cv, Str, 2);
+	CommSend(g_cv);
 	if (tr.LogFile)
 		TelWriteLog(Str, 2);
 }
@@ -836,15 +844,15 @@ void TelSendBreak(void)
 
 	Str[0] = IAC;
 	Str[1] = BREAK;
-	CommRawOut(&cv, Str, 2);
-	CommSend(&cv);
+	CommRawOut(g_cv, Str, 2);
+	CommSend(g_cv);
 	if (tr.LogFile)
 		TelWriteLog(Str, 2);
 }
 
 void TelChangeEcho(void)
 {
-	if (ts.LocalEcho==0)
+	if (g_ts->LocalEcho==0)
 		TelEnableHisOpt(ECHO);
 	else
 		TelDisableHisOpt(ECHO);
@@ -856,8 +864,8 @@ static void TelSendNOP(void)
 
 	Str[0] = IAC;
 	Str[1] = NOP;
-	CommRawOut(&cv, Str, 2);
-	CommSend(&cv);
+	CommRawOut(g_cv, Str, 2);
+	CommSend(g_cv);
 	if (tr.LogFile)
 		TelWriteLog(Str, 2);
 }
@@ -868,12 +876,16 @@ static INT_PTR CALLBACK telnet_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp
 {
 	switch (msg) {
 	case WM_INITDIALOG:
+		SetWindowLongPtrW(hWnd, DWLP_USER, (LONG_PTR)lp);
 		return FALSE;
 
-	case WM_SEND_HEARTBEAT:
+	case WM_SEND_HEARTBEAT: {
+		KeepAlive *ka = (KeepAlive *)GetWindowLongPtrW(hWnd, DWLP_USER);
+		TTSession *prev = SessionEnter(ka->session);
 		TelSendNOP();
+		SessionLeave(prev);
 		return TRUE;
-		break;
+	}
 
 	case WM_COMMAND:
 		switch (LOWORD(wp)) {
@@ -901,22 +913,17 @@ static INT_PTR CALLBACK telnet_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp
 }
 
 
-static unsigned _stdcall TelKeepAliveThread(void *dummy)
+static unsigned _stdcall TelKeepAliveThread(void *arg)
 {
-	static int instance = 0;
+	KeepAlive *ka = (KeepAlive *)arg;
 
-	if (instance > 0)
-		return 0;
-	instance++;
-
-	while (cv.Open && nop_interval > 0) {
-		if (time(NULL) >= cv.LastSendTime + nop_interval) {
-			SendMessage(keepalive_dialog, WM_SEND_HEARTBEAT, 0, 0);
+	while (ka->cv->Open && ka->nop_interval > 0) {
+		if (time(NULL) >= ka->cv->LastSendTime + ka->nop_interval) {
+			SendMessage(ka->dialog, WM_SEND_HEARTBEAT, 0, 0);
 		}
 
 		Sleep(100);
 	}
-	instance--;
 	return 0;
 }
 
@@ -924,41 +931,59 @@ void TelStartKeepAliveThread(void)
 {
 	unsigned tid;
 
-	if (ts.TelKeepAliveInterval > 0) {
-		nop_interval = ts.TelKeepAliveInterval;
+	if (g_ts->TelKeepAliveInterval > 0 && keepalive == NULL) {
+		KeepAlive *ka = (KeepAlive *)calloc(1, sizeof(KeepAlive));
+		ka->session = SessionGetActive();
+		ka->cv = g_cv;
+		ka->nop_interval = g_ts->TelKeepAliveInterval;
 
 		// モードレスダイアログを追加 (2007.12.26 yutaka)
-		keepalive_dialog = CreateDialog(hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
-										HVTWin, telnet_heartbeat_dlg_proc);
+		ka->dialog = CreateDialogParam(hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
+									   HVTWin, telnet_heartbeat_dlg_proc, (LPARAM)ka);
 
-		keepalive_thread = (HANDLE)_beginthreadex(NULL, 0, TelKeepAliveThread, NULL, 0, &tid);
-		if (keepalive_thread == 0) {
-			keepalive_thread = INVALID_HANDLE_VALUE;
-			nop_interval = 0;
+		ka->thread = (HANDLE)_beginthreadex(NULL, 0, TelKeepAliveThread, ka, 0, &tid);
+		if (ka->thread == 0) {
+			DestroyWindow(ka->dialog);
+			free(ka);
+			return;
 		}
+		keepalive = ka;
 	}
 }
 
 static void TelStopKeepAliveThread(void)
 {
-	if (keepalive_thread != INVALID_HANDLE_VALUE) {
-		nop_interval = 0;
-		WaitForSingleObject(keepalive_thread, INFINITE);
-		CloseHandle(keepalive_thread);
-		keepalive_thread = INVALID_HANDLE_VALUE;
-
-		DestroyWindow(keepalive_dialog);
+	if (keepalive != NULL) {
+		keepalive->nop_interval = 0;
+		WaitForSingleObject(keepalive->thread, INFINITE);
+		CloseHandle(keepalive->thread);
+		DestroyWindow(keepalive->dialog);
+		free(keepalive);
+		keepalive = NULL;
 	}
 }
 
 void TelUpdateKeepAliveInterval(void)
 {
-	if (cv.Open && cv.TelFlag && ts.TCPPort==ts.TelPort) {
-		if (ts.TelKeepAliveInterval > 0 && keepalive_thread == INVALID_HANDLE_VALUE)
+	if (g_cv->Open && g_cv->TelFlag && g_ts->TCPPort==g_ts->TelPort) {
+		if (g_ts->TelKeepAliveInterval > 0 && keepalive == NULL)
 			TelStartKeepAliveThread();
-		else if (ts.TelKeepAliveInterval == 0 && keepalive_thread != INVALID_HANDLE_VALUE)
+		else if (g_ts->TelKeepAliveInterval == 0 && keepalive != NULL)
 			TelStopKeepAliveThread();
-		else
-			nop_interval = ts.TelKeepAliveInterval;
+		else if (keepalive != NULL)
+			keepalive->nop_interval = g_ts->TelKeepAliveInterval;
 	}
+}
+
+/**
+ *	Variables kept per session (see session.h)
+ */
+void TelRegisterSessionVars(void)
+{
+	static const SessionVar v[] = {
+		SESSION_VAR(TelStatus),
+		SESSION_VAR(tr),
+		SESSION_VAR(keepalive),
+	};
+	SessionRegisterVars(v, _countof(v));
 }

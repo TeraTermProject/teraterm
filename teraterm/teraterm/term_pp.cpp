@@ -257,7 +257,7 @@ static UINT CALLBACK CallBack(HWND hwnd, UINT uMsg, struct _PROPSHEETPAGEW *ppsp
 HPROPSHEETPAGE CreateTerminalPP(HINSTANCE inst, HWND vtwin, TTTSet *pts)
 {
 	DialogData *data = (DialogData *)calloc(1, sizeof(*data));
-	data->pts = &ts;
+	data->pts = g_ts;
 	data->VTWin = vtwin;
 
 	PROPSHEETPAGEW_V1 psp = {};

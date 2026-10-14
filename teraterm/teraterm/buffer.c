@@ -50,6 +50,7 @@
 #include "asprintf.h"
 #include "ttcstd.h"
 #include "vtdraw.h"
+#include "session.h"
 
 #define	ENABLE_CELL_INDEX	0
 
@@ -505,11 +506,11 @@ static BOOL ChangeBuffer(int Nx, int Ny)
 	if (Nx > BuffXMax) {
 		Nx = BuffXMax;
 	}
-	if (ts.ScrollBuffMax > BuffYMax) {
-		ts.ScrollBuffMax = BuffYMax;
+	if (g_ts->ScrollBuffMax > BuffYMax) {
+		g_ts->ScrollBuffMax = BuffYMax;
 	}
-	if (Ny > ts.ScrollBuffMax) {
-		Ny = ts.ScrollBuffMax;
+	if (Ny > g_ts->ScrollBuffMax) {
+		Ny = g_ts->ScrollBuffMax;
 	}
 
 	if ( (LONG)Nx * (LONG)Ny > BuffSizeMax ) {
@@ -625,8 +626,8 @@ void InitBuffer(IdVtDrawAPI draw_api)
 	UseUnicodeApi = draw_api == IdVtDrawAPIUnicode ? TRUE : FALSE;
 
 	/* setup terminal */
-	NumOfColumns = ts.TerminalWidth;
-	NumOfLines = ts.TerminalHeight;
+	NumOfColumns = g_ts->TerminalWidth;
+	NumOfLines = g_ts->TerminalHeight;
 
 	if (NumOfColumns <= 0)
 		NumOfColumns = 80;
@@ -639,11 +640,11 @@ void InitBuffer(IdVtDrawAPI draw_api)
 		NumOfLines = TermHeightMax;
 
 	/* setup window */
-	if (ts.EnableScrollBuff>0) {
-		if (ts.ScrollBuffSize < NumOfLines) {
-			ts.ScrollBuffSize = NumOfLines;
+	if (g_ts->EnableScrollBuff>0) {
+		if (g_ts->ScrollBuffSize < NumOfLines) {
+			g_ts->ScrollBuffSize = NumOfLines;
 		}
-		Ny = ts.ScrollBuffSize;
+		Ny = g_ts->ScrollBuffSize;
 	}
 	else {
 		Ny = NumOfLines;
@@ -653,8 +654,8 @@ void InitBuffer(IdVtDrawAPI draw_api)
 		PostQuitMessage(0);
 	}
 
-	if (ts.EnableScrollBuff>0) {
-		ts.ScrollBuffSize = NumOfLinesInBuff;
+	if (g_ts->EnableScrollBuff>0) {
+		g_ts->ScrollBuffSize = NumOfLinesInBuff;
 	}
 
 	StatusLine = 0;
@@ -1091,7 +1092,7 @@ void BuffEraseCharsInLine(int XStart, int Count)
 	int head = 0;
 	int tail = 0;
 
-	if (ts.EnableContinuedLineCopy && XStart == 0 && (CodeLineW[0].attr & AttrLineContinued)) {
+	if (g_ts->EnableContinuedLineCopy && XStart == 0 && (CodeLineW[0].attr & AttrLineContinued)) {
 		LineContinued = TRUE;
 	}
 
@@ -1112,7 +1113,7 @@ void BuffEraseCharsInLine(int XStart, int Count)
 	NewLine(PageStart+CursorY);
 	memsetW(&(CodeLineW[XStart]),0x20, CurCharAttr.Fore, CurCharAttr.Back, AttrDefault, CurCharAttr.Attr2 & Attr2ColorMask, Count);
 
-	if (ts.EnableContinuedLineCopy) {
+	if (g_ts->EnableContinuedLineCopy) {
 		if (LineContinued) {
 			BuffLineContinued(TRUE);
 		}
@@ -1837,7 +1838,7 @@ static wchar_t *BuffGetStringForCB(int sx, int sy, int ex, int ey, BOOL box_sele
 				IEnd = NumOfColumns - 1;
 
 				// 継続行コピー設定
-				if (ts.EnableContinuedLineCopy) {
+				if (g_ts->EnableContinuedLineCopy) {
 					LONG NextTmpPtr = NextLinePtr(TmpPtr);
 					if ((CodeBuffW[NextTmpPtr].attr & AttrLineContinued) != 0) {
 						// 次の行に継続している
@@ -3129,7 +3130,7 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 		return 0;
 	}
 
-	if (ts.EnableContinuedLineCopy && CursorX == 0 && (CodeLineW[0].attr & AttrLineContinued)) {
+	if (g_ts->EnableContinuedLineCopy && CursorX == 0 && (CodeLineW[0].attr & AttrLineContinued)) {
 		Attr_Attr |= AttrLineContinued;
 	}
 
@@ -3198,7 +3199,7 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 			// 描画予定がない(StrChangeCount==0)のに、
 			// 結合文字を受信した場合、描画する
 			if (Wrap) {
-				if (!BuffIsHalfWidthFromPropery(&ts, p->WidthProperty)) {
+				if (!BuffIsHalfWidthFromPropery(g_ts, p->WidthProperty)) {
 					// 行末に2セルの文字が描画済み、2セルの右側にカーソルがある状態
 					StrChangeStart = CursorX - 1;
 					StrChangeCount = 2;
@@ -3227,7 +3228,7 @@ int BuffPutUnicode(unsigned int u32, const TCharAttr *Attr, BOOL Insert)
 	else {
 		char width_property;
 		char emoji;
-		BOOL half_width = BuffIsHalfWidthFromCode(&ts, u32, &width_property, &emoji);
+		BOOL half_width = BuffIsHalfWidthFromCode(g_ts, u32, &width_property, &emoji);
 
 		p = &CodeLineW[CursorX];
 		// 現在の位置が全角の右側?
@@ -3803,7 +3804,7 @@ void MoveCursor(int Xnew, int Ynew)
 	Wrap = FALSE;
 
 	/* 最下行でだけ自動スクロールする*/
-	if (ts.AutoScrollOnlyInBottomLine == 0 || WinOrgY == 0) {
+	if (g_ts->AutoScrollOnlyInBottomLine == 0 || WinOrgY == 0) {
 		DispScrollToCursor(vt_src, CursorX, CursorY);
 	}
 }
@@ -3814,7 +3815,7 @@ void MoveRight(void)
 {
 	CursorX++;
 	/* 最下行でだけ自動スクロールする */
-	if (ts.AutoScrollOnlyInBottomLine == 0 || WinOrgY == 0) {
+	if (g_ts->AutoScrollOnlyInBottomLine == 0 || WinOrgY == 0) {
 		DispScrollToCursor(vt_src, CursorX, CursorY);
 	}
 }
@@ -3876,7 +3877,7 @@ void BuffScrollNLines(int n)
 		if (CursorBottom == NumOfLines-1) {
 			WinOrgY = WinOrgY-n;
 			/* 最下行でだけ自動スクロールする */
-			if (ts.AutoScrollOnlyInBottomLine != 0 && NewOrgY != 0) {
+			if (g_ts->AutoScrollOnlyInBottomLine != 0 && NewOrgY != 0) {
 				NewOrgY = WinOrgY;
 			}
 			BuffScroll(n,CursorBottom);
@@ -3885,7 +3886,7 @@ void BuffScrollNLines(int n)
 		}
 		else if (CursorY <= CursorBottom) {
 			/* 最下行でだけ自動スクロールする */
-			if (ts.AutoScrollOnlyInBottomLine != 0 && NewOrgY != 0) {
+			if (g_ts->AutoScrollOnlyInBottomLine != 0 && NewOrgY != 0) {
 				/* スクロールさせない場合の処理 */
 				WinOrgY = WinOrgY-n;
 				NewOrgY = WinOrgY;
@@ -4069,7 +4070,7 @@ static BOOL IsDelimiter(LONG Line, int CharPtr)
 {
 	const buff_char_t *b = &CodeBuffW[Line+CharPtr];
 	wchar_t *wcs = GetWCS(b);
-	wchar_t *findp = wcsstr(ts.DelimListW, wcs);
+	wchar_t *findp = wcsstr(g_ts->DelimListW, wcs);
 	BOOL find = (findp != NULL);
 	free(wcs);
 	return find;
@@ -4109,11 +4110,11 @@ static void invokeBrowserWithUrl(const wchar_t *url)
 		}
 	}
 
-	if (use_browser && ts.ClickableUrlBrowser[0] != 0) {
+	if (use_browser && g_ts->ClickableUrlBrowser[0] != 0) {
 		// ブラウザを使用する
-		wchar_t *browser = ToWcharA(ts.ClickableUrlBrowser);
+		wchar_t *browser = ToWcharA(g_ts->ClickableUrlBrowser);
 		wchar_t *param;
-		aswprintf(&param, L"%hs %s", ts.ClickableUrlBrowserArg, url);
+		aswprintf(&param, L"%hs %s", g_ts->ClickableUrlBrowserArg, url);
 
 		HINSTANCE r = ShellExecuteW(NULL, NULL, browser, param, NULL, SW_SHOWNORMAL);
 		free(param);
@@ -4420,7 +4421,7 @@ BOOL BuffUrlDblClk(int Xw, int Yw)
 	LONG TmpPtr;
 	BOOL url_invoked = FALSE;
 
-	if (! ts.EnableClickableUrl) {
+	if (! g_ts->EnableClickableUrl) {
 		return FALSE;
 	}
 
@@ -4488,7 +4489,7 @@ static BOOL CheckDelimiterChar(LONG ptr, int x, void *vwork)
 	else {
 		// 非区切り文字からスタートした場合
 		if (IsDelimiter(ptr, x) ||
-			(ts.DelimDBCS != 0 && ((b->cell == 1) != work->start_cell))) {
+			(g_ts->DelimDBCS != 0 && ((b->cell == 1) != work->start_cell))) {
 			// 現在位置
 			//		区切り文字になった
 			//		スタート文字のセル数と異なるセル数(1orその他)となった
@@ -4595,12 +4596,12 @@ void BuffDblClk(int Xw, int Yw)
 			int dest_y;
 
 			// 前方の区切りを探す
-			SearchDelimiterPrev(IStart, YStart, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
+			SearchDelimiterPrev(IStart, YStart, g_ts->EnableContinuedLineCopy, &dest_x, &dest_y);
 			IStart = dest_x;
 			YStart = dest_y;
 
 			// 後方の区切りを探す
-			SearchDelimiterNext(IEnd, YEnd, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
+			SearchDelimiterNext(IEnd, YEnd, g_ts->EnableContinuedLineCopy, &dest_x, &dest_y);
 			IEnd = dest_x + 1; // 終端の一つ後ろ
 			YEnd = dest_y;
 		}
@@ -4790,7 +4791,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 
 	if (!Selecting) {
 		// 選択ガード?
-		if (GetTickCount() - SelectStartTime < ts.SelectStartDelay) {
+		if (GetTickCount() - SelectStartTime < g_ts->SelectStartDelay) {
 			// ガード中
 			return;
 		}
@@ -4842,7 +4843,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 			// ダブルクリック選択領域より前を選択
 			int dest_x;
 			int dest_y;
-			SearchDelimiterPrev(X, Y, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
+			SearchDelimiterPrev(X, Y, g_ts->EnableContinuedLineCopy, &dest_x, &dest_y);
 			SelectEnd.x = dest_x;
 			SelectEnd.y = dest_y;
 			SelectStart = DblClkEnd;
@@ -4851,7 +4852,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 			// ダブルクリック選択領域より後ろを選択
 			int dest_x;
 			int dest_y;
-			SearchDelimiterNext(X - 1, Y, ts.EnableContinuedLineCopy, &dest_x, &dest_y);
+			SearchDelimiterNext(X - 1, Y, g_ts->EnableContinuedLineCopy, &dest_x, &dest_y);
 			SelectEnd.x = dest_x + 1;
 			SelectEnd.y = dest_y;
 			SelectStart = DblClkStart;
@@ -4901,7 +4902,7 @@ void BuffEndSelect(int Xw, int Yw)
 	(void)Xw;
 	(void)Yw;
 	if (!Selecting) {
-		if (GetTickCount() - SelectStartTime < ts.SelectStartDelay) {
+		if (GetTickCount() - SelectStartTime < g_ts->SelectStartDelay) {
 			// ガード時間以内なら
 			// 選択領域解除
 			SelectEnd = SelectStart;
@@ -4951,7 +4952,7 @@ void BuffChangeWinSize(int Nx, int Ny)
 		Ny = 1;
 	}
 
-	if ((ts.TermIsWin>0) &&
+	if ((g_ts->TermIsWin>0) &&
 	    ((Nx!=NumOfColumns) || (Ny!=NumOfLines))) {
 		LockBuffer();
 		BuffChangeTerminalSize(Nx,Ny-StatusLine);
@@ -4983,34 +4984,34 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 	if (Nx > BuffXMax) {
 		Nx = BuffXMax;
 	}
-	if (ts.ScrollBuffMax > BuffYMax) {
-		ts.ScrollBuffMax = BuffYMax;
+	if (g_ts->ScrollBuffMax > BuffYMax) {
+		g_ts->ScrollBuffMax = BuffYMax;
 	}
-	if (Ny > ts.ScrollBuffMax) {
-		Ny = ts.ScrollBuffMax;
+	if (Ny > g_ts->ScrollBuffMax) {
+		Ny = g_ts->ScrollBuffMax;
 	}
 
 	St = isCursorOnStatusLine;
 	if ((Nx!=NumOfColumns) || (Ny!=NumOfLines)) {
-		if ((ts.ScrollBuffSize < Ny) ||
-		    (ts.EnableScrollBuff==0)) {
+		if ((g_ts->ScrollBuffSize < Ny) ||
+		    (g_ts->EnableScrollBuff==0)) {
 			Nb = Ny;
 		}
 		else {
-			Nb = ts.ScrollBuffSize;
+			Nb = g_ts->ScrollBuffSize;
 		}
 
 		if (! ChangeBuffer(Nx,Nb)) {
 			return;
 		}
-		if (ts.EnableScrollBuff>0) {
-			ts.ScrollBuffSize = NumOfLinesInBuff;
+		if (g_ts->EnableScrollBuff>0) {
+			g_ts->ScrollBuffSize = NumOfLinesInBuff;
 		}
 		if (Ny > NumOfLinesInBuff) {
 			Ny = NumOfLinesInBuff;
 		}
 
-		if ((ts.TermFlag & TF_CLEARONRESIZE) == 0 && Ny != NumOfLines) {
+		if ((g_ts->TermFlag & TF_CLEARONRESIZE) == 0 && Ny != NumOfLines) {
 			if (Ny > NumOfLines) {
 				CursorY += Ny - NumOfLines;
 				if (Ny > BuffEnd) {
@@ -5031,18 +5032,18 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 
 		NumOfColumns = Nx;
 		NumOfLines = Ny;
-		ts.TerminalWidth = Nx;
-		ts.TerminalHeight = Ny-StatusLine;
+		g_ts->TerminalWidth = Nx;
+		g_ts->TerminalHeight = Ny-StatusLine;
 
 		PageStart = BuffEnd - NumOfLines;
 	}
 
-	if (ts.TermFlag & TF_CLEARONRESIZE) {
+	if (g_ts->TermFlag & TF_CLEARONRESIZE) {
 		BuffScroll(NumOfLines,NumOfLines-1);
 	}
 
 	/* Set Cursor */
-	if (ts.TermFlag & TF_CLEARONRESIZE) {
+	if (g_ts->TermFlag & TF_CLEARONRESIZE) {
 		CursorX = 0;
 		CursorRightM = NumOfColumns-1;
 		if (St) {
@@ -5087,18 +5088,18 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 		TabStops[i-1] = i*8;
 	}
 
-	if (ts.TermIsWin>0) {
+	if (g_ts->TermIsWin>0) {
 		W = NumOfColumns;
 		H = NumOfLines;
 	}
 	else {
 		W = WinWidth;
 		H = WinHeight;
-		if ((ts.AutoWinResize>0) ||
+		if ((g_ts->AutoWinResize>0) ||
 		    (NumOfColumns < W)) {
 			W = NumOfColumns;
 		}
-		if (ts.AutoWinResize>0) {
+		if (g_ts->AutoWinResize>0) {
 			H = NumOfLines;
 		}
 		else if (BuffEnd < H) {
@@ -5114,7 +5115,7 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 
 	DispScrollHomePos(vt_src);
 
-	if (cv.Ready && cv.TelFlag) {
+	if (g_cv->Ready && g_cv->TelFlag) {
 		TelInformWinSize(NumOfColumns,NumOfLines-StatusLine);
 	}
 
@@ -5126,11 +5127,11 @@ void ChangeWin(void)
 	int Ny;
 
 	/* Change buffer */
-	if (ts.EnableScrollBuff>0) {
-		if (ts.ScrollBuffSize < NumOfLines) {
-			ts.ScrollBuffSize = NumOfLines;
+	if (g_ts->EnableScrollBuff>0) {
+		if (g_ts->ScrollBuffSize < NumOfLines) {
+			g_ts->ScrollBuffSize = NumOfLines;
 		}
-		Ny = ts.ScrollBuffSize;
+		Ny = g_ts->ScrollBuffSize;
 	}
 	else {
 		Ny = NumOfLines;
@@ -5138,8 +5139,8 @@ void ChangeWin(void)
 
 	if (NumOfLinesInBuff!=Ny) {
 		ChangeBuffer(NumOfColumns,Ny);
-		if (ts.EnableScrollBuff>0) {
-			ts.ScrollBuffSize = NumOfLinesInBuff;
+		if (g_ts->EnableScrollBuff>0) {
+			g_ts->ScrollBuffSize = NumOfLinesInBuff;
 		}
 
 		if (BuffEnd < WinHeight) {
@@ -5237,7 +5238,7 @@ void CursorForwardTab(int count, BOOL AutoWrapMode) {
 	}
 	else {
 		MoveCursor(LineEnd, CursorY);
-		if (!ts.VTCompatTab) {
+		if (!g_ts->VTCompatTab) {
 			Wrap = AutoWrapMode;
 		}
 		else {
@@ -5275,7 +5276,7 @@ void ClearTabStop(int Ps)
 	if (NTabStops>0) {
 		switch (Ps) {
 		case 0:
-			if (ts.TabStopFlag & TABF_TBC0) {
+			if (g_ts->TabStopFlag & TABF_TBC0) {
 				i = 0;
 				while ((TabStops[i]!=CursorX) && (i<NTabStops-1)) {
 					i++;
@@ -5289,7 +5290,7 @@ void ClearTabStop(int Ps)
 			}
 			break;
 		case 3:
-			if (ts.TabStopFlag & TABF_TBC3)
+			if (g_ts->TabStopFlag & TABF_TBC3)
 				NTabStops = 0;
 			break;
 		}
@@ -5317,46 +5318,46 @@ void ShowStatusLine(int Show)
 		Ny = NumOfLines;
 	}
 	else {
-		Ny = ts.TerminalHeight+1;
+		Ny = g_ts->TerminalHeight+1;
 	}
 
-	if ((ts.ScrollBuffSize < Ny) ||
-	    (ts.EnableScrollBuff==0)) {
+	if ((g_ts->ScrollBuffSize < Ny) ||
+	    (g_ts->EnableScrollBuff==0)) {
 		Nb = Ny;
 	}
 	else {
-		Nb = ts.ScrollBuffSize;
+		Nb = g_ts->ScrollBuffSize;
 	}
 
 	if (! ChangeBuffer(NumOfColumns,Nb)) {
 		return;
 	}
-	if (ts.EnableScrollBuff>0) {
-		ts.ScrollBuffSize = NumOfLinesInBuff;
+	if (g_ts->EnableScrollBuff>0) {
+		g_ts->ScrollBuffSize = NumOfLinesInBuff;
 	}
 	if (Ny > NumOfLinesInBuff) {
 		Ny = NumOfLinesInBuff;
 	}
 
 	NumOfLines = Ny;
-	ts.TerminalHeight = Ny-StatusLine;
+	g_ts->TerminalHeight = Ny-StatusLine;
 
 	if (StatusLine==1) {
 		BuffScroll(1,NumOfLines-1);
 	}
 
-	if (ts.TermIsWin>0) {
+	if (g_ts->TermIsWin>0) {
 		W = NumOfColumns;
 		H = NumOfLines;
 	}
 	else {
 		W = WinWidth;
 		H = WinHeight;
-		if ((ts.AutoWinResize>0) ||
+		if ((g_ts->AutoWinResize>0) ||
 		    (NumOfColumns < W)) {
 			W = NumOfColumns;
 		}
-		if (ts.AutoWinResize>0) {
+		if (g_ts->AutoWinResize>0) {
 			H = NumOfLines;
 		}
 		else if (BuffEnd < H) {
@@ -5378,7 +5379,7 @@ void ShowStatusLine(int Show)
 void BuffLineContinued(BOOL mode)
 {
 	buff_char_t* CodeLineW = &CodeBuffW[LinePtr];
-	if (ts.EnableContinuedLineCopy) {
+	if (g_ts->EnableContinuedLineCopy) {
 		if (mode) {
 			CodeLineW[0].attr |= AttrLineContinued;
 		} else {
@@ -5480,11 +5481,11 @@ void BuffSelectedEraseCurToEnd(void)
 
 	NewLine(PageStart+CursorY);
 
-	if (ts.KanjiCode == IdSJIS ||
-		ts.KanjiCode == IdEUC ||
-		ts.KanjiCode == IdJIS ||
-		ts.KanjiCode == IdKoreanCP949 ||
-		ts.KanjiCode == IdUTF8) {
+	if (g_ts->KanjiCode == IdSJIS ||
+		g_ts->KanjiCode == IdEUC ||
+		g_ts->KanjiCode == IdJIS ||
+		g_ts->KanjiCode == IdKoreanCP949 ||
+		g_ts->KanjiCode == IdUTF8) {
 		if (!(CodeLineW[CursorX].attr2 & Attr2Protect)) {
 			EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
 		}
@@ -5518,11 +5519,11 @@ void BuffSelectedEraseHomeToCur(void)
 	int i, j, YHome;
 
 	NewLine(PageStart+CursorY);
-	if (ts.KanjiCode == IdSJIS ||
-		ts.KanjiCode == IdEUC ||
-		ts.KanjiCode == IdJIS ||
-		ts.KanjiCode == IdKoreanCP949 ||
-		ts.KanjiCode == IdUTF8) {
+	if (g_ts->KanjiCode == IdSJIS ||
+		g_ts->KanjiCode == IdEUC ||
+		g_ts->KanjiCode == IdJIS ||
+		g_ts->KanjiCode == IdKoreanCP949 ||
+		g_ts->KanjiCode == IdUTF8) {
 		if (!(CodeLineW[CursorX].attr2 & Attr2Protect)) {
 			EraseKanji(0); /* if cursor is on left half of a kanji, erase the kanji */
 		}
@@ -5609,15 +5610,15 @@ void BuffSelectedEraseCharsInLine(int XStart, int Count)
 	int i;
 	BOOL LineContinued=FALSE;
 
-	if (ts.EnableContinuedLineCopy && XStart == 0 && (CodeLineW[0].attr & AttrLineContinued)) {
+	if (g_ts->EnableContinuedLineCopy && XStart == 0 && (CodeLineW[0].attr & AttrLineContinued)) {
 		LineContinued = TRUE;
 	}
 
-	if (ts.KanjiCode == IdSJIS ||
-		ts.KanjiCode == IdEUC ||
-		ts.KanjiCode == IdJIS ||
-		ts.KanjiCode == IdKoreanCP949 ||
-		ts.KanjiCode == IdUTF8) {
+	if (g_ts->KanjiCode == IdSJIS ||
+		g_ts->KanjiCode == IdEUC ||
+		g_ts->KanjiCode == IdJIS ||
+		g_ts->KanjiCode == IdKoreanCP949 ||
+		g_ts->KanjiCode == IdUTF8) {
 		if (!(CodeLineW[CursorX].attr2 & Attr2Protect)) {
 			EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
 		}
@@ -5631,7 +5632,7 @@ void BuffSelectedEraseCharsInLine(int XStart, int Count)
 		}
 	}
 
-	if (ts.EnableContinuedLineCopy) {
+	if (g_ts->EnableContinuedLineCopy) {
 		if (LineContinued) {
 			BuffLineContinued(TRUE);
 		}
@@ -6152,4 +6153,48 @@ int BuffGetDispCodePage(void)
 BOOL BuffIsSelected(void)
 {
 	return Selected;
+}
+
+/**
+ *	Variables kept per session (see session.h)
+ */
+void BuffRegisterSessionVars(void)
+{
+	static const SessionVar v[] = {
+		SESSION_VAR(BoxSelect),
+		SESSION_VAR(BuffEndAbs),
+		SESSION_VAR(BuffLock),
+		SESSION_VAR(BuffStartAbs),
+		SESSION_VAR(BufferSize),
+		SESSION_VAR(ClickCell),
+		SESSION_VAR(CodeBuffW),
+		SESSION_VAR(CodePage),
+		SESSION_VAR(CurCharAttr),
+		SESSION_VAR(CursorBottom),
+		SESSION_VAR(CursorLeftM),
+		SESSION_VAR(CursorRightM),
+		SESSION_VAR(CursorTop),
+		SESSION_VAR(DblClkEnd),
+		SESSION_VAR(DblClkStart),
+		SESSION_VAR(NTabStops),
+		SESSION_VAR(NumOfLinesInBuff),
+		SESSION_VAR(SaveBuff),
+		SESSION_VAR(SaveBuffX),
+		SESSION_VAR(SaveBuffY),
+		SESSION_VAR(SelectEnd),
+		SESSION_VAR(SelectEndOld),
+		SESSION_VAR(SelectStart),
+		SESSION_VAR(SelectStartOld),
+		SESSION_VAR(SelectStartTime),
+		SESSION_VAR(Selected),
+		SESSION_VAR(Selecting),
+		SESSION_VAR(StatusLine),
+		SESSION_VAR(StrChangeCount),
+		SESSION_VAR(StrChangeStart),
+		SESSION_VAR(TabStops),
+		SESSION_VAR(UseUnicodeApi),
+		SESSION_VAR(Wrap),
+		SESSION_VAR(vt_src),
+	};
+	SessionRegisterVars(v, _countof(v));
 }

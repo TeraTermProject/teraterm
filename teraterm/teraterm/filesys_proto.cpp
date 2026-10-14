@@ -60,6 +60,7 @@
 #include "bplus.h"
 #include "quickvan.h"
 #include "raw.h"
+#include "session.h"
 
 typedef enum {
 	PROTO_KMT = 1,
@@ -180,7 +181,7 @@ static void FTSetTimeOut(PFileVarProto fv, int T)
 
 static void SetDialogCation(struct FileVarProto *fv, const char *key, const wchar_t *default_caption)
 {
-	const wchar_t *UILanguageFile = ts.UILanguageFileW;
+	const wchar_t *UILanguageFile = g_ts->UILanguageFileW;
 	wchar_t *uimsg;
 	wchar_t *caption;
 	GetI18nStrWW("Tera Term", key, default_caption, UILanguageFile, &uimsg);
@@ -244,14 +245,14 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 
 	// 受信フォルダ
 	{
-		wchar_t *dir = GetFileDir(&ts);
+		wchar_t *dir = GetFileDir(g_ts);
 		size_t len = wcslen(dir) + 2;
 		dir = (wchar_t *)realloc(dir, sizeof(wchar_t) * len);
 		AppendSlashW(dir, len);
 		fv->RecievePath = dir;
 	}
 
-	fv->OverWrite = ((ts.FTFlag & FT_RENAME) == 0);
+	fv->OverWrite = ((g_ts->FTFlag & FT_RENAME) == 0);
 	fv->HMainWin = HVTWin;
 	fv->Success = FALSE;
 	fv->NoMsg = FALSE;
@@ -266,7 +267,7 @@ static BOOL NewFileVar_(PFileVarProto *pfv)
 	fv->InfoOp = &InfoOp;
 
 	fv->Comm = (TComm *)malloc(sizeof(TComm));
-	fv->Comm->private_data = (void *)&cv;
+	fv->Comm->private_data = (void *)g_cv;
 	CommOp const **comm_op_ptr = (CommOp const **)&fv->Comm->op;
 	*comm_op_ptr = &CommOpList;
 
@@ -373,13 +374,13 @@ static BOOL OpenProtoDlg(PFileVarProto fv, ProtoId_t IdProto, int Mode, WORD Opt
 		return FALSE;
 	}
 	CProtoDlgInfo info;
-	info.UILanguageFileW = ts.UILanguageFileW;
+	info.UILanguageFileW = g_ts->UILanguageFileW;
 	info.HMainWin = fv->HMainWin;
 	pd->Create(hInst, HVTWin, &info);
 	fv->HWin = pd->m_hWnd;
 	PtDlg = pd;
 
-	BOOL r = fv->Proto->Op->Init(fv->Proto, &cv, &ts);
+	BOOL r = fv->Proto->Op->Init(fv->Proto, g_cv, g_ts);
 	if (r == FALSE) {
 		//fv->Destroy(fv);
 		return FALSE;
@@ -401,7 +402,7 @@ static void CloseProtoDlg(void)
 			//if ((ProtoId==PROTO_QV) &&
 			//    (((PQVVar)ProtoVar)->QVMode==IdQVSend))
 			if (FileVar->OpId == OpQVSend)
-				CommBinaryOut(&cv,"\015",1);
+				CommBinaryOut(g_cv,"\015",1);
 		}
 	}
 }
@@ -433,7 +434,7 @@ void ProtoEnd(void)
 	cv_ProtoFlag = FALSE;
 
 	/* Enable transmit delay (serial port) */
-	cv.DelayFlag = TRUE;
+	g_cv->DelayFlag = TRUE;
 	TalkStatus = IdTalkKeyb;
 
 	CloseProtoDlg();
@@ -483,7 +484,7 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	WORD Hi, Lo;
 	LPLONG pl;
 	LPOFNOTIFY notify;
-	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
+	const wchar_t *UILanguageFileW = g_ts->UILanguageFileW;
 	static HFONT DlgXoptFont;
 
 	switch (Message) {
@@ -600,7 +601,7 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 
 /**
  *	ダイアログのデフォルトファイル名を返す
- *		フィルタ(ts.FileSendFilter)がワイルドカードではなく、
+ *		フィルタ(g_ts->FileSendFilter)がワイルドカードではなく、
  *		そのファイルが存在する場合
  *		デフォルトのファイル名として返す
  *
@@ -611,7 +612,7 @@ static UINT_PTR CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
  */
 static wchar_t *GetCommonDialogDefaultFilenameW(const wchar_t *path)
 {
-	const char *FileSendFilterA = ts.FileSendFilter;
+	const char *FileSendFilterA = g_ts->FileSendFilter;
 	if (strlen(FileSendFilterA) == 0) {
 		return NULL;
 	}
@@ -722,9 +723,9 @@ static wchar_t **MakeFileArrayMultiSelect(const wchar_t *lpstrFile)
 
 static wchar_t **_GetXFname(HWND HWin, BOOL Receive, const wchar_t *caption, LPLONG Option)
 {
-	wchar_t *FileDir = GetFileDir(&ts);
-	wchar_t *filterW = ToWcharA(ts.FileSendFilter);
-	wchar_t *FNFilter = GetCommonDialogFilterWW(!Receive ? filterW : NULL, ts.UILanguageFileW);
+	wchar_t *FileDir = GetFileDir(g_ts);
+	wchar_t *filterW = ToWcharA(g_ts->FileSendFilter);
+	wchar_t *FNFilter = GetCommonDialogFilterWW(!Receive ? filterW : NULL, g_ts->UILanguageFileW);
 	free(filterW);
 
 	wchar_t FullName[MAX_PATH];
@@ -805,7 +806,7 @@ int ProtoDlgParse(void)
 	if (PtDlg==NULL)
 		return P;
 
-	CommReceive(&cv); //ダイアログ表示中に受信したデータを処理できるように読み取りを行わせる
+	CommReceive(g_cv); //ダイアログ表示中に受信したデータを処理できるように読み取りを行わせる
 
 	PFileVarProto fv = FileVar;
 	if (fv->Proto->Op->Parse(fv->Proto))
@@ -813,7 +814,7 @@ int ProtoDlgParse(void)
 		P = 0;
 	else {
 		// 処理終了
-		CommSend(&cv);
+		CommSend(g_cv);
 		ProtoEnd();
 	}
 	return P;
@@ -856,7 +857,7 @@ static INT_PTR CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	};
 	PFileVarProto fv;
 	wchar_t TempFull[MAX_PATH];
-	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
+	const wchar_t *UILanguageFileW = g_ts->UILanguageFileW;
 
 	switch (Message) {
 	case WM_INITDIALOG:
@@ -915,7 +916,7 @@ static UINT_PTR CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, L
 
 	switch (Message) {
 	case WM_INITDIALOG: {
-		const wchar_t *UILanguageFileW = ts.UILanguageFileW;
+		const wchar_t *UILanguageFileW = g_ts->UILanguageFileW;
 		LPOPENFILENAMEW ofn = (LPOPENFILENAMEW)lParam;
 		pw = (LPWORD)ofn->lCustData;
 		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pw);
@@ -984,8 +985,8 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 {
 #define FnStrMemSize 4096
 	wchar_t TempDir[MAX_PATH];
-	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
-	wchar_t *FileDir = GetFileDir(&ts);
+	const wchar_t *UILanguageFileW = g_ts->UILanguageFileW;
+	wchar_t *FileDir = GetFileDir(g_ts);
 
 	/* save current dir */
 	GetCurrentDirectoryW(_countof(TempDir), TempDir);
@@ -997,7 +998,7 @@ static wchar_t **_GetMultiFname(HWND hWnd, WORD FuncId, const wchar_t *caption, 
 	}
 	FnStrMem[0] = 0;
 
-	wchar_t *filterW = ToWcharA(ts.FileSendFilter);
+	wchar_t *filterW = ToWcharA(g_ts->FileSendFilter);
 	wchar_t *FNFilter = GetCommonDialogFilterWW(filterW, UILanguageFileW);
 	free(filterW);
 
@@ -1057,7 +1058,7 @@ static void KermitStart(int mode)
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
+	g_cv->DelayFlag = FALSE;
 
 	if (! OpenProtoDlg(FileVar,PROTO_KMT,mode,0,0))
 		ProtoEnd();
@@ -1091,7 +1092,7 @@ BOOL KermitStartSend(const wchar_t *filename)
 	}
 	else {
 		if (IsRelativePathW(filename)) {
-			wchar_t *fullpath = GetFileDir(&ts);
+			wchar_t *fullpath = GetFileDir(g_ts);
 			awcscats(&fullpath, L"\\", filename, NULL);
 			fv->FileNames = MakeStrArrayFromStr(fullpath);
 			free(fullpath);
@@ -1122,14 +1123,14 @@ BOOL KermitGet(const wchar_t *filename)
 	SetDialogCation(fv, "FILEDLG_TRANS_TITLE_KMTGET", TitKmtGet);
 
 	if (filename == NULL) {
-		if (! _GetGetFname(FileVar->HMainWin,FileVar, &ts) || FileVar->FileNames == NULL) {
+		if (! _GetGetFname(FileVar->HMainWin,FileVar, g_ts) || FileVar->FileNames == NULL) {
 			FreeFileVar_(&FileVar);
 			return FALSE;
 		}
 	}
 	else {
 		if (IsRelativePathW(filename)) {
-			wchar_t *fullpath = GetFileDir(&ts);
+			wchar_t *fullpath = GetFileDir(g_ts);
 			awcscats(&fullpath, L"\\", filename, NULL);
 			FileVar->FileNames = MakeStrArrayFromStr(fullpath);
 			free(fullpath);
@@ -1212,7 +1213,7 @@ BOOL XMODEMStartReceive(const wchar_t *filename, WORD ParamBinaryFlag, WORD Para
 	SetDialogCation(fv, "FILEDLG_TRANS_TITLE_XRCV", TitXRcv);
 
 	if (filename == NULL) {
-		LONG Option = MAKELONG(ts.XmodemBin,ts.XmodemOpt);
+		LONG Option = MAKELONG(g_ts->XmodemBin,g_ts->XmodemOpt);
 		wchar_t **filenames = _GetXFname(HVTWin, TRUE, fv->DlgCaption, &Option);
 		if (filenames == NULL) {
 			FreeFileVar_(&FileVar);
@@ -1221,26 +1222,26 @@ BOOL XMODEMStartReceive(const wchar_t *filename, WORD ParamBinaryFlag, WORD Para
 		fv->FileNames = filenames;
 		int tmp = HIWORD(Option);
 		if (IsXoptCRC(tmp)) {
-			if (IsXopt1k(ts.XmodemOpt)) {
-				ts.XmodemOpt = Xopt1kCRC;
+			if (IsXopt1k(g_ts->XmodemOpt)) {
+				g_ts->XmodemOpt = Xopt1kCRC;
 			}
 			else {
-				ts.XmodemOpt = XoptCRC;
+				g_ts->XmodemOpt = XoptCRC;
 			}
 		}
 		else {
-			if (IsXopt1k(ts.XmodemOpt)) {
-				ts.XmodemOpt = Xopt1kCksum;
+			if (IsXopt1k(g_ts->XmodemOpt)) {
+				g_ts->XmodemOpt = Xopt1kCksum;
 			}
 			else {
-				ts.XmodemOpt = XoptCheck;
+				g_ts->XmodemOpt = XoptCheck;
 			}
 		}
-		ts.XmodemBin = LOWORD(Option);
+		g_ts->XmodemBin = LOWORD(Option);
 	}
 	else {
 		if (IsRelativePathW(filename)) {
-			wchar_t *fullpath = GetFileDir(&ts);
+			wchar_t *fullpath = GetFileDir(g_ts);
 			awcscats(&fullpath, L"\\", filename, NULL);
 			FileVar->FileNames = MakeStrArrayFromStr(fullpath);
 			free(fullpath);
@@ -1248,24 +1249,24 @@ BOOL XMODEMStartReceive(const wchar_t *filename, WORD ParamBinaryFlag, WORD Para
 		else {
 			FileVar->FileNames = MakeStrArrayFromStr(filename);
 		}
-		if (IsXopt1k(ts.XmodemOpt)) {
+		if (IsXopt1k(g_ts->XmodemOpt)) {
 			if (IsXoptCRC(ParamXmodemOpt)) {
 				// CRC
-				ts.XmodemOpt = Xopt1kCRC;
+				g_ts->XmodemOpt = Xopt1kCRC;
 			}
 			else {	// Checksum
-				ts.XmodemOpt = Xopt1kCksum;
+				g_ts->XmodemOpt = Xopt1kCksum;
 			}
 		}
 		else {
 			if (IsXoptCRC(ParamXmodemOpt)) {
-				ts.XmodemOpt = XoptCRC;
+				g_ts->XmodemOpt = XoptCRC;
 			}
 			else {
-				ts.XmodemOpt = XoptCheck;
+				g_ts->XmodemOpt = XoptCheck;
 			}
 		}
-		ts.XmodemBin = ParamBinaryFlag;
+		g_ts->XmodemBin = ParamBinaryFlag;
 		FileVar->NoMsg = TRUE;
 	}
 
@@ -1276,10 +1277,10 @@ BOOL XMODEMStartReceive(const wchar_t *filename, WORD ParamBinaryFlag, WORD Para
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
+	g_cv->DelayFlag = FALSE;
 
 	int mode = IdXReceive;
-	if (! OpenProtoDlg(FileVar,PROTO_XM,mode, ts.XmodemOpt,ts.XmodemBin)) {
+	if (! OpenProtoDlg(FileVar,PROTO_XM,mode, g_ts->XmodemOpt,g_ts->XmodemBin)) {
 		ProtoEnd();
 		return FALSE;
 	}
@@ -1306,7 +1307,7 @@ BOOL XMODEMStartSend(const wchar_t *filename, WORD ParamXmodemOpt)
 	SetDialogCation(fv, "FILEDLG_TRANS_TITLE_XSEND", TitXSend);
 
 	if (filename == NULL) {
-		LONG Option = MAKELONG(ts.XmodemBin,ts.XmodemOpt);
+		LONG Option = MAKELONG(g_ts->XmodemBin,g_ts->XmodemOpt);
 		wchar_t **filenames = _GetXFname(HVTWin, FALSE, fv->DlgCaption, &Option);
 		if (filenames == NULL) {
 			FreeFileVar_(&FileVar);
@@ -1315,25 +1316,25 @@ BOOL XMODEMStartSend(const wchar_t *filename, WORD ParamXmodemOpt)
 		fv->FileNames = filenames;
 		int tmp = HIWORD(Option);
 		if (IsXopt1k(tmp)) {
-			if (IsXoptCRC(ts.XmodemOpt)) {
-				ts.XmodemOpt = Xopt1kCRC;
+			if (IsXoptCRC(g_ts->XmodemOpt)) {
+				g_ts->XmodemOpt = Xopt1kCRC;
 			}
 			else {
-				ts.XmodemOpt = Xopt1kCksum;
+				g_ts->XmodemOpt = Xopt1kCksum;
 			}
 		}
 		else {
-			if (IsXoptCRC(ts.XmodemOpt)) {
-				ts.XmodemOpt = XoptCRC;
+			if (IsXoptCRC(g_ts->XmodemOpt)) {
+				g_ts->XmodemOpt = XoptCRC;
 			}
 			else {
-				ts.XmodemOpt = XoptCheck;
+				g_ts->XmodemOpt = XoptCheck;
 			}
 		}
 	}
 	else {
 		if (IsRelativePathW(filename)) {
-			wchar_t *fullpath = GetFileDir(&ts);
+			wchar_t *fullpath = GetFileDir(g_ts);
 			awcscats(&fullpath, L"\\", filename, NULL);
 			fv->FileNames = MakeStrArrayFromStr(fullpath);
 			free(fullpath);
@@ -1341,20 +1342,20 @@ BOOL XMODEMStartSend(const wchar_t *filename, WORD ParamXmodemOpt)
 		else {
 			fv->FileNames = MakeStrArrayFromStr(filename);
 		}
-		if (IsXoptCRC(ts.XmodemOpt)) {
+		if (IsXoptCRC(g_ts->XmodemOpt)) {
 			if (IsXopt1k(ParamXmodemOpt)) {
-				ts.XmodemOpt = Xopt1kCRC;
+				g_ts->XmodemOpt = Xopt1kCRC;
 			}
 			else {
-				ts.XmodemOpt = XoptCRC;
+				g_ts->XmodemOpt = XoptCRC;
 			}
 		}
 		else {
 			if (IsXopt1k(ParamXmodemOpt)) {
-				ts.XmodemOpt = Xopt1kCksum;
+				g_ts->XmodemOpt = Xopt1kCksum;
 			}
 			else {
-				ts.XmodemOpt = XoptCheck;
+				g_ts->XmodemOpt = XoptCheck;
 			}
 		}
 		FileVar->NoMsg = TRUE;
@@ -1367,10 +1368,10 @@ BOOL XMODEMStartSend(const wchar_t *filename, WORD ParamXmodemOpt)
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
+	g_cv->DelayFlag = FALSE;
 
 	int mode = IdXSend;
-	if (! OpenProtoDlg(FileVar,PROTO_XM,mode, ts.XmodemOpt,ts.XmodemBin)) {
+	if (! OpenProtoDlg(FileVar,PROTO_XM,mode, g_ts->XmodemOpt,g_ts->XmodemBin)) {
 		ProtoEnd();
 		return FALSE;
 	}
@@ -1412,7 +1413,7 @@ BOOL YMODEMStartReceive(BOOL macro)
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
+	g_cv->DelayFlag = FALSE;
 
 	if (! OpenProtoDlg(FileVar,PROTO_YM,IdYReceive,Opt,0)) {
 		ProtoEnd();
@@ -1453,12 +1454,12 @@ BOOL YMODEMStartSend(const wchar_t *filename)
 			ProtoEnd();
 			return FALSE;
 		}
-		//ts.XmodemBin = Opt;
+		//g_ts->XmodemBin = Opt;
 		fv->FileNames = filenames;
 	}
 	else {
 		if (IsRelativePathW(filename)) {
-			wchar_t *fullpath = GetFileDir(&ts);
+			wchar_t *fullpath = GetFileDir(g_ts);
 			awcscats(&fullpath, L"\\", filename, NULL);
 			fv->FileNames = MakeStrArrayFromStr(fullpath);
 			free(fullpath);
@@ -1472,7 +1473,7 @@ BOOL YMODEMStartSend(const wchar_t *filename)
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
+	g_cv->DelayFlag = FALSE;
 
 	if (! OpenProtoDlg(FileVar,PROTO_YM, IdYSend,Opt,0)) {
 		ProtoEnd();
@@ -1515,7 +1516,7 @@ BOOL ZMODEMStartReceive(BOOL macro, BOOL autostart)
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
+	g_cv->DelayFlag = FALSE;
 
 	WORD Opt = 0;
 	if (! OpenProtoDlg(FileVar,PROTO_ZM,mode,Opt,0)) {
@@ -1551,23 +1552,23 @@ BOOL ZMODEMStartSend(const wchar_t *filename, WORD ParamBinaryFlag, BOOL autosta
 
 	SetDialogCation(fv, "FILEDLG_TRANS_TITLE_ZSEND", TitZSend);
 
-	WORD Opt = ts.XmodemBin;
+	WORD Opt = g_ts->XmodemBin;
 	FileVar->OpId = OpZSend;
 	if (filename == NULL) {
 		wchar_t **filenames = _GetMultiFname(fv->HMainWin, GMF_Z, fv->DlgCaption, &Opt);
 		if (filenames == NULL) {
 			if (mode == IdZAutoS) {
-				CommRawOut(&cv, "\030\030\030\030\030\030\030\030\b\b\b\b\b\b\b\b\b\b", 18);
+				CommRawOut(g_cv, "\030\030\030\030\030\030\030\030\b\b\b\b\b\b\b\b\b\b", 18);
 			}
 			ProtoEnd();
 			return FALSE;
 		}
 		fv->FileNames = filenames;
-		ts.XmodemBin = Opt;
+		g_ts->XmodemBin = Opt;
 	}
 	else {
 		if (IsRelativePathW(filename)) {
-			wchar_t *fullpath = GetFileDir(&ts);
+			wchar_t *fullpath = GetFileDir(g_ts);
 			awcscats(&fullpath, L"\\", filename, NULL);
 			fv->FileNames = MakeStrArrayFromStr(fullpath);
 			free(fullpath);
@@ -1575,14 +1576,14 @@ BOOL ZMODEMStartSend(const wchar_t *filename, WORD ParamBinaryFlag, BOOL autosta
 		else {
 			fv->FileNames = MakeStrArrayFromStr(filename);
 		}
-		ts.XmodemBin = ParamBinaryFlag;
+		g_ts->XmodemBin = ParamBinaryFlag;
 		FileVar->NoMsg = TRUE;
 	}
 
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
+	g_cv->DelayFlag = FALSE;
 
 	if (! OpenProtoDlg(FileVar,PROTO_ZM,mode,Opt,0)) {
 		ProtoEnd();
@@ -1596,13 +1597,13 @@ static wchar_t **_GetTransFname(HWND hWnd, const wchar_t *DlgCaption)
 {
 	wchar_t TempDir[MAX_PATH];
 	wchar_t FileName[MAX_PATH];
-	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
-	wchar_t *FileDir = GetFileDir(&ts);
+	const wchar_t *UILanguageFileW = g_ts->UILanguageFileW;
+	wchar_t *FileDir = GetFileDir(g_ts);
 
 	/* save current dir */
 	GetCurrentDirectoryW(_countof(TempDir), TempDir);
 
-	wchar_t *filterW = ToWcharA(ts.FileSendFilter);
+	wchar_t *filterW = ToWcharA(g_ts->FileSendFilter);
 	wchar_t *FNFilter = GetCommonDialogFilterWW(filterW, UILanguageFileW);
 	free(filterW);
 
@@ -1659,7 +1660,7 @@ BOOL BPStartSend(const wchar_t *filename)
 	}
 	else {
 		if (IsRelativePathW(filename)) {
-			wchar_t *fullpath = GetFileDir(&ts);
+			wchar_t *fullpath = GetFileDir(g_ts);
 			awcscats(&fullpath, L"\\", filename, NULL);
 			fv->FileNames = MakeStrArrayFromStr(fullpath);
 			free(fullpath);
@@ -1673,7 +1674,7 @@ BOOL BPStartSend(const wchar_t *filename)
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
+	g_cv->DelayFlag = FALSE;
 
 	if (! OpenProtoDlg(FileVar,PROTO_BP, IdBPSend,0,0)) {
 		ProtoEnd();
@@ -1708,7 +1709,7 @@ BOOL BPStartReceive(BOOL macro, BOOL autostart)
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
+	g_cv->DelayFlag = FALSE;
 
 	if (! OpenProtoDlg(FileVar,PROTO_BP,mode,0,0)) {
 		ProtoEnd();
@@ -1744,7 +1745,7 @@ BOOL QVStartReceive(BOOL macro)
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
+	g_cv->DelayFlag = FALSE;
 
 	if (! OpenProtoDlg(FileVar,PROTO_QV,mode,0,0)) {
 		ProtoEnd();
@@ -1783,7 +1784,7 @@ BOOL QVStartSend(const wchar_t *filename)
 	}
 	else {
 		if (IsRelativePathW(filename)) {
-			wchar_t *fullpath = GetFileDir(&ts);
+			wchar_t *fullpath = GetFileDir(g_ts);
 			awcscats(&fullpath, L"\\", filename, NULL);
 			fv->FileNames = MakeStrArrayFromStr(fullpath);
 			free(fullpath);
@@ -1797,7 +1798,7 @@ BOOL QVStartSend(const wchar_t *filename)
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
+	g_cv->DelayFlag = FALSE;
 
 	if (! OpenProtoDlg(FileVar,PROTO_QV,IdQVSend,0,0)) {
 		ProtoEnd();
@@ -1827,7 +1828,7 @@ BOOL RawStartReceive(const wchar_t *filename, int autostop_sec, BOOL macro)
 
 	assert(filename);
 	if (IsRelativePathW(filename)) {
-		wchar_t *fullpath = GetFileDir(&ts);
+		wchar_t *fullpath = GetFileDir(g_ts);
 		awcscats(&fullpath, L"\\", filename, NULL);
 		fv->FileNames = MakeStrArrayFromStr(fullpath);
 		free(fullpath);
@@ -1841,7 +1842,7 @@ BOOL RawStartReceive(const wchar_t *filename, int autostop_sec, BOOL macro)
 	TalkStatus = IdTalkQuiet;
 
 	/* disable transmit delay (serial port) */
-	cv.DelayFlag = FALSE;
+	g_cv->DelayFlag = FALSE;
 
 	if (! OpenProtoDlg(FileVar,PROTO_RAW,0,autostop_sec,0)) {
 		ProtoEnd();
@@ -1879,4 +1880,17 @@ BOOL IsFileVarNULL()
 BOOL ProtoGetProtoFlag(void)
 {
 	return cv_ProtoFlag;
+}
+
+/**
+ *	Variables kept per session (see session.h)
+ */
+extern "C" void FileSysProtoRegisterSessionVars(void)
+{
+	static const SessionVar v[] = {
+		SESSION_VAR(cv_ProtoFlag),
+		SESSION_VAR(PtDlg),
+		SESSION_VAR(FileVar),
+	};
+	SessionRegisterVars(v, _countof(v));
 }

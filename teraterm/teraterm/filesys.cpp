@@ -43,6 +43,7 @@
 #include "codeconv.h"
 
 #include "filesys.h"
+#include "session.h"
 
 #define TitSend L"Sending file"
 
@@ -99,17 +100,17 @@ static BOOL OpenFTDlg(PFileVar fv)
 	}
 
 	wchar_t *DlgCaption;
-	wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", TitSend, ts.UILanguageFileW);
+	wchar_t *uimsg = TTGetLangStrW("Tera Term", "FILEDLG_TRANS_TITLE_SENDFILE", TitSend, g_ts->UILanguageFileW);
 	aswprintf(&DlgCaption, L"Tera Term: %s", uimsg);
 	free(uimsg);
 
 	CFileTransDlg::Info info;
-	info.UILanguageFileW = ts.UILanguageFileW;
+	info.UILanguageFileW = g_ts->UILanguageFileW;
 	info.OpId = CFileTransDlg::OpSendFile;
 	info.DlgCaption = DlgCaption;
 	info.FileName = NULL;
 	info.FullName = fv->FullName;
-	info.HideDialog = ts.FTHideDialog ? TRUE : FALSE;
+	info.HideDialog = g_ts->FTHideDialog ? TRUE : FALSE;
 	info.HMainWin = HVTWin;
 
 	FTDlg->Create(hInst, &info);
@@ -182,7 +183,7 @@ BOOL FileSendStart(const wchar_t *filename, int binary)
 	if (SendVar != NULL) {
 		return FALSE;
 	}
-	if (! cv.Ready || FSend) {
+	if (! g_cv->Ready || FSend) {
 		return FALSE;
 	}
 	if (filename == NULL) {
@@ -201,7 +202,7 @@ BOOL FileSendStart(const wchar_t *filename, int binary)
 	PFileVar fv = SendVar;
 
 	SendVar->FullName = _wcsdup(filename);
-	ts.TransBin = binary;
+	g_ts->TransBin = binary;
 
 	SendVar->FileHandle = CreateFileW(SendVar->FullName, GENERIC_READ, FILE_SHARE_READ, NULL,
 									   OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
@@ -228,7 +229,7 @@ BOOL FileSendStart(const wchar_t *filename, int binary)
 	}
 	else {
 		fv->FileBracketMode = FS_BRACKET_NONE;
-		fv->BinaryMode = ts.TransBin;
+		fv->BinaryMode = g_ts->TransBin;
 	}
 
 	if (! OpenFTDlg(SendVar)) {
@@ -271,12 +272,12 @@ static int FSOut1(PFileVar fv)
 {
 	if (fv->BinaryMode) {
 		BYTE b = (BYTE)fv->SendChar;
-		return CommBinaryOut(&cv, (PCHAR)&b, 1);
+		return CommBinaryOut(g_cv, (PCHAR)&b, 1);
 	}
 	else {
 		wchar_t wc = fv->SendChar;
 		if ((wc >= 0x20) || (wc == 0x09) || (wc == 0x0A) || (wc == 0x0D)) {
-			return CommTextOutW(&cv, &wc, 1);
+			return CommTextOutW(g_cv, &wc, 1);
 		}
 		else {
 			return 1;
@@ -288,17 +289,17 @@ static int FSEcho1(PFileVar fv)
 {
 	if (fv->BinaryMode) {
 		BYTE b = (BYTE)fv->SendChar;
-		return CommBinaryEcho(&cv,(PCHAR)&b,1);
+		return CommBinaryEcho(g_cv,(PCHAR)&b,1);
 	} else {
-		return CommTextEchoW(&cv, &fv->SendChar, 1);
+		return CommTextEchoW(g_cv, &fv->SendChar, 1);
 	}
 }
 
 // 以下の時はこちらの関数を使う
 // - BinaryMode == true
 // - FileBracketMode == FS_BRACKET_NONE
-// - cv.TelFlag == false
-// - ts.LocalEcho == 0
+// - g_cv->TelFlag == false
+// - g_ts->LocalEcho == 0
 static void FileSendBinayBoost(void)
 {
 	WORD c, fc;
@@ -313,7 +314,7 @@ static void FileSendBinayBoost(void)
 
 	if (fv->FileRetrySend)
 	{
-		c = CommRawOut(&cv, &(fv->FileSendHandler.buf[fv->FileSendHandler.pos]),
+		c = CommRawOut(g_cv, &(fv->FileSendHandler.buf[fv->FileSendHandler.pos]),
 			fv->FileSendHandler.end - fv->FileSendHandler.pos);
 		fv->FileSendHandler.pos += c;
 		fv->FileRetrySend = (fv->FileSendHandler.end != fv->FileSendHandler.pos);
@@ -333,7 +334,7 @@ static void FileSendBinayBoost(void)
 
 		if (fc != 0)
 		{
-			c = CommRawOut(&cv, &(fv->FileSendHandler.buf[fv->FileSendHandler.pos]),
+			c = CommRawOut(g_cv, &(fv->FileSendHandler.buf[fv->FileSendHandler.pos]),
 				fv->FileSendHandler.end - fv->FileSendHandler.pos);
 			fv->FileSendHandler.pos += c;
 			fv->FileRetrySend = (fv->FileSendHandler.end != fv->FileSendHandler.pos);
@@ -362,9 +363,9 @@ void FileSend(void)
 	LONG BCOld;
 	PFileVar fv = SendVar;
 
-	if (cv.PortType == IdSerial && ts.FileSendHighSpeedMode &&
-		fv->BinaryMode && fv->FileBracketMode == FS_BRACKET_NONE && !cv.TelFlag &&
-	    (ts.LocalEcho == 0) && (ts.Baud >= 115200)) {
+	if (g_cv->PortType == IdSerial && g_ts->FileSendHighSpeedMode &&
+		fv->BinaryMode && fv->FileBracketMode == FS_BRACKET_NONE && !g_cv->TelFlag &&
+	    (g_ts->LocalEcho == 0) && (g_ts->Baud >= 115200)) {
 		return FileSendBinayBoost();
 	}
 
@@ -375,7 +376,7 @@ void FileSend(void)
 
 	if (fv->FileRetrySend)
 	{
-		fv->FileRetryEcho = (ts.LocalEcho>0);
+		fv->FileRetryEcho = (g_ts->LocalEcho>0);
 		c = FSOut1(fv);
 		fv->FileRetrySend = (c==0);
 		if (fv->FileRetrySend)
@@ -398,7 +399,7 @@ void FileSend(void)
 			if (fv->FileBracketPtr >= sizeof(BracketStartStr) - 1) {
 				fv->FileBracketMode = FS_BRACKET_END;
 				fv->FileBracketPtr = 0;
-				fv->BinaryMode = ts.TransBin;
+				fv->BinaryMode = g_ts->TransBin;
 			}
 		}
 		else if (!fv->FileReadEOF) {
@@ -451,7 +452,7 @@ void FileSend(void)
 		if (fc!=0)
 		{
 			c = FSOut1(fv);
-			fv->FileCRSend = (ts.TransBin == 0) && (fv->SendChar == 0x0D);
+			fv->FileCRSend = (g_ts->TransBin == 0) && (fv->SendChar == 0x0D);
 			fv->FileRetrySend = (c == 0);
 			if (fv->FileRetrySend)
 			{
@@ -460,7 +461,7 @@ void FileSend(void)
 				}
 				return;
 			}
-			if (ts.LocalEcho>0)
+			if (g_ts->LocalEcho>0)
 			{
 				c = FSEcho1(fv);
 				fv->FileRetryEcho = (c==0);
@@ -490,4 +491,16 @@ BOOL IsSendVarNULL()
 BOOL FileSnedIsSending(void)
 {
 	return FSend;
+}
+
+/**
+ *	Variables kept per session (see session.h)
+ */
+extern "C" void FileSysRegisterSessionVars(void)
+{
+	static const SessionVar v[] = {
+		SESSION_VAR(FSend),
+		SESSION_VAR(SendVar),
+	};
+	SessionRegisterVars(v, _countof(v));
 }

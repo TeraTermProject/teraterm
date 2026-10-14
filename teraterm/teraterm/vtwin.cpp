@@ -134,6 +134,7 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
 #endif
 
 #include "win32helper.h"
+#include "session.h"
 
 #define VTClassName L"VTWin32"
 
@@ -316,7 +317,7 @@ public:
 			// デバイスまたはメディアの一部が挿入されて使用可能になった
 #if DEBUG_WM_DEVICECHANGE
 			OutputDebugPrintf(" PortType=%d AutoDisconnectedPort=%d state_=%d\n",
-							  ts.PortType, AutoDisconnectedPort, state_);
+							  g_ts->PortType, AutoDisconnectedPort, state_);
 #endif
 			// - 正しくは次の順で2メッセージが送られてくるようだ
 			// 		DBT_DEVTYP_DEVICEINTERFACE
@@ -326,16 +327,16 @@ public:
 			//   - DBT_DEVTYP_DEVICEINTERFACE は WINVER >= 0x040A(Windows2000?) のときだけ発生するらしい
 			if ((pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT ||
 				 pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) &&
-				ts.PortType == IdSerial &&
-				ts.AutoComPortReconnect &&
-				AutoDisconnectedPort == ts.ComPort &&
-				(!cv.Open)) {
+				g_ts->PortType == IdSerial &&
+				g_ts->AutoComPortReconnect &&
+				AutoDisconnectedPort == g_ts->ComPort &&
+				(!g_cv->Open)) {
 				switch(state_) {
 				case NONE:
 					break;
 				case WAIT_DEVTYP_DEVICEINTERFACE: {
 					Connecting = TRUE;	// ポートが分からない、とりあえず接続中にする
-					UINT delay = ts.AutoComPortReconnectDelayIllegal;
+					UINT delay = g_ts->AutoComPortReconnectDelayIllegal;
 					SetTimer(delay);
 					if (pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
 						state_ = WAIT_DEVTYP_PORT;
@@ -353,7 +354,7 @@ public:
 					if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
 						if (comport == AutoDisconnectedPort) {
 							// 接続する
-							UINT delay = ts.AutoComPortReconnectDelayNormal;
+							UINT delay = g_ts->AutoComPortReconnectDelayNormal;
 							Connecting = TRUE;	// 接続中
 							SetTimer(delay);
 							state_ = WAIT_TIMER;
@@ -378,19 +379,19 @@ public:
 		case DBT_DEVICEREMOVECOMPLETE:
 			// デバイスまたはメディアが削除された
 #if DEBUG_WM_DEVICECHANGE
-			OutputDebugPrintf(" PortType=%d AutoDisconnectedPort=%d\n", ts.PortType, AutoDisconnectedPort);
+			OutputDebugPrintf(" PortType=%d AutoDisconnectedPort=%d\n", g_ts->PortType, AutoDisconnectedPort);
 #endif
 			if ((pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT ||
 				 pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) &&
-				ts.PortType == IdSerial &&
-				ts.AutoComPortReconnect) {
+				g_ts->PortType == IdSerial &&
+				g_ts->AutoComPortReconnect) {
 				if (state_ == NONE) {
 					// 切断された、再接続準備
-					if (cv.Open) {
+					if (g_cv->Open) {
 						BOOL disconnected = FALSE;
 						if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
-							if (comport == cv.ComPort) {
-								SetAutoConnectPort(ts.ComPort);
+							if (comport == g_cv->ComPort) {
+								SetAutoConnectPort(g_ts->ComPort);
 								vtwin_->Disconnect(TRUE);
 								disconnected = TRUE;
 							}
@@ -403,10 +404,10 @@ public:
 							// 次の順でメッセージが来るため事実上 DBT_DEVTYP_PORT のコードは使用されない
 							//  - DBT_DEVTYP_DEVICEINTERFACE
 							//  - DBT_DEVTYP_PORT
-							if (CheckComPort(cv.ComPort) == 0) {
+							if (CheckComPort(g_cv->ComPort) == 0) {
 								/* オープンしているポートが無効になった,クローズする */
 								vtwin_->Disconnect(TRUE);
-								SetAutoConnectPort(ts.ComPort);
+								SetAutoConnectPort(g_ts->ComPort);
 							}
 						}
 					}
@@ -417,7 +418,7 @@ public:
 					if (timer_id_ != 0) {
 						KillTimer(vtwin_->m_hWnd, timer_id_);
 					}
-					SetAutoConnectPort(ts.ComPort);
+					SetAutoConnectPort(g_ts->ComPort);
 					Connecting = FALSE;		// 通常状態(接続中ではない)
 					ChangeTitle();
 				}
@@ -437,7 +438,7 @@ public:
 		}
 		AutoDisconnectedPort = port;
 		state_ = WAIT_DEVTYP_DEVICEINTERFACE;
-		retry_left_ = ts.AutoComPortReconnectRetryCount;
+		retry_left_ = g_ts->AutoComPortReconnectRetryCount;
 		ChangeTitle();
 	}
 
@@ -479,21 +480,21 @@ private:
 		BOOL try_open = FALSE;
 		if (CheckComPort(AutoDisconnectedPort) != 0) {
 			// ポートが存在している、オープンを試みる
-			int NoMsg_prev = cv.NoMsg;
+			int NoMsg_prev = g_cv->NoMsg;
 			try_open = TRUE;
 			if (retry_left_ != 0) {
-				cv.NoMsg = 1;	// ポップアップを出さない
+				g_cv->NoMsg = 1;	// ポップアップを出さない
 			}
 			else {
 				state_ = NONE;
 			}
-			CommOpen(vtwin_->m_hWnd, &ts, &cv);
-			cv.NoMsg = NoMsg_prev;
+			CommOpen(vtwin_->m_hWnd, g_ts, g_cv);
+			g_cv->NoMsg = NoMsg_prev;
 #if DEBUG_WM_DEVICECHANGE
 			OutputDebugPrintf("%s() return from CommOpen()\n", __FUNCTION__);
 #endif
 		}
-		if (cv.Open == TRUE) {
+		if (g_cv->Open == TRUE) {
 			// シリアルオープン成功
 #if DEBUG_WM_DEVICECHANGE
 			OutputDebugPrintf("%s() Open success\n", __FUNCTION__);
@@ -514,7 +515,7 @@ private:
 		}
 		else {
 			// シリアルオープン失敗,リトライする
-			UINT delay = ts.AutoComPortReconnectRetryInterval;
+			UINT delay = g_ts->AutoComPortReconnectRetryInterval;
 #if DEBUG_WM_DEVICECHANGE
 			OutputDebugPrintf("%s() Open fail, retry left %d interval %dms\n", __FUNCTION__, retry_left_, delay);
 #endif
@@ -604,14 +605,14 @@ static void ParseFOption(const wchar_t *command_line, PTTSet ts)
  */
 static void InitSettings(void)
 {
-	CommInit(&cv);
-	cv.ts = &ts;
-	StartTeraTerm(&ts);
+	CommInit(g_cv);
+	g_cv->ts = g_ts;
+	StartTeraTerm(g_ts);
 
 	// プラグインの初期化
 	//   ReadIniFile() / ParseParam() のフックが設定される
 	//   iniファイルの読み込みはこの後に行う
-	TTXInit(&ts, &cv); /* TTPLUG */
+	TTXInit(g_ts, g_cv); /* TTPLUG */
 
 	// Parse command line parameters
 	// GetCommandLineW() in MSDN remark
@@ -620,40 +621,40 @@ static void InitSettings(void)
 	wchar_t *ParamW = _wcsdup(GetCommandLineW());
 
 	// コマンドラインから /F= オプションを先に処理する
-	ParseFOption(ParamW, &ts);
+	ParseFOption(ParamW, g_ts);
 
 	if (!LoadTTSET()) {
 		abort();
 	}
 	/* read setup info from "teraterm.ini" */
-	(*ReadIniFile)(ts.SetupFNameW, &ts);
+	(*ReadIniFile)(g_ts->SetupFNameW, g_ts);
 	FreeTTSET();
 
 	LoadTTSET();
-	(*ParseParam)(ParamW, &ts, &(TopicName[0]));
+	(*ParseParam)(ParamW, g_ts, &(TopicName[0]));
 	FreeTTSET();
 
 	free(ParamW);
 	ParamW = NULL;
 
-	// "/DUPLICATE" オプションがあると ts.DuplicateSession == 1となる
+	// "/DUPLICATE" オプションがあると g_ts->DuplicateSession == 1となる
 	// 共有メモリに複製元の設定がない場合もチェック
-	if (ts.DuplicateSession == 1 && IsShmemAvailable()) {
+	if (g_ts->DuplicateSession == 1 && IsShmemAvailable()) {
 		// 共有メモリの座標は複製元の現在のウィンドウ座標になる。
 		// 上で読み込んだ TERATERM.INI の値を使いたいので、待避して戻す。
-		POINT VTPos = ts.VTPos;
-		POINT TEKPos = ts.TEKPos;
-		wchar_t *macro = ts.MacroFNW;
-		ts.MacroFNW = NULL;
+		POINT VTPos = g_ts->VTPos;
+		POINT TEKPos = g_ts->TEKPos;
+		wchar_t *macro = g_ts->MacroFNW;
+		g_ts->MacroFNW = NULL;
 
 		// 複製元の設定を共有メモリから引き継ぐ
 		//   /F で指定したINIファイルを読み込んでいても上書きされる
-		CopyShmemToTTSet(&ts);
+		CopyShmemToTTSet(g_ts);
 
-		ts.VTPos = VTPos;
-		ts.TEKPos = TEKPos;
-		free(ts.MacroFNW);	// 複製元のマクロ指定は使用しない
-		ts.MacroFNW = macro;
+		g_ts->VTPos = VTPos;
+		g_ts->TEKPos = TEKPos;
+		free(g_ts->MacroFNW);	// 複製元のマクロ指定は使用しない
+		g_ts->MacroFNW = macro;
 		SetConnectHostName(L"");	// 複製元の接続先は使用しない
 	}
 
@@ -710,14 +711,14 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	}
 
 	/* Initialize scroll buffer */
-	InitBuffer((IdVtDrawAPI)ts.VTDrawAPI);
-	BuffSetDispCodePage(ts.VTDrawAnsiCodePage);
+	InitBuffer((IdVtDrawAPI)g_ts->VTDrawAPI);
+	BuffSetDispCodePage(g_ts->VTDrawAnsiCodePage);
 
-	if (ts.HideTitle>0) {
+	if (g_ts->HideTitle>0) {
 		Style = WS_VSCROLL | WS_HSCROLL |
 		        WS_BORDER | WS_THICKFRAME | WS_POPUP;
 
-		if (ts.EtermLookfeel.BGNoFrame)
+		if (g_ts->EtermLookfeel.BGNoFrame)
 			Style &= ~(WS_BORDER | WS_THICKFRAME);
 	}
 	else
@@ -746,19 +747,19 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	RegisterClassW(&wc);
 	m_hAccel = ::LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACC));
 
-	if (ts.VTPos.x==CW_USEDEFAULT) {
+	if (g_ts->VTPos.x==CW_USEDEFAULT) {
 		rect = rectDefault;
 	}
 	else {
-		rect.left = ts.VTPos.x;
-		rect.top = ts.VTPos.y;
+		rect.left = g_ts->VTPos.x;
+		rect.top = g_ts->VTPos.y;
 		rect.right = rect.left + 100;
 		rect.bottom = rect.top + 100;
 	}
 	// dark user interface, set up before the window is created
-	DarkModeInit(ts.DarkMode);
+	DarkModeInit(g_ts->DarkMode);
 	if (DarkModeIsEnabled()) {
-		SetDarkTerminalColors(&ts, TRUE);
+		SetDarkTerminalColors(g_ts, TRUE);
 	}
 
 	CreateW(hInstance, VTClassName, L"Tera Term", Style, rect, NULL, NULL);
@@ -766,15 +767,15 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	/*--------- Init2 -----------------*/
 	HVTWin = GetSafeHwnd();
 	if (HVTWin == NULL) return;
-	cv.HWin = HVTWin;
-	vt_src = InitDisp(HVTWin, &ts);
-	BGLoadThemeFile(vt_src, &ts);
+	g_cv->HWin = HVTWin;
+	vt_src = InitDisp(HVTWin, g_ts);
+	BGLoadThemeFile(vt_src, g_ts);
 	if (DarkModeIsEnabled()) {
 		DarkModeApplyToWindow(HVTWin);
 	}
 
 	// Windows 11 でウィンドウの角が丸くならないようにする
-	if (ts.WindowCornerDontround && pDwmSetWindowAttribute != NULL) {
+	if (g_ts->WindowCornerDontround && pDwmSetWindowAttribute != NULL) {
 		DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_DONOTROUND;
 		pDwmSetWindowAttribute(HVTWin, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
 	}
@@ -782,9 +783,9 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 	// register this window to the window list
 	SerialNo = RegWin(HVTWin,NULL);
 
-	SetMouseCursor(ts.MouseCursorName);
+	SetMouseCursor(g_ts->MouseCursorName);
 
-	if(ts.EtermLookfeel.BGNoFrame && ts.HideTitle > 0) {
+	if(g_ts->EtermLookfeel.BGNoFrame && g_ts->HideTitle > 0) {
 		DWORD ExStyle = (DWORD)::GetWindowLongPtr(HVTWin,GWL_EXSTYLE);
 		ExStyle &= ~WS_EX_CLIENTEDGE;
 		::SetWindowLongPtr(HVTWin,GWL_EXSTYLE,ExStyle);
@@ -796,27 +797,27 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 
 	// 通知領域初期化
 	NotifyIcon *ni = Notify2Initialize();
-	cv.NotifyIcon = ni;
-	Notify2SetWindow(ni, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (ts.VTIcon != IdIconDefault) ? ts.VTIcon: IDI_VT);
-	Notify2SetSound(ni, ts.NotifySound);
+	g_cv->NotifyIcon = ni;
+	Notify2SetWindow(ni, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (g_ts->VTIcon != IdIconDefault) ? g_ts->VTIcon: IDI_VT);
+	Notify2SetSound(ni, g_ts->NotifySound);
 
 	// VT ウィンドウのアイコン
-	SetVTIconID(&cv, NULL, 0);
+	SetVTIconID(g_cv, NULL, 0);
 
 	MainMenu = NULL;
 	WinMenu = NULL;
-	if ((ts.HideTitle==0) && (ts.PopupMenu==0)) {
+	if ((g_ts->HideTitle==0) && (g_ts->PopupMenu==0)) {
 		InitMenu(&MainMenu);
 		::SetMenu(HVTWin,MainMenu);
 	}
 
-	cv.StateEcho = MakeOutputStringCreate();
-	cv.StateSend = MakeOutputStringCreate();
+	g_cv->StateEcho = MakeOutputStringCreate();
+	g_cv->StateSend = MakeOutputStringCreate();
 
 	/* Reset Terminal */
 	ResetTerminal();
 
-	if ((ts.PopupMenu>0) || (ts.HideTitle>0)) {
+	if ((g_ts->PopupMenu>0) || (g_ts->HideTitle>0)) {
 		::PostMessage(HVTWin,WM_USER_CHANGEMENU,0,0);
 	}
 
@@ -839,12 +840,12 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 #endif
 
 	// TipWin
-	if (ts.HideWindow==0) {
+	if (g_ts->HideWindow==0) {
 		TipWin = new CTipWin(hInstance);
 		TipWin->Create(HVTWin);
 	}
 
-	if (ts.nCmdShow == SW_HIDE || ts.HideWindow > 0) {
+	if (g_ts->nCmdShow == SW_HIDE || g_ts->HideWindow > 0) {
 		if (strlen(TopicName)>0) {
 			InitDDE();
 			SendDDEReady();
@@ -853,9 +854,9 @@ CVTWindow::CVTWindow(HINSTANCE hInstance)
 		Startup();
 		return;
 	}
-	SetWindowAlpha(ts.AlphaBlendActive);
-	int CmdShow = ts.nCmdShow;
-	if (ts.Minimize > 0) {
+	SetWindowAlpha(g_ts->AlphaBlendActive);
+	int CmdShow = g_ts->nCmdShow;
+	if (g_ts->Minimize > 0) {
 		CmdShow = SW_SHOWMINIMIZED;
 	}
 	ShowWindow(CmdShow);
@@ -892,7 +893,7 @@ void CVTWindow::ButtonUp(POINT p, BOOL Paste)
 	::KillTimer(HVTWin,IdScrollTimer);
 	ReleaseCapture();
 
-	if (ts.SelectOnlyByLButton &&
+	if (g_ts->SelectOnlyByLButton &&
 	    (MButton || RButton)) {
 		disableBuffEndSelect = true;
 	}
@@ -911,7 +912,7 @@ void CVTWindow::ButtonUp(POINT p, BOOL Paste)
 	// バッファが選択状態だったら、選択内容がクリップボードに
 	// コピーされてしまう問題を修正 (2007.12.6 maya)
 	if (!disableBuffEndSelect) {
-		if (ts.AutoTextCopy>0) {
+		if (g_ts->AutoTextCopy>0) {
 			// 選択領域が存在する?
 			if (BuffIsSelected()) {
 				// 選択領域の文字を取得、クリップボードへセットする
@@ -938,7 +939,7 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 	BOOL mousereport;
 
 	if ((LMR==IdLeftButton) && ControlKey() && (MainMenu==NULL) &&
-	    ((ts.MenuFlag & MF_NOPOPUP)==0)) {
+	    ((g_ts->MenuFlag & MF_NOPOPUP)==0)) {
 		int i, numItems;
 
 		InitMenu(&PopupMenu);
@@ -987,12 +988,12 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 
 	// added ConfirmPasteMouseRButton (2007.3.17 maya)
 	if ((LMR == IdRightButton) &&
-		(ts.PasteFlag & CPF_DISABLE_RBUTTON) == 0 &&
-		(ts.PasteFlag & CPF_CONFIRM_RBUTTON) != 0 &&
-		cv.Ready &&
+		(g_ts->PasteFlag & CPF_DISABLE_RBUTTON) == 0 &&
+		(g_ts->PasteFlag & CPF_CONFIRM_RBUTTON) != 0 &&
+		g_cv->Ready &&
 		!mousereport &&
 		IsSendVarNULL() && IsFileVarNULL() &&
-		(cv.PortType!=IdFile) &&
+		(g_cv->PortType!=IdFile) &&
 		(IsClipboardFormatAvailable(CF_TEXT) ||
 		 IsClipboardFormatAvailable(CF_OEMTEXT))) {
 
@@ -1058,8 +1059,8 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 				}
 
 				// Starting the selection only by a left button.
-				if (!ts.SelectOnlyByLButton ||
-				    (ts.SelectOnlyByLButton && LMR == IdLeftButton) ) {
+				if (!g_ts->SelectOnlyByLButton ||
+				    (g_ts->SelectOnlyByLButton && LMR == IdLeftButton) ) {
 					select_start = TRUE;
 				}
 			}
@@ -1183,18 +1184,18 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	ControlMenu = GetSubMenu(hMenu,ID_CONTROL);
 	HelpMenu = GetSubMenu(hMenu,ID_HELPMENU);
 
-	SetDlgMenuTextsW(hMenu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFileW);
+	SetDlgMenuTextsW(hMenu, MenuTextInfo, _countof(MenuTextInfo), g_ts->UILanguageFileW);
 
-	SetDlgMenuTextsW(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), ts.UILanguageFileW);
-	SetDlgMenuTextsW(EditMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), ts.UILanguageFileW);
-	SetDlgMenuTextsW(SetupMenu, SetupMenuTextInfo, _countof(SetupMenuTextInfo), ts.UILanguageFileW);
-	SetDlgMenuTextsW(ControlMenu, ControlMenuTextInfo, _countof(ControlMenuTextInfo), ts.UILanguageFileW);
-	SetDlgMenuTextsW(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFileW);
+	SetDlgMenuTextsW(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), g_ts->UILanguageFileW);
+	SetDlgMenuTextsW(EditMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), g_ts->UILanguageFileW);
+	SetDlgMenuTextsW(SetupMenu, SetupMenuTextInfo, _countof(SetupMenuTextInfo), g_ts->UILanguageFileW);
+	SetDlgMenuTextsW(ControlMenu, ControlMenuTextInfo, _countof(ControlMenuTextInfo), g_ts->UILanguageFileW);
+	SetDlgMenuTextsW(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), g_ts->UILanguageFileW);
 
-	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
+	if ((g_ts->MenuFlag & MF_SHOWWINMENU) !=0) {
 		wchar_t *uimsg;
 		WinMenu = CreatePopupMenu();
-		GetI18nStrWW("Tera Term", "MENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
+		GetI18nStrWW("Tera Term", "MENU_WINDOW", L"&Window", g_ts->UILanguageFileW, &uimsg);
 		InsertMenuW(hMenu, ID_HELPMENU,
 					MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 					(UINT_PTR)WinMenu, uimsg);
@@ -1208,8 +1209,8 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 {
 	if ( SubMenu == FileMenu )
 	{
-		if (ts.DisableMenuNewConnection) {
-			if ( Connecting || cv.Open ) {
+		if (g_ts->DisableMenuNewConnection) {
+			if ( Connecting || g_cv->Open ) {
 				EnableMenuItem(FileMenu,ID_FILE_NEWCONNECTION,MF_BYCOMMAND | MF_GRAYED);
 			}
 			else {
@@ -1225,8 +1226,8 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			}
 		}
 
-		if ( (! cv.Ready) || (!IsSendVarNULL()) ||
-		     (!IsFileVarNULL()) || (cv.PortType==IdFile) ) {
+		if ( (! g_cv->Ready) || (!IsSendVarNULL()) ||
+		     (!IsFileVarNULL()) || (g_cv->PortType==IdFile) ) {
 			EnableMenuItem(FileMenu,ID_FILE_SENDFILE,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_FILE_RECVFILE,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(FileMenu,ID_TRANSFER,MF_BYPOSITION | MF_GRAYED); /* Transfer */
@@ -1238,7 +1239,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(FileMenu,ID_FILE_RECVFILE,MF_BYCOMMAND | MF_ENABLED);
 			EnableMenuItem(FileMenu,ID_TRANSFER,MF_BYPOSITION | MF_ENABLED); /* Transfer */
 			EnableMenuItem(FileMenu,ID_FILE_DISCONNECT,MF_BYCOMMAND | MF_ENABLED);
-			if (ts.DisableMenuDuplicateSession || cv.PortType==IdSerial) {
+			if (g_ts->DisableMenuDuplicateSession || g_cv->PortType==IdSerial) {
 				EnableMenuItem(FileMenu,ID_FILE_DUPLICATESESSION,MF_BYCOMMAND | MF_GRAYED);
 			}
 			else {
@@ -1278,8 +1279,8 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 	}
 	else if ( SubMenu == TransMenu )
 	{
-		if ((cv.PortType==IdSerial) &&
-		    ((ts.DataBit==IdDataBit7) || (ts.Flow==IdFlowX))) {
+		if ((g_cv->PortType==IdSerial) &&
+		    ((g_ts->DataBit==IdDataBit7) || (g_ts->Flow==IdFlowX))) {
 			EnableMenuItem(TransMenu,1,MF_BYPOSITION | MF_GRAYED);  /* XMODEM */
 			EnableMenuItem(TransMenu,2,MF_BYPOSITION | MF_GRAYED);  /* YMODEM */
 			EnableMenuItem(TransMenu,5,MF_BYPOSITION | MF_GRAYED);  /* Quick-VAN */
@@ -1289,8 +1290,8 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(TransMenu,2,MF_BYPOSITION | MF_ENABLED); /* YMODEM */
 			EnableMenuItem(TransMenu,5,MF_BYPOSITION | MF_ENABLED); /* Quick-VAN */
 		}
-		if ((cv.PortType==IdSerial) &&
-		    (ts.DataBit==IdDataBit7)) {
+		if ((g_cv->PortType==IdSerial) &&
+		    (g_ts->DataBit==IdDataBit7)) {
 			EnableMenuItem(TransMenu,3,MF_BYPOSITION | MF_GRAYED); /* ZMODEM */
 			EnableMenuItem(TransMenu,4,MF_BYPOSITION | MF_GRAYED); /* B-Plus */
 		}
@@ -1309,9 +1310,9 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(EditMenu,ID_EDIT_COPY2,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(EditMenu,ID_EDIT_COPYTABLE,MF_BYCOMMAND | MF_GRAYED);
 		}
-		if (cv.Ready &&
+		if (g_cv->Ready &&
 		    IsSendVarNULL() && IsFileVarNULL() &&
-		    (cv.PortType!=IdFile) &&
+		    (g_cv->PortType!=IdFile) &&
 		    (IsClipboardFormatAvailable(CF_TEXT) ||
 		    IsClipboardFormatAvailable(CF_OEMTEXT))) {
 			EnableMenuItem(EditMenu,ID_EDIT_PASTE2,MF_BYCOMMAND | MF_ENABLED);
@@ -1343,15 +1344,15 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 
 	else if (SubMenu == ControlMenu)
 	{
-		if (cv.Ready &&
+		if (g_cv->Ready &&
 		    IsSendVarNULL() && IsFileVarNULL()) {
-			if (ts.DisableMenuSendBreak) {
+			if (g_ts->DisableMenuSendBreak) {
 				EnableMenuItem(ControlMenu,ID_CONTROL_SENDBREAK,MF_BYCOMMAND | MF_GRAYED);
 			}
 			else {
 				EnableMenuItem(ControlMenu,ID_CONTROL_SENDBREAK,MF_BYCOMMAND | MF_ENABLED);
 			}
-			if (cv.PortType==IdSerial) {
+			if (g_cv->PortType==IdSerial) {
 				EnableMenuItem(ControlMenu,ID_CONTROL_RESETPORT,MF_BYCOMMAND | MF_ENABLED);
 			}
 			else {
@@ -1363,7 +1364,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(ControlMenu,ID_CONTROL_RESETPORT,MF_BYCOMMAND | MF_GRAYED);
 		}
 
-		if (cv.Ready && cv.TelFlag && IsFileVarNULL()) {
+		if (g_cv->Ready && g_cv->TelFlag && IsFileVarNULL()) {
 			EnableMenuItem(ControlMenu,ID_CONTROL_AREYOUTHERE,MF_BYCOMMAND | MF_ENABLED);
 		}
 		else {
@@ -1389,7 +1390,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 	}
 	else if (SubMenu == WinMenu)
 	{
-		SetWinMenuW(WinMenu, ts.UILanguageFileW, 1);
+		SetWinMenuW(WinMenu, g_ts->UILanguageFileW, 1);
 	}
 
 	TTXModifyPopupMenu(SubMenu); /* TTPLUG */
@@ -1404,7 +1405,7 @@ void CVTWindow::InitPasteMenu(HMENU *Menu)
 	};
 	*Menu = LoadMenu(m_hInst,
 	                 MAKEINTRESOURCE(IDR_PASTEMENU));
-	SetDlgMenuTextsW(*Menu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFileW);
+	SetDlgMenuTextsW(*Menu, MenuTextInfo, _countof(MenuTextInfo), g_ts->UILanguageFileW);
 }
 
 void CVTWindow::ResetSetup()
@@ -1413,12 +1414,12 @@ void CVTWindow::ResetSetup()
 	BuffChangeWinSize(WinWidth,WinHeight);
 	ChangeCaret(vt_src);
 
-	if (cv.Ready) {
-		ts.PortType = cv.PortType;
-		if (cv.PortType==IdSerial) {
+	if (g_cv->Ready) {
+		g_ts->PortType = g_cv->PortType;
+		if (g_cv->PortType==IdSerial) {
 			/* if serial port, change port parameters */
-			ts.ComPort = cv.ComPort;
-			CommResetSerial(&ts, &cv, TRUE);
+			g_ts->ComPort = g_cv->ComPort;
+			CommResetSerial(g_ts, g_cv, TRUE);
 		}
 	}
 
@@ -1438,7 +1439,7 @@ void CVTWindow::ResetSetup()
 	//
 	// AlphaBlend を即時反映できるようにする。
 	// (2016.12.24 yutaka)
-	SetWindowAlpha(ts.AlphaBlendActive);
+	SetWindowAlpha(g_ts->AlphaBlendActive);
 
 	/* setup window */
 	ChangeWin();
@@ -1454,7 +1455,7 @@ void CVTWindow::ResetSetup()
 void CVTWindow::RestoreSetup()
 {
 	if (LoadTTSET()) {
-		(*ReadIniFile)(ts.SetupFNameW, &ts);
+		(*ReadIniFile)(g_ts->SetupFNameW, g_ts);
 
 		SetColor();
 	}
@@ -1466,29 +1467,29 @@ void CVTWindow::RestoreSetup()
 /* called by the [Setup] Terminal command */
 void CVTWindow::SetupTerm()
 {
-//	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
+//	if (g_ts->Language==IdJapanese || g_ts->Language==IdKorean || g_ts->Language==IdUtf8) {
 		ResetCharSet();
 //	}
-	cv.CRSend = ts.CRSend;
+	g_cv->CRSend = g_ts->CRSend;
 
-	if (cv.Ready) {
-		if (cv.TelFlag && (ts.TelEcho>0)) {
+	if (g_cv->Ready) {
+		if (g_cv->TelFlag && (g_ts->TelEcho>0)) {
 			TelChangeEcho();
 		}
 	}
 
-	if ((ts.TerminalWidth!=NumOfColumns) ||
-	    (ts.TerminalHeight!=NumOfLines-StatusLine)) {
+	if ((g_ts->TerminalWidth!=NumOfColumns) ||
+	    (g_ts->TerminalHeight!=NumOfLines-StatusLine)) {
 		LockBuffer();
 		HideStatusLine();
-		ChangeTerminalSize(ts.TerminalWidth,
-		                   ts.TerminalHeight);
+		ChangeTerminalSize(g_ts->TerminalWidth,
+		                   g_ts->TerminalHeight);
 		UnlockBuffer();
 	}
-	else if ((ts.TermIsWin>0) &&
-	         ((ts.TerminalWidth!=WinWidth) ||
-	          (ts.TerminalHeight!=WinHeight-StatusLine))) {
-		BuffChangeWinSize(ts.TerminalWidth,ts.TerminalHeight+StatusLine);
+	else if ((g_ts->TermIsWin>0) &&
+	         ((g_ts->TerminalWidth!=WinWidth) ||
+	          (g_ts->TerminalHeight!=WinHeight-StatusLine))) {
+		BuffChangeWinSize(g_ts->TerminalWidth,g_ts->TerminalHeight+StatusLine);
 	}
 
 	ChangeTerminalID();
@@ -1499,15 +1500,15 @@ void CVTWindow::Startup()
 	/* auto log */
 	/* OnCommOpen で開始されるのでここでは開始しない (2007.5.14 maya) */
 
-	if ((TopicName[0]==0) && (ts.MacroFNW != NULL && ts.MacroFNW[0] != 0)) {
+	if ((TopicName[0]==0) && (g_ts->MacroFNW != NULL && g_ts->MacroFNW[0] != 0)) {
 		// start the macro specified in the command line or setup file
-		RunMacroW(ts.MacroFNW, TRUE);
-		free(ts.MacroFNW);
-		ts.MacroFNW = NULL;
+		RunMacroW(g_ts->MacroFNW, TRUE);
+		free(g_ts->MacroFNW);
+		g_ts->MacroFNW = NULL;
 	}
 	else {// start connection
 		if (TopicName[0]!=0) {
-			cv.NoMsg=1; /* suppress error messages */
+			g_cv->NoMsg=1; /* suppress error messages */
 		}
 		::PostMessage(HVTWin,WM_USER_COMMSTART,0,0);
 	}
@@ -1537,7 +1538,7 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		switch (wID) {
 			case ID_ACC_SENDBREAK:
 				// added DisableAcceleratorSendBreak (2007.3.17 maya)
-				if (!ts.DisableAcceleratorSendBreak)
+				if (!g_ts->DisableAcceleratorSendBreak)
 					OnControlSendBreak();
 				return TRUE;
 			case ID_ACC_AREYOUTHERE:
@@ -1547,16 +1548,16 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		if (ActiveWin==IdVT) {
 			switch (wID) {
 				case ID_ACC_NEWCONNECTION:
-					if (ts.AcceleratorNewConnection)
+					if (g_ts->AcceleratorNewConnection)
 						OnFileNewConnection();
 					return TRUE;
 				case ID_ACC_DUPLICATESESSION:
 					// added DisableAcceleratorDuplicateSession (2009.4.6 maya)
-					if (!ts.DisableAcceleratorDuplicateSession)
+					if (!g_ts->DisableAcceleratorDuplicateSession)
 						OnDuplicateSession();
 					return TRUE;
 				case ID_ACC_CYGWINCONNECTION:
-					if (ts.AcceleratorCygwinConnection)
+					if (g_ts->AcceleratorCygwinConnection)
 						OnCygwinConnection();
 					return TRUE;
 				case ID_ACC_DISCONNECT:
@@ -1618,9 +1619,9 @@ void CVTWindow::OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized)
 {
 	DispSetActive(vt_src, nState != WA_INACTIVE);
 	if (nState == WA_INACTIVE) {
-		SetWindowAlpha(ts.AlphaBlendInactive);
+		SetWindowAlpha(g_ts->AlphaBlendInactive);
 	} else {
-		SetWindowAlpha(ts.AlphaBlendActive);
+		SetWindowAlpha(g_ts->AlphaBlendActive);
 	}
 }
 
@@ -1637,7 +1638,7 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		return;
 	}
 
-	if (MetaKey(ts.MetaKey)) {
+	if (MetaKey(g_ts->MetaKey)) {
 		::PostMessage(HVTWin,WM_SYSCHAR,nChar,MAKELONG(nRepCnt,nFlags));
 		return;
 	}
@@ -1691,7 +1692,7 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		else if (acp == 1251) {
 			// CP1251	Russian,Cyrillic キリル
 			UINT code_page = CP_ACP;
-			if (ts.RussKeyb != 0) {
+			if (g_ts->RussKeyb != 0) {
 				code_page = 20866; /*koi8-r*/
 			}
 			char mb_str[2];
@@ -1711,9 +1712,9 @@ void CVTWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 
 	// バッファへ出力、画面へ出力
 	for (i=1 ; i<=nRepCnt ; i++) {
-		CommTextOutW(&cv,&u16,1);
-		if (ts.LocalEcho>0) {
-			CommTextEchoW(&cv,&u16,1);
+		CommTextOutW(g_cv,&u16,1);
+		if (g_ts->LocalEcho>0) {
+			CommTextEchoW(g_cv,&u16,1);
 		}
 	}
 
@@ -1733,9 +1734,9 @@ LRESULT CVTWindow::OnUniChar(WPARAM wParam, LPARAM lParam)
 	char32_t u32 = (char32_t)wParam;
 	wchar_t strW[2];
 	size_t u16_len = UTF32ToUTF16(u32, strW, _countof(strW));
-	CommTextOutW(&cv, strW, u16_len);
-	if (ts.LocalEcho > 0) {
-		CommTextEchoW(&cv, strW, u16_len);
+	CommTextOutW(g_cv, strW, u16_len);
+	if (g_ts->LocalEcho > 0) {
+		CommTextEchoW(g_cv, strW, u16_len);
 	}
 
 	return FALSE;
@@ -1748,8 +1749,8 @@ void CVTWindow::OnClose()
 		return;
 	}
 
-	if (cv.Ready && (cv.PortType==IdTCPIP) &&
-	    ((ts.PortFlag & PF_CONFIRMDISCONN) != 0) &&
+	if (g_cv->Ready && (g_cv->PortType==IdTCPIP) &&
+	    ((g_ts->PortFlag & PF_CONFIRMDISCONN) != 0) &&
 	    ! CloseTT) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
@@ -1757,7 +1758,7 @@ void CVTWindow::OnClose()
 			"MSG_DISCONNECT_CONF", L"Disconnect?",
 			MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2
 		};
-		int result = TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+		int result = TTMessageBoxW(HVTWin, &info, g_ts->UILanguageFileW);
 		if (result == IDCANCEL) {
 			return;
 		}
@@ -1767,8 +1768,8 @@ void CVTWindow::OnClose()
 	FileSendEnd();
 	ProtoEnd();
 
-	SaveVTPos(&ts);
-	Notify2UnsetWindow((NotifyIcon *)cv.NotifyIcon);
+	SaveVTPos(g_ts);
+	Notify2UnsetWindow((NotifyIcon *)g_cv->NotifyIcon);
 
 	// アプリケーション終了時にアイコンを破棄すると、ウィンドウが消える前に
 	// タイトルバーのアイコンが "Windows の実行ファイルのアイコン" に変わる
@@ -1788,7 +1789,7 @@ void CVTWindow::OnAllClose()
 		"MSG_ALL_TERMINATE_CONF", L"Terminate ALL Tera Term(s)?",
 		MB_OKCANCEL | MB_ICONERROR | MB_DEFBUTTON2
 	};
-	int result = TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+	int result = TTMessageBoxW(HVTWin, &info, g_ts->UILanguageFileW);
 	if (result == IDCANCEL)
 		return;
 
@@ -1799,7 +1800,7 @@ void CVTWindow::OnAllClose()
 LRESULT CVTWindow::OnNonConfirmClose(WPARAM wParam, LPARAM lParam)
 {
 	// ここで ts の内容を意図的に書き換えても、終了時に自動セーブされるわけではないので、特に問題なし。
-	ts.PortFlag &= ~PF_CONFIRMDISCONN;
+	g_ts->PortFlag &= ~PF_CONFIRMDISCONN;
 	OnClose();
 	return 1;
 }
@@ -1808,10 +1809,10 @@ void CVTWindow::OnDestroy()
 {
 	isClosing = TRUE;
 
-	MakeOutputStringDestroy((OutputCharState *)(cv.StateEcho));
-	cv.StateEcho = NULL;
-	MakeOutputStringDestroy((OutputCharState *)(cv.StateSend));
-	cv.StateSend = NULL;
+	MakeOutputStringDestroy((OutputCharState *)(g_cv->StateEcho));
+	g_cv->StateEcho = NULL;
+	MakeOutputStringDestroy((OutputCharState *)(g_cv->StateSend));
+	g_cv->StateSend = NULL;
 
 	// remove this window from the window list
 	UnregWin(HVTWin);
@@ -1830,10 +1831,10 @@ void CVTWindow::OnDestroy()
 
 	EndDDE();
 
-	if (cv.TelFlag) {
+	if (g_cv->TelFlag) {
 		EndTelnet();
 	}
-	CommClose(&cv);
+	CommClose(g_cv);
 
 	FreeIME(HVTWin);
 	FreeTTSET();
@@ -1856,8 +1857,8 @@ void CVTWindow::OnDestroy()
 
 	FreeBuffer();
 
-	Notify2Uninitialize((NotifyIcon *)cv.NotifyIcon);
-	cv.NotifyIcon = NULL;
+	Notify2Uninitialize((NotifyIcon *)g_cv->NotifyIcon);
+	g_cv->NotifyIcon = NULL;
 
 	DropUninit();
 }
@@ -1937,7 +1938,7 @@ void CVTWindow::DropInit()
 	DropData_t *data =(DropData_t *)calloc(1, sizeof(*data));
 	data->DefaultDropType = DROP_TYPE_CANCEL;
 	data->DefaultDropTypePaste = DROP_TYPE_PASTE_ESCAPE;
-	data->DefaultShowDialog = ts.ConfirmFileDragAndDrop ? true : false;
+	data->DefaultShowDialog = g_ts->ConfirmFileDragAndDrop ? true : false;
 	data->vtwin = HVTWin;
 
 	DropData = data;
@@ -2010,14 +2011,14 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 		}
 
 		data->DoSameProcess = false;
-		const bool isSSH = (cv.isSSH == 2);
+		const bool isSSH = (g_cv->isSSH == 2);
 		data->DropTypePaste = DROP_TYPE_PASTE_ESCAPE;
 		if (data->DefaultDropType == DROP_TYPE_CANCEL) {
 			// default is not set
-			data->TransBin = ts.TransBin == 0 ? false : true;
+			data->TransBin = g_ts->TransBin == 0 ? false : true;
 			if (!ShowDialog) {
 				if (data->FileCount == 1 && data->DirectoryCount == 0) {
-					if (ts.ConfirmFileDragAndDrop) {
+					if (g_ts->ConfirmFileDragAndDrop) {
 						if (isSSH) {
 							data->DropType = DROP_TYPE_SCP;
 						} else {
@@ -2048,7 +2049,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 				} else {
 					// directory only
 					data->DropType = DROP_TYPE_PASTE_FILENAME;
-					data->DoSameProcess = ts.ConfirmFileDragAndDrop ? false : true;
+					data->DoSameProcess = g_ts->ConfirmFileDragAndDrop ? false : true;
 				}
 			} else {
 				// show dialog
@@ -2093,17 +2094,17 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 		const wchar_t *FileName = DropLists[i];
 
 		if (!data->DoSameProcess) {
-			const bool isSSH = (cv.isSSH == 2);
+			const bool isSSH = (g_cv->isSSH == 2);
 			bool DoSameProcessNextDrop;
 			bool DoNotShowDialog = !data->DefaultShowDialog;
-			SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-						  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+			SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
+						  g_ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 			data->DropType =
 				ShowDropDialogBox(m_hInst, HVTWin, FileName, data->DropType,
 								  DropListCount - i,
 								  (data->DirectoryCount == 0 && isSSH) ? true : false, data->DirectoryCount == 0 ? true : false,
 								  &data->TransBin,
-								  &ts,
+								  g_ts,
 								  &data->DropTypePaste, &data->DoSameProcess,
 								  &DoSameProcessNextDrop,
 								  &DoNotShowDialog);
@@ -2113,7 +2114,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 			if (DoSameProcessNextDrop) {
 				data->DefaultDropType = data->DropType;
 			}
-			if (!ts.ConfirmFileDragAndDrop) {
+			if (!g_ts->ConfirmFileDragAndDrop) {
 				data->DefaultShowDialog = !DoNotShowDialog;
 			}
 		}
@@ -2125,8 +2126,8 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 			break;
 		case DROP_TYPE_SEND_FILE: {
 			const BOOL binary = data->TransBin ? TRUE : FALSE;
-			SendMemSendFile2(FileName, binary, (SendMemDelayType)ts.SendfileDelayType, ts.SendfileDelayTick,
-							 ts.SendfileSize, ts.LocalEcho, DropSendCallback, data);
+			SendMemSendFile2(FileName, binary, (SendMemDelayType)g_ts->SendfileDelayType, g_ts->SendfileDelayTick,
+							 g_ts->SendfileSize, g_ts->LocalEcho, DropSendCallback, data);
 			break;
 		}
 		case DROP_TYPE_PASTE_FILENAME:
@@ -2158,7 +2159,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 		{
 			// send by scp
 			const wchar_t *FileName = DropLists[i];
-			wchar_t *SendDirW = ToWcharA(ts.ScpSendDir);
+			wchar_t *SendDirW = ToWcharA(g_ts->ScpSendDir);
 			BOOL r = ScpSend(FileName, SendDirW);
 			free(SendDirW);
 			if (!r) {
@@ -2188,7 +2189,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lparam)
 void CVTWindow::OnDropFiles(HDROP hDropInfo)
 {
 	::SetForegroundWindow(HVTWin);
-	if (cv.Ready && IsSendVarNULL())
+	if (g_cv->Ready && IsSendVarNULL())
 	{
 		const UINT ShowDialog =
 			((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0) ? 1 : 0;
@@ -2323,7 +2324,7 @@ void CVTWindow::OnKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 		return;
 	}
 
-	if (MetaKey(ts.MetaKey) && (nFlags & 0x2000) != 0)
+	if (MetaKey(g_ts->MetaKey) && (nFlags & 0x2000) != 0)
 	{
 		BYTE KeyState[256];
 		MSG M;
@@ -2452,7 +2453,7 @@ void CVTWindow::OnMButtonUp(WPARAM nFlags, POINTS point)
 	POINT p;
 	p.x = point.x;
 	p.y = point.y;
-	if (ts.PasteFlag & CPF_DISABLE_MBUTTON) {
+	if (g_ts->PasteFlag & CPF_DISABLE_MBUTTON) {
 		ButtonUp(p, FALSE);
 	}
 	else {
@@ -2464,7 +2465,7 @@ LRESULT CVTWindow::OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message
 {
 	// eat mouse event for text selection
 	// when window is activated by L button
-	if ((ts.SelOnActive==0) && (nHitTest==HTCLIENT) && (message==WM_LBUTTONDOWN)) {
+	if ((g_ts->SelOnActive==0) && (nHitTest==HTCLIENT) && (message==WM_LBUTTONDOWN)) {
 		IgnoreRelease = TRUE;
 		return MA_ACTIVATEANDEAT;
 	}
@@ -2503,10 +2504,10 @@ void CVTWindow::OnMouseMove(WPARAM nFlags, POINTS point)
 		mousereport = MouseReport(IdMouseEventMove, 0, point.x, point.y);
 
 	if (! (LButton || MButton || RButton)) {
-		if (BuffCheckMouseOnURL(point.x, point.y) && ts.EnableClickableUrl)
+		if (BuffCheckMouseOnURL(point.x, point.y) && g_ts->EnableClickableUrl)
 			SetMouseCursor("HAND");
 		else
-			SetMouseCursor(ts.MouseCursorName);
+			SetMouseCursor(g_ts->MouseCursorName);
 		return;
 	}
 
@@ -2524,8 +2525,8 @@ void CVTWindow::OnMouseMove(WPARAM nFlags, POINTS point)
 		i = 1;
 	}
 
-	if (!ts.SelectOnlyByLButton ||
-	    (ts.SelectOnlyByLButton && LButton) ) {
+	if (!g_ts->SelectOnlyByLButton ||
+	    (g_ts->SelectOnlyByLButton && LButton) ) {
 		// SelectOnlyByLButton == TRUE のときは、左ボタンダウン時のみ選択する (2007.11.21 maya)
 		BuffChangeSelect(point.x, point.y,i);
 	}
@@ -2542,8 +2543,8 @@ void CVTWindow::OnMove(int x, int y)
 	// 		注 x,y はクライアント領域の左上の座標
 	RECT R;
 	::GetWindowRect(HVTWin,&R);
-	ts.VTPos.x = R.left;
-	ts.VTPos.y = R.top;
+	g_ts->VTPos.x = R.left;
+	g_ts->VTPos.y = R.top;
 
 	DispSetWinPos(vt_src);
 
@@ -2577,7 +2578,7 @@ BOOL CVTWindow::OnMouseWheel(
 			int newAlpha = Alpha;
 			POINT tippos;
 
-			newAlpha += delta * ts.MouseWheelScrollLine;
+			newAlpha += delta * g_ts->MouseWheelScrollLine;
 			if (newAlpha > 255)
 				newAlpha = 255;
 			else if (newAlpha < 0)
@@ -2585,7 +2586,7 @@ BOOL CVTWindow::OnMouseWheel(
 			SetWindowAlpha(newAlpha);
 
 			wchar_t *uimsg;
-			GetI18nStrWW("Tera Term", "TOOLTIP_TITLEBAR_OPACITY", L"Opacity %.1f %%", ts.UILanguageFileW, &uimsg);
+			GetI18nStrWW("Tera Term", "TOOLTIP_TITLEBAR_OPACITY", L"Opacity %.1f %%", g_ts->UILanguageFileW, &uimsg);
 			wchar_t *tipbuf;
 			aswprintf(&tipbuf, uimsg, (newAlpha / 255.0) * 100);
 			free(uimsg);
@@ -2616,8 +2617,8 @@ BOOL CVTWindow::OnMouseWheel(
 	if (line < 1) line = 1;
 
 	// 一スクロールあたりの行数に変換する (2008.4.6 yutaka)
-	if (line == 1 && ts.MouseWheelScrollLine > 0)
-		line *= ts.MouseWheelScrollLine;
+	if (line == 1 && g_ts->MouseWheelScrollLine > 0)
+		line *= g_ts->MouseWheelScrollLine;
 
 	if (MouseReport(IdMouseEventWheel, zDelta<0, pt.x, pt.y))
 		return TRUE;
@@ -2645,7 +2646,7 @@ BOOL CVTWindow::OnMouseWheel(
 
 void CVTWindow::OnNcLButtonDblClk(UINT nHitTest, POINTS point)
 {
-	if (! Minimized && !ts.TermIsWin && (nHitTest == HTCAPTION)) {
+	if (! Minimized && !g_ts->TermIsWin && (nHitTest == HTCAPTION)) {
 		DispRestoreWinSize(vt_src);
 	}
 }
@@ -2653,7 +2654,7 @@ void CVTWindow::OnNcLButtonDblClk(UINT nHitTest, POINTS point)
 void CVTWindow::OnNcRButtonDown(UINT nHitTest, POINTS point)
 {
 	if ((nHitTest==HTCAPTION) &&
-	    (ts.HideTitle>0) &&
+	    (g_ts->HideTitle>0) &&
 		AltKey()) {
 		::CloseWindow(HVTWin); /* iconize */
 	}
@@ -2715,14 +2716,14 @@ void CVTWindow::OnRButtonUp(UINT nFlags, POINTS point)
 
 	/*
 	 *  ペースト条件:
-	 *  ・ts.PasteFlag & CPF_DISABLE_RBUTTON -> 右ボタンによるペースト無効
-	 *  ・ts.PasteFlag & CPF_CONFIRM_RBUTTON -> 表示されたメニューからペーストを行うので、
+	 *  ・g_ts->PasteFlag & CPF_DISABLE_RBUTTON -> 右ボタンによるペースト無効
+	 *  ・g_ts->PasteFlag & CPF_CONFIRM_RBUTTON -> 表示されたメニューからペーストを行うので、
 	 *                                          右ボタンアップによるペーストは行わない
 	 */
 	POINT p;
 	p.x = point.x;
 	p.y = point.y;
-	if ((ts.PasteFlag & CPF_DISABLE_RBUTTON) || (ts.PasteFlag & CPF_CONFIRM_RBUTTON)) {
+	if ((g_ts->PasteFlag & CPF_DISABLE_RBUTTON) || (g_ts->PasteFlag & CPF_CONFIRM_RBUTTON)) {
 		ButtonUp(p, FALSE);
 	} else {
 		ButtonUp(p, TRUE);
@@ -2781,8 +2782,8 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 	}
 
 	if (nType == SIZE_MAXIMIZED) {
-		ts.TerminalOldWidth = ts.TerminalWidth;
-		ts.TerminalOldHeight = ts.TerminalHeight;
+		g_ts->TerminalOldWidth = g_ts->TerminalWidth;
+		g_ts->TerminalOldHeight = g_ts->TerminalHeight;
 	}
 
 	::GetWindowRect(HVTWin,&R);
@@ -2795,33 +2796,33 @@ void CVTWindow::OnSize(WPARAM nType, int cx, int cy)
 		int CellWidth, CellHeight;
 		DispGetCellSize(vt_src, &CellWidth, &CellHeight);
 #if 0
-		if (ts.FontScaling) {
+		if (g_ts->FontScaling) {
 			int NewCellWidth, NewCellHeight;
 			BOOL FontChanged = FALSE;
 
-			NewCellWidth = cx / ts.TerminalWidth;
-			NewCellHeight = cy / ts.TerminalHeight;
+			NewCellWidth = cx / g_ts->TerminalWidth;
+			NewCellHeight = cy / g_ts->TerminalHeight;
 
-			if (NewCellWidth - ts.FontDW < 3) {
-				NewCellWidth = ts.FontDW + 3;
+			if (NewCellWidth - g_ts->FontDW < 3) {
+				NewCellWidth = g_ts->FontDW + 3;
 			}
 			if (NewCellWidth != CellWidth) {
-				ts.VTFontSize.x = ts.FontDW - NewCellWidth;
+				g_ts->VTFontSize.x = g_ts->FontDW - NewCellWidth;
 				CellWidth = NewCellWidth;
 				FontChanged = TRUE;
 			}
 
-			if (NewCellHeight - ts.FontDH < 3) {
-				NewCellHeight = ts.FontDH + 3;
+			if (NewCellHeight - g_ts->FontDH < 3) {
+				NewCellHeight = g_ts->FontDH + 3;
 			}
 			if (NewCellHeight != CellHeight) {
-				ts.VTFontSize.y = ts.FontDH - NewCellHeight;
+				g_ts->VTFontSize.y = g_ts->FontDH - NewCellHeight;
 				CellHeight = NewCellHeight;
 				FontChanged = TRUE;
 			}
 
-			w = ts.TerminalWidth;
-			h = ts.TerminalHeight;
+			w = g_ts->TerminalWidth;
+			h = g_ts->TerminalHeight;
 
 			if (FontChanged) {
 				DispSetFontSize(vt_src, CellWidth, CellHeight);
@@ -2871,13 +2872,13 @@ void CVTWindow::OnSizing(WPARAM fwSide, LPRECT pRect)
 	w = nWidth / CellWidth;
 	h = nHeight / CellHeight;
 
-	if (!ts.TermIsWin) {
+	if (!g_ts->TermIsWin) {
 		// TermIsWin=off の時はリサイズでは端末サイズが変わらないので
 		// 現在の端末サイズを上限とする。
-		if (w > ts.TerminalWidth)
-			w = ts.TerminalWidth;
-		if (h > ts.TerminalHeight)
-			h = ts.TerminalHeight;
+		if (w > g_ts->TerminalWidth)
+			w = g_ts->TerminalWidth;
+		if (h > g_ts->TerminalHeight)
+			h = g_ts->TerminalHeight;
 	}
 
 	// 最低でも 1x1 の端末サイズを保障する。
@@ -2933,13 +2934,13 @@ void CVTWindow::OnSysChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 	}
 #endif
 
-	if (MetaKey(ts.MetaKey)) {
+	if (MetaKey(g_ts->MetaKey)) {
 		if (!KeybEnabled || (TalkStatus != IdTalkKeyb))
 			return;
 
 		char Code = nChar;
 		wchar_t u16;
-		switch (ts.Meta8Bit) {
+		switch (g_ts->Meta8Bit) {
 		case IdMeta8BitRaw:
 			Code = nChar;
 			break;
@@ -2948,7 +2949,7 @@ void CVTWindow::OnSysChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 				u16 = nChar;
 			}
 			else {
-				if (ts.Meta8Bit != IdMeta8BitRaw) {
+				if (g_ts->Meta8Bit != IdMeta8BitRaw) {
 					const char mb_str[2] = {(char)nChar, 0};
 					unsigned int u32;
 					size_t mb_len = MBCPToUTF32(mb_str, 1, CP_ACP, &u32);
@@ -2960,28 +2961,28 @@ void CVTWindow::OnSysChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 			}
 		}
 		for (unsigned int i = 1; i <= nRepCnt; i++) {
-			switch (ts.Meta8Bit) {
+			switch (g_ts->Meta8Bit) {
 				case IdMeta8BitRaw:
 					Code |= 0x80;
-					CommBinaryBuffOut(&cv, &Code, 1);
-					if (ts.LocalEcho) {
-						CommBinaryEcho(&cv, &Code, 1);
+					CommBinaryBuffOut(g_cv, &Code, 1);
+					if (g_ts->LocalEcho) {
+						CommBinaryEcho(g_cv, &Code, 1);
 					}
 					break;
 				case IdMeta8BitText:
 					u16 |= 0x80;
-					CommTextOutW(&cv, &u16, 1);
-					if (ts.LocalEcho) {
-						CommTextEchoW(&cv, &u16, 1);
+					CommTextOutW(g_cv, &u16, 1);
+					if (g_ts->LocalEcho) {
+						CommTextEchoW(g_cv, &u16, 1);
 					}
 					break;
 				default: {
 					const wchar_t e = ESC;
-					CommTextOutW(&cv, &e, 1);
-					CommTextOutW(&cv, &u16, 1);
-					if (ts.LocalEcho) {
-						CommTextEchoW(&cv, &e, 1);
-						CommTextEchoW(&cv, &u16, 1);
+					CommTextOutW(g_cv, &e, 1);
+					CommTextOutW(g_cv, &u16, 1);
+					if (g_ts->LocalEcho) {
+						CommTextEchoW(g_cv, &e, 1);
+						CommTextEchoW(g_cv, &u16, 1);
 					}
 				}
 			}
@@ -2995,11 +2996,11 @@ void CVTWindow::OnSysChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 void CVTWindow::OnSysCommand(WPARAM nID, LPARAM lParam)
 {
 	if (nID==ID_SHOWMENUBAR) {
-		ts.PopupMenu = 0;
+		g_ts->PopupMenu = 0;
 		SwitchMenu();
 	}
-	else if (((nID & 0xfff0)==SC_CLOSE) && (cv.PortType==IdTCPIP) &&
-	         cv.Open && ! cv.Ready && (cv.ComPort>0)) {
+	else if (((nID & 0xfff0)==SC_CLOSE) && (g_cv->PortType==IdTCPIP) &&
+	         g_cv->Open && ! g_cv->Ready && (g_cv->ComPort>0)) {
 		// now getting host address (see CommOpen() in commlib.c)
 		::PostMessage(HVTWin,WM_SYSCOMMAND,nID,lParam);
 	}
@@ -3012,7 +3013,7 @@ void CVTWindow::OnSysCommand(WPARAM nID, LPARAM lParam)
 
 void CVTWindow::OnSysKeyDown(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 {
-	if ((nChar==VK_F10) || (MetaKey(ts.MetaKey) && ((MainMenu==NULL) || (nChar!=VK_MENU)))) {
+	if ((nChar==VK_F10) || (MetaKey(g_ts->MetaKey) && ((MainMenu==NULL) || (nChar!=VK_MENU)))) {
 		KeyDown(HVTWin,nChar,nRepCnt,nFlags & 0x1ff);
 		// OnKeyDown(nChar,nRepCnt,nFlags);
 	}
@@ -3038,7 +3039,7 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 	UINT T;
 
 	if (nIDEvent==IdCaretTimer) {
-		if (ts.NonblinkingCursor!=0) {
+		if (g_ts->NonblinkingCursor!=0) {
 			T = GetCaretBlinkTime();
 			SetCaretBlinkTime(T);
 		}
@@ -3063,9 +3064,9 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 	else if (nIDEvent == IdCancelConnectTimer) {
 		// まだ接続が完了していなければ、ソケットを強制クローズ。
 		// CloseSocket()を呼びたいが、ここからは呼べないので、直接Win32APIをコールする。
-		if (!cv.Ready) {
-			closesocket(cv.s);
-			cv.s = INVALID_SOCKET;  /* ソケット無効の印を付ける。(2010.8.6 yutaka) */
+		if (!g_cv->Ready) {
+			closesocket(g_cv->s);
+			g_cv->s = INVALID_SOCKET;  /* ソケット無効の印を付ける。(2010.8.6 yutaka) */
 			//::PostMessage(HVTWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 		}
 	}
@@ -3074,7 +3075,7 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 
 	switch (nIDEvent) {
 		case IdDelayTimer:
-			cv.CanSend = TRUE;
+			g_cv->CanSend = TRUE;
 			break;
 		case IdProtoTimer:
 			ProtoDlgTimeOut();
@@ -3083,31 +3084,31 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 			AfterDblClk = FALSE;
 			break;
 		case IdComEndTimer:
-			if (! CommCanClose(&cv)) {
+			if (! CommCanClose(g_cv)) {
 				// wait if received data remains
 				::SetTimer(m_hWnd, IdComEndTimer,1,NULL);
 				break;
 			}
-			cv.Ready = FALSE;
-			if (cv.TelFlag) {
+			g_cv->Ready = FALSE;
+			if (g_cv->TelFlag) {
 				EndTelnet();
 			}
-			PortType = cv.PortType;
-			CommClose(&cv);
+			PortType = g_cv->PortType;
+			CommClose(g_cv);
 			SetDdeComReady(0);
 			if ((PortType==IdTCPIP) &&
-				((ts.PortFlag & PF_BEEPONCONNECT) != 0)) {
+				((g_ts->PortFlag & PF_BEEPONCONNECT) != 0)) {
 				MessageBeep(0);
 			}
 			if ((PortType==IdTCPIP) &&
-				(ts.AutoWinClose>0) &&
+				(g_ts->AutoWinClose>0) &&
 				::IsWindowEnabled(HVTWin) &&
 				((HTEKWin==NULL) || ::IsWindowEnabled(HTEKWin)) ) {
 				OnClose();
 			}
 			else {
 				ChangeTitle();
-				if (ts.ClearScreenOnCloseConnection) {
+				if (g_ts->ClearScreenOnCloseConnection) {
 					OnEditClearScreen();
 				}
 			}
@@ -3173,7 +3174,7 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 
 LRESULT CVTWindow::OnWindowPosChanging(WPARAM wParam, LPARAM lParam)
 {
-	if(ts.EtermLookfeel.BGEnable && ts.EtermLookfeel.BGNoCopyBits) {
+	if(g_ts->EtermLookfeel.BGEnable && g_ts->EtermLookfeel.BGNoCopyBits) {
 		((WINDOWPOS*)lParam)->flags |= SWP_NOCOPYBITS;
 	}
 
@@ -3208,8 +3209,8 @@ void CVTWindow::SetConversionWindowPos()
 {
 	int CellWidth, CellHeight;
 	DispGetCellSize(vt_src, &CellWidth, &CellHeight);
-	int CaretX = (CursorX - WinOrgX) * CellWidth + ts.FontDX;
-	int CaretY = (CursorY - WinOrgY) * CellHeight + ts.FontDY;
+	int CaretX = (CursorX - WinOrgX) * CellWidth + g_ts->FontDX;
+	int CaretY = (CursorY - WinOrgY) * CellHeight + g_ts->FontDY;
 	SetConversionWindow(m_hWnd, CaretX, CaretY);
 }
 
@@ -3245,10 +3246,10 @@ LRESULT CVTWindow::OnIMEComposition(WPARAM wParam, LPARAM lParam)
 					break;
 				}
 			}
-			if (ts.LocalEcho>0) {
-				CommTextEchoW(&cv,output_wstr,len);
+			if (g_ts->LocalEcho>0) {
+				CommTextEchoW(g_cv,output_wstr,len);
 			}
-			CommTextOutW(&cv,output_wstr,len);
+			CommTextOutW(g_cv,output_wstr,len);
 			free((void *)lpstr);
 			return 0;
 		}
@@ -3277,7 +3278,7 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 			// 状態を表示するIMEのために位置を通知する
 			SetConversionWindowPos();
 
-			if (ts.IMEInline > 0) {
+			if (g_ts->IMEInline > 0) {
 				// フォントを設定する
 				ResetConversionLogFont(HVTWin);
 			}
@@ -3429,7 +3430,7 @@ static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 LRESULT CVTWindow::OnIMERequest(WPARAM wParam, LPARAM lParam)
 {
 	// "IME=off"の場合は、何もしない。
-	if (ts.UseIME > 0) {
+	if (g_ts->UseIME > 0) {
 		switch(wParam) {
 		case IMR_DOCUMENTFEED:
 			return ReplyIMERequestDocumentfeed(HVTWin, lParam);
@@ -3446,7 +3447,7 @@ LRESULT CVTWindow::OnAccelCommand(WPARAM wParam, LPARAM lParam)
 		case IdHold:
 			if (TalkStatus==IdTalkKeyb) {
 				Hold = ! Hold;
-				CommLock(&ts,&cv,Hold);
+				CommLock(g_ts,g_cv,Hold);
 			}
 			 break;
 		case IdPrint:
@@ -3507,13 +3508,13 @@ LRESULT CVTWindow::OnAccelCommand(WPARAM wParam, LPARAM lParam)
 			SelectNextWin(HVTWin,-1,TRUE);
 			break;
 		case IdCmdLocalEcho:
-			if (ts.LocalEcho==0) {
-				ts.LocalEcho = 1;
+			if (g_ts->LocalEcho==0) {
+				g_ts->LocalEcho = 1;
 			}
 			else {
-				ts.LocalEcho = 0;
+				g_ts->LocalEcho = 0;
 			}
-			if (cv.Ready && cv.TelFlag && (ts.TelEcho>0)) {
+			if (g_cv->Ready && g_cv->TelFlag && (g_ts->TelEcho>0)) {
 				TelChangeEcho();
 			}
 			break;
@@ -3538,7 +3539,7 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 	HMENU SysMenu;
 	BOOL Show, B1, B2;
 
-	Show = (ts.PopupMenu==0) && (ts.HideTitle==0);
+	Show = (g_ts->PopupMenu==0) && (g_ts->HideTitle==0);
 
 // TTXKanjiMenu のために、メニューが表示されていても
 // 再描画するようにした。 (2007.7.14 maya)
@@ -3564,14 +3565,14 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 	::SetMenu(HVTWin, MainMenu);
 	::DrawMenuBar(HVTWin);
 
-	B1 = ((ts.MenuFlag & MF_SHOWWINMENU)!=0);
+	B1 = ((g_ts->MenuFlag & MF_SHOWWINMENU)!=0);
 	B2 = (WinMenu!=NULL);
 	if ((MainMenu!=NULL) &&
 	    (B1 != B2)) {
 		if (WinMenu==NULL) {
 			wchar_t *uimsg;
 			WinMenu = CreatePopupMenu();
-			GetI18nStrWW("Tera Term", "MENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
+			GetI18nStrWW("Tera Term", "MENU_WINDOW", L"&Window", g_ts->UILanguageFileW, &uimsg);
 			::InsertMenuW(MainMenu,ID_HELPMENU,
 						  MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 						  (UINT_PTR)WinMenu, uimsg);
@@ -3586,11 +3587,11 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 	}
 
 	::GetSystemMenu(HVTWin,TRUE);
-	if ((! Show) && ((ts.MenuFlag & MF_NOSHOWMENU)==0)) {
+	if ((! Show) && ((g_ts->MenuFlag & MF_NOSHOWMENU)==0)) {
 		wchar_t *uimsg;
 		SysMenu = ::GetSystemMenu(HVTWin,FALSE);
 		AppendMenuA(SysMenu, MF_SEPARATOR, 0, NULL);
-		GetI18nStrWW("Tera Term", "MENU_SHOW_MENUBAR", L"Show menu &bar", ts.UILanguageFileW, &uimsg);
+		GetI18nStrWW("Tera Term", "MENU_SHOW_MENUBAR", L"Show menu &bar", g_ts->UILanguageFileW, &uimsg);
 		AppendMenuW(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
 		free(uimsg);
 	}
@@ -3607,23 +3608,23 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 	ExStyle = (DWORD)::GetWindowLongPtr (HVTWin, GWL_EXSTYLE);
 	TBar = ((Style & WS_SYSMENU)!=0);
 	WFrame = ((Style & WS_BORDER) != 0);
-	if (TBar == (ts.HideTitle==0) && WFrame == (ts.HideTitle==0 || ts.EtermLookfeel.BGNoFrame==0)) {
+	if (TBar == (g_ts->HideTitle==0) && WFrame == (g_ts->HideTitle==0 || g_ts->EtermLookfeel.BGNoFrame==0)) {
 		return 0;
 	}
 
 #ifndef WINDOW_MAXMIMUM_ENABLED
-	if (ts.HideTitle>0)
+	if (g_ts->HideTitle>0)
 		Style = Style & ~(WS_SYSMENU | WS_CAPTION |
 		                  WS_MINIMIZEBOX) | WS_BORDER | WS_POPUP;
 	else
 		Style = Style & ~WS_POPUP | WS_SYSMENU | WS_CAPTION |
 	                     WS_MINIMIZEBOX;
 #else
-	if (ts.HideTitle>0) {
+	if (g_ts->HideTitle>0) {
 		Style = (Style & ~(WS_SYSMENU | WS_CAPTION |
 						   WS_MINIMIZEBOX | WS_MAXIMIZEBOX)) | WS_BORDER | WS_POPUP;
 
-		if(ts.EtermLookfeel.BGNoFrame) {
+		if(g_ts->EtermLookfeel.BGNoFrame) {
 			Style   &= ~(WS_THICKFRAME | WS_BORDER);
 			ExStyle &= ~WS_EX_CLIENTEDGE;
 		}else{
@@ -3646,12 +3647,12 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 	               SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	::ShowWindow(HVTWin, SW_SHOW);
 
-	if ((ts.HideTitle==0) && (MainMenu==NULL) &&
-	    ((ts.MenuFlag & MF_NOSHOWMENU) == 0)) {
+	if ((g_ts->HideTitle==0) && (MainMenu==NULL) &&
+	    ((g_ts->MenuFlag & MF_NOSHOWMENU) == 0)) {
 		wchar_t *uimsg;
 		SysMenu = ::GetSystemMenu(HVTWin,FALSE);
 		AppendMenuA(SysMenu, MF_SEPARATOR, 0, NULL);
-		GetI18nStrWW("Tera Term", "MENU_SHOW_MENUBAR", L"Show menu &bar", ts.UILanguageFileW, &uimsg);
+		GetI18nStrWW("Tera Term", "MENU_SHOW_MENUBAR", L"Show menu &bar", g_ts->UILanguageFileW, &uimsg);
 		AppendMenuW(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
 		free(uimsg);
 	}
@@ -3662,18 +3663,18 @@ LRESULT CVTWindow::OnCommNotify(WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(lParam)) {
 		case FD_READ:  // TCP/IP
-			CommProcRRQ(&cv);
+			CommProcRRQ(g_cv);
 			break;
 		case FD_CLOSE:
-			if (cv.PortType == IdTCPIP) {
+			if (g_cv->PortType == IdTCPIP) {
 				if (TCPLocalEchoUsed) {
 					TCPLocalEchoUsed=FALSE;
-					ts.LocalEcho = ts.LocalEcho_ini;
+					g_ts->LocalEcho = g_ts->LocalEcho_ini;
 				}
 				if (TCPCRSendUsed) {
 					TCPCRSendUsed = FALSE;
-					ts.CRSend = ts.CRSend_ini;
-					cv.CRSend = ts.CRSend_ini;
+					g_ts->CRSend = g_ts->CRSend_ini;
+					g_cv->CRSend = g_ts->CRSend_ini;
 				}
 			}
 			if (!serail_reconnect->IsReconnecting()) {
@@ -3681,9 +3682,9 @@ LRESULT CVTWindow::OnCommNotify(WPARAM wParam, LPARAM lParam)
 			}
 			TCPIPClosed = TRUE;
 			// disable transmition
-			cv.OutBuffCount = 0;
-			cv.LineModeBuffCount = 0;
-			cv.FlushLen = 0;
+			g_cv->OutBuffCount = 0;
+			g_cv->LineModeBuffCount = 0;
+			g_cv->FlushLen = 0;
 			::SetTimer(m_hWnd, IdComEndTimer,1,NULL);
 			break;
 	}
@@ -3694,8 +3695,8 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 {
 	serail_reconnect->ResetAutoConnectPort();
 
-	CommStart(&cv,lParam,&ts);
-	if (ts.PortType == IdTCPIP && cv.RetryWithOtherProtocol == TRUE) {
+	CommStart(g_cv,lParam,g_ts);
+	if (g_ts->PortType == IdTCPIP && g_cv->RetryWithOtherProtocol == TRUE) {
 		Connecting = TRUE;
 	}
 	else {
@@ -3703,47 +3704,47 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 	}
 
 	ChangeTitle();
-	if (! cv.Ready) {
+	if (! g_cv->Ready) {
 		return 0;
 	}
 
 	/* Auto start logging or /L= option */
-	if (ts.LogAutoStart || ts.LogFNW != NULL) {
-		if (ts.LogFNW != NULL) {
+	if (g_ts->LogAutoStart || g_ts->LogFNW != NULL) {
+		if (g_ts->LogFNW != NULL) {
 			// "/L"= で指定されているとき(Auto start logging かもしれない)
 			//   指定ファイル名を展開する
-			wchar_t *LogFNW = FLogGetLogFilename(ts.LogFNW);
-			free(ts.LogFNW);
-			ts.LogFNW = LogFNW;
+			wchar_t *LogFNW = FLogGetLogFilename(g_ts->LogFNW);
+			free(g_ts->LogFNW);
+			g_ts->LogFNW = LogFNW;
 		}
 		else {
 			// Auto start logging のとき("/L"で指定されていないとき)
 			//   デフォルトのファイル名
-			ts.LogFNW = FLogGetLogFilename(NULL);
+			g_ts->LogFNW = FLogGetLogFilename(NULL);
 		}
-		WideCharToACP_t(ts.LogFNW, ts.LogFN, sizeof(ts.LogFN));
+		WideCharToACP_t(g_ts->LogFNW, g_ts->LogFN, sizeof(g_ts->LogFN));
 		if (!FLogIsOpend()) {
-			BOOL r = FLogOpen(ts.LogFNW, LOG_UTF8, FALSE);
-			if (r != TRUE && (ts.HideWindow != 1 && ts.Minimize != 1)) {
+			BOOL r = FLogOpen(g_ts->LogFNW, LOG_UTF8, FALSE);
+			if (r != TRUE && (g_ts->HideWindow != 1 && g_ts->Minimize != 1)) {
 				static const TTMessageBoxInfoW mbinfo = {
 					"Tera Term",
 					"MSG_TT_FILE_OPEN_ERROR", L"Tera Term: File open error",
 					"MSG_LOGFILE_WRITE_ERROR", L"Cannot write log file.\n%s",
 					MB_OK | MB_ICONERROR };
-				TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, ts.LogFNW);
+				TTMessageBoxW(m_hWnd, &mbinfo, g_ts->UILanguageFileW, g_ts->LogFNW);
 			}
 		}
 	}
 
-	if ((ts.PortType==IdTCPIP) &&
-	    ((ts.PortFlag & PF_BEEPONCONNECT) != 0)) {
+	if ((g_ts->PortType==IdTCPIP) &&
+	    ((g_ts->PortFlag & PF_BEEPONCONNECT) != 0)) {
 		MessageBeep(0);
 	}
 
-	if (cv.PortType==IdTCPIP) {
+	if (g_cv->PortType==IdTCPIP) {
 		InitTelnet();
 
-		if ((cv.TelFlag) && (ts.TCPPort==ts.TelPort)) {
+		if ((g_cv->TelFlag) && (g_ts->TCPPort==g_ts->TelPort)) {
 			// Start telnet option negotiation from this side
 			//   if telnet flag is set and port#==default telnet port# (23)
 			TelEnableMyOpt(TERMTYPE);
@@ -3752,13 +3753,13 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 
 			TelEnableMyOpt(SGA);
 
-			if (ts.TelEcho>0)
+			if (g_ts->TelEcho>0)
 				TelChangeEcho();
 			else
 				TelEnableHisOpt(ECHO);
 
 			TelEnableMyOpt(NAWS);
-			if (ts.TelBin>0) {
+			if (g_ts->TelBin>0) {
 				TelEnableMyOpt(BINARY);
 				TelEnableHisOpt(BINARY);
 			}
@@ -3767,15 +3768,15 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 
 			TelStartKeepAliveThread();
 		}
-		else if (!ts.DisableTCPEchoCR) {
-			if (ts.TCPCRSend>0) {
+		else if (!g_ts->DisableTCPEchoCR) {
+			if (g_ts->TCPCRSend>0) {
 				TCPCRSendUsed = TRUE;
-				ts.CRSend = ts.TCPCRSend;
-				cv.CRSend = ts.TCPCRSend;
+				g_ts->CRSend = g_ts->TCPCRSend;
+				g_cv->CRSend = g_ts->TCPCRSend;
 			}
-			if (ts.TCPLocalEcho>0) {
+			if (g_ts->TCPLocalEcho>0) {
 				TCPLocalEchoUsed = TRUE;
-				ts.LocalEcho = ts.TCPLocalEcho;
+				g_ts->LocalEcho = g_ts->TCPLocalEcho;
 			}
 		}
 	}
@@ -3788,9 +3789,9 @@ LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 LRESULT CVTWindow::OnCommStart(WPARAM wParam, LPARAM lParam)
 {
 	// 自動接続が無効のときも接続ダイアログを出すようにした (2006.9.15 maya)
-	if (((ts.PortType!=IdSerial) && (GetConnectHostName()[0]==0)) ||
-	    ((ts.PortType==IdSerial) && (ts.ComAutoConnect == FALSE))) {
-		if (ts.HostDialogOnStartup) {
+	if (((g_ts->PortType!=IdSerial) && (GetConnectHostName()[0]==0)) ||
+	    ((g_ts->PortType==IdSerial) && (g_ts->ComAutoConnect == FALSE))) {
+		if (g_ts->HostDialogOnStartup) {
 			OnFileNewConnection();
 		}
 		else {
@@ -3800,13 +3801,13 @@ LRESULT CVTWindow::OnCommStart(WPARAM wParam, LPARAM lParam)
 	else {
 		Connecting = TRUE;
 		ChangeTitle();
-		if (ts.AutoComPortReconnect && ts.WaitCom && ts.PortType == IdSerial) {
-			if (CheckComPort(ts.ComPort) == 0) {
-				serail_reconnect->SetAutoConnectPort(ts.ComPort);
+		if (g_ts->AutoComPortReconnect && g_ts->WaitCom && g_ts->PortType == IdSerial) {
+			if (CheckComPort(g_ts->ComPort) == 0) {
+				serail_reconnect->SetAutoConnectPort(g_ts->ComPort);
 				return 0;
 			}
 		}
-		CommOpen(HVTWin,&ts,&cv);
+		CommOpen(HVTWin,g_ts,g_cv);
 	}
 	return 0;
 }
@@ -3823,7 +3824,7 @@ LRESULT CVTWindow::OnDdeEnd(WPARAM wParam, LPARAM lParam)
 LRESULT CVTWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 {
 	DWORD help_id = (wParam == 0) ? HelpId : (DWORD)wParam;
-	OpenHelpCV(&cv, HH_HELP_CONTEXT, help_id);
+	OpenHelpCV(g_cv, HH_HELP_CONTEXT, help_id);
 	return 0;
 }
 
@@ -3860,7 +3861,7 @@ LRESULT CVTWindow::OnChangeTitle(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 {
-	Notify2Event((NotifyIcon *)cv.NotifyIcon, wParam, lParam);
+	Notify2Event((NotifyIcon *)g_cv->NotifyIcon, wParam, lParam);
 
 	if (lParam == NIN_BALLOONUSERCLICK) {
 		::SetForegroundWindow(m_hWnd);
@@ -3874,7 +3875,7 @@ LRESULT CVTWindow::OnIdleTimer(WPARAM wParam, LPARAM lParam)
 	// TalkStatus が IdTalkSendMem の状態で連続して OnIdle() を呼びだすと
 	// ファイル転送ダイアログと VTwindow の操作がままならなくなるため、
 	// TalkStatus が IdTalkKeyb か IdTalkQuiet の場合のみ OnIdle() を呼びだす。
-	if (cv.PortType == IdSerial && (TalkStatus == IdTalkKeyb || TalkStatus == IdTalkQuiet)) {
+	if (g_cv->PortType == IdSerial && (TalkStatus == IdTalkKeyb || TalkStatus == IdTalkQuiet)) {
 		int i = IdleLoopCount;
 		while (OnIdle(0)) {
 			if (--i <= 0) {
@@ -3909,64 +3910,64 @@ void CVTWindow::OnFileNewConnection()
 	wchar_t hostname[HostNameMaxLength];
 	hostname[0] = 0;
 	TGetHNRec GetHNRec; /* record for dialog box */
-	GetHNRec.SetupFN = ts.SetupFName;
-	GetHNRec.SetupFNW = ts.SetupFNameW;
-	GetHNRec.PortType = ts.PortType;
-	GetHNRec.Telnet = ts.Telnet;
-	GetHNRec.TelPort = ts.TelPort;
-	GetHNRec.TCPPort = ts.TCPPort;
-	GetHNRec.ProtocolFamily = ts.ProtocolFamily;
-	GetHNRec.ComPort = ts.ComPort;
-	GetHNRec.MaxComPort = ts.MaxComPort;
+	GetHNRec.SetupFN = g_ts->SetupFName;
+	GetHNRec.SetupFNW = g_ts->SetupFNameW;
+	GetHNRec.PortType = g_ts->PortType;
+	GetHNRec.Telnet = g_ts->Telnet;
+	GetHNRec.TelPort = g_ts->TelPort;
+	GetHNRec.TCPPort = g_ts->TCPPort;
+	GetHNRec.ProtocolFamily = g_ts->ProtocolFamily;
+	GetHNRec.ComPort = g_ts->ComPort;
+	GetHNRec.MaxComPort = g_ts->MaxComPort;
 	GetHNRec.HostName = hostname;
 
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
+				  g_ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	BOOL r = (*GetHostName)(HVTWin,&GetHNRec);
 
 	if (r) {
 		if ((GetHNRec.PortType==IdTCPIP) && LoadTTSET()) {
-			if (ts.HistoryList) {
-				(*AddHostToList)(ts.SetupFNameW, hostname);
+			if (g_ts->HistoryList) {
+				(*AddHostToList)(g_ts->SetupFNameW, hostname);
 			}
-			if (ts.JumpList) {
+			if (g_ts->JumpList) {
 				add_session_to_jumplist(hostname, GetHNRec.SetupFNW);
 			}
 			FreeTTSET();
 		}
 
 		static const wchar_t *ttermpro = L"ttermpro";
-		if (! cv.Ready) {
-			ts.PortType = GetHNRec.PortType;
-			ts.Telnet = GetHNRec.Telnet;
-			ts.TCPPort = GetHNRec.TCPPort;
-			ts.ProtocolFamily = GetHNRec.ProtocolFamily;
-			ts.ComPort = GetHNRec.ComPort;
+		if (! g_cv->Ready) {
+			g_ts->PortType = GetHNRec.PortType;
+			g_ts->Telnet = GetHNRec.Telnet;
+			g_ts->TCPPort = GetHNRec.TCPPort;
+			g_ts->ProtocolFamily = GetHNRec.ProtocolFamily;
+			g_ts->ComPort = GetHNRec.ComPort;
 
 			if ((GetHNRec.PortType==IdTCPIP) && LoadTTSET()) {
 				wchar_t *command = NULL;
-				wchar_t *prev_setup = _wcsdup(ts.SetupFNameW);
+				wchar_t *prev_setup = _wcsdup(g_ts->SetupFNameW);
 				awcscats(&command, ttermpro, L" ", hostname, NULL);
-				(*ParseParam)(command, &ts, NULL);
+				(*ParseParam)(command, g_ts, NULL);
 				free(command);
-				if (prev_setup != NULL && _wcsicmp(prev_setup, ts.SetupFNameW) != 0) {
+				if (prev_setup != NULL && _wcsicmp(prev_setup, g_ts->SetupFNameW) != 0) {
 					// /F= で設定ファイルが読み直された。色,フォント,メニューを表示へ再適用する
-					DispApplySetup(vt_src, &ts);
+					DispApplySetup(vt_src, g_ts);
 				}
 				free(prev_setup);
 				FreeTTSET();
 			}
 			SetKeyMap();
-			BGLoadThemeFile(vt_src, &ts);
-			if (ts.MacroFNW != NULL && ts.MacroFNW[0] != 0) {
-				RunMacroW(ts.MacroFNW,TRUE);
-				free(ts.MacroFNW);
-				ts.MacroFNW = NULL;
+			BGLoadThemeFile(vt_src, g_ts);
+			if (g_ts->MacroFNW != NULL && g_ts->MacroFNW[0] != 0) {
+				RunMacroW(g_ts->MacroFNW,TRUE);
+				free(g_ts->MacroFNW);
+				g_ts->MacroFNW = NULL;
 			}
 			else {
 				Connecting = TRUE;
 				ChangeTitle();
-				CommOpen(HVTWin,&ts,&cv);
+				CommOpen(HVTWin,g_ts,g_cv);
 			}
 			ResetSetup();
 		}
@@ -4006,7 +4007,7 @@ void CVTWindow::OnFileNewConnection()
 		}
 	}
 	else {/* canceled */
-		if (! cv.Ready) {
+		if (! g_cv->Ready) {
 			SetDdeComReady(0);
 		}
 	}
@@ -4020,7 +4021,7 @@ static void CygtermPortRange(int *start, int *range)
 	int cygterm_PORT_START = 20000;
 	int cygterm_PORT_RANGE = 40;
 
-	aswprintf(&cygterm_cfg, L"%s\\cygterm.cfg", ts.HomeDirW);
+	aswprintf(&cygterm_cfg, L"%s\\cygterm.cfg", g_ts->HomeDirW);
 	_wfopen_s(&fp, cygterm_cfg, L"r");
 	free(cygterm_cfg);
 	if (fp != NULL) {
@@ -4056,8 +4057,8 @@ static BOOL IsCygterm()
 	CygtermPortRange(&cygterm_PORT_START, &cygterm_PORT_RANGE);
 
 	// Cygterm のポート範囲内かどうか
-	if (ts.TCPPort < cygterm_PORT_START ||
-	    ts.TCPPort > cygterm_PORT_START+cygterm_PORT_RANGE) {
+	if (g_ts->TCPPort < cygterm_PORT_START ||
+	    g_ts->TCPPort > cygterm_PORT_START+cygterm_PORT_RANGE) {
 		return 0;
 	}
 
@@ -4080,7 +4081,7 @@ void CVTWindow::OnDuplicateSession()
 		return;
 	}
 
-	if (!cv.TelFlag && !cv.isSSH) {
+	if (!g_cv->TelFlag && !g_cv->isSSH) {
 		// telnet/ssh/cygwin接続以外では複製を行わない。
 		return;
 	}
@@ -4090,7 +4091,7 @@ void CVTWindow::OnDuplicateSession()
 	//	 "/DUPLICATE" オプション付きで起動すると
 	//	 CopyShmemToTTSet()で共有メモリから設定にリストアされる。
 	//	 /F= でINIファイルを指定しても、"/DUPLICATE" オプションのほうが優先される
-	CopyTTSetToShmem(&ts);
+	CopyTTSetToShmem(g_ts);
 
 	const char *exec = "ttermpro";			// 仮実行ファイル名
 	wchar_t ExecOption[1024];			    // ttermpro.exe の引数(起動時オプション)
@@ -4100,11 +4101,11 @@ void CVTWindow::OnDuplicateSession()
 	// セッションの複製を示すオプション
 	wcscpy_s(ExecOption, _countof(ExecOption), L"/DUPLICATE");
 
-	if (cv.TelFlag) {
+	if (g_cv->TelFlag) {
 		// telnet
 		connect_option = L"/nossh";
 
-	} else if (cv.isSSH) {
+	} else if (g_cv->isSSH) {
 		// SSH
 		// SSHの時は、プラグインにオプション生成してもらう
 		// TTSSH は "/DUPLICATE" を見て自動ログイン用オプションを追記する
@@ -4125,23 +4126,23 @@ void CVTWindow::OnDuplicateSession()
 		assert(FALSE);
 	}
 
-	if (ts.KeyCnfFNW != NULL) {
+	if (g_ts->KeyCnfFNW != NULL) {
 		wcsncat_s(ExecOption, _countof(ExecOption), L" /K=", _TRUNCATE);
-		wcsncat_s(ExecOption, _countof(ExecOption), ts.KeyCnfFNW, _TRUNCATE);
+		wcsncat_s(ExecOption, _countof(ExecOption), g_ts->KeyCnfFNW, _TRUNCATE);
 	}
 
 	wchar_t *setup_def = GetDefaultSetupFNameW(NULL);
-	if (wcscmp(setup_def, ts.SetupFNameW) != 0) {
+	if (wcscmp(setup_def, g_ts->SetupFNameW) != 0) {
 		// INIファイルがデフォルトと異なっている、/F= で指定する
 		wcsncat_s(ExecOption, _countof(ExecOption), L" /F=", _TRUNCATE);
-		wcsncat_s(ExecOption, _countof(ExecOption), ts.SetupFNameW, _TRUNCATE);
+		wcsncat_s(ExecOption, _countof(ExecOption), g_ts->SetupFNameW, _TRUNCATE);
 	}
 	free(setup_def);
 
 	wchar_t *hostnameW = _wcsdup(GetConnectHostName());
 	TTDupInfo info = {};
 	info.szHostName = hostnameW;
-	info.port = ts.TCPPort;
+	info.port = g_ts->TCPPort;
 	info.szConnectOption = connect_option;
 	info.szExecOption = ExecOption;
 	info.mode = TTDUP_COMMANDLINE;
@@ -4154,7 +4155,7 @@ void CVTWindow::OnDuplicateSession()
 			"MSG_EXEC_TT_ERROR", L"Can't execute Tera Term. (%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, e);
+		TTMessageBoxW(HVTWin, &info, g_ts->UILanguageFileW, e);
 	}
 }
 
@@ -4163,7 +4164,7 @@ void CVTWindow::OnDuplicateSession()
 //
 void CVTWindow::OnCygwinConnection()
 {
-	wchar_t *CygwinDirectory = ToWcharA(ts.CygwinDirectory);
+	wchar_t *CygwinDirectory = ToWcharA(g_ts->CygwinDirectory);
 	DWORD e = CygwinConnect(CygwinDirectory, NULL);
 	free(CygwinDirectory);
 	switch(e) {
@@ -4176,7 +4177,7 @@ void CVTWindow::OnCygwinConnection()
 			"MSG_FIND_CYGTERM_DIR_ERROR", L"Can't find Cygwin directory.",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+		TTMessageBoxW(HVTWin, &info, g_ts->UILanguageFileW);
 		break;
 	}
 	case ERROR_NOT_ENOUGH_MEMORY: {
@@ -4186,7 +4187,7 @@ void CVTWindow::OnCygwinConnection()
 			"MSG_CYGTERM_ENV_ALLOC_ERROR", L"Can't allocate memory for environment variable.",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+		TTMessageBoxW(HVTWin, &info, g_ts->UILanguageFileW);
 		break;
 	}
 	case ERROR_OPEN_FAILED:
@@ -4197,7 +4198,7 @@ void CVTWindow::OnCygwinConnection()
 			"MSG_EXEC_CYGTERM_ERROR", L"Can't execute Cygterm.",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+		TTMessageBoxW(HVTWin, &info, g_ts->UILanguageFileW);
 		break;
 	}
 	}
@@ -4218,18 +4219,18 @@ void CVTWindow::OnTTMenuLaunch()
 			"MSG_EXEC_TTMENU_ERROR", L"Can't execute TeraTerm Menu. (%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, e);
+		TTMessageBoxW(HVTWin, &info, g_ts->UILanguageFileW, e);
 	}
 }
 
 void CVTWindow::OnFileLog()
 {
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
+				  g_ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	FLogDlgInfo_t info;
 	info.filename = NULL;
-	info.pts = &ts;
-	info.pcv = &cv;
+	info.pts = g_ts;
+	info.pcv = g_cv;
 	BOOL r = FLogOpenDialog(hInst, m_hWnd, &info);
 	if (r) {
 		const wchar_t *filename = info.filename;
@@ -4243,7 +4244,7 @@ void CVTWindow::OnFileLog()
 				// 現在バッファにあるデータをすべて書き出してから、
 				// ログ採取を開始する。
 				// (2013.9.29 yutaka)
-				if (ts.LogAllBuffIncludedInFirst) {
+				if (g_ts->LogAllBuffIncludedInFirst) {
 					FLogOutputAllBuffer();
 				}
 			}
@@ -4256,7 +4257,7 @@ void CVTWindow::OnFileLog()
 				"MSG_LOGFILE_WRITE_ERROR", L"Cannot write log file.\n%s",
 				MB_OK | MB_ICONERROR
 			};
-			TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, filename);
+			TTMessageBoxW(m_hWnd, &mbinfo, g_ts->UILanguageFileW, filename);
 		}
 		free(info.filename);
 	}
@@ -4272,12 +4273,12 @@ void CVTWindow::OnCommentToLog()
 			"MSG_COMMENT_LOG_OPEN_ERROR", L"It is not opened by the log file yet.",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+		TTMessageBoxW(HVTWin, &info, g_ts->UILanguageFileW);
 		return;
 	}
 
 	wchar_t *comment;
-	INT_PTR r = CommentDlg(m_hInst, HVTWin, &ts, &comment);
+	INT_PTR r = CommentDlg(m_hInst, HVTWin, g_ts, &comment);
 	if (r == IDOK && comment != NULL && comment[0] != 0) {
 		FLogWriteStr(comment);
 		FLogWriteStr(L"\n");		// TODO 改行コード
@@ -4293,7 +4294,7 @@ void CVTWindow::OnViewLog()
 	}
 
 	const wchar_t *filename = FLogGetFilename();
-	DWORD e = TTCreateProcess(ts.ViewlogEditorW, ts.ViewlogEditorArg, filename);
+	DWORD e = TTCreateProcess(g_ts->ViewlogEditorW, g_ts->ViewlogEditorArg, filename);
 	if (e != NO_ERROR) {
 		DWORD error = GetLastError();
 		static const TTMessageBoxInfoW mbinfo = {
@@ -4302,7 +4303,7 @@ void CVTWindow::OnViewLog()
 			"MSG_VIEW_LOGFILE_ERROR", L"Can't view logging file. (%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(m_hWnd, &mbinfo, ts.UILanguageFileW, error);
+		TTMessageBoxW(m_hWnd, &mbinfo, g_ts->UILanguageFileW, error);
 	}
 }
 
@@ -4338,8 +4339,8 @@ void CVTWindow::OnReplayLog()
 	static const wchar_t *exec = L"ttermpro.exe";
 
 	// バイナリモードで採取したログファイルを選択する
-	wchar_t *filter = _get_lang_msg("FILEDLG_OPEN_LOGFILE_FILTER", L"all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW);
-	wchar_t *title = _get_lang_msg("FILEDLG_OPEN_LOGFILE_TITLE", L"Select replay log file with binary mode", ts.UILanguageFileW);
+	wchar_t *filter = _get_lang_msg("FILEDLG_OPEN_LOGFILE_FILTER", L"all(*.*)\\0*.*\\0\\0", g_ts->UILanguageFileW);
+	wchar_t *title = _get_lang_msg("FILEDLG_OPEN_LOGFILE_TITLE", L"Select replay log file with binary mode", g_ts->UILanguageFileW);
 	TTOPENFILENAMEW ofn = {};
 	ofn.hwndOwner = HVTWin;
 	ofn.lpstrFilter = filter;
@@ -4368,26 +4369,26 @@ void CVTWindow::OnReplayLog()
 			"MSG_EXEC_TT_ERROR", L"Can't execute Tera Term. (%d)",
 			MB_OK | MB_ICONWARNING
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, e);
+		TTMessageBoxW(HVTWin, &info, g_ts->UILanguageFileW, e);
 	}
 }
 
 void CVTWindow::OnFileSend()
 {
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
+	SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
+				  g_ts->UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
 	sendfiledlgdata data = {};
-	data.UILanguageFileW = ts.UILanguageFileW;
-	wchar_t *filterW = ToWcharA(ts.FileSendFilter);
+	data.UILanguageFileW = g_ts->UILanguageFileW;
+	wchar_t *filterW = ToWcharA(g_ts->FileSendFilter);
 	data.filesend_filter = filterW;
-	wchar_t *initial_dir = GetFileDir(&ts);
+	wchar_t *initial_dir = GetFileDir(g_ts);
 	data.initial_dir = initial_dir;
-	data.skip_dialog = (BOOL)ts.SendfileSkipOptionDialog;
-	data.binary = ts.TransBin;
-	data.delay_type = (SendMemDelayType)ts.SendfileDelayType;
-	data.delay_tick = ts.SendfileDelayTick;
-	data.send_size = ts.SendfileSize;
-	data.sequential_read = ts.SendfileSequential;
+	data.skip_dialog = (BOOL)g_ts->SendfileSkipOptionDialog;
+	data.binary = g_ts->TransBin;
+	data.delay_type = (SendMemDelayType)g_ts->SendfileDelayType;
+	data.delay_tick = g_ts->SendfileDelayTick;
+	data.send_size = g_ts->SendfileSize;
+	data.sequential_read = g_ts->SendfileSequential;
 
 	INT_PTR ok = sendfiledlg(m_hInst, m_hWnd, &data);
 	free(initial_dir);
@@ -4395,17 +4396,17 @@ void CVTWindow::OnFileSend()
 	if (ok != IDOK) {
 		return;
 	}
-	ts.SendfileSkipOptionDialog = data.skip_dialog;
-	ts.TransBin = data.binary;
-	ts.SendfileDelayType = data.delay_type;
-	ts.SendfileDelayTick = data.delay_tick;
-	ts.SendfileSize = data.send_size;
-	ts.SendfileSequential = data.sequential_read;
+	g_ts->SendfileSkipOptionDialog = data.skip_dialog;
+	g_ts->TransBin = data.binary;
+	g_ts->SendfileDelayType = data.delay_type;
+	g_ts->SendfileDelayTick = data.delay_tick;
+	g_ts->SendfileSize = data.send_size;
+	g_ts->SendfileSequential = data.sequential_read;
 
 	wchar_t *filename = data.filename;
 	if (!data.sequential_read) {
 		// new file send
-		SendMemSendFile(filename, data.binary, data.delay_type, data.delay_tick, data.send_size, ts.LocalEcho);
+		SendMemSendFile(filename, data.binary, data.delay_type, data.delay_tick, data.send_size, g_ts->LocalEcho);
 	}
 	else {
 		// file send same as teraterm 4
@@ -4417,17 +4418,17 @@ void CVTWindow::OnFileSend()
 
 void CVTWindow::OnFileRecv()
 {
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
+	SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
+				  g_ts->UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
 	recvfiledlgdata data = {};
-	data.UILanguageFileW = ts.UILanguageFileW;
-	wchar_t *filterW = ToWcharA(ts.FileReceiveFilter);
+	data.UILanguageFileW = g_ts->UILanguageFileW;
+	wchar_t *filterW = ToWcharA(g_ts->FileReceiveFilter);
 	data.filerecv_filter = filterW;
-	wchar_t *initial_dir = GetFileDir(&ts);
+	wchar_t *initial_dir = GetFileDir(g_ts);
 	data.initial_dir = initial_dir;
-	data.skip_dialog = (BOOL)ts.ReceivefileSkipOptionDialog;
+	data.skip_dialog = (BOOL)g_ts->ReceivefileSkipOptionDialog;
 	data.binary = TRUE;											// バイナリモード固定
-	data.autostop_sec = ts.ReceivefileAutoStopWaitTime;
+	data.autostop_sec = g_ts->ReceivefileAutoStopWaitTime;
 
 	INT_PTR ok = recvfiledlg(m_hInst, m_hWnd, &data);
 	free(initial_dir);
@@ -4435,12 +4436,12 @@ void CVTWindow::OnFileRecv()
 	if (ok != IDOK) {
 		return;
 	}
-	ts.ReceivefileSkipOptionDialog = data.skip_dialog;
-	ts.TransBin = data.binary;
-	ts.ReceivefileAutoStopWaitTime = data.autostop_sec;
+	g_ts->ReceivefileSkipOptionDialog = data.skip_dialog;
+	g_ts->TransBin = data.binary;
+	g_ts->ReceivefileAutoStopWaitTime = data.autostop_sec;
 
 	wchar_t *filename = data.filename;
-	RawStartReceive(filename, ts.ReceivefileAutoStopWaitTime, FALSE);
+	RawStartReceive(filename, g_ts->ReceivefileAutoStopWaitTime, FALSE);
 	free(filename);
 }
 
@@ -4536,12 +4537,12 @@ void CVTWindow::OnFilePrint()
 
 void CVTWindow::Disconnect(BOOL confirm)
 {
-	if (! cv.Ready) {
+	if (! g_cv->Ready) {
 		return;
 	}
 
-	if ((cv.PortType==IdTCPIP) &&
-	    ((ts.PortFlag & PF_CONFIRMDISCONN) != 0) &&
+	if ((g_cv->PortType==IdTCPIP) &&
+	    ((g_ts->PortFlag & PF_CONFIRMDISCONN) != 0) &&
 	    (confirm)) {
 		static const TTMessageBoxInfoW info = {
 			"Tera Term",
@@ -4549,7 +4550,7 @@ void CVTWindow::Disconnect(BOOL confirm)
 			"MSG_DISCONNECT_CONF", L"Disconnect?",
 			MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2
 		};
-		int result = TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+		int result = TTMessageBoxW(HVTWin, &info, g_ts->UILanguageFileW);
 		if (result == IDCANCEL) {
 			return;
 		}
@@ -4667,7 +4668,7 @@ void CVTWindow::OnFileExportBuffer()
 			"MSG_EXPORTBUFFER_ERROR", L"Could not write the text file.",
 			MB_OK | MB_ICONEXCLAMATION
 		};
-		TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
+		TTMessageBoxW(m_hWnd, &info, g_ts->UILanguageFileW);
 	}
 }
 
@@ -4782,7 +4783,7 @@ void CVTWindow::SetColor()
 			"MSG_TT_NOTICE", L"Tera Term: Notice",
 			NULL, L"Theme is used\nDo you want to set color?",
 			MB_ICONQUESTION | MB_YESNO };
-		int r = TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
+		int r = TTMessageBoxW(m_hWnd, &info, g_ts->UILanguageFileW);
 		if (r == IDNO) {
 			set_color = FALSE;
 		}
@@ -4865,13 +4866,13 @@ void CVTWindow::OnSetupGeneral()
  */
 void CVTWindow::OnSetupDarkMode()
 {
-	ts.DarkMode = !DarkModeIsEnabled();
-	DarkModeSetEnabled(ts.DarkMode);
+	g_ts->DarkMode = !DarkModeIsEnabled();
+	DarkModeSetEnabled(g_ts->DarkMode);
 	DarkModeApplyToWindow(m_hWnd);
 	if (HTEKWin != NULL) {
 		DarkModeApplyToWindow(HTEKWin);
 	}
-	if (SetDarkTerminalColors(&ts, ts.DarkMode)) {
+	if (SetDarkTerminalColors(g_ts, g_ts->DarkMode)) {
 		DispResetColor(vt_src, CS_ALL);
 		::InvalidateRect(m_hWnd, NULL, FALSE);
 	}
@@ -4879,7 +4880,7 @@ void CVTWindow::OnSetupDarkMode()
 
 void CVTWindow::OnSetupSave()
 {
-	PTTSet pts = &ts;
+	PTTSet pts = g_ts;
 	const wchar_t *UILanguageFileW = pts->UILanguageFileW;
 
 	wchar_t *filter = _get_lang_msg("FILEDLG_SETUP_FILTER",
@@ -4911,13 +4912,13 @@ void CVTWindow::OnSetupSave()
 	}
 
 	// ファイル名を入れ替える
-	wchar_t *PrevSetupFNW = _wcsdup(ts.SetupFNameW);	// 前のファイルを覚えておく
+	wchar_t *PrevSetupFNW = _wcsdup(g_ts->SetupFNameW);	// 前のファイルを覚えておく
 	free(pts->SetupFNameW);
 	pts->SetupFNameW = _wcsdup(NameW);
 	WideCharToACP_t(pts->SetupFNameW, pts->SetupFName, sizeof(pts->SetupFName));
 
 	// 書き込みできるか?
-	const DWORD attr = GetFileAttributesW(ts.SetupFNameW);
+	const DWORD attr = GetFileAttributesW(g_ts->SetupFNameW);
 	if ((attr & FILE_ATTRIBUTE_DIRECTORY ) == 0 && (attr & FILE_ATTRIBUTE_READONLY) != 0) {
 		// フォルダではなく、読み取り専用だった場合
 		static const TTMessageBoxInfoW info = {
@@ -4926,7 +4927,7 @@ void CVTWindow::OnSetupSave()
 			"MSG_SAVESETUP_PERMISSION_ERROR", L"TERATERM.INI file doesn't have the writable permission.",
 			MB_OK|MB_ICONEXCLAMATION
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+		TTMessageBoxW(HVTWin, &info, g_ts->UILanguageFileW);
 		free(PrevSetupFNW);
 		return;
 	}
@@ -4937,30 +4938,30 @@ void CVTWindow::OnSetupSave()
 
 #ifdef WINDOW_MAXMIMUM_ENABLED
 		if (::IsZoomed(m_hWnd)) {
-			w = ts.TerminalWidth;
-			h = ts.TerminalHeight;
-			ts.TerminalWidth = ts.TerminalOldWidth;
-			ts.TerminalHeight = ts.TerminalOldHeight;
+			w = g_ts->TerminalWidth;
+			h = g_ts->TerminalHeight;
+			g_ts->TerminalWidth = g_ts->TerminalOldWidth;
+			g_ts->TerminalHeight = g_ts->TerminalOldHeight;
 		}
 #endif
 
-		if (wcscmp(PrevSetupFNW, ts.SetupFNameW) == 0) {
+		if (wcscmp(PrevSetupFNW, g_ts->SetupFNameW) == 0) {
 			// 同名ファイルへ書き込み(上書き)
-			if (ts.IniAutoBackup) {
+			if (g_ts->IniAutoBackup) {
 				// バックアップを作成
-				CreateBakupFile(ts.SetupFNameW, NULL);
+				CreateBakupFile(g_ts->SetupFNameW, NULL);
 			}
 		}
 		else {
 			// 異なるファイルへ書き込み
-			CopyFileW(PrevSetupFNW, ts.SetupFNameW, TRUE);
+			CopyFileW(PrevSetupFNW, g_ts->SetupFNameW, TRUE);
 		}
 
-		if (GetFileAttributesW(ts.SetupFNameW) == INVALID_FILE_ATTRIBUTES) {
+		if (GetFileAttributesW(g_ts->SetupFNameW) == INVALID_FILE_ATTRIBUTES) {
 			// ファイルがない
 			// UTF16LE BOMだけのiniファイルを作成
 			FILE *fp;
-			_wfopen_s(&fp, ts.SetupFNameW, L"wb");
+			_wfopen_s(&fp, g_ts->SetupFNameW, L"wb");
 			if (fp != NULL) {
 				fwrite("\xff\xfe", 2, 1, fp);	// BOM
 				fclose(fp);
@@ -4969,22 +4970,22 @@ void CVTWindow::OnSetupSave()
 		else {
 			// ファイルが存在する
 			// iniファイルの文字コードを変更する
-			ConvertIniFileCharCode(ts.SetupFNameW, NULL);
+			ConvertIniFileCharCode(g_ts->SetupFNameW, NULL);
 		}
 
 		/* write current setup values to file */
-		(*WriteIniFile)(ts.SetupFNameW, &ts);
+		(*WriteIniFile)(g_ts->SetupFNameW, g_ts);
 		/* copy host list */
-		(*CopyHostList)(PrevSetupFNW, ts.SetupFNameW);
-		PluginWriteList(ts.SetupFNameW);
+		(*CopyHostList)(PrevSetupFNW, g_ts->SetupFNameW);
+		PluginWriteList(g_ts->SetupFNameW);
 		FreeTTSET();
 		free(PrevSetupFNW);
 		PrevSetupFNW = NULL;
 
 #ifdef WINDOW_MAXMIMUM_ENABLED
 		if (::IsZoomed(m_hWnd)) {
-			ts.TerminalWidth = w;
-			ts.TerminalHeight = h;
+			g_ts->TerminalWidth = w;
+			g_ts->TerminalHeight = h;
 		}
 #endif
 	}
@@ -4992,12 +4993,12 @@ void CVTWindow::OnSetupSave()
 
 void CVTWindow::OnSetupRestore()
 {
-	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
+	const wchar_t *UILanguageFileW = g_ts->UILanguageFileW;
 	wchar_t *FNameFilter = _get_lang_msg("FILEDLG_SETUP_FILTER", L"setup files (*.ini)\\0*.ini\\0\\0", UILanguageFileW);
 
 	TTOPENFILENAMEW ofn = {};
 	ofn.hwndOwner   = m_hWnd;
-	ofn.lpstrFile   = ts.SetupFNameW;
+	ofn.lpstrFile   = g_ts->SetupFNameW;
 	ofn.lpstrFilter = FNameFilter;
 	ofn.nFilterIndex = 1;
 	ofn.hInstance = hInst;
@@ -5013,9 +5014,9 @@ void CVTWindow::OnSetupRestore()
 	free((void *)ofn.lpstrTitle);
 
 	if (Ok) {
-		free(ts.SetupFNameW);
-		ts.SetupFNameW = filename;
-		WideCharToACP_t(ts.SetupFNameW, ts.SetupFName, sizeof(ts.SetupFName));
+		free(g_ts->SetupFNameW);
+		g_ts->SetupFNameW = filename;
+		WideCharToACP_t(g_ts->SetupFNameW, g_ts->SetupFName, sizeof(g_ts->SetupFName));
 
 		RestoreSetup();
 	}
@@ -5027,20 +5028,20 @@ void CVTWindow::OnSetupRestore()
 //
 void CVTWindow::OnOpenSetupDirectory()
 {
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
-	SetupDirectoryDialog(m_hInst, HVTWin, &cv);
+	SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
+				  g_ts->UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
+	SetupDirectoryDialog(m_hInst, HVTWin, g_cv);
 }
 
 void CVTWindow::OnSetupLoadKeyMap()
 {
-	const wchar_t *UILanguageFileW = ts.UILanguageFileW;
+	const wchar_t *UILanguageFileW = g_ts->UILanguageFileW;
 	wchar_t *FNameFilter =
 		_get_lang_msg("FILEDLG_KEYBOARD_FILTER", L"keyboard setup files (*.cnf)\\0*.cnf\\0\\0", UILanguageFileW);
 
 	TTOPENFILENAMEW ofn = {};
 	ofn.hwndOwner = m_hWnd;
-	ofn.lpstrFile   = ts.KeyCnfFNW;
+	ofn.lpstrFile   = g_ts->KeyCnfFNW;
 	ofn.lpstrFilter = FNameFilter;
 	ofn.nFilterIndex = 1;
 	ofn.hInstance = hInst;
@@ -5056,8 +5057,8 @@ void CVTWindow::OnSetupLoadKeyMap()
 	free((void *)ofn.lpstrTitle);
 
 	if (Ok) {
-		free(ts.KeyCnfFNW);
-		ts.KeyCnfFNW = NameW;
+		free(g_ts->KeyCnfFNW);
+		g_ts->KeyCnfFNW = NameW;
 
 		// load key map
 		SetKeyMap();
@@ -5078,32 +5079,32 @@ void CVTWindow::OnControlResetTerminal()
 	RButton = FALSE;
 
 	Hold = FALSE;
-	CommLock(&ts,&cv,FALSE);
+	CommLock(g_ts,g_cv,FALSE);
 
 	KeybEnabled  = TRUE;
 }
 
 void CVTWindow::OnControlResetRemoteTitle()
 {
-	free(cv.TitleRemoteW);
-	cv.TitleRemoteW = NULL;
+	free(g_cv->TitleRemoteW);
+	g_cv->TitleRemoteW = NULL;
 	ChangeTitle();
 }
 
 void CVTWindow::OnControlAreYouThere()
 {
-	if (cv.Ready && (cv.PortType==IdTCPIP) && cv.TelFlag) {
+	if (g_cv->Ready && (g_cv->PortType==IdTCPIP) && g_cv->TelFlag) {
 		TelSendAYT();
 	}
 }
 
 void CVTWindow::OnControlSendBreak()
 {
-	if (cv.Ready)
-		switch (cv.PortType) {
+	if (g_cv->Ready)
+		switch (g_cv->PortType) {
 			case IdTCPIP:
 				// SSH2接続の場合、専用のブレーク信号を送信する。(2010.9.28 yutaka)
-				if (cv.isSSH == 2) {
+				if (g_cv->isSSH == 2) {
 					if (TTXProcessCommand(HVTWin, ID_CONTROL_SENDBREAK)) {
 						break;
 					}
@@ -5112,14 +5113,14 @@ void CVTWindow::OnControlSendBreak()
 				TelSendBreak();
 				break;
 			case IdSerial:
-				CommSendBreak(&cv, ts.SendBreakTime);
+				CommSendBreak(g_cv, g_ts->SendBreakTime);
 				break;
 		}
 }
 
 void CVTWindow::OnControlResetPort()
 {
-	CommResetSerial(&ts, &cv, TRUE);
+	CommResetSerial(g_ts, g_cv, TRUE);
 }
 
 void CVTWindow::OnControlBroadcastCommand(void)
@@ -5130,11 +5131,11 @@ void CVTWindow::OnControlBroadcastCommand(void)
 // WM_COPYDATAの受信
 LRESULT CVTWindow::OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam)
 {
-	if (!cv.Ready) {
+	if (!g_cv->Ready) {
 		return 0;
 	}
 
-	if (!ts.AcceptBroadcast) { // 337: 2007/03/20
+	if (!g_ts->AcceptBroadcast) { // 337: 2007/03/20
 		return 0;
 	}
 
@@ -5184,8 +5185,8 @@ void CVTWindow::OnWindowWindow()
 	if (! LoadTTDLG()) {
 		return;
 	}
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
+				  g_ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	(*WindowWindow)(HVTWin,&Close);
 	if (Close) {
 		OnClose();
@@ -5224,7 +5225,7 @@ void CVTWindow::OnWindowUndo()
 
 void CVTWindow::OnHelpIndex()
 {
-	OpenHelpCV(&cv, HH_DISPLAY_TOPIC, 0);
+	OpenHelpCV(g_cv, HH_DISPLAY_TOPIC, 0);
 }
 
 void CVTWindow::OnHelpAbout()
@@ -5232,8 +5233,8 @@ void CVTWindow::OnHelpAbout()
 	if (! LoadTTDLG()) {
 		return;
 	}
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
+				  g_ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	(*AboutDialog)(HVTWin);
 }
 
@@ -5262,14 +5263,14 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 		if (calcOnly) {
 			// 新DPIのフォントのサイズからスクリーンサイズを算出
 			LOGFONTW VTlfDefault;
-			TSGetLogFont(m_hWnd, &ts, 0, NewDPI, &VTlfDefault); // Normal Font
+			TSGetLogFont(m_hWnd, g_ts, 0, NewDPI, &VTlfDefault); // Normal Font
 			HFONT VTFontDefault = CreateFontIndirectW(&VTlfDefault);
 			HDC TmpDC = GetDC(m_hWnd);
 			SelectObject(TmpDC, VTFontDefault);
 			TEXTMETRIC Metrics;
 			GetTextMetrics(TmpDC, &Metrics);
-			int tmpFontWidth = Metrics.tmAveCharWidth + ts.FontDW;
-			int tmpFontHeight = Metrics.tmHeight + ts.FontDH;
+			int tmpFontWidth = Metrics.tmAveCharWidth + g_ts->FontDW;
+			int tmpFontHeight = Metrics.tmHeight + g_ts->FontDH;
 			DeleteObject(VTFontDefault);
 			ReleaseDC(m_hWnd, TmpDC);
 
@@ -5290,7 +5291,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 		if (pAdjustWindowRectExForDpi != NULL || pAdjustWindowRectEx != NULL) {
 			const DWORD Style = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
 			const DWORD ExStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
-			const BOOL bMenu = (ts.PopupMenu != 0) ? FALSE : TRUE;
+			const BOOL bMenu = (g_ts->PopupMenu != 0) ? FALSE : TRUE;
 			if (pGetSystemMetricsForDpi != NULL) {
 				// スクロールバーが表示されている場合は、
 				// スクリーンサイズ(クライアントエリアのサイズ)に追加する
@@ -5399,8 +5400,8 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 
 #ifdef WINDOW_MAXMIMUM_ENABLED
 	if (IsZoomed(m_hWnd)) {
-		ts.TerminalOldWidth = NewWindowWidth;
-		ts.TerminalOldHeight = NewWindowHeight;
+		g_ts->TerminalOldWidth = NewWindowWidth;
+		g_ts->TerminalOldHeight = NewWindowHeight;
 		GetDesktopRect(m_hWnd, &NewWindowRect[0]);
 		NewRect = &NewWindowRect[0];
 		NewWindowWidth  = NewRect->right  - NewRect->left;
@@ -5419,9 +5420,9 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wp, LPARAM lp, BOOL calcOnly)
 	{
 		HINSTANCE inst;
 		WORD icon_id;
-		inst = (ts.PluginVTIconInstance != NULL) ? ts.PluginVTIconInstance : m_hInst;
-		icon_id = (ts.PluginVTIconID != 0) ? ts.PluginVTIconID
-		                                   : (ts.VTIcon != IdIconDefault) ? ts.VTIcon
+		inst = (g_ts->PluginVTIconInstance != NULL) ? g_ts->PluginVTIconInstance : m_hInst;
+		icon_id = (g_ts->PluginVTIconID != 0) ? g_ts->PluginVTIconID
+		                                   : (g_ts->VTIcon != IdIconDefault) ? g_ts->VTIcon
 		                                                                  : IDI_VT;
 		TTSetIcon(inst, m_hWnd, MAKEINTRESOURCEW(icon_id), NewDPI);
 	}
@@ -5447,9 +5448,9 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	}
 	else if (msg == WM_TASKBER_CREATED) {
 		// タスクバーが再起動した
-		NotifyIcon *ni = (NotifyIcon *)cv.NotifyIcon;
+		NotifyIcon *ni = (NotifyIcon *)g_cv->NotifyIcon;
 		Notify2Hide(ni);
-		Notify2SetWindow(ni, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (ts.VTIcon != IdIconDefault) ? ts.VTIcon: IDI_VT);
+		Notify2SetWindow(ni, m_hWnd, WM_USER_NOTIFYICON, m_hInst, (g_ts->VTIcon != IdIconDefault) ? g_ts->VTIcon: IDI_VT);
 		return 0;
 	}
 	switch(msg)
@@ -5584,7 +5585,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_IME_NOTIFY:
 	case WM_IME_REQUEST:
 	{
-		if (ts.UseIME > 0) {
+		if (g_ts->UseIME > 0) {
 			switch(msg) {
 			case WM_IME_STARTCOMPOSITION:
 				OnIMEStartComposition(wp, lp);
@@ -5778,7 +5779,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	}
 	case WM_NCHITTEST: {
 		retval = TTCFrameWnd::DefWindowProc(msg, wp ,lp);
-		if (ts.HideTitle>0) {
+		if (g_ts->HideTitle>0) {
 			if ((retval == HTCLIENT) && AltKey()) {
 			if(ShiftKey())
 				retval = HTBOTTOMRIGHT;
@@ -5797,7 +5798,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		vtwin_work_t *w = &vtwin_work;
 		if (w->help_id != 0) {
 			// ヘルプがセットされている
-			OpenHelpCV(&cv, HH_HELP_CONTEXT, w->help_id);
+			OpenHelpCV(g_cv, HH_HELP_CONTEXT, w->help_id);
 			break;
 		}
 		goto default_proc;
@@ -5825,4 +5826,20 @@ void VtwinSetHelpId(DWORD help_id)
 {
 	vtwin_work_t *w = &vtwin_work;
 	w->help_id = help_id;
+}
+
+/**
+ *	Variables kept per session (see session.h)
+ */
+extern "C" void VTWinRegisterSessionVars(void)
+{
+	static const SessionVar v[] = {
+		SESSION_VAR(TCPLocalEchoUsed),
+		SESSION_VAR(TCPCRSendUsed),
+		SESSION_VAR(IgnoreRelease),
+		SESSION_VAR(vtwin_work),
+		SESSION_VAR(serail_reconnect),
+		SESSION_VAR(pVTWin),
+	};
+	SessionRegisterVars(v, _countof(v));
 }

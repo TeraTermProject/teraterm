@@ -889,6 +889,9 @@ typedef struct {
 	void *StateEcho;
 
 	ULONGLONG ConnectedTime;	// 接続開始 tick
+	// serial port overlapped I/O (moved from commlib.c so each session has its own)
+	HANDLE ReadEnd;
+	OVERLAPPED wol, rol;
 } TComVar;
 typedef TComVar *PComVar;
 

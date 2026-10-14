@@ -476,6 +476,7 @@
     <ClCompile Include="vtterm.c" />
     <ClCompile Include="vtwin.cpp" />
     <ClCompile Include="darkmode.cpp" />
+    <ClCompile Include="session.c" />
     <ClCompile Include="winjump.c" />
     <ClCompile Include="win_pp.cpp" />
     <ClCompile Include="WSAAsyncGetAddrInfo.c" />
@@ -620,6 +621,7 @@
     <ClInclude Include="vtterm.h" />
     <ClInclude Include="vtwin.h" />
     <ClInclude Include="darkmode.h" />
+    <ClInclude Include="session.h" />
     <ClInclude Include="unicode.h" />
   </ItemGroup>
   <ItemGroup>

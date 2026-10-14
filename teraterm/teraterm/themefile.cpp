@@ -780,7 +780,7 @@ void ThemeLoad(const wchar_t *file, BGTheme *bg_theme, TColorTheme *color_theme)
 			NULL, L"unknown ini file?",
 			MB_OK|MB_ICONEXCLAMATION
 		};
-		TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW);
+		TTMessageBoxW(HVTWin, &info, g_ts->UILanguageFileW);
 #endif
 	}
 

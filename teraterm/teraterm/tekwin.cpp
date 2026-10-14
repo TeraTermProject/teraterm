@@ -63,9 +63,9 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 	DWORD Style;
 	m_hInst = hInstance;
 
-	TEKInit(&tk, &ts);
+	TEKInit(&tk, g_ts);
 
-	if (ts.HideTitle>0) {
+	if (g_ts->HideTitle>0) {
 		Style = WS_POPUP | WS_THICKFRAME | WS_BORDER;
 	}
 	else {
@@ -86,12 +86,12 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 
 	RegisterClassW(&wc);
 
-	if (ts.TEKPos.x==CW_USEDEFAULT) {
+	if (g_ts->TEKPos.x==CW_USEDEFAULT) {
 		rect = rectDefault;
 	}
 	else {
-		rect.left = ts.TEKPos.x;
-		rect.top = ts.TEKPos.y;
+		rect.left = g_ts->TEKPos.x;
+		rect.top = g_ts->TEKPos.y;
 		rect.right = rect.left + 640; //temporary width
 		rect.bottom = rect.top + 400; //temporary height
 	}
@@ -104,7 +104,7 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 	}
 
 	// Windows 11 でウィンドウの角が丸くならないようにする
-	if (ts.WindowCornerDontround && pDwmSetWindowAttribute != NULL) {
+	if (g_ts->WindowCornerDontround && pDwmSetWindowAttribute != NULL) {
 		DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_DONOTROUND;
 		pDwmSetWindowAttribute(HTEKWin, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
 	}
@@ -113,11 +113,11 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 	// register this window to the window list
 	RegWin(HVTWin,HTEKWin);
 
-	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW((ts.TEKIcon!=IdIconDefault)?ts.TEKIcon:IDI_TEK), 0);
+	TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW((g_ts->TEKIcon!=IdIconDefault)?g_ts->TEKIcon:IDI_TEK), 0);
 
 	MainMenu = NULL;
 	WinMenu = NULL;
-	if ((ts.HideTitle==0) && (ts.PopupMenu==0)) {
+	if ((g_ts->HideTitle==0) && (g_ts->PopupMenu==0)) {
 		InitMenu(&MainMenu);
 		::SetMenu(HTEKWin,MainMenu);
 	}
@@ -125,9 +125,9 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 	ChangeTitle();
 
 	::GetWindowRect(tk.HWin,&rect);
-	TEKResizeWindow(&tk,&ts, rect.right-rect.left, rect.bottom-rect.top);
+	TEKResizeWindow(&tk,g_ts, rect.right-rect.left, rect.bottom-rect.top);
 
-	if ((ts.PopupMenu>0) || (ts.HideTitle>0)) {
+	if ((g_ts->PopupMenu>0) || (g_ts->HideTitle>0)) {
 		::PostMessage(HTEKWin,WM_USER_CHANGEMENU,0,0);
 	}
 
@@ -136,12 +136,12 @@ CTEKWindow::CTEKWindow(HINSTANCE hInstance)
 
 int CTEKWindow::Parse()
 {
-	return (TEKParse(&tk,&ts,&cv));
+	return (TEKParse(&tk,g_ts,g_cv));
 }
 
 void CTEKWindow::RestoreSetup()
 {
-	TEKRestoreSetup(&tk,&ts);
+	TEKRestoreSetup(&tk,g_ts);
 	ChangeTitle();
 }
 
@@ -181,16 +181,16 @@ void CTEKWindow::InitMenu(HMENU *Menu)
 	SetupMenu = GetSubMenu(*Menu,2);
 	HelpMenu = GetSubMenu(*Menu,4);
 
-	SetDlgMenuTextsW(*Menu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFileW);
-	SetDlgMenuTextsW(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), ts.UILanguageFileW);
-	SetDlgMenuTextsW(EditMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), ts.UILanguageFileW);
-	SetDlgMenuTextsW(SetupMenu, SetupMenuTextInfo, _countof(SetupMenuTextInfo), ts.UILanguageFileW);
-	SetDlgMenuTextsW(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFileW);
+	SetDlgMenuTextsW(*Menu, MenuTextInfo, _countof(MenuTextInfo), g_ts->UILanguageFileW);
+	SetDlgMenuTextsW(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), g_ts->UILanguageFileW);
+	SetDlgMenuTextsW(EditMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), g_ts->UILanguageFileW);
+	SetDlgMenuTextsW(SetupMenu, SetupMenuTextInfo, _countof(SetupMenuTextInfo), g_ts->UILanguageFileW);
+	SetDlgMenuTextsW(HelpMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), g_ts->UILanguageFileW);
 
-	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
+	if ((g_ts->MenuFlag & MF_SHOWWINMENU) !=0) {
 		wchar_t *uimsg;
 		WinMenu = CreatePopupMenu();
-		GetI18nStrWW("Tera Term", "TEKMENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
+		GetI18nStrWW("Tera Term", "TEKMENU_WINDOW", L"&Window", g_ts->UILanguageFileW, &uimsg);
 		::InsertMenuW(*Menu,4,MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 					  (UINT_PTR)WinMenu, uimsg);
 		free(uimsg);
@@ -207,7 +207,7 @@ void CTEKWindow::InitMenuPopup(HMENU SubMenu)
 			EnableMenuItem(EditMenu,ID_TEKEDIT_COPY,MF_BYCOMMAND | MF_GRAYED);
 		}
 
-		if (cv.Ready &&
+		if (g_cv->Ready &&
 		    (IsClipboardFormatAvailable(CF_TEXT) ||
 		     IsClipboardFormatAvailable(CF_OEMTEXT))) {
 			EnableMenuItem(EditMenu,ID_TEKEDIT_PASTE,MF_BYCOMMAND | MF_ENABLED);
@@ -219,7 +219,7 @@ void CTEKWindow::InitMenuPopup(HMENU SubMenu)
 		}
 	}
 	else if ( SubMenu == WinMenu ) {
-		SetWinMenuW(WinMenu, ts.UILanguageFileW, 0);
+		SetWinMenuW(WinMenu, g_ts->UILanguageFileW, 0);
 	}
 }
 
@@ -278,13 +278,13 @@ void CTEKWindow::OnChar(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 
 	if (tk.GIN) {
 		char Code = (char)nChar;
-		TEKReportGIN(&tk, &ts, &cv, Code);
+		TEKReportGIN(&tk, g_ts, g_cv, Code);
 	}
 	else {
 		for (unsigned int i = 1; i <= nRepCnt; i++) {
-			CommTextOutW(&cv, &u16, 1);
-			if (ts.LocalEcho > 0) {
-				CommTextEchoW(&cv, &u16, 1);
+			CommTextOutW(g_cv, &u16, 1);
+			if (g_ts->LocalEcho > 0) {
+				CommTextEchoW(g_cv, &u16, 1);
 			}
 		}
 	}
@@ -328,7 +328,7 @@ void CTEKWindow::OnKeyUp(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 
 void CTEKWindow::OnKillFocus(HWND hNewWnd)
 {
-	TEKDestroyCaret(&tk,&ts);
+	TEKDestroyCaret(&tk,g_ts);
 	TTCFrameWnd::OnKillFocus(hNewWnd);
 }
 
@@ -383,12 +383,12 @@ void CTEKWindow::OnLButtonDown(WPARAM nFlags, POINTS point)
 		return;
 	}
 
-	TEKWMLButtonDown(&tk,&ts,&cv,p);
+	TEKWMLButtonDown(&tk,g_ts,g_cv,p);
 }
 
 void CTEKWindow::OnLButtonUp(WPARAM nFlags, POINTS point)
 {
-	TEKWMLButtonUp(&tk,&ts);
+	TEKWMLButtonUp(&tk,g_ts);
 }
 
 void CTEKWindow::OnMButtonUp(WPARAM nFlags, POINTS point)
@@ -398,7 +398,7 @@ void CTEKWindow::OnMButtonUp(WPARAM nFlags, POINTS point)
 
 int CTEKWindow::OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message)
 {
-	if ((ts.SelOnActive==0) &&
+	if ((g_ts->SelOnActive==0) &&
 	    (nHitTest==HTCLIENT)) { //disable mouse event for text selection
 		return MA_ACTIVATEANDEAT; //     when window is activated
 	}
@@ -413,7 +413,7 @@ void CTEKWindow::OnMouseMove(WPARAM nFlags, POINTS point)
 
 	p.x = point.x;
 	p.y = point.y;
-	TEKWMMouseMove(&tk,&ts,p);
+	TEKWMMouseMove(&tk,g_ts,p);
 }
 
 void CTEKWindow::OnMove(int x, int y)
@@ -421,8 +421,8 @@ void CTEKWindow::OnMove(int x, int y)
 	RECT R;
 
 	::GetWindowRect(HTEKWin,&R);
-	ts.TEKPos.x = R.left;
-	ts.TEKPos.y = R.top;
+	g_ts->TEKPos.x = R.left;
+	g_ts->TEKPos.y = R.top;
 }
 
 void CTEKWindow::OnPaint()
@@ -432,7 +432,7 @@ void CTEKWindow::OnPaint()
 
 	PaintDC = BeginPaint(&ps);
 
-	TEKPaint(&tk,&ts,PaintDC,&ps);
+	TEKPaint(&tk,g_ts,PaintDC,&ps);
 
 	EndPaint(&ps);
 }
@@ -444,7 +444,7 @@ void CTEKWindow::OnRButtonUp(UINT nFlags, POINTS point)
 
 void CTEKWindow::OnSetFocus(HWND hOldWnd)
 {
-	TEKChangeCaret(&tk,&ts);
+	TEKChangeCaret(&tk,g_ts);
 	TTCFrameWnd::OnSetFocus(hOldWnd);
 }
 
@@ -466,13 +466,13 @@ void CTEKWindow::OnSize(WPARAM nType, int cx, int cy)
 	w = R.right - R.left;
 	h = R.bottom - R.top;
 
-	TEKWMSize(&tk,&ts,w,h,cx,cy);
+	TEKWMSize(&tk,g_ts,w,h,cx,cy);
 }
 
 void CTEKWindow::OnSysCommand(WPARAM nID, LPARAM lParam)
 {
 	if (nID==ID_SHOWMENUBAR) {
-		ts.PopupMenu = 0;
+		g_ts->PopupMenu = 0;
 		SwitchMenu();
 	}
 	else {
@@ -505,7 +505,7 @@ void CTEKWindow::OnTimer(UINT_PTR nIDEvent)
 	UINT T;
 
 	if (nIDEvent==IdCaretTimer) {
-		if (ts.NonblinkingCursor!=0) {
+		if (g_ts->NonblinkingCursor!=0) {
 			T = GetCaretBlinkTime();
 			SetCaretBlinkTime(T);
 		}
@@ -566,7 +566,7 @@ LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 	HMENU SysMenu;
 	BOOL Show, B1, B2;
 
-	Show = (ts.PopupMenu==0) && (ts.HideTitle==0);
+	Show = (g_ts->PopupMenu==0) && (g_ts->HideTitle==0);
 	if (Show != (MainMenu!=NULL)) {
 		if (! Show) {
 			if (WinMenu!=NULL) {
@@ -585,14 +585,14 @@ LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 		::DrawMenuBar(HTEKWin);
 	}
 
-	B1 = ((ts.MenuFlag & MF_SHOWWINMENU)!=0);
+	B1 = ((g_ts->MenuFlag & MF_SHOWWINMENU)!=0);
 	B2 = (WinMenu!=NULL);
 	if ((MainMenu!=NULL) &&
 	    (B1 != B2)) {
 		if (WinMenu==NULL) {
 			wchar_t *uimsg;
 			WinMenu = CreatePopupMenu();
-			GetI18nStrWW("Tera Term", "TEKMENU_WINDOW", L"&Window", ts.UILanguageFileW, &uimsg);
+			GetI18nStrWW("Tera Term", "TEKMENU_WINDOW", L"&Window", g_ts->UILanguageFileW, &uimsg);
 			::InsertMenuW(MainMenu,4,
 						  MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
 						  (UINT_PTR)WinMenu, uimsg);
@@ -607,11 +607,11 @@ LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 	}
 
 	::GetSystemMenu(tk.HWin,TRUE);
-	if ((! Show) && ((ts.MenuFlag & MF_NOSHOWMENU)==0)) {
+	if ((! Show) && ((g_ts->MenuFlag & MF_NOSHOWMENU)==0)) {
 		wchar_t *uimsg;
 		SysMenu = ::GetSystemMenu(tk.HWin,FALSE);
 		AppendMenuW(SysMenu, MF_SEPARATOR, 0, NULL);
-		GetI18nStrWW("Tera Term", "TEKMENU_SHOW_MENUBAR", L"Show menu &bar", ts.UILanguageFileW, &uimsg);
+		GetI18nStrWW("Tera Term", "TEKMENU_SHOW_MENUBAR", L"Show menu &bar", g_ts->UILanguageFileW, &uimsg);
 		AppendMenuW(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
 		free(uimsg);
 	}
@@ -626,10 +626,10 @@ LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 
 	Style = (DWORD)GetWindowLongPtr (GWL_STYLE);
 	TBar = ((Style & WS_SYSMENU)!=0);
-	if (TBar == (ts.HideTitle==0)) {
+	if (TBar == (g_ts->HideTitle==0)) {
 		return 0;
 	}
-	if (ts.HideTitle>0) {
+	if (g_ts->HideTitle>0) {
 		Style = Style & ~(WS_SYSMENU | WS_CAPTION |
 		                  WS_MINIMIZEBOX) | WS_BORDER | WS_POPUP;
 	}
@@ -642,12 +642,12 @@ LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 	                SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	::ShowWindow (HTEKWin, SW_SHOW);
 
-	if ((ts.HideTitle==0) && (MainMenu==NULL) &&
-	    ((ts.MenuFlag & MF_NOSHOWMENU) == 0)) {
+	if ((g_ts->HideTitle==0) && (MainMenu==NULL) &&
+	    ((g_ts->MenuFlag & MF_NOSHOWMENU) == 0)) {
 		wchar_t *uimsg;
 		SysMenu = ::GetSystemMenu(HTEKWin,FALSE);
 		AppendMenuW(SysMenu, MF_SEPARATOR, 0, NULL);
-		GetI18nStrWW("Tera Term", "TEKMENU_SHOW_MENUBAR", L"Show menu &bar", ts.UILanguageFileW, &uimsg);
+		GetI18nStrWW("Tera Term", "TEKMENU_SHOW_MENUBAR", L"Show menu &bar", g_ts->UILanguageFileW, &uimsg);
 		AppendMenuW(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
 		free(uimsg);
 	}
@@ -657,7 +657,7 @@ LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 LRESULT CTEKWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 {
 	DWORD help_id = (wParam == 0) ? HelpId : (DWORD)wParam;
-	OpenHelpCV(&cv, HH_HELP_CONTEXT, help_id);
+	OpenHelpCV(g_cv, HH_HELP_CONTEXT, help_id);
 	return 0;
 }
 
@@ -678,11 +678,11 @@ void CTEKWindow::OnFilePrint()
 	if (PrintDC==NULL) {
 		return;
 	}
-	if (!PrnStart(PrintDC, ts.TitleW)) {
+	if (!PrnStart(PrintDC, g_ts->TitleW)) {
 		return;
 	}
 
-	(*TEKPrint)(&tk,&ts,PrintDC,Sel);
+	(*TEKPrint)(&tk,g_ts,PrintDC,Sel);
 
 	PrnStop(PrintDC);
 	DeleteDC(PrintDC);
@@ -695,12 +695,12 @@ void CTEKWindow::OnFileExit()
 
 void CTEKWindow::OnEditCopy()
 {
-	(*TEKCMCopy)(&tk,&ts);
+	(*TEKCMCopy)(&tk,g_ts);
 }
 
 void CTEKWindow::OnEditCopyScreen()
 {
-	(*TEKCMCopyScreen)(&tk,&ts);
+	(*TEKCMCopyScreen)(&tk,g_ts);
 }
 
 void CTEKWindow::OnEditPaste()
@@ -715,7 +715,7 @@ void CTEKWindow::OnEditPasteCR()
 
 void CTEKWindow::OnEditClearScreen()
 {
-	(*TEKClearScreen)(&tk,&ts);
+	(*TEKClearScreen)(&tk,g_ts);
 }
 
 void CTEKWindow::OnSetupWindow()
@@ -733,7 +733,7 @@ void CTEKWindow::OnSetupFont()
  */
 void CTEKWindow::OnSetupPreProcess()
 {
-	m_OldEmu = ts.TEKColorEmu;
+	m_OldEmu = g_ts->TEKColorEmu;
 }
 
 /**
@@ -745,13 +745,13 @@ void CTEKWindow::OnSetupPostProcess(BOOL Ok)
 {
 	if (Ok) {
 		// window tab
-		TEKResetWin(&tk,&ts, m_OldEmu);
+		TEKResetWin(&tk,g_ts, m_OldEmu);
 		ChangeTitle();
 		SwitchMenu();
 		SwitchTitleBar();
 
 		// font tab
-		TEKSetupFont(&tk,&ts);
+		TEKSetupFont(&tk,g_ts);
 	}
 }
 
@@ -768,8 +768,8 @@ void CTEKWindow::OnWindowWindow()
 	if (! LoadTTDLG()) {
 		return;
 	}
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
+				  g_ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	(*WindowWindow)(HTEKWin,&Close);
 	if (Close) {
 		OnClose();
@@ -778,7 +778,7 @@ void CTEKWindow::OnWindowWindow()
 
 void CTEKWindow::OnHelpIndex()
 {
-	OpenHelpCV(&cv, HH_DISPLAY_TOPIC, 0);
+	OpenHelpCV(g_cv, HH_DISPLAY_TOPIC, 0);
 }
 
 void CTEKWindow::OnHelpAbout()
@@ -909,7 +909,7 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	}
 	case WM_NCHITTEST: {
 		retval = TTCFrameWnd::DefWindowProc(msg, wp, lp);
-		if (ts.HideTitle>0) {
+		if (g_ts->HideTitle>0) {
 			if ((retval ==HTCLIENT) && AltKey()) {
 				retval = HTCAPTION;
 			}
@@ -918,7 +918,7 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	}
 	case WM_DPICHANGED: {
 		const UINT NewDPI = LOWORD(wp);
-		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW((ts.TEKIcon!=IdIconDefault)?ts.TEKIcon:IDI_TEK), NewDPI);
+		TTSetIcon(m_hInst, m_hWnd, MAKEINTRESOURCEW((g_ts->TEKIcon!=IdIconDefault)?g_ts->TEKIcon:IDI_TEK), NewDPI);
 		break;
 	}
 	default:

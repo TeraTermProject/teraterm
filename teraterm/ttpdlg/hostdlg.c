@@ -142,7 +142,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			dlg_data->ComPortInfoPtr = ComPortInfoGet(&dlg_data->ComPortInfoCount);
 			dlg_data->HostDropOpen = FALSE;
 
-			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
+			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), g_ts->UILanguageFileW);
 
 			// ファイルおよび名前付きパイプの場合、TCP/IP扱いとする。
 			if ( GetHNRec->PortType==IdFile ||
@@ -152,7 +152,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			}
 
 			// ホスト (コマンドライン)
-			SetHostDropdown(Dialog, &ts);
+			SetHostDropdown(Dialog, g_ts);
 			SetEditboxEmacsKeybind(Dialog, IDC_HOSTNAME);
 
 			SetRB(Dialog,GetHNRec->Telnet,IDC_HOSTTELNET,IDC_HOSTTELNET);
@@ -224,7 +224,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 			switch (LOWORD(wParam)) {
 				case IDOK: {
 					if (IsEditHistorySelected(Dialog)) {
-						OpenEditHistory(Dialog, &ts);
+						OpenEditHistory(Dialog, g_ts);
 						break;
 					}
 					if (IsDlgButtonChecked(Dialog, IDC_HOSTTCPIP)) {
@@ -299,7 +299,7 @@ static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 							//	ドロップダウンしていないときは、キーかホイールで選択している
 							//	決定(Enter or OK押下)すると編集開始
 							if (IsEditHistorySelected(Dialog)) {
-								OpenEditHistory(Dialog, &ts);
+								OpenEditHistory(Dialog, g_ts);
 							}
 						}
 						break;

@@ -113,7 +113,7 @@ static wchar_t *GetHistoryFileName(TTTSet *ts_)
 static void ApplyBroadCastCommandHistory(HWND Dialog, const wchar_t *historyfile)
 {
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_RESETCONTENT, 0, 0);
-	HistoryStore *hs = HistoryStoreCreate(ts.MaxBroadcatHistory);
+	HistoryStore *hs = HistoryStoreCreate(g_ts->MaxBroadcatHistory);
 	HistoryStoreReadIni(hs, historyfile, L"BroadcastCommands", L"Command");
 	HistoryStoreSetControl(hs, Dialog, IDC_COMMAND_EDIT);
 	HistoryStoreDestroy(hs);
@@ -193,14 +193,14 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 			break;
 
 		case WM_RBUTTONUP:
-			if (ts.PasteFlag & CPF_DISABLE_RBUTTON) {
+			if (g_ts->PasteFlag & CPF_DISABLE_RBUTTON) {
 				return FALSE;
 			}
 			SendCB(dlg);
 			return FALSE;
 
 		case WM_MBUTTONUP:
-			if (ts.PasteFlag & CPF_DISABLE_MBUTTON) {
+			if (g_ts->PasteFlag & CPF_DISABLE_MBUTTON) {
 				return FALSE;
 			}
 			SendCB(dlg);
@@ -525,14 +525,14 @@ void SetMulticastName(const wchar_t *name)
 {
 	// TODO MulticastName を wchar_t 化
 	char *nameA = ToCharW(name);
-	strncpy_s(ts.MulticastName, sizeof(ts.MulticastName), nameA, _TRUNCATE);
+	strncpy_s(g_ts->MulticastName, sizeof(g_ts->MulticastName), nameA, _TRUNCATE);
 	free(nameA);
 }
 
 static int CompareMulticastName(const wchar_t *name)
 {
 	// TODO MulticastName を wchar_t 化
-	wchar_t *MulticastNameW = ToWcharA(ts.MulticastName);
+	wchar_t *MulticastNameW = ToWcharA(g_ts->MulticastName);
 	int result = wcscmp(MulticastNameW, name);
 	free(MulticastNameW);
 	return result;
@@ -634,9 +634,9 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			break;
 
 		case WM_INITDIALOG: {
-			if (ts.CRSend == IdCRLF) {
+			if (g_ts->CRSend == IdCRLF) {
 				CheckRadioButton(hWnd, IDC_RADIO_CRLF, IDC_RADIO_LF, IDC_RADIO_CRLF);
-			} else if (ts.CRSend == IdLF) {
+			} else if (g_ts->CRSend == IdLF) {
 				CheckRadioButton(hWnd, IDC_RADIO_CRLF, IDC_RADIO_LF, IDC_RADIO_LF);
 			} else {
 				CheckRadioButton(hWnd, IDC_RADIO_CRLF, IDC_RADIO_LF, IDC_RADIO_CR);
@@ -644,10 +644,10 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			// デフォルトでチェックボックスを checked 状態にする。
 			SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 			// history を反映する (2007.3.3 maya)
-			if (ts.BroadcastCommandHistory) {
+			if (g_ts->BroadcastCommandHistory) {
 				SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 			}
-			wchar_t *historyfile = GetHistoryFileName(&ts);
+			wchar_t *historyfile = GetHistoryFileName(g_ts);
 			ApplyBroadCastCommandHistory(hWnd, historyfile);
 			free(historyfile);
 
@@ -656,7 +656,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				{ "DLG_BROADCAST_SUBMIT_KEY_ENTER", L"Enter", IdSubmitKeyTypeEnter },
 				{ "DLG_BROADCAST_SUBMIT_KEY_CTRLM", L"Ctrl+M", IdSubmitKeyTypeCtrlM }
 			};
-			SetI18nListW("Tera Term", hWnd, IDC_SUBMITKEY_TYPE, infos, _countof(infos), ts.UILanguageFileW, ts.BroadcastSubmitKey);
+			SetI18nListW("Tera Term", hWnd, IDC_SUBMITKEY_TYPE, infos, _countof(infos), g_ts->UILanguageFileW, g_ts->BroadcastSubmitKey);
 
 			// エディットコントロールにフォーカスをあてる
 			SetFocus(GetDlgItem(hWnd, IDC_COMMAND_EDIT));
@@ -684,7 +684,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			SetWindowLongPtr(BroadcastWindowList, GWLP_WNDPROC, (LONG_PTR)WindowListProc);
 
 			// I18N
-			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
+			SetDlgTextsW(hWnd, TextInfos, _countof(TextInfos), g_ts->UILanguageFileW);
 
 			// 最小サイズは初期化時の横:40%、縦:24%にする
 			resize_helper = ReiseDlgHelperInit(hWnd, FALSE, resize_info, _countof(resize_info));
@@ -788,18 +788,18 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 							// ブロードキャストコマンドの履歴を保存 (2007.3.3 maya)
 							history = SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_GETCHECK, 0, 0);
 							if (history) {
-								wchar_t *historyfile = GetHistoryFileName(&ts);
+								wchar_t *historyfile = GetHistoryFileName(g_ts);
 								if (LoadTTSET()) {
 									(*AddValueToList)(historyfile, buf, L"BroadcastCommands", L"Command",
-													  ts.MaxBroadcatHistory);
+													  g_ts->MaxBroadcatHistory);
 									FreeTTSET();
 								}
 								ApplyBroadCastCommandHistory(hWnd, historyfile);
 								free(historyfile);
-								ts.BroadcastCommandHistory = TRUE;
+								g_ts->BroadcastCommandHistory = TRUE;
 							}
 							else {
-								ts.BroadcastCommandHistory = FALSE;
+								g_ts->BroadcastCommandHistory = FALSE;
 							}
 
 							checked = SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_GETCHECK, 0, 0);
@@ -835,7 +835,7 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 				case IDC_COMMAND_EDIT:
 					if (HIWORD(wp) == CBN_DROPDOWN) {
-						wchar_t *historyfile = GetHistoryFileName(&ts);
+						wchar_t *historyfile = GetHistoryFileName(g_ts);
 						ApplyBroadCastCommandHistory(hWnd, historyfile);
 						free(historyfile);
 					}
@@ -870,31 +870,31 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 
 				case IDC_RADIO_CRLF:
 					if (IsDlgButtonChecked(hWnd, IDC_RADIO_CRLF) == BST_CHECKED) {
-						ts.CRSend = IdCRLF;
-						UpdateSetupTerminalNewlineCode(ts.CRSend);
+						g_ts->CRSend = IdCRLF;
+						UpdateSetupTerminalNewlineCode(g_ts->CRSend);
 						pVTWin->SetupTerm();
 					}
 					return FALSE;
 
 				case IDC_RADIO_LF:
 					if (IsDlgButtonChecked(hWnd, IDC_RADIO_LF) == BST_CHECKED) {
-						ts.CRSend = IdLF;
-						UpdateSetupTerminalNewlineCode(ts.CRSend);
+						g_ts->CRSend = IdLF;
+						UpdateSetupTerminalNewlineCode(g_ts->CRSend);
 						pVTWin->SetupTerm();
 					}
 					return FALSE;
 
 				case IDC_RADIO_CR:
 					if (IsDlgButtonChecked(hWnd, IDC_RADIO_CR) == BST_CHECKED) {
-						ts.CRSend = IdCR;
-						UpdateSetupTerminalNewlineCode(ts.CRSend);
+						g_ts->CRSend = IdCR;
+						UpdateSetupTerminalNewlineCode(g_ts->CRSend);
 						pVTWin->SetupTerm();
 					}
 					return FALSE;
 
 				case IDC_SUBMITKEY_TYPE:
 					SubmitKeyType = GetCurSel(hDlgWnd, IDC_SUBMITKEY_TYPE);
-					ts.BroadcastSubmitKey = SubmitKeyType;
+					g_ts->BroadcastSubmitKey = SubmitKeyType;
 					return FALSE;
 
 				default:
@@ -954,10 +954,10 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			if ((HWND)wp == BroadcastWindowList) {
 				HMENU hMenu = CreatePopupMenu();
 				wchar_t *menuitem;
-				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_FOREGROUND", L"Bring selected window to foreground", ts.UILanguageFileW, &menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_FOREGROUND", L"Bring selected window to foreground", g_ts->UILanguageFileW, &menuitem);
 				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 1, menuitem);
 				free(menuitem);
-				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_MINIMIZE", L"Minimize selected window", ts.UILanguageFileW, &menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_MINIMIZE", L"Minimize selected window", g_ts->UILanguageFileW, &menuitem);
 				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 2, menuitem);
 				free(menuitem);
 				int count = (int)SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
@@ -969,17 +969,17 @@ static INT_PTR CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					}
 				}
 				if (hasSelection) {
-					GetI18nStrWW("Tera Term", "CMENU_BROADCAST_UNSELECT_ALL", L"Unselect all", ts.UILanguageFileW, &menuitem);
+					GetI18nStrWW("Tera Term", "CMENU_BROADCAST_UNSELECT_ALL", L"Unselect all", g_ts->UILanguageFileW, &menuitem);
 				}
 				else {
-					GetI18nStrWW("Tera Term", "CMENU_BROADCAST_SELECT_ALL", L"Select all", ts.UILanguageFileW, &menuitem);
+					GetI18nStrWW("Tera Term", "CMENU_BROADCAST_SELECT_ALL", L"Select all", g_ts->UILanguageFileW, &menuitem);
 				}
 				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 3, menuitem);
 				free(menuitem);
-				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_INVERSE", L"Inverse selection", ts.UILanguageFileW, &menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_INVERSE", L"Inverse selection", g_ts->UILanguageFileW, &menuitem);
 				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 4, menuitem);
 				free(menuitem);
-				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_REFRESH", L"Refresh window list", ts.UILanguageFileW, &menuitem);
+				GetI18nStrWW("Tera Term", "CMENU_BROADCAST_REFRESH", L"Refresh window list", g_ts->UILanguageFileW, &menuitem);
 				AppendMenuW(hMenu, MF_ENABLED | MF_STRING | 0, 5, menuitem);
 				free(menuitem);
 				int choice = TrackPopupMenu(hMenu, TPM_RETURNCMD, GET_X_LPARAM(lp), GET_Y_LPARAM(lp), 0, hWnd, NULL);
@@ -1052,8 +1052,8 @@ void BroadCastShowDialog(HINSTANCE hInst, HWND hWnd)
 		goto activate;
 	}
 
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
+				  g_ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 
 	hDlgWnd = TTCreateDialog(hInst, MAKEINTRESOURCEW(IDD_BROADCAST_DIALOG),
 							 hWnd, BroadcastCommandDlgProc);
@@ -1148,9 +1148,9 @@ BOOL BroadCastReceive(const COPYDATASTRUCT *cds)
 void UpdateBroadcastNewlineCode(int CRSend)
 {
 	if (hDlgWnd) {
-		if (ts.CRSend == IdCRLF) {
+		if (g_ts->CRSend == IdCRLF) {
 			CheckRadioButton(hDlgWnd, IDC_RADIO_CRLF, IDC_RADIO_LF, IDC_RADIO_CRLF);
-		} else if (ts.CRSend == IdLF) {
+		} else if (g_ts->CRSend == IdLF) {
 			CheckRadioButton(hDlgWnd, IDC_RADIO_CRLF, IDC_RADIO_LF, IDC_RADIO_LF);
 		} else {
 			CheckRadioButton(hDlgWnd, IDC_RADIO_CRLF, IDC_RADIO_LF, IDC_RADIO_CR);

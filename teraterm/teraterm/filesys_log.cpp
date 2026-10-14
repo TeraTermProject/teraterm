@@ -57,9 +57,9 @@
  *	機能一覧
  *	- ログのオープン/クローズ
  *		- FLogOpen(), FLogClose()
- *		- テキストモード/バイナリモード(排他, ts.LogBinary)
+ *		- テキストモード/バイナリモード(排他, g_ts->LogBinary)
  *		- ログの文字コード UTF-8/UTF-16LE/UTF-16BE, BOM出力
- *		- 追記/上書き(ts.Append)
+ *		- 追記/上書き(g_ts->Append)
  *	- リングバッファ処理
  *		- リングバッファへ追加
  *			- Put1()
@@ -67,12 +67,12 @@
  *			- FLogWriteFile() -> LogToFile()
  *		- ファイル上の順序はリングバッファへの投入順
  *	- 遅延書き込み
- *		- ts.DeferredLogWriteMode が 1 の時スレッドを使う
+ *		- g_ts->DeferredLogWriteMode が 1 の時スレッドを使う
  *		- 専用スレッド(DeferredLogWriteThread())がファイルへ書き込む
  *		- TODO ロックが怪しい?
  *		  - logfile_lock(), logfile_unlock()
  *	- タイムスタンプ付与
- *		- テキストモード時、ts.LogTimestamp が 1 の時、行頭にタイムスタンプを付与
+ *		- テキストモード時、g_ts->LogTimestamp が 1 の時、行頭にタイムスタンプを付与
  *		- ローカル時刻/UTC/経過時間(ログ開始から,接続から)
  *	- タイムスタンプ用文字列生成
  *		- FLogTimeStampStrW()
@@ -191,17 +191,17 @@ static BOOL OpenFTDlg(PFileVar fv)
 
 	wchar_t *DlgCaption;
 	wchar_t *uimsg;
-	GetI18nStrWW("Tera Term", "FILEDLG_TRANS_TITLE_LOG", TitLog, ts.UILanguageFileW, &uimsg);
+	GetI18nStrWW("Tera Term", "FILEDLG_TRANS_TITLE_LOG", TitLog, g_ts->UILanguageFileW, &uimsg);
 	aswprintf(&DlgCaption, L"Tera Term: %s", uimsg);
 	free(uimsg);
 
 	CFileTransDlg::Info info;
-	info.UILanguageFileW = ts.UILanguageFileW;
+	info.UILanguageFileW = g_ts->UILanguageFileW;
 	info.OpId = CFileTransDlg::OpLog;
 	info.DlgCaption = DlgCaption;
 	info.FileName = NULL;
 	info.FullName = fv->FullName;
-	info.HideDialog = ts.LogHideDialog ? TRUE : FALSE;
+	info.HideDialog = g_ts->LogHideDialog ? TRUE : FALSE;
 	info.HMainWin = HVTWin;
 	FTDlg->Create(hInst, &info);
 	FTDlg->RefreshNum(0, 0, fv->ByteCount);
@@ -251,7 +251,7 @@ static wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src)
 					}
 					case IdSerial: {
 						wchar_t *port;
-						aswprintf(&port, L"COM%d", ts.ComPort);
+						aswprintf(&port, L"COM%d", g_ts->ComPort);
 						add_text = port;
 						break;
 					}
@@ -265,7 +265,7 @@ static wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src)
 				if (pcv->Open) {
 					if (pcv->PortType == IdTCPIP) {
 						wchar_t *port;
-						aswprintf(&port, L"%d", ts.TCPPort);
+						aswprintf(&port, L"%d", g_ts->TCPPort);
 						add_text = port;
 					}
 				}
@@ -306,9 +306,9 @@ static wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src)
 
 static void FixLogOption(void)
 {
-	if (ts.LogBinary) {
-		ts.LogTypePlainText = false;
-		ts.LogTimestamp = false;
+	if (g_ts->LogBinary) {
+		g_ts->LogTypePlainText = false;
+		g_ts->LogTimestamp = false;
 	}
 }
 
@@ -401,7 +401,7 @@ static void OpenLogFile(PFileVar fv)
 	// LogLockExclusive が有効な場合にまったく共有しないと、
 	// 書き込み中のログファイルを他のエディタで開けないため
 	int dwShareMode = FILE_SHARE_READ;
-	if (!ts.LogLockExclusive) {
+	if (!g_ts->LogLockExclusive) {
 		dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	}
 	fv->FileHandle = CreateFileW(fv->FullName, GENERIC_WRITE, dwShareMode, NULL,
@@ -421,7 +421,7 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 	fv->cv_LogPtr = 0;
 	fv->cv_LStart = 0;
 	fv->cv_LCount = 0;
-	if (ts.LogBinary > 0) {
+	if (g_ts->LogBinary > 0) {
 		fv->LogMode = TFileVar::LogModeTag::BIN_MODE;
 	} else {
 		fv->LogMode = TFileVar::LogModeTag::TEXT_MODE;
@@ -434,7 +434,7 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 
 	/* 2007.05.24 Gentaro */
 	fv->eLineEnd = Line_LineHead;
-	if (ts.Append > 0)
+	if (g_ts->Append > 0)
 	{
 		SetFilePointer(fv->FileHandle, 0, NULL, FILE_END);
 		/* 2007.05.24 Gentaro
@@ -445,15 +445,15 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 	}
 
 	// BOM出力
-	if (ts.Append == 0 && ts.LogBinary == 0 && fv->bom) {
+	if (g_ts->Append == 0 && g_ts->LogBinary == 0 && fv->bom) {
 		// 追記ではない(新規) && バイナリではない && BOM を出力時
 		FLogOutputBOM(fv);
 	}
 
 	// Log rotate configuration
-	fv->RotateMode = (enum rotate_mode)ts.LogRotate;
-	fv->RotateSize = ts.LogRotateSize;
-	fv->RotateStep = ts.LogRotateStep;
+	fv->RotateMode = (enum rotate_mode)g_ts->LogRotate;
+	fv->RotateSize = g_ts->LogRotateSize;
+	fv->RotateStep = g_ts->LogRotateStep;
 
 	if (fv->RotateMode != ROTATE_NONE) {
 		// Log rotateが有効の場合、初期ファイルサイズを設定する。
@@ -474,7 +474,7 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 	fv->IsPause = FALSE;
 	fv->StartTime = pGetTickCount64();
 
-	if (ts.DeferredLogWriteMode) {
+	if (g_ts->DeferredLogWriteMode) {
 		StartThread(fv);
 	}
 
@@ -623,7 +623,7 @@ static void LogRotate(PFileVar fv)
 	if (fv->bom) {
 		FLogOutputBOM(fv);
 	}
-	if (ts.DeferredLogWriteMode) {
+	if (g_ts->DeferredLogWriteMode) {
 		StartThread(fv);
 	}
 
@@ -678,8 +678,8 @@ wchar_t* FLogTimeStampStrW(enum LogTimestampType timestamp_type, const wchar_t* 
 
 static wchar_t *TimeStampStr(PFileVar fv)
 {
-	return FLogTimeStampStrW((enum LogTimestampType)ts.LogTimestampType,
-							 ts.LogTimestampFormatW, fv->StartTime, cv.ConnectedTime);
+	return FLogTimeStampStrW((enum LogTimestampType)g_ts->LogTimestampType,
+							 g_ts->LogTimestampFormatW, fv->StartTime, g_cv->ConnectedTime);
 }
 
 /**
@@ -726,7 +726,7 @@ static void LogToFile(PFileVar fv)
 
 	// 書き込み
 	if (WriteBufLen > 0) {
-		if (ts.DeferredLogWriteMode) {
+		if (g_ts->DeferredLogWriteMode) {
 			PostThreadMessage(fv->LogThreadId, WM_DPC_LOGTHREAD_SEND, (WPARAM)WriteBuf, WriteBufLen);
 		}
 		else {
@@ -931,11 +931,11 @@ void FLogInfo(char *param_ptr, size_t param_len)
 	PFileVar fv = LogVar;
 	if (fv) {
 		param_ptr[0] = '0'
-			+ (ts.LogBinary != 0)
-			+ ((ts.Append != 0) << 1)
-			+ ((ts.LogTypePlainText != 0) << 2)
-			+ ((ts.LogTimestamp != 0) << 3)
-			+ ((ts.LogHideDialog != 0) << 4);
+			+ (g_ts->LogBinary != 0)
+			+ ((g_ts->Append != 0) << 1)
+			+ ((g_ts->LogTypePlainText != 0) << 2)
+			+ ((g_ts->LogTimestamp != 0) << 3)
+			+ ((g_ts->LogHideDialog != 0) << 4);
 		char *filenameU8 = ToU8W(fv->FullName);
 		strncpy_s(param_ptr + 1, param_len - 1, filenameU8, _TRUNCATE);
 		free(filenameU8);
@@ -1016,7 +1016,7 @@ wchar_t *FLogGetLogFilenameBase(const wchar_t *filename)
 	free(format);
 
 	// ホスト名など
-	wchar_t *host = ConvertLognameW(&cv, formated);
+	wchar_t *host = ConvertLognameW(g_cv, formated);
 	free(formated);
 
 	// ファイル名に使用できない文字を置換
@@ -1045,8 +1045,8 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 	wchar_t *dir;
 	wchar_t *fname;
 	if (log_filename == NULL) {
-		dir = GetTermLogDir(&ts);
-		fname = _wcsdup(ts.LogDefaultNameW);
+		dir = GetTermLogDir(g_ts);
+		fname = _wcsdup(g_ts->LogDefaultNameW);
 	}
 	else if (!IsRelativePathW(log_filename)) {
 		// 絶対パスが入力された
@@ -1057,7 +1057,7 @@ wchar_t *FLogGetLogFilename(const wchar_t *log_filename)
 		fname = ExtractFileNameW(log_filename);
 	}
 	else {
-		dir = GetTermLogDir(&ts);
+		dir = GetTermLogDir(g_ts);
 		fname = _wcsdup(log_filename);
 	}
 
@@ -1178,7 +1178,7 @@ static void FLogPutUTF32_(PFileVar fv, unsigned int u32)
 	}
 
 	// 行頭か?(改行を出力した直後)
-	if (ts.TerminalID != IdDUMB && ts.LogTimestamp) {
+	if (g_ts->TerminalID != IdDUMB && g_ts->LogTimestamp) {
 		if (fv->eLineEnd) {
 			// タイムスタンプを出力
 			fv->eLineEnd = Line_Other; /* clear endmark*/
@@ -1283,7 +1283,7 @@ static void OutputStr(PFileVar fv, const wchar_t *strW)
 			}
 		}
 	} else if (fv->LogMode == TFileVar::LogModeTag::BIN_MODE) {
-		char *str = MakeOutputStringConvW(strW, ts.KanjiCode, ts.KanjiIn, ts.KanjiOut, ts.JIS7KatakanaSend, NULL);
+		char *str = MakeOutputStringConvW(strW, g_ts->KanjiCode, g_ts->KanjiIn, g_ts->KanjiOut, g_ts->JIS7KatakanaSend, NULL);
 		if (str != NULL) {
 			for (size_t i = 0; str[i] != 0; i++) {
 				Put1(fv, (BYTE)str[i]);

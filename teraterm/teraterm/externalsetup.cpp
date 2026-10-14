@@ -74,7 +74,7 @@ static void ExternalSetupPreProcess(HWND hWnd, CAddSettingPropSheetDlgPage page)
 		;
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::FontPage) {
-		ExternalSetupData.old_VTDrawAPI = ts.VTDrawAPI;
+		ExternalSetupData.old_VTDrawAPI = g_ts->VTDrawAPI;
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::KeyboardPage) {
 		;
@@ -89,7 +89,7 @@ static void ExternalSetupPreProcess(HWND hWnd, CAddSettingPropSheetDlgPage page)
 		;
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::WinPage) {
-		ExternalSetupData.orgTitle = _wcsdup(ts.TitleW);
+		ExternalSetupData.orgTitle = _wcsdup(g_ts->TitleW);
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::SerialPortPage) {
 		;
@@ -122,7 +122,7 @@ static void ExternalSetupPreProcess(HWND hWnd, CAddSettingPropSheetDlgPage page)
 static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 {
 	ExternalSetupData.PerProcessCalled = FALSE;
-	TTTSet *pts = &ts;
+	TTTSet *pts = g_ts;
 
 	//BOOL all = FALSE;
 	BOOL all = TRUE;
@@ -164,10 +164,10 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 			pVTWin->SetColor();
 
 			// タイトルが変更されていたら、リモートタイトルをクリアする
-			if ((ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) &&
-				(wcscmp(ExternalSetupData.orgTitle, ts.TitleW) != 0)) {
-				free(cv.TitleRemoteW);
-				cv.TitleRemoteW = NULL;
+			if ((g_ts->AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) &&
+				(wcscmp(ExternalSetupData.orgTitle, g_ts->TitleW) != 0)) {
+				free(g_cv->TitleRemoteW);
+				g_cv->TitleRemoteW = NULL;
 			}
 			ChangeWin();
 			ChangeFont(vt_src, 0);
@@ -178,35 +178,35 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 	}
 	if (all || page == CAddSettingPropSheetDlgPage::SerialPortPage) {
 		if (ok) {
-			if (ts.ComPort > 0) {
+			if (g_ts->ComPort > 0) {
 
-				if (cv.Ready && (cv.PortType != IdSerial)) {
+				if (g_cv->Ready && (g_cv->PortType != IdSerial)) {
 					// シリアル以外に接続中の場合
-					//  TODO cv.Ready と cv.Openの差は?
+					//  TODO g_cv->Ready と g_cv->Openの差は?
 #if 0
-					OpenNewComport(&ts);
+					OpenNewComport(g_ts);
 					return;
 #endif
 				}
-				else if (!cv.Open) {
+				else if (!g_cv->Open) {
 					// 未接続の場合
 #if 0
-					CommOpen(m_hWnd,&ts,&cv);
+					CommOpen(m_hWnd,g_ts,g_cv);
 #endif
 				}
 				else {
 					// シリアルに接続中の場合
 #if 0
-					if (ts.ComPort != cv.ComPort) {
+					if (g_ts->ComPort != g_cv->ComPort) {
 						// ポートを変更する
-						CommClose(&cv);
-						CommOpen(HVTWin,&ts,&cv);
+						CommClose(g_cv);
+						CommOpen(HVTWin,g_ts,g_cv);
 					}
 					else
 #endif
 					{
 						// 通信パラメータを変更する
-						CommResetSerial(&ts, &cv, ts.ClearComBuffOnOpen);
+						CommResetSerial(g_ts, g_cv, g_ts->ClearComBuffOnOpen);
 					}
 				}
 			}
@@ -214,8 +214,8 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
 
 		// ダイアログフォントの変更
 		if (ok) {
-			SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint,
-						  ts.DialogFontCharSet, ts.UILanguageFileW,
+			SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint,
+						  g_ts->DialogFontCharSet, g_ts->UILanguageFileW,
 						  "Tera Term", "DLG_SYSTEM_FONT");
 		}
 	}
@@ -247,8 +247,8 @@ static void ExternalSetupPostProcess(CAddSettingPropSheetDlgPage page, BOOL ok)
  */
 BOOL OpenExternalSetupTab(HWND hWndParent, CAddSettingPropSheetDlgPage page)
 {
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
+	SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
+				  g_ts->UILanguageFileW, "Tera Term", "DLG_TAHOMA_FONT");
 
 	// PreProcesが呼ばれているかチェック
 	assert(ExternalSetupData.PerProcessCalled == TRUE);
@@ -272,7 +272,7 @@ BOOL OpenExternalSetupTab(HWND hWndParent, CAddSettingPropSheetDlgPage page)
 	int one_page = DefaultPage;
 	CAddSettingPropSheetDlg CAddSetting(hInst, hWndParent, (CAddSettingPropSheetDlg::Page)page);
 	if (one_page == CAddSettingPropSheetDlgPage::DefaultPage) {
-		CAddSetting.SetTreeViewMode(ts.ExperimentalTreePropertySheetEnable);
+		CAddSetting.SetTreeViewMode(g_ts->ExperimentalTreePropertySheetEnable);
 	}
 	INT_PTR ret = CAddSetting.DoModal();
 	return (ret == IDOK) ? TRUE : FALSE;
@@ -301,7 +301,7 @@ void OpenSetupTerminal(HWND hWnd)
 		return;
 	}
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::TermPage);
-	BOOL r = (*SetupTerminal)(hWnd, &ts);
+	BOOL r = (*SetupTerminal)(hWnd, g_ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::TermPage, r);
 }
 
@@ -316,7 +316,7 @@ void OpenSetupWin(HWND hWnd)
 		return;
 	}
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::WinPage);
-	BOOL r = (*SetupWin)(hWnd, &ts);
+	BOOL r = (*SetupWin)(hWnd, g_ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::WinPage, r);
 }
 
@@ -337,7 +337,7 @@ void OpenSetupFont(HWND hWnd)
 
 
 	ExternalSetupPreProcess(hWnd, page);
-	BOOL r = (*ChooseFontDlg)(hWnd, NULL, &ts);
+	BOOL r = (*ChooseFontDlg)(hWnd, NULL, g_ts);
 	ExternalSetupPostProcess(page, r);
 }
 
@@ -347,7 +347,7 @@ void OpenSetupKeyboard(HWND hWnd)
 		return;
 	}
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::KeyboardPage);
-	BOOL r = (*SetupKeyboard)(hWnd, &ts);
+	BOOL r = (*SetupKeyboard)(hWnd, g_ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::KeyboardPage, r);
 }
 
@@ -357,7 +357,7 @@ void OpenSetupTCPIP(HWND hWnd)
 		return;
 	}
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::TcpIpPage);
-	BOOL r = (*SetupTCPIP)(hWnd, &ts);
+	BOOL r = (*SetupTCPIP)(hWnd, g_ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::TcpIpPage, r);
 }
 
@@ -367,7 +367,7 @@ void OpenSetupGeneral(HWND hWnd)
 		return;
 	}
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::GeneralPage);
-	BOOL r = (*SetupGeneral)(hWnd, &ts);
+	BOOL r = (*SetupGeneral)(hWnd, g_ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::GeneralPage, r);
 }
 
@@ -377,7 +377,7 @@ void OpenSetupSerialPort(HWND hWnd)
 		return;
 	}
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::SerialPortPage);
-	BOOL r = (*SetupSerialPort)(hWnd, &ts);
+	BOOL r = (*SetupSerialPort)(hWnd, g_ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::SerialPortPage, r);
 }
 
@@ -387,7 +387,7 @@ void OpenSetupTekWindow(HWND hWnd)
 		return;
 	}
 	ExternalSetupPreProcess(hWnd, CAddSettingPropSheetDlgPage::TekWinPage);
-	BOOL r = (*SetupWin)(hWnd, &ts);
+	BOOL r = (*SetupWin)(hWnd, g_ts);
 	ExternalSetupPostProcess(CAddSettingPropSheetDlgPage::TekWinPage, r);
 }
 

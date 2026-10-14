@@ -53,6 +53,7 @@
 #include "compat_win.h"
 
 #include "commlib.h"
+#include "session.h"
 
 /* create socket */
 static SOCKET OpenSocket(PComVar cv)
@@ -110,8 +111,6 @@ static DWORD CommWriteLimit;	// WriteFile制限 0=制限しない/1～=送信バ
 #define READNAME "Read"
 #define PRNWRITENAME "PrnWrite"
 
-static HANDLE ReadEnd;
-static OVERLAPPED wol, rol;
 
 BOOL TCPIPClosed = TRUE;
 
@@ -604,7 +603,7 @@ void NamedPipeThread(void *arg)
 				PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_READ);
 			}
 			// ReadFile() が終わるまで待つ。
-			WaitForSingleObject(ReadEnd,INFINITE);
+			WaitForSingleObject(cv->ReadEnd,INFINITE);
 		}
 		else {
 			DErr = GetLastError();
@@ -635,7 +634,7 @@ void CommThread(void *arg)
 			if (! cv->RRQ) {
 				PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_READ);
 			}
-			WaitForSingleObject(ReadEnd,INFINITE);
+			WaitForSingleObject(cv->ReadEnd,INFINITE);
 		}
 		else {
 			DErr = GetLastError();  // this returns 995 (operation aborted) if a USB com port is removed
@@ -727,13 +726,13 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 			break;
 
 		case IdSerial:
-			ReadEnd = CreateEvent(NULL, FALSE, FALSE, NULL);
+			cv->ReadEnd = CreateEvent(NULL, FALSE, FALSE, NULL);
 			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", WRITENAME, cv->ComPort);
-			memset(&wol,0,sizeof(OVERLAPPED));
-			wol.hEvent = CreateEvent(NULL,TRUE,TRUE,Temp);
+			memset(&cv->wol,0,sizeof(OVERLAPPED));
+			cv->wol.hEvent = CreateEvent(NULL,TRUE,TRUE,Temp);
 			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READNAME, cv->ComPort);
-			memset(&rol,0,sizeof(OVERLAPPED));
-			rol.hEvent = CreateEvent(NULL,TRUE,FALSE,Temp);
+			memset(&cv->rol,0,sizeof(OVERLAPPED));
+			cv->rol.hEvent = CreateEvent(NULL,TRUE,FALSE,Temp);
 
 			/* create the receiver thread */
 			if (_beginthread(CommThread,0,cv) == -1) {
@@ -753,7 +752,7 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 
 		case IdNamedPipe:
 			cv->ComPort = 0;
-			ReadEnd = CreateEvent(NULL, FALSE, FALSE, NULL);
+			cv->ReadEnd = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 			/* create the receiver thread */
 			if (_beginthread(NamedPipeThread,0,cv) == -1) {
@@ -820,9 +819,9 @@ void CommClose(PComVar cv)
 		case IdSerial:
 			if ( cv->ComID != INVALID_HANDLE_VALUE ) {
 				SetupComm(cv->ComID, 4096, 4096); // デフォルト値に戻す
-				CloseHandle(ReadEnd);
-				CloseHandle(wol.hEvent);
-				CloseHandle(rol.hEvent);
+				CloseHandle(cv->ReadEnd);
+				CloseHandle(cv->wol.hEvent);
+				CloseHandle(cv->rol.hEvent);
 				PurgeComm(cv->ComID, PURGE_TXABORT | PURGE_RXABORT |
 				                     PURGE_TXCLEAR | PURGE_RXCLEAR);
 				EscapeCommFunction(cv->ComID,CLRDTR);
@@ -841,7 +840,7 @@ void CommClose(PComVar cv)
 
 		case IdNamedPipe:
 			if ( cv->ComID != INVALID_HANDLE_VALUE ) {
-				CloseHandle(ReadEnd);
+				CloseHandle(cv->ReadEnd);
 				PCloseFile(cv->ComID);
 			}
 			TTXCloseFile(); /* TTPLUG */
@@ -905,12 +904,12 @@ void CommReceive(PComVar cv)
 				do {
 					C = 0;
 					if (! PReadFile(cv->ComID, &(cv->InBuff[cv->InPtr + cv->InBuffCount]),
-									InBuffSize - cv->InPtr - cv->InBuffCount, &C, &rol)) {
+									InBuffSize - cv->InPtr - cv->InBuffCount, &C, &cv->rol)) {
 						if (GetLastError() == ERROR_IO_PENDING) {
-							if (WaitForSingleObject(rol.hEvent, 1000) != WAIT_OBJECT_0) {
+							if (WaitForSingleObject(cv->rol.hEvent, 1000) != WAIT_OBJECT_0) {
 								C = 0; // タイムアウト
 							} else {
-								if (!GetOverlappedResult(cv->ComID, &rol, &C, FALSE)) {
+								if (!GetOverlappedResult(cv->ComID, &cv->rol, &C, FALSE)) {
 									ClearCommError(cv->ComID, &DErr, NULL);
 									C = 0;
 								}
@@ -953,7 +952,7 @@ void CommReceive(PComVar cv)
 				// 1バイト以上読めたら、イベントを起こし、スレッドを再開させる。
 				if (C > 0) {
 					cv->RRQ = FALSE;
-					SetEvent(ReadEnd);
+					SetEvent(cv->ReadEnd);
 				}
 				break;
 		}
@@ -969,7 +968,7 @@ void CommReceive(PComVar cv)
 				break;
 			case IdSerial:
 				cv->RRQ = FALSE;
-				SetEvent(ReadEnd);
+				SetEvent(cv->ReadEnd);
 				return;
 			case IdFile:
 				if (DErr != ERROR_IO_PENDING) {
@@ -987,7 +986,7 @@ void CommReceive(PComVar cv)
 				} else {
 					cv->RRQ = TRUE;
 				}
-				SetEvent(ReadEnd);
+				SetEvent(cv->ReadEnd);
 				return;
 		}
 		cv->RRQ = FALSE;
@@ -1089,12 +1088,12 @@ void CommSend(PComVar cv)
 
 		case IdSerial:
 			D = 0;
-			ResetEvent(wol.hEvent);
-			if (! PWriteFile(cv->ComID,&(cv->OutBuff[cv->OutPtr]),C,(LPDWORD)&D,&wol)) {
+			ResetEvent(cv->wol.hEvent);
+			if (! PWriteFile(cv->ComID,&(cv->OutBuff[cv->OutPtr]),C,(LPDWORD)&D,&cv->wol)) {
 				if (GetLastError() == ERROR_IO_PENDING) {
-					DErr = WaitForSingleObject(wol.hEvent,1000);
+					DErr = WaitForSingleObject(cv->wol.hEvent,1000);
 					if (DErr == WAIT_OBJECT_0) {
-						if (! GetOverlappedResult(cv->ComID,&wol,(LPDWORD)&D,FALSE)) {
+						if (! GetOverlappedResult(cv->ComID,&cv->wol,(LPDWORD)&D,FALSE)) {
 							ClearCommError(cv->ComID,&DErr,&Stat);
 							D = C; // 送信済のデータは再送しない
 						}
@@ -1300,4 +1299,18 @@ void PrnClose()
 		CloseHandle(PrnID);
 	}
 	PrnID = INVALID_HANDLE_VALUE;
+}
+
+/**
+ *	Variables kept per session (see session.h)
+ */
+void CommRegisterSessionVars(void)
+{
+	static const SessionVar v[] = {
+		SESSION_VAR(CommWriteLimit),
+		SESSION_VAR(PrnID),
+		SESSION_VAR(LPTFlag),
+		SESSION_VAR(TCPIPClosed),
+	};
+	SessionRegisterVars(v, _countof(v));
 }

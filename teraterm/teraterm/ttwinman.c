@@ -41,6 +41,7 @@
 #include "codeconv.h"
 #include "ttwinman.h"
 #include "asprintf.h"
+#include "session.h"
 
 HWND HVTWin = NULL;
 HWND HTEKWin = NULL;
@@ -53,8 +54,11 @@ BOOL Connecting = FALSE;
 /* 'help' button on dialog box */
 WORD MsgDlgHelp;
 
-TTTSet ts;
-TComVar cv;
+/* settings and connection of the active session (see session.c) */
+static TTTSet first_ts;
+static TComVar first_cv;
+TTTSet *g_ts = &first_ts;
+TComVar *g_cv = &first_cv;
 
 /* pointers to window objects */
 void* pTEKWin = NULL;
@@ -74,7 +78,7 @@ void VTActivate()
 //
 // (2005.2.19 yutaka) format ID=13の新規追加、COM5以上の表示に対応
 // (2005.3.13 yutaka) タイトルのSJISへの変換（日本語）を追加
-// (2006.6.15 maya)   ts.KanjiCodeがEUCだと、SJISでもEUCとして
+// (2006.6.15 maya)   g_ts->KanjiCodeがEUCだと、SJISでもEUCとして
 //                    変換してしまうので、ここでは変換しない
 // (2007.7.19 maya)   TCP ポート番号 と シリアルポートのボーレートの表示に対応
 /*
@@ -95,23 +99,23 @@ void ChangeTitle(void)
 
 	{
 		const wchar_t *title_remote;
-		const wchar_t *title = (ts.TitleW != NULL) ? ts.TitleW : L"";
-		title_remote = cv.TitleRemoteW;
-		if (Connecting || !cv.Ready || title_remote == NULL || title_remote[0] == 0) {
+		const wchar_t *title = (g_ts->TitleW != NULL) ? g_ts->TitleW : L"";
+		title_remote = g_cv->TitleRemoteW;
+		if (Connecting || !g_cv->Ready || title_remote == NULL || title_remote[0] == 0) {
 			// リモートタイトルを使用しない or 設定されていない
 			wcsncpy_s(TempTitleWithRemote, _countof(TempTitleWithRemote), title, _TRUNCATE);
 			wcsncpy_s(TempTitle, _countof(TempTitle), title, _TRUNCATE);
 		}
 		else {
 			// リモートからのタイトルを別に扱う (2008.11.1 maya)
-			if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestOff) {
+			if (g_ts->AcceptTitleChangeRequest == IdTitleChangeRequestOff) {
 				wcsncpy_s(TempTitleWithRemote, _countof(TempTitleWithRemote), title, _TRUNCATE);
 			}
-			else if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestAhead) {
+			else if (g_ts->AcceptTitleChangeRequest == IdTitleChangeRequestAhead) {
 				_snwprintf_s(TempTitleWithRemote, _countof(TempTitleWithRemote), _TRUNCATE,
 							 L"%s %s", title_remote, title);
 			}
-			else if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestLast) {
+			else if (g_ts->AcceptTitleChangeRequest == IdTitleChangeRequestLast) {
 				_snwprintf_s(TempTitleWithRemote, _countof(TempTitleWithRemote), _TRUNCATE,
 							 L"%s %s", title, title_remote);
 			}
@@ -122,42 +126,42 @@ void ChangeTitle(void)
 		}
 	}
 
-	if ((ts.TitleFormat & 1)!=0)
+	if ((g_ts->TitleFormat & 1)!=0)
 	{ // host name
 		wchar_t *UIMsg;
 		wcsncat_s(TempTitle,_countof(TempTitle), L" - ",_TRUNCATE);
 		if (Connecting) {
-			GetI18nStrWW("Tera Term", "DLG_MAIN_TITLE_CONNECTING", L"[connecting...]", ts.UILanguageFileW, &UIMsg);
+			GetI18nStrWW("Tera Term", "DLG_MAIN_TITLE_CONNECTING", L"[connecting...]", g_ts->UILanguageFileW, &UIMsg);
 			wcsncat_s(TempTitle,_countof(TempTitle), UIMsg,_TRUNCATE);
 			free(UIMsg);
 		}
-		else if (! cv.Ready) {
-			GetI18nStrWW("Tera Term", "DLG_MAIN_TITLE_DISCONNECTED", L"[disconnected]", ts.UILanguageFileW, &UIMsg);
+		else if (! g_cv->Ready) {
+			GetI18nStrWW("Tera Term", "DLG_MAIN_TITLE_DISCONNECTED", L"[disconnected]", g_ts->UILanguageFileW, &UIMsg);
 			wcsncat_s(TempTitle,_countof(TempTitle), UIMsg,_TRUNCATE);
 			free(UIMsg);
 		}
-		else if (cv.PortType==IdSerial)
+		else if (g_cv->PortType==IdSerial)
 		{
 			// COM5 overに対応
 			wchar_t str[24]; // COMxxxx:xxxxxxxxxxbps
-			if (ts.TitleFormat & 32) {
-				_snwprintf_s(str, _countof(str), _TRUNCATE, L"COM%d:%ubps", ts.ComPort, ts.Baud);
+			if (g_ts->TitleFormat & 32) {
+				_snwprintf_s(str, _countof(str), _TRUNCATE, L"COM%d:%ubps", g_ts->ComPort, g_ts->Baud);
 			}
 			else {
-				_snwprintf_s(str, _countof(str), _TRUNCATE, L"COM%d", ts.ComPort);
+				_snwprintf_s(str, _countof(str), _TRUNCATE, L"COM%d", g_ts->ComPort);
 			}
 
-			if (ts.TitleFormat & 8) {
+			if (g_ts->TitleFormat & 8) {
 				_snwprintf_s(TempTitle, _countof(TempTitle), _TRUNCATE, L"%s - %s", str, TempTitleWithRemote);
 			} else {
 				wcsncat_s(TempTitle, _countof(TempTitle), str, _TRUNCATE);
 			}
 		}
-		else if (cv.PortType == IdNamedPipe)
+		else if (g_cv->PortType == IdNamedPipe)
 		{
 			const wchar_t *str = GetConnectHostName();
 
-			if (ts.TitleFormat & 8) {
+			if (g_ts->TitleFormat & 8) {
 				// format ID = 13(8 + 5): <hots/port> - <title>
 				_snwprintf_s(TempTitle, _countof(TempTitle), _TRUNCATE, L"%s - %s", str, TempTitleWithRemote);
 			}
@@ -168,12 +172,12 @@ void ChangeTitle(void)
 		else {
 			wchar_t host_port[_countof(TempTitle)];
 			const wchar_t *str = GetConnectHostName();
-			if (ts.TitleFormat & 16) {
-				_snwprintf_s(host_port, _countof(host_port), _TRUNCATE, L"%s:%d", str, ts.TCPPort);
+			if (g_ts->TitleFormat & 16) {
+				_snwprintf_s(host_port, _countof(host_port), _TRUNCATE, L"%s:%d", str, g_ts->TCPPort);
 				str = host_port;
 			}
 
-			if (ts.TitleFormat & 8) {
+			if (g_ts->TitleFormat & 8) {
 				// format ID = 13(8 + 5): <hots/port> - <title>
 				_snwprintf_s(TempTitle, _countof(TempTitle), _TRUNCATE, L"%s - %s", str, TempTitleWithRemote);
 			}
@@ -183,7 +187,7 @@ void ChangeTitle(void)
 		}
 	}
 
-	if ((ts.TitleFormat & 2)!=0)
+	if ((g_ts->TitleFormat & 2)!=0)
 	{ // serial no.
 		wchar_t Num[11];
 		wcsncat_s(TempTitle,_countof(TempTitle),L" (",_TRUNCATE);
@@ -192,14 +196,14 @@ void ChangeTitle(void)
 		wcsncat_s(TempTitle,_countof(TempTitle),L")",_TRUNCATE);
 	}
 
-	if ((ts.TitleFormat & 4)!=0) // VT
+	if ((g_ts->TitleFormat & 4)!=0) // VT
 		wcsncat_s(TempTitle,_countof(TempTitle),L" VT",_TRUNCATE);
 
 	SetWindowTextW(HVTWin,TempTitle);
 
 	if (HTEKWin!=0)
 	{
-		if ((ts.TitleFormat & 4)!=0) // TEK
+		if ((g_ts->TitleFormat & 4)!=0) // TEK
 		{
 			wcsncat_s(TempTitle,_countof(TempTitle),L" TEK",_TRUNCATE);
 		}
@@ -251,7 +255,7 @@ HMODULE LoadHomeDLL(const wchar_t *DLLname)
 {
 	HMODULE handle;
 	wchar_t *DLLpath;
-	aswprintf(&DLLpath, L"%s\\%s", ts.ExeDirW, DLLname);
+	aswprintf(&DLLpath, L"%s\\%s", g_ts->ExeDirW, DLLname);
 	handle = LoadLibraryW(DLLpath);
 	free(DLLpath);
 	return handle;
@@ -261,15 +265,15 @@ HMODULE LoadHomeDLL(const wchar_t *DLLname)
  *	ローカルタイトルを設定する
  *
  *	@param	title	タイトル文字列
- *					ts.TitleW を指定しない
+ *					g_ts->TitleW を指定しない
  */
 void SetLocalTitle(const wchar_t *title)
 {
-	if (title == ts.TitleW) {
+	if (title == g_ts->TitleW) {
 		return;
 	}
-	free(ts.TitleW);
-	ts.TitleW = _wcsdup(title != NULL ? title : L"");
+	free(g_ts->TitleW);
+	g_ts->TitleW = _wcsdup(title != NULL ? title : L"");
 	ChangeTitle();
 }
 
@@ -281,34 +285,34 @@ void SetLocalTitle(const wchar_t *title)
  */
 const wchar_t *GetLocalTitle(void)
 {
-	return (ts.TitleW != NULL) ? ts.TitleW : L"";
+	return (g_ts->TitleW != NULL) ? g_ts->TitleW : L"";
 }
 
 /**
  *	接続先ホスト名を設定する
  *
- *	ts.HostNameW と ts.HostName(ANSI) の両方を設定する
+ *	g_ts->HostNameW と g_ts->HostName(ANSI) の両方を設定する
  *
  *	@param	hostname	ホスト名
  *						NULL のときは空にする
- *						ts.HostNameW を指定しない
+ *						g_ts->HostNameW を指定しない
  */
 void SetConnectHostName(const wchar_t *hostname)
 {
-	if (hostname == ts.HostNameW) {
+	if (hostname == g_ts->HostNameW) {
 		return;
 	}
-	free(ts.HostNameW);
-	ts.HostNameW = _wcsdup(hostname != NULL ? hostname : L"");
-	WideCharToACP_t(ts.HostNameW, ts.HostName, _countof(ts.HostName));
+	free(g_ts->HostNameW);
+	g_ts->HostNameW = _wcsdup(hostname != NULL ? hostname : L"");
+	WideCharToACP_t(g_ts->HostNameW, g_ts->HostName, _countof(g_ts->HostName));
 }
 
 /**
  *	接続先ホスト名を取得する
  *
- *	ts.HostName(ANSI) だけを書き換えるプラグイン(TTProxy 1.0.0.27 以前など)が
- *	あるため、ts.HostName が ts.HostNameW と食い違っているときは
- *	ts.HostName から ts.HostNameW を作り直して返す
+ *	g_ts->HostName(ANSI) だけを書き換えるプラグイン(TTProxy 1.0.0.27 以前など)が
+ *	あるため、g_ts->HostName が g_ts->HostNameW と食い違っているときは
+ *	g_ts->HostName から g_ts->HostNameW を作り直して返す
  *
  *	@return	ホスト名(NULLを返さない)
  *			次に SetConnectHostName() または GetConnectHostName() が
@@ -316,15 +320,33 @@ void SetConnectHostName(const wchar_t *hostname)
  */
 const wchar_t *GetConnectHostName(void)
 {
-	if (ts.HostNameW != NULL) {
-		char hostnameA[_countof(ts.HostName)];
-		WideCharToACP_t(ts.HostNameW, hostnameA, _countof(hostnameA));
-		if (strcmp(hostnameA, ts.HostName) == 0) {
-			return ts.HostNameW;
+	if (g_ts->HostNameW != NULL) {
+		char hostnameA[_countof(g_ts->HostName)];
+		WideCharToACP_t(g_ts->HostNameW, hostnameA, _countof(hostnameA));
+		if (strcmp(hostnameA, g_ts->HostName) == 0) {
+			return g_ts->HostNameW;
 		}
 	}
-	// ts.HostNameW が未設定、または ts.HostName だけが書き換えられている
-	free(ts.HostNameW);
-	ts.HostNameW = ToWcharA(ts.HostName);
-	return (ts.HostNameW != NULL) ? ts.HostNameW : L"";
+	// g_ts->HostNameW が未設定、または g_ts->HostName だけが書き換えられている
+	free(g_ts->HostNameW);
+	g_ts->HostNameW = ToWcharA(g_ts->HostName);
+	return (g_ts->HostNameW != NULL) ? g_ts->HostNameW : L"";
+}
+
+/**
+ *	Variables kept per session (see session.h)
+ */
+void WinManRegisterSessionVars(void)
+{
+	static const SessionVar v[] = {
+		SESSION_VAR(ActiveWin),
+		SESSION_VAR(Connecting),
+		SESSION_VAR(HTEKWin),
+		SESSION_VAR(HVTWin),
+		SESSION_VAR(KeybEnabled),
+		SESSION_VAR(SerialNo),
+		SESSION_VAR(TalkStatus),
+		SESSION_VAR(pTEKWin),
+	};
+	SessionRegisterVars(v, _countof(v));
 }

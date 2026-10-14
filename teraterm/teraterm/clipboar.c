@@ -129,7 +129,7 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
 	BOOL confirm = FALSE;
 
 	*out_str_w = NULL;
-	if ((ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE) == 0) {
+	if ((g_ts->PasteFlag & CPF_CONFIRM_CHANGEPASTE) == 0) {
 		return TRUE;
 	}
 
@@ -148,7 +148,7 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
  * 2 の動作はどちらがいいか?
  */
 	if (AddCR) {
-		if (ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE_CR) {
+		if (g_ts->PasteFlag & CPF_CONFIRM_CHANGEPASTE_CR) {
 			confirm = TRUE;
 		}
 	}
@@ -160,9 +160,9 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
 	}
 
 	// 辞書をサーチする
-	if (ts.ConfirmChangePasteStringFile[0] != '\0') {
-		wchar_t *fname_rel =ToWcharA(ts.ConfirmChangePasteStringFile);
-		wchar_t *fnameW = GetFullPathW(ts.HomeDirW, fname_rel);
+	if (g_ts->ConfirmChangePasteStringFile[0] != '\0') {
+		wchar_t *fname_rel =ToWcharA(g_ts->ConfirmChangePasteStringFile);
+		wchar_t *fnameW = GetFullPathW(g_ts->HomeDirW, fname_rel);
 		if (!confirm && search_dictW(fnameW, str_w)) {
 			confirm = TRUE;
 		}
@@ -174,10 +174,10 @@ static BOOL CheckClipboardContentW(HWND HWin, const wchar_t *str_w, BOOL AddCR, 
 	if (confirm) {
 		clipboarddlgdata dlg_data;
 		dlg_data.strW_ptr = str_w;
-		dlg_data.UILanguageFileW = ts.UILanguageFileW;
-		dlg_data.PasteDialogSize = ts.PasteDialogSize;
+		dlg_data.UILanguageFileW = g_ts->UILanguageFileW;
+		dlg_data.PasteDialogSize = g_ts->PasteDialogSize;
 		ret = clipboarddlg(hInst, HWin, &dlg_data);
-		ts.PasteDialogSize = dlg_data.PasteDialogSize;
+		g_ts->PasteDialogSize = dlg_data.PasteDialogSize;
 		*out_str_w = dlg_data.strW_edited_ptr;
 	}
 
@@ -202,18 +202,18 @@ static void CBSendStart(wchar_t *str_w)
 		free(str_w);
 		return;
 	}
-	if (ts.PasteDelayPerLine == 0) {
+	if (g_ts->PasteDelayPerLine == 0) {
 		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
 	}
 	else {
-		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, ts.PasteDelayPerLine, 0);
+		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, g_ts->PasteDelayPerLine, 0);
 	}
-	if (ts.LocalEcho > 0) {
+	if (g_ts->LocalEcho > 0) {
 		SendMemInitEcho(sm, TRUE);
 	}
 
 #if 0
-	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFile);
+	SendMemInitDialog(sm, hInst, HVTWin, g_ts->UILanguageFile);
 	SendMemInitDialogCaption(sm, L"from clipboard");
 	SendMemInitDialogFilename(sm, L"Clipboard");
 #endif
@@ -225,7 +225,7 @@ void CBPreparePaste(HWND HWin, BOOL shouldBeReady, BOOL AddCR, BOOL Bracketed, w
 	wchar_t *str_w;
 	wchar_t *str_w_edited;
 
-	if (shouldBeReady && ! cv.Ready) {
+	if (shouldBeReady && ! g_cv->Ready) {
 		return;
 	}
 	if (TalkStatus!=IdTalkKeyb) {
@@ -238,7 +238,7 @@ void CBPreparePaste(HWND HWin, BOOL shouldBeReady, BOOL AddCR, BOOL Bracketed, w
 		return;
 	}
 
-	if (ts.PasteFlag & CPF_TRIM_TRAILING_NL) {
+	if (g_ts->PasteFlag & CPF_TRIM_TRAILING_NL) {
 		// バッファ最後の改行を削除
 		TrimTrailingNLW(str_w);
 	}
@@ -262,8 +262,8 @@ void CBPreparePaste(HWND HWin, BOOL shouldBeReady, BOOL AddCR, BOOL Bracketed, w
 
 	// ブラケットするかどうか
 	BOOL AddBracket = FALSE;
-	if (ts.BracketedSupport) {
-		if (!ts.BracketedControlOnly) {
+	if (g_ts->BracketedSupport) {
+		if (!g_ts->BracketedControlOnly) {
 			AddBracket = TRUE;
 		}
 		else {
@@ -329,7 +329,7 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 	char *str_mb = NULL;
 	char *str_b64 = NULL;
 
-	if (! cv.Ready) {
+	if (! g_cv->Ready) {
 		return;
 	}
 	if (TalkStatus!=IdTalkKeyb) {
@@ -342,11 +342,11 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 		goto error;
 	}
 
-	if (ts.KanjiCodeSend == IdUTF8) {
+	if (g_ts->KanjiCodeSend == IdUTF8) {
 		str_mb = ToU8W(str_w);
 	}
 	else {
-		str_mb = MakeOutputStringConvW(str_w, ts.KanjiCodeSend, ts.KanjiIn, ts.KanjiOut, ts.JIS7KatakanaSend, NULL);
+		str_mb = MakeOutputStringConvW(str_w, g_ts->KanjiCodeSend, g_ts->KanjiIn, g_ts->KanjiOut, g_ts->JIS7KatakanaSend, NULL);
 	}
 
 	if (str_mb == NULL) {

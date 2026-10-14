@@ -57,8 +57,8 @@ extern BOOL Connecting;
 /* 'help' button on dialog box */
 extern WORD MsgDlgHelp;
 
-extern TTTSet ts;
-extern TComVar cv;
+extern TTTSet *g_ts;
+extern TComVar *g_cv;
 
 /* pointers to window objects */
 extern void* pTEKWin;

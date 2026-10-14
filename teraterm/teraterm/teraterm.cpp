@@ -62,6 +62,7 @@
 #include "codeconv.h"
 #include "ttplug.h"
 #include "ttsetup.h"
+#include "session.h"
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -191,13 +192,13 @@ BOOL OnIdle(LONG lCount)
 	BOOL Size;
 	(void)lCount;
 
-	if (cv.Ready)
+	if (g_cv->Ready)
 	{
 		/* Sender */
-		CommSend(&cv);
+		CommSend(g_cv);
 
 		/* Parser */
-		if ((TelStatus==TelIdle) && cv.TelMode)
+		if ((TelStatus==TelIdle) && g_cv->TelMode)
 			TelStatus = TelIAC;
 
 		if (TelStatus != TelIdle)
@@ -275,14 +276,14 @@ BOOL OnIdle(LONG lCount)
 			// 上書きしてしまう可能性がある。(2007.6.14 yutaka)
 
 		} else {
-			CommReceive(&cv);
+			CommReceive(g_cv);
 		}
 
 	}
 
 	BOOL Busy = FALSE;
-	if (cv.Ready &&
-	    (cv.RRQ || (cv.OutBuffCount>0) || (cv.InBuffCount>0) || (cv.FlushLen>0) || FLogGetCount() > 0 || (DDEGetCount()>0)) ) {
+	if (g_cv->Ready &&
+	    (g_cv->RRQ || (g_cv->OutBuffCount>0) || (g_cv->InBuffCount>0) || (g_cv->FlushLen>0) || FLogGetCount() > 0 || (DDEGetCount()>0)) ) {
 		Busy = TRUE;
 	}
 
@@ -416,21 +417,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
+	// per tab state, before any module is initialized
+	SessionInit();
+
 	srand((unsigned int)time(NULL));
 	setlocale(LC_ALL, "");
 
-	ts.TeraTermInstance = hInstance;
-	ts.nCmdShow = nCmdShow;
+	g_ts->TeraTermInstance = hInstance;
+	g_ts->nCmdShow = nCmdShow;
 	hInst = hInstance;
-	init(&ts);
+	init(g_ts);
 
 	CVTWindow *m_pMainWnd = new CVTWindow(hInstance);
 	pVTWin = m_pMainWnd;
 	main_window = m_pMainWnd->m_hWnd;
 
 	// [Tera Term]セクションのDLG_SYSTEM_FONTをとりあえずセットする
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
+				  g_ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 
 	if (pCreateTimerQueueTimer != NULL) {
 		pCreateTimerQueueTimer(&hIdleTimer, NULL, IdleTimerProc, 0, IdleTimerPeriod, 0, WT_EXECUTEDEFAULT);
@@ -487,7 +491,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 				bool message_processed = false;
 
 				if (m_pMainWnd->m_hAccel != NULL) {
-					if (!MetaKey(ts.MetaKey)) {
+					if (!MetaKey(g_ts->MetaKey)) {
 						// matakeyが押されていない
 						if (::TranslateAcceleratorW(m_pMainWnd->m_hWnd, m_pMainWnd->m_hAccel, &msg)) {
 							// アクセラレーターキーを処理した
@@ -530,7 +534,7 @@ exit_message_loop:
 	// プラグインの終了処理
 	TTXEnd(); /* TTPLUG */
 
-	TTSetUnInit(&ts);
+	TTSetUnInit(g_ts);
 
 	DXUninit();
 

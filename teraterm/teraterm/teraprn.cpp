@@ -114,8 +114,8 @@ static BOOL PrnCreateDialog()
 		return FALSE;
 	}
 
-	SetDialogFont(ts.DialogFontNameW, ts.DialogFontPoint, ts.DialogFontCharSet,
-				  ts.UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+	SetDialogFont(g_ts->DialogFontNameW, g_ts->DialogFontPoint, g_ts->DialogFontCharSet,
+				  g_ts->UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
 	PrnAbortDlg = new CPrnAbortDlg();
 	if (PrnAbortDlg == NULL) {
 		return FALSE;
@@ -127,7 +127,7 @@ static BOOL PrnCreateDialog()
 	else {
 		hParent = HTEKWin;
 	}
-	PrnAbortDlg->Create(hInst, hParent, ts.UILanguageFileW);
+	PrnAbortDlg->Create(hInst, hParent, g_ts->UILanguageFileW);
 	return TRUE;
 }
 
@@ -385,7 +385,7 @@ static void PrintFile_(PrintFile *handle)
 				}
 				if (CRFlag) {
 					DispPrnPosCR(vt, dc);
-					if ((u32==FF) && (ts.PrnConvFF==0)) { // new page
+					if ((u32==FF) && (g_ts->PrnConvFF==0)) { // new page
 						DispPrnPosFF(vt, dc);
 					}
 					else { // new line
@@ -412,7 +412,7 @@ static void PrintFileDirect(PrintFile *handle)
 	handle->HPrnFile = CreateFileW(handle->PrnFName,
 									GENERIC_READ, FILE_SHARE_READ, NULL,
 									OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	PrintAbortFlag = (handle->HPrnFile == INVALID_HANDLE_VALUE) || ! PrnOpen(ts.PrnDev);
+	PrintAbortFlag = (handle->HPrnFile == INVALID_HANDLE_VALUE) || ! PrnOpen(g_ts->PrnDev);
 	handle->PrnBuffCount = 0;
 	SetTimer(HVTWin,IdPrnProcTimer,0,NULL);
 }
@@ -475,7 +475,7 @@ void PrnFileStart(PrintFile *handle)
 	if (handle->PrnFName == NULL) {
 		return;
 	}
-	if (ts.PrnDev[0]!=0) {
+	if (g_ts->PrnDev[0]!=0) {
 		PrintFileDirect(handle); // send file directry to printer port
 	}
 	else { // print file by using Windows API
@@ -496,7 +496,7 @@ void ClosePrnFile(PrintFile *handle, void (*finish_callback)(PrintFile *handle))
 		CloseHandle(p->HPrnFile);
 		p->HPrnFile = INVALID_HANDLE_VALUE;
 	}
-	SetTimer(HVTWin,IdPrnStartTimer,ts.PassThruDelay*1000,NULL);
+	SetTimer(HVTWin,IdPrnStartTimer,g_ts->PassThruDelay*1000,NULL);
 }
 
 /**

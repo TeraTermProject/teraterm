@@ -52,7 +52,7 @@ CLogPropPageDlg::CLogPropPageDlg(HINSTANCE inst)
 {
 	wchar_t *UIMsg;
 	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_Log",
-				 L"Log", ts.UILanguageFileW, &UIMsg);
+				 L"Log", g_ts->UILanguageFileW, &UIMsg);
 	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 	m_TipWin = new CTipWin(inst);
@@ -106,7 +106,7 @@ BOOL CLogPropPageDlg::OnInitDialog()
 		{ IDC_OPT_INCBUF, "DLG_FOPT_ALLBUFFINFIRST" },
 		{ IDC_OPT_TIMESTAMP, "DLG_FOPT_TIMESTAMP" },
 	};
-	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), g_ts->UILanguageFileW);
 
 	const static I18nTextInfo fopt_timestamp[] = {
 		{ "DLG_FOPT_TIMESTAMP_LOCAL", L"Local Time" },
@@ -115,11 +115,11 @@ BOOL CLogPropPageDlg::OnInitDialog()
 		{ "DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION", L"Elapsed Time (Connection)" },
 	};
 	SetI18nListW("Tera Term", m_hWnd, IDC_OPT_TIMESTAMP_TYPE, fopt_timestamp, _countof(fopt_timestamp),
-				 ts.UILanguageFileW, 0);
+				 g_ts->UILanguageFileW, 0);
 
 	// Viewlog Editor path
-	SetDlgItemTextW(IDC_VIEWLOG_EDITOR_EXE, ts.ViewlogEditorW);
-	SetDlgItemTextW(IDC_VIEWLOG_EDITOR_ARG, ts.ViewlogEditorArg);
+	SetDlgItemTextW(IDC_VIEWLOG_EDITOR_EXE, g_ts->ViewlogEditorW);
+	SetDlgItemTextW(IDC_VIEWLOG_EDITOR_ARG, g_ts->ViewlogEditorArg);
 
 	// Log Default File Name
 	static const wchar_t *logfile_patterns[] = {
@@ -139,27 +139,27 @@ BOOL CLogPropPageDlg::OnInitDialog()
 		SendDlgItemMessageW(IDC_DEFAULTNAME_EDITOR, CB_ADDSTRING, 0, (LPARAM)pattern);
 	}
 	ExpandCBWidth(m_hWnd, IDC_DEFAULTNAME_EDITOR);
-	SetDlgItemTextW(IDC_DEFAULTNAME_EDITOR, ts.LogDefaultNameW);
+	SetDlgItemTextW(IDC_DEFAULTNAME_EDITOR, g_ts->LogDefaultNameW);
 
 	// Log Default File Path (2007.5.30 maya)
-	SetDlgItemTextW(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPathW);
+	SetDlgItemTextW(IDC_DEFAULTPATH_EDITOR, g_ts->LogDefaultPathW);
 
 	/* Auto start logging (2007.5.31 maya) */
-	SetCheck(IDC_AUTOSTART, ts.LogAutoStart);
+	SetCheck(IDC_AUTOSTART, g_ts->LogAutoStart);
 
 	// Log rotate
-	SetCheck(IDC_LOG_ROTATE, ts.LogRotate != ROTATE_NONE);
+	SetCheck(IDC_LOG_ROTATE, g_ts->LogRotate != ROTATE_NONE);
 
 	for (int i = 0 ; i < LOG_ROTATE_SIZETYPE_NUM ; i++) {
 		SendDlgItemMessageA(IDC_ROTATE_SIZE_TYPE, CB_ADDSTRING, 0, (LPARAM)LogRotateSizeType[i]);
 	}
-	int TmpLogRotateSize = ts.LogRotateSize;
-	for (int i = 0 ; i < ts.LogRotateSizeType ; i++)
+	int TmpLogRotateSize = g_ts->LogRotateSize;
+	for (int i = 0 ; i < g_ts->LogRotateSizeType ; i++)
 		TmpLogRotateSize /= 1024;
 	SetDlgItemInt(IDC_ROTATE_SIZE, TmpLogRotateSize, FALSE);
-	SendDlgItemMessageA(IDC_ROTATE_SIZE_TYPE, CB_SELECTSTRING, -1, (LPARAM)GetLogRotateSizeType(ts.LogRotateSizeType));
-	SetDlgItemInt(IDC_ROTATE_STEP, ts.LogRotateStep, FALSE);
-	if (ts.LogRotate == ROTATE_NONE) {
+	SendDlgItemMessageA(IDC_ROTATE_SIZE_TYPE, CB_SELECTSTRING, -1, (LPARAM)GetLogRotateSizeType(g_ts->LogRotateSizeType));
+	SetDlgItemInt(IDC_ROTATE_STEP, g_ts->LogRotateStep, FALSE);
+	if (g_ts->LogRotate == ROTATE_NONE) {
 		EnableDlgItem(IDC_ROTATE_SIZE_TEXT, FALSE);
 		EnableDlgItem(IDC_ROTATE_SIZE, FALSE);
 		EnableDlgItem(IDC_ROTATE_SIZE_TYPE, FALSE);
@@ -174,29 +174,29 @@ BOOL CLogPropPageDlg::OnInitDialog()
 	}
 
 	// Log options
-	SetCheck(IDC_OPT_BINARY, ts.LogBinary != 0);
-	if (ts.LogBinary) {
+	SetCheck(IDC_OPT_BINARY, g_ts->LogBinary != 0);
+	if (g_ts->LogBinary) {
 		EnableDlgItem(IDC_OPT_PLAINTEXT, FALSE);
 		EnableDlgItem(IDC_OPT_TIMESTAMP, FALSE);
 	} else {
 		EnableDlgItem(IDC_OPT_PLAINTEXT, TRUE);
 		EnableDlgItem(IDC_OPT_TIMESTAMP, TRUE);
 	}
-	SetCheck(IDC_OPT_APPEND, ts.Append != 0);
-	SetCheck(IDC_OPT_PLAINTEXT, ts.LogTypePlainText != 0);
-	SetCheck(IDC_OPT_HIDEDLG, ts.LogHideDialog != 0);
-	SetCheck(IDC_OPT_INCBUF, ts.LogAllBuffIncludedInFirst != 0);
-	SetCheck(IDC_OPT_TIMESTAMP, ts.LogTimestamp != 0);
+	SetCheck(IDC_OPT_APPEND, g_ts->Append != 0);
+	SetCheck(IDC_OPT_PLAINTEXT, g_ts->LogTypePlainText != 0);
+	SetCheck(IDC_OPT_HIDEDLG, g_ts->LogHideDialog != 0);
+	SetCheck(IDC_OPT_INCBUF, g_ts->LogAllBuffIncludedInFirst != 0);
+	SetCheck(IDC_OPT_TIMESTAMP, g_ts->LogTimestamp != 0);
 
-	SetCurSel(IDC_OPT_TIMESTAMP_TYPE, ts.LogTimestampType);
-	if (ts.LogBinary || !ts.LogTimestamp) {
+	SetCurSel(IDC_OPT_TIMESTAMP_TYPE, g_ts->LogTimestampType);
+	if (g_ts->LogBinary || !g_ts->LogTimestamp) {
 		EnableDlgItem(IDC_OPT_TIMESTAMP_TYPE, FALSE);
 	}
 	else {
 		EnableDlgItem(IDC_OPT_TIMESTAMP_TYPE, TRUE);
 	}
 /*
-	switch (ts.LogTimestampType) {
+	switch (g_ts->LogTimestampType) {
 		case CSF_CBRW:
 			cmb->SetCurSel(3);
 			break;
@@ -258,9 +258,9 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 				TTOPENFILENAMEW ofn = {};
 				ofn.hwndOwner = m_hWnd;
-				ofn.lpstrFilter = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGVIEW_APP_FILTER", L"exe(*.exe)\\0*.exe\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW);
+				ofn.lpstrFilter = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGVIEW_APP_FILTER", L"exe(*.exe)\\0*.exe\\0all(*.*)\\0*.*\\0\\0", g_ts->UILanguageFileW);
 				ofn.lpstrFile = editor;
-				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGVIEW_APP_TITLE", L"Choose a executing file with launching logging file", ts.UILanguageFileW);
+				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGVIEW_APP_TITLE", L"Choose a executing file with launching logging file", g_ts->UILanguageFileW);
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 				wchar_t *filew;
 				BOOL ok = TTGetOpenFileNameW(&ofn, &filew);
@@ -277,12 +277,12 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDC_DEFAULTPATH_PUSH | (BN_CLICKED << 16):
 			// ログディレクトリの選択ダイアログ
 			{
-				wchar_t *title = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGDIR_TITLE", L"Select log folder", ts.UILanguageFileW);
+				wchar_t *title = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_LOGDIR_TITLE", L"Select log folder", g_ts->UILanguageFileW);
 				wchar_t *default_path;
 				hGetDlgItemTextW(m_hWnd, IDC_DEFAULTPATH_EDITOR, &default_path);
 				if (default_path[0] == 0) {
 					free(default_path);
-					default_path = _wcsdup(ts.LogDirW);
+					default_path = _wcsdup(g_ts->LogDirW);
 				}
 				wchar_t *new_path;
 				if (doSelectFolderW(GetSafeHwnd(), default_path, title, &new_path)) {
@@ -355,7 +355,7 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			if (format == NULL) {
 				hGetDlgItemTextW(m_hWnd, IDC_DEFAULTNAME_EDITOR, &format);
 			}
-			wchar_t *preview = MakePreviewStr(format, ts.UILanguageFileW);
+			wchar_t *preview = MakePreviewStr(format, g_ts->UILanguageFileW);
 			if (preview[0] != 0 && wcscmp(format, preview) != 0) {
 				RECT rc;
 				::GetWindowRect(::GetDlgItem(m_hWnd, IDC_DEFAULTNAME_EDITOR), &rc);
@@ -398,7 +398,7 @@ void CLogPropPageDlg::OnOKLogFilename()
 			"MSG_ERROR", L"ERROR",
 			"MSG_LOGFILE_INVALID_CHAR_ERROR", L"Invalid character is included in log file name.",
 			MB_ICONEXCLAMATION };
-		TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
+		TTMessageBoxW(m_hWnd, &info, g_ts->UILanguageFileW);
 		return;
 	}
 
@@ -413,7 +413,7 @@ void CLogPropPageDlg::OnOKLogFilename()
 			"MSG_ERROR", L"ERROR",
 			"MSG_LOGFILE_TOOLONG_ERROR", L"The log file name is too long.",
 			MB_ICONEXCLAMATION };
-		TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
+		TTMessageBoxW(m_hWnd, &info, g_ts->UILanguageFileW);
 		free(def_name);
 		return;
 	}
@@ -426,102 +426,102 @@ void CLogPropPageDlg::OnOKLogFilename()
 			"MSG_ERROR", L"ERROR",
 			"MSG_LOGFILE_INVALID_CHAR_ERROR", L"Invalid character is included in log file name.",
 			MB_ICONEXCLAMATION };
-		TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
+		TTMessageBoxW(m_hWnd, &info, g_ts->UILanguageFileW);
 		free(def_name);
 		free(buf3);
 		return;
 	}
 
-	free(ts.LogDefaultNameW);
-	ts.LogDefaultNameW = def_name;
+	free(g_ts->LogDefaultNameW);
+	g_ts->LogDefaultNameW = def_name;
 	free(buf3);
 }
 
 void CLogPropPageDlg::OnOK()
 {
 	// Viewlog Editor path
-	free(ts.ViewlogEditorW);
-	hGetDlgItemTextW(m_hWnd, IDC_VIEWLOG_EDITOR_EXE, &ts.ViewlogEditorW);
-	free(ts.ViewlogEditorArg);
-	hGetDlgItemTextW(m_hWnd, IDC_VIEWLOG_EDITOR_ARG, &ts.ViewlogEditorArg);
+	free(g_ts->ViewlogEditorW);
+	hGetDlgItemTextW(m_hWnd, IDC_VIEWLOG_EDITOR_EXE, &g_ts->ViewlogEditorW);
+	free(g_ts->ViewlogEditorArg);
+	hGetDlgItemTextW(m_hWnd, IDC_VIEWLOG_EDITOR_ARG, &g_ts->ViewlogEditorArg);
 
 	// Log Default File Name
 	OnOKLogFilename();
 
 	// Log Default File Path (2007.5.30 maya)
-	free(ts.LogDefaultPathW);
-	hGetDlgItemTextW(m_hWnd, IDC_DEFAULTPATH_EDITOR, &ts.LogDefaultPathW);
+	free(g_ts->LogDefaultPathW);
+	hGetDlgItemTextW(m_hWnd, IDC_DEFAULTPATH_EDITOR, &g_ts->LogDefaultPathW);
 
 	/* Auto start logging (2007.5.31 maya) */
-	ts.LogAutoStart = GetCheck(IDC_AUTOSTART);
+	g_ts->LogAutoStart = GetCheck(IDC_AUTOSTART);
 
 	/* Log Rotate */
 	if (GetCheck(IDC_LOG_ROTATE)) {  /* on */
 		char buf[80];
-		ts.LogRotate = ROTATE_SIZE;
+		g_ts->LogRotate = ROTATE_SIZE;
 		GetDlgItemTextA(IDC_ROTATE_SIZE_TYPE, buf, _countof(buf));
-		ts.LogRotateSizeType = 0;
+		g_ts->LogRotateSizeType = 0;
 		for (int i = 0 ; i < LOG_ROTATE_SIZETYPE_NUM ; i++) {
 			if (strcmp(buf, LogRotateSizeType[i]) == 0) {
-				ts.LogRotateSizeType = i;
+				g_ts->LogRotateSizeType = i;
 				break;
 			}
 		}
-		ts.LogRotateSize = GetDlgItemInt(IDC_ROTATE_SIZE);
-		for (int i = 0 ; i < ts.LogRotateSizeType ; i++)
-			ts.LogRotateSize *= 1024;
+		g_ts->LogRotateSize = GetDlgItemInt(IDC_ROTATE_SIZE);
+		for (int i = 0 ; i < g_ts->LogRotateSizeType ; i++)
+			g_ts->LogRotateSize *= 1024;
 
-		ts.LogRotateStep = GetDlgItemInt(IDC_ROTATE_STEP);
+		g_ts->LogRotateStep = GetDlgItemInt(IDC_ROTATE_STEP);
 
 	} else { /* off */
-		ts.LogRotate = ROTATE_NONE;
+		g_ts->LogRotate = ROTATE_NONE;
 		/* 残りのメンバーは意図的に設定を残す。*/
 	}
 
 	// Log Options
 	if (GetCheck(IDC_OPT_BINARY)) {
-		ts.LogBinary = 1;
+		g_ts->LogBinary = 1;
 	}
 	else {
-		ts.LogBinary = 0;
+		g_ts->LogBinary = 0;
 	}
 
 	if (GetCheck(IDC_OPT_APPEND)) {
-		ts.Append = 1;
+		g_ts->Append = 1;
 	}
 	else {
-		ts.Append = 0;
+		g_ts->Append = 0;
 	}
 
 	if (GetCheck(IDC_OPT_PLAINTEXT)) {
-		ts.LogTypePlainText = 1;
+		g_ts->LogTypePlainText = 1;
 	}
 	else {
-		ts.LogTypePlainText = 0;
+		g_ts->LogTypePlainText = 0;
 	}
 
 	if (GetCheck(IDC_OPT_HIDEDLG)) {
-		ts.LogHideDialog = 1;
+		g_ts->LogHideDialog = 1;
 	}
 	else {
-		ts.LogHideDialog = 0;
+		g_ts->LogHideDialog = 0;
 	}
 
 	if (GetCheck(IDC_OPT_INCBUF)) {
-		ts.LogAllBuffIncludedInFirst = 1;
+		g_ts->LogAllBuffIncludedInFirst = 1;
 	}
 	else {
-		ts.LogAllBuffIncludedInFirst = 0;
+		g_ts->LogAllBuffIncludedInFirst = 0;
 	}
 
 	if (GetCheck(IDC_OPT_TIMESTAMP)) {
-		ts.LogTimestamp = 1;
+		g_ts->LogTimestamp = 1;
 	}
 	else {
-		ts.LogTimestamp = 0;
+		g_ts->LogTimestamp = 0;
 	}
 
-	ts.LogTimestampType = GetCurSel(IDC_OPT_TIMESTAMP_TYPE);
+	g_ts->LogTimestampType = GetCurSel(IDC_OPT_TIMESTAMP_TYPE);
 }
 
 void CLogPropPageDlg::OnHelp()

@@ -51,6 +51,7 @@
 
 #include "keyboard.h"
 #include "keyboard_i.h"
+#include "session.h"
 
 BOOL AutoRepeatMode;
 BOOL AppliKeyMode;
@@ -121,7 +122,7 @@ void SetKeyMap()
 	}
 
 	if (LoadTTSET())
-		(*ReadKeyboardCnf)(ts.KeyCnfFNW, KeyMap, TRUE);
+		(*ReadKeyboardCnf)(g_ts->KeyCnfFNW, KeyMap, TRUE);
 	FreeTTSET();
 }
 
@@ -892,14 +893,14 @@ static size_t VKey2KeyStr(WORD VKey, HWND HWin, wchar_t *Code, size_t CodeSize, 
 		case VK_BACK:
 			if (Control) {
 				CodeLength = 1;
-				if (ts.BSKey == IdDEL)
+				if (g_ts->BSKey == IdDEL)
 					Code[0] = 0x08;
 				else
 					Code[0] = 0x7F;
 			}
 			else if (Single) {
 				CodeLength = 1;
-				if (ts.BSKey == IdDEL)
+				if (g_ts->BSKey == IdDEL)
 					Code[0] = 0x7F;
 				else
 					Code[0] = 0x08;
@@ -953,265 +954,265 @@ static size_t VKey2KeyStr(WORD VKey, HWND HWin, wchar_t *Code, size_t CodeSize, 
 			break;
 		case VK_DELETE:
 			if (Single) {
-				if (ts.DelKey > 0) {  // DEL character
+				if (g_ts->DelKey > 0) {  // DEL character
 					CodeLength = 1;
 					Code[0] = 0x7f;
 				}
-				else if (!ts.StrictKeyMapping) {
-					GetKeyStr(HWin, KeyMap, IdRemove, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+				else if (!g_ts->StrictKeyMapping) {
+					GetKeyStr(HWin, KeyMap, IdRemove, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 			}
 			break;
 		case VK_UP:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdUp, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdUp, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_DOWN:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdDown, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdDown, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_RIGHT:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdRight, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdRight, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_LEFT:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdLeft, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdLeft, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_INSERT:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdInsert, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdInsert, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_HOME:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdFind, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdFind, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_END:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdSelect, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdSelect, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_PRIOR:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdPrev, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdPrev, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_NEXT:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdNext, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdNext, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_F1:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdXF1, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdXF1, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_F2:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdXF2, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdXF2, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_F3:
-			if (!ts.StrictKeyMapping) {
+			if (!g_ts->StrictKeyMapping) {
 				if (Single) {
-					GetKeyStr(HWin, KeyMap, IdXF3, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdXF3, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 				else if (Shift) {
-					GetKeyStr(HWin, KeyMap, IdF13, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdF13, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 			}
 			break;
 		case VK_F4:
-			if (!ts.StrictKeyMapping) {
+			if (!g_ts->StrictKeyMapping) {
 				if (Single) {
-					GetKeyStr(HWin, KeyMap, IdXF4, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdXF4, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 				else if (Shift) {
-					GetKeyStr(HWin, KeyMap, IdF14, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdF14, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 			}
 			break;
 		case VK_F5:
-			if (!ts.StrictKeyMapping) {
+			if (!g_ts->StrictKeyMapping) {
 				if (Single) {
-					GetKeyStr(HWin, KeyMap, IdXF5, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdXF5, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 				else if (Shift) {
-					GetKeyStr(HWin, KeyMap, IdHelp, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdHelp, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 			}
 			break;
 		case VK_F6:
-			if (!ts.StrictKeyMapping) {
+			if (!g_ts->StrictKeyMapping) {
 				if (Single) {
-					GetKeyStr(HWin, KeyMap, IdF6, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdF6, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 				else if (Shift) {
-					GetKeyStr(HWin, KeyMap, IdDo, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdDo, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 			}
 			break;
 		case VK_F7:
-			if (!ts.StrictKeyMapping) {
+			if (!g_ts->StrictKeyMapping) {
 				if (Single) {
-					GetKeyStr(HWin, KeyMap, IdF7, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdF7, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 				else if (Shift) {
-					GetKeyStr(HWin, KeyMap, IdF17, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdF17, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 			}
 			break;
 		case VK_F8:
-			if (!ts.StrictKeyMapping) {
+			if (!g_ts->StrictKeyMapping) {
 				if (Single) {
-					GetKeyStr(HWin, KeyMap, IdF8, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdF8, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 				else if (Shift) {
-					GetKeyStr(HWin, KeyMap, IdF18, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdF18, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 			}
 			break;
 		case VK_F9:
-			if (!ts.StrictKeyMapping) {
+			if (!g_ts->StrictKeyMapping) {
 				if (Single) {
-					GetKeyStr(HWin, KeyMap, IdF9, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdF9, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 				else if (Shift) {
-					GetKeyStr(HWin, KeyMap, IdF19, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdF19, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 			}
 			break;
 		case VK_F10:
-			if (!ts.StrictKeyMapping) {
+			if (!g_ts->StrictKeyMapping) {
 				if (Single) {
-					GetKeyStr(HWin, KeyMap, IdF10, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdF10, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 				else if (Shift) {
-					GetKeyStr(HWin, KeyMap, IdF20, AppliKeyMode && !ts.DisableAppKeypad,
-							  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
+					GetKeyStr(HWin, KeyMap, IdF20, AppliKeyMode && !g_ts->DisableAppKeypad,
+							  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength,
 							  CodeType);
 				}
 			}
 			break;
 		case VK_F11:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdF11, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF11, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_F12:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdF12, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF12, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_F13:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdF13, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF13, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_F14:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdF14, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF14, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_F15:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdHelp, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdHelp, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_F16:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdDo, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdDo, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_F17:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdF17, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF17, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_F18:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdF18, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF18, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_F19:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdF19, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF19, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case VK_F20:
-			if (Single && !ts.StrictKeyMapping) {
-				GetKeyStr(HWin, KeyMap, IdF20, AppliKeyMode && !ts.DisableAppKeypad,
-						  AppliCursorMode && !ts.DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
+			if (Single && !g_ts->StrictKeyMapping) {
+				GetKeyStr(HWin, KeyMap, IdF20, AppliKeyMode && !g_ts->DisableAppKeypad,
+						  AppliCursorMode && !g_ts->DisableAppCursor, Send8BitMode, Code, CodeSize, &CodeLength, CodeType);
 			}
 			break;
 		case '2':
 			//  case VK_OEM_3: /* @ (106-JP Keyboard) */
-			if (Control && !ts.StrictKeyMapping) {
+			if (Control && !g_ts->StrictKeyMapping) {
 				// Ctrl-2 -> NUL
 				CodeLength = 1;
 				Code[0] = 0;
 			}
 			break;
 		case '3':
-			if (Control && !ts.StrictKeyMapping) {
+			if (Control && !g_ts->StrictKeyMapping) {
 				// Ctrl-3 -> ESC
 				switch (AppliEscapeMode) {
 					case 1:
@@ -1249,14 +1250,14 @@ static size_t VKey2KeyStr(WORD VKey, HWND HWin, wchar_t *Code, size_t CodeSize, 
 			}
 			break;
 		case '4':
-			if (Control && !ts.StrictKeyMapping) {
+			if (Control && !g_ts->StrictKeyMapping) {
 				// Ctrl-4 -> FS
 				CodeLength = 1;
 				Code[0] = 0x1c;
 			}
 			break;
 		case '5':
-			if (Control && !ts.StrictKeyMapping) {
+			if (Control && !g_ts->StrictKeyMapping) {
 				// Ctrl-5 -> GS
 				CodeLength = 1;
 				Code[0] = 0x1d;
@@ -1264,7 +1265,7 @@ static size_t VKey2KeyStr(WORD VKey, HWND HWin, wchar_t *Code, size_t CodeSize, 
 			break;
 		case '6':
 			//  case VK_OEM_7: /* ^ (106-JP Keyboard) */
-			if (Control && !ts.StrictKeyMapping) {
+			if (Control && !g_ts->StrictKeyMapping) {
 				// Ctrl-6 -> RS
 				CodeLength = 1;
 				Code[0] = 0x1e;
@@ -1272,21 +1273,21 @@ static size_t VKey2KeyStr(WORD VKey, HWND HWin, wchar_t *Code, size_t CodeSize, 
 			break;
 		case '7':
 		case VK_OEM_2: /* / (101/106-JP Keyboard) */
-			if (Control && !ts.StrictKeyMapping) {
+			if (Control && !g_ts->StrictKeyMapping) {
 				// Ctrl-7 -> US
 				CodeLength = 1;
 				Code[0] = 0x1f;
 			}
 			break;
 		case '8':
-			if (Control && !ts.StrictKeyMapping) {
+			if (Control && !g_ts->StrictKeyMapping) {
 				// Ctrl-8 -> DEL
 				CodeLength = 1;
 				Code[0] = 0x7f;
 			}
 			break;
 		case VK_OEM_102:
-			if (Control && Shift && !ts.StrictKeyMapping) {
+			if (Control && Shift && !g_ts->StrictKeyMapping) {
 				// Shift-Ctrl-_ (102RT/106-JP Keyboard)
 				CodeLength = 1;
 				Code[0] = 0x7f;
@@ -1329,9 +1330,9 @@ static void SendBinary(const wchar_t *strW, size_t len, size_t repeat, BOOL isMa
 
 	if (isMacro == FALSE) {
 		for (i = 1; i <= repeat; i++) {
-			CommBinaryBuffOut(&cv, strA, len);
-			if (ts.LocalEcho > 0)
-				CommBinaryEcho(&cv, strA, len);
+			CommBinaryBuffOut(g_cv, strA, len);
+			if (g_ts->LocalEcho > 0)
+				CommBinaryEcho(g_cv, strA, len);
 		}
 	} else {
 		for (i = 1; i <= repeat; i++) {
@@ -1340,7 +1341,7 @@ static void SendBinary(const wchar_t *strW, size_t len, size_t repeat, BOOL isMa
 			SendMem *sm = SendMemBinary(p, len);
 			assert(sm != NULL);
 			if (sm != NULL) {
-				SendMemInitEcho(sm, ts.LocalEcho);
+				SendMemInitEcho(sm, g_ts->LocalEcho);
 				SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
 				SendMemStart(sm);
 			}
@@ -1373,7 +1374,7 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 		return KEYDOWN_CONTROL;
 
 	/* debug mode */
-	if (ts.Debug && (VKey == VK_ESCAPE) && ShiftKey()) {
+	if (g_ts->Debug && (VKey == VK_ESCAPE) && ShiftKey()) {
 		MessageBeep(0);
 		TermSetNextDebugMode();
 		CodeCount = 0;
@@ -1404,14 +1405,14 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 
 	if (AltKey()) {
 		Scan |= 0x800;
-		if (!MetaKey(ts.MetaKey)) {
+		if (!MetaKey(g_ts->MetaKey)) {
 			ModStat |= 16;
 		}
 	}
 
 	CodeCount = Count;
 	CodeLength = 0;
-	if (cv.TelLineMode) {
+	if (g_cv->TelLineMode) {
 		CodeType = IdText;
 	}
 	else {
@@ -1419,7 +1420,7 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 	}
 
 	/* exclude numeric keypad "." (scan code:83) */
-	if ((VKey != VK_DELETE) || (ts.DelKey == 0) || (Scan == 83))
+	if ((VKey != VK_DELETE) || (g_ts->DelKey == 0) || (Scan == 83))
 		/* Windows keycode -> Tera Term keycode */
 		Key = GetKeyCode(KeyMap, Scan);
 	else
@@ -1428,8 +1429,8 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 	if (Key == 0) {
 		CodeLength = VKey2KeyStr(VKey, HWin, Code, _countof(Code), &CodeType, ModStat);
 
-		if (MetaKey(ts.MetaKey) && (CodeLength == 1)) {
-			switch (ts.Meta8Bit) {
+		if (MetaKey(g_ts->MetaKey) && (CodeLength == 1)) {
+			switch (g_ts->Meta8Bit) {
 				case IdMeta8BitRaw:
 					Code[0] |= 0x80;
 					CodeType = IdBinary;
@@ -1447,7 +1448,7 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 		}
 	}
 	else {
-		if (MetaKey(ts.MetaKey)) {
+		if (MetaKey(g_ts->MetaKey)) {
 			PeekMessage((LPMSG)&M, HWin, WM_SYSCHAR, WM_SYSCHAR, PM_REMOVE);
 		}
 
@@ -1457,7 +1458,7 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 			CodeType = IdBinary;
 		}
 		else
-			GetKeyStr(HWin, KeyMap, Key, AppliKeyMode && !ts.DisableAppKeypad, AppliCursorMode && !ts.DisableAppCursor,
+			GetKeyStr(HWin, KeyMap, Key, AppliKeyMode && !g_ts->DisableAppKeypad, AppliCursorMode && !g_ts->DisableAppCursor,
 					  Send8BitMode, Code, _countof(Code), &CodeLength, &CodeType);
 	}
 
@@ -1484,9 +1485,9 @@ KeyDownResult KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 			case IdText:
 				if (TalkStatus == IdTalkKeyb) {
 					for (i = 1; i <= CodeCount; i++) {
-						if (ts.LocalEcho > 0)
-							CommTextEchoW(&cv, Code, CodeLength);
-						CommTextOutW(&cv, Code, CodeLength);
+						if (g_ts->LocalEcho > 0)
+							CommTextEchoW(g_cv, Code, CodeLength);
+						CommTextOutW(g_cv, Code, CodeLength);
 					}
 				}
 				break;
@@ -1564,7 +1565,7 @@ void KeyCodeSend(WORD KCode, WORD Count)
 		CodeType = IdBinary;
 	}
 	else
-		GetKeyStr(HWin, KeyMap, Key, AppliKeyMode && !ts.DisableAppKeypad, AppliCursorMode && !ts.DisableAppCursor,
+		GetKeyStr(HWin, KeyMap, Key, AppliKeyMode && !g_ts->DisableAppKeypad, AppliCursorMode && !g_ts->DisableAppCursor,
 				  Send8BitMode, Code, _countof(Code), &CodeLength, &CodeType);
 
 	if (CodeLength == 0)
@@ -1580,7 +1581,7 @@ void KeyCodeSend(WORD KCode, WORD Count)
 				SendMem *sm = SendMemTextW(p, CodeLength);
 				assert(sm != NULL);
 				if (sm != NULL) {
-					SendMemInitEcho(sm, ts.LocalEcho);
+					SendMemInitEcho(sm, g_ts->LocalEcho);
 					SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
 					SendMemStart(sm);
 				}
@@ -1648,4 +1649,24 @@ void EndKeyboard()
 	FreeUserKey(KeyMap);
 	free(KeyMap);
 	KeyMap = NULL;
+}
+
+/**
+ *	Variables kept per session (see session.h)
+ */
+void KeybRegisterSessionVars(void)
+{
+	static const SessionVar v[] = {
+		SESSION_VAR(AppliCursorMode),
+		SESSION_VAR(AppliEscapeMode),
+		SESSION_VAR(AppliKeyMode),
+		SESSION_VAR(AutoRepeatMode),
+		SESSION_VAR(FuncKeyLen),
+		SESSION_VAR(FuncKeyStr),
+		SESSION_VAR(KeyMap),
+		SESSION_VAR(PreviousKey),
+		SESSION_VAR(Send8BitMode),
+		SESSION_VAR(VKBackslash),
+	};
+	SessionRegisterVars(v, _countof(v));
 }

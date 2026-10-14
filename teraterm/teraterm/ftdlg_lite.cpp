@@ -201,7 +201,7 @@ BOOL CFileTransLiteDlg::Create(HINSTANCE hInstance, HWND hParent, const wchar_t 
 	pData->check_2sec = FALSE;
 	pData->show = FALSE;
 	pData->Pause = FALSE;
-	pData->HideDialog = ts.FTHideDialog ? TRUE : FALSE;
+	pData->HideDialog = g_ts->FTHideDialog ? TRUE : FALSE;
 
 	BOOL Ok = pData->Create(hInstance, hParent);
 	pData->SetUILanguageFile(UILanguageFile);

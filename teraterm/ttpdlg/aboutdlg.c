@@ -311,7 +311,7 @@ static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 #endif
 			}
 
-			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
+			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), g_ts->UILanguageFileW);
 
 			// Tera Term 本体のバージョン
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d.%d ",

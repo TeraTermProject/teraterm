@@ -96,7 +96,7 @@ CSequencePropPageDlg::CSequencePropPageDlg(HINSTANCE inst)
 {
 	wchar_t *UIMsg;
 	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_SEQUENCE",
-				 L"Control Sequence", ts.UILanguageFileW, &UIMsg);
+				 L"Control Sequence", g_ts->UILanguageFileW, &UIMsg);
 	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
@@ -126,7 +126,7 @@ BOOL CSequencePropPageDlg::OnInitDialog()
 		{ IDC_DISABLE_PRINT_START, "DLG_TAB_SEQUENCE_PRINT_START" },
 		{ IDC_BEEP_LABEL, "DLG_TAB_SEQUENCE_BEEP_LABEL" },
 	};
-	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), g_ts->UILanguageFileW);
 
 	const static I18nTextInfo accept_title_changing[] = {
 		{ "DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF", L"off" },
@@ -135,7 +135,7 @@ BOOL CSequencePropPageDlg::OnInitDialog()
 		{ "DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_LAST", L"last" },
 	};
 	SetI18nListW("Tera Term", m_hWnd, IDC_ACCEPT_TITLE_CHANGING, accept_title_changing, _countof(accept_title_changing),
-				 ts.UILanguageFileW, 0);
+				 g_ts->UILanguageFileW, 0);
 
 	const static I18nTextInfo sequence_title_report[] = {
 		{ "DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE", L"ignore" },
@@ -143,7 +143,7 @@ BOOL CSequencePropPageDlg::OnInitDialog()
 		{ "DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY", L"empty" },
 	};
 	SetI18nListW("Tera Term", m_hWnd, IDC_TITLE_REPORT, sequence_title_report, _countof(sequence_title_report),
-				 ts.UILanguageFileW, 0);
+				 g_ts->UILanguageFileW, 0);
 
 	const static I18nTextInfo sequence_clipboard_access[] = {
 		{ "DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF", L"off" },
@@ -152,59 +152,59 @@ BOOL CSequencePropPageDlg::OnInitDialog()
 		{ "DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON", L"read/write" },
 	};
 	SetI18nListW("Tera Term", m_hWnd, IDC_CLIPBOARD_ACCESS, sequence_clipboard_access,
-				 _countof(sequence_clipboard_access), ts.UILanguageFileW, 0);
+				 _countof(sequence_clipboard_access), g_ts->UILanguageFileW, 0);
 
 	const static I18nTextInfo beep_type[] = {
 		{"DLG_TAB_SEQUENCE_BEEP_DISABLE", L"disable"},		  // IdBeepOff = 0
 		{"DLG_TAB_SEQUENCE_BEEP_SOUND", L"sound"},			  // IdBeepOn = 1
 		{"DLG_TAB_SEQUENCE_BEEP_VISUALBELL", L"visualbell"},  // IdBeepVisual = 2
 	};
-	SetI18nListW("Tera Term", m_hWnd, IDC_BEEP_DROPDOWN, beep_type, _countof(beep_type), ts.UILanguageFileW, ts.Beep);
+	SetI18nListW("Tera Term", m_hWnd, IDC_BEEP_DROPDOWN, beep_type, _countof(beep_type), g_ts->UILanguageFileW, g_ts->Beep);
 
 	// (1)IDC_ACCEPT_MOUSE_EVENT_TRACKING
-	SetCheck(IDC_ACCEPT_MOUSE_EVENT_TRACKING, ts.MouseEventTracking);
-	EnableDlgItem(IDC_DISABLE_MOUSE_TRACKING_CTRL, ts.MouseEventTracking ? TRUE : FALSE);
+	SetCheck(IDC_ACCEPT_MOUSE_EVENT_TRACKING, g_ts->MouseEventTracking);
+	EnableDlgItem(IDC_DISABLE_MOUSE_TRACKING_CTRL, g_ts->MouseEventTracking ? TRUE : FALSE);
 
 	// (2)IDC_DISABLE_MOUSE_TRACKING_CTRL
-	SetCheck(IDC_DISABLE_MOUSE_TRACKING_CTRL, ts.DisableMouseTrackingByCtrl);
+	SetCheck(IDC_DISABLE_MOUSE_TRACKING_CTRL, g_ts->DisableMouseTrackingByCtrl);
 
 	// (3)IDC_ACCEPT_TITLE_CHANGING
-	SetCurSel(IDC_ACCEPT_TITLE_CHANGING, ts.AcceptTitleChangeRequest);
+	SetCurSel(IDC_ACCEPT_TITLE_CHANGING, g_ts->AcceptTitleChangeRequest);
 
 	// (4)IDC_TITLE_REPORT
 	SetCurSel(IDC_TITLE_REPORT,
-			  (ts.WindowFlag & WF_TITLEREPORT) == IdTitleReportIgnore ? 0 :
-			  (ts.WindowFlag & WF_TITLEREPORT) == IdTitleReportAccept ? 1
-			  /*(ts.WindowFlag & WF_TITLEREPORT) == IdTitleReportEmptye ? */ : 2);
+			  (g_ts->WindowFlag & WF_TITLEREPORT) == IdTitleReportIgnore ? 0 :
+			  (g_ts->WindowFlag & WF_TITLEREPORT) == IdTitleReportAccept ? 1
+			  /*(g_ts->WindowFlag & WF_TITLEREPORT) == IdTitleReportEmptye ? */ : 2);
 
 	// (5)IDC_WINDOW_CTRL
-	SetCheck(IDC_WINDOW_CTRL, (ts.WindowFlag & WF_WINDOWCHANGE) != 0);
+	SetCheck(IDC_WINDOW_CTRL, (g_ts->WindowFlag & WF_WINDOWCHANGE) != 0);
 
 	// (6)IDC_WINDOW_REPORT
-	SetCheck(IDC_WINDOW_REPORT, (ts.WindowFlag & WF_WINDOWREPORT) != 0);
+	SetCheck(IDC_WINDOW_REPORT, (g_ts->WindowFlag & WF_WINDOWREPORT) != 0);
 
 	// (7)IDC_CURSOR_CTRL_SEQ
-	SetCheck(IDC_CURSOR_CTRL_SEQ, (ts.WindowFlag & WF_CURSORCHANGE) != 0);
+	SetCheck(IDC_CURSOR_CTRL_SEQ, (g_ts->WindowFlag & WF_CURSORCHANGE) != 0);
 
 	// (8)IDC_CLIPBOARD_ACCESS
 	SetCurSel(IDC_CLIPBOARD_ACCESS,
-			  (ts.CtrlFlag & CSF_CBRW) == CSF_CBRW ? 3 :
-			  (ts.CtrlFlag & CSF_CBRW) == CSF_CBREAD ? 2 :
-			  (ts.CtrlFlag & CSF_CBRW) == CSF_CBWRITE ? 1 :
+			  (g_ts->CtrlFlag & CSF_CBRW) == CSF_CBRW ? 3 :
+			  (g_ts->CtrlFlag & CSF_CBRW) == CSF_CBREAD ? 2 :
+			  (g_ts->CtrlFlag & CSF_CBRW) == CSF_CBWRITE ? 1 :
 			  0);	// off
 
 	// (9)IDC_CLIPBOARD_NOTIFY
-	SetCheck(IDC_CLIPBOARD_NOTIFY, ts.NotifyClipboardAccess);
+	SetCheck(IDC_CLIPBOARD_NOTIFY, g_ts->NotifyClipboardAccess);
 	EnableDlgItem(IDC_CLIPBOARD_NOTIFY, HasBalloonTipSupport() ? TRUE : FALSE);
 
 	// (10)IDC_ACCEPT_CLEAR_SBUFF
-	SetCheck(IDC_ACCEPT_CLEAR_SBUFF, (ts.TermFlag & TF_REMOTECLEARSBUFF) != 0);
+	SetCheck(IDC_ACCEPT_CLEAR_SBUFF, (g_ts->TermFlag & TF_REMOTECLEARSBUFF) != 0);
 
 	// IDC_DISABLE_PRINT_START
-	SetCheck(IDC_DISABLE_PRINT_START, (ts.TermFlag & TF_PRINTERCTRL) == 0);
+	SetCheck(IDC_DISABLE_PRINT_START, (g_ts->TermFlag & TF_PRINTERCTRL) == 0);
 
 	// IDC_BEEP_DROPDOWN
-	SetCurSel(IDC_BEEP_DROPDOWN, ts.Beep);
+	SetCurSel(IDC_BEEP_DROPDOWN, g_ts->Beep);
 
 	// TRUE を返す。ダイアログマネージャが先頭 TABSTOPにフォーカスを設定する。
 	return TRUE;
@@ -224,83 +224,83 @@ BOOL CSequencePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 void CSequencePropPageDlg::OnOK()
 {
 	// (1)IDC_ACCEPT_MOUSE_EVENT_TRACKING
-	ts.MouseEventTracking = GetCheck(IDC_ACCEPT_MOUSE_EVENT_TRACKING);
+	g_ts->MouseEventTracking = GetCheck(IDC_ACCEPT_MOUSE_EVENT_TRACKING);
 
 	// (2)IDC_DISABLE_MOUSE_TRACKING_CTRL
-	ts.DisableMouseTrackingByCtrl = GetCheck(IDC_DISABLE_MOUSE_TRACKING_CTRL);
+	g_ts->DisableMouseTrackingByCtrl = GetCheck(IDC_DISABLE_MOUSE_TRACKING_CTRL);
 
 	// (3)IDC_ACCEPT_TITLE_CHANGING
 	int sel = GetCurSel(IDC_ACCEPT_TITLE_CHANGING);
 	if (0 <= sel && sel <= IdTitleChangeRequestMax) {
-		ts.AcceptTitleChangeRequest = sel;
+		g_ts->AcceptTitleChangeRequest = sel;
 	}
 
 	// (4)IDC_TITLE_REPORT
 	switch (GetCurSel(IDC_TITLE_REPORT)) {
 		case 0:
-			ts.WindowFlag &= ~WF_TITLEREPORT;
+			g_ts->WindowFlag &= ~WF_TITLEREPORT;
 			break;
 		case 1:
-			ts.WindowFlag &= ~WF_TITLEREPORT;
-			ts.WindowFlag |= IdTitleReportAccept;
+			g_ts->WindowFlag &= ~WF_TITLEREPORT;
+			g_ts->WindowFlag |= IdTitleReportAccept;
 			break;
 		case 2:
-			ts.WindowFlag |= IdTitleReportEmpty;
+			g_ts->WindowFlag |= IdTitleReportEmpty;
 			break;
 		default: // Invalid value.
 			break;
 	}
 
 	// (5)IDC_WINDOW_CTRL
-	if (((ts.WindowFlag & WF_WINDOWCHANGE) != 0) != GetCheck(IDC_WINDOW_CTRL)) {
-		ts.WindowFlag ^= WF_WINDOWCHANGE;
+	if (((g_ts->WindowFlag & WF_WINDOWCHANGE) != 0) != GetCheck(IDC_WINDOW_CTRL)) {
+		g_ts->WindowFlag ^= WF_WINDOWCHANGE;
 	}
 
 	// (6)IDC_WINDOW_REPORT
-	if (((ts.WindowFlag & WF_WINDOWREPORT) != 0) != GetCheck(IDC_WINDOW_REPORT)) {
-		ts.WindowFlag ^= WF_WINDOWREPORT;
+	if (((g_ts->WindowFlag & WF_WINDOWREPORT) != 0) != GetCheck(IDC_WINDOW_REPORT)) {
+		g_ts->WindowFlag ^= WF_WINDOWREPORT;
 	}
 
 	// (7)IDC_CURSOR_CTRL_SEQ
-	if (((ts.WindowFlag & WF_CURSORCHANGE) != 0) != GetCheck(IDC_CURSOR_CTRL_SEQ)) {
-		ts.WindowFlag ^= WF_CURSORCHANGE;
+	if (((g_ts->WindowFlag & WF_CURSORCHANGE) != 0) != GetCheck(IDC_CURSOR_CTRL_SEQ)) {
+		g_ts->WindowFlag ^= WF_CURSORCHANGE;
 	}
 
 	// (8)IDC_CLIPBOARD_ACCESS
 	switch (GetCurSel(IDC_CLIPBOARD_ACCESS)) {
 		case 0: // off
-			ts.CtrlFlag &= ~CSF_CBRW;
+			g_ts->CtrlFlag &= ~CSF_CBRW;
 			break;
 		case 1: // write only
-			ts.CtrlFlag &= ~CSF_CBRW;
-			ts.CtrlFlag |= CSF_CBWRITE;
+			g_ts->CtrlFlag &= ~CSF_CBRW;
+			g_ts->CtrlFlag |= CSF_CBWRITE;
 			break;
 		case 2: // read only
-			ts.CtrlFlag &= ~CSF_CBRW;
-			ts.CtrlFlag |= CSF_CBREAD;
+			g_ts->CtrlFlag &= ~CSF_CBRW;
+			g_ts->CtrlFlag |= CSF_CBREAD;
 			break;
 		case 3: // read/write
-			ts.CtrlFlag |= CSF_CBRW;
+			g_ts->CtrlFlag |= CSF_CBRW;
 			break;
 		default: // Invalid value.
 			break;
 	}
 
 	// (9)IDC_CLIPBOARD_ACCESS
-	ts.NotifyClipboardAccess = GetCheck(IDC_CLIPBOARD_NOTIFY);
+	g_ts->NotifyClipboardAccess = GetCheck(IDC_CLIPBOARD_NOTIFY);
 
 	// (10)IDC_ACCEPT_CLEAR_SBUFF
-	if (((ts.TermFlag & TF_REMOTECLEARSBUFF) != 0) != GetCheck(IDC_ACCEPT_CLEAR_SBUFF)) {
-		ts.TermFlag ^= TF_REMOTECLEARSBUFF;
+	if (((g_ts->TermFlag & TF_REMOTECLEARSBUFF) != 0) != GetCheck(IDC_ACCEPT_CLEAR_SBUFF)) {
+		g_ts->TermFlag ^= TF_REMOTECLEARSBUFF;
 	}
 
 	if (GetCheck(IDC_DISABLE_PRINT_START) == 0) {
-		ts.TermFlag |= TF_PRINTERCTRL;
+		g_ts->TermFlag |= TF_PRINTERCTRL;
 	} else {
-		ts.TermFlag &= ~TF_PRINTERCTRL;
+		g_ts->TermFlag &= ~TF_PRINTERCTRL;
 	}
 
-	ts.Beep = GetCurSel(IDC_BEEP_DROPDOWN);
+	g_ts->Beep = GetCurSel(IDC_BEEP_DROPDOWN);
 }
 
 void CSequencePropPageDlg::OnHelp()
@@ -327,7 +327,7 @@ CCopypastePropPageDlg::CCopypastePropPageDlg(HINSTANCE inst)
 {
 	wchar_t *UIMsg;
 	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_COPYPASTE",
-				 L"Copy and Paste", ts.UILanguageFileW, &UIMsg);
+				 L"Copy and Paste", g_ts->UILanguageFileW, &UIMsg);
 	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
@@ -358,13 +358,13 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 		{ IDC_SELECT_ON_ACTIVATE, "DLG_TAB_COPYPASTE_SELECT_ON_ACTIVATE" },
 		{ IDC_AUTO_TEXT_COPY, "DLG_TAB_COPYPASTE_AUTO_TEXT_COPY" },
 	};
-	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), g_ts->UILanguageFileW);
 
 	// (1)Enable continued-line copy
-	SetCheck(IDC_LINECOPY, ts.EnableContinuedLineCopy);
+	SetCheck(IDC_LINECOPY, g_ts->EnableContinuedLineCopy);
 
 	// (2)DisablePasteMouseRButton
-	if (ts.PasteFlag & CPF_DISABLE_RBUTTON) {
+	if (g_ts->PasteFlag & CPF_DISABLE_RBUTTON) {
 		SetCheck(IDC_DISABLE_PASTE_RBUTTON, BST_CHECKED);
 		EnableDlgItem(IDC_CONFIRM_PASTE_RBUTTON, FALSE);
 	} else {
@@ -373,23 +373,23 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 	}
 
 	// (3)ConfirmPasteMouseRButton
-	SetCheck(IDC_CONFIRM_PASTE_RBUTTON, (ts.PasteFlag & CPF_CONFIRM_RBUTTON)?BST_CHECKED:BST_UNCHECKED);
+	SetCheck(IDC_CONFIRM_PASTE_RBUTTON, (g_ts->PasteFlag & CPF_CONFIRM_RBUTTON)?BST_CHECKED:BST_UNCHECKED);
 
 	// (4)DisablePasteMouseMButton
-	SetCheck(IDC_DISABLE_PASTE_MBUTTON, (ts.PasteFlag & CPF_DISABLE_MBUTTON)?BST_CHECKED:BST_UNCHECKED);
+	SetCheck(IDC_DISABLE_PASTE_MBUTTON, (g_ts->PasteFlag & CPF_DISABLE_MBUTTON)?BST_CHECKED:BST_UNCHECKED);
 
 	// (5)SelectOnlyByLButton
-	SetCheck(IDC_SELECT_LBUTTON, ts.SelectOnlyByLButton);
+	SetCheck(IDC_SELECT_LBUTTON, g_ts->SelectOnlyByLButton);
 
 	// (6)TrimTrailingNLonPaste
-	SetCheck(IDC_TRIMNLCHAR, (ts.PasteFlag & CPF_TRIM_TRAILING_NL)?BST_CHECKED:BST_UNCHECKED);
+	SetCheck(IDC_TRIMNLCHAR, (g_ts->PasteFlag & CPF_TRIM_TRAILING_NL)?BST_CHECKED:BST_UNCHECKED);
 
 	// (7)ConfirmChangePaste
-	SetCheck(IDC_CONFIRM_CHANGE_PASTE, (ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE)?BST_CHECKED:BST_UNCHECKED);
+	SetCheck(IDC_CONFIRM_CHANGE_PASTE, (g_ts->PasteFlag & CPF_CONFIRM_CHANGEPASTE)?BST_CHECKED:BST_UNCHECKED);
 
 	// ファイルパス
-	SetDlgItemTextA(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile);
-	if (ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE) {
+	SetDlgItemTextA(IDC_CONFIRM_STRING_FILE, g_ts->ConfirmChangePasteStringFile);
+	if (g_ts->PasteFlag & CPF_CONFIRM_CHANGEPASTE) {
 		EnableDlgItem(IDC_CONFIRM_STRING_FILE, TRUE);
 		EnableDlgItem(IDC_CONFIRM_STRING_FILE_PATH, TRUE);
 	} else {
@@ -398,16 +398,16 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 	}
 
 	// (8)delimiter characters
-	SetDlgItemTextW(IDC_DELIM_LIST, ts.DelimListW);
+	SetDlgItemTextW(IDC_DELIM_LIST, g_ts->DelimListW);
 
 	// (9)PasteDelayPerLine
-	SetDlgItemNum(IDC_PASTEDELAY_EDIT, ts.PasteDelayPerLine);
+	SetDlgItemNum(IDC_PASTEDELAY_EDIT, g_ts->PasteDelayPerLine);
 
 	// (10) SelectOnActivate
-	SetCheck(IDC_SELECT_ON_ACTIVATE, ts.SelOnActive ? BST_CHECKED : BST_UNCHECKED);
+	SetCheck(IDC_SELECT_ON_ACTIVATE, g_ts->SelOnActive ? BST_CHECKED : BST_UNCHECKED);
 
 	// (11) auto text copy
-	SetCheck(IDC_AUTO_TEXT_COPY, ts.AutoTextCopy ? BST_CHECKED : BST_UNCHECKED);
+	SetCheck(IDC_AUTO_TEXT_COPY, g_ts->AutoTextCopy ? BST_CHECKED : BST_UNCHECKED);
 
 	// TRUE を返す。ダイアログマネージャが先頭 TABSTOPにフォーカスを設定する。
 	return TRUE;
@@ -438,10 +438,10 @@ BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 				TTOPENFILENAMEW ofn = {};
 				ofn.hwndOwner = m_hWnd;GetSafeHwnd();
-				ofn.lpstrFilter = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER", L"txt(*.txt)\\0*.txt\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFileW);
+				ofn.lpstrFilter = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER", L"txt(*.txt)\\0*.txt\\0all(*.*)\\0*.*\\0\\0", g_ts->UILanguageFileW);
 				ofn.lpstrFile = def;
-				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE", L"Choose a file including strings for ConfirmChangePaste", ts.UILanguageFileW);
-				ofn.lpstrInitialDir = ts.HomeDirW;
+				ofn.lpstrTitle = TTGetLangStrW("Tera Term", "FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE", L"Choose a file including strings for ConfirmChangePaste", g_ts->UILanguageFileW);
+				ofn.lpstrInitialDir = g_ts->HomeDirW;
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 				wchar_t *filename;
 				BOOL ok = TTGetOpenFileNameW(&ofn, &filename);
@@ -464,67 +464,67 @@ void CCopypastePropPageDlg::OnOK()
 	int val;
 
 	// (1)
-	ts.EnableContinuedLineCopy = GetCheck(IDC_LINECOPY);
+	g_ts->EnableContinuedLineCopy = GetCheck(IDC_LINECOPY);
 
 	// (2)
 	if (GetCheck(IDC_DISABLE_PASTE_RBUTTON)) {
-		ts.PasteFlag |= CPF_DISABLE_RBUTTON;
+		g_ts->PasteFlag |= CPF_DISABLE_RBUTTON;
 	}
 	else {
-		ts.PasteFlag &= ~CPF_DISABLE_RBUTTON;
+		g_ts->PasteFlag &= ~CPF_DISABLE_RBUTTON;
 	}
 
 	// (3)
 	if (GetCheck(IDC_CONFIRM_PASTE_RBUTTON)) {
-		ts.PasteFlag |= CPF_CONFIRM_RBUTTON;
+		g_ts->PasteFlag |= CPF_CONFIRM_RBUTTON;
 	}
 	else {
-		ts.PasteFlag &= ~CPF_CONFIRM_RBUTTON;
+		g_ts->PasteFlag &= ~CPF_CONFIRM_RBUTTON;
 	}
 
 	// (4)
 	if (GetCheck(IDC_DISABLE_PASTE_MBUTTON)) {
-		ts.PasteFlag |= CPF_DISABLE_MBUTTON;
+		g_ts->PasteFlag |= CPF_DISABLE_MBUTTON;
 	}
 	else {
-		ts.PasteFlag &= ~CPF_DISABLE_MBUTTON;
+		g_ts->PasteFlag &= ~CPF_DISABLE_MBUTTON;
 	}
 
 	// (5)
-	ts.SelectOnlyByLButton = GetCheck(IDC_SELECT_LBUTTON);
+	g_ts->SelectOnlyByLButton = GetCheck(IDC_SELECT_LBUTTON);
 
 	// (6)
 	if (GetCheck(IDC_TRIMNLCHAR)) {
-		ts.PasteFlag |= CPF_TRIM_TRAILING_NL;
+		g_ts->PasteFlag |= CPF_TRIM_TRAILING_NL;
 	}
 	else {
-		ts.PasteFlag &= ~CPF_TRIM_TRAILING_NL;
+		g_ts->PasteFlag &= ~CPF_TRIM_TRAILING_NL;
 	}
 
 	// (7)IDC_CONFIRM_CHANGE_PASTE
 	if (GetCheck(IDC_CONFIRM_CHANGE_PASTE)) {
-		ts.PasteFlag |= CPF_CONFIRM_CHANGEPASTE;
+		g_ts->PasteFlag |= CPF_CONFIRM_CHANGEPASTE;
 	}
 	else {
-		ts.PasteFlag &= ~CPF_CONFIRM_CHANGEPASTE;
+		g_ts->PasteFlag &= ~CPF_CONFIRM_CHANGEPASTE;
 	}
-	GetDlgItemTextA(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile, sizeof(ts.ConfirmChangePasteStringFile));
+	GetDlgItemTextA(IDC_CONFIRM_STRING_FILE, g_ts->ConfirmChangePasteStringFile, sizeof(g_ts->ConfirmChangePasteStringFile));
 
 	// (8)
-	free(ts.DelimListW);
-	hGetDlgItemTextW(this->m_hWnd, IDC_DELIM_LIST, &ts.DelimListW);
+	free(g_ts->DelimListW);
+	hGetDlgItemTextW(this->m_hWnd, IDC_DELIM_LIST, &g_ts->DelimListW);
 
 	// (9)
 	val = GetDlgItemInt(IDC_PASTEDELAY_EDIT);
-	ts.PasteDelayPerLine =
+	g_ts->PasteDelayPerLine =
 		(val < 0) ? 0 :
 		(val > 5000) ? 5000 : val;
 
 	// (10) SelectOnActivate
-	ts.SelOnActive = (GetCheck(IDC_SELECT_ON_ACTIVATE) == BST_CHECKED);
+	g_ts->SelOnActive = (GetCheck(IDC_SELECT_ON_ACTIVATE) == BST_CHECKED);
 
 	// (11) auto text copy
-	ts.AutoTextCopy = (GetCheck(IDC_AUTO_TEXT_COPY) == BST_CHECKED);
+	g_ts->AutoTextCopy = (GetCheck(IDC_AUTO_TEXT_COPY) == BST_CHECKED);
 }
 
 void CCopypastePropPageDlg::OnHelp()
@@ -558,7 +558,7 @@ CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst)
 {
 	wchar_t *UIMsg;
 	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_VISUAL",
-				 L"Visual", ts.UILanguageFileW, &UIMsg);
+				 L"Visual", g_ts->UILanguageFileW, &UIMsg);
 	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 	TipWin = new CTipWin(inst);
@@ -614,7 +614,7 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 		{ IDC_ENABLE_ATTR_FONT_URL, "DLG_TAB_VISUAL_URL_FONT" },
 		{ IDC_ENABLE_ANSI_COLOR, "DLG_TAB_VISUAL_ANSI" },
 	};
-	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), g_ts->UILanguageFileW);
 
 	const static I18nTextInfo visual_font_quality[] = {
 		{ "DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT", L"Default" },
@@ -623,17 +623,17 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 		{ "DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE", L"ClearType" },
 	};
 	SetI18nListW("Tera Term", m_hWnd, IDC_FONT_QUALITY, visual_font_quality, _countof(visual_font_quality),
-				 ts.UILanguageFileW, 0);
+				 g_ts->UILanguageFileW, 0);
 
 	// (1)AlphaBlend
 
-	SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, ts.AlphaBlendActive);
+	SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, g_ts->AlphaBlendActive);
 	SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETRANGE, TRUE, MAKELPARAM(0, 255));
-	SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETPOS, TRUE, ts.AlphaBlendActive);
+	SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETPOS, TRUE, g_ts->AlphaBlendActive);
 
-	SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, ts.AlphaBlendInactive);
+	SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, g_ts->AlphaBlendInactive);
 	SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETRANGE, TRUE, MAKELPARAM(0, 255));
-	SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETPOS, TRUE, ts.AlphaBlendInactive);
+	SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETPOS, TRUE, g_ts->AlphaBlendInactive);
 
 	BOOL isLayeredWindowSupported = (pSetLayeredWindowAttributes != NULL);
 	EnableDlgItem(IDC_ALPHA_BLEND_ACTIVE, isLayeredWindowSupported);
@@ -646,14 +646,14 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	for (int i = 0 ; MouseCursor[i].name ; i++) {
 		const char *name = MouseCursor[i].name;
 		SendDlgItemMessageA(IDC_MOUSE_CURSOR, CB_ADDSTRING, i, (LPARAM)name);
-		if (_stricmp(name, ts.MouseCursorName) == 0) {
+		if (_stricmp(name, g_ts->MouseCursorName) == 0) {
 			sel = i;
 		}
 	}
 	SetCurSel(IDC_MOUSE_CURSOR, sel);
 
 	// (3)Font quality
-	switch (ts.FontQuality) {
+	switch (g_ts->FontQuality) {
 		case DEFAULT_QUALITY:
 			SetCurSel(IDC_FONT_QUALITY, 0);
 			break;
@@ -670,7 +670,7 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 
 	// (4)ANSI color
 	for (int i = 0; i < 16; i++) {
-		ANSIColor[i] = ts.ANSIColor[i];
+		ANSIColor[i] = g_ts->ANSIColor[i];
 	}
 	for (int i = 0 ; i < 16 ; i++) {
 		char buf[4];
@@ -682,30 +682,30 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 
 	// (5)Bold Attr Color
-	SetCheck(IDC_ENABLE_ATTR_COLOR_BOLD, (ts.ColorFlag&CF_BOLDCOLOR) != 0);
-	SetCheck(IDC_ENABLE_ATTR_FONT_BOLD, (ts.FontFlag&FF_BOLD) != 0);
+	SetCheck(IDC_ENABLE_ATTR_COLOR_BOLD, (g_ts->ColorFlag&CF_BOLDCOLOR) != 0);
+	SetCheck(IDC_ENABLE_ATTR_FONT_BOLD, (g_ts->FontFlag&FF_BOLD) != 0);
 
 	// (6)Blink Attr Color
-	SetCheck(IDC_ENABLE_ATTR_COLOR_BLINK, (ts.ColorFlag&CF_BLINKCOLOR) != 0);
+	SetCheck(IDC_ENABLE_ATTR_COLOR_BLINK, (g_ts->ColorFlag&CF_BLINKCOLOR) != 0);
 
 	// (7)Reverse Attr Color
-	SetCheck(IDC_ENABLE_ATTR_COLOR_REVERSE, (ts.ColorFlag&CF_REVERSECOLOR) != 0);
+	SetCheck(IDC_ENABLE_ATTR_COLOR_REVERSE, (g_ts->ColorFlag&CF_REVERSECOLOR) != 0);
 
 	// Underline Attr
-	SetCheck(IDC_ENABLE_ATTR_COLOR_UNDERLINE, (ts.ColorFlag&CF_UNDERLINE) != 0);
-	SetCheck(IDC_ENABLE_ATTR_FONT_UNDERLINE, (ts.FontFlag&FF_UNDERLINE) != 0);
+	SetCheck(IDC_ENABLE_ATTR_COLOR_UNDERLINE, (g_ts->ColorFlag&CF_UNDERLINE) != 0);
+	SetCheck(IDC_ENABLE_ATTR_FONT_UNDERLINE, (g_ts->FontFlag&FF_UNDERLINE) != 0);
 
 	// URL Underline Attr
-	SetCheck(IDC_ENABLE_ATTR_COLOR_URL, (ts.ColorFlag&CF_URLCOLOR) != 0);
-	SetCheck(IDC_ENABLE_ATTR_FONT_URL, (ts.FontFlag&FF_URLUNDERLINE) != 0);
+	SetCheck(IDC_ENABLE_ATTR_COLOR_URL, (g_ts->ColorFlag&CF_URLCOLOR) != 0);
+	SetCheck(IDC_ENABLE_ATTR_FONT_URL, (g_ts->FontFlag&FF_URLUNDERLINE) != 0);
 
 	// Color
-	SetCheck(IDC_ENABLE_ANSI_COLOR, (ts.ColorFlag&CF_ANSICOLOR) != 0);
+	SetCheck(IDC_ENABLE_ANSI_COLOR, (g_ts->ColorFlag&CF_ANSICOLOR) != 0);
 
-	SetCheck(IDC_CHECK_FLICKER_LESS_MOVE, ts.EtermLookfeel.BGNoCopyBits != 0);
+	SetCheck(IDC_CHECK_FLICKER_LESS_MOVE, g_ts->EtermLookfeel.BGNoCopyBits != 0);
 
 	// ウィンドウの角を丸くしない
-	SetCheck(IDC_CHECK_CORNERDONTROUND, (ts.WindowCornerDontround) != 0);
+	SetCheck(IDC_CHECK_CORNERDONTROUND, (g_ts->WindowCornerDontround) != 0);
 	{
 		DWM_WINDOW_CORNER_PREFERENCE preference;
 		if (pDwmGetWindowAttribute == NULL ||
@@ -855,7 +855,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 					SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, pos);
 				}
 				SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_TRACKBAR, TBM_SETPOS, TRUE, pos);
-				OpacityTooltip(TipWin, m_hWnd, IDC_ALPHA_BLEND_ACTIVE, pos, ts.UILanguageFileW);
+				OpacityTooltip(TipWin, m_hWnd, IDC_ALPHA_BLEND_ACTIVE, pos, g_ts->UILanguageFileW);
 				return TRUE;
 			}
 		case IDC_ALPHA_BLEND_INACTIVE | (EN_CHANGE << 16):
@@ -871,7 +871,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 					SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, pos);
 				}
 				SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_TRACKBAR, TBM_SETPOS, TRUE, pos);
-				OpacityTooltip(TipWin, m_hWnd, IDC_ALPHA_BLEND_INACTIVE, pos, ts.UILanguageFileW);
+				OpacityTooltip(TipWin, m_hWnd, IDC_ALPHA_BLEND_INACTIVE, pos, g_ts->UILanguageFileW);
 				return TRUE;
 			}
 	}
@@ -901,7 +901,7 @@ HBRUSH CVisualPropPageDlg::OnCtlColor(HDC hDC, HWND hWnd)
 BOOL CVisualPropPageDlg::CheckColorChanged()
 {
 	for (int i = 0; i < 16; i++) {
-		if (ts.ANSIColor[i] != ANSIColor[i]) {
+		if (g_ts->ANSIColor[i] != ANSIColor[i]) {
 			return TRUE;
 		}
 	}
@@ -915,7 +915,7 @@ BOOL CVisualPropPageDlg::CheckColorChanged()
  */
 BOOL CVisualPropPageDlg::CheckThemeColor()
 {
-	TColorTheme def;	// default color (=ts.ANSIColor[])
+	TColorTheme def;	// default color (=g_ts->ANSIColor[])
 	ThemeGetColorDefault(&def);
 	TColorTheme disp;	// 今表示されている色
 	ThemeGetColor(vt_src, &disp);
@@ -934,84 +934,84 @@ void CVisualPropPageDlg::OnOK()
 
 	// (1)
 	i = GetDlgItemInt(IDC_ALPHA_BLEND_ACTIVE);
-	ts.AlphaBlendActive =
+	g_ts->AlphaBlendActive =
 		(i < 0) ? 0 :
 		(BYTE)((i > 255) ? 255 : i);
 	i = GetDlgItemInt(IDC_ALPHA_BLEND_INACTIVE);
-	ts.AlphaBlendInactive =
+	g_ts->AlphaBlendInactive =
 		(i < 0) ? 0 :
 		(BYTE)((i > 255) ? 255 : i);
 
 	// (2)
 	sel = GetCurSel(IDC_MOUSE_CURSOR);
 	if (sel >= 0 && sel < MOUSE_CURSOR_MAX) {
-		strncpy_s(ts.MouseCursorName, sizeof(ts.MouseCursorName), MouseCursor[sel].name, _TRUNCATE);
+		strncpy_s(g_ts->MouseCursorName, sizeof(g_ts->MouseCursorName), MouseCursor[sel].name, _TRUNCATE);
 	}
 
 	// (3)Font quality
 	switch (GetCurSel(IDC_FONT_QUALITY)) {
 		case 0:
-			ts.FontQuality = DEFAULT_QUALITY;
+			g_ts->FontQuality = DEFAULT_QUALITY;
 			break;
 		case 1:
-			ts.FontQuality = NONANTIALIASED_QUALITY;
+			g_ts->FontQuality = NONANTIALIASED_QUALITY;
 			break;
 		case 2:
-			ts.FontQuality = ANTIALIASED_QUALITY;
+			g_ts->FontQuality = ANTIALIASED_QUALITY;
 			break;
 		case 3:
-			ts.FontQuality = CLEARTYPE_QUALITY;
+			g_ts->FontQuality = CLEARTYPE_QUALITY;
 			break;
 		default: // Invalid value.
 			break;
 	}
 
 	// (5) Attr Bold Color
-	if (((ts.ColorFlag & CF_BOLDCOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_BOLD)) {
-		ts.ColorFlag ^= CF_BOLDCOLOR;
+	if (((g_ts->ColorFlag & CF_BOLDCOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_BOLD)) {
+		g_ts->ColorFlag ^= CF_BOLDCOLOR;
 	}
-	if (((ts.FontFlag & FF_BOLD) != 0) != GetCheck(IDC_ENABLE_ATTR_FONT_BOLD)) {
-		ts.FontFlag ^= FF_BOLD;
+	if (((g_ts->FontFlag & FF_BOLD) != 0) != GetCheck(IDC_ENABLE_ATTR_FONT_BOLD)) {
+		g_ts->FontFlag ^= FF_BOLD;
 	}
 
 	// (6) Attr Blink Color
-	if (((ts.ColorFlag & CF_BLINKCOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_BLINK)) {
-		ts.ColorFlag ^= CF_BLINKCOLOR;
+	if (((g_ts->ColorFlag & CF_BLINKCOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_BLINK)) {
+		g_ts->ColorFlag ^= CF_BLINKCOLOR;
 	}
 
 	// (7) Attr Reverse Color
-	if (((ts.ColorFlag & CF_REVERSECOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_REVERSE)) {
-		ts.ColorFlag ^= CF_REVERSECOLOR;
+	if (((g_ts->ColorFlag & CF_REVERSECOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_REVERSE)) {
+		g_ts->ColorFlag ^= CF_REVERSECOLOR;
 	}
 
 	// Underline Attr
-	if (((ts.FontFlag & FF_UNDERLINE) != 0) != GetCheck(IDC_ENABLE_ATTR_FONT_UNDERLINE)) {
-		ts.FontFlag ^= FF_UNDERLINE;
+	if (((g_ts->FontFlag & FF_UNDERLINE) != 0) != GetCheck(IDC_ENABLE_ATTR_FONT_UNDERLINE)) {
+		g_ts->FontFlag ^= FF_UNDERLINE;
 	}
-	if (((ts.ColorFlag & CF_UNDERLINE) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_UNDERLINE)) {
-		ts.ColorFlag ^= CF_UNDERLINE;
+	if (((g_ts->ColorFlag & CF_UNDERLINE) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_UNDERLINE)) {
+		g_ts->ColorFlag ^= CF_UNDERLINE;
 	}
 
 	// URL Underline Attr
-	if (((ts.FontFlag & FF_URLUNDERLINE) != 0) != GetCheck(IDC_ENABLE_ATTR_FONT_URL)) {
-		ts.FontFlag ^= FF_URLUNDERLINE;
+	if (((g_ts->FontFlag & FF_URLUNDERLINE) != 0) != GetCheck(IDC_ENABLE_ATTR_FONT_URL)) {
+		g_ts->FontFlag ^= FF_URLUNDERLINE;
 	}
-	if (((ts.ColorFlag & CF_URLCOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_URL)) {
-		ts.ColorFlag ^= CF_URLCOLOR;
+	if (((g_ts->ColorFlag & CF_URLCOLOR) != 0) != GetCheck(IDC_ENABLE_ATTR_COLOR_URL)) {
+		g_ts->ColorFlag ^= CF_URLCOLOR;
 	}
 
 	// Color
-	if (((ts.ColorFlag & CF_ANSICOLOR) != 0) != GetCheck(IDC_ENABLE_ANSI_COLOR)) {
-		ts.ColorFlag ^= CF_ANSICOLOR;
+	if (((g_ts->ColorFlag & CF_ANSICOLOR) != 0) != GetCheck(IDC_ENABLE_ANSI_COLOR)) {
+		g_ts->ColorFlag ^= CF_ANSICOLOR;
 	}
 
-	ts.EtermLookfeel.BGNoCopyBits = GetCheck(IDC_CHECK_FLICKER_LESS_MOVE);
+	g_ts->EtermLookfeel.BGNoCopyBits = GetCheck(IDC_CHECK_FLICKER_LESS_MOVE);
 
 	// ウィンドウの角を丸くしない
-	if (ts.WindowCornerDontround != GetCheck(IDC_CHECK_CORNERDONTROUND)) {
-		ts.WindowCornerDontround = GetCheck(IDC_CHECK_CORNERDONTROUND);
+	if (g_ts->WindowCornerDontround != GetCheck(IDC_CHECK_CORNERDONTROUND)) {
+		g_ts->WindowCornerDontround = GetCheck(IDC_CHECK_CORNERDONTROUND);
 		if (pDwmSetWindowAttribute != NULL) {
-			DWM_WINDOW_CORNER_PREFERENCE preference = ts.WindowCornerDontround ? DWMWCP_DONOTROUND : DWMWCP_DEFAULT;
+			DWM_WINDOW_CORNER_PREFERENCE preference = g_ts->WindowCornerDontround ? DWMWCP_DONOTROUND : DWMWCP_DEFAULT;
 			pDwmSetWindowAttribute(HVTWin, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
 		}
 	}
@@ -1028,7 +1028,7 @@ void CVisualPropPageDlg::OnOK()
 				"MSG_TT_NOTICE", L"Tera Term: Notice",
 				NULL, L"Color settings have been changed.\nDo you want to display this?",
 				MB_ICONQUESTION | MB_YESNO };
-			int r = TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW);
+			int r = TTMessageBoxW(m_hWnd, &info, g_ts->UILanguageFileW);
 			if (r == IDNO) {
 				set_color = FALSE;
 			}
@@ -1036,7 +1036,7 @@ void CVisualPropPageDlg::OnOK()
 
 		// 色を設定(デフォルト色)に反映
 		for (i = 0; i < 16; i++) {
-			ts.ANSIColor[i] = ANSIColor[i];
+			g_ts->ANSIColor[i] = ANSIColor[i];
 		}
 
 		// 設定された色を表示に反映
@@ -1367,7 +1367,7 @@ CCygwinPropPageDlg::CCygwinPropPageDlg(HINSTANCE inst)
 {
 	wchar_t *UIMsg;
 	GetI18nStrWW("Tera Term", "DLG_TABSHEET_TITLE_CYGWIN",
-				 L"Cygwin", ts.UILanguageFileW, &UIMsg);
+				 L"Cygwin", g_ts->UILanguageFileW, &UIMsg);
 	m_psp.pszTitle = UIMsg;
 	m_psp.dwFlags |= (PSP_USETITLE | PSP_HASHELP);
 }
@@ -1386,9 +1386,9 @@ BOOL CCygwinPropPageDlg::OnInitDialog()
 	static const DlgTextInfo TextInfos[] = {
 		{ IDC_CYGWIN_PATH_LABEL, "DLG_TAB_CYGWIN_PATH" }
 	};
-	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
+	SetDlgTextsW(m_hWnd, TextInfos, _countof(TextInfos), g_ts->UILanguageFileW);
 
-	ReadCygtermConfFile(ts.HomeDir, &settings);
+	ReadCygtermConfFile(g_ts->HomeDir, &settings);
 
 	SetDlgItemTextA(IDC_TERM_EDIT, settings.term);
 	SetDlgItemTextA(IDC_TERM_TYPE, settings.term_type);
@@ -1403,7 +1403,7 @@ BOOL CCygwinPropPageDlg::OnInitDialog()
 	SetCheck(IDC_AGENT_PROXY, settings.agent_proxy);
 
 	// Cygwin install path
-	SetDlgItemTextA(IDC_CYGWIN_PATH, ts.CygwinDirectory);
+	SetDlgItemTextA(IDC_CYGWIN_PATH, g_ts->CygwinDirectory);
 
 	// TRUE を返す。ダイアログマネージャが先頭 TABSTOPにフォーカスを設定する。
 	return TRUE;
@@ -1414,7 +1414,7 @@ BOOL CCygwinPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	switch (wParam) {
 		case IDC_SELECT_FILE | (BN_CLICKED << 16):
 			// Cygwin install ディレクトリの選択ダイアログ
-			wchar_t *title = TTGetLangStrW("Tera Term", "DIRDLG_CYGTERM_DIR_TITLE", L"Select Cygwin directory", ts.UILanguageFileW);
+			wchar_t *title = TTGetLangStrW("Tera Term", "DIRDLG_CYGTERM_DIR_TITLE", L"Select Cygwin directory", g_ts->UILanguageFileW);
 			wchar_t *buf;
 			hGetDlgItemTextW(m_hWnd, IDC_CYGWIN_PATH, &buf);
 			wchar_t *path;
@@ -1473,19 +1473,19 @@ void CCygwinPropPageDlg::OnOK()
 
 	// 変更されている場合 cygterm.cfg へ書き込む
 	if (CmpCygtermConfFile(&settings_prop, &settings) == FALSE) {
-		if (WriteCygtermConfFile(ts.HomeDir, &settings_prop) == FALSE) {
+		if (WriteCygtermConfFile(g_ts->HomeDir, &settings_prop) == FALSE) {
 			static const TTMessageBoxInfoW info = {
 				"Tera Term",
 				"MSG_ERROR", L"ERROR",
 				"MSG_CYGTERM_CONF_WRITEFILE_ERROR", L"Can't write CygTerm configuration file (%d).",
 				MB_ICONEXCLAMATION };
 			DWORD e = GetLastError();
-			TTMessageBoxW(m_hWnd, &info, ts.UILanguageFileW, e);
+			TTMessageBoxW(m_hWnd, &info, g_ts->UILanguageFileW, e);
 		}
 	}
 
 	// Cygwin install path
-	GetDlgItemTextA(IDC_CYGWIN_PATH, ts.CygwinDirectory, sizeof(ts.CygwinDirectory));
+	GetDlgItemTextA(IDC_CYGWIN_PATH, g_ts->CygwinDirectory, sizeof(g_ts->CygwinDirectory));
 }
 
 void CCygwinPropPageDlg::OnHelp()
@@ -1563,7 +1563,7 @@ static int GetStartPageNo(CAddSettingPropSheetDlg::Page page)
 CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
 	HINSTANCE hInstance, HWND hParentWnd,
 	CAddSettingPropSheetDlg::Page StartPage):
-	TTCPropSheetDlg(hInstance, hParentWnd, ts.UILanguageFileW)
+	TTCPropSheetDlg(hInstance, hParentWnd, g_ts->UILanguageFileW)
 {
 	HPROPSHEETPAGE pages[PP_MAX] = {0};
 
@@ -1572,7 +1572,7 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
 	// CPP,tmfcのTTCPropertyPage派生クラスから生成
 	int i = 0;
 	if (parent_win == ADDSETTING_WIN_VT) {
-		m_Page[i] = new CGeneralPropPageDlg(hInstance, hParentWnd, &cv);
+		m_Page[i] = new CGeneralPropPageDlg(hInstance, hParentWnd, g_cv);
 		pages[PP_GENERAL] = m_Page[i++]->CreatePropertySheetPage();
 		m_Page[i] = new CSequencePropPageDlg(hInstance);
 		pages[PP_SEQUENCE] = m_Page[i++]->CreatePropertySheetPage();
@@ -1594,23 +1594,23 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
 
 	// TTCPropertyPage を使用しない PropertyPage
 	if (parent_win == ADDSETTING_WIN_VT) {
-		pages[PP_ENCODING] = CodingPageCreate(hInstance, &ts);
-		pages[PP_FONT] = FontPageCreate(hInstance, &ts);
-		pages[PP_THEME] = ThemePageCreate(hInstance, &ts);
-		pages[PP_KEYBOARD] = KeyboardPageCreate(hInstance, &ts);
-		pages[PP_MOUSE] = MousePageCreate(hInstance, &ts);
-		pages[PP_TCPIP] = TcpIPPageCreate(hInstance, &ts);
-		pages[PP_TERMINAL] = CreateTerminalPP(hInstance, hParentWnd, &ts);
-		pages[PP_SERIAL] = SerialPageCreate(hInstance, &ts);
-		pages[PP_UI] = UIPageCreate(hInstance, &ts);
-		pages[PP_WINDOW] = CreateWinVTPP(hInstance, hParentWnd, &ts);
+		pages[PP_ENCODING] = CodingPageCreate(hInstance, g_ts);
+		pages[PP_FONT] = FontPageCreate(hInstance, g_ts);
+		pages[PP_THEME] = ThemePageCreate(hInstance, g_ts);
+		pages[PP_KEYBOARD] = KeyboardPageCreate(hInstance, g_ts);
+		pages[PP_MOUSE] = MousePageCreate(hInstance, g_ts);
+		pages[PP_TCPIP] = TcpIPPageCreate(hInstance, g_ts);
+		pages[PP_TERMINAL] = CreateTerminalPP(hInstance, hParentWnd, g_ts);
+		pages[PP_SERIAL] = SerialPageCreate(hInstance, g_ts);
+		pages[PP_UI] = UIPageCreate(hInstance, g_ts);
+		pages[PP_WINDOW] = CreateWinVTPP(hInstance, hParentWnd, g_ts);
 	}
 	if (parent_win == ADDSETTING_WIN_TEK) {	// TEKから呼び出されたときだけ表示する
 //	{										// いつも表示する
-		pages[PP_TEK_WINDOW] = CreateWinTEKPP(hInstance, hParentWnd, &ts);
-		pages[PP_TEK_FONT] = TEKFontPageCreate(hInstance, hParentWnd, &ts);
+		pages[PP_TEK_WINDOW] = CreateWinTEKPP(hInstance, hParentWnd, g_ts);
+		pages[PP_TEK_FONT] = TEKFontPageCreate(hInstance, hParentWnd, g_ts);
 	}
-	pages[PP_PLUGIN] = PluginPageCreate(hInstance, &ts);
+	pages[PP_PLUGIN] = PluginPageCreate(hInstance, g_ts);
 
 	const int start_page_no = GetStartPageNo(StartPage);
 	int available_page_count = 0;
@@ -1627,7 +1627,7 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
 	}
 	TTCPropSheetDlg::SetStartPage(start_page_index);
 
-	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", ts.UILanguageFileW);
+	wchar_t *title = TTGetLangStrW("Tera Term", "DLG_TABSHEET_TITLE", L"Tera Term: Additional settings", g_ts->UILanguageFileW);
 	SetCaption(title);
 	free(title);
 }

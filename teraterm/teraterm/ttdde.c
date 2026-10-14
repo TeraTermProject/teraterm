@@ -399,7 +399,7 @@ static void SendData(const char *DataPtr, DWORD DataSize)
 		SendMem *sm = SendMemBinary(p, DataSize - 1);
 		assert(sm != NULL);
 		if (sm != NULL) {
-			SendMemInitEcho(sm, ts.LocalEcho);
+			SendMemInitEcho(sm, g_ts->LocalEcho);
 			SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
 			SendMemStart(sm);
 		}
@@ -407,7 +407,7 @@ static void SendData(const char *DataPtr, DWORD DataSize)
 		SendMem *sm = SendMemTextW(strW, 0);
 		assert(sm != NULL);
 		if (sm != NULL) {
-			SendMemInitEcho(sm, ts.LocalEcho);
+			SendMemInitEcho(sm, g_ts->LocalEcho);
 			SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
 			SendMemStart(sm);
 		}
@@ -423,7 +423,7 @@ static void SendStringU8(const char *strU8)
 	SendMem *sm = SendMemTextW(strW, 0);
 	assert(sm != NULL);
 	if (sm != NULL) {
-		SendMemInitEcho(sm, ts.LocalEcho);
+		SendMemInitEcho(sm, g_ts->LocalEcho);
 		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_PER_LINE, 10, 0);
 		SendMemStart(sm);
 	}
@@ -439,7 +439,7 @@ static void SendBinary(const void *data_ptr, DWORD data_size)
 	SendMem *sm = SendMemBinary(p, data_size - 1);
 	assert(sm != NULL);
 	if (sm != NULL) {
-		SendMemInitEcho(sm, ts.LocalEcho);
+		SendMemInitEcho(sm, g_ts->LocalEcho);
 		SendMemInitDelay(sm, SENDMEM_DELAYTYPE_NO_DELAY, 0, 0);
 		SendMemStart(sm);
 	}
@@ -539,7 +539,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	switch (Command[0]) {
 	case CmdSetHWnd:
 		GetClientHWnd(&Command[1]);
-		if (cv.Ready)
+		if (g_cv->Ready)
 			SetDdeComReady(1);
 		break;
 	case CmdSetFile:
@@ -549,13 +549,13 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		ParamBinaryFlag = Command[1] & 1;
 		break;
 	case CmdSetLogOpt:
-		ts.LogBinary        = Command[LogOptBinary] - 0x30;
-		ts.Append           = Command[LogOptAppend] - 0x30;
-		ts.LogTypePlainText = Command[LogOptPlainText] - 0x30;
-		ts.LogTimestamp     = Command[LogOptTimestamp] - 0x30;
-		ts.LogHideDialog    = Command[LogOptHideDialog] - 0x30;
-		ts.LogAllBuffIncludedInFirst = Command[LogOptIncScrBuff] - 0x30;
-		ts.LogTimestampType = Command[LogOptTimestampType] - 0x30;
+		g_ts->LogBinary        = Command[LogOptBinary] - 0x30;
+		g_ts->Append           = Command[LogOptAppend] - 0x30;
+		g_ts->LogTypePlainText = Command[LogOptPlainText] - 0x30;
+		g_ts->LogTimestamp     = Command[LogOptTimestamp] - 0x30;
+		g_ts->LogHideDialog    = Command[LogOptHideDialog] - 0x30;
+		g_ts->LogAllBuffIncludedInFirst = Command[LogOptIncScrBuff] - 0x30;
+		g_ts->LogTimestampType = Command[LogOptTimestampType] - 0x30;
 		break;
 	case CmdSetXmodemOpt:
 		ParamXmodemOpt = Command[1] & 3;
@@ -586,8 +586,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	}
 	case CmdChangeDir:
-		free(ts.FileDirW);
-		ts.FileDirW = ToWcharU8(ParamFileName);
+		free(g_ts->FileDirW);
+		g_ts->FileDirW = ToWcharU8(ParamFileName);
 		break;
 	case CmdClearScreen:
 		switch (ParamFileName[0]) {
@@ -606,28 +606,28 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		CloseTT = TRUE;
 		break;
 	case CmdConnect:
-		if (cv.Open) {
-			if (cv.Ready)
+		if (g_cv->Open) {
+			if (g_cv->Ready)
 				SetDdeComReady(1);
 			break;
 		}
 		if (LoadTTSET()) {
 			char *tmp_u8;
 			wchar_t *commandline;
-			wchar_t *prev_setup = _wcsdup(ts.SetupFNameW);
+			wchar_t *prev_setup = _wcsdup(g_ts->SetupFNameW);
 			asprintf(&tmp_u8, "a %s", ParamFileName); // "a" = dummy exe name
 			commandline = ToWcharU8(tmp_u8);
-			(*ParseParam)(commandline, &ts, NULL);
+			(*ParseParam)(commandline, g_ts, NULL);
 			free(commandline);
 			free(tmp_u8);
-			if (prev_setup != NULL && _wcsicmp(prev_setup, ts.SetupFNameW) != 0) {
+			if (prev_setup != NULL && _wcsicmp(prev_setup, g_ts->SetupFNameW) != 0) {
 				/* /F= で設定ファイルが変更された。読み直して表示へ再適用する */
 				PostMessage(HVTWin, WM_USER_ACCELCOMMAND, IdCmdRestoreSetup, 0);
 			}
 			free(prev_setup);
 		}
 		FreeTTSET();
-		cv.NoMsg = 1; /* suppress error messages */
+		g_cv->NoMsg = 1; /* suppress error messages */
 		PostMessage(HVTWin,WM_USER_COMMSTART,0,0);
 		break;
 	case CmdDisconnect:
@@ -643,7 +643,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	case CmdGetTitle: {
 		// title is transferred later by XTYP_REQUEST
-		char *titleU8 = ToU8W(ts.TitleW);
+		char *titleU8 = ToU8W(g_ts->TitleW);
 		if (titleU8 == NULL) {
 			ParamFileName[0] = 0;
 		}
@@ -657,10 +657,10 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		if (StartupFlag) // in case of startup macro
 		{ // TTMACRO is waiting for connecting to the host
 			// シリアル接続で自動接続が無効の場合は、接続ダイアログを出さない (2006.9.15 maya)
-			if (!((ts.PortType==IdSerial) && (ts.ComAutoConnect == FALSE)) &&
-				((ts.PortType==IdSerial) || (GetConnectHostName()[0]!=0)))
+			if (!((g_ts->PortType==IdSerial) && (g_ts->ComAutoConnect == FALSE)) &&
+				((g_ts->PortType==IdSerial) || (GetConnectHostName()[0]!=0)))
 			{
-				cv.NoMsg = 1;
+				g_cv->NoMsg = 1;
 				// start connecting
 				PostMessage(HVTWin,WM_USER_COMMSTART,0,0);
 			}
@@ -708,8 +708,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	}
 	case CmdLoadKeyMap: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
-		free(ts.KeyCnfFNW);
-		ts.KeyCnfFNW = ParamFileNameW;
+		free(g_ts->KeyCnfFNW);
+		g_ts->KeyCnfFNW = ParamFileNameW;
 		PostMessage(HVTWin, WM_USER_ACCELCOMMAND, IdCmdLoadKeyMap, 0);
 		break;
 	}
@@ -790,11 +790,11 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	}
 	case CmdRestoreSetup: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
-		wchar_t *fnameW = GetFullPathW(ts.HomeDirW, ParamFileNameW);
+		wchar_t *fnameW = GetFullPathW(g_ts->HomeDirW, ParamFileNameW);
 		free(ParamFileNameW);
-		free(ts.SetupFNameW);
-		ts.SetupFNameW = fnameW;
-		WideCharToACP_t(ts.SetupFNameW, ts.SetupFName, _countof(ts.SetupFName));
+		free(g_ts->SetupFNameW);
+		g_ts->SetupFNameW = fnameW;
+		WideCharToACP_t(g_ts->SetupFNameW, g_ts->SetupFName, _countof(g_ts->SetupFName));
 		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdRestoreSetup,0);
 		break;
 	}
@@ -808,8 +808,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		BOOL r = FileSendStart(ParamFileNameW, ParamBinaryFlag);
 #else
 		// 5 で追加した方法で送信
-		BOOL r = SendMemSendFile2(ParamFileNameW, ParamBinaryFlag, (SendMemDelayType)ts.SendfileDelayType,
-								  ts.SendfileDelayTick, ts.SendfileSize, ts.LocalEcho, SendCallback, NULL);
+		BOOL r = SendMemSendFile2(ParamFileNameW, ParamBinaryFlag, (SendMemDelayType)g_ts->SendfileDelayType,
+								  g_ts->SendfileDelayTick, g_ts->SendfileSize, g_ts->LocalEcho, SendCallback, NULL);
 #endif
 		free(ParamFileNameW);
 		if (r) {
@@ -826,8 +826,8 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	}
 	case CmdSetEcho:
-		ts.LocalEcho = ParamBinaryFlag;
-		if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
+		g_ts->LocalEcho = ParamBinaryFlag;
+		if (g_cv->Ready && g_cv->TelFlag && (g_ts->TelEcho>0))
 			TelChangeEcho();
 		break;
 	case CmdSetDebug:
@@ -835,9 +835,9 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	case CmdSetTitle: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
-		if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) {
-			free(cv.TitleRemoteW);
-			cv.TitleRemoteW = NULL;
+		if (g_ts->AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) {
+			free(g_cv->TitleRemoteW);
+			g_cv->TitleRemoteW = NULL;
 		}
 		SetLocalTitle(ParamFileNameW);
 		free(ParamFileNameW);
@@ -975,15 +975,15 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 		int val;
 
-		if (!cv.Open || cv.PortType != IdSerial) {
+		if (!g_cv->Open || g_cv->PortType != IdSerial) {
 			result = DDE_FNOTPROCESSED;
 			break;
 		}
 
 		val = atoi(ParamFileName);
 		if (val > 0) {
-			ts.Baud = val;
-			CommResetSerial(&ts,&cv,FALSE);   // reset serial port
+			g_ts->Baud = val;
+			CommResetSerial(g_ts,g_cv,FALSE);   // reset serial port
 			PostMessage(HVTWin,WM_USER_CHANGETITLE,0,0); // refresh title bar
 		}
 		}
@@ -993,7 +993,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 		int val;
 
-		if (!cv.Open || cv.PortType != IdSerial) {
+		if (!g_cv->Open || g_cv->PortType != IdSerial) {
 			result = DDE_FNOTPROCESSED;
 			break;
 		}
@@ -1004,7 +1004,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			case 2: // RTS/CTS
 			case 3: // none
 			case 4: // DSR/DTR
-				ts.Flow = val;
+				g_ts->Flow = val;
 				break;
 		}
 		break;
@@ -1014,17 +1014,17 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 		int val, ret;
 
-		if (!cv.Open || cv.PortType != IdSerial || ts.Flow != IdFlowNone) {
+		if (!g_cv->Open || g_cv->PortType != IdSerial || g_ts->Flow != IdFlowNone) {
 			result = DDE_FNOTPROCESSED;
 			break;
 		}
 
 		val = atoi(ParamFileName);
 		if (val == 0) {
-			ret = EscapeCommFunction(cv.ComID, CLRRTS);
+			ret = EscapeCommFunction(g_cv->ComID, CLRRTS);
 		}
 		else {
-			ret = EscapeCommFunction(cv.ComID, SETRTS);
+			ret = EscapeCommFunction(g_cv->ComID, SETRTS);
 		}
 		}
 		break;
@@ -1033,17 +1033,17 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 		int val, ret;
 
-		if (!cv.Open || cv.PortType != IdSerial || ts.Flow != IdFlowNone) {
+		if (!g_cv->Open || g_cv->PortType != IdSerial || g_ts->Flow != IdFlowNone) {
 			result = DDE_FNOTPROCESSED;
 			break;
 		}
 
 		val = atoi(ParamFileName);
 		if (val == 0) {
-			ret = EscapeCommFunction(cv.ComID, CLRDTR);
+			ret = EscapeCommFunction(g_cv->ComID, CLRDTR);
 		}
 		else {
-			ret = EscapeCommFunction(cv.ComID, SETDTR);
+			ret = EscapeCommFunction(g_cv->ComID, SETDTR);
 		}
 		}
 		break;
@@ -1052,15 +1052,15 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 			int val;
 
-			if (!cv.Open || cv.PortType != IdSerial) {
+			if (!g_cv->Open || g_cv->PortType != IdSerial) {
 				result = DDE_FNOTPROCESSED;
 				break;
 			}
 
 			val = atoi(ParamFileName);
 			if (val >= 0) {
-				ts.DelayPerChar = val;
-				SendMem *sm = SendMemSetDelay(HWndDdeCli, ts.DelayPerChar, ts.DelayPerLine);
+				g_ts->DelayPerChar = val;
+				SendMem *sm = SendMemSetDelay(HWndDdeCli, g_ts->DelayPerChar, g_ts->DelayPerLine);
 				assert(sm != NULL);
 				if (sm != NULL) {
 					// SendMemInitEcho(sm, FALSE); 使用しない
@@ -1075,15 +1075,15 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 			int val;
 
-			if (!cv.Open || cv.PortType != IdSerial) {
+			if (!g_cv->Open || g_cv->PortType != IdSerial) {
 				result = DDE_FNOTPROCESSED;
 				break;
 			}
 
 			val = atoi(ParamFileName);
 			if (val >= 0) {
-				ts.DelayPerLine = val;
-				SendMem *sm = SendMemSetDelay(HWndDdeCli, ts.DelayPerChar, ts.DelayPerLine);
+				g_ts->DelayPerLine = val;
+				SendMem *sm = SendMemSetDelay(HWndDdeCli, g_ts->DelayPerChar, g_ts->DelayPerLine);
 				assert(sm != NULL);
 				if (sm != NULL) {
 					// SendMemInitEcho(sm, FALSE); 使用しない
@@ -1098,12 +1098,12 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 		DWORD val, n;
 
-		if (!cv.Open || cv.PortType != IdSerial) {
+		if (!g_cv->Open || g_cv->PortType != IdSerial) {
 			result = DDE_FNOTPROCESSED;
 			break;
 		}
 
-		if (GetCommModemStatus(cv.ComID, &val) == 0) { // error
+		if (GetCommModemStatus(g_cv->ComID, &val) == 0) { // error
 			result = DDE_FNOTPROCESSED;
 			break;
 		}
@@ -1123,14 +1123,14 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 
 	case CmdGetHostname:  // add 'gethostname' (2008.12.15 maya)
-		if (cv.Open) {
-			if (cv.PortType == IdTCPIP) {
+		if (g_cv->Open) {
+			if (g_cv->PortType == IdTCPIP) {
 				char *hostnameU8 = ToU8W(GetConnectHostName());
 				strncpy_s(ParamFileName, sizeof(ParamFileName), hostnameU8, _TRUNCATE);
 				free(hostnameU8);
 			}
-			else if (cv.PortType == IdSerial) {
-				_snprintf_s(ParamFileName, sizeof(ParamFileName), _TRUNCATE, "COM%d", ts.ComPort);
+			else if (g_cv->PortType == IdSerial) {
+				_snprintf_s(ParamFileName, sizeof(ParamFileName), _TRUNCATE, "COM%d", g_ts->ComPort);
 			}
 		}
 		break;
@@ -1249,13 +1249,13 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	}
 
 	case CmdSetRecvFileOpt: {
-		ts.ReceivefileAutoStopWaitTime = (int)HexStr2Word(&Command[1]);
+		g_ts->ReceivefileAutoStopWaitTime = (int)HexStr2Word(&Command[1]);
 		break;
 	}
 
 	case CmdRecvFile: {
 		wchar_t *ParamFileNameW = ToWcharU8(ParamFileName);
-		BOOL r = RawStartReceive(ParamFileNameW, ts.ReceivefileAutoStopWaitTime, TRUE);
+		BOOL r = RawStartReceive(ParamFileNameW, g_ts->ReceivefileAutoStopWaitTime, TRUE);
 		free(ParamFileNameW);
 		if (r) {
 			DdeCmnd = TRUE;
@@ -1294,7 +1294,7 @@ static HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
 				if ((DdeCmpStringHandles(Topic, HSz1) == 0) &&
 				    (DdeCmpStringHandles(Service, HSz2) == 0))
 				{
-					if (cv.Ready)
+					if (g_cv->Ready)
 						SetDdeComReady(1);
 					Result = (HDDEDATA)TRUE;
 				}
@@ -1433,7 +1433,7 @@ void EndDDE()
 
 	DDELog = FALSE;
 	DDEFreeBuf();
-	cv.NoMsg = 0;
+	g_cv->NoMsg = 0;
 }
 
 void DDEAdv()

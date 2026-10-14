@@ -47,6 +47,7 @@
 #include "sendmem.h"
 
 #include "ttdde.h"
+#include "session.h"
 
 #define TitSend L"Sending file"
 
@@ -726,7 +727,7 @@ void SendMemInitDialogFilename(SendMem *sm, const wchar_t *filename)
 extern "C" TComVar cv;
 BOOL SendMemStart(SendMem *sm)
 {
-	sm->cv_ = &cv;		// TODO なくしたい
+	sm->cv_ = g_cv;		// TODO なくしたい
 	SendMemStart_i(sm);
 	return TRUE;
 }
@@ -754,7 +755,7 @@ SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayTy
 
 	if (IsRelativePathW(filename)) {
 		// ファイル名をフルパスにする
-		fullpath = GetFileDir(&ts);
+		fullpath = GetFileDir(g_ts);
 		awcscats(&fullpath, L"\\", filename, NULL);
 	}
 	else {
@@ -790,7 +791,7 @@ SendMem *SendMemSendFileCom(const wchar_t *filename, BOOL binary, SendMemDelayTy
 	if (sm == NULL) {
 		goto finish;
 	}
-	SendMemInitDialog(sm, hInst, HVTWin, ts.UILanguageFileW);
+	SendMemInitDialog(sm, hInst, HVTWin, g_ts->UILanguageFileW);
 	SendMemInitDialogCaption(sm, TitSend);	// title
 	SendMemInitDialogFilename(sm, fullpath);
 	SendMemInitDelay(sm, delay_type, delay_tick, send_max);
@@ -829,11 +830,24 @@ BOOL SendMemSendFile2(const wchar_t *filename, BOOL binary, SendMemDelayType del
 BOOL SendMemPasteString(wchar_t *str)
 {
 	const size_t len = wcslen(str);
-	CommTextOutW(&cv, str, (int)len);
-	if (ts.LocalEcho > 0) {
-		CommTextEchoW(&cv, str, (int)len);
+	CommTextOutW(g_cv, str, (int)len);
+	if (g_ts->LocalEcho > 0) {
+		CommTextEchoW(g_cv, str, (int)len);
 	}
 
 	free(str);
 	return TRUE;
+}
+
+/**
+ *	Variables kept per session (see session.h)
+ */
+extern "C" void SendMemRegisterSessionVars(void)
+{
+	static const SessionVar v[] = {
+		SESSION_VAR(sendmem_fifo),
+		SESSION_VAR(sendmem_size),
+		SESSION_VAR(sendmem_max),
+	};
+	SessionRegisterVars(v, _countof(v));
 }

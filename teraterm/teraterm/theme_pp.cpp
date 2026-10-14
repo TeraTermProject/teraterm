@@ -190,7 +190,7 @@ static INT_PTR CALLBACK Proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 				break;
 			}
 			case IDC_THEME_EDITOR_BUTTON | (BN_CLICKED << 16): {
-				ThemeDialog(dlg_data->hInst, hWnd, &cv);
+				ThemeDialog(dlg_data->hInst, hWnd, g_cv);
 				break;
 			}
 			case IDC_THEME_FILE | (CBN_SELCHANGE << 16): {

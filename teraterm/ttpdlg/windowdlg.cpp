@@ -73,7 +73,7 @@ static INT_PTR CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPA
 			Close = (PBOOL)lParam;
 			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
-			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), ts.UILanguageFileW);
+			SetDlgTextsW(Dialog, TextInfos, _countof(TextInfos), g_ts->UILanguageFileW);
 
 			SetWinList(GetParent(Dialog),Dialog,IDC_WINLISTLIST);
 
