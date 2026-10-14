@@ -175,13 +175,7 @@ git checkout -b release/5_6_0-RC
   <li id="rc-receive_feedback">フィードバックを受け入れる<br>
     修正が入ったら再度「ドキュメントを確認する」「サポートされている全 OS で起動・接続チェックする」
   </li>
-  <li id="rc-again">RC2 を出す場合は、この項目の手順を作業ブランチの作成から再度行う</li>
-</ol>
-
-<h2 id="release-operation">リリース作業</h2>
-
-<ol class="release">
-  <li id="rel-announce_text">アナウンス文面を考えておく
+  <li id="rc-announce_text">アナウンス文面を考えておく
     <ul>
       <li>
         <a href="#rel-github_release">GitHub の Release</a> 用<br>
@@ -196,6 +190,12 @@ git checkout -b release/5_6_0-RC
       </li>
     </ul>
   </li>
+  <li id="rc-again">RC2 を出す場合は、この項目の手順を作業ブランチの作成から再度行う</li>
+</ol>
+
+<h2 id="release-operation">リリース作業</h2>
+
+<ol class="release">
   <li id="rel-work_branch">作業ブランチを作成する（main ブランチ、または安定版リリース用ブランチから）
 <pre>
 git switch main

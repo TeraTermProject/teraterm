@@ -174,13 +174,7 @@ git checkout -b release/5_6_0-RC
   <li id="rc-receive_feedback">Get feedbacks.<br>
     If changed source code, redo "Confirm documents" and "Test run and connect in all supported OS."
   </li>
-  <li id="rc-again">If you are going to release RC2, repeat the steps in this section starting from creating a working branch.</li>
-</ol>
-
-<h2 id="release-operation">Release</h2>
-
-<ol class="release">
-  <li id="rel-announce_text">Prepare an announcement texts.
+  <li id="rc-announce_text">Prepare an announcement texts.
     <ul>
       <li>
         For <a href="#rel-github_release">GitHub Releases</a><br>
@@ -195,6 +189,12 @@ git checkout -b release/5_6_0-RC
       </li>
     </ul>
   </li>
+  <li id="rc-again">If you are going to release RC2, repeat the steps in this section starting from creating a working branch.</li>
+</ol>
+
+<h2 id="release-operation">Release</h2>
+
+<ol class="release">
   <li id="rel-work_branch">Create a branch for release work. (from main branch or stable branch)
 <pre>
 git switch main
