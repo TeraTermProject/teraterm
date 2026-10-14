@@ -264,14 +264,32 @@ git push origin v5.6.0
       <li>リリースノートの概要を記述する</li>
     </ul>
   </li>
-  <li id="rel-check_uncommonly">ウイルス対策ソフトの検知を確認する
-    <ul>
-      <li>Chrome でダウンロードしてみる</li>
-      <li>Firefox でダウンロードしてみる</li>
-      <li>Edge でダウンロードしてみる<br>
-          Edge は「Defender SmartScreen」が「一般的にダウンロードされていません」の警告を出したら、これを正しくない検知として報告する。
-      </li>
-    </ul>
+  <li id="rel-antivirus">ウイルス対策ソフトの検知を確認する
+    <div>
+      <ul>
+        <li>Chrome でダウンロードしてみる</li>
+        <li>Firefox でダウンロードしてみる</li>
+        <li>Edge でダウンロードしてみる<br>
+            Edge は「Defender SmartScreen」が「一般的にダウンロードされていません」の警告を出したら、これを正しくない検知として報告する。
+        </li>
+      </ul>
+    </div>
+    <div>
+      ダウンロードしたファイルを実行すると、SmartScreen が「WindowsによってPCが保護されました」という警告を出すことがある。<br>
+      これが解消されないと、窓の杜はインストーラを掲載しない。
+    </div>
+    <div>
+      ウイルス対策ソフトが誤検出することがある。<br>
+      keycode.exe がキーロガーとして検出されやすいらしい。
+    </div>
+    <div>
+      Microsoft には誤検出の申し立てができる。「PCが保護されました」の解消のため報告する。
+      <ul>
+        <li>Microsoft アカウントでログインする</li>
+        <li>https://www.microsoft.com/en-us/wdsi/filesubmission にアクセスする</li>
+        <li>"Software developer" を選んで報告する</li>
+      </ul>
+    </div>
   </li>
   <li id="rel-update_web">プロジェクトWebページ (<a href="https://teratermproject.github.io" target="_blank">https://teratermproject.github.io</a>) を更新する
     <div>
@@ -466,27 +484,6 @@ git checkout -b port/changelog
       main から stable へのマージが必要な issue (Needs MFC) を、この issue で管理する。<br>
       例: <a href="https://github.com/TeraTermProject/teraterm/issues/1436">#1436</a>
     </p>
-  </li>
-  <li id="rel-antivirus">インストーラバイナリのダウンロードに関する確認をする
-    <div>
-      ダウンロードしたファイルを実行すると、SmartScreen が「WindowsによってPCが保護されました」という警告を出すことがある。<br>
-      これが解消されないと、窓の杜はインストーラを掲載しない。
-    </div>
-    <div>
-      Microsoft Edge でダウンロードすると、SmartScreen が「一般的にダウンロードされていません」という警告を出す。
-    </div>
-    <div>
-      ウイルス対策ソフトが誤検出することがある。<br>
-      keycode.exe がキーロガーとして検出されやすいらしい。
-    </div>
-    <div>
-      Microsoft には誤検出の申し立てができる。「PCが保護されました」の解消のため報告する。
-      <ul>
-        <li>Microsoft アカウントでログインする</li>
-        <li>https://www.microsoft.com/en-us/wdsi/filesubmission にアクセスする</li>
-        <li>"Software developer" を選んで報告する</li>
-      </ul>
-    </div>
   </li>
   <li id="rel-chocolatey">Chocolatey (<a href="https://community.chocolatey.org/packages/teraterm5" target="_blank">https://community.chocolatey.org/packages/teraterm5</a>) を更新する
     <div>
