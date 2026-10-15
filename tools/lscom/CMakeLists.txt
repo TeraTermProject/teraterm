@@ -5,7 +5,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 add_executable(
   ${PROJECT_NAME}
   main.cpp
-  iswindowsntkernel.c
+  #iswindowsntkernel.c
   #
   ../../teraterm/ttpcmn/ttcmn_cominfo.h
   ../../teraterm/ttpcmn/ttcmn_cominfo.c

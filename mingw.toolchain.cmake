@@ -1,4 +1,4 @@
-# how to build:
+﻿# how to build:
 # mkdir build; cd build
 # cmake .. -G "Unix Makefiles" -DARCHITECTURE=i686 -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
 # cmake .. -G "Unix Makefiles" -DARCHITECTURE=x86_64 -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
@@ -34,7 +34,7 @@ message(STATUS "Toolchain: PREFIX=${PREFIX}")
 
 set(THREAD_MODEL "-win32")
 #set(THREAD_MODEL "-posix")
-if(MSYS OR (${CMAKE_COMMAND} MATCHES "msys2") OR (${CMAKE_COMMAND} MATCHES "mingw") OR (${CMAKE_COMMAND} MATCHES "clang64"))
+if(MSYS OR DEFINED ENV{MSYSTEM} OR (${CMAKE_COMMAND} MATCHES "msys2") OR (${CMAKE_COMMAND} MATCHES "mingw") OR (${CMAKE_COMMAND} MATCHES "clang64"))
   # msys2はposix版のみ
   unset(THREAD_MODEL)
 elseif(CYGWIN OR (${CMAKE_HOST_SYSTEM_NAME} MATCHES "CYGWIN"))
@@ -73,7 +73,7 @@ else()
   set(CMAKE_AR           ${PREFIX}ar)
   set(CMAKE_RANLIB       ${PREFIX}ranlib)
 endif()
-if(MSYS OR (${CMAKE_COMMAND} MATCHES "msys2") OR (${CMAKE_COMMAND} MATCHES "mingw") OR (${CMAKE_COMMAND} MATCHES "clang64"))
+if(MSYS OR DEFINED ENV{MSYSTEM} OR (${CMAKE_COMMAND} MATCHES "msys2") OR (${CMAKE_COMMAND} MATCHES "mingw") OR (${CMAKE_COMMAND} MATCHES "clang64"))
   set(CMAKE_RC_COMPILER windres)
 endif()
 
