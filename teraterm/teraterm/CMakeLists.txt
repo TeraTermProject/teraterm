@@ -328,6 +328,11 @@ source_group(
   "..\/ttptek\/")
 
 if(SUPPORT_OLD_WINDOWS)
+  target_compile_definitions(
+    ${PROJECT_NAME}
+    PRIVATE
+    SUPPORT_OLD_WINDOWS=1
+    )
   if(MSVC)
     if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
       set(CMAKE_C_STANDARD_LIBRARIES "")

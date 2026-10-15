@@ -34,7 +34,7 @@ if(CMAKE_HOST_UNIX AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
   message(FATAL_ERROR "add option -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/mingw.toolchain.cmake")
 endif()
 
-option(SUPPORT_OLD_WINDOWS "windows 95 support" ${SUPPORT_OLD_WINDOWS_DEFAULT})
+option(SUPPORT_OLD_WINDOWS "Support older versions of Windows" ${SUPPORT_OLD_WINDOWS_DEFAULT})
 option(BMP_ICO "icon(*.ico) file include only bmp(not png)" ${BMP_ICO_DEFAULT})
 option(ENABLE_TTXSAMPLES "TTXSamples" ON)
 option(MORE_WARNING "stronger warning" OFF)
