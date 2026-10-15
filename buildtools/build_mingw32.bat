@@ -1,13 +1,13 @@
 cd %~dp0
 setlocal
 set NOPAUSE=1
+call install_nasm.bat
 call install_cygwin.bat
 call install_msys2.bat
 call install_sbapplocale.bat
 call install_innosetup.bat
 call install_mingw32.bat
 call mingw32.bat
-"%CMAKE_COMMAND%" -P nasm.cmake
 cd ..
 cd libs
 if not exist libressl_mingw_i686 goto build_libs

@@ -15,7 +15,7 @@ Unicode API が存在しない環境で Unicode API を利用するためのラ�
 ### 必要なツール
 
 - nasm
-  - buildtools/ で `cmake -P nasm.cmake` を実行すると準備することができる
+  - buildtools/ で `install_nasm.bat` を実行すると準備することができる
 - perl
 - make
 
