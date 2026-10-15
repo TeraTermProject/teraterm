@@ -851,7 +851,7 @@ wchar_t *Hex2StrW(const wchar_t *Hex, size_t MaxLen)
 	wp = 0;
 	i = 0;
 	while (i < MaxLen) {
-		if (wp + 1 > str_len) {
+		if (wp + 1 >= str_len) {
 			wchar_t *p;
 			str_len += 512;
 			p = (wchar_t *)realloc(Str, sizeof(wchar_t) * str_len);
@@ -907,7 +907,7 @@ wchar_t *Str2HexW(const wchar_t *Str, size_t Len, BOOL ConvSP)
 	size_t MaxHexLen = 0;
 	wchar_t *Hex = NULL;
 	wchar_t b, low;
-	int i, j;
+	size_t i, j;
 
 	if (Len == 0) {
 		Len = wcslen(Str);
@@ -963,7 +963,10 @@ wchar_t *Str2HexW(const wchar_t *Str, size_t Len, BOOL ConvSP)
 		}
 	}
 	Hex[j] = 0;
-	Hex = (wchar_t *)realloc(Hex, sizeof(wchar_t) * (j + 1));
+	wchar_t *p = (wchar_t *)realloc(Hex, sizeof(wchar_t) * (j + 1));
+	if (p != NULL) {
+		Hex = p;
+	}
 
 	return Hex;
 }
