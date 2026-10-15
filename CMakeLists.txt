@@ -154,6 +154,13 @@ elseif(MINGW)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc")
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s -Wl,--gc-sections")
   set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -s -Wl,--gc-sections")
+  if(SUPPORT_OLD_WINDOWS)
+    # C++ の例外処理、関数内 static 変数のスレッドセーフな初期化を使用しない
+    #   GCC 13 以降の libgcc(gthr-win32) が Windows 95 にない API を使用するため
+    #   例外を throw する operator new / delete、std::__throw_*() は
+    #   libmingw/new_delete.cpp, functexcept.cpp で置き換える
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-threadsafe-statics")
+  endif()
 endif()
 
 if(SUPPORT_OLD_WINDOWS)

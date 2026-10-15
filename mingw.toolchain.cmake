@@ -3,6 +3,7 @@
 # cmake .. -G "Unix Makefiles" -DARCHITECTURE=i686 -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
 # cmake .. -G "Unix Makefiles" -DARCHITECTURE=x86_64 -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
 # cmake .. -G Ninja -DARCHITECTURE=x86_64 -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
+# cmake .. -G "Unix Makefiles" -DARCHITECTURE=i686 -DUSE_CLANG=ON -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
 cmake_policy(SET CMP0053 NEW)
 
 # target
@@ -53,8 +54,21 @@ if(NOT USE_CLANG)
   set(CMAKE_NM           ${PREFIX}gcc-nm${THREAD_MODEL})
   set(CMAKE_OBJCOPY      ${PREFIX}objcopy)
 else()
-  set(CMAKE_C_COMPILER   ${PREFIX}clang${THREAD_MODEL})
-  set(CMAKE_CXX_COMPILER ${PREFIX}clang++${THREAD_MODEL})
+  find_program(MINGW_CLANG NAMES ${PREFIX}clang${THREAD_MODEL} ${PREFIX}clang)
+  if(MINGW_CLANG)
+    # prefix付きのclang (llvm-mingw, msys2 clang64 など)
+    get_filename_component(MINGW_CLANG_NAME ${MINGW_CLANG} NAME)
+    string(REPLACE "clang" "clang++" MINGW_CLANGXX_NAME ${MINGW_CLANG_NAME})
+    set(CMAKE_C_COMPILER   ${MINGW_CLANG_NAME})
+    set(CMAKE_CXX_COMPILER ${MINGW_CLANGXX_NAME})
+  else()
+    # prefixなしのclang (Ubuntu の clang パッケージなど)
+    # target を指定し、mingw-w64 のヘッダ/ライブラリと binutils を使う
+    set(CMAKE_C_COMPILER   clang)
+    set(CMAKE_CXX_COMPILER clang++)
+    set(CMAKE_C_COMPILER_TARGET   ${ARCHITECTURE}-w64-mingw32)
+    set(CMAKE_CXX_COMPILER_TARGET ${ARCHITECTURE}-w64-mingw32)
+  endif()
   set(CMAKE_RC_COMPILER  ${PREFIX}windres)
   set(CMAKE_AR           ${PREFIX}ar)
   set(CMAKE_RANLIB       ${PREFIX}ranlib)
