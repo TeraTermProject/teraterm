@@ -153,6 +153,8 @@ Source: {#SrcDir}\ssh_known_hosts; DestDir: {app}; Components: TTSSH
 Source: {#SrcDir}\cygterm.cfg; DestDir: {app}; Components: cygterm
 Source: {#SrcDir}\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
 Source: {#SrcDir}\cygterm.exe; DestDir: {app}; Components: cygterm
+Source: {#SrcDir}\msys2term.exe; DestDir: {app}; Components: cygterm; Flags: skipifsourcedoesntexist
+Source: {#SrcDir}\msys2term.cfg; DestDir: {app}; Components: cygterm; Flags: skipifsourcedoesntexist
 Source: {#SrcDir}\cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: {#SrcDir}\ttlaunch.exe; DestDir: {app}; Components: cygterm; Flags: ignoreversion
 Source: {#SrcDir}\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
