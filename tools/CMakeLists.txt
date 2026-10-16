@@ -15,3 +15,9 @@ set_target_properties(
   ttreg
   PROPERTIES FOLDER tools
 )
+
+add_subdirectory(ttlaunch)
+set_target_properties(
+  ttlaunch
+  PROPERTIES FOLDER tools
+)

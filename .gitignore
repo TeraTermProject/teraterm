@@ -30,6 +30,10 @@ TTXSamples/**/Debug/
 TTXSamples/**/Release/
 TTXSamples/**/Debug.*/
 TTXSamples/**/Release.*/
+tools/**/Debug/
+tools/**/Release/
+tools/**/Debug.*/
+tools/**/Release.*/
 **/.vs/
 *.aps
 /GTAGS
