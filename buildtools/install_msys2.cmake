@@ -20,7 +20,7 @@ set(PACMAN "${MSYS_ROOT}/usr/bin/pacman.exe")
 set(ENV{LANG} "C")
 # ホストの msys2/cygwin 環境の影響を受けないようにする
 set(ENV{MSYSTEM} "MSYS")
-set(ENV{CHERE_INVOKED} "1")
+set(ENV{CHERE_INVOKING} "1")
 
 if(NOT EXISTS "${PACMAN}")
   # msys2-base をダウンロード
@@ -45,7 +45,7 @@ if(NOT EXISTS "${PACMAN}")
   execute_process(
     COMMAND ${BASH} -l -c "true"
     WORKING_DIRECTORY ${MSYS_ROOT}
-    ENCODING none
+    ENCODING NONE
   )
 endif()
 
@@ -55,13 +55,13 @@ execute_process(
   COMMAND ${PACMAN} -Syuu --noconfirm --noprogressbar
   --cachedir ${PACKAGE}
   WORKING_DIRECTORY ${MSYS_ROOT}
-  ENCODING none
+  ENCODING NONE
 )
 execute_process(
   COMMAND ${PACMAN} -Syuu --noconfirm --noprogressbar
   --cachedir ${PACKAGE}
   WORKING_DIRECTORY ${MSYS_ROOT}
-  ENCODING none
+  ENCODING NONE
 )
 
 # install
@@ -71,7 +71,7 @@ execute_process(
   --cachedir ${PACKAGE}
   msys/make msys/cmake msys/gcc
   WORKING_DIRECTORY ${MSYS_ROOT}
-  ENCODING none
+  ENCODING NONE
 )
 
 # Tera Term
