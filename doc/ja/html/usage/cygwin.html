@@ -122,6 +122,14 @@ Tera Term に同梱されている実行ファイルに問題があってうまく起動しない場合は、CygT
 </p>
 
 <p>
+Cygterm Here は、cyglaunch 経由で cygterm を起動します。cygterm へ -d オプションで開くフォルダを渡し、-v オプションで環境変数 CHERE_INVOKING=y を設定しています。
+</p>
+
+<p>
+環境変数 CHERE_INVOKING は Cygwin の chere パッケージ(エクスプローラーのコンテキストメニューに "Bash Prompt Here" などを追加するパッケージ)由来の環境変数です。Cygwin の /etc/profile はログインシェルとして起動したときにホームディレクトリへ移動しますが、CHERE_INVOKING が設定されているときは移動しません。これにより、選択したフォルダでシェルが開始します。
+</p>
+
+<p>
 一般的な環境で動作するようにパラメータを設定していますが、csh/tcsh では CHERE_INVOKING をチェックしないことがあります。必要であれば /etc/csh.login を修正するか Cygterm Here のレジストリ設定を下記のように変更してください。
 </p>
 

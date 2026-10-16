@@ -131,6 +131,11 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="ttlaunch">
+			<param name="Local" value="html\usage\ttlaunch.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Proxy connection">
 			<param name="Local" value="html\usage\proxy.html">
 			<param name="ImageNumber" value="11">

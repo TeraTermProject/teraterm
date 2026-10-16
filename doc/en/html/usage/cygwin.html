@@ -129,6 +129,14 @@ When this option is selected on the Tera Term installer, the "Cygterm Here" cont
 </p>
 
 <p>
+Cygterm Here launches cygterm via cyglaunch. It passes the folder to cygterm with the -d option and sets the environment variable CHERE_INVOKING=y with the -v option.
+</p>
+
+<p>
+The environment variable CHERE_INVOKING comes from the Cygwin chere package, which adds context menu items such as "Bash Prompt Here" to Explorer. Cygwin's /etc/profile changes the current directory to the home directory when the shell is started as a login shell, but it does not when CHERE_INVOKING is set. Therefore the shell starts in the selected folder.
+</p>
+
+<p>
 Tera Term installer will configure the generic parameter, however the csh/tcsh may not check the CHERE_INVOKING. If indicated, please modify the /etc/csh.login file or modify the Cygterm Here registry in the following:
 </p>
 
