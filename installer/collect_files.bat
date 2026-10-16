@@ -46,6 +46,7 @@ copy /y ..\TTXKanjiMenu\Release.%TARGET%\ttxkanjimenu.dll %dst%
 copy /y ..\TTXKanjiMenu\Release.%TARGET%\ttxkanjimenu.pdb %dst%_pdb
 
 copy /y ..\cygwin\Release.%TARGET%\cyglaunch.exe %dst%
+copy /y ..\cygwin\Release.%TARGET%\ttlaunch.exe %dst%
 
 copy /y %common%\cygterm.cfg %dst%
 copy /y "%common%\cygterm+.tar.gz" %dst%

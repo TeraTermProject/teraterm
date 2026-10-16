@@ -2,6 +2,7 @@
 task_desktopicon=Crea collegamento a Tera Term sul &desktop
 task_startupttmenuicon=Crea collegamento al menu Tera Term nel menu Start
 task_cygtermhere=Aggiungi "Cyg&term qui" al menu contestuale
+task_ttlaunchhere=Add "Tera Term &Here" (ttlaunch) to Context menu
 task_macroassoc=Associa i file .&ttl a ttpmacro.exe
 task_telnetassoc=Associa il protocollo t&elnet a ttermpro.exe
 task_sshassoc=Associa il protocollo SSH a ttermpro.exe

@@ -2,6 +2,7 @@
 task_desktopicon=Tera Term kısayolunu &Masaüstüne oluştur
 task_startupttmenuicon=TeraTerm &Menü kısayolunu Başlangıca ekle
 task_cygtermhere="Cy&gterm Burada" seçeneğini sağ tık menüsüne ekle
+task_ttlaunchhere=Add "Tera Term &Here" (ttlaunch) to Context menu
 task_macroassoc=.&ttl dosyasını ttpmacro.exe ile ilişkilendir
 task_telnetassoc=t&elnet protokolünü ttermpro.exe ile ilişkilendir
 task_sshassoc=&ssh protokolünü ttermpro.exe ile ilişkilendir
