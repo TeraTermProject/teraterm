@@ -52,9 +52,6 @@
 
 #include "defaultcolortable.c"
 
-#include <stdio.h>   // #1534 test
-#include "ttdebug.h" // #1534 test
-
 #if 1
 #define _OutputDebugPrintf(...)  OutputDebugPrintf(__VA_ARGS__)
 #else
@@ -176,7 +173,6 @@ static BGSrc BGSrc1;	// 壁紙(Windowsのデスクトップ背景)用
 static BGSrc BGSrc2;	// fill color用
 
 static int  BGEnable;
-static BOOL IsGdiReconfigInProgress;  // TRUE=セッション再接続中(タイマーIdGdiReconfigWaitTimerが有効)
 
 static RECT BGPrevRect;
 
@@ -213,16 +209,8 @@ static HBITMAP CreateScreenCompatibleBitmap(int width,int height)
   _OutputDebugPrintf("CreateScreenCompatibleBitmap : width = %d height = %d\n",width,height);
 
   hdc = GetDC(NULL);
-  if (!hdc) {
-	  WriteDebugPrintf("CreateScreenCompatibleBitmap : hdc=NULL err=%d\n", GetLastError()); // #1534 test
-  }
 
   hbm = CreateCompatibleBitmap(hdc,width,height);
-  if(!hbm) { // #1534 test
-	  WriteDebugPrintf("CreateScreenCompatibleBitmap : fail in CreateCompatibleBitmap err=%d\n", GetLastError());
-  } else {
-	  WriteDebugPrintf("CreateScreenCompatibleBitmap : ok\n");
-  }
 
   ReleaseDC(NULL,hdc);
 
@@ -390,9 +378,10 @@ static void BGPreloadPicture(BGSrc *src, const TTTSet *pts)
 
 	HBITMAP hbm = NULL;
 	const wchar_t *load_file = src->fileW;
-	BitmapLoad(load_file, &param, &hbm);
-
-	if(hbm) {
+	DWORD ret = BitmapLoad(load_file, &param, &hbm);
+	if (ret == ERROR_SHARING_VIOLATION || ret == ERROR_LOCK_VIOLATION) {
+		// 一時的に画像ファイルが読み出せない場合は、既存の背景画像のまま更新しない
+	} else if(hbm) {
 		BITMAP bm;
 
 		if (GetObject(hbm, sizeof(bm), &bm) == 0) {
@@ -406,33 +395,12 @@ static void BGPreloadPicture(BGSrc *src, const TTTSet *pts)
 				src->height = bm.bmHeight;
 			}
 		}
-	}else{
-		{ // #1534 test
-			char str[16];
-			if (src == &BGDest) {
-				sprintf(str, "BGDest");
-			} else if (src == &BGSrc1) {
-				sprintf(str, "BGDSrc1");
-			} else if (src == &BGSrc2) {
-				sprintf(str, "BGDSrc2");
-			} else {
-				sprintf(str, "unknown");
-			}
-			WriteDebugPrintf("BGPreloadPicture : %s->type=%d fallback\n", str, src->type);
-		}
-		src->type = BG_COLOR; // 画像が読めない場合は、単色塗りにフォールバックする
-
-		{ // #1534 test 画像ファイルが開けるか確認する
-			HANDLE hFile = CreateFileW(src->fileW, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-			if (hFile == INVALID_HANDLE_VALUE) {
-				// open error
-				DWORD err = GetLastError();
-				WriteDebugPrintf("BGPreloadPicture : CreateFileW err=%d\n", err);
-			} else {
-				CloseHandle(hFile);
-				WriteDebugPrintf("BGPreloadPicture : CreateFileW ok\n");
-			}
-		}
+	} else {
+		// 画像ファイルが読めない場合は、既存の背景画像を廃棄し、単色塗りにフォールバックする
+		src->type = BG_COLOR;
+		DeleteBitmapDC(&(src->hdc));
+		src->width = 0;
+		src->height = 0;
 	}
 
 	free(susie_path);
@@ -526,8 +494,10 @@ static HBITMAP CreateStretched32BppBitmapBilinear(HBITMAP hbm, INT cxNew, INT cy
         fAlpha = (bm.bmBitsPixel == 32);
         pbBits = (BYTE *)HeapAlloc(GetProcessHeap(), 0,
                                    nWidthBytes * bm.bmHeight);
-        if (pbBits == NULL)
+        if (pbBits == NULL) {
+            DeleteDC(hdc);
             return NULL;
+        }
         GetDIBits(hdc, hbm, 0, bm.bmHeight, pbBits, &bi, DIB_RGB_COLORS);
         bi.bmiHeader.biWidth = cxNew;
         bi.bmiHeader.biHeight = cyNew;
@@ -605,7 +575,13 @@ static void BGPreloadWallpaper(BGSrc *src)
 
 	HBITMAP hbm = NULL;
 	const wchar_t *load_file = wi.filename;
-	BitmapLoad(load_file, NULL, &hbm);
+	DWORD ret = BitmapLoad(load_file, NULL, &hbm);
+	if (ret == ERROR_SHARING_VIOLATION || ret == ERROR_LOCK_VIOLATION) {
+		// 一時的に画像ファイルが読み出せない場合は、既存の壁紙のまま更新しない
+		free(wi.filename);
+		src->color = GetSysColor(COLOR_DESKTOP);
+		return;
+	}
 	if (hbm == NULL) {
 		goto load_finish;
 	}
@@ -675,23 +651,14 @@ load_finish:
 				src->width   = bm.bmWidth;
 				src->height  = bm.bmHeight;
 				src->pattern = wi.pattern;
+
 			}
 		}
 	}else{
-		src->hdc = NULL; // 壁紙を読めない場合は再読み込み出来るようにしておく
-		{ // #1534 test
-			char str[16];
-			if (src == &BGDest) {
-				sprintf(str, "BGDest");
-			} else if (src == &BGSrc1) {
-				sprintf(str, "BGDSrc1");
-			} else if (src == &BGSrc2) {
-				sprintf(str, "BGDSrc2");
-			} else {
-				sprintf(str, "unknown");
-			}
-			WriteDebugPrintf("BGPreloadWallpaper : %s->hdc fallback\n", str);
-		}
+		// 壁紙を読めない場合は、古い壁紙を破棄する
+		DeleteBitmapDC(&(src->hdc));
+		src->width = 0;
+		src->height = 0;
 	}
 
 	src->color = GetSysColor(COLOR_DESKTOP);
@@ -702,8 +669,6 @@ static void BGPreloadSrc(BGSrc *src, const TTTSet *pts)
 	if (!src->enable) {
 		return;
 	}
-
-	DeleteBitmapDC(&(src->hdc));
 
 	switch (src->type) {
 		case BG_COLOR:
@@ -724,36 +689,45 @@ static void BGPreloadSrc(BGSrc *src, const TTTSet *pts)
 
 static void BGStretchPicture(HDC hdcDest, BGSrc *src, int x, int y, int width, int height)
 {
-	if(!hdcDest || !src)
+	if (!hdcDest || !src) {
 		return;
+	}
 
 	const BOOL bAntiAlias = src->antiAlias;
-	if(bAntiAlias || !IsWindowsNTKernel())
-	{	// SetStretchBltMode(HALFTONE) は 95,98,Meではサポートされていない
-		if(src->width != width || src->height != height)
-		{
-			const wchar_t *filename = src->fileW;
-			HBITMAP hbm;
-			BitmapLoad(filename, NULL, &hbm);
-			if(!hbm) {
-				// 画像ファイルが読めなかった
-				return;
+	if (bAntiAlias || !IsWindowsNTKernel()) {
+		// SetStretchBltMode(HALFTONE) は 95,98,Meではサポートされていない
+		if (src->width != width || src->height != height) {
+			HBITMAP hbm = NULL;
+			BitmapLoad(src->fileW, NULL, &hbm);
+			if(hbm) {
+				HBITMAP new_hbm = CreateStretched32BppBitmapBilinear(hbm, width, height);
+				DeleteObject(hbm);
+				if (new_hbm) {
+					HDC new_hdc = CreateBitmapDC(new_hbm);
+					if (new_hdc) {
+						DeleteBitmapDC(&(src->hdc));
+						src->hdc = new_hdc;
+						src->width = width;
+						src->height = height;
+					}
+				}
 			}
-			HBITMAP newhbm = CreateStretched32BppBitmapBilinear(hbm, width, height);
-			DeleteObject(hbm);
-			hbm = newhbm;
-
-			DeleteBitmapDC(&(src->hdc));
-			src->hdc = CreateBitmapDC(hbm);
-			src->width  = width;
-			src->height = height;
 		}
-
-		BitBlt(hdcDest,x,y,width,height,src->hdc,0,0,SRCCOPY);
-	}else{
-		SetStretchBltMode(hdcDest, HALFTONE);	// 写真画像は HALFTONE で処理するほうが自然に拡縮できる
-		SetBrushOrgEx(hdcDest, 0, 0, NULL);		// HALFTONE モードを設定後 SetBrushOrgEx() する必要あり
-		StretchBlt(hdcDest,x,y,width,height,src->hdc,0,0,src->width,src->height,SRCCOPY);
+		if (src->hdc != NULL) {
+			if (src->width == width && src->height == height) {
+				BitBlt(hdcDest, x, y, width, height, src->hdc, 0, 0, SRCCOPY);
+			} else {
+				SetStretchBltMode(hdcDest, HALFTONE);	// 写真画像は HALFTONE で処理するほうが自然に拡縮できる
+				SetBrushOrgEx(hdcDest, 0, 0, NULL);		// HALFTONE モードを設定後 SetBrushOrgEx() する必要あり
+				StretchBlt(hdcDest, x, y, width, height, src->hdc, 0, 0, src->width, src->height, SRCCOPY);
+			}
+		}
+	} else {
+		if (src->hdc != NULL) {
+			SetStretchBltMode(hdcDest, HALFTONE);	// 写真画像は HALFTONE で処理するほうが自然に拡縮できる
+			SetBrushOrgEx(hdcDest, 0, 0, NULL);		// HALFTONE モードを設定後 SetBrushOrgEx() する必要あり
+			StretchBlt(hdcDest, x, y, width, height, src->hdc, 0, 0, src->width, src->height, SRCCOPY);
+		}
 	}
 }
 
@@ -1120,14 +1094,6 @@ static HDC CreateBGImage(vtdraw_t *vt, int width, int height)
 	return hdc_bg;
 }
 
-void SetGdiReconfigInProgressFlag(void) {
-	IsGdiReconfigInProgress = TRUE;
-}
-
-void UnsetGdiReconfigInProgressFlag(void) {
-	IsGdiReconfigInProgress = FALSE;
-}
-
 /**
  *
  *	ThemeSetBG(), ThemeSetColor() のあとにコールする
@@ -1144,14 +1110,6 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
   if(!BGEnable)
     return;
 
-  // GDIリソースの再構成中は背景の描画をスキップする
-  if (IsGdiReconfigInProgress) {
-	  WriteDebugPrintf("BGSetupPrimary : IsGdiReconfigInProgress=%s forceSetup=%s\n",
-					   IsGdiReconfigInProgress ? "true" : "false",
-					   forceSetup ? "true" : "false"); // #1534 test
-	  return;
-  }
-
   //窓の位置、大きさが変わったかチェック
   point.x = 0;
   point.y = 0;
@@ -1163,8 +1121,7 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
   if(!forceSetup && EqualRect(&rect,&BGPrevRect))
     return;
 
-  // 背景画像のフォールバックを元に戻す
-  WriteDebugPrintf("BGSetupPrimary : BGDest.type=%d\n", BGDest.type); // #1534 test
+  // 背景画像の単色塗り(BG_COLOR)へのフォールバックを元に戻す
   BGDest.type = BG_PICTURE;
 
   CopyRect(&BGPrevRect,&rect);
@@ -1194,15 +1151,6 @@ void BGSetupPrimary(vtdraw_t *vt, BOOL forceSetup)
 	  }
 
 	  hdcBG = CreateBGImage(vt, vt->ScreenWidth, vt->ScreenHeight);
-  }
-
-  { // #1534 test
-	  HDC hdc = GetDC(NULL);
-	  WriteDebugPrintf("BGSetupPrimary : hdc=%08lx forceSetup=%s BGDest.type=%d hdcBGWork=%08lx hdcBGBuffer=%08lx hdcBG=%08lx pixel=%d(%d,%d)\n",
-					   hdc, forceSetup ? "true" : "false", BGDest.type,
-					   (unsigned long)hdcBGWork, (unsigned long)hdcBGBuffer, (unsigned long)hdcBG,
-					   GetDeviceCaps(hdc,BITSPIXEL), GetDeviceCaps(hdc ,HORZRES), GetDeviceCaps(hdc ,VERTRES));
-	  ReleaseDC(NULL, hdc);
   }
 }
 
@@ -4011,6 +3959,17 @@ void ThemeGetColorDefaultTS(const TTTSet *pts, TColorTheme *color_theme)
  */
 void ThemeSetBG(vtdraw_t *vt, const BGTheme *bg_theme)
 {
+	// 古い画像を破棄する
+	DeleteBitmapDC(&(BGDest.hdc));
+	DeleteBitmapDC(&(BGSrc1.hdc));
+	DeleteBitmapDC(&(BGSrc2.hdc));
+	BGDest.width = 0;
+	BGDest.height = 0;
+	BGSrc1.width = 0;
+	BGSrc1.height = 0;
+	BGSrc2.width = 0;
+	BGSrc2.height = 0;
+
 	if (BGDest.fileW != NULL) {
 		free(BGDest.fileW);
 	}

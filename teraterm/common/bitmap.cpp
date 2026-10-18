@@ -52,7 +52,6 @@
 #endif
 
 #include "bitmap.h"
-#include "ttdebug.h" // #1534 test
 
 #if ENABLE_GDIPLUS
 namespace {
@@ -553,14 +552,24 @@ static HBITMAP LoadImageWIC(const wchar_t *filename)
  *	@param hBitmap		読み込んだビットマップのハンドルを返す
  *	@param param		パラメータを指定する
  *						NULLのとき適切にファイルを読む
- *	@retval	NO_ERROR			ファイルが読めた、hBitmapにハンドルが返っている
+ *	@retval	NO_ERROR	ファイルが読めた、hBitmapにハンドルが返っている
  *	@retval	ERROR_INVALID_DATA	ファイルが読めない、知らないフォーマット
+ *	@retval	上記以外	ファイルが開けない(GetLastError()の値)
  */
 DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMAP *hBitmap)
 {
+	*hBitmap = NULL;
+
+	// 画像ファイルが開けるか確認する
+	HANDLE hFile = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		return GetLastError(); // open error
+	} else {
+		CloseHandle(hFile);
+	}
+
 	HBITMAP hbm = NULL;
 	const wchar_t *spi_path = param == NULL ? NULL : param->SusiePluginPath;
-	*hBitmap = NULL;
 
 	// Susie plugin で読み込み
 	if (hbm == NULL && spi_path != NULL) {
@@ -575,18 +584,12 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 			LocalFree(hbmi);
 			LocalUnlock(hbuf);
 			LocalFree(hbuf);
-			WriteDebugPrintf("BitmapLoad : SusieLoadPicture() ok filename=%ls spi_path=%ls\n", filename, spi_path); // #1534 test
 		}
 	}
 
 	// WIC を使って読み込む
 	if (hbm == NULL) {
 		hbm = LoadImageWIC(filename);
-		{ // #1534 test
-			if (hbm) {
-				WriteDebugPrintf("BitmapLoad : LoadImageWIC() ok filename=%ls\n", filename);
-			}
-		}
 	}
 
 	// GDI+ ライブラリを使って読み込む
@@ -595,22 +598,12 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 	if (hbm == NULL) {
 		initializer.Init();
 		hbm = GDIPLoad(filename);
-		{ // #1534 test
-			if (hbm) {
-				WriteDebugPrintf("BitmapLoad : GDIPLoad() ok filename=%ls\n", filename);
-			}
-		}
 	}
 #endif
 
 	// OLE を利用して画像(jpeg)を読む
 	if (hbm == NULL) {
 		hbm = GetBitmapHandleW(filename);
-		{ // #1534 test
-			if (hbm) {
-				WriteDebugPrintf("BitmapLoad : GetBitmapHandleW() ok filename=%ls\n", filename);
-			}
-		}
 	}
 
 	// LoadImageW() API で読み込む
@@ -621,16 +614,16 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 		// IMAGE_BITMAPのとき戻り値はHBITMAP
 		// LR_CREATEDIBSECTION を指定すると、DIBを返す
 		hbm = (HBITMAP)LoadImageW(0, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE|LR_CREATEDIBSECTION);
-		{ // #1534 test
-			if (hbm) {
-				WriteDebugPrintf("BitmapLoad : LoadImageW() ok filename=%ls\n", filename);
-			}
-		}
 	}
 
 	if (hbm == NULL) {
-		*hBitmap = NULL;
-		WriteDebugPrintf("BitmapLoad : error filename=%ls\n", filename);
+		// 画像ファイルが開けるか再確認する
+		hFile = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+		if (hFile == INVALID_HANDLE_VALUE) {
+			return GetLastError(); // open error
+		} else {
+			CloseHandle(hFile);
+		}
 		return ERROR_INVALID_DATA;
 	}
 

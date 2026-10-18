@@ -392,8 +392,14 @@ void DebugSetException(const wchar_t *basename)
 	_set_invalid_parameter_handler(InvalidParameterHandler);
 }
 
+#if 0 // 不具合切り分け時に使用 (例 issue #1534)
 /**
- *	デバグメッセージをファイルに出力する (仮：issue #1534 用)
+ *	デバグメッセージをファイルに出力する
+ *
+ *  ログの出力先は、"動作ログ、ダンプフォルダ" 配下 debug_YYYYMMDD-HHMMSS-NNN.txt
+ *  (参考) https://teratermproject.github.io/manual/5/ja/setup/folder.html
+ *  インストール版では、C:\Users\[username]\AppData\Local\teraterm5\debug_YYYYMMDD-HHMMSS-NNN.txt
+ *
  */
 #if defined(_MSC_VER)
 void WriteDebugPrintf(_Printf_format_string_ const char *fmt, ...)
@@ -414,6 +420,9 @@ void WriteDebugPrintf(const char *fmt, ...)
 		fp = _wfsopen(debug_file, L"a", _SH_DENYWR);
 		free(debug_file);
 		free(logdir);
+		if (fp == NULL) {
+			return;
+		}
 	}
 
 	fprintf(fp, "%02d-%02d-%02d %02d:%02d:%02d.%03d ",
@@ -426,3 +435,4 @@ void WriteDebugPrintf(const char *fmt, ...)
 	va_end(arg);
 	fflush(fp);
 }
+#endif

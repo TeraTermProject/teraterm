@@ -449,7 +449,6 @@ target_link_libraries(
   user32
   uuid
   ws2_32
-  Wtsapi32
   )
 
 install(
