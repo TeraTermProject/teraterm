@@ -259,6 +259,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ttlaunch.cpp" />
+    <ClCompile Include="ttlaunch_setup.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="ttlaunch.h" />
+    <ClInclude Include="ttlaunch_setup.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\cygwin\cyglib\cyglib.v17.vcxproj">

@@ -18,6 +18,6 @@ set_target_properties(
 
 add_subdirectory(ttlaunch)
 set_target_properties(
-  ttlaunch
+  ttlaunch ttlaunch_lng
   PROPERTIES FOLDER tools
 )

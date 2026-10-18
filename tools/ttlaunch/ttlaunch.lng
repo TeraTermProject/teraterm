@@ -1,0 +1,77 @@
+﻿; ttlaunch の文言
+;   セクション名は言語名 (Tera Term の lng ファイルの [Info] language= の括弧より前の部分)
+;   Tera Term の設定 (TERATERM.INI の UILanguageFile) で選ばれている言語のセクションを使用する
+;   セクションやキーが無いときは英語 (プログラム内の文言) を使用する
+;   このファイルは UTF-8 で記述し、ビルド時に UTF-16LE に変換する
+
+[English]
+DLG_SETUP_TITLE=ttlaunch settings
+DLG_SETUP_STATUS=Explorer registration status
+DLG_SETUP_TYPE_LABEL=Menu type
+DLG_SETUP_TYPE_POPUP=&Popup menu\n(one item "Open in Tera Term", select a shell from the popup menu)
+DLG_SETUP_TYPE_ITEMS=&Items\n(one item per shell directly in the context menu, also for Windows XP / Vista)
+DLG_SETUP_TYPE_SUBMENU=Sub&menu\n("Open in Tera Term" has one item per shell, Windows 7 or later)
+DLG_SETUP_ITEMS=Shells (currently available):
+DLG_SETUP_OUT_LABEL=Register to
+DLG_SETUP_OUT_REGISTRY=Registr&y (HKEY_CURRENT_USER)
+DLG_SETUP_OUT_REGFILE=.reg &file
+DLG_SETUP_REGISTER=&Register
+DLG_SETUP_UNREGISTER=&Unregister
+DLG_SETUP_SAVE_REGISTER=Save (&register)...
+DLG_SETUP_SAVE_UNREGISTER=Save (&unregister)...
+DLG_SETUP_REGEDIT_LABEL=Registry Editor
+DLG_SETUP_REGEDIT=&Open...
+DLG_SETUP_CLOSE=Close
+MSG_STATUS_NOT_REGISTERED=Not registered
+MSG_STATUS_REGISTERED_POPUP=Registered (popup menu)
+MSG_STATUS_REGISTERED_ITEMS=Registered (items)
+MSG_STATUS_REGISTERED_SUBMENU=Registered (submenu)
+MSG_STATUS_HKCU=, HKEY_CURRENT_USER
+MSG_STATUS_HKLM=, HKEY_LOCAL_MACHINE
+MSG_STATUS_HKLM_NOTE=The registration in HKEY_LOCAL_MACHINE cannot be changed here
+MSG_REGISTER_ERROR=Failed to register to the Explorer context menu.
+MSG_UNREGISTER_ERROR=Failed to remove from the Explorer context menu.
+MSG_REGEDIT_ERROR=Failed to start the Registry Editor.
+MSG_SAVE_REG_TITLE=Save .reg file
+MSG_SAVE_REG_ERROR=Failed to write the file.\n%s
+MSG_SAVE_REG_DONE=Saved.\n%s\n\nDouble-click the file to apply it to HKEY_CURRENT_USER.
+MENU_SETUP=Open &settings dialog...
+MENU_ITEM_FORMAT=Tera Term: %s
+MSG_NO_CYGTERM=cygterm.exe or msys2term.exe not found in %s
+MSG_NO_ENVIRONMENT=Cygwin, MSYS2 or Git for Windows not found
+
+[Japanese]
+DLG_SETUP_TITLE=ttlaunch の設定
+DLG_SETUP_STATUS=エクスプローラーの登録状態
+DLG_SETUP_TYPE_LABEL=メニューの種類
+DLG_SETUP_TYPE_POPUP=ポップアップメニュー(&P)\n("Open in Tera Term" の 1 項目、選択するとポップアップメニューから shell を選ぶ)
+DLG_SETUP_TYPE_ITEMS=項目を直接登録(&I)\n(各 shell をコンテキストメニューする、Windows XP / Vista でも使える)
+DLG_SETUP_TYPE_SUBMENU=サブメニュー(&M)\n("Open in Tera Term" のサブメニューに各 shell を表示、Windows 7 以降)
+DLG_SETUP_ITEMS=shell (現在利用できる shell 一覧)
+DLG_SETUP_OUT_LABEL=出力先
+DLG_SETUP_OUT_REGISTRY=レジストリ(&Y) (HKEY_CURRENT_USER)
+DLG_SETUP_OUT_REGFILE=reg ファイル(&F)
+DLG_SETUP_REGISTER=登録(&R)
+DLG_SETUP_UNREGISTER=削除(&U)
+DLG_SETUP_SAVE_REGISTER=登録用を保存(&R)...
+DLG_SETUP_SAVE_UNREGISTER=削除用を保存(&U)...
+DLG_SETUP_REGEDIT_LABEL=レジストリ エディタ
+DLG_SETUP_REGEDIT=開く(&O)...
+DLG_SETUP_CLOSE=閉じる
+MSG_STATUS_NOT_REGISTERED=未登録
+MSG_STATUS_REGISTERED_POPUP=登録済み (ポップアップメニュー)
+MSG_STATUS_REGISTERED_ITEMS=登録済み (項目を直接登録)
+MSG_STATUS_REGISTERED_SUBMENU=登録済み (サブメニュー)
+MSG_STATUS_HKCU=, HKEY_CURRENT_USER
+MSG_STATUS_HKLM=, HKEY_LOCAL_MACHINE
+MSG_STATUS_HKLM_NOTE=HKEY_LOCAL_MACHINE の登録はここでは変更できません
+MSG_REGISTER_ERROR=エクスプローラーのコンテキストメニューへの登録に失敗しました。
+MSG_UNREGISTER_ERROR=エクスプローラーのコンテキストメニューからの削除に失敗しました。
+MSG_REGEDIT_ERROR=レジストリ エディタを起動できませんでした。
+MSG_SAVE_REG_TITLE=.reg ファイルの保存
+MSG_SAVE_REG_ERROR=書き込みに失敗しました。\n%s
+MSG_SAVE_REG_DONE=保存しました。\n%s\n\nファイルをダブルクリックすると HKEY_CURRENT_USER に反映されます。
+MENU_SETUP=設定ダイアログを開く(&S)...
+MENU_ITEM_FORMAT=Tera Term: %s
+MSG_NO_CYGTERM=%s に cygterm.exe または msys2term.exe がありません
+MSG_NO_ENVIRONMENT=Cygwin, MSYS2, Git for Windows が見つかりません

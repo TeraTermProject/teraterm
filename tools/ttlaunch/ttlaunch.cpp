@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include <wctype.h>
 #include <locale.h>
 
 #include <string>
@@ -45,29 +46,12 @@
 #include "ttlib_static_dir.h"
 #include "win32helper.h"
 #include "compat_win.h"
+#include "ttlib.h"
+#include "i18n.h"
+#include "asprintf.h"
 #include "cyglib.h"
-
-#define Section L"Tera Term"
-
-typedef enum {
-	SYSTEM_CYGWIN,
-	SYSTEM_MSYS2,
-	SYSTEM_GIT_BASH
-} system_t;
-
-/**
- *	ポップアップに表示する起動方法
- */
-struct LaunchItem {
-	std::wstring id;		// -e で指定する名前
-	std::wstring label;		// メニューに表示する文字列
-	int group;				// グループが変わるところにセパレータを入れる
-	system_t system;		// cygterm / msys2term のどちらを使うか
-	std::wstring root;		// cygwin / msys2 / git のインストールフォルダ
-	std::wstring args;		// cygterm(msys2term) に渡す引数
-	bool posix_shell;		// cygwin/msys2 のシェル(CHERE_INVOKINGを設定する)
-	std::wstring icon;		// メニューに表示するアイコン(.ico または .exe), 無いときは ""
-};
+#include "ttlaunch.h"
+#include "ttlaunch_setup.h"
 
 /**
  *	ファイル(フォルダ)が存在するか
@@ -94,7 +78,7 @@ static std::wstring ToSlash(std::wstring path)
 /**
  *	コマンドライン引数として渡せるようクォートする
  */
-static std::wstring QuoteArg(const std::wstring &arg)
+std::wstring QuoteArg(const std::wstring &arg)
 {
 	std::wstring s = L"\"";
 	size_t backslashes = 0;
@@ -168,7 +152,7 @@ static std::wstring GetCygwinDirFromIni(void)
 	free(HomeDir);
 
 	wchar_t *CygwinDir;
-	hGetPrivateProfileStringW(Section, L"CygwinDirectory", L"", teraterm_ini.c_str(), &CygwinDir);
+	hGetPrivateProfileStringW(L"Tera Term", L"CygwinDirectory", L"", teraterm_ini.c_str(), &CygwinDir);
 	std::wstring dir = CygwinDir;
 	free(CygwinDir);
 	return dir;
@@ -402,9 +386,9 @@ static std::wstring IconIfExist(const std::wstring &path)
 }
 
 /**
- *	起動方法の一覧を作成する
+ *	ttlaunch.exe のあるフォルダ
  */
-static std::wstring GetExeDir(void)
+std::wstring GetExeDir(void)
 {
 	wchar_t *ExeDir = GetExeDirW(NULL);
 	std::wstring exe_dir = ExeDir;
@@ -412,6 +396,9 @@ static std::wstring GetExeDir(void)
 	return exe_dir;
 }
 
+/**
+ *	起動方法の一覧を作成する
+ */
 static std::vector<LaunchItem> CreateItems(void)
 {
 	std::vector<LaunchItem> items;
@@ -536,143 +523,72 @@ static std::vector<LaunchItem> CreateItems(void)
 }
 
 /**
- *	エクスプローラーのコンテキストメニューのレジストリキー
- *		インストーラー(teraterm.iss)と同じキー
+ *	文言ファイルの情報を読み込む (ttlaunch.h の LangInfo を参照)
  */
-static const struct {
-	const wchar_t *key;		// HKEY_CLASSES_ROOT(Software\Classes) 以下のキー
-	const wchar_t *param;	// フォルダを示すパラメータ
-} context_menu_keys[] = {
-	{ L"Folder\\shell\\ttlaunch", L"%L" },
-	{ L"Directory\\Background\\shell\\ttlaunch", L"%V" },
-	{ L"LibraryFolder\\Background\\shell\\ttlaunch", L"%V" },
-};
-
-/**
- *	コンテキストメニューが登録されているか
- *		HKEY_CLASSES_ROOT を調べるので HKCU, HKLM のどちらに登録されていても良い
- */
-static bool IsContextMenuRegistered(void)
+static LangInfo LoadLangInfo(void)
 {
-	for (size_t i = 0; i < _countof(context_menu_keys); i++) {
-		HKEY hKey;
-		if (RegOpenKeyExW(HKEY_CLASSES_ROOT, context_menu_keys[i].key, 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
-			return false;
-		}
-		RegCloseKey(hKey);
+	LangInfo info;
+	info.file = GetExeDir() + L"\\ttlaunch.lng";
+
+	wchar_t *setup_fname = GetDefaultSetupFNameW(NULL);
+	wchar_t *ui_language_file = GetUILanguageFileFullW(setup_fname);
+	wchar_t *language;
+	GetI18nStrWW("Info", "language", L"English", ui_language_file, &language);
+	std::wstring lang = language;
+	free(language);
+	free(ui_language_file);
+	free(setup_fname);
+
+	// "Japanese(日本語)" -> "Japanese"
+	const size_t paren = lang.find(L'(');
+	if (paren != std::wstring::npos) {
+		lang.erase(paren);
 	}
-	return true;
-}
-
-/**
- *	コンテキストメニューが HKEY_CURRENT_USER に登録されているか
- *		一部のキーだけ登録されている場合も登録されているとする
- */
-static bool IsContextMenuRegisteredCurrentUser(void)
-{
-	for (size_t i = 0; i < _countof(context_menu_keys); i++) {
-		const std::wstring key = std::wstring(L"Software\\Classes\\") + context_menu_keys[i].key;
-		HKEY hKey;
-		if (RegOpenKeyExW(HKEY_CURRENT_USER, key.c_str(), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
-			RegCloseKey(hKey);
-			return true;
-		}
+	while (!lang.empty() && lang[lang.size() - 1] == L' ') {
+		lang.erase(lang.size() - 1);
 	}
-	return false;
-}
-
-static LSTATUS RegSetString(HKEY hKey, const wchar_t *name, const std::wstring &value)
-{
-	return RegSetValueExW(hKey, name, 0, REG_SZ, (const BYTE *)value.c_str(),
-						  (DWORD)((value.size() + 1) * sizeof(wchar_t)));
+	if (lang.empty() || _wcsicmp(lang.c_str(), L"default") == 0) {
+		// Default.lng は英語
+		lang = L"English";
+	}
+	for (size_t i = 0; i < lang.size(); i++) {
+		info.section += lang[i] < 0x80 ? (char)lang[i] : '?';
+	}
+	return info;
 }
 
 /**
- *	コンテキストメニューをレジストリ(HKEY_CURRENT_USER)に登録する
+ *	文言ファイルの情報 (初回に読み込んで保持する)
  */
-static LSTATUS RegisterContextMenu(void)
+const LangInfo &GetLangInfo(void)
 {
-	wchar_t *exe_path;
-	hGetModuleFileNameW(NULL, &exe_path);
-	const std::wstring exe = L"\"" + std::wstring(exe_path) + L"\"";
-	free(exe_path);
-
-	for (size_t i = 0; i < _countof(context_menu_keys); i++) {
-		const std::wstring key = std::wstring(L"Software\\Classes\\") + context_menu_keys[i].key;
-		HKEY hKey;
-		LSTATUS r = RegCreateKeyExW(HKEY_CURRENT_USER, key.c_str(), 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-		if (r != ERROR_SUCCESS) {
-			return r;
-		}
-		RegSetString(hKey, NULL, L"Tera Term &Here");
-		RegSetString(hKey, L"Icon", exe);
-		RegCloseKey(hKey);
-
-		const std::wstring command_key = key + L"\\command";
-		r = RegCreateKeyExW(HKEY_CURRENT_USER, command_key.c_str(), 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-		if (r != ERROR_SUCCESS) {
-			return r;
-		}
-		r = RegSetString(hKey, NULL, exe + L" -d \"" + context_menu_keys[i].param + L"\"");
-		RegCloseKey(hKey);
-		if (r != ERROR_SUCCESS) {
-			return r;
-		}
+	static LangInfo *info = NULL;
+	if (info == NULL) {
+		info = new LangInfo(LoadLangInfo());
 	}
-	return ERROR_SUCCESS;
+	return *info;
 }
 
-static void RegisterContextMenuWithMessage(void)
+std::wstring GetLangStr(const LangInfo &lang, const char *key, const wchar_t *def)
 {
-	LSTATUS r = RegisterContextMenu();
-	if (r == ERROR_SUCCESS) {
-		MessageBoxW(NULL, L"\"Tera Term Here\" has been added to the Explorer context menu.", L"ttlaunch",
-					MB_OK | MB_ICONINFORMATION);
-	}
-	else {
-		wchar_t *error_msg;
-		hFormatMessageW(r, &error_msg);
-		std::wstring msg = L"Failed to add to the Explorer context menu.\n" + std::wstring(error_msg);
-		free(error_msg);
-		MessageBoxW(NULL, msg.c_str(), L"ttlaunch", MB_OK | MB_ICONWARNING);
-	}
+	wchar_t *str;
+	GetI18nStrWW(lang.section.c_str(), key, def, lang.file.c_str(), &str);
+	std::wstring s = str;
+	free(str);
+	return s;
 }
 
 /**
- *	コンテキストメニューを HKEY_CURRENT_USER から削除する
- *		HKEY_LOCAL_MACHINE に登録されたもの(インストーラーで登録)は削除しない
+ *	文言に %s を埋め込む
  */
-static LSTATUS UnregisterContextMenu(void)
+std::wstring FormatLangStr(const LangInfo &lang, const char *key, const wchar_t *def, const std::wstring &arg)
 {
-	for (size_t i = 0; i < _countof(context_menu_keys); i++) {
-		const std::wstring key = std::wstring(L"Software\\Classes\\") + context_menu_keys[i].key;
-		const std::wstring command_key = key + L"\\command";
-		LSTATUS r = RegDeleteKeyW(HKEY_CURRENT_USER, command_key.c_str());
-		if (r != ERROR_SUCCESS && r != ERROR_FILE_NOT_FOUND) {
-			return r;
-		}
-		r = RegDeleteKeyW(HKEY_CURRENT_USER, key.c_str());
-		if (r != ERROR_SUCCESS && r != ERROR_FILE_NOT_FOUND) {
-			return r;
-		}
-	}
-	return ERROR_SUCCESS;
-}
-
-static void UnregisterContextMenuWithMessage(void)
-{
-	LSTATUS r = UnregisterContextMenu();
-	if (r == ERROR_SUCCESS) {
-		MessageBoxW(NULL, L"\"Tera Term Here\" has been removed from the Explorer context menu.", L"ttlaunch",
-					MB_OK | MB_ICONINFORMATION);
-	}
-	else {
-		wchar_t *error_msg;
-		hFormatMessageW(r, &error_msg);
-		std::wstring msg = L"Failed to remove from the Explorer context menu.\n" + std::wstring(error_msg);
-		free(error_msg);
-		MessageBoxW(NULL, msg.c_str(), L"ttlaunch", MB_OK | MB_ICONWARNING);
-	}
+	const std::wstring fmt = GetLangStr(lang, key, def);
+	wchar_t *str;
+	aswprintf(&str, fmt.c_str(), arg.c_str());
+	std::wstring s = str;
+	free(str);
+	return s;
 }
 
 /**
@@ -680,8 +596,7 @@ static void UnregisterContextMenuWithMessage(void)
  */
 enum {
 	MENU_CANCEL = -1,		// キャンセルされた
-	MENU_REGISTER = -2,		// コンテキストメニューへの登録が選択された
-	MENU_UNREGISTER = -3,	// コンテキストメニューからの削除が選択された
+	MENU_SETUP = -2,		// 設定ダイアログを開くが選択された
 };
 
 static const wchar_t *owner_class_name = L"TTLaunchWindowClass";
@@ -877,24 +792,21 @@ static std::wstring GetNoItemMessage(void)
 	const std::wstring exe_dir = GetExeDir();
 	if (!CheckExist(exe_dir + L"\\cygterm.exe") && !CheckExist(exe_dir + L"\\msys2term.exe")) {
 		// cygterm, msys2term が無いと Cygwin, MSYS2 などを探さない
-		return L"cygterm.exe or msys2term.exe not found in " + EscapeMenu(exe_dir);
+		return FormatLangStr(GetLangInfo(), "MSG_NO_CYGTERM", L"cygterm.exe or msys2term.exe not found in %s",
+							 EscapeMenu(exe_dir));
 	}
-	return L"Cygwin, MSYS2 or Git for Windows not found";
+	return GetLangStr(GetLangInfo(), "MSG_NO_ENVIRONMENT", L"Cygwin, MSYS2 or Git for Windows not found");
 }
 
 /**
  *	マウスカーソル位置にポップアップメニューを表示する
  *
- *	@param	hWnd			オーナーウィンドウ
- *	@param	show_register	コンテキストメニューへの登録項目を表示する
- *	@param	show_unregister	コンテキストメニューからの削除項目を表示する
- *	@return	選択された項目の index, MENU_CANCEL, MENU_REGISTER, MENU_UNREGISTER
+ *	@param	hWnd	オーナーウィンドウ
+ *	@return	選択された項目の index, MENU_CANCEL, MENU_SETUP
  */
-static int ShowPopupMenu(HWND hWnd, const std::vector<LaunchItem> &items, const std::wstring &dir,
-						 bool show_register, bool show_unregister)
+static int ShowPopupMenu(HWND hWnd, const std::vector<LaunchItem> &items, const std::wstring &dir)
 {
-	static const UINT ID_REGISTER = 0x7000;
-	static const UINT ID_UNREGISTER = 0x7001;
+	static const UINT ID_SETUP = 0x7000;
 
 	POINT pt;
 	GetCursorPos(&pt);
@@ -931,15 +843,9 @@ static int ShowPopupMenu(HWND hWnd, const std::vector<LaunchItem> &items, const 
 			}
 		}
 	}
-	if (show_register || show_unregister) {
-		AppendMenuW(hMenu, MF_SEPARATOR, 0, NULL);
-	}
-	if (show_register) {
-		AppendMenuW(hMenu, MF_STRING, ID_REGISTER, L"Add \"Tera Term &Here\" to Explorer context menu");
-	}
-	if (show_unregister) {
-		AppendMenuW(hMenu, MF_STRING, ID_UNREGISTER, L"&Remove \"Tera Term Here\" from Explorer context menu");
-	}
+	AppendMenuW(hMenu, MF_SEPARATOR, 0, NULL);
+	const std::wstring setup_label = GetLangStr(GetLangInfo(), "MENU_SETUP", L"Open &settings dialog...");
+	AppendMenuW(hMenu, MF_STRING, ID_SETUP, setup_label.c_str());
 
 	SetForegroundWindow(hWnd);
 	int cmd = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_NONOTIFY | TPM_RIGHTBUTTON | TPM_LEFTALIGN | TPM_TOPALIGN,
@@ -954,11 +860,8 @@ static int ShowPopupMenu(HWND hWnd, const std::vector<LaunchItem> &items, const 
 	if (cmd == 0) {
 		return MENU_CANCEL;
 	}
-	if ((UINT)cmd == ID_REGISTER) {
-		return MENU_REGISTER;
-	}
-	if ((UINT)cmd == ID_UNREGISTER) {
-		return MENU_UNREGISTER;
+	if ((UINT)cmd == ID_SETUP) {
+		return MENU_SETUP;
 	}
 	return cmd - 1;
 }
@@ -1042,6 +945,7 @@ static void ShowUsage(const std::vector<LaunchItem> &items)
 		L"  -d <directory>\tstart directory\n"
 		L"  -v <NAME=VALUE>\tenvironment variable (can be specified multiple times)\n"
 		L"  -e <id>\tlaunch without popup menu\n"
+		L"  -setup\topen the settings dialog (Explorer context menu)\n"
 		L"  -h\tshow this help\n"
 		L"\n"
 		L"other options are passed to cygterm(msys2term)\n"
@@ -1069,6 +973,7 @@ int wmain(int argc, wchar_t *argv[])
 	std::wstring launch_id;
 	std::wstring extra_args;
 	bool show_usage = false;
+	bool show_setup = false;
 
 	for (int i = 1; i < argc; i++) {
 		if (wcscmp(argv[i], L"-d") == 0 && i + 1 < argc) {
@@ -1083,6 +988,9 @@ int wmain(int argc, wchar_t *argv[])
 			i++;
 			launch_id = argv[i];
 		}
+		else if (wcscmp(argv[i], L"-setup") == 0) {
+			show_setup = true;
+		}
 		else if (wcscmp(argv[i], L"-h") == 0 || wcscmp(argv[i], L"/?") == 0) {
 			show_usage = true;
 		}
@@ -1095,6 +1003,10 @@ int wmain(int argc, wchar_t *argv[])
 
 	if (show_usage) {
 		ShowUsage(items);
+		return 0;
+	}
+	if (show_setup) {
+		ShowSetupDialog(NULL, items);
 		return 0;
 	}
 
@@ -1116,16 +1028,11 @@ int wmain(int argc, wchar_t *argv[])
 	HWND hWnd = CreateOwnerWindow();
 
 	if (launch_id.empty()) {
-		// HKEY_LOCAL_MACHINE に登録されたもの(インストーラーで登録)は削除できないので、
-		// HKEY_CURRENT_USER に登録されているときだけ削除項目を表示する
-		index = ShowPopupMenu(hWnd, items, dir, !IsContextMenuRegistered(), IsContextMenuRegisteredCurrentUser());
+		index = ShowPopupMenu(hWnd, items, dir);
 		if (index < 0) {
 			DestroyOwnerWindow(hWnd);
-			if (index == MENU_REGISTER) {
-				RegisterContextMenuWithMessage();
-			}
-			else if (index == MENU_UNREGISTER) {
-				UnregisterContextMenuWithMessage();
+			if (index == MENU_SETUP) {
+				ShowSetupDialog(NULL, items);
 			}
 			return 0;
 		}

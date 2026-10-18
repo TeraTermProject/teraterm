@@ -15,6 +15,9 @@ perl utf8_to.pl utf16le "release/lang_utf8/pt_BR.lng" "release/lang_utf16le/pt_B
 perl utf8_to.pl utf16le "release/lang_utf8/it_IT.lng" "release/lang_utf16le/it_IT.lng"
 perl utf8_to.pl utf16le "release/lang_utf8/tr_TR.lng" "release/lang_utf16le/tr_TR.lng"
 
+rem ttlaunch
+perl utf8_to.pl utf16le ../tools/ttlaunch/ttlaunch.lng release/ttlaunch.lng
+
 if not exist release\lang mkdir release\lang
 perl utf8_to.pl cp1252 release/lang_utf8/Default.lng release/lang/Default.lng
 perl utf8_to.pl cp1252 release/lang_utf8/en_US.lng release/lang/en_US.lng

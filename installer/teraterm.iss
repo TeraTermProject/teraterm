@@ -157,6 +157,7 @@ Source: {#SrcDir}\msys2term.exe; DestDir: {app}; Components: cygterm; Flags: ski
 Source: {#SrcDir}\msys2term.cfg; DestDir: {app}; Components: cygterm; Flags: skipifsourcedoesntexist
 Source: {#SrcDir}\cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: {#SrcDir}\ttlaunch.exe; DestDir: {app}; Components: cygterm; Flags: ignoreversion
+Source: {#SrcDir}\ttlaunch.lng; DestDir: {app}; Components: cygterm
 Source: {#SrcDir}\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
 Source: {#SrcDir}\ttmenu_readme-j.txt; DestDir: {app}; DestName: "ttmenu_readme-j.txt"; Components: TeraTerm_Menu
 Source: {#SrcDir}\TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion

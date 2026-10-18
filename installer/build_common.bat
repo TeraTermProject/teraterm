@@ -146,6 +146,8 @@ copy /y ..\cygwin\cygterm\msys2term\msys2term.exe %dst%
 copy /y ..\cygwin\cygterm\msys2term.cfg %dst%
 :msys2term_pass
 
+copy /y release\ttlaunch.lng %dst%
+
 mkdir %dst%\lang
 mkdir %dst%\lang_utf16le
 xcopy /s /e /y /i /exclude:archive-exclude.txt release\lang %dst%\lang

@@ -1,1 +1,132 @@
-icon ICON "../../teraterm/common/teraterm.ico"
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <winresrc.h>
+#define IDC_STATIC -1
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 (日本) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include <winresrc.h>\r\n"
+    "#define IDC_STATIC -1\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON                ICON                    "../../teraterm/common/teraterm.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SETUP DIALOGEX 0, 0, 320, 310
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ttlaunch settings"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           "Explorer registration status",IDC_STATUS_LABEL,6,7,307,8
+    LTEXT           "status",IDC_STATUS,15,19,294,34
+    LTEXT           "Menu type",IDC_TYPE_LABEL,6,56,307,8
+    CONTROL         "&Popup menu\n(one item ""Open in Tera Term"", select a shell from the popup menu)",IDC_TYPE_POPUP,
+                    "Button",BS_AUTORADIOBUTTON | BS_MULTILINE | WS_GROUP,15,68,298,18
+    CONTROL         "&Items\n(one item per shell directly in the context menu, also for Windows XP / Vista)",IDC_TYPE_ITEMS,
+                    "Button",BS_AUTORADIOBUTTON | BS_MULTILINE,15,88,298,18
+    CONTROL         "Sub&menu\n(""Open in Tera Term"" has one item per shell, Windows 7 or later)",IDC_TYPE_SUBMENU,
+                    "Button",BS_AUTORADIOBUTTON | BS_MULTILINE,15,108,298,18
+    LTEXT           "Shells (currently available)",IDC_ITEMS_LABEL,6,132,307,8
+    LISTBOX         IDC_ITEMS,15,143,298,56,LBS_NOINTEGRALHEIGHT | LBS_NOSEL | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Register to",IDC_OUT_LABEL,6,207,100,8
+    CONTROL         "Registr&y (HKEY_CURRENT_USER)",IDC_OUT_REGISTRY,"Button",BS_AUTORADIOBUTTON | WS_GROUP,15,219,140,10
+    CONTROL         ".reg &file",IDC_OUT_REGFILE,"Button",BS_AUTORADIOBUTTON,165,219,100,10
+    PUSHBUTTON      "&Register",IDC_REGISTER,15,234,75,14
+    PUSHBUTTON      "&Unregister",IDC_UNREGISTER,96,234,75,14
+    LTEXT           "Registry Editor",IDC_REGEDIT_LABEL,6,255,307,8
+    PUSHBUTTON      "&Open...",IDC_REGEDIT,15,267,50,14
+    DEFPUSHBUTTON   "Close",IDCANCEL,264,290,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_SETUP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 304
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_SETUP AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

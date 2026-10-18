@@ -3,7 +3,11 @@
 add_executable(
   ${PROJECT_NAME} WIN32
   ttlaunch.cpp
+  ttlaunch.h
+  ttlaunch_setup.cpp
+  ttlaunch_setup.h
   ttlaunch.rc
+  resource.h
   ../../cygwin/cyglib/cyglib.h
   )
 
@@ -41,6 +45,33 @@ install(
   FILES README.md
   DESTINATION .
   RENAME ttlaunch.md
+  )
+
+# ttlaunch.lng (UTF-8) -> UTF-16LE
+#  GetPrivateProfileString() で読めるのは ANSI か UTF-16LE のため
+set(LNG_SRC ${CMAKE_CURRENT_SOURCE_DIR}/ttlaunch.lng)
+set(LNG_DEST ${CMAKE_CURRENT_BINARY_DIR}/lng/ttlaunch.lng)
+set(LNG_SCRIPT ${CMAKE_SOURCE_DIR}/installer/utf8_to.pl)
+add_custom_command(
+  OUTPUT ${LNG_DEST}
+  DEPENDS ${LNG_SRC} ${LNG_SCRIPT}
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/lng
+  COMMAND ${PERL} ${LNG_SCRIPT} utf16le ${LNG_SRC} ${LNG_DEST}
+  )
+add_custom_target(
+  ttlaunch_lng
+  DEPENDS ${LNG_DEST}
+  SOURCES ${LNG_SRC}
+  )
+add_dependencies(${PROJECT_NAME} ttlaunch_lng)
+# 実行ファイルと同じフォルダに置く (ビルドツリーから実行するとき用)
+add_custom_command(
+  TARGET ${PROJECT_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LNG_DEST} $<TARGET_FILE_DIR:${PROJECT_NAME}>/ttlaunch.lng
+  )
+install(
+  FILES ${LNG_DEST}
+  DESTINATION .
   )
 
 if(MSVC)
