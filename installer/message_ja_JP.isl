@@ -2,7 +2,6 @@
 task_desktopicon=デスクトップに Tera Term のショートカットを作る(&D)
 task_startupttmenuicon=スタートに TeraTerm Menu のショートカットを作る(&M)
 task_cygtermhere=コンテキストメニューに "Cy&gterm Here" を追加する
-task_ttlaunchhere=コンテキストメニューに "Tera Term &Here" (ttlaunch) を追加する
 task_macroassoc=.&ttl ファイルを ttpmacro.exe に関連付ける
 task_telnetassoc=t&elnet プロトコルを ttermpro.exe に関連付ける
 task_sshassoc=&ssh プロトコルを ttermpro.exe に関連付ける

@@ -2,7 +2,6 @@
 task_desktopicon=Create Tera Term shortcut to &Desktop
 task_startupttmenuicon=Create TeraTerm &Menu shortcut to Startup
 task_cygtermhere=Add "Cy&gterm Here" to Context menu
-task_ttlaunchhere=Add "Tera Term &Here" (ttlaunch) to Context menu
 task_macroassoc=Associate .&ttl file to ttpmacro.exe
 task_telnetassoc=Associate t&elnet protocol to ttermpro.exe
 task_sshassoc=Associate &ssh protocol to ttermpro.exe

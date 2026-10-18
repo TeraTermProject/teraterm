@@ -207,7 +207,7 @@ Name: Additional_Plugins/TTXRecurringCommand; Description: TTXRecurringCommand (
 Name: {group}\Tera Term; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; IconIndex: 0; Components: TeraTerm; Flags: createonlyiffileexists
 Name: {group}\{cm:UninstallProgram,{#AppName}}; Filename: {uninstallexe}; Components: TeraTerm; Flags: createonlyiffileexists
 Name: {group}\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; IconIndex: 0; Components: cygterm; Flags: createonlyiffileexists
-Name: {group}\ttlaunch; Filename: {app}\ttlaunch.exe; WorkingDir: {app}; IconFilename: {app}\ttlaunch.exe; IconIndex: 0; Components: cygterm; Flags: createonlyiffileexists
+Name: {group}\ttlaunch; Filename: {app}\ttlaunch.exe; Parameters: -setup; WorkingDir: {app}; IconFilename: {app}\ttlaunch.exe; IconIndex: 0; Components: cygterm; Flags: createonlyiffileexists
 Name: {group}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app}; IconFilename: {app}\ttpmenu.exe; IconIndex: 0; Components: TeraTerm_Menu; Flags: createonlyiffileexists
 Name: {autodesktop}\Tera Term 5; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; Components: TeraTerm; Tasks: desktopicon; IconIndex: 0; Flags: createonlyiffileexists
 Name: {autostartup}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app}; IconFilename: {app}\ttpmenu.exe; Components: TeraTerm_Menu; IconIndex: 0; Tasks: startupttmenuicon; Flags: createonlyiffileexists
@@ -282,25 +282,11 @@ Root: HKA; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; Flag
 Root: HKA; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Components: cygterm; Tasks: cygtermhere
 Root: HKA; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueName: Icon; ValueData: """{app}\cyglaunch.exe"""; Components: cygterm; Tasks: cygtermhere
 Root: HKA; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -v CHERE_INVOKING=y -d ""\""%V\"""""; Components: cygterm; Tasks: cygtermhere
-; ttlaunch
-Root: HKA; Subkey: Software\Classes\Folder\shell\ttlaunch; Flags: uninsdeletekey; Components: cygterm; Tasks: ttlaunchhere
-Root: HKA; Subkey: Software\Classes\Folder\shell\ttlaunch; ValueType: string; ValueData: Tera Term &Here; Components: cygterm; Tasks: ttlaunchhere
-Root: HKA; Subkey: Software\Classes\Folder\shell\ttlaunch; ValueType: string; ValueName: Icon; ValueData: """{app}\ttlaunch.exe"""; Components: cygterm; Tasks: ttlaunchhere
-Root: HKA; Subkey: Software\Classes\Folder\shell\ttlaunch\command; ValueType: string; ValueData: """{app}\ttlaunch.exe"" -d ""%L"""; Components: cygterm; Tasks: ttlaunchhere
-Root: HKA; Subkey: Software\Classes\Directory\Background\shell\ttlaunch; Flags: uninsdeletekey; Components: cygterm; Tasks: ttlaunchhere
-Root: HKA; Subkey: Software\Classes\Directory\Background\shell\ttlaunch; ValueType: string; ValueData: Tera Term &Here; Components: cygterm; Tasks: ttlaunchhere
-Root: HKA; Subkey: Software\Classes\Directory\Background\shell\ttlaunch; ValueType: string; ValueName: Icon; ValueData: """{app}\ttlaunch.exe"""; Components: cygterm; Tasks: ttlaunchhere
-Root: HKA; Subkey: Software\Classes\Directory\Background\shell\ttlaunch\command; ValueType: string; ValueData: """{app}\ttlaunch.exe"" -d ""%V"""; Components: cygterm; Tasks: ttlaunchhere
-Root: HKA; Subkey: Software\Classes\LibraryFolder\Background\shell\ttlaunch; Flags: uninsdeletekey; Components: cygterm; Tasks: ttlaunchhere
-Root: HKA; Subkey: Software\Classes\LibraryFolder\Background\shell\ttlaunch; ValueType: string; ValueData: Tera Term &Here; Components: cygterm; Tasks: ttlaunchhere
-Root: HKA; Subkey: Software\Classes\LibraryFolder\Background\shell\ttlaunch; ValueType: string; ValueName: Icon; ValueData: """{app}\ttlaunch.exe"""; Components: cygterm; Tasks: ttlaunchhere
-Root: HKA; Subkey: Software\Classes\LibraryFolder\Background\shell\ttlaunch\command; ValueType: string; ValueData: """{app}\ttlaunch.exe"" -d ""%V"""; Components: cygterm; Tasks: ttlaunchhere
 
 [Tasks]
 Name: desktopicon; Description: {cm:task_desktopicon}; Components: TeraTerm
 Name: startupttmenuicon; Description: {cm:task_startupttmenuicon}; Components: TeraTerm_Menu
 Name: cygtermhere; Description: {cm:task_cygtermhere}; Components: cygterm; Flags: unchecked
-Name: ttlaunchhere; Description: {cm:task_ttlaunchhere}; Components: cygterm; Flags: unchecked
 Name: macroassoc; Description: {cm:task_macroassoc}; Components: TeraTerm; Flags: unchecked
 Name: telnetassoc; Description: {cm:task_telnetassoc}; Components: TeraTerm; Flags: unchecked
 Name: sshassoc; Description: {cm:task_sshassoc}; Components: TTSSH; Flags: unchecked
