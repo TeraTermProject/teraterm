@@ -33,6 +33,7 @@
 //
 
 #include <windows.h>
+#include <winioctl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
@@ -320,6 +321,78 @@ static std::wstring GetNativeSystemDir(void)
 	return buf;
 }
 
+#ifndef IO_REPARSE_TAG_APPEXECLINK
+#define IO_REPARSE_TAG_APPEXECLINK (0x8000001BL)
+#endif
+#ifndef MAXIMUM_REPARSE_DATA_BUFFER_SIZE
+#define MAXIMUM_REPARSE_DATA_BUFFER_SIZE (16 * 1024)
+#endif
+
+/**
+ *	アプリ実行エイリアス (App Execution Alias) の再解析ポイントのデータ
+ *		REPARSE_DATA_BUFFER (ntifs.h) の AppExecLink 版
+ */
+typedef struct {
+	ULONG ReparseTag;
+	USHORT ReparseDataLength;
+	USHORT Reserved;
+	ULONG Version;			// 3
+	WCHAR StringList[1];	// NUL 区切りの文字列: パッケージ名, AppUserModelID, 実体のパス, ...
+} APPEXECLINK_REPARSE_BUFFER;
+
+/**
+ *	アプリ実行エイリアス (App Execution Alias) を実体のパスに解決する
+ *
+ *	Microsoft Store (MSIX) のアプリの %LOCALAPPDATA%\Microsoft\WindowsApps\*.exe は
+ *	0 バイトの再解析ポイント (IO_REPARSE_TAG_APPEXECLINK) で、
+ *	CreateProcess() では実行できるが、LoadLibraryEx() や ExtractIconEx() では開けず
+ *	アイコンを取得できない
+ *	実体 (C:\Program Files\WindowsApps\<パッケージ>\*.exe) はパスが分かれば読める
+ *
+ *	@return	実体のパス,
+ *			アプリ実行エイリアスではないとき L""
+ */
+static std::wstring ResolveAppExecLink(const std::wstring &path)
+{
+	const DWORD attr = GetFileAttributesW(path.c_str());
+	if (attr == INVALID_FILE_ATTRIBUTES || (attr & FILE_ATTRIBUTE_REPARSE_POINT) == 0) {
+		return L"";
+	}
+	HANDLE hFile = CreateFileW(path.c_str(), 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
+							   OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		return L"";
+	}
+	std::vector<BYTE> buf(MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
+	DWORD size = 0;
+	const BOOL r = DeviceIoControl(hFile, FSCTL_GET_REPARSE_POINT, NULL, 0, &buf[0], (DWORD)buf.size(), &size, NULL);
+	CloseHandle(hFile);
+	const APPEXECLINK_REPARSE_BUFFER *rb = (const APPEXECLINK_REPARSE_BUFFER *)&buf[0];
+	const size_t header = offsetof(APPEXECLINK_REPARSE_BUFFER, StringList);
+	if (!r || size < header || rb->ReparseTag != IO_REPARSE_TAG_APPEXECLINK) {
+		return L"";
+	}
+
+	// 文字列を順に取り出し、3 番目 (実体のパス) を返す
+	size_t data_end = 8 + rb->ReparseDataLength;	// ReparseTag, ReparseDataLength, Reserved の後からデータ
+	if (data_end > size) {
+		data_end = size;
+	}
+	const wchar_t *p = rb->StringList;
+	const wchar_t *end = (const wchar_t *)(&buf[0] + data_end);
+	for (int i = 0; p < end; i++) {
+		const wchar_t *q = p;
+		while (q < end && *q != 0) {
+			q++;
+		}
+		if (i == 2) {
+			return std::wstring(p, q);
+		}
+		p = q + 1;
+	}
+	return L"";
+}
+
 /**
  *	アイコンファイルが存在すればそのパスを返す
  */
@@ -451,7 +524,10 @@ static std::vector<LaunchItem> CreateItems(void)
 		if (SearchPathW(NULL, L"pwsh.exe", NULL, _countof(pwsh), pwsh, NULL) > 0) {
 			LaunchItem item = { L"pwsh", L"Po&werShell 7", 2, relay_system, relay_dir,
 								L"-nols -s " + QuoteArg(L"'" + ToSlash(pwsh) + L"'"), false, L"" };
-			item.icon = pwsh;
+			// Microsoft Store 版はアプリ実行エイリアスで、そのままではアイコンを読めない
+			//	起動はエイリアスのまま行う (更新でバージョン付きのフォルダ名が変わっても追従する)
+			const std::wstring target = ResolveAppExecLink(pwsh);
+			item.icon = target.empty() ? pwsh : target;
 			items.push_back(item);
 		}
 	}

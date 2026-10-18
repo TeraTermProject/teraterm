@@ -73,6 +73,8 @@ MSYS2_ARG_CONV_EXCL='*' ./ttlaunch -e cygwin -s /bin/sh
   - Windows PowerShell
   - PowerShell 7 (pwsh.exe が PATH にある場合)
   - アイコンは cmd.exe, powershell.exe, pwsh.exe のアイコン
+  - Microsoft Store 版の PowerShell 7 の pwsh.exe はアプリ実行エイリアス(0 バイトの再解析ポイント)で
+    アイコンを読めないため、再解析ポイントが指す実体(C:\Program Files\WindowsApps\...\pwsh.exe)からアイコンを取得します
 
 アイコンはファイルが見つかった場合だけ表示します。
 
