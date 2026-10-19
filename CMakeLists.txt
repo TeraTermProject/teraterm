@@ -34,7 +34,7 @@ if(CMAKE_HOST_UNIX AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
   message(FATAL_ERROR "add option -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/mingw.toolchain.cmake")
 endif()
 
-option(SUPPORT_OLD_WINDOWS "windows 95 support" ${SUPPORT_OLD_WINDOWS_DEFAULT})
+option(SUPPORT_OLD_WINDOWS "Support older versions of Windows" ${SUPPORT_OLD_WINDOWS_DEFAULT})
 option(BMP_ICO "icon(*.ico) file include only bmp(not png)" ${BMP_ICO_DEFAULT})
 option(ENABLE_TTXSAMPLES "TTXSamples" ON)
 option(MORE_WARNING "stronger warning" OFF)
@@ -154,6 +154,13 @@ elseif(MINGW)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc")
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s -Wl,--gc-sections")
   set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -s -Wl,--gc-sections")
+  if(SUPPORT_OLD_WINDOWS)
+    # C++ の例外処理、関数内 static 変数のスレッドセーフな初期化を使用しない
+    #   GCC 13 以降の libgcc(gthr-win32) が Windows 95 にない API を使用するため
+    #   例外を throw する operator new / delete、std::__throw_*() は
+    #   libmingw/new_delete.cpp, functexcept.cpp で置き換える
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-threadsafe-statics")
+  endif()
 endif()
 
 if(SUPPORT_OLD_WINDOWS)

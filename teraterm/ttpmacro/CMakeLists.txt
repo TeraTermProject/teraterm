@@ -131,6 +131,15 @@ if(SUPPORT_OLD_WINDOWS)
     )
 endif()
 
+if(SUPPORT_OLD_WINDOWS AND WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+  # libressl が使用する InitOnceExecuteOnce() など
+  target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+    libcompatwin
+    )
+endif()
+
 target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE
