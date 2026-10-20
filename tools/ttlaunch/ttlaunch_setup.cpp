@@ -45,6 +45,7 @@
 #include "compat_win.h"
 #include "ttcommdlg.h"
 #include "ttlib.h"
+#include "dlglib.h"
 #include "i18n.h"
 #include "asprintf.h"
 #include "resource.h"
@@ -520,22 +521,6 @@ struct SetupDialogData {
 	LangInfo lang;
 };
 
-static const DlgTextInfo setup_dlg_texts[] = {
-	{ 0, "DLG_SETUP_TITLE" },
-	{ IDC_STATUS_LABEL, "DLG_SETUP_STATUS" },
-	{ IDC_TYPE_LABEL, "DLG_SETUP_TYPE_LABEL" },
-	{ IDC_TYPE_POPUP, "DLG_SETUP_TYPE_POPUP" },
-	{ IDC_TYPE_ITEMS, "DLG_SETUP_TYPE_ITEMS" },
-	{ IDC_TYPE_SUBMENU, "DLG_SETUP_TYPE_SUBMENU" },
-	{ IDC_ITEMS_LABEL, "DLG_SETUP_ITEMS" },
-	{ IDC_OUT_LABEL, "DLG_SETUP_OUT_LABEL" },
-	{ IDC_OUT_REGISTRY, "DLG_SETUP_OUT_REGISTRY" },
-	{ IDC_OUT_REGFILE, "DLG_SETUP_OUT_REGFILE" },
-	{ IDC_REGEDIT_LABEL, "DLG_SETUP_REGEDIT_LABEL" },
-	{ IDC_REGEDIT, "DLG_SETUP_REGEDIT" },
-	{ IDCANCEL, "DLG_SETUP_CLOSE" },
-};
-
 static menu_type_t GetSelectedMenuType(HWND hDlg)
 {
 	if (IsDlgButtonChecked(hDlg, IDC_TYPE_SUBMENU) == BST_CHECKED) {
@@ -664,6 +649,22 @@ static void OpenRegistryEditor(HWND hDlg, const LangInfo &lang)
 
 static INT_PTR CALLBACK SetupDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	static const DlgTextInfo setup_dlg_texts[] = {
+		{ 0, "DLG_SETUP_TITLE" },
+		{ IDC_STATUS_LABEL, "DLG_SETUP_STATUS" },
+		{ IDC_TYPE_LABEL, "DLG_SETUP_TYPE_LABEL" },
+		{ IDC_TYPE_POPUP, "DLG_SETUP_TYPE_POPUP" },
+		{ IDC_TYPE_ITEMS, "DLG_SETUP_TYPE_ITEMS" },
+		{ IDC_TYPE_SUBMENU, "DLG_SETUP_TYPE_SUBMENU" },
+		{ IDC_ITEMS_LABEL, "DLG_SETUP_ITEMS" },
+		{ IDC_OUT_LABEL, "DLG_SETUP_OUT_LABEL" },
+		{ IDC_OUT_REGISTRY, "DLG_SETUP_OUT_REGISTRY" },
+		{ IDC_OUT_REGFILE, "DLG_SETUP_OUT_REGFILE" },
+		{ IDC_REGEDIT_LABEL, "DLG_SETUP_REGEDIT_LABEL" },
+		{ IDC_REGEDIT, "DLG_SETUP_REGEDIT" },
+		{ IDCANCEL, "DLG_SETUP_CLOSE" },
+	};
+
 	switch (msg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtrW(hDlg, DWLP_USER, lParam);
@@ -753,13 +754,38 @@ static INT_PTR CALLBACK SetupDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM 
 			return TRUE;
 		case IDOK:
 		case IDCANCEL:
-			EndDialog(hDlg, 0);
+			TTEndDialog(hDlg, 0);
 			return TRUE;
 		}
 		break;
 	}
 	}
 	return FALSE;
+}
+
+/**
+ *	ダイアログフォントを設定する
+ *	Tera Term 本体と同じく TERATERM.INI の DlgFont、lng ファイルの DLG_SYSTEM_FONT、
+ *	MessageBox() のフォントの順に使用する
+ */
+static void SetDialogFontFromIni(void)
+{
+	wchar_t *setup_fname = GetDefaultSetupFNameW(NULL);
+	wchar_t *dlg_font;
+	hGetPrivateProfileStringW(L"Tera Term", L"DlgFont", L"", setup_fname, &dlg_font);
+
+	wchar_t face[LF_FACESIZE];
+	int point = 0;
+	int charset = 0;
+	GetNthStringW(dlg_font, 1, _countof(face), face);
+	GetNthNumW(dlg_font, 2, &point);
+	GetNthNumW(dlg_font, 3, &charset);
+	free(dlg_font);
+
+	wchar_t *ui_language_file = GetUILanguageFileFullW(setup_fname);
+	SetDialogFont(face, point, charset, ui_language_file, "Tera Term", "DLG_SYSTEM_FONT");
+	free(ui_language_file);
+	free(setup_fname);
 }
 
 /**
@@ -770,5 +796,7 @@ void ShowSetupDialog(HWND hParent, const std::vector<LaunchItem> &items)
 	SetupDialogData data;
 	data.items = &items;
 	data.lang = GetLangInfo();
-	DialogBoxParamW(GetModuleHandleW(NULL), MAKEINTRESOURCEW(IDD_SETUP), hParent, SetupDlgProc, (LPARAM)&data);
+	SetDialogFontFromIni();
+	TTDialogBoxParam(GetModuleHandleW(NULL), MAKEINTRESOURCEW(IDD_SETUP),
+					 hParent, SetupDlgProc, (LPARAM)&data);
 }

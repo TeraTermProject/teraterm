@@ -51,9 +51,61 @@ cygterm, msys2term で shell を起動できません。
 MSYS2_ARG_CONV_EXCL='*' ./ttlaunch -e cygwin -s /bin/sh
 ```
 
+## shellの起動
+
+ttlaunch.exe を起動(エクスプローラーからダブルクリック)すると、シェルの一覧と
+`設定ダイアログを開く`ポップアップが出ます。
+
+ttlaunch.exe へのショートカットに `-d` をつけて、エクスプローラーからフォルダをドロップすると
+ポップアップからドロップしたフォルダに shell を開くことができます。
+
+コマンドラインから `ttlaunch -d .` とすることでも shell を開くことができます。
+
+設定ダイアログでレジストリを登録すると、
+エクスプローラのコンテキストメニューから shell を開くことができます。
+
+## 設定ダイアログ
+
+`ttlaunch -setup` を実行するか、ポップアップメニューの `Open settings dialog...` を選択すると
+設定ダイアログが開きます。次のことができます。
+
+- メニューの種類の選択
+  - Popup menu: "Open in Tera Term" の 1 項目を登録します。選択すると ttlaunch のポップアップメニューが表示されます。
+    登録内容が固定なので、shell の追加・削除は次の起動から反映されます
+  - Items: 各 shell をコンテキストメニューの項目として直接登録します(サブメニューなし)。
+    項目名は `Tera Term: Cygwin` のようになります。Windows XP / Vista でも使えますが、メニューが shell の数だけ長くなります
+  - Submenu: "Open in Tera Term" のサブメニューに、ポップアップメニューと同じ項目(各 shell)を並べます。
+    Windows 7 以降で使用できます
+  - Items と Submenu の各項目は `ttlaunch -e <id> -d "%V"` を実行します。
+    末尾に設定ダイアログを開く項目(`ttlaunch -setup`)も登録します
+- 出力先の選択
+  - Registry (HKEY_CURRENT_USER): Register / Unregister で直接レジストリを変更します
+  - .reg file: Register / Unregister と同じ内容の reg ファイルを書き出します(ボタンは Save (register)... / Save (unregister)... になります)。
+    ダブルクリックすると HKEY_CURRENT_USER に反映されます
+- Register: 既存の登録(HKEY_CURRENT_USER の `ttlaunch`, `ttlaunch_*`)をすべて削除してから、選択した種類で登録します
+- Unregister: HKEY_CURRENT_USER の登録をすべて削除します
+- Registry Editor の Open...: レジストリ エディタで登録先のキー(HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell)を開きます。
+  起動時に管理者権限の確認(UAC)が表示されます
+
+Items と Submenu の内容は、設定ダイアログを開いた時点で見つかった環境から作成します。
+Cygwin や WSL ディストリビューションを追加・削除したときは、登録し直してください。
+
+HKEY_LOCAL_MACHINE に登録されたもの(他のユーザーや管理者が登録したもの)は設定ダイアログからは削除できません。
+HKEY_LOCAL_MACHINE に登録があるときは、状態の 2 行目にその旨を表示します。
+
+設定ダイアログの文言と、ポップアップメニューの `Open settings dialog...`、起動できる項目が無いときの文言は、
+ttlaunch.exe と同じフォルダの ttlaunch.lng から読み込みます。
+ttlaunch.lng は言語ごとのセクション(`[English]`, `[Japanese]` など)に文言を持ち、
+Tera Term の設定(TERATERM.INI の UILanguageFile)で選ばれている言語のセクションを使用します
+(言語名は Tera Term の lng ファイルの `[Info]` の `language=` の括弧より前の部分です)。
+セクションやキーが無いときは英語になります。
+ソースの ttlaunch.lng は UTF-8 で、ビルド時に UTF-16LE に変換して配置します。
+
+regファイルはBOMつきUTF-16LEです。
+
 ## メニューの項目
 
-インストールされている環境を調べて、メニューを動的に作成します。
+インストールされている環境を調べて、メニューを作成します。
 
 - Cygwin
   - TERATERM.INI の CygwinDirectory、無い場合はレジストリ HKLM(HKCU)\SOFTWARE\Cygwin\setup の rootdir、
@@ -225,43 +277,6 @@ WSL と Windows の shell(cmd, PowerShell) には設定しません。
 "Open in Tera Term" を登録して、フォルダを指定して shell を起動できます。
 登録は ttlaunch の設定ダイアログ(下記)で行います。インストーラーは登録しません。
 HKEY_CURRENT_USER に登録するので、管理者権限は不要です。
-
-### 設定ダイアログ
-
-`ttlaunch -setup` を実行するか、ポップアップメニューの `Open settings dialog...` を選択すると
-設定ダイアログが開きます。次のことができます。
-
-- メニューの種類の選択
-  - Popup menu: "Open in Tera Term" の 1 項目を登録します。選択すると ttlaunch のポップアップメニューが表示されます。
-    登録内容が固定なので、shell の追加・削除は次の起動から反映されます
-  - Items: 各 shell をコンテキストメニューの項目として直接登録します(サブメニューなし)。
-    項目名は `Tera Term: Cygwin` のようになります。Windows XP / Vista でも使えますが、メニューが shell の数だけ長くなります
-  - Submenu: "Open in Tera Term" のサブメニューに、ポップアップメニューと同じ項目(各 shell)を並べます。
-    Windows 7 以降で使用できます
-  - Items と Submenu の各項目は `ttlaunch -e <id> -d "%V"` を実行します。
-    末尾に設定ダイアログを開く項目(`ttlaunch -setup`)も登録します
-- 出力先の選択
-  - Registry (HKEY_CURRENT_USER): Register / Unregister で直接レジストリを変更します
-  - .reg file: Register / Unregister と同じ内容の reg ファイルを書き出します(ボタンは Save (register)... / Save (unregister)... になります)。
-    ダブルクリックすると HKEY_CURRENT_USER に反映されます
-- Register: 既存の登録(HKEY_CURRENT_USER の `ttlaunch`, `ttlaunch_*`)をすべて削除してから、選択した種類で登録します
-- Unregister: HKEY_CURRENT_USER の登録をすべて削除します
-- Registry Editor の Open...: レジストリ エディタで登録先のキー(HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell)を開きます。
-  起動時に管理者権限の確認(UAC)が表示されます
-
-Items と Submenu の内容は、設定ダイアログを開いた時点で見つかった環境から作成します。
-Cygwin や WSL ディストリビューションを追加・削除したときは、登録し直してください。
-
-HKEY_LOCAL_MACHINE に登録されたもの(他のユーザーや管理者が登録したもの)は設定ダイアログからは削除できません。
-HKEY_LOCAL_MACHINE に登録があるときは、状態の 2 行目にその旨を表示します。
-
-設定ダイアログの文言と、ポップアップメニューの `Open settings dialog...`、起動できる項目が無いときの文言は、
-ttlaunch.exe と同じフォルダの ttlaunch.lng から読み込みます。
-ttlaunch.lng は言語ごとのセクション(`[English]`, `[Japanese]` など)に文言を持ち、
-Tera Term の設定(TERATERM.INI の UILanguageFile)で選ばれている言語のセクションを使用します
-(言語名は Tera Term の lng ファイルの `[Info]` の `language=` の括弧より前の部分です)。
-セクションやキーが無いときは英語になります。
-ソースの ttlaunch.lng は UTF-8 で、ビルド時に UTF-16LE に変換して配置します。
 
 ### 登録されるレジストリ
 
