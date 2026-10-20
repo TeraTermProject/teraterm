@@ -7,6 +7,7 @@ add_executable(
   ttlaunch_setup.cpp
   ttlaunch_setup.h
   ttlaunch.rc
+  ttlaunch_manifest.rc
   resource.h
   ../../cygwin/cyglib/cyglib.h
   )
@@ -77,12 +78,13 @@ install(
 if(MSVC)
   # subsystem:windows, but start form wmain()
   if(${CMAKE_VERSION} VERSION_LESS "3.13.0")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:wmainCRTStartup")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:wmainCRTStartup /MANIFEST:NO")
   else()
     target_link_options(
       ${PROJECT_NAME}
       PRIVATE
       /ENTRY:wmainCRTStartup
+      /MANIFEST:NO
       )
   endif()
 endif(MSVC)
