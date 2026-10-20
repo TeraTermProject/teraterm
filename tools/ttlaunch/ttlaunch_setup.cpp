@@ -46,9 +46,11 @@
 #include "ttcommdlg.h"
 #include "ttlib.h"
 #include "i18n.h"
+#include "asprintf.h"
 #include "resource.h"
 #include "ttlaunch.h"
 #include "ttlaunch_setup.h"
+#include "ttlaunch_version.h"
 
 //#define	HERE_LABEL	L"Tera Term &Here";
 #define	HERE_LABEL	L"&Open in Tera Term";
@@ -697,6 +699,17 @@ static INT_PTR CALLBACK SetupDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM 
 
 		// 出力先: レジストリ
 		CheckRadioButton(hDlg, IDC_OUT_REGISTRY, IDC_OUT_REGFILE, IDC_OUT_REGISTRY);
+
+		// バージョン
+		wchar_t *ver;
+		char *ver_substr = GetVersionSubstr();
+		aswprintf(&ver,
+				  L"ttlaunch version %d.%d.%d\r\n%hs",
+				  TTLAUNCH_VERSION_MAJOR, TTLAUNCH_VERSION_MINOR, TTLAUNCH_VERSION_PATCH,
+				  ver_substr);
+		free(ver_substr);
+		SetDlgItemTextW(hDlg, IDC_VERSION, ver);
+		free(ver);
 
 		UpdateSetupDialog(hDlg, data->lang);
 		return TRUE;

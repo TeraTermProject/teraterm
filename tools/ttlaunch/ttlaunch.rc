@@ -1,6 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include "ttlaunch_version.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -85,6 +86,7 @@ BEGIN
     PUSHBUTTON      "&Unregister",IDC_UNREGISTER,96,234,75,14
     LTEXT           "Registry Editor",IDC_REGEDIT_LABEL,6,255,307,8
     PUSHBUTTON      "&Open...",IDC_REGEDIT,15,267,50,14
+    LTEXT           "ttlaunch version X.X.X\nGit Hash",IDC_VERSION,6,288,250,18,SS_LEFTNOWORDWRAP
     DEFPUSHBUTTON   "Close",IDCANCEL,264,290,50,14
 END
 
@@ -114,6 +116,45 @@ IDD_SETUP AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION TTLAUNCH_VERSION_MAJOR,TTLAUNCH_VERSION_MINOR,TTLAUNCH_VERSION_PATCH,0
+ PRODUCTVERSION TTLAUNCH_VERSION_MAJOR,TTLAUNCH_VERSION_MINOR,TTLAUNCH_VERSION_PATCH,0
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "FileDescription", "Tera Term launcher"
+            VALUE "FileVersion", TTLAUNCH_RES_VERSION_STR
+            VALUE "InternalName", "ttlaunch"
+            VALUE "LegalCopyright", "Copyright (C) 2026- TeraTerm Project"
+            VALUE "OriginalFilename", "ttlaunch.exe"
+            VALUE "ProductName", "Tera Term launcher"
+            VALUE "ProductVersion", TTLAUNCH_RES_PRODUCT_VERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+END
+
 
 #endif    // “ú–{Œê (“ú–{) resources
 /////////////////////////////////////////////////////////////////////////////

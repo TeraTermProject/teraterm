@@ -6,6 +6,7 @@ add_executable(
   ttlaunch.h
   ttlaunch_setup.cpp
   ttlaunch_setup.h
+  ttlaunch_version.h
   ttlaunch.rc
   ttlaunch_manifest.rc
   resource.h

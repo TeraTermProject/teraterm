@@ -152,6 +152,9 @@
       <EntryPointSymbol>wmainCRTStartup</EntryPointSymbol>
       <AdditionalLibraryDirectories>$(SolutionDir)..\teraterm\$(Configuration).$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>..\..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
@@ -171,6 +174,9 @@
       <EntryPointSymbol>wmainCRTStartup</EntryPointSymbol>
       <AdditionalLibraryDirectories>$(SolutionDir)..\teraterm\$(Configuration).$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>..\..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -190,6 +196,9 @@
       <EntryPointSymbol>wmainCRTStartup</EntryPointSymbol>
       <AdditionalLibraryDirectories>$(SolutionDir)..\teraterm\$(Configuration).$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>..\..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -213,6 +222,9 @@
       <EntryPointSymbol>wmainCRTStartup</EntryPointSymbol>
       <AdditionalLibraryDirectories>$(SolutionDir)..\teraterm\$(Configuration).$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>..\..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
@@ -236,6 +248,9 @@
       <EntryPointSymbol>wmainCRTStartup</EntryPointSymbol>
       <AdditionalLibraryDirectories>$(SolutionDir)..\teraterm\$(Configuration).$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>..\..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -259,6 +274,9 @@
       <EntryPointSymbol>wmainCRTStartup</EntryPointSymbol>
       <AdditionalLibraryDirectories>$(SolutionDir)..\teraterm\$(Configuration).$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>..\..\teraterm\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ResourceCompile Include="ttlaunch.rc" />
@@ -272,6 +290,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="ttlaunch.h" />
     <ClInclude Include="ttlaunch_setup.h" />
+    <ClInclude Include="ttlaunch_version.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\cygwin\cyglib\cyglib.v16.vcxproj">
