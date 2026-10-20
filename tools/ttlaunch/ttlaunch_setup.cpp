@@ -478,8 +478,9 @@ static std::wstring RegEntriesToText(const std::vector<RegEntry> &entries)
  */
 static bool WriteTextFile(const std::wstring &path, const std::wstring &text)
 {
-	FILE *fp = _wfopen(path.c_str(), L"wb");
-	if (fp == NULL) {
+	FILE *fp;
+	errno_t e = _wfopen_s(&fp, path.c_str(), L"wb");
+	if (e != 0 || fp == NULL) {
 		return false;
 	}
 	static const unsigned char bom[] = { 0xff, 0xfe };
