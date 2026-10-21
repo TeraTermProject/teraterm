@@ -150,7 +150,14 @@ jobs:
       run: |
         git checkout .
 
+    # msys2term.exe のビルドに使用する
+    #   installer/build_common.bat は C:\msys64 の make, gcc を使用するため、
+    #   新規インストール(RUNNER_TEMP)ではなくランナーにインストール済みの C:\msys64 を使う
     - uses: msys2/setup-msys2@v2
+      with:
+        msystem: MSYS
+        release: false
+        install: make gcc
 
     - name: Create buildinfo.json
       shell: bash
