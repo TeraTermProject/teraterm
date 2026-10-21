@@ -11,7 +11,16 @@ add_executable(
   ttlaunch_manifest.rc
   resource.h
   ../../cygwin/cyglib/cyglib.h
-  )
+)
+
+if(MSVC)
+  target_compile_options(${PROJECT_NAME}
+    PRIVATE
+    /W4
+    #/U_CRT_SECURE_NO_DEPRECATE
+    #/sdl
+    $<$<CONFIG:Debug>:/GS>)
+endif()
 
 if(SUPPORT_OLD_WINDOWS)
   if(MSVC)
