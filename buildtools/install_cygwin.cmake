@@ -48,12 +48,12 @@ endif()
 
 # install packages
 execute_process(
-  COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --upgrade-also --packages cmake,bash,tar,make,perl,perl-HTML-Parser,gcc-core,gcc-g++,icoutils,libiconv
+  COMMAND ${SETUP} --quiet-mode --wait --no-admin --no-write-registry --no-shortcuts --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --upgrade-also --packages cmake,bash,tar,make,perl,perl-HTML-Parser,gcc-core,gcc-g++,icoutils,libiconv
   WORKING_DIRECTORY ${CYGWIN_ROOT}
 )
 # install packages for notify
 execute_process(
-  COMMAND ${SETUP} --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --upgrade-also --packages perl-JSON,perl-LWP-Protocol-https
+  COMMAND ${SETUP} --quiet-mode --wait --no-admin --no-write-registry --no-shortcuts --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --upgrade-also --packages perl-JSON,perl-LWP-Protocol-https
   WORKING_DIRECTORY ${CYGWIN_ROOT}
 )
 
@@ -96,7 +96,7 @@ endif()
 
 # install packages
 execute_process(
-  COMMAND ${SETUP} -X --quiet-mode --wait --no-admin --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --packages cygwin32-gcc-g++
+  COMMAND ${SETUP} -X --quiet-mode --wait --no-admin --no-write-registry --no-shortcuts --root ${CYGWIN_ROOT} --site ${DOWNLOAD_SITE} --local-package-dir ${PACKAGE} --packages cygwin32-gcc-g++
   WORKING_DIRECTORY ${CYGWIN_ROOT}
 )
 

@@ -27,7 +27,7 @@ TeraTerm Project でのリリース手順について以下に示します。
 <h2 id="start-rc">リリース作業の開始</h2>
 
 <ol class="release">
-  <li>チケット、ブランチなどを確認する
+  <li id="init-issues">issue、ブランチなどを確認する
     <ul>
       <li>プロジェクトチーム内で確認する
         <ul>
@@ -53,7 +53,7 @@ TeraTerm Project でのリリース手順について以下に示します。
       <li>この時点で新たに出てくるチケットの対応を検討する</li>
     </ul>
   </li>
-  <li>ツール、ライブラリ、インポート元の最新版をチェックする
+  <li id="init-libs">ツール、ライブラリ、インポート元の最新版をチェックする
     <ul>
       <li>Visual Studio (「更新プログラムの確認」から更新する)</li>
       <li>Inno Setup (<a href="https://jrsoftware.org/isdl.php" target="_blank">https://jrsoftware.org/isdl.php</a>)</li>
@@ -72,20 +72,20 @@ TeraTerm Project でのリリース手順について以下に示します。
     <p>リリースに使うライブラリのバージョンはこの時点でおおむね決定する。</p>
     <p>安定版リリースでは、ライブラリは元になった定期リリースから更新しない。（ライブラリにセキュリティ修正がある場合は個別に検討する。）</p>
   </li>
-  <li>今回のリリースに入れたいものが落ち着く</li>
+  <li id="init-settle_down">今回のリリースに入れたいものが落ち着く</li>
 </ol>
 
 <h2 id="rc-release">RC 作成とその後</h2>
 
 <ol class="release">
-  <li>RC 作業ブランチを作成する（main ブランチ、または安定版リリース用ブランチから）
+  <li id="rc-work_branch">RC 作業ブランチを作成する（main ブランチ、または安定版リリース用ブランチから）
 <pre>
 git switch main
 git pull --rebase
 git checkout -b release/5_6_0-RC
 </pre>
   </li>
-  <li>ドキュメントを確認する
+  <li id="rc-doc">ドキュメントを確認する
     <ul>
       <li>ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。</li>
       <li>ドキュメント変更点が翻訳されていることを確認し、翻訳忘れがあれば翻訳する。</li>
@@ -100,7 +100,7 @@ git checkout -b release/5_6_0-RC
       </li>
     </ul>
   </li>
-  <li>この年における最初のリリースの場合は、著作権表示の「最後の発行の年」をインクリメントする
+  <li id="rc-year">この年における最初のリリースの場合は、著作権表示の「最後の発行の年」をインクリメントする
     <ul>
       <li>teraterm\keycode\keycode-version.rc // VERSIONINFO</li>
       <li>teraterm\teraterm\tt-version.rc // VERSIONINFO</li>
@@ -124,7 +124,7 @@ git checkout -b release/5_6_0-RC
     </ul>
     例: <a href="https://github.com/TeraTermProject/teraterm/commit/51abc3f9a8dd5a19a91019feefe6bbb26ed4f36f">年をインクリメントするコミット</a>
   </li>
-  <li>バージョンをインクリメントする
+  <li id="rc-bumpup">バージョンをインクリメントする
     <ul>
       <li>
         teraterm\common\tt-version.h<br>
@@ -148,26 +148,22 @@ git checkout -b release/5_6_0-RC
     </ul>
     例: <a href="https://github.com/TeraTermProject/teraterm/commit/a901021a1fcc99ba584c3ce083f0395076bef2b8">バージョンをインクリメントするコミット</a>
   </li>
-  <li>インストーラを作成する（確認用）</li>
-  <li>サポートされている全 OS でインストーラの実行、起動、接続をチェックする</li>
-  <li>コミット、push する</li>
-  <li>作業ブランチをマージするための <a href="https://github.com/TeraTermProject/teraterm/pulls" target="_blank">Pull Request</a> を作成する</li>
-  <li id="RC_commit">Pull Request をマージする（main ブランチ、または定期リリース用ブランチへ）</li>
-  <li><a href="https://github.com/TeraTermProject/teraterm/actions" target="_blank">GitHub Actions</a> で workflow が実行されてビルドされる<br>
+  <li id="rc-installer">インストーラを作成する（確認用）</li>
+  <li id="rc-installer_check">サポートされている全 OS でインストーラの実行、起動、接続をチェックする</li>
+  <li id="rc-push">コミット、push する</li>
+  <li id="rc-pr">作業ブランチをマージするための <a href="https://github.com/TeraTermProject/teraterm/pulls" target="_blank">Pull Request</a> を作成する</li>
+  <li id="rc-merge">Pull Request をマージする（main ブランチ、または定期リリース用ブランチへ）</li>
+  <li id="rc-build"><a href="https://github.com/TeraTermProject/teraterm/actions" target="_blank">GitHub Actions</a> で workflow が実行されてビルドされる<br>
     ビルドは3回実行されます:
     <ul>
-      <li>作業ブランチへの push</li>
-      <li>Pull Request の作成</li>
-      <li>main ブランチ、または安定版ブランチへのマージコミット</li>
+      <li>作業ブランチへの <a href="#rc-push">push</a> <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22444778041">(例)</a></li>
+      <li>Pull Request の<a href="#rc-pr">作成</a> <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22444816454">(例)</a></li>
+      <li>main ブランチ、または安定版ブランチへの<a href="#rc-merge">マージコミット</a> <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22450625364">(例)</a></li>
     </ul>
-    例: ビルド
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22444778041">1</a>,
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22444816454">2</a>,
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22450625364">3</a><br>
-    RC の作成では「マージコミットによるビルドバイナリ」を RC 成果物とします。
+	RC の作成では「マージコミットによるビルドバイナリ」を RC 成果物とします。
   </li>
   <!-- ローカルでリリースビルドする場合は、この時点で再度インストーラを作成する。コミットハッシュが変わっているため。 -->
-  <li>RCの作成をアナウンスする
+  <li id="rc-announce">RCの作成をアナウンスする
     <ul>
       <li>X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)</li>
       <li>問題の報告は <a href="../about/contacts.html">ここ</a> にあるように GitHub の <a href="https://github.com/TeraTermProject/teraterm/issues" target="_blank">Issues</a> を案内する。</li>
@@ -175,20 +171,14 @@ git checkout -b release/5_6_0-RC
       <li>例: <a href="https://x.com/Tera_Term/status/2027058083479069022">5.6.0 RC</a></li>
     </ul>
   </li>
-  <li>作業ブランチを削除する</li>
-  <li>フィードバックを受け入れる<br>
+  <li id="rc-del_work_branch">作業ブランチを削除する</li>
+  <li id="rc-receive_feedback">フィードバックを受け入れる<br>
     修正が入ったら再度「ドキュメントを確認する」「サポートされている全 OS で起動・接続チェックする」
   </li>
-  <li>RC2 を出す場合は、この項目の手順を作業ブランチの作成から再度行う</li>
-</ol>
-
-<h2 id="release-operation">リリース作業</h2>
-
-<ol class="release">
-  <li>アナウンス文面を考えておく
+  <li id="rc-announce_text">アナウンス文面を考えておく
     <ul>
       <li>
-        <a href="#github_release">GitHub の Release</a> 用<br>
+        <a href="#rel-github_release">GitHub の Release</a> 用<br>
         ドキュメントの変更履歴からリリースノートの概要をまとめる（日本語・英語ともに）<br>
         ユーザに影響の大きい数項目をピックアップする<br>
         例: <a href="https://github.com/TeraTermProject/teraterm/releases/tag/v5.6.0">5.6.0</a>
@@ -200,15 +190,21 @@ git checkout -b release/5_6_0-RC
       </li>
     </ul>
   </li>
-  <li>作業ブランチを作成する（main ブランチ、または安定版リリース用ブランチから）
+  <li id="rc-again">RC2 を出す場合は、この項目の手順を作業ブランチの作成から再度行う</li>
+</ol>
+
+<h2 id="release-operation">リリース作業</h2>
+
+<ol class="release">
+  <li id="rel-work_branch">作業ブランチを作成する（main ブランチ、または安定版リリース用ブランチから）
 <pre>
 git switch main
 git pull --rebase
 git checkout -b release/5_6_0
 </pre>
   </li>
-  <li>ドキュメントを確認する (詳細は同上)</li>
-  <li>リリース日を変更し、"RC" を削除する ("コメントアウトした dev" にする)
+  <li id="rel-doc">ドキュメントを確認する (詳細は同上)</li>
+  <li id="rel-bumpup">リリース日を変更し、"RC" を削除する ("コメントアウトした dev" にする)
     <ul>
       <li>html/about/history.html</li>
     </ul>
@@ -228,15 +224,15 @@ git checkout -b release/5_6_0
     </ul>
     例: <a href="https://github.com/TeraTermProject/teraterm/commit/96c23a5a90fb42da70e555f9f419163fa829c384">リリース日を変更し、"RC" を削除するコミット</a>
   </li>
-  <li>インストーラを作成する（確認用）
+  <li id="rel-installer">インストーラを作成する（確認用）
     <div>
       ビルド・インストーラの生成がエラーなくできることを確認する。
     </div>
   </li>
-  <li>push する <a href="#login_signpath">*</a></li>
-  <li>作業ブランチをマージするための <a href="https://github.com/TeraTermProject/teraterm/pulls" target="_blank">Pull Request</a> を作成する <a href="#login_signpath">*</a></li>
-  <li>Pull Request をマージする（main ブランチ、または定期リリース用ブランチへ） <a href="#login_signpath">*</a></li>
-  <li>タグを作成し、push する <a href="#login_signpath">*</a>
+  <li id="rel-push">push する <a href="#login_signpath">*</a></li>
+  <li id="rel-pr">作業ブランチをマージするための <a href="https://github.com/TeraTermProject/teraterm/pulls" target="_blank">Pull Request</a> を作成する <a href="#login_signpath">*</a></li>
+  <li id="rel-merge">Pull Request をマージする（main ブランチ、または定期リリース用ブランチへ） <a href="#login_signpath">*</a></li>
+  <li id="rel-tag">タグを作成し、push する <a href="#login_signpath">*</a>
     <div>
       タグは annotated tags とする。<br/>
       タグ名は「v(バージョン)」。（例: 5.6.0ならば "v5.6.0" ）
@@ -251,53 +247,51 @@ git push origin v5.6.0
   <li><a href="https://github.com/TeraTermProject/teraterm/actions" target="_blank">GitHub Actions</a> で workflow が実行されてビルドされる<br>
     ビルドは4回実行されます:
     <ul>
-      <li>作業ブランチへの push</li>
-      <li>Pull Request の作成</li>
-      <li>main ブランチ、または安定版ブランチへのマージコミット</li>
-      <li>タグの作成</li>
+      <li>作業ブランチへの <a href="#rel-push">push</a> <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22512075622">(例)</a></li>
+      <li>Pull Request の<a href="#rel-pr">作成 <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22512366332">(例)</a></li>
+      <li>main ブランチ、または安定版ブランチへの<a href="#rel-merge">マージコミット <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22513910434">(例)</a></li>
+      <li>タグの<a href="#rel-tag">作成</a> <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22514106296">(例)</a></li>
     </ul>
-    例: ビルド
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22512075622">1</a>,
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22512366332">2</a>,
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22513910434">3</a>,
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22514106296">4</a><br>
     リリースでは「タグの作成によるビルドバイナリ」をリリース成果物とします。<br>
     <span id="login_signpath">リリース時には workflow が SignPath にコード署名をリクエストしますが、SignPath の release-signing ポリシーは手動で承認が必要です。そのため workflow は途中で署名リクエストが承認されるのを待ちます。したがって、<a href="https://about.signpath.io/" target="_blank">SignPath.io</a> にログインしておき、署名リクエストを Approve します。</span>
   </li>
   <!-- ローカルでリリースビルドする場合は、この時点で再度インストーラを作成する。コミットハッシュが変わっているため。 -->
-  <li>作業ブランチを削除する</li>
-  <li id="github_release">GitHub の <a href="https://github.com/TeraTermProject/teraterm/releases" target="_blank">Releases</a> に追加する
+  <li id="rel-del_work_branch">作業ブランチを削除する</li>
+  <li id="rel-github_release">GitHub の <a href="https://github.com/TeraTermProject/teraterm/releases" target="_blank">Releases</a> に追加する
     <ul>
       <li>上で追加したタグを選択する</li>
       <li>インストーラとポータブル版の zip ファイルとハッシュファイルを追加する</li>
       <li>リリースノートの概要を記述する</li>
     </ul>
   </li>
-  <li>ウイルス対策ソフトの検知を確認する
-    <ul>
-      <li>Chrome でダウンロードしてみる</li>
-      <li>Edge でダウンロードしてみる<br>
-          Edge は「Defender SmartScreen」は「一般的にダウンロードされていません」の警告を出す。これを正しくない検知として報告する。
-      </li>
-    </ul>
-  </li>
-  <li>プロジェクトWebページ (<a href="https://teratermproject.github.io" target="_blank">https://teratermproject.github.io</a>) を更新する
+  <li id="rel-antivirus">ウイルス対策ソフトの検知を確認する
     <div>
-      更新のしかたは <a href="https://github.com/TeraTermProject/teraterm/wiki/Update-Project-page" target="_blank">プロジェクトページの更新手順</a> を参照
+      <ul>
+        <li>Chrome でダウンロードしてみる</li>
+        <li>Firefox でダウンロードしてみる</li>
+        <li>Edge でダウンロードしてみる<br>
+            Edge は「Defender SmartScreen」が「一般的にダウンロードされていません」の警告を出したら、これを正しくない検知として報告する。
+        </li>
+      </ul>
+    </div>
+    <div>
+      ダウンロードしたファイルを実行すると、SmartScreen が「WindowsによってPCが保護されました」という警告を出すことがある。<br>
+      これが解消されないと、窓の杜はインストーラを掲載しない。
+    </div>
+    <div>
+      ウイルス対策ソフトが誤検出することがある。<br>
+      keycode.exe がキーロガーとして検出されやすいらしい。
+    </div>
+    <div>
+      Microsoft には誤検出の申し立てができる。「PCが保護されました」の解消のため報告する。
+      <ul>
+        <li>Microsoft アカウントでログインする</li>
+        <li>https://www.microsoft.com/en-us/wdsi/filesubmission にアクセスする</li>
+        <li>"Software developer" を選んで報告する</li>
+      </ul>
     </div>
   </li>
-  <li id="X_announce">リリースをアナウンスする
-    <ul>
-      <li>
-        X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)
-        <ul>
-          <li>アナウンスをポストする。</li>
-          <li>そのポストを固定する。</li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-  <li>安定版ブランチを作成し、push する（定期リリースの場合のみ）
+  <li id="rel-new_stable_branch">安定版ブランチを作成し、push する（定期リリースの場合のみ）
 <pre>
 git switch main
 git pull --rebase
@@ -305,7 +299,7 @@ git checkout -b stable_5_6
 git push -u origin stable_5_6
 </pre>
   </li>
-  <li id="increment_version">次のリリースに向けてバージョンをインクリメントする
+  <li id="rel-bumpup_next_version">次のリリースに向けてバージョンをインクリメントする
     <p>定期リリースの場合</p>
     <ul>
       <li>
@@ -442,9 +436,8 @@ git checkout -b release/unfroze
       </li>
     </ul>
   </li>
-  <li>変更履歴を修正する（安定版リリースの場合のみ）
+  <li id="rel-merge_changelog">main ブランチの変更履歴を修正する（安定版リリースの場合のみ）
     <div>
-      main ブランチを修正する。<br>
       安定版リリースの変更履歴をコピーし、安定版に組み込んだ修正の変更履歴を定期リリースからは削除する。
     </div>
 <pre>
@@ -461,7 +454,25 @@ git checkout -b port/changelog
       <li>作業ブランチを削除する</li>
     </ul>
   </li>
-  <li>GitHub の <a href="https://github.com/TeraTermProject/teraterm/milestones">Milestones</a> を調整する（定期リリースの場合のみ）
+  <li id="rel-update_web">プロジェクトWebページ (<a href="https://teratermproject.github.io" target="_blank">https://teratermproject.github.io</a>) を更新する
+    <ul>
+      <li>ウェブサイトのバージョン番号を更新する (<a href="https://github.com/TeraTermProject/web/commit/6768c8eba97d042f3ad67f12004e901b115c8c81">例</a>)</li>
+      <li>main のマニュアルは上記の手順で更新済み</li>
+      <li>反映のしかたは <a href="https://github.com/TeraTermProject/teraterm/wiki/Update-Project-page" target="_blank">プロジェクトページの更新手順</a> を参照</li>
+    </ul>
+  </li>
+  <li id="rel-X_announce">リリースをアナウンスする
+    <ul>
+      <li>
+        X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)
+        <ul>
+          <li>アナウンスをポストする。</li>
+          <li>そのポストを固定する。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li id="rel-github_milestone">GitHub の <a href="https://github.com/TeraTermProject/teraterm/milestones">Milestones</a> を調整する（定期リリースの場合のみ）
     <ul>
       <li>リリースしたバージョンの Milestone を close する。</li>
       <li>次の定期リリースバージョンの Milestone （例: "5.5.0"）を作成する。</li>
@@ -470,34 +481,13 @@ git checkout -b port/changelog
     </ul>
     安定版リリースのマイルストーンは作成しません。
   </li>
-  <li>次の安定版リリースのための、安定版ブランチへのマージ管理用の issue を作成する
+  <li id="rel-issue">次の安定版リリースのための、安定版ブランチへのマージ管理用の issue を作成する
     <p>
-      Needs MFC の issue はこの issue で管理する。<br>
+      main から stable へのマージが必要な issue (Needs MFC) を、この issue で管理する。<br>
       例: <a href="https://github.com/TeraTermProject/teraterm/issues/1436">#1436</a>
     </p>
   </li>
-  <li>インストーラバイナリのダウンロードに関する確認をする
-    <div>
-      ダウンロードしたファイルを実行すると、SmartScreen が「WindowsによってPCが保護されました」という警告を出すことがある。<br>
-      これが解消されないと、窓の杜はインストーラを掲載しない。
-    </div>
-    <div>
-      Microsoft Edge でダウンロードすると、SmartScreen が「一般的にダウンロードされていません」という警告を出す。
-    </div>
-    <div>
-      ウイルス対策ソフトが誤検出することがある。<br>
-      keycode.exe がキーロガーとして検出されやすいらしい。
-    </div>
-    <div>
-      Microsoft には誤検出の申し立てができる。「PCが保護されました」の解消のため報告する。
-      <ul>
-        <li>Microsoft アカウントでログインする</li>
-        <li>https://www.microsoft.com/en-us/wdsi/filesubmission にアクセスする</li>
-        <li>"Software developer" を選んで報告する</li>
-      </ul>
-    </div>
-  </li>
-  <li>Chocolatey (<a href="https://community.chocolatey.org/packages/teraterm5" target="_blank">https://community.chocolatey.org/packages/teraterm5</a>) を更新する
+  <li id="rel-chocolatey">Chocolatey (<a href="https://community.chocolatey.org/packages/teraterm5" target="_blank">https://community.chocolatey.org/packages/teraterm5</a>) を更新する
     <div>
       更新のしかたは wiki の <a href="https://github.com/TeraTermProject/teraterm/wiki/Chocolatey" target="_blank">Chocolatey</a> を参照
     </div>
@@ -512,7 +502,7 @@ git checkout -b port/changelog
 
 <p>
 コードフリース中は、原則的には致命的なバグの修正のみ可能となります。<br>
-コードフリーズは、RC作成（<a href="#RC_commit">teraterm.iss に RC を付けるコミット</a>）から（<a href="#increment_version">バージョンをインクリメントするコミット</a>）までとします。
+コードフリーズは、RC作成（<a href="#rc-merge">teraterm.iss に RC を付けるコミット</a>）から（<a href="#rel-bumpup_next_version">バージョンをインクリメントするコミット</a>）までとします。
 </p>
 
 </body>
