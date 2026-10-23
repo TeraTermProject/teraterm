@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Korean(한국어)
-date=2026-09-09 by TeraTerm Project
+date=2026-10-11 by TeraTerm Project
 contributor=Daeehong Kim (2013-07-25)
 
 [Tera Term]
@@ -428,6 +428,8 @@ DLG_SERIAL_OK_CONNECTION=Connect with &New window
 DLG_SERIAL_OK_OPEN=&New open
 DLG_SERIAL_OK_CLOSEOPEN=Close and &New open
 DLG_SERIAL_OK_RESET=&New setting
+DLG_SERIAL_DEVICE_MANAGER_PROPERTIES=Device Manager Properties
+DLG_SERIAL_RUN_AS_ADMINISTRATOR=Run as administrator
 
 ; edit history
 DLG_TCPIP_ADD=추가(&A)

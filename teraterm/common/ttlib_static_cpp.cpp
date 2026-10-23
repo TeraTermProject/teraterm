@@ -71,12 +71,25 @@ static const wchar_t *invalidFileNameCharsW = L"\\/:*?\"<>|";
  *		可変引数の1つ目を書式化文字列として使用する
  */
 
-static void CALLBACK TTMessageBoxW_WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
+/*
+ *	MessageBox を親ウィンドウの中央へ移動するための CBT hook
+ *
+ *	以前は SetWinEventHook(WINEVENT_OUTOFCONTEXT) を使用していたが、
+ *	ReactOS 0.4.15 で hook 中に接続処理が進まなくなった
+ *	CBT hook は自スレッド内で同期的に呼ばれ、Windows 95 でも使用できる
+ */
+static HHOOK TTMessageBoxW_CBTHook;
+static BOOL TTMessageBoxW_Centered;
+
+static LRESULT CALLBACK TTMessageBoxW_CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-	if ((GetWindowLongPtr(hwnd, GWL_STYLE) & WS_CHILD) == 0) {
+	if (nCode == HCBT_ACTIVATE && !TTMessageBoxW_Centered) {
+		// MessageBox がアクティブになる直前
+		HWND hwnd = (HWND)wParam;
 		CenterWindow(hwnd, GetParent(hwnd));
-		pUnhookWinEvent(hWinEventHook);
+		TTMessageBoxW_Centered = TRUE;
 	}
+	return CallNextHookEx(TTMessageBoxW_CBTHook, nCode, wParam, lParam);
 }
 
 int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILanguageFile, ...)
@@ -108,15 +121,24 @@ int TTMessageBoxW(HWND hWnd, const TTMessageBoxInfoW *info, const wchar_t *UILan
 		free(format);
 	}
 
+	// MessageBox 表示中に TTMessageBoxW() が呼ばれた場合に備えて退避しておく
+	HHOOK prev_hook = TTMessageBoxW_CBTHook;
+	BOOL prev_centered = TTMessageBoxW_Centered;
+	HHOOK hook = NULL;
 	if (hWnd != NULL) {
 		// ウィンドウを親ウィンドウの中央へ移動する
-		if (pSetWinEventHook != NULL) {
-			pSetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, &TTMessageBoxW_WinEventProc,
-							 GetCurrentProcessId(), GetCurrentThreadId(), WINEVENT_OUTOFCONTEXT);
-		}
+		TTMessageBoxW_Centered = FALSE;
+		hook = SetWindowsHookExA(WH_CBT, TTMessageBoxW_CBTProc, NULL, GetCurrentThreadId());
+		TTMessageBoxW_CBTHook = hook;
 	}
 
 	int r = MessageBoxW(hWnd, message, title, uType);
+
+	if (hook != NULL) {
+		UnhookWindowsHookEx(hook);
+		TTMessageBoxW_CBTHook = prev_hook;
+		TTMessageBoxW_Centered = prev_centered;
+	}
 
 	free(title);
 	free(message);
@@ -1379,6 +1401,34 @@ BOOL IsWindowsVerOrLater(DWORD dwMajorVersion, DWORD dwMinorVersion)
 BOOL IsWindowsXPOrLater(void)
 {
 	return IsWindowsVerOrLater(5, 1);
+}
+
+/**
+ *	プロセスが管理者権限に昇格しているか
+ *
+ *	@retval		TRUE	昇格している, または UAC がない環境(XP 以前)
+ *	@retval		FALSE	昇格していない
+ */
+BOOL IsProcessElevated(void)
+{
+#if _MSC_VER == 1400  // VS2005(VC8.0)
+	typedef struct _TOKEN_ELEVATION {
+		DWORD TokenIsElevated;
+	} TOKEN_ELEVATION;
+	const int TokenElevation = 20;
+#endif
+	BOOL elevated = TRUE;
+	HANDLE hToken;
+	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
+		TOKEN_ELEVATION te;
+		DWORD len;
+		if (GetTokenInformation(hToken, (TOKEN_INFORMATION_CLASS)TokenElevation, &te, sizeof(te), &len)) {
+			// 0は昇格していない、非0は昇格している
+			elevated = (te.TokenIsElevated != 0);
+		}
+		CloseHandle(hToken);
+	}
+	return elevated;
 }
 
 /**

@@ -48,6 +48,7 @@ typedef struct {
 
 ComPortInfo_t *ComPortInfoGet(int *count);
 void ComPortInfoFree(ComPortInfo_t *info, int count);
+int ComPortInfoShowDeviceProperties(const ComPortInfo_t *info, HWND hWndParent, BOOL allow_elevation, DCB *dcb);
 
 #ifdef __cplusplus
 }

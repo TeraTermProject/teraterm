@@ -111,6 +111,8 @@ DWORD WINAPI _GetTabbedTextExtentW(HDC hdc, LPCWSTR lpString, int chCount,
 								   int nTabPositions, const int *lpnTabStopPositions);
 HRSRC WINAPI _FindResourceW(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType);
 BOOL WINAPI _CreateDirectoryW(LPCWSTR lpPathName,LPSECURITY_ATTRIBUTES lpSecurityAttributes);
+BOOL WINAPI _CommConfigDialogW(LPCWSTR lpszName, HWND hWnd, LPCOMMCONFIG lpCC);
+BOOL WINAPI _GetDefaultCommConfigW(LPCWSTR lpszName, LPCOMMCONFIG lpCC, LPDWORD lpdwSize);
 
 // gdi32.lib
 int WINAPI _AddFontResourceW(LPCWSTR lpFileName);
