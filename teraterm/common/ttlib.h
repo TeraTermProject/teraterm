@@ -131,6 +131,7 @@ DllExport BOOL IsWindowsNTKernel();
 DllExport BOOL IsWindows2000();
 DllExport BOOL IsWindows2000OrLater();
 BOOL IsWindowsXPOrLater(void);
+BOOL IsProcessElevated(void);
 DllExport BOOL IsWindowsVistaOrLater();
 DllExport BOOL IsWindows7OrLater();
 DllExport BOOL HasMultiMonitorSupport();

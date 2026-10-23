@@ -139,6 +139,8 @@ set(SRC_DIALOG
   sendfiledlg.h
   serial_pp.cpp
   serial_pp.h
+  serial_pp.rc
+  serial_pp_res.h
   setupdirdlg.cpp
   setupdirdlg.h
   tekfont_pp.cpp

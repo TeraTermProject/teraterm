@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Portuguese (Português) - Brazil
-date=2026-09-09 by TeraTerm Project
+date=2026-10-11 by TeraTerm Project
 contributor=Waldemar Vaz Passarinho Neto (2025-05-07)
 
 [Tera Term]
@@ -425,6 +425,8 @@ DLG_SERIAL_OK_CONNECTION=Conectar com &nova janela
 DLG_SERIAL_OK_OPEN=&Nova abertura
 DLG_SERIAL_OK_CLOSEOPEN=Fechar e &abrir novamente
 DLG_SERIAL_OK_RESET=&Nova configuração
+DLG_SERIAL_DEVICE_MANAGER_PROPERTIES=Device Manager Properties
+DLG_SERIAL_RUN_AS_ADMINISTRATOR=Run as administrator
 
 ; edit history
 DLG_TCPIP_ADD=&Adicionar

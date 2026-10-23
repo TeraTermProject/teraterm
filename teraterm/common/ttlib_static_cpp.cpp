@@ -1404,6 +1404,34 @@ BOOL IsWindowsXPOrLater(void)
 }
 
 /**
+ *	プロセスが管理者権限に昇格しているか
+ *
+ *	@retval		TRUE	昇格している, または UAC がない環境(XP 以前)
+ *	@retval		FALSE	昇格していない
+ */
+BOOL IsProcessElevated(void)
+{
+#if _MSC_VER == 1400  // VS2005(VC8.0)
+	typedef struct _TOKEN_ELEVATION {
+		DWORD TokenIsElevated;
+	} TOKEN_ELEVATION;
+	const int TokenElevation = 20;
+#endif
+	BOOL elevated = TRUE;
+	HANDLE hToken;
+	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
+		TOKEN_ELEVATION te;
+		DWORD len;
+		if (GetTokenInformation(hToken, (TOKEN_INFORMATION_CLASS)TokenElevation, &te, sizeof(te), &len)) {
+			// 0は昇格していない、非0は昇格している
+			elevated = (te.TokenIsElevated != 0);
+		}
+		CloseHandle(hToken);
+	}
+	return elevated;
+}
+
+/**
  *	DeleteComment の wchar_t 版
  */
 wchar_t *DeleteCommentW(const wchar_t *src)

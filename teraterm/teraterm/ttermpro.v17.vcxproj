@@ -535,6 +535,7 @@
     <ClInclude Include="debug_pp.h" />
     <ClCompile Include="debug_pp.cpp" />
     <ClInclude Include="serial_pp.h" />
+    <ClInclude Include="serial_pp_res.h" />
     <ClInclude Include="tekfont_pp.h" />
     <ClInclude Include="tekfont_pp_res.h" />
     <ClInclude Include="term_pp.h" />
@@ -565,6 +566,7 @@
     <ResourceCompile Include="font_pp.rc" />
     <ResourceCompile Include="mouse_pp.rc" />
     <ResourceCompile Include="plugin_pp.rc" />
+    <ResourceCompile Include="serial_pp.rc" />
     <ResourceCompile Include="tekfont_pp.rc" />
     <ResourceCompile Include="teraterm_manifest.rc" />
     <ResourceCompile Include="themedlg.rc" />
