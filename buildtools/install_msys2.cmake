@@ -21,6 +21,8 @@ set(ENV{LANG} "C")
 # ホストの msys2/cygwin 環境の影響を受けないようにする
 set(ENV{MSYSTEM} "MSYS")
 set(ENV{CHERE_INVOKING} "1")
+# pacman のフック(install-info 等)がコマンドを見つけられるようにする
+set(ENV{PATH} "${MSYS_ROOT}/usr/bin;$ENV{PATH}")
 
 if(NOT EXISTS "${PACMAN}")
   # msys2-base をダウンロード
@@ -49,6 +51,18 @@ if(NOT EXISTS "${PACMAN}")
   )
 endif()
 
+# 証明書ストアを更新
+#  /etc/pki/ca-trust/source/anchors/ に追加した証明書を反映する
+execute_process(
+  COMMAND ${BASH} -l -c "update-ca-trust"
+  WORKING_DIRECTORY ${MSYS_ROOT}
+  RESULT_VARIABLE rv
+  ENCODING NONE
+)
+if(NOT rv EQUAL 0)
+  message(WARNING "update-ca-trust failed (${rv})")
+endif()
+
 # update
 #  コア (msys2-runtime 等) の更新でプロセスが終了することがあるため 2 回実行する
 execute_process(
@@ -73,7 +87,3 @@ execute_process(
   WORKING_DIRECTORY ${MSYS_ROOT}
   ENCODING NONE
 )
-
-# Tera Term
-#  mingw-w64-i686-cmake mingw-w64-i686-gcc mingw-w64-i686-clang
-#  mingw-w64-x86_64-cmake mingw-w64-x86_64-gcc mingw-w64-x86_64-clang
