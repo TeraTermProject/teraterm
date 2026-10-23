@@ -33,6 +33,7 @@
 //
 
 #include <windows.h>
+#include <shlobj.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -390,9 +391,9 @@ static LSTATUS RegDeleteKeyRecursive(HKEY root, const std::wstring &key)
 }
 
 /**
- *	レジストリ操作を HKEY_CURRENT_USER に適用する
+ *	レジストリ操作を HKEY_CURRENT_USER に適用する (ApplyRegEntries() から呼ばれる)
  */
-static LSTATUS ApplyRegEntries(const std::vector<RegEntry> &entries)
+static LSTATUS ApplyRegEntriesSub(const std::vector<RegEntry> &entries)
 {
 	for (size_t i = 0; i < entries.size(); i++) {
 		const RegEntry &e = entries[i];
@@ -426,6 +427,20 @@ static LSTATUS ApplyRegEntries(const std::vector<RegEntry> &entries)
 		}
 	}
 	return ERROR_SUCCESS;
+}
+
+/**
+ *	レジストリ操作を HKEY_CURRENT_USER に適用する
+ *
+ *	エクスプローラーは関連付けをキャッシュしているため、変更を通知する
+ *	通知しないと、デスクトップのコンテキストメニューに反映されないことがある
+ *	途中で失敗しても一部は変更されているため、常に通知する
+ */
+static LSTATUS ApplyRegEntries(const std::vector<RegEntry> &entries)
+{
+	const LSTATUS r = ApplyRegEntriesSub(entries);
+	SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+	return r;
 }
 
 /**
