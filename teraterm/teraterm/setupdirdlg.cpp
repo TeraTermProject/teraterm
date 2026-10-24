@@ -55,85 +55,48 @@
 
 #include "setupdirdlg.h"
 
-// Virtual Storeが有効であるかどうかを判別する。
-//
-// [Windows 95-XP]
-// return FALSE (always)
-//
-// [Windows Vista-10]
-// return TRUE:  Virtual Store Enabled
-//        FALSE: Virtual Store Disabled or Unknown
-//
+/**
+ *	Virtual Storeが有効であるかどうかを判別する。
+ *
+ *	Windows 95-XP では常に FALSE
+ *
+ *	@retval	TRUE	Virtual Store Enabled (Vista以降, UAC有効, 非昇格)
+ *	@retval	FALSE	Virtual Store Disabled or Unknown
+ */
 static BOOL GetVirtualStoreEnvironment(void)
 {
-#if _MSC_VER == 1400  // VSC2005(VC8.0)
-	typedef struct _TOKEN_ELEVATION {
-		DWORD TokenIsElevated;
-	} TOKEN_ELEVATION, *PTOKEN_ELEVATION;
-	int TokenElevation = 20;
-#endif
-	BOOL ret = FALSE;
-	int flag = 0;
-	HANDLE          hToken;
-	DWORD           dwLength;
-	TOKEN_ELEVATION tokenElevation;
-	LONG lRet;
-	HKEY hKey;
-	char lpData[256];
-	DWORD dwDataSize;
-	DWORD dwType;
-	BYTE bValue;
-
 	// Windows Vista以前は無視する。
-	if (!IsWindowsVistaOrLater())
-		goto error;
+	if (!IsWindowsVistaOrLater()) {
+		return FALSE;
+	}
 
 	// UACが有効かどうか。
 	// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\SystemのEnableLUA(DWORD値)が0かどうかで判断できます(0はUAC無効、1はUAC有効)。
-	flag = 0;
-	lRet = RegOpenKeyExA(HKEY_LOCAL_MACHINE,
-						 "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
-						 0, KEY_QUERY_VALUE, &hKey);
-	if (lRet == ERROR_SUCCESS) {
-		dwDataSize = sizeof(lpData) / sizeof(lpData[0]);
-		lRet = RegQueryValueExA(
-			hKey,
-			"EnableLUA",
-			0,
-			&dwType,
-			(LPBYTE)lpData,
-			&dwDataSize);
-		if (lRet == ERROR_SUCCESS) {
-			bValue = ((LPBYTE)lpData)[0];
-			if (bValue == 1)
-				// UACが有効の場合、Virtual Storeが働く。
-				flag = 1;
-		}
-		RegCloseKey(hKey);
+	// UACが無効の場合、Virtual Storeは働かない。
+	HKEY hKey;
+	LONG lRet = RegOpenKeyExA(HKEY_LOCAL_MACHINE,
+							  "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+							  0, KEY_QUERY_VALUE, &hKey);
+	if (lRet != ERROR_SUCCESS) {
+		return FALSE;
 	}
-	if (flag == 0)
-		goto error;
+	BYTE lpData[256];
+	DWORD dwDataSize = sizeof(lpData);
+	DWORD dwType;
+	lRet = RegQueryValueExA(hKey, "EnableLUA", 0, &dwType, lpData, &dwDataSize);
+	RegCloseKey(hKey);
+	if (lRet != ERROR_SUCCESS || dwDataSize == 0 || lpData[0] != 1) {
+		return FALSE;
+	}
 
 	// UACが有効時、プロセスが管理者権限に昇格しているか。
-	flag = 0;
-	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_DEFAULT, &hToken)) {
-		if (GetTokenInformation(hToken, (TOKEN_INFORMATION_CLASS)TokenElevation, &tokenElevation, sizeof(TOKEN_ELEVATION), &dwLength)) {
-			// (0は昇格していない、非0は昇格している)。
-			if (tokenElevation.TokenIsElevated == 0) {
-				// 管理者権限を持っていなければ、Virtual Storeが働く。
-				flag = 1;
-			}
-		}
-		CloseHandle(hToken);
+	// 管理者権限を持っていれば、Virtual Storeは働かない。
+	if (IsProcessElevated()) {
+		return FALSE;
 	}
-	if (flag == 0)
-		goto error;
 
-	ret = TRUE;
-	return (ret);
-
-error:
-	return (ret);
+	// UACが有効で昇格していない、Virtual Storeが働く。
+	return TRUE;
 }
 
 static wchar_t *GetExplorerFullPath(void)

@@ -118,34 +118,39 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 #elif defined(__MINGW32__)
 static void GetCompilerInfo(char *buf, size_t buf_size)
 {
-#if defined(__GNUC__) || defined(__clang__)
-	_snprintf_s(buf, buf_size, _TRUNCATE,
-				"mingw " __MINGW64_VERSION_STR " "
 #if defined(__clang__)
-				"clang " __clang_version__
+	_snprintf_s(buf, buf_size, _TRUNCATE, "Clang %s", __clang_version__);
 #elif defined(__GNUC__)
-				"gcc " __VERSION__
-#endif
-		);
+	_snprintf_s(buf, buf_size, _TRUNCATE, "GCC %s", __VERSION__);
 #else
-	strncat_s(buf, buf_size, "mingw", _TRUNCATE);
+	strncpy_s(buf, buf_size, "unknown compiler", _TRUNCATE);
 #endif
 }
 
 #else
 static void GetCompilerInfo(char *buf, size_t buf_size)
 {
-	strncpy_s(buf, buf_size, "unknown compiler");
+	strncpy_s(buf, buf_size, "unknown compiler", _TRUNCATE);
 }
 #endif
 
-#if defined(WDK_NTDDI_VERSION)
+#if defined(__MINGW64_VERSION_STR)
+// MinGW-w64 のヘッダ/CRT のバージョン
+// MinGW-w64 も WDK_NTDDI_VERSION を定義するため、先に判定する
+static void GetSDKInfo(char *buf, size_t buf_size)
+{
+	strncpy_s(buf, buf_size, "MinGW-w64 " __MINGW64_VERSION_STR, _TRUNCATE);
+#if defined(SUPPORT_OLD_WINDOWS)
+	strncat_s(buf, buf_size, " +SUPPORT_OLD_WINDOWS", _TRUNCATE);
+#endif
+}
+#elif defined(WDK_NTDDI_VERSION)
 // ビルドしたときに使われた SDK のバージョンを取得する
-// 
+//
 // https://developer.microsoft.com/en-us/windows/downloads/windows-SDK
 // https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/
 // https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/index-legacy
-// 
+//
 // バージョン番号には
 // (1) Visual Studio でプロジェクトのプロパティの "Windows SDK バージョン" に列挙されるバージョン
 // (2) インストールされた SDK が「アプリと機能」で表示されるバージョン
@@ -189,6 +194,9 @@ static void GetSDKInfo(char *buf, size_t buf_size)
 				             //   10.0.26100.3916  April 2025
 				             //   10.0.26100.4188  May 2025
 				strncat_s(buf, buf_size, " for Windows 11 (10.0.26100)", _TRUNCATE);
+				break;
+			case 0x0A000011:  // NTDDI_WIN11_SE
+				strncat_s(buf, buf_size, " for Windows 11 (10.0.28000)", _TRUNCATE);
 				break;
 			default: {
 				char str[32];

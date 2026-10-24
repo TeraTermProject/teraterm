@@ -187,6 +187,9 @@ extern BOOL (WINAPI *pCreateTimerQueueTimer)(PHANDLE phNewTimer, HANDLE TimerQue
 											PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags);
 extern BOOL(WINAPI *pDeleteTimerQueueTimer)(HANDLE TimerQueue, HANDLE Timer, HANDLE CompletionEvent);
 extern ULONGLONG (WINAPI *pGetTickCount64)(void);
+extern BOOL (WINAPI *pWow64DisableWow64FsRedirection)(PVOID *OldValue);
+extern BOOL (WINAPI *pWow64RevertWow64FsRedirection)(PVOID OldValue);
+extern DWORD (WINAPI *pGetProcessId)(HANDLE Process);
 
 #if !defined(LOAD_LIBRARY_SEARCH_SYSTEM32)
 #define LOAD_LIBRARY_SEARCH_SYSTEM32        0x00000800
@@ -265,6 +268,10 @@ BOOL _SetupDiGetDevicePropertyW(HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceI
 
 // wintrust.dll
 extern LONG (WINAPI *pWinVerifyTrust)(HWND hwnd, GUID *pgActionID, LPVOID pWVTData);
+
+// Normaliz.dll
+extern int (WINAPI *pIdnToAscii)(DWORD dwFlags, LPCWSTR lpUnicodeCharStr, int cchUnicodeChar,
+								  LPWSTR lpASCIICharStr, int cchASCIIChar);
 
 void WinCompatInit();
 

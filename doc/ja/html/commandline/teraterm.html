@@ -36,7 +36,8 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
 <dl>
   <dt id="host">&lt;host&gt;</dt>
-  <dd>ホスト名または IP アドレス</dd>
+  <dd>ホスト名または IP アドレス<br>
+	  IPv6アドレスは角括弧（大括弧）で囲みます（<a href="https://datatracker.ietf.org/doc/html/rfc3986" target="_blank">RFC3986</a> / <a href="https://datatracker.ietf.org/doc/html/rfc5952#section-6" target="_blank">RFC5952</a> 参照）。</dd>
 
   <dt>&lt;host&gt;:&lt;TCP port#&gt;</dt>
   <dd>TCP ポート番号つき &lt;host&gt;<br>
@@ -281,14 +282,17 @@ TTERMPRO myhost.example.com
 TTERMPRO myhost.example.com:23
 TTERMPRO myhost.example.com 23
 TTERMPRO 192.0.2.1
-TTERMPRO myhost.example.com /T=0 /P=7
+TTERMPRO [2001:db8:1:2:8401:2ff:fe03:405]
+TTERMPRO [fe80::8401:2ff:fe03:405%3]:8022
 TTERMPRO \\.\pipe\vmware-serial-port
 TTERMPRO /C=1
-TTERMPRO /F=TELNET.INI
+
+TTERMPRO myhost.example.com /T=0 /P=7
 TTERMPRO foohost.example.org /F=FOOHOST.INI
+TTERMPRO /F=TELNET.INI
 TTERMPRO /C=2 /SPEED=9600 /F=MYSETUP.INI
 TTERMPRO /K=MYKEY.CNF /W="My host"
-TTERMPRO /R=README.TXT ; replay a file
+TTERMPRO /R=TERATERM.LOG ; replay a log file
 TTERMPRO myhost /B /X=100 /Y=50
 TTERMPRO /PIPE pipename ; \\.\pipe\pipename への接続
 </pre>

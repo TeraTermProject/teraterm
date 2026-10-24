@@ -138,6 +138,9 @@ BOOL (WINAPI *pCreateTimerQueueTimer)(PHANDLE phNewTimer, HANDLE TimerQueue, WAI
 									  PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags);
 BOOL(WINAPI *pDeleteTimerQueueTimer)(HANDLE TimerQueue, HANDLE Timer, HANDLE CompletionEvent);
 ULONGLONG (WINAPI *pGetTickCount64)();
+BOOL (WINAPI *pWow64DisableWow64FsRedirection)(PVOID *OldValue);
+BOOL (WINAPI *pWow64RevertWow64FsRedirection)(PVOID OldValue);
+DWORD (WINAPI *pGetProcessId)(HANDLE Process);
 
 // gdi32
 int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
@@ -205,6 +208,10 @@ HRESULT (WINAPI *pDWriteCreateFactory)(DWRITE_FACTORY_TYPE factoryType, REFIID i
 
 // wintrust.dll
 LONG (WINAPI *pWinVerifyTrust)(HWND hwnd, GUID *pgActionID, LPVOID pWVTData);
+
+// Normaliz.dll
+int (WINAPI *pIdnToAscii)(DWORD dwFlags, LPCWSTR lpUnicodeCharStr, int cchUnicodeChar,
+						  LPWSTR lpASCIICharStr, int cchASCIIChar);
 
 /**
  *	GetConsoleWindow() と同じ動作をする
@@ -305,6 +312,9 @@ static const APIInfo Lists_kernel32[] = {
 	{ "CreateTimerQueueTimer", (void **)&pCreateTimerQueueTimer },
 	{ "DeleteTimerQueueTimer", (void **)&pDeleteTimerQueueTimer },
 	{ "GetTickCount64", (void **)&pGetTickCount64 },
+	{ "Wow64DisableWow64FsRedirection", (void **)&pWow64DisableWow64FsRedirection },
+	{ "Wow64RevertWow64FsRedirection", (void **)&pWow64RevertWow64FsRedirection },
+	{ "GetProcessId", (void **)&pGetProcessId },
 	{},
 };
 
@@ -375,6 +385,11 @@ static const APIInfo Lists_wintrust[] = {
 	{},
 };
 
+static const APIInfo Lists_normaliz[] = {
+	{ "IdnToAscii", (void **)&pIdnToAscii },
+	{},
+};
+
 static const DllInfo DllInfos[] = {
 	{ L"user32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
 	{ L"msimg32.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
@@ -392,6 +407,7 @@ static const DllInfo DllInfos[] = {
 	{ L"setupapi.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_setupapi },
 	{ L"dwrite.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_dwrite },
 	{ L"wintrust.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_wintrust },
+	{ L"Normaliz.dll", DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_normaliz },
 	{},
 };
 

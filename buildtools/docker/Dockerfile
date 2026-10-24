@@ -1,5 +1,4 @@
-#FROM debian:trixie-20240701-slim
-FROM debian:bookworm-20250113-slim
+FROM debian:trixie-20261005-slim
 
 ARG USER=ttbuilder
 ARG EMAIL=ttbuilder@example.com
@@ -13,7 +12,9 @@ RUN \
 	apt-get install -y \
 		cmake cmake-curses-gui \
 		perl \
-		gcc-mingw-w64-i686-win32 g++-mingw-w64-i686-win32 \
+		mingw-w64-i686-dev \
+		gcc-mingw-w64-i686-win32 \
+		g++-mingw-w64-i686-win32 \
 		fp-utils \
 		git nasm
 

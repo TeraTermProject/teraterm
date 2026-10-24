@@ -33,6 +33,8 @@ add_executable(
   filesys_proto.h
   keyboard.c
   keyboard.h
+  name_resolve.c
+  name_resolve.h
   scp.cpp
   scp.h
   sendmem.cpp
@@ -50,8 +52,8 @@ add_executable(
   teraterml.h
   theme.h
   themefile.cpp
-  tslib.h
   tslib.cpp
+  tslib.h
   tt-version.rc
   ttdde.c
   ttdde.h
@@ -137,6 +139,8 @@ set(SRC_DIALOG
   sendfiledlg.h
   serial_pp.cpp
   serial_pp.h
+  serial_pp.rc
+  serial_pp_res.h
   setupdirdlg.cpp
   setupdirdlg.h
   tekfont_pp.cpp
@@ -326,6 +330,11 @@ source_group(
   "..\/ttptek\/")
 
 if(SUPPORT_OLD_WINDOWS)
+  target_compile_definitions(
+    ${PROJECT_NAME}
+    PRIVATE
+    SUPPORT_OLD_WINDOWS=1
+    )
   if(MSVC)
     if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
       set(CMAKE_C_STANDARD_LIBRARIES "")

@@ -30,6 +30,7 @@
 #include <devguid.h>
 #include <setupapi.h>
 #include <cfgmgr32.h>
+#include <shellapi.h>
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
@@ -40,6 +41,7 @@
 #include "asprintf.h"
 #include "compat_win.h"
 #include "win32helper.h"
+#include "dllutil.h"
 
 #include "comportinfo.h"
 
@@ -425,4 +427,340 @@ void ComPortInfoFree(ComPortInfo_t *info, int count)
 		free(p->property);
 	}
 	free(info);
+}
+
+/**
+ *	デバイスマネージャのデバイスのプロパティを表示する
+ *
+ *	devmgr.dll の DevicePropertiesW() を使用する
+ *	自プロセス内で表示するため昇格しない
+ *	(非昇格のときドライバのプロパティページ(FTDI の [Advanced] など)で
+ *	 設定を変更できない場合がある)
+ *
+ *	@param[in]	instance_id	デバイスインスタンスID
+ *	@param[in]	hWndParent	親ウィンドウ、プロパティが閉じられるまで入力を受け付けない
+ *	@retval		-1	表示できなかった(API なし)
+ *	@retval		1	表示して閉じられた
+ */
+static int ShowDevicePropertiesInProcess(const wchar_t *instance_id, HWND hWndParent)
+{
+	typedef int (WINAPI *DevicePropertiesW_t)(HWND hwndParent, LPCWSTR MachineName, LPCWSTR DeviceID, BOOL ShowDeviceTree);
+	DevicePropertiesW_t pDevicePropertiesW = NULL;
+	DWORD r = DLLGetApiAddress(L"devmgr.dll", DLL_LOAD_LIBRARY_SYSTEM, "DevicePropertiesW", (void **)&pDevicePropertiesW);
+	if (r != NO_ERROR || pDevicePropertiesW == NULL) {
+		return -1;
+	}
+
+	// モーダルで表示、閉じられるまで戻らない
+	//		通常の権限でデバッガで実行すると、RegCloseKey()(rpcrt4.dll)で例外が発生する
+	//		F5を押して続行してok
+	//		内部で例外が出る→(デバッガがキャッチ,F5で続行)→内部でキャッチ→動作続行
+	pDevicePropertiesW(hWndParent, NULL, instance_id, FALSE);
+	return 1;
+}
+
+/**
+ *	WOW64 のファイルリダイレクトを無効にして CreateProcess() する
+ *
+ *	x64 Windows 上の x86 版から System32 の native(64bit) の exe を起動するために使う
+ *	リダイレクトを無効にするのは CreateProcess() の間だけにする
+ *	(ShellExecuteEx() のようにスレッド内で DLL を読み込む API と組み合わせてはいけない)
+ *
+ *	@param[in]	exe		実行ファイルのフルパス
+ *	@param[in]	param	パラメータ
+ *	@return		プロセスハンドル、NULL のとき失敗(GetLastError() に理由)
+ */
+static HANDLE CreateProcessNoWow64Redirect(const wchar_t *exe, const wchar_t *param)
+{
+	PVOID old_value = NULL;
+	BOOL disabled = FALSE;
+	if (pWow64DisableWow64FsRedirection != NULL && pWow64RevertWow64FsRedirection != NULL) {
+		disabled = pWow64DisableWow64FsRedirection(&old_value);
+	}
+
+	wchar_t *cmdline = NULL;
+	aswprintf(&cmdline, L"\"%s\" %s", exe, param);
+
+	STARTUPINFOW si = {};
+	si.cb = sizeof(si);
+	si.dwFlags = STARTF_USESHOWWINDOW;
+	si.wShowWindow = SW_SHOWNORMAL;
+	PROCESS_INFORMATION pi = {};
+	BOOL r = CreateProcessW(exe, cmdline, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+	DWORD err = GetLastError();
+
+	if (disabled) {
+		pWow64RevertWow64FsRedirection(old_value);
+	}
+	free(cmdline);
+
+	if (!r) {
+		SetLastError(err);
+		return NULL;
+	}
+	CloseHandle(pi.hThread);
+	return pi.hProcess;
+}
+
+/**
+ *	キーボード、マウスの入力メッセージか?
+ */
+static BOOL IsInputMessage(UINT msg)
+{
+	return (msg >= WM_KEYFIRST && msg <= WM_KEYLAST) ||
+		(msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST) ||
+		(msg >= WM_NCMOUSEMOVE && msg <= WM_NCMBUTTONDBLCLK) ||
+		msg == WM_SYSCOMMAND;
+}
+
+typedef struct {
+	DWORD pid;
+	HWND hWnd;
+} FindProcessWindowData;
+
+static BOOL CALLBACK FindProcessWindowProc(HWND hWnd, LPARAM lParam)
+{
+	FindProcessWindowData *data = (FindProcessWindowData *)lParam;
+	DWORD pid;
+	GetWindowThreadProcessId(hWnd, &pid);
+	if (pid == data->pid && IsWindowVisible(hWnd)) {
+		data->hWnd = hWnd;
+		return FALSE;
+	}
+	return TRUE;
+}
+
+/**
+ *	プロセスの表示されているトップレベルウィンドウを探す
+ *
+ *	@param[in]	pid		プロセスID
+ *	@return		ウィンドウ、NULL のとき見つからなかった
+ */
+static HWND FindProcessWindow(DWORD pid)
+{
+	FindProcessWindowData data;
+	data.pid = pid;
+	data.hWnd = NULL;
+	EnumWindows(FindProcessWindowProc, (LPARAM)&data);
+	return data.hWnd;
+}
+
+/**
+ *	デバイスマネージャのデバイスのプロパティを管理者権限で表示する
+ *
+ *	次のコマンドを実行する
+ *		rundll32.exe devmgr.dll,DeviceProperties_RunDLL /DeviceID "<instance id>"
+ *	ドライバのプロパティページ(FTDI の [Advanced] など)は HKLM に書き込むため
+ *	管理者権限が必要
+ *
+ *	x64 Windows 上の x86 版から実行したときも System32 の native(64bit) の
+ *	rundll32.exe を起動する必要がある
+ *	- 非昇格のとき
+ *		ShellExecuteEx() の runas で起動する
+ *		昇格プロセスは 64bit の AppInfo サービスが起動するためリダイレクトされない
+ *	- 昇格済み(または UAC がない)とき
+ *		runas は UAC を通らず自プロセスが CreateProcess() するため
+ *		リダイレクトされて SysWOW64 の 32bit 版が起動してしまう
+ *		リダイレクトを無効にして CreateProcess() する
+ *
+ *	@param[in]	instance_id	デバイスインスタンスID
+ *	@param[in]	hWndParent	親ウィンドウ、プロパティが閉じられるまで入力を受け付けない
+ *	@retval		-1	表示できなかった(devmgr.dll に DeviceProperties_RunDLLW() がない, 起動失敗)
+ *	@retval		0	UAC でキャンセルされた
+ *	@retval		1	表示して閉じられた
+ */
+static int ShowDevicePropertiesElevated(const wchar_t *instance_id, HWND hWndParent)
+{
+	// rundll32.exe から呼び出す関数があるか調べる(古い OS にはない)
+	void *func;
+	if (DLLGetApiAddress(L"devmgr.dll", DLL_LOAD_LIBRARY_SYSTEM, "DeviceProperties_RunDLLW", &func) != NO_ERROR) {
+		return -1;
+	}
+
+	// トップレベルウィンドウ
+	//	GetAncestor(GA_ROOT) は古い OS にないため使わない
+	HWND hRoot = hWndParent;
+	while (hRoot != NULL && (GetWindowLongW(hRoot, GWL_STYLE) & WS_CHILD) != 0) {
+		hRoot = GetParent(hRoot);
+	}
+
+	// GetSystemDirectoryW() は WOW64 でも System32 を返す
+	//	GetSystemWindowsDirectoryW() は古い OS にないため使わない
+	wchar_t sysdir[MAX_PATH];
+	if (GetSystemDirectoryW(sysdir, _countof(sysdir)) == 0) {
+		return -1;
+	}
+	wchar_t *exe = NULL;
+	wchar_t *param = NULL;
+	aswprintf(&exe, L"%s\\rundll32.exe", sysdir);
+	aswprintf(&param, L"devmgr.dll,DeviceProperties_RunDLL /DeviceID \"%s\"", instance_id);
+
+	HANDLE hProcess = NULL;
+	BOOL launched;
+	DWORD err;
+	if (IsProcessElevated()) {
+		// 昇格済み、そのまま起動する
+		hProcess = CreateProcessNoWow64Redirect(exe, param);
+		err = GetLastError();
+		launched = (hProcess != NULL);
+	}
+	else {
+		// 非昇格、UAC で昇格して起動する
+		SHELLEXECUTEINFOW ExecInfo = {};
+		ExecInfo.cbSize = sizeof(ExecInfo);
+		ExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI;
+		// hwnd を指定すると UAC 表示中そのウィンドウが無効化される
+		// セキュアデスクトップから戻ったとき無効のままなのでアクティブにならず、
+		// 他のアプリのウィンドウがアクティブになって、その裏に回ってしまう
+		ExecInfo.hwnd = NULL;
+		ExecInfo.lpVerb = L"runas";
+		ExecInfo.lpFile = exe;
+		ExecInfo.lpParameters = param;
+		ExecInfo.nShow = SW_SHOWNORMAL;
+		launched = ShellExecuteExW(&ExecInfo);
+		err = GetLastError();
+		hProcess = ExecInfo.hProcess;
+	}
+	free(exe);
+	free(param);
+	if (!launched) {
+		// UAC でキャンセルされたとき ERROR_CANCELLED
+		return (err == ERROR_CANCELLED) ? 0 : -1;
+	}
+	if (hProcess == NULL) {
+		// 起動したがプロセスハンドルが得られなかった、待たずに戻る
+		return 1;
+	}
+
+	// 閉じられるまで待つ
+	//	EnableWindow() で無効化すると、プロパティが閉じられたとき無効のため
+	//	アクティブにならず、他のアプリのウィンドウがアクティブになってしまう
+	//	無効化せず、入力メッセージを捨ててモーダルのように振る舞う
+	DWORD pid = (pGetProcessId != NULL) ? pGetProcessId(hProcess) : 0;
+	for (;;) {
+		DWORD w = MsgWaitForMultipleObjects(1, &hProcess, FALSE, INFINITE, QS_ALLINPUT);
+		if (w != WAIT_OBJECT_0 + 1) {
+			// プロセス終了 or エラー
+			break;
+		}
+		MSG msg;
+		BOOL quit = FALSE;
+		while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
+			if (msg.message == WM_QUIT) {
+				PostQuitMessage((int)msg.wParam);
+				quit = TRUE;
+				break;
+			}
+			if (hRoot != NULL && IsInputMessage(msg.message) &&
+				(msg.hwnd == hRoot || IsChild(hRoot, msg.hwnd))) {
+				continue;
+			}
+			TranslateMessage(&msg);
+			DispatchMessageW(&msg);
+		}
+		if (quit) {
+			break;
+		}
+		// 自分のウィンドウがアクティブになったらプロパティを前面に戻す
+		HWND hFore = GetForegroundWindow();
+		DWORD fore_pid = 0;
+		if (hFore != NULL) {
+			GetWindowThreadProcessId(hFore, &fore_pid);
+		}
+		if (pid != 0 && fore_pid == GetCurrentProcessId()) {
+			HWND hProp = FindProcessWindow(pid);
+			if (hProp != NULL) {
+				SetForegroundWindow(hProp);
+			}
+		}
+	}
+	CloseHandle(hProcess);
+	return 1;
+}
+
+/**
+ *	デバイスマネージャのデバイスのプロパティを表示する
+ *
+ *	@param[in]	instance_id		デバイスインスタンスID
+ *	@param[in]	hWndParent		親ウィンドウ
+ *	@param[in]	allow_elevation	TRUE のとき昇格してもよい
+ *	@retval		-1	表示できなかった(起動失敗, API なし)
+ *	@retval		0	UAC でキャンセルされた
+ *	@retval		1	表示して閉じられた
+ */
+static int ShowDeviceProperties(const wchar_t *instance_id, HWND hWndParent, BOOL allow_elevation)
+{
+	if (allow_elevation) {
+		int r = ShowDevicePropertiesElevated(instance_id, hWndParent);
+		if (r != -1) {
+			return r;
+		}
+	}
+	return ShowDevicePropertiesInProcess(instance_id, hWndParent);
+}
+
+/**
+ *	COMポートの設定ダイアログを表示する
+ *
+ *	- 昇格してもよいとき
+ *		rundll32.exe を管理者権限で起動してデバイスのプロパティを表示する
+ *		起動できなかったときは DevicePropertiesW() で表示する
+ *	- 昇格しないとき
+ *		DevicePropertiesW() で自プロセス内にデバイスのプロパティを表示する
+ *	- 古い OS などでどちらでも表示できないとき
+ *		CommConfigDialogW() で表示する
+ *
+ *	デバイスのプロパティはドライバ固有の設定(FTDI の [Advanced] など)が可能
+ *
+ *	@param[in]		info			COMポート情報(port_name が必要)
+ *	@param[in]		hWndParent		親ウィンドウ、このダイアログが閉じられるまで入力を受け付けない
+ *	@param[in]		allow_elevation	TRUE のとき昇格してもよい
+ *	@param[in,out]	dcb				in	CommConfigDialogW() の初期値
+ *									out	変更されたポート設定(戻り値が 1 のとき)
+ *	@retval		-1	表示できなかった
+ *	@retval		0	ポート設定は変更されなかった(キャンセルを含む)
+ *	@retval		1	ポート設定が変更された
+ */
+int ComPortInfoShowDeviceProperties(const ComPortInfo_t *info, HWND hWndParent, BOOL allow_elevation, DCB *dcb)
+{
+	if (info == NULL || info->port_name == NULL || dcb == NULL) {
+		return -1;
+	}
+	const wchar_t *com_str = info->port_name;
+
+	if (info->instance_id != NULL) {
+		// 表示前のポート設定(変更されたか調べるため)
+		COMMCONFIG cc_before = {};
+		DWORD size = sizeof(cc_before);
+		cc_before.dwSize = sizeof(cc_before);
+		BOOL has_before = GetDefaultCommConfigW(com_str, &cc_before, &size);
+
+		int r = ShowDeviceProperties(info->instance_id, hWndParent, allow_elevation);
+		if (r == 0) {
+			// UAC でキャンセルされた
+			return 0;
+		}
+		if (r == 1) {
+			// ポート設定が変更されていたら返す
+			COMMCONFIG cc = {};
+			size = sizeof(cc);
+			cc.dwSize = sizeof(cc);
+			if (has_before && GetDefaultCommConfigW(com_str, &cc, &size) &&
+				memcmp(&cc.dcb, &cc_before.dcb, sizeof(DCB)) != 0) {
+				*dcb = cc.dcb;
+				return 1;
+			}
+			return 0;
+		}
+	}
+
+	// デバイスのプロパティを表示できないときは CommConfigDialogW() を使う
+	COMMCONFIG cc = {};
+	cc.dwSize = sizeof(cc);
+	cc.dcb = *dcb;
+	if (!CommConfigDialogW(com_str, hWndParent, &cc)) {
+		return (GetLastError() == ERROR_CANCELLED) ? 0 : -1;
+	}
+	*dcb = cc.dcb;
+	return 1;
 }

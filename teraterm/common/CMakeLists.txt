@@ -39,6 +39,8 @@ add_library(
   i18n.c
   i18n.h
   i18n_static.c
+  idn.cpp
+  idn.h
   inifile_com.cpp
   inifile_com.h
   makeoutputstring.cpp

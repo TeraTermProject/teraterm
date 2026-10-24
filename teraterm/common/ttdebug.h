@@ -36,6 +36,14 @@ void DebugSetException(const wchar_t *basename);
 HWND DebugConsoleOpen(void);
 void DebugTestCrash(void);
 
+#if 0 // 不具合切り分け時に使用
+#if defined(_MSC_VER)
+void WriteDebugPrintf(_Printf_format_string_ const char *fmt, ...);
+#else
+void WriteDebugPrintf(const char *fmt, ...);
+#endif
+#endif
+
 #ifdef __cplusplus
 }
 #endif
