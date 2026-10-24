@@ -345,6 +345,7 @@ static LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS* pExceptionPointer
 			MessageBoxW(NULL, msg, L"Tera Term", MB_OK);
 			free(msg);
 		}
+		free(logdir);
 		free(fname);
 		free(dumpfile);
 	}
