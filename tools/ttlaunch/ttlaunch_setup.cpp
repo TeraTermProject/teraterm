@@ -34,6 +34,7 @@
 
 #include <windows.h>
 #include <shlobj.h>
+#include <commctrl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,6 +54,11 @@
 #include "ttlaunch.h"
 #include "ttlaunch_setup.h"
 #include "ttlaunch_version.h"
+
+#ifndef BCM_SETSHIELD
+// _WIN32_WINNT < 0x0600 のとき SDK で定義されない
+#define BCM_SETSHIELD	0x160c
+#endif
 
 //#define	HERE_LABEL	L"Tera Term &Here";
 #define	HERE_LABEL	L"&Open in Tera Term";
@@ -588,6 +594,8 @@ static void UpdateSetupDialog(HWND hDlg, const LangInfo &lang)
 			status += GetLangStr(lang, "MSG_STATUS_HKLM_NOTE", L"The registration in HKEY_LOCAL_MACHINE cannot be changed here");
 		}
 	}
+	status += L"\n";
+	status += L"ExeDir " + GetExeDir();
 	SetDlgItemTextW(hDlg, IDC_STATUS, status.c_str());
 
 	// 出力先によってボタンの文言を変える, reg ファイルは登録状態にかかわらず書き出せる
@@ -711,11 +719,19 @@ static INT_PTR CALLBACK SetupDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM 
 			EnableWindow(GetDlgItem(hDlg, IDC_TYPE_SUBMENU), FALSE);
 			type = MENU_TYPE_POPUP;
 		}
-		const int type_id = type == MENU_TYPE_SUBMENU ? IDC_TYPE_SUBMENU : type == MENU_TYPE_ITEMS ? IDC_TYPE_ITEMS : IDC_TYPE_POPUP;
+		const int type_id =
+			type == MENU_TYPE_SUBMENU ? IDC_TYPE_SUBMENU :
+			type == MENU_TYPE_ITEMS ? IDC_TYPE_ITEMS : IDC_TYPE_POPUP;
 		CheckRadioButton(hDlg, IDC_TYPE_POPUP, IDC_TYPE_SUBMENU, type_id);
 
 		// 出力先: レジストリ
 		CheckRadioButton(hDlg, IDC_OUT_REGISTRY, IDC_OUT_REGFILE, IDC_OUT_REGISTRY);
+
+		// レジストリエディターの起動には UAC が出るのでシールドアイコンを付ける
+		//   昇格済みなら出ない
+		if (!IsProcessElevated()) {
+			SendDlgItemMessageW(hDlg, IDC_REGEDIT, BCM_SETSHIELD, 0, TRUE);
+		}
 
 		// バージョン
 		wchar_t *ver;
