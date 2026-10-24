@@ -1,7 +1,7 @@
-﻿[Info]
+[Info]
 language=Italian
 date=2026-10-11 by TeraTerm Project
-contributor=R.B. (2026-07-17)
+contributor=R.B. (2026-10-24)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -428,8 +428,8 @@ DLG_SERIAL_OK_CONNECTION=Connetti in una &nuova finestra
 DLG_SERIAL_OK_OPEN=&Nuova apertura
 DLG_SERIAL_OK_CLOSEOPEN=Chiudi a apri &nuova
 DLG_SERIAL_OK_RESET=&Nuove impostazioni
-DLG_SERIAL_DEVICE_MANAGER_PROPERTIES=Device Manager Properties
-DLG_SERIAL_RUN_AS_ADMINISTRATOR=Run as administrator
+DLG_SERIAL_DEVICE_MANAGER_PROPERTIES=Proprietà gestione dispositivo
+DLG_SERIAL_RUN_AS_ADMINISTRATOR=Esegui come amministratore
 
 ; edit history
 DLG_TCPIP_ADD=&Aggiungi
