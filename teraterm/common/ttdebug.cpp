@@ -389,3 +389,50 @@ void DebugSetException(const wchar_t *basename)
 	// Cランタイム無効なパラメータエラーハンドラ
 	_set_invalid_parameter_handler(InvalidParameterHandler);
 }
+
+#if 0 // 不具合切り分け時に使用 (例 issue #1534)
+/**
+ *	デバグメッセージをファイルに出力する
+ *
+ *  ログの出力先は、"動作ログ、ダンプフォルダ" 配下 debug_YYYYMMDD-HHMMSS-NNN.txt
+ *  (参考) https://teratermproject.github.io/manual/5/ja/setup/folder.html
+ *  インストール版では、C:\Users\[username]\AppData\Local\teraterm5\debug_YYYYMMDD-HHMMSS-NNN.txt
+ *
+ */
+#include <share.h>  // for _wfsopen()
+
+#if defined(_MSC_VER)
+void WriteDebugPrintf(_Printf_format_string_ const char *fmt, ...)
+#else
+void WriteDebugPrintf(const char *fmt, ...)
+#endif
+{
+	SYSTEMTIME local_time;
+	GetLocalTime(&local_time);
+
+	static FILE *fp = NULL;
+	if (fp == NULL) {
+		wchar_t *logdir = GetLogDirW(NULL);
+		wchar_t *debug_file;
+		aswprintf(&debug_file, L"%s\\debug_%04d%02d%02d-%02d%02d%02d-%03d.txt", logdir,
+				  local_time.wYear, local_time.wMonth, local_time.wDay,
+				  local_time.wHour, local_time.wMinute, local_time.wSecond, local_time.wMilliseconds);
+		fp = _wfsopen(debug_file, L"a", _SH_DENYWR);
+		free(debug_file);
+		free(logdir);
+		if (fp == NULL) {
+			return;
+		}
+	}
+
+	fprintf(fp, "%02d-%02d-%02d %02d:%02d:%02d.%03d ",
+			local_time.wYear, local_time.wMonth, local_time.wDay,
+			local_time.wHour, local_time.wMinute, local_time.wSecond, local_time.wMilliseconds);
+
+	va_list arg;
+	va_start(arg, fmt);
+	vfprintf(fp, fmt, arg);
+	va_end(arg);
+	fflush(fp);
+}
+#endif
