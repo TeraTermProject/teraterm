@@ -259,9 +259,16 @@ static HDC  CreateBitmapDC(HBITMAP hbm)
   _OutputDebugPrintf("CreateBitmapDC : hbm = %p\n",hbm);
 
   hdc = CreateCompatibleDC(NULL);
+  if (hdc == NULL) {
+	DeleteObject(hbm);
+	return NULL;
+  }
 
-  SaveDC(hdc);
-  SelectObject(hdc,hbm);
+  if (SelectObject(hdc, hbm) == NULL) {
+	DeleteDC(hdc);
+	DeleteObject(hbm);
+	return NULL;
+  }
 
   return hdc;
 }
@@ -280,11 +287,12 @@ static void DeleteBitmapDC(HDC *hdc)
 
   hbm = GetCurrentObject(*hdc,OBJ_BITMAP);
 
-  RestoreDC(*hdc,-1);
-  DeleteObject(hbm);
   DeleteDC(*hdc);
-
   *hdc = 0;
+
+  if (hbm) {
+    DeleteObject(hbm);
+  }
 }
 
 static void FillBitmapDC(HDC hdc,COLORREF color)
