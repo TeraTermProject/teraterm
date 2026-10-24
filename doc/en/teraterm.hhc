@@ -1897,6 +1897,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="delvar">
+					<param name="Local" value="html\macro\command\delvar.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="dirnamebox">
 					<param name="Local" value="html\macro\command\dirnamebox.html">
 					<param name="ImageNumber" value="11">
@@ -1974,6 +1979,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="random">
 					<param name="Local" value="html\macro\command\random.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="redim">
+					<param name="Local" value="html\macro\command\redim.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
