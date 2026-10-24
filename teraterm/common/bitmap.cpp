@@ -518,12 +518,22 @@ static HBITMAP LoadImageWIC(const wchar_t *filename)
  *						NULLのとき適切にファイルを読む
  *	@retval	NO_ERROR			ファイルが読めた、hBitmapにハンドルが返っている
  *	@retval	ERROR_INVALID_DATA	ファイルが読めない、知らないフォーマット
+ *	@retval	上記以外			ファイルが開けない(GetLastError()の値)
  */
 DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMAP *hBitmap)
 {
+	*hBitmap = NULL;
+
+	// 画像ファイルが開けるか確認する
+	HANDLE hFile = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		return GetLastError(); // open error
+	} else {
+		CloseHandle(hFile);
+	}
+
 	HBITMAP hbm = NULL;
 	const wchar_t *spi_path = param == NULL ? NULL : param->SusiePluginPath;
-	*hBitmap = NULL;
 
 	// Susie plugin で読み込み
 	if (hbm == NULL && spi_path != NULL) {
@@ -571,7 +581,13 @@ DWORD BitmapLoad(const wchar_t *filename, const BitmapLoadParam_t *param, HBITMA
 	}
 
 	if (hbm == NULL) {
-		*hBitmap = NULL;
+		// 画像ファイルが開けるか再確認する
+		hFile = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+		if (hFile == INVALID_HANDLE_VALUE) {
+			return GetLastError(); // open error
+		} else {
+			CloseHandle(hFile);
+		}
 		return ERROR_INVALID_DATA;
 	}
 
