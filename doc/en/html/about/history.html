@@ -84,6 +84,12 @@
         Fixed an issue where VT window background images could disappear when reconnecting to an RDP session in AWS environments after a prolonged disconnection period.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1534" target="_blank">issue #1534</a>)
       </li>
+      <li>
+        Fixed an issue where pasting with the right (or middle) mouse button cleared the current selection.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1596" target="_blank">issue #1596</a>)<br>
+        This bug was introduced in 5.7.0. When <a href="../menu/setup-additional-copy-and-paste.html#SelectOnlyByLButton">SelectOnlyByLButton</a> is on (default),
+        the right and middle buttons no longer start a selection.
+      </li>
     </ul>
   </li>
 

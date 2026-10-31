@@ -882,6 +882,7 @@ void CVTWindow::ButtonUp(POINT p, BOOL Paste)
 
 	if (ts.SelectOnlyByLButton &&
 	    (MButton || RButton)) {
+		// 中ボタン, 右ボタンのときは選択に使用しない
 		disableBuffEndSelect = true;
 	}
 
@@ -892,13 +893,14 @@ void CVTWindow::ButtonUp(POINT p, BOOL Paste)
 	TplClk = FALSE;
 	CaretOn(vt_src);
 
-	// ボタンが離された
-	BuffEndSelect(p.x, p.y);
-
 	// SelectOnlyByLButton が on で 中・右クリックしたときに
 	// バッファが選択状態だったら、選択内容がクリップボードに
 	// コピーされてしまう問題を修正 (2007.12.6 maya)
+	// このとき ButtonDown() で選択を開始していないので選択領域には触らない
 	if (!disableBuffEndSelect) {
+		// ボタンが離された
+		BuffEndSelect(p.x, p.y);
+
 		if (ts.AutoTextCopy>0) {
 			// 選択領域が存在する?
 			if (BuffIsSelected()) {
@@ -1052,12 +1054,14 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 				}
 			}
 
-			BuffStartSelect(p.x,p.y, box,shift);
-			TplClk = FALSE;
+			if (select_start) {
+				BuffStartSelect(p.x,p.y, box,shift);
+				TplClk = FALSE;
 
-			/* for AutoScrolling */
-			::SetCapture(HVTWin);
-			::SetTimer(HVTWin, IdScrollTimer, 100, NULL);
+				/* for AutoScrolling */
+				::SetCapture(HVTWin);
+				::SetTimer(HVTWin, IdScrollTimer, 100, NULL);
+			}
 		}
 
 		switch (LMR) {
