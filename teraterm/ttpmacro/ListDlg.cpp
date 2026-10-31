@@ -279,12 +279,16 @@ LRESULT CListDlg::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 				Relocation(FALSE, WW, WH);
 				return TRUE;
 			}
+			// dpi 不一致時は何もしない
+			break;
 		case WM_GETMINMAXINFO:
 			if (GetMonitorDpiFromWindow(m_hWnd) == dpi) {
 				pmmi->ptMinTrackSize.x = init_WW;
 				pmmi->ptMinTrackSize.y = init_WH;
 				return TRUE;
 			}
+			// dpi 不一致時は何もしない
+			break;
 		case WM_COMMAND:
 			if (m_ext & ExtListBoxDoubleclick) {
 				if (HIWORD(wp) == LBN_DBLCLK) {

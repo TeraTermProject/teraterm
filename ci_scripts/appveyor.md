@@ -114,4 +114,4 @@ gcc 64bit
 - `cmake -DCOMPILER_64BIT=ON -P ci_scripts/build_local_appveyor_mingw.cmake`
 
 msys64
-- [build_local_appveyor_mingw_cmake.bat](build_local_appveyor_mingw_cmake.bat)参照
+- [build_local_appveyor.bat](build_local_appveyor.bat)参照

@@ -159,7 +159,7 @@ static void sftp_console_message(PTInstVar pvar, Channel_t *c, char *fmt, ...)
 //
 // buffer_t
 //    +---------+------------------------------------+
-//    | msg_len | data                               |  
+//    | msg_len | data                               |
 //    +---------+------------------------------------+
 //       4byte   <------------- msg_len ------------->
 //
@@ -172,7 +172,7 @@ static void sftp_buffer_alloc(buffer_t **message)
 		goto error;
 	}
 	// Message length(4byte)
-	buffer_put_int(msg, 0); 
+	buffer_put_int(msg, 0);
 
 	*message = msg;
 
@@ -204,15 +204,18 @@ static void sftp_send_msg(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 static void sftp_get_msg(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen, buffer_t **message)
 {
 	buffer_t *msg = *message;
-	int msg_len;
+	unsigned int msg_len;
 
 	// バッファを確保し、データをすべて放り込む。以降は buffer_t 型を通して操作する。
 	// そうしたほうが OpenSSH のコードとの親和性が良くなるため。
 	buffer_clear(msg);
-	buffer_append(msg, data, buflen);
+	buffer_put(msg, data, buflen);
 	buffer_rewind(msg);
 
-	msg_len = buffer_get_int(msg);
+	if (buffer_get_int(msg, &msg_len) != 0) {
+		sftp_syslog(pvar, "Message length error");
+		goto error;
+	}
 	if (msg_len > SFTP_MAX_MSG_LENGTH) {
 		// TODO:
 		sftp_syslog(pvar, "Received message too long %u", msg_len);
@@ -259,7 +262,7 @@ void sftp_do_init(PTInstVar pvar, Channel_t *c)
 
 	// ネゴシエーションの開始
 	sftp_buffer_alloc(&msg);
-	buffer_put_char(msg, SSH2_FXP_INIT); 
+	buffer_put_char(msg, SSH2_FXP_INIT);
 	buffer_put_int(msg, SSH2_FILEXFER_VERSION);
 	sftp_send_msg(pvar, c, msg);
 	sftp_buffer_free(msg);
@@ -269,19 +272,30 @@ void sftp_do_init(PTInstVar pvar, Channel_t *c)
 
 static void sftp_do_init_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 {
-	unsigned int type;
+	u_char type;
 
-	type = buffer_get_char(msg);
+	if (buffer_get_char(msg, &type) != 0) {
+		goto error;
+	}
 	if (type != SSH2_FXP_VERSION) {
 		goto error;
 	}
-	c->sftp.version = buffer_get_int(msg);
+	if (buffer_get_int(msg, &c->sftp.version) != 0) {
+		sftp_syslog(pvar, "SFTP server version %u, remote version missing", type);
+		goto error;
+	}
 	sftp_syslog(pvar, "SFTP server version %u, remote version %u", type, c->sftp.version);
 
 	while (buffer_remain_len(msg) > 0) {
-		char *name = buffer_get_string_msg(msg, NULL);
-		char *value = buffer_get_string_msg(msg, NULL);
+		char *name = NULL;
+		char *value = NULL; 
 		int known = 0;
+
+		if (buffer_get_string(msg, &name, NULL) != 0 ||
+		    buffer_get_string(msg, &value, NULL) != 0) {
+			sftp_syslog(pvar, "buffer put error");
+			goto error;
+		}
 
         if (strcmp(name, "posix-rename@openssh.com") == 0 &&
             strcmp(value, "1") == 0) {
@@ -338,7 +352,7 @@ static void sftp_do_realpath(PTInstVar pvar, Channel_t *c, char *path)
 
 /* Convert from SSH2_FX_ status to text error message */
 static const char *fx2txt(int status)
-{       
+{
     switch (status) {
     case SSH2_FX_OK:
         return("No error");
@@ -366,37 +380,53 @@ static const char *fx2txt(int status)
 
 static char *sftp_do_realpath_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 {
-	unsigned int type, expected_id, count, id;
+	u_char type;
+	unsigned int expected_id, count, id;
 	char *filename = NULL, *longname;
 
-	type = buffer_get_char(msg);
-	id = buffer_get_int(msg);
+	if (buffer_get_char(msg, &type) != 0) {
+		goto error;
+	}
+	if (buffer_get_int(msg, &id) != 0) {
+		goto error;
+	}
 
-	expected_id = c->sftp.msg_id - 1; 
+	expected_id = c->sftp.msg_id - 1;
 	if (id != expected_id) {
 		sftp_syslog(pvar, "ID mismatch (%u != %u)", id, expected_id);
 		goto error;
 	}
 
 	if (type == SSH2_FXP_STATUS) {
-		unsigned int status = buffer_get_int(msg);
+		unsigned int status;
+		if (buffer_get_int(msg, &status) != 0) {
+			sftp_syslog(pvar, "status missing");
+			goto error;
+		}
 
 		sftp_syslog(pvar, "Couldn't canonicalise: %s", fx2txt(status));
 		goto error;
 	} else if (type != SSH2_FXP_NAME) {
-        sftp_syslog(pvar, "Expected SSH2_FXP_NAME(%u) packet, got %u",
-            SSH2_FXP_NAME, type);
+		sftp_syslog(pvar, "Expected SSH2_FXP_NAME(%u) packet, got %u",
+		            SSH2_FXP_NAME, type);
 		goto error;
 	}
 
-	count = buffer_get_int(msg);
+	if (buffer_get_int(msg, &count) != 0) {
+		sftp_syslog(pvar, "count missing");
+		goto error;
+	}
 	if (count != 1) {
 		sftp_syslog(pvar, "Got multiple names (%d) from SSH_FXP_REALPATH", count);
 		goto error;
 	}
 
-	filename = buffer_get_string_msg(msg, NULL);
-	longname = buffer_get_string_msg(msg, NULL);
+	if (buffer_get_string(msg, &filename, NULL) != 0 ||
+	    buffer_get_string(msg, &longname, NULL) != 0) {
+		sftp_syslog(pvar, "buffer put error");
+		goto error;
+	}
+
 	//a = decode_attrib(&msg);
 
 	sftp_console_message(pvar, c, "SSH_FXP_REALPATH %s -> %s", c->sftp.path, filename);
@@ -410,14 +440,14 @@ error:
 
 u_int
 sftp_proto_version(struct sftp *conn)
-{       
+{
     return conn->version;
-} 
+}
 
 static void
 help(void)
 {
-	sftp_console_message(g_pvar, g_channel, 
+	sftp_console_message(g_pvar, g_channel,
 		"Available commands:\r\n"
 	    "bye                                Quit sftp\r\n"
 	    "cd path                            Change remote directory to 'path'\r\n"
@@ -462,7 +492,7 @@ help(void)
  *
  * If "lastquote" is not NULL, the quoting character used for the last
  * argument is placed in *lastquote ("\0", "'" or "\"").
- * 
+ *
  * If "terminated" is not NULL, *terminated will be set to 1 when the
  * last argument's quote has been properly terminated or 0 otherwise.
  * This parameter is only of use if "sloppy" is set.
@@ -507,7 +537,7 @@ makeargv(const char *arg, int *argcp, int sloppy, char *lastquote,
 				state = q;
 				if (lastquote != NULL)
 					*lastquote = arg[i];
-			} else if (state == MA_UNQUOTED) 
+			} else if (state == MA_UNQUOTED)
 				state = q;
 			else if (state == q)
 				state = MA_UNQUOTED;
@@ -1156,8 +1186,8 @@ void sftp_response(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned i
 		sftp_do_init_recv(pvar, c, msg);
 
 		// コンソールを起動する。
-		hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_SFTP_DIALOG), 
-				pvar->cv->HWin, (DLGPROC)OnSftpConsoleDlgProc);	
+		hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_SFTP_DIALOG),
+				pvar->cv->HWin, (DLGPROC)OnSftpConsoleDlgProc);
 		if (hDlgWnd != NULL) {
 			c->sftp.console_window = hDlgWnd;
 			ShowWindow(hDlgWnd, SW_SHOW);

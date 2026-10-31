@@ -37,24 +37,22 @@
 
 #include "teraterm.h"
 #include "tttypes.h"
-#include "tt_res.h"
 #include "ttcommon.h"
 #include "ttwsk.h"
 #include "ttlib.h"
 #include "ttfileio.h"
 #include "ttplug.h" /* TTPLUG */
 #include "ttdde.h"
-#include "commlib.h"
 #include "filesys_log.h"
-#include "ttlib.h"
 #include "codeconv.h"
 #include "helpid.h"
 #include "vtwin.h"
+#include "ttwinman.h"
 #include "makeoutputstring.h"
+#include "name_resolve.h"
+#include "compat_win.h"
 
-static SOCKET OpenSocket(PComVar);
-static void AsyncConnect(PComVar);
-static int CloseSocket(SOCKET);
+#include "commlib.h"
 
 /* create socket */
 static SOCKET OpenSocket(PComVar cv)
@@ -106,6 +104,7 @@ static int CloseSocket(SOCKET s)
 #define CommOutQueSize (1024*4)
 #define CommXonLim 768
 #define CommXoffLim 3328
+static DWORD CommWriteLimit;	// WriteFile制限 0=制限しない/1～=送信バイト数制限
 
 #define WRITENAME "Write"
 #define READNAME "Read"
@@ -113,9 +112,6 @@ static int CloseSocket(SOCKET s)
 
 static HANDLE ReadEnd;
 static OVERLAPPED wol, rol;
-
-// Winsock async operation handle
-static HANDLE HAsync=0;
 
 BOOL TCPIPClosed = TRUE;
 
@@ -174,6 +170,11 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 
 	cv->DelayPerChar = ts->DelayPerChar;
 	cv->DelayPerLine = ts->DelayPerLine;
+	CommWriteLimit = ts->SerialSendLimit;
+	if ((int)ts->SerialSendLimit < 0) {
+		// intでマイナスは待ちなしとして扱う
+		CommWriteLimit = 0;
+	}
 
 	memset(&dcb,0,sizeof(DCB));
 	dcb.DCBlength = sizeof(DCB);
@@ -244,16 +245,19 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 	SetCommMask(cv->ComID,EV_RXCHAR | EV_ERR);
 }
 
-// 名前付きパイプが正しい書式かをチェックする。
-// \\ServerName\pipe\PipeName
-//
-// return  0: 正しい
-//        -1: 不正
-// (2012.3.10 yutaka)
-int CheckNamedPipeFormat(char *p, int size)
+/*
+ * 名前付きパイプが正しい書式かをチェックする。
+ * 例  \\ServerName\pipe\PipeName
+ *
+ *	@param	p
+ *	@retval	0	正しい
+ *	@retval	-1	不正
+ */
+static int CheckNamedPipeFormat(const char *p)
 {
 	int ret = -1;
 	char *s;
+	const size_t size = strlen(p);
 
 	if (size <= 8)
 		goto error;
@@ -275,15 +279,11 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	wchar_t ErrMsgW[21 + 256];
 	char P[50+256];
 
-	MSG Msg;
-	ADDRINFO hints;
-	char pname[NI_MAXSERV];
-
 	BOOL InvalidHost;
 
 	// ホスト名が名前付きパイプかどうかを調べる。
 	if (ts->PortType == IdTCPIP) {
-		if (CheckNamedPipeFormat(ts->HostName, strlen(ts->HostName)) == 0) {
+		if (CheckNamedPipeFormat(ts->HostName) == 0) {
 			ts->PortType = IdNamedPipe;
 		}
 	}
@@ -357,47 +357,31 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 				TTXOpenTCP(); /* TTPLUG */
 				cv->Open = TRUE;
 				/* resolving address */
-				memset(&hints, 0, sizeof(hints));
-				hints.ai_family = ts->ProtocolFamily;
-				hints.ai_socktype = SOCK_STREAM;
-				hints.ai_protocol = IPPROTO_TCP;
-				_snprintf_s(pname, sizeof(pname), _TRUNCATE, "%d", ts->TCPPort);
-
-				HAsync = PWSAAsyncGetAddrInfo(HW, WM_USER_GETHOST,
-				                             ts->HostName, pname, &hints, &cv->res0);
-				if (HAsync == 0)
+				const wchar_t *host_nameW = GetConnectHostName();
+				name_resolve_t *nr;
+				DWORD err = NameResolveStart(&nr, HW, WM_USER_GETHOST,
+				                             host_nameW, ts->TCPPort,
+				                             ts->ProtocolFamily, SOCK_STREAM,
+				                             &cv->res0);
+				if (err != ERROR_SUCCESS)
 					InvalidHost = TRUE;
 				else {
 					cv->ComPort = 1; // set "getting host" flag
 					                 //  (see CVTWindow::OnSysCommand())
-					do {
-						if (GetMessage(&Msg,0,0,0)) {
-							if ((Msg.hwnd==HW) &&
-							    ((Msg.message == WM_SYSCOMMAND) &&
-							     ((Msg.wParam & 0xfff0) == SC_CLOSE) ||
-							     (Msg.message == WM_COMMAND) &&
-							     (LOWORD(Msg.wParam) == ID_FILE_EXIT) ||
-							     (Msg.message == WM_CLOSE))) { /* Exit when the user closes Tera Term */
-								PWSACancelAsyncRequest(HAsync);
-								CloseHandle(HAsync);
-								HAsync = 0;
-								cv->ComPort = 0; // clear "getting host" flag
-								PostMessage(HW,Msg.message,Msg.wParam,Msg.lParam);
-								return;
-							}
-							if (Msg.message != WM_USER_GETHOST) { /* Prosess messages */
-								TranslateMessage(&Msg);
-								DispatchMessage(&Msg);
-							}
-						}
-						else {
-							return;
-						}
-					} while (Msg.message!=WM_USER_GETHOST);
+					name_resolve_result_t r = NameResolveWaitPump(&nr);
 					cv->ComPort = 0; // clear "getting host" flag
-					CloseHandle(HAsync);
-					HAsync = 0;
-					InvalidHost = WSAGETASYNCERROR(Msg.lParam) != 0;
+					switch (r) {
+					case NAME_RESOLVE_OK:
+						InvalidHost = FALSE;
+						break;
+					case NAME_RESOLVE_ERROR:
+						InvalidHost = TRUE;
+						break;
+					case NAME_RESOLVE_ABORT:	/* 閉じる操作は再投函済み */
+					case NAME_RESOLVE_QUIT:
+					default:
+						return;
+					}
 				}
 			} /* if (!LoadWinsock()) */
 
@@ -515,7 +499,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			strncpy_s(P, sizeof(P), ts->HostName, _TRUNCATE);
 
 			// 名前付きパイプが正しい書式かをチェックする。
-			if (CheckNamedPipeFormat(P, strlen(P)) < 0) {
+			if (CheckNamedPipeFormat(P) < 0) {
 				static const TTMessageBoxInfoW info = {
 					"Tera Term",
 					"MSG_TT_ERROR", L"Tera Term: Error",
@@ -784,7 +768,7 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 			break;
 	}
 	cv->Ready = TRUE;
-	cv->ConnectedTime = GetTickCount();
+	cv->ConnectedTime = pGetTickCount64();
 }
 
 BOOL CommCanClose(PComVar cv)
@@ -825,10 +809,6 @@ void CommClose(PComVar cv)
 	/* close port & release resources */
 	switch (cv->PortType) {
 		case IdTCPIP:
-			if (HAsync!=0) {
-				PWSACancelAsyncRequest(HAsync);
-			}
-			HAsync = 0;
 			Pfreeaddrinfo(cv->res0);
 			if ( cv->s!=INVALID_SOCKET ) {
 				Pclosesocket(cv->s);
@@ -1042,6 +1022,11 @@ void CommSend(PComVar cv)
 		case IdSerial:
 			ClearCommError(cv->ComID,&DErr,&Stat);
 			Max = CommOutQueSize - Stat.cbOutQue;
+			if (CommWriteLimit != 0) {
+				if (Max > (int)CommWriteLimit) {
+					Max = (int)CommWriteLimit;
+				}
+			}
 			break;
 		case IdFile:
 			Max = cv->OutBuffCount;

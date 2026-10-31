@@ -24,13 +24,17 @@ You can use the following command line parameters on TTXttyplay.
   <dt id="TP">/TP (short option for /ttyplay)</dt>
   <dd>Enable TTXttyplay. Replay the file that specified by <a href="teraterm.html#r">/R=</a> option as ttyrec format.</dd>
 
-  <dt id="TP=1">/TP=1</dt>
+  <dt id="TP=n">/TP=[&lt;mode&gt;]</dt>
   <dd>Enable TTXttyplay. Replay the file that specified by <a href="teraterm.html#r">/R=</a> option as ttyrec format.</dd>
-  <dd>Display to recording time at title bar.</dd>
-
-  <dt id="TP=3">/TP=3</dt>
-  <dd>Enable TTXttyplay. Replay the file that specified by <a href="teraterm.html#r">/R=</a> option as ttyrec format.</dd>
-  <dd>Display to recording time at title bar. Include milliseconds.</dd>
+  <dd>Replay to setting is specified by &lt;mode&gt;.
+    <ul>
+      <li><span class="syntax">0</span> no custom setting(default)</li>
+      <li><span class="syntax">1</span> Display to recording time at title bar.</li>
+      <li><span class="syntax">3</span> Display to recording time at title bar. Include milliseconds.</li>
+      <li><span class="syntax">4</span> Not display status at title ber</li>
+      <li><span class="syntax">8</span> Display both remote title and status at title ber</li>
+    </ul>
+  </dd>
 
   <dt id="nowait">/ttyplay-nowait</dt>
   <dt id="tpnw">/tpnw (short option for /ttyplay-nowait)</dt>

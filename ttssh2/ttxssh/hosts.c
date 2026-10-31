@@ -1090,7 +1090,9 @@ static char *format_host_key(PTInstVar pvar)
 		char *uu = NULL;
 		int n;
 
-		key_to_blob(key, &blob, &blen);
+		if (key_to_blob(key, &blob, &blen) != 0) {
+			goto error;
+		}
 		uulen = 2 * blen;
 		uu = malloc(uulen);
 		if (uu == NULL) {
@@ -1186,7 +1188,9 @@ static char *format_specified_host_key(Key *key, char *hostname, unsigned short 
 		char *uu = NULL;
 		int n;
 
-		key_to_blob(key, &blob, &blen);
+		if (key_to_blob(key, &blob, &blen) != 0) {
+			goto error;
+		}
 		uulen = 2 * blen;
 		uu = malloc(uulen);
 		if (uu == NULL) {

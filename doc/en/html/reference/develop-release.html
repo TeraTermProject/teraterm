@@ -27,10 +27,14 @@ To release Tera Term installation package is shown in the following step:
 <h2 id="start-rc">Start release operation</h2>
 
 <ol class="release">
-  <li>Confirm ticket and branches.
+  <li id="init-issues">Confirm issues and branches.
     <ul>
       <li>Confirm in project team.
         <ul>
+          <li>
+            Create an issue for tracking and management.<br>
+            e.g. <a href="https://github.com/TeraTermProject/teraterm/issues/1478">#1478</a>
+          </li>
           <li>Organize / decide whether to include bug fix / feature in this release or defer.</li>
         </ul>
       </li>
@@ -49,7 +53,7 @@ To release Tera Term installation package is shown in the following step:
       <li>Decide respond or postpone about new issue.</li>
     </ul>
   </li>
-  <li>Confirm tools, libraries, import sources.
+  <li id="init-libs">Confirm tools, libraries, import sources.
     <ul>
       <li>Visual Studio (<a href="https://visualstudio.microsoft.com/" target="_blank">https://visualstudio.microsoft.com/</a>)</li>
       <li>Inno Setup (<a href="https://jrsoftware.org/isdl.php" target="_blank">https://jrsoftware.org/isdl.php</a>)</li>
@@ -68,20 +72,20 @@ To release Tera Term installation package is shown in the following step:
     <p>Library versions are mostly determined at this timing.</p>
     <p>In a stable release, library versions are not updated from periodic release. (However, if a library has a security fix, we will handle it on a case-by-case basis.)</p>
   </li>
-  <li>What change is included in this release of not included is mostly determined.</li>
+  <li id="init-settle_down">What change is included in this release of not included is mostly determined.</li>
 </ol>
 
 <h2 id="rc-release">Create RC, and aftet that</h2>
 
 <ol class="release">
-  <li>Create a branch for RC work. (from main branch or stable branch)
+  <li id="rc-work_branch">Create a branch for RC work. (from main branch or stable branch)
 <pre>
 git switch main
 git pull --rebase
 git checkout -b release/5_6_0-RC
 </pre>
   </li>
-  <li>Confirm documents.
+  <li id="rc-doc">Confirm documents.
     <ul>
       <li>Check for missing parts of documents. Configuration item on dialog, special options without UI, command line parameters, new macro command and so on.</li>
       <li>Check for translations of changed documents. Translate them if they are not translated.</li>
@@ -96,7 +100,7 @@ git checkout -b release/5_6_0-RC
       </li>
     </ul>
   </li>
-  <li>Increment the year of last publication of copyright notice if it is first release in this year.
+  <li id="rc-year">Increment the year of last publication of copyright notice if it is first release in this year.
     <ul>
       <li>teraterm\keycode\keycode-version.rc // VERSIONINFO</li>
       <li>teraterm\teraterm\tt-version.rc // VERSIONINFO</li>
@@ -120,7 +124,7 @@ git checkout -b release/5_6_0-RC
     </ul>
     e.g. <a href="https://github.com/TeraTermProject/teraterm/commit/51abc3f9a8dd5a19a91019feefe6bbb26ed4f36f">A commit to clean up the changelog</a>
   </li>
-  <li>Increment the version while RC release process.
+  <li id="rc-bumpup">Increment the version while RC release process.
     <ul>
       <li>
         teraterm\common\tt-version.h<br>
@@ -144,25 +148,21 @@ git checkout -b release/5_6_0-RC
     </ul>
     e.g. <a href="https://github.com/TeraTermProject/teraterm/commit/a901021a1fcc99ba584c3ce083f0395076bef2b8">A commit to increment the version</a>
   </li>
-  <li>Create installer. (for check)</li>
-  <li>Test run installer, run and connect in all supported OS.</li>
-  <li>Commit and push.</li>
-  <li>Create the <a href="https://github.com/TeraTermProject/teraterm/pulls" target="_blank">Pull Request</a> to merge working branch.</li>
-  <li id="RC_commit">Merge the Pull Request. (into main branch or stable branch)</li>
-  <li>A build workflow runs on <a href="https://github.com/TeraTermProject/teraterm/actions" target="_blank">GitHub Actions</a>.<br>
+  <li id="rc-installer">Create installer. (for check)</li>
+  <li id="rc-installer_check">Test run installer, run and connect in all supported OS.</li>
+  <li id="rc-push">Commit and push.</li>
+  <li id="rc-pr">Create the <a href="https://github.com/TeraTermProject/teraterm/pulls" target="_blank">Pull Request</a> to merge working branch.</li>
+  <li id="rc-merge">Merge the Pull Request. (into main branch or stable branch)</li>
+  <li id="rc-build">A build workflow runs on <a href="https://github.com/TeraTermProject/teraterm/actions" target="_blank">GitHub Actions</a>.<br>
     Three builds are triggered on:
     <ul>
-      <li>Push to the working branch</li>
-      <li>Pull Request creation</li>
-      <li>Merge commit into the main branch or stable branch.</li>
+      <li><a href="#rc-push">Push</a> to the working branch <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22444778041">(Example)</a></li>
+      <li>Pull Request <a href="#rc-push">creation</a> <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22444816454">(Example)</a></li>
+      <li><a href="#rc-push">Merge</a> commit into the main branch or stable branch. <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22450625364">(Example)</a></li>
     </ul>
-    e.g. build
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22444778041">1</a>,
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22444816454">2</a>,
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22450625364">3</a><br>
     The build binary generated from the merge commit is considered the release candidate artifact.
   </li>
-  <li>Announce RC release.
+  <li id="rc-announce">Announce RC release.
     <ul>
       <li>X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)</li>
       <li>Direct users to report problems via <a href="https://github.com/TeraTermProject/teraterm/issues" target="_blank">Issues</a> on GitHub, as described <a href="../about/contacts.html">here</a>.</li>
@@ -170,20 +170,14 @@ git checkout -b release/5_6_0-RC
       <li>e.g. <a href="https://x.com/Tera_Term/status/2027058083479069022">5.6.0 RC</a></li>
     </ul>
   </li>
-  <li>Delete a working branch.</li>
-  <li>Get feedbacks.<br>
+  <li id="rc-del_work_branch">Delete a working branch.</li>
+  <li id="rc-receive_feedback">Get feedbacks.<br>
     If changed source code, redo "Confirm documents" and "Test run and connect in all supported OS."
   </li>
-  <li>If you are going to release RC2, repeat the steps in this section starting from creating a working branch.</li>
-</ol>
-
-<h2 id="release-operation">Release</h2>
-
-<ol class="release">
-  <li>Prepare an announcement texts.
+  <li id="rc-announce_text">Prepare an announcement texts.
     <ul>
       <li>
-        For <a href="#github_release">GitHub Releases</a><br>
+        For <a href="#rel-github_release">GitHub Releases</a><br>
         Write summary of release note (in Japanese and English) from changelog of document.<br>
         Select a few items that have a major impact on users.<br>
         e.g. <a href="https://github.com/TeraTermProject/teraterm/releases/tag/v5.6.0">5.6.0</a>
@@ -195,15 +189,21 @@ git checkout -b release/5_6_0-RC
       </li>
     </ul>
   </li>
-  <li>Create a branch for release work. (from main branch or stable branch)
+  <li id="rc-again">If you are going to release RC2, repeat the steps in this section starting from creating a working branch.</li>
+</ol>
+
+<h2 id="release-operation">Release</h2>
+
+<ol class="release">
+  <li id="rel-work_branch">Create a branch for release work. (from main branch or stable branch)
 <pre>
 git switch main
 git pull --rebase
 git checkout -b release/5_6_0
 </pre>
   </li>
-  <li>Confirm documents. (same as above)</li>
-  <li>Modify release date and remove "RC" string. (Replace it with a commented-out "dev".)
+  <li id="rel-doc">Confirm documents. (same as above)</li>
+  <li id="rel-bumpup">Modify release date and remove "RC" string. (Replace it with a commented-out "dev".)
     <ul>
       <li>html/about/history.html</li>
     </ul>
@@ -223,15 +223,15 @@ git checkout -b release/5_6_0
     </ul>
     e.g. <a href="https://github.com/TeraTermProject/teraterm/commit/96c23a5a90fb42da70e555f9f419163fa829c384">A commit to change the release date and remove "RC."</a>
   </li>
-  <li>Create installer. (for check)
+  <li id="rel-installer">Create installer. (for check)
     <div>
       Check that build and installer generation without error.
     </div>
   </li>
-  <li>Push. <a href="#login_signpath">*</a></li>
-  <li>Create the <a href="https://github.com/TeraTermProject/teraterm/pulls" target="_blank">Pull Request</a> to merge working branch. <a href="#login_signpath">*</a></li>
-  <li>Merge the Pull Request. (into main branch or stable branch) <a href="#login_signpath">*</a></li>
-  <li>Create a tag and push. <a href="#login_signpath">*</a>
+  <li id="rel-push">Push. <a href="#login_signpath">*</a></li>
+  <li id="rel-pr">Create the <a href="https://github.com/TeraTermProject/teraterm/pulls" target="_blank">Pull Request</a> to merge working branch. <a href="#login_signpath">*</a></li>
+  <li id="rel-merge">Merge the Pull Request. (into main branch or stable branch) <a href="#login_signpath">*</a></li>
+  <li id="rel-tag">Create a tag and push. <a href="#login_signpath">*</a>
     <div>
       Use annotated tags.
       The naming rule is `v(version)' (e.g. v5.6.0).
@@ -246,53 +246,41 @@ git push origin v5.4.0
   <li>A build workflow runs on <a href="https://github.com/TeraTermProject/teraterm/actions" target="_blank">GitHub Actions</a>.<br>
     Four builds are triggered on:
     <ul>
-      <li>Push to the working branch</li>
-      <li>Pull Request creation</li>
-      <li>Merge commit ito the main branch or stable branch</li>
-      <li>Tag creation.</li>
+      <li><a href="#rel-push">Push</a> to the working branch <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22512075622">(Example)</a></li>
+      <li>Pull Request <a href="#rel-pr">creation</a> <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22512366332">(Example)</a></li>
+      <li><a href="#rel-merge">Merge</a> commit ito the main branch or stable branch <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22513910434">(Example)</a></li>
+      <li>Tag <a href="#rel-tag">creation</a> <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22514106296">(Example)</a></li>
     </ul>
-    e.g. build
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22512075622">1</a>,
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22512366332">2</a>,
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22513910434">3</a>,
-    <a href="https://github.com/TeraTermProject/teraterm/actions/runs/22514106296">4</a><br>
 
     The build binary generated from the release tag is considered the release artifact.<br>
     <span id="login_signpath">During the release process, the workflow sends code signing requests to SignPath. SignPath's release-signing policy requires manual approval. Therefore, the workflow will wait until the code signing is approved. To approve the requests, log in to <a href="https://about.signpath.io/" target="_blank">SignPath.io</a> and approve signing requests.</span>
   </li>
-  <li>Delete a working branch.</li>
-  <li id="github_release">Add to GitHub "<a href="https://github.com/TeraTermProject/teraterm/releases" target="_blank">Releases</a>."
+  <li id="rel-del_work_branch">Delete a working branch.</li>
+  <li id="rel-github_release">Add to GitHub "<a href="https://github.com/TeraTermProject/teraterm/releases" target="_blank">Releases</a>."
     <ul>
       <li>select a new tag.</li>
       <li>put installer and portable zip file and hash file.</li>
       <li>write summary of release note.</li>
     </ul>
   </li>
-  <li>Check anti-virus software
-    <ul>
-      <li>download by Chrome</li>
-      <li>download by Edge<br>
-          Edge has "Defender SmartScreen", it notices "Uncommonly downloaded." Report it as incorrectly detected.
-      </li>
-    </ul>
-  </li>
-  <li>Update project web page (<a href="https://teratermproject.github.io" target="_blank">https://teratermproject.github.io</a>).
+  <li id="rel-antivirus">Check anti-virus software
     <div>
-      Please refer to the "<a href="https://github.com/TeraTermProject/teraterm/wiki/Update-Project-page" target="_blank">How to update project home page</a>" page (in Japanese) in the wiki for update instructions.
+      <ul>
+        <li>download by Chrome</li>
+        <li>download by Firefox</li>
+        <li>download by Edge<br>
+            Edge has "Defender SmartScreen." If it notices "Uncommonly downloaded", report it as incorrectly detected.
+        </li>
+      </ul>
+    </div>
+    <div>
+      When execute a download binary, SmartScreen alerts "Windows protected your PC."
+    </div>
+    <div>
+      Anti-Virus Software may reports false positive.
     </div>
   </li>
-  <li id="X_announce">Announce release.
-    <ul>
-      <li>
-        X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)
-        <ul>
-          <li>Post the announcement.</li>
-          <li>Pin that post.</li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-  <li>Create stable branch and push (only for periodic releases).
+  <li id="rel-new_stable_branch">Create stable branch and push (only for periodic releases).
 <pre>
 git switch main
 git pull --rebase
@@ -300,7 +288,7 @@ git checkout -b stable_5_6
 git push -u origin stable_5_6
 </pre>
   </li>
-  <li id="increment_version">Increment the version for text release
+  <li id="rel-bumpup_next_version">Increment the version for text release
     <p>When periodic release,</p>
     <ul>
       <li>
@@ -438,9 +426,8 @@ git checkout -b release/unfroze
       </li>
     </ul>
   </li>
-  <li>Modify changelog (only for stable releases).
+  <li id="rel-merge_changelog">Modify changelog of main branch (only for stable releases).
     <div>
-      Fix the main branch.<br>
       Copy changelogs from stable release, and delete them from periodic release.
     </div>
 <pre>
@@ -452,13 +439,30 @@ git checkout -b port/changelog
       <li>
         doc\en/ja\html\about\history.html<br>
         e.g. <a href="https://github.com/TeraTermProject/teraterm/commit/3c7ece59a6363116b0a34ccae7dbc2c7046f28ab">A commit to apply the stable release changelog to the main branch</a>
-
       </li>
       <li>Commit and push and merge.</li>
       <li>Delete a working branch.</li>
     </ul>
   </li>
-  <li>Configure GitHub <a href="https://github.com/TeraTermProject/teraterm/milestones">Milestones</a> (only for periodic releases).
+  <li id="rel-update_web">Update project web page (<a href="https://teratermproject.github.io" target="_blank">https://teratermproject.github.io</a>).
+    <ul>
+      <li>Update the version number on the website. (<a href="https://github.com/TeraTermProject/web/commit/6768c8eba97d042f3ad67f12004e901b115c8c81">Example</a>)</li>
+      <li>The manual of main is already updated by above process.</li>
+      <li>Please refer to the "<a href="https://github.com/TeraTermProject/teraterm/wiki/Update-Project-page" target="_blank">How to update project home page</a>" page (in Japanese) in the wiki for update instructions.</li>
+    </ul>
+  </li>
+  <li id="rel-X_announce">Announce release.
+    <ul>
+      <li>
+        X (<a href="https://x.com/Tera_Term" target="_blank">https://x.com/Tera_Term</a>)
+        <ul>
+          <li>Post the announcement.</li>
+          <li>Pin that post.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li id="rel-github_milestone">Configure GitHub <a href="https://github.com/TeraTermProject/teraterm/milestones">Milestones</a> (only for periodic releases).
     <ul>
       <li>Close the milestone of released version.</li>
       <li>Create the new milestone for next periodic release version. (e.g. "5.5.0")</li>
@@ -467,18 +471,13 @@ git checkout -b port/changelog
     </ul>
     The Milestone of stable release is not to be created.
   </li>
-  <li>Check for download a installer binary.
-    <div>
-      When execute a download binary, SmartScreen alerts "Windows protected your PC."
-    </div>
-    <div>
-      When download a binary with Microsoft Edge, Smart screen warns "File is not commonly downloaded."
-    </div>
-    <div>
-      Anti-Virus Software may reports false positive.
-    </div>
+  <li>Create an issue to manage merges into the stable branch for the next stable release.
+    <p>
+      Issues labeled "Needs MFC" will be managed in this issue.<br>
+      e.g. <a href="https://github.com/TeraTermProject/teraterm/issues/1436">#1436</a>
+    </p>
   </li>
-  <li>Update Chocolatey (<a href="https://community.chocolatey.org/packages/teraterm5" target="_blank">https://community.chocolatey.org/packages/teraterm5</a>).
+  <li id="rel-chocolatey">Update Chocolatey (<a href="https://community.chocolatey.org/packages/teraterm5" target="_blank">https://community.chocolatey.org/packages/teraterm5</a>).
     <div>
       Please refer to the <a href="https://github.com/TeraTermProject/teraterm/wiki/Chocolatey" target="_blank">Chocolatey</a> page (in Japanese) in the wiki for update instructions.
     </div>
@@ -493,7 +492,7 @@ git checkout -b port/changelog
 
 <p>
 After code freeze, only critical bug fix is able to committed.<br>
-Code freeze start with <a href="#RC_commit">RC commit</a>, and end with <a href="#increment_version">version increment commit.</a>.
+Code freeze start with <a href="#rc-merge">RC commit</a>, and end with <a href="#rel-bumpup_next_version">version increment commit.</a>.
 </p>
 
 </body>

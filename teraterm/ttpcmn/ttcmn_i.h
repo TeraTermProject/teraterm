@@ -39,6 +39,26 @@ extern "C" {
 
 DllExport void WINAPI SetPMPtr(PMap pm_);
 
+/*
+ *	入出力バッファ制御(ttcmn_buff.c)の実体は ttermpro.exe 側にある。
+ *	ttpcmn.dll は互換性のため Comm 系 API をエクスポートし続けているので、
+ *	ttermpro.exe 起動時に実体を登録してもらい、それ経由で呼び出す。
+ *	登録前 (ttpmacro.exe など) に呼ばれた場合は何もしない。
+ */
+typedef struct {
+	int (WINAPI *CommReadRawByte)(PComVar cv, LPBYTE b);
+	int (WINAPI *CommRead1Byte)(PComVar cv, LPBYTE b);
+	void (WINAPI *CommInsert1Byte)(PComVar cv, BYTE b);
+	int (WINAPI *CommRawOut)(PComVar cv, PCHAR B, int C);
+	int (WINAPI *CommBinaryOut)(PComVar cv, PCHAR B, int C);
+	int (WINAPI *CommBinaryBuffOut)(PComVar cv, PCHAR B, int C);
+	int (WINAPI *CommTextOutW)(PComVar cv, const wchar_t *B, int C);
+	int (WINAPI *CommBinaryEcho)(PComVar cv, PCHAR B, int C);
+	int (WINAPI *CommTextEchoW)(PComVar cv, const wchar_t *B, int C);
+} CommBuffFuncs;
+
+DllExport void WINAPI CommBuffSetFuncs(const CommBuffFuncs *funcs);
+
 #ifdef __cplusplus
 }
 #endif

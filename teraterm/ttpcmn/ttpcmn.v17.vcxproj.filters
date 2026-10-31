@@ -40,6 +40,9 @@
     <ClCompile Include="ttcmn_dup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ttcmn_impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ttcmn_lib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

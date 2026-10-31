@@ -977,6 +977,26 @@ BOOL WINAPI _CreateDirectoryW(LPCWSTR lpPathName,LPSECURITY_ATTRIBUTES lpSecurit
 	return r;
 }
 
+BOOL WINAPI _CommConfigDialogW(LPCWSTR lpszName, HWND hWnd, LPCOMMCONFIG lpCC)
+{
+	char *lpszNameA = ToCharW(lpszName);
+	BOOL r = CommConfigDialogA(lpszNameA, hWnd, lpCC);
+	DWORD err = GetLastError();
+	free(lpszNameA);
+	SetLastError(err);
+	return r;
+}
+
+BOOL WINAPI _GetDefaultCommConfigW(LPCWSTR lpszName, LPCOMMCONFIG lpCC, LPDWORD lpdwSize)
+{
+	char *lpszNameA = ToCharW(lpszName);
+	BOOL r = GetDefaultCommConfigA(lpszNameA, lpCC, lpdwSize);
+	DWORD err = GetLastError();
+	free(lpszNameA);
+	SetLastError(err);
+	return r;
+}
+
 BOOL WINAPI _GetMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax)
 {
 	return GetMessageA(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax);

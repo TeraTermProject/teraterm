@@ -299,8 +299,8 @@ typedef struct _TInstVar {
 	int ssh2_autologin;
 	int ask4passwd;
 	SSHAuthMethod ssh2_authmethod;
-	char ssh2_username[MAX_PATH];
-	char ssh2_password[MAX_PATH];
+	char ssh2_username[MAX_PATH];	// UTF-8
+	char ssh2_password[MAX_PATH];	// UTF-8
 	wchar_t ssh2_keyfile[MAX_PATH];
 	time_t ssh_heartbeat_tick;
 	HANDLE ssh_heartbeat_thread;

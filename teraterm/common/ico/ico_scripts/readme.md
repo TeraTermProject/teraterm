@@ -43,11 +43,10 @@
 - https://www.nongnu.org/icoutils/
 - icoファイルから複数のpngを抽出
 - 複数のpngから1つのicoファイルを合成
-- windows用
-  - https://www.cybercircuits.co.nz/web/blog/icoutils-0-32-3-for-windows
 - cygwin では icoutils パッケージに入っている
 - linux では icoutils パッケージに入っている
   - `apt-get install icoutils`
+- Windows用バイナリは配布ページがなくなった
 
 # bmp形式icoファイル作成
 

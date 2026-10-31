@@ -172,9 +172,7 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 				free(UIMsg);
 			}
 
-			SetDlgItemTextA(Dialog, IDC_WINTITLE, ts->Title);
-			SendDlgItemMessage(Dialog, IDC_WINTITLE, EM_LIMITTEXT,
-			                   sizeof(ts->Title)-1, 0);
+			SetDlgItemTextW(Dialog, IDC_WINTITLE, ts->TitleW);
 
 			SetRB(Dialog,ts->HideTitle,IDC_WINHIDETITLE,IDC_WINHIDETITLE);
 			SetRB(Dialog,ts->EtermLookfeel.BGNoFrame,IDC_NO_FRAME,IDC_NO_FRAME);
@@ -283,7 +281,8 @@ static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			case PSN_APPLY: {
 				WORD w;
 				//HDC DC;
-				GetDlgItemText(Dialog, IDC_WINTITLE, ts->Title, sizeof(ts->Title));
+				free(ts->TitleW);
+				hGetDlgItemTextW(Dialog, IDC_WINTITLE, &ts->TitleW);
 				GetRB(Dialog, &ts->HideTitle, IDC_WINHIDETITLE, IDC_WINHIDETITLE);
 				GetRB(Dialog, &w, IDC_NO_FRAME, IDC_NO_FRAME);
 				ts->EtermLookfeel.BGNoFrame = w;

@@ -9,7 +9,7 @@
 </HEAD>
 <BODY>
 
-<h1>Dropping sent and received data</h1>
+<h1 id="SendReceiveDrop">Dropping sent and received data</h1>
 
 Data sent or received may be lost for various reasons.<br>
 The locations where drops occur and the solutions are as follows:
@@ -48,7 +48,12 @@ Tera Term ---> Send buffer  ---> OS,driver ---> (sshd,telnet,pipe) ---> UART chi
     OS (driver) or program handles flow control depends on implementation.<br>
     In TCP/IP, flow control and resend on error are performed, and in most cases,
     protocol stack in OS handles these processes.<br>
-    In serial, user can decide whether flow control is used or not, and resend are not automatically performed in case of overflow or other errors.
+    In serial, user can decide whether flow control is used or not, and resend are not automatically performed in case of overflow or other errors.<br>
+    When the receiving device is slow in serial communication, lowering the
+    transmission performance of Tera Term
+    (<a href="../../menu/setup-additional-serialport.html#Delay">send delay</a>,
+    <a href="../../setup/teraterm-com.html#SerialSendLimit">send size limit</a>)
+    may improve the situation.
   </dd>
   <dt>program</dt>
   <dd>

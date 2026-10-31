@@ -75,7 +75,7 @@ void FLogBinSkip(int add);
 
 void FLogOutputAllBuffer(void);
 wchar_t* FLogTimeStampStrW(enum LogTimestampType timestamp_type, const wchar_t* format,
-						   DWORD start_time, DWORD connected_time);
+						   ULONGLONG start_time, ULONGLONG connected_time);
 
 #ifdef __cplusplus
 }

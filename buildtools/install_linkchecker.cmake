@@ -2,8 +2,8 @@
 
 # linkchecker
 set(LINKCHECKER_PL "${CMAKE_CURRENT_LIST_DIR}/linkchecker/linkchecker.pl")
-set(LINKCHECKER_URL "https://raw.githubusercontent.com/saoyagi2/linkchecker/8c268c1f2706a2113c730e1798777ca05ee10e0d/linkchecker.pl")
-set(LINKCHECKER_HASH "4ec2aeb5384a09b8eb53c117b5f39e5d2661e8592da02b4d2de9ad43e04385a5")
+set(LINKCHECKER_URL "https://raw.githubusercontent.com/saoyagi2/linkchecker/9820513624b4b2b32f0bad9b22bcf20215e6f5af/linkchecker.pl")
+set(LINKCHECKER_HASH "6f1e4c178af2c11a59649c97c66811eb7dc32131909f42351ebfb53e10e65c79")
 
 # check linkchecker
 if(EXISTS ${LINKCHECKER_PL})

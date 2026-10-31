@@ -97,7 +97,7 @@ static LRESULT CALLBACK CSProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
  */
 ColorSample *ColorSampleInit(HWND hWnd, HFONT hFont)
 {
-	ColorSampleWork *work = (ColorSampleWork *)calloc(sizeof(*work), 1);
+	ColorSampleWork *work = (ColorSampleWork *)calloc(1, sizeof(*work));
 	work->hWnd = hWnd;
 	work->SampleFont = hFont;
 	work->OrigProc = (WNDPROC)SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)CSProc);

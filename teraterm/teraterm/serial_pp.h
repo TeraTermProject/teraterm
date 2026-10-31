@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-HPROPSHEETPAGE SerialPageCreate(HINSTANCE inst, TTTSet *pts);
+HPROPSHEETPAGE SerialPageCreate(HINSTANCE inst, TTTSet *pts, TComVar *pcv);
 
 #ifdef __cplusplus
 }

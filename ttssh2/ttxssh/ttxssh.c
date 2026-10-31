@@ -1027,8 +1027,8 @@ typedef struct {
 
 static BOOL IsEditHistorySelected(HWND dlg)
 {
-	LRESULT index = SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCURSEL, 0, 0);
-	LRESULT data = SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETITEMDATA, (WPARAM)index, 0);
+	LRESULT index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_GETCURSEL, 0, 0);
+	LRESULT data = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_GETITEMDATA, (WPARAM)index, 0);
 	return data == 999;
 }
 
@@ -1037,18 +1037,18 @@ static void SetHostDropdown(HWND dlg, const TTTSet *ts)
 	LRESULT index;
 	SetComboBoxHostHistory(dlg, IDC_HOSTNAME, MAXHOSTLIST, ts->SetupFNameW);
 	ExpandCBWidth(dlg, IDC_HOSTNAME);
-	SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
-	if (SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) != 0) {
+	SendDlgItemMessageW(dlg, IDC_HOSTNAME, EM_LIMITTEXT, HostNameMaxLength - 1, 0);
+	if (SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) != 0) {
 		// 一番最初を選択する
-		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
+		SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
 	} else {
 		// 選択しない、エディットボックスは空になる
-		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
+		SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
 	}
 
 	// Edit historyを追加(ITEMDATA=999)
 	index = SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_ADDSTRING, 0, (LPARAM)L"<Edit host list...>");
-	SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
+	SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_SETITEMDATA, index, 999);
 }
 
 static void OpenEditHistory(HWND dlg, TTTSet *ts)
@@ -1060,17 +1060,17 @@ static void OpenEditHistory(HWND dlg, TTTSet *ts)
 	data.title = L"Edit Host list";
 	if (EditHistoryDlg(NULL, dlg, &data)) {
 		// 編集されたので、ドロップダウンを再設定する
-		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_RESETCONTENT, 0, 0);
+		SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_RESETCONTENT, 0, 0);
 
 		SetHostDropdown(dlg, ts);
 	}
 
-	if (SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) > 1) {
+	if (SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_GETCOUNT, 0, 0) > 1) {
 		// 一番最初を選択する
-		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
+		SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_SETCURSEL, 0, 0);
 	} else {
 		// "<Edit History...>のみ、選択しない、エディットボックスは空になる
-		SendDlgItemMessageA(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
+		SendDlgItemMessageW(dlg, IDC_HOSTNAME, CB_SETCURSEL, -1, 0);
 	}
 }
 
@@ -1206,7 +1206,7 @@ static INT_PTR CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPa
 		CheckRadioButton(dlg, IDC_HOSTTCPIP, IDC_HOSTSERIAL,
 		                 IDC_HOSTTCPIP + GetHNRec->PortType - 1);
 		if (GetHNRec->PortType == IdTCPIP) {
-			SendMessageA(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_HOSTNAME), TRUE);
+			SendMessageW(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDC_HOSTNAME), TRUE);
 			enable_dlg_items(dlg, IDC_HOSTCOMLABEL, IDC_HOSTCOM, FALSE);
 
 			enable_dlg_items(dlg, IDC_SSH_VERSION, IDC_SSH_VERSION, TRUE);
@@ -1715,10 +1715,10 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 				}
 
 			} else if (wcsncmp(option + 1, L"user=", 5) == 0) {
-				WideCharToACP_t(option + 6, pvar->ssh2_username, sizeof(pvar->ssh2_username));
+				WideCharToMultiByte(CP_UTF8, 0, option + 6, -1, pvar->ssh2_username, sizeof(pvar->ssh2_username), NULL, NULL);
 
 			} else if (wcsncmp(option + 1, L"passwd=", 7) == 0) {
-				WideCharToACP_t(option + 8, pvar->ssh2_password, sizeof(pvar->ssh2_password));
+				WideCharToMultiByte(CP_UTF8, 0, option + 8, -1, pvar->ssh2_password, sizeof(pvar->ssh2_password), NULL, NULL);
 
 			} else if (wcsncmp(option + 1, L"keyfile=", 8) == 0) {
 				const wchar_t *keyfileW = option + 9;
@@ -1825,14 +1825,10 @@ static void PASCAL TTXParseParam(wchar_t *param, PTTSet ts, PCHAR DDETopic)
 			//   将来的にtelnet authentication optionをサポートした時は
 			//   Tera Term本体で処理するようにする予定。
 			//
-			char *optionA;
 			wchar_t *p;
 			p = wcschr(option, '@');
 			*p = 0;
-
-			optionA = ToCharW(option);
-			strncpy_s(pvar->ssh2_username, sizeof(pvar->ssh2_username), optionA, _TRUNCATE);
-			free(optionA);
+			WideCharToMultiByte(CP_UTF8, 0, option, -1, pvar->ssh2_username, sizeof(pvar->ssh2_username), NULL, NULL);
 
 			// ユーザ名部分をスペースで潰す。
 			// 後続のTTXやTera Term本体で解釈する時にはスペースを読み飛ばすので、
@@ -3770,8 +3766,10 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 			salt, SALT_LEN, key, keylen + ivlen, rounds) < 0)
 			//fatal("bcrypt_pbkdf failed");
 			;
-		buffer_put_string(kdf, salt, SALT_LEN);
-		buffer_put_int(kdf, rounds);
+		if (buffer_put_string(kdf, salt, SALT_LEN) != 0 ||
+		    buffer_put_int(kdf, rounds) != 0) {
+			goto ed25519_error;
+		}
 	}
 	// 暗号化の準備
 	// TODO: OpenSSH 6.5では -Z オプションで、暗号化アルゴリズムを指定可能だが、
@@ -3781,11 +3779,13 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	SecureZeroMemory(key, keylen + ivlen);
 	free(key);
 
-	buffer_append(encoded, AUTH_MAGIC, sizeof(AUTH_MAGIC));
-	buffer_put_cstring(encoded, ciphername);
-	buffer_put_cstring(encoded, kdfname);
-	buffer_put_string(encoded, buffer_ptr(kdf), buffer_len(kdf));
-	buffer_put_int(encoded, 1);			/* number of keys */
+	if (buffer_put(encoded, AUTH_MAGIC, sizeof(AUTH_MAGIC)) != 0 ||
+	    buffer_put_cstring(encoded, ciphername) != 0 ||
+	    buffer_put_cstring(encoded, kdfname) != 0 ||
+	    buffer_put_string(encoded, buffer_ptr(kdf), buffer_len(kdf)) != 0||
+	    buffer_put_int(encoded, 1) != 0) { /* number of keys */
+		goto ed25519_error;
+	}
 
 	// key_to_blob()を一時利用するため、Key構造体を初期化する。
 	keyblob.type = private_key.type;
@@ -3794,32 +3794,47 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	keyblob.ecdsa = private_key.ecdsa;
 	keyblob.ed25519_pk = private_key.ed25519_pk;
 	keyblob.ed25519_sk = private_key.ed25519_sk;
-	key_to_blob(&keyblob, &cp, &len);			/* public key */
+	if (key_to_blob(&keyblob, &cp, &len) != 0) { /* public key */
+		goto ed25519_error;
+	}
 
-	buffer_put_string(encoded, cp, len);
+	if (buffer_put_string(encoded, cp, len) != 0) {
+		goto ed25519_error;
+	}
 
 	SecureZeroMemory(cp, len);
 	free(cp);
 
 	/* Random check bytes */
 	check = arc4random();
-	buffer_put_int(b, check);
-	buffer_put_int(b, check);
+	if (buffer_put_int(b, check) != 0 ||
+	    buffer_put_int(b, check) != 0) {
+		goto ed25519_error;
+	}
 
 	/* append private key and comment*/
 	key_private_serialize(&keyblob, b);
-	buffer_put_cstring(b, comment);
+	if (buffer_put_cstring(b, comment) != 0) {
+		goto ed25519_error;
+	}
 
 	/* padding */
 	i = 0;
-	while (buffer_len(b) % blocksize)
-		buffer_put_char(b, ++i & 0xff);
+	while (buffer_len(b) % blocksize) {
+		if (buffer_put_char(b, ++i & 0xff) != 0) {
+			goto ed25519_error;
+		}
+	}
 
 	/* length */
-	buffer_put_int(encoded, buffer_len(b));
+	if (buffer_put_int(encoded, buffer_len(b)) != 0) {
+		goto ed25519_error;
+	}
 
 	/* encrypt */
-	cp = buffer_append_space(encoded, buffer_len(b) + authlen);
+	if (buffer_reserve(encoded, buffer_len(b) + authlen, &cp) != 0) {
+		goto ed25519_error;
+	}
 	if (EVP_Cipher(cc->evp, cp, buffer_ptr(b), buffer_len(b)) == 0) {
 		//strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 		//free(decrypted);
@@ -3836,15 +3851,27 @@ static void save_bcrypt_private_key(char *passphrase, const wchar_t *filename, c
 	}
 
 	buffer_clear(blob);
-	buffer_append(blob, MARK_BEGIN, sizeof(MARK_BEGIN) - 1);
-	for (i = 0; i < n; i++) {
-		buffer_put_char(blob, cp[i]);
-		if (i % 70 == 69)
-			buffer_put_char(blob, '\n');
+	if (buffer_put(blob, MARK_BEGIN, sizeof(MARK_BEGIN) - 1) != 0) {
+		goto ed25519_error;
 	}
-	if (i % 70 != 69)
-		buffer_put_char(blob, '\n');
-	buffer_append(blob, MARK_END, sizeof(MARK_END) - 1);
+	for (i = 0; i < n; i++) {
+		if (buffer_put_char(blob, cp[i]) != 0) {
+			goto ed25519_error;
+		}
+		if (i % 70 == 69) {
+			if (buffer_put_char(blob, '\n') != 0) {
+				goto ed25519_error;
+			}
+		}
+	}
+	if (i % 70 != 69) {
+		if (buffer_put_char(blob, '\n') != 0) {
+			goto ed25519_error;
+		}
+	}
+	if (buffer_put(blob, MARK_END, sizeof(MARK_END) - 1) != 0) {
+		goto ed25519_error;
+	}
 	free(cp);
 
 	len = buffer_len(blob);
@@ -4401,36 +4428,45 @@ static INT_PTR CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 					DSA_get0_key(dsa, &pub_key, NULL);
 
 					keyname = "ssh-dss";
-					buffer_put_string(b, keyname, strlen(keyname));
-					buffer_put_bignum2(b, p);
-					buffer_put_bignum2(b, q);
-					buffer_put_bignum2(b, g);
-					buffer_put_bignum2(b, pub_key);
+					if (buffer_put_string(b, keyname, strlen(keyname)) != 0 ||
+					    buffer_put_bignum2(b, p) != 0 ||
+					    buffer_put_bignum2(b, q) != 0 ||
+					    buffer_put_bignum2(b, g) != 0 ||
+					    buffer_put_bignum2(b, pub_key) != 0) {
+						goto public_error;
+					}
 					break;
 
 				case KEY_RSA: // RSA
 					RSA_get0_key(rsa, &n, &e, NULL);
 					keyname = "ssh-rsa";
-					buffer_put_string(b, keyname, strlen(keyname));
-					buffer_put_bignum2(b, e);
-					buffer_put_bignum2(b, n);
+					if (buffer_put_string(b, keyname, strlen(keyname)) != 0 ||
+					    buffer_put_bignum2(b, e) != 0 ||
+					    buffer_put_bignum2(b, n) != 0) {
+						goto public_error;
+					}
 					break;
 
 				case KEY_ECDSA256: // ECDSA
 				case KEY_ECDSA384:
 				case KEY_ECDSA521:
 					keyname = get_ssh2_hostkey_type_name(public_key.type);
-					buffer_put_string(b, keyname, strlen(keyname));
+					if (buffer_put_string(b, keyname, strlen(keyname)) != 0)
+						goto public_error;
 					s = curve_keytype_to_name(public_key.type);
-					buffer_put_string(b, s, strlen(s));
-					buffer_put_ecpoint(b, EC_KEY_get0_group(ecdsa),
-					                      EC_KEY_get0_public_key(ecdsa));
+					if (buffer_put_string(b, s, strlen(s)) != 0 ||
+					    buffer_put_ec(b, EC_KEY_get0_public_key(ecdsa),
+					                     EC_KEY_get0_group(ecdsa)) != 0) {
+						goto public_error;
+					}
 					break;
 
 				case KEY_ED25519:
 					keyname = get_ssh2_hostkey_type_name(public_key.type);
-					buffer_put_cstring(b, keyname);
-					buffer_put_string(b, public_key.ed25519_pk, ED25519_PK_SZ);
+					if (buffer_put_cstring(b, keyname) != 0 ||
+					    buffer_put_string(b, public_key.ed25519_pk, ED25519_PK_SZ) != 0) {
+						goto public_error;
+					}
 					break;
 				}
 
@@ -4570,21 +4606,26 @@ public_error:
 				tmp[1] = (rnd >> 8) & 0xff;
 				tmp[2] = tmp[0];
 				tmp[3] = tmp[1];
-				buffer_append(b, tmp, 4);
+				if (buffer_put(b, tmp, 4) != 0)
+					goto error;
 
 				// set private key
 				rsa = private_key.rsa;
 				RSA_get0_key(rsa, &n, &e, &d);
 				RSA_get0_factors(rsa, &p, &q);
 				RSA_get0_crt_params(rsa, &dmp1, &dmq1, &iqmp);
-				buffer_put_bignum(b, d);
-				buffer_put_bignum(b, iqmp);
-				buffer_put_bignum(b, q);
-				buffer_put_bignum(b, p);
+				if (buffer_put_bignum1(b, d) != 0 ||
+				    buffer_put_bignum1(b, iqmp) != 0 ||
+				    buffer_put_bignum1(b, q) != 0 ||
+					buffer_put_bignum1(b, p) != 0) {
+					goto error;
+				}
 
 				// padding with 8byte align
 				while (buffer_len(b) % 8) {
-					buffer_put_char(b, 0);
+					if (buffer_put_char(b, 0) != 0) {
+						goto error;
+					}
 				}
 
 				//
@@ -4593,20 +4634,28 @@ public_error:
 				// encrypted buffer
 			    /* First store keyfile id string. */
 				for (i = 0 ; authfile_id_string[i] ; i++) {
-					buffer_put_char(enc, authfile_id_string[i]);
+					if (buffer_put_char(enc, authfile_id_string[i]) != 0) {
+						goto error;
+					}
 				}
-				buffer_put_char(enc, 0x0a); // LF
-				buffer_put_char(enc, 0);
+				if (buffer_put_char(enc, 0x0a) != 0 || // LF
+				    buffer_put_char(enc, 0) != 0) {
+					goto error;
+				}
 
 				/* Store cipher type. */
-				buffer_put_char(enc, cipher_num);
-				buffer_put_int(enc, 0);  // type is 'int'!! (For future extension)
+				if (buffer_put_char(enc, cipher_num) != 0 ||
+				    buffer_put_int(enc, 0) != 0) { // type is 'int'!! (For future extension)
+					goto error;
+				}
 
 				/* Store public key.  This will be in plain text. */
-				buffer_put_int(enc, BN_num_bits(n));
-				buffer_put_bignum(enc, n);
-				buffer_put_bignum(enc, e);
-				buffer_put_string(enc, comment, strlen(comment));
+				if (buffer_put_int(enc, BN_num_bits(n)) != 0 ||
+				    buffer_put_bignum1(enc, n) != 0 ||
+				    buffer_put_bignum1(enc, e) != 0 ||
+				    buffer_put_string(enc, comment, strlen(comment)) != 0) {
+					goto error;
+				}
 
 				// setup the MD5ed passphrase to cipher encryption key
 				MD5_Init(&md);
@@ -4633,7 +4682,8 @@ public_error:
 					goto error;
 				}
 
-				buffer_append(enc, wrapped, len);
+				if (buffer_put(enc, wrapped, len) != 0)
+					goto error;
 
 				// saving private key file (binary mode)
 				fp = _wfopen(filename, L"wb");
@@ -4880,6 +4930,11 @@ static void _dquote_string(const wchar_t *str, wchar_t *dst, size_t dst_len)
 
 static void dquote_stringW(const wchar_t *str, wchar_t *dst, size_t dst_len)
 {
+	if (str == NULL || *str == L'\0') {
+		*dst = L'\0';
+		return;
+	}
+
 	// ",スペース,;,^A-^_ が含まれる場合にはクオートする
 	if (wcschr(str, '"') != NULL ||
 	    wcschr(str, ' ') != NULL ||
@@ -4922,14 +4977,11 @@ static void dquote_stringW(const wchar_t *str, wchar_t *dst, size_t dst_len)
 	wcsncpy_s(dst, dst_len, str, _TRUNCATE);
 }
 
-static void dquote_string(const char *str, char *dst, size_t dst_len)
+static void dquote_stringU8toW(const char *str, wchar_t *dst, size_t dst_len)
 {
-	wchar_t *dstW = malloc(sizeof(wchar_t) * dst_len);
-	wchar_t *strW = ToWcharA(str);
-	dquote_stringW(strW, dstW, dst_len);
-	WideCharToACP_t(dstW, dst, dst_len);
+	wchar_t *strW = ToWcharU8(str);
+	dquote_stringW(strW, dst, dst_len);
 	free(strW);
-	free(dstW);
 }
 
 static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
@@ -4995,7 +5047,7 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 
 		// セッション複製の場合は、自動ログイン用パラメータを付ける。
 		if (wcsstr(buf, L"DUPLICATE")) {
-			char mark[MAX_PATH];
+			wchar_t mark[MAX_PATH];
 			wchar_t tmp[MAX_PATH*2];
 
 			// 自動ログインの場合は下記フラグが0のため、必要なコマンドを付加する。
@@ -5005,22 +5057,25 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 			}
 
+			wchar_t user[MAX_PATH];
+			dquote_stringU8toW(pvar->auth_state.user, user, _countof(user));
+
 			// パスワードを覚えていて、かつ複数認証要求でない場合にのみコマンドラインに渡す。
 			if (pvar->settings.remember_password &&
 			    !pvar->auth_state.multiple_required_auth &&
 			    pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) {
-				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
+				dquote_stringU8toW(pvar->auth_state.cur_cred.password, mark, _countof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-				             L" /auth=password /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				             L" /auth=password /user=%s /passwd=%s", user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->settings.remember_password &&
 			           !pvar->auth_state.multiple_required_auth &&
 			           pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
 				wchar_t markW[MAX_PATH];
-				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
+				dquote_stringU8toW(pvar->auth_state.cur_cred.password, mark, _countof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-				             L" /auth=publickey /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				             L" /auth=publickey /user=%s /passwd=%s", user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 				dquote_stringW(pvar->session_settings.DefaultRSAPrivateKeyFile, markW, _countof(markW));
@@ -5030,15 +5085,15 @@ static void PASCAL TTXSetCommandLine(wchar_t *cmd, int cmdlen, PGetHNRec rec)
 			} else if (pvar->settings.remember_password &&
 			           !pvar->auth_state.multiple_required_auth &&
 			           pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
-				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
+				dquote_stringU8toW(pvar->auth_state.cur_cred.password, mark, _countof(mark));
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-				             L" /auth=challenge /user=%hs /passwd=%hs", pvar->auth_state.user, mark);
+				             L" /auth=challenge /user=%s /passwd=%s", user, mark);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT &&
 			           !pvar->auth_state.multiple_required_auth) {
 				_snwprintf_s(tmp, _countof(tmp), _TRUNCATE,
-				             L" /auth=pageant /user=%hs", pvar->auth_state.user);
+				             L" /auth=pageant /user=%s", user);
 				wcsncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else {

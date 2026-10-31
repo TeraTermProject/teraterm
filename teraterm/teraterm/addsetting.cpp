@@ -1601,7 +1601,7 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
 		pages[PP_MOUSE] = MousePageCreate(hInstance, &ts);
 		pages[PP_TCPIP] = TcpIPPageCreate(hInstance, &ts);
 		pages[PP_TERMINAL] = CreateTerminalPP(hInstance, hParentWnd, &ts);
-		pages[PP_SERIAL] = SerialPageCreate(hInstance, &ts);
+		pages[PP_SERIAL] = SerialPageCreate(hInstance, &ts, &cv);
 		pages[PP_UI] = UIPageCreate(hInstance, &ts);
 		pages[PP_WINDOW] = CreateWinVTPP(hInstance, hParentWnd, &ts);
 	}

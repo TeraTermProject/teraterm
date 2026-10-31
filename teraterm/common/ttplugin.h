@@ -27,6 +27,8 @@
 #ifndef __TTPLUGIN_H
 #define __TTPLUGIN_H
 
+#include <stddef.h>		// for offsetof()
+
 #include "teraterm.h"
 #include "ttdialog.h"
 #include "ttwsk.h"
@@ -55,7 +57,8 @@ typedef struct {
   TWSAGetLastError * PWSAGetLastError;
 //  Tgetaddrinfo * Pgetaddrinfo;
   Tfreeaddrinfo * Pfreeaddrinfo;
-  TWSAAsyncGetAddrInfo * PWSAAsyncGetAddrInfo;
+  TWSAAsyncGetAddrInfo * PWSAAsyncGetAddrInfo;	// 互換のため残している。Tera Term 本体は呼ばない
+  TWSAAsyncGetAddrInfoW * PWSAAsyncGetAddrInfoW;
 } TTXSockHooks;
 
 typedef struct {
@@ -88,6 +91,36 @@ typedef struct {
   PWindowWindow * WindowWindow;
 } TTXUIHooks;
 
+/**
+ *	Tera Term から Import する関数
+ */
+typedef struct {
+	/**
+	 *	ローカルタイトルを設定する
+	 */
+	void (*SetLocalTitle)(const wchar_t *title);
+
+	/**
+	 *	ローカルタイトルを取得する
+	 */
+	const wchar_t *(*GetLocalTitle)(void);
+
+	/**
+	 *	接続先ホスト名を設定する
+	 *
+	 *	ts->HostNameW と ts->HostName(ANSI) の両方が設定される
+	 */
+	void (*SetConnectHostName)(const wchar_t *hostname);
+
+	/**
+	 *	接続先ホスト名を取得する
+	 */
+	const wchar_t *(*GetConnectHostName)(void);
+} TTXImports;
+
+/**
+ *	Tera Term へ Export する関数
+ */
 typedef struct {
   int size;
   int loadOrder; /* smaller numbers get loaded first */
@@ -100,10 +133,27 @@ typedef struct {
   void (PASCAL * TTXModifyMenu)(HMENU menu); /* called first to last */
   void (PASCAL * TTXModifyPopupMenu)(HMENU menu); /* called first to last */
   int (PASCAL * TTXProcessCommand)(HWND hWin, WORD cmd); /* returns TRUE if handled, called last to first */
-  void (PASCAL * TTXEnd)(void); /* called last to first */
+  void (PASCAL * TTXEnd)(void); /* called last to first, VTWinが破棄され、メッセージループが終了した後に呼び出されます。 */
   void (PASCAL * TTXSetCommandLine)(wchar_t *cmd, int cmdlen, PGetHNRec rec); /* called first to last */
   void (PASCAL * TTXOpenFile)(TTXFileHooks * hooks); /* called first to last */
   void (PASCAL * TTXCloseFile)(TTXFileHooks * hooks); /* called last to first */
+
+	/**
+	 *	TTXInit2()
+	 *
+	 *	TTXInit() の Import 追加版
+	 *	called first to last
+	 *
+	 *	@param	ts
+	 *	@param	cv
+	 *	@param	GetImports()	TTXImportsへのポインタを取得
+	 *							引数には sizeof(TTXImports) を渡す
+	 *							戻り値がNULLの場合は TTXImports が使用できない
+	 *							(ttermpro.exe とプラグインで TTXImports が異なる)
+	 *	@retval	TRUE			初期化ok
+	 *	@retval	FALSE			このプラグインは使用しない
+	 */
+	BOOL (*TTXInit2)(PTTSet ts, PComVar cv, const TTXImports *(*GetImports)(size_t size));
 } TTXExports;
 
 /* On entry, 'size' is set to the size of the structure and the rest of
@@ -113,5 +163,26 @@ typedef struct {
    This is all for binary compatibility across releases; if the record gets bigger,
    then the extra functions will be NULL for DLLs that don't understand them. */
 typedef BOOL (PASCAL * TTXBindProc)(WORD Version, TTXExports * exports);
+
+/**
+ *	TTXBind() に渡された exports が member を含んでいるか調べる
+ *
+ *	ttermpro.exe が古く member を知らない場合呼び出されることがない
+ *	member が無いと動作できないプラグインは、TTXBind() でFALSE を返すこと
+ *
+ *	  BOOL PASCAL TTXBind(WORD Version, TTXExports *exports)
+ *	  {
+ *	      if (!TTXExportsHas(exports, TTXInit2)) {
+ *	          return FALSE;
+ *	      }
+ *	      ...
+ *
+ *	@param	exports	TTXBind() に渡された TTXExports へのポインタ
+ *	@param	member	TTXExports のメンバ名
+ *	@retval	TRUE	含まれている
+ *	@retval	FALSE	含まれていない(本体が古い)
+ */
+#define TTXExportsHas(exports, member) \
+	((exports)->size >= (int)(offsetof(TTXExports, member) + sizeof(((TTXExports *)0)->member)))
 
 #endif

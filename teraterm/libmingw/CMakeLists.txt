@@ -6,6 +6,8 @@ add_library(
   mingw_msvcrt
   STATIC
   msvcrt_wrapper.c
+  new_delete.cpp
+  functexcept.cpp
 )
 
 # for dll tls

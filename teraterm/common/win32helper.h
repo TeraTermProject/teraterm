@@ -58,6 +58,7 @@ BOOL hSetupDiGetDevicePropertyW(
 	void **buf, size_t *buf_size);
 DWORD hGetDlgItemCBTextW(HWND hDlg, int id, int index, wchar_t **text);
 DWORD hGetDlgItemLVTextW(HWND hDlg, int id, int item, int subitem, wchar_t **text);
+DWORD hIdnToAscii(const wchar_t *unicode, wchar_t **ascii);
 
 #ifdef __cplusplus
 }

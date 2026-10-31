@@ -298,7 +298,7 @@ struct tttset {
 	char reserve_KeyCnfFN[MAX_PATH];	// switch KeyCnfFNW
 	char LogFN[MAX_PATH];
 	char reserve_MacroFN[MAX_PATH];		// switch MacroFNW
-	char HostName[1024];
+	char HostName[1024];				// switch HostNameW
 
 	POINT VTPos;
 	char VTFont[LF_FACESIZE];
@@ -366,7 +366,7 @@ struct tttset {
 	HFONT reserve_SampleFont;
 	WORD reserve_TmpColor[12][6];
 	/* Tera Term window setup variables */
-	char Title[TitleBuffSize];
+	char reserve_Title[50];		// 50 = TitleBuffSize
 	WORD TitleFormat;
 	WORD CursorShape;
 	WORD NonblinkingCursor;
@@ -617,10 +617,14 @@ struct tttset {
 	BYTE UnicodeOverrideCharWidthSelected;	// 0...
 	int BroadcastSubmitKey;
 	wchar_t *LogTimestampFormatW;
+	DWORD SerialSendLimit;				// シリアル送信制限(0=制限しない/1～=送信バイト数)
+	wchar_t *TitleW;						// local title (TComVar.TitleRemoteW = remote title)
+	wchar_t *HostNameW;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;
 };
+
 
 typedef struct tttset TTTSet, *PTTSet;
 
@@ -870,18 +874,20 @@ typedef struct {
 
 	void *NotifyIcon;
 
-	DWORD ConnectedTime;
+	DWORD reserve_ConnectedTime;
 
-	void (*Log1Byte)(BYTE b);
-	void (*Log1Bin)(BYTE b);
-	void (*LogBinSkip)(int add);
+	void (*reserve_Log1Byte)(BYTE b);	// FLogPutANSI() を直接呼ぶよう変更
+	void (*reserve_Log1Bin)(BYTE b);	// FLogPutBinary() を直接呼ぶよう変更
+	void (*reserve_LogBinSkip)(int add);	// FLogBinSkip() を直接呼ぶよう変更
 
 	TTTSet *ts;
 
-	wchar_t *TitleRemoteW;
+	wchar_t *TitleRemoteW;					// remote title (tttset.TitleW = local title)
 
 	void *StateSend;
 	void *StateEcho;
+
+	ULONGLONG ConnectedTime;	// 接続開始 tick
 } TComVar;
 typedef TComVar *PComVar;
 

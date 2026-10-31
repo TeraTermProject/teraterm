@@ -33,18 +33,125 @@
 
 <h2 id="teraterm">Tera Term</h2>
 
-<h3 id="teraterm_5.7.0">YYYY.MM.DD (Ver 5.7.0 not released yet)</h3>
+<h3 id="teraterm_5.8.0">YYYY.MM.DD (Ver 5.8.0 not released yet)</h3>
 <ul class="history">
   <li>Changes
     <ul>
       <li>
-        Added a Submit key option to the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> that allows users to select the key operation used to send commands in non-real-time mode.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1158" target="_blank">issue #1158</a>)<br>
-        Since the size of the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> had increased, it was modified so that it can now be resized to smaller than its initial size.
+        MACRO: Added the <a href="../macro/command/delvar.html">delvar</a> command, which restores a user variable to the unused state,
+        and the <a href="../macro/command/redim.html">redim</a> command, which changes the size of an array variable.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/75" target="_blank">issue #75</a>)
       </li>
       <li>
-        Improved the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> so that it no longer becomes distorted when moved between displays with different DPI settings.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1180" target="_blank">issue #1180</a>)<br>
+        Changed the <a href="../menu/setup-additional-window.html#Title">local title</a>
+        (<a href="../commandline/teraterm.html#w">/W=</a> command line option,
+        <a href="../macro/command/settitle.html">settitle</a> macro command)
+        to be handled in Unicode.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)<br>
+        Previously it was held as an ANSI string, and characters that could not be converted were replaced with "?".
+      </li>
+      <li>
+        Added support for plugins to call Tera Term functions.<br>
+        Added TTXInit2() to TTXExports so that plugins can obtain TTXImports,
+        which holds pointers to Tera Term functions.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)
+      </li>
+      <li>
+        Changed the connection host name to be handled in Unicode, and supported connecting to hosts with Internationalized Domain Names (IDN).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        Previously it was held as an ANSI string, and characters that could not be converted were replaced with "?".<br>
+        The host name is held in Unicode and converted to Punycode (ACE form) for the DNS query.
+      </li>
+      <li>
+        Added PWSAAsyncGetAddrInfoW, which receives the host name and port name in UTF-16, to the plug-in (TTX) socket hooks TTXSockHooks.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        The existing PWSAAsyncGetAddrInfo is kept for compatibility but is no longer called by Tera Term.
+      </li>
+      <li>
+        Added SetConnectHostName() and GetConnectHostName(), which set and get the connection host name in Unicode, to TTXImports.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)
+      </li>
+      <li>
+        Added <a href="../menu/setup-additional-serialport.html#Property">Device Manager Properties</a> to the serial port settings.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1529" target="_blank">issue #1529</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>Bug fixes
+    <ul>
+      <li>
+        Fixed an issue where VT window background images could disappear when reconnecting to an RDP session in AWS environments after a prolonged disconnection period.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1534" target="_blank">issue #1534</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>Misc
+    <ul>
+      <li>Upgraded TTSSH to <a href="#ttssh_3.8.0">3.8.0</a>.</li>
+      <li>Upgraded TTProxy to <a href="#ttproxy_1.0.0.28">1.0.0.28</a>.</li>
+      <li>
+        Removed the TTXCopyIniFile plugin from the build, as equivalent functionality is already implemented in Tera Term.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1544" target="_blank">issue #1544</a>)
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_5.7.1">2026.10.09 (Ver 5.7.1)</h3>
+<ul class="history">
+  <!--li>Changes
+    <ul>
+      <li>
+      </li>
+    </ul>
+  </li-->
+
+  <li>Bug fixes
+    <ul>
+      <li>
+        Fixed an issue where the elapsed time in log timestamps (since log start and since connection start) reset to 0 after approximately 49.7 days.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1339" target="_blank">issue #1339</a>)<br>
+        Internally changed the elapsed time from 32-bit to 64-bit.
+      </li>
+      <li>
+        Fixed an issue where Tera Term crashed when it was closed while a message box or similar shown by a plugin was still open,
+        because the plugin code to be executed had already been unloaded.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1556" target="_blank">issue #1556</a>)<br>
+        The plugin termination TTXEnd() is now called after the message loop has ended.
+        The main window has already been destroyed when TTXEnd() is called.
+      </li>
+    </ul>
+  </li>
+
+  <li>Misc
+    <ul>
+      <li>Upgraded TTSSH to <a href="#ttssh_3.7.1">3.7.1</a>.</li>
+      <li>
+        Fixed an issue where file extension associations such as .ttl and URL associations such as ssh were not registered when the installer installed Tera Term for the current user only.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1562" target="_blank">issue #1562</a>)
+      </li>
+      <li>
+        Fixed an issue where the ssh URL association was registered incompletely when ssh was selected but telnet was not selected in the installer.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1562" target="_blank">issue #1562</a>)
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="teraterm_5.7.0">2026.09.04 (Ver 5.7.0)</h3>
+<ul class="history">
+  <li>Changes
+    <ul>
+      <li>
+        Implemented <a href="../setup/teraterm-com.html#SerialSendLimit">send size limit for serial transmission</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1000" target="_blank">issue #1000</a>)
+      </li>
+      <li>
+        When <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> is "dumb",
+        Output timestamps to both the VT window and log file when logging.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/255" target="_blank">issue #255</a>)
       </li>
       <li>
         Selection is extended when Shift+left-clicking to the left of or above the current selection.
@@ -57,23 +164,13 @@
         Previously, clicking anywhere within the selection would shrink the selection to span from the start of the existing selection to the clicked position.
       </li>
       <li>
+        Added a Submit key option to the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> that allows users to select the key operation used to send commands in non-real-time mode.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1158" target="_blank">issue #1158</a>)<br>
+        Since the size of the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> had increased, it was modified so that it can now be resized to smaller than its initial size.
+      </li>
+      <li>
         Added support for WebP image format. Image loading to use WIC (Windows Imaging Component).
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1225" target="_blank">issue #1225</a>)
-      </li>
-      <li>
-        Modified Tera Term installer script.<br>
-        Installer shows dialog to choose between "Install for all users" and "Install for me only".
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1156" target="_blank">issue #1156</a>)
-      </li>
-      <li>
-        The same functionality has been implemented in Tera Term itself.
-        Excluded the plugin from build targets.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1280" target="_blank">issue #1280</a>)
-      </li>
-      <li>
-        Disallowed loading plugins from outside the folder containing ttermpro.exe
-        when a plugin filename is specified directly in the Plugin section of TERATERM.INI.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1286" target="_blank">issue #1286</a>)<br>
       </li>
       <li>
         Plugin filenames are handled as normal filename(long filename, LFN).
@@ -82,43 +179,15 @@
         "ttxtest.dll-" was treated as "TTXTEST.DLL" and loaded.
       </li>
       <li>
-        When <a href="../menu/setup-additional-terminal.html#TerminalID">Terminal ID</a> is "dumb",
-        Output timestamps to both the VT window and log file when logging.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/255" target="_blank">issue #255</a>)
+        Disallowed loading plugins from outside the folder containing ttermpro.exe
+        when a plugin filename is specified directly in the Plugin section of TERATERM.INI.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1286" target="_blank">issue #1286</a>)<br>
       </li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <li>
-        Fixed an issue where enable/disable settings for the 21st and later plugins were not saved to or loaded from teraterm.ini when more than 20 plugins were installed.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1271" target="_blank">issue #1271</a>)
-      </li>
-      <li>
-        Fixed an issue where reading numbered lists (host history, broadcast commands, plugin list, etc.) from teraterm.ini could be cut short if the entry numbers were not consecutive.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1271" target="_blank">issue #1271</a>)
-      </li>
-      <li>
-        Fixed an issue where ttermpro.exe crashes when the VT window is closed during TTXttyplay was playbacking.
-        This bug was introduced in 5.4.0.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1277" target="_blank">issue #1277</a>)
-      </li>
-      <li>
-        Fixed an issue where an empty setting items was deleted from TERATERM.INI when using "Setup &gt; Save setup...".
-        Fixed an issue where Tera Term would crash when removing RussKeyb from the
-        Tera Term section of TERATERM.INI, then launching Tera Term and selecting
-        "Setup &gt; Save setup..".
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1335" target="_blank">issue #1335</a>)
-      </li>
-      <li>
-        Fixed an issue where YMODEM transfers from the local host to a remote system did not stop on the receiver side when the Cancel button was pressed during file transmission.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1439" target="_blank">issue #1439</a>)
-      </li>
-      <li>
-        Fixed an issue where Print dialog("File &gt; Print...") could not be operated with the keyboard.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1448" target="_blank">issue #1448</a>)
-      </li>
       <li>
         Fixed an issue where running multiple Tera Term instances connected to PIPE caused them to malfunction.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1455" target="_blank">issue #1455</a>)
@@ -129,9 +198,52 @@
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1453" target="_blank">issue #1453</a>)
       </li>
       <li>
+        Fixed an issue where YMODEM transfers from the local host to a remote system did not stop on the receiver side when the Cancel button was pressed during file transmission.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1439" target="_blank">issue #1439</a>)
+      </li>
+      <li>
+        Fixed an issue where Print dialog("File &gt; Print...") could not be operated with the keyboard.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1448" target="_blank">issue #1448</a>)
+      </li>
+      <li>
+        Improved the <a href="../menu/control-broadcast.html">Broadcast command dialog</a> so that it no longer becomes distorted when moved between displays with different DPI settings.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1180" target="_blank">issue #1180</a>)<br>
+      </li>
+      <li>
+        Fixed an issue where reading numbered lists (host history, broadcast commands, plugin list, etc.) from teraterm.ini could be cut short if the entry numbers were not consecutive.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1271" target="_blank">issue #1271</a>)
+      </li>
+      <li>
+        Fixed an issue where an empty setting items was deleted from TERATERM.INI when using "Setup &gt; Save setup...".
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1335" target="_blank">issue #1335</a>)
+      </li>
+      <li>
+        Fixed an issue where Tera Term would crash when removing RussKeyb from the Tera Term section of TERATERM.INI, then launching Tera Term and selecting "Setup &gt; Save setup..".
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1380" target="_blank">issue #1380</a>)
+      </li>
+      <li>
+        Fixed an issue where macro response could be delayed by a wait in the receive polling loop.
+        This bug was introduced in version 4.103.
+        See <a href="../macro/appendixes/speed.html">MACRO execution speed</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1290" target="_blank">issue #1290</a>)
+      </li>
+      <li>
         Fixed an issue where the "<a href="../macro/command/logwrite.html">logwrite</a>" macro command could not write to the log file while logging was paused.
         This bug was introduced in 5.5.1.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1459" target="_blank">issue #1459</a>)
+      </li>
+      <li>
+        Fixed an issue where ttpmacro.exe crashed when an integer was passed to the "<a href="../macro/command/dispstr.html">dispstr</a>" macro command.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1485" target="_blank">issue #1485</a>)
+      </li>
+      <li>
+        Fixed an issue where enable/disable settings for the 21st and later plugins were not saved to or loaded from teraterm.ini when more than 20 plugins were installed.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1271" target="_blank">issue #1271</a>)
+      </li>
+      <li>
+        Fixed an issue where ttermpro.exe crashes when the VT window is closed during TTXttyplay was playbacking.
+        This bug was introduced in 5.4.0.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1277" target="_blank">issue #1277</a>)
       </li>
     </ul>
   </li>
@@ -142,8 +254,18 @@
       <li>Upgraded TeraTerm Menu to <a href="#ttmenu_1.24">1.24</a>.</li>
       <li>Upgraded TTXttyrec Plugin to <a href="#ttyrec_1.07">1.07</a>.</li>
       <li>
-        Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is6-whatsnew.htm#6.7.2" target="_blank">6.7.2</a>.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1317" target="_blank">issue #1317</a>)
+        Modified Tera Term installer script.<br>
+        Installer shows dialog to choose between "Install for all users" and "Install for me only".
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1156" target="_blank">issue #1156</a>)
+      </li>
+      <li>
+        Upgraded Inno Setup that is used for the installer to <a href="https://jrsoftware.org/files/is7-whatsnew.htm#7.1.0" target="_blank">7.1.0</a>.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1511" target="_blank">issue #1511</a>)
+      </li>
+      <li>
+        The same functionality has been implemented in Tera Term itself.
+        Excluded the plugin from build targets.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1280" target="_blank">issue #1280</a>)
       </li>
     </ul>
   </li>
@@ -4299,7 +4421,7 @@ SYNOPSIS:
 
 <h2 id="ttssh">TTSSH</h2>
 
-<h3 id="ttssh_3.7.0">YYYY.MM.DD (Ver 3.7.0 not released yet)</h3>
+<h3 id="ttssh_3.8.0">YYYY.MM.DD (Ver 3.8.0 not released yet)</h3>
 <ul class="history">
   <!--li>Changes
     <ul>
@@ -4314,6 +4436,67 @@ SYNOPSIS:
       </li>
     </ul>
   </li-->
+
+  <!--li>Misc
+    <ul>
+      <li>
+      </li>
+    </ul>
+  </li-->
+</ul>
+
+<h3 id="ttssh_3.7.1">2026.10.09 (Ver 3.7.1)</h3>
+<ul class="history">
+  <!--li>Changes
+    <ul>
+      <li>
+      </li>
+    </ul>
+  </li-->
+
+  <li>Bug fixes
+    <ul>
+      <li>
+        Fixed an issue where private keys in PPK format (DSA, RSA, and ECDSA) were not loaded correctly.
+        This bug was introduced in 3.7.0 (Tera Term 5.7.0).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1536" target="_blank">issue #1536</a>)
+      </li>
+      <li>
+        Fixed an issue where the VT window did not return to the active state after sending or receiving files using SCP.
+        This bug was introduced in 3.6.0 (Tera Term 5.6.0).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1519" target="_blank">issue #1519</a>)
+      </li>
+    </ul>
+  </li>
+
+  <li>Misc
+    <ul>
+      <li>
+        Upgraded LibreSSL to 4.3.3, resolving an issue where SSH connections could fail in certain cases on ARM64.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1567" target="_blank">issue #1567</a>,
+        <a href="https://github.com/TeraTermProject/teraterm/issues/1554" target="_blank">issue #1554</a>)
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="ttssh_3.7.0">2026.09.04 (Ver 3.7.0)</h3>
+<ul class="history">
+  <!--li>Changes
+    <ul>
+      <li>
+      </li>
+    </ul>
+  </li-->
+
+  <li>Bug fixes
+    <ul>
+      <li>
+        Fixed the implementation to comply with RFC 4252 by sending the username and password specified via command-line options and macro commands in UTF-8.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1460" target="_blank">issue #1460</a>)
+      </li>
+    </ul>
+  </li>
 
   <!--li>Misc
     <ul>
@@ -4359,7 +4542,7 @@ SYNOPSIS:
     <ul>
       <li>
         Upgraded LibreSSL to 4.3.2.
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/9999" target="_blank">issue #9999</a>)
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1431" target="_blank">issue #1431</a>)
       </li>
     </ul>
   </li>
@@ -6407,6 +6590,23 @@ SYNOPSIS:
 
 <h2 id="ttproxy">TTProxy</h2>
 
+<h3 id="ttproxy_1.0.0.28">YYYY.MM.DD (Ver 1.0.0.28 not released yet)</h3>
+<ul class="history">
+  <li>Changes
+    <ul>
+      <li>
+        Changed the proxy host name to be handled in Unicode (setup dialog, ProxyHost in the setup file).
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)
+      </li>
+      <li>
+        Supported connecting to hosts with Internationalized Domain Names (IDN) via a proxy.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+        Host names containing non-ASCII characters are converted to ACE form (xn--) before being sent to the proxy server.
+      </li>
+    </ul>
+  </li>
+</ul>
+
 <h3 id="ttproxy_1.0.0.27">2025.08.03 (Ver 1.0.0.27)</h3>
 <ul class="history">
   <li>Bug fixes
@@ -6550,7 +6750,7 @@ SYNOPSIS:
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
 
-<h3 id="ttmenu_1.24">YYYY.MM.DD (Ver 1.24 not released yet)</h3>
+<h3 id="ttmenu_1.24">2026.09.04 (Ver 1.24)</h3>
 <ul class="history">
       <li>
         Added the following option under Right-click the task tray icon &gt; Settings.
@@ -6565,11 +6765,11 @@ SYNOPSIS:
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
       </li>
       <li>
-        Updated to prevent password data from being paged out.
+        Added SecureZeroMemory(), out-of-bounds access checks, error handling, and related safeguards.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
       </li>
       <li>
-        Reduced overall memory usage.
+        Updated to prevent password data from being paged out.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
       </li>
       <li>
@@ -6577,7 +6777,7 @@ SYNOPSIS:
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
       </li>
       <li>
-        Added SecureZeroMemory(), out-of-bounds access checks, error handling, and related safeguards.
+        Reduced overall memory usage.
         (<a href="https://github.com/TeraTermProject/teraterm/issues/1293" target="_blank">issue #1293</a>)
       </li>
       <li>
@@ -6854,7 +7054,6 @@ SYNOPSIS:
   <li>Fixed an issue when Tera Term is not connected to host, an application fault occurs.</li>
 </ul>
 
-<h2 id="resizemenu">TTXResizeMenu</h2>
 <h3 id="resizemenu_1.06">2019.12.7 (Ver 1.06)</h3>
 <ul class="history">
   <li>Fixed the access key for the 16th and subsequent entries in the menu.</li>
@@ -6892,8 +7091,20 @@ SYNOPSIS:
 </ul>
 
 <h2 id="ttyrec">TTXttyrec</h2>
-<h3 id="ttyrec_1.07">YYYY.MM.DD (Ver 1.07 not released yet)</h3>
+<h3 id="ttyrec_1.08">YYYY.MM.DD (Ver 1.08 not released yet)</h3>
 <ul class="history">
+  <li>
+    Changed the title bar display to be handled in Unicode.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1546" target="_blank">issue #1546</a>)
+  </li>
+</ul>
+
+<h3 id="ttyrec_1.07">2026.09.04 (Ver 1.07)</h3>
+<ul class="history">
+  <li>
+    Added the ability to stop playback while it is in progress.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1388" target="_blank">issue #1388</a>)
+  </li>
   <li>
     Added support for temporarily switching playback to no-wait mode.
     (<a href="https://github.com/TeraTermProject/teraterm/issues/1326" target="_blank">issue #1326</a>)
@@ -6906,38 +7117,8 @@ SYNOPSIS:
     </ul>
   </li>
   <li>
-    Added support for displaying the recording time in the title bar during playback.
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1298" target="_blank">issue #1298</a>)
-  </li>
-  <li>
-    Fixed status not being displayed in the title during subsequent TTY file playbacks.
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
-  </li>
-  <li>
-    Fixed display corruption when playing a tty file after a non-tty file.
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
-  </li>
-  <li>
-    Fixed an issue where the "TTY Record" menu was disabled after disconnection while recording was still in progress, preventing the recording from being stopped.
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1284" target="_blank">issue #1284</a>)
-  </li>
-  <li>
-    Changed the initial directory of the file selection dialog for the "TTY Replay" menu.
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1382" target="_blank">issue #1382</a>)<br>
-    The dialog now opens in the folder of the most recently replayed file, or the <a href="../setup/folder.html#TermLogDir">Terminal log folder</a> if no previously replayed file exists.
-  </li>
-  <li>
-    Changed the initial directory of the file selection dialog for the "TTY Record" menu to the <a href="../setup/folder.html#TermLogDir">Terminal log folder</a>.
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1384" target="_blank">issue #1384</a>)
-  </li>
-  <li>
-    Added the ability to stop playback while it is in progress.
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1388" target="_blank">issue #1388</a>)
-  </li>
-  <li>
-    Added support for displaying short length of the file path in the title bar during playback.
-    (<a href="https://github.com/TeraTermProject/teraterm/issues/1386" target="_blank">issue #1386</a>)<br>
-    The file path options as added the filename or the filename include the parent directory.
+    Added support for playback from a marked position, loop playback, and playback from the beginning.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1487" target="_blank">issue #1487</a>)
   </li>
   <li>
     Added support for automatic recording. Recording starts on connection and stops on disconnection.
@@ -6947,6 +7128,36 @@ SYNOPSIS:
       <li>Added RecordDefaultPath entry(default recording directory) to teraterm.ini.</li>
       <li>Added RecordDefaultName entry(default recording filename) to teraterm.ini.</li>
     </ul>
+  </li>
+  <li>
+    Added support for displaying the recording time in the title bar during playback.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1298" target="_blank">issue #1298</a>)
+  </li>
+  <li>
+    Added support for displaying short length of the file path in the title bar during playback.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1386" target="_blank">issue #1386</a>)<br>
+    The file path options as added the filename or the filename include the parent directory.
+  </li>
+  <li>
+    Fixed status not being displayed in the title during subsequent TTY file playbacks.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  </li>
+  <li>
+    Fixed an issue where the "TTY Record" menu was disabled after disconnection while recording was still in progress, preventing the recording from being stopped.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1284" target="_blank">issue #1284</a>)
+  </li>
+  <li>
+    Fixed display corruption when playing a tty file after a non-tty file.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1323" target="_blank">issue #1323</a>)
+  </li>
+  <li>
+    Changed the initial directory of the file selection dialog for the "TTY Replay" menu.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1382" target="_blank">issue #1382</a>)<br>
+    The dialog now opens in the folder of the most recently replayed file, or the <a href="../setup/folder.html#TermLogDir">Terminal log folder</a> if no previously replayed file exists.
+  </li>
+  <li>
+    Changed the initial directory of the file selection dialog for the "TTY Record" menu to the <a href="../setup/folder.html#TermLogDir">Terminal log folder</a>.
+    (<a href="https://github.com/TeraTermProject/teraterm/issues/1384" target="_blank">issue #1384</a>)
   </li>
 </ul>
 

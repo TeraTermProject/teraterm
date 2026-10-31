@@ -870,7 +870,8 @@ char *mctimelocal(const char *format, BOOL utc_flag)
  */
 char *strelapsed(DWORD start_time)
 {
-	wchar_t *strW = strelapsedW(start_time);
+	DWORD elapsed = GetTickCount() - start_time;
+	wchar_t *strW = strelapsedW(elapsed);
 	char *strA = ToCharW(strW);
 	free(strW);
 	return strA;
@@ -980,5 +981,6 @@ DllExport void GetMessageboxFont(LOGFONTA *logfont)
 	nci.cbSize = st_size;
 	r = SystemParametersInfoA(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
 	assert(r == TRUE);
+	(void)r;
 	*logfont = nci.lfStatusFont;
 }

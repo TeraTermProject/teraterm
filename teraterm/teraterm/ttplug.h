@@ -79,8 +79,18 @@ void PASCAL TTXModifyPopupMenu(HMENU menu);
    TRUE if they handle it, otherwise FALSE. */
 BOOL PASCAL TTXProcessCommand(HWND hWin, WORD cmd);
 
-/* This function is called to see whether Telnet mode can be turned on when
-   Tera Term thinks it has detected a telnetd */
+/**
+ *	終了時にコールされる
+ *	called last to first
+ *
+ *	Tera Term の終了時に、メインウィンドウを破棄してメッセージループを抜けたあとに
+ *	WinMain() から呼ばれる。各プラグインの TTXEnd() をロード順の逆に呼び、
+ *	そのあとプラグインの DLL を解放する。
+ *
+ *	プラグインが呼び出された時点でメインウィンドウ(VTWin)は既に存在しない。
+ *	ネストしたメッセージループもすべて戻り終わっているので、
+ *	この関数のあとにプラグインのコードが実行されることはない。
+ */
 void PASCAL TTXEnd(void);
 
 /* This function is called when a new Tera Term is being started with certain

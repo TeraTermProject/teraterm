@@ -60,6 +60,7 @@ wchar_t *UILanguageFileW;
 static wchar_t *SetupFNameW;
 static HWND CtrlWnd;
 static HINSTANCE hInst;
+static DWORD BoostTimeMs;
 
 static BOOL Busy;
 static CCtrlWindow *pCCtrlWindow;
@@ -106,6 +107,13 @@ static void init()
 	GetI18nLogfontW(L"Tera Term", L"DlgFont", &logfont, 0, SetupFNameW);
 	SetDialogFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet,
 				  UILanguageFileW, "Tera Term", "DLG_SYSTEM_FONT");
+
+	int boost_time = (int)GetPrivateProfileIntW(L"Macro", L"BoostTime", 0, SetupFNameW);
+	if (boost_time < 0) {
+		// マイナスの時は 0 として扱う
+		boost_time = 0;
+	}
+	BoostTimeMs = (DWORD)boost_time;
 }
 
 // TTMACRO main engine
@@ -133,7 +141,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 {
 	hInst = hInstance;
 	LONG lCount = 0;
-	DWORD SleepTick = 1;
 
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -160,6 +167,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 
 	// message pump
 	MSG msg;
+	DWORD idle_enter_tick = GetTickCount();
+	BOOL sleep_enable = FALSE;
 	for (;;) {
 		// Windowsのメッセージがない場合のループ
 		for(;;) {
@@ -170,15 +179,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 
 			if (!OnIdle(lCount)) {
 				// idle不要
-				if (SleepTick < 500) {	// 最大 501ms未満
-					SleepTick += 2;
+				if (BoostTimeMs == 0) {
+					// メッセージが来た時、即時に復帰する
+					// メッセージが来ない時、最大 1ms 待ってポーリングに戻る
+					MsgWaitForMultipleObjects(0, NULL, FALSE, 1, QS_ALLINPUT);
+				} else {
+					if (!sleep_enable) {
+						if (GetTickCount() - idle_enter_tick > BoostTimeMs) {
+							// idle不要時間がある程度継続したら、待ち時間を入れる
+							sleep_enable = TRUE;
+						}
+					}
+					if (sleep_enable) {
+						// メッセージが来た時、即時に復帰する
+						// メッセージが来ない時、最大 2ms 待ってポーリングに戻る
+						MsgWaitForMultipleObjects(0, NULL, FALSE, 2, QS_ALLINPUT);
+					}
 				}
 				lCount = 0;
-				Sleep(SleepTick);
 			} else {
 				// 要idle
-				SleepTick = 0;
-				lCount++;
+				idle_enter_tick = GetTickCount();
+				sleep_enable = FALSE;
 			}
 		}
 

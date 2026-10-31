@@ -14,7 +14,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/../buildtools/svnrev/build_config.cmake)
 #  DESTINATION ${CMAKE_CURRENT_LIST_DIR}/Output/portable_signed/unzip
 #)
 
-set(ISCC "${CMAKE_CURRENT_LIST_DIR}/../buildtools/innosetup6/ISCC.exe")
+set(ISCC "${CMAKE_CURRENT_LIST_DIR}/../buildtools/innosetup7/ISCC.exe")
 
 if(RELEASE)
   set(SETUP_EXE "teraterm-${VERSION}-${arch}")

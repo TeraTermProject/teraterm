@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>MACRO execution speed</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>MACRO execution speed</h1>
+
+<p>
+  The macro receive wait is message driven. Sending a string, receiving and
+  checking the response, and sending the next string are performed without
+  extra wait time with the default settings.
+</p>
+
+<p>
+  The BoostTime entry in the Macro section of TERATERM.INI adjusts the
+  balance between macro execution speed and CPU load while waiting.
+  The unit is ms.
+</p>
+
+<p>
+  When the default or 0 is specified, the macro waits in a message driven
+  manner. Receiving data generates a message, so it is processed
+  immediately without wait time. When no message arrives, the state is
+  checked after waiting up to 1ms. Due to the timer resolution, this wait
+  can actually be up to about 15.6ms.
+</p>
+
+<p>
+  When a value of 1 or more is specified, no wait time is inserted for the
+  specified time after the last command execution. One CPU core is fully
+  occupied during this time. After the specified time has passed, the macro
+  waits in a message driven manner. Receiving data generates a message, so
+  it is processed immediately without wait time. When no message arrives,
+  the state is checked after waiting up to 2ms. Due to the timer
+  resolution, this wait can actually be up to about 15.6ms.
+</p>
+
+To set 500ms:
+<pre>
+[Macro]
+BoostTime=500
+</pre>
+
+<p>
+  When BoostTime is omitted, it is the same as specifying 0.
+</p>
+
+</body>
+</html>

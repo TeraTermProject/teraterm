@@ -21,8 +21,8 @@
 
 ## TTXChangeFontSize
 
-- [ReadMe.txt](TTXChangeFontSize/TTXChangeFontSize/ReadMe.txt)
-- [ReadMe-ja.txt](TTXChangeFontSize/TTXChangeFontSize/ReadMe-ja.txt)
+- [ReadMe.txt](TTXChangeFontSize/ReadMe.txt)
+- [ReadMe-ja.txt](TTXChangeFontSize/ReadMe-ja.txt)
 
 ## TTXCheckUpdate
 
@@ -34,7 +34,7 @@
 - [ReadMe.txt](TTXCommandLineOpt/ReadMe.txt)
 - [ReadMe-ja.txt](TTXCommandLineOpt/ReadMe-ja.txt)
 
-## TTXCopyIniFile
+## TTXCopyIniFile (deprecated)
 
 - [ReadMe.txt](TTXCopyIniFile/ReadMe.txt)
 - [ReadMe-ja.txt](TTXCopyIniFile/ReadMe-ja.txt)

@@ -146,6 +146,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -190,6 +191,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -233,6 +235,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -388,6 +391,7 @@
     <ClCompile Include="..\..\cygwin\cyglib\cyglib.c" />
     <ClCompile Include="..\common\edithistory.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
+    <ClCompile Include="..\ttpcmn\ttcmn_buff.c" />
     <ClCompile Include="..\ttpcmn\ttcmn_dup.cpp" />
     <ClCompile Include="..\ttpcmn\ttcmn_static.c" />
     <ClCompile Include="..\ttpdlg\aboutdlg.c" />
@@ -437,6 +441,7 @@
     <ClCompile Include="logdlg.cpp" />
     <ClCompile Include="log_pp.cpp" />
     <ClCompile Include="mouse_pp.cpp" />
+    <ClCompile Include="name_resolve.c" />
     <ClCompile Include="plugin_pp.cpp" />
     <ClCompile Include="scp.cpp" />
     <ClCompile Include="sendfiledlg.cpp" />
@@ -515,6 +520,7 @@
     <ClInclude Include="logdlg.h" />
     <ClInclude Include="log_pp.h" />
     <ClInclude Include="mouse_pp.h" />
+    <ClInclude Include="name_resolve.h" />
     <ClInclude Include="plugin_pp.h" />
     <ClInclude Include="plugin_pp_res.h" />
     <ClInclude Include="scp.h" />
@@ -529,6 +535,7 @@
     <ClInclude Include="debug_pp.h" />
     <ClCompile Include="debug_pp.cpp" />
     <ClInclude Include="serial_pp.h" />
+    <ClInclude Include="serial_pp_res.h" />
     <ClInclude Include="tekfont_pp.h" />
     <ClInclude Include="tekfont_pp_res.h" />
     <ClInclude Include="term_pp.h" />
@@ -559,6 +566,7 @@
     <ResourceCompile Include="font_pp.rc" />
     <ResourceCompile Include="mouse_pp.rc" />
     <ResourceCompile Include="plugin_pp.rc" />
+    <ResourceCompile Include="serial_pp.rc" />
     <ResourceCompile Include="tekfont_pp.rc" />
     <ResourceCompile Include="teraterm_manifest.rc" />
     <ResourceCompile Include="themedlg.rc" />

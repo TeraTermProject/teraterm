@@ -56,7 +56,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,177,138,132,10
     CONTROL         "Middle dots (U+00B7,U+2024,U+2219)",IDC_DEC2UNICODE_MIDDLEDOT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,177,152,141,10
-    LTEXT           "Japanese JIS",IDC_STATIC,10,199,110,8
+    LTEXT           "JIS",IDC_STATIC,10,199,110,8
     LTEXT           "Receive",IDC_JIS_RECEIVE_TITLE,22,211,110,8
     CONTROL         "Hal&f-width kana",IDC_TERMKANA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,34,221,115,10
     LTEXT           "Transmit",IDC_JIS_TRANSMIT_TITLE,22,235,110,8

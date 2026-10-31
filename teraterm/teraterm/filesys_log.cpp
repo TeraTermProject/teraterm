@@ -46,6 +46,7 @@
 #include "codeconv.h"
 #include "asprintf.h"
 #include "makeoutputstring.h"
+#include "compat_win.h"
 
 #include "filesys_log.h"
 #include "filesys.h"  // for ProtoGetProtoFlag()
@@ -103,23 +104,18 @@
  *		- ホスト->受信バッファ->パース->端末へ出力(=ログ) となるので書き込みまで少しかかる
  *		- FLogPutUTF32()
  *		- FLogPutANSI()
- *			= cv.Log1Byte(), tekesc 用のログ
+ *			tekesc 用のログ
  *		- ログが一時停止状態の時は何もしない
- *		@TODO
- *			- Tekは以前dllだったため関数へのポインタが必要だったが現在はexeに内蔵している
- *			- cv.Log1Byte() を削除, FLogPutANSI() を直接読み出し
  *	2. バイナリログ
  *		- 受信バッファに入ったものをそのままログへ出力
- *		- 受信バッファ処理から呼ばれる
+ *		- 受信バッファ処理(ttcmn_buff.c)から呼ばれる
  *		- テキストログとバイナリログは排他
  *		- FLogPutBinary()
- *			= cv.Log1Bin()
  *		- FLogBinSkip()
- *			= cv.LogBinSkip()
- *		- ttpcmn.dll 内にバッファ処理があるため、関数へのポインタが必要だった
  *	3. マクロからログへ書き込み
  *		- logwriteマクロコマンド、即時書き込み
  *		- FLogWriteStr()
+ *
  */
 
 #define TitLog      L"Logging"
@@ -138,10 +134,9 @@ typedef struct {
 	wchar_t *FullName;
 
 	HANDLE FileHandle;
-	LONG FileSize;		// 未使用	TODO 削除
 	LONG ByteCount;		// ファイルサイズ
 
-	DWORD StartTime;
+	ULONGLONG StartTime;
 
 	enum enumLineEnd eLineEnd;
 
@@ -209,7 +204,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 	info.HideDialog = ts.LogHideDialog ? TRUE : FALSE;
 	info.HMainWin = HVTWin;
 	FTDlg->Create(hInst, &info);
-	FTDlg->RefreshNum(0, fv->FileSize, fv->ByteCount);
+	FTDlg->RefreshNum(0, 0, fv->ByteCount);
 
 	fv->FLogDlg = FTDlg;
 
@@ -249,9 +244,8 @@ static wchar_t *ConvertLognameW(const TComVar *pcv, const wchar_t *src)
 					switch(pcv->PortType) {
 					case IdTCPIP: {
 						// ホスト名がIPv6アドレスだと、ファイル名に使用できない文字(:)が入るため置換
-						wchar_t *host = ToWcharA(pts->HostName);
+						const wchar_t *host = GetConnectHostName();
 						wchar_t *host_fix = replaceInvalidFileNameCharW(host, '_');
-						free(host);
 						add_text = host_fix;
 						break;
 					}
@@ -478,18 +472,10 @@ static BOOL LogStart(PFileVar fv, const wchar_t *fname)
 	}
 
 	fv->IsPause = FALSE;
-	fv->StartTime = GetTickCount();
+	fv->StartTime = pGetTickCount64();
 
 	if (ts.DeferredLogWriteMode) {
 		StartThread(fv);
-	}
-
-	if (fv->LogMode == TFileVar::LogModeTag::TEXT_MODE) {
-		cv.Log1Byte = FLogPutANSI;
-	}
-	else {
-		cv.Log1Bin = FLogPutBinary;
-		cv.LogBinSkip = FLogBinSkip;
 	}
 
 	return TRUE;
@@ -658,7 +644,7 @@ static void LogRotate(PFileVar fv)
  *	@return	時間文字列、不要になったらfree()すること
  */
 wchar_t* FLogTimeStampStrW(enum LogTimestampType timestamp_type, const wchar_t* format,
-						   DWORD start_time, DWORD connected_time)
+						   ULONGLONG start_time, ULONGLONG connected_time)
 {
 	wchar_t *time_strW = NULL;
 	switch (timestamp_type) {
@@ -671,12 +657,16 @@ wchar_t* FLogTimeStampStrW(enum LogTimestampType timestamp_type, const wchar_t* 
 	case TIMESTAMP_UTC:
 		time_strW = ttstrftime(format, TRUE);
 		break;
-	case TIMESTAMP_ELAPSED_LOGSTART:
-		time_strW = strelapsedW(start_time);
+	case TIMESTAMP_ELAPSED_LOGSTART: {
+		ULONGLONG elapsed = pGetTickCount64() - start_time;
+		time_strW = strelapsedW(elapsed);
 		break;
-	case TIMESTAMP_ELAPSED_CONNECTED:
-		time_strW = strelapsedW(connected_time);
+	}
+	case TIMESTAMP_ELAPSED_CONNECTED: {
+		ULONGLONG elapsed = pGetTickCount64() - connected_time;
+		time_strW = strelapsedW(elapsed);
 		break;
+	}
 	}
 
 	wchar_t *ret;
@@ -749,7 +739,7 @@ static void LogToFile(PFileVar fv)
 	logfile_unlock(fv);
 
 	if (FLogIsPause() || ProtoGetProtoFlag()) return;
-	fv->FLogDlg->RefreshNum(fv->StartTime, fv->FileSize, fv->ByteCount);
+	fv->FLogDlg->RefreshNum(fv->StartTime, 0, fv->ByteCount);
 
 
 	// ログ・ローテート
@@ -760,9 +750,6 @@ static void FileTransEnd_(PFileVar fv)
 {
 	LogToFile(fv);
 	fv->LogMode = TFileVar::LogModeTag::NONE;
-	cv.Log1Byte = NULL;
-	cv.Log1Bin = NULL;
-	cv.LogBinSkip = NULL;
 	PFileTransDlg FLogDlg = fv->FLogDlg;
 	if (FLogDlg != NULL) {
 		FLogDlg->DestroyWindow();
@@ -1308,6 +1295,7 @@ static void OutputStr(PFileVar fv, const wchar_t *strW)
 
 /**
  *	ログに1文字書きこむ(text, unicode)
+ *	端末からのエコー用
  */
 void FLogPutUTF32(unsigned int u32)
 {
@@ -1315,6 +1303,10 @@ void FLogPutUTF32(unsigned int u32)
 		return;
 	}
 	PFileVar fv = LogVar;
+	if (fv == NULL) {
+		// ログを取っていない
+		return;
+	}
 	FLogPutUTF32_(fv, u32);
 }
 
@@ -1327,11 +1319,11 @@ void FLogPutANSI(BYTE b)
 	if (FLogIsPause()) {
 		return;
 	}
-	PFileVar fv = LogVar;
-	if (fv->LogMode != TFileVar::LogModeTag::TEXT_MODE) {
+	if (!FLogIsOpendText()) {
+		// テキストモードのログを取っていない
 		return;
 	}
-	Put1(fv, b);
+	Put1(LogVar, b);
 }
 
 /**
@@ -1340,8 +1332,11 @@ void FLogPutANSI(BYTE b)
  */
 void FLogPutBinary(BYTE b)
 {
-	PFileVar fv = LogVar;
-	Log1Bin(fv, b);
+	if (!FLogIsOpendBin()) {
+		// バイナリモードのログを取っていない
+		return;
+	}
+	Log1Bin(LogVar, b);
 }
 
 /**
@@ -1350,6 +1345,9 @@ void FLogPutBinary(BYTE b)
  */
 void FLogBinSkip(int add)
 {
-	PFileVar fv = LogVar;
-	LogBinSkip(fv, add);
+	if (!FLogIsOpendBin()) {
+		// バイナリモードのログを取っていない
+		return;
+	}
+	LogBinSkip(LogVar, add);
 }

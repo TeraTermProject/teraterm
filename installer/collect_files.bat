@@ -66,8 +66,6 @@ copy /y ..\TTXSamples\Release.%TARGET%\TTXCallSysMenu.dll %dst%
 copy /y ..\TTXSamples\Release.%TARGET%\TTXCallSysMenu.pdb %dst%_pdb
 copy /y ..\TTXSamples\Release.%TARGET%\TTXCommandLineOpt.dll %dst%
 copy /y ..\TTXSamples\Release.%TARGET%\TTXCommandLineOpt.pdb %dst%_pdb
-copy /y ..\TTXSamples\Release.%TARGET%\TTXCopyIniFile.dll %dst%
-copy /y ..\TTXSamples\Release.%TARGET%\TTXCopyIniFile.pdb %dst%_pdb
 copy /y ..\TTXSamples\Release.%TARGET%\TTXFixedWinSize.dll %dst%
 copy /y ..\TTXSamples\Release.%TARGET%\TTXFixedWinSize.pdb %dst%_pdb
 copy /y ..\TTXSamples\Release.%TARGET%\TTXKcodeChange.dll %dst%

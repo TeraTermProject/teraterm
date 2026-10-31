@@ -12,7 +12,7 @@
     <h1>SSH connection</h1>
 
     <p>
-      Description of SSH connection which is a feature of Tera Term. 
+      Description of SSH connection which is a feature of Tera Term.
       When the TTSSH module is installed, Tera Term supports the SSH connection.
     </p>
 
@@ -79,6 +79,10 @@
 	  the server is accessed according to the <a href="../menu/setup-sshauth.html#CheckAuthListFirst">setting</a>.
 	</p>
 	<p>
+	  Non-ASCII characters such as Kanji can be entered (<a href="https://datatracker.ietf.org/doc/html/rfc4252" target="_blank">RFC 4252</a>). The server also needs to support this.<br>
+	  See also: <a href="../usage/tips/login_nonascii.html">Notes on Using Non-ASCII Characters in User Names or Passwords</a>
+	</p>
+	<p>
 	  You can select an option by pushing the button next to the username box.
 	  If username is empty, tab key moves focus to this button.
 	  If username was enterd, tab key moves focus to password and passphrase input box.
@@ -102,6 +106,8 @@
     <ul>
       <li>Control character(0x01 - 0x1F) can be inputted by Control + A - Z, [, \, ], ^ and _.</li>
       <li>Control + V can not be used because the key equals SYN (0x16). Please use Shift + Insert combination for pasting.</li>
+      <li>Non-ASCII characters such as Kanji can be entered (<a href="https://datatracker.ietf.org/doc/html/rfc4252" target="_blank">RFC 4252</a>). The server also needs to support this.<br>
+        When the password is masked, it can not be entered directly, but can be entered by pasting.</li>
     </ul>
 	<p>
 	  You can select an option by pushing the button next to the username field.
@@ -120,7 +126,9 @@
 		</dd>
 
 		<dt>Show passphrase</dt>
-		<dd>You can choose to display the passphrase or not</dd>
+		<dd>You can choose to display the passphrase or not.<br>
+		  When the passphrase is displayed, non-ASCII characters such as Kanji can be entered.
+		</dd>
 	  </dl>
     </p>
 
@@ -164,7 +172,7 @@ menu and choose [SSH KeyGenerator...].
     </p>
     <div class="img"><img src="../image/SelectKeyGenerator.png" alt="Choosing key generation"></div>
     <p>
-      Then you will see a dialog of key generation. 
+      Then you will see a dialog of key generation.
     </p>
     <div class="img"><img src="../image/KeyGenerator.png" alt="Key generation dialog"></div>
     <p>

@@ -24,13 +24,17 @@ TTXttyplayでは以下のコマンドラインオプションが使用できます。
   <dt id="TP">/TP (/ttyplay の短い形式)</dt>
   <dd>TTXttyplayを有効にします。Tera Termの<a href="teraterm.html#r">/R=オプション</a>で指定されたファイルを、ttyrec形式のファイルとして再生します。</dd>
 
-  <dt id="TP=1">/TP=1</dt>
+  <dt id="TP=n">/TP=[&lt;mode&gt;]</dt>
   <dd>TTXttyplayを有効にします。Tera Termの<a href="teraterm.html#r">/R=オプション</a>で指定されたファイルを、ttyrec形式のファイルとして再生します。</dd>
-  <dd>タイトルに録画日時を表示します。</dd>
-
-  <dt id="TP=3">/TP=3</dt>
-  <dd>TTXttyplayを有効にします。Tera Termの<a href="teraterm.html#r">/R=オプション</a>で指定されたファイルを、ttyrec形式のファイルとして再生します。</dd>
-  <dd>タイトルに録画日時をミリ秒まで表示します。</dd>
+  <dd>&lt;mode&gt; で指定された設定で再生します。
+    <ul>
+      <li><span class="syntax">0</span> 設定なし(省略時の設定)</li>
+      <li><span class="syntax">1</span> タイトルに録画日時を表示します</li>
+      <li><span class="syntax">3</span> タイトルに録画日時をミリ秒まで表示します</li>
+      <li><span class="syntax">4</span> タイトルにステータスを表示しない</li>
+      <li><span class="syntax">8</span> タイトルにリモートタイトルとステータスを両方表示します</li>
+    </ul>
+  </dd>
 
   <dt id="nowait">/ttyplay-nowait</dt>
   <dt id="tpnw">/tpnw (/ttyplay-nowait の短い形式)</dt>
