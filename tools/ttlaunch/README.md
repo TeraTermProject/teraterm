@@ -1,6 +1,7 @@
 ﻿# ttlaunch
 
-Tera Term(ttermpro.exe) を shell のターミナルとして起動するランチャー
+Cygwin, MSYS2, Git Bash, WSL などの shell を Tera Term で開くランチャーです。
+Tera Term(ttermpro.exe) を shell のターミナルとして起動します。
 
 実行するとマウスカーソル位置にポップアップメニューが表示され、
 起動する shell を選択できます。
