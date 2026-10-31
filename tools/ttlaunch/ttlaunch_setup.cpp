@@ -413,7 +413,13 @@ static LSTATUS ApplyRegEntriesSub(const std::vector<RegEntry> &entries)
 			continue;
 		}
 		HKEY hKey;
-		r = RegCreateKeyExW(HKEY_CURRENT_USER, key.c_str(), 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
+		// 32bit プロセスが 64bit Windows で Software\Classes 配下に書いた文字列は、
+		// WOW64 が "System32" を "SysWow64" に書き換える
+		// アイコンのパス C:\WINDOWS\System32\wsl.exe,0 が C:\WINDOWS\SysWow64\wsl.exe,0 になり、
+		// wsl.exe は SysWOW64 に無いためアイコンが表示されない
+		// KEY_WOW64_64KEY をつけると書き換えられない
+		// 32bit Windows ではこのフラグは無視される
+		r = RegCreateKeyExW(HKEY_CURRENT_USER, key.c_str(), 0, NULL, 0, KEY_WRITE | KEY_WOW64_64KEY, NULL, &hKey, NULL);
 		if (r != ERROR_SUCCESS) {
 			return r;
 		}
