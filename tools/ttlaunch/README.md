@@ -51,57 +51,80 @@ cygterm, msys2term で shell を起動できません。
 MSYS2_ARG_CONV_EXCL='*' ./ttlaunch -e cygwin -s /bin/sh
 ```
 
-## shellの起動
+## shell の起動
 
-ttlaunch.exe を起動(エクスプローラーからダブルクリック)すると、シェルの一覧と
-`設定ダイアログを開く`ポップアップが出ます。
+ttlaunch.exe を起動(エクスプローラーからダブルクリック)すると、shell の一覧と
+`設定ダイアログを開く...` のポップアップメニューが出ます。
 
 ttlaunch.exe へのショートカットに `-d` をつけて、エクスプローラーからフォルダをドロップすると
 ポップアップからドロップしたフォルダに shell を開くことができます。
 
 コマンドラインから `ttlaunch -d .` とすることでも shell を開くことができます。
+デスクトップや、エクスプローラーの「送る」メニューにこのショートカットを置いて、
+フォルダをドロップする使い方も可能です。
 
 設定ダイアログでレジストリを登録すると、
 エクスプローラのコンテキストメニューから shell を開くことができます。
 
 ## 設定ダイアログ
 
-`ttlaunch -setup` を実行するか、ポップアップメニューの `Open settings dialog...` を選択すると
+`ttlaunch -setup` を実行するか、ポップアップメニューの `設定ダイアログを開く...` を選択すると
 設定ダイアログが開きます。次のことができます。
 
-- メニューの種類の選択
-  - Popup menu: "Open in Tera Term" の 1 項目を登録します。選択すると ttlaunch のポップアップメニューが表示されます。
-    登録内容が固定なので、shell の追加・削除は次の起動から反映されます
-  - Items: 各 shell をコンテキストメニューの項目として直接登録します(サブメニューなし)。
-    項目名は `Tera Term: Cygwin` のようになります。Windows XP / Vista でも使えますが、メニューが shell の数だけ長くなります
-  - Submenu: "Open in Tera Term" のサブメニューに、ポップアップメニューと同じ項目(各 shell)を並べます。
-    Windows 7 以降で使用できます
-  - Items と Submenu の各項目は `ttlaunch -e <id> -d "%V"` を実行します。
-    末尾に設定ダイアログを開く項目(`ttlaunch -setup`)も登録します
-- 出力先の選択
-  - Registry (HKEY_CURRENT_USER): Register / Unregister で直接レジストリを変更します
-  - .reg file: Register / Unregister と同じ内容の reg ファイルを書き出します(ボタンは Save (register)... / Save (unregister)... になります)。
-    ダブルクリックすると HKEY_CURRENT_USER に反映されます
-- Register: 既存の登録(HKEY_CURRENT_USER の `ttlaunch`, `ttlaunch_*`)をすべて削除してから、選択した種類で登録します
-- Unregister: HKEY_CURRENT_USER の登録をすべて削除します
-- Registry Editor の Open...: レジストリ エディタで登録先のキー(HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell)を開きます。
-  起動時に管理者権限の確認(UAC)が表示されます
+ダイアログの文言は ttlaunch.lng([言語ファイル](#言語ファイル) 参照)から読み込みます。
+以下は日本語の文言で、括弧内は英語の文言です。
 
-Items と Submenu の内容は、設定ダイアログを開いた時点で見つかった環境から作成します。
-Cygwin や WSL ディストリビューションを追加・削除したときは、登録し直してください。
+### 登録状態
 
-HKEY_LOCAL_MACHINE に登録されたもの(他のユーザーや管理者が登録したもの)は設定ダイアログからは削除できません。
+HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE の登録状態と、登録されているメニューの種類を表示します。
+
+HKEY_LOCAL_MACHINE に登録されたもの(他のユーザーや管理者が登録したもの)は
+設定ダイアログからは削除できません。
 HKEY_LOCAL_MACHINE に登録があるときは、状態の 2 行目にその旨を表示します。
 
-設定ダイアログの文言と、ポップアップメニューの `Open settings dialog...`、起動できる項目が無いときの文言は、
-ttlaunch.exe と同じフォルダの ttlaunch.lng から読み込みます。
-ttlaunch.lng は言語ごとのセクション(`[English]`, `[Japanese]` など)に文言を持ち、
-Tera Term の設定(TERATERM.INI の UILanguageFile)で選ばれている言語のセクションを使用します
-(言語名は Tera Term の lng ファイルの `[Info]` の `language=` の括弧より前の部分です)。
-セクションやキーが無いときは英語になります。
-ソースの ttlaunch.lng は UTF-8 で、ビルド時に UTF-16LE に変換して配置します。
+### メニューの種類の選択
 
-regファイルはBOMつきUTF-16LEです。
+- ポップアップメニュー(Popup menu)
+  - "Open in Tera Term" の 1 項目を登録します。
+    選択すると ttlaunch のポップアップメニューが表示されます。
+    登録内容が固定なので、shell の追加, 削除は次の起動から反映されます
+- 項目を直接登録(Items)
+  - 各 shell をコンテキストメニューの項目として直接登録します(サブメニューなし)。
+    項目名は `Tera Term: Cygwin` のようになります。
+    Windows XP / Vista でも使えますが、メニューが shell の数だけ長くなります
+- サブメニュー(Submenu)
+  - "Open in Tera Term" のサブメニューに、ポップアップメニューと同じ項目(各 shell)を並べます。
+    Windows 7 以降で使用できます
+
+項目を直接登録, サブメニューの各項目は `ttlaunch -e <id> -d "%V"` を実行します。
+末尾に設定ダイアログを開く項目(`ttlaunch -setup`)も登録します。
+
+項目を直接登録, サブメニューの内容は、設定ダイアログを開いた時点で見つかった環境から作成します。
+Cygwin や WSL ディストリビューションを追加, 削除したときは、登録し直してください。
+
+### 出力先の選択と登録, 削除
+
+- レジストリ(Registry (HKEY_CURRENT_USER))
+  - 登録, 削除ボタンで直接レジストリを変更します
+- reg ファイル(.reg file)
+  - 登録, 削除と同じ内容の reg ファイルを書き出します
+    (ボタンは 登録用を保存...(Save (register)...), 削除用を保存...(Save (unregister)...) になります)。
+    ダブルクリックすると HKEY_CURRENT_USER に反映されます
+  - reg ファイルは BOM 付き UTF-16LE です
+- 登録(Register)ボタン
+  - 既存の登録(HKEY_CURRENT_USER の `ttlaunch`, `ttlaunch_*`)をすべて削除して、
+    選択した種類で登録します
+- 削除(Unregister)ボタン
+  - HKEY_CURRENT_USER の登録をすべて削除します
+
+### レジストリ エディタ
+
+開く...(Open...)ボタンで、レジストリ エディタで登録先のキーを開きます。
+起動時に管理者権限の確認(UAC)が表示されます。
+
+開くキーは HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell
+(登録があればその下の ttlaunch)です。
+登録するキーの一覧は[登録されるレジストリ](#登録されるレジストリ)を参照。
 
 ## メニューの項目
 
@@ -147,8 +170,10 @@ ttlaunch.exe は cygterm.exe, msys2term.exe と同じフォルダに置いてく
 
 ttlaunch は shell を指定しません。cygterm, msys2term は次のように shell を決めます。
 
-- 設定ファイル(cygterm.cfg, msys2term.cfg)の `SHELL = auto` のとき、ユーザー情報(getpwnam(3))のログイン shell を使用します
-  - /etc/passwd にユーザーのエントリがあればその shell、無い場合は /etc/nsswitch.conf の `db_shell` で決まります
+- 設定ファイル(cygterm.cfg, msys2term.cfg)の `SHELL = auto` のとき、
+  ユーザー情報(getpwnam(3))のログイン shell を使用します
+  - /etc/passwd にユーザーのエントリがあればその shell、
+    無い場合は /etc/nsswitch.conf の `db_shell` で決まります
   - 通常は bash (`/bin/bash`, `/usr/bin/bash`) です
 - 設定ファイルの `LOGIN_SHELL = Yes` により、ログイン shell として起動します
   - /etc/profile が読み込まれます(MSYS2 では `MSYSTEM` による設定が行われます)
@@ -232,14 +257,15 @@ WSL は、cygterm または msys2term の `-s` オプションで wsl.exe を sh
 cygterm, msys2term のどちらを使うかは、Cygwin, MSYS2, Git for Windows の順に見つかったものを使用します。
 
 ディストリビューションは、レジストリ
-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Lxss
+`HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Lxss`
 の各サブキーの DistributionName から取得します(docker-desktop* は除く)。
 ディストリビューションが 1 つも無い場合、WSL の項目は表示しません。
 
 - デフォルトのディストリビューション
   - メニューは `WSL (<デフォルトのディストリビューション名>)`、id は `wsl`
   - `wsl.exe` を引数なしで実行します
-  - デフォルトのディストリビューションは Lxss の DefaultDistribution で、`wsl --set-default <ディストリビューション名>` で変更できます
+  - デフォルトのディストリビューションは Lxss の DefaultDistribution です
+    - `wsl --set-default <ディストリビューション名>` で変更できます
 - ディストリビューションを指定
   - メニューは `WSL: <ディストリビューション名>`、id は `wsl:<ディストリビューション名>`
   - `wsl.exe -d <ディストリビューション名>` を実行します
@@ -284,7 +310,7 @@ HKEY_CURRENT_USER に登録するので、管理者権限は不要です。
 
 ### 登録されるレジストリ
 
-Popup menu では次のキーを登録します。
+ポップアップメニューでは次のキーを登録します。
 
 ```
 [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\ttlaunch]
@@ -295,7 +321,7 @@ Popup menu では次のキーを登録します。
 @="\"C:\\path\\to\\ttlaunch.exe\" -d \"%V\""
 ```
 
-Items では、shell ごとに次のキーを登録します(項目は環境によって変わります)。
+項目を直接登録では、shell ごとに次のキーを登録します(項目は環境によって変わります)。
 
 ```
 [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\ttlaunch_01_cygwin]
@@ -306,7 +332,7 @@ Items では、shell ごとに次のキーを登録します(項目は環境に�
 @="\"C:\\path\\to\\ttlaunch.exe\" -e cygwin -d \"%V\""
 ```
 
-Submenu では次のように登録します。
+サブメニューでは次のように登録します。
 
 ```
 [HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\ttlaunch]
@@ -323,10 +349,10 @@ Submenu では次のように登録します。
 ```
 
 - `SubCommands` が空のキーは、その `shell` サブキーの項目をサブメニューとして表示します(Windows 7 以降)
-- 親キーに既定値(`@=`)があるとサブメニューの項目が表示されないため、Submenu では `MUIVerb` を使用します。
+- 親キーに既定値(`@=`)があるとサブメニューの項目が表示されないため、サブメニューでは `MUIVerb` を使用します。
   このため登録時は既存のキーを削除してから書き直します(reg ファイルでは `[-キー]` で削除します)
 - 項目はキー名のアルファベット順に並ぶため、`01_`, `02_` のような番号を付けています。
-  Items では他のアプリの項目と混ざって並ぶので、`ttlaunch_` の接頭辞でまとめています
+  項目を直接登録では他のアプリの項目と混ざって並ぶので、`ttlaunch_` の接頭辞でまとめています
 - `CommandFlags` の `0x20` は、その項目の前に区切り線を入れる指定です(サブメニューのみ)
 - フォルダ自体の右クリック(`Folder\shell`)では `%V` の代わりに `%L` を使用します。
   開いているフォルダの背景(`Directory\Background\shell`)、ライブラリ(`LibraryFolder\Background\shell`)にも同じ内容を登録します
@@ -342,3 +368,15 @@ Git for Windows はレジストリで見つからなかった場合、
 
 ネットワークドライブやリムーバブルドライブにアクセスして、
 動作が遅くなったり、利用者が不快に感じたりしないようにするため探すドライブを絞っています。
+
+## 言語ファイル
+
+設定ダイアログの文言と、ポップアップメニューの `設定ダイアログを開く...`、
+起動できる項目が無いときの文言は、
+ttlaunch.exe と同じフォルダの ttlaunch.lng から読み込みます。
+
+ttlaunch.lng は言語ごとのセクション(`[English]`, `[Japanese]` など)に文言を持ち、
+Tera Term の設定(TERATERM.INI の UILanguageFile)で選ばれている言語のセクションを使用します
+(言語名は Tera Term の lng ファイルの `[Info]` の `language=` の括弧より前の部分です)。
+セクションやキーが無いときは英語になります。
+ソースの ttlaunch.lng は UTF-8 で、ビルド時に UTF-16LE に変換して配置します。
