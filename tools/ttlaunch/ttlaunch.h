@@ -55,6 +55,7 @@ struct LaunchItem {
 	std::wstring args;		// cygterm(msys2term) に渡す引数
 	bool posix_shell;		// cygwin/msys2 のシェル(CHERE_INVOKINGを設定する)
 	std::wstring icon;		// メニューに表示するアイコン(.ico または .exe), 無いときは ""
+	std::wstring alias;		// -e で指定できる別名, 無いときは ""
 };
 
 /**

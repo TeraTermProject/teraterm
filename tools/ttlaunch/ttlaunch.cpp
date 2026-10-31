@@ -413,7 +413,7 @@ static std::vector<LaunchItem> CreateItems(void)
 
 	// cygwin / msys2 / git bash
 	if (!cygwin_dir.empty()) {
-		LaunchItem item = { L"cygwin", L"&Cygwin", 0, SYSTEM_CYGWIN, cygwin_dir, L"", true, L"" };
+		LaunchItem item = { L"cygwin", L"&Cygwin", 0, SYSTEM_CYGWIN, cygwin_dir, L"", true, L"", L"" };
 		item.icon = IconIfExist(cygwin_dir + L"\\Cygwin.ico");
 		items.push_back(item);
 	}
@@ -437,13 +437,13 @@ static std::vector<LaunchItem> CreateItems(void)
 				continue;
 			}
 			LaunchItem item = { msys2_envs[i].id, msys2_envs[i].label, 0, SYSTEM_MSYS2, msys2_dir,
-								std::wstring(L"-v MSYSTEM=") + msys2_envs[i].msystem, true, L"" };
+								std::wstring(L"-v MSYSTEM=") + msys2_envs[i].msystem, true, L"", L"" };
 			item.icon = IconIfExist(msys2_dir + L"\\" + msys2_envs[i].icon);
 			items.push_back(item);
 		}
 	}
 	if (!git_dir.empty()) {
-		LaunchItem item = { L"gitbash", L"&Git Bash", 0, SYSTEM_GIT_BASH, git_dir, L"", true, L"" };
+		LaunchItem item = { L"gitbash", L"&Git Bash", 0, SYSTEM_GIT_BASH, git_dir, L"", true, L"", L"" };
 		item.icon = IconIfExist(git_dir + L"\\git-bash.exe");
 		items.push_back(item);
 	}
@@ -475,11 +475,21 @@ static std::vector<LaunchItem> CreateItems(void)
 	// wsl
 	std::wstring default_distro;
 	std::vector<std::wstring> distros = GetWslDistributions(default_distro);
-	if (!distros.empty()) {
+	if (distros.size() == 1) {
+		// ディストリビューションが 1 つだけのときは "WSL (<ディストリビューション名>)" のみ表示する
+		//	既定のディストリビューションが除外したもの(docker-desktop)のこともあるので -d で指定する
+		const std::wstring wsl = system_dir + L"/wsl.exe";
+		LaunchItem item = { L"wsl", L"&WSL (" + EscapeMenu(distros[0]) + L")", 1, relay_system, relay_dir,
+							L"-nols -s " + QuoteArg(wsl + L" -d '" + distros[0] + L"'"), false, L"", L"" };
+		item.icon = IconIfExist(native_system_dir + L"\\wsl.exe");
+		item.alias = L"wsl:" + distros[0];
+		items.push_back(item);
+	}
+	else if (!distros.empty()) {
 		const std::wstring wsl = system_dir + L"/wsl.exe";
 		const std::wstring wsl_icon = IconIfExist(native_system_dir + L"\\wsl.exe");
 		LaunchItem item = { L"wsl", L"&WSL", 1, relay_system, relay_dir,
-							L"-nols -s " + QuoteArg(wsl), false, L"" };
+							L"-nols -s " + QuoteArg(wsl), false, L"", L"" };
 		if (!default_distro.empty()) {
 			item.label += L" (" + EscapeMenu(default_distro) + L")";
 		}
@@ -487,7 +497,7 @@ static std::vector<LaunchItem> CreateItems(void)
 		items.push_back(item);
 		for (size_t i = 0; i < distros.size(); i++) {
 			LaunchItem distro = { L"wsl:" + distros[i], L"WSL: " + EscapeMenu(distros[i]), 1, relay_system, relay_dir,
-								  L"-nols -s " + QuoteArg(wsl + L" -d '" + distros[i] + L"'"), false, L"" };
+								  L"-nols -s " + QuoteArg(wsl + L" -d '" + distros[i] + L"'"), false, L"", L"" };
 			distro.icon = wsl_icon;
 			items.push_back(distro);
 		}
@@ -496,13 +506,13 @@ static std::vector<LaunchItem> CreateItems(void)
 	// Windows の shell
 	{
 		LaunchItem item = { L"cmd", L"C&ommand Prompt", 2, relay_system, relay_dir,
-							L"-nols -s " + QuoteArg(system_dir + L"/cmd.exe"), false, L"" };
+							L"-nols -s " + QuoteArg(system_dir + L"/cmd.exe"), false, L"", L"" };
 		item.icon = IconIfExist(native_system_dir + L"\\cmd.exe");
 		items.push_back(item);
 	}
 	{
 		LaunchItem item = { L"powershell", L"Windows &PowerShell", 2, relay_system, relay_dir,
-							L"-nols -s " + QuoteArg(system_dir + L"/WindowsPowerShell/v1.0/powershell.exe"), false, L"" };
+							L"-nols -s " + QuoteArg(system_dir + L"/WindowsPowerShell/v1.0/powershell.exe"), false, L"", L"" };
 		item.icon = IconIfExist(native_system_dir + L"\\WindowsPowerShell\\v1.0\\powershell.exe");
 		items.push_back(item);
 	}
@@ -510,7 +520,7 @@ static std::vector<LaunchItem> CreateItems(void)
 		wchar_t pwsh[MAX_PATH];
 		if (SearchPathW(NULL, L"pwsh.exe", NULL, _countof(pwsh), pwsh, NULL) > 0) {
 			LaunchItem item = { L"pwsh", L"Po&werShell 7", 2, relay_system, relay_dir,
-								L"-nols -s " + QuoteArg(L"'" + ToSlash(pwsh) + L"'"), false, L"" };
+								L"-nols -s " + QuoteArg(L"'" + ToSlash(pwsh) + L"'"), false, L"", L"" };
 			// Microsoft Store 版はアプリ実行エイリアスで、そのままではアイコンを読めない
 			//	起動はエイリアスのまま行う (更新でバージョン付きのフォルダ名が変わっても追従する)
 			const std::wstring target = ResolveAppExecLink(pwsh);
@@ -1013,7 +1023,8 @@ int wmain(int argc, wchar_t *argv[])
 	int index = -1;
 	if (!launch_id.empty()) {
 		for (size_t i = 0; i < items.size(); i++) {
-			if (_wcsicmp(items[i].id.c_str(), launch_id.c_str()) == 0) {
+			if (_wcsicmp(items[i].id.c_str(), launch_id.c_str()) == 0 ||
+				(!items[i].alias.empty() && _wcsicmp(items[i].alias.c_str(), launch_id.c_str()) == 0)) {
 				index = (int)i;
 				break;
 			}
