@@ -32,6 +32,7 @@ msg_language_italian=&İtalyanca
 msg_del_confirm=%s dosyasını silmek istediğinizden emin misiniz?
 msg_uninstall_confirm=Daha önceki bir sürüm kurulu görünüyor. Önceki sürümü kaldırmanız önerilir. Önceki sürümü kaldırmak istiyor musunuz?
 comp_TTX=Ekstra Eklentiler
+comp_ttlaunch=Launcher that opens Cygwin, MSYS2, Git Bash, WSL and other shells in Tera Term
 comp_TTXAlwaysOnTop=Her Zaman Üstte özelliği kullanılabilir
 comp_TTXKanjiMenu=Japon Kanji Kodunu VT-Pencere menüsünden değiştirir
 comp_TTXKcodeChange=Japon Kanji kodunu uzaktan komut ile değiştirir

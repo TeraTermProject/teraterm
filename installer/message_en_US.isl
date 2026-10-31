@@ -32,6 +32,7 @@ msg_language_italian=&Italian
 msg_del_confirm=Are you sure that you want to delete %s ?
 msg_uninstall_confirm=It seems a former version is installed. You are recommended to uninstall it previously. Do you uninstall former version ?
 comp_TTX=Additional Plugins
+comp_ttlaunch=Launcher that opens Cygwin, MSYS2, Git Bash, WSL and other shells in Tera Term
 comp_TTXAlwaysOnTop=Always On Top can be used
 comp_TTXKanjiMenu=Changes Japanese Kanji Code from VT-Window menu
 comp_TTXKcodeChange=Change Japanese Kanji code by remote sequence

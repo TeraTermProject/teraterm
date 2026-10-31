@@ -32,6 +32,7 @@ msg_language_turkish=T&urca
 msg_del_confirm=Vuoi eliminare %s?
 msg_uninstall_confirm=Sembra che è installata una versione precedente del programma.%n%nPrima di proseguire ti consigliamo di disinstallare la versione precedente.%n%nVuoi disinstallare la versione precedente?
 comp_TTX=Plugin aggiuntivi
+comp_ttlaunch=Launcher that opens Cygwin, MSYS2, Git Bash, WSL and other shells in Tera Term
 comp_TTXAlwaysOnTop=può essere usato 'Sempre in primo piano'
 comp_TTXKanjiMenu=modifiche al codice Kanji giapponese dal menu VT-Window
 comp_TTXKcodeChange=modifiche codice Kanji giapponese da sequenza remota

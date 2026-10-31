@@ -150,14 +150,14 @@ Source: {#SrcDir}\lang_utf16le\it_IT.lng; DestDir: {app}\lang_utf16le; Component
 Source: {#SrcDir}\lang_utf16le\tr_TR.lng; DestDir: {app}\lang_utf16le; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: {#SrcDir}\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: {#SrcDir}\ssh_known_hosts; DestDir: {app}; Components: TTSSH
-Source: {#SrcDir}\cygterm.cfg; DestDir: {app}; Components: cygterm
-Source: {#SrcDir}\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
-Source: {#SrcDir}\cygterm.exe; DestDir: {app}; Components: cygterm
-Source: {#SrcDir}\msys2term.exe; DestDir: {app}; Components: cygterm; Flags: skipifsourcedoesntexist
-Source: {#SrcDir}\msys2term.cfg; DestDir: {app}; Components: cygterm; Flags: skipifsourcedoesntexist
+Source: {#SrcDir}\cygterm.cfg; DestDir: {app}; Components: cygterm ttlaunch
+Source: {#SrcDir}\cygterm+.tar.gz; DestDir: {app}; Components: cygterm ttlaunch
+Source: {#SrcDir}\cygterm.exe; DestDir: {app}; Components: cygterm ttlaunch
+Source: {#SrcDir}\msys2term.exe; DestDir: {app}; Components: cygterm ttlaunch; Flags: skipifsourcedoesntexist
+Source: {#SrcDir}\msys2term.cfg; DestDir: {app}; Components: cygterm ttlaunch; Flags: skipifsourcedoesntexist
 Source: {#SrcDir}\cyglaunch.exe; DestDir: {app}; Components: cygterm
-Source: {#SrcDir}\ttlaunch.exe; DestDir: {app}; Components: cygterm; Flags: ignoreversion
-Source: {#SrcDir}\ttlaunch.lng; DestDir: {app}; Components: cygterm
+Source: {#SrcDir}\ttlaunch.exe; DestDir: {app}; Components: ttlaunch; Flags: ignoreversion
+Source: {#SrcDir}\ttlaunch.lng; DestDir: {app}; Components: ttlaunch
 Source: {#SrcDir}\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
 Source: {#SrcDir}\ttmenu_readme-j.txt; DestDir: {app}; DestName: "ttmenu_readme-j.txt"; Components: TeraTerm_Menu
 Source: {#SrcDir}\TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion
@@ -189,6 +189,7 @@ Name: custom; Description: {cm:type_custom}; Flags: iscustom
 Name: TeraTerm; Description: Tera Term & Macro; Flags: fixed; Types: custom compact full standard
 Name: TTSSH; Description: TTSSH; Types: compact full standard
 Name: cygterm; Description: CygTerm+; Types: full standard; Check: isExecutableCygtermX64
+Name: ttlaunch; Description: ttlaunch ({cm:comp_ttlaunch}); Types: full standard; Check: isExecutableCygtermX64
 Name: TeraTerm_Menu; Description: TeraTerm Menu; Types: full
 Name: TTProxy; Description: TTProxy; Types: full standard
 Name: Additional_Plugins; Description: {cm:comp_TTX}
@@ -207,7 +208,7 @@ Name: Additional_Plugins/TTXRecurringCommand; Description: TTXRecurringCommand (
 Name: {group}\Tera Term; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; IconIndex: 0; Components: TeraTerm; Flags: createonlyiffileexists
 Name: {group}\{cm:UninstallProgram,{#AppName}}; Filename: {uninstallexe}; Components: TeraTerm; Flags: createonlyiffileexists
 Name: {group}\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; IconIndex: 0; Components: cygterm; Flags: createonlyiffileexists
-Name: {group}\ttlaunch; Filename: {app}\ttlaunch.exe; Parameters: -setup; WorkingDir: {app}; IconFilename: {app}\ttlaunch.exe; IconIndex: 0; Components: cygterm; Flags: createonlyiffileexists
+Name: {group}\ttlaunch; Filename: {app}\ttlaunch.exe; Parameters: -setup; WorkingDir: {app}; IconFilename: {app}\ttlaunch.exe; IconIndex: 0; Components: ttlaunch; Flags: createonlyiffileexists
 Name: {group}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app}; IconFilename: {app}\ttpmenu.exe; IconIndex: 0; Components: TeraTerm_Menu; Flags: createonlyiffileexists
 Name: {autodesktop}\Tera Term 5; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; Components: TeraTerm; Tasks: desktopicon; IconIndex: 0; Flags: createonlyiffileexists
 Name: {autostartup}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app}; IconFilename: {app}\ttpmenu.exe; Components: TeraTerm_Menu; IconIndex: 0; Tasks: startupttmenuicon; Flags: createonlyiffileexists

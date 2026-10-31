@@ -32,6 +32,7 @@ msg_language_turkish=トルコ語(&U)
 msg_del_confirm=%s を削除しますか？
 msg_uninstall_confirm=以前のバージョンがインストールされているようです。先にアンインストールすることをお勧めします。アンインストールしますか？
 comp_TTX=追加プラグイン
+comp_ttlaunch=Cygwin, MSYS2, Git Bash, WSL などの shell を Tera Term で開くランチャー
 comp_TTXAlwaysOnTop=常に最前面に表示できるようにする
 comp_TTXKanjiMenu=日本語の漢字コードをVTウィンドウのメニューから設定できるようにする
 comp_TTXKcodeChange=リモートからのシーケンスで日本語の漢字コードを変更する
